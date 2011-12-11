@@ -1,4 +1,4 @@
--- vim: ft=mib comments=\f\:\",\b\:\-\-,\:\-\-,\f\b\:- fo+=tcqlornw tw=72 nocin nosi sts=4 sw=4 et
+-- vim: ft=mib comments=\f\b\:\"ITU\-T,\f\b\:ITU\-T,\f\:\",\b\:\-\-,\:\-\-,\f\b\:\-,\f\b\:\· fo+=tcqlornw12 tw=72 ai nocin nosi sts=4 sw=4 et
 -- =============================================================================
 -- 
 -- @(#) $RCSfile: OPENSS7-DL-MIB.mib,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2011-07-18 19:42:17 $
@@ -157,6 +157,18 @@ DummySyntax ::= TEXTUAL-CONVENTION
          holder for something more complex to be added later."
     SYNTAX      OCTET STRING
 
+DTEAddress ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "1d"
+    STATUS      current
+    DESCRIPTION 
+        "This textual convention represents a DTE address.  Per ISO/IEC 
+         10733, a DTE address is a numeric string of up to 15 digits.  
+         Therefore, this textual convention describes an OCTET STRING 
+         where the contents of each octet is the printable (ASCII) digit 
+         from 0 to 9.  The OCTET STRING can be a maximum length of 15 
+         digits."
+    SYNTAX      OCTET STRING (SIZE(0..15))
+
 LLCServices ::= TEXTUAL-CONVENTION
     STATUS      current
     DESCRIPTION 
@@ -298,7 +310,7 @@ OriginatingLSPBufferSize ::= TEXTUAL-CONVENTION
     DISPLAY-HINT "d-0"
     STATUS      current
     DESCRIPTION 
-        ""
+        "The originating LSP buffer size."
     REFERENCE   
         "ISO/IEC 10589 ASN.1 OriginatingLSPBufferSize."
     SYNTAX      Integer32 (512..1492)
@@ -422,7 +434,7 @@ communicationsEntityTable OBJECT-TYPE
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides a table of communications entities."
     REFERENCE   
         "ITU-T Rec. X.723 | ISO/IEC 10165-5 communicationsEntity MOC."
     ::= { communicationsEntity 1 }
@@ -432,7 +444,9 @@ communicationsEntityEntry OBJECT-TYPE
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION 
-        ""
+        "Each row is indexed by and defines the communications entity 
+         identifier.  Each row contains the local SAP names and 
+         operational state of the communications entity."
     REFERENCE   
         "ITU-T Rec. X.723 | ISO/IEC 10165-5 communicationsEntity MO."
     INDEX       { communicationsEntityId }
@@ -560,7 +574,7 @@ sap1Table OBJECT-TYPE
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides a table of Style 1 SAPs."
     REFERENCE   
         "ITU-T Rec. X.723 | ISO/IEC 10165-5 sap1 MOC."
     ::= { sap1 1 }
@@ -687,7 +701,7 @@ sap2Table OBJECT-TYPE
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides a table of Style 2 SAPs."
     REFERENCE   
         "ITU-T Rec. X.723 | ISO/IEC 10165-5 sap2 MOC."
     ::= { sap2 1 }
@@ -697,7 +711,8 @@ sap2Entry OBJECT-TYPE
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION 
-        ""
+        "Each row in this table is indexed by SAP identifier.  Each row 
+         contains the user entity names and provider entity names."
     REFERENCE   
         "ITU-T Rec. X.723 | ISO/IEC 10165-5 sap2 MO."
     INDEX       { sapId }
@@ -724,7 +739,8 @@ sap2UserEntityNames OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "The distinguished names of the (N+1) layer entities that use 
+         the services of this SAP."
     REFERENCE   
         "ITU-T Rec. X.723 | ISO/IEC 10165-5 userEntityNames."
     ::= { sap2Entry 2 }
@@ -734,7 +750,7 @@ sap2ProviderEntityNames OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        "The distinguished names of the (N-1) layer entities which 
+        "The distinguished names of the (N-1) layer entities that 
          provide services to this SAP."
     REFERENCE   
         "ITU-T Rec. X.723 | ISO/IEC 10165-5 providerEntityNames."
@@ -748,7 +764,7 @@ clProtocolMachineTable OBJECT-TYPE
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides a table of connectionless protocol machines."
     REFERENCE   
         "ITU-T Rec. X.723 | ISO/IEC 10165-5 clProtocolMachine MOC."
     ::= { clProtocolMachine 1 }
@@ -814,7 +830,7 @@ coProtocolMachineTable OBJECT-TYPE
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides a table of connection-oriented protocol machines."
     REFERENCE   
         "ITU-T Rec. X.723 | ISO/IEC 10165-5 coProtocolMachine MOC."
     ::= { coProtocolMachine 1 }
@@ -936,7 +952,7 @@ suppportedConnectionNames OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides the distinguished names of the supported connections."
     REFERENCE   
         "ITU-T Rec. X.723 | ISO/IEC 10165-5 supportedConnectionNames."
     ::= { singlePeerConnectionEntry 3 }
@@ -1245,7 +1261,7 @@ dataCircuitBitErrorsReceived OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides a count of the bit errors received on the circuit."
     REFERENCE   
         "ITU-T Rec. X.281 | ISO/IEC 13642 bitErrorsReceived."
     ::= { dataCircuitEntry 1 }
@@ -1255,7 +1271,7 @@ dataCircuitBitErrorsTransmitted OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides a count of the bit errors transmitted on the circuit."
     REFERENCE   
         "ITU-T Rec. X.281 | ISO/IEC 13642 bitErrorsTransmitted."
     ::= { dataCircuitEntry 2 }
@@ -1265,7 +1281,7 @@ dataCircuitBitErrorsThreshold OBJECT-TYPE
     MAX-ACCESS  read-create
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides an upper threshold for bit errors."
     REFERENCE   
         "ITU-T Rec. X.281 | ISO/IEC 13642 bitErrorsThreshold."
     ::= { dataCircuitEntry 3 }
@@ -1291,7 +1307,7 @@ dataCircuitPhysicalMediaNames OBJECT-TYPE
     MAX-ACCESS  read-create
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides the distinguished names of the physical media."
     REFERENCE   
         "ITU-T Rec. X.281 | ISO/IEC 13642 physicalMediaNames."
     ::= { dataCircuitEntry 5 }
@@ -1301,7 +1317,7 @@ dataCircuitPhysicalInterfaceType OBJECT-TYPE
     MAX-ACCESS  read-create
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides the physical interface type."
     REFERENCE   
         "ITU-T Rec. X.281 | ISO/IEC 13642 physicalInterfaceType."
     ::= { dataCircuitEntry 6 }
@@ -1311,7 +1327,7 @@ dataCircuitPhysicalInterfaceStandard OBJECT-TYPE
     MAX-ACCESS  read-create
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides the physical interface standard."
     REFERENCE   
         "ITU-T Rec. X.281 | ISO/IEC 13642 physicalInterfaceStandard."
     ::= { dataCircuitEntry 7 }
@@ -1570,7 +1586,7 @@ datalinkEntityTable OBJECT-TYPE
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides a table of data link entities."
     REFERENCE   
         "ITU-T Rec. X.282 | ISO/IEC 10742 datalinkEntity MOC."
     ::= { datalinkEntity 1 }
@@ -1580,7 +1596,8 @@ datalinkEntityEntry OBJECT-TYPE
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION 
-        ""
+        "Each row in this table is indexed by communications entity 
+         identifier.  Each row contains the provider entity names."
     REFERENCE   
         "ITU-T Rec. X.282 | ISO/IEC 10742 datalinkEntity MO."
     INDEX       { communicationsEntityId }
@@ -1630,7 +1647,9 @@ datalinkEntityRowStatus OBJECT-TYPE
     MAX-ACCESS  read-create
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides a mechanism whereby management stations may create and 
+         delete rows in this table.  Entries must persist across agent 
+         reboots."
     REFERENCE   
         "ITU-T Rec. X.282 | ISO/IEC 10742, 
          datalinkEntity-datalinkSubsystem."
@@ -1674,7 +1693,9 @@ dLSAPEntry OBJECT-TYPE
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION 
-        ""
+        "Each row in this table is indexed by communications entity and 
+         SAP identifiers.  Beyond membership, entries are otherwise 
+         empty."
     REFERENCE   
         "ITU-T Rec. X.282 | ISO/IEC 10742 dLSAP MO."
     INDEX       { communicationsEntityId, sapId }
@@ -2630,7 +2651,8 @@ sLPConnectionIVMOTable OBJECT-TYPE
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides a table of signle link protocol connection initial 
+         value managed objects."
     REFERENCE   
         "ITU-T Rec. X.282 | ISO/IEC 10742 sLPConnectionIVMO MOC."
     ::= { sLPConnectionIVMO 1 }
@@ -2640,11 +2662,12 @@ sLPConnectionIVMOEntry OBJECT-TYPE
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION 
-        ""
+        "Each row in this table in indexed by and defines the SLP 
+         connection IVMO identifier.  Each row contains initial values 
+         to be used when forming SLP connections."
     REFERENCE   
         "ITU-T Rec. X.282 | ISO/IEC 10742 sLPConnectionIVMO MOC."
-    INDEX       { communicationsEntityId, coProtocolMachineId, 
-                  connectionId }
+    INDEX       { sLPConnectionIVMOid }
     ::= { sLPConnectionIVMOTable 1 }
 
 SLPConnectionIVMOEntry ::= SEQUENCE {
@@ -2663,10 +2686,10 @@ SLPConnectionIVMOEntry ::= SEQUENCE {
 
 sLPConnectionIVMOid OBJECT-TYPE
     SYNTAX      SimpleNameType
-    MAX-ACCESS  read-only
+    MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides an index into the SLP connection IVMO table."
     REFERENCE   
         "ITU-T Rec. X.282 | ISO/IEC 10742."
     ::= { sLPConnectionIVMOEntry 1 }
@@ -2826,7 +2849,8 @@ mACDLEEntry OBJECT-TYPE
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION 
-        ""
+        "Each row in this table is indexed by communications entity 
+         identifier.  Each row, beyond membership, is otherwise empty."
     REFERENCE   
         "ITU-T Rec. X.272 | ISO/IEC 10742, mACDLE MO."
     INDEX       { communicationsEntityId }
@@ -2841,7 +2865,9 @@ mACDLERowStatus OBJECT-TYPE
     MAX-ACCESS  read-create
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides a mechanism whereby management stations may create and 
+         delete rows in this table.  Entries must persist across agent 
+         reboots."
     REFERENCE   
         "ITU-T Rec. X.282 | ISO/IEC 10742, mACDLE."
     ::= { mACDLEEntry 1 }
@@ -2854,7 +2880,7 @@ mACTable OBJECT-TYPE
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides a table of MAC addresses."
     REFERENCE   
         "ITU-T Rec. X.282 | ISO/IEC 10742 mAC MOC."
     ::= { mAC 1 }
@@ -2864,7 +2890,9 @@ mACEntry OBJECT-TYPE
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION 
-        ""
+        "Each row in this table is indexed by communications entity 
+         identifier and defines the MAC identifier.  Each row contains 
+         the operational state of the MAC."
     REFERENCE   
         "ITU-T Rec. X.282 | ISO/IEC 10742 mAC MO."
     INDEX       { communicationsEntityId, mACId }
@@ -2973,7 +3001,8 @@ lLCDLEEntry OBJECT-TYPE
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION 
-        ""
+        "Each entry in this table is indexed by communications entity 
+         identifier.  Each row, beyond membership, is otherwise empty."
     REFERENCE   
         "ITU-T Rec. X.282 | ISO/IEC 10742, lLCDLE MO."
     INDEX       { communicationsEntityId }
@@ -3078,7 +3107,9 @@ lLCCOPMEntry OBJECT-TYPE
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION 
-        ""
+        "Each row in this table is indexed by communications entity and 
+         connection-oriented protocol machine identifiers.  Each row, 
+         beyond membership, is otherwise empty."
     INDEX       { communicationsEntityId, coProtocolMachineId }
     ::= { lLCCOPMTable 1 }
 
@@ -3113,7 +3144,7 @@ resourceTypeIdTable OBJECT-TYPE
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides a table of resources associated with MAC DLEs."
     REFERENCE   
         "ISO/IEC 10742 but not ITU-T Rec. X.282"
     ::= { resourceTypeId 1 }
@@ -3123,7 +3154,9 @@ resourceTypeIdEntry OBJECT-TYPE
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION 
-        ""
+        "Each row in this table is indexed by communications entity 
+         identifier which identifies the MAC DLE.  Each row contains the 
+         available resources associated with the MAC DLE."
     REFERENCE   
         "ISO/IEC 10742 but not ITU-T Rec. X.282"
     INDEX       { communicationsEntityId }
@@ -3142,7 +3175,7 @@ resourceTypeIdName OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides an simple name for the resource entry."
     REFERENCE   
         "ISO/IEC 10742 but not ITU-T Rec. X.282"
     DEFVAL      { "RTID" }
@@ -3646,7 +3679,9 @@ lLCSAPEntry OBJECT-TYPE
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION 
-        ""
+        "Each row in this table is indexed by communications entity and 
+         SAP identifiers.  Each row contains the LSAP and whether RDE is 
+         provided."
     REFERENCE   
         "IEEE 802.2 (ISO/IEC 8802-2)."
     INDEX       { communicationsEntityId, sapId }
@@ -3711,7 +3746,9 @@ rDESetupEntry OBJECT-TYPE
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION 
-        ""
+        "Each row in this table is indexed by communications entity and 
+         SAP identifiers.  Each row contains information regarding RDE 
+         operation for the LLC SAP."
     REFERENCE   
         "IEEE 802.2 | ISO/IEC 8802-2 rDESetup MO."
     INDEX       { communicationsEntityId, sapId }
@@ -3757,7 +3794,7 @@ rDESetupEnableType2Reset OBJECT-TYPE
     MAX-ACCESS  read-write
     STATUS      current
     DESCRIPTION 
-        ""
+        "A value used to determine whether to enable Type 2 reset."
     REFERENCE   
         "IEEE 802.2 (ISO/IEC 8802-2), enableType2Reset."
     ::= { rDESetupEntry 3 }
@@ -4023,7 +4060,9 @@ lLCConnectionLessEntry OBJECT-TYPE
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION 
-        ""
+        "Each row in this table is indexed by communications entity 
+         and connectionless protocol machine.  Each row contains 
+         measurements concerning the connectionless SAP."
     REFERENCE   
         "IEEE 802.2 (ISO/IEC 8802-2), lLCConnectionless MO."
     INDEX       { communicationsEntityId, clProtocolMachineId, 
@@ -5115,11 +5154,12 @@ lLCConnection2IVMOEntry OBJECT-TYPE
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION 
-        ""
+        "Each row in this table is indexed by and defines the LLC 
+         style 2 connection IVMO identifier.  Each row contains initial 
+         values to be used when forming LLC style 2 connections."
     REFERENCE   
         "IEEE 802.2 (ISO/IEC 8802-2), lLCConenction2IVMO MO."
-    INDEX       { communicationsEntityId, coProtocolMachineId, 
-                  connectionId }
+    INDEX       { lLCConnection2IVMOName }
     ::= { lLCConnection2IVMOTable 1 }
 
 LLCConnection2IVMOEntry ::= SEQUENCE {
@@ -5142,7 +5182,7 @@ lLCConnection2IVMOName OBJECT-TYPE
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides a name for the set of initial values."
     REFERENCE   
         "IEEE 802.2 (ISO/IEC 8802-2)."
     ::= { lLCConnection2IVMOEntry 1 }
@@ -5319,7 +5359,11 @@ lLCConnectionlessAckEntry OBJECT-TYPE
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION 
-        ""
+        "Each row in this table is indexed by communications entity, 
+         connection-oriented protocol machine, and acknowledged 
+         connectionless association identifiers.  Each row contains 
+         measurements for a given acknowledged connectionless 
+         association."
     REFERENCE   
         "IEEE 802.2 (ISO/IEC 8802-2), lLCConnectionlessAck MO."
     INDEX       { communicationsEntityId, coProtocolMachineId, 
@@ -5855,7 +5899,8 @@ lLCConnectionlessAckIVMOTable OBJECT-TYPE
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides a table of initial values for acknowledged 
+         connectionless associations."
     REFERENCE   
         "IEEE 802.2 (ISO/IEC 8802-2), lLCCOnnectionlessAckIVMO MOC."
     ::= { lLCConnectionlessAckIVMO 1 }
@@ -5865,7 +5910,9 @@ lLCConnectionlessAckIVMOEntry OBJECT-TYPE
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION 
-        ""
+        "Each row in this table is indexed by communications entity, 
+         connection-oriented protocol machine identifiers and profile 
+         name.  Each row contains initial values."
     REFERENCE   
         "IEEE 802.2 (ISO/IEC 8802-2), lLCCOnnectionlessAckIVMO MO."
     INDEX       { communicationsEntityId, coProtocolMachineId, 
@@ -5885,7 +5932,7 @@ lLCConnectionlessAckIVMOName OBJECT-TYPE
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides a name for this initial value managed object."
     REFERENCE   
         "IEEE 802.2 (ISO/IEC 8802-2), lLCConnecionlessAckIVMOName."
     ::= { lLCConnectionlessAckIVMOEntry 1 }
@@ -5923,7 +5970,9 @@ lLCConnectionlessAckIVMORowStatus OBJECT-TYPE
     MAX-ACCESS  read-create
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides a mechanism whereby management stations may create and 
+         delete rows in this table.  Entries must persist across agent 
+         reboots."
     REFERENCE   
         "STD 58, SNMPv2-TC RowStatus."
     ::= { lLCConnectionlessAckIVMOEntry 4 }
@@ -6279,7 +6328,7 @@ cLNSOctetsSentCounter OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides a count of the number of octets sent."
     REFERENCE   
         "ITU-T Rec. X.283 | ISO/IEC 10733 octetsSentCounter."
     ::= { cLNSEntry 4 }
@@ -6289,7 +6338,7 @@ cLNSOctetsReceivedCounter OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides a count of the number of octets received."
     REFERENCE   
         "ITU-T Rec. X.283 | ISO/IEC 10733 octetsSentCounter."
     ::= { cLNSEntry 5 }
@@ -6299,7 +6348,7 @@ cLNSSegmentsReceived OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides a count of the number of segments received."
     REFERENCE   
         "ITU-T Rec. X.283 | ISO/IEC 10733 octetsSentCounter."
     ::= { cLNSEntry 6 }
@@ -6309,7 +6358,7 @@ cLNSSegmentsDiscarded OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides a count of the number of segments discarded."
     REFERENCE   
         "ITU-T Rec. X.283 | ISO/IEC 10733 octetsSentCounter."
     ::= { cLNSEntry 7 }
@@ -6319,7 +6368,8 @@ cLNSAssemblingSegmentsDiscarded OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides a count of the number of assembling segments 
+         discarded."
     REFERENCE   
         "ITU-T Rec. X.283 | ISO/IEC 10733 octetsSentCounter."
     ::= { cLNSEntry 8 }
@@ -6329,7 +6379,7 @@ cLNSErrorReportsReceived OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides a count of the number of error reports received."
     REFERENCE   
         "ITU-T Rec. X.283 | ISO/IEC 10733 octetsSentCounter."
     ::= { cLNSEntry 9 }
@@ -6339,7 +6389,7 @@ cLNSpDUDiscards OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides a count of the number of PDU discards."
     REFERENCE   
         "ITU-T Rec. X.283 | ISO/IEC 10733 octetsSentCounter."
     ::= { cLNSEntry 10 }
@@ -6349,7 +6399,7 @@ cLNSCongestionDiscards OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides a count of the number of congestion discard."
     REFERENCE   
         "ITU-T Rec. X.283 | ISO/IEC 10733 octetsSentCounter."
     ::= { cLNSEntry 11 }
@@ -6360,7 +6410,7 @@ cLNSMaximumLifetime OBJECT-TYPE
     MAX-ACCESS  read-create
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides the maximum lifetime in seconds."
     REFERENCE   
         "ITU-T Rec. X.283 | ISO/IEC 10733 maximumLifetime."
     ::= { cLNSEntry 12 }
@@ -6416,7 +6466,7 @@ cLNSISISTable OBJECT-TYPE
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides a table of ISIS protocol machines."
     REFERENCE   
         "ITU-T Rec. X.283 | ISO/IEC 10733."
     ::= { cLNSISIS 1 }
@@ -6426,7 +6476,9 @@ cLNSISISEntry OBJECT-TYPE
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION 
-        ""
+        "Each row is indexed by communications entity and connectionless 
+         protocol machine identifiers.  Each row contains protocol 
+         parameters for the ISIS protocol machine."
     REFERENCE   
         "ITU-T Rec. X.283 | ISO/IEC 10733."
     INDEX       { communicationsEntityId, clProtocolMachineId }
@@ -6472,7 +6524,7 @@ cLNSISISversion OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides the ISIS version."
     ::= { cLNSISISEntry 1 }
 
 cLNSISISiSType OBJECT-TYPE
@@ -6480,7 +6532,7 @@ cLNSISISiSType OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides the ISIS type."
     ::= { cLNSISISEntry 2 }
 
 cLNSISISsystemId OBJECT-TYPE
@@ -6488,7 +6540,7 @@ cLNSISISsystemId OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides the ISIS system identifier."
     ::= { cLNSISISEntry 3 }
 
 cLNSISISmaximumPathSplits OBJECT-TYPE
@@ -6496,7 +6548,7 @@ cLNSISISmaximumPathSplits OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides the maximum number of path splits."
     ::= { cLNSISISEntry 4 }
 
 cLNSISISminimumLSPTransmissionInterval OBJECT-TYPE
@@ -6504,7 +6556,7 @@ cLNSISISminimumLSPTransmissionInterval OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides the minimum LSP transmission interval."
     ::= { cLNSISISEntry 5 }
 
 cLNSISISmaximumLSPGenerationInterval OBJECT-TYPE
@@ -6512,7 +6564,7 @@ cLNSISISmaximumLSPGenerationInterval OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides the maximum LSP generation interval."
     ::= { cLNSISISEntry 6 }
 
 cLNSISISminimumBroadcastLSPTransmissionInterval OBJECT-TYPE
@@ -6520,7 +6572,7 @@ cLNSISISminimumBroadcastLSPTransmissionInterval OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides the minimum broadcast LSP transmission interval."
     ::= { cLNSISISEntry 7 }
 
 cLNSISIScompleteSNPInterval OBJECT-TYPE
@@ -6528,7 +6580,7 @@ cLNSISIScompleteSNPInterval OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides the complete SNP interval."
     ::= { cLNSISISEntry 8 }
 
 cLNSISISoriginatingL1LSPBufferSize OBJECT-TYPE
@@ -6536,7 +6588,7 @@ cLNSISISoriginatingL1LSPBufferSize OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides the originating L1 LSP buffer size."
     ::= { cLNSISISEntry 9 }
 
 cLNSISISmanualAreaAddresses OBJECT-TYPE
@@ -6544,7 +6596,7 @@ cLNSISISmanualAreaAddresses OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides the manual area addresses."
     ::= { cLNSISISEntry 10 }
 
 cLNSISISmaximumAreaAddresses OBJECT-TYPE
@@ -6552,7 +6604,7 @@ cLNSISISmaximumAreaAddresses OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides the maximum number of area addresses."
     ::= { cLNSISISEntry 11 }
 
 cLNSISISminimumLSPGenerationInterval OBJECT-TYPE
@@ -6560,7 +6612,7 @@ cLNSISISminimumLSPGenerationInterval OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides the minimum LSP generation interval."
     ::= { cLNSISISEntry 12 }
 
 cLNSISISpollESHelloRate OBJECT-TYPE
@@ -6568,7 +6620,7 @@ cLNSISISpollESHelloRate OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides the poll end-system hello rate."
     ::= { cLNSISISEntry 13 }
 
 cLNSISISpartialSNPInterval OBJECT-TYPE
@@ -6576,7 +6628,7 @@ cLNSISISpartialSNPInterval OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides the paritial SNP interval."
     ::= { cLNSISISEntry 14 }
 
 cLNSISISwaitingTime OBJECT-TYPE
@@ -6584,7 +6636,7 @@ cLNSISISwaitingTime OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides the waiting time."
     ::= { cLNSISISEntry 15 }
 
 cLNSISISdRISISHelloTimer OBJECT-TYPE
@@ -6592,7 +6644,7 @@ cLNSISISdRISISHelloTimer OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides the DR ISIS hello timer."
     ::= { cLNSISISEntry 16 }
 
 cLNSISISl1State OBJECT-TYPE
@@ -6600,7 +6652,7 @@ cLNSISISl1State OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides the L1 state."
     ::= { cLNSISISEntry 17 }
 
 cLNSISISareaAddresses OBJECT-TYPE
@@ -6608,7 +6660,7 @@ cLNSISISareaAddresses OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides the area addresses."
     ::= { cLNSISISEntry 18 }
 
 cLNSISIScorruptedLSPsDetected OBJECT-TYPE
@@ -6616,7 +6668,7 @@ cLNSISIScorruptedLSPsDetected OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides a count of the number of corrupted LSPs detected."
     ::= { cLNSISISEntry 19 }
 
 cLNSISISlSPL1DatabaseOverloads OBJECT-TYPE
@@ -6624,7 +6676,7 @@ cLNSISISlSPL1DatabaseOverloads OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides a count of the number of LSP L1 database overloads."
     ::= { cLNSISISEntry 20 }
 
 cLNSISISmanualAddressesDroppedFromAreas OBJECT-TYPE
@@ -6632,7 +6684,8 @@ cLNSISISmanualAddressesDroppedFromAreas OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides a count of the number of manual addresses dropped from 
+         areas."
     ::= { cLNSISISEntry 21 }
 
 cLNSISISattemptsToExceedMaximumSequenceNumber OBJECT-TYPE
@@ -6640,7 +6693,8 @@ cLNSISISattemptsToExceedMaximumSequenceNumber OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides a count of the number of attempts to exceed maximum 
+         sequence number."
     ::= { cLNSISISEntry 22 }
 
 cLNSISISsequenceNumberSkips OBJECT-TYPE
@@ -6648,7 +6702,7 @@ cLNSISISsequenceNumberSkips OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides a count of the number of sequence number skips."
     ::= { cLNSISISEntry 23 }
 
 cLNSISISownLSPPurges OBJECT-TYPE
@@ -6656,7 +6710,7 @@ cLNSISISownLSPPurges OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides a count of the number of own-LSP purges."
     ::= { cLNSISISEntry 24 }
 
 cLNSISISiDFieldLengthMismatches OBJECT-TYPE
@@ -6664,7 +6718,7 @@ cLNSISISiDFieldLengthMismatches OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides a count of the number of field length mismatches."
     ::= { cLNSISISEntry 25 }
 
 cLNSISISmaximumAreaAddressesMismatches OBJECT-TYPE
@@ -6672,7 +6726,8 @@ cLNSISISmaximumAreaAddressesMismatches OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides a count of the number of maximum area address 
+         mismatches."
     ::= { cLNSISISEntry 26 }
 
 cLNSISISoriginatingLSPBufferSizeMismatches OBJECT-TYPE
@@ -6680,7 +6735,8 @@ cLNSISISoriginatingLSPBufferSizeMismatches OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides a count of the number of originating LSP buffer size 
+         mismatches."
     ::= { cLNSISISEntry 27 }
 
 cLNSISISlSPTooLargeToPropagate OBJECT-TYPE
@@ -6688,7 +6744,8 @@ cLNSISISlSPTooLargeToPropagate OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides a count of the number of LSP too large to propagate 
+         events."
     ::= { cLNSISISEntry 28 }
 
 cLNSISISareaTransmitPassword OBJECT-TYPE
@@ -6696,7 +6753,7 @@ cLNSISISareaTransmitPassword OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides a count of the number of area transmit passwords."
     ::= { cLNSISISEntry 29 }
 
 cLNSISISareaReceivePasswords OBJECT-TYPE
@@ -6704,7 +6761,7 @@ cLNSISISareaReceivePasswords OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides a count of the number of area receive passwords."
     ::= { cLNSISISEntry 30 }
 
 cLNSISISauthenticationFailures OBJECT-TYPE
@@ -6712,7 +6769,7 @@ cLNSISISauthenticationFailures OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides a count of the number of authentication failures."
     ::= { cLNSISISEntry 31 }
 
 cLNSISISRowStatus OBJECT-TYPE
@@ -6720,7 +6777,9 @@ cLNSISISRowStatus OBJECT-TYPE
     MAX-ACCESS  read-create
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides a mechanism whereby management stations may create and 
+         delete rows in this table.  Entries must persist across agent 
+         reboots."
     ::= { cLNSISISEntry 32 }
 
 cLNSISISLevel2 OBJECT IDENTIFIER
@@ -6731,9 +6790,7 @@ cLNSISISLevel2Table OBJECT-TYPE
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION 
-        ""
-    REFERENCE   
-        ""
+        "Provides a table of ISIS Level 2 protocol machines."
     ::= { cLNSISISLevel2 1 }
 
 cLNSISISLevel2Entry OBJECT-TYPE
@@ -6741,9 +6798,9 @@ cLNSISISLevel2Entry OBJECT-TYPE
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION 
-        ""
-    REFERENCE   
-        ""
+        "Each row in this table is indexed by connection-oriented 
+         protocol machine identifier.  Each row contains parameters and 
+         measurements of ISIS level 2 operation."
     INDEX       { coProtocolMachineId }
     ::= { cLNSISISLevel2Table 1 }
 
@@ -6765,7 +6822,7 @@ cLNSISISLevel2maximumVirtualAdjacencies OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides the maximum virtual adjacencies."
     ::= { cLNSISISLevel2Entry 1 }
 
 cLNSISISLevel2partitionAreaAddresses OBJECT-TYPE
@@ -6773,7 +6830,7 @@ cLNSISISLevel2partitionAreaAddresses OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides the partition area addresses."
     ::= { cLNSISISLevel2Entry 2 }
 
 cLNSISISLevel2partitionDesignatedL2IntermediateSystem OBJECT-TYPE
@@ -6781,7 +6838,7 @@ cLNSISISLevel2partitionDesignatedL2IntermediateSystem OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides the partition designated L2 intermediate system."
     ::= { cLNSISISLevel2Entry 3 }
 
 cLNSISISLevel2partitionVirtualLinkChanges OBJECT-TYPE
@@ -6789,7 +6846,8 @@ cLNSISISLevel2partitionVirtualLinkChanges OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides a count of the number of partition virtual link 
+         changes."
     ::= { cLNSISISLevel2Entry 4 }
 
 cLNSISISLevel2originatingL2LSPBufferSize OBJECT-TYPE
@@ -6797,7 +6855,7 @@ cLNSISISLevel2originatingL2LSPBufferSize OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides the originating L2 LSP buffer size."
     ::= { cLNSISISLevel2Entry 5 }
 
 cLNSISISLevel2l2State OBJECT-TYPE
@@ -6805,7 +6863,7 @@ cLNSISISLevel2l2State OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides the ISIS L2 state."
     ::= { cLNSISISLevel2Entry 6 }
 
 cLNSISISLevel2lSPL2DatabaseOverloads OBJECT-TYPE
@@ -6813,7 +6871,7 @@ cLNSISISLevel2lSPL2DatabaseOverloads OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides a count of the number of LSP L2 database overloads."
     ::= { cLNSISISLevel2Entry 7 }
 
 cLNSISISLevel2domainTransmitPassword OBJECT-TYPE
@@ -6821,7 +6879,7 @@ cLNSISISLevel2domainTransmitPassword OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides the domain transmit password."
     ::= { cLNSISISLevel2Entry 8 }
 
 cLNSISISLevel2domainReceivePasswords OBJECT-TYPE
@@ -6829,7 +6887,7 @@ cLNSISISLevel2domainReceivePasswords OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides the domain receive passwords."
     ::= { cLNSISISLevel2Entry 9 }
 
 cLNSISISLevel2RowStatus OBJECT-TYPE
@@ -6837,7 +6895,9 @@ cLNSISISLevel2RowStatus OBJECT-TYPE
     MAX-ACCESS  read-create
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides a mechanism whereby management stations may create and 
+         delete rows in this table.  Entries must persist across agent 
+         reboots."
     ::= { cLNSISISLevel2Entry 10 }
 
 linkage OBJECT IDENTIFIER
@@ -6872,7 +6932,10 @@ linkageEntry OBJECT-TYPE
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION 
-        ""
+        "Each row in this table is indexed by communications entity and 
+         defines the protocol machine and linkage identifiers.  Each row 
+         contains characteristics and measurements associated with the 
+         linkage."
     REFERENCE   
         "ITU-T Rec. X.283 | ISO/IEC 10733 linkage MO."
     INDEX       { communicationsEntityId, protocolMachineId, linkageId }
@@ -6920,7 +6983,7 @@ LinkageEntry ::= SEQUENCE {
     linkageISISrejectedAdjacencies                          Counter32,
     linkageISISiSISControlPDUsSent                          Counter32,
     linkageISISiSISControlPDUsReceived                      Counter32,
-    linkageISISiDFieldLenthMismatches                       Counter32,
+    linkageISISiDFieldLengthMismatches                      Counter32,
     linkageISISmaximumAreaAddressesMismatches               Counter32,
     linkageISIScircuitTransmitPassword                      DummySyntax,
     linkageISIScircuitReceivedPasswords                     DummySyntax,
@@ -6944,7 +7007,7 @@ LinkageEntry ::= SEQUENCE {
     linkageISISl2IntermediateSystemPriority                 DummySyntax,
     linkageISISl2CircuitID                                  DummySyntax,
     linkageISISl2DesignatedIntermediateSystem               DummySyntax,
-    linkageISISlanL2DesignatedIntermediteSystemChanges      Counter32,
+    linkageISISlanL2DesignatedIntermediateSystemChanges     Counter32,
     linkageRowStatus                                        RowStatus
 }
 
@@ -6953,7 +7016,7 @@ protocolMachineId OBJECT-TYPE
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides a protocol machine identifier for use as an index."
     ::= { linkageEntry 1 }
 
 linkageId OBJECT-TYPE
@@ -6961,7 +7024,7 @@ linkageId OBJECT-TYPE
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides a linkage identifier for use as an index."
     ::= { linkageEntry 2 }
 
 linkageOperationalState OBJECT-TYPE
@@ -6969,7 +7032,8 @@ linkageOperationalState OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides the operational state of the linkage following the 
+         OperationalState textual conventions and X.721."
     ::= { linkageEntry 3 }
 
 linkageAdministrativeState OBJECT-TYPE
@@ -6977,7 +7041,8 @@ linkageAdministrativeState OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides the administrative state of the linkage following the 
+         AdministrativeState textual convention and X.721."
     ::= { linkageEntry 4 }
 
 linkageSnServiceProvider OBJECT-TYPE
@@ -6985,7 +7050,8 @@ linkageSnServiceProvider OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides provides a pointer to the subnetwork service provider 
+         for this linkage."
     ::= { linkageEntry 5 }
 
 linkageSnSAP OBJECT-TYPE
@@ -6993,7 +7059,7 @@ linkageSnSAP OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides a pointer to the SAP for this linkage."
     ::= { linkageEntry 6 }
 
 linkageOperationalProtocols OBJECT-TYPE
@@ -7001,7 +7067,7 @@ linkageOperationalProtocols OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides the operational protocols supported by the linkage."
     ::= { linkageEntry 7 }
 
 -- linkage-ISO9542IS-P conditional package OBJECT-TYPE
@@ -7010,7 +7076,8 @@ linkageISiSO9542OperationalSubsets OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides the ISO 9542 operational subsets supported by the 
+         linkage."
     ::= { linkageEntry 8 }
 
 linkageISHoldingTimerMultiplier OBJECT-TYPE
@@ -7018,7 +7085,7 @@ linkageISHoldingTimerMultiplier OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides the IS holding time multiplier."
     ::= { linkageEntry 9 }
 
 linkageISISConfigurationTimer OBJECT-TYPE
@@ -7026,7 +7093,7 @@ linkageISISConfigurationTimer OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides the ISIS configuration timer."
     ::= { linkageEntry 10 }
 
 linkageISSuggestedEsConfigurationTimer OBJECT-TYPE
@@ -7034,7 +7101,7 @@ linkageISSuggestedEsConfigurationTimer OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides the IS suggested ES configuration timer."
     ::= { linkageEntry 11 }
 
 linkageISRedirectHoldingTime OBJECT-TYPE
@@ -7042,7 +7109,7 @@ linkageISRedirectHoldingTime OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides the IS redirect holding time."
     ::= { linkageEntry 12 }
 
 linkageISESReachabilityChanges OBJECT-TYPE
@@ -7050,7 +7117,7 @@ linkageISESReachabilityChanges OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides a count of the number of IS-ES reachability changes."
     ::= { linkageEntry 13 }
 
 linkageISInvalid9542PDUs OBJECT-TYPE
@@ -7058,7 +7125,8 @@ linkageISInvalid9542PDUs OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides a count of the number of invalid ISO 9542 PDUs 
+         received."
     ::= { linkageEntry 14 }
 
 -- linkage-ISO9542ES-P conditional package OBJECT-TYPE
@@ -7067,7 +7135,7 @@ linkageESiSO9542OperationalSubsets OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides the ES ISO 9542 operational subsets for the linkage."
     ::= { linkageEntry 15 }
 
 linkageESHoldingTimerMultiplier OBJECT-TYPE
@@ -7075,7 +7143,7 @@ linkageESHoldingTimerMultiplier OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides the ES holding time multiplier."
     ::= { linkageEntry 16 }
 
 linkageESManualISSNPAAddress OBJECT-TYPE
@@ -7083,7 +7151,7 @@ linkageESManualISSNPAAddress OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides the ES manual IS SNPA address."
     ::= { linkageEntry 17 }
 
 linkageESDefaultESConfigTimer OBJECT-TYPE
@@ -7091,7 +7159,7 @@ linkageESDefaultESConfigTimer OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides the ES default ES configuration timer."
     ::= { linkageEntry 18 }
 
 linkageESActiveESConfigTimer OBJECT-TYPE
@@ -7099,7 +7167,7 @@ linkageESActiveESConfigTimer OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides the ES active ES configuration timer."
     ::= { linkageEntry 19 }
 
 linkageESISReachabilityChanges OBJECT-TYPE
@@ -7107,7 +7175,7 @@ linkageESISReachabilityChanges OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides a count of the number of IS reachability changes."
     ::= { linkageEntry 20 }
 
 linkageESInvalid9542PDUs OBJECT-TYPE
@@ -7115,7 +7183,8 @@ linkageESInvalid9542PDUs OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides a count of the number of ES invalid ISO 9542 PDUs 
+         received."
     ::= { linkageEntry 21 }
 
 -- linkage-ISO9542Checksum-P conditional package OBJECT-TYPE
@@ -7124,7 +7193,7 @@ linkageEnableChecksum OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Specifies whether checksums are to be applied."
     ::= { linkageEntry 22 }
 
 -- linkageInitialMinimumTimer-P conditional package OBJECT-TYPE
@@ -7133,7 +7202,8 @@ linkageInitialMinimumTimer OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Specifies whether initial minimum timer handling is to be 
+         performed."
     ::= { linkageEntry 23 }
 
 -- linkageReserveTimer-P conditional package OBJECT-TYPE
@@ -7142,7 +7212,7 @@ linkageReserveTimer OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides the reserve timer."
     ::= { linkageEntry 24 }
 
 -- linkageIdleTimer-P conditional package OBJECT-TYPE
@@ -7151,7 +7221,7 @@ linkageIdleTimer OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides the idle timer."
     ::= { linkageEntry 25 }
 
 -- linkage-ISO8473-ISO8208SNDCF-P conditional package OBJECT-TYPE
@@ -7160,7 +7230,7 @@ linkageSNDCFCallsPlaced OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides a count of the number of SNDCF calls placed."
     ::= { linkageEntry 26 }
 
 linkageSNDCFCallsFailed OBJECT-TYPE
@@ -7168,7 +7238,7 @@ linkageSNDCFCallsFailed OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides a count of the number of SNDCF calls failed."
     ::= { linkageEntry 27 }
 
 -- linkageCODLService-P conditional package OBJECT-TYPE
@@ -7177,7 +7247,7 @@ linkageCODLCallsPlaced OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides a count of the number of CODL calls placed."
     ::= { linkageEntry 28 }
 
 linkageCODLCallsFailed OBJECT-TYPE
@@ -7185,7 +7255,7 @@ linkageCODLCallsFailed OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides a count of the number of CODL calls failed."
     ::= { linkageEntry 29 }
 
 -- linkageISISBasic-P conditional package OBJECT-TYPE
@@ -7194,7 +7264,7 @@ linkageISISType OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides the ISIS type."
     ::= { linkageEntry 30 }
 
 linkageISISiSISHelloTimer OBJECT-TYPE
@@ -7202,7 +7272,7 @@ linkageISISiSISHelloTimer OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides the ISIS hello timer."
     ::= { linkageEntry 31 }
 
 linkageISISl1DefaultMetric OBJECT-TYPE
@@ -7210,7 +7280,7 @@ linkageISISl1DefaultMetric OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides the ISIS L1 default metric."
     ::= { linkageEntry 32 }
 
 linkageISISl1DelayMetric OBJECT-TYPE
@@ -7218,7 +7288,7 @@ linkageISISl1DelayMetric OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides the ISIS L1 delay metric."
     ::= { linkageEntry 33 }
 
 linkageISISl1ExpenseMetric OBJECT-TYPE
@@ -7226,7 +7296,7 @@ linkageISISl1ExpenseMetric OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides the ISIS L1 expense metric."
     ::= { linkageEntry 34 }
 
 linkageISISl1ErrorMetric OBJECT-TYPE
@@ -7234,7 +7304,7 @@ linkageISISl1ErrorMetric OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides the ISIS L1 error metric."
     ::= { linkageEntry 35 }
 
 linkageISISexternalDomain OBJECT-TYPE
@@ -7242,7 +7312,7 @@ linkageISISexternalDomain OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides the ISIS external domain."
     ::= { linkageEntry 36 }
 
 linkageISISchangedInAdjacencyState OBJECT-TYPE
@@ -7250,7 +7320,8 @@ linkageISISchangedInAdjacencyState OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides a count of the number of ISIS changes in adjacency 
+         state."
     ::= { linkageEntry 37 }
 
 linkageISISinitialisationFailures OBJECT-TYPE
@@ -7258,7 +7329,7 @@ linkageISISinitialisationFailures OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides a count of the number of ISIS initialization failures."
     ::= { linkageEntry 38 }
 
 linkageISISrejectedAdjacencies OBJECT-TYPE
@@ -7266,7 +7337,7 @@ linkageISISrejectedAdjacencies OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides a count of the number of ISIS rejected adjacencies."
     ::= { linkageEntry 39 }
 
 linkageISISiSISControlPDUsSent OBJECT-TYPE
@@ -7274,7 +7345,7 @@ linkageISISiSISControlPDUsSent OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides a count of the number of ISIS control PDUs sent."
     ::= { linkageEntry 40 }
 
 linkageISISiSISControlPDUsReceived OBJECT-TYPE
@@ -7282,15 +7353,16 @@ linkageISISiSISControlPDUsReceived OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides a count of the number of ISIS control PDUs received."
     ::= { linkageEntry 41 }
 
-linkageISISiDFieldLenthMismatches OBJECT-TYPE
+linkageISISiDFieldLengthMismatches OBJECT-TYPE
     SYNTAX      Counter32
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides a count of the number of ISIS Id field length 
+         mismatches."
     ::= { linkageEntry 42 }
 
 linkageISISmaximumAreaAddressesMismatches OBJECT-TYPE
@@ -7298,7 +7370,8 @@ linkageISISmaximumAreaAddressesMismatches OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides a count of the number of ISIS maximum area addresses 
+         mismatches."
     ::= { linkageEntry 43 }
 
 -- linkageISISAuthentication-P conditional package OBJECT-TYPE
@@ -7307,7 +7380,7 @@ linkageISIScircuitTransmitPassword OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides the ISIS circuit transmit password."
     ::= { linkageEntry 44 }
 
 linkageISIScircuitReceivedPasswords OBJECT-TYPE
@@ -7315,7 +7388,7 @@ linkageISIScircuitReceivedPasswords OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides the ISIS circuit received passwords."
     ::= { linkageEntry 45 }
 
 linkageISISauthenticationFailures OBJECT-TYPE
@@ -7323,7 +7396,8 @@ linkageISISauthenticationFailures OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides a count of the number of ISIS authentication 
+         failures."
     ::= { linkageEntry 46 }
 
 -- linkageISISBroadcast-P conditional package OBJECT-TYPE
@@ -7332,7 +7406,7 @@ linkageISISl1IntermediateSystemPriority OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides the ISIS L1 intermediate system priority."
     ::= { linkageEntry 47 }
 
 linkageISISl1CircuitID OBJECT-TYPE
@@ -7340,7 +7414,7 @@ linkageISISl1CircuitID OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides the ISIS L1 circuit identifier."
     ::= { linkageEntry 48 }
 
 linkageISISl1DesignatedIntermediateSystem OBJECT-TYPE
@@ -7348,7 +7422,7 @@ linkageISISl1DesignatedIntermediateSystem OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides the ISIS L1 designated intermediate system."
     ::= { linkageEntry 49 }
 
 linkageISISlanL1DesignatedIntermediateSystemChanges OBJECT-TYPE
@@ -7356,7 +7430,8 @@ linkageISISlanL1DesignatedIntermediateSystemChanges OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides a count fo the number of ISIS LAN L1 designated 
+         intermediate system changes."
     ::= { linkageEntry 50 }
 
 -- linkageISISDACallEstablishmentMetricIncrement-P conditional package 
@@ -7366,7 +7441,7 @@ linkageISIScallEstablishmentDefaultMetricIncrement OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides the ISIS call establishment default metric increment."
     ::= { linkageEntry 51 }
 
 linkageISIScallEstablishmentDelayMetricIncrement OBJECT-TYPE
@@ -7374,7 +7449,7 @@ linkageISIScallEstablishmentDelayMetricIncrement OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides the ISIS call establishment delay metric increment."
     ::= { linkageEntry 52 }
 
 linkageISIScallEstablishmentExpenseMetricIncrement OBJECT-TYPE
@@ -7382,7 +7457,7 @@ linkageISIScallEstablishmentExpenseMetricIncrement OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides the ISIS call establishment expense metric increment."
     ::= { linkageEntry 53 }
 
 linkageISIScallEstablishmentErrorMetricIncrement OBJECT-TYPE
@@ -7390,7 +7465,7 @@ linkageISIScallEstablishmentErrorMetricIncrement OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides the ISIS call establishment error metric increment."
     ::= { linkageEntry 54 }
 
 -- linkageISISPtToPt-P or linkageISISStatic-P conditional package
@@ -7399,7 +7474,7 @@ linkageISISptPtCircuitID OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides the ISIS point-to-point circuit identifier."
     ::= { linkageEntry 55 }
 
 -- linkageISISStatic-P conditional package OBJECT-TYPE
@@ -7408,7 +7483,8 @@ linkageISISoutgoingCallIVMO OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides a pointer to the ISIS outgoing call initial values 
+         managed object (IVMO)."
     ::= { linkageEntry 56 }
 
 linkageISISneighborSNPAAddress OBJECT-TYPE
@@ -7416,7 +7492,7 @@ linkageISISneighborSNPAAddress OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides the ISIS neighbor SNPA address."
     ::= { linkageEntry 57 }
 
 -- linkageISISLevel2-P conditional package OBJECT-TYPE
@@ -7425,7 +7501,7 @@ linkageISISl2DefaultMetric OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides the ISIS L2 default metric."
     ::= { linkageEntry 58 }
 
 linkageISISl2DelayMetric OBJECT-TYPE
@@ -7433,7 +7509,7 @@ linkageISISl2DelayMetric OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides the ISIS L2 delay metric."
     ::= { linkageEntry 59 }
 
 linkageISISl2ExpenseMetric OBJECT-TYPE
@@ -7441,7 +7517,7 @@ linkageISISl2ExpenseMetric OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides the ISIS L2 expense metric."
     ::= { linkageEntry 60 }
 
 linkageISISl2ErrorMetric OBJECT-TYPE
@@ -7449,7 +7525,7 @@ linkageISISl2ErrorMetric OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides the ISIS L2 error metric."
     ::= { linkageEntry 61 }
 
 linkageISISmanualL2OnlyMode OBJECT-TYPE
@@ -7457,7 +7533,7 @@ linkageISISmanualL2OnlyMode OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides the ISIS manual L2 only mode setting."
     ::= { linkageEntry 62 }
 
 -- linkageISISLevel2Broadcast-P conditional package OBJECT-TYPE
@@ -7466,7 +7542,7 @@ linkageISISl2IntermediateSystemPriority OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides the ISIS L2 intermediate system priority."
     ::= { linkageEntry 63 }
 
 linkageISISl2CircuitID OBJECT-TYPE
@@ -7474,7 +7550,7 @@ linkageISISl2CircuitID OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides the ISIS L2 circuit identifier."
     ::= { linkageEntry 64 }
 
 linkageISISl2DesignatedIntermediateSystem OBJECT-TYPE
@@ -7482,15 +7558,16 @@ linkageISISl2DesignatedIntermediateSystem OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides the ISIS L2 designated intermediate system."
     ::= { linkageEntry 65 }
 
-linkageISISlanL2DesignatedIntermediteSystemChanges OBJECT-TYPE
+linkageISISlanL2DesignatedIntermediateSystemChanges OBJECT-TYPE
     SYNTAX      Counter32
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides a count of the number of ISIS LAN L2 designated 
+         intermediate system changes."
     ::= { linkageEntry 66 }
 
 -- OBJECT-TYPE
@@ -7499,7 +7576,9 @@ linkageRowStatus OBJECT-TYPE
     MAX-ACCESS  read-create
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides a mechanism whereby management stations may create and 
+         delete rows in this table.  Entries must persist across agent 
+         reboots."
     ::= { linkageEntry 67 }
 
 cONS OBJECT IDENTIFIER
@@ -7533,7 +7612,10 @@ cONSEntry OBJECT-TYPE
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION 
-        ""
+        "Each entry in this table is indexed by communications entity 
+         and connection-oriented protocol machine identifiers.  Each 
+         entry contains the administrative state of the CONS and system 
+         types."
     REFERENCE   
         "ITU-T Rec. X.283 | ISO/IEC 10733 cONS MOC."
     INDEX       { communicationsEntityId, coProtocolMachineId }
@@ -7551,7 +7633,8 @@ cONSAdministrativeState OBJECT-TYPE
     MAX-ACCESS  read-create
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides the administrative state of the CONS following the 
+         AdministrativeState textual convention and X.721."
     REFERENCE   
         "ITU-T Rec. X.721 | ISO/IEC 10165-2 administrativeState."
     ::= { cONSEntry 1 }
@@ -7561,7 +7644,8 @@ cONSOperationalSystemType OBJECT-TYPE
     MAX-ACCESS  read-create
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides the operational system type, which can be one or both 
+         of: es(0), end system; or, is(1) intermediate system."
     REFERENCE   
         "ITU-T Rec. X.283 | ISO/IEC 10733 operationalSystemType."
     ::= { cONSEntry 2 }
@@ -7636,7 +7720,8 @@ networkConnectionLocalNSAPMO OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides a pointer to the local NSAP managed object for this 
+         network connection."
     ::= { networkConnectionEntry 1 }
 
 networkConnectionRemoteNSAPAddress OBJECT-TYPE
@@ -7644,7 +7729,8 @@ networkConnectionRemoteNSAPAddress OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides a pointer to the remote NSAP managed object for this 
+         network connection."
     ::= { networkConnectionEntry 2 }
 
 networkConnectionRowStatus OBJECT-TYPE
@@ -7652,7 +7738,9 @@ networkConnectionRowStatus OBJECT-TYPE
     MAX-ACCESS  read-create
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides a mechanism whereby management stations may create and 
+         delete rows in this table.  Entries created by management 
+         stations must perist across agent reboots."
     ::= { networkConnectionEntry 3 }
 
 x25PLE OBJECT IDENTIFIER
@@ -7663,7 +7751,7 @@ x25PLETable OBJECT-TYPE
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides a table of X.25 packet layer link entities."
     REFERENCE   
         "ITU-T Rec. X.283 | ISO/IEC 10733 x25PLE MOC."
     ::= { x25PLE 1 }
@@ -7673,7 +7761,8 @@ x25PLEEntry OBJECT-TYPE
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION 
-        ""
+        "Each row in this table is defines the X.25 packet layer link 
+         entity identifier."
     REFERENCE   
         "ITU-T Rec. X.283 | ISO/IEC 10733 x25PLE MO."
     INDEX       { x25PLEId }
@@ -7684,7 +7773,7 @@ X25PLEEntry ::= SEQUENCE {
     x25PLEoperationalState                      OperationalState,
     x25PLEadministrativeState                   AdministrativeState,
     x25PLEprotocolVersionSupported              DummySyntax,
-    x25PLElocalDTEAddress                       DummySyntax,
+    x25PLElocalDTEAddress                       DTEAddress,
     x25PLEMode                                  X25PLEMode,
     x25PLEdefaultThroughputClasses              DummySyntax,
     x25PLEflowControlParameterNegotiation       DummySyntax,
@@ -7738,7 +7827,8 @@ x25PLEId OBJECT-TYPE
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides an X.25 packet layer link entity identifier for use as 
+         an index into this table."
     ::= { x25PLEEntry 1 }
 
 x25PLEoperationalState OBJECT-TYPE
@@ -7746,7 +7836,8 @@ x25PLEoperationalState OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides the operational state of the link entity following the 
+         OperationalState textual convention and X.721."
     ::= { x25PLEEntry 2 }
 
 x25PLEadministrativeState OBJECT-TYPE
@@ -7754,7 +7845,8 @@ x25PLEadministrativeState OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides the administrative state of the link entity following 
+         the AdministrativeState textual convention an X.721."
     ::= { x25PLEEntry 3 }
 
 x25PLEprotocolVersionSupported OBJECT-TYPE
@@ -7762,15 +7854,15 @@ x25PLEprotocolVersionSupported OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides the protocol versions supported."
     ::= { x25PLEEntry 4 }
 
 x25PLElocalDTEAddress OBJECT-TYPE
-    SYNTAX      DummySyntax
+    SYNTAX      DTEAddress
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides the local DTE address."
     ::= { x25PLEEntry 5 }
 
 x25PLEMode OBJECT-TYPE
@@ -7778,7 +7870,7 @@ x25PLEMode OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides the mode."
     ::= { x25PLEEntry 6 }
 
 x25PLEdefaultThroughputClasses OBJECT-TYPE
@@ -7786,7 +7878,7 @@ x25PLEdefaultThroughputClasses OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides the default throughput class."
     ::= { x25PLEEntry 7 }
 
 x25PLEflowControlParameterNegotiation OBJECT-TYPE
@@ -7794,7 +7886,7 @@ x25PLEflowControlParameterNegotiation OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides for flow control parameter negotiation."
     ::= { x25PLEEntry 8 }
 
 x25PLEdefaultPackageSizes OBJECT-TYPE
@@ -7802,7 +7894,7 @@ x25PLEdefaultPackageSizes OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides the default packet sizes."
     ::= { x25PLEEntry 9 }
 
 x25PLEthroughputClassNegotiation OBJECT-TYPE
@@ -7810,7 +7902,7 @@ x25PLEthroughputClassNegotiation OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides for throughput class negotiation."
     ::= { x25PLEEntry 10 }
 
 x25PLEsNserviceProvider OBJECT-TYPE
@@ -7818,7 +7910,7 @@ x25PLEsNserviceProvider OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides a pointer to the SN service provider."
     ::= { x25PLEEntry 11 }
 
 x25PLEsNsAP OBJECT-TYPE
@@ -7826,7 +7918,7 @@ x25PLEsNsAP OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides the SN SAP."
     ::= { x25PLEEntry 12 }
 
 x25PElogicalChannelAssignments OBJECT-TYPE
@@ -7834,7 +7926,7 @@ x25PElogicalChannelAssignments OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides the logical channel assignments."
     ::= { x25PLEEntry 13 }
 
 x25PLEinterfaceMode OBJECT-TYPE
@@ -7842,7 +7934,7 @@ x25PLEinterfaceMode OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides the interface mode."
     ::= { x25PLEEntry 14 }
 
 x25PLEdefaultThroughputClass OBJECT-TYPE
@@ -7850,7 +7942,7 @@ x25PLEdefaultThroughputClass OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides the default throughput class."
     ::= { x25PLEEntry 15 }
 
 x25PLEflowControlNegotiationPermitted OBJECT-TYPE
@@ -7858,7 +7950,7 @@ x25PLEflowControlNegotiationPermitted OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides for flow control negotiation permission."
     ::= { x25PLEEntry 16 }
 
 x25PLEcallDeflectionSubscription OBJECT-TYPE
@@ -7866,7 +7958,7 @@ x25PLEcallDeflectionSubscription OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides for call deflection subscription."
     ::= { x25PLEEntry 17 }
 
 x25PLEmaxActiveCircuits OBJECT-TYPE
@@ -7874,7 +7966,7 @@ x25PLEmaxActiveCircuits OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides the maximum number of active circuits."
     ::= { x25PLEEntry 18 }
 
 x25PLErestartTime OBJECT-TYPE
@@ -7882,7 +7974,7 @@ x25PLErestartTime OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides the restart time."
     ::= { x25PLEEntry 19 }
 
 x25PLEdefaultPacketSize OBJECT-TYPE
@@ -7890,7 +7982,7 @@ x25PLEdefaultPacketSize OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides the default packet size."
     ::= { x25PLEEntry 20 }
 
 x25PLEdefaultWindowSize OBJECT-TYPE
@@ -7898,7 +7990,7 @@ x25PLEdefaultWindowSize OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides the default window size."
     ::= { x25PLEEntry 21 }
 
 x25PLEminimumRecallTimer OBJECT-TYPE
@@ -7906,7 +7998,7 @@ x25PLEminimumRecallTimer OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides the minimum recall timer."
     ::= { x25PLEEntry 22 }
 
 x25PLErestartCount OBJECT-TYPE
@@ -7914,7 +8006,7 @@ x25PLErestartCount OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides the restart count."
     ::= { x25PLEEntry 23 }
 
 x25PLEsN-ServiceProvider OBJECT-TYPE
@@ -7922,7 +8014,7 @@ x25PLEsN-ServiceProvider OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides the SN service provider."
     ::= { x25PLEEntry 24 }
 
 x25PLEsN-SA-P OBJECT-TYPE
@@ -7930,7 +8022,7 @@ x25PLEsN-SA-P OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides the SN SA P."
     ::= { x25PLEEntry 25 }
 
 x25PLElogicalChannelAssignments OBJECT-TYPE
@@ -7938,7 +8030,7 @@ x25PLElogicalChannelAssignments OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides logical channel assignments."
     ::= { x25PLEEntry 26 }
 
 x25PLEpacketSequencing OBJECT-TYPE
@@ -7946,7 +8038,7 @@ x25PLEpacketSequencing OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides for packet sequencing."
     ::= { x25PLEEntry 27 }
 
 x25PLEoctetsSentCounter OBJECT-TYPE
@@ -7954,7 +8046,7 @@ x25PLEoctetsSentCounter OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides a count of the number of octets sent."
     ::= { x25PLEEntry 28 }
 
 x25PLEoctetsReceivedCounter OBJECT-TYPE
@@ -7962,7 +8054,7 @@ x25PLEoctetsReceivedCounter OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides a count of the number of octets received."
     ::= { x25PLEEntry 29 }
 
 x25PLEdataPacketsSent OBJECT-TYPE
@@ -7970,7 +8062,7 @@ x25PLEdataPacketsSent OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides a count of the number of data packets sent."
     ::= { x25PLEEntry 30 }
 
 x25PLEdataPacketsReceived OBJECT-TYPE
@@ -7978,7 +8070,7 @@ x25PLEdataPacketsReceived OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides a count of the number of data packets received."
     ::= { x25PLEEntry 31 }
 
 x25PLEcallAttempts OBJECT-TYPE
@@ -7986,7 +8078,7 @@ x25PLEcallAttempts OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides a count of the number of call attempts."
     ::= { x25PLEEntry 32 }
 
 x25PLEcallsConnected OBJECT-TYPE
@@ -7994,7 +8086,7 @@ x25PLEcallsConnected OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides a count of the number of calls connected."
     ::= { x25PLEEntry 33 }
 
 x25PLEproviderInitiatedDisconnects OBJECT-TYPE
@@ -8002,7 +8094,8 @@ x25PLEproviderInitiatedDisconnects OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides a count of the number of provider initiated 
+         disconnects."
     ::= { x25PLEEntry 34 }
 
 x25PLEcallTimeouts OBJECT-TYPE
@@ -8010,7 +8103,7 @@ x25PLEcallTimeouts OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides a count of the number of call timeouts."
     ::= { x25PLEEntry 35 }
 
 x25PLEclearTimeouts OBJECT-TYPE
@@ -8018,7 +8111,7 @@ x25PLEclearTimeouts OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides a count of the number of clear timeouts."
     ::= { x25PLEEntry 36 }
 
 x25PLEremotelyInitiatedResets OBJECT-TYPE
@@ -8026,7 +8119,7 @@ x25PLEremotelyInitiatedResets OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides a count of the number of remotely initiated resets."
     ::= { x25PLEEntry 37 }
 
 x25PLEdataRetransmissionTimerExpiries OBJECT-TYPE
@@ -8034,7 +8127,8 @@ x25PLEdataRetransmissionTimerExpiries OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides a count of the number of data retransmission timer 
+         expiries."
     ::= { x25PLEEntry 38 }
 
 x25PLEproviderInitiatedResets OBJECT-TYPE
@@ -8042,7 +8136,7 @@ x25PLEproviderInitiatedResets OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides a count of the number of provider initiated resets."
     ::= { x25PLEEntry 39 }
 
 x25PLEresetTimeouts OBJECT-TYPE
@@ -8050,7 +8144,7 @@ x25PLEresetTimeouts OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides a count of the number of reset timeouts."
     ::= { x25PLEEntry 40 }
 
 x25PLEremotelyInitiatedRestarts OBJECT-TYPE
@@ -8058,7 +8152,7 @@ x25PLEremotelyInitiatedRestarts OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides a count of the number of remotely initiated restarts."
     ::= { x25PLEEntry 41 }
 
 x25PLErestartCountsExceeded OBJECT-TYPE
@@ -8066,7 +8160,7 @@ x25PLErestartCountsExceeded OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides a count of the number of restart counts exceeded."
     ::= { x25PLEEntry 42 }
 
 x25PLEprotocolErrorsDetectedLocally OBJECT-TYPE
@@ -8074,7 +8168,8 @@ x25PLEprotocolErrorsDetectedLocally OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides a count of the number of protocol errors detected 
+         locally."
     ::= { x25PLEEntry 43 }
 
 x25PLEprotocolErrorsAccusedOf OBJECT-TYPE
@@ -8082,7 +8177,7 @@ x25PLEprotocolErrorsAccusedOf OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides a count of the number of protocol errors accused of."
     ::= { x25PLEEntry 44 }
 
 x25PLEcallEstablishmentRetryCountsExceeded OBJECT-TYPE
@@ -8090,7 +8185,8 @@ x25PLEcallEstablishmentRetryCountsExceeded OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides a count of the number of call establishment retry 
+         counts exceeded."
     ::= { x25PLEEntry 45 }
 
 x25PLEclearCountsExceeded OBJECT-TYPE
@@ -8098,7 +8194,7 @@ x25PLEclearCountsExceeded OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides a count of the number of clear counts exceeded."
     ::= { x25PLEEntry 46 }
 
 x25PLEpLEClientMOName OBJECT-TYPE
@@ -8106,7 +8202,7 @@ x25PLEpLEClientMOName OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides the PLE client MO name."
     ::= { x25PLEEntry 47 }
 
 x25PLEregistrationRequestTime OBJECT-TYPE
@@ -8114,7 +8210,7 @@ x25PLEregistrationRequestTime OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides the registration request time."
     ::= { x25PLEEntry 48 }
 
 x25PLEregistrationRequestCount OBJECT-TYPE
@@ -8122,7 +8218,7 @@ x25PLEregistrationRequestCount OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides the registration request count."
     ::= { x25PLEEntry 49 }
 
 x25PLEregistrationPermitted OBJECT-TYPE
@@ -8130,7 +8226,7 @@ x25PLEregistrationPermitted OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Specifies whether registration is permitted."
     ::= { x25PLEEntry 50 }
 
 x25PLERowStatus OBJECT-TYPE
@@ -8138,7 +8234,9 @@ x25PLERowStatus OBJECT-TYPE
     MAX-ACCESS  read-create
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides a mechanism whereby management stations may create and 
+         delete rows in this table.  Entries created by management 
+         stations must persist across agent reboots."
     ::= { x25PLEEntry 51 }
 
 x25PLE-DTE OBJECT IDENTIFIER
@@ -8174,7 +8272,9 @@ x25PLE-DTEEntry OBJECT-TYPE
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION 
-        ""
+        "Each row in this table is indexed by X.25 packet layer entity 
+         identifier.  Each row contains characteristics and operational 
+         status and measurements corresponding to the X.25 PLE DTE."
     REFERENCE   
         "ITU-T Rec. X.283 | ISO/IEC 10733 x25PLE-DTE MO."
     INDEX       { x25PLEId }
@@ -8227,7 +8327,7 @@ x25PLE-DTEcallDeflectionSubscription OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Specifies whether call deflection is subscribed."
     ::= { x25PLE-DTEEntry 1 }
 
 x25PLE-DTEcallRequestResponseTimer OBJECT-TYPE
@@ -8235,7 +8335,7 @@ x25PLE-DTEcallRequestResponseTimer OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides the call request response timer."
     ::= { x25PLE-DTEEntry 2 }
 
 x25PLE-DTEextendedPacketSequenceNumbering OBJECT-TYPE
@@ -8243,7 +8343,7 @@ x25PLE-DTEextendedPacketSequenceNumbering OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides extended packet sequence numbering."
     ::= { x25PLE-DTEEntry 3 }
 
 x25PLE-DTEmaxActiveCircuits OBJECT-TYPE
@@ -8251,7 +8351,7 @@ x25PLE-DTEmaxActiveCircuits OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Specifies the maximum number of active circuits."
     ::= { x25PLE-DTEEntry 4 }
 
 x25PLE-DTEminimumRecallTimer OBJECT-TYPE
@@ -8259,7 +8359,7 @@ x25PLE-DTEminimumRecallTimer OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Specifies the minimum recall timer."
     ::= { x25PLE-DTEEntry 5 }
 
 x25PLE-DTEresetRequestResponseTimer OBJECT-TYPE
@@ -8267,7 +8367,7 @@ x25PLE-DTEresetRequestResponseTimer OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides the reset request response timer."
     ::= { x25PLE-DTEEntry 6 }
 
 x25PLE-DTErestartRequestRetransmissionCount OBJECT-TYPE
@@ -8275,7 +8375,7 @@ x25PLE-DTErestartRequestRetransmissionCount OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides the restart request retransmission count."
     ::= { x25PLE-DTEEntry 7 }
 
 x25PLE-DTErestartRequestResponseTimer OBJECT-TYPE
@@ -8283,7 +8383,7 @@ x25PLE-DTErestartRequestResponseTimer OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides the restart request response timer."
     ::= { x25PLE-DTEEntry 8 }
 
 x25PLE-DTEclearRequestResponseTimer OBJECT-TYPE
@@ -8291,7 +8391,7 @@ x25PLE-DTEclearRequestResponseTimer OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides the clear request response timer."
     ::= { x25PLE-DTEEntry 9 }
 
 x25PLE-DTEinterruptResponseTimer OBJECT-TYPE
@@ -8299,7 +8399,7 @@ x25PLE-DTEinterruptResponseTimer OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides the interrupt response timer."
     ::= { x25PLE-DTEEntry 10 }
 
 x25PLE-DTEresetRequestRetransmissionCount OBJECT-TYPE
@@ -8307,7 +8407,7 @@ x25PLE-DTEresetRequestRetransmissionCount OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides the reset request retransmission count."
     ::= { x25PLE-DTEEntry 11 }
 
 x25PLE-DTEclearRequestRetransmissionCount OBJECT-TYPE
@@ -8315,7 +8415,7 @@ x25PLE-DTEclearRequestRetransmissionCount OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides the clear request retransmission count."
     ::= { x25PLE-DTEEntry 12 }
 
 x25PLE-DTEcallAttempts OBJECT-TYPE
@@ -8323,7 +8423,7 @@ x25PLE-DTEcallAttempts OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides a count of the number of call attempts."
     ::= { x25PLE-DTEEntry 13 }
 
 x25PLE-DTEprotocolErrorsDetectedLocally OBJECT-TYPE
@@ -8331,7 +8431,8 @@ x25PLE-DTEprotocolErrorsDetectedLocally OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides a count of the number of protocol errors detected 
+         locally."
     ::= { x25PLE-DTEEntry 14 }
 
 x25PLE-DTEprotocolErrorsAccusedOf OBJECT-TYPE
@@ -8339,7 +8440,7 @@ x25PLE-DTEprotocolErrorsAccusedOf OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides a count of the number of protocol errors accused of."
     ::= { x25PLE-DTEEntry 15 }
 
 x25PLE-DTEcallEstablishmentRetryCountsExceeded OBJECT-TYPE
@@ -8347,7 +8448,8 @@ x25PLE-DTEcallEstablishmentRetryCountsExceeded OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides a count of the number of call establishment retry 
+         counts exceeded."
     ::= { x25PLE-DTEEntry 16 }
 
 -- dTEX25PLECounters-P conditional package OBJECT-TYPE
@@ -8356,7 +8458,7 @@ x25PLE-DTEoctetsReceivedCounter OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides a count of the number of octets received."
     ::= { x25PLE-DTEEntry 17 }
 
 x25PLE-DTEoctetsSentCounter OBJECT-TYPE
@@ -8364,7 +8466,7 @@ x25PLE-DTEoctetsSentCounter OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides a count of the number of octets sent."
     ::= { x25PLE-DTEEntry 18 }
 
 x25PLE-DTEcallTimeouts OBJECT-TYPE
@@ -8372,7 +8474,7 @@ x25PLE-DTEcallTimeouts OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides a count of the number of call timeouts."
     ::= { x25PLE-DTEEntry 19 }
 
 x25PLE-DTEcallsConnected OBJECT-TYPE
@@ -8380,7 +8482,7 @@ x25PLE-DTEcallsConnected OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides a count of the number of calls connected."
     ::= { x25PLE-DTEEntry 20 }
 
 x25PLE-DTEclearCountsExceeded OBJECT-TYPE
@@ -8388,7 +8490,7 @@ x25PLE-DTEclearCountsExceeded OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides a count of the number of clear counts exceeded."
     ::= { x25PLE-DTEEntry 21 }
 
 x25PLE-DTEclearTimeouts OBJECT-TYPE
@@ -8396,7 +8498,7 @@ x25PLE-DTEclearTimeouts OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides a count of the number of clear timeouts."
     ::= { x25PLE-DTEEntry 22 }
 
 x25PLE-DTEdataPacketsReceived OBJECT-TYPE
@@ -8404,7 +8506,7 @@ x25PLE-DTEdataPacketsReceived OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides a count of the number of data packets received."
     ::= { x25PLE-DTEEntry 23 }
 
 x25PLE-DTEdataPacketsSent OBJECT-TYPE
@@ -8412,7 +8514,7 @@ x25PLE-DTEdataPacketsSent OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides a count of the number of data packets sent."
     ::= { x25PLE-DTEEntry 24 }
 
 x25PLE-DTEdataRetransmissionTimerExpiries OBJECT-TYPE
@@ -8420,7 +8522,8 @@ x25PLE-DTEdataRetransmissionTimerExpiries OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides a count of the number of data retransmission timer 
+         expiries."
     ::= { x25PLE-DTEEntry 25 }
 
 x25PLE-DTEproviderInitiatedResets OBJECT-TYPE
@@ -8428,7 +8531,7 @@ x25PLE-DTEproviderInitiatedResets OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides a count of the number of provider initiated resets."
     ::= { x25PLE-DTEEntry 26 }
 
 x25PLE-DTEproviderInitiatedDisconnects OBJECT-TYPE
@@ -8436,7 +8539,8 @@ x25PLE-DTEproviderInitiatedDisconnects OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides a count of the number of provider initiated 
+         disconnects."
     ::= { x25PLE-DTEEntry 27 }
 
 x25PLE-DTEremotelyInitiatedResets OBJECT-TYPE
@@ -8444,7 +8548,7 @@ x25PLE-DTEremotelyInitiatedResets OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Proivdes a count of the number of remotely initiated resets."
     ::= { x25PLE-DTEEntry 28 }
 
 x25PLE-DTEremotelyInitiatedRestarts OBJECT-TYPE
@@ -8452,7 +8556,7 @@ x25PLE-DTEremotelyInitiatedRestarts OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides a count of the number of remotely initiated restarts."
     ::= { x25PLE-DTEEntry 29 }
 
 x25PLE-DTEresetTimeouts OBJECT-TYPE
@@ -8460,7 +8564,7 @@ x25PLE-DTEresetTimeouts OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides a count of the number of reset timeouts."
     ::= { x25PLE-DTEEntry 30 }
 
 x25PLE-DTErestartCountsExceeded OBJECT-TYPE
@@ -8468,7 +8572,7 @@ x25PLE-DTErestartCountsExceeded OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides a count of the number of restart counts exceeded."
     ::= { x25PLE-DTEEntry 31 }
 
 -- receivingWindowRotationRecoveryProcedures-P conditional package 
@@ -8478,7 +8582,7 @@ x25PLE-DTEwindowStatusTransmissionTimer OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides the window status transmission timer."
     ::= { x25PLE-DTEEntry 32 }
 
 -- transmittingWindowRotationRecoveryProcedures-P conditional package 
@@ -8488,7 +8592,7 @@ x25PLE-DTEwindowRotationTimer OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides the window rotation timer."
     ::= { x25PLE-DTEEntry 33 }
 
 x25PLE-DTEdataPacketRetransmissionCount OBJECT-TYPE
@@ -8496,7 +8600,7 @@ x25PLE-DTEdataPacketRetransmissionCount OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides the data packet retransmission count."
     ::= { x25PLE-DTEEntry 34 }
 
 -- packetRetransmissionProcedures-P conditional package OBJECT-TYPE
@@ -8505,7 +8609,7 @@ x25PLE-DTErejectResponseTimer OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides the reject response timer."
     ::= { x25PLE-DTEEntry 35 }
 
 x25PLE-DTErejectRetransmissionCount OBJECT-TYPE
@@ -8513,7 +8617,7 @@ x25PLE-DTErejectRetransmissionCount OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides the reject retransmission count."
     ::= { x25PLE-DTEEntry 36 }
 
 -- onlineRegistration-P conditional package OBJECT-TYPE
@@ -8522,7 +8626,7 @@ x25PLE-DTEregistrationRequestResponseTimer OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides the registration request response timer."
     ::= { x25PLE-DTEEntry 37 }
 
 x25PLE-DTEregistrationRequestRetransmissionCount OBJECT-TYPE
@@ -8530,7 +8634,7 @@ x25PLE-DTEregistrationRequestRetransmissionCount OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides the registration request retransmission count."
     ::= { x25PLE-DTEEntry 38 }
 
 x25PLE-DTEregistrationPermitted OBJECT-TYPE
@@ -8538,7 +8642,7 @@ x25PLE-DTEregistrationPermitted OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Specifies whether registration is permitted."
     ::= { x25PLE-DTEEntry 39 }
 
 x25PLE-DCE OBJECT IDENTIFIER
@@ -8574,7 +8678,10 @@ x25PLE-DCEEntry OBJECT-TYPE
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION 
-        ""
+        "Each row in this table is indexed by the X.25 packet layer 
+         entity identifier.  Each row contains characteristics and 
+         operational status and measurements for the corresponding X.25 
+         PLE DCE."
     REFERENCE   
         "ITU-T Rec. X.283 | ISO/IEC 10733 x25PLE-DCE MO."
     INDEX       { x25PLEId }
@@ -8636,7 +8743,7 @@ x25PLE-DCEcallAttempts OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides a count of the number of call attempts."
     ::= { x25PLE-DCEEntry 1 }
 
 x25PLE-DCEcallsConnected OBJECT-TYPE
@@ -8644,7 +8751,7 @@ x25PLE-DCEcallsConnected OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides a count of the number of calls connected."
     ::= { x25PLE-DCEEntry 2 }
 
 x25PLE-DCEcUG OBJECT-TYPE
@@ -8652,7 +8759,7 @@ x25PLE-DCEcUG OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Specifies whether the DCE belongs to a closed user group."
     ::= { x25PLE-DCEEntry 3 }
 
 x25PLE-DCEfastSelectAcceptance OBJECT-TYPE
@@ -8660,7 +8767,7 @@ x25PLE-DCEfastSelectAcceptance OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Specifies whether fast select is accepted."
     ::= { x25PLE-DCEEntry 4 }
 
 x25PLE-DCEincomingCallsBarred OBJECT-TYPE
@@ -8668,7 +8775,7 @@ x25PLE-DCEincomingCallsBarred OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Specifies whether incoming calls are barred."
     ::= { x25PLE-DCEEntry 5 }
 
 x25PLE-DCEoneWayLogicalChannelOutgoing OBJECT-TYPE
@@ -8676,7 +8783,7 @@ x25PLE-DCEoneWayLogicalChannelOutgoing OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Specifies whether one-way logical channel outgoing is provided."
     ::= { x25PLE-DCEEntry 6 }
 
 x25PLE-DCEoutgoingCallsBarred OBJECT-TYPE
@@ -8684,7 +8791,7 @@ x25PLE-DCEoutgoingCallsBarred OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Specifies whether outgoing calls are barred."
     ::= { x25PLE-DCEEntry 7 }
 
 -- dCECommonVirtualCircuitCounters-P conditional package
@@ -8693,7 +8800,7 @@ x25PLE-DCEdataPacketsReceived OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides a count of the number of data packets received."
     ::= { x25PLE-DCEEntry 8 }
 
 x25PLE-DCEdataPacketsSent OBJECT-TYPE
@@ -8701,7 +8808,7 @@ x25PLE-DCEdataPacketsSent OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides a count of the number of data packets sent."
     ::= { x25PLE-DCEEntry 9 }
 
 x25PLE-DCEinterruptPacketsReceived OBJECT-TYPE
@@ -8709,7 +8816,7 @@ x25PLE-DCEinterruptPacketsReceived OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides a count of the number of interrupt packets received."
     ::= { x25PLE-DCEEntry 10 }
 
 x25PLE-DCEinterruptPacketsSent OBJECT-TYPE
@@ -8717,7 +8824,7 @@ x25PLE-DCEinterruptPacketsSent OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides a count of the number of interrupt packets sent."
     ::= { x25PLE-DCEEntry 11 }
 
 x25PLE-DCEinterruptTimerExpiries OBJECT-TYPE
@@ -8725,7 +8832,7 @@ x25PLE-DCEinterruptTimerExpiries OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides a count of the number of interrupt timer expiries."
     ::= { x25PLE-DCEEntry 12 }
 
 x25PLE-DCEoctetsReceivedCounter OBJECT-TYPE
@@ -8733,7 +8840,7 @@ x25PLE-DCEoctetsReceivedCounter OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides a count of the number of octets received."
     ::= { x25PLE-DCEEntry 13 }
 
 x25PLE-DCEoctetsSentCounter OBJECT-TYPE
@@ -8741,7 +8848,7 @@ x25PLE-DCEoctetsSentCounter OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides a count of the number of octets sent."
     ::= { x25PLE-DCEEntry 14 }
 
 x25PLE-DCEproviderInitiatedDisconnects OBJECT-TYPE
@@ -8749,7 +8856,8 @@ x25PLE-DCEproviderInitiatedDisconnects OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides a count of the number of provider-initiated 
+         disconnects."
     ::= { x25PLE-DCEEntry 15 }
 
 x25PLE-DCEproviderInitiatedResets OBJECT-TYPE
@@ -8757,7 +8865,7 @@ x25PLE-DCEproviderInitiatedResets OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides a count of the number of provider-initiated resets."
     ::= { x25PLE-DCEEntry 16 }
 
 x25PLE-DCEremotelyInitiatedRestarts OBJECT-TYPE
@@ -8765,7 +8873,7 @@ x25PLE-DCEremotelyInitiatedRestarts OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides a count of the number of remotely-initiated restarts."
     ::= { x25PLE-DCEEntry 17 }
 
 x25PLE-DCEremotelyInitiatedResets OBJECT-TYPE
@@ -8773,7 +8881,7 @@ x25PLE-DCEremotelyInitiatedResets OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides a count of the number of remotely-initiated resets."
     ::= { x25PLE-DCEEntry 18 }
 
 x25PLE-DCEresetTimeouts OBJECT-TYPE
@@ -8781,7 +8889,7 @@ x25PLE-DCEresetTimeouts OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides a count of the number of reset timeouts."
     ::= { x25PLE-DCEEntry 19 }
 
 x25PLE-DCEx25SegmentsReceived OBJECT-TYPE
@@ -8789,7 +8897,7 @@ x25PLE-DCEx25SegmentsReceived OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides a count of the number of X.25 segments received."
     ::= { x25PLE-DCEEntry 20 }
 
 x25PLE-DCEx25SegmentsSent OBJECT-TYPE
@@ -8797,7 +8905,7 @@ x25PLE-DCEx25SegmentsSent OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides a count of the number of X.25 segments sent."
     ::= { x25PLE-DCEEntry 21 }
 
 -- dCEX25PLEFacilities-P conditional package
@@ -8806,7 +8914,7 @@ x25PLE-DCEbilateralCUG OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Specifies whether bilateral CUG is subscribed."
     ::= { x25PLE-DCEEntry 22 }
 
 x25PLE-DCEbilateralCUGWithOutgoingAccess OBJECT-TYPE
@@ -8814,7 +8922,7 @@ x25PLE-DCEbilateralCUGWithOutgoingAccess OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides bilateral CUG with outgoing access."
     ::= { x25PLE-DCEEntry 23 }
 
 x25PLE-DCEcallDeflectionSubscription OBJECT-TYPE
@@ -8822,7 +8930,7 @@ x25PLE-DCEcallDeflectionSubscription OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Speciifes whether call deflection is subscribed."
     ::= { x25PLE-DCEEntry 24 }
 
 x25PLE-DCEcallRedirection OBJECT-TYPE
@@ -8830,7 +8938,7 @@ x25PLE-DCEcallRedirection OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Specifies whether call redirection is subscribed."
     ::= { x25PLE-DCEEntry 25 }
 
 x25PLE-DCEchargingInformation OBJECT-TYPE
@@ -8838,7 +8946,7 @@ x25PLE-DCEchargingInformation OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Specifies whether charging information is subscribed."
     ::= { x25PLE-DCEEntry 26 }
 
 x25PLE-DCEcUGWithIncomingAccess OBJECT-TYPE
@@ -8846,7 +8954,7 @@ x25PLE-DCEcUGWithIncomingAccess OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Specifies whether CUG with incoming access is subscribed."
     ::= { x25PLE-DCEEntry 27 }
 
 x25PLE-DCEcUGWithOutgoingAccess OBJECT-TYPE
@@ -8854,7 +8962,7 @@ x25PLE-DCEcUGWithOutgoingAccess OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Specifies whether CUG with outgoing access is subscribed."
     ::= { x25PLE-DCEEntry 28 }
 
 x25PLE-DCEdBitModification OBJECT-TYPE
@@ -8862,7 +8970,7 @@ x25PLE-DCEdBitModification OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Specifies wehther d-bit modification is subscribed."
     ::= { x25PLE-DCEEntry 29 }
 
 x25PLE-DCEdefaultThroughputClassesAssignment OBJECT-TYPE
@@ -8870,7 +8978,7 @@ x25PLE-DCEdefaultThroughputClassesAssignment OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides default throughput classes assignment."
     ::= { x25PLE-DCEEntry 30 }
 
 x25PLE-DCEextendedPacketSequenceNumbering OBJECT-TYPE
@@ -8878,7 +8986,7 @@ x25PLE-DCEextendedPacketSequenceNumbering OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides extended packet sequence numbering."
     ::= { x25PLE-DCEEntry 31 }
 
 x25PLE-DCEhuntGroup OBJECT-TYPE
@@ -8886,7 +8994,7 @@ x25PLE-DCEhuntGroup OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Specifies whether hunt group is subscribed."
     ::= { x25PLE-DCEEntry 32 }
 
 x25PLE-DCEincomingCallBarredWithinCUG OBJECT-TYPE
@@ -8894,7 +9002,7 @@ x25PLE-DCEincomingCallBarredWithinCUG OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Specifies whether incoming calls are barred within CUG."
     ::= { x25PLE-DCEEntry 33 }
 
 x25PLE-DCElocalChargingPrevention OBJECT-TYPE
@@ -8902,7 +9010,7 @@ x25PLE-DCElocalChargingPrevention OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Specifies local charging prevention."
     ::= { x25PLE-DCEEntry 34 }
 
 x25PLE-DCEnonStandardDefaultPacketSizes OBJECT-TYPE
@@ -8910,7 +9018,7 @@ x25PLE-DCEnonStandardDefaultPacketSizes OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Specifies non-standard default packet sizes."
     ::= { x25PLE-DCEEntry 35 }
 
 x25PLE-DCEnonStandardDefaultWindowSizes OBJECT-TYPE
@@ -8918,7 +9026,7 @@ x25PLE-DCEnonStandardDefaultWindowSizes OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Specifies non-standard default window sizes."
     ::= { x25PLE-DCEEntry 36 }
 
 x25PLE-DCEnUIOverride OBJECT-TYPE
@@ -8926,7 +9034,7 @@ x25PLE-DCEnUIOverride OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Specifies NUI override."
     ::= { x25PLE-DCEEntry 37 }
 
 x25PLE-DCEnUISubscription OBJECT-TYPE
@@ -8934,7 +9042,7 @@ x25PLE-DCEnUISubscription OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Speciifes NUI subscription."
     ::= { x25PLE-DCEEntry 38 }
 
 x25PLE-DCEoneWayLogicalChannelIncoming OBJECT-TYPE
@@ -8942,7 +9050,7 @@ x25PLE-DCEoneWayLogicalChannelIncoming OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Specifies one-way logical channel incoming."
     ::= { x25PLE-DCEEntry 39 }
 
 x25PLE-DCEonlineFacilityRegistration OBJECT-TYPE
@@ -8950,7 +9058,7 @@ x25PLE-DCEonlineFacilityRegistration OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Specifies online facility registration."
     ::= { x25PLE-DCEEntry 40 }
 
 x25PLE-DCEoutgoingCallBarredWithinCUG OBJECT-TYPE
@@ -8958,7 +9066,7 @@ x25PLE-DCEoutgoingCallBarredWithinCUG OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Specifies outgoing call barred within CUG."
     ::= { x25PLE-DCEEntry 41 }
 
 x25PLE-DCEpacketRetransmission OBJECT-TYPE
@@ -8966,7 +9074,7 @@ x25PLE-DCEpacketRetransmission OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Specifies packet retransmission."
     ::= { x25PLE-DCEEntry 42 }
 
 x25PLE-DCEreverseChargingAcceptance OBJECT-TYPE
@@ -8974,7 +9082,7 @@ x25PLE-DCEreverseChargingAcceptance OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Specifies reverse charging acceptance."
     ::= { x25PLE-DCEEntry 43 }
 
 x25PLE-DCErOASubscription OBJECT-TYPE
@@ -8982,7 +9090,7 @@ x25PLE-DCErOASubscription OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Specifies ROA subscription."
     ::= { x25PLE-DCEEntry 44 }
 
 -- dCEX25PLETimers-P conditional package
@@ -8991,7 +9099,7 @@ x25PLE-DCEclearIndication OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides clear indication timer."
     ::= { x25PLE-DCEEntry 45 }
 
 x25PLE-DCEincomingCall OBJECT-TYPE
@@ -8999,7 +9107,7 @@ x25PLE-DCEincomingCall OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides incoming call timer."
     ::= { x25PLE-DCEEntry 46 }
 
 x25PLE-DCEresetIndication OBJECT-TYPE
@@ -9007,7 +9115,7 @@ x25PLE-DCEresetIndication OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides reset indication timer."
     ::= { x25PLE-DCEEntry 47 }
 
 x25PLE-DCErestartIndication OBJECT-TYPE
@@ -9015,7 +9123,7 @@ x25PLE-DCErestartIndication OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides restart indication timer."
     ::= { x25PLE-DCEEntry 48 }
 
 x25PLEIVMO OBJECT IDENTIFIER
@@ -9044,7 +9152,10 @@ x25PLEIVMOEntry OBJECT-TYPE
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION 
-        ""
+        "Each row in this table is indexed by X.25 PLE IVMO identifier 
+         (which is basically an initial value profile name).  Each row 
+         contains initial values for the creation of X.25 packet-layer 
+         entities."
     REFERENCE   
         "ITU-T Rec. X.283 | ISO/IEC 10733 x25PLEIVMO MO."
     INDEX       { x25PLEIVMOId }
@@ -9052,7 +9163,7 @@ x25PLEIVMOEntry OBJECT-TYPE
 
 X25PLEIVMOEntry ::= SEQUENCE {
     x25PLEIVMOId                                SimpleNameType,
-    x25PLEIVMOlocalDTEAddress                   DummySyntax,
+    x25PLEIVMOlocalDTEAddress                   DTEAddress,
     x25PLEIVMOlogicalChannelAssignments         DummySyntax,
     x25PLEIVMOsN-ServiceProvider                DummySyntax,
     x25PLEIVMOdefaultPacketSizes                DummySyntax,
@@ -9083,16 +9194,17 @@ x25PLEIVMOId OBJECT-TYPE
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides a simple name for the protocol parameter profile that 
+         is used as an index into this table."
     ::= { x25PLEIVMOEntry 1 }
 
 -- X.283 or 10733
 x25PLEIVMOlocalDTEAddress OBJECT-TYPE
-    SYNTAX      DummySyntax
+    SYNTAX      DTEAddress
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides the local DTE address."
     ::= { x25PLEIVMOEntry 2 }
 
 x25PLEIVMOlogicalChannelAssignments OBJECT-TYPE
@@ -9100,7 +9212,7 @@ x25PLEIVMOlogicalChannelAssignments OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides logical channel assignment."
     ::= { x25PLEIVMOEntry 3 }
 
 x25PLEIVMOsN-ServiceProvider OBJECT-TYPE
@@ -9108,7 +9220,7 @@ x25PLEIVMOsN-ServiceProvider OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Profiles the subnetwork service provider."
     ::= { x25PLEIVMOEntry 4 }
 
 -- X.283 only
@@ -9117,7 +9229,7 @@ x25PLEIVMOdefaultPacketSizes OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides default packet sizes."
     ::= { x25PLEIVMOEntry 5 }
 
 x25PLEIVMOdefaultThroughputClasses OBJECT-TYPE
@@ -9125,7 +9237,7 @@ x25PLEIVMOdefaultThroughputClasses OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides default throughput classes."
     ::= { x25PLEIVMOEntry 6 }
 
 x25PLEIVMOdefaultWindowSizes OBJECT-TYPE
@@ -9133,7 +9245,7 @@ x25PLEIVMOdefaultWindowSizes OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides default window sizes."
     ::= { x25PLEIVMOEntry 7 }
 
 x25PLEIVMOflowControlParameterNegotiation OBJECT-TYPE
@@ -9141,7 +9253,7 @@ x25PLEIVMOflowControlParameterNegotiation OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides flow control parameter negotiation."
     ::= { x25PLEIVMOEntry 8 }
 
 x25PLEIVMOthroughputClassNegotiation OBJECT-TYPE
@@ -9149,7 +9261,7 @@ x25PLEIVMOthroughputClassNegotiation OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides throughput class negotiation."
     ::= { x25PLEIVMOEntry 9 }
 
 x25PLEIVMOx25PLEMode OBJECT-TYPE
@@ -9157,7 +9269,7 @@ x25PLEIVMOx25PLEMode OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides the X.25 PLE mode."
     ::= { x25PLEIVMOEntry 10 }
 
 -- ISO 10733 only
@@ -9166,7 +9278,7 @@ x25PLEIVMOinterfaceMode OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides the interface mode."
     ::= { x25PLEIVMOEntry 11 }
 
 x25PLEIVMOdefaultThroughputClass OBJECT-TYPE
@@ -9174,7 +9286,7 @@ x25PLEIVMOdefaultThroughputClass OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides the default throughput class."
     ::= { x25PLEIVMOEntry 12 }
 
 x25PLEIVMOflowControlNegotiationPermitted OBJECT-TYPE
@@ -9182,7 +9294,7 @@ x25PLEIVMOflowControlNegotiationPermitted OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Specifies whether flow control negotiation is permitted."
     ::= { x25PLEIVMOEntry 13 }
 
 x25PLEIVMOcallDeflectionSubscription OBJECT-TYPE
@@ -9190,7 +9302,7 @@ x25PLEIVMOcallDeflectionSubscription OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Specifies call deflection subscription."
     ::= { x25PLEIVMOEntry 14 }
 
 x25PLEIVMOmaxActiveCircuits OBJECT-TYPE
@@ -9198,7 +9310,7 @@ x25PLEIVMOmaxActiveCircuits OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides the maximum number of active circuits."
     ::= { x25PLEIVMOEntry 15 }
 
 x25PLEIVMOrestartTime OBJECT-TYPE
@@ -9206,7 +9318,7 @@ x25PLEIVMOrestartTime OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides the restart time."
     ::= { x25PLEIVMOEntry 16 }
 
 x25PLEIVMOdefaultPacketSize OBJECT-TYPE
@@ -9214,7 +9326,7 @@ x25PLEIVMOdefaultPacketSize OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides the default packet size."
     ::= { x25PLEIVMOEntry 17 }
 
 x25PLEIVMOdefaultWindowSize OBJECT-TYPE
@@ -9222,7 +9334,7 @@ x25PLEIVMOdefaultWindowSize OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides the default window size."
     ::= { x25PLEIVMOEntry 18 }
 
 x25PLEIVMOminimumRecallTimer OBJECT-TYPE
@@ -9230,7 +9342,7 @@ x25PLEIVMOminimumRecallTimer OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides the minimum recall timer."
     ::= { x25PLEIVMOEntry 19 }
 
 x25PLEIVMOrestartCount OBJECT-TYPE
@@ -9238,7 +9350,7 @@ x25PLEIVMOrestartCount OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides the restart count."
     ::= { x25PLEIVMOEntry 20 }
 
 x25PLEIVMOpacketSequencing OBJECT-TYPE
@@ -9246,7 +9358,7 @@ x25PLEIVMOpacketSequencing OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Specifies packet sequencing."
     ::= { x25PLEIVMOEntry 21 }
 
 -- ISO 10733 only onlineRegistration-P conditional package
@@ -9255,7 +9367,7 @@ x25PLEIVMOregistrationRequestTime OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides the registration request time."
     ::= { x25PLEIVMOEntry 22 }
 
 x25PLEIVMOregistrationRequestCount OBJECT-TYPE
@@ -9263,7 +9375,7 @@ x25PLEIVMOregistrationRequestCount OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides the registration request count."
     ::= { x25PLEIVMOEntry 23 }
 
 x25PLEIVMOregistrationPermitted OBJECT-TYPE
@@ -9271,7 +9383,7 @@ x25PLEIVMOregistrationPermitted OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Specifies whether registration is permitted."
     ::= { x25PLEIVMOEntry 24 }
 
 -- ISO 10733 only x25PLEIVMO-networkSubsystem name binding
@@ -9280,7 +9392,9 @@ x25PLEIVMORowStatus OBJECT-TYPE
     MAX-ACCESS  read-create
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides a mechanism whereby management stations may create and 
+         delete rows in this table.  Entries must persist across agent 
+         reboots."
     ::= { x25PLEIVMOEntry 25 }
 
 x25PLEIVMO-DTE OBJECT IDENTIFIER
@@ -9291,7 +9405,8 @@ x25PLEIVMO-DTETable OBJECT-TYPE
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides a table of initial values to be used when creating 
+         X.25 PLE DTE's in the x25PLE-DTETable."
     REFERENCE   
         "ITU-T Rec. X.283 | ISO/IEC 10733 x25PLEIVMO-DTE MOC."
     ::= { x25PLEIVMO-DTE 1 }
@@ -9301,7 +9416,10 @@ x25PLEIVMO-DTEEntry OBJECT-TYPE
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION 
-        ""
+        "Each row is indexed by the X.25 PLE IVMO identifier defined by 
+         this table (which is basically a protocol profile name).  Each 
+         row contains the initial values to use when creating rows in 
+         the x25PLE-DTETable."
     REFERENCE   
         "ITU-T Rec. X.283 | ISO/IEC 10733 x25PLEIVMO-DTE MO."
     INDEX       { x25PLEIVMOId }
@@ -9355,7 +9473,7 @@ x25PLEIVMO-DTEcallDeflectionSubscription OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Specifies call deflection subscription."
     ::= { x25PLEIVMO-DTEEntry 1 }
 
 x25PLEIVMO-DTEcallRequestResponseTimer OBJECT-TYPE
@@ -9363,7 +9481,7 @@ x25PLEIVMO-DTEcallRequestResponseTimer OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides the call request response timer."
     ::= { x25PLEIVMO-DTEEntry 2 }
 
 x25PLEIVMO-DTEextendedPacketSequenceNumbering OBJECT-TYPE
@@ -9371,7 +9489,7 @@ x25PLEIVMO-DTEextendedPacketSequenceNumbering OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides extended packet sequence numbering."
     ::= { x25PLEIVMO-DTEEntry 3 }
 
 x25PLEIVMO-DTEmaxActiveCircuits OBJECT-TYPE
@@ -9379,7 +9497,7 @@ x25PLEIVMO-DTEmaxActiveCircuits OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides the maximum active circuits."
     ::= { x25PLEIVMO-DTEEntry 4 }
 
 x25PLEIVMO-DTEminimumRecallTimer OBJECT-TYPE
@@ -9387,7 +9505,7 @@ x25PLEIVMO-DTEminimumRecallTimer OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides the minimum recall timer."
     ::= { x25PLEIVMO-DTEEntry 5 }
 
 x25PLEIVMO-DTEresetRequestResponseTimer OBJECT-TYPE
@@ -9395,7 +9513,7 @@ x25PLEIVMO-DTEresetRequestResponseTimer OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides the reset request response timer."
     ::= { x25PLEIVMO-DTEEntry 6 }
 
 x25PLEIVMO-DTErestartRequestRetransmissionCount OBJECT-TYPE
@@ -9403,7 +9521,7 @@ x25PLEIVMO-DTErestartRequestRetransmissionCount OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides the restart request retransmission count."
     ::= { x25PLEIVMO-DTEEntry 7 }
 
 x25PLEIVMO-DTErestartRequestResponseTimer OBJECT-TYPE
@@ -9411,7 +9529,7 @@ x25PLEIVMO-DTErestartRequestResponseTimer OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides the restart request response timer."
     ::= { x25PLEIVMO-DTEEntry 8 }
 
 x25PLEIVMO-DTEclearRequestResponseTimer OBJECT-TYPE
@@ -9419,7 +9537,7 @@ x25PLEIVMO-DTEclearRequestResponseTimer OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides the clear request response timer."
     ::= { x25PLEIVMO-DTEEntry 9 }
 
 x25PLEIVMO-DTEinterruptResponseTimer OBJECT-TYPE
@@ -9427,7 +9545,7 @@ x25PLEIVMO-DTEinterruptResponseTimer OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides the interrupt response timer."
     ::= { x25PLEIVMO-DTEEntry 10 }
 
 x25PLEIVMO-DTEresetRequestRetransmissionCount OBJECT-TYPE
@@ -9435,7 +9553,7 @@ x25PLEIVMO-DTEresetRequestRetransmissionCount OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides the reset request retransmission count."
     ::= { x25PLEIVMO-DTEEntry 11 }
 
 x25PLEIVMO-DTEclearRequestRetransmissionCount OBJECT-TYPE
@@ -9443,7 +9561,7 @@ x25PLEIVMO-DTEclearRequestRetransmissionCount OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides the clear request retransmission count."
     ::= { x25PLEIVMO-DTEEntry 12 }
 
 x25PLEIVMO-DTEcallAttempts OBJECT-TYPE
@@ -9451,7 +9569,7 @@ x25PLEIVMO-DTEcallAttempts OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides a count of the number of call attempts."
     ::= { x25PLEIVMO-DTEEntry 13 }
 
 x25PLEIVMO-DTEprotocolErrorsDetectedLocally OBJECT-TYPE
@@ -9459,7 +9577,8 @@ x25PLEIVMO-DTEprotocolErrorsDetectedLocally OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides a count of the number of protocol errors detected 
+         locally."
     ::= { x25PLEIVMO-DTEEntry 14 }
 
 x25PLEIVMO-DTEprotocolErrorsAccusedOf OBJECT-TYPE
@@ -9467,7 +9586,7 @@ x25PLEIVMO-DTEprotocolErrorsAccusedOf OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides a count of the number of protocol errors accused of."
     ::= { x25PLEIVMO-DTEEntry 15 }
 
 x25PLEIVMO-DTEcallEstablishmentRetryCountsExceeded OBJECT-TYPE
@@ -9475,7 +9594,8 @@ x25PLEIVMO-DTEcallEstablishmentRetryCountsExceeded OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides a count of the number of call establishment retry 
+         counts exceeded."
     ::= { x25PLEIVMO-DTEEntry 16 }
 
 -- dTEX25PLECounters-P conditional package
@@ -9484,7 +9604,7 @@ x25PLEIVMO-DTEoctetsReceivedCounter OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides a count of the number of octets received."
     ::= { x25PLEIVMO-DTEEntry 17 }
 
 x25PLEIVMO-DTEoctetsSentCounter OBJECT-TYPE
@@ -9492,7 +9612,7 @@ x25PLEIVMO-DTEoctetsSentCounter OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides a count of the number of octets sent."
     ::= { x25PLEIVMO-DTEEntry 18 }
 
 x25PLEIVMO-DTEcallTimeouts OBJECT-TYPE
@@ -9500,7 +9620,7 @@ x25PLEIVMO-DTEcallTimeouts OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides a count of the number of call timeouts."
     ::= { x25PLEIVMO-DTEEntry 19 }
 
 x25PLEIVMO-DTEcallsConnected OBJECT-TYPE
@@ -9508,7 +9628,7 @@ x25PLEIVMO-DTEcallsConnected OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides a count of the number of calls connected."
     ::= { x25PLEIVMO-DTEEntry 20 }
 
 x25PLEIVMO-DTEclearCountsExceeded OBJECT-TYPE
@@ -9516,7 +9636,7 @@ x25PLEIVMO-DTEclearCountsExceeded OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides a count of the number of clear counts exceeded."
     ::= { x25PLEIVMO-DTEEntry 21 }
 
 x25PLEIVMO-DTEclearTimeouts OBJECT-TYPE
@@ -9524,7 +9644,7 @@ x25PLEIVMO-DTEclearTimeouts OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides a count of the number of clear timeouts."
     ::= { x25PLEIVMO-DTEEntry 22 }
 
 x25PLEIVMO-DTEdataPacketsReceived OBJECT-TYPE
@@ -9532,7 +9652,7 @@ x25PLEIVMO-DTEdataPacketsReceived OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides a count of the number of data packets received."
     ::= { x25PLEIVMO-DTEEntry 23 }
 
 x25PLEIVMO-DTEdataPacketsSent OBJECT-TYPE
@@ -9540,7 +9660,7 @@ x25PLEIVMO-DTEdataPacketsSent OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides a count of the number of data packets sent."
     ::= { x25PLEIVMO-DTEEntry 24 }
 
 x25PLEIVMO-DTEdataRetransmissionTimerExpiries OBJECT-TYPE
@@ -9548,7 +9668,8 @@ x25PLEIVMO-DTEdataRetransmissionTimerExpiries OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides a count of the number of data retransmission timer 
+         expiries."
     ::= { x25PLEIVMO-DTEEntry 25 }
 
 x25PLEIVMO-DTEproviderInitiatedResets OBJECT-TYPE
@@ -9556,7 +9677,7 @@ x25PLEIVMO-DTEproviderInitiatedResets OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides a count of the number of provider-initiated resets."
     ::= { x25PLEIVMO-DTEEntry 26 }
 
 x25PLEIVMO-DTEproviderInitiatedDisconnects OBJECT-TYPE
@@ -9564,7 +9685,8 @@ x25PLEIVMO-DTEproviderInitiatedDisconnects OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides a count of the number of provider-initiated 
+         disconnects."
     ::= { x25PLEIVMO-DTEEntry 27 }
 
 x25PLEIVMO-DTEremotelyInitiatedResets OBJECT-TYPE
@@ -9572,7 +9694,7 @@ x25PLEIVMO-DTEremotelyInitiatedResets OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides a count of the number of remotely-initiated resets."
     ::= { x25PLEIVMO-DTEEntry 28 }
 
 x25PLEIVMO-DTEremotelyInitiatedRestarts OBJECT-TYPE
@@ -9580,7 +9702,7 @@ x25PLEIVMO-DTEremotelyInitiatedRestarts OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides a count of the number of remotely-initiated restarts."
     ::= { x25PLEIVMO-DTEEntry 29 }
 
 x25PLEIVMO-DTEresetTimeouts OBJECT-TYPE
@@ -9588,7 +9710,7 @@ x25PLEIVMO-DTEresetTimeouts OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides a count of the number of reset timeouts."
     ::= { x25PLEIVMO-DTEEntry 30 }
 
 x25PLEIVMO-DTErestartCountsExceeded OBJECT-TYPE
@@ -9596,7 +9718,7 @@ x25PLEIVMO-DTErestartCountsExceeded OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides a count of the number of restart counts exceeded."
     ::= { x25PLEIVMO-DTEEntry 31 }
 
 -- receivingWindowRotationRecoveryProcedures-P conditional package
@@ -9605,7 +9727,7 @@ x25PLEIVMO-DTEwindowStatusTransmissionTimer OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides the window status transmission timer."
     ::= { x25PLEIVMO-DTEEntry 32 }
 
 -- transmittingWindowRotationRecoveryProcedures-P conditional package
@@ -9614,7 +9736,7 @@ x25PLEIVMO-DTEwindowRotationTimer OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides the window rotation timer."
     ::= { x25PLEIVMO-DTEEntry 33 }
 
 x25PLEIVMO-DTEdataPacketRetransmissionCount OBJECT-TYPE
@@ -9622,7 +9744,7 @@ x25PLEIVMO-DTEdataPacketRetransmissionCount OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides the data packet retransmission count."
     ::= { x25PLEIVMO-DTEEntry 34 }
 
 -- packetRetransmissionProcedures-P conditional package
@@ -9631,7 +9753,7 @@ x25PLEIVMO-DTErejectResponseTimer OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides the reject response timer."
     ::= { x25PLEIVMO-DTEEntry 35 }
 
 x25PLEIVMO-DTErejectRetransmissionCount OBJECT-TYPE
@@ -9639,7 +9761,7 @@ x25PLEIVMO-DTErejectRetransmissionCount OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides the reject retransmission count."
     ::= { x25PLEIVMO-DTEEntry 36 }
 
 -- onlineRegistration-P conditional package
@@ -9648,7 +9770,7 @@ x25PLEIVMO-DTEregistrationRequestResponseTimer OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides the registration request response timer."
     ::= { x25PLEIVMO-DTEEntry 37 }
 
 x25PLEIVMO-DTEregistrationRequestRetransmissionCount OBJECT-TYPE
@@ -9656,7 +9778,7 @@ x25PLEIVMO-DTEregistrationRequestRetransmissionCount OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides the registration request retransmission count."
     ::= { x25PLEIVMO-DTEEntry 38 }
 
 x25PLEIVMO-DTEregistrationPermitted OBJECT-TYPE
@@ -9664,7 +9786,7 @@ x25PLEIVMO-DTEregistrationPermitted OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Specifies registration permitted."
     ::= { x25PLEIVMO-DTEEntry 39 }
 
 --
@@ -9673,7 +9795,9 @@ x25PLEIVMO-DTERowStatus OBJECT-TYPE
     MAX-ACCESS  read-create
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides a mechanism whereby management stations may create and 
+         delete rows in this table.  Entries must persist across agent 
+         reboots."
     ::= { x25PLEIVMO-DTEEntry 40 }
 
 x25PLEIVMO-DCE OBJECT IDENTIFIER
@@ -9702,7 +9826,11 @@ x25PLEIVMO-DCEEntry OBJECT-TYPE
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION 
-        ""
+        "Each row in this table is indexed by the X.25 PLE IVMO 
+         identifier defined by this table (which is basically a protocol 
+         profile name).  Each row contains initial values to be used 
+         when creating X.25 PLE DCE entities (such as when creating rows 
+         in the x25PLE-DCETable)."
     REFERENCE   
         "ITU-T Rec. X.283 | ISO/IEC 10733 x25PLEIVMO-DCE MO."
     INDEX       { x25PLEIVMOId }
@@ -9717,7 +9845,9 @@ x25PLEIVMO-DCERowStatus OBJECT-TYPE
     MAX-ACCESS  read-create
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides a mechanism whereby management stations may create and 
+         delete rows in this table.  Entries must persist across agent 
+         reboots."
     ::= { x25PLEIVMO-DCEEntry 1 }
 
 virtualCall OBJECT IDENTIFIER
@@ -9744,7 +9874,10 @@ virtualCallEntry OBJECT-TYPE
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION 
-        ""
+        "Each row in this table is indexed by the virtual call 
+         identifier defined in this table.  Each row contains 
+         characteristics and operational status and measurements 
+         associated with the virtual call."
     REFERENCE   
         "ISO/IEC 10733 virtualCall MO."
     INDEX       { virtualCallId }
@@ -9773,7 +9906,8 @@ virtualCallId OBJECT-TYPE
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides a virtual call identifier for use as an index into 
+         this table.  The value is of no other significance."
     ::= { virtualCallEntry 1 }
 
 virtualCallChannel OBJECT-TYPE
@@ -9781,7 +9915,7 @@ virtualCallChannel OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Identifies the channel on which the call exists."
     ::= { virtualCallEntry 2 }
 
 virtualCallPacketSize OBJECT-TYPE
@@ -9789,7 +9923,7 @@ virtualCallPacketSize OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Indicates the packet size."
     ::= { virtualCallEntry 3 }
 
 virtualCallWindowSize OBJECT-TYPE
@@ -9797,7 +9931,7 @@ virtualCallWindowSize OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Indicates the window size."
     ::= { virtualCallEntry 4 }
 
 virtualCallOctetsSentCounter OBJECT-TYPE
@@ -9805,7 +9939,7 @@ virtualCallOctetsSentCounter OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides count of the number of octets sent."
     ::= { virtualCallEntry 5 }
 
 virtualCallOctetsReceivedCounter OBJECT-TYPE
@@ -9813,7 +9947,7 @@ virtualCallOctetsReceivedCounter OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides a count of the number of octets received."
     ::= { virtualCallEntry 6 }
 
 virtualCallDataPacketsSent OBJECT-TYPE
@@ -9821,7 +9955,7 @@ virtualCallDataPacketsSent OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides a count of the number of data packets sent."
     ::= { virtualCallEntry 7 }
 
 virtualCallDataPacketsReceived OBJECT-TYPE
@@ -9829,7 +9963,7 @@ virtualCallDataPacketsReceived OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides a count of the number of data packets received."
     ::= { virtualCallEntry 8 }
 
 virtualCallRemotelyInitiatedResets OBJECT-TYPE
@@ -9837,7 +9971,7 @@ virtualCallRemotelyInitiatedResets OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides a count of the number of remotely initiated resets."
     ::= { virtualCallEntry 9 }
 
 virtualCallDataRetransmissionTimerExpiries OBJECT-TYPE
@@ -9845,7 +9979,8 @@ virtualCallDataRetransmissionTimerExpiries OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides a count of the number of retransmission timer 
+         expiries."
     ::= { virtualCallEntry 10 }
 
 virtualCallProviderInitiatedResets OBJECT-TYPE
@@ -9853,7 +9988,7 @@ virtualCallProviderInitiatedResets OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides a count of the number of provider-initiated resets."
     ::= { virtualCallEntry 11 }
 
 virtualCallResetTimeouts OBJECT-TYPE
@@ -9861,7 +9996,7 @@ virtualCallResetTimeouts OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides a count of the number of reset timeouts."
     ::= { virtualCallEntry 12 }
 
 virtualCallInterruptPacketsSent OBJECT-TYPE
@@ -9869,7 +10004,7 @@ virtualCallInterruptPacketsSent OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides a count of the number of interrupt packets sent."
     ::= { virtualCallEntry 13 }
 
 virtualCallInterruptPacketsReceived OBJECT-TYPE
@@ -9877,7 +10012,7 @@ virtualCallInterruptPacketsReceived OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides a count of the number of interrupt packets received."
     ::= { virtualCallEntry 14 }
 
 virtualCallInterruptTimerExpiries OBJECT-TYPE
@@ -9885,7 +10020,7 @@ virtualCallInterruptTimerExpiries OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides a count of the number of interrupt timer expiries."
     ::= { virtualCallEntry 15 }
 
 virtualCircuit OBJECT IDENTIFIER
@@ -9913,7 +10048,9 @@ virtualCircuitEntry OBJECT-TYPE
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION 
-        ""
+        "Each row in this table is indexed by the virtual circuit 
+         identifier defined in this table.  Each row contains 
+         characteristics of the channel."
     REFERENCE   
         "ITU-T Rec. X.283 | ISO/IEC 10733 virtualCircuit MO."
     INDEX       { virtualCircuitId }
@@ -9932,7 +10069,7 @@ virtualCircuitId OBJECT-TYPE
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides a circuit identifier as an index into this table. "
     ::= { virtualCircuitEntry 1 }
 
 virtualCircuitLogicalChannel OBJECT-TYPE
@@ -9940,7 +10077,7 @@ virtualCircuitLogicalChannel OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "provides the logical channel number."
     ::= { virtualCircuitEntry 2 }
 
 virtualCircuitPacketSizes OBJECT-TYPE
@@ -9948,7 +10085,7 @@ virtualCircuitPacketSizes OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides the packet sizes."
     ::= { virtualCircuitEntry 3 }
 
 virtualCircuitThroughputClasses OBJECT-TYPE
@@ -9956,7 +10093,7 @@ virtualCircuitThroughputClasses OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides the throughput classes."
     ::= { virtualCircuitEntry 4 }
 
 virtualCircuitWindowSizes OBJECT-TYPE
@@ -9964,7 +10101,7 @@ virtualCircuitWindowSizes OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides the window sizes."
     ::= { virtualCircuitEntry 5 }
 
 virtualCircuit-DTE OBJECT IDENTIFIER
@@ -9992,7 +10129,9 @@ virtualCircuit-DTEEntry OBJECT-TYPE
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION 
-        ""
+        "Each row in this table is indexed by virtual circuit 
+         identifier.  Each row contains DTE-specific information for 
+         virtual circuits."
     REFERENCE   
         "ITU-T Rec. X.283 | ISO/IEC 10733 virtualCircuit-DTE MO."
     INDEX       { virtualCircuitId }
@@ -10017,7 +10156,7 @@ virtualCircuit-DTEoctetsSentCounter OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides a count of the number of octets sent."
     ::= { virtualCircuit-DTEEntry 1 }
 
 virtualCircuit-DTEoctetsReceivedCounter OBJECT-TYPE
@@ -10025,7 +10164,7 @@ virtualCircuit-DTEoctetsReceivedCounter OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides a count of the number of octets received."
     ::= { virtualCircuit-DTEEntry 2 }
 
 virtualCircuit-DTEdataPacketsReceived OBJECT-TYPE
@@ -10033,7 +10172,7 @@ virtualCircuit-DTEdataPacketsReceived OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides a count of the number of data packets received."
     ::= { virtualCircuit-DTEEntry 3 }
 
 virtualCircuit-DTEdataPacketsSent OBJECT-TYPE
@@ -10041,7 +10180,7 @@ virtualCircuit-DTEdataPacketsSent OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides a count of the number of data packets sent."
     ::= { virtualCircuit-DTEEntry 4 }
 
 virtualCircuit-DTEdataRetransmissionTimerExpiries OBJECT-TYPE
@@ -10049,7 +10188,8 @@ virtualCircuit-DTEdataRetransmissionTimerExpiries OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides a count of the number of data retransmission timer 
+         expiries."
     ::= { virtualCircuit-DTEEntry 5 }
 
 virtualCircuit-DTEinterruptPacketsReceived OBJECT-TYPE
@@ -10057,7 +10197,7 @@ virtualCircuit-DTEinterruptPacketsReceived OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides ac count of the number of interrupt packets received."
     ::= { virtualCircuit-DTEEntry 6 }
 
 virtualCircuit-DTEinterruptPacketsSent OBJECT-TYPE
@@ -10065,7 +10205,7 @@ virtualCircuit-DTEinterruptPacketsSent OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides a count of the number of interrupt packets sent."
     ::= { virtualCircuit-DTEEntry 7 }
 
 virtualCircuit-DTEinterruptTimerExpiries OBJECT-TYPE
@@ -10073,7 +10213,7 @@ virtualCircuit-DTEinterruptTimerExpiries OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides a count of the number of interrupt timer expiries."
     ::= { virtualCircuit-DTEEntry 8 }
 
 virtualCircuit-DTEproviderInitiatedResets OBJECT-TYPE
@@ -10081,7 +10221,7 @@ virtualCircuit-DTEproviderInitiatedResets OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides a count of the number of provider-initiated resets."
     ::= { virtualCircuit-DTEEntry 9 }
 
 virtualCircuit-DTEremotelyInitiatedResets OBJECT-TYPE
@@ -10089,7 +10229,7 @@ virtualCircuit-DTEremotelyInitiatedResets OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides a count of the number of remotely-initiated resets."
     ::= { virtualCircuit-DTEEntry 10 }
 
 virtualCircuit-DTEresetTimeouts OBJECT-TYPE
@@ -10097,7 +10237,7 @@ virtualCircuit-DTEresetTimeouts OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides a count of the number of reset timeouts."
     ::= { virtualCircuit-DTEEntry 11 }
 
 virtualCircuit-DCE OBJECT IDENTIFIER
@@ -10108,7 +10248,14 @@ virtualCircuit-DCETable OBJECT-TYPE
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION 
-        ""
+        "The virtual circuit DCE managed object.
+         
+         This MO class is never instantiated.  It serves as a generic 
+         virtual circuit DCE MO from which both the virtual Call DCE and 
+         the Permanent Virtual Call DCE MOs are derived.  Note that the 
+         values of the virtualCircuitId naming attribute are required to 
+         be unique across all instances of MOs derived from this which 
+         have a common superior."
     REFERENCE   
         "ITU-T Rec. X.283 | ISO/IEC 10733 virtualCircuit-DCE MOC."
     ::= { virtualCircuit-DCE 1 }
@@ -10118,7 +10265,11 @@ virtualCircuit-DCEEntry OBJECT-TYPE
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION 
-        ""
+        "Each row in this table is indexed by virtual circuit 
+         identifier.  Each row contains DCE-specific information for 
+         virtual circuits.  A row that exists in this table will also 
+         exist in the virtual circuit table and either the virtual call 
+         DCE table or the permanent virtual circuit DCE table."
     REFERENCE   
         "ITU-T Rec. X.283 | ISO/IEC 10733 virtualCircuit-DCE MO."
     INDEX       { virtualCircuitId }
@@ -10146,7 +10297,7 @@ virtualCircuit-DCEdataPacketsReceived OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides a count of the number of data packets received."
     ::= { virtualCircuit-DCEEntry 1 }
 
 virtualCircuit-DCEdataPacketsSent OBJECT-TYPE
@@ -10154,7 +10305,7 @@ virtualCircuit-DCEdataPacketsSent OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides a count of the number of data packets sent."
     ::= { virtualCircuit-DCEEntry 2 }
 
 virtualCircuit-DCEinterruptPacketsReceived OBJECT-TYPE
@@ -10162,7 +10313,7 @@ virtualCircuit-DCEinterruptPacketsReceived OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides a count of the number of interrupt packets received."
     ::= { virtualCircuit-DCEEntry 3 }
 
 virtualCircuit-DCEinterruptPacketsSent OBJECT-TYPE
@@ -10170,7 +10321,7 @@ virtualCircuit-DCEinterruptPacketsSent OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides a count of the number of interrupt packets sent."
     ::= { virtualCircuit-DCEEntry 4 }
 
 virtualCircuit-DCEinterruptTimerExpiries OBJECT-TYPE
@@ -10178,7 +10329,7 @@ virtualCircuit-DCEinterruptTimerExpiries OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides a count of the number of interrupt timer expiries."
     ::= { virtualCircuit-DCEEntry 5 }
 
 virtualCircuit-DCEoctetsReceivedCounter OBJECT-TYPE
@@ -10186,7 +10337,7 @@ virtualCircuit-DCEoctetsReceivedCounter OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides a count of the number of octets received."
     ::= { virtualCircuit-DCEEntry 6 }
 
 virtualCircuit-DCEoctetsSentCounter OBJECT-TYPE
@@ -10194,7 +10345,7 @@ virtualCircuit-DCEoctetsSentCounter OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides a count of the number of octets sent."
     ::= { virtualCircuit-DCEEntry 7 }
 
 virtualCircuit-DCEproviderInitiatedDisconnects OBJECT-TYPE
@@ -10202,7 +10353,8 @@ virtualCircuit-DCEproviderInitiatedDisconnects OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides a count of the number of provider-initiated 
+         disconnects."
     ::= { virtualCircuit-DCEEntry 8 }
 
 virtualCircuit-DCEproviderInitiatedResets OBJECT-TYPE
@@ -10210,7 +10362,7 @@ virtualCircuit-DCEproviderInitiatedResets OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides a count of the number of provider-initiated resets."
     ::= { virtualCircuit-DCEEntry 9 }
 
 virtualCircuit-DCEremotelyInitiatedRestarts OBJECT-TYPE
@@ -10218,7 +10370,7 @@ virtualCircuit-DCEremotelyInitiatedRestarts OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides a count of the number of remotely-initiated restarts."
     ::= { virtualCircuit-DCEEntry 10 }
 
 virtualCircuit-DCEremotelyInitiatedResets OBJECT-TYPE
@@ -10226,7 +10378,7 @@ virtualCircuit-DCEremotelyInitiatedResets OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides a count of the number of remotely-initiated resets."
     ::= { virtualCircuit-DCEEntry 11 }
 
 virtualCircuit-DCEresetTimeouts OBJECT-TYPE
@@ -10234,7 +10386,7 @@ virtualCircuit-DCEresetTimeouts OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides a count of the number of reset timeouts."
     ::= { virtualCircuit-DCEEntry 12 }
 
 virtualCircuit-DCEx25SegmentsReceived OBJECT-TYPE
@@ -10242,7 +10394,7 @@ virtualCircuit-DCEx25SegmentsReceived OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides a count of the number of X.25 segments received."
     ::= { virtualCircuit-DCEEntry 13 }
 
 virtualCircuit-DCEx25SegmentsSent OBJECT-TYPE
@@ -10250,7 +10402,7 @@ virtualCircuit-DCEx25SegmentsSent OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides a count of the number of X.25 segments sent."
     ::= { virtualCircuit-DCEEntry 14 }
 
 permanentVirtualCircuit OBJECT IDENTIFIER
@@ -10290,7 +10442,8 @@ permanentVirtualCircuitChannel OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Specifies the logical channel used by the permanent virtual 
+         circuit."
     ::= { permanentVirtualCircuitEntry 1 }
 
 permanentVirtualCircuitRowStatus OBJECT-TYPE
@@ -10298,7 +10451,9 @@ permanentVirtualCircuitRowStatus OBJECT-TYPE
     MAX-ACCESS  read-create
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides a mechanism whereby management stations may create and 
+         delete rows in this table.  Entries must persist across agent 
+         reboots."
     ::= { permanentVirtualCircuitEntry 2 }
 
 permanentVirtualCircuit-DTE OBJECT IDENTIFIER
@@ -10350,7 +10505,7 @@ permanentVirtualCircuit-DTElogicalChannel OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides the logical channel of the DTE PVC."
     ::= { permanentVirtualCircuit-DTEEntry 1 }
 
 permanentVirtualCircuit-DTEpacketSizes OBJECT-TYPE
@@ -10358,7 +10513,7 @@ permanentVirtualCircuit-DTEpacketSizes OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides the packet sizes."
     ::= { permanentVirtualCircuit-DTEEntry 2 }
 
 permanentVirtualCircuit-DTEthroughputClasses OBJECT-TYPE
@@ -10366,7 +10521,7 @@ permanentVirtualCircuit-DTEthroughputClasses OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides the throughput classes."
     ::= { permanentVirtualCircuit-DTEEntry 3 }
 
 permanentVirtualCircuit-DTEwindowSizes OBJECT-TYPE
@@ -10374,7 +10529,7 @@ permanentVirtualCircuit-DTEwindowSizes OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides the window sizes."
     ::= { permanentVirtualCircuit-DTEEntry 4 }
 
 permanentVirtualCircuit-DTERowStatus OBJECT-TYPE
@@ -10382,7 +10537,9 @@ permanentVirtualCircuit-DTERowStatus OBJECT-TYPE
     MAX-ACCESS  read-create
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides a mechanism whereby management stations may create and 
+         delete row in this table.  Entries must persist across agent 
+         reboots."
     ::= { permanentVirtualCircuit-DTEEntry 5 }
 
 permanentVirtualCircuit-DCE OBJECT IDENTIFIER
@@ -10427,7 +10584,7 @@ PermanentVirtualCircuit-DCEEntry ::= SEQUENCE {
     permanentVirtualCircuit-DCEthroughputClasses        DummySyntax,
     permanentVirtualCircuit-DCEwindowSizes              DummySyntax,
     permanentVirtualCircuit-DCEoperationalState         OperationalState,
-    permanentVirtualCircuit-DCEremoteDTEAddress         DummySyntax,
+    permanentVirtualCircuit-DCEremoteDTEAddress         DTEAddress,
     permanentVirtualCircuit-DCEremoteLogicalChannel     DummySyntax,
     permanentVirtualCircuit-DCERowStatus                RowStatus
 }
@@ -10437,7 +10594,7 @@ permanentVirtualCircuit-DCEchargingDirection OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides the charging direction."
     ::= { permanentVirtualCircuit-DCEEntry 1 }
 
 permanentVirtualCircuit-DCElogicalChannel OBJECT-TYPE
@@ -10445,7 +10602,7 @@ permanentVirtualCircuit-DCElogicalChannel OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides the logical channel for the DCE PVC."
     ::= { permanentVirtualCircuit-DCEEntry 2 }
 
 permanentVirtualCircuit-DCEpacketSizes OBJECT-TYPE
@@ -10453,7 +10610,7 @@ permanentVirtualCircuit-DCEpacketSizes OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides the packet sizes."
     ::= { permanentVirtualCircuit-DCEEntry 3 }
 
 permanentVirtualCircuit-DCEthroughputClasses OBJECT-TYPE
@@ -10461,7 +10618,7 @@ permanentVirtualCircuit-DCEthroughputClasses OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides the throughput classes."
     ::= { permanentVirtualCircuit-DCEEntry 4 }
 
 permanentVirtualCircuit-DCEwindowSizes OBJECT-TYPE
@@ -10469,7 +10626,7 @@ permanentVirtualCircuit-DCEwindowSizes OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides the window sizes."
     ::= { permanentVirtualCircuit-DCEEntry 5 }
 
 permanentVirtualCircuit-DCEoperationalState OBJECT-TYPE
@@ -10477,15 +10634,16 @@ permanentVirtualCircuit-DCEoperationalState OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides the operational state of the PVC in accordance with 
+         the OperationalState textual convention and X.721."
     ::= { permanentVirtualCircuit-DCEEntry 6 }
 
 permanentVirtualCircuit-DCEremoteDTEAddress OBJECT-TYPE
-    SYNTAX      DummySyntax
+    SYNTAX      DTEAddress
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides the remote DTE address."
     ::= { permanentVirtualCircuit-DCEEntry 7 }
 
 permanentVirtualCircuit-DCEremoteLogicalChannel OBJECT-TYPE
@@ -10493,7 +10651,7 @@ permanentVirtualCircuit-DCEremoteLogicalChannel OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides the remote logical channel."
     ::= { permanentVirtualCircuit-DCEEntry 8 }
 
 permanentVirtualCircuit-DCERowStatus OBJECT-TYPE
@@ -10501,7 +10659,9 @@ permanentVirtualCircuit-DCERowStatus OBJECT-TYPE
     MAX-ACCESS  read-create
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides a mechanism whereby management stations may create and 
+         delete rows in this table.  Entries must persist across agent 
+         reboots."
     ::= { permanentVirtualCircuit-DCEEntry 9 }
 
 virtualCallIVMO OBJECT IDENTIFIER
@@ -10531,7 +10691,10 @@ virtualCallIVMOEntry OBJECT-TYPE
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION 
-        ""
+        "Each row in this table is indexed by virtual call IVMO 
+         identifier (which is basically a protocol profile name).  Each 
+         row contains initial values for the creation of virtual calls 
+         (e.g. rows in the virtualCallTable)."
     REFERENCE   
         "ITU-T Rec. X.283 | ISO/IEC 10733 virtualCallIVMO MO."
     INDEX       { x25PLEId, virtualCallIVMOId }
@@ -10541,24 +10704,24 @@ VirtualCallIVMOEntry ::= SEQUENCE {
     virtualCallIVMOId                       SimpleNameType,
     virtualCallIVMOfastSelect               FastSelect,
     virtualCallIVMOpacketSizes              DummySyntax,
-    virtualCallIVMOreverseCharging          DummySyntax,
+    virtualCallIVMOreverseCharging          TruthValue,
     virtualCallIVMOthroughputClasses        DummySyntax,
     virtualCallIVMOwindowSizes              DummySyntax,
-    virtualCallIVMOproposedPacketSize       DummySyntax,
-    virtualCallIVMOproposedWindowSize       DummySyntax,
-    virtualCallIVMOacceptReverseCharging    DummySyntax,
-    virtualCallIVMOproposeReverseCharging   DummySyntax,
-    virtualCallIVMOcallTime                 DummySyntax,
-    virtualCallIVMOresetTime                DummySyntax,
-    virtualCallIVMOclearTime                DummySyntax,
-    virtualCallIVMOinterruptTime            DummySyntax,
-    virtualCallIVMOresetCount               DummySyntax,
-    virtualCallIVMOclearCount               DummySyntax,
-    virtualCallIVMOwindowTime               DummySyntax,
-    virtualCallIVMOdataRetransmissionTime   DummySyntax,
-    virtualCallIVMOdataRetransmissionCount  DummySyntax,
-    virtualCallIVMOrejectTime               DummySyntax,
-    virtualCallIVMOrejectCount              DummySyntax,
+    virtualCallIVMOproposedPacketSize       Integer32,
+    virtualCallIVMOproposedWindowSize       Integer32,
+    virtualCallIVMOacceptReverseCharging    TruthValue,
+    virtualCallIVMOproposeReverseCharging   TruthValue,
+    virtualCallIVMOcallTime                 TimeInterval,
+    virtualCallIVMOresetTime                TimeInterval,
+    virtualCallIVMOclearTime                TimeInterval,
+    virtualCallIVMOinterruptTime            TimeInterval,
+    virtualCallIVMOresetCount               Integer32,
+    virtualCallIVMOclearCount               Integer32,
+    virtualCallIVMOwindowTime               TimeInterval,
+    virtualCallIVMOdataRetransmissionTime   TimeInterval,
+    virtualCallIVMOdataRetransmissionCount  Integer32,
+    virtualCallIVMOrejectTime               TimeInterval,
+    virtualCallIVMOrejectCount              Integer32,
     virtualCallIVMORowStatus                RowStatus
 }
 
@@ -10567,7 +10730,9 @@ virtualCallIVMOId OBJECT-TYPE
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides a simple name for use as an index in this table.  The 
+         value of the name has no other significance and can be chosen 
+         at the convenience of the manager."
     ::= { virtualCallIVMOEntry 1 }
 
 -- X.283 or ISO 10733
@@ -10576,7 +10741,15 @@ virtualCallIVMOfastSelect OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Type of fast select used or to be used for call.  In the case 
+         of an IVMO, this specifies that one of 'fast select', 'fast 
+         select with restricted response', or 'no fast select' facility 
+         is to be used for the call.  It includes a value 'not 
+         specified' which indicates that no preference is expressed in 
+         the IVMO.  In the case of non-IVMO MO, this specifies that one 
+         of 'fast select' or 'no fast select' was used for the call."
+    REFERENCE   
+        "ITU-T Rec. X.283 | ISO/IEC 10733 fastSelect ATTRIBUTE."
     ::= { virtualCallIVMOEntry 2 }
 
 -- X.283 only
@@ -10585,15 +10758,30 @@ virtualCallIVMOpacketSizes OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "The packet sizes for this VC. In the case of an IVMO MO it is 
+         the proposed value of the packet sizes (incoming and outgoing) 
+         to be used when establishing the virtual call, expressed in 
+         octets. The value of NULL indicates that the default packet 
+         size for that direction (as indicated by the defaultPacketSizes 
+         attribute of the containing X.25 PLE MO), is to be used. In the 
+         case of a non-IVMO MO it is the actual packet sizes in use for 
+         this VC."
+    REFERENCE   
+        "ITU-T Rec. X.283 | ISO/IEC 10733 packetSizes ATTRIBUTE."
     ::= { virtualCallIVMOEntry 3 }
 
 virtualCallIVMOreverseCharging OBJECT-TYPE
-    SYNTAX      DummySyntax
-    MAX-ACCESS  read-only
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
     STATUS      current
     DESCRIPTION 
-        ""
+        "Use of reverse charging. When 'True' for an outgoing call, it 
+         shall be (for an IVMO), or was (for a non-IVMO), initiated 
+         requesting reverse charging. When 'True' for an incoming call 
+         associated with a virtualCall MO, it indicates that reverse 
+         charging was accepted."
+    REFERENCE   
+        "ITU-T Rec. X.283 | ISO/IEC 10733 reverseCharging ATTRIBUTE."
     ::= { virtualCallIVMOEntry 4 }
 
 virtualCallIVMOthroughputClasses OBJECT-TYPE
@@ -10601,7 +10789,7 @@ virtualCallIVMOthroughputClasses OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides throughput classes."
     ::= { virtualCallIVMOEntry 5 }
 
 virtualCallIVMOwindowSizes OBJECT-TYPE
@@ -10609,133 +10797,213 @@ virtualCallIVMOwindowSizes OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides window sizes."
     ::= { virtualCallIVMOEntry 6 }
 
 -- ISO 10733 only
 virtualCallIVMOproposedPacketSize OBJECT-TYPE
-    SYNTAX      DummySyntax
+    SYNTAX      Integer32
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "The proposed value of the packet size parameter to be used when 
+         establishing the virtual call, expressed in octets. The value 
+         of NULL (zero) indicates that the default packet size (as 
+         indicated by the defaultPacketSize attribute of the containing 
+         X.25 PLE MO), is to be used."
+    REFERENCE   
+        "ISO/IEC 10733 proposedPacketSize ATTRIBUTE."
     ::= { virtualCallIVMOEntry 7 }
 
 virtualCallIVMOproposedWindowSize OBJECT-TYPE
-    SYNTAX      DummySyntax
+    SYNTAX      Integer32
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "The proposed value of the window size parameter to be used when 
+         establishing the virtual call.  The value of NULL (zero) 
+         indicates that the default window size (as indicated by the 
+         defaultWindowSize attribute of the containing X.25 PLE MO), is 
+         to be used."
+    REFERENCE   
+        "ISO/IEC 10733 proposedWindowSize ATTRIBUTE."
     ::= { virtualCallIVMOEntry 8 }
 
 virtualCallIVMOacceptReverseCharging OBJECT-TYPE
-    SYNTAX      DummySyntax
+    SYNTAX      TruthValue
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "When `False' an incoming call requesting reverse charging shall 
+         not be accepted."
+    REFERENCE   
+        "ISO/IEC 10733: acceptReverseCharging ATTRIBUTE."
     ::= { virtualCallIVMOEntry 9 }
 
 virtualCallIVMOproposeReverseCharging OBJECT-TYPE
-    SYNTAX      DummySyntax
+    SYNTAX      TruthValue
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Specifies whether to propose reverse charging on outgoing 
+         calls.  When true(1), an outgoing call shall be initiated 
+         requesting reverse charging; false(2), reverse charging will 
+         not be requested."
+    REFERENCE   
+        "ISO/IEC 10733: proposeReverseCharging ATTRIBUTE."
     ::= { virtualCallIVMOEntry 10 }
 
 virtualCallIVMOcallTime OBJECT-TYPE
-    SYNTAX      DummySyntax
+    SYNTAX      TimeInterval
+    UNITS       "seconds"
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Value for Timer T21 (Call Request Response Timer) in seconds.  
+         The default value from ISO/IEC 10733 is 20 seconds."
+    REFERENCE   
+        "ISO/IEC 10733: callTime ATTRIBUTE."
+    DEFVAL      { 20000 }
     ::= { virtualCallIVMOEntry 11 }
 
 virtualCallIVMOresetTime OBJECT-TYPE
-    SYNTAX      DummySyntax
+    SYNTAX      TimeInterval
+    UNITS       "seconds"
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Value for Timer T22 (Reset Request Response Timer) in seconds.  
+         The default value from ISO/IEC 10733 is 180 seconds."
+    REFERENCE   
+        "ISO/IEC 10733: resetTime ATTRIBUTE."
+    DEFVAL      { 18000 }
     ::= { virtualCallIVMOEntry 12 }
 
 virtualCallIVMOclearTime OBJECT-TYPE
-    SYNTAX      DummySyntax
+    SYNTAX      TimeInterval
+    UNITS       "seconds"
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Value for Timer T23 (Clear Request Response Timer) in seconds.  
+         The default value from ISO/IEC 10733 is 180 seconds."
+    REFERENCE   
+        "ISO/IEC 10733: clearTime ATTRIBUTE."
+    DEFVAL      { 18000 }
     ::= { virtualCallIVMOEntry 13 }
 
 virtualCallIVMOinterruptTime OBJECT-TYPE
-    SYNTAX      DummySyntax
+    SYNTAX      TimeInterval
+    UNITS       "seconds"
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Value for Timer T26 (Interrupt Response Timer) in seconds.  The 
+         default value from ISO/IEC 10733 is 180 seconds."
+    REFERENCE   
+        "ISO/IEC 10733: interruptTime ATTRIBUTE."
+    DEFVAL      { 18000 }
     ::= { virtualCallIVMOEntry 14 }
 
 virtualCallIVMOresetCount OBJECT-TYPE
-    SYNTAX      DummySyntax
+    SYNTAX      Integer32
+    UNITS       "reset request retransmissions"
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Value for count R22 (Reset Request Retransmission Count).  The 
+         default value from ISO/IEC 10733 is 1."
+    REFERENCE   
+        "ISO/IEC 10733: resetCount ATTRIBUTE."
+    DEFVAL      { 1 }
     ::= { virtualCallIVMOEntry 15 }
 
 virtualCallIVMOclearCount OBJECT-TYPE
-    SYNTAX      DummySyntax
+    SYNTAX      Integer32
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Value for count R23 (Clear Request Retransmission Count).  The 
+         default value from ISO/IEC 10733 is 1."
+    REFERENCE   
+        "ISO/IEC 10733: clearCount ATTRIBUTE."
+    DEFVAL      { 1 }
     ::= { virtualCallIVMOEntry 16 }
 
 -- ISO 10733 only receivingWindowRotationRecoveryProcedures-P 
 -- conditional package
+--      Controls the operation of the optional window rotation recovery 
+--      procedures at a receiving DTE as described in Clause 11.2.2 of 
+--      ISO 8208 (2nd Edition).
 virtualCallIVMOwindowTime OBJECT-TYPE
-    SYNTAX      DummySyntax
+    SYNTAX      TimeInterval
+    UNITS       "seconds"
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Value for Timer T24 (Window Status Transmission Timer) in 
+         seconds.  The default value from ISO/IEC 10733 is 60 seconds."
+    REFERENCE   
+        "ISO/IEC 10733: windowTime ATTRIBUTE."
+    DEFVAL      { 6000 }
     ::= { virtualCallIVMOEntry 17 }
 
 -- ISO 10733 only transmittingWindowRotationRecoveryProcedures-P 
 -- conditional package
+--      Controls the operation of the optional window rotation recovery 
+--      procedures at a transmitting DTE as described in Clause 11.2.1 
+--      of ISO 8208 (2nd Edition).
 virtualCallIVMOdataRetransmissionTime OBJECT-TYPE
-    SYNTAX      DummySyntax
+    SYNTAX      TimeInterval
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Default for Timer T25 (Window Rotation Timer) in seconds.  The 
+         default value from ISO/IEC 10733 is 200 seconds."
+    REFERENCE   
+        "ISO/IEC 10733: dataRetransmissionTime ATTRIBUTE."
+    DEFVAL      { 20000 }
     ::= { virtualCallIVMOEntry 18 }
 
 virtualCallIVMOdataRetransmissionCount OBJECT-TYPE
-    SYNTAX      DummySyntax
+    SYNTAX      Integer32
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Value for count R25 (Data Packet Retransmission Count).  The 
+         default value from ISO/IEC 10733 is zero (0)."
+    REFERENCE   
+        "ISO/IEC 10733: dataRetransmissionCount ATTRIBUTE."
+    DEFVAL      { 0 }
     ::= { virtualCallIVMOEntry 19 }
 
 -- ISO 10733 only packetRetransmissionProcedures-P conditional package
+--      Controls the operation of the optional packet retransmission 
+--      procedures as described in Clause 13.4 of ISO 8208 (2nd 
+--      Edition).
 virtualCallIVMOrejectTime OBJECT-TYPE
-    SYNTAX      DummySyntax
+    SYNTAX      TimeInterval
+    UNITS       "seconds"
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Value for Timer T27 (Reject Response Timer) in seconds.  The 
+         default value from ISO/IEC 10733 is 60 seconds."
+    REFERENCE   
+        "ISO/IEC 10733: rejectTime ATTRIBUTE."
+    DEFVAL      { 6000 }
     ::= { virtualCallIVMOEntry 20 }
 
 virtualCallIVMOrejectCount OBJECT-TYPE
-    SYNTAX      DummySyntax
+    SYNTAX      Integer32
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Value for count R27 (Reject Retransmission Count).  The default 
+         value from ISO/IEC 10733 is zero (0)."
+    REFERENCE   
+        "ISO/IEC 10733: rejectCount ATTRIBUTE."
+    DEFVAL      { 0 }
     ::= { virtualCallIVMOEntry 21 }
 
 -- both
@@ -10744,7 +11012,9 @@ virtualCallIVMORowStatus OBJECT-TYPE
     MAX-ACCESS  read-create
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides a mechanism whereby management stations may create and 
+         delete rows in this table.  Entries must persist across agent 
+         reboot."
     ::= { virtualCallIVMOEntry 22 }
 
 switchedVirtualCall OBJECT IDENTIFIER
@@ -10777,77 +11047,106 @@ switchedVirtualCallEntry OBJECT-TYPE
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION 
-        ""
+        "Each row in this table is indexed by X.25 packet-layer entity 
+         and virtual call identifiers.  Each row contains 
+         characteristics and operational status of a switched virtual 
+         call."
     REFERENCE   
         "ISO/IEC 10733 switchedVirtualCall MO."
     INDEX       { x25PLEId, virtualCallId }
     ::= { switchedVirtualCallTable 1 }
 
 SwitchedVirtualCallEntry ::= SEQUENCE {
-    switchedVirtualCalldirection                DummySyntax,
-    switchedVirtualCallremoteDTEAddress         DummySyntax,
-    switchedVirtualCallthroughputClass          DummySyntax,
-    switchedVirtualCallredirectReason           DummySyntax,
-    switchedVirtualCalloriginallyCalledAddress  DummySyntax,
-    switchedVirtualCallcallingAddressExtension  DummySyntax,
-    switchedVirtualCallcalledAddressExtension   DummySyntax,
+    switchedVirtualCalldirection                INTEGER,
+    switchedVirtualCallremoteDTEAddress         DTEAddress,
+    switchedVirtualCallthroughputClass          Integer32,
+    switchedVirtualCallredirectReason           Integer32,
+    switchedVirtualCalloriginallyCalledAddress  DTEAddress,
+    switchedVirtualCallcallingAddressExtension  NAddress,
+    switchedVirtualCallcalledAddressExtension   NAddress,
     switchedVirtualCallRowStatus                RowStatus
 }
 
 switchedVirtualCalldirection OBJECT-TYPE
-    SYNTAX      DummySyntax
+    SYNTAX      INTEGER { incoming(0), outgoing(1) }
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "The direction (incoming or outgoing) of the call."
+    REFERENCE   
+        "ISO/IEC 10733 direction ATTRIBUTE."
     ::= { switchedVirtualCallEntry 1 }
 
 switchedVirtualCallremoteDTEAddress OBJECT-TYPE
-    SYNTAX      DummySyntax
+    SYNTAX      DTEAddress
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "The DTE Address of the remote DTE. In the case of an outgoing 
+         call, this is the remote DTE address from the called address of 
+         the transmitted call request packet. In the case of an incoming 
+         call, it is the calling address from the received call request 
+         packet."
+    REFERENCE   
+        "ISO/IEC 10733 remoteDTEAddress ATTRIBUTE."
     ::= { switchedVirtualCallEntry 2 }
 
 switchedVirtualCallthroughputClass OBJECT-TYPE
-    SYNTAX      DummySyntax
+    SYNTAX      Integer32 (0..15)
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "The actual throughput class in use for the call. For SVCs this 
+         is the result of negotiation."
+    REFERENCE   
+        "ISO/IEC 10733 throughputClass ATTRIBUTE."
     ::= { switchedVirtualCallEntry 3 }
 
 switchedVirtualCallredirectReason OBJECT-TYPE
-    SYNTAX      DummySyntax
+    SYNTAX      Integer32 (0..127)
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "The reason for call redirect. The zero value indicates that the 
+         call was not redirected."
+    REFERENCE   
+        "ISO/IEC 10733 redirectReason ATTRIBUTE."
     ::= { switchedVirtualCallEntry 4 }
 
 switchedVirtualCalloriginallyCalledAddress OBJECT-TYPE
-    SYNTAX      DummySyntax
+    SYNTAX      DTEAddress
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "The originally called address."
+    REFERENCE   
+        "ISO/IEC 10733 originallyCalledAddress ATTRIBUTE."
     ::= { switchedVirtualCallEntry 5 }
 
 switchedVirtualCallcallingAddressExtension OBJECT-TYPE
-    SYNTAX      DummySyntax
+    SYNTAX      NAddress
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "The contents of the calling address extension field.  In the 
+         OSI context this will always be an NSAP address but in other 
+         uses it may not.  In any case it may be null, for example when 
+         used by ISO 8473."
+    REFERENCE   
+        "ISO/IEC 10733 callingAddressExtension ATTRIBUTE."
     ::= { switchedVirtualCallEntry 6 }
 
 switchedVirtualCallcalledAddressExtension OBJECT-TYPE
-    SYNTAX      DummySyntax
+    SYNTAX      NAddress
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "The contents of the called address extension field.  In the OSI 
+         context this will always be an NSAP address but in other uses 
+         it may not.  In any case it may be null, for example when used 
+         by ISO 8473."
+    REFERENCE   
+        "ISO/IEC 10733 calledAddressExtension ATTRIBUTE."
     ::= { switchedVirtualCallEntry 7 }
 
 -- sVCMO-x25PLE name binding
@@ -10856,7 +11155,11 @@ switchedVirtualCallRowStatus OBJECT-TYPE
     MAX-ACCESS  read-create
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides a mechanism whereby management stations may create and 
+         delete rows in this table.  Entries must persist across agent 
+         reboot."
+    REFERENCE   
+        "ISO/IEC 10733 SVCMO-x25PLE NAME-BINDING."
     ::= { switchedVirtualCallEntry 8 }
 
 virtualCall-DTE OBJECT IDENTIFIER
@@ -10889,46 +11192,60 @@ virtualCall-DTEEntry OBJECT-TYPE
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION 
-        ""
+        "Each row in this table is indexed by X.25 PLE and virtual 
+         circuit identifiers.  Each row contains information concerning 
+         a DTE virtual call."
     REFERENCE   
         "ITU-T Rec. X.283 | ISO/IEC 10733 virtualCall-DTE MO."
     INDEX       { x25PLEId, virtualCircuitId }
     ::= { virtualCall-DTETable 1 }
 
 VirtualCall-DTEEntry ::= SEQUENCE {
-    virtualCall-DTEcallingAddressExtension  DummySyntax,
-    virtualCall-DTEcalledAddressExtension   DummySyntax,
-    virtualCall-DTEdirection                DummySyntax,
+    virtualCall-DTEcallingAddressExtension  NAddress,
+    virtualCall-DTEcalledAddressExtension   NAddress,
+    virtualCall-DTEdirection                INTEGER,
     virtualCall-DTEfastSelect               FastSelect,
-    virtualCall-DTEoriginallyCalledAddress  DummySyntax,
-    virtualCall-DTEredirectReason           DummySyntax,
-    virtualCall-DTEremoteDTEAddress         DummySyntax,
-    virtualCall-DTEreverseCharging          DummySyntax,
+    virtualCall-DTEoriginallyCalledAddress  DTEAddress,
+    virtualCall-DTEredirectReason           Integer32,
+    virtualCall-DTEremoteDTEAddress         DTEAddress,
+    virtualCall-DTEreverseCharging          TruthValue,
     virtualCall-DTERowStatus                RowStatus
 }
 
 virtualCall-DTEcallingAddressExtension OBJECT-TYPE
-    SYNTAX      DummySyntax
+    SYNTAX      NAddress
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "The contents of the calling address extension field.  In the 
+         OSI context this will always be an NSAP address but in other 
+         uses it may not. In any case it may be null, for example, when 
+         used by ITU-T Rec. X.233 | ISO/IEC 8473-1."
+    REFERENCE   
+        "ITU-T Rec. X.283: callingAddressExtension ATTRIBUTE."
     ::= { virtualCall-DTEEntry 1 }
 
 virtualCall-DTEcalledAddressExtension OBJECT-TYPE
-    SYNTAX      DummySyntax
+    SYNTAX      NAddress
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "The contents of the called address extension field.  In the OSI 
+         context this will always be an NSAP address but in other uses 
+         it may not. In any case it may be null, for example, when used 
+         by ITU-T Rec. X.233 | ISO/IEC 8473-1."
+    REFERENCE   
+        "ITU-T Rec. X.283: calledAddressExtension ATTRIBUTE."
     ::= { virtualCall-DTEEntry 2 }
 
 virtualCall-DTEdirection OBJECT-TYPE
-    SYNTAX      DummySyntax
+    SYNTAX      INTEGER { incoming(0), outgoing(1) }
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "The direction (incoming or outgoing) of the call."
+    REFERENCE   
+        "ITU-T Rec. X.283: direction ATTRIBUTE."
     ::= { virtualCall-DTEEntry 3 }
 
 virtualCall-DTEfastSelect OBJECT-TYPE
@@ -10936,39 +11253,69 @@ virtualCall-DTEfastSelect OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Type of fast select used or to be used for call. In the case of 
+         an IVMO, this specifies that one of 'fast select', 'fast select 
+         with restricted response', or no fast select facility is to be 
+         used for the call. It includes a value 'not specified' which 
+         indicates that no preference is expressed in the IVMO. In the 
+         case of a non-IVMO MO, this specifies that one of 'fast select' 
+         or 'no fast select' was used for the call."
+    REFERENCE   
+        "ITU-T Rec. X.283: fastSelect ATTRIBUTE."
     ::= { virtualCall-DTEEntry 4 }
 
 virtualCall-DTEoriginallyCalledAddress OBJECT-TYPE
-    SYNTAX      DummySyntax
+    SYNTAX      DTEAddress
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "The originally called address."
+    REFERENCE   
+        "ITU-T Rec. X.283: originallyCalledAddress ATTRIBUTE."
     ::= { virtualCall-DTEEntry 5 }
 
 virtualCall-DTEredirectReason OBJECT-TYPE
-    SYNTAX      DummySyntax
+    SYNTAX      Integer32 (0..127)
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "The reason why the call has been redirected. This is the reason 
+         why the call has been offered or has been connected to an 
+         address different from the originally called address. That is, 
+         the value of the first octet of the Facility Parameter Field of 
+         the CRCDN or CLAMN facility, indicating the reason for call 
+         redirection or call deflection. The zero value indicates that 
+         the call was not redirected."
+    REFERENCE   
+        "ITU-T Rec. X.283: redirectReason ATTRIBUTE."
     ::= { virtualCall-DTEEntry 6 }
 
 virtualCall-DTEremoteDTEAddress OBJECT-TYPE
-    SYNTAX      DummySyntax
+    SYNTAX      DTEAddress
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "The DTE Address of the remote DTE. In the case of an outgoing 
+         call, this is the remote DTE address from the called address of 
+         the transmitted call request packet. In the case of an incoming 
+         call, it is the calling address from the received call request 
+         packet."
+    REFERENCE   
+        "ITU-T Rec. X.283: remoteDTEAddress ATTRIBUTE."
     ::= { virtualCall-DTEEntry 7 }
 
 virtualCall-DTEreverseCharging OBJECT-TYPE
-    SYNTAX      DummySyntax
+    SYNTAX      TruthValue
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Use of reverse charging. When 'True' for an outgoing call, it 
+         shall be (for an IVMO), or was (for a non-IVMO), initiated 
+         requesting reverse charging. When 'True' for an incoming call 
+         associated with a virtualCall MO, it indicates that reverse 
+         charging was accepted."
+    REFERENCE   
+        "ITU-T Rec. X.283: reverseCharging ATTRIBUTE."
     ::= { virtualCall-DTEEntry 8 }
 
 virtualCall-DTERowStatus OBJECT-TYPE
@@ -10976,7 +11323,9 @@ virtualCall-DTERowStatus OBJECT-TYPE
     MAX-ACCESS  read-create
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides a mechanism whereby management stations may create or 
+         delete rows in this table.  Entries must persist across agent 
+         reboot."
     ::= { virtualCall-DTEEntry 9 }
 
 virtualCall-DCE OBJECT IDENTIFIER
@@ -11003,51 +11352,61 @@ virtualCall-DCEEntry OBJECT-TYPE
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION 
-        ""
+        "Each row in this table is indexed by X.25 PLE and virtual 
+         circuit identifiers.  Each row contains the characteristics and 
+         operational status of DCE virtual calls."
     REFERENCE   
         "ITU-T Rec. X.283 | ISO/IEC 10733 virtualCall-DCE MO."
     INDEX       { x25PLEId, virtualCircuitId }
     ::= { virtualCall-DCETable 1 }
 
 VirtualCall-DCEEntry ::= SEQUENCE {
-    virtualCall-DCEchargingDirection                        DummySyntax,
-    virtualCall-DCEcUGSelection                             DummySyntax,
-    virtualCall-DCEdirection                                DummySyntax,
+    virtualCall-DCEchargingDirection                        TruthValue,
+    virtualCall-DCEcUGSelection                             TruthValue,
+    virtualCall-DCEdirection                                INTEGER,
     virtualCall-DCEfastSelect                               FastSelect,
-    virtualCall-DCEremoteDTEAddress                         DummySyntax,
-    virtualCall-DCEtransitDelaySelectionAndIndication       DummySyntax,
-    virtualCall-DCEbilateralCUGSelection                    DummySyntax,
+    virtualCall-DCEremoteDTEAddress                         DTEAddress,
+    virtualCall-DCEtransitDelaySelectionAndIndication       TruthValue,
+    virtualCall-DCEbilateralCUGSelection                    TruthValue,
     virtualCall-DCEcallRedirectionDeflectionNotification    TruthValue,
     virtualCall-DCEcalledLineAddressModifiedNotification    TruthValue,
-    virtualCall-DCEcUGWithOutgoingAccessSelection           DummySyntax,
-    virtualCall-DCEnUISelection                             DummySyntax,
-    virtualCall-DCEreverseCharging                          DummySyntax,
-    virtualCall-DCErOASelection                             DummySyntax,
+    virtualCall-DCEcUGWithOutgoingAccessSelection           TruthValue,
+    virtualCall-DCEnUISelection                             TruthValue,
+    virtualCall-DCEreverseCharging                          TruthValue,
+    virtualCall-DCErOASelection                             TruthValue,
     virtualCall-DCERowStatus                                RowStatus
 }
 
 virtualCall-DCEchargingDirection OBJECT-TYPE
-    SYNTAX      DummySyntax
+    SYNTAX      TruthValue
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Indicates the use of the charging direction facility for that 
+         call."
+    REFERENCE   
+        "ITU-T Rec. X.283: chargingDirection ATTRIBUTE."
     ::= { virtualCall-DCEEntry 1 }
 
 virtualCall-DCEcUGSelection OBJECT-TYPE
-    SYNTAX      DummySyntax
+    SYNTAX      TruthValue
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Indicates the use of the closed user group selection facility 
+         for that call."
+    REFERENCE   
+        "ITU-T Rec. X.283: cUGSelection ATTRIBUTE."
     ::= { virtualCall-DCEEntry 2 }
 
 virtualCall-DCEdirection OBJECT-TYPE
-    SYNTAX      DummySyntax
+    SYNTAX      INTEGER { incoming(0), outgoing(1) }
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "The direction (incoming or outgoing) of the call."
+    REFERENCE   
+        "ITU-T Rec. X.283: direction ATTRIBUTE."
     ::= { virtualCall-DCEEntry 3 }
 
 virtualCall-DCEfastSelect OBJECT-TYPE
@@ -11055,31 +11414,52 @@ virtualCall-DCEfastSelect OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Type of fast select used or to be used for call. In the case of 
+         an IVMO, this specifies that one of 'fast select', 'fast select 
+         with restricted response', or no fast select facility is to be 
+         used for the call. It includes a value 'not specified' which 
+         indicates that no preference is expressed in the IVMO. In the 
+         case of a non-IVMO MO, this specifies that one of 'fast select' 
+         or 'no fast select' was used for the call."
+    REFERENCE   
+        "ITU-T Rec. X.283: fastSelect ATTRIBUTE."
     ::= { virtualCall-DCEEntry 4 }
 
 virtualCall-DCEremoteDTEAddress OBJECT-TYPE
-    SYNTAX      DummySyntax
+    SYNTAX      DTEAddress
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "The DTE Address of the remote DTE. In the case of an outgoing 
+         call, this is the remote DTE address from the called address of 
+         the transmitted call request packet. In the case of an incoming 
+         call, it is the calling address from the received call request 
+         packet."
+    REFERENCE   
+        "ITU-T Rec. X.283: remoteDTEAddress ATTRIBUTE."
     ::= { virtualCall-DCEEntry 5 }
 
 virtualCall-DCEtransitDelaySelectionAndIndication OBJECT-TYPE
-    SYNTAX      DummySyntax
+    SYNTAX      TruthValue
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Indicates the use of the transit delay selection and indication 
+         facility for that call."
+    REFERENCE   
+        "ITU-T Rec. X.283: transitDelaySelectionAndIndication 
+               ATTRIBUTE."
     ::= { virtualCall-DCEEntry 6 }
 
 virtualCall-DCEbilateralCUGSelection OBJECT-TYPE
-    SYNTAX      DummySyntax
+    SYNTAX      TruthValue
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Indicates the use of the bilateral closed user group selection 
+         facility for that call."
+    REFERENCE   
+        "ITU-T Rec. X.283: bilateralCUGSelection ATTRIBUTE."
     ::= { virtualCall-DCEEntry 7 }
 
 virtualCall-DCEcallRedirectionDeflectionNotification OBJECT-TYPE
@@ -11087,7 +11467,10 @@ virtualCall-DCEcallRedirectionDeflectionNotification OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Indicates the use of the call redirection deflection 
+         notification facility for that call."
+    REFERENCE   
+        "ITU-T Rec. X.283: callRedirectionDeflectionNotification ATTRIBUTE."
     ::= { virtualCall-DCEEntry 8 }
 
 virtualCall-DCEcalledLineAddressModifiedNotification OBJECT-TYPE
@@ -11095,39 +11478,60 @@ virtualCall-DCEcalledLineAddressModifiedNotification OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Indicates the use of the called line address modified 
+         notification facility for that call."
+    REFERENCE   
+        "ITU-T Rec. X.283: calledLineAddressModifiedNotification ATTRIBUTE."
     ::= { virtualCall-DCEEntry 9 }
 
 virtualCall-DCEcUGWithOutgoingAccessSelection OBJECT-TYPE
-    SYNTAX      DummySyntax
+    SYNTAX      TruthValue
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Indicates the use of the Closed User Group With Outgoing Access 
+         Selection facility for that call. It may only take the value 
+         'True' if the DTE does not have a preferential closed user 
+         group, as described in ITU-T Recommendation X.25 and ISO/IEC 
+         8208."
+    REFERENCE   
+        "ITU-T Rec. X.283: cUGWithOutgoingAccessSelection ATTRIBUTE."
     ::= { virtualCall-DCEEntry 10 }
 
 virtualCall-DCEnUISelection OBJECT-TYPE
-    SYNTAX      DummySyntax
+    SYNTAX      TruthValue
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Indicates the use of the network user identification selection 
+         facility for that call."
+    REFERENCE   
+        "ITU-T Rec. X.283: nUISelection ATTRIBUTE."
     ::= { virtualCall-DCEEntry 11 }
 
 virtualCall-DCEreverseCharging OBJECT-TYPE
-    SYNTAX      DummySyntax
+    SYNTAX      TruthValue
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Use of reverse charging. When 'True' for an outgoing call, it 
+         shall be (for an IVMO), or was (for a non-IVMO), initiated 
+         requesting reverse charging. When 'True' for an incoming call 
+         associated with a virtualCall MO, it indicates that reverse 
+         charging was accepted."
+    REFERENCE   
+        "ITU-T Rec. X.283: reverseCharging ATTRIBUTE."
     ::= { virtualCall-DCEEntry 12 }
 
 virtualCall-DCErOASelection OBJECT-TYPE
-    SYNTAX      DummySyntax
+    SYNTAX      TruthValue
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Indicates the use of the registered operating agency selection 
+         facility for that call."
+    REFERENCE   
+        "ITU-T Rec. X.283: rOASelection ATTRIBUTE."
     ::= { virtualCall-DCEEntry 13 }
 
 virtualCall-DCERowStatus OBJECT-TYPE
@@ -11135,7 +11539,8 @@ virtualCall-DCERowStatus OBJECT-TYPE
     MAX-ACCESS  read-create
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides a mechanism whereby management stations may create and 
+         delete rows in this table.  Entries must survive agent reboot."
     ::= { virtualCall-DCEEntry 14 }
 
 dSeriesCounts OBJECT IDENTIFIER
@@ -11187,7 +11592,9 @@ dSeriesId OBJECT-TYPE
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION 
-        ""
+        "The name of this instance of the dSeriesCounts MO."
+    REFERENCE   
+        "ITU-T Rec. X.286: dSeriesId ATTRIBUTE."
     ::= { dSeriesCountsEntry 1 }
 
 dSeriesResetRequestIndicationPackets OBJECT-TYPE
@@ -11195,7 +11602,10 @@ dSeriesResetRequestIndicationPackets OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Value for count of Reset Request or Indication Packets with 
+         restrictions defined in Recommendation D.11."
+    REFERENCE   
+        "ITU-T Rec. X.286: dSeriesResetRequestIndicationPackets ATTRIBUTE."
     ::= { dSeriesCountsEntry 2 }
 
 dSeriesSegmentsSent OBJECT-TYPE
@@ -11203,7 +11613,10 @@ dSeriesSegmentsSent OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Value for count of Segments Sent, in 64 octets, as per 
+         Recommendation D.12."
+    REFERENCE   
+        "ITU-T Rec. X.286: dSeriesSegmentsSent ATTRIBUTE."
     ::= { dSeriesCountsEntry 3 }
 
 dSeriesSegmentsReceived OBJECT-TYPE
@@ -11211,7 +11624,10 @@ dSeriesSegmentsReceived OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Value for count of Segments Received, in 64 octets, as per 
+         Recommendation D.12."
+    REFERENCE   
+        "ITU-T Rec. X.286: dSeriesSegmentsReceived ATTRIBUTE."
     ::= { dSeriesCountsEntry 4 }
 
 dSeriesRowStatus OBJECT-TYPE
@@ -11219,7 +11635,8 @@ dSeriesRowStatus OBJECT-TYPE
     MAX-ACCESS  read-create
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides a mechanism whereby management stations may create and 
+         delete rows in this table.  Entries must survive agent reboot."
     ::= { dSeriesCountsEntry 5 }
 
 adjacency OBJECT IDENTIFIER
@@ -11455,7 +11872,9 @@ virtualAdjacencyEntry OBJECT-TYPE
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION 
-        ""
+        "Each row in this table is indexed by communications entity, 
+         connectionless protocol machine and virtual adjacency network 
+         entity title. Each row contains a network entity title."
     REFERENCE   
         "ISO/IEC 10589 virtualAdjacency MO."
     INDEX       { communicationsEntityId, clProtocolMachineId, 
@@ -11472,7 +11891,7 @@ virtualAdjacencyNetworkEntityTitle OBJECT-TYPE
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides the adjacency network entity title."
     REFERENCE   
         "ISO/IEC 10589 networkEntityTitle attribute."
     ::= { virtualAdjacencyEntry 1 }
@@ -11508,7 +11927,9 @@ destinationEntry OBJECT-TYPE
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION 
-        ""
+        "Each entry in this table is indexed by communications entity, 
+         connectionless protocol machine and destination address prefix.  
+         Each row contains information about destinations."
     REFERENCE   
         "ISO/IEC 10589 destination MO."
     INDEX       { communicationsEntityId, clProtocolMachineId, 
@@ -11622,7 +12043,7 @@ destinationSystemTable OBJECT-TYPE
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides a table of destination systems."
     REFERENCE   
         "ISO/IEC 10589 destinationSystem MOC."
     ::= { destinationSystem 1 }
@@ -11632,13 +12053,14 @@ destinationSystemEntry OBJECT-TYPE
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION 
-        ""
+        "Each row in this table is indexed by communications entity, 
+         connectionless protocol machine and destination system network 
+         entity title.  Each row contains characteristics of the 
+         destination system."
     REFERENCE   
         "ISO/IEC 10589 destinationSystem MO."
     INDEX       { communicationsEntityId, clProtocolMachineId, 
-                  destinationSystemNetworkEntityTitle, 
-                  destinationSystemMetricType, 
-                  destinationSystemAdjacency }
+                  destinationSystemNetworkEntityTitle }
     ::= { destinationSystemTable 1 }
 
 DestinationSystemEntry ::= SEQUENCE {
@@ -11653,7 +12075,7 @@ destinationSystemNetworkEntityTitle OBJECT-TYPE
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides the network entity title used as an index."
     REFERENCE   
         "ISO/IEC 10589 networkEntityTitle attribute."
     ::= { destinationSystemEntry 1 }
@@ -11663,7 +12085,7 @@ destinationSystemMetricType OBJECT-TYPE
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides the metric type."
     ::= { destinationSystemEntry 2 }
 
 desintationSystemMetric OBJECT-TYPE
@@ -11671,9 +12093,7 @@ desintationSystemMetric OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
-    REFERENCE   
-        ""
+        "Provides the metric."
     ::= { destinationSystemEntry 3 }
 
 destinationSystemAdjacency OBJECT-TYPE
@@ -11681,9 +12101,7 @@ destinationSystemAdjacency OBJECT-TYPE
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION 
-        ""
-    REFERENCE   
-        ""
+        "Provides the system adjacency."
     ::= { destinationSystemEntry 4 }
 
 destinationArea OBJECT IDENTIFIER
@@ -11694,7 +12112,7 @@ destinationAreaTable OBJECT-TYPE
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides a table of destination areas."
     REFERENCE   
         "ISO/IEC 10589 destinationArea MOC."
     ::= { destinationArea 1 }
@@ -11704,7 +12122,9 @@ destinationAreaEntry OBJECT-TYPE
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION 
-        ""
+        "Each row in this table is indexed by and defines the 
+         destination area identifier.   Aside for indicating membership, 
+         rows are empty."
     REFERENCE   
         "ISO/IEC 10589 destinationArea MO."
     INDEX       { destinationAreaId }
@@ -11719,7 +12139,8 @@ destinationAreaId OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides the destination area identifier used as an index for 
+         this table."
     ::= { destinationAreaEntry 1 }
 
 reachableAddress OBJECT IDENTIFIER
@@ -13383,7 +13804,8 @@ pDUDiscardIncompletePDUReceived OBJECT-IDENTITY
 pDUDiscardDuplicateOption OBJECT-IDENTITY
     STATUS      current
     DESCRIPTION 
-        ""
+        "Used as an additional specificProbelm in a communicationsAlarm 
+         with pDUDiscard."
     ::= { pDUDiscard 7 }
 
 pDUDiscardDestinationAddressUnreachable OBJECT-IDENTITY
@@ -13801,49 +14223,54 @@ clearCountExceeded OBJECT-IDENTITY
 iSReachabilityChange OBJECT-IDENTITY
     STATUS      current
     DESCRIPTION 
-        ""
+        "This notification is used to report a change in intermediate 
+         system reachability."
     ::= { sseoi 4 1 }
 
 eSReachabilityChange OBJECT-IDENTITY
     STATUS      current
     DESCRIPTION 
-        ""
+        "This notification is used to report a change in end system 
+         reachability."
     ::= { sseoi 4 2 }
 
 successfulConnectionEstablishment OBJECT-IDENTITY
     STATUS      current
     DESCRIPTION 
-        ""
+        "This notification is used to report successful connection 
+         establishment."
     ::= { sseoi 4 3 }
 
 sNPADTEAddress OBJECT-IDENTITY
     STATUS      current
     DESCRIPTION 
-        ""
+        "This identifier is used to report an SNPA DTE address."
     ::= { sseoi 5 1 }
 
 sNPAMACAddress OBJECT-IDENTITY
     STATUS      current
     DESCRIPTION 
-        ""
+        "This identifier is used to report an SNPA MAC address."
     ::= { sseoi 5 2 }
 
 protocol8473 OBJECT-IDENTITY
     STATUS      current
     DESCRIPTION 
-        ""
+        "This identifier is used to identify ISO/IEC 8473."
     ::= { sseoi 6 1 }
 
 protocol9542ES OBJECT-IDENTITY
     STATUS      current
     DESCRIPTION 
-        ""
+        "This identifier is used to identify ISO/IEC 9542 for 
+         end-systems."
     ::= { sseoi 6 2 }
 
 protocol9542IS OBJECT-IDENTITY
     STATUS      current
     DESCRIPTION 
-        ""
+        "This identifier is used to identify ISO/IEC 9542 for 
+         intermediate-systems."
     ::= { sseoi 6 3 }
 
 lapbErrors OBJECT IDENTIFIER
@@ -14366,7 +14793,7 @@ osiObjectGroup OBJECT-GROUP
                   linkageISISrejectedAdjacencies, 
                   linkageISISiSISControlPDUsSent, 
                   linkageISISiSISControlPDUsReceived, 
-                  linkageISISiDFieldLenthMismatches, 
+                  linkageISISiDFieldLengthMismatches, 
                   linkageISISmaximumAreaAddressesMismatches, 
                   linkageISIScircuitTransmitPassword, 
                   linkageISIScircuitReceivedPasswords, 
@@ -14387,7 +14814,7 @@ osiObjectGroup OBJECT-GROUP
                   linkageISISl2IntermediateSystemPriority, 
                   linkageISISl2CircuitID, 
                   linkageISISl2DesignatedIntermediateSystem, 
-                  linkageISISlanL2DesignatedIntermediteSystemChanges, 
+                  linkageISISlanL2DesignatedIntermediateSystemChanges, 
                   linkageRowStatus, cONSAdministrativeState, 
                   cONSOperationalSystemType, cONSRowStatus, 
                   networkConnectionLocalNSAPMO, 
