@@ -56,5 +56,44 @@
 
 static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
 
-/* The purpose of this utility is to perform auto-configuration of the signalling links
+/*
+ * The purpose of this utility is to perform auto-configuration of the
+ * signalling links on one or more X400P cards.
+ *
+ */
+
+/*
+ * First order of business is brining up the cards in their default
+ * configurations when they have not already been brought up by some other
+ * action.  Allow them to settle for at least 10ms so that any blue alarm
+ * conditions (receive carrier loss) is detected.
+ */
+
+
+/*
+ * Second, determine which links do not have anything attached to them by
+ * checking for blue alarms.  Any span with a persistent blue alarm is unusable.
+ * Just because there is a blue alarm for default configuration of a span, does
+ * not mean that there is nothing connected to the span: it may be attached on a
+ * high-impedance monitoring port and the gain is simply insufficient.  So, for
+ * all spans receiving blue alarms, attempt to reconfigure the span with
+ * additional gain.  The possible settings are:
+ *
+ * mxSpanLineGain = MXSPANLINUEGAIN_NONE
+ * mxSpanLineGain = MXSPANLINUEGAIN_MON0DB
+ * mxSpanLineGain = MXSPANLINUEGAIN_MON12DB
+ * mxSpanLineGain = MXSPANLINUEGAIN_MON20DB
+ * mxSpanLineGain = MXSPANLINUEGAIN_MON26DB
+ * mxSpanLineGain = MXSPANLINUEGAIN_MON30DB
+ * mxSpanLineGain = MXSPANLINUEGAIN_MON32DB
+ *
+ * Note that not all gain settings are available for all cards; however, the
+ * driver will select the next lowest gain amount and will, in any case, return
+ * the setting that is made.  Each span reporting a blue alarm should be walked
+ * up through the gain settings until the top is reached.  After each increment,
+ * wait at least 10ms for the span to settle and properly report RCL.  Note that
+ * it might not be sufficient to stop at a point where the blue alarms clear:
+ * the signal might be sufficiently attenuated that the signal cannot get
+ * through.
+ */
 
