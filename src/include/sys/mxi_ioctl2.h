@@ -120,6 +120,11 @@ struct mx_info_card {
 #define X400PCARDTYPE_V400PT				11
 #define X400PCARDTYPE_V401PE				12
 #define X400PCARDTYPE_V401PT				13
+#define X400PCARDTYPE_AE400P                            14
+#define X400PCARDTYPE_AT400P                            15
+#define X400PCARDTYPE_A400P                             16
+#define X400PCARDTYPE_A400PE                            17
+#define X400PCARDTYPE_A400PT                            18
 	uint mxCardIdentifier;
 	uint mxCardRevision;
 	uint mxCardChipType;
@@ -132,6 +137,8 @@ struct mx_info_card {
 #define X400PCARDCHIPTYPE_DS21554			 6
 #define X400PCARDCHIPTYPE_DS2155			 7
 #define X400PCARDCHIPTYPE_DS2156			 8
+#define X400PCARDCHIPTYPE_DS21455                        9
+#define X400PCARDCHIPTYPE_DS21458                       10
 	uint mxCardChipRevision;
 	uint mxCardPciBus;
 	uint mxCardPciSlot;
@@ -555,6 +562,7 @@ struct mx_status_span {
 #define MXSPANALARMS_RED			 1
 #define MXSPANALARMS_BLUE			 2
 #define MXSPANALARMS_RECOVERY			 3
+#define MXSPANALARMS_DISTMF                      4
 	uint mxSpanEvents;
 #define MXSPANEVENTS_RLOS			 0
 #define MXSPANEVENTS_FRCL			 1
