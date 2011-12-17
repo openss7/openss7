@@ -4411,7 +4411,7 @@ stropen(struct inode *inode, struct file *file)
 				_ctrace(cdrv_put(cdev));
 				goto put_error;
 			}
-			sd->sd_dev = dev;
+			/* sd->sd_dev = dev; */ /* autopush() will do this */
 			_ctrace(cdrv_put(sd->sd_cdevsw));
 			sd->sd_cdevsw = cdev;
 			/* FIXME: pull stuff out of qattach here. */

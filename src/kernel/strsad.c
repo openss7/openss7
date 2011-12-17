@@ -287,6 +287,7 @@ autopush_add(struct strapush *sap)
 
 	switch (sap->sap_cmd) {
 	case SAP_ONE:
+	case SAP_CLONE:
 		sap->sap_lastminor = sap->sap_minor;
 		break;
 	case SAP_RANGE:
@@ -430,6 +431,7 @@ apush_set(struct strapush *sap)
 		case SAP_ONE:
 		case SAP_RANGE:
 		case SAP_ALL:
+		case SAP_CLONE:
 			return autopush_add(sap);
 		}
 	}
@@ -564,10 +566,20 @@ EXPORT_SYMBOL_GPL(apush_vml);
 streams_fastcall int
 autopush(struct stdata *sd, struct cdevsw *cdev, dev_t *devp, int oflag, int sflag, cred_t *crp)
 {
-	struct apinfo *api;
+	struct apinfo *api = NULL;
 	int err;
 
-	if ((api = (typeof(api)) autopush_find(*devp)) != NULL) {
+	if (*devp != sd->sd_dev) {	/* redirected clone open */
+		if ((api = (typeof(api)) autopush_find(sd->sd_dev)) != NULL)
+			if (api->api_sap.sap_cmd != SAP_CLONE)
+				api = NULL;
+		sd->sd_dev = *devp;	/* stream head delayed this for us */
+	} else {
+		if ((api = (typeof(api)) autopush_find(sd->sd_dev)) != NULL)
+			if (api->api_sap.sap_cmd == SAP_CLONE)
+				api = NULL;
+	}
+	if (api != NULL) {
 		int k;
 
 		for (k = 0; k < MAX_APUSH; k++) {
