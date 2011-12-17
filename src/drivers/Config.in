@@ -66,6 +66,8 @@ driver	pipe	    pipe	*
 driver	sad	    sad		*		    
 driver	sfx	    sfx		*		    
 driver	spx	    spx		*		    
+driver	nit	    nit		*
+driver	bpf	    bpf		*
 
 driver	inet	    ss_		30		    
 driver	sctp_n	    sctp_n	*		    
@@ -162,6 +164,8 @@ objname	driver	pipe	    pipe
 objname driver	sad	    sad
 objname	driver	sfx	    sfx
 objname	driver	spx	    spx
+objname	driver	nit	    nit_if
+objname	driver	bpf	    bpf
 
 objname	driver	inet	    inet
 objname	driver	sctp_n	    sctp
@@ -265,6 +269,8 @@ objname	driver	xnet	    xnet
 @CONFIG_STREAMS_SAD_MODULE_TRUE@loadable	sad
 @CONFIG_STREAMS_SFX_MODULE_TRUE@loadable	sfx
 @CONFIG_STREAMS_SPX_MODULE_TRUE@loadable	spx
+@CONFIG_STREAMS_NIT_MODULE_TRUE@loadable	nit_if
+@CONFIG_STREAMS_BPF_MODULE_TRUE@loadable	bpf
 
 loadable	inet
 loadable	sctp
@@ -358,6 +364,8 @@ loadable	xnet
 @CONFIG_STREAMS_SAD_MODULE_FALSE@initialize	sad
 @CONFIG_STREAMS_SFX_MODULE_FALSE@initialize	sfx
 @CONFIG_STREAMS_SPX_MODULE_FALSE@initialize	spx
+@CONFIG_STREAMS_NIT_MODULE_FALSE@initialize	nit
+@CONFIG_STREAMS_BPF_MODULE_FALSE@initialize	bpf
 initialize	inet
 initialize	sctp
 
@@ -376,6 +384,8 @@ initialize	sctp
 @CONFIG_STREAMS_SAD_MODULE_FALSE@terminate	sad
 @CONFIG_STREAMS_SFX_MODULE_FALSE@terminate	sfx
 @CONFIG_STREAMS_SPX_MODULE_FALSE@terminate	spx
+@CONFIG_STREAMS_NIT_MODULE_FALSE@terminate	nit
+@CONFIG_STREAMS_BPF_MODULE_FALSE@terminate	bpf
 terminate	inet
 terminate	sctp
 
@@ -411,6 +421,8 @@ node	/dev/nsdev	    c	    *	    nsdev	0
 node	/dev/pipe	    c	    *	    pipe	0
 node	/dev/sfx	    c	    *	    sfx		0
 node	/dev/spx	    c	    *	    spx		0
+node	/dev/nit	    c	    *	    nit		0
+node	/dev/bpf	    c	    *	    bpf		0
 node	/dev/atm	    c	    0666    atm		0
 node	/dev/clns	    c	    0666    clns	0
 node	/dev/dl		    c	    0666    dl		0
