@@ -8373,6 +8373,7 @@ tp_rput(queue_t *q, mblk_t *mp)
 	if (unlikely(mp->b_datap->db_type < QPCTL && (q->q_first || (q->q_flag & QSVCBUSY)))
 	    || tp_r_prim_put(q, mp) != QR_ABSORBED) {
 		np_rstat.ms_acnt++;
+		/* apply backpressure */
 		mp->b_wptr += PRELOAD;
 		if (unlikely(!putq(q, mp))) {
 			mp->b_band = 0;	/* must succeed */
@@ -8391,6 +8392,8 @@ tp_rsrv(queue_t *q)
 		/* remove backpressure */
 		mp->b_wptr -= PRELOAD;
 		if (unlikely(tp_r_prim_srv(q, mp) != QR_ABSORBED)) {
+			/* reapply backpressure */
+			mp->b_wptr += PRELOAD;
 			if (unlikely(!putbq(q, mp))) {
 				mp->b_band = 0;	/* must succeed */
 				putbq(q, mp);
@@ -8407,6 +8410,7 @@ tp_wput(queue_t *q, mblk_t *mp)
 	if (unlikely(mp->b_datap->db_type < QPCTL && (q->q_first || (q->q_flag & QSVCBUSY)))
 	    || tp_w_prim_put(q, mp) != QR_ABSORBED) {
 		np_wstat.ms_acnt++;
+		/* apply backpressure */
 		mp->b_wptr += PRELOAD;
 		if (unlikely(!putq(q, mp))) {
 			mp->b_band = 0;	/* must succeed */
@@ -8422,8 +8426,11 @@ tp_wsrv(queue_t *q)
 	mblk_t *mp;
 
 	while (likely((mp = getq(q)) != NULL)) {
+		/* remove backpressure */
 		mp->b_wptr -= PRELOAD;
 		if (unlikely(tp_w_prim_srv(q, mp) != QR_ABSORBED)) {
+			/* reapply backpressure */
+			mp->b_wptr += PRELOAD;
 			if (unlikely(!putbq(q, mp))) {
 				mp->b_band = 0;	/* must succeed */
 				putbq(q, mp);
