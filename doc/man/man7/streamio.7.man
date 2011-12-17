@@ -166,6 +166,8 @@ character special files.
 .\"
 .SH IOCTLS
 .PP
+The Stream head accepts the following \fISTREAMS\fP-specific input-output
+control commands.
 .\"
 .\"
 .SS I_ATMARK
@@ -1320,8 +1322,8 @@ points to an integer to contain the number of unread bytes.
 .PP
 Upon success,
 .B I_NREAD
-returns zero (0) or a positive integer indicating the number of messages on
-the stream head read queue.
+returns zero (0) or a positive integer indicating the number bytes in the
+first message on the stream head read queue.
 Upon failure,
 .B I_NREAD
 returns -1 and sets
@@ -2064,6 +2066,103 @@ in
 Also, any error returned by the module or driver in a ioctl positive or
 negative acknowledgement message will also be returned in
 .IR errno .
+.\"
+.\"
+.SH "ADDITIONAL IOCTLS"
+.PP
+The Stream head also accepts and processes the following classical
+input-output control commands:
+.\"
+.SS TIOCGSID
+.PP
+Get the session identifier for a controlling terminal.  This will fail with
+[\fBENOTTY\fP] in case the stream is not a terminal.
+The argument is a pointer to a \fBpid_t\fP into which to receive the session
+identifier.
+.\"
+.SS TIOCGPGRP
+.PP
+Gets the process group identifier of the foreground process group on this
+terminal.
+Some implementations require that the stream be a terminal (otherwise they
+return [\fBENOTTY\fP] to this control): \fBLinux Fast-STREAMS\fP permits all
+streams to use this control.
+The argument is a pointer to a \fBpid_t\fP into which to receive the process
+group identifier.
+.\"
+.SS TIOCSPGRP
+.PP
+Sets the foreground process group identifier of this terminal.
+Some implementations require that the stream be a terminal (otherwise they
+return [\fBENOTTY\fP] to this control): \fBLinux Fast-STREAMS\fP permits all
+streams to use this control.
+The argument is a pointer to a \fBpid_t\fP that contains the process
+group identifier to set.
+.\"
+.SS SIOCATMARK
+.PP
+Returns a value indicating whether or not the socket is at the out-of-band
+mark.  When the socket is at the mark, then 1 is returned; otherwise, 0 is
+returned.  This input-output control command does not remove the out-of-band
+mark.
+The argument is a pointer to an \fBint\fP into which to receive the value.
+This is equivalent to the \fII_ATMARK\fP(7) input-output control command
+listed above.
+This input-output control command can be executed successfully on any stream
+(the stream does not need to be a socket).
+.\"
+.SS SIOCSPGRP
+.PP
+Sets the process or process group to send {\fBSIGIO\fP} or {\fBSIGURG\fP}
+signals to when an asynchronous I/O operation has finished or urgent data is
+available.
+The argument is a pointer to a \fBpid_t\fP that contains the process (group)
+identifier to set.
+When the argument is positive, send the signals to that process.  When the
+argument is negative, send the signals to the process group with the
+identifier of the absolute value of the argument.  The process may only
+choose itself or its own process group to receive signals unless it has the
+\fBCAP_KILL\fP capability or an effective user identifier of root (0).
+This input-output control command will return [\fBENOTSOCK\fP] when the
+stream is not a socket.
+.\"
+.SS SIOCGPGRP
+.PP
+Gets the current process or process group that will receive {\fBSIGIO\fP} or
+{\fBSIGURG\fP} signals, or 0 when none is set.
+The argument is a pointer to a \fBpid_t\fP into which to receive the process
+(group) identifier.
+This input-output control command will return [\fBENOTSOCK\fP] when the
+stream is not a socket.
+.\"
+.SS FIOGETOWN
+.PP
+If the stream is a terminal, the same actions as \fBTIOCGPRGP\fP are
+performed.  If the stream is a socket, the same actions as \fBSIOCGPGRP\fP are
+performed.  Otherwise the same value as would be returned by the
+\fBF_GETOWN\fP option to \fBfcntl\fP(2) is returned.
+The argument is a pointer to a \fBpid_t\fP into which to receive the process
+(group) identifier.
+.\"
+.SS FIOSETOWN
+.PP
+If the stream is a terminal, the same actions as \fBTIOCSPRGP\fP are
+performed.  If the stream is a socket, the same actions as \fBSIOCSPGRP\fP are
+performed.  Otherwise the same actions as setting the file owner with the
+\fBF_SETOWN\fP option to \fBfcntl\fP(2) are performed.
+The argument is a pointer to a \fBpid_t\fP that contains the process
+(group) identifier to set.
+.\"
+.\"
+.SH "RECOGNIZED IOCTLS"
+.PP
+The Stream head recognizes and converts the following classical input-output
+control commands to \fII_STR\fP input-output control commands and issues them
+to the driver:  (All other input-output control commands are sent downstream
+as \fBTRANSPARENT\fP input-output control commands.)
+.BR TCSETS ", " TCSETSW ", " TIOCSLCLTRMIOS ", " TCGETS ", " TIOCGLCKTERMIOS ", " TCSETA ", " TCSETAW ", " TCSETAF ", " TCGETA ", " TCSBRK ", " TCXONC ", " TCFLSH ", " TCDSET ", "
+.BR TIOCNXCL ", " TIOCEXCL ", " TIOCNOTTY ", " TIOCSERCONFIG ", " TIOCOUTQ ", " TIOCSBRK ", " TIOCCBRK ", " TIOCSTI ", " TIOCSWINSZ ", " TIOCGWINSZ ", " TIOCSSOFTCAR ", "
+.BR TIOCCPKT ", " TIOCSETD ", " TIOCSERSWILD ", " TIOCGETD ", " TIOCGPTN ", " TIOCSERGWILD ", " TIOCSERGETLSR ", " TIOCTTYGSTRUCT ", " TIOCINQ .
 .\"
 .\"
 .SH "RETURN VALUE"

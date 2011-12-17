@@ -159,7 +159,7 @@ Upon success,
 .B I_NREAD
 returns zero
 .RB ( 0 )
-or a positive integer indicating the number of messages on
+or a positive integer indicating the number of bytes in the first message on
 the Stream head read queue.
 Upon failure,
 .B I_NREAD
