@@ -554,6 +554,4 @@ typedef struct {
 #define DLIOCMARGININFO		(DLIOC|3)	/* margin size info */
 #define DLIOCHDRINFO		(DLIOC|10)	/* IP fast-path */
 
-#define DL_IOC_HDR_INFO	DLIOCHDRINFO
-
 #endif				/* __SYS_DLPI_SUN_H__ */
