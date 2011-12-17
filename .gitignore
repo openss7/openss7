@@ -900,9 +900,13 @@ src/java/javax/jain/ss7/isup/package-tree.html
 src/java/javax/jain/ss7/package-frame.html
 src/java/javax/jain/ss7/package-summary.html
 src/java/javax/jain/ss7/package-tree.html
+src/snmp/*.mib
+src/snmp/*.lint
 src/snmp/*.tree
 src/snmp/*_openss7.c
 src/snmp/*_openss7.h
+src/snmp/*_master.c
+src/snmp/*_master.h
 src/util/isupcre
 src/util/ss72pcap
 tags
