@@ -1294,7 +1294,7 @@ pfmod_rsrv(queue_t *q)
 		case M_DATA:
 			/* I hate to say it, but Solaris pulls up the wrong message (as though
 			   message pullup is necessary anyway). */
-			if (!pfmod_filter(q, mp)) {
+			if (!pfmod_filter(q, b)) {
 				freemsg(mp);
 				continue;
 			}

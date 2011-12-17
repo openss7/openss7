@@ -133,7 +133,7 @@ struct nit_iftime {
 
 /** @} */
 
-#ifdef __KERNEL__
+#ifdef KERNEL
 /*
  * Bridge between hardware interface and nit subsystem.
  */
@@ -143,6 +143,23 @@ struct nit_if {
 	uint nif_bodylen;		/* lenght of packet body */
 	int nif_promisc;		/* packet not addressed to host */
 };
+#endif
+
+#ifdef __KERNEL__
+
+#ifndef __EXTERN
+#define __EXTERN extern
+#endif
+
+#ifndef __STREAMS_EXTERN
+#define __STREAMS_EXTERN __EXTERN streams_fastcall
+#endif
+
+__STREAMS_EXTERN int register_nit(struct cdevsw *cdev);
+__STREAMS_EXTERN int unregister_nit(struct cdevsw *cdev);
+
+#define NIT_NODE    1
+
 #endif				/* __KERNEL__ */
 
 /** @} */

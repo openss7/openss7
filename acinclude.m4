@@ -492,6 +492,20 @@ dnl--------------------------------------------------------------------------
     AM_CONDITIONAL([CONFIG_STREAMS_SPX], [test :"${enable_driver_spx:-module}" = :yes])
     AM_CONDITIONAL([CONFIG_STREAMS_SPX_MODULE], [test :"${enable_driver_spx:-module}" = :module])
 dnl--------------------------------------------------------------------------
+    AC_ARG_ENABLE([driver-nit],
+	[AS_HELP_STRING([--enable-driver-nit],
+	    [nit linked with STREAMS @<:@default=module@:>@])])
+    case "${enable_driver_nit:-module}" in (yes|no) ;; (*) enable_driver_nit=module ;; esac
+    AM_CONDITIONAL([CONFIG_STREAMS_NIT], [test :"${enable_driver_nit:-module}" = :yes])
+    AM_CONDITIONAL([CONFIG_STREAMS_NIT_MODULE], [test :"${enable_driver_nit:-module}" = :module])
+dnl--------------------------------------------------------------------------
+    AC_ARG_ENABLE([driver-bpf],
+	[AS_HELP_STRING([--enable-driver-bpf],
+	    [bpf linked with STREAMS @<:@default=module@:>@])])
+    case "${enable_driver_bpf:-module}" in (yes|no) ;; (*) enable_driver_bpf=module ;; esac
+    AM_CONDITIONAL([CONFIG_STREAMS_BPF], [test :"${enable_driver_bpf:-module}" = :yes])
+    AM_CONDITIONAL([CONFIG_STREAMS_BPF_MODULE], [test :"${enable_driver_bpf:-module}" = :module])
+dnl--------------------------------------------------------------------------
     AC_ARG_ENABLE([compat-os7],
 	[AS_HELP_STRING([--enable-compat-os7],
 	    [OpenSS7 compatibility linked @<:@default=module@:>@])])
@@ -4067,6 +4081,48 @@ dnl--------------------------------------------------------------------------
 		AC_PACKAGE_TITLE [will include the spx driver as a standalone
 		loadable kernel module.  When undefined,] AC_PACKAGE_TITLE [will
 		not include the spx driver as a standalone loadable kernel
+		module.])
+	    ;;
+    esac
+dnl--------------------------------------------------------------------------
+    AC_MSG_CHECKING([for STREAMS driver nit])
+	if test :"${enable_driver_nit:-module}" = :module -a :${linux_cv_k_linkage:-loadable} = :linkable ; then
+	    enable_driver_nit='yes'
+	fi
+    AC_MSG_RESULT([${enable_driver_nit:-module}])
+    case "${enable_driver_nit:-module}" in
+	(yes)
+	    AC_DEFINE_UNQUOTED([CONFIG_STREAMS_NIT], [1], [When defined,]
+		AC_PACKAGE_TITLE [ will include the nit driver for linkage with
+		STREAMS.  When undefined,] AC_PACKAGE_TITLE [will not include
+		the nit driver for linkage with STREAMS.])
+	    ;;
+	(module)
+	    AC_DEFINE_UNQUOTED([CONFIG_STREAMS_NIT_MODULE], [1], [When defined,]
+		AC_PACKAGE_TITLE [will include the nit driver as a standalone
+		loadable kernel module.  When undefined,] AC_PACKAGE_TITLE [will
+		not include the nit driver as a standalone loadable kernel
+		module.])
+	    ;;
+    esac
+dnl--------------------------------------------------------------------------
+    AC_MSG_CHECKING([for STREAMS driver bpf])
+	if test :"${enable_driver_bpf:-module}" = :module -a :${linux_cv_k_linkage:-loadable} = :linkable ; then
+	    enable_driver_bpf='yes'
+	fi
+    AC_MSG_RESULT([${enable_driver_bpf:-module}])
+    case "${enable_driver_bpf:-module}" in
+	(yes)
+	    AC_DEFINE_UNQUOTED([CONFIG_STREAMS_BPF], [1], [When defined,]
+		AC_PACKAGE_TITLE [ will include the bpf driver for linkage with
+		STREAMS.  When undefined,] AC_PACKAGE_TITLE [will not include
+		the bpf driver for linkage with STREAMS.])
+	    ;;
+	(module)
+	    AC_DEFINE_UNQUOTED([CONFIG_STREAMS_BPF_MODULE], [1], [When defined,]
+		AC_PACKAGE_TITLE [will include the bpf driver as a standalone
+		loadable kernel module.  When undefined,] AC_PACKAGE_TITLE [will
+		not include the bpf driver as a standalone loadable kernel
 		module.])
 	    ;;
     esac

@@ -1,0 +1,589 @@
+'\" rtp
+.\" vim: ft=nroff sw=4 noet nocin nosi com=b\:.\\\" fo+=tcqlorn tw=77
+.\" =========================================================================
+.\"
+.\" @(#) $Id$
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
+.\" Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+.\" Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to copy, distribute and/or modify this manual
+.\" under the terms of the GNU Free Documentation License, Version 1.3 or
+.\" any later version published by the Free Software Foundation; with no
+.\" Invariant Sections, no Front-Cover Texts, and no Back-Cover Texts.  A
+.\" copy of the license is included in the section entitled "GNU Free
+.\" Documentation License".
+.\"
+.\" Permission to use, copy and distribute this manual without modification,
+.\" for any purpose and without fee or royalty is hereby granted, provided
+.\" that both the above copyright notice and this permission notice appears
+.\" in all copies and that the name of OpenSS7 Corporation not be used in
+.\" advertising or publicity pertaning to distribution of this documentation
+.\" or its contents without specific, written prior permission.  OpenSS7
+.\" Corporation makes no representation about the suitability of this manual
+.\" for any purpose.  It is provided "as is" without express or implied
+.\" warranty.
+.\"
+.\" Permission is granted to process this file through groff and print the
+.\" results, provided the printed document carries a copying permission
+.\" notice identical to this one except for the removal of this paragraph
+.\" (this paragraph not being relevant to the printed manual).
+.\"
+.\" OPENSS7 CORPORATION DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS MANUAL
+.\" INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A
+.\" PARTICULAR PURPOSE, NON-INFRINGEMENT, OR TITLE; THAT THE CONTENTS OF THE
+.\" DOCUMENT ARE SUITABLE FOR ANY PURPOSE, OR THAT THE IMPLEMENTATION OF
+.\" SUCH CONTENTS WILL NOT INFRINGE ON ANY THIRD PARTY PATENTS, COPYRIGHTS,
+.\" TRADEMARKS OR OTHER RIGHTS.  IN NO EVENT SHALL OPENSS7 CORPORATION BE
+.\" LIABLE FOR ANY DIRECT, INDIRECT, SPECIAL OR CONSEQUENTIAL DAMAGES OR ANY
+.\" DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER
+.\" IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING
+.\" OUT OF OR IN CONNECTION WITH ANY USE OF THIS DOCUMENT OR THE PERFORMANCE
+.\" OR IMPLEMENTATION OF THE CONTENTS THEREOF.
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not have
+.\" taken the same level of care in the production of this manual, which is
+.\" licensed free of charge, as they might when working professionally.  The
+.\" author(s) will take no responsibility in it.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by the
+.\" source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any successor
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date$ by $Author$
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Log$
+.\" =========================================================================
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database openss7.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+search-truncate 40
+search-ignore CGIQOSTU
+.R2
+.so openss7.macros
+.\"
+.\"
+.TH NIT 4 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ Modules"
+.\"
+.\"
+.SH NAME
+.B nit
+\- \fISTREAMS\fP Network Interface Tap (SNIT) clone driver
+.\"
+.\"
+.\" ====================
+.SH SYNOPSIS
+.PP
+.B #include <stropts.h>
+.br
+.B #include <net/socket.h>
+.br
+.B #include <net/if.h>
+.br
+.B #include <net/nit_if.h>
+.HP 8
+.BI "int " fd ;
+.PD 0
+.HP
+.BI "int " fd " = open(" \*(lq\fR/dev/streams/nit/\fP\fIxxxx\fP\*(rq ", " \fR0\fP );
+.HP
+.BI "int ioctl(" fd ", " \fRI_PUSH\fP ", " \*(lq\fRpf\fP\*(rq );
+.HP
+.BI "int ioctl(" fd ", " \fRI_PUSH\fP ", " \*(lq\fRnbuf\fP\*(rq );
+.PD
+.\"
+.\"
+.\" ====================
+.SH DESCRIPTION
+.PP
+\fBnit\fP is a \fISTREAMS\fP Newtork Interface Tap (SNIT) clone driver for
+\fBLinux Fast-STREAMS\fP.  Its purpose is to allow \fISTREAMS\fP device
+drivers to register with and be opened by the NIT subsystem.
+.\"
+.\" --------------------
+.SS Registration
+.PP
+\fISTREAMS\fP device drivers that wish to register with the NIT subsystem do
+so at initialization time using the \fBregister_nit\fP(9) registration
+function and unregister on unload using the \fBunregister_nit\fP(9)
+registration function.  The argument to both functions is the character
+device structure, \fBcdev\fP(9), of the registering driver.
+.PP
+Once a device has registered, a minor device node named \fIxxxx\fP appears in
+the \fB/dev/streams/nit/\fP directory, where \fIxxxx\fP is the major node
+name of the registering driver.
+.\"
+.\" --------------------
+.SS Opening
+.PP
+.\"
+.\" ====================
+.SH USAGE
+.PP
+.IP \ 1. \w'00.\(em'u
+Open the device.  If opening the device with \fBO_RDWR\fP fails, try opening
+the device with \fBO_RDONLY\fP.
+.IP \ 2.
+Set the stream head read options with \fII_SRDOPT\fP(7) to \fBRMSGD\fP.
+.IP \ 3.
+Push the \fBnit_pf\fP(4) \fI\(lqpf\(rq\fP module if desired.
+.IP \ 4.
+Push the \fBnit_buf\fP(4) \fI\(lqnbuf\(rq\fP module if desired.
+.IP \ 5.
+Set the chunk size using the \fBNIOCSCHUNK\fP command to the \fBnit_buf\fP(4)
+module.
+.IP \ 6.
+Set the interface using the \fBNIOCBIND\fP command to the \fBnit_if\fP(4)
+driver.
+.IP \ 7.
+Set the snapshot length using the \fBNIOCSSNAP\fP command to the
+\fBnit_if\fP(4) driver.
+.IP \ 8.
+Set the timeout using the \fBNIOCSTIME\fP command to the \fBnit_buf\fP(4)
+module.
+.IP \ 9.
+Set the NIT flags using the \fBNIOCSFLAGS\fP command to the \fBnit_if\fP(4)
+driver.
+.IP \10.
+Flush the interface with the \fII_FLUSH\fP(7) command.
+.IP \11.
+Read the interface using \fBread\fP(2s) with an \fInbytes\fP argument set to
+the chunk size.
+.\"
+.\" ====================
+.SH IOCTLS
+.PP
+The \fBnit\fP registered driver must implement a set of \fBnit_if\fP(4) and
+\fBnetdevice\fP(7) input-output control commands.  These commands are
+described in the sections that follow.
+.\" --------------------
+.SS "NIT Commands"
+.PP
+Device drivers that register with \fBnit\fP must implement the input-output
+control commands described for NIT interfaces in \fBnit_if\fP(4).  These
+commands are as follows:
+.\" ----
+.TP 4
+.BR NIOCBIND
+.RB ( "struct ifreq" )
+Attaches the stream to the specified network interface.
+The (third) argument is a pointer to an \fBifreq\fP structure whose
+\fIifr_name\fP member names the desired interface.  The \fBifreq\fP structure
+is defined in \fI<net/if.h>\fP as follows:
+.sp
+.RS
+.nf
+\s-1\fC\
+struct ifreq {
+    char ifr_name[IFNAMSIZ]; /* Interface name */
+    union {
+        struct sockaddr ifr_addr;
+        struct sockaddr ifr_dstaddr;
+        struct sockaddr ifr_broadaddr;
+        struct sockaddr ifr_netmask;
+        struct sockaddr ifr_hwaddr;
+        short           ifr_flags;
+        int             ifr_ifindex;
+        int             ifr_metric;
+        int             ifr_mtu;
+        struct ifmap    ifr_map;
+        char            ifr_slave[IFNAMSIZ];
+        char            ifr_newname[IFNAMSIZE];
+        char            *ifr_data;
+    };
+};
+\s+1\fP
+.fi
+.PP
+The fields are:
+.TP
+.I ifr_name
+The name of the interface.
+.PP
+Additional fields are only present for specific commands.
+.PP
+Note that executing this command has the effect of attaching, binding and
+enabling the interface.  This means that captured packets start flowing
+during successful completion of this command.  Other commands can all be
+performed before binding the interface.
+.RE
+.\" ----
+.TP
+.BR NIOCSSNAP
+.RB ( ulong )
+Set the snapshot length.  \fBnit\fP interprets a snapshot length of zero as
+meaning infinity, so that it will copy all selected packets in their
+entirety.  The snapshot length cannot otherwise be less than the length of
+the link-level header.  The default snapshot length is zero (0).
+The (third) argument is a pointer to a \fBulong\fP containing the requested
+snapshot length.
+.\" ----
+.TP
+.BR NIOCGSNAP
+.RB ( ulong )
+Get the snapshot length.  The (third) argument is a pointer to a \fBulong\fP
+into which to retreive the snapshot length.
+.\" ----
+.TP
+.BR NIOCSFLAGS
+.RB ( ulong )
+Sets the NIT option flags.  The (third) argument is a pointer to a
+\fBulong\fP containing the requested flag bits.  The defined flag bits were
+to be augmented in future releases (but never were).  All but the
+\fINI_PROMISC\fP bit cotroll the addition of headers that precede the packet
+body.  These headers appear in the order given below, with the last-mentioned
+enabled header adjacent to the packet body.
+.RS
+.TP
+.I NI_PROMISC
+Requests that the underlying interface be set into promiscuous mode and that
+all packets that the interface receives be passed up through the stream.
+\fBnit\fP only honours this bit from the super-user.
+.TP
+.I NI_TIMESTAMP 
+Prepend to each selected packet a header containing the packet arrival time
+expressed as a \fBstruct timeval\fP.
+.TP
+.I NI_DROPS
+Prepend to each selected packet a header containing the cumulative number of
+packets that this instance of \fBnit\fP has dropped because of flow control
+requirements or resource exhaustion.  The header value is expressed as a
+\fBulong\fP.  Note: it accounts only for events occurring within \fBnit\fP,
+and does not count packets dropped at the network interface levfel or by
+upstream modules.
+.TP
+.I NI_LEN
+Prepend to each selected packet a header containing the packet's original
+length (including link-level header), as it was before being trimmed to the
+snapshot length.  The header value is express as a \fBulong\fP.
+.RE
+.\" ----
+.TP
+.BR NIOCGFLAGS
+.RB ( ulong )
+Returns the current state of the flag bits.  The (third) argument is a
+pointer to a \fBulong\fP into which to received the flag bits.
+.\" --------------------
+.SS "Netdevice Commands"
+.PP
+Device drivers that register with \fBnit\fP must also implement a subset of
+the input-output control commands described for network devices in
+\fBnetdevice\fP(7).  These commands are as follows:
+.TP 4
+.BR SIOCGIFADDR
+.RB ( "struct ifreq" )
+Retrieves the interface address, \fIifr_addr\fP, for the interface named
+\fIifr_name\fP.
+\fISunOS\fP\(rg\fI 4.x\fP documents this command as being required of the NIT device: see \fBnit_if\fP(4).
+This command is not required for \fBnit\fP registered interface drivers.
+.TP
+.BR SIOCADDMULTI
+.RB ( "struct ifreq" )
+Adds the multicast address, \fIifr_addr\fP, to the multicast addresses of
+the
+interface named \fIifr_name\fP.
+\fISunOS\fP\(rg\fI 4.x\fP documents this command as being required of the NIT device: see \fBnit_if\fP(4).
+This command is not required for \fBnit\fP registered interface drivers.
+.TP
+.BR SIOCDELMULTI
+.RB ( "struct ifreq" )
+Deletes the multicast address, \fIifr_addr\fP, from the the multicast address
+list of the interface named \fIifr_name\fP.
+\fISunOS\fP\(rg\fI 4.x\fP documents this command as being required of the NIT device: see \fBnit_if\fP(4).
+This command is not required for \fBnit\fP registered interface drivers.
+.TP
+.BR SIOCGIFNAME
+.RB ( "struct ifreq" )
+Gets the name of an interface with the specified index.  The
+\fIifr_ifindex\fP member is completed on call and the \fIifr_name\fP member
+is completed on successful return.  The \fBnit\fP driver should allow the use
+of this command to permit the capture application to "walk" the interface
+table and obtain a list of valid interface names.
+.TP
+.BR SIOCGIFINDEX
+.RB ( "struct ifreq" )
+Gets the index of an interface with the specified name.  The \fIifr_name\fP
+member is completed on call and the \fIifr_ifindex\fP member is completed on
+successful return.  The \fBnit\fP driver should allow the use of this command
+to permit reverse indexing of interface indexes to interface names.
+.TP
+.BR SIOCGIFFLAGS ", " SIOCSIFFLAGS
+.RB ( "struct ifreq" )
+Gets or sets the active flag word of the device specified by \fIifr_name\fP.
+\fIifr_flags\fP contains a bit mask of the following values:
+.RS
+.TP \w'\fIIFF_POINTTOPOINT\fP\(em'u
+.I IFF_UP
+interface is running.
+.PD 0
+.TP
+.I IFF_BROADCAST
+valid broadcast address set.
+.TP
+.I IFF_DEBUG
+internal debugging flag.
+.TP
+.I IFF_LOOPBACK
+interface is loopback interface.
+.TP
+.I IFF_POINTTOPOINT
+interface is point-to-point link.
+.TP
+.I IFF_RUNNING
+interface has resources allocated.
+.TP
+.I IFF_NOARP
+no arp protocol, L2 desintation address not set.
+.TP
+.I IFF_PROMISC
+interface in promiscuous mode.
+.TP
+.I IFF_NOTRAILERS
+avoid used of trailers.
+.TP
+.I IFF_ALLMULTI
+receive all multicast packets.
+.TP
+.I IFF_MASTER
+master of load balancing bundle.
+.TP
+.I IFF_SLAVE
+slave of load balancing bundle.
+.TP
+.I IFF_MULTICAST
+supports multicast.
+.TP
+.I IFF_PORTSEL
+able to select media type via ifmap.
+.TP
+.I IFF_AUTOMEDIA
+auto media selection active.
+.TP
+.I IFF_DYNAMIC
+addresses lost when down.
+.TP
+.I IFF_LOWER_UP
+driver signals L1 up.
+.TP
+.I IFF_DORMANT
+driver signals dormant.
+.TP
+.I IFF_ECHO
+echo sent packets.
+.PD
+.PP
+Setting the active flag word is a privileged operation, but any process may
+read it.
+The \fBnit\fP driver may support these commands primarily to allow the use of
+the \fISBIOCGIFFLAGS\fP command to test the \fIIFF_UP\fP flag.
+.RE
+.TP
+.BR SIOCSIFNAME
+.RB ( "struct ifreq" )
+Sets the name of the interface specified by \fIifr_name\fP to
+\fIifr_newname\fP.
+The \fBnit\fP driver may support this command to allow renaming of
+interfaces.
+.\"
+.TP
+.BR SIOCGIFCONF
+.RB ( "struct ifconf" )
+Returns a list of interface addresses.  This currently means only addresses
+of the \fBAF_INET\fP (IPv4) family for compatibility.  The user passes an
+\fIifconf\fP structure as the (third) argument to the \fBioctl\fP(2s) call.
+it contains a pointer to an array of \fBifreq\fP structures in \fIifc_req\fP
+and its length in bytes in \fIifc_len\fP.  The driver fills the \fBifreq\fP
+structures with all current L3 interface addresses that are running:
+\fIifr_name\fP contains the interface name (eth0:1, etc.), \fIifr_addr\fP the
+address.  The driver returns the actual length in \fIifc_len\fP.  If
+\fIifc_len\fP is equal to the original length the buffer probably has
+overflowed and the caller should retry with a larger buffer to get all
+addresses.  When no error occurs, the command returns zero (0); otherwise
+minus one (-1) and \fIerrno\fP(3) is set to an appropriate error code.
+Overflow is not considered an error.
+.RS
+.PP
+The \fBifconf\fP structure, defined in \fI<net/if.h>\fP is formatted as
+follows:
+.sp
+.nf
+\s-1\fC\
+struct ifconf {
+    int ifc_len;               /* size of buffer */
+    union {
+        char *ifc_buf;         /* buffer address */
+        struct ifreq *ifc_req; /* array of structures */
+    };
+};
+\s+1\fP
+.fi
+.PP
+The \fBifconf\fP structure has the following members:
+.TP \w'\fIifc_len\fP\(em'u
+.I ifc_len
+The length (in bytes) of the array of \fBifreq\fP structures pointed to by
+the \fIifc_req\fP member.
+.TP
+.I ifc_buf
+An aliased character pointer pointing to the array of \fBifreq\fP structures.
+.TP
+.I ifc_req
+The array of \fBifreq\fP structures containing at least \fIifc_len\fP
+bytes.
+.PP
+This command should be supported by the driver to permit the capture
+application to obtain a list of valid interface names for use with the
+\fIBIOCSETIF\fP command.  The addresses returned in \fIifr_addr\fP are not
+important, and could be simply \fB0.0.0.0\fP.
+.RE
+.\"
+.\" ====================
+.SH DEVICES
+.PP
+.TP 4
+.BI /dev/streams/nit/ xxxx
+The registered \fBnit\fP device for device driver \fIxxxx\fP.
+.TP
+.B /dev/nit
+A symbolic link to \fB/dev/streams/nit/ldl\fP to support the classic device
+name.
+.\"
+.\"
+.\" ====================
+.SH FILES
+.PP
+.\".TP \w'\fI<net/nit_if.h>\fP\(em'u
+.TP 4
+.I <net/socket.h>
+Header file containing the definition for \fBstruct sockaddr\fP.
+.TP
+.I <net/if.h>
+Header file containing the definition for \fBstruct ifreq\fP and \fBstruct
+ifconf\fP.
+.TP
+.I <net/nit_if.h>
+Header file containing the NIOC input-output control command definitions,
+structure and flags.
+.\"
+.\"
+.\" ====================
+.SH MODULES
+.PP
+.TP \w'\fBnbuf\fP\(em'u
+.B pf
+The \fBnit_pf\fP(4) NIT packet filter module for use with NIT devices.
+.TP
+.B nbuf
+The \fBnit_buf\fP(4) NIT buffer module for use with NIT devices.
+.\"
+.\"
+.\" ====================
+.SH NOTICES
+.PP
+.\"
+.\"
+.\" ====================
+.SH BUGS
+.PP
+The \fBnit\fP clone device has no known bugs.  The \fBnit\fP clone device
+does not use any mechanisms not also used by the \fBclone\fP(4) device.
+.\"
+.\"
+.\" ====================
+.SH "SEE ALSO"
+.PP
+.BR clone (4),
+.BR open (2s),
+.BR ioctl (2s),
+.BR nit_if (4),
+.BR nit_pf (4),
+.BR nit_buf (4),
+.BR register_nit (9),
+.BR unregister_nit (9),
+.IR STREAMS (9).
+.\"
+.\"
+.\" ====================
+.SH IMPLEMENTATION
+.PP
+.\"
+.\"
+.\" ====================
+.SH COMPATIBILITY
+.PP
+\fBnit\fP is compatible with \fISunOS\fP\(rg\fI 4.x\fP, with the following
+portability considerations:
+.IP \(em \w'\(em\(em'u
+.IP \(em
+.IP \(em
+.IP \(em
+.PP
+Compatibility is tested using the \fBtest-snit\fP(8) test case executable and
+the \fI@PACKAGE_TITLE@\fP \fBautotest\fP test suite.
+.\"
+.\"
+.\" ====================
+.SH CONFORMANCE
+.PP
+Network interface taps and raw sockets and DLPI drivers have never been an
+interesting subject for standards organizations such as IEEE and the
+OpenGroup, and these drivers have never been subjected to formal
+standardization.
+.\"
+.\"
+.\" ====================
+.SH HISTORY
+.PP
+The \fBnit\fP clone device for \fBLinux Fast-STREAMS\fP was first implemented
+in \fBopenss7-1.1.1\fP.
+.PP
+.B snit
+first appeared in
+.IR "SunOS\fR\(rg\fP 4.x" .
+.\"
+.\"
+.[
+$LIST$
+.]
+.TI

@@ -716,6 +716,9 @@ openss7_man_MANS = \
 	man4/atm.4 \
 	man4/bicc.4 \
 	man4/bicc_ioctl.4 \
+	man4/bpf.4 \
+	man4/bpfdrv.4 \
+	man4/bpfmod.4 \
 	man4/bssap.4 \
 	man4/bssap_ioctl.4 \
 	man4/bua.4 \
@@ -893,7 +896,9 @@ openss7_man_MANS = \
 	man4/mx_x400p.4 \
 	man4/mxi_ioctl.4 \
 	man4/nbuf.4 \
+	man4/nit.4 \
 	man4/nit_buf.4 \
+	man4/nit_if.4 \
 	man4/nit_pf.4 \
 	man4/nli3.4 \
 	man4/np.4 \
@@ -5098,6 +5103,9 @@ openss7_dist_noinst_MANS = \
 	man4/atm.4.man \
 	man4/bicc.4.man \
 	man4/bicc_ioctl.4.man \
+	man4/bpf.4.man \
+	man4/bpfdrv.4.man \
+	man4/bpfmod.4.man \
 	man4/bssap.4.man \
 	man4/bssap_ioctl.4.man \
 	man4/bua.4.man \
@@ -5275,7 +5283,9 @@ openss7_dist_noinst_MANS = \
 	man4/mx_x400p.4.man \
 	man4/mxi_ioctl.4.man \
 	man4/nbuf.4.man \
+	man4/nit.4.man \
 	man4/nit_buf.4.man \
+	man4/nit_if.4.man \
 	man4/nit_pf.4.man \
 	man4/nli3.4.man \
 	man4/np.4.man \

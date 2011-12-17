@@ -597,28 +597,28 @@ if CONFIG_STREAMS_TIRDWR
 libOS7streams_a_SOURCES	       += src/modules/tirdwr.c
 endif
 if CONFIG_STREAMS_BUFMOD_MODULE
-libOS7modules_a_SOURCES		+= src/modules/bufmod.c
+libOS7modules_a_SOURCES		+= src/modules/bufmod.c src/include/sys/bufmod.h
 endif
 if CONFIG_STREAMS_BUFMOD
-libOS7streams_a_SOURCES		+= src/modules/bufmod.c
+libOS7streams_a_SOURCES		+= src/modules/bufmod.c src/include/sys/bufmod.h
 endif
 if CONFIG_STREAMS_PFMOD_MODULE
-libOS7modules_a_SOURCES		+= src/modules/pfmod.c
+libOS7modules_a_SOURCES		+= src/modules/pfmod.c src/include/sys/pfmod.h
 endif
 if CONFIG_STREAMS_PFMOD
-libOS7streams_a_SOURCES		+= src/modules/pfmod.c
+libOS7streams_a_SOURCES		+= src/modules/pfmod.c src/include/sys/pfmod.h
 endif
 if CONFIG_STREAMS_NBUF_MODULE
-libOS7modules_a_SOURCES		+= src/modules/nit_buf.c
+libOS7modules_a_SOURCES		+= src/modules/nit_buf.c src/include/net/nit_buf.h
 endif
 if CONFIG_STREAMS_NBUF
-libOS7streams_a_SOURCES		+= src/modules/nit_buf.c
+libOS7streams_a_SOURCES		+= src/modules/nit_buf.c src/include/net/nit_buf.h
 endif
 if CONFIG_STREAMS_PF_MODULE
-libOS7modules_a_SOURCES		+= src/modules/nit_pf.c
+libOS7modules_a_SOURCES		+= src/modules/nit_pf.c src/include/net/nit_pf.h
 endif
 if CONFIG_STREAMS_PF
-libOS7streams_a_SOURCES		+= src/modules/nit_pf.c
+libOS7streams_a_SOURCES		+= src/modules/nit_pf.c src/include/net/nit_pf.h
 endif
 
 ## =====================================================================
@@ -915,6 +915,18 @@ libOS7drivers_a_SOURCES	       += src/drivers/spx.c
 endif
 if CONFIG_STREAMS_SPX
 libOS7streams_a_SOURCES	       += src/drivers/spx.c
+endif
+if CONFIG_STREAMS_NIT_MODULE
+libOS7drivers_a_SOURCES	       += src/drivers/nit_if.c src/include/net/nit_if.h
+endif
+if CONFIG_STREAMS_NIT
+libOS7streams_a_SOURCES	       += src/drivers/nit_if.c src/include/net/nit_if.h
+endif
+if CONFIG_STREAMS_BPF_MODULE
+libOS7drivers_a_SOURCES	       += src/drivers/bpf.c src/include/net/bpf.h
+endif
+if CONFIG_STREAMS_BPF
+libOS7streams_a_SOURCES	       += src/drivers/bpf.c src/include/net/bpf.h
 endif
 
 ## =====================================================================
@@ -2864,7 +2876,9 @@ EXPORT_SRCFILES			+= src/kernel/specfs.c \
 ## !CONFIG_STREAMS_SEPARATE_COMPILE
 endif
 
-EXPORT_SRCFILES			+= src/drivers/clone.c \
+EXPORT_SRCFILES			+= src/drivers/nit_if.c \
+				   src/drivers/bpf.c \
+				   src/drivers/clone.c \
 				   src/modules/sth.c \
 				   src/kernel/aixcompat.c \
 				   src/kernel/hpuxcompat.c \
@@ -2904,7 +2918,9 @@ EXPORT_VERFILES			+= $(PKGINCL)/versions/specfs.ver \
 ## CONFIG_STREAMS_SEPARATE_COMPILE
 endif
 
-EXPORT_VERFILES			+= $(PKGINCL)/versions/clone.ver \
+EXPORT_VERFILES			+= $(PKGINCL)/versions/nit_if.ver \
+				   $(PKGINCL)/versions/bpf.ver \
+				   $(PKGINCL)/versions/clone.ver \
 				   $(PKGINCL)/versions/sth.ver \
 				   $(PKGINCL)/versions/aixcompat.ver \
 				   $(PKGINCL)/versions/hpuxcompat.ver \
