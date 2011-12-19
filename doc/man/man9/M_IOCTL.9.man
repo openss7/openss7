@@ -586,8 +586,12 @@ or
 .BR M_COPYOUT (9)
 message, or, before the pointer is used internaly by the module or driver.
 .PP
-In addition, on Linux kernels prior to kernel 2.6.11, it may be necessary to register the 32-bit
-input-output control command with for the Stream head using the
+In addition, on
+.B Linux
+kernels prior to kernel
+.BR 2.6.11 ,
+it may be necessary to register the 32-bit input-output control command with
+for the Stream head using the
 .BR register_ioctl32 (9)
 utility when the module or driver loads, and de-register the command using the
 .BR unregister_ioctl32 (9)

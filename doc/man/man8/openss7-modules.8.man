@@ -586,7 +586,10 @@ Either the compressed or decompressed system symbol version file must be
 available to perform kernel module weak updates.
 .sp
 (Note, however, that, because Debian systems do not provide either with the
-linux-image-2.6 package, the script attempts to obtain kernel symbol versions
+.B linux-image-2.6
+or
+.B linux-image-3.0
+package, the script attempts to obtain kernel symbol versions
 from the modules installed under the
 .B kernel
 subdirectory.)
@@ -610,7 +613,10 @@ Either the compressed or decompressed system symbol version file must be
 available to perform kernel module weak updates.
 .sp
 (Note, however, that, because Debian systems do not provide either with the
-linux-image-2.6 package, the script attempts to obtain kernel symbol versions
+.B linux-image-2.6
+or
+.B linux-image-3.0
+package, the script attempts to obtain kernel symbol versions
 from the modules installed under the
 .B kernel
 subdirectory.)
@@ -820,7 +826,9 @@ The
 .B openss7-modules
 script is only applicable to
 .B .ko
-kernel modules, that is, kernel versions 2.6.3 and greater.
+kernel modules, that is, kernel versions
+.B 2.6.3
+and greater.
 .\"
 .\"
 .SH IMPLEMENTATION
@@ -938,8 +946,9 @@ are only two or three instances of this in the
 .B @PACKAGE_TITLE@
 kernel modules.  These symbols normally are for functions deep within the
 file-system or terminal behaviour control that have been the same across the
-entire spread of 2.4 and 2.6 kernels, but simply are not exported in current
-production kernels.
+entire spread of
+.BR 2.4 ", " 2.6 " and " 3.x
+kernels, but simply are not exported in current production kernels.
 .\"
 .IP 4)
 .B Weak Absolute:

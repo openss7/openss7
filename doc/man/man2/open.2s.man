@@ -194,16 +194,19 @@ Enable signal-driven I/O: generate a signal
 by default, but this can be changed with
 .BR fcntl (2))
 when input or output becomes possible on this file descriptor.  This feature
-is only available for terminals, pseudo-terminals, sockets, and (since Linux
-2.6) pipes, FIFOs and
+is only available for terminals, pseudo-terminals, sockets, and (since
+.BR "Linux 2.6" )
+pipes, FIFOs and
 .IR STREAMS .
 See
 .BR fcntl (2)
 for further details.
 .TP
 .B O_CLOEXEC
-(Since Linux 2.6.23) Enable the close-on-exec flag for the new file
-descriptor.  Specifying this flag permits a program to avoid an additional
+(Since
+.BR "Linux 2.6.23" )
+Enable the close-on-exec flag for the new file descriptor.  Specifying this
+flag permits a program to avoid an additional
 .BR fcntl (2)
 .B F_SETFD
 operation to set the
@@ -310,7 +313,8 @@ is the preferred method of accessing large files on 32-bit systems (see
 .BR feature_test_macros (7)).
 .TP
 .B O_NOATIME
-(Since Linux 2.6.8)
+(Since
+.BR "Linux 2.6.8" )
 Do not update the file last access time
 .RI ( st_atime
 in the inode) when this file processes

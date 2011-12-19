@@ -514,8 +514,9 @@ library call to unlock the slave device.
 .\"
 .SH NOTICES
 .PP
-On Linux 2.6 systems, or Linux 2.4 systems with extended device
-numbering, and with the
+On
+.BR "Linux 3.x" ", " 2.6 " or " 2.4
+systems with extended device numbering, and with the
 .BR specfs (5)
 file system mounted on
 .BR /dev/streams,
@@ -669,7 +670,9 @@ These devices provide 65536 addressable slave side devices numbered from
 .BR /dev/streams/pts/0
 through
 .BR /dev/streams/pts/65635
-on all Linux 2.4 and Linux 2.6 systems.
+on all
+.BR "Linux 3.x" ", " 2.6 " and " 2.4
+systems.
 .\"
 .\"
 .SH "SEE ALSO"
