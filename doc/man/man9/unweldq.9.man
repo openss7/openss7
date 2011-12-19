@@ -413,7 +413,7 @@ does not need to be called.
 .\".BR unweldq ()
 .\"simply obtains the necessary locks in the calling thread, performs the
 .\"function and then calls the callback function (if any).    Under
-.\".BR "Linux 2.6" ,
+.\".BR "Linux 2.6" " or " 3.x ,
 .\"with kernel pre-emption, the call may be rescheduled.
 .\"
 .\"

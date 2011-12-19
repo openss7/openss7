@@ -241,7 +241,7 @@ will try to use the
 provided.
 If the
 .I mi_idnum
-is non-zero,
+is zero,
 .BR register_strdrv ()
 will attempt to dynamically select a module id.
 If
@@ -255,6 +255,16 @@ is the \(lqindex\(rq into the character device switch table.
 The
 .I mi_idnum
 also serves as the internal major device number.
+Note that when the kernel supports extended device numbering (which all
+.B 2.6
+and
+.B 3.x
+kernels,
+and latest patched
+.B 2.4
+kernels do), the internal major device number and external major device
+number for a driver are the same. See
+.BR dev_t (9).
 .PP
 If there is already another
 .I STREAMS
@@ -482,6 +492,7 @@ for details.
 .\"
 .SH "SEE ALSO"
 .PP
+.BR dev_t (9),
 .BR cdevsw (9),
 .BR specfs (5),
 .BR streamtab (9),

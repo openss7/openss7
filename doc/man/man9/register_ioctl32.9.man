@@ -146,9 +146,11 @@ architectures supporting 32-bit IO controls on a 64-bit kernel.
 .PP
 On
 .B Linux
-kernels prior to 2.6.11 it is necessary for the driver or module to register its 32-bit IO control
-commands, otherwise, the kernel will not pass these IO control commands to the driver, or in the
-case of conflict with another
+kernels prior to
+.B 2.6.11
+it is necessary for the driver or module to register its 32-bit IO control
+commands, otherwise, the kernel will not pass these IO control commands to
+the driver, or in the case of conflict with another
 .RI (non- STREAMS )
 device, might pass inappropriate arguments.
 .BR register_ioctl32 ()
@@ -191,8 +193,12 @@ system, regardless of IO control command conflicts.
 .BR register_ioctl32 ()
 is only necessary for
 .B Linux
-kernels prior to kernel 2.6.11.  For kernels 2.6.11 or greater, 32-bit IO control commands are
-automatically passed to the Stream head for processing.  On these later kernels, the functions
+kernels prior to kernel
+.BR 2.6.11 .
+For kernels
+.B 2.6.11
+or greater, 32-bit IO control commands are automatically passed to the Stream
+head for processing.  On these later kernels, the functions
 .BR register_ioctl32 ()
 and
 .BR unregister_ioctl32 (9)
