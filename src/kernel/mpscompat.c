@@ -2465,11 +2465,15 @@ __MPS_EXTERN int
 mi_strlog(queue_t *q, char level, ushort flags, char *fmt, ...)
 {
 	int result;
-	struct mi_comm *mi = ptr_to_mi(q->q_ptr);
-	modID_t mid = mi->mi_mid;
-	minor_t sid = mi->mi_sid;
+	struct mi_comm *mi;
+	modID_t mid = 0;
+	minor_t sid = 0;
 	va_list args;
 
+	if (q != NULL && (mi = ptr_to_mi(q->q_ptr)) != NULL) {
+		mid = mi->mi_mid;
+		sid = mi->mi_sid;
+	}
 	va_start(args, fmt);
 	result = vstrlog(mid, sid, level, flags, fmt, args);
 	va_end(args);

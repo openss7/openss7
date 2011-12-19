@@ -201,7 +201,10 @@ The
 argument passed to
 .BR vstrlog (9)
 is always zero
-.RB ( 0 ).
+.RB ( 0 )
+for modules; but, see
+.RI \(lq COMPATIBILITY \(rq,
+below for a discussion on drivers.
 The remaining arguments,
 .IR level ,
 .IR flags ,
@@ -220,11 +223,12 @@ might support more format strings than are supported by
 .BR strlog (9),
 this is not the case for
 .BR "@PACKAGE_TITLE@" .
-Therefore,
+Therefore, for a module,
 .BR mi_strlog ()
-is equivalent to
+is roughly equivalent to
 .BI strlog( q->q_qinfo->qi_minfo->mi_idnum ", 0, " level ", " flags ", " fmt ", " ... ").
-In fact, a macro defintiion to that effect would be better.
+In fact, a macro definition to that effect could be better in some
+circumstances.
 .\"
 .\"
 .SH RETURN
@@ -332,6 +336,62 @@ and
 .IR Solaris \(rg,
 with the following portability considerations:
 .IP \(em \w'\(em\(em'u
+The original MPS\(rg function always substituted the module id number,
+.IR q->q_qinfo->q_minfo->mi_idnum ,
+for
+.BR mid ,
+when the queue pointer,
+.BR q ,
+was non-\fBNULL\fP;
+and always substituted zero (0) for
+.BR sid .
+When the queue pointer,
+.BR q ,
+was
+.BR NULL ,
+zero (0) was substituted for both
+.BR mid " and " sid .
+.IP ""
+.B "@PACKAGE_TITLE@"
+retains the null queue pointer,
+.BR q ,
+behaviour; however, it should be pointed out that a
+.BR strlog (9)
+entry with an
+.BR mid " and " sid
+of zero is rather useless.  In fact, in previous versions of
+.BR "@PACKAGE_TITLE@" ,
+passing a null queue pointer,
+.BR q ,
+would panic the kernel (and nobody complained).
+.IP ""
+When the queue pointer,
+.BR q ,
+is non-\fBNULL\fP,
+.B "@PACKAGE_TITLE@"
+has the same behavior as described for modules.  However, when the queue
+pointer,
+.BR q ,
+corresponds to a driver,
+.BR mi_strlog ()
+will additionally provide the minor device number asssigned to the Stream
+belonging to
+.B q
+to the
+.B sid
+argument to
+.BR strlog (9).
+.IP ""
+Accomplishing this additional functionality requires that any queue pointer,
+.BR q ,
+passed to
+.BR mi_strlog ()
+must also have been opened with one of the
+.BR mi_open_comm (9)
+family of functions; otherwise, the values of the
+.BR mid " and " sid
+may be undefined, and the kernel may panic.
+.IP \(em
 See
 .BR strlog (9)
 for a detailed discussion on supported conversion specifiers.
