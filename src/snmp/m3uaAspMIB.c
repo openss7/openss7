@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2010  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -202,6 +202,9 @@ oid m3uaAspRsAlarm_oid[14] = { 1, 3, 6, 1, 4, 1, 29591, 1, 311, 1, 2, 7, 0, 1 };
  * Other oids defined in this MIB.
  */
 oid m3uaAspRsEvents_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 1, 311, 1, 2, 7, 0 };
+oid m3uaAspFullCompliance_oid[12] = { 1, 3, 6, 1, 4, 1, 29591, 1, 311, 2, 1, 1 };
+oid m3uaAspObjectGroup_oid[12] = { 1, 3, 6, 1, 4, 1, 29591, 1, 311, 2, 2, 1 };
+oid m3uaAspNotifyGroup_oid[12] = { 1, 3, 6, 1, 4, 1, 29591, 1, 311, 2, 2, 2 };
 static oid zeroDotZero_oid[2] = { 0, 0 };
 static oid snmpTrapOID_oid[11] = { 1, 3, 6, 1, 6, 3, 1, 1, 4, 1, 0 };
 
@@ -246,7 +249,7 @@ struct variable7 m3uaAspMIB_variables[] = {
 #define   M3UAASPAGASPPROTOCOLPAYLOADID  17
 	{(u_char) M3UAASPAGASPPROTOCOLPAYLOADID, ASN_INTEGER, RWRITE, var_m3uaAspAgTable, 6, {1, 2, 2, 2, 1, 6}},
 #define   M3UAASPAGIPPORT       18
-	{(u_char) M3UAASPAGIPPORT,, RWRITE, var_m3uaAspAgTable, 6, {1, 2, 2, 2, 1, 7}},
+	{(u_char) M3UAASPAGIPPORT, ASN_UNSIGNED, RWRITE, var_m3uaAspAgTable, 6, {1, 2, 2, 2, 1, 7}},
 #define   M3UAASPAGMINOSTREAMS  19
 	{(u_char) M3UAASPAGMINOSTREAMS, ASN_INTEGER, RWRITE, var_m3uaAspAgTable, 6, {1, 2, 2, 2, 1, 8}},
 #define   M3UAASPAGMAXISTREAMS  20
@@ -314,7 +317,7 @@ struct variable7 m3uaAspMIB_variables[] = {
 #define   M3UAASPSGTIMERT2T     51
 	{(u_char) M3UAASPSGTIMERT2T, ASN_INTEGER, RWRITE, var_m3uaAspSgTable, 6, {1, 2, 3, 1, 1, 24}},
 #define   M3UAASPSGSTATUS       52
-	{(u_char) M3UAASPSGSTATUS, ASN_INTEGER, RONLY, var_m3uaAspSgTable, 6, {1, 2, 3, 1, 1, 25}},
+	{(u_char) M3UAASPSGSTATUS, ASN_INTEGER, RWRITE, var_m3uaAspSgTable, 6, {1, 2, 3, 1, 1, 25}},
 #define   M3UAASPSGPNAME        53
 	{(u_char) M3UAASPSGPNAME, ASN_OCTET_STR, RWRITE, var_m3uaAspSgpTable, 6, {1, 2, 4, 1, 1, 2}},
 #define   M3UAASPSGPADMINISTRATIVESTATE  54
@@ -327,151 +330,153 @@ struct variable7 m3uaAspMIB_variables[] = {
 	{(u_char) M3UAASPSGPUSAGESTATE, ASN_INTEGER, RONLY, var_m3uaAspSgpTable, 6, {1, 2, 4, 1, 1, 6}},
 #define   M3UAASPSGPASPSTATE    58
 	{(u_char) M3UAASPSGPASPSTATE, ASN_INTEGER, RWRITE, var_m3uaAspSgpTable, 6, {1, 2, 4, 1, 1, 7}},
-#define   M3UAASPSGPPRIMARYADDRESS  59
-	{(u_char) M3UAASPSGPPRIMARYADDRESS, ASN_OCTET_STR, RWRITE, var_m3uaAspSgpTable, 6, {1, 2, 4, 1, 1, 8}},
-#define   M3UAASPSGPHOSTNAME    60
-	{(u_char) M3UAASPSGPHOSTNAME, ASN_OCTET_STR, RWRITE, var_m3uaAspSgpTable, 6, {1, 2, 4, 1, 1, 9}},
-#define   M3UAASPSGPSTATUS      61
-	{(u_char) M3UAASPSGPSTATUS, ASN_INTEGER, RWRITE, var_m3uaAspSgpTable, 6, {1, 2, 4, 1, 1, 10}},
-#define   M3UAASPSPNEXTINDEX    62
+#define   M3UAASPSGPPRIMARYADDRESSTYPE  59
+	{(u_char) M3UAASPSGPPRIMARYADDRESSTYPE, ASN_INTEGER, RWRITE, var_m3uaAspSgpTable, 6, {1, 2, 4, 1, 1, 8}},
+#define   M3UAASPSGPPRIMARYADDRESS  60
+	{(u_char) M3UAASPSGPPRIMARYADDRESS, ASN_OCTET_STR, RWRITE, var_m3uaAspSgpTable, 6, {1, 2, 4, 1, 1, 9}},
+#define   M3UAASPSGPHOSTNAME    61
+	{(u_char) M3UAASPSGPHOSTNAME, ASN_OCTET_STR, RWRITE, var_m3uaAspSgpTable, 6, {1, 2, 4, 1, 1, 10}},
+#define   M3UAASPSGPSTATUS      62
+	{(u_char) M3UAASPSGPSTATUS, ASN_INTEGER, RWRITE, var_m3uaAspSgpTable, 6, {1, 2, 4, 1, 1, 11}},
+#define   M3UAASPSPNEXTINDEX    63
 	{(u_char) M3UAASPSPNEXTINDEX, ASN_UNSIGNED, RONLY, var_m3uaAspMIB, 4, {1, 2, 5, 1}},
-#define   M3UAASPSPNAME         63
+#define   M3UAASPSPNAME         64
 	{(u_char) M3UAASPSPNAME, ASN_OCTET_STR, RWRITE, var_m3uaAspSpTable, 6, {1, 2, 5, 2, 1, 2}},
-#define   M3UAASPSPOPERATIONALSTATE  64
+#define   M3UAASPSPOPERATIONALSTATE  65
 	{(u_char) M3UAASPSPOPERATIONALSTATE, ASN_INTEGER, RONLY, var_m3uaAspSpTable, 6, {1, 2, 5, 2, 1, 3}},
-#define   M3UAASPSPUSAGESTATE   65
+#define   M3UAASPSPUSAGESTATE   66
 	{(u_char) M3UAASPSPUSAGESTATE, ASN_INTEGER, RONLY, var_m3uaAspSpTable, 6, {1, 2, 5, 2, 1, 4}},
-#define   M3UAASPSPADMINISTRATIVESTATE  66
+#define   M3UAASPSPADMINISTRATIVESTATE  67
 	{(u_char) M3UAASPSPADMINISTRATIVESTATE, ASN_INTEGER, RWRITE, var_m3uaAspSpTable, 6, {1, 2, 5, 2, 1, 5}},
-#define   M3UAASPSPALARMSTATUS  67
+#define   M3UAASPSPALARMSTATUS  68
 	{(u_char) M3UAASPSPALARMSTATUS, ASN_OCTET_STR, RWRITE, var_m3uaAspSpTable, 6, {1, 2, 5, 2, 1, 6}},
-#define   M3UAASPSPPROCEDURALSTATUS  68
+#define   M3UAASPSPPROCEDURALSTATUS  69
 	{(u_char) M3UAASPSPPROCEDURALSTATUS, ASN_OCTET_STR, RONLY, var_m3uaAspSpTable, 6, {1, 2, 5, 2, 1, 7}},
-#define   M3UAASPSPAVAILABILTYSTATUS  69
-	{(u_char) M3UAASPSPAVAILABILTYSTATUS, ASN_OCTET_STR, RONLY, var_m3uaAspSpTable, 6, {1, 2, 5, 2, 1, 8}},
-#define   M3UAASPSPPOINTCODE    70
+#define   M3UAASPSPAVAILABILITYSTATUS  70
+	{(u_char) M3UAASPSPAVAILABILITYSTATUS, ASN_OCTET_STR, RONLY, var_m3uaAspSpTable, 6, {1, 2, 5, 2, 1, 8}},
+#define   M3UAASPSPPOINTCODE    71
 	{(u_char) M3UAASPSPPOINTCODE, ASN_OCTET_STR, RWRITE, var_m3uaAspSpTable, 6, {1, 2, 5, 2, 1, 9}},
-#define   M3UAASPSPTIMERT1R     71
+#define   M3UAASPSPTIMERT1R     72
 	{(u_char) M3UAASPSPTIMERT1R, ASN_INTEGER, RWRITE, var_m3uaAspSpTable, 6, {1, 2, 5, 2, 1, 10}},
-#define   M3UAASPSPTIMERT18     72
+#define   M3UAASPSPTIMERT18     73
 	{(u_char) M3UAASPSPTIMERT18, ASN_INTEGER, RWRITE, var_m3uaAspSpTable, 6, {1, 2, 5, 2, 1, 11}},
-#define   M3UAASPSPTIMERT20     73
+#define   M3UAASPSPTIMERT20     74
 	{(u_char) M3UAASPSPTIMERT20, ASN_INTEGER, RWRITE, var_m3uaAspSpTable, 6, {1, 2, 5, 2, 1, 12}},
-#define   M3UAASPSPTIMERT22A    74
+#define   M3UAASPSPTIMERT22A    75
 	{(u_char) M3UAASPSPTIMERT22A, ASN_INTEGER, RWRITE, var_m3uaAspSpTable, 6, {1, 2, 5, 2, 1, 13}},
-#define   M3UAASPSPTIMERT23A    75
+#define   M3UAASPSPTIMERT23A    76
 	{(u_char) M3UAASPSPTIMERT23A, ASN_INTEGER, RWRITE, var_m3uaAspSpTable, 6, {1, 2, 5, 2, 1, 14}},
-#define   M3UAASPSPTIMERT24A    76
+#define   M3UAASPSPTIMERT24A    77
 	{(u_char) M3UAASPSPTIMERT24A, ASN_INTEGER, RWRITE, var_m3uaAspSpTable, 6, {1, 2, 5, 2, 1, 15}},
-#define   M3UAASPSPTIMERT26A    77
+#define   M3UAASPSPTIMERT26A    78
 	{(u_char) M3UAASPSPTIMERT26A, ASN_INTEGER, RWRITE, var_m3uaAspSpTable, 6, {1, 2, 5, 2, 1, 16}},
-#define   M3UAASPSPTIMERT27A    78
+#define   M3UAASPSPTIMERT27A    79
 	{(u_char) M3UAASPSPTIMERT27A, ASN_INTEGER, RWRITE, var_m3uaAspSpTable, 6, {1, 2, 5, 2, 1, 17}},
-#define   M3UAASPSPSTATUS       79
+#define   M3UAASPSPSTATUS       80
 	{(u_char) M3UAASPSPSTATUS, ASN_INTEGER, RWRITE, var_m3uaAspSpTable, 6, {1, 2, 5, 2, 1, 18}},
-#define   M3UAASPMTNAME         80
+#define   M3UAASPMTNAME         81
 	{(u_char) M3UAASPMTNAME, ASN_OCTET_STR, RWRITE, var_m3uaAspMtTable, 6, {1, 2, 6, 1, 1, 2}},
-#define   M3UAASPMTADMINISTRATIVESTATE  81
+#define   M3UAASPMTADMINISTRATIVESTATE  82
 	{(u_char) M3UAASPMTADMINISTRATIVESTATE, ASN_INTEGER, RWRITE, var_m3uaAspMtTable, 6, {1, 2, 6, 1, 1, 3}},
-#define   M3UAASPMTOPERATIONALSTATE  82
+#define   M3UAASPMTOPERATIONALSTATE  83
 	{(u_char) M3UAASPMTOPERATIONALSTATE, ASN_INTEGER, RONLY, var_m3uaAspMtTable, 6, {1, 2, 6, 1, 1, 4}},
-#define   M3UAASPMTPROCEDURALSTATUS  83
+#define   M3UAASPMTPROCEDURALSTATUS  84
 	{(u_char) M3UAASPMTPROCEDURALSTATUS, ASN_OCTET_STR, RONLY, var_m3uaAspMtTable, 6, {1, 2, 6, 1, 1, 5}},
-#define   M3UAASPMTUSAGESTATE   84
+#define   M3UAASPMTUSAGESTATE   85
 	{(u_char) M3UAASPMTUSAGESTATE, ASN_INTEGER, RONLY, var_m3uaAspMtTable, 6, {1, 2, 6, 1, 1, 6}},
-#define   M3UAASPMTASSTATE      85
+#define   M3UAASPMTASSTATE      86
 	{(u_char) M3UAASPMTASSTATE, ASN_INTEGER, RWRITE, var_m3uaAspMtTable, 6, {1, 2, 6, 1, 1, 7}},
-#define   M3UAASPMTSTATUS       86
+#define   M3UAASPMTSTATUS       87
 	{(u_char) M3UAASPMTSTATUS, ASN_INTEGER, RWRITE, var_m3uaAspMtTable, 6, {1, 2, 6, 1, 1, 8}},
-#define   M3UAASPRSNAME         87
+#define   M3UAASPRSNAME         88
 	{(u_char) M3UAASPRSNAME, ASN_OCTET_STR, RONLY, var_m3uaAspRsTable, 6, {1, 2, 7, 1, 1, 2}},
-#define   M3UAASPRSREMOTEPOINTCODE  88
+#define   M3UAASPRSREMOTEPOINTCODE  89
 	{(u_char) M3UAASPRSREMOTEPOINTCODE, ASN_OCTET_STR, RONLY, var_m3uaAspRsTable, 6, {1, 2, 7, 1, 1, 3}},
-#define   M3UAASPRSOPERATIONALSTATE  89
+#define   M3UAASPRSOPERATIONALSTATE  90
 	{(u_char) M3UAASPRSOPERATIONALSTATE, ASN_INTEGER, RONLY, var_m3uaAspRsTable, 6, {1, 2, 7, 1, 1, 4}},
-#define   M3UAASPRSADMINISTRATIVESTATE  90
+#define   M3UAASPRSADMINISTRATIVESTATE  91
 	{(u_char) M3UAASPRSADMINISTRATIVESTATE, ASN_INTEGER, RWRITE, var_m3uaAspRsTable, 6, {1, 2, 7, 1, 1, 5}},
-#define   M3UAASPRSUSAGESTATE   91
+#define   M3UAASPRSUSAGESTATE   92
 	{(u_char) M3UAASPRSUSAGESTATE, ASN_INTEGER, RONLY, var_m3uaAspRsTable, 6, {1, 2, 7, 1, 1, 6}},
-#define   M3UAASPRSALARMSTATUS  92
+#define   M3UAASPRSALARMSTATUS  93
 	{(u_char) M3UAASPRSALARMSTATUS, ASN_OCTET_STR, RWRITE, var_m3uaAspRsTable, 6, {1, 2, 7, 1, 1, 7}},
-#define   M3UAASPRSPROCEDURALSTATUS  93
+#define   M3UAASPRSPROCEDURALSTATUS  94
 	{(u_char) M3UAASPRSPROCEDURALSTATUS, ASN_OCTET_STR, RONLY, var_m3uaAspRsTable, 6, {1, 2, 7, 1, 1, 8}},
-#define   M3UAASPRSTIMERT8      94
+#define   M3UAASPRSTIMERT8      95
 	{(u_char) M3UAASPRSTIMERT8, ASN_INTEGER, RONLY, var_m3uaAspRsTable, 6, {1, 2, 7, 1, 1, 9}},
-#define   M3UAASPRSTIMERT11     95
+#define   M3UAASPRSTIMERT11     96
 	{(u_char) M3UAASPRSTIMERT11, ASN_INTEGER, RONLY, var_m3uaAspRsTable, 6, {1, 2, 7, 1, 1, 10}},
-#define   M3UAASPRSTIMERT15     96
+#define   M3UAASPRSTIMERT15     97
 	{(u_char) M3UAASPRSTIMERT15, ASN_INTEGER, RONLY, var_m3uaAspRsTable, 6, {1, 2, 7, 1, 1, 11}},
-#define   M3UAASPRSTIMERT16     97
+#define   M3UAASPRSTIMERT16     98
 	{(u_char) M3UAASPRSTIMERT16, ASN_INTEGER, RONLY, var_m3uaAspRsTable, 6, {1, 2, 7, 1, 1, 12}},
-#define   M3UAASPRSTIMERT18A    98
+#define   M3UAASPRSTIMERT18A    99
 	{(u_char) M3UAASPRSTIMERT18A, ASN_INTEGER, RONLY, var_m3uaAspRsTable, 6, {1, 2, 7, 1, 1, 13}},
-#define   M3UAASPRSOPTIONS      99
+#define   M3UAASPRSOPTIONS      100
 	{(u_char) M3UAASPRSOPTIONS, ASN_OCTET_STR, RONLY, var_m3uaAspRsTable, 6, {1, 2, 7, 1, 1, 14}},
-#define   M3UAASPRSAVAILABILITYSTATUS  100
+#define   M3UAASPRSAVAILABILITYSTATUS  101
 	{(u_char) M3UAASPRSAVAILABILITYSTATUS, ASN_OCTET_STR, RONLY, var_m3uaAspRsTable, 6, {1, 2, 7, 1, 1, 15}},
-#define   M3UAASPRSCONGESTIONLEVEL  101
+#define   M3UAASPRSCONGESTIONLEVEL  102
 	{(u_char) M3UAASPRSCONGESTIONLEVEL, ASN_INTEGER, RONLY, var_m3uaAspRsTable, 6, {1, 2, 7, 1, 1, 16}},
-#define   M3UAASPRSSTATUS       102
-	{(u_char) M3UAASPRSSTATUS, ASN_INTEGER, RONLY, var_m3uaAspRsTable, 6, {1, 2, 7, 1, 1, 17}},
-#define   M3UAASPRLCOST         103
+#define   M3UAASPRSSTATUS       103
+	{(u_char) M3UAASPRSSTATUS, ASN_INTEGER, RWRITE, var_m3uaAspRsTable, 6, {1, 2, 7, 1, 1, 17}},
+#define   M3UAASPRLCOST         104
 	{(u_char) M3UAASPRLCOST, ASN_UNSIGNED, RWRITE, var_m3uaAspRlTable, 6, {1, 2, 8, 1, 1, 1}},
-#define   M3UAASPRLADMINISTRATIVESTATE  104
+#define   M3UAASPRLADMINISTRATIVESTATE  105
 	{(u_char) M3UAASPRLADMINISTRATIVESTATE, ASN_INTEGER, RWRITE, var_m3uaAspRlTable, 6, {1, 2, 8, 1, 1, 2}},
-#define   M3UAASPRLOPERATIONALSTATE  105
+#define   M3UAASPRLOPERATIONALSTATE  106
 	{(u_char) M3UAASPRLOPERATIONALSTATE, ASN_INTEGER, RONLY, var_m3uaAspRlTable, 6, {1, 2, 8, 1, 1, 3}},
-#define   M3UAASPRLPROCEDURALSTATUS  106
+#define   M3UAASPRLPROCEDURALSTATUS  107
 	{(u_char) M3UAASPRLPROCEDURALSTATUS, ASN_OCTET_STR, RONLY, var_m3uaAspRlTable, 6, {1, 2, 8, 1, 1, 4}},
-#define   M3UAASPRLUSAGESTATE   107
+#define   M3UAASPRLUSAGESTATE   108
 	{(u_char) M3UAASPRLUSAGESTATE, ASN_INTEGER, RONLY, var_m3uaAspRlTable, 6, {1, 2, 8, 1, 1, 5}},
-#define   M3UAASPRLAVAILABILITYSTATUS  108
-	{(u_char) M3UAASPRLAVAILABILITYSTATUS,, RONLY, var_m3uaAspRlTable, 6, {1, 2, 8, 1, 1, 6}},
-#define   M3UAASPRLSTATUS       109
-	{(u_char) M3UAASPRLSTATUS, ASN_INTEGER, RONLY, var_m3uaAspRlTable, 6, {1, 2, 8, 1, 1, 7}},
-#define   M3UAASPRTCOST         110
+#define   M3UAASPRLAVAILABILITYSTATUS  109
+	{(u_char) M3UAASPRLAVAILABILITYSTATUS, ASN_OCTET_STR, RONLY, var_m3uaAspRlTable, 6, {1, 2, 8, 1, 1, 6}},
+#define   M3UAASPRLSTATUS       110
+	{(u_char) M3UAASPRLSTATUS, ASN_INTEGER, RWRITE, var_m3uaAspRlTable, 6, {1, 2, 8, 1, 1, 7}},
+#define   M3UAASPRTCOST         111
 	{(u_char) M3UAASPRTCOST, ASN_UNSIGNED, RONLY, var_m3uaAspRtTable, 6, {1, 2, 9, 1, 1, 1}},
-#define   M3UAASPRTTIMERT6      111
+#define   M3UAASPRTTIMERT6      112
 	{(u_char) M3UAASPRTTIMERT6, ASN_INTEGER, RONLY, var_m3uaAspRtTable, 6, {1, 2, 9, 1, 1, 2}},
-#define   M3UAASPRTTIMERT10     112
+#define   M3UAASPRTTIMERT10     113
 	{(u_char) M3UAASPRTTIMERT10, ASN_INTEGER, RONLY, var_m3uaAspRtTable, 6, {1, 2, 9, 1, 1, 3}},
-#define   M3UAASPRTAVAILABILITYSTATUS  113
+#define   M3UAASPRTAVAILABILITYSTATUS  114
 	{(u_char) M3UAASPRTAVAILABILITYSTATUS, ASN_OCTET_STR, RONLY, var_m3uaAspRtTable, 6, {1, 2, 9, 1, 1, 4}},
-#define   M3UAASPRTADMINSTRATIVESTATE  114
+#define   M3UAASPRTADMINSTRATIVESTATE  115
 	{(u_char) M3UAASPRTADMINSTRATIVESTATE, ASN_INTEGER, RONLY, var_m3uaAspRtTable, 6, {1, 2, 9, 1, 1, 5}},
-#define   M3UAASPRTOPERATIONALSTATE  115
+#define   M3UAASPRTOPERATIONALSTATE  116
 	{(u_char) M3UAASPRTOPERATIONALSTATE, ASN_INTEGER, RONLY, var_m3uaAspRtTable, 6, {1, 2, 9, 1, 1, 6}},
-#define   M3UAASPRTPROCEDURALSTATUS  116
+#define   M3UAASPRTPROCEDURALSTATUS  117
 	{(u_char) M3UAASPRTPROCEDURALSTATUS, ASN_OCTET_STR, RONLY, var_m3uaAspRtTable, 6, {1, 2, 9, 1, 1, 7}},
-#define   M3UAASPRTUSAGESTATE   117
+#define   M3UAASPRTUSAGESTATE   118
 	{(u_char) M3UAASPRTUSAGESTATE, ASN_INTEGER, RONLY, var_m3uaAspRtTable, 6, {1, 2, 9, 1, 1, 8}},
-#define   M3UAASPRTSTATUS       118
-	{(u_char) M3UAASPRTSTATUS, ASN_INTEGER, RONLY, var_m3uaAspRtTable, 6, {1, 2, 9, 1, 1, 9}},
-#define   M3UAASPRCVALUE        119
+#define   M3UAASPRTSTATUS       119
+	{(u_char) M3UAASPRTSTATUS, ASN_INTEGER, RWRITE, var_m3uaAspRtTable, 6, {1, 2, 9, 1, 1, 9}},
+#define   M3UAASPRCVALUE        120
 	{(u_char) M3UAASPRCVALUE, ASN_UNSIGNED, RWRITE, var_m3uaAspRcTable, 6, {1, 2, 10, 1, 1, 1}},
-#define   M3UAASPRCREGSTRATIONPOLICY  120
-	{(u_char) M3UAASPRCREGSTRATIONPOLICY, ASN_INTEGER, RWRITE, var_m3uaAspRcTable, 6, {1, 2, 10, 1, 1, 3}},
-#define   M3UAASPRCTRAFFICMODE  121
+#define   M3UAASPRCREGISTRATIONPOLICY  121
+	{(u_char) M3UAASPRCREGISTRATIONPOLICY, ASN_INTEGER, RWRITE, var_m3uaAspRcTable, 6, {1, 2, 10, 1, 1, 3}},
+#define   M3UAASPRCTRAFFICMODE  122
 	{(u_char) M3UAASPRCTRAFFICMODE, ASN_OBJECT_ID, RWRITE, var_m3uaAspRcTable, 6, {1, 2, 10, 1, 1, 4}},
-#define   M3UAASPRCSTATUS       122
+#define   M3UAASPRCSTATUS       123
 	{(u_char) M3UAASPRCSTATUS, ASN_INTEGER, RWRITE, var_m3uaAspRcTable, 6, {1, 2, 10, 1, 1, 5}},
-#define   M3UAASPASASSTATE      123
+#define   M3UAASPASASSTATE      124
 	{(u_char) M3UAASPASASSTATE, ASN_INTEGER, RONLY, var_m3uaAspAsTable, 6, {1, 2, 11, 1, 1, 1}},
-#define   M3UAASPASOPERATIONALSTATE  124
+#define   M3UAASPASOPERATIONALSTATE  125
 	{(u_char) M3UAASPASOPERATIONALSTATE, ASN_INTEGER, RONLY, var_m3uaAspAsTable, 6, {1, 2, 11, 1, 1, 2}},
-#define   M3UAASPASPROCEDURALSTATUS  125
+#define   M3UAASPASPROCEDURALSTATUS  126
 	{(u_char) M3UAASPASPROCEDURALSTATUS, ASN_OCTET_STR, RONLY, var_m3uaAspAsTable, 6, {1, 2, 11, 1, 1, 3}},
-#define   M3UAASPASUSAGESTATE   126
+#define   M3UAASPASUSAGESTATE   127
 	{(u_char) M3UAASPASUSAGESTATE, ASN_INTEGER, RONLY, var_m3uaAspAsTable, 6, {1, 2, 11, 1, 1, 4}},
-#define   M3UAASPAFASSTATE      127
+#define   M3UAASPAFASSTATE      128
 	{(u_char) M3UAASPAFASSTATE, ASN_INTEGER, RWRITE, var_m3uaAspAfTable, 6, {1, 2, 12, 1, 1, 1}},
-#define   M3UAASPAFADMINISTRATIVESTATE  128
+#define   M3UAASPAFADMINISTRATIVESTATE  129
 	{(u_char) M3UAASPAFADMINISTRATIVESTATE, ASN_INTEGER, RWRITE, var_m3uaAspAfTable, 6, {1, 2, 12, 1, 1, 2}},
-#define   M3UAASPAFOPERATIONALSTATE  129
+#define   M3UAASPAFOPERATIONALSTATE  130
 	{(u_char) M3UAASPAFOPERATIONALSTATE, ASN_INTEGER, RONLY, var_m3uaAspAfTable, 6, {1, 2, 12, 1, 1, 3}},
-#define   M3UAASPAFPROCEDURALSTATUS  130
+#define   M3UAASPAFPROCEDURALSTATUS  131
 	{(u_char) M3UAASPAFPROCEDURALSTATUS, ASN_OCTET_STR, RONLY, var_m3uaAspAfTable, 6, {1, 2, 12, 1, 1, 4}},
-#define   M3UAASPAFUSAGESTATE   131
+#define   M3UAASPAFUSAGESTATE   132
 	{(u_char) M3UAASPAFUSAGESTATE, ASN_INTEGER, RONLY, var_m3uaAspAfTable, 6, {1, 2, 12, 1, 1, 5}},
 };
 
@@ -741,6 +746,7 @@ store_m3uaAspMIB(int majorID, int minorID, void *serverarg, void *clientarg)
 		memset(line, 0, sizeof(line));
 		strcat(line, "m3uaAspMIB ");
 		cptr = line + strlen(line);
+		(void) cptr;
 		/* XXX: remove individual scalars that are not persistent */
 		cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->m3uaAspNextIndex, &tmpsize);
 		cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->m3uaAspAgNextIndex, &tmpsize);
@@ -1067,6 +1073,7 @@ store_m3uaAspTable(int majorID, int minorID, void *serverarg, void *clientarg)
 			memset(line, 0, sizeof(line));
 			strcat(line, "m3uaAspTable ");
 			cptr = line + strlen(line);
+			(void) cptr;
 			/* XXX: remove individual columns if not persistent */
 			cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->m3uaAspIndex, &tmpsize);
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->m3uaAspName, &StorageTmp->m3uaAspNameLen);
@@ -1109,6 +1116,7 @@ m3uaAspAgTable_create(void)
 		StorageNew->m3uaAspAgRegistrationPolicy = 0;
 		StorageNew->m3uaAspAgAspIdPolicy = 0;
 		StorageNew->m3uaAspAgAspProtocolPayloadId = 0;
+		StorageNew->m3uaAspAgIpPort = 2905;
 		StorageNew->m3uaAspAgMinOstreams = 32;
 		StorageNew->m3uaAspAgMaxIstreams = 0;
 		StorageNew->m3uaAspAgTimerT7 = 0;
@@ -1271,6 +1279,7 @@ parse_m3uaAspAgTable(const char *token, char *line)
 	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->m3uaAspAgRegistrationPolicy, &tmpsize);
 	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->m3uaAspAgAspIdPolicy, &tmpsize);
 	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->m3uaAspAgAspProtocolPayloadId, &tmpsize);
+	line = read_config_read_data(ASN_UNSIGNED, line, &StorageTmp->m3uaAspAgIpPort, &tmpsize);
 	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->m3uaAspAgMinOstreams, &tmpsize);
 	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->m3uaAspAgMaxIstreams, &tmpsize);
 	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->m3uaAspAgTimerT7, &tmpsize);
@@ -1309,6 +1318,7 @@ store_m3uaAspAgTable(int majorID, int minorID, void *serverarg, void *clientarg)
 			memset(line, 0, sizeof(line));
 			strcat(line, "m3uaAspAgTable ");
 			cptr = line + strlen(line);
+			(void) cptr;
 			/* XXX: remove individual columns if not persistent */
 			cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->m3uaAspAgIndex, &tmpsize);
 			cptr = read_config_store_data(ASN_OBJECT_ID, cptr, &StorageTmp->m3uaAspAgProtocolVersion, &StorageTmp->m3uaAspAgProtocolVersionLen);
@@ -1316,6 +1326,7 @@ store_m3uaAspAgTable(int majorID, int minorID, void *serverarg, void *clientarg)
 			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->m3uaAspAgRegistrationPolicy, &tmpsize);
 			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->m3uaAspAgAspIdPolicy, &tmpsize);
 			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->m3uaAspAgAspProtocolPayloadId, &tmpsize);
+			cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->m3uaAspAgIpPort, &tmpsize);
 			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->m3uaAspAgMinOstreams, &tmpsize);
 			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->m3uaAspAgMaxIstreams, &tmpsize);
 			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->m3uaAspAgTimerT7, &tmpsize);
@@ -1352,11 +1363,11 @@ m3uaAspSgTable_create(void)
 		StorageNew->m3uaAspAgIndex = 0;
 		if ((StorageNew->m3uaAspSgName = (uint8_t *) strdup("")) != NULL)
 			StorageNew->m3uaAspSgNameLen = strlen("");
-		StorageNew->m3uaAspSgAdministrativeState = 0;
-		StorageNew->m3uaAspSgOperationalState = 0;
+		StorageNew->m3uaAspSgAdministrativeState = M3UAASPSGADMINISTRATIVESTATE_LOCKED;
+		StorageNew->m3uaAspSgOperationalState = M3UAASPSGOPERATIONALSTATE_DISABLED;
 		if (memdup((u_char **) &StorageNew->m3uaAspSgProcedurealStatus, (u_char *) "\x00", 1) == SNMPERR_SUCCESS)
 			StorageNew->m3uaAspSgProcedurealStatusLen = 1;
-		StorageNew->m3uaAspSgUsgageState = 0;
+		StorageNew->m3uaAspSgUsgageState = M3UAASPSGUSGAGESTATE_IDLE;
 		StorageNew->m3uaAspSgAspState = 0;
 		StorageNew->m3uaAspSgMaxInitRetrans = 5;
 		StorageNew->m3uaAspSgMaxPathRetrans = 10;
@@ -1578,6 +1589,7 @@ store_m3uaAspSgTable(int majorID, int minorID, void *serverarg, void *clientarg)
 			memset(line, 0, sizeof(line));
 			strcat(line, "m3uaAspSgTable ");
 			cptr = line + strlen(line);
+			(void) cptr;
 			/* XXX: remove individual columns if not persistent */
 			cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->m3uaAspAgIndex, &tmpsize);
 			cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->m3uaAspSgIndex, &tmpsize);
@@ -1632,12 +1644,13 @@ m3uaAspSgpTable_create(void)
 		StorageNew->m3uaAspSgIndex = 0;
 		if ((StorageNew->m3uaAspSgpName = (uint8_t *) strdup("")) != NULL)
 			StorageNew->m3uaAspSgpNameLen = strlen("");
-		StorageNew->m3uaAspSgpAdministrativeState = 0;
+		StorageNew->m3uaAspSgpAdministrativeState = M3UAASPSGPADMINISTRATIVESTATE_LOCKED;
 		if (memdup((u_char **) &StorageNew->m3uaAspSgpProceduralStatus, (u_char *) "\x00", 1) == SNMPERR_SUCCESS)
 			StorageNew->m3uaAspSgpProceduralStatusLen = 1;
-		StorageNew->m3uaAspSgpOperationalState = 0;
-		StorageNew->m3uaAspSgpUsageState = 0;
+		StorageNew->m3uaAspSgpOperationalState = M3UAASPSGPOPERATIONALSTATE_DISABLED;
+		StorageNew->m3uaAspSgpUsageState = M3UAASPSGPUSAGESTATE_IDLE;
 		StorageNew->m3uaAspSgpAspState = 0;
+		StorageNew->m3uaAspSgpPrimaryAddressType = 0;
 		if ((StorageNew->m3uaAspSgpPrimaryAddress = (uint8_t *) strdup("")) != NULL)
 			StorageNew->m3uaAspSgpPrimaryAddressLen = strlen("");
 		if ((StorageNew->m3uaAspSgpHostName = (uint8_t *) strdup("")) != NULL)
@@ -1806,6 +1819,7 @@ parse_m3uaAspSgpTable(const char *token, char *line)
 	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->m3uaAspSgpOperationalState, &tmpsize);
 	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->m3uaAspSgpUsageState, &tmpsize);
 	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->m3uaAspSgpAspState, &tmpsize);
+	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->m3uaAspSgpPrimaryAddressType, &tmpsize);
 	SNMP_FREE(StorageTmp->m3uaAspSgpPrimaryAddress);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->m3uaAspSgpPrimaryAddress, &StorageTmp->m3uaAspSgpPrimaryAddressLen);
 	if (StorageTmp->m3uaAspSgpPrimaryAddress == NULL) {
@@ -1847,6 +1861,7 @@ store_m3uaAspSgpTable(int majorID, int minorID, void *serverarg, void *clientarg
 			memset(line, 0, sizeof(line));
 			strcat(line, "m3uaAspSgpTable ");
 			cptr = line + strlen(line);
+			(void) cptr;
 			/* XXX: remove individual columns if not persistent */
 			cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->m3uaAspAgIndex, &tmpsize);
 			cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->m3uaAspSgIndex, &tmpsize);
@@ -1857,6 +1872,7 @@ store_m3uaAspSgpTable(int majorID, int minorID, void *serverarg, void *clientarg
 			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->m3uaAspSgpOperationalState, &tmpsize);
 			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->m3uaAspSgpUsageState, &tmpsize);
 			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->m3uaAspSgpAspState, &tmpsize);
+			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->m3uaAspSgpPrimaryAddressType, &tmpsize);
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->m3uaAspSgpPrimaryAddress, &StorageTmp->m3uaAspSgpPrimaryAddressLen);
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->m3uaAspSgpHostName, &StorageTmp->m3uaAspSgpHostNameLen);
 			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->m3uaAspSgpStatus, &tmpsize);
@@ -1892,8 +1908,8 @@ m3uaAspSpTable_create(void)
 			StorageNew->m3uaAspSpAlarmStatusLen = 1;
 		if (memdup((u_char **) &StorageNew->m3uaAspSpProceduralStatus, (u_char *) "\x00", 1) == SNMPERR_SUCCESS)
 			StorageNew->m3uaAspSpProceduralStatusLen = 1;
-		if (memdup((u_char **) &StorageNew->m3uaAspSpAvailabiltyStatus, (u_char *) "\x00\x00", 2) == SNMPERR_SUCCESS)
-			StorageNew->m3uaAspSpAvailabiltyStatusLen = 2;
+		if (memdup((u_char **) &StorageNew->m3uaAspSpAvailabilityStatus, (u_char *) "\x00\x00", 2) == SNMPERR_SUCCESS)
+			StorageNew->m3uaAspSpAvailabilityStatusLen = 2;
 		if ((StorageNew->m3uaAspSpPointCode = (uint8_t *) strdup("")) != NULL)
 			StorageNew->m3uaAspSpPointCodeLen = strlen("");
 		StorageNew->m3uaAspSpTimerT1R = 0;
@@ -1959,8 +1975,8 @@ m3uaAspSpTable_destroy(struct m3uaAspSpTable_data **thedata)
 		StorageDel->m3uaAspSpAlarmStatusLen = 0;
 		SNMP_FREE(StorageDel->m3uaAspSpProceduralStatus);
 		StorageDel->m3uaAspSpProceduralStatusLen = 0;
-		SNMP_FREE(StorageDel->m3uaAspSpAvailabiltyStatus);
-		StorageDel->m3uaAspSpAvailabiltyStatusLen = 0;
+		SNMP_FREE(StorageDel->m3uaAspSpAvailabilityStatus);
+		StorageDel->m3uaAspSpAvailabilityStatusLen = 0;
 		SNMP_FREE(StorageDel->m3uaAspSpPointCode);
 		StorageDel->m3uaAspSpPointCodeLen = 0;
 		SNMP_FREE(StorageDel);
@@ -2069,10 +2085,10 @@ parse_m3uaAspSpTable(const char *token, char *line)
 		config_perror("invalid specification for m3uaAspSpProceduralStatus");
 		return;
 	}
-	SNMP_FREE(StorageTmp->m3uaAspSpAvailabiltyStatus);
-	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->m3uaAspSpAvailabiltyStatus, &StorageTmp->m3uaAspSpAvailabiltyStatusLen);
-	if (StorageTmp->m3uaAspSpAvailabiltyStatus == NULL) {
-		config_perror("invalid specification for m3uaAspSpAvailabiltyStatus");
+	SNMP_FREE(StorageTmp->m3uaAspSpAvailabilityStatus);
+	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->m3uaAspSpAvailabilityStatus, &StorageTmp->m3uaAspSpAvailabilityStatusLen);
+	if (StorageTmp->m3uaAspSpAvailabilityStatus == NULL) {
+		config_perror("invalid specification for m3uaAspSpAvailabilityStatus");
 		return;
 	}
 	SNMP_FREE(StorageTmp->m3uaAspSpPointCode);
@@ -2118,6 +2134,7 @@ store_m3uaAspSpTable(int majorID, int minorID, void *serverarg, void *clientarg)
 			memset(line, 0, sizeof(line));
 			strcat(line, "m3uaAspSpTable ");
 			cptr = line + strlen(line);
+			(void) cptr;
 			/* XXX: remove individual columns if not persistent */
 			cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->m3uaAspSpIndex, &tmpsize);
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->m3uaAspSpName, &StorageTmp->m3uaAspSpNameLen);
@@ -2126,7 +2143,7 @@ store_m3uaAspSpTable(int majorID, int minorID, void *serverarg, void *clientarg)
 			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->m3uaAspSpAdministrativeState, &tmpsize);
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->m3uaAspSpAlarmStatus, &StorageTmp->m3uaAspSpAlarmStatusLen);
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->m3uaAspSpProceduralStatus, &StorageTmp->m3uaAspSpProceduralStatusLen);
-			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->m3uaAspSpAvailabiltyStatus, &StorageTmp->m3uaAspSpAvailabiltyStatusLen);
+			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->m3uaAspSpAvailabilityStatus, &StorageTmp->m3uaAspSpAvailabilityStatusLen);
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->m3uaAspSpPointCode, &StorageTmp->m3uaAspSpPointCodeLen);
 			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->m3uaAspSpTimerT1R, &tmpsize);
 			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->m3uaAspSpTimerT18, &tmpsize);
@@ -2163,12 +2180,12 @@ m3uaAspMtTable_create(void)
 		StorageNew->m3uaAspSpIndex = 0;
 		if ((StorageNew->m3uaAspMtName = (uint8_t *) strdup("")) != NULL)
 			StorageNew->m3uaAspMtNameLen = strlen("");
-		StorageNew->m3uaAspMtAdministrativeState = 0;
-		StorageNew->m3uaAspMtOperationalState = 0;
+		StorageNew->m3uaAspMtAdministrativeState = M3UAASPMTADMINISTRATIVESTATE_LOCKED;
+		StorageNew->m3uaAspMtOperationalState = M3UAASPMTOPERATIONALSTATE_DISABLED;
 		if (memdup((u_char **) &StorageNew->m3uaAspMtProceduralStatus, (u_char *) "\x00", 1) == SNMPERR_SUCCESS)
 			StorageNew->m3uaAspMtProceduralStatusLen = 1;
-		StorageNew->m3uaAspMtUsageState = 0;
-		StorageNew->m3uaAspMtAsState = 0;
+		StorageNew->m3uaAspMtUsageState = M3UAASPMTUSAGESTATE_IDLE;
+		StorageNew->m3uaAspMtAsState = M3UAASPMTASSTATE_DOWN;
 		StorageNew->m3uaAspMtStatus = 0;
 		StorageNew->m3uaAspMtStatus = RS_NOTREADY;
 	}
@@ -2249,7 +2266,7 @@ m3uaAspMtTable_add(struct m3uaAspMtTable_data *thedata)
 		/* m3uaAspSpIndex */
 		snmp_varlist_add_variable(&vars, NULL, 0, ASN_UNSIGNED, (u_char *) &thedata->m3uaAspSpIndex, sizeof(thedata->m3uaAspSpIndex));
 		/* m3uaAspMtIndex */
-		snmp_varlist_add_variable(&vars, NULL, 0,, (u_char *) thedata->m3uaAspMtIndex, thedata->m3uaAspMtIndex);
+		snmp_varlist_add_variable(&vars, NULL, 0, ASN_INTEGER, (u_char *) &thedata->m3uaAspMtIndex, sizeof(thedata->m3uaAspMtIndex));
 		header_complex_add_data(&m3uaAspMtTableStorage, vars, thedata);
 	}
 	DEBUGMSGTL(("m3uaAspMIB", "registered an entry.\n"));
@@ -2309,6 +2326,7 @@ parse_m3uaAspMtTable(const char *token, char *line)
 	}
 	/* XXX: remove individual columns if not persistent */
 	line = read_config_read_data(ASN_UNSIGNED, line, &StorageTmp->m3uaAspSpIndex, &tmpsize);
+	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->m3uaAspMtIndex, &tmpsize);
 	SNMP_FREE(StorageTmp->m3uaAspMtName);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->m3uaAspMtName, &StorageTmp->m3uaAspMtNameLen);
 	if (StorageTmp->m3uaAspMtName == NULL) {
@@ -2354,8 +2372,10 @@ store_m3uaAspMtTable(int majorID, int minorID, void *serverarg, void *clientarg)
 			memset(line, 0, sizeof(line));
 			strcat(line, "m3uaAspMtTable ");
 			cptr = line + strlen(line);
+			(void) cptr;
 			/* XXX: remove individual columns if not persistent */
 			cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->m3uaAspSpIndex, &tmpsize);
+			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->m3uaAspMtIndex, &tmpsize);
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->m3uaAspMtName, &StorageTmp->m3uaAspMtNameLen);
 			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->m3uaAspMtAdministrativeState, &tmpsize);
 			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->m3uaAspMtOperationalState, &tmpsize);
@@ -2631,6 +2651,7 @@ store_m3uaAspRsTable(int majorID, int minorID, void *serverarg, void *clientarg)
 			memset(line, 0, sizeof(line));
 			strcat(line, "m3uaAspRsTable ");
 			cptr = line + strlen(line);
+			(void) cptr;
 			/* XXX: remove individual columns if not persistent */
 			cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->m3uaAspSpIndex, &tmpsize);
 			cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->m3uaAspRsIndex, &tmpsize);
@@ -2677,11 +2698,13 @@ m3uaAspRlTable_create(void)
 		StorageNew->m3uaAspRsIndex = 0;
 		StorageNew->m3uaAspAgIndex = 0;
 		StorageNew->m3uaAspRlCost = 0;
-		StorageNew->m3uaAspRlAdministrativeState = 0;
-		StorageNew->m3uaAspRlOperationalState = 1;
+		StorageNew->m3uaAspRlAdministrativeState = M3UAASPRLADMINISTRATIVESTATE_LOCKED;
+		StorageNew->m3uaAspRlOperationalState = M3UAASPRLOPERATIONALSTATE_ENABLED;
 		if (memdup((u_char **) &StorageNew->m3uaAspRlProceduralStatus, (u_char *) "\x00", 1) == SNMPERR_SUCCESS)
 			StorageNew->m3uaAspRlProceduralStatusLen = 1;
 		StorageNew->m3uaAspRlUsageState = 0;
+		if (memdup((u_char **) &StorageNew->m3uaAspRlAvailabilityStatus, (u_char *) "\x00\x00", 2) == SNMPERR_SUCCESS)
+			StorageNew->m3uaAspRlAvailabilityStatusLen = 2;
 		StorageNew->m3uaAspRlStatus = 0;
 		StorageNew->m3uaAspRlStatus = RS_NOTREADY;
 	}
@@ -2733,6 +2756,8 @@ m3uaAspRlTable_destroy(struct m3uaAspRlTable_data **thedata)
 	if ((StorageDel = *thedata) != NULL) {
 		SNMP_FREE(StorageDel->m3uaAspRlProceduralStatus);
 		StorageDel->m3uaAspRlProceduralStatusLen = 0;
+		SNMP_FREE(StorageDel->m3uaAspRlAvailabilityStatus);
+		StorageDel->m3uaAspRlAvailabilityStatusLen = 0;
 		SNMP_FREE(StorageDel);
 		*thedata = StorageDel;
 	}
@@ -2834,6 +2859,12 @@ parse_m3uaAspRlTable(const char *token, char *line)
 		return;
 	}
 	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->m3uaAspRlUsageState, &tmpsize);
+	SNMP_FREE(StorageTmp->m3uaAspRlAvailabilityStatus);
+	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->m3uaAspRlAvailabilityStatus, &StorageTmp->m3uaAspRlAvailabilityStatusLen);
+	if (StorageTmp->m3uaAspRlAvailabilityStatus == NULL) {
+		config_perror("invalid specification for m3uaAspRlAvailabilityStatus");
+		return;
+	}
 	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->m3uaAspRlStatus, &tmpsize);
 	m3uaAspRlTable_add(StorageTmp);
 	(void) tmpsize;
@@ -2863,6 +2894,7 @@ store_m3uaAspRlTable(int majorID, int minorID, void *serverarg, void *clientarg)
 			memset(line, 0, sizeof(line));
 			strcat(line, "m3uaAspRlTable ");
 			cptr = line + strlen(line);
+			(void) cptr;
 			/* XXX: remove individual columns if not persistent */
 			cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->m3uaAspSpIndex, &tmpsize);
 			cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->m3uaAspRsIndex, &tmpsize);
@@ -2872,6 +2904,7 @@ store_m3uaAspRlTable(int majorID, int minorID, void *serverarg, void *clientarg)
 			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->m3uaAspRlOperationalState, &tmpsize);
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->m3uaAspRlProceduralStatus, &StorageTmp->m3uaAspRlProceduralStatusLen);
 			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->m3uaAspRlUsageState, &tmpsize);
+			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->m3uaAspRlAvailabilityStatus, &StorageTmp->m3uaAspRlAvailabilityStatusLen);
 			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->m3uaAspRlStatus, &tmpsize);
 			snmpd_store_config(line);
 		}
@@ -3104,6 +3137,7 @@ store_m3uaAspRtTable(int majorID, int minorID, void *serverarg, void *clientarg)
 			memset(line, 0, sizeof(line));
 			strcat(line, "m3uaAspRtTable ");
 			cptr = line + strlen(line);
+			(void) cptr;
 			/* XXX: remove individual columns if not persistent */
 			cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->m3uaAspSpIndex, &tmpsize);
 			cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->m3uaAspRsIndex, &tmpsize);
@@ -3143,9 +3177,10 @@ m3uaAspRcTable_create(void)
 		/* XXX: fill in default row values here into StorageNew */
 		StorageNew->m3uaAspIndex = 0;
 		StorageNew->m3uaAspSpIndex = 0;
+		StorageNew->m3uaAspMtIndex = 0;
 		StorageNew->m3uaAspAgIndex = 0;
 		StorageNew->m3uaAspRcValue = 0;
-		StorageNew->m3uaAspRcRegstrationPolicy = 0;
+		StorageNew->m3uaAspRcRegistrationPolicy = 0;
 		if ((StorageNew->m3uaAspRcTrafficMode = snmp_duplicate_objid(zeroDotZero_oid, 2)))
 			StorageNew->m3uaAspRcTrafficModeLen = 2;
 		StorageNew->m3uaAspRcStatus = 0;
@@ -3228,7 +3263,7 @@ m3uaAspRcTable_add(struct m3uaAspRcTable_data *thedata)
 		/* m3uaAspSpIndex */
 		snmp_varlist_add_variable(&vars, NULL, 0, ASN_UNSIGNED, (u_char *) &thedata->m3uaAspSpIndex, sizeof(thedata->m3uaAspSpIndex));
 		/* m3uaAspMtIndex */
-		snmp_varlist_add_variable(&vars, NULL, 0,, (u_char *) thedata->m3uaAspMtIndex, thedata->m3uaAspMtIndex);
+		snmp_varlist_add_variable(&vars, NULL, 0, ASN_INTEGER, (u_char *) &thedata->m3uaAspMtIndex, sizeof(thedata->m3uaAspMtIndex));
 		/* m3uaAspAgIndex */
 		snmp_varlist_add_variable(&vars, NULL, 0, ASN_UNSIGNED, (u_char *) &thedata->m3uaAspAgIndex, sizeof(thedata->m3uaAspAgIndex));
 		header_complex_add_data(&m3uaAspRcTableStorage, vars, thedata);
@@ -3291,9 +3326,10 @@ parse_m3uaAspRcTable(const char *token, char *line)
 	/* XXX: remove individual columns if not persistent */
 	line = read_config_read_data(ASN_UNSIGNED, line, &StorageTmp->m3uaAspIndex, &tmpsize);
 	line = read_config_read_data(ASN_UNSIGNED, line, &StorageTmp->m3uaAspSpIndex, &tmpsize);
+	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->m3uaAspMtIndex, &tmpsize);
 	line = read_config_read_data(ASN_UNSIGNED, line, &StorageTmp->m3uaAspAgIndex, &tmpsize);
 	line = read_config_read_data(ASN_UNSIGNED, line, &StorageTmp->m3uaAspRcValue, &tmpsize);
-	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->m3uaAspRcRegstrationPolicy, &tmpsize);
+	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->m3uaAspRcRegistrationPolicy, &tmpsize);
 	SNMP_FREE(StorageTmp->m3uaAspRcTrafficMode);
 	line = read_config_read_data(ASN_OBJECT_ID, line, &StorageTmp->m3uaAspRcTrafficMode, &StorageTmp->m3uaAspRcTrafficModeLen);
 	if (StorageTmp->m3uaAspRcTrafficMode == NULL) {
@@ -3329,12 +3365,14 @@ store_m3uaAspRcTable(int majorID, int minorID, void *serverarg, void *clientarg)
 			memset(line, 0, sizeof(line));
 			strcat(line, "m3uaAspRcTable ");
 			cptr = line + strlen(line);
+			(void) cptr;
 			/* XXX: remove individual columns if not persistent */
 			cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->m3uaAspIndex, &tmpsize);
 			cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->m3uaAspSpIndex, &tmpsize);
+			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->m3uaAspMtIndex, &tmpsize);
 			cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->m3uaAspAgIndex, &tmpsize);
 			cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->m3uaAspRcValue, &tmpsize);
-			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->m3uaAspRcRegstrationPolicy, &tmpsize);
+			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->m3uaAspRcRegistrationPolicy, &tmpsize);
 			cptr = read_config_store_data(ASN_OBJECT_ID, cptr, &StorageTmp->m3uaAspRcTrafficMode, &StorageTmp->m3uaAspRcTrafficModeLen);
 			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->m3uaAspRcStatus, &tmpsize);
 			snmpd_store_config(line);
@@ -3362,6 +3400,7 @@ m3uaAspAsTable_create(void)
 		/* XXX: fill in default row values here into StorageNew */
 		StorageNew->m3uaAspIndex = 0;
 		StorageNew->m3uaAspSpIndex = 0;
+		StorageNew->m3uaAspMtIndex = 0;
 		StorageNew->m3uaAspAgIndex = 0;
 		StorageNew->m3uaAspSgIndex = 0;
 		StorageNew->m3uaAspAsAsState = 0;
@@ -3448,7 +3487,7 @@ m3uaAspAsTable_add(struct m3uaAspAsTable_data *thedata)
 		/* m3uaAspSpIndex */
 		snmp_varlist_add_variable(&vars, NULL, 0, ASN_UNSIGNED, (u_char *) &thedata->m3uaAspSpIndex, sizeof(thedata->m3uaAspSpIndex));
 		/* m3uaAspMtIndex */
-		snmp_varlist_add_variable(&vars, NULL, 0,, (u_char *) thedata->m3uaAspMtIndex, thedata->m3uaAspMtIndex);
+		snmp_varlist_add_variable(&vars, NULL, 0, ASN_INTEGER, (u_char *) &thedata->m3uaAspMtIndex, sizeof(thedata->m3uaAspMtIndex));
 		/* m3uaAspAgIndex */
 		snmp_varlist_add_variable(&vars, NULL, 0, ASN_UNSIGNED, (u_char *) &thedata->m3uaAspAgIndex, sizeof(thedata->m3uaAspAgIndex));
 		/* m3uaAspSgIndex */
@@ -3513,6 +3552,7 @@ parse_m3uaAspAsTable(const char *token, char *line)
 	/* XXX: remove individual columns if not persistent */
 	line = read_config_read_data(ASN_UNSIGNED, line, &StorageTmp->m3uaAspIndex, &tmpsize);
 	line = read_config_read_data(ASN_UNSIGNED, line, &StorageTmp->m3uaAspSpIndex, &tmpsize);
+	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->m3uaAspMtIndex, &tmpsize);
 	line = read_config_read_data(ASN_UNSIGNED, line, &StorageTmp->m3uaAspAgIndex, &tmpsize);
 	line = read_config_read_data(ASN_UNSIGNED, line, &StorageTmp->m3uaAspSgIndex, &tmpsize);
 	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->m3uaAspAsAsState, &tmpsize);
@@ -3552,9 +3592,11 @@ store_m3uaAspAsTable(int majorID, int minorID, void *serverarg, void *clientarg)
 			memset(line, 0, sizeof(line));
 			strcat(line, "m3uaAspAsTable ");
 			cptr = line + strlen(line);
+			(void) cptr;
 			/* XXX: remove individual columns if not persistent */
 			cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->m3uaAspIndex, &tmpsize);
 			cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->m3uaAspSpIndex, &tmpsize);
+			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->m3uaAspMtIndex, &tmpsize);
 			cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->m3uaAspAgIndex, &tmpsize);
 			cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->m3uaAspSgIndex, &tmpsize);
 			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->m3uaAspAsAsState, &tmpsize);
@@ -3586,6 +3628,7 @@ m3uaAspAfTable_create(void)
 		/* XXX: fill in default row values here into StorageNew */
 		StorageNew->m3uaAspIndex = 0;
 		StorageNew->m3uaAspSpIndex = 0;
+		StorageNew->m3uaAspMtIndex = 0;
 		StorageNew->m3uaAspAgIndex = 0;
 		StorageNew->m3uaAspSgIndex = 0;
 		StorageNew->m3uaAspSgpIndex = 0;
@@ -3674,7 +3717,7 @@ m3uaAspAfTable_add(struct m3uaAspAfTable_data *thedata)
 		/* m3uaAspSpIndex */
 		snmp_varlist_add_variable(&vars, NULL, 0, ASN_UNSIGNED, (u_char *) &thedata->m3uaAspSpIndex, sizeof(thedata->m3uaAspSpIndex));
 		/* m3uaAspMtIndex */
-		snmp_varlist_add_variable(&vars, NULL, 0,, (u_char *) thedata->m3uaAspMtIndex, thedata->m3uaAspMtIndex);
+		snmp_varlist_add_variable(&vars, NULL, 0, ASN_INTEGER, (u_char *) &thedata->m3uaAspMtIndex, sizeof(thedata->m3uaAspMtIndex));
 		/* m3uaAspAgIndex */
 		snmp_varlist_add_variable(&vars, NULL, 0, ASN_UNSIGNED, (u_char *) &thedata->m3uaAspAgIndex, sizeof(thedata->m3uaAspAgIndex));
 		/* m3uaAspSgIndex */
@@ -3741,6 +3784,7 @@ parse_m3uaAspAfTable(const char *token, char *line)
 	/* XXX: remove individual columns if not persistent */
 	line = read_config_read_data(ASN_UNSIGNED, line, &StorageTmp->m3uaAspIndex, &tmpsize);
 	line = read_config_read_data(ASN_UNSIGNED, line, &StorageTmp->m3uaAspSpIndex, &tmpsize);
+	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->m3uaAspMtIndex, &tmpsize);
 	line = read_config_read_data(ASN_UNSIGNED, line, &StorageTmp->m3uaAspAgIndex, &tmpsize);
 	line = read_config_read_data(ASN_UNSIGNED, line, &StorageTmp->m3uaAspSgIndex, &tmpsize);
 	line = read_config_read_data(ASN_UNSIGNED, line, &StorageTmp->m3uaAspSgpIndex, &tmpsize);
@@ -3782,9 +3826,11 @@ store_m3uaAspAfTable(int majorID, int minorID, void *serverarg, void *clientarg)
 			memset(line, 0, sizeof(line));
 			strcat(line, "m3uaAspAfTable ");
 			cptr = line + strlen(line);
+			(void) cptr;
 			/* XXX: remove individual columns if not persistent */
 			cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->m3uaAspIndex, &tmpsize);
 			cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->m3uaAspSpIndex, &tmpsize);
+			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->m3uaAspMtIndex, &tmpsize);
 			cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->m3uaAspAgIndex, &tmpsize);
 			cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->m3uaAspSgIndex, &tmpsize);
 			cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->m3uaAspSgpIndex, &tmpsize);
@@ -4042,8 +4088,8 @@ var_m3uaAspAgTable(struct variable *vp, oid * name, size_t *length, int exact, s
 		*write_method = write_m3uaAspAgIpPort;
 		if (!StorageTmp)
 			break;
-		*var_len = StorageTmp->m3uaAspAgIpPort;
-		rval = (u_char *) StorageTmp->m3uaAspAgIpPort;
+		*var_len = sizeof(StorageTmp->m3uaAspAgIpPort);
+		rval = (u_char *) &StorageTmp->m3uaAspAgIpPort;
 		break;
 	case (u_char) M3UAASPAGMINOSTREAMS:	/* Create */
 		*write_method = write_m3uaAspAgMinOstreams;
@@ -4343,7 +4389,8 @@ var_m3uaAspSgTable(struct variable *vp, oid * name, size_t *length, int exact, s
 		*var_len = sizeof(StorageTmp->m3uaAspSgTimerT2T);
 		rval = (u_char *) &StorageTmp->m3uaAspSgTimerT2T;
 		break;
-	case (u_char) M3UAASPSGSTATUS:	/* ReadOnly */
+	case (u_char) M3UAASPSGSTATUS:	/* Create */
+		*write_method = write_m3uaAspSgStatus;
 		if (!StorageTmp)
 			break;
 		*var_len = sizeof(StorageTmp->m3uaAspSgStatus);
@@ -4458,6 +4505,13 @@ var_m3uaAspSgpTable(struct variable *vp, oid * name, size_t *length, int exact, 
 			break;
 		*var_len = sizeof(StorageTmp->m3uaAspSgpAspState);
 		rval = (u_char *) &StorageTmp->m3uaAspSgpAspState;
+		break;
+	case (u_char) M3UAASPSGPPRIMARYADDRESSTYPE:	/* Create */
+		*write_method = write_m3uaAspSgpPrimaryAddressType;
+		if (!StorageTmp)
+			break;
+		*var_len = sizeof(StorageTmp->m3uaAspSgpPrimaryAddressType);
+		rval = (u_char *) &StorageTmp->m3uaAspSgpPrimaryAddressType;
 		break;
 	case (u_char) M3UAASPSGPPRIMARYADDRESS:	/* Create */
 		*write_method = write_m3uaAspSgpPrimaryAddress;
@@ -4590,11 +4644,11 @@ var_m3uaAspSpTable(struct variable *vp, oid * name, size_t *length, int exact, s
 		*var_len = StorageTmp->m3uaAspSpProceduralStatusLen;
 		rval = (u_char *) StorageTmp->m3uaAspSpProceduralStatus;
 		break;
-	case (u_char) M3UAASPSPAVAILABILTYSTATUS:	/* ReadOnly */
+	case (u_char) M3UAASPSPAVAILABILITYSTATUS:	/* ReadOnly */
 		if (!StorageTmp)
 			break;
-		*var_len = StorageTmp->m3uaAspSpAvailabiltyStatusLen;
-		rval = (u_char *) StorageTmp->m3uaAspSpAvailabiltyStatus;
+		*var_len = StorageTmp->m3uaAspSpAvailabilityStatusLen;
+		rval = (u_char *) StorageTmp->m3uaAspSpAvailabilityStatus;
 		break;
 	case (u_char) M3UAASPSPPOINTCODE:	/* Create */
 		*write_method = write_m3uaAspSpPointCode;
@@ -4946,7 +5000,8 @@ var_m3uaAspRsTable(struct variable *vp, oid * name, size_t *length, int exact, s
 		*var_len = sizeof(StorageTmp->m3uaAspRsCongestionLevel);
 		rval = (u_char *) &StorageTmp->m3uaAspRsCongestionLevel;
 		break;
-	case (u_char) M3UAASPRSSTATUS:	/* ReadOnly */
+	case (u_char) M3UAASPRSSTATUS:	/* Create */
+		*write_method = write_m3uaAspRsStatus;
 		if (!StorageTmp)
 			break;
 		*var_len = sizeof(StorageTmp->m3uaAspRsStatus);
@@ -5058,10 +5113,11 @@ var_m3uaAspRlTable(struct variable *vp, oid * name, size_t *length, int exact, s
 	case (u_char) M3UAASPRLAVAILABILITYSTATUS:	/* ReadOnly */
 		if (!StorageTmp)
 			break;
-		*var_len = StorageTmp->m3uaAspRlAvailabilityStatus;
+		*var_len = StorageTmp->m3uaAspRlAvailabilityStatusLen;
 		rval = (u_char *) StorageTmp->m3uaAspRlAvailabilityStatus;
 		break;
-	case (u_char) M3UAASPRLSTATUS:	/* ReadOnly */
+	case (u_char) M3UAASPRLSTATUS:	/* Create */
+		*write_method = write_m3uaAspRlStatus;
 		if (!StorageTmp)
 			break;
 		*var_len = sizeof(StorageTmp->m3uaAspRlStatus);
@@ -5186,7 +5242,8 @@ var_m3uaAspRtTable(struct variable *vp, oid * name, size_t *length, int exact, s
 		*var_len = sizeof(StorageTmp->m3uaAspRtUsageState);
 		rval = (u_char *) &StorageTmp->m3uaAspRtUsageState;
 		break;
-	case (u_char) M3UAASPRTSTATUS:	/* ReadOnly */
+	case (u_char) M3UAASPRTSTATUS:	/* Create */
+		*write_method = write_m3uaAspRtStatus;
 		if (!StorageTmp)
 			break;
 		*var_len = sizeof(StorageTmp->m3uaAspRtStatus);
@@ -5270,12 +5327,12 @@ var_m3uaAspRcTable(struct variable *vp, oid * name, size_t *length, int exact, s
 		*var_len = sizeof(StorageTmp->m3uaAspRcValue);
 		rval = (u_char *) &StorageTmp->m3uaAspRcValue;
 		break;
-	case (u_char) M3UAASPRCREGSTRATIONPOLICY:	/* Create */
-		*write_method = write_m3uaAspRcRegstrationPolicy;
+	case (u_char) M3UAASPRCREGISTRATIONPOLICY:	/* Create */
+		*write_method = write_m3uaAspRcRegistrationPolicy;
 		if (!StorageTmp)
 			break;
-		*var_len = sizeof(StorageTmp->m3uaAspRcRegstrationPolicy);
-		rval = (u_char *) &StorageTmp->m3uaAspRcRegstrationPolicy;
+		*var_len = sizeof(StorageTmp->m3uaAspRcRegistrationPolicy);
+		rval = (u_char *) &StorageTmp->m3uaAspRcRegistrationPolicy;
 		break;
 	case (u_char) M3UAASPRCTRAFFICMODE:	/* Create */
 		*write_method = write_m3uaAspRcTrafficMode;
@@ -6355,9 +6412,10 @@ write_m3uaAspAgAspProtocolPayloadId(int action, u_char *var_val, u_char var_val_
 int
 write_m3uaAspAgIpPort(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static old_value;
+	static ulong old_value;
 	struct m3uaAspAgTable_data *StorageTmp = NULL;
 	size_t newlen = name_len - 15;
+	ulong set_value = *((ulong *) var_val);
 
 	DEBUGMSGTL(("m3uaAspMIB", "write_m3uaAspAgIpPort entering action=%d...  \n", action));
 	StorageTmp = header_complex(m3uaAspAgTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
@@ -6376,15 +6434,20 @@ write_m3uaAspAgIpPort(int action, u_char *var_val, u_char var_val_type, size_t v
 				break;
 			}
 		}
-		if () {
-			snmp_log(MY_FACILITY(LOG_NOTICE), "write to m3uaAspAgIpPort not \n");
+		if (var_val_type != ASN_UNSIGNED) {
+			snmp_log(MY_FACILITY(LOG_NOTICE), "write to m3uaAspAgIpPort not ASN_UNSIGNED\n");
 			return SNMP_ERR_WRONGTYPE;
 		}
-		if () {
+		if (var_val_len > sizeof(uint32_t)) {
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to m3uaAspAgIpPort: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
 		/* Note: default value 2905 */
+		/* Note: ranges 0..65535 */
+		if ((0 > set_value || set_value > 65535)) {
+			snmp_log(MY_FACILITY(LOG_NOTICE), "write to m3uaAspAgIpPort: bad value\n");
+			return SNMP_ERR_WRONGVALUE;
+		}
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
 		break;
@@ -6392,10 +6455,13 @@ write_m3uaAspAgIpPort(int action, u_char *var_val, u_char var_val_type, size_t v
 				   be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
+		old_value = StorageTmp->m3uaAspAgIpPort;
+		StorageTmp->m3uaAspAgIpPort = set_value;
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
+		StorageTmp->m3uaAspAgIpPort = old_value;
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
 		break;
@@ -7157,7 +7223,7 @@ write_m3uaAspSgAdministrativeState(int action, u_char *var_val, u_char var_val_t
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to m3uaAspSgAdministrativeState: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
-		/* Note: default value 0 */
+		/* Note: default value locked */
 		switch (set_value) {
 		case M3UAASPSGADMINISTRATIVESTATE_LOCKED:
 		case M3UAASPSGADMINISTRATIVESTATE_UNLOCKED:
@@ -8516,7 +8582,7 @@ write_m3uaAspSgpAdministrativeState(int action, u_char *var_val, u_char var_val_
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to m3uaAspSgpAdministrativeState: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
-		/* Note: default value 0 */
+		/* Note: default value locked */
 		switch (set_value) {
 		case M3UAASPSGPADMINISTRATIVESTATE_LOCKED:
 		case M3UAASPSGPADMINISTRATIVESTATE_UNLOCKED:
@@ -8615,6 +8681,83 @@ write_m3uaAspSgpAspState(int action, u_char *var_val, u_char var_val_type, size_
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->m3uaAspSgpAspState = old_value;
+		/* fall through */
+	case FREE:		/* Release any resources that have been allocated */
+		break;
+	}
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int write_m3uaAspSgpPrimaryAddressType(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid *name, size_t name_len)
+ * @param action the stage of the SET operation.
+ * @param var_val pointer to the varbind value.
+ * @param var_val_type the ASN type.
+ * @param var_val_len the length of the varbind value.
+ * @param statP static pointer.
+ * @param name the varbind OID.
+ * @param name_len number of elements in OID.
+ * @brief Table row and column write routine.
+ */
+int
+write_m3uaAspSgpPrimaryAddressType(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
+{
+	static long old_value;
+	struct m3uaAspSgpTable_data *StorageTmp = NULL;
+	size_t newlen = name_len - 15;
+	long set_value = *((long *) var_val);
+
+	DEBUGMSGTL(("m3uaAspMIB", "write_m3uaAspSgpPrimaryAddressType entering action=%d...  \n", action));
+	StorageTmp = header_complex(m3uaAspSgpTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
+	switch (action) {
+	case RESERVE1:
+		if (StorageTmp != NULL && statP == NULL) {
+			/* have row but no column */
+			switch (StorageTmp->m3uaAspSgpStatus) {
+			case RS_ACTIVE:
+				/* cannot create non-existent column while active */
+				snmp_log(MY_FACILITY(LOG_NOTICE), "write to m3uaAspSgpPrimaryAddressType: but column non-existent\n");
+				return SNMP_ERR_INCONSISTENTVALUE;
+			case RS_NOTINSERVICE:
+			case RS_NOTREADY:
+				/* assume column can be created */
+				break;
+			}
+		}
+		if (var_val_type != ASN_INTEGER) {
+			snmp_log(MY_FACILITY(LOG_NOTICE), "write to m3uaAspSgpPrimaryAddressType not ASN_INTEGER\n");
+			return SNMP_ERR_WRONGTYPE;
+		}
+		if (var_val_len > sizeof(int32_t)) {
+			snmp_log(MY_FACILITY(LOG_NOTICE), "write to m3uaAspSgpPrimaryAddressType: bad length\n");
+			return SNMP_ERR_WRONGLENGTH;
+		}
+		switch (set_value) {
+		case M3UAASPSGPPRIMARYADDRESSTYPE_UNKNOWN:
+		case M3UAASPSGPPRIMARYADDRESSTYPE_IPV4:
+		case M3UAASPSGPPRIMARYADDRESSTYPE_IPV6:
+		case M3UAASPSGPPRIMARYADDRESSTYPE_IPV4Z:
+		case M3UAASPSGPPRIMARYADDRESSTYPE_IPV6Z:
+		case M3UAASPSGPPRIMARYADDRESSTYPE_DNS:
+			break;
+		default:
+			snmp_log(MY_FACILITY(LOG_NOTICE), "write to m3uaAspSgpPrimaryAddressType: bad value\n");
+			return SNMP_ERR_WRONGVALUE;
+		}
+		break;
+	case RESERVE2:		/* memory reseveration, final preparation... */
+		break;
+	case ACTION:		/* The variable has been stored in StorageTmp->m3uaAspSgpPrimaryAddressType for you to use, and you have just been asked to do something with it.  Note that anything
+				   done here must be reversable in the UNDO case */
+		if (StorageTmp == NULL)
+			return SNMP_ERR_NOSUCHNAME;
+		old_value = StorageTmp->m3uaAspSgpPrimaryAddressType;
+		StorageTmp->m3uaAspSgpPrimaryAddressType = set_value;
+		break;
+	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		break;
+	case UNDO:		/* Back out any changes made in the ACTION case */
+		StorageTmp->m3uaAspSgpPrimaryAddressType = old_value;
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
 		break;
@@ -9781,7 +9924,7 @@ write_m3uaAspMtAdministrativeState(int action, u_char *var_val, u_char var_val_t
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to m3uaAspMtAdministrativeState: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
-		/* Note: default value 0 */
+		/* Note: default value locked */
 		switch (set_value) {
 		case M3UAASPMTADMINISTRATIVESTATE_LOCKED:
 		case M3UAASPMTADMINISTRATIVESTATE_UNLOCKED:
@@ -9856,7 +9999,7 @@ write_m3uaAspMtAsState(int action, u_char *var_val, u_char var_val_type, size_t 
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to m3uaAspMtAsState: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
-		/* Note: default value 0 */
+		/* Note: default value down */
 		switch (set_value) {
 		case M3UAASPMTASSTATE_DOWN:
 		case M3UAASPMTASSTATE_INITIALIZING:
@@ -10161,7 +10304,7 @@ write_m3uaAspRlAdministrativeState(int action, u_char *var_val, u_char var_val_t
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to m3uaAspRlAdministrativeState: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
-		/* Note: default value 0 */
+		/* Note: default value locked */
 		switch (set_value) {
 		case M3UAASPRLADMINISTRATIVESTATE_LOCKED:
 		case M3UAASPRLADMINISTRATIVESTATE_UNLOCKED:
@@ -10258,7 +10401,7 @@ write_m3uaAspRcValue(int action, u_char *var_val, u_char var_val_type, size_t va
 }
 
 /**
- * @fn int write_m3uaAspRcRegstrationPolicy(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid *name, size_t name_len)
+ * @fn int write_m3uaAspRcRegistrationPolicy(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid *name, size_t name_len)
  * @param action the stage of the SET operation.
  * @param var_val pointer to the varbind value.
  * @param var_val_type the ASN type.
@@ -10269,14 +10412,14 @@ write_m3uaAspRcValue(int action, u_char *var_val, u_char var_val_type, size_t va
  * @brief Table row and column write routine.
  */
 int
-write_m3uaAspRcRegstrationPolicy(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
+write_m3uaAspRcRegistrationPolicy(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
 	static long old_value;
 	struct m3uaAspRcTable_data *StorageTmp = NULL;
 	size_t newlen = name_len - 15;
 	long set_value = *((long *) var_val);
 
-	DEBUGMSGTL(("m3uaAspMIB", "write_m3uaAspRcRegstrationPolicy entering action=%d...  \n", action));
+	DEBUGMSGTL(("m3uaAspMIB", "write_m3uaAspRcRegistrationPolicy entering action=%d...  \n", action));
 	StorageTmp = header_complex(m3uaAspRcTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -10285,7 +10428,7 @@ write_m3uaAspRcRegstrationPolicy(int action, u_char *var_val, u_char var_val_typ
 			switch (StorageTmp->m3uaAspRcStatus) {
 			case RS_ACTIVE:
 				/* cannot create non-existent column while active */
-				snmp_log(MY_FACILITY(LOG_NOTICE), "write to m3uaAspRcRegstrationPolicy: but column non-existent\n");
+				snmp_log(MY_FACILITY(LOG_NOTICE), "write to m3uaAspRcRegistrationPolicy: but column non-existent\n");
 				return SNMP_ERR_INCONSISTENTVALUE;
 			case RS_NOTINSERVICE:
 			case RS_NOTREADY:
@@ -10294,37 +10437,37 @@ write_m3uaAspRcRegstrationPolicy(int action, u_char *var_val, u_char var_val_typ
 			}
 		}
 		if (var_val_type != ASN_INTEGER) {
-			snmp_log(MY_FACILITY(LOG_NOTICE), "write to m3uaAspRcRegstrationPolicy not ASN_INTEGER\n");
+			snmp_log(MY_FACILITY(LOG_NOTICE), "write to m3uaAspRcRegistrationPolicy not ASN_INTEGER\n");
 			return SNMP_ERR_WRONGTYPE;
 		}
 		if (var_val_len > sizeof(int32_t)) {
-			snmp_log(MY_FACILITY(LOG_NOTICE), "write to m3uaAspRcRegstrationPolicy: bad length\n");
+			snmp_log(MY_FACILITY(LOG_NOTICE), "write to m3uaAspRcRegistrationPolicy: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
 		switch (set_value) {
-		case M3UAASPRCREGSTRATIONPOLICY_UNKNOWN:
-		case M3UAASPRCREGSTRATIONPOLICY_FORBIDDEN:
-		case M3UAASPRCREGSTRATIONPOLICY_PERMITTED:
-		case M3UAASPRCREGSTRATIONPOLICY_REQUIRED:
+		case M3UAASPRCREGISTRATIONPOLICY_UNKNOWN:
+		case M3UAASPRCREGISTRATIONPOLICY_FORBIDDEN:
+		case M3UAASPRCREGISTRATIONPOLICY_PERMITTED:
+		case M3UAASPRCREGISTRATIONPOLICY_REQUIRED:
 			break;
 		default:
-			snmp_log(MY_FACILITY(LOG_NOTICE), "write to m3uaAspRcRegstrationPolicy: bad value\n");
+			snmp_log(MY_FACILITY(LOG_NOTICE), "write to m3uaAspRcRegistrationPolicy: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
 		break;
-	case ACTION:		/* The variable has been stored in StorageTmp->m3uaAspRcRegstrationPolicy for you to use, and you have just been asked to do something with it.  Note that anything
+	case ACTION:		/* The variable has been stored in StorageTmp->m3uaAspRcRegistrationPolicy for you to use, and you have just been asked to do something with it.  Note that anything
 				   done here must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->m3uaAspRcRegstrationPolicy;
-		StorageTmp->m3uaAspRcRegstrationPolicy = set_value;
+		old_value = StorageTmp->m3uaAspRcRegistrationPolicy;
+		StorageTmp->m3uaAspRcRegistrationPolicy = set_value;
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->m3uaAspRcRegstrationPolicy = old_value;
+		StorageTmp->m3uaAspRcRegistrationPolicy = old_value;
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
 		break;
@@ -11943,7 +12086,7 @@ write_m3uaAspMtStatus(int action, u_char *var_val, u_char var_val_type, size_t v
 				return SNMP_ERR_RESOURCEUNAVAILABLE;
 			}
 			/* m3uaAspMtIndex */
-			if ((vp = snmp_varlist_add_variable(&vars, NULL, 0,, NULL, 0)) == NULL) {
+			if ((vp = snmp_varlist_add_variable(&vars, NULL, 0, ASN_INTEGER, NULL, 0)) == NULL) {
 				snmp_free_varbind(vars);
 				return SNMP_ERR_RESOURCEUNAVAILABLE;
 			}
@@ -11960,8 +12103,31 @@ write_m3uaAspMtStatus(int action, u_char *var_val, u_char var_val_type, size_t v
 			}
 			vp = vp->next_variable;
 			/* m3uaAspMtIndex */
-			if () {
+			if (vp->val_len > sizeof(int32_t)) {
 				snmp_log(MY_FACILITY(LOG_NOTICE), "index m3uaAspMtIndex: bad length\n");
+				snmp_free_varbind(vars);
+				return SNMP_ERR_INCONSISTENTNAME;
+			}
+			switch ((long) *vp->val.integer) {
+			case M3UAASPMTINDEX_SNMM:
+			case M3UAASPMTINDEX_SNTM:
+			case M3UAASPMTINDEX_SNSM:
+			case M3UAASPMTINDEX_SCCP:
+			case M3UAASPMTINDEX_TUP:
+			case M3UAASPMTINDEX_ISUP:
+			case M3UAASPMTINDEX_DUP1:
+			case M3UAASPMTINDEX_DUP2:
+			case M3UAASPMTINDEX_MTUP:
+			case M3UAASPMTINDEX_BISUP:
+			case M3UAASPMTINDEX_SIUP:
+			case M3UAASPMTINDEX_SPNEUP:
+			case M3UAASPMTINDEX_STC:
+			case M3UAASPMTINDEX_USER13:
+			case M3UAASPMTINDEX_USER14:
+			case M3UAASPMTINDEX_USER15:
+				break;
+			default:
+				snmp_log(MY_FACILITY(LOG_NOTICE), "index m3uaAspMtIndex: bad value\n");
 				snmp_free_varbind(vars);
 				return SNMP_ERR_INCONSISTENTNAME;
 			}
@@ -11973,6 +12139,7 @@ write_m3uaAspMtStatus(int action, u_char *var_val, u_char var_val_type, size_t v
 			vp = vars;
 			StorageNew->m3uaAspSpIndex = (ulong) *vp->val.integer;
 			vp = vp->next_variable;
+			StorageNew->m3uaAspMtIndex = (long) *vp->val.integer;
 			vp = vp->next_variable;
 			header_complex_add_data(&m3uaAspMtTableStorage, vars, StorageNew);	/* frees vars */
 			break;
@@ -12897,7 +13064,7 @@ write_m3uaAspRcStatus(int action, u_char *var_val, u_char var_val_type, size_t v
 				return SNMP_ERR_RESOURCEUNAVAILABLE;
 			}
 			/* m3uaAspMtIndex */
-			if ((vp = snmp_varlist_add_variable(&vars, NULL, 0,, NULL, 0)) == NULL) {
+			if ((vp = snmp_varlist_add_variable(&vars, NULL, 0, ASN_INTEGER, NULL, 0)) == NULL) {
 				snmp_free_varbind(vars);
 				return SNMP_ERR_RESOURCEUNAVAILABLE;
 			}
@@ -12926,8 +13093,31 @@ write_m3uaAspRcStatus(int action, u_char *var_val, u_char var_val_type, size_t v
 			}
 			vp = vp->next_variable;
 			/* m3uaAspMtIndex */
-			if () {
+			if (vp->val_len > sizeof(int32_t)) {
 				snmp_log(MY_FACILITY(LOG_NOTICE), "index m3uaAspMtIndex: bad length\n");
+				snmp_free_varbind(vars);
+				return SNMP_ERR_INCONSISTENTNAME;
+			}
+			switch ((long) *vp->val.integer) {
+			case M3UAASPMTINDEX_SNMM:
+			case M3UAASPMTINDEX_SNTM:
+			case M3UAASPMTINDEX_SNSM:
+			case M3UAASPMTINDEX_SCCP:
+			case M3UAASPMTINDEX_TUP:
+			case M3UAASPMTINDEX_ISUP:
+			case M3UAASPMTINDEX_DUP1:
+			case M3UAASPMTINDEX_DUP2:
+			case M3UAASPMTINDEX_MTUP:
+			case M3UAASPMTINDEX_BISUP:
+			case M3UAASPMTINDEX_SIUP:
+			case M3UAASPMTINDEX_SPNEUP:
+			case M3UAASPMTINDEX_STC:
+			case M3UAASPMTINDEX_USER13:
+			case M3UAASPMTINDEX_USER14:
+			case M3UAASPMTINDEX_USER15:
+				break;
+			default:
+				snmp_log(MY_FACILITY(LOG_NOTICE), "index m3uaAspMtIndex: bad value\n");
 				snmp_free_varbind(vars);
 				return SNMP_ERR_INCONSISTENTNAME;
 			}
@@ -12948,6 +13138,7 @@ write_m3uaAspRcStatus(int action, u_char *var_val, u_char var_val_type, size_t v
 			vp = vp->next_variable;
 			StorageNew->m3uaAspSpIndex = (ulong) *vp->val.integer;
 			vp = vp->next_variable;
+			StorageNew->m3uaAspMtIndex = (long) *vp->val.integer;
 			vp = vp->next_variable;
 			StorageNew->m3uaAspAgIndex = (ulong) *vp->val.integer;
 			vp = vp->next_variable;

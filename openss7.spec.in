@@ -2542,8 +2542,8 @@ generating and submitting problem reports to @PACKAGE_BUGREPORT@.
     %{?_without_wrapper_module:             '%disable %_without_wrapper_module'} \
     %{?_with_module_sth:                    '%enable %_with_module_sth'} \
     %{?_without_module_sth:                 '%disable %_without_module_sth'} \
-    %{?_with_module_bufmod:                 '%enable %_with_module_bufmod'} \
-    %{?_without_module_bufmod:              '%disable %_without_module_bufmod'} \
+    %{?_with_module_srvmod:                 '%enable %_with_module_srvmod'} \
+    %{?_without_module_srvmod:              '%disable %_without_module_srvmod'} \
     %{?_with_module_nullmod:                '%enable %_with_module_nullmod'} \
     %{?_without_module_nullmod:             '%disable %_without_module_nullmod'} \
     %{?_with_module_pipemod:                '%enable %_with_module_pipemod'} \
@@ -2554,6 +2554,14 @@ generating and submitting problem reports to @PACKAGE_BUGREPORT@.
     %{?_without_module_sc:                  '%disable %_without_module_sc'} \
     %{?_with_module_testmod:                '%enable %_with_module_testmod'} \
     %{?_without_module_testmod:             '%disable %_without_module_testmod'} \
+    %{?_with_module_bufmod:                 '%enable %_with_module_bufmod'} \
+    %{?_without_module_bufmod:              '%disable %_without_module_bufmod'} \
+    %{?_with_module_pfmod:                  '%enable %_with_module_pfmod'} \
+    %{?_without_module_pfmod:               '%disable %_without_module_pfmod'} \
+    %{?_with_module_nbuf:                   '%enable %_with_module_nbuf'} \
+    %{?_without_module_nbuf:                '%disable %_without_module_nbuf'} \
+    %{?_with_module_pf:                     '%enable %_with_module_pf'} \
+    %{?_without_module_pf:                  '%disable %_without_module_pf'} \
     %{?_with_driver_clone:                  '%enable %_with_driver_clone'} \
     %{?_without_driver_clone:               '%disable %_without_driver_clone'} \
     %{?_with_driver_echo:                   '%enable %_with_driver_echo'} \

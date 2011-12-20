@@ -27,7 +27,7 @@
 --
 -- -----------------------------------------------------------------------------
 --
--- Note well: nonwithstanding this AGPL license, you are not permitted to make 
+-- Note well: notwithstanding this AGPL license, you are not permitted to make 
 -- modifications under the OpenSS7 project's enterprise object identifier arc: 
 -- 1.3.6.1.4.1.29591.  Modifications must be made only within an object 
 -- identifier arc under your control.
@@ -92,7 +92,7 @@ IMPORTS
         FROM SNMPv2-TC;
 
 slMIB MODULE-IDENTITY
-    LAST-UPDATED "200812300356Z"
+    LAST-UPDATED "201112101120Z"
     ORGANIZATION 
         "The OpenSS7 Project"
     CONTACT-INFO 
@@ -129,11 +129,14 @@ slMIB MODULE-IDENTITY
          <http://www.gnu.org/licenses/>, or write to the Free Software 
          Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
          
-         Note well: nonwithstanding this AGPL license, you are not 
+         Note well: notwithstanding this AGPL license, you are not 
          permitted to make modifications under the OpenSS7 project's 
          enterprise object identifier arc: 1.3.6.1.4.1.29591.  
          Modifications must be made only within an object identifier arc 
          under your control."
+    REVISION    "201112101120Z"
+    DESCRIPTION 
+        "Corrections an smilint workup."
     REVISION    "200812300356Z"
     DESCRIPTION 
         "First release of this module."
@@ -1297,8 +1300,6 @@ slId OBJECT-TYPE
         "Provides an non-zero ordinal index into the signalling link 
          table, slTable.  Rows in this table can be referred to using 
          this index or using the RowPointer pointer."
-    REFERENCE   
-        ""
     ::= { slEntry 1 }
 
 slMaxCapacitySL OBJECT-TYPE
@@ -1667,8 +1668,6 @@ slNbTable OBJECT-TYPE
     DESCRIPTION 
         "Provides an auxillary table of narrowband specific MTP Level 2 
          protocol profile information for Signalling Terminals."
-    REFERENCE   
-        ""
     ::= { slSdt 1 }
 
 slNbEntry OBJECT-TYPE
@@ -1680,8 +1679,6 @@ slNbEntry OBJECT-TYPE
          mtpSlL2ProfileTable which provides the common MTP Level 2 
          protocol profile information whereas each of these entries 
          provides narrowband signalling link specific information."
-    REFERENCE   
-        ""
     INDEX       { slSdtProfileId }
     ::= { slNbTable 1 }
 
@@ -1710,8 +1707,6 @@ slSdtProfileId OBJECT-TYPE
     DESCRIPTION 
         "Provides a signalling terminal protocol profile index for the 
          narrowband, ATM SAAL and M2PA protocol profile tables."
-    REFERENCE   
-        ""
     ::= { slNbEntry 1 }
 
 slNbTransmissionRate OBJECT-TYPE
@@ -2510,8 +2505,6 @@ slM2paProving OBJECT-TYPE
          accordance with Q.703, ANSI T1.111.3, and optional Q.2140 
          procedures, or whether the M2PA signalling link will, when 
          false(2), forego proving althogether."
-    REFERENCE   
-        ""
     DEFVAL      { true }
     ::= { slM2paEntry 2 }
 
@@ -2550,8 +2543,6 @@ slM2paLoopDelayLower OBJECT-TYPE
          conjunction with another pair of ranges belonging to another 
          entry belonging to the same managed switching system and 
          network entity."
-    REFERENCE   
-        ""
     ::= { slM2paEntry 4 }
 
 slM2paLoopDelayUpper OBJECT-TYPE
@@ -2569,8 +2560,6 @@ slM2paLoopDelayUpper OBJECT-TYPE
          conjunction with another pair of ranges belonging to another 
          entry belonging to the same managed switching system and 
          network entity."
-    REFERENCE   
-        ""
     ::= { slM2paEntry 5 }
 
 slM2paTransRateIntervalLower OBJECT-TYPE
@@ -2588,8 +2577,6 @@ slM2paTransRateIntervalLower OBJECT-TYPE
          in conjunction with another pair of ranges belonging to another 
          entry belonging to the same managed switching element and 
          network entity."
-    REFERENCE   
-        ""
     ::= { slM2paEntry 6 }
 
 slM2paTransRateIntervalUpper OBJECT-TYPE
@@ -2607,8 +2594,6 @@ slM2paTransRateIntervalUpper OBJECT-TYPE
          overlap in conjunction with another pair of ranges belonging to 
          another entry belonging to the same managed switching element 
          and network entity."
-    REFERENCE   
-        ""
     ::= { slM2paEntry 7 }
 
 slM2paSctpNoDelay OBJECT-TYPE
@@ -2626,8 +2611,6 @@ slM2paSctpNoDelay OBJECT-TYPE
          
          The default value is determined by the setting of 
          slM2paDefaultSctpNoDelay."
-    REFERENCE   
-        ""
     ::= { slM2paEntry 8 }
 
 slM2paSctpMaxseg OBJECT-TYPE
@@ -2649,8 +2632,6 @@ slM2paSctpMaxseg OBJECT-TYPE
          
          The default value is determined by the setting of 
          slM2paDefaultSctpMaxseg."
-    REFERENCE   
-        ""
     ::= { slM2paEntry 9 }
 
 slM2paSctpHeartbeatItvl OBJECT-TYPE
@@ -2667,8 +2648,6 @@ slM2paSctpHeartbeatItvl OBJECT-TYPE
          
          The default value is determined by the setting of 
          m2paDefaultHeartbeatItvl."
-    REFERENCE   
-        ""
     ::= { slM2paEntry 10 }
 
 slM2paSctpHeartbeat OBJECT-TYPE
@@ -2688,8 +2667,6 @@ slM2paSctpHeartbeat OBJECT-TYPE
          
          The default value is determined by the setting of 
          slM2paDefaultSctpHeartbeat."
-    REFERENCE   
-        ""
     ::= { slM2paEntry 11 }
 
 slM2paSctpRtoInitial OBJECT-TYPE
@@ -2713,8 +2690,6 @@ slM2paSctpRtoInitial OBJECT-TYPE
          
          The default value is determined by the setting of 
          slM2paDefaultSctpRtoInitial."
-    REFERENCE   
-        ""
     ::= { slM2paEntry 12 }
 
 slM2paSctpRtoMin OBJECT-TYPE
@@ -2739,8 +2714,6 @@ slM2paSctpRtoMin OBJECT-TYPE
          
          The default value is determined by the setting of 
          slM2paDefaultSctpRtoMin."
-    REFERENCE   
-        ""
     ::= { slM2paEntry 13 }
 
 slM2paSctpRtoMax OBJECT-TYPE
@@ -2765,8 +2738,6 @@ slM2paSctpRtoMax OBJECT-TYPE
          
          The default value is determined by the setting of 
          slM2paDefaultSctpRtoMax."
-    REFERENCE   
-        ""
     ::= { slM2paEntry 14 }
 
 slM2paSctpPathMaxRetrans OBJECT-TYPE
@@ -2790,8 +2761,6 @@ slM2paSctpPathMaxRetrans OBJECT-TYPE
          
          The default value is determined by the setting of 
          slM2paDefaultSctpPathMaxRetrans."
-    REFERENCE   
-        ""
     ::= { slM2paEntry 15 }
 
 slM2paSctpCookieLife OBJECT-TYPE
@@ -2827,8 +2796,6 @@ slM2paSctpCookieLife OBJECT-TYPE
          
          The default value is determined by the setting of 
          slM2paDefaultSctpCookieLife."
-    REFERENCE   
-        ""
     ::= { slM2paEntry 16 }
 
 slM2paSctpCookieInc OBJECT-TYPE
@@ -2851,8 +2818,6 @@ slM2paSctpCookieInc OBJECT-TYPE
          
          The default value is determined by the setting of 
          slM2paDefaultSctpCookieInc."
-    REFERENCE   
-        ""
     ::= { slM2paEntry 17 }
 
 slM2paSctpMaxInitRetries OBJECT-TYPE
@@ -2869,8 +2834,6 @@ slM2paSctpMaxInitRetries OBJECT-TYPE
          
          The default value is determined by the setting of 
          slM2paDefaultSctpMaxInitRetries."
-    REFERENCE   
-        ""
     ::= { slM2paEntry 18 }
 
 slM2paSctpMaxBurst OBJECT-TYPE
@@ -2886,8 +2849,6 @@ slM2paSctpMaxBurst OBJECT-TYPE
          
          The default value is determined by the setting of 
          slM2paDefaultSctpMaxBurst."
-    REFERENCE   
-        ""
     ::= { slM2paEntry 19 }
 
 slM2paSctpAssocMaxRetrans OBJECT-TYPE
@@ -2912,8 +2873,6 @@ slM2paSctpAssocMaxRetrans OBJECT-TYPE
          
          The default value is determined by the setting of 
          m2paDefaultAssocMaxRetrans."
-    REFERENCE   
-        ""
     DEFVAL      { 20 }
     ::= { slM2paEntry 20 }
 
@@ -2932,8 +2891,6 @@ slM2paSctpSackDelay OBJECT-TYPE
          
          The default value is determined by the setting of 
          slM2paDefaultSctpSackDelay."
-    REFERENCE   
-        ""
     DEFVAL      { 20 }
     ::= { slM2paEntry 21 }
 
@@ -2945,8 +2902,6 @@ slM2paSctpLifetime OBJECT-TYPE
     DESCRIPTION 
         "The default value is determined by the setting of 
          slM2paDefaultSctpLifetime."
-    REFERENCE   
-        ""
     ::= { slM2paEntry 22 }
 
 slM2paProvingAttempts OBJECT-TYPE
@@ -2957,8 +2912,6 @@ slM2paProvingAttempts OBJECT-TYPE
         "Defines the number of unsuccesful proving attempts that will be 
          conducted during link alignment before the alignment procedures 
          will be considered unsuccessful."
-    REFERENCE   
-        ""
     ::= { slM2paEntry 23 }
 
 slM2paRowStatus OBJECT-TYPE
@@ -3169,8 +3122,6 @@ slSdtProfilePointer OBJECT-TYPE
          be used with the signalling terminal.  This points to an entry 
          in the slNbTable, an entry in the slSaalTable or a entry in the 
          slM2paTable, as appropriate."
-    REFERENCE   
-        ""
     ::= { slSdtEntry 9 }
 
 slSdtRowStatus OBJECT-TYPE
@@ -3539,13 +3490,13 @@ slPackage OBJECT-GROUP
                   slSdlStmChannel, slSdlVcTTpPointer, slSdlRowStatus }
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides a complete compliance group for this MIB."
     ::= { slGroups 1 }
 
 slGeneralCompliance MODULE-COMPLIANCE
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides a general compliance."
 
     MODULE      -- this module
 

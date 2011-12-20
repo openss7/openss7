@@ -469,7 +469,7 @@ typedef unsigned long int t_uscalar_t;
 #define SNDZERO		(1<<0)	/**< Permit sending of zero length messages. */
 #define SNDPIPE		(1<<1)	/**< Sending on a disconnected pipe send SIGPIPE. */
 #define SNDHOLD		(1<<2)	/**< Coallese small messages. */
-#define SNDELIM		(1<<3)	/**< Delimit writes with MGSDELIM. */
+#define SNDDELIM	(1<<3)	/**< Delimit writes with MGSDELIM. */
 #define SNDMREAD	(1<<4)	/**< Send M_READ messages. */
 /** @} */
 

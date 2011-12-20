@@ -547,7 +547,7 @@ and
 .BR strerr (8)
 facilities to transfer log events to the system logs.
 .IP \(em
-Unlinke the default logger, that always returns success, the
+Unlike the default logger, that always returns success, the
 .IR STREAMS -based
 logger filters trace messages with trace ids requested by the
 .BR strace (8)
@@ -564,10 +564,10 @@ it is more efficient in the utilization of system resources when performing trac
 .I STREAMS
 modules and drivers.
 .IP \(em
-Unlinke the default logger, which formats the message string in the kernel using the calling thread,
+Unlike the default logger, which formats the message string in the kernel using the calling thread,
 the
 .IR STREAMS -based
-logger passes the format string an argument to the userspace error or trace logger daemon which then
+logger passes the format string and arguments to the userspace error or trace logger daemon which then
 formats the message.  This is more efficient in the utilization of system resources.
 .\"
 .\"
@@ -710,7 +710,7 @@ uw7doc
 .IR UXP/V \(rg
 states that no more than
 .B NLOGARGS
-argumnets can be passed, but does not state a default for
+arguments can be passed, but does not state a default for
 .BR NLOGARGS .
 .[
 uxpdoc
@@ -718,7 +718,7 @@ uxpdoc
 .IP ""
 Portable
 .I STREAMS
-drivers and modules will pass more than
+drivers and modules will not pass more than
 .B NLOGARGS
 arguments to
 .BR strlog (),

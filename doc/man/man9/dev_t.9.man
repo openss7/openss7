@@ -184,6 +184,7 @@ SVR 4.2:14:18
 Linux 2.2:8:8
 Linux 2.4:8:8
 Linux 2.6:12:20
+Linux 3.x:12:20
 @PACKAGE@-@VERSION@:16:16
 .TE
 .RE
@@ -257,6 +258,8 @@ kernel series and prior to
 also provided an 8-bit major device number and an
 8-bit minor device number grouped into a 16-bit combined device number.
 .B Linux 2.6
+and
+.B 3.x
 kernels (and some patched
 .B 2.4
 kernels) now have larger device numbers.  These extended device
@@ -292,6 +295,8 @@ scheme.
 .PP
 On
 .B Linux 2.6
+and
+.B 3.x
 kernels that support the newer extended device numbers, external device numbers and internal device
 numbers will be the same.  On
 .B Linux 2.4

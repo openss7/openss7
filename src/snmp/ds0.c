@@ -706,6 +706,7 @@ store_dsx0ConfigTable(int majorID, int minorID, void *serverarg, void *clientarg
 			memset(line, 0, sizeof(line));
 			strcat(line, "dsx0ConfigTable ");
 			cptr = line + strlen(line);
+			(void) cptr;
 			/* XXX: remove individual columns if not persistent */
 			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->ifIndex, &tmpsize);
 			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->dsx0Ds0ChannelNumber, &tmpsize);
@@ -907,6 +908,7 @@ store_dsx0ChanMappingTable(int majorID, int minorID, void *serverarg, void *clie
 			memset(line, 0, sizeof(line));
 			strcat(line, "dsx0ChanMappingTable ");
 			cptr = line + strlen(line);
+			(void) cptr;
 			/* XXX: remove individual columns if not persistent */
 			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->ifIndex, &tmpsize);
 			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->dsx0Ds0ChannelNumber, &tmpsize);

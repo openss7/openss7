@@ -69,13 +69,17 @@
  * STREAMS Network Interface Tab buffer "nit_buf" header file.
  */
 
+#ifndef NIOC
+#define NIOC ('p' << 8)
+#endif
+
 /** @name Old SNIT buffer input-output controls.
   * @{ */
-#define NIOCSTIME	_IOW(p, 6, struct timeval)	/**< Set timeout value.  */
-#define NIOCGTIME	_IOWR(p, 7, struct timeval)	/**< Get timeout value.  */
-#define NIOCCTIME	_IO(p, 8)			/**< Clear timeout value. */
-#define NIOCSCHUNK	_IOW(p, 9, u_int)		/**< Set chunk size. */
-#define NIOCGCHUNK	_IOWR(p, 10, u_int)		/**< Get chunk size. */
+#define NIOCSTIME	_IOW('p', 6, struct timeval)	/**< Set timeout value.  */
+#define NIOCGTIME	_IOWR('p', 7, struct timeval)	/**< Get timeout value.  */
+#define NIOCCTIME	_IO('p', 8)			/**< Clear timeout value. */
+#define NIOCSCHUNK	_IOW('p', 9, u_int)		/**< Set chunk size. */
+#define NIOCGCHUNK	_IOWR('p', 10, u_int)		/**< Get chunk size. */
 /** @} */
 
 /** Default chunk size.

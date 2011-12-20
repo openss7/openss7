@@ -97,9 +97,37 @@ typedef struct sdl_timers {
 typedef struct sdl_config {
 	const char *ifname;		/* interface name */
 	volatile sdl_ulong ifflags;	/* interface flags */
-#	define	SDL_IF_UP		0x01	/* device enabled */
-#	define	SDL_IF_RX_RUNNING	0x02	/* Rx running */
-#	define	SDL_IF_TX_RUNNING	0x04	/* Tx running */
+#	define	SDL_IF_UP		(1<< 0)	/* device enabled */
+#	define	SDL_IF_RX_RUNNING	(1<< 1)	/* Rx running */
+#	define	SDL_IF_TX_RUNNING	(1<< 2)	/* Tx running */
+#	define	SDL_IF_RX_UP		(1<< 3)	/* Rx up */
+#	define	SDL_IF_TX_UP		(1<< 4)	/* Tx up */
+#	define	SDL_IF_RX_MON		(1<< 5)	/* Rx monitoring */
+#	define	SDL_IF_AUTOCONFIG	(1<< 6)	/* Autoconfigure */
+#	define	SDL_IF_TX_OCD		(1<< 6)	/* Tx open-circuit */
+#	define	SDL_IF_TX_SCD		(1<< 7)	/* Tx short-circuit */
+#	define	SDL_IF_TX_LOLITC	(1<< 8)	/* Tx i/f loss of tx clock */
+#	define	SDL_IF_TX_LOTC		(1<< 9)	/* Tx loss of tx clock */
+#	define	SDL_IF_RX_LRCL		(1<<10)	/* Rx line i/f carrier loss */
+#	define	SDL_IF_RX_ILUT		(1<<11)	/* Rx input level under thresh */
+#	define	SDL_IF_RX_RLOS		(1<<12)	/* Rx loss of sync */
+#	define	SDL_IF_RX_FRCL		(1<<13)	/* Rx frame carrier loss */
+#	define	SDL_IF_RX_RUA1		(1<<14)	/* Rx unframed all ones */
+#	define	SDL_IF_RX_RYEL		(1<<15)	/* Rx yellow alarm */
+#	define	SDL_IF_RX_RRA		(1<<16)	/* Rx remote alarm */
+#	define	SDL_IF_RX_LORC		(1<<17)	/* Rx loss of rx clock */
+#	define	SDL_IF_RX_LUP		(1<<18)	/* Rx loop-up code */
+#	define	SDL_IF_RX_LDN		(1<<19)	/* Rx loop-down code */
+#	define	SDL_IF_RX_SPARE		(1<<20)	/* Rx spare code */
+#	define	SDL_IF_RX_RDMA		(1<<21)	/* Rx dist MF alarm */
+#	define	SDL_IF_RX_RSAZ		(1<<22)	/* Rx sig. all zeros */
+#	define	SDL_IF_RX_RSAO		(1<<23)	/* Rx sig. all ones */
+#	define	SDL_IF_RX_RAIS		(1<<24)	/* Rx AIS-CI */
+#	define	SDL_IF_RX_B8ZS		(1<<25)	/* Rx B8ZS codeword */
+#	define	SDL_IF_RX_16ZD		(1<<26)	/* Rx 16-zeros */
+#	define	SDL_IF_RX_8ZD		(1<<27)	/* Rx 8-zeros */
+#	define	SDL_IF_TX_TUA1		(1<<28)	/* Tx unframed all ones */
+#	define	SDL_IF_TX_CUSTD		(1<<29)	/* Tx customer disconnect */
 	sdl_ulong iftype;		/* interface type */
 #	define	SDL_TYPE_NONE		0	/* unknown/unspecified */
 #	define	SDL_TYPE_V35		1	/* V.35 interface */
@@ -119,7 +147,7 @@ typedef struct sdl_config {
 #	define	SDL_RATE_E1		2048000
 #	define	SDL_RATE_T2		6312000
 #	define	SDL_RATE_E2		8488000
-#	define	SDL_RATE_E3		0
+#	define	SDL_RATE_E3		34368000
 #	define	SDL_RATE_T3		44736000
 	sdl_ulong ifgtype;		/* group type */
 #	define	SDL_GTYPE_NONE		0	/* */
@@ -143,17 +171,17 @@ typedef struct sdl_config {
 #	define	SDL_GTYPE_OC192		18	/* */
 	sdl_ulong ifgrate;		/* interface group rate */
 #	define	SDL_GRATE_NONE		0
-#	define	SDL_GRATE_T1		1544000
-#	define	SDL_GRATE_J1		1544000
-#	define	SDL_GRATE_E1		2048000
-#	define	SDL_GRATE_T2		6312000
-#	define	SDL_GRATE_E2		8488000
-#	define	SDL_GRATE_E3		0
-#	define	SDL_GRATE_T3		44736000
-#	define	SDL_GRATE_OC3		0
-#	define	SDL_GRATE_OC12		0
-#	define	SDL_GRATE_OC48		0
-#	define	SDL_GRATE_OC192		0
+#	define	SDL_GRATE_T1		1544
+#	define	SDL_GRATE_J1		1544
+#	define	SDL_GRATE_E1		2048
+#	define	SDL_GRATE_T2		6312
+#	define	SDL_GRATE_E2		8488
+#	define	SDL_GRATE_E3		34368
+#	define	SDL_GRATE_T3		44736
+#	define	SDL_GRATE_OC3		155520
+#	define	SDL_GRATE_OC12		622080
+#	define	SDL_GRATE_OC48		2488320
+#	define	SDL_GRATE_OC192		9953280
 	sdl_ulong ifmode;		/* interface mode */
 #	define	SDL_MODE_NONE		0	/* */
 #	define	SDL_MODE_DSU		1	/* */
@@ -168,11 +196,15 @@ typedef struct sdl_config {
 #	define	SDL_MODE_LOC_LB		10	/* */
 #	define	SDL_MODE_LB_ECHO	11	/* */
 #	define	SDL_MODE_TEST		12	/* */
+#       define  SDL_MODE_IDLE           13      /* */
+#       define  SDL_MODE_MW             14      /* */
+#       define  SDL_MODE_SIG            15      /* */
 	sdl_ulong ifgmode;		/* interface group mode */
 #	define	SDL_GMODE_NONE		0	/* no loopback */
 #	define	SDL_GMODE_LOC_LB	1	/* loopback locally asserted */
 #	define	SDL_GMODE_REM_LB	2	/* loopback remotely asserted */
-#	define	SDL_GMODE_BOTH_LB	3	/* loopback locally and remotely asserted */
+#	define	SDL_GMODE_BOTH_LB	3	/* loopback locally and remotely asserted 
+						 */
 	sdl_ulong ifgcrc;		/* group CRC type */
 #	define	SDL_GCRC_NONE		0	/* */
 #	define	SDL_GCRC_CRC4		1	/* */
@@ -210,17 +242,18 @@ typedef struct sdl_config {
 #	define	SDL_FRAMING_D4		SDL_FRAMING_SF
 	sdl_ulong ifblksize;		/* interface block size */
 	volatile sdl_ulong ifleads;	/* interface leads */
-#	define	SDL_LEAD_DTR		0x01	/* for V.35 DTR lead set or clr */
-#	define	SDL_LEAD_RTS		0x02	/* for V.35 RTS lead set or clr */
-#	define	SDL_LEAD_DCD		0x04	/* for V.35 DCD lead get */
-#	define	SDL_LEAD_CTS		0x08	/* for V.35 CTS lead get */
-#	define	SDL_LEAD_DSR		0x10	/* for V.35 DSR lead get */
+#	define	SDL_LEAD_DTR		(1<<0)	/* for V.35 DTR lead set or clr */
+#	define	SDL_LEAD_RTS		(1<<1)	/* for V.35 RTS lead set or clr */
+#	define	SDL_LEAD_DCD		(1<<2)	/* for V.35 DCD lead get */
+#	define	SDL_LEAD_CTS		(1<<3)	/* for V.35 CTS lead get */
+#	define	SDL_LEAD_DSR		(1<<4)	/* for V.35 DSR lead get */
 	volatile sdl_ulong ifbpv;	/* bipolar violations (E1/T1) */
 	volatile sdl_ulong ifalarms;	/* interface alarms (E1/T1) */
-#	define	SDL_ALARM_RED		0x01	/* for E1/T1 Red Alarm */
-#	define	SDL_ALARM_BLU		0x02	/* for E1/T1 Blue Alarm */
-#	define	SDL_ALARM_YEL		0x04	/* for E1/T1 Yellow Alarm */
-#	define	SDL_ALARM_REC		0x08	/* for E1/T1 Alarm Recovery */
+#	define	SDL_ALARM_RED		(1<<0)	/* for E1/T1 Red Alarm */
+#	define	SDL_ALARM_BLU		(1<<1)	/* for E1/T1 Blue Alarm */
+#	define	SDL_ALARM_YEL		(1<<2)	/* for E1/T1 Yellow Alarm */
+#	define	SDL_ALARM_REC		(1<<3)	/* for E1/T1 Alarm Recovery */
+#	define	SDL_ALARM_DMF		(1<<4)	/* for E1 Distant MF Alarm */
 	volatile sdl_ulong ifrxlevel;	/* interface rxlevel */
 	volatile sdl_ulong iftxlevel;	/* interface txlevel */
 #	define	SDL_TXLEVEL_NONE	0

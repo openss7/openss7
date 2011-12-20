@@ -716,6 +716,9 @@ openss7_man_MANS = \
 	man4/atm.4 \
 	man4/bicc.4 \
 	man4/bicc_ioctl.4 \
+	man4/bpf.4 \
+	man4/bpfdrv.4 \
+	man4/bpfmod.4 \
 	man4/bssap.4 \
 	man4/bssap_ioctl.4 \
 	man4/bua.4 \
@@ -892,6 +895,11 @@ openss7_man_MANS = \
 	man4/mx_sdl.4 \
 	man4/mx_x400p.4 \
 	man4/mxi_ioctl.4 \
+	man4/nbuf.4 \
+	man4/nit.4 \
+	man4/nit_buf.4 \
+	man4/nit_if.4 \
+	man4/nit_pf.4 \
 	man4/nli3.4 \
 	man4/np.4 \
 	man4/np_ip.4 \
@@ -911,6 +919,8 @@ openss7_man_MANS = \
 	man4/otpi.4 \
 	man4/pca200e.4 \
 	man4/pckt.4 \
+	man4/pf.4 \
+	man4/pfmod.4 \
 	man4/phys.4 \
 	man4/pipe.4 \
 	man4/pipemod.4 \
@@ -1004,6 +1014,7 @@ openss7_man_MANS = \
 	man4/socksys.4 \
 	man4/spm.4 \
 	man4/spx.4 \
+	man4/srvmod.4 \
 	man4/ss7-sdl-acb0.4 \
 	man4/ss7-sdl-acb1.4 \
 	man4/ss7-sdl-acb2.4 \
@@ -2960,6 +2971,7 @@ openss7_man_MANS = \
 	man8/tcapconf.8 \
 	man8/test-atm.8 \
 	man8/test-bcm.8 \
+	man8/test-bufmod.8 \
 	man8/test-chan.8 \
 	man8/test-clone.8 \
 	man8/test-connld.8 \
@@ -2981,9 +2993,12 @@ openss7_man_MANS = \
 	man8/test-m3ua-raw.8 \
 	man8/test-m3ua_as.8 \
 	man8/test-mux.8 \
+	man8/test-nbuf.8 \
 	man8/test-np_ip.8 \
 	man8/test-nsdev.8 \
 	man8/test-nuls.8 \
+	man8/test-pf.8 \
+	man8/test-pfmod.8 \
 	man8/test-pipe.8 \
 	man8/test-pipemod.8 \
 	man8/test-q781-pipe.8 \
@@ -5088,6 +5103,9 @@ openss7_dist_noinst_MANS = \
 	man4/atm.4.man \
 	man4/bicc.4.man \
 	man4/bicc_ioctl.4.man \
+	man4/bpf.4.man \
+	man4/bpfdrv.4.man \
+	man4/bpfmod.4.man \
 	man4/bssap.4.man \
 	man4/bssap_ioctl.4.man \
 	man4/bua.4.man \
@@ -5264,6 +5282,11 @@ openss7_dist_noinst_MANS = \
 	man4/mx_sdl.4.man \
 	man4/mx_x400p.4.man \
 	man4/mxi_ioctl.4.man \
+	man4/nbuf.4.man \
+	man4/nit.4.man \
+	man4/nit_buf.4.man \
+	man4/nit_if.4.man \
+	man4/nit_pf.4.man \
 	man4/nli3.4.man \
 	man4/np.4.man \
 	man4/np_ip.4.man \
@@ -5283,6 +5306,8 @@ openss7_dist_noinst_MANS = \
 	man4/otpi.4.man \
 	man4/pca200e.4.man \
 	man4/pckt.4.man \
+	man4/pf.4.man \
+	man4/pfmod.4.man \
 	man4/phys.4.man \
 	man4/pipe.4.man \
 	man4/pipemod.4.man \
@@ -5376,6 +5401,7 @@ openss7_dist_noinst_MANS = \
 	man4/socksys.4.man \
 	man4/spm.4.man \
 	man4/spx.4.man \
+	man4/srvmod.4.man \
 	man4/ss7-sdl-acb0.4.man \
 	man4/ss7-sdl-acb1.4.man \
 	man4/ss7-sdl-acb2.4.man \
@@ -7332,6 +7358,7 @@ openss7_dist_noinst_MANS = \
 	man8/tcapconf.8.man \
 	man8/test-atm.8.man \
 	man8/test-bcm.8.man \
+	man8/test-bufmod.8.man \
 	man8/test-chan.8.man \
 	man8/test-clone.8.man \
 	man8/test-connld.8.man \
@@ -7353,9 +7380,12 @@ openss7_dist_noinst_MANS = \
 	man8/test-m3ua-raw.8.man \
 	man8/test-m3ua_as.8.man \
 	man8/test-mux.8.man \
+	man8/test-nbuf.8.man \
 	man8/test-np_ip.8.man \
 	man8/test-nsdev.8.man \
 	man8/test-nuls.8.man \
+	man8/test-pf.8.man \
+	man8/test-pfmod.8.man \
 	man8/test-pipe.8.man \
 	man8/test-pipemod.8.man \
 	man8/test-q781-pipe.8.man \

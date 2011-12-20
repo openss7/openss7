@@ -27,7 +27,7 @@
 --
 -- -----------------------------------------------------------------------------
 --
--- Note well: nonwithstanding this AGPL license, you are not permitted to make 
+-- Note well: notwithstanding this AGPL license, you are not permitted to make 
 -- modifications under the OpenSS7 project's enterprise object identifier arc: 
 -- 1.3.6.1.4.1.29591.  Modifications must be made only within an object 
 -- identifier arc under your control.
@@ -90,7 +90,7 @@ IMPORTS
         FROM SNMPv2-TC;
 
 sfpOmMIB MODULE-IDENTITY
-    LAST-UPDATED "201106270909Z"
+    LAST-UPDATED "201112101120Z"
     ORGANIZATION 
         "The OpenSS7 Project"
     CONTACT-INFO 
@@ -142,11 +142,14 @@ sfpOmMIB MODULE-IDENTITY
          <http://www.gnu.org/licenses/>, or write to the Free Software 
          Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
          
-         Note well: nonwithstanding this AGPL license, you are not 
+         Note well: notwithstanding this AGPL license, you are not 
          permitted to make modifications under the OpenSS7 project's 
          enterprise object identifier arc: 1.3.6.1.4.1.29591.  
          Modifications must be made only within an object identifier arc 
          under your control."
+    REVISION    "201112101120Z"
+    DESCRIPTION 
+        "Corrections an smilint workup."
     REVISION    "201106270909Z"
     DESCRIPTION 
         "Passes smilint and reformatted with smidump."
@@ -909,6 +912,16 @@ sfpOmDuration OBJECT-TYPE
          notifications."
     ::= { sfpOmNotifs 1 }
 
+sfpOmModuleId OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION 
+        "Provides a non-zero, ordinal index that identifies the specific 
+         SFP/SFP+ module.  This is the same value as the sfpModuleId 
+         index into the sfpModuleTable."
+    ::= { sfpOmNotifs 2 }
+
 sfpOmOids OBJECT IDENTIFIER
     ::= { sfpOmObjects 4 }
 
@@ -935,7 +948,7 @@ sfpOmGroups OBJECT IDENTIFIER
 
 sfpOm5minReport NOTIFICATION-TYPE
     OBJECTS     { sfpOmDiscontinuityTime, sfpOmTimeStamp, sfpOmDuration, 
-                  sfpOmPollingInterval, sfpModuleId, sfpOm5MinTempMarkHi, 
+                  sfpOmPollingInterval, sfpOmModuleId, sfpOm5MinTempMarkHi, 
                   sfpOm5MinTempMarkLo, sfpOm5MinVoltMarkHi, 
                   sfpOm5MinVoltMarkLo, sfpOm5MinBiasMarkHi, 
                   sfpOm5MinBiasMarkLo, sfpOm5MinTxPowerMarkHi, 
@@ -951,7 +964,7 @@ sfpOm5minReport NOTIFICATION-TYPE
 
 sfpOm15minReport NOTIFICATION-TYPE
     OBJECTS     { sfpOmDiscontinuityTime, sfpOmTimeStamp, sfpOmDuration, 
-                  sfpOmPollingInterval, sfpModuleId, 
+                  sfpOmPollingInterval, sfpOmModuleId, 
                   sfpOm15MinTempMarkHi, sfpOm15MinTempMarkLo, 
                   sfpOm15MinVoltMarkHi, sfpOm15MinVoltMarkLo, 
                   sfpOm15MinBiasMarkHi, sfpOm15MinBiasMarkLo, 
@@ -966,7 +979,7 @@ sfpOm15minReport NOTIFICATION-TYPE
     ::= { sfpOmNotifications 2 }
 
 sfpOmObligatoryGroup OBJECT-GROUP
-    OBJECTS     { sfpOmDiscontinuityTime, sfpOmTimeStamp, 
+    OBJECTS     { sfpOmDiscontinuityTime, sfpOmModuleId, sfpOmTimeStamp, 
                   sfpOmPollingInterval, sfpOm5MinMaxIntervals, 
                   sfpOm15MinMaxIntervals }
     STATUS      current

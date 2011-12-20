@@ -154,7 +154,7 @@ calls when called for
 .I arg
 is an integer value containing the write options flags which may be one or
 more flags from the following:
-.TP \w'\fBSNDZERO\fR\(em'u
+.TP \w'\fBSNDDELIM\fR\(em'u
 .B SNDZERO
 send a zero-length message downstream when a write of zero bytes occurs.
 .TP
@@ -179,7 +179,7 @@ The flag can be set, but cannot subsequently be reset.  This is a
 .B @PACKAGE_TITLE@
 extension.
 .TP
-.B SNDELIM
+.B SNDDELIM
 delimit messages.  This flag corresponds to the
 .I SO_DELIM
 flag to
@@ -187,6 +187,23 @@ flag to
 The flag can be set or reset.  This is a
 .B @PACKAGE_TITLE@
 extension.
+(Normally this value can only be set by a module or driver in a
+.BR M_SETOPTS (9)
+message.)
+.TP
+.B SNDMREAD
+send
+.BR M_READ (9)
+messages.  This flag corresponds to the
+.B SO_MREADON
+flag to
+.BR M_SETOPTS (9).
+The flag can be set or reset.  This is a
+.B @PACKAGE_TITLE@
+extension.
+(Normally this value can only be set by a module or driver in a
+.BR M_SETOPTS (9)
+message.)
 .\"
 .\"
 .SH "RETURN VALUE"
@@ -387,6 +404,17 @@ can be returned in
 .BR ioctl (2s)
 calls are complex and there is much conflicting documentation in specific
 areas of behaviour.  Not all bugs are bugs and not all features are features.
+.PP
+Setting the
+.B SNDMREAD
+flag with a driver that does not accept
+.BR M_READ (9)
+messages could confuse the driver.
+.PP
+Setting the
+.B SNDDELIM
+flag with a driver that does not recognize delimited messages could confuse
+the driver.
 .\"
 .\"
 .SH "SEE ALSO"
@@ -436,6 +464,12 @@ Portable
 .I STREAMS
 applications programs will expect conformance to
 .IR POSIX/SUSv3 .
+.IP \(em
+Portable applications will use neither the
+.B SNDDELIM
+nor
+.B SNDMREAD
+flags.
 .PP
 For general
 .BR ioctl (2s)

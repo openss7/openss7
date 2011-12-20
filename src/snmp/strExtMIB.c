@@ -524,6 +524,7 @@ store_strExtMIB(int majorID, int minorID, void *serverarg, void *clientarg)
 		memset(line, 0, sizeof(line));
 		strcat(line, "strExtMIB ");
 		cptr = line + strlen(line);
+		(void) cptr;
 		/* XXX: remove individual scalars that are not persistent */
 		cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->strExtStrlogRecordNextIndex, &tmpsize);
 		cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->strNlogargs, &tmpsize);
@@ -874,6 +875,7 @@ store_strExtStrlogRecordTable(int majorID, int minorID, void *serverarg, void *c
 			memset(line, 0, sizeof(line));
 			strcat(line, "strExtStrlogRecordTable ");
 			cptr = line + strlen(line);
+			(void) cptr;
 			/* XXX: remove individual columns if not persistent */
 			cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->strExtStrlogRecordIndex, &tmpsize);
 			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->strExtStrlogRecordSeqNo, &tmpsize);
@@ -1077,6 +1079,7 @@ store_strExtTraceTable(int majorID, int minorID, void *serverarg, void *clientar
 			memset(line, 0, sizeof(line));
 			strcat(line, "strExtTraceTable ");
 			cptr = line + strlen(line);
+			(void) cptr;
 			/* XXX: remove individual columns if not persistent */
 			cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->strExtTraceId, &tmpsize);
 			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->strExtTraceMid, &tmpsize);

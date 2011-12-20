@@ -1482,7 +1482,8 @@ mi_copyout_alloc(queue_t *q, mblk_t *mp, caddr_t uaddr, size_t len, int free_on_
 			bp = XCHG(&mp->b_cont, NULL);
 		} else {
 			bp = allocb(sizeof(*mi), BPRI_MED);
-			bzero(bp->b_rptr, sizeof(*mi));
+			if (likely(bp != NULL))
+				bzero(bp->b_rptr, sizeof(*mi));
 		}
 		if (!bp) {
 			if (free_on_error)
@@ -2464,11 +2465,15 @@ __MPS_EXTERN int
 mi_strlog(queue_t *q, char level, ushort flags, char *fmt, ...)
 {
 	int result;
-	struct mi_comm *mi = ptr_to_mi(q->q_ptr);
-	modID_t mid = mi->mi_mid;
-	minor_t sid = mi->mi_sid;
+	struct mi_comm *mi;
+	modID_t mid = 0;
+	minor_t sid = 0;
 	va_list args;
 
+	if (q != NULL && (mi = ptr_to_mi(q->q_ptr)) != NULL) {
+		mid = mi->mi_mid;
+		sid = mi->mi_sid;
+	}
 	va_start(args, fmt);
 	result = vstrlog(mid, sid, level, flags, fmt, args);
 	va_end(args);

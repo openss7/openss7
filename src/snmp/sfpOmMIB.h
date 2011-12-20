@@ -91,7 +91,7 @@ struct sfpOmMIB_data {
 struct sfpOmActualTable_data {
 	uint sfpOmActualTable_request;
 	uint sfpOmActualTable_refs;
-	ulong sfpModuleId;		/* ReadOnly */
+	ulong sfpModuleId;		/* NoAccess */
 	long sfpOmTemp;			/* ReadOnly */
 	long sfpOmVolt;			/* ReadOnly */
 	long sfpOmBias;			/* ReadOnly */
@@ -101,7 +101,7 @@ struct sfpOmActualTable_data {
 struct sfpOmCurrentTable_data {
 	uint sfpOmCurrentTable_request;
 	uint sfpOmCurrentTable_refs;
-	ulong sfpModuleId;		/* ReadOnly */
+	ulong sfpModuleId;		/* NoAccess */
 	long sfpOmTempMarkHi;		/* ReadOnly */
 	long sfpOmTempMarkLo;		/* ReadOnly */
 	long sfpOmVoltMarkHi;		/* ReadOnly */
@@ -118,7 +118,7 @@ struct sfpOmCurrentTable_data {
 struct sfpOm5MinHistoryTable_data {
 	uint sfpOm5MinHistoryTable_request;
 	uint sfpOm5MinHistoryTable_refs;
-	ulong sfpModuleId;		/* ReadOnly */
+	ulong sfpModuleId;		/* NoAccess */
 	long sfpOmInterval;		/* NoAccess */
 	long sfpOm5MinTempMarkHi;	/* ReadOnly */
 	long sfpOm5MinTempMarkLo;	/* ReadOnly */
@@ -134,7 +134,7 @@ struct sfpOm5MinHistoryTable_data {
 struct sfpOm15MinHistoryTable_data {
 	uint sfpOm15MinHistoryTable_request;
 	uint sfpOm15MinHistoryTable_refs;
-	ulong sfpModuleId;		/* ReadOnly */
+	ulong sfpModuleId;		/* NoAccess */
 	long sfpOmInterval;		/* NoAccess */
 	long sfpOm15MinTempMarkHi;	/* ReadOnly */
 	long sfpOm15MinTempMarkLo;	/* ReadOnly */
@@ -163,6 +163,7 @@ extern oid sfpOm15minReport_oid[12];
 
 /* scalars accessible only for notify */
 extern oid sfpOmDuration_oid[13];
+extern oid sfpOmModuleId_oid[13];
 
 /* object id definitions */
 extern oid sfpOmProfile_oid[13];

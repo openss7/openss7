@@ -133,7 +133,7 @@ struct sccpOmMIB_data {
 struct sccpOmErrorsTable_data {
 	uint sccpOmErrorsTable_request;
 	uint sccpOmErrorsTable_refs;
-	uint8_t *sccpNetworkEntityId;	/* Notify */
+	uint8_t *sccpNetworkEntityId;	/* NoAccess */
 	size_t sccpNetworkEntityIdLen;
 	long sccpOmNoTranslatorForAddress;	/* ReadOnly */
 	long sccpOmNoRuleForAddress;	/* ReadOnly */
@@ -162,7 +162,7 @@ struct sccpOmErrorsTable_data {
 struct sccpOmMessageTable_data {
 	uint sccpOmMessageTable_request;
 	uint sccpOmMessageTable_refs;
-	uint8_t *sccpNetworkEntityId;	/* Notify */
+	uint8_t *sccpNetworkEntityId;	/* NoAccess */
 	size_t sccpNetworkEntityIdLen;
 	long sccpOmTotalMessagesHandled;	/* ReadOnly */
 	long sccpOmTotalMessagesLocal;	/* ReadOnly */
@@ -193,7 +193,7 @@ struct sccpOmMessageTable_data {
 struct sccpOmAccessibilityTable_data {
 	uint sccpOmAccessibilityTable_request;
 	uint sccpOmAccessibilityTable_refs;
-	uint8_t *sccpNetworkEntityId;	/* Notify */
+	uint8_t *sccpNetworkEntityId;	/* NoAccess */
 	size_t sccpNetworkEntityIdLen;
 	long sccpOmSSCMessageReceived;	/* ReadOnly */
 	long sccpOmSSPMessageReceived;	/* ReadOnly */
@@ -204,7 +204,7 @@ struct sccpOmAccessibilityTable_data {
 struct sccpOmUtilizationTable_data {
 	uint sccpOmUtilizationTable_request;
 	uint sccpOmUtilizationTable_refs;
-	uint8_t *sccpNetworkEntityId;	/* Notify */
+	uint8_t *sccpNetworkEntityId;	/* NoAccess */
 	size_t sccpNetworkEntityIdLen;
 	long sccpOmSsn;			/* NoAccess */
 	long sccpOmLXUDTMessagesOrigClass0;	/* ReadOnly */
@@ -224,7 +224,7 @@ struct sccpOmUtilizationTable_data {
 struct sccpOm5MinHistoryTable_data {
 	uint sccpOm5MinHistoryTable_request;
 	uint sccpOm5MinHistoryTable_refs;
-	uint8_t *sccpNetworkEntityId;	/* Notify */
+	uint8_t *sccpNetworkEntityId;	/* NoAccess */
 	size_t sccpNetworkEntityIdLen;
 	long sccpOmInterval;		/* NoAccess */
 	long sccpOm5MinNoTranslatorForAddress;	/* ReadOnly */
@@ -277,7 +277,7 @@ struct sccpOm5MinHistoryTable_data {
 struct sccpOm15MinHistoryTable_data {
 	uint sccpOm15MinHistoryTable_request;
 	uint sccpOm15MinHistoryTable_refs;
-	uint8_t *sccpNetworkEntityId;	/* Notify */
+	uint8_t *sccpNetworkEntityId;	/* NoAccess */
 	size_t sccpNetworkEntityIdLen;
 	long sccpOmInterval;		/* NoAccess */
 	long sccpOm15MinNoTranslatorForAddress;	/* ReadOnly */
@@ -329,7 +329,7 @@ struct sccpOm15MinHistoryTable_data {
 struct sccpOm5MinSsnHistoryTable_data {
 	uint sccpOm5MinSsnHistoryTable_request;
 	uint sccpOm5MinSsnHistoryTable_refs;
-	uint8_t *sccpNetworkEntityId;	/* Notify */
+	uint8_t *sccpNetworkEntityId;	/* NoAccess */
 	size_t sccpNetworkEntityIdLen;
 	long sccpOmSsn;			/* NoAccess */
 	long sccpOmInterval;		/* NoAccess */
@@ -348,7 +348,7 @@ struct sccpOm5MinSsnHistoryTable_data {
 struct sccpOm15MinSsnHistoryTable_data {
 	uint sccpOm15MinSsnHistoryTable_request;
 	uint sccpOm15MinSsnHistoryTable_refs;
-	uint8_t *sccpNetworkEntityId;	/* Notify */
+	uint8_t *sccpNetworkEntityId;	/* NoAccess */
 	size_t sccpNetworkEntityIdLen;
 	long sccpOmSsn;			/* NoAccess */
 	long sccpOmInterval;		/* NoAccess */
@@ -384,10 +384,10 @@ extern struct header_complex_index *sccpOm15MinSsnHistoryTableStorage;
 #define SCCPOMSYNTAXERRORTYPE_INVALIDVALUEFORENCODINGSCHEME 3
 #define SCCPOMSYNTAXERRORTYPE_INVALIDPARAMETERLENGTH 4
 #define SCCPOMSYNTAXERRORTYPE_INVALIDPOINTERTOOPTIONALPARAMETER 5
-#define SCCPOMSYNTAXERRORTYPE_OPTIONALPARAMETERTOLONG 6
+#define SCCPOMSYNTAXERRORTYPE_OPTIONALPARAMETERTOOLONG 6
 #define SCCPOMSYNTAXERRORTYPE_POINTERINCONSISTENTWITHLENGTHS 7
 #define SCCPOMSYNTAXERRORTYPE_INCOMPATIBLEADDRESSLENGTH 8
-#define SCCPOMSYNTAXERRORTYPE_EXPECTEDSSNNOTFOUND 9
+#define SCCPOMSYNTAXERRORTYPE_EXPECTEDSSNOTFOUND 9
 
 /* notifications */
 extern oid sccpOm5minReport_oid[12];

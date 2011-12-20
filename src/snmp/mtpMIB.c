@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2010  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -211,239 +211,263 @@ volatile int mtpM3uaAsTable_refresh = 1;
  * This is the top level oid that we want to register under.  This is essentially a prefix, with the
  * suffix appearing in the variable below.
  */
-oid mtpMIB_variables_oid[11] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 3 };
-oid mtpSapTable_variables_oid[16] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 3, 1, 1, 1, 1, 1 };
-oid mtpNaTable_variables_oid[16] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 3, 1, 1, 2, 1, 1 };
-oid mtpMsTable_variables_oid[16] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 3, 1, 1, 3, 1, 1 };
-oid mtpSpProfileTable_variables_oid[16] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 3, 1, 1, 4, 1, 1 };
-oid mtpSpTable_variables_oid[16] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 3, 1, 1, 4, 2, 1 };
-oid mtpL3Table_variables_oid[16] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 3, 1, 1, 5, 1, 1 };
-oid mtpGsTable_variables_oid[16] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 3, 1, 1, 6, 1, 1 };
-oid mtpGsLineTable_variables_oid[16] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 3, 1, 1, 6, 2, 1 };
-oid mtpGsLineContentTable_variables_oid[16] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 3, 1, 1, 6, 3, 1 };
-oid mtpRsProfileTable_variables_oid[16] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 3, 1, 1, 7, 1, 1 };
-oid mtpRsTable_variables_oid[16] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 3, 1, 1, 7, 2, 1 };
-oid mtpRtProfileTable_variables_oid[16] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 3, 1, 1, 8, 1, 1 };
-oid mtpRtTable_variables_oid[16] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 3, 1, 1, 8, 2, 1 };
-oid mtpLsProfileTable_variables_oid[16] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 3, 1, 1, 9, 1, 1 };
-oid mtpLsTable_variables_oid[16] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 3, 1, 1, 9, 2, 1 };
-oid mtpSlL3ProfileTable_variables_oid[16] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 3, 1, 1, 10, 1, 1 };
-oid mtpSlL2ProfileTable_variables_oid[16] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 3, 1, 1, 10, 2, 1 };
-oid mtpSlTable_variables_oid[16] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 3, 1, 1, 10, 3, 1 };
-oid mtpSlSdlListTable_variables_oid[16] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 3, 1, 1, 10, 4, 1 };
-oid mtpSlSdtListTable_variables_oid[16] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 3, 1, 1, 10, 5, 1 };
-oid mtpNbTable_variables_oid[16] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 3, 1, 1, 11, 1, 1 };
-oid mtpSaalTable_variables_oid[16] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 3, 1, 1, 11, 2, 1 };
-oid mtpM2paTable_variables_oid[16] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 3, 1, 1, 11, 3, 1 };
-oid mtpSdtTable_variables_oid[16] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 3, 1, 1, 11, 4, 1 };
-oid mtpSdlTable_variables_oid[16] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 3, 1, 1, 12, 1, 1 };
-oid mtpSctpProfileTable_variables_oid[16] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 3, 1, 1, 13, 1, 1 };
-oid mtpSctpTable_variables_oid[16] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 3, 1, 1, 13, 2, 1 };
-oid mtpSctpLocalTable_variables_oid[16] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 3, 1, 1, 13, 3, 1 };
-oid mtpSctpRemoteTable_variables_oid[16] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 3, 1, 1, 13, 4, 1 };
-oid mtpM2uaAspTable_variables_oid[16] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 3, 1, 1, 13, 5, 1 };
-oid mtpM2uaAsTable_variables_oid[16] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 3, 1, 1, 13, 6, 1 };
-oid mtpM3uaAspTable_variables_oid[16] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 3, 1, 1, 13, 7, 1 };
-oid mtpM3uaAsTable_variables_oid[16] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 3, 1, 1, 13, 8, 1 };
+oid mtpMIB_variables_oid[10] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1 };
+oid mtpSapTable_variables_oid[15] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 1, 1, 1, 1, 1 };
+oid mtpNaTable_variables_oid[15] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 1, 1, 2, 1, 1 };
+oid mtpMsTable_variables_oid[15] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 1, 1, 3, 1, 1 };
+oid mtpSpProfileTable_variables_oid[15] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 1, 1, 4, 1, 1 };
+oid mtpSpTable_variables_oid[15] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 1, 1, 4, 2, 1 };
+oid mtpL3Table_variables_oid[15] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 1, 1, 5, 1, 1 };
+oid mtpGsTable_variables_oid[15] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 1, 1, 6, 1, 1 };
+oid mtpGsLineTable_variables_oid[15] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 1, 1, 6, 2, 1 };
+oid mtpGsLineContentTable_variables_oid[15] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 1, 1, 6, 3, 1 };
+oid mtpRsProfileTable_variables_oid[15] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 1, 1, 7, 1, 1 };
+oid mtpRsTable_variables_oid[15] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 1, 1, 7, 2, 1 };
+oid mtpRtProfileTable_variables_oid[15] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 1, 1, 8, 1, 1 };
+oid mtpRtTable_variables_oid[15] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 1, 1, 8, 2, 1 };
+oid mtpLsProfileTable_variables_oid[15] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 1, 1, 9, 1, 1 };
+oid mtpLsTable_variables_oid[15] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 1, 1, 9, 2, 1 };
+oid mtpSlL3ProfileTable_variables_oid[15] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 1, 1, 10, 1, 1 };
+oid mtpSlL2ProfileTable_variables_oid[15] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 1, 1, 10, 2, 1 };
+oid mtpSlTable_variables_oid[15] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 1, 1, 10, 3, 1 };
+oid mtpSlSdlListTable_variables_oid[15] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 1, 1, 10, 4, 1 };
+oid mtpSlSdtListTable_variables_oid[15] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 1, 1, 10, 5, 1 };
+oid mtpNbTable_variables_oid[15] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 1, 1, 11, 1, 1 };
+oid mtpSaalTable_variables_oid[15] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 1, 1, 11, 2, 1 };
+oid mtpM2paTable_variables_oid[15] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 1, 1, 11, 3, 1 };
+oid mtpSdtTable_variables_oid[15] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 1, 1, 11, 4, 1 };
+oid mtpSdlTable_variables_oid[15] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 1, 1, 12, 1, 1 };
+oid mtpSctpProfileTable_variables_oid[15] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 1, 1, 13, 1, 1 };
+oid mtpSctpTable_variables_oid[15] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 1, 1, 13, 2, 1 };
+oid mtpSctpLocalTable_variables_oid[15] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 1, 1, 13, 3, 1 };
+oid mtpSctpRemoteTable_variables_oid[15] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 1, 1, 13, 4, 1 };
+oid mtpM2uaAspTable_variables_oid[15] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 1, 1, 13, 5, 1 };
+oid mtpM2uaAsTable_variables_oid[15] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 1, 1, 13, 6, 1 };
+oid mtpM3uaAspTable_variables_oid[15] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 1, 1, 13, 7, 1 };
+oid mtpM3uaAsTable_variables_oid[15] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 1, 1, 13, 8, 1 };
 
 /*
  * Oids for use in notifications defined in this MIB.
  */
-oid mtpRestarting_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 3, 0, 1 };
-oid ss7OnOccEvent_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 3, 0, 2 };
-oid sdlEventLostSync_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 3, 0, 3 };
-oid sdlEventSuError_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 3, 0, 4 };
-oid sdlEventTxFail_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 3, 0, 5 };
-oid sdlEventRxFail_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 3, 0, 6 };
-oid sdtEventLostSync_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 3, 0, 7 };
-oid sdtEventSuError_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 3, 0, 8 };
-oid sdtEventTxFail_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 3, 0, 9 };
-oid sdtEventRxFail_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 3, 0, 10 };
-oid sdtEventCarrier_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 3, 0, 11 };
-oid slEventFailureAllReasons_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 3, 0, 12 };
-oid slEventFailureAbnormalBsnrFibr_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 3, 0, 13 };
-oid slEventFailureExcessiveDelayOfAck_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 3, 0, 14 };
-oid slEventFailureExcessiveErrorRate_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 3, 0, 15 };
-oid slEventFailureExcessiveDurationCongestion_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 3, 0, 16 };
-oid slEventLocalAutomaticChangeover_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 3, 0, 17 };
-oid slEventLocalAutomaticChangeback_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 3, 0, 18 };
-oid slEventRestoration_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 3, 0, 19 };
-oid slEventRpoStartEvent_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 3, 0, 20 };
-oid slEventRpoStopEvent_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 3, 0, 21 };
-oid slEventLocalInhibitionStart_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 3, 0, 22 };
-oid slEventLocalInhibitionStop_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 3, 0, 23 };
-oid slEventRemoteInhibitionStart_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 3, 0, 24 };
-oid slEventRemoteInhibitionStop_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 3, 0, 25 };
-oid slEventCongestionStart_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 3, 0, 26 };
-oid slEventCongestionStop_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 3, 0, 27 };
-oid slEventCongestionLoss_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 3, 0, 28 };
-oid lkEventFailureStart_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 3, 0, 29 };
-oid lkEventFailureStop_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 3, 0, 30 };
-oid lkEventSendTFP_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 3, 0, 31 };
-oid lkEventSendTFA_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 3, 0, 32 };
-oid rsEventUnavailableStart_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 3, 0, 33 };
-oid rsEventUnavailableStop_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 3, 0, 34 };
-oid rsEventAdjSpLinkSetChange_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 3, 0, 35 };
-oid rsEventAdjSPInaccessibleStart_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 3, 0, 36 };
-oid rsEventAdjSpInaccessibleStop_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 3, 0, 37 };
-oid rsEventRecvTFC_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 3, 0, 38 };
-oid spEventMsuDiscard_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 3, 0, 39 };
-oid spEventUpuSent_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 3, 0, 40 };
-oid spEventUpuRecv_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 3, 0, 41 };
+oid mtpRestarting_oid[12] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 0, 1 };
+oid ss7OnOccEvent_oid[12] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 0, 2 };
+oid sdlEventLostSync_oid[12] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 0, 3 };
+oid sdlEventSuError_oid[12] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 0, 4 };
+oid sdlEventTxFail_oid[12] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 0, 5 };
+oid sdlEventRxFail_oid[12] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 0, 6 };
+oid sdtEventLostSync_oid[12] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 0, 7 };
+oid sdtEventSuError_oid[12] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 0, 8 };
+oid sdtEventTxFail_oid[12] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 0, 9 };
+oid sdtEventRxFail_oid[12] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 0, 10 };
+oid sdtEventCarrier_oid[12] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 0, 11 };
+oid slEventFailureAllReasons_oid[12] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 0, 12 };
+oid slEventFailureAbnormalBsnrFibr_oid[12] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 0, 13 };
+oid slEventFailureExcessiveDelayOfAck_oid[12] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 0, 14 };
+oid slEventFailureExcessiveErrorRate_oid[12] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 0, 15 };
+oid slEventFailureExcessiveDurationCongestion_oid[12] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 0, 16 };
+oid slEventLocalAutomaticChangeover_oid[12] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 0, 17 };
+oid slEventLocalAutomaticChangeback_oid[12] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 0, 18 };
+oid slEventRestoration_oid[12] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 0, 19 };
+oid slEventRpoStartEvent_oid[12] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 0, 20 };
+oid slEventRpoStopEvent_oid[12] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 0, 21 };
+oid slEventLocalInhibitionStart_oid[12] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 0, 22 };
+oid slEventLocalInhibitionStop_oid[12] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 0, 23 };
+oid slEventRemoteInhibitionStart_oid[12] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 0, 24 };
+oid slEventRemoteInhibitionStop_oid[12] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 0, 25 };
+oid slEventCongestionStart_oid[12] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 0, 26 };
+oid slEventCongestionStop_oid[12] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 0, 27 };
+oid slEventCongestionLoss_oid[12] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 0, 28 };
+oid lkEventFailureStart_oid[12] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 0, 29 };
+oid lkEventFailureStop_oid[12] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 0, 30 };
+oid lkEventSendTFP_oid[12] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 0, 31 };
+oid lkEventSendTFA_oid[12] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 0, 32 };
+oid rsEventUnavailableStart_oid[12] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 0, 33 };
+oid rsEventUnavailableStop_oid[12] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 0, 34 };
+oid rsEventAdjSpLinkSetChange_oid[12] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 0, 35 };
+oid rsEventAdjSPInaccessibleStart_oid[12] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 0, 36 };
+oid rsEventAdjSpInaccessibleStop_oid[12] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 0, 37 };
+oid rsEventRecvTFC_oid[12] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 0, 38 };
+oid spEventMsuDiscard_oid[12] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 0, 39 };
+oid spEventUpuSent_oid[12] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 0, 40 };
+oid spEventUpuRecv_oid[12] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 0, 41 };
 
 /*
  * Oids accessible only for notify defined in this MIB.
  */
-oid changeInLsToAdjSp_oid[14] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 3, 1, 3, 1 };
-oid oldLs_oid[14] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 3, 1, 3, 2 };
-oid newLs_oid[14] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 3, 1, 3, 3 };
-oid inaccessibleSp_oid[14] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 3, 1, 3, 4 };
-oid remoteUnavailableUserPart_oid[14] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 3, 1, 3, 5 };
-oid congestionStatus_oid[14] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 3, 1, 3, 6 };
-oid networkPointCode_oid[14] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 3, 1, 3, 7 };
-oid userPart_oid[14] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 3, 1, 3, 8 };
-oid userPartStatus_oid[14] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 3, 1, 3, 9 };
-oid linkFailureReason_oid[14] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 3, 1, 3, 10 };
+oid changeInLsToAdjSp_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 1, 3, 1 };
+oid oldLs_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 1, 3, 2 };
+oid newLs_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 1, 3, 3 };
+oid inaccessibleSp_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 1, 3, 4 };
+oid remoteUnavailableUserPart_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 1, 3, 5 };
+oid congestionStatus_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 1, 3, 6 };
+oid networkPointCode_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 1, 3, 7 };
+oid userPart_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 1, 3, 8 };
+oid userPartStatus_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 1, 3, 9 };
+oid linkFailureReason_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 1, 3, 10 };
 
 /*
  * Other oids defined in this MIB.
  */
-oid mtpProtocolItut_oid[15] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 3, 1, 4, 1, 1 };
-oid mtpProtocolEtsi_oid[15] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 3, 1, 4, 1, 2 };
-oid mtpProtocolAnsi_oid[15] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 3, 1, 4, 1, 3 };
-oid mtpProtocolJttc_oid[15] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 3, 1, 4, 1, 4 };
-oid mtpProtocolChin_oid[15] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 3, 1, 4, 1, 5 };
-oid mtpProtocolPnoc_oid[15] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 3, 1, 4, 1, 6 };
-oid mtpProtocolSing_oid[15] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 3, 1, 4, 1, 7 };
-oid mtpProtocolSpan_oid[15] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 3, 1, 4, 1, 8 };
-oid localUserPartUnavailable_oid[15] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 3, 1, 4, 2, 1 };
-oid remoteUserPartUnavailable_oid[15] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 3, 1, 4, 2, 2 };
-oid slFailure_oid[15] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 3, 1, 4, 2, 102 };
-oid localAutomaticChange_oid[15] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 3, 1, 4, 2, 110 };
-oid remoteProcOutage_oid[15] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 3, 1, 4, 2, 210 };
-oid localInhibition_oid[15] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 3, 1, 4, 2, 216 };
-oid remoteInhibition_oid[15] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 3, 1, 4, 2, 218 };
-oid linkCongestionIndications_oid[15] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 3, 1, 4, 2, 306 };
-oid linkCongestionDiscard_oid[15] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 3, 1, 4, 2, 311 };
-oid linkSetFailure_oid[15] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 3, 1, 4, 2, 403 };
-oid linkSetFailureTFPBroadcast_oid[15] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 3, 1, 4, 2, 405 };
-oid routesetUnavailability_oid[15] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 3, 1, 4, 2, 411 };
-oid linksetAdjSpChange_oid[15] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 3, 1, 4, 2, 413 };
-oid adjSpInaccessibility_oid[15] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 3, 1, 4, 2, 501 };
-oid routingDataError_oid[15] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 3, 1, 4, 2, 505 };
-oid userPartUnavailableSent_oid[15] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 3, 1, 4, 2, 506 };
-oid userPartUnavailableReceived_oid[15] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 3, 1, 4, 2, 507 };
-oid transferControlledReceived_oid[15] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 3, 1, 4, 2, 508 };
-oid abnormalFIBRorBSNR_oid[15] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 3, 1, 4, 3, 3 };
-oid excessiveAckDelay_oid[15] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 3, 1, 4, 3, 4 };
-oid excessiveErrorRate_oid[15] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 3, 1, 4, 3, 5 };
-oid excessiveCongDuration_oid[15] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 3, 1, 4, 3, 6 };
-oid remoteUPUnknown_oid[15] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 3, 1, 4, 3, 7 };
-oid remoteUPUnequipped_oid[15] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 3, 1, 4, 3, 8 };
-oid remoteUPInaccessible_oid[15] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 3, 1, 4, 3, 9 };
-oid defaultInLsLoadShareAlgorithm_oid[15] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 3, 1, 4, 4, 1 };
-oid mtpLsProfileCompliance_oid[14] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 3, 2, 1, 1 };
-oid mtpSapCompliance_oid[14] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 3, 2, 1, 2 };
-oid mtpL2ProfocolProfileCompliance_oid[14] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 3, 2, 1, 3 };
-oid mtpNbProfileCompliance_oid[14] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 3, 2, 1, 4 };
-oid mtpSaalProfileCompliance_oid[14] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 3, 2, 1, 5 };
-oid mtpM2paProfileCompliance_oid[14] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 3, 2, 1, 6 };
-oid mtpL3Compliacne_oid[14] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 3, 2, 1, 7 };
-oid mtpSpCompliance_oid[14] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 3, 2, 1, 8 };
-oid mtpSdlCompliance_oid[14] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 3, 2, 1, 9 };
-oid mtpLsCompliance_oid[14] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 3, 2, 1, 10 };
-oid mtpSlCompliance_oid[14] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 3, 2, 1, 11 };
-oid mtpSlL3ProfileCompliance_oid[14] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 3, 2, 1, 12 };
-oid mtpSpProfileCompliance_oid[14] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 3, 2, 1, 13 };
-oid mtpRtCompliance_oid[14] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 3, 2, 1, 14 };
-oid mtpSignRouteSetNetPartCompliance_oid[14] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 3, 2, 1, 15 };
-oid mtpStCompliance_oid[14] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 3, 2, 1, 16 };
-oid mtpGsCompliance_oid[14] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 3, 2, 1, 17 };
-oid mtpGsLineCompliance_oid[14] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 3, 2, 1, 18 };
-oid mtpLsProfilePackage_oid[14] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 3, 2, 2, 1 };
-oid mtpSapPkg_oid[14] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 3, 2, 2, 2 };
-oid mtpSlL2ProfilePkg_oid[14] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 3, 2, 2, 3 };
-oid mtpL3Package_oid[14] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 3, 2, 2, 4 };
-oid mtpSpPackage_oid[14] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 3, 2, 2, 5 };
-oid mtpSdlPackage_oid[14] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 3, 2, 2, 6 };
-oid mtpLsPackage_oid[14] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 3, 2, 2, 7 };
-oid mtpSlPackage_oid[14] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 3, 2, 2, 8 };
-oid mtpSlL3ProfilePackage_oid[14] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 3, 2, 2, 9 };
-oid mtpSpProfilePackage_oid[14] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 3, 2, 2, 10 };
-oid mtpRtPackage_oid[14] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 3, 2, 2, 11 };
-oid mtpRsPackage_oid[14] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 3, 2, 2, 12 };
-oid mtpStPackage_oid[14] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 3, 2, 2, 13 };
-oid mtpGsPkg_oid[14] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 3, 2, 2, 14 };
-oid mtpGsLinePkg_oid[14] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 3, 2, 2, 15 };
-oid administrativeStatePackage_oid[14] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 3, 2, 2, 16 };
-oid bufferMechanismPackage_oid[14] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 3, 2, 2, 17 };
-oid cICPackage_oid[14] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 3, 2, 2, 18 };
-oid clsLoadsharingInformationPackage_oid[14] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 3, 2, 2, 19 };
-oid congestedStatePackage_oid[14] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 3, 2, 2, 20 };
-oid congestionHandlingPackage_oid[14] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 3, 2, 2, 21 };
-oid congestionLevelPackage_oid[14] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 3, 2, 2, 22 };
-oid getScreenedOpcsOrLinkSetsByDpcActionPackage_oid[14] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 3, 2, 2, 23 };
-oid fixedRouteNePartPriorityPackage_oid[14] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 3, 2, 2, 24 };
-oid flexibleRouteNePartPriorityPackage_oid[14] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 3, 2, 2, 25 };
-oid inLsLoadShareAlgorithmPackage_oid[14] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 3, 2, 2, 26 };
-oid linkCongestionLevelPackage_oid[14] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 3, 2, 2, 27 };
-oid loadsharingInformationRouteNePartPackage_oid[14] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 3, 2, 2, 28 };
-oid loadsharingInformationRouteSetNePartPackage_oid[14] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 3, 2, 2, 29 };
-oid loopDelayPackage_oid[14] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 3, 2, 2, 30 };
-oid mtpLsProfileNamePackage_oid[14] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 3, 2, 2, 31 };
-oid mtpLsProfilePointerPackage_oid[14] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 3, 2, 2, 32 };
-oid mtpSapNamePackage_oid[14] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 3, 2, 2, 33 };
-oid mtpSlL2ProfileNamePackage_oid[14] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 3, 2, 2, 34 };
-oid mtpL3NamePackage_oid[14] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 3, 2, 2, 35 };
-oid mtpLoadsharingObjectForRouteNePartPointerPackage_oid[14] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 3, 2, 2, 36 };
-oid mtpLoadsharingObjectForRouteSetNePartPointerPackage_oid[14] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 3, 2, 2, 37 };
-oid mtpSpNamePackage_oid[14] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 3, 2, 2, 38 };
-oid multipleTransmissionCongestionLevelsPackage_oid[14] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 3, 2, 2, 39 };
-oid multipleTransmissionCongestionLevelsWithPrioPackage_oid[14] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 3, 2, 2, 40 };
-oid multipleTransmissionCongestionStatesPackage_oid[14] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 3, 2, 2, 41 };
-oid noBasicLinkAllocationPackage_oid[14] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 3, 2, 2, 42 };
-oid pCRPackage_oid[14] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 3, 2, 2, 43 };
-oid receiveCongestionLevelsPackage_oid[14] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 3, 2, 2, 44 };
-oid relatedLinkGroupNumberPackage_oid[14] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 3, 2, 2, 45 };
-oid remoteExchangeLabelPackage_oid[14] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 3, 2, 2, 46 };
-oid mtpSdlListPackage_oid[14] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 3, 2, 2, 47 };
-oid mtpSdlNamePackage_oid[14] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 3, 2, 2, 48 };
-oid mtpLsNamePackage_oid[14] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 3, 2, 2, 49 };
-oid mtpSignLinkTestPackage_oid[14] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 3, 2, 2, 50 };
-oid mtpSlNamePackage_oid[14] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 3, 2, 2, 51 };
-oid mtpRtNamePackage_oid[14] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 3, 2, 2, 52 };
-oid mtpRsNamePackage_oid[14] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 3, 2, 2, 53 };
-oid mtpStListPackage_oid[14] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 3, 2, 2, 54 };
-oid mtpStNamePackage_oid[14] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 3, 2, 2, 55 };
-oid slsCodeNormalListPackage_oid[14] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 3, 2, 2, 56 };
-oid slsListPackage_oid[14] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 3, 2, 2, 57 };
-oid mtpSlL3ProfileNamePackage_oid[14] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 3, 2, 2, 58 };
-oid mtpSlL3ProfilePointerPackage_oid[14] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 3, 2, 2, 59 };
-oid mtpRestartingNotification_oid[14] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 3, 2, 2, 60 };
-oid mtpSpProfileNamePackage_oid[14] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 3, 2, 2, 62 };
-oid mtpSpProfilePointerPackage_oid[14] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 3, 2, 2, 63 };
-oid ss7OnOccEventPackage_oid[14] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 3, 2, 2, 64 };
-oid stmChannelPackage_oid[14] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 3, 2, 2, 65 };
-oid mtpGsNamePackage_oid[14] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 3, 2, 2, 66 };
-oid usageStatePackage_oid[14] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 3, 2, 2, 67 };
-oid broadbandSpecificPackage_oid[14] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 3, 2, 2, 68 };
-oid egressTransmissionRateIntervalPackage_oid[14] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 3, 2, 2, 69 };
-oid longMessageSupportedPackage_oid[14] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 3, 2, 2, 70 };
-oid narrowbandSpecificPackage_oid[14] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 3, 2, 2, 71 };
-oid pollAfterRetransmissionPackage_oid[14] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 3, 2, 2, 72 };
-oid mtpSaalProfilePackage_oid[14] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 3, 2, 2, 73 };
-oid saalSdlPackage_oid[14] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 3, 2, 2, 74 };
-oid m2paSctpDefaultsPackage_oid[14] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 3, 2, 2, 75 };
-oid mtpM2paProfilePkg_oid[14] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 3, 2, 2, 76 };
-oid m2paProvingPackage_oid[14] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 3, 2, 2, 77 };
-oid providerEntityNamesPackage_oid[14] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 3, 2, 2, 78 };
-oid mtpRestartingParameters_oid[14] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 3, 2, 2, 79 };
-oid ss7OnOccEventParameters_oid[14] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 3, 2, 2, 80 };
-oid mtpSapAsaPointerPackage_oid[14] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 3, 2, 2, 81 };
-oid mtpL3AsaPointerPackage_oid[14] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 3, 2, 2, 82 };
-oid mtpSlAsaPointerPackage_oid[14] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 3, 2, 2, 83 };
-oid mtpRsAsaPointerPackage_oid[14] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 3, 2, 2, 84 };
-oid mtpLsAsaPointerPackage_oid[14] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 3, 2, 2, 85 };
+oid mtpProtocolItut_oid[14] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 1, 4, 1, 1 };
+oid mtpProtocolEtsi_oid[14] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 1, 4, 1, 2 };
+oid mtpProtocolAnsi_oid[14] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 1, 4, 1, 3 };
+oid mtpProtocolJttc_oid[14] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 1, 4, 1, 4 };
+oid mtpProtocolChin_oid[14] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 1, 4, 1, 5 };
+oid mtpProtocolPnoc_oid[14] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 1, 4, 1, 6 };
+oid mtpProtocolSing_oid[14] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 1, 4, 1, 7 };
+oid mtpProtocolSpan_oid[14] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 1, 4, 1, 8 };
+oid localUserPartUnavailable_oid[14] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 1, 4, 2, 1 };
+oid remoteUserPartUnavailable_oid[14] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 1, 4, 2, 2 };
+oid slFailure_oid[14] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 1, 4, 2, 102 };
+oid localAutomaticChange_oid[14] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 1, 4, 2, 110 };
+oid remoteProcOutage_oid[14] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 1, 4, 2, 210 };
+oid localInhibition_oid[14] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 1, 4, 2, 216 };
+oid remoteInhibition_oid[14] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 1, 4, 2, 218 };
+oid linkCongestionIndications_oid[14] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 1, 4, 2, 306 };
+oid linkCongestionDiscard_oid[14] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 1, 4, 2, 311 };
+oid linkSetFailure_oid[14] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 1, 4, 2, 403 };
+oid linkSetFailureTFPBroadcast_oid[14] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 1, 4, 2, 405 };
+oid routesetUnavailability_oid[14] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 1, 4, 2, 411 };
+oid linksetAdjSpChange_oid[14] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 1, 4, 2, 413 };
+oid adjSpInaccessibility_oid[14] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 1, 4, 2, 501 };
+oid routingDataError_oid[14] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 1, 4, 2, 505 };
+oid userPartUnavailableSent_oid[14] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 1, 4, 2, 506 };
+oid userPartUnavailableReceived_oid[14] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 1, 4, 2, 507 };
+oid transferControlledReceived_oid[14] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 1, 4, 2, 508 };
+oid abnormalFIBRorBSNR_oid[14] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 1, 4, 3, 3 };
+oid excessiveAckDelay_oid[14] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 1, 4, 3, 4 };
+oid excessiveErrorRate_oid[14] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 1, 4, 3, 5 };
+oid excessiveCongDuration_oid[14] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 1, 4, 3, 6 };
+oid remoteUPUnknown_oid[14] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 1, 4, 3, 7 };
+oid remoteUPUnequipped_oid[14] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 1, 4, 3, 8 };
+oid remoteUPInaccessible_oid[14] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 1, 4, 3, 9 };
+oid defaultInLsLoadShareAlgorithm_oid[14] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 1, 4, 4, 1 };
+oid mtpLsProfileCompliance_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 2, 1, 1 };
+oid mtpSapCompliance_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 2, 1, 2 };
+oid mtpL2ProfocolProfileCompliance_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 2, 1, 3 };
+oid mtpNbProfileCompliance_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 2, 1, 4 };
+oid mtpSaalProfileCompliance_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 2, 1, 5 };
+oid mtpM2paProfileCompliance_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 2, 1, 6 };
+oid mtpL3Compliance_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 2, 1, 7 };
+oid mtpSpCompliance_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 2, 1, 8 };
+oid mtpSdlCompliance_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 2, 1, 9 };
+oid mtpLsCompliance_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 2, 1, 10 };
+oid mtpSlCompliance_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 2, 1, 11 };
+oid mtpSlL3ProfileCompliance_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 2, 1, 12 };
+oid mtpSpProfileCompliance_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 2, 1, 13 };
+oid mtpRtCompliance_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 2, 1, 14 };
+oid mtpSignRouteSetNetPartCompliance_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 2, 1, 15 };
+oid mtpStCompliance_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 2, 1, 16 };
+oid mtpGsCompliance_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 2, 1, 17 };
+oid mtpGsLineCompliance_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 2, 1, 18 };
+oid mtpAdditionalCompliance_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 2, 1, 19 };
+oid mtpLsProfilePackage_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 2, 2, 1 };
+oid mtpSapPkg_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 2, 2, 2 };
+oid mtpSlL2ProfilePkg_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 2, 2, 3 };
+oid mtpL3Package_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 2, 2, 4 };
+oid mtpSpPackage_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 2, 2, 5 };
+oid mtpSdlPackage_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 2, 2, 6 };
+oid mtpLsPackage_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 2, 2, 7 };
+oid mtpSlPackage_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 2, 2, 8 };
+oid mtpSlL3ProfilePackage_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 2, 2, 9 };
+oid mtpSpProfilePackage_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 2, 2, 10 };
+oid mtpRtPackage_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 2, 2, 11 };
+oid mtpRsPackage_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 2, 2, 12 };
+oid mtpStPackage_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 2, 2, 13 };
+oid mtpGsPkg_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 2, 2, 14 };
+oid mtpGsLinePkg_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 2, 2, 15 };
+oid administrativeStatePackage_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 2, 2, 16 };
+oid bufferMechanismPackage_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 2, 2, 17 };
+oid cICPackage_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 2, 2, 18 };
+oid clsLoadsharingInformationPackage_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 2, 2, 19 };
+oid congestedStatePackage_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 2, 2, 20 };
+oid congestionHandlingPackage_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 2, 2, 21 };
+oid congestionLevelPackage_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 2, 2, 22 };
+oid getScreenedOpcsOrLinkSetsByDpcActionPackage_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 2, 2, 23 };
+oid fixedRouteNePartPriorityPackage_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 2, 2, 24 };
+oid flexibleRouteNePartPriorityPackage_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 2, 2, 25 };
+oid inLsLoadShareAlgorithmPackage_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 2, 2, 26 };
+oid linkCongestionLevelPackage_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 2, 2, 27 };
+oid loadsharingInformationRouteNePartPackage_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 2, 2, 28 };
+oid loadsharingInformationRouteSetNePartPackage_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 2, 2, 29 };
+oid loopDelayPackage_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 2, 2, 30 };
+oid mtpLsProfileNamePackage_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 2, 2, 31 };
+oid mtpLsProfilePointerPackage_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 2, 2, 32 };
+oid mtpSapNamePackage_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 2, 2, 33 };
+oid mtpSlL2ProfileNamePackage_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 2, 2, 34 };
+oid mtpL3NamePackage_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 2, 2, 35 };
+oid mtpLoadsharingObjectForRouteNePartPointerPackage_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 2, 2, 36 };
+oid mtpLoadsharingObjectForRouteSetNePartPointerPackage_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 2, 2, 37 };
+oid mtpSpNamePackage_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 2, 2, 38 };
+oid multipleTransmissionCongestionLevelsPackage_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 2, 2, 39 };
+oid multipleTransmissionCongestionLevelsWithPrioPackage_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 2, 2, 40 };
+oid multipleTransmissionCongestionStatesPackage_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 2, 2, 41 };
+oid noBasicLinkAllocationPackage_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 2, 2, 42 };
+oid pCRPackage_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 2, 2, 43 };
+oid receiveCongestionLevelsPackage_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 2, 2, 44 };
+oid relatedLinkGroupNumberPackage_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 2, 2, 45 };
+oid remoteExchangeLabelPackage_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 2, 2, 46 };
+oid mtpSdlListPackage_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 2, 2, 47 };
+oid mtpSdlNamePackage_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 2, 2, 48 };
+oid mtpLsNamePackage_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 2, 2, 49 };
+oid mtpSignLinkTestPackage_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 2, 2, 50 };
+oid mtpSlNamePackage_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 2, 2, 51 };
+oid mtpRtNamePackage_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 2, 2, 52 };
+oid mtpRsNamePackage_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 2, 2, 53 };
+oid mtpStListPackage_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 2, 2, 54 };
+oid mtpStNamePackage_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 2, 2, 55 };
+oid slsCodeNormalListPackage_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 2, 2, 56 };
+oid slsListPackage_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 2, 2, 57 };
+oid mtpSlL3ProfileNamePackage_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 2, 2, 58 };
+oid mtpSlL3ProfilePointerPackage_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 2, 2, 59 };
+oid mtpRestartingNotification_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 2, 2, 60 };
+oid mtpSpTimersPackage_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 2, 2, 61 };
+oid mtpSpProfileNamePackage_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 2, 2, 62 };
+oid mtpSpProfilePointerPackage_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 2, 2, 63 };
+oid ss7OnOccEventPackage_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 2, 2, 64 };
+oid stmChannelPackage_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 2, 2, 65 };
+oid mtpGsNamePackage_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 2, 2, 66 };
+oid usageStatePackage_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 2, 2, 67 };
+oid broadbandSpecificPackage_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 2, 2, 68 };
+oid egressTransmissionRateIntervalPackage_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 2, 2, 69 };
+oid longMessageSupportedPackage_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 2, 2, 70 };
+oid narrowbandSpecificPackage_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 2, 2, 71 };
+oid pollAfterRetransmissionPackage_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 2, 2, 72 };
+oid mtpSaalProfilePackage_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 2, 2, 73 };
+oid saalSdlPackage_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 2, 2, 74 };
+oid m2paSctpDefaultsPackage_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 2, 2, 75 };
+oid mtpM2paProfilePkg_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 2, 2, 76 };
+oid m2paProvingPackage_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 2, 2, 77 };
+oid providerEntityNamesPackage_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 2, 2, 78 };
+oid mtpRestartingParameters_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 2, 2, 79 };
+oid ss7OnOccEventParameters_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 2, 2, 80 };
+oid mtpSapAsaPointerPackage_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 2, 2, 81 };
+oid mtpL3AsaPointerPackage_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 2, 2, 82 };
+oid mtpSlAsaPointerPackage_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 2, 2, 83 };
+oid mtpRsAsaPointerPackage_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 2, 2, 84 };
+oid mtpLsAsaPointerPackage_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 2, 2, 85 };
+oid mtpSapGroup_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 2, 2, 86 };
+oid mtpNaGroup_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 2, 2, 87 };
+oid mtpMsGroup_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 2, 2, 88 };
+oid mtpSpGroup_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 2, 2, 89 };
+oid mtpGsLineGroup_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 2, 2, 90 };
+oid mtpRsProfileGroup_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 2, 2, 91 };
+oid mtpRtProfileGroup_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 2, 2, 92 };
+oid mtpLsProfileGroup_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 2, 2, 93 };
+oid mtpSlL3ProfileGroup_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 2, 2, 94 };
+oid mtpSlL2ProfileGroup_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 2, 2, 95 };
+oid mtpNbGroup_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 2, 2, 96 };
+oid mtpSctpProfileGroup_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 2, 2, 97 };
+oid mtpSctpGroup_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 2, 2, 98 };
+oid mtpM2uaGroup_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 2, 2, 99 };
+oid mtpM3uaGroup_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 2, 2, 100 };
+oid mtpAlarmStatusGroup_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 2, 2, 101 };
+oid mtpSdlEventGroup_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 2, 2, 102 };
+oid mtpSdtEventGroup_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 2, 2, 103 };
+oid mtpSlEventGroup_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 2, 2, 104 };
+oid mtpLkEventGroup_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 2, 2, 105 };
+oid mtpRsEventGroup_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 2, 2, 106 };
+oid mtpSpEventGroup_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 2, 2, 107 };
 static oid zeroDotZero_oid[2] = { 0, 0 };
 static oid snmpTrapOID_oid[11] = { 1, 3, 6, 1, 6, 3, 1, 1, 4, 1, 0 };
 
@@ -1244,7 +1268,7 @@ struct variable7 mtpMIB_variables[] = {
 #define   MTPM2UAASSTATE        395
 	{(u_char) MTPM2UAASSTATE, ASN_INTEGER, RONLY, var_mtpM2uaAsTable, 6, {1, 1, 13, 6, 1, 2}},
 #define   MTPM2UAASINTERFACEIDENTIFIER  396
-	{(u_char) MTPM2UAASINTERFACEIDENTIFIER, ASN_INTEGER, RWRITE, var_mtpM2uaAsTable, 6, {1, 1, 13, 6, 1, 3}},
+	{(u_char) MTPM2UAASINTERFACEIDENTIFIER, ASN_UNSIGNED, RWRITE, var_mtpM2uaAsTable, 6, {1, 1, 13, 6, 1, 3}},
 #define   MTPM2UAINTERFACEIDENTIFIERTEXT  397
 	{(u_char) MTPM2UAINTERFACEIDENTIFIERTEXT, ASN_OCTET_STR, RWRITE, var_mtpM2uaAsTable, 6, {1, 1, 13, 6, 1, 4}},
 #define   MTPM2UAASSDTI         398
@@ -1697,6 +1721,7 @@ store_mtpMIB(int majorID, int minorID, void *serverarg, void *clientarg)
 		memset(line, 0, sizeof(line));
 		strcat(line, "mtpMIB ");
 		cptr = line + strlen(line);
+		(void) cptr;
 		/* XXX: remove individual scalars that are not persistent */
 		cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->mtpDefaultSctpNoDelay, &tmpsize);
 		cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->mtpDefaultSctpMaxseg, &tmpsize);
@@ -2146,6 +2171,7 @@ store_mtpSapTable(int majorID, int minorID, void *serverarg, void *clientarg)
 			memset(line, 0, sizeof(line));
 			strcat(line, "mtpSapTable ");
 			cptr = line + strlen(line);
+			(void) cptr;
 			/* XXX: remove individual columns if not persistent */
 			cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->mtpMsId, &tmpsize);
 			cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->mtpSpId, &tmpsize);
@@ -2184,9 +2210,9 @@ mtpNaTable_create(void)
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
 		{
-			static oid tmpoid[15] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 0, 1, 4, 1, 1, 0 };
-			if ((StorageNew->mtpNaProtocolVariant = snmp_duplicate_objid(tmpoid, 15)))
-				StorageNew->mtpNaProtocolVariantLen = 15;
+			static oid tmpoid[14] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 0, 1, 4, 1, 1 };
+			if ((StorageNew->mtpNaProtocolVariant = snmp_duplicate_objid(tmpoid, 14)))
+				StorageNew->mtpNaProtocolVariantLen = 14;
 		}
 		StorageNew->mtpNaProtocolYear = MTPNAPROTOCOLYEAR_YCURRENT;
 		if (memdup((u_char **) &StorageNew->mtpNaProtocolOptions, (u_char *) "\x81\x07\x00\x80", 4) == SNMPERR_SUCCESS)
@@ -2195,10 +2221,10 @@ mtpNaTable_create(void)
 		if (memdup((u_char **) &StorageNew->mtpNaPointCodeFormat, (u_char *) "\x03\x08\x03", 3) == SNMPERR_SUCCESS)
 			StorageNew->mtpNaPointCodeFormatLen = 3;
 		StorageNew->mtpNaSlsLength = MTPNASLSLENGTH_SLS4BITS;
-		StorageNew->mtpNaSpDefault = (uint8_t *) strdup("");
-		StorageNew->mtpNaSpDefaultLen = strlen("");
-		StorageNew->mtpNaName = (uint8_t *) strdup("");
-		StorageNew->mtpNaNameLen = strlen("");
+		if ((StorageNew->mtpNaSpDefault = (uint8_t *) strdup("")) != NULL)
+			StorageNew->mtpNaSpDefaultLen = strlen("");
+		if ((StorageNew->mtpNaName = (uint8_t *) strdup("")) != NULL)
+			StorageNew->mtpNaNameLen = strlen("");
 		StorageNew->mtpNaRowStatus = 0;
 		StorageNew->mtpNaRowStatus = RS_NOTREADY;
 	}
@@ -2405,6 +2431,7 @@ store_mtpNaTable(int majorID, int minorID, void *serverarg, void *clientarg)
 			memset(line, 0, sizeof(line));
 			strcat(line, "mtpNaTable ");
 			cptr = line + strlen(line);
+			(void) cptr;
 			/* XXX: remove individual columns if not persistent */
 			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->mtpNaId, &tmpsize);
 			cptr = read_config_store_data(ASN_OBJECT_ID, cptr, &StorageTmp->mtpNaProtocolVariant, &StorageTmp->mtpNaProtocolVariantLen);
@@ -2696,6 +2723,7 @@ store_mtpMsTable(int majorID, int minorID, void *serverarg, void *clientarg)
 			memset(line, 0, sizeof(line));
 			strcat(line, "mtpMsTable ");
 			cptr = line + strlen(line);
+			(void) cptr;
 			/* XXX: remove individual columns if not persistent */
 			cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->mtpMsId, &tmpsize);
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->mtpMsName, &StorageTmp->mtpMsNameLen);
@@ -2762,10 +2790,10 @@ mtpSpProfileTable_create(void)
 		if ((StorageNew->mtpSpProfileName = (uint8_t *) strdup("")) != NULL)
 			StorageNew->mtpSpProfileNameLen = strlen("");
 		StorageNew->mtpSpProfileCircularRteDetect = MTPSPPROFILECIRCULARRTEDETECT_NONE;
-		StorageNew->mtpSpRsDefault = (uint8_t *) strdup("");
-		StorageNew->mtpSpRsDefaultLen = strlen("");
-		StorageNew->mtpSpLsDefault = (uint8_t *) strdup("");
-		StorageNew->mtpSpLsDefaultLen = strlen("");
+		if ((StorageNew->mtpSpRsDefault = (uint8_t *) strdup("")) != NULL)
+			StorageNew->mtpSpRsDefaultLen = strlen("");
+		if ((StorageNew->mtpSpLsDefault = (uint8_t *) strdup("")) != NULL)
+			StorageNew->mtpSpLsDefaultLen = strlen("");
 		StorageNew->mtpSpProfileRowStatus = 0;
 		StorageNew->mtpSpProfileRowStatus = RS_NOTREADY;
 	}
@@ -2987,6 +3015,7 @@ store_mtpSpProfileTable(int majorID, int minorID, void *serverarg, void *clienta
 			memset(line, 0, sizeof(line));
 			strcat(line, "mtpSpProfileTable ");
 			cptr = line + strlen(line);
+			(void) cptr;
 			/* XXX: remove individual columns if not persistent */
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->mtpSpProfileId, &StorageTmp->mtpSpProfileIdLen);
 			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->mtpSpProfileTimerT1R, &tmpsize);
@@ -3052,13 +3081,13 @@ mtpSpTable_create(void)
 			StorageNew->mtpSpProceduralStatusLen = 1;
 		if (memdup((u_char **) &StorageNew->mtpSpAvailabilityStatus, (u_char *) "\x00\x00", 2) == SNMPERR_SUCCESS)
 			StorageNew->mtpSpAvailabilityStatusLen = 2;
-		StorageNew->mtpSpVersion = (uint8_t *) strdup("ITU-T Q.704 1996");
-		StorageNew->mtpSpVersionLen = strlen("ITU-T Q.704 1996");
+		if ((StorageNew->mtpSpVersion = (uint8_t *) strdup("ITU-T Q.704 1996")) != NULL)
+			StorageNew->mtpSpVersionLen = strlen("ITU-T Q.704 1996");
 		StorageNew->mtpSpNetworkIndicator = MTPSPNETWORKINDICATOR_INTERNATIONALNETWORK1;
 		if ((StorageNew->mtpSpName = (uint8_t *) strdup("")) != NULL)
 			StorageNew->mtpSpNameLen = strlen("");
-		StorageNew->mtpSpProfilePointer = (uint8_t *) strdup("");
-		StorageNew->mtpSpProfilePointerLen = strlen("");
+		if ((StorageNew->mtpSpProfilePointer = (uint8_t *) strdup("")) != NULL)
+			StorageNew->mtpSpProfilePointerLen = strlen("");
 		if ((StorageNew->mtpSpNaPointer = snmp_duplicate_objid(zeroDotZero_oid, 2)))
 			StorageNew->mtpSpNaPointerLen = 2;
 		if (memdup((u_char **) &StorageNew->mtpSpOptions, (u_char *) "\x20", 1) == SNMPERR_SUCCESS)
@@ -3316,6 +3345,7 @@ store_mtpSpTable(int majorID, int minorID, void *serverarg, void *clientarg)
 			memset(line, 0, sizeof(line));
 			strcat(line, "mtpSpTable ");
 			cptr = line + strlen(line);
+			(void) cptr;
 			/* XXX: remove individual columns if not persistent */
 			cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->mtpMsId, &tmpsize);
 			cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->mtpSpId, &tmpsize);
@@ -3365,8 +3395,8 @@ mtpL3Table_create(void)
 			StorageNew->mtpL3ProceduralStatusLen = 1;
 		if ((StorageNew->mtpL3AsaProfilePointer = snmp_duplicate_objid(zeroDotZero_oid, 2)))
 			StorageNew->mtpL3AsaProfilePointerLen = 2;
-		StorageNew->mtpL3Name = (uint8_t *) strdup("");
-		StorageNew->mtpL3NameLen = strlen("");
+		if ((StorageNew->mtpL3Name = (uint8_t *) strdup("")) != NULL)
+			StorageNew->mtpL3NameLen = strlen("");
 		StorageNew->mtpL3RowStatus = 0;
 		StorageNew->mtpL3RowStatus = RS_NOTREADY;
 	}
@@ -3563,6 +3593,7 @@ store_mtpL3Table(int majorID, int minorID, void *serverarg, void *clientarg)
 			memset(line, 0, sizeof(line));
 			strcat(line, "mtpL3Table ");
 			cptr = line + strlen(line);
+			(void) cptr;
 			/* XXX: remove individual columns if not persistent */
 			cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->mtpMsId, &tmpsize);
 			cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->mtpSpId, &tmpsize);
@@ -3788,6 +3819,7 @@ store_mtpGsTable(int majorID, int minorID, void *serverarg, void *clientarg)
 			memset(line, 0, sizeof(line));
 			strcat(line, "mtpGsTable ");
 			cptr = line + strlen(line);
+			(void) cptr;
 			/* XXX: remove individual columns if not persistent */
 			cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->mtpMsId, &tmpsize);
 			cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->mtpSpId, &tmpsize);
@@ -4009,6 +4041,7 @@ store_mtpGsLineTable(int majorID, int minorID, void *serverarg, void *clientarg)
 			memset(line, 0, sizeof(line));
 			strcat(line, "mtpGsLineTable ");
 			cptr = line + strlen(line);
+			(void) cptr;
 			/* XXX: remove individual columns if not persistent */
 			cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->mtpMsId, &tmpsize);
 			cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->mtpSpId, &tmpsize);
@@ -4261,6 +4294,7 @@ store_mtpGsLineContentTable(int majorID, int minorID, void *serverarg, void *cli
 			memset(line, 0, sizeof(line));
 			strcat(line, "mtpGsLineContentTable ");
 			cptr = line + strlen(line);
+			(void) cptr;
 			/* XXX: remove individual columns if not persistent */
 			cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->mtpMsId, &tmpsize);
 			cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->mtpSpId, &tmpsize);
@@ -4303,8 +4337,8 @@ mtpRsProfileTable_create(void)
 		StorageNew->mtpRsProfileTimerT15 = 250;
 		StorageNew->mtpRsProfileTimerT16 = 175;
 		StorageNew->mtpRsProfileTimerT18A = 1200;
-		StorageNew->mtpRsProfileRtDefault = (uint8_t *) strdup("");
-		StorageNew->mtpRsProfileRtDefaultLen = strlen("");
+		if ((StorageNew->mtpRsProfileRtDefault = (uint8_t *) strdup("")) != NULL)
+			StorageNew->mtpRsProfileRtDefaultLen = strlen("");
 		StorageNew->mtpRsProfileRowStatus = 0;
 		StorageNew->mtpRsProfileRowStatus = RS_NOTREADY;
 	}
@@ -4496,6 +4530,7 @@ store_mtpRsProfileTable(int majorID, int minorID, void *serverarg, void *clienta
 			memset(line, 0, sizeof(line));
 			strcat(line, "mtpRsProfileTable ");
 			cptr = line + strlen(line);
+			(void) cptr;
 			/* XXX: remove individual columns if not persistent */
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->mtpRsProfileId, &StorageTmp->mtpRsProfileIdLen);
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->mtpRsProfileName, &StorageTmp->mtpRsProfileNameLen);
@@ -4549,8 +4584,8 @@ mtpRsTable_create(void)
 			StorageNew->mtpRsRemoteExchangeLabelLen = strlen("");
 		if ((StorageNew->mtpRsName = (uint8_t *) strdup("")) != NULL)
 			StorageNew->mtpRsNameLen = strlen("");
-		StorageNew->mtpRsProfile = (uint8_t *) strdup("");
-		StorageNew->mtpRsProfileLen = strlen("");
+		if ((StorageNew->mtpRsProfile = (uint8_t *) strdup("")) != NULL)
+			StorageNew->mtpRsProfileLen = strlen("");
 		if (memdup((u_char **) &StorageNew->mtpRsAlarmStatus, (u_char *) "\x00", 1) == SNMPERR_SUCCESS)
 			StorageNew->mtpRsAlarmStatusLen = 1;
 		StorageNew->mtpRsRowStatus = 0;
@@ -4798,6 +4833,7 @@ store_mtpRsTable(int majorID, int minorID, void *serverarg, void *clientarg)
 			memset(line, 0, sizeof(line));
 			strcat(line, "mtpRsTable ");
 			cptr = line + strlen(line);
+			(void) cptr;
 			/* XXX: remove individual columns if not persistent */
 			cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->mtpMsId, &tmpsize);
 			cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->mtpSpId, &tmpsize);
@@ -5013,6 +5049,7 @@ store_mtpRtProfileTable(int majorID, int minorID, void *serverarg, void *clienta
 			memset(line, 0, sizeof(line));
 			strcat(line, "mtpRtProfileTable ");
 			cptr = line + strlen(line);
+			(void) cptr;
 			/* XXX: remove individual columns if not persistent */
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->mtpRtProfileId, &StorageTmp->mtpRtProfileIdLen);
 			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->mtpRtProfileTimerT6, &tmpsize);
@@ -5064,8 +5101,8 @@ mtpRtTable_create(void)
 			StorageNew->mtpRtSlsListLen = strlen("");
 		StorageNew->mtpRtUsageState = MTPRTUSAGESTATE_IDLE;
 		StorageNew->mtpRtRlSlot = 0;
-		StorageNew->mtpRtProfile = (uint8_t *) strdup("");
-		StorageNew->mtpRtProfileLen = strlen("");
+		if ((StorageNew->mtpRtProfile = (uint8_t *) strdup("")) != NULL)
+			StorageNew->mtpRtProfileLen = strlen("");
 		StorageNew->mtpRtRowStatus = 0;
 		StorageNew->mtpRtRowStatus = RS_NOTREADY;
 	}
@@ -5302,6 +5339,7 @@ store_mtpRtTable(int majorID, int minorID, void *serverarg, void *clientarg)
 			memset(line, 0, sizeof(line));
 			strcat(line, "mtpRtTable ");
 			cptr = line + strlen(line);
+			(void) cptr;
 			/* XXX: remove individual columns if not persistent */
 			cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->mtpMsId, &tmpsize);
 			cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->mtpSpId, &tmpsize);
@@ -5535,6 +5573,7 @@ store_mtpRtLsaTable(int majorID, int minorID, void *serverarg, void *clientarg)
 			memset(line, 0, sizeof(line));
 			strcat(line, "mtpRtLsaTable ");
 			cptr = line + strlen(line);
+			(void) cptr;
 			/* XXX: remove individual columns if not persistent */
 			cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->mtpMsId, &tmpsize);
 			cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->mtpSpId, &tmpsize);
@@ -5580,8 +5619,8 @@ mtpLsProfileTable_create(void)
 		StorageNew->mtpLsProfileParameterM = 3;
 		if ((StorageNew->mtpLsProfileName = (uint8_t *) strdup("")) != NULL)
 			StorageNew->mtpLsProfileNameLen = strlen("");
-		StorageNew->mtpLsProfileSlDefault = (uint8_t *) strdup("");
-		StorageNew->mtpLsProfileSlDefaultLen = strlen("");
+		if ((StorageNew->mtpLsProfileSlDefault = (uint8_t *) strdup("")) != NULL)
+			StorageNew->mtpLsProfileSlDefaultLen = strlen("");
 		StorageNew->mtpLsProfileRowStatus = 0;
 		StorageNew->mtpLsProfileRowStatus = RS_NOTREADY;
 	}
@@ -5780,6 +5819,7 @@ store_mtpLsProfileTable(int majorID, int minorID, void *serverarg, void *clienta
 			memset(line, 0, sizeof(line));
 			strcat(line, "mtpLsProfileTable ");
 			cptr = line + strlen(line);
+			(void) cptr;
 			/* XXX: remove individual columns if not persistent */
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->mtpLsProfileId, &StorageTmp->mtpLsProfileIdLen);
 			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->mtpLsProfileTimerT6, &tmpsize);
@@ -5837,9 +5877,9 @@ mtpLsTable_create(void)
 		StorageNew->mtpLsPeriodicLinkTestFail = TV_FALSE;
 		StorageNew->mtpLsAdministrativeState = MTPLSADMINISTRATIVESTATE_LOCKED;
 		{
-			static oid tmpoid[15] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 3, 1, 4, 4, 1 };
-			if ((StorageNew->mtpLsInLsLoadShareAlgorithm = snmp_duplicate_objid(tmpoid, 15)))
-				StorageNew->mtpLsInLsLoadShareAlgorithmLen = 15;
+			static oid tmpoid[14] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 1, 4, 4, 1 };
+			if ((StorageNew->mtpLsInLsLoadShareAlgorithm = snmp_duplicate_objid(tmpoid, 14)))
+				StorageNew->mtpLsInLsLoadShareAlgorithmLen = 14;
 		}
 		if ((StorageNew->mtpLsProfilePointer = (uint8_t *) strdup("")) != NULL)
 			StorageNew->mtpLsProfilePointerLen = strlen("");
@@ -6092,6 +6132,7 @@ store_mtpLsTable(int majorID, int minorID, void *serverarg, void *clientarg)
 			memset(line, 0, sizeof(line));
 			strcat(line, "mtpLsTable ");
 			cptr = line + strlen(line);
+			(void) cptr;
 			/* XXX: remove individual columns if not persistent */
 			cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->mtpMsId, &tmpsize);
 			cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->mtpSpId, &tmpsize);
@@ -6161,8 +6202,8 @@ mtpSlL3ProfileTable_create(void)
 		StorageNew->mtpSlL3ProfileTimerT1T = 400;
 		StorageNew->mtpSlL3ProfileTimerT2T = 6000;
 		StorageNew->mtpSlL3ProfileTimerT1S = 400;
-		StorageNew->mtpSlL3ProfileL2Default = (uint8_t *) strdup("");
-		StorageNew->mtpSlL3ProfileL2DefaultLen = strlen("");
+		if ((StorageNew->mtpSlL3ProfileL2Default = (uint8_t *) strdup("")) != NULL)
+			StorageNew->mtpSlL3ProfileL2DefaultLen = strlen("");
 		StorageNew->mtpSlL3ProfileRowStatus = 0;
 		StorageNew->mtpSlL3ProfileRowStatus = RS_NOTREADY;
 	}
@@ -6371,6 +6412,7 @@ store_mtpSlL3ProfileTable(int majorID, int minorID, void *serverarg, void *clien
 			memset(line, 0, sizeof(line));
 			strcat(line, "mtpSlL3ProfileTable ");
 			cptr = line + strlen(line);
+			(void) cptr;
 			/* XXX: remove individual columns if not persistent */
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->mtpSlL3ProfileId, &StorageTmp->mtpSlL3ProfileIdLen);
 			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->mtpSlL3ProfileTimerT1, &tmpsize);
@@ -6423,9 +6465,9 @@ mtpSlL2ProfileTable_create(void)
 		/* XXX: fill in default row values here into StorageNew */
 		StorageNew->mtpSlL2ProfileErrorCorrectionMethod = MTPSLL2PROFILEERRORCORRECTIONMETHOD_BASICRETR;
 		{
-			static oid tmpoid[15] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 0, 1, 4, 1, 1, 0 };
-			if ((StorageNew->mtpSlL2ProfileProtocolVariant = snmp_duplicate_objid(tmpoid, 15)))
-				StorageNew->mtpSlL2ProfileProtocolVariantLen = 15;
+			static oid tmpoid[14] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 0, 1, 4, 1, 1 };
+			if ((StorageNew->mtpSlL2ProfileProtocolVariant = snmp_duplicate_objid(tmpoid, 14)))
+				StorageNew->mtpSlL2ProfileProtocolVariantLen = 14;
 		}
 		StorageNew->mtpSlL2ProfileTimerT1 = 4500;
 		StorageNew->mtpSlL2ProfileTimerT2 = 500;
@@ -6435,8 +6477,8 @@ mtpSlL2ProfileTable_create(void)
 		StorageNew->mtpSlL2ProfileTimerT4N = 800;
 		StorageNew->mtpSlL2ProfileTimerT4E = 50;
 		StorageNew->mtpSlL2ProfileTimerT5 = 10;
-		StorageNew->mtpSlL2ProfileTimerT6 = 4000;
-		StorageNew->mtpSlL2ProfileTimerT7 = 1000;
+		StorageNew->mtpSlL2ProfileTimerT6 = 400;
+		StorageNew->mtpSlL2ProfileTimerT7 = 100;
 		StorageNew->mtpSlL2ProfileTbOnset1 = 69632;
 		StorageNew->mtpSlL2ProfileTbAbate1 = 34816;
 		StorageNew->mtpSlL2ProfileNumberOfThresholdLevels = 1;
@@ -6685,6 +6727,7 @@ store_mtpSlL2ProfileTable(int majorID, int minorID, void *serverarg, void *clien
 			memset(line, 0, sizeof(line));
 			strcat(line, "mtpSlL2ProfileTable ");
 			cptr = line + strlen(line);
+			(void) cptr;
 			/* XXX: remove individual columns if not persistent */
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->mtpSlL2ProfileId, &StorageTmp->mtpSlL2ProfileIdLen);
 			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->mtpSlL2ProfileTransmissionRate, &tmpsize);
@@ -6763,8 +6806,8 @@ mtpSlTable_create(void)
 		StorageNew->mtpSlUsageState = MTPSLUSAGESTATE_IDLE;
 		if (memdup((u_char **) &StorageNew->mtpSlProceduralStatus, (u_char *) "\x80", 1) == SNMPERR_SUCCESS)
 			StorageNew->mtpSlProceduralStatusLen = 1;
-		StorageNew->mtpSlMtpL2ProtocolProfilePointer = (uint8_t *) strdup("");
-		StorageNew->mtpSlMtpL2ProtocolProfilePointerLen = strlen("");
+		if ((StorageNew->mtpSlMtpL2ProtocolProfilePointer = (uint8_t *) strdup("")) != NULL)
+			StorageNew->mtpSlMtpL2ProtocolProfilePointerLen = strlen("");
 		if ((StorageNew->mtpSlSignTermPointer = snmp_duplicate_objid(zeroDotZero_oid, 2)))
 			StorageNew->mtpSlSignTermPointerLen = 2;
 		if ((StorageNew->mtpSlSignDataLinkTpPointer = snmp_duplicate_objid(zeroDotZero_oid, 2)))
@@ -6783,8 +6826,8 @@ mtpSlTable_create(void)
 		StorageNew->mtpSlSdtList = 0;
 		if (memdup((u_char **) &StorageNew->mtpSlSlsCodeNormalList, (u_char *) "\xFF\xFF", 2) == SNMPERR_SUCCESS)
 			StorageNew->mtpSlSlsCodeNormalListLen = 2;
-		StorageNew->mtpSlL3ProfilePointer = (uint8_t *) strdup("");
-		StorageNew->mtpSlL3ProfilePointerLen = strlen("");
+		if ((StorageNew->mtpSlL3ProfilePointer = (uint8_t *) strdup("")) != NULL)
+			StorageNew->mtpSlL3ProfilePointerLen = strlen("");
 		if (memdup((u_char **) &StorageNew->mtpSlAlarmStatus, (u_char *) "\x00", 1) == SNMPERR_SUCCESS)
 			StorageNew->mtpSlAlarmStatusLen = 1;
 		StorageNew->mtpSlRowStatus = 0;
@@ -7061,6 +7104,7 @@ store_mtpSlTable(int majorID, int minorID, void *serverarg, void *clientarg)
 			memset(line, 0, sizeof(line));
 			strcat(line, "mtpSlTable ");
 			cptr = line + strlen(line);
+			(void) cptr;
 			/* XXX: remove individual columns if not persistent */
 			cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->mtpMsId, &tmpsize);
 			cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->mtpSpId, &tmpsize);
@@ -7304,6 +7348,7 @@ store_mtpSlSdlListTable(int majorID, int minorID, void *serverarg, void *clienta
 			memset(line, 0, sizeof(line));
 			strcat(line, "mtpSlSdlListTable ");
 			cptr = line + strlen(line);
+			(void) cptr;
 			/* XXX: remove individual columns if not persistent */
 			cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->mtpMsId, &tmpsize);
 			cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->mtpSpId, &tmpsize);
@@ -7524,6 +7569,7 @@ store_mtpSlSdtListTable(int majorID, int minorID, void *serverarg, void *clienta
 			memset(line, 0, sizeof(line));
 			strcat(line, "mtpSlSdtListTable ");
 			cptr = line + strlen(line);
+			(void) cptr;
 			/* XXX: remove individual columns if not persistent */
 			cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->mtpMsId, &tmpsize);
 			cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->mtpSpId, &tmpsize);
@@ -7751,6 +7797,7 @@ store_mtpNbTable(int majorID, int minorID, void *serverarg, void *clientarg)
 			memset(line, 0, sizeof(line));
 			strcat(line, "mtpNbTable ");
 			cptr = line + strlen(line);
+			(void) cptr;
 			/* XXX: remove individual columns if not persistent */
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->mtpSdtProfileId, &StorageTmp->mtpSdtProfileIdLen);
 			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->mtpNbTransmissionRate, &tmpsize);
@@ -8012,6 +8059,7 @@ store_mtpSaalTable(int majorID, int minorID, void *serverarg, void *clientarg)
 			memset(line, 0, sizeof(line));
 			strcat(line, "mtpSaalTable ");
 			cptr = line + strlen(line);
+			(void) cptr;
 			/* XXX: remove individual columns if not persistent */
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->mtpSdtProfileId, &StorageTmp->mtpSdtProfileIdLen);
 			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->mtpSaalBufferRelease, &tmpsize);
@@ -8281,6 +8329,7 @@ store_mtpM2paTable(int majorID, int minorID, void *serverarg, void *clientarg)
 			memset(line, 0, sizeof(line));
 			strcat(line, "mtpM2paTable ");
 			cptr = line + strlen(line);
+			(void) cptr;
 			/* XXX: remove individual columns if not persistent */
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->mtpSdtProfileId, &StorageTmp->mtpSdtProfileIdLen);
 			cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->mtpM2paN1, &tmpsize);
@@ -8345,8 +8394,8 @@ mtpSdtTable_create(void)
 			StorageNew->mtpSdtNameLen = strlen("");
 		StorageNew->mtpSdtStandbyStatus = 0;
 		StorageNew->mtpSdtPrimaryId = 0;
-		/* StorageNew->mtpSdtProfilePointer = NULL; *//* DEFVAL '' */
-		/* StorageNew->mtpSdtProfilePointer = 0; *//* DEFVAL '' */
+		if ((StorageNew->mtpSdtProfilePointer = snmp_duplicate_objid(zeroDotZero_oid, 2)))
+			StorageNew->mtpSdtProfilePointerLen = 2;
 		StorageNew->mtpSdtRowStatus = 0;
 		StorageNew->mtpSdtRowStatus = RS_NOTREADY;
 	}
@@ -8559,6 +8608,7 @@ store_mtpSdtTable(int majorID, int minorID, void *serverarg, void *clientarg)
 			memset(line, 0, sizeof(line));
 			strcat(line, "mtpSdtTable ");
 			cptr = line + strlen(line);
+			(void) cptr;
 			/* XXX: remove individual columns if not persistent */
 			cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->mtpMsId, &tmpsize);
 			cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->mtpSdtId, &tmpsize);
@@ -8608,8 +8658,8 @@ mtpSdlTable_create(void)
 			StorageNew->mtpSdlEquipmentPointerLen = 2;
 		StorageNew->mtpSdlCIC = 0;
 		StorageNew->mtpSdlTransmissionRate = MTPSDLTRANSMISSIONRATE_KBITS64;
-		/* StorageNew->mtpSdlStmChannel = (uint8_t *) strdup(19); *//* DEFVAL 19 */
-		/* StorageNew->mtpSdlStmChannelLen = strlen(19); *//* DEFVAL 19 */
+		if (memdup((u_char **) &StorageNew->mtpSdlStmChannel, (u_char *) "\x13", 1) == SNMPERR_SUCCESS)
+			StorageNew->mtpSdlStmChannelLen = 1;
 		if ((StorageNew->mtpSdlVcTTpPointer = snmp_duplicate_objid(zeroDotZero_oid, 2)))
 			StorageNew->mtpSdlVcTTpPointerLen = 2;
 		if ((StorageNew->mtpSdlSctpPointer = snmp_duplicate_objid(zeroDotZero_oid, 2)))
@@ -8845,6 +8895,7 @@ store_mtpSdlTable(int majorID, int minorID, void *serverarg, void *clientarg)
 			memset(line, 0, sizeof(line));
 			strcat(line, "mtpSdlTable ");
 			cptr = line + strlen(line);
+			(void) cptr;
 			/* XXX: remove individual columns if not persistent */
 			cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->mtpMsId, &tmpsize);
 			cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->mtpSpId, &tmpsize);
@@ -9088,6 +9139,7 @@ store_mtpSctpProfileTable(int majorID, int minorID, void *serverarg, void *clien
 			memset(line, 0, sizeof(line));
 			strcat(line, "mtpSctpProfileTable ");
 			cptr = line + strlen(line);
+			(void) cptr;
 			/* XXX: remove individual columns if not persistent */
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->mtpSctpProfileId, &StorageTmp->mtpSctpProfileIdLen);
 			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->mtpSctpProfileNoDelay, &tmpsize);
@@ -9138,8 +9190,8 @@ mtpSctpTable_create(void)
 			StorageNew->mtpSctpProceduralStatusLen = 1;
 		StorageNew->mtpSctpLocalPort = 0;
 		StorageNew->mtpSctpRemotePort = 0;
-		StorageNew->mtpSctpProfile = (uint8_t *) strdup("");
-		StorageNew->mtpSctpProfileLen = strlen("");
+		if ((StorageNew->mtpSctpProfile = (uint8_t *) strdup("")) != NULL)
+			StorageNew->mtpSctpProfileLen = strlen("");
 		StorageNew->mtpSctpProtocolPayloadId = 0;
 		StorageNew->mtpSctpRowStatus = 0;
 		StorageNew->mtpSctpRowStatus = RS_NOTREADY;
@@ -9326,6 +9378,7 @@ store_mtpSctpTable(int majorID, int minorID, void *serverarg, void *clientarg)
 			memset(line, 0, sizeof(line));
 			strcat(line, "mtpSctpTable ");
 			cptr = line + strlen(line);
+			(void) cptr;
 			/* XXX: remove individual columns if not persistent */
 			cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->mtpSctpId, &tmpsize);
 			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->mtpSctpAdministrativeState, &tmpsize);
@@ -9535,6 +9588,7 @@ store_mtpSctpLocalTable(int majorID, int minorID, void *serverarg, void *clienta
 			memset(line, 0, sizeof(line));
 			strcat(line, "mtpSctpLocalTable ");
 			cptr = line + strlen(line);
+			(void) cptr;
 			/* XXX: remove individual columns if not persistent */
 			cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->mtpSctpId, &tmpsize);
 			cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->mtpSctpLocalId, &tmpsize);
@@ -9738,6 +9792,7 @@ store_mtpSctpRemoteTable(int majorID, int minorID, void *serverarg, void *client
 			memset(line, 0, sizeof(line));
 			strcat(line, "mtpSctpRemoteTable ");
 			cptr = line + strlen(line);
+			(void) cptr;
 			/* XXX: remove individual columns if not persistent */
 			cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->mtpSctpId, &tmpsize);
 			cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->mtpSctpRemoteId, &tmpsize);
@@ -9975,6 +10030,7 @@ store_mtpM2uaAspTable(int majorID, int minorID, void *serverarg, void *clientarg
 			memset(line, 0, sizeof(line));
 			strcat(line, "mtpM2uaAspTable ");
 			cptr = line + strlen(line);
+			(void) cptr;
 			/* XXX: remove individual columns if not persistent */
 			cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->mtpSctpId, &tmpsize);
 			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->mtpM2uaAspState, &tmpsize);
@@ -10018,8 +10074,11 @@ mtpM2uaAsTable_create(void)
 		if ((StorageNew->mtpM2uaInterfaceIdentifierText = (uint8_t *) strdup("")) != NULL)
 			StorageNew->mtpM2uaInterfaceIdentifierTextLen = strlen("");
 		StorageNew->mtpM2uaAsSDTI = 0;
-		/* StorageNew->mtpM2uaAsTrafficMode = NULL; *//* DEFVAL OPENSS7-SIGTRAN-TC : activeStandby */
-		/* StorageNew->mtpM2uaAsTrafficMode = 0; *//* DEFVAL OPENSS7-SIGTRAN-TC : activeStandby */
+		{
+			static oid tmpoid[11] = { 1, 3, 6, 1, 4, 1, 29591, 1, 10, 1, 1 };
+			if ((StorageNew->mtpM2uaAsTrafficMode = snmp_duplicate_objid(tmpoid, 11)))
+				StorageNew->mtpM2uaAsTrafficModeLen = 11;
+		}
 		StorageNew->mtpM2uaAsRowStatus = 0;
 		StorageNew->mtpM2uaAsRowStatus = RS_NOTREADY;
 	}
@@ -10163,7 +10222,7 @@ parse_mtpM2uaAsTable(const char *token, char *line)
 	line = read_config_read_data(ASN_UNSIGNED, line, &StorageTmp->mtpM3uaAsId, &tmpsize);
 	line = read_config_read_data(ASN_UNSIGNED, line, &StorageTmp->mtpM2uaAsId, &tmpsize);
 	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->mtpM2uaAsState, &tmpsize);
-	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->mtpM2uaAsInterfaceIdentifier, &tmpsize);
+	line = read_config_read_data(ASN_UNSIGNED, line, &StorageTmp->mtpM2uaAsInterfaceIdentifier, &tmpsize);
 	SNMP_FREE(StorageTmp->mtpM2uaInterfaceIdentifierText);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->mtpM2uaInterfaceIdentifierText, &StorageTmp->mtpM2uaInterfaceIdentifierTextLen);
 	if (StorageTmp->mtpM2uaInterfaceIdentifierText == NULL) {
@@ -10206,12 +10265,13 @@ store_mtpM2uaAsTable(int majorID, int minorID, void *serverarg, void *clientarg)
 			memset(line, 0, sizeof(line));
 			strcat(line, "mtpM2uaAsTable ");
 			cptr = line + strlen(line);
+			(void) cptr;
 			/* XXX: remove individual columns if not persistent */
 			cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->mtpSctpId, &tmpsize);
 			cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->mtpM3uaAsId, &tmpsize);
 			cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->mtpM2uaAsId, &tmpsize);
 			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->mtpM2uaAsState, &tmpsize);
-			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->mtpM2uaAsInterfaceIdentifier, &tmpsize);
+			cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->mtpM2uaAsInterfaceIdentifier, &tmpsize);
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->mtpM2uaInterfaceIdentifierText, &StorageTmp->mtpM2uaInterfaceIdentifierTextLen);
 			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->mtpM2uaAsSDTI, &tmpsize);
 			cptr = read_config_store_data(ASN_OBJECT_ID, cptr, &StorageTmp->mtpM2uaAsTrafficMode, &StorageTmp->mtpM2uaAsTrafficModeLen);
@@ -10240,7 +10300,7 @@ mtpM3uaAspTable_create(void)
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
 		StorageNew->mtpSctpId = 0;
-		StorageNew->mtpM3uaAspState = 0;
+		StorageNew->mtpM3uaAspState = MTPM3UAASPSTATE_DOWN;
 		StorageNew->mtpM3uaAsType = MTPM3UAASTYPE_IPSP;
 		StorageNew->mtpM3uaAspId = 0;
 		if (memdup((u_char **) &StorageNew->mtpM3uaAspCapabilities, (u_char *) "\x00\x00", 2) == SNMPERR_SUCCESS)
@@ -10450,6 +10510,7 @@ store_mtpM3uaAspTable(int majorID, int minorID, void *serverarg, void *clientarg
 			memset(line, 0, sizeof(line));
 			strcat(line, "mtpM3uaAspTable ");
 			cptr = line + strlen(line);
+			(void) cptr;
 			/* XXX: remove individual columns if not persistent */
 			cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->mtpSctpId, &tmpsize);
 			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->mtpM3uaAspState, &tmpsize);
@@ -10679,6 +10740,7 @@ store_mtpM3uaAsTable(int majorID, int minorID, void *serverarg, void *clientarg)
 			memset(line, 0, sizeof(line));
 			strcat(line, "mtpM3uaAsTable ");
 			cptr = line + strlen(line);
+			(void) cptr;
 			/* XXX: remove individual columns if not persistent */
 			cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->mtpSctpId, &tmpsize);
 			cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->mtpM3uaAsId, &tmpsize);
@@ -15986,11 +16048,11 @@ write_mtpSapUserPart(int action, u_char *var_val, u_char var_val_type, size_t va
 {
 	static long old_value;
 	struct mtpSapTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("mtpMIB", "write_mtpSapUserPart entering action=%d...  \n", action));
-	StorageTmp = header_complex(mtpSapTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(mtpSapTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -16073,11 +16135,11 @@ write_mtpSapUserPartStatus(int action, u_char *var_val, u_char var_val_type, siz
 {
 	static long old_value;
 	struct mtpSapTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("mtpMIB", "write_mtpSapUserPartStatus entering action=%d...  \n", action));
-	StorageTmp = header_complex(mtpSapTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(mtpSapTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -16147,12 +16209,12 @@ write_mtpSapProviderEntityNames(int action, u_char *var_val, u_char var_val_type
 {
 	static oid *old_value;
 	struct mtpSapTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	static size_t old_length = 0;
 	static oid *objid = NULL;
 
 	DEBUGMSGTL(("mtpMIB", "write_mtpSapProviderEntityNames entering action=%d...  \n", action));
-	StorageTmp = header_complex(mtpSapTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(mtpSapTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		objid = NULL;
@@ -16223,12 +16285,12 @@ write_mtpSapAsaProfilePointer(int action, u_char *var_val, u_char var_val_type, 
 {
 	static oid *old_value;
 	struct mtpSapTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	static size_t old_length = 0;
 	static oid *objid = NULL;
 
 	DEBUGMSGTL(("mtpMIB", "write_mtpSapAsaProfilePointer entering action=%d...  \n", action));
-	StorageTmp = header_complex(mtpSapTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(mtpSapTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		objid = NULL;
@@ -16253,7 +16315,7 @@ write_mtpSapAsaProfilePointer(int action, u_char *var_val, u_char var_val_type, 
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to mtpSapAsaProfilePointer: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
-		/* Note: default value { zeroDotZero } */
+		/* Note: default value zeroDotZero */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
 		if ((objid = snmp_duplicate_objid((void *) var_val, var_val_len / sizeof(oid))) == NULL)
@@ -16300,12 +16362,12 @@ write_mtpSapName(int action, u_char *var_val, u_char var_val_type, size_t var_va
 {
 	static uint8_t *old_value;
 	struct mtpSapTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	static size_t old_length = 0;
 	static uint8_t *string = NULL;
 
 	DEBUGMSGTL(("mtpMIB", "write_mtpSapName entering action=%d...  \n", action));
-	StorageTmp = header_complex(mtpSapTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(mtpSapTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		string = NULL;
@@ -16379,11 +16441,11 @@ write_mtpSapLongMessageSupported(int action, u_char *var_val, u_char var_val_typ
 {
 	static long old_value;
 	struct mtpSapTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("mtpMIB", "write_mtpSapLongMessageSupported entering action=%d...  \n", action));
-	StorageTmp = header_complex(mtpSapTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(mtpSapTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -16452,12 +16514,12 @@ write_mtpNaProtocolVariant(int action, u_char *var_val, u_char var_val_type, siz
 {
 	static oid *old_value;
 	struct mtpNaTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	static size_t old_length = 0;
 	static oid *objid = NULL;
 
 	DEBUGMSGTL(("mtpMIB", "write_mtpNaProtocolVariant entering action=%d...  \n", action));
-	StorageTmp = header_complex(mtpNaTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(mtpNaTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		objid = NULL;
@@ -16478,12 +16540,11 @@ write_mtpNaProtocolVariant(int action, u_char *var_val, u_char var_val_type, siz
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to mtpNaProtocolVariant not ASN_OBJECT_ID\n");
 			return SNMP_ERR_WRONGTYPE;
 		}
-		/* Note: ranges 14..15 */
-		if (MIN_OID_LEN * sizeof(oid) > var_val_len || var_val_len > MAX_OID_LEN * sizeof(oid) || ((14 * sizeof(oid) > var_val_len || var_val_len > 15 * sizeof(oid)))) {
+		if (MIN_OID_LEN * sizeof(oid) > var_val_len || var_val_len > MAX_OID_LEN * sizeof(oid)) {
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to mtpNaProtocolVariant: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
-		/* Note: default value { OPENSS7-SS7-MIB : ss7ProtocolItut 0 } */
+		/* Note: default value ss7ProtocolItut */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
 		if ((objid = snmp_duplicate_objid((void *) var_val, var_val_len / sizeof(oid))) == NULL)
@@ -16530,11 +16591,11 @@ write_mtpNaProtocolYear(int action, u_char *var_val, u_char var_val_type, size_t
 {
 	static long old_value;
 	struct mtpNaTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("mtpMIB", "write_mtpNaProtocolYear entering action=%d...  \n", action));
-	StorageTmp = header_complex(mtpNaTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(mtpNaTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -16611,12 +16672,12 @@ write_mtpNaProtocolOptions(int action, u_char *var_val, u_char var_val_type, siz
 {
 	static uint8_t *old_value;
 	struct mtpNaTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	static size_t old_length = 0;
 	static uint8_t *string = NULL;
 
 	DEBUGMSGTL(("mtpMIB", "write_mtpNaProtocolOptions entering action=%d...  \n", action));
-	StorageTmp = header_complex(mtpNaTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(mtpNaTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		string = NULL;
@@ -16698,11 +16759,11 @@ write_mtpNaNetworkIndicator(int action, u_char *var_val, u_char var_val_type, si
 {
 	static long old_value;
 	struct mtpNaTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("mtpMIB", "write_mtpNaNetworkIndicator entering action=%d...  \n", action));
-	StorageTmp = header_complex(mtpNaTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(mtpNaTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -16774,12 +16835,12 @@ write_mtpNaPointCodeFormat(int action, u_char *var_val, u_char var_val_type, siz
 {
 	static uint8_t *old_value;
 	struct mtpNaTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	static size_t old_length = 0;
 	static uint8_t *string = NULL;
 
 	DEBUGMSGTL(("mtpMIB", "write_mtpNaPointCodeFormat entering action=%d...  \n", action));
-	StorageTmp = header_complex(mtpNaTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(mtpNaTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		string = NULL;
@@ -16805,7 +16866,7 @@ write_mtpNaPointCodeFormat(int action, u_char *var_val, u_char var_val_type, siz
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to mtpNaPointCodeFormat: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
-		/* Note: default value '030803'X */
+		/* Note: default value \"\x03\x08\x03\" */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
 		if ((string = malloc(var_val_len + 1)) == NULL)
@@ -16854,11 +16915,11 @@ write_mtpNaSlsLength(int action, u_char *var_val, u_char var_val_type, size_t va
 {
 	static long old_value;
 	struct mtpNaTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("mtpMIB", "write_mtpNaSlsLength entering action=%d...  \n", action));
-	StorageTmp = header_complex(mtpNaTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(mtpNaTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -16929,12 +16990,12 @@ write_mtpNaSpDefault(int action, u_char *var_val, u_char var_val_type, size_t va
 {
 	static uint8_t *old_value;
 	struct mtpNaTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	static size_t old_length = 0;
 	static uint8_t *string = NULL;
 
 	DEBUGMSGTL(("mtpMIB", "write_mtpNaSpDefault entering action=%d...  \n", action));
-	StorageTmp = header_complex(mtpNaTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(mtpNaTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		string = NULL;
@@ -16960,7 +17021,7 @@ write_mtpNaSpDefault(int action, u_char *var_val, u_char var_val_type, size_t va
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to mtpNaSpDefault: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
-		/* Note: default value '' */
+		/* Note: default value \"\" */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
 		if ((string = malloc(var_val_len + 1)) == NULL)
@@ -17009,12 +17070,12 @@ write_mtpNaName(int action, u_char *var_val, u_char var_val_type, size_t var_val
 {
 	static uint8_t *old_value;
 	struct mtpNaTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	static size_t old_length = 0;
 	static uint8_t *string = NULL;
 
 	DEBUGMSGTL(("mtpMIB", "write_mtpNaName entering action=%d...  \n", action));
-	StorageTmp = header_complex(mtpNaTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(mtpNaTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		string = NULL;
@@ -17040,7 +17101,7 @@ write_mtpNaName(int action, u_char *var_val, u_char var_val_type, size_t var_val
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to mtpNaName: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
-		/* Note: default value '' */
+		/* Note: default value \"\" */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
 		if ((string = malloc(var_val_len + 1)) == NULL)
@@ -17089,12 +17150,12 @@ write_mtpMsName(int action, u_char *var_val, u_char var_val_type, size_t var_val
 {
 	static uint8_t *old_value;
 	struct mtpMsTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	static size_t old_length = 0;
 	static uint8_t *string = NULL;
 
 	DEBUGMSGTL(("mtpMIB", "write_mtpMsName entering action=%d...  \n", action));
-	StorageTmp = header_complex(mtpMsTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(mtpMsTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		string = NULL;
@@ -17168,12 +17229,12 @@ write_mtpMsAlarmStatus(int action, u_char *var_val, u_char var_val_type, size_t 
 {
 	static uint8_t *old_value;
 	struct mtpMsTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	static size_t old_length = 0;
 	static uint8_t *string = NULL;
 
 	DEBUGMSGTL(("mtpMIB", "write_mtpMsAlarmStatus entering action=%d...  \n", action));
-	StorageTmp = header_complex(mtpMsTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(mtpMsTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		string = NULL;
@@ -17254,12 +17315,12 @@ write_mtpMsUserLabel(int action, u_char *var_val, u_char var_val_type, size_t va
 {
 	static uint8_t *old_value;
 	struct mtpMsTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	static size_t old_length = 0;
 	static uint8_t *string = NULL;
 
 	DEBUGMSGTL(("mtpMIB", "write_mtpMsUserLabel entering action=%d...  \n", action));
-	StorageTmp = header_complex(mtpMsTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(mtpMsTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		string = NULL;
@@ -17333,12 +17394,12 @@ write_mtpMsAsaProfilePointer(int action, u_char *var_val, u_char var_val_type, s
 {
 	static oid *old_value;
 	struct mtpMsTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	static size_t old_length = 0;
 	static oid *objid = NULL;
 
 	DEBUGMSGTL(("mtpMIB", "write_mtpMsAsaProfilePointer entering action=%d...  \n", action));
-	StorageTmp = header_complex(mtpMsTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(mtpMsTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		objid = NULL;
@@ -17363,7 +17424,7 @@ write_mtpMsAsaProfilePointer(int action, u_char *var_val, u_char var_val_type, s
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to mtpMsAsaProfilePointer: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
-		/* Note: default value { zeroDotZero } */
+		/* Note: default value zeroDotZero */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
 		if ((objid = snmp_duplicate_objid((void *) var_val, var_val_len / sizeof(oid))) == NULL)
@@ -17410,12 +17471,12 @@ write_mtpMsNetworkElementAliases(int action, u_char *var_val, u_char var_val_typ
 {
 	static uint8_t *old_value;
 	struct mtpMsTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	static size_t old_length = 0;
 	static uint8_t *string = NULL;
 
 	DEBUGMSGTL(("mtpMIB", "write_mtpMsNetworkElementAliases entering action=%d...  \n", action));
-	StorageTmp = header_complex(mtpMsTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(mtpMsTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		string = NULL;
@@ -17489,11 +17550,11 @@ write_mtpSpProfileTimerT1R(int action, u_char *var_val, u_char var_val_type, siz
 {
 	static long old_value;
 	struct mtpSpProfileTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("mtpMIB", "write_mtpSpProfileTimerT1R entering action=%d...  \n", action));
-	StorageTmp = header_complex(mtpSpProfileTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(mtpSpProfileTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -17560,11 +17621,11 @@ write_mtpSpProfileTimerT2(int action, u_char *var_val, u_char var_val_type, size
 {
 	static long old_value;
 	struct mtpSpProfileTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("mtpMIB", "write_mtpSpProfileTimerT2 entering action=%d...  \n", action));
-	StorageTmp = header_complex(mtpSpProfileTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(mtpSpProfileTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -17631,11 +17692,11 @@ write_mtpSpProfileTimerT4(int action, u_char *var_val, u_char var_val_type, size
 {
 	static long old_value;
 	struct mtpSpProfileTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("mtpMIB", "write_mtpSpProfileTimerT4 entering action=%d...  \n", action));
-	StorageTmp = header_complex(mtpSpProfileTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(mtpSpProfileTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -17702,11 +17763,11 @@ write_mtpSpProfileTimerT5(int action, u_char *var_val, u_char var_val_type, size
 {
 	static long old_value;
 	struct mtpSpProfileTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("mtpMIB", "write_mtpSpProfileTimerT5 entering action=%d...  \n", action));
-	StorageTmp = header_complex(mtpSpProfileTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(mtpSpProfileTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -17773,11 +17834,11 @@ write_mtpSpProfileTimerT7(int action, u_char *var_val, u_char var_val_type, size
 {
 	static long old_value;
 	struct mtpSpProfileTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("mtpMIB", "write_mtpSpProfileTimerT7 entering action=%d...  \n", action));
-	StorageTmp = header_complex(mtpSpProfileTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(mtpSpProfileTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -17844,11 +17905,11 @@ write_mtpSpProfileTimerT11(int action, u_char *var_val, u_char var_val_type, siz
 {
 	static long old_value;
 	struct mtpSpProfileTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("mtpMIB", "write_mtpSpProfileTimerT11 entering action=%d...  \n", action));
-	StorageTmp = header_complex(mtpSpProfileTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(mtpSpProfileTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -17915,11 +17976,11 @@ write_mtpSpProfileTimerT12(int action, u_char *var_val, u_char var_val_type, siz
 {
 	static long old_value;
 	struct mtpSpProfileTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("mtpMIB", "write_mtpSpProfileTimerT12 entering action=%d...  \n", action));
-	StorageTmp = header_complex(mtpSpProfileTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(mtpSpProfileTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -17986,11 +18047,11 @@ write_mtpSpProfileTimerT13(int action, u_char *var_val, u_char var_val_type, siz
 {
 	static long old_value;
 	struct mtpSpProfileTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("mtpMIB", "write_mtpSpProfileTimerT13 entering action=%d...  \n", action));
-	StorageTmp = header_complex(mtpSpProfileTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(mtpSpProfileTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -18057,11 +18118,11 @@ write_mtpSpProfileTimerT14(int action, u_char *var_val, u_char var_val_type, siz
 {
 	static long old_value;
 	struct mtpSpProfileTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("mtpMIB", "write_mtpSpProfileTimerT14 entering action=%d...  \n", action));
-	StorageTmp = header_complex(mtpSpProfileTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(mtpSpProfileTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -18128,11 +18189,11 @@ write_mtpSpProfileTimerT15(int action, u_char *var_val, u_char var_val_type, siz
 {
 	static long old_value;
 	struct mtpSpProfileTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("mtpMIB", "write_mtpSpProfileTimerT15 entering action=%d...  \n", action));
-	StorageTmp = header_complex(mtpSpProfileTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(mtpSpProfileTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -18199,11 +18260,11 @@ write_mtpSpProfileTimerT16(int action, u_char *var_val, u_char var_val_type, siz
 {
 	static long old_value;
 	struct mtpSpProfileTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("mtpMIB", "write_mtpSpProfileTimerT16 entering action=%d...  \n", action));
-	StorageTmp = header_complex(mtpSpProfileTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(mtpSpProfileTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -18270,11 +18331,11 @@ write_mtpSpProfileTimerT18I(int action, u_char *var_val, u_char var_val_type, si
 {
 	static long old_value;
 	struct mtpSpProfileTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("mtpMIB", "write_mtpSpProfileTimerT18I entering action=%d...  \n", action));
-	StorageTmp = header_complex(mtpSpProfileTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(mtpSpProfileTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -18341,11 +18402,11 @@ write_mtpSpProfileTimerT19I(int action, u_char *var_val, u_char var_val_type, si
 {
 	static long old_value;
 	struct mtpSpProfileTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("mtpMIB", "write_mtpSpProfileTimerT19I entering action=%d...  \n", action));
-	StorageTmp = header_complex(mtpSpProfileTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(mtpSpProfileTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -18412,11 +18473,11 @@ write_mtpSpProfileTimerT20I(int action, u_char *var_val, u_char var_val_type, si
 {
 	static long old_value;
 	struct mtpSpProfileTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("mtpMIB", "write_mtpSpProfileTimerT20I entering action=%d...  \n", action));
-	StorageTmp = header_complex(mtpSpProfileTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(mtpSpProfileTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -18483,11 +18544,11 @@ write_mtpSpProfileTimerT21I(int action, u_char *var_val, u_char var_val_type, si
 {
 	static long old_value;
 	struct mtpSpProfileTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("mtpMIB", "write_mtpSpProfileTimerT21I entering action=%d...  \n", action));
-	StorageTmp = header_complex(mtpSpProfileTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(mtpSpProfileTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -18554,11 +18615,11 @@ write_mtpSpProfileTimerT22I(int action, u_char *var_val, u_char var_val_type, si
 {
 	static long old_value;
 	struct mtpSpProfileTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("mtpMIB", "write_mtpSpProfileTimerT22I entering action=%d...  \n", action));
-	StorageTmp = header_complex(mtpSpProfileTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(mtpSpProfileTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -18625,11 +18686,11 @@ write_mtpSpProfileTimerT23I(int action, u_char *var_val, u_char var_val_type, si
 {
 	static long old_value;
 	struct mtpSpProfileTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("mtpMIB", "write_mtpSpProfileTimerT23I entering action=%d...  \n", action));
-	StorageTmp = header_complex(mtpSpProfileTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(mtpSpProfileTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -18696,11 +18757,11 @@ write_mtpSpProfileTimerT20A(int action, u_char *var_val, u_char var_val_type, si
 {
 	static long old_value;
 	struct mtpSpProfileTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("mtpMIB", "write_mtpSpProfileTimerT20A entering action=%d...  \n", action));
-	StorageTmp = header_complex(mtpSpProfileTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(mtpSpProfileTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -18767,11 +18828,11 @@ write_mtpSpProfileTimerT21A(int action, u_char *var_val, u_char var_val_type, si
 {
 	static long old_value;
 	struct mtpSpProfileTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("mtpMIB", "write_mtpSpProfileTimerT21A entering action=%d...  \n", action));
-	StorageTmp = header_complex(mtpSpProfileTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(mtpSpProfileTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -18838,11 +18899,11 @@ write_mtpSpProfileTimerT22A(int action, u_char *var_val, u_char var_val_type, si
 {
 	static long old_value;
 	struct mtpSpProfileTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("mtpMIB", "write_mtpSpProfileTimerT22A entering action=%d...  \n", action));
-	StorageTmp = header_complex(mtpSpProfileTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(mtpSpProfileTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -18909,11 +18970,11 @@ write_mtpSpProfileTimerT23A(int action, u_char *var_val, u_char var_val_type, si
 {
 	static long old_value;
 	struct mtpSpProfileTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("mtpMIB", "write_mtpSpProfileTimerT23A entering action=%d...  \n", action));
-	StorageTmp = header_complex(mtpSpProfileTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(mtpSpProfileTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -18980,11 +19041,11 @@ write_mtpSpProfileTimerT24A(int action, u_char *var_val, u_char var_val_type, si
 {
 	static long old_value;
 	struct mtpSpProfileTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("mtpMIB", "write_mtpSpProfileTimerT24A entering action=%d...  \n", action));
-	StorageTmp = header_complex(mtpSpProfileTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(mtpSpProfileTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -19051,11 +19112,11 @@ write_mtpSpProfileTimerT26A(int action, u_char *var_val, u_char var_val_type, si
 {
 	static long old_value;
 	struct mtpSpProfileTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("mtpMIB", "write_mtpSpProfileTimerT26A entering action=%d...  \n", action));
-	StorageTmp = header_complex(mtpSpProfileTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(mtpSpProfileTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -19122,11 +19183,11 @@ write_mtpSpProfileTimerT27A(int action, u_char *var_val, u_char var_val_type, si
 {
 	static long old_value;
 	struct mtpSpProfileTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("mtpMIB", "write_mtpSpProfileTimerT27A entering action=%d...  \n", action));
-	StorageTmp = header_complex(mtpSpProfileTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(mtpSpProfileTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -19193,11 +19254,11 @@ write_mtpSpProfileTimerT1T(int action, u_char *var_val, u_char var_val_type, siz
 {
 	static long old_value;
 	struct mtpSpProfileTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("mtpMIB", "write_mtpSpProfileTimerT1T entering action=%d...  \n", action));
-	StorageTmp = header_complex(mtpSpProfileTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(mtpSpProfileTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -19264,11 +19325,11 @@ write_mtpSpProfileTimerT2T(int action, u_char *var_val, u_char var_val_type, siz
 {
 	static long old_value;
 	struct mtpSpProfileTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("mtpMIB", "write_mtpSpProfileTimerT2T entering action=%d...  \n", action));
-	StorageTmp = header_complex(mtpSpProfileTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(mtpSpProfileTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -19335,12 +19396,12 @@ write_mtpSpProfileName(int action, u_char *var_val, u_char var_val_type, size_t 
 {
 	static uint8_t *old_value;
 	struct mtpSpProfileTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	static size_t old_length = 0;
 	static uint8_t *string = NULL;
 
 	DEBUGMSGTL(("mtpMIB", "write_mtpSpProfileName entering action=%d...  \n", action));
-	StorageTmp = header_complex(mtpSpProfileTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(mtpSpProfileTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		string = NULL;
@@ -19414,11 +19475,11 @@ write_mtpSpProfileCircularRteDetect(int action, u_char *var_val, u_char var_val_
 {
 	static long old_value;
 	struct mtpSpProfileTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("mtpMIB", "write_mtpSpProfileCircularRteDetect entering action=%d...  \n", action));
-	StorageTmp = header_complex(mtpSpProfileTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(mtpSpProfileTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -19490,12 +19551,12 @@ write_mtpSpRsDefault(int action, u_char *var_val, u_char var_val_type, size_t va
 {
 	static uint8_t *old_value;
 	struct mtpSpProfileTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	static size_t old_length = 0;
 	static uint8_t *string = NULL;
 
 	DEBUGMSGTL(("mtpMIB", "write_mtpSpRsDefault entering action=%d...  \n", action));
-	StorageTmp = header_complex(mtpSpProfileTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(mtpSpProfileTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		string = NULL;
@@ -19521,7 +19582,7 @@ write_mtpSpRsDefault(int action, u_char *var_val, u_char var_val_type, size_t va
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to mtpSpRsDefault: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
-		/* Note: default value '' */
+		/* Note: default value \"\" */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
 		if ((string = malloc(var_val_len + 1)) == NULL)
@@ -19570,12 +19631,12 @@ write_mtpSpLsDefault(int action, u_char *var_val, u_char var_val_type, size_t va
 {
 	static uint8_t *old_value;
 	struct mtpSpProfileTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	static size_t old_length = 0;
 	static uint8_t *string = NULL;
 
 	DEBUGMSGTL(("mtpMIB", "write_mtpSpLsDefault entering action=%d...  \n", action));
-	StorageTmp = header_complex(mtpSpProfileTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(mtpSpProfileTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		string = NULL;
@@ -19601,7 +19662,7 @@ write_mtpSpLsDefault(int action, u_char *var_val, u_char var_val_type, size_t va
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to mtpSpLsDefault: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
-		/* Note: default value '' */
+		/* Note: default value \"\" */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
 		if ((string = malloc(var_val_len + 1)) == NULL)
@@ -19650,12 +19711,12 @@ write_mtpSpPointCode(int action, u_char *var_val, u_char var_val_type, size_t va
 {
 	static uint8_t *old_value;
 	struct mtpSpTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	static size_t old_length = 0;
 	static uint8_t *string = NULL;
 
 	DEBUGMSGTL(("mtpMIB", "write_mtpSpPointCode entering action=%d...  \n", action));
-	StorageTmp = header_complex(mtpSpTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(mtpSpTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		string = NULL;
@@ -19681,7 +19742,7 @@ write_mtpSpPointCode(int action, u_char *var_val, u_char var_val_type, size_t va
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to mtpSpPointCode: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
-		/* Note: default value '00000000'X */
+		/* Note: default value \"\x00\x00\x00\x00\" */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
 		if ((string = malloc(var_val_len + 1)) == NULL)
@@ -19730,11 +19791,11 @@ write_mtpSpType(int action, u_char *var_val, u_char var_val_type, size_t var_val
 {
 	static long old_value;
 	struct mtpSpTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("mtpMIB", "write_mtpSpType entering action=%d...  \n", action));
-	StorageTmp = header_complex(mtpSpTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(mtpSpTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -19805,12 +19866,12 @@ write_mtpSpVersion(int action, u_char *var_val, u_char var_val_type, size_t var_
 {
 	static uint8_t *old_value;
 	struct mtpSpTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	static size_t old_length = 0;
 	static uint8_t *string = NULL;
 
 	DEBUGMSGTL(("mtpMIB", "write_mtpSpVersion entering action=%d...  \n", action));
-	StorageTmp = header_complex(mtpSpTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(mtpSpTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		string = NULL;
@@ -19835,7 +19896,7 @@ write_mtpSpVersion(int action, u_char *var_val, u_char var_val_type, size_t var_
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to mtpSpVersion: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
-		/* Note: default value 'ITU-T Q.704 1996' */
+		/* Note: default value \"ITU-T Q.704 1996\" */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
 		if ((string = malloc(var_val_len + 1)) == NULL)
@@ -19884,11 +19945,11 @@ write_mtpSpNetworkIndicator(int action, u_char *var_val, u_char var_val_type, si
 {
 	static long old_value;
 	struct mtpSpTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("mtpMIB", "write_mtpSpNetworkIndicator entering action=%d...  \n", action));
-	StorageTmp = header_complex(mtpSpTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(mtpSpTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -19960,12 +20021,12 @@ write_mtpSpName(int action, u_char *var_val, u_char var_val_type, size_t var_val
 {
 	static uint8_t *old_value;
 	struct mtpSpTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	static size_t old_length = 0;
 	static uint8_t *string = NULL;
 
 	DEBUGMSGTL(("mtpMIB", "write_mtpSpName entering action=%d...  \n", action));
-	StorageTmp = header_complex(mtpSpTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(mtpSpTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		string = NULL;
@@ -20039,12 +20100,12 @@ write_mtpSpProfilePointer(int action, u_char *var_val, u_char var_val_type, size
 {
 	static uint8_t *old_value;
 	struct mtpSpTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	static size_t old_length = 0;
 	static uint8_t *string = NULL;
 
 	DEBUGMSGTL(("mtpMIB", "write_mtpSpProfilePointer entering action=%d...  \n", action));
-	StorageTmp = header_complex(mtpSpTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(mtpSpTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		string = NULL;
@@ -20070,7 +20131,7 @@ write_mtpSpProfilePointer(int action, u_char *var_val, u_char var_val_type, size
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to mtpSpProfilePointer: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
-		/* Note: default value '' */
+		/* Note: default value \"\" */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
 		if ((string = malloc(var_val_len + 1)) == NULL)
@@ -20119,12 +20180,12 @@ write_mtpSpNaPointer(int action, u_char *var_val, u_char var_val_type, size_t va
 {
 	static oid *old_value;
 	struct mtpSpTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	static size_t old_length = 0;
 	static oid *objid = NULL;
 
 	DEBUGMSGTL(("mtpMIB", "write_mtpSpNaPointer entering action=%d...  \n", action));
-	StorageTmp = header_complex(mtpSpTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(mtpSpTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		objid = NULL;
@@ -20195,12 +20256,12 @@ write_mtpSpOptions(int action, u_char *var_val, u_char var_val_type, size_t var_
 {
 	static uint8_t *old_value;
 	struct mtpSpTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	static size_t old_length = 0;
 	static uint8_t *string = NULL;
 
 	DEBUGMSGTL(("mtpMIB", "write_mtpSpOptions entering action=%d...  \n", action));
-	StorageTmp = header_complex(mtpSpTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(mtpSpTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		string = NULL;
@@ -20282,12 +20343,12 @@ write_mtpSpUsers(int action, u_char *var_val, u_char var_val_type, size_t var_va
 {
 	static uint8_t *old_value;
 	struct mtpSpTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	static size_t old_length = 0;
 	static uint8_t *string = NULL;
 
 	DEBUGMSGTL(("mtpMIB", "write_mtpSpUsers entering action=%d...  \n", action));
-	StorageTmp = header_complex(mtpSpTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(mtpSpTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		string = NULL;
@@ -20369,12 +20430,12 @@ write_mtpSpAlarmStatus(int action, u_char *var_val, u_char var_val_type, size_t 
 {
 	static uint8_t *old_value;
 	struct mtpSpTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	static size_t old_length = 0;
 	static uint8_t *string = NULL;
 
 	DEBUGMSGTL(("mtpMIB", "write_mtpSpAlarmStatus entering action=%d...  \n", action));
-	StorageTmp = header_complex(mtpSpTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(mtpSpTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		string = NULL;
@@ -20455,11 +20516,11 @@ write_mtpL3AdministrativeState(int action, u_char *var_val, u_char var_val_type,
 {
 	static long old_value;
 	struct mtpL3Table_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("mtpMIB", "write_mtpL3AdministrativeState entering action=%d...  \n", action));
-	StorageTmp = header_complex(mtpL3TableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(mtpL3TableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -20530,12 +20591,12 @@ write_mtpL3AsaProfilePointer(int action, u_char *var_val, u_char var_val_type, s
 {
 	static oid *old_value;
 	struct mtpL3Table_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	static size_t old_length = 0;
 	static oid *objid = NULL;
 
 	DEBUGMSGTL(("mtpMIB", "write_mtpL3AsaProfilePointer entering action=%d...  \n", action));
-	StorageTmp = header_complex(mtpL3TableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(mtpL3TableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		objid = NULL;
@@ -20560,7 +20621,7 @@ write_mtpL3AsaProfilePointer(int action, u_char *var_val, u_char var_val_type, s
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to mtpL3AsaProfilePointer: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
-		/* Note: default value { zeroDotZero } */
+		/* Note: default value zeroDotZero */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
 		if ((objid = snmp_duplicate_objid((void *) var_val, var_val_len / sizeof(oid))) == NULL)
@@ -20607,12 +20668,12 @@ write_mtpL3Name(int action, u_char *var_val, u_char var_val_type, size_t var_val
 {
 	static uint8_t *old_value;
 	struct mtpL3Table_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	static size_t old_length = 0;
 	static uint8_t *string = NULL;
 
 	DEBUGMSGTL(("mtpMIB", "write_mtpL3Name entering action=%d...  \n", action));
-	StorageTmp = header_complex(mtpL3TableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(mtpL3TableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		string = NULL;
@@ -20638,7 +20699,7 @@ write_mtpL3Name(int action, u_char *var_val, u_char var_val_type, size_t var_val
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to mtpL3Name: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
-		/* Note: default value '' */
+		/* Note: default value \"\" */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
 		if ((string = malloc(var_val_len + 1)) == NULL)
@@ -20687,11 +20748,11 @@ write_mtpGsAdministrativeState(int action, u_char *var_val, u_char var_val_type,
 {
 	static long old_value;
 	struct mtpGsTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("mtpMIB", "write_mtpGsAdministrativeState entering action=%d...  \n", action));
-	StorageTmp = header_complex(mtpGsTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(mtpGsTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -20762,11 +20823,11 @@ write_mtpGsTreatmentOfOutsideRanges(int action, u_char *var_val, u_char var_val_
 {
 	static long old_value;
 	struct mtpGsTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("mtpMIB", "write_mtpGsTreatmentOfOutsideRanges entering action=%d...  \n", action));
-	StorageTmp = header_complex(mtpGsTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(mtpGsTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -20840,11 +20901,11 @@ write_mtpGsListMode(int action, u_char *var_val, u_char var_val_type, size_t var
 {
 	static long old_value;
 	struct mtpGsTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("mtpMIB", "write_mtpGsListMode entering action=%d...  \n", action));
-	StorageTmp = header_complex(mtpGsTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(mtpGsTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -20914,11 +20975,11 @@ write_mtpGsScreeningByLinkSetOrByOpc(int action, u_char *var_val, u_char var_val
 {
 	static long old_value;
 	struct mtpGsTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("mtpMIB", "write_mtpGsScreeningByLinkSetOrByOpc entering action=%d...  \n", action));
-	StorageTmp = header_complex(mtpGsTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(mtpGsTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -20989,11 +21050,11 @@ write_mtpGsGetScreenedOpcsOrLinkSetsByDpc(int action, u_char *var_val, u_char va
 {
 	static long old_value;
 	struct mtpGsTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("mtpMIB", "write_mtpGsGetScreenedOpcsOrLinkSetsByDpc entering action=%d...  \n", action));
-	StorageTmp = header_complex(mtpGsTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(mtpGsTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -21069,12 +21130,12 @@ write_mtpGsName(int action, u_char *var_val, u_char var_val_type, size_t var_val
 {
 	static uint8_t *old_value;
 	struct mtpGsTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	static size_t old_length = 0;
 	static uint8_t *string = NULL;
 
 	DEBUGMSGTL(("mtpMIB", "write_mtpGsName entering action=%d...  \n", action));
-	StorageTmp = header_complex(mtpGsTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(mtpGsTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		string = NULL;
@@ -21148,12 +21209,12 @@ write_mtpGsLineObject(int action, u_char *var_val, u_char var_val_type, size_t v
 {
 	static oid *old_value;
 	struct mtpGsLineTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	static size_t old_length = 0;
 	static oid *objid = NULL;
 
 	DEBUGMSGTL(("mtpMIB", "write_mtpGsLineObject entering action=%d...  \n", action));
-	StorageTmp = header_complex(mtpGsLineTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(mtpGsLineTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		objid = NULL;
@@ -21178,7 +21239,7 @@ write_mtpGsLineObject(int action, u_char *var_val, u_char var_val_type, size_t v
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to mtpGsLineObject: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
-		/* Note: default value { zeroDotZero } */
+		/* Note: default value zeroDotZero */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
 		if ((objid = snmp_duplicate_objid((void *) var_val, var_val_len / sizeof(oid))) == NULL)
@@ -21225,11 +21286,11 @@ write_mtpGsLineContent(int action, u_char *var_val, u_char var_val_type, size_t 
 {
 	static ulong old_value;
 	struct mtpGsLineTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	ulong set_value = *((ulong *) var_val);
 
 	DEBUGMSGTL(("mtpMIB", "write_mtpGsLineContent entering action=%d...  \n", action));
-	StorageTmp = header_complex(mtpGsLineTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(mtpGsLineTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -21290,12 +21351,12 @@ write_mtpGsLineContentDesignatedDPCFirst(int action, u_char *var_val, u_char var
 {
 	static uint8_t *old_value;
 	struct mtpGsLineContentTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	static size_t old_length = 0;
 	static uint8_t *string = NULL;
 
 	DEBUGMSGTL(("mtpMIB", "write_mtpGsLineContentDesignatedDPCFirst entering action=%d...  \n", action));
-	StorageTmp = header_complex(mtpGsLineContentTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(mtpGsLineContentTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		string = NULL;
@@ -21321,7 +21382,7 @@ write_mtpGsLineContentDesignatedDPCFirst(int action, u_char *var_val, u_char var
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to mtpGsLineContentDesignatedDPCFirst: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
-		/* Note: default value '00000000'X */
+		/* Note: default value \"\x00\x00\x00\x00\" */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
 		if ((string = malloc(var_val_len + 1)) == NULL)
@@ -21370,12 +21431,12 @@ write_mtpGsLineContentDesignatedDPCLast(int action, u_char *var_val, u_char var_
 {
 	static uint8_t *old_value;
 	struct mtpGsLineContentTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	static size_t old_length = 0;
 	static uint8_t *string = NULL;
 
 	DEBUGMSGTL(("mtpMIB", "write_mtpGsLineContentDesignatedDPCLast entering action=%d...  \n", action));
-	StorageTmp = header_complex(mtpGsLineContentTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(mtpGsLineContentTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		string = NULL;
@@ -21401,7 +21462,7 @@ write_mtpGsLineContentDesignatedDPCLast(int action, u_char *var_val, u_char var_
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to mtpGsLineContentDesignatedDPCLast: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
-		/* Note: default value '00000000'X */
+		/* Note: default value \"\x00\x00\x00\x00\" */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
 		if ((string = malloc(var_val_len + 1)) == NULL)
@@ -21450,12 +21511,12 @@ write_mtpGsLineContentSiMask(int action, u_char *var_val, u_char var_val_type, s
 {
 	static uint8_t *old_value;
 	struct mtpGsLineContentTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	static size_t old_length = 0;
 	static uint8_t *string = NULL;
 
 	DEBUGMSGTL(("mtpMIB", "write_mtpGsLineContentSiMask entering action=%d...  \n", action));
-	StorageTmp = header_complex(mtpGsLineContentTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(mtpGsLineContentTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		string = NULL;
@@ -21488,7 +21549,7 @@ write_mtpGsLineContentSiMask(int action, u_char *var_val, u_char var_val_type, s
 				return SNMP_ERR_WRONGLENGTH;
 			}
 		}
-		/* Note: default value 8191 */
+		/* Note: default value { sccp , tup , isup , dup1 , dup2 , mtup , bisup , siup , spneup , stc , user13 , user14 , user15 } */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
 		if ((string = malloc(var_val_len + 1)) == NULL)
@@ -21537,11 +21598,11 @@ write_mtpGsLineContentMessageTreatment(int action, u_char *var_val, u_char var_v
 {
 	static long old_value;
 	struct mtpGsLineContentTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("mtpMIB", "write_mtpGsLineContentMessageTreatment entering action=%d...  \n", action));
-	StorageTmp = header_complex(mtpGsLineContentTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(mtpGsLineContentTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -21615,12 +21676,12 @@ write_mtpGsLineContentComment(int action, u_char *var_val, u_char var_val_type, 
 {
 	static uint8_t *old_value;
 	struct mtpGsLineContentTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	static size_t old_length = 0;
 	static uint8_t *string = NULL;
 
 	DEBUGMSGTL(("mtpMIB", "write_mtpGsLineContentComment entering action=%d...  \n", action));
-	StorageTmp = header_complex(mtpGsLineContentTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(mtpGsLineContentTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		string = NULL;
@@ -21694,12 +21755,12 @@ write_mtpRsProfileName(int action, u_char *var_val, u_char var_val_type, size_t 
 {
 	static uint8_t *old_value;
 	struct mtpRsProfileTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	static size_t old_length = 0;
 	static uint8_t *string = NULL;
 
 	DEBUGMSGTL(("mtpMIB", "write_mtpRsProfileName entering action=%d...  \n", action));
-	StorageTmp = header_complex(mtpRsProfileTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(mtpRsProfileTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		string = NULL;
@@ -21773,11 +21834,11 @@ write_mtpRsProfileTimerT8(int action, u_char *var_val, u_char var_val_type, size
 {
 	static long old_value;
 	struct mtpRsProfileTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("mtpMIB", "write_mtpRsProfileTimerT8 entering action=%d...  \n", action));
-	StorageTmp = header_complex(mtpRsProfileTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(mtpRsProfileTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -21844,11 +21905,11 @@ write_mtpRsProfileTimerT11(int action, u_char *var_val, u_char var_val_type, siz
 {
 	static long old_value;
 	struct mtpRsProfileTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("mtpMIB", "write_mtpRsProfileTimerT11 entering action=%d...  \n", action));
-	StorageTmp = header_complex(mtpRsProfileTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(mtpRsProfileTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -21915,11 +21976,11 @@ write_mtpRsProfileTimerT15(int action, u_char *var_val, u_char var_val_type, siz
 {
 	static long old_value;
 	struct mtpRsProfileTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("mtpMIB", "write_mtpRsProfileTimerT15 entering action=%d...  \n", action));
-	StorageTmp = header_complex(mtpRsProfileTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(mtpRsProfileTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -21986,11 +22047,11 @@ write_mtpRsProfileTimerT16(int action, u_char *var_val, u_char var_val_type, siz
 {
 	static long old_value;
 	struct mtpRsProfileTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("mtpMIB", "write_mtpRsProfileTimerT16 entering action=%d...  \n", action));
-	StorageTmp = header_complex(mtpRsProfileTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(mtpRsProfileTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -22057,11 +22118,11 @@ write_mtpRsProfileTimerT18A(int action, u_char *var_val, u_char var_val_type, si
 {
 	static long old_value;
 	struct mtpRsProfileTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("mtpMIB", "write_mtpRsProfileTimerT18A entering action=%d...  \n", action));
-	StorageTmp = header_complex(mtpRsProfileTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(mtpRsProfileTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -22128,12 +22189,12 @@ write_mtpRsProfileRtDefault(int action, u_char *var_val, u_char var_val_type, si
 {
 	static uint8_t *old_value;
 	struct mtpRsProfileTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	static size_t old_length = 0;
 	static uint8_t *string = NULL;
 
 	DEBUGMSGTL(("mtpMIB", "write_mtpRsProfileRtDefault entering action=%d...  \n", action));
-	StorageTmp = header_complex(mtpRsProfileTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(mtpRsProfileTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		string = NULL;
@@ -22159,7 +22220,7 @@ write_mtpRsProfileRtDefault(int action, u_char *var_val, u_char var_val_type, si
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to mtpRsProfileRtDefault: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
-		/* Note: default value '' */
+		/* Note: default value \"\" */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
 		if ((string = malloc(var_val_len + 1)) == NULL)
@@ -22208,12 +22269,12 @@ write_mtpRsDest(int action, u_char *var_val, u_char var_val_type, size_t var_val
 {
 	static uint8_t *old_value;
 	struct mtpRsTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	static size_t old_length = 0;
 	static uint8_t *string = NULL;
 
 	DEBUGMSGTL(("mtpMIB", "write_mtpRsDest entering action=%d...  \n", action));
-	StorageTmp = header_complex(mtpRsTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(mtpRsTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		string = NULL;
@@ -22239,7 +22300,7 @@ write_mtpRsDest(int action, u_char *var_val, u_char var_val_type, size_t var_val
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to mtpRsDest: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
-		/* Note: default value '00000000'X */
+		/* Note: default value \"\x00\x00\x00\x00\" */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
 		if ((string = malloc(var_val_len + 1)) == NULL)
@@ -22288,12 +22349,12 @@ write_mtpRsOptions(int action, u_char *var_val, u_char var_val_type, size_t var_
 {
 	static uint8_t *old_value;
 	struct mtpRsTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	static size_t old_length = 0;
 	static uint8_t *string = NULL;
 
 	DEBUGMSGTL(("mtpMIB", "write_mtpRsOptions entering action=%d...  \n", action));
-	StorageTmp = header_complex(mtpRsTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(mtpRsTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		string = NULL;
@@ -22375,11 +22436,11 @@ write_mtpRsAdministrativeState(int action, u_char *var_val, u_char var_val_type,
 {
 	static long old_value;
 	struct mtpRsTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("mtpMIB", "write_mtpRsAdministrativeState entering action=%d...  \n", action));
-	StorageTmp = header_complex(mtpRsTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(mtpRsTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -22450,12 +22511,12 @@ write_mtpRsAsaProfilePointer(int action, u_char *var_val, u_char var_val_type, s
 {
 	static oid *old_value;
 	struct mtpRsTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	static size_t old_length = 0;
 	static oid *objid = NULL;
 
 	DEBUGMSGTL(("mtpMIB", "write_mtpRsAsaProfilePointer entering action=%d...  \n", action));
-	StorageTmp = header_complex(mtpRsTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(mtpRsTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		objid = NULL;
@@ -22480,7 +22541,7 @@ write_mtpRsAsaProfilePointer(int action, u_char *var_val, u_char var_val_type, s
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to mtpRsAsaProfilePointer: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
-		/* Note: default value { zeroDotZero } */
+		/* Note: default value zeroDotZero */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
 		if ((objid = snmp_duplicate_objid((void *) var_val, var_val_len / sizeof(oid))) == NULL)
@@ -22527,12 +22588,12 @@ write_mtpRsLoadsharingInformation(int action, u_char *var_val, u_char var_val_ty
 {
 	static uint8_t *old_value;
 	struct mtpRsTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	static size_t old_length = 0;
 	static uint8_t *string = NULL;
 
 	DEBUGMSGTL(("mtpMIB", "write_mtpRsLoadsharingInformation entering action=%d...  \n", action));
-	StorageTmp = header_complex(mtpRsTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(mtpRsTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		string = NULL;
@@ -22605,12 +22666,12 @@ write_mtpRsLoadsharingObject(int action, u_char *var_val, u_char var_val_type, s
 {
 	static oid *old_value;
 	struct mtpRsTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	static size_t old_length = 0;
 	static oid *objid = NULL;
 
 	DEBUGMSGTL(("mtpMIB", "write_mtpRsLoadsharingObject entering action=%d...  \n", action));
-	StorageTmp = header_complex(mtpRsTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(mtpRsTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		objid = NULL;
@@ -22635,7 +22696,7 @@ write_mtpRsLoadsharingObject(int action, u_char *var_val, u_char var_val_type, s
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to mtpRsLoadsharingObject: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
-		/* Note: default value { zeroDotZero } */
+		/* Note: default value zeroDotZero */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
 		if ((objid = snmp_duplicate_objid((void *) var_val, var_val_len / sizeof(oid))) == NULL)
@@ -22682,12 +22743,12 @@ write_mtpRsRemoteExchangeLabel(int action, u_char *var_val, u_char var_val_type,
 {
 	static uint8_t *old_value;
 	struct mtpRsTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	static size_t old_length = 0;
 	static uint8_t *string = NULL;
 
 	DEBUGMSGTL(("mtpMIB", "write_mtpRsRemoteExchangeLabel entering action=%d...  \n", action));
-	StorageTmp = header_complex(mtpRsTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(mtpRsTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		string = NULL;
@@ -22761,12 +22822,12 @@ write_mtpRsName(int action, u_char *var_val, u_char var_val_type, size_t var_val
 {
 	static uint8_t *old_value;
 	struct mtpRsTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	static size_t old_length = 0;
 	static uint8_t *string = NULL;
 
 	DEBUGMSGTL(("mtpMIB", "write_mtpRsName entering action=%d...  \n", action));
-	StorageTmp = header_complex(mtpRsTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(mtpRsTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		string = NULL;
@@ -22840,12 +22901,12 @@ write_mtpRsProfile(int action, u_char *var_val, u_char var_val_type, size_t var_
 {
 	static uint8_t *old_value;
 	struct mtpRsTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	static size_t old_length = 0;
 	static uint8_t *string = NULL;
 
 	DEBUGMSGTL(("mtpMIB", "write_mtpRsProfile entering action=%d...  \n", action));
-	StorageTmp = header_complex(mtpRsTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(mtpRsTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		string = NULL;
@@ -22871,7 +22932,7 @@ write_mtpRsProfile(int action, u_char *var_val, u_char var_val_type, size_t var_
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to mtpRsProfile: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
-		/* Note: default value '' */
+		/* Note: default value \"\" */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
 		if ((string = malloc(var_val_len + 1)) == NULL)
@@ -22920,12 +22981,12 @@ write_mtpRsAlarmStatus(int action, u_char *var_val, u_char var_val_type, size_t 
 {
 	static uint8_t *old_value;
 	struct mtpRsTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	static size_t old_length = 0;
 	static uint8_t *string = NULL;
 
 	DEBUGMSGTL(("mtpMIB", "write_mtpRsAlarmStatus entering action=%d...  \n", action));
-	StorageTmp = header_complex(mtpRsTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(mtpRsTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		string = NULL;
@@ -23006,11 +23067,11 @@ write_mtpRtProfileTimerT6(int action, u_char *var_val, u_char var_val_type, size
 {
 	static long old_value;
 	struct mtpRtProfileTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("mtpMIB", "write_mtpRtProfileTimerT6 entering action=%d...  \n", action));
-	StorageTmp = header_complex(mtpRtProfileTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(mtpRtProfileTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -23077,11 +23138,11 @@ write_mtpRtProfileTimerT10(int action, u_char *var_val, u_char var_val_type, siz
 {
 	static long old_value;
 	struct mtpRtProfileTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("mtpMIB", "write_mtpRtProfileTimerT10 entering action=%d...  \n", action));
-	StorageTmp = header_complex(mtpRtProfileTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(mtpRtProfileTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -23148,12 +23209,12 @@ write_mtpRtLsPointer(int action, u_char *var_val, u_char var_val_type, size_t va
 {
 	static oid *old_value;
 	struct mtpRtTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	static size_t old_length = 0;
 	static oid *objid = NULL;
 
 	DEBUGMSGTL(("mtpMIB", "write_mtpRtLsPointer entering action=%d...  \n", action));
-	StorageTmp = header_complex(mtpRtTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(mtpRtTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		objid = NULL;
@@ -23178,7 +23239,7 @@ write_mtpRtLsPointer(int action, u_char *var_val, u_char var_val_type, size_t va
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to mtpRtLsPointer: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
-		/* Note: default value { zeroDotZero } */
+		/* Note: default value zeroDotZero */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
 		if ((objid = snmp_duplicate_objid((void *) var_val, var_val_len / sizeof(oid))) == NULL)
@@ -23225,11 +23286,11 @@ write_mtpRtAdministrativeState(int action, u_char *var_val, u_char var_val_type,
 {
 	static long old_value;
 	struct mtpRtTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("mtpMIB", "write_mtpRtAdministrativeState entering action=%d...  \n", action));
-	StorageTmp = header_complex(mtpRtTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(mtpRtTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -23300,11 +23361,11 @@ write_mtpRtInClsLoadsharingAlgorithm(int action, u_char *var_val, u_char var_val
 {
 	static ulong old_value;
 	struct mtpRtTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	ulong set_value = *((ulong *) var_val);
 
 	DEBUGMSGTL(("mtpMIB", "write_mtpRtInClsLoadsharingAlgorithm entering action=%d...  \n", action));
-	StorageTmp = header_complex(mtpRtTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(mtpRtTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -23371,11 +23432,11 @@ write_mtpRtFixedPriority(int action, u_char *var_val, u_char var_val_type, size_
 {
 	static ulong old_value;
 	struct mtpRtTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	ulong set_value = *((ulong *) var_val);
 
 	DEBUGMSGTL(("mtpMIB", "write_mtpRtFixedPriority entering action=%d...  \n", action));
-	StorageTmp = header_complex(mtpRtTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(mtpRtTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -23437,11 +23498,11 @@ write_mtpRtFlexiblePriority(int action, u_char *var_val, u_char var_val_type, si
 {
 	static ulong old_value;
 	struct mtpRtTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	ulong set_value = *((ulong *) var_val);
 
 	DEBUGMSGTL(("mtpMIB", "write_mtpRtFlexiblePriority entering action=%d...  \n", action));
-	StorageTmp = header_complex(mtpRtTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(mtpRtTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -23502,11 +23563,11 @@ write_mtpRtPriorityMode(int action, u_char *var_val, u_char var_val_type, size_t
 {
 	static long old_value;
 	struct mtpRtTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("mtpMIB", "write_mtpRtPriorityMode entering action=%d...  \n", action));
-	StorageTmp = header_complex(mtpRtTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(mtpRtTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -23577,12 +23638,12 @@ write_mtpRtLoadsharingInformation(int action, u_char *var_val, u_char var_val_ty
 {
 	static uint8_t *old_value;
 	struct mtpRtTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	static size_t old_length = 0;
 	static uint8_t *string = NULL;
 
 	DEBUGMSGTL(("mtpMIB", "write_mtpRtLoadsharingInformation entering action=%d...  \n", action));
-	StorageTmp = header_complex(mtpRtTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(mtpRtTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		string = NULL;
@@ -23655,12 +23716,12 @@ write_mtpRtLoadsharingObject(int action, u_char *var_val, u_char var_val_type, s
 {
 	static oid *old_value;
 	struct mtpRtTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	static size_t old_length = 0;
 	static oid *objid = NULL;
 
 	DEBUGMSGTL(("mtpMIB", "write_mtpRtLoadsharingObject entering action=%d...  \n", action));
-	StorageTmp = header_complex(mtpRtTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(mtpRtTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		objid = NULL;
@@ -23685,7 +23746,7 @@ write_mtpRtLoadsharingObject(int action, u_char *var_val, u_char var_val_type, s
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to mtpRtLoadsharingObject: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
-		/* Note: default value { zeroDotZero } */
+		/* Note: default value zeroDotZero */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
 		if ((objid = snmp_duplicate_objid((void *) var_val, var_val_len / sizeof(oid))) == NULL)
@@ -23732,12 +23793,12 @@ write_mtpRtName(int action, u_char *var_val, u_char var_val_type, size_t var_val
 {
 	static uint8_t *old_value;
 	struct mtpRtTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	static size_t old_length = 0;
 	static uint8_t *string = NULL;
 
 	DEBUGMSGTL(("mtpMIB", "write_mtpRtName entering action=%d...  \n", action));
-	StorageTmp = header_complex(mtpRtTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(mtpRtTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		string = NULL;
@@ -23811,12 +23872,12 @@ write_mtpRtSlsList(int action, u_char *var_val, u_char var_val_type, size_t var_
 {
 	static uint8_t *old_value;
 	struct mtpRtTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	static size_t old_length = 0;
 	static uint8_t *string = NULL;
 
 	DEBUGMSGTL(("mtpMIB", "write_mtpRtSlsList entering action=%d...  \n", action));
-	StorageTmp = header_complex(mtpRtTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(mtpRtTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		string = NULL;
@@ -23890,11 +23951,11 @@ write_mtpRtRlSlot(int action, u_char *var_val, u_char var_val_type, size_t var_v
 {
 	static ulong old_value;
 	struct mtpRtTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	ulong set_value = *((ulong *) var_val);
 
 	DEBUGMSGTL(("mtpMIB", "write_mtpRtRlSlot entering action=%d...  \n", action));
-	StorageTmp = header_complex(mtpRtTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(mtpRtTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -23960,12 +24021,12 @@ write_mtpRtProfile(int action, u_char *var_val, u_char var_val_type, size_t var_
 {
 	static uint8_t *old_value;
 	struct mtpRtTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	static size_t old_length = 0;
 	static uint8_t *string = NULL;
 
 	DEBUGMSGTL(("mtpMIB", "write_mtpRtProfile entering action=%d...  \n", action));
-	StorageTmp = header_complex(mtpRtTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(mtpRtTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		string = NULL;
@@ -23991,7 +24052,7 @@ write_mtpRtProfile(int action, u_char *var_val, u_char var_val_type, size_t var_
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to mtpRtProfile: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
-		/* Note: default value '' */
+		/* Note: default value \"\" */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
 		if ((string = malloc(var_val_len + 1)) == NULL)
@@ -24040,11 +24101,11 @@ write_mtpRtLsaNormalSlCode(int action, u_char *var_val, u_char var_val_type, siz
 {
 	static long old_value;
 	struct mtpRtLsaTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("mtpMIB", "write_mtpRtLsaNormalSlCode entering action=%d...  \n", action));
-	StorageTmp = header_complex(mtpRtLsaTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(mtpRtLsaTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	switch (action) {
@@ -24097,12 +24158,12 @@ write_mtpRtLsaAlternativeSlCodeList(int action, u_char *var_val, u_char var_val_
 {
 	static uint8_t *old_value;
 	struct mtpRtLsaTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	static size_t old_length = 0;
 	static uint8_t *string = NULL;
 
 	DEBUGMSGTL(("mtpMIB", "write_mtpRtLsaAlternativeSlCodeList entering action=%d...  \n", action));
-	StorageTmp = header_complex(mtpRtLsaTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(mtpRtLsaTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	switch (action) {
@@ -24163,11 +24224,11 @@ write_mtpLsProfileTimerT6(int action, u_char *var_val, u_char var_val_type, size
 {
 	static long old_value;
 	struct mtpLsProfileTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("mtpMIB", "write_mtpLsProfileTimerT6 entering action=%d...  \n", action));
-	StorageTmp = header_complex(mtpLsProfileTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(mtpLsProfileTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -24234,11 +24295,11 @@ write_mtpLsProfileTimerT8(int action, u_char *var_val, u_char var_val_type, size
 {
 	static long old_value;
 	struct mtpLsProfileTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("mtpMIB", "write_mtpLsProfileTimerT8 entering action=%d...  \n", action));
-	StorageTmp = header_complex(mtpLsProfileTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(mtpLsProfileTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -24305,11 +24366,11 @@ write_mtpLsProfileTimerT10(int action, u_char *var_val, u_char var_val_type, siz
 {
 	static long old_value;
 	struct mtpLsProfileTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("mtpMIB", "write_mtpLsProfileTimerT10 entering action=%d...  \n", action));
-	StorageTmp = header_complex(mtpLsProfileTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(mtpLsProfileTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -24376,11 +24437,11 @@ write_mtpLsProfileTimerT7(int action, u_char *var_val, u_char var_val_type, size
 {
 	static long old_value;
 	struct mtpLsProfileTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("mtpMIB", "write_mtpLsProfileTimerT7 entering action=%d...  \n", action));
-	StorageTmp = header_complex(mtpLsProfileTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(mtpLsProfileTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -24447,11 +24508,11 @@ write_mtpLsProfileTimerT19I(int action, u_char *var_val, u_char var_val_type, si
 {
 	static long old_value;
 	struct mtpLsProfileTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("mtpMIB", "write_mtpLsProfileTimerT19I entering action=%d...  \n", action));
-	StorageTmp = header_complex(mtpLsProfileTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(mtpLsProfileTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -24518,11 +24579,11 @@ write_mtpLsProfileTimerT21I(int action, u_char *var_val, u_char var_val_type, si
 {
 	static long old_value;
 	struct mtpLsProfileTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("mtpMIB", "write_mtpLsProfileTimerT21I entering action=%d...  \n", action));
-	StorageTmp = header_complex(mtpLsProfileTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(mtpLsProfileTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -24589,11 +24650,11 @@ write_mtpLsProfileTimerT25A(int action, u_char *var_val, u_char var_val_type, si
 {
 	static long old_value;
 	struct mtpLsProfileTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("mtpMIB", "write_mtpLsProfileTimerT25A entering action=%d...  \n", action));
-	StorageTmp = header_complex(mtpLsProfileTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(mtpLsProfileTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -24660,11 +24721,11 @@ write_mtpLsProfileTimerT28A(int action, u_char *var_val, u_char var_val_type, si
 {
 	static long old_value;
 	struct mtpLsProfileTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("mtpMIB", "write_mtpLsProfileTimerT28A entering action=%d...  \n", action));
-	StorageTmp = header_complex(mtpLsProfileTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(mtpLsProfileTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -24731,11 +24792,11 @@ write_mtpLsProfileTimerT29A(int action, u_char *var_val, u_char var_val_type, si
 {
 	static long old_value;
 	struct mtpLsProfileTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("mtpMIB", "write_mtpLsProfileTimerT29A entering action=%d...  \n", action));
-	StorageTmp = header_complex(mtpLsProfileTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(mtpLsProfileTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -24802,11 +24863,11 @@ write_mtpLsProfileTimerT30A(int action, u_char *var_val, u_char var_val_type, si
 {
 	static long old_value;
 	struct mtpLsProfileTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("mtpMIB", "write_mtpLsProfileTimerT30A entering action=%d...  \n", action));
-	StorageTmp = header_complex(mtpLsProfileTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(mtpLsProfileTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -24873,11 +24934,11 @@ write_mtpLsProfileParameterN(int action, u_char *var_val, u_char var_val_type, s
 {
 	static ulong old_value;
 	struct mtpLsProfileTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	ulong set_value = *((ulong *) var_val);
 
 	DEBUGMSGTL(("mtpMIB", "write_mtpLsProfileParameterN entering action=%d...  \n", action));
-	StorageTmp = header_complex(mtpLsProfileTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(mtpLsProfileTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -24944,11 +25005,11 @@ write_mtpLsProfileParameterM(int action, u_char *var_val, u_char var_val_type, s
 {
 	static ulong old_value;
 	struct mtpLsProfileTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	ulong set_value = *((ulong *) var_val);
 
 	DEBUGMSGTL(("mtpMIB", "write_mtpLsProfileParameterM entering action=%d...  \n", action));
-	StorageTmp = header_complex(mtpLsProfileTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(mtpLsProfileTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -25015,12 +25076,12 @@ write_mtpLsProfileName(int action, u_char *var_val, u_char var_val_type, size_t 
 {
 	static uint8_t *old_value;
 	struct mtpLsProfileTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	static size_t old_length = 0;
 	static uint8_t *string = NULL;
 
 	DEBUGMSGTL(("mtpMIB", "write_mtpLsProfileName entering action=%d...  \n", action));
-	StorageTmp = header_complex(mtpLsProfileTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(mtpLsProfileTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		string = NULL;
@@ -25094,12 +25155,12 @@ write_mtpLsProfileSlDefault(int action, u_char *var_val, u_char var_val_type, si
 {
 	static uint8_t *old_value;
 	struct mtpLsProfileTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	static size_t old_length = 0;
 	static uint8_t *string = NULL;
 
 	DEBUGMSGTL(("mtpMIB", "write_mtpLsProfileSlDefault entering action=%d...  \n", action));
-	StorageTmp = header_complex(mtpLsProfileTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(mtpLsProfileTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		string = NULL;
@@ -25125,7 +25186,7 @@ write_mtpLsProfileSlDefault(int action, u_char *var_val, u_char var_val_type, si
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to mtpLsProfileSlDefault: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
-		/* Note: default value '' */
+		/* Note: default value \"\" */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
 		if ((string = malloc(var_val_len + 1)) == NULL)
@@ -25174,12 +25235,12 @@ write_mtpLsAdjPc(int action, u_char *var_val, u_char var_val_type, size_t var_va
 {
 	static uint8_t *old_value;
 	struct mtpLsTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	static size_t old_length = 0;
 	static uint8_t *string = NULL;
 
 	DEBUGMSGTL(("mtpMIB", "write_mtpLsAdjPc entering action=%d...  \n", action));
-	StorageTmp = header_complex(mtpLsTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(mtpLsTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		string = NULL;
@@ -25205,7 +25266,7 @@ write_mtpLsAdjPc(int action, u_char *var_val, u_char var_val_type, size_t var_va
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to mtpLsAdjPc: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
-		/* Note: default value '00000000'X */
+		/* Note: default value \"\x00\x00\x00\x00\" */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
 		if ((string = malloc(var_val_len + 1)) == NULL)
@@ -25254,12 +25315,12 @@ write_mtpLsRsId(int action, u_char *var_val, u_char var_val_type, size_t var_val
 {
 	static oid *old_value;
 	struct mtpLsTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	static size_t old_length = 0;
 	static oid *objid = NULL;
 
 	DEBUGMSGTL(("mtpMIB", "write_mtpLsRsId entering action=%d...  \n", action));
-	StorageTmp = header_complex(mtpLsTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(mtpLsTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		objid = NULL;
@@ -25284,7 +25345,7 @@ write_mtpLsRsId(int action, u_char *var_val, u_char var_val_type, size_t var_val
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to mtpLsRsId: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
-		/* Note: default value { zeroDotZero } */
+		/* Note: default value zeroDotZero */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
 		if ((objid = snmp_duplicate_objid((void *) var_val, var_val_len / sizeof(oid))) == NULL)
@@ -25331,11 +25392,11 @@ write_mtpLsMaxCapacity(int action, u_char *var_val, u_char var_val_type, size_t 
 {
 	static ulong old_value;
 	struct mtpLsTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	ulong set_value = *((ulong *) var_val);
 
 	DEBUGMSGTL(("mtpMIB", "write_mtpLsMaxCapacity entering action=%d...  \n", action));
-	StorageTmp = header_complex(mtpLsTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(mtpLsTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -25401,11 +25462,11 @@ write_mtpLsCongestionControlMethod(int action, u_char *var_val, u_char var_val_t
 {
 	static long old_value;
 	struct mtpLsTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("mtpMIB", "write_mtpLsCongestionControlMethod entering action=%d...  \n", action));
-	StorageTmp = header_complex(mtpLsTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(mtpLsTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -25478,11 +25539,11 @@ write_mtpLsPeriodicLinkTestFlag(int action, u_char *var_val, u_char var_val_type
 {
 	static long old_value;
 	struct mtpLsTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("mtpMIB", "write_mtpLsPeriodicLinkTestFlag entering action=%d...  \n", action));
-	StorageTmp = header_complex(mtpLsTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(mtpLsTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -25552,11 +25613,11 @@ write_mtpLsPeriodicLinkTestFail(int action, u_char *var_val, u_char var_val_type
 {
 	static long old_value;
 	struct mtpLsTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("mtpMIB", "write_mtpLsPeriodicLinkTestFail entering action=%d...  \n", action));
-	StorageTmp = header_complex(mtpLsTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(mtpLsTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -25626,11 +25687,11 @@ write_mtpLsAdministrativeState(int action, u_char *var_val, u_char var_val_type,
 {
 	static long old_value;
 	struct mtpLsTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("mtpMIB", "write_mtpLsAdministrativeState entering action=%d...  \n", action));
-	StorageTmp = header_complex(mtpLsTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(mtpLsTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -25701,12 +25762,12 @@ write_mtpLsInLsLoadShareAlgorithm(int action, u_char *var_val, u_char var_val_ty
 {
 	static oid *old_value;
 	struct mtpLsTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	static size_t old_length = 0;
 	static oid *objid = NULL;
 
 	DEBUGMSGTL(("mtpMIB", "write_mtpLsInLsLoadShareAlgorithm entering action=%d...  \n", action));
-	StorageTmp = header_complex(mtpLsTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(mtpLsTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		objid = NULL;
@@ -25731,7 +25792,7 @@ write_mtpLsInLsLoadShareAlgorithm(int action, u_char *var_val, u_char var_val_ty
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to mtpLsInLsLoadShareAlgorithm: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
-		/* Note: default value { defaultInLsLoadShareAlgorithm } */
+		/* Note: default value defaultInLsLoadShareAlgorithm */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
 		if ((objid = snmp_duplicate_objid((void *) var_val, var_val_len / sizeof(oid))) == NULL)
@@ -25778,12 +25839,12 @@ write_mtpLsProfilePointer(int action, u_char *var_val, u_char var_val_type, size
 {
 	static uint8_t *old_value;
 	struct mtpLsTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	static size_t old_length = 0;
 	static uint8_t *string = NULL;
 
 	DEBUGMSGTL(("mtpMIB", "write_mtpLsProfilePointer entering action=%d...  \n", action));
-	StorageTmp = header_complex(mtpLsTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(mtpLsTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		string = NULL;
@@ -25857,11 +25918,11 @@ write_mtpLsNumberOfNormallyActiveSignLinks(int action, u_char *var_val, u_char v
 {
 	static ulong old_value;
 	struct mtpLsTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	ulong set_value = *((ulong *) var_val);
 
 	DEBUGMSGTL(("mtpMIB", "write_mtpLsNumberOfNormallyActiveSignLinks entering action=%d...  \n", action));
-	StorageTmp = header_complex(mtpLsTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(mtpLsTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -25928,12 +25989,12 @@ write_mtpLsName(int action, u_char *var_val, u_char var_val_type, size_t var_val
 {
 	static uint8_t *old_value;
 	struct mtpLsTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	static size_t old_length = 0;
 	static uint8_t *string = NULL;
 
 	DEBUGMSGTL(("mtpMIB", "write_mtpLsName entering action=%d...  \n", action));
-	StorageTmp = header_complex(mtpLsTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(mtpLsTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		string = NULL;
@@ -26007,12 +26068,12 @@ write_mtpLsAsaProfilePointer(int action, u_char *var_val, u_char var_val_type, s
 {
 	static oid *old_value;
 	struct mtpLsTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	static size_t old_length = 0;
 	static oid *objid = NULL;
 
 	DEBUGMSGTL(("mtpMIB", "write_mtpLsAsaProfilePointer entering action=%d...  \n", action));
-	StorageTmp = header_complex(mtpLsTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(mtpLsTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		objid = NULL;
@@ -26037,7 +26098,7 @@ write_mtpLsAsaProfilePointer(int action, u_char *var_val, u_char var_val_type, s
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to mtpLsAsaProfilePointer: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
-		/* Note: default value { zeroDotZero } */
+		/* Note: default value zeroDotZero */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
 		if ((objid = snmp_duplicate_objid((void *) var_val, var_val_len / sizeof(oid))) == NULL)
@@ -26084,12 +26145,12 @@ write_mtpLsAlarmStatus(int action, u_char *var_val, u_char var_val_type, size_t 
 {
 	static uint8_t *old_value;
 	struct mtpLsTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	static size_t old_length = 0;
 	static uint8_t *string = NULL;
 
 	DEBUGMSGTL(("mtpMIB", "write_mtpLsAlarmStatus entering action=%d...  \n", action));
-	StorageTmp = header_complex(mtpLsTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(mtpLsTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		string = NULL;
@@ -26170,11 +26231,11 @@ write_mtpSlL3ProfileTimerT1(int action, u_char *var_val, u_char var_val_type, si
 {
 	static long old_value;
 	struct mtpSlL3ProfileTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("mtpMIB", "write_mtpSlL3ProfileTimerT1 entering action=%d...  \n", action));
-	StorageTmp = header_complex(mtpSlL3ProfileTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(mtpSlL3ProfileTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -26241,11 +26302,11 @@ write_mtpSlL3ProfileTimerT3(int action, u_char *var_val, u_char var_val_type, si
 {
 	static long old_value;
 	struct mtpSlL3ProfileTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("mtpMIB", "write_mtpSlL3ProfileTimerT3 entering action=%d...  \n", action));
-	StorageTmp = header_complex(mtpSlL3ProfileTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(mtpSlL3ProfileTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -26312,11 +26373,11 @@ write_mtpSlL3ProfileTimerT17(int action, u_char *var_val, u_char var_val_type, s
 {
 	static long old_value;
 	struct mtpSlL3ProfileTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("mtpMIB", "write_mtpSlL3ProfileTimerT17 entering action=%d...  \n", action));
-	StorageTmp = header_complex(mtpSlL3ProfileTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(mtpSlL3ProfileTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -26383,11 +26444,11 @@ write_mtpSlL3ProfileTimerT24I(int action, u_char *var_val, u_char var_val_type, 
 {
 	static long old_value;
 	struct mtpSlL3ProfileTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("mtpMIB", "write_mtpSlL3ProfileTimerT24I entering action=%d...  \n", action));
-	StorageTmp = header_complex(mtpSlL3ProfileTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(mtpSlL3ProfileTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -26454,12 +26515,12 @@ write_mtpSlL3ProfileName(int action, u_char *var_val, u_char var_val_type, size_
 {
 	static uint8_t *old_value;
 	struct mtpSlL3ProfileTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	static size_t old_length = 0;
 	static uint8_t *string = NULL;
 
 	DEBUGMSGTL(("mtpMIB", "write_mtpSlL3ProfileName entering action=%d...  \n", action));
-	StorageTmp = header_complex(mtpSlL3ProfileTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(mtpSlL3ProfileTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		string = NULL;
@@ -26533,11 +26594,11 @@ write_mtpSlL3ProfileTimerT2(int action, u_char *var_val, u_char var_val_type, si
 {
 	static long old_value;
 	struct mtpSlL3ProfileTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("mtpMIB", "write_mtpSlL3ProfileTimerT2 entering action=%d...  \n", action));
-	StorageTmp = header_complex(mtpSlL3ProfileTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(mtpSlL3ProfileTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -26604,11 +26665,11 @@ write_mtpSlL3ProfileTimerT4(int action, u_char *var_val, u_char var_val_type, si
 {
 	static long old_value;
 	struct mtpSlL3ProfileTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("mtpMIB", "write_mtpSlL3ProfileTimerT4 entering action=%d...  \n", action));
-	StorageTmp = header_complex(mtpSlL3ProfileTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(mtpSlL3ProfileTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -26675,11 +26736,11 @@ write_mtpSlL3ProfileTimerT5(int action, u_char *var_val, u_char var_val_type, si
 {
 	static long old_value;
 	struct mtpSlL3ProfileTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("mtpMIB", "write_mtpSlL3ProfileTimerT5 entering action=%d...  \n", action));
-	StorageTmp = header_complex(mtpSlL3ProfileTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(mtpSlL3ProfileTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -26746,11 +26807,11 @@ write_mtpSlL3ProfileTimerT12(int action, u_char *var_val, u_char var_val_type, s
 {
 	static long old_value;
 	struct mtpSlL3ProfileTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("mtpMIB", "write_mtpSlL3ProfileTimerT12 entering action=%d...  \n", action));
-	StorageTmp = header_complex(mtpSlL3ProfileTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(mtpSlL3ProfileTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -26817,11 +26878,11 @@ write_mtpSlL3ProfileTimerT13(int action, u_char *var_val, u_char var_val_type, s
 {
 	static long old_value;
 	struct mtpSlL3ProfileTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("mtpMIB", "write_mtpSlL3ProfileTimerT13 entering action=%d...  \n", action));
-	StorageTmp = header_complex(mtpSlL3ProfileTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(mtpSlL3ProfileTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -26888,11 +26949,11 @@ write_mtpSlL3ProfileTimerT14(int action, u_char *var_val, u_char var_val_type, s
 {
 	static long old_value;
 	struct mtpSlL3ProfileTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("mtpMIB", "write_mtpSlL3ProfileTimerT14 entering action=%d...  \n", action));
-	StorageTmp = header_complex(mtpSlL3ProfileTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(mtpSlL3ProfileTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -26959,11 +27020,11 @@ write_mtpSlL3ProfileTimerT19A(int action, u_char *var_val, u_char var_val_type, 
 {
 	static long old_value;
 	struct mtpSlL3ProfileTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("mtpMIB", "write_mtpSlL3ProfileTimerT19A entering action=%d...  \n", action));
-	StorageTmp = header_complex(mtpSlL3ProfileTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(mtpSlL3ProfileTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -27030,11 +27091,11 @@ write_mtpSlL3ProfileTimerT20A(int action, u_char *var_val, u_char var_val_type, 
 {
 	static long old_value;
 	struct mtpSlL3ProfileTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("mtpMIB", "write_mtpSlL3ProfileTimerT20A entering action=%d...  \n", action));
-	StorageTmp = header_complex(mtpSlL3ProfileTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(mtpSlL3ProfileTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -27101,11 +27162,11 @@ write_mtpSlL3ProfileTimerT21A(int action, u_char *var_val, u_char var_val_type, 
 {
 	static long old_value;
 	struct mtpSlL3ProfileTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("mtpMIB", "write_mtpSlL3ProfileTimerT21A entering action=%d...  \n", action));
-	StorageTmp = header_complex(mtpSlL3ProfileTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(mtpSlL3ProfileTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -27172,11 +27233,11 @@ write_mtpSlL3ProfileTimerT22I(int action, u_char *var_val, u_char var_val_type, 
 {
 	static long old_value;
 	struct mtpSlL3ProfileTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("mtpMIB", "write_mtpSlL3ProfileTimerT22I entering action=%d...  \n", action));
-	StorageTmp = header_complex(mtpSlL3ProfileTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(mtpSlL3ProfileTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -27243,11 +27304,11 @@ write_mtpSlL3ProfileTimerT23I(int action, u_char *var_val, u_char var_val_type, 
 {
 	static long old_value;
 	struct mtpSlL3ProfileTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("mtpMIB", "write_mtpSlL3ProfileTimerT23I entering action=%d...  \n", action));
-	StorageTmp = header_complex(mtpSlL3ProfileTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(mtpSlL3ProfileTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -27314,11 +27375,11 @@ write_mtpSlL3ProfileTimerT31A(int action, u_char *var_val, u_char var_val_type, 
 {
 	static long old_value;
 	struct mtpSlL3ProfileTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("mtpMIB", "write_mtpSlL3ProfileTimerT31A entering action=%d...  \n", action));
-	StorageTmp = header_complex(mtpSlL3ProfileTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(mtpSlL3ProfileTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -27385,11 +27446,11 @@ write_mtpSlL3ProfileTimerT32A(int action, u_char *var_val, u_char var_val_type, 
 {
 	static long old_value;
 	struct mtpSlL3ProfileTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("mtpMIB", "write_mtpSlL3ProfileTimerT32A entering action=%d...  \n", action));
-	StorageTmp = header_complex(mtpSlL3ProfileTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(mtpSlL3ProfileTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -27456,11 +27517,11 @@ write_mtpSlL3ProfileTimerT33A(int action, u_char *var_val, u_char var_val_type, 
 {
 	static long old_value;
 	struct mtpSlL3ProfileTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("mtpMIB", "write_mtpSlL3ProfileTimerT33A entering action=%d...  \n", action));
-	StorageTmp = header_complex(mtpSlL3ProfileTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(mtpSlL3ProfileTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -27527,11 +27588,11 @@ write_mtpSlL3ProfileTimerT34A(int action, u_char *var_val, u_char var_val_type, 
 {
 	static long old_value;
 	struct mtpSlL3ProfileTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("mtpMIB", "write_mtpSlL3ProfileTimerT34A entering action=%d...  \n", action));
-	StorageTmp = header_complex(mtpSlL3ProfileTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(mtpSlL3ProfileTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -27598,11 +27659,11 @@ write_mtpSlL3ProfileTimerT1T(int action, u_char *var_val, u_char var_val_type, s
 {
 	static long old_value;
 	struct mtpSlL3ProfileTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("mtpMIB", "write_mtpSlL3ProfileTimerT1T entering action=%d...  \n", action));
-	StorageTmp = header_complex(mtpSlL3ProfileTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(mtpSlL3ProfileTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -27669,11 +27730,11 @@ write_mtpSlL3ProfileTimerT2T(int action, u_char *var_val, u_char var_val_type, s
 {
 	static long old_value;
 	struct mtpSlL3ProfileTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("mtpMIB", "write_mtpSlL3ProfileTimerT2T entering action=%d...  \n", action));
-	StorageTmp = header_complex(mtpSlL3ProfileTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(mtpSlL3ProfileTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -27740,11 +27801,11 @@ write_mtpSlL3ProfileTimerT1S(int action, u_char *var_val, u_char var_val_type, s
 {
 	static long old_value;
 	struct mtpSlL3ProfileTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("mtpMIB", "write_mtpSlL3ProfileTimerT1S entering action=%d...  \n", action));
-	StorageTmp = header_complex(mtpSlL3ProfileTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(mtpSlL3ProfileTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -27811,12 +27872,12 @@ write_mtpSlL3ProfileL2Default(int action, u_char *var_val, u_char var_val_type, 
 {
 	static uint8_t *old_value;
 	struct mtpSlL3ProfileTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	static size_t old_length = 0;
 	static uint8_t *string = NULL;
 
 	DEBUGMSGTL(("mtpMIB", "write_mtpSlL3ProfileL2Default entering action=%d...  \n", action));
-	StorageTmp = header_complex(mtpSlL3ProfileTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(mtpSlL3ProfileTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		string = NULL;
@@ -27842,7 +27903,7 @@ write_mtpSlL3ProfileL2Default(int action, u_char *var_val, u_char var_val_type, 
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to mtpSlL3ProfileL2Default: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
-		/* Note: default value '' */
+		/* Note: default value \"\" */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
 		if ((string = malloc(var_val_len + 1)) == NULL)
@@ -27891,11 +27952,11 @@ write_mtpSlL2ProfileErrorCorrectionMethod(int action, u_char *var_val, u_char va
 {
 	static long old_value;
 	struct mtpSlL2ProfileTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("mtpMIB", "write_mtpSlL2ProfileErrorCorrectionMethod entering action=%d...  \n", action));
-	StorageTmp = header_complex(mtpSlL2ProfileTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(mtpSlL2ProfileTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -27965,12 +28026,12 @@ write_mtpSlL2ProfileProtocolVariant(int action, u_char *var_val, u_char var_val_
 {
 	static oid *old_value;
 	struct mtpSlL2ProfileTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	static size_t old_length = 0;
 	static oid *objid = NULL;
 
 	DEBUGMSGTL(("mtpMIB", "write_mtpSlL2ProfileProtocolVariant entering action=%d...  \n", action));
-	StorageTmp = header_complex(mtpSlL2ProfileTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(mtpSlL2ProfileTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		objid = NULL;
@@ -27991,12 +28052,11 @@ write_mtpSlL2ProfileProtocolVariant(int action, u_char *var_val, u_char var_val_
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to mtpSlL2ProfileProtocolVariant not ASN_OBJECT_ID\n");
 			return SNMP_ERR_WRONGTYPE;
 		}
-		/* Note: ranges 14..15 */
-		if (MIN_OID_LEN * sizeof(oid) > var_val_len || var_val_len > MAX_OID_LEN * sizeof(oid) || ((14 * sizeof(oid) > var_val_len || var_val_len > 15 * sizeof(oid)))) {
+		if (MIN_OID_LEN * sizeof(oid) > var_val_len || var_val_len > MAX_OID_LEN * sizeof(oid)) {
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to mtpSlL2ProfileProtocolVariant: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
-		/* Note: default value { OPENSS7-SS7-MIB : ss7ProtocolItut 0 } */
+		/* Note: default value ss7ProtocolItut */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
 		if ((objid = snmp_duplicate_objid((void *) var_val, var_val_len / sizeof(oid))) == NULL)
@@ -28043,11 +28103,11 @@ write_mtpSlL2ProfileTimerT1(int action, u_char *var_val, u_char var_val_type, si
 {
 	static long old_value;
 	struct mtpSlL2ProfileTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("mtpMIB", "write_mtpSlL2ProfileTimerT1 entering action=%d...  \n", action));
-	StorageTmp = header_complex(mtpSlL2ProfileTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(mtpSlL2ProfileTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -28114,11 +28174,11 @@ write_mtpSlL2ProfileTimerT2(int action, u_char *var_val, u_char var_val_type, si
 {
 	static long old_value;
 	struct mtpSlL2ProfileTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("mtpMIB", "write_mtpSlL2ProfileTimerT2 entering action=%d...  \n", action));
-	StorageTmp = header_complex(mtpSlL2ProfileTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(mtpSlL2ProfileTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -28185,11 +28245,11 @@ write_mtpSlL2ProfileTimerT2L(int action, u_char *var_val, u_char var_val_type, s
 {
 	static long old_value;
 	struct mtpSlL2ProfileTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("mtpMIB", "write_mtpSlL2ProfileTimerT2L entering action=%d...  \n", action));
-	StorageTmp = header_complex(mtpSlL2ProfileTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(mtpSlL2ProfileTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -28256,11 +28316,11 @@ write_mtpSlL2ProfileTimerT2H(int action, u_char *var_val, u_char var_val_type, s
 {
 	static long old_value;
 	struct mtpSlL2ProfileTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("mtpMIB", "write_mtpSlL2ProfileTimerT2H entering action=%d...  \n", action));
-	StorageTmp = header_complex(mtpSlL2ProfileTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(mtpSlL2ProfileTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -28327,11 +28387,11 @@ write_mtpSlL2ProfileTimerT3(int action, u_char *var_val, u_char var_val_type, si
 {
 	static long old_value;
 	struct mtpSlL2ProfileTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("mtpMIB", "write_mtpSlL2ProfileTimerT3 entering action=%d...  \n", action));
-	StorageTmp = header_complex(mtpSlL2ProfileTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(mtpSlL2ProfileTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -28398,11 +28458,11 @@ write_mtpSlL2ProfileTimerT4N(int action, u_char *var_val, u_char var_val_type, s
 {
 	static long old_value;
 	struct mtpSlL2ProfileTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("mtpMIB", "write_mtpSlL2ProfileTimerT4N entering action=%d...  \n", action));
-	StorageTmp = header_complex(mtpSlL2ProfileTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(mtpSlL2ProfileTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -28469,11 +28529,11 @@ write_mtpSlL2ProfileTimerT4E(int action, u_char *var_val, u_char var_val_type, s
 {
 	static long old_value;
 	struct mtpSlL2ProfileTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("mtpMIB", "write_mtpSlL2ProfileTimerT4E entering action=%d...  \n", action));
-	StorageTmp = header_complex(mtpSlL2ProfileTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(mtpSlL2ProfileTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -28540,11 +28600,11 @@ write_mtpSlL2ProfileTimerT5(int action, u_char *var_val, u_char var_val_type, si
 {
 	static long old_value;
 	struct mtpSlL2ProfileTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("mtpMIB", "write_mtpSlL2ProfileTimerT5 entering action=%d...  \n", action));
-	StorageTmp = header_complex(mtpSlL2ProfileTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(mtpSlL2ProfileTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -28611,11 +28671,11 @@ write_mtpSlL2ProfileTimerT6(int action, u_char *var_val, u_char var_val_type, si
 {
 	static long old_value;
 	struct mtpSlL2ProfileTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("mtpMIB", "write_mtpSlL2ProfileTimerT6 entering action=%d...  \n", action));
-	StorageTmp = header_complex(mtpSlL2ProfileTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(mtpSlL2ProfileTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -28639,7 +28699,7 @@ write_mtpSlL2ProfileTimerT6(int action, u_char *var_val, u_char var_val_type, si
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to mtpSlL2ProfileTimerT6: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
-		/* Note: default value 4000 */
+		/* Note: default value 400 */
 		/* Note: ranges 300..1200 */
 		if ((300 > set_value || set_value > 1200)) {
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to mtpSlL2ProfileTimerT6: bad value\n");
@@ -28682,11 +28742,11 @@ write_mtpSlL2ProfileTimerT7(int action, u_char *var_val, u_char var_val_type, si
 {
 	static long old_value;
 	struct mtpSlL2ProfileTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("mtpMIB", "write_mtpSlL2ProfileTimerT7 entering action=%d...  \n", action));
-	StorageTmp = header_complex(mtpSlL2ProfileTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(mtpSlL2ProfileTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -28710,7 +28770,7 @@ write_mtpSlL2ProfileTimerT7(int action, u_char *var_val, u_char var_val_type, si
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to mtpSlL2ProfileTimerT7: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
-		/* Note: default value 1000 */
+		/* Note: default value 100 */
 		/* Note: ranges 50..600 */
 		if ((50 > set_value || set_value > 600)) {
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to mtpSlL2ProfileTimerT7: bad value\n");
@@ -28753,11 +28813,11 @@ write_mtpSlL2ProfileTbOnset1(int action, u_char *var_val, u_char var_val_type, s
 {
 	static ulong old_value;
 	struct mtpSlL2ProfileTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	ulong set_value = *((ulong *) var_val);
 
 	DEBUGMSGTL(("mtpMIB", "write_mtpSlL2ProfileTbOnset1 entering action=%d...  \n", action));
-	StorageTmp = header_complex(mtpSlL2ProfileTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(mtpSlL2ProfileTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -28819,11 +28879,11 @@ write_mtpSlL2ProfileTbAbate1(int action, u_char *var_val, u_char var_val_type, s
 {
 	static ulong old_value;
 	struct mtpSlL2ProfileTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	ulong set_value = *((ulong *) var_val);
 
 	DEBUGMSGTL(("mtpMIB", "write_mtpSlL2ProfileTbAbate1 entering action=%d...  \n", action));
-	StorageTmp = header_complex(mtpSlL2ProfileTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(mtpSlL2ProfileTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -28885,11 +28945,11 @@ write_mtpSlL2ProfileNumberOfThresholdLevels(int action, u_char *var_val, u_char 
 {
 	static ulong old_value;
 	struct mtpSlL2ProfileTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	ulong set_value = *((ulong *) var_val);
 
 	DEBUGMSGTL(("mtpMIB", "write_mtpSlL2ProfileNumberOfThresholdLevels entering action=%d...  \n", action));
-	StorageTmp = header_complex(mtpSlL2ProfileTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(mtpSlL2ProfileTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -28951,11 +29011,11 @@ write_mtpSlL2ProfileCongestionCounting(int action, u_char *var_val, u_char var_v
 {
 	static long old_value;
 	struct mtpSlL2ProfileTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("mtpMIB", "write_mtpSlL2ProfileCongestionCounting entering action=%d...  \n", action));
-	StorageTmp = header_complex(mtpSlL2ProfileTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(mtpSlL2ProfileTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -29025,11 +29085,11 @@ write_mtpSlL2ProfileCongestionReportingBaseObject(int action, u_char *var_val, u
 {
 	static long old_value;
 	struct mtpSlL2ProfileTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("mtpMIB", "write_mtpSlL2ProfileCongestionReportingBaseObject entering action=%d...  \n", action));
-	StorageTmp = header_complex(mtpSlL2ProfileTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(mtpSlL2ProfileTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -29101,11 +29161,11 @@ write_mtpSlL2ProfileLoopDelay(int action, u_char *var_val, u_char var_val_type, 
 {
 	static ulong old_value;
 	struct mtpSlL2ProfileTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	ulong set_value = *((ulong *) var_val);
 
 	DEBUGMSGTL(("mtpMIB", "write_mtpSlL2ProfileLoopDelay entering action=%d...  \n", action));
-	StorageTmp = header_complex(mtpSlL2ProfileTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(mtpSlL2ProfileTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -29166,12 +29226,12 @@ write_mtpSlL2ProfileName(int action, u_char *var_val, u_char var_val_type, size_
 {
 	static uint8_t *old_value;
 	struct mtpSlL2ProfileTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	static size_t old_length = 0;
 	static uint8_t *string = NULL;
 
 	DEBUGMSGTL(("mtpMIB", "write_mtpSlL2ProfileName entering action=%d...  \n", action));
-	StorageTmp = header_complex(mtpSlL2ProfileTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(mtpSlL2ProfileTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		string = NULL;
@@ -29245,11 +29305,11 @@ write_mtpSlL2ProfileTbOnset2(int action, u_char *var_val, u_char var_val_type, s
 {
 	static ulong old_value;
 	struct mtpSlL2ProfileTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	ulong set_value = *((ulong *) var_val);
 
 	DEBUGMSGTL(("mtpMIB", "write_mtpSlL2ProfileTbOnset2 entering action=%d...  \n", action));
-	StorageTmp = header_complex(mtpSlL2ProfileTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(mtpSlL2ProfileTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -29311,11 +29371,11 @@ write_mtpSlL2ProfileTbAbate2(int action, u_char *var_val, u_char var_val_type, s
 {
 	static ulong old_value;
 	struct mtpSlL2ProfileTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	ulong set_value = *((ulong *) var_val);
 
 	DEBUGMSGTL(("mtpMIB", "write_mtpSlL2ProfileTbAbate2 entering action=%d...  \n", action));
-	StorageTmp = header_complex(mtpSlL2ProfileTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(mtpSlL2ProfileTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -29377,11 +29437,11 @@ write_mtpSlL2ProfileTbOnset3(int action, u_char *var_val, u_char var_val_type, s
 {
 	static ulong old_value;
 	struct mtpSlL2ProfileTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	ulong set_value = *((ulong *) var_val);
 
 	DEBUGMSGTL(("mtpMIB", "write_mtpSlL2ProfileTbOnset3 entering action=%d...  \n", action));
-	StorageTmp = header_complex(mtpSlL2ProfileTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(mtpSlL2ProfileTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -29443,11 +29503,11 @@ write_mtpSlL2ProfileTbAbate3(int action, u_char *var_val, u_char var_val_type, s
 {
 	static ulong old_value;
 	struct mtpSlL2ProfileTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	ulong set_value = *((ulong *) var_val);
 
 	DEBUGMSGTL(("mtpMIB", "write_mtpSlL2ProfileTbAbate3 entering action=%d...  \n", action));
-	StorageTmp = header_complex(mtpSlL2ProfileTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(mtpSlL2ProfileTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -29509,11 +29569,11 @@ write_mtpSlL2ProfileTbDiscard1(int action, u_char *var_val, u_char var_val_type,
 {
 	static ulong old_value;
 	struct mtpSlL2ProfileTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	ulong set_value = *((ulong *) var_val);
 
 	DEBUGMSGTL(("mtpMIB", "write_mtpSlL2ProfileTbDiscard1 entering action=%d...  \n", action));
-	StorageTmp = header_complex(mtpSlL2ProfileTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(mtpSlL2ProfileTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -29575,11 +29635,11 @@ write_mtpSlL2ProfileTbDiscard2(int action, u_char *var_val, u_char var_val_type,
 {
 	static ulong old_value;
 	struct mtpSlL2ProfileTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	ulong set_value = *((ulong *) var_val);
 
 	DEBUGMSGTL(("mtpMIB", "write_mtpSlL2ProfileTbDiscard2 entering action=%d...  \n", action));
-	StorageTmp = header_complex(mtpSlL2ProfileTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(mtpSlL2ProfileTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -29641,11 +29701,11 @@ write_mtpSlL2ProfileTbDiscard3(int action, u_char *var_val, u_char var_val_type,
 {
 	static ulong old_value;
 	struct mtpSlL2ProfileTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	ulong set_value = *((ulong *) var_val);
 
 	DEBUGMSGTL(("mtpMIB", "write_mtpSlL2ProfileTbDiscard3 entering action=%d...  \n", action));
-	StorageTmp = header_complex(mtpSlL2ProfileTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(mtpSlL2ProfileTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -29707,11 +29767,11 @@ write_mtpSlL2ProfileTimerTx(int action, u_char *var_val, u_char var_val_type, si
 {
 	static long old_value;
 	struct mtpSlL2ProfileTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("mtpMIB", "write_mtpSlL2ProfileTimerTx entering action=%d...  \n", action));
-	StorageTmp = header_complex(mtpSlL2ProfileTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(mtpSlL2ProfileTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -29778,11 +29838,11 @@ write_mtpSlL2ProfileTimerTy(int action, u_char *var_val, u_char var_val_type, si
 {
 	static long old_value;
 	struct mtpSlL2ProfileTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("mtpMIB", "write_mtpSlL2ProfileTimerTy entering action=%d...  \n", action));
-	StorageTmp = header_complex(mtpSlL2ProfileTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(mtpSlL2ProfileTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -29849,11 +29909,11 @@ write_mtpSlL2ProfileNumberOfCongestionStates(int action, u_char *var_val, u_char
 {
 	static ulong old_value;
 	struct mtpSlL2ProfileTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	ulong set_value = *((ulong *) var_val);
 
 	DEBUGMSGTL(("mtpMIB", "write_mtpSlL2ProfileNumberOfCongestionStates entering action=%d...  \n", action));
-	StorageTmp = header_complex(mtpSlL2ProfileTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(mtpSlL2ProfileTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -29915,11 +29975,11 @@ write_mtpSlL2ProfileInitialLevelOfCongestion(int action, u_char *var_val, u_char
 {
 	static ulong old_value;
 	struct mtpSlL2ProfileTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	ulong set_value = *((ulong *) var_val);
 
 	DEBUGMSGTL(("mtpMIB", "write_mtpSlL2ProfileInitialLevelOfCongestion entering action=%d...  \n", action));
-	StorageTmp = header_complex(mtpSlL2ProfileTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(mtpSlL2ProfileTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -29981,11 +30041,11 @@ write_mtpSlL2ProfileMaxMSUsRetransN1(int action, u_char *var_val, u_char var_val
 {
 	static ulong old_value;
 	struct mtpSlL2ProfileTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	ulong set_value = *((ulong *) var_val);
 
 	DEBUGMSGTL(("mtpMIB", "write_mtpSlL2ProfileMaxMSUsRetransN1 entering action=%d...  \n", action));
-	StorageTmp = header_complex(mtpSlL2ProfileTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(mtpSlL2ProfileTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -30052,11 +30112,11 @@ write_mtpSlL2ProfileMaxOctRetransN2(int action, u_char *var_val, u_char var_val_
 {
 	static ulong old_value;
 	struct mtpSlL2ProfileTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	ulong set_value = *((ulong *) var_val);
 
 	DEBUGMSGTL(("mtpMIB", "write_mtpSlL2ProfileMaxOctRetransN2 entering action=%d...  \n", action));
-	StorageTmp = header_complex(mtpSlL2ProfileTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(mtpSlL2ProfileTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -30118,11 +30178,11 @@ write_mtpSlL2ProfileReceiveCongestionThresholdOnset(int action, u_char *var_val,
 {
 	static ulong old_value;
 	struct mtpSlL2ProfileTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	ulong set_value = *((ulong *) var_val);
 
 	DEBUGMSGTL(("mtpMIB", "write_mtpSlL2ProfileReceiveCongestionThresholdOnset entering action=%d...  \n", action));
-	StorageTmp = header_complex(mtpSlL2ProfileTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(mtpSlL2ProfileTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -30184,11 +30244,11 @@ write_mtpSlL2ProfileReceiveCongestionThresholdAbate(int action, u_char *var_val,
 {
 	static ulong old_value;
 	struct mtpSlL2ProfileTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	ulong set_value = *((ulong *) var_val);
 
 	DEBUGMSGTL(("mtpMIB", "write_mtpSlL2ProfileReceiveCongestionThresholdAbate entering action=%d...  \n", action));
-	StorageTmp = header_complex(mtpSlL2ProfileTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(mtpSlL2ProfileTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -30250,11 +30310,11 @@ write_mtpSlL2ProfileReceiveCongestionThresholdDiscard(int action, u_char *var_va
 {
 	static ulong old_value;
 	struct mtpSlL2ProfileTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	ulong set_value = *((ulong *) var_val);
 
 	DEBUGMSGTL(("mtpMIB", "write_mtpSlL2ProfileReceiveCongestionThresholdDiscard entering action=%d...  \n", action));
-	StorageTmp = header_complex(mtpSlL2ProfileTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(mtpSlL2ProfileTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -30316,11 +30376,11 @@ write_mtpSlL2ProfileM(int action, u_char *var_val, u_char var_val_type, size_t v
 {
 	static ulong old_value;
 	struct mtpSlL2ProfileTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	ulong set_value = *((ulong *) var_val);
 
 	DEBUGMSGTL(("mtpMIB", "write_mtpSlL2ProfileM entering action=%d...  \n", action));
-	StorageTmp = header_complex(mtpSlL2ProfileTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(mtpSlL2ProfileTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -30382,11 +30442,11 @@ write_mtpSlAdministrativeState(int action, u_char *var_val, u_char var_val_type,
 {
 	static long old_value;
 	struct mtpSlTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("mtpMIB", "write_mtpSlAdministrativeState entering action=%d...  \n", action));
-	StorageTmp = header_complex(mtpSlTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(mtpSlTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -30457,12 +30517,12 @@ write_mtpSlMtpL2ProtocolProfilePointer(int action, u_char *var_val, u_char var_v
 {
 	static uint8_t *old_value;
 	struct mtpSlTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	static size_t old_length = 0;
 	static uint8_t *string = NULL;
 
 	DEBUGMSGTL(("mtpMIB", "write_mtpSlMtpL2ProtocolProfilePointer entering action=%d...  \n", action));
-	StorageTmp = header_complex(mtpSlTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(mtpSlTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		string = NULL;
@@ -30488,7 +30548,7 @@ write_mtpSlMtpL2ProtocolProfilePointer(int action, u_char *var_val, u_char var_v
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to mtpSlMtpL2ProtocolProfilePointer: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
-		/* Note: default value '' */
+		/* Note: default value \"\" */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
 		if ((string = malloc(var_val_len + 1)) == NULL)
@@ -30537,12 +30597,12 @@ write_mtpSlSignTermPointer(int action, u_char *var_val, u_char var_val_type, siz
 {
 	static oid *old_value;
 	struct mtpSlTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	static size_t old_length = 0;
 	static oid *objid = NULL;
 
 	DEBUGMSGTL(("mtpMIB", "write_mtpSlSignTermPointer entering action=%d...  \n", action));
-	StorageTmp = header_complex(mtpSlTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(mtpSlTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		objid = NULL;
@@ -30567,7 +30627,7 @@ write_mtpSlSignTermPointer(int action, u_char *var_val, u_char var_val_type, siz
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to mtpSlSignTermPointer: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
-		/* Note: default value { zeroDotZero } */
+		/* Note: default value zeroDotZero */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
 		if ((objid = snmp_duplicate_objid((void *) var_val, var_val_len / sizeof(oid))) == NULL)
@@ -30614,12 +30674,12 @@ write_mtpSlSignDataLinkTpPointer(int action, u_char *var_val, u_char var_val_typ
 {
 	static oid *old_value;
 	struct mtpSlTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	static size_t old_length = 0;
 	static oid *objid = NULL;
 
 	DEBUGMSGTL(("mtpMIB", "write_mtpSlSignDataLinkTpPointer entering action=%d...  \n", action));
-	StorageTmp = header_complex(mtpSlTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(mtpSlTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		objid = NULL;
@@ -30644,7 +30704,7 @@ write_mtpSlSignDataLinkTpPointer(int action, u_char *var_val, u_char var_val_typ
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to mtpSlSignDataLinkTpPointer: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
-		/* Note: default value { zeroDotZero } */
+		/* Note: default value zeroDotZero */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
 		if ((objid = snmp_duplicate_objid((void *) var_val, var_val_len / sizeof(oid))) == NULL)
@@ -30691,11 +30751,11 @@ write_mtpSlLocalInhibit(int action, u_char *var_val, u_char var_val_type, size_t
 {
 	static long old_value;
 	struct mtpSlTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("mtpMIB", "write_mtpSlLocalInhibit entering action=%d...  \n", action));
-	StorageTmp = header_complex(mtpSlTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(mtpSlTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -30771,11 +30831,11 @@ write_mtpSlLocalUninhibit(int action, u_char *var_val, u_char var_val_type, size
 {
 	static long old_value;
 	struct mtpSlTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("mtpMIB", "write_mtpSlLocalUninhibit entering action=%d...  \n", action));
-	StorageTmp = header_complex(mtpSlTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(mtpSlTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -30851,11 +30911,11 @@ write_mtpSlReplaceSt(int action, u_char *var_val, u_char var_val_type, size_t va
 {
 	static long old_value;
 	struct mtpSlTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("mtpMIB", "write_mtpSlReplaceSt entering action=%d...  \n", action));
-	StorageTmp = header_complex(mtpSlTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(mtpSlTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -30931,12 +30991,12 @@ write_mtpSlAsaProfilePointer(int action, u_char *var_val, u_char var_val_type, s
 {
 	static oid *old_value;
 	struct mtpSlTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	static size_t old_length = 0;
 	static oid *objid = NULL;
 
 	DEBUGMSGTL(("mtpMIB", "write_mtpSlAsaProfilePointer entering action=%d...  \n", action));
-	StorageTmp = header_complex(mtpSlTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(mtpSlTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		objid = NULL;
@@ -30961,7 +31021,7 @@ write_mtpSlAsaProfilePointer(int action, u_char *var_val, u_char var_val_type, s
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to mtpSlAsaProfilePointer: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
-		/* Note: default value { zeroDotZero } */
+		/* Note: default value zeroDotZero */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
 		if ((objid = snmp_duplicate_objid((void *) var_val, var_val_len / sizeof(oid))) == NULL)
@@ -31008,11 +31068,11 @@ write_mtpSlRelatedLinkGroupNumber(int action, u_char *var_val, u_char var_val_ty
 {
 	static long old_value;
 	struct mtpSlTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("mtpMIB", "write_mtpSlRelatedLinkGroupNumber entering action=%d...  \n", action));
-	StorageTmp = header_complex(mtpSlTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(mtpSlTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -31078,11 +31138,11 @@ write_mtpSlSdlList(int action, u_char *var_val, u_char var_val_type, size_t var_
 {
 	static ulong old_value;
 	struct mtpSlTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	ulong set_value = *((ulong *) var_val);
 
 	DEBUGMSGTL(("mtpMIB", "write_mtpSlSdlList entering action=%d...  \n", action));
-	StorageTmp = header_complex(mtpSlTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(mtpSlTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -31143,11 +31203,11 @@ write_mtpSlTest(int action, u_char *var_val, u_char var_val_type, size_t var_val
 {
 	static long old_value;
 	struct mtpSlTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("mtpMIB", "write_mtpSlTest entering action=%d...  \n", action));
-	StorageTmp = header_complex(mtpSlTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(mtpSlTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -31223,12 +31283,12 @@ write_mtpSlName(int action, u_char *var_val, u_char var_val_type, size_t var_val
 {
 	static uint8_t *old_value;
 	struct mtpSlTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	static size_t old_length = 0;
 	static uint8_t *string = NULL;
 
 	DEBUGMSGTL(("mtpMIB", "write_mtpSlName entering action=%d...  \n", action));
-	StorageTmp = header_complex(mtpSlTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(mtpSlTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		string = NULL;
@@ -31302,11 +31362,11 @@ write_mtpSlSdtList(int action, u_char *var_val, u_char var_val_type, size_t var_
 {
 	static ulong old_value;
 	struct mtpSlTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	ulong set_value = *((ulong *) var_val);
 
 	DEBUGMSGTL(("mtpMIB", "write_mtpSlSdtList entering action=%d...  \n", action));
-	StorageTmp = header_complex(mtpSlTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(mtpSlTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -31367,12 +31427,12 @@ write_mtpSlSlsCodeNormalList(int action, u_char *var_val, u_char var_val_type, s
 {
 	static uint8_t *old_value;
 	struct mtpSlTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	static size_t old_length = 0;
 	static uint8_t *string = NULL;
 
 	DEBUGMSGTL(("mtpMIB", "write_mtpSlSlsCodeNormalList entering action=%d...  \n", action));
-	StorageTmp = header_complex(mtpSlTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(mtpSlTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		string = NULL;
@@ -31398,7 +31458,7 @@ write_mtpSlSlsCodeNormalList(int action, u_char *var_val, u_char var_val_type, s
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to mtpSlSlsCodeNormalList: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
-		/* Note: default value 'FFFF'X */
+		/* Note: default value \"\xFF\xFF\" */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
 		if ((string = malloc(var_val_len + 1)) == NULL)
@@ -31447,12 +31507,12 @@ write_mtpSlL3ProfilePointer(int action, u_char *var_val, u_char var_val_type, si
 {
 	static uint8_t *old_value;
 	struct mtpSlTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	static size_t old_length = 0;
 	static uint8_t *string = NULL;
 
 	DEBUGMSGTL(("mtpMIB", "write_mtpSlL3ProfilePointer entering action=%d...  \n", action));
-	StorageTmp = header_complex(mtpSlTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(mtpSlTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		string = NULL;
@@ -31478,7 +31538,7 @@ write_mtpSlL3ProfilePointer(int action, u_char *var_val, u_char var_val_type, si
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to mtpSlL3ProfilePointer: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
-		/* Note: default value '' */
+		/* Note: default value \"\" */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
 		if ((string = malloc(var_val_len + 1)) == NULL)
@@ -31527,12 +31587,12 @@ write_mtpSlAlarmStatus(int action, u_char *var_val, u_char var_val_type, size_t 
 {
 	static uint8_t *old_value;
 	struct mtpSlTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	static size_t old_length = 0;
 	static uint8_t *string = NULL;
 
 	DEBUGMSGTL(("mtpMIB", "write_mtpSlAlarmStatus entering action=%d...  \n", action));
-	StorageTmp = header_complex(mtpSlTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(mtpSlTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		string = NULL;
@@ -31613,12 +31673,12 @@ write_mtpSlSdlListPointer(int action, u_char *var_val, u_char var_val_type, size
 {
 	static oid *old_value;
 	struct mtpSlSdlListTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	static size_t old_length = 0;
 	static oid *objid = NULL;
 
 	DEBUGMSGTL(("mtpMIB", "write_mtpSlSdlListPointer entering action=%d...  \n", action));
-	StorageTmp = header_complex(mtpSlSdlListTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(mtpSlSdlListTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		objid = NULL;
@@ -31643,7 +31703,7 @@ write_mtpSlSdlListPointer(int action, u_char *var_val, u_char var_val_type, size
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to mtpSlSdlListPointer: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
-		/* Note: default value { zeroDotZero } */
+		/* Note: default value zeroDotZero */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
 		if ((objid = snmp_duplicate_objid((void *) var_val, var_val_len / sizeof(oid))) == NULL)
@@ -31690,12 +31750,12 @@ write_mtpSlSdtListPointer(int action, u_char *var_val, u_char var_val_type, size
 {
 	static oid *old_value;
 	struct mtpSlSdtListTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	static size_t old_length = 0;
 	static oid *objid = NULL;
 
 	DEBUGMSGTL(("mtpMIB", "write_mtpSlSdtListPointer entering action=%d...  \n", action));
-	StorageTmp = header_complex(mtpSlSdtListTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(mtpSlSdtListTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		objid = NULL;
@@ -31720,7 +31780,7 @@ write_mtpSlSdtListPointer(int action, u_char *var_val, u_char var_val_type, size
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to mtpSlSdtListPointer: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
-		/* Note: default value { zeroDotZero } */
+		/* Note: default value zeroDotZero */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
 		if ((objid = snmp_duplicate_objid((void *) var_val, var_val_len / sizeof(oid))) == NULL)
@@ -31767,11 +31827,11 @@ write_mtpNbTransmissionRate(int action, u_char *var_val, u_char var_val_type, si
 {
 	static long old_value;
 	struct mtpNbTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("mtpMIB", "write_mtpNbTransmissionRate entering action=%d...  \n", action));
-	StorageTmp = header_complex(mtpNbTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(mtpNbTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -31844,11 +31904,11 @@ write_mtpNbf(int action, u_char *var_val, u_char var_val_type, size_t var_val_le
 {
 	static long old_value;
 	struct mtpNbTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("mtpMIB", "write_mtpNbf entering action=%d...  \n", action));
-	StorageTmp = header_complex(mtpNbTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(mtpNbTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -31923,11 +31983,11 @@ write_mtpSaalBufferRelease(int action, u_char *var_val, u_char var_val_type, siz
 {
 	static long old_value;
 	struct mtpSaalTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("mtpMIB", "write_mtpSaalBufferRelease entering action=%d...  \n", action));
-	StorageTmp = header_complex(mtpSaalTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(mtpSaalTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -31997,11 +32057,11 @@ write_mtpSaalMaxCc(int action, u_char *var_val, u_char var_val_type, size_t var_
 {
 	static ulong old_value;
 	struct mtpSaalTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	ulong set_value = *((ulong *) var_val);
 
 	DEBUGMSGTL(("mtpMIB", "write_mtpSaalMaxCc entering action=%d...  \n", action));
-	StorageTmp = header_complex(mtpSaalTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(mtpSaalTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -32063,11 +32123,11 @@ write_mtpSaalMaxNrp(int action, u_char *var_val, u_char var_val_type, size_t var
 {
 	static ulong old_value;
 	struct mtpSaalTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	ulong set_value = *((ulong *) var_val);
 
 	DEBUGMSGTL(("mtpMIB", "write_mtpSaalMaxNrp entering action=%d...  \n", action));
-	StorageTmp = header_complex(mtpSaalTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(mtpSaalTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -32129,11 +32189,11 @@ write_mtpSaalMaxInformationFieldLength(int action, u_char *var_val, u_char var_v
 {
 	static ulong old_value;
 	struct mtpSaalTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	ulong set_value = *((ulong *) var_val);
 
 	DEBUGMSGTL(("mtpMIB", "write_mtpSaalMaxInformationFieldLength entering action=%d...  \n", action));
-	StorageTmp = header_complex(mtpSaalTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(mtpSaalTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -32195,11 +32255,11 @@ write_mtpSaalMaxLengthSscopUuField(int action, u_char *var_val, u_char var_val_t
 {
 	static ulong old_value;
 	struct mtpSaalTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	ulong set_value = *((ulong *) var_val);
 
 	DEBUGMSGTL(("mtpMIB", "write_mtpSaalMaxLengthSscopUuField entering action=%d...  \n", action));
-	StorageTmp = header_complex(mtpSaalTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(mtpSaalTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -32261,11 +32321,11 @@ write_mtpSaalMaxPd(int action, u_char *var_val, u_char var_val_type, size_t var_
 {
 	static ulong old_value;
 	struct mtpSaalTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	ulong set_value = *((ulong *) var_val);
 
 	DEBUGMSGTL(("mtpMIB", "write_mtpSaalMaxPd entering action=%d...  \n", action));
-	StorageTmp = header_complex(mtpSaalTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(mtpSaalTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -32327,11 +32387,11 @@ write_mtpSaalMaxSscopCreditToPeer(int action, u_char *var_val, u_char var_val_ty
 {
 	static ulong old_value;
 	struct mtpSaalTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	ulong set_value = *((ulong *) var_val);
 
 	DEBUGMSGTL(("mtpMIB", "write_mtpSaalMaxSscopCreditToPeer entering action=%d...  \n", action));
-	StorageTmp = header_complex(mtpSaalTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(mtpSaalTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -32393,11 +32453,11 @@ write_mtpSaalMaxStat(int action, u_char *var_val, u_char var_val_type, size_t va
 {
 	static ulong old_value;
 	struct mtpSaalTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	ulong set_value = *((ulong *) var_val);
 
 	DEBUGMSGTL(("mtpMIB", "write_mtpSaalMaxStat entering action=%d...  \n", action));
-	StorageTmp = header_complex(mtpSaalTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(mtpSaalTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -32459,11 +32519,11 @@ write_mtpSaalN1(int action, u_char *var_val, u_char var_val_type, size_t var_val
 {
 	static ulong old_value;
 	struct mtpSaalTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	ulong set_value = *((ulong *) var_val);
 
 	DEBUGMSGTL(("mtpMIB", "write_mtpSaalN1 entering action=%d...  \n", action));
-	StorageTmp = header_complex(mtpSaalTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(mtpSaalTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -32525,11 +32585,11 @@ write_mtpSaalNniLayerManagementProvingState(int action, u_char *var_val, u_char 
 {
 	static long old_value;
 	struct mtpSaalTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("mtpMIB", "write_mtpSaalNniLayerManagementProvingState entering action=%d...  \n", action));
-	StorageTmp = header_complex(mtpSaalTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(mtpSaalTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -32600,11 +32660,11 @@ write_mtpSaalNniLayerManagementTimerNoCredit(int action, u_char *var_val, u_char
 {
 	static long old_value;
 	struct mtpSaalTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("mtpMIB", "write_mtpSaalNniLayerManagementTimerNoCredit entering action=%d...  \n", action));
-	StorageTmp = header_complex(mtpSaalTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(mtpSaalTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -32671,11 +32731,11 @@ write_mtpSaalNniLayerManagementTimerRepeatSrec(int action, u_char *var_val, u_ch
 {
 	static long old_value;
 	struct mtpSaalTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("mtpMIB", "write_mtpSaalNniLayerManagementTimerRepeatSrec entering action=%d...  \n", action));
-	StorageTmp = header_complex(mtpSaalTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(mtpSaalTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -32741,11 +32801,11 @@ write_mtpSaalNniTimerT1(int action, u_char *var_val, u_char var_val_type, size_t
 {
 	static long old_value;
 	struct mtpSaalTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("mtpMIB", "write_mtpSaalNniTimerT1 entering action=%d...  \n", action));
-	StorageTmp = header_complex(mtpSaalTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(mtpSaalTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -32812,11 +32872,11 @@ write_mtpSaalNniTimerT2(int action, u_char *var_val, u_char var_val_type, size_t
 {
 	static long old_value;
 	struct mtpSaalTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("mtpMIB", "write_mtpSaalNniTimerT2 entering action=%d...  \n", action));
-	StorageTmp = header_complex(mtpSaalTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(mtpSaalTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -32883,11 +32943,11 @@ write_mtpSaalNniTimerT3(int action, u_char *var_val, u_char var_val_type, size_t
 {
 	static long old_value;
 	struct mtpSaalTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("mtpMIB", "write_mtpSaalNniTimerT3 entering action=%d...  \n", action));
-	StorageTmp = header_complex(mtpSaalTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(mtpSaalTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -32954,11 +33014,11 @@ write_mtpSaalSscopTimerCc(int action, u_char *var_val, u_char var_val_type, size
 {
 	static long old_value;
 	struct mtpSaalTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("mtpMIB", "write_mtpSaalSscopTimerCc entering action=%d...  \n", action));
-	StorageTmp = header_complex(mtpSaalTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(mtpSaalTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -33025,11 +33085,11 @@ write_mtpSaalSscopTimerIdle(int action, u_char *var_val, u_char var_val_type, si
 {
 	static long old_value;
 	struct mtpSaalTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("mtpMIB", "write_mtpSaalSscopTimerIdle entering action=%d...  \n", action));
-	StorageTmp = header_complex(mtpSaalTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(mtpSaalTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -33096,11 +33156,11 @@ write_mtpSaalSscopTimerKeepAlive(int action, u_char *var_val, u_char var_val_typ
 {
 	static long old_value;
 	struct mtpSaalTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("mtpMIB", "write_mtpSaalSscopTimerKeepAlive entering action=%d...  \n", action));
-	StorageTmp = header_complex(mtpSaalTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(mtpSaalTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -33167,11 +33227,11 @@ write_mtpSaalSscopTimerNoResponse(int action, u_char *var_val, u_char var_val_ty
 {
 	static long old_value;
 	struct mtpSaalTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("mtpMIB", "write_mtpSaalSscopTimerNoResponse entering action=%d...  \n", action));
-	StorageTmp = header_complex(mtpSaalTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(mtpSaalTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -33238,11 +33298,11 @@ write_mtpSaalSscopTimerPoll(int action, u_char *var_val, u_char var_val_type, si
 {
 	static long old_value;
 	struct mtpSaalTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("mtpMIB", "write_mtpSaalSscopTimerPoll entering action=%d...  \n", action));
-	StorageTmp = header_complex(mtpSaalTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(mtpSaalTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -33309,11 +33369,11 @@ write_mtpSaalTransmissionRateIntervalLower(int action, u_char *var_val, u_char v
 {
 	static ulong old_value;
 	struct mtpSaalTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	ulong set_value = *((ulong *) var_val);
 
 	DEBUGMSGTL(("mtpMIB", "write_mtpSaalTransmissionRateIntervalLower entering action=%d...  \n", action));
-	StorageTmp = header_complex(mtpSaalTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(mtpSaalTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -33380,11 +33440,11 @@ write_mtpSaalTransmissionRateIntervalUpper(int action, u_char *var_val, u_char v
 {
 	static ulong old_value;
 	struct mtpSaalTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	ulong set_value = *((ulong *) var_val);
 
 	DEBUGMSGTL(("mtpMIB", "write_mtpSaalTransmissionRateIntervalUpper entering action=%d...  \n", action));
-	StorageTmp = header_complex(mtpSaalTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(mtpSaalTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -33451,11 +33511,11 @@ write_mtpSaalEgressTransmissionRateIntervalLower(int action, u_char *var_val, u_
 {
 	static ulong old_value;
 	struct mtpSaalTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	ulong set_value = *((ulong *) var_val);
 
 	DEBUGMSGTL(("mtpMIB", "write_mtpSaalEgressTransmissionRateIntervalLower entering action=%d...  \n", action));
-	StorageTmp = header_complex(mtpSaalTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(mtpSaalTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -33522,11 +33582,11 @@ write_mtpSaalEgressTransmissionRateIntervalUpper(int action, u_char *var_val, u_
 {
 	static ulong old_value;
 	struct mtpSaalTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	ulong set_value = *((ulong *) var_val);
 
 	DEBUGMSGTL(("mtpMIB", "write_mtpSaalEgressTransmissionRateIntervalUpper entering action=%d...  \n", action));
-	StorageTmp = header_complex(mtpSaalTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(mtpSaalTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -33593,11 +33653,11 @@ write_mtpSaalPollAfterRetransmission(int action, u_char *var_val, u_char var_val
 {
 	static long old_value;
 	struct mtpSaalTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("mtpMIB", "write_mtpSaalPollAfterRetransmission entering action=%d...  \n", action));
-	StorageTmp = header_complex(mtpSaalTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(mtpSaalTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -33667,11 +33727,11 @@ write_mtpM2paN1(int action, u_char *var_val, u_char var_val_type, size_t var_val
 {
 	static ulong old_value;
 	struct mtpM2paTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	ulong set_value = *((ulong *) var_val);
 
 	DEBUGMSGTL(("mtpMIB", "write_mtpM2paN1 entering action=%d...  \n", action));
-	StorageTmp = header_complex(mtpM2paTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(mtpM2paTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -33733,11 +33793,11 @@ write_mtpM2paProving(int action, u_char *var_val, u_char var_val_type, size_t va
 {
 	static long old_value;
 	struct mtpM2paTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("mtpMIB", "write_mtpM2paProving entering action=%d...  \n", action));
-	StorageTmp = header_complex(mtpM2paTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(mtpM2paTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -33807,11 +33867,11 @@ write_mtpM2paManagementProvingState(int action, u_char *var_val, u_char var_val_
 {
 	static long old_value;
 	struct mtpM2paTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("mtpMIB", "write_mtpM2paManagementProvingState entering action=%d...  \n", action));
-	StorageTmp = header_complex(mtpM2paTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(mtpM2paTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -33882,11 +33942,11 @@ write_mtpM2paProvingAttempts(int action, u_char *var_val, u_char var_val_type, s
 {
 	static ulong old_value;
 	struct mtpM2paTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	ulong set_value = *((ulong *) var_val);
 
 	DEBUGMSGTL(("mtpMIB", "write_mtpM2paProvingAttempts entering action=%d...  \n", action));
-	StorageTmp = header_complex(mtpM2paTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(mtpM2paTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -33948,11 +34008,11 @@ write_mtpM2paSctpNoDelay(int action, u_char *var_val, u_char var_val_type, size_
 {
 	static long old_value;
 	struct mtpM2paTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("mtpMIB", "write_mtpM2paSctpNoDelay entering action=%d...  \n", action));
-	StorageTmp = header_complex(mtpM2paTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(mtpM2paTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -34022,11 +34082,11 @@ write_mtpM2paSctpMaxseg(int action, u_char *var_val, u_char var_val_type, size_t
 {
 	static ulong old_value;
 	struct mtpM2paTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	ulong set_value = *((ulong *) var_val);
 
 	DEBUGMSGTL(("mtpMIB", "write_mtpM2paSctpMaxseg entering action=%d...  \n", action));
-	StorageTmp = header_complex(mtpM2paTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(mtpM2paTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -34093,11 +34153,11 @@ write_mtpM2paSctpHeartbeatItvl(int action, u_char *var_val, u_char var_val_type,
 {
 	static ulong old_value;
 	struct mtpM2paTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	ulong set_value = *((ulong *) var_val);
 
 	DEBUGMSGTL(("mtpMIB", "write_mtpM2paSctpHeartbeatItvl entering action=%d...  \n", action));
-	StorageTmp = header_complex(mtpM2paTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(mtpM2paTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -34159,11 +34219,11 @@ write_mtpM2paSctpHeartbeat(int action, u_char *var_val, u_char var_val_type, siz
 {
 	static long old_value;
 	struct mtpM2paTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("mtpMIB", "write_mtpM2paSctpHeartbeat entering action=%d...  \n", action));
-	StorageTmp = header_complex(mtpM2paTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(mtpM2paTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -34233,11 +34293,11 @@ write_mtpM2paSctpRtoInitial(int action, u_char *var_val, u_char var_val_type, si
 {
 	static ulong old_value;
 	struct mtpM2paTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	ulong set_value = *((ulong *) var_val);
 
 	DEBUGMSGTL(("mtpMIB", "write_mtpM2paSctpRtoInitial entering action=%d...  \n", action));
-	StorageTmp = header_complex(mtpM2paTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(mtpM2paTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -34299,11 +34359,11 @@ write_mtpM2paSctpRtoMin(int action, u_char *var_val, u_char var_val_type, size_t
 {
 	static ulong old_value;
 	struct mtpM2paTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	ulong set_value = *((ulong *) var_val);
 
 	DEBUGMSGTL(("mtpMIB", "write_mtpM2paSctpRtoMin entering action=%d...  \n", action));
-	StorageTmp = header_complex(mtpM2paTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(mtpM2paTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -34365,11 +34425,11 @@ write_mtpM2paSctpRtoMax(int action, u_char *var_val, u_char var_val_type, size_t
 {
 	static ulong old_value;
 	struct mtpM2paTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	ulong set_value = *((ulong *) var_val);
 
 	DEBUGMSGTL(("mtpMIB", "write_mtpM2paSctpRtoMax entering action=%d...  \n", action));
-	StorageTmp = header_complex(mtpM2paTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(mtpM2paTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -34431,11 +34491,11 @@ write_mtpM2paSctpPathMaxRetrans(int action, u_char *var_val, u_char var_val_type
 {
 	static ulong old_value;
 	struct mtpM2paTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	ulong set_value = *((ulong *) var_val);
 
 	DEBUGMSGTL(("mtpMIB", "write_mtpM2paSctpPathMaxRetrans entering action=%d...  \n", action));
-	StorageTmp = header_complex(mtpM2paTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(mtpM2paTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -34497,11 +34557,11 @@ write_mtpM2paSctpCookieLife(int action, u_char *var_val, u_char var_val_type, si
 {
 	static ulong old_value;
 	struct mtpM2paTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	ulong set_value = *((ulong *) var_val);
 
 	DEBUGMSGTL(("mtpMIB", "write_mtpM2paSctpCookieLife entering action=%d...  \n", action));
-	StorageTmp = header_complex(mtpM2paTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(mtpM2paTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -34563,11 +34623,11 @@ write_mtpM2paSctpCookieInc(int action, u_char *var_val, u_char var_val_type, siz
 {
 	static ulong old_value;
 	struct mtpM2paTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	ulong set_value = *((ulong *) var_val);
 
 	DEBUGMSGTL(("mtpMIB", "write_mtpM2paSctpCookieInc entering action=%d...  \n", action));
-	StorageTmp = header_complex(mtpM2paTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(mtpM2paTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -34629,11 +34689,11 @@ write_mtpM2paSctpMaxInitRetries(int action, u_char *var_val, u_char var_val_type
 {
 	static ulong old_value;
 	struct mtpM2paTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	ulong set_value = *((ulong *) var_val);
 
 	DEBUGMSGTL(("mtpMIB", "write_mtpM2paSctpMaxInitRetries entering action=%d...  \n", action));
-	StorageTmp = header_complex(mtpM2paTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(mtpM2paTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -34695,11 +34755,11 @@ write_mtpM2paSctpMaxBurst(int action, u_char *var_val, u_char var_val_type, size
 {
 	static ulong old_value;
 	struct mtpM2paTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	ulong set_value = *((ulong *) var_val);
 
 	DEBUGMSGTL(("mtpMIB", "write_mtpM2paSctpMaxBurst entering action=%d...  \n", action));
-	StorageTmp = header_complex(mtpM2paTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(mtpM2paTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -34761,11 +34821,11 @@ write_mtpM2paSctpAssocMaxRetrans(int action, u_char *var_val, u_char var_val_typ
 {
 	static ulong old_value;
 	struct mtpM2paTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	ulong set_value = *((ulong *) var_val);
 
 	DEBUGMSGTL(("mtpMIB", "write_mtpM2paSctpAssocMaxRetrans entering action=%d...  \n", action));
-	StorageTmp = header_complex(mtpM2paTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(mtpM2paTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -34827,11 +34887,11 @@ write_mtpM2paSctpSackDelay(int action, u_char *var_val, u_char var_val_type, siz
 {
 	static ulong old_value;
 	struct mtpM2paTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	ulong set_value = *((ulong *) var_val);
 
 	DEBUGMSGTL(("mtpMIB", "write_mtpM2paSctpSackDelay entering action=%d...  \n", action));
-	StorageTmp = header_complex(mtpM2paTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(mtpM2paTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -34898,11 +34958,11 @@ write_mtpM2paSctpLifetime(int action, u_char *var_val, u_char var_val_type, size
 {
 	static ulong old_value;
 	struct mtpM2paTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	ulong set_value = *((ulong *) var_val);
 
 	DEBUGMSGTL(("mtpMIB", "write_mtpM2paSctpLifetime entering action=%d...  \n", action));
-	StorageTmp = header_complex(mtpM2paTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(mtpM2paTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -34964,11 +35024,11 @@ write_mtpM2paLoopDelayLower(int action, u_char *var_val, u_char var_val_type, si
 {
 	static ulong old_value;
 	struct mtpM2paTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	ulong set_value = *((ulong *) var_val);
 
 	DEBUGMSGTL(("mtpMIB", "write_mtpM2paLoopDelayLower entering action=%d...  \n", action));
-	StorageTmp = header_complex(mtpM2paTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(mtpM2paTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -35030,11 +35090,11 @@ write_mtpM2paLoopDelayUpper(int action, u_char *var_val, u_char var_val_type, si
 {
 	static ulong old_value;
 	struct mtpM2paTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	ulong set_value = *((ulong *) var_val);
 
 	DEBUGMSGTL(("mtpMIB", "write_mtpM2paLoopDelayUpper entering action=%d...  \n", action));
-	StorageTmp = header_complex(mtpM2paTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(mtpM2paTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -35096,11 +35156,11 @@ write_mtpM2paTransmissionRateIntervalLower(int action, u_char *var_val, u_char v
 {
 	static ulong old_value;
 	struct mtpM2paTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	ulong set_value = *((ulong *) var_val);
 
 	DEBUGMSGTL(("mtpMIB", "write_mtpM2paTransmissionRateIntervalLower entering action=%d...  \n", action));
-	StorageTmp = header_complex(mtpM2paTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(mtpM2paTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -35162,11 +35222,11 @@ write_mtpM2paTransmissionRateIntervalUpper(int action, u_char *var_val, u_char v
 {
 	static ulong old_value;
 	struct mtpM2paTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	ulong set_value = *((ulong *) var_val);
 
 	DEBUGMSGTL(("mtpMIB", "write_mtpM2paTransmissionRateIntervalUpper entering action=%d...  \n", action));
-	StorageTmp = header_complex(mtpM2paTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(mtpM2paTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -35228,11 +35288,11 @@ write_mtpSdtAdministrativeState(int action, u_char *var_val, u_char var_val_type
 {
 	static long old_value;
 	struct mtpSdtTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("mtpMIB", "write_mtpSdtAdministrativeState entering action=%d...  \n", action));
-	StorageTmp = header_complex(mtpSdtTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(mtpSdtTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -35303,12 +35363,12 @@ write_mtpSdtEquipmentPointer(int action, u_char *var_val, u_char var_val_type, s
 {
 	static oid *old_value;
 	struct mtpSdtTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	static size_t old_length = 0;
 	static oid *objid = NULL;
 
 	DEBUGMSGTL(("mtpMIB", "write_mtpSdtEquipmentPointer entering action=%d...  \n", action));
-	StorageTmp = header_complex(mtpSdtTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(mtpSdtTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		objid = NULL;
@@ -35333,7 +35393,7 @@ write_mtpSdtEquipmentPointer(int action, u_char *var_val, u_char var_val_type, s
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to mtpSdtEquipmentPointer: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
-		/* Note: default value { zeroDotZero } */
+		/* Note: default value zeroDotZero */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
 		if ((objid = snmp_duplicate_objid((void *) var_val, var_val_len / sizeof(oid))) == NULL)
@@ -35380,12 +35440,12 @@ write_mtpSdtName(int action, u_char *var_val, u_char var_val_type, size_t var_va
 {
 	static uint8_t *old_value;
 	struct mtpSdtTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	static size_t old_length = 0;
 	static uint8_t *string = NULL;
 
 	DEBUGMSGTL(("mtpMIB", "write_mtpSdtName entering action=%d...  \n", action));
-	StorageTmp = header_complex(mtpSdtTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(mtpSdtTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		string = NULL;
@@ -35459,12 +35519,12 @@ write_mtpSdtProfilePointer(int action, u_char *var_val, u_char var_val_type, siz
 {
 	static oid *old_value;
 	struct mtpSdtTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	static size_t old_length = 0;
 	static oid *objid = NULL;
 
 	DEBUGMSGTL(("mtpMIB", "write_mtpSdtProfilePointer entering action=%d...  \n", action));
-	StorageTmp = header_complex(mtpSdtTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(mtpSdtTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		objid = NULL;
@@ -35489,7 +35549,7 @@ write_mtpSdtProfilePointer(int action, u_char *var_val, u_char var_val_type, siz
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to mtpSdtProfilePointer: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
-		/* Note: default value '' */
+		/* Note: default value zeroDotZero */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
 		if ((objid = snmp_duplicate_objid((void *) var_val, var_val_len / sizeof(oid))) == NULL)
@@ -35536,11 +35596,11 @@ write_mtpSdlType(int action, u_char *var_val, u_char var_val_type, size_t var_va
 {
 	static long old_value;
 	struct mtpSdlTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("mtpMIB", "write_mtpSdlType entering action=%d...  \n", action));
-	StorageTmp = header_complex(mtpSdlTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(mtpSdlTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -35610,12 +35670,12 @@ write_mtpSdlAdjPc(int action, u_char *var_val, u_char var_val_type, size_t var_v
 {
 	static uint8_t *old_value;
 	struct mtpSdlTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	static size_t old_length = 0;
 	static uint8_t *string = NULL;
 
 	DEBUGMSGTL(("mtpMIB", "write_mtpSdlAdjPc entering action=%d...  \n", action));
-	StorageTmp = header_complex(mtpSdlTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(mtpSdlTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		string = NULL;
@@ -35641,7 +35701,7 @@ write_mtpSdlAdjPc(int action, u_char *var_val, u_char var_val_type, size_t var_v
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to mtpSdlAdjPc: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
-		/* Note: default value '00000000'X */
+		/* Note: default value \"\x00\x00\x00\x00\" */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
 		if ((string = malloc(var_val_len + 1)) == NULL)
@@ -35690,11 +35750,11 @@ write_mtpSdlLoopDelay(int action, u_char *var_val, u_char var_val_type, size_t v
 {
 	static ulong old_value;
 	struct mtpSdlTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	ulong set_value = *((ulong *) var_val);
 
 	DEBUGMSGTL(("mtpMIB", "write_mtpSdlLoopDelay entering action=%d...  \n", action));
-	StorageTmp = header_complex(mtpSdlTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(mtpSdlTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -35756,12 +35816,12 @@ write_mtpSdlEquipmentPointer(int action, u_char *var_val, u_char var_val_type, s
 {
 	static oid *old_value;
 	struct mtpSdlTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	static size_t old_length = 0;
 	static oid *objid = NULL;
 
 	DEBUGMSGTL(("mtpMIB", "write_mtpSdlEquipmentPointer entering action=%d...  \n", action));
-	StorageTmp = header_complex(mtpSdlTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(mtpSdlTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		objid = NULL;
@@ -35786,7 +35846,7 @@ write_mtpSdlEquipmentPointer(int action, u_char *var_val, u_char var_val_type, s
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to mtpSdlEquipmentPointer: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
-		/* Note: default value { zeroDotZero } */
+		/* Note: default value zeroDotZero */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
 		if ((objid = snmp_duplicate_objid((void *) var_val, var_val_len / sizeof(oid))) == NULL)
@@ -35833,11 +35893,11 @@ write_mtpSdlCIC(int action, u_char *var_val, u_char var_val_type, size_t var_val
 {
 	static long old_value;
 	struct mtpSdlTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("mtpMIB", "write_mtpSdlCIC entering action=%d...  \n", action));
-	StorageTmp = header_complex(mtpSdlTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(mtpSdlTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -35862,8 +35922,8 @@ write_mtpSdlCIC(int action, u_char *var_val, u_char var_val_type, size_t var_val
 			return SNMP_ERR_WRONGLENGTH;
 		}
 		/* Note: default value 0 */
-		/* Note: ranges 0..16383 */
-		if ((0 > set_value || set_value > 16383)) {
+		/* Note: ranges 0..65535 */
+		if ((0 > set_value || set_value > 65535)) {
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to mtpSdlCIC: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
@@ -35904,11 +35964,11 @@ write_mtpSdlTransmissionRate(int action, u_char *var_val, u_char var_val_type, s
 {
 	static long old_value;
 	struct mtpSdlTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("mtpMIB", "write_mtpSdlTransmissionRate entering action=%d...  \n", action));
-	StorageTmp = header_complex(mtpSdlTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(mtpSdlTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -35981,12 +36041,12 @@ write_mtpSdlStmChannel(int action, u_char *var_val, u_char var_val_type, size_t 
 {
 	static uint8_t *old_value;
 	struct mtpSdlTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	static size_t old_length = 0;
 	static uint8_t *string = NULL;
 
 	DEBUGMSGTL(("mtpMIB", "write_mtpSdlStmChannel entering action=%d...  \n", action));
-	StorageTmp = header_complex(mtpSdlTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(mtpSdlTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		string = NULL;
@@ -36012,7 +36072,7 @@ write_mtpSdlStmChannel(int action, u_char *var_val, u_char var_val_type, size_t 
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to mtpSdlStmChannel: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
-		/* Note: default value 19 */
+		/* Note: default value \"\x13\" */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
 		if ((string = malloc(var_val_len + 1)) == NULL)
@@ -36061,12 +36121,12 @@ write_mtpSdlVcTTpPointer(int action, u_char *var_val, u_char var_val_type, size_
 {
 	static oid *old_value;
 	struct mtpSdlTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	static size_t old_length = 0;
 	static oid *objid = NULL;
 
 	DEBUGMSGTL(("mtpMIB", "write_mtpSdlVcTTpPointer entering action=%d...  \n", action));
-	StorageTmp = header_complex(mtpSdlTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(mtpSdlTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		objid = NULL;
@@ -36091,7 +36151,7 @@ write_mtpSdlVcTTpPointer(int action, u_char *var_val, u_char var_val_type, size_
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to mtpSdlVcTTpPointer: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
-		/* Note: default value { zeroDotZero } */
+		/* Note: default value zeroDotZero */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
 		if ((objid = snmp_duplicate_objid((void *) var_val, var_val_len / sizeof(oid))) == NULL)
@@ -36138,12 +36198,12 @@ write_mtpSdlSctpPointer(int action, u_char *var_val, u_char var_val_type, size_t
 {
 	static oid *old_value;
 	struct mtpSdlTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	static size_t old_length = 0;
 	static oid *objid = NULL;
 
 	DEBUGMSGTL(("mtpMIB", "write_mtpSdlSctpPointer entering action=%d...  \n", action));
-	StorageTmp = header_complex(mtpSdlTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(mtpSdlTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		objid = NULL;
@@ -36168,7 +36228,7 @@ write_mtpSdlSctpPointer(int action, u_char *var_val, u_char var_val_type, size_t
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to mtpSdlSctpPointer: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
-		/* Note: default value { zeroDotZero } */
+		/* Note: default value zeroDotZero */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
 		if ((objid = snmp_duplicate_objid((void *) var_val, var_val_len / sizeof(oid))) == NULL)
@@ -36215,12 +36275,12 @@ write_mtpSdlName(int action, u_char *var_val, u_char var_val_type, size_t var_va
 {
 	static uint8_t *old_value;
 	struct mtpSdlTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	static size_t old_length = 0;
 	static uint8_t *string = NULL;
 
 	DEBUGMSGTL(("mtpMIB", "write_mtpSdlName entering action=%d...  \n", action));
-	StorageTmp = header_complex(mtpSdlTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(mtpSdlTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		string = NULL;
@@ -36294,11 +36354,11 @@ write_mtpSctpProfileNoDelay(int action, u_char *var_val, u_char var_val_type, si
 {
 	static long old_value;
 	struct mtpSctpProfileTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("mtpMIB", "write_mtpSctpProfileNoDelay entering action=%d...  \n", action));
-	StorageTmp = header_complex(mtpSctpProfileTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(mtpSctpProfileTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -36368,11 +36428,11 @@ write_mtpSctpProfileMaxseg(int action, u_char *var_val, u_char var_val_type, siz
 {
 	static ulong old_value;
 	struct mtpSctpProfileTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	ulong set_value = *((ulong *) var_val);
 
 	DEBUGMSGTL(("mtpMIB", "write_mtpSctpProfileMaxseg entering action=%d...  \n", action));
-	StorageTmp = header_complex(mtpSctpProfileTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(mtpSctpProfileTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -36439,11 +36499,11 @@ write_mtpSctpProfileHeartbeatItvl(int action, u_char *var_val, u_char var_val_ty
 {
 	static ulong old_value;
 	struct mtpSctpProfileTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	ulong set_value = *((ulong *) var_val);
 
 	DEBUGMSGTL(("mtpMIB", "write_mtpSctpProfileHeartbeatItvl entering action=%d...  \n", action));
-	StorageTmp = header_complex(mtpSctpProfileTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(mtpSctpProfileTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -36505,11 +36565,11 @@ write_mtpSctpProfileHeartbeat(int action, u_char *var_val, u_char var_val_type, 
 {
 	static long old_value;
 	struct mtpSctpProfileTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("mtpMIB", "write_mtpSctpProfileHeartbeat entering action=%d...  \n", action));
-	StorageTmp = header_complex(mtpSctpProfileTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(mtpSctpProfileTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -36579,11 +36639,11 @@ write_mtpSctpProfileRtoInitial(int action, u_char *var_val, u_char var_val_type,
 {
 	static ulong old_value;
 	struct mtpSctpProfileTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	ulong set_value = *((ulong *) var_val);
 
 	DEBUGMSGTL(("mtpMIB", "write_mtpSctpProfileRtoInitial entering action=%d...  \n", action));
-	StorageTmp = header_complex(mtpSctpProfileTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(mtpSctpProfileTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -36645,11 +36705,11 @@ write_mtpSctpProfileRtoMin(int action, u_char *var_val, u_char var_val_type, siz
 {
 	static ulong old_value;
 	struct mtpSctpProfileTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	ulong set_value = *((ulong *) var_val);
 
 	DEBUGMSGTL(("mtpMIB", "write_mtpSctpProfileRtoMin entering action=%d...  \n", action));
-	StorageTmp = header_complex(mtpSctpProfileTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(mtpSctpProfileTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -36711,11 +36771,11 @@ write_mtpSctpProfileRtoMax(int action, u_char *var_val, u_char var_val_type, siz
 {
 	static ulong old_value;
 	struct mtpSctpProfileTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	ulong set_value = *((ulong *) var_val);
 
 	DEBUGMSGTL(("mtpMIB", "write_mtpSctpProfileRtoMax entering action=%d...  \n", action));
-	StorageTmp = header_complex(mtpSctpProfileTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(mtpSctpProfileTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -36777,11 +36837,11 @@ write_mtpSctpProfilePathMaxRetrans(int action, u_char *var_val, u_char var_val_t
 {
 	static ulong old_value;
 	struct mtpSctpProfileTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	ulong set_value = *((ulong *) var_val);
 
 	DEBUGMSGTL(("mtpMIB", "write_mtpSctpProfilePathMaxRetrans entering action=%d...  \n", action));
-	StorageTmp = header_complex(mtpSctpProfileTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(mtpSctpProfileTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -36843,11 +36903,11 @@ write_mtpSctpProfileCookieLife(int action, u_char *var_val, u_char var_val_type,
 {
 	static ulong old_value;
 	struct mtpSctpProfileTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	ulong set_value = *((ulong *) var_val);
 
 	DEBUGMSGTL(("mtpMIB", "write_mtpSctpProfileCookieLife entering action=%d...  \n", action));
-	StorageTmp = header_complex(mtpSctpProfileTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(mtpSctpProfileTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -36909,11 +36969,11 @@ write_mtpSctpProfileCookieInc(int action, u_char *var_val, u_char var_val_type, 
 {
 	static ulong old_value;
 	struct mtpSctpProfileTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	ulong set_value = *((ulong *) var_val);
 
 	DEBUGMSGTL(("mtpMIB", "write_mtpSctpProfileCookieInc entering action=%d...  \n", action));
-	StorageTmp = header_complex(mtpSctpProfileTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(mtpSctpProfileTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -36975,11 +37035,11 @@ write_mtpSctpProfileMaxInitRetries(int action, u_char *var_val, u_char var_val_t
 {
 	static ulong old_value;
 	struct mtpSctpProfileTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	ulong set_value = *((ulong *) var_val);
 
 	DEBUGMSGTL(("mtpMIB", "write_mtpSctpProfileMaxInitRetries entering action=%d...  \n", action));
-	StorageTmp = header_complex(mtpSctpProfileTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(mtpSctpProfileTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -37041,11 +37101,11 @@ write_mtpSctpProfileMaxBurst(int action, u_char *var_val, u_char var_val_type, s
 {
 	static ulong old_value;
 	struct mtpSctpProfileTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	ulong set_value = *((ulong *) var_val);
 
 	DEBUGMSGTL(("mtpMIB", "write_mtpSctpProfileMaxBurst entering action=%d...  \n", action));
-	StorageTmp = header_complex(mtpSctpProfileTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(mtpSctpProfileTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -37107,11 +37167,11 @@ write_mtpSctpProfileAssocMaxRetrans(int action, u_char *var_val, u_char var_val_
 {
 	static ulong old_value;
 	struct mtpSctpProfileTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	ulong set_value = *((ulong *) var_val);
 
 	DEBUGMSGTL(("mtpMIB", "write_mtpSctpProfileAssocMaxRetrans entering action=%d...  \n", action));
-	StorageTmp = header_complex(mtpSctpProfileTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(mtpSctpProfileTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -37173,11 +37233,11 @@ write_mtpSctpProfileSackDelay(int action, u_char *var_val, u_char var_val_type, 
 {
 	static ulong old_value;
 	struct mtpSctpProfileTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	ulong set_value = *((ulong *) var_val);
 
 	DEBUGMSGTL(("mtpMIB", "write_mtpSctpProfileSackDelay entering action=%d...  \n", action));
-	StorageTmp = header_complex(mtpSctpProfileTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(mtpSctpProfileTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -37244,11 +37304,11 @@ write_mtpSctpProfileLifetime(int action, u_char *var_val, u_char var_val_type, s
 {
 	static ulong old_value;
 	struct mtpSctpProfileTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	ulong set_value = *((ulong *) var_val);
 
 	DEBUGMSGTL(("mtpMIB", "write_mtpSctpProfileLifetime entering action=%d...  \n", action));
-	StorageTmp = header_complex(mtpSctpProfileTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(mtpSctpProfileTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -37310,11 +37370,11 @@ write_mtpSctpProfileMinOstreams(int action, u_char *var_val, u_char var_val_type
 {
 	static long old_value;
 	struct mtpSctpProfileTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("mtpMIB", "write_mtpSctpProfileMinOstreams entering action=%d...  \n", action));
-	StorageTmp = header_complex(mtpSctpProfileTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(mtpSctpProfileTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -37381,11 +37441,11 @@ write_mtpSctpProfileMaxIstreams(int action, u_char *var_val, u_char var_val_type
 {
 	static long old_value;
 	struct mtpSctpProfileTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("mtpMIB", "write_mtpSctpProfileMaxIstreams entering action=%d...  \n", action));
-	StorageTmp = header_complex(mtpSctpProfileTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(mtpSctpProfileTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -37452,11 +37512,11 @@ write_mtpSctpAdministrativeState(int action, u_char *var_val, u_char var_val_typ
 {
 	static long old_value;
 	struct mtpSctpTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("mtpMIB", "write_mtpSctpAdministrativeState entering action=%d...  \n", action));
-	StorageTmp = header_complex(mtpSctpTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(mtpSctpTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -37527,11 +37587,11 @@ write_mtpSctpLocalPort(int action, u_char *var_val, u_char var_val_type, size_t 
 {
 	static long old_value;
 	struct mtpSctpTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("mtpMIB", "write_mtpSctpLocalPort entering action=%d...  \n", action));
-	StorageTmp = header_complex(mtpSctpTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(mtpSctpTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -37598,11 +37658,11 @@ write_mtpSctpRemotePort(int action, u_char *var_val, u_char var_val_type, size_t
 {
 	static long old_value;
 	struct mtpSctpTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("mtpMIB", "write_mtpSctpRemotePort entering action=%d...  \n", action));
-	StorageTmp = header_complex(mtpSctpTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(mtpSctpTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -37668,12 +37728,12 @@ write_mtpSctpProfile(int action, u_char *var_val, u_char var_val_type, size_t va
 {
 	static uint8_t *old_value;
 	struct mtpSctpTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	static size_t old_length = 0;
 	static uint8_t *string = NULL;
 
 	DEBUGMSGTL(("mtpMIB", "write_mtpSctpProfile entering action=%d...  \n", action));
-	StorageTmp = header_complex(mtpSctpTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(mtpSctpTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		string = NULL;
@@ -37699,7 +37759,7 @@ write_mtpSctpProfile(int action, u_char *var_val, u_char var_val_type, size_t va
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to mtpSctpProfile: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
-		/* Note: default value '' */
+		/* Note: default value \"\" */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
 		if ((string = malloc(var_val_len + 1)) == NULL)
@@ -37748,11 +37808,11 @@ write_mtpSctpProtocolPayloadId(int action, u_char *var_val, u_char var_val_type,
 {
 	static ulong old_value;
 	struct mtpSctpTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	ulong set_value = *((ulong *) var_val);
 
 	DEBUGMSGTL(("mtpMIB", "write_mtpSctpProtocolPayloadId entering action=%d...  \n", action));
-	StorageTmp = header_complex(mtpSctpTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(mtpSctpTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -37814,12 +37874,12 @@ write_mtpSctpLocalAddress(int action, u_char *var_val, u_char var_val_type, size
 {
 	static uint8_t *old_value;
 	struct mtpSctpLocalTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	static size_t old_length = 0;
 	static uint8_t *string = NULL;
 
 	DEBUGMSGTL(("mtpMIB", "write_mtpSctpLocalAddress entering action=%d...  \n", action));
-	StorageTmp = header_complex(mtpSctpLocalTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(mtpSctpLocalTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		string = NULL;
@@ -37892,12 +37952,12 @@ write_mtpSctpRemoteAddress(int action, u_char *var_val, u_char var_val_type, siz
 {
 	static uint8_t *old_value;
 	struct mtpSctpRemoteTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	static size_t old_length = 0;
 	static uint8_t *string = NULL;
 
 	DEBUGMSGTL(("mtpMIB", "write_mtpSctpRemoteAddress entering action=%d...  \n", action));
-	StorageTmp = header_complex(mtpSctpRemoteTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(mtpSctpRemoteTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		string = NULL;
@@ -37970,11 +38030,11 @@ write_mtpM2uaAspId(int action, u_char *var_val, u_char var_val_type, size_t var_
 {
 	static ulong old_value;
 	struct mtpM2uaAspTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	ulong set_value = *((ulong *) var_val);
 
 	DEBUGMSGTL(("mtpMIB", "write_mtpM2uaAspId entering action=%d...  \n", action));
-	StorageTmp = header_complex(mtpM2uaAspTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(mtpM2uaAspTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -38036,12 +38096,12 @@ write_mtpM2uaAspCapabilities(int action, u_char *var_val, u_char var_val_type, s
 {
 	static uint8_t *old_value;
 	struct mtpM2uaAspTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	static size_t old_length = 0;
 	static uint8_t *string = NULL;
 
 	DEBUGMSGTL(("mtpMIB", "write_mtpM2uaAspCapabilities entering action=%d...  \n", action));
-	StorageTmp = header_complex(mtpM2uaAspTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(mtpM2uaAspTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		string = NULL;
@@ -38122,12 +38182,12 @@ write_mtpM2uaAspSgVersion(int action, u_char *var_val, u_char var_val_type, size
 {
 	static oid *old_value;
 	struct mtpM2uaAspTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	static size_t old_length = 0;
 	static oid *objid = NULL;
 
 	DEBUGMSGTL(("mtpMIB", "write_mtpM2uaAspSgVersion entering action=%d...  \n", action));
-	StorageTmp = header_complex(mtpM2uaAspTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(mtpM2uaAspTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		objid = NULL;
@@ -38152,7 +38212,7 @@ write_mtpM2uaAspSgVersion(int action, u_char *var_val, u_char var_val_type, size
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to mtpM2uaAspSgVersion: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
-		/* Note: default value { OPENSS7-SIGTRAN-TC : interoperableVersion } */
+		/* Note: default value interoperableVersion */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
 		if ((objid = snmp_duplicate_objid((void *) var_val, var_val_len / sizeof(oid))) == NULL)
@@ -38199,12 +38259,12 @@ write_mtpM2uaAspSgOptions(int action, u_char *var_val, u_char var_val_type, size
 {
 	static uint8_t *old_value;
 	struct mtpM2uaAspTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	static size_t old_length = 0;
 	static uint8_t *string = NULL;
 
 	DEBUGMSGTL(("mtpMIB", "write_mtpM2uaAspSgOptions entering action=%d...  \n", action));
-	StorageTmp = header_complex(mtpM2uaAspTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(mtpM2uaAspTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		string = NULL;
@@ -38285,11 +38345,11 @@ write_mtpM2uaAspSgRegistrationPolicy(int action, u_char *var_val, u_char var_val
 {
 	static long old_value;
 	struct mtpM2uaAspTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("mtpMIB", "write_mtpM2uaAspSgRegistrationPolicy entering action=%d...  \n", action));
-	StorageTmp = header_complex(mtpM2uaAspTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(mtpM2uaAspTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -38360,11 +38420,11 @@ write_mtpM2uaAspSgAspIdPolicy(int action, u_char *var_val, u_char var_val_type, 
 {
 	static long old_value;
 	struct mtpM2uaAspTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("mtpMIB", "write_mtpM2uaAspSgAspIdPolicy entering action=%d...  \n", action));
-	StorageTmp = header_complex(mtpM2uaAspTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(mtpM2uaAspTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -38436,11 +38496,11 @@ write_mtpM2uaAspAssociationPolicy(int action, u_char *var_val, u_char var_val_ty
 {
 	static long old_value;
 	struct mtpM2uaAspTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("mtpMIB", "write_mtpM2uaAspAssociationPolicy entering action=%d...  \n", action));
-	StorageTmp = header_complex(mtpM2uaAspTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(mtpM2uaAspTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -38512,11 +38572,11 @@ write_mtpM2uaAspProtocolPayloadId(int action, u_char *var_val, u_char var_val_ty
 {
 	static long old_value;
 	struct mtpM2uaAspTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("mtpMIB", "write_mtpM2uaAspProtocolPayloadId entering action=%d...  \n", action));
-	StorageTmp = header_complex(mtpM2uaAspTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(mtpM2uaAspTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -38540,6 +38600,7 @@ write_mtpM2uaAspProtocolPayloadId(int action, u_char *var_val, u_char var_val_ty
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to mtpM2uaAspProtocolPayloadId: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
+		/* Note: default value 0 */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
 		break;
@@ -38575,13 +38636,13 @@ write_mtpM2uaAspProtocolPayloadId(int action, u_char *var_val, u_char var_val_ty
 int
 write_mtpM2uaAsInterfaceIdentifier(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static long old_value;
+	static ulong old_value;
 	struct mtpM2uaAsTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
-	long set_value = *((long *) var_val);
+	size_t newlen = name_len - 16;
+	ulong set_value = *((ulong *) var_val);
 
 	DEBUGMSGTL(("mtpMIB", "write_mtpM2uaAsInterfaceIdentifier entering action=%d...  \n", action));
-	StorageTmp = header_complex(mtpM2uaAsTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(mtpM2uaAsTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -38597,16 +38658,16 @@ write_mtpM2uaAsInterfaceIdentifier(int action, u_char *var_val, u_char var_val_t
 				break;
 			}
 		}
-		if (var_val_type != ASN_INTEGER) {
-			snmp_log(MY_FACILITY(LOG_NOTICE), "write to mtpM2uaAsInterfaceIdentifier not ASN_INTEGER\n");
+		if (var_val_type != ASN_UNSIGNED) {
+			snmp_log(MY_FACILITY(LOG_NOTICE), "write to mtpM2uaAsInterfaceIdentifier not ASN_UNSIGNED\n");
 			return SNMP_ERR_WRONGTYPE;
 		}
-		if (var_val_len > sizeof(int32_t)) {
+		if (var_val_len > sizeof(uint32_t)) {
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to mtpM2uaAsInterfaceIdentifier: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
-		/* Note: ranges 1..2147483647 */
-		if ((1 > set_value || set_value > 2147483647)) {
+		/* Note: ranges 1..4294967295 */
+		if ((1 > set_value || set_value > 4294967295U)) {
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to mtpM2uaAsInterfaceIdentifier: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
@@ -38647,12 +38708,12 @@ write_mtpM2uaInterfaceIdentifierText(int action, u_char *var_val, u_char var_val
 {
 	static uint8_t *old_value;
 	struct mtpM2uaAsTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	static size_t old_length = 0;
 	static uint8_t *string = NULL;
 
 	DEBUGMSGTL(("mtpMIB", "write_mtpM2uaInterfaceIdentifierText entering action=%d...  \n", action));
-	StorageTmp = header_complex(mtpM2uaAsTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(mtpM2uaAsTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		string = NULL;
@@ -38726,11 +38787,11 @@ write_mtpM2uaAsSDTI(int action, u_char *var_val, u_char var_val_type, size_t var
 {
 	static long old_value;
 	struct mtpM2uaAsTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("mtpMIB", "write_mtpM2uaAsSDTI entering action=%d...  \n", action));
-	StorageTmp = header_complex(mtpM2uaAsTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(mtpM2uaAsTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -38791,12 +38852,12 @@ write_mtpM2uaAsTrafficMode(int action, u_char *var_val, u_char var_val_type, siz
 {
 	static oid *old_value;
 	struct mtpM2uaAsTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	static size_t old_length = 0;
 	static oid *objid = NULL;
 
 	DEBUGMSGTL(("mtpMIB", "write_mtpM2uaAsTrafficMode entering action=%d...  \n", action));
-	StorageTmp = header_complex(mtpM2uaAsTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(mtpM2uaAsTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		objid = NULL;
@@ -38821,7 +38882,7 @@ write_mtpM2uaAsTrafficMode(int action, u_char *var_val, u_char var_val_type, siz
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to mtpM2uaAsTrafficMode: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
-		/* Note: default value OPENSS7-SIGTRAN-TC : activeStandby */
+		/* Note: default value activeStandby */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
 		if ((objid = snmp_duplicate_objid((void *) var_val, var_val_len / sizeof(oid))) == NULL)
@@ -38868,11 +38929,11 @@ write_mtpM3uaAsType(int action, u_char *var_val, u_char var_val_type, size_t var
 {
 	static long old_value;
 	struct mtpM3uaAspTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("mtpMIB", "write_mtpM3uaAsType entering action=%d...  \n", action));
-	StorageTmp = header_complex(mtpM3uaAspTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(mtpM3uaAspTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -38943,11 +39004,11 @@ write_mtpM3uaAspId(int action, u_char *var_val, u_char var_val_type, size_t var_
 {
 	static ulong old_value;
 	struct mtpM3uaAspTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	ulong set_value = *((ulong *) var_val);
 
 	DEBUGMSGTL(("mtpMIB", "write_mtpM3uaAspId entering action=%d...  \n", action));
-	StorageTmp = header_complex(mtpM3uaAspTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(mtpM3uaAspTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -39008,12 +39069,12 @@ write_mtpM3uaAspCapabilities(int action, u_char *var_val, u_char var_val_type, s
 {
 	static uint8_t *old_value;
 	struct mtpM3uaAspTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	static size_t old_length = 0;
 	static uint8_t *string = NULL;
 
 	DEBUGMSGTL(("mtpMIB", "write_mtpM3uaAspCapabilities entering action=%d...  \n", action));
-	StorageTmp = header_complex(mtpM3uaAspTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(mtpM3uaAspTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		string = NULL;
@@ -39094,12 +39155,12 @@ write_mtpM3uaAspSgVersion(int action, u_char *var_val, u_char var_val_type, size
 {
 	static oid *old_value;
 	struct mtpM3uaAspTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	static size_t old_length = 0;
 	static oid *objid = NULL;
 
 	DEBUGMSGTL(("mtpMIB", "write_mtpM3uaAspSgVersion entering action=%d...  \n", action));
-	StorageTmp = header_complex(mtpM3uaAspTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(mtpM3uaAspTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		objid = NULL;
@@ -39124,7 +39185,7 @@ write_mtpM3uaAspSgVersion(int action, u_char *var_val, u_char var_val_type, size
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to mtpM3uaAspSgVersion: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
-		/* Note: default value { OPENSS7-SIGTRAN-TC : interoperableVersion } */
+		/* Note: default value interoperableVersion */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
 		if ((objid = snmp_duplicate_objid((void *) var_val, var_val_len / sizeof(oid))) == NULL)
@@ -39171,12 +39232,12 @@ write_mtpM3uaAspSgOptions(int action, u_char *var_val, u_char var_val_type, size
 {
 	static uint8_t *old_value;
 	struct mtpM3uaAspTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	static size_t old_length = 0;
 	static uint8_t *string = NULL;
 
 	DEBUGMSGTL(("mtpMIB", "write_mtpM3uaAspSgOptions entering action=%d...  \n", action));
-	StorageTmp = header_complex(mtpM3uaAspTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(mtpM3uaAspTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		string = NULL;
@@ -39257,11 +39318,11 @@ write_mtpM3uaAspSgRegistrationPolicy(int action, u_char *var_val, u_char var_val
 {
 	static long old_value;
 	struct mtpM3uaAspTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("mtpMIB", "write_mtpM3uaAspSgRegistrationPolicy entering action=%d...  \n", action));
-	StorageTmp = header_complex(mtpM3uaAspTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(mtpM3uaAspTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -39332,11 +39393,11 @@ write_mtpM3uaAspSgAspIdPolicy(int action, u_char *var_val, u_char var_val_type, 
 {
 	static long old_value;
 	struct mtpM3uaAspTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("mtpMIB", "write_mtpM3uaAspSgAspIdPolicy entering action=%d...  \n", action));
-	StorageTmp = header_complex(mtpM3uaAspTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(mtpM3uaAspTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -39408,11 +39469,11 @@ write_mtpM3uaAspAssociationPolicy(int action, u_char *var_val, u_char var_val_ty
 {
 	static long old_value;
 	struct mtpM3uaAspTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("mtpMIB", "write_mtpM3uaAspAssociationPolicy entering action=%d...  \n", action));
-	StorageTmp = header_complex(mtpM3uaAspTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(mtpM3uaAspTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -39484,11 +39545,11 @@ write_mtpM3uaAspProtocolPayloadId(int action, u_char *var_val, u_char var_val_ty
 {
 	static long old_value;
 	struct mtpM3uaAspTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("mtpMIB", "write_mtpM3uaAspProtocolPayloadId entering action=%d...  \n", action));
-	StorageTmp = header_complex(mtpM3uaAspTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(mtpM3uaAspTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -39549,11 +39610,11 @@ write_mtpM3uaAsRoutingContext(int action, u_char *var_val, u_char var_val_type, 
 {
 	static ulong old_value;
 	struct mtpM3uaAsTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	ulong set_value = *((ulong *) var_val);
 
 	DEBUGMSGTL(("mtpMIB", "write_mtpM3uaAsRoutingContext entering action=%d...  \n", action));
-	StorageTmp = header_complex(mtpM3uaAsTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(mtpM3uaAsTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -39614,11 +39675,11 @@ write_mtpM3uaAsNetworkAppearance(int action, u_char *var_val, u_char var_val_typ
 {
 	static ulong old_value;
 	struct mtpM3uaAsTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	ulong set_value = *((ulong *) var_val);
 
 	DEBUGMSGTL(("mtpMIB", "write_mtpM3uaAsNetworkAppearance entering action=%d...  \n", action));
-	StorageTmp = header_complex(mtpM3uaAsTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(mtpM3uaAsTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -39679,12 +39740,12 @@ write_mtpM3uaAsNetworkPointCode(int action, u_char *var_val, u_char var_val_type
 {
 	static uint8_t *old_value;
 	struct mtpM3uaAsTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	static size_t old_length = 0;
 	static uint8_t *string = NULL;
 
 	DEBUGMSGTL(("mtpMIB", "write_mtpM3uaAsNetworkPointCode entering action=%d...  \n", action));
-	StorageTmp = header_complex(mtpM3uaAsTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(mtpM3uaAsTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		string = NULL;
@@ -39758,12 +39819,12 @@ write_mtpM3uaAsTrafficMode(int action, u_char *var_val, u_char var_val_type, siz
 {
 	static oid *old_value;
 	struct mtpM3uaAsTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	static size_t old_length = 0;
 	static oid *objid = NULL;
 
 	DEBUGMSGTL(("mtpMIB", "write_mtpM3uaAsTrafficMode entering action=%d...  \n", action));
-	StorageTmp = header_complex(mtpM3uaAsTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(mtpM3uaAsTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		objid = NULL;
@@ -40534,8 +40595,8 @@ write_mtpDefaultSctpSackDelay(int action, u_char *var_val, u_char var_val_type, 
 			return SNMP_ERR_WRONGLENGTH;
 		}
 		/* Note: default value 200 */
-		/* Note: ranges 0..50 */
-		if ((0 > set_value || set_value > 50)) {
+		/* Note: ranges 0..500 */
+		if ((0 > set_value || set_value > 500)) {
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to mtpDefaultSctpSackDelay: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
@@ -41237,13 +41298,13 @@ write_mtpSapRowStatus(int action, u_char *var_val, u_char var_val_type, size_t v
 {
 	struct mtpSapTable_data *StorageTmp = NULL;
 	static struct mtpSapTable_data *StorageNew, *StorageDel;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	static int old_value;
 	int set_value, ret;
 	static struct variable_list *vars, *vp;
 
 	DEBUGMSGTL(("mtpMIB", "write_mtpSapRowStatus entering action=%d...  \n", action));
-	StorageTmp = header_complex(mtpSapTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(mtpSapTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	if (var_val_type != ASN_INTEGER || var_val == NULL) {
 		snmp_log(MY_FACILITY(LOG_NOTICE), "write to mtpSapRowStatus not ASN_INTEGER\n");
 		return SNMP_ERR_WRONGTYPE;
@@ -41316,7 +41377,7 @@ write_mtpSapRowStatus(int action, u_char *var_val, u_char var_val_type, size_t v
 				snmp_free_varbind(vars);
 				return SNMP_ERR_RESOURCEUNAVAILABLE;
 			}
-			if (header_complex_parse_oid(&(name[17]), newlen, vars) != SNMPERR_SUCCESS) {
+			if (header_complex_parse_oid(&(name[16]), newlen, vars) != SNMPERR_SUCCESS) {
 				snmp_free_varbind(vars);
 				return SNMP_ERR_INCONSISTENTNAME;
 			}
@@ -41478,13 +41539,13 @@ write_mtpNaRowStatus(int action, u_char *var_val, u_char var_val_type, size_t va
 {
 	struct mtpNaTable_data *StorageTmp = NULL;
 	static struct mtpNaTable_data *StorageNew, *StorageDel;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	static int old_value;
 	int set_value, ret;
 	static struct variable_list *vars, *vp;
 
 	DEBUGMSGTL(("mtpMIB", "write_mtpNaRowStatus entering action=%d...  \n", action));
-	StorageTmp = header_complex(mtpNaTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(mtpNaTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	if (var_val_type != ASN_INTEGER || var_val == NULL) {
 		snmp_log(MY_FACILITY(LOG_NOTICE), "write to mtpNaRowStatus not ASN_INTEGER\n");
 		return SNMP_ERR_WRONGTYPE;
@@ -41547,7 +41608,7 @@ write_mtpNaRowStatus(int action, u_char *var_val, u_char var_val_type, size_t va
 				snmp_free_varbind(vars);
 				return SNMP_ERR_RESOURCEUNAVAILABLE;
 			}
-			if (header_complex_parse_oid(&(name[17]), newlen, vars) != SNMPERR_SUCCESS) {
+			if (header_complex_parse_oid(&(name[16]), newlen, vars) != SNMPERR_SUCCESS) {
 				snmp_free_varbind(vars);
 				return SNMP_ERR_INCONSISTENTNAME;
 			}
@@ -41697,13 +41758,13 @@ write_mtpMsRowStatus(int action, u_char *var_val, u_char var_val_type, size_t va
 {
 	struct mtpMsTable_data *StorageTmp = NULL;
 	static struct mtpMsTable_data *StorageNew, *StorageDel;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	static int old_value;
 	int set_value, ret;
 	static struct variable_list *vars, *vp;
 
 	DEBUGMSGTL(("mtpMIB", "write_mtpMsRowStatus entering action=%d...  \n", action));
-	StorageTmp = header_complex(mtpMsTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(mtpMsTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	if (var_val_type != ASN_INTEGER || var_val == NULL) {
 		snmp_log(MY_FACILITY(LOG_NOTICE), "write to mtpMsRowStatus not ASN_INTEGER\n");
 		return SNMP_ERR_WRONGTYPE;
@@ -41766,7 +41827,7 @@ write_mtpMsRowStatus(int action, u_char *var_val, u_char var_val_type, size_t va
 				snmp_free_varbind(vars);
 				return SNMP_ERR_RESOURCEUNAVAILABLE;
 			}
-			if (header_complex_parse_oid(&(name[17]), newlen, vars) != SNMPERR_SUCCESS) {
+			if (header_complex_parse_oid(&(name[16]), newlen, vars) != SNMPERR_SUCCESS) {
 				snmp_free_varbind(vars);
 				return SNMP_ERR_INCONSISTENTNAME;
 			}
@@ -41910,13 +41971,13 @@ write_mtpSpProfileRowStatus(int action, u_char *var_val, u_char var_val_type, si
 {
 	struct mtpSpProfileTable_data *StorageTmp = NULL;
 	static struct mtpSpProfileTable_data *StorageNew, *StorageDel;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	static int old_value;
 	int set_value, ret;
 	static struct variable_list *vars, *vp;
 
 	DEBUGMSGTL(("mtpMIB", "write_mtpSpProfileRowStatus entering action=%d...  \n", action));
-	StorageTmp = header_complex(mtpSpProfileTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(mtpSpProfileTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	if (var_val_type != ASN_INTEGER || var_val == NULL) {
 		snmp_log(MY_FACILITY(LOG_NOTICE), "write to mtpSpProfileRowStatus not ASN_INTEGER\n");
 		return SNMP_ERR_WRONGTYPE;
@@ -41979,7 +42040,7 @@ write_mtpSpProfileRowStatus(int action, u_char *var_val, u_char var_val_type, si
 				snmp_free_varbind(vars);
 				return SNMP_ERR_RESOURCEUNAVAILABLE;
 			}
-			if (header_complex_parse_oid(&(name[17]), newlen, vars) != SNMPERR_SUCCESS) {
+			if (header_complex_parse_oid(&(name[16]), newlen, vars) != SNMPERR_SUCCESS) {
 				snmp_free_varbind(vars);
 				return SNMP_ERR_INCONSISTENTNAME;
 			}
@@ -42125,13 +42186,13 @@ write_mtpSpRowStatus(int action, u_char *var_val, u_char var_val_type, size_t va
 {
 	struct mtpSpTable_data *StorageTmp = NULL;
 	static struct mtpSpTable_data *StorageNew, *StorageDel;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	static int old_value;
 	int set_value, ret;
 	static struct variable_list *vars, *vp;
 
 	DEBUGMSGTL(("mtpMIB", "write_mtpSpRowStatus entering action=%d...  \n", action));
-	StorageTmp = header_complex(mtpSpTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(mtpSpTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	if (var_val_type != ASN_INTEGER || var_val == NULL) {
 		snmp_log(MY_FACILITY(LOG_NOTICE), "write to mtpSpRowStatus not ASN_INTEGER\n");
 		return SNMP_ERR_WRONGTYPE;
@@ -42199,7 +42260,7 @@ write_mtpSpRowStatus(int action, u_char *var_val, u_char var_val_type, size_t va
 				snmp_free_varbind(vars);
 				return SNMP_ERR_RESOURCEUNAVAILABLE;
 			}
-			if (header_complex_parse_oid(&(name[17]), newlen, vars) != SNMPERR_SUCCESS) {
+			if (header_complex_parse_oid(&(name[16]), newlen, vars) != SNMPERR_SUCCESS) {
 				snmp_free_varbind(vars);
 				return SNMP_ERR_INCONSISTENTNAME;
 			}
@@ -42352,13 +42413,13 @@ write_mtpL3RowStatus(int action, u_char *var_val, u_char var_val_type, size_t va
 {
 	struct mtpL3Table_data *StorageTmp = NULL;
 	static struct mtpL3Table_data *StorageNew, *StorageDel;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	static int old_value;
 	int set_value, ret;
 	static struct variable_list *vars, *vp;
 
 	DEBUGMSGTL(("mtpMIB", "write_mtpL3RowStatus entering action=%d...  \n", action));
-	StorageTmp = header_complex(mtpL3TableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(mtpL3TableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	if (var_val_type != ASN_INTEGER || var_val == NULL) {
 		snmp_log(MY_FACILITY(LOG_NOTICE), "write to mtpL3RowStatus not ASN_INTEGER\n");
 		return SNMP_ERR_WRONGTYPE;
@@ -42431,7 +42492,7 @@ write_mtpL3RowStatus(int action, u_char *var_val, u_char var_val_type, size_t va
 				snmp_free_varbind(vars);
 				return SNMP_ERR_RESOURCEUNAVAILABLE;
 			}
-			if (header_complex_parse_oid(&(name[17]), newlen, vars) != SNMPERR_SUCCESS) {
+			if (header_complex_parse_oid(&(name[16]), newlen, vars) != SNMPERR_SUCCESS) {
 				snmp_free_varbind(vars);
 				return SNMP_ERR_INCONSISTENTNAME;
 			}
@@ -42593,13 +42654,13 @@ write_mtpGsRowStatus(int action, u_char *var_val, u_char var_val_type, size_t va
 {
 	struct mtpGsTable_data *StorageTmp = NULL;
 	static struct mtpGsTable_data *StorageNew, *StorageDel;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	static int old_value;
 	int set_value, ret;
 	static struct variable_list *vars, *vp;
 
 	DEBUGMSGTL(("mtpMIB", "write_mtpGsRowStatus entering action=%d...  \n", action));
-	StorageTmp = header_complex(mtpGsTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(mtpGsTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	if (var_val_type != ASN_INTEGER || var_val == NULL) {
 		snmp_log(MY_FACILITY(LOG_NOTICE), "write to mtpGsRowStatus not ASN_INTEGER\n");
 		return SNMP_ERR_WRONGTYPE;
@@ -42672,7 +42733,7 @@ write_mtpGsRowStatus(int action, u_char *var_val, u_char var_val_type, size_t va
 				snmp_free_varbind(vars);
 				return SNMP_ERR_RESOURCEUNAVAILABLE;
 			}
-			if (header_complex_parse_oid(&(name[17]), newlen, vars) != SNMPERR_SUCCESS) {
+			if (header_complex_parse_oid(&(name[16]), newlen, vars) != SNMPERR_SUCCESS) {
 				snmp_free_varbind(vars);
 				return SNMP_ERR_INCONSISTENTNAME;
 			}
@@ -42834,13 +42895,13 @@ write_mtpGsLineRowStatus(int action, u_char *var_val, u_char var_val_type, size_
 {
 	struct mtpGsLineTable_data *StorageTmp = NULL;
 	static struct mtpGsLineTable_data *StorageNew, *StorageDel;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	static int old_value;
 	int set_value, ret;
 	static struct variable_list *vars, *vp;
 
 	DEBUGMSGTL(("mtpMIB", "write_mtpGsLineRowStatus entering action=%d...  \n", action));
-	StorageTmp = header_complex(mtpGsLineTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(mtpGsLineTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	if (var_val_type != ASN_INTEGER || var_val == NULL) {
 		snmp_log(MY_FACILITY(LOG_NOTICE), "write to mtpGsLineRowStatus not ASN_INTEGER\n");
 		return SNMP_ERR_WRONGTYPE;
@@ -42918,7 +42979,7 @@ write_mtpGsLineRowStatus(int action, u_char *var_val, u_char var_val_type, size_
 				snmp_free_varbind(vars);
 				return SNMP_ERR_RESOURCEUNAVAILABLE;
 			}
-			if (header_complex_parse_oid(&(name[17]), newlen, vars) != SNMPERR_SUCCESS) {
+			if (header_complex_parse_oid(&(name[16]), newlen, vars) != SNMPERR_SUCCESS) {
 				snmp_free_varbind(vars);
 				return SNMP_ERR_INCONSISTENTNAME;
 			}
@@ -43089,13 +43150,13 @@ write_mtpGsLineContentRowStatus(int action, u_char *var_val, u_char var_val_type
 {
 	struct mtpGsLineContentTable_data *StorageTmp = NULL;
 	static struct mtpGsLineContentTable_data *StorageNew, *StorageDel;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	static int old_value;
 	int set_value, ret;
 	static struct variable_list *vars, *vp;
 
 	DEBUGMSGTL(("mtpMIB", "write_mtpGsLineContentRowStatus entering action=%d...  \n", action));
-	StorageTmp = header_complex(mtpGsLineContentTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(mtpGsLineContentTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	if (var_val_type != ASN_INTEGER || var_val == NULL) {
 		snmp_log(MY_FACILITY(LOG_NOTICE), "write to mtpGsLineContentRowStatus not ASN_INTEGER\n");
 		return SNMP_ERR_WRONGTYPE;
@@ -43178,7 +43239,7 @@ write_mtpGsLineContentRowStatus(int action, u_char *var_val, u_char var_val_type
 				snmp_free_varbind(vars);
 				return SNMP_ERR_RESOURCEUNAVAILABLE;
 			}
-			if (header_complex_parse_oid(&(name[17]), newlen, vars) != SNMPERR_SUCCESS) {
+			if (header_complex_parse_oid(&(name[16]), newlen, vars) != SNMPERR_SUCCESS) {
 				snmp_free_varbind(vars);
 				return SNMP_ERR_INCONSISTENTNAME;
 			}
@@ -43358,13 +43419,13 @@ write_mtpRsProfileRowStatus(int action, u_char *var_val, u_char var_val_type, si
 {
 	struct mtpRsProfileTable_data *StorageTmp = NULL;
 	static struct mtpRsProfileTable_data *StorageNew, *StorageDel;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	static int old_value;
 	int set_value, ret;
 	static struct variable_list *vars, *vp;
 
 	DEBUGMSGTL(("mtpMIB", "write_mtpRsProfileRowStatus entering action=%d...  \n", action));
-	StorageTmp = header_complex(mtpRsProfileTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(mtpRsProfileTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	if (var_val_type != ASN_INTEGER || var_val == NULL) {
 		snmp_log(MY_FACILITY(LOG_NOTICE), "write to mtpRsProfileRowStatus not ASN_INTEGER\n");
 		return SNMP_ERR_WRONGTYPE;
@@ -43427,7 +43488,7 @@ write_mtpRsProfileRowStatus(int action, u_char *var_val, u_char var_val_type, si
 				snmp_free_varbind(vars);
 				return SNMP_ERR_RESOURCEUNAVAILABLE;
 			}
-			if (header_complex_parse_oid(&(name[17]), newlen, vars) != SNMPERR_SUCCESS) {
+			if (header_complex_parse_oid(&(name[16]), newlen, vars) != SNMPERR_SUCCESS) {
 				snmp_free_varbind(vars);
 				return SNMP_ERR_INCONSISTENTNAME;
 			}
@@ -43573,13 +43634,13 @@ write_mtpRsRowStatus(int action, u_char *var_val, u_char var_val_type, size_t va
 {
 	struct mtpRsTable_data *StorageTmp = NULL;
 	static struct mtpRsTable_data *StorageNew, *StorageDel;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	static int old_value;
 	int set_value, ret;
 	static struct variable_list *vars, *vp;
 
 	DEBUGMSGTL(("mtpMIB", "write_mtpRsRowStatus entering action=%d...  \n", action));
-	StorageTmp = header_complex(mtpRsTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(mtpRsTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	if (var_val_type != ASN_INTEGER || var_val == NULL) {
 		snmp_log(MY_FACILITY(LOG_NOTICE), "write to mtpRsRowStatus not ASN_INTEGER\n");
 		return SNMP_ERR_WRONGTYPE;
@@ -43652,7 +43713,7 @@ write_mtpRsRowStatus(int action, u_char *var_val, u_char var_val_type, size_t va
 				snmp_free_varbind(vars);
 				return SNMP_ERR_RESOURCEUNAVAILABLE;
 			}
-			if (header_complex_parse_oid(&(name[17]), newlen, vars) != SNMPERR_SUCCESS) {
+			if (header_complex_parse_oid(&(name[16]), newlen, vars) != SNMPERR_SUCCESS) {
 				snmp_free_varbind(vars);
 				return SNMP_ERR_INCONSISTENTNAME;
 			}
@@ -43814,13 +43875,13 @@ write_mtpRtProfileRowStatus(int action, u_char *var_val, u_char var_val_type, si
 {
 	struct mtpRtProfileTable_data *StorageTmp = NULL;
 	static struct mtpRtProfileTable_data *StorageNew, *StorageDel;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	static int old_value;
 	int set_value, ret;
 	static struct variable_list *vars, *vp;
 
 	DEBUGMSGTL(("mtpMIB", "write_mtpRtProfileRowStatus entering action=%d...  \n", action));
-	StorageTmp = header_complex(mtpRtProfileTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(mtpRtProfileTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	if (var_val_type != ASN_INTEGER || var_val == NULL) {
 		snmp_log(MY_FACILITY(LOG_NOTICE), "write to mtpRtProfileRowStatus not ASN_INTEGER\n");
 		return SNMP_ERR_WRONGTYPE;
@@ -43883,7 +43944,7 @@ write_mtpRtProfileRowStatus(int action, u_char *var_val, u_char var_val_type, si
 				snmp_free_varbind(vars);
 				return SNMP_ERR_RESOURCEUNAVAILABLE;
 			}
-			if (header_complex_parse_oid(&(name[17]), newlen, vars) != SNMPERR_SUCCESS) {
+			if (header_complex_parse_oid(&(name[16]), newlen, vars) != SNMPERR_SUCCESS) {
 				snmp_free_varbind(vars);
 				return SNMP_ERR_INCONSISTENTNAME;
 			}
@@ -44029,13 +44090,13 @@ write_mtpRtRowStatus(int action, u_char *var_val, u_char var_val_type, size_t va
 {
 	struct mtpRtTable_data *StorageTmp = NULL;
 	static struct mtpRtTable_data *StorageNew, *StorageDel;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	static int old_value;
 	int set_value, ret;
 	static struct variable_list *vars, *vp;
 
 	DEBUGMSGTL(("mtpMIB", "write_mtpRtRowStatus entering action=%d...  \n", action));
-	StorageTmp = header_complex(mtpRtTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(mtpRtTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	if (var_val_type != ASN_INTEGER || var_val == NULL) {
 		snmp_log(MY_FACILITY(LOG_NOTICE), "write to mtpRtRowStatus not ASN_INTEGER\n");
 		return SNMP_ERR_WRONGTYPE;
@@ -44113,7 +44174,7 @@ write_mtpRtRowStatus(int action, u_char *var_val, u_char var_val_type, size_t va
 				snmp_free_varbind(vars);
 				return SNMP_ERR_RESOURCEUNAVAILABLE;
 			}
-			if (header_complex_parse_oid(&(name[17]), newlen, vars) != SNMPERR_SUCCESS) {
+			if (header_complex_parse_oid(&(name[16]), newlen, vars) != SNMPERR_SUCCESS) {
 				snmp_free_varbind(vars);
 				return SNMP_ERR_INCONSISTENTNAME;
 			}
@@ -44284,13 +44345,13 @@ write_mtpLsProfileRowStatus(int action, u_char *var_val, u_char var_val_type, si
 {
 	struct mtpLsProfileTable_data *StorageTmp = NULL;
 	static struct mtpLsProfileTable_data *StorageNew, *StorageDel;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	static int old_value;
 	int set_value, ret;
 	static struct variable_list *vars, *vp;
 
 	DEBUGMSGTL(("mtpMIB", "write_mtpLsProfileRowStatus entering action=%d...  \n", action));
-	StorageTmp = header_complex(mtpLsProfileTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(mtpLsProfileTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	if (var_val_type != ASN_INTEGER || var_val == NULL) {
 		snmp_log(MY_FACILITY(LOG_NOTICE), "write to mtpLsProfileRowStatus not ASN_INTEGER\n");
 		return SNMP_ERR_WRONGTYPE;
@@ -44353,7 +44414,7 @@ write_mtpLsProfileRowStatus(int action, u_char *var_val, u_char var_val_type, si
 				snmp_free_varbind(vars);
 				return SNMP_ERR_RESOURCEUNAVAILABLE;
 			}
-			if (header_complex_parse_oid(&(name[17]), newlen, vars) != SNMPERR_SUCCESS) {
+			if (header_complex_parse_oid(&(name[16]), newlen, vars) != SNMPERR_SUCCESS) {
 				snmp_free_varbind(vars);
 				return SNMP_ERR_INCONSISTENTNAME;
 			}
@@ -44499,13 +44560,13 @@ write_mtpLsRowStatus(int action, u_char *var_val, u_char var_val_type, size_t va
 {
 	struct mtpLsTable_data *StorageTmp = NULL;
 	static struct mtpLsTable_data *StorageNew, *StorageDel;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	static int old_value;
 	int set_value, ret;
 	static struct variable_list *vars, *vp;
 
 	DEBUGMSGTL(("mtpMIB", "write_mtpLsRowStatus entering action=%d...  \n", action));
-	StorageTmp = header_complex(mtpLsTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(mtpLsTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	if (var_val_type != ASN_INTEGER || var_val == NULL) {
 		snmp_log(MY_FACILITY(LOG_NOTICE), "write to mtpLsRowStatus not ASN_INTEGER\n");
 		return SNMP_ERR_WRONGTYPE;
@@ -44578,7 +44639,7 @@ write_mtpLsRowStatus(int action, u_char *var_val, u_char var_val_type, size_t va
 				snmp_free_varbind(vars);
 				return SNMP_ERR_RESOURCEUNAVAILABLE;
 			}
-			if (header_complex_parse_oid(&(name[17]), newlen, vars) != SNMPERR_SUCCESS) {
+			if (header_complex_parse_oid(&(name[16]), newlen, vars) != SNMPERR_SUCCESS) {
 				snmp_free_varbind(vars);
 				return SNMP_ERR_INCONSISTENTNAME;
 			}
@@ -44740,13 +44801,13 @@ write_mtpSlL3ProfileRowStatus(int action, u_char *var_val, u_char var_val_type, 
 {
 	struct mtpSlL3ProfileTable_data *StorageTmp = NULL;
 	static struct mtpSlL3ProfileTable_data *StorageNew, *StorageDel;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	static int old_value;
 	int set_value, ret;
 	static struct variable_list *vars, *vp;
 
 	DEBUGMSGTL(("mtpMIB", "write_mtpSlL3ProfileRowStatus entering action=%d...  \n", action));
-	StorageTmp = header_complex(mtpSlL3ProfileTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(mtpSlL3ProfileTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	if (var_val_type != ASN_INTEGER || var_val == NULL) {
 		snmp_log(MY_FACILITY(LOG_NOTICE), "write to mtpSlL3ProfileRowStatus not ASN_INTEGER\n");
 		return SNMP_ERR_WRONGTYPE;
@@ -44809,7 +44870,7 @@ write_mtpSlL3ProfileRowStatus(int action, u_char *var_val, u_char var_val_type, 
 				snmp_free_varbind(vars);
 				return SNMP_ERR_RESOURCEUNAVAILABLE;
 			}
-			if (header_complex_parse_oid(&(name[17]), newlen, vars) != SNMPERR_SUCCESS) {
+			if (header_complex_parse_oid(&(name[16]), newlen, vars) != SNMPERR_SUCCESS) {
 				snmp_free_varbind(vars);
 				return SNMP_ERR_INCONSISTENTNAME;
 			}
@@ -44955,13 +45016,13 @@ write_mtpSlL2ProfileRowStatus(int action, u_char *var_val, u_char var_val_type, 
 {
 	struct mtpSlL2ProfileTable_data *StorageTmp = NULL;
 	static struct mtpSlL2ProfileTable_data *StorageNew, *StorageDel;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	static int old_value;
 	int set_value, ret;
 	static struct variable_list *vars, *vp;
 
 	DEBUGMSGTL(("mtpMIB", "write_mtpSlL2ProfileRowStatus entering action=%d...  \n", action));
-	StorageTmp = header_complex(mtpSlL2ProfileTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(mtpSlL2ProfileTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	if (var_val_type != ASN_INTEGER || var_val == NULL) {
 		snmp_log(MY_FACILITY(LOG_NOTICE), "write to mtpSlL2ProfileRowStatus not ASN_INTEGER\n");
 		return SNMP_ERR_WRONGTYPE;
@@ -45029,7 +45090,7 @@ write_mtpSlL2ProfileRowStatus(int action, u_char *var_val, u_char var_val_type, 
 				snmp_free_varbind(vars);
 				return SNMP_ERR_RESOURCEUNAVAILABLE;
 			}
-			if (header_complex_parse_oid(&(name[17]), newlen, vars) != SNMPERR_SUCCESS) {
+			if (header_complex_parse_oid(&(name[16]), newlen, vars) != SNMPERR_SUCCESS) {
 				snmp_free_varbind(vars);
 				return SNMP_ERR_INCONSISTENTNAME;
 			}
@@ -45048,7 +45109,6 @@ write_mtpSlL2ProfileRowStatus(int action, u_char *var_val, u_char var_val_type, 
 				snmp_free_varbind(vars);
 				return SNMP_ERR_INCONSISTENTNAME;
 			}
-			/* Note: default value kbits64 */
 			switch ((long) *vp->val.integer) {
 			case MTPSLL2PROFILETRANSMISSIONRATE_KBITS4POINT8:
 			case MTPSLL2PROFILETRANSMISSIONRATE_KBITS56:
@@ -45197,13 +45257,13 @@ write_mtpSlRowStatus(int action, u_char *var_val, u_char var_val_type, size_t va
 {
 	struct mtpSlTable_data *StorageTmp = NULL;
 	static struct mtpSlTable_data *StorageNew, *StorageDel;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	static int old_value;
 	int set_value, ret;
 	static struct variable_list *vars, *vp;
 
 	DEBUGMSGTL(("mtpMIB", "write_mtpSlRowStatus entering action=%d...  \n", action));
-	StorageTmp = header_complex(mtpSlTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(mtpSlTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	if (var_val_type != ASN_INTEGER || var_val == NULL) {
 		snmp_log(MY_FACILITY(LOG_NOTICE), "write to mtpSlRowStatus not ASN_INTEGER\n");
 		return SNMP_ERR_WRONGTYPE;
@@ -45281,7 +45341,7 @@ write_mtpSlRowStatus(int action, u_char *var_val, u_char var_val_type, size_t va
 				snmp_free_varbind(vars);
 				return SNMP_ERR_RESOURCEUNAVAILABLE;
 			}
-			if (header_complex_parse_oid(&(name[17]), newlen, vars) != SNMPERR_SUCCESS) {
+			if (header_complex_parse_oid(&(name[16]), newlen, vars) != SNMPERR_SUCCESS) {
 				snmp_free_varbind(vars);
 				return SNMP_ERR_INCONSISTENTNAME;
 			}
@@ -45458,13 +45518,13 @@ write_mtpSlSdlListRowStatus(int action, u_char *var_val, u_char var_val_type, si
 {
 	struct mtpSlSdlListTable_data *StorageTmp = NULL;
 	static struct mtpSlSdlListTable_data *StorageNew, *StorageDel;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	static int old_value;
 	int set_value, ret;
 	static struct variable_list *vars, *vp;
 
 	DEBUGMSGTL(("mtpMIB", "write_mtpSlSdlListRowStatus entering action=%d...  \n", action));
-	StorageTmp = header_complex(mtpSlSdlListTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(mtpSlSdlListTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	if (var_val_type != ASN_INTEGER || var_val == NULL) {
 		snmp_log(MY_FACILITY(LOG_NOTICE), "write to mtpSlSdlListRowStatus not ASN_INTEGER\n");
 		return SNMP_ERR_WRONGTYPE;
@@ -45547,7 +45607,7 @@ write_mtpSlSdlListRowStatus(int action, u_char *var_val, u_char var_val_type, si
 				snmp_free_varbind(vars);
 				return SNMP_ERR_RESOURCEUNAVAILABLE;
 			}
-			if (header_complex_parse_oid(&(name[17]), newlen, vars) != SNMPERR_SUCCESS) {
+			if (header_complex_parse_oid(&(name[16]), newlen, vars) != SNMPERR_SUCCESS) {
 				snmp_free_varbind(vars);
 				return SNMP_ERR_INCONSISTENTNAME;
 			}
@@ -45733,13 +45793,13 @@ write_mtpSlSdtListRowStatus(int action, u_char *var_val, u_char var_val_type, si
 {
 	struct mtpSlSdtListTable_data *StorageTmp = NULL;
 	static struct mtpSlSdtListTable_data *StorageNew, *StorageDel;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	static int old_value;
 	int set_value, ret;
 	static struct variable_list *vars, *vp;
 
 	DEBUGMSGTL(("mtpMIB", "write_mtpSlSdtListRowStatus entering action=%d...  \n", action));
-	StorageTmp = header_complex(mtpSlSdtListTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(mtpSlSdtListTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	if (var_val_type != ASN_INTEGER || var_val == NULL) {
 		snmp_log(MY_FACILITY(LOG_NOTICE), "write to mtpSlSdtListRowStatus not ASN_INTEGER\n");
 		return SNMP_ERR_WRONGTYPE;
@@ -45822,7 +45882,7 @@ write_mtpSlSdtListRowStatus(int action, u_char *var_val, u_char var_val_type, si
 				snmp_free_varbind(vars);
 				return SNMP_ERR_RESOURCEUNAVAILABLE;
 			}
-			if (header_complex_parse_oid(&(name[17]), newlen, vars) != SNMPERR_SUCCESS) {
+			if (header_complex_parse_oid(&(name[16]), newlen, vars) != SNMPERR_SUCCESS) {
 				snmp_free_varbind(vars);
 				return SNMP_ERR_INCONSISTENTNAME;
 			}
@@ -46008,13 +46068,13 @@ write_mtpNbRowStatus(int action, u_char *var_val, u_char var_val_type, size_t va
 {
 	struct mtpNbTable_data *StorageTmp = NULL;
 	static struct mtpNbTable_data *StorageNew, *StorageDel;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	static int old_value;
 	int set_value, ret;
 	static struct variable_list *vars, *vp;
 
 	DEBUGMSGTL(("mtpMIB", "write_mtpNbRowStatus entering action=%d...  \n", action));
-	StorageTmp = header_complex(mtpNbTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(mtpNbTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	if (var_val_type != ASN_INTEGER || var_val == NULL) {
 		snmp_log(MY_FACILITY(LOG_NOTICE), "write to mtpNbRowStatus not ASN_INTEGER\n");
 		return SNMP_ERR_WRONGTYPE;
@@ -46077,7 +46137,7 @@ write_mtpNbRowStatus(int action, u_char *var_val, u_char var_val_type, size_t va
 				snmp_free_varbind(vars);
 				return SNMP_ERR_RESOURCEUNAVAILABLE;
 			}
-			if (header_complex_parse_oid(&(name[17]), newlen, vars) != SNMPERR_SUCCESS) {
+			if (header_complex_parse_oid(&(name[16]), newlen, vars) != SNMPERR_SUCCESS) {
 				snmp_free_varbind(vars);
 				return SNMP_ERR_INCONSISTENTNAME;
 			}
@@ -46223,13 +46283,13 @@ write_mtpSaalRowStatus(int action, u_char *var_val, u_char var_val_type, size_t 
 {
 	struct mtpSaalTable_data *StorageTmp = NULL;
 	static struct mtpSaalTable_data *StorageNew, *StorageDel;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	static int old_value;
 	int set_value, ret;
 	static struct variable_list *vars, *vp;
 
 	DEBUGMSGTL(("mtpMIB", "write_mtpSaalRowStatus entering action=%d...  \n", action));
-	StorageTmp = header_complex(mtpSaalTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(mtpSaalTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	if (var_val_type != ASN_INTEGER || var_val == NULL) {
 		snmp_log(MY_FACILITY(LOG_NOTICE), "write to mtpSaalRowStatus not ASN_INTEGER\n");
 		return SNMP_ERR_WRONGTYPE;
@@ -46292,7 +46352,7 @@ write_mtpSaalRowStatus(int action, u_char *var_val, u_char var_val_type, size_t 
 				snmp_free_varbind(vars);
 				return SNMP_ERR_RESOURCEUNAVAILABLE;
 			}
-			if (header_complex_parse_oid(&(name[17]), newlen, vars) != SNMPERR_SUCCESS) {
+			if (header_complex_parse_oid(&(name[16]), newlen, vars) != SNMPERR_SUCCESS) {
 				snmp_free_varbind(vars);
 				return SNMP_ERR_INCONSISTENTNAME;
 			}
@@ -46438,13 +46498,13 @@ write_mtpM2paRowStatus(int action, u_char *var_val, u_char var_val_type, size_t 
 {
 	struct mtpM2paTable_data *StorageTmp = NULL;
 	static struct mtpM2paTable_data *StorageNew, *StorageDel;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	static int old_value;
 	int set_value, ret;
 	static struct variable_list *vars, *vp;
 
 	DEBUGMSGTL(("mtpMIB", "write_mtpM2paRowStatus entering action=%d...  \n", action));
-	StorageTmp = header_complex(mtpM2paTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(mtpM2paTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	if (var_val_type != ASN_INTEGER || var_val == NULL) {
 		snmp_log(MY_FACILITY(LOG_NOTICE), "write to mtpM2paRowStatus not ASN_INTEGER\n");
 		return SNMP_ERR_WRONGTYPE;
@@ -46507,7 +46567,7 @@ write_mtpM2paRowStatus(int action, u_char *var_val, u_char var_val_type, size_t 
 				snmp_free_varbind(vars);
 				return SNMP_ERR_RESOURCEUNAVAILABLE;
 			}
-			if (header_complex_parse_oid(&(name[17]), newlen, vars) != SNMPERR_SUCCESS) {
+			if (header_complex_parse_oid(&(name[16]), newlen, vars) != SNMPERR_SUCCESS) {
 				snmp_free_varbind(vars);
 				return SNMP_ERR_INCONSISTENTNAME;
 			}
@@ -46653,13 +46713,13 @@ write_mtpSdtRowStatus(int action, u_char *var_val, u_char var_val_type, size_t v
 {
 	struct mtpSdtTable_data *StorageTmp = NULL;
 	static struct mtpSdtTable_data *StorageNew, *StorageDel;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	static int old_value;
 	int set_value, ret;
 	static struct variable_list *vars, *vp;
 
 	DEBUGMSGTL(("mtpMIB", "write_mtpSdtRowStatus entering action=%d...  \n", action));
-	StorageTmp = header_complex(mtpSdtTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(mtpSdtTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	if (var_val_type != ASN_INTEGER || var_val == NULL) {
 		snmp_log(MY_FACILITY(LOG_NOTICE), "write to mtpSdtRowStatus not ASN_INTEGER\n");
 		return SNMP_ERR_WRONGTYPE;
@@ -46727,7 +46787,7 @@ write_mtpSdtRowStatus(int action, u_char *var_val, u_char var_val_type, size_t v
 				snmp_free_varbind(vars);
 				return SNMP_ERR_RESOURCEUNAVAILABLE;
 			}
-			if (header_complex_parse_oid(&(name[17]), newlen, vars) != SNMPERR_SUCCESS) {
+			if (header_complex_parse_oid(&(name[16]), newlen, vars) != SNMPERR_SUCCESS) {
 				snmp_free_varbind(vars);
 				return SNMP_ERR_INCONSISTENTNAME;
 			}
@@ -46880,13 +46940,13 @@ write_mtpSdlRowStatus(int action, u_char *var_val, u_char var_val_type, size_t v
 {
 	struct mtpSdlTable_data *StorageTmp = NULL;
 	static struct mtpSdlTable_data *StorageNew, *StorageDel;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	static int old_value;
 	int set_value, ret;
 	static struct variable_list *vars, *vp;
 
 	DEBUGMSGTL(("mtpMIB", "write_mtpSdlRowStatus entering action=%d...  \n", action));
-	StorageTmp = header_complex(mtpSdlTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(mtpSdlTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	if (var_val_type != ASN_INTEGER || var_val == NULL) {
 		snmp_log(MY_FACILITY(LOG_NOTICE), "write to mtpSdlRowStatus not ASN_INTEGER\n");
 		return SNMP_ERR_WRONGTYPE;
@@ -46959,7 +47019,7 @@ write_mtpSdlRowStatus(int action, u_char *var_val, u_char var_val_type, size_t v
 				snmp_free_varbind(vars);
 				return SNMP_ERR_RESOURCEUNAVAILABLE;
 			}
-			if (header_complex_parse_oid(&(name[17]), newlen, vars) != SNMPERR_SUCCESS) {
+			if (header_complex_parse_oid(&(name[16]), newlen, vars) != SNMPERR_SUCCESS) {
 				snmp_free_varbind(vars);
 				return SNMP_ERR_INCONSISTENTNAME;
 			}
@@ -47123,13 +47183,13 @@ write_mtpSctpProfileRowStatus(int action, u_char *var_val, u_char var_val_type, 
 {
 	struct mtpSctpProfileTable_data *StorageTmp = NULL;
 	static struct mtpSctpProfileTable_data *StorageNew, *StorageDel;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	static int old_value;
 	int set_value, ret;
 	static struct variable_list *vars, *vp;
 
 	DEBUGMSGTL(("mtpMIB", "write_mtpSctpProfileRowStatus entering action=%d...  \n", action));
-	StorageTmp = header_complex(mtpSctpProfileTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(mtpSctpProfileTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	if (var_val_type != ASN_INTEGER || var_val == NULL) {
 		snmp_log(MY_FACILITY(LOG_NOTICE), "write to mtpSctpProfileRowStatus not ASN_INTEGER\n");
 		return SNMP_ERR_WRONGTYPE;
@@ -47192,7 +47252,7 @@ write_mtpSctpProfileRowStatus(int action, u_char *var_val, u_char var_val_type, 
 				snmp_free_varbind(vars);
 				return SNMP_ERR_RESOURCEUNAVAILABLE;
 			}
-			if (header_complex_parse_oid(&(name[17]), newlen, vars) != SNMPERR_SUCCESS) {
+			if (header_complex_parse_oid(&(name[16]), newlen, vars) != SNMPERR_SUCCESS) {
 				snmp_free_varbind(vars);
 				return SNMP_ERR_INCONSISTENTNAME;
 			}
@@ -47338,13 +47398,13 @@ write_mtpSctpRowStatus(int action, u_char *var_val, u_char var_val_type, size_t 
 {
 	struct mtpSctpTable_data *StorageTmp = NULL;
 	static struct mtpSctpTable_data *StorageNew, *StorageDel;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	static int old_value;
 	int set_value, ret;
 	static struct variable_list *vars, *vp;
 
 	DEBUGMSGTL(("mtpMIB", "write_mtpSctpRowStatus entering action=%d...  \n", action));
-	StorageTmp = header_complex(mtpSctpTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(mtpSctpTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	if (var_val_type != ASN_INTEGER || var_val == NULL) {
 		snmp_log(MY_FACILITY(LOG_NOTICE), "write to mtpSctpRowStatus not ASN_INTEGER\n");
 		return SNMP_ERR_WRONGTYPE;
@@ -47407,7 +47467,7 @@ write_mtpSctpRowStatus(int action, u_char *var_val, u_char var_val_type, size_t 
 				snmp_free_varbind(vars);
 				return SNMP_ERR_RESOURCEUNAVAILABLE;
 			}
-			if (header_complex_parse_oid(&(name[17]), newlen, vars) != SNMPERR_SUCCESS) {
+			if (header_complex_parse_oid(&(name[16]), newlen, vars) != SNMPERR_SUCCESS) {
 				snmp_free_varbind(vars);
 				return SNMP_ERR_INCONSISTENTNAME;
 			}
@@ -47551,13 +47611,13 @@ write_mtpSctpLocalRowStatus(int action, u_char *var_val, u_char var_val_type, si
 {
 	struct mtpSctpLocalTable_data *StorageTmp = NULL;
 	static struct mtpSctpLocalTable_data *StorageNew, *StorageDel;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	static int old_value;
 	int set_value, ret;
 	static struct variable_list *vars, *vp;
 
 	DEBUGMSGTL(("mtpMIB", "write_mtpSctpLocalRowStatus entering action=%d...  \n", action));
-	StorageTmp = header_complex(mtpSctpLocalTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(mtpSctpLocalTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	if (var_val_type != ASN_INTEGER || var_val == NULL) {
 		snmp_log(MY_FACILITY(LOG_NOTICE), "write to mtpSctpLocalRowStatus not ASN_INTEGER\n");
 		return SNMP_ERR_WRONGTYPE;
@@ -47625,7 +47685,7 @@ write_mtpSctpLocalRowStatus(int action, u_char *var_val, u_char var_val_type, si
 				snmp_free_varbind(vars);
 				return SNMP_ERR_RESOURCEUNAVAILABLE;
 			}
-			if (header_complex_parse_oid(&(name[17]), newlen, vars) != SNMPERR_SUCCESS) {
+			if (header_complex_parse_oid(&(name[16]), newlen, vars) != SNMPERR_SUCCESS) {
 				snmp_free_varbind(vars);
 				return SNMP_ERR_INCONSISTENTNAME;
 			}
@@ -47778,13 +47838,13 @@ write_mtpSctpRemoteRowStatus(int action, u_char *var_val, u_char var_val_type, s
 {
 	struct mtpSctpRemoteTable_data *StorageTmp = NULL;
 	static struct mtpSctpRemoteTable_data *StorageNew, *StorageDel;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	static int old_value;
 	int set_value, ret;
 	static struct variable_list *vars, *vp;
 
 	DEBUGMSGTL(("mtpMIB", "write_mtpSctpRemoteRowStatus entering action=%d...  \n", action));
-	StorageTmp = header_complex(mtpSctpRemoteTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(mtpSctpRemoteTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	if (var_val_type != ASN_INTEGER || var_val == NULL) {
 		snmp_log(MY_FACILITY(LOG_NOTICE), "write to mtpSctpRemoteRowStatus not ASN_INTEGER\n");
 		return SNMP_ERR_WRONGTYPE;
@@ -47852,7 +47912,7 @@ write_mtpSctpRemoteRowStatus(int action, u_char *var_val, u_char var_val_type, s
 				snmp_free_varbind(vars);
 				return SNMP_ERR_RESOURCEUNAVAILABLE;
 			}
-			if (header_complex_parse_oid(&(name[17]), newlen, vars) != SNMPERR_SUCCESS) {
+			if (header_complex_parse_oid(&(name[16]), newlen, vars) != SNMPERR_SUCCESS) {
 				snmp_free_varbind(vars);
 				return SNMP_ERR_INCONSISTENTNAME;
 			}
@@ -48005,13 +48065,13 @@ write_mtpM2uaAspRowStatus(int action, u_char *var_val, u_char var_val_type, size
 {
 	struct mtpM2uaAspTable_data *StorageTmp = NULL;
 	static struct mtpM2uaAspTable_data *StorageNew, *StorageDel;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	static int old_value;
 	int set_value, ret;
 	static struct variable_list *vars, *vp;
 
 	DEBUGMSGTL(("mtpMIB", "write_mtpM2uaAspRowStatus entering action=%d...  \n", action));
-	StorageTmp = header_complex(mtpM2uaAspTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(mtpM2uaAspTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	if (var_val_type != ASN_INTEGER || var_val == NULL) {
 		snmp_log(MY_FACILITY(LOG_NOTICE), "write to mtpM2uaAspRowStatus not ASN_INTEGER\n");
 		return SNMP_ERR_WRONGTYPE;
@@ -48074,7 +48134,7 @@ write_mtpM2uaAspRowStatus(int action, u_char *var_val, u_char var_val_type, size
 				snmp_free_varbind(vars);
 				return SNMP_ERR_RESOURCEUNAVAILABLE;
 			}
-			if (header_complex_parse_oid(&(name[17]), newlen, vars) != SNMPERR_SUCCESS) {
+			if (header_complex_parse_oid(&(name[16]), newlen, vars) != SNMPERR_SUCCESS) {
 				snmp_free_varbind(vars);
 				return SNMP_ERR_INCONSISTENTNAME;
 			}
@@ -48218,13 +48278,13 @@ write_mtpM2uaAsRowStatus(int action, u_char *var_val, u_char var_val_type, size_
 {
 	struct mtpM2uaAsTable_data *StorageTmp = NULL;
 	static struct mtpM2uaAsTable_data *StorageNew, *StorageDel;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	static int old_value;
 	int set_value, ret;
 	static struct variable_list *vars, *vp;
 
 	DEBUGMSGTL(("mtpMIB", "write_mtpM2uaAsRowStatus entering action=%d...  \n", action));
-	StorageTmp = header_complex(mtpM2uaAsTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(mtpM2uaAsTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	if (var_val_type != ASN_INTEGER || var_val == NULL) {
 		snmp_log(MY_FACILITY(LOG_NOTICE), "write to mtpM2uaAsRowStatus not ASN_INTEGER\n");
 		return SNMP_ERR_WRONGTYPE;
@@ -48292,7 +48352,7 @@ write_mtpM2uaAsRowStatus(int action, u_char *var_val, u_char var_val_type, size_
 				snmp_free_varbind(vars);
 				return SNMP_ERR_RESOURCEUNAVAILABLE;
 			}
-			if (header_complex_parse_oid(&(name[17]), newlen, vars) != SNMPERR_SUCCESS) {
+			if (header_complex_parse_oid(&(name[16]), newlen, vars) != SNMPERR_SUCCESS) {
 				snmp_free_varbind(vars);
 				return SNMP_ERR_INCONSISTENTNAME;
 			}
@@ -48445,13 +48505,13 @@ write_mtpM3uaAspRowStatus(int action, u_char *var_val, u_char var_val_type, size
 {
 	struct mtpM3uaAspTable_data *StorageTmp = NULL;
 	static struct mtpM3uaAspTable_data *StorageNew, *StorageDel;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	static int old_value;
 	int set_value, ret;
 	static struct variable_list *vars, *vp;
 
 	DEBUGMSGTL(("mtpMIB", "write_mtpM3uaAspRowStatus entering action=%d...  \n", action));
-	StorageTmp = header_complex(mtpM3uaAspTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(mtpM3uaAspTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	if (var_val_type != ASN_INTEGER || var_val == NULL) {
 		snmp_log(MY_FACILITY(LOG_NOTICE), "write to mtpM3uaAspRowStatus not ASN_INTEGER\n");
 		return SNMP_ERR_WRONGTYPE;
@@ -48514,7 +48574,7 @@ write_mtpM3uaAspRowStatus(int action, u_char *var_val, u_char var_val_type, size
 				snmp_free_varbind(vars);
 				return SNMP_ERR_RESOURCEUNAVAILABLE;
 			}
-			if (header_complex_parse_oid(&(name[17]), newlen, vars) != SNMPERR_SUCCESS) {
+			if (header_complex_parse_oid(&(name[16]), newlen, vars) != SNMPERR_SUCCESS) {
 				snmp_free_varbind(vars);
 				return SNMP_ERR_INCONSISTENTNAME;
 			}
@@ -48658,13 +48718,13 @@ write_mtpM3uaAsRowStatus(int action, u_char *var_val, u_char var_val_type, size_
 {
 	struct mtpM3uaAsTable_data *StorageTmp = NULL;
 	static struct mtpM3uaAsTable_data *StorageNew, *StorageDel;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	static int old_value;
 	int set_value, ret;
 	static struct variable_list *vars, *vp;
 
 	DEBUGMSGTL(("mtpMIB", "write_mtpM3uaAsRowStatus entering action=%d...  \n", action));
-	StorageTmp = header_complex(mtpM3uaAsTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(mtpM3uaAsTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	if (var_val_type != ASN_INTEGER || var_val == NULL) {
 		snmp_log(MY_FACILITY(LOG_NOTICE), "write to mtpM3uaAsRowStatus not ASN_INTEGER\n");
 		return SNMP_ERR_WRONGTYPE;
@@ -48732,7 +48792,7 @@ write_mtpM3uaAsRowStatus(int action, u_char *var_val, u_char var_val_type, size_
 				snmp_free_varbind(vars);
 				return SNMP_ERR_RESOURCEUNAVAILABLE;
 			}
-			if (header_complex_parse_oid(&(name[17]), newlen, vars) != SNMPERR_SUCCESS) {
+			if (header_complex_parse_oid(&(name[16]), newlen, vars) != SNMPERR_SUCCESS) {
 				snmp_free_varbind(vars);
 				return SNMP_ERR_INCONSISTENTNAME;
 			}

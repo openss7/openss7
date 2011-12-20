@@ -608,13 +608,13 @@ sub defval {
 	    $len = (($len + 7) >> 3);
 	    $ret = "if (memdup((u_char **) \&StorageNew->${name}, (u_char *) \"$val\", $len) == SNMPERR_SUCCESS)\n";
 	    $ret .= "StorageNew->${name}Len = $len;\n";
-	} elsif ($defval =~ /^{ ([a-zA-Z][a-zA-Z0-9_]*(\([0-9]+\))?|[0-9]+)(\s*,\s*([a-zA-Z][a-zA-Z0-9_]*(\([0-9]+\))?|[0-9]+))* }$/) {
-	    $defval =~ s/^{ //;
-	    $defval =~ s/ }$//;
+	} elsif ($defval =~ /^{\s*([a-zA-Z][a-zA-Z0-9_]*(\([0-9]+\))?|[0-9]+)(\s*,\s*([a-zA-Z][a-zA-Z0-9_]*(\([0-9]+\))?|[0-9]+))*\s*}$/) {
+	    $defval =~ s/^{\s*//;
+	    $defval =~ s/\s*}$//;
 	    my @elements = split(/\s*,\s*/,$defval);
 	    my @bits = ();
 	    foreach my $e (@elements) {
-		if ($e =~ /([0-9]+)$/ || $e =~ /\(([0-9]+)\)$/) {
+		if ($e =~ /^([0-9]+)$/ || $e =~ /\(([0-9]+)\)$/) {
 		    push @bits, $1;
 		} elsif (defined($mib->{'enums'}{$e})) {
 		    push @bits, $mib->{'enums'}{$e};
@@ -645,7 +645,7 @@ sub defval {
 	    $ret = "StorageNew->${name} = (u_char *) \"\\x00\\x00\\x00\\x00\";\n";
 	    $ret .= "StorageNew->${name}Len = 4;\n";
 	} elsif ($defval =~ /^([0-9]+)\.([0-9]+)\.([0-9]+)\.([0-9]+)$/) {
-	    $val = sprintf("\"\\x%02x\\x%02x\\x%02x\\x%02x\"", $1, $2, $3, $4);
+	    $val = sprintf("\"\\x%02X\\x%02X\\x%02X\\x%02X\"", $1, $2, $3, $4);
 	    $ret = "StorageNew->${name} = (u_char *) $val;\n";
 	    $ret .= "StorageNew->${name}Len = 4;\n";
 	}

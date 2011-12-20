@@ -1,11 +1,11 @@
--- vim: ft=mib comments=\f\:\",\b\:\-\-,\:\-\-,\f\b\:- fo+=tcqlornw tw=72 nocin nosi sts=4 sw=4
+-- vim: ft=mib comments=\f\b\:\"ITU\-T,\f\b\:ITU\-T,\f\:\",\b\:\-\-,\:\-\-,\f\b\:\-,\f\b\:\· fo+=tcqlornw12 tw=64 ai nocin nosi sts=4 sw=4 et
 -- =============================================================================
 -- 
 -- @(#) $RCSfile: OPENSS7-ISUP-OM-MIB.mib,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-07-18 19:42:18 $
 --
 -- -----------------------------------------------------------------------------
 --
--- Copyright (c) 2008-2009  Monavacon Limited <http://www.monavacon.com/>
+-- Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
 -- Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
 -- Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 --
@@ -27,7 +27,7 @@
 --
 -- -----------------------------------------------------------------------------
 --
--- Note well: nonwithstanding this AGPL license, you are not permitted to make 
+-- Note well: notwithstanding this AGPL license, you are not permitted to make 
 -- modifications under the OpenSS7 project's enterprise object identifier arc: 
 -- 1.3.6.1.4.1.29591.  Modifications must be made only within an object 
 -- identifier arc under your control.
@@ -74,492 +74,447 @@
 OPENSS7-ISUP-OM-MIB DEFINITIONS ::= BEGIN
 
 IMPORTS
-    MODULE-IDENTITY, OBJECT-TYPE, TEXTUAL-CONVENTION, enterprises
-	FROM SNMPv2-SMI
-    MODULE-COMPLIANCE, RowStatus, RowPointer, AutonomousType, 
-    TimeInterval, DisplayString, TruthValue
-	FROM SNMPv2-TC
-    PerfCurrentCount, PerfIntervalCount, PerfTotalCount
-	FROM PerfHist-TC-MIB
-    HCPerfValidIntervals, HCPerfInvalidIntervals, HCPerfTimeElapsed,
-    HCPerfIntervalThreshold, HCPerfCurrentCount, HCPerfIntervalCount,
-    HCPerfTotalCount
-	FROM HC-PerfHist-TC-MIB
-    CommonLanguageName
-	FROM OPENSS7-TC
-    AdministrativeState, OperationalState, UsageState, ProceduralStatus, 
-    AvailabilityStatus, AlarmStatus, SimpleNameType
-	FROM OPENSS7-SMI-MIB
-    NEntitySystemTypes, NEntitySystemType
-	FROM OPENSS7-CLNS-MIB
-    Ss7ProtocolVariant
-	FROM OPENSS7-SS7-MIB
-    openss7
-	FROM OPENSS7-SMI;
+    HCPerfValidIntervals
+        FROM HC-PerfHist-TC-MIB
+    isupCtId, isupSrId
+        FROM OPENSS7-ISUP-MIB
+    openss7Q752
+        FROM OPENSS7-SMI
+    MODULE-COMPLIANCE, OBJECT-GROUP
+        FROM SNMPv2-CONF
+    Counter32, MODULE-IDENTITY, OBJECT-TYPE
+        FROM SNMPv2-SMI;
 
 isupOmMIB MODULE-IDENTITY
-    LAST-UPDATED
-	"200812092229Z"
-    ORGANIZATION
-	"The OpenSS7 Project"
-    CONTACT-INFO
-	"Brian Bidulock
-	 OpenSS7 Corporation
-	 1469 Jefferys Crescent
-	 Edmonton, Alberta  T6L 6T1
-	 CANADA
-	 Tel: +1 780 490 1141
-	 Fax: +1 780 490 1241
-	 Mob: +1 780 953 0557
-	 mailto:bidulock@openss7.org"
-    DESCRIPTION
-	"The purpose of this MIB is to proivde SNMP support for the ISUP 
-	 operational measurements provided in ITU-T Q.752 and ANSI 
-	 T1.116.  There exists a draft GDMO specification for ANSI 
-	 T1.116.1 from which this MIB is based.  Strangely enough, no 
-	 GDMO is standardized for SS7 operational measurements.
-
-	 The objective of this MIB is to support both the reporting of 
-	 statistics obtained from Operational Measurements as well as 
-	 providing a mechanism to activate and report the results of OM 
-	 studies.
-
+    LAST-UPDATED "200812092229Z"
+    ORGANIZATION 
+        "The OpenSS7 Project"
+    CONTACT-INFO 
+        "Brian Bidulock
+         OpenSS7 Corporation
+         1469 Jefferys Crescent
+         Edmonton, Alberta  T6L 6T1
+         CANADA
+         Tel: +1 780 490 1141
+         Fax: +1 780 490 1241
+         Mob: +1 780 953 0557
+         mailto:bidulock@openss7.org"
+    DESCRIPTION 
+        "The purpose of this MIB is to proivde SNMP support for the ISUP 
+         operational measurements provided in ITU-T Q.752 and ANSI 
+         T1.116.  There exists a draft GDMO specification for ANSI 
+         T1.116.1 from which this MIB is based.  Strangely enough, no 
+         GDMO is standardized for SS7 operational measurements.
+         
+         The objective of this MIB is to support both the reporting of 
+         statistics obtained from Operational Measurements as well as 
+         providing a mechanism to activate and report the results of OM 
+         studies.
+         
          Copyright (c) 2008-2011  Monavacon Limited
          Copyright (c) 2001-2008  OpenSS7 Corporation
          Copyright (c) 1997-2001  Brian F. G. Bidulock
-
+         
          All Rights Reserved.
-
+         
          This program is free software; you can redistribute it and/or 
          modify it under the terms of the GNU Affero General Public 
          License as published by the Free Software Foundation; version 3 
          of the License.
-
+         
          This program is distributed in the hope that it will be useful, 
          but WITHOUT ANY WARRANTY; without even the implied warranty of 
          MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the 
          GNU Affero General Public License for more details.
-
+         
          You should have received a copy of the GNU Affero General 
          Public License along with this program.  If not, see 
          <http://www.gnu.org/licenses/>, or write to the Free Software 
          Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
-
-         Note well: nonwithstanding this AGPL license, you are not 
+         
+         Note well: notwithstanding this AGPL license, you are not 
          permitted to make modifications under the OpenSS7 project's 
          enterprise object identifier arc: 1.3.6.1.4.1.29591.  
          Modifications must be made only within an object identifier arc 
          under your control."
-    REVISION
-	"200812092229Z"
-    DESCRIPTION
-	"This is the initial revision of this MIB."
-    ::= { openss7 17 752 3 }
+    REVISION    "200812092229Z"
+    DESCRIPTION 
+        "This is the initial revision of this MIB."
+    ::= { openss7Q752 3 }
 
- -- top level organization of the MIB
 
-isupOmNotifications	OBJECT IDENTIFIER ::= { isupOmMIB	 0 }
-isupOmObjects		OBJECT IDENTIFIER ::= { isupOmMIB	 1 }
-isupOmConformance	OBJECT IDENTIFIER ::= { isupOmMIB	 2 }
+isupOmNotifications OBJECT IDENTIFIER
+    ::= { isupOmMIB 0 }
 
-isupOmTables		OBJECT IDENTIFIER ::= { isupOmObjects	 1 }
-isupOmScalars		OBJECT IDENTIFIER ::= { isupOmObjects	 2 }
-isupOmNotifs		OBJECT IDENTIFIER ::= { isupOmObjects	 3 }
-isupOmOids		OBJECT IDENTIFIER ::= { isupOmObjects	 4 }
+isupOmObjects OBJECT IDENTIFIER
+    ::= { isupOmMIB 1 }
 
-isupOmCompliance	OBJECT IDENTIFIER ::= { isupOmConformance 1 }
-isupOmGroups		OBJECT IDENTIFIER ::= { isupOmConformance 2 }
-isupOmCapabilities	OBJECT IDENTIFIER ::= { isupOmConformance 3 }
-
--- (1.3.6.1.4.1.29591.17.752.3) openss7Q.752.3 (isupOmMIB)
--- |__(0) isupOmNotifications
--- |
--- |__(1) isupOmObjects
--- |  |__(1) isupOmTables
--- |  |__(2) isupOmScalars
--- |  |__(3) isupOmNotifs
--- |  |__(4) isupOmOids
--- |
--- |__(2) isupOmConformance
---    |__(1) isupOmCompliance
---    |__(2) isupOmGroups
---    |__(3) isupOmCapabilities
-
+isupOmTables OBJECT IDENTIFIER
+    ::= { isupOmObjects 1 }
 
 isupOmErrorsTable OBJECT-TYPE
-    SYNTAX SEQUENCE OF IsupOmErrorsEntry
-    MAX-ACCESS not-accessible
-    STATUS current
-    DESCRIPTION
-	""
-    REFERENCE
-	""
+    SYNTAX      SEQUENCE OF IsupOmErrorsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        ""
     ::= { isupOmTables 1 }
 
 isupOmErrorsEntry OBJECT-TYPE
-    SYNTAX IsupOmErrorsEntry
-    MAX-ACCESS not-accessible
-    STATUS current
-    DESCRIPTION
-	"Table 12: ISDN User Part error performance measurements are 
-	 listed in Table 12.  In the event of catastrophic failure, 
-	 there are potentially many reports, and these might need to be 
-	 filtered.
-
-	 Items 12.8 through 12.5 refer to the abnormal blocking and 
-	 circuit group blocking procedures in 2.9.2.3/Q.764, on which 
-	 the management system should be notified.
-
-	 Items 12.1 and 12.2 refer to failure of the reset circuit and 
-	 reset circuit group procedures in 2.10.3/Q.764.
-
-	 Items 12.16 through 12.19 refer to failure in the 
-	 blocking/unblocking sequences defined in 2.10.4/Q.764.
-
-	 Items 12.20 through 12.22 relate to protocol errors, namely 
-	 receipt of unreasonable signalling information messages.  See 
-	 2.10.5/Q.764.
-
-	 Item 12.5 reports the failure condition of non-receipt of 
-	 Release Complete message on expiry of timer T5.  See 
-	 2.10.6/Q.764.
-
-	 Item 12.6 and 12.23 refer to the inability to release a circuit 
-	 and the abnormal release conditions described in 2.10.8/Q.764.
-
-	 Measurements:
-	 
-	 - missing blocking acknowledgement in CGBA message for blocking 
-	   request in previous CGB message (item 12.8);
-	 - missing unblocking acknowledgement in CGUA message for 
-	   unblocking request in previous CGU message (item 12.9);
-	 - abnormal blocking acknolwedgement in CGBA message with 
-	   respect to previous CGB message (item 12.10);
-	 - abnormal blocking acknowledgement in CGUA message with 
-	   respect to previous CGU message (item 12.11);
-	 - unexpected CGBA message received with an abnormal blocking 
-	   acknowledgement (item 12.12);
-	 - unexpected CGUA message received with an abnormal unblocking 
-	   acknowledgement (item 12.13);
-	 - unexpected BLA message received with an abnormal blocking 
-	   acknowledgement (item 12.14);
-	 - unexpected UBA message received with an abnormal unblocking 
-	   acknowledgement (item 12.15);
-	 - no RLC message received for a previously sent RSC message 
-	   within timer T17 (item 12.1);
-	 - no GRA message received for a previously sent GRS message 
-	   within timer T23 (item 12.2);
-	 - no BLA message received for a previously sent BLO message 
-	   within timer T13 (item 12.16);
-	 - no UBA message received for a previously sent UBL message 
-	   within timer T156 (item 12.17);
-	 - no CGBA message received for a previously sent CGB message 
-	   within timer T18 (item 12.18);
-	 - no CGUA message received for a previously sent CGU message 
-	   within timer T21 (item 12.19);
-	 - message format error (iterm 12.20);
-	 - unexpected message received (item 12.21);
-	 - release due to unrecognized information (item 12.22);
-	 - RLC not received for a previously sent REL message within 
-	   timer T5 (item 12.5);
-	 - inability to release a circuit (item 12.23);
-	 - abnormal release condition (iterm 12.6);
-	 - circuit blocked because of excessive errors detected by CRC 
-	   failure (iterm 12.7).
-	"
-    REFERENCE
-	""
-    INDEX   {
-		isupSrId,	    -- shared index
-		isupCtId	    -- shared index
-	    }
+    SYNTAX      IsupOmErrorsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Table 12: ISDN User Part error performance measurements are 
+         listed in Table 12.  In the event of catastrophic failure, 
+         there are potentially many reports, and these might need to be 
+         filtered.
+         
+         Items 12.8 through 12.5 refer to the abnormal blocking and 
+         circuit group blocking procedures in 2.9.2.3/Q.764, on which 
+         the management system should be notified.
+         
+         Items 12.1 and 12.2 refer to failure of the reset circuit and 
+         reset circuit group procedures in 2.10.3/Q.764.
+         
+         Items 12.16 through 12.19 refer to failure in the 
+         blocking/unblocking sequences defined in 2.10.4/Q.764.
+         
+         Items 12.20 through 12.22 relate to protocol errors, namely 
+         receipt of unreasonable signalling information messages.  See 
+         2.10.5/Q.764.
+         
+         Item 12.5 reports the failure condition of non-receipt of 
+         Release Complete message on expiry of timer T5.  See 
+         2.10.6/Q.764.
+         
+         Item 12.6 and 12.23 refer to the inability to release a circuit 
+         and the abnormal release conditions described in 2.10.8/Q.764.
+         
+         Measurements:
+         
+         - missing blocking acknowledgement in CGBA message for blocking 
+           request in previous CGB message (item 12.8);
+         - missing unblocking acknowledgement in CGUA message for 
+           unblocking request in previous CGU message (item 12.9);
+         - abnormal blocking acknolwedgement in CGBA message with 
+           respect to previous CGB message (item 12.10);
+         - abnormal blocking acknowledgement in CGUA message with 
+           respect to previous CGU message (item 12.11);
+         - unexpected CGBA message received with an abnormal blocking 
+           acknowledgement (item 12.12);
+         - unexpected CGUA message received with an abnormal unblocking 
+           acknowledgement (item 12.13);
+         - unexpected BLA message received with an abnormal blocking 
+           acknowledgement (item 12.14);
+         - unexpected UBA message received with an abnormal unblocking 
+           acknowledgement (item 12.15);
+         - no RLC message received for a previously sent RSC message 
+           within timer T17 (item 12.1);
+         - no GRA message received for a previously sent GRS message 
+           within timer T23 (item 12.2);
+         - no BLA message received for a previously sent BLO message 
+           within timer T13 (item 12.16);
+         - no UBA message received for a previously sent UBL message 
+           within timer T156 (item 12.17);
+         - no CGBA message received for a previously sent CGB message 
+           within timer T18 (item 12.18);
+         - no CGUA message received for a previously sent CGU message 
+           within timer T21 (item 12.19);
+         - message format error (iterm 12.20);
+         - unexpected message received (item 12.21);
+         - release due to unrecognized information (item 12.22);
+         - RLC not received for a previously sent REL message within 
+           timer T5 (item 12.5);
+         - inability to release a circuit (item 12.23);
+         - abnormal release condition (iterm 12.6);
+         - circuit blocked because of excessive errors detected by CRC 
+           failure (iterm 12.7)."
+    INDEX       { isupSrId, isupCtId }
     ::= { isupOmErrorsTable 1 }
 
--- NOTES: Q.751.2 says that most of these are per CIC per destination 
--- (which shares isupCtId and isupSpId in our model).
-
-IsupOmErrorsEntry ::=
-    SEQUENCE {
-	-- Obligatory 1st & Int. and 15 min
-	isupOmT17Timeout			Counter,
-	isupOmT23Timeout			Counter,
-	isupOmT5Timeout				Counter,
-	isupOmAbnormalRelease			Counter,
-	isupOmHardwareBlocking			Counter,
-	isupOmMissingCGBA			Counter,
-	isupOmMissingCGUA			Counter,
-	isupOmAbnormalCGBA			Counter,
-	isupOmAbnormalCGUA			Counter,
-	isupOmUnexpectedCGBA			Counter,
-	isupOmUnexpectedCGUA			Counter,
-	isupOmUnexpectedBLA			Counter,
-	isupOmUnexpectedUBA			Counter,
-	isupOmT13Timeout			Counter,
-	isupOmT15Timeout			Counter,
-	isupOmT19Timeout			Counter,
-	isupOmT21Timeout			Counter,
-	isupOmMessageFormatError		Counter,
-	isupOmUnexpectedMessage			Counter,
-	isupOmUnrecInfoRelease			Counter,
-	isupOmUnableToRelease			Counter,
-	isupOmErrors5MinValidIntervals		HCPerfValidIntervals,
-	isupOmErrors15MinValidIntervals		HCPerfValidIntervals
-    }
+IsupOmErrorsEntry ::= SEQUENCE {
+    isupOmT17Timeout                    Counter32,
+    isupOmT23Timeout                    Counter32,
+    isupOmT5Timeout                     Counter32,
+    isupOmAbnormalRelease               Counter32,
+    isupOmHardwareBlocking              Counter32,
+    isupOmMissingCGBA                   Counter32,
+    isupOmMissingCGUA                   Counter32,
+    isupOmAbnormalCGBA                  Counter32,
+    isupOmAbnormalCGUA                  Counter32,
+    isupOmUnexpectedCGBA                Counter32,
+    isupOmUnexpectedCGUA                Counter32,
+    isupOmUnexpectedBLA                 Counter32,
+    isupOmUnexpectedUBA                 Counter32,
+    isupOmT13Timeout                    Counter32,
+    isupOmT15Timeout                    Counter32,
+    isupOmT19Timeout                    Counter32,
+    isupOmT21Timeout                    Counter32,
+    isupOmMessageFormatError            Counter32,
+    isupOmUnexpectedMessage             Counter32,
+    isupOmUnrecInfoRelease              Counter32,
+    isupOmUnableToRelease               Counter32,
+    isupOmErrors5MinValidIntervals      HCPerfValidIntervals,
+    isupOmErrors15MinValidIntervals     HCPerfValidIntervals
+}
 
 isupOmT17Timeout OBJECT-TYPE
-    SYNTAX Counter
-    UNITS "Events/ISUP"
-    MAX-ACCESS read-only
-    STATUS current
-    DESCRIPTION
-	""
-    REFERENCE
-	""
+    SYNTAX      Counter32
+    UNITS       "Events/ISUP"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        ""
     ::= { isupOmErrorsEntry 1 }
 
 isupOmT23Timeout OBJECT-TYPE
-    SYNTAX Counter
-    UNITS "Events/ISUP"
-    MAX-ACCESS read-only
-    STATUS current
-    DESCRIPTION
-	""
-    REFERENCE
-	""
+    SYNTAX      Counter32
+    UNITS       "Events/ISUP"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        ""
     ::= { isupOmErrorsEntry 2 }
 
 isupOmT5Timeout OBJECT-TYPE
-    SYNTAX Counter
-    UNITS "Events/ISUP"
-    MAX-ACCESS read-only
-    STATUS current
-    DESCRIPTION
-	""
-    REFERENCE
-	""
+    SYNTAX      Counter32
+    UNITS       "Events/ISUP"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        ""
     ::= { isupOmErrorsEntry 3 }
 
 isupOmAbnormalRelease OBJECT-TYPE
-    SYNTAX Counter
-    UNITS "Events/ISUP"
-    MAX-ACCESS read-only
-    STATUS current
-    DESCRIPTION
-	""
-    REFERENCE
-	""
+    SYNTAX      Counter32
+    UNITS       "Events/ISUP"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        ""
     ::= { isupOmErrorsEntry 4 }
 
 isupOmHardwareBlocking OBJECT-TYPE
-    SYNTAX Counter
-    UNITS "Events/ISUP"
-    MAX-ACCESS read-only
-    STATUS current
-    DESCRIPTION
-	""
-    REFERENCE
-	""
+    SYNTAX      Counter32
+    UNITS       "Events/ISUP"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        ""
     ::= { isupOmErrorsEntry 5 }
 
 isupOmMissingCGBA OBJECT-TYPE
-    SYNTAX Counter
-    UNITS "Events/ISUP"
-    MAX-ACCESS read-only
-    STATUS current
-    DESCRIPTION
-	""
-    REFERENCE
-	""
+    SYNTAX      Counter32
+    UNITS       "Events/ISUP"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        ""
     ::= { isupOmErrorsEntry 6 }
 
 isupOmMissingCGUA OBJECT-TYPE
-    SYNTAX Counter
-    UNITS "Events/ISUP"
-    MAX-ACCESS read-only
-    STATUS current
-    DESCRIPTION
-	""
-    REFERENCE
-	""
+    SYNTAX      Counter32
+    UNITS       "Events/ISUP"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        ""
     ::= { isupOmErrorsEntry 7 }
 
 isupOmAbnormalCGBA OBJECT-TYPE
-    SYNTAX Counter
-    UNITS "Events/ISUP"
-    MAX-ACCESS read-only
-    STATUS current
-    DESCRIPTION
-	""
-    REFERENCE
-	""
+    SYNTAX      Counter32
+    UNITS       "Events/ISUP"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        ""
     ::= { isupOmErrorsEntry 8 }
 
 isupOmAbnormalCGUA OBJECT-TYPE
-    SYNTAX Counter
-    UNITS "Events/ISUP"
-    MAX-ACCESS read-only
-    STATUS current
-    DESCRIPTION
-	""
-    REFERENCE
-	""
+    SYNTAX      Counter32
+    UNITS       "Events/ISUP"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        ""
     ::= { isupOmErrorsEntry 9 }
 
 isupOmUnexpectedCGBA OBJECT-TYPE
-    SYNTAX Counter
-    UNITS "Events/ISUP"
-    MAX-ACCESS read-only
-    STATUS current
-    DESCRIPTION
-	""
-    REFERENCE
-	""
+    SYNTAX      Counter32
+    UNITS       "Events/ISUP"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        ""
     ::= { isupOmErrorsEntry 10 }
 
 isupOmUnexpectedCGUA OBJECT-TYPE
-    SYNTAX Counter
-    UNITS "Events/ISUP"
-    MAX-ACCESS read-only
-    STATUS current
-    DESCRIPTION
-	""
-    REFERENCE
-	""
+    SYNTAX      Counter32
+    UNITS       "Events/ISUP"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        ""
     ::= { isupOmErrorsEntry 11 }
 
 isupOmUnexpectedBLA OBJECT-TYPE
-    SYNTAX Counter
-    UNITS "Events/ISUP"
-    MAX-ACCESS read-only
-    STATUS current
-    DESCRIPTION
-	""
-    REFERENCE
-	""
+    SYNTAX      Counter32
+    UNITS       "Events/ISUP"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        ""
     ::= { isupOmErrorsEntry 12 }
 
 isupOmUnexpectedUBA OBJECT-TYPE
-    SYNTAX Counter
-    UNITS "Events/ISUP"
-    MAX-ACCESS read-only
-    STATUS current
-    DESCRIPTION
-	""
-    REFERENCE
-	""
+    SYNTAX      Counter32
+    UNITS       "Events/ISUP"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        ""
     ::= { isupOmErrorsEntry 13 }
 
 isupOmT13Timeout OBJECT-TYPE
-    SYNTAX Counter
-    UNITS "Events/ISUP"
-    MAX-ACCESS read-only
-    STATUS current
-    DESCRIPTION
-	""
-    REFERENCE
-	""
+    SYNTAX      Counter32
+    UNITS       "Events/ISUP"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        ""
     ::= { isupOmErrorsEntry 14 }
 
 isupOmT15Timeout OBJECT-TYPE
-    SYNTAX Counter
-    UNITS "Events/ISUP"
-    MAX-ACCESS read-only
-    STATUS current
-    DESCRIPTION
-	""
-    REFERENCE
-	""
+    SYNTAX      Counter32
+    UNITS       "Events/ISUP"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        ""
     ::= { isupOmErrorsEntry 15 }
 
 isupOmT19Timeout OBJECT-TYPE
-    SYNTAX Counter
-    UNITS "Events/ISUP"
-    MAX-ACCESS read-only
-    STATUS current
-    DESCRIPTION
-	""
-    REFERENCE
-	""
+    SYNTAX      Counter32
+    UNITS       "Events/ISUP"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        ""
     ::= { isupOmErrorsEntry 16 }
 
 isupOmT21Timeout OBJECT-TYPE
-    SYNTAX Counter
-    UNITS "Events/ISUP"
-    MAX-ACCESS read-only
-    STATUS current
-    DESCRIPTION
-	""
-    REFERENCE
-	""
+    SYNTAX      Counter32
+    UNITS       "Events/ISUP"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        ""
     ::= { isupOmErrorsEntry 17 }
 
 isupOmMessageFormatError OBJECT-TYPE
-    SYNTAX Counter
-    UNITS "Events/ISUP"
-    MAX-ACCESS read-only
-    STATUS current
-    DESCRIPTION
-	""
-    REFERENCE
-	""
+    SYNTAX      Counter32
+    UNITS       "Events/ISUP"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        ""
     ::= { isupOmErrorsEntry 18 }
 
 isupOmUnexpectedMessage OBJECT-TYPE
-    SYNTAX Counter
-    UNITS "Events/ISUP"
-    MAX-ACCESS read-only
-    STATUS current
-    DESCRIPTION
-	""
-    REFERENCE
-	""
+    SYNTAX      Counter32
+    UNITS       "Events/ISUP"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        ""
     ::= { isupOmErrorsEntry 19 }
 
 isupOmUnrecInfoRelease OBJECT-TYPE
-    SYNTAX Counter
-    UNITS "Events/ISUP"
-    MAX-ACCESS read-only
-    STATUS current
-    DESCRIPTION
-	""
-    REFERENCE
-	""
+    SYNTAX      Counter32
+    UNITS       "Events/ISUP"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        ""
     ::= { isupOmErrorsEntry 20 }
 
 isupOmUnableToRelease OBJECT-TYPE
-    SYNTAX Counter
-    UNITS "Events/ISUP"
-    MAX-ACCESS read-only
-    STATUS current
-    DESCRIPTION
-	""
-    REFERENCE
-	""
+    SYNTAX      Counter32
+    UNITS       "Events/ISUP"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        ""
     ::= { isupOmErrorsEntry 21 }
 
 isupOmErrors5MinValidIntervals OBJECT-TYPE
-    SYNTAX HCPerfValidIntervals
-    UNITS "Events/ISUP"
-    MAX-ACCESS read-only
-    STATUS current
-    DESCRIPTION
-	""
-    REFERENCE
-	""
+    SYNTAX      HCPerfValidIntervals
+    UNITS       "Events/ISUP"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        ""
     ::= { isupOmErrorsEntry 22 }
 
 isupOmErrors15MinValidIntervals OBJECT-TYPE
-    SYNTAX HCPerfValidIntervals
-    UNITS "Events/ISUP"
-    MAX-ACCESS read-only
-    STATUS current
-    DESCRIPTION
-	""
-    REFERENCE
-	""
+    SYNTAX      HCPerfValidIntervals
+    UNITS       "Events/ISUP"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        ""
     ::= { isupOmErrorsEntry 23 }
 
+isupOmScalars OBJECT IDENTIFIER
+    ::= { isupOmObjects 2 }
 
-END
+isupOmNotifs OBJECT IDENTIFIER
+    ::= { isupOmObjects 3 }
 
--- vim: ft=mib comments=\f\:\",\b\:\-\-,\:\-\-,\f\b\:- fo+=tcqlornw tw=72 nocin nosi sts=4 sw=4
+isupOmOids OBJECT IDENTIFIER
+    ::= { isupOmObjects 4 }
+
+isupOmConformance OBJECT IDENTIFIER
+    ::= { isupOmMIB 2 }
+
+isupOmCompliances OBJECT IDENTIFIER
+    ::= { isupOmConformance 1 }
+
+isupOmGroups OBJECT IDENTIFIER
+    ::= { isupOmConformance 2 }
+
+isupOmCapabilities OBJECT IDENTIFIER
+    ::= { isupOmConformance 3 }
+
+isupOmObjectGroup OBJECT-GROUP
+    OBJECTS     { isupOmT17Timeout, isupOmT23Timeout, isupOmT5Timeout, 
+                  isupOmAbnormalRelease, isupOmHardwareBlocking, 
+                  isupOmMissingCGBA, isupOmMissingCGUA, 
+                  isupOmAbnormalCGBA, isupOmAbnormalCGUA, 
+                  isupOmUnexpectedCGBA, isupOmUnexpectedCGUA, 
+                  isupOmUnexpectedBLA, isupOmUnexpectedUBA, 
+                  isupOmT13Timeout, isupOmT15Timeout, isupOmT19Timeout, 
+                  isupOmT21Timeout, isupOmMessageFormatError, 
+                  isupOmUnexpectedMessage, isupOmUnrecInfoRelease, 
+                  isupOmUnableToRelease, isupOmErrors5MinValidIntervals, 
+                  isupOmErrors15MinValidIntervals }
+    STATUS      current
+    DESCRIPTION 
+        "A group that provides, for now, all the compilance objects of 
+         this mib."
+    ::= { isupOmGroups 1 }
+
+isupOmFullCompliance MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION 
+        "Provides a compliance profile that provides full compliance to 
+         this mib."
+
+    MODULE      -- this module
+
+        MANDATORY-GROUPS        { isupOmObjectGroup }
+
+    ::= { isupOmCompliances 1 }
+
+END -- end of module OPENSS7-ISUP-OM-MIB.

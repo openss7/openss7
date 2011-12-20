@@ -282,6 +282,8 @@ oid sccpLocalSccpLinkagePackage_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 2,
 oid sccpCongestionPackage_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 2, 2, 2, 16 };
 oid sccpAddressInfoConversionRulePackage_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 2, 2, 2, 17 };
 oid sccpCommonLanguageNameGroup_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 2, 2, 2, 18 };
+oid sccpOtherGroup_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 2, 2, 2, 19 };
+oid sccpOtherNotifications_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 2, 2, 2, 20 };
 static oid zeroDotZero_oid[2] = { 0, 0 };
 static oid snmpTrapOID_oid[11] = { 1, 3, 6, 1, 6, 3, 1, 1, 4, 1, 0 };
 
@@ -528,7 +530,7 @@ struct variable7 sccpMIB_variables[] = {
 #define   SCCPADDRESSINFOADDRESSELEMENT  118
 	{(u_char) SCCPADDRESSINFOADDRESSELEMENT, ASN_INTEGER, RWRITE, var_sccpAddressInfoTable, 6, {1, 1, 10, 2, 1, 3}},
 #define   SCCPADDRESSINFONROFADDRESSELEMENTS  119
-	{(u_char) SCCPADDRESSINFONROFADDRESSELEMENTS, ASN_INTEGER, RWRITE, var_sccpAddressInfoTable, 6, {1, 1, 10, 2, 1, 4}},
+	{(u_char) SCCPADDRESSINFONROFADDRESSELEMENTS, ASN_UNSIGNED, RWRITE, var_sccpAddressInfoTable, 6, {1, 1, 10, 2, 1, 4}},
 #define   SCCPADDRESSINFOROWSTATUS  120
 	{(u_char) SCCPADDRESSINFOROWSTATUS, ASN_INTEGER, RWRITE, var_sccpAddressInfoTable, 6, {1, 1, 10, 2, 1, 5}},
 #define   SCCPGTTRANSLATORGTINDICATOR  121
@@ -1222,6 +1224,7 @@ store_sccpNetworkEntityTable(int majorID, int minorID, void *serverarg, void *cl
 			memset(line, 0, sizeof(line));
 			strcat(line, "sccpNetworkEntityTable ");
 			cptr = line + strlen(line);
+			(void) cptr;
 			/* XXX: remove individual columns if not persistent */
 			cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->mtpMsId, &tmpsize);
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->sccpNetworkEntityId, &StorageTmp->sccpNetworkEntityIdLen);
@@ -1264,7 +1267,7 @@ sccpLocalSapNamesTable_create(void)
 		StorageNew->mtpMsId = 0;
 		if ((StorageNew->sccpNetworkEntityId = (uint8_t *) strdup("")) != NULL)
 			StorageNew->sccpNetworkEntityIdLen = strlen("");
-		/* StorageNew->sccpLocalSapNamesPointer = { zeroDotZero }; *//* DEFVAL { zeroDotZero } */
+		StorageNew->sccpLocalSapNamesPointer = 0;
 		StorageNew->sccpLocalSapNamesRowStatus = RS_NOTREADY;
 		StorageNew->sccpLocalSapNamesRowStatus = RS_NOTREADY;
 	}
@@ -1442,6 +1445,7 @@ store_sccpLocalSapNamesTable(int majorID, int minorID, void *serverarg, void *cl
 			memset(line, 0, sizeof(line));
 			strcat(line, "sccpLocalSapNamesTable ");
 			cptr = line + strlen(line);
+			(void) cptr;
 			/* XXX: remove individual columns if not persistent */
 			cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->mtpMsId, &tmpsize);
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->sccpNetworkEntityId, &StorageTmp->sccpNetworkEntityIdLen);
@@ -1486,7 +1490,7 @@ sccpAccessPointTable_create(void)
 			StorageNew->sccpAccessPointAvailabilityStatusLen = 2;
 		StorageNew->sccpAccessPointConcernedAreaPointer = 0;
 		StorageNew->sccpAccessPointLinkagePointer = 0;
-		StorageNew->sccpAccessPointSsAvailableAfterSpRestart = 2;
+		StorageNew->sccpAccessPointSsAvailableAfterSpRestart = TV_FALSE;
 		if ((StorageNew->sccpAccessPointAsaProfilePointer = snmp_duplicate_objid(zeroDotZero_oid, 2)))
 			StorageNew->sccpAccessPointAsaProfilePointerLen = 2;
 		if ((StorageNew->sccpAccessPointName = (uint8_t *) strdup("")) != NULL)
@@ -1726,6 +1730,7 @@ store_sccpAccessPointTable(int majorID, int minorID, void *serverarg, void *clie
 			memset(line, 0, sizeof(line));
 			strcat(line, "sccpAccessPointTable ");
 			cptr = line + strlen(line);
+			(void) cptr;
 			/* XXX: remove individual columns if not persistent */
 			cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->mtpMsId, &tmpsize);
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->sccpNetworkEntityId, &StorageTmp->sccpNetworkEntityIdLen);
@@ -2197,6 +2202,7 @@ store_sccpLinkageTable(int majorID, int minorID, void *serverarg, void *clientar
 			memset(line, 0, sizeof(line));
 			strcat(line, "sccpLinkageTable ");
 			cptr = line + strlen(line);
+			(void) cptr;
 			/* XXX: remove individual columns if not persistent */
 			cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->mtpMsId, &tmpsize);
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->sccpNetworkEntityId, &StorageTmp->sccpNetworkEntityIdLen);
@@ -2503,6 +2509,7 @@ store_sccpMtpTable(int majorID, int minorID, void *serverarg, void *clientarg)
 			memset(line, 0, sizeof(line));
 			strcat(line, "sccpMtpTable ");
 			cptr = line + strlen(line);
+			(void) cptr;
 			/* XXX: remove individual columns if not persistent */
 			cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->mtpMsId, &tmpsize);
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->sccpNetworkEntityId, &StorageTmp->sccpNetworkEntityIdLen);
@@ -2779,6 +2786,7 @@ store_sccpSclcTable(int majorID, int minorID, void *serverarg, void *clientarg)
 			memset(line, 0, sizeof(line));
 			strcat(line, "sccpSclcTable ");
 			cptr = line + strlen(line);
+			(void) cptr;
 			/* XXX: remove individual columns if not persistent */
 			cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->mtpMsId, &tmpsize);
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->sccpNetworkEntityId, &StorageTmp->sccpNetworkEntityIdLen);
@@ -3028,6 +3036,7 @@ store_sccpScocTable(int majorID, int minorID, void *serverarg, void *clientarg)
 			memset(line, 0, sizeof(line));
 			strcat(line, "sccpScocTable ");
 			cptr = line + strlen(line);
+			(void) cptr;
 			/* XXX: remove individual columns if not persistent */
 			cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->mtpMsId, &tmpsize);
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->sccpNetworkEntityId, &StorageTmp->sccpNetworkEntityIdLen);
@@ -3277,6 +3286,7 @@ store_sccpScrcTable(int majorID, int minorID, void *serverarg, void *clientarg)
 			memset(line, 0, sizeof(line));
 			strcat(line, "sccpScrcTable ");
 			cptr = line + strlen(line);
+			(void) cptr;
 			/* XXX: remove individual columns if not persistent */
 			cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->mtpMsId, &tmpsize);
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->sccpNetworkEntityId, &StorageTmp->sccpNetworkEntityIdLen);
@@ -3317,8 +3327,8 @@ sccpEntitySetTable_create(void)
 		if ((StorageNew->sccpEntitySetName = (uint8_t *) strdup("")) != NULL)
 			StorageNew->sccpEntitySetNameLen = strlen("");
 		StorageNew->sccpEntitySetType = 0;
-		/* StorageNew->sccpEntitySetSsn = (uint8_t *) strdup(0); *//* DEFVAL 0 */
-		/* StorageNew->sccpEntitySetSsnLen = strlen(0); *//* DEFVAL 0 */
+		if ((StorageNew->sccpEntitySetSsn = (uint8_t *) strdup("")) != NULL)
+			StorageNew->sccpEntitySetSsnLen = strlen("");
 		StorageNew->sccpEntitySetRowStatus = 0;
 		StorageNew->sccpEntitySetRowStatus = RS_NOTREADY;
 	}
@@ -3528,6 +3538,7 @@ store_sccpEntitySetTable(int majorID, int minorID, void *serverarg, void *client
 			memset(line, 0, sizeof(line));
 			strcat(line, "sccpEntitySetTable ");
 			cptr = line + strlen(line);
+			(void) cptr;
 			/* XXX: remove individual columns if not persistent */
 			cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->mtpMsId, &tmpsize);
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->sccpNetworkEntityId, &StorageTmp->sccpNetworkEntityIdLen);
@@ -3771,6 +3782,7 @@ store_sccpEntitySetSapTable(int majorID, int minorID, void *serverarg, void *cli
 			memset(line, 0, sizeof(line));
 			strcat(line, "sccpEntitySetSapTable ");
 			cptr = line + strlen(line);
+			(void) cptr;
 			/* XXX: remove individual columns if not persistent */
 			cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->mtpMsId, &tmpsize);
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->sccpNetworkEntityId, &StorageTmp->sccpNetworkEntityIdLen);
@@ -3990,6 +4002,7 @@ store_sccpConcernedAreaTable(int majorID, int minorID, void *serverarg, void *cl
 			memset(line, 0, sizeof(line));
 			strcat(line, "sccpConcernedAreaTable ");
 			cptr = line + strlen(line);
+			(void) cptr;
 			/* XXX: remove individual columns if not persistent */
 			cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->mtpMsId, &tmpsize);
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->sccpNetworkEntityId, &StorageTmp->sccpNetworkEntityIdLen);
@@ -4237,6 +4250,7 @@ store_sccpRemoteSCCPTable(int majorID, int minorID, void *serverarg, void *clien
 			memset(line, 0, sizeof(line));
 			strcat(line, "sccpRemoteSCCPTable ");
 			cptr = line + strlen(line);
+			(void) cptr;
 			/* XXX: remove individual columns if not persistent */
 			cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->mtpMsId, &tmpsize);
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->sccpNetworkEntityId, &StorageTmp->sccpNetworkEntityIdLen);
@@ -4271,10 +4285,10 @@ sccpGtConversionRuleTable_create(void)
 		StorageNew->mtpMsId = 0;
 		if ((StorageNew->sccpNetworkEntityId = (uint8_t *) strdup("")) != NULL)
 			StorageNew->sccpNetworkEntityIdLen = strlen("");
-		StorageNew->sccpGtConversionRuleNewEncodingScheme = 256;
-		StorageNew->sccpGtConversionRuleNewNatureOfAddress = 256;
-		StorageNew->sccpGtConversionRuleNewNumberingPlan = 256;
-		StorageNew->sccpGtConversionRuleNewTranslationType = 256;
+		StorageNew->sccpGtConversionRuleNewEncodingScheme = SCCPGTCONVERSIONRULENEWENCODINGSCHEME_NOTUSEDORNOOVERWITE;
+		StorageNew->sccpGtConversionRuleNewNatureOfAddress = SCCPGTCONVERSIONRULENEWNATUREOFADDRESS_NOTUSEDORNOOVERWITE;
+		StorageNew->sccpGtConversionRuleNewNumberingPlan = SCCPGTCONVERSIONRULENEWNUMBERINGPLAN_NOTUSEDORNOOVERWRITE;
+		StorageNew->sccpGtConversionRuleNewTranslationType = SCCPGTCONVERSIONRULENEWTRANSLATIONTYPE_NOTUSEDORNOOVERWRITE;
 		if ((StorageNew->sccpGtConversionRuleName = (uint8_t *) strdup("")) != NULL)
 			StorageNew->sccpGtConversionRuleNameLen = strlen("");
 		StorageNew->sccpGtConversionRuleRowStatus = 0;
@@ -4472,6 +4486,7 @@ store_sccpGtConversionRuleTable(int majorID, int minorID, void *serverarg, void 
 			memset(line, 0, sizeof(line));
 			strcat(line, "sccpGtConversionRuleTable ");
 			cptr = line + strlen(line);
+			(void) cptr;
 			/* XXX: remove individual columns if not persistent */
 			cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->mtpMsId, &tmpsize);
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->sccpNetworkEntityId, &StorageTmp->sccpNetworkEntityIdLen);
@@ -4679,7 +4694,7 @@ parse_sccpAddressInfoTable(const char *token, char *line)
 	}
 	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->sccpAddressInfoOperation, &tmpsize);
 	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->sccpAddressInfoAddressElement, &tmpsize);
-	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->sccpAddressInfoNrOfAddressElements, &tmpsize);
+	line = read_config_read_data(ASN_UNSIGNED, line, &StorageTmp->sccpAddressInfoNrOfAddressElements, &tmpsize);
 	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->sccpAddressInfoRowStatus, &tmpsize);
 	sccpAddressInfoTable_add(StorageTmp);
 	(void) tmpsize;
@@ -4709,6 +4724,7 @@ store_sccpAddressInfoTable(int majorID, int minorID, void *serverarg, void *clie
 			memset(line, 0, sizeof(line));
 			strcat(line, "sccpAddressInfoTable ");
 			cptr = line + strlen(line);
+			(void) cptr;
 			/* XXX: remove individual columns if not persistent */
 			cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->mtpMsId, &tmpsize);
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->sccpNetworkEntityId, &StorageTmp->sccpNetworkEntityIdLen);
@@ -4716,7 +4732,7 @@ store_sccpAddressInfoTable(int majorID, int minorID, void *serverarg, void *clie
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->sccpAddressInfoOperationId, &StorageTmp->sccpAddressInfoOperationIdLen);
 			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->sccpAddressInfoOperation, &tmpsize);
 			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->sccpAddressInfoAddressElement, &tmpsize);
-			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->sccpAddressInfoNrOfAddressElements, &tmpsize);
+			cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->sccpAddressInfoNrOfAddressElements, &tmpsize);
 			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->sccpAddressInfoRowStatus, &tmpsize);
 			snmpd_store_config(line);
 		}
@@ -4947,6 +4963,7 @@ store_sccpGtTranslatorTable(int majorID, int minorID, void *serverarg, void *cli
 			memset(line, 0, sizeof(line));
 			strcat(line, "sccpGtTranslatorTable ");
 			cptr = line + strlen(line);
+			(void) cptr;
 			/* XXX: remove individual columns if not persistent */
 			cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->mtpMsId, &tmpsize);
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->sccpNetworkEntityId, &StorageTmp->sccpNetworkEntityIdLen);
@@ -5223,6 +5240,7 @@ store_sccpGtRuleTable(int majorID, int minorID, void *serverarg, void *clientarg
 			memset(line, 0, sizeof(line));
 			strcat(line, "sccpGtRuleTable ");
 			cptr = line + strlen(line);
+			(void) cptr;
 			/* XXX: remove individual columns if not persistent */
 			cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->mtpMsId, &tmpsize);
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->sccpNetworkEntityId, &StorageTmp->sccpNetworkEntityIdLen);
@@ -5271,7 +5289,7 @@ sccpSrvtTable_create(void)
 			StorageNew->sccpSrvtProceduralStatusLen = 1;
 		StorageNew->sccpSrvtTraceRequested = 0;
 		StorageNew->sccpSrvtThreshold = 0;
-		StorageNew->sccpSrvtMtpBackwardRoutingRequested = 2;
+		StorageNew->sccpSrvtMtpBackwardRoutingRequested = TV_FALSE;
 		if ((StorageNew->sccpSrvtOriginalGT = (uint8_t *) strdup("")) != NULL)
 			StorageNew->sccpSrvtOriginalGTLen = strlen("");
 		if (memdup((u_char **) &StorageNew->sccpSrvtInfoRequest, (u_char *) "\x00", 1) == SNMPERR_SUCCESS)
@@ -5508,6 +5526,7 @@ store_sccpSrvtTable(int majorID, int minorID, void *serverarg, void *clientarg)
 			memset(line, 0, sizeof(line));
 			strcat(line, "sccpSrvtTable ");
 			cptr = line + strlen(line);
+			(void) cptr;
 			/* XXX: remove individual columns if not persistent */
 			cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->mtpMsId, &tmpsize);
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->sccpNetworkEntityId, &StorageTmp->sccpNetworkEntityIdLen);
@@ -7878,8 +7897,7 @@ write_sccpNetworkEntityVersion(int action, u_char *var_val, u_char var_val_type,
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpNetworkEntityVersion not ASN_OBJECT_ID\n");
 			return SNMP_ERR_WRONGTYPE;
 		}
-		/* Note: ranges 14..15 */
-		if (MIN_OID_LEN * sizeof(oid) > var_val_len || var_val_len > MAX_OID_LEN * sizeof(oid) || ((14 * sizeof(oid) > var_val_len || var_val_len > 15 * sizeof(oid)))) {
+		if (MIN_OID_LEN * sizeof(oid) > var_val_len || var_val_len > MAX_OID_LEN * sizeof(oid)) {
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpNetworkEntityVersion: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
@@ -8246,7 +8264,7 @@ write_sccpNetworkEntityAsaProfilePointer(int action, u_char *var_val, u_char var
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpNetworkEntityAsaProfilePointer: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
-		/* Note: default value { zeroDotZero } */
+		/* Note: default value zeroDotZero */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
 		if ((objid = snmp_duplicate_objid((void *) var_val, var_val_len / sizeof(oid))) == NULL)
@@ -8400,7 +8418,7 @@ write_sccpLocalSapNamesPointer(int action, u_char *var_val, u_char var_val_type,
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpLocalSapNamesPointer: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
-		/* Note: default value { zeroDotZero } */
+		/* Note: default value 0 */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
 		break;
@@ -8787,7 +8805,7 @@ write_sccpAccessPointConcernedAreaPointer(int action, u_char *var_val, u_char va
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpAccessPointConcernedAreaPointer: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
-		/* Note: default value */
+		/* Note: default value 0 */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
 		break;
@@ -8918,7 +8936,7 @@ write_sccpAccessPointSsAvailableAfterSpRestart(int action, u_char *var_val, u_ch
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpAccessPointSsAvailableAfterSpRestart: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
-		/* Note: default value 2 */
+		/* Note: default value false */
 		switch (set_value) {
 		case TV_TRUE:
 		case TV_FALSE:
@@ -8994,7 +9012,7 @@ write_sccpAccessPointAsaProfilePointer(int action, u_char *var_val, u_char var_v
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpAccessPointAsaProfilePointer: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
-		/* Note: default value { zeroDotZero } */
+		/* Note: default value zeroDotZero */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
 		if ((objid = snmp_duplicate_objid((void *) var_val, var_val_len / sizeof(oid))) == NULL)
@@ -9791,7 +9809,7 @@ write_sccpLinkageImportanceLevelCR(int action, u_char *var_val, u_char var_val_t
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpLinkageImportanceLevelCR: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
-		/* Note: default value '0204'X */
+		/* Note: default value \"\x02\x04\" */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
 		if ((string = malloc(var_val_len + 1)) == NULL)
@@ -9871,7 +9889,7 @@ write_sccpLinkageImportanceLevelCC(int action, u_char *var_val, u_char var_val_t
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpLinkageImportanceLevelCC: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
-		/* Note: default value '0304'X */
+		/* Note: default value \"\x03\x04\" */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
 		if ((string = malloc(var_val_len + 1)) == NULL)
@@ -9951,7 +9969,7 @@ write_sccpLinkageImportanceLevelCREF(int action, u_char *var_val, u_char var_val
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpLinkageImportanceLevelCREF: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
-		/* Note: default value '0204'X */
+		/* Note: default value \"\x02\x04\" */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
 		if ((string = malloc(var_val_len + 1)) == NULL)
@@ -10031,7 +10049,7 @@ write_sccpLinkageImportanceLevelDT1(int action, u_char *var_val, u_char var_val_
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpLinkageImportanceLevelDT1: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
-		/* Note: default value '0406'X */
+		/* Note: default value \"\x04\x06\" */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
 		if ((string = malloc(var_val_len + 1)) == NULL)
@@ -10111,7 +10129,7 @@ write_sccpLinkageImportanceLevelDT2(int action, u_char *var_val, u_char var_val_
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpLinkageImportanceLevelDT2: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
-		/* Note: default value '0406'X */
+		/* Note: default value \"\x04\x06\" */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
 		if ((string = malloc(var_val_len + 1)) == NULL)
@@ -10191,7 +10209,7 @@ write_sccpLinkageImportanceLevelAK(int action, u_char *var_val, u_char var_val_t
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpLinkageImportanceLevelAK: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
-		/* Note: default value '0600'X */
+		/* Note: default value \"\x06\x00\" */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
 		if ((string = malloc(var_val_len + 1)) == NULL)
@@ -10271,7 +10289,7 @@ write_sccpLinkageImportanceLevelIT(int action, u_char *var_val, u_char var_val_t
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpLinkageImportanceLevelIT: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
-		/* Note: default value '0600'X */
+		/* Note: default value \"\x06\x00\" */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
 		if ((string = malloc(var_val_len + 1)) == NULL)
@@ -10351,7 +10369,7 @@ write_sccpLinkageImportanceLevelED(int action, u_char *var_val, u_char var_val_t
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpLinkageImportanceLevelED: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
-		/* Note: default value '0700'X */
+		/* Note: default value \"\x07\x00\" */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
 		if ((string = malloc(var_val_len + 1)) == NULL)
@@ -10431,7 +10449,7 @@ write_sccpLinkageImportanceLevelEA(int action, u_char *var_val, u_char var_val_t
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpLinkageImportanceLevelEA: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
-		/* Note: default value '0700'X */
+		/* Note: default value \"\x07\x00\" */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
 		if ((string = malloc(var_val_len + 1)) == NULL)
@@ -10511,7 +10529,7 @@ write_sccpLinkageImportanceLevelRSR(int action, u_char *var_val, u_char var_val_
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpLinkageImportanceLevelRSR: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
-		/* Note: default value '0600'X */
+		/* Note: default value \"\x06\x00\" */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
 		if ((string = malloc(var_val_len + 1)) == NULL)
@@ -10591,7 +10609,7 @@ write_sccpLinkageImportanceLevelRSC(int action, u_char *var_val, u_char var_val_
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpLinkageImportanceLevelRSC: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
-		/* Note: default value '0600'X */
+		/* Note: default value \"\x06\x00\" */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
 		if ((string = malloc(var_val_len + 1)) == NULL)
@@ -10671,7 +10689,7 @@ write_sccpLinkageImportanceLevelERR(int action, u_char *var_val, u_char var_val_
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpLinkageImportanceLevelERR: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
-		/* Note: default value '0700'X */
+		/* Note: default value \"\x07\x00\" */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
 		if ((string = malloc(var_val_len + 1)) == NULL)
@@ -10751,7 +10769,7 @@ write_sccpLinkageImportanceLevelRLC(int action, u_char *var_val, u_char var_val_
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpLinkageImportanceLevelRLC: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
-		/* Note: default value '0400'X */
+		/* Note: default value \"\x04\x00\" */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
 		if ((string = malloc(var_val_len + 1)) == NULL)
@@ -10831,7 +10849,7 @@ write_sccpLinkageImportanceLevelRLSD(int action, u_char *var_val, u_char var_val
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpLinkageImportanceLevelRLSD: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
-		/* Note: default value '0606'X */
+		/* Note: default value \"\x06\x06\" */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
 		if ((string = malloc(var_val_len + 1)) == NULL)
@@ -10911,7 +10929,7 @@ write_sccpLinkageImportanceLevelUDT(int action, u_char *var_val, u_char var_val_
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpLinkageImportanceLevelUDT: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
-		/* Note: default value '0406'X */
+		/* Note: default value \"\x04\x06\" */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
 		if ((string = malloc(var_val_len + 1)) == NULL)
@@ -10991,7 +11009,7 @@ write_sccpLinkageImportanceLevelUDTS(int action, u_char *var_val, u_char var_val
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpLinkageImportanceLevelUDTS: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
-		/* Note: default value '0300'X */
+		/* Note: default value \"\x03\x00\" */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
 		if ((string = malloc(var_val_len + 1)) == NULL)
@@ -11071,7 +11089,7 @@ write_sccpLinkageImportanceLevelXUDT(int action, u_char *var_val, u_char var_val
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpLinkageImportanceLevelXUDT: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
-		/* Note: default value '0406'X */
+		/* Note: default value \"\x04\x06\" */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
 		if ((string = malloc(var_val_len + 1)) == NULL)
@@ -11151,7 +11169,7 @@ write_sccpLinkageImportanceLevelXUDTS(int action, u_char *var_val, u_char var_va
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpLinkageImportanceLevelXUDTS: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
-		/* Note: default value '0300'X */
+		/* Note: default value \"\x03\x00\" */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
 		if ((string = malloc(var_val_len + 1)) == NULL)
@@ -11231,7 +11249,7 @@ write_sccpLinkageImportanceLevelLUDT(int action, u_char *var_val, u_char var_val
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpLinkageImportanceLevelLUDT: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
-		/* Note: default value '0406'X */
+		/* Note: default value \"\x04\x06\" */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
 		if ((string = malloc(var_val_len + 1)) == NULL)
@@ -11311,7 +11329,7 @@ write_sccpLinkageImportanceLevelLUDTS(int action, u_char *var_val, u_char var_va
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpLinkageImportanceLevelLUDTS: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
-		/* Note: default value '0300'X */
+		/* Note: default value \"\x03\x00\" */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
 		if ((string = malloc(var_val_len + 1)) == NULL)
@@ -12607,7 +12625,7 @@ write_sccpSclcAsaProfilePointer(int action, u_char *var_val, u_char var_val_type
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpSclcAsaProfilePointer: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
-		/* Note: default value { zeroDotZero } */
+		/* Note: default value zeroDotZero */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
 		if ((objid = snmp_duplicate_objid((void *) var_val, var_val_len / sizeof(oid))) == NULL)
@@ -12991,7 +13009,7 @@ write_sccpScocName(int action, u_char *var_val, u_char var_val_type, size_t var_
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpScocName: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
-		/* Note: default value */
+		/* Note: default value \"\" */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
 		if ((string = malloc(var_val_len + 1)) == NULL)
@@ -13071,7 +13089,7 @@ write_sccpScrcId(int action, u_char *var_val, u_char var_val_type, size_t var_va
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpScrcId: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
-		/* Note: default value */
+		/* Note: default value \"\" */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
 		if ((string = malloc(var_val_len + 1)) == NULL)
@@ -13158,7 +13176,7 @@ write_sccpScrcAlarmStatus(int action, u_char *var_val, u_char var_val_type, size
 				return SNMP_ERR_WRONGLENGTH;
 			}
 		}
-		/* Note: default value */
+		/* Note: default value { } */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
 		if ((string = malloc(var_val_len + 1)) == NULL)
@@ -13237,7 +13255,7 @@ write_sccpScrcAsaProfilePointer(int action, u_char *var_val, u_char var_val_type
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpScrcAsaProfilePointer: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
-		/* Note: default value { zeroDotZero } */
+		/* Note: default value zeroDotZero */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
 		if ((objid = snmp_duplicate_objid((void *) var_val, var_val_len / sizeof(oid))) == NULL)
@@ -13315,7 +13333,7 @@ write_sccpScrcName(int action, u_char *var_val, u_char var_val_type, size_t var_
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpScrcName: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
-		/* Note: default value */
+		/* Note: default value \"\" */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
 		if ((string = malloc(var_val_len + 1)) == NULL)
@@ -13546,7 +13564,7 @@ write_sccpEntitySetName(int action, u_char *var_val, u_char var_val_type, size_t
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpEntitySetName: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
-		/* Note: default value */
+		/* Note: default value \"\" */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
 		if ((string = malloc(var_val_len + 1)) == NULL)
@@ -13700,7 +13718,7 @@ write_sccpEntitySetSsn(int action, u_char *var_val, u_char var_val_type, size_t 
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpEntitySetSsn: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
-		/* Note: default value 0 */
+		/* Note: default value \"\" */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
 		if ((string = malloc(var_val_len + 1)) == NULL)
@@ -14082,7 +14100,7 @@ write_sccpGtConversionRuleNewEncodingScheme(int action, u_char *var_val, u_char 
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpGtConversionRuleNewEncodingScheme: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
-		/* Note: default value 256 */
+		/* Note: default value notUsedOrNoOverwite */
 		switch (set_value) {
 		case SCCPGTCONVERSIONRULENEWENCODINGSCHEME_UNKNOWN:
 		case SCCPGTCONVERSIONRULENEWENCODINGSCHEME_BCDODD:
@@ -14159,7 +14177,7 @@ write_sccpGtConversionRuleNewNatureOfAddress(int action, u_char *var_val, u_char
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpGtConversionRuleNewNatureOfAddress: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
-		/* Note: default value 256 */
+		/* Note: default value notUsedOrNoOverwite */
 		switch (set_value) {
 		case SCCPGTCONVERSIONRULENEWNATUREOFADDRESS_UNKNOWN:
 		case SCCPGTCONVERSIONRULENEWNATUREOFADDRESS_ISDNTNP:
@@ -14241,7 +14259,7 @@ write_sccpGtConversionRuleNewNumberingPlan(int action, u_char *var_val, u_char v
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpGtConversionRuleNewNumberingPlan: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
-		/* Note: default value 256 */
+		/* Note: default value notUsedOrNoOverwrite */
 		switch (set_value) {
 		case SCCPGTCONVERSIONRULENEWNUMBERINGPLAN_UNKNOWN:
 		case SCCPGTCONVERSIONRULENEWNUMBERINGPLAN_SUBSCRIBER:
@@ -14318,7 +14336,7 @@ write_sccpGtConversionRuleNewTranslationType(int action, u_char *var_val, u_char
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpGtConversionRuleNewTranslationType: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
-		/* Note: default value 256 */
+		/* Note: default value notUsedOrNoOverwrite */
 		switch (set_value) {
 		case SCCPGTCONVERSIONRULENEWTRANSLATIONTYPE_UNKNOWN:
 		case SCCPGTCONVERSIONRULENEWTRANSLATIONTYPE_ITCC:
@@ -14398,7 +14416,7 @@ write_sccpGtConversionRuleName(int action, u_char *var_val, u_char var_val_type,
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpGtConversionRuleName: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
-		/* Note: default value */
+		/* Note: default value \"\" */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
 		if ((string = malloc(var_val_len + 1)) == NULL)
@@ -14592,10 +14610,10 @@ write_sccpAddressInfoAddressElement(int action, u_char *var_val, u_char var_val_
 int
 write_sccpAddressInfoNrOfAddressElements(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static long old_value;
+	static ulong old_value;
 	struct sccpAddressInfoTable_data *StorageTmp = NULL;
 	size_t newlen = name_len - 16;
-	long set_value = *((long *) var_val);
+	ulong set_value = *((ulong *) var_val);
 
 	DEBUGMSGTL(("sccpMIB", "write_sccpAddressInfoNrOfAddressElements entering action=%d...  \n", action));
 	StorageTmp = header_complex(sccpAddressInfoTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
@@ -14614,11 +14632,11 @@ write_sccpAddressInfoNrOfAddressElements(int action, u_char *var_val, u_char var
 				break;
 			}
 		}
-		if (var_val_type != ASN_INTEGER) {
-			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpAddressInfoNrOfAddressElements not ASN_INTEGER\n");
+		if (var_val_type != ASN_UNSIGNED) {
+			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpAddressInfoNrOfAddressElements not ASN_UNSIGNED\n");
 			return SNMP_ERR_WRONGTYPE;
 		}
-		if (var_val_len > sizeof(int32_t)) {
+		if (var_val_len > sizeof(uint32_t)) {
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpAddressInfoNrOfAddressElements: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
@@ -14691,8 +14709,8 @@ write_sccpGtTranslatorGtIndicator(int action, u_char *var_val, u_char var_val_ty
 		case SCCPGTTRANSLATORGTINDICATOR_NOGLOBALTITLE:
 		case SCCPGTTRANSLATORGTINDICATOR_NOAONLY:
 		case SCCPGTTRANSLATORGTINDICATOR_TTONLY:
-		case SCCPGTTRANSLATORGTINDICATOR_TT_NP_ES:
-		case SCCPGTTRANSLATORGTINDICATOR_TT_NP_ES_NOA:
+		case SCCPGTTRANSLATORGTINDICATOR_TTNPES:
+		case SCCPGTTRANSLATORGTINDICATOR_TTNPESNOA:
 			break;
 		default:
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpGtTranslatorGtIndicator: bad value\n");
@@ -15074,7 +15092,7 @@ write_sccpGtTranslatorName(int action, u_char *var_val, u_char var_val_type, siz
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpGtTranslatorName: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
-		/* Note: default value */
+		/* Note: default value \"\" */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
 		if ((string = malloc(var_val_len + 1)) == NULL)
@@ -15541,7 +15559,7 @@ write_sccpGtRuleName(int action, u_char *var_val, u_char var_val_type, size_t va
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpGtRuleName: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
-		/* Note: default value */
+		/* Note: default value \"\" */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
 		if ((string = malloc(var_val_len + 1)) == NULL)
@@ -15756,7 +15774,7 @@ write_sccpSrvtName(int action, u_char *var_val, u_char var_val_type, size_t var_
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpSrvtName: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
-		/* Note: default value */
+		/* Note: default value \"\" */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
 		if ((string = malloc(var_val_len + 1)) == NULL)
@@ -16046,7 +16064,7 @@ write_sccpSrvtMtpBackwardRoutingRequested(int action, u_char *var_val, u_char va
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpSrvtMtpBackwardRoutingRequested: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
-		/* Note: default value 2 */
+		/* Note: default value false */
 		switch (set_value) {
 		case TV_TRUE:
 		case TV_FALSE:
@@ -16122,7 +16140,7 @@ write_sccpSrvtOriginalGT(int action, u_char *var_val, u_char var_val_type, size_
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpSrvtOriginalGT: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
-		/* Note: default value */
+		/* Note: default value \"\" */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
 		if ((string = malloc(var_val_len + 1)) == NULL)
@@ -16209,7 +16227,7 @@ write_sccpSrvtInfoRequest(int action, u_char *var_val, u_char var_val_type, size
 				return SNMP_ERR_WRONGLENGTH;
 			}
 		}
-		/* Note: default value */
+		/* Note: default value { } */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
 		if ((string = malloc(var_val_len + 1)) == NULL)
@@ -16296,7 +16314,7 @@ write_sccpSrvtReturnUnknownParams(int action, u_char *var_val, u_char var_val_ty
 				return SNMP_ERR_WRONGLENGTH;
 			}
 		}
-		/* Note: default value */
+		/* Note: default value { } */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
 		if ((string = malloc(var_val_len + 1)) == NULL)

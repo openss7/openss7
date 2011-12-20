@@ -1,4 +1,4 @@
-PKGNAME="@PACKAGE@"
+PRGNAME="@PACKAGE@"
 VERSION="@VERSION@"
 HOMEPAGE="http://www.openss7.org/"
 DOWNLOAD="http://www.openss7.org/repo/tarballs/@PACKAGE@-@VERSION@.tar.xz"

@@ -1010,6 +1010,7 @@ store_dsx1ConfigTable(int majorID, int minorID, void *serverarg, void *clientarg
 			memset(line, 0, sizeof(line));
 			strcat(line, "dsx1ConfigTable ");
 			cptr = line + strlen(line);
+			(void) cptr;
 			/* XXX: remove individual columns if not persistent */
 			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->dsx1LineIndex, &tmpsize);
 			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->dsx1IfIndex, &tmpsize);
@@ -1238,6 +1239,7 @@ store_dsx1CurrentTable(int majorID, int minorID, void *serverarg, void *clientar
 			memset(line, 0, sizeof(line));
 			strcat(line, "dsx1CurrentTable ");
 			cptr = line + strlen(line);
+			(void) cptr;
 			/* XXX: remove individual columns if not persistent */
 			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->dsx1CurrentIndex, &tmpsize);
 			cptr = read_config_store_data(ASN_GAUGE, cptr, &StorageTmp->dsx1CurrentESs, &tmpsize);
@@ -1459,6 +1461,7 @@ store_dsx1IntervalTable(int majorID, int minorID, void *serverarg, void *clienta
 			memset(line, 0, sizeof(line));
 			strcat(line, "dsx1IntervalTable ");
 			cptr = line + strlen(line);
+			(void) cptr;
 			/* XXX: remove individual columns if not persistent */
 			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->dsx1IntervalIndex, &tmpsize);
 			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->dsx1IntervalNumber, &tmpsize);
@@ -1677,6 +1680,7 @@ store_dsx1TotalTable(int majorID, int minorID, void *serverarg, void *clientarg)
 			memset(line, 0, sizeof(line));
 			strcat(line, "dsx1TotalTable ");
 			cptr = line + strlen(line);
+			(void) cptr;
 			/* XXX: remove individual columns if not persistent */
 			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->dsx1TotalIndex, &tmpsize);
 			cptr = read_config_store_data(ASN_GAUGE, cptr, &StorageTmp->dsx1TotalESs, &tmpsize);
@@ -1897,6 +1901,7 @@ store_dsx1FarEndCurrentTable(int majorID, int minorID, void *serverarg, void *cl
 			memset(line, 0, sizeof(line));
 			strcat(line, "dsx1FarEndCurrentTable ");
 			cptr = line + strlen(line);
+			(void) cptr;
 			/* XXX: remove individual columns if not persistent */
 			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->dsx1FarEndCurrentIndex, &tmpsize);
 			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->dsx1FarEndTimeElapsed, &tmpsize);
@@ -2118,6 +2123,7 @@ store_dsx1FarEndIntervalTable(int majorID, int minorID, void *serverarg, void *c
 			memset(line, 0, sizeof(line));
 			strcat(line, "dsx1FarEndIntervalTable ");
 			cptr = line + strlen(line);
+			(void) cptr;
 			/* XXX: remove individual columns if not persistent */
 			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->dsx1FarEndIntervalIndex, &tmpsize);
 			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->dsx1FarEndIntervalNumber, &tmpsize);
@@ -2333,6 +2339,7 @@ store_dsx1FarEndTotalTable(int majorID, int minorID, void *serverarg, void *clie
 			memset(line, 0, sizeof(line));
 			strcat(line, "dsx1FarEndTotalTable ");
 			cptr = line + strlen(line);
+			(void) cptr;
 			/* XXX: remove individual columns if not persistent */
 			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->dsx1FarEndTotalIndex, &tmpsize);
 			cptr = read_config_store_data(ASN_GAUGE, cptr, &StorageTmp->dsx1FarEndTotalESs, &tmpsize);
@@ -2533,6 +2540,7 @@ store_dsx1FracTable(int majorID, int minorID, void *serverarg, void *clientarg)
 			memset(line, 0, sizeof(line));
 			strcat(line, "dsx1FracTable ");
 			cptr = line + strlen(line);
+			(void) cptr;
 			/* XXX: remove individual columns if not persistent */
 			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->dsx1FracIndex, &tmpsize);
 			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->dsx1FracNumber, &tmpsize);
@@ -2728,6 +2736,7 @@ store_dsx1ChanMappingTable(int majorID, int minorID, void *serverarg, void *clie
 			memset(line, 0, sizeof(line));
 			strcat(line, "dsx1ChanMappingTable ");
 			cptr = line + strlen(line);
+			(void) cptr;
 			/* XXX: remove individual columns if not persistent */
 			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->ifIndex, &tmpsize);
 			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->dsx1Ds1ChannelNumber, &tmpsize);

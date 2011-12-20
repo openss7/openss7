@@ -134,6 +134,10 @@ nobase_pkginclude_HEADERS = \
 	xti_mosi.h \
 	xti_osi.h \
 	xti_xx25.h \
+	net/bpf.h \
+	net/nit_if.h \
+	net/nit_buf.h \
+	net/nit_pf.h \
 	netx25/ll_control.h \
 	netx25/nli.h \
 	netx25/x25_control.h \
@@ -233,6 +237,8 @@ nobase_pkginclude_HEADERS = \
 	ss7/v5ua_ioctl.h \
 	ss7/x400p_ioctl.h \
 	ss7/zapata.h \
+	sys/bufmod.h \
+	sys/pfmod.h \
 	sys/apli.h \
 	sys/atm_dlpi.h \
 	sys/capi.h \

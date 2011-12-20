@@ -1748,7 +1748,7 @@ fi
       -r -t $testtime -i $interval -m nullmod -p 0 -s $size ${1+$@}
     [ -n "$perftestn" ] && $perftestn -q \
       -r -t $testtime -i $interval -m nullmod -p 0 -s $size ${1+$@}
-    [ -n "$scls"      ] && $scls -a -c -r pipe pipemod bufmod nullmod
+    [ -n "$scls"      ] && $scls -a -c -r pipe pipemod srvmod nullmod
   done
 ) 2>&1 | tee `hostname`.$command.`date -uIseconds`.log
 \end{verbatim}

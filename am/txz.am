@@ -110,6 +110,8 @@ slack_checksums		= $(slack_dirs:%=%/CHECKSUMS.md5)
 
 slack_packages		= $(slack_dirs:%=%/PACKAGES.TXT)
 
+slack_slackbuilds	= $(slack_dirs:%=%/SLACKBUILDS.TXT)
+
 slack_filelists		= $(txzdistdir)/FILELIST.TXT \
 			  $(slack_dirs:%=%/FILE_LIST)
 
@@ -239,6 +241,37 @@ $(slack_manifests):
 			$(ECHO) "";
 		done; \
 	) | bzip -c >$@
+
+$(slack_slackbuilds):
+	$(AM_V_GEN)( cd $$(dirname $@); \
+		$(ECHO) "SLACKBUILDS.TXT;  `date`" >/dev/null; \
+		$(ECHO) "" >/dev/null; \
+		$(ECHO) "This file provides details on the Slackware packages found" >/dev/null; \
+		$(ECHO) "in the ./$$(basename $$(pwd))/ directory." >/dev/null; \
+		$(ECHO) "" >/dev/null; \
+		$(ECHO) "" >/dev/null; \
+		find . -name '*.info' | sort -u | while read p; do \
+		( \
+			source $$p; \
+			name=$$(basename $$p .info); \
+			if test -r $$(dirname $$p)/slack-desc.$$name ; then \
+				desc="$$(dirname $$p)/slack-desc.$$name"; \
+			else \
+				desc="$$(dirname $$p)/slack-desc"; \
+			fi; \
+			$(ECHO) "SLACKBUILD NAME: $$PRGNAME"; \
+			$(ECHO) "SLACKBUILD LOCATION: $$(dirname $$p)"; \
+			$(ECHO) "SLACKBUILD FILES: $$($$(ls $$(dirname $$p))|xargs basename)"; \
+			$(ECHO) "SLACKBUILD VERSION: $$VERSION"; \
+			$(ECHO) "SLACKBUILD DOWNLOAD: $$DOWNLOAD"; \
+			$(ECHO) "SLACKBUILD DOWNLOAD_x86_64: $$DOWNLOAD_x86_64"; \
+			$(ECHO) "SLACKBUILD MD5SUM: $$MD5SUM"; \
+			$(ECHO) "SLACKBUILD MD5SUM_x86_64: $$MD5SUM_x86_64"; \
+			$(ECHO) "SLACKBUILD SHORT DESCRIPTION: $$(sed -n -r 's,^[^#[:space:]][^:[:space:]]*:(.*)$$,\1,p' $$desc | head -1)"; \
+			$(ECHO) ""; \
+		) ; \
+		done; \
+	) >$@
 
 $(slack_packages):
 	$(AM_V_GEN)( cd $$(dirname $@); \

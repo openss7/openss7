@@ -85,7 +85,7 @@ IMPORTS
         FROM SNMPv2-TC;
 
 smiMIB MODULE-IDENTITY
-    LAST-UPDATED "201106250258Z"
+    LAST-UPDATED "201112101120Z"
     ORGANIZATION 
         "The OpenSS7 Project"
     CONTACT-INFO 
@@ -129,6 +129,9 @@ smiMIB MODULE-IDENTITY
          enterprise object identifier arc: 1.3.6.1.4.1.29591.  
          Modifications must be made only within an object identifier arc 
          under your control."
+    REVISION    "201112101120Z"
+    DESCRIPTION 
+        "Corrections an smilint workup."
     REVISION    "201106250258Z"
     DESCRIPTION 
         "Passes smilint and reformatted with smidump."
@@ -6847,21 +6850,6 @@ smiCompliance MODULE-COMPLIANCE
         DESCRIPTION   
               "Optional items when some alarms are implemented 
                and logged."
-
-        GROUP   createDeleteNotificationsPackage
-        DESCRIPTION   
-              "Optional items when notifications of deletion are 
-               implemented and logged."
-
-        GROUP   attributeValueChangeNotificationPackage
-        DESCRIPTION   
-              "Optional items when notifications of change are 
-               implemented and logged."
-
-        GROUP   communicationsAlarmPackage
-        DESCRIPTION   
-              "Optional items when alarm notifications are 
-               implemented and logged."
 
     ::= { smiCompliances 1 }
 

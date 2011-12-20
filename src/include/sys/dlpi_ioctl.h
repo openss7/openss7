@@ -75,8 +75,6 @@
 #define DLIOCMARGININFO	(DLIOC|3)	/* margin size info */
 #define DLIOCHDRINFO	(DLIOC|10)	/* IP fast-path */
 
-#define DL_IOC_HDR_INFO	DLIOCHDRINFO
-
 #endif				/* _SUN_SOURCE */
 
 #ifdef _HPUX_SOURCE
@@ -142,8 +140,8 @@ typedef struct dl_hp_set_drv_param_ioctl {
 #define DL_HP_DRV_RESERVED4	(1UL<<11)	/* dl_reserved2[1] is valid. */
 #define DL_HP_SERIALIZE		(1UL<<30)	/* Serialize request. */
 
-#define DL_HP_HALF_DUPLIX	(1UL<<0)	/* Half-Duplex. */
-#define DL_HP_FULL_DUPLIX	(1UL<<1)	/* Full-Duplex. */
+#define DL_HP_HALF_DUPLEX	(1UL<<0)	/* Half-Duplex. */
+#define DL_HP_FULL_DUPLEX	(1UL<<1)	/* Full-Duplex. */
 
 #define DL_HP_AUTONEG_SENSE_ON	(1UL<<0)	/* Autonegotiate/Auto-sense on. */
 #define DL_HP_AUTONEG_SENSE_OFF	(1UL<<1)	/* Autonegotiate/Auto-sense off. */
@@ -448,6 +446,7 @@ struct dlc_trace_arg {
 #define LLC2_GET_CON_STATS	2
 
 #define LLC2_MAX_SAPS 128
+#define LLC2_MAX_CONS 128   /* FIXME */
 
 typedef struct llc2GetStaStats {
 	uint32_t ppa;			/* PPA of station component */
@@ -491,13 +490,13 @@ typedef struct llc2GetSapStats {
 #define MAC_MAX_LEN 8
 
 /* wild guess */
-struct dlsap {
+typedef struct dlsap {
 	uint8_t mac_len;
 	uint8_t mac[MAC_MAX_LEN];
 	uint8_t lsap;
 } dlsap_t;
 
-typdef struct llc2GetConStats {
+typedef struct llc2GetConStats {
 	uint32_t ppa;			/* PPA of Connection component */
 	uint32_t cmd;			/* LLC2_GET_CON_STATS */
 	uint8_t sap;			/* SAP value */

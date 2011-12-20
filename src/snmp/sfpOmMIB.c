@@ -154,6 +154,7 @@ oid sfpOm15minReport_oid[12] = { 1, 3, 6, 1, 4, 1, 29591, 7, 774, 12, 0, 2 };
  * Oids accessible only for notify defined in this MIB.
  */
 oid sfpOmDuration_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 7, 774, 12, 1, 3, 1 };
+oid sfpOmModuleId_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 7, 774, 12, 1, 3, 2 };
 
 /*
  * Other oids defined in this MIB.
@@ -174,97 +175,97 @@ static oid snmpTrapOID_oid[11] = { 1, 3, 6, 1, 6, 3, 1, 1, 4, 1, 0 };
  */
 struct variable7 sfpOmMIB_variables[] = {
 	/* magic number, variable type, ro/rw, callback fn, L, oidsuffix */
-#define   SFPOMTEMP             2
+#define   SFPOMTEMP             1
 	{(u_char) SFPOMTEMP, ASN_GAUGE, RONLY, var_sfpOmActualTable, 6, {1, 1, 1, 1, 1, 1}},
-#define   SFPOMVOLT             3
+#define   SFPOMVOLT             2
 	{(u_char) SFPOMVOLT, ASN_GAUGE, RONLY, var_sfpOmActualTable, 6, {1, 1, 1, 1, 1, 2}},
-#define   SFPOMBIAS             4
+#define   SFPOMBIAS             3
 	{(u_char) SFPOMBIAS, ASN_GAUGE, RONLY, var_sfpOmActualTable, 6, {1, 1, 1, 1, 1, 3}},
-#define   SFPOMTXPOWER          5
+#define   SFPOMTXPOWER          4
 	{(u_char) SFPOMTXPOWER, ASN_GAUGE, RONLY, var_sfpOmActualTable, 6, {1, 1, 1, 1, 1, 4}},
-#define   SFPOMRXPOWER          6
+#define   SFPOMRXPOWER          5
 	{(u_char) SFPOMRXPOWER, ASN_GAUGE, RONLY, var_sfpOmActualTable, 6, {1, 1, 1, 1, 1, 5}},
-#define   SFPOMTEMPMARKHI       8
+#define   SFPOMTEMPMARKHI       6
 	{(u_char) SFPOMTEMPMARKHI, ASN_GAUGE, RONLY, var_sfpOmCurrentTable, 6, {1, 1, 2, 1, 1, 1}},
-#define   SFPOMTEMPMARKLO       9
+#define   SFPOMTEMPMARKLO       7
 	{(u_char) SFPOMTEMPMARKLO, ASN_GAUGE, RONLY, var_sfpOmCurrentTable, 6, {1, 1, 2, 1, 1, 2}},
-#define   SFPOMVOLTMARKHI       10
+#define   SFPOMVOLTMARKHI       8
 	{(u_char) SFPOMVOLTMARKHI, ASN_GAUGE, RONLY, var_sfpOmCurrentTable, 6, {1, 1, 2, 1, 1, 3}},
-#define   SFPOMVOLTMARKLO       11
+#define   SFPOMVOLTMARKLO       9
 	{(u_char) SFPOMVOLTMARKLO, ASN_GAUGE, RONLY, var_sfpOmCurrentTable, 6, {1, 1, 2, 1, 1, 4}},
-#define   SFPOMBIASMARKHI       12
+#define   SFPOMBIASMARKHI       10
 	{(u_char) SFPOMBIASMARKHI, ASN_GAUGE, RONLY, var_sfpOmCurrentTable, 6, {1, 1, 2, 1, 1, 5}},
-#define   SFPOMBIASMARKLO       13
+#define   SFPOMBIASMARKLO       11
 	{(u_char) SFPOMBIASMARKLO, ASN_GAUGE, RONLY, var_sfpOmCurrentTable, 6, {1, 1, 2, 1, 1, 6}},
-#define   SFPOMTXPOWERMARKHI    14
+#define   SFPOMTXPOWERMARKHI    12
 	{(u_char) SFPOMTXPOWERMARKHI, ASN_GAUGE, RONLY, var_sfpOmCurrentTable, 6, {1, 1, 2, 1, 1, 7}},
-#define   SFPOMTXPOWERMARKLO    15
+#define   SFPOMTXPOWERMARKLO    13
 	{(u_char) SFPOMTXPOWERMARKLO, ASN_GAUGE, RONLY, var_sfpOmCurrentTable, 6, {1, 1, 2, 1, 1, 8}},
-#define   SFPOMRXPOWERMARKHI    16
+#define   SFPOMRXPOWERMARKHI    14
 	{(u_char) SFPOMRXPOWERMARKHI, ASN_GAUGE, RONLY, var_sfpOmCurrentTable, 6, {1, 1, 2, 1, 1, 9}},
-#define   SFPOMRXPOWERMARKLO    17
+#define   SFPOMRXPOWERMARKLO    15
 	{(u_char) SFPOMRXPOWERMARKLO, ASN_GAUGE, RONLY, var_sfpOmCurrentTable, 6, {1, 1, 2, 1, 1, 10}},
-#define   SFPOM5MINVALIDINTERVALS  18
+#define   SFPOM5MINVALIDINTERVALS  16
 	{(u_char) SFPOM5MINVALIDINTERVALS, ASN_INTEGER, RONLY, var_sfpOmCurrentTable, 6, {1, 1, 2, 1, 1, 11}},
-#define   SFPOM15MINVALIDINTERVALS  19
+#define   SFPOM15MINVALIDINTERVALS  17
 	{(u_char) SFPOM15MINVALIDINTERVALS, ASN_INTEGER, RONLY, var_sfpOmCurrentTable, 6, {1, 1, 2, 1, 1, 12}},
-#define   SFPOM5MINTEMPMARKHI   21
+#define   SFPOM5MINTEMPMARKHI   18
 	{(u_char) SFPOM5MINTEMPMARKHI, ASN_GAUGE, RONLY, var_sfpOm5MinHistoryTable, 6, {1, 1, 3, 1, 1, 2}},
-#define   SFPOM5MINTEMPMARKLO   22
+#define   SFPOM5MINTEMPMARKLO   19
 	{(u_char) SFPOM5MINTEMPMARKLO, ASN_GAUGE, RONLY, var_sfpOm5MinHistoryTable, 6, {1, 1, 3, 1, 1, 3}},
-#define   SFPOM5MINVOLTMARKHI   23
+#define   SFPOM5MINVOLTMARKHI   20
 	{(u_char) SFPOM5MINVOLTMARKHI, ASN_GAUGE, RONLY, var_sfpOm5MinHistoryTable, 6, {1, 1, 3, 1, 1, 4}},
-#define   SFPOM5MINVOLTMARKLO   24
+#define   SFPOM5MINVOLTMARKLO   21
 	{(u_char) SFPOM5MINVOLTMARKLO, ASN_GAUGE, RONLY, var_sfpOm5MinHistoryTable, 6, {1, 1, 3, 1, 1, 5}},
-#define   SFPOM5MINBIASMARKHI   25
+#define   SFPOM5MINBIASMARKHI   22
 	{(u_char) SFPOM5MINBIASMARKHI, ASN_GAUGE, RONLY, var_sfpOm5MinHistoryTable, 6, {1, 1, 3, 1, 1, 6}},
-#define   SFPOM5MINBIASMARKLO   26
+#define   SFPOM5MINBIASMARKLO   23
 	{(u_char) SFPOM5MINBIASMARKLO, ASN_GAUGE, RONLY, var_sfpOm5MinHistoryTable, 6, {1, 1, 3, 1, 1, 7}},
-#define   SFPOM5MINTXPOWERMARKHI  27
+#define   SFPOM5MINTXPOWERMARKHI  24
 	{(u_char) SFPOM5MINTXPOWERMARKHI, ASN_GAUGE, RONLY, var_sfpOm5MinHistoryTable, 6, {1, 1, 3, 1, 1, 8}},
-#define   SFPOM5MINTXPOWERMARKLO  28
+#define   SFPOM5MINTXPOWERMARKLO  25
 	{(u_char) SFPOM5MINTXPOWERMARKLO, ASN_GAUGE, RONLY, var_sfpOm5MinHistoryTable, 6, {1, 1, 3, 1, 1, 9}},
-#define   SFPOM5MINRXPOWERMARKHI  29
+#define   SFPOM5MINRXPOWERMARKHI  26
 	{(u_char) SFPOM5MINRXPOWERMARKHI, ASN_GAUGE, RONLY, var_sfpOm5MinHistoryTable, 6, {1, 1, 3, 1, 1, 10}},
-#define   SFPOM5MINRXPOWERMARKLO  30
+#define   SFPOM5MINRXPOWERMARKLO  27
 	{(u_char) SFPOM5MINRXPOWERMARKLO, ASN_GAUGE, RONLY, var_sfpOm5MinHistoryTable, 6, {1, 1, 3, 1, 1, 11}},
-#define   SFPOM15MINTEMPMARKHI  32
+#define   SFPOM15MINTEMPMARKHI  28
 	{(u_char) SFPOM15MINTEMPMARKHI, ASN_GAUGE, RONLY, var_sfpOm15MinHistoryTable, 6, {1, 1, 4, 1, 1, 1}},
-#define   SFPOM15MINTEMPMARKLO  33
+#define   SFPOM15MINTEMPMARKLO  29
 	{(u_char) SFPOM15MINTEMPMARKLO, ASN_GAUGE, RONLY, var_sfpOm15MinHistoryTable, 6, {1, 1, 4, 1, 1, 2}},
-#define   SFPOM15MINVOLTMARKHI  34
+#define   SFPOM15MINVOLTMARKHI  30
 	{(u_char) SFPOM15MINVOLTMARKHI, ASN_GAUGE, RONLY, var_sfpOm15MinHistoryTable, 6, {1, 1, 4, 1, 1, 3}},
-#define   SFPOM15MINVOLTMARKLO  35
+#define   SFPOM15MINVOLTMARKLO  31
 	{(u_char) SFPOM15MINVOLTMARKLO, ASN_GAUGE, RONLY, var_sfpOm15MinHistoryTable, 6, {1, 1, 4, 1, 1, 4}},
-#define   SFPOM15MINBIASMARKHI  36
+#define   SFPOM15MINBIASMARKHI  32
 	{(u_char) SFPOM15MINBIASMARKHI, ASN_GAUGE, RONLY, var_sfpOm15MinHistoryTable, 6, {1, 1, 4, 1, 1, 5}},
-#define   SFPOM15MINBIASMARKLO  37
+#define   SFPOM15MINBIASMARKLO  33
 	{(u_char) SFPOM15MINBIASMARKLO, ASN_GAUGE, RONLY, var_sfpOm15MinHistoryTable, 6, {1, 1, 4, 1, 1, 6}},
-#define   SFPOM15MINTXPOWERMARKHI  38
+#define   SFPOM15MINTXPOWERMARKHI  34
 	{(u_char) SFPOM15MINTXPOWERMARKHI, ASN_GAUGE, RONLY, var_sfpOm15MinHistoryTable, 6, {1, 1, 4, 1, 1, 7}},
-#define   SFPOM15MINTXPOWERMARKLO  39
+#define   SFPOM15MINTXPOWERMARKLO  35
 	{(u_char) SFPOM15MINTXPOWERMARKLO, ASN_GAUGE, RONLY, var_sfpOm15MinHistoryTable, 6, {1, 1, 4, 1, 1, 8}},
-#define   SFPOM15MINRXPOWERMARKHI  40
+#define   SFPOM15MINRXPOWERMARKHI  36
 	{(u_char) SFPOM15MINRXPOWERMARKHI, ASN_GAUGE, RONLY, var_sfpOm15MinHistoryTable, 6, {1, 1, 4, 1, 1, 9}},
-#define   SFPOM15MINRXPOWERMARKLO  41
+#define   SFPOM15MINRXPOWERMARKLO  37
 	{(u_char) SFPOM15MINRXPOWERMARKLO, ASN_GAUGE, RONLY, var_sfpOm15MinHistoryTable, 6, {1, 1, 4, 1, 1, 10}},
-#define   SFPOM5MINACTIVATE     42
+#define   SFPOM5MINACTIVATE     38
 	{(u_char) SFPOM5MINACTIVATE, ASN_OBJECT_ID, RWRITE, var_sfpOmMIB, 3, {1, 2, 1}},
-#define   SFPOM5MINDEACTIVATE   43
+#define   SFPOM5MINDEACTIVATE   39
 	{(u_char) SFPOM5MINDEACTIVATE, ASN_OBJECT_ID, RWRITE, var_sfpOmMIB, 3, {1, 2, 2}},
-#define   SFPOM15MINACTIVATE    44
+#define   SFPOM15MINACTIVATE    40
 	{(u_char) SFPOM15MINACTIVATE, ASN_OBJECT_ID, RWRITE, var_sfpOmMIB, 3, {1, 2, 3}},
-#define   SFPOM15MINDEACTIVATE  45
+#define   SFPOM15MINDEACTIVATE  41
 	{(u_char) SFPOM15MINDEACTIVATE, ASN_OBJECT_ID, RWRITE, var_sfpOmMIB, 3, {1, 2, 4}},
-#define   SFPOMDISCONTINUITYTIME  46
+#define   SFPOMDISCONTINUITYTIME  42
 	{(u_char) SFPOMDISCONTINUITYTIME, ASN_TIMETICKS, RONLY, var_sfpOmMIB, 3, {1, 2, 6}},
-#define   SFPOMTIMESTAMP        47
+#define   SFPOMTIMESTAMP        43
 	{(u_char) SFPOMTIMESTAMP, ASN_TIMETICKS, RONLY, var_sfpOmMIB, 3, {1, 2, 7}},
-#define   SFPOM5MINMAXINTERVALS  48
+#define   SFPOM5MINMAXINTERVALS  44
 	{(u_char) SFPOM5MINMAXINTERVALS, ASN_UNSIGNED, RWRITE, var_sfpOmMIB, 3, {1, 2, 8}},
-#define   SFPOM15MINMAXINTERVALS  49
+#define   SFPOM15MINMAXINTERVALS  45
 	{(u_char) SFPOM15MINMAXINTERVALS, ASN_UNSIGNED, RWRITE, var_sfpOmMIB, 3, {1, 2, 9}},
-#define   SFPOMPOLLINGINTERVAL  50
+#define   SFPOMPOLLINGINTERVAL  46
 	{(u_char) SFPOMPOLLINGINTERVAL, ASN_INTEGER, RWRITE, var_sfpOmMIB, 3, {1, 2, 10}},
 };
 
@@ -546,6 +547,7 @@ store_sfpOmMIB(int majorID, int minorID, void *serverarg, void *clientarg)
 		memset(line, 0, sizeof(line));
 		strcat(line, "sfpOmMIB ");
 		cptr = line + strlen(line);
+		(void) cptr;
 		/* XXX: remove individual scalars that are not persistent */
 		cptr = read_config_store_data(ASN_OBJECT_ID, cptr, &StorageTmp->sfpOm5MinActivate, &StorageTmp->sfpOm5MinActivateLen);
 		cptr = read_config_store_data(ASN_OBJECT_ID, cptr, &StorageTmp->sfpOm5MinDeactivate, &StorageTmp->sfpOm5MinDeactivateLen);
@@ -888,6 +890,7 @@ store_sfpOmActualTable(int majorID, int minorID, void *serverarg, void *clientar
 			memset(line, 0, sizeof(line));
 			strcat(line, "sfpOmActualTable ");
 			cptr = line + strlen(line);
+			(void) cptr;
 			/* XXX: remove individual columns if not persistent */
 			cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->sfpModuleId, &tmpsize);
 			cptr = read_config_store_data(ASN_GAUGE, cptr, &StorageTmp->sfpOmTemp, &tmpsize);
@@ -1104,6 +1107,7 @@ store_sfpOmCurrentTable(int majorID, int minorID, void *serverarg, void *clienta
 			memset(line, 0, sizeof(line));
 			strcat(line, "sfpOmCurrentTable ");
 			cptr = line + strlen(line);
+			(void) cptr;
 			/* XXX: remove individual columns if not persistent */
 			cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->sfpModuleId, &tmpsize);
 			cptr = read_config_store_data(ASN_GAUGE, cptr, &StorageTmp->sfpOmTempMarkHi, &tmpsize);
@@ -1326,6 +1330,7 @@ store_sfpOm5MinHistoryTable(int majorID, int minorID, void *serverarg, void *cli
 			memset(line, 0, sizeof(line));
 			strcat(line, "sfpOm5MinHistoryTable ");
 			cptr = line + strlen(line);
+			(void) cptr;
 			/* XXX: remove individual columns if not persistent */
 			cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->sfpModuleId, &tmpsize);
 			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->sfpOmInterval, &tmpsize);
@@ -1548,6 +1553,7 @@ store_sfpOm15MinHistoryTable(int majorID, int minorID, void *serverarg, void *cl
 			memset(line, 0, sizeof(line));
 			strcat(line, "sfpOm15MinHistoryTable ");
 			cptr = line + strlen(line);
+			(void) cptr;
 			/* XXX: remove individual columns if not persistent */
 			cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->sfpModuleId, &tmpsize);
 			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->sfpOmInterval, &tmpsize);

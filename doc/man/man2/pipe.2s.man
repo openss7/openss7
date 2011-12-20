@@ -140,7 +140,7 @@ opens a
 pipe.
 All the way through the
 .B Linux
-kernel series including 2.6, the
+kernel series including 3.x, the
 .BR pipe ()
 system call provided by glibc will return a
 .RB non- STREAMS -based

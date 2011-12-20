@@ -274,6 +274,13 @@ For the following distributions, follow the instructions in the sections referen
 @item Ubuntu 10.04 Server (LTS) @tab ubu10.04 @tab @ref{Installing with APT}
 @item Ubuntu 10.04.1 Server (LTS) @tab ubu10.04 @tab @ref{Installing with APT}
 @item Ubuntu 10.04.2 Server (LTS) @tab ubu10.04 @tab @ref{Installing with APT}
+@item Slackware 13.1 @tab Slack13.1 @tab @ref{Installing with SLACKPKG}
+@item Slackware 13.2 @tab Slack13.2 @tab @ref{Installing with SLACKPKG}
+@item Slackware 13.37 @tab Slack13.37 @tab @ref{Installing with SLACKPKG}
+@item Salix 13.1 @tab Salix13.1 @tab @ref{Installing with SLAPT}
+@item Salix 13.2 @tab Salix13.2 @tab @ref{Installing with SLAPT}
+@item Salix 13.37 @tab Salix13.37 @tab @ref{Installing with SLAPT}
+@item Archlinux @tab Archlinux @tab @ref{Installing with PACMAN}
 @end multitable
 
 @node Repositories for YUM

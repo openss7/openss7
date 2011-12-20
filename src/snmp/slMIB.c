@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2010  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -183,16 +183,16 @@ volatile int slSdlTable_refresh = 1;
  * This is the top level oid that we want to register under.  This is essentially a prefix, with the
  * suffix appearing in the variable below.
  */
-oid slMIB_variables_oid[11] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 2 };
-oid slProfileTable_variables_oid[16] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 2, 1, 1, 1, 1, 1 };
-oid slTable_variables_oid[16] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 2, 1, 1, 1, 2, 1 };
-oid slSdlListTable_variables_oid[16] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 2, 1, 1, 1, 3, 1 };
-oid slSdtListTable_variables_oid[16] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 2, 1, 1, 1, 4, 1 };
-oid slNbTable_variables_oid[16] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 2, 1, 1, 2, 1, 1 };
-oid slSaalTable_variables_oid[16] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 2, 1, 1, 2, 2, 1 };
-oid slM2paTable_variables_oid[16] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 2, 1, 1, 2, 3, 1 };
-oid slSdtTable_variables_oid[16] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 2, 1, 1, 2, 5, 1 };
-oid slSdlTable_variables_oid[16] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 2, 1, 1, 3, 2, 1 };
+oid slMIB_variables_oid[10] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 11 };
+oid slProfileTable_variables_oid[15] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 11, 1, 1, 1, 1, 1 };
+oid slTable_variables_oid[15] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 11, 1, 1, 1, 2, 1 };
+oid slSdlListTable_variables_oid[15] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 11, 1, 1, 1, 3, 1 };
+oid slSdtListTable_variables_oid[15] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 11, 1, 1, 1, 4, 1 };
+oid slNbTable_variables_oid[15] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 11, 1, 1, 2, 1, 1 };
+oid slSaalTable_variables_oid[15] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 11, 1, 1, 2, 2, 1 };
+oid slM2paTable_variables_oid[15] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 11, 1, 1, 2, 3, 1 };
+oid slSdtTable_variables_oid[15] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 11, 1, 1, 2, 5, 1 };
+oid slSdlTable_variables_oid[15] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 11, 1, 1, 3, 2, 1 };
 
 /*
  * Oids for use in notifications defined in this MIB.
@@ -205,8 +205,8 @@ oid slSdlTable_variables_oid[16] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 2, 1, 
 /*
  * Other oids defined in this MIB.
  */
-oid slPackage_oid[14] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 2, 2, 1, 1 };
-oid slGeneralCompliance_oid[14] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 1, 2, 2, 2, 1 };
+oid slPackage_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 11, 2, 1, 1 };
+oid slGeneralCompliance_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 11, 2, 2, 1 };
 static oid zeroDotZero_oid[2] = { 0, 0 };
 static oid snmpTrapOID_oid[11] = { 1, 3, 6, 1, 6, 3, 1, 1, 4, 1, 0 };
 
@@ -293,7 +293,7 @@ struct variable7 slMIB_variables[] = {
 #define   SLMAXCAPACITYSL       38
 	{(u_char) SLMAXCAPACITYSL, ASN_UNSIGNED, RWRITE, var_slTable, 6, {1, 1, 1, 2, 1, 2}},
 #define   SLPROCEDURALSTATUS    39
-	{(u_char) SLPROCEDURALSTATUS, ASN_BIT_STR, RONLY, var_slTable, 6, {1, 1, 1, 2, 1, 3}},
+	{(u_char) SLPROCEDURALSTATUS, ASN_OCTET_STR, RONLY, var_slTable, 6, {1, 1, 1, 2, 1, 3}},
 #define   SLPROFILEPOINTER      40
 	{(u_char) SLPROFILEPOINTER, ASN_OCTET_STR, RWRITE, var_slTable, 6, {1, 1, 1, 2, 1, 4}},
 #define   SLSIGNTERMPOINTER     41
@@ -459,9 +459,9 @@ struct variable7 slMIB_variables[] = {
 #define   SLSDTUSAGESTATE       121
 	{(u_char) SLSDTUSAGESTATE, ASN_INTEGER, RONLY, var_slSdtTable, 6, {1, 1, 2, 5, 1, 4}},
 #define   SLSDTPROCEDURALSTATUS  122
-	{(u_char) SLSDTPROCEDURALSTATUS, ASN_BIT_STR, RONLY, var_slSdtTable, 6, {1, 1, 2, 5, 1, 5}},
+	{(u_char) SLSDTPROCEDURALSTATUS, ASN_OCTET_STR, RONLY, var_slSdtTable, 6, {1, 1, 2, 5, 1, 5}},
 #define   SLSDTAVAILABILITYSTATUS  123
-	{(u_char) SLSDTAVAILABILITYSTATUS, ASN_BIT_STR, RONLY, var_slSdtTable, 6, {1, 1, 2, 5, 1, 6}},
+	{(u_char) SLSDTAVAILABILITYSTATUS, ASN_OCTET_STR, RONLY, var_slSdtTable, 6, {1, 1, 2, 5, 1, 6}},
 #define   SLSDTEQUIPMENTPOINTER  124
 	{(u_char) SLSDTEQUIPMENTPOINTER, ASN_OBJECT_ID, RWRITE, var_slSdtTable, 6, {1, 1, 2, 5, 1, 7}},
 #define   SLSDTNAME             125
@@ -746,6 +746,7 @@ store_slMIB(int majorID, int minorID, void *serverarg, void *clientarg)
 		memset(line, 0, sizeof(line));
 		strcat(line, "slMIB ");
 		cptr = line + strlen(line);
+		(void) cptr;
 		/* XXX: remove individual scalars that are not persistent */
 		cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->slSdtNextIndex, &tmpsize);
 		cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->slSdlNextIndex, &tmpsize);
@@ -1121,6 +1122,7 @@ store_slProfileTable(int majorID, int minorID, void *serverarg, void *clientarg)
 			memset(line, 0, sizeof(line));
 			strcat(line, "slProfileTable ");
 			cptr = line + strlen(line);
+			(void) cptr;
 			/* XXX: remove individual columns if not persistent */
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->slProfileId, &StorageTmp->slProfileIdLen);
 			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->slProfileTransmissionRate, &tmpsize);
@@ -1346,7 +1348,7 @@ parse_slTable(const char *token, char *line)
 	line = read_config_read_data(ASN_UNSIGNED, line, &StorageTmp->slId, &tmpsize);
 	line = read_config_read_data(ASN_UNSIGNED, line, &StorageTmp->slMaxCapacitySL, &tmpsize);
 	SNMP_FREE(StorageTmp->slProceduralStatus);
-	line = read_config_read_data(ASN_BIT_STR, line, &StorageTmp->slProceduralStatus, &StorageTmp->slProceduralStatusLen);
+	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->slProceduralStatus, &StorageTmp->slProceduralStatusLen);
 	if (StorageTmp->slProceduralStatus == NULL) {
 		config_perror("invalid specification for slProceduralStatus");
 		return;
@@ -1409,10 +1411,11 @@ store_slTable(int majorID, int minorID, void *serverarg, void *clientarg)
 			memset(line, 0, sizeof(line));
 			strcat(line, "slTable ");
 			cptr = line + strlen(line);
+			(void) cptr;
 			/* XXX: remove individual columns if not persistent */
 			cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->slId, &tmpsize);
 			cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->slMaxCapacitySL, &tmpsize);
-			cptr = read_config_store_data(ASN_BIT_STR, cptr, &StorageTmp->slProceduralStatus, &StorageTmp->slProceduralStatusLen);
+			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->slProceduralStatus, &StorageTmp->slProceduralStatusLen);
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->slProfilePointer, &StorageTmp->slProfilePointerLen);
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->slSignTermPointer, &StorageTmp->slSignTermPointerLen);
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->slSignDataLinkTpPointer, &StorageTmp->slSignDataLinkTpPointerLen);
@@ -1623,6 +1626,7 @@ store_slSdlListTable(int majorID, int minorID, void *serverarg, void *clientarg)
 			memset(line, 0, sizeof(line));
 			strcat(line, "slSdlListTable ");
 			cptr = line + strlen(line);
+			(void) cptr;
 			/* XXX: remove individual columns if not persistent */
 			cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->slId, &tmpsize);
 			cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->slSdlListId, &tmpsize);
@@ -1828,6 +1832,7 @@ store_slSdtListTable(int majorID, int minorID, void *serverarg, void *clientarg)
 			memset(line, 0, sizeof(line));
 			strcat(line, "slSdtListTable ");
 			cptr = line + strlen(line);
+			(void) cptr;
 			/* XXX: remove individual columns if not persistent */
 			cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->slId, &tmpsize);
 			cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->slSdtListId, &tmpsize);
@@ -2052,6 +2057,7 @@ store_slNbTable(int majorID, int minorID, void *serverarg, void *clientarg)
 			memset(line, 0, sizeof(line));
 			strcat(line, "slNbTable ");
 			cptr = line + strlen(line);
+			(void) cptr;
 			/* XXX: remove individual columns if not persistent */
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->slSdtProfileId, &StorageTmp->slSdtProfileIdLen);
 			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->slNbTransmissionRate, &tmpsize);
@@ -2313,6 +2319,7 @@ store_slSaalTable(int majorID, int minorID, void *serverarg, void *clientarg)
 			memset(line, 0, sizeof(line));
 			strcat(line, "slSaalTable ");
 			cptr = line + strlen(line);
+			(void) cptr;
 			/* XXX: remove individual columns if not persistent */
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->slSdtProfileId, &StorageTmp->slSdtProfileIdLen);
 			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->slSaalBufferRelease, &tmpsize);
@@ -2582,6 +2589,7 @@ store_slM2paTable(int majorID, int minorID, void *serverarg, void *clientarg)
 			memset(line, 0, sizeof(line));
 			strcat(line, "slM2paTable ");
 			cptr = line + strlen(line);
+			(void) cptr;
 			/* XXX: remove individual columns if not persistent */
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->slSdtProfileId, &StorageTmp->slSdtProfileIdLen);
 			cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->slM2paN1, &tmpsize);
@@ -2792,13 +2800,13 @@ parse_slSdtTable(const char *token, char *line)
 	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->slSdtOperationalState, &tmpsize);
 	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->slSdtUsageState, &tmpsize);
 	SNMP_FREE(StorageTmp->slSdtProceduralStatus);
-	line = read_config_read_data(ASN_BIT_STR, line, &StorageTmp->slSdtProceduralStatus, &StorageTmp->slSdtProceduralStatusLen);
+	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->slSdtProceduralStatus, &StorageTmp->slSdtProceduralStatusLen);
 	if (StorageTmp->slSdtProceduralStatus == NULL) {
 		config_perror("invalid specification for slSdtProceduralStatus");
 		return;
 	}
 	SNMP_FREE(StorageTmp->slSdtAvailabilityStatus);
-	line = read_config_read_data(ASN_BIT_STR, line, &StorageTmp->slSdtAvailabilityStatus, &StorageTmp->slSdtAvailabilityStatusLen);
+	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->slSdtAvailabilityStatus, &StorageTmp->slSdtAvailabilityStatusLen);
 	if (StorageTmp->slSdtAvailabilityStatus == NULL) {
 		config_perror("invalid specification for slSdtAvailabilityStatus");
 		return;
@@ -2850,13 +2858,14 @@ store_slSdtTable(int majorID, int minorID, void *serverarg, void *clientarg)
 			memset(line, 0, sizeof(line));
 			strcat(line, "slSdtTable ");
 			cptr = line + strlen(line);
+			(void) cptr;
 			/* XXX: remove individual columns if not persistent */
 			cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->slSdtId, &tmpsize);
 			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->slSdtAdministrativeState, &tmpsize);
 			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->slSdtOperationalState, &tmpsize);
 			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->slSdtUsageState, &tmpsize);
-			cptr = read_config_store_data(ASN_BIT_STR, cptr, &StorageTmp->slSdtProceduralStatus, &StorageTmp->slSdtProceduralStatusLen);
-			cptr = read_config_store_data(ASN_BIT_STR, cptr, &StorageTmp->slSdtAvailabilityStatus, &StorageTmp->slSdtAvailabilityStatusLen);
+			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->slSdtProceduralStatus, &StorageTmp->slSdtProceduralStatusLen);
+			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->slSdtAvailabilityStatus, &StorageTmp->slSdtAvailabilityStatusLen);
 			cptr = read_config_store_data(ASN_OBJECT_ID, cptr, &StorageTmp->slSdtEquipmentPointer, &StorageTmp->slSdtEquipmentPointerLen);
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->slSdtName, &StorageTmp->slSdtNameLen);
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->slSdtProfilePointer, &StorageTmp->slSdtProfilePointerLen);
@@ -3105,6 +3114,7 @@ store_slSdlTable(int majorID, int minorID, void *serverarg, void *clientarg)
 			memset(line, 0, sizeof(line));
 			strcat(line, "slSdlTable ");
 			cptr = line + strlen(line);
+			(void) cptr;
 			/* XXX: remove individual columns if not persistent */
 			cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->slSdlId, &tmpsize);
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->slSdlAdjPc, &StorageTmp->slSdlAdjPcLen);
@@ -4712,11 +4722,11 @@ write_slProfileErrorCorrectionMethod(int action, u_char *var_val, u_char var_val
 {
 	static long old_value;
 	struct slProfileTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("slMIB", "write_slProfileErrorCorrectionMethod entering action=%d...  \n", action));
-	StorageTmp = header_complex(slProfileTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(slProfileTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -4786,12 +4796,12 @@ write_slProfileProtocolVariant(int action, u_char *var_val, u_char var_val_type,
 {
 	static oid *old_value;
 	struct slProfileTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	static size_t old_length = 0;
 	static oid *objid = NULL;
 
 	DEBUGMSGTL(("slMIB", "write_slProfileProtocolVariant entering action=%d...  \n", action));
-	StorageTmp = header_complex(slProfileTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(slProfileTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		objid = NULL;
@@ -4862,11 +4872,11 @@ write_slProfileTimerT1(int action, u_char *var_val, u_char var_val_type, size_t 
 {
 	static long old_value;
 	struct slProfileTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("slMIB", "write_slProfileTimerT1 entering action=%d...  \n", action));
-	StorageTmp = header_complex(slProfileTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(slProfileTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -4933,11 +4943,11 @@ write_slProfileTimerT2(int action, u_char *var_val, u_char var_val_type, size_t 
 {
 	static long old_value;
 	struct slProfileTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("slMIB", "write_slProfileTimerT2 entering action=%d...  \n", action));
-	StorageTmp = header_complex(slProfileTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(slProfileTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -5004,11 +5014,11 @@ write_slProfileTimerT2L(int action, u_char *var_val, u_char var_val_type, size_t
 {
 	static long old_value;
 	struct slProfileTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("slMIB", "write_slProfileTimerT2L entering action=%d...  \n", action));
-	StorageTmp = header_complex(slProfileTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(slProfileTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -5075,11 +5085,11 @@ write_slProfileTimerT2H(int action, u_char *var_val, u_char var_val_type, size_t
 {
 	static long old_value;
 	struct slProfileTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("slMIB", "write_slProfileTimerT2H entering action=%d...  \n", action));
-	StorageTmp = header_complex(slProfileTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(slProfileTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -5146,11 +5156,11 @@ write_slProfileTimerT3(int action, u_char *var_val, u_char var_val_type, size_t 
 {
 	static long old_value;
 	struct slProfileTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("slMIB", "write_slProfileTimerT3 entering action=%d...  \n", action));
-	StorageTmp = header_complex(slProfileTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(slProfileTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -5217,11 +5227,11 @@ write_slProfileTimerT4N(int action, u_char *var_val, u_char var_val_type, size_t
 {
 	static long old_value;
 	struct slProfileTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("slMIB", "write_slProfileTimerT4N entering action=%d...  \n", action));
-	StorageTmp = header_complex(slProfileTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(slProfileTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -5288,11 +5298,11 @@ write_slProfileTimerT4E(int action, u_char *var_val, u_char var_val_type, size_t
 {
 	static long old_value;
 	struct slProfileTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("slMIB", "write_slProfileTimerT4E entering action=%d...  \n", action));
-	StorageTmp = header_complex(slProfileTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(slProfileTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -5359,11 +5369,11 @@ write_slProfileTimerT5(int action, u_char *var_val, u_char var_val_type, size_t 
 {
 	static long old_value;
 	struct slProfileTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("slMIB", "write_slProfileTimerT5 entering action=%d...  \n", action));
-	StorageTmp = header_complex(slProfileTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(slProfileTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -5430,11 +5440,11 @@ write_slProfileTimerT6(int action, u_char *var_val, u_char var_val_type, size_t 
 {
 	static long old_value;
 	struct slProfileTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("slMIB", "write_slProfileTimerT6 entering action=%d...  \n", action));
-	StorageTmp = header_complex(slProfileTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(slProfileTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -5501,11 +5511,11 @@ write_slProfileTimerT7(int action, u_char *var_val, u_char var_val_type, size_t 
 {
 	static long old_value;
 	struct slProfileTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("slMIB", "write_slProfileTimerT7 entering action=%d...  \n", action));
-	StorageTmp = header_complex(slProfileTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(slProfileTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -5572,11 +5582,11 @@ write_slProfileTbOnset1(int action, u_char *var_val, u_char var_val_type, size_t
 {
 	static ulong old_value;
 	struct slProfileTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	ulong set_value = *((ulong *) var_val);
 
 	DEBUGMSGTL(("slMIB", "write_slProfileTbOnset1 entering action=%d...  \n", action));
-	StorageTmp = header_complex(slProfileTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(slProfileTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -5638,11 +5648,11 @@ write_slProfileTbAbate1(int action, u_char *var_val, u_char var_val_type, size_t
 {
 	static ulong old_value;
 	struct slProfileTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	ulong set_value = *((ulong *) var_val);
 
 	DEBUGMSGTL(("slMIB", "write_slProfileTbAbate1 entering action=%d...  \n", action));
-	StorageTmp = header_complex(slProfileTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(slProfileTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -5704,11 +5714,11 @@ write_slProfileNumberOfThresholdLevels(int action, u_char *var_val, u_char var_v
 {
 	static ulong old_value;
 	struct slProfileTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	ulong set_value = *((ulong *) var_val);
 
 	DEBUGMSGTL(("slMIB", "write_slProfileNumberOfThresholdLevels entering action=%d...  \n", action));
-	StorageTmp = header_complex(slProfileTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(slProfileTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -5770,11 +5780,11 @@ write_slProfileCongestionCounting(int action, u_char *var_val, u_char var_val_ty
 {
 	static long old_value;
 	struct slProfileTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("slMIB", "write_slProfileCongestionCounting entering action=%d...  \n", action));
-	StorageTmp = header_complex(slProfileTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(slProfileTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -5844,11 +5854,11 @@ write_slProfileCongestionRepBaseObject(int action, u_char *var_val, u_char var_v
 {
 	static long old_value;
 	struct slProfileTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("slMIB", "write_slProfileCongestionRepBaseObject entering action=%d...  \n", action));
-	StorageTmp = header_complex(slProfileTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(slProfileTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -5920,11 +5930,11 @@ write_slProfileLoopDelay(int action, u_char *var_val, u_char var_val_type, size_
 {
 	static ulong old_value;
 	struct slProfileTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	ulong set_value = *((ulong *) var_val);
 
 	DEBUGMSGTL(("slMIB", "write_slProfileLoopDelay entering action=%d...  \n", action));
-	StorageTmp = header_complex(slProfileTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(slProfileTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -5985,12 +5995,12 @@ write_slProfileName(int action, u_char *var_val, u_char var_val_type, size_t var
 {
 	static uint8_t *old_value;
 	struct slProfileTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	static size_t old_length = 0;
 	static uint8_t *string = NULL;
 
 	DEBUGMSGTL(("slMIB", "write_slProfileName entering action=%d...  \n", action));
-	StorageTmp = header_complex(slProfileTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(slProfileTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		string = NULL;
@@ -6064,11 +6074,11 @@ write_slProfileTbOnset2(int action, u_char *var_val, u_char var_val_type, size_t
 {
 	static ulong old_value;
 	struct slProfileTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	ulong set_value = *((ulong *) var_val);
 
 	DEBUGMSGTL(("slMIB", "write_slProfileTbOnset2 entering action=%d...  \n", action));
-	StorageTmp = header_complex(slProfileTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(slProfileTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -6130,11 +6140,11 @@ write_slProfileTbAbate2(int action, u_char *var_val, u_char var_val_type, size_t
 {
 	static ulong old_value;
 	struct slProfileTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	ulong set_value = *((ulong *) var_val);
 
 	DEBUGMSGTL(("slMIB", "write_slProfileTbAbate2 entering action=%d...  \n", action));
-	StorageTmp = header_complex(slProfileTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(slProfileTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -6196,11 +6206,11 @@ write_slProfileTbOnset3(int action, u_char *var_val, u_char var_val_type, size_t
 {
 	static ulong old_value;
 	struct slProfileTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	ulong set_value = *((ulong *) var_val);
 
 	DEBUGMSGTL(("slMIB", "write_slProfileTbOnset3 entering action=%d...  \n", action));
-	StorageTmp = header_complex(slProfileTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(slProfileTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -6262,11 +6272,11 @@ write_slProfileTbAbate3(int action, u_char *var_val, u_char var_val_type, size_t
 {
 	static ulong old_value;
 	struct slProfileTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	ulong set_value = *((ulong *) var_val);
 
 	DEBUGMSGTL(("slMIB", "write_slProfileTbAbate3 entering action=%d...  \n", action));
-	StorageTmp = header_complex(slProfileTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(slProfileTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -6328,11 +6338,11 @@ write_slProfileTbDiscard1(int action, u_char *var_val, u_char var_val_type, size
 {
 	static ulong old_value;
 	struct slProfileTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	ulong set_value = *((ulong *) var_val);
 
 	DEBUGMSGTL(("slMIB", "write_slProfileTbDiscard1 entering action=%d...  \n", action));
-	StorageTmp = header_complex(slProfileTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(slProfileTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -6394,11 +6404,11 @@ write_slProfileTbDiscard2(int action, u_char *var_val, u_char var_val_type, size
 {
 	static ulong old_value;
 	struct slProfileTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	ulong set_value = *((ulong *) var_val);
 
 	DEBUGMSGTL(("slMIB", "write_slProfileTbDiscard2 entering action=%d...  \n", action));
-	StorageTmp = header_complex(slProfileTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(slProfileTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -6460,11 +6470,11 @@ write_slProfileTbDiscard3(int action, u_char *var_val, u_char var_val_type, size
 {
 	static ulong old_value;
 	struct slProfileTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	ulong set_value = *((ulong *) var_val);
 
 	DEBUGMSGTL(("slMIB", "write_slProfileTbDiscard3 entering action=%d...  \n", action));
-	StorageTmp = header_complex(slProfileTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(slProfileTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -6526,11 +6536,11 @@ write_slProfileTimerTx(int action, u_char *var_val, u_char var_val_type, size_t 
 {
 	static long old_value;
 	struct slProfileTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("slMIB", "write_slProfileTimerTx entering action=%d...  \n", action));
-	StorageTmp = header_complex(slProfileTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(slProfileTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -6596,11 +6606,11 @@ write_slProfileTimerTy(int action, u_char *var_val, u_char var_val_type, size_t 
 {
 	static long old_value;
 	struct slProfileTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("slMIB", "write_slProfileTimerTy entering action=%d...  \n", action));
-	StorageTmp = header_complex(slProfileTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(slProfileTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -6666,11 +6676,11 @@ write_slProfileNumOfCongestionStates(int action, u_char *var_val, u_char var_val
 {
 	static ulong old_value;
 	struct slProfileTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	ulong set_value = *((ulong *) var_val);
 
 	DEBUGMSGTL(("slMIB", "write_slProfileNumOfCongestionStates entering action=%d...  \n", action));
-	StorageTmp = header_complex(slProfileTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(slProfileTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -6731,11 +6741,11 @@ write_slProfileInitLevelOfCongestion(int action, u_char *var_val, u_char var_val
 {
 	static ulong old_value;
 	struct slProfileTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	ulong set_value = *((ulong *) var_val);
 
 	DEBUGMSGTL(("slMIB", "write_slProfileInitLevelOfCongestion entering action=%d...  \n", action));
-	StorageTmp = header_complex(slProfileTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(slProfileTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -6796,11 +6806,11 @@ write_slProfileMaxMSUsRetransN1(int action, u_char *var_val, u_char var_val_type
 {
 	static ulong old_value;
 	struct slProfileTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	ulong set_value = *((ulong *) var_val);
 
 	DEBUGMSGTL(("slMIB", "write_slProfileMaxMSUsRetransN1 entering action=%d...  \n", action));
-	StorageTmp = header_complex(slProfileTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(slProfileTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -6867,11 +6877,11 @@ write_slProfileMaxOctRetransN2(int action, u_char *var_val, u_char var_val_type,
 {
 	static ulong old_value;
 	struct slProfileTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	ulong set_value = *((ulong *) var_val);
 
 	DEBUGMSGTL(("slMIB", "write_slProfileMaxOctRetransN2 entering action=%d...  \n", action));
-	StorageTmp = header_complex(slProfileTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(slProfileTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -6933,11 +6943,11 @@ write_slProfileReceiveCongThreshOnset(int action, u_char *var_val, u_char var_va
 {
 	static ulong old_value;
 	struct slProfileTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	ulong set_value = *((ulong *) var_val);
 
 	DEBUGMSGTL(("slMIB", "write_slProfileReceiveCongThreshOnset entering action=%d...  \n", action));
-	StorageTmp = header_complex(slProfileTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(slProfileTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -6999,11 +7009,11 @@ write_slProfileReceiveCongThreshAbate(int action, u_char *var_val, u_char var_va
 {
 	static ulong old_value;
 	struct slProfileTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	ulong set_value = *((ulong *) var_val);
 
 	DEBUGMSGTL(("slMIB", "write_slProfileReceiveCongThreshAbate entering action=%d...  \n", action));
-	StorageTmp = header_complex(slProfileTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(slProfileTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -7065,11 +7075,11 @@ write_slProfileReceiveCongThreshDisc(int action, u_char *var_val, u_char var_val
 {
 	static ulong old_value;
 	struct slProfileTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	ulong set_value = *((ulong *) var_val);
 
 	DEBUGMSGTL(("slMIB", "write_slProfileReceiveCongThreshDisc entering action=%d...  \n", action));
-	StorageTmp = header_complex(slProfileTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(slProfileTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -7131,11 +7141,11 @@ write_slMaxCapacitySL(int action, u_char *var_val, u_char var_val_type, size_t v
 {
 	static ulong old_value;
 	struct slTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	ulong set_value = *((ulong *) var_val);
 
 	DEBUGMSGTL(("slMIB", "write_slMaxCapacitySL entering action=%d...  \n", action));
-	StorageTmp = header_complex(slTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(slTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -7201,12 +7211,12 @@ write_slProfilePointer(int action, u_char *var_val, u_char var_val_type, size_t 
 {
 	static uint8_t *old_value;
 	struct slTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	static size_t old_length = 0;
 	static uint8_t *string = NULL;
 
 	DEBUGMSGTL(("slMIB", "write_slProfilePointer entering action=%d...  \n", action));
-	StorageTmp = header_complex(slTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(slTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		string = NULL;
@@ -7280,12 +7290,12 @@ write_slSignTermPointer(int action, u_char *var_val, u_char var_val_type, size_t
 {
 	static uint8_t *old_value;
 	struct slTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	static size_t old_length = 0;
 	static uint8_t *string = NULL;
 
 	DEBUGMSGTL(("slMIB", "write_slSignTermPointer entering action=%d...  \n", action));
-	StorageTmp = header_complex(slTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(slTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		string = NULL;
@@ -7359,12 +7369,12 @@ write_slSignDataLinkTpPointer(int action, u_char *var_val, u_char var_val_type, 
 {
 	static uint8_t *old_value;
 	struct slTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	static size_t old_length = 0;
 	static uint8_t *string = NULL;
 
 	DEBUGMSGTL(("slMIB", "write_slSignDataLinkTpPointer entering action=%d...  \n", action));
-	StorageTmp = header_complex(slTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(slTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		string = NULL;
@@ -7438,11 +7448,11 @@ write_slReplaceSt(int action, u_char *var_val, u_char var_val_type, size_t var_v
 {
 	static long old_value;
 	struct slTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("slMIB", "write_slReplaceSt entering action=%d...  \n", action));
-	StorageTmp = header_complex(slTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(slTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -7518,11 +7528,11 @@ write_slRelatedLinkGroupNumber(int action, u_char *var_val, u_char var_val_type,
 {
 	static ulong old_value;
 	struct slTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	ulong set_value = *((ulong *) var_val);
 
 	DEBUGMSGTL(("slMIB", "write_slRelatedLinkGroupNumber entering action=%d...  \n", action));
-	StorageTmp = header_complex(slTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(slTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -7588,11 +7598,11 @@ write_slSdlList(int action, u_char *var_val, u_char var_val_type, size_t var_val
 {
 	static ulong old_value;
 	struct slTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	ulong set_value = *((ulong *) var_val);
 
 	DEBUGMSGTL(("slMIB", "write_slSdlList entering action=%d...  \n", action));
-	StorageTmp = header_complex(slTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(slTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -7653,12 +7663,12 @@ write_slName(int action, u_char *var_val, u_char var_val_type, size_t var_val_le
 {
 	static uint8_t *old_value;
 	struct slTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	static size_t old_length = 0;
 	static uint8_t *string = NULL;
 
 	DEBUGMSGTL(("slMIB", "write_slName entering action=%d...  \n", action));
-	StorageTmp = header_complex(slTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(slTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		string = NULL;
@@ -7732,11 +7742,11 @@ write_slSdtList(int action, u_char *var_val, u_char var_val_type, size_t var_val
 {
 	static ulong old_value;
 	struct slTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	ulong set_value = *((ulong *) var_val);
 
 	DEBUGMSGTL(("slMIB", "write_slSdtList entering action=%d...  \n", action));
-	StorageTmp = header_complex(slTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(slTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -7797,12 +7807,12 @@ write_slSdlListPointer(int action, u_char *var_val, u_char var_val_type, size_t 
 {
 	static uint8_t *old_value;
 	struct slSdlListTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	static size_t old_length = 0;
 	static uint8_t *string = NULL;
 
 	DEBUGMSGTL(("slMIB", "write_slSdlListPointer entering action=%d...  \n", action));
-	StorageTmp = header_complex(slSdlListTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(slSdlListTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		string = NULL;
@@ -7876,12 +7886,12 @@ write_slSdtListPointer(int action, u_char *var_val, u_char var_val_type, size_t 
 {
 	static uint8_t *old_value;
 	struct slSdtListTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	static size_t old_length = 0;
 	static uint8_t *string = NULL;
 
 	DEBUGMSGTL(("slMIB", "write_slSdtListPointer entering action=%d...  \n", action));
-	StorageTmp = header_complex(slSdtListTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(slSdtListTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		string = NULL;
@@ -7955,11 +7965,11 @@ write_slNbTransmissionRate(int action, u_char *var_val, u_char var_val_type, siz
 {
 	static long old_value;
 	struct slNbTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("slMIB", "write_slNbTransmissionRate entering action=%d...  \n", action));
-	StorageTmp = header_complex(slNbTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(slNbTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -8032,11 +8042,11 @@ write_slNbf(int action, u_char *var_val, u_char var_val_type, size_t var_val_len
 {
 	static long old_value;
 	struct slNbTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("slMIB", "write_slNbf entering action=%d...  \n", action));
-	StorageTmp = header_complex(slNbTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(slNbTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -8111,11 +8121,11 @@ write_slSaalBufferRelease(int action, u_char *var_val, u_char var_val_type, size
 {
 	static long old_value;
 	struct slSaalTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("slMIB", "write_slSaalBufferRelease entering action=%d...  \n", action));
-	StorageTmp = header_complex(slSaalTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(slSaalTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -8184,11 +8194,11 @@ write_slSaalMaxCc(int action, u_char *var_val, u_char var_val_type, size_t var_v
 {
 	static ulong old_value;
 	struct slSaalTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	ulong set_value = *((ulong *) var_val);
 
 	DEBUGMSGTL(("slMIB", "write_slSaalMaxCc entering action=%d...  \n", action));
-	StorageTmp = header_complex(slSaalTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(slSaalTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -8250,11 +8260,11 @@ write_slSaalMaxNrp(int action, u_char *var_val, u_char var_val_type, size_t var_
 {
 	static ulong old_value;
 	struct slSaalTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	ulong set_value = *((ulong *) var_val);
 
 	DEBUGMSGTL(("slMIB", "write_slSaalMaxNrp entering action=%d...  \n", action));
-	StorageTmp = header_complex(slSaalTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(slSaalTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -8315,11 +8325,11 @@ write_slSaalMaxInformationFieldLength(int action, u_char *var_val, u_char var_va
 {
 	static ulong old_value;
 	struct slSaalTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	ulong set_value = *((ulong *) var_val);
 
 	DEBUGMSGTL(("slMIB", "write_slSaalMaxInformationFieldLength entering action=%d...  \n", action));
-	StorageTmp = header_complex(slSaalTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(slSaalTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -8381,11 +8391,11 @@ write_slSaalMaxLengthSscopUuField(int action, u_char *var_val, u_char var_val_ty
 {
 	static ulong old_value;
 	struct slSaalTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	ulong set_value = *((ulong *) var_val);
 
 	DEBUGMSGTL(("slMIB", "write_slSaalMaxLengthSscopUuField entering action=%d...  \n", action));
-	StorageTmp = header_complex(slSaalTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(slSaalTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -8447,11 +8457,11 @@ write_slSaalMaxPd(int action, u_char *var_val, u_char var_val_type, size_t var_v
 {
 	static ulong old_value;
 	struct slSaalTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	ulong set_value = *((ulong *) var_val);
 
 	DEBUGMSGTL(("slMIB", "write_slSaalMaxPd entering action=%d...  \n", action));
-	StorageTmp = header_complex(slSaalTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(slSaalTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -8513,11 +8523,11 @@ write_slSaalMaxSscopCreditToPeer(int action, u_char *var_val, u_char var_val_typ
 {
 	static ulong old_value;
 	struct slSaalTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	ulong set_value = *((ulong *) var_val);
 
 	DEBUGMSGTL(("slMIB", "write_slSaalMaxSscopCreditToPeer entering action=%d...  \n", action));
-	StorageTmp = header_complex(slSaalTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(slSaalTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -8578,11 +8588,11 @@ write_slSaalMaxStat(int action, u_char *var_val, u_char var_val_type, size_t var
 {
 	static ulong old_value;
 	struct slSaalTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	ulong set_value = *((ulong *) var_val);
 
 	DEBUGMSGTL(("slMIB", "write_slSaalMaxStat entering action=%d...  \n", action));
-	StorageTmp = header_complex(slSaalTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(slSaalTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -8644,11 +8654,11 @@ write_slSaalN1(int action, u_char *var_val, u_char var_val_type, size_t var_val_
 {
 	static ulong old_value;
 	struct slSaalTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	ulong set_value = *((ulong *) var_val);
 
 	DEBUGMSGTL(("slMIB", "write_slSaalN1 entering action=%d...  \n", action));
-	StorageTmp = header_complex(slSaalTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(slSaalTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -8710,11 +8720,11 @@ write_slSaalNniLayerMgrProvingState(int action, u_char *var_val, u_char var_val_
 {
 	static long old_value;
 	struct slSaalTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("slMIB", "write_slSaalNniLayerMgrProvingState entering action=%d...  \n", action));
-	StorageTmp = header_complex(slSaalTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(slSaalTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -8784,11 +8794,11 @@ write_slSaalNniLayerMgrTimerNoCredit(int action, u_char *var_val, u_char var_val
 {
 	static long old_value;
 	struct slSaalTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("slMIB", "write_slSaalNniLayerMgrTimerNoCredit entering action=%d...  \n", action));
-	StorageTmp = header_complex(slSaalTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(slSaalTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -8854,11 +8864,11 @@ write_slSaalNniLayerMgrTimerRepeatSrec(int action, u_char *var_val, u_char var_v
 {
 	static long old_value;
 	struct slSaalTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("slMIB", "write_slSaalNniLayerMgrTimerRepeatSrec entering action=%d...  \n", action));
-	StorageTmp = header_complex(slSaalTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(slSaalTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -8924,11 +8934,11 @@ write_slSaalNniTimerT1(int action, u_char *var_val, u_char var_val_type, size_t 
 {
 	static long old_value;
 	struct slSaalTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("slMIB", "write_slSaalNniTimerT1 entering action=%d...  \n", action));
-	StorageTmp = header_complex(slSaalTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(slSaalTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -8995,11 +9005,11 @@ write_slSaalNniTimerT2(int action, u_char *var_val, u_char var_val_type, size_t 
 {
 	static long old_value;
 	struct slSaalTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("slMIB", "write_slSaalNniTimerT2 entering action=%d...  \n", action));
-	StorageTmp = header_complex(slSaalTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(slSaalTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -9066,11 +9076,11 @@ write_slSaalNniTimerT3(int action, u_char *var_val, u_char var_val_type, size_t 
 {
 	static long old_value;
 	struct slSaalTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("slMIB", "write_slSaalNniTimerT3 entering action=%d...  \n", action));
-	StorageTmp = header_complex(slSaalTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(slSaalTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -9136,11 +9146,11 @@ write_slSaalSscopTimerCc(int action, u_char *var_val, u_char var_val_type, size_
 {
 	static long old_value;
 	struct slSaalTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("slMIB", "write_slSaalSscopTimerCc entering action=%d...  \n", action));
-	StorageTmp = header_complex(slSaalTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(slSaalTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -9207,11 +9217,11 @@ write_slSaalSscopTimerIdle(int action, u_char *var_val, u_char var_val_type, siz
 {
 	static long old_value;
 	struct slSaalTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("slMIB", "write_slSaalSscopTimerIdle entering action=%d...  \n", action));
-	StorageTmp = header_complex(slSaalTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(slSaalTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -9278,11 +9288,11 @@ write_slSaalSscopTimerKeepAlive(int action, u_char *var_val, u_char var_val_type
 {
 	static long old_value;
 	struct slSaalTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("slMIB", "write_slSaalSscopTimerKeepAlive entering action=%d...  \n", action));
-	StorageTmp = header_complex(slSaalTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(slSaalTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -9349,11 +9359,11 @@ write_slSaalSscopTimerNoResponse(int action, u_char *var_val, u_char var_val_typ
 {
 	static long old_value;
 	struct slSaalTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("slMIB", "write_slSaalSscopTimerNoResponse entering action=%d...  \n", action));
-	StorageTmp = header_complex(slSaalTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(slSaalTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -9420,11 +9430,11 @@ write_slSaalSscopTimerPoll(int action, u_char *var_val, u_char var_val_type, siz
 {
 	static long old_value;
 	struct slSaalTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("slMIB", "write_slSaalSscopTimerPoll entering action=%d...  \n", action));
-	StorageTmp = header_complex(slSaalTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(slSaalTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -9491,11 +9501,11 @@ write_slSaalTransRateIntervalLower(int action, u_char *var_val, u_char var_val_t
 {
 	static ulong old_value;
 	struct slSaalTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	ulong set_value = *((ulong *) var_val);
 
 	DEBUGMSGTL(("slMIB", "write_slSaalTransRateIntervalLower entering action=%d...  \n", action));
-	StorageTmp = header_complex(slSaalTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(slSaalTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -9562,11 +9572,11 @@ write_slSaalTransRateIntervalUpper(int action, u_char *var_val, u_char var_val_t
 {
 	static ulong old_value;
 	struct slSaalTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	ulong set_value = *((ulong *) var_val);
 
 	DEBUGMSGTL(("slMIB", "write_slSaalTransRateIntervalUpper entering action=%d...  \n", action));
-	StorageTmp = header_complex(slSaalTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(slSaalTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -9633,11 +9643,11 @@ write_slSaalEgressTransRateIntvlLower(int action, u_char *var_val, u_char var_va
 {
 	static ulong old_value;
 	struct slSaalTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	ulong set_value = *((ulong *) var_val);
 
 	DEBUGMSGTL(("slMIB", "write_slSaalEgressTransRateIntvlLower entering action=%d...  \n", action));
-	StorageTmp = header_complex(slSaalTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(slSaalTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -9703,11 +9713,11 @@ write_slSaalEgressTransRateIntvlUpper(int action, u_char *var_val, u_char var_va
 {
 	static ulong old_value;
 	struct slSaalTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	ulong set_value = *((ulong *) var_val);
 
 	DEBUGMSGTL(("slMIB", "write_slSaalEgressTransRateIntvlUpper entering action=%d...  \n", action));
-	StorageTmp = header_complex(slSaalTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(slSaalTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -9773,11 +9783,11 @@ write_slSaalPollAfterRetransmission(int action, u_char *var_val, u_char var_val_
 {
 	static long old_value;
 	struct slSaalTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("slMIB", "write_slSaalPollAfterRetransmission entering action=%d...  \n", action));
-	StorageTmp = header_complex(slSaalTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(slSaalTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -9846,11 +9856,11 @@ write_slM2paN1(int action, u_char *var_val, u_char var_val_type, size_t var_val_
 {
 	static ulong old_value;
 	struct slM2paTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	ulong set_value = *((ulong *) var_val);
 
 	DEBUGMSGTL(("slMIB", "write_slM2paN1 entering action=%d...  \n", action));
-	StorageTmp = header_complex(slM2paTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(slM2paTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -9912,11 +9922,11 @@ write_slM2paProving(int action, u_char *var_val, u_char var_val_type, size_t var
 {
 	static long old_value;
 	struct slM2paTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("slMIB", "write_slM2paProving entering action=%d...  \n", action));
-	StorageTmp = header_complex(slM2paTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(slM2paTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -9986,11 +9996,11 @@ write_slM2paManagementProvingState(int action, u_char *var_val, u_char var_val_t
 {
 	static long old_value;
 	struct slM2paTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("slMIB", "write_slM2paManagementProvingState entering action=%d...  \n", action));
-	StorageTmp = header_complex(slM2paTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(slM2paTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -10060,11 +10070,11 @@ write_slM2paLoopDelayLower(int action, u_char *var_val, u_char var_val_type, siz
 {
 	static ulong old_value;
 	struct slM2paTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	ulong set_value = *((ulong *) var_val);
 
 	DEBUGMSGTL(("slMIB", "write_slM2paLoopDelayLower entering action=%d...  \n", action));
-	StorageTmp = header_complex(slM2paTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(slM2paTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -10125,11 +10135,11 @@ write_slM2paLoopDelayUpper(int action, u_char *var_val, u_char var_val_type, siz
 {
 	static ulong old_value;
 	struct slM2paTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	ulong set_value = *((ulong *) var_val);
 
 	DEBUGMSGTL(("slMIB", "write_slM2paLoopDelayUpper entering action=%d...  \n", action));
-	StorageTmp = header_complex(slM2paTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(slM2paTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -10190,11 +10200,11 @@ write_slM2paTransRateIntervalLower(int action, u_char *var_val, u_char var_val_t
 {
 	static ulong old_value;
 	struct slM2paTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	ulong set_value = *((ulong *) var_val);
 
 	DEBUGMSGTL(("slMIB", "write_slM2paTransRateIntervalLower entering action=%d...  \n", action));
-	StorageTmp = header_complex(slM2paTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(slM2paTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -10255,11 +10265,11 @@ write_slM2paTransRateIntervalUpper(int action, u_char *var_val, u_char var_val_t
 {
 	static ulong old_value;
 	struct slM2paTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	ulong set_value = *((ulong *) var_val);
 
 	DEBUGMSGTL(("slMIB", "write_slM2paTransRateIntervalUpper entering action=%d...  \n", action));
-	StorageTmp = header_complex(slM2paTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(slM2paTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -10320,11 +10330,11 @@ write_slM2paSctpNoDelay(int action, u_char *var_val, u_char var_val_type, size_t
 {
 	static long old_value;
 	struct slM2paTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("slMIB", "write_slM2paSctpNoDelay entering action=%d...  \n", action));
-	StorageTmp = header_complex(slM2paTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(slM2paTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -10393,11 +10403,11 @@ write_slM2paSctpMaxseg(int action, u_char *var_val, u_char var_val_type, size_t 
 {
 	static ulong old_value;
 	struct slM2paTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	ulong set_value = *((ulong *) var_val);
 
 	DEBUGMSGTL(("slMIB", "write_slM2paSctpMaxseg entering action=%d...  \n", action));
-	StorageTmp = header_complex(slM2paTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(slM2paTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -10463,11 +10473,11 @@ write_slM2paSctpHeartbeatItvl(int action, u_char *var_val, u_char var_val_type, 
 {
 	static ulong old_value;
 	struct slM2paTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	ulong set_value = *((ulong *) var_val);
 
 	DEBUGMSGTL(("slMIB", "write_slM2paSctpHeartbeatItvl entering action=%d...  \n", action));
-	StorageTmp = header_complex(slM2paTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(slM2paTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -10528,11 +10538,11 @@ write_slM2paSctpHeartbeat(int action, u_char *var_val, u_char var_val_type, size
 {
 	static long old_value;
 	struct slM2paTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("slMIB", "write_slM2paSctpHeartbeat entering action=%d...  \n", action));
-	StorageTmp = header_complex(slM2paTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(slM2paTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -10601,11 +10611,11 @@ write_slM2paSctpRtoInitial(int action, u_char *var_val, u_char var_val_type, siz
 {
 	static ulong old_value;
 	struct slM2paTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	ulong set_value = *((ulong *) var_val);
 
 	DEBUGMSGTL(("slMIB", "write_slM2paSctpRtoInitial entering action=%d...  \n", action));
-	StorageTmp = header_complex(slM2paTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(slM2paTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -10666,11 +10676,11 @@ write_slM2paSctpRtoMin(int action, u_char *var_val, u_char var_val_type, size_t 
 {
 	static ulong old_value;
 	struct slM2paTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	ulong set_value = *((ulong *) var_val);
 
 	DEBUGMSGTL(("slMIB", "write_slM2paSctpRtoMin entering action=%d...  \n", action));
-	StorageTmp = header_complex(slM2paTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(slM2paTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -10731,11 +10741,11 @@ write_slM2paSctpRtoMax(int action, u_char *var_val, u_char var_val_type, size_t 
 {
 	static ulong old_value;
 	struct slM2paTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	ulong set_value = *((ulong *) var_val);
 
 	DEBUGMSGTL(("slMIB", "write_slM2paSctpRtoMax entering action=%d...  \n", action));
-	StorageTmp = header_complex(slM2paTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(slM2paTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -10796,11 +10806,11 @@ write_slM2paSctpPathMaxRetrans(int action, u_char *var_val, u_char var_val_type,
 {
 	static ulong old_value;
 	struct slM2paTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	ulong set_value = *((ulong *) var_val);
 
 	DEBUGMSGTL(("slMIB", "write_slM2paSctpPathMaxRetrans entering action=%d...  \n", action));
-	StorageTmp = header_complex(slM2paTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(slM2paTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -10861,11 +10871,11 @@ write_slM2paSctpCookieLife(int action, u_char *var_val, u_char var_val_type, siz
 {
 	static ulong old_value;
 	struct slM2paTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	ulong set_value = *((ulong *) var_val);
 
 	DEBUGMSGTL(("slMIB", "write_slM2paSctpCookieLife entering action=%d...  \n", action));
-	StorageTmp = header_complex(slM2paTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(slM2paTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -10926,11 +10936,11 @@ write_slM2paSctpCookieInc(int action, u_char *var_val, u_char var_val_type, size
 {
 	static ulong old_value;
 	struct slM2paTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	ulong set_value = *((ulong *) var_val);
 
 	DEBUGMSGTL(("slMIB", "write_slM2paSctpCookieInc entering action=%d...  \n", action));
-	StorageTmp = header_complex(slM2paTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(slM2paTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -10991,11 +11001,11 @@ write_slM2paSctpMaxInitRetries(int action, u_char *var_val, u_char var_val_type,
 {
 	static ulong old_value;
 	struct slM2paTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	ulong set_value = *((ulong *) var_val);
 
 	DEBUGMSGTL(("slMIB", "write_slM2paSctpMaxInitRetries entering action=%d...  \n", action));
-	StorageTmp = header_complex(slM2paTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(slM2paTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -11056,11 +11066,11 @@ write_slM2paSctpMaxBurst(int action, u_char *var_val, u_char var_val_type, size_
 {
 	static ulong old_value;
 	struct slM2paTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	ulong set_value = *((ulong *) var_val);
 
 	DEBUGMSGTL(("slMIB", "write_slM2paSctpMaxBurst entering action=%d...  \n", action));
-	StorageTmp = header_complex(slM2paTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(slM2paTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -11121,11 +11131,11 @@ write_slM2paSctpAssocMaxRetrans(int action, u_char *var_val, u_char var_val_type
 {
 	static ulong old_value;
 	struct slM2paTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	ulong set_value = *((ulong *) var_val);
 
 	DEBUGMSGTL(("slMIB", "write_slM2paSctpAssocMaxRetrans entering action=%d...  \n", action));
-	StorageTmp = header_complex(slM2paTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(slM2paTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -11187,11 +11197,11 @@ write_slM2paSctpSackDelay(int action, u_char *var_val, u_char var_val_type, size
 {
 	static ulong old_value;
 	struct slM2paTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	ulong set_value = *((ulong *) var_val);
 
 	DEBUGMSGTL(("slMIB", "write_slM2paSctpSackDelay entering action=%d...  \n", action));
-	StorageTmp = header_complex(slM2paTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(slM2paTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -11258,11 +11268,11 @@ write_slM2paSctpLifetime(int action, u_char *var_val, u_char var_val_type, size_
 {
 	static ulong old_value;
 	struct slM2paTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	ulong set_value = *((ulong *) var_val);
 
 	DEBUGMSGTL(("slMIB", "write_slM2paSctpLifetime entering action=%d...  \n", action));
-	StorageTmp = header_complex(slM2paTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(slM2paTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -11323,11 +11333,11 @@ write_slM2paProvingAttempts(int action, u_char *var_val, u_char var_val_type, si
 {
 	static ulong old_value;
 	struct slM2paTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	ulong set_value = *((ulong *) var_val);
 
 	DEBUGMSGTL(("slMIB", "write_slM2paProvingAttempts entering action=%d...  \n", action));
-	StorageTmp = header_complex(slM2paTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(slM2paTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -11388,11 +11398,11 @@ write_slSdtAdministrativeState(int action, u_char *var_val, u_char var_val_type,
 {
 	static long old_value;
 	struct slSdtTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("slMIB", "write_slSdtAdministrativeState entering action=%d...  \n", action));
-	StorageTmp = header_complex(slSdtTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(slSdtTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -11463,12 +11473,12 @@ write_slSdtEquipmentPointer(int action, u_char *var_val, u_char var_val_type, si
 {
 	static oid *old_value;
 	struct slSdtTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	static size_t old_length = 0;
 	static oid *objid = NULL;
 
 	DEBUGMSGTL(("slMIB", "write_slSdtEquipmentPointer entering action=%d...  \n", action));
-	StorageTmp = header_complex(slSdtTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(slSdtTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		objid = NULL;
@@ -11540,12 +11550,12 @@ write_slSdtName(int action, u_char *var_val, u_char var_val_type, size_t var_val
 {
 	static uint8_t *old_value;
 	struct slSdtTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	static size_t old_length = 0;
 	static uint8_t *string = NULL;
 
 	DEBUGMSGTL(("slMIB", "write_slSdtName entering action=%d...  \n", action));
-	StorageTmp = header_complex(slSdtTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(slSdtTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		string = NULL;
@@ -11619,12 +11629,12 @@ write_slSdtProfilePointer(int action, u_char *var_val, u_char var_val_type, size
 {
 	static uint8_t *old_value;
 	struct slSdtTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	static size_t old_length = 0;
 	static uint8_t *string = NULL;
 
 	DEBUGMSGTL(("slMIB", "write_slSdtProfilePointer entering action=%d...  \n", action));
-	StorageTmp = header_complex(slSdtTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(slSdtTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		string = NULL;
@@ -11698,12 +11708,12 @@ write_slSdlAdjPc(int action, u_char *var_val, u_char var_val_type, size_t var_va
 {
 	static uint8_t *old_value;
 	struct slSdlTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	static size_t old_length = 0;
 	static uint8_t *string = NULL;
 
 	DEBUGMSGTL(("slMIB", "write_slSdlAdjPc entering action=%d...  \n", action));
-	StorageTmp = header_complex(slSdlTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(slSdlTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		string = NULL;
@@ -11777,11 +11787,11 @@ write_slSdlTransmissionRate(int action, u_char *var_val, u_char var_val_type, si
 {
 	static long old_value;
 	struct slSdlTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("slMIB", "write_slSdlTransmissionRate entering action=%d...  \n", action));
-	StorageTmp = header_complex(slSdlTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(slSdlTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -11853,11 +11863,11 @@ write_slSdlLoopDelay(int action, u_char *var_val, u_char var_val_type, size_t va
 {
 	static ulong old_value;
 	struct slSdlTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	ulong set_value = *((ulong *) var_val);
 
 	DEBUGMSGTL(("slMIB", "write_slSdlLoopDelay entering action=%d...  \n", action));
-	StorageTmp = header_complex(slSdlTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(slSdlTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -11919,12 +11929,12 @@ write_slSdlEquipmentPointer(int action, u_char *var_val, u_char var_val_type, si
 {
 	static oid *old_value;
 	struct slSdlTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	static size_t old_length = 0;
 	static oid *objid = NULL;
 
 	DEBUGMSGTL(("slMIB", "write_slSdlEquipmentPointer entering action=%d...  \n", action));
-	StorageTmp = header_complex(slSdlTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(slSdlTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		objid = NULL;
@@ -11996,11 +12006,11 @@ write_slSdlCIC(int action, u_char *var_val, u_char var_val_type, size_t var_val_
 {
 	static long old_value;
 	struct slSdlTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("slMIB", "write_slSdlCIC entering action=%d...  \n", action));
-	StorageTmp = header_complex(slSdlTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(slSdlTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -12067,12 +12077,12 @@ write_slSdlName(int action, u_char *var_val, u_char var_val_type, size_t var_val
 {
 	static uint8_t *old_value;
 	struct slSdlTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	static size_t old_length = 0;
 	static uint8_t *string = NULL;
 
 	DEBUGMSGTL(("slMIB", "write_slSdlName entering action=%d...  \n", action));
-	StorageTmp = header_complex(slSdlTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(slSdlTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		string = NULL;
@@ -12146,12 +12156,12 @@ write_slSdlStmChannel(int action, u_char *var_val, u_char var_val_type, size_t v
 {
 	static uint8_t *old_value;
 	struct slSdlTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	static size_t old_length = 0;
 	static uint8_t *string = NULL;
 
 	DEBUGMSGTL(("slMIB", "write_slSdlStmChannel entering action=%d...  \n", action));
-	StorageTmp = header_complex(slSdlTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(slSdlTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		string = NULL;
@@ -12225,12 +12235,12 @@ write_slSdlVcTTpPointer(int action, u_char *var_val, u_char var_val_type, size_t
 {
 	static oid *old_value;
 	struct slSdlTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	static size_t old_length = 0;
 	static oid *objid = NULL;
 
 	DEBUGMSGTL(("slMIB", "write_slSdlVcTTpPointer entering action=%d...  \n", action));
-	StorageTmp = header_complex(slSdlTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(slSdlTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		objid = NULL;
@@ -12463,13 +12473,13 @@ write_slProfileRowStatus(int action, u_char *var_val, u_char var_val_type, size_
 {
 	struct slProfileTable_data *StorageTmp = NULL;
 	static struct slProfileTable_data *StorageNew, *StorageDel;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	static int old_value;
 	int set_value, ret;
 	static struct variable_list *vars, *vp;
 
 	DEBUGMSGTL(("slMIB", "write_slProfileRowStatus entering action=%d...  \n", action));
-	StorageTmp = header_complex(slProfileTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(slProfileTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	if (var_val_type != ASN_INTEGER || var_val == NULL) {
 		snmp_log(MY_FACILITY(LOG_NOTICE), "write to slProfileRowStatus not ASN_INTEGER\n");
 		return SNMP_ERR_WRONGTYPE;
@@ -12537,7 +12547,7 @@ write_slProfileRowStatus(int action, u_char *var_val, u_char var_val_type, size_
 				snmp_free_varbind(vars);
 				return SNMP_ERR_RESOURCEUNAVAILABLE;
 			}
-			if (header_complex_parse_oid(&(name[17]), newlen, vars) != SNMPERR_SUCCESS) {
+			if (header_complex_parse_oid(&(name[16]), newlen, vars) != SNMPERR_SUCCESS) {
 				snmp_free_varbind(vars);
 				return SNMP_ERR_INCONSISTENTNAME;
 			}
@@ -12704,13 +12714,13 @@ write_slRowStatus(int action, u_char *var_val, u_char var_val_type, size_t var_v
 {
 	struct slTable_data *StorageTmp = NULL;
 	static struct slTable_data *StorageNew, *StorageDel;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	static int old_value;
 	int set_value, ret;
 	static struct variable_list *vars, *vp;
 
 	DEBUGMSGTL(("slMIB", "write_slRowStatus entering action=%d...  \n", action));
-	StorageTmp = header_complex(slTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(slTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	if (var_val_type != ASN_INTEGER || var_val == NULL) {
 		snmp_log(MY_FACILITY(LOG_NOTICE), "write to slRowStatus not ASN_INTEGER\n");
 		return SNMP_ERR_WRONGTYPE;
@@ -12773,7 +12783,7 @@ write_slRowStatus(int action, u_char *var_val, u_char var_val_type, size_t var_v
 				snmp_free_varbind(vars);
 				return SNMP_ERR_RESOURCEUNAVAILABLE;
 			}
-			if (header_complex_parse_oid(&(name[17]), newlen, vars) != SNMPERR_SUCCESS) {
+			if (header_complex_parse_oid(&(name[16]), newlen, vars) != SNMPERR_SUCCESS) {
 				snmp_free_varbind(vars);
 				return SNMP_ERR_INCONSISTENTNAME;
 			}
@@ -12917,13 +12927,13 @@ write_slSdlListRowStatus(int action, u_char *var_val, u_char var_val_type, size_
 {
 	struct slSdlListTable_data *StorageTmp = NULL;
 	static struct slSdlListTable_data *StorageNew, *StorageDel;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	static int old_value;
 	int set_value, ret;
 	static struct variable_list *vars, *vp;
 
 	DEBUGMSGTL(("slMIB", "write_slSdlListRowStatus entering action=%d...  \n", action));
-	StorageTmp = header_complex(slSdlListTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(slSdlListTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	if (var_val_type != ASN_INTEGER || var_val == NULL) {
 		snmp_log(MY_FACILITY(LOG_NOTICE), "write to slSdlListRowStatus not ASN_INTEGER\n");
 		return SNMP_ERR_WRONGTYPE;
@@ -12991,7 +13001,7 @@ write_slSdlListRowStatus(int action, u_char *var_val, u_char var_val_type, size_
 				snmp_free_varbind(vars);
 				return SNMP_ERR_RESOURCEUNAVAILABLE;
 			}
-			if (header_complex_parse_oid(&(name[17]), newlen, vars) != SNMPERR_SUCCESS) {
+			if (header_complex_parse_oid(&(name[16]), newlen, vars) != SNMPERR_SUCCESS) {
 				snmp_free_varbind(vars);
 				return SNMP_ERR_INCONSISTENTNAME;
 			}
@@ -13144,13 +13154,13 @@ write_slSdtListRowStatus(int action, u_char *var_val, u_char var_val_type, size_
 {
 	struct slSdtListTable_data *StorageTmp = NULL;
 	static struct slSdtListTable_data *StorageNew, *StorageDel;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	static int old_value;
 	int set_value, ret;
 	static struct variable_list *vars, *vp;
 
 	DEBUGMSGTL(("slMIB", "write_slSdtListRowStatus entering action=%d...  \n", action));
-	StorageTmp = header_complex(slSdtListTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(slSdtListTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	if (var_val_type != ASN_INTEGER || var_val == NULL) {
 		snmp_log(MY_FACILITY(LOG_NOTICE), "write to slSdtListRowStatus not ASN_INTEGER\n");
 		return SNMP_ERR_WRONGTYPE;
@@ -13218,7 +13228,7 @@ write_slSdtListRowStatus(int action, u_char *var_val, u_char var_val_type, size_
 				snmp_free_varbind(vars);
 				return SNMP_ERR_RESOURCEUNAVAILABLE;
 			}
-			if (header_complex_parse_oid(&(name[17]), newlen, vars) != SNMPERR_SUCCESS) {
+			if (header_complex_parse_oid(&(name[16]), newlen, vars) != SNMPERR_SUCCESS) {
 				snmp_free_varbind(vars);
 				return SNMP_ERR_INCONSISTENTNAME;
 			}
@@ -13371,13 +13381,13 @@ write_slNbRowStatus(int action, u_char *var_val, u_char var_val_type, size_t var
 {
 	struct slNbTable_data *StorageTmp = NULL;
 	static struct slNbTable_data *StorageNew, *StorageDel;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	static int old_value;
 	int set_value, ret;
 	static struct variable_list *vars, *vp;
 
 	DEBUGMSGTL(("slMIB", "write_slNbRowStatus entering action=%d...  \n", action));
-	StorageTmp = header_complex(slNbTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(slNbTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	if (var_val_type != ASN_INTEGER || var_val == NULL) {
 		snmp_log(MY_FACILITY(LOG_NOTICE), "write to slNbRowStatus not ASN_INTEGER\n");
 		return SNMP_ERR_WRONGTYPE;
@@ -13440,7 +13450,7 @@ write_slNbRowStatus(int action, u_char *var_val, u_char var_val_type, size_t var
 				snmp_free_varbind(vars);
 				return SNMP_ERR_RESOURCEUNAVAILABLE;
 			}
-			if (header_complex_parse_oid(&(name[17]), newlen, vars) != SNMPERR_SUCCESS) {
+			if (header_complex_parse_oid(&(name[16]), newlen, vars) != SNMPERR_SUCCESS) {
 				snmp_free_varbind(vars);
 				return SNMP_ERR_INCONSISTENTNAME;
 			}
@@ -13586,13 +13596,13 @@ write_slSaalRowStatus(int action, u_char *var_val, u_char var_val_type, size_t v
 {
 	struct slSaalTable_data *StorageTmp = NULL;
 	static struct slSaalTable_data *StorageNew, *StorageDel;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	static int old_value;
 	int set_value, ret;
 	static struct variable_list *vars, *vp;
 
 	DEBUGMSGTL(("slMIB", "write_slSaalRowStatus entering action=%d...  \n", action));
-	StorageTmp = header_complex(slSaalTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(slSaalTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	if (var_val_type != ASN_INTEGER || var_val == NULL) {
 		snmp_log(MY_FACILITY(LOG_NOTICE), "write to slSaalRowStatus not ASN_INTEGER\n");
 		return SNMP_ERR_WRONGTYPE;
@@ -13655,7 +13665,7 @@ write_slSaalRowStatus(int action, u_char *var_val, u_char var_val_type, size_t v
 				snmp_free_varbind(vars);
 				return SNMP_ERR_RESOURCEUNAVAILABLE;
 			}
-			if (header_complex_parse_oid(&(name[17]), newlen, vars) != SNMPERR_SUCCESS) {
+			if (header_complex_parse_oid(&(name[16]), newlen, vars) != SNMPERR_SUCCESS) {
 				snmp_free_varbind(vars);
 				return SNMP_ERR_INCONSISTENTNAME;
 			}
@@ -13801,13 +13811,13 @@ write_slM2paRowStatus(int action, u_char *var_val, u_char var_val_type, size_t v
 {
 	struct slM2paTable_data *StorageTmp = NULL;
 	static struct slM2paTable_data *StorageNew, *StorageDel;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	static int old_value;
 	int set_value, ret;
 	static struct variable_list *vars, *vp;
 
 	DEBUGMSGTL(("slMIB", "write_slM2paRowStatus entering action=%d...  \n", action));
-	StorageTmp = header_complex(slM2paTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(slM2paTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	if (var_val_type != ASN_INTEGER || var_val == NULL) {
 		snmp_log(MY_FACILITY(LOG_NOTICE), "write to slM2paRowStatus not ASN_INTEGER\n");
 		return SNMP_ERR_WRONGTYPE;
@@ -13870,7 +13880,7 @@ write_slM2paRowStatus(int action, u_char *var_val, u_char var_val_type, size_t v
 				snmp_free_varbind(vars);
 				return SNMP_ERR_RESOURCEUNAVAILABLE;
 			}
-			if (header_complex_parse_oid(&(name[17]), newlen, vars) != SNMPERR_SUCCESS) {
+			if (header_complex_parse_oid(&(name[16]), newlen, vars) != SNMPERR_SUCCESS) {
 				snmp_free_varbind(vars);
 				return SNMP_ERR_INCONSISTENTNAME;
 			}
@@ -14016,13 +14026,13 @@ write_slSdtRowStatus(int action, u_char *var_val, u_char var_val_type, size_t va
 {
 	struct slSdtTable_data *StorageTmp = NULL;
 	static struct slSdtTable_data *StorageNew, *StorageDel;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	static int old_value;
 	int set_value, ret;
 	static struct variable_list *vars, *vp;
 
 	DEBUGMSGTL(("slMIB", "write_slSdtRowStatus entering action=%d...  \n", action));
-	StorageTmp = header_complex(slSdtTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(slSdtTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	if (var_val_type != ASN_INTEGER || var_val == NULL) {
 		snmp_log(MY_FACILITY(LOG_NOTICE), "write to slSdtRowStatus not ASN_INTEGER\n");
 		return SNMP_ERR_WRONGTYPE;
@@ -14085,7 +14095,7 @@ write_slSdtRowStatus(int action, u_char *var_val, u_char var_val_type, size_t va
 				snmp_free_varbind(vars);
 				return SNMP_ERR_RESOURCEUNAVAILABLE;
 			}
-			if (header_complex_parse_oid(&(name[17]), newlen, vars) != SNMPERR_SUCCESS) {
+			if (header_complex_parse_oid(&(name[16]), newlen, vars) != SNMPERR_SUCCESS) {
 				snmp_free_varbind(vars);
 				return SNMP_ERR_INCONSISTENTNAME;
 			}
@@ -14229,13 +14239,13 @@ write_slSdlRowStatus(int action, u_char *var_val, u_char var_val_type, size_t va
 {
 	struct slSdlTable_data *StorageTmp = NULL;
 	static struct slSdlTable_data *StorageNew, *StorageDel;
-	size_t newlen = name_len - 17;
+	size_t newlen = name_len - 16;
 	static int old_value;
 	int set_value, ret;
 	static struct variable_list *vars, *vp;
 
 	DEBUGMSGTL(("slMIB", "write_slSdlRowStatus entering action=%d...  \n", action));
-	StorageTmp = header_complex(slSdlTableStorage, NULL, &name[17], &newlen, 1, NULL, NULL);
+	StorageTmp = header_complex(slSdlTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	if (var_val_type != ASN_INTEGER || var_val == NULL) {
 		snmp_log(MY_FACILITY(LOG_NOTICE), "write to slSdlRowStatus not ASN_INTEGER\n");
 		return SNMP_ERR_WRONGTYPE;
@@ -14298,7 +14308,7 @@ write_slSdlRowStatus(int action, u_char *var_val, u_char var_val_type, size_t va
 				snmp_free_varbind(vars);
 				return SNMP_ERR_RESOURCEUNAVAILABLE;
 			}
-			if (header_complex_parse_oid(&(name[17]), newlen, vars) != SNMPERR_SUCCESS) {
+			if (header_complex_parse_oid(&(name[16]), newlen, vars) != SNMPERR_SUCCESS) {
 				snmp_free_varbind(vars);
 				return SNMP_ERR_INCONSISTENTNAME;
 			}

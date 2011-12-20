@@ -456,7 +456,11 @@ See
 .RI \*(lq EXAMPLES \*(rq
 below.
 .PP
-Under Linux 2.6 kernels, and kernels that provide the
+Under
+.B Linux 2.6
+and
+.B 3.x
+kernels, and kernels that provide the
 .BR module_text_address ()
 symbol,
 .B Linux Fast-STREAMS
@@ -514,9 +518,13 @@ above.
 .B MOD_INC_USE_COUNT
 and
 .B MOD_DEC_USE_COUNT
-in the example code is only necessary for Linux 2.4 kernels and can be defined
-as shown for Linux 2.6 kernels (where reference counting is performed
-automatically).
+in the example code is only necessary for
+.B Linux 2.4
+kernels and can be defined as shown for
+.B Linux 2.6
+and
+.B 3.x
+kernels (where reference counting is performed automatically).
 .\"
 .\"
 .SH "SEE ALSO"

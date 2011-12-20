@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2010  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -234,8 +234,13 @@ oid x400pCardTypeT400P_SS7_oid[14] = { 1, 3, 6, 1, 4, 1, 29591, 1, 400, 1, 4, 1,
 oid x400pCardTypeV400P_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 1, 400, 1, 4, 1, 5 };
 oid x400pCardTypeV400PE_oid[14] = { 1, 3, 6, 1, 4, 1, 29591, 1, 400, 1, 4, 1, 5, 1 };
 oid x400pCardTypeV400PT_oid[14] = { 1, 3, 6, 1, 4, 1, 29591, 1, 400, 1, 4, 1, 5, 2 };
+oid x400pCardTypeA400P_oid[14] = { 1, 3, 6, 1, 4, 1, 29591, 1, 400, 1, 4, 1, 5, 3 };
 oid x400pCardTypeV401PE_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 1, 400, 1, 4, 1, 6 };
 oid x400pCardTypeV401PT_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 1, 400, 1, 4, 1, 7 };
+oid x400pCardTypeAT400P_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 1, 400, 1, 4, 1, 8 };
+oid x400pCardTypeAE400P_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 1, 400, 1, 4, 1, 9 };
+oid x400pCardTypeA400PT_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 1, 400, 1, 4, 1, 10 };
+oid x400pCardTypeA400PE_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 1, 400, 1, 4, 1, 11 };
 oid x400pChipTypeDS2152_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 1, 400, 1, 4, 2, 1 };
 oid x400pChipTypeDS21352_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 1, 400, 1, 4, 2, 2 };
 oid x400pChipTypeDS21552_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 1, 400, 1, 4, 2, 3 };
@@ -244,6 +249,8 @@ oid x400pChipTypeDS21354_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 1, 400, 1, 4, 2, 5
 oid x400pChipTypeDS21554_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 1, 400, 1, 4, 2, 6 };
 oid x400pChipTypeDS2155_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 1, 400, 1, 4, 2, 7 };
 oid x400pChipTypeDS2156_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 1, 400, 1, 4, 2, 8 };
+oid x400pChipTypeDS21455_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 1, 400, 1, 4, 2, 9 };
+oid x400pChipTypeDS21458_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 1, 400, 1, 4, 2, 10 };
 oid x400pSyncMandatoryGroup_oid[12] = { 1, 3, 6, 1, 4, 1, 29591, 1, 400, 2, 1, 1 };
 oid x400pCardIdGroup_oid[12] = { 1, 3, 6, 1, 4, 1, 29591, 1, 400, 2, 1, 2 };
 oid x400pChipGroup_oid[12] = { 1, 3, 6, 1, 4, 1, 29591, 1, 400, 2, 1, 3 };
@@ -400,8 +407,8 @@ struct variable7 x400pMIB_variables[] = {
 	{(u_char) X400PSPANDATALINK, ASN_OCTET_STR, RWRITE, var_x400pSpanTable, 6, {1, 1, 4, 1, 1, 25}},
 #define   X400PSPANLINECODE     64
 	{(u_char) X400PSPANLINECODE, ASN_INTEGER, RWRITE, var_x400pSpanTable, 6, {1, 1, 4, 1, 1, 26}},
-#define   X400PSPANALARMSEVERITYMAPPINGPROFILE  65
-	{(u_char) X400PSPANALARMSEVERITYMAPPINGPROFILE, ASN_OBJECT_ID, RWRITE, var_x400pSpanTable, 6, {1, 1, 4, 1, 1, 27}},
+#define   X400PSPANALARMSEVERITYMAPPROFILE  65
+	{(u_char) X400PSPANALARMSEVERITYMAPPROFILE, ASN_OBJECT_ID, RWRITE, var_x400pSpanTable, 6, {1, 1, 4, 1, 1, 27}},
 #define   X400PSPANADMINISTRATIVESTATE  66
 	{(u_char) X400PSPANADMINISTRATIVESTATE, ASN_INTEGER, RWRITE, var_x400pSpanTable, 6, {1, 1, 4, 1, 1, 28}},
 #define   X400PSPANOPERATIONALSTATE  67
@@ -890,6 +897,7 @@ store_x400pMIB(int majorID, int minorID, void *serverarg, void *clientarg)
 		memset(line, 0, sizeof(line));
 		strcat(line, "x400pMIB ");
 		cptr = line + strlen(line);
+		(void) cptr;
 		/* XXX: remove individual scalars that are not persistent */
 		cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->x400pCardNextIndex, &tmpsize);
 		cptr = read_config_store_data(ASN_TIMETICKS, cptr, &StorageTmp->x400pDiscontinuityTime, &tmpsize);
@@ -1180,6 +1188,7 @@ store_x400pSyncTable(int majorID, int minorID, void *serverarg, void *clientarg)
 			memset(line, 0, sizeof(line));
 			strcat(line, "x400pSyncTable ");
 			cptr = line + strlen(line);
+			(void) cptr;
 			/* XXX: remove individual columns if not persistent */
 			cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->x400pSyncGroup, &tmpsize);
 			cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->x400pSyncIndex, &tmpsize);
@@ -1444,6 +1453,7 @@ store_x400pDrivTable(int majorID, int minorID, void *serverarg, void *clientarg)
 			memset(line, 0, sizeof(line));
 			strcat(line, "x400pDrivTable ");
 			cptr = line + strlen(line);
+			(void) cptr;
 			/* XXX: remove individual columns if not persistent */
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->x400pDrivName, &StorageTmp->x400pDrivNameLen);
 			cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->x400pDrivIdnum, &tmpsize);
@@ -1792,6 +1802,7 @@ store_x400pCardTable(int majorID, int minorID, void *serverarg, void *clientarg)
 			memset(line, 0, sizeof(line));
 			strcat(line, "x400pCardTable ");
 			cptr = line + strlen(line);
+			(void) cptr;
 			/* XXX: remove individual columns if not persistent */
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->x400pDrivName, &StorageTmp->x400pDrivNameLen);
 			cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->x400pCardIndex, &tmpsize);
@@ -1877,8 +1888,8 @@ x400pSpanTable_create(void)
 		if (memdup((u_char **) &StorageNew->x400pSpanDataLink, (u_char *) "\x00", 1) == SNMPERR_SUCCESS)
 			StorageNew->x400pSpanDataLinkLen = 1;
 		StorageNew->x400pSpanLineCode = X400PSPANLINECODE_NOCODE;
-		if ((StorageNew->x400pSpanAlarmSeverityMappingProfile = snmp_duplicate_objid(zeroDotZero_oid, 2)))
-			StorageNew->x400pSpanAlarmSeverityMappingProfileLen = 2;
+		if ((StorageNew->x400pSpanAlarmSeverityMapProfile = snmp_duplicate_objid(zeroDotZero_oid, 2)))
+			StorageNew->x400pSpanAlarmSeverityMapProfileLen = 2;
 		StorageNew->x400pSpanAdministrativeState = X400PSPANADMINISTRATIVESTATE_LOCKED;
 		StorageNew->x400pSpanOperationalState = 0;
 		StorageNew->x400pSpanUsageState = 0;
@@ -1965,8 +1976,8 @@ x400pSpanTable_destroy(struct x400pSpanTable_data **thedata)
 		StorageDel->x400pSpanModeLen = 0;
 		SNMP_FREE(StorageDel->x400pSpanDataLink);
 		StorageDel->x400pSpanDataLinkLen = 0;
-		SNMP_FREE(StorageDel->x400pSpanAlarmSeverityMappingProfile);
-		StorageDel->x400pSpanAlarmSeverityMappingProfileLen = 0;
+		SNMP_FREE(StorageDel->x400pSpanAlarmSeverityMapProfile);
+		StorageDel->x400pSpanAlarmSeverityMapProfileLen = 0;
 		SNMP_FREE(StorageDel->x400pSpanAlarmStatus);
 		StorageDel->x400pSpanAlarmStatusLen = 0;
 		SNMP_FREE(StorageDel->x400pSpanProceduralStatus);
@@ -2131,10 +2142,10 @@ parse_x400pSpanTable(const char *token, char *line)
 		return;
 	}
 	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->x400pSpanLineCode, &tmpsize);
-	SNMP_FREE(StorageTmp->x400pSpanAlarmSeverityMappingProfile);
-	line = read_config_read_data(ASN_OBJECT_ID, line, &StorageTmp->x400pSpanAlarmSeverityMappingProfile, &StorageTmp->x400pSpanAlarmSeverityMappingProfileLen);
-	if (StorageTmp->x400pSpanAlarmSeverityMappingProfile == NULL) {
-		config_perror("invalid specification for x400pSpanAlarmSeverityMappingProfile");
+	SNMP_FREE(StorageTmp->x400pSpanAlarmSeverityMapProfile);
+	line = read_config_read_data(ASN_OBJECT_ID, line, &StorageTmp->x400pSpanAlarmSeverityMapProfile, &StorageTmp->x400pSpanAlarmSeverityMapProfileLen);
+	if (StorageTmp->x400pSpanAlarmSeverityMapProfile == NULL) {
+		config_perror("invalid specification for x400pSpanAlarmSeverityMapProfile");
 		return;
 	}
 	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->x400pSpanAdministrativeState, &tmpsize);
@@ -2227,6 +2238,7 @@ store_x400pSpanTable(int majorID, int minorID, void *serverarg, void *clientarg)
 			memset(line, 0, sizeof(line));
 			strcat(line, "x400pSpanTable ");
 			cptr = line + strlen(line);
+			(void) cptr;
 			/* XXX: remove individual columns if not persistent */
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->x400pDrivName, &StorageTmp->x400pDrivNameLen);
 			cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->x400pCardIndex, &tmpsize);
@@ -2256,7 +2268,7 @@ store_x400pSpanTable(int majorID, int minorID, void *serverarg, void *clientarg)
 			cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->x400pSpanPrimary, &tmpsize);
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->x400pSpanDataLink, &StorageTmp->x400pSpanDataLinkLen);
 			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->x400pSpanLineCode, &tmpsize);
-			cptr = read_config_store_data(ASN_OBJECT_ID, cptr, &StorageTmp->x400pSpanAlarmSeverityMappingProfile, &StorageTmp->x400pSpanAlarmSeverityMappingProfileLen);
+			cptr = read_config_store_data(ASN_OBJECT_ID, cptr, &StorageTmp->x400pSpanAlarmSeverityMapProfile, &StorageTmp->x400pSpanAlarmSeverityMapProfileLen);
 			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->x400pSpanAdministrativeState, &tmpsize);
 			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->x400pSpanOperationalState, &tmpsize);
 			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->x400pSpanUsageState, &tmpsize);
@@ -2505,6 +2517,7 @@ store_x400pBertTable(int majorID, int minorID, void *serverarg, void *clientarg)
 			memset(line, 0, sizeof(line));
 			strcat(line, "x400pBertTable ");
 			cptr = line + strlen(line);
+			(void) cptr;
 			/* XXX: remove individual columns if not persistent */
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->x400pDrivName, &StorageTmp->x400pDrivNameLen);
 			cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->x400pCardIndex, &tmpsize);
@@ -2794,6 +2807,7 @@ store_x400pChanTable(int majorID, int minorID, void *serverarg, void *clientarg)
 			memset(line, 0, sizeof(line));
 			strcat(line, "x400pChanTable ");
 			cptr = line + strlen(line);
+			(void) cptr;
 			/* XXX: remove individual columns if not persistent */
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->x400pDrivName, &StorageTmp->x400pDrivNameLen);
 			cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->x400pCardIndex, &tmpsize);
@@ -3029,6 +3043,7 @@ store_x400pXconTable(int majorID, int minorID, void *serverarg, void *clientarg)
 			memset(line, 0, sizeof(line));
 			strcat(line, "x400pXconTable ");
 			cptr = line + strlen(line);
+			(void) cptr;
 			/* XXX: remove individual columns if not persistent */
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->x400pDrivName, &StorageTmp->x400pDrivNameLen);
 			cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->x400pCardIndex, &tmpsize);
@@ -3263,6 +3278,7 @@ store_x400pNearEndCurrentTable(int majorID, int minorID, void *serverarg, void *
 			memset(line, 0, sizeof(line));
 			strcat(line, "x400pNearEndCurrentTable ");
 			cptr = line + strlen(line);
+			(void) cptr;
 			/* XXX: remove individual columns if not persistent */
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->x400pDrivName, &StorageTmp->x400pDrivNameLen);
 			cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->x400pCardIndex, &tmpsize);
@@ -3504,6 +3520,7 @@ store_x400pNearEndIntervalTable(int majorID, int minorID, void *serverarg, void 
 			memset(line, 0, sizeof(line));
 			strcat(line, "x400pNearEndIntervalTable ");
 			cptr = line + strlen(line);
+			(void) cptr;
 			/* XXX: remove individual columns if not persistent */
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->x400pDrivName, &StorageTmp->x400pDrivNameLen);
 			cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->x400pCardIndex, &tmpsize);
@@ -3745,6 +3762,7 @@ store_x400pNearEndTotalTable(int majorID, int minorID, void *serverarg, void *cl
 			memset(line, 0, sizeof(line));
 			strcat(line, "x400pNearEndTotalTable ");
 			cptr = line + strlen(line);
+			(void) cptr;
 			/* XXX: remove individual columns if not persistent */
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->x400pDrivName, &StorageTmp->x400pDrivNameLen);
 			cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->x400pCardIndex, &tmpsize);
@@ -3982,6 +4000,7 @@ store_x400pFarEndCurrentTable(int majorID, int minorID, void *serverarg, void *c
 			memset(line, 0, sizeof(line));
 			strcat(line, "x400pFarEndCurrentTable ");
 			cptr = line + strlen(line);
+			(void) cptr;
 			/* XXX: remove individual columns if not persistent */
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->x400pDrivName, &StorageTmp->x400pDrivNameLen);
 			cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->x400pCardIndex, &tmpsize);
@@ -4220,6 +4239,7 @@ store_x400pFarEndIntervalTable(int majorID, int minorID, void *serverarg, void *
 			memset(line, 0, sizeof(line));
 			strcat(line, "x400pFarEndIntervalTable ");
 			cptr = line + strlen(line);
+			(void) cptr;
 			/* XXX: remove individual columns if not persistent */
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->x400pDrivName, &StorageTmp->x400pDrivNameLen);
 			cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->x400pCardIndex, &tmpsize);
@@ -4458,6 +4478,7 @@ store_x400pFarEndTotalTable(int majorID, int minorID, void *serverarg, void *cli
 			memset(line, 0, sizeof(line));
 			strcat(line, "x400pFarEndTotalTable ");
 			cptr = line + strlen(line);
+			(void) cptr;
 			/* XXX: remove individual columns if not persistent */
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->x400pDrivName, &StorageTmp->x400pDrivNameLen);
 			cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->x400pCardIndex, &tmpsize);
@@ -5172,12 +5193,12 @@ var_x400pSpanTable(struct variable *vp, oid * name, size_t *length, int exact, s
 		*var_len = sizeof(StorageTmp->x400pSpanLineCode);
 		rval = (u_char *) &StorageTmp->x400pSpanLineCode;
 		break;
-	case (u_char) X400PSPANALARMSEVERITYMAPPINGPROFILE:	/* Create */
-		*write_method = write_x400pSpanAlarmSeverityMappingProfile;
+	case (u_char) X400PSPANALARMSEVERITYMAPPROFILE:	/* Create */
+		*write_method = write_x400pSpanAlarmSeverityMapProfile;
 		if (!StorageTmp)
 			break;
-		*var_len = StorageTmp->x400pSpanAlarmSeverityMappingProfileLen * sizeof(oid);
-		rval = (u_char *) StorageTmp->x400pSpanAlarmSeverityMappingProfile;
+		*var_len = StorageTmp->x400pSpanAlarmSeverityMapProfileLen * sizeof(oid);
+		rval = (u_char *) StorageTmp->x400pSpanAlarmSeverityMapProfile;
 		break;
 	case (u_char) X400PSPANADMINISTRATIVESTATE:	/* Create */
 		*write_method = write_x400pSpanAdministrativeState;
@@ -9023,7 +9044,7 @@ write_x400pSpanLineCode(int action, u_char *var_val, u_char var_val_type, size_t
 }
 
 /**
- * @fn int write_x400pSpanAlarmSeverityMappingProfile(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid *name, size_t name_len)
+ * @fn int write_x400pSpanAlarmSeverityMapProfile(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid *name, size_t name_len)
  * @param action the stage of the SET operation.
  * @param var_val pointer to the varbind value.
  * @param var_val_type the ASN type.
@@ -9034,7 +9055,7 @@ write_x400pSpanLineCode(int action, u_char *var_val, u_char var_val_type, size_t
  * @brief Table row and column write routine.
  */
 int
-write_x400pSpanAlarmSeverityMappingProfile(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
+write_x400pSpanAlarmSeverityMapProfile(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
 	static oid *old_value;
 	struct x400pSpanTable_data *StorageTmp = NULL;
@@ -9042,7 +9063,7 @@ write_x400pSpanAlarmSeverityMappingProfile(int action, u_char *var_val, u_char v
 	static size_t old_length = 0;
 	static oid *objid = NULL;
 
-	DEBUGMSGTL(("x400pMIB", "write_x400pSpanAlarmSeverityMappingProfile entering action=%d...  \n", action));
+	DEBUGMSGTL(("x400pMIB", "write_x400pSpanAlarmSeverityMapProfile entering action=%d...  \n", action));
 	StorageTmp = header_complex(x400pSpanTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -9052,7 +9073,7 @@ write_x400pSpanAlarmSeverityMappingProfile(int action, u_char *var_val, u_char v
 			switch (StorageTmp->x400pSpanRowStatus) {
 			case RS_ACTIVE:
 				/* cannot create non-existent column while active */
-				snmp_log(MY_FACILITY(LOG_NOTICE), "write to x400pSpanAlarmSeverityMappingProfile: but column non-existent\n");
+				snmp_log(MY_FACILITY(LOG_NOTICE), "write to x400pSpanAlarmSeverityMapProfile: but column non-existent\n");
 				return SNMP_ERR_INCONSISTENTVALUE;
 			case RS_NOTINSERVICE:
 			case RS_NOTREADY:
@@ -9061,11 +9082,11 @@ write_x400pSpanAlarmSeverityMappingProfile(int action, u_char *var_val, u_char v
 			}
 		}
 		if (var_val_type != ASN_OBJECT_ID) {
-			snmp_log(MY_FACILITY(LOG_NOTICE), "write to x400pSpanAlarmSeverityMappingProfile not ASN_OBJECT_ID\n");
+			snmp_log(MY_FACILITY(LOG_NOTICE), "write to x400pSpanAlarmSeverityMapProfile not ASN_OBJECT_ID\n");
 			return SNMP_ERR_WRONGTYPE;
 		}
 		if (MIN_OID_LEN * sizeof(oid) > var_val_len || var_val_len > MAX_OID_LEN * sizeof(oid)) {
-			snmp_log(MY_FACILITY(LOG_NOTICE), "write to x400pSpanAlarmSeverityMappingProfile: bad length\n");
+			snmp_log(MY_FACILITY(LOG_NOTICE), "write to x400pSpanAlarmSeverityMapProfile: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
 		/* Note: default value zeroDotZero */
@@ -9074,14 +9095,14 @@ write_x400pSpanAlarmSeverityMappingProfile(int action, u_char *var_val, u_char v
 		if ((objid = snmp_duplicate_objid((void *) var_val, var_val_len / sizeof(oid))) == NULL)
 			return SNMP_ERR_RESOURCEUNAVAILABLE;
 		break;
-	case ACTION:		/* The variable has been stored in StorageTmp->x400pSpanAlarmSeverityMappingProfile for you to use, and you have just been asked to do something with it.  Note that
+	case ACTION:		/* The variable has been stored in StorageTmp->x400pSpanAlarmSeverityMapProfile for you to use, and you have just been asked to do something with it.  Note that
 				   anything done here must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->x400pSpanAlarmSeverityMappingProfile;
-		old_length = StorageTmp->x400pSpanAlarmSeverityMappingProfileLen;
-		StorageTmp->x400pSpanAlarmSeverityMappingProfile = objid;
-		StorageTmp->x400pSpanAlarmSeverityMappingProfileLen = var_val_len / sizeof(oid);
+		old_value = StorageTmp->x400pSpanAlarmSeverityMapProfile;
+		old_length = StorageTmp->x400pSpanAlarmSeverityMapProfileLen;
+		StorageTmp->x400pSpanAlarmSeverityMapProfile = objid;
+		StorageTmp->x400pSpanAlarmSeverityMapProfileLen = var_val_len / sizeof(oid);
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		SNMP_FREE(old_value);
@@ -9089,8 +9110,8 @@ write_x400pSpanAlarmSeverityMappingProfile(int action, u_char *var_val, u_char v
 		objid = NULL;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->x400pSpanAlarmSeverityMappingProfile = old_value;
-		StorageTmp->x400pSpanAlarmSeverityMappingProfileLen = old_length;
+		StorageTmp->x400pSpanAlarmSeverityMapProfile = old_value;
+		StorageTmp->x400pSpanAlarmSeverityMapProfileLen = old_length;
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
 		SNMP_FREE(objid);

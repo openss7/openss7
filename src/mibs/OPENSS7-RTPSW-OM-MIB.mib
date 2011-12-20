@@ -70,17 +70,19 @@ OPENSS7-RTPSW-OM-MIB DEFINITIONS ::= BEGIN
 IMPORTS
     HCPerfIntervalCount, HCPerfValidIntervals
         FROM HC-PerfHist-TC-MIB
-    rtpswIfAddrId, rtpswInterfaceId, rtpswCallId
+    rtpswCallId, rtpswIfAddrId, rtpswInterfaceId, rtpswTermPointId
         FROM OPENSS7-RTPSW-MIB
     openss7Modules
         FROM OPENSS7-SMI
     MODULE-COMPLIANCE, OBJECT-GROUP
         FROM SNMPv2-CONF
-    Counter64, Integer32, MODULE-IDENTITY, OBJECT-TYPE
-        FROM SNMPv2-SMI;
+    Counter32, Counter64, Integer32, MODULE-IDENTITY, OBJECT-TYPE
+        FROM SNMPv2-SMI
+    DateAndTime, TruthValue
+        FROM SNMPv2-TC;
 
 rtpswOmMIB MODULE-IDENTITY
-    LAST-UPDATED "201106291622Z"
+    LAST-UPDATED "201112101120Z"
     ORGANIZATION 
         "The OpenSS7 Project"
     CONTACT-INFO 
@@ -122,6 +124,9 @@ rtpswOmMIB MODULE-IDENTITY
          enterprise object identifier arc: 1.3.6.1.4.1.29591.  
          Modifications must be made only within an object identifier arc 
          under your control."
+    REVISION    "201112101120Z"
+    DESCRIPTION 
+        "Corrections an smilint workup."
     REVISION    "201106291622Z"
     DESCRIPTION 
         "Initial version of this mib."
@@ -140,7 +145,7 @@ rtpswOmScalars OBJECT IDENTIFIER
 rtpswOmCurrent OBJECT IDENTIFIER
     ::= { rtpswOmScalars 1 }
 
-rtpswOmOctetsSent OBJECT-TYPE
+rtpswOmCurrOctetsSent OBJECT-TYPE
     SYNTAX      Counter64
     UNITS       "Octets"
     MAX-ACCESS  read-only
@@ -151,7 +156,7 @@ rtpswOmOctetsSent OBJECT-TYPE
          and MAC headers."
     ::= { rtpswOmCurrent 1 }
 
-rtpswOmOctetsRecv OBJECT-TYPE
+rtpswOmCurrOctetsRecv OBJECT-TYPE
     SYNTAX      Counter64
     UNITS       "Octets"
     MAX-ACCESS  read-only
@@ -162,7 +167,7 @@ rtpswOmOctetsRecv OBJECT-TYPE
          and MAC headers."
     ::= { rtpswOmCurrent 2 }
 
-rtpswOmPacketsSent OBJECT-TYPE
+rtpswOmCurrPacketsSent OBJECT-TYPE
     SYNTAX      Counter64
     UNITS       "Packets"
     MAX-ACCESS  read-only
@@ -173,7 +178,7 @@ rtpswOmPacketsSent OBJECT-TYPE
          packets."
     ::= { rtpswOmCurrent 3 }
 
-rtpswOmPacketsRecv OBJECT-TYPE
+rtpswOmCurrPacketsRecv OBJECT-TYPE
     SYNTAX      Counter64
     UNITS       "Packets"
     MAX-ACCESS  read-only
@@ -184,7 +189,7 @@ rtpswOmPacketsRecv OBJECT-TYPE
          packets."
     ::= { rtpswOmCurrent 4 }
 
-rtpswOmStunPacketsSent OBJECT-TYPE
+rtpswOmCurrStunPacketsSent OBJECT-TYPE
     SYNTAX      Counter64
     UNITS       "Packets"
     MAX-ACCESS  read-only
@@ -194,7 +199,7 @@ rtpswOmStunPacketsSent OBJECT-TYPE
          sent during the current interval."
     ::= { rtpswOmCurrent 5 }
 
-rtpswOmStunPacketsRecv OBJECT-TYPE
+rtpswOmCurrStunPacketsRecv OBJECT-TYPE
     SYNTAX      Counter64
     UNITS       "Packets"
     MAX-ACCESS  read-only
@@ -1343,18 +1348,18 @@ rtpswOmTermPointCurrentEntry OBJECT-TYPE
     ::= { rtpswOmTermPointCurrentTable 1 }
 
 RtpswOmTermPointCurrentEntry ::= SEQUENCE {
-    rtpswOmTpMediaAware             TruthValue,
-    rtpswOmRtpPacketsSent           Counter32,
-    rtpswOmRtpPacketsRecv           Counter32,
-    rtpswOmRtcpPacketsSent          Counter32,
-    rtpswOmRtcpPacketsRecv          Counter32,
-    rtpswOmStunPacketsSent          Counter32,
-    rtpswOmStunPacketsRecv          Counter32,
-    rtpswOmRtpOctetsSent            Counter32,
-    rtpswOmRtpOctetsRecv            Counter32,
-    rtpswOmRtpPacketsLost           Counter32,
-    rtpswOmRtpJitter                Counter32,
-    rtpswOmRtpDelay                 Counter32
+    rtpswOmTpMediaAware     TruthValue,
+    rtpswOmRtpPacketsSent   Counter32,
+    rtpswOmRtpPacketsRecv   Counter32,
+    rtpswOmRtcpPacketsSent  Counter32,
+    rtpswOmRtcpPacketsRecv  Counter32,
+    rtpswOmStunPacketsSent  Counter32,
+    rtpswOmStunPacketsRecv  Counter32,
+    rtpswOmRtpOctetsSent    Counter32,
+    rtpswOmRtpOctetsRecv    Counter32,
+    rtpswOmRtpPacketsLost   Counter32,
+    rtpswOmRtpJitter        Counter32,
+    rtpswOmRtpDelay         Counter32
 }
 
 rtpswOmTpMediaAware OBJECT-TYPE
@@ -1375,7 +1380,7 @@ rtpswOmRtpPacketsSent OBJECT-TYPE
         "Indicates the number of RTP packets sent from the 
          termination point in the current or most recent 
          session."
-    ::= { rtpswOmTermPointCurrentEntry 1 }
+    ::= { rtpswOmTermPointCurrentEntry 2 }
 
 rtpswOmRtpPacketsRecv OBJECT-TYPE
     SYNTAX      Counter32
@@ -1386,7 +1391,7 @@ rtpswOmRtpPacketsRecv OBJECT-TYPE
         "Indicates the number of RTP packets received on the 
          termination point in the current or most recent 
          session."
-    ::= { rtpswOmTermPointCurrentEntry 1 }
+    ::= { rtpswOmTermPointCurrentEntry 3 }
 
 rtpswOmRtcpPacketsSent OBJECT-TYPE
     SYNTAX      Counter32
@@ -1397,7 +1402,7 @@ rtpswOmRtcpPacketsSent OBJECT-TYPE
         "Indicates the number of RTCP packets send from the 
          termination point in the current or most recent 
          session."
-    ::= { rtpswOmTermPointCurrentEntry 1 }
+    ::= { rtpswOmTermPointCurrentEntry 4 }
 
 rtpswOmRtcpPacketsRecv OBJECT-TYPE
     SYNTAX      Counter32
@@ -1408,7 +1413,7 @@ rtpswOmRtcpPacketsRecv OBJECT-TYPE
         "Indicates the number of RTCP packets received on the 
          termination point in the current or most receint 
          session."
-    ::= { rtpswOmTermPointCurrentEntry 1 }
+    ::= { rtpswOmTermPointCurrentEntry 5 }
 
 rtpswOmStunPacketsSent OBJECT-TYPE
     SYNTAX      Counter32
@@ -1419,7 +1424,7 @@ rtpswOmStunPacketsSent OBJECT-TYPE
         "Inidcates the number of STUN packets sent from the 
          termination point in the current or most recent 
          session."
-    ::= { rtpswOmTermPointCurrentEntry 1 }
+    ::= { rtpswOmTermPointCurrentEntry 6 }
 
 rtpswOmStunPacketsRecv OBJECT-TYPE
     SYNTAX      Counter32
@@ -1430,7 +1435,7 @@ rtpswOmStunPacketsRecv OBJECT-TYPE
         "Indicates the number of STUN packets received from the 
          termination point in the current or most recent 
          session."
-    ::= { rtpswOmTermPointCurrentEntry 1 }
+    ::= { rtpswOmTermPointCurrentEntry 7 }
 
 rtpswOmRtpOctetsSent OBJECT-TYPE
     SYNTAX      Counter32
@@ -1442,7 +1447,7 @@ rtpswOmRtpOctetsSent OBJECT-TYPE
          the termination point in the current or most recent 
          session.  Only media-aware sessions cause this count to 
          increase from zero."
-    ::= { rtpswOmTermPointCurrentEntry 1 }
+    ::= { rtpswOmTermPointCurrentEntry 8 }
 
 rtpswOmRtpOctetsRecv OBJECT-TYPE
     SYNTAX      Counter32
@@ -1454,7 +1459,7 @@ rtpswOmRtpOctetsRecv OBJECT-TYPE
          the termination point in the current or most recent 
          session.  Only media-aware sessions cause this count to 
          increase from zero."
-    ::= { rtpswOmTermPointCurrentEntry 1 }
+    ::= { rtpswOmTermPointCurrentEntry 9 }
 
 rtpswOmRtpPacketsLost OBJECT-TYPE
     SYNTAX      Counter32
@@ -1465,7 +1470,7 @@ rtpswOmRtpPacketsLost OBJECT-TYPE
         "Indicates the number of RTP packets lost in the current 
          or most recent session.  Only media-aware sessions 
          cause this count to increase from zero."
-    ::= { rtpswOmTermPointCurrentEntry 1 }
+    ::= { rtpswOmTermPointCurrentEntry 10 }
 
 rtpswOmRtpJitter OBJECT-TYPE
     SYNTAX      Counter32
@@ -1476,7 +1481,7 @@ rtpswOmRtpJitter OBJECT-TYPE
         "Indicates the jitter as a number of timestamp 
          (quantization) intervals deviated experienced on the 
          current or most recent session."
-    ::= { rtpswOmTermPointCurrentEntry 1 }
+    ::= { rtpswOmTermPointCurrentEntry 11 }
 
 rtpswOmRtpDelay OBJECT-TYPE
     SYNTAX      Counter32
@@ -1488,8 +1493,7 @@ rtpswOmRtpDelay OBJECT-TYPE
          timestamp (quantization) intervals experienced on the 
          most recent session.  Only media-aware sessions cause 
          this count to increase from zero."
-    ::= { rtpswOmTermPointCurrentEntry 1 }
-
+    ::= { rtpswOmTermPointCurrentEntry 12 }
 
 rtpswOmCallCurrent OBJECT IDENTIFIER
     ::= { rtpswOmTables 12 }
@@ -1545,9 +1549,232 @@ RtpswOmCallCurrentEntry ::= SEQUENCE {
     rtpswOmRtpStunPcktsCalleeRecv   Counter32
 }
 
+rtpswOmCallStartTime OBJECT-TYPE
+    SYNTAX      DateAndTime
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The start time of the call."
+    ::= { rtpswOmCallCurrentEntry 1 }
+
+rtpswOmIpOctetsCallerSent OBJECT-TYPE
+    SYNTAX      Counter32
+    UNITS       "IP Octets"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The number of IP octets sent by the caller."
+    ::= { rtpswOmCallCurrentEntry 2 }
+
+rtpswOmIpOctetsCallerRecv OBJECT-TYPE
+    SYNTAX      Counter32
+    UNITS       "IP Octets"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The number of IP octets received by the caller."
+    ::= { rtpswOmCallCurrentEntry 3 }
+
+rtpswOmIpOctetsCalleeSent OBJECT-TYPE
+    SYNTAX      Counter32
+    UNITS       "IP Octets"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The number of IP octets sent by the callee."
+    ::= { rtpswOmCallCurrentEntry 4 }
+
+rtpswOmIpOctetsCalleeRecv OBJECT-TYPE
+    SYNTAX      Counter32
+    UNITS       "IP Octets"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The number of IP octets received by the callee."
+    ::= { rtpswOmCallCurrentEntry 5 }
+
+rtpswOmIpPacketsCallerSent OBJECT-TYPE
+    SYNTAX      Counter32
+    UNITS       "IP Packets"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The number of IP packets sent by the caller."
+    ::= { rtpswOmCallCurrentEntry 6 }
+
+rtpswOmIpPacketsCallerRecv OBJECT-TYPE
+    SYNTAX      Counter32
+    UNITS       "IP Packets"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The number of IP packets received by the caller."
+    ::= { rtpswOmCallCurrentEntry 7 }
+
+rtpswOmIpPacketsCalleeSent OBJECT-TYPE
+    SYNTAX      Counter32
+    UNITS       "IP Packets"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The number of IP packets sent by the callee."
+    ::= { rtpswOmCallCurrentEntry 8 }
+
+rtpswOmIpPacketsCalleeRecv OBJECT-TYPE
+    SYNTAX      Counter32
+    UNITS       "IP Packets"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The number of IP packets received by the callee."
+    ::= { rtpswOmCallCurrentEntry 9 }
+
+rtpswOmRtpOctetsCallerSent OBJECT-TYPE
+    SYNTAX      Counter32
+    UNITS       "RTP octets"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The number of RTP octets send by the caller."
+    ::= { rtpswOmCallCurrentEntry 10 }
+
+rtpswOmRtpOctetsCallerRecv OBJECT-TYPE
+    SYNTAX      Counter32
+    UNITS       "RTP octets"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The number of RTP octets received by the caller."
+    ::= { rtpswOmCallCurrentEntry 11 }
+
+rtpswOmRtpOctetsCalleeSent OBJECT-TYPE
+    SYNTAX      Counter32
+    UNITS       "RTP octets"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The number of RTP octets send by the callee."
+    ::= { rtpswOmCallCurrentEntry 12 }
+
+rtpswOmRtpOctetsCalleeRecv OBJECT-TYPE
+    SYNTAX      Counter32
+    UNITS       "RTP octets"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The number of RTP octets received by the callee."
+    ::= { rtpswOmCallCurrentEntry 13 }
+
+rtpswOmRtpPacketsCallerSent OBJECT-TYPE
+    SYNTAX      Counter32
+    UNITS       "RTP packets"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The number of RTP packets sent by the caller."
+    ::= { rtpswOmCallCurrentEntry 14 }
+
+rtpswOmRtpPacketsCallerRecv OBJECT-TYPE
+    SYNTAX      Counter32
+    UNITS       "RTP packets"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The number of RTP packets received by the caller."
+    ::= { rtpswOmCallCurrentEntry 15 }
+
+rtpswOmRtpPacketsCalleeSent OBJECT-TYPE
+    SYNTAX      Counter32
+    UNITS       "RTP packets"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The number of RTP packets sent by the callee."
+    ::= { rtpswOmCallCurrentEntry 16 }
+
+rtpswOmRtpPacketsCalleeRecv OBJECT-TYPE
+    SYNTAX      Counter32
+    UNITS       "RTP packets"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The number of RTP packets received by the callee."
+    ::= { rtpswOmCallCurrentEntry 17 }
+
+rtpswOmRtcpPacketsCallerSent OBJECT-TYPE
+    SYNTAX      Counter32
+    UNITS       "RTCP Packets"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The number of RTCP packets sent by the caller."
+    ::= { rtpswOmCallCurrentEntry 18 }
+
+rtpswOmRtcpPacketsCallerRecv OBJECT-TYPE
+    SYNTAX      Counter32
+    UNITS       "RTCP Packets"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The number of RTCP packets received by the caller."
+    ::= { rtpswOmCallCurrentEntry 19 }
+
+rtpswOmRtcpPacketsCalleeSent OBJECT-TYPE
+    SYNTAX      Counter32
+    UNITS       "RTCP Packets"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The number of RTCP packets sent by the callee."
+    ::= { rtpswOmCallCurrentEntry 20 }
+
+rtpswOmRtcpPacketsCalleeRecv OBJECT-TYPE
+    SYNTAX      Counter32
+    UNITS       "RTCP Packets"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The number of RTCP packets received by the callee."
+    ::= { rtpswOmCallCurrentEntry 21 }
+
+rtpswOmRtpStunPcktsCallerSent OBJECT-TYPE
+    SYNTAX      Counter32
+    UNITS       "RTP STUN Packets"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The number of RTP STUN packets sent by the caller."
+    ::= { rtpswOmCallCurrentEntry 22 }
+
+rtpswOmRtpStunPcktsCallerRecv OBJECT-TYPE
+    SYNTAX      Counter32
+    UNITS       "RTP STUN Packets"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The number of RTP STUN packets received by the caller."
+    ::= { rtpswOmCallCurrentEntry 23 }
+
+rtpswOmRtpStunPcktsCalleeSent OBJECT-TYPE
+    SYNTAX      Counter32
+    UNITS       "RTP STUN Packets"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The number of RTP STUN packets sent by the callee."
+    ::= { rtpswOmCallCurrentEntry 24 }
+
+rtpswOmRtpStunPcktsCalleeRecv OBJECT-TYPE
+    SYNTAX      Counter32
+    UNITS       "RTP STUN Packets"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The number of RTP STUN packets received by the callee."
+    ::= { rtpswOmCallCurrentEntry 25 }
 
 rtpswOmCallHistory OBJECT IDENTIFIER
-    ::= { rtpswOmTables 12 }
+    ::= { rtpswOmTables 13 }
 
 rtpswOmOids OBJECT IDENTIFIER
     ::= { rtpswOmMIB 4 }
@@ -1559,9 +1786,9 @@ rtpswOmCompliance OBJECT IDENTIFIER
     ::= { rtpswOmMIB 6 }
 
 rtpswOmMandatoryGroup OBJECT-GROUP
-    OBJECTS     { rtpswOmOctetsSent, rtpswOmOctetsRecv, 
-                  rtpswOmPacketsSent, rtpswOmPacketsRecv, 
-                  rtpswOmStunPacketsSent, rtpswOmStunPacketsRecv, 
+    OBJECTS     { rtpswOmCurrOctetsSent, rtpswOmCurrOctetsRecv, 
+                  rtpswOmCurrPacketsSent, rtpswOmCurrPacketsRecv, 
+                  rtpswOmCurrStunPacketsSent, rtpswOmCurrStunPacketsRecv, 
                   rtpswOm15minValidIntervals, rtpswOm15MinOctetsSent, 
                   rtpswOm15MinOctetsRecv, rtpswOm15MinPacketsSent, 
                   rtpswOm15MinPacketsRecv, rtpswOm15MinStunPktsSent, 
@@ -1599,7 +1826,7 @@ rtpswOmMandatoryGroup OBJECT-GROUP
 --     NOTIFICATIONS {
 --     }
 --     STATUS      current
---     DESCRIPTION
+--     DESCRIPTION 
 --         "A group that provides all of the mandatory compliance 
 --          notifications"
 --     ::= { rtpswOmGroups 2 }
@@ -1618,7 +1845,31 @@ rtpswOmOptionsGroup OBJECT-GROUP
                   rtpswIfAddrOm5MinPacketsSent, 
                   rtpswIfAddrOm5MinPacketsRecv, 
                   rtpswIfAddrOm5MinStunPktsSent, 
-                  rtpswIfAddrOm5MinStunPktsRecv }
+                  rtpswIfAddrOm5MinStunPktsRecv, rtpswOmTpMediaAware, 
+                  rtpswOmRtpPacketsSent, rtpswOmRtpPacketsRecv, 
+                  rtpswOmRtcpPacketsSent, rtpswOmRtcpPacketsRecv, 
+                  rtpswOmStunPacketsSent, rtpswOmStunPacketsRecv, 
+                  rtpswOmRtpOctetsSent, rtpswOmRtpOctetsRecv, 
+                  rtpswOmRtpPacketsLost, rtpswOmRtpJitter, 
+                  rtpswOmRtpDelay, rtpswOmCallStartTime, 
+                  rtpswOmIpOctetsCallerSent, rtpswOmIpOctetsCallerRecv, 
+                  rtpswOmIpOctetsCalleeSent, rtpswOmIpOctetsCalleeRecv, 
+                  rtpswOmIpPacketsCallerSent, rtpswOmIpPacketsCallerRecv, 
+                  rtpswOmIpPacketsCalleeSent, rtpswOmIpPacketsCalleeRecv, 
+                  rtpswOmRtpOctetsCallerSent, rtpswOmRtpOctetsCallerRecv, 
+                  rtpswOmRtpOctetsCalleeSent, rtpswOmRtpOctetsCalleeRecv, 
+                  rtpswOmRtpPacketsCallerSent, 
+                  rtpswOmRtpPacketsCallerRecv, 
+                  rtpswOmRtpPacketsCalleeSent, 
+                  rtpswOmRtpPacketsCalleeRecv, 
+                  rtpswOmRtcpPacketsCallerSent, 
+                  rtpswOmRtcpPacketsCallerRecv, 
+                  rtpswOmRtcpPacketsCalleeSent, 
+                  rtpswOmRtcpPacketsCalleeRecv, 
+                  rtpswOmRtpStunPcktsCallerSent, 
+                  rtpswOmRtpStunPcktsCallerRecv, 
+                  rtpswOmRtpStunPcktsCalleeSent, 
+                  rtpswOmRtpStunPcktsCalleeRecv }
     STATUS      current
     DESCRIPTION 
         "A group that provides all of the optional compliance 
@@ -1629,7 +1880,7 @@ rtpswOmOptionsGroup OBJECT-GROUP
 --     NOTIFICATIONS {
 --     }
 --     STATUS      current
---     DESCRIPTION
+--     DESCRIPTION 
 --         "A group that provides all of the optional compliance 
 --          notifications."
 --     ::= { rtpswOmGroups 4 }

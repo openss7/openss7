@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2010  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -221,11 +221,11 @@ volatile int mxFarEndTotalTable_refresh = 1;
  * suffix appearing in the variable below.
  */
 oid mxMIB_variables_oid[9] = { 1, 3, 6, 1, 4, 1, 29591, 1, 11 };
-oid mxSyncTable_variables_oid[14] = { 1, 3, 6, 1, 4, 1, 29591, 1, 11, 1, 2, 1, 1, 1 };
-oid mxDrivTable_variables_oid[14] = { 1, 3, 6, 1, 4, 1, 29591, 1, 11, 1, 2, 2, 1, 1 };
-oid mxCardTable_variables_oid[14] = { 1, 3, 6, 1, 4, 1, 29591, 1, 11, 1, 2, 3, 2, 1 };
-oid mxSpanTable_variables_oid[14] = { 1, 3, 6, 1, 4, 1, 29591, 1, 11, 1, 2, 4, 1, 1 };
-oid mxXconTable_variables_oid[14] = { 1, 3, 6, 1, 4, 1, 29591, 1, 11, 1, 2, 7, 1, 1 };
+oid mxSyncTable_variables_oid[14] = { 1, 3, 6, 1, 4, 1, 29591, 1, 11, 1, 1, 1, 1, 1 };
+oid mxDrivTable_variables_oid[14] = { 1, 3, 6, 1, 4, 1, 29591, 1, 11, 1, 1, 2, 1, 1 };
+oid mxCardTable_variables_oid[14] = { 1, 3, 6, 1, 4, 1, 29591, 1, 11, 1, 1, 3, 2, 1 };
+oid mxSpanTable_variables_oid[14] = { 1, 3, 6, 1, 4, 1, 29591, 1, 11, 1, 1, 4, 1, 1 };
+oid mxXconTable_variables_oid[14] = { 1, 3, 6, 1, 4, 1, 29591, 1, 11, 1, 1, 7, 1, 1 };
 
 /*
  * Oids for use in notifications defined in this MIB.
@@ -238,27 +238,34 @@ oid mxXconTable_variables_oid[14] = { 1, 3, 6, 1, 4, 1, 29591, 1, 11, 1, 2, 7, 1
 /*
  * Other oids defined in this MIB.
  */
-oid mxCardTypePLX9030_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 1, 11, 1, 5, 1, 1 };
-oid mxCardTypePLXDevelopmentBoard_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 1, 11, 1, 5, 1, 2 };
-oid mxCardTypeX400P_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 1, 11, 1, 5, 1, 3 };
-oid mxCardTypeE400P_oid[14] = { 1, 3, 6, 1, 4, 1, 29591, 1, 11, 1, 5, 1, 3, 1 };
-oid mxCardTypeT400P_oid[14] = { 1, 3, 6, 1, 4, 1, 29591, 1, 11, 1, 5, 1, 3, 2 };
-oid mxCardTypeX400P_SS7_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 1, 11, 1, 5, 1, 4 };
-oid mxCardTypeE400P_SS7_oid[14] = { 1, 3, 6, 1, 4, 1, 29591, 1, 11, 1, 5, 1, 4, 1 };
-oid mxCardTypeT400P_SS7_oid[14] = { 1, 3, 6, 1, 4, 1, 29591, 1, 11, 1, 5, 1, 4, 2 };
-oid mxCardTypeV400P_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 1, 11, 1, 5, 1, 5 };
-oid mxCardTypeV400PE_oid[14] = { 1, 3, 6, 1, 4, 1, 29591, 1, 11, 1, 5, 1, 5, 1 };
-oid mxCardTypeV400PT_oid[14] = { 1, 3, 6, 1, 4, 1, 29591, 1, 11, 1, 5, 1, 5, 2 };
-oid mxCardTypeV401PE_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 1, 11, 1, 5, 1, 6 };
-oid mxCardTypeV401PT_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 1, 11, 1, 5, 1, 7 };
-oid mxChipTypeDS2152_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 1, 11, 1, 5, 2, 1 };
-oid mxChipTypeDS21352_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 1, 11, 1, 5, 2, 2 };
-oid mxChipTypeDS21552_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 1, 11, 1, 5, 2, 3 };
-oid mxChipTypeDS2154_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 1, 11, 1, 5, 2, 4 };
-oid mxChipTypeDS21354_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 1, 11, 1, 5, 2, 5 };
-oid mxChipTypeDS21554_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 1, 11, 1, 5, 2, 6 };
-oid mxChipTypeDS2155_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 1, 11, 1, 5, 2, 7 };
-oid mxChipTypeDS2156_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 1, 11, 1, 5, 2, 8 };
+oid mxCardTypePLX9030_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 1, 11, 1, 4, 1, 1 };
+oid mxCardTypePLXDevelopmentBoard_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 1, 11, 1, 4, 1, 2 };
+oid mxCardTypeX400P_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 1, 11, 1, 4, 1, 3 };
+oid mxCardTypeE400P_oid[14] = { 1, 3, 6, 1, 4, 1, 29591, 1, 11, 1, 4, 1, 3, 1 };
+oid mxCardTypeT400P_oid[14] = { 1, 3, 6, 1, 4, 1, 29591, 1, 11, 1, 4, 1, 3, 2 };
+oid mxCardTypeX400P_SS7_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 1, 11, 1, 4, 1, 4 };
+oid mxCardTypeE400P_SS7_oid[14] = { 1, 3, 6, 1, 4, 1, 29591, 1, 11, 1, 4, 1, 4, 1 };
+oid mxCardTypeT400P_SS7_oid[14] = { 1, 3, 6, 1, 4, 1, 29591, 1, 11, 1, 4, 1, 4, 2 };
+oid mxCardTypeV400P_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 1, 11, 1, 4, 1, 5 };
+oid mxCardTypeV400PE_oid[14] = { 1, 3, 6, 1, 4, 1, 29591, 1, 11, 1, 4, 1, 5, 1 };
+oid mxCardTypeV400PT_oid[14] = { 1, 3, 6, 1, 4, 1, 29591, 1, 11, 1, 4, 1, 5, 2 };
+oid mxCardTypeA400P_oid[14] = { 1, 3, 6, 1, 4, 1, 29591, 1, 11, 1, 4, 1, 5, 3 };
+oid mxCardTypeV401PE_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 1, 11, 1, 4, 1, 6 };
+oid mxCardTypeV401PT_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 1, 11, 1, 4, 1, 7 };
+oid mxCardTypeAT400P_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 1, 11, 1, 4, 1, 8 };
+oid mxCardTypeAE400P_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 1, 11, 1, 4, 1, 9 };
+oid mxCardTypeA400PT_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 1, 11, 1, 4, 1, 10 };
+oid mxCardTypeA400PE_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 1, 11, 1, 4, 1, 11 };
+oid mxChipTypeDS2152_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 1, 11, 1, 4, 2, 1 };
+oid mxChipTypeDS21352_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 1, 11, 1, 4, 2, 2 };
+oid mxChipTypeDS21552_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 1, 11, 1, 4, 2, 3 };
+oid mxChipTypeDS2154_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 1, 11, 1, 4, 2, 4 };
+oid mxChipTypeDS21354_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 1, 11, 1, 4, 2, 5 };
+oid mxChipTypeDS21554_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 1, 11, 1, 4, 2, 6 };
+oid mxChipTypeDS2155_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 1, 11, 1, 4, 2, 7 };
+oid mxChipTypeDS2156_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 1, 11, 1, 4, 2, 8 };
+oid mxChipTypeDS21455_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 1, 11, 1, 4, 2, 9 };
+oid mxChipTypeDS21458_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 1, 11, 1, 4, 2, 10 };
 oid mxSyncMandatoryGroup_oid[12] = { 1, 3, 6, 1, 4, 1, 29591, 1, 11, 2, 1, 1 };
 oid mxCardIdGroup_oid[12] = { 1, 3, 6, 1, 4, 1, 29591, 1, 11, 2, 1, 2 };
 oid mxChipGroup_oid[12] = { 1, 3, 6, 1, 4, 1, 29591, 1, 11, 2, 1, 3 };
@@ -275,6 +282,7 @@ oid mxNearEndTotalGroup_oid[12] = { 1, 3, 6, 1, 4, 1, 29591, 1, 11, 2, 1, 13 };
 oid mxFarEndCurrentGroup_oid[12] = { 1, 3, 6, 1, 4, 1, 29591, 1, 11, 2, 1, 14 };
 oid mxFarEndIntervalGroup_oid[12] = { 1, 3, 6, 1, 4, 1, 29591, 1, 11, 2, 1, 15 };
 oid mxFarEndTotalGroup_oid[12] = { 1, 3, 6, 1, 4, 1, 29591, 1, 11, 2, 1, 16 };
+oid mxDrivGroup_oid[12] = { 1, 3, 6, 1, 4, 1, 29591, 1, 11, 2, 1, 17 };
 oid mxBasicCompliance_oid[12] = { 1, 3, 6, 1, 4, 1, 29591, 1, 11, 2, 2, 1 };
 oid mxEnhancedCompliance_oid[12] = { 1, 3, 6, 1, 4, 1, 29591, 1, 11, 2, 2, 2 };
 static oid zeroDotZero_oid[2] = { 0, 0 };
@@ -286,354 +294,354 @@ static oid snmpTrapOID_oid[11] = { 1, 3, 6, 1, 6, 3, 1, 1, 4, 1, 0 };
  */
 struct variable7 mxMIB_variables[] = {
 	/* magic number, variable type, ro/rw, callback fn, L, oidsuffix */
-#define   MXDISCONTINUITYTIME   1
-	{(u_char) MXDISCONTINUITYTIME, ASN_TIMETICKS, RONLY, var_mxMIB, 3, {1, 1, 1}},
-#define   MXSYNCSPANID          2
-	{(u_char) MXSYNCSPANID, ASN_OCTET_STR, RWRITE, var_mxSyncTable, 6, {1, 2, 1, 1, 1, 3}},
-#define   MXSYNCROWSTATUS       3
-	{(u_char) MXSYNCROWSTATUS, ASN_INTEGER, RWRITE, var_mxSyncTable, 6, {1, 2, 1, 1, 1, 4}},
-#define   MXDRIVIDNUM           4
-	{(u_char) MXDRIVIDNUM, ASN_UNSIGNED, RONLY, var_mxDrivTable, 6, {1, 2, 2, 1, 1, 2}},
-#define   MXDRIVMAJOR           5
-	{(u_char) MXDRIVMAJOR, ASN_UNSIGNED, RONLY, var_mxDrivTable, 6, {1, 2, 2, 1, 1, 3}},
-#define   MXDRIVDESCRIPTION     6
-	{(u_char) MXDRIVDESCRIPTION, ASN_OCTET_STR, RONLY, var_mxDrivTable, 6, {1, 2, 2, 1, 1, 4}},
-#define   MXDRIVREVISION        7
-	{(u_char) MXDRIVREVISION, ASN_OCTET_STR, RONLY, var_mxDrivTable, 6, {1, 2, 2, 1, 1, 5}},
-#define   MXDRIVCOPYRIGHT       8
-	{(u_char) MXDRIVCOPYRIGHT, ASN_OCTET_STR, RONLY, var_mxDrivTable, 6, {1, 2, 2, 1, 1, 6}},
-#define   MXDRIVSUPPORTEDDEVICE  9
-	{(u_char) MXDRIVSUPPORTEDDEVICE, ASN_OCTET_STR, RONLY, var_mxDrivTable, 6, {1, 2, 2, 1, 1, 7}},
-#define   MXDRIVCONTACT         10
-	{(u_char) MXDRIVCONTACT, ASN_OCTET_STR, RONLY, var_mxDrivTable, 6, {1, 2, 2, 1, 1, 8}},
-#define   MXDRIVLICENSE         11
-	{(u_char) MXDRIVLICENSE, ASN_INTEGER, RONLY, var_mxDrivTable, 6, {1, 2, 2, 1, 1, 9}},
-#define   MXDRIVDATE            12
-	{(u_char) MXDRIVDATE, ASN_OCTET_STR, RONLY, var_mxDrivTable, 6, {1, 2, 2, 1, 1, 10}},
-#define   MXDRIVROWSTATUS       13
-	{(u_char) MXDRIVROWSTATUS, ASN_INTEGER, RWRITE, var_mxDrivTable, 6, {1, 2, 2, 1, 1, 11}},
-#define   MXCARDNEXTINDEX       14
-	{(u_char) MXCARDNEXTINDEX, ASN_UNSIGNED, RONLY, var_mxMIB, 4, {1, 2, 3, 1}},
-#define   MXCARDTYPE            15
-	{(u_char) MXCARDTYPE, ASN_OBJECT_ID, RONLY, var_mxCardTable, 6, {1, 2, 3, 2, 1, 2}},
-#define   MXCARDIDENTIFIER      16
-	{(u_char) MXCARDIDENTIFIER, ASN_INTEGER, RONLY, var_mxCardTable, 6, {1, 2, 3, 2, 1, 3}},
-#define   MXCARDREVISION        17
-	{(u_char) MXCARDREVISION, ASN_OCTET_STR, RONLY, var_mxCardTable, 6, {1, 2, 3, 2, 1, 4}},
-#define   MXCARDCHIPTYPE        18
-	{(u_char) MXCARDCHIPTYPE, ASN_OBJECT_ID, RONLY, var_mxCardTable, 6, {1, 2, 3, 2, 1, 5}},
-#define   MXCARDCHIPREVISION    19
-	{(u_char) MXCARDCHIPREVISION, ASN_OCTET_STR, RONLY, var_mxCardTable, 6, {1, 2, 3, 2, 1, 6}},
-#define   MXCARDPCIBUS          20
-	{(u_char) MXCARDPCIBUS, ASN_UNSIGNED, RONLY, var_mxCardTable, 6, {1, 2, 3, 2, 1, 7}},
-#define   MXCARDPCISLOT         21
-	{(u_char) MXCARDPCISLOT, ASN_UNSIGNED, RONLY, var_mxCardTable, 6, {1, 2, 3, 2, 1, 8}},
-#define   MXCARDPCIIRQ          22
-	{(u_char) MXCARDPCIIRQ, ASN_UNSIGNED, RONLY, var_mxCardTable, 6, {1, 2, 3, 2, 1, 9}},
-#define   MXCARDSPANTYPE        23
-	{(u_char) MXCARDSPANTYPE, ASN_INTEGER, RWRITE, var_mxCardTable, 6, {1, 2, 3, 2, 1, 10}},
-#define   MXCARDMODE            24
-	{(u_char) MXCARDMODE, ASN_OCTET_STR, RWRITE, var_mxCardTable, 6, {1, 2, 3, 2, 1, 11}},
-#define   MXCARDSYNCMASTER      25
-	{(u_char) MXCARDSYNCMASTER, ASN_INTEGER, RWRITE, var_mxCardTable, 6, {1, 2, 3, 2, 1, 12}},
-#define   MXCARDSYNCSOURCE      26
-	{(u_char) MXCARDSYNCSOURCE, ASN_INTEGER, RWRITE, var_mxCardTable, 6, {1, 2, 3, 2, 1, 13}},
-#define   MXCARDSYNCGROUP       27
-	{(u_char) MXCARDSYNCGROUP, ASN_UNSIGNED, RWRITE, var_mxCardTable, 6, {1, 2, 3, 2, 1, 14}},
-#define   MXCARDADMINISTRATIVESTATE  28
-	{(u_char) MXCARDADMINISTRATIVESTATE, ASN_INTEGER, RWRITE, var_mxCardTable, 6, {1, 2, 3, 2, 1, 15}},
-#define   MXCARDOPERATIONALSTATE  29
-	{(u_char) MXCARDOPERATIONALSTATE, ASN_INTEGER, RONLY, var_mxCardTable, 6, {1, 2, 3, 2, 1, 16}},
-#define   MXCARDUSAGESTATE      30
-	{(u_char) MXCARDUSAGESTATE, ASN_INTEGER, RONLY, var_mxCardTable, 6, {1, 2, 3, 2, 1, 17}},
-#define   MXCARDALARMSTATUS     31
-	{(u_char) MXCARDALARMSTATUS, ASN_OCTET_STR, RWRITE, var_mxCardTable, 6, {1, 2, 3, 2, 1, 18}},
-#define   MXCARDPROCEDURALSTATUS  32
-	{(u_char) MXCARDPROCEDURALSTATUS, ASN_OCTET_STR, RONLY, var_mxCardTable, 6, {1, 2, 3, 2, 1, 19}},
-#define   MXCARDAVAILABILITYSTATUS  33
-	{(u_char) MXCARDAVAILABILITYSTATUS, ASN_OCTET_STR, RONLY, var_mxCardTable, 6, {1, 2, 3, 2, 1, 20}},
-#define   MXCARDCONTROLSTATUS   34
-	{(u_char) MXCARDCONTROLSTATUS, ASN_OCTET_STR, RWRITE, var_mxCardTable, 6, {1, 2, 3, 2, 1, 21}},
-#define   MXCARDUNKNOWNSTATUS   35
-	{(u_char) MXCARDUNKNOWNSTATUS, ASN_INTEGER, RONLY, var_mxCardTable, 6, {1, 2, 3, 2, 1, 22}},
-#define   MXCARDSTANDBYSTATUS   36
-	{(u_char) MXCARDSTANDBYSTATUS, ASN_INTEGER, RONLY, var_mxCardTable, 6, {1, 2, 3, 2, 1, 23}},
-#define   MXCARDSYNCSPANID      37
-	{(u_char) MXCARDSYNCSPANID, ASN_OCTET_STR, RONLY, var_mxCardTable, 6, {1, 2, 3, 2, 1, 24}},
-#define   MXCARDSYNCTRANSITIONS  38
-	{(u_char) MXCARDSYNCTRANSITIONS, ASN_COUNTER, RONLY, var_mxCardTable, 6, {1, 2, 3, 2, 1, 25}},
-#define   MXCARDNAME            39
-	{(u_char) MXCARDNAME, ASN_OCTET_STR, RONLY, var_mxCardTable, 6, {1, 2, 3, 2, 1, 26}},
-#define   MXCARDSTATUS          40
-	{(u_char) MXCARDSTATUS, ASN_INTEGER, RWRITE, var_mxCardTable, 6, {1, 2, 3, 2, 1, 27}},
-#define   MXSPANNAME            41
-	{(u_char) MXSPANNAME, ASN_OCTET_STR, RWRITE, var_mxSpanTable, 6, {1, 2, 4, 1, 1, 2}},
-#define   MXSPANDEVICE          42
-	{(u_char) MXSPANDEVICE, ASN_OBJECT_ID, RWRITE, var_mxSpanTable, 6, {1, 2, 4, 1, 1, 3}},
-#define   MXSPANEQUIPMENTID     43
-	{(u_char) MXSPANEQUIPMENTID, ASN_OCTET_STR, RWRITE, var_mxSpanTable, 6, {1, 2, 4, 1, 1, 4}},
-#define   MXSPANTYPE            44
-	{(u_char) MXSPANTYPE, ASN_INTEGER, RWRITE, var_mxSpanTable, 6, {1, 2, 4, 1, 1, 5}},
-#define   MXSPANNUMBER          45
-	{(u_char) MXSPANNUMBER, ASN_UNSIGNED, RWRITE, var_mxSpanTable, 6, {1, 2, 4, 1, 1, 6}},
-#define   MXSPANRATE            46
-	{(u_char) MXSPANRATE, ASN_INTEGER, RONLY, var_mxSpanTable, 6, {1, 2, 4, 1, 1, 7}},
-#define   MXSPANMODE            47
-	{(u_char) MXSPANMODE, ASN_OCTET_STR, RWRITE, var_mxSpanTable, 6, {1, 2, 4, 1, 1, 8}},
-#define   MXSPANCRC             48
-	{(u_char) MXSPANCRC, ASN_INTEGER, RWRITE, var_mxSpanTable, 6, {1, 2, 4, 1, 1, 9}},
-#define   MXSPANCLOCKING        49
-	{(u_char) MXSPANCLOCKING, ASN_INTEGER, RWRITE, var_mxSpanTable, 6, {1, 2, 4, 1, 1, 10}},
-#define   MXSPANPRIORITY        50
-	{(u_char) MXSPANPRIORITY, ASN_UNSIGNED, RWRITE, var_mxSpanTable, 6, {1, 2, 4, 1, 1, 11}},
-#define   MXSPANCODING          51
-	{(u_char) MXSPANCODING, ASN_INTEGER, RWRITE, var_mxSpanTable, 6, {1, 2, 4, 1, 1, 12}},
-#define   MXSPANFRAMING         52
-	{(u_char) MXSPANFRAMING, ASN_INTEGER, RWRITE, var_mxSpanTable, 6, {1, 2, 4, 1, 1, 13}},
-#define   MXSPANLINEIMPEDANCE   53
-	{(u_char) MXSPANLINEIMPEDANCE, ASN_INTEGER, RWRITE, var_mxSpanTable, 6, {1, 2, 4, 1, 1, 14}},
-#define   MXSPANLINEMODE        54
-	{(u_char) MXSPANLINEMODE, ASN_INTEGER, RWRITE, var_mxSpanTable, 6, {1, 2, 4, 1, 1, 15}},
-#define   MXSPANLINELENGTH      55
-	{(u_char) MXSPANLINELENGTH, ASN_INTEGER, RWRITE, var_mxSpanTable, 6, {1, 2, 4, 1, 1, 16}},
-#define   MXSPANLINEATTENUATION  56
-	{(u_char) MXSPANLINEATTENUATION, ASN_INTEGER, RWRITE, var_mxSpanTable, 6, {1, 2, 4, 1, 1, 17}},
-#define   MXSPANLINEGAIN        57
-	{(u_char) MXSPANLINEGAIN, ASN_INTEGER, RWRITE, var_mxSpanTable, 6, {1, 2, 4, 1, 1, 18}},
-#define   MXSPANLINEDELAY       58
-	{(u_char) MXSPANLINEDELAY, ASN_UNSIGNED, RWRITE, var_mxSpanTable, 6, {1, 2, 4, 1, 1, 19}},
-#define   MXSPANTXLEVEL         59
-	{(u_char) MXSPANTXLEVEL, ASN_INTEGER, RWRITE, var_mxSpanTable, 6, {1, 2, 4, 1, 1, 20}},
-#define   MXSPANRXLEVEL         60
-	{(u_char) MXSPANRXLEVEL, ASN_INTEGER, RWRITE, var_mxSpanTable, 6, {1, 2, 4, 1, 1, 21}},
-#define   MXSPANALARMSETTLETIME  61
-	{(u_char) MXSPANALARMSETTLETIME, ASN_INTEGER, RWRITE, var_mxSpanTable, 6, {1, 2, 4, 1, 1, 22}},
-#define   MXSPANLINECODETIME    62
-	{(u_char) MXSPANLINECODETIME, ASN_INTEGER, RWRITE, var_mxSpanTable, 6, {1, 2, 4, 1, 1, 23}},
-#define   MXSPANPRIMARY         63
-	{(u_char) MXSPANPRIMARY, ASN_UNSIGNED, RWRITE, var_mxSpanTable, 6, {1, 2, 4, 1, 1, 24}},
-#define   MXSPANDATALINK        64
-	{(u_char) MXSPANDATALINK, ASN_OCTET_STR, RWRITE, var_mxSpanTable, 6, {1, 2, 4, 1, 1, 25}},
-#define   MXSPANLINECODE        65
-	{(u_char) MXSPANLINECODE, ASN_INTEGER, RWRITE, var_mxSpanTable, 6, {1, 2, 4, 1, 1, 26}},
-#define   MXSPANALARMSEVERITYMAPPINGPROFILE  66
-	{(u_char) MXSPANALARMSEVERITYMAPPINGPROFILE, ASN_OBJECT_ID, RWRITE, var_mxSpanTable, 6, {1, 2, 4, 1, 1, 27}},
-#define   MXSPANADMINISTRATIVESTATE  67
-	{(u_char) MXSPANADMINISTRATIVESTATE, ASN_INTEGER, RWRITE, var_mxSpanTable, 6, {1, 2, 4, 1, 1, 28}},
-#define   MXSPANOPERATIONALSTATE  68
-	{(u_char) MXSPANOPERATIONALSTATE, ASN_INTEGER, RONLY, var_mxSpanTable, 6, {1, 2, 4, 1, 1, 29}},
-#define   MXSPANUSAGESTATE      69
-	{(u_char) MXSPANUSAGESTATE, ASN_INTEGER, RONLY, var_mxSpanTable, 6, {1, 2, 4, 1, 1, 30}},
-#define   MXSPANALARMSTATUS     70
-	{(u_char) MXSPANALARMSTATUS, ASN_OCTET_STR, RWRITE, var_mxSpanTable, 6, {1, 2, 4, 1, 1, 31}},
-#define   MXSPANPROCEDURALSTATUS  71
-	{(u_char) MXSPANPROCEDURALSTATUS, ASN_OCTET_STR, RONLY, var_mxSpanTable, 6, {1, 2, 4, 1, 1, 32}},
-#define   MXSPANAVAILABILITYSTATUS  72
-	{(u_char) MXSPANAVAILABILITYSTATUS, ASN_OCTET_STR, RONLY, var_mxSpanTable, 6, {1, 2, 4, 1, 1, 33}},
-#define   MXSPANCONTROLSTATUS   73
-	{(u_char) MXSPANCONTROLSTATUS, ASN_OCTET_STR, RWRITE, var_mxSpanTable, 6, {1, 2, 4, 1, 1, 34}},
-#define   MXSPANSTANDBYSTATUS   74
-	{(u_char) MXSPANSTANDBYSTATUS, ASN_INTEGER, RONLY, var_mxSpanTable, 6, {1, 2, 4, 1, 1, 35}},
-#define   MXSPANUNKNOWNSTATUS   75
-	{(u_char) MXSPANUNKNOWNSTATUS, ASN_INTEGER, RONLY, var_mxSpanTable, 6, {1, 2, 4, 1, 1, 36}},
-#define   MXSPANSAP             76
-	{(u_char) MXSPANSAP, ASN_OBJECT_ID, RONLY, var_mxSpanTable, 6, {1, 2, 4, 1, 1, 37}},
-#define   MXSPANLOOPBACKSTATUS  77
-	{(u_char) MXSPANLOOPBACKSTATUS, ASN_OCTET_STR, RONLY, var_mxSpanTable, 6, {1, 2, 4, 1, 1, 38}},
-#define   MXSPANLINESTATUS      78
-	{(u_char) MXSPANLINESTATUS, ASN_OCTET_STR, RONLY, var_mxSpanTable, 6, {1, 2, 4, 1, 1, 39}},
-#define   MXSPANALARMS          79
-	{(u_char) MXSPANALARMS, ASN_OCTET_STR, RONLY, var_mxSpanTable, 6, {1, 2, 4, 1, 1, 40}},
-#define   MXSPANEVENTS          80
-	{(u_char) MXSPANEVENTS, ASN_OCTET_STR, RONLY, var_mxSpanTable, 6, {1, 2, 4, 1, 1, 41}},
-#define   MXSPANRECEIVELEVEL    81
-	{(u_char) MXSPANRECEIVELEVEL, ASN_UNSIGNED, RONLY, var_mxSpanTable, 6, {1, 2, 4, 1, 1, 42}},
-#define   MXSPANRECEIVETHRESHOLD  82
-	{(u_char) MXSPANRECEIVETHRESHOLD, ASN_UNSIGNED, RWRITE, var_mxSpanTable, 6, {1, 2, 4, 1, 1, 43}},
-#define   MXSPANROWSTATUS       83
-	{(u_char) MXSPANROWSTATUS, ASN_INTEGER, RWRITE, var_mxSpanTable, 6, {1, 2, 4, 1, 1, 44}},
-#define   MXBERTMODE            84
-	{(u_char) MXBERTMODE, ASN_INTEGER, RWRITE, var_mxBertTable, 6, {1, 2, 5, 1, 1, 1}},
-#define   MXBERTSELECT          85
-	{(u_char) MXBERTSELECT, ASN_INTEGER, RWRITE, var_mxBertTable, 6, {1, 2, 5, 1, 1, 2}},
-#define   MXBERTPATTERN         86
-	{(u_char) MXBERTPATTERN, ASN_OCTET_STR, RWRITE, var_mxBertTable, 6, {1, 2, 5, 1, 1, 3}},
-#define   MXBERTOPERATIONALSTATE  87
-	{(u_char) MXBERTOPERATIONALSTATE, ASN_INTEGER, RONLY, var_mxBertTable, 6, {1, 2, 5, 1, 1, 4}},
-#define   MXBERTPROCEDURALSTATUS  88
-	{(u_char) MXBERTPROCEDURALSTATUS, ASN_OCTET_STR, RONLY, var_mxBertTable, 6, {1, 2, 5, 1, 1, 5}},
-#define   MXBERTBITCOUNT        89
-	{(u_char) MXBERTBITCOUNT, ASN_COUNTER, RONLY, var_mxBertTable, 6, {1, 2, 5, 1, 1, 6}},
-#define   MXBERTERRORCOUNT      90
-	{(u_char) MXBERTERRORCOUNT, ASN_COUNTER, RONLY, var_mxBertTable, 6, {1, 2, 5, 1, 1, 7}},
-#define   MXCHANTYPE            91
-	{(u_char) MXCHANTYPE, ASN_INTEGER, RWRITE, var_mxChanTable, 6, {1, 2, 6, 1, 1, 2}},
-#define   MXCHANFORMAT          92
-	{(u_char) MXCHANFORMAT, ASN_INTEGER, RWRITE, var_mxChanTable, 6, {1, 2, 6, 1, 1, 3}},
-#define   MXCHANRATE            93
-	{(u_char) MXCHANRATE, ASN_INTEGER, RWRITE, var_mxChanTable, 6, {1, 2, 6, 1, 1, 4}},
-#define   MXCHANMODE            94
-	{(u_char) MXCHANMODE, ASN_OCTET_STR, RWRITE, var_mxChanTable, 6, {1, 2, 6, 1, 1, 5}},
-#define   MXCHANSAP             95
-	{(u_char) MXCHANSAP, ASN_OBJECT_ID, RONLY, var_mxChanTable, 6, {1, 2, 6, 1, 1, 6}},
-#define   MXCHANADMINISTRATIVESTATE  96
-	{(u_char) MXCHANADMINISTRATIVESTATE, ASN_INTEGER, RWRITE, var_mxChanTable, 6, {1, 2, 6, 1, 1, 7}},
-#define   MXCHANOPERATIONALSTATE  97
-	{(u_char) MXCHANOPERATIONALSTATE, ASN_INTEGER, RONLY, var_mxChanTable, 6, {1, 2, 6, 1, 1, 8}},
-#define   MXCHANUSAGESTATE      98
-	{(u_char) MXCHANUSAGESTATE, ASN_INTEGER, RONLY, var_mxChanTable, 6, {1, 2, 6, 1, 1, 9}},
-#define   MXCHANAVAILABILITYSTATUS  99
-	{(u_char) MXCHANAVAILABILITYSTATUS, ASN_OCTET_STR, RONLY, var_mxChanTable, 6, {1, 2, 6, 1, 1, 10}},
-#define   MXCHANCONTROLSTATUS   100
-	{(u_char) MXCHANCONTROLSTATUS, ASN_OCTET_STR, RWRITE, var_mxChanTable, 6, {1, 2, 6, 1, 1, 11}},
-#define   MXCHANPROCEDURALSTATUS  101
-	{(u_char) MXCHANPROCEDURALSTATUS, ASN_OCTET_STR, RONLY, var_mxChanTable, 6, {1, 2, 6, 1, 1, 12}},
-#define   MXCHANALARMSTATUS     102
-	{(u_char) MXCHANALARMSTATUS, ASN_OCTET_STR, RWRITE, var_mxChanTable, 6, {1, 2, 6, 1, 1, 13}},
-#define   MXCHANSTANDBYSTATUS   103
-	{(u_char) MXCHANSTANDBYSTATUS, ASN_INTEGER, RONLY, var_mxChanTable, 6, {1, 2, 6, 1, 1, 14}},
-#define   MXXCONCARDINDEX       104
-	{(u_char) MXXCONCARDINDEX, ASN_UNSIGNED, RWRITE, var_mxXconTable, 6, {1, 2, 7, 1, 1, 1}},
-#define   MXXCONSPANINDEX       105
-	{(u_char) MXXCONSPANINDEX, ASN_UNSIGNED, RWRITE, var_mxXconTable, 6, {1, 2, 7, 1, 1, 2}},
-#define   MXXCONCHANINDEX       106
-	{(u_char) MXXCONCHANINDEX, ASN_UNSIGNED, RWRITE, var_mxXconTable, 6, {1, 2, 7, 1, 1, 3}},
-#define   MXXCONTYPE            107
-	{(u_char) MXXCONTYPE, ASN_INTEGER, RWRITE, var_mxXconTable, 6, {1, 2, 7, 1, 1, 4}},
-#define   MXXCONSTORAGETYPE     108
-	{(u_char) MXXCONSTORAGETYPE, ASN_INTEGER, RWRITE, var_mxXconTable, 6, {1, 2, 7, 1, 1, 5}},
-#define   MXXCONROWSTATUS       109
-	{(u_char) MXXCONROWSTATUS, ASN_INTEGER, RWRITE, var_mxXconTable, 6, {1, 2, 7, 1, 1, 6}},
+#define   MXSYNCSPANID          1
+	{(u_char) MXSYNCSPANID, ASN_OCTET_STR, RWRITE, var_mxSyncTable, 6, {1, 1, 1, 1, 1, 3}},
+#define   MXSYNCROWSTATUS       2
+	{(u_char) MXSYNCROWSTATUS, ASN_INTEGER, RWRITE, var_mxSyncTable, 6, {1, 1, 1, 1, 1, 4}},
+#define   MXDRIVIDNUM           3
+	{(u_char) MXDRIVIDNUM, ASN_UNSIGNED, RONLY, var_mxDrivTable, 6, {1, 1, 2, 1, 1, 2}},
+#define   MXDRIVMAJOR           4
+	{(u_char) MXDRIVMAJOR, ASN_UNSIGNED, RONLY, var_mxDrivTable, 6, {1, 1, 2, 1, 1, 3}},
+#define   MXDRIVDESCRIPTION     5
+	{(u_char) MXDRIVDESCRIPTION, ASN_OCTET_STR, RONLY, var_mxDrivTable, 6, {1, 1, 2, 1, 1, 4}},
+#define   MXDRIVREVISION        6
+	{(u_char) MXDRIVREVISION, ASN_OCTET_STR, RONLY, var_mxDrivTable, 6, {1, 1, 2, 1, 1, 5}},
+#define   MXDRIVCOPYRIGHT       7
+	{(u_char) MXDRIVCOPYRIGHT, ASN_OCTET_STR, RONLY, var_mxDrivTable, 6, {1, 1, 2, 1, 1, 6}},
+#define   MXDRIVSUPPORTEDDEVICE  8
+	{(u_char) MXDRIVSUPPORTEDDEVICE, ASN_OCTET_STR, RONLY, var_mxDrivTable, 6, {1, 1, 2, 1, 1, 7}},
+#define   MXDRIVCONTACT         9
+	{(u_char) MXDRIVCONTACT, ASN_OCTET_STR, RONLY, var_mxDrivTable, 6, {1, 1, 2, 1, 1, 8}},
+#define   MXDRIVLICENSE         10
+	{(u_char) MXDRIVLICENSE, ASN_INTEGER, RONLY, var_mxDrivTable, 6, {1, 1, 2, 1, 1, 9}},
+#define   MXDRIVDATE            11
+	{(u_char) MXDRIVDATE, ASN_OCTET_STR, RONLY, var_mxDrivTable, 6, {1, 1, 2, 1, 1, 10}},
+#define   MXDRIVROWSTATUS       12
+	{(u_char) MXDRIVROWSTATUS, ASN_INTEGER, RWRITE, var_mxDrivTable, 6, {1, 1, 2, 1, 1, 11}},
+#define   MXCARDNEXTINDEX       13
+	{(u_char) MXCARDNEXTINDEX, ASN_UNSIGNED, RONLY, var_mxMIB, 4, {1, 1, 3, 1}},
+#define   MXCARDTYPE            14
+	{(u_char) MXCARDTYPE, ASN_OBJECT_ID, RONLY, var_mxCardTable, 6, {1, 1, 3, 2, 1, 2}},
+#define   MXCARDIDENTIFIER      15
+	{(u_char) MXCARDIDENTIFIER, ASN_INTEGER, RONLY, var_mxCardTable, 6, {1, 1, 3, 2, 1, 3}},
+#define   MXCARDREVISION        16
+	{(u_char) MXCARDREVISION, ASN_OCTET_STR, RONLY, var_mxCardTable, 6, {1, 1, 3, 2, 1, 4}},
+#define   MXCARDCHIPTYPE        17
+	{(u_char) MXCARDCHIPTYPE, ASN_OBJECT_ID, RONLY, var_mxCardTable, 6, {1, 1, 3, 2, 1, 5}},
+#define   MXCARDCHIPREVISION    18
+	{(u_char) MXCARDCHIPREVISION, ASN_OCTET_STR, RONLY, var_mxCardTable, 6, {1, 1, 3, 2, 1, 6}},
+#define   MXCARDPCIBUS          19
+	{(u_char) MXCARDPCIBUS, ASN_UNSIGNED, RONLY, var_mxCardTable, 6, {1, 1, 3, 2, 1, 7}},
+#define   MXCARDPCISLOT         20
+	{(u_char) MXCARDPCISLOT, ASN_UNSIGNED, RONLY, var_mxCardTable, 6, {1, 1, 3, 2, 1, 8}},
+#define   MXCARDPCIIRQ          21
+	{(u_char) MXCARDPCIIRQ, ASN_UNSIGNED, RONLY, var_mxCardTable, 6, {1, 1, 3, 2, 1, 9}},
+#define   MXCARDSPANTYPE        22
+	{(u_char) MXCARDSPANTYPE, ASN_INTEGER, RWRITE, var_mxCardTable, 6, {1, 1, 3, 2, 1, 10}},
+#define   MXCARDMODE            23
+	{(u_char) MXCARDMODE, ASN_OCTET_STR, RWRITE, var_mxCardTable, 6, {1, 1, 3, 2, 1, 11}},
+#define   MXCARDSYNCMASTER      24
+	{(u_char) MXCARDSYNCMASTER, ASN_INTEGER, RWRITE, var_mxCardTable, 6, {1, 1, 3, 2, 1, 12}},
+#define   MXCARDSYNCSOURCE      25
+	{(u_char) MXCARDSYNCSOURCE, ASN_INTEGER, RWRITE, var_mxCardTable, 6, {1, 1, 3, 2, 1, 13}},
+#define   MXCARDSYNCGROUP       26
+	{(u_char) MXCARDSYNCGROUP, ASN_UNSIGNED, RWRITE, var_mxCardTable, 6, {1, 1, 3, 2, 1, 14}},
+#define   MXCARDADMINISTRATIVESTATE  27
+	{(u_char) MXCARDADMINISTRATIVESTATE, ASN_INTEGER, RWRITE, var_mxCardTable, 6, {1, 1, 3, 2, 1, 15}},
+#define   MXCARDOPERATIONALSTATE  28
+	{(u_char) MXCARDOPERATIONALSTATE, ASN_INTEGER, RONLY, var_mxCardTable, 6, {1, 1, 3, 2, 1, 16}},
+#define   MXCARDUSAGESTATE      29
+	{(u_char) MXCARDUSAGESTATE, ASN_INTEGER, RONLY, var_mxCardTable, 6, {1, 1, 3, 2, 1, 17}},
+#define   MXCARDALARMSTATUS     30
+	{(u_char) MXCARDALARMSTATUS, ASN_OCTET_STR, RWRITE, var_mxCardTable, 6, {1, 1, 3, 2, 1, 18}},
+#define   MXCARDPROCEDURALSTATUS  31
+	{(u_char) MXCARDPROCEDURALSTATUS, ASN_OCTET_STR, RONLY, var_mxCardTable, 6, {1, 1, 3, 2, 1, 19}},
+#define   MXCARDAVAILABILITYSTATUS  32
+	{(u_char) MXCARDAVAILABILITYSTATUS, ASN_OCTET_STR, RONLY, var_mxCardTable, 6, {1, 1, 3, 2, 1, 20}},
+#define   MXCARDCONTROLSTATUS   33
+	{(u_char) MXCARDCONTROLSTATUS, ASN_OCTET_STR, RWRITE, var_mxCardTable, 6, {1, 1, 3, 2, 1, 21}},
+#define   MXCARDUNKNOWNSTATUS   34
+	{(u_char) MXCARDUNKNOWNSTATUS, ASN_INTEGER, RONLY, var_mxCardTable, 6, {1, 1, 3, 2, 1, 22}},
+#define   MXCARDSTANDBYSTATUS   35
+	{(u_char) MXCARDSTANDBYSTATUS, ASN_INTEGER, RONLY, var_mxCardTable, 6, {1, 1, 3, 2, 1, 23}},
+#define   MXCARDSYNCSPANID      36
+	{(u_char) MXCARDSYNCSPANID, ASN_OCTET_STR, RONLY, var_mxCardTable, 6, {1, 1, 3, 2, 1, 24}},
+#define   MXCARDSYNCTRANSITIONS  37
+	{(u_char) MXCARDSYNCTRANSITIONS, ASN_COUNTER, RONLY, var_mxCardTable, 6, {1, 1, 3, 2, 1, 25}},
+#define   MXCARDNAME            38
+	{(u_char) MXCARDNAME, ASN_OCTET_STR, RONLY, var_mxCardTable, 6, {1, 1, 3, 2, 1, 26}},
+#define   MXCARDSTATUS          39
+	{(u_char) MXCARDSTATUS, ASN_INTEGER, RWRITE, var_mxCardTable, 6, {1, 1, 3, 2, 1, 27}},
+#define   MXSPANNAME            40
+	{(u_char) MXSPANNAME, ASN_OCTET_STR, RWRITE, var_mxSpanTable, 6, {1, 1, 4, 1, 1, 2}},
+#define   MXSPANDEVICE          41
+	{(u_char) MXSPANDEVICE, ASN_OBJECT_ID, RWRITE, var_mxSpanTable, 6, {1, 1, 4, 1, 1, 3}},
+#define   MXSPANEQUIPMENTID     42
+	{(u_char) MXSPANEQUIPMENTID, ASN_OCTET_STR, RWRITE, var_mxSpanTable, 6, {1, 1, 4, 1, 1, 4}},
+#define   MXSPANTYPE            43
+	{(u_char) MXSPANTYPE, ASN_INTEGER, RWRITE, var_mxSpanTable, 6, {1, 1, 4, 1, 1, 5}},
+#define   MXSPANNUMBER          44
+	{(u_char) MXSPANNUMBER, ASN_UNSIGNED, RWRITE, var_mxSpanTable, 6, {1, 1, 4, 1, 1, 6}},
+#define   MXSPANRATE            45
+	{(u_char) MXSPANRATE, ASN_INTEGER, RONLY, var_mxSpanTable, 6, {1, 1, 4, 1, 1, 7}},
+#define   MXSPANMODE            46
+	{(u_char) MXSPANMODE, ASN_OCTET_STR, RWRITE, var_mxSpanTable, 6, {1, 1, 4, 1, 1, 8}},
+#define   MXSPANCRC             47
+	{(u_char) MXSPANCRC, ASN_INTEGER, RWRITE, var_mxSpanTable, 6, {1, 1, 4, 1, 1, 9}},
+#define   MXSPANCLOCKING        48
+	{(u_char) MXSPANCLOCKING, ASN_INTEGER, RWRITE, var_mxSpanTable, 6, {1, 1, 4, 1, 1, 10}},
+#define   MXSPANPRIORITY        49
+	{(u_char) MXSPANPRIORITY, ASN_UNSIGNED, RWRITE, var_mxSpanTable, 6, {1, 1, 4, 1, 1, 11}},
+#define   MXSPANCODING          50
+	{(u_char) MXSPANCODING, ASN_INTEGER, RWRITE, var_mxSpanTable, 6, {1, 1, 4, 1, 1, 12}},
+#define   MXSPANFRAMING         51
+	{(u_char) MXSPANFRAMING, ASN_INTEGER, RWRITE, var_mxSpanTable, 6, {1, 1, 4, 1, 1, 13}},
+#define   MXSPANLINEIMPEDANCE   52
+	{(u_char) MXSPANLINEIMPEDANCE, ASN_INTEGER, RWRITE, var_mxSpanTable, 6, {1, 1, 4, 1, 1, 14}},
+#define   MXSPANLINEMODE        53
+	{(u_char) MXSPANLINEMODE, ASN_INTEGER, RWRITE, var_mxSpanTable, 6, {1, 1, 4, 1, 1, 15}},
+#define   MXSPANLINELENGTH      54
+	{(u_char) MXSPANLINELENGTH, ASN_INTEGER, RWRITE, var_mxSpanTable, 6, {1, 1, 4, 1, 1, 16}},
+#define   MXSPANLINEATTENUATION  55
+	{(u_char) MXSPANLINEATTENUATION, ASN_INTEGER, RWRITE, var_mxSpanTable, 6, {1, 1, 4, 1, 1, 17}},
+#define   MXSPANLINEGAIN        56
+	{(u_char) MXSPANLINEGAIN, ASN_INTEGER, RWRITE, var_mxSpanTable, 6, {1, 1, 4, 1, 1, 18}},
+#define   MXSPANLINEDELAY       57
+	{(u_char) MXSPANLINEDELAY, ASN_UNSIGNED, RWRITE, var_mxSpanTable, 6, {1, 1, 4, 1, 1, 19}},
+#define   MXSPANTXLEVEL         58
+	{(u_char) MXSPANTXLEVEL, ASN_INTEGER, RWRITE, var_mxSpanTable, 6, {1, 1, 4, 1, 1, 20}},
+#define   MXSPANRXLEVEL         59
+	{(u_char) MXSPANRXLEVEL, ASN_INTEGER, RWRITE, var_mxSpanTable, 6, {1, 1, 4, 1, 1, 21}},
+#define   MXSPANALARMSETTLETIME  60
+	{(u_char) MXSPANALARMSETTLETIME, ASN_INTEGER, RWRITE, var_mxSpanTable, 6, {1, 1, 4, 1, 1, 22}},
+#define   MXSPANLINECODETIME    61
+	{(u_char) MXSPANLINECODETIME, ASN_INTEGER, RWRITE, var_mxSpanTable, 6, {1, 1, 4, 1, 1, 23}},
+#define   MXSPANPRIMARY         62
+	{(u_char) MXSPANPRIMARY, ASN_UNSIGNED, RWRITE, var_mxSpanTable, 6, {1, 1, 4, 1, 1, 24}},
+#define   MXSPANDATALINK        63
+	{(u_char) MXSPANDATALINK, ASN_OCTET_STR, RWRITE, var_mxSpanTable, 6, {1, 1, 4, 1, 1, 25}},
+#define   MXSPANLINECODE        64
+	{(u_char) MXSPANLINECODE, ASN_INTEGER, RWRITE, var_mxSpanTable, 6, {1, 1, 4, 1, 1, 26}},
+#define   MXSPANALARMSEVERITYMAPPROFILE  65
+	{(u_char) MXSPANALARMSEVERITYMAPPROFILE, ASN_OBJECT_ID, RWRITE, var_mxSpanTable, 6, {1, 1, 4, 1, 1, 27}},
+#define   MXSPANADMINISTRATIVESTATE  66
+	{(u_char) MXSPANADMINISTRATIVESTATE, ASN_INTEGER, RWRITE, var_mxSpanTable, 6, {1, 1, 4, 1, 1, 28}},
+#define   MXSPANOPERATIONALSTATE  67
+	{(u_char) MXSPANOPERATIONALSTATE, ASN_INTEGER, RONLY, var_mxSpanTable, 6, {1, 1, 4, 1, 1, 29}},
+#define   MXSPANUSAGESTATE      68
+	{(u_char) MXSPANUSAGESTATE, ASN_INTEGER, RONLY, var_mxSpanTable, 6, {1, 1, 4, 1, 1, 30}},
+#define   MXSPANALARMSTATUS     69
+	{(u_char) MXSPANALARMSTATUS, ASN_OCTET_STR, RWRITE, var_mxSpanTable, 6, {1, 1, 4, 1, 1, 31}},
+#define   MXSPANPROCEDURALSTATUS  70
+	{(u_char) MXSPANPROCEDURALSTATUS, ASN_OCTET_STR, RONLY, var_mxSpanTable, 6, {1, 1, 4, 1, 1, 32}},
+#define   MXSPANAVAILABILITYSTATUS  71
+	{(u_char) MXSPANAVAILABILITYSTATUS, ASN_OCTET_STR, RONLY, var_mxSpanTable, 6, {1, 1, 4, 1, 1, 33}},
+#define   MXSPANCONTROLSTATUS   72
+	{(u_char) MXSPANCONTROLSTATUS, ASN_OCTET_STR, RWRITE, var_mxSpanTable, 6, {1, 1, 4, 1, 1, 34}},
+#define   MXSPANSTANDBYSTATUS   73
+	{(u_char) MXSPANSTANDBYSTATUS, ASN_INTEGER, RONLY, var_mxSpanTable, 6, {1, 1, 4, 1, 1, 35}},
+#define   MXSPANUNKNOWNSTATUS   74
+	{(u_char) MXSPANUNKNOWNSTATUS, ASN_INTEGER, RONLY, var_mxSpanTable, 6, {1, 1, 4, 1, 1, 36}},
+#define   MXSPANSAP             75
+	{(u_char) MXSPANSAP, ASN_OBJECT_ID, RONLY, var_mxSpanTable, 6, {1, 1, 4, 1, 1, 37}},
+#define   MXSPANLOOPBACKSTATUS  76
+	{(u_char) MXSPANLOOPBACKSTATUS, ASN_OCTET_STR, RONLY, var_mxSpanTable, 6, {1, 1, 4, 1, 1, 38}},
+#define   MXSPANLINESTATUS      77
+	{(u_char) MXSPANLINESTATUS, ASN_OCTET_STR, RONLY, var_mxSpanTable, 6, {1, 1, 4, 1, 1, 39}},
+#define   MXSPANALARMS          78
+	{(u_char) MXSPANALARMS, ASN_OCTET_STR, RONLY, var_mxSpanTable, 6, {1, 1, 4, 1, 1, 40}},
+#define   MXSPANEVENTS          79
+	{(u_char) MXSPANEVENTS, ASN_OCTET_STR, RONLY, var_mxSpanTable, 6, {1, 1, 4, 1, 1, 41}},
+#define   MXSPANRECEIVELEVEL    80
+	{(u_char) MXSPANRECEIVELEVEL, ASN_UNSIGNED, RONLY, var_mxSpanTable, 6, {1, 1, 4, 1, 1, 42}},
+#define   MXSPANRECEIVETHRESHOLD  81
+	{(u_char) MXSPANRECEIVETHRESHOLD, ASN_UNSIGNED, RWRITE, var_mxSpanTable, 6, {1, 1, 4, 1, 1, 43}},
+#define   MXSPANROWSTATUS       82
+	{(u_char) MXSPANROWSTATUS, ASN_INTEGER, RWRITE, var_mxSpanTable, 6, {1, 1, 4, 1, 1, 44}},
+#define   MXBERTMODE            83
+	{(u_char) MXBERTMODE, ASN_INTEGER, RWRITE, var_mxBertTable, 6, {1, 1, 5, 1, 1, 1}},
+#define   MXBERTSELECT          84
+	{(u_char) MXBERTSELECT, ASN_INTEGER, RWRITE, var_mxBertTable, 6, {1, 1, 5, 1, 1, 2}},
+#define   MXBERTPATTERN         85
+	{(u_char) MXBERTPATTERN, ASN_OCTET_STR, RWRITE, var_mxBertTable, 6, {1, 1, 5, 1, 1, 3}},
+#define   MXBERTOPERATIONALSTATE  86
+	{(u_char) MXBERTOPERATIONALSTATE, ASN_INTEGER, RONLY, var_mxBertTable, 6, {1, 1, 5, 1, 1, 4}},
+#define   MXBERTPROCEDURALSTATUS  87
+	{(u_char) MXBERTPROCEDURALSTATUS, ASN_OCTET_STR, RONLY, var_mxBertTable, 6, {1, 1, 5, 1, 1, 5}},
+#define   MXBERTBITCOUNT        88
+	{(u_char) MXBERTBITCOUNT, ASN_COUNTER, RONLY, var_mxBertTable, 6, {1, 1, 5, 1, 1, 6}},
+#define   MXBERTERRORCOUNT      89
+	{(u_char) MXBERTERRORCOUNT, ASN_COUNTER, RONLY, var_mxBertTable, 6, {1, 1, 5, 1, 1, 7}},
+#define   MXCHANTYPE            90
+	{(u_char) MXCHANTYPE, ASN_INTEGER, RWRITE, var_mxChanTable, 6, {1, 1, 6, 1, 1, 2}},
+#define   MXCHANFORMAT          91
+	{(u_char) MXCHANFORMAT, ASN_INTEGER, RWRITE, var_mxChanTable, 6, {1, 1, 6, 1, 1, 3}},
+#define   MXCHANRATE            92
+	{(u_char) MXCHANRATE, ASN_INTEGER, RWRITE, var_mxChanTable, 6, {1, 1, 6, 1, 1, 4}},
+#define   MXCHANMODE            93
+	{(u_char) MXCHANMODE, ASN_OCTET_STR, RWRITE, var_mxChanTable, 6, {1, 1, 6, 1, 1, 5}},
+#define   MXCHANSAP             94
+	{(u_char) MXCHANSAP, ASN_OBJECT_ID, RONLY, var_mxChanTable, 6, {1, 1, 6, 1, 1, 6}},
+#define   MXCHANADMINISTRATIVESTATE  95
+	{(u_char) MXCHANADMINISTRATIVESTATE, ASN_INTEGER, RWRITE, var_mxChanTable, 6, {1, 1, 6, 1, 1, 7}},
+#define   MXCHANOPERATIONALSTATE  96
+	{(u_char) MXCHANOPERATIONALSTATE, ASN_INTEGER, RONLY, var_mxChanTable, 6, {1, 1, 6, 1, 1, 8}},
+#define   MXCHANUSAGESTATE      97
+	{(u_char) MXCHANUSAGESTATE, ASN_INTEGER, RONLY, var_mxChanTable, 6, {1, 1, 6, 1, 1, 9}},
+#define   MXCHANAVAILABILITYSTATUS  98
+	{(u_char) MXCHANAVAILABILITYSTATUS, ASN_OCTET_STR, RONLY, var_mxChanTable, 6, {1, 1, 6, 1, 1, 10}},
+#define   MXCHANCONTROLSTATUS   99
+	{(u_char) MXCHANCONTROLSTATUS, ASN_OCTET_STR, RWRITE, var_mxChanTable, 6, {1, 1, 6, 1, 1, 11}},
+#define   MXCHANPROCEDURALSTATUS  100
+	{(u_char) MXCHANPROCEDURALSTATUS, ASN_OCTET_STR, RONLY, var_mxChanTable, 6, {1, 1, 6, 1, 1, 12}},
+#define   MXCHANALARMSTATUS     101
+	{(u_char) MXCHANALARMSTATUS, ASN_OCTET_STR, RWRITE, var_mxChanTable, 6, {1, 1, 6, 1, 1, 13}},
+#define   MXCHANSTANDBYSTATUS   102
+	{(u_char) MXCHANSTANDBYSTATUS, ASN_INTEGER, RONLY, var_mxChanTable, 6, {1, 1, 6, 1, 1, 14}},
+#define   MXXCONCARDINDEX       103
+	{(u_char) MXXCONCARDINDEX, ASN_UNSIGNED, RWRITE, var_mxXconTable, 6, {1, 1, 7, 1, 1, 1}},
+#define   MXXCONSPANINDEX       104
+	{(u_char) MXXCONSPANINDEX, ASN_UNSIGNED, RWRITE, var_mxXconTable, 6, {1, 1, 7, 1, 1, 2}},
+#define   MXXCONCHANINDEX       105
+	{(u_char) MXXCONCHANINDEX, ASN_UNSIGNED, RWRITE, var_mxXconTable, 6, {1, 1, 7, 1, 1, 3}},
+#define   MXXCONTYPE            106
+	{(u_char) MXXCONTYPE, ASN_INTEGER, RWRITE, var_mxXconTable, 6, {1, 1, 7, 1, 1, 4}},
+#define   MXXCONSTORAGETYPE     107
+	{(u_char) MXXCONSTORAGETYPE, ASN_INTEGER, RWRITE, var_mxXconTable, 6, {1, 1, 7, 1, 1, 5}},
+#define   MXXCONROWSTATUS       108
+	{(u_char) MXXCONROWSTATUS, ASN_INTEGER, RWRITE, var_mxXconTable, 6, {1, 1, 7, 1, 1, 6}},
+#define   MXDISCONTINUITYTIME   109
+	{(u_char) MXDISCONTINUITYTIME, ASN_TIMETICKS, RONLY, var_mxMIB, 3, {1, 2, 1}},
 #define   MXNEARENDCURRENTTIMEELAPSED  110
-	{(u_char) MXNEARENDCURRENTTIMEELAPSED, ASN_INTEGER, RONLY, var_mxNearEndCurrentTable, 7, {1, 3, 1, 1, 1, 1, 1}},
+	{(u_char) MXNEARENDCURRENTTIMEELAPSED, ASN_INTEGER, RONLY, var_mxNearEndCurrentTable, 7, {1, 5, 1, 1, 1, 1, 1}},
 #define   MXNEARENDCURRENTESS   111
-	{(u_char) MXNEARENDCURRENTESS, ASN_GAUGE, RONLY, var_mxNearEndCurrentTable, 7, {1, 3, 1, 1, 1, 1, 2}},
+	{(u_char) MXNEARENDCURRENTESS, ASN_GAUGE, RONLY, var_mxNearEndCurrentTable, 7, {1, 5, 1, 1, 1, 1, 2}},
 #define   MXNEARENDCURRENTSESS  112
-	{(u_char) MXNEARENDCURRENTSESS, ASN_GAUGE, RONLY, var_mxNearEndCurrentTable, 7, {1, 3, 1, 1, 1, 1, 3}},
+	{(u_char) MXNEARENDCURRENTSESS, ASN_GAUGE, RONLY, var_mxNearEndCurrentTable, 7, {1, 5, 1, 1, 1, 1, 3}},
 #define   MXNEARENDCURRENTSEFSS  113
-	{(u_char) MXNEARENDCURRENTSEFSS, ASN_GAUGE, RONLY, var_mxNearEndCurrentTable, 7, {1, 3, 1, 1, 1, 1, 4}},
+	{(u_char) MXNEARENDCURRENTSEFSS, ASN_GAUGE, RONLY, var_mxNearEndCurrentTable, 7, {1, 5, 1, 1, 1, 1, 4}},
 #define   MXNEARENDCURRENTUASS  114
-	{(u_char) MXNEARENDCURRENTUASS, ASN_GAUGE, RONLY, var_mxNearEndCurrentTable, 7, {1, 3, 1, 1, 1, 1, 5}},
+	{(u_char) MXNEARENDCURRENTUASS, ASN_GAUGE, RONLY, var_mxNearEndCurrentTable, 7, {1, 5, 1, 1, 1, 1, 5}},
 #define   MXNEARENDCURRENTCSSS  115
-	{(u_char) MXNEARENDCURRENTCSSS, ASN_GAUGE, RONLY, var_mxNearEndCurrentTable, 7, {1, 3, 1, 1, 1, 1, 6}},
+	{(u_char) MXNEARENDCURRENTCSSS, ASN_GAUGE, RONLY, var_mxNearEndCurrentTable, 7, {1, 5, 1, 1, 1, 1, 6}},
 #define   MXNEARENDCURRENTPCVS  116
-	{(u_char) MXNEARENDCURRENTPCVS, ASN_GAUGE, RONLY, var_mxNearEndCurrentTable, 7, {1, 3, 1, 1, 1, 1, 7}},
+	{(u_char) MXNEARENDCURRENTPCVS, ASN_GAUGE, RONLY, var_mxNearEndCurrentTable, 7, {1, 5, 1, 1, 1, 1, 7}},
 #define   MXNEARENDCURRENTLESS  117
-	{(u_char) MXNEARENDCURRENTLESS, ASN_GAUGE, RONLY, var_mxNearEndCurrentTable, 7, {1, 3, 1, 1, 1, 1, 8}},
+	{(u_char) MXNEARENDCURRENTLESS, ASN_GAUGE, RONLY, var_mxNearEndCurrentTable, 7, {1, 5, 1, 1, 1, 1, 8}},
 #define   MXNEARENDCURRENTBESS  118
-	{(u_char) MXNEARENDCURRENTBESS, ASN_GAUGE, RONLY, var_mxNearEndCurrentTable, 7, {1, 3, 1, 1, 1, 1, 9}},
+	{(u_char) MXNEARENDCURRENTBESS, ASN_GAUGE, RONLY, var_mxNearEndCurrentTable, 7, {1, 5, 1, 1, 1, 1, 9}},
 #define   MXNEARENDCURRENTDMS   119
-	{(u_char) MXNEARENDCURRENTDMS, ASN_GAUGE, RONLY, var_mxNearEndCurrentTable, 7, {1, 3, 1, 1, 1, 1, 10}},
+	{(u_char) MXNEARENDCURRENTDMS, ASN_GAUGE, RONLY, var_mxNearEndCurrentTable, 7, {1, 5, 1, 1, 1, 1, 10}},
 #define   MXNEARENDCURRENTLCVS  120
-	{(u_char) MXNEARENDCURRENTLCVS, ASN_GAUGE, RONLY, var_mxNearEndCurrentTable, 7, {1, 3, 1, 1, 1, 1, 11}},
+	{(u_char) MXNEARENDCURRENTLCVS, ASN_GAUGE, RONLY, var_mxNearEndCurrentTable, 7, {1, 5, 1, 1, 1, 1, 11}},
 #define   MXNEARENDINTERVALESS  121
-	{(u_char) MXNEARENDINTERVALESS, ASN_GAUGE, RONLY, var_mxNearEndIntervalTable, 7, {1, 3, 1, 2, 1, 1, 2}},
+	{(u_char) MXNEARENDINTERVALESS, ASN_GAUGE, RONLY, var_mxNearEndIntervalTable, 7, {1, 5, 1, 2, 1, 1, 2}},
 #define   MXNEARENDINTERVALSESS  122
-	{(u_char) MXNEARENDINTERVALSESS, ASN_GAUGE, RONLY, var_mxNearEndIntervalTable, 7, {1, 3, 1, 2, 1, 1, 3}},
+	{(u_char) MXNEARENDINTERVALSESS, ASN_GAUGE, RONLY, var_mxNearEndIntervalTable, 7, {1, 5, 1, 2, 1, 1, 3}},
 #define   MXNEARENDINTERVALSEFSS  123
-	{(u_char) MXNEARENDINTERVALSEFSS, ASN_GAUGE, RONLY, var_mxNearEndIntervalTable, 7, {1, 3, 1, 2, 1, 1, 4}},
+	{(u_char) MXNEARENDINTERVALSEFSS, ASN_GAUGE, RONLY, var_mxNearEndIntervalTable, 7, {1, 5, 1, 2, 1, 1, 4}},
 #define   MXNEARENDINTERVALUASS  124
-	{(u_char) MXNEARENDINTERVALUASS, ASN_GAUGE, RONLY, var_mxNearEndIntervalTable, 7, {1, 3, 1, 2, 1, 1, 5}},
+	{(u_char) MXNEARENDINTERVALUASS, ASN_GAUGE, RONLY, var_mxNearEndIntervalTable, 7, {1, 5, 1, 2, 1, 1, 5}},
 #define   MXNEARENDINTERVALCSSS  125
-	{(u_char) MXNEARENDINTERVALCSSS, ASN_GAUGE, RONLY, var_mxNearEndIntervalTable, 7, {1, 3, 1, 2, 1, 1, 6}},
+	{(u_char) MXNEARENDINTERVALCSSS, ASN_GAUGE, RONLY, var_mxNearEndIntervalTable, 7, {1, 5, 1, 2, 1, 1, 6}},
 #define   MXNEARENDINTERVALPCVS  126
-	{(u_char) MXNEARENDINTERVALPCVS, ASN_GAUGE, RONLY, var_mxNearEndIntervalTable, 7, {1, 3, 1, 2, 1, 1, 7}},
+	{(u_char) MXNEARENDINTERVALPCVS, ASN_GAUGE, RONLY, var_mxNearEndIntervalTable, 7, {1, 5, 1, 2, 1, 1, 7}},
 #define   MXNEARENDINTERVALLESS  127
-	{(u_char) MXNEARENDINTERVALLESS, ASN_GAUGE, RONLY, var_mxNearEndIntervalTable, 7, {1, 3, 1, 2, 1, 1, 8}},
+	{(u_char) MXNEARENDINTERVALLESS, ASN_GAUGE, RONLY, var_mxNearEndIntervalTable, 7, {1, 5, 1, 2, 1, 1, 8}},
 #define   MXNEARENDINTERVALBESS  128
-	{(u_char) MXNEARENDINTERVALBESS, ASN_GAUGE, RONLY, var_mxNearEndIntervalTable, 7, {1, 3, 1, 2, 1, 1, 9}},
+	{(u_char) MXNEARENDINTERVALBESS, ASN_GAUGE, RONLY, var_mxNearEndIntervalTable, 7, {1, 5, 1, 2, 1, 1, 9}},
 #define   MXNEARENDINTERVALDMS  129
-	{(u_char) MXNEARENDINTERVALDMS, ASN_GAUGE, RONLY, var_mxNearEndIntervalTable, 7, {1, 3, 1, 2, 1, 1, 10}},
+	{(u_char) MXNEARENDINTERVALDMS, ASN_GAUGE, RONLY, var_mxNearEndIntervalTable, 7, {1, 5, 1, 2, 1, 1, 10}},
 #define   MXNEARENDINTERVALLCVS  130
-	{(u_char) MXNEARENDINTERVALLCVS, ASN_GAUGE, RONLY, var_mxNearEndIntervalTable, 7, {1, 3, 1, 2, 1, 1, 11}},
+	{(u_char) MXNEARENDINTERVALLCVS, ASN_GAUGE, RONLY, var_mxNearEndIntervalTable, 7, {1, 5, 1, 2, 1, 1, 11}},
 #define   MXNEARENDINTERVALVALIDDATA  131
-	{(u_char) MXNEARENDINTERVALVALIDDATA, ASN_INTEGER, RONLY, var_mxNearEndIntervalTable, 7, {1, 3, 1, 2, 1, 1, 12}},
+	{(u_char) MXNEARENDINTERVALVALIDDATA, ASN_INTEGER, RONLY, var_mxNearEndIntervalTable, 7, {1, 5, 1, 2, 1, 1, 12}},
 #define   MXNEARENDTOTALVALIDINTERVALS  132
-	{(u_char) MXNEARENDTOTALVALIDINTERVALS, ASN_INTEGER, RONLY, var_mxNearEndTotalTable, 7, {1, 3, 1, 3, 1, 1, 1}},
+	{(u_char) MXNEARENDTOTALVALIDINTERVALS, ASN_INTEGER, RONLY, var_mxNearEndTotalTable, 7, {1, 5, 1, 3, 1, 1, 1}},
 #define   MXNEARENDTOTALINVALIDINTERVALS  133
-	{(u_char) MXNEARENDTOTALINVALIDINTERVALS, ASN_INTEGER, RONLY, var_mxNearEndTotalTable, 7, {1, 3, 1, 3, 1, 1, 2}},
+	{(u_char) MXNEARENDTOTALINVALIDINTERVALS, ASN_INTEGER, RONLY, var_mxNearEndTotalTable, 7, {1, 5, 1, 3, 1, 1, 2}},
 #define   MXNEARENDTOTALESS     134
-	{(u_char) MXNEARENDTOTALESS, ASN_GAUGE, RONLY, var_mxNearEndTotalTable, 7, {1, 3, 1, 3, 1, 1, 3}},
+	{(u_char) MXNEARENDTOTALESS, ASN_GAUGE, RONLY, var_mxNearEndTotalTable, 7, {1, 5, 1, 3, 1, 1, 3}},
 #define   MXNEARENDTOTALSESS    135
-	{(u_char) MXNEARENDTOTALSESS, ASN_GAUGE, RONLY, var_mxNearEndTotalTable, 7, {1, 3, 1, 3, 1, 1, 4}},
+	{(u_char) MXNEARENDTOTALSESS, ASN_GAUGE, RONLY, var_mxNearEndTotalTable, 7, {1, 5, 1, 3, 1, 1, 4}},
 #define   MXNEARENDTOTALSEFSS   136
-	{(u_char) MXNEARENDTOTALSEFSS, ASN_GAUGE, RONLY, var_mxNearEndTotalTable, 7, {1, 3, 1, 3, 1, 1, 5}},
+	{(u_char) MXNEARENDTOTALSEFSS, ASN_GAUGE, RONLY, var_mxNearEndTotalTable, 7, {1, 5, 1, 3, 1, 1, 5}},
 #define   MXNEARENDTOTALUASS    137
-	{(u_char) MXNEARENDTOTALUASS, ASN_GAUGE, RONLY, var_mxNearEndTotalTable, 7, {1, 3, 1, 3, 1, 1, 6}},
+	{(u_char) MXNEARENDTOTALUASS, ASN_GAUGE, RONLY, var_mxNearEndTotalTable, 7, {1, 5, 1, 3, 1, 1, 6}},
 #define   MXNEARENDTOTALCSSS    138
-	{(u_char) MXNEARENDTOTALCSSS, ASN_GAUGE, RONLY, var_mxNearEndTotalTable, 7, {1, 3, 1, 3, 1, 1, 7}},
+	{(u_char) MXNEARENDTOTALCSSS, ASN_GAUGE, RONLY, var_mxNearEndTotalTable, 7, {1, 5, 1, 3, 1, 1, 7}},
 #define   MXNEARENDTOTALPCVS    139
-	{(u_char) MXNEARENDTOTALPCVS, ASN_GAUGE, RONLY, var_mxNearEndTotalTable, 7, {1, 3, 1, 3, 1, 1, 8}},
+	{(u_char) MXNEARENDTOTALPCVS, ASN_GAUGE, RONLY, var_mxNearEndTotalTable, 7, {1, 5, 1, 3, 1, 1, 8}},
 #define   MXNEARENDTOTALLESS    140
-	{(u_char) MXNEARENDTOTALLESS, ASN_GAUGE, RONLY, var_mxNearEndTotalTable, 7, {1, 3, 1, 3, 1, 1, 9}},
+	{(u_char) MXNEARENDTOTALLESS, ASN_GAUGE, RONLY, var_mxNearEndTotalTable, 7, {1, 5, 1, 3, 1, 1, 9}},
 #define   MXNEARENDTOTALBESS    141
-	{(u_char) MXNEARENDTOTALBESS, ASN_GAUGE, RONLY, var_mxNearEndTotalTable, 7, {1, 3, 1, 3, 1, 1, 10}},
+	{(u_char) MXNEARENDTOTALBESS, ASN_GAUGE, RONLY, var_mxNearEndTotalTable, 7, {1, 5, 1, 3, 1, 1, 10}},
 #define   MXNEARENDTOTALDMS     142
-	{(u_char) MXNEARENDTOTALDMS, ASN_GAUGE, RONLY, var_mxNearEndTotalTable, 7, {1, 3, 1, 3, 1, 1, 11}},
+	{(u_char) MXNEARENDTOTALDMS, ASN_GAUGE, RONLY, var_mxNearEndTotalTable, 7, {1, 5, 1, 3, 1, 1, 11}},
 #define   MXNEARENDTOTALLCVS    143
-	{(u_char) MXNEARENDTOTALLCVS, ASN_GAUGE, RONLY, var_mxNearEndTotalTable, 7, {1, 3, 1, 3, 1, 1, 12}},
+	{(u_char) MXNEARENDTOTALLCVS, ASN_GAUGE, RONLY, var_mxNearEndTotalTable, 7, {1, 5, 1, 3, 1, 1, 12}},
 #define   MXFARENDCURRENTTIMEELAPSED  144
-	{(u_char) MXFARENDCURRENTTIMEELAPSED, ASN_INTEGER, RONLY, var_mxFarEndCurrentTable, 7, {1, 3, 2, 1, 1, 1, 1}},
+	{(u_char) MXFARENDCURRENTTIMEELAPSED, ASN_INTEGER, RONLY, var_mxFarEndCurrentTable, 7, {1, 5, 2, 1, 1, 1, 1}},
 #define   MXFARENDCURRENTESS    145
-	{(u_char) MXFARENDCURRENTESS, ASN_GAUGE, RONLY, var_mxFarEndCurrentTable, 7, {1, 3, 2, 1, 1, 1, 2}},
+	{(u_char) MXFARENDCURRENTESS, ASN_GAUGE, RONLY, var_mxFarEndCurrentTable, 7, {1, 5, 2, 1, 1, 1, 2}},
 #define   MXFARENDCURRENTSESS   146
-	{(u_char) MXFARENDCURRENTSESS, ASN_GAUGE, RONLY, var_mxFarEndCurrentTable, 7, {1, 3, 2, 1, 1, 1, 3}},
+	{(u_char) MXFARENDCURRENTSESS, ASN_GAUGE, RONLY, var_mxFarEndCurrentTable, 7, {1, 5, 2, 1, 1, 1, 3}},
 #define   MXFARENDCURRENTSEFSS  147
-	{(u_char) MXFARENDCURRENTSEFSS, ASN_GAUGE, RONLY, var_mxFarEndCurrentTable, 7, {1, 3, 2, 1, 1, 1, 4}},
+	{(u_char) MXFARENDCURRENTSEFSS, ASN_GAUGE, RONLY, var_mxFarEndCurrentTable, 7, {1, 5, 2, 1, 1, 1, 4}},
 #define   MXFARENDCURRENTUASS   148
-	{(u_char) MXFARENDCURRENTUASS, ASN_GAUGE, RONLY, var_mxFarEndCurrentTable, 7, {1, 3, 2, 1, 1, 1, 5}},
+	{(u_char) MXFARENDCURRENTUASS, ASN_GAUGE, RONLY, var_mxFarEndCurrentTable, 7, {1, 5, 2, 1, 1, 1, 5}},
 #define   MXFARENDCURRENTCSSS   149
-	{(u_char) MXFARENDCURRENTCSSS, ASN_GAUGE, RONLY, var_mxFarEndCurrentTable, 7, {1, 3, 2, 1, 1, 1, 6}},
+	{(u_char) MXFARENDCURRENTCSSS, ASN_GAUGE, RONLY, var_mxFarEndCurrentTable, 7, {1, 5, 2, 1, 1, 1, 6}},
 #define   MXFARENDCURRENTPCVS   150
-	{(u_char) MXFARENDCURRENTPCVS, ASN_GAUGE, RONLY, var_mxFarEndCurrentTable, 7, {1, 3, 2, 1, 1, 1, 7}},
+	{(u_char) MXFARENDCURRENTPCVS, ASN_GAUGE, RONLY, var_mxFarEndCurrentTable, 7, {1, 5, 2, 1, 1, 1, 7}},
 #define   MXFARENDCURRENTLESS   151
-	{(u_char) MXFARENDCURRENTLESS, ASN_GAUGE, RONLY, var_mxFarEndCurrentTable, 7, {1, 3, 2, 1, 1, 1, 8}},
+	{(u_char) MXFARENDCURRENTLESS, ASN_GAUGE, RONLY, var_mxFarEndCurrentTable, 7, {1, 5, 2, 1, 1, 1, 8}},
 #define   MXFARENDCURRENTBESS   152
-	{(u_char) MXFARENDCURRENTBESS, ASN_GAUGE, RONLY, var_mxFarEndCurrentTable, 7, {1, 3, 2, 1, 1, 1, 9}},
+	{(u_char) MXFARENDCURRENTBESS, ASN_GAUGE, RONLY, var_mxFarEndCurrentTable, 7, {1, 5, 2, 1, 1, 1, 9}},
 #define   MXFARENDCURRENTDMS    153
-	{(u_char) MXFARENDCURRENTDMS, ASN_GAUGE, RONLY, var_mxFarEndCurrentTable, 7, {1, 3, 2, 1, 1, 1, 10}},
+	{(u_char) MXFARENDCURRENTDMS, ASN_GAUGE, RONLY, var_mxFarEndCurrentTable, 7, {1, 5, 2, 1, 1, 1, 10}},
 #define   MXFARENDINTERVALESS   154
-	{(u_char) MXFARENDINTERVALESS, ASN_GAUGE, RONLY, var_mxFarEndIntervalTable, 7, {1, 3, 2, 2, 1, 1, 2}},
+	{(u_char) MXFARENDINTERVALESS, ASN_GAUGE, RONLY, var_mxFarEndIntervalTable, 7, {1, 5, 2, 2, 1, 1, 2}},
 #define   MXFARENDINTERVALSESS  155
-	{(u_char) MXFARENDINTERVALSESS, ASN_GAUGE, RONLY, var_mxFarEndIntervalTable, 7, {1, 3, 2, 2, 1, 1, 3}},
+	{(u_char) MXFARENDINTERVALSESS, ASN_GAUGE, RONLY, var_mxFarEndIntervalTable, 7, {1, 5, 2, 2, 1, 1, 3}},
 #define   MXFARENDINTERVALSEFSS  156
-	{(u_char) MXFARENDINTERVALSEFSS, ASN_GAUGE, RONLY, var_mxFarEndIntervalTable, 7, {1, 3, 2, 2, 1, 1, 4}},
+	{(u_char) MXFARENDINTERVALSEFSS, ASN_GAUGE, RONLY, var_mxFarEndIntervalTable, 7, {1, 5, 2, 2, 1, 1, 4}},
 #define   MXFARENDINTERVALUASS  157
-	{(u_char) MXFARENDINTERVALUASS, ASN_GAUGE, RONLY, var_mxFarEndIntervalTable, 7, {1, 3, 2, 2, 1, 1, 5}},
+	{(u_char) MXFARENDINTERVALUASS, ASN_GAUGE, RONLY, var_mxFarEndIntervalTable, 7, {1, 5, 2, 2, 1, 1, 5}},
 #define   MXFARENDINTERVALCSSS  158
-	{(u_char) MXFARENDINTERVALCSSS, ASN_GAUGE, RONLY, var_mxFarEndIntervalTable, 7, {1, 3, 2, 2, 1, 1, 6}},
+	{(u_char) MXFARENDINTERVALCSSS, ASN_GAUGE, RONLY, var_mxFarEndIntervalTable, 7, {1, 5, 2, 2, 1, 1, 6}},
 #define   MXFARENDINTERVALPCVS  159
-	{(u_char) MXFARENDINTERVALPCVS, ASN_GAUGE, RONLY, var_mxFarEndIntervalTable, 7, {1, 3, 2, 2, 1, 1, 7}},
+	{(u_char) MXFARENDINTERVALPCVS, ASN_GAUGE, RONLY, var_mxFarEndIntervalTable, 7, {1, 5, 2, 2, 1, 1, 7}},
 #define   MXFARENDINTERVALLESS  160
-	{(u_char) MXFARENDINTERVALLESS, ASN_GAUGE, RONLY, var_mxFarEndIntervalTable, 7, {1, 3, 2, 2, 1, 1, 8}},
+	{(u_char) MXFARENDINTERVALLESS, ASN_GAUGE, RONLY, var_mxFarEndIntervalTable, 7, {1, 5, 2, 2, 1, 1, 8}},
 #define   MXFARENDINTERVALBESS  161
-	{(u_char) MXFARENDINTERVALBESS, ASN_GAUGE, RONLY, var_mxFarEndIntervalTable, 7, {1, 3, 2, 2, 1, 1, 9}},
+	{(u_char) MXFARENDINTERVALBESS, ASN_GAUGE, RONLY, var_mxFarEndIntervalTable, 7, {1, 5, 2, 2, 1, 1, 9}},
 #define   MXFARENDINTERVALDMS   162
-	{(u_char) MXFARENDINTERVALDMS, ASN_GAUGE, RONLY, var_mxFarEndIntervalTable, 7, {1, 3, 2, 2, 1, 1, 10}},
+	{(u_char) MXFARENDINTERVALDMS, ASN_GAUGE, RONLY, var_mxFarEndIntervalTable, 7, {1, 5, 2, 2, 1, 1, 10}},
 #define   MXFARENDINTERVALVALIDDATA  163
-	{(u_char) MXFARENDINTERVALVALIDDATA, ASN_INTEGER, RONLY, var_mxFarEndIntervalTable, 7, {1, 3, 2, 2, 1, 1, 11}},
+	{(u_char) MXFARENDINTERVALVALIDDATA, ASN_INTEGER, RONLY, var_mxFarEndIntervalTable, 7, {1, 5, 2, 2, 1, 1, 11}},
 #define   MXFARENDTOTALVALIDINTERVALS  164
-	{(u_char) MXFARENDTOTALVALIDINTERVALS, ASN_INTEGER, RONLY, var_mxFarEndTotalTable, 7, {1, 3, 2, 3, 1, 1, 1}},
+	{(u_char) MXFARENDTOTALVALIDINTERVALS, ASN_INTEGER, RONLY, var_mxFarEndTotalTable, 7, {1, 5, 2, 3, 1, 1, 1}},
 #define   MXFARENDTOTALINVALIDINTERVALS  165
-	{(u_char) MXFARENDTOTALINVALIDINTERVALS, ASN_INTEGER, RONLY, var_mxFarEndTotalTable, 7, {1, 3, 2, 3, 1, 1, 2}},
+	{(u_char) MXFARENDTOTALINVALIDINTERVALS, ASN_INTEGER, RONLY, var_mxFarEndTotalTable, 7, {1, 5, 2, 3, 1, 1, 2}},
 #define   MXFARENDTOTALESS      166
-	{(u_char) MXFARENDTOTALESS, ASN_GAUGE, RONLY, var_mxFarEndTotalTable, 7, {1, 3, 2, 3, 1, 1, 3}},
+	{(u_char) MXFARENDTOTALESS, ASN_GAUGE, RONLY, var_mxFarEndTotalTable, 7, {1, 5, 2, 3, 1, 1, 3}},
 #define   MXFARENDTOTALSESS     167
-	{(u_char) MXFARENDTOTALSESS, ASN_GAUGE, RONLY, var_mxFarEndTotalTable, 7, {1, 3, 2, 3, 1, 1, 4}},
+	{(u_char) MXFARENDTOTALSESS, ASN_GAUGE, RONLY, var_mxFarEndTotalTable, 7, {1, 5, 2, 3, 1, 1, 4}},
 #define   MXFARENDTOTALSEFSS    168
-	{(u_char) MXFARENDTOTALSEFSS, ASN_GAUGE, RONLY, var_mxFarEndTotalTable, 7, {1, 3, 2, 3, 1, 1, 5}},
+	{(u_char) MXFARENDTOTALSEFSS, ASN_GAUGE, RONLY, var_mxFarEndTotalTable, 7, {1, 5, 2, 3, 1, 1, 5}},
 #define   MXFARENDTOTALUASS     169
-	{(u_char) MXFARENDTOTALUASS, ASN_GAUGE, RONLY, var_mxFarEndTotalTable, 7, {1, 3, 2, 3, 1, 1, 6}},
+	{(u_char) MXFARENDTOTALUASS, ASN_GAUGE, RONLY, var_mxFarEndTotalTable, 7, {1, 5, 2, 3, 1, 1, 6}},
 #define   MXFARENDTOTALCSSS     170
-	{(u_char) MXFARENDTOTALCSSS, ASN_GAUGE, RONLY, var_mxFarEndTotalTable, 7, {1, 3, 2, 3, 1, 1, 7}},
+	{(u_char) MXFARENDTOTALCSSS, ASN_GAUGE, RONLY, var_mxFarEndTotalTable, 7, {1, 5, 2, 3, 1, 1, 7}},
 #define   MXFARENDTOTALPCVS     171
-	{(u_char) MXFARENDTOTALPCVS, ASN_GAUGE, RONLY, var_mxFarEndTotalTable, 7, {1, 3, 2, 3, 1, 1, 8}},
+	{(u_char) MXFARENDTOTALPCVS, ASN_GAUGE, RONLY, var_mxFarEndTotalTable, 7, {1, 5, 2, 3, 1, 1, 8}},
 #define   MXFARENDTOTALLESS     172
-	{(u_char) MXFARENDTOTALLESS, ASN_GAUGE, RONLY, var_mxFarEndTotalTable, 7, {1, 3, 2, 3, 1, 1, 9}},
+	{(u_char) MXFARENDTOTALLESS, ASN_GAUGE, RONLY, var_mxFarEndTotalTable, 7, {1, 5, 2, 3, 1, 1, 9}},
 #define   MXFARENDTOTALBESS     173
-	{(u_char) MXFARENDTOTALBESS, ASN_GAUGE, RONLY, var_mxFarEndTotalTable, 7, {1, 3, 2, 3, 1, 1, 10}},
+	{(u_char) MXFARENDTOTALBESS, ASN_GAUGE, RONLY, var_mxFarEndTotalTable, 7, {1, 5, 2, 3, 1, 1, 10}},
 #define   MXFARENDTOTALDMS      174
-	{(u_char) MXFARENDTOTALDMS, ASN_GAUGE, RONLY, var_mxFarEndTotalTable, 7, {1, 3, 2, 3, 1, 1, 11}},
+	{(u_char) MXFARENDTOTALDMS, ASN_GAUGE, RONLY, var_mxFarEndTotalTable, 7, {1, 5, 2, 3, 1, 1, 11}},
 };
 
 /* (L = length of the oidsuffix) */
@@ -808,8 +816,8 @@ mxMIB_create(void)
 	DEBUGMSGTL(("mxMIB", "mxMIB_create: creating scalars...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default scalar values here into StorageNew */
-		StorageNew->mxDiscontinuityTime = 0;
 		StorageNew->mxCardNextIndex = 0;
+		StorageNew->mxDiscontinuityTime = 0;
 
 	}
 	DEBUGMSGTL(("mxMIB", "done.\n"));
@@ -882,8 +890,8 @@ parse_mxMIB(const char *token, char *line)
 		return;
 	}
 	/* XXX: remove individual scalars that are not persistent */
-	line = read_config_read_data(ASN_TIMETICKS, line, &StorageTmp->mxDiscontinuityTime, &tmpsize);
 	line = read_config_read_data(ASN_UNSIGNED, line, &StorageTmp->mxCardNextIndex, &tmpsize);
+	line = read_config_read_data(ASN_TIMETICKS, line, &StorageTmp->mxDiscontinuityTime, &tmpsize);
 	mxMIB_add(StorageTmp);
 	(void) tmpsize;
 	DEBUGMSGTL(("mxMIB", "done.\n"));
@@ -912,9 +920,10 @@ store_mxMIB(int majorID, int minorID, void *serverarg, void *clientarg)
 		memset(line, 0, sizeof(line));
 		strcat(line, "mxMIB ");
 		cptr = line + strlen(line);
+		(void) cptr;
 		/* XXX: remove individual scalars that are not persistent */
-		cptr = read_config_store_data(ASN_TIMETICKS, cptr, &StorageTmp->mxDiscontinuityTime, &tmpsize);
 		cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->mxCardNextIndex, &tmpsize);
+		cptr = read_config_store_data(ASN_TIMETICKS, cptr, &StorageTmp->mxDiscontinuityTime, &tmpsize);
 		snmpd_store_config(line);
 	}
 	DEBUGMSGTL(("mxMIB", "done.\n"));
@@ -988,17 +997,17 @@ var_mxMIB(struct variable *vp, oid * name, size_t *length, int exact, size_t *va
 	rval = NULL;
 	/* This is where we do the value assignments for the mib results. */
 	switch (vp->magic) {
-	case (u_char) MXDISCONTINUITYTIME:	/* ReadOnly */
-		if (!StorageTmp)
-			break;
-		*var_len = sizeof(StorageTmp->mxDiscontinuityTime);
-		rval = (u_char *) &StorageTmp->mxDiscontinuityTime;
-		break;
 	case (u_char) MXCARDNEXTINDEX:	/* ReadOnly */
 		if (!StorageTmp)
 			break;
 		*var_len = sizeof(StorageTmp->mxCardNextIndex);
 		rval = (u_char *) &StorageTmp->mxCardNextIndex;
+		break;
+	case (u_char) MXDISCONTINUITYTIME:	/* ReadOnly */
+		if (!StorageTmp)
+			break;
+		*var_len = sizeof(StorageTmp->mxDiscontinuityTime);
+		rval = (u_char *) &StorageTmp->mxDiscontinuityTime;
 		break;
 	default:
 		ERROR_MSG("");
@@ -1202,6 +1211,7 @@ store_mxSyncTable(int majorID, int minorID, void *serverarg, void *clientarg)
 			memset(line, 0, sizeof(line));
 			strcat(line, "mxSyncTable ");
 			cptr = line + strlen(line);
+			(void) cptr;
 			/* XXX: remove individual columns if not persistent */
 			cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->mxSyncGroup, &tmpsize);
 			cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->mxSyncIndex, &tmpsize);
@@ -1478,6 +1488,7 @@ store_mxDrivTable(int majorID, int minorID, void *serverarg, void *clientarg)
 			memset(line, 0, sizeof(line));
 			strcat(line, "mxDrivTable ");
 			cptr = line + strlen(line);
+			(void) cptr;
 			/* XXX: remove individual columns if not persistent */
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->mxDrivName, &StorageTmp->mxDrivNameLen);
 			cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->mxDrivIdnum, &tmpsize);
@@ -1826,6 +1837,7 @@ store_mxCardTable(int majorID, int minorID, void *serverarg, void *clientarg)
 			memset(line, 0, sizeof(line));
 			strcat(line, "mxCardTable ");
 			cptr = line + strlen(line);
+			(void) cptr;
 			/* XXX: remove individual columns if not persistent */
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->mxDrivName, &StorageTmp->mxDrivNameLen);
 			cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->mxCardIndex, &tmpsize);
@@ -1881,8 +1893,8 @@ mxSpanTable_create(void)
 		if ((StorageNew->mxDrivName = (uint8_t *) strdup("")) != NULL)
 			StorageNew->mxDrivNameLen = strlen("");
 		StorageNew->mxCardIndex = 0;
-		StorageNew->mxSpanName = (uint8_t *) strdup("");
-		StorageNew->mxSpanNameLen = strlen("");
+		if ((StorageNew->mxSpanName = (uint8_t *) strdup("")) != NULL)
+			StorageNew->mxSpanNameLen = strlen("");
 		if ((StorageNew->mxSpanDevice = snmp_duplicate_objid(zeroDotZero_oid, 2)))
 			StorageNew->mxSpanDeviceLen = 2;
 		if ((StorageNew->mxSpanEquipmentId = (uint8_t *) strdup("")) != NULL)
@@ -1911,8 +1923,8 @@ mxSpanTable_create(void)
 		if (memdup((u_char **) &StorageNew->mxSpanDataLink, (u_char *) "\x00", 1) == SNMPERR_SUCCESS)
 			StorageNew->mxSpanDataLinkLen = 1;
 		StorageNew->mxSpanLineCode = MXSPANLINECODE_NOCODE;
-		if ((StorageNew->mxSpanAlarmSeverityMappingProfile = snmp_duplicate_objid(zeroDotZero_oid, 2)))
-			StorageNew->mxSpanAlarmSeverityMappingProfileLen = 2;
+		if ((StorageNew->mxSpanAlarmSeverityMapProfile = snmp_duplicate_objid(zeroDotZero_oid, 2)))
+			StorageNew->mxSpanAlarmSeverityMapProfileLen = 2;
 		StorageNew->mxSpanAdministrativeState = MXSPANADMINISTRATIVESTATE_LOCKED;
 		StorageNew->mxSpanOperationalState = 0;
 		StorageNew->mxSpanUsageState = 0;
@@ -1999,8 +2011,8 @@ mxSpanTable_destroy(struct mxSpanTable_data **thedata)
 		StorageDel->mxSpanModeLen = 0;
 		SNMP_FREE(StorageDel->mxSpanDataLink);
 		StorageDel->mxSpanDataLinkLen = 0;
-		SNMP_FREE(StorageDel->mxSpanAlarmSeverityMappingProfile);
-		StorageDel->mxSpanAlarmSeverityMappingProfileLen = 0;
+		SNMP_FREE(StorageDel->mxSpanAlarmSeverityMapProfile);
+		StorageDel->mxSpanAlarmSeverityMapProfileLen = 0;
 		SNMP_FREE(StorageDel->mxSpanAlarmStatus);
 		StorageDel->mxSpanAlarmStatusLen = 0;
 		SNMP_FREE(StorageDel->mxSpanProceduralStatus);
@@ -2165,10 +2177,10 @@ parse_mxSpanTable(const char *token, char *line)
 		return;
 	}
 	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->mxSpanLineCode, &tmpsize);
-	SNMP_FREE(StorageTmp->mxSpanAlarmSeverityMappingProfile);
-	line = read_config_read_data(ASN_OBJECT_ID, line, &StorageTmp->mxSpanAlarmSeverityMappingProfile, &StorageTmp->mxSpanAlarmSeverityMappingProfileLen);
-	if (StorageTmp->mxSpanAlarmSeverityMappingProfile == NULL) {
-		config_perror("invalid specification for mxSpanAlarmSeverityMappingProfile");
+	SNMP_FREE(StorageTmp->mxSpanAlarmSeverityMapProfile);
+	line = read_config_read_data(ASN_OBJECT_ID, line, &StorageTmp->mxSpanAlarmSeverityMapProfile, &StorageTmp->mxSpanAlarmSeverityMapProfileLen);
+	if (StorageTmp->mxSpanAlarmSeverityMapProfile == NULL) {
+		config_perror("invalid specification for mxSpanAlarmSeverityMapProfile");
 		return;
 	}
 	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->mxSpanAdministrativeState, &tmpsize);
@@ -2261,6 +2273,7 @@ store_mxSpanTable(int majorID, int minorID, void *serverarg, void *clientarg)
 			memset(line, 0, sizeof(line));
 			strcat(line, "mxSpanTable ");
 			cptr = line + strlen(line);
+			(void) cptr;
 			/* XXX: remove individual columns if not persistent */
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->mxDrivName, &StorageTmp->mxDrivNameLen);
 			cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->mxCardIndex, &tmpsize);
@@ -2290,7 +2303,7 @@ store_mxSpanTable(int majorID, int minorID, void *serverarg, void *clientarg)
 			cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->mxSpanPrimary, &tmpsize);
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->mxSpanDataLink, &StorageTmp->mxSpanDataLinkLen);
 			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->mxSpanLineCode, &tmpsize);
-			cptr = read_config_store_data(ASN_OBJECT_ID, cptr, &StorageTmp->mxSpanAlarmSeverityMappingProfile, &StorageTmp->mxSpanAlarmSeverityMappingProfileLen);
+			cptr = read_config_store_data(ASN_OBJECT_ID, cptr, &StorageTmp->mxSpanAlarmSeverityMapProfile, &StorageTmp->mxSpanAlarmSeverityMapProfileLen);
 			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->mxSpanAdministrativeState, &tmpsize);
 			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->mxSpanOperationalState, &tmpsize);
 			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->mxSpanUsageState, &tmpsize);
@@ -2539,6 +2552,7 @@ store_mxBertTable(int majorID, int minorID, void *serverarg, void *clientarg)
 			memset(line, 0, sizeof(line));
 			strcat(line, "mxBertTable ");
 			cptr = line + strlen(line);
+			(void) cptr;
 			/* XXX: remove individual columns if not persistent */
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->mxDrivName, &StorageTmp->mxDrivNameLen);
 			cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->mxCardIndex, &tmpsize);
@@ -2585,7 +2599,7 @@ mxChanTable_create(void)
 		if ((StorageNew->mxChanSap = snmp_duplicate_objid(zeroDotZero_oid, 2)))
 			StorageNew->mxChanSapLen = 2;
 		StorageNew->mxChanAdministrativeState = MXCHANADMINISTRATIVESTATE_LOCKED;
-		StorageNew->mxChanOperationalState = 0;
+		StorageNew->mxChanOperationalState = MXCHANOPERATIONALSTATE_DISABLED;
 		StorageNew->mxChanUsageState = 0;
 		if (memdup((u_char **) &StorageNew->mxChanAvailabilityStatus, (u_char *) "\x00\x00", 2) == SNMPERR_SUCCESS)
 			StorageNew->mxChanAvailabilityStatusLen = 2;
@@ -2828,6 +2842,7 @@ store_mxChanTable(int majorID, int minorID, void *serverarg, void *clientarg)
 			memset(line, 0, sizeof(line));
 			strcat(line, "mxChanTable ");
 			cptr = line + strlen(line);
+			(void) cptr;
 			/* XXX: remove individual columns if not persistent */
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->mxDrivName, &StorageTmp->mxDrivNameLen);
 			cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->mxCardIndex, &tmpsize);
@@ -3063,6 +3078,7 @@ store_mxXconTable(int majorID, int minorID, void *serverarg, void *clientarg)
 			memset(line, 0, sizeof(line));
 			strcat(line, "mxXconTable ");
 			cptr = line + strlen(line);
+			(void) cptr;
 			/* XXX: remove individual columns if not persistent */
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->mxDrivName, &StorageTmp->mxDrivNameLen);
 			cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->mxCardIndex, &tmpsize);
@@ -3297,6 +3313,7 @@ store_mxNearEndCurrentTable(int majorID, int minorID, void *serverarg, void *cli
 			memset(line, 0, sizeof(line));
 			strcat(line, "mxNearEndCurrentTable ");
 			cptr = line + strlen(line);
+			(void) cptr;
 			/* XXX: remove individual columns if not persistent */
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->mxDrivName, &StorageTmp->mxDrivNameLen);
 			cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->mxCardIndex, &tmpsize);
@@ -3538,6 +3555,7 @@ store_mxNearEndIntervalTable(int majorID, int minorID, void *serverarg, void *cl
 			memset(line, 0, sizeof(line));
 			strcat(line, "mxNearEndIntervalTable ");
 			cptr = line + strlen(line);
+			(void) cptr;
 			/* XXX: remove individual columns if not persistent */
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->mxDrivName, &StorageTmp->mxDrivNameLen);
 			cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->mxCardIndex, &tmpsize);
@@ -3779,6 +3797,7 @@ store_mxNearEndTotalTable(int majorID, int minorID, void *serverarg, void *clien
 			memset(line, 0, sizeof(line));
 			strcat(line, "mxNearEndTotalTable ");
 			cptr = line + strlen(line);
+			(void) cptr;
 			/* XXX: remove individual columns if not persistent */
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->mxDrivName, &StorageTmp->mxDrivNameLen);
 			cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->mxCardIndex, &tmpsize);
@@ -4016,6 +4035,7 @@ store_mxFarEndCurrentTable(int majorID, int minorID, void *serverarg, void *clie
 			memset(line, 0, sizeof(line));
 			strcat(line, "mxFarEndCurrentTable ");
 			cptr = line + strlen(line);
+			(void) cptr;
 			/* XXX: remove individual columns if not persistent */
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->mxDrivName, &StorageTmp->mxDrivNameLen);
 			cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->mxCardIndex, &tmpsize);
@@ -4254,6 +4274,7 @@ store_mxFarEndIntervalTable(int majorID, int minorID, void *serverarg, void *cli
 			memset(line, 0, sizeof(line));
 			strcat(line, "mxFarEndIntervalTable ");
 			cptr = line + strlen(line);
+			(void) cptr;
 			/* XXX: remove individual columns if not persistent */
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->mxDrivName, &StorageTmp->mxDrivNameLen);
 			cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->mxCardIndex, &tmpsize);
@@ -4492,6 +4513,7 @@ store_mxFarEndTotalTable(int majorID, int minorID, void *serverarg, void *client
 			memset(line, 0, sizeof(line));
 			strcat(line, "mxFarEndTotalTable ");
 			cptr = line + strlen(line);
+			(void) cptr;
 			/* XXX: remove individual columns if not persistent */
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->mxDrivName, &StorageTmp->mxDrivNameLen);
 			cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->mxCardIndex, &tmpsize);
@@ -5041,6 +5063,20 @@ refresh_mxCardTable(int force)
 						StorageTmp->mxCardChipTypeLen = 12;
 					}
 					break;
+				case X400PCARDCHIPTYPE_DS21455:
+					if ((tmpoid = snmp_duplicate_objid(mxChipTypeDS21455_oid, 12))) {
+						SNMP_FREE(StorageTmp->mxCardChipType);
+						StorageTmp->mxCardChipType = tmpoid;
+						StorageTmp->mxCardChipTypeLen = 12;
+					}
+					break;
+				case X400PCARDCHIPTYPE_DS21458:
+					if ((tmpoid = snmp_duplicate_objid(mxChipTypeDS21458_oid, 12))) {
+						SNMP_FREE(StorageTmp->mxCardChipType);
+						StorageTmp->mxCardChipType = tmpoid;
+						StorageTmp->mxCardChipTypeLen = 12;
+					}
+					break;
 				}
 				StorageTmp->mxCardChipRevision[0] = buf.card.inform.mxCardChipRevision + 65;
 				StorageTmp->mxCardPciBus = buf.card.inform.mxCardPciBus;
@@ -5176,6 +5212,14 @@ refresh_mxCardTable(int force)
 					break;
 				case X400PCARDCHIPTYPE_DS2156:
 					StorageNew->mxCardChipType = snmp_duplicate_objid(mxChipTypeDS2156_oid, 12);
+					StorageNew->mxCardChipTypeLen = 12;
+					break;
+				case X400PCARDCHIPTYPE_DS21455:
+					StorageNew->mxCardChipType = snmp_duplicate_objid(mxChipTypeDS21455_oid, 12);
+					StorageNew->mxCardChipTypeLen = 12;
+					break;
+				case X400PCARDCHIPTYPE_DS21458:
+					StorageNew->mxCardChipType = snmp_duplicate_objid(mxChipTypeDS21458_oid, 12);
 					StorageNew->mxCardChipTypeLen = 12;
 					break;
 				}
@@ -5607,9 +5651,9 @@ refresh_mxSpanTable(int force)
 				StorageTmp->mxSpanFraming = buf.span.config.mxSpanFraming;
 				uinttobits(StorageTmp->mxSpanDataLink, buf.span.config.mxSpanDataLink, 2);
 				if ((tmpoid = snmp_duplicate_objid(zeroDotZero_oid, 2))) {
-					SNMP_FREE(StorageTmp->mxSpanAlarmSeverityMappingProfile);
-					StorageTmp->mxSpanAlarmSeverityMappingProfile = tmpoid;
-					StorageTmp->mxSpanAlarmSeverityMappingProfileLen = 2;
+					SNMP_FREE(StorageTmp->mxSpanAlarmSeverityMapProfile);
+					StorageTmp->mxSpanAlarmSeverityMapProfile = tmpoid;
+					StorageTmp->mxSpanAlarmSeverityMapProfileLen = 2;
 				}
 				StorageTmp->mxSpanPriority = buf.span.config.mxSpanPriority;
 				StorageTmp->mxSpanPrimary = buf.span.config.mxSpanPrimary;
@@ -5692,8 +5736,8 @@ refresh_mxSpanTable(int force)
 				StorageNew->mxSpanCoding = buf.span.config.mxSpanCoding;
 				StorageNew->mxSpanFraming = buf.span.config.mxSpanFraming;
 				uinttobitsalloc(&StorageNew->mxSpanDataLink, buf.span.config.mxSpanDataLink, 2);
-				StorageNew->mxSpanAlarmSeverityMappingProfile = snmp_duplicate_objid(zeroDotZero_oid, 2);
-				StorageNew->mxSpanAlarmSeverityMappingProfileLen = 2;
+				StorageNew->mxSpanAlarmSeverityMapProfile = snmp_duplicate_objid(zeroDotZero_oid, 2);
+				StorageNew->mxSpanAlarmSeverityMapProfileLen = 2;
 				StorageNew->mxSpanPriority = buf.span.config.mxSpanPriority;
 				StorageNew->mxSpanPrimary = buf.span.config.mxSpanPrimary;
 				uinttobitsalloc(&StorageNew->mxSpanMode, buf.span.option.mxSpanMode, 3);
@@ -5946,12 +5990,12 @@ var_mxSpanTable(struct variable *vp, oid * name, size_t *length, int exact, size
 		*var_len = sizeof(StorageTmp->mxSpanLineCode);
 		rval = (u_char *) &StorageTmp->mxSpanLineCode;
 		break;
-	case (u_char) MXSPANALARMSEVERITYMAPPINGPROFILE:	/* Create */
-		*write_method = write_mxSpanAlarmSeverityMappingProfile;
+	case (u_char) MXSPANALARMSEVERITYMAPPROFILE:	/* Create */
+		*write_method = write_mxSpanAlarmSeverityMapProfile;
 		if (!StorageTmp)
 			break;
-		*var_len = StorageTmp->mxSpanAlarmSeverityMappingProfileLen * sizeof(oid);
-		rval = (u_char *) StorageTmp->mxSpanAlarmSeverityMappingProfile;
+		*var_len = StorageTmp->mxSpanAlarmSeverityMapProfileLen * sizeof(oid);
+		rval = (u_char *) StorageTmp->mxSpanAlarmSeverityMapProfile;
 		break;
 	case (u_char) MXSPANADMINISTRATIVESTATE:	/* Create */
 		*write_method = write_mxSpanAdministrativeState;
@@ -7866,7 +7910,7 @@ write_mxCardAlarmStatus(int action, u_char *var_val, u_char var_val_type, size_t
 				return SNMP_ERR_WRONGLENGTH;
 			}
 		}
-		/* Note: default value 0 */
+		/* Note: default value { } */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
 		if ((string = malloc(var_val_len + 1)) == NULL)
@@ -7953,7 +7997,7 @@ write_mxCardControlStatus(int action, u_char *var_val, u_char var_val_type, size
 				return SNMP_ERR_WRONGLENGTH;
 			}
 		}
-		/* Note: default value 0 */
+		/* Note: default value { } */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
 		if ((string = malloc(var_val_len + 1)) == NULL)
@@ -8033,7 +8077,7 @@ write_mxSpanName(int action, u_char *var_val, u_char var_val_type, size_t var_va
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to mxSpanName: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
-		/* Note: default value '' */
+		/* Note: default value \"\" */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
 		if ((string = malloc(var_val_len + 1)) == NULL)
@@ -8112,7 +8156,7 @@ write_mxSpanDevice(int action, u_char *var_val, u_char var_val_type, size_t var_
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to mxSpanDevice: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
-		/* Note: default value { zeroDotZero } */
+		/* Note: default value zeroDotZero */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
 		if ((objid = snmp_duplicate_objid((void *) var_val, var_val_len / sizeof(oid))) == NULL)
@@ -8425,7 +8469,7 @@ write_mxSpanMode(int action, u_char *var_val, u_char var_val_type, size_t var_va
 				return SNMP_ERR_WRONGLENGTH;
 			}
 		}
-		/* Note: default value 0 */
+		/* Note: default value { } */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
 		if ((string = malloc(var_val_len + 1)) == NULL)
@@ -9806,7 +9850,7 @@ write_mxSpanLineCode(int action, u_char *var_val, u_char var_val_type, size_t va
 }
 
 /**
- * @fn int write_mxSpanAlarmSeverityMappingProfile(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid *name, size_t name_len)
+ * @fn int write_mxSpanAlarmSeverityMapProfile(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid *name, size_t name_len)
  * @param action the stage of the SET operation.
  * @param var_val pointer to the varbind value.
  * @param var_val_type the ASN type.
@@ -9817,7 +9861,7 @@ write_mxSpanLineCode(int action, u_char *var_val, u_char var_val_type, size_t va
  * @brief Table row and column write routine.
  */
 int
-write_mxSpanAlarmSeverityMappingProfile(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
+write_mxSpanAlarmSeverityMapProfile(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
 	static oid *old_value;
 	struct mxSpanTable_data *StorageTmp = NULL;
@@ -9825,7 +9869,7 @@ write_mxSpanAlarmSeverityMappingProfile(int action, u_char *var_val, u_char var_
 	static size_t old_length = 0;
 	static oid *objid = NULL;
 
-	DEBUGMSGTL(("mxMIB", "write_mxSpanAlarmSeverityMappingProfile entering action=%d...  \n", action));
+	DEBUGMSGTL(("mxMIB", "write_mxSpanAlarmSeverityMapProfile entering action=%d...  \n", action));
 	StorageTmp = header_complex(mxSpanTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -9835,7 +9879,7 @@ write_mxSpanAlarmSeverityMappingProfile(int action, u_char *var_val, u_char var_
 			switch (StorageTmp->mxSpanRowStatus) {
 			case RS_ACTIVE:
 				/* cannot create non-existent column while active */
-				snmp_log(MY_FACILITY(LOG_NOTICE), "write to mxSpanAlarmSeverityMappingProfile: but column non-existent\n");
+				snmp_log(MY_FACILITY(LOG_NOTICE), "write to mxSpanAlarmSeverityMapProfile: but column non-existent\n");
 				return SNMP_ERR_INCONSISTENTVALUE;
 			case RS_NOTINSERVICE:
 			case RS_NOTREADY:
@@ -9844,27 +9888,27 @@ write_mxSpanAlarmSeverityMappingProfile(int action, u_char *var_val, u_char var_
 			}
 		}
 		if (var_val_type != ASN_OBJECT_ID) {
-			snmp_log(MY_FACILITY(LOG_NOTICE), "write to mxSpanAlarmSeverityMappingProfile not ASN_OBJECT_ID\n");
+			snmp_log(MY_FACILITY(LOG_NOTICE), "write to mxSpanAlarmSeverityMapProfile not ASN_OBJECT_ID\n");
 			return SNMP_ERR_WRONGTYPE;
 		}
 		if (MIN_OID_LEN * sizeof(oid) > var_val_len || var_val_len > MAX_OID_LEN * sizeof(oid)) {
-			snmp_log(MY_FACILITY(LOG_NOTICE), "write to mxSpanAlarmSeverityMappingProfile: bad length\n");
+			snmp_log(MY_FACILITY(LOG_NOTICE), "write to mxSpanAlarmSeverityMapProfile: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
-		/* Note: default value { zeroDotZero } */
+		/* Note: default value zeroDotZero */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
 		if ((objid = snmp_duplicate_objid((void *) var_val, var_val_len / sizeof(oid))) == NULL)
 			return SNMP_ERR_RESOURCEUNAVAILABLE;
 		break;
-	case ACTION:		/* The variable has been stored in StorageTmp->mxSpanAlarmSeverityMappingProfile for you to use, and you have just been asked to do something with it.  Note that
-				   anything done here must be reversable in the UNDO case */
+	case ACTION:		/* The variable has been stored in StorageTmp->mxSpanAlarmSeverityMapProfile for you to use, and you have just been asked to do something with it.  Note that anything
+				   done here must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->mxSpanAlarmSeverityMappingProfile;
-		old_length = StorageTmp->mxSpanAlarmSeverityMappingProfileLen;
-		StorageTmp->mxSpanAlarmSeverityMappingProfile = objid;
-		StorageTmp->mxSpanAlarmSeverityMappingProfileLen = var_val_len / sizeof(oid);
+		old_value = StorageTmp->mxSpanAlarmSeverityMapProfile;
+		old_length = StorageTmp->mxSpanAlarmSeverityMapProfileLen;
+		StorageTmp->mxSpanAlarmSeverityMapProfile = objid;
+		StorageTmp->mxSpanAlarmSeverityMapProfileLen = var_val_len / sizeof(oid);
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		SNMP_FREE(old_value);
@@ -9872,8 +9916,8 @@ write_mxSpanAlarmSeverityMappingProfile(int action, u_char *var_val, u_char var_
 		objid = NULL;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->mxSpanAlarmSeverityMappingProfile = old_value;
-		StorageTmp->mxSpanAlarmSeverityMappingProfileLen = old_length;
+		StorageTmp->mxSpanAlarmSeverityMapProfile = old_value;
+		StorageTmp->mxSpanAlarmSeverityMapProfileLen = old_length;
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
 		SNMP_FREE(objid);
@@ -10011,7 +10055,7 @@ write_mxSpanAlarmStatus(int action, u_char *var_val, u_char var_val_type, size_t
 				return SNMP_ERR_WRONGLENGTH;
 			}
 		}
-		/* Note: default value 0 */
+		/* Note: default value { } */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
 		if ((string = malloc(var_val_len + 1)) == NULL)
@@ -10367,7 +10411,7 @@ write_mxBertPattern(int action, u_char *var_val, u_char var_val_type, size_t var
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to mxBertPattern: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
-		/* Note: default value '10FFFFFFFF'X */
+		/* Note: default value \"\x10\xFF\xFF\xFF\xFF\" */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
 		if ((string = malloc(var_val_len + 1)) == NULL)

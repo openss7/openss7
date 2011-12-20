@@ -27,7 +27,7 @@
 --
 -- -----------------------------------------------------------------------------
 --
--- Note well: nonwithstanding this AGPL license, you are not permitted to make 
+-- Note well: notwithstanding this AGPL license, you are not permitted to make 
 -- modifications under the OpenSS7 project's enterprise object identifier arc: 
 -- 1.3.6.1.4.1.29591.  Modifications must be made only within an object 
 -- identifier arc under your control.
@@ -85,7 +85,7 @@ IMPORTS
         FROM SNMPv2-TC;
 
 gmiMIB MODULE-IDENTITY
-    LAST-UPDATED "201106252033Z"
+    LAST-UPDATED "201112101120Z"
     ORGANIZATION 
         "The OpenSS7 Project"
     CONTACT-INFO 
@@ -124,11 +124,14 @@ gmiMIB MODULE-IDENTITY
          <http://www.gnu.org/licenses/>, or write to the Free Software 
          Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
          
-         Note well: nonwithstanding this AGPL license, you are not 
+         Note well: notwithstanding this AGPL license, you are not 
          permitted to make modifications under the OpenSS7 project's 
          enterprise object identifier arc: 1.3.6.1.4.1.29591.  
          Modifications must be made only within an object identifier arc 
          under your control."
+    REVISION    "201112101120Z"
+    DESCRIPTION 
+        "Corrections an smilint workup."
     REVISION    "201106252033Z"
     DESCRIPTION 
         "Passes smilint and reformatted with smidump."
@@ -293,27 +296,45 @@ gmiTables OBJECT IDENTIFIER
 applicationProcess OBJECT IDENTIFIER
     ::= { gmiTables 1 }
 
+    -- applicationProcessId
+    -- applicationProcessTitle
+    -- supportEntityNames
+    -- operationalState
+    -- applicationProcess-system NAME BINDING (applicationProcessId)
+    -- ap-applicationSubsystem NAME BINDING (applicationProcessId)
+
 applicationProcessTable OBJECT-TYPE
     SYNTAX      SEQUENCE OF ApplicationProcessEntry
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides a table of application processes."
     REFERENCE   
         "ITU-T Rec. X.723 | ISO/IEC 10165-5 applicationProcess 
          MOC."
     ::= { applicationProcess 1 }
 
+-- note that an SNMP agent (managed host) does not have 
+-- a systemId and subsystemId in the same sense that a CMIP or 
+-- TMN system does.
 applicationProcessEntry OBJECT-TYPE
     SYNTAX      ApplicationProcessEntry
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION 
-        ""
+        "Each entry in this table is indexed by, and defines, 
+         the application process identifier.  Each row contains 
+         the application process title (address) and a set of 
+         application entity names that support the process.  
+         Each row also contains the operational state of the 
+         application process."
     REFERENCE   
         "ITU-T Rec. X.723 | ISO/IEC 10165-5 applicationProcess 
          MO."
     INDEX       { applicationProcessId }
+                -- systemId - applicationProcess-system NAME BINDING (applicationProcessId)
+                -- subsystemId - subsystem-system NAME BINDING
+                -- applicationProcessId - ap-applicationSubsystem NAME BINDING (applicationProcessId)
     ::= { applicationProcessTable 1 }
 
 ApplicationProcessEntry ::= SEQUENCE {
@@ -328,7 +349,8 @@ applicationProcessId OBJECT-TYPE
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides the application process identifier as an 
+         index into this table."
     REFERENCE   
         "ITU-T Rec. X.723 | ISO/IEC 10165-5 applicationProcessId 
          attribute."
@@ -339,7 +361,8 @@ applicationProcessTitle OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides tha application process title (OID-base name) 
+         of the application process."
     REFERENCE   
         "ITU-T Rec. X.723 | ISO/IEC 10165-5 
          applicationProcessTitle attribute."
@@ -350,7 +373,7 @@ supportEntityNames OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides a set of supporting application entity names."
     REFERENCE   
         "ITU-T Rec. X.723 | ISO/IEC 10165-5 supportEntityNames 
          attribute."
@@ -361,7 +384,26 @@ applicationProcessOpState OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides the operational state of the application 
+         process in following the OperationalState textual 
+         convention and ITU-T Rec. X.721 | ISO/IEC 10165-2.  
+         This attribute is single-valued and may contain one of 
+         the following values:
+         
+         - disabled(0), the application process is inoperable 
+           and unable to provide service to its user(s);
+           
+         - enabled(1), the application process is partially or 
+           fully operable and available for use.
+           
+         When the application process does not have any defined 
+         support entites, the application process has an 
+         operatoinal state of disabled(0).
+         
+         When the application process contains support 
+         entitites, but no support entity is operable, the 
+         application process has an operational state of 
+         disabled(0)."
     REFERENCE   
         "ITU-T Rec. X.721 | ISO/IEC 10165-2 operationalState 
          attribute."
@@ -375,7 +417,7 @@ communicationsEntityTable OBJECT-TYPE
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides a table of communications entities."
     REFERENCE   
         "ITU-T Rec. X.723 | ISO/IEC 10165-5 communicationsEntity 
          MOC."
@@ -408,7 +450,7 @@ communicationsEntityId OBJECT-TYPE
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides an index into the communications entity table."
     REFERENCE   
         "ITU-T Rec. X.723 | ISO/IEC 10165-5 
          communicationsEntityId attribute."
@@ -419,7 +461,9 @@ localSapNames OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides a set of object identifiers that name the 
+         local service access points for the communications 
+         entity."
     REFERENCE   
         "ITU-T Rec. X.723 | ISO/IEC 10165-5 localSapNames 
          attribute."
@@ -430,7 +474,26 @@ communicationsEntityOpState OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides the operational state of the communications 
+         entity following the OperationalState textual 
+         convention and ITU-T Rec. X.721 | ISO/IEC 10165-2.  
+         This state is single-valued and may contain one of the 
+         following values:
+         
+         - disabled(0), the communications entity is inoperable 
+           and unable to provide service to its user(s);
+           
+         - enabled(1), the communications entity is partially or 
+           fully operable and available for use.
+           
+         When the communications entity does not have defined 
+         any local service access points, the communications 
+         entity has an operational state of diabled(0).
+         
+         When the communications entity contains local service 
+         access points, but no local SAP is operable, the 
+         communication entity has an operational state of 
+         disabled(0)."
     REFERENCE   
         "ITU-T Rec. X.721 | ISO/IEC 10165-2 operationalState 
          attribute."
@@ -444,7 +507,7 @@ communicationsInfoRecordTable OBJECT-TYPE
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION 
-        ""
+        "This is a table of information records."
     REFERENCE   
         "ITU-T Rec. X.723 | ISO/IEC 10165-5 
          communicationsInformationRecord MOC."
@@ -477,7 +540,8 @@ informationType OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides the information type object identifier for the 
+         communication information record."
     REFERENCE   
         "ITU-T Rec. X.723 | ISO/IEC 10165-5 informationType 
          attribute."
@@ -488,7 +552,8 @@ informationData OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides additional information data for the 
+         communications information record."
     REFERENCE   
         "ITU-T Rec. X.723 | ISO/IEC 10165-5 informationData 
          attribute."
@@ -502,7 +567,7 @@ clProtocolMachineTable OBJECT-TYPE
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION 
-        ""
+        "This is a table of connectionless protocol machines."
     REFERENCE   
         "ITU-T Rec. X.723 | ISO/IEC 10165-5 clProtocolMachine 
          MOC."
@@ -535,7 +600,8 @@ clProtocolMachineId OBJECT-TYPE
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides an index into the connectionless protocol 
+         machine table (this table)."
     REFERENCE   
         "ITU-T Rec. X.723 | ISO/IEC 10165-5 clProtocolMachineId 
          attribute."
@@ -546,7 +612,19 @@ clProtocolMachineOpState OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides the operational state of the connectionless 
+         protocol machine in accordance with the 
+         OperationalState textual convention and ITU-T Rec. 
+         X.721 | ISO/IEC 10165-2.  This attribute is 
+         single-valued and can contain one of the following 
+         values:
+         
+         - disabled(0), the connectionless protocol machine is 
+           inoperable and unabled to provide service to its 
+           user(s);
+           
+         - enabled(1), the connectionless protocol machine is 
+           partially or fully operable and available for use."
     REFERENCE   
         "ITU-T Rec. X.721 | ISO/IEC 10165-2 operationalState 
          attribute."
@@ -557,7 +635,9 @@ totalRemoteSAPs OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Specifies the total number of remote service access 
+         points avaliable to the connectionless protocol 
+         machine."
     REFERENCE   
         "ITU-T Rec. X.723 | ISO/IEC 10165-5 totalRemoteSAPs 
          attribute."
@@ -571,7 +651,8 @@ coProtocolMachineTable OBJECT-TYPE
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION 
-        ""
+        "This is a table of connection-oriented protocol 
+         machines."
     REFERENCE   
         "ITU-T Rec. X.723 | ISO/IEC 10165-5 coProtocolMachine 
          MOC."
@@ -603,7 +684,8 @@ coProtocolMachineId OBJECT-TYPE
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION 
-        ""
+        "Defines an index into the connection-oriented protocol 
+         machine table."
     REFERENCE   
         "ITU-T Rec. X.723 | ISO/IEC 10165-5 coProtocolMachineId 
          attribute."
@@ -614,7 +696,20 @@ coProtocolMachineOpState OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides the operational state of the 
+         connection-oriented protocol machine in accordance with 
+         the OperationalState textual convention and ITU-T Rec.  
+         X.721 | ISO/IEC 10165-2.  This attribute is 
+         single-valued and can contain one of the following 
+         values:
+         
+         - disabled(0), the connection-oriented protocol machine 
+           is inoperable and unabled to provide service to its 
+           user(s);
+           
+         - enabled(1), the connection-oriented protocol machine 
+           is partially or fully operable and available for 
+           use."
     REFERENCE   
         "ITU-T Rec. X.721 | ISO/IEC 10165-2 operationalState 
          attribute."
@@ -628,7 +723,7 @@ sap1Table OBJECT-TYPE
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION 
-        ""
+        "This is a table of style 1 service access points."
     REFERENCE   
         "ITU-T Rec. X.723 | ISO/IEC 10165-5 sap1 MOC."
     ::= { sap1 1 }
@@ -639,7 +734,7 @@ sap1Entry OBJECT-TYPE
     STATUS      current
     DESCRIPTION 
         "
-         Each type 1 SAP belongs to a communications entity, 
+         Each style 1 SAP belongs to a communications entity, 
          which in turn belongs to a subsystem."
     REFERENCE   
         "ITU-T Rec. X.723 | ISO/IEC 10165-5 sap1 MO."
@@ -657,7 +752,8 @@ sap1Id OBJECT-TYPE
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION 
-        ""
+        "Defines an index into the style 1 service access point 
+         table."
     REFERENCE   
         "ITU-T Rec. X.723 | ISO/IEC 10165-5 sapId attribute."
     ::= { sap1Entry 1 }
@@ -667,7 +763,8 @@ sap1Address OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides the address of the style 1 service access 
+         point."
     REFERENCE   
         "ITU-T Rec. X.723 | ISO/IEC 10165-5 sap1Address 
          attribute."
@@ -678,7 +775,8 @@ sap1UserEntityNames OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides a set of object identifiers that name the user 
+         communications entites."
     REFERENCE   
         "ITU-T Rec. X.723 | ISO/IEC 10165-5 userEntityNames 
          attribute."
@@ -692,7 +790,7 @@ sap2Table OBJECT-TYPE
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION 
-        ""
+        "This is a table of style 2 service access points."
     REFERENCE   
         "ITU-T Rec. X.723 | ISO/IEC 10165-5 sap2 MOC."
     ::= { sap2 1 }
@@ -703,7 +801,7 @@ sap2Entry OBJECT-TYPE
     STATUS      current
     DESCRIPTION 
         "
-         Each type 2 SAP belongs to a subsystem."
+         Each style 2 SAP belongs to a subsystem."
     REFERENCE   
         "ITU-T Rec. X.723 | ISO/IEC 10165-5 sap2 MO."
     INDEX       { subsystemId, sap2Id }
@@ -721,7 +819,8 @@ sap2Id OBJECT-TYPE
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION 
-        ""
+        "Defines the index into the style 2 service access point 
+         table."
     REFERENCE   
         "ITU-T Rec. X.723 | ISO/IEC 10165-5 sapId attribute."
     ::= { sap2Entry 1 }
@@ -731,7 +830,8 @@ sap2Address OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides the address of the style 2 service access 
+         point."
     REFERENCE   
         "ITU-T Rec. X.723 | ISO/IEC 10165-5 sap2Address 
          attribute."
@@ -742,7 +842,8 @@ sap2UserEntityNames OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides the group of object identifiers than name the 
+         user communications entities."
     REFERENCE   
         "ITU-T Rec. X.723 | ISO/IEC 10165-5 userEntityNames 
          attribute."
@@ -753,7 +854,8 @@ sap2providerEntityNames OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides the group of objects that idenfies the 
+         provider communications entities."
     REFERENCE   
         "ITU-T Rec. X.723 | ISO/IEC 10165-5 providerEntityNames 
          attribute."
@@ -767,7 +869,7 @@ singlePeerConnectionTable OBJECT-TYPE
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION 
-        ""
+        "This is a table of single peer connections."
     REFERENCE   
         "ITU-T Rec. X.723 | ISO/IEC 10165-5 singlePeerConnection 
          MOC."
@@ -801,7 +903,7 @@ connectionId OBJECT-TYPE
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION 
-        ""
+        "Defines an index into the single peer connection table."
     REFERENCE   
         "ITU-T Rec. X.723 | ISO/IEC 10165-5 connectionId 
          attribute."
@@ -812,7 +914,8 @@ underlyingConnectionNames OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides a group of object identifiers that name the 
+         underlying connections."
     REFERENCE   
         "ITU-T Rec. X.723 | ISO/IEC 10165-5 
          underlyingConnectionNames attribute."
@@ -823,7 +926,8 @@ supportedConnectionNames OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides a group of object identifiers that name the 
+         supported connections."
     REFERENCE   
         "ITU-T Rec. X.723 | ISO/IEC 10165-5 
          supportedConnectionNames attribute."
@@ -837,7 +941,7 @@ subsystemTable OBJECT-TYPE
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION 
-        ""
+        "This is a table of communications subsystems."
     REFERENCE   
         "ITU-T Rec. X.723 | ISO/IEC 10165-5 subsystem MOC."
     ::= { subsystem 1 }
@@ -847,7 +951,8 @@ subsystemEntry OBJECT-TYPE
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION 
-        ""
+        "Each row in this table is indexed by (and defines the) 
+         communications subsystem identifer."
     REFERENCE   
         "ITU-T Rec. X.723 | ISO/IEC 10165-5 subsystem MO."
     INDEX       { subsystemId }
@@ -862,7 +967,8 @@ subsystemId OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Defines an index into the communications subsystem 
+         table."
     REFERENCE   
         "ITU-T Rec. X.723 | ISO/IEC 10165-5 subsystemId 
          attribute."

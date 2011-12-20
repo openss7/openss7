@@ -312,6 +312,46 @@ test_timod_LDADD		= libstreams.la
 
 ## =====================================================================
 
+pkglibexec32_PROGRAMS		+= test-bufmod
+
+test_bufmod_SOURCES		= $(top_srcdir)/src/test/test-bufmod.c
+test_bufmod_CPPFLAGS		= $(TEST_INCLUDES)
+test_bufmod_CFLAGS		= $(USER_CFLAGS) $(USER_DFLAGS) $(MACHINE_FLAGS)
+test_bufmod_LDFLAGS		= $(USER_LDFLAGS)
+test_bufmod_LDADD		= libstreams.la
+
+## =====================================================================
+
+pkglibexec32_PROGRAMS		+= test-pfmod
+
+test_pfmod_SOURCES		= $(top_srcdir)/src/test/test-pfmod.c
+test_pfmod_CPPFLAGS		= $(TEST_INCLUDES)
+test_pfmod_CFLAGS		= $(USER_CFLAGS) $(USER_DFLAGS) $(MACHINE_FLAGS)
+test_pfmod_LDFLAGS		= $(USER_LDFLAGS)
+test_pfmod_LDADD		= libstreams.la
+
+## =====================================================================
+
+pkglibexec32_PROGRAMS		+= test-nbuf
+
+test_nbuf_SOURCES		= $(top_srcdir)/src/test/test-nbuf.c
+test_nbuf_CPPFLAGS		= $(TEST_INCLUDES)
+test_nbuf_CFLAGS		= $(USER_CFLAGS) $(USER_DFLAGS) $(MACHINE_FLAGS)
+test_nbuf_LDFLAGS		= $(USER_LDFLAGS)
+test_nbuf_LDADD			= libstreams.la
+
+## =====================================================================
+
+pkglibexec32_PROGRAMS		+= test-pf
+
+test_pf_SOURCES			= $(top_srcdir)/src/test/test-pf.c
+test_pf_CPPFLAGS		= $(TEST_INCLUDES)
+test_pf_CFLAGS			= $(USER_CFLAGS) $(USER_DFLAGS) $(MACHINE_FLAGS)
+test_pf_LDFLAGS			= $(USER_LDFLAGS)
+test_pf_LDADD			= libstreams.la
+
+## =====================================================================
+
 pkglibexec32_PROGRAMS		+= test-xnet
 
 test_xnet_SOURCES		= $(top_srcdir)/src/test/test-xnet.c
