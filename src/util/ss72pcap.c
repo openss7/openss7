@@ -82,16 +82,6 @@ static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
 
 #include <pcap/pcap.h>
 
-#ifndef NAME
-#define NAME "ss72pcap"
-#endif
-#ifndef PACKAGE
-#define PACKAGE "openss7"
-#endif
-#ifndef VERSION
-#define VERSION "1.1.1.20110510"
-#endif
-
 int output = 1;
 int debug = 0;
 int lasterr = 0;
@@ -578,7 +568,7 @@ main(int argc, char **argv)
 		case 'i':	/* -i, --inpfile inpfile */
 			if (debug)
 				fprintf(stderr, "%s: setting inpfile to %s\n", argv[0], optarg);
-			strncpy(inpfile, optarg, sizeof(outfile) - 1);
+			strncpy(inpfile, optarg, sizeof(inpfile) - 1);
 			break;
 		case 'o':	/* -o, --outfile outfile */
 			if (debug)
