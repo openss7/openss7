@@ -131,16 +131,25 @@ class MsgStat {
       protected:
 	ulong msgs;
 	ulong bytes;
+	ulong bads;
+	ulong fisus;
+	ulong lssus;
+	ulong lssu2s;
+	ulong msus;
+	ulong sis[16];
+	ulong undec;
 	struct timeval beg, end;
 
       public:
-	MsgStat(void) : msgs(0), bytes(0) {
+	MsgStat(void) : msgs(0), bytes(0), bads(0), fisus(0), lssus(0), lssu2s(0), msus(0), sis(), undec(0) {
 		if (debug > 1)
 			fprintf(stderr, "I: %s: %p\n", __PRETTY_FUNCTION__, this);
 		beg.tv_sec = 0x7fffffff;
 		beg.tv_usec = 0x7fffffff;
 		end.tv_sec = 0;
 		end.tv_usec = 0;
+		for (int i = 0; i < 16; i++)
+			sis[i] = 0;
 	};
 	virtual ~MsgStat(void) {
 		if (debug > 1)
@@ -290,14 +299,35 @@ hash_map<int,Path *> paths;
 //  -------------------------------------------------------------------------
 //  Each path object represents a channel of communication.
 //
+enum HeaderType {
+	HT_UNKNOWN,
+	HT_BASIC,
+	HT_EXTENDED
+};
+enum RlType {
+	RL_UNKNOWN,
+	RL_14BIT_PC,
+	RL_24BIT_PC
+};
+enum MsgPriority {
+	MP_UNKNOWN,
+	MP_JAPAN,
+	MP_NATIONAL,
+	MP_INTERNATIONAL
+};
 class Path : public MsgStat {
       private:
 	// static hash_map<int,Path *> paths;
 	File& file;
 	int ppa;
+	enum HeaderType ht;
+	enum MsgPriority pr;
+	enum RlType rt;
 
       public:
-	Path(File& f, int a) : file(f), ppa(a) {
+	Path(File& f, int a) : file(f), ppa(a), ht(HT_UNKNOWN),
+		pr(MP_UNKNOWN), rt(RL_UNKNOWN)
+	{
 		if (debug > 1)
 			fprintf(stderr, "I: %s: %p\n", __PRETTY_FUNCTION__, this);
 		paths[ppa] = this;
@@ -305,6 +335,10 @@ class Path : public MsgStat {
 		if (debug > 1)
 			fprintf(stderr, "I: %s: created (%d:%d:%d) %p\n", __PRETTY_FUNCTION__,
 					cardNum(),spanNum(),slotNum(),this);
+		if (slotNum() == 0)
+			setHeaderType(HT_EXTENDED);
+		else
+			setHeaderType(HT_BASIC);
 	};
 	virtual ~Path(void) {
 		if (debug > 1)
@@ -327,6 +361,95 @@ class Path : public MsgStat {
 	int slotNum(void) { return ((ppa >> 0) & 0x1f); };
 	virtual void identify(void);
 	virtual void add(Message& msg);
+	enum HeaderType headerType(void) { return (ht); }
+	void setHeaderType(enum HeaderType t) {
+		if (ht != t && t != HT_UNKNOWN) {
+			switch (ht) {
+			case HT_UNKNOWN:
+				if (debug) {
+					if (t == HT_BASIC)
+						fprintf(stderr, "I: path header type set to basic\n");
+					else if (t == HT_EXTENDED)
+						fprintf(stderr, "I: path header type set to extended\n");
+				}
+				break;
+			case HT_BASIC:
+				if (debug && t == HT_EXTENDED)
+					fprintf(stderr, "W: path header type change from basic to extended\n");
+				break;
+			case HT_EXTENDED:
+				if (debug && t == HT_BASIC)
+					fprintf(stderr, "W: path header type change from extended to basic\n");
+				break;
+			}
+			ht = t;
+		}
+	};
+	enum MsgPriority msgPriority(void) { return (pr); };
+	void setMsgPriority(enum MsgPriority p) {
+		if (pr != p && p != MP_UNKNOWN) {
+			switch (pr) {
+			case MP_UNKNOWN:
+				if (debug) {
+					if (p == MP_JAPAN)
+						fprintf(stderr, "I: msg priority set to japan\n");
+					else if (p == MP_NATIONAL)
+						fprintf(stderr, "I: msg priority set to national\n");
+					else if (p == MP_INTERNATIONAL)
+						fprintf(stderr, "I: msg priority set to international\n");
+				}
+				break;
+			case MP_JAPAN:
+				if (debug) {
+					if (p == MP_NATIONAL)
+						fprintf(stderr, "W: msg priority change from japan to national\n");
+					if (p == MP_INTERNATIONAL)
+						fprintf(stderr, "W: msg priority change from japan to international\n");
+				}
+				break;
+			case MP_NATIONAL:
+				if (debug) {
+					if (p == MP_JAPAN)
+						fprintf(stderr, "W: msg priority change from national to japan\n");
+					if (p == MP_INTERNATIONAL)
+						fprintf(stderr, "W: msg priority change from national to international\n");
+				}
+				break;
+			case MP_INTERNATIONAL:
+				if (debug) {
+					if (p == MP_NATIONAL)
+						fprintf(stderr, "W: msg priority change from international to national\n");
+					if (p == MP_JAPAN)
+						fprintf(stderr, "W: msg priority change from international to japan\n");
+				}
+				break;
+			}
+			pr = p;
+		}
+	};
+	enum RlType routingLabel(void) { return (rt); };
+	void setRoutingLabel(enum RlType r) {
+		if (rt != r && r != RL_UNKNOWN) {
+			switch (rt) {
+			case RL_UNKNOWN:
+				if (debug) {
+					if (r == RL_24BIT_PC)
+						fprintf(stderr, "W: routing label set to 24-bit\n");
+					if (r == RL_14BIT_PC)
+						fprintf(stderr, "W: routing label set to 14-bit\n");
+				}
+				break;
+			case RL_14BIT_PC:
+				if (debug && r == RL_24BIT_PC)
+					fprintf(stderr, "W: routing label change from 14-bit to 24-bit\n");
+				break;
+			case RL_24BIT_PC:
+				if (debug && r == RL_14BIT_PC)
+					fprintf(stderr, "W: routing label change from 24-bit to 14-bit\n");
+				break;
+			}
+		}
+	};
 };
 
 //  -------------------------------------------------------------------------
@@ -336,6 +459,13 @@ class Path : public MsgStat {
 //  -------------------------------------------------------------------------
 //  Each message object represents an SS7 message.
 //
+enum MessageType {
+	MT_UNKNOWN,
+	MT_FISU,
+	MT_LSSU,
+	MT_LSSU2,
+	MT_MSU
+};
 class Message {
       private:
 	Path& path;
@@ -344,22 +474,128 @@ class Message {
 	struct pcap_pkthdr hdr;
 	unsigned char *dat;
 	struct pseudohdr phdr;
-	bool mtp2decode, mtp3decode;
-	unsigned char *beg, *mid, *end;
+	bool mtp2decode;
+	bool mtp3decode;
+	unsigned char *beg;
+	unsigned char *mid;
+	unsigned char *end;
+	unsigned int bib, bsn, fib, fsn, li, li0, ni, mp, si, dpc, opc, sls, cic, mt;
 
 	Message(Path& p, struct pcap_pkthdr *h, unsigned char *d, struct pseudohdr *ph) :
-		path(p), hdr(*h), dat(d), phdr(*ph), mtp2decode(false), mtp3decode(false)
+		path(p), hdr(*h), dat(d), phdr(*ph), mtp2decode(!!0), mtp3decode(!!0),
+		beg(d), mid(d), end(d+h->caplen)
 	{
 		if (debug > 3)
 			fprintf(stderr, "I: %s\n", __PRETTY_FUNCTION__);
-		beg = mid = dat;
-		end = beg + hdr.caplen;
-		path.add(*this);
+		if (3 <= hdr.len && hdr.len <= 5)
+			path.setHeaderType(HT_BASIC);
+		if (6 <= hdr.len && hdr.len <= 8)
+			path.setHeaderType(HT_EXTENDED);
+		switch (path.headerType()) {
+		case HT_UNKNOWN:
+			fprintf(stderr, "unknown header type\n");
+			return;
+		case HT_BASIC:
+			// basic link header
+			bsn = *mid & 0x7f;
+			bib = (*mid++ & 0x80) >> 7;
+			fsn = *mid & 0x7f;
+			bib = (*mid++ & 0x80) >> 7;
+			li = *mid & 0x3f;
+			if ((li != hdr.len - 3) && (hdr.len - 3 <= 63 || li != 63))
+				fprintf(stderr, "bad length indicator %d != %d\n", li, hdr.len - 3);
+			mp = (*mid++ & 0xc0) >> 6;
+			if (mp != 0) {
+				path.setRoutingLabel(RL_24BIT_PC);
+				path.setMsgPriority(MP_JAPAN);
+			}
+			break;
+		case HT_EXTENDED:
+			// annex a link header
+			bsn = (*mid++ & 0xff);
+			bsn |= ((*mid & 0x0f) << 8);
+			bib = (*mid++ & 0x80) >> 7;
+			fsn = (*mid++ & 0xff);
+			fsn |= ((*mid & 0x0f) << 8);
+			fib = (*mid++ & 0x80) >> 7;
+			li = (*mid++ & 0xff);
+			li |= ((*mid & 0x01) << 8);
+			if ((li != hdr.len - 6) && (hdr.len - 6 <= 63 || li != 63))
+				fprintf(stderr, "bad length indicator %d != %d\n", li, hdr.len - 6);
+			mp = (*mid++ & 0xc0) >> 6;
+			if (mp != 0) {
+				path.setRoutingLabel(RL_24BIT_PC);
+				path.setMsgPriority(MP_JAPAN);
+			}
+			break;
+		}
+		mtp2decode = !0;
+		switch (li) {
+		case 0:
+			return;
+		case 1:
+			si = (*mid++ & 0xff);
+			return;
+		case 2:
+			si = (*mid++ & 0xff);
+			mid++;
+			return;
+		}
+		si = *mid & 0x0f;
+		ni = (*mid & 0xc0) >> 6;
+		if (ni == 0) {
+			path.setRoutingLabel(RL_14BIT_PC);
+			path.setMsgPriority(MP_INTERNATIONAL);
+		}
+		switch (path.msgPriority()) {
+		case MP_UNKNOWN:
+			mp = (*mid & 0x30) >> 4;
+			break;
+		case MP_JAPAN:
+			break;
+		case MP_NATIONAL:
+			mp = (*mid & 0x30) >> 4;
+			break;
+		case MP_INTERNATIONAL:
+			mp = 0;
+			break;
+		}
+		mid++;
+		if (li < 6) {
+			fprintf(stderr, "too short for RL, li = %d", li);
+			return;
+		}
+		if (li < 9)
+			path.setRoutingLabel(RL_14BIT_PC);
+		else if (si == 0x05 && li < 11)
+			path.setRoutingLabel(RL_14BIT_PC);
+		if (path.getRoutingLabel() == RL_UNKNOWN) {
+		}
 	};
 	virtual ~Message(void) {
 		if (debug > 3)
 			fprintf(stderr, "I: %s\n", __PRETTY_FUNCTION__);
 		free(dat);
+	};
+	bool isFisu(void) { return ((hdr.len == 3) || (hdr.len == 6)); };
+	bool isLssu(void) { return ((hdr.len == 4) || (hdr.len == 7)); };
+	bool isLssu2(void) { return ((hdr.len == 5) || (hdr.len == 6)); };
+	bool isMsu(void) { return (hdr.len > 6); };
+	enum MessageType messageType(void) {
+		switch (hdr.len) {
+		case 0: case 1: case 2: return (MT_UNKNOWN);
+		case 3: case 6: return (MT_FISU);
+		case 4: case 7: return (MT_LSSU);
+		case 5: case 8: return (MT_LSSU2);
+		default: return (MT_MSU);
+		}
+	};
+	bool mtp2Decoded(void) { return mtp2decode; };
+	bool mtp3Decoded(void) { return mtp3decode; };
+	int siValue(void) {
+		if (!mtp2decode)
+			return (-1);
+		return (si);
 	};
 };
 
@@ -379,6 +615,27 @@ void
 MsgStat::add(Message& msg)
 {
 	msgs++;
+	switch (msg.messageType()) {
+	case MT_UNKNOWN:
+		bads++;
+		break;
+	case MT_FISU:
+		fisus++;
+		break;
+	case MT_LSSU:
+		lssus++;
+		break;
+	case MT_LSSU2:
+		lssu2s++;
+		break;
+	case MT_MSU:
+		msus++;
+		if (msg.siValue() != -1)
+			sis[msg.siValue()]++;
+		else
+			undec++;
+		break;
+	}
 	bytes += msg.hdr.len;
 	if ((msg.hdr.ts.tv_sec < beg.tv_sec) ||
 	   ((msg.hdr.ts.tv_sec == beg.tv_sec) && (msg.hdr.ts.tv_usec < beg.tv_usec)))
@@ -408,6 +665,28 @@ MsgStat::identify(void)
 		double avglen = (double) bytes/ (double) msgs;
 		fprintf(stdout, "Message length %g bytes (avg)\n", avglen);
 	}
+	fprintf(stdout, "Message bad   %lu\n", bads);
+	fprintf(stdout, "Message fisu  %lu\n", fisus);
+	fprintf(stdout, "Message lssu  %lu\n", lssus);
+	fprintf(stdout, "Message lssu2 %lu\n", lssu2s);
+	fprintf(stdout, "Message msu   %lu\n", msus);
+	if (sis[0]) fprintf(stdout, "        snmm  %lu\n", sis[0]);
+	if (sis[1]) fprintf(stdout, "        sntm  %lu\n", sis[1]);
+	if (sis[2]) fprintf(stdout, "        snsm  %lu\n", sis[2]);
+	if (sis[3]) fprintf(stdout, "        sccp  %lu\n", sis[3]);
+	if (sis[4]) fprintf(stdout, "        tup   %lu\n", sis[4]);
+	if (sis[5]) fprintf(stdout, "        isup  %lu\n", sis[5]);
+	if (sis[6]) fprintf(stdout, "        dup1  %lu\n", sis[6]);
+	if (sis[7]) fprintf(stdout, "        dup2  %lu\n", sis[7]);
+	if (sis[8]) fprintf(stdout, "        mtup  %lu\n", sis[8]);
+	if (sis[9]) fprintf(stdout, "        bisup %lu\n", sis[9]);
+	if (sis[10]) fprintf(stdout, "        siup  %lu\n", sis[10]);
+	if (sis[11]) fprintf(stdout, "        spnep %lu\n", sis[11]);
+	if (sis[12]) fprintf(stdout, "        stc   %lu\n", sis[12]);
+	if (sis[13]) fprintf(stdout, "        si13  %lu\n", sis[13]);
+	if (sis[14]) fprintf(stdout, "        si14  %lu\n", sis[14]);
+	if (sis[15]) fprintf(stdout, "        si15  %lu\n", sis[15]);
+	if (undec) fprintf(stdout, "        undec %lu\n", undec);
 	if (beg.tv_sec != 0x7fffffff || beg.tv_usec != 0x7fffffff) {
 		fprintf(stdout, "Timestamp beg %012ld.%06ld\n", beg.tv_sec, beg.tv_usec);
 	}
@@ -543,6 +822,7 @@ FileText::readmsg(void)
 		Path &p = Path::get(*this, ppa);
 		if ((m = new Message(p, &hdr, dat, &phdr)) == NULL)
 			throw Error(1);
+		p.add(*m);
 		break;
 	}
 	return (m);
@@ -572,6 +852,7 @@ FilePcap::readmsg(void)
 		memcpy(buf, dat, hdr.len);
 		if ((m = new Message(p, &hdr, buf, phdr)) == NULL)
 			throw Error(1);
+		p.add(*m);
 	}
 	return (m);
 }
