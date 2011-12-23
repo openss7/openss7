@@ -121,6 +121,163 @@ struct pseudohdr {
 	unsigned char lkno[2];
 };
 
+enum MessageType {
+	ISUP_MT_IAM	= 0x01,		// 0b00000001 - Initial address
+	ISUP_MT_SAM	= 0x02,		// 0b00000010 - Subsequent address (not ANSI)
+	ISUP_MT_INR	= 0x03,		// 0b00000011 - Information request
+	ISUP_MT_INF	= 0x04,		// 0b00000100 - Information
+	ISUP_MT_COT	= 0x05,		// 0b00000101 - Continuity
+	ISUP_MT_ACM	= 0x06,		// 0b00000110 - Address complete
+	ISUP_MT_CON	= 0x07,		// 0b00000111 - Connect (not ANSI)
+	ISUP_MT_FOT	= 0x08,		// 0b00001000 - Forward transfer
+	ISUP_MT_ANM	= 0x09,		// 0b00001001 - Answer
+	ISUP_MT_REL	= 0x0c,		// 0b00001100 - Release
+	ISUP_MT_SUS	= 0x0d,		// 0b00001101 - Suspend
+	ISUP_MT_RES	= 0x0e,		// 0b00001110 - Resume
+	ISUP_MT_RLC	= 0x10,		// 0b00010000 - Release complete
+	ISUP_MT_CCR	= 0x11,		// 0b00010001 - Continuity check request
+	ISUP_MT_RSC	= 0x12,		// 0b00010010 - Reset circuit
+	ISUP_MT_BLO	= 0x13,		// 0b00010011 - Blocking
+	ISUP_MT_UBL	= 0x14,		// 0b00010100 - Unblocking
+	ISUP_MT_BLA	= 0x15,		// 0b00010101 - Blocking acknowledgement
+	ISUP_MT_UBA	= 0x16,		// 0b00010110 - Unblocking acknowledgement
+	ISUP_MT_GRS	= 0x17,		// 0b00010111 - Circuit group reset
+	ISUP_MT_CGB	= 0x18,		// 0b00011000 - Circuit group blocking
+	ISUP_MT_CGU	= 0x19,		// 0b00011001 - Circuit group unblocking
+	ISUP_MT_CGBA	= 0x1a,		// 0b00011010 - Circuit group blocking acknowledgement
+	ISUP_MT_CGUA	= 0x1b,		// 0b00011011 - Circuit group unblocking acknowledgement
+	ISUP_MT_CMR	= 0x1c,		// 0b00011100 - Call Modification Request (not ANSI)
+	ISUP_MT_CMC	= 0x1d,		// 0b00011101 - Call Modification Completed (not ANSI)
+	ISUP_MT_CMRJ	= 0x1e,		// 0b00011110 - Call Modification Reject (not ANSI)
+	ISUP_MT_FAR	= 0x1f,		// 0b00011111 - Facility request (not ANSI)
+	ISUP_MT_FAA	= 0x20,		// 0b00100000 - Facility accepted (not ANSI)
+	ISUP_MT_FRJ	= 0x21,		// 0b00100001 - Facility reject (not ANSI)
+	ISUP_MT_FAD	= 0x22,		// 0b00100010 - Facility Deactivated (not ANSI)
+	ISUP_MT_FAI	= 0x23,		// 0b00100011 - Facility Information (not ANSI)
+	ISUP_MT_LPA	= 0x24,		// 0b00100100 - Loop back acknowledgement
+	ISUP_MT_CSVQ	= 0x25,		// 0b00100101 - CUG Selection and Validation Request (not ANSI)
+	ISUP_MT_CSVR	= 0x26,		// 0b00100110 - CUG Selection and Validation Response (not ANSI)
+	ISUP_MT_DRS	= 0x27,		// 0b00100111 - Delayed release (not ANSI)
+	ISUP_MT_PAM	= 0x28,		// 0b00101000 - Pass along
+	ISUP_MT_GRA	= 0x29,		// 0b00101001 - Circuit group reset acknowledgement
+	ISUP_MT_CQM	= 0x2a,		// 0b00101010 - Circuit group query
+	ISUP_MT_CQR	= 0x2b,		// 0b00101011 - Circuit group query response
+	ISUP_MT_CPG	= 0x2c,		// 0b00101100 - Call progress
+	ISUP_MT_USR	= 0x2d,		// 0b00101101 - User-to-user information (not ANSI)
+	ISUP_MT_UCIC	= 0x2e,		// 0b00101110 - Unequipped circuit identification code
+	ISUP_MT_CFN	= 0x2f,		// 0b00101111 - Confusion
+	ISUP_MT_OLM	= 0x30,		// 0b00110000 - Overload (not ANSI)
+	ISUP_MT_CRG	= 0x31,		// 0b00110001 - Charge information (not ANSI)
+	ISUP_MT_NRM	= 0x32,		// 0b00110010 - Network resource management (not ANSI)
+	ISUP_MT_FAC	= 0x33,		// 0b00110011 - Facility
+	ISUP_MT_UPT	= 0x34,		// 0b00110100 - User part test (not ANSI)
+	ISUP_MT_UPA	= 0x35,		// 0b00110101 - User part available (not ANSI)
+	ISUP_MT_IDR	= 0x36,		// 0b00110110 - Identification request (not ANSI)
+	ISUP_MT_IRS	= 0x37,		// 0b00110111 - Identification response (not ANSI)
+	ISUP_MT_SGM	= 0x38,		// 0b00111000 - Segmentation
+	ISUP_MT_CRA	= 0xe9,		// 0b11101001 - Circuit Reservation Ack (ANSI 2000)
+	ISUP_MT_CRM	= 0xea,		// 0b11101010 - Circuit Reservation (ANSI 2000)
+	ISUP_MT_CVR	= 0xeb,		// 0b11101011 - Circuit Validation Response (ANSI 2000)
+	ISUP_MT_CVT	= 0xec,		// 0b11101100 - Circuit Validation Test (ANSI 2000)
+	ISUP_MT_EXM	= 0xed,		// 0b11101101 - Exit (old Bellcore/ANSI 2000)
+	ISUP_MT_NON	= 0xf8,		// 0b11111000 - National Notification (Spain)
+	ISUP_MT_LLM	= 0xfc,		// 0b11111100 - National Malicious Call (Spain)
+	ISUP_MT_CAK	= 0xfd,		// 0b11111101 - Charge Acknowledgement (Singapore)
+	ISUP_MT_TCM	= 0xfe,		// 0b11111110 - Tariff Charge (Singapore)
+	ISUP_MT_MCP	= 0xff,		// 0b11111111 - Malicious Call Print (Singapore)
+};					// message type
+enum ParameterType {
+	ISUP_PT_EOP	= 0UL,		// 0x00 - 0b00000000 - End of optional parameters
+	ISUP_PT_CLRF	= 1UL,		// 0x01 - 0b00000001 - Call reference @
+	ISUP_PT_TMR	= 2UL,		// 0x02 - 0b00000010 - Transmission medium requirement
+	ISUP_PT_ATP	= 3UL,		// 0x03 - 0b00000011 - Access transport
+	ISUP_PT_CDPN	= 4UL,		// 0x04 - 0b00000100 - Called party number
+	ISUP_PT_SUBN	= 5UL,		// 0x05 - 0b00000101 - Subsequent number
+	ISUP_PT_NCI	= 6UL,		// 0x06 - 0b00000110 - Nature of connection indicators
+	ISUP_PT_FCI	= 7UL,		// 0x07 - 0b00000111 - Forward call indicators
+	ISUP_PT_OFCI	= 8UL,		// 0x08 - 0b00001000 - Optional forward call indicators
+	ISUP_PT_CPC	= 9UL,		// 0x09 - 0b00001001 - Calling party's category
+	ISUP_PT_CGPN	= 10UL,		// 0x0a - 0b00001010 - Calling party number
+	ISUP_PT_RDGN	= 11UL,		// 0x0b - 0b00001011 - Redirecting number
+	ISUP_PT_RDNN	= 12UL,		// 0x0c - 0b00001100 - Redirection number
+	ISUP_PT_CONR	= 13UL,		// 0x0d - 0b00001101 - Connection request
+	ISUP_PT_INRI	= 14UL,		// 0x0e - 0b00001110 - Information request indicators
+	ISUP_PT_INFI	= 15UL,		// 0x0f - 0b00001111 - Information indicators @
+	ISUP_PT_COTI	= 16UL,		// 0x10 - 0b00010000 - Continuity indicators
+	ISUP_PT_BCI	= 17UL,		// 0x11 - 0b00010001 - Backward call indicators
+	ISUP_PT_CAUS	= 18UL,		// 0x12 - 0b00010010 - Cause indicators
+	ISUP_PT_RDI	= 19UL,		// 0x13 - 0b00010011 - Redirection information
+	ISUP_PT_CGI	= 21UL,		// 0x15 - 0b00010101 - Circuit group supervision msg type ind
+	ISUP_PT_RS	= 22UL,		// 0x16 - 0b00010110 - Range and status
+	ISUP_PT_CMI	= 23UL,		// 0x17 - 0b00010111 - Call modification indicators (Blue Book)
+	ISUP_PT_FACI	= 24UL,		// 0x18 - 0b00011000 - Facility indicator
+	ISUP_PT_FAII	= 25UL,		// 0x19 - 0b00011001 - Facility information indicators (Bcore)
+	ISUP_PT_CUGI	= 26UL,		// 0x1a - 0b00011010 - Closed user group interlock code
+	ISUP_PT_INDEX	= 27UL,		// 0x1b - 0b00011011 - Index (Bellcore)
+	ISUP_PT_USI	= 29UL,		// 0x1d - 0b00011101 - User service information
+	ISUP_PT_SPC	= 30UL,		// 0x1e - 0b00011110 - Signalling point code @ (Bellcore)
+	ISUP_PT_UUI	= 32UL,		// 0x20 - 0b00100000 - User to user information
+	ISUP_PT_CONN	= 33UL,		// 0x21 - 0b00100001 - Connected number
+	ISUP_PT_SRIS	= 34UL,		// 0x22 - 0b00100010 - Suspend/resume indicators
+	ISUP_PT_TNS	= 35UL,		// 0x23 - 0b00100011 - Transit network selection @
+	ISUP_PT_EVNT	= 36UL,		// 0x24 - 0b00100100 - Event information
+	ISUP_PT_CSI	= 38UL,		// 0x26 - 0b00100110 - Circuit state indicator @
+	ISUP_PT_ACL	= 39UL,		// 0x27 - 0b00100111 - Automatic congestion level
+	ISUP_PT_OCDN	= 40UL,		// 0x28 - 0b00101000 - Original called number
+	ISUP_PT_OBCI	= 41UL,		// 0x29 - 0b00101001 - Optional backward call indicators
+	ISUP_PT_UUIND	= 42UL,		// 0x2a - 0b00101010 - User to user indicators
+	ISUP_PT_ISPC	= 43UL,		// 0x2b - 0b00101011 - Origination ISC point code
+	ISUP_PT_GNOT	= 44UL,		// 0x2c - 0b00101100 - Generic notification
+	ISUP_PT_CHI	= 45UL,		// 0x2d - 0b00101101 - Call history information
+	ISUP_PT_ADI	= 46UL,		// 0x2e - 0b00101110 - Access delivery information
+	ISUP_PT_NSF	= 47UL,		// 0x2f - 0b00101111 - Network specific facilities @
+	ISUP_PT_USIP	= 48UL,		// 0x30 - 0b00110000 - User service information prime
+	ISUP_PT_PROP	= 49UL,		// 0x31 - 0b00110001 - Propagation delay counter
+	ISUP_PT_ROPS	= 50UL,		// 0x32 - 0b00110010 - Remote operations @
+	ISUP_PT_SA	= 51UL,		// 0x33 - 0b00110011 - Service activation @
+	ISUP_PT_UTI	= 52UL,		// 0x34 - 0b00110100 - User teleservice information
+	ISUP_PT_TMU	= 53UL,		// 0x35 - 0b00110101 - Transmission medium used
+	ISUP_PT_CDI	= 54UL,		// 0x36 - 0b00110110 - Call diversion information
+	ISUP_PT_ECI	= 55UL,		// 0x37 - 0b00110111 - Echo control information
+	ISUP_PT_MCI	= 56UL,		// 0x38 - 0b00111000 - Message compatibility information
+	ISUP_PT_PCI	= 57UL,		// 0x39 - 0b00111001 - Parameter compatibility information
+	ISUP_PT_MLPP	= 58UL,		// 0x3a - 0b00111010 - MLPP preference (Precedence)
+	ISUP_PT_MCIQ	= 59UL,		// 0x3b - 0b00111011 - MCID request indicator
+	ISUP_PT_MCIR	= 60UL,		// 0x3c - 0b00111100 - MCID response indicator
+	ISUP_PT_HOPC	= 61UL,		// 0x3d - 0b00111101 - Hop counter (reserved)
+	ISUP_PT_TMRP	= 62UL,		// 0x3e - 0b00111110 - Transmission medium requirement prime
+	ISUP_PT_LN	= 63UL,		// 0x3f - 0b00111111 - Location number
+	ISUP_PT_RDNR	= 64UL,		// 0x40 - 0b01000000 - Redirection number restriction
+	ISUP_PT_FREEP	= 65UL,		// 0x41 - 0b01000001 - Freephone indicators (reserved)
+	ISUP_PT_GREF	= 66UL,		// 0x42 - 0b01000010 - Generic reference (reserved)
+	ISUP_PT_GNUM	= 192UL,	// 0xc0 - 0b11000000 - Generic number (address Bellcore)
+	ISUP_PT_GDIG	= 193UL,	// 0xc1 - 0b11000001 - Generic digits @
+	ISUP_PT_EGRESS	= 195UL,	// 0xc3 - 0b11000011 - Egress (ANSI)
+	ISUP_PT_JUR	= 196UL,	// 0xc4 - 0b11000100 - Jurisdiction (ANSI)
+	ISUP_PT_CIDC	= 197UL,	// 0xc5 - 0b11000101 - Carrier identification code (ANSI)
+	ISUP_PT_BGROUP	= 198UL,	// 0xc6 - 0b11000110 - Business group (ANSI)
+	ISUP_PT_NOTI	= 225UL,	// 0xe1 - 0b11100001 - Notification indicator (ANSI)
+	ISUP_PT_SVACT	= 226UL,	// 0xe2 - 0b11100010 - Service activation (ANSI)
+	ISUP_PT_TRNSRQ	= 227UL,	// 0xe3 - 0b11100011 - Transaction request (ANSI,Bellcore)
+	ISUP_PT_SPR	= 228UL,	// 0xe4 - 0b11100100 - Special processing request (Bellcore)
+	ISUP_PT_CGCI	= 229UL,	// 0xe5 - 0b11100101 - Cc't group char ind (ANSI,Bellcore)
+	ISUP_PT_CVRI	= 230UL,	// 0xe6 - 0b11100110 - Cc't validation resp ind (ANSI,Bellcore)
+	ISUP_PT_OTGN	= 231UL,	// 0xe7 - 0b11100111 - Outgoing trunk group numb (ANSI,Bellcore)
+	ISUP_PT_CIN	= 232UL,	// 0xe8 - 0b11101000 - Circuit ident name (ANSI,Bellcore)
+	ISUP_PT_CLLI	= 233UL,	// 0xe9 - 0b11101001 - Common language loc id (ANSI,Bellcore)
+	ISUP_PT_OLI	= 234UL,	// 0xea - 0b11101010 - Originating line info (ANSI,Bellcore)
+	ISUP_PT_CHGN	= 235UL,	// 0xeb - 0b11101011 - Charge number (ANSI,Bellcore)
+	ISUP_PT_SVCD	= 236UL,	// 0xec - 0b11101100 - Service code indicator (ANSI,Bellcore)
+	ISUP_PT_CSEL	= 238UL,	// 0xee - 0b11101110 - Carrier selection info (ANSI,Bellcore)
+	ISUP_PT_ORI	= 243UL,	// 0xf3 - 0b11110011 - Outgoing route identification (Spain)
+	ISUP_PT_IRI	= 244UL,	// 0xf4 - 0b11110100 - Incoming route identification (Spain)
+	ISUP_PT_RATE	= 248UL,	// 0xf8 - 0b11111000 - Rate (Spain)
+	ISUP_PT_IIC	= 249UL,	// 0xf9 - 0b11111001 - Identifier of incoming circuit (Spain)
+	ISUP_PT_TOI	= 253UL,	// 0xfd - 0b11111101 - Trunk offering information (Singapore)
+	ISUP_PT_TON	= 253UL,	// 0xfd - 0b11111101 - Type of notification (Spain)
+	ISUP_PT_CRI	= 254UL,	// 0xfe - 0b11111110 - Charge rate information (Singapore)
+	ISUP_PT_ICCI	= 255UL,	// 0xff - 0b11111111 - Call charge information (Singapore)
+};
 //  -------------------------------------------------------------------------
 //
 //  MsgStat class
@@ -136,6 +293,7 @@ class MsgStat {
 	ulong lssus;
 	ulong lssu2s;
 	ulong msus;
+	friend class Message;
 	ulong sis[16];
 	ulong undec;
 	struct timeval beg, end;
@@ -157,6 +315,7 @@ class MsgStat {
 	};
 	virtual void identify(void);
 	virtual void add(Message& msg);
+	virtual void complete(Message& msg);
 };
 
 //  -------------------------------------------------------------------------
@@ -323,6 +482,7 @@ class Path : public MsgStat {
 	enum HeaderType ht;
 	enum MsgPriority pr;
 	enum RlType rt;
+	list<Message *> messages;
 
       public:
 	Path(File& f, int a) : file(f), ppa(a), ht(HT_UNKNOWN),
@@ -448,7 +608,17 @@ class Path : public MsgStat {
 					fprintf(stderr, "W: routing label change from 24-bit to 14-bit\n");
 				break;
 			}
+			rt = r;
 		}
+	};
+	bool detecting(void) {
+		if (ht == HT_UNKNOWN)
+			return (true);
+		if (pr == MP_UNKNOWN)
+			return (true);
+		if (rt == RL_UNKNOWN)
+			return (true);
+		return (false);
 	};
 };
 
@@ -459,12 +629,17 @@ class Path : public MsgStat {
 //  -------------------------------------------------------------------------
 //  Each message object represents an SS7 message.
 //
-enum MessageType {
+enum MsgType {
 	MT_UNKNOWN,
 	MT_FISU,
 	MT_LSSU,
 	MT_LSSU2,
 	MT_MSU
+};
+enum ProtocolTest {
+	PT_YES,
+	PT_MAYBE,
+	PT_NO
 };
 class Message {
       private:
@@ -479,109 +654,28 @@ class Message {
 	unsigned char *beg;
 	unsigned char *mid;
 	unsigned char *end;
+	unsigned char *sio;
+	unsigned char *sif;
 	unsigned int bib, bsn, fib, fsn, li, li0, ni, mp, si, dpc, opc, sls, cic, mt;
 
 	Message(Path& p, struct pcap_pkthdr *h, unsigned char *d, struct pseudohdr *ph) :
-		path(p), hdr(*h), dat(d), phdr(*ph), mtp2decode(!!0), mtp3decode(!!0),
+		path(p), hdr(*h), dat(d), phdr(*ph), mtp2decode(false), mtp3decode(false),
 		beg(d), mid(d), end(d+h->caplen)
 	{
 		if (debug > 3)
 			fprintf(stderr, "I: %s\n", __PRETTY_FUNCTION__);
-		if (3 <= hdr.len && hdr.len <= 5)
-			path.setHeaderType(HT_BASIC);
-		if (6 <= hdr.len && hdr.len <= 8)
-			path.setHeaderType(HT_EXTENDED);
-		switch (path.headerType()) {
-		case HT_UNKNOWN:
-			fprintf(stderr, "unknown header type\n");
-			return;
-		case HT_BASIC:
-			// basic link header
-			bsn = *mid & 0x7f;
-			bib = (*mid++ & 0x80) >> 7;
-			fsn = *mid & 0x7f;
-			bib = (*mid++ & 0x80) >> 7;
-			li = *mid & 0x3f;
-			if ((li != hdr.len - 3) && (hdr.len - 3 <= 63 || li != 63))
-				fprintf(stderr, "bad length indicator %d != %d\n", li, hdr.len - 3);
-			mp = (*mid++ & 0xc0) >> 6;
-			if (mp != 0) {
-				path.setRoutingLabel(RL_24BIT_PC);
-				path.setMsgPriority(MP_JAPAN);
-			}
-			break;
-		case HT_EXTENDED:
-			// annex a link header
-			bsn = (*mid++ & 0xff);
-			bsn |= ((*mid & 0x0f) << 8);
-			bib = (*mid++ & 0x80) >> 7;
-			fsn = (*mid++ & 0xff);
-			fsn |= ((*mid & 0x0f) << 8);
-			fib = (*mid++ & 0x80) >> 7;
-			li = (*mid++ & 0xff);
-			li |= ((*mid & 0x01) << 8);
-			if ((li != hdr.len - 6) && (hdr.len - 6 <= 63 || li != 63))
-				fprintf(stderr, "bad length indicator %d != %d\n", li, hdr.len - 6);
-			mp = (*mid++ & 0xc0) >> 6;
-			if (mp != 0) {
-				path.setRoutingLabel(RL_24BIT_PC);
-				path.setMsgPriority(MP_JAPAN);
-			}
-			break;
-		}
-		mtp2decode = !0;
-		switch (li) {
-		case 0:
-			return;
-		case 1:
-			si = (*mid++ & 0xff);
-			return;
-		case 2:
-			si = (*mid++ & 0xff);
-			mid++;
-			return;
-		}
-		si = *mid & 0x0f;
-		ni = (*mid & 0xc0) >> 6;
-		if (ni == 0) {
-			path.setRoutingLabel(RL_14BIT_PC);
-			path.setMsgPriority(MP_INTERNATIONAL);
-		}
-		switch (path.msgPriority()) {
-		case MP_UNKNOWN:
-			mp = (*mid & 0x30) >> 4;
-			break;
-		case MP_JAPAN:
-			break;
-		case MP_NATIONAL:
-			mp = (*mid & 0x30) >> 4;
-			break;
-		case MP_INTERNATIONAL:
-			mp = 0;
-			break;
-		}
-		mid++;
-		if (li < 6) {
-			fprintf(stderr, "too short for RL, li = %d", li);
-			return;
-		}
-		if (li < 9)
-			path.setRoutingLabel(RL_14BIT_PC);
-		else if (si == 0x05 && li < 11)
-			path.setRoutingLabel(RL_14BIT_PC);
-		if (path.getRoutingLabel() == RL_UNKNOWN) {
-		}
 	};
 	virtual ~Message(void) {
 		if (debug > 3)
 			fprintf(stderr, "I: %s\n", __PRETTY_FUNCTION__);
 		free(dat);
 	};
+	int decode(void);
 	bool isFisu(void) { return ((hdr.len == 3) || (hdr.len == 6)); };
 	bool isLssu(void) { return ((hdr.len == 4) || (hdr.len == 7)); };
 	bool isLssu2(void) { return ((hdr.len == 5) || (hdr.len == 6)); };
 	bool isMsu(void) { return (hdr.len > 6); };
-	enum MessageType messageType(void) {
+	enum MsgType messageType(void) {
 		switch (hdr.len) {
 		case 0: case 1: case 2: return (MT_UNKNOWN);
 		case 3: case 6: return (MT_FISU);
@@ -597,6 +691,14 @@ class Message {
 			return (-1);
 		return (si);
 	};
+	enum ProtocolTest reasonableItutIsupMsg(void);
+	enum ProtocolTest reasonableAnsiIsupMsg(void);
+	enum ProtocolTest reasonableItutSnmmMsg(void);
+	enum ProtocolTest reasonableAnsiSnmmMsg(void);
+	enum ProtocolTest reasonableItutSntmMsg(void);
+	enum ProtocolTest reasonableAnsiSntmMsg(void);
+	enum ProtocolTest reasonableItutSnsmMsg(void);
+	enum ProtocolTest reasonableAnsiSnsmMsg(void);
 };
 
 void
@@ -636,6 +738,9 @@ MsgStat::add(Message& msg)
 			undec++;
 		break;
 	}
+	if (msg.hdr.len > 200) {
+		fprintf(stderr, "W: message length is %u\n", msg.hdr.len);
+	}
 	bytes += msg.hdr.len;
 	if ((msg.hdr.ts.tv_sec < beg.tv_sec) ||
 	   ((msg.hdr.ts.tv_sec == beg.tv_sec) && (msg.hdr.ts.tv_usec < beg.tv_usec)))
@@ -645,6 +750,10 @@ MsgStat::add(Message& msg)
 		end = msg.hdr.ts;
 }
 void
+MsgStat::complete(Message &msg)
+{
+}
+void
 File::add(Message& msg)
 {
 	MsgStat::add(msg);
@@ -652,8 +761,26 @@ File::add(Message& msg)
 void
 Path::add(Message& msg)
 {
-	MsgStat::add(msg);
-	file.add(msg);
+	if (detecting()) {
+		MsgStat::add(msg);
+		messages.push_back(&msg);
+	} else if (messages.empty()) {
+		MsgStat::add(msg);
+		MsgStat::complete(msg);
+		file.add(msg);
+		file.complete(msg);
+		delete &msg;
+	} else {
+		messages.push_back(&msg);
+		while(!messages.empty()) {
+			Message *m = messages.front();
+			messages.pop_front();
+			m->decode(); // redecode after detection
+			MsgStat::complete(*m);
+			file.complete(*m);
+			delete m;
+		}
+	}
 }
 
 void
@@ -822,6 +949,7 @@ FileText::readmsg(void)
 		Path &p = Path::get(*this, ppa);
 		if ((m = new Message(p, &hdr, dat, &phdr)) == NULL)
 			throw Error(1);
+		m->decode();
 		p.add(*m);
 		break;
 	}
@@ -852,6 +980,7 @@ FilePcap::readmsg(void)
 		memcpy(buf, dat, hdr.len);
 		if ((m = new Message(p, &hdr, buf, phdr)) == NULL)
 			throw Error(1);
+		m->decode();
 		p.add(*m);
 	}
 	return (m);
@@ -860,10 +989,784 @@ FilePcap::readmsg(void)
 void
 File::readmsgs(void)
 {
-	Message *m;
+	while (this->readmsg() != NULL) ;
+}
 
-	while ((m = this->readmsg()) != NULL)
-		delete m;
+int
+Message::decode(void)
+{
+	if (!mtp2decode) {
+		if (3 <= hdr.len && hdr.len <= 5)
+			path.setHeaderType(HT_BASIC);
+		if (6 <= hdr.len && hdr.len <= 8)
+			path.setHeaderType(HT_EXTENDED);
+		switch (path.headerType()) {
+		case HT_UNKNOWN:
+			fprintf(stderr, "unknown header type\n");
+			return (0);
+		case HT_BASIC:
+			// basic link header
+			bsn = *mid & 0x7f;
+			bib = (*mid++ & 0x80) >> 7;
+			fsn = *mid & 0x7f;
+			bib = (*mid++ & 0x80) >> 7;
+			li = *mid & 0x3f;
+			if ((li != hdr.len - 3) && (hdr.len - 3 <= 63 || li != 63))
+				fprintf(stderr, "bad length indicator %d != %d\n", li, hdr.len - 3);
+			li0 = (*mid++ & 0xc0) >> 6;
+			if (li0 != 0) {
+				path.setRoutingLabel(RL_24BIT_PC);
+				path.setMsgPriority(MP_JAPAN);
+			}
+			break;
+		case HT_EXTENDED:
+			// annex a link header
+			bsn = (*mid++ & 0xff);
+			bsn |= ((*mid & 0x0f) << 8);
+			bib = (*mid++ & 0x80) >> 7;
+			fsn = (*mid++ & 0xff);
+			fsn |= ((*mid & 0x0f) << 8);
+			fib = (*mid++ & 0x80) >> 7;
+			li = (*mid++ & 0xff);
+			li |= ((*mid & 0x01) << 8);
+			if ((li != hdr.len - 6) && (hdr.len - 6 <= 63 || li != 63))
+				fprintf(stderr, "bad length indicator %d != %d\n", li, hdr.len - 6);
+			li0 = (*mid++ & 0xc0) >> 6;
+			if (li0 != 0) {
+				path.setRoutingLabel(RL_24BIT_PC);
+				path.setMsgPriority(MP_JAPAN);
+			}
+			break;
+		}
+		sio = mid;
+		mid++;
+		sif = mid;
+		mtp2decode = true;
+	}
+	switch (li) {
+	case 0:
+		return (1);
+	case 1:
+		si = (*sio++ & 0xff);
+		return (1);
+	case 2:
+		si = (*sio++ & 0xff);
+		return (1);
+	}
+	si = *sio & 0x0f;
+	ni = (*sio & 0xc0) >> 6;
+	if (ni == 0) {
+		path.setRoutingLabel(RL_14BIT_PC);
+		path.setMsgPriority(MP_INTERNATIONAL);
+	}
+	switch (path.msgPriority()) {
+	case MP_UNKNOWN:
+		mp = (*sio & 0x30) >> 4;
+		if (mp != 0 && path.routingLabel() == RL_24BIT_PC)
+			path.setMsgPriority(MP_NATIONAL);
+		break;
+	case MP_JAPAN:
+		mp = li0;
+		break;
+	case MP_NATIONAL:
+		mp = (*sio & 0x30) >> 4;
+		break;
+	case MP_INTERNATIONAL:
+		mp = 0;
+		break;
+	}
+	if (li < 6) {
+		fprintf(stderr, "too short for RL, li = %d", li);
+		return (-1);
+	}
+	if (li < 9)
+		path.setRoutingLabel(RL_14BIT_PC);
+	else if (si == 0x05 && li < 11)
+		path.setRoutingLabel(RL_14BIT_PC);
+	switch (si) {
+	case 0:		// snmm
+		switch (reasonableAnsiSnmmMsg()) {
+		case PT_YES:
+			switch (reasonableItutSnmmMsg()) {
+			case PT_YES:
+				break;
+			case PT_MAYBE:
+			case PT_NO:
+				if (debug && path.routingLabel() != RL_24BIT_PC) {
+					fprintf(stderr, "I: setting 24-bit on snmm h1h0 %02x, li = %u\n", sif[7], li);
+					fprintf(stderr, "I: snmm message number %lu\n", path.sis[si] + 1);
+					fprintf(stderr, "I: msu  message number %lu\n", path.msus + 1);
+				}
+				path.setRoutingLabel(RL_24BIT_PC);
+				break;
+			}
+			break;
+		case PT_MAYBE:
+			switch (reasonableItutSnmmMsg()) {
+			case PT_YES:
+				if (debug && path.routingLabel() != RL_14BIT_PC) {
+					fprintf(stderr, "I: setting 14-bit on snmm h1h0 0x%02x, li = %u\n", sif[4], li);
+					fprintf(stderr, "I: snmm message number %lu\n", path.sis[si] + 1);
+					fprintf(stderr, "I: msu  message number %lu\n", path.msus + 1);
+				}
+				path.setRoutingLabel(RL_14BIT_PC);
+				break;
+			case PT_MAYBE:
+				break;
+			case PT_NO:
+				if (debug && path.routingLabel() != RL_24BIT_PC) {
+					fprintf(stderr, "I: setting 24-bit on snmm h1h0 0x%02x, li = %u\n", sif[7], li);
+					fprintf(stderr, "I: snmm message number %lu\n", path.sis[si] + 1);
+					fprintf(stderr, "I: msu  message number %lu\n", path.msus + 1);
+				}
+				path.setRoutingLabel(RL_24BIT_PC);
+				break;
+			}
+			break;
+		case PT_NO:
+			switch (reasonableItutSnmmMsg()) {
+			case PT_YES:
+			case PT_MAYBE:
+				if (debug && path.routingLabel() != RL_14BIT_PC) {
+					fprintf(stderr, "I: setting 14-bit on snmm h1h0 0x%02x, li = %u\n", sif[4], li);
+					fprintf(stderr, "I: snmm message number %lu\n", path.sis[si] + 1);
+					fprintf(stderr, "I: msu  message number %lu\n", path.msus + 1);
+				}
+				path.setRoutingLabel(RL_14BIT_PC);
+				break;
+			case PT_NO:
+				return (-1);
+			}
+			break;
+		}
+		break;
+	case 1:		// sntm
+		switch (reasonableAnsiSntmMsg()) {
+		case PT_YES:
+			switch (reasonableItutSntmMsg()) {
+			case PT_YES:
+				break;
+			case PT_MAYBE:
+			case PT_NO:
+				if (debug && path.routingLabel() != RL_24BIT_PC) {
+					fprintf(stderr, "I: setting 24-bit on sntm h1h0 %02x, li = %u\n", sif[7], li);
+					fprintf(stderr, "I: sntm message number %lu\n", path.sis[si] + 1);
+					fprintf(stderr, "I: msu  message number %lu\n", path.msus + 1);
+				}
+				path.setRoutingLabel(RL_24BIT_PC);
+				break;
+			}
+			break;
+		case PT_MAYBE:
+			switch (reasonableItutSntmMsg()) {
+			case PT_YES:
+				if (debug && path.routingLabel() != RL_14BIT_PC) {
+					fprintf(stderr, "I: setting 14-bit on sntm h1h0 0x%02x, li = %u\n", sif[4], li);
+					fprintf(stderr, "I: sntm message number %lu\n", path.sis[si] + 1);
+					fprintf(stderr, "I: msu  message number %lu\n", path.msus + 1);
+				}
+				path.setRoutingLabel(RL_14BIT_PC);
+				break;
+			case PT_MAYBE:
+				break;
+			case PT_NO:
+				if (debug && path.routingLabel() != RL_24BIT_PC) {
+					fprintf(stderr, "I: setting 24-bit on sntm h1h0 0x%02x, li = %u\n", sif[7], li);
+					fprintf(stderr, "I: sntm message number %lu\n", path.sis[si] + 1);
+					fprintf(stderr, "I: msu  message number %lu\n", path.msus + 1);
+				}
+				path.setRoutingLabel(RL_24BIT_PC);
+				break;
+			}
+			break;
+		case PT_NO:
+			switch (reasonableItutSntmMsg()) {
+			case PT_YES:
+			case PT_MAYBE:
+				if (debug && path.routingLabel() != RL_14BIT_PC) {
+					fprintf(stderr, "I: setting 14-bit on sntm h1h0 0x%02x, li = %u\n", sif[4], li);
+					fprintf(stderr, "I: sntm message number %lu\n", path.sis[si] + 1);
+					fprintf(stderr, "I: msu  message number %lu\n", path.msus + 1);
+				}
+				path.setRoutingLabel(RL_14BIT_PC);
+				break;
+			case PT_NO:
+				return (-1);
+			}
+			break;
+		}
+		break;
+		break;
+	case 2:		// snsm
+		switch (reasonableAnsiSnsmMsg()) {
+		case PT_YES:
+			switch (reasonableItutSnsmMsg()) {
+			case PT_YES:
+				break;
+			case PT_MAYBE:
+			case PT_NO:
+				if (debug && path.routingLabel() != RL_24BIT_PC) {
+					fprintf(stderr, "I: setting 24-bit on snsm h1h0 %02x, li = %u\n", sif[7], li);
+					fprintf(stderr, "I: snsm message number %lu\n", path.sis[si] + 1);
+					fprintf(stderr, "I: msu  message number %lu\n", path.msus + 1);
+				}
+				path.setRoutingLabel(RL_24BIT_PC);
+				break;
+			}
+			break;
+		case PT_MAYBE:
+			switch (reasonableItutSnsmMsg()) {
+			case PT_YES:
+				if (debug && path.routingLabel() != RL_14BIT_PC) {
+					fprintf(stderr, "I: setting 14-bit on snsm h1h0 0x%02x, li = %u\n", sif[4], li);
+					fprintf(stderr, "I: snsm message number %lu\n", path.sis[si] + 1);
+					fprintf(stderr, "I: msu  message number %lu\n", path.msus + 1);
+				}
+				path.setRoutingLabel(RL_14BIT_PC);
+				break;
+			case PT_MAYBE:
+				break;
+			case PT_NO:
+				if (debug && path.routingLabel() != RL_24BIT_PC) {
+					fprintf(stderr, "I: setting 24-bit on snsm h1h0 0x%02x, li = %u\n", sif[7], li);
+					fprintf(stderr, "I: snsm message number %lu\n", path.sis[si] + 1);
+					fprintf(stderr, "I: msu  message number %lu\n", path.msus + 1);
+				}
+				path.setRoutingLabel(RL_24BIT_PC);
+				break;
+			}
+			break;
+		case PT_NO:
+			switch (reasonableItutSnsmMsg()) {
+			case PT_YES:
+			case PT_MAYBE:
+				if (debug && path.routingLabel() != RL_14BIT_PC) {
+					fprintf(stderr, "I: setting 14-bit on snsm h1h0 0x%02x, li = %u\n", sif[4], li);
+					fprintf(stderr, "I: snsm message number %lu\n", path.sis[si] + 1);
+					fprintf(stderr, "I: msu  message number %lu\n", path.msus + 1);
+				}
+				path.setRoutingLabel(RL_14BIT_PC);
+				break;
+			case PT_NO:
+				return (-1);
+			}
+			break;
+		}
+		break;
+	case 3:		// sccp
+	case 4:		// tup
+		break;
+	case 5:		// isup
+		switch (reasonableAnsiIsupMsg()) {
+		case PT_YES:
+			switch (reasonableItutIsupMsg()) {
+			case PT_YES:
+				break;
+			case PT_MAYBE:
+			case PT_NO:
+				if (debug && path.routingLabel() != RL_24BIT_PC) {
+					fprintf(stderr, "I: setting 24-bit on isup mt 0x%02x, li = %u\n", sif[9], li);
+					fprintf(stderr, "I: isup message number %lu\n", path.sis[si] + 1);
+					fprintf(stderr, "I: msu  message number %lu\n", path.msus + 1);
+				}
+				path.setRoutingLabel(RL_24BIT_PC);
+				break;
+			}
+			break;
+		case PT_MAYBE:
+			switch (reasonableItutIsupMsg()) {
+			case PT_YES:
+				if (debug && path.routingLabel() != RL_14BIT_PC) {
+					fprintf(stderr, "I: setting 14-bit on isup mt 0x%02x, li = %u\n", sif[6], li);
+					fprintf(stderr, "I: isup message number %lu\n", path.sis[si] + 1);
+					fprintf(stderr, "I: msu  message number %lu\n", path.msus + 1);
+				}
+				path.setRoutingLabel(RL_14BIT_PC);
+				break;
+			case PT_MAYBE:
+				break;
+			case PT_NO:
+				if (debug && path.routingLabel() != RL_24BIT_PC) {
+					fprintf(stderr, "I: setting 24-bit on isup mt 0x%02x, li = %u\n", sif[9], li);
+					fprintf(stderr, "I: isup message number %lu\n", path.sis[si] + 1);
+					fprintf(stderr, "I: msu  message number %lu\n", path.msus + 1);
+				}
+				path.setRoutingLabel(RL_24BIT_PC);
+				break;
+			}
+			break;
+		case PT_NO:
+			switch (reasonableItutIsupMsg()) {
+			case PT_YES:
+			case PT_MAYBE:
+				if (debug && path.routingLabel() != RL_14BIT_PC) {
+					fprintf(stderr, "I: setting 14-bit on isup mt 0x%02x, li = %u\n", sif[6], li);
+					fprintf(stderr, "I: isup message number %lu\n", path.sis[si] + 1);
+					fprintf(stderr, "I: msu  message number %lu\n", path.msus + 1);
+				}
+				path.setRoutingLabel(RL_14BIT_PC);
+				break;
+			case PT_NO:
+				return (-1);
+			}
+			break;
+		}
+		break;
+	default:
+		break;
+	}
+	if (!mtp3decode) {
+		mtp3decode = true;
+	}
+	return (1);
+}
+
+enum ProtocolTest
+Message::reasonableItutSnmmMsg(void)
+{
+	size_t size = sif - beg;
+
+	switch (size) {
+	case 5:		// trx or slm message
+		switch (sif[4]) {	// ITU H0H1 byte
+		case 0x17:	// tra
+		case 0x27:	// trw
+		case 0x13:	// rct
+		case 0x28:	// css
+		case 0x38:	// cns
+		case 0x48:	// cnp
+		case 0x12:	// eco
+		case 0x22:	// eca
+		case 0x16:	// lin
+		case 0x26:	// lun
+		case 0x36:	// lia
+		case 0x46:	// lua
+		case 0x56:	// lid
+		case 0x66:	// lfu
+		case 0x76:	// llt
+		case 0x86:	// lrt
+			return (PT_YES);
+		}
+		return (PT_NO);
+	case 6:		// com or cbm message
+		switch (sif[4]) {	// ITU H0H1 byte
+		case 0x11:	// coo
+		case 0x21:	// coa
+		case 0x51:	// cbd
+		case 0x61:	// cba
+			return (PT_YES);
+		}
+		return (PT_NO);
+	case 7:		// tfc or tfm or dlc message
+		switch (sif[4]) {
+		case 0x23:	// tfc
+		case 0x14:	// tfp
+		case 0x24:	// tcp
+		case 0x34:	// tfr
+		case 0x44:	// tcr
+		case 0x54:	// tfa
+		case 0x64:	// tca
+		case 0x15:	// rst
+		case 0x25:	// rsr
+		case 0x35:	// rcp
+		case 0x45:	// rcr
+			return (PT_YES);
+		}
+		return (PT_NO);
+	case 8:
+		switch (sif[4]) {	// ITU H0H1 byte
+		case 0x1a:	// upu
+		case 0x2a:	// upa
+		case 0x3a:	// upt
+			return (PT_YES);
+		}
+		return (PT_NO);
+	}
+	return (PT_NO);
+}
+enum ProtocolTest
+Message::reasonableAnsiSnmmMsg(void)
+{
+	size_t size = end - sif;
+
+	if (size < 8)
+		return (PT_NO);
+
+	switch (size) {
+	case 8:
+		switch (sif[7]) {
+		case 0x17:	// tra
+		case 0x27:	// trw
+		case 0x13:	// rct
+			return (PT_YES);
+		}
+		return (PT_NO);
+	case 9:		// slm message
+		switch (sif[7]) {
+		case 0x28:	// css
+		case 0x38:	// cns
+		case 0x48:	// cnp
+		case 0x12:	// eco
+		case 0x22:	// eca
+		case 0x16:	// lin
+		case 0x26:	// lun
+		case 0x36:	// lia
+		case 0x46:	// lua
+		case 0x56:	// lid
+		case 0x66:	// lfu
+		case 0x76:	// llt
+		case 0x86:	// lrt
+			return (PT_YES);
+		}
+		return (PT_NO);
+	case 10:		// com or cbm message
+		switch (sif[7]) {
+		case 0x11:	// coo
+		case 0x21:	// coa
+		case 0x51:	// cbd
+		case 0x61:	// cba
+			return (PT_YES);
+		}
+		return (PT_NO);
+	case 11:		// tfm or dlc message
+		switch (sif[7]) {
+		case 0x14:	// tfp
+		case 0x24:	// tcp
+		case 0x34:	// tfr
+		case 0x44:	// tcr
+		case 0x54:	// tfa
+		case 0x64:	// tca
+		case 0x15:	// rst
+		case 0x25:	// rsr
+		case 0x35:	// rcp
+		case 0x45:	// rcr
+		case 0x18:	// dlc
+			return (PT_YES);
+		}
+		return (PT_NO);
+	case 12:		// tfc or upm message
+		switch (sif[7]) {
+		case 0x23:	// tfc
+		case 0x1a:	// upu
+		case 0x2a:	// upa
+		case 0x3a:	// upt
+			return (PT_YES);
+		}
+		return (PT_NO);
+	default:
+		return (PT_NO);
+	}
+}
+
+enum ProtocolTest
+Message::reasonableItutSntmMsg(void)
+{
+	size_t size = sif - beg;
+
+	if (6 > size || size > 21)
+		return (PT_NO);
+
+	switch (sif[4]) {
+	case 0x11:
+	case 0x21:
+		break;
+	default:
+		return (PT_NO);
+	}
+	switch (size) {
+	case 6:
+	case 7:
+	case 8:
+		if ((sif[5] >> 4) == size - 6)
+			return (PT_YES);
+		return (PT_NO);
+	}
+	if ((sif[5] >> 4) == size - 6)
+		return (PT_MAYBE);
+	return (PT_NO);
+}
+enum ProtocolTest
+Message::reasonableAnsiSntmMsg(void)
+{
+	size_t size = sif - beg;
+
+	if (9 > size || size > 24)
+		return (PT_NO);
+	switch (sif[7]) {
+	case 0x11:
+	case 0x21:
+		break;
+	default:
+		return (PT_NO);
+	}
+	switch (size) {
+	case 22:
+	case 23:
+	case 24:
+		if ((sif[8] >> 4) == size - 9)
+			return (PT_YES);
+		return (PT_NO);
+	}
+	if ((sif[8] >> 4) == size - 9)
+		return (PT_MAYBE);
+	return (PT_NO);
+}
+enum ProtocolTest
+Message::reasonableItutSnsmMsg(void)
+{
+	return (PT_NO);
+}
+enum ProtocolTest
+Message::reasonableAnsiSnsmMsg(void)
+{
+	return reasonableAnsiSntmMsg();
+}
+
+// Check whether a message that is too large to definitely be an ITUT message
+// (i.e. >= 10 SIF octets) is possibly an ITUT message.
+enum ProtocolTest
+Message::reasonableItutIsupMsg(void)
+{
+	// sif must point to the beginning of the routing label
+	size_t size = end - sif; // length of SIF field (excluding SIO)
+
+	// need 7 bytes just to have a RL+CIC+MT
+	if (size < 7)
+		return (PT_NO);
+
+	switch (sif[6]) {
+	case ISUP_MT_CCR:	// ITUT: (none)
+	case ISUP_MT_RSC:	// ITUT: (none)
+	case ISUP_MT_BLO:	// ITUT: (none)
+	case ISUP_MT_UBL:	// ITUT: (none)
+	case ISUP_MT_BLA:	// ITUT: (none)
+	case ISUP_MT_UBA:	// ITUT: (none)
+	case ISUP_MT_LPA:	// ITUT: (none)
+	case ISUP_MT_UCIC:	// ITUT: (none)
+	case ISUP_MT_OLM:	// ITUT: (none)
+	case ISUP_MT_CRG:	// ITUT: (none)
+		// These all have no parameters whatsoever so cannot be longer than the
+		// message type. RL(4)+CIC(2)+MT(1) == 7.
+		if (size != 7)
+			return (PT_NO);
+		return (PT_YES);
+	case ISUP_MT_COT:	// 0b00000101 - Continuity
+		// These all have a single octet fixed parameter and no optional
+		// parameters, so cannot be longer than one plus the message type.
+		// RL(4)+CIC(2)+MT(1)+MFP(1) == 8.
+		if (size != 8)
+			return (PT_NO);
+		return (PT_YES);
+	case ISUP_MT_RLC:	// ITUT: O() >= 8
+	case ISUP_MT_DRS:	// ITUT: O() >= 8
+	case ISUP_MT_FOT:	// ITUT: O() >= 8
+	case ISUP_MT_ANM:	// ITUT: O() >= 8
+	case ISUP_MT_UPT:	// ITUT: O() >= 8
+	case ISUP_MT_FAC:	// ITUT: O() >= 8
+	case ISUP_MT_UPA:	// ITUT: O() >= 8
+	case ISUP_MT_IDR:	// ITUT: O() >= 8
+	case ISUP_MT_IRS:	// ITUT: O() >= 8
+	case ISUP_MT_SGM:	// ITUT: O() >= 8
+	case ISUP_MT_NRM:	// ITUT: O() >= 8
+		// These all have no mandatory parameters, but optional parameters, but
+		// can be sent with no optional parameters.  When the optional
+		// parameter list is empty (pointer is zero), these must be of a fixed
+		// size: RL(4)+CIC(2)+MT(1)+EOP(0) == 8.
+		if (size < 8)
+			return (PT_NO);
+		if (size > 8) {
+			if (sif[7] == 0)
+				return (PT_NO);
+			if (size < 10)
+				return (PT_YES);
+			return (PT_MAYBE);
+		}
+		if (sif[7] != 0)
+			return (PT_NO);
+		return (PT_YES);
+	case ISUP_MT_INR:	// ITUT: MFP(1) O()
+	case ISUP_MT_INF:	// ITUT: MFP(1) O()
+	case ISUP_MT_ACM:	// ITUT: MFP(1) O()
+	case ISUP_MT_SUS:	// ITUT: MFP(1) O()
+	case ISUP_MT_RES:	// ITUT: MFP(1) O()
+	case ISUP_MT_CMR:	// ITUT: MFP(1) O()
+	case ISUP_MT_CMC:	// ITUT: MFP(1) O()
+	case ISUP_MT_CMRJ:	// ITUT: MFP(1) O()
+	case ISUP_MT_FAR:	// ITUT: MFP(1) O()
+	case ISUP_MT_FAA:	// ITUT: MFP(1) O()
+	case ISUP_MT_CPG:	// ITUT: MFP(1) O()
+		// These have one-octet fixed parameter and optional parameter list.
+		// These all have a one-octet fixed parameter and optional parameter list
+		// and are often sent with no optional parameters.  When the optional
+		// parameter list is empty (pointer is zero), these must be of a fixed
+		// size: RL(4)+CIC(2)+MT(1)+MFP(1)+EOP(0) == 9.
+		if (size < 9)
+			return (PT_NO);
+		if (size > 9) {
+			if (sif[7] == 0)
+				return (PT_NO);
+			return (PT_MAYBE);
+		}
+		if (sif[7] != 0)
+			return (PT_NO);
+		return (PT_YES);
+	case ISUP_MT_IAM:	// ITUT: F(NCI(1) FCI(2) CPC(1) TMR(1)) V(CDPN(2+N(2min)) O() >= 17
+		if (size < 17)
+			return (PT_NO);
+		return (PT_MAYBE);
+	case ISUP_MT_FRJ:	// ITUT: F(FACI(1)) V(CAUS(2+N(2min))) O() >= 13
+	case ISUP_MT_CQR:	// ITUT: V(RS(2+N(1min)) CSI(2+N(1min))) >= 13
+		if (size < 13)
+			return (PT_NO);
+		return (PT_MAYBE);
+	case ISUP_MT_SAM:	// ITUT: V(SUBN(2+N(2min))) O() >= 12
+	case ISUP_MT_REL:	// ITUT: V(CAUS(2+N(2min))) O() >= 12
+	case ISUP_MT_CFN:	// ITUT: V(CAUS(2+N(2min))) O() >= 12
+		if (size < 12)
+			return (PT_NO);
+		return (PT_MAYBE);
+	case ISUP_MT_GRS:	// ITUT: V(RS(2+N(min1))) O() >= 11
+	case ISUP_MT_USR:	// ITUT: V(UUI(2+N(1min))) O() >= 11
+	case ISUP_MT_CGB:	// ITUT: F(CGI(1)) V(RS(2+N(1min))) >= 11
+	case ISUP_MT_CGBA:	// ITUT: F(CGI(1)) V(RS(2+N(1min))) >= 11
+	case ISUP_MT_CGU:	// ITUT: F(CGI(1)) V(RS(2+N(1min))) >= 11
+	case ISUP_MT_CGUA:	// ITUT: F(CGI(1)) V(RS(2+N(1min))) >= 11
+		if (size < 11)
+			return (PT_NO);
+		return (PT_MAYBE);
+	case ISUP_MT_CON:	// ITUT: F(BCI(2)) O() >= 10
+		if (size < 10)
+			return (PT_NO);
+		if (size > 10) {
+			if (sif[9] == 0)
+				return (PT_NO);
+			return (PT_MAYBE);
+		}
+		if (sif[9] != 0)
+			return (PT_NO);
+		return (PT_YES);
+	case ISUP_MT_GRA:	// ITUT: V(RS(2+N(min1))) >= 10
+	case ISUP_MT_CQM:	// ITUT: V(RS(2+N(min1))) >= 10
+		if (size < 10)
+			return (PT_NO);
+		return (PT_MAYBE);
+	case ISUP_MT_PAM:	// 0b00101000 - Pass along
+		// not really expected
+		return (PT_MAYBE);
+	default:
+	case ISUP_MT_FAD:	// (Bellcore only)
+	case ISUP_MT_FAI:	// (Bellcore only)
+	case ISUP_MT_CRA:	// (Bellcore only)
+	case ISUP_MT_CRM:	// (Bellcore only)
+	case ISUP_MT_CVR:	// (Bellcore only)
+	case ISUP_MT_CVT:	// (Bellcore only)
+	case ISUP_MT_EXM:	// (Bellcore only)
+	case ISUP_MT_NON:	// (Spain)
+	case ISUP_MT_LLM:	// (Spain)
+	case ISUP_MT_CAK:	// (Singapore)
+	case ISUP_MT_TCM:	// (Singapore)
+	case ISUP_MT_MCP:	// (Singapore)
+	case ISUP_MT_CSVQ:	// (Bellocore only)
+	case ISUP_MT_CSVR:	// (Bellocore only)
+		return (PT_NO);
+	}
+}
+
+// Check whether a message that is large enough to be an ANSI message
+// (i.e. >= 10 SIF octets) is possibly an ANSI message.
+enum ProtocolTest
+Message::reasonableAnsiIsupMsg(void)
+{
+	// sif must point to the beginning of the routing label
+	size_t size = end - sif;
+
+	// need 10 bytes just to have a RL+CIC+MT
+	if (size < 10)
+		return (PT_NO);
+
+	switch (sif[9]) {
+	case ISUP_MT_RLC: // ANSI: (none) == 10
+	case ISUP_MT_CCR: // ANSI: (none) == 10
+	case ISUP_MT_RSC: // ANSI: (none) == 10
+	case ISUP_MT_BLO: // ANSI: (none) == 10
+	case ISUP_MT_UBL: // ANSI: (none) == 10
+	case ISUP_MT_BLA: // ANSI: (none) == 10
+	case ISUP_MT_UBA: // ANSI: (none) == 10
+	case ISUP_MT_LPA: // ANSI: (none) == 10
+	case ISUP_MT_UCIC: // ANSI: (none) == 10
+	case ISUP_MT_CRA: // ANSI: (none) == 10
+	case ISUP_MT_CVT: // ANSI: (none) == 10
+		if (size != 10)
+			return (PT_NO);
+		return (PT_MAYBE);
+	case ISUP_MT_EXM: // ANSI: O() >= 11
+		if (size < 11)
+			return (PT_NO);
+		if (size > 11) {
+			if (sif[10] == 0)
+				return (PT_NO);
+			return (PT_MAYBE);
+		}
+		if (sif[10] != 0)
+			return (PT_NO);
+		return (PT_MAYBE);
+	case ISUP_MT_COT: // ANSI: F(COTI(1)) >= 11
+	case ISUP_MT_CRM: // ANSI: F(NCI(1)) >= 11
+		if (size != 11)
+			return (PT_NO);
+		return (PT_MAYBE);
+	case ISUP_MT_IAM:
+	case ISUP_MT_SAM:
+	case ISUP_MT_INR:
+	case ISUP_MT_INF:
+	case ISUP_MT_ACM:
+	case ISUP_MT_CON:
+	case ISUP_MT_FOT:
+	case ISUP_MT_ANM:
+	case ISUP_MT_REL:
+	case ISUP_MT_SUS:
+	case ISUP_MT_RES:
+	case ISUP_MT_GRS:
+	case ISUP_MT_CGB:
+	case ISUP_MT_CGU:
+	case ISUP_MT_CGBA:
+	case ISUP_MT_CGUA:
+	case ISUP_MT_CMR:
+	case ISUP_MT_CMC:
+	case ISUP_MT_CMRJ:
+	case ISUP_MT_FAR:
+	case ISUP_MT_FAA:
+	case ISUP_MT_FRJ:
+	case ISUP_MT_FAD:
+	case ISUP_MT_FAI:
+	case ISUP_MT_CSVQ:
+	case ISUP_MT_CSVR:
+	case ISUP_MT_DRS:
+	case ISUP_MT_PAM:
+	case ISUP_MT_GRA:
+	case ISUP_MT_CQM:
+	case ISUP_MT_CQR:
+	case ISUP_MT_CPG:
+	case ISUP_MT_USR:
+	case ISUP_MT_CFN:
+	case ISUP_MT_OLM:
+	case ISUP_MT_CRG:
+	case ISUP_MT_NRM:
+	case ISUP_MT_FAC:
+	case ISUP_MT_UPT:
+	case ISUP_MT_UPA:
+	case ISUP_MT_IDR:
+	case ISUP_MT_IRS:
+	case ISUP_MT_SGM:
+	case ISUP_MT_CVR:
+	case ISUP_MT_NON:
+	case ISUP_MT_LLM:
+	case ISUP_MT_CAK:
+	case ISUP_MT_TCM:
+	case ISUP_MT_MCP:
+	default:
+		return (PT_MAYBE);
+	}
 }
 
 static void
