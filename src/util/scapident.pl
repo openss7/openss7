@@ -133,35 +133,353 @@ require Tk::TableMatrix::Spreadsheet;
 require Tk::Frame;
 
 my $canvas;
+my $mycanvas;
+my $top;
 
 # -------------------------------------
-package Route;
+package Relation;
 use strict;
 # -------------------------------------
+# A relation is an association between signalling points that communicate with
+# each other.  This object is used to track these interactions, primarily for
+# identifying the role of nodes.
+# -------------------------------------
 
-sub new {
-	my ($type,$path,$end,$node) = @_;
+my %relations;
+
+#package Relation;
+sub get {
+	my ($type,$nodea,$nodeb) = @_;
+	my $key = "$nodea->{'pc'},$nodeb->{'pc'}";
+	return $relations{$key} if exists $relations{$key};
 	my $self = {};
 	bless $self, $type;
-	$self->{'path'} = $path;
-	$self->{'end'} = $end;
-	$self->{'node'} = $node;
-	my $x1 = $path->{"x$end"};
-	my $y1 = $path->{"y$end"};
-	my $x2 = $node->{'x'};
-	my $y2 = $node->{'y'};
-	$self->{'item'} = $main::canvas->createLine($x1,$y1,$x2,$y2,
+	$self->{'key'} = $key;
+	$relations{$key} = $self;
+	$key = "$nodeb->{'pc'},$nodea->{'pc'}";
+	$relations{$key} = $self; # place reverse entry too
+	$self->{'nodea'} = $nodea;
+	$self->{'nodeb'} = $nodeb;
+	$nodea->{'relate'}->{$nodeb->{'pc'}} = $self;
+	$nodeb->{'relate'}->{$nodea->{'pc'}} = $self;
+	my $xa = $self->{'xa'} = $nodea->{'x'};
+	my $ya = $self->{'ya'} = $nodea->{'y'};
+	my $xb = $self->{'xb'} = $nodeb->{'x'};
+	my $yb = $self->{'yb'} = $nodeb->{'y'};
+	$self->{'fill'} = 'grey';
+	$self->{'item'} = $main::canvas->createLine($xa,$ya,$xb,$yb,
 		-arrow=>'none',
 		-capstyle=>'round',
-		-fill=>'gray',
+		-fill=>$self->{'fill'},
 		-joinstyle=>'round',
 		-smooth=>0,
 		-tags=>('path'),
 		-width=>1,
 	);
 	$main::canvas->idletasks;
-	$main::canvas->update;
 	return $self;
+}
+
+#package Relation;
+sub add_forw { # from nodea to nodeb
+	my ($self,$msg) = @_;
+	my $si = $msg->{'si'};
+	my $mt = $msg->{'mt'};
+	if ($si == 5) {
+		if ($mt == 0x10) { # rlc
+			unless ($self->{'xchg_isup'}) {
+				$self->{'xchg_isup'} = 1;
+				$self->{'reanalyze'} = 1;
+			}
+			$self->{'circuits'}->{$msg->{'dpc'}} = 1;
+		}
+		$self->reanalyze if $self->{'reanalyze'};
+		return;
+	}
+	if ($si == 3) {
+		if ($mt == 0x09 || $mt == 0x11 || $mt == 0x13) { # udt,xudt,ludt
+			unless ($self->{'forw_tcap'}) {
+				$self->{'forw_tcap'} = 1;
+				$self->{'reanalyze'} = 1;
+			}
+			$self->{'tqueries'}->{$msg->{'dpc'}} = 1;
+		}
+		$self->reanalyze if $self->{'reanalyze'};
+		return;
+	}
+	if ($si == 2 || $si == 1) {
+		if ($mt == 0x11 || $mt == 0x12) { # sltm,slta
+			unless ($self->{'exch_sltm'}) {
+				$self->{'exch_sltm'} = 1;
+				$self->{'reanalyze'} = 1;
+			}
+			$self->{'adjacent'} = $msg->{'dpc'};
+		}
+		$self->reanalyze if $self->{'reanalyze'};
+		return;
+	}
+}
+
+#package Relation;
+sub add_revs { # from nodeb to nodea
+	my ($self,$msg) = @_;
+	my $si = $msg->{'si'};
+	my $mt = $msg->{'mt'};
+	if ($si == 5) {
+		if ($mt == 0x10) { # rlc
+			unless ($self->{'xchg_isup'}) {
+				$self->{'xchg_isup'} = 1;
+				$self->{'reanalyze'} = 1;
+			}
+			$self->{'circuits'}->{$msg->{'opc'}} = 1;
+		}
+		$self->reanalyze if $self->{'reanalyze'};
+		return;
+	}
+	if ($si == 3) {
+		if ($mt == 0x09 || $mt == 0x11 || $mt == 0x13) { # udt,xudt,ludt
+			unless ($self->{'revs_tcap'}) {
+				$self->{'revs_tcap'} = 1;
+				$self->{'reanalyze'} = 1;
+			}
+			$self->{'tqueries'}->{$msg->{'opc'}} = 1;
+		}
+		$self->reanalyze if $self->{'reanalyze'};
+		return;
+	}
+	if ($si == 2 || $si == 1) {
+		if ($mt == 0x11 || $mt == 0x12) { # sltm,slta
+			unless ($self->{'xchg_sltm'}) {
+				$self->{'xchg_sltm'} = 1;
+				$self->{'reanalyze'} = 1;
+			}
+			$self->{'adjacent'} = $msg->{'opc'};
+		}
+		$self->reanalyze if $self->{'reanalyze'};
+		return;
+	}
+}
+
+#package Relation;
+sub add {
+	my ($self,$msg) = @_;
+	if ($self->{'key'} eq "$msg->{'opc'},$msg->{'dpc'}") {
+		$self->add_forw($msg);
+		return;
+	}
+	if ($self->{'key'} eq "$msg->{'dpc'},$msg->{'opc'}") {
+		$self->add_revs($msg);
+		return;
+	}
+	print STDERR "error key=$self->{'key'}, opc=$msg->{'opc'}, dpc=$msg->{'dpc'}\n";
+}
+
+#package Relation;
+sub reanalyze {
+	my $self = shift;
+	if ($self->{'xchg_sltm'}) {
+		$self->{'fill'} = 'black';
+		$main::canvas->itemconfigure($self->{'item'}, -fill=>$self->{'fill'});
+		return;
+	}
+	if ($self->{'xchg_isup'}) {
+		$self->{'fill'} = 'blue';
+		$main::canvas->itemconfigure($self->{'item'}, -fill=>$self->{'fill'});
+		return;
+	}
+	if ($self->{'forw_tcap'} && $self->{'revs_tcap'}) {
+		$self->{'fill'} = 'blue';
+		$main::canvas->itemconfigure($self->{'item'}, -fill=>$self->{'fill'});
+		return;
+	}
+	if ($self->{'forw_tcap'}) {
+		$self->{'fill'} = 'red';
+		$main::canvas->itemconfigure($self->{'item'}, -fill=>$self->{'fill'});
+		return;
+	}
+	if ($self->{'revs_tcap'}) {
+		$self->{'fill'} = 'green';
+		$main::canvas->itemconfigure($self->{'item'}, -fill=>$self->{'fill'});
+		return;
+	}
+	$self->{'fill'} = 'gray';
+	$main::canvas->itemconfigure($self->{'item'}, -fill=>$self->{'fill'});
+	return;
+	if ($self->{'xchg_isup'}) {
+		if ($self->{'forw_tcap'}) {
+			if ($self->{'revs_tcap'}) {
+				if ($self->{'xchg_sltm'}) {
+				} else {
+				}
+			} else {
+				if ($self->{'xchg_sltm'}) {
+				} else {
+				}
+			}
+		} else {
+			if ($self->{'revs_tcap'}) {
+				if ($self->{'xchg_sltm'}) {
+				} else {
+				}
+			} else {
+				if ($self->{'xchg_sltm'}) {
+				} else {
+				}
+			}
+		}
+	} else {
+		if ($self->{'forw_tcap'}) {
+			if ($self->{'revs_tcap'}) {
+				if ($self->{'xchg_sltm'}) {
+				} else {
+				}
+			} else {
+				# SCP's originate but never terminate
+				if ($self->{'xchg_sltm'}) {
+				} else {
+				}
+			}
+		} else {
+			if ($self->{'revs_tcap'}) {
+				# GTT functions never originate, just terminate
+				if ($self->{'xchg_sltm'}) {
+				} else {
+				}
+			} else {
+				if ($self->{'xchg_sltm'}) {
+				} else {
+				}
+			}
+		}
+	}
+	delete $self->{'reanalyze'};
+}
+
+#package Relation;
+sub move {
+	my $self = shift;
+	my $nodea = $self->{'nodea'};
+	my $nodeb = $self->{'nodeb'};
+	my $xa = $nodea->{'x'};
+	my $ya = $nodea->{'y'};
+	my $xb = $nodeb->{'x'};
+	my $yb = $nodeb->{'y'};
+	return if $xa == $self->{'xa'} &&
+		  $ya == $self->{'ya'} &&
+		  $xb == $self->{'xb'} &&
+		  $yb == $self->{'yb'};
+	$self->{'cola'} = $nodea->{'col'};
+	$self->{'rowa'} = $nodea->{'row'};
+	$self->{'colb'} = $nodeb->{'col'};
+	$self->{'rowb'} = $nodeb->{'row'};
+	$main::canvas->delete($self->{'item'});
+	$self->{'item'} = $main::canvas->createLine($xa,$ya,$xb,$yb,
+		-arrow=>'none',
+		-capstyle=>'round',
+		-fill=>$self->{'fill'},
+		-joinstyle=>'round',
+		-smooth=>0,
+		-tags=>('path'),
+		-width=>1,
+	);
+	$self->{'xa'} = $xa;
+	$self->{'ya'} = $ya;
+	$self->{'xb'} = $xb;
+	$self->{'yb'} = $yb;
+}
+
+# -------------------------------------
+package Route;
+use strict;
+# -------------------------------------
+
+#package Route;
+sub new {
+	my ($type,$path,$side,$node) = @_;
+	my $self = {};
+	bless $self, $type;
+	$self->{'path'} = $path;
+	$self->{'side'} = $side;
+	$self->{'node'} = $node;
+	$self->{'fill'} = 'magenta';
+	my ($cola,$rowa,$colb,$rowb);
+	if ($side eq 'a') {
+		$cola = $self->{'cola'} = $node->{'col'};
+		$rowa = $self->{'rowa'} = $node->{'row'};
+		$colb = $self->{'colb'} = $path->{'cola'};
+		$rowb = $self->{'rowb'} = $path->{'rowa'};
+	} else {
+		$cola = $self->{'cola'} = $path->{'colb'};
+		$rowa = $self->{'rowa'} = $path->{'rowb'};
+		$colb = $self->{'colb'} = $node->{'col'};
+		$rowb = $self->{'rowb'} = $node->{'row'};
+	}
+	my $xa = $self->{'xa'} = $main::mycanvas->colpos($cola);
+	my $ya = $self->{'ya'} = $main::mycanvas->rowpos($rowa);
+	my $xb = $self->{'xb'} = $main::mycanvas->colpos($colb);
+	my $yb = $self->{'yb'} = $main::mycanvas->rowpos($rowb);
+	$node->{'routes'}->{$path->{'ppa'}} = $self;
+	$path->{'routes'}->{$node->{'pc'}} = $self;
+	$self->{'item'} = $main::canvas->createLine($xa,$ya,$xb,$yb,
+		-arrow=>'last',
+		-capstyle=>'round',
+		-fill=>$self->{'fill'},
+		-joinstyle=>'round',
+		-smooth=>0,
+		-tags=>('path'),
+		-width=>1,
+	);
+	$main::canvas->idletasks;
+	return $self;
+}
+
+#package Route;
+sub move {
+	my $self = shift;
+	my $node = $self->{'node'};
+	my $path = $self->{'path'};
+	my $side = $self->{'side'};
+	my ($xa,$ya,$xb,$yb);
+	if ($side eq 'a') {
+		$xa = $node->{'x'};
+		$ya = $node->{'y'};
+		$xb = $path->{'xa'};
+		$yb = $path->{'ya'};
+	} else {
+		$xa = $path->{'xb'};
+		$ya = $path->{'yb'};
+		$xb = $node->{'x'};
+		$yb = $node->{'y'};
+	}
+	return if $xa == $self->{'xa'} &&
+		  $ya == $self->{'ya'} &&
+		  $xb == $self->{'xb'} &&
+		  $yb == $self->{'yb'};
+	if ($side eq 'a') {
+		$self->{'cola'} = $node->{'col'};
+		$self->{'rowa'} = $node->{'row'};
+		$self->{'colb'} = $path->{'cola'};
+		$self->{'rowb'} = $path->{'rowa'};
+	} else {
+		$self->{'cola'} = $path->{'colb'};
+		$self->{'rowa'} = $path->{'rowb'};
+		$self->{'colb'} = $node->{'col'};
+		$self->{'rowb'} = $node->{'row'};
+	}
+	$main::canvas->delete($self->{'item'});
+	$self->{'item'} = $main::canvas->createLine($xa,$ya,$xb,$yb,
+		-arrow=>'last',
+		-capstyle=>'round',
+		-fill=>$self->{'fill'},
+		-joinstyle=>'round',
+		-smooth=>0,
+		-tags=>('path'),
+		-width=>1,
+	);
+	$self->{'xa'} = $xa;
+	$self->{'ya'} = $ya;
+	$self->{'xb'} = $xb;
+	$self->{'yb'} = $yb;
 }
 
 # -------------------------------------
@@ -169,23 +487,49 @@ package Node;
 use strict;
 # -------------------------------------
 
-my %nodes = {};
+my %nodes;
 my $nodeno = 0;
 
+use constant {
+	COL_NOD => 6,
+	COL_SSP => 5,
+	COL_SCP => 4,
+	COL_GTT => 3,
+	COL_ADJ => 2,
+};
+
+#package Node;
 sub get {
-	my ($type,$pc) = @_;
-	return $nodes{$pc} if exists $nodes{$pc};
+	my ($type,$pc,$side) = @_;
+	return $Node::nodes{$pc} if exists $Node::nodes{$pc};
 	my $self = {};
 	bless $self, $type;
-	$nodes{$pc} = $self;
+	$Node::nodes{$pc} = $self;
 	$nodeno = $nodeno + 1;
 	$self->{'pc'} = $pc;
-	my $x = 50;
-	my $y = $nodeno * 30;
+	$self->{'side'} = $side;
+	$self->{'tqueries'} = {};
+	$self->{'circuits'} = {};
+	$self->{'responds'} = {};
+	$self->{'routes'} = {}; # routes that term or orig here
+	$self->{'relate'} = {}; # relations in which this is a node
+	my $x;
+	if ($side < 0) {
+		$x = $main::mycanvas->colpos(0 - COL_NOD);
+		$self->{'col'} = 0 - COL_NOD;
+	} else {
+		$x = $main::mycanvas->colpos(0 + COL_NOD);
+		$self->{'col'} = 0 + COL_NOD;
+	}
+	my $y = $main::mycanvas->rowpos($nodeno);
+	$self->{'row'} = $nodeno;
 	$self->{'x'} = $x;
 	$self->{'y'} = $y;
 	$self->{'item'} = $main::canvas->createOval(
-		$x-12.5,$y-12.5,$x+12.5,$y+12.5,
+		$x-25,$y-25,$x+25,$y+25,
+		#-fill=>'white',
+		-outline=>'red',
+		-width=>2,
 	);
 	my ($text,$ntw,$cls,$mem);
 	if ($pc & ~0x3fff) {
@@ -204,9 +548,217 @@ sub get {
 		-justify=>'center',
 		-text=>$text,
 	);
+	Node->regroup;
 	$main::canvas->idletasks;
 	return $self;
+}
+
+#package Node;
+sub add_orig {
+	my ($self,$msg) = @_;
+	my $si = $msg->{'si'};
+	my $mt = $msg->{'mt'};
+	if ($si == 5) {
+		if ($mt == 0x10) { # rlc
+			unless ($self->{'xchg_isup'}) {
+				$self->{'xchg_isup'} = 1;
+				$self->{'reanalyze'} = 1;
+			}
+			$self->{'circuits'}->{$msg->{'dpc'}} = 1;
+		}
+		$self->reanalyze if $self->{'reanalyze'};
+		return;
+	}
+	if ($si == 3) {
+		if ($mt == 0x09 || $mt == 0x11 || $mt == 0x13) { # udt,xudt,ludt
+			unless ($self->{'orig_tcap'}) {
+				$self->{'orig_tcap'} = 1;
+				$self->{'reanalyze'} = 1;
+			}
+			$self->{'tqueries'}->{$msg->{'dpc'}} = 1;
+		}
+		$self->reanalyze if $self->{'reanalyze'};
+		return;
+	}
+	if ($si == 2 || $si == 1) {
+		if ($mt == 0x11 || $mt == 0x12) { # sltm,slta
+			unless ($self->{'exch_sltm'}) {
+				$self->{'exch_sltm'} = 1;
+				$self->{'reanalyze'} = 1;
+			}
+			$self->{'adjacent'} = $msg->{'dpc'};
+		}
+		$self->reanalyze if $self->{'reanalyze'};
+		return;
+	}
+}
+
+#package Node;
+sub add_term {
+	my ($self,$msg) = @_;
+	my $si = $msg->{'si'};
+	my $mt = $msg->{'mt'};
+	if ($si == 5) {
+		if ($mt == 0x10) { # rlc
+			unless ($self->{'xchg_isup'}) {
+				$self->{'xchg_isup'} = 1;
+				$self->{'reanalyze'} = 1;
+			}
+			$self->{'circuits'}->{$msg->{'opc'}} = 1;
+		}
+		$self->reanalyze if $self->{'reanalyze'};
+		return;
+	}
+	if ($si == 3) {
+		if ($mt == 0x09 || $mt == 0x11 || $mt == 0x13) { # udt,xudt,ludt
+			unless ($self->{'term_tcap'}) {
+				$self->{'term_tcap'} = 1;
+				$self->{'reanalyze'} = 1;
+			}
+			$self->{'tqueries'}->{$msg->{'opc'}} = 1;
+		}
+		$self->reanalyze if $self->{'reanalyze'};
+		return;
+	}
+	if ($si == 2 || $si == 1) {
+		if ($mt == 0x11 || $mt == 0x12) { # sltm,slta
+			unless ($self->{'xchg_sltm'}) {
+				$self->{'xchg_sltm'} = 1;
+				$self->{'reanalyze'} = 1;
+			}
+			$self->{'adjacent'} = $msg->{'opc'};
+		}
+		$self->reanalyze if $self->{'reanalyze'};
+		return;
+	}
+}
+
+use constant {
+	N_UNKNOWN => 0, # not yet identified
+	N_GTT_CC  => 1, # GTT capability code
+	N_SCP_DB  => 2, # SCP database
+	N_SSP_TA  => 3, # SSP transaction alias
+	N_SSP_AP  => 4, # SSP alias point code
+	N_SSP_PP  => 5, # SSP primary point code
+	N_SSP_NT  => 6, # SSP w/o TCAP
+	N_SSP_WT  => 7, # SSP w/ TCAP
+	N_STP_NG  => 8, # STP w/o GTT
+	N_STP_WG  => 9, # STP w/ GTT
 };
+
+#package Node;
+sub reanalyze {
+	my $self = shift;
+	my $col = abs($self->{'col'});
+	my $row = $self->{'row'};
+	if ($self->{'xchg_sltm'}) {
+		$col = COL_ADJ;
+	} elsif ($self->{'xchg_isup'} || ($self->{'orig_tcap'} && $self->{'term_tcap'})) {
+		$col = COL_SSP;
+	} elsif ($self->{'orig_tcap'} && !$self->{'term_tcap'}) {
+		$col = COL_SCP;
+	} elsif (!$self->{'orig_tcap'} && $self->{'term_tcap'}) {
+		$col = COL_GTT;
+	} 
+	if (abs($self->{'col'}) != $col) {
+		if ($self->{'col'} < 0) {
+			$col = 0 - $col;
+		}
+		$self->moveto($col,$row);
+		Node->regroup;
+		$main::canvas->idletasks;
+	}
+	if ($self->{'xchg_isup'}) {
+		if ($self->{'orig_tcap'}) {
+			if ($self->{'term_tcap'}) {
+				if ($self->{'xchg_sltm'}) {
+				} else {
+				}
+			} else {
+				if ($self->{'xchg_sltm'}) {
+				} else {
+				}
+			}
+		} else {
+			if ($self->{'term_tcap'}) {
+				if ($self->{'xchg_sltm'}) {
+				} else {
+				}
+			} else {
+				if ($self->{'xchg_sltm'}) {
+				} else {
+				}
+			}
+		}
+	} else {
+		if ($self->{'orig_tcap'}) {
+			if ($self->{'term_tcap'}) {
+				if ($self->{'xchg_sltm'}) {
+				} else {
+				}
+			} else {
+				# SCP's originate but never terminate
+				if ($self->{'xchg_sltm'}) {
+				} else {
+				}
+			}
+		} else {
+			if ($self->{'term_tcap'}) {
+				# GTT functions never originate, just terminate
+				if ($self->{'xchg_sltm'}) {
+				} else {
+				}
+			} else {
+				if ($self->{'xchg_sltm'}) {
+				} else {
+				}
+			}
+		}
+	}
+	delete $self->{'reanalyze'};
+}
+
+#package Node;
+sub swap {
+	my $self = shift;
+	$self->moveto(-$self->{'col'},$self->{'row'});
+}
+
+#package Node;
+sub moveto {
+	my ($self,$col,$row) = @_;
+	return if $col == $self->{'col'} && $row == $self->{'row'};
+	my $newcol = $main::mycanvas->colpos($col);
+	my $newrow = $main::mycanvas->rowpos($row);
+	my $deltax = $newcol - $self->{'x'};
+	my $deltay = $newrow - $self->{'y'};
+	$main::canvas->move($self->{'item'},$deltax,$deltay);
+	$main::canvas->move($self->{'text'},$deltax,$deltay);
+	$self->{'x'} = $newcol;
+	$self->{'y'} = $newrow;
+	$self->{'col'} = $col;
+	$self->{'row'} = $row;
+	while (my ($k,$r) = each %{$self->{'routes'}}) { $r->move; }
+	while (my ($k,$r) = each %{$self->{'relate'}}) { $r->move; }
+}
+
+#package Node;
+#call this as Node->regroup
+sub regroup {
+	my %totals;
+	while (my ($pc,$node) = each %Node::nodes) {
+		my $col = $node->{'col'};
+		$totals{$col} += 1;
+	}
+	my %counts;
+	foreach my $pc (sort keys %Node::nodes) {
+		my $node = $Node::nodes{$pc};
+		my $col = $node->{'col'};
+		my $row = $counts{$col} - $totals{$col};
+		$counts{$col} += 2;
+		$node->moveto($col,$row);
+	}
+}
 
 # -------------------------------------
 package Path;
@@ -230,9 +782,10 @@ use constant {
 	MP_INTERNATIONAL => 3
 };
 
-my %paths = {};
+my %paths;
 my $pathno = 0;
 
+#package Path;
 sub get {
 	my $type = shift;
 	my $ppa = shift;
@@ -251,106 +804,126 @@ sub get {
 	$self->{'rt'} = RT_UNKNOWN;
 	$self->{'orig'} = {};
 	$self->{'dest'} = {};
-	print "Created new path ($self->{'card'}:$self->{'span'}:$self->{'slot'}).\n";
-	my ($x,$y,$w,$h,$c) = (100,$pathno*100,300,0,'red');
-	$self->{'xopc'} = $x;
-	$self->{'yopc'} = $y+$h;
-	$self->{'xdpc'} = $x+$w;
-	$self->{'ydpc'} = $y;
-	$self->{'color'} = $c;
-	$self->{'item'} = $main::canvas->createLine($x,$y+$h,$x+$w,$y,
-		-arrow=>'none',
+	$self->{'opcs'} = {};
+	$self->{'dpcs'} = {};
+	$self->{'routes'} = {};
+	#print "Created new path ($self->{'card'}:$self->{'span'}:$self->{'slot'}).\n";
+	$self->{'fill'} = 'red';
+	my $cola = $self->{'cola'} = 0 - Node::COL_ADJ;
+	my $rowa = $self->{'rowa'} = $pathno * 2;
+	my $colb = $self->{'colb'} = 0 + Node::COL_ADJ;
+	my $rowb = $self->{'rowb'} = $pathno * 2;
+	my $xa = $self->{'xa'} = $main::mycanvas->colpos($cola);
+	my $ya = $self->{'ya'} = $main::mycanvas->rowpos($rowa);
+	my $xb = $self->{'xb'} = $main::mycanvas->colpos($colb);
+	my $yb = $self->{'yb'} = $main::mycanvas->rowpos($rowb);
+	$self->{'item'} = $main::canvas->createLine($xa,$ya,$xb,$yb,
+		-arrow=>'last',
 		-capstyle=>'round',
-		-fill=>$c,
+		-fill=>$self->{'fill'},
 		-joinstyle=>'round',
 		-smooth=>0,
 		-tags=>('path'),
 		-width=>4,
 	);
-	$self->{'count'} = 0;
-	$self->{'text'} = $main::canvas->createText($x+$w/2,$y+$h/2,
-		-anchor=>'center',
-		-fill=>'black',
-		-justify=>'center',
-		-text=>'0',
-	);
-	$self->{'httext'} = $main::canvas->createText($x+$w/2,$y+$h/2+15,
-		-anchor=>'center',
-		-fill=>'black',
-		-justify=>'center',
-		-text=>'HT_UNKNOWN',
-	);
-	$self->{'rttext'} = $main::canvas->createText($x+$w/2,$y+$h/2+30,
-		-anchor=>'center',
-		-fill=>'black',
-		-justify=>'center',
-		-text=>'RT_UNKNOWN',
-	);
-	$self->{'prtext'} = $main::canvas->createText($x+$w/2,$y+$h/2+45,
-		-anchor=>'center',
-		-fill=>'black',
-		-justify=>'center',
-		-text=>'MP_UNKNOWN',
-	);
+	#Path->regroup;
 	$main::canvas->idletasks;
 	return $self;
 }
 
+#package Path;
 sub cardnum {
 	shift->{'card'};
 }
+#package Path;
 sub spannum {
 	shift->{'span'};
 }
+#package Path;
 sub slotnum {
 	shift->{'slot'};
 }
+#package Path;
 sub ppa {
 	shift->{'ppa'};
 }
+#package Path;
 sub add {
 	my ($self,$msg,@args) = @_;
-	if ($self->detecting) {
-		push @{$self->{'msgs'}}, $msg;
-		return;
+	$self->{'looping'} += 1;
+	if ($self->{'looping'} > 1) {
+		print STDERR "looping = $self->{'looping'}\n";
 	}
-	push @{$self->{'msgs'}}, $msg;
-	while ($msg = pop @{$self->{'msgs'}}) {
+	unless ($self->{'detected'}) {
+		if ($self->detecting) {
+			push @{$self->{'msgs'}}, $msg;
+			$self->{'looping'} -= 1;
+			return;
+		}
+		$self->{'detected'} = 1;
+		push @{$self->{'msgs'}}, $msg;
+		while ($msg = pop @{$self->{'msgs'}}) {
+			$self->complete($msg);
+		}
+	} else {
 		$self->complete($msg);
 	}
+	$self->{'looping'} -= 1;
 }
+#package Path;
 sub complete {
 	my ($self,$msg,@args) = @_;
-	$self->{'count'} += 1;
-#	if ($self->{'count'} % 100 == 0) {
-#		$main::canvas->itemconfigure($self->{'text'},
-#			-text=>"$self->{'count'}",
-#		);
-#		$main::canvas->idletasks;
-#	}
-	if (exists $msg->{'dpc'}) {
-		my $pc = $msg->{'dpc'};
-		if (!exists $self->{'dpcs'}->{$pc}) {
-			my $node = Node->get($pc);
-			my $route = Route->new($self,'dpc',$node);
-			$self->{'dpcs'}->{$pc} = $route;
-		}
-	}
+	my ($nodeb,$nodea,$pc,$route);
 	if (exists $msg->{'opc'}) {
-		my $pc = $msg->{'opc'};
-		if (!exists $self->{'opcs'}->{$pc}) {
-			my $node = Node->get($pc);
-			my $route = Route->new($self,'opc',$node);
+		$pc = $msg->{'opc'};
+		if ($route = $self->{'opcs'}->{$pc}) {
+			$nodea = $route->{'node'};
+			$self->swap if $nodea->{'col'} < 0 && $self->{'cola'} > 0;
+		} else {
+			$nodea = Node->get($pc, $self->{'cola'});
+			$self->swap if $nodea->{'col'} < 0 && $self->{'cola'} > 0;
+			$route = Route->new($self,'a',$nodea);
 			$self->{'opcs'}->{$pc} = $route;
 		}
+		$nodea->add_orig($msg);
+	}
+	if (exists $msg->{'dpc'}) {
+		$pc = $msg->{'dpc'};
+		if ($route = $self->{'dpcs'}->{$pc}) {
+			$nodeb = $route->{'node'};
+			$self->swap if $nodeb->{'col'} < 0 && $self->{'colb'} > 0;
+		} else {
+			$nodeb = Node->get($pc, $self->{'colb'});
+			$self->swap if $nodeb->{'col'} < 0 && $self->{'colb'} > 0;
+			$route = Route->new($self,'b',$nodeb);
+			$self->{'dpcs'}->{$pc} = $route;
+		}
+		$nodeb->add_term($msg);
+	}
+	if (exists $msg->{'dpc'} && exists $msg->{'opc'}) {
+		my $rela = Relation->get($nodea,$nodeb);
+		$rela->add($msg);
 	}
 }
+#package Path;
+sub swap {
+	my $self = shift;
+	$self->moveto(-$self->{'cola'},$self->{'rowa'}, -$self->{'colb'},$self->{'rowb'});
+	while (my ($k,$node) = each %{$self->{'opcs'}}) {
+		$node->swap if $self->{'cola'} < 0 && $node->{'col'} > 0;
+	}
+	while (my ($k,$node) = each %{$self->{'dpcs'}}) {
+		$node->swap if $self->{'colb'} < 0 && $node->{'col'} > 0;
+	}
+}
+#package Path;
 sub detecting {
 	my $self = shift;
 	return 0 if ($self->{'ht'} != 0 && $self->{'pr'} != 0 && $self->{'rt'} != 0);
 	return 1;
 }
 
+#package Path;
 sub setht {
 	my ($self,$ht) = @_;
 	if ($self->{'ht'} != $ht) {
@@ -363,12 +936,9 @@ sub setht {
 		} else {
 			$text = 'HT_UNKNOWN';
 		}
-		$main::canvas->itemconfigure($self->{'httext'},
-			-text=>$text,
-		);
-		$main::canvas->idletasks;
 	}
 }
+#package Path;
 sub setrt {
 	my ($self,$rt) = @_;
 	if ($self->{'rt'} != $rt) {
@@ -381,12 +951,9 @@ sub setrt {
 		} else {
 			$text = 'RT_UNKNOWN';
 		}
-		$main::canvas->itemconfigure($self->{'rttext'},
-			-text=>$text,
-		);
-		$main::canvas->idletasks;
 	}
 }
+#package Path;
 sub setpr {
 	my ($self,$pr) = @_;
 	if ($self->{'pr'} != $pr) {
@@ -401,10 +968,68 @@ sub setpr {
 		} else {
 			$text = 'MP_UNKNOWN';
 		}
-		$main::canvas->itemconfigure($self->{'prtext'},
-			-text=>$text,
-		);
-		$main::canvas->idletasks;
+	}
+}
+
+#package Path;
+sub move {
+	my $self = shift;
+	my $nodea = $self->{'nodea'};
+	my $nodeb = $self->{'nodeb'};
+	my $xa = $nodea->{'x'};
+	my $ya = $nodea->{'y'};
+	my $xb = $nodeb->{'x'};
+	my $yb = $nodeb->{'y'};
+	return if $xa == $self->{'xa'} &&
+		  $ya == $self->{'ya'} &&
+		  $xb == $self->{'xb'} &&
+		  $yb == $self->{'yb'};
+	$self->{'cola'} = $nodea->{'col'};
+	$self->{'rowa'} = $nodea->{'row'};
+	$self->{'colb'} = $nodeb->{'col'};
+	$self->{'rowb'} = $nodeb->{'row'};
+	$main::canvas->delete($self->{'item'});
+	$self->{'item'} = $main::canvas->createLine($xa,$ya,$xb,$yb,
+		-arrow=>'last',
+		-capstyle=>'round',
+		-fill=>$self->{'fill'},
+		-joinstyle=>'round',
+		-smooth=>0,
+		-tags=>('path'),
+		-width=>4,
+	);
+	$self->{'xa'} = $xa;
+	$self->{'ya'} = $ya;
+	$self->{'xb'} = $xa;
+	$self->{'yb'} = $yb;
+	while (my ($k,$r) = each %{$self->{'routes'}}) { $r->move; }
+}
+sub moveto {
+	my ($self,$cola,$rowa,$colb,$rowb) = @_;
+	return if $cola == $self->{'cola'} &&
+	          $rowa == $self->{'rowa'} &&
+		  $colb == $self->{'colb'} &&
+		  $rowb == $self->{'rowb'};
+	my $xa = $self->{'xa'} = $main::mycanvas->colpos($cola);
+	my $ya = $self->{'ya'} = $main::mycanvas->rowpos($rowa);
+	my $xb = $self->{'xb'} = $main::mycanvas->colpos($colb);
+	my $yb = $self->{'yb'} = $main::mycanvas->rowpos($rowb);
+	$self->{'cola'} = $cola;
+	$self->{'rowa'} = $rowa;
+	$self->{'colb'} = $colb;
+	$self->{'rowb'} = $rowb;
+	$main::canvas->delete($self->{'item'});
+	$self->{'item'} = $main::canvas->createLine($xa,$ya,$xb,$yb,
+		-arrow=>'last',
+		-capstyle=>'round',
+		-fill=>$self->{'fill'},
+		-joinstyle=>'round',
+		-smooth=>0,
+		-tags=>('path'),
+		-width=>4,
+	);
+	while (my ($k,$v) = each %{$self->{'routes'}}) {
+		$v->move($self);
 	}
 }
 
@@ -573,12 +1198,13 @@ my @mtypes = (
 );
 
 # $msg = Message::create($pcap);
+#package Message;
 sub create {
 	my $type = shift;
 	my $self = {};
 	bless $self, $type;
 	my $pcap = shift;
-	my %hdr = {};
+	my %hdr;
 	my $dat = '';
 	$self->{'hdr'} = {};
 	$self->{'dat'} = '';
@@ -589,7 +1215,7 @@ sub create {
 	$self->{'hdr'}->{'tv_usec'} = $hdr{'tv_usec'};
 	$self->{'dat'} = substr($dat, 4);
 	return undef if $ret != 1;
-	$count = $count + 1;
+	$main::count += 1;
 	my ( $dir, $xsn, $lkno0, $lkno1 ) = unpack('CCCC', $dat);
 	$self->{'dir'} = $dir;
 	$self->{'xsn'} = $xsn;
@@ -597,6 +1223,7 @@ sub create {
 	return $self;
 }
 
+#package Message;
 sub process {
 	my $self = shift;
 	my $path = Path->get($self->{'ppa'});
@@ -607,13 +1234,14 @@ sub process {
 	#print STDERR "decoding error\n";
 }
 
+#package Message;
 sub getCount {
-	return $count;
+	return $main::count;
 }
 
+#package Message;
 sub decode {
 	my ($self,$path,@args) = @_;
-	my $self = shift;
 	my @b = (unpack('C*', substr($self->{'dat'}, 0, 8)));
 	if (!exists $self->{'mtp2decode'}) {
 		my $len = $self->{'hdr'}->{'len'};
@@ -695,7 +1323,6 @@ sub decode {
 			$self->{'opc'} |= $b[3] << 2;
 			$self->{'opc'} |= ($b[4] & 0x0f) << 10;
 			$self->{'sls'} = $b[4] >> 4;
-			$self->{'mt' } = $b[5];
 		} else {
 			if ($self->{'li'} < 9) {
 				print STDERR "too short for 24-bit RL, li = $self->{'li'}\n";
@@ -708,16 +1335,14 @@ sub decode {
 			$self->{'opc'} |= $b[5] << 8;
 			$self->{'opc'} |= $b[6] << 16;
 			$self->{'sls'} = $b[7];
-			$self->{'mt' } = $b[8];
 		}
-		@b = (unpack('C*', substr($self->{'dat'}, $path->{'ht'} + 1 + $self->{'rt'}, 3)));
+		@b = (unpack('C*', substr($self->{'dat'}, $path->{'ht'} + 1 + $path->{'rt'}, 3)));
 		if ($self->{'si'} == 5) {
 			$self->{'cic'} = $b[0];
 			$self->{'cic'} |= $b[1] << 8;
 			$self->{'mt'} = $b[2];
 		} elsif ($self->{'si'} < 3) {
-			$self->{'mt'} = (($b[0] & 0x0f) << 4);
-			$self->{'mt'} |= $b[0] >> 4;
+			$self->{'mt'} = (($b[0] & 0x0f) << 4) | ($b[0] >> 4);
 		} else {
 			$self->{'mt'} = $b[0];
 		}
@@ -742,6 +1367,7 @@ sub decode {
 	return 1;
 }
 
+#package Message;
 sub checkRoutingLabelType {
 	my ($self,$si,@args) = @_;
 	if ($si == 0) {
@@ -764,6 +1390,7 @@ use constant {
 	PT_NO => -1
 };
 
+#package Message;
 sub checkSnmm {
 	my ($self,$path,@args) = @_;
 	my $ansi = $self->checkAnsiSnmm($path,@args);
@@ -788,6 +1415,7 @@ sub checkSnmm {
 		return 1;
 	}
 }
+#package Message;
 sub checkItutSnmm {
 	my ($self,$path,$li,$b) = @_;
 	my $mt = (($b->[5] & 0x0f) << 4) | ($b->[5] >> 4);
@@ -815,6 +1443,7 @@ sub checkItutSnmm {
 	}
 	return PT_NO;
 }
+#package Message;
 sub checkAnsiSnmm {
 	my ($self,$path,$li,$b) = @_;
 	my $mt = (($b->[8] & 0x0f) << 4) | ($b->[8] >> 4);
@@ -848,6 +1477,7 @@ sub checkAnsiSnmm {
 	return PT_NO;
 }
 
+#package Message;
 sub checkSntm {
 	my ($self,$path,@args) = @_;
 	my $ansi = $self->checkAnsiSntm($path,@args);
@@ -872,6 +1502,7 @@ sub checkSntm {
 		return 1;
 	}
 }
+#package Message;
 sub checkItutSntm {
 	my ($self,$path,$li,$b) = @_;
 	my $mt = (($b->[5] & 0x0f) << 4) | ($b->[5] >> 4);
@@ -885,6 +1516,7 @@ sub checkItutSntm {
 	}
 	return PT_NO;
 }
+#package Message;
 sub checkAnsiSntm {
 	my ($self,$path,$li,$b) = @_;
 	my $mt = (($b->[8] & 0x0f) << 4) | ($b->[8] >> 4);
@@ -898,6 +1530,7 @@ sub checkAnsiSntm {
 	}
 	return PT_NO;
 }
+#package Message;
 sub checkSnsm {
 	my ($self,$path,@args) = @_;
 	my $ansi = $self->checkAnsiSnsm($path,@args);
@@ -922,14 +1555,17 @@ sub checkSnsm {
 		return 1;
 	}
 }
+#package Message;
 sub checkItutSnsm {
 	return PT_NO;
 }
+#package Message;
 sub checkAnsiSnsm {
 	my ($self,@args) = @_;
 	return $self->checkAnsiSntm(@args);
 }
 
+#package Message;
 sub checkSccp {
 	my ($self,$path,$li,$b) = @_;
 	my $ansi = $self->checkAnsiSccp($path,$b);
@@ -954,12 +1590,14 @@ sub checkSccp {
 		return 1;
 	}
 }
+#package Message;
 sub checkItutSccp {
 	my ($self,$path,$li,$b) = @_;
 	my $mt = $b->[5];
 	return PT_MAYBE if 0x01 <= $mt && $mt <= 0x14;
 	return PT_NO;
 }
+#package Message;
 sub checkAnsiSccp {
 	my ($self,$path,$li,$b) = @_;
 	my $mt = $b->[8];
@@ -967,6 +1605,7 @@ sub checkAnsiSccp {
 	return PT_NO;
 }
 
+#package Message;
 sub checkIsup {
 	my ($self,$path,@args) = @_;
 	my $ansi = $self->checkAnsiIsup($path,@args);
@@ -991,6 +1630,7 @@ sub checkIsup {
 		return 1;
 	}
 }
+#package Message;
 sub checkItutIsup {
 	my ($self,$path,$li,$b) = @_;
 	my $mt = $b->[7];
@@ -1061,6 +1701,7 @@ sub checkItutIsup {
 	}
 	return PT_NO;
 }
+#package Message;
 sub checkAnsiIsup {
 	my ($self,$path,$li,$b) = @_;
 	my $mt = $b->[10];
@@ -1084,7 +1725,7 @@ sub checkAnsiIsup {
 		return PT_NO if $li != 12;
 		return PT_MAYBE;
 	}
-	if (exists $isup_mt{$mt}) {
+	if (exists $Message::isup_mt{$mt}) {
 		return PT_MAYBE;
 	}
 	return PT_MAYBE;
@@ -1096,6 +1737,7 @@ package MyOptions;
 use strict;
 # -------------------------------------
 
+#package MyOptions;
 sub assign {
 	my $mw = shift;
 	#$mw->optionAdd('*font'=>'-*-helvetica-medium-r-*--*-100-*-*-*-*-*-*');
@@ -1664,6 +2306,7 @@ static char * streams_icon_xpm[] = {
 ". . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . "};
 EOF
 
+#package MyPixmaps;
 sub assign {
 	my $mw = shift;
 	$mw->Pixmap('icon', -data=>$iconImage,);
@@ -1674,6 +2317,7 @@ package MyWidget;
 use strict;
 # -------------------------------------
 
+#package MyWidget;
 sub new {
 	my ($type,$parent,@args) = @_;
 	my $self = {};
@@ -1681,6 +2325,7 @@ sub new {
 	$self->{'parent'} = $parent;
 	return $self;
 }
+#package MyWidget;
 sub destroy {
 	my ($self,@args) = @_;
 	$self->SUPER::destroy(@args);
@@ -1688,18 +2333,21 @@ sub destroy {
 	delete $self->{'widget'};
 	delete $self->{'tree'};
 }
+#package MyWidget;
 sub setframe {
 	my ($self,$frame,@args) = @_;
 	$self->{'frame'} = $frame;
 	$frame->{_myobject} = $self;
 	return $frame;
 }
+#package MyWidget;
 sub setwidget {
 	my ($self,$widget,@args) = @_;
 	$self->{'widget'} = $widget;
 	$widget->{_myobject} = $self;
 	return $widget;
 }
+#package MyWidget;
 sub setmainwindow {
 	my ($self,$widget,@args) = @_;
 	$self->setwidget($widget);
@@ -1716,9 +2364,11 @@ sub setmainwindow {
 	);
 	return $widget;
 }
+#package MyWidget;
 sub parent {
 	shift->{'parent'}
 }
+#package MyWidget;
 sub top {
 	my $self = shift;
 	my $top = $self;
@@ -1727,6 +2377,7 @@ sub top {
 	}
 	return $top;
 }
+#package MyWidget;
 sub toplevel {
 	my $self = shift;
 	if (defined $self->widget) {
@@ -1734,28 +2385,35 @@ sub toplevel {
 	}
 	return $self->parent->toplevel;
 }
+#package MyWidget;
 sub widget {
 	shift->{'widget'};
 }
+#package MyWidget;
 sub frame {
 	shift->{'frame'};
 }
+#package MyWidget;
 sub attachballoon {
 	my ($self,@args) = @_;
 	return $self->parent->attachballoon(@args);
 }
+#package MyWidget;
 sub statusmsg {
 	my ($self,@args) = @_;
 	return $self->parent->statusmsg(@args);
 }
+#package MyWidget;
 sub configure {
 	my ($self,@args) = @_;
 	return $self->widget->configure(@args);
 }
+#package MyWidget;
 sub cget {
 	my ($self,@args) = @_;
 	return $self->widget->cget(@args);
 }
+#package MyWidget;
 sub pack {
 	my ($self,@args) = @_;
 	return $self->widget->pack(@args);
@@ -1771,11 +2429,13 @@ use vars qw(@ISA);
 
 @MyMainWindow::windows = ();
 
+#package MyMainWindow;
 sub new {
 	my ($type,$title,@args) = @_;
 	my $self = MyWidget::new($type,undef,@args);
 	$self->{'data'}->{'title'} = $title;
 	my $mw = Tk::MainWindow->new;
+	$main::top = $mw;
 	$self->setmainwindow($mw);
 	$mw->title($title);
 	$mw->minsize(600,400);
@@ -1791,6 +2451,7 @@ sub new {
 	return $self;
 }
 
+#package MyMainWindow;
 sub destroy {
 	my ($self,@args) = @_;
 	for (my $i = 0; $i < @MyMainWindow::windows; $i++) {
@@ -1801,14 +2462,17 @@ sub destroy {
 	}
 }
 
+#package MyMainWindow;
 sub wm_delete_window {
 	my ($self,@args) = @_;
 }
 
+#package MyMainWindow;
 sub wm_save_yourself {
 	my ($self,@args) = @_;
 }
 
+#package MyMainWindow;
 sub wm_take_focus {
 	my ($self,@args) = @_;
 }
@@ -1820,6 +2484,7 @@ use vars qw(@ISA);
 @ISA = qw(MyWidget);
 # -------------------------------------
 
+#package MyCanvas;
 sub new {
 	my ($type,$parent,$width,@args) = @_;
 	my $self = MyWidget::new($type,$parent,$width,@args);
@@ -1839,7 +2504,37 @@ sub new {
 	$self->{'top'} = $parent->widget;
 	$self->setwidget($c);
 	$main::canvas = $c;
+	$c->update;
+	$main::mycanvas = $self;
+	my $w = $self->{'w'} = $c->width;
+	my $h = $self->{'h'} = $c->height;
 	return $self;
+}
+
+# unknown nodes are in columns +-7
+# remote/alias SSP nodes are in columns +-6
+# remote/alias SCP nodes are in columns +-5
+# remote/alias STP nodes are in columns +-4 (GTT cap codes)
+# remote/alias STP nodes are in columns +-3
+# adjacent nodes are in columns +-2
+
+sub colpos {
+	my ($self,$col) = @_;
+	my $w = $self->{'w'};
+	my $dw = $w / 12; # 12 columns
+	if ($col < 0) {
+		return $col * $dw + $dw/2 + $w/2;
+	} elsif ($col > 0) {
+		return $col * $dw - $dw/2 + $w/2;
+	} else {
+		return 0 + $w/2;
+	}
+}
+
+sub rowpos {
+	my ($self,$row) = @_;
+	my $h = $self->{'h'};
+	return $row * 30 + $h/2;
 }
 
 # -------------------------------------
@@ -1852,6 +2547,7 @@ use vars qw(@ISA);
 @MyTop::myapps = ();
 $MyTop::appnum = 0;
 
+#package MyTop;
 sub new {
 	my ($type,$filename,$number,@args) = @_;
 	my $title = 'OpenSS7 SS7 Analyzer';
@@ -1867,6 +2563,7 @@ sub new {
 	return $self;
 }
 
+#package MyTop;
 sub createmenubar {
 	my $self = shift;
 	my $w = $self->widget;
@@ -1962,6 +2659,7 @@ sub createmenubar {
 	$self->{'FileMenu'} = $mi;
 }
 
+#package MyTop;
 sub createstatusbar {
 	my $self = shift;
 	my $sb = $self->toplevel->Message(
@@ -1979,6 +2677,7 @@ sub createstatusbar {
 	$self->{'Message'} = $sb;
 }
 
+#package MyTop;
 sub createballoon {
 	my $self = shift;
 	$_ = $self->{'Balloon'} = $self->toplevel->Balloon(
@@ -1989,33 +2688,25 @@ sub createballoon {
 	return $_;
 }
 
+#package MyTop;
 sub createcanvas {
 	my ($self,$width,@args) = @_;
 	my $c = MyCanvas->new($self,$width,@args);
-#	for (my ($x,$y) = (50,40); $x < 1000; $x=$x+50,$y=$y+40) {
-#		$c->widget->createImage($x,$y,
-#			-anchor=>'center',
-#			-image=>'icon',
-#			-tags=>'icon',
-#		);
-#	}
-#	$c->widget->createImage(500,400,
-#		-anchor=>'center',
-#		-image=>'icon',
-#		-tags=>( 'icon' ),
-#	);
 }
 
+#package MyTop;
 sub attachballoon {
 	my ($self,@args) = @_;
 	return $self->{'Balloon'}->attach(@args) if $self->{'Balloon'};
 }
+#package MyTop;
 sub statusmsg {
 	my ($self,$msg) = @_;
 	$self->{'Message'}->configure(-text=>$msg) if $self->{'Message'};
 	printf STDERR "$msg\n";
 }
 
+#package MyTop;
 sub menuFileOpen {
 	my $self = shift;
 	my $data = $self->{'data'};
@@ -2039,10 +2730,16 @@ sub menuFileOpen {
 		$d->destroy;
 		return;
 	}
-	my $fh = Net::Pcap::pcap_file($pcap);
-	Tk::Event::IO->fileevent($fh, 'readable' => [\&MyTop::readmsg,$self,$pcap,$fh]);
+#	my $fh = Net::Pcap::pcap_file($pcap);
+#	Tk::Event::IO->fileevent($fh, 'readable' => [\&MyTop::readmsg,$self,$pcap,$fh]);
+	while (my $msg = Message->create($pcap)) {
+		$msg->process();
+	}
+	Net::Pcap::pcap_close($pcap);
+	print STDERR "Pcap file closed.\n";
 }
 
+#package MyTop;
 sub readmsg {
 	my ($self,$pcap,$fh,@args) = @_;
 	if (my $msg = Message->create($pcap)) {
@@ -2064,43 +2761,7 @@ if (length @infiles == 0) {
 	@infiles = ( $infile );
 }
 
-#foreach $infile (@infiles) {
-#	my $infile = "./testdata/ss7capall.pcap";
-#	my $err = '';
-#	my $pcap = Net::Pcap::pcap_open_offline($infile, \$err)
-#		or die "Can't read '$infile': $err\n";
-#
-#	my $pcapswap = Net::Pcap::pcap_is_swapped($pcap);
-#	my $pcapmaj = Net::Pcap::pcap_major_version($pcap);
-#	my $pcapmin = Net::Pcap::pcap_minor_version($pcap);
-#	my %stats;
-#	Net::Pcap::pcap_stats($pcap, \%stats);
-#	my $linktype = Net::Pcap::pcap_datalink($pcap);
-#	my $linkname = Net::Pcap::pcap_datalink_val_to_name($linktype);
-#	my $linkdesc = Net::Pcap::pcap_datalink_val_to_description($linktype);
-#
-#	print "File: $infile\n";
-#	print "Swapped: $pcapswap\n";
-#	print "Major Version: $pcapmaj\n";
-#	print "Minor Version: $pcapmin\n";
-#	print "Data Link Type: $linktype\n";
-#	print "Data Link Type Name: $linkname\n";
-#	print "Data Link Type Desc: $linkdesc\n";
-#	print "Packets capt: $stats{'ps_recv'}\n";
-#	print "Packets drop: $stats{'ps_drop'}\n";
-#	print "Packets ifdrop: $stats{'ps_ifdrop'}\n";
-#		
-#	my $msg;
-#
-#	while (($msg = Message->create($pcap)) != undef) {
-#		$msg->process();
-#	}
-#	Net::Pcap::pcap_close($pcap);
-#
-#	print "File '$infile' contains '$count' messages\n";
-#}
-
-MyTop->new;
+$top = MyTop->new;
 
 Tk::MainLoop;
 
