@@ -132,6 +132,7 @@ require Tk::DropSite;
 require Tk::TableMatrix;
 require Tk::TableMatrix::Spreadsheet;
 require Tk::Frame;
+require Tk::TFrame;
 
 my $canvas;
 my $mycanvas;
@@ -678,7 +679,7 @@ sub stats {
 			$tw->UnmapWindow;
 		}
 	} else {
-		my $title = "Message Statistics";
+		my $title = $self->identify." Message Statistics";
 		$tw = $canvas->toplevel->Toplevel(
 			-title=>$title,
 		);
@@ -865,7 +866,7 @@ sub dist {
 	$tw->transient($w->toplevel);
 	$tw->iconimage('icon');
 	$tw->iconname($title);
-	$tw->resizable(0,0);
+	#$tw->resizable(0,0);
 	$tw->positionfrom('user');
 	$tw->geometry("+$X+$Y");
 	$tw->protocol('WM_DELETE_WINDOW', [sub {
@@ -890,36 +891,16 @@ sub dist {
 	);
 	my $h = $self->{'durs'}->{'dist'}->{$event};
 	my ($maxx,$minx,$maxy,$miny);
-	foreach my $v (sort {$b<=>$a} values %{$h}) {
-		$maxy = $v unless defined $maxy;
-		$miny = $v;
-	}
+	foreach my $v (sort {$b<=>$a} values %{$h}) { $maxy = $v unless defined $maxy; $miny = $v; }
 	# remove anomalies
 	if ($miny * 1000 < $maxy) {
-		while (my ($k,$v) = each %{$h}) {
-			delete $h->{$k} if $v * 1000 < $maxy;
-		}
-		foreach my $v (sort {$a<=>$b} values %{$h}) {
-			$miny = $v;
-			last;
-		}
+		while (my ($k,$v) = each %{$h}) { delete $h->{$k} if $v * 1000 < $maxy; }
+		foreach my $v (sort {$a<=>$b} values %{$h}) { $miny = $v; last; }
 	}
-	if ($maxy == $miny) {
-		$maxy++;
-	}
-	foreach my $k (sort {$b<=>$a} keys %{$h}) {
-		$maxx = $k unless defined $maxx;
-		$minx = $k;
-	}
-	if ($maxx == $minx) {
-		$maxx++;
-	}
-	for (my $i = $minx; $i <= $maxx; $i++) {
-		unless (exists $h->{$i}) {
-			$h->{$i} = 0;
-			$miny = 0;
-		}
-	}
+	if ($maxy == $miny) { $maxy++; }
+	foreach my $k (sort {$b<=>$a} keys %{$h}) { $maxx = $k unless defined $maxx; $minx = $k; }
+	if ($maxx == $minx) { $maxx++; }
+	for (my $i = $minx; $i <= $maxx; $i++) { unless (exists $h->{$i}) { $h->{$i} = 0; $miny = 0; } }
 	my ($scalex,$scaley) = (500/($maxx-$minx),300/($maxy-$miny));
 	my @coords = ();
 	foreach my $k (sort {$a<=>$b} keys %{$h}) {
@@ -988,77 +969,86 @@ sub dist {
 	$c->createLine(550,50,40,50, %blackline);
 	$c->createLine(@coords, %blueline);
 	$c->createLine(@coords, %blackcurve);
+	$c->toplevel->bind('<ResizeRequest>',[\&MsgStats::resizedist,$self,$tw,$c,Tk::Ev('w'),Tk::Ev('h')]);
 	$tw->MapWindow;
+}
+
+sub resizedist {
+	my ($self,$tw,$c,$w,$h) = @_;
+	foreach my $a ( @_ ) {
+		print "attribute: $a\n";
+	}
+	print $c->geometry."\n";
 }
 
 sub dircstat {
 	my ($self,$tw,$row,$span,$event,$prefix,$l1,$l2,$l3) = @_;
-	my ($pegs,$durs);
-	if ($prefix eq 'Total') {
-		if ($self->{'pegs'}->{$event - 20} && $self->{'pegs'}->{$event - 10}) {
-			$pegs = $self->{'pegs'}->{$event};
-			$durs = $self->{'durs'}->{$event};
-		} else {
-			$pegs = 0;
-			$durs = 0;
-		}
-	} else {
-		$pegs = $self->{'pegs'}->{$event};
-		$durs = $self->{'durs'}->{$event};
-	}
-	if ($pegs) {
-		$tw->Label(
-			-anchor=>'e',
-			-justify=>'right',
-			-text=>"$prefix $l1:",
-		)->grid(-row=>$$row,-column=>0,-sticky=>'ew');
-		my $dur = sprintf("%12.4f erlangs",$durs / $span);
-		$tw->Entry(
-			-readonlybackground=>'white',
-			-background=>'white',
-			-justify=>'right',
-			-textvariable=>\$dur,
-			-state=>'readonly',
-			-exportselection=>1,
-		)->grid(-row=>$$row,-column=>1,-sticky=>'ew');
-		$tw->Label(
-			-anchor=>'e',
-			-justify=>'right',
-			-text=>"$prefix $l3:",
-		)->grid(-row=>$$row,-column=>2,-sticky=>'ew');
-		my $hit = sprintf("%7.1f per hour", $pegs * $span / 3600);
-		$tw->Entry(
-			-readonlybackground=>'white',
-			-background=>'white',
-			-justify=>'right',
-			-textvariable=>\$hit,
-			-state=>'readonly',
-			-exportselection=>1,
-		)->grid(-row=>$$row,-column=>3,-sticky=>'ew');
-		$tw->Label(
-			-anchor=>'e',
-			-justify=>'right',
-			-text=>"$prefix average $l2:",
-		)->grid(-row=>$$row,-column=>4,-sticky=>'ew');
-		my $del = sprintf("%7.2f seconds", $durs/$pegs);
-		$tw->Entry(
-			-readonlybackground=>'white',
-			-background=>'white',
-			-justify=>'right',
-			-textvariable=>\$del,
-			-state=>'readonly',
-			-exportselection=>1,
-		)->grid(-row=>$$row,-column=>5,-sticky=>'ew');
-		my $X = $tw->toplevel->rootx;
-		my $Y = $tw->toplevel->rooty;
-		$tw->Button(
-			-command=>[\&MsgStats::dist,$self,$tw,$event,$prefix,$l2,$X,$Y],
-			-text=>'Distribution',
-			-relief=>'flat',
-			-overrelief=>'raised',
-		)->grid(-row=>$$row,-column=>6,-sticky=>'ew');
-		$$row++;
-	}
+	my $p;
+	my $del = sprintf("%7.2f", $self->{'durs'}->{$event}/(($p = $self->{'pegs'}->{$event})?$p:1));
+	my $dur = sprintf("%12.2f", $self->{'durs'}->{$event} / $span);
+	$tw->Label(
+		-anchor=>'e',
+		-justify=>'right',
+		-text=>"$prefix $l1:",
+	)->grid(-row=>$$row,-column=>0,-sticky=>'ew');
+	$tw->Entry(
+		-readonlybackground=>'white',
+		-background=>'white',
+		-justify=>'right',
+		-textvariable=>\$dur,
+		-state=>'readonly',
+		-exportselection=>1,
+	)->grid(-row=>$$row,-column=>1,-sticky=>'ew');
+	$tw->Label(
+		-anchor=>'e',
+		-justify=>'right',
+		-text=>"$prefix $l3:",
+	)->grid(-row=>$$row,-column=>2,-sticky=>'ew');
+	$tw->Entry(
+		-readonlybackground=>'white',
+		-background=>'white',
+		-justify=>'right',
+		-textvariable=>\$self->{'pegs'}->{$event},
+		-validatecommand=>[sub{
+			my ($del,$dur,$self,$event,$row,$col,$old,$proposed,$index,@args) = @_;
+			my $p;
+			$$del = sprintf("%7.2f", $self->{'durs'}->{$event}/(($p = $self->{'pegs'}->{$event})?$p:1));
+			my $span;
+			if (ref $self eq 'Counts') {
+				$span = 300;
+			} else {
+				$span = $main::endtime->{'tv_sec'}  - $main::begtime->{'tv_sec'}
+				     + ($main::endtime->{'tv_usec'} - $main::begtime->{'tv_usec'})/1000000;
+			}
+			$$dur = sprintf("%12.2f", $self->{'durs'}->{$event}/$span);
+			return 1;
+		 },\$del,\$dur,$self,$event],
+		-validate=>'all',
+		-state=>'readonly',
+		-exportselection=>1,
+	)->grid(-row=>$$row,-column=>3,-sticky=>'ew');
+	$tw->Label(
+		-anchor=>'e',
+		-justify=>'right',
+		-text=>"$prefix average $l2:",
+	)->grid(-row=>$$row,-column=>4,-sticky=>'ew');
+	$tw->Entry(
+		-readonlybackground=>'white',
+		-background=>'white',
+		-justify=>'right',
+		-textvariable=>\$del,
+		-state=>'readonly',
+		-exportselection=>1,
+	)->grid(-row=>$$row,-column=>5,-sticky=>'ew');
+	my $X = $tw->toplevel->rootx;
+	my $Y = $tw->toplevel->rooty;
+	$tw->Button(
+		-command=>[\&MsgStats::dist,$self,$tw,$event,$prefix,$l2,$X,$Y],
+		-text=>'Distribution',
+		-relief=>'flat',
+		-overrelief=>'raised',
+	)->grid(-row=>$$row,-column=>6,-sticky=>'ew');
+	$$row++;
 }
 
 sub addcstat {
@@ -1092,7 +1082,7 @@ sub cstat {
 			$tw->UnmapWindow;
 		}
 	} else {
-		my $title = "Call Statistics";
+		my $title = $self->identify." Call Statistics";
 		$tw = $canvas->toplevel->Toplevel(
 			-title=>$title,
 		);
@@ -1605,7 +1595,7 @@ sub props {
 			$tw->UnmapWindow;
 		}
 	} else {
-		my $title = "Relation ($self->{'nodea'}->{'pcode'} - $self->{'nodeb'}->{'pcode'}) Properties";
+		my $title = $self->identify." Properties";
 		$tw = $canvas->toplevel->Toplevel(
 			-title=>$title,
 		);
@@ -1664,11 +1654,11 @@ sub props {
 			-state=>'readonly',
 			-exportselection=>1,
 		)->grid(-row=>$row++,-column=>1,-sticky=>'ew');
-		foreach my $pc (sort {$a <=> $b} keys %{$self->{'reponds'}}) {
+		foreach my $pc (sort {$a <=> $b} keys %{$self->{'responds'}}) {
 			$tw->Label(
 				-anchor=>'e',
 				-justify=>'right',
-				-text=>'Receives responses from:',
+				-text=>'Responses from:',
 			)->grid(-row=>$row,-column=>0,-sticky=>'ew');
 			my $pcode = main::pcstring($pc);
 			my $pownr = main::pcowner($pc,0);
@@ -1698,7 +1688,7 @@ sub status {
 			$tw->UnmapWindow;
 		}
 	} else {
-		my $title = "Relation ($self->{'nodea'}->{'pcode'} - $self->{'nodeb'}->{'pcode'}) Status";
+		my $title = $self->identify." Status";
 		$tw = $canvas->toplevel->Toplevel(
 			-title=>$title,
 		);
@@ -1720,49 +1710,53 @@ sub status {
 		$tw->Label(
 			-anchor=>'e',
 			-justify=>'right',
-			-text=>'Exchanges SLTM traffic:',
+			-text=>'Exchange SLTM',
 		)->grid(-row=>$row,-column=>0,-sticky=>'ew');
 		$tw->Checkbutton(
 			-anchor=>'w',
 			-justify=>'left',
 			-indicatoron=>1,
 			-variable=>\$self->{'xchg_sltm'},
+			-text=>'Exchanges SLTM',
 			-stat=>'disabled',
 		)->grid(-row=>$row++,-column=>1,-sticky=>'ew');
 		$tw->Label(
 			-anchor=>'e',
 			-justify=>'right',
-			-text=>'Exchanges ISUP traffic:',
+			-text=>'Exchange ISUP:',
 		)->grid(-row=>$row,-column=>0,-sticky=>'ew');
 		$tw->Checkbutton(
 			-anchor=>'w',
 			-justify=>'left',
 			-indicatoron=>1,
 			-variable=>\$self->{'xchg_isup'},
+			-text=>'Exchanges ISUP',
 			-stat=>'disabled',
 		)->grid(-row=>$row++,-column=>1,-sticky=>'ew');
 		$tw->Label(
 			-anchor=>'e',
 			-justify=>'right',
-			-text=>'Forward TCAP traffic:',
+			-text=>'Forward TCAP',
 		)->grid(-row=>$row,-column=>0,-sticky=>'ew');
 		$tw->Checkbutton(
 			-anchor=>'w',
 			-justify=>'left',
 			-indicatoron=>1,
 			-variable=>\$self->{'forw_tcap'},
+			-text=>'Forward TCAP',
 			-stat=>'disabled',
 		)->grid(-row=>$row++,-column=>1,-sticky=>'ew');
 		$tw->Label(
 			-anchor=>'e',
 			-justify=>'right',
-			-text=>'Reverse TCAP traffic:',
+			-text=>'Reverse TCAP',
 		)->grid(-row=>$row,-column=>0,-sticky=>'ew');
 		$tw->Checkbutton(
 			-anchor=>'w',
 			-justify=>'left',
 			-indicatoron=>1,
 			-variable=>\$self->{'revs_tcap'},
+			-text=>'Reverse TCAP',
 			-stat=>'disabled',
 		)->grid(-row=>$row++,-column=>1,-sticky=>'ew');
 		if ($self->{'slccnt'}) {
@@ -2520,6 +2514,16 @@ sub new {
 }
 
 #package Route;
+sub identify {
+	my $self = shift;
+	my $id = "Route from $self->{'nodea'}->{'pcode'}";
+	$id .= " ($self->{'nodea'}->{'pownr'})" if $self->{'nodea'}->{'pownr'};
+	$id .= "to $self->{'nodeb'}->{'pcode'}";
+	$id .= " ($self->{'nodeb'}->{'pownr'})" if $self->{'nodeb'}->{'pownr'};
+	return $id;
+}
+
+#package Route;
 sub move {
 	my $self = shift;
 	my $node = $self->{'node'};
@@ -2606,9 +2610,7 @@ sub props {
 			$tw->UnmapWindow;
 		}
 	} else {
-		my $ppastr = "$self->{'path'}->{'card'}:$self->{'path'}->{'span'}:$self->{'path'}->{'slot'}";
-		my $pcode = $self->{'node'}->{'pcode'};
-		my $title = "Route ($ppastr - $pcode) Properties";
+		my $title = $self->identify." Properties";
 		$tw = $canvas->toplevel->Toplevel(
 			-title=>$title,
 		);
@@ -2647,7 +2649,7 @@ sub props {
 		$tw->Entry(
 			-readonlybackground=>'white',
 			-background=>'white',
-			-textvariable=>\$ppastr,
+			-text=>"$self->{'card'}:$self->{'span'}:$self->{'slot'}",
 			-state=>'readonly',
 			-exportselection=>1,
 		)->grid(-row=>$row++,-column=>1,-sticky=>'ew');
@@ -2656,6 +2658,7 @@ sub props {
 			-justify=>'right',
 			-text=>'Signalling point:',
 		)->grid(-row=>$row,-column=>0,-sticky=>'ew');
+		my $pcode = $self->{'node'}->{'pcode'};
 		$pcode .= " ($self->{'node'}->{'pwonr'})" if $self->{'node'}->{'pownr'};
 		$tw->Entry(
 			-readonlybackground=>'white',
@@ -2681,9 +2684,7 @@ sub status {
 			$tw->UnmapWindow;
 		}
 	} else {
-		my $ppastr = "$self->{'path'}->{'card'}:$self->{'path'}->{'span'}:$self->{'path'}->{'slot'}";
-		my $pcode = $self->{'node'}->{'pcode'};
-		my $title = "Route ($ppastr - $pcode) Status";
+		my $title = $self->identify." Status";
 		$tw = $canvas->toplevel->Toplevel(
 			-title=>$title,
 		);
@@ -2928,7 +2929,7 @@ sub add_term {
 				$self->{'term_tcap'} = 1;
 				$self->{'reanalyze'} = 1;
 			}
-			$self->{'reponds'}->{$msg->{'opc'}} = 1;
+			$self->{'responds'}->{$msg->{'opc'}} = 1;
 		}
 		$self->reanalyze if $self->{'reanalyze'};
 		return;
@@ -3210,7 +3211,7 @@ sub props {
 			$tw->UnmapWindow;
 		}
 	} else {
-		my $title = "SP ($self->{'pcode'}) Properties";
+		my $title = $self->identify." Properties";
 		$tw = $canvas->toplevel->Toplevel(
 			-title=>$title,
 		);
@@ -3240,7 +3241,7 @@ sub commonstatus {
 	$tw->Label(
 		-anchor=>'e',
 		-justify=>'right',
-		-text=>'Exchanges SLTM traffic:',
+		-text=>'Exchange SLTM',
 	)->grid(-row=>$$row,-column=>0,-sticky=>'ew');
 	$tw->Checkbutton(
 		-anchor=>'w',
@@ -3248,43 +3249,43 @@ sub commonstatus {
 		-indicatoron=>1,
 		-variable=>\$self->{'xchg_sltm'},
 		-stat=>'disabled',
-	)->grid(-row=>$$row++,-column=>1,-sticky=>'ew');
+	)->grid(-row=>$$row,-column=>1,-sticky=>'ew');
 	$tw->Label(
 		-anchor=>'e',
 		-justify=>'right',
-		-text=>'Exchanges ISUP traffic:',
-	)->grid(-row=>$$row,-column=>0,-sticky=>'ew');
+		-text=>'Exchange ISUP',
+	)->grid(-row=>$$row,-column=>2,-sticky=>'ew');
 	$tw->Checkbutton(
 		-anchor=>'w',
 		-justify=>'left',
 		-indicatoron=>1,
 		-variable=>\$self->{'xchg_isup'},
 		-stat=>'disabled',
-	)->grid(-row=>$$row++,-column=>1,-sticky=>'ew');
+	)->grid(-row=>$$row,-column=>3,-sticky=>'ew');
 	$tw->Label(
 		-anchor=>'e',
 		-justify=>'right',
-		-text=>'Originates TCAP traffic:',
-	)->grid(-row=>$$row,-column=>0,-sticky=>'ew');
+		-text=>'Originate TCAP',
+	)->grid(-row=>$$row,-column=>4,-sticky=>'ew');
 	$tw->Checkbutton(
 		-anchor=>'w',
 		-justify=>'left',
 		-indicatoron=>1,
 		-variable=>\$self->{'orig_tcap'},
 		-stat=>'disabled',
-	)->grid(-row=>$$row++,-column=>1,-sticky=>'ew');
+	)->grid(-row=>$$row,-column=>5,-sticky=>'ew');
 	$tw->Label(
 		-anchor=>'e',
 		-justify=>'right',
-		-text=>'Terminates TCAP traffic:',
-	)->grid(-row=>$$row,-column=>0,-sticky=>'ew');
+		-text=>'Terminate TCAP',
+	)->grid(-row=>$$row,-column=>6,-sticky=>'ew');
 	$tw->Checkbutton(
 		-anchor=>'w',
 		-justify=>'left',
 		-indicatoron=>1,
 		-variable=>\$self->{'term_tcap'},
 		-stat=>'disabled',
-	)->grid(-row=>$$row++,-column=>1,-sticky=>'ew');
+	)->grid(-row=>$$row++,-column=>7,-sticky=>'ew');
 }
 
 #package Node;
@@ -3300,7 +3301,7 @@ sub status {
 			$tw->UnmapWindow;
 		}
 	} else {
-		my $title = "SP ($self->{'pcode'}) Status";
+		my $title = $self->identify." Status";
 		$tw = $canvas->toplevel->Toplevel(
 			-title=>$title,
 		);
@@ -3427,7 +3428,7 @@ sub props {
 			$tw->UnmapWindow;
 		}
 	} else {
-		my $title = "SSP ($self->{'pcode'}) Properties";
+		my $title = $self->identify." Properties";
 		$tw = $canvas->toplevel->Toplevel(
 			-title=>$title,
 		);
@@ -3464,7 +3465,7 @@ sub status {
 			$tw->UnmapWindow;
 		}
 	} else {
-		my $title = "SSP ($self->{'pcode'}) Status";
+		my $title = $self->identify." Status";
 		$tw = $canvas->toplevel->Toplevel(
 			-title=>$title,
 		);
@@ -3483,108 +3484,200 @@ sub status {
 		},$self]);
 		$self->{'status'} = $tw;
 
-		$self->commonstatus($canvas,$tw,$v,\$row);
-		foreach my $pc (sort {$a <=> $b} keys %{$self->{'circuits'}}) {
-			my $n = "$self->{'relate'}->{$pc}->{'ciccnt'} defined";
-			my $a = "$self->{'relate'}->{$pc}->{'actcnt'} active";
-			my ($o,$i);
-			if ($self->{'way'} eq 'O') {
-				$o = "$self->{'relate'}->{$pc}->{'actforw'} O/G active";
-				$i = "$self->{'relate'}->{$pc}->{'actrevs'} I/C active";
-			} else {
-				$o = "$self->{'relate'}->{$pc}->{'actrevs'} O/G active";
-				$i = "$self->{'relate'}->{$pc}->{'actforw'} I/C active";
-			}
-			my $b = "$self->{'relate'}->{$pc}->{'actboth'} 2/W active";
-			$tw->Label(
-				-anchor=>'e',
-				-justify=>'right',
-				-text=>"Has circuits to:",
+		my $f = $tw->Frame(
+			-relief=>'ridge',
+			-borderwidth=>2,
+		)->pack(
+			-expand=>1,
+			-fill=>'x',
+			-side=>'top',
+			-anchor=>'n',
+		);
+		$self->commonstatus($canvas,$f,$v,\$row);
+		if (keys %{$self->{'circuits'}}) {
+			$f = $tw->TFrame(
+				-relief=>'ridge',
+				-borderwidth=>2,
+				-label=>'Circuits:',
+			)->pack(
+				-expand=>1,
+				-fill=>'both',
+				-side=>'top',
+				-anchor=>'n',
+			);
+			$row = 0;
+			$f->Label(
+				-anchor=>'s',
+				-justify=>'center',
+				-text=>'Point Code',
+				-relief=>'raised',
+				-borderwidth=>2,
 			)->grid(-row=>$row,-column=>0,-sticky=>'ew');
-			my $pcode = main::pcstring($pc);
-			my $pownr = main::pcowner($pc,0);
-			$pcode .= " ($pownr)" if $pownr;
-			$tw->Entry(
-				-readonlybackground=>'white',
-				-background=>'white',
-				-textvariable=>\$pcode,
-				-state=>'readonly',
-				-exportselection=>1,
+			$f->Label(
+				-anchor=>'s',
+				-justify=>'center',
+				-text=>'Alloc.',
+				-relief=>'raised',
+				-borderwidth=>2,
 			)->grid(-row=>$row,-column=>1,-sticky=>'ew');
-			$tw->Entry(
-				-readonlybackground=>'white',
-				-background=>'white',
-				-justify=>'right',
-				-textvariable=>\$n,
-				-state=>'readonly',
-				-exportselection=>1,
+			$f->Label(
+				-anchor=>'s',
+				-justify=>'center',
+				-text=>'Act.',
+				-relief=>'raised',
+				-borderwidth=>2,
 			)->grid(-row=>$row,-column=>2,-sticky=>'ew');
-			$tw->Entry(
-				-readonlybackground=>'white',
-				-background=>'white',
-				-justify=>'right',
-				-textvariable=>\$a,
-				-state=>'readonly',
-				-exportselection=>1,
+			$f->Label(
+				-anchor=>'s',
+				-justify=>'center',
+				-text=>'O/G',
+				-relief=>'raised',
+				-borderwidth=>2,
 			)->grid(-row=>$row,-column=>3,-sticky=>'ew');
-			$tw->Entry(
-				-readonlybackground=>'white',
-				-background=>'white',
-				-justify=>'right',
-				-textvariable=>\$o,
-				-state=>'readonly',
-				-exportselection=>1,
+			$f->Label(
+				-anchor=>'s',
+				-justify=>'center',
+				-text=>'I/C',
+				-relief=>'raised',
+				-borderwidth=>2,
 			)->grid(-row=>$row,-column=>4,-sticky=>'ew');
-			$tw->Entry(
-				-readonlybackground=>'white',
-				-background=>'white',
-				-justify=>'right',
-				-textvariable=>\$i,
-				-state=>'readonly',
-				-exportselection=>1,
-			)->grid(-row=>$row,-column=>5,-sticky=>'ew');
-			$tw->Entry(
-				-readonlybackground=>'white',
-				-background=>'white',
-				-justify=>'right',
-				-textvariable=>\$b,
-				-state=>'readonly',
-				-exportselection=>1,
-			)->grid(-row=>$row++,-column=>6,-sticky=>'ew');
+			$f->Label(
+				-anchor=>'s',
+				-justify=>'center',
+				-text=>'2/W',
+				-relief=>'raised',
+				-borderwidth=>2,
+			)->grid(-row=>$row++,-column=>5,-sticky=>'ew');
+			foreach my $pc (sort {$a <=> $b} keys %{$self->{'circuits'}}) {
+				my ($ogcol,$iccol);
+				if ($self->{'way'} eq 'O')
+				{ $ogcol = 3; $iccol = 4; } else
+				{ $ogcol = 4; $iccol = 3; }
+				my $pcode = main::pcstring($pc);
+				my $pownr = main::pcowner($pc,0);
+				$pcode .= " ($pownr)" if $pownr;
+				$f->Entry(
+					-readonlybackground=>'white',
+					-background=>'white',
+					-justify=>'center',
+					-textvariable=>\$pcode,
+					-state=>'readonly',
+					-exportselection=>1,
+				)->grid(-row=>$row,-column=>0,-sticky=>'ew');
+				$f->Entry(
+					-readonlybackground=>'white',
+					-background=>'white',
+					-justify=>'right',
+					-width=>8,
+					-textvariable=>\$self->{'relate'}->{$pc}->{'ciccnt'},
+					-state=>'readonly',
+					-exportselection=>1,
+				)->grid(-row=>$row,-column=>1,-sticky=>'ew');
+				$f->Entry(
+					-readonlybackground=>'white',
+					-background=>'white',
+					-justify=>'right',
+					-width=>8,
+					-textvariable=>\$self->{'relate'}->{$pc}->{'actcnt'},
+					-state=>'readonly',
+					-exportselection=>1,
+				)->grid(-row=>$row,-column=>2,-sticky=>'ew');
+				$f->Entry(
+					-readonlybackground=>'white',
+					-background=>'white',
+					-justify=>'right',
+					-width=>8,
+					-textvariable=>\$self->{'relate'}->{$pc}->{'actforw'},
+					-state=>'readonly',
+					-exportselection=>1,
+				)->grid(-row=>$row,-column=>$ogcol,-sticky=>'ew');
+				$f->Entry(
+					-readonlybackground=>'white',
+					-background=>'white',
+					-justify=>'right',
+					-width=>8,
+					-textvariable=>\$self->{'relate'}->{$pc}->{'actrevs'},
+					-state=>'readonly',
+					-exportselection=>1,
+				)->grid(-row=>$row,-column=>$iccol,-sticky=>'ew');
+				$f->Entry(
+					-readonlybackground=>'white',
+					-background=>'white',
+					-justify=>'right',
+					-width=>8,
+					-textvariable=>\$self->{'relate'}->{$pc}->{'actboth'},
+					-state=>'readonly',
+					-exportselection=>1,
+				)->grid(-row=>$row++,-column=>5,-sticky=>'ew');
+			}
 		}
-		foreach my $pc (sort {$a <=> $b} keys %{$self->{'tqueries'}}) {
-			$tw->Label(
-				-anchor=>'e',
-				-justify=>'right',
-				-text=>'Launches queries to:',
-			)->grid(-row=>$row,-column=>0,-sticky=>'ew');
-			my $pcode = main::pcstring($pc);
-			my $pownr = main::pcowner($pc,0);
-			$pcode .= " ($pownr)" if $pownr;
-			$tw->Entry(
-				-readonlybackground=>'white',
-				-background=>'white',
-				-textvariable=>\$pcode,
-				-state=>'readonly',
-				-exportselection=>1,
-			)->grid(-row=>$row++,-column=>1,-sticky=>'ew');
-		}
-		foreach my $pc (sort {$a <=> $b} keys %{$self->{'reponds'}}) {
-			$tw->Label(
-				-anchor=>'e',
-				-justify=>'right',
-				-text=>'Receives responses from:',
-			)->grid(-row=>$row,-column=>0,-sticky=>'ew');
-			my $pcode = main::pcstring($pc);
-			my $pownr = main::pcowner($pc,0);
-			$pcode .= " ($pownr)" if $pownr;
-			$tw->Entry(
-				-readonlybackground=>'white',
-				-background=>'white',
-				-textvariable=>\$pcode,
-				-state=>'readonly',
-				-exportselection=>1,
-			)->grid(-row=>$row++,-column=>1,-sticky=>'ew');
+		if (keys %{$self->{'tqueries'}} || keys %{$self->{'responds'}}) {
+			$f = $tw->TFrame(
+				-relief=>'ridge',
+				-borderwidth=>2,
+				-label=>'Queries:',
+			)->pack(
+				-expand=>1,
+				-fill=>'both',
+				-side=>'top',
+				-anchor=>'n',
+			);
+			$row = 0;
+			my $col = 0;
+			foreach my $pc (sort {$a <=> $b} keys %{$self->{'tqueries'}}) {
+				if ($col == 0) {
+					$f->Label(
+						-anchor=>'e',
+						-justify=>'right',
+						-text=>'Query to:',
+					)->grid(-row=>$row,-column=>$col,-sticky=>'ew');
+				}
+				$col++;
+				my $pcode = main::pcstring($pc);
+				my $pownr = main::pcowner($pc,0);
+				$pcode .= " ($pownr)" if $pownr;
+				$f->Entry(
+					-readonlybackground=>'white',
+					-background=>'white',
+					-justify=>'center',
+					-textvariable=>\$pcode,
+					-state=>'readonly',
+					-exportselection=>1,
+				)->grid(-row=>$row,-column=>$col,-sticky=>'ew');
+				if ($col > 5) {
+					$col = 0;
+					$row++;
+				}
+			}
+			if ($col != 0) {
+				$col = 0;
+				$row++;
+			}
+			foreach my $pc (sort {$a <=> $b} keys %{$self->{'responds'}}) {
+				if ($col == 0) {
+					$f->Label(
+						-anchor=>'e',
+						-justify=>'right',
+						-text=>'Reply from:',
+					)->grid(-row=>$row,-column=>$col,-sticky=>'ew');
+				}
+				$col++;
+				my $pcode = main::pcstring($pc);
+				my $pownr = main::pcowner($pc,0);
+				$pcode .= " ($pownr)" if $pownr;
+				$f->Entry(
+					-readonlybackground=>'white',
+					-background=>'white',
+					-justify=>'center',
+					-textvariable=>\$pcode,
+					-state=>'readonly',
+					-exportselection=>1,
+				)->grid(-row=>$row,-column=>$col,-sticky=>'ew');
+				if ($col > 5) {
+					$col = 0;
+					$row++;
+				}
+			}
 		}
 	}
 	$tw->MapWindow;
@@ -3632,6 +3725,14 @@ sub xform {
 }
 
 #package Scp;
+sub identify {
+	my $self = shift;
+	my $id = "Service control point $self->{'pcode'}";
+	$id .= " ($self->{'pownr'})" if $self->{'pownr'};
+	return $id;
+}
+
+#package Scp;
 sub button3 {
 	my ($canvas,$self,$X,$Y) = @_;
 	my $m = $canvas->toplevel->Menu(
@@ -3676,7 +3777,7 @@ sub props {
 			$tw->UnmapWindow;
 		}
 	} else {
-		my $title = "SCP ($self->{'pcode'}) Properties";
+		my $title = $self->identify." Properties";
 		$tw = $canvas->toplevel->Toplevel(
 			-title=>$title,
 		);
@@ -3713,7 +3814,7 @@ sub status {
 			$tw->UnmapWindow;
 		}
 	} else {
-		my $title = "SCP ($self->{'pcode'}) Status";
+		my $title = $self->identify." Status";
 		$tw = $canvas->toplevel->Toplevel(
 			-title=>$title,
 		);
@@ -3732,57 +3833,108 @@ sub status {
 		},$self]);
 		$self->{'status'} = $tw;
 
-		$self->commonstatus($canvas,$tw,$v,\$row);
+		my $f = $tw->Frame(
+			-relief=>'ridge',
+			-borderwidth=>2,
+		)->pack(
+			-expand=>1,
+			-fill=>'x',
+			-side=>'top',
+			-anchor=>'n',
+		);
+		$self->commonstatus($canvas,$f,$v,\$row);
+		$f = $tw->Frame(
+			-relief=>'ridge',
+			-borderwidth=>2,
+		)->pack(
+			-expand=>1,
+			-fill=>'both',
+			-side=>'top',
+			-anchor=>'n',
+		);
+		$row = 0;
 		foreach my $pc (sort {$a <=> $b} keys %{$self->{'circuits'}}) {
-			$tw->Label(
+			$f->Label(
 				-anchor=>'e',
 				-justify=>'right',
-				-text=>'Has circuits to:',
+				-text=>'Circuits to:',
 			)->grid(-row=>$row,-column=>0,-sticky=>'ew');
 			my $pcode = main::pcstring($pc);
 			my $pownr = main::pcowner($pc,0);
 			$pcode .= " ($pownr)" if $pownr;
-			$tw->Entry(
+			$f->Entry(
 				-readonlybackground=>'white',
 				-background=>'white',
+				-justify=>'center',
 				-textvariable=>\$pcode,
 				-state=>'readonly',
 				-exportselection=>1,
 			)->grid(-row=>$row++,-column=>1,-sticky=>'ew');
 		}
+		$f = $tw->Frame(
+			-relief=>'ridge',
+			-borderwidth=>2,
+		)->pack(
+			-expand=>1,
+			-fill=>'both',
+			-side=>'top',
+			-anchor=>'n',
+		);
+		$row = 0;
+		my $col = 0;
 		foreach my $pc (sort {$a <=> $b} keys %{$self->{'tqueries'}}) {
-			$tw->Label(
-				-anchor=>'e',
-				-justify=>'right',
-				-text=>'Responds to queries from:',
-			)->grid(-row=>$row,-column=>0,-sticky=>'ew');
+			if ($col == 0) {
+				$f->Label(
+					-anchor=>'e',
+					-justify=>'right',
+					-text=>'Responds to:',
+				)->grid(-row=>$row,-column=>$col,-sticky=>'ew');
+			}
+			$col++;
 			my $pcode = main::pcstring($pc);
 			my $pownr = main::pcowner($pc,0);
 			$pcode .= " ($pownr)" if $pownr;
-			$tw->Entry(
+			$f->Entry(
 				-readonlybackground=>'white',
 				-background=>'white',
+				-justify=>'center',
 				-textvariable=>\$pcode,
 				-state=>'readonly',
 				-exportselection=>1,
-			)->grid(-row=>$row++,-column=>1,-sticky=>'ew');
+			)->grid(-row=>$row,-column=>$col,-sticky=>'ew');
+			if ($col > 5) {
+				$col = 0;
+				$row++;
+			}
 		}
-		foreach my $pc (sort {$a <=> $b} keys %{$self->{'reponds'}}) {
-			$tw->Label(
-				-anchor=>'e',
-				-justify=>'right',
-				-text=>'Responds to queries from:',
-			)->grid(-row=>$row,-column=>0,-sticky=>'ew');
+		if ($col != 0) {
+			$col = 0;
+			$row++;
+		}
+		foreach my $pc (sort {$a <=> $b} keys %{$self->{'responds'}}) {
+			if ($col == 0) {
+				$f->Label(
+					-anchor=>'e',
+					-justify=>'right',
+					-text=>'Responds to:',
+				)->grid(-row=>$row,-column=>$col,-sticky=>'ew');
+			}
+			$col++;
 			my $pcode = main::pcstring($pc);
 			my $pownr = main::pcowner($pc,0);
 			$pcode .= " ($pownr)" if $pownr;
-			$tw->Entry(
+			$f->Entry(
 				-readonlybackground=>'white',
 				-background=>'white',
+				-justify=>'center',
 				-textvariable=>\$pcode,
 				-state=>'readonly',
 				-exportselection=>1,
-			)->grid(-row=>$row++,-column=>1,-sticky=>'ew');
+			)->grid(-row=>$row,-column=>$col,-sticky=>'ew');
+			if ($col > 5) {
+				$col = 0;
+				$row++;
+			}
 		}
 	}
 	$tw->MapWindow;
@@ -3831,6 +3983,14 @@ sub xform {
 }
 
 #package Stp;
+sub identify {
+	my $self = shift;
+	my $id = "Signal transfer point $self->{'pcode'}";
+	$id .= " ($self->{'pownr'})" if $self->{'pownr'};
+	return $id;
+}
+
+#package Stp;
 sub button3 {
 	my ($canvas,$self,$X,$Y) = @_;
 	my $m = $canvas->toplevel->Menu(
@@ -3875,7 +4035,7 @@ sub props {
 			$tw->UnmapWindow;
 		}
 	} else {
-		my $title = "STP ($self->{'pcode'}) Properties";
+		my $title = $self->identify." Properties";
 		$tw = $canvas->toplevel->Toplevel(
 			-title=>$title,
 		);
@@ -3912,7 +4072,7 @@ sub status {
 			$tw->UnmapWindow;
 		}
 	} else {
-		my $title = "STP ($self->{'pcode'}) Status";
+		my $title = $self->identify." Status";
 		$tw = $canvas->toplevel->Toplevel(
 			-title=>$title,
 		);
@@ -3931,57 +4091,109 @@ sub status {
 		},$self]);
 		$self->{'status'} = $tw;
 
-		$self->commonstatus($canvas,$tw,$v,\$row);
+		my $f = $tw->Frame(
+			-relief=>'ridge',
+			-borderwidth=>2,
+		)->pack(
+			-expand=>1,
+			-fill=>'x',
+			-side=>'top',
+			-anchor=>'n',
+		);
+		$self->commonstatus($canvas,$f,$v,\$row);
+		$f = $tw->Frame(
+			-relief=>'ridge',
+			-borderwidth=>2,
+			-borderwidth=>2,
+		)->pack(
+			-expand=>1,
+			-fill=>'both',
+			-side=>'top',
+			-anchor=>'n',
+		);
+		$row = 0;
 		foreach my $pc (sort {$a <=> $b} keys %{$self->{'circuits'}}) {
-			$tw->Label(
+			$f->Label(
 				-anchor=>'e',
 				-justify=>'right',
-				-text=>'Has circuits to:',
+				-text=>'Circuits to:',
 			)->grid(-row=>$row,-column=>0,-sticky=>'ew');
 			my $pcode = main::pcstring($pc);
 			my $pownr = main::pcowner($pc,0);
 			$pcode .= " ($pownr)" if $pownr;
-			$tw->Entry(
+			$f->Entry(
 				-readonlybackground=>'white',
 				-background=>'white',
+				-justify=>'center',
 				-textvariable=>\$pcode,
 				-state=>'readonly',
 				-exportselection=>1,
 			)->grid(-row=>$row++,-column=>1,-sticky=>'ew');
 		}
+		$f = $tw->Frame(
+			-relief=>'ridge',
+			-borderwidth=>2,
+		)->pack(
+			-expand=>1,
+			-fill=>'both',
+			-side=>'top',
+			-anchor=>'n',
+		);
+		$row = 0;
+		my $col = 0;
 		foreach my $pc (sort {$a <=> $b} keys %{$self->{'tqueries'}}) {
-			$tw->Label(
-				-anchor=>'e',
-				-justify=>'right',
-				-text=>'Launches queries to:',
-			)->grid(-row=>$row,-column=>0,-sticky=>'ew');
+			if ($col == 0) {
+				$f->Label(
+					-anchor=>'e',
+					-justify=>'right',
+					-text=>'Queries:',
+				)->grid(-row=>$row,-column=>$col,-sticky=>'ew');
+			}
+			$col++;
 			my $pcode = main::pcstring($pc);
 			my $pownr = main::pcowner($pc,0);
 			$pcode .= " ($pownr)" if $pownr;
-			$tw->Entry(
+			$f->Entry(
 				-readonlybackground=>'white',
 				-background=>'white',
+				-justify=>'center',
 				-textvariable=>\$pcode,
 				-state=>'readonly',
 				-exportselection=>1,
-			)->grid(-row=>$row++,-column=>1,-sticky=>'ew');
+			)->grid(-row=>$row,-column=>$col,-sticky=>'ew');
+			if ($col > 5) {
+				$col = 0;
+				$row++;
+			}
 		}
-		foreach my $pc (sort {$a <=> $b} keys %{$self->{'reponds'}}) {
-			$tw->Label(
-				-anchor=>'e',
-				-justify=>'right',
-				-text=>'Translates queries from:',
-			)->grid(-row=>$row,-column=>0,-sticky=>'ew');
+		if ($col != 0) {
+			$col = 0;
+			$row++;
+		}
+		foreach my $pc (sort {$a <=> $b} keys %{$self->{'responds'}}) {
+			if ($col == 0) {
+				$f->Label(
+					-anchor=>'e',
+					-justify=>'right',
+					-text=>'Translates from:',
+				)->grid(-row=>$row,-column=>$col,-sticky=>'ew');
+			}
+			$col++;
 			my $pcode = main::pcstring($pc);
 			my $pownr = main::pcowner($pc,0);
 			$pcode .= " ($pownr)" if $pownr;
-			$tw->Entry(
+			$f->Entry(
 				-readonlybackground=>'white',
 				-background=>'white',
+				-justify=>'center',
 				-textvariable=>\$pcode,
 				-state=>'readonly',
 				-exportselection=>1,
-			)->grid(-row=>$row++,-column=>1,-sticky=>'ew');
+			)->grid(-row=>$row,-column=>$col,-sticky=>'ew');
+			if ($col > 5) {
+				$col = 0;
+				$row++;
+			}
 		}
 	}
 	$tw->MapWindow;
@@ -4023,6 +4235,14 @@ sub xform {
 	$main::canvas->bind($self->{'ownr'},'<ButtonPress-3>',[\&Gtt::button3,$self,Tk::Ev('X'),Tk::Ev('Y')]) if $self->{'ownr'};
 #	$main::canvas->idletasks;
 	$main::top->{'updatenow'} = 1;
+}
+
+#package Gtt;
+sub identify {
+	my $self = shift;
+	my $id = "Global title translator $self->{'pcode'}";
+	$id .= " ($self->{'pownr'})" if $self->{'pownr'};
+	return $id;
 }
 
 #package Gtt;
@@ -4070,7 +4290,7 @@ sub props {
 			$tw->UnmapWindow;
 		}
 	} else {
-		my $title = "GTT ($self->{'pcode'}) Properties";
+		my $title = $self->identify." Properties";
 		$tw = $canvas->toplevel->Toplevel(
 			-title=>$title,
 		);
@@ -4107,7 +4327,7 @@ sub status {
 			$tw->UnmapWindow;
 		}
 	} else {
-		my $title = "GTT ($self->{'pcode'}) Status";
+		my $title = $self->identify." Status";
 		$tw = $canvas->toplevel->Toplevel(
 			-title=>$title,
 		);
@@ -4126,56 +4346,110 @@ sub status {
 		},$self]);
 		$self->{'status'} = $tw;
 
+		my $f = $tw->Frame(
+			-relief=>'ridge',
+			-borderwidth=>2,
+		)->pack(
+			-expand=>1,
+			-fill=>'x',
+			-side=>'top',
+			-anchor=>'n',
+		);
+		$self->commonstatus($canvas,$f,$v,\$row);
+		$f = $tw->Frame(
+			-relief=>'ridge',
+			-borderwidth=>2,
+			-borderwidth=>2,
+		)->pack(
+			-expand=>1,
+			-fill=>'both',
+			-side=>'top',
+			-anchor=>'n',
+		);
+		$row = 0;
 		foreach my $pc (sort {$a <=> $b} keys %{$self->{'circuits'}}) {
-			$tw->Label(
+			$f->Label(
 				-anchor=>'e',
 				-justify=>'right',
-				-text=>'Has circuits to:',
+				-text=>'Circuits to:',
 			)->grid(-row=>$row,-column=>0,-sticky=>'ew');
 			my $pcode = main::pcstring($pc);
 			my $pownr = main::pcowner($pc,0);
 			$pcode .= " ($pownr)" if $pownr;
-			$tw->Entry(
+			$f->Entry(
 				-readonlybackground=>'white',
 				-background=>'white',
+				-justify=>'center',
 				-textvariable=>\$pcode,
 				-state=>'readonly',
 				-exportselection=>1,
 			)->grid(-row=>$row++,-column=>1,-sticky=>'ew');
 		}
+		$f = $tw->Frame(
+			-relief=>'ridge',
+			-borderwidth=>2,
+			-borderwidth=>2,
+		)->pack(
+			-expand=>1,
+			-fill=>'both',
+			-side=>'top',
+			-anchor=>'n',
+		);
+		$row = 0;
+		my $col = 0;
 		foreach my $pc (sort {$a <=> $b} keys %{$self->{'tqueries'}}) {
-			$tw->Label(
-				-anchor=>'e',
-				-justify=>'right',
-				-text=>'Launches queries to:',
-			)->grid(-row=>$row,-column=>0,-sticky=>'ew');
+			if ($col == 0) {
+				$f->Label(
+					-anchor=>'e',
+					-justify=>'right',
+					-text=>'Queries:',
+				)->grid(-row=>$row,-column=>$col,-sticky=>'ew');
+			}
+			$col++;
 			my $pcode = main::pcstring($pc);
 			my $pownr = main::pcowner($pc,0);
 			$pcode .= " ($pownr)" if $pownr;
-			$tw->Entry(
+			$f->Entry(
 				-readonlybackground=>'white',
 				-background=>'white',
+				-justify=>'center',
 				-textvariable=>\$pcode,
 				-state=>'readonly',
 				-exportselection=>1,
-			)->grid(-row=>$row++,-column=>1,-sticky=>'ew');
+			)->grid(-row=>$row,-column=>$col,-sticky=>'ew');
+			if ($col > 5) {
+				$col = 0;
+				$row++;
+			}
 		}
-		foreach my $pc (sort {$a <=> $b} keys %{$self->{'reponds'}}) {
-			$tw->Label(
-				-anchor=>'e',
-				-justify=>'right',
-				-text=>'Translates queries from:',
-			)->grid(-row=>$row,-column=>0,-sticky=>'ew');
+		if ($col != 0) {
+			$col = 0;
+			$row++;
+		}
+		foreach my $pc (sort {$a <=> $b} keys %{$self->{'responds'}}) {
+			if ($col == 0) {
+				$f->Label(
+					-anchor=>'e',
+					-justify=>'right',
+					-text=>'Translates from:',
+				)->grid(-row=>$row,-column=>$col,-sticky=>'ew');
+			}
+			$col++;
 			my $pcode = main::pcstring($pc);
 			my $pownr = main::pcowner($pc,0);
 			$pcode .= " ($pownr)" if $pownr;
-			$tw->Entry(
+			$f->Entry(
 				-readonlybackground=>'white',
 				-background=>'white',
+				-justify=>'center',
 				-textvariable=>\$pcode,
 				-state=>'readonly',
 				-exportselection=>1,
-			)->grid(-row=>$row++,-column=>1,-sticky=>'ew');
+			)->grid(-row=>$row,-column=>$col,-sticky=>'ew');
+			if ($col > 5) {
+				$col = 0;
+				$row++;
+			}
 		}
 	}
 	$tw->MapWindow;
@@ -4341,9 +4615,7 @@ sub props {
 			$tw->UnmapWindow;
 		}
 	} else {
-		my $ppastr = "$self->{'path'}->{'card'}:$self->{'path'}->{'span'}:$self->{'path'}->{'slot'}";
-		my $pcode = $self->{'node'}->{'pcode'};
-		my $title = "Route ($ppastr - $pcode) Properties";
+		my $title = $self->identify." Properties";
 		$tw = $canvas->toplevel->Toplevel(
 			-title=>$title,
 		);
@@ -4391,9 +4663,7 @@ sub status {
 			$tw->UnmapWindow;
 		}
 	} else {
-		my $ppastr = "$self->{'path'}->{'card'}:$self->{'path'}->{'span'}:$self->{'path'}->{'slot'}";
-		my $pcode = $self->{'node'}->{'pcode'};
-		my $title = "Route ($ppastr - $pcode) Status";
+		my $title = $self->identify." Status";
 		$tw = $canvas->toplevel->Toplevel(
 			-title=>$title,
 		);
@@ -4821,6 +5091,14 @@ sub moveto {
 }
 
 #package Path;
+sub identify {
+	my $self = shift;
+	my $id = "Signalling path ($self->{'card'}:$self->{'span'}:$self->{'slot'})";
+	$id .= " $self->{'nodea'}->{'pcode'} to $self->{'nodeb'}->{'pcode'} link $self->{'slc'}" if $self->{'nodea'};
+	return $id;
+}
+
+#package Path;
 sub button3 {
 	my ($canvas,$self,$X,$Y) = @_;
 	my $m = $canvas->toplevel->Menu(
@@ -4866,7 +5144,7 @@ sub props {
 			$tw->UnmapWindow;
 		}
 	} else {
-		my $title = "Path ($ppa) Properties";
+		my $title = $self->identify." Properties";
 		$tw = $canvas->toplevel->Toplevel(
 			-title=>$title,
 		);
@@ -4927,7 +5205,7 @@ sub status {
 			$tw->UnmapWindow;
 		}
 	} else {
-		my $title = "Path ($ppa) Status";
+		my $title = $self->identify." Status";
 		$tw = $canvas->toplevel->Toplevel(
 			-title=>$title,
 		);
