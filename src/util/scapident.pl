@@ -863,7 +863,7 @@ sub dist {
 		-title=>$title,
 	);
 	$tw->group($w->toplevel);
-	$tw->transient($w->toplevel);
+	#$tw->transient($w->toplevel);
 	$tw->iconimage('icon');
 	$tw->iconname($title);
 	#$tw->resizable(0,0);
@@ -969,16 +969,21 @@ sub dist {
 	$c->createLine(550,50,40,50, %blackline);
 	$c->createLine(@coords, %blueline);
 	$c->createLine(@coords, %blackcurve);
-	$c->toplevel->bind('<ResizeRequest>',[\&MsgStats::resizedist,$self,$tw,$c,Tk::Ev('w'),Tk::Ev('h')]);
+	$c->update;
+	$c->{'_mydata'} = {};
+	$c->{'_mydata'}->{'w'} = 600;
+	$c->{'_mydata'}->{'h'} = 400;
+	$c->CanvasBind('<Configure>',[\&MsgStats::resizedist,Tk::Ev('w'),Tk::Ev('h')]);
 	$tw->MapWindow;
 }
 
 sub resizedist {
-	my ($self,$tw,$c,$w,$h) = @_;
-	foreach my $a ( @_ ) {
-		print "attribute: $a\n";
-	}
-	print $c->geometry."\n";
+	my ($c,$w,$h) = @_;
+	my $ow = $c->{'_mydata'}->{'w'};
+	my $oh = $c->{'_mydata'}->{'h'};
+	$c->scale('all',0,0,$w/$ow,$h/$oh);
+	$c->{'_mydata'}->{'w'} = $w;
+	$c->{'_mydata'}->{'h'} = $h;
 }
 
 sub dircstat {
