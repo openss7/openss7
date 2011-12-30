@@ -654,6 +654,7 @@ sub init {
 	my ($self,@args) = @_;
 	my $self = shift;
 	Stats::init($self,@args);
+	$self->{'dist'} = {};
 }
 
 #package MsgStats;
@@ -685,8 +686,10 @@ sub stats {
 		$tw->transient($canvas->toplevel);
 		$tw->iconimage('icon');
 		$tw->iconname($title);
-		$tw->resizable(0,0);
+		#$tw->resizable(0,0);
 		$tw->positionfrom('user');
+		$tw->sizefrom('program');
+		#$tw->minsize(600,400);
 		$tw->geometry("+$X+$Y");
 		$tw->protocol('WM_DELETE_WINDOW', [sub {
 			my $self = shift;
@@ -695,14 +698,29 @@ sub stats {
 			$tw->destroy;
 		},$self]);
 		$self->{'stats'} = $tw;
-
+		my $p = $tw->Scrolled('Pane',
+			-scrollbars=>'osoe',
+			-sticky=>'ewns',
+		)->pack(
+			-expand=>1,
+			-fill=>'both',
+			-side=>'top',
+			-anchor=>'n',
+		);
+		my $f = $p->Subwidget('scrolled');
+		my $s = $f->Frame->pack(
+			-expand=>1,
+			-fill=>'both',
+			-side=>'top',
+			-anchor=>'n',
+		);
 		if ($self->{'incs'}->{'fisus'}) {
-			$tw->Label(
+			$s->Label(
 				-anchor=>'e',
 				-justify=>'right',
 				-text=>'FISUs:',
 			)->grid(-row=>$row,-column=>0,-sticky=>'ew');
-			$tw->Entry(
+			$s->Entry(
 				-readonlybackground=>'white',
 				-background=>'white',
 				-justify=>'right',
@@ -712,12 +730,12 @@ sub stats {
 			)->grid(-row=>$row++,-column=>1,-sticky=>'ew');
 		}
 		if ($self->{'incs'}->{'lssus'}) {
-			$tw->Label(
+			$s->Label(
 				-anchor=>'e',
 				-justify=>'right',
 				-text=>'1-octet LSSUs:',
 			)->grid(-row=>$row,-column=>0,-sticky=>'ew');
-			$tw->Entry(
+			$s->Entry(
 				-readonlybackground=>'white',
 				-background=>'white',
 				-justify=>'right',
@@ -727,12 +745,12 @@ sub stats {
 			)->grid(-row=>$row++,-column=>1,-sticky=>'ew');
 		}
 		if ($self->{'incs'}->{'lss2s'}) {
-			$tw->Label(
+			$s->Label(
 				-anchor=>'e',
 				-justify=>'right',
 				-text=>'2-octet LSSUs:',
 			)->grid(-row=>$row,-column=>0,-sticky=>'ew');
-			$tw->Entry(
+			$s->Entry(
 				-readonlybackground=>'white',
 				-background=>'white',
 				-justify=>'right',
@@ -742,12 +760,12 @@ sub stats {
 			)->grid(-row=>$row++,-column=>1,-sticky=>'ew');
 		}
 		if ($self->{'incs'}->{'msus'}) {
-			$tw->Label(
+			$s->Label(
 				-anchor=>'e',
 				-justify=>'right',
 				-text=>'MSUs:',
 			)->grid(-row=>$row,-column=>0,-sticky=>'ew');
-			$tw->Entry(
+			$s->Entry(
 				-readonlybackground=>'white',
 				-background=>'white',
 				-justify=>'right',
@@ -758,12 +776,12 @@ sub stats {
 		}
 		foreach my $si (sort {$a <=> $b} keys %{$self->{'incs'}->{'sis'}}) {
 			next unless (exists $mtypes{$si});
-			$tw->Label(
+			$s->Label(
 				-anchor=>'e',
 				-justify=>'right',
 				-text=>"$mtypes{$si}->{0x00}($si):",
 			)->grid(-row=>$row,-column=>0,-sticky=>'ew');
-			$tw->Entry(
+			$s->Entry(
 				-readonlybackground=>'white',
 				-background=>'white',
 				-justify=>'right',
@@ -776,12 +794,12 @@ sub stats {
 				next if $mt eq 'msus';
 				next unless exists $mtypes{$si}->{$mt};
 				$mtcount += 1;
-				$tw->Label(
+				$s->Label(
 					-anchor=>'e',
 					-justify=>'right',
 					-text=>"$mtypes{$si}->{$mt}($mt):",
 				)->grid(-row=>$row,-column=>2,-sticky=>'ew');
-				$tw->Entry(
+				$s->Entry(
 					-readonlybackground=>'white',
 					-background=>'white',
 					-justify=>'right',
@@ -793,12 +811,12 @@ sub stats {
 				foreach my $mp (sort {$a <=> $b} keys %{$self->{'incs'}->{'sis'}->{$si}->{$mt}}) {
 					next if $mp eq 'msus';
 					$mpcount += 1;
-					$tw->Label(
+					$s->Label(
 						-anchor=>'e',
 						-justify=>'right',
 						-text=>"mp($mp):",
 					)->grid(-row=>$row,-column=>4,-sticky=>'ew');
-					$tw->Entry(
+					$s->Entry(
 						-readonlybackground=>'white',
 						-background=>'white',
 						-justify=>'right',
@@ -811,23 +829,52 @@ sub stats {
 			}
 			$row++ unless $mtcount;
 		}
+		$s->update;
+		my $x = $s->width+40;
+		my $y = $s->height+40;
+		$tw->geometry("=$x"."x$y");
 	}
 	$tw->MapWindow;
 }
 
+my %centerblack = ( -anchor=>'center', -fill=>'black', -justify=>'center' );
+my %rightblack = ( -anchor=>'e', -fill=>'black', -justify=>'right' );
+my %blackline = ( -arrow=>'none', -capstyle=>'round', -fill=>'black', -joinstyle=>'round', -smooth=>0, -width=>1 );
+my %greyline = ( -arrow=>'none', -capstyle=>'round', -fill=>'grey', -joinstyle=>'round', -smooth=>0, -width=>1 );
+my %dashline = ( -arrow=>'none', -capstyle=>'round', -fill=>'grey', -joinstyle=>'round', -smooth=>0, -width=>1, -dash=>[3,2] );
+my %blackcurve = ( -arrow=>'none', -capstyle=>'round', -fill=>'black', -joinstyle=>'round', -smooth=>1, -width=>1 );
+my %blueline = ( -arrow=>'none', -capstyle=>'round', -fill=>'blue', -joinstyle=>'round', -smooth=>0, -width=>2 );
+
 sub dist {
-	my ($self,$w,$event,$label,$X,$Y) = @_;
-	my $title = "Distribution of $label";
-	my $tw = $w->toplevel->Toplevel(
+	my ($self,$w,$event,$prefix,$label,$X,$Y) = @_;
+	my $tw;
+	if ($tw = $self->{'dist'}->{$event}) {
+		if ($tw->state eq 'iconic') {
+			$tw->deiconify;
+		} else {
+			$tw->UnmapWindow;
+		}
+		$tw->MapWindow;
+		return;
+	}
+	my $title = "$prefix distribution of $label";
+	$tw = $w->toplevel->Toplevel(
 		-title=>$title,
 	);
 	$tw->group($w->toplevel);
 	$tw->transient($w->toplevel);
 	$tw->iconimage('icon');
-	$tw->iconname($label);
+	$tw->iconname($title);
 	$tw->resizable(0,0);
 	$tw->positionfrom('user');
 	$tw->geometry("+$X+$Y");
+	$tw->protocol('WM_DELETE_WINDOW', [sub {
+		my ($self,$event) = @_;
+		my $tw = $self->{'dist'}->{$event};
+		delete $self->{'dist'}->{$event};
+		$tw->destroy;
+	},$self,$event]);
+	$self->{'dist'}->{$event} = $tw;
 	my $c = $tw->Canvas(
 		-confine=>1,
 		-width=>600,
@@ -882,192 +929,66 @@ sub dist {
 		push @coords, $x;
 		push @coords, $y;
 	}
-	$c->createText(300,25,
-		-anchor=>'center',
-		-fill=>'black',
-		-justify=>'center',
-		-text=>$title,
-	);
-	$c->createLine(50,50,50,350,
-		-arrow=>'none',
-		-capstyle=>'round',
-		-fill=>'black',
-		-joinstyle=>'round',
-		-smooth=>0,
-		-width=>1,
-	);
-	$c->createLine(50,350,550,350,
-		-arrow=>'none',
-		-capstyle=>'round',
-		-fill=>'black',
-		-joinstyle=>'round',
-		-smooth=>0,
-		-width=>1,
-	);
+	$c->createText(300,20, %centerblack, -text=>"\U$title");
+	my $id = $self->identify;
+	$c->createText(300,35, %centerblack, -text=>"for $id");
+	$c->createText(300,385, %centerblack, -text=>'seconds of duration');
+	$c->createText(550,385, %rightblack, -text=>"total calls = $self->{'pegs'}->{$event}");
+	$c->createText(45,200, %rightblack, -text=>'calls');
+	$c->createLine(50,50,50,350, %blackline);
+	$c->createLine(50,350,550,350, %blackline);
 	my $tickx = 10**(int(log($maxx-$minx)/log(10)));
-	$c->createText(50,375,
-		-anchor=>'center',
-		-fill=>'black',
-		-justify=>'center',
-		-text=>$minx,
-	);
-	$c->createLine(50,350,50,360,
-		-arrow=>'none',
-		-capstyle=>'round',
-		-fill=>'black',
-		-joinstyle=>'round',
-		-smooth=>0,
-		-width=>1,
-	);
+	$c->createText(50,368, %centerblack, -text=>$minx);
+	$c->createLine(50,50,50,360, %blackline);
 	for (my $x = 0; $x < $maxx; $x += $tickx) {
 		my $X = 50 + ($x - $minx) * $scalex;
 		next if $X < 50;
-		$c->createLine($X,350,$X,360,
-			-arrow=>'none',
-			-capstyle=>'round',
-			-fill=>'black',
-			-joinstyle=>'round',
-			-smooth=>0,
-			-width=>1,
-		);
+		$c->createLine($X,50,$X,360, %blackline);
 		next if $X > 500 || $X < 100;
-		$c->createText($X,375,
-			-anchor=>'center',
-			-fill=>'black',
-			-justify=>'center',
-			-text=>$x,
-		);
+		$c->createText($X,368, %centerblack, -text=>$x);
 	}
 	for (my $x = $tickx/2; $x < $maxx; $x += $tickx) {
 		next if $x < $minx;
 		my $X = 50 + ($x - $minx) * $scalex;
-		$c->createLine($X,350,$X,357,
-			-arrow=>'none',
-			-capstyle=>'round',
-			-fill=>'grey',
-			-joinstyle=>'round',
-			-smooth=>0,
-			-width=>1,
-		);
+		$c->createLine($X,50,$X,357, %greyline);
 	}
 	foreach my $s ( 1, 2, 3, 4, 6, 7, 8, 9 ) {
 		for (my $x = $s*$tickx/10; $x < $maxx; $x += $tickx) {
 			next if $x < $minx;
 			my $X = 50 + ($x - $minx) * $scalex;
-			$c->createLine($X,350,$X,353,
-				-arrow=>'none',
-				-capstyle=>'round',
-				-fill=>'grey',
-				-joinstyle=>'round',
-				-smooth=>0,
-				-width=>1,
-			);
+			$c->createLine($X,50,$X,353, %dashline);
 		}
 	}
-	$c->createText(550,375,
-		-anchor=>'center',
-		-fill=>'black',
-		-justify=>'center',
-		-text=>$maxx,
-	);
-	$c->createLine(550,350,550,360,
-		-arrow=>'none',
-		-capstyle=>'round',
-		-fill=>'black',
-		-joinstyle=>'round',
-		-smooth=>0,
-		-width=>1,
-	);
-	$c->createText(25,350,
-		-anchor=>'center',
-		-fill=>'black',
-		-justify=>'center',
-		-text=>$miny,
-	);
-	$c->createLine(50,350,40,350,
-		-arrow=>'none',
-		-capstyle=>'round',
-		-fill=>'black',
-		-joinstyle=>'round',
-		-smooth=>0,
-		-width=>1,
-	);
+	$c->createText(550,368, %centerblack, -text=>$maxx);
+	$c->createLine(550,50,550,360, %blackline);
+	$c->createText(35,350, %rightblack, -text=>$miny);
+	$c->createLine(550,350,40,350, %blackline);
 	my $ticky = 10**(int(log($maxy-$miny)/log(10)));
 	for (my $y = 0; $y < $maxy; $y += $ticky) {
 		my $Y = 350 - ($y - $miny) * $scaley;
 		next if $Y > 350;
-		$c->createLine(50,$Y,40,$Y,
-			-arrow=>'none',
-			-capstyle=>'round',
-			-fill=>'black',
-			-joinstyle=>'round',
-			-smooth=>0,
-			-width=>1,
-		);
+		$c->createLine(550,$Y,40,$Y, %blackline);
 		next if $Y < 60 || $Y > 340;
-		$c->createText(25, $Y,
-			-anchor=>'center',
-			-fill=>'black',
-			-justify=>'center',
-			-text=>$y,
-		);
+		next if $Y > 190 && $Y < 210;
+		$c->createText(35, $Y, %rightblack, -text=>$y);
 	}
 	for (my $y = $ticky/2; $y < $maxy; $y += $ticky) {
 		next if $y < $miny;
 		my $Y = 350 - ($y - $miny) * $scaley;
-		$c->createLine(50,$Y,43,$Y,
-			-arrow=>'none',
-			-capstyle=>'round',
-			-fill=>'grey',
-			-joinstyle=>'round',
-			-smooth=>0,
-			-width=>1,
-		);
+		$c->createLine(550,$Y,43,$Y, %greyline);
 	}
 	foreach my $s ( 1, 2, 3, 4, 6, 7, 8, 9 ) {
 		for (my $y = $s*$ticky/10; $y < $maxy; $y += $ticky) {
 			next if $y < $miny;
 			my $Y = 350 - ($y - $miny) * $scaley;
-			$c->createLine(50,$Y,47,$Y,
-				-arrow=>'none',
-				-capstyle=>'round',
-				-fill=>'grey',
-				-joinstyle=>'round',
-				-smooth=>0,
-				-width=>1,
-			);
+			$c->createLine(550,$Y,47,$Y, %dashline);
 		}
 	}
-	$c->createText(25,50,
-		-anchor=>'center',
-		-fill=>'black',
-		-justify=>'center',
-		-text=>$maxy,
-	);
-	$c->createLine(50,50,40,50,
-		-arrow=>'none',
-		-capstyle=>'round',
-		-fill=>'black',
-		-joinstyle=>'round',
-		-smooth=>0,
-		-width=>1,
-	);
-	$c->createLine(@coords,
-		-arrow=>'none',
-		-capstyle=>'round',
-		-fill=>'black',
-		-joinstyle=>'round',
-		-smooth=>1,
-		-width=>2,
-	);
-	$c->createLine(@coords,
-		-arrow=>'none',
-		-capstyle=>'round',
-		-fill=>'blue',
-		-joinstyle=>'round',
-		-smooth=>0,
-		-width=>2,
-	);
+	$c->createText(35,50, %rightblack, -text=>$maxy);
+	$c->createLine(550,50,40,50, %blackline);
+	$c->createLine(@coords, %blueline);
+	$c->createLine(@coords, %blackcurve);
+	$tw->MapWindow;
 }
 
 sub dircstat {
@@ -1131,7 +1052,7 @@ sub dircstat {
 		my $X = $tw->toplevel->rootx;
 		my $Y = $tw->toplevel->rooty;
 		$tw->Button(
-			-command=>[\&MsgStats::dist,$self,$tw,$event,$l2,$X,$Y],
+			-command=>[\&MsgStats::dist,$self,$tw,$event,$prefix,$l2,$X,$Y],
 			-text=>'Distribution',
 			-relief=>'flat',
 			-overrelief=>'raised',
@@ -1184,6 +1105,12 @@ sub cstat {
 		$tw->geometry("+$X+$Y");
 		$tw->protocol('WM_DELETE_WINDOW', [sub {
 			my $self = shift;
+			while (my ($k,$v) = each %{$self->{'dist'}}) {
+				if ($v) {
+					delete $self->{'dist'}->{$k};
+					$v->destroy;
+				}
+			}
 			my $tw = $self->{'cstat'};
 			delete $self->{'cstat'};
 			$tw->destroy;
@@ -1319,12 +1246,12 @@ sub cstat {
 			)->grid(-row=>$row++,-column=>3,-sticky=>'ew');
 		}
 		if ($self->{'actcnt'}) {
-			$self->addcstat($tw,\$row,$span,CTS_IDLE,'idle duration','idle period','idle periods');
-			$self->addcstat($tw,\$row,$span,CTS_WAIT_ACM,'setup duration','setup period','call attempts');
-			$self->addcstat($tw,\$row,$span,CTS_WAIT_ANM,'ringing duration','ringing period','rung calls');
-			$self->addcstat($tw,\$row,$span,CTS_ANSWERED,'call duration','call period','completed calls');
-			$self->addcstat($tw,\$row,$span,CTS_SUSPENDED,'suspended duration','suspended period','call suspensions');
-			$self->addcstat($tw,\$row,$span,CTS_WAIT_RLC,'release duration','release period','call releases');
+			$self->addcstat($tw,\$row,$span,CTS_IDLE,'idle occupancy','idle duration','idle periods');
+			$self->addcstat($tw,\$row,$span,CTS_WAIT_ACM,'setup occupancy','setup duration','call attempts');
+			$self->addcstat($tw,\$row,$span,CTS_WAIT_ANM,'ringing occupancy','ringing duration','call alerts');
+			$self->addcstat($tw,\$row,$span,CTS_ANSWERED,'call occupancy','call duration','call completions');
+			$self->addcstat($tw,\$row,$span,CTS_SUSPENDED,'suspended occupancy','suspended duration','call suspensions');
+			$self->addcstat($tw,\$row,$span,CTS_WAIT_RLC,'release occupancy','release duration','call releases');
 		}
 	}
 	$tw->MapWindow;
@@ -1380,7 +1307,8 @@ sub init {
 	$main::canvas->bind($self->{'item'},'<ButtonPress-3>',[\&Relation::button3,$self,Tk::Ev('X'),Tk::Ev('Y')]);
 	$main::canvas->lower('relation','node');
 	$main::canvas->lower('relation','path');
-	$main::canvas->idletasks;
+	$main::top->{'updatenow'} = 1;
+#	$main::canvas->idletasks;
 
 
 }
@@ -1408,6 +1336,21 @@ sub get {
 	$relations{$key} = $self; # place reverse entry too
 	$self->init($relationno,$nodea,$nodeb,@args);
 	return $self;
+}
+
+sub makeLinkSet {
+	LinkSet->xform(shift);
+}
+
+#package Relation;
+sub identify {
+	my $self = shift;
+	my $id = "Signalling relation between ";
+	$id .= "$self->{'nodea'}->{'pcode'}";
+	$id .= " ($self->{'nodea'}->{'pownr'})" if $self->{'nodea'}->{'pownr'};
+	$id .= " and $self->{'nodeb'}->{'pcode'}";
+	$id .= " ($self->{'nodeb'}->{'pownr'})" if $self->{'nodeb'}->{'pownr'};
+	return $id;
 }
 
 #package Relation;
@@ -1615,27 +1558,27 @@ sub move {
 sub button3 {
 	my ($canvas,$self,$X,$Y) = @_;
 	my $m = $canvas->toplevel->Menu(
-		-tearoff=>0,
+		-tearoff=>1,
 		-title=>'Relation Menu',
 		-type=>'normal',
 	);
 	$m->add('command',
 		#-accelerator=>'p',
 		-command=>[\&Relation::props, $self, $canvas, $X, $Y],
-		-label=>'Properties...',
-		-underline=>0,
+		-label=>'Relation Properties...',
+		-underline=>9,
 	);
 	$m->add('command',
 		#-accelerator=>'s',
 		-command=>[\&Relation::status, $self, $canvas, $X, $Y],
-		-label=>'Status...',
-		-underline=>0,
+		-label=>'Relation Status...',
+		-underline=>9,
 	);
 	$m->add('command',
-		#-accelerator=>'t',
+		#-accelerator=>'m',
 		-command=>[\&MsgStats::stats, $self, $canvas, $X, $Y],
 		-label=>'Message Statistics...',
-		-underline=>1,
+		-underline=>0,
 	);
 	$m->add('command',
 		#-accelerator=>'c',
@@ -2406,6 +2349,69 @@ sub add_msg {
 }
 
 # -------------------------------------
+package LinkSet;
+use strict;
+use vars qw(@ISA);
+@ISA = qw(MsgStats Relation);
+# -------------------------------------
+
+use constant {
+	COL_NOD => 6,
+	COL_SSP => 5,
+	COL_SCP => 4,
+	COL_GTT => 3,
+	COL_ADJ => 2,
+};
+#package LinkSet;
+sub init {
+	my ($self,$nodea,$nodeb,@args) = @_;
+	$self->{'forw'} = [];
+	$self->{'revs'} = [];
+}
+
+#package LinkSet;
+sub new {
+	my ($type,$network,@args) = @_;
+	my $self = {};
+	bless $self,$type;
+	$self->{'network'} = $network;
+	$self->init(@args);
+	return $self;
+}
+
+#package LinkSet;
+sub xform {
+	my ($type,$self) = @_;
+	return if $self->{'type'} == 1;
+	return if ref $self eq $type;
+	bless $self,$type;
+	my $nodea = $self->{'nodea'};
+	my $nodeb = $self->{'nodeb'};
+	if ($nodea->{'col'} < 0) {
+		$nodea->moveto(0 - LinkSet::COL_ADJ,$nodea->{'row'});
+	} else {
+		$nodea->moveto(0 + LinkSet::COL_ADJ,$nodea->{'row'});
+	}
+	if ($nodeb->{'col'} < 0) {
+		$nodeb->moveto(0 - LinkSet::COL_ADJ,$nodeb->{'row'});
+	} else {
+		$nodeb->moveto(0 + LinkSet::COL_ADJ,$nodeb->{'row'});
+	}
+	$self->move;
+}
+
+#package LinkSet;
+sub getLink {
+	my ($self,$nodea,$nodeb,$slc,@args) = @_;
+	return $self->{'links'}->{$slc} if exists $self->{'links'}->{$slc};
+	my $link = Link->new($nodea,$nodeb,$slc,@args);
+	$self->{'links'}->{$slc} = $link;
+	return $link;
+}
+
+#package LinkSet;
+
+# -------------------------------------
 package Link;
 use strict;
 use vars qw(@ISA);
@@ -2413,20 +2419,39 @@ use vars qw(@ISA);
 # -------------------------------------
 
 #package Link;
-sub get {
-	my ($type,$set,$slc,@args) = @_;
-	return $set->{'slcs'}->{$slc} if exists $set->{'slcs'}->{$slc};
+sub init {
+	my ($self,$nodea,$nodeb,$slc,@args) = @_;
+	MsgStats::init($self);
+	$self->{'nodea'} = $nodea;
+	$self->{'nodeb'} = $nodeb;
+	$self->{'slc'} = $slc;
+	$self->{'pathforw'} = undef;
+	$self->{'pathrevs'} = undef;
+}
+
+#package Link;
+sub new {
+	my ($type,$network,@args) = @_;
 	my $self = {};
 	bless $self,$type;
-	$self->MsgStats::init(@args);
-	$self->{'slc'} = $slc;
-	$self->{'set'} = $set;
-	$set->{'slcs'}->{$slc} = $self;
-	$set->{'slscnt'} += 1;
-	$set->{'state'} = 0;
+	$self->{'network'} = $network;
+	$self->init(@args);
 	return $self;
 }
 
+#package Link;
+sub addPathForw {
+	my ($self,$path) = @_;
+	$self->{'pathforw'} = $path;
+}
+
+#package Link;
+sub addPathRevs {
+	my ($self,$path) = @_;
+	$self->{'pathrevs'} = $path;
+}
+
+#package Link;
 sub add {
 	my ($self,$msg) = @_;
 	$self->inc($msg);
@@ -2489,7 +2514,8 @@ sub new {
 	$main::canvas->bind($self->{'item'},'<ButtonPress-3>',[\&Route::button3,$self,Tk::Ev('X'),Tk::Ev('Y')]);
 	$main::canvas->lower('route','path');
 	$main::canvas->lower('route','node');
-	$main::canvas->idletasks;
+	$main::top->{'updatenow'} = 1;
+#	$main::canvas->idletasks;
 	return $self;
 }
 
@@ -2539,27 +2565,27 @@ sub move {
 sub button3 {
 	my ($canvas,$self,$X,$Y) = @_;
 	my $m = $canvas->toplevel->Menu(
-		-tearoff=>0,
+		-tearoff=>1,
 		-title=>'Route Menu',
 		-type=>'normal',
 	);
 	$m->add('command',
 		#-accelerator=>'p',
 		-command=>[\&Route::props, $self, $canvas, $X, $Y],
-		-label=>'Properties...',
-		-underline=>0,
+		-label=>'Route Properties...',
+		-underline=>6,
 	);
 	$m->add('command',
 		#-accelerator=>'s',
 		-command=>[\&Route::status, $self, $canvas, $X, $Y],
-		-label=>'Status...',
-		-underline=>0,
+		-label=>'Route Status...',
+		-underline=>6,
 	);
 	$m->add('command',
-		#-accelerator=>'t',
+		#-accelerator=>'m',
 		-command=>[\&MsgStats::stats, $self, $canvas, $X, $Y],
 		-label=>'Message Statistics...',
-		-underline=>1,
+		-underline=>0,
 	);
 	$m->Popup(
 		-popanchor=>'nw',
@@ -2804,7 +2830,8 @@ sub init {
 	$main::canvas->raise('text','scri');
 #	Node->regroup;
 	$self->{'network'}->regroupNodes;
-	$main::canvas->idletasks;
+	$main::top->{'updatenow'} = 1;
+#	$main::canvas->idletasks;
 }
 
 #package Node;
@@ -2827,6 +2854,14 @@ sub get {
 	$nodeno = $nodeno + 1;
 	$self->init($nodeno,$pc,@args);
 	return $self;
+}
+
+#package Node;
+sub identify {
+	my $self = shift;
+	my $id = "Signalling point $self->{'pcode'}";
+	$id .= " ($self->{'pownr'})" if $self->{'pownr'};
+	return $id;
 }
 
 #package Node;
@@ -2962,7 +2997,8 @@ sub reanalyze {
 		$self->moveto($col,$row);
 #		Node->regroup;
 		$self->{'network'}->regroupNodes;
-		$main::canvas->idletasks;
+		$main::top->{'updatenow'} = 1;
+#		$main::canvas->idletasks;
 	}
 	if ($self->{'xchg_isup'} || ($self->{'orig_tcap'} && $self->{'term_tcap'})) {
 		$self->makeSsp;
@@ -3073,27 +3109,27 @@ sub regroup {
 sub button3 {
 	my ($canvas,$self,$X,$Y) = @_;
 	my $m = $canvas->toplevel->Menu(
-		-tearoff=>0,
+		-tearoff=>1,
 		-title=>'Node Menu',
 		-type=>'normal',
 	);
 	$m->add('command',
 		#-accelerator=>'p',
 		-command=>[\&Node::props, $self, $canvas, $X, $Y],
-		-label=>'Properties...',
-		-underline=>0,
+		-label=>'Node Properties...',
+		-underline=>5,
 	);
 	$m->add('command',
 		#-accelerator=>'s',
 		-command=>[\&Node::status, $self, $canvas, $X, $Y],
-		-label=>'Status...',
-		-underline=>0,
+		-label=>'Node Status...',
+		-underline=>5,
 	);
 	$m->add('command',
-		#-accelerator=>'t',
+		#-accelerator=>'m',
 		-command=>[\&MsgStats::stats, $self, $canvas, $X, $Y],
 		-label=>'Message Statistics...',
-		-underline=>1,
+		-underline=>0,
 	);
 	$m->add('command',
 		#-accelerator=>'c',
@@ -3328,34 +3364,43 @@ sub xform {
 	$main::canvas->bind($self->{'ttxt'},'<ButtonPress-3>',[\&Ssp::button3,$self,Tk::Ev('X'),Tk::Ev('Y')]);
 	$main::canvas->bind($self->{'text'},'<ButtonPress-3>',[\&Ssp::button3,$self,Tk::Ev('X'),Tk::Ev('Y')]);
 	$main::canvas->bind($self->{'ownr'},'<ButtonPress-3>',[\&Ssp::button3,$self,Tk::Ev('X'),Tk::Ev('Y')]) if $self->{'ownr'};
-	$main::canvas->idletasks;
+#	$main::canvas->idletasks;
+	$main::top->{'updatenow'} = 1;
+}
+
+#package Ssp;
+sub identify {
+	my $self = shift;
+	my $id = "Service switching point $self->{'pcode'}";
+	$id .= " ($self->{'pownr'})" if $self->{'pownr'};
+	return $id;
 }
 
 #package Ssp;
 sub button3 {
 	my ($canvas,$self,$X,$Y) = @_;
 	my $m = $canvas->toplevel->Menu(
-		-tearoff=>0,
+		-tearoff=>1,
 		-title=>'Ssp Menu',
 		-type=>'normal',
 	);
 	$m->add('command',
 		#-accelerator=>'p',
 		-command=>[\&Ssp::props, $self, $canvas, $X, $Y],
-		-label=>'Properties...',
-		-underline=>0,
+		-label=>'SSP Properties...',
+		-underline=>4,
 	);
 	$m->add('command',
 		#-accelerator=>'s',
 		-command=>[\&Ssp::status, $self, $canvas, $X, $Y],
-		-label=>'Status...',
-		-underline=>0,
+		-label=>'SSP Status...',
+		-underline=>4,
 	);
 	$m->add('command',
-		#-accelerator=>'t',
+		#-accelerator=>'m',
 		-command=>[\&MsgStats::stats, $self, $canvas, $X, $Y],
 		-label=>'Message Statistics...',
-		-underline=>1,
+		-underline=>0,
 	);
 	$m->add('command',
 		#-accelerator=>'c',
@@ -3582,34 +3627,35 @@ sub xform {
 	$main::canvas->bind($self->{'ttxt'},'<ButtonPress-3>',[\&Scp::button3,$self,Tk::Ev('X'),Tk::Ev('Y')]);
 	$main::canvas->bind($self->{'text'},'<ButtonPress-3>',[\&Scp::button3,$self,Tk::Ev('X'),Tk::Ev('Y')]);
 	$main::canvas->bind($self->{'ownr'},'<ButtonPress-3>',[\&Scp::button3,$self,Tk::Ev('X'),Tk::Ev('Y')]) if $self->{'ownr'};
-	$main::canvas->idletasks;
+#	$main::canvas->idletasks;
+	$main::top->{'updatenow'} = 1;
 }
 
 #package Scp;
 sub button3 {
 	my ($canvas,$self,$X,$Y) = @_;
 	my $m = $canvas->toplevel->Menu(
-		-tearoff=>0,
+		-tearoff=>1,
 		-title=>'Scp Menu',
 		-type=>'normal',
 	);
 	$m->add('command',
 		#-accelerator=>'p',
 		-command=>[\&Scp::props, $self, $canvas, $X, $Y],
-		-label=>'Properties...',
-		-underline=>0,
+		-label=>'SCP Properties...',
+		-underline=>4,
 	);
 	$m->add('command',
 		#-accelerator=>'s',
 		-command=>[\&Scp::status, $self, $canvas, $X, $Y],
-		-label=>'Status...',
-		-underline=>0,
+		-label=>'SCP Status...',
+		-underline=>4,
 	);
 	$m->add('command',
-		#-accelerator=>'t',
+		#-accelerator=>'m',
 		-command=>[\&MsgStats::stats, $self, $canvas, $X, $Y],
 		-label=>'Message Statistics...',
-		-underline=>1,
+		-underline=>0,
 	);
 	$m->Popup(
 		-popanchor=>'nw',
@@ -3780,34 +3826,35 @@ sub xform {
 	$main::canvas->bind($self->{'ttxt'},'<ButtonPress-3>',[\&Stp::button3,$self,Tk::Ev('X'),Tk::Ev('Y')]);
 	$main::canvas->bind($self->{'text'},'<ButtonPress-3>',[\&Stp::button3,$self,Tk::Ev('X'),Tk::Ev('Y')]);
 	$main::canvas->bind($self->{'ownr'},'<ButtonPress-3>',[\&Stp::button3,$self,Tk::Ev('X'),Tk::Ev('Y')]) if $self->{'ownr'};
-	$main::canvas->idletasks;
+#	$main::canvas->idletasks;
+	$main::top->{'updatenow'} = 1;
 }
 
 #package Stp;
 sub button3 {
 	my ($canvas,$self,$X,$Y) = @_;
 	my $m = $canvas->toplevel->Menu(
-		-tearoff=>0,
+		-tearoff=>1,
 		-title=>'Stp Menu',
 		-type=>'normal',
 	);
 	$m->add('command',
 		#-accelerator=>'p',
 		-command=>[\&Stp::props, $self, $canvas, $X, $Y],
-		-label=>'Properties...',
-		-underline=>0,
+		-label=>'STP Properties...',
+		-underline=>4,
 	);
 	$m->add('command',
 		#-accelerator=>'s',
 		-command=>[\&Stp::status, $self, $canvas, $X, $Y],
-		-label=>'Status...',
-		-underline=>0,
+		-label=>'STP Status...',
+		-underline=>4,
 	);
 	$m->add('command',
-		#-accelerator=>'t',
+		#-accelerator=>'m',
 		-command=>[\&MsgStats::stats, $self, $canvas, $X, $Y],
 		-label=>'Message Statistics...',
-		-underline=>1,
+		-underline=>0,
 	);
 	$m->Popup(
 		-popanchor=>'nw',
@@ -3974,34 +4021,35 @@ sub xform {
 	$main::canvas->bind($self->{'ttxt'},'<ButtonPress-3>',[\&Gtt::button3,$self,Tk::Ev('X'),Tk::Ev('Y')]);
 	$main::canvas->bind($self->{'text'},'<ButtonPress-3>',[\&Gtt::button3,$self,Tk::Ev('X'),Tk::Ev('Y')]);
 	$main::canvas->bind($self->{'ownr'},'<ButtonPress-3>',[\&Gtt::button3,$self,Tk::Ev('X'),Tk::Ev('Y')]) if $self->{'ownr'};
-	$main::canvas->idletasks;
+#	$main::canvas->idletasks;
+	$main::top->{'updatenow'} = 1;
 }
 
 #package Gtt;
 sub button3 {
 	my ($canvas,$self,$X,$Y) = @_;
 	my $m = $canvas->toplevel->Menu(
-		-tearoff=>0,
+		-tearoff=>1,
 		-title=>'Gtt Menu',
 		-type=>'normal',
 	);
 	$m->add('command',
 		#-accelerator=>'p',
 		-command=>[\&Gtt::props, $self, $canvas, $X, $Y],
-		-label=>'Properties...',
-		-underline=>0,
+		-label=>'GTT Properties...',
+		-underline=>4,
 	);
 	$m->add('command',
 		#-accelerator=>'s',
 		-command=>[\&Gtt::status, $self, $canvas, $X, $Y],
-		-label=>'Status...',
-		-underline=>0,
+		-label=>'GTT Status...',
+		-underline=>4,
 	);
 	$m->add('command',
-		#-accelerator=>'t',
+		#-accelerator=>'m',
 		-command=>[\&MsgStats::stats, $self, $canvas, $X, $Y],
 		-label=>'Message Statistics...',
-		-underline=>1,
+		-underline=>0,
 	);
 	$m->Popup(
 		-popanchor=>'nw',
@@ -4156,8 +4204,21 @@ sub new {
 	$self->{'pathno'} = 0;
 	$self->{'relations'} = {};
 	$self->{'relationno'} = 0;
-	$main::canvas->CanvasBind('<ButtonPress-3>',[\&Network::button3,$self,Tk::Ev('X'),Tk::Ev('Y')]);
+	$main::canvas->CanvasBind('<ButtonPress-3>',[\&Network::button3,$self,Tk::Ev('X'),Tk::Ev('Y'),Tk::Ev('x'),Tk::Ev('y')]);
 	return $self;
+}
+
+#package Network;
+sub identify {
+	my $self = shift;
+	return "The full newtork";
+}
+
+#package Network;
+sub getLink {
+	my ($self,$nodea,$nodeb,$slc,@args) = @_;
+	my $set = $self->getLinkSet($nodea,$nodeb,@args);
+	return $set->getLink($nodea,$nodeb,$slc,@args);
 }
 
 #package Network;
@@ -4197,6 +4258,16 @@ sub getRelation {
 }
 
 #package Network;
+sub getLinkSet {
+	my ($self,@args) = @_;
+	my $linkset = $self->getRelation(@args); 
+	if (ref $linkset eq 'Relation') {
+		LinkSet->xform($linkset);
+	}
+	return $linkset;
+}
+
+#package Network;
 sub regroupNodes {
 	my $self = shift;
 	my %totals;
@@ -4216,9 +4287,14 @@ sub regroupNodes {
 
 #package Network;
 sub button3 {
-	my ($canvas,$self,$X,$Y) = @_;
+	my ($canvas,$self,$X,$Y,$x,$y) = @_;
+	my $cx = $canvas->canvasx($x,1);
+	my $cy = $canvas->canvasy($y,1);
+	if ($canvas->find('overlapping', $cx - 2, $cy - 2, $cx + 2, $cy + 2)) {
+		return;
+	}
 	my $m = $canvas->toplevel->Menu(
-		-tearoff=>0,
+		-tearoff=>1,
 		-title=>'Network Menu',
 		-type=>'normal',
 	);
@@ -4502,7 +4578,8 @@ sub init {
 	$main::canvas->bind($self->{'item'},'<ButtonPress-3>',[\&Path::button3,$self,Tk::Ev('X'),Tk::Ev('Y')]);
 	$main::canvas->lower('path','node');
 	#Path->regroup;
-	$main::canvas->idletasks;
+#	$main::canvas->idletasks;
+	$main::top->{'updatenow'} = 1;
 }
 
 #package Path;
@@ -4525,6 +4602,22 @@ sub get {
 	$pathno = $pathno + 1;
 	$self->init($pathno,$ppa,@args);
 	return $self;
+}
+
+#package Path;
+sub bind {
+	my $self = shift;
+	my $nodea = $self->{'nodea'};
+	my $nodeb = $self->{'nodeb'};
+	my $slc = $self->{'slc'};
+	my $network = $self->{'network'};
+	my $link = $network->getLink($nodea,$nodeb,$slc);
+	if ($link->{'nodea'}->{'pc'} == $nodea->{'pc'}) {
+		$link->addForwPath($self);
+	} else {
+		$link->addRevsPath($self);
+	}
+	$self->{'link'} = $link;
 }
 
 #package Path;
@@ -4613,7 +4706,8 @@ sub complete {
 					$nodeb->moveto(0 + Node::COL_ADJ,$nodeb->{'row'});
 				}
 				$self->move;
-				$main::canvas->idletasks;
+#				$main::canvas->idletasks;
+				$main::top->{'updatenow'} = 1;
 			}
 		}
 	}
@@ -4730,27 +4824,27 @@ sub moveto {
 sub button3 {
 	my ($canvas,$self,$X,$Y) = @_;
 	my $m = $canvas->toplevel->Menu(
-		-tearoff=>0,
+		-tearoff=>1,
 		-title=>'Path Menu',
 		-type=>'normal',
 	);
 	$m->add('command',
 		#-accelerator=>'p',
 		-command=>[\&Path::props, $self, $canvas, $X, $Y],
-		-label=>'Properties...',
-		-underline=>0,
+		-label=>'Path Properties...',
+		-underline=>5,
 	);
 	$m->add('command',
 		#-accelerator=>'s',
 		-command=>[\&Path::status, $self, $canvas, $X, $Y],
-		-label=>'Status...',
-		-underline=>0,
+		-label=>'Path Status...',
+		-underline=>5,
 	);
 	$m->add('command',
-		#-accelerator=>'t',
+		#-accelerator=>'m',
 		-command=>[\&MsgStats::stats, $self, $canvas, $X, $Y],
 		-label=>'Statistics...',
-		-underline=>1,
+		-underline=>0,
 	);
 	$m->Popup(
 		-popanchor=>'nw',
@@ -6658,18 +6752,36 @@ sub menuFileOpen {
 	my $network = Network->new;
 #	my $fh = Net::Pcap::pcap_file($pcap);
 #	Tk::Event::IO->fileevent($fh, 'readable' => [\&MyTop::readmsg,$self,$pcap,$fh,$network]);
-	$w->Busy(-recurse=>1);
+#	$w->Busy(-recurse=>1);
 	if (my $msg = Message->create($pcap)) {
 		$main::begtime = $msg->{'hdr'};
 		$main::endtime = $msg->{'hdr'};
 		$msg->process($network);
+#		$w->update;
+#		if ($main::top->{'updatenow'}) {
+#			$w->update;
+#			$w->idletasks;
+#			delete $main::top->{'updatenow'};
+#		}
 		while ($msg = Message->create($pcap)) {
 			$main::endtime = $msg->{'hdr'};
 			$msg->process($network);
+#			$w->update;
+			if ($main::top->{'updatenow'}) {
+				$w->update;
+#				$w->idletasks;
+				delete $main::top->{'updatenow'};
+			}
 		}
 	}
 	Net::Pcap::pcap_close($pcap);
-	$w->Unbusy;
+#	$w->update;
+#	$w->Unbusy;
+#	if ($main::top->{'updatenow'}) {
+#		$w->update;
+#		$w->idletasks;
+#		delete $main::top->{'updatenow'};
+#	}
 }
 
 #package MyTop;
