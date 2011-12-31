@@ -115,6 +115,8 @@ $printit++ unless $nflag;
 #$* = 0;	$ do singleline matching
 undef $/;	# read entire file
 
+use Carp;
+
 use Net::Pcap qw(:functions);
 use Tk;
 use Tk::Xrm;
@@ -133,6 +135,15 @@ require Tk::TableMatrix;
 require Tk::TableMatrix::Spreadsheet;
 require Tk::Frame;
 require Tk::TFrame;
+
+use Data::Dumper;
+use Date::Parse;
+use XML::Simple;
+use XML::SAX;
+use XML::SAX::Base;
+#use XML::SAX::ParseFactory;
+
+use Time::HiRes qw(gettimeofday);
 
 my $canvas;
 my $mycanvas;
@@ -349,6 +360,221 @@ sub pcstring {
 	return "$ntw-$cls-$mem";
 }
 
+# distributions of message priorities should be:
+# priority 3 0%-5%, 2 0%-20%, 1 30%-45%, 0 30%-45%
+#
+my %mtypes = (
+	0=>{
+		0x00 => ['snmm', 0x0],
+		0x11 => ['coo',  0x8],
+		0x12 => ['coa',  0x8],
+		0x15 => ['cbd',  0x8],
+		0x16 => ['cba',  0x8],
+		0x21 => ['eco',  0x8],
+		0x22 => ['eca',  0x8],
+		0x31 => ['rct',  0x8],
+		0x32 => ['tfc',  0x8],
+		0x41 => ['tfp',  0x8],
+		0x42 => ['tcp',  0x8],
+		0x43 => ['tfr',  0x8],
+		0x44 => ['tcr',  0x8],
+		0x45 => ['tfa',  0x8],
+		0x46 => ['tca',  0x8],
+		0x51 => ['rst',  0xf],
+		0x52 => ['rsr',  0x8],
+		0x53 => ['rcp',  0x8],
+		0x54 => ['rcr',  0x8],
+		0x61 => ['lin',  0x8],
+		0x62 => ['lun',  0x8],
+		0x63 => ['lia',  0x8],
+		0x64 => ['lua',  0x8],
+		0x65 => ['lid',  0x8],
+		0x66 => ['lfu',  0x8],
+		0x67 => ['llt',  0x8],
+		0x68 => ['lrt',  0x8],
+		0x71 => ['tra',  0x8],
+		0x72 => ['trw',  0x8],
+		0x81 => ['dlc',  0x8],
+		0x82 => ['css',  0x8],
+		0x83 => ['cns',  0x8],
+		0x84 => ['cnp',  0x8],
+		0xa1 => ['upu',  0x8],
+		0xa2 => ['upa',  0x8],
+		0xa3 => ['upt',  0x8],
+	},
+	1=>{
+		0x00 => ['sntm', 0x0],
+		0x11 => ['sltm', 0x8],
+		0x12 => ['slta', 0x8],
+	},
+	2=>{
+		0x00 => ['snsm', 0x0],
+		0x11 => ['sltm', 0x8],
+		0x12 => ['slta', 0x8],
+	},
+	3=>{
+		0x00 => ['sccp',  0x0],
+		0x01 => ['cr',    0x3],
+		0x02 => ['cc',    0x2],
+		0x03 => ['cref',  0x2],
+		0x04 => ['rlsd',  0x4],
+		0x05 => ['rlc',   0x4],
+		0x06 => ['dt1',   0x3],
+		0x07 => ['dt2',   0x3],
+		0x08 => ['ak',    0x3],
+		0x09 => ['udt',   0x7],
+		0x0a => ['udts',  0x7],
+		0x0b => ['ed',    0x2],
+		0x0c => ['ea',    0x2],
+		0x0d => ['rsr',   0x2],
+		0x0e => ['rsc',   0x2],
+		0x0f => ['err',   0x2],
+		0x10 => ['it',    0x2],
+		0x11 => ['xudt',  0x7],
+		0x12 => ['xudts', 0x7],
+		0x13 => ['ludt',  0x7],
+		0x14 => ['ludts', 0x7],
+	},
+	5=>{
+		0x00 => ['isup', 0x0],
+		0x01 => ['iam',  0x3],
+		0x02 => ['sam',  0x0],
+		0x03 => ['inr',  0x2],
+		0x04 => ['inf',  0x2],
+		0x05 => ['cot',  0x2],
+		0x06 => ['acm',  0x2],
+		0x07 => ['con',  0x0],
+		0x08 => ['fot',  0x2],
+		0x09 => ['anm',  0x4],
+		0x0c => ['rel',  0x2],
+		0x0d => ['sus',  0x2],
+		0x0e => ['res',  0x2],
+		0x10 => ['rlc',  0x4],
+		0x11 => ['ccr',  0x2],
+		0x12 => ['rsc',  0x1],
+		0x13 => ['blo',  0x1],
+		0x14 => ['ubl',  0x1],
+		0x15 => ['bla',  0x1],
+		0x16 => ['uba',  0x1],
+		0x17 => ['grs',  0x1],
+		0x18 => ['cgb',  0x1],
+		0x19 => ['cgu',  0x1],
+		0x1a => ['cgba', 0x1],
+		0x1b => ['cgua', 0x1],
+		0x1c => ['cmr',  0x0],
+		0x1d => ['cmc',  0x0],
+		0x1e => ['cmrj', 0x0],
+		0x1f => ['far',  0x0],
+		0x20 => ['faa',  0x0],
+		0x21 => ['frj',  0x0],
+		0x22 => ['fad',  0x0],
+		0x23 => ['fai',  0x0],
+		0x24 => ['lpa',  0x1],
+		0x25 => ['csvq', 0x0],
+		0x26 => ['csvr', 0x0],
+		0x27 => ['drs',  0x0],
+		0x28 => ['pam',  0x7],
+		0x29 => ['gra',  0x1],
+		0x2a => ['cqm',  0x1],
+		0x2b => ['cqr',  0x1],
+		0x2c => ['cpg',  0x2],
+		0x2d => ['usr',  0x0],
+		0x2e => ['ucic', 0x2],
+		0x2f => ['cfn',  0x1],
+		0x30 => ['olm',  0x0],
+		0x31 => ['crg',  0x0],
+		0x32 => ['nrm',  0x0],
+		0x33 => ['fac',  0x7],
+		0x34 => ['upt',  0x0],
+		0x35 => ['upa',  0x0],
+		0x36 => ['idr',  0x0],
+		0x37 => ['irs',  0x0],
+		0x38 => ['sgm',  0x1],
+		0xe9 => ['cra',  0x1],
+		0xea => ['crm',  0x1],
+		0xeb => ['cvr',  0x1],
+		0xec => ['cvt',  0x1],
+		0xed => ['exm',  0x7],
+		0xf8 => ['non',  0x0],
+		0xfc => ['llm',  0x0],
+		0xfd => ['cak',  0x0],
+		0xfe => ['tcm',  0x0],
+		0xff => ['mcp',  0x0],
+	},
+);
+
+# -------------------------------------
+package Logging;
+use strict;
+# -------------------------------------
+
+#package Logging;
+sub init {
+	my $self = shift;
+	$self->{logs} = [];
+}
+
+#package Logging;
+sub new {
+	my ($type,@args) = @_;
+	my $self = {};
+	bless $self,$type;
+	$self->init(@args);
+	return $self;
+}
+
+#package Logging;
+sub showlog {
+	my ($self,$canvas,$X,$Y) = @_;
+
+	my $tw;
+	if ($tw = $self->{logw}) {
+		if ($tw->state eq 'iconic') {
+			$tw->deiconify;
+		} else {
+			$tw->UnmapWindow;
+		}
+		$tw->MapWindow;
+		return;
+	}
+	my $title = $self->identify." Logs";
+	$tw = $canvas->toplevel->Toplevel(
+		-title=>$title,
+	);
+	$tw->group($canvas->toplevel);
+	#$tw->transient($canvas->toplevel);
+	$tw->iconimage('icon');
+	$tw->iconname($title);
+	#$tw->resizable(0,0);
+	$tw->positionfrom('user');
+	$tw->geometry("+$X+$Y");
+	$tw->protocol('WM_DELETE_WINDOW', [sub {
+		my ($self) = @_;
+		my $tw = $self->{logw};
+		delete $self->{logw};
+		$tw->destroy;
+	},$self]);
+	$self->{logw} = $tw;
+	my $sc = $tw->Scrolled('ROText',
+		-scrollbars=>'osoe',
+	)->pack(
+		-expand=>1,
+		-fill=>'both',
+		-side=>'left',
+		-anchor=>'w',
+	);
+	my $ro = $sc->Subwidget('scrolled');
+	$ro->delete('0.0', 'end');
+	$ro->insert('end', join("\n",@{$self->{logs}}));
+	$tw->MapWindow;
+}
+
+#package Logging;
+sub log {
+	my ($self,$text) = @_;
+	push @{$self->{logs}}, $text;
+}
+
 # -------------------------------------
 package Counts;
 use strict;
@@ -357,10 +583,10 @@ use strict;
 #package Counts;
 sub init {
 	my ($self,$interval) = @_;
-	$self->{'interval'} = $interval;
-	$self->{'incs'} = {};
-	$self->{'pegs'} = {};
-	$self->{'durs'} = {};
+	$self->{interval} = $interval;
+	$self->{incs} = {};
+	$self->{pegs} = {};
+	$self->{durs} = {};
 }
 
 #package Counts;
@@ -374,43 +600,108 @@ sub new {
 
 #package Counts;
 sub inc {
-	my ($self,$msg) = @_;
-	my $li = $msg->{'li'};
+	my ($self,$msg,$dir) = @_;
+	my $li = $msg->{li};
+	$self->{incs}->{$dir}->{sus} += 1;
 	if ($li == 0) {
-		$self->{'incs'}->{'fisus'} += 1;
+		$self->{incs}->{$dir}->{fisus} += 1;
 		return;
 	}
 	if ($li == 1) {
-		$self->{'incs'}->{'lssus'} += 1;
+		$self->{incs}->{$dir}->{lssus} += 1;
 		return;
 	}
 	if ($li == 2) {
-		$self->{'incs'}->{'lss2s'} += 1;
+		$self->{incs}->{$dir}->{lss2s} += 1;
 		return;
 	}
-	my $si = $msg->{'si'};
-	my $mt = $msg->{'mt'};
-	my $mp = $msg->{'mp'};
-	$self->{'incs'}->{'msus'} += 1;
-	$self->{'incs'}->{'sis'}->{$si}->{'msus'} += 1;
-	$self->{'incs'}->{'sis'}->{$si}->{$mt}->{'msus'} += 1;
-	$self->{'incs'}->{'sis'}->{$si}->{$mt}->{$mp} += 1;
-	$self->{'incs'}->{'mp'}->{$mp} += 1;
+	my $si = $msg->{si};
+	my $mt = $msg->{mt};
+	my $mp = $msg->{mp};
+	$self->{incs}->{$dir}->{msus} += 1;
+	$self->{incs}->{$dir}->{sis}->{$si}->{msus} += 1;
+	$self->{incs}->{$dir}->{sis}->{$si}->{$mt}->{msus} += 1;
+	$self->{incs}->{$dir}->{sis}->{$si}->{$mt}->{$mp} += 1;
+	$self->{incs}->{$dir}->{mp}->{$mp} += 1;
 }
 
 #package Counts;
 sub peg {
 	my ($self,$event) = @_;
-	$self->{'pegs'}->{$event} += 1;
+	$self->{pegs}->{$event} += 1;
 }
 
 #package Counts;
 sub dur {
 	my ($self,$event,$start,$end) = @_;
-	my $dur = $end->{'tv_sec'} - $start->{'tv_sec'} + ($end->{'tv_usec'} - $start->{'tv_usec'})/1000000;
-	$self->{'durs'}->{$event} += $dur;
-	$self->{'durs'}->{'dist'}->{$event}->{int($dur)} += 1;
+	my $dur = $end->{tv_sec} - $start->{tv_sec} + ($end->{tv_usec} - $start->{tv_usec})/1000000;
+	$self->{durs}->{$event} += $dur;
+	$self->{durs}->{dist}->{$event}->{int($dur)} += 1;
 }
+
+# -------------------------------------
+package style;
+use strict;
+# -------------------------------------
+
+my %tframestyle = (
+	-relief=>'groove',
+	-borderwidth=>2,
+);
+my %tframepack = (
+	-expand=>1,
+	-fill=>'both',
+	-side=>'top',
+	-anchor=>'n',
+	-padx=>3,
+	-pady=>1,
+);
+my %labelright = (
+	-anchor=>'e',
+	-justify=>'right',
+	-relief=>'groove',
+	-borderwidth=>2,
+);
+my %labelcenter = (
+	-anchor=>'s',
+	-justify=>'center',
+	-relief=>'groove',
+	-borderwidth=>2,
+);
+my %labelgrid = (
+);
+my %entryinput = (
+	-background=>'white',
+	-exportselection=>1,
+);
+my %entryleft = (
+	%entryinput,
+	-state=>'readonly',
+	-relief=>'groove',
+	-borderwidth=>2,
+);
+my %entryright = (
+	%entryleft,
+	-justify=>'right',
+	-width=>8,
+);
+my %entrycenter = (
+	%entryleft,
+	-justify=>'center',
+);
+my %entrygrid = (
+);
+my %buttonleft = (
+	-anchor=>'w',
+	-justify=>'left',
+	-indicatoron=>1,
+	-state=>'disabled',
+);
+my %optionleft = (
+	-anchor=>'w',
+	-justify=>'left',
+	-indicatoron=>0,
+);
 
 # -------------------------------------
 package Stats;
@@ -423,7 +714,7 @@ use vars qw(@ISA);
 sub init {
 	my $self = shift;
 	Counts::init($self);
-	$self->{'hist'} = {};
+	$self->{hist} = {};
 }
 
 #package Stats;
@@ -438,8 +729,8 @@ sub new {
 #package Stats;
 sub interval {
 	my ($self,$ts) = @_;
-	my $int = $ts->{'tv_sec'};
-	$int++ if ($ts->{'tv_usec'} > 0);
+	my $int = $ts->{tv_sec};
+	$int++ if ($ts->{tv_usec} > 0);
 	$int = int(($int + 299)/300);
 	return $int;
 }
@@ -448,19 +739,19 @@ sub interval {
 sub hist {
 	my ($self,$int) = @_;
 	my $obj;
-	unless ($obj = $self->{'hist'}->{$int}) {
-		$obj = $self->{'hist'}->{$int} = Counts->new($int);
+	unless ($obj = $self->{hist}->{$int}) {
+		$obj = $self->{hist}->{$int} = Counts->new($int);
 	}
 	return $obj;
 }
 
 #package Stats;
 sub inc {
-	my ($self,$msg) = @_;
-#	my $int = $self->interval($msg->{'hdr'});
+	my ($self,$msg,$dir) = @_;
+#	my $int = $self->interval($msg->{hdr});
 #	my $hist = $self->hist($int);
-#	$hist->inc($msg);
-	$self->Counts::inc($msg);
+#	$hist->inc($msg,$dir);
+	$self->Counts::inc($msg,$dir);
 }
 
 #package Stats;
@@ -510,152 +801,11 @@ use constant {
 };
 
 #package MsgStats;
-my %mtypes = (
-	0=>{
-		0x00 => 'snmm',
-		0x11 => 'coo',
-		0x12 => 'coa',
-		0x15 => 'cbd',
-		0x16 => 'cba',
-		0x21 => 'eco',
-		0x22 => 'eca',
-		0x31 => 'rct',
-		0x32 => 'tfc',
-		0x41 => 'tfp',
-		0x42 => 'tcp',
-		0x43 => 'tfr',
-		0x44 => 'tcr',
-		0x45 => 'tfa',
-		0x46 => 'tca',
-		0x51 => 'rst',
-		0x52 => 'rsr',
-		0x53 => 'rcp',
-		0x54 => 'rcr',
-		0x61 => 'lin',
-		0x62 => 'lun',
-		0x63 => 'lia',
-		0x64 => 'lua',
-		0x65 => 'lid',
-		0x66 => 'lfu',
-		0x67 => 'llt',
-		0x68 => 'lrt',
-		0x71 => 'tra',
-		0x72 => 'trw',
-		0x81 => 'dlc',
-		0x82 => 'css',
-		0x83 => 'cns',
-		0x84 => 'cnp',
-		0xa1 => 'upu',
-		0xa2 => 'upa',
-		0xa3 => 'upt',
-	},
-	1=>{
-		0x00 => 'sntm',
-		0x11 => 'sltm',
-		0x12 => 'slta',
-	},
-	2=>{
-		0x00 => 'snsm',
-		0x11 => 'sltm',
-		0x12 => 'slta',
-	},
-	3=>{
-		0x00 => 'sccp',
-		0x01 => 'cr',
-		0x02 => 'cc',
-		0x03 => 'cref',
-		0x04 => 'rlsd',
-		0x05 => 'rlc',
-		0x06 => 'dt1',
-		0x07 => 'dt2',
-		0x08 => 'ak',
-		0x09 => 'udt',
-		0x0a => 'udts',
-		0x0b => 'ed',
-		0x0c => 'ea',
-		0x0d => 'rsr',
-		0x0e => 'rsc',
-		0x0f => 'err',
-		0x10 => 'it',
-		0x11 => 'xudt',
-		0x12 => 'xudts',
-		0x13 => 'ludt',
-		0x14 => 'ludts',
-	},
-	5=>{
-		0x00 => 'isup',
-		0x01 =>'iam',
-		0x02 =>'sam',
-		0x03 =>'inr',
-		0x04 =>'inf',
-		0x05 =>'cot',
-		0x06 =>'acm',
-		0x07 =>'con',
-		0x08 =>'fot',
-		0x09 =>'anm',
-		0x0c =>'rel',
-		0x0d =>'sus',
-		0x0e =>'res',
-		0x10 =>'rlc',
-		0x11 =>'ccr',
-		0x12 =>'rsc',
-		0x13 =>'blo',
-		0x14 =>'ubl',
-		0x15 =>'bla',
-		0x16 =>'uba',
-		0x17 =>'grs',
-		0x18 =>'cgb',
-		0x19 =>'cgu',
-		0x1a =>'cgba',
-		0x1b =>'cgua',
-		0x1c =>'cmr',
-		0x1d =>'cmc',
-		0x1e =>'cmrj',
-		0x1f =>'far',
-		0x20 =>'faa',
-		0x21 =>'frj',
-		0x22 =>'fad',
-		0x23 =>'fai',
-		0x24 =>'lpa',
-		0x25 =>'csvq',
-		0x26 =>'csvr',
-		0x27 =>'drs',
-		0x28 =>'pam',
-		0x29 =>'gra',
-		0x2a =>'cqm',
-		0x2b =>'cqr',
-		0x2c =>'cpg',
-		0x2d =>'usr',
-		0x2e =>'ucic',
-		0x2f =>'cfn',
-		0x30 =>'olm',
-		0x31 =>'crg',
-		0x32 =>'nrm',
-		0x33 =>'fac',
-		0x34 =>'upt',
-		0x35 =>'upa',
-		0x36 =>'idr',
-		0x37 =>'irs',
-		0x38 =>'sgm',
-		0xe9 =>'cra',
-		0xea =>'crm',
-		0xeb =>'cvr',
-		0xec =>'cvt',
-		0xed =>'exm',
-		0xf8 =>'non',
-		0xfc =>'llm',
-		0xfd =>'cak',
-		0xfe =>'tcm',
-		0xff =>'mcp',
-	},
-);
-
-#package MsgStats;
 sub init {
 	my ($self,@args) = @_;
 	my $self = shift;
 	Stats::init($self,@args);
-	$self->{'dist'} = {};
+	$self->{dist} = {};
 }
 
 #package MsgStats;
@@ -671,8 +821,8 @@ sub new {
 sub stats {
 	my ($self,$canvas,$X,$Y) = @_;
 	my $row = 0;
-	my $tw;
-	if ($tw = $self->{'stats'}) {
+	my ($tw,$w,$bmsg);
+	if ($tw = $self->{stats}) {
 		if ($tw->state eq 'iconic') {
 			$tw->deiconify;
 		} else {
@@ -684,7 +834,7 @@ sub stats {
 			-title=>$title,
 		);
 		$tw->group($canvas->toplevel);
-		$tw->transient($canvas->toplevel);
+		#$tw->transient($canvas->toplevel);
 		$tw->iconimage('icon');
 		$tw->iconname($title);
 		#$tw->resizable(0,0);
@@ -694,141 +844,255 @@ sub stats {
 		$tw->geometry("+$X+$Y");
 		$tw->protocol('WM_DELETE_WINDOW', [sub {
 			my $self = shift;
-			my $tw = $self->{'stats'};
-			delete $self->{'stats'};
+			my $tw = $self->{stats};
+			delete $self->{stats};
 			$tw->destroy;
 		},$self]);
-		$self->{'stats'} = $tw;
+		$self->{stats} = $tw;
+		my $balloon = $tw->Balloon(-statusbar=>$::statusbar);
 		my $p = $tw->Scrolled('Pane',
 			-scrollbars=>'osoe',
 			-sticky=>'ewns',
-		)->pack(
-			-expand=>1,
-			-fill=>'both',
-			-side=>'top',
-			-anchor=>'n',
-		);
+		)->pack(%tframepack);
 		my $f = $p->Subwidget('scrolled');
-		my $s = $f->Frame->pack(
-			-expand=>1,
-			-fill=>'both',
-			-side=>'top',
-			-anchor=>'n',
-		);
-		if ($self->{'incs'}->{'fisus'}) {
-			$s->Label(
-				-anchor=>'e',
-				-justify=>'right',
+		my $s = $f->Frame->pack(%tframepack);
+		if ($self->{incs}->{0}->{fisus} or $self->{incs}->{1}->{fisus}) {
+			$w = $s->Label(%labelright,
 				-text=>'FISUs:',
-			)->grid(-row=>$row,-column=>0,-sticky=>'ew');
-			$s->Entry(
-				-readonlybackground=>'white',
-				-background=>'white',
-				-justify=>'right',
-				-textvariable=>\$self->{'incs'}->{'fisus'},
-				-state=>'readonly',
-				-exportselection=>1,
-			)->grid(-row=>$row++,-column=>1,-sticky=>'ew');
+			)->grid(-row=>$row,-column=>0,-sticky=>'ewns');
+			$balloon->attach($w,
+				-balloonmsg=>"Number of FISUs sent and received.",
+			);
+			$w = $s->Entry(%entryright,
+				-textvariable=>\$self->{incs}->{0}->{fisus},
+			)->grid(-row=>$row,-column=>1,-sticky=>'ewns');
+			$balloon->attach($w,
+				-balloonmsg=>"Number of FISUs sent.",
+			);
+			$w = $s->Entry(%entryright,
+				-textvariable=>\$self->{incs}->{1}->{fisus},
+			)->grid(-row=>$row++,-column=>2,-sticky=>'ewns');
+			$balloon->attach($w,
+				-balloonmsg=>"Number of FISUs received.",
+			);
 		}
-		if ($self->{'incs'}->{'lssus'}) {
-			$s->Label(
-				-anchor=>'e',
-				-justify=>'right',
+		if ($self->{incs}->{0}->{lssus} or $self->{incs}->{1}->{lssus}) {
+			$w = $s->Label(%labelright,
 				-text=>'1-octet LSSUs:',
-			)->grid(-row=>$row,-column=>0,-sticky=>'ew');
-			$s->Entry(
-				-readonlybackground=>'white',
-				-background=>'white',
-				-justify=>'right',
-				-textvariable=>\$self->{'incs'}->{'lssus'},
-				-state=>'readonly',
-				-exportselection=>1,
-			)->grid(-row=>$row++,-column=>1,-sticky=>'ew');
+			)->grid(-row=>$row,-column=>0,-sticky=>'ewns');
+			$balloon->attach($w,
+				-balloonmsg=>"Number of 1-octet LSSUs sent and received.",
+			);
+			$s->Entry(%entryright,
+				-textvariable=>\$self->{incs}->{0}->{lssus},
+			)->grid(-row=>$row,-column=>1,-sticky=>'ewns');
+			$w = $balloon->attach($w,
+				-balloonmsg=>"Number of 1-octet LSSUs sent.",
+			);
+			$s->Entry(%entryright,
+				-textvariable=>\$self->{incs}->{1}->{lssus},
+			)->grid(-row=>$row++,-column=>2,-sticky=>'ewns');
+			$w = $balloon->attach($w,
+				-balloonmsg=>"Number of 1-octet LSSUs received.",
+			);
 		}
-		if ($self->{'incs'}->{'lss2s'}) {
-			$s->Label(
-				-anchor=>'e',
-				-justify=>'right',
+		if ($self->{incs}->{0}->{lss2s} or $self->{incs}->{1}->{lss2s}) {
+			$w = $s->Label(%labelright,
 				-text=>'2-octet LSSUs:',
-			)->grid(-row=>$row,-column=>0,-sticky=>'ew');
-			$s->Entry(
-				-readonlybackground=>'white',
-				-background=>'white',
-				-justify=>'right',
-				-textvariable=>\$self->{'incs'}->{'lss2s'},
-				-state=>'readonly',
-				-exportselection=>1,
-			)->grid(-row=>$row++,-column=>1,-sticky=>'ew');
+			)->grid(-row=>$row,-column=>0,-sticky=>'ewns');
+			$balloon->attach($w,
+				-balloonmsg=>"Number of 2-octet LSSUs sent and received.",
+			);
+			$w = $s->Entry(%entryright,
+				-textvariable=>\$self->{incs}->{0}->{lss2s},
+			)->grid(-row=>$row,-column=>1,-sticky=>'ewns');
+			$balloon->attach($w,
+				-balloonmsg=>"Number of 2-octet LSSUs sent.",
+			);
+			$w = $s->Entry(%entryright,
+				-textvariable=>\$self->{incs}->{1}->{lss2s},
+			)->grid(-row=>$row++,-column=>2,-sticky=>'ewns');
+			$balloon->attach($w,
+				-balloonmsg=>"Number of 2-octet LSSUs received.",
+			);
 		}
-		if ($self->{'incs'}->{'msus'}) {
-			$s->Label(
-				-anchor=>'e',
-				-justify=>'right',
+		if ($self->{incs}->{0}->{msus} or $self->{incs}->{1}->{msus}) {
+			$w = $s->Label(%labelright,
 				-text=>'MSUs:',
-			)->grid(-row=>$row,-column=>0,-sticky=>'ew');
-			$s->Entry(
-				-readonlybackground=>'white',
-				-background=>'white',
-				-justify=>'right',
-				-textvariable=>\$self->{'incs'}->{'msus'},
-				-state=>'readonly',
-				-exportselection=>1,
-			)->grid(-row=>$row++,-column=>1,-sticky=>'ew');
-		}
-		foreach my $si (sort {$a <=> $b} keys %{$self->{'incs'}->{'sis'}}) {
-			next unless (exists $mtypes{$si});
-			$s->Label(
-				-anchor=>'e',
-				-justify=>'right',
-				-text=>"$mtypes{$si}->{0x00}($si):",
-			)->grid(-row=>$row,-column=>0,-sticky=>'ew');
-			$s->Entry(
-				-readonlybackground=>'white',
-				-background=>'white',
-				-justify=>'right',
-				-textvariable=>\$self->{'incs'}->{'sis'}->{$si}->{'msus'},
-				-state=>'readonly',
-				-exportselection=>1,
-			)->grid(-row=>$row,-column=>1,-sticky=>'ew');
-			my $mtcount = 0;
-			foreach my $mt (sort {$a <=> $b} keys %{$self->{'incs'}->{'sis'}->{$si}}) {
-				next if $mt eq 'msus';
-				next unless exists $mtypes{$si}->{$mt};
-				$mtcount += 1;
-				$s->Label(
-					-anchor=>'e',
-					-justify=>'right',
-					-text=>"$mtypes{$si}->{$mt}($mt):",
-				)->grid(-row=>$row,-column=>2,-sticky=>'ew');
-				$s->Entry(
-					-readonlybackground=>'white',
-					-background=>'white',
-					-justify=>'right',
-					-textvariable=>\$self->{'incs'}->{'sis'}->{$si}->{$mt}->{'msus'},
-					-state=>'readonly',
-					-exportselection=>1,
-				)->grid(-row=>$row,-column=>3,-sticky=>'ew');
-				my $mpcount = 0;
-				foreach my $mp (sort {$a <=> $b} keys %{$self->{'incs'}->{'sis'}->{$si}->{$mt}}) {
-					next if $mp eq 'msus';
-					$mpcount += 1;
-					$s->Label(
-						-anchor=>'e',
-						-justify=>'right',
-						-text=>"mp($mp):",
-					)->grid(-row=>$row,-column=>4,-sticky=>'ew');
-					$s->Entry(
-						-readonlybackground=>'white',
-						-background=>'white',
-						-justify=>'right',
-						-textvariable=>\$self->{'incs'}->{'sis'}->{$si}->{$mt}->{$mp},
-						-state=>'readonly',
-						-exportselection=>1,
-					)->grid(-row=>$row++,-column=>5,-sticky=>'ew');
+			)->grid(-row=>$row,-column=>0,-sticky=>'ewns');
+			$balloon->attach($w,
+				-balloonmsg=>"Number of MSUs sent and received.",
+			);
+			$w = $s->Entry(%entryright,
+				-textvariable=>\$self->{incs}->{0}->{msus},
+			)->grid(-row=>$row,-column=>1,-sticky=>'ewns');
+			$balloon->attach($w,
+				-balloonmsg=>"Number of MSUs sent.",
+			);
+			$w = $s->Entry(%entryright,
+				-textvariable=>\$self->{incs}->{1}->{msus},
+			)->grid(-row=>$row,-column=>2,-sticky=>'ewns');
+			$balloon->attach($w,
+				-balloonmsg=>"Number of MSUs received.",
+			);
+			for (my $mp = 0; $mp < 4; $mp++) {
+				my $p;
+				my $mpp0 = sprintf('%6.2f', ($self->{incs}->{0}->{mp}->{$mp}*100)/(($p=$self->{incs}->{0}->{msus})?$p:1));
+				my $mpp1 = sprintf('%6.2f', ($self->{incs}->{1}->{mp}->{$mp}*100)/(($p=$self->{incs}->{1}->{msus})?$p:1));
+				if ($mp == 3) {
+					$bmsg = "\nThis value should be between 0% and 5%.";
+				} elsif ($mp == 2) {
+					$bmsg = "\nThis value should be between 0% and 20%.";
+				} else {
+					$bmsg = "\nThis value should be between 30% and 45%.";
 				}
-				$row++ unless $mpcount;
+				$w = $s->Label(%labelright,
+					-text=>"mp($mp)",
+				)->grid(-row=>$row,-column=>3,-sticky=>'ewns');
+				$balloon->attach($w,
+					-balloonmsg=>"Number of MP($mp) MSUs sent and received.",
+				);
+				$w = $s->Entry(%entryright,
+					-textvariable=>\$self->{incs}->{0}->{mp}->{$mp},
+					-validatecommand=>[sub{
+						my ($mpp,$mp,$self,$row,$col,$old,$proposed,$index,@args) = @_;
+						my $p;
+						$$mpp = sprintf('%6.2f', ($self->{incs}->{0}->{mp}->{$mp}*100)/(($p=$self->{incs}->{0}->{msus})?$p:1));
+						return 1;
+					},\$mpp0,$mp,$self],
+					-validate=>'all',
+				)->grid(-row=>$row,-column=>4,-sticky=>'ewns');
+				$balloon->attach($w,
+					-balloonmsg=>"Number of MP($mp) MSUs sent.",
+				);
+				$w = $s->Entry(%entryright,
+					-textvariable=>\$self->{incs}->{1}->{mp}->{$mp},
+					-validatecommand=>[sub{
+						my ($mpp,$mp,$self,$row,$col,$old,$proposed,$index,@args) = @_;
+						my $p;
+						$$mpp = sprintf('%6.2f', ($self->{incs}->{1}->{mp}->{$mp}*100)/(($p=$self->{incs}->{1}->{msus})?$p:1));
+						return 1;
+					},\$mpp1,$mp,$self],
+					-validate=>'all',
+				)->grid(-row=>$row,-column=>5,-sticky=>'ewns');
+				$balloon->attach($w,
+					-balloonmsg=>"Number of MP($mp) MSUs received.",
+				);
+				$w = $s->Label(%labelright,
+					-text=>"mp($mp)%",
+				)->grid(-row=>$row,-column=>6,-sticky=>'ewns');
+				$balloon->attach($w,
+					-balloonmsg=>"Percentage of MP($mp) MSUs sent and received.$bmsg",
+				);
+				$w = $s->Entry(%entryright,
+					-textvariable=>\$mpp0,
+				)->grid(-row=>$row,-column=>7,-sticky=>'ewns');
+				$balloon->attach($w,
+					-balloonmsg=>"Percentage of MP($mp) MSUs sent.$bmsg",
+				);
+				$w = $s->Entry(%entryright,
+					-textvariable=>\$mpp1,
+				)->grid(-row=>$row++,-column=>8,-sticky=>'ewns');
+				$balloon->attach($w,
+					-balloonmsg=>"Percentage of MP($mp) MSUs received.$bmsg",
+				);
 			}
-			$row++ unless $mtcount;
+		}
+		if ($self->{incs}->{0}->{sis} or $self->{incs}->{1}->{sis}) {
+			my %keys = ();
+			foreach my $k (keys %{$self->{incs}->{0}->{sis}},
+				       keys %{$self->{incs}->{1}->{sis}}) {
+				$keys{$k} = 1;
+			}
+			foreach my $si (sort {$a <=> $b} keys %keys) {
+				next unless (exists $mtypes{$si});
+				$w = $s->Label(%labelright,
+					-text=>"$mtypes{$si}->{0x00}->[0]($si):",
+				)->grid(-row=>$row,-column=>0,-sticky=>'ewns');
+				$balloon->attach($w,
+					-balloonmsg=>"Number of \U$mtypes{$si}->{0x00}->[0]($si)\E messages sent and received.",
+				);
+				$w = $s->Entry(%entryright,
+					-textvariable=>\$self->{incs}->{0}->{sis}->{$si}->{msus},
+				)->grid(-row=>$row,-column=>1,-sticky=>'ewns');
+				$balloon->attach($w,
+					-balloonmsg=>"Number of \U$mtypes{$si}->{0x00}->[0]($si)\E messages sent.",
+				);
+				$w = $s->Entry(%entryright,
+					-textvariable=>\$self->{incs}->{1}->{sis}->{$si}->{msus},
+				)->grid(-row=>$row,-column=>2,-sticky=>'ewns');
+				$balloon->attach($w,
+					-balloonmsg=>"Number of \U$mtypes{$si}->{0x00}->[0]($si)\E messages received.",
+				);
+				my $mtcount = 0;
+				my %keys2 = ();
+				foreach my $k (keys %{$self->{incs}->{0}->{sis}->{$si}},
+					       keys %{$self->{incs}->{1}->{sis}->{$si}}) {
+					$keys2{$k} = 1;
+				}
+				foreach my $mt (sort {$a <=> $b} keys %keys2) {
+					next if $mt eq 'msus';
+					next unless exists $mtypes{$si}->{$mt};
+					$mtcount += 1;
+					$w = $s->Label(%labelright,
+						-text=>"$mtypes{$si}->{$mt}->[0]($mt):",
+					)->grid(-row=>$row,-column=>3,-sticky=>'ewns');
+					$balloon->attach($w,
+						-balloonmsg=>"Number of \U$mtypes{$si}->{$mt}->[0]($mt)\E messages sent and received.",
+					);
+					$w = $s->Entry(%entryright,
+						-textvariable=>\$self->{incs}->{0}->{sis}->{$si}->{$mt}->{msus},
+					)->grid(-row=>$row,-column=>4,-sticky=>'ewns');
+					$balloon->attach($w,
+						-balloonmsg=>"Number of \U$mtypes{$si}->{$mt}->[0]($mt)\E messages sent.",
+					);
+					$w = $s->Entry(%entryright,
+						-textvariable=>\$self->{incs}->{1}->{sis}->{$si}->{$mt}->{msus},
+					)->grid(-row=>$row,-column=>5,-sticky=>'ewns');
+					$balloon->attach($w,
+						-balloonmsg=>"Number of \U$mtypes{$si}->{$mt}->[0]($mt)\E messages received.",
+					);
+					my $mpcount = 0;
+					my %keys3 = ();
+					foreach my $k (keys %{$self->{incs}->{0}->{sis}->{$si}->{$mt}},
+						       keys %{$self->{incs}->{1}->{sis}->{$si}->{$mt}}) {
+						$keys3{$k} = 1;
+					}
+					foreach my $mp (sort {$a <=> $b} keys %keys3) {
+						next if $mp eq 'msus';
+						$mpcount += 1;
+						my $color = 'black';
+						$bmsg = '';
+						unless ($mtypes{$si}->{$mt}->[1] & (1<<$mp)) {
+							$color = 'red';
+							$bmsg = "\nMP($mp) is not valid for \U$mtypes{$si}->{$mt}->[0]($mt)\E messages.";
+						}
+						$w = $s->Label(%labelright,
+							-fg=>$color,
+							-text=>"mp($mp):",
+						)->grid(-row=>$row,-column=>6,-sticky=>'ewns');
+						$balloon->attach($w,
+							-balloonmsg=>"Number of MP($mp) \U$mtypes{$si}->{$mt}->[0]($mt)\E messages sent and received.$bmsg",
+						);
+						$w = $s->Entry(%entryright,
+							-fg=>$color,
+							-textvariable=>\$self->{incs}->{0}->{sis}->{$si}->{$mt}->{$mp},
+						)->grid(-row=>$row,-column=>7,-sticky=>'ewns');
+						$balloon->attach($w,
+							-balloonmsg=>"Number of MP($mp) \U$mtypes{$si}->{$mt}->[0]($mt)\E messages sent.$bmsg",
+						);
+						$w = $s->Entry(%entryright,
+							-fg=>$color,
+							-textvariable=>\$self->{incs}->{1}->{sis}->{$si}->{$mt}->{$mp},
+						)->grid(-row=>$row++,-column=>8,-sticky=>'ewns');
+						$balloon->attach($w,
+							-balloonmsg=>"Number of MP($mp) \U$mtypes{$si}->{$mt}->[0]($mt)\E messages received.$bmsg",
+						);
+					}
+					$row++ unless $mpcount;
+				}
+				$row++ unless $mtcount;
+			}
 		}
 		$s->update;
 		my $x = $s->width+40;
@@ -849,7 +1113,7 @@ my %blueline = ( -arrow=>'none', -capstyle=>'round', -fill=>'blue', -joinstyle=>
 sub dist {
 	my ($self,$w,$event,$prefix,$label,$X,$Y) = @_;
 	my $tw;
-	if ($tw = $self->{'dist'}->{$event}) {
+	if ($tw = $self->{dist}->{$event}) {
 		if ($tw->state eq 'iconic') {
 			$tw->deiconify;
 		} else {
@@ -871,11 +1135,11 @@ sub dist {
 	$tw->geometry("+$X+$Y");
 	$tw->protocol('WM_DELETE_WINDOW', [sub {
 		my ($self,$event) = @_;
-		my $tw = $self->{'dist'}->{$event};
-		delete $self->{'dist'}->{$event};
+		my $tw = $self->{dist}->{$event};
+		delete $self->{dist}->{$event};
 		$tw->destroy;
 	},$self,$event]);
-	$self->{'dist'}->{$event} = $tw;
+	$self->{dist}->{$event} = $tw;
 	my $c = $tw->Canvas(
 		-confine=>1,
 		-width=>600,
@@ -889,7 +1153,7 @@ sub dist {
 		-side=>'left',
 		-anchor=>'w',
 	);
-	my $h = $self->{'durs'}->{'dist'}->{$event};
+	my $h = $self->{durs}->{dist}->{$event};
 	my ($maxx,$minx,$maxy,$miny);
 	foreach my $v (sort {$b<=>$a} values %{$h}) { $maxy = $v unless defined $maxy; $miny = $v; }
 	# remove anomalies
@@ -914,7 +1178,7 @@ sub dist {
 	my $id = $self->identify;
 	$c->createText(300,35, %centerblack, -text=>"for $id");
 	$c->createText(300,385, %centerblack, -text=>'seconds of duration');
-	$c->createText(550,385, %rightblack, -text=>"total calls = $self->{'pegs'}->{$event}");
+	$c->createText(550,385, %rightblack, -text=>"total calls = $self->{pegs}->{$event}");
 	$c->createText(45,200, %rightblack, -text=>'calls');
 	$c->createLine(50,50,50,350, %blackline);
 	$c->createLine(50,350,550,350, %blackline);
@@ -970,108 +1234,88 @@ sub dist {
 	$c->createLine(@coords, %blueline);
 	$c->createLine(@coords, %blackcurve);
 	$c->update;
-	$c->{'_mydata'} = {};
-	$c->{'_mydata'}->{'w'} = 600;
-	$c->{'_mydata'}->{'h'} = 400;
+	$c->{_mydata} = {};
+	$c->{_mydata}->{w} = 600;
+	$c->{_mydata}->{h} = 400;
 	$c->CanvasBind('<Configure>',[\&MsgStats::resizedist,Tk::Ev('w'),Tk::Ev('h')]);
 	$tw->MapWindow;
 }
 
 sub resizedist {
 	my ($c,$w,$h) = @_;
-	my $ow = $c->{'_mydata'}->{'w'};
-	my $oh = $c->{'_mydata'}->{'h'};
+	my $ow = $c->{_mydata}->{w};
+	my $oh = $c->{_mydata}->{h};
 	$c->scale('all',0,0,$w/$ow,$h/$oh);
-	$c->{'_mydata'}->{'w'} = $w;
-	$c->{'_mydata'}->{'h'} = $h;
+	$c->{_mydata}->{w} = $w;
+	$c->{_mydata}->{h} = $h;
 }
 
 sub dircstat {
 	my ($self,$tw,$row,$span,$event,$prefix,$l1,$l2,$l3) = @_;
 	my $p;
-	my $del = sprintf("%7.2f", $self->{'durs'}->{$event}/(($p = $self->{'pegs'}->{$event})?$p:1));
-	my $dur = sprintf("%12.2f", $self->{'durs'}->{$event} / $span);
-	$tw->Label(
-		-anchor=>'e',
-		-justify=>'right',
-		-text=>"$prefix $l1:",
-	)->grid(-row=>$$row,-column=>0,-sticky=>'ew');
-	$tw->Entry(
-		-readonlybackground=>'white',
-		-background=>'white',
-		-justify=>'right',
+	my $del = sprintf("%7.2f", $self->{durs}->{$event}/(($p = $self->{pegs}->{$event})?$p:1));
+	my $dur = sprintf("%12.2f", $self->{durs}->{$event} / $span);
+	$tw->Entry(%entryright,
 		-textvariable=>\$dur,
-		-state=>'readonly',
-		-exportselection=>1,
-	)->grid(-row=>$$row,-column=>1,-sticky=>'ew');
-	$tw->Label(
-		-anchor=>'e',
-		-justify=>'right',
-		-text=>"$prefix $l3:",
-	)->grid(-row=>$$row,-column=>2,-sticky=>'ew');
-	$tw->Entry(
-		-readonlybackground=>'white',
-		-background=>'white',
-		-justify=>'right',
-		-textvariable=>\$self->{'pegs'}->{$event},
+	)->grid(-row=>$$row,-column=>2,-sticky=>'ewns');
+	$tw->Entry(%entryright,
+		-textvariable=>\$self->{pegs}->{$event},
 		-validatecommand=>[sub{
 			my ($del,$dur,$self,$event,$row,$col,$old,$proposed,$index,@args) = @_;
 			my $p;
-			$$del = sprintf("%7.2f", $self->{'durs'}->{$event}/(($p = $self->{'pegs'}->{$event})?$p:1));
+			$$del = sprintf("%7.2f", $self->{durs}->{$event}/(($p = $self->{pegs}->{$event})?$p:1));
 			my $span;
 			if (ref $self eq 'Counts') {
 				$span = 300;
 			} else {
-				$span = $main::endtime->{'tv_sec'}  - $main::begtime->{'tv_sec'}
-				     + ($main::endtime->{'tv_usec'} - $main::begtime->{'tv_usec'})/1000000;
+				$span = $main::endtime->{tv_sec}  - $main::begtime->{tv_sec}
+				     + ($main::endtime->{tv_usec} - $main::begtime->{tv_usec})/1000000;
 			}
-			$$dur = sprintf("%12.2f", $self->{'durs'}->{$event}/$span);
+			$$dur = sprintf("%12.2f", $self->{durs}->{$event}/$span);
 			return 1;
 		 },\$del,\$dur,$self,$event],
 		-validate=>'all',
-		-state=>'readonly',
-		-exportselection=>1,
-	)->grid(-row=>$$row,-column=>3,-sticky=>'ew');
-	$tw->Label(
-		-anchor=>'e',
-		-justify=>'right',
-		-text=>"$prefix average $l2:",
-	)->grid(-row=>$$row,-column=>4,-sticky=>'ew');
-	$tw->Entry(
-		-readonlybackground=>'white',
-		-background=>'white',
-		-justify=>'right',
+	)->grid(-row=>$$row,-column=>3,-sticky=>'ewns');
+	my $e = $tw->Entry(%entryright,
 		-textvariable=>\$del,
-		-state=>'readonly',
-		-exportselection=>1,
-	)->grid(-row=>$$row,-column=>5,-sticky=>'ew');
+	)->grid(-row=>$$row,-column=>4,-sticky=>'ewns');
 	my $X = $tw->toplevel->rootx;
 	my $Y = $tw->toplevel->rooty;
 	$tw->Button(
 		-command=>[\&MsgStats::dist,$self,$tw,$event,$prefix,$l2,$X,$Y],
-		-text=>'Distribution',
-		-relief=>'flat',
-		-overrelief=>'raised',
-	)->grid(-row=>$$row,-column=>6,-sticky=>'ew');
+		-text=>'Plot',
+#		-relief=>'flat',
+#		-overrelief=>'raised',
+		-pady=>0,
+		-pady=>0,
+	)->grid(-row=>$$row,-column=>5,-sticky=>'ewns');
 	$$row++;
 }
 
 sub addcstat {
-	my ($self,$tw,$row,$span,$event,$l1,$l2,$l3) = @_;
+	my ($self,$tw,$row,$span,$event,$label) = @_;
 	for (my $dir = 0; $dir <= 20; $dir += 10) {
 		my $prefix;
 		if ($dir > 10) {
 			$prefix = 'Total';
 		} else {
-			if ($self->{'way'} eq 'O') {
+			if ($self->{way} eq 'O') {
 				$prefix = ($dir == 0) ? 'O/G' : 'I/C';
-			} elsif ($self->{'way'} eq 'I') {
+			} elsif ($self->{way} eq 'I') {
 				$prefix = ($dir == 0) ? 'I/C' : 'O/G';
 			} else {
 				$prefix = ($dir == 0) ? 'Forward' : 'Reverse';
 			}
 		}
-		$self->dircstat($tw,$row,$span,$event+$dir,$prefix,$l1,$l2,$l3);
+		if ($dir == 20) {
+			$tw->Label(%labelright,
+				-text=>$label,
+			)->grid(-row=>$$row,-column=>0,-sticky=>'ewns');
+		}
+		$tw->Label(%labelright,
+			-text=>$prefix,
+		)->grid(-row=>$$row,-column=>1,-sticky=>'ewns');
+		$self->dircstat($tw,$row,$span,$event+$dir,$prefix,$label);
 	}
 }
 
@@ -1080,7 +1324,7 @@ sub cstat {
 	my ($self,$canvas,$X,$Y) = @_;
 	my $row = 0;
 	my $tw;
-	if ($tw = $self->{'cstat'}) {
+	if ($tw = $self->{cstat}) {
 		if ($tw->state eq 'iconic') {
 			$tw->deiconify;
 		} else {
@@ -1092,7 +1336,7 @@ sub cstat {
 			-title=>$title,
 		);
 		$tw->group($canvas->toplevel);
-		$tw->transient($canvas->toplevel);
+		#$tw->transient($canvas->toplevel);
 		$tw->iconimage('icon');
 		$tw->iconname($title);
 		$tw->resizable(0,0);
@@ -1100,153 +1344,117 @@ sub cstat {
 		$tw->geometry("+$X+$Y");
 		$tw->protocol('WM_DELETE_WINDOW', [sub {
 			my $self = shift;
-			while (my ($k,$v) = each %{$self->{'dist'}}) {
+			while (my ($k,$v) = each %{$self->{dist}}) {
 				if ($v) {
-					delete $self->{'dist'}->{$k};
+					delete $self->{dist}->{$k};
 					$v->destroy;
 				}
 			}
-			my $tw = $self->{'cstat'};
-			delete $self->{'cstat'};
+			my $tw = $self->{cstat};
+			delete $self->{cstat};
 			$tw->destroy;
 		},$self]);
-		$self->{'cstat'} = $tw;
+		$self->{cstat} = $tw;
 
 		my $span;
 		if (ref $self eq 'Counts') {
 			$span = 300;
 		} else {
-			$span = $main::endtime->{'tv_sec'}  - $main::begtime->{'tv_sec'}
-			     + ($main::endtime->{'tv_usec'} - $main::begtime->{'tv_usec'})/1000000;
+			$span = $main::endtime->{tv_sec}  - $main::begtime->{tv_sec}
+			     + ($main::endtime->{tv_usec} - $main::begtime->{tv_usec})/1000000;
 		}
-		if ($self->{'ciccnt'}) {
-			$tw->Label(
-				-anchor=>'e',
-				-justify=>'right',
-				-text=>'Defined circuits:',
-			)->grid(-row=>$row,-column=>0,-sticky=>'ew');
-			$tw->Entry(
-				-readonlybackground=>'white',
-				-background=>'white',
-				-justify=>'right',
-				-textvariable=>\$self->{'ciccnt'},
-				-state=>'readonly',
-				-exportselection=>1,
-			)->grid(-row=>$row,-column=>1,-sticky=>'ew');
-			if ($self->{'actcnt'}) {
-				$tw->Label(
-					-anchor=>'e',
-					-justify=>'right',
-					-text=>'Active circuits:',
-				)->grid(-row=>$row,-column=>2,-sticky=>'ew');
-				$tw->Entry(
-					-readonlybackground=>'white',
-					-background=>'white',
-					-justify=>'right',
-					-textvariable=>\$self->{'actcnt'},
-					-state=>'readonly',
-					-exportselection=>1,
-				)->grid(-row=>$row,-column=>3,-sticky=>'ew');
-			}
-			$row++;
-		}
-		if ($self->{'actog'}) {
-			$tw->Label(
-				-anchor=>'e',
-				-justify=>'right',
+		my $f = $tw->TFrame(%tframestyle,
+			-label=>'Circuits:',
+		)->pack(%tframepack);
+		$f->Label(%labelright,
+			-text=>'Defined circuits:',
+		)->grid(-row=>$row,-column=>0,-sticky=>'ewns');
+		$f->Entry(%entryright,
+			-textvariable=>\$self->{ciccnt},
+		)->grid(-row=>$row,-column=>1,-sticky=>'ewns');
+		$f->Label(%labelright,
+			-text=>'Active circuits:',
+		)->grid(-row=>$row,-column=>2,-sticky=>'ewns');
+		$f->Entry(%entryright,
+			-textvariable=>\$self->{actcnt},
+		)->grid(-row=>$row,-column=>3,-sticky=>'ewns');
+		if (ref $self eq 'Ssp' or ref $self eq 'Node') {
+			$f->Label(%labelright,
 				-text=>'Active O/G circuits:',
-			)->grid(-row=>$row,-column=>2,-sticky=>'ew');
-			$tw->Entry(
-				-readonlybackground=>'white',
-				-background=>'white',
-				-justify=>'right',
-				-textvariable=>\$self->{'actog'},
-				-state=>'readonly',
-				-exportselection=>1,
-			)->grid(-row=>$row++,-column=>3,-sticky=>'ew');
-		}
-		if ($self->{'actic'}) {
-			$tw->Label(
-				-anchor=>'e',
-				-justify=>'right',
+			)->grid(-row=>$row,-column=>4,-sticky=>'ewns');
+			$f->Entry(%entryright,
+				-textvariable=>\$self->{actog},
+			)->grid(-row=>$row++,-column=>5,-sticky=>'ewns');
+			$f->Label(%labelright,
 				-text=>'Active I/C circuits:',
-			)->grid(-row=>$row,-column=>2,-sticky=>'ew');
-			$tw->Entry(
-				-readonlybackground=>'white',
-				-background=>'white',
-				-justify=>'right',
-				-textvariable=>\$self->{'actic'},
-				-state=>'readonly',
-				-exportselection=>1,
-			)->grid(-row=>$row++,-column=>3,-sticky=>'ew');
-		}
-		if ($self->{'act2w'}) {
-			$tw->Label(
-				-anchor=>'e',
-				-justify=>'right',
+			)->grid(-row=>$row,-column=>4,-sticky=>'ewns');
+			$f->Entry(%entryright,
+				-textvariable=>\$self->{actic},
+			)->grid(-row=>$row++,-column=>5,-sticky=>'ewns');
+			$f->Label(%labelright,
 				-text=>'Active 2/W circuits:',
-			)->grid(-row=>$row,-column=>2,-sticky=>'ew');
-			$tw->Entry(
-				-readonlybackground=>'white',
-				-background=>'white',
-				-justify=>'right',
-				-textvariable=>\$self->{'act2w'},
-				-state=>'readonly',
-				-exportselection=>1,
-			)->grid(-row=>$row++,-column=>3,-sticky=>'ew');
+			)->grid(-row=>$row,-column=>4,-sticky=>'ewns');
+			$f->Entry(%entryright,
+				-textvariable=>\$self->{act2w},
+			)->grid(-row=>$row++,-column=>5,-sticky=>'ewns');
 		}
-		if ($self->{'actforw'}) {
-			$tw->Label(
-				-anchor=>'e',
-				-justify=>'right',
+		if (ref $self eq 'Relation' or ref $self eq 'LinkSet') {
+			$f->Label(%labelright,
 				-text=>'Active forward circuits:',
-			)->grid(-row=>$row,-column=>2,-sticky=>'ew');
-			$tw->Entry(
-				-readonlybackground=>'white',
-				-background=>'white',
-				-justify=>'right',
-				-textvariable=>\$self->{'actforw'},
-				-state=>'readonly',
-				-exportselection=>1,
-			)->grid(-row=>$row++,-column=>3,-sticky=>'ew');
-		}
-		if ($self->{'actrevs'}) {
-			$tw->Label(
-				-anchor=>'e',
-				-justify=>'right',
+			)->grid(-row=>$row,-column=>4,-sticky=>'ewns');
+			$f->Entry(%entryright,
+				-textvariable=>\$self->{actforw},
+			)->grid(-row=>$row++,-column=>5,-sticky=>'ewns');
+			$f->Label(%labelright,
 				-text=>'Active reverse circuits:',
-			)->grid(-row=>$row,-column=>2,-sticky=>'ew');
-			$tw->Entry(
-				-readonlybackground=>'white',
-				-background=>'white',
-				-justify=>'right',
-				-textvariable=>\$self->{'actrevs'},
-				-state=>'readonly',
-				-exportselection=>1,
-			)->grid(-row=>$row++,-column=>3,-sticky=>'ew');
-		}
-		if ($self->{'actboth'}) {
-			$tw->Label(
-				-anchor=>'e',
-				-justify=>'right',
+			)->grid(-row=>$row,-column=>4,-sticky=>'ewns');
+			$f->Entry(%entryright,
+				-textvariable=>\$self->{actrevs},
+			)->grid(-row=>$row++,-column=>5,-sticky=>'ewns');
+			$f->Label(%labelright,
 				-text=>'Active bothway circuits:',
-			)->grid(-row=>$row,-column=>2,-sticky=>'ew');
-			$tw->Entry(
-				-readonlybackground=>'white',
-				-background=>'white',
-				-justify=>'right',
-				-textvariable=>\$self->{'actboth'},
-				-state=>'readonly',
-				-exportselection=>1,
-			)->grid(-row=>$row++,-column=>3,-sticky=>'ew');
+			)->grid(-row=>$row,-column=>4,-sticky=>'ewns');
+			$f->Entry(%entryright,
+				-textvariable=>\$self->{actboth},
+			)->grid(-row=>$row++,-column=>5,-sticky=>'ewns');
 		}
-		if ($self->{'actcnt'}) {
-			$self->addcstat($tw,\$row,$span,CTS_IDLE,'idle occupancy','idle duration','idle periods');
-			$self->addcstat($tw,\$row,$span,CTS_WAIT_ACM,'setup occupancy','setup duration','call attempts');
-			$self->addcstat($tw,\$row,$span,CTS_WAIT_ANM,'ringing occupancy','ringing duration','call alerts');
-			$self->addcstat($tw,\$row,$span,CTS_ANSWERED,'call occupancy','call duration','call completions');
-			$self->addcstat($tw,\$row,$span,CTS_SUSPENDED,'suspended occupancy','suspended duration','call suspensions');
-			$self->addcstat($tw,\$row,$span,CTS_WAIT_RLC,'release occupancy','release duration','call releases');
+		if (ref $self eq 'Network') {
+			$f->Label(%labelright,
+				-text=>'Active one-way circuits:',
+			)->grid(-row=>$row,-column=>4,-sticky=>'ewns');
+			$f->Entry(%entryright,
+				-textvariable=>\$self->{act1w},
+			)->grid(-row=>$row++,-column=>5,-sticky=>'ewns');
+			$f->Label(%labelright,
+				-text=>'Active bothway circuits:',
+			)->grid(-row=>$row,-column=>4,-sticky=>'ewns');
+			$f->Entry(%entryright,
+				-textvariable=>\$self->{act2w},
+			)->grid(-row=>$row++,-column=>5,-sticky=>'ewns');
+		}
+		if ($self->{actcnt}) {
+			$f = $tw->TFrame(%tframestyle,
+				-label=>'Call stats:',
+			)->pack(%tframepack);
+			$row = 0;
+			$f->Label(%labelcenter,
+				-text=>'Occupancy',
+			)->grid(-row=>$row,-column=>2,-sticky=>'ewns');
+			$f->Label(%labelcenter,
+				-text=>'Periods',
+			)->grid(-row=>$row,-column=>3,-sticky=>'ewns');
+			$f->Label(%labelcenter,
+				-text=>'Duration',
+			)->grid(-row=>$row,-column=>4,-sticky=>'ewns');
+			$f->Label(%labelcenter,
+				-text=>'Distribution',
+			)->grid(-row=>$row++,-column=>5,-sticky=>'ewns');
+			$self->addcstat($f,\$row,$span,CTS_IDLE,'Idle:');
+			$self->addcstat($f,\$row,$span,CTS_WAIT_ACM,'Setup:');
+			$self->addcstat($f,\$row,$span,CTS_WAIT_ANM,'Ringing:');
+			$self->addcstat($f,\$row,$span,CTS_ANSWERED,'Talk:');
+			$self->addcstat($f,\$row,$span,CTS_SUSPENDED,'Suspension:');
+			$self->addcstat($f,\$row,$span,CTS_WAIT_RLC,'Release:');
 		}
 	}
 	$tw->MapWindow;
@@ -1256,7 +1464,7 @@ sub cstat {
 package Relation;
 use strict;
 use vars qw(@ISA);
-@ISA = qw(MsgStats);
+@ISA = qw(MsgStats Logging);
 # -------------------------------------
 # A relation is an association between signalling points that communicate with
 # each other.  This object is used to track these interactions, primarily for
@@ -1270,39 +1478,40 @@ my $relationno = 0;
 sub init {
 	my ($self,$relationno,$nodea,$nodeb,@args) = @_;
 	$self->MsgStats::init(@args);
-	$self->{'key'} = "$nodea->{'pc'},$nodeb->{'pc'}";
-	$self->{'cics'} = {};
-	$self->{'ciccnt'} = 0;
-	$self->{'actcnt'} = 0;
-	$self->{'actforw'} = 0;
-	$self->{'actrevs'} = 0;
-	$self->{'actboth'} = 0;
-	$self->{'slcs'} = {};
-	$self->{'slccnt'} = 0;
-	$self->{'nodea'} = $nodea;
-	$self->{'nodeb'} = $nodeb;
-	$nodea->{'relate'}->{$nodeb->{'pc'}} = $self;
-	$nodeb->{'relate'}->{$nodea->{'pc'}} = $self;
-	my $xa = $self->{'xa'} = $nodea->{'x'};
-	my $ya = $self->{'ya'} = $nodea->{'y'};
-	my $xb = $self->{'xb'} = $nodeb->{'x'};
-	my $yb = $self->{'yb'} = $nodeb->{'y'};
-	$self->{'x'} = ($xa + $xb)/2;
-	$self->{'y'} = ($ya + $yb)/2;
-	$self->{'fill'} = 'grey';
-	$self->{'item'} = $main::canvas->createLine($xa,$ya,$xb,$yb,
+	$self->Logging::init(@args);
+	$self->{key} = "$nodea->{pc},$nodeb->{pc}";
+	$self->{cics} = {};
+	$self->{ciccnt} = 0;
+	$self->{actcnt} = 0;
+	$self->{actforw} = 0;
+	$self->{actrevs} = 0;
+	$self->{actboth} = 0;
+	$self->{slcs} = {};
+	$self->{slccnt} = 0;
+	$self->{nodea} = $nodea;
+	$self->{nodeb} = $nodeb;
+	$nodea->{relate}->{$nodeb->{pc}} = $self;
+	$nodeb->{relate}->{$nodea->{pc}} = $self;
+	my $xa = $self->{xa} = $nodea->{x};
+	my $ya = $self->{ya} = $nodea->{y};
+	my $xb = $self->{xb} = $nodeb->{x};
+	my $yb = $self->{yb} = $nodeb->{y};
+	$self->{x} = ($xa + $xb)/2;
+	$self->{y} = ($ya + $yb)/2;
+	$self->{fill} = 'grey';
+	$self->{item} = $main::canvas->createLine($xa,$ya,$xb,$yb,
 		-arrow=>'none',
 		-capstyle=>'round',
-		-fill=>$self->{'fill'},
+		-fill=>$self->{fill},
 		-joinstyle=>'round',
 		-smooth=>0,
 		-tags=>['relation'],
 		-width=>1,
 	);
-	$main::canvas->bind($self->{'item'},'<ButtonPress-3>',[\&Relation::button3,$self,Tk::Ev('X'),Tk::Ev('Y')]);
+	$main::canvas->bind($self->{item},'<ButtonPress-3>',[\&Relation::button3,$self,Tk::Ev('X'),Tk::Ev('Y')]);
 	$main::canvas->lower('relation','node');
 	$main::canvas->lower('relation','path');
-	$main::top->{'updatenow'} = 1;
+	$main::top->{updatenow} = 1;
 #	$main::canvas->idletasks;
 
 
@@ -1313,7 +1522,7 @@ sub new {
 	my ($type,$network,@args) = @_;
 	my $self = {};
 	bless $self,$type;
-	$self->{'network'} = $network;
+	$self->{network} = $network;
 	$self->init(@args);
 	return $self;
 }
@@ -1321,13 +1530,13 @@ sub new {
 #package Relation;
 sub get {
 	my ($type,$nodea,$nodeb,@args) = @_;
-	my $key = "$nodea->{'pc'},$nodeb->{'pc'}";
+	my $key = "$nodea->{pc},$nodeb->{pc}";
 	return $relations{$key} if exists $relations{$key};
 	my $self = {};
 	bless $self, $type;
 	$relationno = $relationno + 1;
 	$relations{$key} = $self;
-	$key = "$nodeb->{'pc'},$nodea->{'pc'}";
+	$key = "$nodeb->{pc},$nodea->{pc}";
 	$relations{$key} = $self; # place reverse entry too
 	$self->init($relationno,$nodea,$nodeb,@args);
 	return $self;
@@ -1341,46 +1550,46 @@ sub makeLinkSet {
 sub identify {
 	my $self = shift;
 	my $id = "Signalling relation between ";
-	$id .= "$self->{'nodea'}->{'pcode'}";
-	$id .= " ($self->{'nodea'}->{'pownr'})" if $self->{'nodea'}->{'pownr'};
-	$id .= " and $self->{'nodeb'}->{'pcode'}";
-	$id .= " ($self->{'nodeb'}->{'pownr'})" if $self->{'nodeb'}->{'pownr'};
+	$id .= "$self->{nodea}->{pcode}";
+	$id .= " ($self->{nodea}->{pownr})" if $self->{nodea}->{pownr};
+	$id .= " and $self->{nodeb}->{pcode}";
+	$id .= " ($self->{nodeb}->{pownr})" if $self->{nodeb}->{pownr};
 	return $id;
 }
 
 #package Relation;
 sub add_forw { # from nodea to nodeb
 	my ($self,$msg) = @_;
-	my $si = $msg->{'si'};
-	my $mt = $msg->{'mt'};
+	my $si = $msg->{si};
+	my $mt = $msg->{mt};
 	if ($si == 5) {
 		if ($mt == 0x10 || (0x12 <= $mt && $mt <= 0x1b) || $mt == 0x2a || $mt == 0x2b) {
-			unless ($self->{'xchg_isup'}) {
-				$self->{'xchg_isup'} = 1;
-				$self->{'reanalyze'} = 1;
+			unless ($self->{xchg_isup}) {
+				$self->{xchg_isup} = 1;
+				$self->{reanalyze} = 1;
 			}
 		}
-		$self->reanalyze if $self->{'reanalyze'};
+		$self->reanalyze if $self->{reanalyze};
 		return;
 	}
 	if ($si == 3) {
 		if ($mt == 0x09 || $mt == 0x11 || $mt == 0x13) { # udt,xudt,ludt
-			unless ($self->{'forw_tcap'}) {
-				$self->{'forw_tcap'} = 1;
-				$self->{'reanalyze'} = 1;
+			unless ($self->{forw_tcap}) {
+				$self->{forw_tcap} = 1;
+				$self->{reanalyze} = 1;
 			}
 		}
-		$self->reanalyze if $self->{'reanalyze'};
+		$self->reanalyze if $self->{reanalyze};
 		return;
 	}
 	if ($si == 2 || $si == 1) {
 		if ($mt == 0x11 || $mt == 0x12) { # sltm,slta
-			unless ($self->{'exch_sltm'}) {
-				$self->{'exch_sltm'} = 1;
-				$self->{'reanalyze'} = 1;
+			unless ($self->{exch_sltm}) {
+				$self->{exch_sltm} = 1;
+				$self->{reanalyze} = 1;
 			}
 		}
-		$self->reanalyze if $self->{'reanalyze'};
+		$self->reanalyze if $self->{reanalyze};
 		return;
 	}
 }
@@ -1388,36 +1597,36 @@ sub add_forw { # from nodea to nodeb
 #package Relation;
 sub add_revs { # from nodeb to nodea
 	my ($self,$msg) = @_;
-	my $si = $msg->{'si'};
-	my $mt = $msg->{'mt'};
+	my $si = $msg->{si};
+	my $mt = $msg->{mt};
 	if ($si == 5) {
 		if ($mt == 0x10 || (0x12 <= $mt && $mt <= 0x1b) || $mt == 0x2a || $mt == 0x2b) {
-			unless ($self->{'xchg_isup'}) {
-				$self->{'xchg_isup'} = 1;
-				$self->{'reanalyze'} = 1;
+			unless ($self->{xchg_isup}) {
+				$self->{xchg_isup} = 1;
+				$self->{reanalyze} = 1;
 			}
 		}
-		$self->reanalyze if $self->{'reanalyze'};
+		$self->reanalyze if $self->{reanalyze};
 		return;
 	}
 	if ($si == 3) {
 		if ($mt == 0x09 || $mt == 0x11 || $mt == 0x13) { # udt,xudt,ludt
-			unless ($self->{'revs_tcap'}) {
-				$self->{'revs_tcap'} = 1;
-				$self->{'reanalyze'} = 1;
+			unless ($self->{revs_tcap}) {
+				$self->{revs_tcap} = 1;
+				$self->{reanalyze} = 1;
 			}
 		}
-		$self->reanalyze if $self->{'reanalyze'};
+		$self->reanalyze if $self->{reanalyze};
 		return;
 	}
 	if ($si == 2 || $si == 1) {
 		if ($mt == 0x11 || $mt == 0x12) { # sltm,slta
-			unless ($self->{'xchg_sltm'}) {
-				$self->{'xchg_sltm'} = 1;
-				$self->{'reanalyze'} = 1;
+			unless ($self->{xchg_sltm}) {
+				$self->{xchg_sltm} = 1;
+				$self->{reanalyze} = 1;
 			}
 		}
-		$self->reanalyze if $self->{'reanalyze'};
+		$self->reanalyze if $self->{reanalyze};
 		return;
 	}
 }
@@ -1425,138 +1634,135 @@ sub add_revs { # from nodeb to nodea
 #package Relation;
 sub add {
 	my ($self,$msg) = @_;
-	$self->inc($msg);
-	$self->{'network'}->inc($msg);
-	if ($msg->{'si'} == 5) {
-		my $circuit = Circuit->get($self,$msg->{'cic'});
+	if ($msg->{si} == 5) {
+		my $circuit = Circuit->get($self,$msg->{cic});
 		$circuit->add_msg($msg);
 	}
-	if ($self->{'key'} eq "$msg->{'opc'},$msg->{'dpc'}") {
+	if ($self->{key} eq "$msg->{opc},$msg->{dpc}") {
 		$self->add_forw($msg);
+		$self->inc($msg,'0');
+		$self->{network}->inc($msg,'0');
 		return;
 	}
-	if ($self->{'key'} eq "$msg->{'dpc'},$msg->{'opc'}") {
+	if ($self->{key} eq "$msg->{dpc},$msg->{opc}") {
 		$self->add_revs($msg);
+		$self->inc($msg,'1');
+		$self->{network}->inc($msg,'1');
 		return;
 	}
-	print STDERR "error key=$self->{'key'}, opc=$msg->{'opc'}, dpc=$msg->{'dpc'}\n";
+	print STDERR "error key=$self->{key}, opc=$msg->{opc}, dpc=$msg->{dpc}\n";
 }
 
 #package Relation;
 sub reanalyze {
 	my $self = shift;
-	if ($self->{'xchg_sltm'}) {
-		$self->{'fill'} = 'black';
-		$main::canvas->itemconfigure($self->{'item'}, -fill=>$self->{'fill'});
+	if ($self->{xchg_sltm}) {
+		$self->{fill} = 'black';
+		$main::canvas->itemconfigure($self->{item}, -fill=>$self->{fill});
 		return;
 	}
-	if ($self->{'xchg_isup'}) {
-		$self->{'fill'} = 'blue';
-		$main::canvas->itemconfigure($self->{'item'}, -fill=>$self->{'fill'});
+	if ($self->{xchg_isup}) {
+		$self->{fill} = 'blue';
+		$main::canvas->itemconfigure($self->{item}, -fill=>$self->{fill});
 		return;
 	}
-	if ($self->{'forw_tcap'} && $self->{'revs_tcap'}) {
-		$self->{'fill'} = 'blue';
-		$main::canvas->itemconfigure($self->{'item'}, -fill=>$self->{'fill'});
+	if ($self->{forw_tcap} && $self->{revs_tcap}) {
+		$self->{fill} = 'blue';
+		$main::canvas->itemconfigure($self->{item}, -fill=>$self->{fill});
 		return;
 	}
-	if ($self->{'forw_tcap'}) {
-		$self->{'fill'} = 'red';
-		$main::canvas->itemconfigure($self->{'item'}, -fill=>$self->{'fill'});
+	if ($self->{forw_tcap}) {
+		$self->{fill} = 'red';
+		$main::canvas->itemconfigure($self->{item}, -fill=>$self->{fill});
 		return;
 	}
-	if ($self->{'revs_tcap'}) {
-		$self->{'fill'} = 'green';
-		$main::canvas->itemconfigure($self->{'item'}, -fill=>$self->{'fill'});
+	if ($self->{revs_tcap}) {
+		$self->{fill} = 'green';
+		$main::canvas->itemconfigure($self->{item}, -fill=>$self->{fill});
 		return;
 	}
-	$self->{'fill'} = 'gray';
-	$main::canvas->itemconfigure($self->{'item'}, -fill=>$self->{'fill'});
+	$self->{fill} = 'gray';
+	$main::canvas->itemconfigure($self->{item}, -fill=>$self->{fill});
 	return;
-	if ($self->{'xchg_isup'}) {
-		if ($self->{'forw_tcap'}) {
-			if ($self->{'revs_tcap'}) {
-				if ($self->{'xchg_sltm'}) {
+	if ($self->{xchg_isup}) {
+		if ($self->{forw_tcap}) {
+			if ($self->{revs_tcap}) {
+				if ($self->{xchg_sltm}) {
 				} else {
 				}
 			} else {
-				if ($self->{'xchg_sltm'}) {
+				if ($self->{xchg_sltm}) {
 				} else {
 				}
 			}
 		} else {
-			if ($self->{'revs_tcap'}) {
-				if ($self->{'xchg_sltm'}) {
+			if ($self->{revs_tcap}) {
+				if ($self->{xchg_sltm}) {
 				} else {
 				}
 			} else {
-				if ($self->{'xchg_sltm'}) {
+				if ($self->{xchg_sltm}) {
 				} else {
 				}
 			}
 		}
 	} else {
-		if ($self->{'forw_tcap'}) {
-			if ($self->{'revs_tcap'}) {
-				if ($self->{'xchg_sltm'}) {
+		if ($self->{forw_tcap}) {
+			if ($self->{revs_tcap}) {
+				if ($self->{xchg_sltm}) {
 				} else {
 				}
 			} else {
 				# SCP's originate but never terminate
-				if ($self->{'xchg_sltm'}) {
+				if ($self->{xchg_sltm}) {
 				} else {
 				}
 			}
 		} else {
-			if ($self->{'revs_tcap'}) {
+			if ($self->{revs_tcap}) {
 				# GTT functions never originate, just terminate
-				if ($self->{'xchg_sltm'}) {
+				if ($self->{xchg_sltm}) {
 				} else {
 				}
 			} else {
-				if ($self->{'xchg_sltm'}) {
+				if ($self->{xchg_sltm}) {
 				} else {
 				}
 			}
 		}
 	}
-	delete $self->{'reanalyze'};
+	delete $self->{reanalyze};
 }
 
 #package Relation;
 sub move {
 	my $self = shift;
-	my $nodea = $self->{'nodea'};
-	my $nodeb = $self->{'nodeb'};
-	my $xa = $nodea->{'x'};
-	my $ya = $nodea->{'y'};
-	my $xb = $nodeb->{'x'};
-	my $yb = $nodeb->{'y'};
-	return if $xa == $self->{'xa'} &&
-		  $ya == $self->{'ya'} &&
-		  $xb == $self->{'xb'} &&
-		  $yb == $self->{'yb'};
-	$self->{'cola'} = $nodea->{'col'};
-	$self->{'rowa'} = $nodea->{'row'};
-	$self->{'colb'} = $nodeb->{'col'};
-	$self->{'rowb'} = $nodeb->{'row'};
-	$main::canvas->coords($self->{'item'},$xa,$ya,$xb,$yb);
-	$self->{'xa'} = $xa;
-	$self->{'ya'} = $ya;
-	$self->{'xb'} = $xb;
-	$self->{'yb'} = $yb;
-	$self->{'x'} = ($xa + $xb)/2;
-	$self->{'y'} = ($ya + $yb)/2;
+	my $nodea = $self->{nodea};
+	my $nodeb = $self->{nodeb};
+	my $xa = $nodea->{x};
+	my $ya = $nodea->{y};
+	my $xb = $nodeb->{x};
+	my $yb = $nodeb->{y};
+	return if $xa == $self->{xa} &&
+		  $ya == $self->{ya} &&
+		  $xb == $self->{xb} &&
+		  $yb == $self->{yb};
+	$self->{cola} = $nodea->{col};
+	$self->{rowa} = $nodea->{row};
+	$self->{colb} = $nodeb->{col};
+	$self->{rowb} = $nodeb->{row};
+	$main::canvas->coords($self->{item},$xa,$ya,$xb,$yb);
+	$self->{xa} = $xa;
+	$self->{ya} = $ya;
+	$self->{xb} = $xb;
+	$self->{yb} = $yb;
+	$self->{x} = ($xa + $xb)/2;
+	$self->{y} = ($ya + $yb)/2;
 }
 
 #package Relation;
-sub button3 {
-	my ($canvas,$self,$X,$Y) = @_;
-	my $m = $canvas->toplevel->Menu(
-		-tearoff=>1,
-		-title=>'Relation Menu',
-		-type=>'normal',
-	);
+sub getmenu {
+	my ($self,$m,$canvas,$X,$Y) = @_;
 	$m->add('command',
 		#-accelerator=>'p',
 		-command=>[\&Relation::props, $self, $canvas, $X, $Y],
@@ -1570,17 +1776,106 @@ sub button3 {
 		-underline=>9,
 	);
 	$m->add('command',
+		#-accelerator=>'l',
+		-command=>[\&Logging::showlog, $self, $canvas, $X, $Y],
+		-label=>'Relation Logs...',
+		-underline=>9,
+		-state=>(@{$self->{logs}} ? 'normal' : 'disabled'),
+	);
+	$m->add('command',
 		#-accelerator=>'m',
 		-command=>[\&MsgStats::stats, $self, $canvas, $X, $Y],
 		-label=>'Message Statistics...',
 		-underline=>0,
+		-state=>($self->{incs}->{0}->{sus} + $self->{incs}->{1}->{sus} ? 'normal' : 'disabled'),
 	);
 	$m->add('command',
 		#-accelerator=>'c',
 		-command=>[\&MsgStats::cstat, $self, $canvas, $X, $Y],
 		-label=>'Call statistics...',
 		-underline=>0,
+		-state=>($self->{ciccnt} ? 'normal' : 'disabled'),
 	);
+}
+
+#package Relation;
+sub button3 {
+	my ($canvas,$self,$X,$Y) = @_;
+	my ($m,$mc,$m3,$pf,$pr);
+	$m = $canvas->toplevel->Menu(
+		-tearoff=>1,
+		-title=>'Relation Menu',
+		-type=>'normal',
+	);
+	$mc = $m->Menu(
+		-tearoff=>1,
+		-title=>'Links Menu',
+	);
+	foreach my $slc (sort {$a <=> $b} keys %{$self->{links}}) {
+		my $path;
+		$m3 = $mc->Menu(
+			-tearoff=>1,
+			-title=>"Link $slc Menu",
+		);
+		$path = $self->{links}->{$slc}->{pathforw};
+		$pf = $m3->Menu(
+			-tearoff=>1,
+			-title=>'Forward path Menu',
+		);
+		$path->getmenu($pf,$canvas,$X,$Y) if ($path);
+		$m3->add('cascade',
+			-menu=>$pf,
+			-label=>'Forward path',
+			-state=>($path?'normal':'disabled'),
+		);
+		$path = $self->{links}->{$slc}->{pathrevs};
+		$pr = $m3->Menu(
+			-tearoff=>1,
+			-title=>'Reverse path Menu',
+		);
+		$path->getmenu($pr,$canvas,$X,$Y) if ($path);
+		$m3->add('cascade',
+			-menu=>$pr,
+			-label=>'Reverse path',
+			-state=>($path?'normal':'disabled'),
+		);
+		my $link = $self->{links}->{$slc};
+		$mc->add('separator');
+		$link->getmenu($m3,$canvas,$X,$Y);
+		$mc->add('cascade',
+			-menu=>$m3,
+			-label=>"Link $slc",
+		);
+	}
+	$m->add('cascade',
+		-menu=>$mc,
+		-label=>'Links',
+		-state=>((keys %{$self->{links}})?'normal':'disabled'),
+	);
+	$mc = $m->Menu(
+		-tearoff=>1,
+		-title=>'Circuits Menu',
+	);
+	foreach my $cic (sort {$a <=> $b} keys %{$self->{cics}}) {
+		my $circuit;
+		$m3 = $mc->Menu(
+			-tearoff=>1,
+			-title=>"Circuit $cic Menu",
+		);
+		$circuit = $self->{cics}->{$cic};
+		$circuit->getmenu($m3,$canvas,$X,$Y) if $circuit;
+		$mc->add('cascade',
+			-menu=>$m3,
+			-label=>"Circuit $cic",
+		);
+	}
+	$m->add('cascade',
+		-menu=>$mc,
+		-label=>'Circuits',
+		-state=>((keys %{$self->{cics}})?'normal':'disabled'),
+	);
+	$m->add('separator');
+	$self->getmenu($m,$canvas,$X,$Y);
 	$m->Popup(
 		-popanchor=>'nw',
 		-popover=>'cursor',
@@ -1593,7 +1888,7 @@ sub props {
 	my $row = 0;
 	my $tw;
 	my $v = 'Signalling relation';
-	if ($tw = $self->{'props'}) {
+	if ($tw = $self->{props}) {
 		if ($tw->state eq 'iconic') {
 			$tw->deiconify;
 		} else {
@@ -1605,7 +1900,7 @@ sub props {
 			-title=>$title,
 		);
 		$tw->group($canvas->toplevel);
-		$tw->transient($canvas->toplevel);
+		#$tw->transient($canvas->toplevel);
 		$tw->iconimage('icon');
 		$tw->iconname($title);
 		$tw->resizable(0,0);
@@ -1613,69 +1908,34 @@ sub props {
 		$tw->geometry("+$X+$Y");
 		$tw->protocol('WM_DELETE_WINDOW', [sub {
 			my $self = shift;
-			my $tw = $self->{'props'};
-			$self->{'props'} = undef;
+			my $tw = $self->{props};
+			$self->{props} = undef;
 			$tw->destroy;
 		},$self]);
-		$self->{'props'} = $tw;
+		$self->{props} = $tw;
 
-		$tw->Label(
-			-anchor=>'e',
-			-justify=>'right',
+		$tw->Label(%labelright,
 			-text=>'Object type:',
-		)->grid(-row=>$row,-column=>0,-sticky=>'ew');
-		$tw->Entry(
-			-readonlybackground=>'white',
-			-background=>'white',
+		)->grid(-row=>$row,-column=>0,-sticky=>'ewns');
+		$tw->Entry(%entryleft,
 			-textvariable=>\$v,
-			-state=>'readonly',
-			-exportselection=>1,
-		)->grid(-row=>$row++,-column=>1,-sticky=>'ew');
-		$tw->Label(
-			-anchor=>'e',
-			-justify=>'right',
+		)->grid(-row=>$row++,-column=>1,-sticky=>'ewns');
+		$tw->Label(%labelright,
 			-text=>'Node A point code:',
-		)->grid(-row=>$row,-column=>0,-sticky=>'ew');
-		my $pca = $self->{'nodea'}->{'pcode'};
-		$pca .= " ($self->{'nodea'}->{'pownr'})" if $self->{'nodea'}->{'pownr'};
-		$tw->Entry(
-			-readonlybackground=>'white',
-			-background=>'white',
+		)->grid(-row=>$row,-column=>0,-sticky=>'ewns');
+		my $pca = $self->{nodea}->{pcode};
+		$pca .= " ($self->{nodea}->{pownr})" if $self->{nodea}->{pownr};
+		$tw->Entry(%entryleft,
 			-textvariable=>\$pca,
-			-state=>'readonly',
-			-exportselection=>1,
-		)->grid(-row=>$row++,-column=>1,-sticky=>'ew');
-		$tw->Label(
-			-anchor=>'e',
-			-justify=>'right',
+		)->grid(-row=>$row++,-column=>1,-sticky=>'ewns');
+		$tw->Label(%labelright,
 			-text=>'Node B point code:',
-		)->grid(-row=>$row,-column=>0,-sticky=>'ew');
-		my $pcb = $self->{'nodeb'}->{'pcode'};
-		$pcb .= " ($self->{'nodeb'}->{'pownr'})" if $self->{'nodeb'}->{'pownr'};
-		$tw->Entry(
-			-readonlybackground=>'white',
-			-background=>'white',
+		)->grid(-row=>$row,-column=>0,-sticky=>'ewns');
+		my $pcb = $self->{nodeb}->{pcode};
+		$pcb .= " ($self->{nodeb}->{pownr})" if $self->{nodeb}->{pownr};
+		$tw->Entry(%entryleft,
 			-textvariable=>\$pcb,
-			-state=>'readonly',
-			-exportselection=>1,
-		)->grid(-row=>$row++,-column=>1,-sticky=>'ew');
-		foreach my $pc (sort {$a <=> $b} keys %{$self->{'responds'}}) {
-			$tw->Label(
-				-anchor=>'e',
-				-justify=>'right',
-				-text=>'Responses from:',
-			)->grid(-row=>$row,-column=>0,-sticky=>'ew');
-			my $pcode = main::pcstring($pc);
-			my $pownr = main::pcowner($pc,0);
-			$pcode .= " ($pownr)" if $pownr;
-			$tw->Entry(
-				-readonlybackground=>'white',
-				-background=>'white',
-				-textvariable=>\$pcode,
-				-state=>'readonly',
-				-exportselection=>1,
-			)->grid(-row=>$row++,-column=>1,-sticky=>'ew');
-		}
+		)->grid(-row=>$row++,-column=>1,-sticky=>'ewns');
 	}
 	$tw->MapWindow;
 }
@@ -1686,7 +1946,7 @@ sub status {
 	my $row = 0;
 	my $tw;
 	my $v = 'Signalling relation';
-	if ($tw = $self->{'status'}) {
+	if ($tw = $self->{status}) {
 		if ($tw->state eq 'iconic') {
 			$tw->deiconify;
 		} else {
@@ -1698,7 +1958,7 @@ sub status {
 			-title=>$title,
 		);
 		$tw->group($canvas->toplevel);
-		$tw->transient($canvas->toplevel);
+		#$tw->transient($canvas->toplevel);
 		$tw->iconimage('icon');
 		$tw->iconname($title);
 		$tw->resizable(0,0);
@@ -1706,150 +1966,98 @@ sub status {
 		$tw->geometry("+$X+$Y");
 		$tw->protocol('WM_DELETE_WINDOW', [sub {
 			my $self = shift;
-			my $tw = $self->{'status'};
-			$self->{'status'} = undef;
+			my $tw = $self->{status};
+			$self->{status} = undef;
 			$tw->destroy;
 		},$self]);
-		$self->{'status'} = $tw;
+		$self->{status} = $tw;
 
-		$tw->Label(
-			-anchor=>'e',
-			-justify=>'right',
+		$tw->Label(%labelright,
 			-text=>'Exchange SLTM',
-		)->grid(-row=>$row,-column=>0,-sticky=>'ew');
-		$tw->Checkbutton(
-			-anchor=>'w',
-			-justify=>'left',
-			-indicatoron=>1,
-			-variable=>\$self->{'xchg_sltm'},
+		)->grid(-row=>$row,-column=>0,-sticky=>'ewns');
+		$tw->Checkbutton(%buttonleft,
+			-variable=>\$self->{xchg_sltm},
 			-text=>'Exchanges SLTM',
-			-stat=>'disabled',
-		)->grid(-row=>$row++,-column=>1,-sticky=>'ew');
-		$tw->Label(
-			-anchor=>'e',
-			-justify=>'right',
+		)->grid(-row=>$row++,-column=>1,-sticky=>'ewns');
+		$tw->Label(%labelright,
 			-text=>'Exchange ISUP:',
-		)->grid(-row=>$row,-column=>0,-sticky=>'ew');
-		$tw->Checkbutton(
-			-anchor=>'w',
-			-justify=>'left',
-			-indicatoron=>1,
-			-variable=>\$self->{'xchg_isup'},
+		)->grid(-row=>$row,-column=>0,-sticky=>'ewns');
+		$tw->Checkbutton(%buttonleft,
+			-variable=>\$self->{xchg_isup},
 			-text=>'Exchanges ISUP',
-			-stat=>'disabled',
-		)->grid(-row=>$row++,-column=>1,-sticky=>'ew');
-		$tw->Label(
-			-anchor=>'e',
-			-justify=>'right',
+		)->grid(-row=>$row++,-column=>1,-sticky=>'ewns');
+		$tw->Label(%labelright,
 			-text=>'Forward TCAP',
-		)->grid(-row=>$row,-column=>0,-sticky=>'ew');
-		$tw->Checkbutton(
-			-anchor=>'w',
-			-justify=>'left',
-			-indicatoron=>1,
-			-variable=>\$self->{'forw_tcap'},
+		)->grid(-row=>$row,-column=>0,-sticky=>'ewns');
+		$tw->Checkbutton(%buttonleft,
+			-variable=>\$self->{forw_tcap},
 			-text=>'Forward TCAP',
-			-stat=>'disabled',
-		)->grid(-row=>$row++,-column=>1,-sticky=>'ew');
-		$tw->Label(
-			-anchor=>'e',
-			-justify=>'right',
+		)->grid(-row=>$row++,-column=>1,-sticky=>'ewns');
+		$tw->Label(%labelright,
 			-text=>'Reverse TCAP',
-		)->grid(-row=>$row,-column=>0,-sticky=>'ew');
-		$tw->Checkbutton(
-			-anchor=>'w',
-			-justify=>'left',
-			-indicatoron=>1,
-			-variable=>\$self->{'revs_tcap'},
+		)->grid(-row=>$row,-column=>0,-sticky=>'ewns');
+		$tw->Checkbutton(%buttonleft,
+			-variable=>\$self->{revs_tcap},
 			-text=>'Reverse TCAP',
-			-stat=>'disabled',
-		)->grid(-row=>$row++,-column=>1,-sticky=>'ew');
-		if ($self->{'slccnt'}) {
-			$tw->Label(
-				-anchor=>'e',
-				-justify=>'right',
+		)->grid(-row=>$row++,-column=>1,-sticky=>'ewns');
+		if ($self->{slccnt}) {
+			$tw->Label(%labelright,
 				-text=>'Signalling links:',
-			)->grid(-row=>$row,-column=>0,-sticky=>'ew');
-			$tw->Entry(
-				-readonlybackground=>'white',
-				-background=>'white',
-				-textvariable=>\$self->{'slccnt'},
-				-state=>'readonly',
-				-exportselection=>1,
-			)->grid(-row=>$row++,-column=>1,-sticky=>'ew');
+			)->grid(-row=>$row,-column=>0,-sticky=>'ewns');
+			$tw->Entry(%entryright,
+				-textvariable=>\$self->{slccnt},
+			)->grid(-row=>$row++,-column=>1,-sticky=>'ewns');
 		}
-		if ($self->{'ciccnt'}) {
-			$tw->Label(
-				-anchor=>'e',
-				-justify=>'right',
+		if ($self->{ciccnt}) {
+			$tw->Label(%labelright,
 				-text=>'Defined circuits:',
-			)->grid(-row=>$row,-column=>0,-sticky=>'ew');
-			$tw->Entry(
-				-readonlybackground=>'white',
-				-background=>'white',
-				-textvariable=>\$self->{'ciccnt'},
-				-state=>'readonly',
-				-exportselection=>1,
-			)->grid(-row=>$row++,-column=>1,-sticky=>'ew');
-			if ($self->{'actcnt'}) {
-				$tw->Label(
-					-anchor=>'e',
-					-justify=>'right',
+			)->grid(-row=>$row,-column=>0,-sticky=>'ewns');
+			$tw->Entry(%entryright,
+				-textvariable=>\$self->{ciccnt},
+			)->grid(-row=>$row++,-column=>1,-sticky=>'ewns');
+			if ($self->{actcnt}) {
+				$tw->Label(%labelright,
 					-text=>'Active circuits:',
-				)->grid(-row=>$row,-column=>0,-sticky=>'ew');
-				$tw->Entry(
-					-readonlybackground=>'white',
-					-background=>'white',
-					-textvariable=>\$self->{'actcnt'},
-					-state=>'readonly',
-					-exportselection=>1,
-				)->grid(-row=>$row++,-column=>1,-sticky=>'ew');
+				)->grid(-row=>$row,-column=>0,-sticky=>'ewns');
+				$tw->Entry(%entryright,
+					-textvariable=>\$self->{actcnt},
+				)->grid(-row=>$row++,-column=>1,-sticky=>'ewns');
 			}
-			if ($self->{'actforw'}) {
-				$tw->Label(
-					-anchor=>'e',
-					-justify=>'right',
+			if ($self->{actforw}) {
+				$tw->Label(%labelright,
 					-text=>'Active forward circuits:',
-				)->grid(-row=>$row,-column=>0,-sticky=>'ew');
-				$tw->Entry(
-					-readonlybackground=>'white',
-					-background=>'white',
-					-textvariable=>\$self->{'actforw'},
-					-state=>'readonly',
-					-exportselection=>1,
-				)->grid(-row=>$row++,-column=>1,-sticky=>'ew');
+				)->grid(-row=>$row,-column=>0,-sticky=>'ewns');
+				$tw->Entry(%entryright,
+					-textvariable=>\$self->{actforw},
+				)->grid(-row=>$row++,-column=>1,-sticky=>'ewns');
 			}
-			if ($self->{'actrevs'}) {
-				$tw->Label(
-					-anchor=>'e',
-					-justify=>'right',
+			if ($self->{actrevs}) {
+				$tw->Label(%labelright,
 					-text=>'Active reverse circuits:',
-				)->grid(-row=>$row,-column=>0,-sticky=>'ew');
-				$tw->Entry(
-					-readonlybackground=>'white',
-					-background=>'white',
-					-textvariable=>\$self->{'actrevs'},
-					-state=>'readonly',
-					-exportselection=>1,
-				)->grid(-row=>$row++,-column=>1,-sticky=>'ew');
+				)->grid(-row=>$row,-column=>0,-sticky=>'ewns');
+				$tw->Entry(%entryright,
+					-textvariable=>\$self->{actrevs},
+				)->grid(-row=>$row++,-column=>1,-sticky=>'ewns');
 			}
-			if ($self->{'actboth'}) {
-				$tw->Label(
-					-anchor=>'e',
-					-justify=>'right',
+			if ($self->{actboth}) {
+				$tw->Label(%labelright,
 					-text=>'Active bothway circuits:',
-				)->grid(-row=>$row,-column=>0,-sticky=>'ew');
-				$tw->Entry(
-					-readonlybackground=>'white',
-					-background=>'white',
-					-textvariable=>\$self->{'actboth'},
-					-state=>'readonly',
-					-exportselection=>1,
-				)->grid(-row=>$row++,-column=>1,-sticky=>'ew');
+				)->grid(-row=>$row,-column=>0,-sticky=>'ewns');
+				$tw->Entry(%entryright,
+					-textvariable=>\$self->{actboth},
+				)->grid(-row=>$row++,-column=>1,-sticky=>'ewns');
 			}
 		}
 	}
 	$tw->MapWindow;
+}
+
+#package Relation;
+sub log {
+	my ($self,$text) = @_;
+	$self->Logging::log($text);
+	$self->{'nodea'}->log($text);
+	$self->{'nodeb'}->log($text);
 }
 
 # -------------------------------------
@@ -1862,33 +2070,33 @@ sub new {
 	my ($type,$circuit) = @_;
 	my $self = {};
 	bless $self,$type;
-	$self->{'circuit'} = $circuit;
-	$self->{'msgs'} = [];
-	$self->{'state'} = 0;
-	if ($circuit->{'call'}) {
-		push @{$circuit->{'calls'}}, $circuit->{'call'};
+	$self->{circuit} = $circuit;
+	$self->{msgs} = [];
+	$self->{state} = 0;
+	if ($circuit->{call}) {
+		push @{$circuit->{calls}}, $circuit->{call};
 	}
-	$circuit->{'call'} = $self;
+	$circuit->{call} = $self;
 	return $self;
 }
 
 #package Call;
 sub setstate {
 	my ($self,$msg,$newstate) = @_;
-	$self->{'state'} = $newstate;
+	$self->{state} = $newstate;
 }
 
 #package Call;
 sub add_msg {
 	my ($self,$msg,$state) = @_;
-	push @{$self->{'msgs'}}, $msg;
+	push @{$self->{msgs}}, $msg;
 	$self->setstate($state);
 }
 
 #package Call;
 sub clear {
 	my ($self,$msg,$state) = @_;
-	$self->{'msgs'} = [];
+	$self->{msgs} = [];
 	$self->setstate($state);
 }
 
@@ -1897,7 +2105,7 @@ sub clear {
 package Circuit;
 use strict;
 use vars qw(@ISA);
-@ISA = qw(MsgStats);
+@ISA = qw(MsgStats Logging);
 # -------------------------------------
 
 use constant {
@@ -1915,31 +2123,32 @@ use constant {
 #package Circuit;
 sub get {
 	my ($type,$group,$cic,@args) = @_;
-	return $group->{'cics'}->{$cic} if exists $group->{'cics'}->{$cic};
+	return $group->{cics}->{$cic} if exists $group->{cics}->{$cic};
 	my $self = {};
 	bless $self,$type;
 	$self->MsgStats::init(@args);
-	$self->{'dir'} = 0;
-	$self->{'cic'} = $cic;
-	$self->{'group'} = $group;
-	$group->{'cics'}->{$cic} = $self;
-	$group->{'ciccnt'} += 1;
-	$group->{'nodea'}->{'ciccnt'} += 1;
-	$group->{'nodeb'}->{'ciccnt'} += 1;
-	$group->{'network'}->{'ciccnt'} += 1;
-	$self->{'active'} = 0;
-	$self->{'call'} = undef;
-	$self->{'calls'} = [];
-	$self->{'state'} = CTS_UNINIT;
+	$self->Logging::init(@args);
+	$self->{dir} = 0;
+	$self->{cic} = $cic;
+	$self->{group} = $group;
+	$group->{cics}->{$cic} = $self;
+	$group->{ciccnt} += 1;
+	$group->{nodea}->{ciccnt} += 1;
+	$group->{nodeb}->{ciccnt} += 1;
+	$group->{network}->{ciccnt} += 1;
+	$self->{active} = 0;
+	$self->{call} = undef;
+	$self->{calls} = [];
+	$self->{state} = CTS_UNINIT;
 	return $self;
 }
 
 #package Circuit
 sub setstate {
 	my ($self,$msg,$newstate,$newdir) = @_;
-	return if $self->{'state'} == $newstate;
-	my $oldstate = $self->{'state'};
-	my $olddir = $self->{'dir'};
+	return if $self->{state} == $newstate;
+	my $oldstate = $self->{state};
+	my $olddir = $self->{dir};
 	# There are several states that mean anything
 	# CTS_UNINIT
 	# CTS_IDLE - idle
@@ -1948,10 +2157,10 @@ sub setstate {
 	# CTS_SUSPENDED - call or teardown
 	# CTS_WAIT_RLC - teardown
 	if ($oldstate == CTS_UNINIT) {
-		$self->{'group'}->{'actcnt'} += 1;
-		$self->{'group'}->{'nodea'}->{'actcnt'} += 1;
-		$self->{'group'}->{'nodeb'}->{'actcnt'} += 1;
-		$self->{'group'}->{'network'}->{'actcnt'} += 1;
+		$self->{group}->{actcnt} += 1;
+		$self->{group}->{nodea}->{actcnt} += 1;
+		$self->{group}->{nodeb}->{actcnt} += 1;
+		$self->{group}->{network}->{actcnt} += 1;
 		if ($newstate == CTS_WAIT_ACM) {
 			$oldstate = CTS_IDLE;
 		} elsif ($newstate == CTS_WAIT_ANM) {
@@ -1965,36 +2174,36 @@ sub setstate {
 		} elsif ($newstate == CTS_IDLE) {
 			$oldstate = CTS_WAIT_RLC;
 		}
-		$self->{'ts'}->{$oldstate} = $main::begtime;
+		$self->{ts}->{$oldstate} = $main::begtime;
 	}
-	$self->{'ts'}->{$newstate + $newdir} = $msg->{'hdr'};
-	$self->dur($oldstate + $olddir, $self->{'ts'}->{$oldstate + $olddir}, $msg->{'hdr'});
-	$self->dur($oldstate + 20, $self->{'ts'}->{$oldstate + $olddir}, $msg->{'hdr'});
-	$self->peg($newstate + $newdir, $msg->{'hdr'});
-	$self->peg($newstate + 20, $msg->{'hdr'});
-	delete $self->{'ts'}->{$oldstate + $olddir};
-	$self->{'state'} = $newstate;
-	$self->{'dir'} = $newdir;
+	$self->{ts}->{$newstate + $newdir} = $msg->{hdr};
+	$self->dur($oldstate + $olddir, $self->{ts}->{$oldstate + $olddir}, $msg->{hdr});
+	$self->dur($oldstate + 20, $self->{ts}->{$oldstate + $olddir}, $msg->{hdr});
+	$self->peg($newstate + $newdir, $msg->{hdr});
+	$self->peg($newstate + 20, $msg->{hdr});
+	delete $self->{ts}->{$oldstate + $olddir};
+	$self->{state} = $newstate;
+	$self->{dir} = $newdir;
 }
 
 #package Circuit
 sub dur {
 	my ($self,@args) = @_;
 	$self->Stats::dur(@args);
-	$self->{'group'}->dur(@args);
-	$self->{'group'}->{'nodea'}->dur(@args);
-	$self->{'group'}->{'nodeb'}->dur(@args);
-	$self->{'group'}->{'network'}->dur(@args);
+	$self->{group}->dur(@args);
+	$self->{group}->{nodea}->dur(@args);
+	$self->{group}->{nodeb}->dur(@args);
+	$self->{group}->{network}->dur(@args);
 }
 
 #package Circuit;
 sub peg {
 	my ($self,@args) = @_;
 	$self->Stats::peg(@args);
-	$self->{'group'}->peg(@args);
-	$self->{'group'}->{'nodea'}->peg(@args);
-	$self->{'group'}->{'nodeb'}->peg(@args);
-	$self->{'group'}->{'network'}->peg(@args);
+	$self->{group}->peg(@args);
+	$self->{group}->{nodea}->peg(@args);
+	$self->{group}->{nodeb}->peg(@args);
+	$self->{group}->{network}->peg(@args);
 }
 
 #package Circuit;
@@ -2002,8 +2211,8 @@ sub end_of_call {
 	my ($self,$call,$msg,$dir) = @_;
 	$self->setstate($msg,CTS_IDLE,$dir);
 	$call->add_msg($msg,CTS_IDLE);
-	push @{$self->{'calls'}}, $call;
-	$self->{'call'} = undef
+	push @{$self->{calls}}, $call;
+	$self->{call} = undef
 }
 
 #package Circuit;
@@ -2017,9 +2226,9 @@ sub clear_call {
 sub restart_call {
 	my ($self,$call,$msg,$dir) = @_;
 	$self->setstate($msg,CTS_IDLE,$dir);
-	if (@{$call->{'msgs'}}) {
-		push @{$self->{'calls'}}, $call;
-		$self->{'call'} = undef;
+	if (@{$call->{msgs}}) {
+		push @{$self->{calls}}, $call;
+		$self->{call} = undef;
 	} else {
 		$call->clear($msg,CTS_IDLE);
 	}
@@ -2028,57 +2237,57 @@ sub restart_call {
 #package Circuit;
 sub add_msg {
 	my ($self,$msg) = @_;
-	my $mt = $msg->{'mt'};
+	my $mt = $msg->{mt};
 	my $call;
-	my $dir = $self->{'dir'};
+	my $dir = $self->{dir};
 	while (1) {
-		unless ($call = $self->{'call'}) {
-			$call = $self->{'call'} = Call->new($self);
+		unless ($call = $self->{call}) {
+			$call = $self->{call} = Call->new($self);
 		}
 		if ($mt == 0x01) { # iam
-			if ($self->{'state'} <= CTS_WAIT_ACM) {
-				my $group = $self->{'group'};
-				my $nodea = $group->{'nodea'};
-				my $nodeb = $group->{'nodeb'};
-				my $network = $group->{'network'};
-				if ($msg->{'opc'} == $nodea->{'pc'}) {
+			if ($self->{state} <= CTS_WAIT_ACM) {
+				my $group = $self->{group};
+				my $nodea = $group->{nodea};
+				my $nodeb = $group->{nodeb};
+				my $network = $group->{network};
+				if ($msg->{opc} == $nodea->{pc}) {
 					$dir = 0;
-					if (!($self->{'active'} & 0x1)) {
-						$self->{'active'} |= 0x1;
-						if ($self->{'active'} & 0x2) {
-							$group->{'actboth'} += 1;
-							$nodea->{'act2w'} += 1;
-							$nodeb->{'act2w'} += 1;
-							$network->{'act2w'} += 1;
-							$group->{'actrevs'} -= 1;
-							$nodea->{'actic'} -= 1;
-							$nodeb->{'actog'} -= 1;
-							$network->{'act1w'} -= 1;
+					if (!($self->{active} & 0x1)) {
+						$self->{active} |= 0x1;
+						if ($self->{active} & 0x2) {
+							$group->{actboth} += 1;
+							$nodea->{act2w} += 1;
+							$nodeb->{act2w} += 1;
+							$network->{act2w} += 1;
+							$group->{actrevs} -= 1;
+							$nodea->{actic} -= 1;
+							$nodeb->{actog} -= 1;
+							$network->{act1w} -= 1;
 						} else {
-							$group->{'actforw'} += 1;
-							$nodea->{'actog'} += 1;
-							$nodeb->{'actic'} += 1;
-							$network->{'act1w'} += 1;
+							$group->{actforw} += 1;
+							$nodea->{actog} += 1;
+							$nodeb->{actic} += 1;
+							$network->{act1w} += 1;
 						}
 					}
 				} else {
 					$dir = 10;
-					if (!($self->{'active'} & 0x2)) {
-						$self->{'active'} |= 0x2;
-						if ($self->{'active'} & 0x1) {
-							$group->{'actboth'} += 1;
-							$nodea->{'act2w'} += 1;
-							$nodeb->{'act2w'} += 1;
-							$network->{'act2w'} += 1;
-							$group->{'actforw'} -= 1;
-							$nodea->{'actog'} -= 1;
-							$nodeb->{'actic'} -= 1;
-							$network->{'act1w'} -= 1;
+					if (!($self->{active} & 0x2)) {
+						$self->{active} |= 0x2;
+						if ($self->{active} & 0x1) {
+							$group->{actboth} += 1;
+							$nodea->{act2w} += 1;
+							$nodeb->{act2w} += 1;
+							$network->{act2w} += 1;
+							$group->{actforw} -= 1;
+							$nodea->{actog} -= 1;
+							$nodeb->{actic} -= 1;
+							$network->{act1w} -= 1;
 						} else {
-							$group->{'actrevs'} += 1;
-							$nodea->{'actic'} += 1;
-							$nodeb->{'actog'} += 1;
-							$network->{'act1w'} += 1;
+							$group->{actrevs} += 1;
+							$nodea->{actic} += 1;
+							$nodeb->{actog} += 1;
+							$network->{act1w} += 1;
 						}
 					}
 				}
@@ -2101,14 +2310,14 @@ sub add_msg {
 			last;
 		}
 		if ($mt == 0x06 || $mt == 0xed) { # acm exm
-			if ($self->{'state'} == CTS_WAIT_ACM) {
+			if ($self->{state} == CTS_WAIT_ACM) {
 				$self->setstate($msg,CTS_WAIT_ANM,$dir);
 				last;
 			}
 			return;
 		}
 		if ($mt == 0x07) { # con
-			if ($self->{'state'} == CTS_WAIT_ANM) {
+			if ($self->{state} == CTS_WAIT_ANM) {
 				$self->setstate($msg,CTS_ANSWERED,$dir);
 				last;
 			}
@@ -2118,35 +2327,35 @@ sub add_msg {
 			last;
 		}
 		if ($mt == 0x09) { # anm
-			if ($self->{'state'} == CTS_WAIT_ANM) {
+			if ($self->{state} == CTS_WAIT_ANM) {
 				$self->setstate($msg,CTS_ANSWERED,$dir);
 				last;
 			}
 			return;
 		}
 		if ($mt == 0x0c) { # rel
-			if ($self->{'state'} > CTS_IDLE) {
+			if ($self->{state} > CTS_IDLE) {
 				$self->setstate($msg,CTS_WAIT_RLC,$dir);
 				last;
 			}
 			return;
 		}
 		if ($mt == 0x0d) { # sus
-			if ($self->{'state'} == CTS_ANSWERED || $self->{'state'} == CTS_SUSPENDED) {
+			if ($self->{state} == CTS_ANSWERED || $self->{state} == CTS_SUSPENDED) {
 				$self->setstate($msg,CTS_SUSPENDED,$dir);
 				last;
 			}
 			return;
 		}
 		if ($mt == 0x0e) { # res
-			if ($self->{'state'} == CTS_ANSWERED || $self->{'state'} == CTS_SUSPENDED) {
+			if ($self->{state} == CTS_ANSWERED || $self->{state} == CTS_SUSPENDED) {
 				$self->setstate($msg,CTS_ANSWERED,$dir);
 				last;
 			}
 			return;
 		}
 		if ($mt == 0x10) { # rlc
-			if ($self->{'state'} == CTS_WAIT_RLC) {
+			if ($self->{state} == CTS_WAIT_RLC) {
 				$self->end_of_call($call,$msg,$dir);
 				return;
 			}
@@ -2157,7 +2366,7 @@ sub add_msg {
 			return;
 		}
 		if ($mt == 0x12) { # rsc
-			if ($self->{'state'} > CTS_WAIT_ANM) {
+			if ($self->{state} > CTS_WAIT_ANM) {
 				$self->end_of_call($call,$msg,$dir);
 				return;
 			}
@@ -2165,7 +2374,7 @@ sub add_msg {
 			return;
 		}
 		if ($mt == 0x13) { # blo
-			if ($self->{'state'} < CTS_WAIT_ANM) {
+			if ($self->{state} < CTS_WAIT_ANM) {
 				$self->clear_call($call,$msg,$dir);
 				return;
 			}
@@ -2175,7 +2384,7 @@ sub add_msg {
 			return;
 		}
 		if ($mt == 0x15) { # bla
-			if ($self->{'state'} < CTS_WAIT_ANM) {
+			if ($self->{state} < CTS_WAIT_ANM) {
 				$self->clear_call($call,$msg,$dir);
 				return;
 			}
@@ -2185,7 +2394,7 @@ sub add_msg {
 			return;
 		}
 		if ($mt == 0x17) { # grs
-			if ($self->{'state'} > CTS_WAIT_ANM) {
+			if ($self->{state} > CTS_WAIT_ANM) {
 				$self->end_of_call($call,$msg,$dir);
 				return;
 			}
@@ -2196,7 +2405,7 @@ sub add_msg {
 			return;
 		}
 		if ($mt == 0x1a) { # cgba
-			if ($self->{'state'} < CTS_WAIT_ANM) {
+			if ($self->{state} < CTS_WAIT_ANM) {
 				$self->clear_call($call,$msg,$dir);
 				return;
 			}
@@ -2245,7 +2454,7 @@ sub add_msg {
 			last;
 		}
 		if ($mt == 0x29) { # gra
-			if ($self->{'state'} > CTS_WAIT_ANM) {
+			if ($self->{state} > CTS_WAIT_ANM) {
 				$self->end_of_call($call,$msg,$dir);
 				return;
 			}
@@ -2259,7 +2468,7 @@ sub add_msg {
 			return;
 		}
 		if ($mt == 0x2c) { # cpg
-			if ($self->{'state'} == CTS_WAIT_ACM || $self->{'state'} == CTS_WAIT_ANM) {
+			if ($self->{state} == CTS_WAIT_ACM || $self->{state} == CTS_WAIT_ANM) {
 				return;
 			}
 			last;
@@ -2272,7 +2481,7 @@ sub add_msg {
 			return;
 		}
 		if ($mt == 0x2f) { # cfn
-			if ($self->{'state'} < CTS_ANSWERED) {
+			if ($self->{state} < CTS_ANSWERED) {
 				$self->clear_call($call,$msg,$dir);
 				return;
 			}
@@ -2306,14 +2515,14 @@ sub add_msg {
 			last;
 		}
 		if ($mt == 0xe9) { # cra
-			if ($self->{'state'} == CTS_WAIT_ACM) {
+			if ($self->{state} == CTS_WAIT_ACM) {
 				$self->setstate($msg,CTS_WAIT_ACM,$dir);
 				last;
 			}
 			return;
 		}
 		if ($mt == 0xea) { # crm
-			if ($self->{'state'} != CTS_IDLE && $self->{'state'} != CTS_WAIT_ACM) {
+			if ($self->{state} != CTS_IDLE && $self->{state} != CTS_WAIT_ACM) {
 				$self->end_of_call($call,$msg,$dir);
 				return;
 			}
@@ -2343,15 +2552,171 @@ sub add_msg {
 		}
 		return;
 	}
-	$call->add_msg($msg, $self->{'state'});
+	$call->add_msg($msg, $self->{state});
 	return;
+}
+
+#package Circuit;
+sub identify {
+	my $self = shift;
+	my $group = $self->{group};
+	my $id = "Circuit $self->{cic} between ";
+	$id .= "$group->{nodea}->{pcode}";
+	$id .= " ($group->{nodea}->{pownr})" if $group->{nodea}->{pownr};
+	$id .= " and $group->{nodeb}->{pcode}";
+	$id .= " ($group->{nodeb}->{pownr})" if $group->{nodeb}->{pownr};
+	return $id;
+}
+
+#package Circuit;
+sub getmenu {
+	my ($self,$m,$canvas,$X,$Y) = @_;
+	$m->add('command',
+		#-accelerator=>'p',
+		-command=>[\&Circuit::props, $self, $canvas, $X, $Y],
+		-label=>'Circuit Properties...',
+		-underline=>8,
+	);
+	$m->add('command',
+		#-accelerator=>'s',
+		-command=>[\&Circuit::status, $self, $canvas, $X, $Y],
+		-label=>'Circuit Status...',
+		-underline=>8,
+	);
+	$m->add('command',
+		#-accelerator=>'l',
+		-command=>[\&Logging::showlog, $self, $canvas, $X, $Y],
+		-label=>'Circuit Logs...',
+		-underline=>8,
+		-state=>(@{$self->{logs}} ? 'normal' : 'disabled'),
+	);
+	$m->add('command',
+		#-accelerator=>'m',
+		-command=>[\&MsgStats::stats, $self, $canvas, $X, $Y],
+		-label=>'Message Statistics...',
+		-underline=>0,
+		-state=>($self->{incs}->{0}->{sus} + $self->{incs}->{1}->{sus} ? 'normal' : 'disabled'),
+	);
+	$m->add('command',
+		#-accelerator=>'c',
+		-command=>[\&MsgStats::cstat, $self, $canvas, $X, $Y],
+		-label=>'Call statistics...',
+		-underline=>0,
+	);
+};
+
+#package Circuit;
+sub props {
+	my ($self,$canvas,$X,$Y) = @_;
+	my $row = 0;
+	my $tw;
+	my $v = 'Circuit';
+	if ($tw = $self->{props}) {
+		if ($tw->state eq 'iconic') {
+			$tw->deiconify;
+		} else {
+			$tw->UnmapWindow;
+		}
+	} else {
+		my $title = $self->identify." Properties";
+		$tw = $canvas->toplevel->Toplevel(
+			-title=>$title,
+		);
+		$tw->group($canvas->toplevel);
+		#$tw->transient($canvas->toplevel);
+		$tw->iconimage('icon');
+		$tw->iconname($title);
+		$tw->resizable(0,0);
+		$tw->positionfrom('user');
+		$tw->geometry("+$X+$Y");
+		$tw->protocol('WM_DELETE_WINDOW', [sub {
+			my $self = shift;
+			my $tw = $self->{props};
+			$self->{props} = undef;
+			$tw->destroy;
+		},$self]);
+		$self->{props} = $tw;
+
+		$tw->Label(%labelright,
+			-text=>'Object type:',
+		)->grid(-row=>$row,-column=>0,-sticky=>'ewns');
+		$tw->Entry(%entryleft,
+			-textvariable=>\$v,
+		)->grid(-row=>$row++,-column=>1,-sticky=>'ewns');
+		$tw->Label(%labelright,
+			-text=>'Circuit id code:',
+		)->grid(-row=>$row,-column=>0,-sticky=>'ewns');
+		$tw->Entry(%entryright,
+			-textvariable=>\$self->{cic},
+		)->grid(-row=>$row++,-column=>1,-sticky=>'ewns');
+		my $group = $self->{group};
+		$tw->Label(%labelright,
+			-text=>'Node A point code:',
+		)->grid(-row=>$row,-column=>0,-sticky=>'ewns');
+		my $pca = $group->{nodea}->{pcode};
+		$pca .= " ($group->{nodea}->{pownr})" if $group->{nodea}->{pownr};
+		$tw->Entry(%entrycenter,
+			-textvariable=>\$pca,
+		)->grid(-row=>$row++,-column=>1,-sticky=>'ewns');
+		$tw->Label(%labelright,
+			-text=>'Node B point code:',
+		)->grid(-row=>$row,-column=>0,-sticky=>'ewns');
+		my $pcb = $group->{nodeb}->{pcode};
+		$pcb .= " ($group->{nodeb}->{pownr})" if $group->{nodeb}->{pownr};
+		$tw->Entry(%entrycenter,
+			-textvariable=>\$pcb,
+		)->grid(-row=>$row++,-column=>1,-sticky=>'ewns');
+	}
+	$tw->MapWindow;
+}
+
+#package Circuit;
+sub status {
+	my ($self,$canvas,$X,$Y) = @_;
+	my $row = 0;
+	my $tw;
+	my $v = 'Circuit';
+	if ($tw = $self->{status}) {
+		if ($tw->state eq 'iconic') {
+			$tw->deiconify;
+		} else {
+			$tw->UnmapWindow;
+		}
+	} else {
+		my $title = $self->identify." Status";
+		$tw = $canvas->toplevel->Toplevel(
+			-title=>$title,
+		);
+		$tw->group($canvas->toplevel);
+		#$tw->transient($canvas->toplevel);
+		$tw->iconimage('icon');
+		$tw->iconname($title);
+		$tw->resizable(0,0);
+		$tw->positionfrom('user');
+		$tw->geometry("+$X+$Y");
+		$tw->protocol('WM_DELETE_WINDOW', [sub {
+			my $self = shift;
+			my $tw = $self->{status};
+			$self->{status} = undef;
+			$tw->destroy;
+		},$self]);
+		$self->{status} = $tw;
+
+		$tw->Label(%labelright,
+			-text=>'Active:',
+		)->grid(-row=>$row,-column=>0,-sticky=>'ewns');
+		$tw->Entry(%entryleft,
+			-textvariable=>\$self->{active},
+		)->grid(-row=>$row++,-column=>1,-sticky=>'ewns');
+	}
+	$tw->MapWindow;
 }
 
 # -------------------------------------
 package LinkSet;
 use strict;
 use vars qw(@ISA);
-@ISA = qw(MsgStats Relation);
+@ISA = qw(Relation);
 # -------------------------------------
 
 use constant {
@@ -2364,8 +2729,8 @@ use constant {
 #package LinkSet;
 sub init {
 	my ($self,$nodea,$nodeb,@args) = @_;
-	$self->{'forw'} = [];
-	$self->{'revs'} = [];
+	$self->{forw} = [];
+	$self->{revs} = [];
 }
 
 #package LinkSet;
@@ -2373,7 +2738,7 @@ sub new {
 	my ($type,$network,@args) = @_;
 	my $self = {};
 	bless $self,$type;
-	$self->{'network'} = $network;
+	$self->{network} = $network;
 	$self->init(@args);
 	return $self;
 }
@@ -2381,51 +2746,371 @@ sub new {
 #package LinkSet;
 sub xform {
 	my ($type,$self) = @_;
-	return if $self->{'type'} == 1;
+	return if $self->{type} == 1;
 	return if ref $self eq $type;
 	bless $self,$type;
-	my $nodea = $self->{'nodea'};
-	my $nodeb = $self->{'nodeb'};
-	if ($nodea->{'col'} < 0) {
-		$nodea->moveto(0 - LinkSet::COL_ADJ,$nodea->{'row'});
+	$self->{fill} = 'black';
+	$self->{width} = 2;
+	$main::canvas->itemconfigure($self->{item},
+		-fill=>$self->{file},
+		-width=>$self->{width},
+	);
+	$main::canvas->bind($self->{item},'<ButtonPress-3>',[\&LinkSet::button3,$self,Tk::Ev('X'),Tk::Ev('Y')]);
+	my $nodea = $self->{nodea};
+	my $nodeb = $self->{nodeb};
+	if ($nodea->{col} < 0) {
+		$nodea->moveto(0 - LinkSet::COL_ADJ,$nodea->{row});
 	} else {
-		$nodea->moveto(0 + LinkSet::COL_ADJ,$nodea->{'row'});
+		$nodea->moveto(0 + LinkSet::COL_ADJ,$nodea->{row});
 	}
-	if ($nodeb->{'col'} < 0) {
-		$nodeb->moveto(0 - LinkSet::COL_ADJ,$nodeb->{'row'});
+	if ($nodeb->{col} < 0) {
+		$nodeb->moveto(0 - LinkSet::COL_ADJ,$nodeb->{row});
 	} else {
-		$nodeb->moveto(0 + LinkSet::COL_ADJ,$nodeb->{'row'});
+		$nodeb->moveto(0 + LinkSet::COL_ADJ,$nodeb->{row});
 	}
-	$self->move;
+	#$self->move; # nodes will move me
+#	$main::canvas->idletasks;
+	$main::top->{updatenow} = 1;
 }
 
 #package LinkSet;
 sub getLink {
 	my ($self,$nodea,$nodeb,$slc,@args) = @_;
-	return $self->{'links'}->{$slc} if exists $self->{'links'}->{$slc};
+	return $self->{links}->{$slc} if exists $self->{links}->{$slc};
 	my $link = Link->new($nodea,$nodeb,$slc,@args);
-	$self->{'links'}->{$slc} = $link;
+	$self->{links}->{$slc} = $link;
 	return $link;
 }
 
 #package LinkSet;
+sub move {
+	my $self = shift;
+	$self->Relation::move;
+	foreach my $link (values %{$self->{links}}) {
+		$link->move;
+	}
+}
+
+#package LinkSet;
+sub identify {
+	my $self = shift;
+	my $id = "Direct linkset between ";
+	$id .= "$self->{nodea}->{pcode}";
+	$id .= " ($self->{nodea}->{pownr})" if $self->{nodea}->{pownr};
+	$id .= " and $self->{nodeb}->{pcode}";
+	$id .= " ($self->{nodeb}->{pownr})" if $self->{nodeb}->{pownr};
+	return $id;
+}
+
+#package LinkSet;
+sub getmenu {
+	my ($self,$m,$canvas,$X,$Y) = @_;
+	$m->add('command',
+		#-accelerator=>'p',
+		-command=>[\&LinkSet::props, $self, $canvas, $X, $Y],
+		-label=>'Linkset Properties...',
+		-underline=>8,
+	);
+	$m->add('command',
+		#-accelerator=>'s',
+		-command=>[\&LinkSet::status, $self, $canvas, $X, $Y],
+		-label=>'Linkset Status...',
+		-underline=>8,
+	);
+	$m->add('command',
+		#-accelerator=>'l',
+		-command=>[\&Logging::showlog, $self, $canvas, $X, $Y],
+		-label=>'Linkset Logs...',
+		-underline=>8,
+		-state=>(@{$self->{logs}} ? 'normal' : 'disabled'),
+	);
+	$m->add('command',
+		#-accelerator=>'m',
+		-command=>[\&MsgStats::stats, $self, $canvas, $X, $Y],
+		-label=>'Message Statistics...',
+		-underline=>0,
+		-state=>($self->{incs}->{0}->{sus} + $self->{incs}->{1}->{sus} ? 'normal' : 'disabled'),
+	);
+	$m->add('command',
+		#-accelerator=>'c',
+		-command=>[\&MsgStats::cstat, $self, $canvas, $X, $Y],
+		-label=>'Call statistics...',
+		-underline=>0,
+		-state=>($self->{ciccnt} ? 'normal' : 'disabled'),
+	);
+}
+
+#package LinkSet;
+sub button3 {
+	my ($canvas,$self,$X,$Y) = @_;
+	my ($m,$mc,$m3,$pf,$pr);
+	$m = $canvas->toplevel->Menu(
+		-tearoff=>1,
+		-title=>'Linkset Menu',
+		-type=>'normal',
+	);
+	$mc = $m->Menu(
+		-tearoff=>1,
+		-title=>'Links Menu',
+	);
+	foreach my $slc (sort {$a <=> $b} keys %{$self->{links}}) {
+		my $path;
+		$m3 = $mc->Menu(
+			-tearoff=>1,
+			-title=>"Link $slc Menu",
+		);
+		$path = $self->{links}->{$slc}->{pathforw};
+		$pf = $m3->Menu(
+			-tearoff=>1,
+			-title=>'Forward path Menu',
+		);
+		$path->getmenu($pf,$canvas,$X,$Y) if ($path);
+		$m3->add('cascade',
+			-menu=>$pf,
+			-label=>'Forward path',
+			-state=>($path?'normal':'disabled'),
+		);
+		$path = $self->{links}->{$slc}->{pathrevs};
+		$pr = $m3->Menu(
+			-tearoff=>1,
+			-title=>'Reverse path Menu',
+		);
+		$path->getmenu($pr,$canvas,$X,$Y) if ($path);
+		$m3->add('cascade',
+			-menu=>$pr,
+			-label=>'Reverse path',
+			-state=>($path?'normal':'disabled'),
+		);
+		my $link = $self->{links}->{$slc};
+		$mc->add('separator');
+		$link->getmenu($m3,$canvas,$X,$Y);
+		$mc->add('cascade',
+			-menu=>$m3,
+			-label=>"Link $slc",
+		);
+	}
+	$m->add('cascade',
+		-menu=>$mc,
+		-label=>'Links',
+		-state=>((keys %{$self->{links}})?'normal':'disabled'),
+	);
+	$mc = $m->Menu(
+		-tearoff=>1,
+		-title=>'Circuits Menu',
+	);
+	foreach my $cic (sort {$a <=> $b} keys %{$self->{cics}}) {
+		my $circuit;
+		$m3 = $mc->Menu(
+			-tearoff=>1,
+			-title=>"Circuit $cic Menu",
+		);
+		$circuit = $self->{cics}->{$cic};
+		$circuit->getmenu($m3,$canvas,$X,$Y) if $circuit;
+		$mc->add('cascade',
+			-menu=>$m3,
+			-label=>"Circuit $cic",
+		);
+	}
+	$m->add('cascade',
+		-menu=>$mc,
+		-label=>'Circuits',
+		-state=>((keys %{$self->{cics}})?'normal':'disabled'),
+	);
+	$m->add('separator');
+	$self->getmenu($m,$canvas,$X,$Y);
+	$m->Popup(
+		-popanchor=>'nw',
+		-popover=>'cursor',
+	);
+}
+
+#package LinkSet;
+sub props {
+	my ($self,$canvas,$X,$Y) = @_;
+	my $row = 0;
+	my $tw;
+	my $v = 'Direct link set';
+	if ($tw = $self->{props}) {
+		if ($tw->state eq 'iconic') {
+			$tw->deiconify;
+		} else {
+			$tw->UnmapWindow;
+		}
+	} else {
+		my $title = $self->identify." Properties";
+		$tw = $canvas->toplevel->Toplevel(
+			-title=>$title,
+		);
+		$tw->group($canvas->toplevel);
+		#$tw->transient($canvas->toplevel);
+		$tw->iconimage('icon');
+		$tw->iconname($title);
+		$tw->resizable(0,0);
+		$tw->positionfrom('user');
+		$tw->geometry("+$X+$Y");
+		$tw->protocol('WM_DELETE_WINDOW', [sub {
+			my $self = shift;
+			my $tw = $self->{props};
+			$self->{props} = undef;
+			$tw->destroy;
+		},$self]);
+		$self->{props} = $tw;
+
+		$tw->Label(%labelright,
+			-text=>'Object type:',
+		)->grid(-row=>$row,-column=>0,-sticky=>'ewns');
+		$tw->Entry(%entryleft,
+			-textvariable=>\$v,
+		)->grid(-row=>$row++,-column=>1,-sticky=>'ewns');
+		$tw->Label(%labelright,
+			-text=>'Node A point code:',
+		)->grid(-row=>$row,-column=>0,-sticky=>'ewns');
+		my $pca = $self->{nodea}->{pcode};
+		$pca .= " ($self->{nodea}->{pownr})" if $self->{nodea}->{pownr};
+		$tw->Entry(%entrycenter,
+			-textvariable=>\$pca,
+		)->grid(-row=>$row++,-column=>1,-sticky=>'ewns');
+		$tw->Label(%labelright,
+			-text=>'Node B point code:',
+		)->grid(-row=>$row,-column=>0,-sticky=>'ewns');
+		my $pcb = $self->{nodeb}->{pcode};
+		$pcb .= " ($self->{nodeb}->{pownr})" if $self->{nodeb}->{pownr};
+		$tw->Entry(%entrycenter,
+			-textvariable=>\$pcb,
+		)->grid(-row=>$row++,-column=>1,-sticky=>'ewns');
+	}
+	$tw->MapWindow;
+}
+
+#package LinkSet;
+sub status {
+	my ($self,$canvas,$X,$Y) = @_;
+	my $row = 0;
+	my $tw;
+	my $v = 'Direct link set';
+	if ($tw = $self->{status}) {
+		if ($tw->state eq 'iconic') {
+			$tw->deiconify;
+		} else {
+			$tw->UnmapWindow;
+		}
+	} else {
+		my $title = $self->identify." Status";
+		$tw = $canvas->toplevel->Toplevel(
+			-title=>$title,
+		);
+		$tw->group($canvas->toplevel);
+		#$tw->transient($canvas->toplevel);
+		$tw->iconimage('icon');
+		$tw->iconname($title);
+		$tw->resizable(0,0);
+		$tw->positionfrom('user');
+		$tw->geometry("+$X+$Y");
+		$tw->protocol('WM_DELETE_WINDOW', [sub {
+			my $self = shift;
+			my $tw = $self->{status};
+			$self->{status} = undef;
+			$tw->destroy;
+		},$self]);
+		$self->{status} = $tw;
+
+		$tw->Label(%labelright,
+			-text=>'Exchange SLTM',
+		)->grid(-row=>$row,-column=>0,-sticky=>'ewns');
+		$tw->Checkbutton(%buttonleft,
+			-variable=>\$self->{xchg_sltm},
+			-text=>'Exchanges SLTM',
+		)->grid(-row=>$row++,-column=>1,-sticky=>'ewns');
+		$tw->Label(%labelright,
+			-text=>'Exchange ISUP:',
+		)->grid(-row=>$row,-column=>0,-sticky=>'ewns');
+		$tw->Checkbutton(%buttonleft,
+			-variable=>\$self->{xchg_isup},
+			-text=>'Exchanges ISUP',
+		)->grid(-row=>$row++,-column=>1,-sticky=>'ewns');
+		$tw->Label(%labelright,
+			-text=>'Forward TCAP',
+		)->grid(-row=>$row,-column=>0,-sticky=>'ewns');
+		$tw->Checkbutton(%buttonleft,
+			-variable=>\$self->{forw_tcap},
+			-text=>'Forward TCAP',
+		)->grid(-row=>$row++,-column=>1,-sticky=>'ewns');
+		$tw->Label(%labelright,
+			-text=>'Reverse TCAP',
+		)->grid(-row=>$row,-column=>0,-sticky=>'ewns');
+		$tw->Checkbutton(%buttonleft,
+			-variable=>\$self->{revs_tcap},
+			-text=>'Reverse TCAP',
+		)->grid(-row=>$row++,-column=>1,-sticky=>'ewns');
+		if ($self->{slccnt}) {
+			$tw->Label(%labelright,
+				-text=>'Signalling links:',
+			)->grid(-row=>$row,-column=>0,-sticky=>'ewns');
+			$tw->Entry(%entryright,
+				-textvariable=>\$self->{slccnt},
+			)->grid(-row=>$row++,-column=>1,-sticky=>'ewns');
+		}
+		if ($self->{ciccnt}) {
+			$tw->Label(%labelright,
+				-text=>'Defined circuits:',
+			)->grid(-row=>$row,-column=>0,-sticky=>'ewns');
+			$tw->Entry(%entryright,
+				-textvariable=>\$self->{ciccnt},
+			)->grid(-row=>$row++,-column=>1,-sticky=>'ewns');
+			if ($self->{actcnt}) {
+				$tw->Label(%labelright,
+					-text=>'Active circuits:',
+				)->grid(-row=>$row,-column=>0,-sticky=>'ewns');
+				$tw->Entry(%entryright,
+					-textvariable=>\$self->{actcnt},
+				)->grid(-row=>$row++,-column=>1,-sticky=>'ewns');
+			}
+			if ($self->{actforw}) {
+				$tw->Label(%labelright,
+					-text=>'Active forward circuits:',
+				)->grid(-row=>$row,-column=>0,-sticky=>'ewns');
+				$tw->Entry(%entryright,
+					-textvariable=>\$self->{actforw},
+				)->grid(-row=>$row++,-column=>1,-sticky=>'ewns');
+			}
+			if ($self->{actrevs}) {
+				$tw->Label(%labelright,
+					-text=>'Active reverse circuits:',
+				)->grid(-row=>$row,-column=>0,-sticky=>'ewns');
+				$tw->Entry(%entryright,
+					-textvariable=>\$self->{actrevs},
+				)->grid(-row=>$row++,-column=>1,-sticky=>'ewns');
+			}
+			if ($self->{actboth}) {
+				$tw->Label(%labelright,
+					-text=>'Active bothway circuits:',
+				)->grid(-row=>$row,-column=>0,-sticky=>'ewns');
+				$tw->Entry(%entryright,
+					-textvariable=>\$self->{actboth},
+				)->grid(-row=>$row++,-column=>1,-sticky=>'ewns');
+			}
+		}
+	}
+	$tw->MapWindow;
+}
 
 # -------------------------------------
 package Link;
 use strict;
 use vars qw(@ISA);
-@ISA = qw(MsgStats);
+@ISA = qw(MsgStats Logging);
 # -------------------------------------
 
 #package Link;
 sub init {
 	my ($self,$nodea,$nodeb,$slc,@args) = @_;
-	MsgStats::init($self);
-	$self->{'nodea'} = $nodea;
-	$self->{'nodeb'} = $nodeb;
-	$self->{'slc'} = $slc;
-	$self->{'pathforw'} = undef;
-	$self->{'pathrevs'} = undef;
+	$self->MsgStats::init(@args);
+	$self->Logging::init(@args);
+	$self->{nodea} = $nodea;
+	$self->{nodeb} = $nodeb;
+	$self->{slc} = $slc;
+	$self->{pathforw} = undef;
+	$self->{pathrevs} = undef;
 }
 
 #package Link;
@@ -2433,7 +3118,7 @@ sub new {
 	my ($type,$network,@args) = @_;
 	my $self = {};
 	bless $self,$type;
-	$self->{'network'} = $network;
+	$self->{network} = $network;
 	$self->init(@args);
 	return $self;
 }
@@ -2441,26 +3126,110 @@ sub new {
 #package Link;
 sub addPathForw {
 	my ($self,$path) = @_;
-	$self->{'pathforw'} = $path;
+	$self->{pathforw} = $path;
 }
 
 #package Link;
 sub addPathRevs {
 	my ($self,$path) = @_;
-	$self->{'pathrevs'} = $path;
+	$self->{pathrevs} = $path;
+}
+
+#package Link;
+sub addPath {
+	my ($self,$path) = @_;
+	if ($path->{nodea}->{pc} == $self->{nodea}->{pc}) {
+		$self->addPathForw($path);
+	} else {
+		$self->addPathRevs($path);
+	}
 }
 
 #package Link;
 sub add {
 	my ($self,$msg) = @_;
-	$self->inc($msg);
+	if ($msg->{'opc'} == $self->{'nodea'}->{'pc'}) {
+		$self->inc($msg,'0');
+	} else {
+		$self->inc($msg,'1');
+	}
+}
+
+#package Link;
+sub move {
+	my $self = shift;
+	my $path;
+	if ($path = $self->{pathforw}) {
+		$path->move;
+	}
+	if ($path = $self->{pathrevs}) {
+		$path->move;
+	}
+}
+
+#package Link;
+sub identify {
+	my $self = shift;
+	my $id = "Direct link $self->{slc} between ";
+	$id .= "$self->{nodea}->{pcode}";
+	$id .= " ($self->{nodea}->{pownr})" if $self->{nodea}->{pownr};
+	$id .= " and $self->{nodeb}->{pcode}";
+	$id .= " ($self->{nodeb}->{pownr})" if $self->{nodeb}->{pownr};
+	return $id;
+}
+
+#package Link;
+sub getmenu {
+	my ($self,$m,$canvas,$X,$Y) = @_;
+	$m->add('command',
+		#-accelerator=>'p',
+		-command=>[\&Link::props, $self, $canvas, $X, $Y],
+		-label=>'Link Properties...',
+		-underline=>5,
+	);
+	$m->add('command',
+		#-accelerator=>'s',
+		-command=>[\&Link::status, $self, $canvas, $X, $Y],
+		-label=>'Link Status...',
+		-underline=>5,
+	);
+	$m->add('command',
+		#-accelerator=>'l',
+		-command=>[\&Logging::showlog, $self, $canvas, $X, $Y],
+		-label=>'Link Logs...',
+		-underline=>5,
+		-state=>(@{$self->{logs}} ? 'normal' : 'disabled'),
+	);
+	$m->add('command',
+		#-accelerator=>'m',
+		-command=>[\&MsgStats::stats, $self, $canvas, $X, $Y],
+		-label=>'Link Statistics...',
+		-underline=>5,
+		-state=>($self->{incs}->{0}->{sus} + $self->{incs}->{1}->{sus} ? 'normal' : 'disabled'),
+	);
+}
+
+#package Link;
+sub props {
+	my ($self,$canvas,$X,$Y) = @_;
+	my $row = 0;
+	my $tw;
+	my $v = 'Signalling link';
+}
+
+#package Link;
+sub status {
+	my ($self,$canvas,$X,$Y) = @_;
+	my $row = 0;
+	my $tw;
+	my $v = 'Signalling link';
 }
 
 # -------------------------------------
 package Route;
 use strict;
 use vars qw(@ISA);
-@ISA = qw(MsgStats);
+@ISA = qw(MsgStats Logging);
 # -------------------------------------
 
 use constant {
@@ -2475,45 +3244,46 @@ sub new {
 	my $self = {};
 	bless $self, $type;
 	$self->MsgStats::init(@args);
-	$self->{'state'} = RT_AVAILABLE;
-	$self->{'statetext'} = 'Available';
-	$self->{'path'} = $path;
-	$self->{'side'} = $side;
-	$self->{'node'} = $node;
-	$node->{'routes'}->{$path->{'ppa'}} = $self;
-	$path->{'routes'}->{$node->{'pc'}} = $self;
+	$self->Logging::init(@args);
+	$self->{state} = RT_AVAILABLE;
+	$self->{statetext} = 'Available';
+	$self->{path} = $path;
+	$self->{side} = $side;
+	$self->{node} = $node;
+	$node->{routes}->{$path->{ppa}} = $self;
+	$path->{routes}->{$node->{pc}} = $self;
 	my ($cola,$rowa,$colb,$rowb);
 	if ($side eq 'a') {
-		$cola = $self->{'cola'} = $node->{'col'};
-		$rowa = $self->{'rowa'} = $node->{'row'};
-		$colb = $self->{'colb'} = $path->{'cola'};
-		$rowb = $self->{'rowb'} = $path->{'rowa'};
+		$cola = $self->{cola} = $node->{col};
+		$rowa = $self->{rowa} = $node->{row};
+		$colb = $self->{colb} = $path->{cola};
+		$rowb = $self->{rowb} = $path->{rowa};
 	} else {
-		$cola = $self->{'cola'} = $path->{'colb'};
-		$rowa = $self->{'rowa'} = $path->{'rowb'};
-		$colb = $self->{'colb'} = $node->{'col'};
-		$rowb = $self->{'rowb'} = $node->{'row'};
+		$cola = $self->{cola} = $path->{colb};
+		$rowa = $self->{rowa} = $path->{rowb};
+		$colb = $self->{colb} = $node->{col};
+		$rowb = $self->{rowb} = $node->{row};
 	}
-	my $xa = $self->{'xa'} = $main::mycanvas->colpos($cola);
-	my $ya = $self->{'ya'} = $main::mycanvas->rowpos($rowa);
-	my $xb = $self->{'xb'} = $main::mycanvas->colpos($colb);
-	my $yb = $self->{'yb'} = $main::mycanvas->rowpos($rowb);
-	$self->{'x'} = ($xa + $xb)/2;
-	$self->{'y'} = ($ya + $yb)/2;
-	$self->{'fill'} = 'gray';
-	$self->{'item'} = $main::canvas->createLine($xa,$ya,$xb,$yb,
+	my $xa = $self->{xa} = $main::mycanvas->colpos($cola);
+	my $ya = $self->{ya} = $main::mycanvas->rowpos($rowa);
+	my $xb = $self->{xb} = $main::mycanvas->colpos($colb);
+	my $yb = $self->{yb} = $main::mycanvas->rowpos($rowb);
+	$self->{x} = ($xa + $xb)/2;
+	$self->{y} = ($ya + $yb)/2;
+	$self->{fill} = 'gray';
+	$self->{item} = $main::canvas->createLine($xa,$ya,$xb,$yb,
 		-arrow=>'last',
 		-capstyle=>'round',
-		-fill=>$self->{'fill'},
+		-fill=>$self->{fill},
 		-joinstyle=>'round',
 		-smooth=>0,
 		-tags=>['route'],
 		-width=>1,
 	);
-	$main::canvas->bind($self->{'item'},'<ButtonPress-3>',[\&Route::button3,$self,Tk::Ev('X'),Tk::Ev('Y')]);
+	$main::canvas->bind($self->{item},'<ButtonPress-3>',[\&Route::button3,$self,Tk::Ev('X'),Tk::Ev('Y')]);
 	$main::canvas->lower('route','path');
 	$main::canvas->lower('route','node');
-	$main::top->{'updatenow'} = 1;
+	$main::top->{updatenow} = 1;
 #	$main::canvas->idletasks;
 	return $self;
 }
@@ -2521,53 +3291,53 @@ sub new {
 #package Route;
 sub identify {
 	my $self = shift;
-	my $id = "Route from $self->{'nodea'}->{'pcode'}";
-	$id .= " ($self->{'nodea'}->{'pownr'})" if $self->{'nodea'}->{'pownr'};
-	$id .= "to $self->{'nodeb'}->{'pcode'}";
-	$id .= " ($self->{'nodeb'}->{'pownr'})" if $self->{'nodeb'}->{'pownr'};
+	my $id = "Route from $self->{nodea}->{pcode}";
+	$id .= " ($self->{nodea}->{pownr})" if $self->{nodea}->{pownr};
+	$id .= "to $self->{nodeb}->{pcode}";
+	$id .= " ($self->{nodeb}->{pownr})" if $self->{nodeb}->{pownr};
 	return $id;
 }
 
 #package Route;
 sub move {
 	my $self = shift;
-	my $node = $self->{'node'};
-	my $path = $self->{'path'};
-	my $side = $self->{'side'};
+	my $node = $self->{node};
+	my $path = $self->{path};
+	my $side = $self->{side};
 	my ($xa,$ya,$xb,$yb);
 	if ($side eq 'a') {
-		$xa = $node->{'x'};
-		$ya = $node->{'y'};
-		$xb = $path->{'xa'};
-		$yb = $path->{'ya'};
+		$xa = $node->{x};
+		$ya = $node->{y};
+		$xb = $path->{xa};
+		$yb = $path->{ya};
 	} else {
-		$xa = $path->{'xb'};
-		$ya = $path->{'yb'};
-		$xb = $node->{'x'};
-		$yb = $node->{'y'};
+		$xa = $path->{xb};
+		$ya = $path->{yb};
+		$xb = $node->{x};
+		$yb = $node->{y};
 	}
-	return if $xa == $self->{'xa'} &&
-		  $ya == $self->{'ya'} &&
-		  $xb == $self->{'xb'} &&
-		  $yb == $self->{'yb'};
+	return if $xa == $self->{xa} &&
+		  $ya == $self->{ya} &&
+		  $xb == $self->{xb} &&
+		  $yb == $self->{yb};
 	if ($side eq 'a') {
-		$self->{'cola'} = $node->{'col'};
-		$self->{'rowa'} = $node->{'row'};
-		$self->{'colb'} = $path->{'cola'};
-		$self->{'rowb'} = $path->{'rowa'};
+		$self->{cola} = $node->{col};
+		$self->{rowa} = $node->{row};
+		$self->{colb} = $path->{cola};
+		$self->{rowb} = $path->{rowa};
 	} else {
-		$self->{'cola'} = $path->{'colb'};
-		$self->{'rowa'} = $path->{'rowb'};
-		$self->{'colb'} = $node->{'col'};
-		$self->{'rowb'} = $node->{'row'};
+		$self->{cola} = $path->{colb};
+		$self->{rowa} = $path->{rowb};
+		$self->{colb} = $node->{col};
+		$self->{rowb} = $node->{row};
 	}
-	$main::canvas->coords($self->{'item'},$xa,$ya,$xb,$yb);
-	$self->{'xa'} = $xa;
-	$self->{'ya'} = $ya;
-	$self->{'xb'} = $xb;
-	$self->{'yb'} = $yb;
-	$self->{'x'} = ($xa + $xb)/2;
-	$self->{'y'} = ($ya + $yb)/2;
+	$main::canvas->coords($self->{item},$xa,$ya,$xb,$yb);
+	$self->{xa} = $xa;
+	$self->{ya} = $ya;
+	$self->{xb} = $xb;
+	$self->{yb} = $yb;
+	$self->{x} = ($xa + $xb)/2;
+	$self->{y} = ($ya + $yb)/2;
 }
 
 #package Route;
@@ -2591,10 +3361,18 @@ sub button3 {
 		-underline=>6,
 	);
 	$m->add('command',
+		#-accelerator=>'l',
+		-command=>[\&Logging::showlog, $self, $canvas, $X, $Y],
+		-label=>'Route Logs...',
+		-underline=>6,
+		-state=>(@{$self->{logs}} ? 'normal' : 'disabled'),
+	);
+	$m->add('command',
 		#-accelerator=>'m',
 		-command=>[\&MsgStats::stats, $self, $canvas, $X, $Y],
 		-label=>'Message Statistics...',
 		-underline=>0,
+		-state=>($self->{incs}->{0}->{sus} + $self->{incs}->{1}->{sus} ? 'normal' : 'disabled'),
 	);
 	$m->Popup(
 		-popanchor=>'nw',
@@ -2608,7 +3386,7 @@ sub props {
 	my $row = 0;
 	my $tw;
 	my $v = 'Signalling route';
-	if ($tw = $self->{'props'}) {
+	if ($tw = $self->{props}) {
 		if ($tw->state eq 'iconic') {
 			$tw->deiconify;
 		} else {
@@ -2620,7 +3398,7 @@ sub props {
 			-title=>$title,
 		);
 		$tw->group($canvas->toplevel);
-		$tw->transient($canvas->toplevel);
+		#$tw->transient($canvas->toplevel);
 		$tw->iconimage('icon');
 		$tw->iconname($title);
 		$tw->resizable(0,0);
@@ -2628,50 +3406,32 @@ sub props {
 		$tw->geometry("+$X+$Y");
 		$tw->protocol('WM_DELETE_WINDOW', [sub {
 			my $self = shift;
-			my $tw = $self->{'props'};
-			$self->{'props'} = undef;
+			my $tw = $self->{props};
+			$self->{props} = undef;
 			$tw->destroy;
 		},$self]);
-		$self->{'props'} = $tw;
+		$self->{props} = $tw;
 
-		$tw->Label(
-			-anchor=>'e',
-			-justify=>'right',
+		$tw->Label(%labelright,
 			-text=>'Object type:',
-		)->grid(-row=>$row,-column=>0,-sticky=>'ew');
-		$tw->Entry(
-			-readonlybackground=>'white',
-			-background=>'white',
+		)->grid(-row=>$row,-column=>0,-sticky=>'ewns');
+		$tw->Entry(%entryleft,
 			-textvariable=>\$v,
-			-state=>'readonly',
-			-exportselection=>1,
-		)->grid(-row=>$row++,-column=>1,-sticky=>'ew');
-		$tw->Label(
-			-anchor=>'e',
-			-justify=>'right',
+		)->grid(-row=>$row++,-column=>1,-sticky=>'ewns');
+		$tw->Label(%labelright,
 			-text=>'Signalling path:',
-		)->grid(-row=>$row,-column=>0,-sticky=>'ew');
-		$tw->Entry(
-			-readonlybackground=>'white',
-			-background=>'white',
-			-text=>"$self->{'card'}:$self->{'span'}:$self->{'slot'}",
-			-state=>'readonly',
-			-exportselection=>1,
-		)->grid(-row=>$row++,-column=>1,-sticky=>'ew');
-		$tw->Label(
-			-anchor=>'e',
-			-justify=>'right',
+		)->grid(-row=>$row,-column=>0,-sticky=>'ewns');
+		$tw->Entry(%entryleft,
+			-text=>"$self->{card}:$self->{span}:$self->{slot}",
+		)->grid(-row=>$row++,-column=>1,-sticky=>'ewns');
+		$tw->Label(%labelright,
 			-text=>'Signalling point:',
-		)->grid(-row=>$row,-column=>0,-sticky=>'ew');
-		my $pcode = $self->{'node'}->{'pcode'};
-		$pcode .= " ($self->{'node'}->{'pwonr'})" if $self->{'node'}->{'pownr'};
-		$tw->Entry(
-			-readonlybackground=>'white',
-			-background=>'white',
+		)->grid(-row=>$row,-column=>0,-sticky=>'ewns');
+		my $pcode = $self->{node}->{pcode};
+		$pcode .= " ($self->{node}->{pwonr})" if $self->{node}->{pownr};
+		$tw->Entry(%entryleft,
 			-textvariable=>\$pcode,
-			-state=>'readonly',
-			-exportselection=>1,
-		)->grid(-row=>$row++,-column=>1,-sticky=>'ew');
+		)->grid(-row=>$row++,-column=>1,-sticky=>'ewns');
 	}
 	$tw->MapWindow;
 }
@@ -2682,7 +3442,7 @@ sub status {
 	my $row = 0;
 	my $tw;
 	my $v = 'Signalling route';
-	if ($tw = $self->{'status'}) {
+	if ($tw = $self->{status}) {
 		if ($tw->state eq 'iconic') {
 			$tw->deiconify;
 		} else {
@@ -2694,7 +3454,7 @@ sub status {
 			-title=>$title,
 		);
 		$tw->group($canvas->toplevel);
-		$tw->transient($canvas->toplevel);
+		#$tw->transient($canvas->toplevel);
 		$tw->iconimage('icon');
 		$tw->iconname($title);
 		$tw->resizable(0,0);
@@ -2702,28 +3462,23 @@ sub status {
 		$tw->geometry("+$X+$Y");
 		$tw->protocol('WM_DELETE_WINDOW', [sub {
 			my $self = shift;
-			my $tw = $self->{'status'};
-			$self->{'status'} = undef;
+			my $tw = $self->{status};
+			$self->{status} = undef;
 			$tw->destroy;
 		},$self]);
-		$self->{'status'} = $tw;
+		$self->{status} = $tw;
 
-		$tw->Label(
-			-anchor=>'e',
-			-justify=>'right',
+		$tw->Label(%labelright,
 			-text=>'Status:',
-		)->grid(-row=>$row,-column=>0,-sticky=>'ew');
-		$tw->Optionmenu(
-			-anchor=>'w',
-			-justify=>'left',
-			-indicatoron=>0,
+		)->grid(-row=>$row,-column=>0,-sticky=>'ewns');
+		$tw->Optionmenu(%optionleft,
 			-options=>[
 				['Available'=>RT_AVAILABLE],
 				['Restricted'=>RT_RESTRICTED],
 				['Prohibited'=>RT_PROHIBITED] ],
-			-variable=>\$self->{'state'},
-			-textvariable=>\$self->{'statetext'},
-		)->grid(-row=>$row++,-column=>1,-sticky=>'ew');
+			-variable=>\$self->{state},
+			-textvariable=>\$self->{statetext},
+		)->grid(-row=>$row++,-column=>1,-sticky=>'ewns');
 	}
 	$tw->MapWindow;
 }
@@ -2732,7 +3487,7 @@ sub status {
 package Node;
 use strict;
 use vars qw(@ISA);
-@ISA = qw(MsgStats);
+@ISA = qw(MsgStats Logging);
 # -------------------------------------
 
 my %nodes;
@@ -2755,43 +3510,44 @@ use constant {
 sub init {
 	my ($self,$nodeno,$pc,$path,$side,$way,@args) = @_;
 	$self->MsgStats::init(@args);
-	$self->{'pc'} = $pc;
-	$self->{'rt'} = $path->{'rt'};
-	$self->{'rttext'} = $path->{'rttext'};
-	$self->{'side'} = $side;
-	$self->{'way'} = $way;
-	$self->{'ciccnt'} = 0;
-	$self->{'actcnt'} = 0;
-	$self->{'actog'} = 0;
-	$self->{'actic'} = 0;
-	$self->{'act2w'} = 0;
-	$self->{'tqueries'} = {};
-	$self->{'circuits'} = {};
-	$self->{'responds'} = {};
-	$self->{'routes'} = {}; # routes that term or orig here
-	$self->{'relate'} = {}; # relations in which this is a node
+	$self->Logging::init(@args);
+	$self->{pc} = $pc;
+	$self->{rt} = $path->{rt};
+	$self->{rttext} = $path->{rttext};
+	$self->{side} = $side;
+	$self->{way} = $way;
+	$self->{ciccnt} = 0;
+	$self->{actcnt} = 0;
+	$self->{actog} = 0;
+	$self->{actic} = 0;
+	$self->{act2w} = 0;
+	$self->{tqueries} = {};
+	$self->{circuits} = {};
+	$self->{responds} = {};
+	$self->{routes} = {}; # routes that term or orig here
+	$self->{relate} = {}; # relations in which this is a node
 	my $x;
 	if ($side < 0) {
 		$x = $main::mycanvas->colpos(0 - COL_NOD);
-		$self->{'col'} = 0 - COL_NOD;
+		$self->{col} = 0 - COL_NOD;
 	} else {
 		$x = $main::mycanvas->colpos(0 + COL_NOD);
-		$self->{'col'} = 0 + COL_NOD;
+		$self->{col} = 0 + COL_NOD;
 	}
-	my $y = $main::mycanvas->rowpos($nodeno);
-	$self->{'row'} = $nodeno;
-	$self->{'x'} = $x;
-	$self->{'y'} = $y;
-	$self->{'item'} = $main::canvas->createOval(
+	my $y = $main::mycanvas->rowpos(0);
+	$self->{row} = 0;
+	$self->{x} = $x;
+	$self->{y} = $y;
+	$self->{item} = $main::canvas->createOval(
 		$x-33,$y-33,$x+33,$y+33,
 		-fill=>'white',
 		-outline=>'red',
 		-width=>2,
 		-tags=>['node'],
 	);
-	$main::canvas->bind($self->{'item'},'<ButtonPress-3>',[\&Node::button3,$self,Tk::Ev('X'),Tk::Ev('Y')]);
+	$main::canvas->bind($self->{item},'<ButtonPress-3>',[\&Node::button3,$self,Tk::Ev('X'),Tk::Ev('Y')]);
 	$main::canvas->raise('node','path');
-	$self->{'scri'} = $main::canvas->createLine(
+	$self->{scri} = $main::canvas->createLine(
 		$x-23,$y-23,$x+23,$y-23,$x+23,$y+23,$x-23,$y+23,$x-23,$y-23,
 		-arrow=>'none',
 		-capstyle=>'round',
@@ -2801,42 +3557,42 @@ sub init {
 		-tags=>['scri'],
 		-width=>1,
 	);
-	$main::canvas->bind($self->{'scri'},'<ButtonPress-3>',[\&Node::button3,$self,Tk::Ev('X'),Tk::Ev('Y')]);
+	$main::canvas->bind($self->{scri},'<ButtonPress-3>',[\&Node::button3,$self,Tk::Ev('X'),Tk::Ev('Y')]);
 	$main::canvas->raise('scri','node');
-	$self->{'pcode'} = main::pcstring($pc);
-	$self->{'lownr'} = main::pcowner($pc,1);
-	if ($self->{'pownr'} = main::pcowner($pc,0)) {
-		$self->{'ownr'} = $main::canvas->createText($x,$y+15,
+	$self->{pcode} = main::pcstring($pc);
+	$self->{lownr} = main::pcowner($pc,1);
+	if ($self->{pownr} = main::pcowner($pc,0)) {
+		$self->{ownr} = $main::canvas->createText($x,$y+15,
 			-anchor=>'center',
 			-fill=>'black',
 			-justify=>'center',
-			-text=>$self->{'pownr'},
+			-text=>$self->{pownr},
 			-tags=>['ownr'],
 		);
-		$main::canvas->bind($self->{'ownr'},'<ButtonPress-3>',[\&Node::button3,$self,Tk::Ev('X'),Tk::Ev('Y')]);
+		$main::canvas->bind($self->{ownr},'<ButtonPress-3>',[\&Node::button3,$self,Tk::Ev('X'),Tk::Ev('Y')]);
 		$main::canvas->raise('ownr','scri');
 	}
-	$self->{'ttxt'} = $main::canvas->createText($x,$y-15,
+	$self->{ttxt} = $main::canvas->createText($x,$y-15,
 		-anchor=>'center',
 		-fill=>'black',
 		-justify=>'center',
 		-text=>'SP',
 		-tags=>['text'],
 	);
-	$main::canvas->bind($self->{'ttxt'},'<ButtonPress-3>',[\&Node::button3,$self,Tk::Ev('X'),Tk::Ev('Y')]);
+	$main::canvas->bind($self->{ttxt},'<ButtonPress-3>',[\&Node::button3,$self,Tk::Ev('X'),Tk::Ev('Y')]);
 	$main::canvas->raise('ttxt','scri');
-	$self->{'text'} = $main::canvas->createText($x,$y,
+	$self->{text} = $main::canvas->createText($x,$y,
 		-anchor=>'center',
 		-fill=>'black',
 		-justify=>'center',
-		-text=>$self->{'pcode'},
+		-text=>$self->{pcode},
 		-tags=>['text'],
 	);
-	$main::canvas->bind($self->{'text'},'<ButtonPress-3>',[\&Node::button3,$self,Tk::Ev('X'),Tk::Ev('Y')]);
+	$main::canvas->bind($self->{text},'<ButtonPress-3>',[\&Node::button3,$self,Tk::Ev('X'),Tk::Ev('Y')]);
 	$main::canvas->raise('text','scri');
 #	Node->regroup;
-	$self->{'network'}->regroupNodes;
-	$main::top->{'updatenow'} = 1;
+	$self->{network}->regroupNodes;
+	$main::top->{updatenow} = 1;
 #	$main::canvas->idletasks;
 }
 
@@ -2845,7 +3601,7 @@ sub new {
 	my ($type,$network,@args) = @_;
 	my $self = {};
 	bless $self,$type;
-	$self->{'network'} = $network;
+	$self->{network} = $network;
 	$self->init(@args);
 	return $self;
 }
@@ -2865,48 +3621,48 @@ sub get {
 #package Node;
 sub identify {
 	my $self = shift;
-	my $id = "Signalling point $self->{'pcode'}";
-	$id .= " ($self->{'pownr'})" if $self->{'pownr'};
+	my $id = "Signalling point $self->{pcode}";
+	$id .= " ($self->{pownr})" if $self->{pownr};
 	return $id;
 }
 
 #package Node;
 sub add_orig {
 	my ($self,$msg) = @_;
-	$self->inc($msg);
-	my $si = $msg->{'si'};
-	my $mt = $msg->{'mt'};
+	$self->inc($msg,'0');
+	my $si = $msg->{si};
+	my $mt = $msg->{mt};
 	if ($si == 5) {
 		if ($mt == 0x10 || (0x12 <= $mt && $mt <= 0x1b) || $mt == 0x2a || $mt == 0x2b) {
-			unless ($self->{'xchg_isup'}) {
-				$self->{'xchg_isup'} = 1;
-				$self->{'reanalyze'} = 1;
+			unless ($self->{xchg_isup}) {
+				$self->{xchg_isup} = 1;
+				$self->{reanalyze} = 1;
 			}
-			$self->{'circuits'}->{$msg->{'dpc'}} = 1;
+			$self->{circuits}->{$msg->{dpc}} = 1;
 		}
-		$self->reanalyze if $self->{'reanalyze'};
+		$self->reanalyze if $self->{reanalyze};
 		return;
 	}
 	if ($si == 3) {
 		if ($mt == 0x09 || $mt == 0x11 || $mt == 0x13) { # udt,xudt,ludt
-			unless ($self->{'orig_tcap'}) {
-				$self->{'orig_tcap'} = 1;
-				$self->{'reanalyze'} = 1;
+			unless ($self->{orig_tcap}) {
+				$self->{orig_tcap} = 1;
+				$self->{reanalyze} = 1;
 			}
-			$self->{'tqueries'}->{$msg->{'dpc'}} = 1;
+			$self->{tqueries}->{$msg->{dpc}} = 1;
 		}
-		$self->reanalyze if $self->{'reanalyze'};
+		$self->reanalyze if $self->{reanalyze};
 		return;
 	}
 	if ($si == 2 || $si == 1) {
 		if ($mt == 0x11 || $mt == 0x12) { # sltm,slta
-			unless ($self->{'exch_sltm'}) {
-				$self->{'exch_sltm'} = 1;
-				$self->{'reanalyze'} = 1;
+			unless ($self->{exch_sltm}) {
+				$self->{exch_sltm} = 1;
+				$self->{reanalyze} = 1;
 			}
-			$self->{'adjacent'} = $msg->{'dpc'};
+			$self->{adjacent}->{$msg->{dpc}} = 1;
 		}
-		$self->reanalyze if $self->{'reanalyze'};
+		$self->reanalyze if $self->{reanalyze};
 		return;
 	}
 }
@@ -2914,40 +3670,40 @@ sub add_orig {
 #package Node;
 sub add_term {
 	my ($self,$msg) = @_;
-	$self->inc($msg);
-	my $si = $msg->{'si'};
-	my $mt = $msg->{'mt'};
+	$self->inc($msg,'1');
+	my $si = $msg->{si};
+	my $mt = $msg->{mt};
 	if ($si == 5) {
 		if ($mt == 0x10 || (0x12 <= $mt && $mt <= 0x1b) || $mt == 0x2a || $mt == 0x2b) {
-			unless ($self->{'xchg_isup'}) {
-				$self->{'xchg_isup'} = 1;
-				$self->{'reanalyze'} = 1;
+			unless ($self->{xchg_isup}) {
+				$self->{xchg_isup} = 1;
+				$self->{reanalyze} = 1;
 			}
-			$self->{'circuits'}->{$msg->{'opc'}} = 1;
+			$self->{circuits}->{$msg->{opc}} = 1;
 		}
-		$self->reanalyze if $self->{'reanalyze'};
+		$self->reanalyze if $self->{reanalyze};
 		return;
 	}
 	if ($si == 3) {
 		if ($mt == 0x09 || $mt == 0x11 || $mt == 0x13) { # udt,xudt,ludt
-			unless ($self->{'term_tcap'}) {
-				$self->{'term_tcap'} = 1;
-				$self->{'reanalyze'} = 1;
+			unless ($self->{term_tcap}) {
+				$self->{term_tcap} = 1;
+				$self->{reanalyze} = 1;
 			}
-			$self->{'responds'}->{$msg->{'opc'}} = 1;
+			$self->{responds}->{$msg->{opc}} = 1;
 		}
-		$self->reanalyze if $self->{'reanalyze'};
+		$self->reanalyze if $self->{reanalyze};
 		return;
 	}
 	if ($si == 2 || $si == 1) {
 		if ($mt == 0x11 || $mt == 0x12) { # sltm,slta
-			unless ($self->{'xchg_sltm'}) {
-				$self->{'xchg_sltm'} = 1;
-				$self->{'reanalyze'} = 1;
+			unless ($self->{xchg_sltm}) {
+				$self->{xchg_sltm} = 1;
+				$self->{reanalyze} = 1;
 			}
-			$self->{'adjacent'} = $msg->{'opc'};
+			$self->{adjacent}->{$msg->{opc}} = 1;
 		}
-		$self->reanalyze if $self->{'reanalyze'};
+		$self->reanalyze if $self->{reanalyze};
 		return;
 	}
 }
@@ -2985,111 +3741,115 @@ sub makeGtt {
 #package Node;
 sub reanalyze {
 	my $self = shift;
-	my $col = abs($self->{'col'});
-	my $row = $self->{'row'};
-	if ($self->{'xchg_sltm'}) {
+	my $col = abs($self->{col});
+	my $row = $self->{row};
+	if ($self->{xchg_sltm}) {
 		$col = COL_ADJ;
-	} elsif ($self->{'xchg_isup'} || ($self->{'orig_tcap'} && $self->{'term_tcap'})) {
+	} elsif ($self->{xchg_isup} || ($self->{orig_tcap} && $self->{term_tcap})) {
 		$col = COL_SSP;
-	} elsif ($self->{'orig_tcap'} && !$self->{'term_tcap'}) {
+	} elsif ($self->{orig_tcap} && !$self->{term_tcap}) {
 		$col = COL_SCP;
-	} elsif (!$self->{'orig_tcap'} && $self->{'term_tcap'}) {
+	} elsif (!$self->{orig_tcap} && $self->{term_tcap}) {
 		$col = COL_GTT;
 	} 
-	if (abs($self->{'col'}) != $col) {
-		if ($self->{'col'} < 0) {
+	if (abs($self->{col}) != $col) {
+		if ($self->{col} < 0) {
 			$col = 0 - $col;
 		}
 		$self->moveto($col,$row);
 #		Node->regroup;
-		$self->{'network'}->regroupNodes;
-		$main::top->{'updatenow'} = 1;
+		$self->{network}->regroupNodes;
+		$main::top->{updatenow} = 1;
 #		$main::canvas->idletasks;
 	}
-	if ($self->{'xchg_isup'} || ($self->{'orig_tcap'} && $self->{'term_tcap'})) {
+	if ($self->{xchg_isup} || ($self->{orig_tcap} && $self->{term_tcap})) {
 		$self->makeSsp;
-	} elsif ($self->{'orig_tcap'} && !$self->{'term_tcap'}) {
+	} elsif ($self->{orig_tcap} && !$self->{term_tcap}) {
 		$self->makeScp;
-	} elsif (!$self->{'orig_tcap'} && $self->{'term_tcap'}) {
+	} elsif (!$self->{orig_tcap} && $self->{term_tcap}) {
 		$self->makeGtt;
-	} elsif ($self->{'xchg_sltm'}) {
+	} elsif ($self->{xchg_sltm}) {
 		$self->makeStp;
 	}
-	if ($self->{'xchg_isup'}) {
-		if ($self->{'orig_tcap'}) {
-			if ($self->{'term_tcap'}) {
-				if ($self->{'xchg_sltm'}) {
+	if ($self->{xchg_isup}) {
+		if ($self->{orig_tcap}) {
+			if ($self->{term_tcap}) {
+				if ($self->{xchg_sltm}) {
 				} else {
 				}
 			} else {
-				if ($self->{'xchg_sltm'}) {
+				if ($self->{xchg_sltm}) {
 				} else {
 				}
 			}
 		} else {
-			if ($self->{'term_tcap'}) {
-				if ($self->{'xchg_sltm'}) {
+			if ($self->{term_tcap}) {
+				if ($self->{xchg_sltm}) {
 				} else {
 				}
 			} else {
-				if ($self->{'xchg_sltm'}) {
+				if ($self->{xchg_sltm}) {
 				} else {
 				}
 			}
 		}
 	} else {
-		if ($self->{'orig_tcap'}) {
-			if ($self->{'term_tcap'}) {
-				if ($self->{'xchg_sltm'}) {
+		if ($self->{orig_tcap}) {
+			if ($self->{term_tcap}) {
+				if ($self->{xchg_sltm}) {
 				} else {
 				}
 			} else {
 				# SCP's originate but never terminate
-				if ($self->{'xchg_sltm'}) {
+				if ($self->{xchg_sltm}) {
 				} else {
 				}
 			}
 		} else {
-			if ($self->{'term_tcap'}) {
+			if ($self->{term_tcap}) {
 				# GTT functions never originate, just terminate
-				if ($self->{'xchg_sltm'}) {
+				if ($self->{xchg_sltm}) {
 				} else {
 				}
 			} else {
-				if ($self->{'xchg_sltm'}) {
+				if ($self->{xchg_sltm}) {
 				} else {
 				}
 			}
 		}
 	}
-	delete $self->{'reanalyze'};
+	delete $self->{reanalyze};
 }
 
 #package Node;
 sub swap {
 	my $self = shift;
-	$self->moveto(-$self->{'col'},$self->{'row'});
+	$self->moveto(-$self->{col},$self->{row});
 }
 
 #package Node;
 sub moveto {
 	my ($self,$col,$row) = @_;
-	return if $col == $self->{'col'} && $row == $self->{'row'};
+	#return if $col == $self->{col} && $row == $self->{row};
 	my $newx = $main::mycanvas->colpos($col);
 	my $newy = $main::mycanvas->rowpos($row);
-	my $deltax = $newx - $self->{'x'};
-	my $deltay = $newy - $self->{'y'};
-	$main::canvas->move($self->{'item'},$deltax,$deltay);
-	$main::canvas->move($self->{'scri'},$deltax,$deltay);
-	$main::canvas->move($self->{'ttxt'},$deltax,$deltay);
-	$main::canvas->move($self->{'ownr'},$deltax,$deltay) if $self->{'ownr'};
-	$main::canvas->move($self->{'text'},$deltax,$deltay);
-	$self->{'x'} = $newx;
-	$self->{'y'} = $newy;
-	$self->{'col'} = $col;
-	$self->{'row'} = $row;
-	while (my ($k,$r) = each %{$self->{'routes'}}) { $r->move; }
-	while (my ($k,$r) = each %{$self->{'relate'}}) { $r->move; }
+	my $deltax = $newx - $self->{x};
+	my $deltay = $newy - $self->{y};
+	if ($deltax or $deltay) {
+		$main::canvas->move($self->{item},$deltax,$deltay);
+		$main::canvas->move($self->{scri},$deltax,$deltay);
+		$main::canvas->move($self->{ttxt},$deltax,$deltay);
+		$main::canvas->move($self->{ownr},$deltax,$deltay) if $self->{ownr};
+		$main::canvas->move($self->{text},$deltax,$deltay);
+	}
+	$self->{x} = $newx;
+	$self->{y} = $newy;
+	$self->{col} = $col;
+	$self->{row} = $row;
+	if ($deltax or $deltay) {
+		foreach my $r (values %{$self->{routes}}) { $r->move; }
+		foreach my $r (values %{$self->{relate}}) { $r->move; }
+	}
 }
 
 #package Node;
@@ -3098,13 +3858,13 @@ sub regroup {
 	my $network = shift;
 	my %totals;
 	while (my ($pc,$node) = each %Node::nodes) {
-		my $col = $node->{'col'};
+		my $col = $node->{col};
 		$totals{$col} += 1;
 	}
 	my %counts;
 	foreach my $pc (sort {$a <=> $b} keys %Node::nodes) {
 		my $node = $Node::nodes{$pc};
-		my $col = $node->{'col'};
+		my $col = $node->{col};
 		my $row = $counts{$col} - $totals{$col};
 		$counts{$col} += 2;
 		$node->moveto($col,$row);
@@ -3132,16 +3892,25 @@ sub button3 {
 		-underline=>5,
 	);
 	$m->add('command',
+		#-accelerator=>'l',
+		-command=>[\&Logging::showlog, $self, $canvas, $X, $Y],
+		-label=>'Node Logs...',
+		-underline=>5,
+		-state=>(@{$self->{logs}} ? 'normal' : 'disabled'),
+	);
+	$m->add('command',
 		#-accelerator=>'m',
 		-command=>[\&MsgStats::stats, $self, $canvas, $X, $Y],
 		-label=>'Message Statistics...',
 		-underline=>0,
+		-state=>($self->{incs}->{0}->{sus} + $self->{incs}->{1}->{sus} ? 'normal' : 'disabled'),
 	);
 	$m->add('command',
 		#-accelerator=>'c',
 		-command=>[\&MsgStats::cstat, $self, $canvas, $X, $Y],
 		-label=>'Call statistics...',
 		-underline=>0,
+		-state=>($self->{ciccnt} ? 'normal' : 'disabled'),
 	);
 	$m->Popup(
 		-popanchor=>'nw',
@@ -3151,56 +3920,34 @@ sub button3 {
 
 sub commonprops {
 	my ($self,$canvas,$tw,$type,$row) = @_;
-	$tw->Label(
-		-anchor=>'e',
-		-justify=>'right',
+	$tw->Label(%labelright,
 		-text=>'Object type:',
-	)->grid(-row=>$$row,-column=>0,-sticky=>'ew');
-	$tw->Entry(
-		-readonlybackground=>'white',
-		-background=>'white',
+	)->grid(-row=>$$row,-column=>0,-sticky=>'ewns');
+	$tw->Entry(%entryleft,
 		-textvariable=>\$type,
-		-state=>'readonly',
-		-exportselection=>1,
-	)->grid(-row=>$$row++,-column=>1,-sticky=>'ew');
-	$tw->Label(
-		-anchor=>'e',
-		-justify=>'right',
+	)->grid(-row=>$$row++,-column=>1,-sticky=>'ewns');
+	$tw->Label(%labelright,
 		-text=>'Point code type:',
-	)->grid(-row=>$$row,-column=>0,-sticky=>'ew');
-	$tw->Optionmenu(
-		-anchor=>'w',
-		-justify=>'left',
-		-indicatoron=>0,
+	)->grid(-row=>$$row,-column=>0,-sticky=>'ewns');
+	$tw->Optionmenu(%optionleft,
 		-options=>[
 			['14-bit point code'=>RT_14BIT_PC],
 			['24-bit point code'=>RT_24BIT_PC] ],
-		-variable=>\$self->{'rt'},
-		-textvariable=>\$self->{'rttext'},
-	)->grid(-row=>$$row++,-column=>1,-sticky=>'ew');
-	$tw->Label(
-		-anchor=>'e',
-		-justify=>'right',
+		-variable=>\$self->{rt},
+		-textvariable=>\$self->{rttext},
+	)->grid(-row=>$$row++,-column=>1,-sticky=>'ewns');
+	$tw->Label(%labelright,
 		-text=>'Point code:',
-	)->grid(-row=>$$row,-column=>0,-sticky=>'ew');
-	$tw->Entry(
-		-readonlybackground=>'white',
-		-background=>'white',
-		-textvariable=>\$self->{'pcode'},
-		-state=>'readonly',
-		-exportselection=>1,
-	)->grid(-row=>$$row++,-column=>1,-sticky=>'ew');
-	$tw->Label(
-		-anchor=>'e',
-		-justify=>'right',
+	)->grid(-row=>$$row,-column=>0,-sticky=>'ewns');
+	$tw->Entry(%entryleft,
+		-textvariable=>\$self->{pcode},
+	)->grid(-row=>$$row++,-column=>1,-sticky=>'ewns');
+	$tw->Label(%labelright,
 		-text=>'Point code owner:',
-	)->grid(-row=>$$row,-column=>0,-sticky=>'ew');
-	$tw->Entry(
-		-readonlybackground=>'white',
-		-background=>'white',
-		-textvariable=>\$self->{'lownr'},
-		-exportselection=>1,
-	)->grid(-row=>$$row++,-column=>1,-sticky=>'ew');
+	)->grid(-row=>$$row,-column=>0,-sticky=>'ewns');
+	$tw->Entry(%entryinput,
+		-textvariable=>\$self->{lownr},
+	)->grid(-row=>$$row++,-column=>1,-sticky=>'ewns');
 }
 
 #package Node;
@@ -3209,7 +3956,7 @@ sub props {
 	my $row = 0;
 	my $tw;
 	my $v = 'Signalling point (SP)';
-	if ($tw = $self->{'props'}) {
+	if ($tw = $self->{props}) {
 		if ($tw->state eq 'iconic') {
 			$tw->deiconify;
 		} else {
@@ -3221,7 +3968,7 @@ sub props {
 			-title=>$title,
 		);
 		$tw->group($canvas->toplevel);
-		$tw->transient($canvas->toplevel);
+		#$tw->transient($canvas->toplevel);
 		$tw->iconimage('icon');
 		$tw->iconname($title);
 		$tw->resizable(0,0);
@@ -3229,11 +3976,11 @@ sub props {
 		$tw->geometry("+$X+$Y");
 		$tw->protocol('WM_DELETE_WINDOW', [sub {
 			my $self = shift;
-			my $tw = $self->{'props'};
-			$self->{'props'} = undef;
+			my $tw = $self->{props};
+			$self->{props} = undef;
 			$tw->destroy;
 		},$self]);
-		$self->{'props'} = $tw;
+		$self->{props} = $tw;
 
 		$self->commonprops($canvas,$tw,$v,\$row);
 	}
@@ -3243,54 +3990,30 @@ sub props {
 #package Node;
 sub commonstatus {
 	my ($self,$canvas,$tw,$type,$row) = @_;
-	$tw->Label(
-		-anchor=>'e',
-		-justify=>'right',
+	$tw->Label(%labelright,
 		-text=>'Exchange SLTM',
-	)->grid(-row=>$$row,-column=>0,-sticky=>'ew');
-	$tw->Checkbutton(
-		-anchor=>'w',
-		-justify=>'left',
-		-indicatoron=>1,
-		-variable=>\$self->{'xchg_sltm'},
-		-stat=>'disabled',
-	)->grid(-row=>$$row,-column=>1,-sticky=>'ew');
-	$tw->Label(
-		-anchor=>'e',
-		-justify=>'right',
+	)->grid(-row=>$$row,-column=>0,-sticky=>'ewns');
+	$tw->Checkbutton(%buttonleft,
+		-variable=>\$self->{xchg_sltm},
+	)->grid(-row=>$$row,-column=>1,-sticky=>'ewns');
+	$tw->Label(%labelright,
 		-text=>'Exchange ISUP',
-	)->grid(-row=>$$row,-column=>2,-sticky=>'ew');
-	$tw->Checkbutton(
-		-anchor=>'w',
-		-justify=>'left',
-		-indicatoron=>1,
-		-variable=>\$self->{'xchg_isup'},
-		-stat=>'disabled',
-	)->grid(-row=>$$row,-column=>3,-sticky=>'ew');
-	$tw->Label(
-		-anchor=>'e',
-		-justify=>'right',
+	)->grid(-row=>$$row,-column=>2,-sticky=>'ewns');
+	$tw->Checkbutton(%buttonleft,
+		-variable=>\$self->{xchg_isup},
+	)->grid(-row=>$$row,-column=>3,-sticky=>'ewns');
+	$tw->Label(%labelright,
 		-text=>'Originate TCAP',
-	)->grid(-row=>$$row,-column=>4,-sticky=>'ew');
-	$tw->Checkbutton(
-		-anchor=>'w',
-		-justify=>'left',
-		-indicatoron=>1,
-		-variable=>\$self->{'orig_tcap'},
-		-stat=>'disabled',
-	)->grid(-row=>$$row,-column=>5,-sticky=>'ew');
-	$tw->Label(
-		-anchor=>'e',
-		-justify=>'right',
+	)->grid(-row=>$$row,-column=>4,-sticky=>'ewns');
+	$tw->Checkbutton(%buttonleft,
+		-variable=>\$self->{orig_tcap},
+	)->grid(-row=>$$row,-column=>5,-sticky=>'ewns');
+	$tw->Label(%labelright,
 		-text=>'Terminate TCAP',
-	)->grid(-row=>$$row,-column=>6,-sticky=>'ew');
-	$tw->Checkbutton(
-		-anchor=>'w',
-		-justify=>'left',
-		-indicatoron=>1,
-		-variable=>\$self->{'term_tcap'},
-		-stat=>'disabled',
-	)->grid(-row=>$$row++,-column=>7,-sticky=>'ew');
+	)->grid(-row=>$$row,-column=>6,-sticky=>'ewns');
+	$tw->Checkbutton(%buttonleft,
+		-variable=>\$self->{term_tcap},
+	)->grid(-row=>$$row++,-column=>7,-sticky=>'ewns');
 }
 
 #package Node;
@@ -3299,7 +4022,7 @@ sub status {
 	my $row = 0;
 	my $tw;
 	my $v = 'Signalling point (SP)';
-	if ($tw = $self->{'status'}) {
+	if ($tw = $self->{status}) {
 		if ($tw->state eq 'iconic') {
 			$tw->deiconify;
 		} else {
@@ -3311,7 +4034,7 @@ sub status {
 			-title=>$title,
 		);
 		$tw->group($canvas->toplevel);
-		$tw->transient($canvas->toplevel);
+		#$tw->transient($canvas->toplevel);
 		$tw->iconimage('icon');
 		$tw->iconname($title);
 		$tw->resizable(0,0);
@@ -3319,11 +4042,11 @@ sub status {
 		$tw->geometry("+$X+$Y");
 		$tw->protocol('WM_DELETE_WINDOW', [sub {
 			my $self = shift;
-			my $tw = $self->{'status'};
-			$self->{'status'} = undef;
+			my $tw = $self->{status};
+			$self->{status} = undef;
 			$tw->destroy;
 		},$self]);
-		$self->{'status'} = $tw;
+		$self->{status} = $tw;
 
 		$self->commonstatus($canvas,$tw,$v,\$row);
 	}
@@ -3346,13 +4069,13 @@ use constant {
 #package Ssp;
 sub xform {
 	my ($type,$self) = @_;
-	return if $self->{'type'} == 1;
+	return if $self->{type} == 1;
 	return if ref $self eq $type;
 	bless $self,$type;
-	my $x = $self->{'x'};
-	my $y = $self->{'y'};
-	$main::canvas->delete($self->{'item'});
-	$self->{'item'} = $main::canvas->createOval(
+	my $x = $self->{x};
+	my $y = $self->{y};
+	$main::canvas->delete($self->{item});
+	$self->{item} = $main::canvas->createOval(
 		$x-33,$y-33,$x+33,$y+33,
 		-fill=>'white',
 		-outline=>'black',
@@ -3360,25 +4083,25 @@ sub xform {
 		-tags=>['ssp','node'],
 	);
 	$main::canvas->raise('node','path');
-	$main::canvas->coords($self->{'scri'},
+	$main::canvas->coords($self->{scri},
 		$x-23,$y-23,$x+23,$y+23,$x+23,$y-23,$x-23,$y+23,$x-23,$y-23,
 	);
-	$main::canvas->itemconfigure($self->{'ttxt'}, -text=>'SSP');
-	$self->{'type'} = 1;
-	$main::canvas->bind($self->{'item'},'<ButtonPress-3>',[\&Ssp::button3,$self,Tk::Ev('X'),Tk::Ev('Y')]);
-	$main::canvas->bind($self->{'scri'},'<ButtonPress-3>',[\&Ssp::button3,$self,Tk::Ev('X'),Tk::Ev('Y')]);
-	$main::canvas->bind($self->{'ttxt'},'<ButtonPress-3>',[\&Ssp::button3,$self,Tk::Ev('X'),Tk::Ev('Y')]);
-	$main::canvas->bind($self->{'text'},'<ButtonPress-3>',[\&Ssp::button3,$self,Tk::Ev('X'),Tk::Ev('Y')]);
-	$main::canvas->bind($self->{'ownr'},'<ButtonPress-3>',[\&Ssp::button3,$self,Tk::Ev('X'),Tk::Ev('Y')]) if $self->{'ownr'};
+	$main::canvas->itemconfigure($self->{ttxt}, -text=>'SSP');
+	$self->{type} = 1;
+	$main::canvas->bind($self->{item},'<ButtonPress-3>',[\&Ssp::button3,$self,Tk::Ev('X'),Tk::Ev('Y')]);
+	$main::canvas->bind($self->{scri},'<ButtonPress-3>',[\&Ssp::button3,$self,Tk::Ev('X'),Tk::Ev('Y')]);
+	$main::canvas->bind($self->{ttxt},'<ButtonPress-3>',[\&Ssp::button3,$self,Tk::Ev('X'),Tk::Ev('Y')]);
+	$main::canvas->bind($self->{text},'<ButtonPress-3>',[\&Ssp::button3,$self,Tk::Ev('X'),Tk::Ev('Y')]);
+	$main::canvas->bind($self->{ownr},'<ButtonPress-3>',[\&Ssp::button3,$self,Tk::Ev('X'),Tk::Ev('Y')]) if $self->{ownr};
 #	$main::canvas->idletasks;
-	$main::top->{'updatenow'} = 1;
+	$main::top->{updatenow} = 1;
 }
 
 #package Ssp;
 sub identify {
 	my $self = shift;
-	my $id = "Service switching point $self->{'pcode'}";
-	$id .= " ($self->{'pownr'})" if $self->{'pownr'};
+	my $id = "Service switching point $self->{pcode}";
+	$id .= " ($self->{pownr})" if $self->{pownr};
 	return $id;
 }
 
@@ -3403,16 +4126,25 @@ sub button3 {
 		-underline=>4,
 	);
 	$m->add('command',
+		#-accelerator=>'l',
+		-command=>[\&Logging::showlog, $self, $canvas, $X, $Y],
+		-label=>'SSP Logs...',
+		-underline=>4,
+		-state=>(@{$self->{logs}} ? 'normal' : 'disabled'),
+	);
+	$m->add('command',
 		#-accelerator=>'m',
 		-command=>[\&MsgStats::stats, $self, $canvas, $X, $Y],
 		-label=>'Message Statistics...',
 		-underline=>0,
+		-state=>($self->{incs}->{0}->{sus} + $self->{incs}->{1}->{sus} ? 'normal' : 'disabled'),
 	);
 	$m->add('command',
 		#-accelerator=>'c',
 		-command=>[\&MsgStats::cstat, $self, $canvas, $X, $Y],
 		-label=>'Call statistics...',
 		-underline=>0,
+		-state=>($self->{ciccnt} ? 'normal' : 'disabled'),
 	);
 	$m->Popup(
 		-popanchor=>'nw',
@@ -3426,7 +4158,7 @@ sub props {
 	my $row = 0;
 	my $tw;
 	my $v = 'Service switching point (SSP)';
-	if ($tw = $self->{'props'}) {
+	if ($tw = $self->{props}) {
 		if ($tw->state eq 'iconic') {
 			$tw->deiconify;
 		} else {
@@ -3438,7 +4170,7 @@ sub props {
 			-title=>$title,
 		);
 		$tw->group($canvas->toplevel);
-		$tw->transient($canvas->toplevel);
+		#$tw->transient($canvas->toplevel);
 		$tw->iconimage('icon');
 		$tw->iconname($title);
 		$tw->resizable(0,0);
@@ -3446,11 +4178,11 @@ sub props {
 		$tw->geometry("+$X+$Y");
 		$tw->protocol('WM_DELETE_WINDOW', [sub {
 			my $self = shift;
-			my $tw = $self->{'props'};
-			$self->{'props'} = undef;
+			my $tw = $self->{props};
+			$self->{props} = undef;
 			$tw->destroy;
 		},$self]);
-		$self->{'props'} = $tw;
+		$self->{props} = $tw;
 
 		$self->commonprops($canvas,$tw,$v,\$row);
 	}
@@ -3463,7 +4195,7 @@ sub status {
 	my $row = 0;
 	my $tw;
 	my $v = 'Service switching point (SSP)';
-	if ($tw = $self->{'status'}) {
+	if ($tw = $self->{status}) {
 		if ($tw->state eq 'iconic') {
 			$tw->deiconify;
 		} else {
@@ -3475,7 +4207,7 @@ sub status {
 			-title=>$title,
 		);
 		$tw->group($canvas->toplevel);
-		$tw->transient($canvas->toplevel);
+		#$tw->transient($canvas->toplevel);
 		$tw->iconimage('icon');
 		$tw->iconname($title);
 		$tw->resizable(0,0);
@@ -3483,172 +4215,102 @@ sub status {
 		$tw->geometry("+$X+$Y");
 		$tw->protocol('WM_DELETE_WINDOW', [sub {
 			my $self = shift;
-			my $tw = $self->{'status'};
-			$self->{'status'} = undef;
+			my $tw = $self->{status};
+			$self->{status} = undef;
 			$tw->destroy;
 		},$self]);
-		$self->{'status'} = $tw;
+		$self->{status} = $tw;
 
-		my $f = $tw->Frame(
-			-relief=>'ridge',
-			-borderwidth=>2,
-		)->pack(
-			-expand=>1,
-			-fill=>'x',
-			-side=>'top',
-			-anchor=>'n',
-		);
+		my $f = $tw->Frame(%tframestyle,
+		)->pack(%tframepack);
 		$self->commonstatus($canvas,$f,$v,\$row);
-		if (keys %{$self->{'circuits'}}) {
-			$f = $tw->TFrame(
-				-relief=>'ridge',
-				-borderwidth=>2,
-				-label=>'Circuits:',
-			)->pack(
-				-expand=>1,
-				-fill=>'both',
-				-side=>'top',
-				-anchor=>'n',
-			);
+		if (keys %{$self->{adjacent}}) {
+			$f = $tw->TFrame(%tframestyle,
+				-label=>'Linksets:',
+			)->pack(%tframepack);
 			$row = 0;
-			$f->Label(
-				-anchor=>'s',
-				-justify=>'center',
+			foreach my $pc (sort {$a <=> $b} keys %{$self->{adjacent}}) {
+				$f->Label(%labelright,
+					-text=>'Linksets to:',
+				)->grid(-row=>$row,-column=>0,-sticky=>'ewns');
+				my $pcode = main::pcstring($pc);
+				my $pownr = main::pcowner($pc,0);
+				$pcode .= " ($pownr)" if $pownr;
+				$f->Entry(%entrycenter,
+					-textvariable=>\$pcode,
+				)->grid(-row=>$row++,-column=>1,-sticky=>'ewns');
+			}
+		}
+		if (keys %{$self->{circuits}}) {
+			$f = $tw->TFrame(%tframestyle,
+				-label=>'Circuits:',
+			)->pack(%tframepack);
+			$row = 0;
+			$f->Label(%labelcenter,
 				-text=>'Point Code',
-				-relief=>'raised',
-				-borderwidth=>2,
-			)->grid(-row=>$row,-column=>0,-sticky=>'ew');
-			$f->Label(
-				-anchor=>'s',
-				-justify=>'center',
+			)->grid(-row=>$row,-column=>0,-sticky=>'ewns');
+			$f->Label(%labelcenter,
 				-text=>'Alloc.',
-				-relief=>'raised',
-				-borderwidth=>2,
-			)->grid(-row=>$row,-column=>1,-sticky=>'ew');
-			$f->Label(
-				-anchor=>'s',
-				-justify=>'center',
+			)->grid(-row=>$row,-column=>1,-sticky=>'ewns');
+			$f->Label(%labelcenter,
 				-text=>'Act.',
-				-relief=>'raised',
-				-borderwidth=>2,
-			)->grid(-row=>$row,-column=>2,-sticky=>'ew');
-			$f->Label(
-				-anchor=>'s',
-				-justify=>'center',
+			)->grid(-row=>$row,-column=>2,-sticky=>'ewns');
+			$f->Label(%labelcenter,
 				-text=>'O/G',
-				-relief=>'raised',
-				-borderwidth=>2,
-			)->grid(-row=>$row,-column=>3,-sticky=>'ew');
-			$f->Label(
-				-anchor=>'s',
-				-justify=>'center',
+			)->grid(-row=>$row,-column=>3,-sticky=>'ewns');
+			$f->Label(%labelcenter,
 				-text=>'I/C',
-				-relief=>'raised',
-				-borderwidth=>2,
-			)->grid(-row=>$row,-column=>4,-sticky=>'ew');
-			$f->Label(
-				-anchor=>'s',
-				-justify=>'center',
+			)->grid(-row=>$row,-column=>4,-sticky=>'ewns');
+			$f->Label(%labelcenter,
 				-text=>'2/W',
-				-relief=>'raised',
-				-borderwidth=>2,
-			)->grid(-row=>$row++,-column=>5,-sticky=>'ew');
-			foreach my $pc (sort {$a <=> $b} keys %{$self->{'circuits'}}) {
+			)->grid(-row=>$row++,-column=>5,-sticky=>'ewns');
+			foreach my $pc (sort {$a <=> $b} keys %{$self->{circuits}}) {
 				my ($ogcol,$iccol);
-				if ($self->{'way'} eq 'O')
+				if ($self->{way} eq 'O')
 				{ $ogcol = 3; $iccol = 4; } else
 				{ $ogcol = 4; $iccol = 3; }
 				my $pcode = main::pcstring($pc);
 				my $pownr = main::pcowner($pc,0);
 				$pcode .= " ($pownr)" if $pownr;
-				$f->Entry(
-					-readonlybackground=>'white',
-					-background=>'white',
-					-justify=>'center',
+				$f->Entry(%entrycenter,
 					-textvariable=>\$pcode,
-					-state=>'readonly',
-					-exportselection=>1,
-				)->grid(-row=>$row,-column=>0,-sticky=>'ew');
-				$f->Entry(
-					-readonlybackground=>'white',
-					-background=>'white',
-					-justify=>'right',
-					-width=>8,
-					-textvariable=>\$self->{'relate'}->{$pc}->{'ciccnt'},
-					-state=>'readonly',
-					-exportselection=>1,
-				)->grid(-row=>$row,-column=>1,-sticky=>'ew');
-				$f->Entry(
-					-readonlybackground=>'white',
-					-background=>'white',
-					-justify=>'right',
-					-width=>8,
-					-textvariable=>\$self->{'relate'}->{$pc}->{'actcnt'},
-					-state=>'readonly',
-					-exportselection=>1,
-				)->grid(-row=>$row,-column=>2,-sticky=>'ew');
-				$f->Entry(
-					-readonlybackground=>'white',
-					-background=>'white',
-					-justify=>'right',
-					-width=>8,
-					-textvariable=>\$self->{'relate'}->{$pc}->{'actforw'},
-					-state=>'readonly',
-					-exportselection=>1,
-				)->grid(-row=>$row,-column=>$ogcol,-sticky=>'ew');
-				$f->Entry(
-					-readonlybackground=>'white',
-					-background=>'white',
-					-justify=>'right',
-					-width=>8,
-					-textvariable=>\$self->{'relate'}->{$pc}->{'actrevs'},
-					-state=>'readonly',
-					-exportselection=>1,
-				)->grid(-row=>$row,-column=>$iccol,-sticky=>'ew');
-				$f->Entry(
-					-readonlybackground=>'white',
-					-background=>'white',
-					-justify=>'right',
-					-width=>8,
-					-textvariable=>\$self->{'relate'}->{$pc}->{'actboth'},
-					-state=>'readonly',
-					-exportselection=>1,
-				)->grid(-row=>$row++,-column=>5,-sticky=>'ew');
+				)->grid(-row=>$row,-column=>0,-sticky=>'ewns');
+				$f->Entry(%entryright,
+					-textvariable=>\$self->{relate}->{$pc}->{ciccnt},
+				)->grid(-row=>$row,-column=>1,-sticky=>'ewns');
+				$f->Entry(%entryright,
+					-textvariable=>\$self->{relate}->{$pc}->{actcnt},
+				)->grid(-row=>$row,-column=>2,-sticky=>'ewns');
+				$f->Entry(%entryright,
+					-textvariable=>\$self->{relate}->{$pc}->{actforw},
+				)->grid(-row=>$row,-column=>$ogcol,-sticky=>'ewns');
+				$f->Entry(%entryright,
+					-textvariable=>\$self->{relate}->{$pc}->{actrevs},
+				)->grid(-row=>$row,-column=>$iccol,-sticky=>'ewns');
+				$f->Entry(%entryright,
+					-textvariable=>\$self->{relate}->{$pc}->{actboth},
+				)->grid(-row=>$row++,-column=>5,-sticky=>'ewns');
 			}
 		}
-		if (keys %{$self->{'tqueries'}} || keys %{$self->{'responds'}}) {
-			$f = $tw->TFrame(
-				-relief=>'ridge',
-				-borderwidth=>2,
+		if (keys %{$self->{tqueries}} || keys %{$self->{responds}}) {
+			$f = $tw->TFrame(%tframestyle,
 				-label=>'Queries:',
-			)->pack(
-				-expand=>1,
-				-fill=>'both',
-				-side=>'top',
-				-anchor=>'n',
-			);
+			)->pack(%tframepack);
 			$row = 0;
 			my $col = 0;
-			foreach my $pc (sort {$a <=> $b} keys %{$self->{'tqueries'}}) {
+			foreach my $pc (sort {$a <=> $b} keys %{$self->{tqueries}}) {
 				if ($col == 0) {
-					$f->Label(
-						-anchor=>'e',
-						-justify=>'right',
+					$f->Label(%labelright,
 						-text=>'Query to:',
-					)->grid(-row=>$row,-column=>$col,-sticky=>'ew');
+					)->grid(-row=>$row,-column=>$col,-sticky=>'ewns');
 				}
 				$col++;
 				my $pcode = main::pcstring($pc);
 				my $pownr = main::pcowner($pc,0);
 				$pcode .= " ($pownr)" if $pownr;
-				$f->Entry(
-					-readonlybackground=>'white',
-					-background=>'white',
-					-justify=>'center',
+				$f->Entry(%entrycenter,
 					-textvariable=>\$pcode,
-					-state=>'readonly',
-					-exportselection=>1,
-				)->grid(-row=>$row,-column=>$col,-sticky=>'ew');
+				)->grid(-row=>$row,-column=>$col,-sticky=>'ewns');
 				if ($col > 5) {
 					$col = 0;
 					$row++;
@@ -3658,26 +4320,19 @@ sub status {
 				$col = 0;
 				$row++;
 			}
-			foreach my $pc (sort {$a <=> $b} keys %{$self->{'responds'}}) {
+			foreach my $pc (sort {$a <=> $b} keys %{$self->{responds}}) {
 				if ($col == 0) {
-					$f->Label(
-						-anchor=>'e',
-						-justify=>'right',
+					$f->Label(%labelright,
 						-text=>'Reply from:',
-					)->grid(-row=>$row,-column=>$col,-sticky=>'ew');
+					)->grid(-row=>$row,-column=>$col,-sticky=>'ewns');
 				}
 				$col++;
 				my $pcode = main::pcstring($pc);
 				my $pownr = main::pcowner($pc,0);
 				$pcode .= " ($pownr)" if $pownr;
-				$f->Entry(
-					-readonlybackground=>'white',
-					-background=>'white',
-					-justify=>'center',
+				$f->Entry(%entrycenter,
 					-textvariable=>\$pcode,
-					-state=>'readonly',
-					-exportselection=>1,
-				)->grid(-row=>$row,-column=>$col,-sticky=>'ew');
+				)->grid(-row=>$row,-column=>$col,-sticky=>'ewns');
 				if ($col > 5) {
 					$col = 0;
 					$row++;
@@ -3704,13 +4359,13 @@ use constant {
 #package Scp;
 sub xform {
 	my ($type,$self) = @_;
-	return if $self->{'type'} == 2;
+	return if $self->{type} == 2;
 	return if ref $self eq $type;
 	bless $self,$type;
-	my $x = $self->{'x'};
-	my $y = $self->{'y'};
-	$main::canvas->delete($self->{'item'});
-	$self->{'item'} = $main::canvas->createOval(
+	my $x = $self->{x};
+	my $y = $self->{y};
+	$main::canvas->delete($self->{item});
+	$self->{item} = $main::canvas->createOval(
 		$x-33,$y-23,$x+33,$y+23,
 		-fill=>'white',
 		-outline=>'black',
@@ -3718,22 +4373,22 @@ sub xform {
 		-tags=>['scp','node'],
 	);
 	$main::canvas->raise('node','path');
-	$main::canvas->itemconfigure($self->{'ttxt'}, -text=>'SCP');
-	$self->{'type'} = 2;
-	$main::canvas->bind($self->{'item'},'<ButtonPress-3>',[\&Scp::button3,$self,Tk::Ev('X'),Tk::Ev('Y')]);
-	$main::canvas->bind($self->{'scri'},'<ButtonPress-3>',[\&Scp::button3,$self,Tk::Ev('X'),Tk::Ev('Y')]);
-	$main::canvas->bind($self->{'ttxt'},'<ButtonPress-3>',[\&Scp::button3,$self,Tk::Ev('X'),Tk::Ev('Y')]);
-	$main::canvas->bind($self->{'text'},'<ButtonPress-3>',[\&Scp::button3,$self,Tk::Ev('X'),Tk::Ev('Y')]);
-	$main::canvas->bind($self->{'ownr'},'<ButtonPress-3>',[\&Scp::button3,$self,Tk::Ev('X'),Tk::Ev('Y')]) if $self->{'ownr'};
+	$main::canvas->itemconfigure($self->{ttxt}, -text=>'SCP');
+	$self->{type} = 2;
+	$main::canvas->bind($self->{item},'<ButtonPress-3>',[\&Scp::button3,$self,Tk::Ev('X'),Tk::Ev('Y')]);
+	$main::canvas->bind($self->{scri},'<ButtonPress-3>',[\&Scp::button3,$self,Tk::Ev('X'),Tk::Ev('Y')]);
+	$main::canvas->bind($self->{ttxt},'<ButtonPress-3>',[\&Scp::button3,$self,Tk::Ev('X'),Tk::Ev('Y')]);
+	$main::canvas->bind($self->{text},'<ButtonPress-3>',[\&Scp::button3,$self,Tk::Ev('X'),Tk::Ev('Y')]);
+	$main::canvas->bind($self->{ownr},'<ButtonPress-3>',[\&Scp::button3,$self,Tk::Ev('X'),Tk::Ev('Y')]) if $self->{ownr};
 #	$main::canvas->idletasks;
-	$main::top->{'updatenow'} = 1;
+	$main::top->{updatenow} = 1;
 }
 
 #package Scp;
 sub identify {
 	my $self = shift;
-	my $id = "Service control point $self->{'pcode'}";
-	$id .= " ($self->{'pownr'})" if $self->{'pownr'};
+	my $id = "Service control point $self->{pcode}";
+	$id .= " ($self->{pownr})" if $self->{pownr};
 	return $id;
 }
 
@@ -3758,10 +4413,18 @@ sub button3 {
 		-underline=>4,
 	);
 	$m->add('command',
+		#-accelerator=>'l',
+		-command=>[\&Logging::showlog, $self, $canvas, $X, $Y],
+		-label=>'SCP Logs...',
+		-underline=>4,
+		-state=>(@{$self->{logs}} ? 'normal' : 'disabled'),
+	);
+	$m->add('command',
 		#-accelerator=>'m',
 		-command=>[\&MsgStats::stats, $self, $canvas, $X, $Y],
 		-label=>'Message Statistics...',
 		-underline=>0,
+		-state=>($self->{incs}->{0}->{sus} + $self->{incs}->{1}->{sus} ? 'normal' : 'disabled'),
 	);
 	$m->Popup(
 		-popanchor=>'nw',
@@ -3775,7 +4438,7 @@ sub props {
 	my $row = 0;
 	my $tw;
 	my $v = 'Service control point (SCP)';
-	if ($tw = $self->{'props'}) {
+	if ($tw = $self->{props}) {
 		if ($tw->state eq 'iconic') {
 			$tw->deiconify;
 		} else {
@@ -3787,7 +4450,7 @@ sub props {
 			-title=>$title,
 		);
 		$tw->group($canvas->toplevel);
-		$tw->transient($canvas->toplevel);
+		#$tw->transient($canvas->toplevel);
 		$tw->iconimage('icon');
 		$tw->iconname($title);
 		$tw->resizable(0,0);
@@ -3795,11 +4458,11 @@ sub props {
 		$tw->geometry("+$X+$Y");
 		$tw->protocol('WM_DELETE_WINDOW', [sub {
 			my $self = shift;
-			my $tw = $self->{'props'};
-			$self->{'props'} = undef;
+			my $tw = $self->{props};
+			$self->{props} = undef;
 			$tw->destroy;
 		},$self]);
-		$self->{'props'} = $tw;
+		$self->{props} = $tw;
 
 		$self->commonprops($canvas,$tw,$v,\$row);
 	}
@@ -3812,7 +4475,7 @@ sub status {
 	my $row = 0;
 	my $tw;
 	my $v = 'Service control point (SCP)';
-	if ($tw = $self->{'status'}) {
+	if ($tw = $self->{status}) {
 		if ($tw->state eq 'iconic') {
 			$tw->deiconify;
 		} else {
@@ -3824,7 +4487,7 @@ sub status {
 			-title=>$title,
 		);
 		$tw->group($canvas->toplevel);
-		$tw->transient($canvas->toplevel);
+		#$tw->transient($canvas->toplevel);
 		$tw->iconimage('icon');
 		$tw->iconname($title);
 		$tw->resizable(0,0);
@@ -3832,113 +4495,94 @@ sub status {
 		$tw->geometry("+$X+$Y");
 		$tw->protocol('WM_DELETE_WINDOW', [sub {
 			my $self = shift;
-			my $tw = $self->{'status'};
-			$self->{'status'} = undef;
+			my $tw = $self->{status};
+			$self->{status} = undef;
 			$tw->destroy;
 		},$self]);
-		$self->{'status'} = $tw;
+		$self->{status} = $tw;
 
-		my $f = $tw->Frame(
-			-relief=>'ridge',
-			-borderwidth=>2,
-		)->pack(
-			-expand=>1,
-			-fill=>'x',
-			-side=>'top',
-			-anchor=>'n',
-		);
+		my $f = $tw->Frame(%tframestyle,
+		)->pack(%tframepack);
 		$self->commonstatus($canvas,$f,$v,\$row);
-		$f = $tw->Frame(
-			-relief=>'ridge',
-			-borderwidth=>2,
-		)->pack(
-			-expand=>1,
-			-fill=>'both',
-			-side=>'top',
-			-anchor=>'n',
-		);
-		$row = 0;
-		foreach my $pc (sort {$a <=> $b} keys %{$self->{'circuits'}}) {
-			$f->Label(
-				-anchor=>'e',
-				-justify=>'right',
-				-text=>'Circuits to:',
-			)->grid(-row=>$row,-column=>0,-sticky=>'ew');
-			my $pcode = main::pcstring($pc);
-			my $pownr = main::pcowner($pc,0);
-			$pcode .= " ($pownr)" if $pownr;
-			$f->Entry(
-				-readonlybackground=>'white',
-				-background=>'white',
-				-justify=>'center',
-				-textvariable=>\$pcode,
-				-state=>'readonly',
-				-exportselection=>1,
-			)->grid(-row=>$row++,-column=>1,-sticky=>'ew');
-		}
-		$f = $tw->Frame(
-			-relief=>'ridge',
-			-borderwidth=>2,
-		)->pack(
-			-expand=>1,
-			-fill=>'both',
-			-side=>'top',
-			-anchor=>'n',
-		);
-		$row = 0;
-		my $col = 0;
-		foreach my $pc (sort {$a <=> $b} keys %{$self->{'tqueries'}}) {
-			if ($col == 0) {
-				$f->Label(
-					-anchor=>'e',
-					-justify=>'right',
-					-text=>'Responds to:',
-				)->grid(-row=>$row,-column=>$col,-sticky=>'ew');
+		if (keys %{$self->{adjacent}}) {
+			$f = $tw->TFrame(%tframestyle,
+				-label=>'Linksets:',
+			)->pack(%tframepack);
+			$row = 0;
+			foreach my $pc (sort {$a <=> $b} keys %{$self->{adjacent}}) {
+				$f->Label(%main::abelright,
+					-text=>'Linksets to:',
+				)->grid(-row=>$row,-column=>0,-sticky=>'ewns');
+				my $pcode = main::pcstring($pc);
+				my $pownr = main::pcowner($pc,0);
+				$pcode .= " ($pownr)" if $pownr;
+				$f->Entry(%entrycenter,
+					-textvariable=>\$pcode,
+				)->grid(-row=>$row++,-column=>1,-sticky=>'ewns');
 			}
-			$col++;
-			my $pcode = main::pcstring($pc);
-			my $pownr = main::pcowner($pc,0);
-			$pcode .= " ($pownr)" if $pownr;
-			$f->Entry(
-				-readonlybackground=>'white',
-				-background=>'white',
-				-justify=>'center',
-				-textvariable=>\$pcode,
-				-state=>'readonly',
-				-exportselection=>1,
-			)->grid(-row=>$row,-column=>$col,-sticky=>'ew');
-			if ($col > 5) {
+		}
+		if (keys %{$self->{circuits}}) {
+			$f = $tw->TFrame(%tframestyle,
+				-label=>'Circuits:',
+			)->pack(%tframepack);
+			$row = 0;
+			foreach my $pc (sort {$a <=> $b} keys %{$self->{circuits}}) {
+				$f->Label(%main::abelright,
+					-text=>'Circuits to:',
+				)->grid(-row=>$row,-column=>0,-sticky=>'ewns');
+				my $pcode = main::pcstring($pc);
+				my $pownr = main::pcowner($pc,0);
+				$pcode .= " ($pownr)" if $pownr;
+				$f->Entry(%entrycenter,
+					-textvariable=>\$pcode,
+				)->grid(-row=>$row++,-column=>1,-sticky=>'ewns');
+			}
+		}
+		if (keys %{$self->{tqueries}} || keys %{$self->{responds}}) {
+			$f = $tw->TFrame(%tframestyle,
+				-label=>'Queries:',
+			)->pack(%tframepack);
+			$row = 0;
+			my $col = 0;
+			foreach my $pc (sort {$a <=> $b} keys %{$self->{tqueries}}) {
+				if ($col == 0) {
+					$f->Label(%main::abelright,
+						-text=>'Responds to:',
+					)->grid(-row=>$row,-column=>$col,-sticky=>'ewns');
+				}
+				$col++;
+				my $pcode = main::pcstring($pc);
+				my $pownr = main::pcowner($pc,0);
+				$pcode .= " ($pownr)" if $pownr;
+				$f->Entry(%entrycenter,
+					-textvariable=>\$pcode,
+				)->grid(-row=>$row,-column=>$col,-sticky=>'ewns');
+				if ($col > 5) {
+					$col = 0;
+					$row++;
+				}
+			}
+			if ($col != 0) {
 				$col = 0;
 				$row++;
 			}
-		}
-		if ($col != 0) {
-			$col = 0;
-			$row++;
-		}
-		foreach my $pc (sort {$a <=> $b} keys %{$self->{'responds'}}) {
-			if ($col == 0) {
-				$f->Label(
-					-anchor=>'e',
-					-justify=>'right',
-					-text=>'Responds to:',
-				)->grid(-row=>$row,-column=>$col,-sticky=>'ew');
-			}
-			$col++;
-			my $pcode = main::pcstring($pc);
-			my $pownr = main::pcowner($pc,0);
-			$pcode .= " ($pownr)" if $pownr;
-			$f->Entry(
-				-readonlybackground=>'white',
-				-background=>'white',
-				-justify=>'center',
-				-textvariable=>\$pcode,
-				-state=>'readonly',
-				-exportselection=>1,
-			)->grid(-row=>$row,-column=>$col,-sticky=>'ew');
-			if ($col > 5) {
-				$col = 0;
-				$row++;
+			foreach my $pc (sort {$a <=> $b} keys %{$self->{responds}}) {
+				if ($col == 0) {
+					$f->Label(%main::abelright,
+						-text=>'Responds to:',
+					)->grid(-row=>$row,-column=>$col,-sticky=>'ewns');
+				}
+				$col++;
+				my $pcode = main::pcstring($pc);
+				my $pownr = main::pcowner($pc,0);
+				$pcode .= " ($pownr)" if $pownr;
+				$f->Entry(%entrycenter,
+					-textvariable=>\$pcode,
+				)->grid(-row=>$row,-column=>$col,-sticky=>'ewns');
+				if ($col > 5) {
+					$col = 0;
+					$row++;
+				}
 			}
 		}
 	}
@@ -3961,13 +4605,13 @@ use constant {
 #package Stp;
 sub xform {
 	my ($type,$self) = @_;
-	return if $self->{'type'} == 3;
+	return if $self->{type} == 3;
 	return if ref $self eq $type;
 	bless $self,$type;
-	my $x = $self->{'x'};
-	my $y = $self->{'y'};
-	$main::canvas->delete($self->{'item'});
-	$self->{'item'} = $main::canvas->createRectangle(
+	my $x = $self->{x};
+	my $y = $self->{y};
+	$main::canvas->delete($self->{item});
+	$self->{item} = $main::canvas->createRectangle(
 		$x-28,$y-28,$x+28,$y+28,
 		-fill=>'white',
 		-outline=>'black',
@@ -3975,23 +4619,23 @@ sub xform {
 		-tags=>['stp','node'],
 	);
 	$main::canvas->raise('node','path');
-	$main::canvas->coords($self->{'scri'}, $x+28,$y-28,$x-28,$y+28);
-	$main::canvas->itemconfigure($self->{'ttxt'}, -text=>'STP');
-	$self->{'type'} = 3;
-	$main::canvas->bind($self->{'item'},'<ButtonPress-3>',[\&Stp::button3,$self,Tk::Ev('X'),Tk::Ev('Y')]);
-	$main::canvas->bind($self->{'scri'},'<ButtonPress-3>',[\&Stp::button3,$self,Tk::Ev('X'),Tk::Ev('Y')]);
-	$main::canvas->bind($self->{'ttxt'},'<ButtonPress-3>',[\&Stp::button3,$self,Tk::Ev('X'),Tk::Ev('Y')]);
-	$main::canvas->bind($self->{'text'},'<ButtonPress-3>',[\&Stp::button3,$self,Tk::Ev('X'),Tk::Ev('Y')]);
-	$main::canvas->bind($self->{'ownr'},'<ButtonPress-3>',[\&Stp::button3,$self,Tk::Ev('X'),Tk::Ev('Y')]) if $self->{'ownr'};
+	$main::canvas->coords($self->{scri}, $x+28,$y-28,$x-28,$y+28);
+	$main::canvas->itemconfigure($self->{ttxt}, -text=>'STP');
+	$self->{type} = 3;
+	$main::canvas->bind($self->{item},'<ButtonPress-3>',[\&Stp::button3,$self,Tk::Ev('X'),Tk::Ev('Y')]);
+	$main::canvas->bind($self->{scri},'<ButtonPress-3>',[\&Stp::button3,$self,Tk::Ev('X'),Tk::Ev('Y')]);
+	$main::canvas->bind($self->{ttxt},'<ButtonPress-3>',[\&Stp::button3,$self,Tk::Ev('X'),Tk::Ev('Y')]);
+	$main::canvas->bind($self->{text},'<ButtonPress-3>',[\&Stp::button3,$self,Tk::Ev('X'),Tk::Ev('Y')]);
+	$main::canvas->bind($self->{ownr},'<ButtonPress-3>',[\&Stp::button3,$self,Tk::Ev('X'),Tk::Ev('Y')]) if $self->{ownr};
 #	$main::canvas->idletasks;
-	$main::top->{'updatenow'} = 1;
+	$main::top->{updatenow} = 1;
 }
 
 #package Stp;
 sub identify {
 	my $self = shift;
-	my $id = "Signal transfer point $self->{'pcode'}";
-	$id .= " ($self->{'pownr'})" if $self->{'pownr'};
+	my $id = "Signal transfer point $self->{pcode}";
+	$id .= " ($self->{pownr})" if $self->{pownr};
 	return $id;
 }
 
@@ -4016,10 +4660,18 @@ sub button3 {
 		-underline=>4,
 	);
 	$m->add('command',
+		#-accelerator=>'l',
+		-command=>[\&Logging::showlog, $self, $canvas, $X, $Y],
+		-label=>'STP Logs...',
+		-underline=>4,
+		-state=>(@{$self->{logs}} ? 'normal' : 'disabled'),
+	);
+	$m->add('command',
 		#-accelerator=>'m',
 		-command=>[\&MsgStats::stats, $self, $canvas, $X, $Y],
 		-label=>'Message Statistics...',
 		-underline=>0,
+		-state=>($self->{incs}->{0}->{sus} + $self->{incs}->{1}->{sus} ? 'normal' : 'disabled'),
 	);
 	$m->Popup(
 		-popanchor=>'nw',
@@ -4033,7 +4685,7 @@ sub props {
 	my $row = 0;
 	my $tw;
 	my $v = 'Signal transfer point (STP)';
-	if ($tw = $self->{'props'}) {
+	if ($tw = $self->{props}) {
 		if ($tw->state eq 'iconic') {
 			$tw->deiconify;
 		} else {
@@ -4045,7 +4697,7 @@ sub props {
 			-title=>$title,
 		);
 		$tw->group($canvas->toplevel);
-		$tw->transient($canvas->toplevel);
+		#$tw->transient($canvas->toplevel);
 		$tw->iconimage('icon');
 		$tw->iconname($title);
 		$tw->resizable(0,0);
@@ -4053,11 +4705,11 @@ sub props {
 		$tw->geometry("+$X+$Y");
 		$tw->protocol('WM_DELETE_WINDOW', [sub {
 			my $self = shift;
-			my $tw = $self->{'props'};
-			$self->{'props'} = undef;
+			my $tw = $self->{props};
+			$self->{props} = undef;
 			$tw->destroy;
 		},$self]);
-		$self->{'props'} = $tw;
+		$self->{props} = $tw;
 
 		$self->commonprops($canvas,$tw,$v,\$row);
 	}
@@ -4070,7 +4722,7 @@ sub status {
 	my $row = 0;
 	my $tw;
 	my $v = 'Signal transfer point (STP)';
-	if ($tw = $self->{'status'}) {
+	if ($tw = $self->{status}) {
 		if ($tw->state eq 'iconic') {
 			$tw->deiconify;
 		} else {
@@ -4082,7 +4734,7 @@ sub status {
 			-title=>$title,
 		);
 		$tw->group($canvas->toplevel);
-		$tw->transient($canvas->toplevel);
+		#$tw->transient($canvas->toplevel);
 		$tw->iconimage('icon');
 		$tw->iconname($title);
 		$tw->resizable(0,0);
@@ -4090,114 +4742,94 @@ sub status {
 		$tw->geometry("+$X+$Y");
 		$tw->protocol('WM_DELETE_WINDOW', [sub {
 			my $self = shift;
-			my $tw = $self->{'status'};
-			$self->{'status'} = undef;
+			my $tw = $self->{status};
+			$self->{status} = undef;
 			$tw->destroy;
 		},$self]);
-		$self->{'status'} = $tw;
+		$self->{status} = $tw;
 
-		my $f = $tw->Frame(
-			-relief=>'ridge',
-			-borderwidth=>2,
-		)->pack(
-			-expand=>1,
-			-fill=>'x',
-			-side=>'top',
-			-anchor=>'n',
-		);
+		my $f = $tw->Frame(%tframestyle,
+		)->pack(%tframepack);
 		$self->commonstatus($canvas,$f,$v,\$row);
-		$f = $tw->Frame(
-			-relief=>'ridge',
-			-borderwidth=>2,
-			-borderwidth=>2,
-		)->pack(
-			-expand=>1,
-			-fill=>'both',
-			-side=>'top',
-			-anchor=>'n',
-		);
-		$row = 0;
-		foreach my $pc (sort {$a <=> $b} keys %{$self->{'circuits'}}) {
-			$f->Label(
-				-anchor=>'e',
-				-justify=>'right',
-				-text=>'Circuits to:',
-			)->grid(-row=>$row,-column=>0,-sticky=>'ew');
-			my $pcode = main::pcstring($pc);
-			my $pownr = main::pcowner($pc,0);
-			$pcode .= " ($pownr)" if $pownr;
-			$f->Entry(
-				-readonlybackground=>'white',
-				-background=>'white',
-				-justify=>'center',
-				-textvariable=>\$pcode,
-				-state=>'readonly',
-				-exportselection=>1,
-			)->grid(-row=>$row++,-column=>1,-sticky=>'ew');
-		}
-		$f = $tw->Frame(
-			-relief=>'ridge',
-			-borderwidth=>2,
-		)->pack(
-			-expand=>1,
-			-fill=>'both',
-			-side=>'top',
-			-anchor=>'n',
-		);
-		$row = 0;
-		my $col = 0;
-		foreach my $pc (sort {$a <=> $b} keys %{$self->{'tqueries'}}) {
-			if ($col == 0) {
-				$f->Label(
-					-anchor=>'e',
-					-justify=>'right',
-					-text=>'Queries:',
-				)->grid(-row=>$row,-column=>$col,-sticky=>'ew');
+		if (keys %{$self->{adjacent}}) {
+			$f = $tw->TFrame(%tframestyle,
+				-label=>'Linksets:',
+			)->pack(%tframepack);
+			$row = 0;
+			foreach my $pc (sort {$a <=> $b} keys %{$self->{adjacent}}) {
+				$f->Label(%labelright,
+					-text=>'Linksets to:',
+				)->grid(-row=>$row,-column=>0,-sticky=>'ewns');
+				my $pcode = main::pcstring($pc);
+				my $pownr = main::pcowner($pc,0);
+				$pcode .= " ($pownr)" if $pownr;
+				$f->Entry(%entrycenter,
+					-textvariable=>\$pcode,
+				)->grid(-row=>$row++,-column=>1,-sticky=>'ewns');
 			}
-			$col++;
-			my $pcode = main::pcstring($pc);
-			my $pownr = main::pcowner($pc,0);
-			$pcode .= " ($pownr)" if $pownr;
-			$f->Entry(
-				-readonlybackground=>'white',
-				-background=>'white',
-				-justify=>'center',
-				-textvariable=>\$pcode,
-				-state=>'readonly',
-				-exportselection=>1,
-			)->grid(-row=>$row,-column=>$col,-sticky=>'ew');
-			if ($col > 5) {
+		}
+		if (keys %{$self->{circuits}}) {
+			$f = $tw->TFrame(%tframestyle,
+				-label=>'Circuits:',
+			)->pack(%tframepack);
+			$row = 0;
+			foreach my $pc (sort {$a <=> $b} keys %{$self->{circuits}}) {
+				$f->Label(%labelright,
+					-text=>'Circuits to:',
+				)->grid(-row=>$row,-column=>0,-sticky=>'ewns');
+				my $pcode = main::pcstring($pc);
+				my $pownr = main::pcowner($pc,0);
+				$pcode .= " ($pownr)" if $pownr;
+				$f->Entry(%entrycenter,
+					-textvariable=>\$pcode,
+				)->grid(-row=>$row++,-column=>1,-sticky=>'ewns');
+			}
+		}
+		if (keys %{$self->{tqueries}} || keys %{$self->{responds}}) {
+			$f = $tw->TFrame(%tframestyle,
+				-label=>'Queries:',
+			)->pack(%tframepack);
+			$row = 0;
+			my $col = 0;
+			foreach my $pc (sort {$a <=> $b} keys %{$self->{tqueries}}) {
+				if ($col == 0) {
+					$f->Label(%labelright,
+						-text=>'Queries:',
+					)->grid(-row=>$row,-column=>$col,-sticky=>'ewns');
+				}
+				$col++;
+				my $pcode = main::pcstring($pc);
+				my $pownr = main::pcowner($pc,0);
+				$pcode .= " ($pownr)" if $pownr;
+				$f->Entry(%entrycenter,
+					-textvariable=>\$pcode,
+				)->grid(-row=>$row,-column=>$col,-sticky=>'ewns');
+				if ($col > 5) {
+					$col = 0;
+					$row++;
+				}
+			}
+			if ($col != 0) {
 				$col = 0;
 				$row++;
 			}
-		}
-		if ($col != 0) {
-			$col = 0;
-			$row++;
-		}
-		foreach my $pc (sort {$a <=> $b} keys %{$self->{'responds'}}) {
-			if ($col == 0) {
-				$f->Label(
-					-anchor=>'e',
-					-justify=>'right',
-					-text=>'Translates from:',
-				)->grid(-row=>$row,-column=>$col,-sticky=>'ew');
-			}
-			$col++;
-			my $pcode = main::pcstring($pc);
-			my $pownr = main::pcowner($pc,0);
-			$pcode .= " ($pownr)" if $pownr;
-			$f->Entry(
-				-readonlybackground=>'white',
-				-background=>'white',
-				-justify=>'center',
-				-textvariable=>\$pcode,
-				-state=>'readonly',
-				-exportselection=>1,
-			)->grid(-row=>$row,-column=>$col,-sticky=>'ew');
-			if ($col > 5) {
-				$col = 0;
-				$row++;
+			foreach my $pc (sort {$a <=> $b} keys %{$self->{responds}}) {
+				if ($col == 0) {
+					$f->Label(%labelright,
+						-text=>'Translates from:',
+					)->grid(-row=>$row,-column=>$col,-sticky=>'ewns');
+				}
+				$col++;
+				my $pcode = main::pcstring($pc);
+				my $pownr = main::pcowner($pc,0);
+				$pcode .= " ($pownr)" if $pownr;
+				$f->Entry(%entrycenter,
+					-textvariable=>\$pcode,
+				)->grid(-row=>$row,-column=>$col,-sticky=>'ewns');
+				if ($col > 5) {
+					$col = 0;
+					$row++;
+				}
 			}
 		}
 	}
@@ -4214,13 +4846,13 @@ use vars qw(@ISA);
 #package Gtt;
 sub xform {
 	my ($type,$self) = @_;
-	return if $self->{'type'} == 4;
+	return if $self->{type} == 4;
 	return if ref $self eq $type;
 	bless $self,$type;
-	my $x = $self->{'x'};
-	my $y = $self->{'y'};
-	$main::canvas->delete($self->{'item'});
-	$self->{'item'} = $main::canvas->createRectangle(
+	my $x = $self->{x};
+	my $y = $self->{y};
+	$main::canvas->delete($self->{item});
+	$self->{item} = $main::canvas->createRectangle(
 		$x-28,$y-28,$x+28,$y+28,
 		-dash=>[5, 2],
 		-fill=>'white',
@@ -4229,24 +4861,24 @@ sub xform {
 		-tags=>['stp','node'],
 	);
 	$main::canvas->raise('node','path');
-	$main::canvas->coords($self->{'scri'}, $x+28,$y-28,$x-28,$y+28);
-	$main::canvas->itemconfigure($self->{'scri'}, -dash=>[5, 2]);
-	$main::canvas->itemconfigure($self->{'ttxt'}, -text=>'GTT');
-	$self->{'type'} = 4;
-	$main::canvas->bind($self->{'item'},'<ButtonPress-3>',[\&Gtt::button3,$self,Tk::Ev('X'),Tk::Ev('Y')]);
-	$main::canvas->bind($self->{'scri'},'<ButtonPress-3>',[\&Gtt::button3,$self,Tk::Ev('X'),Tk::Ev('Y')]);
-	$main::canvas->bind($self->{'ttxt'},'<ButtonPress-3>',[\&Gtt::button3,$self,Tk::Ev('X'),Tk::Ev('Y')]);
-	$main::canvas->bind($self->{'text'},'<ButtonPress-3>',[\&Gtt::button3,$self,Tk::Ev('X'),Tk::Ev('Y')]);
-	$main::canvas->bind($self->{'ownr'},'<ButtonPress-3>',[\&Gtt::button3,$self,Tk::Ev('X'),Tk::Ev('Y')]) if $self->{'ownr'};
+	$main::canvas->coords($self->{scri}, $x+28,$y-28,$x-28,$y+28);
+	$main::canvas->itemconfigure($self->{scri}, -dash=>[5, 2]);
+	$main::canvas->itemconfigure($self->{ttxt}, -text=>'GTT');
+	$self->{type} = 4;
+	$main::canvas->bind($self->{item},'<ButtonPress-3>',[\&Gtt::button3,$self,Tk::Ev('X'),Tk::Ev('Y')]);
+	$main::canvas->bind($self->{scri},'<ButtonPress-3>',[\&Gtt::button3,$self,Tk::Ev('X'),Tk::Ev('Y')]);
+	$main::canvas->bind($self->{ttxt},'<ButtonPress-3>',[\&Gtt::button3,$self,Tk::Ev('X'),Tk::Ev('Y')]);
+	$main::canvas->bind($self->{text},'<ButtonPress-3>',[\&Gtt::button3,$self,Tk::Ev('X'),Tk::Ev('Y')]);
+	$main::canvas->bind($self->{ownr},'<ButtonPress-3>',[\&Gtt::button3,$self,Tk::Ev('X'),Tk::Ev('Y')]) if $self->{ownr};
 #	$main::canvas->idletasks;
-	$main::top->{'updatenow'} = 1;
+	$main::top->{updatenow} = 1;
 }
 
 #package Gtt;
 sub identify {
 	my $self = shift;
-	my $id = "Global title translator $self->{'pcode'}";
-	$id .= " ($self->{'pownr'})" if $self->{'pownr'};
+	my $id = "Global title translator $self->{pcode}";
+	$id .= " ($self->{pownr})" if $self->{pownr};
 	return $id;
 }
 
@@ -4271,10 +4903,18 @@ sub button3 {
 		-underline=>4,
 	);
 	$m->add('command',
+		#-accelerator=>'l',
+		-command=>[\&Logging::showlog, $self, $canvas, $X, $Y],
+		-label=>'GTT Logs...',
+		-underline=>4,
+		-state=>(@{$self->{logs}} ? 'normal' : 'disabled'),
+	);
+	$m->add('command',
 		#-accelerator=>'m',
 		-command=>[\&MsgStats::stats, $self, $canvas, $X, $Y],
 		-label=>'Message Statistics...',
 		-underline=>0,
+		-state=>($self->{incs}->{0}->{sus} + $self->{incs}->{1}->{sus} ? 'normal' : 'disabled'),
 	);
 	$m->Popup(
 		-popanchor=>'nw',
@@ -4288,7 +4928,7 @@ sub props {
 	my $row = 0;
 	my $tw;
 	my $v = 'Global title translator (GTT)';
-	if ($tw = $self->{'props'}) {
+	if ($tw = $self->{props}) {
 		if ($tw->state eq 'iconic') {
 			$tw->deiconify;
 		} else {
@@ -4300,7 +4940,7 @@ sub props {
 			-title=>$title,
 		);
 		$tw->group($canvas->toplevel);
-		$tw->transient($canvas->toplevel);
+		#$tw->transient($canvas->toplevel);
 		$tw->iconimage('icon');
 		$tw->iconname($title);
 		$tw->resizable(0,0);
@@ -4308,11 +4948,11 @@ sub props {
 		$tw->geometry("+$X+$Y");
 		$tw->protocol('WM_DELETE_WINDOW', [sub {
 			my $self = shift;
-			my $tw = $self->{'props'};
-			$self->{'props'} = undef;
+			my $tw = $self->{props};
+			$self->{props} = undef;
 			$tw->destroy;
 		},$self]);
-		$self->{'props'} = $tw;
+		$self->{props} = $tw;
 
 		$self->commonprops($canvas,$tw,$v,\$row);
 	}
@@ -4325,7 +4965,7 @@ sub status {
 	my $row = 0;
 	my $tw;
 	my $v = 'Global title translator (GTT)';
-	if ($tw = $self->{'status'}) {
+	if ($tw = $self->{status}) {
 		if ($tw->state eq 'iconic') {
 			$tw->deiconify;
 		} else {
@@ -4337,7 +4977,7 @@ sub status {
 			-title=>$title,
 		);
 		$tw->group($canvas->toplevel);
-		$tw->transient($canvas->toplevel);
+		#$tw->transient($canvas->toplevel);
 		$tw->iconimage('icon');
 		$tw->iconname($title);
 		$tw->resizable(0,0);
@@ -4345,115 +4985,94 @@ sub status {
 		$tw->geometry("+$X+$Y");
 		$tw->protocol('WM_DELETE_WINDOW', [sub {
 			my $self = shift;
-			my $tw = $self->{'status'};
-			$self->{'status'} = undef;
+			my $tw = $self->{status};
+			$self->{status} = undef;
 			$tw->destroy;
 		},$self]);
-		$self->{'status'} = $tw;
+		$self->{status} = $tw;
 
-		my $f = $tw->Frame(
-			-relief=>'ridge',
-			-borderwidth=>2,
-		)->pack(
-			-expand=>1,
-			-fill=>'x',
-			-side=>'top',
-			-anchor=>'n',
-		);
+		my $f = $tw->Frame(%tframestyle,
+		)->pack(%tframepack);
 		$self->commonstatus($canvas,$f,$v,\$row);
-		$f = $tw->Frame(
-			-relief=>'ridge',
-			-borderwidth=>2,
-			-borderwidth=>2,
-		)->pack(
-			-expand=>1,
-			-fill=>'both',
-			-side=>'top',
-			-anchor=>'n',
-		);
-		$row = 0;
-		foreach my $pc (sort {$a <=> $b} keys %{$self->{'circuits'}}) {
-			$f->Label(
-				-anchor=>'e',
-				-justify=>'right',
-				-text=>'Circuits to:',
-			)->grid(-row=>$row,-column=>0,-sticky=>'ew');
-			my $pcode = main::pcstring($pc);
-			my $pownr = main::pcowner($pc,0);
-			$pcode .= " ($pownr)" if $pownr;
-			$f->Entry(
-				-readonlybackground=>'white',
-				-background=>'white',
-				-justify=>'center',
-				-textvariable=>\$pcode,
-				-state=>'readonly',
-				-exportselection=>1,
-			)->grid(-row=>$row++,-column=>1,-sticky=>'ew');
-		}
-		$f = $tw->Frame(
-			-relief=>'ridge',
-			-borderwidth=>2,
-			-borderwidth=>2,
-		)->pack(
-			-expand=>1,
-			-fill=>'both',
-			-side=>'top',
-			-anchor=>'n',
-		);
-		$row = 0;
-		my $col = 0;
-		foreach my $pc (sort {$a <=> $b} keys %{$self->{'tqueries'}}) {
-			if ($col == 0) {
-				$f->Label(
-					-anchor=>'e',
-					-justify=>'right',
-					-text=>'Queries:',
-				)->grid(-row=>$row,-column=>$col,-sticky=>'ew');
+		if (keys %{$self->{adjacent}}) {
+			$f = $tw->TFrame(%tframestyle,
+				-label=>'Linksets:',
+			)->pack(%tframepack);
+			$row = 0;
+			foreach my $pc (sort {$a <=> $b} keys %{$self->{adjacent}}) {
+				$f->Label(%labelright,
+					-text=>'Linksets to:',
+				)->grid(-row=>$row,-column=>0,-sticky=>'ewns');
+				my $pcode = main::pcstring($pc);
+				my $pownr = main::pcowner($pc,0);
+				$pcode .= " ($pownr)" if $pownr;
+				$f->Entry(%entrycenter,
+					-textvariable=>\$pcode,
+				)->grid(-row=>$row++,-column=>1,-sticky=>'ewns');
 			}
-			$col++;
-			my $pcode = main::pcstring($pc);
-			my $pownr = main::pcowner($pc,0);
-			$pcode .= " ($pownr)" if $pownr;
-			$f->Entry(
-				-readonlybackground=>'white',
-				-background=>'white',
-				-justify=>'center',
-				-textvariable=>\$pcode,
-				-state=>'readonly',
-				-exportselection=>1,
-			)->grid(-row=>$row,-column=>$col,-sticky=>'ew');
-			if ($col > 5) {
+		}
+		if (keys %{$self->{circuits}}) {
+			$f = $tw->TFrame(%tframestyle,
+				-label=>'Circuits:',
+			)->pack(%tframepack);
+			$row = 0;
+			foreach my $pc (sort {$a <=> $b} keys %{$self->{circuits}}) {
+				$f->Label(%labelright,
+					-text=>'Circuits to:',
+				)->grid(-row=>$row,-column=>0,-sticky=>'ewns');
+				my $pcode = main::pcstring($pc);
+				my $pownr = main::pcowner($pc,0);
+				$pcode .= " ($pownr)" if $pownr;
+				$f->Entry(%entrycenter,
+					-textvariable=>\$pcode,
+				)->grid(-row=>$row++,-column=>1,-sticky=>'ewns');
+			}
+		}
+		if (keys %{$self->{tqueries}} || keys %{$self->{responds}}) {
+			$f = $tw->TFrame(%tframestyle,
+				-label=>'Queries:',
+			)->pack(%tframepack);
+			$row = 0;
+			my $col = 0;
+			foreach my $pc (sort {$a <=> $b} keys %{$self->{tqueries}}) {
+				if ($col == 0) {
+					$f->Label(%labelright,
+						-text=>'Queries:',
+					)->grid(-row=>$row,-column=>$col,-sticky=>'ewns');
+				}
+				$col++;
+				my $pcode = main::pcstring($pc);
+				my $pownr = main::pcowner($pc,0);
+				$pcode .= " ($pownr)" if $pownr;
+				$f->Entry(%entrycenter,
+					-textvariable=>\$pcode,
+				)->grid(-row=>$row,-column=>$col,-sticky=>'ewns');
+				if ($col > 5) {
+					$col = 0;
+					$row++;
+				}
+			}
+			if ($col != 0) {
 				$col = 0;
 				$row++;
 			}
-		}
-		if ($col != 0) {
-			$col = 0;
-			$row++;
-		}
-		foreach my $pc (sort {$a <=> $b} keys %{$self->{'responds'}}) {
-			if ($col == 0) {
-				$f->Label(
-					-anchor=>'e',
-					-justify=>'right',
-					-text=>'Translates from:',
-				)->grid(-row=>$row,-column=>$col,-sticky=>'ew');
-			}
-			$col++;
-			my $pcode = main::pcstring($pc);
-			my $pownr = main::pcowner($pc,0);
-			$pcode .= " ($pownr)" if $pownr;
-			$f->Entry(
-				-readonlybackground=>'white',
-				-background=>'white',
-				-justify=>'center',
-				-textvariable=>\$pcode,
-				-state=>'readonly',
-				-exportselection=>1,
-			)->grid(-row=>$row,-column=>$col,-sticky=>'ew');
-			if ($col > 5) {
-				$col = 0;
-				$row++;
+			foreach my $pc (sort {$a <=> $b} keys %{$self->{responds}}) {
+				if ($col == 0) {
+					$f->Label(%labelright,
+						-text=>'Translates from:',
+					)->grid(-row=>$row,-column=>$col,-sticky=>'ewns');
+				}
+				$col++;
+				my $pcode = main::pcstring($pc);
+				my $pownr = main::pcowner($pc,0);
+				$pcode .= " ($pownr)" if $pownr;
+				$f->Entry(%entrycenter,
+					-textvariable=>\$pcode,
+				)->grid(-row=>$row,-column=>$col,-sticky=>'ewns');
+				if ($col > 5) {
+					$col = 0;
+					$row++;
+				}
 			}
 		}
 	}
@@ -4464,8 +5083,10 @@ sub status {
 package Network;
 use strict;
 use vars qw(@ISA);
-@ISA = qw(MsgStats);
+@ISA = qw(MsgStats Logging);
 # -------------------------------------
+
+my $network;
 
 #package Network;
 sub new {
@@ -4473,17 +5094,19 @@ sub new {
 	my $self = {};
 	bless $self,$type;
 	$self->MsgStats::init(@args);
-	$self->{'ciccnt'} = 0;
-	$self->{'actcnt'} = 0;
-	$self->{'act1w'} = 0;
-	$self->{'act2w'} = 0;
-	$self->{'nodes'} = {};
-	$self->{'nodeno'} = 0;
-	$self->{'paths'} = {};
-	$self->{'pathno'} = 0;
-	$self->{'relations'} = {};
-	$self->{'relationno'} = 0;
+	$self->Logging::init(@args);
+	$self->{ciccnt} = 0;
+	$self->{actcnt} = 0;
+	$self->{act1w} = 0;
+	$self->{act2w} = 0;
+	$self->{nodes} = {};
+	$self->{nodeno} = 0;
+	$self->{paths} = {};
+	$self->{pathno} = 0;
+	$self->{relations} = {};
+	$self->{relationno} = 0;
 	$main::canvas->CanvasBind('<ButtonPress-3>',[\&Network::button3,$self,Tk::Ev('X'),Tk::Ev('Y'),Tk::Ev('x'),Tk::Ev('y')]);
+	$Network::network = $self;
 	return $self;
 }
 
@@ -4503,36 +5126,36 @@ sub getLink {
 #package Network;
 sub getPath {
 	my ($self,$ppa,@args) = @_;
-	return $self->{'paths'}->{$ppa} if exists $self->{'paths'}->{$ppa};
-	my $pathno = $self->{'pathno'} + 1;
+	return $self->{paths}->{$ppa} if exists $self->{paths}->{$ppa};
+	my $pathno = $self->{pathno} + 1;
 	my $path = Path->new($self,$pathno,$ppa,@args);
-	$self->{'paths'}->{$ppa} = $path;
-	$self->{'pathno'} = $pathno;
+	$self->{paths}->{$ppa} = $path;
+	$self->{pathno} = $pathno;
 	return $path;
 }
 
 #package Network;
 sub getNode {
 	my ($self,$pc,@args) = @_;
-	return $self->{'nodes'}->{$pc} if exists $self->{'nodes'}->{$pc};
-	my $nodeno = $self->{'nodeno'} + 1;
+	return $self->{nodes}->{$pc} if exists $self->{nodes}->{$pc};
+	my $nodeno = $self->{nodeno} + 1;
 	my $node = Node->new($self,$nodeno,$pc,@args);
-	$self->{'nodes'}->{$pc} = $node;
-	$self->{'nodeno'} = $nodeno;
+	$self->{nodes}->{$pc} = $node;
+	$self->{nodeno} = $nodeno;
 	return $node;
 }
 
 #package Network;
 sub getRelation {
 	my ($self,$nodea,$nodeb,@args) = @_;
-	my $key = "$nodea->{'pc'},$nodeb->{'pc'}";
-	return $self->{'relations'}->{$key} if exists $self->{'relations'}->{$key};
-	my $relationno = $self->{'relationno'} + 1;
+	my $key = "$nodea->{pc},$nodeb->{pc}";
+	return $self->{relations}->{$key} if exists $self->{relations}->{$key};
+	my $relationno = $self->{relationno} + 1;
 	my $relation = Relation->new($self,$relationno,$nodea,$nodeb,@args);
-	$self->{'relations'}->{$key} = $relation;
-	$key = "$nodeb->{'pc'},$nodea->{'pc'}";
-	$self->{'relations'}->{$key} = $relation;
-	$self->{'relationno'} = $relationno;
+	$self->{relations}->{$key} = $relation;
+	$key = "$nodeb->{pc},$nodea->{pc}";
+	$self->{relations}->{$key} = $relation;
+	$self->{relationno} = $relationno;
 	return $relation;
 }
 
@@ -4550,14 +5173,14 @@ sub getLinkSet {
 sub regroupNodes {
 	my $self = shift;
 	my %totals;
-	while (my ($pc,$node) = each %{$self->{'nodes'}}) {
-		my $col = $node->{'col'};
+	while (my ($pc,$node) = each %{$self->{nodes}}) {
+		my $col = $node->{col};
 		$totals{$col} += 1;
 	}
 	my %counts;
-	foreach my $pc (sort {$a <=> $b} keys %{$self->{'nodes'}}) {
-		my $node = $self->{'nodes'}->{$pc};
-		my $col = $node->{'col'};
+	foreach my $pc (sort {$a <=> $b} keys %{$self->{nodes}}) {
+		my $node = $self->{nodes}->{$pc};
+		my $col = $node->{col};
 		my $row = $counts{$col} - $totals{$col};
 		$counts{$col} += 2;
 		$node->moveto($col,$row);
@@ -4580,26 +5203,35 @@ sub button3 {
 	$m->add('command',
 		#-accelerator=>'p',
 		-command=>[\&Network::props, $self, $canvas, $X, $Y],
-		-label=>'Newtork Properties...',
+		-label=>'Network Properties...',
 		-underline=>8,
 	);
 	$m->add('command',
 		#-accelerator=>'s',
 		-command=>[\&Network::status, $self, $canvas, $X, $Y],
-		-label=>'Newtork Status...',
+		-label=>'Network Status...',
 		-underline=>8,
+	);
+	$m->add('command',
+		#-accelerator=>'l',
+		-command=>[\&Logging::showlog, $self, $canvas, $X, $Y],
+		-label=>'Network Logs...',
+		-underline=>8,
+		-state=>(@{$self->{logs}} ? 'normal' : 'disabled'),
 	);
 	$m->add('command',
 		#-accelerator=>'m',
 		-command=>[\&MsgStats::stats, $self, $canvas, $X, $Y],
 		-label=>'Message Statistics...',
 		-underline=>0,
+		-state=>($self->{incs}->{0}->{sus} + $self->{incs}->{1}->{sus} ? 'normal' : 'disabled'),
 	);
 	$m->add('command',
 		#-accelerator=>'c',
 		-command=>[\&MsgStats::cstat, $self, $canvas, $X, $Y],
 		-label=>'Call statistics...',
 		-underline=>0,
+		-state=>($self->{ciccnt} ? 'normal' : 'disabled'),
 	);
 	$m->Popup(
 		-popanchor=>'nw',
@@ -4613,7 +5245,7 @@ sub props {
 	my $row = 0;
 	my $tw;
 	my $v = 'Network';
-	if ($tw = $self->{'props'}) {
+	if ($tw = $self->{props}) {
 		if ($tw->state eq 'iconic') {
 			$tw->deiconify;
 		} else {
@@ -4625,7 +5257,7 @@ sub props {
 			-title=>$title,
 		);
 		$tw->group($canvas->toplevel);
-		$tw->transient($canvas->toplevel);
+		#$tw->transient($canvas->toplevel);
 		$tw->iconimage('icon');
 		$tw->iconname($title);
 		$tw->resizable(0,0);
@@ -4633,24 +5265,18 @@ sub props {
 		$tw->geometry("+$X+$Y");
 		$tw->protocol('WM_DELETE_WINDOW', [sub {
 			my $self = shift;
-			my $tw = $self->{'props'};
-			$self->{'props'} = undef;
+			my $tw = $self->{props};
+			$self->{props} = undef;
 			$tw->destroy;
 		},$self]);
-		$self->{'props'} = $tw;
+		$self->{props} = $tw;
 
-		$tw->Label(
-			-anchor=>'e',
-			-justify=>'right',
+		$tw->Label(%labelright,
 			-text=>'Object type:',
-		)->grid(-row=>$row,-column=>0,-sticky=>'ew');
-		$tw->Entry(
-			-readonlybackground=>'white',
-			-background=>'white',
+		)->grid(-row=>$row,-column=>0,-sticky=>'ewns');
+		$tw->Entry(%entryleft,
 			-textvariable=>\$v,
-			-state=>'readonly',
-			-exportselection=>1,
-		)->grid(-row=>$row++,-column=>1,-sticky=>'ew');
+		)->grid(-row=>$row++,-column=>1,-sticky=>'ewns');
 	}
 	$tw->MapWindow;
 }
@@ -4661,7 +5287,7 @@ sub status {
 	my $row = 0;
 	my $tw;
 	my $v = 'Signalling route';
-	if ($tw = $self->{'status'}) {
+	if ($tw = $self->{status}) {
 		if ($tw->state eq 'iconic') {
 			$tw->deiconify;
 		} else {
@@ -4673,7 +5299,7 @@ sub status {
 			-title=>$title,
 		);
 		$tw->group($canvas->toplevel);
-		$tw->transient($canvas->toplevel);
+		#$tw->transient($canvas->toplevel);
 		$tw->iconimage('icon');
 		$tw->iconname($title);
 		$tw->resizable(0,0);
@@ -4681,103 +5307,54 @@ sub status {
 		$tw->geometry("+$X+$Y");
 		$tw->protocol('WM_DELETE_WINDOW', [sub {
 			my $self = shift;
-			my $tw = $self->{'status'};
-			$self->{'status'} = undef;
+			my $tw = $self->{status};
+			$self->{status} = undef;
 			$tw->destroy;
 		},$self]);
-		$self->{'status'} = $tw;
+		$self->{status} = $tw;
 
-		$tw->Label(
-			-anchor=>'e',
-			-justify=>'right',
+		$tw->Label(%labelright,
 			-text=>'Number of paths:',
-		)->grid(-row=>$row,-column=>0,-sticky=>'ew');
-		$tw->Entry(
-			-readonlybackground=>'white',
-			-background=>'white',
-			-justify=>'right',
-			-textvariable=>\$self->{'pathno'},
-			-state=>'readonly',
-			-exportselection=>1,
-		)->grid(-row=>$row++,-column=>1,-sticky=>'ew');
-		$tw->Label(
-			-anchor=>'e',
-			-justify=>'right',
+		)->grid(-row=>$row,-column=>0,-sticky=>'ewns');
+		$tw->Entry(%entryright,
+			-textvariable=>\$self->{pathno},
+		)->grid(-row=>$row++,-column=>1,-sticky=>'ewns');
+		$tw->Label(%labelright,
 			-text=>'Number of nodes:',
-		)->grid(-row=>$row,-column=>0,-sticky=>'ew');
-		$tw->Entry(
-			-readonlybackground=>'white',
-			-background=>'white',
-			-justify=>'right',
-			-textvariable=>\$self->{'nodeno'},
-			-state=>'readonly',
-			-exportselection=>1,
-		)->grid(-row=>$row++,-column=>1,-sticky=>'ew');
-		$tw->Label(
-			-anchor=>'e',
-			-justify=>'right',
+		)->grid(-row=>$row,-column=>0,-sticky=>'ewns');
+		$tw->Entry(%entryright,
+			-textvariable=>\$self->{nodeno},
+		)->grid(-row=>$row++,-column=>1,-sticky=>'ewns');
+		$tw->Label(%labelright,
 			-text=>'Number of signalling relations:',
-		)->grid(-row=>$row,-column=>0,-sticky=>'ew');
-		$tw->Entry(
-			-readonlybackground=>'white',
-			-background=>'white',
-			-justify=>'right',
-			-textvariable=>\$self->{'relationno'},
-			-state=>'readonly',
-			-exportselection=>1,
-		)->grid(-row=>$row++,-column=>1,-sticky=>'ew');
-		$tw->Label(
-			-anchor=>'e',
-			-justify=>'right',
+		)->grid(-row=>$row,-column=>0,-sticky=>'ewns');
+		$tw->Entry(%entryright,
+			-textvariable=>\$self->{relationno},
+		)->grid(-row=>$row++,-column=>1,-sticky=>'ewns');
+		$tw->Label(%labelright,
 			-text=>'Number of circuits:',
-		)->grid(-row=>$row,-column=>0,-sticky=>'ew');
-		$tw->Entry(
-			-readonlybackground=>'white',
-			-background=>'white',
-			-justify=>'right',
-			-textvariable=>\$self->{'ciccnt'},
-			-state=>'readonly',
-			-exportselection=>1,
-		)->grid(-row=>$row++,-column=>1,-sticky=>'ew');
-		$tw->Label(
-			-anchor=>'e',
-			-justify=>'right',
+		)->grid(-row=>$row,-column=>0,-sticky=>'ewns');
+		$tw->Entry(%entryright,
+			-textvariable=>\$self->{ciccnt},
+		)->grid(-row=>$row++,-column=>1,-sticky=>'ewns');
+		$tw->Label(%labelright,
 			-text=>'Number of active circuits:',
-		)->grid(-row=>$row,-column=>0,-sticky=>'ew');
-		$tw->Entry(
-			-readonlybackground=>'white',
-			-background=>'white',
-			-justify=>'right',
-			-textvariable=>\$self->{'actcnt'},
-			-state=>'readonly',
-			-exportselection=>1,
-		)->grid(-row=>$row++,-column=>1,-sticky=>'ew');
-		$tw->Label(
-			-anchor=>'e',
-			-justify=>'right',
+		)->grid(-row=>$row,-column=>0,-sticky=>'ewns');
+		$tw->Entry(%entryright,
+			-textvariable=>\$self->{actcnt},
+		)->grid(-row=>$row++,-column=>1,-sticky=>'ewns');
+		$tw->Label(%labelright,
 			-text=>'Number of active one-way circuits:',
-		)->grid(-row=>$row,-column=>0,-sticky=>'ew');
-		$tw->Entry(
-			-readonlybackground=>'white',
-			-background=>'white',
-			-justify=>'right',
-			-textvariable=>\$self->{'act1w'},
-			-state=>'readonly',
-			-exportselection=>1,
-		)->grid(-row=>$row++,-column=>1,-sticky=>'ew');
-		$tw->Label(
-			-anchor=>'e',
-			-justify=>'right',
+		)->grid(-row=>$row,-column=>0,-sticky=>'ewns');
+		$tw->Entry(%entryright,
+			-textvariable=>\$self->{act1w},
+		)->grid(-row=>$row++,-column=>1,-sticky=>'ewns');
+		$tw->Label(%labelright,
 			-text=>'Number of active both-way circuits:',
-		)->grid(-row=>$row,-column=>0,-sticky=>'ew');
-		$tw->Entry(
-			-readonlybackground=>'white',
-			-background=>'white',
-			-justify=>'right',
-			-textvariable=>\$self->{'act2w'},
-			-state=>'readonly',
-			-exportselection=>1,
-		)->grid(-row=>$row++,-column=>1,-sticky=>'ew');
+		)->grid(-row=>$row,-column=>0,-sticky=>'ewns');
+		$tw->Entry(%entryright,
+			-textvariable=>\$self->{act2w},
+		)->grid(-row=>$row++,-column=>1,-sticky=>'ewns');
 	}
 	$tw->MapWindow;
 }
@@ -4786,7 +5363,7 @@ sub status {
 package Path;
 use strict;
 use vars qw(@ISA);
-@ISA = qw(MsgStats);
+@ISA = qw(MsgStats Logging);
 # -------------------------------------
 
 use constant {
@@ -4813,48 +5390,49 @@ my $pathno = 0;
 sub init {
 	my ($self,$pathno,$ppa,@args) = @_;
 	$self->MsgStats::init(@args);
-	$self->{'ppa'} = $ppa;
-	$self->{'slot'} = (($ppa >> 0) & 0x1f);
-	$self->{'span'} = (($ppa >> 5) & 0x03);
-	$self->{'card'} = (($ppa >> 7) & 0x01);
-	$self->{'msgs'} = ();
-	$self->{'ht'} = HT_UNKNOWN;
-	$self->{'httext'} = 'Unknown';
-	$self->{'pr'} = MP_UNKNOWN;
-	$self->{'prtext'} = 'Unknown';
-	$self->{'rt'} = RT_UNKNOWN;
-	$self->{'rttext'} = 'Unknown';
-	$self->{'orig'} = {};
-	$self->{'dest'} = {};
-	$self->{'opcs'} = {};
-	$self->{'dpcs'} = {};
-	$self->{'routes'} = {};
-	#print "Created new path ($self->{'card'}:$self->{'span'}:$self->{'slot'}).\n";
-	$self->{'fill'} = 'red';
-	my $cola = $self->{'cola'} = 0 - Node::COL_ADJ;
-	my $rowa = $self->{'rowa'} = $pathno * 2;
-	my $colb = $self->{'colb'} = 0 + Node::COL_ADJ;
-	my $rowb = $self->{'rowb'} = $pathno * 2;
-	my $xa = $self->{'xa'} = $main::mycanvas->colpos($cola);
-	my $ya = $self->{'ya'} = $main::mycanvas->rowpos($rowa);
-	my $xb = $self->{'xb'} = $main::mycanvas->colpos($colb);
-	my $yb = $self->{'yb'} = $main::mycanvas->rowpos($rowb);
-	$self->{'x'} = ($xa + $xb)/2;
-	$self->{'y'} = ($ya + $yb)/2;
-	$self->{'item'} = $main::canvas->createLine($xa,$ya,$xb,$yb,
+	$self->Logging::init(@args);
+	$self->{ppa} = $ppa;
+	$self->{slot} = (($ppa >> 0) & 0x1f);
+	$self->{span} = (($ppa >> 5) & 0x03);
+	$self->{card} = (($ppa >> 7) & 0x01);
+	$self->{msgs} = ();
+	$self->{ht} = HT_UNKNOWN;
+	$self->{httext} = 'Unknown';
+	$self->{pr} = MP_UNKNOWN;
+	$self->{prtext} = 'Unknown';
+	$self->{rt} = RT_UNKNOWN;
+	$self->{rttext} = 'Unknown';
+	$self->{orig} = {};
+	$self->{dest} = {};
+	$self->{opcs} = {};
+	$self->{dpcs} = {};
+	$self->{routes} = {};
+	#print "Created new path ($self->{card}:$self->{span}:$self->{slot}).\n";
+	$self->{fill} = 'red';
+	my $cola = $self->{cola} = 0 - Node::COL_ADJ;
+	my $rowa = $self->{rowa} = $pathno * 2;
+	my $colb = $self->{colb} = 0 + Node::COL_ADJ;
+	my $rowb = $self->{rowb} = $pathno * 2;
+	my $xa = $self->{xa} = $main::mycanvas->colpos($cola);
+	my $ya = $self->{ya} = $main::mycanvas->rowpos($rowa);
+	my $xb = $self->{xb} = $main::mycanvas->colpos($colb);
+	my $yb = $self->{yb} = $main::mycanvas->rowpos($rowb);
+	$self->{x} = ($xa + $xb)/2;
+	$self->{y} = ($ya + $yb)/2;
+	$self->{item} = $main::canvas->createLine($xa,$ya,$xb,$yb,
 		-arrow=>'last',
 		-capstyle=>'round',
-		-fill=>$self->{'fill'},
+		-fill=>$self->{fill},
 		-joinstyle=>'round',
 		-smooth=>0,
 		-tags=>['path'],
 		-width=>4,
 	);
-	$main::canvas->bind($self->{'item'},'<ButtonPress-3>',[\&Path::button3,$self,Tk::Ev('X'),Tk::Ev('Y')]);
+	$main::canvas->bind($self->{item},'<ButtonPress-3>',[\&Path::button3,$self,Tk::Ev('X'),Tk::Ev('Y')]);
 	$main::canvas->lower('path','node');
 	#Path->regroup;
 #	$main::canvas->idletasks;
-	$main::top->{'updatenow'} = 1;
+	$main::top->{updatenow} = 1;
 }
 
 #package Path;
@@ -4862,7 +5440,7 @@ sub new {
 	my ($type,$network,@args) = @_;
 	my $self = {};
 	bless $self,$type;
-	$self->{'network'} = $network;
+	$self->{network} = $network;
 	$self->init(@args);
 	return $self;
 }
@@ -4882,46 +5460,46 @@ sub get {
 #package Path;
 sub bind {
 	my $self = shift;
-	my $nodea = $self->{'nodea'};
-	my $nodeb = $self->{'nodeb'};
-	my $slc = $self->{'slc'};
-	my $network = $self->{'network'};
+	my $nodea = $self->{nodea};
+	my $nodeb = $self->{nodeb};
+	my $slc = $self->{slc};
+	my $network = $self->{network};
 	my $link = $network->getLink($nodea,$nodeb,$slc);
-	if ($link->{'nodea'}->{'pc'} == $nodea->{'pc'}) {
+	if ($link->{nodea}->{pc} == $nodea->{pc}) {
 		$link->addForwPath($self);
 	} else {
 		$link->addRevsPath($self);
 	}
-	$self->{'link'} = $link;
+	$self->{link} = $link;
 }
 
 #package Path;
 sub cardnum {
-	shift->{'card'};
+	shift->{card};
 }
 #package Path;
 sub spannum {
-	shift->{'span'};
+	shift->{span};
 }
 #package Path;
 sub slotnum {
-	shift->{'slot'};
+	shift->{slot};
 }
 #package Path;
 sub ppa {
-	shift->{'ppa'};
+	shift->{ppa};
 }
 #package Path;
 sub add {
 	my ($self,$msg,@args) = @_;
-	unless ($self->{'detected'}) {
+	unless ($self->{detected}) {
 		if ($self->detecting) {
-			push @{$self->{'msgs'}}, $msg;
+			push @{$self->{msgs}}, $msg;
 			return;
 		}
-		$self->{'detected'} = 1;
-		push @{$self->{'msgs'}}, $msg;
-		while ($msg = pop @{$self->{'msgs'}}) {
+		$self->{detected} = 1;
+		push @{$self->{msgs}}, $msg;
+		while ($msg = pop @{$self->{msgs}}) {
 			$self->complete($msg);
 		}
 	} else {
@@ -4931,166 +5509,167 @@ sub add {
 #package Path;
 sub complete {
 	my ($self,$msg,@args) = @_;
-	$self->inc($msg);
+	$self->inc($msg,'0');
 	my ($nodeb,$nodea,$pc,$route);
-	my $network = $self->{'network'};
-	if (exists $msg->{'opc'}) {
-		$pc = $msg->{'opc'};
-		if ($route = $self->{'opcs'}->{$pc}) {
-			$nodea = $route->{'node'};
-			$self->swap if $nodea->{'col'} < 0 && $self->{'cola'} > 0;
+	my $network = $self->{network};
+	if (exists $msg->{opc}) {
+		$pc = $msg->{opc};
+		if ($route = $self->{opcs}->{$pc}) {
+			$nodea = $route->{node};
+			$self->swap if $nodea->{col} < 0 && $self->{cola} > 0;
 		} else {
-			$nodea = $network->getNode($pc, $self, $self->{'cola'},'O');
-			$self->swap if $nodea->{'col'} < 0 && $self->{'cola'} > 0;
+			$nodea = $network->getNode($pc, $self, $self->{cola},'O');
+			$self->swap if $nodea->{col} < 0 && $self->{cola} > 0;
 			$route = Route->new($self,'a',$nodea);
-			$self->{'opcs'}->{$pc} = $route;
+			$self->{opcs}->{$pc} = $route;
 		}
-		$route->inc($msg);
+		$route->inc($msg,'0');
 		$nodea->add_orig($msg);
 	}
-	if (exists $msg->{'dpc'}) {
-		$pc = $msg->{'dpc'};
-		if ($route = $self->{'dpcs'}->{$pc}) {
-			$nodeb = $route->{'node'};
-			$self->swap if $nodeb->{'col'} < 0 && $self->{'colb'} > 0;
+	if (exists $msg->{dpc}) {
+		$pc = $msg->{dpc};
+		if ($route = $self->{dpcs}->{$pc}) {
+			$nodeb = $route->{node};
+			$self->swap if $nodeb->{col} < 0 && $self->{colb} > 0;
 		} else {
-			$nodeb = $network->getNode($pc, $self, $self->{'colb'},'I');
-			$self->swap if $nodeb->{'col'} < 0 && $self->{'colb'} > 0;
+			$nodeb = $network->getNode($pc, $self, $self->{colb},'I');
+			$self->swap if $nodeb->{col} < 0 && $self->{colb} > 0;
 			$route = Route->new($self,'b',$nodeb);
-			$self->{'dpcs'}->{$pc} = $route;
+			$self->{dpcs}->{$pc} = $route;
 		}
-		$route->inc($msg);
+		$route->inc($msg,'1');
 		$nodeb->add_term($msg);
 	}
-	if (exists $msg->{'dpc'} && exists $msg->{'opc'}) {
+	if (exists $msg->{dpc} && exists $msg->{opc}) {
 		my $rela = $network->getRelation($nodea,$nodeb);
 		$rela->add($msg);
-		if ($msg->{'si'} == 1 || $msg->{'si'} == 2) {
-			if ($msg->{'mt'} == 0x11 || $msg->{'mt'} == 0x12) {
-				$self->{'slc'} = $msg->{'slc'};
-				$self->{'nodea'} = $nodea;
-				$self->{'nodeb'} = $nodeb;
-				if ($nodea->{'col'} < 0) {
-					$nodea->moveto(0 - Node::COL_ADJ,$nodea->{'row'});
-				} else {
-					$nodea->moveto(0 + Node::COL_ADJ,$nodea->{'row'});
-				}
-				if ($nodeb->{'col'} < 0) {
-					$nodeb->moveto(0 - Node::COL_ADJ,$nodeb->{'row'});
-				} else {
-					$nodeb->moveto(0 + Node::COL_ADJ,$nodeb->{'row'});
-				}
+		if ($msg->{si} == 1 || $msg->{si} == 2) {
+			if ($msg->{mt} == 0x11 || $msg->{mt} == 0x12) {
+				my $slc = $msg->{slc};
+				$self->{slc} = $slc;
+				$self->{nodea} = $nodea;
+				$self->{nodeb} = $nodeb;
+				my $link = $network->getLink($nodea,$nodeb,$slc);
+				$link->addPath($self);
+				$main::canvas->itemconfigure($self->{item},
+					-state=>'hidden',
+				);
 				$self->move;
 #				$main::canvas->idletasks;
-				$main::top->{'updatenow'} = 1;
+				$main::top->{updatenow} = 1;
 			}
 		}
+#		if ($self->{pr} == MP_NATIONAL) {
+#			unless ($mtypes{$msg->{si}}->{$msg->{mt}}->[1] & (1<<$msg->{mp})) {
+#				$rela->log("Message from ".main::pcstring($msg->{opc})." to ".main::pcstring($msg->{dpc})." with invalid priority $msg->{mp} for $mtypes{$msg->{si}}->{0x00}->[0] $mtypes{$msg->{si}}->{$msg->{mt}}->[0]");
+#			}
+#		}
 	}
 }
 #package Path;
 sub swap {
 	my $self = shift;
-	$self->moveto(-$self->{'cola'},$self->{'rowa'}, -$self->{'colb'},$self->{'rowb'});
-	while (my ($k,$node) = each %{$self->{'opcs'}}) {
-		$node->swap if $self->{'cola'} < 0 && $node->{'col'} > 0;
+	$self->moveto(-$self->{cola},$self->{rowa}, -$self->{colb},$self->{rowb});
+	while (my ($k,$node) = each %{$self->{opcs}}) {
+		$node->swap if $self->{cola} < 0 && $node->{col} > 0;
 	}
-	while (my ($k,$node) = each %{$self->{'dpcs'}}) {
-		$node->swap if $self->{'colb'} < 0 && $node->{'col'} > 0;
+	while (my ($k,$node) = each %{$self->{dpcs}}) {
+		$node->swap if $self->{colb} < 0 && $node->{col} > 0;
 	}
 }
 #package Path;
 sub detecting {
 	my $self = shift;
-	return 0 if ($self->{'ht'} != 0 && $self->{'pr'} != 0 && $self->{'rt'} != 0);
+	return 0 if ($self->{ht} != 0 && $self->{pr} != 0 && $self->{rt} != 0);
 	return 1;
 }
 
 #package Path;
 sub setht {
 	my ($self,$ht) = @_;
-	$self->{'ht'} = $ht;
+	$self->{ht} = $ht;
 	if ($ht == HT_UNKNOWN) {
-		$self->{'httext'} = 'Unknown';
+		$self->{httext} = 'Unknown';
 	} elsif ($ht == HT_BASIC) {
-		$self->{'httext'} = 'Basic';
+		$self->{httext} = 'Basic';
 	} elsif ($ht == HT_EXTENDED) {
-		$self->{'httext'} = 'Extended';
+		$self->{httext} = 'Extended';
 	}
 }
 #package Path;
 sub setrt {
 	my ($self,$rt) = @_;
-	$self->{'rt'} = $rt;
+	$self->{rt} = $rt;
 	if ($rt == RT_UNKNOWN) {
-		$self->{'rttext'} = 'Unknown';
+		$self->{rttext} = 'Unknown';
 	} elsif ($rt == RT_14BIT_PC) {
-		$self->{'rttext'} = '14-bit point code';
+		$self->{rttext} = '14-bit point code';
 	} elsif ($rt == RT_24BIT_PC) {
-		$self->{'rttext'} = '24-bit point code';
+		$self->{rttext} = '24-bit point code';
 	}
 }
 #package Path;
 sub setpr {
 	my ($self,$pr) = @_;
-	$self->{'pr'} = $pr;
+	$self->{pr} = $pr;
 	if ($pr == MP_UNKNOWN) {
-		$self->{'prtext'} = 'Unknown';
+		$self->{prtext} = 'Unknown';
 	} elsif ($pr == MP_JAPAN) {
-		$self->{'prtext'} = 'Japan';
+		$self->{prtext} = 'Japan';
 	} elsif ($pr == MP_NATIONAL) {
-		$self->{'prtext'} = 'National';
+		$self->{prtext} = 'National';
 	} elsif ($pr == MP_INTERNATIONAL) {
-		$self->{'prtext'} = 'International';
+		$self->{prtext} = 'International';
 	}
 }
 
 #package Path;
 sub move {
 	my $self = shift;
-	my $nodea = $self->{'nodea'};
-	my $nodeb = $self->{'nodeb'};
-	my $xa = $nodea->{'x'};
-	my $ya = $nodea->{'y'};
-	my $xb = $nodeb->{'x'};
-	my $yb = $nodeb->{'y'};
-	return if $xa == $self->{'xa'} &&
-		  $ya == $self->{'ya'} &&
-		  $xb == $self->{'xb'} &&
-		  $yb == $self->{'yb'};
-	$self->{'cola'} = $nodea->{'col'};
-	$self->{'rowa'} = $nodea->{'row'};
-	$self->{'colb'} = $nodeb->{'col'};
-	$self->{'rowb'} = $nodeb->{'row'};
-	$main::canvas->coords($self->{'item'},$xa,$ya,$xb,$yb);
-	$self->{'xa'} = $xa;
-	$self->{'ya'} = $ya;
-	$self->{'xb'} = $xb;
-	$self->{'yb'} = $yb;
-	$self->{'x'} = ($xa + $xb)/2;
-	$self->{'y'} = ($ya + $yb)/2;
-	while (my ($k,$r) = each %{$self->{'routes'}}) { $r->move; }
+	my $nodea = $self->{nodea};
+	my $nodeb = $self->{nodeb};
+	my $xa = $nodea->{x};
+	my $ya = $nodea->{y};
+	my $xb = $nodeb->{x};
+	my $yb = $nodeb->{y};
+	return if $xa == $self->{xa} &&
+		  $ya == $self->{ya} &&
+		  $xb == $self->{xb} &&
+		  $yb == $self->{yb};
+	$self->{cola} = $nodea->{col};
+	$self->{rowa} = $nodea->{row};
+	$self->{colb} = $nodeb->{col};
+	$self->{rowb} = $nodeb->{row};
+	$main::canvas->coords($self->{item},$xa,$ya,$xb,$yb);
+	$self->{xa} = $xa;
+	$self->{ya} = $ya;
+	$self->{xb} = $xb;
+	$self->{yb} = $yb;
+	$self->{x} = ($xa + $xb)/2;
+	$self->{y} = ($ya + $yb)/2;
+	while (my ($k,$r) = each %{$self->{routes}}) { $r->move; }
 }
 
 #package Path;
 sub moveto {
 	my ($self,$cola,$rowa,$colb,$rowb) = @_;
-	return if $cola == $self->{'cola'} &&
-	          $rowa == $self->{'rowa'} &&
-		  $colb == $self->{'colb'} &&
-		  $rowb == $self->{'rowb'};
-	my $xa = $self->{'xa'} = $main::mycanvas->colpos($cola);
-	my $ya = $self->{'ya'} = $main::mycanvas->rowpos($rowa);
-	my $xb = $self->{'xb'} = $main::mycanvas->colpos($colb);
-	my $yb = $self->{'yb'} = $main::mycanvas->rowpos($rowb);
-	$self->{'x'} = ($xa + $xb)/2;
-	$self->{'y'} = ($ya + $yb)/2;
-	$self->{'cola'} = $cola;
-	$self->{'rowa'} = $rowa;
-	$self->{'colb'} = $colb;
-	$self->{'rowb'} = $rowb;
-	$main::canvas->coords($self->{'item'},$xa,$ya,$xb,$yb);
+	return if $cola == $self->{cola} &&
+	          $rowa == $self->{rowa} &&
+		  $colb == $self->{colb} &&
+		  $rowb == $self->{rowb};
+	my $xa = $self->{xa} = $main::mycanvas->colpos($cola);
+	my $ya = $self->{ya} = $main::mycanvas->rowpos($rowa);
+	my $xb = $self->{xb} = $main::mycanvas->colpos($colb);
+	my $yb = $self->{yb} = $main::mycanvas->rowpos($rowb);
+	$self->{x} = ($xa + $xb)/2;
+	$self->{y} = ($ya + $yb)/2;
+	$self->{cola} = $cola;
+	$self->{rowa} = $rowa;
+	$self->{colb} = $colb;
+	$self->{rowb} = $rowb;
+	$main::canvas->coords($self->{item},$xa,$ya,$xb,$yb);
 	$main::canvas->lower('path','node');
-	while (my ($k,$v) = each %{$self->{'routes'}}) {
+	while (my ($k,$v) = each %{$self->{routes}}) {
 		$v->move($self);
 	}
 }
@@ -5098,19 +5677,14 @@ sub moveto {
 #package Path;
 sub identify {
 	my $self = shift;
-	my $id = "Signalling path ($self->{'card'}:$self->{'span'}:$self->{'slot'})";
-	$id .= " $self->{'nodea'}->{'pcode'} to $self->{'nodeb'}->{'pcode'} link $self->{'slc'}" if $self->{'nodea'};
+	my $id = "Signalling path ($self->{card}:$self->{span}:$self->{slot})";
+	$id .= " $self->{nodea}->{pcode} to $self->{nodeb}->{pcode} link $self->{slc}" if $self->{nodea};
 	return $id;
 }
 
 #package Path;
-sub button3 {
-	my ($canvas,$self,$X,$Y) = @_;
-	my $m = $canvas->toplevel->Menu(
-		-tearoff=>1,
-		-title=>'Path Menu',
-		-type=>'normal',
-	);
+sub getmenu {
+	my ($self,$m,$canvas,$X,$Y) = @_;
 	$m->add('command',
 		#-accelerator=>'p',
 		-command=>[\&Path::props, $self, $canvas, $X, $Y],
@@ -5124,11 +5698,30 @@ sub button3 {
 		-underline=>5,
 	);
 	$m->add('command',
+		#-accelerator=>'l',
+		-command=>[\&Logging::showlog, $self, $canvas, $X, $Y],
+		-label=>'Path Logs...',
+		-underline=>5,
+		-state=>(@{$self->{logs}} ? 'normal' : 'disabled'),
+	);
+	$m->add('command',
 		#-accelerator=>'m',
 		-command=>[\&MsgStats::stats, $self, $canvas, $X, $Y],
-		-label=>'Statistics...',
-		-underline=>0,
+		-label=>'Path Statistics...',
+		-underline=>5,
+		-state=>($self->{incs}->{0}->{sus} + $self->{incs}->{1}->{sus} ? 'normal' : 'disabled'),
 	);
+}
+
+#package Path;
+sub button3 {
+	my ($canvas,$self,$X,$Y) = @_;
+	my $m = $canvas->toplevel->Menu(
+		-tearoff=>1,
+		-title=>'Path Menu',
+		-type=>'normal',
+	);
+	$self->getmenu($m,$canvas,$X,$Y);
 	$m->Popup(
 		-popanchor=>'nw',
 		-popover=>'cursor',
@@ -5141,8 +5734,8 @@ sub props {
 	my $row = 0;
 	my $tw;
 	my $v = 'Signalling path';
-	my $ppa = "$self->{'card'}:$self->{'span'}:$self->{'slot'}";
-	if ($tw = $self->{'props'}) {
+	my $ppa = "$self->{card}:$self->{span}:$self->{slot}";
+	if ($tw = $self->{props}) {
 		if ($tw->state eq 'iconic') {
 			$tw->deiconify;
 		} else {
@@ -5154,7 +5747,7 @@ sub props {
 			-title=>$title,
 		);
 		$tw->group($canvas->toplevel);
-		$tw->transient($canvas->toplevel);
+		#$tw->transient($canvas->toplevel);
 		$tw->iconimage('icon');
 		$tw->iconname($title);
 		$tw->resizable(0,0);
@@ -5162,36 +5755,24 @@ sub props {
 		$tw->geometry("+$X+$Y");
 		$tw->protocol('WM_DELETE_WINDOW', [sub {
 			my $self = shift;
-			my $tw = $self->{'props'};
-			$self->{'props'} = undef;
+			my $tw = $self->{props};
+			$self->{props} = undef;
 			$tw->destroy;
 		},$self]);
-		$self->{'props'} = $tw;
+		$self->{props} = $tw;
 
-		$tw->Label(
-			-anchor=>'e',
-			-justify=>'right',
+		$tw->Label(%labelright,
 			-text=>'Object type:',
-		)->grid(-row=>$row,-column=>0,-sticky=>'ew');
-		$tw->Entry(
-			-readonlybackground=>'white',
-			-background=>'white',
+		)->grid(-row=>$row,-column=>0,-sticky=>'ewns');
+		$tw->Entry(%entryleft,
 			-textvariable=>\$v,
-			-state=>'readonly',
-			-exportselection=>1,
-		)->grid(-row=>$row++,-column=>1,-sticky=>'ew');
-		$tw->Label(
-			-anchor=>'e',
-			-justify=>'right',
+		)->grid(-row=>$row++,-column=>1,-sticky=>'ewns');
+		$tw->Label(%labelright,
 			-text=>'Channel:',
-		)->grid(-row=>$row,-column=>0,-sticky=>'ew');
-		$tw->Entry(
-			-readonlybackground=>'white',
-			-background=>'white',
+		)->grid(-row=>$row,-column=>0,-sticky=>'ewns');
+		$tw->Entry(%entryleft,
 			-textvariable=>\$ppa,
-			-state=>'readonly',
-			-exportselection=>1,
-		)->grid(-row=>$row++,-column=>1,-sticky=>'ew');
+		)->grid(-row=>$row++,-column=>1,-sticky=>'ewns');
 	}
 	$tw->MapWindow;
 }
@@ -5202,8 +5783,8 @@ sub status {
 	my $row = 0;
 	my $tw;
 	my $v = 'Signalling path';
-	my $ppa = "$self->{'card'}:$self->{'span'}:$self->{'slot'}";
-	if ($tw = $self->{'status'}) {
+	my $ppa = "$self->{card}:$self->{span}:$self->{slot}";
+	if ($tw = $self->{status}) {
 		if ($tw->state eq 'iconic') {
 			$tw->deiconify;
 		} else {
@@ -5215,7 +5796,7 @@ sub status {
 			-title=>$title,
 		);
 		$tw->group($canvas->toplevel);
-		$tw->transient($canvas->toplevel);
+		#$tw->transient($canvas->toplevel);
 		$tw->iconimage('icon');
 		$tw->iconname($title);
 		$tw->resizable(0,0);
@@ -5223,103 +5804,70 @@ sub status {
 		$tw->geometry("+$X+$Y");
 		$tw->protocol('WM_DELETE_WINDOW', [sub {
 			my $self = shift;
-			my $tw = $self->{'status'};
-			$self->{'status'} = undef;
+			my $tw = $self->{status};
+			$self->{status} = undef;
 			$tw->destroy;
 		},$self]);
-		$self->{'status'} = $tw;
+		$self->{status} = $tw;
 
-		if ($self->{'nodea'} && $self->{'nodeb'}) {
-			$tw->Label(
-				-anchor=>'e',
-				-justify=>'right',
+		if ($self->{nodea} && $self->{nodeb}) {
+			$tw->Label(%labelright,
 				-text=>'Signalling link code:',
-			)->grid(-row=>$row,-column=>0,-sticky=>'ew');
-			$tw->Entry(
-				-readonlybackground=>'white',
-				-background=>'white',
-				-textvariable=>\$self->{'slc'},
-				-state=>'readonly',
-				-exportselection=>1,
-			)->grid(-row=>$row++,-column=>1,-sticky=>'ew');
+			)->grid(-row=>$row,-column=>0,-sticky=>'ewns');
+			$tw->Entry(%entryleft,
+				-textvariable=>\$self->{slc},
+			)->grid(-row=>$row++,-column=>1,-sticky=>'ewns');
 		}
-		if ($self->{'nodea'}) {
-			$tw->Label(
-				-anchor=>'e',
-				-justify=>'right',
+		if ($self->{nodea}) {
+			$tw->Label(%labelright,
 				-text=>'Node A point code:',
-			)->grid(-row=>$row,-column=>0,-sticky=>'ew');
-			$tw->Entry(
-				-readonlybackground=>'white',
-				-background=>'white',
-				-textvariable=>\$self->{'nodea'}->{'pcode'},
-				-state=>'readonly',
-				-exportselection=>1,
-			)->grid(-row=>$row++,-column=>1,-sticky=>'ew');
+			)->grid(-row=>$row,-column=>0,-sticky=>'ewns');
+			$tw->Entry(%entryleft,
+				-textvariable=>\$self->{nodea}->{pcode},
+			)->grid(-row=>$row++,-column=>1,-sticky=>'ewns');
 		}
-		if ($self->{'nodeb'}) {
-			$tw->Label(
-				-anchor=>'e',
-				-justify=>'right',
+		if ($self->{nodeb}) {
+			$tw->Label(%labelright,
 				-text=>'Node B point code:',
-			)->grid(-row=>$row,-column=>0,-sticky=>'ew');
-			$tw->Entry(
-				-readonlybackground=>'white',
-				-background=>'white',
-				-textvariable=>\$self->{'nodeb'}->{'pcode'},
-				-state=>'readonly',
-				-exportselection=>1,
-			)->grid(-row=>$row++,-column=>1,-sticky=>'ew');
+			)->grid(-row=>$row,-column=>0,-sticky=>'ewns');
+			$tw->Entry(%entryleft,
+				-textvariable=>\$self->{nodeb}->{pcode},
+			)->grid(-row=>$row++,-column=>1,-sticky=>'ewns');
 		}
-		$tw->Label(
-			-anchor=>'e',
-			-justify=>'right',
+		$tw->Label(%labelright,
 			-text=>'Header type:',
-		)->grid(-row=>$row,-column=>0,-sticky=>'ew');
-		$tw->Optionmenu(
-			-anchor=>'w',
-			-justify=>'left',
-			-indicatoron=>0,
+		)->grid(-row=>$row,-column=>0,-sticky=>'ewns');
+		$tw->Optionmenu(%optionleft,
 			-options=>[
 				['Unknown'=>HT_UNKNOWN],
 				['Basic'=>HT_BASIC],
 				['Extended'=>HT_EXTENDED] ],
-			-variable=>\$self->{'ht'},
-			-textvariable=>\$self->{'httext'},
-		)->grid(-row=>$row++,-column=>1,-sticky=>'ew');
-		$tw->Label(
-			-anchor=>'e',
-			-justify=>'right',
+			-variable=>\$self->{ht},
+			-textvariable=>\$self->{httext},
+		)->grid(-row=>$row++,-column=>1,-sticky=>'ewns');
+		$tw->Label(%labelright,
 			-text=>'Message priority:',
-		)->grid(-row=>$row,-column=>0,-sticky=>'ew');
-		$tw->Optionmenu(
-			-anchor=>'w',
-			-justify=>'left',
-			-indicatoron=>0,
+		)->grid(-row=>$row,-column=>0,-sticky=>'ewns');
+		$tw->Optionmenu(%optionleft,
 			-options=>[
 				['Unknown'=>MP_UNKNOWN],
 				['Japan'=>MP_JAPAN],
 				['National'=>MP_NATIONAL],
 				['International'=>MP_INTERNATIONAL] ],
-			-variable=>\$self->{'pr'},
-			-textvariable=>\$self->{'prtext'},
-		)->grid(-row=>$row++,-column=>1,-sticky=>'ew');
-		$tw->Label(
-			-anchor=>'e',
-			-justify=>'right',
+			-variable=>\$self->{pr},
+			-textvariable=>\$self->{prtext},
+		)->grid(-row=>$row++,-column=>1,-sticky=>'ewns');
+		$tw->Label(%labelright,
 			-text=>'Routing label type:',
-		)->grid(-row=>$row,-column=>0,-sticky=>'ew');
-		$tw->Optionmenu(
-			-anchor=>'w',
-			-justify=>'left',
-			-indicatoron=>0,
+		)->grid(-row=>$row,-column=>0,-sticky=>'ewns');
+		$tw->Optionmenu(%optionleft,
 			-options=>[
 				['Unknown'=>RT_UNKNOWN],
 				['14-bit point code'=>RT_14BIT_PC],
 				['24-bit point code'=>RT_24BIT_PC] ],
-			-variable=>\$self->{'rt'},
-			-textvariable=>\$self->{'rttext'},
-		)->grid(-row=>$row++,-column=>1,-sticky=>'ew');
+			-variable=>\$self->{rt},
+			-textvariable=>\$self->{rttext},
+		)->grid(-row=>$row++,-column=>1,-sticky=>'ewns');
 	}
 	$tw->MapWindow;
 }
@@ -5347,146 +5895,6 @@ use constant {
 };
 my $count = 0;
 
-my %mtypes = (
-	0=>{
-		0x00 => 'snmm',
-		0x11 => 'coo',
-		0x12 => 'coa',
-		0x15 => 'cbd',
-		0x16 => 'cba',
-		0x21 => 'eco',
-		0x22 => 'eca',
-		0x31 => 'rct',
-		0x32 => 'tfc',
-		0x41 => 'tfp',
-		0x42 => 'tcp',
-		0x43 => 'tfr',
-		0x44 => 'tcr',
-		0x45 => 'tfa',
-		0x46 => 'tca',
-		0x51 => 'rst',
-		0x52 => 'rsr',
-		0x53 => 'rcp',
-		0x54 => 'rcr',
-		0x61 => 'lin',
-		0x62 => 'lun',
-		0x63 => 'lia',
-		0x64 => 'lua',
-		0x65 => 'lid',
-		0x66 => 'lfu',
-		0x67 => 'llt',
-		0x68 => 'lrt',
-		0x71 => 'tra',
-		0x72 => 'trw',
-		0x81 => 'dlc',
-		0x82 => 'css',
-		0x83 => 'cns',
-		0x84 => 'cnp',
-		0xa1 => 'upu',
-		0xa2 => 'upa',
-		0xa3 => 'upt',
-	},
-	1=>{
-		0x00 => 'sntm',
-		0x11 => 'sltm',
-		0x12 => 'slta',
-	},
-	2=>{
-		0x00 => 'snsm',
-		0x11 => 'sltm',
-		0x12 => 'slta',
-	},
-	3=>{
-		0x00 => 'sccp',
-		0x01 => 'cr',
-		0x02 => 'cc',
-		0x03 => 'cref',
-		0x04 => 'rlsd',
-		0x05 => 'rlc',
-		0x06 => 'dt1',
-		0x07 => 'dt2',
-		0x08 => 'ak',
-		0x09 => 'udt',
-		0x0a => 'udts',
-		0x0b => 'ed',
-		0x0c => 'ea',
-		0x0d => 'rsr',
-		0x0e => 'rsc',
-		0x0f => 'err',
-		0x10 => 'it',
-		0x11 => 'xudt',
-		0x12 => 'xudts',
-		0x13 => 'ludt',
-		0x14 => 'ludts',
-	},
-	5=>{
-		0x00 => 'isup',
-		0x01 =>'iam',
-		0x02 =>'sam',
-		0x03 =>'inr',
-		0x04 =>'inf',
-		0x05 =>'cot',
-		0x06 =>'acm',
-		0x07 =>'con',
-		0x08 =>'fot',
-		0x09 =>'anm',
-		0x0c =>'rel',
-		0x0d =>'sus',
-		0x0e =>'res',
-		0x10 =>'rlc',
-		0x11 =>'ccr',
-		0x12 =>'rsc',
-		0x13 =>'blo',
-		0x14 =>'ubl',
-		0x15 =>'bla',
-		0x16 =>'uba',
-		0x17 =>'grs',
-		0x18 =>'cgb',
-		0x19 =>'cgu',
-		0x1a =>'cgba',
-		0x1b =>'cgua',
-		0x1c =>'cmr',
-		0x1d =>'cmc',
-		0x1e =>'cmrj',
-		0x1f =>'far',
-		0x20 =>'faa',
-		0x21 =>'frj',
-		0x22 =>'fad',
-		0x23 =>'fai',
-		0x24 =>'lpa',
-		0x25 =>'csvq',
-		0x26 =>'csvr',
-		0x27 =>'drs',
-		0x28 =>'pam',
-		0x29 =>'gra',
-		0x2a =>'cqm',
-		0x2b =>'cqr',
-		0x2c =>'cpg',
-		0x2d =>'usr',
-		0x2e =>'ucic',
-		0x2f =>'cfn',
-		0x30 =>'olm',
-		0x31 =>'crg',
-		0x32 =>'nrm',
-		0x33 =>'fac',
-		0x34 =>'upt',
-		0x35 =>'upa',
-		0x36 =>'idr',
-		0x37 =>'irs',
-		0x38 =>'sgm',
-		0xe9 =>'cra',
-		0xea =>'crm',
-		0xeb =>'cvr',
-		0xec =>'cvt',
-		0xed =>'exm',
-		0xf8 =>'non',
-		0xfc =>'llm',
-		0xfd =>'cak',
-		0xfe =>'tcm',
-		0xff =>'mcp',
-	},
-);
-
 # $msg = Message::create($pcap);
 #package Message;
 sub create {
@@ -5496,27 +5904,27 @@ sub create {
 	my $pcap = shift;
 	my %hdr;
 	my $dat = '';
-	$self->{'hdr'} = {};
-	$self->{'dat'} = '';
+	$self->{hdr} = {};
+	$self->{dat} = '';
 	my $ret = Net::Pcap::pcap_next_ex($pcap, \%hdr, \$dat);
-	$self->{'hdr'}->{'len'} = $hdr{'len'} - 4;
-	$self->{'hdr'}->{'caplen'} = $hdr{'caplen'} - 4;
-	$self->{'hdr'}->{'tv_sec'} = $hdr{'tv_sec'};
-	$self->{'hdr'}->{'tv_usec'} = $hdr{'tv_usec'};
-	$self->{'dat'} = substr($dat, 4);
+	$self->{hdr}->{len} = $hdr{len} - 4;
+	$self->{hdr}->{caplen} = $hdr{caplen} - 4;
+	$self->{hdr}->{tv_sec} = $hdr{tv_sec};
+	$self->{hdr}->{tv_usec} = $hdr{tv_usec};
+	$self->{dat} = substr($dat, 4);
 	return undef if $ret != 1;
 	$main::count += 1;
 	my ( $dir, $xsn, $lkno0, $lkno1 ) = unpack('CCCC', $dat);
-	$self->{'dir'} = $dir;
-	$self->{'xsn'} = $xsn;
-	$self->{'ppa'} = ($lkno0 << 8) | $lkno1;
+	$self->{dir} = $dir;
+	$self->{xsn} = $xsn;
+	$self->{ppa} = ($lkno0 << 8) | $lkno1;
 	return $self;
 }
 
 #package Message;
 sub process {
 	my ($self,$network) = @_;
-	my $path = $network->getPath($self->{'ppa'});
+	my $path = $network->getPath($self->{ppa});
 	if ($self->decode($path) >= 0) {
 		$path->add($self);
 		return;
@@ -5532,127 +5940,127 @@ sub getCount {
 #package Message;
 sub decode {
 	my ($self,$path,@args) = @_;
-	my @b = (unpack('C*', substr($self->{'dat'}, 0, 8)));
-	if (!exists $self->{'mtp2decode'}) {
-		my $len = $self->{'hdr'}->{'len'};
+	my @b = (unpack('C*', substr($self->{dat}, 0, 8)));
+	if (!exists $self->{mtp2decode}) {
+		my $len = $self->{hdr}->{len};
 		if (3 <= $len && $len <= 5) {
 			$path->setht(HT_BASIC);
 		} elsif (6 <= $len && $len <= 8) {
 			$path->setht(HT_EXTENDED);
 		}
-		return 0 unless $path->{'ht'} != HT_UNKNOWN;
+		return 0 unless $path->{ht} != HT_UNKNOWN;
 		my ($bsn,$bib,$fsn,$fib,$li,$li0);
-		if ($path->{'ht'} == HT_BASIC) {
-			$self->{'bsn'} = $b[0] & 0x7f;
-			$self->{'bib'} = $b[0] >> 7;
-			$self->{'fsn'} = $b[1] & 0x7f;
-			$self->{'fib'} = $b[1] >> 7;
-			$self->{'li' } = $b[2] & 0x3f;
-			$self->{'li0'} = $b[2] >> 6;
-		} elsif ($path->{'ht'} == HT_EXTENDED) {
-			$self->{'bsn'} = $b[0];
-			$self->{'bsn'} |= ($b[1] & 0x0f) << 8;
-			$self->{'bib'} = $b[1] >> 7;
-			$self->{'fsn'} = $b[2];
-			$self->{'fsn'} |= ($b[3] & 0x0f) << 8;
-			$self->{'fib'} = $b[3] >> 7;
-			$self->{'li' } = $b[4];
-			$self->{'li' } |= ($b[5] & 0x1) << 8;
-			$self->{'li0'} = $b[5] >> 6;
+		if ($path->{ht} == HT_BASIC) {
+			$self->{bsn} = $b[0] & 0x7f;
+			$self->{bib} = $b[0] >> 7;
+			$self->{fsn} = $b[1] & 0x7f;
+			$self->{fib} = $b[1] >> 7;
+			$self->{li} = $b[2] & 0x3f;
+			$self->{li0} = $b[2] >> 6;
+		} elsif ($path->{ht} == HT_EXTENDED) {
+			$self->{bsn} = $b[0];
+			$self->{bsn} |= ($b[1] & 0x0f) << 8;
+			$self->{bib} = $b[1] >> 7;
+			$self->{fsn} = $b[2];
+			$self->{fsn} |= ($b[3] & 0x0f) << 8;
+			$self->{fib} = $b[3] >> 7;
+			$self->{li} = $b[4];
+			$self->{li} |= ($b[5] & 0x1) << 8;
+			$self->{li0} = $b[5] >> 6;
 		}
-		my $inf = $len - $path->{'ht'};
-		if (($self->{'li'} != $inf) && ($inf <= 63 || $self->{'li'} != 63)) {
-			print STDERR "bad length indicator $self->{'li'} != $inf\n";
+		my $inf = $len - $path->{ht};
+		if (($self->{li} != $inf) && ($inf <= 63 || $self->{li} != 63)) {
+			print STDERR "bad length indicator $self->{li} != $inf\n";
 		}
-		if ($self->{'li0'} != 0) {
+		if ($self->{li0} != 0) {
 			$path->setrt(RT_24BIT_PC);
 			$path->setpr(MP_JAPAN);
 		}
-		$self->{'mtp2decode'} = 1;
+		$self->{mtp2decode} = 1;
 	}
-	return 1 if $self->{'li'} == 0;
-	@b = (unpack('C*', substr($self->{'dat'}, $path->{'ht'}, 11)));
-	$self->{'si'} = $b[0];
-	return 1 if $self->{'li'} < 3;
-	$self->{'ni'} = ($b[0] & 0xc0) >> 6;
-	$self->{'mp'} = ($b[0] & 0x30) >> 4;
-	$self->{'si'} = ($b[0] & 0x0f);
-	if ($self->{'ni'} == 0) {
+	return 1 if $self->{li} == 0;
+	@b = (unpack('C*', substr($self->{dat}, $path->{ht}, 11)));
+	$self->{si} = $b[0];
+	return 1 if $self->{li} < 3;
+	$self->{ni} = ($b[0] & 0xc0) >> 6;
+	$self->{mp} = ($b[0] & 0x30) >> 4;
+	$self->{si} = ($b[0] & 0x0f);
+	if ($self->{ni} == 0) {
 		$path->setrt(RT_14BIT_PC);
 		$path->setpr(MP_INTERNATIONAL);
 	}
-	if ($path->{'pr'} == MP_UNKNOWN) {
-		$path->setpr(MP_NATIONAL) if $self->{'mp'} != 0;
-	} elsif ($path->{'pr'} == MP_JAPAN) {
-		$self->{'mp'} = $self->{'li0'};
-	} elsif ($path->{'pr'} == MP_INTERNATIONAL) {
-		$self->{'mp'} = 0;
+	if ($path->{pr} == MP_UNKNOWN) {
+		$path->setpr(MP_NATIONAL) if $self->{mp} != 0;
+	} elsif ($path->{pr} == MP_JAPAN) {
+		$self->{mp} = $self->{li0};
+	} elsif ($path->{pr} == MP_INTERNATIONAL) {
+		$self->{mp} = 0;
 	}
-	if ($self->{'li'} < HT_EXTENDED) {
-		print STDERR "too short for RL, li = $self->{'li'}\n";
+	if ($self->{li} < HT_EXTENDED) {
+		print STDERR "too short for RL, li = $self->{li}\n";
 		return -1;
 	}
-	if ($self->{'li'} < 9 || ($self->{'si'} == 5 && $self->{'li'} < 11)) {
+	if ($self->{li} < 9 || ($self->{si} == 5 && $self->{li} < 11)) {
 		$path->setrt(RT_14BIT_PC);
 	}
-	if ($path->{'rt'} == RT_UNKNOWN) {
-		my $ret = $self->checkRoutingLabelType($self->{'si'},$path,$self->{'li'},\@b) < 0;
+	if ($path->{rt} == RT_UNKNOWN) {
+		my $ret = $self->checkRoutingLabelType($self->{si},$path,$self->{li},\@b) < 0;
 		return $ret if $ret <= 0;
-		print "check succeeded on si=$self->{'si'}, mt=$self->{'mt'}";
+		print "check succeeded on si=$self->{si}, mt=$self->{mt}";
 	}
-	if (!exists $self->{'mtp3decode'}) {
+	if (!exists $self->{mtp3decode}) {
 		return 0 if $path->detecting;
-		if ($path->{'rt'} == RT_14BIT_PC) {
-			if ($self->{'li'} < 6) {
-				print STDERR "too short for 14-bit RL, li = $self->{'li'}\n";
+		if ($path->{rt} == RT_14BIT_PC) {
+			if ($self->{li} < 6) {
+				print STDERR "too short for 14-bit RL, li = $self->{li}\n";
 				return -1;
 			}
-			$self->{'dpc'} = $b[1];
-			$self->{'dpc'} |= ($b[2] & 0x3f) << 8;
-			$self->{'opc'} = ($b[2] & 0xc0) >> 6;
-			$self->{'opc'} |= $b[3] << 2;
-			$self->{'opc'} |= ($b[4] & 0x0f) << 10;
-			$self->{'sls'} = $b[4] >> 4;
+			$self->{dpc} = $b[1];
+			$self->{dpc} |= ($b[2] & 0x3f) << 8;
+			$self->{opc} = ($b[2] & 0xc0) >> 6;
+			$self->{opc} |= $b[3] << 2;
+			$self->{opc} |= ($b[4] & 0x0f) << 10;
+			$self->{sls} = $b[4] >> 4;
 		} else {
-			if ($self->{'li'} < 9) {
-				print STDERR "too short for 24-bit RL, li = $self->{'li'}\n";
+			if ($self->{li} < 9) {
+				print STDERR "too short for 24-bit RL, li = $self->{li}\n";
 				return -1;
 			}
-			$self->{'dpc'} = $b[1];
-			$self->{'dpc'} |= $b[2] << 8;
-			$self->{'dpc'} |= $b[3] << 16;
-			$self->{'opc'} = $b[4];
-			$self->{'opc'} |= $b[5] << 8;
-			$self->{'opc'} |= $b[6] << 16;
-			$self->{'sls'} = $b[7];
+			$self->{dpc} = $b[1];
+			$self->{dpc} |= $b[2] << 8;
+			$self->{dpc} |= $b[3] << 16;
+			$self->{opc} = $b[4];
+			$self->{opc} |= $b[5] << 8;
+			$self->{opc} |= $b[6] << 16;
+			$self->{sls} = $b[7];
 		}
-		@b = (unpack('C*', substr($self->{'dat'}, $path->{'ht'} + 1 + $path->{'rt'}, 3)));
-		if ($self->{'si'} == 5) {
-			$self->{'cic'} = $b[0];
-			$self->{'cic'} |= $b[1] << 8;
-			$self->{'mt'} = $b[2];
-		} elsif ($self->{'si'} < 3) {
-			$self->{'mt'} = (($b[0] & 0x0f) << 4) | ($b[0] >> 4);
+		@b = (unpack('C*', substr($self->{dat}, $path->{ht} + 1 + $path->{rt}, 3)));
+		if ($self->{si} == 5) {
+			$self->{cic} = $b[0];
+			$self->{cic} |= $b[1] << 8;
+			$self->{mt} = $b[2];
+		} elsif ($self->{si} < 3) {
+			$self->{mt} = (($b[0] & 0x0f) << 4) | ($b[0] >> 4);
 		} else {
-			$self->{'mt'} = $b[0];
+			$self->{mt} = $b[0];
 		}
-		unless (exists $mtypes{$self->{'si'}}) {
-			print STDERR "no message type for si=$self->{'si'}\n";
+		unless (exists $mtypes{$self->{si}}) {
+			print STDERR "no message type for si=$self->{si}\n";
 			return -1;
 		}
-		unless (exists $mtypes{$self->{'si'}}->{$self->{'mt'}}) {
-			print STDERR "no message type for si=$self->{'si'}, mt=$self->{'mt'}\n";
+		unless (exists $mtypes{$self->{si}}->{$self->{mt}}) {
+			print STDERR "no message type for si=$self->{si}, mt=$self->{mt}\n";
 			return -1;
 		}
-		if ($self->{'si'} == 1 || $self->{'si'} == 2) {
-			if ($path->{'rt'} == RT_14BIT_PC) {
-				$self->{'slc'} = $self->{'sls'};
+		if ($self->{si} == 1 || $self->{si} == 2) {
+			if ($path->{rt} == RT_14BIT_PC) {
+				$self->{slc} = $self->{sls};
 			} else {
-				$self->{'slc'} = $b[1] & 0x0f;
+				$self->{slc} = $b[1] & 0x0f;
 			}
-			$self->{'dlen'} = $b[1] >> 4;
+			$self->{dlen} = $b[1] >> 4;
 		}
-		$self->{'mtp3decode'} = 1;
+		$self->{mtp3decode} = 1;
 	}
 	return 1;
 }
@@ -6030,13 +6438,13 @@ use strict;
 #package MyOptions;
 sub assign {
 	my $mw = shift;
-	#$mw->optionAdd('*font'=>'-*-helvetica-medium-r-*--*-100-*-*-*-*-*-*');
-	#$mw->optionAdd('*.Button.*.font'=>'-*-helvetica-bold-r-*--*-100-*-*-*-*-*-*');
-	#$mw->optionAdd('*.Label.*.font'=>'-*-helvetica-bold-r-*--*-100-*-*-*-*-*-*');
+	#$mw->optionAdd('*font'=>'-*-helvetica-medium-r-*--*-120-*-*-*-*-*-*');
+	#$mw->optionAdd('*.Button.*.font'=>'-*-helvetica-bold-r-*--*-120-*-*-*-*-*-*');
+	#$mw->optionAdd('*.Label.*.font'=>'-*-helvetica-bold-r-*--*-120-*-*-*-*-*-*');
 	#$mw->optionAdd('*font'=>'Arial 9');
 	#$mw->optionAdd('*font'=>'Helvetica 10');
-	#$mw->optionAdd('*Button*font'=>'Helvetica-Bold 10');
-	#$mw->optionAdd('*Label*font'=>'Helvetica-Bold 10');
+	#$mw->optionAdd('*Button*font'=>'Arial-Bold 9');
+	#$mw->optionAdd('*Label*font'=>'Arial-Bold 9');
 	#$mw->optionAdd('*disabledBackground'=>'dark grey');
 	#$mw->optionAdd('*highlightBackground'=>'light grey');
 	#$mw->optionAdd('*highlightThickness'=>1);
@@ -6044,13 +6452,13 @@ sub assign {
 	#$mw->optionAdd('*borderWidth'=>1);
 	#$mw->optionAdd('*border'=>0);
 	#$mw->optionAdd('*Menu*Width'=>1);
-	#$mw->optionAdd('*Menu*Heigth'=>1);
+	#$mw->optionAdd('*Menu*Height'=>1);
 
-	#$mw->optionAdd('*Balloon*font'=>'Arial 8');
+	$mw->optionAdd('*Balloon*font'=>'Arial 8');
 	#$mw->optionAdd('*padX'=>0);
 	#$mw->optionAdd('*padY'=>0);
 	#$mw->optionAdd('*relief'=>'groove');
-	#$mw->optionAdd('*Scrollbar*Width'=>8);
+	$mw->optionAdd('*Scrollbar*Width'=>8);
 }
 
 # -------------------------------------
@@ -6612,28 +7020,28 @@ sub new {
 	my ($type,$parent,@args) = @_;
 	my $self = {};
 	bless $self, $type;
-	$self->{'parent'} = $parent;
+	$self->{parent} = $parent;
 	return $self;
 }
 #package MyWidget;
 sub destroy {
 	my ($self,@args) = @_;
 	$self->SUPER::destroy(@args);
-	delete $self->{'parent'};
-	delete $self->{'widget'};
-	delete $self->{'tree'};
+	delete $self->{parent};
+	delete $self->{widget};
+	delete $self->{tree};
 }
 #package MyWidget;
 sub setframe {
 	my ($self,$frame,@args) = @_;
-	$self->{'frame'} = $frame;
+	$self->{frame} = $frame;
 	$frame->{_myobject} = $self;
 	return $frame;
 }
 #package MyWidget;
 sub setwidget {
 	my ($self,$widget,@args) = @_;
-	$self->{'widget'} = $widget;
+	$self->{widget} = $widget;
 	$widget->{_myobject} = $self;
 	return $widget;
 }
@@ -6656,14 +7064,14 @@ sub setmainwindow {
 }
 #package MyWidget;
 sub parent {
-	shift->{'parent'}
+	shift->{parent}
 }
 #package MyWidget;
 sub top {
 	my $self = shift;
 	my $top = $self;
-	while (defined $top->{'parent'}) {
-		$top = $top->{'parent'};
+	while (defined $top->{parent}) {
+		$top = $top->{parent};
 	}
 	return $top;
 }
@@ -6677,11 +7085,11 @@ sub toplevel {
 }
 #package MyWidget;
 sub widget {
-	shift->{'widget'};
+	shift->{widget};
 }
 #package MyWidget;
 sub frame {
-	shift->{'frame'};
+	shift->{frame};
 }
 #package MyWidget;
 sub attachballoon {
@@ -6723,7 +7131,7 @@ use vars qw(@ISA);
 sub new {
 	my ($type,$title,@args) = @_;
 	my $self = MyWidget::new($type,undef,@args);
-	$self->{'data'}->{'title'} = $title;
+	$self->{data}->{title} = $title;
 	my $mw = Tk::MainWindow->new;
 	$main::mw = $mw;
 	$self->setmainwindow($mw);
@@ -6794,7 +7202,7 @@ sub new {
 		-side=>'left',
 		-anchor=>'w',
 	);
-	$self->{'top'} = $parent->widget;
+	$self->{top} = $parent->widget;
 	$self->setwidget($c);
 	$main::canvas = $c;
 	$c->update;
@@ -6807,8 +7215,8 @@ sub new {
 #	$c->bind('path','<ButtonPress-3>',[\&Path::popup,Tk::Ev('b'),Tk::Ev('x'),Tk::Ev('y'),Tk::Ev('X'),Tk::Ev('Y')]);
 #	$c->bind('route','<ButtonPress-3>',[\&Route::popup,Tk::Ev('b'),Tk::Ev('x'),Tk::Ev('y'),Tk::Ev('X'),Tk::Ev('Y')]);
 #	$c->bind('relation','<ButtonPress-3>',[\&Relation::popup,Tk::Ev('b'),Tk::Ev('x'),Tk::Ev('y'),Tk::Ev('X'),Tk::Ev('Y')]);
-	my $w = $self->{'w'} = $c->width;
-	my $h = $self->{'h'} = $c->height;
+	my $w = $self->{w} = $c->width;
+	my $h = $self->{h} = $c->height;
 	return $self;
 }
 
@@ -6821,7 +7229,7 @@ sub new {
 
 sub colpos {
 	my ($self,$col) = @_;
-	my $w = $self->{'w'};
+	my $w = $self->{w};
 	my $dw = $w / 12; # 12 columns
 	if ($col < 0) {
 		return $col * $dw + $dw/2 + $w/2;
@@ -6834,7 +7242,7 @@ sub colpos {
 
 sub rowpos {
 	my ($self,$row) = @_;
-	my $h = $self->{'h'};
+	my $h = $self->{h};
 	return $row * 35 + $h/2;
 }
 
@@ -6869,17 +7277,17 @@ sub createmenubar {
 	my $self = shift;
 	my $w = $self->widget;
 	my ($mb,$mi,$mc);
-	$mb = $self->{'MenuBar'} = $w->Menu(
+	$mb = $self->{MenuBar} = $w->Menu(
 		-type=>'menubar',
 	);
 	$w->configure(-menu=>$mb);
-	$self->{'Dialog'} = $self->toplevel->Dialog(
+	$self->{Dialog} = $self->toplevel->Dialog(
 		-buttons=>[qw/Ok Cancel Help/],
 		-default_button=>'Cancel',
 		-text=>'Please input capture file or interface from which to load.',
 		-title=>'Source Selection',
 	);
-	$mi = $self->{'FileMenu'} = $mb->Menu(
+	$mi = $self->{FileMenu} = $mb->Menu(
 		-tearoff=>1,
 		-title=>'File Menu',
 		-title=>'normal',
@@ -6898,6 +7306,11 @@ sub createmenubar {
 		-label=>'Open...',
 		-underline=>0,
 		-command=>[\&MyTop::menuFileOpen,$self],
+	);
+	$mi->add('command',
+		-label=>'Play...',
+		-underline=>0,
+		-command=>[\&MyTop::menuFilePlay,$self],
 	);
 	$mi->add('command',
 		-label=>'Save',
@@ -6930,7 +7343,7 @@ sub createmenubar {
 		-underline=>0,
 		-state=>'disabled',
 	);
-	$self->{'RecentMenu'} = $mc;
+	$self->{RecentMenu} = $mc;
 	$mi->add('separator');
 	$mi->add('command',
 		-label=>'Exit All',
@@ -6941,7 +7354,7 @@ sub createmenubar {
 		-label=>'Debug Dump',
 		-underline=>1,
 		-command=>[sub {
-			my $parent = shift->{'FileMenu'};
+			my $parent = shift->{FileMenu};
 			my $w;
 			while ($w = $parent) {
 				$parent = $w->parent;
@@ -6957,7 +7370,7 @@ sub createmenubar {
 		-label=>'File',
 		-underline=>0,
 	);
-	$self->{'FileMenu'} = $mi;
+	$self->{FileMenu} = $mi;
 }
 
 #package MyTop;
@@ -6975,15 +7388,16 @@ sub createstatusbar {
 		-side=>'bottom',
 		-anchor=>'sw',
 	);
-	$self->{'Message'} = $sb;
+	$::statusbar = $sb;
+	$self->{Message} = $sb;
 }
 
 #package MyTop;
 sub createballoon {
 	my $self = shift;
-	$_ = $self->{'Balloon'} = $self->toplevel->Balloon(
+	$_ = $self->{Balloon} = $self->toplevel->Balloon(
 		#-initwait=>1000,
-		-statusbar=>$self->{'Message'},
+		-statusbar=>$self->{Message},
 	);
 	$::balloonwidget = $_;
 	return $_;
@@ -6998,19 +7412,19 @@ sub createcanvas {
 #package MyTop;
 sub attachballoon {
 	my ($self,@args) = @_;
-	return $self->{'Balloon'}->attach(@args) if $self->{'Balloon'};
+	return $self->{Balloon}->attach(@args) if $self->{Balloon};
 }
 #package MyTop;
 sub statusmsg {
 	my ($self,$msg) = @_;
-	$self->{'Message'}->configure(-text=>$msg) if $self->{'Message'};
+	$self->{Message}->configure(-text=>$msg) if $self->{Message};
 	printf STDERR "$msg\n";
 }
 
 #package MyTop;
 sub menuFileOpen {
 	my $self = shift;
-	my $data = $self->{'data'};
+	my $data = $self->{data};
 	my $w = $self->widget;
 	my $file = $w->getOpenFile(
 		-defaultextension=>'.pcap',
@@ -7037,33 +7451,33 @@ sub menuFileOpen {
 #	Tk::Event::IO->fileevent($fh, 'readable' => [\&MyTop::readmsg,$self,$pcap,$fh,$network]);
 #	$w->Busy(-recurse=>1);
 	if (my $msg = Message->create($pcap)) {
-		$main::begtime = $msg->{'hdr'};
-		$main::endtime = $msg->{'hdr'};
+		$main::begtime = $msg->{hdr};
+		$main::endtime = $msg->{hdr};
 		$msg->process($network);
 #		$w->update;
-#		if ($main::top->{'updatenow'}) {
+#		if ($main::top->{updatenow}) {
 #			$w->update;
 #			$w->idletasks;
-#			delete $main::top->{'updatenow'};
+#			delete $main::top->{updatenow};
 #		}
 		while ($msg = Message->create($pcap)) {
-			$main::endtime = $msg->{'hdr'};
+			$main::endtime = $msg->{hdr};
 			$msg->process($network);
 #			$w->update;
-			if ($main::top->{'updatenow'}) {
+			if ($main::top->{updatenow}) {
 				$w->update;
 #				$w->idletasks;
-				delete $main::top->{'updatenow'};
+				delete $main::top->{updatenow};
 			}
 		}
 	}
 	Net::Pcap::pcap_close($pcap);
 #	$w->update;
 #	$w->Unbusy;
-#	if ($main::top->{'updatenow'}) {
+#	if ($main::top->{updatenow}) {
 #		$w->update;
 #		$w->idletasks;
-#		delete $main::top->{'updatenow'};
+#		delete $main::top->{updatenow};
 #	}
 }
 
@@ -7080,6 +7494,79 @@ sub readmsg {
 	}
 }
 
+#package MyTop;
+sub menuFilePlay {
+	my $self = shift;
+	my $data = $self->{data};
+	my $w = $self->widget;
+	my $file = $w->getOpenFile(
+		-defaultextension=>'.pcap',
+		-initialdir=>'./testdata',
+		-initialfile=>'ss7capall.pcap',
+		-title=>'Play Dialog',
+	);
+	return unless $file;
+	my $err = '';
+	unless ($self->{pcap} = Net::Pcap::pcap_open_offline($file, \$err)) {
+		my $d = $w->Dialog(
+			-title=>'Could not open file.',
+			-text=>$err,
+			-default_button=>'Ok',
+			-buttons=>[ 'Ok' ],
+		);
+		$d->Show;
+		$d->destroy;
+		return;
+	}
+	$self->{network} = Network->new;
+	if (my $msg = Message->create($self->{pcap})) {
+		$main::begtime = $msg->{hdr};
+		$main::endtime = $msg->{hdr};
+		my ($secs,$usec) = Time::HiRes::gettimeofday;
+		$secs -= $msg->{hdr}->{tv_sec};
+		$usec -= $msg->{hdr}->{tv_usec};
+		while ($usec < 0) {
+			$secs -= 1;
+			$usec += 1000000;
+		}
+		$self->{ofs} = { tv_sec=>$secs, tv_usec=>$usec };
+		$msg->process($self->{network});
+		if ($msg = Message->create($self->{pcap})) {
+			$self->contmsg($msg);
+			return;
+		}
+	}
+	Net::Pcap::pcap_close($self->{pcap});
+	delete $self->{pcap};
+}
+
+#package MyTop;
+sub contmsg {
+	my ($self,$msg) = @_;
+	my $w = $self->widget;
+	my ($osecs,$ousec) = ($self->{ofs}->{tv_sec},$self->{ofs}->{tv_usec});
+	do {
+		my ($secs,$usec) = Time::HiRes::gettimeofday;
+		$secs -= $osecs + $msg->{hdr}->{tv_sec};
+		$usec -= $ousec + $msg->{hdr}->{tv_usec};
+		while ($secs > 0 && $usec < 0) {
+			$secs -= 1;
+			$usec += 1000000;
+		}
+		if ($secs > 0 || ($secs == 0 && $usec > 0)) {
+			$main::endtime = $msg->{hdr};
+			$msg->process($self->{network});
+		} else {
+			my $ms = (-$secs*1000) + int((-$usec+999)/1000);
+			$w->after($ms, [\&MyTop::contmsg, $self, $msg]);
+			return;
+		}
+
+	} while ($msg = Message->create($self->{pcap}));
+	Net::Pcap::pcap_close($self->{pcap});
+	delete $self->{pcap};
+}
+
 # -------------------------------------
 package main;
 use strict;
@@ -7092,6 +7579,13 @@ if (length @infiles == 0) {
 $top = MyTop->new;
 
 Tk::MainLoop;
+
+my $xml = XMLout($Network::network);
+print $xml;
+
+#my $handler = MyParser->new();
+#my $p = XML::SAX::ParserFactory->parser(Handler => $handler);
+#$p->parse_usr($filename);
 
 exit;
 
