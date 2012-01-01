@@ -293,6 +293,12 @@ my %pc_blocks = (
 	},
 );
 
+my $pc_assigments = {
+	large_networks=>\%large_networks,
+	small_networks=>\%small_networks,
+	pc_blocks=>\%pc_blocks,
+};
+
 sub pcowner {
 	my ($pc,$i) = @_;
 	my ($ntw,$cls,$mem,$own);
@@ -301,7 +307,7 @@ sub pcowner {
 	$mem = $pc & 0xff;
 	if (5 < $ntw && $ntw < 255) {
 		if ($cls != 0) {
-			if ($own = $large_networks{$ntw}) {
+			if ($own = $pc_assigments->{large_networks}->{$ntw}) {
 				return $own->[$i];
 			}
 			if ($i) {
@@ -313,7 +319,7 @@ sub pcowner {
 	if (1 <= $ntw && $ntw <= 4) {
 		if ($cls != 0) {
 			my $small;
-			if ($small = $small_networks{$ntw}) {
+			if ($small = $pc_assigments->{small_networks}->{$ntw}) {
 				if ($own = $small->{$cls}) {
 					return $own->[$i];
 				}
@@ -327,7 +333,7 @@ sub pcowner {
 	if ($ntw == 5) {
 		if ($cls != 0) {
 			my $cluster;
-			if ($cluster = $pc_blocks{$cls}) {
+			if ($cluster = $pc_assigments->{pc_blocks}->{$cls}) {
 				my $member = $mem & ~0x03;
 				if ($own = $cluster->{$member}) {
 					return $own->[$i];
@@ -1511,6 +1517,7 @@ sub init {
 	$main::canvas->bind($self->{item},'<ButtonPress-3>',[\&Relation::button3,$self,Tk::Ev('X'),Tk::Ev('Y')]);
 	$main::canvas->lower('relation','node');
 	$main::canvas->lower('relation','path');
+	$main::mycanvas->addballoon($self->{item}, $self->identify);
 	$main::top->{updatenow} = 1;
 #	$main::canvas->idletasks;
 
@@ -1524,6 +1531,7 @@ sub new {
 	bless $self,$type;
 	$self->{network} = $network;
 	$self->init(@args);
+	$::statusbar->configure(-text=>"New ".$self->identify);
 	return $self;
 }
 
@@ -2740,7 +2748,16 @@ sub new {
 	bless $self,$type;
 	$self->{network} = $network;
 	$self->init(@args);
+	$::statusbar->configure(-text=>"New ".$self->identify);
 	return $self;
+}
+
+#package LinkSet;
+sub reposition {
+	my ($self,$node) = @_;
+	my $col = LinkSet::COL_ADJ;
+	if ($node->{col} < 0) { $col = -$col; }
+	$node->moveto($col,$node->{row});
 }
 
 #package LinkSet;
@@ -2756,28 +2773,19 @@ sub xform {
 		-width=>$self->{width},
 	);
 	$main::canvas->bind($self->{item},'<ButtonPress-3>',[\&LinkSet::button3,$self,Tk::Ev('X'),Tk::Ev('Y')]);
-	my $nodea = $self->{nodea};
-	my $nodeb = $self->{nodeb};
-	if ($nodea->{col} < 0) {
-		$nodea->moveto(0 - LinkSet::COL_ADJ,$nodea->{row});
-	} else {
-		$nodea->moveto(0 + LinkSet::COL_ADJ,$nodea->{row});
-	}
-	if ($nodeb->{col} < 0) {
-		$nodeb->moveto(0 - LinkSet::COL_ADJ,$nodeb->{row});
-	} else {
-		$nodeb->moveto(0 + LinkSet::COL_ADJ,$nodeb->{row});
-	}
+	$self->reposition($self->{nodea});
+	$self->reposition($self->{nodeb});
 	#$self->move; # nodes will move me
 #	$main::canvas->idletasks;
 	$main::top->{updatenow} = 1;
+	$::statusbar->configure(-text=>"Discovered ".$self->identify);
 }
 
 #package LinkSet;
 sub getLink {
 	my ($self,$nodea,$nodeb,$slc,@args) = @_;
 	return $self->{links}->{$slc} if exists $self->{links}->{$slc};
-	my $link = Link->new($nodea,$nodeb,$slc,@args);
+	my $link = Link->new($self->{'network'},$nodea,$nodeb,$slc,@args);
 	$self->{links}->{$slc} = $link;
 	return $link;
 }
@@ -3120,6 +3128,7 @@ sub new {
 	bless $self,$type;
 	$self->{network} = $network;
 	$self->init(@args);
+	$::statusbar->configure(-text=>"New ".$self->identify);
 	return $self;
 }
 
@@ -3283,18 +3292,30 @@ sub new {
 	$main::canvas->bind($self->{item},'<ButtonPress-3>',[\&Route::button3,$self,Tk::Ev('X'),Tk::Ev('Y')]);
 	$main::canvas->lower('route','path');
 	$main::canvas->lower('route','node');
+	$main::mycanvas->addballoon($self->{item}, $self->identify);
 	$main::top->{updatenow} = 1;
 #	$main::canvas->idletasks;
+	$::statusbar->configure(-text=>"New ".$self->identify);
 	return $self;
 }
 
 #package Route;
 sub identify {
 	my $self = shift;
-	my $id = "Route from $self->{nodea}->{pcode}";
-	$id .= " ($self->{nodea}->{pownr})" if $self->{nodea}->{pownr};
-	$id .= "to $self->{nodeb}->{pcode}";
-	$id .= " ($self->{nodeb}->{pownr})" if $self->{nodeb}->{pownr};
+	my $id = "Route ";
+	if ($self->{side} eq 'a') {
+		$id .= "to ";
+	} else {
+		$id .= "from ";
+	}
+	$id .= "($self->{path}->{card}:$self->{path}->{span}:$self->{path}->{slot})";
+	if ($self->{side} eq 'a') {
+		$id .= " from ";
+	} else {
+		$id .= " to ";
+	}
+	$id .= "$self->{node}->{pcode}";
+	$id .= " ($self->{node}->{pownr})" if $self->{node}->{pownr};
 	return $id;
 }
 
@@ -3590,6 +3611,10 @@ sub init {
 	);
 	$main::canvas->bind($self->{text},'<ButtonPress-3>',[\&Node::button3,$self,Tk::Ev('X'),Tk::Ev('Y')]);
 	$main::canvas->raise('text','scri');
+	$main::mycanvas->addballoon($self->{item}, $self->identify,
+				    $self->{scri}, $self->identify,
+				    $self->{ttxt}, $self->identify,
+				    $self->{text}, $self->identify);
 #	Node->regroup;
 	$self->{network}->regroupNodes;
 	$main::top->{updatenow} = 1;
@@ -3603,6 +3628,7 @@ sub new {
 	bless $self,$type;
 	$self->{network} = $network;
 	$self->init(@args);
+	$::statusbar->configure(-text=>"New ".$self->identify);
 	return $self;
 }
 
@@ -4074,6 +4100,7 @@ sub xform {
 	bless $self,$type;
 	my $x = $self->{x};
 	my $y = $self->{y};
+	$main::mycanvas->delballoon($self->{item});
 	$main::canvas->delete($self->{item});
 	$self->{item} = $main::canvas->createOval(
 		$x-33,$y-33,$x+33,$y+33,
@@ -4093,8 +4120,13 @@ sub xform {
 	$main::canvas->bind($self->{ttxt},'<ButtonPress-3>',[\&Ssp::button3,$self,Tk::Ev('X'),Tk::Ev('Y')]);
 	$main::canvas->bind($self->{text},'<ButtonPress-3>',[\&Ssp::button3,$self,Tk::Ev('X'),Tk::Ev('Y')]);
 	$main::canvas->bind($self->{ownr},'<ButtonPress-3>',[\&Ssp::button3,$self,Tk::Ev('X'),Tk::Ev('Y')]) if $self->{ownr};
+	$main::mycanvas->addballoon($self->{item}, $self->identify,
+				    $self->{scri}, $self->identify,
+				    $self->{ttxt}, $self->identify,
+				    $self->{text}, $self->identify);
 #	$main::canvas->idletasks;
 	$main::top->{updatenow} = 1;
+	$::statusbar->configure(-text=>"Discovered ".$self->identify);
 }
 
 #package Ssp;
@@ -4364,6 +4396,7 @@ sub xform {
 	bless $self,$type;
 	my $x = $self->{x};
 	my $y = $self->{y};
+	$main::mycanvas->delballoon($self->{item});
 	$main::canvas->delete($self->{item});
 	$self->{item} = $main::canvas->createOval(
 		$x-33,$y-23,$x+33,$y+23,
@@ -4380,8 +4413,13 @@ sub xform {
 	$main::canvas->bind($self->{ttxt},'<ButtonPress-3>',[\&Scp::button3,$self,Tk::Ev('X'),Tk::Ev('Y')]);
 	$main::canvas->bind($self->{text},'<ButtonPress-3>',[\&Scp::button3,$self,Tk::Ev('X'),Tk::Ev('Y')]);
 	$main::canvas->bind($self->{ownr},'<ButtonPress-3>',[\&Scp::button3,$self,Tk::Ev('X'),Tk::Ev('Y')]) if $self->{ownr};
+	$main::mycanvas->addballoon($self->{item}, $self->identify,
+				    $self->{scri}, $self->identify,
+				    $self->{ttxt}, $self->identify,
+				    $self->{text}, $self->identify);
 #	$main::canvas->idletasks;
 	$main::top->{updatenow} = 1;
+	$::statusbar->configure(-text=>"Discovered ".$self->identify);
 }
 
 #package Scp;
@@ -4610,6 +4648,7 @@ sub xform {
 	bless $self,$type;
 	my $x = $self->{x};
 	my $y = $self->{y};
+	$main::mycanvas->delballoon($self->{item});
 	$main::canvas->delete($self->{item});
 	$self->{item} = $main::canvas->createRectangle(
 		$x-28,$y-28,$x+28,$y+28,
@@ -4627,8 +4666,13 @@ sub xform {
 	$main::canvas->bind($self->{ttxt},'<ButtonPress-3>',[\&Stp::button3,$self,Tk::Ev('X'),Tk::Ev('Y')]);
 	$main::canvas->bind($self->{text},'<ButtonPress-3>',[\&Stp::button3,$self,Tk::Ev('X'),Tk::Ev('Y')]);
 	$main::canvas->bind($self->{ownr},'<ButtonPress-3>',[\&Stp::button3,$self,Tk::Ev('X'),Tk::Ev('Y')]) if $self->{ownr};
+	$main::mycanvas->addballoon($self->{item}, $self->identify,
+				    $self->{scri}, $self->identify,
+				    $self->{ttxt}, $self->identify,
+				    $self->{text}, $self->identify);
 #	$main::canvas->idletasks;
 	$main::top->{updatenow} = 1;
+	$::statusbar->configure(-text=>"Discovered ".$self->identify);
 }
 
 #package Stp;
@@ -4851,6 +4895,7 @@ sub xform {
 	bless $self,$type;
 	my $x = $self->{x};
 	my $y = $self->{y};
+	$main::mycanvas->delballoon($self->{item});
 	$main::canvas->delete($self->{item});
 	$self->{item} = $main::canvas->createRectangle(
 		$x-28,$y-28,$x+28,$y+28,
@@ -4870,8 +4915,13 @@ sub xform {
 	$main::canvas->bind($self->{ttxt},'<ButtonPress-3>',[\&Gtt::button3,$self,Tk::Ev('X'),Tk::Ev('Y')]);
 	$main::canvas->bind($self->{text},'<ButtonPress-3>',[\&Gtt::button3,$self,Tk::Ev('X'),Tk::Ev('Y')]);
 	$main::canvas->bind($self->{ownr},'<ButtonPress-3>',[\&Gtt::button3,$self,Tk::Ev('X'),Tk::Ev('Y')]) if $self->{ownr};
+	$main::mycanvas->addballoon($self->{item}, $self->identify,
+				    $self->{scri}, $self->identify,
+				    $self->{ttxt}, $self->identify,
+				    $self->{text}, $self->identify);
 #	$main::canvas->idletasks;
 	$main::top->{updatenow} = 1;
+	$::statusbar->configure(-text=>"Discovered ".$self->identify);
 }
 
 #package Gtt;
@@ -5107,6 +5157,7 @@ sub new {
 	$self->{relationno} = 0;
 	$main::canvas->CanvasBind('<ButtonPress-3>',[\&Network::button3,$self,Tk::Ev('X'),Tk::Ev('Y'),Tk::Ev('x'),Tk::Ev('y')]);
 	$Network::network = $self;
+	$::statusbar->configure(-text=>"New ".$self->identify);
 	return $self;
 }
 
@@ -5114,13 +5165,6 @@ sub new {
 sub identify {
 	my $self = shift;
 	return "The full newtork";
-}
-
-#package Network;
-sub getLink {
-	my ($self,$nodea,$nodeb,$slc,@args) = @_;
-	my $set = $self->getLinkSet($nodea,$nodeb,@args);
-	return $set->getLink($nodea,$nodeb,$slc,@args);
 }
 
 #package Network;
@@ -5431,6 +5475,7 @@ sub init {
 	$main::canvas->bind($self->{item},'<ButtonPress-3>',[\&Path::button3,$self,Tk::Ev('X'),Tk::Ev('Y')]);
 	$main::canvas->lower('path','node');
 	#Path->regroup;
+	$main::mycanvas->addballoon($self->{item}, $self->identify);
 #	$main::canvas->idletasks;
 	$main::top->{updatenow} = 1;
 }
@@ -5442,6 +5487,7 @@ sub new {
 	bless $self,$type;
 	$self->{network} = $network;
 	$self->init(@args);
+	$::statusbar->configure(-text=>"New ".$self->identify);
 	return $self;
 }
 
@@ -5458,19 +5504,40 @@ sub get {
 }
 
 #package Path;
-sub bind {
-	my $self = shift;
-	my $nodea = $self->{nodea};
-	my $nodeb = $self->{nodeb};
-	my $slc = $self->{slc};
-	my $network = $self->{network};
-	my $link = $network->getLink($nodea,$nodeb,$slc);
-	if ($link->{nodea}->{pc} == $nodea->{pc}) {
-		$link->addForwPath($self);
-	} else {
-		$link->addRevsPath($self);
+sub findalias {
+	my ($self,$node,@routes) = @_;
+	return unless ref $node eq 'Ssp' or ref $node eq 'Scp';
+	my $col = LinkSet::COL_GTT;
+	foreach my $route (@routes) {
+		my $alias = $route->{node};
+		next unless $alias->{'pc'} != $node->{'pc'};
+		if (abs($alias->{col}) != $col) {
+			my $newcol = $col;
+			if ($alias->{col} < 0) { $newcol = -$col; }
+			$alias->moveto($newcol,$alias->{row});
+			$main::canvas->itemconfigure($alias->{item}, -dash=>[3,2]);
+			$main::canvas->itemconfigure($alias->{scri}, -dash=>[3,2]);
+		}
 	}
+}
+
+#package Path;
+sub bindpath {
+	my ($self,$network,$nodea,$nodeb,$slc) = @_;
+	$self->{slc} = $slc;
+	$self->{nodea} = $nodea;
+	$self->{nodeb} = $nodeb;
+	$self->{slc} = $slc;
+	my $linkset = $network->getLinkSet($nodea,$nodeb);
+	my $link = $linkset->getLink($nodea,$nodeb,$slc);
 	$self->{link} = $link;
+	$link->addPath($self);
+	$self->findalias($nodea,(values %{$self->{opcs}}));
+	$self->findalias($nodeb,(values %{$self->{dpcs}}));
+	$main::canvas->itemconfigure($self->{item}, -state=>'hidden');
+	$self->move;
+#	$main::canvas->idletasks;
+	$main::top->{updatenow} = 1;
 }
 
 #package Path;
@@ -5545,25 +5612,9 @@ sub complete {
 		$rela->add($msg);
 		if ($msg->{si} == 1 || $msg->{si} == 2) {
 			if ($msg->{mt} == 0x11 || $msg->{mt} == 0x12) {
-				my $slc = $msg->{slc};
-				$self->{slc} = $slc;
-				$self->{nodea} = $nodea;
-				$self->{nodeb} = $nodeb;
-				my $link = $network->getLink($nodea,$nodeb,$slc);
-				$link->addPath($self);
-				$main::canvas->itemconfigure($self->{item},
-					-state=>'hidden',
-				);
-				$self->move;
-#				$main::canvas->idletasks;
-				$main::top->{updatenow} = 1;
+				$self->bindpath($network,$nodea,$nodeb,$msg->{slc});
 			}
 		}
-#		if ($self->{pr} == MP_NATIONAL) {
-#			unless ($mtypes{$msg->{si}}->{$msg->{mt}}->[1] & (1<<$msg->{mp})) {
-#				$rela->log("Message from ".main::pcstring($msg->{opc})." to ".main::pcstring($msg->{dpc})." with invalid priority $msg->{mp} for $mtypes{$msg->{si}}->{0x00}->[0] $mtypes{$msg->{si}}->{$msg->{mt}}->[0]");
-#			}
-#		}
 	}
 }
 #package Path;
@@ -7205,6 +7256,7 @@ sub new {
 	$self->{top} = $parent->widget;
 	$self->setwidget($c);
 	$main::canvas = $c;
+	$self->{balloon} = $c->toplevel->Balloon(-statusbar=>$::statusbar);
 	$c->update;
 	$main::mycanvas = $self;
 	# try creating some bindings by tag
@@ -7218,6 +7270,30 @@ sub new {
 	my $w = $self->{w} = $c->width;
 	my $h = $self->{h} = $c->height;
 	return $self;
+}
+
+sub addballoon {
+	my $self = shift;
+	while (my ($item,$msg) = @_) {
+		$self->{balloonmsgs}->{$item} = $msg;
+		shift; shift;
+	}
+	$self->{balloon}->attach($self->widget,
+		-balloonposition=>'mouse',
+		-msg=>$self->{balloonmsgs},
+	);
+}
+
+sub delballoon {
+	my $self = shift;
+	while (my ($item) = @_) {
+		delete $self->{balloonmsgs}->{$item};
+		shift;
+	}
+	$self->{balloon}->attach($self->widget,
+		-balloonposition=>'mouse',
+		-msg=>$self->{balloonmsgs},
+	);
 }
 
 # unknown nodes are in columns +-7
@@ -7365,6 +7441,24 @@ sub createmenubar {
 			}
 		}, $self],
 	);
+	$w->Balloon(-statusbar=>$::statusbar)->attach($mi,
+		-balloonposition=>'mouse',
+		-msg=>[
+			"Tearoff this menu.",
+			"New canvas.",
+			"Read an existing capture file.",
+			"Open an existing capture file.",
+			"Play back a capture file in simulated real-time.",
+			"Save configuration.",
+			"Save configuration in another file.",
+			"Close capture.",
+			"Separator.",
+			"Show file properties.",
+			"Select recent files.",
+			"Separator.",
+			"Exit all windows.",
+			"Dump debuging information to stdout."
+		]);
 	$mb->add('cascade',
 		-menu=>$mi,
 		-label=>'File',
@@ -7580,7 +7674,7 @@ $top = MyTop->new;
 
 Tk::MainLoop;
 
-my $xml = XMLout($Network::network);
+my $xml = XMLout($pc_assigments);
 print $xml;
 
 #my $handler = MyParser->new();
