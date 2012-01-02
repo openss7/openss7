@@ -595,6 +595,7 @@ sub init {
 	$self->{incs} = {};
 	$self->{pegs} = {};
 	$self->{durs} = {};
+	$self->{iats} = {};
 }
 
 #package Counts;
@@ -642,9 +643,22 @@ sub peg {
 #package Counts;
 sub dur {
 	my ($self,$event,$start,$end) = @_;
-	my $dur = $end->{tv_sec} - $start->{tv_sec} + ($end->{tv_usec} - $start->{tv_usec})/1000000;
+	my $dsecs = $end->{tv_sec} - $start->{tv_sec};
+	my $dusec = $end->{tv_usec} - $start->{tv_usec};
+	while ($dusec < 0 ) { $dsecs++; $dusec += 1000000; }
+	my $dur = $dsecs + $dusec/1000000;
 	$self->{durs}->{$event} += $dur;
-	$self->{durs}->{dist}->{$event}->{int($dur)} += 1;
+	my $int = $dsecs;
+	$int++ if $dusec > 0;
+	$self->{durs}->{dist}->{$event}->{$int} += 1;
+}
+
+#package Counts;
+sub iat {
+	my ($self,$event,$ts) = @_;
+
+	$self->{iats}->{$event} = [] unless exists $self->{iats}->{$event};
+	push @{$self->{iats}->{$event}}, $ts;
 }
 
 # -------------------------------------
@@ -787,6 +801,12 @@ sub dur {
 #		}
 #	}
 	$self->Counts::dur($event,$start,$end);
+}
+
+#package Stats;
+sub iat {
+	my ($self,$event,$ts) = @_;
+	$self->Counts::iat($event,$ts);
 }
 
 # -------------------------------------
@@ -1119,50 +1139,11 @@ my %dashline = ( -arrow=>'none', -capstyle=>'round', -fill=>'grey', -joinstyle=>
 my %blackcurve = ( -arrow=>'none', -capstyle=>'round', -fill=>'black', -joinstyle=>'round', -smooth=>1, -width=>1 );
 my %blueline = ( -arrow=>'none', -capstyle=>'round', -fill=>'blue', -joinstyle=>'round', -smooth=>0, -width=>2 );
 
+#package MsgStats;
 sub dist {
-	my ($self,$w,$event,$prefix,$label,$X,$Y) = @_;
-	my $tw;
-	if ($tw = $self->{dist}->{$event}) {
-		if ($tw->state eq 'iconic') {
-			$tw->deiconify;
-		} else {
-			$tw->UnmapWindow;
-		}
-		$tw->MapWindow;
-		return;
-	}
-	my $title = "$prefix distribution of $label";
-	$tw = $w->toplevel->Toplevel(
-		-title=>$title,
-	);
-	$tw->group($w->toplevel);
-	#$tw->transient($w->toplevel);
-	$tw->iconimage('icon');
-	$tw->iconname($title);
-	#$tw->resizable(0,0);
-	$tw->positionfrom('user');
-	$tw->geometry("+$X+$Y");
-	$tw->protocol('WM_DELETE_WINDOW', [sub {
-		my ($self,$event) = @_;
-		my $tw = $self->{dist}->{$event};
-		delete $self->{dist}->{$event};
-		$tw->destroy;
-	},$self,$event]);
-	$self->{dist}->{$event} = $tw;
-	my $c = $tw->Canvas(
-		-confine=>1,
-		-width=>600,
-		-height=>400,
-		-xscrollincrement=>0,
-		-yscrollincrement=>0,
-		-background=>'white',
-	)->pack(
-		-expand=>1,
-		-fill=>'both',
-		-side=>'left',
-		-anchor=>'w',
-	);
-	my $h = $self->{durs}->{dist}->{$event};
+	my ($self,$event,$kind,$c) = @_;
+	# copy the data
+	my $h = {}; while (my ($k,$v) = each %{$self->{durs}->{dist}->{$event}}) { $h->{$k} = $v; }
 	my ($maxx,$minx,$maxy,$miny);
 	foreach my $v (sort {$b<=>$a} values %{$h}) { $maxy = $v unless defined $maxy; $miny = $v; }
 	# remove anomalies
@@ -1174,6 +1155,9 @@ sub dist {
 	foreach my $k (sort {$b<=>$a} keys %{$h}) { $maxx = $k unless defined $maxx; $minx = $k; }
 	if ($maxx == $minx) { $maxx++; }
 	for (my $i = $minx; $i <= $maxx; $i++) { unless (exists $h->{$i}) { $h->{$i} = 0; $miny = 0; } }
+	my $t = 0; for (my $i = $minx; $i <= $maxx; $i++) { $t += $h->{$i}; if ($kind == 1) { $h->{$i} = $t; } }
+	for (my $i = $minx; $i <= $maxx; $i++) { $h->{$i} /= $t; }
+	if ($kind == 1) { $maxy = 1; } else { $maxy /= $t; } $miny = 0;
 	my ($scalex,$scaley) = (500/($maxx-$minx),300/($maxy-$miny));
 	my @coords = ();
 	foreach my $k (sort {$a<=>$b} keys %{$h}) {
@@ -1183,12 +1167,9 @@ sub dist {
 		push @coords, $x;
 		push @coords, $y;
 	}
-	$c->createText(300,20, %centerblack, -text=>"\U$title");
-	my $id = $self->identify;
-	$c->createText(300,35, %centerblack, -text=>"for $id");
 	$c->createText(300,385, %centerblack, -text=>'seconds of duration');
-	$c->createText(550,385, %rightblack, -text=>"total calls = $self->{pegs}->{$event}");
-	$c->createText(45,200, %rightblack, -text=>'calls');
+	$c->createText(550,385, %rightblack, -text=>"total calls = $t");
+	#$c->createText(45,200, %rightblack, -text=>'calls');
 	$c->createLine(50,50,50,350, %blackline);
 	$c->createLine(50,350,550,350, %blackline);
 	my $tickx = 10**(int(log($maxx-$minx)/log(10)));
@@ -1213,18 +1194,19 @@ sub dist {
 			$c->createLine($X,50,$X,353, %dashline);
 		}
 	}
+	my $format = ($kind == 1)?'%.1f':'%.3f';
 	$c->createText(550,368, %centerblack, -text=>$maxx);
 	$c->createLine(550,50,550,360, %blackline);
-	$c->createText(35,350, %rightblack, -text=>$miny);
+	$c->createText(35,350, %rightblack, -text=>sprintf($format,$miny));
 	$c->createLine(550,350,40,350, %blackline);
-	my $ticky = 10**(int(log($maxy-$miny)/log(10)));
+	my $ticky = 10**(int(log($maxy-$miny)/log(10))-1);
 	for (my $y = 0; $y < $maxy; $y += $ticky) {
 		my $Y = 350 - ($y - $miny) * $scaley;
 		next if $Y > 350;
 		$c->createLine(550,$Y,40,$Y, %blackline);
 		next if $Y < 60 || $Y > 340;
-		next if $Y > 190 && $Y < 210;
-		$c->createText(35, $Y, %rightblack, -text=>$y);
+##		#next if $Y > 190 && $Y < 210;
+		$c->createText(35, $Y, %rightblack, -text=>sprintf($format,$y));
 	}
 	for (my $y = $ticky/2; $y < $maxy; $y += $ticky) {
 		next if $y < $miny;
@@ -1238,7 +1220,7 @@ sub dist {
 			$c->createLine(550,$Y,47,$Y, %dashline);
 		}
 	}
-	$c->createText(35,50, %rightblack, -text=>$maxy);
+	$c->createText(35,50, %rightblack, -text=>sprintf($format, $maxy));
 	$c->createLine(550,50,40,50, %blackline);
 	$c->createLine(@coords, %blueline);
 	$c->createLine(@coords, %blackcurve);
@@ -1247,10 +1229,295 @@ sub dist {
 	$c->{_mydata}->{w} = 600;
 	$c->{_mydata}->{h} = 400;
 	$c->CanvasBind('<Configure>',[\&MsgStats::resizedist,Tk::Ev('w'),Tk::Ev('h')]);
+}
+
+#package MsgStats;
+sub phase {
+	my ($self,$event,$kind,$c) = @_;
+	my @iats = ();
+	my ($imax,$t);
+	my $count = 0;
+	unless ($self->{iats}->{$event}) {
+		$c->createText(300,300,%centerblack,-text=>'NO DATA');
+		return;
+	}
+	foreach my $ts (@{$self->{iats}->{$event}}) {
+		my $n = $ts;
+		if (defined $t) {
+			my $i = { tv_sec=>$n->{tv_sec}-$t->{tv_sec}, tv_usec=>$n->{tv_usec}-$t->{tv_usec} };
+			while ($i->{tv_usec} < 0) {
+				$i->{tv_sec}--;
+				$i->{tv_usec} += 1000000;
+			}
+			my $v = $i->{tv_sec} + $i->{tv_usec}/1000000;
+			push @iats, $v;
+			$imax = $v unless defined $imax;
+			if ($v > $imax) { $imax = $v; }
+			$count++;
+		}
+		$t = $n;
+	}
+	unless ($count) {
+		$c->createText(300,300,%centerblack,-text=>'NO DATA');
+		return;
+	}
+	my $scale = 500/$imax;
+	$c->createText(300,585, %centerblack, -text=>'X[i] (seconds)');
+	$c->createText(550,585, %rightblack, -text=>"total interarrivals = $count");
+	$c->createText(45,300, %rightblack, -text=>'X[i+1]');
+	$c->createLine(50,50,50,550, %blackline);
+	$c->createLine(50,550,550,550, %blackline);
+	my $tick = 10**(int(log($imax)/log(10)));
+	$c->createText(50,568, %centerblack, -text=>0);
+	$c->createLine(50,50,50,560, %blackline);
+	for (my $x = 0; $x < $imax; $x += $tick) {
+		my $X = 50 + $x * $scale;
+		next if $X < 50;
+		$c->createLine($X,50,$X,560, %blackline);
+		next if $X > 500 || $X < 100;
+		$c->createText($X,568, %centerblack, -text=>$x);
+	}
+	for (my $x = $tick/2; $x < $imax; $x += $tick) {
+		my $X = 50 + $x * $scale;
+		$c->createLine($X,50,$X,557, %greyline);
+	}
+	foreach my $s ( 1, 2, 3, 4, 6, 7, 8, 9 ) {
+		for (my $x = $s*$tick/10; $x < $imax; $x += $tick) {
+			my $X = 50 + $x * $scale;
+			$c->createLine($X,50,$X,553, %dashline);
+		}
+	}
+	$c->createText(550,568, %centerblack, -text=>sprintf('%.2f',$imax));
+	$c->createLine(550,50,550,560, %blackline);
+	$c->createText(35,550, %rightblack, -text=>0);
+	$c->createLine(550,550,40,550, %blackline);
+	for (my $y = 0; $y < $imax; $y += $tick) {
+		my $Y = 550 - $y * $scale;
+		next if $Y > 550;
+		$c->createLine(550,$Y,40,$Y, %blackline);
+		next if $Y < 60 || $Y > 540;
+		next if $Y > 290 && $Y < 310;
+		$c->createText(35, $Y, %rightblack, -text=>$y);
+	}
+	for (my $y = $tick/2; $y < $imax; $y += $tick) {
+		my $Y = 550 - $y * $scale;
+		$c->createLine(550,$Y,43,$Y, %greyline);
+	}
+	foreach my $s ( 1, 2, 3, 4, 6, 7, 8, 9 ) {
+		for (my $y = $s*$tick/10; $y < $imax; $y += $tick) {
+			my $Y = 550 - $y * $scale;
+			$c->createLine(550,$Y,47,$Y, %dashline);
+		}
+	}
+	$c->createText(35,50, %rightblack, -text=>sprintf('%.2f',$imax));
+	$c->createLine(550,50,40,50, %blackline);
+	my $ti = shift @iats;
+	foreach my $tip1 (@iats) {
+		my $X = 50 + $ti * $scale;
+		my $Y = 550 - $tip1 * $scale;
+		$c->createOval($X-1,$Y-1,$X+1,$Y+1,
+			-fill=>'black',
+			-outline=>'black',
+			-width=>0,
+		);
+		$ti = $tip1;
+	}
+	$c->update;
+	$c->{_mydata} = {};
+	$c->{_mydata}->{w} = 600;
+	$c->{_mydata}->{h} = 600;
+	$c->CanvasBind('<Configure>',[\&MsgStats::resizedist,Tk::Ev('w'),Tk::Ev('h')]);
+}
+
+#package MsgStats;
+sub pdf {
+	my ($self,$event,$kind,$c) = @_;
+	my @iats = ();
+	my ($max,$maxx,$maxy,$t);
+	my $count = 0;
+	unless ($self->{iats}->{$event}) {
+		$c->createText(300,300,%centerblack,-text=>'NO DATA');
+		return;
+	}
+	foreach my $ts (@{$self->{iats}->{$event}}) {
+		my $n = $ts;
+		if (defined $t) {
+			my $i = { tv_sec=>$n->{tv_sec}-$t->{tv_sec}, tv_usec=>$n->{tv_usec}-$t->{tv_usec} };
+			while ($i->{tv_usec} < 0) {
+				$i->{tv_sec}--;
+				$i->{tv_usec} += 1000000;
+			}
+			my $v = $i->{tv_sec} + $i->{tv_usec}/1000000;
+			push @iats, $v;
+			$max = $v unless defined $max;
+			if ($v > $max) { $max = $v; }
+			$count++;
+		}
+		$t = $n;
+	}
+	unless ($count) {
+		$c->createText(300,300,%centerblack,-text=>'NO DATA');
+		return;
+	}
+	my $pow = int(log($max)/log(10))-2;
+	my $int = 10**$pow;
+	my $h = {};
+	foreach my $v (@iats) {
+		my $i = $v/$int;
+		if (int($i) < $i) {
+			$v = (int($i) + 1);
+		} else {
+			$v = int($i);
+		}
+		$h->{$v}++;
+	}
+	foreach my $v (sort {$b<=>$a} values %{$h}) { $maxy = $v; last; }
+	foreach my $k (sort {$b<=>$a} keys %{$h}) { $maxx = $k; last; }
+	for (my $i = 0; $i <= $maxx; $i++) { unless (exists $h->{$i}) { $h->{$i} = 0; } }
+	my $t = 0; for (my $i = 0; $i <= $maxx; $i++) { $t += $h->{$i}; if ($kind == 4) { $h->{$i} = $t; } }
+	for (my $i = 0; $i <= $maxx; $i++) { $h->{$i} /= $t; }
+	if ($kind == 4) { $maxy = 1; } else { $maxy /= $t; }
+	my ($scalex,$scaley) = (500/$maxx,300/$maxy);
+	my @coords = ();
+	foreach my $k (sort {$a<=>$b} keys %{$h}) {
+		my $v = $h->{$k};
+		my $x = 50 + $k * $scalex;
+		my $y = 350 - $v * $scaley;
+		push @coords, $x;
+		push @coords, $y;
+	}
+	$c->createText(300,385, %centerblack, -text=>'seconds between arrivals');
+	$c->createText(550,385, %rightblack, -text=>"total interarrivals = $t");
+	#$c->createText(45,200, %rightblack, -text=>'calls');
+	$c->createLine(50,50,50,350, %blackline);
+	$c->createLine(50,350,550,350, %blackline);
+	my $tickx = 10**(int(log($maxx)/log(10)));
+	$c->createText(50,368, %centerblack, -text=>0);
+	$c->createLine(50,50,50,360, %blackline);
+	for (my $x = 0; $x < $maxx; $x += $tickx) {
+		my $X = 50 + $x * $scalex;
+		next if $X < 50;
+		$c->createLine($X,50,$X,360, %blackline);
+		next if $X > 500 || $X < 100;
+		$c->createText($X,368, %centerblack, -text=>$x*$int);
+	}
+	for (my $x = $tickx/2; $x < $maxx; $x += $tickx) {
+		my $X = 50 + $x * $scalex;
+		$c->createLine($X,50,$X,357, %greyline);
+	}
+	foreach my $s ( 1, 2, 3, 4, 6, 7, 8, 9 ) {
+		for (my $x = $s*$tickx/10; $x < $maxx; $x += $tickx) {
+			my $X = 50 + $x * $scalex;
+			$c->createLine($X,50,$X,353, %dashline);
+		}
+	}
+	my $format = ($kind == 4)?'%.1f':'%.3f';
+	$c->createText(550,368, %centerblack, -text=>$maxx*$int);
+	$c->createLine(550,50,550,360, %blackline);
+	$c->createText(35,350, %rightblack, -text=>0);
+	$c->createLine(550,350,40,350, %blackline);
+	my $ticky = 10**(int(log($maxy)/log(10))-1);
+	for (my $y = 0; $y < $maxy; $y += $ticky) {
+		my $Y = 350 - $y * $scaley;
+		next if $Y > 350;
+		$c->createLine(550,$Y,40,$Y, %blackline);
+		next if $Y < 60 || $Y > 340;
+##		#next if $Y > 190 && $Y < 210;
+		$c->createText(35, $Y, %rightblack, -text=>sprintf($format,$y));
+	}
+	for (my $y = $ticky/2; $y < $maxy; $y += $ticky) {
+		my $Y = 350 - $y * $scaley;
+		$c->createLine(550,$Y,43,$Y, %greyline);
+	}
+	foreach my $s ( 1, 2, 3, 4, 6, 7, 8, 9 ) {
+		for (my $y = $s*$ticky/10; $y < $maxy; $y += $ticky) {
+			my $Y = 350 - $y * $scaley;
+			$c->createLine(550,$Y,47,$Y, %dashline);
+		}
+	}
+	$c->createText(35,50, %rightblack, -text=>sprintf($format, $maxy));
+	$c->createLine(550,50,40,50, %blackline);
+	$c->createLine(@coords, %blueline);
+	$c->createLine(@coords, %blackcurve);
+	$c->update;
+	$c->{_mydata} = {};
+	$c->{_mydata}->{w} = 600;
+	$c->{_mydata}->{h} = 400;
+	$c->CanvasBind('<Configure>',[\&MsgStats::resizedist,Tk::Ev('w'),Tk::Ev('h')]);
+}
+
+#package MsgStats;
+sub plot {
+	my ($self,$w,$event,$prefix,$label,$X,$Y,$kind) = @_;
+	my $tw;
+	if ($tw = $self->{dist}->{$event}->{$kind}) {
+		if ($tw->state eq 'iconic') {
+			$tw->deiconify;
+		} else {
+			$tw->UnmapWindow;
+		}
+		$tw->MapWindow;
+		return;
+	}
+	my $title;
+	if ($kind == 0) {
+		$title = "probability density of $label holding times";
+	} elsif ($kind == 1) {
+		$title = "cummulative distribution of $label holding times";
+	} elsif ($kind == 2) {
+		$title = "phase plot of $label interarrival times";
+	} elsif ($kind == 3) {
+		$title = "probability density of $label interarrival times";
+	} elsif ($kind == 4) {
+		$title = "cummulative distribution of $label interarrival times";
+	}
+	$tw = $w->toplevel->Toplevel(
+		-title=>$title,
+	);
+	$tw->group($w->toplevel);
+	#$tw->transient($w->toplevel);
+	$tw->iconimage('icon');
+	$tw->iconname($title);
+	#$tw->resizable(0,0);
+	$tw->positionfrom('user');
+	$tw->geometry("+$X+$Y");
+	$tw->protocol('WM_DELETE_WINDOW', [sub {
+		my ($self,$event,$kind) = @_;
+		my $tw = $self->{dist}->{$event}->{$kind};
+		delete $self->{dist}->{$event}->{$kind};
+		$tw->destroy;
+	},$self,$event,$kind]);
+	$self->{dist}->{$event}->{$kind} = $tw;
+	my ($width,$height) = (600,400);
+	if ($kind == 2) { ($width,$height) = (600,600); }
+	my $c = $tw->Canvas(
+		-confine=>1,
+		-width=>$width,
+		-height=>$height,
+		-xscrollincrement=>0,
+		-yscrollincrement=>0,
+		-background=>'white',
+	)->pack(
+		-expand=>1,
+		-fill=>'both',
+		-side=>'left',
+		-anchor=>'w',
+	);
+	$c->createText(300,20, %centerblack, -text=>"\U$title");
+	my $id = $self->identify;
+	$c->createText(300,35, %centerblack, -text=>"$prefix for $id");
+	if ($kind == 0 || $kind == 1) {
+		$self->dist($event,$kind,$c);
+	} elsif ($kind == 2) {
+		$self->phase($event,$kind,$c);
+	} elsif ($kind == 3 || $kind == 4) {
+		$self->pdf($event,$kind,$c);
+	}
 	$tw->update;
 	$tw->MapWindow;
 }
 
+#package MsgStats;
 sub resizedist {
 	my ($c,$w,$h) = @_;
 	my $ow = $c->{_mydata}->{w};
@@ -1260,8 +1527,47 @@ sub resizedist {
 	$c->{_mydata}->{h} = $h;
 }
 
+#package MsgStats;
+sub plotmenu {
+	my ($self,$tw,$event,$prefix,$label,$X,$Y) = @_;
+	my $m = $tw->Menu(
+		-tearoff=>1,
+		-title=>'Plot Menu',
+	);
+	$m->add('command',
+		-label=>'Holding PDF...',
+		-underline=>0,
+		-command=>[\&MsgStats::plot,$self,$tw,$event,$prefix,$label,$X,$Y,0],
+	);
+	$m->add('command',
+		-label=>'Holding CDF...',
+		-underline=>0,
+		-command=>[\&MsgStats::plot,$self,$tw,$event,$prefix,$label,$X,$Y,1],
+	);
+	$m->add('command',
+		-label=>'Interarrival phase...',
+		-underline=>0,
+		-command=>[\&MsgStats::plot,$self,$tw,$event,$prefix,$label,$X,$Y,2],
+	);
+	$m->add('command',
+		-label=>'Interarrival PDF...',
+		-underline=>0,
+		-command=>[\&MsgStats::plot,$self,$tw,$event,$prefix,$label,$X,$Y,3],
+	);
+	$m->add('command',
+		-label=>'Interarrival CDF...',
+		-underline=>0,
+		-command=>[\&MsgStats::plot,$self,$tw,$event,$prefix,$label,$X,$Y,4],
+	);
+	$m->Popup(
+		-popanchor=>'nw',
+		-popover=>'cursor',
+	);
+}
+
+#package MsgStats;
 sub dircstat {
-	my ($self,$tw,$row,$span,$event,$prefix,$l1,$l2,$l3) = @_;
+	my ($self,$tw,$row,$span,$event,$prefix,$label) = @_;
 	my $p;
 	my $del = sprintf("%7.2f", $self->{durs}->{$event}/(($p = $self->{pegs}->{$event})?$p:1));
 	my $dur = sprintf("%12.2f", $self->{durs}->{$event} / $span);
@@ -1292,7 +1598,8 @@ sub dircstat {
 	my $X = $tw->toplevel->rootx;
 	my $Y = $tw->toplevel->rooty;
 	$tw->Button(
-		-command=>[\&MsgStats::dist,$self,$tw,$event,$prefix,$l2,$X,$Y],
+#		-command=>[\&MsgStats::dist,$self,$tw,$event,$prefix,$label,$X,$Y],
+		-command=>[\&MsgStats::plotmenu,$self,$tw,$event,$prefix,$label,$X,$Y],
 		-text=>'Plot',
 #		-relief=>'flat',
 #		-overrelief=>'raised',
@@ -1302,6 +1609,7 @@ sub dircstat {
 	$$row++;
 }
 
+#package MsgStats;
 sub addcstat {
 	my ($self,$tw,$row,$span,$event,$label) = @_;
 	for (my $dir = 0; $dir <= 20; $dir += 10) {
@@ -1355,9 +1663,11 @@ sub cstat {
 		$tw->protocol('WM_DELETE_WINDOW', [sub {
 			my $self = shift;
 			while (my ($k,$v) = each %{$self->{dist}}) {
-				if ($v) {
-					delete $self->{dist}->{$k};
-					$v->destroy;
+				while (my ($l,$m) = each %{$v}) {
+					if ($m) {
+						delete $v->{$l};
+						$m->destroy;
+					}
 				}
 			}
 			my $tw = $self->{cstat};
@@ -1459,12 +1769,12 @@ sub cstat {
 			$f->Label(%labelcenter,
 				-text=>'Distribution',
 			)->grid(-row=>$row++,-column=>5,-sticky=>'ewns');
-			$self->addcstat($f,\$row,$span,CTS_IDLE,'Idle:');
-			$self->addcstat($f,\$row,$span,CTS_WAIT_ACM,'Setup:');
-			$self->addcstat($f,\$row,$span,CTS_WAIT_ANM,'Ringing:');
-			$self->addcstat($f,\$row,$span,CTS_ANSWERED,'Talk:');
-			$self->addcstat($f,\$row,$span,CTS_SUSPENDED,'Suspension:');
-			$self->addcstat($f,\$row,$span,CTS_WAIT_RLC,'Release:');
+			$self->addcstat($f,\$row,$span,CTS_IDLE,'Idle');
+			$self->addcstat($f,\$row,$span,CTS_WAIT_ACM,'Setup');
+			$self->addcstat($f,\$row,$span,CTS_WAIT_ANM,'Ringing');
+			$self->addcstat($f,\$row,$span,CTS_ANSWERED,'Call');
+			$self->addcstat($f,\$row,$span,CTS_SUSPENDED,'Suspension');
+			$self->addcstat($f,\$row,$span,CTS_WAIT_RLC,'Release');
 		}
 	}
 	$tw->update;
@@ -1976,6 +2286,8 @@ sub move {
 #package Relation;
 sub getmenu {
 	my ($self,$m,$canvas,$X,$Y) = @_;
+	shift->Clickable::getmenu(@_);
+	$m->add('separator');
 	my ($mc,$m3);
 	$mc = $m->Menu(
 		-tearoff=>1,
@@ -2020,8 +2332,6 @@ sub getmenu {
 		-label=>'Circuits',
 		-state=>((keys %{$self->{cics}})?'normal':'disabled'),
 	);
-	$m->add('separator');
-	shift->Clickable::getmenu(@_);
 }
 
 #package Relation;
@@ -2263,6 +2573,8 @@ sub setstate {
 		$self->{ts}->{$oldstate} = $main::begtime;
 	}
 	$self->{ts}->{$newstate + $newdir} = $msg->{hdr};
+	$self->iat($newstate + $newdir, $msg->{hdr});
+	$self->iat($newstate + 20, $msg->{hdr});
 	$self->dur($oldstate + $olddir, $self->{ts}->{$oldstate + $olddir}, $msg->{hdr});
 	$self->dur($oldstate + 20, $self->{ts}->{$oldstate + $olddir}, $msg->{hdr});
 	$self->peg($newstate + $newdir, $msg->{hdr});
@@ -2280,6 +2592,16 @@ sub dur {
 	$self->{group}->{nodea}->dur(@args);
 	$self->{group}->{nodeb}->dur(@args);
 	$self->{group}->{network}->dur(@args);
+}
+
+#package Circuit
+sub iat {
+	my ($self,@args) = @_;
+	$self->Stats::iat(@args);
+	$self->{group}->iat(@args);
+	$self->{group}->{nodea}->iat(@args);
+	$self->{group}->{nodeb}->iat(@args);
+	$self->{group}->{network}->iat(@args);
 }
 
 #package Circuit;
@@ -3016,6 +3338,8 @@ sub shortid {
 #package Link;
 sub getmenu {
 	my ($self,$m,$canvas,$X,$Y) = @_;
+	shift->Clickable::getmenu(@_);
+	$m->add('separator');
 	my ($path,$mc);
 	$path = $self->{pathforw};
 	$mc = $m->Menu(
@@ -3039,8 +3363,6 @@ sub getmenu {
 		-label=>'Reverse path',
 		-state=>($path?'normal':'disabled'),
 	);
-	$m->add('separator');
-	shift->Clickable::getmenu(@_);
 }
 
 #package Link;
@@ -3697,8 +4019,9 @@ sub movesp {
 #package SP;
 sub getmenu {
 	my ($self,$m,$canvas,$X,$Y) = @_;
-	my $network = $self->{network};
+	shift->Clickable::getmenu(@_);
 	if (keys %{$self->{relate}}) {
+		$m->add('separator');
 		foreach my $pc (sort {$a <=> $b} keys %{$self->{relate}}) {
 			my $relation = $self->{relate}->{$pc};
 			my $node;
@@ -3717,39 +4040,7 @@ sub getmenu {
 				-label=>'Routeset to '.$node->shortid,
 			);
 		}
-		$m->add('separator');
 	}
-#?	if (keys %{$self->{adjacent}}) {
-#?		foreach my $pc (sort {$a <=> $b} keys %{$self->{adjacent}}) {
-#?			my $nodea = $self;
-#?			my $nodeb = $network->getSp($pc);
-#?			my $linkset = $network->getRelation($nodea,$nodeb);
-#?			my $mc = $m->Menu(
-#?				-tearoff=>1,
-#?				-title=>"Linkset to $nodeb->{pcode} $nodeb->{pownr} Menu",
-#?			);
-#?			foreach my $slc (sort {$a <=> $b} keys %{$linkset->{links}}) {
-#?				my $link = $linkset->{links}->{$slc};
-#?				my $m3 = $mc->Menu(
-#?					-tearoff=>1,
-#?					-title=>"Link $slc Menu",
-#?				);
-#?				$link->getmenu($m3,$canvas,$X,$Y);
-#?				$mc->add('cascade',
-#?					-menu=>$m3,
-#?					-label=>"Link $slc",
-#?				);
-#?			}
-#?			$mc->add('separator');
-#?			$linkset->Clickable::getmenu($mc,$canvas,$X,$Y);
-#?			$m->add('cascade',
-#?				-menu=>$mc,
-#?				-label=>"Linkset to $nodeb->{pcode} $nodeb->{pownr}",
-#?			);
-#?		}
-#?		$m->add('separator');
-#?	}
-	shift->Clickable::getmenu(@_);
 }
 
 #package SP;
@@ -5348,7 +5639,7 @@ sub assign {
 	#$mw->optionAdd('*padX'=>0);
 	#$mw->optionAdd('*padY'=>0);
 	#$mw->optionAdd('*relief'=>'groove');
-	$mw->optionAdd('*Scrollbar*Width'=>8);
+	$mw->optionAdd('*Scrollbar*Width'=>12);
 }
 
 # -------------------------------------
