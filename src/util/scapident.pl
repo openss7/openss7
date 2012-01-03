@@ -596,6 +596,14 @@ sub init {
 	$self->{pegs} = {};
 	$self->{durs} = {};
 	$self->{iats} = {};
+	$self->{itvs} = {};
+	$self->{plots} = {};
+	$self->{plots}->{pdfh} = {};
+	$self->{plots}->{cdfh} = {};
+	$self->{plots}->{phsh} = {};
+	$self->{plots}->{pdfa} = {};
+	$self->{plots}->{cdfa} = {};
+	$self->{plots}->{phsa} = {};
 }
 
 #package Counts;
@@ -638,6 +646,14 @@ sub inc {
 sub peg {
 	my ($self,$event) = @_;
 	$self->{pegs}->{$event} += 1;
+}
+
+#package Counts;
+sub itv {
+	my ($self,$event,$start,$end) = @_;
+	my $itv = { beg=>$start, end=>$end };
+	$self->{itvs}->{$event} = [] unless exists $self->{itvs}->{$event};
+	push @{$self->{itvs}->{$event}}, $itv;
 }
 
 #package Counts;
@@ -786,27 +802,819 @@ sub peg {
 }
 
 #package Stats;
+sub itv {
+	my ($self,$event,$beg,$end) = @_;
+	$self->Counts::itv($event,$beg,$end);
+}
+
+#package Stats;
 sub dur {
-	my ($self,$event,$start,$end) = @_;
-#	my $s = $self->interval($start);
+	my ($self,$event,$beg,$end) = @_;
+#	my $s = $self->interval($beg);
 #	my $e = $self->interval($end);
 #	for (my $t = $s; $t <= $e; $t += 300) {
 #		my $hist = $self->hist($t);
 #		if ($t == $s) {
-#			$hist->dur($event,$start,{tv_sec=>$t+300,tv_usec=>0});
+#			$hist->dur($event,$beg,{tv_sec=>$t+300,tv_usec=>0});
 #		} elsif ($t == $e) {
 #			$hist->dur($event,{tv_sec=>$t,tv_usec=>0},$end);
 #		} else {
 #			$hist->dur($event,{tv_sec=>$t,tv_usec=>0},{tv_sec=>$t+300,tv_usec=>0});
 #		}
 #	}
-	$self->Counts::dur($event,$start,$end);
+	$self->Counts::dur($event,$beg,$end);
 }
 
 #package Stats;
 sub iat {
 	my ($self,$event,$ts) = @_;
 	$self->Counts::iat($event,$ts);
+}
+
+# -------------------------------------
+package Plot;
+use strict;
+# -------------------------------------
+
+my %centerblack = ( -anchor=>'center', -fill=>'black', -justify=>'center' );
+my %rightblack = ( -anchor=>'e', -fill=>'black', -justify=>'right' );
+my %leftblack = ( -anchor=>'w', -fill=>'black', -justify=>'left' );
+my %blackline = ( -arrow=>'none', -capstyle=>'round', -fill=>'black', -joinstyle=>'round', -smooth=>0, -width=>1 );
+my %greyline = ( -arrow=>'none', -capstyle=>'round', -fill=>'grey', -joinstyle=>'round', -smooth=>0, -width=>1 );
+my %dashline = ( -arrow=>'none', -capstyle=>'round', -fill=>'grey', -joinstyle=>'round', -smooth=>0, -width=>1, -dash=>[3,2] );
+my %blackcurve = ( -arrow=>'none', -capstyle=>'round', -fill=>'black', -joinstyle=>'round', -smooth=>1, -width=>1 );
+my %blueline = ( -arrow=>'none', -capstyle=>'round', -fill=>'blue', -joinstyle=>'round', -smooth=>0, -width=>2 );
+my %redcurve = ( -arrow=>'none', -capstyle=>'round', -fill=>'red', -joinstyle=>'round', -smooth=>1, -width=>2, -dash=>[3,2] );
+
+my @dirlabels = ( 'I/C trunks', 'O/G trunks', 'All trunks');
+
+my @evtlabels = (
+	'Init',
+	'Idle',
+	'Setup',
+	'Ringing',
+	'Call',
+	'Suspension',
+	'Release',
+	'Complettions',
+);
+
+#package Plot;
+sub new {
+	my ($type,$me,$stat,$event,$w,$X,$Y,@args) = @_;
+	my $self;
+	if ($self = $$me) {
+		$self->display;
+		return $self;
+	}
+	$self = {};
+	bless $self,$type;
+	$$me = $self;
+	$self->{stat} = $stat;
+	$self->{event} = $event;
+	my $title = $self->gettitle;
+	my $tw = $self->{tw} = $w->toplevel->Toplevel(-title=>$title);
+	$tw->group($w->toplevel);
+	#$tw->transient($w->toplevel);
+	$tw->iconimage('icon');
+	$tw->iconname($title);
+	#$tw->resizable(0,0);
+	$tw->positionfrom('user');
+	$tw->geometry("+$X+$Y");
+	$tw->protocol('WM_DELETE_WINDOW', [sub {
+		my $me = shift;
+		$$me->{tw}->destroy;
+		delete $$me->{tw};
+		$$me = undef;
+	},$me]);
+	my $dimx = $self->{dimx} = $self->getdimx;
+	my $dimy = $self->{dimy} = $self->getdimy;
+	my $c = $self->{canvas} = $tw->Canvas(
+		-confine=>1,
+		-width=>$dimx,
+		-height=>$dimy,
+		-xscrollincrement=>0,
+		-yscrollincrement=>0,
+		-background=>'white',
+	)->pack(
+		-expand=>1,
+		-fill=>'both',
+		-side=>'left',
+		-anchor=>'w',
+	);
+	$c->createText($dimx/2,20,%centerblack,-text=>"\U$title\E");
+	my $dirname = $dirlabels[int($event/10)];
+	my $id = $stat->identify;
+	$c->createText($dimx/2,35,%centerblack,-text=>"$dirname for $id");
+	$self->createplot;
+	$c->raise('min','sub');
+	$c->raise('maj','min');
+	$c->raise('end','maj');
+	$c->raise('lab','end');
+	$c->raise('dat','lab');
+	$c->raise('smo','dat');
+	$c->raise('the','smo');
+	$c->update;
+	$c->CanvasBind('<Configure>',[sub{
+			my ($c,$self,$w,$h) = @_;
+			my $ow = $self->{dimx};
+			my $oh = $self->{dimy};
+			$c->scale('all',0,0,$w/$ow,$h/$oh);
+			$self->{dimx} = $w;
+			$self->{dimy} = $h;
+		}, $self, Tk::Ev('w'), Tk::Ev('h')]);
+	$tw->MapWindow;
+	return $self;
+}
+
+#package Plot;
+sub gettitle {
+	my $self = shift;
+	my $prefix = $self->getprefix;
+	my $suffix = $self->getsuffix;
+	my $evtname = $evtlabels[$self->{event} % 10];
+	return "$prefix of $evtname $suffix";
+}
+
+#package Plot;
+sub getdimx { return 600; }
+#package Plot;
+sub getdimy { return 400; }
+
+#package Plot;
+sub display {
+	my $self = shift;
+	my $tw = $self->{tw};
+	if ($tw->state eq 'iconic') {
+		$tw->deiconify;
+	} else {
+		$tw->UnmapWindow;
+	}
+	$tw->MapWindow;
+}
+
+#package Plot;
+sub createplot {
+	my $self = shift;
+	$self->compiledata;
+	if ($self->{data}->{num} == 0) {
+		$self->{canvas}->createText($self->{dimx}/2,$self->{dimy}/2,%centerblack,-text=>'NO DATA');
+		return;
+	}
+	$self->adjustdata;
+	$self->plotdata;
+	# throw away the data store
+	$self->{data} = {};
+	# throw away the plot hash
+	$self->{hash} = {};
+}
+
+#package Plot;
+sub setlogx {
+	my $self = shift;
+	my $c = $self->{canvas};
+	my $label = $self->labelx;
+	my ($xmin,$xmax) = (50,$self->{dimx}-50);
+	my ($ymin,$ymax) = ($self->{dimy}-50,50);
+	my $scale = $self->{scalex} = ($xmax-$xmin)/log($self->{maxx}); $scale *= log(10);
+	my $powr = log($self->{maxx})/log(10);
+	my $tick = int($powr);
+	my ($subw,$minw,$majw,$endw) = (1,4,6,6);
+	# sub-minor lines
+	foreach  my $s ( 3, 4, 6, 7, 8, 9 ) {
+		for (my $x = $tick-3 + log($s)/log(10); $x < $powr; $x++) {
+			my $X = $xmin + $x * $scale;
+			next if $X < $xmin;
+			$c->createLine($X,$ymax,$X,$ymin+$subw,%dashline,-tags=>['sub']);
+		}
+	}
+	# minor lines
+	foreach my $s ( 2, 5 ) {
+		for (my $x = $tick-3 + log($s)/log(10); $x < $powr; $x++) {
+			my $X = $xmin + $x * $scale;
+			next if $X < $xmin;
+			$c->createLine($X,$ymax,$X,$ymin+$minw,%greyline,-tags=>['min']);
+		}
+	}
+	# major lines and labels
+	for (my $x = $tick-3; $x < $powr; $x++) {
+		my $X = $xmin + $x * $scale;
+		next if $X < $xmin;
+		$c->createLine($X,$ymax,$X,$ymin+$majw, %blackline,-tags=>['maj']);
+		next if $X > $xmax - 60 || $X < $xmin + 50;
+		$c->createText($X,$ymin+18, %centerblack,-text=>((10**$x)*$self->{intx}),-tags=>['lab']);
+	}
+	# min-x line and label
+	$c->createLine($xmin,$ymax,$xmin,$ymin+$endw,%blackline,-tags=>['end']);
+	$c->createText($xmin,$ymin+18,%centerblack,-text=>1*$self->{intx},-tags=>['lab']);
+	# max-x line and label
+	$c->createLine($xmax,$ymax,$xmax,$ymin+$endw,%blackline,-tags=>['end']);
+	$c->createText($xmax,$ymin+18,%centerblack,-text=>$self->{maxx}*$self->{intx},-tags=>['lab']);
+	$c->createText(($xmin+$xmax)/2,$ymin+35,%centerblack,-text=>$label,-tags=>['lab']) if $label;
+	$c->createText($xmax,$ymin+35,%rightblack,-text=>"total calls = $self->{data}->{num}",-tags=>['lab']);
+	$c->raise('min','sub');
+	$c->raise('maj','min');
+	$c->raise('end','maj');
+	$c->raise('lab','end');
+}
+
+#package Plot;
+sub setlogy {
+	my $self = shift;
+	my $c = $self->{canvas};
+	my $label = $self->labely;
+	my ($ymin,$ymax) = ($self->{dimy}-50,50);
+	my ($xmin,$xmax) = (50,$self->{dimx}-50);
+	my $tot = $self->{toty};
+	my $max = $self->{maxy};
+	my $scale = $self->{scaley} = ($ymin-$ymax)/log($max); $scale *= log(10);
+	my $powr = (log($max)-log($tot))/log(10);
+	my $tock = (         -log($tot))/log(10);
+	my $tick = int($tock)-1;
+	my ($subw,$minw,$majw,$endw) = (1,4,6,6);
+	# sub-minor lines
+	foreach  my $s ( 3, 4, 6, 7, 8, 9 ) {
+		for (my $y = $tick + log($s)/log(10); $y < $powr; $y++) {
+			my $Y = $ymin - ($y + log($tot)/log(10)) * $scale;
+			next if $Y > $ymin;
+			$c->createLine($xmax,$Y,$xmin-$subw,$Y,%dashline,-tags=>['sub']);
+		}
+	}
+	# minor lines
+	foreach my $s ( 2, 5 ) {
+		for (my $y = $tick + log($s)/log(10); $y < $powr; $y++) {
+			my $Y = $ymin - ($y + log($tot)/log(10)) * $scale;
+			next if $Y > $ymin;
+			$c->createLine($xmax,$Y,$xmin-$minw,$Y,%greyline,-tags=>['min']);
+		}
+	}
+	# major lines and labels
+	for (my $y = $tick; $y < $powr; $y++) {
+		my $Y = $ymin - ($y + log($tot)/log(10)) * $scale;
+		next if $Y > $ymin;
+		$c->createLine($xmax,$Y,$xmin-$majw,$Y, %blackline,-tags=>['maj']);
+		next if $Y > $ymin - 15 || $Y < $ymax + 15;
+		next if $label && ($Y > ($ymin+$ymax)/2-15 && $Y < ($ymin+$ymax)/2+15);
+		$c->createText($xmin-$endw-2,$Y,%rightblack,-text=>sprintf('%.2g',10**$y),-tags=>['lab']);
+	}
+	# min-y line and label
+	$c->createLine($xmax,$ymin,$xmin-$endw,$ymin,%blackline,-tags=>['end']);
+	$c->createText($xmin-$endw-2,$ymin,%rightblack,-text=>sprintf('%.2g',1/$tot),-tags=>['lab']);
+	# max-y line and label
+	$c->createLine($xmax,$ymax,$xmin-$endw,$ymax,%blackline,-tags=>['end']);
+	$c->createText($xmin-$endw-2,$ymax,%rightblack,-text=>sprintf('%.2g',$max/$tot),-tags=>['lab']);
+	$c->createText($xmin-25,($ymin+$ymax)/2,%centerblack,-text=>$label,-tags=>['lab']) if $label;
+	$c->raise('min','sub');
+	$c->raise('maj','min');
+	$c->raise('end','maj');
+	$c->raise('lab','end');
+}
+
+#package Plot;
+sub setlinx {
+	my $self = shift;
+	my $c = $self->{canvas};
+	my $label = $self->labelx;
+	my ($xmin,$xmax) = (50,$self->{dimx}-50);
+	my ($ymin,$ymax) = ($self->{dimy}-50,50);
+	my $max = $self->{maxx};
+	my $scale = $self->{scalex} = ($xmax-$xmin)/$max;
+	my $tick = 10**(int(log($max)/log(10)));
+	my ($subw,$minw,$majw,$endw) = (1,4,6,6);
+	# sub-minor lines
+	foreach my $s ( 1, 2, 3, 4, 6, 7, 8, 9 ) {
+		for (my $x = $s*$tick/10; $x < $max; $x += $tick) {
+			my $X = $xmin + $x * $scale;
+			$c->createLine($X,$ymax,$X,$ymin+$subw,%dashline,-tags=>['sub']);
+		}
+	}
+	# minor lines
+	for (my $x = $tick/2; $x < $max; $x += $tick) {
+		my $X = $xmin + $x * $scale;
+		$c->createLine($X,$ymax,$X,$ymin+$minw,%greyline,-tags=>['min']);
+	}
+	# major lines and labels
+	for (my $x = 0; $x < $max; $x += $tick) {
+		my $X = $xmin + $x * $scale;
+		next if $X < $xmin;
+		$c->createLine($X,$ymax,$X,$ymin+$majw,%blackline,-tags=>['maj']);
+		next if $X > $xmax - 60 || $X < $xmin + 20;
+		$c->createText($X,$ymin+18,%centerblack,-text=>$x,-tags=>['lab']);
+	}
+	# min-x line and label
+	$c->createLine($xmin,$ymax,$xmin,$ymin+$endw,%blackline,-tags=>['end']);
+	$c->createText($xmin,$ymin+18,%centerblack,-text=>0,-tags=>['lab']);
+	# max-x line and label
+	$c->createLine($xmax,$ymax,$xmax,$ymin+$endw,%blackline,-tags=>['end']);
+	$c->createText($xmax,$ymin+18,%centerblack,-text=>sprintf('%.3g', $max),-tags=>['lab']);
+	$c->createText(($xmin+$xmax)/2,$ymin+35,%centerblack,-text=>$label,-tags=>['lab']) if $label;
+	$c->createText($xmax,$ymin+35,%rightblack,-text=>"total calls = $self->{data}->{num}",-tags=>['lab']);
+}
+
+#package Plot;
+sub setliny {
+	my $self = shift;
+	my $c = $self->{canvas};
+	my $label = $self->labely;
+	my ($xmin,$xmax) = (50,$self->{dimx}-50);
+	my ($ymin,$ymax) = ($self->{dimy}-50,50);
+	my $max = $self->{maxy};
+	my $tot = $self->{toty};
+	my $scale = $self->{scaley} = ($ymin-$ymax)/$max;
+	my $tick = 10**(int(log($max)/log(10)));
+	my ($subw,$minw,$majw,$endw) = (1,4,6,6);
+	# sub-minor lines
+	foreach my $s ( 1, 2, 3, 4, 6, 7, 8, 9 ) {
+		for (my $y = $s*$tick/10; $y < $max; $y += $tick) {
+			my $Y = $ymin - $y * $scale;
+			$c->createLine($xmax,$Y,$xmin-$subw,$Y,%dashline,-tags=>['sub']);
+		}
+	}
+	# minor lines
+	for (my $y = $tick/2; $y < $max; $y += $tick) {
+		my $Y = $ymin - $y * $scale;
+		$c->createLine($xmax,$Y,$xmin-$minw,$Y,%greyline,-tags=>['min']);
+	}
+	# major lines and labels
+	for (my $y = 0; $y < $max; $y += $tick) {
+		my $Y = $ymin - $y * $scale;
+		next if $Y > $ymin;
+		$c->createLine($xmax,$Y,$xmin-$majw,$Y,%blackline,-tags=>['maj']);
+		next if $Y > $ymin - 15 || $Y < $ymax + 15;
+		next if $label && ($Y > ($ymin+$ymax)/2-15 && $Y < ($ymin+$ymax)/2+15);
+		$c->createText($xmin-$endw-2,$Y,%rightblack,-text=>$y/$tot,-tags=>['lab']);
+	}
+	# min-y line and label
+	$c->createLine($xmax,$ymin,$xmin-$endw,$ymin,%blackline,-tags=>['end']);
+	$c->createText($xmin-$endw-2,$ymin,%rightblack,-text=>0,-tags=>['lab']);
+	# max-y line and label
+	$c->createLine($xmax,$ymax,$xmin-$endw,$ymax,%blackline,-tags=>['end']);
+	$c->createText($xmin-$endw-2,$ymax,%rightblack,-text=>sprintf('%.3g', $max/$tot),-tags=>['lab']);
+	# y-axis label
+	$c->createText($xmin-25,($ymin+$ymax)/2,%centerblack,-text=>$label,-tags=>['lab']) if $label;
+}
+
+# -------------------------------------
+package PlotDist;
+use strict;
+use vars qw(@ISA);
+@ISA = qw(Plot);
+# -------------------------------------
+
+#package PlotDist;
+sub new {
+	my ($type,@args) = @_;
+	return Plot::new($type,@args);
+}
+
+# -------------------------------------
+package PlotPdf;
+use strict;
+use vars qw(@ISA);
+@ISA = qw(PlotDist);
+# -------------------------------------
+
+#package PlotPdf;
+sub new {
+	my ($type,@args) = @_;
+	return PlotDist::new($type,@args);
+}
+
+#package PlotPdf;
+sub getprefix {
+	return 'probability density';
+}
+
+#package PlotPdf;
+sub labely { return 'p(x)'; }
+
+#package PlotPdf;
+sub adjustdata {
+	my $self = shift;
+	my $max = $self->{data}->{max};
+	my $int = 10**(int(log($max)/log(10))-2);
+	my ($maxx,$maxy) = (0,0);
+	my $h = {};
+	foreach my $v (@{$self->{data}->{vals}}) {
+		next if $v > $max;
+		my $i = $v/$int;
+		if (($v = int($i)) < $i) { $v++; }
+		if ($v <= 0) { $v = 1; }
+		$h->{$v}++;
+		if ($v > $maxx) { $maxx = $v; }
+		if ($h->{$v} > $maxy) { $maxy = $h->{$v}; }
+	}
+
+	for (my $i = 1; $i <= $maxx; $i++) { unless (exists $h->{$i}) { $h->{$i} = 0; } }
+	my $t = 0;
+	for (my $i = 1; $i <= $maxx; $i++) { $t += $h->{$i}; }
+	$self->{intx} = $int;
+	$self->{maxx} = $maxx;
+	$self->{maxy} = $maxy;
+	$self->{hash} = $h;
+	$self->{toty} = $t;
+	$self->{expv} = $self->{data}->{exv};
+}
+
+#package PlotPdf;
+sub labely { return 'p(x)'; }
+
+#package PlotPdf;
+sub plotdata {
+	my $self = shift;
+	my $c = $self->{canvas};
+	$self->setlinx;
+	$self->setlogy;
+	my ($dimx,$dimy) = ($self->{dimx},$self->{dimy});
+	my ($xmin,$xmax) = (50,$dimx-50);
+	my ($ymin,$ymax) = ($dimy-50,50);
+	my ($scalex,$scaley) = ($self->{scalex},$self->{scaley});
+	my $intx = $self->{intx};
+	my $tot = $self->{toty};
+	my $lambda = 1/$self->{expv};
+	$c->createText($xmin,$ymin+35,%leftblack,-text=>"lambda = ".sprintf('%.3g',$lambda),-tags=>['lab']);
+	my @coords = ();
+	my @theory = ();
+	foreach my $k (sort {$a <=> $b} keys %{$self->{hash}}) {
+		my $x = $k;
+		my $X = $xmin + $x * $scalex;
+		next if $xmin > $X || $X > $xmax;
+		my $tx = $k*$intx;
+		my $ty = $lambda * exp(-$lambda*$tx) * $tot;
+		$ty = log($ty);
+		my $TY = $ymin - $ty * $scaley;
+		if ($ymax <= $TY && $TY <= $ymin) {
+			push @theory, ($X, $TY);
+		}
+		my $v = $self->{hash}->{$k};
+		next if $v <= 0;
+		my $y = log($v);
+		my $Y = $ymin - $y * $scaley;
+		next if $ymax > $Y || $Y > $ymin;
+		push @coords, ( $X, $Y );
+	}
+	$c->createLine(@coords, %blueline,  -tags=>['dat']);
+	$c->createLine(@coords, %blackcurve,-tags=>['smo']);
+	$c->createLine(@theory, %redcurve,  -tags=>['the']);
+}
+
+# -------------------------------------
+package PlotCdf;
+use strict;
+use vars qw(@ISA);
+@ISA = qw(PlotDist);
+# -------------------------------------
+
+#package PlotCdf;
+sub new {
+	my ($type,@args) = @_;
+	return PlotDist::new($type,@args);
+}
+
+#package PlotCdf;
+sub getprefix {
+	return 'cummulative distribution';
+}
+
+#package PlotCdf;
+sub adjustdata {
+	my $self = shift;
+	my $max = $self->{data}->{max};
+	my $int = 10**(int(log($max)/log(10))-2);
+	my ($maxx,$maxy) = (0,0);
+	my $h = {};
+	foreach my $v (@{$self->{data}->{vals}}) {
+		next if $v > $max;
+		my $i = $v/$int;
+		if (($v = int($i)) < $i) { $v++; }
+		if ($v <= 0) { $v = 1; }
+		$h->{$v}++;
+		if ($v > $maxx) { $maxx = $v; }
+		if ($h->{$v} > $maxy) { $maxy = $h->{$v}; }
+	}
+
+	for (my $i = 0; $i <= $maxx; $i++) { unless (exists $h->{$i}) { $h->{$i} = 0; } }
+	my $t = 0;
+	for (my $i = 0; $i <= $maxx; $i++) { $t += $h->{$i}; $h->{$i} = $t; }
+	$maxy = $t;
+	$self->{intx} = $int;
+	$self->{maxx} = $maxx;
+	$self->{maxy} = $maxy;
+	$self->{hash} = $h;
+	$self->{toty} = $t;
+	$self->{expv} = $self->{data}->{exv};
+}
+
+#package PlotCdf;
+sub labely { return 'A(x)'; }
+
+#package PlotCdf;
+sub plotdata {
+	my $self = shift;
+	my $c = $self->{canvas};
+	$self->setlogx;
+	$self->setliny;
+	my ($dimx,$dimy) = ($self->{dimx},$self->{dimy});
+	my ($xmin,$xmax) = (50,$dimx-50);
+	my ($ymin,$ymax) = ($dimy-50,50);
+	my ($scalex,$scaley) = ($self->{scalex},$self->{scaley});
+	my $intx = $self->{intx};
+	my $tot = $self->{toty};
+	my $lambda = 1/$self->{expv};
+	$c->createText($xmin,$ymin+35,%leftblack,-text=>"lambda = ".sprintf('%.3g',$lambda),-tags=>['lab']);
+	my @coords = ();
+	my @theory = ();
+	foreach my $k (sort {$a <=> $b} keys %{$self->{hash}}) {
+		next unless $k > 0;
+		my $x = log($k);
+		my $X = $xmin + $x * $scalex;
+		next if $xmin > $X || $X > $xmax;
+		my $tx = $k*$intx;
+		my $ty = (1 - exp(-$lambda*$tx)) * $tot;
+		my $TY = $ymin - $ty * $scaley;
+		if ($ymax <= $TY && $TY <= $ymin) {
+			push @theory, ($X, $TY);
+		}
+		my $v = $self->{hash}->{$k};
+		my $y = $v;
+		my $Y = $ymin - $y * $scaley;
+		next if $ymax > $Y || $Y > $ymin;
+		push @coords, ( $X, $Y );
+	}
+	$c->createLine(@coords, %blueline,  -tags=>['dat']);
+	$c->createLine(@coords, %blackcurve,-tags=>['smo']);
+	$c->createLine(@theory, %redcurve,  -tags=>['the']);
+}
+
+# -------------------------------------
+package PlotPhase;
+use strict;
+use vars qw(@ISA);
+@ISA = qw(Plot);
+# -------------------------------------
+
+#package PlotPhase;
+sub new {
+	my ($type,@args) = @_;
+	return Plot::new($type,@args);
+}
+
+#package PlotPhase;
+sub getprefix {
+	return 'phase plot';
+}
+
+#package PlotPhase;
+sub getdimx { return 600; }
+#package PlotPhase;
+sub getdimy { return 600; }
+
+#package PlotPhase;
+sub adjustdata {
+	my $self = shift;
+	my $max = $self->{data}->{max};
+	my $int = 10**(int(log($max)/log(10))-2);
+
+	$self->{intx} = $int;
+	$self->{maxx} = $max;
+	$self->{maxy} = $max;
+	$self->{toty} = 1;
+}
+
+#package PlotPhase;
+sub labelx { return 'X[j] = (seconds)'; }
+sub labely { return 'X[j+1]'; }
+
+#package PlotPhase;
+sub plotdata {
+	my $self = shift;
+	my $c = $self->{canvas};
+	$self->setlinx;
+	$self->setliny;
+	my ($dimx,$dimy) = ($self->{dimx},$self->{dimy});
+	my ($xmin,$xmax) = (50,$dimx-50);
+	my ($ymin,$ymax) = ($dimy-50,50);
+	my ($scalex,$scaley) = ($self->{scalex},$self->{scaley});
+	my $ti = shift @{$self->{data}->{vals}};
+	foreach my $tip1 (@{$self->{data}->{vals}}) {
+		my $X = $xmin + $ti   * $scalex;
+		next if $xmin > $X || $X > $xmax;
+		my $Y = $ymin - $tip1 * $scaley;
+		next if $ymax > $Y || $Y > $ymin;
+		$c->createOval($X-1,$Y-1,$X+1,$Y+1,
+			-fill=>'black',
+			-outline=>'black',
+			-width=>0,
+			-tags=>['dat'],
+		);
+		$ti = $tip1;
+	}
+}
+
+# -------------------------------------
+package PlotHolding;
+use strict;
+use vars qw(@ISA);
+@ISA = qw(Plot);
+# -------------------------------------
+
+#package PlotHolding;
+sub getsuffix {
+	return 'holding times';
+}
+
+#package PlotHolding;
+sub compiledata {
+	my $self = shift;
+	my @durs = ();
+	my ($e,$n) = (0, 0);
+	foreach my $i (@{$self->{stat}->{itvs}->{$self->{event}}}) {
+		my $v = { tv_sec=>($i->{end}->{tv_sec}-$i->{beg}->{tv_sec}), tv_usec=>($i->{end}->{tv_usec}-$i->{beg}->{tv_usec}) };
+		while ($v->{tv_usec} < 0) {
+			$v->{tv_sec}--;
+			$v->{tv_usec} += 1000000;
+		}
+		my $d = $v->{tv_sec} + $v->{tv_usec}/1000000;
+		push @durs, $d;
+		$e += $d;
+		$n += 1;
+	}
+	my $num = scalar(@durs);
+	my @vals = sort {$a <=> $b} @durs;
+	$self->{data}->{vals} = \@durs;
+	$self->{data}->{min} = $vals[0];
+	my $ignore = 10;
+	if ($num > $ignore) {
+		$self->{data}->{max} = $vals[-$ignore-1];
+		for (my $i = -$ignore; $i < 0; $i++) {
+			$e -= $vals[$i];
+			$n--;
+		}
+		$self->{data}->{num} = $num-$ignore;
+	} else {
+		$self->{data}->{max} = $vals[-1];
+		$self->{data}->{num} = $num;
+	}
+	$self->{data}->{exv} = $e/$n;
+}
+
+#package PlotHolding;
+sub labelx { return 'x = holding time (seconds)'; }
+
+# -------------------------------------
+package PlotArrival;
+use strict;
+use vars qw(@ISA);
+@ISA = qw(Plot);
+# -------------------------------------
+
+#package PlotArrival;
+sub getsuffix {
+	return 'interarrival times';
+}
+
+#package PlotArrival;
+sub tscmp {
+	my ($a,$b) = @_;
+	if ($a->{tv_sec} < $b->{tv_sec}) {
+		return -1;
+	}
+	if ($a->{tv_sec} > $b->{tv_sec}) {
+		return 1;
+	}
+	if ($a->{tv_usec} < $b->{tv_usec}) {
+		return -1;
+	}
+	if ($a->{tv_usec} > $b->{tv_usec}) {
+		return 1;
+	}
+	return 0;
+}
+
+#package PlotArrival;
+sub compiledata {
+	my $self = shift;
+	my @iats = ();
+	my $t;
+	my ($e,$n) = (0, 0);
+	foreach my $i (sort {tscmp($a->{beg},$b->{beg})} @{$self->{stat}->{itvs}->{$self->{event}}}) {
+		if (defined $t) {
+			my $v = { tv_sec=>($i->{beg}->{tv_sec}-$t->{tv_sec}), tv_usec=>($i->{beg}->{tv_usec}-$t->{tv_usec}) };
+			while ($v->{tv_usec} < 0) {
+				$v->{tv_sec}--;
+				$v->{tv_usec} += 1000000;
+			}
+			my $d = $v->{tv_sec} + $v->{tv_usec}/1000000;
+			push @iats, $d;
+			$e += $d;
+			$n += 1;
+		}
+		$t = $i->{beg};
+	}
+	my $num = scalar(@iats);
+	my @vals = sort {$a <=> $b} @iats;
+	$self->{data}->{vals} = \@iats;
+	$self->{data}->{min} = $vals[0];
+	my $ignore = 10;
+	if ($num > $ignore) {
+		$self->{data}->{max} = $vals[-$ignore-1];
+		for (my $i = -$ignore; $i < 0; $i++) {
+			$e -= $vals[$i];
+			$n--;
+		}
+		$self->{data}->{num} = $num-$ignore;
+	} else {
+		$self->{data}->{max} = $vals[-1];
+		$self->{data}->{num} = $num;
+	}
+	$self->{data}->{exv} = $e/$n;
+}
+
+#package PlotArrival;
+sub labelx { return 'x = interarrival time (seconds)'; }
+
+# -------------------------------------
+package PlotPdfHolding;
+use strict;
+use vars qw(@ISA);
+@ISA = qw(PlotPdf PlotHolding);
+# -------------------------------------
+
+#package PlotPdfHolding;
+sub get {
+	my ($type,$stat,$event,@args) = @_;
+	my $me = \$stat->{plots}->{pdfh}->{$event};
+	return PlotPdf::new($type,$me,$stat,$event,@args);
+}
+
+# -------------------------------------
+package PlotCdfHolding;
+use strict;
+use vars qw(@ISA);
+@ISA = qw(PlotCdf PlotHolding);
+# -------------------------------------
+
+#package PlotCdfHolding;
+sub get {
+	my ($type,$stat,$event,@args) = @_;
+	my $me = \$stat->{plots}->{cdfh}->{$event};
+	return PlotCdf::new($type,$me,$stat,$event,@args);
+}
+
+# -------------------------------------
+package PlotPhaseHolding;
+use strict;
+use vars qw(@ISA);
+@ISA = qw(PlotPhase PlotHolding);
+# -------------------------------------
+
+#package PlotPhaseHolding;
+sub get {
+	my ($type,$stat,$event,@args) = @_;
+	my $me = \$stat->{plots}->{phsh}->{$event};
+	return PlotPhase::new($type,$me,$stat,$event,@args);
+}
+
+# -------------------------------------
+package PlotPdfArrival;
+use strict;
+use vars qw(@ISA);
+@ISA = qw(PlotPdf PlotArrival);
+# -------------------------------------
+
+#package PlotPdfArrival;
+sub get {
+	my ($type,$stat,$event,@args) = @_;
+	my $me = \$stat->{plots}->{pdfa}->{$event};
+	return PlotPdf::new($type,$me,$stat,$event,@args);
+}
+
+# -------------------------------------
+package PlotCdfArrival;
+use strict;
+use vars qw(@ISA);
+@ISA = qw(PlotCdf PlotArrival);
+# -------------------------------------
+
+#package PlotCdfArrival;
+sub get {
+	my ($type,$stat,$event,@args) = @_;
+	my $me = \$stat->{plots}->{cdfa}->{$event};
+	return PlotCdf::new($type,$me,$stat,$event,@args);
+}
+
+# -------------------------------------
+package PlotPhaseArrival;
+use strict;
+use vars qw(@ISA);
+@ISA = qw(PlotPhase PlotArrival);
+# -------------------------------------
+
+#package PlotPhaseArrival;
+sub get {
+	my ($type,$stat,$event,@args) = @_;
+	my $me = \$stat->{plots}->{phsa}->{$event};
+	return PlotPhase::new($type,$me,$stat,$event,@args);
 }
 
 # -------------------------------------
@@ -1131,402 +1939,6 @@ sub stats {
 	$tw->MapWindow;
 }
 
-my %centerblack = ( -anchor=>'center', -fill=>'black', -justify=>'center' );
-my %rightblack = ( -anchor=>'e', -fill=>'black', -justify=>'right' );
-my %blackline = ( -arrow=>'none', -capstyle=>'round', -fill=>'black', -joinstyle=>'round', -smooth=>0, -width=>1 );
-my %greyline = ( -arrow=>'none', -capstyle=>'round', -fill=>'grey', -joinstyle=>'round', -smooth=>0, -width=>1 );
-my %dashline = ( -arrow=>'none', -capstyle=>'round', -fill=>'grey', -joinstyle=>'round', -smooth=>0, -width=>1, -dash=>[3,2] );
-my %blackcurve = ( -arrow=>'none', -capstyle=>'round', -fill=>'black', -joinstyle=>'round', -smooth=>1, -width=>1 );
-my %blueline = ( -arrow=>'none', -capstyle=>'round', -fill=>'blue', -joinstyle=>'round', -smooth=>0, -width=>2 );
-
-#package MsgStats;
-sub dist {
-	my ($self,$event,$kind,$c) = @_;
-	# copy the data
-	my $h = {}; while (my ($k,$v) = each %{$self->{durs}->{dist}->{$event}}) { $h->{$k} = $v; }
-	my ($maxx,$minx,$maxy,$miny);
-	foreach my $v (sort {$b<=>$a} values %{$h}) { $maxy = $v unless defined $maxy; $miny = $v; }
-	# remove anomalies
-	if ($miny * 1000 < $maxy) {
-		while (my ($k,$v) = each %{$h}) { delete $h->{$k} if $v * 1000 < $maxy; }
-		foreach my $v (sort {$a<=>$b} values %{$h}) { $miny = $v; last; }
-	}
-	if ($maxy == $miny) { $maxy++; }
-	foreach my $k (sort {$b<=>$a} keys %{$h}) { $maxx = $k unless defined $maxx; $minx = $k; }
-	if ($maxx == $minx) { $maxx++; }
-	for (my $i = $minx; $i <= $maxx; $i++) { unless (exists $h->{$i}) { $h->{$i} = 0; $miny = 0; } }
-	my $t = 0; for (my $i = $minx; $i <= $maxx; $i++) { $t += $h->{$i}; if ($kind == 1) { $h->{$i} = $t; } }
-	for (my $i = $minx; $i <= $maxx; $i++) { $h->{$i} /= $t; }
-	if ($kind == 1) { $maxy = 1; } else { $maxy /= $t; } $miny = 0;
-	my ($scalex,$scaley) = (500/($maxx-$minx),300/($maxy-$miny));
-	my @coords = ();
-	foreach my $k (sort {$a<=>$b} keys %{$h}) {
-		my $v = $h->{$k};
-		my $x = 50 + ($k - $minx) * $scalex;
-		my $y = 350 - ($v - $miny) * $scaley;
-		push @coords, $x;
-		push @coords, $y;
-	}
-	$c->createText(300,385, %centerblack, -text=>'seconds of duration');
-	$c->createText(550,385, %rightblack, -text=>"total calls = $t");
-	#$c->createText(45,200, %rightblack, -text=>'calls');
-	$c->createLine(50,50,50,350, %blackline);
-	$c->createLine(50,350,550,350, %blackline);
-	my $tickx = 10**(int(log($maxx-$minx)/log(10)));
-	$c->createText(50,368, %centerblack, -text=>$minx);
-	$c->createLine(50,50,50,360, %blackline);
-	for (my $x = 0; $x < $maxx; $x += $tickx) {
-		my $X = 50 + ($x - $minx) * $scalex;
-		next if $X < 50;
-		$c->createLine($X,50,$X,360, %blackline);
-		next if $X > 500 || $X < 100;
-		$c->createText($X,368, %centerblack, -text=>$x);
-	}
-	for (my $x = $tickx/2; $x < $maxx; $x += $tickx) {
-		next if $x < $minx;
-		my $X = 50 + ($x - $minx) * $scalex;
-		$c->createLine($X,50,$X,357, %greyline);
-	}
-	foreach my $s ( 1, 2, 3, 4, 6, 7, 8, 9 ) {
-		for (my $x = $s*$tickx/10; $x < $maxx; $x += $tickx) {
-			next if $x < $minx;
-			my $X = 50 + ($x - $minx) * $scalex;
-			$c->createLine($X,50,$X,353, %dashline);
-		}
-	}
-	my $format = ($kind == 1)?'%.1f':'%.3f';
-	$c->createText(550,368, %centerblack, -text=>$maxx);
-	$c->createLine(550,50,550,360, %blackline);
-	$c->createText(35,350, %rightblack, -text=>sprintf($format,$miny));
-	$c->createLine(550,350,40,350, %blackline);
-	my $ticky = 10**(int(log($maxy-$miny)/log(10))-1);
-	for (my $y = 0; $y < $maxy; $y += $ticky) {
-		my $Y = 350 - ($y - $miny) * $scaley;
-		next if $Y > 350;
-		$c->createLine(550,$Y,40,$Y, %blackline);
-		next if $Y < 60 || $Y > 340;
-##		#next if $Y > 190 && $Y < 210;
-		$c->createText(35, $Y, %rightblack, -text=>sprintf($format,$y));
-	}
-	for (my $y = $ticky/2; $y < $maxy; $y += $ticky) {
-		next if $y < $miny;
-		my $Y = 350 - ($y - $miny) * $scaley;
-		$c->createLine(550,$Y,43,$Y, %greyline);
-	}
-	foreach my $s ( 1, 2, 3, 4, 6, 7, 8, 9 ) {
-		for (my $y = $s*$ticky/10; $y < $maxy; $y += $ticky) {
-			next if $y < $miny;
-			my $Y = 350 - ($y - $miny) * $scaley;
-			$c->createLine(550,$Y,47,$Y, %dashline);
-		}
-	}
-	$c->createText(35,50, %rightblack, -text=>sprintf($format, $maxy));
-	$c->createLine(550,50,40,50, %blackline);
-	$c->createLine(@coords, %blueline);
-	$c->createLine(@coords, %blackcurve);
-	$c->update;
-	$c->{_mydata} = {};
-	$c->{_mydata}->{w} = 600;
-	$c->{_mydata}->{h} = 400;
-	$c->CanvasBind('<Configure>',[\&MsgStats::resizedist,Tk::Ev('w'),Tk::Ev('h')]);
-}
-
-#package MsgStats;
-sub phase {
-	my ($self,$event,$kind,$c) = @_;
-	my @iats = ();
-	my ($imax,$t);
-	my $count = 0;
-	unless ($self->{iats}->{$event}) {
-		$c->createText(300,300,%centerblack,-text=>'NO DATA');
-		return;
-	}
-	foreach my $ts (@{$self->{iats}->{$event}}) {
-		my $n = $ts;
-		if (defined $t) {
-			my $i = { tv_sec=>$n->{tv_sec}-$t->{tv_sec}, tv_usec=>$n->{tv_usec}-$t->{tv_usec} };
-			while ($i->{tv_usec} < 0) {
-				$i->{tv_sec}--;
-				$i->{tv_usec} += 1000000;
-			}
-			my $v = $i->{tv_sec} + $i->{tv_usec}/1000000;
-			push @iats, $v;
-			$imax = $v unless defined $imax;
-			if ($v > $imax) { $imax = $v; }
-			$count++;
-		}
-		$t = $n;
-	}
-	unless ($count) {
-		$c->createText(300,300,%centerblack,-text=>'NO DATA');
-		return;
-	}
-	my $scale = 500/$imax;
-	$c->createText(300,585, %centerblack, -text=>'X[i] (seconds)');
-	$c->createText(550,585, %rightblack, -text=>"total interarrivals = $count");
-	$c->createText(45,300, %rightblack, -text=>'X[i+1]');
-	$c->createLine(50,50,50,550, %blackline);
-	$c->createLine(50,550,550,550, %blackline);
-	my $tick = 10**(int(log($imax)/log(10)));
-	$c->createText(50,568, %centerblack, -text=>0);
-	$c->createLine(50,50,50,560, %blackline);
-	for (my $x = 0; $x < $imax; $x += $tick) {
-		my $X = 50 + $x * $scale;
-		next if $X < 50;
-		$c->createLine($X,50,$X,560, %blackline);
-		next if $X > 500 || $X < 100;
-		$c->createText($X,568, %centerblack, -text=>$x);
-	}
-	for (my $x = $tick/2; $x < $imax; $x += $tick) {
-		my $X = 50 + $x * $scale;
-		$c->createLine($X,50,$X,557, %greyline);
-	}
-	foreach my $s ( 1, 2, 3, 4, 6, 7, 8, 9 ) {
-		for (my $x = $s*$tick/10; $x < $imax; $x += $tick) {
-			my $X = 50 + $x * $scale;
-			$c->createLine($X,50,$X,553, %dashline);
-		}
-	}
-	$c->createText(550,568, %centerblack, -text=>sprintf('%.2f',$imax));
-	$c->createLine(550,50,550,560, %blackline);
-	$c->createText(35,550, %rightblack, -text=>0);
-	$c->createLine(550,550,40,550, %blackline);
-	for (my $y = 0; $y < $imax; $y += $tick) {
-		my $Y = 550 - $y * $scale;
-		next if $Y > 550;
-		$c->createLine(550,$Y,40,$Y, %blackline);
-		next if $Y < 60 || $Y > 540;
-		next if $Y > 290 && $Y < 310;
-		$c->createText(35, $Y, %rightblack, -text=>$y);
-	}
-	for (my $y = $tick/2; $y < $imax; $y += $tick) {
-		my $Y = 550 - $y * $scale;
-		$c->createLine(550,$Y,43,$Y, %greyline);
-	}
-	foreach my $s ( 1, 2, 3, 4, 6, 7, 8, 9 ) {
-		for (my $y = $s*$tick/10; $y < $imax; $y += $tick) {
-			my $Y = 550 - $y * $scale;
-			$c->createLine(550,$Y,47,$Y, %dashline);
-		}
-	}
-	$c->createText(35,50, %rightblack, -text=>sprintf('%.2f',$imax));
-	$c->createLine(550,50,40,50, %blackline);
-	my $ti = shift @iats;
-	foreach my $tip1 (@iats) {
-		my $X = 50 + $ti * $scale;
-		my $Y = 550 - $tip1 * $scale;
-		$c->createOval($X-1,$Y-1,$X+1,$Y+1,
-			-fill=>'black',
-			-outline=>'black',
-			-width=>0,
-		);
-		$ti = $tip1;
-	}
-	$c->update;
-	$c->{_mydata} = {};
-	$c->{_mydata}->{w} = 600;
-	$c->{_mydata}->{h} = 600;
-	$c->CanvasBind('<Configure>',[\&MsgStats::resizedist,Tk::Ev('w'),Tk::Ev('h')]);
-}
-
-#package MsgStats;
-sub pdf {
-	my ($self,$event,$kind,$c) = @_;
-	my @iats = ();
-	my ($max,$maxx,$maxy,$t);
-	my $count = 0;
-	unless ($self->{iats}->{$event}) {
-		$c->createText(300,300,%centerblack,-text=>'NO DATA');
-		return;
-	}
-	foreach my $ts (@{$self->{iats}->{$event}}) {
-		my $n = $ts;
-		if (defined $t) {
-			my $i = { tv_sec=>$n->{tv_sec}-$t->{tv_sec}, tv_usec=>$n->{tv_usec}-$t->{tv_usec} };
-			while ($i->{tv_usec} < 0) {
-				$i->{tv_sec}--;
-				$i->{tv_usec} += 1000000;
-			}
-			my $v = $i->{tv_sec} + $i->{tv_usec}/1000000;
-			push @iats, $v;
-			$max = $v unless defined $max;
-			if ($v > $max) { $max = $v; }
-			$count++;
-		}
-		$t = $n;
-	}
-	unless ($count) {
-		$c->createText(300,300,%centerblack,-text=>'NO DATA');
-		return;
-	}
-	my $pow = int(log($max)/log(10))-2;
-	my $int = 10**$pow;
-	my $h = {};
-	foreach my $v (@iats) {
-		my $i = $v/$int;
-		if (int($i) < $i) {
-			$v = (int($i) + 1);
-		} else {
-			$v = int($i);
-		}
-		$h->{$v}++;
-	}
-	foreach my $v (sort {$b<=>$a} values %{$h}) { $maxy = $v; last; }
-	foreach my $k (sort {$b<=>$a} keys %{$h}) { $maxx = $k; last; }
-	for (my $i = 0; $i <= $maxx; $i++) { unless (exists $h->{$i}) { $h->{$i} = 0; } }
-	my $t = 0; for (my $i = 0; $i <= $maxx; $i++) { $t += $h->{$i}; if ($kind == 4) { $h->{$i} = $t; } }
-	for (my $i = 0; $i <= $maxx; $i++) { $h->{$i} /= $t; }
-	if ($kind == 4) { $maxy = 1; } else { $maxy /= $t; }
-	my ($scalex,$scaley) = (500/$maxx,300/$maxy);
-	my @coords = ();
-	foreach my $k (sort {$a<=>$b} keys %{$h}) {
-		my $v = $h->{$k};
-		my $x = 50 + $k * $scalex;
-		my $y = 350 - $v * $scaley;
-		push @coords, $x;
-		push @coords, $y;
-	}
-	$c->createText(300,385, %centerblack, -text=>'seconds between arrivals');
-	$c->createText(550,385, %rightblack, -text=>"total interarrivals = $t");
-	#$c->createText(45,200, %rightblack, -text=>'calls');
-	$c->createLine(50,50,50,350, %blackline);
-	$c->createLine(50,350,550,350, %blackline);
-	my $tickx = 10**(int(log($maxx)/log(10)));
-	$c->createText(50,368, %centerblack, -text=>0);
-	$c->createLine(50,50,50,360, %blackline);
-	for (my $x = 0; $x < $maxx; $x += $tickx) {
-		my $X = 50 + $x * $scalex;
-		next if $X < 50;
-		$c->createLine($X,50,$X,360, %blackline);
-		next if $X > 500 || $X < 100;
-		$c->createText($X,368, %centerblack, -text=>$x*$int);
-	}
-	for (my $x = $tickx/2; $x < $maxx; $x += $tickx) {
-		my $X = 50 + $x * $scalex;
-		$c->createLine($X,50,$X,357, %greyline);
-	}
-	foreach my $s ( 1, 2, 3, 4, 6, 7, 8, 9 ) {
-		for (my $x = $s*$tickx/10; $x < $maxx; $x += $tickx) {
-			my $X = 50 + $x * $scalex;
-			$c->createLine($X,50,$X,353, %dashline);
-		}
-	}
-	my $format = ($kind == 4)?'%.1f':'%.3f';
-	$c->createText(550,368, %centerblack, -text=>$maxx*$int);
-	$c->createLine(550,50,550,360, %blackline);
-	$c->createText(35,350, %rightblack, -text=>0);
-	$c->createLine(550,350,40,350, %blackline);
-	my $ticky = 10**(int(log($maxy)/log(10))-1);
-	for (my $y = 0; $y < $maxy; $y += $ticky) {
-		my $Y = 350 - $y * $scaley;
-		next if $Y > 350;
-		$c->createLine(550,$Y,40,$Y, %blackline);
-		next if $Y < 60 || $Y > 340;
-##		#next if $Y > 190 && $Y < 210;
-		$c->createText(35, $Y, %rightblack, -text=>sprintf($format,$y));
-	}
-	for (my $y = $ticky/2; $y < $maxy; $y += $ticky) {
-		my $Y = 350 - $y * $scaley;
-		$c->createLine(550,$Y,43,$Y, %greyline);
-	}
-	foreach my $s ( 1, 2, 3, 4, 6, 7, 8, 9 ) {
-		for (my $y = $s*$ticky/10; $y < $maxy; $y += $ticky) {
-			my $Y = 350 - $y * $scaley;
-			$c->createLine(550,$Y,47,$Y, %dashline);
-		}
-	}
-	$c->createText(35,50, %rightblack, -text=>sprintf($format, $maxy));
-	$c->createLine(550,50,40,50, %blackline);
-	$c->createLine(@coords, %blueline);
-	$c->createLine(@coords, %blackcurve);
-	$c->update;
-	$c->{_mydata} = {};
-	$c->{_mydata}->{w} = 600;
-	$c->{_mydata}->{h} = 400;
-	$c->CanvasBind('<Configure>',[\&MsgStats::resizedist,Tk::Ev('w'),Tk::Ev('h')]);
-}
-
-#package MsgStats;
-sub plot {
-	my ($self,$w,$event,$prefix,$label,$X,$Y,$kind) = @_;
-	my $tw;
-	if ($tw = $self->{dist}->{$event}->{$kind}) {
-		if ($tw->state eq 'iconic') {
-			$tw->deiconify;
-		} else {
-			$tw->UnmapWindow;
-		}
-		$tw->MapWindow;
-		return;
-	}
-	my $title;
-	if ($kind == 0) {
-		$title = "probability density of $label holding times";
-	} elsif ($kind == 1) {
-		$title = "cummulative distribution of $label holding times";
-	} elsif ($kind == 2) {
-		$title = "phase plot of $label interarrival times";
-	} elsif ($kind == 3) {
-		$title = "probability density of $label interarrival times";
-	} elsif ($kind == 4) {
-		$title = "cummulative distribution of $label interarrival times";
-	}
-	$tw = $w->toplevel->Toplevel(
-		-title=>$title,
-	);
-	$tw->group($w->toplevel);
-	#$tw->transient($w->toplevel);
-	$tw->iconimage('icon');
-	$tw->iconname($title);
-	#$tw->resizable(0,0);
-	$tw->positionfrom('user');
-	$tw->geometry("+$X+$Y");
-	$tw->protocol('WM_DELETE_WINDOW', [sub {
-		my ($self,$event,$kind) = @_;
-		my $tw = $self->{dist}->{$event}->{$kind};
-		delete $self->{dist}->{$event}->{$kind};
-		$tw->destroy;
-	},$self,$event,$kind]);
-	$self->{dist}->{$event}->{$kind} = $tw;
-	my ($width,$height) = (600,400);
-	if ($kind == 2) { ($width,$height) = (600,600); }
-	my $c = $tw->Canvas(
-		-confine=>1,
-		-width=>$width,
-		-height=>$height,
-		-xscrollincrement=>0,
-		-yscrollincrement=>0,
-		-background=>'white',
-	)->pack(
-		-expand=>1,
-		-fill=>'both',
-		-side=>'left',
-		-anchor=>'w',
-	);
-	$c->createText(300,20, %centerblack, -text=>"\U$title");
-	my $id = $self->identify;
-	$c->createText(300,35, %centerblack, -text=>"$prefix for $id");
-	if ($kind == 0 || $kind == 1) {
-		$self->dist($event,$kind,$c);
-	} elsif ($kind == 2) {
-		$self->phase($event,$kind,$c);
-	} elsif ($kind == 3 || $kind == 4) {
-		$self->pdf($event,$kind,$c);
-	}
-	$tw->update;
-	$tw->MapWindow;
-}
-
-#package MsgStats;
-sub resizedist {
-	my ($c,$w,$h) = @_;
-	my $ow = $c->{_mydata}->{w};
-	my $oh = $c->{_mydata}->{h};
-	$c->scale('all',0,0,$w/$ow,$h/$oh);
-	$c->{_mydata}->{w} = $w;
-	$c->{_mydata}->{h} = $h;
-}
-
 #package MsgStats;
 sub plotmenu {
 	my ($self,$tw,$event,$prefix,$label,$X,$Y) = @_;
@@ -1537,27 +1949,32 @@ sub plotmenu {
 	$m->add('command',
 		-label=>'Holding PDF...',
 		-underline=>0,
-		-command=>[\&MsgStats::plot,$self,$tw,$event,$prefix,$label,$X,$Y,0],
+		-command=>[\&PlotPdfHolding::get,'PlotPdfHolding',$self,$event,$tw,$X,$Y],
 	);
 	$m->add('command',
 		-label=>'Holding CDF...',
 		-underline=>0,
-		-command=>[\&MsgStats::plot,$self,$tw,$event,$prefix,$label,$X,$Y,1],
+		-command=>[\&PlotCdfHolding::get,'PlotCdfHolding',$self,$event,$tw,$X,$Y],
 	);
 	$m->add('command',
-		-label=>'Interarrival phase...',
+		-label=>'Holding phase...',
 		-underline=>0,
-		-command=>[\&MsgStats::plot,$self,$tw,$event,$prefix,$label,$X,$Y,2],
+		-command=>[\&PlotPhaseHolding::get,'PlotPhaseHolding',$self,$event,$tw,$X,$Y],
 	);
 	$m->add('command',
 		-label=>'Interarrival PDF...',
 		-underline=>0,
-		-command=>[\&MsgStats::plot,$self,$tw,$event,$prefix,$label,$X,$Y,3],
+		-command=>[\&PlotPdfArrival::get,'PlotPdfArrival',$self,$event,$tw,$X,$Y],
 	);
 	$m->add('command',
 		-label=>'Interarrival CDF...',
 		-underline=>0,
-		-command=>[\&MsgStats::plot,$self,$tw,$event,$prefix,$label,$X,$Y,4],
+		-command=>[\&PlotCdfArrival::get,'PlotCdfArrival',$self,$event,$tw,$X,$Y],
+	);
+	$m->add('command',
+		-label=>'Interarrival phase...',
+		-underline=>0,
+		-command=>[\&PlotPhaseArrival::get,'PlotPhaseArrival',$self,$event,$tw,$X,$Y],
 	);
 	$m->Popup(
 		-popanchor=>'nw',
@@ -1598,11 +2015,8 @@ sub dircstat {
 	my $X = $tw->toplevel->rootx;
 	my $Y = $tw->toplevel->rooty;
 	$tw->Button(
-#		-command=>[\&MsgStats::dist,$self,$tw,$event,$prefix,$label,$X,$Y],
 		-command=>[\&MsgStats::plotmenu,$self,$tw,$event,$prefix,$label,$X,$Y],
 		-text=>'Plot',
-#		-relief=>'flat',
-#		-overrelief=>'raised',
 		-pady=>0,
 		-pady=>0,
 	)->grid(-row=>$$row,-column=>5,-sticky=>'ewns');
@@ -2575,13 +2989,25 @@ sub setstate {
 	$self->{ts}->{$newstate + $newdir} = $msg->{hdr};
 	$self->iat($newstate + $newdir, $msg->{hdr});
 	$self->iat($newstate + 20, $msg->{hdr});
-	$self->dur($oldstate + $olddir, $self->{ts}->{$oldstate + $olddir}, $msg->{hdr});
-	$self->dur($oldstate + 20, $self->{ts}->{$oldstate + $olddir}, $msg->{hdr});
+	$self->itv($oldstate + $olddir, $self->{ts}->{$oldstate + $olddir}, $msg->{hdr});
+	$self->itv($oldstate + 20, $self->{ts}->{$oldstate + $olddir}, $msg->{hdr});
+	#$self->dur($oldstate + $olddir, $self->{ts}->{$oldstate + $olddir}, $msg->{hdr});
+	#$self->dur($oldstate + 20, $self->{ts}->{$oldstate + $olddir}, $msg->{hdr});
 	$self->peg($newstate + $newdir, $msg->{hdr});
 	$self->peg($newstate + 20, $msg->{hdr});
 	delete $self->{ts}->{$oldstate + $olddir};
 	$self->{state} = $newstate;
 	$self->{dir} = $newdir;
+}
+
+#package Circuit
+sub itv {
+	my ($self,@args) = @_;
+	$self->Stats::itv(@args);
+	$self->{group}->itv(@args);
+	$self->{group}->{nodea}->itv(@args);
+	$self->{group}->{nodeb}->itv(@args);
+	$self->{group}->{network}->itv(@args);
 }
 
 #package Circuit
