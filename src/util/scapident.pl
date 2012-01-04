@@ -511,6 +511,70 @@ my %mtypes = (
 );
 
 # -------------------------------------
+package style;
+use strict;
+# -------------------------------------
+
+my %tframestyle = (
+	-relief=>'groove',
+	-borderwidth=>2,
+);
+my %tframepack = (
+	-expand=>1,
+	-fill=>'both',
+	-side=>'top',
+	-anchor=>'n',
+	-padx=>3,
+	-pady=>1,
+);
+my %labelright = (
+	-anchor=>'e',
+	-justify=>'right',
+	-relief=>'groove',
+	-borderwidth=>2,
+);
+my %labelcenter = (
+	-anchor=>'s',
+	-justify=>'center',
+	-relief=>'groove',
+	-borderwidth=>2,
+);
+my %labelgrid = (
+);
+my %entryinput = (
+	-background=>'white',
+	-exportselection=>1,
+);
+my %entryleft = (
+	%entryinput,
+	-state=>'readonly',
+	-relief=>'groove',
+	-borderwidth=>2,
+);
+my %entryright = (
+	%entryleft,
+	-justify=>'right',
+	-width=>8,
+);
+my %entrycenter = (
+	%entryleft,
+	-justify=>'center',
+);
+my %entrygrid = (
+);
+my %buttonleft = (
+	-anchor=>'w',
+	-justify=>'left',
+	-indicatoron=>1,
+	-state=>'disabled',
+);
+my %optionleft = (
+	-anchor=>'w',
+	-justify=>'left',
+	-indicatoron=>0,
+);
+
+# -------------------------------------
 package Logging;
 use strict;
 # -------------------------------------
@@ -715,70 +779,6 @@ sub iat {
 }
 
 # -------------------------------------
-package style;
-use strict;
-# -------------------------------------
-
-my %tframestyle = (
-	-relief=>'groove',
-	-borderwidth=>2,
-);
-my %tframepack = (
-	-expand=>1,
-	-fill=>'both',
-	-side=>'top',
-	-anchor=>'n',
-	-padx=>3,
-	-pady=>1,
-);
-my %labelright = (
-	-anchor=>'e',
-	-justify=>'right',
-	-relief=>'groove',
-	-borderwidth=>2,
-);
-my %labelcenter = (
-	-anchor=>'s',
-	-justify=>'center',
-	-relief=>'groove',
-	-borderwidth=>2,
-);
-my %labelgrid = (
-);
-my %entryinput = (
-	-background=>'white',
-	-exportselection=>1,
-);
-my %entryleft = (
-	%entryinput,
-	-state=>'readonly',
-	-relief=>'groove',
-	-borderwidth=>2,
-);
-my %entryright = (
-	%entryleft,
-	-justify=>'right',
-	-width=>8,
-);
-my %entrycenter = (
-	%entryleft,
-	-justify=>'center',
-);
-my %entrygrid = (
-);
-my %buttonleft = (
-	-anchor=>'w',
-	-justify=>'left',
-	-indicatoron=>1,
-	-state=>'disabled',
-);
-my %optionleft = (
-	-anchor=>'w',
-	-justify=>'left',
-	-indicatoron=>0,
-);
-
-# -------------------------------------
 package Stats;
 use strict;
 use vars qw(@ISA);
@@ -894,12 +894,12 @@ use strict;
 my %centerblack = ( -anchor=>'center', -fill=>'black', -justify=>'center' );
 my %rightblack = ( -anchor=>'e', -fill=>'black', -justify=>'right' );
 my %leftblack = ( -anchor=>'w', -fill=>'black', -justify=>'left' );
-my %blackline = ( -arrow=>'none', -capstyle=>'round', -fill=>'black', -joinstyle=>'round', -smooth=>0, -width=>0.5 );
-my %greyline = ( -arrow=>'none', -capstyle=>'round', -fill=>'grey', -joinstyle=>'round', -smooth=>0, -width=>0.5 );
-my %dashline = ( -arrow=>'none', -capstyle=>'round', -fill=>'grey', -joinstyle=>'round', -smooth=>0, -width=>0.5, -dash=>[4,3] );
-my %datacurve = ( -arrow=>'none', -capstyle=>'round', -fill=>'blue', -joinstyle=>'round', -smooth=>1, -width=>0.5 );
-my %dataline = ( -arrow=>'none', -capstyle=>'round', -fill=>'black', -joinstyle=>'round', -smooth=>0, -width=>1 );
-my %redcurve = ( -arrow=>'none', -capstyle=>'round', -fill=>'red', -joinstyle=>'round', -smooth=>1, -width=>0.5, -dash=>[4,3] );
+my %blackline = ( -arrow=>'none', -capstyle=>'round', -fill=>'black', -joinstyle=>'round', -smooth=>0, -width=>0.1 );
+my %greyline = ( -arrow=>'none', -capstyle=>'round', -fill=>'grey', -joinstyle=>'round', -smooth=>0, -width=>0.1 );
+my %dashline = ( -arrow=>'none', -capstyle=>'round', -fill=>'grey', -joinstyle=>'round', -smooth=>0, -width=>0.1, -dash=>[2,2] );
+my %datacurve = ( -arrow=>'none', -capstyle=>'round', -fill=>'blue', -joinstyle=>'round', -smooth=>1, -width=>0.2 );
+my %dataline = ( -arrow=>'none', -capstyle=>'round', -fill=>'black', -joinstyle=>'round', -smooth=>0, -width=>0.3 );
+my %redcurve = ( -arrow=>'none', -capstyle=>'round', -fill=>'red', -joinstyle=>'round', -smooth=>1, -width=>0.2, -dash=>[2,2] );
 
 my @dirlabels = ( 'I/C trunks', 'O/G trunks', 'All trunks');
 
@@ -2632,23 +2632,6 @@ sub cstat {
 }
 
 # -------------------------------------
-package CallCollector;
-use strict;
-# -------------------------------------
-
-sub init {
-	my ($self,@args) = @_;
-	$self->{calls} = [];
-	$self->{call} = undef;
-}
-
-sub pushcall {
-	my ($self,$call) = @_;
-	push @{$self->{calls}}, $call;
-	$self->{call} = undef;
-}
-
-# -------------------------------------
 package MsgCollector;
 use strict;
 # -------------------------------------
@@ -2679,6 +2662,188 @@ sub clearmsgs {
 sub msgcnt {
 	my $self = shift;
 	return scalar(@{$self->{msgs}});
+}
+
+sub msgs {
+	my ($self,$canvas,$X,$Y) = @_;
+	my ($self,$canvas,$X,$Y) = @_;
+	my ($tw,$w,$bmsg);
+	if ($tw = $self->{show}) {
+		if ($tw->state eq 'iconic') {
+			$tw->deiconify;
+		} else {
+			$tw->UnmapWindow;
+		}
+		$tw->MapWindow;
+		return;
+	}
+	my $title = $self->identify." Messages";
+	$tw = $canvas->toplevel->Toplevel(
+		-title=>$title,
+	);
+	$tw->group($canvas->toplevel);
+	#$tw->transient($canvas->toplevel);
+	$tw->iconimage('icon');
+	$tw->iconname($title);
+	#$tw->resizeable(0,0);
+	$tw->positionfrom('user');
+	#$tw->minsize(600,400);
+	$tw->geometry("+$X+$Y");
+	$tw->protocol('WM_DELETE_WINDOW', [sub {
+		my $self = shift;
+		my $tw = $self->{show};
+		delete $self->{show};
+		$tw->destroy;
+	},$self]);
+	$self->{show} = $tw;
+	$self->showmsgs($tw);
+	$tw->MapWindow;
+}
+
+sub showmsgs {
+	my ($self,$tw) = @_;
+	my $s = $tw->Scrolled('Spreadsheet',
+		-scrollbars=>'osoe',
+		-anchor=>'n',
+		-exportselection=>1,
+		-invertselected=>1,
+		-takefocus=>1,
+		-autoclear=>0,
+		-cache=>1,
+		-drawmode=>'compatible',
+		-flashmode=>1,
+		-multiline=>1,
+		-resizeborders=>'both',
+		-selectmode=>'extended',
+		-selecttitle=>0,
+		-selecttype=>'cell',
+		-colseparator=>';',
+		-colstretchmode=>'none',
+		-colwidth=>12,
+		-cols=>9,
+		-titlecols=>0,
+		#-maxwidth=>?, (800 pixels)
+		-rowseparator=>',',
+		-rowstretchmode=>'none',
+		-rows=>(scalar @{$self->{msgs}})+1,
+		-titlerows=>1,
+		#-maxheight=>?, (600 pixels)
+		-usecommand=>1,
+		#-validate=>1,
+		-command=>[\&MsgCollector::value,$self],
+		-variable=>$self->{array},
+		-wrap=>0,
+	)->pack(
+		-expand=>1,
+		-fill=>'both',
+		-side=>'top',
+		-anchor=>'n',
+	);
+}
+
+sub value {
+	my ($self,$set,$row,$col,$value) = @_;
+	return $self->header($set,$row,$col,$value) if $row == 0;
+	return undef if $row < 0;
+	my $msg;
+	unless ($msg = $self->{msgs}->[$row-1]) {
+		return undef;
+	}
+	if ($col == 0) {
+		return $row;
+	}
+	if ($col == 1) {
+		return sprintf('%.6f', $msg->{hdr}->{tv_sec} + $msg->{hdr}->{tv_usec}/1000000);
+	}
+	if ($col == 2) {
+		return 'FISU' if $msg->{li} == 0;
+		return 'LSSU' if $msg->{li} == 1;
+		return 'LSS2' if $msg->{li} == 2;
+		return 'MSU';
+	}
+	return '' if $msg->{li} < 3;
+	if ($col == 3) {
+		return '' unless exists $mtypes{$msg->{si}};
+		return "\U$mtypes{$msg->{si}}->{0x00}->[0]\E";
+	}
+	return main::pcstring($msg->{'opc'}) if $col == 4;
+	return main::pcstring($msg->{'dpc'}) if $col == 5;
+	return $msg->{sls} if $col == 6;
+	if ($col == 7) {
+		return '' unless exists $mtypes{$msg->{si}}->{$msg->{mt}};
+		return "\U$mtypes{$msg->{si}}->{$msg->{mt}}->[0]\E";
+	}
+	return '';
+}
+
+sub header {
+	my ($self,$set,$row,$col,$value) = @_;
+	return 'Msg No.' if $col == 0;
+	return 'Time'    if $col == 1;
+	return 'Type'    if $col == 2;
+	return 'Service' if $col == 3;
+	return 'OPC'     if $col == 4;
+	return 'DPC'	 if $col == 5;
+	return 'SLS'	 if $col == 6;
+	return 'MT'	 if $col == 7;
+	return 'Params'  if $col == 8;
+	return '';
+}
+
+# -------------------------------------
+package CallCollector;
+use strict;
+# -------------------------------------
+
+sub init {
+	my ($self,@args) = @_;
+	$self->{calls} = [];
+	$self->{call} = undef;
+}
+
+sub pushcall {
+	my ($self,$call) = @_;
+	push @{$self->{calls}}, $call;
+	$self->{call} = undef;
+}
+
+sub calls {
+	my ($self,$canvas,$X,$Y) = @_;
+	my ($tw,$w,$bmsg);
+	if ($tw = $self->{show}) {
+		if ($tw->state eq 'iconic') {
+			$tw->deiconify;
+		} else {
+			$tw->UnmapWindow;
+		}
+		$tw->MapWindow;
+		return;
+	}
+	my $title = $self->identify." Calls";
+	$tw = $canvas->toplevel->Toplevel(
+		-title=>$title,
+	);
+	$tw->group($canvas->toplevel);
+	#$tw->transient($canvas->toplevel);
+	$tw->iconimage('icon');
+	$tw->iconname($title);
+	#$tw->resizeable(0,0);
+	$tw->positionfrom('user');
+	#$tw->minsize(600,400);
+	$tw->geometry("+$X+$Y");
+	$tw->protocol('WM_DELETE_WINDOW', [sub {
+		my $self = shift;
+		my $tw = $self->{show};
+		delete $self->{show};
+		$tw->destroy;
+	},$self]);
+	$self->{show} = $tw;
+	$self->showcalls($tw);
+	$tw->MapWindow;
+}
+
+sub showcalls {
+	my ($self,$tw) = @_;
 }
 
 # -------------------------------------
@@ -2836,6 +3001,26 @@ sub getmenu {
 			-label=>'Call statistics...',
 			-underline=>0,
 			-state=>($self->{ciccnt} ? 'normal' : 'disabled'),
+		);
+	}
+	if (exists $self->{msgs}) {
+		my $n = scalar @{$self->{msgs}};
+		$m->add('command',
+			#-accelerator=>'e',
+			-command=>[\&MsgCollector::msgs, $self, $canvas, $X, $Y],
+			-label=>"Messages $n...",
+			-underline=>1,
+			-state=>($n ? 'normal' : 'disabled'),
+		);
+	}
+	if (exists $self->{calls}) {
+		my $n = scalar @{$self->{calls}};
+		$m->add('command',
+			#-accelerator=>'a',
+			-command=>[\&CallCollector::calls, $self, $canvas, $X, $Y],
+			-label=>"Calls $n...",
+			-underline=>1,
+			-state=>($n ? 'normal' : 'disabled'),
 		);
 	}
 }
