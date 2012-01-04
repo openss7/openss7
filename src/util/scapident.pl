@@ -2632,6 +2632,56 @@ sub cstat {
 }
 
 # -------------------------------------
+package CallCollector;
+use strict;
+# -------------------------------------
+
+sub init {
+	my ($self,@args) = @_;
+	$self->{calls} = [];
+	$self->{call} = undef;
+}
+
+sub pushcall {
+	my ($self,$call) = @_;
+	push @{$self->{calls}}, $call;
+	$self->{call} = undef;
+}
+
+# -------------------------------------
+package MsgCollector;
+use strict;
+# -------------------------------------
+
+sub init {
+	my ($self,@args) = @_;
+	$self->{msgs} = [];
+	$self->{msg} = undef;
+}
+
+sub pushmsg {
+	my ($self,$msg) = @_;
+	push @{$self->{msgs}}, $msg;
+	$self->{msg} = undef;
+}
+
+sub popmsg {
+	my $self = shift;
+	return pop @{$self->{msgs}};
+}
+
+sub clearmsgs {
+	my $self = shift;
+	$self->{msgs} = [];
+	$self->{msg} = undef;
+}
+
+sub msgcnt {
+	my $self = shift;
+	return scalar(@{$self->{msgs}});
+}
+
+# -------------------------------------
 package Properties;
 use strict;
 # -------------------------------------
@@ -2811,7 +2861,7 @@ sub button3 {
 package Relation;
 use strict;
 use vars qw(@ISA);
-@ISA = qw(MsgStats Logging Properties Status Clickable);
+@ISA = qw(MsgStats Logging Properties Status Clickable CallCollector MsgCollector);
 # -------------------------------------
 # A relation is an association between signalling points that communicate with
 # each other.  This object is used to track these interactions, primarily for
@@ -2846,6 +2896,8 @@ sub init {
 	$self->Logging::init(@args);
 	$self->Properties::init(@args);
 	$self->Status::init(@args);
+	$self->CallCollector::init(@args);
+	$self->MsgCollector::init(@args);
 	$self->{key} = "$nodea->{pc},$nodeb->{pc}";
 	$self->{state} = RS_AVAILABLE;
 	$self->{statetext} = 'Available';
@@ -2911,6 +2963,15 @@ sub get {
 	$relations{$key} = $self; # place reverse entry too
 	$self->init($relationno,$nodea,$nodeb,@args);
 	return $self;
+}
+
+#package Relation;
+sub pushcall {
+	my ($self,$call) = @_;
+	$self->CallCollector::pushcall($call);
+	$self->{nodea}->pushcall($call);
+	$self->{nodeb}->pushcall($call);
+	$self->{network}->pushcall($call);
 }
 
 #package Relation;
@@ -3005,7 +3066,7 @@ sub add_revs { # from nodeb to nodea
 }
 
 #package Relation;
-sub add {
+sub add_msg {
 	my ($self,$msg) = @_;
 	if ($msg->{si} == 5) {
 		my $circuit = Circuit->get($self,$msg->{cic});
@@ -3013,14 +3074,14 @@ sub add {
 	}
 	if ($self->{key} eq "$msg->{opc},$msg->{dpc}") {
 		$self->add_forw($msg);
-		$self->inc($msg,'0');
-		$self->{network}->inc($msg,'0');
+		$self->inc($msg,0);
+		$self->pushmsg($msg);
 		return;
 	}
 	if ($self->{key} eq "$msg->{dpc},$msg->{opc}") {
 		$self->add_revs($msg);
-		$self->inc($msg,'1');
-		$self->{network}->inc($msg,'1');
+		$self->inc($msg,1);
+		$self->pushmsg($msg);
 		return;
 	}
 	print STDERR "error key=$self->{key}, opc=$msg->{opc}, dpc=$msg->{dpc}\n";
@@ -3307,20 +3368,28 @@ sub log {
 # -------------------------------------
 package Call;
 use strict;
+use vars qw(@ISA);
+@ISA = qw(MsgCollector);
 # -------------------------------------
 
 #package Call;
-sub new {
-	my ($type,$circuit) = @_;
-	my $self = {};
-	bless $self,$type;
+sub init {
+	my ($self,$circuit,@args) = @_;
 	$self->{circuit} = $circuit;
-	$self->{msgs} = [];
 	$self->{state} = 0;
 	if ($circuit->{call}) {
-		push @{$circuit->{calls}}, $circuit->{call};
+		$circuit->pushcall($circuit->{call});
 	}
 	$circuit->{call} = $self;
+}
+
+#package Call;
+sub new {
+	my ($type,$circuit,@args) = @_;
+	my $self = {};
+	bless $self,$type;
+	$self->MsgCollector::init(@args);
+	$self->init(@args);
 	return $self;
 }
 
@@ -3333,14 +3402,14 @@ sub setstate {
 #package Call;
 sub add_msg {
 	my ($self,$msg,$state) = @_;
-	push @{$self->{msgs}}, $msg;
+	$self->pushmsg($msg);
 	$self->setstate($state);
 }
 
 #package Call;
 sub clear {
 	my ($self,$msg,$state) = @_;
-	$self->{msgs} = [];
+	$self->clearmsgs;
 	$self->setstate($state);
 }
 
@@ -3349,7 +3418,7 @@ sub clear {
 package Circuit;
 use strict;
 use vars qw(@ISA);
-@ISA = qw(MsgStats Logging Properties Status Clickable);
+@ISA = qw(MsgStats Logging Properties Status Clickable CallCollector MsgCollector);
 # -------------------------------------
 
 use constant {
@@ -3374,14 +3443,14 @@ sub get {
 	$self->Logging::init(@args);
 	$self->Properties::init(@args);
 	$self->Status::init(@args);
+	$self->CallCollector::init(@args);
+	$self->MsgCollector::init(@args);
 	$self->{dir} = 0;
 	$self->{cic} = $cic;
 	$self->{group} = $group;
 	$group->{cics}->{$cic} = $self;
 	$self->cnt;
 	$self->{active} = 0;
-	$self->{call} = undef;
-	$self->{calls} = [];
 	$self->{state} = CTS_UNINIT;
 	return $self;
 }
@@ -3482,12 +3551,18 @@ sub sim {
 }
 
 #package Circuit;
+sub pushcall {
+	my ($self,$call) = @_;
+	$self->CallCollector::pushcall($call);
+	$self->{group}->pushcall($call);
+}
+
+#package Circuit;
 sub end_of_call {
 	my ($self,$call,$msg,$dir) = @_;
 	$self->setstate($msg,CTS_IDLE,$dir);
 	$call->add_msg($msg,CTS_IDLE);
-	push @{$self->{calls}}, $call;
-	$self->{call} = undef
+	$self->pushcall($call);
 }
 
 #package Circuit;
@@ -3501,9 +3576,8 @@ sub clear_call {
 sub restart_call {
 	my ($self,$call,$msg,$dir) = @_;
 	$self->setstate($msg,CTS_IDLE,$dir);
-	if (@{$call->{msgs}}) {
-		push @{$self->{calls}}, $call;
-		$self->{call} = undef;
+	if ($self->msgcnt) {
+		$self->pushcall($call);
 	} else {
 		$call->clear($msg,CTS_IDLE);
 	}
@@ -3512,6 +3586,7 @@ sub restart_call {
 #package Circuit;
 sub add_msg {
 	my ($self,$msg) = @_;
+	$self->pushmsg($msg);
 	my $mt = $msg->{mt};
 	my $call;
 	my $dir = $self->{dir};
@@ -4105,7 +4180,7 @@ sub fillstatus {
 package Link;
 use strict;
 use vars qw(@ISA);
-@ISA = qw(MsgStats Logging Properties Status Clickable);
+@ISA = qw(MsgStats Logging Properties Status Clickable MsgCollector);
 # -------------------------------------
 
 use constant {
@@ -4121,6 +4196,7 @@ sub init {
 	$self->Logging::init(@args);
 	$self->Properties::init(@args);
 	$self->Status::init(@args);
+	$self->MsgCollector::init(@args);
 	$self->{nodea} = $nodea;
 	$self->{nodeb} = $nodeb;
 	$self->{slc} = $slc;
@@ -4167,9 +4243,11 @@ sub addPath {
 sub add {
 	my ($self,$msg) = @_;
 	if ($msg->{'opc'} == $self->{'nodea'}->{'pc'}) {
-		$self->inc($msg,'0');
+		$self->inc($msg,0);
+		$self->pushmsg($msg);
 	} else {
-		$self->inc($msg,'1');
+		$self->inc($msg,1);
+		$self->pushmsg($msg);
 	}
 }
 
@@ -4246,7 +4324,7 @@ sub fillstatus {
 package Route;
 use strict;
 use vars qw(@ISA);
-@ISA = qw(MsgStats Logging Properties Status Clickable);
+@ISA = qw(MsgStats Logging Properties Status Clickable MsgCollector);
 # -------------------------------------
 
 use constant {
@@ -4270,6 +4348,7 @@ sub new {
 	$self->Logging::init(@args);
 	$self->Properties::init(@args);
 	$self->Status::init(@args);
+	$self->MsgCollector::init(@args);
 	$self->{state} = RT_AVAILABLE;
 	$self->{statetext} = 'Available';
 	$self->{path} = $path;
@@ -4323,6 +4402,13 @@ sub DESTROY {
 	my $self = shift;
 	$main::canvas->traceVdelete(\$self->{state});
 	$main::canvas->traceVdelete(\$self->{color});
+}
+
+#package Route;
+sub add_msg {
+	my ($self,$msg,$dir) = @_;
+	$self->inc($msg,$dir);
+	$self->pushmsg($msg);
 }
 
 #package Route;
@@ -4460,7 +4546,7 @@ sub fillstatus {
 package SP;
 use strict;
 use vars qw(@ISA);
-@ISA = qw(MsgStats Logging Properties Status Clickable);
+@ISA = qw(MsgStats Logging Properties Status Clickable CallCollector MsgCollector);
 # -------------------------------------
 
 my %nodes;
@@ -4491,6 +4577,8 @@ sub init {
 	$self->Logging::init(@args);
 	$self->Properties::init(@args);
 	$self->Status::init(@args);
+	$self->CallCollector::init(@args);
+	$self->MsgCollector::init(@args);
 	$self->{pc} = $pc;
 	$self->{rt} = $path->{rt};
 	$self->{rttext} = $path->{rttext};
@@ -4678,7 +4766,8 @@ sub shortid {
 #package SP;
 sub add_orig {
 	my ($self,$msg) = @_;
-	$self->inc($msg,'0');
+	$self->inc($msg,0);
+	$self->pushmsg($msg);
 	my $si = $msg->{si};
 	my $mt = $msg->{mt};
 	if ($si == 5) {
@@ -4719,7 +4808,8 @@ sub add_orig {
 #package SP;
 sub add_term {
 	my ($self,$msg) = @_;
-	$self->inc($msg,'1');
+	$self->inc($msg,1);
+	$self->pushmsg($msg);
 	my $si = $msg->{si};
 	my $mt = $msg->{mt};
 	if ($si == 5) {
@@ -4754,6 +4844,16 @@ sub add_term {
 		}
 		$self->reanalyze if $self->{reanalyze};
 		return;
+	}
+}
+
+#package SP;
+sub add_msg {
+	my ($self,$msg,$dir) = @_;
+	if ($dir == 1) {
+		$self->add_term($msg);
+	} else {
+		$self->add_orig($msg);
 	}
 }
 
@@ -5319,7 +5419,7 @@ sub fillstatus {
 package Network;
 use strict;
 use vars qw(@ISA);
-@ISA = qw(MsgStats Logging Properties Status Clickable);
+@ISA = qw(MsgStats Logging Properties Status Clickable CallCollector MsgCollector);
 # -------------------------------------
 
 my $network;
@@ -5333,6 +5433,8 @@ sub new {
 	$self->Logging::init(@args);
 	$self->Properties::init(@args);
 	$self->Status::init(@args);
+	$self->CallCollector::init(@args);
+	$self->MsgCollector::init(@args);
 	$self->{ciccnt} = 0;
 	$self->{actcnt} = 0;
 	$self->{act1w} = 0;
@@ -5426,6 +5528,13 @@ sub regroupsps {
 }
 
 #package Network;
+sub add_msg {
+	my ($self,$msg) = @_;
+	$self->inc($msg,0); # for now
+	$self->pushmsg($msg);
+}
+
+#package Network;
 sub button3 {
 	my ($canvas,$self,$X,$Y,$x,$y) = @_;
 	my $cx = $canvas->canvasx($x,1);
@@ -5493,7 +5602,7 @@ sub fillstatus {
 package Path;
 use strict;
 use vars qw(@ISA);
-@ISA = qw(MsgStats Logging Properties Status Clickable);
+@ISA = qw(MsgStats Logging Properties Status Clickable MsgCollector);
 # -------------------------------------
 
 use constant {
@@ -5539,11 +5648,11 @@ sub init {
 	$self->Logging::init(@args);
 	$self->Properties::init(@args);
 	$self->Status::init(@args);
+	$self->MsgCollector::init(@args);
 	$self->{ppa} = $ppa;
 	$self->{slot} = (($ppa >> 0) & 0x1f);
 	$self->{span} = (($ppa >> 5) & 0x03);
 	$self->{card} = (($ppa >> 7) & 0x01);
-	$self->{msgs} = ();
 	$self->{ht} = HT_UNKNOWN;
 	$self->{httext} = 'Unknown';
 	$self->{pr} = MP_UNKNOWN;
@@ -5555,6 +5664,7 @@ sub init {
 	$self->{opcs} = {};
 	$self->{dpcs} = {};
 	$self->{routes} = {};
+	$self->{msgbuf} = [];
 	#print "Created new path ($self->{card}:$self->{span}:$self->{slot}).\n";
 	$self->{fill} = 'red';
 	my $cola = $self->{cola} = 0 - SP::COL_ADJ;
@@ -5667,12 +5777,12 @@ sub add {
 	my ($self,$msg,@args) = @_;
 	unless ($self->{detected}) {
 		if ($self->detecting) {
-			push @{$self->{msgs}}, $msg;
+			push @{$self->{msgbuf}}, $msg;
 			return;
 		}
 		$self->{detected} = 1;
-		push @{$self->{msgs}}, $msg;
-		while ($msg = pop @{$self->{msgs}}) {
+		push @{$self->{msgbuf}}, $msg;
+		while ($msg = pop @{$self->{msgbuf}}) {
 			$self->complete($msg);
 		}
 	} else {
@@ -5682,9 +5792,11 @@ sub add {
 #package Path;
 sub complete {
 	my ($self,$msg,@args) = @_;
-	$self->inc($msg,'0');
 	my ($nodeb,$nodea,$pc,$route);
 	my $network = $self->{network};
+	$self->inc($msg,0);
+	$self->pushmsg($msg);
+	$network->add_msg($msg);
 	if (exists $msg->{opc}) {
 		$pc = $msg->{opc};
 		if ($route = $self->{opcs}->{$pc}) {
@@ -5699,8 +5811,8 @@ sub complete {
 			$self->findalias($self->{nodeb},(values %{$self->{dpcs}})) if $self->{nodeb};
 			$network->regroupsps;
 		}
-		$route->inc($msg,'0');
-		$nodea->add_orig($msg);
+		$route->add_msg($msg,0);
+		$nodea->add_msg($msg,0);
 	}
 	if (exists $msg->{dpc}) {
 		$pc = $msg->{dpc};
@@ -5716,12 +5828,12 @@ sub complete {
 			$self->findalias($self->{nodeb},(values %{$self->{dpcs}})) if $self->{nodeb};
 			$network->regroupsps;
 		}
-		$route->inc($msg,'1');
-		$nodeb->add_term($msg);
+		$route->add_msg($msg,1);
+		$nodeb->add_msg($msg,1);
 	}
 	if (exists $msg->{dpc} && exists $msg->{opc}) {
 		my $rela = $network->getRelation($nodea,$nodeb);
-		$rela->add($msg);
+		$rela->add_msg($msg);
 		if ($msg->{si} == 1 || $msg->{si} == 2) {
 			if ($msg->{mt} == 0x11 || $msg->{mt} == 0x12) {
 				$self->bindpath($network,$nodea,$nodeb,$msg->{slc});
