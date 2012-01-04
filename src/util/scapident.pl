@@ -594,6 +594,7 @@ sub init {
 	$self->{interval} = $interval;
 	$self->{incs} = {};
 	$self->{pegs} = {};
+	$self->{sims} = {};
 	$self->{durs} = {};
 	$self->{iats} = {};
 	$self->{itvs} = {};
@@ -649,11 +650,47 @@ sub peg {
 }
 
 #package Counts;
+sub act {
+	my ($self) = @_;
+	$self->{actcnt} += 1;
+}
+
+#package Counts;
+sub cnt {
+	my ($self) = @_;
+	$self->{ciccnt} += 1;
+}
+
+#package Counts;
+sub sim {
+	my ($self,$oldevent,$newevent) = @_;
+	my ($new,$old);
+	if ($new = $self->{sims}->{$newevent}) {
+		$new->{curr}++;
+		$new->{hiwa} = $new->{curr} if $new->{curr} > $new->{hiwa};
+	} else {
+		$self->{sims}->{$newevent} = { curr=>1,hiwa=>1,lowa=>0 };
+	}
+	if ($old = $self->{sims}->{$oldevent}) {
+		$old->{curr}--;
+		$old->{lowa} = $old->{curr} if $old->{curr} < $old->{lowa} || $old->{lowa} <= 0;
+		if ($old->{curr} < 0) {
+			$old->{hiwa} += -$old->{curr};
+			$old->{lowa} += -$old->{curr};
+			$old->{curr} = 0;
+		}
+	} else {
+		$self->{sims}->{$oldevent} = { curr=>0,hiwa=>0,lowa=>0 };
+	}
+}
+
+#package Counts;
 sub itv {
 	my ($self,$event,$start,$end) = @_;
 	my $itv = { beg=>$start, end=>$end };
 	$self->{itvs}->{$event} = [] unless exists $self->{itvs}->{$event};
 	push @{$self->{itvs}->{$event}}, $itv;
+	$self->dur($event,$start,$end);
 }
 
 #package Counts;
@@ -802,6 +839,24 @@ sub peg {
 }
 
 #package Stats;
+sub act {
+	my ($self) = @_;
+	$self->Counts::act;
+}
+
+#package Stats;
+sub cnt {
+	my ($self) = @_;
+	$self->Counts::cnt;
+}
+
+#package Stats;
+sub sim {
+	my ($self,$oldevent,$newevent) = @_;
+	$self->Counts::sim($oldevent,$newevent);
+}
+
+#package Stats;
 sub itv {
 	my ($self,$event,$beg,$end) = @_;
 	$self->Counts::itv($event,$beg,$end);
@@ -839,12 +894,12 @@ use strict;
 my %centerblack = ( -anchor=>'center', -fill=>'black', -justify=>'center' );
 my %rightblack = ( -anchor=>'e', -fill=>'black', -justify=>'right' );
 my %leftblack = ( -anchor=>'w', -fill=>'black', -justify=>'left' );
-my %blackline = ( -arrow=>'none', -capstyle=>'round', -fill=>'black', -joinstyle=>'round', -smooth=>0, -width=>1 );
-my %greyline = ( -arrow=>'none', -capstyle=>'round', -fill=>'grey', -joinstyle=>'round', -smooth=>0, -width=>1 );
-my %dashline = ( -arrow=>'none', -capstyle=>'round', -fill=>'grey', -joinstyle=>'round', -smooth=>0, -width=>1, -dash=>[3,2] );
-my %blackcurve = ( -arrow=>'none', -capstyle=>'round', -fill=>'black', -joinstyle=>'round', -smooth=>1, -width=>1 );
-my %blueline = ( -arrow=>'none', -capstyle=>'round', -fill=>'blue', -joinstyle=>'round', -smooth=>0, -width=>2 );
-my %redcurve = ( -arrow=>'none', -capstyle=>'round', -fill=>'red', -joinstyle=>'round', -smooth=>1, -width=>2, -dash=>[3,2] );
+my %blackline = ( -arrow=>'none', -capstyle=>'round', -fill=>'black', -joinstyle=>'round', -smooth=>0, -width=>0.5 );
+my %greyline = ( -arrow=>'none', -capstyle=>'round', -fill=>'grey', -joinstyle=>'round', -smooth=>0, -width=>0.5 );
+my %dashline = ( -arrow=>'none', -capstyle=>'round', -fill=>'grey', -joinstyle=>'round', -smooth=>0, -width=>0.5, -dash=>[4,3] );
+my %datacurve = ( -arrow=>'none', -capstyle=>'round', -fill=>'blue', -joinstyle=>'round', -smooth=>1, -width=>0.5 );
+my %dataline = ( -arrow=>'none', -capstyle=>'round', -fill=>'black', -joinstyle=>'round', -smooth=>0, -width=>1 );
+my %redcurve = ( -arrow=>'none', -capstyle=>'round', -fill=>'red', -joinstyle=>'round', -smooth=>1, -width=>0.5, -dash=>[4,3] );
 
 my @dirlabels = ( 'I/C trunks', 'O/G trunks', 'All trunks');
 
@@ -899,21 +954,24 @@ sub new {
 	)->pack(
 		-expand=>1,
 		-fill=>'both',
-		-side=>'left',
-		-anchor=>'w',
+		-side=>'top',
+		-anchor=>'nw',
 	);
-	$c->createText($dimx/2,20,%centerblack,-text=>"\U$title\E");
+	$c->createText($dimx/2,20,%centerblack,-text=>"\U$title\E",-tags=>['title']);
 	my $dirname = $dirlabels[int($event/10)];
 	my $id = $stat->identify;
-	$c->createText($dimx/2,35,%centerblack,-text=>"$dirname for $id");
+	$c->createText($dimx/2,35,%centerblack,-text=>"$dirname for $id",-tags=>['subtitle']);
 	$self->createplot;
 	$c->raise('min','sub');
 	$c->raise('maj','min');
 	$c->raise('end','maj');
 	$c->raise('lab','end');
-	$c->raise('dat','lab');
-	$c->raise('smo','dat');
-	$c->raise('the','smo');
+	$c->raise('dat','lab') if $self->{normal};
+	$c->raise('smo','lab') if $self->{smooth};
+	$c->raise('the','lab') if $self->{theory};
+	$c->raise('smo','dat') if $self->{smooth} && $self->{normal};
+	$c->raise('the','dat') if $self->{theory} && $self->{normal};
+	$c->raise('the','smo') if $self->{smooth} && $self->{theory};
 	$c->update;
 	$c->CanvasBind('<Configure>',[sub{
 			my ($c,$self,$w,$h) = @_;
@@ -923,8 +981,128 @@ sub new {
 			$self->{dimx} = $w;
 			$self->{dimy} = $h;
 		}, $self, Tk::Ev('w'), Tk::Ev('h')]);
+	$c->CanvasBind('<ButtonPress-3>', [sub {
+		my ($c,@args) = @_;
+		Plot::popup(@args);
+	},$self,$me,Tk::Ev('X'),Tk::Ev('Y')]);
 	$tw->MapWindow;
 	return $self;
+}
+
+#package Plot;
+sub popup {
+	my ($self,$me,$X,$Y) = @_;
+	my $m = $self->{tw}->Menu(
+		-tearoff=>1,
+		-title=>'Plot Menu',
+	);
+	$m->add('command',
+		-label=>'Redraw',
+		-underline=>0,
+		-command=>[\&Plot::redraw,$self,$X,$Y],
+	);
+	$m->add('command',
+		-label=>'Export PS...',
+		-underline=>0,
+		-command=>[\&Plot::exportps,$self,$X,$Y],
+	);
+	$m->add('separator');
+	$m->add('radiobutton',
+		-value=>0,
+		-variable=>\$self->{xscale},
+		-label=>'X scale linear',
+	);
+	$m->add('radiobutton',
+		-value=>1,
+		-variable=>\$self->{xscale},
+		-label=>'X scale logarithmic',
+	);
+	$m->add('separator');
+	$m->add('radiobutton',
+		-value=>0,
+		-variable=>\$self->{yscale},
+		-label=>'Y scale linear',
+	);
+	$m->add('radiobutton',
+		-value=>1,
+		-variable=>\$self->{yscale},
+		-label=>'Y scale logarithmic',
+	);
+	$m->add('separator');
+	$m->add('checkbutton',
+		-onvalue=>1,
+		-offvalue=>0,
+		-variable=>\$self->{normal},
+		-label=>'Plot line data',
+	);
+	$m->add('checkbutton',
+		-onvalue=>1,
+		-offvalue=>0,
+		-variable=>\$self->{smooth},
+		-label=>'Plot smooth curve',
+	);
+	$m->add('checkbutton',
+		-onvalue=>1,
+		-offvalue=>0,
+		-variable=>\$self->{theory},
+		-label=>'Plot theoretical',
+	);
+	$m->add('separator');
+	$m->add('command',
+		-label=>'Close',
+		-underline=>0,
+		-command=>[sub {
+				my ($self,$me) = @_;
+				$self->{tw}->destroy;
+				delete $self->{tw};
+				$$me = undef;
+			},$self,$me,$X,$Y],
+	);
+	$m->Popup(
+		-popanchor=>'nw',
+		-popover=>'cursor',
+	);
+}
+
+#package Plot;
+sub exportps {
+	my ($self,$X,$Y) = @_;
+	my $tw = $self->{tw};
+	my $file = $tw->getSaveFile(
+		-defaultextension=>'.eps',
+		-initialdir=>'./testdata',
+		-initialfile=>'plot.eps',
+		-title=>'Export PS Dialog',
+	);
+	return unless $file;
+	my $c = $self->{canvas};
+	$c->postscript(
+		-colormode=>'color',
+		-file=>$file,
+		#-height=>$self->{dimy},
+		#-width=>$self->{dimx},
+		#-pageanchor=>'center',
+	);
+}
+
+#package Plot;
+sub redraw {
+	my ($self,$X,$Y) = @_;
+	my $c = $self->{canvas};
+	$c->delete('sub||min||maj||end||lab||dat||smo||the');
+	$self->createplot;
+	$c->raise('min','sub');
+	$c->raise('maj','min');
+	$c->raise('end','maj');
+	$c->raise('lab','end');
+	$c->raise('dat','lab');
+	$c->raise('dat','lab') if $self->{normal};
+	$c->raise('smo','lab') if $self->{smooth};
+	$c->raise('the','lab') if $self->{theory};
+	$c->raise('smo','dat') if $self->{smooth} && $self->{normal};
+	$c->raise('the','dat') if $self->{theory} && $self->{normal};
+	$c->raise('the','smo') if $self->{smooth} && $self->{theory};
+	$c->update;
 }
 
 #package Plot;
@@ -972,6 +1150,7 @@ sub createplot {
 #package Plot;
 sub setlogx {
 	my $self = shift;
+	$self->{xscale} = 1;
 	my $c = $self->{canvas};
 	my $label = $self->labelx;
 	my ($xmin,$xmax) = (50,$self->{dimx}-50);
@@ -1021,6 +1200,7 @@ sub setlogx {
 #package Plot;
 sub setlogy {
 	my $self = shift;
+	$self->{yscale} = 1;
 	my $c = $self->{canvas};
 	my $label = $self->labely;
 	my ($ymin,$ymax) = ($self->{dimy}-50,50);
@@ -1073,6 +1253,7 @@ sub setlogy {
 #package Plot;
 sub setlinx {
 	my $self = shift;
+	$self->{xscale} = 0;
 	my $c = $self->{canvas};
 	my $label = $self->labelx;
 	my ($xmin,$xmax) = (50,$self->{dimx}-50);
@@ -1114,35 +1295,38 @@ sub setlinx {
 #package Plot;
 sub setliny {
 	my $self = shift;
+	$self->{yscale} = 0;
 	my $c = $self->{canvas};
 	my $label = $self->labely;
 	my ($xmin,$xmax) = (50,$self->{dimx}-50);
 	my ($ymin,$ymax) = ($self->{dimy}-50,50);
 	my $max = $self->{maxy};
 	my $tot = $self->{toty};
-	my $scale = $self->{scaley} = ($ymin-$ymax)/$max;
-	my $tick = 10**(int(log($max)/log(10)));
+	my $scale = $self->{scaley} = ($ymin-$ymax)/$max; $scale *= $tot;
+	my $powr = log($max/$tot)/log(10);
+	my $tick = 10**(int($powr));
+	if (int($powr) == $powr) { $tick /= 10; }
 	my ($subw,$minw,$majw,$endw) = (1,4,6,6);
 	# sub-minor lines
 	foreach my $s ( 1, 2, 3, 4, 6, 7, 8, 9 ) {
-		for (my $y = $s*$tick/10; $y < $max; $y += $tick) {
+		for (my $y = $s*$tick/10; $y < $max/$tot; $y += $tick) {
 			my $Y = $ymin - $y * $scale;
 			$c->createLine($xmax,$Y,$xmin-$subw,$Y,%dashline,-tags=>['sub']);
 		}
 	}
 	# minor lines
-	for (my $y = $tick/2; $y < $max; $y += $tick) {
+	for (my $y = $tick/2; $y < $max/$tot; $y += $tick) {
 		my $Y = $ymin - $y * $scale;
 		$c->createLine($xmax,$Y,$xmin-$minw,$Y,%greyline,-tags=>['min']);
 	}
 	# major lines and labels
-	for (my $y = 0; $y < $max; $y += $tick) {
+	for (my $y = 0; $y < $max/$tot; $y += $tick) {
 		my $Y = $ymin - $y * $scale;
 		next if $Y > $ymin;
 		$c->createLine($xmax,$Y,$xmin-$majw,$Y,%blackline,-tags=>['maj']);
 		next if $Y > $ymin - 15 || $Y < $ymax + 15;
 		next if $label && ($Y > ($ymin+$ymax)/2-15 && $Y < ($ymin+$ymax)/2+15);
-		$c->createText($xmin-$endw-2,$Y,%rightblack,-text=>$y/$tot,-tags=>['lab']);
+		$c->createText($xmin-$endw-2,$Y,%rightblack,-text=>($y),-tags=>['lab']);
 	}
 	# min-y line and label
 	$c->createLine($xmax,$ymin,$xmin-$endw,$ymin,%blackline,-tags=>['end']);
@@ -1155,29 +1339,16 @@ sub setliny {
 }
 
 # -------------------------------------
-package PlotDist;
+package PlotPdf;
 use strict;
 use vars qw(@ISA);
 @ISA = qw(Plot);
 # -------------------------------------
 
-#package PlotDist;
-sub new {
-	my ($type,@args) = @_;
-	return Plot::new($type,@args);
-}
-
-# -------------------------------------
-package PlotPdf;
-use strict;
-use vars qw(@ISA);
-@ISA = qw(PlotDist);
-# -------------------------------------
-
 #package PlotPdf;
 sub new {
 	my ($type,@args) = @_;
-	return PlotDist::new($type,@args);
+	return Plot::new($type,@args);
 }
 
 #package PlotPdf;
@@ -1223,8 +1394,13 @@ sub labely { return 'p(x)'; }
 sub plotdata {
 	my $self = shift;
 	my $c = $self->{canvas};
-	$self->setlinx;
-	$self->setlogy;
+	$self->{normal} = 1 unless exists $self->{normal};
+	$self->{smooth} = 1 unless exists $self->{smooth};
+	$self->{theory} = 1 unless exists $self->{theory};
+	$self->{xscale} = 0 unless exists $self->{xscale};
+	if ($self->{xscale}) { $self->setlogx; } else { $self->setlinx; }
+	$self->{yscale} = 1 unless exists $self->{yscale};
+	if ($self->{yscale}) { $self->setlogy; } else { $self->setliny; }
 	my ($dimx,$dimy) = ($self->{dimx},$self->{dimy});
 	my ($xmin,$xmax) = (50,$dimx-50);
 	my ($ymin,$ymax) = ($dimy-50,50);
@@ -1237,38 +1413,44 @@ sub plotdata {
 	my @theory = ();
 	foreach my $k (sort {$a <=> $b} keys %{$self->{hash}}) {
 		my $x = $k;
+		next if $x <= 0 && $self->{xscale};
+		$x = log($x) if $self->{xscale};
 		my $X = $xmin + $x * $scalex;
 		next if $xmin > $X || $X > $xmax;
-		my $tx = $k*$intx;
-		my $ty = $lambda * exp(-$lambda*$tx) * $tot;
-		$ty = log($ty);
-		my $TY = $ymin - $ty * $scaley;
-		if ($ymax <= $TY && $TY <= $ymin) {
-			push @theory, ($X, $TY);
+		if ($self->{theory}) {
+			my $tx = $k*$intx;
+			my $ty = $lambda * exp(-$lambda*$tx) * $tot;
+			if ($self->{yscale} == 0 || $ty > 0) {
+				$ty = log($ty) if $self->{yscale};
+				my $TY = $ymin - $ty * $scaley;
+				if ($ymax <= $TY && $TY <= $ymin) {
+					push @theory, ($X, $TY);
+				}
+			}
 		}
-		my $v = $self->{hash}->{$k};
-		next if $v <= 0;
-		my $y = log($v);
+		my $y = $self->{hash}->{$k};
+		next if $y <= 0 && $self->{yscale};
+		$y = log($y) if $self->{yscale};
 		my $Y = $ymin - $y * $scaley;
 		next if $ymax > $Y || $Y > $ymin;
 		push @coords, ( $X, $Y );
 	}
-	$c->createLine(@coords, %blueline,  -tags=>['dat']);
-	$c->createLine(@coords, %blackcurve,-tags=>['smo']);
-	$c->createLine(@theory, %redcurve,  -tags=>['the']);
+	$c->createLine(@coords, %dataline,  -tags=>['dat']) if $self->{normal};
+	$c->createLine(@coords, %datacurve, -tags=>['smo']) if $self->{smooth};
+	$c->createLine(@theory, %redcurve,  -tags=>['the']) if $self->{theory};
 }
 
 # -------------------------------------
 package PlotCdf;
 use strict;
 use vars qw(@ISA);
-@ISA = qw(PlotDist);
+@ISA = qw(Plot);
 # -------------------------------------
 
 #package PlotCdf;
 sub new {
 	my ($type,@args) = @_;
-	return PlotDist::new($type,@args);
+	return Plot::new($type,@args);
 }
 
 #package PlotCdf;
@@ -1281,7 +1463,7 @@ sub adjustdata {
 	my $self = shift;
 	my $max = $self->{data}->{max};
 	my $int = 10**(int(log($max)/log(10))-2);
-	my ($maxx,$maxy) = (0,0);
+	my $maxx = 0;
 	my $h = {};
 	foreach my $v (@{$self->{data}->{vals}}) {
 		next if $v > $max;
@@ -1290,16 +1472,14 @@ sub adjustdata {
 		if ($v <= 0) { $v = 1; }
 		$h->{$v}++;
 		if ($v > $maxx) { $maxx = $v; }
-		if ($h->{$v} > $maxy) { $maxy = $h->{$v}; }
 	}
 
 	for (my $i = 0; $i <= $maxx; $i++) { unless (exists $h->{$i}) { $h->{$i} = 0; } }
 	my $t = 0;
 	for (my $i = 0; $i <= $maxx; $i++) { $t += $h->{$i}; $h->{$i} = $t; }
-	$maxy = $t;
 	$self->{intx} = $int;
 	$self->{maxx} = $maxx;
-	$self->{maxy} = $maxy;
+	$self->{maxy} = $t;
 	$self->{hash} = $h;
 	$self->{toty} = $t;
 	$self->{expv} = $self->{data}->{exv};
@@ -1312,8 +1492,13 @@ sub labely { return 'A(x)'; }
 sub plotdata {
 	my $self = shift;
 	my $c = $self->{canvas};
-	$self->setlogx;
-	$self->setliny;
+	$self->{normal} = 1 unless exists $self->{normal};
+	$self->{smooth} = 1 unless exists $self->{smooth};
+	$self->{theory} = 1 unless exists $self->{theory};
+	$self->{xscale} = 1 unless exists $self->{xscale};
+	if ($self->{xscale}) { $self->setlogx; } else { $self->setlinx; }
+	$self->{yscale} = 0 unless exists $self->{yscale};
+	if ($self->{yscale}) { $self->setlogy; } else { $self->setliny; }
 	my ($dimx,$dimy) = ($self->{dimx},$self->{dimy});
 	my ($xmin,$xmax) = (50,$dimx-50);
 	my ($ymin,$ymax) = ($dimy-50,50);
@@ -1325,25 +1510,32 @@ sub plotdata {
 	my @coords = ();
 	my @theory = ();
 	foreach my $k (sort {$a <=> $b} keys %{$self->{hash}}) {
-		next unless $k > 0;
-		my $x = log($k);
+		my $x = $k;
+		next if $x <= 0 && $self->{xscale};
+		$x = log($x) if $self->{xscale};
 		my $X = $xmin + $x * $scalex;
 		next if $xmin > $X || $X > $xmax;
-		my $tx = $k*$intx;
-		my $ty = (1 - exp(-$lambda*$tx)) * $tot;
-		my $TY = $ymin - $ty * $scaley;
-		if ($ymax <= $TY && $TY <= $ymin) {
-			push @theory, ($X, $TY);
+		if ($self->{theory}) {
+			my $tx = $k*$intx;
+			my $ty = (1 - exp(-$lambda*$tx)) * $tot;
+			if ($self->{yscale} == 0 || $ty > 0) {
+				$ty = log($ty) if $self->{yscale};
+				my $TY = $ymin - $ty * $scaley;
+				if ($ymax <= $TY && $TY <= $ymin) {
+					push @theory, ($X, $TY);
+				}
+			}
 		}
-		my $v = $self->{hash}->{$k};
-		my $y = $v;
+		my $y = $self->{hash}->{$k};
+		next if $y <= 0 && $self->{yscale};
+		$y = log($y) if $self->{yscale};
 		my $Y = $ymin - $y * $scaley;
 		next if $ymax > $Y || $Y > $ymin;
 		push @coords, ( $X, $Y );
 	}
-	$c->createLine(@coords, %blueline,  -tags=>['dat']);
-	$c->createLine(@coords, %blackcurve,-tags=>['smo']);
-	$c->createLine(@theory, %redcurve,  -tags=>['the']);
+	$c->createLine(@coords, %dataline,  -tags=>['dat']) if $self->{normal};
+	$c->createLine(@coords, %datacurve, -tags=>['smo']) if $self->{smooth};
+	$c->createLine(@theory, %redcurve,  -tags=>['the']) if $self->{theory};
 }
 
 # -------------------------------------
@@ -1389,6 +1581,9 @@ sub labely { return 'X[j+1]'; }
 sub plotdata {
 	my $self = shift;
 	my $c = $self->{canvas};
+	$self->{normal} = 1;
+	$self->{smooth} = 0;
+	$self->{theory} = 0;
 	$self->setlinx;
 	$self->setliny;
 	my ($dimx,$dimy) = ($self->{dimx},$self->{dimy});
@@ -1983,51 +2178,111 @@ sub plotmenu {
 }
 
 #package MsgStats;
+sub updatedur {
+	my ($index,$value,$op,$self,$dur,$event,$span) = @_;
+	if (ref $self eq 'Counts') {
+		$span = 300;
+	} else {
+		$span = $main::endtime->{tv_sec}  - $main::begtime->{tv_sec}
+		     + ($main::endtime->{tv_usec} - $main::begtime->{tv_usec})/1000000;
+	}
+	$$dur = sprintf("%12.2f", $self->{durs}->{$event} / $span);
+	return $value;
+}
+
+#package MsgStats;
 sub dircstat {
-	my ($self,$tw,$row,$span,$event,$prefix,$label) = @_;
-	my $p;
-	my $del = sprintf("%7.2f", $self->{durs}->{$event}/(($p = $self->{pegs}->{$event})?$p:1));
+	my ($self,$tw,$balloon,$row,$span,$event,$prefix,$label) = @_;
+	my ($p,$w,$bmsg);
+	$bmsg =
+"$prefix $label occupancy.\
+This is the total duration of time (in Erlangs) that\
+circuits have been in the $label state for the study\
+period.";
 	my $dur = sprintf("%12.2f", $self->{durs}->{$event} / $span);
-	$tw->Entry(%entryright,
+	$tw->traceVariable(\$self->{durs}->{$event},'w'=>[\&MsgStats::updatedur,$self,\$dur,$event,$span]);
+	$tw->traceVariable($main::endtime,'w'=>[\&MsgStats::updatedur,$self,\$dur,$event,$span]);
+	$w = $tw->Entry(%entryright,
 		-textvariable=>\$dur,
 	)->grid(-row=>$$row,-column=>2,-sticky=>'ewns');
-	$tw->Entry(%entryright,
+	$balloon->attach($w,-balloonmsg=>$bmsg);
+	$bmsg =
+"$prefix $label periods.
+This is the total count of the times that circuits\
+transitioned to the $label state in the study\
+period.";
+	$w = $tw->Entry(%entryright,
 		-textvariable=>\$self->{pegs}->{$event},
-		-validatecommand=>[sub{
-			my ($del,$dur,$self,$event,$row,$col,$old,$proposed,$index,@args) = @_;
-			my $p;
-			$$del = sprintf("%7.2f", $self->{durs}->{$event}/(($p = $self->{pegs}->{$event})?$p:1));
-			my $span;
-			if (ref $self eq 'Counts') {
-				$span = 300;
-			} else {
-				$span = $main::endtime->{tv_sec}  - $main::begtime->{tv_sec}
-				     + ($main::endtime->{tv_usec} - $main::begtime->{tv_usec})/1000000;
-			}
-			$$dur = sprintf("%12.2f", $self->{durs}->{$event}/$span);
-			return 1;
-		 },\$del,\$dur,$self,$event],
-		-validate=>'all',
 	)->grid(-row=>$$row,-column=>3,-sticky=>'ewns');
-	my $e = $tw->Entry(%entryright,
+	$balloon->attach($w,-balloonmsg=>$bmsg);
+	$bmsg =
+"$prefix $label duration.\
+This is the average duration (in seconds) that circuits\
+were in the $label state for the study period.";
+	my $del = sprintf("%7.2f", $self->{durs}->{$event}/(($p = $self->{pegs}->{$event})?$p:1));
+	$tw->traceVariable(\$self->{durs}->{$event},'w'=>[sub{
+		my ($index,$value,$op,$self,$event,$del,$p) = @_;
+		$$del = sprintf("%7.2f", $value/(($p = $self->{pegs}->{$event})?$p:1));
+		return $value;
+	},$self,$event,\$del]);
+	$tw->traceVariable(\$self->{pegs}->{$event},'w'=>[sub{
+		my ($index,$value,$op,$self,$event,$del,$p) = @_;
+		$$del = sprintf("%7.2f", $self->{durs}->{$event}/(($p = $value)?$p:1));
+		return $value;
+	},$self,$event,\$del]);
+	$w = $tw->Entry(%entryright,
 		-textvariable=>\$del,
 	)->grid(-row=>$$row,-column=>4,-sticky=>'ewns');
+	$balloon->attach($w,-balloonmsg=>$bmsg);
+	$bmsg =
+"$prefix $label pegs.\
+This is the current number of circuits that are in the\
+$label state.";
+	$w = $tw->Entry(%entryright,
+		-textvariable=>\$self->{sims}->{$event}->{curr},
+	)->grid(-row=>$$row,-column=>5,-sticky=>'ewns');
+	$balloon->attach($w,-balloonmsg=>$bmsg);
+	$bmsg =
+"$prefix $label high water mark.\
+This is the high water mark for the number of circuits\
+in the $label state for the study period.";
+	$w = $tw->Entry(%entryright,
+		-textvariable=>\$self->{sims}->{$event}->{hiwa},
+	)->grid(-row=>$$row,-column=>6,-sticky=>'ewns');
+	$balloon->attach($w,-balloonmsg=>$bmsg);
+	$bmsg =
+"$prefix $label low water mark.\
+This is the low (non-zero) water mark for the number of\
+circuits in the $label state for the study period.";
+	$w = $tw->Entry(%entryright,
+		-textvariable=>\$self->{sims}->{$event}->{lowa},
+	)->grid(-row=>$$row,-column=>7,-sticky=>'ewns');
+	$balloon->attach($w,-balloonmsg=>$bmsg);
 	my $X = $tw->toplevel->rootx;
 	my $Y = $tw->toplevel->rooty;
-	$tw->Button(
+	$bmsg =
+"$prefix $label plots.\
+Press this button (using left or right mouse button) to\
+generate plots of the study period for the $label state.";
+	$w = $tw->Button(
 		-command=>[\&MsgStats::plotmenu,$self,$tw,$event,$prefix,$label,$X,$Y],
 		-text=>'Plot',
 		-pady=>0,
 		-pady=>0,
-	)->grid(-row=>$$row,-column=>5,-sticky=>'ewns');
+	)->grid(-row=>$$row,-column=>8,-sticky=>'ewns');
+	$balloon->attach($w,-balloonmsg=>$bmsg);
+	$w->bind('<ButtonPress-3>',[sub {
+		my ($w,@args) = @_;
+		MsgStats::plotmenu(@args);
+	},$self,$tw,$event,$prefix,$label,Tk::Ev('X'),Tk::Ev('Y')]);
 	$$row++;
 }
 
 #package MsgStats;
 sub addcstat {
-	my ($self,$tw,$row,$span,$event,$label) = @_;
+	my ($self,$tw,$balloon,$row,$span,$event,$label) = @_;
 	for (my $dir = 0; $dir <= 20; $dir += 10) {
-		my $prefix;
+		my ($prefix,$w,$bmsg);
 		if ($dir > 10) {
 			$prefix = 'Total';
 		} else {
@@ -2039,15 +2294,293 @@ sub addcstat {
 				$prefix = ($dir == 0) ? 'Forward' : 'Reverse';
 			}
 		}
+		$bmsg = "$label counts.";
 		if ($dir == 20) {
-			$tw->Label(%labelright,
+			$w = $tw->Label(%labelright,
 				-text=>$label,
 			)->grid(-row=>$$row,-column=>0,-sticky=>'ewns');
+			$balloon->attach($w,-balloonmsg=>$bmsg,);
 		}
-		$tw->Label(%labelright,
+		$bmsg = "$prefix $label counts.";
+		$w = $tw->Label(%labelright,
 			-text=>$prefix,
 		)->grid(-row=>$$row,-column=>1,-sticky=>'ewns');
-		$self->dircstat($tw,$row,$span,$event+$dir,$prefix,$label);
+		$balloon->attach($w,-balloonmsg=>$bmsg,);
+		$self->dircstat($tw,$balloon,$row,$span,$event+$dir,$prefix,$label);
+	}
+}
+
+sub cctstatnew {
+	my ($self,$tw,$balloon)= @_;
+	my ($w,$bmsg);
+	my $span;
+	if (ref $self eq 'Counts') {
+		$span = 300;
+	} else {
+		$span = $main::endtime->{tv_sec}  - $main::begtime->{tv_sec}
+		     + ($main::endtime->{tv_usec} - $main::begtime->{tv_usec})/1000000;
+	}
+	my $f = $tw->TFrame(%tframestyle,
+		-label=>'Circuits:',
+	)->pack(%tframepack);
+	my $s = $f->Scrolled('Spreadsheet',
+		-scrollbars=>'osoe',
+		-anchor=>'n',
+		-exportselection=>1,
+		-invertselected=>1,
+		-takefocus=>1,
+		-autoclear=>0,
+		-cache=>1,
+		-drawmode=>'compatible',
+		-flashmode=>1,
+		-multiline=>1,
+		-resizeborders=>'both',
+		-selectmode=>'extended',
+		-selecttitle=>0,
+		-selecttype=>'cell',
+		-colseparator=>';',
+		-colstretchmode=>'none',
+		-colwidth=>12,
+		-cols=>9,
+		-titlecols=>2,
+		#-maxwidth=>?, (800 pixels)
+		-rowseparator=>',',
+		-rowstretchmode=>'none',
+		-rows=>22,
+		-titlerows=>1,
+		#-maxheight=>?, (600 pixels)
+		#-usecommand=>1,
+		#-validate=>1,
+		#-variable=>$self->{array},
+		-wrap=>0,
+	)->pack(
+		-expand=>1,
+		-fill=>'x',
+		-side=>'top',
+		-anchor=>'n',
+	);
+	my $m = $s->Subwidget('scrolled');
+	$m->bind('<Return>',
+		[sub {
+			my $w = shift;
+			my $index;
+			eval { $index = $w->index('active') };
+			$index = '' if $@ || $index eq '0,0';
+			if ($index) {
+				$w->MoveCell(1,0);
+				return;
+			}
+			eval { $index = $w->index('anchor') };
+			$index = '' if $@ || $index eq '0,0';
+			if ($index) {
+				if ($w->selectionIncludes('anchor')) {
+					$w->activate($index);
+					return;
+				}
+			}
+			$w->MoveCell(1,0);
+		}]);
+#	$m->configure(
+#		-browsecommand=>[\&MsgStats::browsecommand,$self,$m],
+#		-command=>[\&MsgStats::accesscommand,$self],
+#		-selectioncommand=>[\&MsgStats::selectioncommand,$self],
+#		-coltagcommand=>[\&MsgStats::coltagcommand,$self],
+#		-rowtagcommand=>[\&MsgStats::rowtagcommand,$self],
+#		-validatecommand=>[\&MsgStats::validatecommand,$self],
+#	);
+	$m->bind('<Shift-KP_Tab>', undef);
+	$m->bind('<<LeftTab>>', [sub { shift->MoveCell(0,-1); Tk->break; }]);
+	$m->selectionClear('all');
+	$m->selectionAnchor(0,0);
+	$m->selectionSet(0,0);
+	$m->actiave('0,0');
+}
+
+sub cctstat {
+	my ($self,$tw,$balloon)= @_;
+	my ($w,$bmsg);
+	my $row = 0;
+	my $span;
+	if (ref $self eq 'Counts') {
+		$span = 300;
+	} else {
+		$span = $main::endtime->{tv_sec}  - $main::begtime->{tv_sec}
+		     + ($main::endtime->{tv_usec} - $main::begtime->{tv_usec})/1000000;
+	}
+	my $f = $tw->TFrame(%tframestyle,
+		-label=>'Circuits:',
+	)->pack(%tframepack);
+	$bmsg =
+"Number of defined circuits.  Defined circuits may\
+or may not be active.  Unactive defined circuits\
+are circuits that were blocked for the entire study\
+period.";
+	$w = $f->Label(%labelright,
+		-text=>'Defined circuits:',
+	)->grid(-row=>$row,-column=>0,-sticky=>'ewns');
+	$balloon->attach($w,-balloonmsg=>$bmsg,);
+	$w = $f->Entry(%entryright,
+		-textvariable=>\$self->{ciccnt},
+	)->grid(-row=>$row,-column=>1,-sticky=>'ewns');
+	$balloon->attach($w,-balloonmsg=>$bmsg,);
+	$bmsg =
+"Number of active circuits.  Active circuits are\
+actively carrying calls or have actively carried\
+calls at some time within the study period.";
+	$w = $f->Label(%labelright,
+		-text=>'Active circuits:',
+	)->grid(-row=>$row,-column=>2,-sticky=>'ewns');
+	$balloon->attach($w,-balloonmsg=>$bmsg,);
+	$w = $f->Entry(%entryright,
+		-textvariable=>\$self->{actcnt},
+	)->grid(-row=>$row,-column=>3,-sticky=>'ewns');
+	$balloon->attach($w,-balloonmsg=>$bmsg,);
+	if (ref $self eq 'SSP' or ref $self eq 'SP') {
+		$bmsg = "Number of active outgoing circuits.";
+		$w = $f->Label(%labelright,
+			-text=>'Active O/G circuits:',
+		)->grid(-row=>$row,-column=>4,-sticky=>'ewns');
+		$balloon->attach($w,-balloonmsg=>$bmsg,);
+		$w = $f->Entry(%entryright,
+			-textvariable=>\$self->{actog},
+		)->grid(-row=>$row++,-column=>5,-sticky=>'ewns');
+		$balloon->attach($w,-balloonmsg=>$bmsg,);
+		$bmsg = "Number of active incoming circuits.";
+		$w = $f->Label(%labelright,
+			-text=>'Active I/C circuits:',
+		)->grid(-row=>$row,-column=>4,-sticky=>'ewns');
+		$balloon->attach($w,-balloonmsg=>$bmsg,);
+		$w = $f->Entry(%entryright,
+			-textvariable=>\$self->{actic},
+		)->grid(-row=>$row++,-column=>5,-sticky=>'ewns');
+		$balloon->attach($w,-balloonmsg=>$bmsg,);
+		$bmsg = "Number of active bothway circuits.";
+		$w = $f->Label(%labelright,
+			-text=>'Active 2/W circuits:',
+		)->grid(-row=>$row,-column=>4,-sticky=>'ewns');
+		$balloon->attach($w,-balloonmsg=>$bmsg,);
+		$w = $f->Entry(%entryright,
+			-textvariable=>\$self->{act2w},
+		)->grid(-row=>$row++,-column=>5,-sticky=>'ewns');
+		$balloon->attach($w,-balloonmsg=>$bmsg,);
+	}
+	if (ref $self eq 'Relation' or ref $self eq 'Linkset') {
+		$bmsg = "number of active circuits in the forward direction.";
+		$w = $f->Label(%labelright,
+			-text=>'Active forward circuits:',
+		)->grid(-row=>$row,-column=>4,-sticky=>'ewns');
+		$balloon->attach($w,-balloonmsg=>$bmsg,);
+		$w = $f->Entry(%entryright,
+			-textvariable=>\$self->{actforw},
+		)->grid(-row=>$row++,-column=>5,-sticky=>'ewns');
+		$balloon->attach($w,-balloonmsg=>$bmsg,);
+		$bmsg = "number of active circuits in the reverse direction.";
+		$w = $f->Label(%labelright,
+			-text=>'Active reverse circuits:',
+		)->grid(-row=>$row,-column=>4,-sticky=>'ewns');
+		$balloon->attach($w,-balloonmsg=>$bmsg,);
+		$w = $f->Entry(%entryright,
+			-textvariable=>\$self->{actrevs},
+		)->grid(-row=>$row++,-column=>5,-sticky=>'ewns');
+		$balloon->attach($w,-balloonmsg=>$bmsg,);
+		$bmsg = "number of active circuits in both directions.";
+		$w = $f->Label(%labelright,
+			-text=>'Active bothway circuits:',
+		)->grid(-row=>$row,-column=>4,-sticky=>'ewns');
+		$balloon->attach($w,-balloonmsg=>$bmsg,);
+		$w = $f->Entry(%entryright,
+			-textvariable=>\$self->{actboth},
+		)->grid(-row=>$row++,-column=>5,-sticky=>'ewns');
+		$balloon->attach($w,-balloonmsg=>$bmsg,);
+	}
+	if (ref $self eq 'Network') {
+		$bmsg = "number of active one-way circuits.";
+		$w = $f->Label(%labelright,
+			-text=>'Active one-way circuits:',
+		)->grid(-row=>$row,-column=>4,-sticky=>'ewns');
+		$balloon->attach($w,-balloonmsg=>$bmsg,);
+		$w = $f->Entry(%entryright,
+			-textvariable=>\$self->{act1w},
+		)->grid(-row=>$row++,-column=>5,-sticky=>'ewns');
+		$balloon->attach($w,-balloonmsg=>$bmsg,);
+		$bmsg = "number of active bothway circuits.";
+		$w = $f->Label(%labelright,
+			-text=>'Active bothway circuits:',
+		)->grid(-row=>$row,-column=>4,-sticky=>'ewns');
+		$balloon->attach($w,-balloonmsg=>$bmsg,);
+		$w = $f->Entry(%entryright,
+			-textvariable=>\$self->{act2w},
+		)->grid(-row=>$row++,-column=>5,-sticky=>'ewns');
+		$balloon->attach($w,-balloonmsg=>$bmsg,);
+	}
+	if ($self->{actcnt}) {
+		$w = $f = $tw->TFrame(%tframestyle,
+			-label=>'Call stats:',
+		)->pack(%tframepack);
+		$row = 0;
+		$bmsg =
+"Occupancy: this is the total duration of time (in\
+Erlangs) that the indicated circuits have been in\
+the corresponding state for the study period.";
+		$w = $f->Label(%labelcenter,
+			-text=>'Occupancy',
+		)->grid(-row=>$row,-column=>2,-sticky=>'ewns');
+		$balloon->attach($w,-balloonmsg=>$bmsg,);
+		$bmsg =
+"Periods: this is the total count of the times that\
+the circuit state transitioned to the indicated state\
+during the study period.";
+		$w = $f->Label(%labelcenter,
+			-text=>'Periods',
+		)->grid(-row=>$row,-column=>3,-sticky=>'ewns');
+		$balloon->attach($w,-balloonmsg=>$bmsg,);
+		$bmsg =
+"Duration: this is the average duration (in seconds)\
+that the indicated circuits have been in the\
+corresponding state for the study period.";
+		$w = $f->Label(%labelcenter,
+			-text=>'Duration',
+		)->grid(-row=>$row,-column=>4,-sticky=>'ewns');
+		$balloon->attach($w,-balloonmsg=>$bmsg,);
+		$bmsg =
+"Pegs: this is the current number of circuits that\
+are in the corresponding state.";
+		$w = $f->Label(%labelcenter,
+			-text=>'Pegs',
+		)->grid(-row=>$row,-column=>5,-sticky=>'ewns');
+		$balloon->attach($w,-balloonmsg=>$bmsg,);
+		$bmsg =
+"High Water Mark: this is the maximum number of\
+circuits that were simutaneously in the corresponding\
+state for the study period.";
+		$w = $f->Label(%labelcenter,
+			-text=>'Hi WM',
+		)->grid(-row=>$row,-column=>6,-sticky=>'ewns');
+		$balloon->attach($w,-balloonmsg=>$bmsg,);
+		$bmsg =
+"Low Water Mark: this is the minimum (non-zero)\
+number of circuits that were simutaneously in the\
+corresponding state for the study period.";
+		$w = $f->Label(%labelcenter,
+			-text=>'Lo WM',
+		)->grid(-row=>$row,-column=>7,-sticky=>'ewns');
+		$balloon->attach($w,-balloonmsg=>$bmsg,);
+		$bmsg =
+"Plots: press the corresponding button (using the\
+left or right mouse button) to generate plots of\
+holding and interarrival times for the corresponding\
+circuits and state for the study period.";
+		$w = $f->Label(%labelcenter,
+			-text=>'Distribution',
+		)->grid(-row=>$row++,-column=>8,-sticky=>'ewns');
+		$balloon->attach($w,-balloonmsg=>$bmsg,);
+		$self->addcstat($f,$balloon,\$row,$span,CTS_UNINIT,'Unused');
+		$self->addcstat($f,$balloon,\$row,$span,CTS_IDLE,'Idle');
+		$self->addcstat($f,$balloon,\$row,$span,CTS_WAIT_ACM,'Setup');
+		$self->addcstat($f,$balloon,\$row,$span,CTS_WAIT_ANM,'Alerting');
+		$self->addcstat($f,$balloon,\$row,$span,CTS_ANSWERED,'Connected');
+		$self->addcstat($f,$balloon,\$row,$span,CTS_SUSPENDED,'Suspended');
+		$self->addcstat($f,$balloon,\$row,$span,CTS_WAIT_RLC,'Releasing');
 	}
 }
 
@@ -2055,7 +2588,7 @@ sub addcstat {
 sub cstat {
 	my ($self,$canvas,$X,$Y) = @_;
 	my $row = 0;
-	my $tw;
+	my ($tw,$w,$bmsg);
 	if ($tw = $self->{cstat}) {
 		if ($tw->state eq 'iconic') {
 			$tw->deiconify;
@@ -2076,11 +2609,12 @@ sub cstat {
 		$tw->geometry("+$X+$Y");
 		$tw->protocol('WM_DELETE_WINDOW', [sub {
 			my $self = shift;
-			while (my ($k,$v) = each %{$self->{dist}}) {
+			while (my ($k,$v) = each %{$self->{plots}}) {
 				while (my ($l,$m) = each %{$v}) {
 					if ($m) {
 						delete $v->{$l};
-						$m->destroy;
+						$m->{tw}->destroy;
+						delete $m->{tw};
 					}
 				}
 			}
@@ -2090,106 +2624,8 @@ sub cstat {
 		},$self]);
 		$self->{cstat} = $tw;
 
-		my $span;
-		if (ref $self eq 'Counts') {
-			$span = 300;
-		} else {
-			$span = $main::endtime->{tv_sec}  - $main::begtime->{tv_sec}
-			     + ($main::endtime->{tv_usec} - $main::begtime->{tv_usec})/1000000;
-		}
-		my $f = $tw->TFrame(%tframestyle,
-			-label=>'Circuits:',
-		)->pack(%tframepack);
-		$f->Label(%labelright,
-			-text=>'Defined circuits:',
-		)->grid(-row=>$row,-column=>0,-sticky=>'ewns');
-		$f->Entry(%entryright,
-			-textvariable=>\$self->{ciccnt},
-		)->grid(-row=>$row,-column=>1,-sticky=>'ewns');
-		$f->Label(%labelright,
-			-text=>'Active circuits:',
-		)->grid(-row=>$row,-column=>2,-sticky=>'ewns');
-		$f->Entry(%entryright,
-			-textvariable=>\$self->{actcnt},
-		)->grid(-row=>$row,-column=>3,-sticky=>'ewns');
-		if (ref $self eq 'SSP' or ref $self eq 'SP') {
-			$f->Label(%labelright,
-				-text=>'Active O/G circuits:',
-			)->grid(-row=>$row,-column=>4,-sticky=>'ewns');
-			$f->Entry(%entryright,
-				-textvariable=>\$self->{actog},
-			)->grid(-row=>$row++,-column=>5,-sticky=>'ewns');
-			$f->Label(%labelright,
-				-text=>'Active I/C circuits:',
-			)->grid(-row=>$row,-column=>4,-sticky=>'ewns');
-			$f->Entry(%entryright,
-				-textvariable=>\$self->{actic},
-			)->grid(-row=>$row++,-column=>5,-sticky=>'ewns');
-			$f->Label(%labelright,
-				-text=>'Active 2/W circuits:',
-			)->grid(-row=>$row,-column=>4,-sticky=>'ewns');
-			$f->Entry(%entryright,
-				-textvariable=>\$self->{act2w},
-			)->grid(-row=>$row++,-column=>5,-sticky=>'ewns');
-		}
-		if (ref $self eq 'Relation' or ref $self eq 'Linkset') {
-			$f->Label(%labelright,
-				-text=>'Active forward circuits:',
-			)->grid(-row=>$row,-column=>4,-sticky=>'ewns');
-			$f->Entry(%entryright,
-				-textvariable=>\$self->{actforw},
-			)->grid(-row=>$row++,-column=>5,-sticky=>'ewns');
-			$f->Label(%labelright,
-				-text=>'Active reverse circuits:',
-			)->grid(-row=>$row,-column=>4,-sticky=>'ewns');
-			$f->Entry(%entryright,
-				-textvariable=>\$self->{actrevs},
-			)->grid(-row=>$row++,-column=>5,-sticky=>'ewns');
-			$f->Label(%labelright,
-				-text=>'Active bothway circuits:',
-			)->grid(-row=>$row,-column=>4,-sticky=>'ewns');
-			$f->Entry(%entryright,
-				-textvariable=>\$self->{actboth},
-			)->grid(-row=>$row++,-column=>5,-sticky=>'ewns');
-		}
-		if (ref $self eq 'Network') {
-			$f->Label(%labelright,
-				-text=>'Active one-way circuits:',
-			)->grid(-row=>$row,-column=>4,-sticky=>'ewns');
-			$f->Entry(%entryright,
-				-textvariable=>\$self->{act1w},
-			)->grid(-row=>$row++,-column=>5,-sticky=>'ewns');
-			$f->Label(%labelright,
-				-text=>'Active bothway circuits:',
-			)->grid(-row=>$row,-column=>4,-sticky=>'ewns');
-			$f->Entry(%entryright,
-				-textvariable=>\$self->{act2w},
-			)->grid(-row=>$row++,-column=>5,-sticky=>'ewns');
-		}
-		if ($self->{actcnt}) {
-			$f = $tw->TFrame(%tframestyle,
-				-label=>'Call stats:',
-			)->pack(%tframepack);
-			$row = 0;
-			$f->Label(%labelcenter,
-				-text=>'Occupancy',
-			)->grid(-row=>$row,-column=>2,-sticky=>'ewns');
-			$f->Label(%labelcenter,
-				-text=>'Periods',
-			)->grid(-row=>$row,-column=>3,-sticky=>'ewns');
-			$f->Label(%labelcenter,
-				-text=>'Duration',
-			)->grid(-row=>$row,-column=>4,-sticky=>'ewns');
-			$f->Label(%labelcenter,
-				-text=>'Distribution',
-			)->grid(-row=>$row++,-column=>5,-sticky=>'ewns');
-			$self->addcstat($f,\$row,$span,CTS_IDLE,'Idle');
-			$self->addcstat($f,\$row,$span,CTS_WAIT_ACM,'Setup');
-			$self->addcstat($f,\$row,$span,CTS_WAIT_ANM,'Ringing');
-			$self->addcstat($f,\$row,$span,CTS_ANSWERED,'Call');
-			$self->addcstat($f,\$row,$span,CTS_SUSPENDED,'Suspension');
-			$self->addcstat($f,\$row,$span,CTS_WAIT_RLC,'Release');
-		}
+		my $balloon = $tw->Balloon(-statusbar=>$::statusbar);
+		$self->cctstat($tw,$balloon);
 	}
 	$tw->update;
 	$tw->MapWindow;
@@ -2724,28 +3160,28 @@ sub getmenu {
 		-label=>'Links',
 		-state=>((keys %{$self->{links}})?'normal':'disabled'),
 	);
-	$mc = $m->Menu(
-		-tearoff=>1,
-		-title=>'Circuits Menu',
-	);
-	foreach my $cic (sort {$a <=> $b} keys %{$self->{cics}}) {
-		my $circuit;
-		$m3 = $mc->Menu(
-			-tearoff=>1,
-			-title=>"Circuit $cic Menu",
-		);
-		$circuit = $self->{cics}->{$cic};
-		$circuit->getmenu($m3,$canvas,$X,$Y) if $circuit;
-		$mc->add('cascade',
-			-menu=>$m3,
-			-label=>"Circuit $cic",
-		);
-	}
-	$m->add('cascade',
-		-menu=>$mc,
-		-label=>'Circuits',
-		-state=>((keys %{$self->{cics}})?'normal':'disabled'),
-	);
+#	$mc = $m->Menu(
+#		-tearoff=>1,
+#		-title=>'Circuits Menu',
+#	);
+#	foreach my $cic (sort {$a <=> $b} keys %{$self->{cics}}) {
+#		my $circuit;
+#		$m3 = $mc->Menu(
+#			-tearoff=>1,
+#			-title=>"Circuit $cic Menu",
+#		);
+#		$circuit = $self->{cics}->{$cic};
+#		$circuit->getmenu($m3,$canvas,$X,$Y) if $circuit;
+#		$mc->add('cascade',
+#			-menu=>$m3,
+#			-label=>"Circuit $cic",
+#		);
+#	}
+#	$m->add('cascade',
+#		-menu=>$mc,
+#		-label=>'Circuits',
+#		-state=>((keys %{$self->{cics}})?'normal':'disabled'),
+#	);
 }
 
 #package Relation;
@@ -2942,10 +3378,7 @@ sub get {
 	$self->{cic} = $cic;
 	$self->{group} = $group;
 	$group->{cics}->{$cic} = $self;
-	$group->{ciccnt} += 1;
-	$group->{nodea}->{ciccnt} += 1;
-	$group->{nodeb}->{ciccnt} += 1;
-	$group->{network}->{ciccnt} += 1;
+	$self->cnt;
 	$self->{active} = 0;
 	$self->{call} = undef;
 	$self->{calls} = [];
@@ -2958,41 +3391,19 @@ sub setstate {
 	my ($self,$msg,$newstate,$newdir) = @_;
 	return if $self->{state} == $newstate;
 	my $oldstate = $self->{state};
-	my $olddir = $self->{dir};
-	# There are several states that mean anything
-	# CTS_UNINIT
-	# CTS_IDLE - idle
-	# CTS_WAIT_ACM, CTS_WAIT_ANM - setup
-	# CTS_ANSWERED - call
-	# CTS_SUSPENDED - call or teardown
-	# CTS_WAIT_RLC - teardown
+	my $olddir   = $self->{dir};
 	if ($oldstate == CTS_UNINIT) {
-		$self->{group}->{actcnt} += 1;
-		$self->{group}->{nodea}->{actcnt} += 1;
-		$self->{group}->{nodeb}->{actcnt} += 1;
-		$self->{group}->{network}->{actcnt} += 1;
-		if ($newstate == CTS_WAIT_ACM) {
-			$oldstate = CTS_IDLE;
-		} elsif ($newstate == CTS_WAIT_ANM) {
-			$oldstate = CTS_WAIT_ACM;
-		} elsif ($newstate == CTS_ANSWERED) {
-			$oldstate = CTS_WAIT_ANM;
-		} elsif ($newstate == CTS_SUSPENDED) {
-			$oldstate = CTS_ANSWERED;
-		} elsif ($newstate == CTS_WAIT_RLC) {
-			$oldstate = CTS_SUSPENDED;
-		} elsif ($newstate == CTS_IDLE) {
-			$oldstate = CTS_WAIT_RLC;
-		}
-		$self->{ts}->{$oldstate} = $main::begtime;
+		$self->act;
+		$olddir = $newdir;
+		$self->peg($oldstate + $olddir, $msg->{hdr});
+		$self->peg($oldstate + 20, $msg->{hdr});
+		$self->{ts}->{$oldstate + $olddir} = $main::begtime;
 	}
 	$self->{ts}->{$newstate + $newdir} = $msg->{hdr};
-	$self->iat($newstate + $newdir, $msg->{hdr});
-	$self->iat($newstate + 20, $msg->{hdr});
+	$self->sim($oldstate + $olddir, $newstate + $newdir);
+	$self->sim($oldstate + 20     , $newstate + 20     );
 	$self->itv($oldstate + $olddir, $self->{ts}->{$oldstate + $olddir}, $msg->{hdr});
 	$self->itv($oldstate + 20, $self->{ts}->{$oldstate + $olddir}, $msg->{hdr});
-	#$self->dur($oldstate + $olddir, $self->{ts}->{$oldstate + $olddir}, $msg->{hdr});
-	#$self->dur($oldstate + 20, $self->{ts}->{$oldstate + $olddir}, $msg->{hdr});
 	$self->peg($newstate + $newdir, $msg->{hdr});
 	$self->peg($newstate + 20, $msg->{hdr});
 	delete $self->{ts}->{$oldstate + $olddir};
@@ -3038,6 +3449,36 @@ sub peg {
 	$self->{group}->{nodea}->peg(@args);
 	$self->{group}->{nodeb}->peg(@args);
 	$self->{group}->{network}->peg(@args);
+}
+
+#package Circuit;
+sub act {
+	my ($self,@args) = @_;
+	$self->Stats::act(@args);
+	$self->{group}->act(@args);
+	$self->{group}->{nodea}->act(@args);
+	$self->{group}->{nodeb}->act(@args);
+	$self->{group}->{network}->act(@args);
+}
+
+#package Circuit;
+sub cnt {
+	my ($self,@args) = @_;
+	$self->Stats::cnt(@args);
+	$self->{group}->cnt(@args);
+	$self->{group}->{nodea}->cnt(@args);
+	$self->{group}->{nodeb}->cnt(@args);
+	$self->{group}->{network}->cnt(@args);
+}
+
+#package Circuit;
+sub sim {
+	my ($self,@args) = @_;
+	$self->Stats::sim(@args);
+	$self->{group}->sim(@args);
+	$self->{group}->{nodea}->sim(@args);
+	$self->{group}->{nodeb}->sim(@args);
+	$self->{group}->{network}->sim(@args);
 }
 
 #package Circuit;
@@ -6922,7 +7363,6 @@ sub createmenubar {
 	$mi = $self->{FileMenu} = $mb->Menu(
 		-tearoff=>1,
 		-title=>'File Menu',
-		-title=>'normal',
 	);
 	$mi->add('command',
 		-label=>'New',
@@ -7138,9 +7578,7 @@ sub readmsg {
 		$msg->process($network);
 	} else {
 		Tk::Event::IO->fileevent($fh, 'readable' => '');
-		print STDERR "closing file\n";
 		Net::Pcap::pcap_close($pcap);
-		print STDERR "file closed\n";
 	}
 }
 
