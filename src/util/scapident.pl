@@ -2636,6 +2636,11 @@ package MsgCollector;
 use strict;
 # -------------------------------------
 
+use constant {
+	RT_UNKNOWN => 0,
+	RT_14BIT_PC => 4, # also RL length in octets
+	RT_24BIT_PC => 7  # also RL length in octets
+};
 sub init {
 	my ($self,@args) = @_;
 	$self->{msgs} = [];
@@ -2686,13 +2691,14 @@ sub msgs {
 	$tw->iconimage('icon');
 	$tw->iconname($title);
 	#$tw->resizeable(0,0);
-	$tw->positionfrom('user');
+	#$tw->positionfrom('user');
 	#$tw->minsize(600,400);
-	$tw->geometry("+$X+$Y");
+	#$tw->geometry("+$X+$Y");
 	$tw->protocol('WM_DELETE_WINDOW', [sub {
 		my $self = shift;
 		my $tw = $self->{show};
 		delete $self->{show};
+		$tw->traceVdelete(\$self->{row});
 		$tw->destroy;
 	},$self]);
 	$self->{show} = $tw;
@@ -2713,10 +2719,10 @@ sub showmsgs {
 		-drawmode=>'compatible',
 		-flashmode=>1,
 		-multiline=>1,
-		-resizeborders=>'both',
+		-resizeborders=>'none',
 		-selectmode=>'extended',
 		-selecttitle=>0,
-		-selecttype=>'cell',
+		-selecttype=>'row',
 		-colseparator=>';',
 		-colstretchmode=>'none',
 		-colwidth=>12,
@@ -2730,18 +2736,289 @@ sub showmsgs {
 		#-maxheight=>?, (600 pixels)
 		-usecommand=>1,
 		#-validate=>1,
-		-command=>[\&MsgCollector::value,$self],
+		-command=>[\&MsgCollector::access,$self],
+		#-selectioncommand=>[\&MsgCollector::select,$self],
+		#-browsecommand=>[\&MsgCollector::browse,$self],
 		-variable=>$self->{array},
 		-wrap=>0,
+		-width=>0,
+		-maxwidth=>$tw->screenwidth,
+		-state=>'disabled',
 	)->pack(
 		-expand=>1,
 		-fill=>'both',
 		-side=>'top',
 		-anchor=>'n',
 	);
+	my $tm = $self->{tm} = $s->Subwidget('scrolled');
+	$tm->colWidth(0,12);
+	$tm->colWidth(1,24);
+	$tm->colWidth(2,6);
+	$tm->colWidth(3,6);
+	$tm->colWidth(4,12);
+	$tm->colWidth(5,12);
+	$tm->colWidth(6,5);
+	$tm->colWidth(7,5);
+	$tm->colWidth(8,48);
+	$tm->bind('<ButtonRelease-1>',[sub{
+			my ($tm,$self,$x,$y,@args) = @_;
+			my $index = $tm->index("\@$x,$y");
+			my ($row,$col) = split(/,/,$index);
+			$tm->selectionClear('all');
+			if ($row > 0) {
+				$tm->selectionSet("\@$x,$y");
+				$self->{row} = $row;
+			}
+		},$self,Tk::Ev('x'),Tk::Ev('y')]);
+	$tm->bind('<Shift-4>',['xview','scroll',-1,'units']);
+	$tm->bind('<Shift-5>',['xview','scroll',1,'units']);
+	$tm->bind('<Button-6>',['xview','scroll',-1,'units']);
+	$tm->bind('<Button-7>',['xview','scroll',1,'units']);
+	$tm->bind('<4>',['yview','scroll',-1,'pages']);
+	$tm->bind('<5>',['yview','scroll',1,'pages']);
+	$tm->bind('<Up>',[sub{
+			my ($tm,$self) = @_;
+			my $row;
+			eval { $row = join(':',$tm->curselection) };
+			return if ($@);
+			$row=~s/,.*$//;
+			$self->{row} = $row if $row > 0;
+		},$self]);
+	$tm->bind('<Down>',[sub{
+			my ($tm,$self) = @_;
+			my $row;
+			eval { $row = join(':',$tm->curselection) };
+			return if ($@);
+			$row=~s/,.*$//;
+			$self->{row} = $row if $row > 0;
+		},$self]);
+	$tm->selectionSet('1,0');
+	$tm->selectionAnchor('0,0');
+	$self->{row} = 1;
+	$tw->Adjuster(
+		-side=>'top',
+		-widget=>$s,
+		-restore=>0,
+	)->pack(
+		-expand=>0,
+		-fill=>'x',
+		-side=>'top',
+		-anchor=>'n',
+	);
+	$self->{tree}->{0} = '-';
+	$self->{tree}->{1} = '-';
+	$self->{tree}->{2} = '-';
+	$self->{tree}->{3} = '-';
+	$self->{tree}->{4} = '-';
+	$s = $tw->Scrolled('HList',
+		-scrollbars=>'osoe',
+		-columns=>4,
+		#-browsecmd=>,
+		#-command=>,
+		-background=>'white',
+		-drawbranch=>1,
+		-header=>1,
+		-indent=>19,
+		-indicator=>1,
+		-indicatorcmd=>[sub{
+			my ($self,$entry,$action) = @_;
+			my $hl = $self->{hl};
+			if ($action eq '<Activate>') {
+				delete $hl->{armed};
+				if ($hl->indicator('cget', $entry, '-text') eq '+') {
+					foreach ($hl->info('children',$entry)) {
+						$hl->show('entry',$_);
+					}
+					$hl->indicator('configure', $entry, -text=>'-',);
+					$self->{tree}->{$entry} = '-';
+				} else {
+					foreach ($hl->info('children',$entry)) {
+						$hl->hide('entry',$_);
+					}
+					$hl->indicator('configure', $entry, -text=>'+',);
+					$self->{tree}->{$entry} = '+';
+				}
+			} elsif ($action eq '<Arm>') {
+				$hl->{armed} = $entry;
+			} elsif ($action eq '<Disarm>') {
+				delete $hl->{armed};
+			}
+		},$self],
+		-selectmode=>'browse',
+		-separator=>'.',
+		#-width=>,
+		-exportselection=>1,
+	)->pack(
+		-expand=>1,
+		-fill=>'both',
+		-side=>'top',
+		-anchor=>'n',
+	);
+	my $hl = $self->{hl} = $s->Subwidget('scrolled');
+	$hl->header('create', 0, -itemtype=>'text',-text=>'Level',);
+	$hl->header('create', 1, -itemtype=>'text',-text=>'Field',);
+	$hl->header('create', 2, -itemtype=>'text',-text=>'Values',);
+	$hl->header('create', 3, -itemtype=>'text',-text=>'Description',);
+	my $ro = $self->{ro} = $tw->ROText(
+		-background=>'white',
+		-wrap=>'word',
+		-height=>4,
+	)->pack(
+		-expand=>0,
+		-fill=>'both',
+		-side=>'top',
+		-anchor=>'s',
+	);
+	$ro->insert('0.0','Message bytes...');
+	$hl->configure(-font=>$ro->cget('-font'));
+	$tw->traceVariable(\$self->{row},'w'=>[\&MsgCollector::rowchange,$self]);
+	MsgCollector::rowchange(undef,1,'w',$self);
 }
 
-sub value {
+sub rotext {
+	my ($self,$msg) = @_;
+	my $ro = $self->{ro};
+	$ro->delete('0.0','end');
+	my @b = (unpack('C*', $msg->{dat}));
+	my ($i,$c,$line);
+	while (@b) {
+		for ($i = 0; ($i < 32) and @b; $i++) {
+			$line .= ' ';
+			$line .= ' ' unless $i & 0x7;
+			$line .= sprintf('%02X',shift @b);
+		}
+		$line .= "\n";
+	}
+	$ro->insert('0.0', $line);
+}
+
+sub makeentry {
+	my ($self,$hl,$beg,$end,$val,$name,$entry,$desc,$sub) = @_;
+	my @bytes = ();
+	my $bits = '';
+	my $value;
+	if ($sub) {
+		my $func = shift @{$sub};
+		$value = &$func(@{$sub});
+	} else {
+		$value = $val;
+	}
+	my $word = $val;
+	for (my $i = 0; $i < $beg; $i++) {
+		$bits = '-'.$bits;
+	}
+	for (my $i = $beg; $i <= $end; $i++) {
+		$bits = (($word & 0x1) ? '1' : '0') . $bits;
+		$word >>= 1;
+		if (($i & 0x7) == 0x7) {
+			push @bytes, " $bits";
+			$bits = '';
+		}
+	}
+	if (($end & 0x7) != 0x7) {
+		for (my $i = $end+1; ($i&0x7) != 0; $i++) {
+			$bits = '-'.$bits;
+		}
+	}
+	if (length($bits)) {
+		push @bytes, " $bits";
+	}
+	$bits = join("\n", @bytes);
+	my $parent = $entry;
+	$parent=~s/\.[^\.]*$//;
+	$hl->add($entry,-itemtype=>'text', -text=>$bits);
+	$hl->itemCreate($entry, 1, -itemtype=>'text', -text=>$name);
+	$hl->itemCreate($entry, 2, -itemtype=>'text', -text=>$value);
+	if (ref($desc) eq 'HASH') {
+		$hl->itemCreate($entry, 3, -itemtype=>'text', -text=>$desc->{$val});
+	} elsif (ref($desc) eq 'ARRAY') {
+		$hl->itemCreate($entry, 3, -itemtype=>'text', -text=>$desc->[$val]);
+	} else {
+		$hl->itemCreate($entry, 3, -itemtype=>'text', -text=>$desc);
+	}
+	$hl->hide('entry',$entry) if $self->{tree}->{$parent} eq '+';
+}
+
+sub hlist {
+	my ($self,$msg) = @_;
+	my $hl = $self->{hl};
+	$hl->delete('all');
+	$hl->add('0', -itemtype=>'text', -text=>'L2 Pseudoheader',);
+	$hl->indicator('create', '0', -itemtype=>'text', -text=>$self->{tree}->{0},);
+	$hl->add('1', -itemtype=>'text', -text=>'L2 Header',);
+	$hl->indicator('create', '1', -itemtype=>'text', -text=>$self->{tree}->{1},);
+	$self->makeentry($hl,0,0,$msg->{bib},'BIB','1.1','Backward Indicator Bit');
+	$self->makeentry($hl,1,7,$msg->{bsn},'BSN','1.2','Backward Sequence Number');
+	$self->makeentry($hl,0,0,$msg->{fib},'FIB','1.3','Forward Indicator Bit');
+	$self->makeentry($hl,1,7,$msg->{fsn},'FSN','1.4','Forward Sequence Number');
+	$self->makeentry($hl,0,5,$msg->{li},'LI','1.5','Length Indicator');
+	$self->makeentry($hl,6,7,$msg->{li0},'LI0','1.6','Spare Bits');
+	if ($msg->{li} > 3) {
+		$hl->add('2', -itemtype=>'text', -text=>'L3 Header',);
+		$hl->indicator('create', '2', -itemtype=>'text', -text=>$self->{tree}->{2},);
+		$self->makeentry($hl,0,1,$msg->{ni},'NI','2.1',{
+				0=>'Network Indicator: International',
+				1=>'Network Indicator: International (spare)',
+				2=>'Network Indicator: National',
+				3=>'Network Indicator: National (spare)',});
+
+		$self->makeentry($hl,2,3,$msg->{mp},'MP','2.2',{
+				0=>'Message Priority 0',
+				1=>'Message Priority 1',
+				2=>'Message Priority 2',
+				3=>'Message Priority 3',});
+		my ($desc,$mtyp);
+		if (exists $mtypes{$msg->{si}}) {
+			$mtyp = "\U$mtypes{$msg->{si}}->{0}->[0]\E";
+			$desc = "Service Indicator: $mtyp";
+		} else {
+			$mtyp = 'L4';
+			$desc = "Service Indicator: ($msg->{si}) Unknown.";
+		}
+		$self->makeentry($hl,4,7,$msg->{si},'SI','2.3',$desc,);
+		$self->makeentry($hl,0,23,$msg->{opc},'OPC','2.4','Originating Point Code',[\&main::pcstring,$msg->{opc}]);
+		$self->makeentry($hl,0,23,$msg->{dpc},'DPC','2.5','Destination Point Code',[\&main::pcstring,$msg->{dpc}]);
+		$self->makeentry($hl,0,7,$msg->{sls},'SLS','2.6','Signalling Link Selection');
+		$hl->add('3', -itemtype=>'text', -text=>"$mtyp Message",);
+		if (exists $mtypes{$msg->{si}}->{$msg->{mt}}) {
+			$desc = "Message Type: \U$mtypes{$msg->{si}}->{$msg->{mt}}->[0]\E";
+		} else {
+			$desc = "Message Type: ($msg->{mt}) Unknown.";
+		}
+		if ($msg->{si} == 0) {
+			$self->makeentry($hl,0,7,$msg->{mt},'MT','3.1',$desc,);
+		} elsif ($msg->{si} == 1 || $msg->{si} == 2) {
+			$self->makeentry($hl,0,7,$msg->{mt},'MT','3.1',$desc,);
+			if ($msg->{rt} == RT_24BIT_PC) {
+				$self->makeentry($hl,0,3,$msg->{slc},'SLC','3.2','Signalling Link Code');
+			} else {
+				$self->makeentry($hl,0,3,$msg->{slc},'SLC','3.2','Signalling Link Code');
+			}
+			$self->makeentry($hl,4,7,$msg->{dlen},'DLEN','3.3','Test Data Length');
+		} elsif ($msg->{si} == 3) {
+			$self->makeentry($hl,0,7,$msg->{mt},'MT','3.1',$desc,);
+			$hl->add('4', -itemtype=>'text', -text=>'Paramaters',);
+			$hl->indicator('create', '4', -itemtype=>'text', -text=>$self->{tree}->{4},);
+		} elsif ($msg->{si} == 5) {
+			$self->makeentry($hl,0,15,$msg->{cic},'CIC','3.1','Circuit Identification Code');
+			$self->makeentry($hl,0,7,$msg->{mt},'MT','3.2',$desc,);
+			$hl->add('4', -itemtype=>'text', -text=>'Paramaters',);
+			$hl->indicator('create', '4', -itemtype=>'text', -text=>$self->{tree}->{4},);
+		}
+		$hl->indicator('create', '3', -itemtype=>'text', -text=>$self->{tree}->{3},);
+	}
+}
+
+sub rowchange {
+	my ($ind,$val,$op,$self,$msg) = @_;
+	return $val if $op ne 'w';
+	return $val unless $msg = $self->{msgs}->[$val-1];
+	$self->rotext($msg);
+	$self->hlist($msg);
+	return $val;
+}
+
+sub access {
 	my ($self,$set,$row,$col,$value) = @_;
 	return $self->header($set,$row,$col,$value) if $row == 0;
 	return undef if $row < 0;
@@ -2772,6 +3049,11 @@ sub value {
 	if ($col == 7) {
 		return '' unless exists $mtypes{$msg->{si}}->{$msg->{mt}};
 		return "\U$mtypes{$msg->{si}}->{$msg->{mt}}->[0]\E";
+	}
+	if ($col == 8) {
+		if ($msg->{si} == 5) {
+			return "CIC = $msg->{cic}";
+		}
 	}
 	return '';
 }
@@ -5968,6 +6250,7 @@ sub add {
 		$self->{detected} = 1;
 		push @{$self->{msgbuf}}, $msg;
 		while ($msg = pop @{$self->{msgbuf}}) {
+			$msg->decode($self);
 			$self->complete($msg);
 		}
 	} else {
@@ -6391,20 +6674,22 @@ sub decode {
 		}
 		unless (exists $mtypes{$self->{si}}) {
 			print STDERR "no message type for si=$self->{si}\n";
-			return -1;
 		}
 		unless (exists $mtypes{$self->{si}}->{$self->{mt}}) {
 			print STDERR "no message type for si=$self->{si}, mt=$self->{mt}\n";
-			return -1;
 		}
 		if ($self->{si} == 1 || $self->{si} == 2) {
 			if ($path->{rt} == RT_14BIT_PC) {
 				$self->{slc} = $self->{sls};
+				$self->{dlen0} = $b[1] & 0x0f;
 			} else {
 				$self->{slc} = $b[1] & 0x0f;
 			}
 			$self->{dlen} = $b[1] >> 4;
 		}
+		$self->{ht} = $path->{ht};
+		$self->{pr} = $path->{pr};
+		$self->{rt} = $path->{rt};
 		$self->{mtp3decode} = 1;
 	}
 	return 1;
