@@ -126,6 +126,7 @@ require Tk::Toplevel;
 require Tk::Adjuster;
 require Tk::Dialog;
 require Tk::HList;
+require Tk::ItemStyle;
 require Tk::ROText;
 require Tk::NoteBook;
 require Tk::Pane;
@@ -2699,6 +2700,7 @@ sub msgs {
 		my $tw = $self->{show};
 		delete $self->{show};
 		$tw->traceVdelete(\$self->{row});
+		$tw->traceVdelete(\$self->{col});
 		$tw->destroy;
 	},$self]);
 	$self->{show} = $tw;
@@ -2751,6 +2753,9 @@ sub showmsgs {
 		-anchor=>'n',
 	);
 	my $tm = $self->{tm} = $s->Subwidget('scrolled');
+	$self->{list} = [];
+	print ref($self->{msgs})."\n";
+	@{$self->{list}} = @{$self->{msgs}};
 	$tm->colWidth(0,12);
 	$tm->colWidth(1,24);
 	$tm->colWidth(2,6);
@@ -2760,14 +2765,21 @@ sub showmsgs {
 	$tm->colWidth(6,5);
 	$tm->colWidth(7,5);
 	$tm->colWidth(8,48);
-	$tm->bind('<ButtonRelease-1>',[sub{
+	$tm->bind('<Button-1><ButtonRelease-1>',[sub{
 			my ($tm,$self,$x,$y,@args) = @_;
 			my $index = $tm->index("\@$x,$y");
 			my ($row,$col) = split(/,/,$index);
-			$tm->selectionClear('all');
-			if ($row > 0) {
-				$tm->selectionSet("\@$x,$y");
-				$self->{row} = $row;
+			if ($row == 0) {
+				$tm->selectionClear('all');
+				if (abs($self->{col}) == $col) {
+					$self->{col} = -$self->{col};
+				} else {
+					$self->{col} = $col;
+				}
+				Tk->break;
+			} else {
+				$tm->activate("\@$x,$y");
+				$self->{row} = $row if $self->{row} != $row;
 			}
 		},$self,Tk::Ev('x'),Tk::Ev('y')]);
 	$tm->bind('<Shift-4>',['xview','scroll',-1,'units']);
@@ -2795,6 +2807,7 @@ sub showmsgs {
 	$tm->selectionSet('1,0');
 	$tm->selectionAnchor('0,0');
 	$self->{row} = 1;
+	$self->{col} = 0;
 	$tw->Adjuster(
 		-side=>'top',
 		-widget=>$s,
@@ -2805,11 +2818,11 @@ sub showmsgs {
 		-side=>'top',
 		-anchor=>'n',
 	);
-	$self->{tree}->{0} = '-';
-	$self->{tree}->{1} = '-';
-	$self->{tree}->{2} = '-';
-	$self->{tree}->{3} = '-';
-	$self->{tree}->{4} = '-';
+	$self->{tree}->{0} = 'minus';
+	$self->{tree}->{1} = 'minus';
+	$self->{tree}->{2} = 'minus';
+	$self->{tree}->{3} = 'minus';
+	$self->{tree}->{4} = 'minus';
 	$s = $tw->Scrolled('HList',
 		-scrollbars=>'osoe',
 		-columns=>4,
@@ -2818,6 +2831,7 @@ sub showmsgs {
 		-background=>'white',
 		-drawbranch=>1,
 		-header=>1,
+		-itemtype=>'text',
 		-indent=>19,
 		-indicator=>1,
 		-indicatorcmd=>[sub{
@@ -2825,18 +2839,20 @@ sub showmsgs {
 			my $hl = $self->{hl};
 			if ($action eq '<Activate>') {
 				delete $hl->{armed};
-				if ($hl->indicator('cget', $entry, '-text') eq '+') {
-					foreach ($hl->info('children',$entry)) {
-						$hl->show('entry',$_);
+				if (exists $self->{tree}->{$entry}) {
+					if ($self->{tree}->{$entry} eq 'plus') {
+						foreach ($hl->info('children',$entry)) {
+							$hl->show('entry',$_);
+						}
+						$hl->indicator('configure', $entry, -image=>'minus',);
+						$self->{tree}->{$entry} = 'minus';
+					} else {
+						foreach ($hl->info('children',$entry)) {
+							$hl->hide('entry',$_);
+						}
+						$hl->indicator('configure', $entry, -image=>'plus',);
+						$self->{tree}->{$entry} = 'plus';
 					}
-					$hl->indicator('configure', $entry, -text=>'-',);
-					$self->{tree}->{$entry} = '-';
-				} else {
-					foreach ($hl->info('children',$entry)) {
-						$hl->hide('entry',$_);
-					}
-					$hl->indicator('configure', $entry, -text=>'+',);
-					$self->{tree}->{$entry} = '+';
 				}
 			} elsif ($action eq '<Arm>') {
 				$hl->{armed} = $entry;
@@ -2855,9 +2871,9 @@ sub showmsgs {
 		-anchor=>'n',
 	);
 	my $hl = $self->{hl} = $s->Subwidget('scrolled');
-	$hl->header('create', 0, -itemtype=>'text',-text=>'Level',);
-	$hl->header('create', 1, -itemtype=>'text',-text=>'Field',);
-	$hl->header('create', 2, -itemtype=>'text',-text=>'Values',);
+	$hl->header('create', 0, -itemtype=>'text',-text=>'Field',);
+	$hl->header('create', 1, -itemtype=>'text',-text=>'Bits',);
+	$hl->header('create', 2, -itemtype=>'text',-text=>'Value',);
 	$hl->header('create', 3, -itemtype=>'text',-text=>'Description',);
 	my $ro = $self->{ro} = $tw->ROText(
 		-background=>'white',
@@ -2870,8 +2886,14 @@ sub showmsgs {
 		-anchor=>'s',
 	);
 	$ro->insert('0.0','Message bytes...');
-	$hl->configure(-font=>$ro->cget('-font'));
+	my $font = $ro->cget('-font');
+	$hl->configure(-font=>$font);
+	$self->{fldstyle} = $hl->ItemStyle('text', -refwindow=>$hl, -pady=>0, -background=>'white', -font=>$font, -justify=>'right'); #, -anchor=>'e');
+	$self->{bitstyle} = $hl->ItemStyle('text', -refwindow=>$hl, -pady=>0, -background=>'white', -font=>$font, -justify=>'left'); #, -anchor=>'e');
+	$self->{valstyle} = $hl->ItemStyle('text', -refwindow=>$hl, -pady=>0, -background=>'white', -font=>$font, -justify=>'right'); #, -anchor=>'e');
+	$self->{desstyle} = $hl->ItemStyle('text', -refwindow=>$hl, -pady=>0, -background=>'white', -font=>$font, -justify=>'left'); #, -anchor=>'w');
 	$tw->traceVariable(\$self->{row},'w'=>[\&MsgCollector::rowchange,$self]);
+	$tw->traceVariable(\$self->{col},'w'=>[\&MsgCollector::colchange,$self]);
 	MsgCollector::rowchange(undef,1,'w',$self);
 }
 
@@ -2926,15 +2948,16 @@ sub makeentry {
 	$bits = join("\n", @bytes);
 	my $parent = $entry;
 	$parent=~s/\.[^\.]*$//;
-	$hl->add($entry,-itemtype=>'text', -text=>$bits);
-	$hl->itemCreate($entry, 1, -itemtype=>'text', -text=>$name);
-	$hl->itemCreate($entry, 2, -itemtype=>'text', -text=>$value);
+	$hl->add($entry,-itemtype=>'text', -text=>$name, -style=>$self->{fldstyle});
+	#$hl->indicator('create', $entry, -itemtype=>'image', -image=>'box');
+	$hl->itemCreate($entry, 1, -itemtype=>'text', -text=>$bits, -style=>$self->{bitstyle});
+	$hl->itemCreate($entry, 2, -itemtype=>'text', -text=>" $value", -style=>$self->{valstyle});
 	if (ref($desc) eq 'HASH') {
-		$hl->itemCreate($entry, 3, -itemtype=>'text', -text=>$desc->{$val});
+		$hl->itemCreate($entry, 3, -itemtype=>'text', -text=>" $desc->{$val}", -style=>$self->{desstyle});
 	} elsif (ref($desc) eq 'ARRAY') {
-		$hl->itemCreate($entry, 3, -itemtype=>'text', -text=>$desc->[$val]);
+		$hl->itemCreate($entry, 3, -itemtype=>'text', -text=>" $desc->[$val]", -style=>$self->{desstyle});
 	} else {
-		$hl->itemCreate($entry, 3, -itemtype=>'text', -text=>$desc);
+		$hl->itemCreate($entry, 3, -itemtype=>'text', -text=>" $desc", -style=>$self->{desstyle});
 	}
 	$hl->hide('entry',$entry) if $self->{tree}->{$parent} eq '+';
 }
@@ -2943,10 +2966,14 @@ sub hlist {
 	my ($self,$msg) = @_;
 	my $hl = $self->{hl};
 	$hl->delete('all');
-	$hl->add('0', -itemtype=>'text', -text=>'L2 Pseudoheader',);
-	$hl->indicator('create', '0', -itemtype=>'text', -text=>$self->{tree}->{0},);
-	$hl->add('1', -itemtype=>'text', -text=>'L2 Header',);
-	$hl->indicator('create', '1', -itemtype=>'text', -text=>$self->{tree}->{1},);
+	$hl->add('0', -itemtype=>'text', -text=>'L2',);
+	$hl->itemCreate('0', 1, -itemtype=>'text', -text=>' ********');
+	$hl->itemCreate('0', 3, -itemtype=>'text', -text=>' L2 Pseudoheader');
+	$hl->indicator('create', '0', -itemtype=>'image', -image=>$self->{tree}->{0},);
+	$hl->add('1', -itemtype=>'text', -text=>'L2',);
+	$hl->itemCreate('1', 1, -itemtype=>'text', -text=>' ********');
+	$hl->itemCreate('1', 3, -itemtype=>'text', -text=>' L2 Header');
+	$hl->indicator('create', '1', -itemtype=>'image', -image=>$self->{tree}->{1},);
 	$self->makeentry($hl,0,0,$msg->{bib},'BIB','1.1','Backward Indicator Bit');
 	$self->makeentry($hl,1,7,$msg->{bsn},'BSN','1.2','Backward Sequence Number');
 	$self->makeentry($hl,0,0,$msg->{fib},'FIB','1.3','Forward Indicator Bit');
@@ -2954,8 +2981,10 @@ sub hlist {
 	$self->makeentry($hl,0,5,$msg->{li},'LI','1.5','Length Indicator');
 	$self->makeentry($hl,6,7,$msg->{li0},'LI0','1.6','Spare Bits');
 	if ($msg->{li} > 3) {
-		$hl->add('2', -itemtype=>'text', -text=>'L3 Header',);
-		$hl->indicator('create', '2', -itemtype=>'text', -text=>$self->{tree}->{2},);
+		$hl->add('2', -itemtype=>'text', -text=>'L3',);
+		$hl->itemCreate('2', 1, -itemtype=>'text', -text=>' ********');
+		$hl->itemCreate('2', 3, -itemtype=>'text', -text=>' L3 Header');
+		$hl->indicator('create', '2', -itemtype=>'image', -image=>$self->{tree}->{2},);
 		$self->makeentry($hl,0,1,$msg->{ni},'NI','2.1',{
 				0=>'Network Indicator: International',
 				1=>'Network Indicator: International (spare)',
@@ -2976,10 +3005,12 @@ sub hlist {
 			$desc = "Service Indicator: ($msg->{si}) Unknown.";
 		}
 		$self->makeentry($hl,4,7,$msg->{si},'SI','2.3',$desc,);
-		$self->makeentry($hl,0,23,$msg->{opc},'OPC','2.4','Originating Point Code',[\&main::pcstring,$msg->{opc}]);
-		$self->makeentry($hl,0,23,$msg->{dpc},'DPC','2.5','Destination Point Code',[\&main::pcstring,$msg->{dpc}]);
+		$self->makeentry($hl,0,23,$msg->{opc},"\nOPC\n",'2.4',"Originating Point Code",[\&main::pcstring,$msg->{opc}]);
+		$self->makeentry($hl,0,23,$msg->{dpc},"\nDPC\n",'2.5',"Destination Point Code",[\&main::pcstring,$msg->{dpc}]);
 		$self->makeentry($hl,0,7,$msg->{sls},'SLS','2.6','Signalling Link Selection');
-		$hl->add('3', -itemtype=>'text', -text=>"$mtyp Message",);
+		$hl->add('3', -itemtype=>'text', -text=>$mtyp);
+		$hl->itemCreate('3', 1, -itemtype=>'text', -text=>' ********');
+		$hl->itemCreate('3', 3, -itemtype=>'text', -text=>" $mtyp Message");
 		if (exists $mtypes{$msg->{si}}->{$msg->{mt}}) {
 			$desc = "Message Type: \U$mtypes{$msg->{si}}->{$msg->{mt}}->[0]\E";
 		} else {
@@ -2997,24 +3028,191 @@ sub hlist {
 			$self->makeentry($hl,4,7,$msg->{dlen},'DLEN','3.3','Test Data Length');
 		} elsif ($msg->{si} == 3) {
 			$self->makeentry($hl,0,7,$msg->{mt},'MT','3.1',$desc,);
-			$hl->add('4', -itemtype=>'text', -text=>'Paramaters',);
-			$hl->indicator('create', '4', -itemtype=>'text', -text=>$self->{tree}->{4},);
+			$hl->add('4', -itemtype=>'text', -text=>'L5',);
+			$hl->itemCreate('4', 1, -itemtype=>'text', -text=>' ********');
+			$hl->itemCreate('4', 3, -itemtype=>'text', -text=>' Parameters');
+			$hl->indicator('create', '4', -itemtype=>'image', -image=>$self->{tree}->{4},);
 		} elsif ($msg->{si} == 5) {
-			$self->makeentry($hl,0,15,$msg->{cic},'CIC','3.1','Circuit Identification Code');
+			$self->makeentry($hl,0,15,$msg->{cic},"CIC\n",'3.1','Circuit Identification Code');
 			$self->makeentry($hl,0,7,$msg->{mt},'MT','3.2',$desc,);
-			$hl->add('4', -itemtype=>'text', -text=>'Paramaters',);
-			$hl->indicator('create', '4', -itemtype=>'text', -text=>$self->{tree}->{4},);
+			$hl->add('4', -itemtype=>'text', -text=>'L5',);
+			$hl->itemCreate('4', 1, -itemtype=>'text', -text=>' ********');
+			$hl->itemCreate('4', 3, -itemtype=>'text', -text=>' Parameters');
+			$hl->indicator('create', '4', -itemtype=>'image', -image=>$self->{tree}->{4},);
 		}
-		$hl->indicator('create', '3', -itemtype=>'text', -text=>$self->{tree}->{3},);
+		$hl->indicator('create', '3', -itemtype=>'image', -image=>$self->{tree}->{3},);
 	}
 }
 
 sub rowchange {
 	my ($ind,$val,$op,$self,$msg) = @_;
 	return $val if $op ne 'w';
-	return $val unless $msg = $self->{msgs}->[$val-1];
+	return $val unless $msg = $self->{list}->[$val-1];
 	$self->rotext($msg);
 	$self->hlist($msg);
+	return $val;
+}
+
+sub colchange {
+	my ($ind,$val,$op,$self) = @_;
+	return $val if $op ne 'w';
+	return $val unless -8 <= $val && $val <= 8;
+	print ref($self->{msgs})."\n";
+	if ($val == 0) {
+		@{$self->{list}} = @{$self->{msgs}};
+	} elsif (abs($val) == 1) {
+		if ($val > 0) {
+			@{$self->{list}} = sort {
+				return -1 if $a->{hdr}->{tv_sec} < $b->{hdr}->{tv_sec};
+				return  1 if $a->{hdr}->{tv_sec} > $b->{hdr}->{tv_sec};
+				return -1 if $a->{hdr}->{tv_usec} < $b->{hdr}->{tv_usec};
+				return  1 if $a->{hdr}->{tv_usec} > $b->{hdr}->{tv_usec};
+				return  0;
+			} @{$self->{msgs}};
+		} else {
+			@{$self->{list}} = sort {
+				return  1 if $a->{hdr}->{tv_sec} < $b->{hdr}->{tv_sec};
+				return -1 if $a->{hdr}->{tv_sec} > $b->{hdr}->{tv_sec};
+				return  1 if $a->{hdr}->{tv_usec} < $b->{hdr}->{tv_usec};
+				return -1 if $a->{hdr}->{tv_usec} > $b->{hdr}->{tv_usec};
+				return  0;
+			} @{$self->{msgs}};
+		}
+	} elsif (abs($val) == 2) {
+		if ($val > 0) {
+			@{$self->{list}} = sort {
+				return -1 if $a->{li} < 3 && $a->{li} < $b->{li};
+				return  1 if $b->{li} < 3 && $b->{li} < $a->{li};
+				return  0;
+			} @{$self->{msgs}};
+		} else {
+			@{$self->{list}} = sort {
+				return  1 if $a->{li} < 3 && $a->{li} < $b->{li};
+				return -1 if $b->{li} < 3 && $b->{li} < $a->{li};
+				return  0;
+			} @{$self->{msgs}};
+		}
+	} elsif (abs($val) == 3) {
+		if ($val > 0) {
+			@{$self->{list}} = sort {
+				return -1 if $a->{li} < 3 && $a->{li} < $b->{li};
+				return  1 if $b->{li} < 3 && $b->{li} < $a->{li};
+				return  0 if $a->{li} < 3 || $b->{li} < 3;
+				return $a->{si} <=> $b->{si};
+			} @{$self->{msgs}};
+		} else {
+			@{$self->{list}} = sort {
+				return  1 if $a->{li} < 3 && $a->{li} < $b->{li};
+				return -1 if $b->{li} < 3 && $b->{li} < $a->{li};
+				return  0 if $a->{li} < 3 || $b->{li} < 3;
+				return 0-($a->{si} <=> $b->{si});
+			} @{$self->{msgs}};
+		}
+	} elsif (abs($val) == 4) {
+		if ($val > 0) {
+			@{$self->{list}} = sort {
+				return -1 if $a->{li} < 3 && $a->{li} < $b->{li};
+				return  1 if $b->{li} < 3 && $b->{li} < $a->{li};
+				return  0 if $a->{li} < 3 || $b->{li} < 3;
+				return -1 if $a->{si} < $b->{si};
+				return  1 if $a->{si} > $b->{si};
+				return $a->{opc} <=> $b->{opc};
+			} @{$self->{msgs}};
+		} else {
+			@{$self->{list}} = sort {
+				return  1 if $a->{li} < 3 && $a->{li} < $b->{li};
+				return -1 if $b->{li} < 3 && $b->{li} < $a->{li};
+				return  0 if $a->{li} < 3 || $b->{li} < 3;
+				return  1 if $a->{si} < $b->{si};
+				return -1 if $a->{si} > $b->{si};
+				return 0-($a->{opc} <=> $b->{opc});
+			} @{$self->{msgs}};
+		}
+	} elsif (abs($val) == 5) {
+		if ($val > 0) {
+			@{$self->{list}} = sort {
+				return -1 if $a->{li} < 3 && $a->{li} < $b->{li};
+				return  1 if $b->{li} < 3 && $b->{li} < $a->{li};
+				return  0 if $a->{li} < 3 || $b->{li} < 3;
+				return -1 if $a->{si} < $b->{si};
+				return  1 if $a->{si} > $b->{si};
+				return $a->{dpc} <=> $b->{dpc};
+			} @{$self->{msgs}};
+		} else {
+			@{$self->{list}} = sort {
+				return  1 if $a->{li} < 3 && $a->{li} < $b->{li};
+				return -1 if $b->{li} < 3 && $b->{li} < $a->{li};
+				return  0 if $a->{li} < 3 || $b->{li} < 3;
+				return  1 if $a->{si} < $b->{si};
+				return -1 if $a->{si} > $b->{si};
+				return 0-($a->{dpc} <=> $b->{dpc});
+			} @{$self->{msgs}};
+		}
+	} elsif (abs($val) == 6) {
+		if ($val > 0) {
+			@{$self->{list}} = sort {
+				return -1 if $a->{li} < 3 && $a->{li} < $b->{li};
+				return  1 if $b->{li} < 3 && $b->{li} < $a->{li};
+				return  0 if $a->{li} < 3 || $b->{li} < 3;
+				return -1 if $a->{si} < $b->{si};
+				return  1 if $a->{si} > $b->{si};
+				return $a->{sls} <=> $b->{sls};
+			} @{$self->{msgs}};
+		} else {
+			@{$self->{list}} = sort {
+				return  1 if $a->{li} < 3 && $a->{li} < $b->{li};
+				return -1 if $b->{li} < 3 && $b->{li} < $a->{li};
+				return  0 if $a->{li} < 3 || $b->{li} < 3;
+				return  1 if $a->{si} < $b->{si};
+				return -1 if $a->{si} > $b->{si};
+				return 0-($a->{sls} <=> $b->{sls});
+			} @{$self->{msgs}};
+		}
+	} elsif (abs($val) == 7) {
+		if ($val > 0) {
+			@{$self->{list}} = sort {
+				return -1 if $a->{li} < 3 && $a->{li} < $b->{li};
+				return  1 if $b->{li} < 3 && $b->{li} < $a->{li};
+				return  0 if $a->{li} < 3 || $b->{li} < 3;
+				return -1 if $a->{si} < $b->{si};
+				return  1 if $a->{si} > $b->{si};
+				return $a->{mt} <=> $b->{mt};
+			} @{$self->{msgs}};
+		} else {
+			@{$self->{list}} = sort {
+				return  1 if $a->{li} < 3 && $a->{li} < $b->{li};
+				return -1 if $b->{li} < 3 && $b->{li} < $a->{li};
+				return  0 if $a->{li} < 3 || $b->{li} < 3;
+				return  1 if $a->{si} < $b->{si};
+				return -1 if $a->{si} > $b->{si};
+				return 0-($a->{mt} <=> $b->{mt});
+			} @{$self->{msgs}};
+		}
+	} elsif (abs($val) == 8) {
+		if ($val > 0) {
+			@{$self->{list}} = sort {
+				return -1 if $a->{li} < 3 && $a->{li} < $b->{li};
+				return  1 if $b->{li} < 3 && $b->{li} < $a->{li};
+				return  0 if $a->{li} < 3 || $b->{li} < 3;
+				return -1 if $a->{si} < $b->{si};
+				return  1 if $a->{si} > $b->{si};
+				return $a->{cic} <=> $b->{cic};
+			} @{$self->{msgs}};
+		} else {
+			@{$self->{list}} = sort {
+				return  1 if $a->{li} < 3 && $a->{li} < $b->{li};
+				return -1 if $b->{li} < 3 && $b->{li} < $a->{li};
+				return  0 if $a->{li} < 3 || $b->{li} < 3;
+				return  1 if $a->{si} < $b->{si};
+				return -1 if $a->{si} > $b->{si};
+				return 0-($a->{cic} <=> $b->{cic});
+			} @{$self->{msgs}};
+		}
+	}
+	my $tm = $self->{tm};
+	$tm->configure(-rows=>scalar(@{$self->{list}}));
+	$tm->clearCache;
+	print "sorting changed to $val\n";
 	return $val;
 }
 
@@ -3023,7 +3221,7 @@ sub access {
 	return $self->header($set,$row,$col,$value) if $row == 0;
 	return undef if $row < 0;
 	my $msg;
-	unless ($msg = $self->{msgs}->[$row-1]) {
+	unless ($msg = $self->{list}->[$row-1]) {
 		return undef;
 	}
 	if ($col == 0) {
@@ -7096,6 +7294,78 @@ package MyPixmaps;
 use strict;
 # -------------------------------------
 
+my $plusImage = <<EOF;
+/* XPM */
+static char * mini_plus_xpm[] = {
+"16 14 4 1",
+" 	c None",
+"a	c black",
+"b	c white",
+"c	c gray50",
+"                ",
+"                ",
+"  aaaaaaaaaaa   ",
+"  a         ab  ",
+"  a         ab  ",
+"  a    a    ab  ",
+"  a    a    ab  ",
+"  a  aaaaa  aaaa",
+"  a    a    abbb",
+"  a    a    ab  ",
+"  a         ab  ",
+"  a         ab  ",
+"  aaaaaaaaaaab  ",
+"   bbbbbbbbbbb  "};
+EOF
+
+my $minusImage = <<EOF;
+/* XPM */
+static char * mini_minus_xpm[] = {
+"16 14 4 1",
+" 	c None",
+"a	c black",
+"b	c white",
+"c	c gray50",
+"                ",
+"                ",
+"  aaaaaaaaaaa   ",
+"  a         ab  ",
+"  a         ab  ",
+"  a         ab  ",
+"  a         ab  ",
+"  a  aaaaa  aaaa",
+"  a         abbb",
+"  a         ab  ",
+"  a         ab  ",
+"  a         ab  ",
+"  aaaaaaaaaaab  ",
+"   bbbbbbbbbbb  "};
+EOF
+
+my $boxImage = <<EOF;
+/* XPM */
+static char * mini_box_xpm[] = {
+"16 14 4 1",
+" 	c None",
+"a	c black",
+"b	c white",
+"c	c gray50",
+"       ab       ",
+"       ab       ",
+"  aaaaaaaaaaa   ",
+"  a         ab  ",
+"  a         ab  ",
+"  a         ab  ",
+"  a         ab  ",
+"  a         aaaa",
+"  a         abbb",
+"  a         ab  ",
+"  a         ab  ",
+"  a         ab  ",
+"  aaaaaaaaaaab  ",
+"   bbbbbbbbbbb  "};
+EOF
+
 my $iconImage = <<EOF;
 /* XPM */
 static char * streams_icon_xpm[] = {
@@ -7638,6 +7908,9 @@ EOF
 sub assign {
 	my $mw = shift;
 	$mw->Pixmap('icon', -data=>$iconImage,);
+	$mw->Pixmap('plus', -data=>$plusImage,);
+	$mw->Pixmap('minus', -data=>$minusImage,);
+	$mw->Pixmap('box', -data=>$boxImage,);
 }
 
 # -------------------------------------
