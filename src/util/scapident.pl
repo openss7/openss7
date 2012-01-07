@@ -2642,36 +2642,36 @@ use constant {
 	RT_14BIT_PC => 4, # also RL length in octets
 	RT_24BIT_PC => 7  # also RL length in octets
 };
+#package MsgCollector;
 sub init {
 	my ($self,@args) = @_;
 	$self->{msgs} = [];
 	$self->{msg} = undef;
 }
-
+#package MsgCollector;
 sub pushmsg {
 	my ($self,$msg) = @_;
 	push @{$self->{msgs}}, $msg;
 	$self->{msg} = undef;
 }
-
+#package MsgCollector;
 sub popmsg {
 	my $self = shift;
 	return pop @{$self->{msgs}};
 }
-
+#package MsgCollector;
 sub clearmsgs {
 	my $self = shift;
 	$self->{msgs} = [];
 	$self->{msg} = undef;
 }
-
+#package MsgCollector;
 sub msgcnt {
 	my $self = shift;
 	return scalar(@{$self->{msgs}});
 }
-
+#package MsgCollector;
 sub msgs {
-	my ($self,$canvas,$X,$Y) = @_;
 	my ($self,$canvas,$X,$Y) = @_;
 	my ($tw,$w,$bmsg);
 	if ($tw = $self->{show}) {
@@ -2687,7 +2687,7 @@ sub msgs {
 	$tw = $canvas->toplevel->Toplevel(
 		-title=>$title,
 	);
-	$tw->group($canvas->toplevel);
+	#$tw->group($canvas->toplevel);
 	#$tw->transient($canvas->toplevel);
 	$tw->iconimage('icon');
 	$tw->iconname($title);
@@ -2699,15 +2699,13 @@ sub msgs {
 		my $self = shift;
 		my $tw = $self->{show};
 		delete $self->{show};
-		$tw->traceVdelete(\$self->{row});
-		$tw->traceVdelete(\$self->{col});
 		$tw->destroy;
 	},$self]);
 	$self->{show} = $tw;
 	$self->showmsgs($tw);
 	$tw->MapWindow;
 }
-
+#package MsgCollector;
 sub showmsgs {
 	my ($self,$tw) = @_;
 	my $s = $tw->Scrolled('Spreadsheet',
@@ -2754,7 +2752,6 @@ sub showmsgs {
 	);
 	my $tm = $self->{tm} = $s->Subwidget('scrolled');
 	$self->{list} = [];
-	print ref($self->{msgs})."\n";
 	@{$self->{list}} = @{$self->{msgs}};
 	$tm->colWidth(0,12);
 	$tm->colWidth(1,24);
@@ -2765,6 +2762,25 @@ sub showmsgs {
 	$tm->colWidth(6,5);
 	$tm->colWidth(7,5);
 	$tm->colWidth(8,48);
+	$tm->bind('<Button-3>',[sub{
+			my ($tm,$self,$x,$y) = @_;
+			my $row = $tm->index("\@$x,$y",'row');
+			my $msg;
+			return unless $msg = $self->{list}->[$row-1];
+			my $m = $tm->Menu(
+				-tearoff=>0,
+				-title=>'Message Menu',
+			);
+			$m->add('command',
+				-label=>'Decode',
+				-underline=>0,
+				-command=>[\&Message::showmsg,$msg,$tm],
+			);
+			$m->Popup(
+				-popanchor=>'nw',
+				-popover=>'cursor',
+			);
+		},$self,Tk::Ev('x'),Tk::Ev('y')]);
 	$tm->bind('<Button-1><ButtonRelease-1>',[sub{
 			my ($tm,$self,$x,$y,@args) = @_;
 			my $index = $tm->index("\@$x,$y");
@@ -2776,10 +2792,14 @@ sub showmsgs {
 				} else {
 					$self->{col} = $col;
 				}
+				$self->colchange;
 				Tk->break;
 			} else {
 				$tm->activate("\@$x,$y");
-				$self->{row} = $row if $self->{row} != $row;
+				if ($row > 0 and $self->{row} != $row) {
+					$self->{row} = $row;
+					$self->rowchange;
+				}
 			}
 		},$self,Tk::Ev('x'),Tk::Ev('y')]);
 	$tm->bind('<Shift-4>',['xview','scroll',-1,'units']);
@@ -2788,21 +2808,16 @@ sub showmsgs {
 	$tm->bind('<Button-7>',['xview','scroll',1,'units']);
 	$tm->bind('<4>',['yview','scroll',-1,'pages']);
 	$tm->bind('<5>',['yview','scroll',1,'pages']);
-	$tm->bind('<Up>',[sub{
+	$tm->bind('<Up><Down>',[sub{
 			my ($tm,$self) = @_;
 			my $row;
 			eval { $row = join(':',$tm->curselection) };
 			return if ($@);
 			$row=~s/,.*$//;
-			$self->{row} = $row if $row > 0;
-		},$self]);
-	$tm->bind('<Down>',[sub{
-			my ($tm,$self) = @_;
-			my $row;
-			eval { $row = join(':',$tm->curselection) };
-			return if ($@);
-			$row=~s/,.*$//;
-			$self->{row} = $row if $row > 0;
+			if ($row > 0 and $self->{row} != $row) {
+				$self->{row} = $row;
+				$self->rowchange;
+			}
 		},$self]);
 	$tm->selectionSet('1,0');
 	$tm->selectionAnchor('0,0');
@@ -2830,9 +2845,9 @@ sub showmsgs {
 		#-command=>,
 		-background=>'white',
 		-drawbranch=>1,
-		-header=>1,
+		-header=>0,
 		-itemtype=>'text',
-		-indent=>19,
+		-indent=>18,
 		-indicator=>1,
 		-indicatorcmd=>[sub{
 			my ($self,$entry,$action) = @_;
@@ -2871,10 +2886,10 @@ sub showmsgs {
 		-anchor=>'n',
 	);
 	my $hl = $self->{hl} = $s->Subwidget('scrolled');
-	$hl->header('create', 0, -itemtype=>'text',-text=>'Field',);
-	$hl->header('create', 1, -itemtype=>'text',-text=>'Bits',);
-	$hl->header('create', 2, -itemtype=>'text',-text=>'Value',);
-	$hl->header('create', 3, -itemtype=>'text',-text=>'Description',);
+	#$hl->header('create', 0, -itemtype=>'text',-text=>'Field',);
+	#$hl->header('create', 1, -itemtype=>'text',-text=>'Bits',);
+	#$hl->header('create', 2, -itemtype=>'text',-text=>'Value',);
+	#$hl->header('create', 3, -itemtype=>'text',-text=>'Description',);
 	my $ro = $self->{ro} = $tw->ROText(
 		-background=>'white',
 		-wrap=>'word',
@@ -2892,176 +2907,24 @@ sub showmsgs {
 	$self->{bitstyle} = $hl->ItemStyle('text', -refwindow=>$hl, -pady=>0, -background=>'white', -font=>$font, -justify=>'left'); #, -anchor=>'e');
 	$self->{valstyle} = $hl->ItemStyle('text', -refwindow=>$hl, -pady=>0, -background=>'white', -font=>$font, -justify=>'right'); #, -anchor=>'e');
 	$self->{desstyle} = $hl->ItemStyle('text', -refwindow=>$hl, -pady=>0, -background=>'white', -font=>$font, -justify=>'left'); #, -anchor=>'w');
-	$tw->traceVariable(\$self->{row},'w'=>[\&MsgCollector::rowchange,$self]);
-	$tw->traceVariable(\$self->{col},'w'=>[\&MsgCollector::colchange,$self]);
-	MsgCollector::rowchange(undef,1,'w',$self);
+	$self->rowchange;
 }
-
-sub rotext {
-	my ($self,$msg) = @_;
-	my $ro = $self->{ro};
-	$ro->delete('0.0','end');
-	my @b = (unpack('C*', $msg->{dat}));
-	my ($i,$c,$line);
-	while (@b) {
-		for ($i = 0; ($i < 32) and @b; $i++) {
-			$line .= ' ';
-			$line .= ' ' unless $i & 0x7;
-			$line .= sprintf('%02X',shift @b);
-		}
-		$line .= "\n";
-	}
-	$ro->insert('0.0', $line);
-}
-
-sub makeentry {
-	my ($self,$hl,$beg,$end,$val,$name,$entry,$desc,$sub) = @_;
-	my @bytes = ();
-	my $bits = '';
-	my $value;
-	if ($sub) {
-		my $func = shift @{$sub};
-		$value = &$func(@{$sub});
-	} else {
-		$value = $val;
-	}
-	my $word = $val;
-	for (my $i = 0; $i < $beg; $i++) {
-		$bits = '-'.$bits;
-	}
-	for (my $i = $beg; $i <= $end; $i++) {
-		$bits = (($word & 0x1) ? '1' : '0') . $bits;
-		$word >>= 1;
-		if (($i & 0x7) == 0x7) {
-			push @bytes, " $bits";
-			$bits = '';
-		}
-	}
-	if (($end & 0x7) != 0x7) {
-		for (my $i = $end+1; ($i&0x7) != 0; $i++) {
-			$bits = '-'.$bits;
-		}
-	}
-	if (length($bits)) {
-		push @bytes, " $bits";
-	}
-	$bits = join("\n", @bytes);
-	my $parent = $entry;
-	$parent=~s/\.[^\.]*$//;
-	$hl->add($entry,-itemtype=>'text', -text=>$name, -style=>$self->{fldstyle});
-	#$hl->indicator('create', $entry, -itemtype=>'image', -image=>'box');
-	$hl->itemCreate($entry, 1, -itemtype=>'text', -text=>$bits, -style=>$self->{bitstyle});
-	$hl->itemCreate($entry, 2, -itemtype=>'text', -text=>" $value", -style=>$self->{valstyle});
-	if (ref($desc) eq 'HASH') {
-		$hl->itemCreate($entry, 3, -itemtype=>'text', -text=>" $desc->{$val}", -style=>$self->{desstyle});
-	} elsif (ref($desc) eq 'ARRAY') {
-		$hl->itemCreate($entry, 3, -itemtype=>'text', -text=>" $desc->[$val]", -style=>$self->{desstyle});
-	} else {
-		$hl->itemCreate($entry, 3, -itemtype=>'text', -text=>" $desc", -style=>$self->{desstyle});
-	}
-	$hl->hide('entry',$entry) if $self->{tree}->{$parent} eq '+';
-}
-
-sub hlist {
-	my ($self,$msg) = @_;
-	my $hl = $self->{hl};
-	$hl->delete('all');
-	$hl->add('0', -itemtype=>'text', -text=>'L2',);
-	$hl->itemCreate('0', 1, -itemtype=>'text', -text=>' ********');
-	$hl->itemCreate('0', 3, -itemtype=>'text', -text=>' L2 Pseudoheader');
-	$hl->indicator('create', '0', -itemtype=>'image', -image=>$self->{tree}->{0},);
-	$hl->add('1', -itemtype=>'text', -text=>'L2',);
-	$hl->itemCreate('1', 1, -itemtype=>'text', -text=>' ********');
-	$hl->itemCreate('1', 3, -itemtype=>'text', -text=>' L2 Header');
-	$hl->indicator('create', '1', -itemtype=>'image', -image=>$self->{tree}->{1},);
-	$self->makeentry($hl,0,0,$msg->{bib},'BIB','1.1','Backward Indicator Bit');
-	$self->makeentry($hl,1,7,$msg->{bsn},'BSN','1.2','Backward Sequence Number');
-	$self->makeentry($hl,0,0,$msg->{fib},'FIB','1.3','Forward Indicator Bit');
-	$self->makeentry($hl,1,7,$msg->{fsn},'FSN','1.4','Forward Sequence Number');
-	$self->makeentry($hl,0,5,$msg->{li},'LI','1.5','Length Indicator');
-	$self->makeentry($hl,6,7,$msg->{li0},'LI0','1.6','Spare Bits');
-	if ($msg->{li} > 3) {
-		$hl->add('2', -itemtype=>'text', -text=>'L3',);
-		$hl->itemCreate('2', 1, -itemtype=>'text', -text=>' ********');
-		$hl->itemCreate('2', 3, -itemtype=>'text', -text=>' L3 Header');
-		$hl->indicator('create', '2', -itemtype=>'image', -image=>$self->{tree}->{2},);
-		$self->makeentry($hl,0,1,$msg->{ni},'NI','2.1',{
-				0=>'Network Indicator: International',
-				1=>'Network Indicator: International (spare)',
-				2=>'Network Indicator: National',
-				3=>'Network Indicator: National (spare)',});
-
-		$self->makeentry($hl,2,3,$msg->{mp},'MP','2.2',{
-				0=>'Message Priority 0',
-				1=>'Message Priority 1',
-				2=>'Message Priority 2',
-				3=>'Message Priority 3',});
-		my ($desc,$mtyp);
-		if (exists $mtypes{$msg->{si}}) {
-			$mtyp = "\U$mtypes{$msg->{si}}->{0}->[0]\E";
-			$desc = "Service Indicator: $mtyp";
-		} else {
-			$mtyp = 'L4';
-			$desc = "Service Indicator: ($msg->{si}) Unknown.";
-		}
-		$self->makeentry($hl,4,7,$msg->{si},'SI','2.3',$desc,);
-		$self->makeentry($hl,0,23,$msg->{opc},"\nOPC\n",'2.4',"Originating Point Code",[\&main::pcstring,$msg->{opc}]);
-		$self->makeentry($hl,0,23,$msg->{dpc},"\nDPC\n",'2.5',"Destination Point Code",[\&main::pcstring,$msg->{dpc}]);
-		$self->makeentry($hl,0,7,$msg->{sls},'SLS','2.6','Signalling Link Selection');
-		$hl->add('3', -itemtype=>'text', -text=>$mtyp);
-		$hl->itemCreate('3', 1, -itemtype=>'text', -text=>' ********');
-		$hl->itemCreate('3', 3, -itemtype=>'text', -text=>" $mtyp Message");
-		if (exists $mtypes{$msg->{si}}->{$msg->{mt}}) {
-			$desc = "Message Type: \U$mtypes{$msg->{si}}->{$msg->{mt}}->[0]\E";
-		} else {
-			$desc = "Message Type: ($msg->{mt}) Unknown.";
-		}
-		if ($msg->{si} == 0) {
-			$self->makeentry($hl,0,7,$msg->{mt},'MT','3.1',$desc,);
-		} elsif ($msg->{si} == 1 || $msg->{si} == 2) {
-			$self->makeentry($hl,0,7,$msg->{mt},'MT','3.1',$desc,);
-			if ($msg->{rt} == RT_24BIT_PC) {
-				$self->makeentry($hl,0,3,$msg->{slc},'SLC','3.2','Signalling Link Code');
-			} else {
-				$self->makeentry($hl,0,3,$msg->{slc},'SLC','3.2','Signalling Link Code');
-			}
-			$self->makeentry($hl,4,7,$msg->{dlen},'DLEN','3.3','Test Data Length');
-		} elsif ($msg->{si} == 3) {
-			$self->makeentry($hl,0,7,$msg->{mt},'MT','3.1',$desc,);
-			$hl->add('4', -itemtype=>'text', -text=>'L5',);
-			$hl->itemCreate('4', 1, -itemtype=>'text', -text=>' ********');
-			$hl->itemCreate('4', 3, -itemtype=>'text', -text=>' Parameters');
-			$hl->indicator('create', '4', -itemtype=>'image', -image=>$self->{tree}->{4},);
-		} elsif ($msg->{si} == 5) {
-			$self->makeentry($hl,0,15,$msg->{cic},"CIC\n",'3.1','Circuit Identification Code');
-			$self->makeentry($hl,0,7,$msg->{mt},'MT','3.2',$desc,);
-			$hl->add('4', -itemtype=>'text', -text=>'L5',);
-			$hl->itemCreate('4', 1, -itemtype=>'text', -text=>' ********');
-			$hl->itemCreate('4', 3, -itemtype=>'text', -text=>' Parameters');
-			$hl->indicator('create', '4', -itemtype=>'image', -image=>$self->{tree}->{4},);
-		}
-		$hl->indicator('create', '3', -itemtype=>'image', -image=>$self->{tree}->{3},);
-	}
-}
-
+#package MsgCollector;
 sub rowchange {
-	my ($ind,$val,$op,$self,$msg) = @_;
-	return $val if $op ne 'w';
-	return $val unless $msg = $self->{list}->[$val-1];
-	$self->rotext($msg);
-	$self->hlist($msg);
-	return $val;
+	my ($self,$msg) = @_;
+	my $row = $self->{row};
+	return unless $msg = $self->{list}->[$row-1];
+	$msg->rotext($self->{ro});
+	$msg->hlist($self->{hl});
 }
-
+#package MsgCollector;
 sub colchange {
-	my ($ind,$val,$op,$self) = @_;
-	return $val if $op ne 'w';
-	return $val unless -8 <= $val && $val <= 8;
-	print ref($self->{msgs})."\n";
-	if ($val == 0) {
+	my $self = shift;
+	my $col = $self->{col};
+	if ($col == 0) {
 		@{$self->{list}} = @{$self->{msgs}};
-	} elsif (abs($val) == 1) {
-		if ($val > 0) {
+	} elsif (abs($col) == 1) {
+		if ($col > 0) {
 			@{$self->{list}} = sort {
 				return -1 if $a->{hdr}->{tv_sec} < $b->{hdr}->{tv_sec};
 				return  1 if $a->{hdr}->{tv_sec} > $b->{hdr}->{tv_sec};
@@ -3078,8 +2941,8 @@ sub colchange {
 				return  0;
 			} @{$self->{msgs}};
 		}
-	} elsif (abs($val) == 2) {
-		if ($val > 0) {
+	} elsif (abs($col) == 2) {
+		if ($col > 0) {
 			@{$self->{list}} = sort {
 				return -1 if $a->{li} < 3 && $a->{li} < $b->{li};
 				return  1 if $b->{li} < 3 && $b->{li} < $a->{li};
@@ -3092,8 +2955,8 @@ sub colchange {
 				return  0;
 			} @{$self->{msgs}};
 		}
-	} elsif (abs($val) == 3) {
-		if ($val > 0) {
+	} elsif (abs($col) == 3) {
+		if ($col > 0) {
 			@{$self->{list}} = sort {
 				return -1 if $a->{li} < 3 && $a->{li} < $b->{li};
 				return  1 if $b->{li} < 3 && $b->{li} < $a->{li};
@@ -3108,8 +2971,8 @@ sub colchange {
 				return 0-($a->{si} <=> $b->{si});
 			} @{$self->{msgs}};
 		}
-	} elsif (abs($val) == 4) {
-		if ($val > 0) {
+	} elsif (abs($col) == 4) {
+		if ($col > 0) {
 			@{$self->{list}} = sort {
 				return -1 if $a->{li} < 3 && $a->{li} < $b->{li};
 				return  1 if $b->{li} < 3 && $b->{li} < $a->{li};
@@ -3128,8 +2991,8 @@ sub colchange {
 				return 0-($a->{opc} <=> $b->{opc});
 			} @{$self->{msgs}};
 		}
-	} elsif (abs($val) == 5) {
-		if ($val > 0) {
+	} elsif (abs($col) == 5) {
+		if ($col > 0) {
 			@{$self->{list}} = sort {
 				return -1 if $a->{li} < 3 && $a->{li} < $b->{li};
 				return  1 if $b->{li} < 3 && $b->{li} < $a->{li};
@@ -3148,8 +3011,8 @@ sub colchange {
 				return 0-($a->{dpc} <=> $b->{dpc});
 			} @{$self->{msgs}};
 		}
-	} elsif (abs($val) == 6) {
-		if ($val > 0) {
+	} elsif (abs($col) == 6) {
+		if ($col > 0) {
 			@{$self->{list}} = sort {
 				return -1 if $a->{li} < 3 && $a->{li} < $b->{li};
 				return  1 if $b->{li} < 3 && $b->{li} < $a->{li};
@@ -3168,8 +3031,8 @@ sub colchange {
 				return 0-($a->{sls} <=> $b->{sls});
 			} @{$self->{msgs}};
 		}
-	} elsif (abs($val) == 7) {
-		if ($val > 0) {
+	} elsif (abs($col) == 7) {
+		if ($col > 0) {
 			@{$self->{list}} = sort {
 				return -1 if $a->{li} < 3 && $a->{li} < $b->{li};
 				return  1 if $b->{li} < 3 && $b->{li} < $a->{li};
@@ -3188,8 +3051,8 @@ sub colchange {
 				return 0-($a->{mt} <=> $b->{mt});
 			} @{$self->{msgs}};
 		}
-	} elsif (abs($val) == 8) {
-		if ($val > 0) {
+	} elsif (abs($col) == 8) {
+		if ($col > 0) {
 			@{$self->{list}} = sort {
 				return -1 if $a->{li} < 3 && $a->{li} < $b->{li};
 				return  1 if $b->{li} < 3 && $b->{li} < $a->{li};
@@ -3212,10 +3075,8 @@ sub colchange {
 	my $tm = $self->{tm};
 	$tm->configure(-rows=>scalar(@{$self->{list}}));
 	$tm->clearCache;
-	print "sorting changed to $val\n";
-	return $val;
 }
-
+#package MsgCollector;
 sub access {
 	my ($self,$set,$row,$col,$value) = @_;
 	return $self->header($set,$row,$col,$value) if $row == 0;
@@ -3225,7 +3086,7 @@ sub access {
 		return undef;
 	}
 	if ($col == 0) {
-		return $row;
+		return $msg->{msgnum};
 	}
 	if ($col == 1) {
 		return sprintf('%.6f', $msg->{hdr}->{tv_sec} + $msg->{hdr}->{tv_usec}/1000000);
@@ -3255,7 +3116,7 @@ sub access {
 	}
 	return '';
 }
-
+#package MsgCollector;
 sub header {
 	my ($self,$set,$row,$col,$value) = @_;
 	return 'Msg No.' if $col == 0;
@@ -6100,6 +5961,7 @@ sub new {
 	$self->Status::init(@args);
 	$self->CallCollector::init(@args);
 	$self->MsgCollector::init(@args);
+	$self->{msgnum} = 0;
 	$self->{ciccnt} = 0;
 	$self->{actcnt} = 0;
 	$self->{act1w} = 0;
@@ -6196,6 +6058,8 @@ sub regroupsps {
 sub add_msg {
 	my ($self,$msg) = @_;
 	$self->inc($msg,0); # for now
+	$self->{msgnum}++;
+	$msg->{msgnum} = $self->{msgnum};
 	$self->pushmsg($msg);
 }
 
@@ -6701,7 +6565,6 @@ sub fillstatus {
 package Message;
 use strict;
 # -------------------------------------
-
 use constant {
 	RT_UNKNOWN => 0,
 	RT_14BIT_PC => 4, # also RL length in octets
@@ -6718,9 +6581,7 @@ use constant {
 	MP_NATIONAL => 2,
 	MP_INTERNATIONAL => 3
 };
-
 my $count = 0;
-
 # $msg = Message::create($pcap);
 #package Message;
 sub create {
@@ -6746,7 +6607,6 @@ sub create {
 	$self->{ppa} = ($lkno0 << 8) | $lkno1;
 	return $self;
 }
-
 #package Message;
 sub process {
 	my ($self,$network) = @_;
@@ -6757,15 +6617,14 @@ sub process {
 	}
 	#print STDERR "decoding error\n";
 }
-
 #package Message;
 sub getCount {
 	return $main::count;
 }
-
 #package Message;
 sub decode {
 	my ($self,$path,@args) = @_;
+	$self->{path} = $path;
 	my @b = (unpack('C*', substr($self->{dat}, 0, 8)));
 	if (!exists $self->{mtp2decode}) {
 		my $len = $self->{hdr}->{len};
@@ -6885,14 +6744,10 @@ sub decode {
 			}
 			$self->{dlen} = $b[1] >> 4;
 		}
-		$self->{ht} = $path->{ht};
-		$self->{pr} = $path->{pr};
-		$self->{rt} = $path->{rt};
 		$self->{mtp3decode} = 1;
 	}
 	return 1;
 }
-
 #package Message;
 sub checkRoutingLabelType {
 	my ($self,$si,@args) = @_;
@@ -6909,13 +6764,11 @@ sub checkRoutingLabelType {
 	}
 	return 0;
 }
-
 use constant {
 	PT_YES => 1,
 	PT_MAYBE => 0,
 	PT_NO => -1
 };
-
 #package Message;
 sub checkSnmm {
 	my ($self,$path,@args) = @_;
@@ -6945,7 +6798,6 @@ sub checkSnmm {
 sub checkItutSnmm {
 	my ($self,$path,$li,$b) = @_;
 	my $mt = (($b->[5] & 0x0f) << 4) | ($b->[5] >> 4);
-
 	if ($li == 6) {
 		return PT_YES if $mt == 0x17 || $mt == 0x27 || $mt == 0x13 || $mt == 0x28
 			|| $mt == 0x38 || $mt == 0x48 || $mt == 0x12 || $mt == 0x22 || $mt == 0x16
@@ -6973,9 +6825,7 @@ sub checkItutSnmm {
 sub checkAnsiSnmm {
 	my ($self,$path,$li,$b) = @_;
 	my $mt = (($b->[8] & 0x0f) << 4) | ($b->[8] >> 4);
-
 	return PT_NO if $li < 9;
-
 	if ($li == 9) {
 		return PT_YES if $mt == 0x17 || $mt == 0x27 || $mt == 0x13;
 		return PT_NO;
@@ -7002,7 +6852,6 @@ sub checkAnsiSnmm {
 	}
 	return PT_NO;
 }
-
 #package Message;
 sub checkSntm {
 	my ($self,$path,@args) = @_;
@@ -7032,10 +6881,8 @@ sub checkSntm {
 sub checkItutSntm {
 	my ($self,$path,$li,$b) = @_;
 	my $mt = (($b->[5] & 0x0f) << 4) | ($b->[5] >> 4);
-
 	return PT_NO if 7 > $li || $li > 22;
 	return PT_NO if $mt != 0x11 && $mt != 0x12;
-
 	if (($b->[6] >> 4) == $li - 7) {
 		return PT_YES if 7 <= $li && $li <= 9;
 		return PT_MAYBE;
@@ -7046,10 +6893,8 @@ sub checkItutSntm {
 sub checkAnsiSntm {
 	my ($self,$path,$li,$b) = @_;
 	my $mt = (($b->[8] & 0x0f) << 4) | ($b->[8] >> 4);
-
 	return PT_NO if 10 > $li || $li > 25;
 	return PT_NO if $mt != 0x11 && $mt != 0x12;
-
 	if (($b->[9] >> 4) == $li - 10) {
 		return PT_YES if 23 <= $li && $li <= 25;
 		return PT_MAYBE;
@@ -7090,7 +6935,6 @@ sub checkAnsiSnsm {
 	my ($self,@args) = @_;
 	return $self->checkAnsiSntm(@args);
 }
-
 #package Message;
 sub checkSccp {
 	my ($self,$path,$li,$b) = @_;
@@ -7130,7 +6974,6 @@ sub checkAnsiSccp {
 	return PT_MAYBE if 0x01 <= $mt && $mt <= 0x14;
 	return PT_NO;
 }
-
 #package Message;
 sub checkIsup {
 	my ($self,$path,@args) = @_;
@@ -7160,9 +7003,7 @@ sub checkIsup {
 sub checkItutIsup {
 	my ($self,$path,$li,$b) = @_;
 	my $mt = $b->[7];
-
 	return PT_NO if $li < 8;
-
 	if ($mt == 0x11 || $mt == 0x12 || $mt == 0x13 || $mt == 0x14 || $mt == 0x15 || $mt == 0x16 || $mt == 0x24 || $mt == 0x2e || $mt == 0x30 || $mt == 0x31) {
 		return PT_NO if $li != 8;
 		return PT_YES;
@@ -7231,9 +7072,7 @@ sub checkItutIsup {
 sub checkAnsiIsup {
 	my ($self,$path,$li,$b) = @_;
 	my $mt = $b->[10];
-
 	return PT_NO if $li < 11;
-
 	if ($mt == 0x10 || $mt == 0x11 || $mt == 0x12 || $mt == 0x13 || $mt == 0x14 || $mt == 0x15 || $mt == 0x16 || $mt == 0x24 || $mt == 0x2e || $mt == 0xe9 || $mt == 0xec) {
 		return PT_NO if $li != 11;
 		return PT_MAYBE;
@@ -7256,7 +7095,268 @@ sub checkAnsiIsup {
 	}
 	return PT_MAYBE;
 }
-
+#package Message;
+sub showmsg {
+	my ($self,$window) = @_;
+	my ($tw,$w,$bmsg);
+	if ($tw = $self->{show}) {
+		if ($tw->state eq 'iconic') {
+			$tw->deiconify;
+		} else {
+			$tw->UnmapWindow;
+		}
+		$tw->MapWindow;
+		return;
+	}
+	my $title = "Message $self->{msgnum}";
+	$tw = $window->toplevel->Toplevel(
+		-title=>$title,
+	);
+	#$tw->group($window->toplevel);
+	#$tw->transient($window->toplevel);
+	$tw->iconimage('icon');
+	$tw->iconname($title);
+	#$tw->resizeable(0,0);
+	#$tw->positionfrom('user');
+	#$tw->minsize(600,400);
+	#$tw->geometry("+$X+$Y");
+	$tw->protocol('WM_DELETE_WINDOW', [sub {
+		my $self = shift;
+		my $tw = $self->{show};
+		delete $self->{show};
+		$tw->destroy;
+	},$self]);
+	$self->{show} = $tw;
+	$self->showdecode($tw);
+	$tw->MapWindow;
+}
+#package Message;
+sub showdecode {
+	my ($self,$tw) = @_;
+	$self->{tree}->{0} = 'minus';
+	$self->{tree}->{1} = 'minus';
+	$self->{tree}->{2} = 'minus';
+	$self->{tree}->{3} = 'minus';
+	$self->{tree}->{4} = 'minus';
+	my $s = $tw->Scrolled('HList',
+		-scrollbars=>'osoe',
+		-columns=>4,
+		-background=>'white',
+		-drawbranch=>0,
+		-header=>0,
+		-itemtype=>'text',
+		-indent=>16,
+		-indicator=>1,
+		-indicatorcmd=>[sub{
+			my ($self,$entry,$action) = @_;
+			my $hl = $self->{hl};
+			if ($action eq '<Activate>') {
+				delete $hl->{armed};
+				if (exists $self->{tree}->{$entry}) {
+					if ($self->{tree}->{$entry} eq 'plus') {
+						foreach ($hl->info('children',$entry)) {
+							$hl->show('entry',$_);
+						}
+						$hl->indicator('configure', $entry, -image=>'minus',);
+						$self->{tree}->{$entry} = 'minus';
+					} else {
+						foreach ($hl->info('children',$entry)) {
+							$hl->hide('entry',$_);
+						}
+						$hl->indicator('configure', $entry, -image=>'plus',);
+						$self->{tree}->{$entry} = 'plus';
+					}
+				}
+			} elsif ($action eq '<Arm>') {
+				$hl->{armed} = $entry;
+			} elsif ($action eq '<Disarm>') {
+				delete $hl->{armed};
+			}
+		},$self],
+		-selectmode=>'browse',
+		-separator=>'.',
+		-exportselection=>1,
+	)->pack(
+		-expand=>1,
+		-fill=>'both',
+		-side=>'top',
+		-anchor=>'n',
+	);
+	my $hl = $self->{hl} = $s->Subwidget('scrolled');
+	my $ro = $self->{ro} = $tw->ROText(
+		-background=>'white',
+		-wrap=>'word',
+		-height=>8,
+	)->pack(
+		-expand=>0,
+		-fill=>'both',
+		-side=>'top',
+		-anchor=>'s',
+	);
+	$ro->insert('0.0', 'Message bytes...');
+	my $font = $ro->cget('-font');
+	$hl->configure(-font=>$font);
+	$self->rotext($ro);
+	$self->hlist($hl);
+}
+#package Message;
+sub rotext {
+	my ($self,$ro) = @_;
+	$ro->delete('0.0','end');
+	my @b = (unpack('C*',$self->{dat}));
+	my @lines = ();
+	my ($i,$c,$line);
+	while (@b) {
+		for ($i = 0; ($i < 16) and @b; $i++) {
+			$line .= ' ' if $line;
+			$line .= ' ' unless $i & 0x7;
+			$line .= sprintf('%02X',shift @b);
+		}
+		push @lines, $line;
+		$line = undef;
+	}
+	$ro->insert('0.0',join("\n",@lines));
+}
+#package Message;
+sub makeentry {
+	my ($self,$hl,$byte,$beg,$end,$val,$name,$entry,$desc,$sub) = @_;
+	my @bytes = ();
+	my $bits = '';
+	my $value;
+	if ($sub) {
+		my $func = shift @{$sub};
+		$value = &$func(@{$sub});
+	} else {
+		$value = $val;
+	}
+	my $word = $val;
+	for (my $i = 0; $i < $beg; $i++) {
+		$bits = '-'.$bits;
+	}
+	for (my $i = $beg; $i <= $end; $i++) {
+		$bits = (($word & 0x1) ? '1' : '0') . $bits;
+		$word >>= 1;
+		if (($i & 0x7) == 0x7) {
+			push @bytes, " $bits";
+			$bits = '';
+		}
+	}
+	if (($end & 0x7) != 0x7) {
+		for (my $i = $end+1; ($i&0x7) != 0; $i++) {
+			$bits = '-'.$bits;
+		}
+	}
+	if (length($bits)) {
+		push @bytes, " $bits";
+	}
+	$bits = join("\n", @bytes);
+	my $parent = $entry;
+	$parent=~s/\.[^\.]*$//;
+	$hl->add($entry,-itemtype=>'text', -text=>$name, -style=>$self->{fldstyle});
+	#$hl->indicator('create', $entry, -itemtype=>'image', -image=>'box');
+	$hl->itemCreate($entry, 1, -itemtype=>'text', -text=>$bits, -style=>$self->{bitstyle});
+	$hl->itemCreate($entry, 2, -itemtype=>'text', -text=>" $value", -style=>$self->{valstyle});
+	if (ref($desc) eq 'HASH') {
+		$hl->itemCreate($entry, 3, -itemtype=>'text', -text=>" $desc->{$val}", -style=>$self->{desstyle});
+	} elsif (ref($desc) eq 'ARRAY') {
+		$hl->itemCreate($entry, 3, -itemtype=>'text', -text=>" $desc->[$val]", -style=>$self->{desstyle});
+	} else {
+		$hl->itemCreate($entry, 3, -itemtype=>'text', -text=>" $desc", -style=>$self->{desstyle});
+	}
+	$hl->hide('entry',$entry) if $self->{tree}->{$parent} eq '+';
+}
+#package Message;
+sub hlist {
+	my ($self,$hl) = @_;
+	$hl->delete('all');
+	$hl->add('0',-text=>'L2',);
+	$hl->itemCreate('0',1,-text=>' ********');
+	$hl->itemCreate('0',3,-text=>'L2 Pseudoheader');
+	$hl->indicator('create','0',-itemtype=>'image',-image=>$self->{tree}->{0});
+	$hl->add('1',-itemtype=>'text',-text=>'L2',);
+	$hl->itemCreate('1',1,-text=>' ********');
+	$hl->itemCreate('1',3,-text=>'L2 Header');
+	$hl->indicator('create','1',-itemtype=>'image',-image=>$self->{tree}->{1});
+	my $sio;
+	if ($self->{path}->{ht} == HT_EXTENDED) {
+		$self->makeentry($hl,0,0,11,$self->{bsn},'BSN','1.2','Backward Sequence Number');
+		$self->makeentry($hl,1,7,7,$self->{bib},'BIB','1.1','Backward Indicator Bit');
+		$self->makeentry($hl,2,0,11,$self->{fsn},'FSN','1.4','Forward Sequence Number');
+		$self->makeentry($hl,3,7,7,$self->{fib},'FIB','1.3','Forward Indicator Bit');
+		$self->makeentry($hl,4,0,8,$self->{li},'LI','1.5','Length Indicator');
+		$self->makeentry($hl,5,2,7,$self->{li0},'LI0','1.6','Spare Bits');
+		$sio = 6;
+	} else {
+		$self->makeentry($hl,0,0,6,$self->{bsn},'BSN','1.2','Backward Sequence Number');
+		$self->makeentry($hl,0,7,7,$self->{bib},'BIB','1.1','Backward Indicator Bit');
+		$self->makeentry($hl,1,0,6,$self->{fsn},'FSN','1.4','Forward Sequence Number');
+		$self->makeentry($hl,1,7,7,$self->{fib},'FIB','1.3','Forward Indicator Bit');
+		$self->makeentry($hl,2,0,5,$self->{li},'LI','1.5','Length Indicator');
+		$self->makeentry($hl,2,6,7,$self->{li0},'LI0','1.6','Spare Bits');
+		$sio = 3;
+	}
+	if ($self->{li} > 3) {
+		$hl->add('2',-itemtype=>'text',-text=>'L3',);
+		$hl->itemCreate('2',1,-text=>' ********');
+		$hl->itemCreate('2',3,-text=>'L3 Header');
+		$hl->indicator('create','2',-itemtype=>'image',-image=>$self->{tree}->{2});
+		my ($desc,$mtyp);
+		if (exists $mtypes{$self->{si}}) {
+			$mtyp = "\U$mtypes{$self->{si}}->{0}->[0]\E";
+			$desc = "Service Indicator: $mtyp";
+		} else {
+			$mtyp = 'L4';
+			$desc = "Service Indicator: ($self->{si}) Unknown.";
+		}
+		$self->makeentry($hl,$sio,0,3,$self->{si},'SI','2.3',$desc,);
+		$self->makeentry($hl,$sio,4,5,$self->{mp},'MP','2.2',{
+				0=>'Message Priority 0',
+				1=>'Message Priority 1',
+				2=>'Message Priority 2',
+				3=>'Message Priority 3',});
+		$self->makeentry($hl,$sio,6,7,$self->{ni},'NI','2.1',{
+				0=>'Network Indicator: International',
+				1=>'Network Indicator: International (spare)',
+				2=>'Network Indicator: National',
+				3=>'Network Indicator: National (spare)',});
+		$self->makeentry($hl,4,0,23,$self->{opc},"\nOPC\n",'2.4',"Originating Point Code",[\&main::pcstring,$self->{opc}]);
+		$self->makeentry($hl,7,0,23,$self->{dpc},"\nDPC\n",'2.5',"Destination Point Code",[\&main::pcstring,$self->{dpc}]);
+		$self->makeentry($hl,10,0,7,$self->{sls},'SLS','2.6','Signalling Link Selection');
+		$hl->add('3',-itemtype=>'text',-text=>$mtyp,);
+		$hl->itemCreate('3',1,-text=>' ********');
+		$hl->itemCreate('3',3,-text=>"$mtyp Message");
+		$hl->indicator('create','3',-itemtype=>'image',-image=>$self->{tree}->{3});
+		if (exists $mtypes{$self->{si}}->{$self->{mt}}) {
+			$desc = "Message Type: \U$mtypes{$self->{si}}->{$self->{mt}}->[0]\E";
+		} else {
+			$desc = "Message Type: ($self->{mt}) Unknown.";
+		}
+		if ($self->{si} == 0) {
+			$self->makeentry($hl,11,0,7,$self->{mt},'MT','3.1',$desc,);
+		} elsif ($self->{si} == 1 || $self->{si} == 2) {
+			$self->makeentry($hl,11,0,7,$self->{mt},'MT','3.1',$desc,);
+			if ($self->{path}->{rt} == RT_24BIT_PC) {
+				$self->makeentry($hl,12,0,3,$self->{slc},'SLC','3.2','Signalling Link Code');
+			} else {
+				$self->makeentry($hl,12,0,3,$self->{slc},'SLC','3.2','Signalling Link Code');
+			}
+			$self->makeentry($hl,12,4,7,$self->{dlen},'DLEN','3.3','Test Data Length');
+		} elsif ($self->{si} == 3) {
+			$self->makeentry($hl,11,0,7,$self->{mt},'MT','3.1',$desc,);
+			$hl->add('4',-itemtype=>'text',-text=>'L5',);
+			$hl->itemCreate('4',1,-text=>' ********');
+			$hl->itemCreate('4',3,-text=>'L5 Header');
+			$hl->indicator('create','4',-itemtype=>'image',-image=>$self->{tree}->{4});
+		} elsif ($self->{si} == 5) {
+			$self->makeentry($hl,12,0,15,$self->{cic},"CIC",'3.1','Circuit Identification Code');
+			$self->makeentry($hl,14,0,7,$self->{mt},'MT','3.2',$desc,);
+			$hl->add('4',-itemtype=>'text',-text=>'L5',);
+			$hl->itemCreate('4',1,-text=>' ********');
+			$hl->itemCreate('4',3,-text=>'L5 Header');
+			$hl->indicator('create','4',-itemtype=>'image',-image=>$self->{tree}->{4});
+		}
+	}
+}
 
 # -------------------------------------
 package MyOptions;
