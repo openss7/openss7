@@ -373,141 +373,141 @@ sub pcstring {
 #
 my %mtypes = (
 	0=>{
-		0x00 => ['snmm', 0x0],
-		0x11 => ['coo',  0x8],
-		0x12 => ['coa',  0x8],
-		0x15 => ['cbd',  0x8],
-		0x16 => ['cba',  0x8],
-		0x21 => ['eco',  0x8],
-		0x22 => ['eca',  0x8],
-		0x31 => ['rct',  0x8],
-		0x32 => ['tfc',  0x8],
-		0x41 => ['tfp',  0x8],
-		0x42 => ['tcp',  0x8],
-		0x43 => ['tfr',  0x8],
-		0x44 => ['tcr',  0x8],
-		0x45 => ['tfa',  0x8],
-		0x46 => ['tca',  0x8],
-		0x51 => ['rst',  0xf],
-		0x52 => ['rsr',  0x8],
-		0x53 => ['rcp',  0x8],
-		0x54 => ['rcr',  0x8],
-		0x61 => ['lin',  0x8],
-		0x62 => ['lun',  0x8],
-		0x63 => ['lia',  0x8],
-		0x64 => ['lua',  0x8],
-		0x65 => ['lid',  0x8],
-		0x66 => ['lfu',  0x8],
-		0x67 => ['llt',  0x8],
-		0x68 => ['lrt',  0x8],
-		0x71 => ['tra',  0x8],
-		0x72 => ['trw',  0x8],
-		0x81 => ['dlc',  0x8],
-		0x82 => ['css',  0x8],
-		0x83 => ['cns',  0x8],
-		0x84 => ['cnp',  0x8],
-		0xa1 => ['upu',  0x8],
-		0xa2 => ['upa',  0x8],
-		0xa3 => ['upt',  0x8],
+		0x00 => ['snmm', 0x0, 'SnmmMessage'],
+		0x11 => ['coo',  0x8, 'CooMessage'],
+		0x12 => ['coa',  0x8, 'CoaMessage'],
+		0x15 => ['cbd',  0x8, 'CbdMessage'],
+		0x16 => ['cba',  0x8, 'CbaMessage'],
+		0x21 => ['eco',  0x8, 'EcoMessage'],
+		0x22 => ['eca',  0x8, 'EcaMessage'],
+		0x31 => ['rct',  0x8, 'RctMessage'],
+		0x32 => ['tfc',  0x8, 'TfcMessage'],
+		0x41 => ['tfp',  0x8, 'TfpMessage'],
+		0x42 => ['tcp',  0x8, 'TcpMessage'],
+		0x43 => ['tfr',  0x8, 'TfrMessage'],
+		0x44 => ['tcr',  0x8, 'TcrMessage'],
+		0x45 => ['tfa',  0x8, 'TfaMessage'],
+		0x46 => ['tca',  0x8, 'TcaMessage'],
+		0x51 => ['rst',  0xf, 'RstMessage'],
+		0x52 => ['rsr',  0x8, 'RsrMessage'],
+		0x53 => ['rcp',  0x8, 'RcpMessage'],
+		0x54 => ['rcr',  0x8, 'RcrMessage'],
+		0x61 => ['lin',  0x8, 'LinMessage'],
+		0x62 => ['lun',  0x8, 'LunMessage'],
+		0x63 => ['lia',  0x8, 'LiaMessage'],
+		0x64 => ['lua',  0x8, 'LuaMessage'],
+		0x65 => ['lid',  0x8, 'LidMessage'],
+		0x66 => ['lfu',  0x8, 'LfuMessage'],
+		0x67 => ['llt',  0x8, 'LltMessage'],
+		0x68 => ['lrt',  0x8, 'LrtMessage'],
+		0x71 => ['tra',  0x8, 'TraMessage'],
+		0x72 => ['trw',  0x8, 'TrwMessage'],
+		0x81 => ['dlc',  0x8, 'DlcMessage'],
+		0x82 => ['css',  0x8, 'CssMessage'],
+		0x83 => ['cns',  0x8, 'CnsMessage'],
+		0x84 => ['cnp',  0x8, 'CnpMessage'],
+		0xa1 => ['upu',  0x8, 'UpuMessage'],
+		0xa2 => ['upa',  0x8, 'UpaMessage'],
+		0xa3 => ['upt',  0x8, 'UptMessage'],
 	},
 	1=>{
-		0x00 => ['sntm', 0x0],
-		0x11 => ['sltm', 0x8],
-		0x12 => ['slta', 0x8],
+		0x00 => ['sntm', 0x0, 'SntmMessage'],
+		0x11 => ['sltm', 0x8, 'SltmMessage'],
+		0x12 => ['slta', 0x8, 'SltaMessage'],
 	},
 	2=>{
-		0x00 => ['snsm', 0x0],
-		0x11 => ['sltm', 0x8],
-		0x12 => ['slta', 0x8],
+		0x00 => ['snsm', 0x0, 'SnsmMessage'],
+		0x11 => ['sltm', 0x8, 'SltmMessage'],
+		0x12 => ['slta', 0x8, 'SltaMessage'],
 	},
 	3=>{
-		0x00 => ['sccp',  0x0],
-		0x01 => ['cr',    0x3],
-		0x02 => ['cc',    0x2],
-		0x03 => ['cref',  0x2],
-		0x04 => ['rlsd',  0x4],
-		0x05 => ['rlc',   0x4],
-		0x06 => ['dt1',   0x3],
-		0x07 => ['dt2',   0x3],
-		0x08 => ['ak',    0x3],
-		0x09 => ['udt',   0x7],
-		0x0a => ['udts',  0x7],
-		0x0b => ['ed',    0x2],
-		0x0c => ['ea',    0x2],
-		0x0d => ['rsr',   0x2],
-		0x0e => ['rsc',   0x2],
-		0x0f => ['err',   0x2],
-		0x10 => ['it',    0x2],
-		0x11 => ['xudt',  0x7],
-		0x12 => ['xudts', 0x7],
-		0x13 => ['ludt',  0x7],
-		0x14 => ['ludts', 0x7],
+		0x00 => ['sccp',  0x0, 'SccpMessage'],
+		0x01 => ['cr',    0x3, 'CrMessage'],
+		0x02 => ['cc',    0x2, 'CcMessage'],
+		0x03 => ['cref',  0x2, 'CrefMessage'],
+		0x04 => ['rlsd',  0x4, 'RlsdMessage'],
+		0x05 => ['rlc',   0x4, 'RlcMessage'],
+		0x06 => ['dt1',   0x3, 'Dt1Message'],
+		0x07 => ['dt2',   0x3, 'Dt2Message'],
+		0x08 => ['ak',    0x3, 'AkMessage'],
+		0x09 => ['udt',   0x7, 'UdtMessage'],
+		0x0a => ['udts',  0x7, 'UdtsMessage'],
+		0x0b => ['ed',    0x2, 'EdMessage'],
+		0x0c => ['ea',    0x2, 'EaMessage'],
+		0x0d => ['rsr',   0x2, 'RsrMessage'],
+		0x0e => ['rsc',   0x2, 'RscMessage'],
+		0x0f => ['err',   0x2, 'ErrMessage'],
+		0x10 => ['it',    0x2, 'ItMessage'],
+		0x11 => ['xudt',  0x7, 'XudtMessage'],
+		0x12 => ['xudts', 0x7, 'XudtsMessage'],
+		0x13 => ['ludt',  0x7, 'LudtMessage'],
+		0x14 => ['ludts', 0x7, 'LudtsMessage'],
 	},
 	5=>{
-		0x00 => ['isup', 0x0],
-		0x01 => ['iam',  0x3],
-		0x02 => ['sam',  0x0],
-		0x03 => ['inr',  0x2],
-		0x04 => ['inf',  0x2],
-		0x05 => ['cot',  0x2],
-		0x06 => ['acm',  0x2],
-		0x07 => ['con',  0x0],
-		0x08 => ['fot',  0x2],
-		0x09 => ['anm',  0x4],
-		0x0c => ['rel',  0x2],
-		0x0d => ['sus',  0x2],
-		0x0e => ['res',  0x2],
-		0x10 => ['rlc',  0x4],
-		0x11 => ['ccr',  0x2],
-		0x12 => ['rsc',  0x1],
-		0x13 => ['blo',  0x1],
-		0x14 => ['ubl',  0x1],
-		0x15 => ['bla',  0x1],
-		0x16 => ['uba',  0x1],
-		0x17 => ['grs',  0x1],
-		0x18 => ['cgb',  0x1],
-		0x19 => ['cgu',  0x1],
-		0x1a => ['cgba', 0x1],
-		0x1b => ['cgua', 0x1],
-		0x1c => ['cmr',  0x0],
-		0x1d => ['cmc',  0x0],
-		0x1e => ['cmrj', 0x0],
-		0x1f => ['far',  0x0],
-		0x20 => ['faa',  0x0],
-		0x21 => ['frj',  0x0],
-		0x22 => ['fad',  0x0],
-		0x23 => ['fai',  0x0],
-		0x24 => ['lpa',  0x1],
-		0x25 => ['csvq', 0x0],
-		0x26 => ['csvr', 0x0],
-		0x27 => ['drs',  0x0],
-		0x28 => ['pam',  0x7],
-		0x29 => ['gra',  0x1],
-		0x2a => ['cqm',  0x1],
-		0x2b => ['cqr',  0x1],
-		0x2c => ['cpg',  0x2],
-		0x2d => ['usr',  0x0],
-		0x2e => ['ucic', 0x2],
-		0x2f => ['cfn',  0x1],
-		0x30 => ['olm',  0x0],
-		0x31 => ['crg',  0x0],
-		0x32 => ['nrm',  0x0],
-		0x33 => ['fac',  0x7],
-		0x34 => ['upt',  0x0],
-		0x35 => ['upa',  0x0],
-		0x36 => ['idr',  0x0],
-		0x37 => ['irs',  0x0],
-		0x38 => ['sgm',  0x1],
-		0xe9 => ['cra',  0x1],
-		0xea => ['crm',  0x1],
-		0xeb => ['cvr',  0x1],
-		0xec => ['cvt',  0x1],
-		0xed => ['exm',  0x7],
-		0xf8 => ['non',  0x0],
-		0xfc => ['llm',  0x0],
-		0xfd => ['cak',  0x0],
-		0xfe => ['tcm',  0x0],
-		0xff => ['mcp',  0x0],
+		0x00 => ['isup', 0x0, 'IsupMessage'],
+		0x01 => ['iam',  0x3, 'IamMessage'],
+		0x02 => ['sam',  0x0, 'SamMessage'],
+		0x03 => ['inr',  0x2, 'InrMessage'],
+		0x04 => ['inf',  0x2, 'InfMessage'],
+		0x05 => ['cot',  0x2, 'CotMessage'],
+		0x06 => ['acm',  0x2, 'AcmMessage'],
+		0x07 => ['con',  0x0, 'ConMessage'],
+		0x08 => ['fot',  0x2, 'FotMessage'],
+		0x09 => ['anm',  0x4, 'AnmMessage'],
+		0x0c => ['rel',  0x2, 'RelMessage'],
+		0x0d => ['sus',  0x2, 'SusMessage'],
+		0x0e => ['res',  0x2, 'ResMessage'],
+		0x10 => ['rlc',  0x4, 'RlcMessage'],
+		0x11 => ['ccr',  0x2, 'CcrMessage'],
+		0x12 => ['rsc',  0x1, 'RscMessage'],
+		0x13 => ['blo',  0x1, 'BloMessage'],
+		0x14 => ['ubl',  0x1, 'UblMessage'],
+		0x15 => ['bla',  0x1, 'BlaMessage'],
+		0x16 => ['uba',  0x1, 'UbaMessage'],
+		0x17 => ['grs',  0x1, 'GrsMessage'],
+		0x18 => ['cgb',  0x1, 'CgbMessage'],
+		0x19 => ['cgu',  0x1, 'CguMessage'],
+		0x1a => ['cgba', 0x1, 'CgbaMessage'],
+		0x1b => ['cgua', 0x1, 'CguaMessage'],
+		0x1c => ['cmr',  0x0, 'CmrMessage'],
+		0x1d => ['cmc',  0x0, 'CmcMessage'],
+		0x1e => ['cmrj', 0x0, 'CmrjMessage'],
+		0x1f => ['far',  0x0, 'FarMessage'],
+		0x20 => ['faa',  0x0, 'FaaMessage'],
+		0x21 => ['frj',  0x0, 'FrjMessage'],
+		0x22 => ['fad',  0x0, 'FadMessage'],
+		0x23 => ['fai',  0x0, 'FaiMessage'],
+		0x24 => ['lpa',  0x1, 'LpaMessage'],
+		0x25 => ['csvq', 0x0, 'CsvqMessage'],
+		0x26 => ['csvr', 0x0, 'CsvrMessage'],
+		0x27 => ['drs',  0x0, 'DrsMessage'],
+		0x28 => ['pam',  0x7, 'PamMessage'],
+		0x29 => ['gra',  0x1, 'GraMessage'],
+		0x2a => ['cqm',  0x1, 'CqmMessage'],
+		0x2b => ['cqr',  0x1, 'CqrMessage'],
+		0x2c => ['cpg',  0x2, 'CpgMessage'],
+		0x2d => ['usr',  0x0, 'UsrMessage'],
+		0x2e => ['ucic', 0x2, 'UcicMessage'],
+		0x2f => ['cfn',  0x1, 'CfnMessage'],
+		0x30 => ['olm',  0x0, 'OlmMessage'],
+		0x31 => ['crg',  0x0, 'CrgMessage'],
+		0x32 => ['nrm',  0x0, 'NrmMessage'],
+		0x33 => ['fac',  0x7, 'FacMessage'],
+		0x34 => ['upt',  0x0, 'UptMessage'],
+		0x35 => ['upa',  0x0, 'UpaMessage'],
+		0x36 => ['idr',  0x0, 'IdrMessage'],
+		0x37 => ['irs',  0x0, 'IrsMessage'],
+		0x38 => ['sgm',  0x1, 'SgmMessage'],
+		0xe9 => ['cra',  0x1, 'CraMessage'],
+		0xea => ['crm',  0x1, 'CrmMessage'],
+		0xeb => ['cvr',  0x1, 'CvrMessage'],
+		0xec => ['cvt',  0x1, 'CvtMessage'],
+		0xed => ['exm',  0x7, 'ExmMessage'],
+		0xf8 => ['non',  0x0, 'NonMessage'],
+		0xfc => ['llm',  0x0, 'LlmMessage'],
+		0xfd => ['cak',  0x0, 'CakMessage'],
+		0xfe => ['tcm',  0x0, 'TcmMessage'],
+		0xff => ['mcp',  0x0, 'McpMessage'],
 	},
 );
 
@@ -986,6 +986,7 @@ sub new {
 		my ($c,@args) = @_;
 		Plot::popup(@args);
 	},$self,$me,Tk::Ev('X'),Tk::Ev('Y')]);
+	$tw->update;
 	$tw->MapWindow;
 	return $self;
 }
@@ -1129,6 +1130,7 @@ sub display {
 	} else {
 		$tw->UnmapWindow;
 	}
+	$tw->update;
 	$tw->MapWindow;
 }
 
@@ -2703,6 +2705,7 @@ sub msgs {
 	},$self]);
 	$self->{show} = $tw;
 	$self->showmsgs($tw);
+	$tw->update;
 	$tw->MapWindow;
 }
 #package MsgCollector;
@@ -3180,6 +3183,7 @@ sub calls {
 	},$self]);
 	$self->{show} = $tw;
 	$self->showcalls($tw);
+	$tw->update;
 	$tw->MapWindow;
 }
 
@@ -6562,6 +6566,625 @@ sub fillstatus {
 }
 
 # -------------------------------------
+package Field;
+use strict;
+# -------------------------------------
+sub new {
+	my ($type,@args) = @_;
+	my $self = {};
+	bless $self,$type;
+	return $self;
+}
+
+# -------------------------------------
+package BitField; use strict; use vars qw(@ISA); @ISA = qw(Field);
+# -------------------------------------
+sub new {
+	my ($type,$b,$p,$s,$e,@args) = @_;
+	my $self = Field::new($type,$b,$p,@args);
+	$self->{len} = int($e/8) + 1;
+	$self->{ptr} = $p;
+	$self->{beg} = $s;
+	$self->{end} = $e;
+	$self->{wid} = $e+1-$s;
+	#TODO unpack bits
+	my $sb = $p + int($s/8);
+	my $eb = $p + int($e/8);
+	for (my ($v,$i) = (0,$eb); $i >= $sb; $i--) {
+		my ($m,$c) = (0xff,$b->[$i]);
+		if ($i == $eb) { $m &=  ((1<<(8-$e))-1); }
+		if ($i == $sb) { $m &= ~((1<<($s+1))-1); }
+		$v |= ($c & $m);
+		$v <<= 8 unless $i == $sb;
+	}
+	$v >>= $s;
+	$self->{val} = $v;
+	return $self;
+}
+
+sub bits {
+	my $self = shift;
+	my @bytes = ();
+	my $bits = '';
+	my $word = $self->{val};
+	for (my $i = 0; $i < $self->{beg}; $i++) {
+		$bits = '-'.$bits;
+	}
+	for (my $i = $self->{beg}; $i <= $self->{end}; $i++) {
+		$bits = (($word & 0x1)?'1':'0').$bits;
+		$word >>= 1;
+		if (($i&0x7) == 0x7) {
+			push @bytes, sprintf('%3d %s', $p + scalar(@bytes), $bits);
+			$bits = '';
+		}
+
+	}
+	if (($self->{end}&0x7) != 0x7) {
+		for (my $i=$self->{end}+1; ($i&0x7) != 0; $i++) {
+			$bits = '-'.$bits;
+		}
+	}
+	if (length($bits)) {
+		push @bytes, sprintf('%3d %s', $p + scalar(@bytes), $bits);
+	}
+	return join("\n",@bytes);
+}
+
+sub makeentry {
+	my ($self,$hl,$entry,$ind) = @_;
+	$hl->add($entry,-text=>$self->{name});
+	$hl->itemCreate($entry,1,-text=>$self->bits);
+	$hl->itemCreate($entry,2," $self->{val}");
+	if (ref($self->{desc}) eq 'HASH') {
+		$hl->itemCreate($entry,3,-text=>" $self->{desc}->{$self->{val}}");
+	} elsif (ref($self->{desc}) eq 'ARRAY') {
+		$hl->itemCreate($entry,3,-text=>" $self->{desc}->[$self->{val}]");
+	} else {
+		$hl->itemCreate($entry,3,-text=>" $self->{desc}");
+	}
+	$hl->hide('entry',$entry) if $ind eq '+';
+}
+
+# -------------------------------------
+package ClrfField; use strict; use vars qw(@ISA); @ISA = qw(BitField);
+# -------------------------------------
+sub new {
+	my ($type,$b,$p,@args) = @_;
+	return BitField::new($type,$b,$p,0,23,@args);
+}
+
+# -------------------------------------
+package SpcField; use strict; use vars qw(@ISA); @ISA = qw(BitField);
+# -------------------------------------
+sub new {
+	my ($type,$b,$p,$rt,@args) = @_;
+	if ($rt == RT_14BIT_PC) {
+		return BitField::new($type,$b,$p,0,13,@args);
+	} else {
+		return BitField::new($type,$b,$p,0,23,@args);
+	}
+}
+
+# -------------------------------------
+package TmrField; use strict; use vars qw(@ISA); @ISA = qw(BitField);
+# -------------------------------------
+my %enum = (
+	0x00=>'speech',
+	0x01=>'spare',
+	0x02=>'64 kbit/s unrestricted',
+	0x03=>'3.1 kHz audio',
+	0x04=>'reserved for alternate speech(s2)/64 kbit/s unrestricted (s1)',
+	0x05=>'reserved for alternate 64 kbit/s unrestricted (s1), speech (s2)',
+	0x06=>'64 kbit/s preferred',
+	0x07=>'2 x 64 kbit/s unrestricted',
+	0x08=>'384 kbit/s unrestricted',
+	0x09=>'1536 kbit/s unrestricted',
+	0x0a=>'1920 kbit/s unrestricted',
+	0x0b=>'spare',
+	0x0c=>'spare',
+	0x0d=>'spare',
+	0x0e=>'spare',
+	0x0f=>'spare',
+	0x10=>'3 x 64 kbit/s unrestricted',
+	0x11=>'4 x 64 kbit/s unrestricted',
+	0x12=>'5 x 64 kbit/s unrestricted',
+	0x13=>'spare', # note: 6x64 same as 384 kbit/s
+	0x14=>'7 x 64 kbit/s unrestricted',
+	0x15=>'8 x 64 kbit/s unrestricted',
+	0x16=>'9 x 64 kbit/s unrestricted',
+	0x17=>'10 x 64 kbit/s unrestricted',
+	0x18=>'11 x 64 kbit/s unrestricted',
+	0x19=>'12 x 64 kbit/s unrestricted',
+	0x1a=>'13 x 64 kbit/s unrestricted',
+	0x1b=>'14 x 64 kbit/s unrestricted',
+	0x1c=>'15 x 64 kbit/s unrestricted',
+	0x1d=>'16 x 64 kbit/s unrestricted',
+	0x1e=>'17 x 64 kbit/s unrestricted',
+	0x1f=>'18 x 64 kbit/s unrestricted',
+	0x20=>'19 x 64 kbit/s unrestricted',
+	0x21=>'20 x 64 kbit/s unrestricted',
+	0x22=>'21 x 64 kbit/s unrestricted',
+	0x23=>'22 x 64 kbit/s unrestricted',
+	0x24=>'23 x 64 kbit/s unrestricted',
+	0x25=>'spare', # note: 24x64 same as 1536 kbit/s
+	0x26=>'25 x 64 kbit/s unrestricted',
+	0x27=>'26 x 64 kbit/s unrestricted',
+	0x28=>'27 x 64 kbit/s unrestricted',
+	0x29=>'28 x 64 kbit/s unrestricted',
+	0x2a=>'29 x 64 kbit/s unrestricted',
+	0x2b=>'spare', # note: 30x64 same as 1920 kbit/s
+);
+sub new {
+	my ($type,$b,$p,$rt,@args) = @_;
+	my $self = BitField::new($type,$b,$p,0,7,@args);
+	$self->{name} = 'TMR';
+	$self->{dflt} = 'spare';
+	$self->{enum} = \%enum;
+	$self->{desc} = 'Transmission Medium Requirement';
+}
+
+
+# -------------------------------------
+package Parameter;
+use strict;
+# -------------------------------------
+sub new {
+	my ($type,@args) = @_;
+	my $self = {};
+	bless $self,$type;
+	return $self;
+}
+
+# -------------------------------------
+package IsupParameter; use strict; use vars qw(@ISA); @ISA = qw(Parameter);
+# -------------------------------------
+sub new {
+	my ($type,$b,$p,$e,@args) = @_;
+	my $self = Parameter::new($type,$b,$p,$e,@args);
+	return $self;
+}
+sub opt {
+	my ($type,$b,$p,$e,@args) = @_;
+	my $self = Parameter::new($type,$b,$p,$e,@args);
+	$self->dec($b,$p,$e,@args);
+	return $self;
+}
+# -------------------------------------
+package FixIsupParameter; use strict; use vars qw(@ISA); @ISA = qw(IsupParameter);
+# -------------------------------------
+sub new {
+	my ($type,$b,$p,$e,@args) = @_;
+	my $self = IsupParameter::new($type,$b,$p,$e,@args);
+	$self->{len} = $e - $p;
+	$self->{ptr} = $p;
+	if ($self->{len} <= 4) {
+		$self->{val} = 0;
+		for (my $i = $e-1; $i >= $p; $i--) {
+			$self->{val} <<= 8;
+			$self->{val} |= $b->[$i];
+		}
+	} else {
+		$self->{val} = pack('C*', $b->[$p..($e-1)]);
+	}
+}
+sub dec {
+	my ($self,$b,$p,$e,$l,@args) = @_;
+	$self->{len} = $l;
+	$self->{ptr} = $$p;
+	if ($l <= 4) {
+		$self->{val} = 0;
+		for (my $i = $$p + $l - 1; $i >= $$p; $i--) {
+			$self->{val} <<= 8;
+			$self->{val} |= $b->[$i];
+		}
+	} else {
+		$self->{val} = pack('C*', $b->[$$p..($$p+$l-1)]);
+	}
+}
+sub man {
+	my ($type,$b,$p,$e,@args) = @_;
+	my $self = IsupParameter::new($type,$b,$p,$e,@args);
+	$self->dec($b,$p,$e,$e-$$p,@args);
+	return $self;
+}
+sub opt {
+	my ($type,$b,$p,$e,@args) = @_;
+	my $self = IsupParameter::new($type,$b,$p,$e,@args);
+	my $l = $b->[$$p++];
+	$self->dec($b,$p,$e,$l,@args);
+	return $self;
+}
+
+
+# -------------------------------------
+package VarIsupParameter; use strict; use vars qw(@ISA); @ISA = qw(IsupParameter);
+# -------------------------------------
+sub new {
+	my ($type,$b,$p,$e,@args) = @_;
+	my $self = IsupParameter::new($type,$b,$p,$e,@args);
+	$self->{len} = $b->[$p];
+	$p++;
+	$e = $p + $self->{len};
+	$self->{ptr} = $p;
+	if ($self->{len} <= 4) {
+		$self->{val} = 0;
+		for (my $i = $e-1; $i >= $p; $i--) {
+			$self->{val} <<= 8;
+			$self->{val} |= $b->[$i];
+		}
+	} else {
+		$self->{val} = pack('C*', $b->[$p..($e-1)]);
+	}
+}
+sub dec {
+	my ($self,$b,$p,$e,$l,@args) = @_;
+	$self->{len} = $l;
+	$self->{ptr} = $$p;
+	$self->{val} = pack('C*', $b->[$$p..($$p+$l-1)]);
+}
+sub man {
+	my ($type,$b,$p,$e,@args) = @_;
+	my $self = IsupParameter::new($type,$b,$p,$e,@args);
+	my $l = $b->[$$p++];
+	$self->dec($b,$p,$e,$l,@args);
+	return $self;
+}
+sub opt {
+	return VarIsupParameter::man(@_);
+}
+
+# -------------------------------------
+package EopIsupParameter; use strict; use vars qw(@ISA); @ISA = qw(FixIsupParameter);
+# -------------------------------------
+sub man {
+	my ($type,$b,$p,$e,@args) = @_;
+	return SUPER::man($type,$b,$p,$$p,@args);
+}
+sub opt {
+	my ($type,$b,$p,$e,@args) = @_;
+	return SUPER::opt($type,$b,$p,$$p,@args);
+}
+# -------------------------------------
+package ClrfIsupParameter; use strict; use vars qw(@ISA); @ISA = qw(FixIsupParameter);
+# -------------------------------------
+sub dec {
+	my ($self,$b,$p,$e,$l,$rt,@args) = @_;
+	$self->{fields} = [];
+	push @{$self->{fields}}, ClrfField->new($b,$self->{ptr});
+	push @{$self->{fileds}}, SpcField->new($b,$self->{ptr}+3);
+}
+# -------------------------------------
+package TmrIsupParameter; use strict; use vars qw(@ISA); @ISA = qw(FixIsupParameter);
+# -------------------------------------
+sub dec {
+	my ($sefl,$b,$p,$e,$l,$rt,@args) = @_;
+	$self->{fields} = [];
+	push @{$self->{fields}}, TmrField->new($b,$self->{ptr});
+}
+# -------------------------------------
+package AtpIsupParameter; use strict; use vars qw(@ISA); @ISA = qw(VarIsupParameter);
+# -------------------------------------
+# -------------------------------------
+package CdpnIsupParameter; use strict; use vars qw(@ISA); @ISA = qw(VarIsupParameter);
+# -------------------------------------
+# -------------------------------------
+package SubnIsupParameter; use strict; use vars qw(@ISA); @ISA = qw(VarIsupParameter);
+# -------------------------------------
+# -------------------------------------
+package NciIsupParameter; use strict; use vars qw(@ISA); @ISA = qw(FixIsupParameter);
+# -------------------------------------
+# -------------------------------------
+package FciIsupParameter; use strict; use vars qw(@ISA); @ISA = qw(FixIsupParameter);
+# -------------------------------------
+# -------------------------------------
+package OfciIsupParameter; use strict; use vars qw(@ISA); @ISA = qw(FixIsupParameter);
+# -------------------------------------
+# -------------------------------------
+package CpcIsupParameter; use strict; use vars qw(@ISA); @ISA = qw(FixIsupParameter);
+# -------------------------------------
+# -------------------------------------
+package CgpnIsupParameter; use strict; use vars qw(@ISA); @ISA = qw(VarIsupParameter);
+# -------------------------------------
+# -------------------------------------
+package RdgnIsupParameter; use strict; use vars qw(@ISA); @ISA = qw(VarIsupParameter);
+# -------------------------------------
+# -------------------------------------
+package RdnnIsupParameter; use strict; use vars qw(@ISA); @ISA = qw(VarIsupParameter);
+# -------------------------------------
+# -------------------------------------
+package ConrIsupParameter; use strict; use vars qw(@ISA); @ISA = qw(VarIsupParameter);
+# -------------------------------------
+# -------------------------------------
+package InriIsupParameter; use strict; use vars qw(@ISA); @ISA = qw(FixIsupParameter);
+# -------------------------------------
+# -------------------------------------
+package InfiIsupParameter; use strict; use vars qw(@ISA); @ISA = qw(FixIsupParameter);
+# -------------------------------------
+# -------------------------------------
+package CotiIsupParameter; use strict; use vars qw(@ISA); @ISA = qw(FixIsupParameter);
+# -------------------------------------
+# -------------------------------------
+package BciIsupParameter; use strict; use vars qw(@ISA); @ISA = qw(FixIsupParameter);
+# -------------------------------------
+# -------------------------------------
+package CausIsupParameter; use strict; use vars qw(@ISA); @ISA = qw(VarIsupParameter);
+# -------------------------------------
+# -------------------------------------
+package RdiIsupParameter; use strict; use vars qw(@ISA); @ISA = qw(FixIsupParameter);
+# -------------------------------------
+# -------------------------------------
+package CgiIsupParameter; use strict; use vars qw(@ISA); @ISA = qw(FixIsupParameter);
+# -------------------------------------
+# -------------------------------------
+package RsIsupParameter; use strict; use vars qw(@ISA); @ISA = qw(FixIsupParameter);
+# -------------------------------------
+# -------------------------------------
+package CmiIsupParameter; use strict; use vars qw(@ISA); @ISA = qw(FixIsupParameter);
+# -------------------------------------
+# -------------------------------------
+package FaciIsupParameter; use strict; use vars qw(@ISA); @ISA = qw(FixIsupParameter);
+# -------------------------------------
+# -------------------------------------
+package FaiiIsupParameter; use strict; use vars qw(@ISA); @ISA = qw(FixIsupParameter);
+# -------------------------------------
+# -------------------------------------
+package CugiIsupParameter; use strict; use vars qw(@ISA); @ISA = qw(VarIsupParameter);
+# -------------------------------------
+# -------------------------------------
+package IndexIsupParameter; use strict; use vars qw(@ISA); @ISA = qw(FixIsupParameter);
+# -------------------------------------
+# -------------------------------------
+package CugcriIsupParameter; use strict; use vars qw(@ISA); @ISA = qw(IsupParameter);
+# -------------------------------------
+# -------------------------------------
+package UsiIsupParameter; use strict; use vars qw(@ISA); @ISA = qw(FixIsupParameter);
+# -------------------------------------
+# -------------------------------------
+package SpcIsupParameter; use strict; use vars qw(@ISA); @ISA = qw(FixIsupParameter);
+# -------------------------------------
+# -------------------------------------
+package UuiIsupParameter; use strict; use vars qw(@ISA); @ISA = qw(FixIsupParameter);
+# -------------------------------------
+# -------------------------------------
+package ConnIsupParameter; use strict; use vars qw(@ISA); @ISA = qw(VarIsupParameter);
+# -------------------------------------
+# -------------------------------------
+package SrisIsupParameter; use strict; use vars qw(@ISA); @ISA = qw(FixIsupParameter);
+# -------------------------------------
+# -------------------------------------
+package TnsIsupParameter; use strict; use vars qw(@ISA); @ISA = qw(VarIsupParameter);
+# -------------------------------------
+# -------------------------------------
+package EvntIsupParameter; use strict; use vars qw(@ISA); @ISA = qw(FixIsupParameter);
+# -------------------------------------
+# -------------------------------------
+package CamIsupParameter; use strict; use vars qw(@ISA); @ISA = qw(IsupParameter);
+# -------------------------------------
+# -------------------------------------
+package CsiIsupParameter; use strict; use vars qw(@ISA); @ISA = qw(FixIsupParameter);
+# -------------------------------------
+# -------------------------------------
+package AclIsupParameter; use strict; use vars qw(@ISA); @ISA = qw(FixIsupParameter);
+# -------------------------------------
+# -------------------------------------
+package OcdnIsupParameter; use strict; use vars qw(@ISA); @ISA = qw(VarIsupParameter);
+# -------------------------------------
+# -------------------------------------
+package ObciIsupParameter; use strict; use vars qw(@ISA); @ISA = qw(FixIsupParameter);
+# -------------------------------------
+# -------------------------------------
+package UuindIsupParameter; use strict; use vars qw(@ISA); @ISA = qw(FixIsupParameter);
+# -------------------------------------
+# -------------------------------------
+package IspcIsupParameter; use strict; use vars qw(@ISA); @ISA = qw(FixIsupParameter);
+# -------------------------------------
+# -------------------------------------
+package GnotIsupParameter; use strict; use vars qw(@ISA); @ISA = qw(FixIsupParameter);
+# -------------------------------------
+# -------------------------------------
+package ChiIsupParameter; use strict; use vars qw(@ISA); @ISA = qw(FixIsupParameter);
+# -------------------------------------
+# -------------------------------------
+package AdiIsupParameter; use strict; use vars qw(@ISA); @ISA = qw(FixIsupParameter);
+# -------------------------------------
+# -------------------------------------
+package NsfIsupParameter; use strict; use vars qw(@ISA); @ISA = qw(FixIsupParameter);
+# -------------------------------------
+# -------------------------------------
+package UsipIsupParameter; use strict; use vars qw(@ISA); @ISA = qw(VarIsupParameter);
+# -------------------------------------
+# -------------------------------------
+package PropIsupParameter; use strict; use vars qw(@ISA); @ISA = qw(FixIsupParameter);
+# -------------------------------------
+# -------------------------------------
+package RopsIsupParameter; use strict; use vars qw(@ISA); @ISA = qw(VarIsupParameter);
+# -------------------------------------
+# -------------------------------------
+package SaIsupParameter; use strict; use vars qw(@ISA); @ISA = qw(VarIsupParameter);
+# -------------------------------------
+# -------------------------------------
+package UtiIsupParameter; use strict; use vars qw(@ISA); @ISA = qw(VarIsupParameter);
+# -------------------------------------
+# -------------------------------------
+package TmuIsupParameter; use strict; use vars qw(@ISA); @ISA = qw(FixIsupParameter);
+# -------------------------------------
+# -------------------------------------
+package CdiIsupParameter; use strict; use vars qw(@ISA); @ISA = qw(FixIsupParameter);
+# -------------------------------------
+# -------------------------------------
+package EciIsupParameter; use strict; use vars qw(@ISA); @ISA = qw(FixIsupParameter);
+# -------------------------------------
+# -------------------------------------
+package MciIsupParameter; use strict; use vars qw(@ISA); @ISA = qw(FixIsupParameter);
+# -------------------------------------
+# -------------------------------------
+package PciIsupParameter; use strict; use vars qw(@ISA); @ISA = qw(FixIsupParameter);
+# -------------------------------------
+# -------------------------------------
+package MlppIsupParameter; use strict; use vars qw(@ISA); @ISA = qw(FixIsupParameter);
+# -------------------------------------
+# -------------------------------------
+package MciqIsupParameter; use strict; use vars qw(@ISA); @ISA = qw(FixIsupParameter);
+# -------------------------------------
+# -------------------------------------
+package McirIsupParameter; use strict; use vars qw(@ISA); @ISA = qw(FixIsupParameter);
+# -------------------------------------
+# -------------------------------------
+package HopcIsupParameter; use strict; use vars qw(@ISA); @ISA = qw(FixIsupParameter);
+# -------------------------------------
+# -------------------------------------
+package TmrpIsupParameter; use strict; use vars qw(@ISA); @ISA = qw(FixIsupParameter);
+# -------------------------------------
+# -------------------------------------
+package LnIsupParameter; use strict; use vars qw(@ISA); @ISA = qw(VarIsupParameter);
+# -------------------------------------
+# -------------------------------------
+package RdnrIsupParameter; use strict; use vars qw(@ISA); @ISA = qw(FixIsupParameter);
+# -------------------------------------
+# -------------------------------------
+package FreepIsupParameter; use strict; use vars qw(@ISA); @ISA = qw(FixIsupParameter);
+# -------------------------------------
+# -------------------------------------
+package GrefIsupParameter; use strict; use vars qw(@ISA); @ISA = qw(FixIsupParameter);
+# -------------------------------------
+# -------------------------------------
+package RcapIsupParameter; use strict; use vars qw(@ISA); @ISA = qw(IsupParameter);
+# -------------------------------------
+# -------------------------------------
+package NmcIsupParameter; use strict; use vars qw(@ISA); @ISA = qw(IsupParameter);
+# -------------------------------------
+# -------------------------------------
+package RcntIsupParameter; use strict; use vars qw(@ISA); @ISA = qw(IsupParameter);
+# -------------------------------------
+# -------------------------------------
+package PcapIsupParameter; use strict; use vars qw(@ISA); @ISA = qw(IsupParameter);
+# -------------------------------------
+# -------------------------------------
+package PriIsupParameter; use strict; use vars qw(@ISA); @ISA = qw(IsupParameter);
+# -------------------------------------
+# -------------------------------------
+package GglIsupParameter; use strict; use vars qw(@ISA); @ISA = qw(IsupParameter);
+# -------------------------------------
+# -------------------------------------
+package PstaIsupParameter; use strict; use vars qw(@ISA); @ISA = qw(IsupParameter);
+# -------------------------------------
+# -------------------------------------
+package PcntIsupParameter; use strict; use vars qw(@ISA); @ISA = qw(IsupParameter);
+# -------------------------------------
+# -------------------------------------
+package PrfiIsupParameter; use strict; use vars qw(@ISA); @ISA = qw(IsupParameter);
+# -------------------------------------
+# -------------------------------------
+package PrbiIsupParameter; use strict; use vars qw(@ISA); @ISA = qw(IsupParameter);
+# -------------------------------------
+# -------------------------------------
+package RstaIsupParameter; use strict; use vars qw(@ISA); @ISA = qw(IsupParameter);
+# -------------------------------------
+# -------------------------------------
+package RfiIsupParameter; use strict; use vars qw(@ISA); @ISA = qw(IsupParameter);
+# -------------------------------------
+# -------------------------------------
+package RbiIsupParameter; use strict; use vars qw(@ISA); @ISA = qw(IsupParameter);
+# -------------------------------------
+# -------------------------------------
+package GnumIsupParameter; use strict; use vars qw(@ISA); @ISA = qw(IsupParameter);
+# -------------------------------------
+# -------------------------------------
+package GdigIsupParameter; use strict; use vars qw(@ISA); @ISA = qw(VarIsupParameter);
+# -------------------------------------
+# -------------------------------------
+package OsiIsupParameter; use strict; use vars qw(@ISA); @ISA = qw(IsupParameter);
+# -------------------------------------
+# -------------------------------------
+package EgressIsupParameter; use strict; use vars qw(@ISA); @ISA = qw(FixIsupParameter);
+# -------------------------------------
+# -------------------------------------
+package JurIsupParameter; use strict; use vars qw(@ISA); @ISA = qw(FixIsupParameter);
+# -------------------------------------
+# -------------------------------------
+package CidcIsupParameter; use strict; use vars qw(@ISA); @ISA = qw(FixIsupParameter);
+# -------------------------------------
+# -------------------------------------
+package BgroupIsupParameter; use strict; use vars qw(@ISA); @ISA = qw(FixIsupParameter);
+# -------------------------------------
+# -------------------------------------
+package GnamIsupParameter; use strict; use vars qw(@ISA); @ISA = qw(IsupParameter);
+# -------------------------------------
+# -------------------------------------
+package NotiIsupParameter; use strict; use vars qw(@ISA); @ISA = qw(FixIsupParameter);
+# -------------------------------------
+# -------------------------------------
+package SvactIsupParameter; use strict; use vars qw(@ISA); @ISA = qw(FixIsupParameter);
+# -------------------------------------
+# -------------------------------------
+package CspiIsupParameter; use strict; use vars qw(@ISA); @ISA = qw(IsupParameter);
+# -------------------------------------
+# -------------------------------------
+package TrnreqIsupParameter; use strict; use vars qw(@ISA); @ISA = qw(FixIsupParameter);
+# -------------------------------------
+# -------------------------------------
+package LspiIsupParameter; use strict; use vars qw(@ISA); @ISA = qw(IsupParameter);
+# -------------------------------------
+# -------------------------------------
+package CgciIsupParameter; use strict; use vars qw(@ISA); @ISA = qw(FixIsupParameter);
+# -------------------------------------
+# -------------------------------------
+package CvriIsupParameter; use strict; use vars qw(@ISA); @ISA = qw(FixIsupParameter);
+# -------------------------------------
+# -------------------------------------
+package OtgnIsupParameter; use strict; use vars qw(@ISA); @ISA = qw(FixIsupParameter);
+# -------------------------------------
+# -------------------------------------
+package CinIsupParameter; use strict; use vars qw(@ISA); @ISA = qw(FixIsupParameter);
+# -------------------------------------
+# -------------------------------------
+package ClliIsupParameter; use strict; use vars qw(@ISA); @ISA = qw(VarIsupParameter);
+# -------------------------------------
+# -------------------------------------
+package OliIsupParameter; use strict; use vars qw(@ISA); @ISA = qw(FixIsupParameter);
+# -------------------------------------
+# -------------------------------------
+package ChgnIsupParameter; use strict; use vars qw(@ISA); @ISA = qw(VarIsupParameter);
+# -------------------------------------
+# -------------------------------------
+package SvcdIsupParameter; use strict; use vars qw(@ISA); @ISA = qw(VarIsupParameter);
+# -------------------------------------
+# -------------------------------------
+package SprIsupParameter; use strict; use vars qw(@ISA); @ISA = qw(VarIsupParameter);
+# -------------------------------------
+# -------------------------------------
+package CselIsupParameter; use strict; use vars qw(@ISA); @ISA = qw(VarIsupParameter);
+# -------------------------------------
+# -------------------------------------
+package NtIsupParameter; use strict; use vars qw(@ISA); @ISA = qw(IsupParameter);
+# -------------------------------------
+# -------------------------------------
+package OriIsupParameter; use strict; use vars qw(@ISA); @ISA = qw(VarIsupParameter);
+# -------------------------------------
+# -------------------------------------
+package IriIsupParameter; use strict; use vars qw(@ISA); @ISA = qw(VarIsupParameter);
+# -------------------------------------
+# -------------------------------------
+package RateIsupParameter; use strict; use vars qw(@ISA); @ISA = qw(FixIsupParameter);
+# -------------------------------------
+# -------------------------------------
+package IicIsupParameter; use strict; use vars qw(@ISA); @ISA = qw(FixIsupParameter);
+# -------------------------------------
+# -------------------------------------
+package ToiIsupParameter; use strict; use vars qw(@ISA); @ISA = qw(FixIsupParameter);
+# -------------------------------------
+# -------------------------------------
+package TonIsupParameter; use strict; use vars qw(@ISA); @ISA = qw(FixIsupParameter);
+# -------------------------------------
+# -------------------------------------
+package CriIsupParameter; use strict; use vars qw(@ISA); @ISA = qw(FixIsupParameter);
+# -------------------------------------
+# -------------------------------------
+package IcciIsupParameter; use strict; use vars qw(@ISA); @ISA = qw(VarIsupParameter);
+# -------------------------------------
+
+
+# -------------------------------------
 package Message;
 use strict;
 # -------------------------------------
@@ -7128,6 +7751,7 @@ sub showmsg {
 	},$self]);
 	$self->{show} = $tw;
 	$self->showdecode($tw);
+	$tw->update;
 	$tw->MapWindow;
 }
 #package Message;
@@ -7324,7 +7948,7 @@ sub hlist {
 		$self->makeentry($hl,10,0,7,$self->{sls},'SLS','2.6','Signalling Link Selection');
 		$hl->add('3',-itemtype=>'text',-text=>$mtyp,);
 		$hl->itemCreate('3',1,-text=>' ********');
-		$hl->itemCreate('3',3,-text=>"$mtyp Message");
+		$hl->itemCreate('3',3,-text=>"$mtyp Header");
 		$hl->indicator('create','3',-itemtype=>'image',-image=>$self->{tree}->{3});
 		if (exists $mtypes{$self->{si}}->{$self->{mt}}) {
 			$desc = "Message Type: \U$mtypes{$self->{si}}->{$self->{mt}}->[0]\E";
@@ -7352,9 +7976,1000 @@ sub hlist {
 			$self->makeentry($hl,14,0,7,$self->{mt},'MT','3.2',$desc,);
 			$hl->add('4',-itemtype=>'text',-text=>'L5',);
 			$hl->itemCreate('4',1,-text=>' ********');
-			$hl->itemCreate('4',3,-text=>'L5 Header');
+			$hl->itemCreate('4',3,-text=>'Parameters');
 			$hl->indicator('create','4',-itemtype=>'image',-image=>$self->{tree}->{4});
+			my $mt = $self->{mt};
 		}
+	}
+}
+
+# -------------------------------------
+package FisuMessage; use strict; use vars qw(@ISA); @ISA = qw(Message);
+# -------------------------------------
+# -------------------------------------
+package LssuMessage; use strict; use vars qw(@ISA); @ISA = qw(Message);
+# -------------------------------------
+# -------------------------------------
+package Lss2Message; use strict; use vars qw(@ISA); @ISA = qw(Message);
+# -------------------------------------
+# -------------------------------------
+package MsuMessage; use strict; use vars qw(@ISA); @ISA = qw(Message);
+# -------------------------------------
+# -------------------------------------
+package SnmmMessage; use strict; use vars qw(@ISA); @ISA = qw(MsuMessage);
+# -------------------------------------
+sub decode {
+	my ($self,$b,$o) = @_;
+	$self->{mt} = $b->[$$o];
+	$$o++;
+	my $mt = (($self->{mt} & 0x0f) << 4) | ($self->{mt} >> 4);
+	if (exists $mtypes{$self->{si}}->{$mt}) {
+		bless $self,$mtypes{$self->{si}}->{$mt}->[2];
+		$self->decode($b,$$o);
+	}
+	while ($self->{pdu} = ''; defined $b->[$$o]; $$o++) {
+		$self->{pdu} .= sprintf('%02X', $b->[$o]);
+	}
+}
+# -------------------------------------
+package ComMessage; use strict; use vars qw(@ISA); @ISA = qw(SnmmMessage);
+# -------------------------------------
+sub decode {
+	my ($self,$b,$o) = @_;
+	if ($self->{path}->{rt} == RT_14BIT_PC) {
+		$self->{slc} = $self->{sls};
+		$self->{fsnl} = $b->[$$o] & 0x7f;
+		$self->{fsnl0} = $b->[$$o] >> 7;
+		$$o++;
+	} else {
+		$self->{slc} = $b->[$$o] & 0x0f;
+		$self->{fsnl} = $b->[$$o] >> 4;
+		$$o++;
+		$self->{fsnl} |= ($b->[$$o] & 0x07) << 4;
+		$self->{fsnl0} = $b->[$$o] >> 3;
+		$$o++;
+	}
+}
+# -------------------------------------
+package CbmMessage; use strict; use vars qw(@ISA); @ISA = qw(SnmmMessage);
+# -------------------------------------
+sub decode {
+	my ($self,$b,$o) = @_;
+	if ($self->{path}->{rt} == RT_14BIT_PC) {
+		$self->{slc} = $self->{sls};
+		$self->{cbc} = $b->[$$o];
+		$$o++;
+	} else {
+		$self->{slc} = $b->[$$o] & 0x0f;
+		$self->{cbc} = $b->[$$o] >> 4;
+		$$o++;
+		$self->{cbc} |= ($b->[$$o] & 0x0f) << 4;
+		$self->{cbc0} = $b->[$$o] >> 4;
+		$$o++;
+	}
+}
+# -------------------------------------
+package SlmMessage; use strict; use vars qw(@ISA); @ISA = qw(SnmmMessage);
+# -------------------------------------
+sub decode {
+	my ($self,$b,$o) = @_;
+	if ($self->{path}->{rt} == RT_14BIT_PC) {
+		$self->{slc} = $self->{sls};
+	} else {
+		$self->{slc} = $b->[$$o] & 0x0f;
+		$self->{slc0} = $b->[$$o] >> 4;
+		$$o++;
+	}
+}
+# -------------------------------------
+package TfmMessage; use strict; use vars qw(@ISA); @ISA = qw(SnmmMessage);
+# -------------------------------------
+sub decode {
+	my ($self,$b,$o,$rt) = @_;
+	if ($rt == RT_14BIT_PC) {
+		$self->{dest} = $b->[$$o];
+		$$o++;
+		$self->{dest} |= ($b->[$$o] & 0x3f) << 8;
+		$self->{dest0} = $b->[$$o] >> 6;
+		$$o++;
+	} else {
+		$self->{dest} = $b->[$$o];
+		$$o++;
+		$self->{dest} |= $b->[$$o] << 8;
+		$$o++;
+		$self->{dest} |= $b->[$$o] << 16;
+		$$o++;
+	}
+}
+# -------------------------------------
+package UpmMessage; use strict; use vars qw(@ISA); @ISA = qw(SnmmMessage);
+# -------------------------------------
+sub decode {
+	my ($self,$b,$o,$rt) = @_;
+	if ($rt == RT_14BIT_PC) {
+		$self->{dest} = $b->[$$o];
+		$$o++;
+		$self->{dest} |= ($b->[$$o] & 0x3f) << 8;
+		$self->{dest0} = $b->[$$o] >> 6;
+		$$o++;
+	} else {
+		$self->{dest} = $b->[$$o];
+		$$o++;
+		$self->{dest} |= $b->[$$o] << 8;
+		$$o++;
+		$self->{dest} |= $b->[$$o] << 16;
+		$$o++;
+	}
+	$self->{upi} = $b->[$$o] & 0x0f;
+	$self->{upi0} = $b->[$$o] >> 4;
+	$$o++;
+}
+# -------------------------------------
+package CooMessage; use strict; use vars qw(@ISA); @ISA = qw(ComMessage);
+# -------------------------------------
+# -------------------------------------
+package CoaMessage; use strict; use vars qw(@ISA); @ISA = qw(ComMessage);
+# -------------------------------------
+# -------------------------------------
+package CbdMessage; use strict; use vars qw(@ISA); @ISA = qw(CbmMessage);
+# -------------------------------------
+# -------------------------------------
+package CbaMessage; use strict; use vars qw(@ISA); @ISA = qw(CbmMessage);
+# -------------------------------------
+# -------------------------------------
+package EcoMessage; use strict; use vars qw(@ISA); @ISA = qw(SlmMessage);
+# -------------------------------------
+# -------------------------------------
+package EcaMessage; use strict; use vars qw(@ISA); @ISA = qw(SlmMessage);
+# -------------------------------------
+# -------------------------------------
+package RctMessage; use strict; use vars qw(@ISA); @ISA = qw(SnmmMessage);
+# -------------------------------------
+# -------------------------------------
+package TfcMessage; use strict; use vars qw(@ISA); @ISA = qw(SnmmMessage);
+# -------------------------------------
+sub decode {
+	my ($self,$b,$o) = @_;
+	if ($self->{path}->{rt} == RT_14BIT_PC) {
+		$self->{dest} = $b->[$$o];
+		$$o++;
+		$self->{dest} |= ($b->[$$o] & 0x3f) << 8;
+		$self->{stat} = $b->[$$o] >> 6;
+		$$o++;
+	} else {
+		$self->{dest} = $b->[$$o];
+		$$o++;
+		$self->{dest} |= $b->[$$o] << 8;
+		$$o++;
+		$self->{dest} |= $b->[$$o] << 16;
+		$$o++;
+		$self->{stat} = $b->[$$o] & 0x3;
+		$self->{stat0} = $b->[$$o] >> 2;
+		$$o++;
+	}
+}
+# -------------------------------------
+package TfpMessage; use strict; use vars qw(@ISA); @ISA = qw(TfmMessage);
+# -------------------------------------
+# -------------------------------------
+package TcpMessage; use strict; use vars qw(@ISA); @ISA = qw(TfmMessage);
+# -------------------------------------
+# -------------------------------------
+package TfrMessage; use strict; use vars qw(@ISA); @ISA = qw(TfmMessage);
+# -------------------------------------
+# -------------------------------------
+package TcrMessage; use strict; use vars qw(@ISA); @ISA = qw(TfmMessage);
+# -------------------------------------
+# -------------------------------------
+package TfaMessage; use strict; use vars qw(@ISA); @ISA = qw(TfmMessage);
+# -------------------------------------
+# -------------------------------------
+package TcaMessage; use strict; use vars qw(@ISA); @ISA = qw(TfmMessage);
+# -------------------------------------
+# -------------------------------------
+package RstMessage; use strict; use vars qw(@ISA); @ISA = qw(TfmMessage);
+# -------------------------------------
+# -------------------------------------
+package RsrMessage; use strict; use vars qw(@ISA); @ISA = qw(TfmMessage);
+# -------------------------------------
+# -------------------------------------
+package RcpMessage; use strict; use vars qw(@ISA); @ISA = qw(TfmMessage);
+# -------------------------------------
+# -------------------------------------
+package RcrMessage; use strict; use vars qw(@ISA); @ISA = qw(TfmMessage);
+# -------------------------------------
+# -------------------------------------
+package LinMessage; use strict; use vars qw(@ISA); @ISA = qw(SlmMessage);
+# -------------------------------------
+# -------------------------------------
+package LunMessage; use strict; use vars qw(@ISA); @ISA = qw(SlmMessage);
+# -------------------------------------
+# -------------------------------------
+package LiaMessage; use strict; use vars qw(@ISA); @ISA = qw(SlmMessage);
+# -------------------------------------
+# -------------------------------------
+package LuaMessage; use strict; use vars qw(@ISA); @ISA = qw(SlmMessage);
+# -------------------------------------
+# -------------------------------------
+package LidMessage; use strict; use vars qw(@ISA); @ISA = qw(SlmMessage);
+# -------------------------------------
+# -------------------------------------
+package LfuMessage; use strict; use vars qw(@ISA); @ISA = qw(SlmMessage);
+# -------------------------------------
+# -------------------------------------
+package LltMessage; use strict; use vars qw(@ISA); @ISA = qw(SlmMessage);
+# -------------------------------------
+# -------------------------------------
+package LrtMessage; use strict; use vars qw(@ISA); @ISA = qw(SlmMessage);
+# -------------------------------------
+# -------------------------------------
+package TraMessage; use strict; use vars qw(@ISA); @ISA = qw(SnmmMessage);
+# -------------------------------------
+# -------------------------------------
+package TrwMessage; use strict; use vars qw(@ISA); @ISA = qw(SnmmMessage);
+# -------------------------------------
+# -------------------------------------
+package DlcMessage; use strict; use vars qw(@ISA); @ISA = qw(SnmmMessage);
+# -------------------------------------
+sub decode {
+	my ($self,$b,$o,$rt) = @_;
+	if ($rt == RT_14BIT_PC) {
+		$self->{slc} = $self->{sls};
+		$self->{sdli} = $b->[$$o];
+		$$o++;
+		$self->{sdli} |= ($b->[$$o] & 0x0f) << 8;
+		$self->{sdli0} = $b->[$$o] >> 4;
+		$$o++;
+	} else {
+		$self->{slc} = $b->[$$o] & 0x0f;
+		$self->{sdli} = $b->[$$o] >> 4;
+		$$o++;
+		$self->{sdli} |= $b->[$$o] << 4;
+		$$o++;
+		$self->{sdli} |= ($b->[$$o] & 0x03) << 12;
+		$self->{sdli0} = $b->[$$o] >> 2;
+		$$o++;
+	}
+}
+# -------------------------------------
+package CssMessage; use strict; use vars qw(@ISA); @ISA = qw(SlmMessage);
+# -------------------------------------
+# -------------------------------------
+package CnsMessage; use strict; use vars qw(@ISA); @ISA = qw(SlmMessage);
+# -------------------------------------
+# -------------------------------------
+package CnpMessage; use strict; use vars qw(@ISA); @ISA = qw(SlmMessage);
+# -------------------------------------
+# -------------------------------------
+package UpuMessage; use strict; use vars qw(@ISA); @ISA = qw(UpmMessage);
+# -------------------------------------
+# -------------------------------------
+package UpaMessage; use strict; use vars qw(@ISA); @ISA = qw(UpmMessage);
+# -------------------------------------
+# -------------------------------------
+package UptMessage; use strict; use vars qw(@ISA); @ISA = qw(UpmMessage);
+# -------------------------------------
+
+# -------------------------------------
+package SntmMessage; use strict; use vars qw(@ISA); @ISA = qw(MsuMessage);
+# -------------------------------------
+sub decode {
+	my ($self,$b,$o,$rt) = @_;
+	if ($rt == RT_14BIT_PC) {
+		$self->{slc} = $self->{sls};
+		$self->{dlen0} = $b->[$$o] & 0x0f;
+	} else {
+		$self->{slc} = $b->[$$o] & 0x0f;
+	}
+	$self->{dlen} = $b->[$$o] >> 4;
+	$self->{tmsg} = '';
+	$$o++;
+	for (my $i = 0; $i < $self->{dlen}; $i++) {
+		$self->{tmsg} .= sprintf('%02X', $b->[$$o+$i]);
+	}
+	$$o += $self->{dlen};
+}
+# -------------------------------------
+package SnsmMessage; use strict; use vars qw(@ISA); @ISA = qw(MsuMessage);
+# -------------------------------------
+sub decode {
+	my ($self,@args) = @_;
+	SntmMessage::decode(@args);
+}
+# -------------------------------------
+package SltmMessage; use strict; use vars qw(@ISA); @ISA = qw(SntmMessage SnsmMessage);
+# -------------------------------------
+# -------------------------------------
+package SltaMessage; use strict; use vars qw(@ISA); @ISA = qw(SntmMessage SnsmMessage);
+# -------------------------------------
+
+# -------------------------------------
+package SccpMessage; use strict; use vars qw(@ISA); @ISA = qw(MsuMessage);
+# -------------------------------------
+# -------------------------------------
+package CrMessage; use strict; use vars qw(@ISA); @ISA = qw(SccpMessage);
+# -------------------------------------
+# -------------------------------------
+package CcMessage; use strict; use vars qw(@ISA); @ISA = qw(SccpMessage);
+# -------------------------------------
+# -------------------------------------
+package CrefMessage; use strict; use vars qw(@ISA); @ISA = qw(SccpMessage);
+# -------------------------------------
+# -------------------------------------
+package RlsdMessage; use strict; use vars qw(@ISA); @ISA = qw(SccpMessage);
+# -------------------------------------
+# -------------------------------------
+package RlcMessage; use strict; use vars qw(@ISA); @ISA = qw(SccpMessage);
+# -------------------------------------
+# -------------------------------------
+package Dt1Message; use strict; use vars qw(@ISA); @ISA = qw(SccpMessage);
+# -------------------------------------
+# -------------------------------------
+package Dt2Message; use strict; use vars qw(@ISA); @ISA = qw(SccpMessage);
+# -------------------------------------
+# -------------------------------------
+package AkMessage; use strict; use vars qw(@ISA); @ISA = qw(SccpMessage);
+# -------------------------------------
+# -------------------------------------
+package UdtMessage; use strict; use vars qw(@ISA); @ISA = qw(SccpMessage);
+# -------------------------------------
+# -------------------------------------
+package UdtsMessage; use strict; use vars qw(@ISA); @ISA = qw(SccpMessage);
+# -------------------------------------
+# -------------------------------------
+package EdMessage; use strict; use vars qw(@ISA); @ISA = qw(SccpMessage);
+# -------------------------------------
+# -------------------------------------
+package EaMessage; use strict; use vars qw(@ISA); @ISA = qw(SccpMessage);
+# -------------------------------------
+# -------------------------------------
+package RsrMessage; use strict; use vars qw(@ISA); @ISA = qw(SccpMessage);
+# -------------------------------------
+# -------------------------------------
+package RscMessage; use strict; use vars qw(@ISA); @ISA = qw(SccpMessage);
+# -------------------------------------
+# -------------------------------------
+package ErrMessage; use strict; use vars qw(@ISA); @ISA = qw(SccpMessage);
+# -------------------------------------
+# -------------------------------------
+package ItMessage; use strict; use vars qw(@ISA); @ISA = qw(SccpMessage);
+# -------------------------------------
+# -------------------------------------
+package XudtMessage; use strict; use vars qw(@ISA); @ISA = qw(SccpMessage);
+# -------------------------------------
+# -------------------------------------
+package XudtsMessage; use strict; use vars qw(@ISA); @ISA = qw(SccpMessage);
+# -------------------------------------
+# -------------------------------------
+package LudtMessage; use strict; use vars qw(@ISA); @ISA = qw(SccpMessage);
+# -------------------------------------
+# -------------------------------------
+package LudtsMessage; use strict; use vars qw(@ISA); @ISA = qw(SccpMessage);
+# -------------------------------------
+
+# -------------------------------------
+package IsupMessage; use strict; use vars qw(@ISA); @ISA = qw(MsuMessage);
+# -------------------------------------
+my %isupparm = (
+	0x00 => ['eop',		'End of optional parameters',			'EopIsupParameter'	],
+	0x01 => ['clrf',	'Call reference',				'ClrfIsupParameter'	],
+	0x02 => ['tmr',		'Transmission medium requirement',		'TmrIsupParameter'	],
+	0x03 => ['atp',		'Access transport',				'AtpIsupParameter'	],
+	0x04 => ['cdpn',	'Called party number',				'CdpnIsupParameter'	],
+	0x05 => ['subn',	'Subsequent number',				'SubnIsupParameter'	],
+	0x06 => ['nci',		'Nature of connection indicators',		'NciIsupParameter'	],
+	0x07 => ['FCI',		'Forward call indicators',			'FciIsupParameter'	],
+	0x08 => ['OFCI',	'Optional forward call indicators',		'OfciIsupParameter'	],
+	0x09 => ['CPC',		'Calling party\'s category',			'CpcIsupParameter'	],
+	0x0a => ['CGPN',	'Calling party number',				'CgpnIsupParameter'	],
+	0x0b => ['RDGN',	'Redirecting number',				'RdgnIsupParameter'	],
+	0x0c => ['RDNN',	'Redirection number',				'RdnnIsupParameter',	],
+	0x0d => ['CONR',	'Connection request',				'ConrIsupParameter',	],
+	0x0e => ['INRI',	'Information request indicators',		'InriIsupParameter',	],
+	0x0f => ['INFI',	'Information indicators @',			'InfiIsupParameter',	],
+	0x10 => ['COTI',	'Continuity indicators',			'CotiIsupParameter',	],
+	0x11 => ['BCI',		'Backward call indicators',			'BciIsupParameter',	],
+	0x12 => ['CAUS',	'Cause indicators',				'CausIsupParameter',	],
+	0x13 => ['RDI',		'Redirection information',			'RdiIsupParameter',	],
+	0x15 => ['CGI',		'Circuit group supervision msg type ind',	'CgiIsupParameter',	],
+	0x16 => ['RS',		'Range and status',				'RsIsupParameter',	],
+	0x17 => ['CMI',		'Call modification indicators (Blue Book)',	'CmiIsupParameter',	],
+	0x18 => ['FACI',	'Facility indicator',				'FaciIsupParameter',	],
+	0x19 => ['FAII',	'Facility information indicators (Bellcore)',	'FaiiIsupParameter',	],
+	0x1a => ['CUGI',	'Closed user group interlock code',		'CugiIsupParameter',	],
+	0x1b => ['INDEX',	'Index (Bellcore)',				'IndexIsupParameter',	],
+	0x1c => ['CUGCRI',	'Closed user group check response indicators',	'CugcriIsupParameter',	],
+	0x1d => ['USI',		'User service information',			'UsiIsupParameter',	],
+	0x1e => ['SPC',		'Signalling point code @ (Bellcore)',		'SpcIsupParameter',	],
+	0x20 => ['UUI',		'User to user information',			'UuiIsupParameter',	],
+	0x21 => ['CONN',	'Connected number',				'ConnIsupParameter',	],
+	0x22 => ['SRIS',	'Suspend/resume indicators',			'SrisIsupParameter',	],
+	0x23 => ['TNS',		'Transit network selection @',			'TnsIsupParameter',	],
+	0x24 => ['EVNT',	'Event information',				'EvntIsupParameter',	],
+	0x25 => ['CAM',		'Circuit assignment map',			'CamIsupParameter',	],
+	0x26 => ['CSI',		'Circuit state indicator @',			'CsiIsupParameter',	],
+	0x27 => ['ACL',		'Automatic congestion level',			'AclIsupParameter',	],
+	0x28 => ['OCDN',	'Original called number',			'OcdnIsupParameter',	],
+	0x29 => ['OBCI',	'Optional backward call indicators',		'ObciIsupParameter',	],
+	0x2a => ['UUIND',	'User to user indicators',			'UuindIsupParameter',	],
+	0x2b => ['ISPC',	'Origination ISC point code (not ANSI)',	'IspcIsupParameter',	],
+	0x2c => ['GNOT',	'Generic notification (not ANSI)',		'GnotIsupParameter',	],
+	0x2d => ['CHI',		'Call history information (not ANSI)',		'ChiIsupParameter',	],
+	0x2e => ['ADI',		'Access delivery information (not ANSI)',	'AdiIsupParameter',	],
+	0x2f => ['NSF',		'Network specific facilities @',		'NsfIsupParameter',	],
+	0x30 => ['USIP',	'User service information prime',		'UsipIsupParameter',	],
+	0x31 => ['PROP',	'Propagation delay counter (not ANSI)',		'PropIsupParameter',	],
+	0x32 => ['ROPS',	'Remote operations @',				'RopsIsupParameter',	],
+	0x33 => ['SA',		'Service activation @',				'SaIsupParameter',	],
+	0x34 => ['UTI',		'User teleservice information (not ANSI)',	'UtiIsupParameter',	],
+	0x35 => ['TMU',		'Transmission medium used',			'TmuIsupParameter',	],
+	0x36 => ['CDI',		'Call diversion information (not ANSI)',	'CdiIsupParameter',	],
+	0x37 => ['ECI',		'Echo control information (not ANSI)',		'EciIsupParameter',	],
+	0x38 => ['MCI',		'Message compatibility information',		'MciIsupParameter',	],
+	0x39 => ['PCI',		'Parameter compatibility information',		'PciIsupParameter',	],
+	0x3a => ['MLPP',	'MLPP preference (Precedence ANSI)',		'MlppIsupParameter',	],
+	0x3b => ['MCIQ',	'MCID request indicator (not ANSI)',		'MciqIsupParameter',	],
+	0x3c => ['MCIR',	'MCID response indicator (not ANSI)',		'McirIsupParameter',	],
+	0x3d => ['HOPC',	'Hop counter (reserved)',			'HopcIsupParameter',	],
+	0x3e => ['TMRP',	'Transmission medium requirement prime (not ANSI)','TmrpIsupParameter',	],
+	0x3f => ['LN',		'Location number (not ANSI)',			'LnIsupParameter',	],
+	0x40 => ['RDNR',	'Redirection number restriction (not ANSI)',	'RdnrIsupParameter',	],
+	0x41 => ['FREEP',	'Freephone indicators (reserved) (not ANSI)',	'FreepIsupParameter',	],
+	0x42 => ['GREF',	'Generic reference (reserved) (not ANSI)',	'GrefIsupParameter',	],
+	0x4e => ['RCAP',	'Redirect capability (ANSI)',			'RcapIsupParameter',	],
+	0x5b => ['NMC',		'Network management controls (ANSI)',		'NmcIsupParameter',	],
+	0x77 => ['RCNT',	'Redirect counter (ANSI)',			'RcntIsupParameter',	],
+	0x7b => ['PCAP',	'Pivot capability (ANSI)',			'PcapIsupParameter',	],
+	0x7c => ['PRI',		'Pivot routing indicator (ANSI)',		'PriIsupParameter',	],
+	0x81 => ['CGL',		'Calling geodetic location (ANSI)',		'GglIsupParameter',	],
+	0x86 => ['PSTA',	'Pivot status (ANSI)',				'PstaIsupParameter',	],
+	0x87 => ['PCNT',	'Pivot counter (ANSI)',				'PcntIsupParameter',	],
+	0x88 => ['PRFI',	'Pivot routing forward information (ANSI)',	'PrfiIsupParameter',	],
+	0x89 => ['PRBI',	'Pivot routing backward information (ANSI)',	'PrbiIsupParameter',	],
+	0x8a => ['RSTA',	'Redirect status (ANSI)',			'RstaIsupParameter',	],
+	0x8b => ['RFI',		'Redirect forward information (ANSI)',		'RfiIsupParameter',	],
+	0x8c => ['RBI',		'Redirect backward information (ANSI)',		'RbiIsupParameter',	],
+	0xc0 => ['GNUM',	'Generic number (Generic address ANSI, Bellcore)','GnumIsupParameter',	],
+	0xc1 => ['GDIG',	'Generic digits @',				'GdigIsupParameter',	],
+	0xc2 => ['OSI',		'Operator services information (ANSI)',		'OsiIsupParameter',	],
+	0xc3 => ['EGRESS',	'Egress (ANSI)',				'EgressIsupParameter',	],
+	0xc4 => ['JUR',		'Jurisdiction (ANSI)',				'JurIsupParameter',	],
+	0xc5 => ['CIDC',	'Carrier identification code (ANSI)',		'CidcIsupParameter',	],
+	0xc6 => ['BGROUP',	'Business group (ANSI)',			'BgroupIsupParameter',	],
+	0xc7 => ['GNAM',	'Generic name (ANSI)',				'GnamIsupParameter',	],
+	0xe1 => ['NOTI',	'Notification indicator (ANSI)',		'NotiIsupParameter',	],
+	0xe2 => ['SVACT',	'Service activation (ANSI)',			'SvactIsupParameter',	],
+	0xe2 => ['CSPI',	'Carrier service provider identification (ANSI)','CspiIsupParameter',	],
+	0xe3 => ['TRNSRQ',	'Transaction request (ANSI, Bellcore)',		'TrnreqIsupParameter',	],
+	0xe4 => ['LSPI',	'Local service provider information (ANSI)',	'LspiIsupParameter',	],
+	0xe5 => ['CGCI',	'Cc\'t group char ind (ANSI, Bellcore)',	'CgciIsupParameter',	],
+	0xe6 => ['CVRI',	'Cc\'t validation resp ind (ANSI, Bellcore)',	'CvriIsupParameter',	],
+	0xe7 => ['OTGN',	'Outgoing trunk group numb (ANSI, Bellcore)',	'OtgnIsupParameter',	],
+	0xe8 => ['CIN',		'Circuit ident name (ANSI, Bellcore)',		'CinIsupParameter',	],
+	0xe9 => ['CLLI',	'Common language loc id (ANSI, Bellcore)',	'ClliIsupParameter',	],
+	0xea => ['OLI',		'Originating line info (ANSI, Bellcore)',	'OliIsupParameter',	],
+	0xeb => ['CHGN',	'Charge number (ANSI, Bellcore)',		'ChgnIsupParameter',	],
+	0xec => ['SVCD',	'Service code indicator (ANSI, Bellcore)',	'SvcdIsupParameter',	],
+	0xed => ['SPR',		'Special processing request (ANSI, Bellcore)',	'SprIsupParameter',	],
+	0xee => ['CSEL',	'Carrier selection info (ANSI, Bellcore)',	'CselIsupParameter',	],
+	0xef => ['NT',		'Network transport (ANSI)',			'NtIsupParameter',	],
+	0xf3 => ['ORI',		'Outgoing route identification (Spain)',	'OriIsupParameter',	],
+	0xf4 => ['IRI',		'Incoming route identification (Spain)',	'IriIsupParameter',	],
+	0xf8 => ['RATE',	'Rate (Spain)',					'RateIsupParameter',	],
+	0xf9 => ['IIC',		'Identifier of incoming circuit (Spain)',	'IicIsupParameter',	],
+	0xfd => ['TOI',		'Trunk offering information (Singapore)',	'ToiIsupParameter',	],
+	0xfd => ['TON',		'Type of notification (Spain)',			'TonIsupParameter',	],
+	0xfe => ['CRI',		'Charge rate information (Singapore)',		'CriIsupParameter',	],
+	0xff => ['ICCI',	'Call charge information (Singapore)',		'IcciIsupParameter',	],
+);
+sub oparms {
+	my ($self,$b,$p,$e,$rt) = @_;
+	my @parms = ();
+	for (;;) {
+		my $pt = $b->[$$p];
+		last unless exists $isupparm{$pt};
+		$$p++;
+		push @parms, IsupParameter::opt($isupparm{$pt}->[2],$b,$p,$e,$rt);
+		last if $pt == 0 or ref $parms[-1] eq 'EopIsupParameter';
+	}
+	return \@parms;
+}
+# -------------------------------------
+package IamMessage; use strict; use vars qw(@ISA); @ISA = qw(IsupMessage);
+# -------------------------------------
+sub decode {
+	my ($self,$b,$p,$e,$rt) = @_;
+	if ($rt == RT_14BIT_PC) {
+		$self->{nci} = NciIsupParameter->man($b,$p,$e,$rt);
+		$self->{fci} = FciIsupParameter->man($b,$p,$e,$rt);
+		$self->{cpc} = CpcIsupParameter->man($b,$p,$e,$rt);
+		$self->{tmr} = TmrIsupParameter->man($b,$p,$e,$rt);
+		$self->{cdpn} = CdpnIsupParameter->man($b,$p,$e,$rt);
+	} else {
+		$self->{nci} = NciIsupParameter->man($b,$p,$e,$rt);
+		$self->{fci} = FciIsupParameter->man($b,$p,$e,$rt);
+		$self->{cpc} = CpcIsupParameter->man($b,$p,$e,$rt);
+		$self->{usi} = UsiIsupParameter->man($b,$p,$e,$rt);
+		$self->{cdpn} = CdpnIsupParameter->man($b,$p,$e,$rt);
+	}
+	$self->{oparms} = $self->oparms($b,$p,$e,$rt);
+}
+# -------------------------------------
+package SamMessage; use strict; use vars qw(@ISA); @ISA = qw(IsupMessage);
+# -------------------------------------
+sub decode {
+	my ($self,$b,$p,$e,$rt) = @_;
+	if ($rt == RT_14BIT_PC) {
+		$self->{subn} = SubnIsupParameter->man($b,$p,$e,$rt);
+		$self->{oparms} = $self->oparms($b,$p,$e,$rt);
+	}
+}
+# -------------------------------------
+package InrMessage; use strict; use vars qw(@ISA); @ISA = qw(IsupMessage);
+# -------------------------------------
+sub decode {
+	my ($self,$b,$p,$e,$rt) = @_;
+	$self->{inri} = InriIsupParameter->man($b,$p,$e,$rt);
+	$self->{oparms} = $self->oparms($b,$p,$e,$rt);
+}
+# -------------------------------------
+package InfMessage; use strict; use vars qw(@ISA); @ISA = qw(IsupMessage);
+# -------------------------------------
+sub decode {
+	my ($self,$b,$p,$e,$rt) = @_;
+	$self->{infi} = InfiIsupParameter->man($b,$p,$e,$rt);
+	$self->{oparms} = $self->oparms($b,$p,$e,$rt);
+}
+# -------------------------------------
+package CotMessage; use strict; use vars qw(@ISA); @ISA = qw(IsupMessage);
+# -------------------------------------
+sub decode {
+	my ($self,$b,$p,$e,$rt) = @_;
+	$self->{coti} = CotiIsupParameter->man($b,$p,$e,$rt);
+}
+# -------------------------------------
+package AcmMessage; use strict; use vars qw(@ISA); @ISA = qw(IsupMessage);
+# -------------------------------------
+sub decode {
+	my ($self,$b,$p,$e,$rt) = @_;
+	$self->{bci} = BciIsupParameter->man($b,$p,$e,$rt);
+	$self->{oparms} = $self->oparms($b,$p,$e,$rt);
+}
+# -------------------------------------
+package ConMessage; use strict; use vars qw(@ISA); @ISA = qw(IsupMessage);
+# -------------------------------------
+sub decode {
+	my ($self,$b,$p,$e,$rt) = @_;
+	if ($rt == RT_14BIT_PC) {
+		$self->{bci} = BciIsupParameter->man($b,$p,$e,$rt);
+		$self->{oparms} = $self->oparms($b,$p,$e,$rt);
+	}
+}
+# -------------------------------------
+package FotMessage; use strict; use vars qw(@ISA); @ISA = qw(IsupMessage);
+# -------------------------------------
+sub decode {
+	my ($self,$b,$p,$e,$rt) = @_;
+	$self->{oparms} = $self->oparms($b,$p,$e,$rt);
+}
+# -------------------------------------
+package AnmMessage; use strict; use vars qw(@ISA); @ISA = qw(IsupMessage);
+# -------------------------------------
+sub decode {
+	my ($self,$b,$p,$e,$rt) = @_;
+	$self->{oparms} = $self->oparms($b,$p,$e,$rt);
+}
+# -------------------------------------
+package RelMessage; use strict; use vars qw(@ISA); @ISA = qw(IsupMessage);
+# -------------------------------------
+sub decode {
+	my ($self,$b,$p,$e,$rt) = @_;
+	$self->{caus} = CausIsupParameter->man($b,$p,$e,$rt);
+	$self->{oparms} = $self->oparms($b,$p,$e,$rt);
+}
+# -------------------------------------
+package SusMessage; use strict; use vars qw(@ISA); @ISA = qw(IsupMessage);
+# -------------------------------------
+sub decode {
+	my ($self,$b,$p,$e,$rt) = @_;
+	$self->{sris} = SrisIsupParameter->man($b,$p,$e,$rt);
+	$self->{oparms} = $self->oparms($b,$p,$e,$rt);
+}
+# -------------------------------------
+package ResMessage; use strict; use vars qw(@ISA); @ISA = qw(IsupMessage);
+# -------------------------------------
+sub decode {
+	my ($self,$b,$p,$e,$rt) = @_;
+	$self->{sris} = SrisIsupParameter->man($b,$p,$e,$rt);
+	$self->{oparms} = $self->oparms($b,$p,$e,$rt);
+}
+# -------------------------------------
+package RlcMessage; use strict; use vars qw(@ISA); @ISA = qw(IsupMessage);
+# -------------------------------------
+sub decode {
+	my ($self,$b,$p,$e,$rt) = @_;
+	if ($rt == RT_14BIT_PC) {
+		$self->{oparms} = $self->oparms($b,$p,$e,$rt);
+	}
+}
+# -------------------------------------
+package CcrMessage; use strict; use vars qw(@ISA); @ISA = qw(IsupMessage);
+# -------------------------------------
+# -------------------------------------
+package RscMessage; use strict; use vars qw(@ISA); @ISA = qw(IsupMessage);
+# -------------------------------------
+# -------------------------------------
+package BloMessage; use strict; use vars qw(@ISA); @ISA = qw(IsupMessage);
+# -------------------------------------
+# -------------------------------------
+package UblMessage; use strict; use vars qw(@ISA); @ISA = qw(IsupMessage);
+# -------------------------------------
+# -------------------------------------
+package BlaMessage; use strict; use vars qw(@ISA); @ISA = qw(IsupMessage);
+# -------------------------------------
+# -------------------------------------
+package UbaMessage; use strict; use vars qw(@ISA); @ISA = qw(IsupMessage);
+# -------------------------------------
+# -------------------------------------
+package GrsMessage; use strict; use vars qw(@ISA); @ISA = qw(IsupMessage);
+# -------------------------------------
+sub decode {
+	my ($self,$b,$p,$e,$rt) = @_;
+	$self->{rs} = RsIsupParameter->man($b,$p,$e,$rt);
+}
+# -------------------------------------
+package CgbMessage; use strict; use vars qw(@ISA); @ISA = qw(IsupMessage);
+# -------------------------------------
+sub decode {
+	my ($self,$b,$p,$e,$rt) = @_;
+	$self->{cgi} = CgiIsupParameter->man($b,$p,$e,$rt);
+	$self->{rs} = RsIsupParameter->man($b,$p,$e,$rt);
+}
+# -------------------------------------
+package CguMessage; use strict; use vars qw(@ISA); @ISA = qw(IsupMessage);
+# -------------------------------------
+sub decode {
+	my ($self,$b,$p,$e,$rt) = @_;
+	$self->{cgi} = CgiIsupParameter->man($b,$p,$e,$rt);
+	$self->{rs} = RsIsupParameter->man($b,$p,$e,$rt);
+}
+# -------------------------------------
+package CgbaMessage; use strict; use vars qw(@ISA); @ISA = qw(IsupMessage);
+# -------------------------------------
+sub decode {
+	my ($self,$b,$p,$e,$rt) = @_;
+	$self->{cgi} = CgiIsupParameter->man($b,$p,$e,$rt);
+	$self->{rs} = RsIsupParameter->man($b,$p,$e,$rt);
+}
+# -------------------------------------
+package CguaMessage; use strict; use vars qw(@ISA); @ISA = qw(IsupMessage);
+# -------------------------------------
+sub decode {
+	my ($self,$b,$p,$e,$rt) = @_;
+	$self->{cgi} = CgiIsupParameter->man($b,$p,$e,$rt);
+	$self->{rs} = RsIsupParameter->man($b,$p,$e,$rt);
+}
+# -------------------------------------
+package CmrMessage; use strict; use vars qw(@ISA); @ISA = qw(IsupMessage);
+# -------------------------------------
+sub decode {
+	my ($self,$b,$p,$e,$rt) = @_;
+	if ($rt == RT_14BIT_PC) {
+		$self->{cmi} = CmiIsupParameter->man($b,$p,$e,$rt);
+		$self->{oparms} = $self->oparms($b,$p,$e,$rt);
+	}
+}
+# -------------------------------------
+package CmcMessage; use strict; use vars qw(@ISA); @ISA = qw(IsupMessage);
+# -------------------------------------
+sub decode {
+	my ($self,$b,$p,$e,$rt) = @_;
+	if ($rt == RT_14BIT_PC) {
+		$self->{cmi} = CmiIsupParameter->man($b,$p,$e,$rt);
+		$self->{oparms} = $self->oparms($b,$p,$e,$rt);
+	}
+}
+# -------------------------------------
+package CmrjMessage; use strict; use vars qw(@ISA); @ISA = qw(IsupMessage);
+# -------------------------------------
+sub decode {
+	my ($self,$b,$p,$e,$rt) = @_;
+	if ($rt == RT_14BIT_PC) {
+		$self->{cmi} = CmiIsupParameter->man($b,$p,$e,$rt);
+		$self->{oparms} = $self->oparms($b,$p,$e,$rt);
+	}
+}
+# -------------------------------------
+package FarMessage; use strict; use vars qw(@ISA); @ISA = qw(IsupMessage);
+# -------------------------------------
+sub decode {
+	my ($self,$b,$p,$e,$rt) = @_;
+	$self->{faci} = FaciIsupParameter->man($b,$p,$e,$rt);
+	$self->{oparms} = $self->oparms($b,$p,$e,$rt);
+}
+# -------------------------------------
+package FaaMessage; use strict; use vars qw(@ISA); @ISA = qw(IsupMessage);
+# -------------------------------------
+sub decode {
+	my ($self,$b,$p,$e,$rt) = @_;
+	$self->{faci} = FaciIsupParameter->man($b,$p,$e,$rt);
+	$self->{oparms} = $self->oparms($b,$p,$e,$rt);
+}
+# -------------------------------------
+package FrjMessage; use strict; use vars qw(@ISA); @ISA = qw(IsupMessage);
+# -------------------------------------
+sub decode {
+	my ($self,$b,$p,$e,$rt) = @_;
+	$self->{faci} = FaciIsupParameter->man($b,$p,$e,$rt);
+	$self->{caus} = CausIsupParameter->man($b,$p,$e,$rt);
+	$self->{oparms} = $self->oparms($b,$p,$e,$rt);
+}
+# -------------------------------------
+package FadMessage; use strict; use vars qw(@ISA); @ISA = qw(IsupMessage);
+# -------------------------------------
+sub decode {
+	my ($self,$b,$p,$e,$rt) = @_;
+	if ($rt == RT_24BIT_PC) {
+		$self->{faci} = FaciIsupParameter->man($b,$p,$e,$rt);
+		$self->{oparms} = $self->oparms($b,$p,$e,$rt);
+	}
+}
+# -------------------------------------
+package FaiMessage; use strict; use vars qw(@ISA); @ISA = qw(IsupMessage);
+# -------------------------------------
+sub decode {
+	my ($self,$b,$p,$e,$rt) = @_;
+	if ($rt == RT_24BIT_PC) {
+		$self->{faci} = FaciIsupParameter->man($b,$p,$e,$rt);
+		$self->{faii} = FaiiIsupParameter->man($b,$p,$e,$rt);
+		$self->{oparms} = $self->oparms($b,$p,$e,$rt);
+	}
+}
+# -------------------------------------
+package LpaMessage; use strict; use vars qw(@ISA); @ISA = qw(IsupMessage);
+# -------------------------------------
+# -------------------------------------
+package CsvqMessage; use strict; use vars qw(@ISA); @ISA = qw(IsupMessage);
+# -------------------------------------
+# -------------------------------------
+package CsvrMessage; use strict; use vars qw(@ISA); @ISA = qw(IsupMessage);
+# -------------------------------------
+# -------------------------------------
+package DrsMessage; use strict; use vars qw(@ISA); @ISA = qw(IsupMessage);
+# -------------------------------------
+sub decode {
+	my ($self,$b,$p,$e,$rt) = @_;
+	if ($rt == RT_14BIT_PC) {
+		$self->{oparms} = $self->oparms($b,$p,$e,$rt);
+	}
+}
+# -------------------------------------
+package PamMessage; use strict; use vars qw(@ISA); @ISA = qw(IsupMessage);
+# -------------------------------------
+# -------------------------------------
+package GraMessage; use strict; use vars qw(@ISA); @ISA = qw(IsupMessage);
+# -------------------------------------
+sub decode {
+	my ($self,$b,$p,$e,$rt) = @_;
+	$self->{rs} = RsIsupParameter->man($b,$p,$e,$rt);
+}
+# -------------------------------------
+package CqmMessage; use strict; use vars qw(@ISA); @ISA = qw(IsupMessage);
+# -------------------------------------
+sub decode {
+	my ($self,$b,$p,$e,$rt) = @_;
+	$self->{rs} = RsIsupParameter->man($b,$p,$e,$rt);
+}
+# -------------------------------------
+package CqrMessage; use strict; use vars qw(@ISA); @ISA = qw(IsupMessage);
+# -------------------------------------
+sub decode {
+	my ($self,$b,$p,$e,$rt) = @_;
+	$self->{rs} = RsIsupParameter->man($b,$p,$e,$rt);
+	$self->{csi} = CsiIsupParameter->man($b,$p,$e,$rt);
+}
+# -------------------------------------
+package CpgMessage; use strict; use vars qw(@ISA); @ISA = qw(IsupMessage);
+# -------------------------------------
+sub decode {
+	my ($self,$b,$p,$e,$rt) = @_;
+	$self->{evnt} = EvntIsupParameter->man($b,$p,$e,$rt);
+	$self->{oparms} = $self->oparms($b,$p,$e,$rt);
+}
+# -------------------------------------
+package UsrMessage; use strict; use vars qw(@ISA); @ISA = qw(IsupMessage);
+# -------------------------------------
+sub decode {
+	my ($self,$b,$p,$e,$rt) = @_;
+	if ($rt == RT_14BIT_PC) {
+		$self->{uui} = UuiIsupParameter->man($b,$p,$e,$rt);
+		$self->{oparms} = $self->oparms($b,$p,$e,$rt);
+	}
+}
+# -------------------------------------
+package UcicMessage; use strict; use vars qw(@ISA); @ISA = qw(IsupMessage);
+# -------------------------------------
+# -------------------------------------
+package CfnMessage; use strict; use vars qw(@ISA); @ISA = qw(IsupMessage);
+# -------------------------------------
+sub decode {
+	my ($self,$b,$p,$e,$rt) = @_;
+	$self->{caus} = CausIsupParameter->man($b,$p,$e,$rt);
+	$self->{oparms} = $self->oparms($b,$p,$e,$rt);
+}
+# -------------------------------------
+package OlmMessage; use strict; use vars qw(@ISA); @ISA = qw(IsupMessage);
+# -------------------------------------
+# -------------------------------------
+package CrgMessage; use strict; use vars qw(@ISA); @ISA = qw(IsupMessage);
+# -------------------------------------
+sub decode {
+	my ($self,$b,$p,$e,$rt) = @_;
+	if ($rt == RT_14BIT_PC) {
+		#FIXME only for Singapore
+		$self->{icci} = IcciIsupParameter->man($b,$p,$e,$rt);
+		#FIXME only for Singapore and Spain
+		$self->{oparms} = $self->oparms($b,$p,$e,$rt);
+	}
+}
+# -------------------------------------
+package NrmMessage; use strict; use vars qw(@ISA); @ISA = qw(IsupMessage);
+# -------------------------------------
+sub decode {
+	my ($self,$b,$p,$e,$rt) = @_;
+	if ($rt == RT_14BIT_PC) {
+		$self->{oparms} = $self->oparms($b,$p,$e,$rt);
+	}
+}
+# -------------------------------------
+package FacMessage; use strict; use vars qw(@ISA); @ISA = qw(IsupMessage);
+# -------------------------------------
+sub decode {
+	my ($self,$b,$p,$e,$rt) = @_;
+	if ($rt == RT_14BIT_PC) {
+		$self->{oparms} = $self->oparms($b,$p,$e,$rt);
+	}
+}
+# -------------------------------------
+package UptMessage; use strict; use vars qw(@ISA); @ISA = qw(IsupMessage);
+# -------------------------------------
+sub decode {
+	my ($self,$b,$p,$e,$rt) = @_;
+	if ($rt == RT_14BIT_PC) {
+		$self->{oparms} = $self->oparms($b,$p,$e,$rt);
+	}
+}
+# -------------------------------------
+package UpaMessage; use strict; use vars qw(@ISA); @ISA = qw(IsupMessage);
+# -------------------------------------
+sub decode {
+	my ($self,$b,$p,$e,$rt) = @_;
+	if ($rt == RT_14BIT_PC) {
+		$self->{oparms} = $self->oparms($b,$p,$e,$rt);
+	}
+}
+# -------------------------------------
+package IdrMessage; use strict; use vars qw(@ISA); @ISA = qw(IsupMessage);
+# -------------------------------------
+sub decode {
+	my ($self,$b,$p,$e,$rt) = @_;
+	if ($rt == RT_14BIT_PC) {
+		$self->{oparms} = $self->oparms($b,$p,$e,$rt);
+	}
+}
+# -------------------------------------
+package IrsMessage; use strict; use vars qw(@ISA); @ISA = qw(IsupMessage);
+# -------------------------------------
+sub decode {
+	my ($self,$b,$p,$e,$rt) = @_;
+	if ($rt == RT_14BIT_PC) {
+		$self->{oparms} = $self->oparms($b,$p,$e,$rt);
+	}
+}
+# -------------------------------------
+package SgmMessage; use strict; use vars qw(@ISA); @ISA = qw(IsupMessage);
+# -------------------------------------
+sub decode {
+	my ($self,$b,$p,$e,$rt) = @_;
+	if ($rt == RT_14BIT_PC) {
+		$self->{oparms} = $self->oparms($b,$p,$e,$rt);
+	}
+}
+# -------------------------------------
+package CraMessage; use strict; use vars qw(@ISA); @ISA = qw(IsupMessage);
+# -------------------------------------
+sub decode {
+	my ($self,$b,$p,$e,$rt) = @_;
+	if ($rt == RT_24BIT_PC) {
+		return;
+	}
+}
+# -------------------------------------
+package CrmMessage; use strict; use vars qw(@ISA); @ISA = qw(IsupMessage);
+# -------------------------------------
+sub decode {
+	my ($self,$b,$p,$e,$rt) = @_;
+	if ($rt == RT_24BIT_PC) {
+		$self->{nci} = NciIsupParameter->man($b,$p,$e,$rt);
+	}
+}
+# -------------------------------------
+package CvrMessage; use strict; use vars qw(@ISA); @ISA = qw(IsupMessage);
+# -------------------------------------
+sub decode {
+	my ($self,$b,$p,$e,$rt) = @_;
+	if ($rt == RT_24BIT_PC) {
+		$self->{cvri} = CvriIsupParameter->man($b,$p,$e,$rt);
+		$self->{cgci} = CgciIsupParameter->man($b,$p,$e,$rt);
+	}
+}
+# -------------------------------------
+package CvtMessage; use strict; use vars qw(@ISA); @ISA = qw(IsupMessage);
+# -------------------------------------
+sub decode {
+	my ($self,$b,$p,$e,$rt) = @_;
+	if ($rt == RT_24BIT_PC) {
+		return;
+	}
+}
+# -------------------------------------
+package ExmMessage; use strict; use vars qw(@ISA); @ISA = qw(IsupMessage);
+# -------------------------------------
+sub decode {
+	my ($self,$b,$p,$e,$rt) = @_;
+	if ($rt == RT_24BIT_PC) {
+		$self->{oparms} = $self->oparms($b,$p,$e,$rt);
+	}
+}
+# -------------------------------------
+package NonMessage; use strict; use vars qw(@ISA); @ISA = qw(IsupMessage);
+# -------------------------------------
+sub decode {
+	my ($self,$b,$p,$e,$rt) = @_;
+	if ($rt == RT_14BIT_PC) {
+		#FIXME Spain only
+		$self->{ton} = TonIsupParameter->man($b,$p,$e,$rt);
+	}
+}
+# -------------------------------------
+package LlmMessage; use strict; use vars qw(@ISA); @ISA = qw(IsupMessage);
+# -------------------------------------
+sub decode {
+	my ($self,$b,$p,$e,$rt) = @_;
+	if ($rt == RT_14BIT_PC) {
+		#FIXME Spain only
+		return;
+	}
+}
+# -------------------------------------
+package CakMessage; use strict; use vars qw(@ISA); @ISA = qw(IsupMessage);
+# -------------------------------------
+sub decode {
+	my ($self,$b,$p,$e,$rt) = @_;
+	if ($rt == RT_14BIT_PC) {
+		#FIXME Singapore only
+		return;
+	}
+}
+# -------------------------------------
+package TcmMessage; use strict; use vars qw(@ISA); @ISA = qw(IsupMessage);
+# -------------------------------------
+sub decode {
+	my ($self,$b,$p,$e,$rt) = @_;
+	if ($rt == RT_14BIT_PC) {
+		#FIXME Singapore only
+		$self->{cri} = CriIsupParameter->man($b,$p,$e,$rt);
+		return;
+	}
+}
+# -------------------------------------
+package McpMessage; use strict; use vars qw(@ISA); @ISA = qw(IsupMessage);
+# -------------------------------------
+sub decode {
+	my ($self,$b,$p,$e,$rt) = @_;
+	if ($rt == RT_14BIT_PC) {
+		#FIXME Singapore only
+		return;
 	}
 }
 
