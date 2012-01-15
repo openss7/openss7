@@ -451,7 +451,7 @@ class FilePcap : public File {
 	FilePcap(void) { }
       public:
 	FilePcap(char *path) : File(path), pp(NULL) { }
-	virtual ~FileText(void) {
+	virtual ~FilePcap(void) {
 		if (pp != NULL) { pcap_close(pp); fp = NULL; }
 		if (fp != NULL) {     fclose(fp); fp = NULL; }
 	}
