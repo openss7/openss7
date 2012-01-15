@@ -141,7 +141,7 @@ EOF
 		exit 0;
 	}
 	usage();
-	die "I don't recognize this switch: $_\\n";
+	die "I don't recognize this switch: $_\n";
 }
 
 foreach $infile (@ARGV) {
