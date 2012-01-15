@@ -22,7 +22,7 @@
 -di1
 -lps
 -ss
--hnl
+-nhnl
 -nbc
 -TSTR_DECLARATION
 -THEAD_DECLARATION
