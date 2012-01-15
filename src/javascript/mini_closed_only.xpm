@@ -1,5 +1,5 @@
 /* XPM */
-static char * mini_closed_xpm[] = {
+static char * mini_closed_only_xpm[] = {
 "16 16 4 1",
 " 	c None",
 "a	c black",
