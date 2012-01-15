@@ -86,8 +86,8 @@ int output = 1;
 int debug = 0;
 int lasterr = 0;
 
-char outfile[256] = "/dev/stdin";
-char inpfile[256] = "/dev/stdout";
+char inpfile[256] = "/dev/stdin";
+char outfile[256] = "/dev/stdout";
 char errfile[256] = "/dev/stderr";
 
 // for now
@@ -379,11 +379,11 @@ ss72pcap(void)
 			break;
 		}
 		if (end - beg < 3) {
-			fprintf(stderr, "Got bad message %ld bytes long\n", end - beg);
+			fprintf(stderr, "Got bad message %zd bytes long\n", end - beg);
 			continue;
 		}
 		if (output > 3)
-			fprintf(stderr, "Got good message %ld bytes long\n", end - beg);
+			fprintf(stderr, "Got good message %zd bytes long\n", end - beg);
 
 		// we never truncate because 4096 is the largest frame
 		ph->caplen = (bpf_u_int32) (end - beg) + MTP2_HDR_LEN;
@@ -506,6 +506,13 @@ Usage:\n\
 Arguments:\n\
     None.\n\
 Options:\n\
+  Code Options:\n\
+    -c, --card card                     (default: %7$d)\n\
+        card number for link code\n\
+    -s, --span span                     (default: %8$d)\n\
+        span number for link code\n\
+    -t, --slot slot                     (default: %9$d)\n\
+        slot number for link code\n\
   File Options:\n\
     -i, --inpfile inpfile               (default: %2$s)\n\
         input file to read ss7capd formatted data\n\
@@ -526,7 +533,7 @@ Options:\n\
         print version and exit\n\
     -C, --copying\n\
         print copying permission and exit\n\
-", argv[0], inpfile, outfile, errfile, debug, output);
+", argv[0], inpfile, outfile, errfile, debug, output, card, span, slot);
 }
 
 int
@@ -539,6 +546,9 @@ main(int argc, char **argv)
 		int option_index = 0;
 		/* *INDENT-OFF* */
 		static struct option long_options[] = {
+			{"card",	required_argument,	NULL,	'c'},
+			{"span",	required_argument,	NULL,	's'},
+			{"slot",	required_argument,	NULL,	't'},
 			{"infile",	required_argument,	NULL,	'i'},
 			{"outfile",	required_argument,	NULL,	'o'},
 			{"errfile",	required_argument,	NULL,	'e'},
@@ -554,9 +564,9 @@ main(int argc, char **argv)
 		};
 		/* *INDENT-ON* */
 
-		c = getopt_long(argc, argv, "i:o:e:qD::v::hVC?W:", long_options, &option_index);
+		c = getopt_long(argc, argv, "c:s:t:i:o:e:qD::v::hVC?W:", long_options, &option_index);
 #else				/* defined _GNU_SOURCE */
-		c = getopt(argc, argv, "i:o:e:qDvhVC?");
+		c = getopt(argc, argv, "c:s:t:i:o:e:qDvhVC?");
 #endif				/* defined _GNU_SOURCE */
 		if (c == -1) {
 			break;
@@ -565,6 +575,27 @@ main(int argc, char **argv)
 		case 0:
 			usage(argc, argv);
 			exit(2);
+		case 'c':	/* -c, --card CARD */
+			if (debug)
+				fprintf(stderr, "%s: setting card to %s\n", argv[0], optarg);
+			if ((val = strtol(optarg, NULL, 0)) < 0)
+				goto bad_option;
+			card = val;
+			break;
+		case 's':	/* -s, --span SPAN */
+			if (debug)
+				fprintf(stderr, "%s: setting span to %s\n", argv[0], optarg);
+			if ((val = strtol(optarg, NULL, 0)) < 0)
+				goto bad_option;
+			span = val;
+			break;
+		case 't':	/* -t, --slot SLOT */
+			if (debug)
+				fprintf(stderr, "%s: setting slot to %s\n", argv[0], optarg);
+			if ((val = strtol(optarg, NULL, 0)) < 0)
+				goto bad_option;
+			slot = val;
+			break;
 		case 'i':	/* -i, --inpfile inpfile */
 			if (debug)
 				fprintf(stderr, "%s: setting inpfile to %s\n", argv[0], optarg);
