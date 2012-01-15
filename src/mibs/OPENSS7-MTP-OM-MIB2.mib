@@ -1019,7 +1019,7 @@ mtpOmSpStudyHandledOctetsOpcDpcSio OBJECT-TYPE
          SIO in units of number of MSUs per OPC, DPC and SIO combination 
          collected over a 5- or 30-minute interval.  This operational 
          measurement is non-obligatory.  This measurement may be used 
-         for performance managment, accounting management, and network 
+         for performance management, accounting management, and network 
          administration and planning."
     REFERENCE   
         "ANSI T1.116.1D handledOctetsOpcDpcSio.
@@ -1119,7 +1119,7 @@ mtpOmSpStudyInt5minHandledOctetsOpcDpcSio OBJECT-TYPE
          SIO in units of number of MSUs per OPC, DPC and SIO combination 
          collected over a 5- or 30-minute interval.  This operational 
          measurement is non-obligatory.  This measurement may be used 
-         for performance managment, accounting management, and network 
+         for performance management, accounting management, and network 
          administration and planning."
     REFERENCE   
         "ANSI T1.116.1D handledOctetsOpcDpcSio.
@@ -1208,7 +1208,7 @@ mtpOmSpStudyInt15minHandledOctetsOpcDpcSio OBJECT-TYPE
          SIO in units of number of MSUs per OPC, DPC and SIO combination 
          collected over a 5- or 30-minute interval.  This operational 
          measurement is non-obligatory.  This measurement may be used 
-         for performance managment, accounting management, and network 
+         for performance management, accounting management, and network 
          administration and planning."
     REFERENCE   
         "ANSI T1.116.1D handledOctetsOpcDpcSio.
@@ -2144,9 +2144,9 @@ mtpOmLsAdjacentInaccessibleEvents OBJECT-TYPE
          
          Adjacent SP inaccessible.  Events per SP. On occurrence reports 
          are obligatory and permanent and are handled by alarm events.  
-         Accumuated counts on 5 and 30 minute intervals are optional.  
+         Accumulated counts on 5 and 30 minute intervals are optional.  
          This operational measurement can be derived from events 
-         indicating the start and stop of ajacent SP inaccessible (items 
+         indicating the start and stop of adjacent SP inaccessible (items 
          5.1 and 5.4)."
     REFERENCE   
         "ANSI T1.116.1D adjacentInaccessibleEvents
@@ -2161,10 +2161,10 @@ mtpOmLsAdjacentInaccessibleDuration OBJECT-TYPE
     STATUS      current
     DESCRIPTION 
         "This attribute represents measurement T1.116.2/5.2 Duration of 
-         adjacent SP inaccessible.  Seconds per SP.  Accumuated counts 
+         adjacent SP inaccessible.  Seconds per SP.  Accumulated counts 
          on 5 and 30 minute intervals are obligatory.  This operational 
          measurement can be derived from events indicating the start and 
-         stop of ajacent SP inaccessible (items 5.1 and 5.4)."
+         stop of adjacent SP inaccessible (items 5.1 and 5.4)."
     REFERENCE   
         "ANSI T1.116.1D adjacentInaccessibleDuration.
          ANSI T1.116.2/2000 Table 5 (5.2).
@@ -2245,9 +2245,9 @@ mtpOmLsInt5minAdjacentInaccessibleEvents OBJECT-TYPE
          
          Adjacent SP inaccessible.  Events per SP. On occurrence reports 
          are obligatory and permanent and are handled by alarm events.  
-         Accumuated counts on 5 and 30 minute intervals are optional.  
+         Accumulated counts on 5 and 30 minute intervals are optional.  
          This operational measurement can be derived from events 
-         indicating the start and stop of ajacent SP inaccessible (items 
+         indicating the start and stop of adjacent SP inaccessible (items 
          5.1 and 5.4)."
     REFERENCE   
         "ANSI T1.116.1D adjacentInaccessibleEvents
@@ -2262,10 +2262,10 @@ mtpOmLsInt5minAdjacentInaccessibleDuration OBJECT-TYPE
     STATUS      current
     DESCRIPTION 
         "This attribute represents measurement T1.116.2/5.2 Duration of 
-         adjacent SP inaccessible.  Seconds per SP.  Accumuated counts 
+         adjacent SP inaccessible.  Seconds per SP.  Accumulated counts 
          on 5 and 30 minute intervals are obligatory.  This operational 
          measurement can be derived from events indicating the start and 
-         stop of ajacent SP inaccessible (items 5.1 and 5.4)."
+         stop of adjacent SP inaccessible (items 5.1 and 5.4)."
     REFERENCE   
         "ANSI T1.116.1D adjacentInaccessibleDuration.
          ANSI T1.116.2/2000 Table 5 (5.2).
@@ -2347,9 +2347,9 @@ mtpOmLsInt15minAdjacentInaccessibleEvents OBJECT-TYPE
          
          Adjacent SP inaccessible.  Events per SP. On occurrence reports 
          are obligatory and permanent and are handled by alarm events.  
-         Accumuated counts on 5 and 30 minute intervals are optional.  
+         Accumulated counts on 5 and 30 minute intervals are optional.  
          This operational measurement can be derived from events 
-         indicating the start and stop of ajacent SP inaccessible (items 
+         indicating the start and stop of adjacent SP inaccessible (items 
          5.1 and 5.4)."
     REFERENCE   
         "ANSI T1.116.1D adjacentInaccessibleEvents
@@ -2364,10 +2364,10 @@ mtpOmLsInt15minAdjacentInaccessibleDuration OBJECT-TYPE
     STATUS      current
     DESCRIPTION 
         "This attribute represents measurement T1.116.2/5.2 Duration of 
-         adjacent SP inaccessible.  Seconds per SP.  Accumuated counts 
+         adjacent SP inaccessible.  Seconds per SP.  Accumulated counts 
          on 5 and 30 minute intervals are obligatory.  This operational 
          measurement can be derived from events indicating the start and 
-         stop of ajacent SP inaccessible (items 5.1 and 5.4)."
+         stop of adjacent SP inaccessible (items 5.1 and 5.4)."
     REFERENCE   
         "ANSI T1.116.1D adjacentInaccessibleDuration.
          ANSI T1.116.2/2000 Table 5 (5.2).
@@ -2453,7 +2453,7 @@ mtpOmSlStatsDurInService OBJECT-TYPE
         "This is a count of the number of seconds of duration that the 
          signalling link was in service."
     REFERENCE   
-        "ITU-T Rec. Q.752, ANSI T1.116.2"
+        "ITU-T Rec. Q.752, ANSI T1.116.2, Table 1/Q.752 1.1."
     ::= { mtpOmSlStatsEntry 1 }
 
 mtpOmSlStatsFailAlignOrProving OBJECT-TYPE
@@ -2464,7 +2464,7 @@ mtpOmSlStatsFailAlignOrProving OBJECT-TYPE
         "This is a count of the number of alignment proving failures for 
          the signalling link."
     REFERENCE   
-        "ITU-T Rec. Q.752, ANSI T1.116.2"
+        "ITU-T Rec. Q.752, ANSI T1.116.2, Table 1/Q.752 1.7."
     ::= { mtpOmSlStatsEntry 2 }
 
 mtpOmSlStatsNacksReceived OBJECT-TYPE
@@ -2475,7 +2475,7 @@ mtpOmSlStatsNacksReceived OBJECT-TYPE
         "This is a count of the number of negative acknowledgements 
          received on the signalling link."
     REFERENCE   
-        "ITU-T Rec. Q.752, ANSI T1.116.2"
+        "ITU-T Rec. Q.752, ANSI T1.116.2, Table 1/Q.752 1.9"
     ::= { mtpOmSlStatsEntry 3 }
 
 mtpOmSlStatsDurUnavail OBJECT-TYPE
@@ -2486,7 +2486,7 @@ mtpOmSlStatsDurUnavail OBJECT-TYPE
         "This is a count of the number of seconds of duration that the 
          signalling link was unavailable for any reason."
     REFERENCE   
-        "ITU-T Rec. Q.752, ANSI T1.116.2"
+        "ITU-T Rec. Q.752, ANSI T1.116.2, Table 2/Q.752 2.1."
     ::= { mtpOmSlStatsEntry 4 }
 
 mtpOmSlStatsDurUnavailFailed OBJECT-TYPE
@@ -2497,7 +2497,7 @@ mtpOmSlStatsDurUnavailFailed OBJECT-TYPE
         "This is a count of the number of seconds of duration that the 
          signalling link was unavailable due to failure."
     REFERENCE   
-        "ITU-T Rec. Q.752, ANSI T1.116.2"
+        "ITU-T Rec. Q.752, ANSI T1.116.2, Table 2/Q.752 2.7."
     ::= { mtpOmSlStatsEntry 5 }
 
 mtpOmSlStatsDurUnavailRpo OBJECT-TYPE
@@ -2508,7 +2508,7 @@ mtpOmSlStatsDurUnavailRpo OBJECT-TYPE
         "This is a count of the number of seconds of duration that the 
          signalling link was unavailable due to remote processor outage."
     REFERENCE   
-        "ITU-T Rec. Q.752, ANSI T1.116.2"
+        "ITU-T Rec. Q.752, ANSI T1.116.2, Table 2/Q.752 2.9."
     ::= { mtpOmSlStatsEntry 6 }
 
 mtpOmSlStatsSibsSent OBJECT-TYPE
@@ -2518,7 +2518,7 @@ mtpOmSlStatsSibsSent OBJECT-TYPE
     DESCRIPTION 
         "This is a count of the number of SIBs sent."
     REFERENCE   
-        "ITU-T Rec. Q.752, ANSI T1.116.2"
+        "ITU-T Rec. Q.752, ANSI T1.116.2, Table 2/Q.752 2.15."
     ::= { mtpOmSlStatsEntry 7 }
 
 mtpOmSlStatsTranSioSifOctets OBJECT-TYPE
@@ -2529,7 +2529,7 @@ mtpOmSlStatsTranSioSifOctets OBJECT-TYPE
         "This is a count of the number of SIO and SIF field octets 
          transmitted on the signalling link."
     REFERENCE   
-        "ITU-T Rec. Q.752, ANSI T1.116.2"
+        "ITU-T Rec. Q.752, ANSI T1.116.2, Table 3/Q.752 3.1."
     ::= { mtpOmSlStatsEntry 8 }
 
 mtpOmSlStatsRetransOctets OBJECT-TYPE
@@ -2540,7 +2540,7 @@ mtpOmSlStatsRetransOctets OBJECT-TYPE
         "This is a count of the number of SIO and SIF field octets 
          retransmitted on the signalling link."
     REFERENCE   
-        "ITU-T Rec. Q.752, ANSI T1.116.2"
+        "ITU-T Rec. Q.752, ANSI T1.116.2, Table 3/Q.752 3.2."
     ::= { mtpOmSlStatsEntry 9 }
 
 mtpOmSlStatsTranMsus OBJECT-TYPE
@@ -2551,7 +2551,7 @@ mtpOmSlStatsTranMsus OBJECT-TYPE
         "This is a count of the number of message signal units (MSUs) 
          transmitted on the signalling link."
     REFERENCE   
-        "ITU-T Rec. Q.752, ANSI T1.116.2"
+        "ITU-T Rec. Q.752, ANSI T1.116.2, Table 3/Q.752 3.3."
     ::= { mtpOmSlStatsEntry 10 }
 
 mtpOmSlStatsRecvSioSifOctets OBJECT-TYPE
@@ -2562,7 +2562,7 @@ mtpOmSlStatsRecvSioSifOctets OBJECT-TYPE
         "This is a count of the number of SIO and SIF field octets 
          received on the signalling link."
     REFERENCE   
-        "ITU-T Rec. Q.752, ANSI T1.116.2"
+        "ITU-T Rec. Q.752, ANSI T1.116.2, Table 3/Q.752 3.4."
     ::= { mtpOmSlStatsEntry 11 }
 
 mtpOmSlStatsRecvMsus OBJECT-TYPE
@@ -2573,7 +2573,7 @@ mtpOmSlStatsRecvMsus OBJECT-TYPE
         "This is a count of the number of message signal units (MSUs) 
          received on the signalling link."
     REFERENCE   
-        "ITU-T Rec. Q.752, ANSI T1.116.2"
+        "ITU-T Rec. Q.752, ANSI T1.116.2, Table 3/Q.752 3.5."
     ::= { mtpOmSlStatsEntry 12 }
 
 mtpOmSlStatsCongOnsetInd0 OBJECT-TYPE
@@ -2584,7 +2584,7 @@ mtpOmSlStatsCongOnsetInd0 OBJECT-TYPE
         "This is a count of the number of congestion level 0 onset 
          indications."
     REFERENCE   
-        "ITU-T Rec. Q.752, ANSI T1.116.2"
+        "ITU-T Rec. Q.752, ANSI T1.116.2, Table 3/Q.752 3.6."
     ::= { mtpOmSlStatsEntry 13 }
 
 mtpOmSlStatsCongOnsetInd1 OBJECT-TYPE
@@ -2595,7 +2595,7 @@ mtpOmSlStatsCongOnsetInd1 OBJECT-TYPE
         "This is a count of the number of congestion level 1 onset 
          indications."
     REFERENCE   
-        "ITU-T Rec. Q.752, ANSI T1.116.2"
+        "ITU-T Rec. Q.752, ANSI T1.116.2, Table 3/Q.752 3.6."
     ::= { mtpOmSlStatsEntry 14 }
 
 mtpOmSlStatsCongOnsetInd2 OBJECT-TYPE
@@ -2606,7 +2606,7 @@ mtpOmSlStatsCongOnsetInd2 OBJECT-TYPE
         "This is a count of the number of congestion level 2 onset 
          indications."
     REFERENCE   
-        "ITU-T Rec. Q.752, ANSI T1.116.2"
+        "ITU-T Rec. Q.752, ANSI T1.116.2, Table 3/Q.752 3.6."
     ::= { mtpOmSlStatsEntry 15 }
 
 mtpOmSlStatsCongOnsetInd3 OBJECT-TYPE
@@ -2617,7 +2617,7 @@ mtpOmSlStatsCongOnsetInd3 OBJECT-TYPE
         "This is a count of the number of congestion level 3 onset 
          indications."
     REFERENCE   
-        "ITU-T Rec. Q.752, ANSI T1.116.2"
+        "ITU-T Rec. Q.752, ANSI T1.116.2, Table 3/Q.752 3.6."
     ::= { mtpOmSlStatsEntry 16 }
 
 mtpOmSlStatsDurCongStatus0 OBJECT-TYPE
@@ -2629,7 +2629,7 @@ mtpOmSlStatsDurCongStatus0 OBJECT-TYPE
         "This is a count of the number of seconds duration of congestion 
          level 0 status."
     REFERENCE   
-        "ITU-T Rec. Q.752, ANSI T1.116.2"
+        "ITU-T Rec. Q.752, ANSI T1.116.2, Table 3/Q.752 3.7."
     ::= { mtpOmSlStatsEntry 17 }
 
 mtpOmSlStatsDurCongStatus1 OBJECT-TYPE
@@ -2641,7 +2641,7 @@ mtpOmSlStatsDurCongStatus1 OBJECT-TYPE
         "This is a count of the number of seconds duration of congestion 
          level 1 status."
     REFERENCE   
-        "ITU-T Rec. Q.752, ANSI T1.116.2"
+        "ITU-T Rec. Q.752, ANSI T1.116.2, Table 3/Q.752 3.7."
     ::= { mtpOmSlStatsEntry 18 }
 
 mtpOmSlStatsDurCongStatus2 OBJECT-TYPE
@@ -2653,7 +2653,7 @@ mtpOmSlStatsDurCongStatus2 OBJECT-TYPE
         "This is a count of the number of seconds duration of congestion 
          level 2 status."
     REFERENCE   
-        "ITU-T Rec. Q.752, ANSI T1.116.2"
+        "ITU-T Rec. Q.752, ANSI T1.116.2, Table 3/Q.752 3.7."
     ::= { mtpOmSlStatsEntry 19 }
 
 mtpOmSlStatsDurCongStatus3 OBJECT-TYPE
@@ -2664,7 +2664,7 @@ mtpOmSlStatsDurCongStatus3 OBJECT-TYPE
         "This is a count of the number of seconds duration of congestion 
          level 3 status."
     REFERENCE   
-        "ITU-T Rec. Q.752, ANSI T1.116.2"
+        "ITU-T Rec. Q.752, ANSI T1.116.2, Table 3/Q.752 3.7."
     ::= { mtpOmSlStatsEntry 20 }
 
 mtpOmSlStatsCongDiscdInd0 OBJECT-TYPE
@@ -2675,7 +2675,7 @@ mtpOmSlStatsCongDiscdInd0 OBJECT-TYPE
         "This is a count of the number of congestion level 0 discard 
          indications."
     REFERENCE   
-        "ITU-T Rec. Q.752, ANSI T1.116.2"
+        "ITU-T Rec. Q.752, ANSI T1.116.2, Table 3/Q.752 3.11."
     ::= { mtpOmSlStatsEntry 21 }
 
 mtpOmSlStatsCongDiscdInd1 OBJECT-TYPE
@@ -2686,7 +2686,7 @@ mtpOmSlStatsCongDiscdInd1 OBJECT-TYPE
         "This is a count of the number of congestion level 1 discard 
          indications."
     REFERENCE   
-        "ITU-T Rec. Q.752, ANSI T1.116.2"
+        "ITU-T Rec. Q.752, ANSI T1.116.2, Table 3/Q.752 3.11."
     ::= { mtpOmSlStatsEntry 22 }
 
 mtpOmSlStatsCongDiscdInd2 OBJECT-TYPE
@@ -2697,7 +2697,7 @@ mtpOmSlStatsCongDiscdInd2 OBJECT-TYPE
         "This is a count of the number of congestion level 2 discard 
          indications."
     REFERENCE   
-        "ITU-T Rec. Q.752, ANSI T1.116.2"
+        "ITU-T Rec. Q.752, ANSI T1.116.2, Table 3/Q.752 3.11."
     ::= { mtpOmSlStatsEntry 23 }
 
 mtpOmSlStatsCongDiscdInd3 OBJECT-TYPE
@@ -2708,7 +2708,7 @@ mtpOmSlStatsCongDiscdInd3 OBJECT-TYPE
         "This is a count of the number of congestion level 3 discard 
          indications."
     REFERENCE   
-        "ITU-T Rec. Q.752, ANSI T1.116.2"
+        "ITU-T Rec. Q.752, ANSI T1.116.2, Table 3/Q.752 3.11."
     ::= { mtpOmSlStatsEntry 24 }
 
 
@@ -2883,8 +2883,8 @@ mtpOmSlL3SlRemoteProcOutage OBJECT-TYPE
         "This attribute represents measurementT1.116.2/2.9.
          See also 3.2.6/T1.111.4.
          
-         Duraing of signalling link unavailability due to remote 
-         processor outage in units of seconds per siganlling link 
+         Duration of signalling link unavailability due to remote 
+         processor outage in units of seconds per signalling link 
          collected on a 30 minute interval.  This is a non-obligatory 
          operational measurement that may be derived (from 2.10 and 2.11 
          which are alarm indication and clearing events).
@@ -2928,7 +2928,7 @@ mtpOmSlL3LocalMgmtUninhibit OBJECT-TYPE
         "This attribute represents measurement T1.116.2/2.14.
          See also 10.3/T1.111.4.
          
-         Local management unininhibit in number of events per signalling 
+         Local management uninhibit in number of events per signalling 
          link collected on a 5 or 30 minute interval.  This is a 
          non-obligatory measurement that may be derived (from 2.17 and 
          2.19 which are alarm clearing events)."
@@ -3064,7 +3064,7 @@ mtpOmSlL3DiscardedMSUs OBJECT-TYPE
          
          The number of MSUs discarded due to signalling link congestion.  
          The significance and method of measuring this item depends upon 
-         the method of congestion handling employed in the newtork.  The 
+         the method of congestion handling employed in the network.  The 
          three congestion handling methods are:
          
          a) single congestion level without priority; or
@@ -3077,14 +3077,14 @@ mtpOmSlL3DiscardedMSUs OBJECT-TYPE
          under extreme overload.  Thus the count indicates, if greater 
          than zero, an extreme congestion.  It indicates the 
          effectiveness of flow control procedures.  For case c), 
-         messages with priority less thatn the discard level are 
+         messages with priority less than the discard level are 
          discarded in the MTP.  For this case, the MSUs discarded due to 
          SL congestion (thresholds 1, 2 and 3 separately) are counted 
          based on the greatest congestion discard threshold in effect on 
          the link.  For example, if the congestion on a link has 
          exceeded congestion discard threshold 2, and therefore MSUs 
          with priority 0 and 1 are being discarded, a MSU discarded with 
-         priority 0 is counted in the threshould 2 count."
+         priority 0 is counted in the threshold 2 count."
     REFERENCE   
         "ANSI T1.116.1D discardedMSUs
          ITU-T Rec. Q.751.1, (10/95) : discardedMSUs.
@@ -3117,7 +3117,7 @@ mtpOmSlL3CongestionEventsMSULoss OBJECT-TYPE
          effect at one time, this being the greatest numbered threshold.  
          Therefore, the congestion even that may result in the loss of 
          MSUs for threshold 'n' is suspended (not stopped) when 
-         congestion discard threshod 'n+1' is exceeded, and resumed (not 
+         congestion discard threshold 'n+1' is exceeded, and resumed (not 
          a new one started) when the congestion level falls below 
          congestion abatement threshold 'n+1'."
     REFERENCE   
@@ -3335,8 +3335,8 @@ mtpOmSlL3Int5minSlRemoteProcOutage OBJECT-TYPE
         "This attribute represents measurementT1.116.2/2.9.
          See also 3.2.6/T1.111.4.
          
-         Duraing of signalling link unavailability due to remote 
-         processor outage in units of seconds per siganlling link 
+         Duration of signalling link unavailability due to remote 
+         processor outage in units of seconds per signalling link 
          collected on a 30 minute interval.  This is a non-obligatory 
          operational measurement that may be derived (from 2.10 and 2.11 
          which are alarm indication and clearing events).
@@ -3380,7 +3380,7 @@ mtpOmSlL3Int5minLocalMgmtUninhibit OBJECT-TYPE
         "This attribute represents measurement T1.116.2/2.14.
          See also 10.3/T1.111.4.
          
-         Local management unininhibit in number of events per signalling 
+         Local management uninhibit in number of events per signalling 
          link collected on a 5 or 30 minute interval.  This is a 
          non-obligatory measurement that may be derived (from 2.17 and 
          2.19 which are alarm clearing events)."
@@ -3516,7 +3516,7 @@ mtpOmSlL3Int5minDiscardedMSUs OBJECT-TYPE
          
          The number of MSUs discarded due to signalling link congestion.  
          The significance and method of measuring this item depends upon 
-         the method of congestion handling employed in the newtork.  The 
+         the method of congestion handling employed in the network.  The 
          three congestion handling methods are:
          
          a) single congestion level without priority; or
@@ -3529,14 +3529,14 @@ mtpOmSlL3Int5minDiscardedMSUs OBJECT-TYPE
          under extreme overload.  Thus the count indicates, if greater 
          than zero, an extreme congestion.  It indicates the 
          effectiveness of flow control procedures.  For case c), 
-         messages with priority less thatn the discard level are 
+         messages with priority less than the discard level are 
          discarded in the MTP.  For this case, the MSUs discarded due to 
          SL congestion (thresholds 1, 2 and 3 separately) are counted 
          based on the greatest congestion discard threshold in effect on 
          the link.  For example, if the congestion on a link has 
          exceeded congestion discard threshold 2, and therefore MSUs 
          with priority 0 and 1 are being discarded, a MSU discarded with 
-         priority 0 is counted in the threshould 2 count."
+         priority 0 is counted in the threshold 2 count."
     REFERENCE   
         "ANSI T1.116.1D discardedMSUs
          ITU-T Rec. Q.751.1, (10/95) : discardedMSUs.
@@ -3569,7 +3569,7 @@ mtpOmSlL3Int5minCongestionEventsMSULoss OBJECT-TYPE
          effect at one time, this being the greatest numbered threshold.  
          Therefore, the congestion even that may result in the loss of 
          MSUs for threshold 'n' is suspended (not stopped) when 
-         congestion discard threshod 'n+1' is exceeded, and resumed (not 
+         congestion discard threshold 'n+1' is exceeded, and resumed (not 
          a new one started) when the congestion level falls below 
          congestion abatement threshold 'n+1'."
     REFERENCE   
@@ -3788,8 +3788,8 @@ mtpOmSlL3Int15minSlRemoteProcOutage OBJECT-TYPE
         "This attribute represents measurementT1.116.2/2.9.
          See also 3.2.6/T1.111.4.
          
-         Duraing of signalling link unavailability due to remote 
-         processor outage in units of seconds per siganlling link 
+         Duration of signalling link unavailability due to remote 
+         processor outage in units of seconds per signalling link 
          collected on a 30 minute interval.  This is a non-obligatory 
          operational measurement that may be derived (from 2.10 and 2.11 
          which are alarm indication and clearing events).
@@ -3833,7 +3833,7 @@ mtpOmSlL3Int15minLocalMgmtUninhibit OBJECT-TYPE
         "This attribute represents measurement T1.116.2/2.14.
          See also 10.3/T1.111.4.
          
-         Local management unininhibit in number of events per signalling 
+         Local management uninhibit in number of events per signalling 
          link collected on a 5 or 30 minute interval.  This is a 
          non-obligatory measurement that may be derived (from 2.17 and 
          2.19 which are alarm clearing events)."
@@ -3969,7 +3969,7 @@ mtpOmSlL3Int15minDiscardedMSUs OBJECT-TYPE
          
          The number of MSUs discarded due to signalling link congestion.  
          The significance and method of measuring this item depends upon 
-         the method of congestion handling employed in the newtork.  The 
+         the method of congestion handling employed in the network.  The 
          three congestion handling methods are:
          
          a) single congestion level without priority; or
@@ -3982,14 +3982,14 @@ mtpOmSlL3Int15minDiscardedMSUs OBJECT-TYPE
          under extreme overload.  Thus the count indicates, if greater 
          than zero, an extreme congestion.  It indicates the 
          effectiveness of flow control procedures.  For case c), 
-         messages with priority less thatn the discard level are 
+         messages with priority less than the discard level are 
          discarded in the MTP.  For this case, the MSUs discarded due to 
          SL congestion (thresholds 1, 2 and 3 separately) are counted 
          based on the greatest congestion discard threshold in effect on 
          the link.  For example, if the congestion on a link has 
          exceeded congestion discard threshold 2, and therefore MSUs 
          with priority 0 and 1 are being discarded, a MSU discarded with 
-         priority 0 is counted in the threshould 2 count."
+         priority 0 is counted in the threshold 2 count."
     REFERENCE   
         "ANSI T1.116.1D discardedMSUs
          ITU-T Rec. Q.751.1, (10/95) : discardedMSUs.
@@ -4022,7 +4022,7 @@ mtpOmSlL3Int15minCongestionEventsMSULoss OBJECT-TYPE
          effect at one time, this being the greatest numbered threshold.  
          Therefore, the congestion even that may result in the loss of 
          MSUs for threshold 'n' is suspended (not stopped) when 
-         congestion discard threshod 'n+1' is exceeded, and resumed (not 
+         congestion discard threshold 'n+1' is exceeded, and resumed (not 
          a new one started) when the congestion level falls below 
          congestion abatement threshold 'n+1'."
     REFERENCE   
@@ -4687,7 +4687,7 @@ mtpOmSdtStatsEntry OBJECT-TYPE
          contains statistics associated with a single signalling 
          terminal.  The entries are indexed using the same index as is 
          used for the signalling terminal configuration and state table, 
-         and the statistics are corelated with the signalling terminal 
+         and the statistics are correlated with the signalling terminal 
          using that index.  Whenever a row exists in the signalling 
          terminal table, a corresponding row with the same index exists 
          in this table.
@@ -4769,7 +4769,7 @@ mtpOmSdtStatsTxSusRepeated OBJECT-TYPE
          transmitted was an MSUs, a FISU is generated from the MSU 
          previously sent.  This count should increase rapidly while idle 
          (e.g. idling FISUs) during normal operation.  It is also normal 
-         for this count to not increase when the line is busy (activiely 
+         for this count to not increase when the line is busy (actively 
          carrying a significant traffic load of MSUs."
     DEFVAL      { 0 }
     ::= { mtpOmSdtStatsEntry 3 }
@@ -4781,7 +4781,7 @@ mtpOmSdtStatsTxUnderruns OBJECT-TYPE
     STATUS      current
     DESCRIPTION 
         "This is the count of the number of transmitter underrun events.  
-         A transmitter underrun event occurs when an unsufficient number 
+         A transmitter underrun event occurs when an insufficient number 
          of bits where provided to the signalling data link when the 
          time came to transmit bits on the wire.  This count should not 
          increase past possibly a small number when the link  is 
@@ -4814,7 +4814,7 @@ mtpOmSdtStatsTxBufferOverflows OBJECT-TYPE
          events.  A transmit  overflow event occurs when the signalling 
          terminal goes to acquire a buffer to transmit data bits to the 
          signalling data link and cannot immediately acquire a buffer, 
-         resulting in data loss.  The drivers recycle recieve buffers 
+         resulting in data loss.  The drivers recycle receive buffers 
          into transmit buffers from and to the signalling data link.  
          There should be no counts in this item.  A significant number 
          here would represent a significant problem."
@@ -4872,11 +4872,11 @@ mtpOmSdtStatsRxOverruns OBJECT-TYPE
          occurred.  A receive buffer overrun occurs when the signalling 
          terminal goes to allocate a buffer to deliver an SU to the 
          signalling link and a buffer is not immediately available.  The 
-         drivers recycle singalling data link receive buffers into 
+         drivers recycle signalling data link receive buffers into 
          signalling data link transmit buffers and the signalling data 
          link does the opposite (recycles transmit buffers to receive 
          buffers).  This number should be low or zero and should not 
-         increase after the first initialization of the siganalling 
+         increase after the first initialization of the signalling 
          link.  A significant number here would represent a significant 
          problem."
     DEFVAL      { 0 }
@@ -4896,7 +4896,7 @@ mtpOmSdtStatsRxAborts OBJECT-TYPE
          experiencing difficulties.  When a T1 or E1 span is losing 
          synchronization, it is not uncommon to see this count rise.  If 
          there are no group synchronization problems with the signalling 
-         link an increasing count here represends a problem with the 
+         link an increasing count here represents a problem with the 
          facility or a problem with the remote signalling terminal."
     DEFVAL      { 0 }
     ::= { mtpOmSdtStatsEntry 11 }
@@ -4909,7 +4909,7 @@ mtpOmSdtStatsRxBufferOverflows OBJECT-TYPE
     DESCRIPTION 
         "This count is the number of receive buffer overflow conditions.  
          A receive buffer overflow condition occurs when, on the receive 
-         side, the siganlling terminal attempts to allocate a buffer to 
+         side, the signalling terminal attempts to allocate a buffer to 
          transmit data to a signalling link and a buffer is not 
          immediately available.  Signalling link drivers typically 
          recycle their buffers from receive to transmit and the 
@@ -4946,7 +4946,7 @@ mtpOmSdtStatsRxSyncTransitions OBJECT-TYPE
     STATUS      current
     DESCRIPTION 
         "This count is the count of the number of synchronization 
-         transitions on the receive bitstream.  Syncrhonization 
+         transitions on the receive bit-stream.  Syncrhonization 
          transitions occur when the signalling terminal begins hunting 
          for flags because a flag does not exist where expected and when 
          the signalling terminal locks on flags and begins to frame 
@@ -4955,7 +4955,7 @@ mtpOmSdtStatsRxSyncTransitions OBJECT-TYPE
          flag and frame lock are counted.  A significant or increasing 
          number of transitions here normally indicates that the group 
          carrier providing the signalling link is experiencing 
-         syncrhonization problems (i.e. it is slipping).  For a clean 
+         synchronization problems (i.e. it is slipping).  For a clean 
          facility, an increasing number here would indicate a difficulty 
          with the remote signalling terminal."
     DEFVAL      { 0 }
@@ -4989,7 +4989,7 @@ mtpOmSdtStatsRxCrcErrors OBJECT-TYPE
          received bit stream.  This number should be small.  An 
          excessive number of CRC errors either indicates that the 
          signalling data link facility is noisy and is experiencing bit 
-         errors.  This would not normally result from a syncrhonization 
+         errors.  This would not normally result from a synchronization 
          problem (framing would likely be lost and octet counting 
          entered).  CRC errors result from random bit errors that are 
          unlikely to affect flags.  A increasing or significant number 
@@ -5035,10 +5035,10 @@ mtpOmSdtStatsRxFrameTooLong OBJECT-TYPE
     DESCRIPTION 
         "This is the count of the number of frames that were too long 
          (they had a number of octets between flags and CRC of greater 
-         than the maximum SIF length) in the receive bitstream.  This 
+         than the maximum SIF length) in the receive bit-stream.  This 
          number should be zero or very small.  A significant count in 
-         this field indicates a loss of syncrhonization on the carrier 
-         hosting the signalling data link, a noisy signalilng data link, 
+         this field indicates a loss of synchronization on the carrier 
+         hosting the signalling data link, a noisy signalling data link, 
          or a serious problem with the remote signalling terminal."
     DEFVAL      { 0 }
     ::= { mtpOmSdtStatsEntry 19 }
@@ -5050,9 +5050,9 @@ mtpOmSdtStatsRxFrameTooShort OBJECT-TYPE
     STATUS      current
     DESCRIPTION 
         "This is the count of the number of frames that were too short 
-         (they were shorter than a FISU) in the receive bitstream.  This 
+         (they were shorter than a FISU) in the receive bit-stream.  This 
          number should be zero or very small.  A significant number in 
-         this field indicates a loss of syncrhonization on the carrier 
+         this field indicates a loss of synchronization on the carrier 
          hosting the signalling data link, a noisy signalling data link 
          or a serious problem with the remote signalling terminal."
     DEFVAL      { 0 }
@@ -5065,9 +5065,9 @@ mtpOmSdtStatsRxResidueErrors OBJECT-TYPE
     STATUS      current
     DESCRIPTION 
         "This is the count of frames with residue errors (a non-octet 
-         aligned number of bits) in the receive bitstream.  This number 
+         aligned number of bits) in the receive bit-stream.  This number 
          should be zero or small.  A significant or increasing number in 
-         this column indicates a loss of syncrhonization of the group 
+         this column indicates a loss of synchronization of the group 
          carrier containing the signalling data link, a noisy signalling 
          data link, or a serious problem with the remote signalling 
          terminal."
@@ -5096,7 +5096,7 @@ mtpOmSdtStatsCarrierDcdLost OBJECT-TYPE
     DESCRIPTION 
         "This is the count of the number of times that the DCD (Data 
          Carrier Detect) lead was lost (deasserted) on a V.35 interface.  
-         A significant number in this column indicates a problemw tih 
+         A significant number in this column indicates a problem with 
          the modem or channel bank providing access to the signalling 
          data link over the V.35 interface."
     DEFVAL      { 0 }
@@ -5110,7 +5110,7 @@ mtpOmSdtStatsCarrierLost OBJECT-TYPE
     DESCRIPTION 
         "This is the count of the number of times that the carrier was 
          lost on a DS0/DS1 interface.  A significant number in this 
-         field indicates that there is a problem with syncrhonization of 
+         field indicates that there is a problem with synchronization of 
          the group carrier containing the signalling data link."
     DEFVAL      { 0 }
     ::= { mtpOmSdtStatsEntry 24 }
@@ -5139,7 +5139,7 @@ mtpOmSdlStatsEntry OBJECT-TYPE
          contains statistics associated with a single signalling data 
          link.  The entries are indexed using the same index as is used 
          for the signalling data link configuration and state table, and 
-         the statistics are corelated with the signalling data link 
+         the statistics are correlated with the signalling data link 
          using that index.  Whenever a row exists in the signalling data 
          link table, a corresponding row with the same index exists in 
          this table.
@@ -5179,7 +5179,7 @@ mtpOmSdlStatsRxOctets OBJECT-TYPE
          increase, it means that the receivers are not receiving data.  
          Monitoring this column over a short period of time is a way of 
          verifying the bit rate of the signalling data link.  During 
-         normal operation, this column should increase at a fixe rate 
+         normal operation, this column should increase at a fixed rate 
          equal to the bit rate of the signalling data link."
     ::= { mtpOmSdlStatsEntry 1 }
 
@@ -5192,7 +5192,7 @@ mtpOmSdlStatsTxOctets OBJECT-TYPE
         "This is the count of the number of octets transmitted by the 
          signalling data link to the line.  This count should increase 
          rapidly during normal operation.  When this count does not 
-         increase, it means that the transmittters are not transmitting 
+         increase, it means that the transmitters are not transmitting 
          data.  Monitoring this column over a short period of time is a 
          way of verifying the transmission rate of the signalling data 
          link.  During normal operation, this column should increase at 
@@ -5227,7 +5227,7 @@ mtpOmSdlStatsTxUnderruns OBJECT-TYPE
     STATUS      current
     DESCRIPTION 
         "Transmit underruns are counted on the transmitter between the 
-         signalling data link and the line.  This occrus whenever bits 
+         signalling data link and the line.  This occurs whenever bits 
          were required to be transmitted on the wire and the signalling 
          data link driver did not supply a sufficient number of bits to 
          satisfy the requirement.  This should not occur in normal 
@@ -5313,7 +5313,7 @@ mtpOmSdlStatsCarrierLost OBJECT-TYPE
     DESCRIPTION 
         "This is the count of the number of times that the carrier was 
          lost on a DS0/DS1 interface.  A significant number in this 
-         field indicates that there is a problem with syncrhonization of 
+         field indicates that there is a problem with synchronization of 
          the group carrier containing the signalling data link."
     ::= { mtpOmSdlStatsEntry 9 }
 
@@ -5349,7 +5349,7 @@ mtpOm1stAndIntervalActivate OBJECT-TYPE
          
          The activation state of a measurement can be determined by 
          attempting to read its PerfValue.  This is because these 
-         texutal conventions will return an error ('wrong value') if the 
+         textual conventions will return an error ('wrong value') if the 
          particular columnar object is not activated (the data collected 
          is invalid or missing).
          
@@ -5376,7 +5376,7 @@ mtpOm1stAndIntervalDeactivate OBJECT-TYPE
          
          The activation state of a measurement can be determined by 
          attempting to read its PerfValue.  This is because these 
-         texutal conventions will return an error if they particular 
+         textual conventions will return an error if they particular 
          columnar object is not activated (the data collected is invalid 
          or missing).
          
@@ -5396,14 +5396,14 @@ mtpOm5MinActivate OBJECT-TYPE
         "Some measurements in this MIB that are to be collected on a 
          5-minute basis are marked as obligatory by requiring 
          activation.  Writing the instance pointer of the columnar 
-         object coresponding to the Counter32 for the measurement will 
+         object corresponding to the Counter32 for the measurement will 
          activate the 5-minute measurement if not already activated.  
          When the object cannot be activated, an SNMP error will be 
          returned.
          
          The activation state of a measurement can be determined by 
          attempting to read its PerfValue.  This is because these 
-         texutal conventions will return an error if they particular 
+         textual conventions will return an error if they particular 
          columnar object is not activated (the data collected is invalid 
          or missing)."
     ::= { mtpOmScalars 3 }
@@ -5416,14 +5416,14 @@ mtpOm5MinDeaActivate OBJECT-TYPE
         "Some measurements in this MIB that are to be collected on a 
          5-minute basis are marked as obligatory by requiring 
          activation.  Writing the instance pointer of the columnar 
-         object coresponding to the Counter32 for the measurement will 
+         object corresponding to the Counter32 for the measurement will 
          deactivate the 5-minute measurement if not already deactivated.  
          When the object cannot be deactivated, an SNMP error will be 
          returned.
          
          The activation state of a measurement can be determined by 
          attempting to read its PerfValue.  This is because these 
-         texutal conventions will return an error if they particular 
+         textual conventions will return an error if they particular 
          columnar object is not activated (the data collected is invalid 
          or missing)."
     ::= { mtpOmScalars 4 }
@@ -5436,14 +5436,14 @@ mtpOm15MinActivate OBJECT-TYPE
         "Some measurements in this MIB that are to be collected on a 
          15-minute basis are marked as obligatory by requiring 
          activation.  Writing the instance pointer of the columnar 
-         object coresponding to the Counter32 for the measurement will 
+         object corresponding to the Counter32 for the measurement will 
          activate the 15-minute measurement if not already activated.  
          When the object cannot be activated, an SNMP error will be 
          returned.
          
          The activation state of a measurement can be determined by 
          attempting to read its PerfValue.  This is because these 
-         texutal conventions will return an error if they particular 
+         textual conventions will return an error if they particular 
          columnar object is not activated (the data collected is invalid 
          or missing)."
     ::= { mtpOmScalars 5 }
@@ -5456,14 +5456,14 @@ mtpOm15MinDeaActivate OBJECT-TYPE
         "Some measurements in this MIB that are to be collected on a 
          15-minute basis are marked as obligatory by requiring 
          activation.  Writing the instance pointer of the columnar 
-         object coresponding to the Counter32 for the measurement will 
+         object corresponding to the Counter32 for the measurement will 
          deactivate the 15-minute measurement if not already 
          deactivated.  When the object cannot be deactivated, an SNMP 
          error will be returned.
          
          The activation state of a measurement can be determined by 
          attempting to read its PerfValue.  This is because these 
-         texutal conventions will return an error if they particular 
+         textual conventions will return an error if they particular 
          columnar object is not activated (the data collected is invalid 
          or missing)."
     ::= { mtpOmScalars 6 }
