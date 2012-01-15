@@ -291,8 +291,7 @@ typedef struct sl_stats {
 	sl_ulong sl_recv_msus;		/* Q.752 Table 3.5 5,30 min - passed to L3 */
 	sl_ulong sl_cong_onset_ind[4];	/* Q.752 Table 3.6 5,30 min - and 3.9 */
 	sl_ulong sl_dur_cong_status[4];	/* Q.752 Table 3.7 30 min - rising only */
-	/* 
-	   sl_ulong sl_msus_cong_discard; Q.752 Table 3.10 5,30 min - Not here in MTP or SLS */
+	/* sl_ulong sl_msus_cong_discard; Q.752 Table 3.10 5,30 min - Not here in MTP or SLS */
 	sl_ulong sl_cong_discd_ind[4];	/* Q.752 Table 3.11 5,30 min - rising only when < onset */
 } sl_stats_t;				/* FIXME: read 3.11 and recheck congestion procedures */
 
