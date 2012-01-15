@@ -909,4 +909,6 @@ src/snmp/*_master.c
 src/snmp/*_master.h
 src/util/isupcre
 src/util/ss72pcap
+src/util/scapident
+src/util/ss7capmerge
 tags
