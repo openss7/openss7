@@ -91,19 +91,25 @@ extern "C" {
 #include <vector>
 #include <algorithm>
 #include <hash_map>
+#include <map>
+#include <set>
 
 using std::list;
 using std::vector;
 using __gnu_cxx::hash_map;
+using std::map;
+using std::set;
 
 int output = -1;
 int debug = 0;
 
 class Error;
+class MsgCount;
 class MsgStat;
 class File;
 class FileText;
 class FilePcap;
+class Node;
 class Path;
 class Message;
 
@@ -280,42 +286,140 @@ enum ParameterType {
 };
 //  -------------------------------------------------------------------------
 //
-//  MsgStat class
+//  Count class
 //
 //  -------------------------------------------------------------------------
-//  This is a base class for things that count messages.
-class MsgStat {
+template<class _Message>
+class Count {
+      public:
+	Count(void) {
+		if (debug > 1)
+			fprintf(stderr, "I: %s: %p\n", __PRETTY_FUNCTION__, this);
+	};
+	virtual ~Count(void) {
+		if (debug > 1)
+			fprintf(stderr, "I: %s: %p\n", __PRETTY_FUNCTION__, this);
+	};
+	virtual void identify(void) = 0;
+	virtual void add(_Message& msg) = 0;
+	virtual void complete(_Message& msg) = 0;
+};
+//  -------------------------------------------------------------------------
+//
+//  Stat class
+//
+//  -------------------------------------------------------------------------
+struct itv_ltstr {
+	bool operator() (const unsigned long i1, const unsigned long i2) const {
+		return (i1 < i2);
+	};
+};
+template<class _Count, class _Message>
+class Stat  : public _Count {
       protected:
-	ulong msgs;
-	ulong bytes;
-	ulong bads;
-	ulong fisus;
-	ulong lssus;
-	ulong lssu2s;
-	ulong msus;
-	friend class Message;
-	ulong sis[16];
-	ulong undec;
-	struct timeval beg, end;
+	map<unsigned long,_Count,itv_ltstr> intervals;
+	unsigned long convert(struct timeval tv) {
+		return ((tv.tv_sec + ((tv.tv_usec > 0) ? 1 : 0) + 299) / 300);
+	};
 
       public:
-	MsgStat(void) : msgs(0), bytes(0), bads(0), fisus(0), lssus(0), lssu2s(0), msus(0), sis(), undec(0) {
+	Stat(void) : _Count() {
+		if (debug > 1)
+			fprintf(stderr, "I: %s: %p\n", __PRETTY_FUNCTION__, this);
+	};
+	virtual ~Stat() {
+		if (debug > 1)
+			fprintf(stderr, "I: %s: %p\n", __PRETTY_FUNCTION__, this);
+	};
+	virtual void identify(void);
+	virtual void add(_Message& msg);
+	virtual void complete(_Message& msg);
+};
+//  -------------------------------------------------------------------------
+//
+//  MsgCount class
+//
+//  -------------------------------------------------------------------------
+//  This is a base class for message counts.
+struct mtypes {
+	unsigned char si;
+	unsigned char mt;
+	unsigned char mp;
+};
+struct mt_ltstr {
+	bool operator() (const struct mtypes m1, const struct mtypes m2) const {
+		if (m1.si < m2.si) return (true);
+		if (m1.si > m2.si) return (false);
+		if (m1.mt < m2.mt) return (true);
+		if (m1.mt > m2.mt) return (false);
+		if (m1.mp < m2.mp) return (true);
+		return (false);
+	};
+};
+class MsgCount : public Count<Message> {
+      protected:
+	unsigned long msgs;
+	unsigned long bytes;
+	unsigned long octets;
+	unsigned long bads;
+	unsigned long fisus;
+	unsigned long lssus;
+	unsigned long lssu2s;
+	unsigned long msus;
+	unsigned long siosifs;
+	friend class Message;
+	unsigned long sis[16];
+	unsigned long mps[4];
+	unsigned long simps[16][4];
+	unsigned long undec;
+	typedef map<struct mtypes,unsigned long,mt_ltstr> counts_map;
+	counts_map counts;
+	struct timeval beg, end;
+
+
+      public:
+	MsgCount(void) : msgs(0), bytes(0), octets(0), bads(0), fisus(0),
+		lssus(0), lssu2s(0), msus(0), siosifs(0), sis(), mps(), simps(),
+		undec(0)
+	{
 		if (debug > 1)
 			fprintf(stderr, "I: %s: %p\n", __PRETTY_FUNCTION__, this);
 		beg.tv_sec = 0x7fffffff;
 		beg.tv_usec = 0x7fffffff;
 		end.tv_sec = 0;
 		end.tv_usec = 0;
-		for (int i = 0; i < 16; i++)
-			sis[i] = 0;
 	};
-	virtual ~MsgStat(void) {
+	virtual ~MsgCount(void) {
 		if (debug > 1)
 			fprintf(stderr, "I: %s: %p\n", __PRETTY_FUNCTION__, this);
 	};
 	virtual void identify(void);
 	virtual void add(Message& msg);
 	virtual void complete(Message& msg);
+	unsigned long msuCounts(void);
+	unsigned long siCounts(int si);
+	unsigned long siMtCounts(int si, int mt);
+	unsigned long siMtMpCounts(int si, int mt, int mp);
+	unsigned long mpCounts(int mp);
+};
+
+//  -------------------------------------------------------------------------
+//
+//  MsgStat class
+//
+//  -------------------------------------------------------------------------
+//  This is a base class for things that count messages.
+class MsgStat : public Stat<MsgCount,Message> {
+	typedef Stat<MsgCount,Message> _Stat;
+      public:
+	MsgStat(void) : _Stat() {
+		if (debug > 1)
+			fprintf(stderr, "I: %s: %p\n", __PRETTY_FUNCTION__, this);
+	};
+	virtual ~MsgStat(void) {
+		if (debug > 1)
+			fprintf(stderr, "I: %s: %p\n", __PRETTY_FUNCTION__, this);
+	};
 };
 
 //  -------------------------------------------------------------------------
@@ -453,6 +557,45 @@ hash_map<int,Path *> paths;
 
 //  -------------------------------------------------------------------------
 //
+//  Node class
+//
+//  -------------------------------------------------------------------------
+class Node {
+      private:
+	int pcode;
+	MsgStat orig;
+	MsgStat dest;
+	bool orig_tcap;
+	bool term_tcap;
+	bool orig_isup;
+	bool term_isup;
+	bool exch_sltm;
+	set<int> queries;
+	set<int> responds;
+	set<int> adjacent;
+	set<int> circuits;
+
+      public:
+	Node(void) : pcode(0), orig(), dest(),
+	orig_tcap(false), term_tcap(false),
+	orig_isup(false), term_isup(false),
+	exch_sltm(false)
+	{ };
+	Node(int pc) : pcode(pc), orig(), dest(),
+	orig_tcap(false), term_tcap(false),
+	orig_isup(false), term_isup(false),
+	exch_sltm(false)
+	{ };
+	~Node(void) { };
+	void identify(void);
+	void add_orig(Message& msg);
+	void add_dest(Message& msg);
+};
+
+map<int,Node> nodes;
+
+//  -------------------------------------------------------------------------
+//
 //  Path class
 //
 //  -------------------------------------------------------------------------
@@ -483,6 +626,8 @@ class Path : public MsgStat {
 	enum MsgPriority pr;
 	enum RlType rt;
 	list<Message *> messages;
+	set<int> orig;
+	set<int> dest;
 
       public:
 	Path(File& f, int a) : file(f), ppa(a), ht(HT_UNKNOWN),
@@ -521,6 +666,7 @@ class Path : public MsgStat {
 	int slotNum(void) { return ((ppa >> 0) & 0x1f); };
 	virtual void identify(void);
 	virtual void add(Message& msg);
+	virtual void complete(Message& msg);
 	enum HeaderType headerType(void) { return (ht); }
 	void setHeaderType(enum HeaderType t) {
 		if (ht != t && t != HT_UNKNOWN) {
@@ -656,7 +802,8 @@ class Message {
 	unsigned char *end;
 	unsigned char *sio;
 	unsigned char *sif;
-	unsigned int bib, bsn, fib, fsn, li, li0, ni, mp, si, dpc, opc, sls, cic, mt;
+	unsigned char *sdu;
+	unsigned int bib, bsn, fib, fsn, li, li0, ni, mp, si, dpc, opc, sls, cic, mt, h0, h1, slc, dlen;
 
 	Message(Path& p, struct pcap_pkthdr *h, unsigned char *d, struct pseudohdr *ph) :
 		path(p), hdr(*h), dat(d), phdr(*ph), mtp2decode(false), mtp3decode(false),
@@ -691,6 +838,11 @@ class Message {
 			return (-1);
 		return (si);
 	};
+	int mpValue(void) {
+		if (!mtp3decode)
+			return (-1);
+		return (mp);
+	};
 	enum ProtocolTest reasonableItutIsupMsg(void);
 	enum ProtocolTest reasonableAnsiIsupMsg(void);
 	enum ProtocolTest reasonableItutSnmmMsg(void);
@@ -713,8 +865,55 @@ File::delall(void)
 	}
 }
 
+unsigned long
+MsgCount::siCounts(int si)
+{
+	unsigned long cnt = 0;
+	for (counts_map::iterator it = counts.begin(); it != counts.end(); ++it) {
+		if (it->first.si == si)
+			cnt += it->second;
+		else if (it->first.si > si)
+			break;
+	}
+	return (cnt);
+}
+unsigned long
+MsgCount::siMtCounts(int si, int mt)
+{
+	unsigned long cnt = 0;
+	for (counts_map::iterator it = counts.begin(); it != counts.end(); ++it) {
+		if (it->first.si == si && it->first.mt == mt)
+			cnt += it->second;
+		else if ((it->first.si > si) || (it->first.si == si && it->first.mt > mt))
+			break;
+	}
+	return (cnt);
+}
+unsigned long
+MsgCount::siMtMpCounts(int si, int mt, int mp)
+{
+	unsigned long cnt = 0;
+	for (counts_map::iterator it = counts.begin(); it != counts.end(); ++it) {
+		if (it->first.si == si && it->first.mt == mt && it->first.mp == mp)
+			cnt += it->second;
+		else if ((it->first.si > si) || (it->first.si == si && it->first.mt > mt))
+			break;
+	}
+	return (cnt);
+}
+unsigned long
+MsgCount::mpCounts(int mp)
+{
+	unsigned long cnt = 0;
+	for (counts_map::iterator it = counts.begin(); it != counts.end(); ++it) {
+		if (it->first.mp == mp)
+			cnt += it->second;
+	}
+	return (cnt);
+}
+
 void
-MsgStat::add(Message& msg)
+MsgCount::add(Message& msg)
 {
 	msgs++;
 	switch (msg.messageType()) {
@@ -750,8 +949,30 @@ MsgStat::add(Message& msg)
 		end = msg.hdr.ts;
 }
 void
-MsgStat::complete(Message &msg)
+MsgCount::complete(Message &msg)
 {
+	if (msg.mpValue() != -1) {
+		mps[msg.mpValue()]++;
+		simps[msg.siValue()][msg.mpValue()]++;
+	}
+	if (msg.mtp3Decoded()) {
+		struct mtypes m = { msg.si, msg.mt, msg.mp };
+		counts[m]++;
+	}
+}
+template<class _Count, class _Message>
+void
+Stat<_Count,_Message>::add(_Message& msg)
+{
+	_Count::add(msg);
+	intervals[convert(msg.hdr.ts)].add(msg);
+}
+template<class _Count, class _Message>
+void
+Stat<_Count, _Message>::complete(_Message& msg)
+{
+	_Count::complete(msg);
+	intervals[convert(msg.hdr.ts)].complete(msg);
 }
 void
 File::add(Message& msg)
@@ -764,56 +985,387 @@ Path::add(Message& msg)
 	if (detecting()) {
 		MsgStat::add(msg);
 		messages.push_back(&msg);
-	} else if (messages.empty()) {
-		MsgStat::add(msg);
-		MsgStat::complete(msg);
-		file.add(msg);
-		file.complete(msg);
-		delete &msg;
-	} else {
-		messages.push_back(&msg);
-		while(!messages.empty()) {
-			Message *m = messages.front();
-			messages.pop_front();
-			m->decode(); // redecode after detection
-			MsgStat::complete(*m);
-			file.complete(*m);
-			delete m;
+		return;
+	}
+	complete(msg);
+}
+void
+Path::complete(Message& msg)
+{
+	messages.push_back(&msg);
+	do {
+		Message *m = messages.front();
+		messages.pop_front();
+		m->decode(); // redecode after detection
+		MsgStat::complete(*m);
+		if (m->isMsu() && m->mtp3Decoded()) {
+			orig.insert(m->opc);
+			dest.insert(m->dpc);
+			nodes[msg.opc].add_orig(*m);
+			nodes[msg.dpc].add_dest(*m);
+		}
+		delete m;
+	} while (!messages.empty());
+}
+void
+Node::add_orig(Message& msg)
+{
+	if (pcode == 0)
+		pcode = msg.opc;
+	orig.add(msg);
+	orig.complete(msg);
+	if (msg.mtp3Decoded()) {
+		switch (msg.si) {
+		case 0x01: // sntm
+		case 0x02: // snsm
+			switch (msg.mt) {
+			case 0x11: // sltm
+			case 0x12: // slta
+				exch_sltm = true;
+				adjacent.insert(msg.dpc);
+				break;
+			}
+			break;
+		case 0x03: // sccp
+			switch (msg.mt) {
+			case 0x09: // udt
+			case 0x11: // xudt
+			case 0x13: // ludt
+				orig_tcap = true;
+				queries.insert(msg.dpc);
+				break;
+			}
+			break;
+		case 0x05: // isup
+			switch (msg.mt) {
+			case 0x10: // relc
+				orig_isup = true;
+				circuits.insert(msg.dpc);
+				break;
+			}
+		}
+	}
+}
+void
+Node::add_dest(Message& msg)
+{
+	if (pcode == 0)
+		pcode = msg.dpc;
+	dest.add(msg);
+	dest.complete(msg);
+	if (msg.mtp3Decoded()) {
+		switch (msg.si) {
+		case 0x01: // sntm
+		case 0x02: // snsm
+			switch (msg.mt) {
+			case 0x11: // sltm
+			case 0x12: // slta
+				exch_sltm = true;
+				adjacent.insert(msg.opc);
+				break;
+			}
+			break;
+		case 0x03: // sccp
+			switch (msg.mt) {
+			case 0x09: // udt
+			case 0x11: // xudt
+			case 0x13: // ludt
+				term_tcap = true;
+				responds.insert(msg.opc);
+				break;
+			}
+			break;
+		case 0x05: // isup
+			switch (msg.mt) {
+			case 0x10: // rlc
+				term_isup = true;
+				circuits.insert(msg.opc);
+				break;
+			}
 		}
 	}
 }
 
-void
-MsgStat::identify(void)
+const char *
+si_string(int si)
 {
-	fprintf(stdout, "Message count %lu\n", msgs);
-	fprintf(stdout, "Message bytes %lu\n", bytes);
-	if (msgs > 0) {
-		double avglen = (double) bytes/ (double) msgs;
-		fprintf(stdout, "Message length %g bytes (avg)\n", avglen);
+	switch (si) {
+	case 0: return ("snmm");
+	case 1: return ("sntm");
+	case 2: return ("snsm");
+	case 3: return ("sccp");
+	case 4: return ("tup ");
+	case 5: return ("isup");
+	case 6: return ("dup1");
+	case 7: return ("dup2");
+	case 8: return ("mtup");
+	case 9: return ("bsup");
+	case 10: return ("siup");
+	case 11: return ("spep");
+	case 12: return ("stc ");
+	case 13: return ("si13");
+	case 14: return ("si14");
+	case 15: return ("si15");
+	default: return ("????");
 	}
-	fprintf(stdout, "Message bad   %lu\n", bads);
-	fprintf(stdout, "Message fisu  %lu\n", fisus);
-	fprintf(stdout, "Message lssu  %lu\n", lssus);
-	fprintf(stdout, "Message lssu2 %lu\n", lssu2s);
-	fprintf(stdout, "Message msu   %lu\n", msus);
-	if (sis[0]) fprintf(stdout, "        snmm  %lu\n", sis[0]);
-	if (sis[1]) fprintf(stdout, "        sntm  %lu\n", sis[1]);
-	if (sis[2]) fprintf(stdout, "        snsm  %lu\n", sis[2]);
-	if (sis[3]) fprintf(stdout, "        sccp  %lu\n", sis[3]);
-	if (sis[4]) fprintf(stdout, "        tup   %lu\n", sis[4]);
-	if (sis[5]) fprintf(stdout, "        isup  %lu\n", sis[5]);
-	if (sis[6]) fprintf(stdout, "        dup1  %lu\n", sis[6]);
-	if (sis[7]) fprintf(stdout, "        dup2  %lu\n", sis[7]);
-	if (sis[8]) fprintf(stdout, "        mtup  %lu\n", sis[8]);
-	if (sis[9]) fprintf(stdout, "        bisup %lu\n", sis[9]);
-	if (sis[10]) fprintf(stdout, "        siup  %lu\n", sis[10]);
-	if (sis[11]) fprintf(stdout, "        spnep %lu\n", sis[11]);
-	if (sis[12]) fprintf(stdout, "        stc   %lu\n", sis[12]);
-	if (sis[13]) fprintf(stdout, "        si13  %lu\n", sis[13]);
-	if (sis[14]) fprintf(stdout, "        si14  %lu\n", sis[14]);
-	if (sis[15]) fprintf(stdout, "        si15  %lu\n", sis[15]);
-	if (undec) fprintf(stdout, "        undec %lu\n", undec);
+}
+const char *
+mt_string(int si, int mt)
+{
+	switch (si) {
+	case 0:
+		switch (mt) {
+		case 0x11: return ("coo ");
+		case 0x12: return ("coa ");
+		case 0x15: return ("cbd ");
+		case 0x16: return ("cba ");
+		case 0x21: return ("eco ");
+		case 0x22: return ("eca ");
+		case 0x31: return ("rct ");
+		case 0x32: return ("tfc ");
+		case 0x41: return ("tfp ");
+		case 0x42: return ("tcp ");
+		case 0x43: return ("tfr ");
+		case 0x44: return ("tcr ");
+		case 0x45: return ("tfa ");
+		case 0x46: return ("tca ");
+		case 0x51: return ("rst ");
+		case 0x52: return ("rsr ");
+		case 0x53: return ("rcp ");
+		case 0x54: return ("rcr ");
+		case 0x61: return ("lin ");
+		case 0x62: return ("lun ");
+		case 0x63: return ("lia ");
+		case 0x64: return ("lua ");
+		case 0x65: return ("lid ");
+		case 0x66: return ("lfu ");
+		case 0x67: return ("llt ");
+		case 0x68: return ("lrt ");
+		case 0x71: return ("tra ");
+		case 0x72: return ("trw ");
+		case 0x81: return ("dlc ");
+		case 0x82: return ("css ");
+		case 0x83: return ("cns ");
+		case 0x84: return ("cnp ");
+		case 0xa1: return ("upu ");
+		case 0xa2: return ("upa ");
+		case 0xa3: return ("upt ");
+		default: return ("????");
+		}
+	case 1:
+		switch (mt) {
+		case 0x11: return ("sltm");
+		case 0x12: return ("slta");
+		default: return ("????");
+		}
+	case 2:
+		switch (mt) {
+		case 0x11: return ("sltm");
+		case 0x12: return ("slta");
+		default: return ("????");
+		}
+	case 3:
+		switch (mt) {
+		case 0x01: return ("cr  ");
+		case 0x02: return ("cc  ");
+		case 0x03: return ("cref");
+		case 0x04: return ("rlsd");
+		case 0x05: return ("rlc ");
+		case 0x06: return ("dt1 ");
+		case 0x07: return ("dt2 ");
+		case 0x08: return ("ak  ");
+		case 0x09: return ("udt ");
+		case 0x0a: return ("udts");
+		case 0x0b: return ("ed  ");
+		case 0x0c: return ("ea  ");
+		case 0x0d: return ("rsr ");
+		case 0x0e: return ("rsc ");
+		case 0x0f: return ("err ");
+		case 0x10: return ("it  ");
+		case 0x11: return ("xudt");
+		case 0x12: return ("xuds");
+		case 0x13: return ("ludt");
+		case 0x14: return ("luds");
+		default: return ("????");
+		}
+	case 4:
+		return ("????");
+	case 5:
+		switch (mt) {
+		case 0x01: return ("iam ");
+		case 0x02: return ("sam ");
+		case 0x03: return ("inr ");
+		case 0x04: return ("inf ");
+		case 0x05: return ("cot ");
+		case 0x06: return ("acm ");
+		case 0x07: return ("con ");
+		case 0x08: return ("fot ");
+		case 0x09: return ("anm ");
+		case 0x0c: return ("rel ");
+		case 0x0d: return ("sus ");
+		case 0x0e: return ("res ");
+		case 0x10: return ("rlc ");
+		case 0x11: return ("ccr ");
+		case 0x12: return ("rsc ");
+		case 0x13: return ("blo ");
+		case 0x14: return ("ubl ");
+		case 0x15: return ("bla ");
+		case 0x16: return ("uba ");
+		case 0x17: return ("grs ");
+		case 0x18: return ("cgb ");
+		case 0x19: return ("cgu ");
+		case 0x1a: return ("cgba");
+		case 0x1b: return ("cgua");
+		case 0x1c: return ("cmr ");
+		case 0x1d: return ("cmc ");
+		case 0x1e: return ("cmrj");
+		case 0x1f: return ("far ");
+		case 0x20: return ("faa ");
+		case 0x21: return ("frj ");
+		case 0x22: return ("fad ");
+		case 0x23: return ("fai ");
+		case 0x24: return ("lpa ");
+		case 0x25: return ("csvq");
+		case 0x26: return ("csvr");
+		case 0x27: return ("drs ");
+		case 0x28: return ("pam ");
+		case 0x29: return ("gra ");
+		case 0x2a: return ("cqm ");
+		case 0x2b: return ("cqr ");
+		case 0x2c: return ("cpg ");
+		case 0x2d: return ("usr ");
+		case 0x2e: return ("ucic");
+		case 0x2f: return ("cfn ");
+		case 0x30: return ("olm ");
+		case 0x31: return ("crg ");
+		case 0x32: return ("nrm ");
+		case 0x33: return ("fac ");
+		case 0x34: return ("upt ");
+		case 0x35: return ("upa ");
+		case 0x36: return ("idr ");
+		case 0x37: return ("irs ");
+		case 0x38: return ("sgm ");
+		case 0xe9: return ("cra ");
+		case 0xea: return ("crm ");
+		case 0xeb: return ("cvr ");
+		case 0xec: return ("cvt ");
+		case 0xed: return ("exm ");
+		case 0xf8: return ("non ");
+		case 0xfc: return ("llm ");
+		case 0xfd: return ("cak ");
+		case 0xfe: return ("tcm ");
+		case 0xff: return ("mcp ");
+		default: return ("????");
+		}
+	case 6:
+	case 7:
+	case 8:
+	case 9:
+	case 10:
+	case 11:
+	case 12:
+	case 13:
+	case 14:
+	case 15:
+	default:
+		return ("????");
+	}
+}
+int
+mp_mask(int si, int mt)
+{
+	switch (si) {
+	case 0:
+	case 1:
+	case 2:
+	case 3:
+	case 4:
+		return (0xf);
+	case 5:
+		switch (mt) {
+		case 0x01: return ((1<<0)|(1<<1)); // iam
+		case 0x02: return (0x0); // sam
+		case 0x03: return ((1<<1)); // inr
+		case 0x04: return ((1<<1)); // inf
+		case 0x05: return ((1<<1)); // cot
+		case 0x06: return ((1<<1)); // acm
+		case 0x07: return (0x0); // con
+		case 0x08: return ((1<<1)); // fot
+		case 0x09: return ((1<<2)); // anm
+		case 0x0c: return ((1<<1)); // rel
+		case 0x0d: return ((1<<1)); // sus
+		case 0x0e: return ((1<<1)); // res
+		case 0x10: return ((1<<2)); // rlc
+		case 0x11: return ((1<<1)); // ccr
+		case 0x12: return ((1<<0)); // rsc
+		case 0x13: return ((1<<0)); // blo
+		case 0x14: return ((1<<0)); // ubl
+		case 0x15: return ((1<<0)); // bla
+		case 0x16: return ((1<<0)); // uba
+		case 0x17: return ((1<<0)); // grs
+		case 0x18: return ((1<<0)); // cgb
+		case 0x19: return ((1<<0)); // cgu
+		case 0x1a: return ((1<<0)); // cgba
+		case 0x1b: return ((1<<0)); // cgua
+		case 0x1c: return (0x00); // cmr
+		case 0x1d: return (0x00); // cmc
+		case 0x1e: return (0x00); // cmrj
+		case 0x1f: return (0x00); // far
+		case 0x20: return (0x00); // faa
+		case 0x21: return (0x00); // frj
+		case 0x22: return (0x00); // fad
+		case 0x23: return (0x00); // fai
+		case 0x24: return ((1<<1)); // lpa
+		case 0x25: return (0x00); // csvq
+		case 0x26: return (0x00); // csvr
+		case 0x27: return (0x00); // drs
+		case 0x28: return ((1<<2)|(1<<1)|(1<<0)); // pam
+		case 0x29: return ((1<<0)); // gra
+		case 0x2a: return ((1<<0)); // cqm
+		case 0x2b: return ((1<<0)); // cqr
+		case 0x2c: return ((1<<1)); // cpg
+		case 0x2d: return (0x00); // usr
+		case 0x2e: return ((1<<1)); // ucic
+		case 0x2f: return ((1<<0)); // cfn
+		case 0x30: return (0x00); // olm
+		case 0x31: return (0x00); // crg
+		case 0x32: return (0x00); // nrm
+		case 0x33: return ((1<<2)|(1<<1)|(1<<0)); // fac
+		case 0x34: return (0x00); // upt
+		case 0x35: return (0x00); // upa
+		case 0x36: return (0x00); // idr
+		case 0x37: return (0x00); // irs
+		case 0x38: return ((1<<0)); // sgm
+		case 0xe9: return ((1<<0)); // cra
+		case 0xea: return ((1<<0)); // crm
+		case 0xeb: return ((1<<0)); // cvr
+		case 0xec: return ((1<<0)); // cvt
+		case 0xed: return ((1<<2)|(1<<1)|(1<<0)); // exm
+		case 0xf8: return (0x00); // non
+		case 0xfc: return (0x00); // llm
+		case 0xfd: return (0x00); // cak
+		case 0xfe: return (0x00); // tcm
+		case 0xff: return (0x00); // mcp
+		};
+	case 6:
+	case 7:
+	case 8:
+	case 9:
+	case 10:
+	case 11:
+	case 12:
+	case 13:
+	case 14:
+	case 15:
+	default:
+		return (0xf);
+	}
+}
+
+void
+MsgCount::identify(void)
+{
+	fprintf(stdout, "- - - - - - - - - - - - - - - - - - - - - -\n");
 	if (beg.tv_sec != 0x7fffffff || beg.tv_usec != 0x7fffffff) {
 		fprintf(stdout, "Timestamp beg %012ld.%06ld\n", beg.tv_sec, beg.tv_usec);
 	}
@@ -831,12 +1383,313 @@ MsgStat::identify(void)
 		}
 		fprintf(stdout, "Timestamp dur %012ld.%06ld\n", dur.tv_sec, dur.tv_usec);
 	}
+	fprintf(stdout, "Messages count %lu\n", msgs);
+	fprintf(stdout, "Messages bytes %lu\n", bytes);
+	if (msgs > 0) {
+		double avglen = (double) bytes/ (double) msgs;
+		fprintf(stdout, "Messages length %g bytes (avg)\n", avglen);
+	}
+	fprintf(stdout, "Messages bad   %lu\n", bads);
+	fprintf(stdout, "Messages fisu  %lu\n", fisus);
+	fprintf(stdout, "Messages lssu  %lu\n", lssus);
+	fprintf(stdout, "Messages lssu2 %lu\n", lssu2s);
+	fprintf(stdout, "Messages msu   %lu\n", msus);
+	if (mps[0]) fprintf(stdout, "         mp 0  %lu\n", mps[0]);
+	if (mps[1]) fprintf(stdout, "         mp 1  %lu\n", mps[1]);
+	if (mps[2]) fprintf(stdout, "         mp 2  %lu\n", mps[2]);
+	if (mps[3]) fprintf(stdout, "         mp 3  %lu\n", mps[3]);
+	if (sis[0]) fprintf(stdout, "         snmm  %lu\n", sis[0]);
+	if (simps[0][0]) fprintf(stdout, "    mp 0 snmm  %lu\n", simps[0][0]);
+	if (simps[0][1]) fprintf(stdout, "    mp 1 snmm  %lu\n", simps[0][1]);
+	if (simps[0][2]) fprintf(stdout, "    mp 2 snmm  %lu\n", simps[0][2]);
+	if (simps[0][3]) fprintf(stdout, "    mp 3 snmm  %lu\n", simps[0][3]);
+	if (sis[1]) fprintf(stdout, "         sntm  %lu\n", sis[1]);
+	if (simps[1][0]) fprintf(stdout, "    mp 0 sntm  %lu\n", simps[1][0]);
+	if (simps[1][1]) fprintf(stdout, "    mp 1 sntm  %lu\n", simps[1][1]);
+	if (simps[1][2]) fprintf(stdout, "    mp 2 sntm  %lu\n", simps[1][2]);
+	if (simps[1][3]) fprintf(stdout, "    mp 3 sntm  %lu\n", simps[1][3]);
+	if (sis[2]) fprintf(stdout, "         snsm  %lu\n", sis[2]);
+	if (simps[2][0]) fprintf(stdout, "    mp 0 snsm  %lu\n", simps[2][0]);
+	if (simps[2][1]) fprintf(stdout, "    mp 1 snsm  %lu\n", simps[2][1]);
+	if (simps[2][2]) fprintf(stdout, "    mp 2 snsm  %lu\n", simps[2][2]);
+	if (simps[2][3]) fprintf(stdout, "    mp 3 snsm  %lu\n", simps[2][3]);
+	if (sis[3]) fprintf(stdout, "         sccp  %lu\n", sis[3]);
+	if (simps[3][0]) fprintf(stdout, "    mp 0 sccp  %lu\n", simps[3][0]);
+	if (simps[3][1]) fprintf(stdout, "    mp 1 sccp  %lu\n", simps[3][1]);
+	if (simps[3][2]) fprintf(stdout, "    mp 2 sccp  %lu\n", simps[3][2]);
+	if (simps[3][3]) fprintf(stdout, "    mp 3 sccp  %lu\n", simps[3][3]);
+	if (sis[4]) fprintf(stdout, "         tup   %lu\n", sis[4]);
+	if (simps[4][0]) fprintf(stdout, "    mp 0 tup   %lu\n", simps[4][0]);
+	if (simps[4][1]) fprintf(stdout, "    mp 1 tup   %lu\n", simps[4][1]);
+	if (simps[4][2]) fprintf(stdout, "    mp 2 tup   %lu\n", simps[4][2]);
+	if (simps[4][3]) fprintf(stdout, "    mp 3 tup   %lu\n", simps[4][3]);
+	if (sis[5]) fprintf(stdout, "         isup  %lu\n", sis[5]);
+	if (simps[5][0]) fprintf(stdout, "    mp 0 isup  %lu\n", simps[5][0]);
+	if (simps[5][1]) fprintf(stdout, "    mp 1 isup  %lu\n", simps[5][1]);
+	if (simps[5][2]) fprintf(stdout, "    mp 2 isup  %lu\n", simps[5][2]);
+	if (simps[5][3]) fprintf(stdout, "    mp 3 isup  %lu\n", simps[5][3]);
+	if (sis[6]) fprintf(stdout, "         dup1  %lu\n", sis[6]);
+	if (simps[6][0]) fprintf(stdout, "    mp 0 dup1  %lu\n", simps[6][0]);
+	if (simps[6][1]) fprintf(stdout, "    mp 1 dup1  %lu\n", simps[6][1]);
+	if (simps[6][2]) fprintf(stdout, "    mp 2 dup1  %lu\n", simps[6][2]);
+	if (simps[6][3]) fprintf(stdout, "    mp 3 dup1  %lu\n", simps[6][3]);
+	if (sis[7]) fprintf(stdout, "         dup2  %lu\n", sis[7]);
+	if (simps[7][0]) fprintf(stdout, "    mp 0 dup2  %lu\n", simps[7][0]);
+	if (simps[7][1]) fprintf(stdout, "    mp 1 dup2  %lu\n", simps[7][1]);
+	if (simps[7][2]) fprintf(stdout, "    mp 2 dup2  %lu\n", simps[7][2]);
+	if (simps[7][3]) fprintf(stdout, "    mp 3 dup2  %lu\n", simps[7][3]);
+	if (sis[8]) fprintf(stdout, "         mtup  %lu\n", sis[8]);
+	if (simps[8][0]) fprintf(stdout, "    mp 0 mtup  %lu\n", simps[8][0]);
+	if (simps[8][1]) fprintf(stdout, "    mp 1 mtup  %lu\n", simps[8][1]);
+	if (simps[8][2]) fprintf(stdout, "    mp 2 mtup  %lu\n", simps[8][2]);
+	if (simps[8][3]) fprintf(stdout, "    mp 3 mtup  %lu\n", simps[8][3]);
+	if (sis[9]) fprintf(stdout, "         bisup %lu\n", sis[9]);
+	if (simps[9][0]) fprintf(stdout, "    mp 0 bisup %lu\n", simps[9][0]);
+	if (simps[9][1]) fprintf(stdout, "    mp 1 bisup %lu\n", simps[9][1]);
+	if (simps[9][2]) fprintf(stdout, "    mp 2 bisup %lu\n", simps[9][2]);
+	if (simps[9][3]) fprintf(stdout, "    mp 3 bisup %lu\n", simps[9][3]);
+	if (sis[10]) fprintf(stdout, "         siup  %lu\n", sis[10]);
+	if (simps[10][0]) fprintf(stdout, "    mp 0 siup  %lu\n", simps[10][0]);
+	if (simps[10][1]) fprintf(stdout, "    mp 1 siup  %lu\n", simps[10][1]);
+	if (simps[10][2]) fprintf(stdout, "    mp 2 siup  %lu\n", simps[10][2]);
+	if (simps[10][3]) fprintf(stdout, "    mp 3 siup  %lu\n", simps[10][3]);
+	if (sis[11]) fprintf(stdout, "         spnep %lu\n", sis[11]);
+	if (simps[11][0]) fprintf(stdout, "    mp 0 spnep %lu\n", simps[11][0]);
+	if (simps[11][1]) fprintf(stdout, "    mp 1 spnep %lu\n", simps[11][1]);
+	if (simps[11][2]) fprintf(stdout, "    mp 2 spnep %lu\n", simps[11][2]);
+	if (simps[11][3]) fprintf(stdout, "    mp 3 spnep %lu\n", simps[11][3]);
+	if (sis[12]) fprintf(stdout, "         stc   %lu\n", sis[12]);
+	if (simps[12][0]) fprintf(stdout, "    mp 0 stc   %lu\n", simps[12][0]);
+	if (simps[12][1]) fprintf(stdout, "    mp 1 stc   %lu\n", simps[12][1]);
+	if (simps[12][2]) fprintf(stdout, "    mp 2 stc   %lu\n", simps[12][2]);
+	if (simps[12][3]) fprintf(stdout, "    mp 3 stc   %lu\n", simps[12][3]);
+	if (sis[13]) fprintf(stdout, "         si13  %lu\n", sis[13]);
+	if (simps[13][0]) fprintf(stdout, "    mp 0 si13  %lu\n", simps[13][0]);
+	if (simps[13][1]) fprintf(stdout, "    mp 1 si13  %lu\n", simps[13][1]);
+	if (simps[13][2]) fprintf(stdout, "    mp 2 si13  %lu\n", simps[13][2]);
+	if (simps[13][3]) fprintf(stdout, "    mp 3 si13  %lu\n", simps[13][3]);
+	if (sis[14]) fprintf(stdout, "         si14  %lu\n", sis[14]);
+	if (simps[14][0]) fprintf(stdout, "    mp 0 si14  %lu\n", simps[14][0]);
+	if (simps[14][1]) fprintf(stdout, "    mp 1 si14  %lu\n", simps[14][1]);
+	if (simps[14][2]) fprintf(stdout, "    mp 2 si14  %lu\n", simps[14][2]);
+	if (simps[14][3]) fprintf(stdout, "    mp 3 si14  %lu\n", simps[14][3]);
+	if (sis[15]) fprintf(stdout, "         si15  %lu\n", sis[15]);
+	if (simps[15][0]) fprintf(stdout, "    mp 0 si15  %lu\n", simps[15][0]);
+	if (simps[15][1]) fprintf(stdout, "    mp 1 si15  %lu\n", simps[15][1]);
+	if (simps[15][2]) fprintf(stdout, "    mp 2 si15  %lu\n", simps[15][2]);
+	if (simps[15][3]) fprintf(stdout, "    mp 3 si15  %lu\n", simps[15][3]);
+	if (undec) fprintf(stdout, "         undec %lu\n", undec);
+
+	map<struct mtypes,unsigned long,mt_ltstr>::iterator it;
+	
+	int si = -1, mt = -1;
+	unsigned long to_cnt = 0, si_cnt = 0, mt_cnt = 0, to_num = 0, si_num = 0, mt_num = 0;
+	unsigned long mp_cnt[4] = { 0, 0, 0, 0 };
+	for (it = counts.begin(); it != counts.end(); ++it) {
+		to_cnt += it->second;
+		to_num += 1;
+		if (si == it->first.si && mt == it->first.mt) {
+			mt_cnt += it->second;
+			mt_num += 1;
+			si_cnt += it->second;
+			si_num += 1;
+		} else {
+			if (mt != -1 && mt_num > 1) {
+				if (debug && it->first.mt < mt && it->first.si == si)
+					fprintf(stdout, "v_misordered mt si = %02x, cur = %02x, new = %02x\n", si, mt, it->first.mt);
+				// print mt_cnt
+				fprintf(stdout, "%s %s ---- %6lu\n", si_string(si), mt_string(si, mt), mt_cnt);
+			}
+			mt = it->first.mt;
+			mt_cnt = it->second;
+			mt_num = 1;
+			if (si == it->first.si) { // mt is different
+				si_cnt += it->second;
+				si_num += 1;
+			} else { // si is different
+				if (si != -1 && si_num > 1) {
+					if (debug && it->first.si < si)
+						fprintf(stdout, "v_misordered si cur = %02x, new = %02x\n", si, it->first.si);
+					// print si_cnt
+					fprintf(stdout, "%s ---- ---- %6lu\n", si_string(si), si_cnt);
+				}
+				si = it->first.si;
+				si_cnt = it->second;
+				si_num = 1;
+			}
+		}
+		mp_cnt[it->first.mp] += it->second;
+		// print mp_cnt
+		fprintf(stdout, "%s %s mp %d %6lu", si_string(si), mt_string(si, mt), it->first.mp, it->second);
+		int mask;
+		if (!((mask = mp_mask(si, mt)) & (1<<it->first.mp))) {
+			fprintf(stdout, " <-- invalid");
+			if (mask != 0) {
+				fprintf(stdout, ", should be ");
+				for (int i = 0; i < 3; i++) {
+					if (mask & (1<<i)) {
+						mask &= ~(1<<i);
+						if (mask)
+							fprintf(stdout, "%d|", i);
+						else
+							fprintf(stdout, "%d", i);
+					}
+				}
+			}
+		}
+		fprintf(stdout, "\n");
+	}
+	if (mt != -1 && mt_num > 1) {
+		// print mt_cnt
+		fprintf(stdout, "%s %s ---- %6lu\n", si_string(si), mt_string(si, mt), mt_cnt);
+	}
+	if (si != -1 && si_num > 1) {
+		// print si_cnt
+		fprintf(stdout, "%s ---- ---- %6lu\n", si_string(si), si_cnt);
+	}
+	// print to_cnt
+	if (to_num > 1)
+		fprintf(stdout, "---- ---- ---- %6lu\n", to_cnt);
+	for (int i = 0; i < 4; i++) {
+		if (mp_cnt[i])
+			fprintf(stdout, "---- ---- mp %d %6lu\n", i, mp_cnt[i]);
+	}
+}
+template<class _Count, class _Message>
+void
+Stat<_Count,_Message>::identify(void)
+{
+	_Count::identify();
+	if (output > 1) {
+		typename map<unsigned long,_Count,itv_ltstr>::iterator it;
+		for (it = intervals.begin(); it != intervals.end(); ++it)
+			it->second.identify();
+	}
+}
+struct pcode {
+	int ntw;
+	int cls;
+	int mem;
+};
+struct pcode
+pcode_convert(int pc)
+{
+	struct pcode p;
+	if (pc & ~0x3fff) {
+		p.ntw = (pc >> 16) & 0xff;
+		p.cls = (pc >>  8) & 0xff;
+		p.mem = (pc >>  0) & 0xff;
+	} else {
+		p.ntw = (pc >> 11) & 0x07;
+		p.cls = (pc >>  3) & 0xff;
+		p.mem = (pc >>  0) & 0x07;
+	}
+	return (p);
+}
+void
+Node::identify(void)
+{
+	fprintf(stdout, "-------------------------------------------\n");
+	struct pcode pc = pcode_convert(pcode);
+	fprintf(stdout, "Node (%d-%d-%d):\n", pc.ntw, pc.cls, pc.mem);
+	if (orig_tcap)
+		fprintf(stdout, "Node originates TCAP traffic.\n");
+	if (term_tcap)
+		fprintf(stdout, "Node terminates TCAP traffic.\n");
+	if (orig_isup)
+		fprintf(stdout, "Node originates ISUP traffic.\n");
+	if (term_isup)
+		fprintf(stdout, "Node terminates ISUP traffic.\n");
+	if (exch_sltm)
+		fprintf(stdout, "Node exchanges SLTM/SLTA traffic.\n");
+	set<int>::iterator it;
+	const char *locale = exch_sltm ? "adjacent" : "distant";
+	if (!orig_tcap && term_tcap && !orig_isup && !term_isup) {
+		// GTT functions never originate, just terminate
+		fprintf(stdout, "Node is %s STP with GTT function (or capablity code).\n", locale);
+		for (it = responds.begin(); it != responds.end(); ++it) {
+			struct pcode pc = pcode_convert(*it);
+			fprintf(stdout, "Node (%d-%d-%d) translates through this node.\n", pc.ntw, pc.cls, pc.mem);
+		}
+	}
+	if (orig_tcap && !term_tcap && !orig_isup && !term_isup) {
+		// SCP's originate but never terminate
+		fprintf(stdout, "Node is %s SCP behind STP GTT.\n", locale);
+		for (it = queries.begin(); it != queries.end(); ++it) {
+			struct pcode pc = pcode_convert(*it);
+			fprintf(stdout, "Node (%d-%d-%d) is responded to by this node.\n", pc.ntw, pc.cls, pc.mem);
+		}
+	}
+	if (orig_tcap && term_tcap && !orig_isup && !term_isup) {
+		// SCP's have no ISUP traffic
+		fprintf(stdout, "Node is local SCCP transaction alias.\n");
+		for (it = queries.begin(); it != queries.end(); ++it) {
+			struct pcode pc = pcode_convert(*it);
+			fprintf(stdout, "Node (%d-%d-%d) is queried by this node.\n", pc.ntw, pc.cls, pc.mem);
+		}
+		for (it = responds.begin(); it != responds.end(); ++it) {
+			struct pcode pc = pcode_convert(*it);
+			fprintf(stdout, "Node (%d-%d-%d) repsonds to this node.\n", pc.ntw, pc.cls, pc.mem);
+		}
+	}
+	if (orig_tcap && term_tcap && (orig_isup || term_isup)) {
+		// SSPs originate and terminate all
+		fprintf(stdout, "Node is %s SSP with TCAP (or local alias).\n", locale);
+		for (it = circuits.begin(); it != circuits.end(); ++it) {
+			struct pcode pc = pcode_convert(*it);
+			fprintf(stdout, "Node (%d-%d-%d) has circuits to this node.\n", pc.ntw, pc.cls, pc.mem);
+		}
+		for (it = queries.begin(); it != queries.end(); ++it) {
+			struct pcode pc = pcode_convert(*it);
+			fprintf(stdout, "Node (%d-%d-%d) is queried by this node.\n", pc.ntw, pc.cls, pc.mem);
+		}
+		for (it = responds.begin(); it != responds.end(); ++it) {
+			struct pcode pc = pcode_convert(*it);
+			fprintf(stdout, "Node (%d-%d-%d) responds to this node.\n", pc.ntw, pc.cls, pc.mem);
+		}
+	}
+	if (!(orig_tcap || term_tcap) && (orig_isup || term_isup)) {
+		fprintf(stdout, "Node is %s SSP w/o TCAP.\n", locale);
+		for (it = circuits.begin(); it != circuits.end(); ++it) {
+			struct pcode pc = pcode_convert(*it);
+			fprintf(stdout, "Node (%d-%d-%d) has circuits to this node.\n", pc.ntw, pc.cls, pc.mem);
+		}
+	}
+	if (!(orig_tcap || term_tcap || orig_isup || term_isup) && exch_sltm) {
+		fprintf(stdout, "Node is %s STP w/o GTT (or separate capility code).\n", locale);
+	}
+	for (it = adjacent.begin(); it != adjacent.end(); ++it) {
+		struct pcode pc = pcode_convert(*it);
+		fprintf(stdout, "Node (%d-%d-%d) is adjacent to this node.\n", pc.ntw, pc.cls, pc.mem);
+	}
+
+	fprintf(stdout, "-------------------------------------------\n");
+	fprintf(stdout, "Origination (%d-%d-%d):\n", pc.ntw, pc.cls, pc.mem);
+	orig.identify();
+	fprintf(stdout, "-------------------------------------------\n");
+	fprintf(stdout, "Destination (%d-%d-%d):\n", pc.ntw, pc.cls, pc.mem);
+	dest.identify();
 }
 void
 Path::identify(void)
 {
 	fprintf(stdout, "-------------------------------------------\n");
 	fprintf(stdout, "Path (%d:%d:%d):\n", cardNum(), spanNum(), slotNum());
+	set<int>::iterator it;
+	struct pcode pc;
+	fprintf(stdout, "-------------------------------------------\n");
+	fprintf(stdout, "Originating nodes:\n");
+	for (it = orig.begin(); it != orig.end(); ++it) {
+		pc = pcode_convert(*it);
+		fprintf(stdout, "Node (%d-%d-%d)\n", pc.ntw, pc.cls, pc.mem);
+	}
+	fprintf(stdout, "-------------------------------------------\n");
+	fprintf(stdout, "Terminating nodes:\n");
+	for (it = dest.begin(); it != dest.end(); ++it) {
+		pc = pcode_convert(*it);
+		fprintf(stdout, "Node (%d-%d-%d)\n", pc.ntw, pc.cls, pc.mem);
+	}
+	fprintf(stdout, "-------------------------------------------\n");
 	MsgStat::identify();
 }
 void
@@ -1135,6 +1988,11 @@ Message::decode(void)
 				path.setRoutingLabel(RL_14BIT_PC);
 				break;
 			case PT_NO:
+				fprintf(stderr, "snmm decoding error\n");
+				fprintf(stderr, "snmm message is: ");
+				for (unsigned char *p = sif; p < end; p++)
+					fprintf(stderr, "%02x", *p);
+				fprintf(stderr, "\n");
 				return (-1);
 			}
 			break;
@@ -1191,6 +2049,11 @@ Message::decode(void)
 				path.setRoutingLabel(RL_14BIT_PC);
 				break;
 			case PT_NO:
+				fprintf(stderr, "sntm decoding error\n");
+				fprintf(stderr, "sntm message is: ");
+				for (unsigned char *p = sif; p < end; p++)
+					fprintf(stderr, "%02x", *p);
+				fprintf(stderr, "\n");
 				return (-1);
 			}
 			break;
@@ -1248,6 +2111,11 @@ Message::decode(void)
 				path.setRoutingLabel(RL_14BIT_PC);
 				break;
 			case PT_NO:
+				fprintf(stderr, "snsm decoding error\n");
+				fprintf(stderr, "snsm message is: ");
+				for (unsigned char *p = sif; p < end; p++)
+					fprintf(stderr, "%02x", *p);
+				fprintf(stderr, "\n");
 				return (-1);
 			}
 			break;
@@ -1307,6 +2175,11 @@ Message::decode(void)
 				path.setRoutingLabel(RL_14BIT_PC);
 				break;
 			case PT_NO:
+				fprintf(stderr, "isup decoding error\n");
+				fprintf(stderr, "isup message is: ");
+				for (unsigned char *p = sif; p < end; p++)
+					fprintf(stderr, "%02x", *p);
+				fprintf(stderr, "\n");
 				return (-1);
 			}
 			break;
@@ -1316,6 +2189,137 @@ Message::decode(void)
 		break;
 	}
 	if (!mtp3decode) {
+		if (path.detecting())
+			return (0);
+		mid = sif;
+		switch (path.routingLabel()) {
+		case RL_UNKNOWN:
+			return (0);	// cannot decode further, yet
+		case RL_14BIT_PC:
+			// SSSSOOOO OOOOOOOO OODDDDDD DDDDDDDD
+			if (li < 6)
+				fprintf(stderr, "too short for RL, li = %d\n", li);
+			dpc = (*mid++ & 0xff);
+			dpc |= ((*mid & 0x3f) << 8);
+			opc = ((*mid++ & 0xc0) >> 6);
+			opc |= ((*mid++ & 0xff) << 2);
+			opc |= ((*mid & 0x0f) << 10);
+			sls = (*mid++ * 0xf0) >> 4;
+			break;
+		case RL_24BIT_PC:
+			if (li < 9)
+				fprintf(stderr, "too short for RL, li = %d\n", li);
+			dpc = (*mid++ & 0x0ff);
+			dpc |= ((*mid++ & 0xff) << 8);
+			dpc |= ((*mid++ & 0xff) << 16);
+			opc = (*mid++ & 0x0ff);
+			opc |= ((*mid++ & 0xff) << 8);
+			opc |= ((*mid++ & 0xff) << 16);
+			sls = *mid++ & 0xff;
+			break;
+		}
+		sdu = mid;
+		switch (si) {
+		case 0:	// snmm
+			h0 = (*mid & 0x0f);
+			h1 = (*mid++ & 0xf0) >> 4;
+			mt = ((h0 << 4) | h1);
+			switch (mt) {
+			case 0x11:	// coo (link)
+			case 0x12:	// coa (link)
+				return (-1);
+			case 0x15:	// cbd
+				// link specific
+				if (path.routingLabel() == RL_14BIT_PC)
+					slc = sls;
+				else
+					slc = (*mid++ & 0xf);
+				mid++;
+				//path.setLink(*this);
+				break;
+			case 0x16:	// cba
+			case 0x21:	// eco (link)
+			case 0x22:	// eca (link)
+			case 0x31:	// rct (route-set)
+			case 0x32:	// tfc (route-set)
+			case 0x41:	// tfp (route)
+			case 0x42:	// tcp (route)
+			case 0x43:	// tfr (route)
+			case 0x44:	// tcr (route)
+			case 0x45:	// tfa (route)
+			case 0x46:	// tca (route)
+			case 0x51:	// rst (route-test)
+			case 0x52:	// rsr (route-test)
+			case 0x53:	// rcp (route-test)
+			case 0x54:	// rcr (route-test)
+				// side getting the message has the transfer function
+				// opc is adjacent
+				// dpc is remote
+				break;
+			case 0x61:	// lin (link)
+			case 0x62:	// lun (link)
+			case 0x63:	// lia (link)
+			case 0x64:	// lua (link)
+			case 0x65:	// lid (link)
+			case 0x66:	// lfu (link)
+			case 0x67:	// llt (link)
+			case 0x68:	// lrt (link)
+			case 0x71:	// tra (adjacent)
+			case 0x72:	// trw (adjacent)
+			case 0x81:	// dlc
+			case 0x82:	// css
+			case 0x83:	// cns
+			case 0x84:	// cnp
+			case 0xa1:	// upu (route-set)
+			case 0xa2:	// upa (route-set)
+			case 0xa3:	// upt (route-set)
+			default:
+				return (-1);
+			}
+			break;
+		case 1:	// sntm
+		case 2:	// snsm
+			h0 = (*mid & 0x0f);
+			h1 = (*mid++ & 0xf0) >> 4;
+			mt = ((h0 << 4) | h1);
+			// check for SLTM/SLTA SSLTM/SSLTA message
+			switch (mt) {
+			case 0x12:	// (s)slta
+				/* well.... */
+			case 0x11:	// (s)sltm
+				if (path.routingLabel() == RL_14BIT_PC)
+					slc = sls;
+				else
+					slc = (*mid & 0x0f);
+				dlen = (*mid++ & 0xf0) >> 4;
+				//path.setLink(*this);
+				break;
+			}
+			break;
+		case 3:	// sccp
+			mt = (*mid++ & 0xff);
+			break;
+		case 4:	// tup
+			return (-1);	// unexpected (obsolete)
+		case 5:	// isup
+			cic = (*mid++ & 0xff);
+			cic |= ((*mid++ & 0xff) << 8);
+			mt = (*mid++ & 0xff);
+			break;
+		case 6:	// dup1
+		case 7:	// dup2
+			return (-1);	// unexpected (obsolete)
+		case 8:	// mtup
+			break;
+		case 9:	// bisup
+		case 10:	// siup
+		case 11:	// spneup
+		case 12:	// stc
+		case 13:	// unused
+		case 14:	// unused
+		case 15:	// unused
+			return (-1);	// unexpected
+		}
 		mtp3decode = true;
 	}
 	return (1);
@@ -1324,7 +2328,7 @@ Message::decode(void)
 enum ProtocolTest
 Message::reasonableItutSnmmMsg(void)
 {
-	size_t size = sif - beg;
+	size_t size = end - sif;
 
 	switch (size) {
 	case 5:		// trx or slm message
@@ -1461,7 +2465,7 @@ Message::reasonableAnsiSnmmMsg(void)
 enum ProtocolTest
 Message::reasonableItutSntmMsg(void)
 {
-	size_t size = sif - beg;
+	size_t size = end - sif;
 
 	if (6 > size || size > 21)
 		return (PT_NO);
@@ -1488,15 +2492,20 @@ Message::reasonableItutSntmMsg(void)
 enum ProtocolTest
 Message::reasonableAnsiSntmMsg(void)
 {
-	size_t size = sif - beg;
+	size_t size = end - sif;
 
-	if (9 > size || size > 24)
+	if (9 > size || size > 24) {
+		if (debug)
+			fprintf(stderr, "%s: bad size = %d\n", __PRETTY_FUNCTION__, (int)size);
 		return (PT_NO);
+	}
 	switch (sif[7]) {
 	case 0x11:
 	case 0x21:
 		break;
 	default:
+		if (debug)
+			fprintf(stderr, "%s: wrong message type 0x%02x\n", __PRETTY_FUNCTION__, sif[7]);
 		return (PT_NO);
 	}
 	switch (size) {
@@ -1505,10 +2514,14 @@ Message::reasonableAnsiSntmMsg(void)
 	case 24:
 		if ((sif[8] >> 4) == size - 9)
 			return (PT_YES);
+		if (debug)
+			fprintf(stderr, "%s: bad li = %d, size = %d\n", __PRETTY_FUNCTION__, (int)(sif[8] >> 4), (int)size);
 		return (PT_NO);
 	}
 	if ((sif[8] >> 4) == size - 9)
 		return (PT_MAYBE);
+	if (debug)
+		fprintf(stderr, "%s: bad li = %d, size = %d\n", __PRETTY_FUNCTION__, (int)(sif[8] >> 4), (int)size);
 	return (PT_NO);
 }
 enum ProtocolTest
@@ -1793,6 +2806,10 @@ scapident(int num, char *fnames[])
 		f->identify();
 		delete f;
 		f = NULL;
+		map<int,Node>::iterator it;
+		for (it = nodes.begin(); it != nodes.end(); ++it)
+			it->second.identify();
+		nodes.clear();
 	}
 }
 
