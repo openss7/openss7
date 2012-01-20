@@ -3060,7 +3060,7 @@ sub cnt {
 	if (($self->{ciccnt} += 1) == 1) {
 		if ($self->isa('Relation')) {
 			my $c = $top->canvas;
-			$c->addtag('circuits','withtag',$self->{item}) if defined $c and $self->{item};
+			$c->addtag('circuits',withtag=>$self->{item}) if defined $c and $self->{item};
 			my $state = ($top->{show}->{circuits}) ? 'normal' : 'hidden';
 			$c->itemconfigure($self->{item},-state=>$state);
 		}
@@ -5270,14 +5270,14 @@ sub showmsgs {
 				delete $hl->{armed};
 				if (exists $self->{tree}->{$entry}) {
 					if ($self->{tree}->{$entry} eq 'plus') {
-						foreach ($hl->info('children',$entry)) {
-							$hl->show('entry',$_);
+						foreach my $e ($hl->info('children',$entry)) {
+							$hl->show('entry',$e);
 						}
 						$hl->indicator('configure', $entry, -image=>'minus',);
 						$self->{tree}->{$entry} = 'minus';
 					} else {
-						foreach ($hl->info('children',$entry)) {
-							$hl->hide('entry',$_);
+						foreach my $e ($hl->info('children',$entry)) {
+							$hl->hide('entry',$e);
 						}
 						$hl->indicator('configure', $entry, -image=>'plus',);
 						$self->{tree}->{$entry} = 'plus';
@@ -5835,7 +5835,7 @@ sub props {
 			-textvariable=>\$v,
 		)->grid(-row=>$row++,-column=>1,-sticky=>'ewns');
 
-		$self->fillprops($tw,\$row);
+		$self->fillprops($top,$tw,\$row);
 	}
 	$tw->update;
 	$tw->MapWindow;
@@ -5906,8 +5906,8 @@ sub init {
 sub attach {
 	my ($self,$top) = @_;
 	if (exists $self->{items}) {
-		foreach (@{$self->{items}}) {
-			$top->canvas->bind($_,'<ButtonPress-3>',[\&Clickable::button3,$self,$top,Tk::Ev('X'),Tk::Ev('Y')]);
+		foreach my $i (@{$self->{items}}) {
+			$top->canvas->bind($i,'<ButtonPress-3>',[\&Clickable::button3,$self,$top,Tk::Ev('X'),Tk::Ev('Y')]);
 		}
 		$top->mycanvas->addballoon($self,$self->{items});
 	} else {
@@ -6004,49 +6004,259 @@ sub bindtowidget {
 }
 
 # -------------------------------------
+package Stateful;
+use strict;
+# -------------------------------------
+
+#package Stateful;
+sub init {
+	my ($self,$top,$state,$options,$colors) = @_;
+	$self->{options} = $options;
+	$self->{colors} = $colors;
+	$self->{state} = $self->{oldstate} = $state;
+	$self->{statetext} = $options->[$state]->[0];
+	$self->{color} = $colors->[$state];
+	my $tl = $top->widget;
+	$top->widget->traceVariable(\$self->{state},'w'=>[\&Stateful::tracestate,$self,$top]);
+}
+#package Stateful;
+sub tracestate {
+	my ($ind,$val,$op,$self,$top) = @_;
+	if ($op eq 'w') {
+		if ($self->{oldstate} != $val) {
+			$self->{statetext} = $self->{options}->[$val]->[0];
+			my $color = $self->{colors}->[$val];
+			if ($self->{color} ne $color) {
+				$self->{color} = $color;
+				$top->canvas->itemconfigure($self->{items}->[0], -fill=>$color)
+					if exists $self->{items} and $self->{items}->[0];
+			}
+			$top->statusbar->configure(
+				-text=>$self->identify.' state changed from '.$self->{options}->[$self->{oldstate}]->[0].' to '.$self->{options}->[$val]->[0],
+			);
+			$self->statechange($top,$val);
+			$self->{oldstate} = $val;
+		}
+	}
+	return $val;
+}
+#package Stateful;
+sub statechange {
+	my ($self,$top,$val) = @_;
+}
+#package Stateful;
+sub updatestate {
+	my ($self,$top,$obj) = @_;
+}
+#package Stateful;
+sub fillstate {
+	my ($self,$top,$w,$row) = @_;
+	$w->Label(%labelright,
+		-text=>'State:',
+	)->grid(-row=>$$row,-column=>0,-sticky=>'ewns');
+	$w->Optionmenu(%optionleft,
+		-options=>$self->{options},
+		-variable=>\$self->{state},
+		-textvariable=>\$self->{statetext},
+	)->grid(-row=>$$row++,-column=>1,-sticky=>'ewns');
+}
+
+# -------------------------------------
+package Tristate;
+use strict;
+use vars qw(@ISA);
+@ISA = qw(Stateful);
+# -------------------------------------
+
+#package Tristate;
+use constant {
+	TS_AVAILABLE => 0,
+	TS_DEGRADED => 1,
+	TS_UNAVAILABLE => 2,
+};
+#package Tristate;
+$Tristate::options = [
+	['Available'	=> TS_AVAILABLE    ],
+	['Degraded'	=> TS_DEGRADED	    ],
+	['Unavailable'	=> TS_UNAVAILABLE  ],
+];
+#package Tristate;
+$Tristate::colors = {
+	white=>['white', 'orange', 'red'],
+	black=>['black', 'orange', 'red'],
+	grey =>['grey',  'orange', 'red'],
+};
+#package Tristate;
+sub init {
+	my ($self,$top,$color) = @_;
+	$self->Stateful::init($top,TS_AVAILABLE,$Tristate::options,
+		$Tristate::colors->{$color});
+}
+
+# -------------------------------------
+package Hexstate;
+use strict;
+use vars qw(@ISA);
+@ISA = qw(Stateful);
+# -------------------------------------
+
+#package Hexstate;
+use constant {
+	HS_AVAILABLE => 0,
+	HS_DEGRADED => 1,
+	HS_CONGESTED_1 => 2,
+	HS_CONGESTED_2 => 3,
+	HS_CONGESTED_3 => 4,
+	HS_UNAVAILABLE => 5,
+};
+#package Hexstate;
+$Hexstate::options = [
+	['Available'	=> HS_AVAILABLE	    ],
+	['Degraded'	=> HS_DEGRADED	    ],
+	['Congested(1)'	=> HS_CONGESTED_1   ],
+	['Congested(2)'	=> HS_CONGESTED_2   ],
+	['Congested(3)'	=> HS_CONGESTED_3   ],
+	['Unavailable' 	=> HS_UNAVAILABLE   ],
+];
+#package Hexstate;
+$Hexstate::colors = {
+	white=>['white', 'orange', 'yellow1', 'yellow2', 'yellow3', 'red'],
+	black=>['black', 'orange', 'yellow1', 'yellow2', 'yellow3', 'red'],
+	grey =>['grey',  'orange', 'yellow1', 'yellow2', 'yellow3', 'red'],
+};
+#package Hexstate;
+sub init {
+	my ($self,$top,$color) = @_;
+	$self->Stateful::init($top,HS_AVAILABLE,$Hexstate::options,
+		$Hexstate::colors->{$color});
+}
+
+# -------------------------------------
+package Pentastate;
+use strict;
+use vars qw(@ISA);
+@ISA = qw(Stateful);
+# -------------------------------------
+
+#package Pentastate;
+use constant {
+	PS_INSERVICE => 0,
+	PS_BUSY => 1,
+	PS_INHIBITED => 2,
+	PS_BLOCKED => 3,
+	PS_OUTOFSERVICE => 4,
+};
+#package Pentastate;
+$Pentastate::options = [
+	['Inservice'	  => PS_INSERVICE	],
+	['Busy'		  => PS_BUSY		],
+	['Inhibited'	  => PS_INHIBITED	],
+	['Blocked'	  => PS_BLOCKED		],
+	['Out of service' => PS_OUTOFSERVICE	],
+];
+#package Pentastate;
+$Pentastate::colors = {
+	white=>['white', 'orange', 'blue', 'red3', 'red'],
+	black=>['black', 'orange', 'blue', 'red3', 'red'],
+	grey =>['grey',  'orange', 'blue', 'red3', 'red'],
+};
+#package Pentastate;
+sub init {
+	my ($self,$top,$color) = @_;
+	$self->Stateful::init($top,PS_INSERVICE,$Pentastate::options,
+		$Pentastate::colors->{$color});
+}
+
+# -------------------------------------
+package Arcitem;
+use strict;
+# -------------------------------------
+
+$Arcitem::style = {
+	line=>{
+		-arrow=>'none',
+		-capstyle=>'round',
+		-joinstyle=>'round',
+		-smooth=>0,
+	},
+	dash=>{
+		-arrow=>'none',
+		-capstyle=>'round',
+		-joinstyle=>'round',
+		-smooth=>0,
+		-dash=>[5,2],
+	},
+};
+
+#package Arcitem;
+sub init {
+	my ($self,$top,$obja,$objb,$under,$format) = @_;
+	$format = 'line' unless defined $format;
+	my $type = ref $self;
+	my $show = "\L$type\Es";
+	my $tags = "\L$type\E";
+	my $c = $top->canvas;
+	$self->{obja} = $obja;
+	$self->{objb} = $objb;
+	$obja->{arcs} = [] unless exists $obja->{arcs}; push @{$obja->{arcs}}, $self;
+	$objb->{arcs} = [] unless exists $objb->{arcs}; push @{$objb->{arcs}}, $self;
+	my $xa = $self->{xa} = $obja->{x};
+	my $ya = $self->{ya} = $obja->{y};
+	my $xb = $self->{xb} = $objb->{x};
+	my $yb = $self->{yb} = $objb->{y};
+	$self->{x} = ($xa + $xb)/2;
+	$self->{y} = ($ya + $yb)/2;
+	$self->{item} = $c->createLine($xa,$ya,$xb,$yb,%{$Arcitem::style->{$format}},
+		-fill=>$self->{color}, -width=>0.1,
+		-activefill=>'cyan', -activewidth=>2,
+		-state=>$top->{show}->{$show}?'normal':'hidden',
+		-tags=>[$tags],
+	);
+	push @{$self->{items}}, $self->{item};
+	$c->lower($self->{item},'node');
+	$c->lower($self->{item},$under);
+}
+
+#package Arcitem;
+sub moveit {
+	my ($self,$top) = @_;
+	my $obja = $self->{obja};
+	my $objb = $self->{objb};
+	my $xa = $obja->{x};
+	my $ya = $obja->{y};
+	my $xb = $objb->{x};
+	my $yb = $objb->{y};
+	return undef if $xa == $self->{xa} &&
+			$ya == $self->{ya} &&
+			$xb == $self->{xb} &&
+			$yb == $self->{yb};
+	$top->canvas->coords($self->{item},$xa,$ya,$xb,$yb);
+	$self->{xa} = $xa;
+	$self->{ya} = $ya;
+	$self->{xb} = $xb;
+	$self->{yb} = $yb;
+	$self->{x} = ($xa + $xb)/2;
+	$self->{y} = ($ya + $yb)/2;
+	if (exists $self->{arcs}) { foreach my $a (@{$self->{arcs}}) { $a->moveit($top); } }
+	return 1;
+}
+
+# -------------------------------------
 package Relation;
 use strict;
 use vars qw(@ISA);
-@ISA = qw(MsgStats Logging Properties Status Clickable CallCollector MsgCollector);
+@ISA = qw(Hexstate Arcitem MsgStats Logging Properties Status Clickable CallCollector MsgCollector);
 # -------------------------------------
 # A relation is an association between signalling points that communicate with
 # each other.  This object is used to track these interactions, primarily for
 # identifying the role of nodes.
 # -------------------------------------
 
-use constant {
-	RS_AVAILABLE => 0,
-	RS_DEGRADED => 1,
-	RS_CONGESTED_1 => 2,
-	RS_CONGESTED_2 => 3,
-	RS_CONGESTED_3 => 4,
-	RS_UNAVAILABLE => 5,
-};
-
-my @rsoptions = (
-	['Available'    => RS_AVAILABLE  ],
-	['Degraded'     => RS_DEGRADED   ],
-	['Congested'    => RS_CONGESTED_1],
-	['Congested(2)' => RS_CONGESTED_2],
-	['Congested(3)' => RS_CONGESTED_3],
-	['Unavailable'  => RS_UNAVAILABLE],
-);
-my @rscolors = (
-	'black',
-	'orange',
-	'yellow1',
-	'yellow2',
-	'yellow3',
-	'red',
-);
-
-my %relations;
-my $relationno = 0;
-
 #package Relation;
 sub init {
 	my ($self,$top,$network,$relationno,$nodea,$nodeb,@args) = @_;
 	$self->{network} = $network;
+	$self->Hexstate::init($top,'black');
 	$self->MsgStats::init(@args);
 	$self->Logging::init(@args);
 	$self->Properties::init(@args);
@@ -6055,8 +6265,6 @@ sub init {
 	$self->CallCollector::init(@args);
 	$self->MsgCollector::init(@args);
 	$self->{key} = "$nodea->{pc},$nodeb->{pc}";
-	$self->{state} = RS_AVAILABLE;
-	$self->{statetext} = 'Available';
 	$self->{cics} = {};
 	$self->{ciccnt} = 0;
 	$self->{actcnt} = 0;
@@ -6068,28 +6276,7 @@ sub init {
 	$self->{nodeb} = $nodeb;
 	$nodea->{relate}->{$nodeb->{pc}} = $self;
 	$nodeb->{relate}->{$nodea->{pc}} = $self;
-	my $xa = $self->{xa} = $nodea->{x};
-	my $ya = $self->{ya} = $nodea->{y};
-	my $xb = $self->{xb} = $nodeb->{x};
-	my $yb = $self->{yb} = $nodeb->{y};
-	my $c = $top->canvas;
-	$self->{x} = ($xa + $xb)/2;
-	$self->{y} = ($ya + $yb)/2;
-	$self->{fill} = 'grey';
-	$self->{item} = $c->createLine($xa,$ya,$xb,$yb,
-		-arrow=>'none',
-		-capstyle=>'round',
-		-fill=>$self->{fill}, -width=>0.1,
-		-activefill=>'cyan', -activewidth=>2,
-		-joinstyle=>'round',
-		-smooth=>0,
-		-state=>$top->{show}->{relations}?'normal':'hidden',
-		-tags=>['relation'],
-	);
-	push @{$self->{items}}, $self->{item};
-	$c->toplevel->traceVariable(\$self->{state},'w'=>[\&Relation::tracestate,$self,$c]);
-	$c->lower($self->{item},'node');
-	$c->lower($self->{item},'channel');
+	$self->Arcitem::init($top,$nodea,$nodeb);
 	$self->Clickable::attach($top,@args);
 
 
@@ -6103,17 +6290,8 @@ sub init {
 #}
 
 #package Relation;
-sub tracestate {
-	my ($ind,$val,$op,$self,$c) = @_;
-	if ($op eq 'w') {
-		my $color = $rscolors[$val];
-		$self->{statetext} = $rsoptions[$val]->[0];
-		if ($self->{color} ne $color) {
-			$self->{color} = $color;
-			$c->itemconfigure($self->{item},-fill=>$color);
-		}
-	}
-	return $val;
+sub statechange {
+	my ($self,$top,$val) = @_;
 }
 
 #package Relation;
@@ -6326,36 +6504,36 @@ sub reanalyze {
 	if ($self->{xchg_sltm}) {
 		$self->{fill} = 'black';
 		$c->itemconfigure($self->{item}, -fill=>$self->{fill});
-		$c->addtag('linkset','withtag',$self->{item});
-		$c->addtag('SLTM','withtag',$self->{item});
+		$c->addtag('linkset',withtag=>$self->{item});
+		$c->addtag('SLTM',withtag=>$self->{item});
 		return;
 	}
 	if ($self->{xchg_isup}) {
 		$self->{fill} = 'black';
 		$c->itemconfigure($self->{item}, -fill=>$self->{fill});
-		$c->addtag('circuits','withtag',$self->{item});
-		$c->addtag('ISUP','withtag',$self->{item});
+		$c->addtag('circuits',withtag=>$self->{item});
+		$c->addtag('ISUP',withtag=>$self->{item});
 		return;
 	}
 	if ($self->{forw_tcap} && $self->{revs_tcap}) {
 		$self->{fill} = 'black';
 		$c->itemconfigure($self->{item}, -fill=>$self->{fill},-dash=>[5,3]);
-		$c->addtag('association','withtag',$self->{item});
-		$c->addtag('TCAP','withtag',$self->{item});
+		$c->addtag('association',withtag=>$self->{item});
+		$c->addtag('TCAP',withtag=>$self->{item});
 		return;
 	}
 	if ($self->{forw_tcap}) {
 		$self->{fill} = 'black';
 		$c->itemconfigure($self->{item}, -fill=>$self->{fill},-dash=>[5,3]);
-		$c->addtag('association','withtag',$self->{item});
-		$c->addtag('TCAP','withtag',$self->{item});
+		$c->addtag('association',withtag=>$self->{item});
+		$c->addtag('TCAP',withtag=>$self->{item});
 		return;
 	}
 	if ($self->{revs_tcap}) {
 		$self->{fill} = 'black';
 		$c->itemconfigure($self->{item}, -fill=>$self->{fill},-dash=>[5,3]);
-		$c->addtag('association','withtag',$self->{item});
-		$c->addtag('TCAP','withtag',$self->{item});
+		$c->addtag('association',withtag=>$self->{item});
+		$c->addtag('TCAP',withtag=>$self->{item});
 		return;
 	}
 	$self->{fill} = 'gray';
@@ -6412,33 +6590,12 @@ sub reanalyze {
 }
 
 #package Relation;
-sub move {
-	my ($self,$top) = @_;
-	my $nodea = $self->{nodea};
-	my $nodeb = $self->{nodeb};
-	my $xa = $nodea->{x};
-	my $ya = $nodea->{y};
-	my $xb = $nodeb->{x};
-	my $yb = $nodeb->{y};
-	my $c = $top->canvas;
-	return if $xa == $self->{xa} &&
-		  $ya == $self->{ya} &&
-		  $xb == $self->{xb} &&
-		  $yb == $self->{yb};
-	$self->{offa} = $nodea->{off};
-	$self->{cola} = $nodea->{col};
-	$self->{rowa} = $nodea->{row};
-	$self->{offb} = $nodeb->{off};
-	$self->{colb} = $nodeb->{col};
-	$self->{rowb} = $nodeb->{row};
-	$c->coords($self->{item},$xa,$ya,$xb,$yb);
-	$self->{xa} = $xa;
-	$self->{ya} = $ya;
-	$self->{xb} = $xb;
-	$self->{yb} = $yb;
-	$self->{x} = ($xa + $xb)/2;
-	$self->{y} = ($ya + $yb)/2;
-	if (my $linkset = $self->{linkset}) { $linkset->move($top); }
+sub moveit {
+	my ($self,$top,$ret) = @_;
+	if ($ret = $self->Arcitem::moveit($top)) {
+		$self->{linkset}->moveit($top) if exists $self->{linkset};
+	}
+	return $ret;
 }
 
 #package Relation;
@@ -6509,7 +6666,7 @@ sub getmore {
 
 #package Relation;
 sub fillprops {
-	my ($self,$tw,$row) = @_;
+	my ($self,$top,$tw,$row) = @_;
 
 	$tw->Label(%labelright,
 		-text=>'SP A point code:',
@@ -6557,14 +6714,7 @@ sub fillstatus {
 		-text=>'Reverse TCAP',
 		-variable=>\$self->{revs_tcap},
 	)->grid(-row=>$$row++,-column=>1,-sticky=>'ewns');
-	$tw->Label(%labelright,
-		-text=>'State:',
-	)->grid(-row=>$$row,-column=>0,-sticky=>'ewns');
-	$tw->Optionmenu(%optionleft,
-		-options=>\@rsoptions,
-		-variable=>\$self->{state},
-		-textvariable=>\$self->{statetext},
-	)->grid(-row=>$$row++,-column=>1,-sticky=>'ewns');
+	$self->fillstate($top,$tw,$row);
 	if ($self->{slccnt}) {
 		$tw->Label(%labelright,
 			-text=>'Signalling links:',
@@ -6621,6 +6771,44 @@ sub log {
 	$self->Logging::log($text);
 	$self->{nodea}->log($text);
 	$self->{nodeb}->log($text);
+}
+
+# -------------------------------------
+package Routeset;
+use strict;
+use vars qw(@ISA);
+@ISA = qw(Hexstate Arcitem MsgStats Logging Properties Status Clickable MsgCollector);
+# -------------------------------------
+# A routeset is a collection of routes from one node (node a) to another (node b).
+# In contrast to relations, a routeset is a unidirectional concept.
+# -------------------------------------
+
+#package Routeset;
+sub init {
+	my ($self,$top,$network,$routesetno,$nodea,$nodeb,@args) = @_;
+	$self->Hexstate::init($top,'black');
+	$self->MsgStats::init(@args);
+	$self->Logging::init(@args);
+	$self->Properties::init(@args);
+	$self->Status::init(@args);
+	$self->Clickable::init(@args);
+	$self->MsgCollector::init(@args);
+	$self->{key} = "$nodea->{pc},$nodeb->{pc}";
+	$self->{nodea} = $nodea;
+	$self->{nodeb} = $nodeb;
+	$nodea->{routesets}->{og}->{$nodeb->{pc}} = $self;
+	$nodeb->{routesets}->{ic}->{$nodea->{pc}} = $self;
+	$self->Arcitem::init($top,$nodea,$nodeb,'relation');
+	$self->Clickable::attach($top,@args);
+}
+
+#package Routeset;
+sub new {
+	my ($type,@args) = @_;
+	my $self = {};
+	bless $self,$type;
+	$self->init(@args);
+	return $self;
 }
 
 # -------------------------------------
@@ -7162,7 +7350,7 @@ sub shortid {
 
 #package Circuit;
 sub fillprops {
-	my ($self,$tw,$row) = @_;
+	my ($self,$top,$tw,$row) = @_;
 
 	$tw->Label(%labelright,
 		-text=>'Circuit id code:',
@@ -7200,7 +7388,7 @@ sub fillstatus {
 package Linkset;
 use strict;
 use vars qw(@ISA);
-@ISA = qw(MsgStats Logging Properties Status Clickable CallCollector MsgCollector);
+@ISA = qw(Tristate Arcitem MsgStats Logging Properties Status Clickable CallCollector MsgCollector);
 # -------------------------------------
 
 use constant {
@@ -7210,37 +7398,11 @@ use constant {
 	COL_GTT => 2,
 	COL_ADJ => 1,
 };
-
-use constant {
-	LK_INSERVICE => 0,
-	LK_BUSY => 1,
-	LK_OUTOFSERVICE => 2,
-};
-
-use constant {
-	LS_AVAILABLE => 0,
-	LS_DEGRADED => 1,
-	LS_UNAVAILABLE => 2,
-};
-
-my @lsoptions = (
-	['Available'	=> LS_AVAILABLE	 ],
-	['Degraded'	=> LS_DEGRADED	 ],
-	['Unavailable'	=> LS_UNAVAILABLE],
-);
-my @lscolors = (
-	'black',
-	'orange',
-	'red',
-);
-
-my %linksets;
-my $linksetno = 0;
-
 #package Linkset;
 sub init {
 	my ($self,$top,$network,$relation,@args) = @_;
 	$self->{network} = $network;
+	$self->Tristate::init($top,'black');
 	$self->MsgStats::init(@args);
 	$self->Logging::init(@args);
 	$self->Properties::init(@args);
@@ -7248,33 +7410,14 @@ sub init {
 	$self->Clickable::init(@args);
 	$self->CallCollector::init(@args);
 	$self->MsgCollector::init(@args);
-	$self->{state} = LS_AVAILABLE;
-	$self->{statetext} = $lsoptions[LS_AVAILABLE]->[0];
 	$self->{slccnt} = 0;
-	$self->{nodea} = $relation->{nodea};
-	$self->{nodeb} = $relation->{nodeb};
+	$self->{links} = {};
+	my $nodea = $self->{nodea} = $relation->{nodea};
+	my $nodeb = $self->{nodeb} = $relation->{nodeb};
 	$self->{relation} = $relation; $relation->{linkset} = $self;
 	$self->{routesa} = {}; # routes from the a-side
 	$self->{routesb} = {}; # routes from the b-side
-	my $xa = $self->{xa} = $relation->{xa};
-	my $ya = $self->{ya} = $relation->{ya};
-	my $xb = $self->{xb} = $relation->{xb};
-	my $yb = $self->{yb} = $relation->{yb};
-	my $x = $self->{x} = $relation->{x};
-	my $y = $self->{y} = $relation->{y};
-	$self->{fill} = 'black';
-	my $c = $top->canvas;
-	my $type = ref $self;
-	$self->{item} = $c->createLine($xa,$ya,$xb,$yb,
-		-arrow=>'none',-capstyle=>'round',-joinstyle=>'round',-smooth=>0,
-		-fill=>$self->{fill},-width=>0.1,
-		-activefill=>'cyan',-activewidth=>2,
-		-state=>($top->{show}->{"\L$type\Es"}) ? 'normal' : 'hidden',
-		-tags=>['linkset'],
-	);
-	push @{$self->{items}}, $self->{item};
-	$c->lower($self->{item},'node');
-	$c->toplevel->traceVariable(\$self->{state},'w'=>[\&Linkset::tracestate,$self,$c]);
+	$self->Arcitem::init($top,$nodea,$nodeb,'node');
 	$self->Clickable::attach($top,@args);
 }
 
@@ -7312,46 +7455,38 @@ sub shortid {
 }
 
 #package Linkset;
-sub tracestate {
-	my ($ind,$val,$op,$self,$c) = @_;
-	if ($op eq 'w') {
-		my $color = $lscolors[$val];
-		$self->{statetext} = $lsoptions[$val]->[0];
-		if ($self->{color} ne $color) {
-			$self->{color} = $color;
-			$c->itemconfigure($self->{item},-fill=>$color);
-		}
-		foreach my $route (values %{$self->{routesa}}) {
-			$route->updatestate($self,$c);
-		}
-		foreach my $route (values %{$self->{routesb}}) {
-			$route->updatestate($self,$c);
-		}
+sub statechange {
+	my ($self,$top,$val) = @_;
+	my $c = $top->canvas;
+	foreach my $route (values %{$self->{routesa}}) {
+		$route->updatestate($top,$self);
 	}
-	return $val;
+	foreach my $route (values %{$self->{routesb}}) {
+		$route->updatestate($top,$self);
+	}
 }
 
 #package Linkset;
 sub updatestate {
-	my ($self,$obj,$c) = @_;
+	my ($self,$top,$obj) = @_;
 	my ($inserv,$busy,$ooserv) = (0,0,0);
 	foreach my $link (values %{$self->{links}}) {
 		my $lstate = $link->{state};
-		if ($lstate == LK_INSERVICE) {
+		if ($lstate == Tristate::TS_AVAILABLE) {
 			$inserv++;
-		} elsif ($lstate == LK_BUSY) {
+		} elsif ($lstate == Tristate::TS_DEGRADED) {
 			$busy++;
-		} elsif ($lstate == LK_OUTOFSERVICE) {
+		} elsif ($lstate == Tristate::TS_UNAVAILABLE) {
 			$ooserv++;
 		}
 	}
 	my $state;
 	if ($inserv == 0 && $busy == 0 && $ooserv > 0) {
-		$state = LS_UNAVAILABLE;
+		$state = Tristate::TS_UNAVAILABLE;
 	} elsif ($busy + $ooserv > 0) {
-		$state = LS_DEGRADED;
+		$state = Tristate::TS_DEGRADED;
 	} else {
-		$state = LS_AVAILABLE;
+		$state = Tristate::TS_AVAILABLE;
 	}
 	return if $self->{state} == $state;
 	$self->{state} = $state;
@@ -7445,27 +7580,21 @@ sub getLink {
 }
 
 #package Linkset;
-sub move {
-	my ($self,$top) = @_;
-	my $relation = $self->{relation};
-	my $xa = $relation->{xa};
-	my $ya = $relation->{ya};
-	my $xb = $relation->{xb};
-	my $yb = $relation->{yb};
-	return if $xa == $self->{xa} &&
-		  $ya == $self->{ya} &&
-		  $xb == $self->{xb} &&
-		  $yb == $self->{yb};
-	$top->canvas->coords($self->{item},$xa,$ya,$xb,$yb) if $self->{item};
-	$self->{xa} = $xa;
-	$self->{ya} = $ya;
-	$self->{xb} = $xb;
-	$self->{yb} = $yb;
-	$self->{x} = $relation->{x};
-	$self->{y} = $relation->{y};
-	foreach my $link (values %{$self->{links}}) { $link->move($top); }
-	foreach my $route (values %{$self->{routesa}}) { $route->move($top); }
-	foreach my $route (values %{$self->{routesb}}) { $route->move($top); }
+sub moveit {
+	my ($self,$top,$ret) = @_;
+	if ($ret = $self->Arcitem::moveit($top)) {
+		foreach my $o (values %{$self->{links}}  ) {
+			unless (defined $o) {
+				print STDERR "undefined value in links for ",$self->identify,"\n";
+				print STDERR Data::Dumper->Dump([$self->{links}]);
+				die;
+			}
+			$o->moveit($top);
+		}
+		foreach my $o (values %{$self->{routesa}}) { $o->moveit($top); }
+		foreach my $o (values %{$self->{routesb}}) { $o->moveit($top); }
+	}
+	return $ret;
 }
 
 #package Linkset;
@@ -7514,7 +7643,7 @@ sub getmore {
 
 #package Linkset;
 sub fillprops {
-	my ($self,$tw,$row) = @_;
+	my ($self,$top,$tw,$row) = @_;
 
 	$tw->Label(%labelright,
 		-text=>'SP A point code:',
@@ -7562,14 +7691,7 @@ sub fillstatus {
 		-text=>'Reverse TCAP',
 		-variable=>\$self->{revs_tcap},
 	)->grid(-row=>$$row++,-column=>1,-sticky=>'ewns');
-	$tw->Label(%labelright,
-		-text=>'State:',
-	)->grid(-row=>$$row,-column=>0,-sticky=>'ewns');
-	$tw->Optionmenu(%optionleft,
-		-options=>\@lsoptions,
-		-variable=>\$self->{state},
-		-textvariable=>\$self->{statetext},
-	)->grid(-row=>$$row++,-column=>1,-sticky=>'ewns');
+	$self->fillstate($top,$tw,$row);
 	if ($self->{slccnt}) {
 		$tw->Label(%labelright,
 			-text=>'Signalling links:',
@@ -7624,57 +7746,24 @@ sub fillstatus {
 package Combined;
 use strict;
 use vars qw(@ISA);
-@ISA = qw(MsgStats Logging Properties Status Clickable MsgCollector);
+@ISA = qw(Tristate Arcitem MsgStats Logging Properties Status Clickable MsgCollector);
 # -------------------------------------
-
-use constant {
-	CL_AVAILABLE=>0,
-	CL_DEGRADED=>0,
-	CL_UNAVAILABLE=>0,
-};
-my @cloptions = (
-	['Available'	=> CL_AVAILABLE],
-	['Degraded'	=> CL_DEGRADED],
-	['Unavailable'	=> CL_UNAVAILABLE],
-);
-my @clcolors = (
-	'black',
-	'orange',
-	'red',
-);
 
 #package Combined;
 sub init {
 	my ($self,$top,$network,$linkseta,$linksetb,@args) = @_;
 	my $type = ref $self;
-	$self->{network} = $network;
+	$self->Tristate::init($top,'black');
 	$self->MsgStats::init(@args);
 	$self->Logging::init(@args);
 	$self->Properties::init(@args);
 	$self->Status::init(@args);
 	$self->Clickable::init(@args);
 	$self->MsgCollector::init(@args);
-	$self->{state} = CL_AVAILABLE;
-	$self->{statetext} = $cloptions[CL_AVAILABLE]->[0];
-	$self->{fill} = $clcolors[CL_AVAILABLE];
 	$self->{lnkcnt} = 0;
 	$self->{linkseta} = $linkseta;
 	$self->{linksetb} = $linksetb;
-	my $xa = $self->{xa} = $linkseta->{x};
-	my $ya = $self->{ya} = $linkseta->{y};
-	my $xb = $self->{xb} = $linksetb->{x};
-	my $yb = $self->{yb} = $linksetb->{y};
-	my $x = $self->{x} = ($xa+$xb)/2;
-	my $y = $self->{y} = ($ya+$yb)/2;
-	my $c = $top->canvas;
-	$self->{item} = $c->createLine($xa,$ya,$xb,$yb,
-		-arrow=>'none',-capstyle=>'round',-joinstyle=>'round',-smooth=>0,-dash=>[5,2],
-		-fill=>$self->{fill},-width=>0.1,
-		-activefill=>'cyan',-activewidth=>2,
-		-state=>($top->{show}->{"\L$type\Es"})?'normal':'hidden',
-		-tags=>['combined'],
-	);
-	push @{$self->{items}}, $self->{item};
+	$self->Arcitem::init($top,$linkseta,$linksetb,'node','dash');
 	$self->Clickable::attach($top,@args);
 }
 
@@ -7683,47 +7772,27 @@ sub init {
 package Link;
 use strict;
 use vars qw(@ISA);
-@ISA = qw(MsgStats Logging Properties Status Clickable MsgCollector);
+@ISA = qw(Tristate Arcitem MsgStats Logging Properties Status Clickable MsgCollector);
 # -------------------------------------
-
-use constant {
-	LK_INSERVICE => 0,
-	LK_BUSY => 1,
-	LK_OUTOFSERVICE => 2,
-};
-
-my @lkoptions = (
-	['Inservice'	    =>  LK_INSERVICE    ],
-	['Busy'		    =>  LK_BUSY		],
-	['Out of service'   =>	LK_OUTOFSERVICE	],
-);
-my @lkcolors = (
-	'black',
-	'orange',
-	'red',
-);
 
 #package Link;
 sub init {
 	my ($self,$top,$linkset,$slc,@args) = @_;
+	$self->Tristate::init($top,'black');
 	$self->MsgStats::init(@args);
 	$self->Logging::init(@args);
 	$self->Properties::init(@args);
 	$self->Status::init(@args);
+	$self->Clickable::init(@args);
 	$self->MsgCollector::init(@args);
-	$self->{state} = LK_INSERVICE;
-	$self->{statetext} = $lkoptions[LK_INSERVICE]->[0];
 	$self->{linkset} = $linkset;
-	$self->{nodea} = $linkset->{nodea};
-	$self->{nodeb} = $linkset->{nodeb};
+	my $nodea = $self->{nodea} = $linkset->{nodea};
+	my $nodeb = $self->{nodeb} = $linkset->{nodeb};
 	$self->{slc} = $slc;
-	$self->{state} = LK_INSERVICE;
-	$self->{statetext} = 'In Service';
 	$self->{channelforw} = undef;
 	$self->{channelrevs} = undef;
-	$top->statusbar->configure(-text=>"New ".$self->identify);
-	my $c = $top->canvas;
-	$c->toplevel->traceVariable(\$self->{state},'w'=>[\&Link::tracestate,$self,$c]);
+	$self->Arcitem::init($top,$nodea,$nodeb,'linkset');
+	$self->Clickable::attach($top,@args);
 }
 
 #package Link;
@@ -7736,19 +7805,9 @@ sub new {
 }
 
 #package Link;
-sub tracestate {
-	my ($ind,$val,$op,$self,$c) = @_;
-	if ($op eq 'w') {
-		my $color = $lkcolors[$val];
-		$self->{statetext} = $lkoptions[$val]->[0];
-		if ($self->{color} ne $color) {
-			$self->{color} = $color;
-			$c->itemconfigure($self->{item},-fill=>$color)
-				if $self->{item};
-		}
-		$self->{linkset}->upatestate($self,$c);
-	}
-	return $val;
+sub statechange {
+	my ($self,$top,$val) = @_;
+	$self->{linkset}->updatestate($top,$self);
 }
 
 #package Link;
@@ -7782,27 +7841,13 @@ sub add_msg {
 }
 
 #package Link;
-sub move {
-	my ($self,$top) = @_;
-	my $relation = $self->{linkset}->{relation};
-	my $xa = $relation->{xa};
-	my $ya = $relation->{ya};
-	my $xb = $relation->{xb};
-	my $yb = $relation->{yb};
-	return if $xa == $self->{xa} &&
-		  $ya == $self->{ya} &&
-		  $xb == $self->{xb} &&
-		  $yb == $self->{yb};
-	$top->canvas->coords($self->{item},$xa,$ya,$xb,$yb) if $self->{item};
-	$self->{xa} = $xa;
-	$self->{ya} = $ya;
-	$self->{xb} = $xb;
-	$self->{yb} = $yb;
-	$self->{x} = $relation->{x};
-	$self->{y} = $relation->{y};
-	my $channel;
-	if ($channel = $self->{channelforw}) { $channel->move($top); }
-	if ($channel = $self->{channelrevs}) { $channel->move($top); }
+sub moveit {
+	my ($self,$top,$ret) = @_;
+	if ($ret = $self->Arcitem::moveit($top)) {
+		if (my $o = $self->{channelforw}) { $o->moveit($top); }
+		if (my $o = $self->{channelrevs}) { $o->moveit($top); }
+	}
+	return $ret;
 }
 
 #package Link;
@@ -7843,51 +7888,34 @@ sub getmore {
 
 #package Link;
 sub fillprops {
-	my ($self,$tw,$row) = @_;
+	my ($self,$top,$tw,$row) = @_;
 }
 
 #package Link;
 sub fillstatus {
 	my ($self,$top,$tw,$row) = @_;
+	$self->fillstate($top,$tw,$row);
 }
 
 # -------------------------------------
 package Route;
 use strict;
 use vars qw(@ISA);
-@ISA = qw(MsgStats Logging Properties Status Clickable MsgCollector);
+@ISA = qw(Tristate Arcitem MsgStats Logging Properties Status Clickable MsgCollector);
 # -------------------------------------
-
-use constant {
-	RT_AVAILABLE=>0,
-	RT_RESTRICTED=>1,
-	RT_PROHIBITED=>2,
-};
-
-my @rtoptions = (
-	['Available'	=>  RT_AVAILABLE    ],
-	['Restricted'	=>  RT_RESTRICTED   ],
-	['Prohibited'	=>  RT_PROHIBITED   ],
-);
-my @rtcolors = (
-	'black',
-	'orange',
-	'red',
-);
 
 #package Route
 sub new {
 	my ($type,$top,$linkset,$side,$node,@args) = @_;
 	my $self = {};
 	bless $self,$type;
+	$self->Tristate::init($top,'black');
 	$self->MsgStats::init(@args);
 	$self->Logging::init(@args);
 	$self->Properties::init(@args);
 	$self->Status::init(@args);
 	$self->Clickable::init(@args);
 	$self->MsgCollector::init(@args);
-	$self->{state} = RT_AVAILABLE;
-	$self->{statetext} = 'Available';
 	$self->{linkset} = $linkset;
 	$self->{side} = $side;
 	my ($nodea,$nodeb);
@@ -7899,30 +7927,9 @@ sub new {
 		$nodeb = $self->{nodeb} = $linkset->{nodeb};
 	}
 	$self->{node} = $node;
-	$nodeb->{routes}->{$node->{pc}} = $self;
-	my $xa = $self->{xa} = $nodeb->{x};
-	my $ya = $self->{ya} = $nodeb->{y};
-	my $xb = $self->{xb} = $node->{x};
-	my $yb = $self->{yb} = $node->{y};
-	$self->{x} = ($xa + $xb)/2;
-	$self->{y} = ($ya + $yb)/2;
-	$self->{color} = 'gray';
-	my $c = $top->canvas;
-	$self->{item} = $c->createLine($xa,$ya,$xb,$yb,
-		-arrow=>'none',
-		-capstyle=>'round',
-		-fill=>$self->{color}, -width=>0.1,
-		-activefill=>'cyan', -activewidth=>2,
-		-joinstyle=>'round',
-		-smooth=>0,
-		-state=>($top->{show}->{"\L$type\Es"}) ? 'normal' : 'hidden',
-		-tags=>['route'],
-	);
-	push @{$self->{items}}, $self->{item};
-	$c->lower($self->{item},'node');
-	$c->lower($self->{item},'linkset');
-	$c->raise($self->{item},'path');
-	$c->toplevel->traceVariable(\$self->{state},'w'=>[\&Route::tracestate,$self,$c]);
+	$nodeb->{routes}->{og}->{$node->{pc}} = $self;
+	$node->{routes}->{ic}->{$nodeb->{pc}} = $self;
+	$self->Arcitem::init($top,$nodeb,$node,'linkset');
 	$self->Clickable::attach($top,@args);
 	return $self;
 }
@@ -7942,23 +7949,14 @@ sub add_msg {
 }
 
 #package Route;
-sub tracestate {
-	my ($ind,$val,$op,$self,$c) = @_;
-	if ($op eq 'w') {
-		my $color = $rtcolors[$val];
-		$self->{statetext} = $rtoptions[$val]->[0];
-		if ($self->{color} ne $color) {
-			$self->{color} = $color;
-			$c->itemconfigure($self->{item},-fill=>$color);
-		}
-		$self->{node}->updatestate($self,$c);
-	}
-	return $val;
+sub statechange {
+	my ($self,$top,$val) = @_;
+	$self->{node}->updatestate($top,$self);
 }
 
 #package Route;
 sub updatestate {
-	my ($self,$obj,$c) = @_;
+	my ($self,$top,$obj) = @_;
 }
 
 #package Route;
@@ -7985,28 +7983,6 @@ sub shortid {
 }
 
 #package Route;
-sub move {
-	my ($self,$top) = @_;
-	my $nodeb = $self->{nodeb};
-	my $node = $self->{node};
-	my $xa = $nodeb->{x};
-	my $ya = $nodeb->{y};
-	my $xb = $node->{x};
-	my $yb = $node->{y};
-	return if $xa == $self->{xa} &&
-		  $ya == $self->{ya} &&
-		  $xb == $self->{xb} &&
-		  $yb == $self->{yb};
-	$top->canvas->coords($self->{item},$xa,$ya,$xb,$yb);
-	$self->{xa} = $xa;
-	$self->{ya} = $ya;
-	$self->{xb} = $xb;
-	$self->{yb} = $yb;
-	$self->{x} = ($xa + $xb)/2;
-	$self->{y} = ($ya + $yb)/2;
-}
-
-#package Route;
 sub getmore {
 	my ($self,$m,$top,$X,$Y) = @_;
 	$m->add('separator');
@@ -8030,53 +8006,62 @@ sub getmore {
 
 #package Route;
 sub fillprops {
-	my ($self,$tw,$row) = @_;
+	my ($self,$top,$tw,$row,$id,$node,$w) = @_;
+
+	$tw->Label(%labelright,
+		-text=>'Destination node:',
+	)->grid(-row=>$$row,-column=>0,-sticky=>'ewns');
+	$node = $self->{node};
+	$id = $node->identify;
+	$w = $tw->Entry(%entryleft,
+		-text=>$id, -width=>length($id),
+	)->grid(-row=>$$row++,-column=>1,-sticky=>'ewns');
+	$node->bindtowidget($top,$w);
+	$tw->Label(%labelright,
+		-text=>'Egress node:',
+	)->grid(-row=>$$row,-column=>0,-sticky=>'ewns');
+	$node = $self->{nodeb};
+	$id = $node->identify;
+	$w = $tw->Entry(%entryleft,
+		-text=>$id, -width=>length($id),
+	)->grid(-row=>$$row++,-column=>1,-sticky=>'ewns');
+	$node->bindtowidget($top,$w);
+	$tw->Label(%labelright,
+		-text=>'Ingress node:',
+	)->grid(-row=>$$row,-column=>0,-sticky=>'ewns');
+	$node = $self->{nodea};
+	$id = $node->identify;
+	$w = $tw->Entry(%entryleft,
+		-text=>$id, -width=>length($id),
+	)->grid(-row=>$$row++,-column=>1,-sticky=>'ewns');
+	$node->bindtowidget($top,$w);
 }
 
 #package Route;
 sub fillstatus {
 	my ($self,$top,$tw,$row) = @_;
+	$self->fillstate($top,$tw,$row);
 }
-
-
 
 # -------------------------------------
 package Path;
 use strict;
 use vars qw(@ISA);
-@ISA = qw(MsgStats Logging Properties Status Clickable MsgCollector);
+@ISA = qw(Tristate MsgStats Logging Properties Status Clickable MsgCollector);
 # -------------------------------------
-
-use constant {
-	PA_AVAILABLE => 0,
-	PA_RESTRICTED => 1,
-	PA_PROHIBITED => 2,
-};
-
-my @paoptions = (
-	['Available'	=>  PA_AVAILABLE    ],
-	['Restricted'	=>  PA_RESTRICTED   ],
-	['Prohibited'	=>  PA_PROHIBITED   ],
-);
-my @pacolors = (
-	'grey',
-	'orange',
-	'red',
-);
 
 #package Path;
 sub new {
 	my ($type,$top,$channel,$side,$node,@args) = @_;
 	my $self = {};
 	bless $self, $type;
+	$self->Tristate::init($top,'grey');
 	$self->MsgStats::init(@args);
 	$self->Logging::init(@args);
 	$self->Properties::init(@args);
 	$self->Status::init(@args);
 	$self->Clickable::init(@args);
 	$self->MsgCollector::init(@args);
-	$self->{state} = PA_AVAILABLE;
-	$self->{statetext} = 'Available';
 	$self->{channel} = $channel;
 	$self->{side} = $side;
 	$self->{node} = $node;
@@ -8105,23 +8090,18 @@ sub new {
 	my $yb = $self->{yb} = $mc->rowpos($rowb);
 	$self->{x} = ($xa + $xb)/2;
 	$self->{y} = ($ya + $yb)/2;
-	$self->{color} = 'gray';
 	my $c = $top->canvas;
 	$self->{item} = $c->createLine($xa,$ya,$xb,$yb,
-		-arrow=>'last',
-		-capstyle=>'round',
+		-arrow=>'last', -capstyle=>'round', -joinstyle=>'round', -smooth=>0,
 		-fill=>$self->{color}, -width=>0.1,
 		-activefill=>'cyan', -activewidth=>2,
-		-joinstyle=>'round',
-		-smooth=>0,
-		-state=>($top->{show}->{"\L$type\Es"}) ? 'normal' : 'hidden',
+		-state=>$top->{show}->{"\L$type\Es"} ? 'normal' : 'hidden',
 		-tags=>['path'],
 	);
 	push @{$self->{items}}, $self->{item};
 	$c->lower($self->{item},'node');
 	$c->lower($self->{item},'channel');
 	$c->lower($self->{item},'linkset');
-	$c->toplevel->traceVariable(\$self->{state},'w'=>[\&Path::tracestate,$self,$c]);
 	$self->Clickable::attach($top,@args);
 	return $self;
 }
@@ -8141,18 +8121,9 @@ sub add_msg {
 }
 
 #package Path;
-sub tracestate {
-	my ($ind,$val,$op,$self,$c) = @_;
-	if ($op eq 'w') {
-		my $color = $pacolors[$val];
-		$self->{statetext} = $paoptions[$val]->[0];
-		if ($self->{color} ne $color) {
-			$self->{color} = $color;
-			$c->itemconfigure($self->{item},-fill=>$color);
-		}
-		$self->{node}->updatestate($self,$c);
-	}
-	return $val;
+sub statechange {
+	my ($self,$top,$val) = @_;
+	$self->{node}->updatestate($top,$self);
 }
 
 #package Path;
@@ -8183,7 +8154,7 @@ sub shortid {
 }
 
 #package Path;
-sub move {
+sub moveit {
 	my ($self,$top) = @_;
 	my $node = $self->{node};
 	my $channel = $self->{channel};
@@ -8227,7 +8198,7 @@ sub move {
 
 #package Path;
 sub fillprops {
-	my ($self,$tw,$row) = @_;
+	my ($self,$top,$tw,$row) = @_;
 
 	$tw->Label(%labelright,
 		-text=>'Signalling channel:',
@@ -8246,22 +8217,14 @@ sub fillprops {
 #package Path;
 sub fillstatus {
 	my ($self,$top,$tw,$row) = @_;
-
-	$tw->Label(%labelright,
-		-text=>'Status:',
-	)->grid(-row=>$$row,-column=>0,-sticky=>'ewns');
-	$tw->Optionmenu(%optionleft,
-		-options=>\@paoptions,
-		-variable=>\$self->{state},
-		-textvariable=>\$self->{statetext},
-	)->grid(-row=>$$row++,-column=>1,-sticky=>'ewns');
+	$self->fillstate($top,$tw,$row);
 }
 
 # -------------------------------------
 package SP;
 use strict;
 use vars qw(@ISA);
-@ISA = qw(MsgStats Logging Properties Status Clickable CallCollector MsgCollector);
+@ISA = qw(Tristate MsgStats Logging Properties Status Clickable CallCollector MsgCollector);
 # -------------------------------------
 
 my %nodes;
@@ -8274,25 +8237,10 @@ use constant {
 	COL_GTT => 2,
 	COL_ADJ => 1,
 };
-use constant {
-	SP_AVAILABLE => 0,
-	SP_DEGRADED => 1,
-	SP_UNAVAILABLE => 2,
-};
-my @spoptions = (
-	['Available'	=> SP_AVAILABLE  ],
-	['Degraded'	=> SP_DEGRADED	 ],
-	['Unavailable'	=> SP_UNAVAILABLE],
-);
-my @spcolors = (
-	'white',
-	'orange',
-	'red',
-);
-
 #package SP;
 sub init {
 	my ($self,$top,$network,$nodeno,$pc,$channel,$side,$way,@args) = @_;
+	$self->Tristate::init($top,'white');
 	$self->MsgStats::init(@args);
 	$self->Logging::init(@args);
 	$self->Properties::init(@args);
@@ -8305,8 +8253,6 @@ sub init {
 	$self->{rttext} = $channel->{rttext};
 	$self->{side} = $side;
 	$self->{way} = $way;
-	$self->{state} = SP_AVAILABLE;
-	$self->{statetext} = 'Available';
 	$self->{ciccnt} = 0;
 	$self->{actcnt} = 0;
 	$self->{actog} = 0;
@@ -8317,6 +8263,8 @@ sub init {
 	$self->{responds} = {};
 	$self->{paths} = {}; # paths that term or orig here
 	$self->{routes} = {}; # routes that term or orig here
+	$self->{routes}->{og} = {};
+	$self->{routes}->{ic} = {};
 	$self->{relate} = {}; # relations in which this is a node
 	$self->{linksets} = {}; # linksets that attach here
 	my $c = $top->canvas;
@@ -8328,7 +8276,6 @@ sub init {
 	my $y = $self->{y} = $mc->rowpos($row);
 	my $type = ref $self;
 	my $state = ($top->{show}->{"\L$type\Es"}) ? 'normal' : 'hidden';
-	$self->{color} = 'white';
 	$self->{items} = [];
 	$self->{item} = $c->createOval(
 		$x-40,$y-40,$x+40,$y+40,
@@ -8341,12 +8288,9 @@ sub init {
 	push @{$self->{items}}, $self->{item};
 	$self->{scri} = $c->createLine(
 		$x-23,$y-23,$x+23,$y-23,$x+23,$y+23,$x-23,$y+23,$x-23,$y-23,
-		-arrow=>'none',
-		-capstyle=>'round',
+		-arrow=>'none', -capstyle=>'round', -joinstyle=>'round', -smooth=>0,
 		-fill=>'gray', -width=>0.1,
 		#-activefill=>'cyan', -activewidth=>2,
-		-joinstyle=>'round',
-		-smooth=>0,
 		-state=>$state,
 		-tags=>['SP','scri'],
 	);
@@ -8354,9 +8298,7 @@ sub init {
 	$self->{pcode} = SP::pcstring($pc);
 	if ($self->{pownr} = $self->pcowner(0)) {
 		$self->{ownr} = $c->createText($x,$y+15,
-			-anchor=>'center',
-			-fill=>'black',
-			-justify=>'center',
+			-anchor=>'center', -fill=>'black', -justify=>'center',
 			-text=>$self->{pownr},
 			-state=>$state,
 			-tags=>['SP','text'],
@@ -8364,18 +8306,14 @@ sub init {
 		push @{$self->{items}}, $self->{ownr};
 	}
 	$self->{ttxt} = $c->createText($x,$y-15,
-		-anchor=>'center',
-		-fill=>'black',
-		-justify=>'center',
+		-anchor=>'center', -fill=>'black', -justify=>'center',
 		-text=>'SP',
 		-state=>$state,
 		-tags=>['SP','text'],
 	);
 	push @{$self->{items}}, $self->{ttxt};
 	$self->{text} = $c->createText($x,$y,
-		-anchor=>'center',
-		-fill=>'black',
-		-justify=>'center',
+		-anchor=>'center', -fill=>'black', -justify=>'center',
 		-text=>$self->{pcode},
 		-state=>$state,
 		-tags=>['SP','text'],
@@ -8386,7 +8324,6 @@ sub init {
 	$c->raise($self->{ttxt},$self->{scri});
 	$c->raise($self->{text},$self->{scri});
 	$c->raise($self->{ownr},$self->{scri}) if $self->{ownr};
-	$c->toplevel->traceVariable(\$self->{state},'w'=>[\&SP::tracestate,$self,$c]);
 	$network->regroupsps($top);
 	$self->Clickable::attach($top,@args);
 }
@@ -8407,12 +8344,12 @@ sub xform {
 	my $mc = $top->mycanvas;
 	$mc->delballoon($self->{items});
 
-	$c->dtag($self->{item},$oldtype); $c->addtag($type,'withtag',$self->{item});
-	$c->dtag($self->{scri},$oldtype); $c->addtag($type,'withtag',$self->{scri});
-	$c->dtag($self->{ttxt},$oldtype); $c->addtag($type,'withtag',$self->{ttxt});
-	$c->dtag($self->{text},$oldtype); $c->addtag($type,'withtag',$self->{text});
+	$c->dtag($self->{item},$oldtype); $c->addtag($type,withtag=>$self->{item});
+	$c->dtag($self->{scri},$oldtype); $c->addtag($type,withtag=>$self->{scri});
+	$c->dtag($self->{ttxt},$oldtype); $c->addtag($type,withtag=>$self->{ttxt});
+	$c->dtag($self->{text},$oldtype); $c->addtag($type,withtag=>$self->{text});
 	if ($self->{ownr})
-      { $c->dtag($self->{ownr},$oldtype); $c->addtag($type,'withtag',$self->{ownr}); }
+      { $c->dtag($self->{ownr},$oldtype); $c->addtag($type,withtag=>$self->{ownr}); }
 
 	my @oldtags = ();
 	push @oldtags, 'SLTM' if $self->{xchg_sltm};
@@ -8469,60 +8406,45 @@ sub shortid {
 }
 
 #package SP;
-sub tracestate {
-	my ($ind,$val,$op,$self,$c) = @_;
-	print STDERR "got SP::tracestate event: ind=$ind, val=$val, op=$op\n";
-	if ($op eq 'w') {
-		my $color = $spcolors[$val];
-		$self->{statetext} = $spoptions[$val]->[0];
-		if ($self->{color} ne $color) {
-			$self->{color} = $color;
-			print STDERR "setting color to $color\n";
-			$c->itemconfigure($self->{item},-fill=>$color);
-		}
-	}
-	return $val;
+sub statechange {
+	my ($self,$top,$val) = @_;
 }
 
 #package SP;
 sub updatestate {
-	my ($self,$obj,$c) = @_;
+	my ($self,$top,$obj) = @_;
 	my ($avail,$degra,$unava) = (0,0,0);
-	foreach my $route (values %{$self->{routes}}) {
+	foreach my $route (values %{$self->{routes}->{og}}) {
 		my $rstate = $route->{state};
-		if ($rstate == Route::RT_AVAILABLE) {
+		if ($rstate == Tristate::TS_AVAILABLE) {
 			$avail++;
-		} elsif ($rstate == Route::RT_RESTRICTED) {
+		} elsif ($rstate == Tristate::TS_DEGRADED) {
 			$degra++;
-		} elsif ($rstate == Route::RT_PROHIBITED) {
+		} elsif ($rstate == Tristate::TS_UNAVAILABLE) {
 			$unava++;
 		}
 	}
 	foreach my $path (values %{$self->{paths}}) {
 		next if $path->{channel}->{link};
 		my $rstate = $path->{state};
-		if ($rstate == Path::PA_AVAILABLE) {
+		if ($rstate == Tristate::TS_AVAILABLE) {
 			$avail++;
-		} elsif ($rstate == Path::PA_RESTRICTED) {
+		} elsif ($rstate == Tristate::TS_DEGRADED) {
 			$degra++;
-		} elsif ($rstate == Path::PA_PROHIBITED) {
+		} elsif ($rstate == Tristate::TS_UNAVAILABLE) {
 			$unava++;
 		}
 	}
 	my ($state,$color);
 	if ($avail == 0 && $degra == 0 && $unava >= 0) {
-		$state = SP_UNAVAILABLE;
-		$color = 'red';
+		$state = Tristate::TS_UNAVAILABLE;
 	} elsif ($degra + $unava > 0) {
-		$state = SP_DEGRADED;
-		$color = 'orange';
+		$state = Tristate::TS_DEGRADED;
 	} else {
-		$state = SP_AVAILABLE;
-		$color = 'white';
+		$state = Tristate::TS_AVAILABLE;
 	}
 	return if $self->{state} == $state;
 	$self->{state} = $state;
-	$self->{color} = $color;
 }
 
 #package SP;
@@ -8771,25 +8693,25 @@ sub reanalyze {
 	my ($self,$top,$network) = @_;
 	my $c = $top->canvas;
 	if ($self->{xchg_isup}) {
-		$c->addtag('ISUP','withtag',$self->{item});
-		$c->addtag('ISUP','withtag',$self->{scri});
-		$c->addtag('ISUP','withtag',$self->{ttxt});
-		$c->addtag('ISUP','withtag',$self->{text});
-		$c->addtag('ISUP','withtag',$self->{ownr}) if $self->{ownr};
+		$c->addtag('ISUP',withtag=>$self->{item});
+		$c->addtag('ISUP',withtag=>$self->{scri});
+		$c->addtag('ISUP',withtag=>$self->{ttxt});
+		$c->addtag('ISUP',withtag=>$self->{text});
+		$c->addtag('ISUP',withtag=>$self->{ownr}) if $self->{ownr};
 	}
 	if ($self->{orig_tcap} or $self->{term_tcap}) {
-		$c->addtag('TCAP','withtag',$self->{item});
-		$c->addtag('TCAP','withtag',$self->{scri});
-		$c->addtag('TCAP','withtag',$self->{ttxt});
-		$c->addtag('TCAP','withtag',$self->{text});
-		$c->addtag('TCAP','withtag',$self->{ownr}) if $self->{ownr};
+		$c->addtag('TCAP',withtag=>$self->{item});
+		$c->addtag('TCAP',withtag=>$self->{scri});
+		$c->addtag('TCAP',withtag=>$self->{ttxt});
+		$c->addtag('TCAP',withtag=>$self->{text});
+		$c->addtag('TCAP',withtag=>$self->{ownr}) if $self->{ownr};
 	}
 	if ($self->{xchg_sltm}) {
-		$c->addtag('SLTM','withtag',$self->{item});
-		$c->addtag('SLTM','withtag',$self->{scri});
-		$c->addtag('SLTM','withtag',$self->{ttxt});
-		$c->addtag('SLTM','withtag',$self->{text});
-		$c->addtag('SLTM','withtag',$self->{ownr}) if $self->{ownr};
+		$c->addtag('SLTM',withtag=>$self->{item});
+		$c->addtag('SLTM',withtag=>$self->{scri});
+		$c->addtag('SLTM',withtag=>$self->{ttxt});
+		$c->addtag('SLTM',withtag=>$self->{text});
+		$c->addtag('SLTM',withtag=>$self->{ownr}) if $self->{ownr};
 	}
 	my $col = abs($self->{col});
 	my $row = $self->{row};
@@ -8897,11 +8819,13 @@ sub movesp {
 	$self->{col} = $col;
 	$self->{row} = $row;
 	#if ($dx or $dy) {
-		foreach my $r (values %{$self->{paths}}   ) { $r->move($top); }
-		foreach my $r (values %{$self->{relate}}  ) { $r->move($top); }
-		foreach my $r (values %{$self->{linksets}}) { $r->move($top); }
-		foreach my $r (values %{$self->{routes}}  ) { $r->move($top); }
+		foreach my $o (values %{$self->{paths}}       ) { $o->moveit($top); }
+		#foreach my $o (values %{$self->{relate}}      ) { $o->moveit($top); }
+		#foreach my $o (values %{$self->{linksets}}    ) { $o->moveit($top); }
+		#foreach my $o (values %{$self->{routes}->{og}}) { $o->moveit($top); }
+		#foreach my $o (values %{$self->{routes}->{ic}}) { $o->moveit($top); }
 	#}
+	if (exists $self->{arcs}) { foreach my $a (@{$self->{arcs}}) { $a->moveit($top); } }
 }
 
 #package SP;
@@ -8913,7 +8837,7 @@ sub getmore {
 	$have->{adjacent} = scalar keys %{$self->{adjacent}};
 	$have->{combined} = scalar keys %{$self->{combined}};
 	$have->{linksets} = scalar keys %{$self->{linksets}};
-	$have->{routes}   = scalar keys %{$self->{routes}};
+	$have->{routes}   = scalar keys %{$self->{routes}->{og}};
 	$have->{relate}   = scalar keys %{$self->{relate}};
 	$have->{circuits} = scalar keys %{$self->{circuits}};
 	$m->add('separator') if
@@ -8985,8 +8909,8 @@ sub getmore {
 	}
 	if ($have->{routes}) {
 		my $mc = $m->Menu(-title=>'Routesets Menu');
-		foreach my $pc (sort {$a <=> $b} keys %{$self->{routes}}) {
-			my $route = $self->{routes}->{$pc};
+		foreach my $pc (sort {$a <=> $b} keys %{$self->{routes}->{og}}) {
+			my $route = $self->{routes}->{og}->{$pc};
 			my $node = $route->{node};
 			my $label = 'Route to '.$node->shortid;
 			my $m3 = $mc->Menu(-title=>"$label Menu");
@@ -9016,7 +8940,7 @@ sub getmore {
 
 #package SP;
 sub fillprops {
-	my ($self,$tw,$row) = @_;
+	my ($self,$top,$tw,$row) = @_;
 
 	$tw->Label(%labelright,
 		-text=>'Point code type:',
@@ -9102,14 +9026,7 @@ sub fillstatus {
 		-label=>'State:',
 	)->pack(%tframepack);
 	$$row = 0;
-	$f->Label(%labelright,
-		-text=>'State:',
-	)->grid(-row=>$$row,-column=>0,-sticky=>'ewns');
-	$f->Optionmenu(%optionleft,
-		-options=>\@spoptions,
-		-variable=>\$self->{state},
-		-textvariable=>\$self->{statetext},
-	)->grid(-row=>$$row++,-column=>1,-sticky=>'ewns');
+	$self->fillstate($top,$f,$row);
 	if ($self->{primary} or keys %{$self->{aliases}}) {
 		$f = $tw->TFrame(%tframestyle, -label=>'Aliases:',
 		)->pack(%tframepack);
@@ -9130,7 +9047,7 @@ sub fillstatus {
 			my $w = $f->Entry(%entrycenter,-text=>$node->shortid,
 			)->grid(-row=>$$row,-column=>$col,-sticky=>'ewns');
 			$node->bindtowidget($top,$w);
-			if ($col > 4) { $col = 0; $row++ };
+			if ($col > 4) { $col = 0; $$row++ };
 		}
 	}
 	if (keys %{$self->{adjacent}}) {
@@ -9144,7 +9061,7 @@ sub fillstatus {
 			my $w = $f->Entry(%entrycenter,-text=>$node->shortid,
 			)->grid(-row=>$$row,-column=>$col,-sticky=>'ewns');
 			$node->bindtowidget($top,$w);
-			if ($col > 4) { $col = 0; $row++ };
+			if ($col > 4) { $col = 0; $$row++ };
 		}
 	}
 	if (keys %{$self->{linksets}}) {
@@ -9155,10 +9072,39 @@ sub fillstatus {
 			$f->Label(%labelright,-text=>"$ltxt:",
 			)->grid(-row=>$$row,-column=>0,-sticky=>'ewns') if $col == 0; $col++;
 			my $linkset = $self->{linksets}->{$pc};
-			my $w = $f->Entry(%entrycenter,-text=>$linkset->shortid,
+			my $node;
+			if ($self->{pc} == $linkset->{nodea}->{pc}) {
+				$node = $linkset->{nodeb};
+			} else {
+				$node = $linkset->{nodea};
+			}
+			my $w = $f->Entry(%entrycenter,-text=>$node->shortid,
 			)->grid(-row=>$$row,-column=>$col,-sticky=>'ewns');
 			$linkset->bindtowidget($top,$w);
-			if ($col > 4) { $col = 0; $row++ };
+			if ($col > 4) { $col = 0; $$row++ };
+		}
+	}
+	if (keys %{$self->{routes}->{og}}) {
+		$f = $tw->TFrame(%tframestyle, -label=>'Routes:',
+		)->pack(%tframepack);
+		my $p = $f;
+		$p = $f->Scrolled('Pane',
+			-scrollbars=>'osoe',
+			-sticky=>'we',
+			-gridded=>'y',
+		)->pack(%tframepack) if keys %{$self->{routes}->{og}} > 20;
+		$$row = 0;
+		my $col = 0;
+		$p->Label(%labelright,-text=>'Routes to:',
+		)->grid(-row=>$$row,-column=>0,-sticky=>'ewns');
+		foreach my $pc (sort {$a <=> $b} keys %{$self->{routes}->{og}}) {
+			my $route = $self->{routes}->{og}->{$pc};
+			my $node = $route->{node};
+			$col++;
+			my $w = $p->Entry(%entrycenter,-text=>$node->shortid,
+			)->grid(-row=>$$row,-column=>$col,-sticky=>'ewns');
+			$route->bindtowidget($top,$w);
+			if ($col > 4) { $col = 0; $$row++ };
 		}
 	}
 	if (keys %{$self->{relate}}) {
@@ -9569,7 +9515,7 @@ sub button3 {
 
 #package Network;
 sub fillprops {
-	my ($self,$tw,$row) = @_;
+	my ($self,$top,$tw,$row) = @_;
 }
 
 #package Network;
@@ -9689,7 +9635,7 @@ sub fillstatus {
 package Channel;
 use strict;
 use vars qw(@ISA);
-@ISA = qw(MsgStats Logging Properties Status Clickable MsgCollector);
+@ISA = qw(Pentastate MsgStats Logging Properties Status Clickable MsgCollector);
 # -------------------------------------
 
 use constant {
@@ -9731,6 +9677,7 @@ my $channelno = 0;
 #package Channel;
 sub init {
 	my ($self,$top,$channelno,$ppa,@args) = @_;
+	$self->Pentastate::init($top,'black');
 	$self->MsgStats::init(@args);
 	$self->Logging::init(@args);
 	$self->Properties::init(@args);
@@ -9754,7 +9701,6 @@ sub init {
 	$self->{paths} = {};
 	$self->{msgbuf} = [];
 	#print "Created new channel ($self->{card}:$self->{span}:$self->{slot}).\n";
-	$self->{fill} = 'red';
 	my $offa = $self->{offa} = 0;
 	my $cola = $self->{cola} = 0 - SP::COL_ADJ;
 	my $rowa = $self->{rowa} = $channelno * 2;
@@ -9770,12 +9716,9 @@ sub init {
 	$self->{y} = ($ya + $yb)/2;
 	my $c = $top->canvas;
 	$self->{item} = $c->createLine($xa,$ya,$xb,$yb,
-		-arrow=>'last',
-		-capstyle=>'round',
-		-fill=>$self->{fill}, -width=>0.1,
+		-arrow=>'last', -capstyle=>'round', -joinstyle=>'round', -smooth=>0,
+		-fill=>$self->{color}, -width=>0.1,
 		-activefill=>'cyan', -activewidth=>2,
-		-joinstyle=>'round',
-		-smooth=>0,
 		-state=>($top->{show}->{channels}) ? 'normal' : 'hidden',
 		-tags=>['channel'],
 	);
@@ -9845,7 +9788,7 @@ sub bindchannel {
 	my $c = $top->canvas;
 	$c->lower($self->{item},$linkset->{item});
 	#$c->itemconfigure($self->{item}, -state=>'hidden');
-	$self->move($top);
+	$self->moveit($top);
 	$network->regroupsps($top);
 	$top->{updatenow} = 1;
 }
@@ -10007,7 +9950,7 @@ sub setpr {
 }
 
 #package Channel;
-sub move {
+sub moveit {
 	my ($self,$top) = @_;
 	my $nodea = $self->{nodea};
 	my $nodeb = $self->{nodeb};
@@ -10033,7 +9976,7 @@ sub move {
 	$self->{yb} = $yb;
 	$self->{x} = ($xa + $xb)/2;
 	$self->{y} = ($ya + $yb)/2;
-	foreach my $path (values %{$self->{paths}}) { $path->move($top); }
+	foreach my $o (values %{$self->{paths}}) { $o->moveit($top); }
 }
 
 #package Channel;
@@ -10058,7 +10001,7 @@ sub movechannel {
 	$c->coords($self->{item},$xa,$ya,$xb,$yb);
 	$c->lower($self->{item},'node');
 	$c->lower($self->{item},'linkset');
-	foreach my $path (values %{$self->{paths}}) { $path->move($top); }
+	foreach my $o (values %{$self->{paths}}) { $o->moveit($top); }
 }
 
 #package Channel;
@@ -10077,7 +10020,7 @@ sub shortid {
 
 #package Channel;
 sub fillprops {
-	my ($self,$tw,$row) = @_;
+	my ($self,$top,$tw,$row) = @_;
 
 	my $ppa = "$self->{card}:$self->{span}:$self->{slot}";
 	$tw->Label(%labelright,
@@ -10141,6 +10084,7 @@ sub fillstatus {
 		-variable=>\$self->{rt},
 		-textvariable=>\$self->{rttext},
 	)->grid(-row=>$$row++,-column=>1,-sticky=>'ewns');
+	$self->fillstate($top,$tw,$row);
 }
 
 # -------------------------------------
@@ -10627,6 +10571,7 @@ sub new {
 	$self->{dflt} = 'spare';
 	$self->{enum} = \%enum;
 	$self->{desc} = 'Transmission Medium Requirement';
+	return $self;
 }
 
 
@@ -10672,6 +10617,7 @@ sub new {
 	} else {
 		$self->{val} = pack('C*', $b->[$p..($e-1)]);
 	}
+	return $self;
 }
 sub dec {
 	my ($self,$b,$p,$e,$l,@args) = @_;
@@ -10721,6 +10667,7 @@ sub new {
 	} else {
 		$self->{val} = pack('C*', $b->[$p..($e-1)]);
 	}
+	return $self;
 }
 sub dec {
 	my ($self,$b,$p,$e,$l,@args) = @_;
@@ -11740,14 +11687,14 @@ sub showdecode {
 				delete $hl->{armed};
 				if (exists $self->{tree}->{$entry}) {
 					if ($self->{tree}->{$entry} eq 'plus') {
-						foreach ($hl->info('children',$entry)) {
-							$hl->show('entry',$_);
+						foreach my $e ($hl->info('children',$entry)) {
+							$hl->show('entry',$e);
 						}
 						$hl->indicator('configure', $entry, -image=>'minus',);
 						$self->{tree}->{$entry} = 'minus';
 					} else {
-						foreach ($hl->info('children',$entry)) {
-							$hl->hide('entry',$_);
+						foreach my $e ($hl->info('children',$entry)) {
+							$hl->hide('entry',$e);
 						}
 						$hl->indicator('configure', $entry, -image=>'plus',);
 						$self->{tree}->{$entry} = 'plus';
@@ -14769,7 +14716,7 @@ sub canvas {
 sub addballoon {
 	my ($self,$obj,$items) = @_;
 	$obj->identify;
-	foreach (@{$items}) { $self->{balloonmsgs}->{$_} = \$obj->{id}; }
+	foreach my $i (@{$items}) { $self->{balloonmsgs}->{$i} = \$obj->{id}; }
 	$self->{balloon}->attach($self->widget,
 		-balloonposition=>'mouse',
 		-msg=>$self->{balloonmsgs},
@@ -14779,7 +14726,7 @@ sub addballoon {
 #package MyCanvas;
 sub delballoon {
 	my ($self,$items) = @_;
-	foreach (@{$items}) { delete $self->{balloonmsgs}->{$_}; }
+	foreach my $i (@{$items}) { delete $self->{balloonmsgs}->{$i}; }
 	$self->{balloon}->attach($self->widget,
 		-balloonposition=>'mouse',
 		-msg=>$self->{balloonmsgs},
@@ -14947,8 +14894,8 @@ sub createmenubar {
 			while ($w = $parent) {
 				$parent = $w->parent;
 				print $w;
-				foreach (@{$w->configure}) {
-					print "Option: ".join(', ',@$_);
+				foreach my $o (@{$w->configure}) {
+					print "Option: ".join(', ',@$o);
 				}
 			}
 		}, $self],
@@ -15034,9 +14981,12 @@ sub createmenubar {
 		circuits=>1,
 		assocs=>1,
 		relations=>1,
+		routesets=>0,
 		routes=>1,
 		paths=>0,
+		combineds=>0,
 		linksets=>1,
+		links=>0,
 		channels=>0,
 		sps=>1,
 		ssps=>1,
@@ -15055,8 +15005,8 @@ sub createmenubar {
 		-command=>[sub{
 				my $self = shift;
 				my $c = $self->canvas;
-				foreach (keys %{$self->{show}}) {
-					$self->{show}->{$_} = 1;
+				foreach my $k (keys %{$self->{show}}) {
+					$self->{show}->{$k} = 1;
 				}
 				$c->itemconfigure('all',-state=>'normal');
 				$self->{show}->{channels} = 0;
@@ -15074,8 +15024,8 @@ sub createmenubar {
 		-command=>[sub{
 				my $self = shift;
 				my $c = $self->canvas;
-				foreach (keys %{$self->{show}}) {
-					$self->{show}->{$_} = 0;
+				foreach my $k (keys %{$self->{show}}) {
+					$self->{show}->{$k} = 0;
 				}
 				$c->itemconfigure('all',-state=>'hidden');
 				$c->itemconfigure('route',-state=>'normal');
@@ -15107,8 +15057,8 @@ sub createmenubar {
 		-command=>[sub{
 				my $self = shift;
 				my $c = $self->canvas;
-				foreach (keys %{$self->{show}}) {
-					$self->{show}->{$_} = 0;
+				foreach my $k (keys %{$self->{show}}) {
+					$self->{show}->{$k} = 0;
 				}
 				$c->itemconfigure('all',-state=>'hidden');
 				$c->itemconfigure('circuits',-state=>'normal');
@@ -15126,8 +15076,8 @@ sub createmenubar {
 		-command=>[sub{
 				my $self = shift;
 				my $c = $self->canvas;
-				foreach (keys %{$self->{show}}) {
-					$self->{show}->{$_} = 0;
+				foreach my $k (keys %{$self->{show}}) {
+					$self->{show}->{$k} = 0;
 				}
 				$c->itemconfigure('all',-state=>'hidden');
 				$c->itemconfigure('association',-state=>'normal');
@@ -15147,8 +15097,8 @@ sub createmenubar {
 		-command=>[sub{
 				my $self = shift;
 				my $v = $self->{show}->{all};
-				foreach (keys %{$self->{show}}) {
-					$self->{show}->{$_} = $v;
+				foreach my $k (keys %{$self->{show}}) {
+					$self->{show}->{$k} = $v;
 				}
 				$self->{view} = $v ? 0 : 4;
 				my $c = $self->canvas;
@@ -15171,7 +15121,18 @@ sub createmenubar {
 				$self->{show}->{assocs} = $v;
 				my $c = $self->canvas;
 				my $s = $v ? 'normal' : 'hidden';
-				$c->itemconfigure('relation',-state=>$s) if $c->find('withtag', 'relation');
+				$c->itemconfigure('relation',-state=>$s) if $c->find(withtag=>'relation');
+			},$self],
+	);
+	$mi->add('checkbutton', -label=>'Routesets',
+		-onvalue=>1, -offvalue=>0, -variable=>\$self->{show}->{routesets},
+		-command=>[sub{
+				my $self = shift;
+				my $v = $self->{show}->{routesets};
+				$self->{view} = 4;
+				my $c = $self->canvas;
+				my $s = $v ? 'normal' : 'hidden';
+				$c->itemconfigure('routeset',-state=>$s) if $c->find(withtag=>'routeset');
 			},$self],
 	);
 	$mi->add('checkbutton', -label=>'Circuit Groups',
@@ -15182,7 +15143,7 @@ sub createmenubar {
 				$self->{view} = 4;
 				my $c = $self->canvas;
 				my $s = $v ? 'normal' : 'hidden';
-				$c->itemconfigure('circuits',-state=>$s) if $c->find('withtag', 'circuits');
+				$c->itemconfigure('circuits',-state=>$s) if $c->find(withtag=>'circuits');
 				$self->{show}->{relations} = $v
 					if $self->{show}->{assocs} == $v;
 			},$self],
@@ -15195,12 +15156,23 @@ sub createmenubar {
 				$self->{view} = 4;
 				my $c = $self->canvas;
 				my $s = $v ? 'normal' : 'hidden';
-				$c->itemconfigure('association',-state=>$s) if $c->find('withtag', 'association');
+				$c->itemconfigure('association',-state=>$s) if $c->find(withtag=>'association');
 				$self->{show}->{relations} = $v
 					if $self->{show}->{circuits} == $v;
 			},$self],
 	);
-	$mi->add('checkbutton', -label=>'Link Sets',
+	$mi->add('checkbutton', -label=>'Combined Linksets',
+		-onvalue=>1, -offvalue=>0, -variable=>\$self->{show}->{combineds},
+		-command=>[sub{
+				my $self = shift;
+				my $v = $self->{show}->{combineds};
+				$self->{view} = 4;
+				my $c = $self->canvas;
+				my $s = $v ? 'normal' : 'hidden';
+				$c->itemconfigure('combined',-state=>$s) if $c->find(withtag=>'combined');
+			},$self],
+	);
+	$mi->add('checkbutton', -label=>'Linksets',
 		-onvalue=>1, -offvalue=>0, -variable=>\$self->{show}->{linksets},
 		-command=>[sub{
 				my $self = shift;
@@ -15208,7 +15180,18 @@ sub createmenubar {
 				$self->{view} = 4;
 				my $c = $self->canvas;
 				my $s = $v ? 'normal' : 'hidden';
-				$c->itemconfigure('linkset',-state=>$s) if $c->find('withtag', 'linkset');
+				$c->itemconfigure('linkset',-state=>$s) if $c->find(withtag=>'linkset');
+			},$self],
+	);
+	$mi->add('checkbutton',-label=>'Links',
+		-onvalue=>1, -offvalue=>0, -variable=>\$self->{show}->{links},
+		-command=>[sub{
+				my $self = shift;
+				my $v = $self->{show}->{links};
+				$self->{view} = 4;
+				my $c = $self->canvas;
+				my $s = $v ? 'normal' : 'hidden';
+				$c->itemconfigure('link',-state=>$s) if $c->find(withtag=>'link');
 			},$self],
 	);
 	$mi->add('separator',);
@@ -15220,7 +15203,7 @@ sub createmenubar {
 				$self->{view} = 4;
 				my $c = $self->canvas;
 				my $s = $v ? 'normal' : 'hidden';
-				$c->itemconfigure('route',-state=>$s) if $c->find('withtag', 'route');
+				$c->itemconfigure('route',-state=>$s) if $c->find(withtag=>'route');
 			},$self],
 	);
 	$mi->add('checkbutton', -label=>'Paths',
@@ -15231,7 +15214,7 @@ sub createmenubar {
 				$self->{view} = 4;
 				my $c = $self->canvas;
 				my $s = $v ? 'normal' : 'hidden';
-				$c->itemconfigure('path',-state=>$s) if $c->find('withtag', 'path');
+				$c->itemconfigure('path',-state=>$s) if $c->find(withtag=>'path');
 			},$self],
 	);
 	$mi->add('checkbutton', -label=>'Channels',
@@ -15242,8 +15225,7 @@ sub createmenubar {
 				$self->{view} = 4;
 				my $c = $self->canvas;
 				my $s = $v ? 'normal' : 'hidden';
-				$c->itemconfigure('channel',-state=>$s) if $c->find('withtag',
-					'channel');
+				$c->itemconfigure('channel',-state=>$s) if $c->find(withtag=>'channel');
 			},$self],
 	);
 	$mi->add('separator',);
@@ -15255,7 +15237,7 @@ sub createmenubar {
 				$self->{view} = 4;
 				my $c = $self->canvas;
 				my $s = $v ? 'normal' : 'hidden';
-				$c->itemconfigure('SP',-state=>$s) if $c->find('withtag', 'SP');
+				$c->itemconfigure('SP',-state=>$s) if $c->find(withtag=>'SP');
 			},$self],
 	);
 	$mi->add('checkbutton', -label=>'SSPs',
@@ -15266,7 +15248,7 @@ sub createmenubar {
 				$self->{view} = 4;
 				my $c = $self->canvas;
 				my $s = $v ? 'normal' : 'hidden';
-				$c->itemconfigure('SSP',-state=>$s) if $c->find('withtag', 'SSP');
+				$c->itemconfigure('SSP',-state=>$s) if $c->find(withtag=>'SSP');
 			},$self],
 	);
 	$mi->add('checkbutton', -label=>'GTTs',
@@ -15277,7 +15259,7 @@ sub createmenubar {
 				$self->{view} = 4;
 				my $c = $self->canvas;
 				my $s = $v ? 'normal' : 'hidden';
-				$c->itemconfigure('GTT',-state=>$s) if $c->find('withtag', 'GTT');
+				$c->itemconfigure('GTT',-state=>$s) if $c->find(withtag=>'GTT');
 			},$self],
 	);
 	$mi->add('checkbutton', -label=>'STPs',
@@ -15288,7 +15270,7 @@ sub createmenubar {
 				$self->{view} = 4;
 				my $c = $self->canvas;
 				my $s = $v ? 'normal' : 'hidden';
-				$c->itemconfigure('STP',-state=>$s) if $c->find('withtag', 'STP');
+				$c->itemconfigure('STP',-state=>$s) if $c->find(withtag=>'STP');
 			},$self],
 	);
 	$mi->add('checkbutton', -label=>'SCPs',
@@ -15299,7 +15281,7 @@ sub createmenubar {
 				$self->{view} = 4;
 				my $c = $self->canvas;
 				my $s = $v ? 'normal' : 'hidden';
-				$c->itemconfigure('SCP',-state=>$s) if $c->find('withtag', 'SCP');
+				$c->itemconfigure('SCP',-state=>$s) if $c->find(withtag=>'SCP');
 			},$self],
 	);
 	$mi->add('checkbutton', -label=>'Aliases',
@@ -15323,10 +15305,14 @@ sub createmenubar {
 			"Show/hide all items.",
 			undef, # separator
 			"Show/hide signalling relations.",
+			"Show/hide routesets.",
 			"Show/hide circuit groups.",
 			"Show/hide transaction associations.",
+			"Show/hide combined linksets.",
 			"Show/hide signalling linksets.",
+			"Show/hide signalling links.",
 			undef, # separator
+			"Show/hide signalling routes.",
 			"Show/hide signalling paths.",
 			"Show/hide signalling channels.",
 			undef, # separator
@@ -15541,12 +15527,12 @@ sub statusbar {
 #package MyTop;
 sub createballoon {
 	my $self = shift;
-	$_ = $self->{Balloon} = $self->toplevel->Balloon(
+	my $balloon = $self->{Balloon} = $self->toplevel->Balloon(
 		#-initwait=>1000,
 		-statusbar=>$self->{Message},
 	);
-	$::balloonwidget = $_;
-	return $_;
+	$::balloonwidget = $balloon;
+	return $balloon;
 }
 
 #package MyTop;
