@@ -293,182 +293,192 @@ use XML::SAX::Base;
 use Time::HiRes qw(gettimeofday);
 
 my %large_networks = (
-	254=>['AT&T',	    'AT&T Communications'],
-	253=>['Sprint',	    'US Sprint'],
-	252=>['BellSouth',  'BellSouth Services'],
-	#251=>['Pacific',    'Pacific Bell'],
-	251=>['Pacific',    'Pacific Telesis'],
-	#250=>['Ameritech',  'Ameritech'],
-	250=>['Ameritech',  'Ameritech Services'],
-	249=>['SWB',	    'Southwestern Bell Telephone'],
-	#248=>['Bell',	    'Bell Tri-Co Services'],
-	248=>['US WEST',    'US WEST Communications'],
-	247=>['Nynex',	    'Nynex Service Co.'],
-	246=>['BA',	    'Bell Atlantic'],
-	#245=>['Canada',	    'Telecom Canada'],
-	245=>['Canada',	    'AT&T Canada Long Distance Services'],
-	244=>['MCI',	    'MCI Telecommunications Group'],
-	243=>['SNET',	    'Southern New England Telephone'],
-	242=>['Allnet',	    'Allnet Communications Services Inc.'],
-	241=>['DCA',	    'Defense Communications Agency'],
-	240=>['GTE',	    'GTE Service Corporation/Telephone Operations'],
-	#239=>['United',	    'United Telephone Sys'],
-	239=>['Sprint',	    'Sprint Local Telecommunications Division'],
-	238=>['Independent','Independent Telecommunications Network'],
-	237=>['C&W',	    'Cable & Wireless'],
-	#236=>['CNCP',	    'CNCP Telecommunications'],
-	236=>['Canada',	    'AT&T Canada Long Distance Services'],
-	#235=>['Comtel',	    'Comtel'],
-	235=>['CONTEL',	    'CONTEL (GTE Wireless)'],
-	234=>['Alltel',	    'Alltel'],
-	#233=>['Rochester',  'Rochester Telephone'],
-	233=>['Frontier',   'Frontier Communications Int\'l, Inc.'],
-	232=>['Century',    'Century Telephone Enterprises, Inc.'],
-	231=>['AT&T',	    'AT&T (VSN)'],
-	#230=>['Centel',	    'Centel'],
-	230=>['Sprint',	    'Sprint Local Telecommunications Division'],
-	229=>['Test',	    'Test Code'],
-	# Point codes within this network identifier may be assigned by
-	# any network operator to real or simulated signalling points
-	# for test purposes.  Due to possible duplicated assigments of
-	# these codes, messages address with one of these point codes
-	# should not be sent across network boudnaries except with
-	# agreement of the networks involved.
-	228=>['Pacific',    'Pacific Telecom'],
-	227=>['NACN',	    'North America Cellular Network'],
-	226=>['Cantel',	    'Cantel'],
-	225=>['Lincoln',    'Lincoln Telephone Company'],
-	224=>['Cincinnati', 'Cincinnati Bell Telephone'],
-	223=>['TDS',	    'TDS Telecom'],
+#	Table B1/T1.111.8 -  List of Large Network Codes 
+#	Large Network Code Network Identification Field Signalling Network
+#	255=>['',		'RESERVED - FUTURE USE'],
+	254=>['AT&T',		'AT&T Communications'],
+	253=>['US SPRINT',	'US SPRINT'],
+	252=>['BellSouth',	'BellSouth'],
+#	251=>['Pac Bell',	'Pacific Bell'],
+	251=>['PacificTelesis',	'PacificTelesis'],
+#	250=>['Ameritech',	'Ameritech'],
+	250=>['Ameritech',	'Ameritech Services'],
+	249=>['SWB',		'Southwestern Bell Telephone'],
+#	248=>['Bell',		'Bell Tri-Co Services'],
+	248=>['U S WEST',	'U S WEST Communications'],
+#	247=>['Nynex',		'Nynex Service Co.'],
+	247=>['NYNEX',		'NYNEX'],
+	246=>['Bell Atlantic',	'Bell Atlantic'],
+#	245=>['Canada',		'Telecom Canada'],
+	245=>['AT&T Canada',	'AT&T Canada Long Distance Services'],
+#	244=>['MCI',		'MCI Telecommunications Group'],
+	244=>['MCI',		'MCI Telecommunications Corporation'],
+	243=>['SNET',		'Southern New England Telephone'],
+	242=>['Allnet',		'Allnet Communications Services, Inc.'],
+	241=>['Defense',	'Defense Communications Agency'],
+#	240=>['GTE',		'GTE Service Corporation/Telephone Operations'],
+	240=>['GTE',		'GTE Service Corporation'],
+#	239=>['United',		'United Telephone Sys'],
+	239=>['Sprint',		'Sprint Local Telecommunications Division'],
+	238=>['Independent',	'Independent Telecommunications Network'],
+	237=>['C&W',		'Cable & Wireless'],
+#	236=>['CNCP',		'CNCP Telecommunications'],
+	236=>['AT&T Canada',	'AT&T Canada Long Distance Services'],
+#	235=>['Comtel',		'Comtel'],
+	235=>['CONTEL',		'CONTEL (GTE Wireless)'],
+	234=>['ALLTEL',		'ALLTEL'],
+#	233=>['Rochester',	'Rochester Telephone'],
+	233=>['Frontier',	'Frontier Communications Int\'l, Inc.'],
+	232=>['Century',	'Century Telephone Enterprises, Inc.'],
+	231=>['AT&T',		'AT&T (VSN)'],
+#	230=>['Centel',		'Centel'],
+	230=>['Sprint',		'Sprint Local Telecommunications Division'],
+	229=>['TEST',		'TEST CODE (T1S1)'],
+#	Point codes with this network identifier may be assigned by
+#	any network operator to real or simulated signalling points
+#	for test purposes.  Due to possible duplicate assignments of
+#	these codes, messages addressed with one of these point codes
+#	should not be sent across network boundaries except with
+#	agreements of the networks involved.
+	228=>['PacTel',		'Pacific Telecom'],
+	227=>['NACN',		'North American Cellular Network'],
+	226=>['Cantel',		'Cantel'],
+	225=>['Lincoln',	'Lincoln Telephone Company'],
+	224=>['Cinc, Bell',	'Cincinnati Bell Telephone'],
+	223=>['TDS',		'TDS TELECOM'],
 	222=>['MEANS/INS/SDN',	'MEANS/INS/SDN'],
-	221=>['CTIA',	    'CTIA'],
-	220=>['SWBM',	    'Southwestern Bell Mobile Systems'],
-	219=>['Nextel',	    'Nextel (was OneComm, Inc.)'],
-	218=>['Citizens',   'Citizens Telecom'],
-	217=>['ICG',	    'ICG Network Services'],
-	216=>['MCImetro',   'MCI Metro'],
-	215=>['AT&T',	    'AT&T'],
-	214=>['Sprint',	    'Sprint Spectrum L.P.'],
-	213=>['Canada',	    'Mobility Canada'],
-	212=>['Teleglobe',  'Teleglobe USA'],
-	211=>['Omnipoint',  'Omnipoint Communications Inc.'],
-	210=>['NextWave',   'NextWave Telecom'],
-	209=>['BellSouth',  'BellSouth Enterprises'],
-	208=>['GST',	    'GST Telecom'],
+	221=>['CTIA',		'CTIA'],
+	220=>['SWB',		'Southwestern Bell Mobile Systems'],
+	219=>['Nextel',		'Nextel (Was OneComm, Inc.)'],
+	218=>['Citizens',	'Citizens Telecom'],
+	217=>['ICG',		'ICG Network Services'],
+	216=>['MCI',		'MCImetro'],
+	215=>['AT&T',		'AT&T'],
+	214=>['Sprint',		'Sprint Spectrum L.P.'],
+	213=>['Mobility Canada','Mobility Canada'],
+	212=>['Teleglobe',	'Teleglobe USA'],
+	211=>['Omnipoint',	'Omnipoint Communications Inc.'],
+	210=>['NextWave',	'NextWave Telecom'],
+	209=>['BellSouth',	'BellSouth Enterprises'],
+	208=>['GST',		'GST Telecom'],
 );
 my %small_networks = (
 	1=>{
 		  1=>['Puerto Rico',	'Puerto Rico Telephone Company'],
-		  2=>['Cincinnati',	'Cincinnati Bell'],
-		  #3=>['LDS',		'LDS Metromedia Ltd'],
+#		  2=>['Cincinnati',	'Cincinnati Bell'],
+		  2=>['Standard',	'Standard Telephone Company'],
+#		  3=>['LDS',		'LDS Metromedia Ltd'],
 		  3=>['WorldCom',	'WorldCom'],
-		  4=>['Schneider ',	'Schneider Communications'],
-		  #5=>['Microtel',	'Microtel Inc'],
-		  5=>['WorldCom',	'WorldCom'],
-		  6=>['ACC',		'ACC Long Distance Corp'],
-		  7=>['SouthernNet',	'SouthernNet'],
-		  8=>['Teleconnect',	'Teleconnect Co'],
-		  #9=>['Telepshere',	'Telesphere Network'],
-		  #10=>['MidAmerican',	'MidAmerican'],
+		  4=>['Schneider',	'Schneider Communications'],
+#		  5=>['Microtel',	'Microtel Inc'],
+		  5=>['WorldCom',	'WorldCom.'],
+		  6=>['ACC',		'ACC Long Distance Corporation'],
+#		  7=>['SouthernNet',	'SouthernNet'],
+		  7=>['Southernet',	'Southernet'],
+		  8=>['Teleconnect',	'Teleconnect Company'],
+#		  9=>['Telepshere',	'Telesphere Network'],
 		  9=>['WorldCom',	'WorldCom'],
+#		 10=>['MidAmerican',	'MidAmerican'],
 		 10=>['WorldCom',	'WorldCom'],
-		 11=>['LDUSA',		'Long Distance USA/Sprint'],
+		 11=>['Sprint',		'Long Distance USA/Sprint'],
 		 12=>['RCI',		'RCI Corporation'],
 		 13=>['Phoenix',	'Phoenix Network'],
 		 14=>['Teledial',	'Teledial America'],
-		 #15=>['USTS',		'U.S. Transmission Systems'],
+#		 15=>['USTS',		'U.S. Transmission Systems'],
 		 15=>['Antigua',	'Antigua Public Utilities Authority'],
-		 #16=>['Litel',		'Litel Telecommunication Corp'],
-		 16=>['LCI',		'LCI International/Litel'],
+#		 16=>['Litel',		'Litel Telecommunication Corp'],
+		 16=>['Litel',		'LCI International/Litel'],
 		 17=>['Chadwick',	'Chadwick Telephone'],
-		 18=>['LDS',		'Long Distance Service Inc'],
+		 18=>['LDS',		'Long Distance Service, Inc.'],
 		 19=>['WITS',		'Washington Interagency Telecommunications Service'],
-		 20=>['PBS',		'Phone Base Systems, Inc'],
-		 21=>['General',	'General Communication Incorporated'],
-		 22=>['CTI',		'CTI Telecommunications Incorporated'],
-		 #23=>['SouthTel',	'SouthTel'],
-		 23=>['MicroNet',	'MicroNet Communications Group, Inc.'],
+		 20=>['PBSI',		'Phone Base Systems, Inc.'],
+		 21=>['General',	'General Communication, Inc.'],
+		 22=>['CTI',		'CTI Telecom Inc.'],
+#		 23=>['SouthTel',	'SouthTel'],
+		 23=>['MetroNet',	'MetroNet Communication Group, Inc.'],
 		 24=>['Roseville',	'Roseville Telephone Company'],
-		 #25=>['TCL',		'TelaMarketing Corporation of Louisiana'],
+#		 25=>['TCL',		'TelaMarketing Corporation of Louisiana'],
 		 25=>['Rio',		'Rio Communications'],
-		 #26=>['LDDS',		'LDDS'],
+#		 26=>['LDDS',		'LDDS'],
 		 26=>['WorldCom',	'WorldCom'],
-		 27=>['Capital',	'Capital Telecommunications, Inc.'],
+		 27=>['Capital',	'Capital Telecom, Inc.'],
 		 28=>['Transtel',	'Transtel Corporation'],
-		 #29=>['ComSystem',	'ComSystem'],
+#		 29=>['ComSystem',	'ComSystem'],
 		 29=>['WorldCom',	'WorldCom'],
-		 30=>['Mid Altantic',	'Mid Altantic/Frontier'],
-		 #33=>['NTC',		'NTC Inc.'],
+		 30=>['Frontier',	'Mid Atlantic/Frontier'],
+		 31=>['LDM',		'Long Distance Management'],
+		 32=>['Bhamas',		'Bhamas Telecommunications Corp'],
+#		 33=>['NTC',		'NTC Inc.'],
 		 33=>['WorldCom',	'WorldCom'],
 		 34=>['NDC',		'National Data Corporation'],
-		 35=>['FTC',		'FTC Communications, Inc.'],
-		 #36=>['Lincoln',	'Lincoln Telephone Company'],
-		 36=>['MediaOne',	'Media One'],
+		 35=>['FTC',		'FTC Communications'],
+#		 36=>['Lincoln',	'Lincoln Telephone Company'],
+		 36=>['Media One',	'Media One'],
 		 37=>['Alascom',	'Alascom'],
 		 38=>['Motorola',	'Motorola, Inc.'],
-		 39=>['West Coast',	'West Coast Telecommunications'],
+		 39=>['West Coast',	'West Coast Telecom'],
 		 40=>['LDS',		'Long Distance Savers, Inc./LDS'],
-		 #41=>['EdTel',		'Ed Tel'],
-		 41=>['TCE',		'TELUS Communications (Edmonton) Inc./TCE'],
-		 42=>['NPT',		'North Pittsburg Telephone Company'],
+#		 41=>['EdTel',		'Ed Tel'],
+		 41=>['TELUS',		'TELUS Communications (Edmonton) Inc (TCE)'],
+		 42=>['N Pittsburgh',	'North Pittsburgh Telephone Company'],
 		 43=>['Rock Hill',	'Rock Hill Telephone Company'],
 		 44=>['Teleglobe',	'Teleglobe Canada'],
-		 45=>['Jamaica',	'Jamaica Telephone Company Limited'],
+		 45=>['Jamaica',	'Jamaica Telephone Company'],
 		 46=>['Sugarland',	'Sugarland Telephone Company'],
 		 47=>['Lakedale',	'Lakedale Telephone Company'],
-		 48=>['Chillicothe ',	'Chillicothe Telephone Company'],
-		 49=>['NSTC',		'North State Telephone Company'],
-		 50=>['PSTC',		'Public Service Telephone Company'],
-		 51=>['Cincinnati',	'Cincinnati Bell Long Distance'],
+		 48=>['Chillicothe',	'Chillicothe Telephone Company'],
+		 49=>['N State',	'North State Telephone Company'],
+		 50=>['Pub. Service',	'Public Service Telephone Company'],
+		 51=>['Cinc. Bell',	'Cincinnati Bell Long Distance'],
 		 52=>['NTX',		'National Telephone Exchange/NTX'],
 		 53=>['Lake States',	'Lake States Long Distance'],
-		 54=>['NTF',		'National Telecommunications of Florida'],
-		 55=>['DET&T',		'Denver & Ephrata Telephone & Telegraph Company'],
-		 56=>['VarTec',		'VarTec National, Incorporated'],
-		 57=>['ETS',		'Eastern Telephone Systems, Inc.'],
-		 58=>['TEXP',		'Telephone Express'],
+		 54=>['NTF',		'National Telecom of Florida'],
+		 55=>['D&ET&T',		'Denver & Ephrata Telephone & Telegraph'],
+		 56=>['Vartec',		'VarTec National, Inc.'],
+		 57=>['Eastern',	'Eastern Telephone'],
+		 58=>['Tel.Express',	'Telephone Express'],
 		 59=>['SNET',		'SNET Protocol Conversion'],
-		 60=>['EATC',		'East Ascension Telephone Company, Inc.'],
+		 60=>['E Ascension',	'East Ascension Telephone Company, Inc.'],
 		 61=>['Codetel',	'Codetel'],
-		 62=>['KTC',		'Kerrville Telephone Company'],
-		 63=>['BCTC',		'Barry County Telephone Company'],
+		 62=>['Kerrville',	'Kerrville Telephone Company'],
+		 63=>['Barry Cty',	'Barry County Telephone Company'],
 		 64=>['CALNET',		'CALNET'],
-		 65=>['DET&T',		'Denver & Ephrata Telephone & Telegraph Company'],
-		 66=>['DET&T',		'Denver & Ephrata Telephone & Telegraph Company'],
-		 67=>['NetServ',	'Network Services'],
-		 68=>['RCTC',		'Redwood County Telephone Company/Clements Telephone Company'],
-		 69=>['HTHT',		'Horry Telephone/Hargray Telephone'],
-		 70=>['HTHT',		'Horry Telephone/Hargray Telephone'],
-		 71=>['HTHT',		'Horry Telephone/Hargray Telephone'],
-		 72=>['HTHT',		'Horry Telephone/Hargray Telephone'],
-		 73=>['CGRP',		'CommuniGroup, Inc.'],
-		 74=>['CTC',		'The Concord Telephone Company'],
-		 75=>['CTC',		'The Concord Telephone Company'],
-		 76=>['CTC',		'The Concord Telephone Company'],
-		 77=>['CTC',		'The Concord Telephone Company'],
-		 78=>['WKRTC',		'West Kentucky Rural Telephone Cooperative'],
-		 79=>['PTA',		'Pioneer Telephone Association'],
-		 80=>['DCTCC',		'Duo County Telephone Cooperative Corporation'],
+		 65=>['D&ET&T',		'Denver & Ephrata Telephone & Telegraph'],
+		 66=>['D&ET&T',		'Denver & Ephrata Telephone & Telegraph'],
+		 67=>['Network Svcs.',	'Network Services'],
+		 68=>['Redwood Cty',	'Redwood County Telephone Company/Clements Telephone Company'],
+		 69=>['Hargray',	'Horry Telephone/Hargray Telephone'],
+		 70=>['Hargray',	'Horry Telephone/Hargray Telephone'],
+		 71=>['Hargray',	'Horry Telephone/Hargray Telephone'],
+		 72=>['Hargray',	'Horry Telephone/Hargray Telephone'],
+		 73=>['CommuniGroup',	'CommuniGroup, Inc.'],
+		 74=>['Concord',	'The Concord Telephone Company'],
+		 75=>['Concord',	'The Concord Telephone Company'],
+		 76=>['Concord',	'The Concord Telephone Company'],
+		 77=>['Concord',	'The Concord Telephone Company'],
+		 78=>['W Kentucky R',	'West Kentucky Rural Telephone Cooperative'],
+		 79=>['Pioneer',	'Pioneer Telephone Association'],
+		 80=>['Duo Cty',	'Duo County Telephone Cooperative Corporation'],
 		 81=>['CFW',		'CFW Telephone'],
-		 82=>['LCTE',		'Lufkin-Conroe Telephone Exch., Inc.'],
-		 83=>['LCTE',		'Lufkin-Conroe Telephone Exch., Inc.'],
-		 84=>['LCTE',		'Lufkin-Conroe Telephone Exch., Inc.'],
+		 82=>['Lufkin-Conroe',	'Lufkin-Conroe Telephone Exch., Inc.'],
+		 83=>['Lufkin-Conroe',	'Lufkin-Conroe Telephone Exch., Inc.'],
+		 84=>['Lufkin-Conroe',	'Lufkin-Conroe Telephone Exch., Inc.'],
 		 85=>['Puerto Rico',	'Puerto Rico Telephone Company'],
 		 86=>['Puerto Rico',	'Puerto Rico Telephone Company'],
 		 87=>['Puerto Rico',	'Puerto Rico Telephone Company'],
-		 88=>['ICTC',		'Illinois Consolidated Telphone Company'],
-		 89=>['WestHouse',	'Westinghouse Communications'],
-		 90=>['ATU',		'Anchorage Telephone Utility'],
-		 91=>['USWEST',		'US WEST New Vector Group'],
-		 92=>['USWEST',		'US WEST New Vector Group'],
-		 93=>['USWEST',		'US WEST New Vector Group'],
-		 94=>['USWEST',		'US WEST New Vector Group'],
+		 88=>['Illinois Cons.',	'Illinois Consolidated Telephone Company'],
+		 89=>['Westinghouse',	'Westinghouse Communications'],
+		 90=>['Anchorage',	'Anchorage Telephone Utility'],
+		 91=>['U S WEST',	'U S WEST New Vector Group'],
+		 92=>['U S WEST',	'U S WEST New Vector Group'],
+		 93=>['U S WEST',	'U S WEST New Vector Group'],
+		 94=>['U S WEST',	'U S WEST New Vector Group'],
 		 95=>['Lakedale',	'Lakedale Telephone Company'],
 		 96=>['Lakedale',	'Lakedale Telephone Company'],
 		 97=>['Lakedale',	'Lakedale Telephone Company'],
-		 98=>['CTTC',		'Central Texal Telephone Cooperative'],
-		 99=>['CTTC',		'Central Texal Telephone Cooperative'],
-		100=>['CTTC',		'Central Texal Telephone Cooperative'],
+		 98=>['C Texas',	'Central Texas Telephone Cooperative'],
+		 99=>['C Texas',	'Central Texas Telephone Cooperative'],
+		100=>['C Texas',	'Central Texas Telephone Cooperative'],
 		101=>['LinkUSA',	'LinkUSA Corporation'],
 		102=>['LinkUSA',	'LinkUSA Corporation'],
 		103=>['Standish',	'Standish Telephone Company'],
@@ -479,28 +489,28 @@ my %small_networks = (
 		108=>['WorldCom',	'WorldCom'],
 		109=>['WorldCom',	'WorldCom'],
 		110=>['WorldCom',	'WorldCom'],
-		111=>['Common',		'Commonwealth Telephone Company'],
+		111=>['Commonwealth',	'Commonwealth Telephone Company'],
 		112=>['WorldCom',	'WorldCom'],
 		113=>['Matanuska',	'Matanuska Telephone Association, Inc.'],
-		114=>['Reserve',	'Reserve Telephone Company'],
+		114=>['Reserve',	'Reserve Telephone Company, Inc.'],
 		115=>['Brazoria',	'Brazoria Telephone Company'],
-		116=>['Common',		'Commonwealth Telephone Company'],
-		117=>['Common',		'Commonwealth Telephone Company'],
-		118=>['USC',		'United States Cellular'],
-		119=>['USC',		'United States Cellular'],
-		120=>['Videotron',	'Videotron Telecom Ltee.'],
+		116=>['Commonwealth',	'Commonwealth Telephone Company'],
+		117=>['Commonwealth',	'Commonwealth Telephone Company'],
+		118=>['US Cellular',	'United States Cellular'],
+		119=>['US Cellular',	'United States Cellular'],
+		120=>['Videotron',	'Videotron Telecom Ltee'],
 		121=>['Novus',		'Novus Telecom Inc.'],
-		122=>['BA Mobile',	'Bell Atlantic Mobile'],
+		122=>['Bell Atlantic',	'Bell Atlantic Mobile'],
 		123=>['USLink',		'USLink Long Distance'],
-		124=>['NEPTC',		'North-Eastern Pennsylvania Telephone Company'],
+		124=>['NE Pennsylvania','North-Eastern Pennsylvania Telephone Company'],
 		125=>['Gulf',		'Gulf Telephone Company'],
 		126=>['Gulf',		'Gulf Telephone Company'],
-		127=>['BA Mobile',	'Bell Atlantic Mobile'],
-		128=>['BA Mobile',	'Bell Atlantic Mobile'],
-		129=>['BA Mobile',	'Bell Atlantic Mobile'],
-		130=>['NYNEX',		'NYNEX Mobile Communications'],
+		127=>['Bell Atlantic',	'Bell Atlantic Mobile'],
+		128=>['Bell Atlantic',	'Bell Atlantic Mobile'],
+		129=>['Bell Atlantic',	'Bell Atlantic Mobile'],
+		130=>['NYNEX Mobile',	'NYNEX Mobile Communications'],
 		131=>['Ameritech',	'Ameritech Cellular Services, Inc.'],
-		132=>['YVTMC',		'Yadkin Valey Telephone Membership Corporation'],
+		132=>['Yadkin Vly',	'Yadkin Valley Telephone Membership Corporation'],
 		133=>['Intermedia',	'Intermedia Communications, Inc.'],
 		134=>['Advantis',	'Advantis'],
 		135=>['Advantis',	'Advantis'],
@@ -509,8 +519,8 @@ my %small_networks = (
 		138=>['Pac Tel',	'Pac Tel Corporation'],
 		139=>['Com Net',	'Com Net'],
 		140=>['Hickory',	'Hickory Telephone Company'],
-		141=>['Barbados',	'Barbados Telephone Company, Ltd.'],
-		142=>['Barbados',	'Barbados Telephone Company, Ltd.'],
+		141=>['Bartel',		'Barbados Telephone Company, Ltd., (Bartel)'],
+		142=>['Bartel',		'Barbados Telephone Company, Ltd., (Bartel)'],
 		143=>['WorldCom',	'WorldCom'],
 		144=>['WorldCom',	'WorldCom'],
 		145=>['WorldCom',	'WorldCom'],
@@ -526,42 +536,42 @@ my %small_networks = (
 		155=>['WorldCom',	'WorldCom'],
 		156=>['WorldCom',	'WorldCom'],
 		157=>['Transaction',	'Transaction Network Services, Inc.'],
-		158=>['Trinidad',	'Telecommunication Services of Trinidad/Tobago'],
-		159=>['PMTC',		'Project Mutual Telephone Company'],
-		160=>['Sprint',		'Sprint Canada'],
-		161=>['WCCTA',		'Webster Calhoun Cooperative Telephone Association'],
+		158=>['Trinidad/Tobago','Telecommunication Services of Trinidad/Tobago'],
+		159=>['Project Mutual',	'Project Mutual Telephone Company'],
+		160=>['Sprint Canada',	'Sprint Canada'],
+		161=>['Webster Calhoun','Webster Calhoun Cooperative Telephone Association'],
 		162=>['Trenton',	'Trenton Telephone Company/Ringgold Telephone Company'],
 		163=>['WilTel',		'WilTel'],
 		164=>['fONOROLA',	'fONOROLA'],
 		165=>['Comcast',	'Comcast Cellular'],
 		166=>['MicroCell',	'MicroCell 1-2-1 Inc.'],
-		167=>['ITC',		'Independent Telephone Company'],
+		167=>['Independent',	'Independent Telephone Company'],
 		168=>['Ameritech',	'Ameritech Communication Inc.'],
-		169=>['Ameritech',	'Ameritech Communication Inc.'],
-		170=>['Ameritech',	'Ameritech Communication Inc.'],
-		171=>['Ameritech',	'Ameritech Communication Inc.'],
+		169=>['Ameritech',	'Ameritech Communication Inc'],
+		170=>['Ameritech',	'Ameritech Communication Inc'],
+		171=>['Ameritech',	'Ameritech Communication Inc'],
 		172=>['Pembroke',	'Pembroke Telephone Company'],
-		173=>['PacBell',	'Pacific Bell Mobile Services'],
+		173=>['Pac Bell',	'Pacific Bell Mobile Services'],
 		174=>['BellSouth',	'BellSouth PCS'],
-		175=>['Brooks',		'Brooks Fiber Communications'],
-		176=>['Intermedia',	'Intermedia Communications, Inc.'],
-		177=>['PrimeCO',	'PrimeCO Personal Communications, L.P.'],
+		175=>['Brooks Fiber',	'Brooks Fiber Communications'],
+		176=>['Intermedia',	'Intermedia Communication'],
+		177=>['PrimeCO',	'PrimeCO Personal Communications , L.P.'],
 		178=>['Vital',		'Vital Inc.'],
-		179=>['Western',	'Western Wireless Corporation'],
-		180=>['SNS',		'SNS Shared Network Scvs. Inc.'],
+		179=>['W Wireless',	'Western Wireless Corporation'],
+		180=>['SNS',		'SNS Shared Network Svcs. Inc.'],
 		181=>['BellSouth',	'BellSouth Cellular Corporation'],
 		182=>['BellSouth',	'BellSouth Cellular Corporation'],
-		183=>['PBTC',		'Pine Belt Telephone Company, Inc.'],
-		184=>['Avantel',	'Avantel S.A.'],
+		183=>['Pine Belt',	'Pine Belt Telephone Company, Inc.'],
+		184=>['Avantel',	'Avantel, SA'],
 		185=>['Classic',	'Classic Telephone'],
 		186=>['US One',		'US One Communications, Inc.'],
 		187=>['Clearnet',	'Clearnet Communications, Inc.'],
-		188=>['Clearnet',	'Clearnet Communications, Inc.'],
+		188=>['Clearnet',	'Clearnet Communications, Inc'],
 		189=>['Sierra',		'Sierra Cellular, Inc.'],
-		190=>['American',	'American Telco., Inc.'],
-		191=>['American',	'American Portable Telecom'],
-		192=>['American',	'American Portable Telecom'],
-		193=>['American',	'American Portable Telecom'],
+		190=>['American Telco',	'American Telco, Inc'],
+		191=>['APT',		'American Portable Telecom'],
+		192=>['APT',		'American Portable Telecom'],
+		193=>['APT',		'American Portable Telecom'],
 		194=>['WorldCom',	'WorldCom'],
 		195=>['WorldCom',	'WorldCom'],
 		196=>['WorldCom',	'WorldCom'],
@@ -571,48 +581,49 @@ my %small_networks = (
 		200=>['WorldCom',	'WorldCom'],
 		201=>['WorldCom',	'WorldCom'],
 		202=>['WorldCom',	'WorldCom'],
-		203=>['Global',		'Global Telemedia International, Inc.'],
-		204=>['BA NYNEX',	'Bell Atlantic NYNEX Mobile'],
-		205=>['BA NYNEX',	'Bell Atlantic NYNEX Mobile'],
-		206=>['BA NYNEX',	'Bell Atlantic NYNEX Mobile'],
-		207=>['BA NYNEX',	'Bell Atlantic NYNEX Mobile'],
-		208=>['BA NYNEX',	'Bell Atlantic NYNEX Mobile'],
-		209=>['BA NYNEX',	'Bell Atlantic NYNEX Mobile'],
-		210=>['BA NYNEX',	'Bell Atlantic NYNEX Mobile'],
-		211=>['BA NYNEX',	'Bell Atlantic NYNEX Mobile'],
+		203=>['Globoal Telemeida','Global Telemedia International Inc.'],
+		204=>['Bell Atlantic',	'Bell Atlantic NYNEX Mobile'],
+		205=>['Bell Atlantic',	'Bell Atlantic NYNEX Mobile'],
+		206=>['Bell Atlantic',	'Bell Atlantic NYNEX Mobile'],
+		207=>['Bell Atlantic',	'Bell Atlantic NYNEX Mobile'],
+		208=>['Bell Atlantic',	'Bell Atlantic NYNEX Mobile'],
+		209=>['Bell Atlantic',	'Bell Atlantic NYNEX Mobile'],
+		210=>['Bell Atlantic',	'Bell Atlantic NYNEX Mobile'],
+		211=>['Bell Atlantic',	'Bell Atlantic NYNEX Mobile'],
 		212=>['Headwaters',	'Headwaters Telephone Company'],
-		213=>['Wood',		'Wood County Telephone Company'],
-		214=>['Pocket',		'Pocket COmmunications, Inc.'],
-		215=>['BA Virginia',	'Bell Atlantic - Virginia, Inc.'],
+		213=>['Wood Cty',	'Wood County Telephone Company'],
+		214=>['Pocket',		'Pocket Communications, Inc.'],
+		215=>['Bell Atlantic',	'Bell Atlantic - Virginia, Inc.'],
 		216=>['360',		'360 Communications'],
-		217=>['Bermuda',	'TeleBermuda International Ltd.'],
+		217=>['TeleBermuda',	'TeleBermuda International Ltd.'],
 		218=>['Cox',		'Cox Communication'],
 		219=>['Winstar',	'Winstar Telecommunications Group'],
 		220=>['MIDCOM',		'MIDCOM Communications, Inc.'],
-		221=>['Excel',		'Excel Switch Facility, Inc.'],
-		222=>['Western',	'Western Wireless Corporation'],
-		223=>['TeleHub',	'TeleHub Network SErvices Corporation'],
-		224=>['IXC',		'IXC Communication, Inc.'],
+		221=>['Excel',		'Excel Switch Facility, Inc'],
+		222=>['Western Wireless','Western Wireless Corporation'],
+		223=>['TeleHub',	'TeleHub Network Services Corporation'],
+		224=>['IXC',		'IXC Communication, Inc'],
 		225=>['PrimeCo',	'PrimeCo Personal Communications'],
 		226=>['PrimeCo',	'PrimeCo Personal Communications'],
 		227=>['TPC',		'The Phone Company'],
 		228=>['Iridium',	'Iridium LLC'],
 		229=>['Teligent',	'Teligent'],
 		230=>['SpectraNet',	'SpectraNet Orange'],
-		231=>['USX',		'US Xchange, L.L.C.'],
-		232=>['BA Mobile',	'Bell Atlantic Mobile'],
-		233=>['BA Mobile',	'Bell Atlantic Mobile'],
-		234=>['BA Mobile',	'Bell Atlantic Mobile'],
-		235=>['BA Mobile',	'Bell Atlantic Mobile'],
-		236=>['BA Mobile',	'Bell Atlantic Mobile'],
-		237=>['Oregon',		'Oregon Telco Services, Inc.'],
+		231=>['US Xchange',	'US Xchange, L.L.C'],
+		232=>['Bell Atlantic',	'Bell Atlantic Mobile, Inc.'],
+		232=>['Bell Atlantic',	'Bell Atlantic Mobile, Inc.'],
+		233=>['Bell Atlantic',	'Bell Atlantic Mobile, Inc.'],
+		234=>['Bell Atlantic',	'Bell Atlantic Mobile, Inc.'],
+		235=>['Bell Atlantic',	'Bell Atlantic Mobile, Inc.'],
+		236=>['Pac Bell',	'Pacific Bell Mobile Services'],
+		237=>['Oregon TSI',	'Oregon Telco Services, Inc'],
 		238=>['Telecorp',	'Telecorp Holding Corporation, Inc.'],
-		239=>['Magnacom',	'Magnacom, LLC dba PCS Plus, Inc.'],
+		239=>['Magnacom',	'Magnacom, LLC dba PCS Plus, Inc'],
 		240=>['Global Naps',	'Global Naps'],
-		241=>['Tiniton',	'Triniton PCS Inc.'],
+		241=>['Trinton',	'Trinton PCS Inc.'],
 		242=>['Strikenet',	'Strikenet'],
 		243=>['Connect',	'Connect Holding Corporation'],
-		244=>['NetPlus',	'Network Plus'],
+		244=>['Network Plus',	'Network Plus'],
 		245=>['CapRock',	'CapRock Communications, Inc.'],
 	},
 	2=>{
@@ -623,843 +634,2070 @@ my %small_networks = (
 	},
 );
 my %pc_blocks = (
-	1=>{
-		  0=>['Cleartel',	'Cleartel Communications'],
-		  4=>['Business',	'Business Telecom'],
-		  #8=>['PA',		'Phone America'],
-		  8=>['WorldCOm',	'WorldCom'],
-		 12=>['National',	'National Telephone'],
-		 #16=>['Vyvx',		'Vyvx Telecom'],
-		 20=>['NTA',		'National Telecommunications of Austin'],
-		 #24=>['FPNE',		'First Phone of New England'],
-		 24=>['WorldCom',	'WorldCom'],
-		 28=>['SIS',		'Southern Interexchange Services, Inc.'],
-		 32=>['NTS',		'NTS Communications'],
-		 36=>['Digital',	'Digital Network'],
-		 40=>['ATX',		'ATX Telecommunications Services'],
-		 #44=>['Vyvx',		'Vyvx Telecom'],
-		 48=>['NNC',		'National Network Corp'],
-		 52=>['StarTel',	'StarTel'],
-		 56=>['TMC',		'TMC of San Diego'],
-		 #60=>['First',		'First Phone'],
-		 #64=>['CNI',		'CNI'],
-		 #68=>['WorldCom',	'WorldCom'],
-		 72=>['WT&EC',		'Wilkes Telephone & Electric Company'],
-		 76=>['Sandhill',	'Sandhill Telephone Cooperative'],
-		 80=>['Chester',	'Chester Telephone'],
-		 84=>['SJT&T',		'St. Joseph Telephone & Telegraph Company'],
-		 88=>['ITC',		'Interstate Telephone Company'],
-		 92=>['VUT',		'Vista-United Telecommunications'],
-		 96=>['Brandenburg',	'Brandenburg Telephone Company'],
-		 #100=>['FirstPhone',	'FirstPhone'],
-		104=>['Chesnee',	'Chesnee Telephone Company'],
-		#108=>['Hargray',	'Hargray Telephone Company'],
-		108=>['Access',		'Access Long Distance'],
-		112=>['LaFourche',	'LaFourche Telephone Company'],
-		116=>['Evans',		'Evans Telephone Company'],
-		#120=>['ICTC',		'Illinois Consolidated Telephone Company'],
-		120=>['JBN',		'JBN Telephone Company, Inc.'],
-		#124=>['ICTC',		'Illinois Consolidated Telephone Company'],
-		124=>['Iowa',		'Iowa Communications Network'],
-		128=>['Roanoke',	'Roanoke Telephone Company'],
-		#132=>['INS',		'Iowa Network Services'],
-		132=>['IEX',		'IEX\'s Corporation'],
-		136=>['Telefonica',	'Telefonica Larga Distancia'],
-		#140=>['Cherokee',	'Cherokee Telephone Company'],
-		140=>['Alabama',	'National Telephone of Alabama'],
-		144=>['Sears',		'Sears Technology Services, Inc.'],
-		148=>['Phone One',	'Phone One'],
-		152=>['Orwell',		'Orwell Telephone Company'],
-		156=>['Call-Net',	'Call-Net Telecommunications Ltd.'],
-		160=>['Fort Bend',	'Fort Bend Telephone Company'],
-		164=>['Capital',	'Capital Network Systems, Inc.'],
-		168=>['Northwestel',	'Northwestel, Inc.'],
-		172=>['Northwestel',	'Northwestel, Inc.'],
-		176=>['Gulf',		'Gulf Telephone Company'],
-		180=>['Florala',	'Florala Telephone Company'],
-		184=>['Marianna',	'Marianna and Scenery Hill Telephone Company'],
-		188=>['Panhandle',	'Panhandle Telephone Cooperative'],
-		192=>['Panhandle',	'Panhandle Telephone Cooperative'],
-		196=>['Panhandle',	'Panhandle Telephone Cooperative'],
-		200=>['Peoples',	'Peoples Mutual Telephone Company'],
-		204=>['BA Mobile',	'Bell Atlantic Mobile Systems'],
-		208=>['Logan',		'Logan Telephone Cooperative'],
-		212=>['TresCom',	'TresCom U.S.A., Inc.'],
-		216=>['Rochester',	'Rochester Telephone Company'],
-		220=>['Ponderosa',	'Ponderosa Telephone Company'],
-		224=>['Ponderosa',	'Ponderosa Telephone Company'],
-		228=>['Ponderosa',	'Ponderosa Telephone Company'],
-		232=>['Ellijay',	'Ellijay Telephone Company'],
-		236=>['American',	'American Telephone Company'],
-		240=>['Loretto',	'Loretto Telephone Company, Inc.'],
-		244=>['Millry',		'Millry Telephone Company, Inc.'],
-		248=>['NW Ind.',	'Northwest Indiana Telephone Company'],
-		252=>['Pond Br.',	'Pond Branch Telephone Company, Inc.'],
-	},
-	2=>{
-		  0=>['Farmers',	'Farmers Telephone Cooperative (AL.)'],
-		  4=>['Total-Tel',	'Total-Tel USA'],
-		  8=>['Farmers',	'Farmers Telephone Cooperative (SC.)'],
-		 12=>['Farmers',	'Farmers Telephone Cooperative (SC.)'],
-		 16=>['Farmers',	'Farmers Telephone Cooperative (SC.)'],
-		 20=>['Farmers',	'Farmers Telephone Cooperative (SC.)'],
-		 24=>['Bentley',	'Bentleyville Telephone Company'],
-		 28=>['Communique',	'Communique Telecomm.'],
-		 32=>['Santa Rosa',	'Santa Rosa Telephone Cooperative'],
-		 36=>['SW Oklahoma',	'Southwest Oklahoma Telephone Company'],
-		 40=>['SW Oklahoma',	'Southwest Oklahoma Telephone Company'],
-		 44=>['Piedmont',	'Piedmont Rural Telephone Cooperative'],
-		 48=>['Piedmont',	'Piedmont Rural Telephone Cooperative'],
-		 52=>['LDD',		'LDD, Inc.'],
-		 56=>['Saco River',	'Saco River Telephone & Telegraph Company'],
-		 60=>['Bruce',		'Bruce Telephone Company'],
-		 64=>['Bledsoe',	'Bledsoe Telephone Cooperative'],
-		 68=>['Bledsoe',	'Bledsoe Telephone Cooperative'],
-		 72=>['Foothills',	'Foothills Rural Telephone Cooperative'],
-		 76=>['Germantown',	'Germantown Telephone Company, Inc.'],
-		 80=>['Elkhart',	'Elkhart Telephone Company'],
-		 84=>['Yell County',	'Yell County Telephone Company'],
-		 88=>['Yell County',	'Yell County Telephone Company'],
-		 92=>['Calif-Oregon',	'California-Oregon Telephone Company'],
-		 96=>['Crown',		'Crown Point Telephone'],
-		100=>['Berkshire',	'Berkshire Telephone Corporation'],
-		104=>['Cobboss.',	'Cobbosseecontee Telephone & Telegraph Company'],
-		108=>['Siskiyou',	'Siskiyou Telephone Company'],
-		112=>['Siskiyou',	'Siskiyou Telephone Company'],
-		116=>['Millry',		'Millry Telephone Company, Inc.'],
-		120=>['Mountain',	'Mountain Rural Telephone'],
-		124=>['Taconic',	'Taconic Telephone Corporation'],
-		128=>['Champlain',	'Champlain Telephone Company'],
-		132=>['Planters',	'Planters Rural Telephone Cooperative, Inc.'],
-		136=>['Dekalb',		'Dekalb Telephone Cooperative'],
-		140=>['Citizens',	'Citizens Telephone Cooperative'],
-		144=>['Bulloch',	'Bulloch Telephone Cooperative, Inc.'],
-		148=>['NE Florida',	'Northeast Florida Telephone Company, Inc.'],
-		152=>['Camden',		'Camden Telephone and Telegraph Company'],
-		156=>['N Arkansas',	'Northern Arkansas Telephone Company'],
-		160=>['Access',		'Acess Long Distance'],
-		164=>['Access',		'Acess Long Distance'],
-		168=>['Access',		'Acess Long Distance'],
-		172=>['Ballard',	'Ballard Rural Telephone Cooperative'],
-		176=>['Hancock',	'Hancock Rural Telephone Company'],
-		180=>['Madison',	'Madison County Telephone Company'],
-		184=>['Valu-Line',	'Valu-Line Long Distance'],
-		188=>['Mtn View',	'Mountain View Telephone Company'],
-		192=>['Mtn View',	'Mountain View Telephone Company'],
-		196=>['Pine Tree',	'Pine Tree Telephone & Telegraph Company'],
-		200=>['McLoud',		'McLoud Telephone Company'],
-		204=>['Ardmore',	'Ardmore Telephone Company'],
-		208=>['Cimarron',	'Cimarron Telephone Company'],
-		212=>['Cimarron',	'Cimarron Telephone Company'],
-		216=>['Cimarron',	'Cimarron Telephone Company'],
-		220=>['Statesboro',	'Statesboro Telephone Company'],
-		224=>['Waitsfield',	'Waitsfield-Flayston Telephone Company'],
-		228=>['Mid-Plains',	'Mid-Plains Telephone Company, Inc.'],
-		232=>['Mid-Plains',	'Mid-Plains Telephone Company, Inc.'],
-		236=>['Columbus',	'Columbus Telephone Company'],
-		240=>['KanOkla',	'KanOkla Telephone Association, Inc.'],
-		244=>['KanOkla',	'KanOkla Telephone Association, Inc.'],
-		248=>['S Central',	'South Central Telephone Association, Inc.'],
-		252=>['S Central',	'South Central Telephone Association, Inc.'],
-	},
-	3=>{
-		  0=>['S Kansas',	'Southern Kansas Telephone Company'],
-		  4=>['S Kansas',	'Southern Kansas Telephone Company'],
-		  8=>['Dobson',		'Dobson Telephone Company'],
-		 12=>['Dobson',		'Dobson Telephone Company'],
-		 16=>['Dobson',		'Dobson Telephone Company'],
-		 20=>['Etex',		'Etex Telephone Cooperative, Inc.'],
-		 24=>['Etex',		'Etex Telephone Cooperative, Inc.'],
-		 28=>['Wheat St',	'Wheat State Telephone, Inc.'],
-		 32=>['Wheat St',	'Wheat State Telephone, Inc.'],
-		 36=>['Westel',		'Westel'],
-		 40=>['Westel',		'Westel'],
-		 44=>['Westel',		'Westel'],
-		 48=>['Smithville',	'Smithville Telephone'],
-		 52=>['Smithville',	'Smithville Telephone'],
-		 56=>['Smithville',	'Smithville Telephone'],
-		 60=>['Blackfoot',	'Blackfoot Telephone Cooperative, Inc.'],
-		 64=>['Blackfoot',	'Blackfoot Telephone Cooperative, Inc.'],
-		 68=>['Blackfoot',	'Blackfoot Telephone Cooperative, Inc.'],
-		 72=>['American',	'American Sharecom'],
-		 76=>['American',	'American Sharecom'],
-		 80=>['American',	'American Sharecom'],
-		 84=>['Spencer',	'Perry Spencer Rural Telephone Cooperative'],
-		 88=>['Stellville',	'Stellville Telephone Exchange'],
-		 92=>['Chibardun',	'Chibardun Telephone Cooperative, Inc.'],
-		 96=>['Chibardun',	'Chibardun Telephone Cooperative, Inc.'],
-		100=>['S Central',	'South Central Rural Telephone Cooperative Corporation, Inc.'],
-		104=>['United',		'United Telephone Company, Inc.'],
-		108=>['National',	'National TeleService'],
-		112=>['Execulines',	'Execulines of the Northwest, Inc.'],
-		116=>['Wilson',		'Wilson Telephone Company'],
-		120=>['Rochester',	'Rochester Telephone'],
-		124=>['Rochester',	'Rochester Telephone'],
-		128=>['Rochester',	'Rochester Telephone'],
-		132=>['Rochester',	'Rochester Telephone'],
-		136=>['Rochester',	'Rochester Telephone'],
-		140=>['Rochester',	'Rochester Telephone'],
-		144=>['Vernon',		'Vernon Telephone Cooperative'],
-		148=>['Vernon',		'Vernon Telephone Cooperative'],
-		152=>['Union',		'Union Telephone Company'],
-		156=>['Union',		'Union Telephone Company'],
-		160=>['Dunbarton',	'Dunbarton Telephone Company'],
-		164=>['Palmetto',	'Palmetto Rural Telephone Company'],
-		168=>['Green Hills',	'Green Hills Telephone Company'],
-		172=>['Conestoga',	'Conestoga Telephone & Telegraph Company'],
-		176=>['Roanoke',	'Roanoke & Botetourt Telephone Company'],
-		180=>['C Oklahoma',	'Central Oklahoma Telephone Company'],
-		184=>['C Oklahoma',	'Central Oklahoma Telephone Company'],
-		188=>['Pierce',		'Pierce Telephone Company, Inc.'],
-		192=>['Mid-Missouri',	'Mid-Missouri Telephone Company'],
-		196=>['Mid-Missouri',	'Mid-Missouri Telephone Company'],
-		200=>['Mid-Missouri',	'Mid-Missouri Telephone Company'],
-		204=>['Mid-Missouri',	'Mid-Missouri Telephone Company'],
-		208=>['Chequamegon',	'Chequamegon Telephone'],
-		212=>['Chequamegon',	'Chequamegon Telephone'],
-		216=>['Chequamegon',	'Chequamegon Telephone'],
-		220=>['Fidelity',	'Fidelity Telephone Company'],
-		224=>['Spencer',	'Perry Spencer Rural Telephone Cooperative'],
-		228=>['Utelco',		'Utelco, Inc.'],
-		232=>['Ontario',	'Ontario Telephone Compan, Inc.'],
-		236=>['Germantown',	'Germantown Independent Telephone'],
-		240=>['Kerman',		'Kerman Telephone Company.Inc.'],
-		244=>['Hayneville',	'Hayneville Telephone Company, Inc.'],
-		248=>['Bruce',		'Bruce Municipal Telephone System'],
-		252=>['Granite',	'Granite State Telephone'],
-	},
-	4=>{
-		  0=>['Skyline',	'Skyline Telephone Membership Corporation'],
-		  4=>['Skyline',	'Skyline Telephone Membership Corporation'],
-		  8=>['Skyline',	'Skyline Telephone Membership Corporation'],
-		 12=>['Skyline',	'Skyline Telephone Membership Corporation'],
-		 16=>['Community',	'Community Service Telephone Company'],
-		 20=>['Community',	'Community Service Telephone Company'],
-	         24=>['Headwaters',	'Headwaters Telephone Company'],
-		 28=>['W Tennessee',	'West Tennessee Telephone Company'],
-		 32=>['Peoples',	'Peoples Mutual Telephone Company'],
-		 36=>['Crockett',	'Crockett Telephone Company'],
-		 40=>['Bay Springs',	'Bay Springs Telephone Company, Inc.'],
-		 44=>['Ellerbe',	'Ellerbe Telephone Company'],
-		 48=>['Pineville',	'Pineville Telephone Company'],
-		 52=>['Randolph',	'Randolph Telephone Company'],
-		 56=>['Lomand',		'Ben Lomand Rural Telephone Cooperative, Inc.'],
-		 60=>['Lomand',		'Ben Lomand Rural Telephone Cooperative, Inc.'],
-		 64=>['Lomand',		'Ben Lomand Rural Telephone Cooperative, Inc.'],
-		 68=>['Lomand',		'Ben Lomand Rural Telephone Cooperative, Inc.'],
-		 72=>['Mountain',	'Mountain Rural Telephone'],
-		 76=>['Gila River',	'Gila River Telecommunications, Inc.'],
-		 80=>['Gila River',	'Gila River Telecommunications, Inc.'],
-		 84=>['Gila River',	'Gila River Telecommunications, Inc.'],
-		 88=>['NE Missouri',	'NE Missouri Rural Telephone Company'],
-		 92=>['Highland',	'Highland Telephone Company'],
-		 96=>['Highland',	'Highland Telephone Company'],
-		100=>['Highland',	'Highland Telephone Company'],
-		104=>['RTSC',		'Rural Telephone Service Company, Inc.'],
-		108=>['RTSC',		'Rural Telephone Service Company, Inc.'],
-		112=>['Peoples',	'Peoples Rural Telephone Cooperative Corporation'],
-		116=>['EDS',		'EDS Personal Communicaitons Corporation'],
-		120=>['EDS',		'EDS Personal Communicaitons Corporation'],
-		124=>['West Side',	'West Side Telephone'],
-		128=>['Citizens',	'Citizens Telephone Cooperative, Inc.'],
-		132=>['W Carolina',	'West Carolina Rural Telephone Cooperative, Inc.'],
-		136=>['W Carolina',	'West Carolina Rural Telephone Cooperative, Inc.'],
-		140=>['Twin Valley',	'Twin Valley Telephone, Inc.'],
-		144=>['Twin Valley',	'Twin Valley Telephone, Inc.'],
-		#148=>['SPARE',		'SPARE - UNASSIGNED'],
-		#152=>['SPARE',		'SPARE - UNASSIGNED'],
-		156=>['Teleport',	'Teleport Valley Telephone, Inc.'],
-		160=>['Teleport',	'Teleport Valley Telephone, Inc.'],
-		164=>['Teleport',	'Teleport Valley Telephone, Inc.'],
-		168=>['Teleport',	'Teleport Valley Telephone, Inc.'],
-		172=>['Atlas',		'Atlas Telephone Company'],
-		176=>['Atlas',		'Atlas Telephone Company'],
-	        180=>['Hickory',	'Hickory Telephone Company'],
-	        184=>['Spavinaw',	'Salina Spavinaw Telephone Company, Inc.'],
-	        188=>['Spavinaw',	'Salina Spavinaw Telephone Company, Inc.'],
-	        192=>['La Ward',	'La Ward Telephone Exchange, Inc.'],
-	        196=>['Rib Lake',	'Rib Lake Telephone Company'],
-		200=>['Citizens',	'Citizens Telephone Company of Kecksburg'],
-		204=>['Kingdom',	'Kingdom Telephone Company'],
-		208=>['Kingdom',	'Kingdom Telephone Company'],
-		212=>['Kingdom',	'Kingdom Telephone Company'],
-		216=>['Kingdom',	'Kingdom Telephone Company'],
-		220=>['Carnegie',	'Carnegie Telephone Company'],
-		224=>['Ace',		'Ace Telephone Company of Michigan, Inc.'],
-		228=>['Ace',		'Ace Telephone Company of Michigan, Inc.'],
-		232=>['Hurontario',	'Hurontario Telephone Ltd.'],
-		236=>['N Norwich',	'North Norwich Telephones Ltd.'],
-		240=>['Durham',		'Durham Telephones Ltd.'],
-		244=>['Vadacom',	'Vadacom'],
-		248=>['Vadacom',	'Vadacom'],
-		252=>['Gosfiled',	'Gosfiled North Municipal Telephone Ssytem'],
-	},
-	5=>{
-		  0=>['NE Missouri',	'NE Missouri Rural Telephone Company'],
-		  4=>['NE Missouri',	'NE Missouri Rural Telephone Company'],
-		  8=>['NE Missouri',	'NE Missouri Rural Telephone Company'],
-		 12=>['Corporate',	'Corporate Telemanagement Group'],
-		 16=>['Corporate',	'Corporate Telemanagement Group'],
-		 20=>['Mustang',	'Mustang Telecom, Inc.'],
-		 24=>['Mustang',	'Mustang Telecom, Inc.'],
-		 28=>['Mustang',	'Mustang Telecom, Inc.'],
-		 32=>['Zenda',		'Zenda Telephone Company, Inc.'],
-		 36=>['San Marcos',	'San Marcos Telephone Company'],
-		 40=>['Pymatunning',	'Pymatunning Independent Telephone Company'],
-		 44=>['Pine',		'Pine Telephone Company'],
-		 48=>['Pine',		'Pine Telephone Company'],
-		 52=>['Ft Mojave',	'Fort Mojave Telecommunications, Inc.'],
-		 56=>['Ft Mojave',	'Fort Mojave Telecommunications, Inc.'],
-		 60=>['Oklahoma',	'Oklahoma Western Telephone Company'],
-		 64=>['Oklahoma',	'Oklahoma Western Telephone Company'],
-		 68=>['Oklahoma',	'Oklahoma Western Telephone Company'],
-		 72=>['Oklahoma',	'Oklahoma Western Telephone Company'],
-		 76=>['Hinton',		'Hinton Telephone Company'],
-		 80=>['Hinton',		'Hinton Telephone Company'],
-		 84=>['Hinton',		'Hinton Telephone Company'],
-		 88=>['American',	'American Long Lines'],
-		 92=>['Vernon',		'Vernon Telephone Cooperative'],
-		 96=>['W Wisconsin',	'West Wisconsin Telecommunications Cooperative, Inc.'],
-		100=>['W Wisconsin',	'West Wisconsin Telecommunications Cooperative, Inc.'],
-		104=>['Northeast',	'Northeast Telephone Company'],
-		108=>['Coon Valley',	'Coon Valley Farmers Telephone Company'],
-		112=>['Coon Valley',	'Coon Valley Farmers Telephone Company'],
-		116=>['Cross',		'Cross Telephone'],
-		120=>['Cross',		'Cross Telephone'],
-		124=>['Cross',		'Cross Telephone'],
-		128=>['Cambridge',	'Cambridge Telephone Company'],
-		132=>['Peoples',	'Peoples Mutual Telephone Company'],
-		136=>['Craw-Kan',	'Craw-Kan Telephone Cooperative, Inc.'],
-		140=>['Craw-Kan',	'Craw-Kan Telephone Cooperative, Inc.'],
-		144=>['Craw-Kan',	'Craw-Kan Telephone Cooperative, Inc.'],
-		148=>['Monon',		'Monon Telephone Company, Inc.'],
-		152=>['Muenster',	'Muenster Telephone Corporation of Texas'],
-		156=>['Blue Valley',	'Blue Valley Telephone Company'],
-		160=>['Moundridge',	'Moundridge Telephone Company'],
-		164=>['Vaughnsville',	'Vaughnsville Telephone Company, Inc.'],
-		168=>['Kalida',		'Kalida Telephone Company, Inc.'],
-		172=>['Grand',		'Grand Telephone Company, Inc.'],
-		176=>['Scott-Rice',	'Scott-Rice Telephone Company, Inc.'],
-		180=>['Tri-County',	'Tri-County Telephone Association, Inc.'],
-		184=>['US Wats',	'US Wats'],
-		188=>['Richland-Grant',	'Richland-Grant Telephone Cooperative, Inc.'],
-		192=>['Richland-Grant',	'Richland-Grant Telephone Cooperative, Inc.'],
-		196=>['La Valle',	'La Valle Telephone Cooperative, Inc.'],
-		200=>['Arthur Mutual',	'The Arthur Mutual Telephone Company'],
-		204=>['Price County',	'Price County Telephone Company'],
-		208=>['Nova',		'The Nova Telephone Company'],
-		212=>['New Ulm',	'New Ulm Telecom, Inc.'],
-		216=>['Pottawatomic',	'Pottawatomic Telephone Company, Inc.'],
-		220=>['Pottawatomic',	'Pottawatomic Telephone Company, Inc.'],
-		224=>['Pottawatomic',	'Pottawatomic Telephone Company, Inc.'],
-		228=>['H&B',		'H&B Communications, Inc.'],
-		232=>['Milltown',	'Milltown Mutual Telephone Company'],
-		236=>['Wamego',		'Wamego Telephone Company, Inc.'],
-		240=>['Luck',		'Luck Telephone Company'],
-		244=>['Farmers Ind.',	'Farmers Independent Telephone Company'],
-		248=>['Mid-Iowa',	'Mid-Iowa Telephone Co-Op Association'],
-		252=>['Lewis River',	'Lewis River Telephone'],
-	},
-	6=>{
-		  0=>['Kin',		'Kin Network, Inc.'],
-		  4=>['Conneaut',	'Conneaut Telephone Company'],
-		  8=>['Madison',	'Madison Telephone Company, Inc.'],
-		 12=>['Hartman',	'Hartman Telephone Exchanges'],
-		 16=>['Rainbow',	'Rainbow Telephone Cooperative Associaiton, Inc.'],
-		 20=>['Golden Belt',	'Golden Belt Telephone Association, Inc.'],
-		 24=>['Middleburgh',	'Middleburgh Telephone Company'],
-		 28=>['Ganado',		'Ganado Telephone Company'],
-		 32=>['Coleman',	'Coleman County Telephone Cooperative, Inc.'],
-		 36=>['Comanche',	'Comanche County Telephone Company, Inc.'],
-		 40=>['Comanche',	'Comanche County Telephone Company, Inc.'],
-		 44=>['Lake Dallas',	'Lake Dallas Telephone Company'],
-		 48=>['Curtis',		'The Curtis Telephone Company'],
-		 52=>['Gridley',	'Gridley Telephone Company'],
-		 56=>['SP Telecom',	'SP Telecom'],
-		 60=>['Guadalupe',	'Guadalupe Valley Telephone Cooperative'],
-		 64=>['Guadalupe',	'Guadalupe Valley Telephone Cooperative'],
-		 68=>['Guadalupe',	'Guadalupe Valley Telephone Cooperative'],
-		 72=>['Guadalupe',	'Guadalupe Valley Telephone Cooperative'],
-		 76=>['Twin Lakes',	'Twin Lakes Telephone Cooperative Corporation'],
-		 80=>['Twin Lakes',	'Twin Lakes Telephone Cooperative Corporation'],
-		 84=>['Twin Lakes',	'Twin Lakes Telephone Cooperative Corporation'],
-		 88=>['Twin Lakes',	'Twin Lakes Telephone Cooperative Corporation'],
-		 92=>['Stellars',	'Stellars Telecommunications Services'],
-		 96=>['Intercontinental',	'Intercontinental Communications Corp.'],
-		100=>['Intercontinental',	'Intercontinental Communications Corp.'],
-		104=>['Switch 2000',	'Switch 2000'],
-		108=>['Switch 2000',	'Switch 2000'],
-		112=>['Colorado',	'Colorado Valley Telephone Cooperative'],
-		116=>['Colorado',	'Colorado Valley Telephone Cooperative'],
-		120=>['Hooper',		'Hooper Telephone Company'],
-		124=>['Ottoville',	'Ottoville Mutual Telephone Company'],
-		128=>['Keystone',	'Keystone-Arthur Telephone Company'],
-		132=>['S&W',		'S&W Telephone Company'],
-		136=>['Cochrane',	'Cochrane Cooperative Telephone Company'],
-		140=>['New Knoxville',	'The New Knoxville Telephone Company'],
-		144=>['Climax',		'Climax Telephone Company'],
-		148=>['Middle Point',	'Middle Point Home Telephone Company'],
-		152=>['E. Ritter',	'E. Ritter Telephone Company'],
-		156=>['Union',		'Union Telephone Company'],
-		160=>['Atlantic',	'Atlantic Telephone Membership Corporation'],
-		164=>['Ayersville',	'Ayersville Telephone Company'],
-		168=>['Arkansas',	'Arkansas Telephone Company, Inc.'],
-		172=>['Daviess-Martin',	'Daviess-Martin County Rurual Telephone Corporation'],
-		176=>['Granite State',	'Granite State Telephone'],
-		180=>['Totah',		'Totah Telephone Company'],
-		184=>['Totah',		'Totah Telephone Company'],
-		188=>['Totah',		'Totah Telephone Company'],
-		192=>['Villisca',	'Villisca Farmers Telephone Company'],
-		196=>['Standard',	'Standard Telephone Company'],
-		200=>['N Central',	'North Central Telephone Cooperative'],
-		204=>['N Central',	'North Central Telephone Cooperative'],
-		208=>['TMC',		'TMC of Lexington'],
-		212=>['Network',	'Network'],
-		216=>['McClure',	'The McClure Telephone Company'],
-		220=>['Yukon-Waltz',	'Yukon-Waltz Telephone COmpany'],
-		224=>['Fonorola',	'Fonorola'],
-		228=>['Glasford',	'Glasford Telephone Company'],
-		232=>['Benton',		'Benton Cooperative Telephone Company'],
-		236=>['Union Springs',	'Union Springs Telephone Company'],
-		240=>['Ft Jennings',	'Fort Jennings Telephone Company'],
-		244=>['Farmers',	'Farmers Mutual Telephone Company'],
-		248=>['Pattersonville',	'Pattersonville Telephone Company'],
-		252=>['ITG',		'International Telemanagement Group'],
-	},
-	7=>{
-		  0=>['Pacific G/W',	'Pacific Gateway Exchange'],
-		  4=>['Pacific G/W',	'Pacific Gateway Exchange'],
-		  8=>['Electric L/W',	'Electrict Ligthwave'],
-		 12=>['Allendale',	'Allendale Telephone Company'],
-		 16=>['Decatur',	'Decatur Telephone Company, Inc.'],
-		 20=>['Bell',		'Bell Mobility Cellular'],
-		 24=>['Five Star',	'Five Star Telecom'],
-		 28=>['TTI',		'TTI Telecommunications'],
-		 32=>['Graceba',	'Graceba Total Communications, Inc.'],
-		 36=>['SW Arkansas',	'Southwest Arkansas Telephone Cooperative'],
-		 40=>['SW Arkansas',	'Southwest Arkansas Telephone Cooperative'],
-		 44=>['Ogden',		'Ogden Telephone Company'],
-		 48=>['Township',	'Township Telephone Company'],
-		 52=>['Bloutsville',	'Bloutsville Telephone Company'],
-		 56=>['Coastal',	'Coastal Telephone Company'],
-		 60=>['Armstrong',	'Armstrong Telephone Company'],
-		 64=>['Armstrong',	'Armstrong Telephone Company'],
-		 68=>['Delta',		'Delta Telephone Company, Inc.'],
-		 72=>['Franklin',	'Franklin Telephone Company, Inc.'],
-		 76=>['Ridgeville',	'Ridgeville Telephone Company'],
-		 80=>['Community',	'Community Telephone'],
-		 84=>['St. Joseph',	'St. Joseph Telephone and Telegraph Company'],
-		 88=>['St. Joseph',	'St. Joseph Telephone and Telegraph Company'],
-		 92=>['St. Joseph',	'St. Joseph Telephone and Telegraph Company'],
-		 96=>['Peoples',	'Peoples Mutual Telephone Company'],
-		100=>['Cameron',	'Cameron Telephone Company'],
-		104=>['Action',		'Action Telephone Company'],
-		108=>['TCC',		'TCC Communications'],
-		112=>['Smithville',	'Smithville Telephone Company, Inc.'],
-		116=>['Oneida',		'Oneida County Rural Telephone Company'],
-		120=>['Emily',		'Emily Cooperative Telephone Company'],
-		124=>['Beehive',	'Beehive Telephone Company, Inc.'],
-		128=>['Custer',		'CUster Telephone Cooperative, Inc.'],
-		132=>['MGW',		'MGW Telephone'],
-		136=>['Call America',	'Call America'],
-		140=>['Blanchard',	'Blanchard Telephone Assocation, Inc.'],
-		144=>['Tonica',		'Tonica Telephone Company'],
-		148=>['Pine Belt',	'Pine Belt Telephone Company, Inc.'],
-		152=>['Rockland',	'Rockland Telephone Company, Inc.'],
-		156=>['Sogetel',	'Sogetel, Inc.'],
-		160=>['Hamilton',	'Hamilton County Telephone Cooperative'],
-		164=>['Fleet Call',	'Fleet Call'],
-		168=>['New Lisbon',	'New Lisbon Telephone Company'],
-		172=>['W River',	'West River Telephone Cooperative'],
-		176=>['W River',	'West River Telephone Cooperative'],
-		180=>['Nebraska',	'Nebraska Central Telephone Company'],
-		184=>['Coastal',	'Coastal Utilities, Inc.'],
-		188=>['Diller',		'Diller Telephone Company'],
-		192=>['HunTel',		'HunTel Systems'],
-		196=>['Progressive',	'Progressive Rural Telephone Cooperative, Inc.'],
-		200=>['Delta',		'Delta Telephone Company, Inc.'],
-		204=>['K&M',		'K&M Telephone Company, Inc.'],
-		208=>['Wash. City',	'Washington City Rural Telephone Cooperative, Inc.'],
-		212=>['Hanson',		'Hanson Communications'],
-		216=>['Hanson',		'Hanson Communications'],
-		220=>['Leaf River',	'Leaf River Telephone Company'],
-		224=>['New Windsor',	'New Windsor Telephone Company'],
-		228=>['Lakefield',	'Lakefield Telephone Company'],
-		232=>['Hart',		'Hart Telephone Company'],
-		236=>['Margaretville',	'Margaretville Telephone Company, Inc.'],
-		240=>['Warwick Valley',	'Warwick Valley Telephone Company'],
-		244=>['Cherokee',	'Cherokee Telephone Company'],
-		248=>['Cherokee',	'Cherokee Telephone Company'],
-		252=>['Cherokee',	'Cherokee Telephone Company'],
-	},
-	8=>{
-		  0=>['Cherokee',	'Cherokee Telephone Company'],
-		  4=>['Deerfield',	'Deerfield Farmers\' Telephone Company'],
-		  8=>['Suntel',		'Suntel Network'],
-		 12=>['Mid-Century',	'Mid-Century Telephone Company'],
-		 16=>['Madison',	'Madison Telephone Company'],
-		 20=>['Amnex',		'Amnex Network'],
-		 24=>['Amnex',		'Amnex Network'],
-		 28=>['ConQuest',	'ConQuest'],
-		 32=>['Thunder Bay',	'Thunder Bay Telephone'],
-		 36=>['Viola',		'Viola Telephone Company'],
-		 40=>['Reynolds',	'Reynolds Telephone Company'],
-		 44=>['Yeoman',		'Yeoman Telephone Company'],
-		 48=>['Harrisonville',	'Harrisonville Telephone Company'],
-		 52=>['Craigville',	'Craigville Telephone Company Inc.'],
-		 56=>['Clarence',	'Clarence Telephone Company'],
-		 60=>['NIU',		'Northern Illinois University'],
-		 64=>['One call',	'One call Communications, Inc.'],
-		 68=>['One call',	'One call Communications, Inc.'],
-		 72=>['Churchill',	'Churchill City Telephone & Telegraph System'],
-		 76=>['Chippewa',	'Chippewa City Telephone Company'],
-		 80=>['Roberts',	'Roberts City Telephone Cooperative Association'],
-		 84=>['Bretton',	'Bretton Woods Telephone Company'],
-		 88=>['Eastern',	'Eastern Telecom Corporation'],
-		 92=>['Northwest',	'Northwest Telephone Company'],
-		 96=>['Northwest',	'Northwest Telephone Company'],
-		100=>['ICON',		'ICON'],
-		104=>['Bittel',		'Bittel Telecommunications Corporation'],
-		108=>['Bittel',		'Bittel Telecommunications Corporation'],
-		112=>['TeleSystems',	'Communications TeleSystems International'],
-		116=>['Thacker',	'Thacker-Grigsby Telephone Company, Inc.'],
-		120=>['Thrifty',	'Thrifty Telephone, Inc.'],
-		124=>['Telco',		'Telco Communications, Inc.'],
-		128=>['ASC',		'Applied Signal Corporation'],
-		132=>['Wilton',		'Wilton Telephone Company'],
-		136=>['ANS',		'Alternative Network Services'],
-		140=>['ANS',		'Alternative Network Services'],
-		144=>['Telstar',	'Telstar Communications, Inc.'],
-		148=>['Telstar',	'Telstar Communications, Inc.'],
-		152=>['ITC',		'ITC Companies'],
-		154=>['ITC',		'ITC Companies'],
-		160=>['UNICOM',		'United Communications (UNICOM)'],
-		164=>['BNI',		'BNI Telecommunications'],
-		168=>['Wabash',		'Wabash Telephone Company'],
-		172=>['Flat Rock',	'Flat Rock Telephone Company'],
-		176=>['Woodhull',	'Woodhull Telephone Company'],
-		180=>['BellSouth',	'BellSouth Mobility'],
-		184=>['BellSouth',	'BellSouth Mobility'],
-		188=>['BellSouth',	'BellSouth Mobility'],
-		192=>['BellSouth',	'BellSouth Mobility'],
-		196=>['Hi-Rim',		'Hi-Rim Communications'],
-		200=>['Hi-Rim',		'Hi-Rim Communications'],
-		204=>['Prarie Grove',	'Prarie Grove Telephone Company'],
-		208=>['Prarie Grove',	'Prarie Grove Telephone Company'],
-		212=>['Dakota',		'Dakota Cooperative Telecommunications, Inc.'],
-		216=>['Dakota',		'Dakota Cooperative Telecommunications, Inc.'],
-		220=>['Dakota',		'Dakota Cooperative Telecommunications, Inc.'],
-		224=>['Dakota',		'Dakota Cooperative Telecommunications, Inc.'],
-		228=>['Mebtel',		'Mebtel Communications'],
-		232=>['Glandorf',	'Glandorf Telephone Company, Inc.'],
-		236=>['Waldron',	'Waldron Telephone Company'],
-		240=>['Indiantown',	'Indiantown Telephone System, Inc.'],
-		244=>['Big Bend',	'Big Bend Telephone'],
-		248=>['Fibertech',	'Fibertech Telecom, Inc.'],
-		252=>['Fibertech',	'Fibertech Telecom, Inc.'],
-	},
-	9=>{
-		  0=>['Fibertech',	'Fibertech Telecom, Inc.'],
-		  4=>['Dial US',	'Dial US'],
-		  8=>['Piedmont',	'Piedmont Telephone Membership Corporation'],
-		 12=>['MRC',		'MRC Telecommunications, Inc.'],
-		 16=>['Telco',		'Telco Communications Group'],
-		 20=>['Telco',		'Telco Communications Group'],
-		 24=>['Granby',		'Granby Telephone and Telegraph Company'],
-		 28=>['STSJ',		'STSJ Telephone Company'],
-		 32=>['Big Sandy',	'Big Sandy Telecom'],
-		 36=>['State',		'State Telephone Company'],
-		 40=>['Ringgold',	'Ringgold Telephone Company'],
-		 44=>['InterAmerican',	'InterAmerican Telephone Company'],
-		 48=>['Union River',	'Union River Telephone Company'],
-		 52=>['Flex',		'Flex Communications'],
-		 56=>['Sand Creek',	'Sand Creek Telephone Company'],
-		 60=>['TotalNet',	'TotalNet Communications, Inc.'],
-		 64=>['BEK',		'BEK Communications Cooperative'],
-		 68=>['Dakota',		'Dakota Central Telecommunication Cooperative'],
-		 72=>['Teleport',	'Teleport Communications Group'],
-		 76=>['Teleport',	'Teleport Communications Group'],
-		 80=>['Teleport',	'Teleport Communications Group'],
-		 84=>['Teleport',	'Teleport Communications Group'],
-		 88=>['Teleport',	'Teleport Communications Group'],
-		 92=>['Huntel',		'Huntel Systems, Inc.'],
-		 96=>['TRI',		'TRI Touch America'],
-		100=>['TRI',		'TRI Touch America'],
-		104=>['star',		'star Telephone Membership Corporation'],
-		108=>['star',		'star Telephone Membership Corporation'],
-		112=>['star',		'star Telephone Membership Corporation'],
-		116=>['Indianhead',	'Indianhead Telephone Company'],
-		120=>['Polar',		'Polar Communications Mutual Aid Corporation'],
-		124=>['Multimedia',	'Multimedia Telephone Service'],
-		128=>['Multimedia',	'Multimedia Telephone Service'],
-		#132=>['SPARE',		'SPARE - UNASSIGNED'],
-		136=>['TWT',		'Total World Telecom'],
-		140=>['TWT',		'Total World Telecom'],
-		144=>['TWT',		'Total World Telecom'],
-		148=>['TWT',		'Total World Telecom'],
-		152=>['ATCI',		'ATCI Inc.'],
-		156=>['ATCI',		'Econo Call/ATCI (USA)'],
-		160=>['ATCI',		'Econo Call/ATCI (USA)'],
-		164=>['Ardmore',	'Ardmore Telephone Company, Inc.'],
-		168=>['Niagra',		'Niagra Telephone Company'],
-		172=>['Mabel',		'Mabel Cooperative Telephone Company'],
-		176=>['Fox',		'Fox Communications Corporation'],
-		180=>['Spring Grove',	'Spring Grove Cooperative Telephone'],
-		184=>['Ogden',		'Ogden Telephone Company'],
-		188=>['Souris River',	'Souris River Telecommunications Cooperative'],
-		192=>['Medicine Park',	'Medicine Park Telephone Company'],
-		196=>['Yelcot',		'Yelcot Telephone Company'],
-		200=>['Sunman',		'Sunman Telephone'],
-		204=>['Home',		'Home Telephone Company'],
-		208=>['Southeast',	'Southeast Telephone of WI, Inc.'],
-		212=>['Springport',	'Springport Telephone Company'],
-		216=>['Valley',		'Valley Telephone Cooperative, Inc.'],
-		220=>['CGN',		'Communications Gateway Network, Inc.'],
-		224=>['CGN',		'Communications Gateway Network, Inc.'],
-		228=>['CGN',		'Communications Gateway Network, Inc.'],
-		232=>['Vista',		'Vista Telephone'],
-		236=>['Clay County',	'Clay County Rural Telephone Cooperative, Inc.'],
-		#240=>['SPARE',		'SPARE - UNASSIGNED'],
-		244=>['McDonough',	'McDonoughClay Telephone Company'],
-		248=>['Oneida',		'Oneida Telephone Company'],
-		252=>['LaHarpe',	'LaHarpe Telephone Company'],
-	},
-	10=>{
-		  0=>['Great Plains',	'Great Plains Communications'],
-		  4=>['Great Plains',	'Great Plains Communications'],
-		  8=>['Great Plains',	'Great Plains Communications'],
-		 12=>['Great Plains',	'Great Plains Communications'],
-		 16=>['Great Plains',	'Great Plains Communications'],
-		 20=>['Great Plains',	'Great Plains Communications'],
-		 24=>['Great Plains',	'Great Plains Communications'],
-		 28=>['Northland',	'Northland Telephone'],
-		 32=>['Brooke',		'Brooke Municipal Telephone System'],
-		 36=>['LCT',		'LCT Long Distance'],
-		 40=>['Cablevision',	'Cablevision'],
-		 44=>['Oxford City',	'Oxford City Telephone and Telegraph Company'],
-		 48=>['Oxford City',	'Oxford City Telephone and Telegraph Company'],
-		 52=>['Oxford City',	'Oxford City Telephone and Telegraph Company'],
-		 56=>['Logan',		'Logan Telephone Cooperative, Inc.'],
-		 60=>['Logan',		'Logan Telephone Cooperative, Inc.'],
-		 64=>['Ex. TeleCard',	'Executive TeleCard International'],
-		 68=>['Farmers',	'Farmers Telephone'],
-		 72=>['S C Utah',	'South Central Utah Telephone Association'],
-		 76=>['Griggs City',	'Griggs City Telephone Company'],
-		 80=>['Teltrust',	'Teltrust'],
-		 84=>['Teltrust',	'Teltrust'],
-		 88=>['Western',	'Western Telephone Company'],
-		 92=>['Tidewater',	'Tidewater Telecom'],
-		 96=>['Glens Falls',	'Glens Falls Communications Corporation'],
-		100=>['Pac-West',	'Pac-West Telecomm, Inc. dba AmeriCall'],
-		#104=>['SPARE',		'SPARE - UNASSIGNED'],
-		#108=>['SPARE',		'SPARE - UNASSIGNED'],
-		112=>['Clay County',	'Clay County Rural Telephone Cooperative, Inc.'],
-		116=>['Clay County',	'Clay County Rural Telephone Cooperative, Inc.'],
-		120=>['CCI',		'Communication Consultants, Inc.'],
-		124=>['Mornington',	'Mornington Municipal Telephone System'],
-		128=>['Blanchard',	'Blanchard Municipal Telephone System'],
-		132=>['Citizens',	'Citizens Telephone'],
-		136=>['Siren',		'Siren Telephone Company, Inc.'],
-		140=>['Time Warner',	'Time Warner Communications'],
-		144=>['Time Warner',	'Time Warner Communications'],
-		148=>['Minkfort',	'Minkfort Intelligent Network'],
-		152=>['Surry',		'Surry Telephone Membership Corporation'],
-		156=>['Surry',		'Surry Telephone Membership Corporation'],
-		160=>['Wes-Tex',	'Wes-Tex Telephone Cooperative, Inc.'],
-		164=>['Cytel',		'Cypress Telecommunications, Inc./Cytel'],
-		168=>['Cytel',		'Cypress Telecommunications, Inc./Cytel'],
-		172=>['Cytel',		'Cypress Telecommunications, Inc./Cytel'],
-		176=>['LaJiacarita',	'LaJiacarita Rural Telephone Coop'],
-		180=>['Rye',		'Rye Telephone Company'],
-		184=>['Alma',		'Alma Telephone Company'],
-		188=>['Cal-North',	'Cal-North Cellular'],
-		192=>['Five Area',	'Five Area Telephone Cooperative, Inc.'],
-		196=>['Eastex',		'Eastex Telephone Cooperative, Inc.'],
-		200=>['Wood',		'Wood County Telephone Company'],
-		204=>['Warwick',	'La Compagnie de Tel. de Warwick'],
-		208=>['Amtelecom',	'Amtelecom, Inc.'],
-		212=>['Granby',		'Granby Telephone Company'],
-		216=>['CellularONE',	'CellularONE'],
-		220=>['Thrifty',	'Thrifty Telephone, Inc.'],
-		224=>['Kaplan',		'Kaplan Telephone Company'],
-		228=>['SW Texas',	'Southwest Texas Telephone Company'],
-		232=>['Shawnee',	'Shawnee Telephone Company'],
-		236=>['S Canaan',	'South Canaan Telephone Company'],
-		240=>['ATG',		'American Telephone Group'],
-		244=>['Bruce',		'Bruce Municipal Telephone System'],
-		248=>['MTC',		'MTC Telemanagement'],
-		252=>['MTC',		'MTC Telemanagement'],
-	},
-	11=>{
-		  0=>['Winn',		'Winn Telephone Company'],
-		  4=>['Orwell',		'Orwell Telephone Company'],
-		  8=>['CellularOne',	'CellularOne (Puerto Rico)'],
-		#12=>['SPARE',		'SPARE - UNASSIGNED'],
-		#16=>['SPARE',		'SPARE - UNASSIGNED'],
-		 20=>['Econophone',	'Econophone, Inc.'],
-		 24=>['Econophone',	'Econophone, Inc.'],
-		 28=>['Econophone',	'Econophone, Inc.'],
-		 32=>['SE IN',		'Southeastern IN Rural Telephone Cooperative Inc.'],
-		 36=>['Leaco',		'Leaco Rural Telephone Cooperative, Inc.'],
-		 40=>['Mt. Horeb',	'Mt. Horeb Telephone Company'],
-		 44=>['Otelco',		'Otelco'],
-		 48=>['CallAmerica',	'CallAmerica'],
-		 52=>['CallAmerica',	'CallAmerica'],
-		 56=>['Alhambra',	'Alhambra-Grantfork Telephone Company'],
-		 60=>['Grafton',	'Grafton Telephone Company'],
-		 64=>['Home',		'Home Telephone Company'],
-		 68=>['McDonald',	'McDonald Telephone Company'],
-		 72=>['McLeod',		'McLeod Network Services'],
-		 76=>['Westphalia',	'Westphalia Telephone Company'],
-		 80=>['Amherst',	'Amherst Telephone Company'],
-		 84=>['Carr',		'Carr Telephone'],
-		 88=>['Carr',		'Carr Telephone'],
-		 92=>['Cyberlink',	'Cyberlink'],
-		 96=>['Pine Drive',	'Pine Drive Telephone Company'],
-		100=>['Hyperion',	'Hyperion Telecommunications, Inc.'],
-		104=>['Hyperion',	'Hyperion Telecommunications, Inc.'],
-		108=>['Brantely',	'Brantely Telephone Company'],
-		112=>['TelRoute',	'TelRoute Communications, Inc.'],
-		116=>['TelRoute',	'TelRoute Communications, Inc.'],
-		120=>['Star',		'Star Telephone'],
-		124=>['Star',		'Star Telephone'],
-		128=>['Star',		'Star Telephone'],
-		132=>['SCN',		'South Carolina Net, Inc.'],
-		136=>['Armour',		'Armour Independent Telephone Company'],
-		140=>['Union',		'Union Telephone Company'],
-		144=>['Baldwin',	'Baldwin Telecom, Inc.'],
-		148=>['Cass County',	'Cass County Telephone Company'],
-		152=>['C-R',		'C-R Telephone Company'],
-		156=>['E TeleLogic',	'Eastern TeleLogic Corporation'],
-		160=>['Tri-County',	'Tri-County Telephone Cooperative'],
-		164=>['Citizens',	'Citizens Telephone Company'],
-		168=>['Marquette',	'Marquette Adams Telephone Cooperative'],
-		172=>['St. Liboire',	'Le Tel de St. Liboire'],
-		176=>['Austin Bestline','Austin Bestline'],
-		180=>['N Dakota',	'North Dakota Telephone Company'],
-		184=>['TSC',		'Telecommunications Service Center, Inc. (TSC)'],
-		188=>['TSC',		'Telecommunications Service Center, Inc. (TSC)'],
-		192=>['Elec. Lightwave','Electric Lightwave, Inc.'],
-		196=>['Elec. Lightwave','Electric Lightwave, Inc.'],
-		#200=>['SPARE',		'SPARE - UNASSIGNED'],
-		204=>['Lansdowne',	'Lansdowne Rural Telephone Company Ltd.'],
-		208=>['PTCF',		'People\'s Telephone Company of Forest Ltd.'],
-		212=>['Home',		'Home Telephone Company, Inc.'],
-		216=>['Commnet',	'Commnet Cellular'],
-		220=>['Commnet',	'Commnet Cellular'],
-		224=>['Commnet',	'Commnet Cellular'],
-		228=>['ISI',		'ISI Telecommunications'],
-		232=>['Pulaski',	'Pulaski-White Telephone Company'],
-		236=>['OFMTC',		'Oregon Farmers Mutual Telephone Company'],
-		240=>['Mulberry',	'Mulberry Cooperativef Telephone Company'],
-		244=>['ITC',		'International Telecomm. Corporation'],
-		248=>['Mountaineer',	'Mountaineer Long Distance, Inc.'],
-		252=>['Champaign',	'Champaign Telephone Company'],
-	},
-	12=>{
-	},
-	13=>{
-	},
-	14=>{
-	},
-	15=>{
-	},
-	16=>{
-	},
-	17=>{
-	},
-	18=>{
-	},
-	19=>{
-	},
-	20=>{
-	},
-	21=>{
-	},
-	22=>{
-	},
-	23=>{
-	},
-	24=>{
-	},
-	25=>{
-	},
-	26=>{
-	},
+#		Table B3/T1.111.8 -  List of Signalling Point Code Blocks 
+#		Signalling Point Code Block
+		1=>{
+			  0=>['Cleartel',	'Cleartel Communications'],
+			  4=>['Business',	'Business Telecom'],
+			  8=>['WorldCom',	'WorldCom'],
+			 12=>['National',	'National Telephone'],
+#			 16=>['SPARE',		'SPARE - UNASSIGNED (was Vyvx Telephone)'],
+			 20=>['Nat\'l Austin',	'National Telecommunications of Austin'],
+			 24=>['WorldCom',	'WorldCom'],
+			 28=>['SIS',		'Southern Interexchange Services, Inc.'],
+			 32=>['NTS',		'NTS Communications'],
+			 36=>['Digital Ntwk',	'Digital Network, Inc.'],
+			 40=>['ATX',		'ATX Telecommunications Services'],
+#			 44=>['SPARE',		'SPARE - UNASSIGNED (was Vyvx Telephone)'],
+			 48=>['NNC',		'National Network Corporation'],
+			 52=>['Startel',	'Startel'],
+			 56=>['TMC',		'TMC of San Diego'],
+#			 60=>['SPARE',		'SPARE - UNASSIGNED (was First Phone)'],
+			 64=>['CNI',		'CNI'],
+#			 68=>['SPARE',		'SPARE - UNASSIGNED (was WorldCom)'],
+			 72=>['Wilkes',		'Wilkes Telephone & Electric Company'],
+			 76=>['Sandhill',	'Sandhill Telephone Coop'],
+			 80=>['Chester',	'Chester Telephone Company'],
+			 84=>['St. Joseph',	'St. Joseph Telephone Company'],
+			 88=>['Interstate',	'Interstate Telephone Company'],
+			 92=>['Vista-United',	'Vista-United Telcom'],
+			 96=>['Brandenburg',	'Brandenburg Telephone Company'],
+#			100=>['SPARE',		'SPARE - UNASSIGNED (was FirstPhone)'],
+			104=>['Chesnee',	'Chesnee Telephone Company'],
+			108=>['Access',		'Access Long Distance'],
+			112=>['La Fourche',	'La Fourche Telephone Company'],
+			116=>['Evans',		'Evans Telephone Company'],
+			120=>['JBN',		'JBN Telephone Company, Inc.'],
+			124=>['Iowa',		'Iowa Communications Network'],
+			128=>['Roanoke',	'Roanoke Telephone Company'],
+			132=>['IEX',		'IEX\'s Corporation'],
+			136=>['Telefonica',	'Telefonica Larga Distancia'],
+			140=>['Nat\'l AL',	'National Telephone of Alabama'],
+			144=>['Sears',		'Sears Technology Services'],
+			148=>['PHone One',	'Phone One'],
+			152=>['Orwell',		'Orwell Telephone Company'],
+			156=>['Call-Net',	'Call-Net Telecom, Ltd.'],
+			160=>['Fort Bend',	'Fort Bend Telephone Company'],
+			164=>['Capital',	'Capital Network Systems, Inc.'],
+			168=>['Northwestel',	'Northwestel, Inc.'],
+			172=>['Northwestel',	'Northwestel, Inc.'],
+			176=>['Gulf',		'Gulf Telephone Company'],
+			180=>['Florala',	'Florala Telephone Company'],
+			184=>['Marianna',	'Marianna and Scenery Hill Telephone Company'],
+			188=>['Panhandle',	'Panhandle Telephone Cooperative'],
+			192=>['Panhandle',	'Panhandle Telephone Cooperative'],
+			196=>['Panhandle',	'Panhandle Telephone Cooperative'],
+			200=>['Peoples Mutual',	'Peoples Mutual Telephone Company'],
+			204=>['Bell Atlantic',	'Bell Atlantic Mobile Systems'],
+			208=>['Logan',		'Logan Telephone Cooperative'],
+			212=>['TresCom',	'TresCom U.S.A., Inc.'],
+			216=>['Rochester',	'Rochester Telephone Company'],
+			220=>['Ponderosa',	'Ponderosa Telephone Company'],
+			224=>['Ponderosa',	'Ponderosa Telephone Company'],
+			228=>['Ponderosa',	'Ponderosa Telephone Company'],
+			232=>['Ellijay',	'Ellijay Telephone Company'],
+			236=>['American',	'American Telephone Company, Inc.'],
+			240=>['Loretto',	'Loretto Telephone Company, Inc.'],
+			244=>['Millry',		'Millry Telephone Company, Inc.'],
+			248=>['NW Indiana',	'Northwestern Indiana Telephone Company'],
+			252=>['Pond Branch',	'Pond Branch Telephone Company, Inc.'],
+		},
+		2=>{
+			  0=>['Farmers',	'Farmers Telephone Cooperative (AL)'],
+			  4=>['Total-Tel',	'Total-Tel USA'],
+			  8=>['Farmers',	'Farmers Telephone Cooperative (SC)'],
+			 12=>['Farmers',	'Farmers Telephone Cooperative (SC)'],
+			 16=>['Farmers',	'Farmers Telephone Cooperative (SC)'],
+			 20=>['Farmers',	'Farmers Telephone Cooperative (SC)'],
+			 24=>['Bentleyville',	'Bentleyville Telephone Company'],
+			 28=>['Communique',	'Communique Telecomm.'],
+			 32=>['Santa Rosa',	'Santa Rosa Telephone Cooperative'],
+			 36=>['SW Oklahoma',	'Southwest Oklahoma Telephone Company'],
+			 40=>['SW Oklahoma',	'Southwest Oklahoma Telephone Company'],
+			 44=>['Piedmont R',	'Piedmont Rural Telephone Cooperative'],
+			 48=>['Piedmont R',	'Piedmont Rural Telephone Cooperative'],
+			 52=>['LDD',		'LDD, Inc.'],
+			 56=>['Saco River',	'Saco River Telephone & Telegraph Company'],
+			 60=>['Bruce',		'Bruce Telephone Company'],
+			 64=>['Bledsoe',	'Bledsoe Telephone Cooperative'],
+			 68=>['Bledsoe',	'Bledsoe Telephone Cooperative'],
+			 72=>['Foothills R',	'Foothills Rural Telephone Cooperative'],
+			 76=>['Germantown',	'Germantown Telephone Company, Inc.'],
+			 80=>['Elkhart',	'Elkhart Telephone Company'],
+			 84=>['Yell Cty',	'Yell County Telephone Company'],
+			 88=>['Yell Cty',	'Yell County Telephone Company'],
+			 92=>['CA-OR',		'California-Oregon Telephone Company'],
+			 96=>['Crown Point',	'Crown Point Telephone'],
+			100=>['Berkshire',	'Berkshire Telephone Corporation'],
+			104=>['Cobbosseecontee','Cobbosseecontee Telephone & Telegraph Company'],
+			108=>['Siskiyou',	'Siskiyou Telephone Company'],
+			112=>['Siskiyou',	'Siskiyou Telephone Company'],
+			116=>['Millry',		'Millry Telephone Company, Inc'],
+			120=>['Mountain R',	'Mountain Rural Telephone'],
+			124=>['Taconic',	'Taconic Telephone Corporation'],
+			128=>['Champlain',	'Champlain Telephone Company'],
+			132=>['Planters R',	'Planters Rural Telephone Cooperative, Inc.'],
+			136=>['Dekalb',		'Dekalb Telephone Cooperative'],
+			140=>['Citizens',	'Citizens Telephone Cooperative'],
+			144=>['Bulloch',	'Bulloch Telephone Cooperative, Inc.'],
+			148=>['NE Florida',	'Northeast Florida Telephone Company, Inc.'],
+			152=>['Camden',		'Camden Telephone and Telegraph Company'],
+			156=>['N Arkansas',	'Northern Arkansas Telephone Company'],
+			160=>['Access',		'Access Long Distance'],
+			164=>['Access',		'Access Long Distance'],
+			168=>['Access',		'Access Long Distance'],
+			172=>['Ballard R',	'Ballard Rural Telephone Cooperative'],
+			176=>['Hancock R',	'Hancock Rural Telephone Company'],
+			180=>['Madison Cty',	'Madison County Telephone Company'],
+			184=>['Valu-Line',	'Valu-Line Long Distance'],
+			188=>['Mountain View',	'Mountain View Telephone Company'],
+			192=>['Mountain View',	'Mountain View Telephone Company'],
+			196=>['Pine Tree',	'Pine Tree Telephone & Telegraph Company'],
+			200=>['McLoud',		'McLoud Telephone Company'],
+			204=>['Ardmore',	'Ardmore Telephone Company'],
+			208=>['Cimarron',	'Cimarron Telephone Company'],
+			212=>['Cimarron',	'Cimarron Telephone Company'],
+			216=>['Cimarron',	'Cimarron Telephone Company'],
+			220=>['Statesboro',	'Statesboro Telephone Company'],
+			224=>['Waitsfield',	'Waitsfield-Flayston Telephone Company'],
+			228=>['Mid-Plains',	'Mid-Plains Telephone Company, Inc.'],
+			232=>['Mid-Plains',	'Mid-Plains Telephone Company, Inc.'],
+			236=>['Columbus',	'Columbus Telephone Company'],
+			240=>['KanOkla',	'KanOkla Telephone Association, Inc.'],
+			244=>['KanOkla',	'KanOkla Telephone Association, Inc.'],
+			248=>['S Central',	'South Central Telephone Association, Inc.'],
+			252=>['S Central',	'South Central Telephone Association, Inc.'],
+		},
+		3=>{
+			  0=>['S Kansas',	'Southern Kansas Telephone Company'],
+			  4=>['S Kansas',	'Southern Kansas Telephone Company'],
+			  8=>['Dobson',		'Dobson Telephone Company'],
+			 12=>['Dobson',		'Dobson Telephone Company'],
+			 16=>['Dobson',		'Dobson Telephone Company'],
+			 20=>['Etex',		'Etex Telephone Cooperative, Inc.'],
+			 24=>['Etex',		'Etex Telephone Cooperative, Inc.'],
+			 28=>['Wheat State',	'Wheat State Telephone, Inc.'],
+			 32=>['Wheat State',	'Wheat State Telephone, Inc.'],
+			 36=>['Westel',		'Westel'],
+			 40=>['Westel',		'Westel'],
+			 44=>['Westel',		'Westel'],
+			 48=>['Smithville',	'Smithville Telephone'],
+			 52=>['Smithville',	'Smithville Telephone'],
+			 56=>['Smithville',	'Smithville Telephone'],
+			 60=>['Blackfoot',	'Blackfoot Telephone Cooperative, Inc.'],
+			 64=>['Blackfoot',	'Blackfoot Telephone Cooperative, Inc.'],
+			 68=>['Blackfoot',	'Blackfoot Telephone Cooperative, Inc.'],
+			 72=>['Amer Sharecom',	'American Sharecom'],
+			 76=>['Amer Sharecom',	'American Sharecom'],
+			 80=>['Amer Sharecom',	'American Sharecom'],
+			 84=>['P Spencer R',	'Perry Spencer Rural Telephone Cooperative'],
+			 88=>['Steelville',	'Steelville Telephone Exchange'],
+			 92=>['Chibardun',	'Chibardun Telephone Cooperative, Inc.'],
+			 96=>['Chibardun',	'Chibardun Telephone Cooperative, Inc.'],
+			100=>['S C Rural',	'South Central Rural Telephone Cooperative Corporation, Inc.'],
+			104=>['United',		'United Telephone Company, Inc.'],
+			108=>['Nat.TeleSvc',	'National TeleService'],
+			112=>['Execulines',	'Execulines of the Northwest, Inc.'],
+			116=>['Wilson',		'Wilson Telephone Company'],
+			120=>['Rochester',	'Rochester Telephone'],
+			124=>['Rochester',	'Rochester Telephone'],
+			128=>['Rochester',	'Rochester Telephone'],
+			132=>['Rochester',	'Rochester Telephone'],
+			136=>['Rochester',	'Rochester Telephone'],
+			140=>['Rochester',	'Rochester Telephone'],
+			144=>['Vernon',		'Vernon Telephone Cooperative'],
+			148=>['Vernon',		'Vernon Telephone Cooperative'],
+			152=>['Union',		'Union Telephone Company'],
+			156=>['Union',		'Union Telephone Company'],
+			160=>['Dunbarton',	'Dunbarton Telephone Company'],
+			164=>['Palmetto R',	'Palmetto Rural Telephone Cooperative, Inc.'],
+			168=>['Green Hills',	'Green Hills Telephone Corporation'],
+			172=>['Conestoga',	'Conestoga Telephone & Telegraph Company'],
+			176=>['Roanoke & B',	'Roanoke & Botetourt Telephone Company'],
+			180=>['C Oklahoma',	'Central Oklahoma Telephone Company'],
+			184=>['C Oklahoma',	'Central Oklahoma Telephone Company'],
+			188=>['Pierce',		'Pierce Telephone Company, Inc.'],
+			192=>['Mid-Missouri',	'Mid-Missouri Telephone Company'],
+			196=>['Mid-Missouri',	'Mid-Missouri Telephone Company'],
+			200=>['Mid-Missouri',	'Mid-Missouri Telephone Company'],
+			204=>['Mid-Missouri',	'Mid-Missouri Telephone Company'],
+			208=>['Chequamegon',	'Chequamegon Telephone'],
+			212=>['Chequamegon',	'Chequamegon Telephone'],
+			216=>['Chequamegon',	'Chequamegon Telephone'],
+			220=>['Fidelity',	'Fidelity Telephone Company'],
+			224=>['P Spencer R',	'Perry Spencer Rural Telephone Cooperative'],
+			228=>['Utelco',		'Utelco, Inc.'],
+			232=>['Ontario',	'Ontario Telephone Company, Inc.'],
+			236=>['Germantown',	'Germantown Independent Telephone'],
+			240=>['Kerman',		'Kerman Telephone Company'],
+			244=>['Hayneville',	'Hayneville Telephone Company, Inc.'],
+			248=>['Bruce Mun.',	'Bruce Municipal Telephone System'],
+			252=>['Granite State',	'Granite State Telephone'],
+		},
+		4=>{
+			  0=>['Skyline',	'Skyline Telephone Membership Corporation'],
+			  4=>['Skyline',	'Skyline Telephone Membership Corporation'],
+			  8=>['Skyline',	'Skyline Telephone Membership Corporation'],
+			 12=>['Skyline',	'Skyline Telephone Membership Corporation'],
+			 16=>['Community Svc.',	'Community Service Telephone Company'],
+			 20=>['Community Svc.',	'Community Service Telephone Company'],
+			 24=>['Headwaters',	'Headwaters Telephone Company'],
+			 28=>['W Tennessee',	'West Tennessee Telephone Company'],
+			 32=>['Peoples',	'Peoples Telephone Company, Inc.'],
+			 36=>['Crockett',	'Crockett Telephone Company'],
+			 40=>['Bay Springs',	'Bay Springs Telephone Company, Inc.'],
+			 44=>['Ellerbe',	'Ellerbe Telephone Company'],
+			 48=>['Pineville',	'Pineville Telephone Company'],
+			 52=>['Randolph',	'Randolph Telephone Company'],
+			 56=>['B Lomand R',	'Ben Lomand Rural Telephone Cooperative, Inc.'],
+			 60=>['B Lomand R',	'Ben Lomand Rural Telephone Cooperative, Inc.'],
+			 64=>['B Lomand R',	'Ben Lomand Rural Telephone Cooperative, Inc.'],
+			 68=>['B Lomand R',	'Ben Lomand Rural Telephone Cooperative, Inc.'],
+			 72=>['Mountain R',	'Mountain Rural Telephone'],
+			 76=>['Gila River',	'Gila River Telecommunications, Inc.'],
+			 80=>['Gila River',	'Gila River Telecommunications, Inc.'],
+			 84=>['Gila River',	'Gila River Telecommunications, Inc.'],
+			 88=>['NE Missouri R',	'Northeast Missouri Rural Telephone Company'],
+			 92=>['Highland',	'Highland Telephone Cooperative, Inc.'],
+			 96=>['Highland',	'Highland Telephone Cooperative, Inc.'],
+			100=>['Highland',	'Highland Telephone Cooperative, Inc.'],
+			104=>['RTSC',		'Rural Telephone Service Company, Inc.'],
+			108=>['RTSC',		'Rural Telephone Service Company, Inc.'],
+			112=>['Peoples R',	'Peoples Rural Telephone Cooperative Corporation'],
+			116=>['EDS Personal',	'EDS Personal Communications Corporation'],
+			120=>['EDS Personal',	'EDS Personal Communications Corporation'],
+			124=>['West Side',	'West Side Telephone'],
+			128=>['Citizens',	'Citizens Telephone Cooperative, Inc.'],
+			132=>['W Carolina R',	'West Carolina Rural Telephone Cooperative, Inc.'],
+			136=>['W Carolina R',	'West Carolina Rural Telephone Cooperative, Inc.'],
+			140=>['Twin Valley',	'Twin Valley Telephone, Inc.'],
+			144=>['Twin Valley',	'Twin Valley Telephone, Inc.'],
+#			148=>['SPARE',		'SPARE - UNASSIGNED'],
+#			152=>['SPARE',		'SPARE - UNASSIGNED'],
+			156=>['Teleport',	'Teleport Communications Group'],
+			160=>['Teleport',	'Teleport Communications Group'],
+			164=>['Teleport',	'Teleport Communications Group'],
+			168=>['Teleport',	'Teleport Communications Group'],
+			172=>['Atlas',		'Atlas Telephone Company'],
+			176=>['Atlas',		'Atlas Telephone Company'],
+			180=>['Hickory',	'Hickory Telephone Company'],
+			184=>['S Spavinaw',	'Salina Spavinaw Telephone Company, Inc.'],
+			188=>['S Spavinaw',	'Salina Spavinaw Telephone Company, Inc.'],
+			192=>['La Ward',	'La Ward Telephone Exchange, Inc.'],
+			196=>['Rib Lake',	'Rib Lake Telephone Company'],
+			200=>['Citizens',	'Citizens Telephone Company of Kecksburg'],
+			204=>['Kingdom',	'Kingdom Telephone Company'],
+			208=>['Kingdom',	'Kingdom Telephone Company'],
+			212=>['Kingdom',	'Kingdom Telephone Company'],
+			216=>['Kingdom',	'Kingdom Telephone Company'],
+			220=>['Carnegie',		'Carnegie Telephone Company'],
+			224=>['Ace',		'Ace Telephone Company of Michigan, Inc.'],
+			228=>['Ace',		'Ace Telephone Company of Michigan, Inc.'],
+			232=>['Hurontario',	'Hurontario Telephones Ltd.'],
+			236=>['N Norwich',	'North Norwich Telephones Ltd.'],
+			240=>['Durham',		'Durham Telephones Ltd.'],
+			244=>['Vadacom',	'Vadacom'],
+			248=>['Vadacom',	'Vadacom'],
+			252=>['Gosfield',	'Gosfield North Municipal Telephone System'],
+		},
+		5=>{
+			  0=>['NE Missouri',	'Northeast Missouri Rural Telephone Company'],
+			  4=>['NE Missouri',	'Northeast Missouri Rural Telephone Company'],
+			  8=>['NE Missouri',	'Northeast Missouri Rural Telephone Company'],
+			 12=>['CTG',		'Corporate Telemanagement Group'],
+			 16=>['CTG',		'Corporate Telemanagement Group'],
+			 20=>['Mustang',	'Mustang Telecom, Inc.'],
+			 24=>['Mustang',	'Mustang Telecom, Inc.'],
+			 28=>['Mustang',	'Mustang Telecom, Inc.'],
+			 32=>['Zenda',		'Zenda Telephone Company, Inc.'],
+			 36=>['San Marcos',	'San Marcos Telephone Company'],
+			 40=>['Pymatuning',	'Pymatuning Independent Telephone Company'],
+			 44=>['Pine',		'Pine Telephone Company'],
+			 48=>['Pine',		'Pine Telephone Company'],
+			 52=>['Fort Mojave',	'Fort Mojave Telecommunications, Inc.'],
+			 56=>['Fort Mojave',	'Fort Mojave Telecommunications, Inc.'],
+			 60=>['Oklahoma W',	'Oklahoma Western Telephone Company'],
+			 64=>['Oklahoma W',	'Oklahoma Western Telephone Company'],
+			 68=>['Oklahoma W',	'Oklahoma Western Telephone Company'],
+			 72=>['Oklahoma W',	'Oklahoma Western Telephone Company'],
+			 76=>['Hinton',		'Hinton Telephone Company'],
+			 80=>['Hinton',		'Hinton Telephone Company'],
+			 84=>['Hinton',		'Hinton Telephone Company'],
+			 88=>['ALL',		'American Long Lines'],
+			 92=>['Vernon',		'Vernon Telephone Cooperative'],
+			 96=>['W Wisconsin',	'West Wisconsin Telcommunications Cooperative, Inc.'],
+			100=>['W Wisconsin',	'West Wisconsin Telcommunications Cooperative, Inc.'],
+			104=>['Northeast',	'Northeast Telephone Company'],
+			108=>['Coon Valley',	'Coon Valley Farmers Telephone Company'],
+			112=>['Coon Valley',	'Coon Valley Farmers Telephone Company'],
+			116=>['Cross',		'Cross Telephone'],
+			120=>['Cross',		'Cross Telephone'],
+			124=>['Cross',		'Cross Telephone'],
+			128=>['Cambridge',	'Cambridge Telephone Company'],
+			132=>['Peoples Mutual',	'Peoples Mutual Telephone Company'],
+			136=>['Craw-Kan',	'Craw-Kan Telephone Cooperative, Inc.'],
+			140=>['Craw-Kan',	'Craw-Kan Telephone Cooperative, Inc.'],
+			144=>['Craw-Kan',	'Craw-Kan Telephone Cooperative, Inc.'],
+			148=>['Monon',		'Monon Telephone Company, Inc.'],
+			152=>['Muenster',	'Muenster Telephone Corporation of Texas'],
+			156=>['Blue Valley',	'Blue Valley Telephone Company'],
+			160=>['Moundridge',	'Moundridge Telephone Company'],
+			164=>['Vaughnsville',	'Vaughnsville Telephone Company, Inc.'],
+			168=>['Kalida',		'Kalida Telephone Company, Inc.'],
+			172=>['Grand',		'Grand Telephone Company, Inc.'],
+			176=>['Scott-Rice',	'Scott-Rice Telephone Company, Inc.'],
+			180=>['Tri-County',	'Tri-County Telephone Association, Inc.'],
+			184=>['US Wats',	'US Wats'],
+			188=>['Richland-G',	'Richland-Grant Telephone Cooperative, Inc.'],
+			192=>['Richland-G',	'Richland-Grant Telephone Cooperative, Inc.'],
+			196=>['Richland-G',	'LaValle Telephone Cooperative, Inc.'],
+			200=>['Arthur Mutual',	'The Arthur Mutual Telephone Company'],
+			204=>['Price Cty',	'Price County Telephone Company'],
+			208=>['Nova',		'The Nova Telephone Company'],
+			212=>['New Ulm',	'New Ulm Telecom, Inc.'],
+			216=>['Pottawatomie',	'Pottawatomie Telephone Company, Inc.'],
+			220=>['Pottawatomie',	'Pottawatomie Telephone Company, Inc.'],
+			224=>['Pottawatomie',	'Pottawatomie Telephone Company, Inc.'],
+			228=>['H&B',		'H&B Communications, Inc.'],
+			232=>['Milltown',	'Milltown Mutual Telephone Company'],
+			236=>['Wamego',		'Wamego Telephone Company, Inc.'],
+			240=>['Luck',		'Luck Telephone Company'],
+			244=>['Farmers Ind.',	'Farmers Independent Telephone Company'],
+			248=>['Mid-Iowa',	'Mid-Iowa Telephone Co-Op Association'],
+			252=>['Lewis River',	'Lewis River Telephone'],
+		},
+		6=>{
+			  0=>['Kin Network',	'Kin Network, Inc.'],
+			  4=>['Conneaut',	'Conneaut Telephone Company'],
+			  8=>['Madison',	'Madison Telephone Company, Inc.'],
+			 12=>['Hartman',	'Hartman Telephone Exchanges'],
+			 16=>['Rainbow',	'Rainbow Telephone Cooperative Association, Inc.'],
+			 20=>['Golden Belt',	'Golden Belt Telephone Association, Inc.'],
+			 24=>['Middleburgh',	'Middleburgh Telephone Company'],
+			 28=>['Ganado',		'Ganado Telephone Company'],
+			 32=>['Coleman Cty',	'Coleman County Telephone Cooperative, Inc.'],
+			 36=>['Comanche Cty',	'Comanche County Telephone Company, Inc.'],
+			 40=>['Comanche Cty',	'Comanche County Telephone Company, Inc.'],
+			 44=>['Lake Dallas',	'Lake Dallas Telephone Company'],
+			 48=>['Curtis',		'The Curtis Telephone Company'],
+			 52=>['Gridley',	'Gridley Telephone Company'],
+			 56=>['SP Telecom',	'SP Telecom'],
+			 60=>['Guadalupe Vly',	'Guadalupe Valley Telephone Cooperative'],
+			 64=>['Guadalupe Vly',	'Guadalupe Valley Telephone Cooperative'],
+			 68=>['Guadalupe Vly',	'Guadalupe Valley Telephone Cooperative'],
+			 72=>['Guadalupe Vly',	'Guadalupe Valley Telephone Cooperative'],
+			 76=>['Twin Lakes',	'Twin Lakes Telephone Cooperative Corporation'],
+			 80=>['Twin Lakes',	'Twin Lakes Telephone Cooperative Corporation'],
+			 84=>['Twin Lakes',	'Twin Lakes Telephone Cooperative Corporation'],
+			 88=>['Twin Lakes',	'Twin Lakes Telephone Cooperative Corporation'],
+			 92=>['Stellars',	'Stellars Telecommunications Services'],
+			 96=>['Intercont.',	'Intercontinental Communications Corp.'],
+			100=>['Intercont.',	'Intercontinental Communications Corp.'],
+			104=>['Switch 2000',	'Switch 2000'],
+			108=>['Switch 2000',	'Switch 2000'],
+			112=>['Colorado Vly',	'Colorado Valley Telephone Cooperative'],
+			116=>['Colorado Vly',	'Colorado Valley Telephone Cooperative'],
+			120=>['Hooper',		'Hooper Telephone Company'],
+			124=>['Ottoville M',	'Ottoville Mutual Telephone Company'],
+			128=>['Keystone-Arthur','Keystone-Arthur Telephone Company'],
+			132=>['S&W',		'S&W Telephone Company, Inc.'],
+			136=>['Cochrane Coop',	'Cochrane Cooperative Telephone Company'],
+			140=>['Knoxville',	'The New Knoxville Telephone Company'],
+			144=>['Climax',		'Climax Telephone Company'],
+			148=>['Middle Point',	'Middle Point Home Telephone Company'],
+			152=>['E. Ritter',	'E. Ritter Telephone Company'],
+			156=>['Union',		'Union Telephone Company'],
+			160=>['Atlantic',	'Atlantic Telephone Membership Corporation'],
+			164=>['Ayersville',	'Ayersville Telephone Company'],
+			168=>['Arkansas',	'Arkansas Telephone Company, Inc.'],
+			172=>['Daviess-M Cty',	'Daviess-Martin County Rural Telephone Corporation'],
+			176=>['Granite State',	'Granite State Telephone'],
+			180=>['Totah',		'Totah Telephone Company'],
+			184=>['Totah',		'Totah Telephone Company'],
+			188=>['Totah',		'Totah Telephone Company'],
+			192=>['Villisca F',	'Villisca Farmers Telephone Company'],
+			196=>['Standard',	'Standard Telephone Company'],
+			200=>['N Central',	'North Central Telephone Cooperative'],
+			204=>['N Central',	'North Central Telephone Cooperative'],
+			208=>['TMC',		'TMC of Lexington'],
+			212=>['Network',	'Network'],
+			216=>['McClure',	'The McClure Telephone Company'],
+			220=>['Yukon-Waltz',	'Yukon-Waltz Telephone Company'],
+			224=>['Fonorola',	'Fonorola'],
+			228=>['Glasford',	'Glasford Telephone Company'],
+			232=>['Benton',		'Benton Cooperative Telephone Company'],
+			236=>['Union Springs',	'Union Springs Telephone Company'],
+			240=>['Ft. Jennings',	'Ft. Jennings Telephone Company'],
+			244=>['Farmers Mutual',	'Farmers Mutual Telephone Company'],
+			248=>['Pattersonville',	'Pattersonville Telephone Company'],
+			252=>['ITG',		'International Telemanagement Group'],
+		},
+		7=>{
+			  0=>['Pac Gateway',	'Pacific Gateway Exchange'],
+			  4=>['Pac Gateway',	'Pacific Gateway Exchange'],
+			  8=>['Elec Lightwave',	'Electric Lightwave'],
+			 12=>['Allendale',	'Allendale Telephone Company'],
+			 16=>['Decatur',	'Decatur Telephone Company, Inc.'],
+			 20=>['Bell Mobility',	'Bell Mobility Cellular'],
+			 24=>['Five Star',	'Five Star Telecom'],
+			 28=>['TTI',		'TTI Telecommunications'],
+			 32=>['Graceba',	'Graceba Total Communications, Inc.'],
+			 36=>['SW Arkansas',	'Southwest Arkansas Telephone Cooperative'],
+			 40=>['SW Arkansas',	'Southwest Arkansas Telephone Cooperative'],
+			 44=>['Ogden',		'Ogden Telephone Company'],
+			 48=>['Township',	'Township Telephone Company'],
+			 52=>['Bloutsville',	'Bloutsville Telephone Company'],
+			 56=>['Coastal',	'Coastal Telephone Company'],
+			 60=>['Armstrong',	'Armstrong Telephone Company'],
+			 64=>['Armstrong',	'Armstrong Telephone Company'],
+			 68=>['Delta',		'Delta Telephone Company, Inc.'],
+			 72=>['Franklin',	'Franklin Telephone Company, Inc.'],
+			 76=>['Ridgeville',	'Ridgeville Telephone Company'],
+			 80=>['Community',	'Community Telephone'],
+			 84=>['St. Joseph',	'St. Joseph Telephone and Telegraph Company'],
+			 88=>['St. Joseph',	'St. Joseph Telephone and Telegraph Company'],
+			 92=>['St. Joseph',	'St. Joseph Telephone and Telegraph Company'],
+			 96=>['Peoples Mutual',	'Peoples Mutual Telephone Company'],
+			100=>['Cameron',	'Cameron Telephone Company'],
+			104=>['Action',		'Action Telcom Company'],
+			108=>['TCC',		'TCC Communications'],
+			112=>['Smithville',	'Smithville Telephone Company, Inc.'],
+			116=>['Oneida Cty',	'Oneida County Rural Telephone Company'],
+			120=>['Emily Coop',	'Emily Cooperative Telephone Company'],
+			124=>['Beehive',	'Beehive Telephone Company, Inc.'],
+			128=>['Custer',		'Custer Telephone Cooperative, Inc.'],
+			132=>['MGW',		'MGW Telephone'],
+			136=>['Call America',	'Call America'],
+			140=>['Blanchard',	'Blanchard Telephone Association, Inc.'],
+			144=>['Tonica',		'Tonica Telephone Company'],
+			148=>['Pine Belt',	'Pine Belt Telephone Company, Inc.'],
+			152=>['Rockland',	'Rockland Telephone Company, Inc.'],
+			156=>['Sogetel',	'Sogetel, Inc.'],
+			160=>['Hamilton Cty',	'Hamilton County Telephone Cooperative'],
+			164=>['Fleet Call',	'Fleet Call'],
+			168=>['New Lisbon',	'New Lisbon Telephone Company'],
+			172=>['West River',	'West River Telecommunications Cooperative'],
+			176=>['West River',	'West River Telecommunications Cooperative'],
+			180=>['Nebraska C',	'Nebraska Central Telephone Company'],
+			184=>['Coastal',	'Coastal Utilities, Inc.'],
+			188=>['Diller',		'Diller Telephone Company'],
+			192=>['HunTel',		'HunTel Systems'],
+			196=>['Progressive R',	'Progressive Rural Telephone Cooperative, Inc.'],
+			200=>['Delta',		'Delta Telephone Company, Inc.'],
+			204=>['K&M',		'K&M Telephone Company, Inc.'],
+			208=>['Washington City','Washington City Rural Telephone Cooperative, Inc.'],
+			212=>['Hanson',		'Hanson Communications'],
+			216=>['Hanson',		'Hanson Communications'],
+			220=>['Leaf River',	'Leaf River Telephone Company'],
+			224=>['New Windsor',	'New Windsor Telephone Company'],
+			228=>['Lakefield',	'Lakefield Telephone Company'],
+			232=>['Hart',		'Hart Telephone Company'],
+			236=>['Margaretville',	'Margaretville Telephone Company, Inc.'],
+			240=>['Warwick Valley',	'Warwick Valley Telephone Company'],
+			244=>['Cherokee',	'Cherokee Telephone Company'],
+			248=>['Cherokee',	'Cherokee Telephone Company'],
+			252=>['Cherokee',	'Cherokee Telephone Company'],
+		},
+		8=>{
+			  0=>['Cherokee',	'Cherokee Telephone Company'],
+			  4=>['Deerfield F',	'Deerfield Farmers\' Telephone Company'],
+			  8=>['Suntel',		'Suntel Network'],
+			 12=>['Mid-Century',	'Mid-Century Telephone Company'],
+			 16=>['Madison',	'Madison Telephone Company'],
+			 20=>['Amnex',		'Amnex Network'],
+			 24=>['Amnex',		'Amnex Network'],
+			 28=>['ConQuest',	'ConQuest'],
+			 32=>['Thunder Bay',	'Thunder Bay Telephone'],
+			 36=>['Viola',		'Viola Telephone Company'],
+			 40=>['Reynolds',	'Reynolds Telephone Company'],
+			 44=>['Yeoman',		'Yeoman Telephone Company'],
+			 48=>['Harrisonville',	'Harrisonville Telephone Company'],
+			 52=>['Craigville',	'Craigville Telephone Company, Inc.'],
+			 56=>['Clarence',	'Clarence Telephone Company'],
+			 60=>['N Illinois Univ','Northern Illinois University'],
+			 64=>['One call',	'One call Communications, Inc.'],
+			 68=>['One call',	'One call Communications, Inc.'],
+			 72=>['Churchill City',	'Churchill City Telephone & Telegraph System'],
+			 76=>['Chippewa City',	'Chippewa City Telephone Company'],
+			 80=>['Roberts City',	'Roberts City Telephone Cooperative Association'],
+			 84=>['Bretton Woods',	'Bretton Woods Telephone Company'],
+			 88=>['Eastern Telecom','Eastern Telecom Corporation'],
+			 92=>['Northwest',	'Northwest Telephone Company'],
+			 96=>['Northwest',	'Northwest Telephone Company'],
+			100=>['ICON',		'ICON'],
+			104=>['Bittel',		'Bittel Telecommunications Corporation'],
+			108=>['Bittel',		'Bittel Telecommunications Corporation'],
+			112=>['CTI',		'Communications TeleSystems Int\'l'],
+			116=>['Thacker-G',	'Thacker - Grigsby Telephone Company, Inc.'],
+			120=>['Thrifty',	'Thrifty Telephone, Inc.'],
+			124=>['Telco',		'Telco Communications, Inc.'],
+			128=>['Applied Signal',	'Applied Signal Corporation'],
+			132=>['Wilton',		'Wilton Telephone Company'],
+			136=>['ANS',		'Alternative Network Services'],
+			140=>['ANS',		'Alternative Network Services'],
+			144=>['Telstar',	'Telstar Communications, Inc.'],
+			148=>['Telstar',	'Telstar Communications, Inc.'],
+			152=>['ITC',		'ITC Companies'],
+			156=>['ITC',		'ITC Companies'],
+			160=>['United',		'United Communications (UNICOM)'],
+			164=>['BN1',		'BN1 Telecommunications'],
+			168=>['Wabash',		'Wabash Telephone Company'],
+			172=>['Flat Rock',	'Flat Rock Telephone Company'],
+			176=>['Woodhull',	'Woodhull Telephone Company'],
+			180=>['BellSouth',	'BellSouth Mobility'],
+			184=>['BellSouth',	'BellSouth Mobility'],
+			188=>['BellSouth',	'BellSouth Mobility'],
+			192=>['BellSouth',	'BellSouth Mobility'],
+			196=>['Hi-Rim',		'Hi-Rim Communications'],
+			200=>['Hi-Rim',		'Hi-Rim Communications'],
+			204=>['Prairie Grove',	'Prairie Grove Telephone Company'],
+			208=>['Prairie Grove',	'Prairie Grove Telephone Company'],
+			212=>['Dakota',		'Dakota Cooperative Telecommunications, Inc.'],
+			216=>['Dakota',		'Dakota Cooperative Telecommunications, Inc.'],
+			220=>['Dakota',		'Dakota Cooperative Telecommunications, Inc.'],
+			224=>['Dakota',		'Dakota Cooperative Telecommunications, Inc.'],
+			228=>['Mebtel',		'Mebtel Communications'],
+			232=>['Glandorf',	'Glandorf Telephone Company, Inc.'],
+			236=>['Waldron',	'Waldron Telephone Company'],
+			240=>['Indiantown',	'Indiantown Telephone System, Inc.'],
+			244=>['Big Bend',	'Big Bend Telephone'],
+			248=>['Fibertech',	'Fibertech Telecom, Inc.'],
+			252=>['Fibertech',	'Fibertech Telecom, Inc.'],
+		},
+		9=>{
+			  0=>['Fibertech',	'Fibertech Telecom, Inc.'],
+			  4=>['Dial US',	'Dial US'],
+			  8=>['Piedmont',	'Piedmont Telephone Membership Corporation'],
+			 12=>['MRC',		'MRC Telecommunications, Inc.'],
+			 16=>['Telco',		'Telco Communications Group'],
+			 20=>['Telco',		'Telco Communications Group'],
+			 24=>['Granby',		'Granby Telephone and Telegraph Company'],
+			 28=>['STSJ',		'STSJ Telephone Company'],
+			 32=>['Big Sandy',	'Big Sandy Telecom'],
+			 36=>['State',		'State Telephone Company'],
+			 40=>['Ringgold',	'Ringgold Telephone Company'],
+			 44=>['InterAmerican',	'InterAmerican Telephone Company'],
+			 48=>['Union River',	'Union River Telephone Company'],
+			 52=>['Flex',		'Flex Communications'],
+			 56=>['Sand Creek',	'Sand Creek Telephone Company'],
+			 60=>['TotalNet',	'TotalNet Communications, Inc.'],
+			 64=>['BEK',		'BEK Communications Cooperative'],
+			 68=>['Dakota Central',	'Dakota Central Telecommunication Cooperative'],
+			 72=>['Teleport',	'Teleport Communications Group'],
+			 76=>['Teleport',	'Teleport Communications Group'],
+			 80=>['Teleport',	'Teleport Communications Group'],
+			 84=>['Teleport',	'Teleport Communications Group'],
+			 88=>['Teleport',	'Teleport Communications Group'],
+			 92=>['Huntel',		'Huntel Systems, Inc.'],
+			 96=>['TRI',		'TRI Touch America'],
+			100=>['TRI',		'TRI Touch America'],
+			104=>['Star',		'Star Telephone Membership Corporation'],
+			108=>['Star',		'Star Telephone Membership Corporation'],
+			112=>['Star',		'Star Telephone Membership Corporation'],
+			116=>['Indianhead',	'Indianhead Telephone Company'],
+			120=>['Polar',		'Polar Communications Mutual Aid Corporation'],
+			124=>['Multimedia',	'Multimedia Telephone Service'],
+			128=>['Multimedia',	'Multimedia Telephone Service'],
+#			132=>['SPARE',		'SPARE - UNASSIGNED'],
+			136=>['Total',		'Total World Telecom'],
+			140=>['Total',		'Total World Telecom'],
+			144=>['Total',		'Total World Telecom'],
+			148=>['Total',		'Total World Telecom'],
+			152=>['ATCI',		'ATCI Inc.'],
+			156=>['ATCI',		'Econo Call/ATCI (USA)'],
+			160=>['ATCI',		'Econo Call/ATCI (USA)'],
+			164=>['Ardmore',	'Ardmore Telephone Company, Inc.'],
+			168=>['Niagara',	'Niagara Telephone Company'],
+			172=>['Mabel Coop',	'Mabel Cooperative Telephone Company'],
+			176=>['Fox',		'Fox Communications Corporation'],
+			180=>['Spring Grove',	'Spring Grove Cooperative Telephone'],
+			184=>['Ogden',		'Ogden Telephone Company'],
+			188=>['Souris River',	'Souris River Telecommunications Cooperative'],
+			192=>['Medicine Park',	'Medicine Park Telephone Company'],
+			196=>['Yelcot',		'Yelcot Telephone Company'],
+			200=>['Sunman',		'Sunman Telephone'],
+			204=>['Home',		'Home Telephone Company'],
+			208=>['Southeast',	'Southeast Telephone of WI, Inc.'],
+			212=>['Springport',	'Springport Telephone Company'],
+			216=>['Valley',		'Valley Telephone Cooperative, Inc.'],
+			220=>['CGN',		'Communications Gateway Network, Inc.'],
+			224=>['CGN',		'Communications Gateway Network, Inc.'],
+			228=>['CGN',		'Communications Gateway Network, Inc.'],
+			232=>['Vista',		'Vista Telephone'],
+			236=>['Clay Cty',	'Clay County Rural Telephone Cooperative, Inc.'],
+			244=>['McDonough',	'McDonough Telephone Company'],
+			248=>['Oneida',		'Oneida Telephone Company'],
+			252=>['LaHarpe',	'LaHarpe Telephone Company'],
+		},
+		10=>{
+			  0=>['Great Plains',	'Great Plains Communications'],
+			  4=>['Great Plains',	'Great Plains Communications'],
+			  7=>['Great Plains',	'Great Plains Communications'],
+			 12=>['Great Plains',	'Great Plains Communications'],
+			 16=>['Great Plains',	'Great Plains Communications'],
+			 20=>['Great Plains',	'Great Plains Communications'],
+			 24=>['Great Plains',	'Great Plains Communications'],
+			 28=>['Northland',	'Northland Telephone'],
+			 32=>['Brooke',		'Brooke Municipal Telephone System'],
+			 36=>['LCT',		'LCT Long Distance'],
+			 40=>['Cablevision',	'Cablevision'],
+			 44=>['Oxford City',	'Oxford City Telephone and Telegraph Company'],
+			 48=>['Oxford City',	'Oxford City Telephone and Telegraph Company'],
+			 52=>['Oxford City',	'Oxford City Telephone and Telegraph Company'],
+			 56=>['Logan',		'Logan Telephone Cooperative, Inc'],
+			 60=>['Logan',		'Logan Telephone Cooperative, Inc'],
+			 64=>['ETI',		'Executive TeleCard International'],
+			 68=>['Farmers',	'Farmers Telephone'],
+			 72=>['S C Utah',	'South Central Utah Telephone Association'],
+			 76=>['Griggs City',	'Griggs City Telephone Company'],
+			 80=>['Teltrust',	'Teltrust'],
+			 84=>['Teltrust',	'Teltrust'],
+			 88=>['Western',	'Western Telephone Company'],
+			 92=>['Tidewater',	'Tidewater Telecom'],
+			 96=>['Glens Falls',	'Glens Falls Communications Corporation'],
+			100=>['Pac-West',	'Pac-West Telecomm, Inc. dba AmeriCall'],
+#			104=>['SPARE',		'SPARE - UNASSIGNED'],
+#			108=>['SPARE',		'SPARE - UNASSIGNED'],
+			112=>['Clay Cty',	'Clay County Rural Telephone Cooperative, Inc.'],
+			116=>['Clay Cty',	'Clay County Rural Telephone Cooperative, Inc.'],
+			120=>['CCI',		'Communication Consultants, Inc.'],
+			124=>['Mornington',	'Mornington Municipal Telephone System'],
+			128=>['Blanchard',	'Blanchard Municipal Telephone System'],
+			132=>['Citizens',	'Citizens Telephone'],
+			136=>['Siren',		'Siren Telephone Company, Inc.'],
+			140=>['TimeWarner',	'TimeWarner Communications'],
+			144=>['TimeWarner',	'TimeWarner Communications'],
+			148=>['Minkfort',	'Minkfort Intelligent Network'],
+			152=>['Surry',		'Surry Telephone Membership Corporation'],
+			156=>['Surry',		'Surry Telephone Membership Corporation'],
+			160=>['Wes-Tex',	'Wes-Tex Telephone Cooperative Inc.'],
+			164=>['Cypress',	'Cypress Telecommunications, Inc./Cytel.'],
+			168=>['Cypress',	'Cypress Telecommunications, Inc./Cytel'],
+			172=>['Cypress',	'Cypress Telecommunications, Inc./Cytel'],
+			176=>['LaJicarita R',	'LaJicarita Rural Telephone Coop'],
+			180=>['Rye',		'Rye Telephone Company'],
+			184=>['Alma',		'Alma Telephone Company'],
+			188=>['Cal-North',	'Cal-North Cellular'],
+			192=>['Five Area',	'Five Area Telephone Cooperative, Inc.'],
+			196=>['Eastex',		'Eastex Telephone Cooperative, Inc.'],
+			200=>['Wood Cty',	'Wood County Telephone Company'],
+			204=>['La Compagnie',	'La Compagnie de Tel. de Warwick'],
+			208=>['Amtelecom',	'Amtelecom, Inc.'],
+			212=>['Granby',		'Granby Telephone Company'],
+			216=>['CellularONE',	'CellularONE'],
+			220=>['Thrifty',	'Thrifty Telephone, Inc.'],
+			224=>['Kaplan',		'Kaplan Telephone Company'],
+			228=>['SW Texas',	'Southwest Texas Telephone Company'],
+			232=>['Shawnee',	'Shawnee Telephone Company'],
+			236=>['S Canaan',	'South Canaan Telephone Company'],
+			240=>['ATG',		'American Telephone Group'],
+			244=>['Bruce',		'Bruce Municipal Telephone System'],
+			248=>['MTC',		'MTC Telemanagement'],
+			252=>['MTC',		'MTC'],
+		},
+		11=>{
+			  0=>['Winn',		'Winn Telephone Company'],
+			  4=>['Orwell',		'Orwell Telephone Company'],
+			  8=>['CellularOne',	'CellularOne (Puerto Rico)'],
+#			 12=>['SPARE',		'SPARE - UNASSIGNED'],
+#			 16=>['SPARE',		'SPARE - UNASSIGNED'],
+			 20=>['Econophone',	'Econophone Inc.'],
+			 24=>['Econophone',	'Econophone Inc.'],
+			 28=>['Econophone',	'Econophone Inc.'],
+			 32=>['SE IN R',	'Southeastern IN Rural Telephone Cooperative Inc.'],
+			 36=>['Leaco R',	'Leaco Rural Telephone Cooperative, Inc.'],
+			 40=>['Mt. Horeb',	'Mt. Horeb Telephone Company'],
+			 44=>['Otelco',		'Otelco'],
+			 48=>['CallAmerica',	'CallAmerica'],
+			 52=>['CallAmerica',	'CallAmerica'],
+			 56=>['Alhambra-G',	'Alhambra-Grantfork Telephone Company'],
+			 60=>['Grafton',	'Grafton Telephone Company'],
+			 64=>['Home',		'Home Telephone Company'],
+			 68=>['McDonald',	'McDonald Telephone Company'],
+			 72=>['McLeod',		'McLeod Network Services'],
+			 76=>['Westphalia',	'Westphalia Telephone Company'],
+			 80=>['Amherst',	'Amherst Telephone Company'],
+			 84=>['Carr',		'Carr Telephone'],
+			 88=>['Carr',		'Carr Telephone'],
+			 92=>['Cyberlink',	'Cyberlink'],
+			 96=>['Pine Drive',	'Pine Drive Telephone Company'],
+			100=>['Hyperion',	'Hyperion Telecommunications, Inc.'],
+			104=>['Hyperion',	'Hyperion Telecommunications, Inc.'],
+			108=>['Brantley',	'Brantley Telephone Company'],
+			112=>['TelRoute',	'TelRoute Communications, Inc.'],
+			116=>['TelRoute',	'TelRoute Communications, Inc.'],
+			120=>['Star',		'Star Telephone'],
+			124=>['Star',		'Star Telephone'],
+			128=>['Star',		'Star Telephone'],
+			132=>['S Carolina Net',	'South Carolina Net, Inc.'],
+			136=>['Armour Ind.',	'Armour Independent Telephone Company'],
+			140=>['Union',		'Union Telephone Company'],
+			144=>['Baldwin',	'Baldwin Telecom, Inc.'],
+			148=>['Cass Cty',	'Cass County Telephone Company'],
+			152=>['C-R',		'C-R Telephone Company'],
+			156=>['ETC',		'Eastern TeleLogic Corporation'],
+			160=>['Tri-County',	'Tri-County Telephone Cooperative'],
+			164=>['Citizens',	'Citizens Telephone Company'],
+			168=>['M Adams',	'Marquette Adams Telephone Cooperative'],
+			172=>['St. Liboire',	'Le Tel de St. Liboire'],
+			176=>['Bestline',	'Austin Bestline'],
+			180=>['N Dakota',	'North Dakota Telephone Company'],
+			184=>['TSC',		'Telecommunications Service Center, Inc (TSC)'],
+			188=>['TSC',		'Telecommunications Service Center, Inc (TSC)'],
+			192=>['Elec Lightwave',	'Electric Lightwave, Inc.'],
+			196=>['Elec Lightwave',	'Electric Lightwave, Inc.'],
+#			200=>['SPARE',		'SPARE - UNASSIGNED'],
+			204=>['Lansdowne R',	'Lansdowne Rural Telephone Company Ltd.'],
+			208=>['People\'s',	'People\'s Telephone Company of Forest Ltd.'],
+			212=>['Home',		'Home Telephone Company, Inc.'],
+			216=>['Commnet',	'Commnet Cellular'],
+			220=>['Commnet',	'Commnet Cellular'],
+			224=>['Commnet',	'Commnet Cellular'],
+			228=>['ISI',		'ISI Telecommunications'],
+			232=>['Pulaski-White',	'Pulaski-White Telephone Company'],
+			236=>['Oregon F M',	'Oregon Farmers Mutual Telephone Company'],
+			240=>['Mulberry Coop',	'Mulberry Cooperative Telephone Company, Inc.'],
+			244=>['ITC',		'International Telecomm. Corporation'],
+			248=>['Mountaineer',	'Mountaineer Long Distance, Inc.'],
+			252=>['Champaign',	'Champaign Telephone Company'],
+		},
+		12=>{
+			  0=>['CTI',		'Communication Telesystems, Int\'l'],
+			  4=>['CTI',		'Communication Telesystems, Int\'l'],
+			  8=>['Fresh Start',	'Fresh Start Communications'],
+			 12=>['Kennebec',	'Kennebec Telephone Company'],
+			 16=>['Feist',		'Feist Long Distance'],
+			 20=>['Cherry',		'Cherry Communications'],
+			 24=>['Cherry',		'Cherry Communications'],
+			 28=>['S Plains',	'South Plains Telephone Cooperative, Inc.'],
+			 32=>['Hollis',		'Hollis Telephone Company'],
+			 36=>['IXC',		'IXC Long Distance, Inc.'],
+			 40=>['IXC',		'IXC Long Distance, Inc.'],
+			 44=>['Premiere',	'Premiere Comm.'],
+			 48=>['LDN',		'Long Distance Network'],
+			 52=>['Council Grove',	'Council Grove Telephone Company'],
+			 56=>['Sledge',		'Sledge Telephone Company'],
+			 60=>['CTI',		'Com Tech International'],
+			 64=>['CapRock',	'CapRock Communications'],
+			 68=>['Telenational',	'Telenational Communications'],
+			 72=>['Baraga',		'Baraga Telephone Company'],
+			 76=>['American Per.',	'American Personal Communications'],
+			 80=>['Merrimack Cty',	'Merrimack County Telephone'],
+			 84=>['Contoocook Vly',	'Contoocook Valley Telephone'],
+			 88=>['Contoocook Vly',	'Contoocook Valley Telephone'],
+			 92=>['Phillips Cty',	'Phillips County Telephone Company'],
+			 96=>['T-One',		'T-One Corporation'],
+			100=>['Fulton',		'Fulton Telephone Company, Inc.'],
+			104=>['Brazos',		'Brazos Telephone Cooperative, Inc.'],
+			108=>['McNabb',		'McNabb Telephone Company'],
+			112=>['Cam-Net',	'Cam-Net Communications, Inc.'],
+			116=>['El Paso',	'El Paso Telephone Company'],
+			120=>['Primus',		'Primus Telecommunications'],
+			124=>['Riviera',	'Riviera Telephone Company Inc.'],
+			128=>['Northern',	'Northern Telephone Cooperative, Inc.'],
+			132=>['Chickamauga',	'Chickamauga Telephone Company'],
+			136=>['Mid-Maine',	'Mid-Maine Telecom'],
+			140=>['Mid-Maine',	'Mid-Maine Telecom'],
+			144=>['CellularONE',	'CellularONE'],
+			148=>['WesTel',		'WesTel Telecommunications, Ltd.'],
+			152=>['TSI',		'Telecommunication Services, Inc.'],
+			156=>['Vermont',	'Vermont Telephone Company, Inc.'],
+			160=>['Swayzee',	'Swayzee Telephone Company, Inc.'],
+			164=>['Sweetser',	'Sweetser Telephone Company, Inc.'],
+			168=>['Bixby',		'Bixby Telephone Company'],
+			172=>['Champlain Vly',	'Champlain Valley Telecom'],
+			176=>['Champlain Vly',	'Champlain Valley Telecom'],
+			180=>['Cellcom',	'Mobile Telephone Switching Office/Cellcom'],
+			184=>['ESS',		'ESS Ventures'],
+			188=>['NE Louisana',	'Northeast Louisana Telephone Company'],
+			192=>['AmeriVision',	'AmeriVision Communications Inc.'],
+			196=>['AmeriVision',	'AmeriVision Communications, Inc.'],
+			200=>['Blanca',		'Blanca Telephone Company'],
+			204=>['Lavaca',		'Lavaca Telephone Company, Inc.'],
+			208=>['Five Star',	'Five Star Telecom'],
+			212=>['Orwell',		'Orwell Telephone Company'],
+			216=>['Bascom M',	'Bascom Mutual Telephone Company'],
+			220=>['Delcambre',	'Delcambre Telephone Company'],
+			224=>['Bloomingdale',	'Bloomingdale Telephone Company, Inc.'],
+			228=>['Cellular One',	'Cellular One (Kansas City)'],
+			232=>['Scherers',	'Scherers Communication Group, Inc.'],
+			236=>['Scherers',	'Scherers Communication Group, Inc.'],
+			240=>['Cowiche',	'Cowiche Telephone'],
+			244=>['RT',		'RT Communications'],
+			248=>['RT',		'RT Communications'],
+			252=>['Seneca',		'Seneca Telephone Company'],
+		},
+		13=>{
+			  0=>['Goodman',	'Goodman Telephone Company'],
+			  4=>['Frontenac',	'Frontenac Telephone Company'],
+			  8=>['Harold',		'Harold Telephone Company'],
+			 12=>['STAR',		'STAR Telecommunications, Inc.'],
+			 16=>['Access',		'Access Long Distance'],
+			 20=>['C-P Hill',	'Compti-Pleasant Hill Telephone Company'],
+			 24=>['C Arkansas',	'Central Arkansas Telephone Cooperative, Inc.'],
+			 28=>['N. Renfrew',	'N. Renfrew Telephone Company, Ltd.'],
+			 32=>['Westport',	'Westport Telephone Company, Ltd.'],
+			 36=>['Harold',		'Harold Telephone Company'],
+			 40=>['National',	'National Communications Association'],
+			 44=>['Nelson Ball',	'Nelson Ball Ground Telephone Company'],
+			 48=>['Brindlee Mtn.',	'Brindlee Mtn. Telephone Company'],
+			 52=>['Hill Cty',	'Hill Country Telephone Cooperative, Inc.'],
+			 56=>['Hill Cty',	'Hill Country Telephone Cooperative, Inc.'],
+			 60=>['Hill Cty',	'Hill Country Telephone Cooperative, Inc.'],
+			 64=>['STS',		'Specialized Telecommunication Services'],
+			 68=>['Upton',		'Upton, Inc. (La Cie de Telephone)'],
+			 72=>['Valcourt',	'Valcourt (Co-op de Telephone de)'],
+			 76=>['Milot',		'Telephone Milot, Inc.'],
+			 80=>['Athena',		'Athena International L.L.C.'],
+			 84=>['Athena',		'Athena International L.L.C.'],
+			 88=>['Athena',		'Athena International L.L.C.'],
+			 92=>['Tecnet',		'Tecnet, Inc.'],
+			 96=>['Tecnet',		'Tecnet, Inc.'],
+			100=>['Tri-County',	'Tri-County Telephone Membership Corporation'],
+			104=>['Crossville',	'Crossville Communications, Inc.'],
+			108=>['Dell Coop',	'Dell Telephone Cooperative'],
+			112=>['Automated',	'Automated Communications, Inc.'],
+			116=>['Noonan F',	'Noonan Farmers Telephone Company'],
+			120=>['Telco',		'Telco Communications Group'],
+			124=>['New Florence',	'New Florence Telephone Company'],
+			128=>['N Central',	'North Central Telephone Cooperative'],
+			132=>['Farber',		'Farber Telephone Company'],
+			136=>['Northwest',	'Northwest Communications Cooperative'],
+			140=>['ITS',		'ITS'],
+			144=>['Intercel',	'Intercel'],
+			148=>['Valliant',	'Valliant Telephone Company'],
+			152=>['LDM',		'LDM, Inc.'],
+			156=>['Star',		'Star Telephone Company'],
+			160=>['Georgia',	'Georgia Telephone Corporation'],
+			164=>['Carib',		'Carib Comm, L.P.'],
+			168=>['Cherry',		'Cherry Communications'],
+			172=>['Cherry',		'Cherry Communications'],
+			176=>['Valu-Line',	'Valu-Line'],
+			180=>['C Utah',		'Central Utah Telephone, Inc.'],
+			184=>['TelAmerica',	'TelAmerica Long Distance'],
+			188=>['Thrifty',	'Thrifty Call, Inc. L.D.'],
+			192=>['Thrifty',	'Thrifty Call, Inc. L.D.'],
+			196=>['IT Group',	'The I.T. Group'],
+			200=>['Mid-Plains R',	'Mid-Plains Rural Telephone Cooperative, Inc.'],
+			204=>['Direct Net',	'Direct Net Telecommunications'],
+			208=>['Dallas NextFone','Dallas NextFone Systems, LC'],
+			212=>['State LD',	'State Long Distance Telephone Company'],
+			216=>['Dobson',		'Dobson Telephone Company'],
+			220=>['McLoud',		'McLoud Telephone Company'],
+			224=>['Tri-County',	'Tri-County Telephone Company, Inc.'],
+			228=>['Tri-County',	'Tri-County Telephone Company, Inc.'],
+			232=>['Rock Cty',	'Rock County Telephone Company'],
+			236=>['E Nebraska',	'Eastern Nebraska Telephone Company'],
+			240=>['Chariton Vly',	'Chariton Valley Telephone Corporation'],
+			244=>['Pennsylvania',	'Pennsylvania Telephone Company'],
+			248=>['Pineland',	'Pineland Telephone Cooperative, Inc.'],
+			252=>['Jones Intercable','Jones Intercable'],
+		},
+		14=>{
+#			  0=>['',		'NOT USED'],
+			  4=>['Voyager',	'Voyager Networks, Inc'],
+			  8=>['Voyager',	'Voyager Networks, Inc'],
+			 12=>['Voyager',	'Voyager Networks, Inc'],
+			 16=>['Apollo',		'Apollo Telecom'],
+			 20=>['Apollo',		'Apollo Telecom'],
+			 24=>['Sprint',		'Sprint Cellular'],
+			 28=>['Merchants & F',	'Merchants & Farmers Telephone Company'],
+			 32=>['Choctaw',	'Choctaw Telephone Company'],
+			 36=>['W Wireless',	'Western Wireless'],
+			 40=>['W Wireless',	'Western Wireless'],
+			 44=>['W Wireless',	'Western Wireless'],
+			 48=>['Kallback',	'Kallback'],
+			 52=>['Kallback',	'Kallback'],
+			 56=>['Kallback',	'Kallback'],
+			 60=>['Tel-Save',	'Tel-Save, Inc.'],
+			 64=>['Tel-Save',	'Tel-Save, Inc.'],
+			 68=>['Tel-Save',	'Tel-Save, Inc.'],
+			 72=>['UTA',		'United Telephone Association, Inc.'],
+			 76=>['NVTS',		'NVTS Ameritel'],
+			 80=>['CCI',		'C.C.I.'],
+			 84=>['CCI',		'C.C.I.'],
+			 88=>['CCI',		'C.C.I.'],
+			 92=>['York',		'York Telephone Company'],
+			 96=>['Midstate',	'Midstate Telephone Company'],
+			100=>['JBN',		'JBN Telephone Company, Inc.'],
+			104=>['Qwest',		'Qwest Communications'],
+			108=>['Qwest',		'Qwest Communications'],
+			112=>['Qwest',		'Qwest Communications'],
+			116=>['Kadoka',		'Kadoka Telephone Company'],
+			120=>['Dominican',	'Dominican Communications'],
+			124=>['SITA',		'SITA'],
+			128=>['Beresford Mun',	'Beresford Municipal Telephone Company'],
+			132=>['Table Top',	'Table Top Telephone Company, Inc.'],
+			136=>['Table Top',	'Table Top Telephone Company, Inc.'],
+			140=>['Lipan',		'Lipan Telephone Company, Inc.'],
+			144=>['Centennial',	'Centennial Cellular Corporation'],
+			148=>['Coast to Coast',	'Coast to Coast'],
+			152=>['Cooperative',	'Cooperative Communications Inc.'],
+			156=>['Egyptian',	'Egyptian Telephone Cooperative'],
+			160=>['MICL',		'MICL'],
+			164=>['Searsboro',	'Searsboro Telephone Company'],
+			168=>['US WATS',	'US WATS'],
+			172=>['Sprint',		'Sprint Cellular'],
+			176=>['Sprint',		'Sprint Cellular'],
+			180=>['Sprint',		'Sprint Cellular'],
+			184=>['Ellington',	'Ellington Telephone Company'],
+			188=>['Ellington',	'Ellington Telephone Company'],
+			192=>['Telnex',		'Telnex, Inc.'],
+			196=>['Telnex',		'Telnex, Inc.'],
+			200=>['Atlantic',	'Atlantic Cellular Company, L.P.'],
+			204=>['TCAST',		'TCAST Communications, Inc.'],
+			208=>['TCAST',		'TCAST Communications, Inc.'],
+			212=>['TCAST',		'TCAST Communications, Inc.'],
+			216=>['Liberty',	'Liberty Cellular, Inc.'],
+			220=>['Geetingsville',	'Geetingsville Telepone Company, Inc.'],
+			224=>['Laurel H',	'Laurel Highland Telephone Company'],
+			228=>['Nokia',		'Nokia Telecom'],
+			232=>['FCI',		'FCI Int\'l'],
+			236=>['Huron',		'Huron Telecomm.Cooperative'],
+			240=>['Hay',		'Hay Communications Cooperative'],
+			244=>['KCTC',		'KCTC'],
+			248=>['Mosinee',	'Mosinee Telephone Company'],
+			252=>['Montrose',	'Montrose Mutual Telephone Company'],
+		},
+		15=>{
+#			  0=>['',		'NOT USED'],
+			  4=>['Caribbean',	'Caribbean Telephone and Telegraph, Inc.'],
+			  8=>['Caribbean',	'Caribbean Telephone and Telegraph, Inc.'],
+			 12=>['iXnet',		'iXnet'],
+			 16=>['iXnet',		'iXnet'],
+			 20=>['iXnet',		'iXnet'],
+			 24=>['iXnet',		'iXnet'],
+			 28=>['iXnet',		'iXnet'],
+			 32=>['Motorola',	'Motorola'],
+			 36=>['Motorola',	'Motorola'],
+			 40=>['General',	'General Telecom'],
+			 44=>['Western',	'Western Wireless'],
+			 44=>['Western',	'Western Wireless'],
+			 48=>['Western',	'Western Wireless'],
+			 52=>['Western',	'Western Wireless'],
+			 56=>['Western',	'Western Wireless'],
+			 60=>['Western',	'Western Wireless'],
+			 64=>['Yorkville',	'Yorkville Telephone Cooperative'],
+			 68=>['Tuckersmith',	'Tuckersmith Communications Cooperative, Ltd.'],
+			 72=>['Telegroup',	'Telegroup'],
+			 76=>['NAC',		'North American Comm (NAC)'],
+			 80=>['Wilkinson Cty',	'Wilkinson County Telephone Company'],
+			 84=>['WorldPass',	'WorldPass'],
+			 88=>['BayStar',	'BayStar Communications'],
+			 92=>['Filer Mutual',	'Filer Mutual Telephone Company'],
+			 96=>['Elec Lightwave',	'Electric Lightwave'],
+			100=>['Network Plus',	'Network Plus'],
+			104=>['Network Plus',	'Network Plus'],
+			108=>['KINNET',		'KINNET Fiber Optic Communications'],
+			112=>['Peoples',	'Peoples Telephone Company'],
+			116=>['Fairwater-B-A',	'Fairwater-Brandon-Alto Telephone Company'],
+			120=>['Lackawaxen',	'Lackawaxen Telephone Company'],
+			124=>['HSS',		'HSS Vending Distributors'],
+			128=>['HSS',		'HSS Vending Distributors'],
+			132=>['Eastex',		'Eastex Telephone Cooperative, Inc.'],
+			136=>['Eastex',		'Eastex Telephone Cooperative, Inc.'],
+			140=>['Eastex',		'Eastex Telephone Cooperative, Inc.'],
+			144=>['Eastex',		'Eastex Telephone Cooperative, Inc.'],
+			148=>['Eastex',		'Eastex Telephone Cooperative, Inc.'],
+			152=>['Eastex',		'Eastex Telephone Cooperative, Inc.'],
+			156=>['Ringgold',	'Ringgold Telephone Company, Inc.'],
+			160=>['Farmers',	'Farmers Telephone Cooperative, Inc'],
+			164=>['US South',	'US South Communications, Inc.'],
+			168=>['MediaOne',	'MediaOne, Inc.'],
+			172=>['POPP',		'POPP Telecom'],
+			176=>['POPP',		'POPP Telecom'],
+			180=>['WTS',		'World Telecommunications Services'],
+			184=>['Teleport',	'Teleport Communications Group'],
+			188=>['Livingston',	'Livingston Telephone Company'],
+			192=>['Peoples',	'Peoples Telephone Cooperative, Inc.'],
+			196=>['New Hope',	'New Hope Telephone Cooperative'],
+			200=>['DataComm',	'DataComm. International Company, Ltd.'],
+			204=>['Vista',		'Vista International'],
+			208=>['Startec\'s',	'Startec\'s'],
+			212=>['Cable Plus',	'Cable Plus Company LP'],
+			216=>['Cable Plus',	'Cable Plus Company LP'],
+			220=>['Venus',		'Venus Telephone Corp.'],
+			224=>['S. F. C.',	'S. F. C. Enterprises'],
+			228=>['Tech Ctrl',	'Technology Control, Inc.'],
+			232=>['Tech Ctrl',	'Technology Control, Inc.'],
+			236=>['Mark Twain R',	'Mark Twain Rural Telephone Company'],
+			240=>['Mark Twain R',	'Mark Twain Rural Telephone Company'],
+			244=>['Mark Twain R',	'Mark Twain Rural Telephone Company'],
+			248=>['Mark Twain R',	'Mark Twain Rural Telephone Company'],
+			252=>['',		'RAM Technologies, Inc.'],
+		},
+		16=>{
+#			  0=>['',		'NOT USED'],
+			  4=>['Ironton',	'Ironton Telephone Company'],
+			  8=>['TCT West',	'TCT West, Inc.'],
+			 12=>['La Harpe',	'La Harpe Telephone Company, Inc.'],
+			 16=>['United',		'United Telephone Association, Inc.'],
+			 20=>['Dubois',		'Dubois Telephone Exchange, Inc'],
+			 24=>['Northland',	'Northland Telephone Company'],
+			 28=>['Northland',	'Northland Telephone Company'],
+			 32=>['Northland',	'Northland Telephone Company'],
+			 36=>['Northland',	'Northland Telephone Company'],
+			 40=>['Time Warner',	'Time Warner Communications'],
+			 44=>['Time Warner',	'Time Warner Communications'],
+			 48=>['Time Warner',	'Time Warner Communications'],
+			 52=>['AIC',		'AIC Asia International Services Corporation'],
+			 56=>['Zenex',		'Zenex Long Distance'],
+			 60=>['El Paso Cty',	'El Paso County Telephone Company'],
+			 64=>['W Wisconsin',	'West Wisconsin Telecom Cooperative, Inc.'],
+			 68=>['W Wisconsin',	'West Wisconsin Telecom Cooperative, Inc.'],
+			 72=>['American Per.',	'American Personal Communications'],
+			 76=>['Telescan',	'Telescan, Inc.'],
+			 80=>['St. Cloud',	'Cellular Mobile Systems of St. Cloud'],
+			 84=>['Consolidated',	'Consolidated Telco, Inc.'],
+			 88=>['Consolidated',	'Consolidated Telco, Inc.'],
+			 92=>['Consolidated',	'Consolidated Telco, Inc.'],
+			 96=>['Consolidated',	'Consolidated Telco, Inc.'],
+			100=>['Consolidated',	'Consolidated Telco, Inc.'],
+			104=>['Consolidated',	'Consolidated Telco, Inc.'],
+			108=>['IDS',		'IDS Long Distance, Inc.'],
+			112=>['W New Mexico',	'Western New Mexico Telephone Company, Inc.'],
+			116=>['Minford',	'Minford Telephone Company'],
+			120=>['STAR',		'STAR Telecommunications, Inc.'],
+			124=>['American',	'American Communications Services, Inc.'],
+			128=>['American',	'American Communications Services, Inc.'],
+			132=>['NAGI',		'North American Gateway Inc.'],
+			136=>['Bloomingdale',	'Bloomingdale Telephone Company'],
+			140=>['NevTEL',		'NevTEL'],
+		},
+		17=>{
+			state=>['AL',		'Alabama'],
+			  4=>['Teleport',	'Teleport Communications Group'],
+			  8=>['American',	'American Communications Services, Inc.'],
+			 12=>['DiGiPH FCS',	'DiGiPH FCS, Inc.'],
+			 16=>['KMC',		'KMC Telecom Inc.'],
+			 20=>['Moundville',	'Moundville Telephone Company, Inc.'],
+			 24=>['BellSouth',	'BellSouth Public Communications, Inc.'],
+			 28=>['ROPIR',		'ROPIR Communications, Inc.'],
+			 32=>['PC Mgmt',	'PC Management'],
+			 36=>['PC Mgmt',	'PC Management'],
+			 40=>['UniversalCom',	'UniversalCom,Inc.'],
+			 44=>['Ragland',	'Ragland Telephone Co., Inc.'],
+		},
+		18=>{
+			state=>['AK',		'Alaska'],
+			  4=>['TelAlaska',	'TelAlaska, Inc.'],
+			  8=>['TelAlaska',	'TelAlaska, Inc.'],
+			 12=>['TelAlaska',	'TelAlaska, Inc.'],
+			 16=>['TelAlaska',	'TelAlaska, Inc.'],
+			 20=>['TelAlaska',	'TelAlaska, Inc.'],
+			 24=>['Cordova',	'Cordova Telephone Cooperative'],
+			 32=>['Alaska Net Sys',	'Alaska Network Systems, Inc.'],
+			 36=>['Bristol Bay',	'Bristol Bay Telephone Cooperative, Inc.'],
+			 40=>['Bristol Bay',	'Bristol Bay Telephone Cooperative, Inc.'],
+			 44=>['Bristol Bay',	'Bristol Bay Telephone Cooperative, Inc.'],
+			 48=>['OTZ',		'OTZ Telephone Cooperative, Inc.'],
+			 52=>['OTZ',		'OTZ Telephone Cooperative, Inc.'],
+			 56=>['OTZ',		'OTZ Telephone Cooperative, Inc.'],
+			 60=>['Nashagak',	'Nashagak Telephone Cooperative, Inc.'],
+			 64=>['KPU',		'KPU Telecommunications'],
+			 68=>['Alaska DigiTel',	'Alaska DigiTel'],
+		},
+		19=>{
+			state=>['AZ',		'Arizona'],
+			  4=>['KLP',		'KLP, Inc. dba Call America.'],
+			  8=>['Teleport',	'Teleport Communications Group'],
+			 12=>['Valley',		'Valley Telephone Cooperative, Inc.'],
+			 16=>['FTI',		'FTI Communications'],
+			 20=>['Valley',		'Valley Telephone Cooperative, Inc.'],
+			 24=>['Valley',		'Valley Telephone Cooperative, Inc.'],
+			 28=>['Valley',		'Valley Telephone Cooperative, Inc.'],
+			 32=>['Valley',		'Valley Telephone Cooperative, Inc.'],
+			 36=>['Mountain',	'Mountain Telecommunications'],
+			 40=>['Metro One',	'Metro One Telecommunications'],
+			 44=>['Dakota',		'Dakota Carrier Services'],
+			 48=>['Dakota',		'Dakota Carrier Services'],
+			 52=>['Dakota',		'Dakota Carrier Services'],
+			 56=>['Dakota',		'Dakota Carrier Services'],
+			 60=>['OPTel',		'OPTel, Inc.'],
+			 64=>['Authentix',	'Authentix Network, Inc.'],
+			 68=>['Authentix',	'Authentix Network, Inc.'],
+			 72=>['San Carlos',	'San Carlos Apache Telecommunications Utility'],
+			 76=>['Alphanet',	'Alphanet Telecom Inc.'],
+		},
+		20=>{
+			state=>['AR',		'Arkansas'],
+			  4=>['Walnut Hill',	'Walnut Hill Telephone Company, Inc.'],
+			  8=>['Walnut Hill',	'Walnut Hill Telephone Company, Inc.'],
+			 12=>['Yell Cty',	'Yell County Telephone Company'],
+			 16=>['Hyperion',	'Hyperion Telecommunications, Inc.'],
+			 20=>['S Arkansas',	'South Arkansas Telephone Company'],
+			 24=>['Gabriel',	'Gabriel Communications, Inc. - Arkansas Site'],
+		},
+		21=>{
+			state=>['CA',		'California'],
+			  4=>['Harris Digital',	'Harris Digital Telephone Systems'],
+			  8=>['Universal',	'Universal Communications Network, Inc.'],
+			 12=>['Genesis',	'Genesis Communications International, Inc.'],
+			 16=>['Primus',		'Primus Telecommunications, Inc.'],
+			 20=>['CTI',		'Communications Telesystems International dba'],
+			 24=>['Teleport',	'Teleport Communications Group'],
+			 28=>['Teleport',	'Teleport Communications Group'],
+			 32=>['Phonetime',	'Phonetime, Inc.'],
+			 36=>['New Global',	'New Global Telecom'],
+			 40=>['Intellicom',	'Intellicom, Inc.'],
+			 44=>['Stanford Univ.',	'Stanford University Communications Services'],
+			 48=>['SpectraNet',	'SpectraNet Anaheim International'],
+			 52=>['Cyberlight',	'Cyberlight International, Inc.'],
+			 56=>['Pacific Bell',	'Pacific Bell Communications'],
+			 60=>['Five Star',	'Five Star Telecom'],
+			 64=>['World Touch',	'World Touch Communications'],
+			 68=>['Pac Gateway',	'Pacific Gateway Exchange'],
+			 72=>['Paging Net',	'Paging Network Inc.,(AKA PageNet)'],
+			 76=>['AmeriCom',	'AmeriCom Communications, LLC'],
+			 80=>['Metro One',	'Metro One Telecommunications'],
+			 84=>['MGC',		'MGC Communications, Inc.'],
+			 88=>['World Exchange',	'World Exchange'],
+			 92=>['ILD',		'ILD Teleservices, Inc.'],
+			 96=>['Avirnex',	'Avirnex Communications Group'],
+			100=>['Pacific',	'Pacific Telecom'],
+			104=>['Econophone',	'Econophone, Inc. - California site'],
+			108=>['GNP',		'Global Network Providers - California site'],
+			112=>['Opentel',	'Opentel Communications, Inc.'],
+			116=>['Global One',	'Global One - California site'],
+			120=>['Pac-West',	'Pac-West Telecomm, Inc.'],
+			124=>['Pac-West',	'Pac-West Telecomm, Inc.'],
+			128=>['Teltrust',	'Teltrust Communications Services, Inc.'],
+			132=>['Telegroup',	'Telegroup, Inc. - California site'],
+			136=>['ACS Systems',	'ACS Systems, Inc. - California site'],
+			140=>['Megawats',	'Megawats'],
+			144=>['LDIP',		'LD International Provisioning - California'],
+			148=>['FDN',		'FDN, Inc. - California site'],
+			152=>['New Millennium',	'New Millennium Comm. Corp.- California'],
+			156=>['MGC',		'MGC Communications, Inc. - California site'],
+			160=>['MGC',		'MGC Communications, Inc. - California site'],
+			164=>['C Florida',	'Tele. Co. of Central Florida, Inc. - California'],
+			168=>['Allegiance',	'Allegiance Telecom, Inc. - California site'],
+			172=>['Justice',	'Justice Technology Corp. - California'],
+#			176=>['SPARE',		'SPARE - UNASSIGNED'],
+			180=>['FaciliCom',	'FaciliCom International - CA site'],
+			184=>['AirTouch',	'AirTouch Satellite Services-CA site'],
+			188=>['Focal',		'Focal Communications Corp.'],
+			192=>['New Global',	'New Global Telecom'],
+			196=>['PanAmSat',	'PanAmSat Corporation - CA site'],
+			200=>['Worldport',	'Worldport Communications,Inc.-CA site'],
+			204=>['AirTouch',	'AirTouch Satellite Services-CA site'],
+			208=>['One. Tel',	'One. Tel, Inc.'],
+			212=>['OzEmail',	'OzEmail Interline Pty Ltd. - CA site'],
+			216=>['Japan Telecom',	'Japan Telecom America,Inc. - CA site'],
+			220=>['Focal',		'Focal Communications Corp. - CA site'],
+			224=>['DJB',		'DJB Entterprises Inc. - CA site'],
+			228=>['DJB',		'DJB Enterprises Inc. - CA site'],
+			232=>['INET',		'INET Interactive Network System - CA site'],
+			236=>['New Zealand',	'Telecom New Zealand USA Limited'],
+			240=>['Level 3',	'Level 3 - CA site'],
+			244=>['Voice and Data',	'Voice and Data Communications - CA site'],
+			248=>['LEC Unwired',	'LEC Unwired, LLC'],
+			252=>['Teleselect',	'Teleselect Group, Inc. - CA site'],
+		},
+		22=>{
+			state=>['CO',		'Colorado'],
+			  4=>['Plains',		'Plains Cooperative Telephone Association, Inc.'],
+			  8=>['Teleport',	'Teleport Communications Group'],
+			 12=>['Intellicom',	'Intellicom, Inc.'],
+			 16=>['American',	'American Communications Services, Inc.'],
+			 20=>['Bijou',		'The Bijou Telephone Co-op Association'],
+			 24=>['NA DigiCom',	'North American DigiCom Corporation'],
+			 28=>['NA DigiCom',	'North American DigiCom Corporation'],
+			 32=>['Nucla-N',	'Nucla-Naturita Telephone Company'],
+			 36=>['Nucla-N',	'Nucla-Naturita Telephone Company'],
+			 40=>['ConferTech',	'ConferTech International'],
+			 44=>['ConferTech',	'ConferTech International'],
+			 48=>['Metro One',	'Metro One Telecommunications'],
+			 52=>['Sunflower',	'Sunflower Tele. Co., Inc. - Colorado'],
+			 56=>['Columbine',	'Columbine Telecom Company'],
+			 60=>['Convergent',	'Convergent Communications Services,Inc.'],
+			 64=>['ACS',		'ACS Systems, Inc. - Colorado site'],
+			 68=>['Optimum',	'Optimum Network Service, LLC'],
+			 72=>['Great West',	'Great West Services, Ltd.'],
+			 76=>['Farmers',	'Farmers Telephone Co., Inc.'],
+			 80=>['Level 3',	'LeveL 3 - CO site'],
+			 84=>['Voice and Data',	'Voice and Data Communications - CO site'],
+			 88=>['CellularOne',	'CellularOne of Northeast Colorado'],
+			 92=>['Level 3',	'Level 3 Communications - CO site'],
+			 96=>['GlobalLink',	'USA Global Link - CO site'],
+			100=>['OpTel',		'OpTel, Inc. - CO site'],
+		},
+		23=>{
+			state=>['CT',		'Connecticut'],
+			  4=>['Teleport',	'Teleport Communications Group'],
+		},
+		24=>{
+			state=>['DE',		'Delaware'],
+		},
+		25=>{
+			state=>['DC',		'District of Columbia'],
+			  4=>['Teleport',	'Teleport Communications Group'],
+		},
+		26=>{
+			state=>['FL',		'Florida'],
+			  4=>['Universal',	'Universal Communications Network, Inc.'],
+			  8=>['Teleport',	'Teleport Communications Group'],
+			 12=>['',		'Intellicom, Inc.'],
+			 16=>['',		'Phonetime, Inc.'],
+			 20=>['American',	'American Communications Services, Inc.'],
+			 24=>['',		'International Digital Telecommunications Systems'],
+			 28=>['',		'TresCom International'],
+			 32=>['',		'BellSouth Long Distance, Inc.'],
+			 36=>['Orlando',	'Orlando Telephone Company, Inc.'],
+			 40=>['',		'Hyperion Telecommunications, Inc.'],
+			 44=>['Time Warner',	'Time Warner Communications'],
+			 48=>['Teleport',	'Teleport Communications Group'],
+			 52=>['Teleport',	'Teleport Communications Group'],
+			 56=>['',		'Long Distance International Inc.'],
+			 60=>['L. C.',		'L. C. Communications'],
+			 64=>['',		'UniversalCom, Inc.'],
+			 68=>['',		'Metro One Telecommunications'],
+			 72=>['Pick',		'Pick Communications Corporation'],
+			 76=>['',		'US LEC of North Carolina-Florida'],
+			 80=>['',		'Star Telecom(Miami, Florida site'],
+			 84=>['',		'Econophone, Inc.-Florida site'],
+			 88=>['New Millennium',	'New Millennium Communications Corp.'],
+			 92=>['',		'Telegroup, Inc.-Florida site'],
+			 96=>['',		'KMC Telecom Inc. - Florida site'],
+			100=>['',		'Americatel Corporation'],
+			104=>['',		'City of Lakewood'],
+			108=>['',		'FDN Inc.-Florida site'],
+			112=>['MGC',		'MGC Communications,Inc.-Florida site'],
+			116=>['',		'Tele.Co. of Central Florida,Inc.-Florida'],
+			120=>['',		'Voiceware Systems'],
+			124=>['',		'First Data Corp.(FDC) Florida site'],
+			128=>['',		'PanAmSat Corporation - Florida site'],
+			132=>['Worldport',	'Worldport Communications,Inc. - FL site'],
+			136=>['',		'Call Sciences - Florida site'],
+			140=>['',		'American International Telephone'],
+			144=>['',		'INET Interactive Network Sys.-FL site'],
+			148=>['',		'Thrifty Call Inc. - Florida site'],
+			152=>['Voice and Data',	'Voice and Data Communications - FL site'],
+			156=>['',		'KMC Telecom II,Inc. - FL site'],
+			160=>['',		'Business Technology Services, Inc.'],
+			164=>['PaeTec',		'PaeTec Communications,Inc. -FL site'],
+			168=>['',		'North American Telecomm. Corp'],
+			172=>['',		'USTel dba Arcada Commun.-FLsite'],
+			176=>['Premiere',	'Premiere Communications - FL site'],
+			180=>['',		'US LEC of Florida Inc. - FL site'],
+			184=>['',		'Eastland of Orlando Telephone Corp.'],
+			188=>['',		'OpTel, Inc. - Florita site'],
+			192=>['',		'Florida Digital Network, Inc.'],
+			196=>['',		'World Access Commun. Corp.'],
+			200=>['',		'Startec Global Commun. Corp.'],
+		},
+		27=>{
+			state=>['GA',		'Georgia'],
+			  4=>['Darien',		'Darien Telephone Company, Inc.'],
+			  8=>['Glenwood',	'Glenwood Telephone Company'],
+			 12=>['',		'Intellicom, Inc.'],
+			 16=>['',		'Phonetime, Inc.'],
+			 20=>['American',	'American Communications Services, Inc.'],
+			 24=>['',		'BellSouth Long Distance, Inc.'],
+			 28=>['Citizens',	'Citizens Telephone Company, Inc.'],
+			 32=>['',		'KMC Telecom Inc.'],
+			 36=>['Teleport',	'Teleport Communications Group'],
+			 40=>['Teleport',	'Teleport Communications Group'],
+			 44=>['Plant',		'Plant Telephone Company'],
+			 48=>['Plant',		'Plant Telephone Company'],
+			 52=>['Plant',		'Plant Telephone Company'],
+			 56=>['Coastal',	'Coastal Telephone Company'],
+			 60=>['',		'Emory University'],
+			 64=>['MGC',		'MGC Communications, Inc.'],
+			 68=>['',		'ILD Teleservices, Inc.'],
+			 72=>['Teltrust',	'Teltrust Communications Services, Inc.'],
+			 76=>['',		'Savannah Independent PCS, Inc.'],
+			 80=>['',		'Georgia Independent PCS, Inc.'],
+			 84=>['',		'US LEC of North Carolina - Georgia'],
+			 88=>['',		'SITA - Georgia location'],
+			 92=>['',		'Allegiance Telecom,Inc.-Georgia site'],
+			 96=>['',		'Econophone, Inc.-Georgia site'],
+			100=>['',		'Five Star Telecom - Georgia site'],
+			104=>['Enterprise',	'Enterprise Communications'],
+			108=>['',		'FaciliCom International - GA site'],
+			112=>['',		'Call Sciences - GA site'],
+			116=>['',		'N + 1, Inc. - GA site'],
+			120=>['Level 3',	'Level 3 Communications-GA site'],
+			124=>['',		'Pre-Paid Cellular Services'],
+			128=>['',		'USTel dba Arcada Commun.-GA site'],
+			132=>['',		'WorldxChange - GA site'],
+			136=>['',		'Network Switching Services,Inc.-GA site'],
+			140=>['',		'Waverly Hall Telephone Co.,Inc.'],
+		},
+		28=>{
+			state=>['HI',		'Hawaii'],
+			  4=>['Time Warner',	'Time Warner Communications'],
+			  8=>['',		'TelHawaii, Inc.'],
+			 12=>['Sandwich Isles',	'Sandwich Isles Communications,Inc.'],
+			 16=>['Sandwich Isles',	'Sandwich Isles Communications,Inc.'],
+			 20=>['',		'USTel dba Arcada Commun. - HI site'],
+		},
+		29=>{
+			state=>['ID',		'Idaho'],
+			  4=>['American',	'American Communications Services, Inc.'],
+			  8=>['',		'Fremont Telcom'],
+			 12=>['',		'USTel dba Arcada Commun. - ID site'],
+		},
+		30=>{
+			state=>['IL',		'Illinois'],
+			  4=>['Pantel',		'Pantel Communications'],
+			  8=>['IXC',		'IXC Communications, Inc.'],
+			 12=>['Teleport',	'Teleport Communications Group'],
+			 16=>['Teleport',	'Teleport Communications Group'],
+			 20=>['',		'Focal communications Corporation'],
+			 24=>['',		'Intellicom, Inc.'],
+			 28=>['',		'Phonetime, Inc.'],
+			 32=>['',		'Odin Telephone Exchange, Inc.'],
+			 36=>['FTI',		'FTI Communications'],
+			 40=>['',		'Metro One Telecommunications'],
+			 44=>['',		'World Exchange'],
+			 48=>['',		'Connect America,Inc. - IL site'],
+			 52=>['',		'Econophone, Inc. - IL site'],
+			 56=>['',		'21ST Century Cable - IL site'],
+			 60=>['',		'Telegroup, Inc. - IL site'],
+			 64=>['',		'Long Distance Int\'l Provisioning - IL'],
+			 68=>['Net',		'Net Communications,Inc. - IL site'],
+			 72=>['',		'Tele. Co. of Central Florida,Inc. - IL'],
+			 76=>['',		'Allegiance Telecom,Inc. - IL site'],
+			 80=>['',		'Motorola Corporation'],
+			 84=>['',		'FaciliCom International -IL site'],
+			 88=>['',		'Southern Illinois RSA Partnership'],
+			 92=>['',		'Thrifty Call Inc. - IL site'],
+			 96=>['',		'LEVEL 3 - IL site'],
+			100=>['Gallatin River',	'Gallatin River Communications-IL site'],
+			104=>['Gallatin River',	'Gallatin River Communications-IL site'],
+			108=>['',		'USTel dba Arcada Commun. - IL site'],
+			112=>['',		'WorldxChange - IL site'],
+			116=>['',		'Megsinet, Inc.'],
+			120=>['',		'OpTel, Inc. - IL site'],
+		},
+		31=>{
+			state=>['IN',		'Indiana'],
+			  4=>['Bloomingdale H',	'Bloomingdale Home Telephone Company'],
+			  8=>['West Point',	'West Point Telephone Company'],
+			 12=>['Teleport',	'Teleport Communications Group'],
+			 16=>['Time Warner',	'Time Warner Communications'],
+			 20=>['',		'US Xchange LLC(Indiana site)'],
+			 24=>['',		'Pend Oreille Telephone'],
+			 28=>['',		'KMC Telecom II, Inc. - IN site'],
+		},
+		32=>{
+			state=>['IA',		'Iowa'],
+			  4=>['Scranton',	'Scranton Telephone Company'],
+			  8=>['Templeton',	'Templeton Telephone Company'],
+			 12=>['',		'Marne & Elk Horn Telephone Comapny'],
+			 16=>['',		'Farmers & Merchants Mutual Telephone'],
+			 20=>['Miller',		'Miller Telephone Company'],
+			 24=>['Farmers M',	'Farmers Mutual Telephone Company'],
+			 28=>['',		'Consolidated Comm. Inc. - Iowa site'],
+			 32=>['',		'Amica Wireless Phone Service'],
+			 36=>['Dunkerton',	'Dunkerton Telephone Cooperative'],
+		},
+		33=>{
+			state=>['KS',		'Kansas'],
+			  4=>['Peoples Mutual',	'Peoples Mutual Telephone Company'],
+			  8=>['S&T',		'S&T Telephone Cooperative Association'],
+			 12=>['',		'KIN Network, Inc.'],
+			 16=>['S&T',		'S&T Telephone Cooperative Assn.'],
+			 20=>['',		'Kansas Personal Communication Services Ltd.'],
+			 24=>['Home',		'Home Telephone Company, Inc.'],
+			 28=>['',		'Hyperion Telecommunications, Inc.'],
+			 32=>['',		'Sunflower Telephone Co.,Inc.-Kansas'],
+			 36=>['Bluestem',	'Bluestem Telephone Company-Kansas'],
+			 40=>['',		'Mercury Cellular & Paging - KS location'],
+			 44=>['',		'Cunningham Telephone Co.,Inc.'],
+			 48=>['',		'MoKan Dial, Inc. - Kansas site'],
+			 52=>['',		'Birch Telecom - Kansas site'],
+			 56=>['',		'Sunflower Telephone Co.,Inc. - Kansas'],
+			 60=>['',		'KMC Telecom II, Inc. - Kansas site'],
+			 64=>['Mutual',		'Mutual Telephone Company - KS site'],
+			 68=>['Gabriel',	'Gabriel Communications,Inc. - KS site'],
+		},
+		34=>{
+			state=>['KY',		'Kentucky'],
+			  8=>['',		'Alec, Inc.'],
+			 12=>['',		'Hyperion Telecomm. Inc. - Kentucky'],
+			 16=>['',		'Wireless 2000 PCS - Kentucky site'],
+			 20=>['',		'Wireless 2000 PCS - Kentucky site'],
+			 24=>['',		'SouthEast Telephone'],
+		},
+		35=>{
+			state=>['LA',		'Louisiana'],
+			  4=>['Elizabeth',	'Elizabeth Telephone Company'],
+			  8=>['',		'Radiofone, Inc.'],
+			 12=>['American',	'American Communications Services, Inc.'],
+			 16=>['',		'MobileTel Inc.'],
+			 20=>['',		'Mercury Cellular & Paging'],
+			 24=>['',		'American MetroComm Corporation'],
+			 28=>['',		'BellSouth Long Distance, Inc.'],
+			 32=>['',		'Advanced Tel., Inc.'],
+			 36=>['Meretel',	'Meretel Communications, L.P.'],
+			 40=>['',		'Hyperion Telecommunications, Inc.'],
+			 44=>['',		'KMC Telecom Inc.'],
+			 48=>['',		'Data & Electronic Services, Inc.'],
+			 52=>['',		'Shell Offshore Services, Co.'],
+			 56=>['',		'Columbia Telecommunications, Inc.'],
+			 60=>['',		'Louisiana Unwired LLC'],
+			 64=>['',		'Louisiana Unwired LLC'],
+		},
+		36=>{
+			state=>['ME',		'Maine'],
+			  4=>['',		'Unitel Incorporated'],
+			  8=>['',		'Saco River Cellular Tele. Co.(DBA S/C)'],
+		},
+		37=>{
+			state=>['MD',		'Maryland'],
+			  4=>['Teleport',	'Teleport Communications Group'],
+			  8=>['American',	'American Communications Services, Inc.'],
+			 12=>['',		'Metro One Telecommunications'],
+			 16=>['',		'RCN Telecom Services,Inc. MD site'],
+			 20=>['',		'Bell Atlantic - MD'],
+			 24=>['PaeTec',		'PaeTec Communications,Inc. - MD site'],
+			 28=>['',		'Comav Telco, Inc. - MD site'],
+		},
+		38=>{
+			state=>['MA',		'Massachusetts'],
+			  4=>['',		'Xcom Technologies, Inc.'],
+			  8=>['Teleport',	'Teleport Communications Group'],
+			 12=>['Teleport',	'Teleport Communications Group'],
+			 16=>['Residential',	'Residential Communications Netwprk, Inc.'],
+			 20=>['Arch',		'Arch Communications Group, Inc.'],
+			 24=>['',		'Atlantic Connections, Inc.'],
+			 28=>['',		'RNK, Inc.'],
+			 32=>['',		'Global NAPS'],
+			 36=>['',		'XCOM Technologies'],
+			 44=>['',		'Norfolk County Internet'],
+			 48=>['',		'Thrifty Call Inc. - MA site'],
+			 52=>['',		'Bell Atlantic Global Networks - MA site'],
+			 56=>['',		'LEVEL 3 - MA site'],
+			 60=>['',		'LBC Telephony - MA site'],
+			 64=>['',		'Allegiance Telecom, Inc. - MA site'],
+			 68=>['PaeTec',		'PaeTec Communications, Inc. - MA site'],
+		},
+		39=>{
+			state=>['MI',		'Michigan'],
+			  4=>['Ontonagon Cty',	'Ontonagon County Telephone Company'],
+			  8=>['Ontonagon Cty',	'Ontonagon County Telephone Company'],
+			 12=>['Ontonagon Cty',	'Midway Telephone Company'],
+			 16=>['',		'Chapin telephone Company'],
+			 20=>['',		'Peninsula telephone Company'],
+			 24=>['Nationwide',	'Nationwide Communications, Inc.'],
+			 28=>['BRE',		'BRE Communications dba Phone Michigan'],
+			 32=>['',		'FoneTel'],
+			 36=>['',		'NPI Wireless'],
+			 40=>['',		'NPI Wireless'],
+			 44=>['',		'Metro One Telecommunications'],
+			 48=>['Hiawatha',	'Hiawatha Telephone Company'],
+			 52=>['',		'Anishnabe Comm. Enterprise,Inc. MI'],
+			 56=>['',		'Long Distance of Michigan'],
+			 60=>['',		'MichTel, Inc. - MI site'],
+			 64=>['',		'KMC Telecom II, Inc. - MN site'],
+			 68=>['Level 3',	'Level 3 Communications - MI site'],
+			 72=>['',		'USTel dba Arcada Commun. - MI site'],
+			 76=>['Focal',		'Focal Communications Corporation'],
+		},
+		40=>{
+			state=>['MN',		'Minnesota'],
+			  4=>['American',	'American Communications Services, Inc.'],
+			  8=>['',		'RCC Network, Inc.'],
+			 12=>['OCI',		'OCI Communications of Minnesota, Inc.'],
+			 16=>['Woodstock',	'Woodstock Telephone Company'],
+			 20=>['',		'Metro One Telecommunications'],
+			 24=>['',		'Upsala Cooperative Telephone Assoc.'],
+			 32=>['',		'Teleport Comm. Group-Minnesota site'],
+			 36=>['',		'Otter Tail Telcom'],
+			 40=>['',		'Five Star Telecom - MN site'],
+			 44=>['',		'Lismore Cooperative Telephone Co.'],
+			 48=>['',		'KMC Telecom II, Inc. - MN site'],
+			 52=>['',		'USTel dba Arcada Commun. MN site'],
+			 56=>['',		'Digital Telecommunications, Inc.'],
+		},
+		41=>{
+			state=>['MS',		'Mississippi'],
+			  4=>['',		'Hyperion Telecomm, Inc.'],
+			  8=>['Teleport',	'Teleport Communications Group'],
+			 12=>['American',	'American Communications Services Inc.'],
+			 16=>['Mound Bayou',	'Mound Bayou Telephone & Communications'],
+			 20=>['',		'Cellular Holding, Inc.'],
+			 24=>['Georgetown',	'Georgetown Telephone Company'],
+		},
+		42=>{
+			state=>['MO',		'Missouri'],
+			  4=>['',		'Cass telephone Company'],
+			  8=>['Teleport',	'Teleport Communications Group'],
+			 12=>['',		'Intellicom, Inc.'],
+			 16=>['',		'Phonetime, Inc.'],
+			 20=>['American',	'American Communications Services Inc.'],
+			 24=>['Consolidated',	'Consolidated Communications, Inc.'],
+			 28=>['',		'Metro One Telecommunications'],
+			 32=>['Miller',		'Miller Telephone Company'],
+			 36=>['',		'MoKan Dia, Inc. - Missouri site'],
+			 40=>['',		'Digital Teleport, Inc.'],
+			 44=>['Alma',		'Alma Telephone Company, Inc.'],
+			 48=>['',		'Birch Telecom - Missouri site'],
+			 52=>['',		'USTel dba Arcada Commun. - MO site'],
+			 56=>['',		'ExOp of Missouri, Inc.'],
+			 60=>['BPS',		'BPS Telephone Company'],
+			 64=>['Gabriel',	'Gabriel Communications, Inc. - MO site'],
+			 68=>['Gabriel',	'Gabriel Communications,Inc. - MO site'],
+			 72=>['',		'Chariton Valley Long Distance Corp.'],
+			 76=>['',		'Missouri RSA #5'],
+		},
+		43=>{
+			state=>['MT',		'Montana'],
+			  4=>['Range',		'Range Telephone Cooperative'],
+			  8=>['',		'Montana Wireless, Inc.'],
+			 12=>['Ronan',		'Ronan Telephone Company'],
+			 16=>['',		'Project Telephone Co. - Montana'],
+			 20=>['',		'Project Telephone Co. - Montana'],
+			 24=>['Nemont',		'Nemont Telephone Cooperative, Inc.'],
+			 28=>['Nemont',		'Nemont Telephone Cooperative, Inc.'],
+			 32=>['Nemont',		'Nemont Telephone Cooperative, Inc.'],
+			 36=>['Nemont',		'Nemont Telephone Cooperative, Inc.'],
+			 40=>['Nemont',		'Nemont Telephone Cooperative, Inc.'],
+			 44=>['',		'Wireless II'],
+			 48=>['',		'USTel dba Arcada Commun. - MT site'],
+			 52=>['InterBel',	'InterBel Telephone Cooperative, Inc.'],
+		},
+		44=>{
+			state=>['NE',		'Nebraska'],
+			  4=>['Teleport',	'Teleport Communications Group'],
+			  8=>['Wauneta',	'Wauneta Telephone Company'],
+			 12=>['Keystone-A',	'Keystone-Arthur Telephone Company'],
+			 16=>['',		'USA Global Link'],
+			 20=>['',		'Three River Telco'],
+			 24=>['Plainview',	'Plainview Telephone Company, Inc.'],
+			 28=>['Elsie M',	'Elsie Mutual Telephone Company'],
+			 32=>['',		'Hamilton Telecommunications'],
+			 36=>['Stanton',	'The Stanton Telephone Company'],
+			 40=>['',		'Wauneta Telephone Co.,Inc.'],
+			 44=>['',		'Hartington Telecomm. Co.,Inc.'],
+			 48=>['ATC',		'ATC Communications'],
+			 52=>['',		'Henderson Co-Op Telephone Co.'],
+			 56=>['',		'First Data Corporation(FDC)NE site'],
+			 60=>['',		'Dalton Telephone Co.,Inc.'],
+			 64=>['',		'Curtis Telephone Co.,Inc.'],
+			 68=>['',		'Clarks Telecommunications Co.'],
+			 72=>['',		'Hershey Cooperative Telephone Co.'],
+			 76=>['',		'Northeast Nebraska Telephone Co.'],
+			 80=>['',		'Northeast Nebraska Telephone Co.'],
+			 84=>['',		'NebCom, Inc.'],
+			 88=>['',		'Tracey Corp. II d/b/a Western Total'],
+			 92=>['',		'Eastern Nebraska Telephone Co.-NE site'],
+			 96=>['Home',		'Home Telephone Company of Nebraska'],
+			100=>['',		'Glenwood Telephone Membership Corp.'],
+		},
+		45=>{
+			state=>['NV',		'Nevada'],
+			  4=>['',		'Phoenix Fiberlink of Utah, Inc.'],
+			  8=>['Moapa Valley',	'Moapa Valley Telephone Company'],
+			 12=>['Moapa Valley',	'Moapa Valley Telephone Company'],
+			 16=>['',		'The  Lincoln County Telephone System, Inc.'],
+			 20=>['',		'NTI Telecom Incorporated'],
+			 24=>['',		'ILD Teleservices, Inc.'],
+			 28=>['',		'American Comm.Services,Inc. Nevada'],
+			 32=>['MGC',		'MGC Communications Inc.'],
+			 36=>['Net',		'Net Communications,Inc. - Nevada site'],
+			 40=>['',		'USTel dba Arcada Commun. - NV site'],
+			 44=>['',		'Rio Virgin Telephone Co. - NV site'],
+		},
+		46=>{
+			state=>['NH',		'New Hampshire'],
+			  4=>['',		'Vitts Corporation'],
+			  8=>['',		'XCOM Technologies (NH site)'],
+			 12=>['Freedom Ring',	'Freedom Ring Communications, Inc.'],
+			 16=>['',		'CMG Telecommunications, Inc.'],
+		},
+		47=>{
+			state=>['NJ',		'New Jersey'],
+			  4=>['',		'Primus Telecommunications'],
+			  8=>['Teleport',	'Teleport Communications Group'],
+			 12=>['',		' Intellicom, Inc.'],
+			 16=>['',		'Phonetime, Inc.'],
+			 20=>['',		'Graphnet, Inc.'],
+			 24=>['',		'Metro One Telecommunications'],
+			 28=>['Pick',		'Pick Communications Corporation'],
+			 32=>['Caricall',	'Caricall Communications - NJ site'],
+			 36=>['',		'GSI Telecom - NJ site'],
+			 40=>['',		'Telephone Co. of Central Florida,Inc.-NJ'],
+			 44=>['',		'Call Sciences - NJ site'],
+			 48=>['',		'Thrifty Call Inc. - NJ site'],
+			 52=>['Viatel',		'Viatel Global Communications-NJ site'],
+			 56=>['Premiere',	'Premiere Communications - NJ site'],
+			 60=>['L.C.',		'L.C. Communications - NJ site'],
+			 64=>['Cooperative',	'Cooperative Communications, Inc- NJ site'],
+			 68=>['',		'PAPOSH, LLC -NJ site'],
+		},
+		48=>{
+			state=>['NM',		'New Mexico'],
+			  4=>['Baca Valley',	'Baca Valley Telephone Company'],
+			  8=>['Penasco Vly',	'Penasco Valley Telephone Cooperative, Inc.'],
+			 12=>['Valley',		'Valley Telephone Cooperative, Inc.'],
+			 16=>['',		'Tularosa Basin Telephone Co.,Inc.'],
+			 20=>['Valley',		'Valley Telephone Cooperative, Inc.'],
+			 24=>['Valley',		'Valley Telephone Cooperative, Inc.'],
+			 28=>['Roosevelt Cty',	'Roosevelt County Rural Telephone Coop., Inc.'],
+			 32=>['',		'Reams Commun.,Inc.dba Valuline Long'],
+		},
+		49=>{
+			state=>['NY',		'New York'],
+			  4=>['Universal',	'Universal Communications Network, Inc.'],
+			  8=>['',		'Athena International LLC'],
+			 16=>['Inter-Community','Inter-Community Telephone Company'],
+			 20=>['Teleport',	'Teleport Communications Group'],
+			 24=>['Teleport',	'Teleport Communications Group'],
+			 28=>['Residential',	'Residential Communications Network, Inc.'],
+			 32=>['',		'Telcom International Inc.'],
+			 36=>['',		'Cyberlight International, Inc.'],
+			 40=>['',		'Access Technologies Group'],
+			 44=>['',		'Five Star Telecom'],
+			 48=>['',		'TresCom International'],
+			 52=>['',		'USFI, Inc.'],
+			 56=>['Viatel',		'Viatel Global Communications'],
+			 60=>['Time Warner',	'Time Warner Communications'],
+			 64=>['',		'USA Global Link'],
+			 68=>['',		'Pacific Gateway Exchange'],
+			 72=>['Unicall',	'Unicall Communications, Inc.'],
+			 76=>['Focal',		'Focal Communications Corporation'],
+			 80=>['',		'World Exchange'],
+			 84=>['',		'Hyperion Telecommunications, Inc.'],
+			 88=>['',		'DirectNet Telecommunications - NY'],
+			 92=>['',		'DirectNet Telecommunications - NY'],
+			 96=>['',		'Telia North America Inc. - NY'],
+			100=>['',		'SITA - New York location'],
+			104=>['',		'Startec, Inc. - NY location'],
+			108=>['',		'XCOM Technologies ( NY site)'],
+			112=>['',		'Graphnet, Inc. (NY site)'],
+			116=>['',		'Northland Comm.Group-Syracuse & Utica'],
+			120=>['',		'Oneida County Rural Tele. Co.'],
+			124=>['',		'Hudson Valley RSA Cellular Partnership'],
+			128=>['',		'Econophone, Inc. - NY site'],
+			132=>['',		'Chautauqua & Erie Telephone Corp.'],
+			136=>['',		'American International Tele.Co.,Inc.-NY'],
+			140=>['',		'KDD America, Inc.'],
+			144=>['',		'Allegiance Telecom,Inc. - NY site'],
+			148=>['',		'AlphaNet Telecom Inc. - NY site'],
+			152=>['',		'Long Distance Int\'l Provisioning-NY'],
+			156=>['',		'Domtel Comm.Inc. d/b/a Tricom USA-NY'],
+			160=>['',		'FDN, Inc. - NY site'],
+			164=>['',		'New Millennium Comm.Corp - NY'],
+			168=>['Trans Global',	'Trans Global Communications-NY site'],
+			172=>['Arbit',		'Arbit Communications, Inc. - NY site'],
+			176=>['Arbit',		'Arbit Communications, Inc. -NY site'],
+			180=>['',		'Local Fiber, L.L.C.'],
+			184=>['',		'Telcom International - NY site'],
+			188=>['Net',		'Net Communications,Inc. - NY site'],
+			192=>['',		'Justice Technology Corp. - NY'],
+			196=>['',		'North American Gateway Inc. - NY site'],
+			200=>['',		'North American Telecomm. Corp.'],
+			204=>['',		'Transwire LLC'],
+			208=>['',		'Transwire LLC'],
+			212=>['',		'Transwire LLC'],
+			216=>['',		'FaciliCom International - NY site'],
+			220=>['Worldport',	'Worldport Communications, Inc. NY site'],
+			228=>['',		'OzEmail Interline Pty Limited - NY site'],
+			232=>['',		'ITC, Inc. - NY site'],
+			236=>['',		'INET Interactive Network System-NY'],
+			240=>['',		'Thrifty Call Inc. - NY site'],
+			244=>['',		'Bell Atlantic Global Networks -NY site'],
+			248=>['Voice Data',	'Voice Data Communicationsl - NY site'],
+		},
+		50=>{
+			state=>['NC',		'North Carolina'],
+			  4=>['',		'US LEC of North Carolina, LLC'],
+			  8=>['American',	'American Communications Services, Inc.'],
+			 12=>['Fiber South',	'Fiber South Communications'],
+			 16=>['',		'BellSouth Long Distance, Inc.'],
+			 20=>['Time Warner',	'Time Warner Communications'],
+			 24=>['Teleport',	'Teleport Communications Group'],
+			 28=>['',		'US LEC of North Carolina - NC'],
+			 32=>['',		'KMC Telecom Inc. - NC'],
+			 36=>['',		'Long Distance Int\'l Provisioning - NC'],
+			 40=>['Citizens',	'Citizens Telephone Company'],
+			 44=>['',		'Listing Services Solutions, Inc. - NC site'],
+			 48=>['Interpath',	'Interpath Communications, Inc.'],
+			 52=>['USTel',		'USTel dba Arcada Communications-NC'],
+			 56=>['',		'PC Management - NC site'],
+			 60=>['',		'PC Management - NC site'],
+		},
+		51=>{
+			state=>['ND',		'North Dakota'],
+			  4=>['Dickey Rural',	'Dickey Rural Telephone Company'],
+			  8=>['Consolidated',	'Consolidated Telephone Cooperative'],
+			 12=>['',		'Dakota Central Telecommunications Cooperative'],
+		},
+		52=>{
+			state=>['OH',		'Ohio'],
+			  4=>['Teleport',	'Teleport Communications Group'],
+			  8=>['Time Warner',	'Time Warner Communications'],
+			 12=>['',		'Buckeye Telesystem - Ohio site'],
+			 16=>['',		'Con Quest'],
+			 20=>['',		'Con Quest'],
+			 24=>['',		'Con Quest'],
+		},
+		53=>{
+			state=>['OK',		'Oklahoma'],
+			  4=>['',		'Panhandle telephone Cooperative, Inc.'],
+			  8=>['OnQue',		'OnQue Communications, Inc.'],
+			 12=>['Scott Cty',	'Scott County Telephone Company'],
+			 16=>['American',	'American Communications Services, Inc.'],
+			 20=>['',		'Long Distance Int\'l Provisioning - OK'],
+			 24=>['',		'Oklahoma Telephone & Telegraph,Inc.'],
+			 28=>['Panhandle',	'Panhandle Telephone Cooperative,Inc.'],
+		},
+		54=>{
+			state=>['OR',		'Oregon'],
+			  4=>['ECI',		'ECI Communications'],
+			  8=>['Teleport',	'Teleport Communications Group'],
+			 12=>['',		'Metro One Telecommunications'],
+			 16=>['',		'OGI Telecomm'],
+			 20=>['',		'Great West Services, Ltd.'],
+			 24=>['',		'Oregon Telco Services, Inc.'],
+			 28=>['Rio',		'Rio Communications, Inc. - OR site'],
+			 32=>['USTel',		'USTel dba Arcada Communications-OR'],
+			 36=>['',		'Cascade Utilities, Inc. - OR site'],
+			 40=>['',		'Oregon Telephone Corporation'],
+			 44=>['North-State',	'North-State Telephone Company'],
+		},
+		55=>{
+			state=>['PA',		'Pennsylavania'],
+			  4=>['Palmerton',	'Palmerton Telephone Company'],
+			  8=>['Teleport',	'Teleport Communications Group'],
+			 12=>['Teleport',	'Teleport Communications Group'],
+			 16=>['Residential',	'Residential Communications Network, Inc.'],
+			 20=>['',		'Buffalo Valley Telephone'],
+			 24=>['',		'Conestoga Wireless Company'],
+			 28=>['',		'Metro One Telecommunications'],
+			 32=>['Xtel',		'Xtel Communications, Inc.'],
+			 36=>['',		'Hyperion Telecomm.Inc. - PA'],
+			 40=>['',		'Hyperion Telecomm. Inc. - PA'],
+			 44=>['',		'Hyperion Telecomm. Inc. - PA'],
+			 48=>['Focal',		'Focal Communications Corp. - PA site'],
+			 52=>['',		'Bell Atlantic Global Networks-PA site'],
+			 56=>['PaeTec',		'PaeTec Communications, Inc. - PA site'],
+			 60=>['Level 3',	'Level 3 Communications - PA site'],
+			 64=>['USTel',		'USTel dba Arcada Communications-PA'],
+			 68=>['',		'Allegiance Telcom, Inc. - PA site'],
+			 72=>['',		'Comav Telco, Inc. - PA site'],
+		},
+		56=>{
+			state=>['RI',		'Rhode Island'],
+			  4=>['Teleport',	'Teleport Communications Group'],
+			  8=>['',		'XCOM Technologies - Rhode Island'],
+		},
+		57=>{
+			state=>['SC',		'South Carolina'],
+			  4=>['Pond Branch',	'Pond Branch Telephone Company, Inc.'],
+			  8=>['W Carolina R',	'West Carolina Rural Telephone Cooperative, Inc.'],
+			 12=>['American',	'American Communications Services, Inc.'],
+			 16=>['',		'NewSouth Comm.L.L.C. - SC'],
+			 20=>['',		'Rhinos International Ltd. Co.'],
+			 24=>['',		'Rhinos International Ltd. Co.'],
+			 28=>['',		'Rhinos International Ltd. Co.'],
+			 32=>['',		'P.V. Tel LLC - SC site'],
+		},
+		58=>{
+			state=>['SD',		'South Dakota'],
+			  4=>['RC',		'RC Communications, Inc.'],
+			  8=>['',		'Bridgewater-Canistota Independent Telephone'],
+			 12=>['Midco',		'Midco Communications'],
+			 16=>['',		'Kadoka Telephone Co.-South Dakota'],
+		},
+		59=>{
+			state=>['TN',		'Tennessee'],
+			  4=>['Teleport',	'Teleport Communications Group'],
+			  8=>['American',	'American Communications Services, Inc.'],
+			 12=>['',		'Advantage Cellular Systems'],
+			 16=>['',		'BellSouth Long Distance, Inc.'],
+			 20=>['',		'US LEC of North Carolina - Tennessee'],
+			 24=>['',		'Teleport Comm. Group - Tennessee'],
+			 28=>['Chase',		'Chase Communications,Inc. -Tennessee'],
+			 32=>['Chase',		'Chase Communications,Inc. -Tennessee'],
+			 36=>['Chase',		'Chase Communications,Inc. - Tennessee'],
+			 40=>['Chase',		'Chase Communications,Inc. - Tennessee'],
+			 44=>['',		'Comm. Depot, Inc. - TN site'],
+			 48=>['',		'P.V. Tel LLC - TN site'],
+		},
+		60=>{
+			state=>['TX',		'Texas'],
+			  4=>['Future',		'Future Telephone Communications, Inc. dba FTC  Long Distance'],
+			  8=>['Universal',	'Universal Communications Network, Inc.'],
+			 12=>['Cameron',	'Cameron Telephone Company Texas Division'],
+			 16=>['Lk. Livingston',	'Lake Livingston Telephone Company'],
+			 20=>['IXC',		'IXC Communications, Inc.'],
+			 24=>['Crawford',	'Crawford Telephone Company'],
+			 28=>['Teleport',	'Teleport Communications Group'],
+			 32=>['Teleport',	'Teleport Communications Group'],
+			 36=>['',		'NRPT Corporation'],
+			 40=>['',		'Intellicom, Inc.'],
+			 44=>['',		'Phonetime, Inc.'],
+			 48=>['American',	'American Communications Services, Inc.'],
+			 52=>['American',	'American Communications Services, Inc.'],
+			 56=>['Border to Border','Border to Border Communications, Inc.'],
+			 60=>['OpTel',		'OpTel, Inc.'],
+			 64=>['Five Star',	'Five Star Telecom'],
+			 68=>['Voice Track',	'Voice Track'],
+			 72=>['Taylor',		'Taylor Communications Group, Inc.'],
+			 76=>['FTI',		'FTI Communications'],
+			 80=>['Hill Cty',	'Hill Country Telephone Cooperative, Inc.'],
+			 84=>['',		'TCA Long Distance'],
+			 88=>['',		'CSW/ICG ChoiceCom, L.P.'],
+			 92=>['',		'CSW/ICG ChoiceCom, L.P.'],
+			 96=>['',		'CSW/ICG ChoiceCom, L.P.'],
+			100=>['Time Warner',	'Time Warner Communications'],
+			104=>['',		'KMC Telecom Inc.'],
+			108=>['Telco',		'Telco Communications Group'],
+			112=>['',		'SA Telecommunications'],
+			116=>['Alenco',		'Alenco Communications, Inc.'],
+			120=>['Alenco',		'Alenco Communications, Inc.'],
+			124=>['',		'World Exchange'],
+			128=>['',		'ILD Teleservices, Inc.'],
+			132=>['',		'CoServ L.L.C.'],
+			136=>['',		'IWL Comm. d.b.a. IWL Connect-Texas'],
+			140=>['',		'Star Telecom (Dallas,Texas site)'],
+			144=>['',		'Allegiance Telecom,Inc.-Texas site'],
+			148=>['',		'Econophone, Inc. - Texas site'],
+			152=>['',		'FiberWave'],
+			156=>['',		'West Texas Rural Tele.Cooperative'],
+			160=>['',		'West Texas Rural Tele. Cooperative'],
+			164=>['',		'West Texas Rural Tele. Cooperative'],
+			168=>['',		'WT Services, Inc.'],
+			172=>['Revenue',	'Revenue Communications, Inc.-Texas'],
+			176=>['',		'Great West Services, Ltd.'],
+			180=>['Industry',	'Industry Telephone Company'],
+			184=>['',		'Telescape International, Inc.'],
+			188=>['',		'FDN, Inc. - Texas site'],
+			192=>['',		'New Millennium Comm.Corp. - Texas'],
+			196=>['',		'Tele.Co.of Central Florida,Inc.-Texas'],
+			200=>['',		'Blossom Telephone Co.,Inc.'],
+			204=>['',		'American Telesource Int\'l Inc.'],
+			208=>['',		'American Gateway Telecommunications'],
+			212=>['',		'FaciliCom International-Texas site'],
+			216=>['',		'AirTouch Satellite Services-Texas site'],
+			220=>['Tech',		'Tech Telephone Company, Ltd.'],
+			224=>['',		'IXE Corporation'],
+			228=>['Worldport',	'Worldport Communications,Inc.-TX site'],
+			232=>['Logix',		'Logix Communications'],
+			236=>['Logix',		'Logix Communications'],
+			240=>['',		'Thrifty Call Inc. - TX site'],
+			244=>['',		'Paging Network Inc. - TX site'],
+			248=>['',		'Nortex Telcom'],
+			252=>['',		'Twister Comm. Network, Inc.'],
+		},
+		61=>{
+			state=>['UT',		'Utah'],
+			  4=>['All West',	'All West Communications'],
+			  8=>['',		'Phoenix Fiberlink of Utah, Inc.'],
+			 12=>['Teleport',	'Teleport Communications Group'],
+			 16=>['FTI',		'FTI Communications'],
+			 20=>['Teltrust',	'Teltrust Communications Services, Inc.'],
+			 24=>['',		'Access Long Distance'],
+			 28=>['',		'Access Long Distance'],
+			 32=>['',		'Access Long Distance'],
+			 36=>['Teltrust',	'Teltrust Communications Services, Inc.'],
+			 40=>['',		'USTel dba Arcada Commun. - UT side'],
+		},
+		62=>{
+			state=>['VT',		'Vermont'],
+			  4=>['',		'Hyperion Telcommunications, Inc.'],
+			  8=>['',		'Personal Commun. Network,Inc. - VT'],
+			 12=>['',		'Personal Commun. Network,Inc. - VT'],
+			 16=>['',		'Personal Commun. Network, Inc. - VT'],
+		},
+		63=>{
+			state=>['VA',		'Virginia'],
+			  4=>['',		'Swiftcall (USA) Inc.'],
+			  8=>['Global Tone',	'Global Tone Communications, Inc.'],
+			 12=>['',		'Hyperion Telecommunications, Inc.'],
+			 16=>['',		'US LEC of North Carolina - Virginia'],
+			 20=>['',		'XCOM Technologies - Virginia site'],
+			 24=>['',		'KMC Telecom Inc. - Virginia site'],
+			 28=>['',		'CFW Wireless'],
+			 32=>['',		'LEVEL 3 - VA site'],
+			 36=>['',		'Allegiance Telecom, Inc. - VA site'],
+			 40=>['',		'Ameritech Global Gateway Services'],
+		},
+		64=>{
+			state=>['WV',		'West Virginia'],
+			  4=>['',		'ComScape Telecommunications, Inc.'],
+			  8=>['',		'Hardy Telecommunications, Inc.'],
+		},
+		65=>{
+			state=>['WA',		'Washington'],
+			  4=>['',		'XYPOINT Corporation'],
+			  8=>['Teleport',	'Teleport Communications Group'],
+			 12=>['',		'Five Star Telecom'],
+			 16=>['',		'Phonetime, Inc.'],
+			 20=>['St. John',	'St. John Telephone Company'],
+			 24=>['',		'USA Global Link'],
+			 28=>['',		'Global Connect Partners LLC'],
+			 32=>['',		'Metro One Telecommunications'],
+			 36=>['',		'World Exchange'],
+			 40=>['',		'XYPOINT Corporation'],
+			 44=>['',		'XYPOINT Corporation'],
+			 48=>['',		'AlphaNet Telecom Inc. - Seattle site'],
+			 52=>['',		'Global Mobility Systems, Inc.'],
+			 56=>['',		'Pass Word, Inc.'],
+			 60=>['',		'Cable Plus Company LP'],
+			 64=>['',		'Great West Services'],
+			 68=>['',		'USTel dba Arcada Commun. - WA site'],
+		},
+		66=>{
+			state=>['WI',		'Wisconsin'],
+			  4=>['Somerset',	'Somerset Telephone Company, Inc.'],
+			  8=>['Airadigm',	'Airadigm Communications'],
+			 12=>['Airadigm',	'Airadigm Communications'],
+			 16=>['Airadigm',	'Airadigm Communications'],
+			 20=>['Airadigm',	'Airadigm Communications'],
+			 24=>['Airadigm',	'Airadigm Communications'],
+			 28=>['Airadigm',	'Airadigm Communications'],
+			 32=>['',		'Kendall Telephone Inc.'],
+			 36=>['',		'Cuba City Telephone Exchange Company'],
+			 40=>['',		'KMC Telecom Inc.'],
+			 44=>['Manawa',		'Manawa Telephone Company, Inc.'],
+			 48=>['',		'US Xchange LLC(Wisconsin site)'],
+			 52=>['',		'Lemonweir Valley Telephone Co.'],
+			 56=>['',		'Amery Telcom, Inc.'],
+		},
+		67=>{
+			state=>['WY',		'Wyoming'],
+			  4=>['Range',		'Range Telephone Cooperative'],
+			  8=>['',		'Silver Star Telephone Co. - WY site'],
+			 12=>['RT',		'RT Communications, Inc.'],
+		},
+		68=>{
+			state=>['AB',		'Alberta'],
+			  4=>['',		'AirTouch Satellite Services-Calgary site'],
+		},
+		69=>{
+			state=>['BC',		'British Columbia'],
+			  4=>['',		'Hongkong Telecom Canada'],
+			  8=>['',		'Prince Rupert City Telephone'],
+			 12=>['',		'GT Group Telecom Networks, Inc.'],
+			 16=>['',		'Vancouver Telephone Co. Ltd.'],
+		},
+		70=>{
+			state=>['MB',		'Manitoba'],
+		},
+		71=>{
+			state=>['NB',		'New Brunswick'],
+		},
+		72=>{
+			state=>['NL',		'Newfoundland'],
+		},
+		73=>{
+			state=>['NT',		'Northwest Territories'],
+		},
+		74=>{
+			state=>['NS',		'Nova Scotia'],
+		},
+		75=>{
+			state=>['ON',		'Ontario'],
+			  4=>['',		'Primus Telecommunications, Inc'],
+			  8=>['Telehop',	'Telehop Communications, Inc.'],
+			 12=>['',		'Dryden Municipal Telephone System'],
+			 16=>['',		'Econophone, Inc. - Ontario site'],
+			 20=>['Kenora M',	'Kenora Municipal Telephone Company'],
+			 24=>['',		'AlphaNet Telecom Inc.'],
+			 28=>['',		'Eastern Independent Telecomm. Ltd.'],
+			 32=>['',		'AirTouch Satellite Services-Ontario site'],
+			 36=>['',		'Wightman Telephone Ltd.'],
+			 40=>['Premiere',	'Premiere Communications -Ontario site'],
+		},
+		76=>{
+			state=>['PE',		'Prince Edward Island'],
+		},
+		77=>{
+			state=>['QC',		'Quebec'],
+			  4=>['',		'La Compagnie de Telephone de St-Victor'],
+			  8=>['',		'Telephone de St-Ephrem'],
+			 12=>['',		'Telephone Guevremont Inc.'],
+			 16=>['',		'Videotron Telecom Ltee'],
+			 20=>['',		'La Corporation de Telephone de la Baie'],
+			 24=>['',		'Videotron Telecom Ltee'],
+			 28=>['',		'La Compagnie de Telephone de Lambton'],
+			 32=>['',		'La Cie de Telephone de Courcelles Inc.'],
+		},
+		78=>{
+			state=>['SK',		'Saskatchewan'],
+		},
+		79=>{
+			state=>['YT',		'Yukon'],
+		},
+		80=>{
+			state=>['Atlantic',	'ATLANTIC and CARIBBEAN ISLANDS (U.S. Territories)'],
+			  4=>['',		'Panam Wireless, Inc.'],
+			  8=>['',		'IT&E Overseas, Inc.'],
+			 12=>['Quantum',	'Quantum Communications Ltd.'],
+			 16=>['Quantum',	'Quantum Communications Ltd.'],
+			 20=>['',		'AirTouch Satellite Serv.-Puerto Rico site'],
+			 24=>['Bermuda',	'Bermuda Digital Communications Ltd.'],
+			 28=>['',		'Caribcom'],
+		},
+		81=>{
+			state=>['Pacific',	'PACIFIC ISLANDS (U.S. Territories)'],
+			  4=>['',		'Guam Telephone Authority'],
+			  8=>['',		'Access Telecom'],
+			 12=>['',		'American Samoa Telecommunications'],
+			 16=>['',		'American Samoa Telecommunications'],
+			 20=>['',		'Guam Cellular & Paging'],
+			 24=>['',		'Saipan Cellular & Paging'],
+		},
+		82=>{
+			state=>['TX',		'Texas'],
+			  4=>['',		'N + 1, Inc., - TX site'],
+			  8=>['Level 3',	'Level 3 Communications - TX site'],
+			 12=>['',		'Fort Bend Long Distance Co. - TX site'],
+			 16=>['',		'USTel dba Arcada Commun. - TX site'],
+			 20=>['',		'Network Switching Services,Inc.-TX site'],
+			 24=>['Grande River',	'Grande River Communications,Inc.'],
+			 28=>['Southside',	'Southside Communications,Inc.-TX site'],
+			 32=>['',		'Alamosa PCS LLC - TX site'],
+			 36=>['',		'Allegiance Telecom, Inc. - TX site'],
+			 40=>['',		'Millenium Telcom, L.L.C.'],
+			 44=>['',		'Logix'],
+			 48=>['',		'Logix'],
+			 52=>['Cumby',		'Cumby Telephone Cooperative,Inc.'],
+			 56=>['',		'U.S. Operations, Inc.'],
+		},
+		83=>{
+			state=>['CA',		'California'],
+			  4=>['',		'Allegiance Telecom, Inc. - CA site'],
+			  8=>['PaeTec',		'PaeTec Communications,Inc. - CA site'],
+			 12=>['Level 3',	'Level 3 Communications - CA site'],
+			 16=>['',		'KDD America Inc. - CA site'],
+			 20=>['',		'USTel dba Arcada Commun. - CA site'],
+			 24=>['',		'WorldxChange - CA site'],
+			 28=>['Premiere',	'Premiere Communications - CA site'],
+			 32=>['',		'Network Switching Services,Inc.-CA site'],
+			 36=>['',		'US TelePacific Corp.dba TelePacific'],
+			 40=>['',		'OpTel,Inc. - CA site'],
+			 48=>['',		'VIP Calling - CA site'],
+			 52=>['',		'Alphanet Telecom Inc. - CA site'],
+			 56=>['',		'RCN Telecom of California'],
+			 60=>['Startec',	'Startec Global Communications Corp.'],
+		},
+		84=>{
+			state=>['NY',		'New York'],
+			  4=>['',		'Carrier 1, Inc. - NY site'],
+			  8=>['',		'Telergy'],
+			 12=>['',		'USTel dba Arcada Commun. - NY site'],
+			 16=>['',		'City Telecom (USA)Inc. - NY site'],
+			 20=>['',		'Network Switching Services, Inc.NY site'],
+			 24=>['',		'Interoute Telecommunications, Inc.'],
+			 28=>['',		'Interoute Telecommunications, Inc.'],
+			 32=>['Choice One',	'Choice One Communications-NY site'],
+			 36=>['',		'Star/UniSource Carrier Services'],
+			 40=>['Choice One',	'Choice One Communications'],
+			 44=>['',		'Comav Telco, Inc. - NY site'],
+		},
 );
 
-my $pc_assigments = {
+our $pc_assignments = {
 	large_networks=>\%large_networks,
 	small_networks=>\%small_networks,
 	pc_blocks=>\%pc_blocks,
 };
-
-sub pcowner {
-	my ($pc,$i) = @_;
-	my ($ntw,$cls,$mem,$own);
-	$ntw = $pc >> 16;
-	$cls = ($pc >> 8) & 0xff;
-	$mem = $pc & 0xff;
-	if (5 < $ntw && $ntw < 255) {
-		if ($cls != 0) {
-			if ($own = $pc_assigments->{large_networks}->{$ntw}) {
-				return $own->[$i];
-			}
-			if ($i) {
-				return 'Unknown large network';
-			}
-			return '';
-		}
-	}
-	if (1 <= $ntw && $ntw <= 4) {
-		if ($cls != 0) {
-			my $small;
-			if ($small = $pc_assigments->{small_networks}->{$ntw}) {
-				if ($own = $small->{$cls}) {
-					return $own->[$i];
-				}
-			}
-			if ($i) {
-				return 'Unknown small network.';
-			}
-			return '';
-		}
-	}
-	if ($ntw == 5) {
-		if ($cls != 0) {
-			my $cluster;
-			if ($cluster = $pc_assigments->{pc_blocks}->{$cls}) {
-				my $member = $mem & ~0x03;
-				if ($own = $cluster->{$member}) {
-					return $own->[$i];
-				}
-			}
-			if ($i) {
-				return 'Unknown point code block.';
-			}
-			return '';
-		}
-	}
-	if ($i) {
-		return 'Invalid point code.';
-	}
-	return '';
-}
-
-sub pcstring {
-	my ($pc) = @_;
-	my ($ntw,$cls,$mem,$own);
-	if ($pc & ~0x3fff) {
-		$ntw = $pc >> 16;
-		$cls = ($pc >> 8) & 0xff;
-		$mem = $pc & 0xff;
-	} else {
-		$ntw = $pc >> 11;
-		$cls = ($pc >> 3) & 0xff;
-		$mem = $pc & 0x7;
-	}
-	return "$ntw-$cls-$mem";
-}
 
 # distributions of message priorities should be:
 # priority 3 0%-5%, 2 0%-20%, 1 30%-45%, 0 30%-45%
@@ -4454,8 +5692,8 @@ sub access {
 		return '' unless exists $mtypes{$msg->{si}};
 		return "\U$mtypes{$msg->{si}}->{0x00}->[0]\E";
 	}
-	return main::pcstring($msg->{'opc'}) if $col == 4;
-	return main::pcstring($msg->{'dpc'}) if $col == 5;
+	return SP::pcstring($msg->{opc}) if $col == 4;
+	return SP::pcstring($msg->{dpc}) if $col == 5;
 	return $msg->{sls} if $col == 6;
 	if ($col == 7) {
 		return '' unless exists $mtypes{$msg->{si}}->{$msg->{mt}};
@@ -4647,7 +5885,7 @@ sub status {
 			$tw->destroy;
 		},$self]);
 		$self->{statu} = $tw;
-		$self->fillstatus($tw,\$row);
+		$self->fillstatus($top,$tw,\$row);
 	}
 	$tw->update;
 	$tw->MapWindow;
@@ -4657,6 +5895,28 @@ sub status {
 package Clickable;
 use strict;
 # -------------------------------------
+
+#package Clickable;
+sub init {
+	my ($self) = @_;
+	$self->{items} = [];
+}
+
+#package Clickable;
+sub attach {
+	my ($self,$top) = @_;
+	if (exists $self->{items}) {
+		foreach (@{$self->{items}}) {
+			$top->canvas->bind($_,'<ButtonPress-3>',[\&Clickable::button3,$self,$top,Tk::Ev('X'),Tk::Ev('Y')]);
+		}
+		$top->mycanvas->addballoon($self,$self->{items});
+	} else {
+		$top->canvas->bind($self->{item},'<ButtonPress-3>',[\&Clickable::button3,$self,$top,Tk::Ev('X'),Tk::Ev('Y')]);
+		$top->mycanvas->addballoon($self,[$self->{item}]);
+	}
+	$top->statusbar->configure(-text=>"Discovered ".$self->identify);
+	$top->{updatenow} = 1;
+}
 
 #package Clickable;
 sub getmenu {
@@ -4723,20 +5983,24 @@ sub getmenu {
 }
 
 #package Clickable;
-sub button3 {
-	my ($canvas,$self,$top,$X,$Y) = @_;
-	my $ref = ref $self;
-	my $m = $canvas->toplevel->Menu(
-		-tearoff=>0,
-		-title=>"$ref Menu",
-		-type=>'normal',
-	);
-	$self->getmenu($m,$top,$X,$Y);
-	$m->Popup(
-		-popanchor=>'nw',
-		-popover=>'cursor',
-	);
+sub getmore {
+	my ($self,$m,$top,$X,$Y) = @_;
+}
 
+#package Clickable;
+sub button3 {
+	my ($widget,$self,$top,$X,$Y) = @_;
+	my $title = $self->identify;
+	my $m = $widget->toplevel->Menu(-title=>"$title Menu");
+	$self->getmenu($m,$top,$X,$Y,1);
+	$self->getmore($m,$top,$X,$Y,1);
+	$m->Popup(-popanchor=>'nw',-popover=>'cursor');
+}
+
+#package Clickable;
+sub bindtowidget {
+	my ($self,$top,$widget) = @_;
+	$widget->bind('<ButtonPress-3>',[\&Clickable::button3,$self,$top,Tk::Ev('X'),Tk::Ev('Y')]);
 }
 
 # -------------------------------------
@@ -4767,6 +6031,14 @@ my @rsoptions = (
 	['Congested(3)' => RS_CONGESTED_3],
 	['Unavailable'  => RS_UNAVAILABLE],
 );
+my @rscolors = (
+	'black',
+	'orange',
+	'yellow1',
+	'yellow2',
+	'yellow3',
+	'red',
+);
 
 my %relations;
 my $relationno = 0;
@@ -4779,6 +6051,7 @@ sub init {
 	$self->Logging::init(@args);
 	$self->Properties::init(@args);
 	$self->Status::init(@args);
+	$self->Clickable::init(@args);
 	$self->CallCollector::init(@args);
 	$self->MsgCollector::init(@args);
 	$self->{key} = "$nodea->{pc},$nodeb->{pc}";
@@ -4790,7 +6063,6 @@ sub init {
 	$self->{actforw} = 0;
 	$self->{actrevs} = 0;
 	$self->{actboth} = 0;
-	$self->{slcs} = {};
 	$self->{slccnt} = 0;
 	$self->{nodea} = $nodea;
 	$self->{nodeb} = $nodeb;
@@ -4807,25 +6079,41 @@ sub init {
 	$self->{item} = $c->createLine($xa,$ya,$xb,$yb,
 		-arrow=>'none',
 		-capstyle=>'round',
-		-fill=>$self->{fill},
-		-activefill=>'green',
+		-fill=>$self->{fill}, -width=>0.1,
+		-activefill=>'cyan', -activewidth=>2,
 		-joinstyle=>'round',
 		-smooth=>0,
+		-state=>$top->{show}->{relations}?'normal':'hidden',
 		-tags=>['relation'],
-		-width=>0.1,
-		-activewidth=>2,
 	);
-	my $type = ref $self;
-	my $state = ($top->{show}->{"\L$type\Es"}) ? 'normal' : 'hidden';
-	$c->itemconfigure($self->{item},-state=>$state);
-	$c->bind($self->{item},'<ButtonPress-3>',[\&Clickable::button3,$self,$top,Tk::Ev('X'),Tk::Ev('Y')]);
+	push @{$self->{items}}, $self->{item};
+	$c->toplevel->traceVariable(\$self->{state},'w'=>[\&Relation::tracestate,$self,$c]);
 	$c->lower($self->{item},'node');
-	$c->lower($self->{item},'path');
-	$top->mycanvas->addballoon($self, $self->{item});
-	$top->statusbar->configure(-text=>"New ".$self->identify);
-	$top->{updatenow} = 1;
+	$c->lower($self->{item},'channel');
+	$self->Clickable::attach($top,@args);
 
 
+}
+
+#package Relation;
+#sub DESTROY {
+#	my $self = shift;
+#	my $c = $self->canvas;
+#	$c->toplevel->traceVdelete(\$self->{state});
+#}
+
+#package Relation;
+sub tracestate {
+	my ($ind,$val,$op,$self,$c) = @_;
+	if ($op eq 'w') {
+		my $color = $rscolors[$val];
+		$self->{statetext} = $rsoptions[$val]->[0];
+		if ($self->{color} ne $color) {
+			$self->{color} = $color;
+			$c->itemconfigure($self->{item},-fill=>$color);
+		}
+	}
+	return $val;
 }
 
 #package Relation;
@@ -4913,10 +6201,9 @@ sub pushcall {
 sub identify {
 	my $self = shift;
 	my $id = $self->{ciccnt} ? 'Circuits ' : 'Relation ';
-	$id .= "$self->{nodea}->{pcode}";
-	$id .= " ($self->{nodea}->{pownr})" if $self->{nodea}->{pownr};
-	$id .= ", $self->{nodeb}->{pcode}";
-	$id .= " ($self->{nodeb}->{pownr})" if $self->{nodeb}->{pownr};
+	$id .= $self->{nodea}->shortid;
+	$id .= ', ';
+	$id .= $self->{nodeb}->shortid;
 	return ($self->{id} = $id);
 }
 
@@ -5002,13 +6289,20 @@ sub add_revs { # from nodeb to nodea
 
 #package Relation;
 sub add_msg {
-	my ($self,$top,$network,$msg) = @_;
+	my ($self,$top,$network,$msg,$dir) = @_;
 	if ($msg->{si} == 5) {
 		my ($mt,$cic) = ($msg->{mt},$msg->{cic});
 		if ($self->{ciccnt} or ($mt == 0x10 || (0x12 <= $mt && $mt <= 0x1b) || $mt == 0x2a || $mt == 0x2b)) {
 			my $circuit = Circuit->get($top,$network,$self,$cic);
-			$circuit->add_msg($top,$network,$msg);
+			$circuit->add_msg($top,$network,$msg,$dir);
 		}
+	}
+	if (defined $dir) {
+		if ($dir)   { $self->add_revs($top,$network,$msg); }
+		else	    { $self->add_forw($top,$network,$msg); }
+		$self->inc($msg,$dir);
+		$self->pushmsg($msg);
+		return;
 	}
 	if ($self->{key} eq "$msg->{opc},$msg->{dpc}") {
 		$self->add_forw($top,$network,$msg);
@@ -5131,8 +6425,10 @@ sub move {
 		  $ya == $self->{ya} &&
 		  $xb == $self->{xb} &&
 		  $yb == $self->{yb};
+	$self->{offa} = $nodea->{off};
 	$self->{cola} = $nodea->{col};
 	$self->{rowa} = $nodea->{row};
+	$self->{offb} = $nodeb->{off};
 	$self->{colb} = $nodeb->{col};
 	$self->{rowb} = $nodeb->{row};
 	$c->coords($self->{item},$xa,$ya,$xb,$yb);
@@ -5142,58 +6438,73 @@ sub move {
 	$self->{yb} = $yb;
 	$self->{x} = ($xa + $xb)/2;
 	$self->{y} = ($ya + $yb)/2;
+	if (my $linkset = $self->{linkset}) { $linkset->move($top); }
 }
 
 #package Relation;
-sub getmenu {
+sub getmore {
 	my ($self,$m,$top,$X,$Y) = @_;
-	shift->Clickable::getmenu(@_);
-	if (keys %{$self->{links}}) {
-		$m->add('separator');
+	my $have = {};
+	my $have->{linkset} = $self->{linkset} ? 1 : 0;
+	my $have->{links} = scalar keys %{$self->{links}};
+	$m->add('separator'); # if $have->{linkset} + $have->{links};
+	{
+		my $label = $self->{nodea}->shortid;
+		my $mc = $m->Menu(-title=>"$label Menu");
+		$self->{nodea}->getmenu($mc,$top,$X,$Y);
+		$m->add('cascade',-menu=>$mc,-label=>$label);
+	}
+	{
+		my $label = $self->{nodeb}->shortid;
+		my $mc = $m->Menu(-title=>"$label Menu");
+		$self->{nodeb}->getmenu($mc,$top,$X,$Y);
+		$m->add('cascade',-menu=>$mc,-label=>$label);
+	}
+	if ($have->{linkset}) {
+		my $linkset = $self->{linkset};
+		unless ($Linkset::gotmenu) {
+			my $mc = $m->Menu(-title=>'Linkset Menu');
+			$linkset->getmenu($mc,$top,$X,$Y);
+			$m->add('cascade',-menu=>$mc,-label=>'Linkset');
+		}
+
+	}
+	if ($have->{links}) {
 		my ($mc,$m3);
-		$mc = $m->Menu(
-			-tearoff=>0,
-			-title=>'Links Menu',
-		);
+		$mc = $m->Menu(-title=>'Links Menu');
 		foreach my $slc (sort {$a <=> $b} keys %{$self->{links}}) {
 			my $link = $self->{links}->{$slc};
-			$m3 = $mc->Menu(
-				-tearoff=>0,
-				-title=>"Link $slc Menu",
-			);
+			$m3 = $mc->Menu(-title=>"Link $slc Menu");
 			$link->getmenu($m3,$top,$X,$Y);
-			$mc->add('cascade',
-				-menu=>$m3,
-				-label=>"Link $slc",
-			);
+			$mc->add('cascade', -menu=>$m3, -label=>"Link $slc");
 		}
-		$m->add('cascade',
-			-menu=>$mc,
-			-label=>'Links',
-		);
+		$m->add('cascade', -menu=>$mc, -label=>'Links');
 	}
 #	$mc = $m->Menu(
 #		-tearoff=>1,
 #		-title=>'Circuits Menu',
 #	);
 #	foreach my $cic (sort {$a <=> $b} keys %{$self->{cics}}) {
+#		my $count = 0;
 #		my $circuit;
 #		$m3 = $mc->Menu(
 #			-tearoff=>0,
 #			-title=>"Circuit $cic Menu",
 #		);
 #		$circuit = $self->{cics}->{$cic};
-#		$circuit->getmenu($m3,$top,$X,$Y) if $circuit;
+#		$count += $circuit->getmenu($m3,$top,$X,$Y) if $circuit;
 #		$mc->add('cascade',
 #			-menu=>$m3,
 #			-label=>"Circuit $cic",
 #		);
 #	}
-#	$m->add('cascade',
-#		-menu=>$mc,
-#		-label=>'Circuits',
-#		-state=>((keys %{$self->{cics}})?'normal':'disabled'),
-#	);
+#	if ($count) {
+#		$m->add('cascade',
+#			-menu=>$mc,
+#			-label=>'Circuits',
+#			-state=>((keys %{$self->{cics}})?'normal':'disabled'),
+#		);
+#	}
 }
 
 #package Relation;
@@ -5203,24 +6514,20 @@ sub fillprops {
 	$tw->Label(%labelright,
 		-text=>'SP A point code:',
 	)->grid(-row=>$$row,-column=>0,-sticky=>'ewns');
-	my $pca = $self->{nodea}->{pcode};
-	$pca .= " ($self->{nodea}->{pownr})" if $self->{nodea}->{pownr};
 	$tw->Entry(%entryleft,
-		-textvariable=>\$pca,
-	)->grid(-row=>$$row++,-column=>1,-sticky=>'ewns');
+		-text=>$self->{nodea}->identify, -width=>32,
+	)->grid(-row=>$$row++,-column=>1,-sticky=>'wns');
 	$tw->Label(%labelright,
 		-text=>'SP B point code:',
 	)->grid(-row=>$$row,-column=>0,-sticky=>'ewns');
-	my $pcb = $self->{nodeb}->{pcode};
-	$pcb .= " ($self->{nodeb}->{pownr})" if $self->{nodeb}->{pownr};
 	$tw->Entry(%entryleft,
-		-textvariable=>\$pcb,
-	)->grid(-row=>$$row++,-column=>1,-sticky=>'ewns');
+		-text=>$self->{nodeb}->identify, -width=>32,
+	)->grid(-row=>$$row++,-column=>1,-sticky=>'wns');
 }
 
 #package Relation;
 sub fillstatus {
-	my ($self,$tw,$row) = @_;
+	my ($self,$top,$tw,$row) = @_;
 
 	$tw->Label(%labelright,
 		-text=>'Exchange SLTM:',
@@ -5312,8 +6619,8 @@ sub fillstatus {
 sub log {
 	my ($self,$text) = @_;
 	$self->Logging::log($text);
-	$self->{'nodea'}->log($text);
-	$self->{'nodeb'}->log($text);
+	$self->{nodea}->log($text);
+	$self->{nodeb}->log($text);
 }
 
 # -------------------------------------
@@ -5840,10 +7147,9 @@ sub identify {
 	my $self = shift;
 	my $group = $self->{group};
 	my $id = "Circuit $self->{cic} ";
-	$id .= "$group->{nodea}->{pcode}";
-	$id .= " ($group->{nodea}->{pownr})" if $group->{nodea}->{pownr};
-	$id .= ", $group->{nodeb}->{pcode}";
-	$id .= " ($group->{nodeb}->{pownr})" if $group->{nodeb}->{pownr};
+	$id .= $group->{nodea}->shortid;
+	$id .= ', ';
+	$id .= $group->{nodeb}->shortid;
 	return ($self->{id} = $id);
 }
 
@@ -5862,30 +7168,25 @@ sub fillprops {
 		-text=>'Circuit id code:',
 	)->grid(-row=>$$row,-column=>0,-sticky=>'ewns');
 	$tw->Entry(%entryright,
-		-textvariable=>\$self->{cic},
-	)->grid(-row=>$$row++,-column=>1,-sticky=>'ewns');
-	my $group = $self->{group};
+		-textvariable=>\$self->{cic}, -width=>8,
+	)->grid(-row=>$$row++,-column=>1,-sticky=>'wns');
 	$tw->Label(%labelright,
 		-text=>'SP A point code:',
 	)->grid(-row=>$$row,-column=>0,-sticky=>'ewns');
-	my $pca = $group->{nodea}->{pcode};
-	$pca .= " ($group->{nodea}->{pownr})" if $group->{nodea}->{pownr};
 	$tw->Entry(%entrycenter,
-		-textvariable=>\$pca,
-	)->grid(-row=>$$row++,-column=>1,-sticky=>'ewns');
+		-text=>$self->{group}->{nodea}->identify, -width=>32,
+	)->grid(-row=>$$row++,-column=>1,-sticky=>'wns');
 	$tw->Label(%labelright,
 		-text=>'SP B point code:',
 	)->grid(-row=>$$row,-column=>0,-sticky=>'ewns');
-	my $pcb = $group->{nodeb}->{pcode};
-	$pcb .= " ($group->{nodeb}->{pownr})" if $group->{nodeb}->{pownr};
 	$tw->Entry(%entrycenter,
-		-textvariable=>\$pcb,
-	)->grid(-row=>$$row++,-column=>1,-sticky=>'ewns');
+		-text=>$self->{group}->{nodeb}->identify, -width=>32,
+	)->grid(-row=>$$row++,-column=>1,-sticky=>'wns');
 }
 
 #package Circuit;
 sub fillstatus {
-	my ($self,$tw,$row) = @_;
+	my ($self,$top,$tw,$row) = @_;
 
 	$tw->Label(%labelright,
 		-text=>'Active:',
@@ -5899,15 +7200,21 @@ sub fillstatus {
 package Linkset;
 use strict;
 use vars qw(@ISA);
-@ISA = qw(Relation);
+@ISA = qw(MsgStats Logging Properties Status Clickable CallCollector MsgCollector);
 # -------------------------------------
 
 use constant {
-	COL_NOD => 6,
-	COL_SSP => 5,
-	COL_SCP => 4,
-	COL_GTT => 3,
-	COL_ADJ => 2,
+	COL_NOD => 5,
+	COL_SSP => 4,
+	COL_SCP => 3,
+	COL_GTT => 2,
+	COL_ADJ => 1,
+};
+
+use constant {
+	LK_INSERVICE => 0,
+	LK_BUSY => 1,
+	LK_OUTOFSERVICE => 2,
 };
 
 use constant {
@@ -5916,37 +7223,173 @@ use constant {
 	LS_UNAVAILABLE => 2,
 };
 
+my @lsoptions = (
+	['Available'	=> LS_AVAILABLE	 ],
+	['Degraded'	=> LS_DEGRADED	 ],
+	['Unavailable'	=> LS_UNAVAILABLE],
+);
+my @lscolors = (
+	'black',
+	'orange',
+	'red',
+);
+
+my %linksets;
+my $linksetno = 0;
+
+#package Linkset;
+sub init {
+	my ($self,$top,$network,$relation,@args) = @_;
+	$self->{network} = $network;
+	$self->MsgStats::init(@args);
+	$self->Logging::init(@args);
+	$self->Properties::init(@args);
+	$self->Status::init(@args);
+	$self->Clickable::init(@args);
+	$self->CallCollector::init(@args);
+	$self->MsgCollector::init(@args);
+	$self->{state} = LS_AVAILABLE;
+	$self->{statetext} = $lsoptions[LS_AVAILABLE]->[0];
+	$self->{slccnt} = 0;
+	$self->{nodea} = $relation->{nodea};
+	$self->{nodeb} = $relation->{nodeb};
+	$self->{relation} = $relation; $relation->{linkset} = $self;
+	$self->{routesa} = {}; # routes from the a-side
+	$self->{routesb} = {}; # routes from the b-side
+	my $xa = $self->{xa} = $relation->{xa};
+	my $ya = $self->{ya} = $relation->{ya};
+	my $xb = $self->{xb} = $relation->{xb};
+	my $yb = $self->{yb} = $relation->{yb};
+	my $x = $self->{x} = $relation->{x};
+	my $y = $self->{y} = $relation->{y};
+	$self->{fill} = 'black';
+	my $c = $top->canvas;
+	my $type = ref $self;
+	$self->{item} = $c->createLine($xa,$ya,$xb,$yb,
+		-arrow=>'none',-capstyle=>'round',-joinstyle=>'round',-smooth=>0,
+		-fill=>$self->{fill},-width=>0.1,
+		-activefill=>'cyan',-activewidth=>2,
+		-state=>($top->{show}->{"\L$type\Es"}) ? 'normal' : 'hidden',
+		-tags=>['linkset'],
+	);
+	push @{$self->{items}}, $self->{item};
+	$c->lower($self->{item},'node');
+	$c->toplevel->traceVariable(\$self->{state},'w'=>[\&Linkset::tracestate,$self,$c]);
+	$self->Clickable::attach($top,@args);
+}
+
+#package Linkset;
+sub new {
+	my ($type,@args) = @_;
+	my $self = {};
+	bless $self,$type;
+	$self->init(@args);
+	return $self;
+}
+
+#package Linkset;
+#sub DESTROY {
+#	my $self = shift;
+#	my $c = $self->canvas;
+#	$c->toplevel->traceVdelete(\$self->{state});
+#}
+
+#package Linkset;
+sub identify {
+	my $self = shift;
+	my $letter = $Linkset::letters[$self->checktype];
+	my $id = "$letter-Linkset ";
+	$id .= $self->{nodea}->shortid;
+	$id .= ', ';
+	$id .= $self->{nodeb}->shortid;
+	return ($self->{id} = $id);
+}
+
+#package Linkset;
+sub shortid {
+	my $self = shift;
+	return "$self->{nodea}->{pcode}:$self->{nodeb}->{pcode}";
+}
+
+#package Linkset;
+sub tracestate {
+	my ($ind,$val,$op,$self,$c) = @_;
+	if ($op eq 'w') {
+		my $color = $lscolors[$val];
+		$self->{statetext} = $lsoptions[$val]->[0];
+		if ($self->{color} ne $color) {
+			$self->{color} = $color;
+			$c->itemconfigure($self->{item},-fill=>$color);
+		}
+		foreach my $route (values %{$self->{routesa}}) {
+			$route->updatestate($self,$c);
+		}
+		foreach my $route (values %{$self->{routesb}}) {
+			$route->updatestate($self,$c);
+		}
+	}
+	return $val;
+}
+
+#package Linkset;
+sub updatestate {
+	my ($self,$obj,$c) = @_;
+	my ($inserv,$busy,$ooserv) = (0,0,0);
+	foreach my $link (values %{$self->{links}}) {
+		my $lstate = $link->{state};
+		if ($lstate == LK_INSERVICE) {
+			$inserv++;
+		} elsif ($lstate == LK_BUSY) {
+			$busy++;
+		} elsif ($lstate == LK_OUTOFSERVICE) {
+			$ooserv++;
+		}
+	}
+	my $state;
+	if ($inserv == 0 && $busy == 0 && $ooserv > 0) {
+		$state = LS_UNAVAILABLE;
+	} elsif ($busy + $ooserv > 0) {
+		$state = LS_DEGRADED;
+	} else {
+		$state = LS_AVAILABLE;
+	}
+	return if $self->{state} == $state;
+	$self->{state} = $state;
+}
+
+#package Linkset;
+sub add_msg {
+	my ($self,$top,$network,$msg,$dir) = @_;
+	$self->inc($msg,$dir);
+	$self->pushmsg($msg);
+	my ($pc,$side,$node,$route);
+	if ($dir) {
+		$side = 'b'; $pc = $msg->{opc};
+		$node = $network->getSp($top,$pc,$msg->{channel},$self->{nodeb}->{col},'O');
+		$route = $self->getRoute($top,$side,$node);
+		$route->add_msg($top,$network,$msg,$dir);
+		$side = 'a'; $pc = $msg->{dpc};
+		$node = $network->getSp($top,$pc,$msg->{channel},$self->{nodea}->{col},'I');
+		$route = $self->getRoute($top,$side,$node);
+		$route->add_msg($top,$network,$msg,$dir);
+	} else {
+		$side = 'a'; $pc = $msg->{opc};
+		$node = $network->getSp($top,$pc,$msg->{channel},$self->{nodea}->{col},'I');
+		$route = $self->getRoute($top,$side,$node);
+		$route->add_msg($top,$network,$msg,$dir);
+		$side = 'b'; $pc = $msg->{dpc};
+		$node = $network->getSp($top,$pc,$msg->{channel},$self->{nodeb}->{col},'O');
+		$route = $self->getRoute($top,$side,$node);
+		$route->add_msg($top,$network,$msg,$dir);
+	}
+}
+
 #package Linkset;
 sub reposition {
 	my ($self,$top,$node) = @_;
 	my $col = COL_ADJ;
 	if ($node->{col} < 0) { $col = -$col; }
 	$node->movesp($top,$col,$node->{row});
-}
-
-#package Linkset;
-sub xform {
-	my ($type,$self,$top) = @_;
-	return if ref $self eq $type;
-	bless $self,$type;
-	$self->{fill} = 'black';
-	$self->{width} = 2;
-	my $c = $top->canvas;
-	$c->itemconfigure($self->{item},
-		-fill=>$self->{file},
-		-width=>$self->{width},
-	);
-	$c->addtag('linkset','withtag',$self->{item});
-	my $state = ($top->{show}->{"\L$type\Es"}) ? 'normal' : 'hidden';
-	$c->itemconfigure($self->{item},-state=>$state);
-	$c->bind($self->{item},'<ButtonPress-3>',[\&Clickable::button3,$self,$top,Tk::Ev('X'),Tk::Ev('Y')]);
-	my $mc = $top->mycanvas;
-	$mc->addballoon($self, $self->{item});
-	$self->reposition($top,$self->{nodea});
-	$self->reposition($top,$self->{nodeb});
-	$self->checktype;
-	$top->statusbar->configure(-text=>"Discovered ".$self->identify);
-	$top->{updatenow} = 1;
 }
 
 use constant {
@@ -5976,10 +7419,27 @@ sub checktype {
 }
 
 #package Linkset;
+sub getRoute {
+	my ($self,$top,$side,$node,@args) = @_;
+	my $pc = $node->{pc};
+	my $route;
+	if ($side eq 'a') {
+		return $self->{routesa}->{$pc} if exists $self->{routesa}->{$pc};
+		$route = Route->new($top,$self,$side,$node,@args);
+		$self->{routesa}->{$pc} = $route;
+	} else {
+		return $self->{routesb}->{$pc} if exists $self->{routesb}->{$pc};
+		$route = Route->new($top,$self,$side,$node,@args);
+		$self->{routesb}->{$pc} = $route;
+	}
+	return $route;
+}
+
+#package Linkset;
 sub getLink {
-	my ($self,$top,$nodea,$nodeb,$slc,@args) = @_;
+	my ($self,$top,$slc,@args) = @_;
 	return $self->{links}->{$slc} if exists $self->{links}->{$slc};
-	my $link = Link->new($top,$nodea,$nodeb,$slc,@args);
+	my $link = Link->new($top,$self,$slc,@args);
 	$self->{links}->{$slc} = $link;
 	return $link;
 }
@@ -5987,26 +7447,69 @@ sub getLink {
 #package Linkset;
 sub move {
 	my ($self,$top) = @_;
-	$self->Relation::move($top);
+	my $relation = $self->{relation};
+	my $xa = $relation->{xa};
+	my $ya = $relation->{ya};
+	my $xb = $relation->{xb};
+	my $yb = $relation->{yb};
+	return if $xa == $self->{xa} &&
+		  $ya == $self->{ya} &&
+		  $xb == $self->{xb} &&
+		  $yb == $self->{yb};
+	$top->canvas->coords($self->{item},$xa,$ya,$xb,$yb) if $self->{item};
+	$self->{xa} = $xa;
+	$self->{ya} = $ya;
+	$self->{xb} = $xb;
+	$self->{yb} = $yb;
+	$self->{x} = $relation->{x};
+	$self->{y} = $relation->{y};
 	foreach my $link (values %{$self->{links}}) { $link->move($top); }
+	foreach my $route (values %{$self->{routesa}}) { $route->move($top); }
+	foreach my $route (values %{$self->{routesb}}) { $route->move($top); }
 }
 
 #package Linkset;
-sub identify {
-	my $self = shift;
-	my $letter = $Linkset::letters[$self->checktype];
-	my $id = "$letter-Linkset ";
-	$id .= "$self->{nodea}->{pcode}";
-	$id .= " ($self->{nodea}->{pownr})" if $self->{nodea}->{pownr};
-	$id .= ", $self->{nodeb}->{pcode}";
-	$id .= " ($self->{nodeb}->{pownr})" if $self->{nodeb}->{pownr};
-	return ($self->{id} = $id);
-}
+sub getmore {
+	my ($self,$m,$top,$X,$Y) = @_;
+	my $havelinks = scalar keys %{$self->{links}};
+	my $haverouta = scalar keys %{$self->{routesa}};
+	my $haveroutb = scalar keys %{$self->{routesb}};
+	$m->add('separator') if $havelinks + $haverouta + $haveroutb;
+	if ($havelinks) {
+		my ($mc,$m3);
+		$mc = $m->Menu(-title=>'Links Menu');
+		foreach my $slc (sort {$a <=> $b} keys %{$self->{links}}) {
+			my $link = $self->{links}->{$slc};
+			$m3 = $mc->Menu(-title=>"Link $slc Menu");
+			$link->getmenu($m3,$top,$X,$Y);
+			$mc->add('cascade',-menu=>$m3,-label=>"Link $slc");
+		}
+		$m->add('cascade',-menu=>$mc,-label=>'Links');
+	}
+	if ($haveroutb) {
+		my ($mc,$m3);
+		$mc = $m->Menu(-title=>'Routes Forward Menu');
+		foreach my $pc (sort {$a <=> $b} keys %{$self->{routesb}}) {
+			my $route = $self->{routesb}->{$pc};
+			$m3 = $mc->Menu(-title=>"Route $route->{node}->{pcode} Menu");
+			$route->getmenu($m3,$top,$X,$Y);
+			$mc->add('cascade',-menu=>$m3,-label=>"Route $route->{node}->{pcode}");
 
-#package Linkset;
-sub shortid {
-	my $self = shift;
-	return "$self->{nodea}->{pcode}:$self->{nodeb}->{pcode}";
+		}
+		$m->add('cascade',-menu=>$mc,-label=>'Routes Forward');
+	}
+	if ($haverouta) {
+		my ($mc,$m3);
+		$mc = $m->Menu(-title=>'Routes Reverse Menu');
+		foreach my $pc (sort {$a <=> $b} keys %{$self->{routesa}}) {
+			my $route = $self->{routesa}->{$pc};
+			$m3 = $mc->Menu(-title=>"Route $route->{node}->{pcode} Menu");
+			$route->getmenu($m3,$top,$X,$Y);
+			$mc->add('cascade',-menu=>$m3,-label=>"Route $route->{node}->{pcode}");
+
+		}
+		$m->add('cascade',-menu=>$mc,-label=>'Routes Reverse');
+	}
 }
 
 #package Linkset;
@@ -6016,24 +7519,20 @@ sub fillprops {
 	$tw->Label(%labelright,
 		-text=>'SP A point code:',
 	)->grid(-row=>$$row,-column=>0,-sticky=>'ewns');
-	my $pca = $self->{nodea}->{pcode};
-	$pca .= " ($self->{nodea}->{pownr})" if $self->{nodea}->{pownr};
 	$tw->Entry(%entrycenter,
-		-textvariable=>\$pca,
-	)->grid(-row=>$$row++,-column=>1,-sticky=>'ewns');
+		-text=>$self->{nodea}->identify, -width=>32,
+	)->grid(-row=>$$row++,-column=>1,-sticky=>'wns');
 	$tw->Label(%labelright,
 		-text=>'SP B point code:',
 	)->grid(-row=>$$row,-column=>0,-sticky=>'ewns');
-	my $pcb = $self->{nodeb}->{pcode};
-	$pcb .= " ($self->{nodeb}->{pownr})" if $self->{nodeb}->{pownr};
 	$tw->Entry(%entrycenter,
-		-textvariable=>\$pcb,
-	)->grid(-row=>$$row++,-column=>1,-sticky=>'ewns');
+		-text=>$self->{nodeb}->identify, -width=>32,
+	)->grid(-row=>$$row++,-column=>1,-sticky=>'wns');
 }
 
 #package Linkset;
 sub fillstatus {
-	my ($self,$tw,$row) = @_;
+	my ($self,$top,$tw,$row) = @_;
 
 	$tw->Label(%labelright,
 		-text=>'Exchange SLTM',
@@ -6062,6 +7561,14 @@ sub fillstatus {
 	$tw->Checkbutton(%buttonleft,
 		-text=>'Reverse TCAP',
 		-variable=>\$self->{revs_tcap},
+	)->grid(-row=>$$row++,-column=>1,-sticky=>'ewns');
+	$tw->Label(%labelright,
+		-text=>'State:',
+	)->grid(-row=>$$row,-column=>0,-sticky=>'ewns');
+	$tw->Optionmenu(%optionleft,
+		-options=>\@lsoptions,
+		-variable=>\$self->{state},
+		-textvariable=>\$self->{statetext},
 	)->grid(-row=>$$row++,-column=>1,-sticky=>'ewns');
 	if ($self->{slccnt}) {
 		$tw->Label(%labelright,
@@ -6114,6 +7621,65 @@ sub fillstatus {
 }
 
 # -------------------------------------
+package Combined;
+use strict;
+use vars qw(@ISA);
+@ISA = qw(MsgStats Logging Properties Status Clickable MsgCollector);
+# -------------------------------------
+
+use constant {
+	CL_AVAILABLE=>0,
+	CL_DEGRADED=>0,
+	CL_UNAVAILABLE=>0,
+};
+my @cloptions = (
+	['Available'	=> CL_AVAILABLE],
+	['Degraded'	=> CL_DEGRADED],
+	['Unavailable'	=> CL_UNAVAILABLE],
+);
+my @clcolors = (
+	'black',
+	'orange',
+	'red',
+);
+
+#package Combined;
+sub init {
+	my ($self,$top,$network,$linkseta,$linksetb,@args) = @_;
+	my $type = ref $self;
+	$self->{network} = $network;
+	$self->MsgStats::init(@args);
+	$self->Logging::init(@args);
+	$self->Properties::init(@args);
+	$self->Status::init(@args);
+	$self->Clickable::init(@args);
+	$self->MsgCollector::init(@args);
+	$self->{state} = CL_AVAILABLE;
+	$self->{statetext} = $cloptions[CL_AVAILABLE]->[0];
+	$self->{fill} = $clcolors[CL_AVAILABLE];
+	$self->{lnkcnt} = 0;
+	$self->{linkseta} = $linkseta;
+	$self->{linksetb} = $linksetb;
+	my $xa = $self->{xa} = $linkseta->{x};
+	my $ya = $self->{ya} = $linkseta->{y};
+	my $xb = $self->{xb} = $linksetb->{x};
+	my $yb = $self->{yb} = $linksetb->{y};
+	my $x = $self->{x} = ($xa+$xb)/2;
+	my $y = $self->{y} = ($ya+$yb)/2;
+	my $c = $top->canvas;
+	$self->{item} = $c->createLine($xa,$ya,$xb,$yb,
+		-arrow=>'none',-capstyle=>'round',-joinstyle=>'round',-smooth=>0,-dash=>[5,2],
+		-fill=>$self->{fill},-width=>0.1,
+		-activefill=>'cyan',-activewidth=>2,
+		-state=>($top->{show}->{"\L$type\Es"})?'normal':'hidden',
+		-tags=>['combined'],
+	);
+	push @{$self->{items}}, $self->{item};
+	$self->Clickable::attach($top,@args);
+}
+
+
+# -------------------------------------
 package Link;
 use strict;
 use vars qw(@ISA);
@@ -6126,22 +7692,38 @@ use constant {
 	LK_OUTOFSERVICE => 2,
 };
 
+my @lkoptions = (
+	['Inservice'	    =>  LK_INSERVICE    ],
+	['Busy'		    =>  LK_BUSY		],
+	['Out of service'   =>	LK_OUTOFSERVICE	],
+);
+my @lkcolors = (
+	'black',
+	'orange',
+	'red',
+);
+
 #package Link;
 sub init {
-	my ($self,$top,$nodea,$nodeb,$slc,@args) = @_;
+	my ($self,$top,$linkset,$slc,@args) = @_;
 	$self->MsgStats::init(@args);
 	$self->Logging::init(@args);
 	$self->Properties::init(@args);
 	$self->Status::init(@args);
 	$self->MsgCollector::init(@args);
-	$self->{nodea} = $nodea;
-	$self->{nodeb} = $nodeb;
+	$self->{state} = LK_INSERVICE;
+	$self->{statetext} = $lkoptions[LK_INSERVICE]->[0];
+	$self->{linkset} = $linkset;
+	$self->{nodea} = $linkset->{nodea};
+	$self->{nodeb} = $linkset->{nodeb};
 	$self->{slc} = $slc;
 	$self->{state} = LK_INSERVICE;
 	$self->{statetext} = 'In Service';
-	$self->{pathforw} = undef;
-	$self->{pathrevs} = undef;
+	$self->{channelforw} = undef;
+	$self->{channelrevs} = undef;
 	$top->statusbar->configure(-text=>"New ".$self->identify);
+	my $c = $top->canvas;
+	$c->toplevel->traceVariable(\$self->{state},'w'=>[\&Link::tracestate,$self,$c]);
 }
 
 #package Link;
@@ -6154,55 +7736,82 @@ sub new {
 }
 
 #package Link;
-sub addPathForw {
-	my ($self,$path) = @_;
-	$self->{pathforw} = $path;
+sub tracestate {
+	my ($ind,$val,$op,$self,$c) = @_;
+	if ($op eq 'w') {
+		my $color = $lkcolors[$val];
+		$self->{statetext} = $lkoptions[$val]->[0];
+		if ($self->{color} ne $color) {
+			$self->{color} = $color;
+			$c->itemconfigure($self->{item},-fill=>$color)
+				if $self->{item};
+		}
+		$self->{linkset}->upatestate($self,$c);
+	}
+	return $val;
 }
 
 #package Link;
-sub addPathRevs {
-	my ($self,$path) = @_;
-	$self->{pathrevs} = $path;
+sub addChannelForw {
+	my ($self,$channel) = @_;
+	$self->{channelforw} = $channel;
 }
 
 #package Link;
-sub addPath {
-	my ($self,$path) = @_;
-	if ($path->{nodea}->{pc} == $self->{nodea}->{pc}) {
-		$self->addPathForw($path);
+sub addChannelRevs {
+	my ($self,$channel) = @_;
+	$self->{channelrevs} = $channel;
+}
+
+#package Link;
+sub addChannel {
+	my ($self,$channel) = @_;
+	if ($channel->{nodea}->{pc} == $self->{nodea}->{pc}) {
+		$self->addChannelForw($channel);
 	} else {
-		$self->addPathRevs($path);
+		$self->addChannelRevs($channel);
 	}
 }
 
 #package Link;
-sub add {
-	my ($self,$msg) = @_;
-	if ($msg->{'opc'} == $self->{'nodea'}->{'pc'}) {
-		$self->inc($msg,0);
-		$self->pushmsg($msg);
-	} else {
-		$self->inc($msg,1);
-		$self->pushmsg($msg);
-	}
+sub add_msg {
+	my ($self,$top,$network,$msg,$dir) = @_;
+	$self->inc($msg,$dir);
+	$self->pushmsg($msg);
+	$self->{linkset}->add_msg($top,$network,$msg,$dir);
 }
 
 #package Link;
 sub move {
 	my ($self,$top) = @_;
-	my $path;
-	if ($path = $self->{pathforw}) { $path->move($top); }
-	if ($path = $self->{pathrevs}) { $path->move($top); }
+	my $relation = $self->{linkset}->{relation};
+	my $xa = $relation->{xa};
+	my $ya = $relation->{ya};
+	my $xb = $relation->{xb};
+	my $yb = $relation->{yb};
+	return if $xa == $self->{xa} &&
+		  $ya == $self->{ya} &&
+		  $xb == $self->{xb} &&
+		  $yb == $self->{yb};
+	$top->canvas->coords($self->{item},$xa,$ya,$xb,$yb) if $self->{item};
+	$self->{xa} = $xa;
+	$self->{ya} = $ya;
+	$self->{xb} = $xb;
+	$self->{yb} = $yb;
+	$self->{x} = $relation->{x};
+	$self->{y} = $relation->{y};
+	my $channel;
+	if ($channel = $self->{channelforw}) { $channel->move($top); }
+	if ($channel = $self->{channelrevs}) { $channel->move($top); }
 }
 
 #package Link;
 sub identify {
 	my $self = shift;
 	my $id = "Link $self->{slc} ";
-	$id .= "$self->{nodea}->{pcode}";
-	$id .= " ($self->{nodea}->{pownr})" if $self->{nodea}->{pownr};
-	$id .= ", $self->{nodeb}->{pcode}";
-	$id .= " ($self->{nodeb}->{pownr})" if $self->{nodeb}->{pownr};
+	$id .= $self->{nodea}->shortid;
+	$id .= ', ';
+	$id .= $self->{nodeb}->shortid;
 	return ($self->{id} = $id);
 }
 
@@ -6213,33 +7822,23 @@ sub shortid {
 }
 
 #package Link;
-sub getmenu {
+sub getmore {
 	my ($self,$m,$top,$X,$Y) = @_;
-	shift->Clickable::getmenu(@_);
-	$m->add('separator');
-	my ($path,$mc);
-	$path = $self->{pathforw};
-	$mc = $m->Menu(
-		-tearoff=>0,
-		-title=>'Forward path menu',
-	);
-	$path->getmenu($mc,$top,$X,$Y) if $path;
-	$m->add('cascade',
-		-menu=>$mc,
-		-label=>'Forward path',
-		-state=>($path?'normal':'disabled'),
-	);
-	$path = $self->{pathrevs};
-	$mc = $m->Menu(
-		-tearoff=>0,
-		-title=>'Revers path menu',
-	);
-	$path->getmenu($mc,$top,$X,$Y) if $path;
-	$m->add('cascade',
-		-menu=>$mc,
-		-label=>'Reverse path',
-		-state=>($path?'normal':'disabled'),
-	);
+	my $haveforw = $self->{channelforw} ? 1 : 0;
+	my $haverevs = $self->{channelrevs} ? 1 : 0;
+	$m->add('separator') if $haveforw + $haverevs;
+	if ($haveforw) {
+		my $channel = $self->{channelforw};
+		my $mc = $m->Menu(-title=>'Forward channel menu');
+		$channel->getmenu($mc,$top,$X,$Y);
+		$m->add('cascade', -menu=>$mc, -label=>'Forward channel');
+	}
+	if ($haverevs) {
+		my $channel = $self->{channelrevs};
+		my $mc = $m->Menu(-title=>'Revers channel menu');
+		$channel->getmenu($mc,$top,$X,$Y) if $channel;
+		$m->add('cascade', -menu=>$mc, -label=>'Reverse channel');
+	}
 }
 
 #package Link;
@@ -6249,7 +7848,7 @@ sub fillprops {
 
 #package Link;
 sub fillstatus {
-	my ($self,$tw,$row) = @_;
+	my ($self,$top,$tw,$row) = @_;
 }
 
 # -------------------------------------
@@ -6260,76 +7859,71 @@ use vars qw(@ISA);
 # -------------------------------------
 
 use constant {
-	RT_AVAILABLE => 0,
-	RT_RESTRICTED => 1,
-	RT_PROHIBITED => 2,
+	RT_AVAILABLE=>0,
+	RT_RESTRICTED=>1,
+	RT_PROHIBITED=>2,
 };
 
 my @rtoptions = (
-	['Available'  => RT_AVAILABLE ],
-	['Restricted' => RT_RESTRICTED],
-	['Prohibited' => RT_PROHIBITED],
+	['Available'	=>  RT_AVAILABLE    ],
+	['Restricted'	=>  RT_RESTRICTED   ],
+	['Prohibited'	=>  RT_PROHIBITED   ],
+);
+my @rtcolors = (
+	'black',
+	'orange',
+	'red',
 );
 
-#package Route;
+#package Route
 sub new {
-	my ($type,$top,$path,$side,$node,@args) = @_;
+	my ($type,$top,$linkset,$side,$node,@args) = @_;
 	my $self = {};
-	bless $self, $type;
+	bless $self,$type;
 	$self->MsgStats::init(@args);
 	$self->Logging::init(@args);
 	$self->Properties::init(@args);
 	$self->Status::init(@args);
+	$self->Clickable::init(@args);
 	$self->MsgCollector::init(@args);
 	$self->{state} = RT_AVAILABLE;
 	$self->{statetext} = 'Available';
-	$self->{path} = $path;
+	$self->{linkset} = $linkset;
 	$self->{side} = $side;
-	$self->{node} = $node;
-	$node->{routes}->{$path->{ppa}} = $self;
-	$path->{routes}->{$node->{pc}} = $self;
-	my ($cola,$rowa,$colb,$rowb);
+	my ($nodea,$nodeb);
 	if ($side eq 'a') {
-		$cola = $self->{cola} = $node->{col};
-		$rowa = $self->{rowa} = $node->{row};
-		$colb = $self->{colb} = $path->{cola};
-		$rowb = $self->{rowb} = $path->{rowa};
+		$nodea = $self->{nodea} = $linkset->{nodeb};
+		$nodeb = $self->{nodeb} = $linkset->{nodea};
 	} else {
-		$cola = $self->{cola} = $path->{colb};
-		$rowa = $self->{rowa} = $path->{rowb};
-		$colb = $self->{colb} = $node->{col};
-		$rowb = $self->{rowb} = $node->{row};
+		$nodea = $self->{nodea} = $linkset->{nodea};
+		$nodeb = $self->{nodeb} = $linkset->{nodeb};
 	}
-	my $mc = $top->mycanvas;
-	my $xa = $self->{xa} = $mc->colpos($cola);
-	my $ya = $self->{ya} = $mc->rowpos($rowa);
-	my $xb = $self->{xb} = $mc->colpos($colb);
-	my $yb = $self->{yb} = $mc->rowpos($rowb);
+	$self->{node} = $node;
+	$nodeb->{routes}->{$node->{pc}} = $self;
+	my $xa = $self->{xa} = $nodeb->{x};
+	my $ya = $self->{ya} = $nodeb->{y};
+	my $xb = $self->{xb} = $node->{x};
+	my $yb = $self->{yb} = $node->{y};
 	$self->{x} = ($xa + $xb)/2;
 	$self->{y} = ($ya + $yb)/2;
 	$self->{color} = 'gray';
 	my $c = $top->canvas;
 	$self->{item} = $c->createLine($xa,$ya,$xb,$yb,
-		-arrow=>'last',
+		-arrow=>'none',
 		-capstyle=>'round',
-		-fill=>$self->{color},
-		-activefill=>'green',
+		-fill=>$self->{color}, -width=>0.1,
+		-activefill=>'cyan', -activewidth=>2,
 		-joinstyle=>'round',
 		-smooth=>0,
+		-state=>($top->{show}->{"\L$type\Es"}) ? 'normal' : 'hidden',
 		-tags=>['route'],
-		-width=>0.1,
-		-activewidth=>2,
 	);
-	my $state = ($top->{show}->{"\L$type\Es"}) ? 'normal' : 'hidden';
-	$c->itemconfigure($self->{item},-state=>$state);
-	$c->bind($self->{item},'<ButtonPress-3>',[\&Clickable::button3,$self,$top,Tk::Ev('X'),Tk::Ev('Y')]);
-	$c->traceVariable(\$self->{state},'w'=>[\&Route::tracestate,$self]);
-	$c->traceVariable(\$self->{color},'w'=>[\&Route::tracecolor,$self,$c]);
-	$c->lower($self->{item},'path');
+	push @{$self->{items}}, $self->{item};
 	$c->lower($self->{item},'node');
-	$mc->addballoon($self, $self->{item});
-	$top->statusbar->configure(-text=>"New ".$self->identify);
-	$top->{updatenow} = 1;
+	$c->lower($self->{item},'linkset');
+	$c->raise($self->{item},'path');
+	$c->toplevel->traceVariable(\$self->{state},'w'=>[\&Route::tracestate,$self,$c]);
+	$self->Clickable::attach($top,@args);
 	return $self;
 }
 
@@ -6337,8 +7931,7 @@ sub new {
 #sub DESTROY {
 #	my $self = shift;
 #	my $c = $self->canvas;
-#	$c->traceVdelete(\$self->{state});
-#	$c->traceVdelete(\$self->{color});
+#	$c->toplevel->traceVdelete(\$self->{state});
 #}
 
 #package Route;
@@ -6350,46 +7943,236 @@ sub add_msg {
 
 #package Route;
 sub tracestate {
-	my ($ind,$val,$op,$self) = @_;
+	my ($ind,$val,$op,$self,$c) = @_;
 	if ($op eq 'w') {
-		if ($val == RT_AVAILABLE) {
-			$self->{color} = 'gray';
-		} elsif ($val == RT_RESTRICTED) {
-			$self->{color} = 'orange';
-		} elsif ($val == RT_PROHIBITED) {
-			$self->{color} = 'red';
+		my $color = $rtcolors[$val];
+		$self->{statetext} = $rtoptions[$val]->[0];
+		if ($self->{color} ne $color) {
+			$self->{color} = $color;
+			$c->itemconfigure($self->{item},-fill=>$color);
 		}
-		$self->{node}->updatestate;
+		$self->{node}->updatestate($self,$c);
 	}
 	return $val;
 }
 
 #package Route;
-sub tracecolor {
-	my ($ind,$val,$op,$self,$c) = @_;
-	$c->itemconfigure($self->{item},-fill=>$val) if $op eq 'w';
-	return $val;
+sub updatestate {
+	my ($self,$obj,$c) = @_;
 }
 
 #package Route;
 sub identify {
 	my $self = shift;
 	my $id = "Route ";
-	$id .= "($self->{path}->{card}:$self->{path}->{span}:$self->{path}->{slot})";
-	if ($self->{side} eq 'a') {
-		$id .= " <- ";
-	} else {
-		$id .= " -> ";
-	}
-	$id .= "$self->{node}->{pcode}";
-	$id .= " ($self->{node}->{pownr})" if $self->{node}->{pownr};
+	$id .= $self->{nodea}->shortid;
+	$id .= " <=> ";
+	$id .= $self->{nodeb}->shortid;
+	$id .= " <=> ";
+	$id .= $self->{node}->shortid;
 	return ($self->{id} = $id);
 }
 
 #package Route;
 sub shortid {
 	my $self = shift;
-	my $id = "($self->{path}->{card}:$self->{path}->{span}:$self->{path}->{slot})";
+	my $id = "($self->{nodea}->{pcode})";
+	$id .= '<=>';
+	$id .= "($self->{nodeb}->{pcode})";
+	$id .= '<=>';
+	$id .= "($self->{node}->{pcode})";
+	return $id;
+}
+
+#package Route;
+sub move {
+	my ($self,$top) = @_;
+	my $nodeb = $self->{nodeb};
+	my $node = $self->{node};
+	my $xa = $nodeb->{x};
+	my $ya = $nodeb->{y};
+	my $xb = $node->{x};
+	my $yb = $node->{y};
+	return if $xa == $self->{xa} &&
+		  $ya == $self->{ya} &&
+		  $xb == $self->{xb} &&
+		  $yb == $self->{yb};
+	$top->canvas->coords($self->{item},$xa,$ya,$xb,$yb);
+	$self->{xa} = $xa;
+	$self->{ya} = $ya;
+	$self->{xb} = $xb;
+	$self->{yb} = $yb;
+	$self->{x} = ($xa + $xb)/2;
+	$self->{y} = ($ya + $yb)/2;
+}
+
+#package Route;
+sub getmore {
+	my ($self,$m,$top,$X,$Y) = @_;
+	$m->add('separator');
+	my ($mc,$linkset,$node);
+
+	$linkset = $self->{linkset};
+	$mc = $m->Menu(-title=>'Linkset Menu');
+	$linkset->getmenu($mc,$top,$X,$Y);
+	$m->add('cascade',-menu=>$mc,-label=>'Linkset');
+
+	$node =  $self->{nodeb};
+	$mc = $m->Menu(-title=>'Transit Node Menu');
+	$node->getmenu($mc,$top,$X,$Y);
+	$m->add('cascade',-menu=>$mc,-label=>'Transit Node');
+
+	$node = $self->{node};
+	$mc = $m->Menu(-title=>'Destination Node Menu');
+	$node->getmenu($mc,$top,$X,$Y);
+	$m->add('cascade',-menu=>$mc,-label=>'Destination Node');
+}
+
+#package Route;
+sub fillprops {
+	my ($self,$tw,$row) = @_;
+}
+
+#package Route;
+sub fillstatus {
+	my ($self,$top,$tw,$row) = @_;
+}
+
+
+
+# -------------------------------------
+package Path;
+use strict;
+use vars qw(@ISA);
+@ISA = qw(MsgStats Logging Properties Status Clickable MsgCollector);
+# -------------------------------------
+
+use constant {
+	PA_AVAILABLE => 0,
+	PA_RESTRICTED => 1,
+	PA_PROHIBITED => 2,
+};
+
+my @paoptions = (
+	['Available'	=>  PA_AVAILABLE    ],
+	['Restricted'	=>  PA_RESTRICTED   ],
+	['Prohibited'	=>  PA_PROHIBITED   ],
+);
+my @pacolors = (
+	'grey',
+	'orange',
+	'red',
+);
+
+#package Path;
+sub new {
+	my ($type,$top,$channel,$side,$node,@args) = @_;
+	my $self = {};
+	bless $self, $type;
+	$self->MsgStats::init(@args);
+	$self->Logging::init(@args);
+	$self->Properties::init(@args);
+	$self->Status::init(@args);
+	$self->Clickable::init(@args);
+	$self->MsgCollector::init(@args);
+	$self->{state} = PA_AVAILABLE;
+	$self->{statetext} = 'Available';
+	$self->{channel} = $channel;
+	$self->{side} = $side;
+	$self->{node} = $node;
+	$node->{paths}->{$channel->{ppa}} = $self;
+	$channel->{paths}->{$node->{pc}} = $self;
+	my ($offa,$cola,$rowa,$offb,$colb,$rowb);
+	if ($side eq 'a') {
+		$offa = $self->{offa} = $node->{off};
+		$cola = $self->{cola} = $node->{col};
+		$rowa = $self->{rowa} = $node->{row};
+		$offb = $self->{offb} = $channel->{offa};
+		$colb = $self->{colb} = $channel->{cola};
+		$rowb = $self->{rowb} = $channel->{rowa};
+	} else {
+		$offa = $self->{offa} = $channel->{offb};
+		$cola = $self->{cola} = $channel->{colb};
+		$rowa = $self->{rowa} = $channel->{rowb};
+		$offb = $self->{offb} = $node->{off};
+		$colb = $self->{colb} = $node->{col};
+		$rowb = $self->{rowb} = $node->{row};
+	}
+	my $mc = $top->mycanvas;
+	my $xa = $self->{xa} = $mc->colpos($cola+$offa);
+	my $ya = $self->{ya} = $mc->rowpos($rowa);
+	my $xb = $self->{xb} = $mc->colpos($colb+$offb);
+	my $yb = $self->{yb} = $mc->rowpos($rowb);
+	$self->{x} = ($xa + $xb)/2;
+	$self->{y} = ($ya + $yb)/2;
+	$self->{color} = 'gray';
+	my $c = $top->canvas;
+	$self->{item} = $c->createLine($xa,$ya,$xb,$yb,
+		-arrow=>'last',
+		-capstyle=>'round',
+		-fill=>$self->{color}, -width=>0.1,
+		-activefill=>'cyan', -activewidth=>2,
+		-joinstyle=>'round',
+		-smooth=>0,
+		-state=>($top->{show}->{"\L$type\Es"}) ? 'normal' : 'hidden',
+		-tags=>['path'],
+	);
+	push @{$self->{items}}, $self->{item};
+	$c->lower($self->{item},'node');
+	$c->lower($self->{item},'channel');
+	$c->lower($self->{item},'linkset');
+	$c->toplevel->traceVariable(\$self->{state},'w'=>[\&Path::tracestate,$self,$c]);
+	$self->Clickable::attach($top,@args);
+	return $self;
+}
+
+##package Path;
+#sub DESTROY {
+#	my $self = shift;
+#	my $c = $self->canvas;
+#	$c->toplevel->traceVdelete(\$self->{state});
+#}
+
+#package Path;
+sub add_msg {
+	my ($self,$top,$network,$msg,$dir) = @_;
+	$self->inc($msg,$dir);
+	$self->pushmsg($msg);
+}
+
+#package Path;
+sub tracestate {
+	my ($ind,$val,$op,$self,$c) = @_;
+	if ($op eq 'w') {
+		my $color = $pacolors[$val];
+		$self->{statetext} = $paoptions[$val]->[0];
+		if ($self->{color} ne $color) {
+			$self->{color} = $color;
+			$c->itemconfigure($self->{item},-fill=>$color);
+		}
+		$self->{node}->updatestate($self,$c);
+	}
+	return $val;
+}
+
+#package Path;
+sub identify {
+	my $self = shift;
+	my $id = "Path ";
+	$id .= "($self->{channel}->{card}:$self->{channel}->{span}:$self->{channel}->{slot})";
+	if ($self->{side} eq 'a') {
+		$id .= " <- ";
+	} else {
+		$id .= " -> ";
+	}
+	$id .= $self->{node}->shortid;
+	return ($self->{id} = $id);
+}
+
+#package Path;
+sub shortid {
+	my $self = shift;
+	my $id = "($self->{channel}->{card}:$self->{channel}->{span}:$self->{channel}->{slot})";
 	if ($self->{side} eq 'a') {
 		$id .= "<-";
 	} else {
@@ -6399,21 +8182,21 @@ sub shortid {
 	return $id;
 }
 
-#package Route;
+#package Path;
 sub move {
 	my ($self,$top) = @_;
 	my $node = $self->{node};
-	my $path = $self->{path};
+	my $channel = $self->{channel};
 	my $side = $self->{side};
 	my ($xa,$ya,$xb,$yb);
 	if ($side eq 'a') {
 		$xa = $node->{x};
 		$ya = $node->{y};
-		$xb = $path->{xa};
-		$yb = $path->{ya};
+		$xb = $channel->{xa};
+		$yb = $channel->{ya};
 	} else {
-		$xa = $path->{xb};
-		$ya = $path->{yb};
+		$xa = $channel->{xb};
+		$ya = $channel->{yb};
 		$xb = $node->{x};
 		$yb = $node->{y};
 	}
@@ -6424,11 +8207,11 @@ sub move {
 	if ($side eq 'a') {
 		$self->{cola} = $node->{col};
 		$self->{rowa} = $node->{row};
-		$self->{colb} = $path->{cola};
-		$self->{rowb} = $path->{rowa};
+		$self->{colb} = $channel->{cola};
+		$self->{rowb} = $channel->{rowa};
 	} else {
-		$self->{cola} = $path->{colb};
-		$self->{rowa} = $path->{rowb};
+		$self->{cola} = $channel->{colb};
+		$self->{rowa} = $channel->{rowb};
 		$self->{colb} = $node->{col};
 		$self->{rowb} = $node->{row};
 	}
@@ -6442,35 +8225,33 @@ sub move {
 	$self->{y} = ($ya + $yb)/2;
 }
 
-#package Route;
+#package Path;
 sub fillprops {
 	my ($self,$tw,$row) = @_;
 
 	$tw->Label(%labelright,
-		-text=>'Signalling path:',
+		-text=>'Signalling channel:',
 	)->grid(-row=>$$row,-column=>0,-sticky=>'ewns');
 	$tw->Entry(%entryleft,
-		-text=>"$self->{card}:$self->{span}:$self->{slot}",
-	)->grid(-row=>$$row++,-column=>1,-sticky=>'ewns');
+		-text=>$self->{channel}->identify, -width=>32,
+	)->grid(-row=>$$row++,-column=>1,-sticky=>'wns');
 	$tw->Label(%labelright,
 		-text=>'Signalling point:',
 	)->grid(-row=>$$row,-column=>0,-sticky=>'ewns');
-	my $pcode = $self->{node}->{pcode};
-	$pcode .= " ($self->{node}->{pwonr})" if $self->{node}->{pownr};
 	$tw->Entry(%entryleft,
-		-textvariable=>\$pcode,
-	)->grid(-row=>$$row++,-column=>1,-sticky=>'ewns');
+		-text=>$self->{node}->identify, -width=>32,
+	)->grid(-row=>$$row++,-column=>1,-sticky=>'wns');
 }
 
-#package Route;
+#package Path;
 sub fillstatus {
-	my ($self,$tw,$row) = @_;
+	my ($self,$top,$tw,$row) = @_;
 
 	$tw->Label(%labelright,
 		-text=>'Status:',
 	)->grid(-row=>$$row,-column=>0,-sticky=>'ewns');
 	$tw->Optionmenu(%optionleft,
-		-options=>\@rtoptions,
+		-options=>\@paoptions,
 		-variable=>\$self->{state},
 		-textvariable=>\$self->{statetext},
 	)->grid(-row=>$$row++,-column=>1,-sticky=>'ewns');
@@ -6487,11 +8268,11 @@ my %nodes;
 my $nodeno = 0;
 
 use constant {
-	COL_NOD => 6,
-	COL_SSP => 5,
-	COL_SCP => 4,
-	COL_GTT => 3,
-	COL_ADJ => 2,
+	COL_NOD => 5,
+	COL_SSP => 4,
+	COL_SCP => 3,
+	COL_GTT => 2,
+	COL_ADJ => 1,
 };
 use constant {
 	SP_AVAILABLE => 0,
@@ -6503,19 +8284,25 @@ my @spoptions = (
 	['Degraded'	=> SP_DEGRADED	 ],
 	['Unavailable'	=> SP_UNAVAILABLE],
 );
+my @spcolors = (
+	'white',
+	'orange',
+	'red',
+);
 
 #package SP;
 sub init {
-	my ($self,$top,$network,$nodeno,$pc,$path,$side,$way,@args) = @_;
+	my ($self,$top,$network,$nodeno,$pc,$channel,$side,$way,@args) = @_;
 	$self->MsgStats::init(@args);
 	$self->Logging::init(@args);
 	$self->Properties::init(@args);
 	$self->Status::init(@args);
+	$self->Clickable::init(@args);
 	$self->CallCollector::init(@args);
 	$self->MsgCollector::init(@args);
 	$self->{pc} = $pc;
-	$self->{rt} = $path->{rt};
-	$self->{rttext} = $path->{rttext};
+	$self->{rt} = $channel->{rt};
+	$self->{rttext} = $channel->{rttext};
 	$self->{side} = $side;
 	$self->{way} = $way;
 	$self->{state} = SP_AVAILABLE;
@@ -6528,99 +8315,86 @@ sub init {
 	$self->{tqueries} = {};
 	$self->{circuits} = {};
 	$self->{responds} = {};
+	$self->{paths} = {}; # paths that term or orig here
 	$self->{routes} = {}; # routes that term or orig here
 	$self->{relate} = {}; # relations in which this is a node
+	$self->{linksets} = {}; # linksets that attach here
 	my $c = $top->canvas;
 	my $mc = $top->mycanvas;
-	my $x;
-	if ($side < 0) {
-		$x = $mc->colpos(0 - COL_NOD);
-		$self->{col} = 0 - COL_NOD;
-	} else {
-		$x = $mc->colpos(0 + COL_NOD);
-		$self->{col} = 0 + COL_NOD;
-	}
-	my $y = $mc->rowpos(0);
-	$self->{row} = 0;
-	$self->{x} = $x;
-	$self->{y} = $y;
+	my $off = $self->{off} = 0;
+	my $col = $self->{col} = (($side < 0) ? 0 - COL_NOD : 0 + COL_NOD);
+	my $row = $self->{row} = 0;
+	my $x = $self->{x} = $mc->colpos($col+$off);
+	my $y = $self->{y} = $mc->rowpos($row);
+	my $type = ref $self;
+	my $state = ($top->{show}->{"\L$type\Es"}) ? 'normal' : 'hidden';
 	$self->{color} = 'white';
+	$self->{items} = [];
 	$self->{item} = $c->createOval(
-		$x-33,$y-33,$x+33,$y+33,
+		$x-40,$y-40,$x+40,$y+40,
 		-fill=>$self->{color},
-		-outline=>'blue',
-		-activeoutline=>'green',
-		-width=>2,
-		-activewidth=>3,
+		-outline=>'blue', -width=>2,
+		-activeoutline=>'cyan', -activewidth=>3,
+		-state=>$state,
 		-tags=>['SP','node'],
 	);
-	$c->bind($self->{item},'<ButtonPress-3>',[\&Clickable::button3,$self,$top,Tk::Ev('X'),Tk::Ev('Y')]);
+	push @{$self->{items}}, $self->{item};
 	$self->{scri} = $c->createLine(
 		$x-23,$y-23,$x+23,$y-23,$x+23,$y+23,$x-23,$y+23,$x-23,$y-23,
 		-arrow=>'none',
 		-capstyle=>'round',
-		-fill=>'gray',
-		-activefill=>'green',
+		-fill=>'gray', -width=>0.1,
+		#-activefill=>'cyan', -activewidth=>2,
 		-joinstyle=>'round',
 		-smooth=>0,
+		-state=>$state,
 		-tags=>['SP','scri'],
-		-width=>0.1,
-		-activewidth=>2,
 	);
-	$c->bind($self->{scri},'<ButtonPress-3>',[\&Clickable::button3,$self,$top,Tk::Ev('X'),Tk::Ev('Y')]);
-	$self->{pcode} = main::pcstring($pc);
-	$self->{lownr} = main::pcowner($pc,1);
-	if ($self->{pownr} = main::pcowner($pc,0)) {
+	push @{$self->{items}}, $self->{scri};
+	$self->{pcode} = SP::pcstring($pc);
+	if ($self->{pownr} = $self->pcowner(0)) {
 		$self->{ownr} = $c->createText($x,$y+15,
 			-anchor=>'center',
 			-fill=>'black',
 			-justify=>'center',
 			-text=>$self->{pownr},
+			-state=>$state,
 			-tags=>['SP','text'],
 		);
-		$c->bind($self->{ownr},'<ButtonPress-3>',[\&Clickable::button3,$self,$top,Tk::Ev('X'),Tk::Ev('Y')]);
+		push @{$self->{items}}, $self->{ownr};
 	}
 	$self->{ttxt} = $c->createText($x,$y-15,
 		-anchor=>'center',
 		-fill=>'black',
 		-justify=>'center',
 		-text=>'SP',
+		-state=>$state,
 		-tags=>['SP','text'],
 	);
-	$c->bind($self->{ttxt},'<ButtonPress-3>',[\&Clickable::button3,$self,$top,Tk::Ev('X'),Tk::Ev('Y')]);
+	push @{$self->{items}}, $self->{ttxt};
 	$self->{text} = $c->createText($x,$y,
 		-anchor=>'center',
 		-fill=>'black',
 		-justify=>'center',
 		-text=>$self->{pcode},
+		-state=>$state,
 		-tags=>['SP','text'],
 	);
-	my $type = ref $self;
+	push @{$self->{items}}, $self->{text};
 	$c->raise($self->{item},'all');
 	$c->raise($self->{scri},$self->{item});
 	$c->raise($self->{ttxt},$self->{scri});
 	$c->raise($self->{text},$self->{scri});
 	$c->raise($self->{ownr},$self->{scri}) if $self->{ownr};
-	my $state = ($top->{show}->{"\L$type\Es"}) ? 'normal' : 'hidden';
-	$c->itemconfigure($self->{item},-state=>$state);
-	$c->itemconfigure($self->{scri},-state=>$state);
-	$c->itemconfigure($self->{ttxt},-state=>$state);
-	$c->itemconfigure($self->{text},-state=>$state);
-	$c->itemconfigure($self->{ownr},-state=>$state) if $self->{ownr};
-	$c->bind($self->{text},'<ButtonPress-3>',[\&Clickable::button3,$self,$top,Tk::Ev('X'),Tk::Ev('Y')]);
-	$c->traceVariable(\$self->{state},'w'=>[\&SP::tracestate,$self]);
-	$c->traceVariable(\$self->{color},'w'=>[\&SP::tracecolor,$self,$c]);
-	$mc->addballoon($self, $self->{item}, $self->{scri}, $self->{ttxt}, $self->{text});
-	$mc->addballoon($self, $self->{ownr}) if $self->{ownr};
+	$c->toplevel->traceVariable(\$self->{state},'w'=>[\&SP::tracestate,$self,$c]);
 	$network->regroupsps($top);
-	$top->statusbar->configure(-text=>"New ".$self->identify);
-	$top->{updatenow} = 1;
+	$self->Clickable::attach($top,@args);
 }
 
 #sub DESTROY {
 #	my $self = shift;
 #	my $c = $self->canvas;
-#	$c->traceVdelete(\$self->{state});
+#	$c->toplevel->traceVdelete(\$self->{state});
 #}
 
 #package SP;
@@ -6631,8 +8405,7 @@ sub xform {
 	bless $self,$type;
 	my $c = $top->canvas;
 	my $mc = $top->mycanvas;
-	$mc->delballoon($self->{item}, $self->{scri}, $self->{ttxt}, $self->{text});
-	$mc->delballoon($self->{ownr}) if $self->{ownr};
+	$mc->delballoon($self->{items});
 
 	$c->dtag($self->{item},$oldtype); $c->addtag($type,'withtag',$self->{item});
 	$c->dtag($self->{scri},$oldtype); $c->addtag($type,'withtag',$self->{scri});
@@ -6648,6 +8421,7 @@ sub xform {
 	push @oldtags, 'circuits' if $self->{ciccnt} > 0;
 
 	$c->delete($self->{item});
+	shift @{$self->{items}};
 	$self->adjitems($c,\@oldtags);
 	$c->itemconfigure($self->{ttxt}, -text=>ref($self));
 	if ($self->{alias}) {
@@ -6665,15 +8439,7 @@ sub xform {
 	$c->itemconfigure($self->{ttxt},-state=>$state);
 	$c->itemconfigure($self->{text},-state=>$state);
 	$c->itemconfigure($self->{ownr},-state=>$state) if $self->{ownr};
-	$c->bind($self->{item},'<ButtonPress-3>',[\&Clickable::button3,$self,$top,Tk::Ev('X'),Tk::Ev('Y')]);
-	$c->bind($self->{scri},'<ButtonPress-3>',[\&Clickable::button3,$self,$top,Tk::Ev('X'),Tk::Ev('Y')]);
-	$c->bind($self->{ttxt},'<ButtonPress-3>',[\&Clickable::button3,$self,$top,Tk::Ev('X'),Tk::Ev('Y')]);
-	$c->bind($self->{text},'<ButtonPress-3>',[\&Clickable::button3,$self,$top,Tk::Ev('X'),Tk::Ev('Y')]);
-	$c->bind($self->{ownr},'<ButtonPress-3>',[\&Clickable::button3,$self,$top,Tk::Ev('X'),Tk::Ev('Y')]) if $self->{ownr};
-	$mc->addballoon($self, $self->{item}, $self->{scri}, $self->{ttxt}, $self->{text});
-	$mc->addballoon($self, $self->{ownr}) if $self->{owner};
-	$top->statusbar->configure(-text=>"Discovered ".$self->identify);
-	$top->{updatenow} = 1;
+	$self->Clickable::attach($top);
 }
 
 #package SP;
@@ -6704,32 +8470,26 @@ sub shortid {
 
 #package SP;
 sub tracestate {
-	my ($ind,$val,$op,$self) = @_;
+	my ($ind,$val,$op,$self,$c) = @_;
+	print STDERR "got SP::tracestate event: ind=$ind, val=$val, op=$op\n";
 	if ($op eq 'w') {
-		if ($val == SP_AVAILABLE) {
-			$self->{color} = 'white';
-		} elsif ($val == SP_DEGRADED) {
-			$self->{color} = 'orange';
-		} elsif ($val == SP_UNAVAILABLE) {
-			$self->{color} = 'red';
+		my $color = $spcolors[$val];
+		$self->{statetext} = $spoptions[$val]->[0];
+		if ($self->{color} ne $color) {
+			$self->{color} = $color;
+			print STDERR "setting color to $color\n";
+			$c->itemconfigure($self->{item},-fill=>$color);
 		}
 	}
 	return $val;
 }
 
 #package SP;
-sub tracecolor {
-	my ($ind,$val,$op,$self,$c) = @_;
-	$c->itemconfigure($self->{item},-fill=>$val) if $op eq 'w';
-	return $val;
-}
-
-#package SP;
 sub updatestate {
-	my $self = shift;
-	my ($avail,$degra,$unava) = (0,0);
+	my ($self,$obj,$c) = @_;
+	my ($avail,$degra,$unava) = (0,0,0);
 	foreach my $route (values %{$self->{routes}}) {
-		my $rstate = $route->{'state'};
+		my $rstate = $route->{state};
 		if ($rstate == Route::RT_AVAILABLE) {
 			$avail++;
 		} elsif ($rstate == Route::RT_RESTRICTED) {
@@ -6738,13 +8498,165 @@ sub updatestate {
 			$unava++;
 		}
 	}
-	if ($avail == 0 && $degra == 0 && $unava >= 0) {
-		$self->{state} = SP_UNAVAILABLE;
-	} elsif ($degra + $unava > 0) {
-		$self->{state} = SP_DEGRADED;
-	} else {
-		$self->{state} = SP_AVAILABLE;
+	foreach my $path (values %{$self->{paths}}) {
+		next if $path->{channel}->{link};
+		my $rstate = $path->{state};
+		if ($rstate == Path::PA_AVAILABLE) {
+			$avail++;
+		} elsif ($rstate == Path::PA_RESTRICTED) {
+			$degra++;
+		} elsif ($rstate == Path::PA_PROHIBITED) {
+			$unava++;
+		}
 	}
+	my ($state,$color);
+	if ($avail == 0 && $degra == 0 && $unava >= 0) {
+		$state = SP_UNAVAILABLE;
+		$color = 'red';
+	} elsif ($degra + $unava > 0) {
+		$state = SP_DEGRADED;
+		$color = 'orange';
+	} else {
+		$state = SP_AVAILABLE;
+		$color = 'white';
+	}
+	return if $self->{state} == $state;
+	$self->{state} = $state;
+	$self->{color} = $color;
+}
+
+#package SP;
+sub pcstate {
+	my ($self,$i) = @_;
+	my $pc = $self->{pc};
+	my ($ntw,$cls,$mem);
+	$ntw = $pc >> 16;
+	$cls = ($pc >> 8) & 0xff;
+	$mem = $pc & 0xff;
+	if ($ntw == 5) {
+		if ($cls != 0) {
+			my $cluster;
+			if ($cluster = $pc_assignments->{pc_blocks}->{$cls}) {
+				if (exists $cluster->{state}) {
+					return $cluster->{state}->[$i];
+				}
+			}
+		}
+	}
+	return '';
+}
+
+sub pctype {
+	my ($self) = @_;
+	my $pc = $self->{pc};
+	my ($ntw,$cls,$mem);
+	$ntw = $pc >> 16;
+	$cls = ($pc >> 8) & 0xff;
+	$mem = $pc & 0xff;
+	if (5 < $ntw && $ntw < 255) {
+		if ($cls != 0) {
+			return 'large network code';
+		}
+		return "invalid cluster $cls";
+	}
+	if (1 <= $ntw && $ntw <= 4) {
+		if ($cls != 0) {
+			return 'small network code';
+		}
+		return "invalid cluster $cls";
+	}
+	if ($ntw == 5) {
+		if ($cls != 0) {
+			my $cluster;
+			if ($cluster = $pc_assignments->{pc_blocks}->{$cls}) {
+				if (exists $cluster->{state}) {
+					if ($mem > 3) {
+						return "point code block for $cluster->{state}->[1]";
+					}
+					return 'unused point code block 0 to '.($mem+1);
+				} else {
+					return "point code block";
+				}
+			}
+			return 'no information for cluster '.$cls;
+		}
+		return "invalid cluster $cls";
+	}
+	return "invalid point code network $ntw";
+}
+
+sub pcowner {
+	my ($self,$i) = @_;
+	my $pc = $self->{pc};
+	my ($ntw,$cls,$mem,$own);
+	$ntw = $pc >> 16;
+	$cls = ($pc >> 8) & 0xff;
+	$mem = $pc & 0xff;
+	if (5 < $ntw && $ntw < 255) {
+		if ($cls != 0) {
+			if ($own = $pc_assignments->{large_networks}->{$ntw}) {
+				return $own->[$i];
+			}
+			if ($i) {
+				return 'Unknown large network';
+			}
+			return '';
+		}
+	}
+	if (1 <= $ntw && $ntw <= 4) {
+		if ($cls != 0) {
+			my $small;
+			if ($small = $pc_assignments->{small_networks}->{$ntw}) {
+				if ($own = $small->{$cls}) {
+					return $own->[$i];
+				}
+			}
+			if ($i) {
+				return 'Unknown small network.';
+			}
+			return '';
+		}
+	}
+	if ($ntw == 5) {
+		if ($cls != 0) {
+			my $cluster;
+			if ($cluster = $pc_assignments->{pc_blocks}->{$cls}) {
+				my $member = $mem & ~0x03;
+#				if (exists $cluster->{state}) {
+#					if ($mem > 3 && ($own = $cluster->{$member})) {
+#						return "$own->[$i] $cluster->{state}->[$i]";
+#					}
+#				} else {
+					if ($own = $cluster->{$member}) {
+						return $own->[$i];
+					}
+#				}
+			}
+			if ($i) {
+				return 'Unknown point code block.';
+			}
+			return '';
+		}
+	}
+	if ($i) {
+		return 'Invalid point code.';
+	}
+	return '';
+}
+
+sub pcstring {
+	my ($pc) = @_;
+	my ($ntw,$cls,$mem,$own);
+	if ($pc & ~0x3fff) {
+		$ntw = $pc >> 16;
+		$cls = ($pc >> 8) & 0xff;
+		$mem = $pc & 0xff;
+	} else {
+		$ntw = $pc >> 11;
+		$cls = ($pc >> 3) & 0xff;
+		$mem = $pc & 0x7;
+	}
+	return "$ntw-$cls-$mem";
 }
 
 #package SP;
@@ -6760,7 +8672,7 @@ sub add_orig {
 				$self->{xchg_isup} = 1;
 				$self->{reanalyze} = 1;
 			}
-			$self->{circuits}->{$msg->{dpc}} = 1;
+			$self->{circuits}->{$msg->{dpc}} = $network->{nodes}->{$msg->{dpc}};
 		}
 		$self->reanalyze($top,$network) if $self->{reanalyze};
 		return;
@@ -6771,7 +8683,7 @@ sub add_orig {
 				$self->{orig_tcap} = 1;
 				$self->{reanalyze} = 1;
 			}
-			$self->{tqueries}->{$msg->{dpc}} = 1;
+			$self->{tqueries}->{$msg->{dpc}} = $network->{nodes}->{$msg->{dpc}};
 		}
 		$self->reanalyze($top,$network) if $self->{reanalyze};
 		return;
@@ -6782,7 +8694,7 @@ sub add_orig {
 				$self->{exch_sltm} = 1;
 				$self->{reanalyze} = 1;
 			}
-			$self->{adjacent}->{$msg->{dpc}} = 1;
+			$self->{adjacent}->{$msg->{dpc}} = $network->{nodes}->{$msg->{dpc}};
 		}
 		$self->reanalyze($top,$network) if $self->{reanalyze};
 		return;
@@ -6802,7 +8714,7 @@ sub add_term {
 				$self->{xchg_isup} = 1;
 				$self->{reanalyze} = 1;
 			}
-			$self->{circuits}->{$msg->{opc}} = 1;
+			$self->{circuits}->{$msg->{opc}} = $network->{nodes}->{$msg->{opc}};
 		}
 		$self->reanalyze($top,$network) if $self->{reanalyze};
 		return;
@@ -6813,7 +8725,7 @@ sub add_term {
 				$self->{term_tcap} = 1;
 				$self->{reanalyze} = 1;
 			}
-			$self->{responds}->{$msg->{opc}} = 1;
+			$self->{responds}->{$msg->{opc}} = $network->{nodes}->{$msg->{opc}};
 		}
 		$self->reanalyze($top,$network) if $self->{reanalyze};
 		return;
@@ -6824,7 +8736,7 @@ sub add_term {
 				$self->{xchg_sltm} = 1;
 				$self->{reanalyze} = 1;
 			}
-			$self->{adjacent}->{$msg->{opc}} = 1;
+			$self->{adjacent}->{$msg->{opc}} = $network->{nodes}->{$msg->{opc}};
 		}
 		$self->reanalyze($top,$network) if $self->{reanalyze};
 		return;
@@ -6965,10 +8877,9 @@ sub swap {
 
 #package SP;
 sub movesp {
-	my ($self,$top,$col,$row) = @_;
-	#return if $col == $self->{col} && $row == $self->{row};
+	my ($self,$top,$col,$row,$off) = @_;
 	my $mc = $top->mycanvas;
-	my $nx = $mc->colpos($col);
+	my $nx = $mc->colpos($col+$off);
 	my $ny = $mc->rowpos($row);
 	my $dx = $nx - $self->{x};
 	my $dy = $ny - $self->{y};
@@ -6982,20 +8893,110 @@ sub movesp {
 	}
 	$self->{x} = $nx;
 	$self->{y} = $ny;
+	$self->{off} = $off;
 	$self->{col} = $col;
 	$self->{row} = $row;
-	if ($dx or $dy) {
-		foreach my $r (values %{$self->{routes}}) { $r->move($top); }
-		foreach my $r (values %{$self->{relate}}) { $r->move($top); }
-	}
+	#if ($dx or $dy) {
+		foreach my $r (values %{$self->{paths}}   ) { $r->move($top); }
+		foreach my $r (values %{$self->{relate}}  ) { $r->move($top); }
+		foreach my $r (values %{$self->{linksets}}) { $r->move($top); }
+		foreach my $r (values %{$self->{routes}}  ) { $r->move($top); }
+	#}
 }
 
 #package SP;
-sub getmenu {
+sub getmore {
 	my ($self,$m,$top,$X,$Y) = @_;
-	shift->Clickable::getmenu(@_);
-	if (keys %{$self->{relate}}) {
-		$m->add('separator');
+	my $have = {};
+	$have->{primary} = $self->{primary} ? 1 : 0;
+	$have->{aliases}  = scalar keys %{$self->{aliases}};
+	$have->{adjacent} = scalar keys %{$self->{adjacent}};
+	$have->{combined} = scalar keys %{$self->{combined}};
+	$have->{linksets} = scalar keys %{$self->{linksets}};
+	$have->{routes}   = scalar keys %{$self->{routes}};
+	$have->{relate}   = scalar keys %{$self->{relate}};
+	$have->{circuits} = scalar keys %{$self->{circuits}};
+	$m->add('separator') if
+		$have->{primary} +
+		$have->{aliases} +
+		$have->{adjacent} +
+		$have->{combined} +
+		$have->{linksets} +
+		$have->{routes} +
+		$have->{relate};
+	if ($have->{primary}) {
+		my $node = $self->{primary};
+		my $label = 'Primary '.$node->shortid;
+		my $mc = $m->Menu(-title=>"$label Menu");
+		$node->getmenu($mc,$top,$X,$Y);
+		$m->add('cascade',-menu=>$mc,-label=>$label);
+	}
+	if ($have->{aliases}) {
+		my $mc = $m->Menu(-title=>'Alias Point Codes Menu');
+		foreach my $pc (sort {$a <=> $b} keys %{$self->{aliases}}) {
+			my $node = $self->{aliases}->{$pc};
+			my $label = 'Alias '.$node->shortid;
+			my $m3 = $mc->Menu(-title=>"$label Menu");
+			$node->getmenu($m3,$top,$X,$Y);
+			$mc->add('cascade',-menu=>$m3,-label=>$label);
+		}
+		$m->add('cascade',-menu=>$mc,-label=>'Alias Point Codes');
+	}
+	if ($have->{adjacent}) {
+		my $mc = $m->Menu(-title=>'Adjacent Nodes Menu');
+		foreach my $pc (sort {$a <=> $b} keys %{$self->{adjacent}}) {
+			my $node = $self->{adjacent}->{$pc};
+			my $label = 'Adjacent '.$node->shortid;
+			my $m3 = $mc->Menu(-title=>"$label Menu");
+			$node->getmenu($m3,$top,$X,$Y);
+			$mc->add('cascade',-menu=>$m3,-label=>$label);
+		}
+		$m->add('cascade',-menu=>$mc,-label=>'Adjacent Nodes');
+	}
+	if ($have->{combined}) {
+		my $mc = $m->Menu(-title=>'Combined Linksets Menu');
+		foreach my $key (sort keys %{$self->{combined}}) {
+			my $combined = $self->{combined}->{$key};
+			my $nodea = $combined->{nodea};
+			my $nodeb = $combined->{nodeb};
+			my $label = 'Combined Linkset to '.$nodea->shortid.' and '.$nodeb->shortid;
+			my $m3 = $mc->Menu(-title=>"$label Menu");
+			$combined->getmenu($m3,$top,$X,$Y);
+			$mc->add('cascade',-menu=>$m3,-label=>$label);
+		}
+		$m->add('cascade',-menu=>$mc,-label=>'Combined Linksets');
+	}
+	if ($have->{linksets}) {
+		my $mc = $m->Menu(-title=>'Linksets Menu');
+		foreach my $pc (sort {$a <=> $b} keys %{$self->{linksets}}) {
+			my $linkset = $self->{linksets}->{$pc};
+			my $node;
+			if ($linkset->{nodea}->{pc} == $self->{pc}) {
+				$node = $linkset->{nodeb};
+			} else {
+				$node = $linkset->{nodea};
+			}
+			my $label = 'Linkset to '.$node->shortid;
+			my $m3 = $mc->Menu(-title=>"$label Menu");
+			$linkset->getmenu($m3,$top,$X,$Y);
+			$mc->add('cascade',-menu=>$m3,-label=>$label);
+		}
+		$m->add('cascade',-menu=>$mc,-label=>'Linksets');
+	}
+	if ($have->{routes}) {
+		my $mc = $m->Menu(-title=>'Routesets Menu');
+		foreach my $pc (sort {$a <=> $b} keys %{$self->{routes}}) {
+			my $route = $self->{routes}->{$pc};
+			my $node = $route->{node};
+			my $label = 'Route to '.$node->shortid;
+			my $m3 = $mc->Menu(-title=>"$label Menu");
+			$route->getmenu($m3,$top,$X,$Y);
+			$mc->add('cascade',-menu=>$m3,-label=>$label);
+		}
+		$m->add('cascade',-menu=>$mc,-label=>'Routesets');
+	}
+	if ($have->{relate}) {
+		my $mc = $m->Menu(-title=>'Relations Menu');
 		foreach my $pc (sort {$a <=> $b} keys %{$self->{relate}}) {
 			my $relation = $self->{relate}->{$pc};
 			my $node;
@@ -7004,16 +9005,12 @@ sub getmenu {
 			} else {
 				$node = $relation->{nodea};
 			}
-			my $mc = $m->Menu(
-				-tearoff=>0,
-				-title=>'Routeset to '.$node->shortid.' Menu',
-			);
-			$relation->getmenu($mc,$top,$X,$Y);
-			$m->add('cascade',
-				-menu=>$mc,
-				-label=>'Routeset to '.$node->shortid,
-			);
+			my $label = 'Routset to '.$node->shortid;
+			my $m3 = $mc->Menu( -title=>"$label Menu");
+			$relation->getmenu($m3,$top,$X,$Y);
+			$mc->add('cascade',-menu=>$m3,-label=>$label);
 		}
+		$m->add('cascade',-menu=>$mc,-label=>'Relations');
 	}
 }
 
@@ -7025,33 +9022,63 @@ sub fillprops {
 		-text=>'Point code type:',
 	)->grid(-row=>$$row,-column=>0,-sticky=>'ewns');
 	$tw->Optionmenu(%optionleft,
-		-options=>\@Path::rloptions,
+		-options=>\@Channel::rloptions,
 		-variable=>\$self->{rt},
-		-textvariable=>\$self->{rttext},
-	)->grid(-row=>$$row++,-column=>1,-sticky=>'ewns');
+		-textvariable=>\$self->{rttext}, -width=>12,
+	)->grid(-row=>$$row++,-column=>1,-sticky=>'wns');
 	$tw->Label(%labelright,
 		-text=>'Point code:',
 	)->grid(-row=>$$row,-column=>0,-sticky=>'ewns');
 	$tw->Entry(%entryleft,
-		-textvariable=>\$self->{pcode},
-	)->grid(-row=>$$row++,-column=>1,-sticky=>'ewns');
+		-textvariable=>\$self->{pcode}, -width=>12,
+	)->grid(-row=>$$row++,-column=>1,-sticky=>'wns');
+	$tw->Label(%labelright,
+		-text=>'Point code type:',
+	)->grid(-row=>$$row,-column=>0,-sticky=>'ewns');
+	my $pctyp = $self->pctype();
+	$tw->Entry(%entryinput,
+		-textvariable=>\$pctyp, -width=>32,
+	)->grid(-row=>$$row++,-column=>1,-sticky=>'wns');
 	$tw->Label(%labelright,
 		-text=>'Point code owner:',
 	)->grid(-row=>$$row,-column=>0,-sticky=>'ewns');
+	my $lownr = $self->pcowner(1);
 	$tw->Entry(%entryinput,
-		-textvariable=>\$self->{lownr},
-	)->grid(-row=>$$row++,-column=>1,-sticky=>'ewns');
+		-textvariable=>\$lownr, -width=>40,
+	)->grid(-row=>$$row,-column=>1,-sticky=>'wns');
+	$tw->Entry(%entryinput,
+		-textvariable=>\$self->{pownr}, -width=>16,
+	)->grid(-row=>$$row++,-column=>2,-sticky=>'wns');
+	$tw->Label(%labelright,
+		-text=>'Point code location:',
+	)->grid(-row=>$$row,-column=>0,-sticky=>'ewns');
+	my $pcloc = $self->pcstate(1);
+	$tw->Entry(%entryinput,
+		-textvariable=>\$pcloc, -width=>32,
+	)->grid(-row=>$$row,-column=>1,-sticky=>'wns');
+	my $pcsta = $self->pcstate(0);
+	$tw->Entry(%entryinput,
+		-textvariable=>\$pcsta, -width=>16,
+	)->grid(-row=>$$row++,-column=>2,-sticky=>'wns');
+	$tw->Label(%labelright,
+		-text=>'CLLI:',
+	)->grid(-row=>$$row,-column=>0,-sticky=>'ewns');
+	$tw->Entry(%entryinput,
+		-textvariable=>\$self->{clli}, -width=>24,
+	)->grid(-row=>$$row++,-column=>1,-sticky=>'wns');
 }
 
 #package SP;
 sub fillstatus {
-	my ($self,$tw,$row,$lnktxt,$cirtxt,$quetxt,$restxt) = @_;
+	my ($self,$top,$tw,$row,$ptxt,$atxt,$ltxt,$ctxt,$qtxt,$rtxt) = @_;
 	my $f;
 
-	$lnktxt = 'Linksets' unless defined $lnktxt;
-	$cirtxt = 'Circuits' unless defined $cirtxt;
-	$quetxt = 'Queries' unless defined $quetxt;
-	$restxt = 'Replies' unless defined $restxt;
+	$ptxt = 'Primary'  unless defined $ptxt;
+	$atxt = 'Aliases'  unless defined $atxt;
+	$ltxt = 'Linksets' unless defined $ltxt;
+	$ctxt = 'Circuits' unless defined $ctxt;
+	$qtxt = 'Queries'  unless defined $qtxt;
+	$rtxt = 'Replies'  unless defined $rtxt;
 
 	$f = $tw->Frame(%tframestyle,
 	)->pack(%tframepack);
@@ -7083,119 +9110,151 @@ sub fillstatus {
 		-variable=>\$self->{state},
 		-textvariable=>\$self->{statetext},
 	)->grid(-row=>$$row++,-column=>1,-sticky=>'ewns');
-	if (keys %{$self->{adjacent}}) {
-		$f = $tw->TFrame(%tframestyle,
-			-label=>'Linksets:',
+	if ($self->{primary} or keys %{$self->{aliases}}) {
+		$f = $tw->TFrame(%tframestyle, -label=>'Aliases:',
 		)->pack(%tframepack);
 		$$row = 0;
-		foreach my $pc (sort {$a <=> $b} keys %{$self->{adjacent}}) {
-			$f->Label(%labelright,
-				-text=>"$lnktxt:",
+		my $col = 0;
+		my $node;
+		if ($node = $self->{primary}) {
+			$f->Label(%labelright,-text=>"$ptxt:",
 			)->grid(-row=>$$row,-column=>0,-sticky=>'ewns');
-			my $pcode = main::pcstring($pc);
-			my $pownr = main::pcowner($pc,0);
-			$pcode .= " ($pownr)" if $pownr;
-			$f->Entry(%entrycenter,
-				-textvariable=>\$pcode,
+			my $w = $f->Entry(%entrycenter,-text=>$node->shortid,
 			)->grid(-row=>$$row++,-column=>1,-sticky=>'ewns');
+			$node->bindtowidget($top,$w);
+		}
+		foreach my $pc (sort {$a <=> $b} keys %{$self->{aliases}}) {
+			$f->Label(%labelright,-text=>"$atxt:",
+			)->grid(-row=>$$row,-column=>0,-sticky=>'ewns') if $col == 0; $col++;
+			$node = $self->{aliases}->{$pc};
+			my $w = $f->Entry(%entrycenter,-text=>$node->shortid,
+			)->grid(-row=>$$row,-column=>$col,-sticky=>'ewns');
+			$node->bindtowidget($top,$w);
+			if ($col > 4) { $col = 0; $row++ };
+		}
+	}
+	if (keys %{$self->{adjacent}}) {
+		$f = $tw->TFrame(%tframestyle, -label=>'Adjacent:')->pack(%tframepack);
+		$$row = 0;
+		my $col = 0;
+		foreach my $pc (sort {$a <=> $b} keys %{$self->{adjacent}}) {
+			$f->Label(%labelright,-text=>"Adjacent:",
+			)->grid(-row=>$$row,-column=>0,-sticky=>'ewns') if $col == 0; $col++;
+			my $node = $self->{adjacent}->{$pc};
+			my $w = $f->Entry(%entrycenter,-text=>$node->shortid,
+			)->grid(-row=>$$row,-column=>$col,-sticky=>'ewns');
+			$node->bindtowidget($top,$w);
+			if ($col > 4) { $col = 0; $row++ };
+		}
+	}
+	if (keys %{$self->{linksets}}) {
+		$f = $tw->TFrame(%tframestyle, -label=>'Linksets:')->pack(%tframepack);
+		$$row = 0;
+		my $col = 0;
+		foreach my $pc (sort {$a <=> $b} keys %{$self->{linksets}}) {
+			$f->Label(%labelright,-text=>"$ltxt:",
+			)->grid(-row=>$$row,-column=>0,-sticky=>'ewns') if $col == 0; $col++;
+			my $linkset = $self->{linksets}->{$pc};
+			my $w = $f->Entry(%entrycenter,-text=>$linkset->shortid,
+			)->grid(-row=>$$row,-column=>$col,-sticky=>'ewns');
+			$linkset->bindtowidget($top,$w);
+			if ($col > 4) { $col = 0; $row++ };
+		}
+	}
+	if (keys %{$self->{relate}}) {
+		$f = $tw->TFrame(%tframestyle, -label=>'Routesets:',
+		)->pack(%tframepack);
+		my $p = $f;
+		$p = $f->Scrolled('Pane',
+			-scrollbars=>'osoe',
+			-sticky=>'we',
+			-gridded=>'y',
+		)->pack(%tframepack) if keys %{$self->{relate}} > 4;
+		$$row = 0;
+		$p->Label(%labelcenter,-text=>'Point Code',
+		)->grid(-row=>$$row++,-column=>0,-sticky=>'ewns');
+		foreach my $pc (sort {$a <=> $b} keys %{$self->{relate}}) {
+			my $relation = $self->{relate}->{$pc};
+			my $node;
+			if ($relation->{nodea}->{pc} == $self->{pc}) {
+				$node = $relation->{nodeb};
+			} else {
+				$node = $relation->{nodea};
+			}
+			my $w = $p->Entry(%entrycenter, -text=>$node->shortid,
+			)->grid(-row=>$$row++,-column=>0,-sticky=>'ewns');
+			$relation->bindtowidget($top,$w);
 		}
 	}
 	if (keys %{$self->{circuits}}) {
-		$f = $tw->TFrame(%tframestyle,
-			-label=>'Circuits:',
+		$f = $tw->TFrame(%tframestyle, -label=>'Circuits:',
 		)->pack(%tframepack);
+		my $p = $f;
+		$p = $f->Scrolled('Pane',
+			-scrollbars=>'osoe',
+			-sticky=>'we',
+			-gridded=>'y',
+		)->pack(%tframepack) if keys %{$self->{circuits}} > 4;
 		$$row = 0;
-		$f->Label(%labelcenter,
-			-text=>'Point Code',
+		$p->Label(%labelcenter, -text=>'Point Code',
 		)->grid(-row=>$$row,-column=>0,-sticky=>'ewns');
-		$f->Label(%labelcenter,
-			-text=>'Alloc.',
+		$p->Label(%labelcenter, -text=>'Alloc.',
 		)->grid(-row=>$$row,-column=>1,-sticky=>'ewns');
-		$f->Label(%labelcenter,
-			-text=>'Act.',
+		$p->Label(%labelcenter, -text=>'Act.',
 		)->grid(-row=>$$row,-column=>2,-sticky=>'ewns');
-		$f->Label(%labelcenter,
-			-text=>'O/G',
+		$p->Label(%labelcenter, -text=>'O/G',
 		)->grid(-row=>$$row,-column=>3,-sticky=>'ewns');
-		$f->Label(%labelcenter,
-			-text=>'I/C',
+		$p->Label(%labelcenter, -text=>'I/C',
 		)->grid(-row=>$$row,-column=>4,-sticky=>'ewns');
-		$f->Label(%labelcenter,
-			-text=>'2/W',
+		$p->Label(%labelcenter, -text=>'2/W',
 		)->grid(-row=>$$row++,-column=>5,-sticky=>'ewns');
 		foreach my $pc (sort {$a <=> $b} keys %{$self->{circuits}}) {
 			my ($ogcol,$iccol);
 			if ($self->{way} eq 'O')
 			{ $ogcol = 3; $iccol = 4; } else
 			{ $ogcol = 4; $iccol = 3; }
-			my $pcode = main::pcstring($pc);
-			my $pownr = main::pcowner($pc,0);
-			$pcode .= " ($pownr)" if $pownr;
-			$f->Entry(%entrycenter,
-				-textvariable=>\$pcode,
+			my $node = $self->{circuits}->{$pc};
+			my $w = $p->Entry(%entrycenter, -text=>$node->shortid,
 			)->grid(-row=>$$row,-column=>0,-sticky=>'ewns');
-			$f->Entry(%entryright,
-				-textvariable=>\$self->{relate}->{$pc}->{ciccnt},
+			$node->bindtowidget($top,$w);
+			$p->Entry(%entryright, -textvariable=>\$self->{relate}->{$pc}->{ciccnt},
 			)->grid(-row=>$$row,-column=>1,-sticky=>'ewns');
-			$f->Entry(%entryright,
-				-textvariable=>\$self->{relate}->{$pc}->{actcnt},
+			$p->Entry(%entryright, -textvariable=>\$self->{relate}->{$pc}->{actcnt},
 			)->grid(-row=>$$row,-column=>2,-sticky=>'ewns');
-			$f->Entry(%entryright,
-				-textvariable=>\$self->{relate}->{$pc}->{actforw},
+			$p->Entry(%entryright, -textvariable=>\$self->{relate}->{$pc}->{actforw},
 			)->grid(-row=>$$row,-column=>$ogcol,-sticky=>'ewns');
-			$f->Entry(%entryright,
-				-textvariable=>\$self->{relate}->{$pc}->{actrevs},
+			$p->Entry(%entryright, -textvariable=>\$self->{relate}->{$pc}->{actrevs},
 			)->grid(-row=>$$row,-column=>$iccol,-sticky=>'ewns');
-			$f->Entry(%entryright,
-				-textvariable=>\$self->{relate}->{$pc}->{actboth},
+			$p->Entry(%entryright, -textvariable=>\$self->{relate}->{$pc}->{actboth},
 			)->grid(-row=>$$row++,-column=>5,-sticky=>'ewns');
 		}
 	}
 	if (keys %{$self->{tqueries}} || keys %{$self->{responds}}) {
-		$f = $tw->TFrame(%tframestyle,
-			-label=>'Queries:',
+		$f = $tw->TFrame(%tframestyle, -label=>'Queries:',
 		)->pack(%tframepack);
 		$$row = 0;
 		my $col = 0;
 		foreach my $pc (sort {$a <=> $b} keys %{$self->{tqueries}}) {
-			if ($col == 0) {
-				$f->Label(%labelright,
-					-text=>"$quetxt:",
-				)->grid(-row=>$$row,-column=>$col,-sticky=>'ewns');
-			}
-			$col++;
-			my $pcode = main::pcstring($pc);
-			my $pownr = main::pcowner($pc,0);
-			$pcode .= " ($pownr)" if $pownr;
-			$f->Entry(%entrycenter,
-				-textvariable=>\$pcode,
+			$f->Label(%labelright, -text=>"$qtxt:",
+			)->grid(-row=>$$row,-column=>$col,-sticky=>'ewns') if $col == 0; $col++;
+			my $node = $self->{tqueries}->{$pc};
+			my $w = $f->Entry(%entrycenter, -text=>$node->shortid,
 			)->grid(-row=>$$row,-column=>$col,-sticky=>'ewns');
-			if ($col > 5) {
-				$col = 0;
-				$$row++;
-			}
+			$node->bindtowidget($top,$w);
+			if ($col > 4) { $col = 0; $$row++; }
 		}
 		if ($col != 0) {
 			$col = 0;
 			$$row++;
 		}
 		foreach my $pc (sort {$a <=> $b} keys %{$self->{responds}}) {
-			if ($col == 0) {
-				$f->Label(%labelright,
-					-text=>"$restxt:",
-				)->grid(-row=>$$row,-column=>$col,-sticky=>'ewns');
-			}
-			$col++;
-			my $pcode = main::pcstring($pc);
-			my $pownr = main::pcowner($pc,0);
-			$pcode .= " ($pownr)" if $pownr;
-			$f->Entry(%entrycenter,
-				-textvariable=>\$pcode,
+			$f->Label(%labelright, -text=>"$rtxt:",
+			)->grid(-row=>$$row,-column=>$col,-sticky=>'ewns') if $col == 0; $col++;
+			my $node = $self->{responds}->{$pc};
+			my $w = $f->Entry(%entrycenter, -text=>$node->shortid,
 			)->grid(-row=>$$row,-column=>$col,-sticky=>'ewns');
-			if ($col > 5) {
-				$col = 0;
-				$$row++;
-			}
+			$node->bindtowidget($top,$w);
+			if ($col > 4) { $col = 0; $$row++; }
 		}
 	}
 }
@@ -7211,23 +9270,24 @@ sub adjitems {
 	my ($self,$c,$oldtags) = @_;
 	my ($x,$y) = ($self->{x},$self->{y});
 	$self->{item} = $c->createOval(
-		$x-33,$y-33,$x+33,$y+33,
+		$x-40,$y-40,$x+40,$y+40,
 		-fill=>'white',
-		-outline=>'black',
-		-activeoutline=>'green',
-		-width=>2,
-		-activewidth=>3,
+		-outline=>'black', -width=>2,
+		-activeoutline=>'cyan', -activewidth=>3,
 		-tags=>[ref($self),'node',@{$oldtags}],
 	);
+	unshift @{$self->{items}}, $self->{item};
 	$c->coords($self->{scri},
-		$x-23,$y-23,$x+23,$y+23,$x+23,$y-23,$x-23,$y+23,$x-23,$y-23,
+		$x-26,$y-26,$x+26,$y+26,$x+26,$y-26,$x-26,$y+26,$x-26,$y-26,
 	);
 }
 
 #package SSP;
 sub fillstatus {
-	my ($self,$tw,$row) = @_;
-	$self->SP::fillstatus($tw,$row,
+	my ($self,$top,$tw,$row) = @_;
+	$self->SP::fillstatus($top,$tw,$row,
+		'Alias of',
+		'Primary for',
 		'Linksets to',
 		'Circuits to',
 		'Query to',
@@ -7246,20 +9306,21 @@ sub adjitems {
 	my ($self,$c,$oldtags) = @_;
 	my ($x,$y) = ($self->{x},$self->{y});
 	$self->{item} = $c->createOval(
-		$x-33,$y-23,$x+33,$y+23,
+		$x-40,$y-30,$x+40,$y+30,
 		-fill=>'white',
-		-outline=>'black',
-		-activeoutline=>'green',
-		-width=>2,
-		-activewidth=>3,
+		-outline=>'black', -width=>2,
+		-activeoutline=>'cyan', -activewidth=>3,
 		-tags=>[ref($self),'node',@{$oldtags}],
 	);
+	unshift @{$self->{items}}, $self->{item};
 }
 
 #package SCP;
 sub fillstatus {
-	my ($self,$tw,$row) = @_;
-	$self->SP::fillstatus($tw,$row,
+	my ($self,$top,$tw,$row) = @_;
+	$self->SP::fillstatus($top,$tw,$row,
+		'Alias of',
+		'Primary for',
 		'Linksets to',
 		'Circuits to',
 		'Responds to',
@@ -7278,23 +9339,24 @@ sub adjitems {
 	my ($self,$c,$oldtags) = @_;
 	my ($x,$y) = ($self->{x},$self->{y});
 	$self->{item} = $c->createRectangle(
-		$x-28,$y-28,$x+28,$y+28,
+		$x-38,$y-38,$x+38,$y+38,
 		-fill=>'white',
-		-outline=>'black',
-		-activeoutline=>'green',
-		-width=>2,
-		-activewidth=>3,
+		-outline=>'black', -width=>2,
+		-activeoutline=>'cyan', -activewidth=>3,
 		-tags=>[ref($self),'node',@{$oldtags}],
 	);
+	unshift @{$self->{items}}, $self->{item};
 	$c->coords($self->{scri},
-		$x+28,$y-28,$x-28,$y+28,
+		$x+38,$y-38,$x-38,$y+38,
 	);
 }
 
 #package STP;
 sub fillstatus {
-	my ($self,$tw,$row) = @_;
-	$self->SP::fillstatus($tw,$row,
+	my ($self,$top,$tw,$row) = @_;
+	$self->SP::fillstatus($top,$tw,$row,
+		'Alias of',
+		'Primary for',
 		'Linksets to',
 		'Circuits to',
 		'Queries',
@@ -7314,23 +9376,24 @@ sub adjitems {
 	my ($x,$y) = ($self->{x},$self->{y});
 	$self->{alias} = 1;
 	$self->{item} = $c->createRectangle(
-		$x-28,$y-28,$x+28,$y+28,
+		$x-38,$y-38,$x+38,$y+38,
 		-fill=>'white',
-		-outline=>'black',
-		-activeoutline=>'green',
-		-width=>2,
-		-activewidth=>3,
+		-outline=>'black', -width=>2,
+		-activeoutline=>'cyan', -activewidth=>3,
 		-tags=>[ref($self),'node',@{$oldtags}],
 	);
+	unshift @{$self->{items}}, $self->{item};
 	$c->coords($self->{scri},
-		$x+28,$y-28,$x-28,$y+28,
+		$x+38,$y-38,$x-38,$y+38,
 	);
 }
 
 #package GTT;
 sub fillstatus {
-	my ($self,$tw,$row) = @_;
-	$self->SP::fillstatus($tw,$row,
+	my ($self,$top,$tw,$row) = @_;
+	$self->SP::fillstatus($top,$tw,$row,
+		'Alias of',
+		'Primary for',
 		'Linksets to',
 		'Circuits to',
 		'Queries',
@@ -7357,6 +9420,7 @@ sub new {
 	$self->Logging::init(@args);
 	$self->Properties::init(@args);
 	$self->Status::init(@args);
+	$self->Clickable::init(@args);
 	$self->CallCollector::init(@args);
 	$self->MsgCollector::init(@args);
 	$self->{msgnum} = 0;
@@ -7366,14 +9430,14 @@ sub new {
 	$self->{act2w} = 0;
 	$self->{nodes} = {};
 	$self->{nodeno} = 0;
-	$self->{paths} = {};
-	$self->{pathno} = 0;
+	$self->{channels} = {};
+	$self->{channelno} = 0;
 	$self->{relations} = {};
 	$self->{relationno} = 0;
 	my $c = $top->canvas;
 	$c->CanvasBind('<ButtonPress-3>',[\&Network::button3,$self,$top,Tk::Ev('X'),Tk::Ev('Y'),Tk::Ev('x'),Tk::Ev('y')]);
 	$Network::network = $self;
-	$top->statusbar->configure(-text=>"New ".$self->identify);
+	$top->statusbar->configure(-text=>"Discovered ".$self->identify);
 	return $self;
 }
 
@@ -7391,14 +9455,14 @@ sub shortid {
 }
 
 #package Network;
-sub getPath {
+sub getChannel {
 	my ($self,$top,$ppa,@args) = @_;
-	return $self->{paths}->{$ppa} if exists $self->{paths}->{$ppa};
-	my $pathno = $self->{pathno} + 1;
-	my $path = Path->new($top,$pathno,$ppa,@args);
-	$self->{paths}->{$ppa} = $path;
-	$self->{pathno} = $pathno;
-	return $path;
+	return $self->{channels}->{$ppa} if exists $self->{channels}->{$ppa};
+	my $channelno = $self->{channelno} + 1;
+	my $channel = Channel->new($top,$channelno,$ppa,@args);
+	$self->{channels}->{$ppa} = $channel;
+	$self->{channelno} = $channelno;
+	return $channel;
 }
 
 #package Network;
@@ -7427,30 +9491,59 @@ sub getRelation {
 }
 
 #package Network;
-sub getLinkSet {
-	my ($self,$top,@args) = @_;
-	my $linkset = $self->getRelation($top,@args); 
-	if (ref $linkset eq 'Relation') {
-		Linkset->xform($linkset,$top);
-	}
+sub getLinkset {
+	my ($self,$top,$nodea,$nodeb,@args) = @_;
+	my $key = "$nodea->{pc},$nodeb->{pc}";
+	return $self->{linksets}->{$key} if exists $self->{linksets}->{$key};
+	my $linksetno = $self->{linksetno} + 1;
+	my $relation = $self->getRelation($top,$nodea,$nodeb,@args);
+	my $linkset = Linkset->new($top,$self,$relation,@args);
+	$nodea->{linksets}->{$nodeb->{pc}} = $linkset;
+	$nodeb->{linksets}->{$nodea->{pc}} = $linkset;
+	$linkset->{key} = $key;
+	$relation->{linkset} = $linkset;
+	$self->{linksets}->{$key} = $linkset;
+	$key = "$nodeb->{pc},$nodea->{pc}";
+	$self->{linksets}->{$key} = $linkset;
+	$self->{linksetno} = $linksetno;
 	return $linkset;
 }
 
 #package Network;
 sub regroupsps {
 	my ($self,$top) = @_;
+	my $mc = $top->mycanvas;
 	my %totals;
+	my %offset;
+	my ($mincol,$maxcol) = (0,0);
 	while (my ($pc,$node) = each %{$self->{nodes}}) {
 		my $col = $node->{col};
-		$totals{$col} += 1;
+		$totals{$col}++;
+		$offset{$col}=0;
+		$mincol = $col if $col < $mincol;
+		$maxcol = $col if $col > $maxcol;
 	}
+	$mincol = -5 if $mincol == 0;
+	$maxcol =  5 if $maxcol == 0;
+	$mc->{mincol} = $mincol;
+	$mc->{maxcol} = $maxcol;
+	my $max = int($mc->{h}/42/2);
 	my %counts;
 	foreach my $pc (sort {$a <=> $b} keys %{$self->{nodes}}) {
 		my $node = $self->{nodes}->{$pc};
 		my $col = $node->{col};
-		my $row = $counts{$col} - $totals{$col};
+		my $tot = $totals{$col};
+		my $row = $counts{$col} - $tot;
+		my $off = $offset{$col};
 		$counts{$col} += 2;
-		$node->movesp($top,$col,$row);
+		if ($tot > $max) {
+			if ($off != 0)   { $offset{$col} =  0; }
+			elsif ($col > 0) { $offset{$col} =  1; }
+			else		 { $offset{$col} = -1; }
+			$row /= 2;
+		}
+		$node->movesp($top,$col,$row,$off/2);
+#		$node->movesp($top,$col+$offset{$col}/2,$row);
 	}
 }
 
@@ -7480,14 +9573,79 @@ sub fillprops {
 }
 
 #package Network;
+sub getmore {
+	my ($self,$m,$top,$X,$Y) = @_;
+	my $have = {};
+	$have->{channels}  = scalar keys %{$self->{channels}};
+	$have->{nodes}     = scalar keys %{$self->{nodes}};
+	$have->{relations} = scalar keys %{$self->{relations}};
+	$have->{linksets}  = scalar keys %{$self->{linksets}};
+	$m->add('separator') if
+		$have->{channels} +
+		$have->{nodes} +
+		$have->{relations} +
+		$have->{linksets};
+	if ($have->{channels}) {
+		my $mc = $m->Menu(-title=>'Channels Menu');
+		foreach my $ppa (sort {$a <=> $b} keys %{$self->{channels}}) {
+			my $channel = $self->{channels}->{$ppa};
+			my $label = 'Channel '.$channel->shortid;
+			my $m3 = $mc->Menu(-title=>"$label Menu");
+			$channel->getmenu($m3,$top,$X,$Y);
+			$channel->getmore($m3,$top,$X,$Y);
+			$mc->add('cascade',-menu=>$m3,-label=>$label);
+		}
+		$m->add('cascade',-menu=>$mc,-label=>'Channels');
+	}
+	if ($have->{nodes}) {
+		my $mc = $m->Menu(-title=>'Nodes Menu');
+		foreach my $pc (sort {$a <=> $b} keys %{$self->{nodes}}) {
+			my $node = $self->{nodes}->{$pc};
+			my $label = ref($node).' '.$node->shortid;
+			my $m3 = $mc->Menu(-title=>"$label Menu");
+			$node->getmenu($m3,$top,$X,$Y);
+			$node->getmore($m3,$top,$X,$Y);
+			$mc->add('cascade',-menu=>$m3,-label=>$label);
+		}
+		$m->add('cascade',-menu=>$mc,-label=>'Nodes');
+	}
+	if ($have->{relations}) {
+		my $mc = $m->Menu(-title=>'Relations Menu');
+		foreach my $key (sort keys %{$self->{relations}}) {
+			my $relation = $self->{relations}->{$key};
+			next unless $relation->{key} eq $key;
+			my $label = ref($relation).' '.$relation->shortid;
+			my $m3 = $mc->Menu(-title=>"$label Menu");
+			$relation->getmenu($m3,$top,$X,$Y);
+			$relation->getmore($m3,$top,$X,$Y);
+			$mc->add('cascade',-menu=>$m3,-label=>$label);
+		}
+		$m->add('cascade',-menu=>$mc,-label=>'Relations');
+	}
+	if ($have->{linksets}) {
+		my $mc = $m->Menu(-title=>'Linksets Menu');
+		foreach my $key (sort keys %{$self->{linksets}}) {
+			my $linkset = $self->{linksets}->{$key};
+			next unless $linkset->{key} eq $key;
+			my $label = ref($linkset).' '.$linkset->shortid;
+			my $m3 = $mc->Menu(-title=>"$label Menu");
+			$linkset->getmenu($m3,$top,$X,$Y);
+			$linkset->getmore($m3,$top,$X,$Y);
+			$mc->add('cascade',-menu=>$m3,-label=>$label);
+		}
+		$m->add('cascade',-menu=>$mc,-label=>'Linksets');
+	}
+}
+
+#package Network;
 sub fillstatus {
-	my ($self,$tw,$row) = @_;
+	my ($self,$top,$tw,$row) = @_;
 
 	$tw->Label(%labelright,
-		-text=>'Number of paths:',
+		-text=>'Number of channels:',
 	)->grid(-row=>$$row,-column=>0,-sticky=>'ewns');
 	$tw->Entry(%entryright,
-		-textvariable=>\$self->{pathno},
+		-textvariable=>\$self->{channelno},
 	)->grid(-row=>$$row++,-column=>1,-sticky=>'ewns');
 	$tw->Label(%labelright,
 		-text=>'Number of nodes:',
@@ -7528,7 +9686,7 @@ sub fillstatus {
 }
 
 # -------------------------------------
-package Path;
+package Channel;
 use strict;
 use vars qw(@ISA);
 @ISA = qw(MsgStats Logging Properties Status Clickable MsgCollector);
@@ -7567,16 +9725,17 @@ my @mpoptions = (
 	['International'    => MP_INTERNATIONAL	],
 );
 
-my %paths;
-my $pathno = 0;
+my %channels;
+my $channelno = 0;
 
-#package Path;
+#package Channel;
 sub init {
-	my ($self,$top,$pathno,$ppa,@args) = @_;
+	my ($self,$top,$channelno,$ppa,@args) = @_;
 	$self->MsgStats::init(@args);
 	$self->Logging::init(@args);
 	$self->Properties::init(@args);
 	$self->Status::init(@args);
+	$self->Clickable::init(@args);
 	$self->MsgCollector::init(@args);
 	$self->{ppa} = $ppa;
 	$self->{slot} = (($ppa >> 0) & 0x1f);
@@ -7592,18 +9751,20 @@ sub init {
 	$self->{dest} = {};
 	$self->{opcs} = {};
 	$self->{dpcs} = {};
-	$self->{routes} = {};
+	$self->{paths} = {};
 	$self->{msgbuf} = [];
-	#print "Created new path ($self->{card}:$self->{span}:$self->{slot}).\n";
+	#print "Created new channel ($self->{card}:$self->{span}:$self->{slot}).\n";
 	$self->{fill} = 'red';
+	my $offa = $self->{offa} = 0;
 	my $cola = $self->{cola} = 0 - SP::COL_ADJ;
-	my $rowa = $self->{rowa} = $pathno * 2;
+	my $rowa = $self->{rowa} = $channelno * 2;
+	my $offb = $self->{offb} = 0;
 	my $colb = $self->{colb} = 0 + SP::COL_ADJ;
-	my $rowb = $self->{rowb} = $pathno * 2;
+	my $rowb = $self->{rowb} = $channelno * 2;
 	my $mc = $top->mycanvas;
-	my $xa = $self->{xa} = $mc->colpos($cola);
+	my $xa = $self->{xa} = $mc->colpos($cola+$offa);
 	my $ya = $self->{ya} = $mc->rowpos($rowa);
-	my $xb = $self->{xb} = $mc->colpos($colb);
+	my $xb = $self->{xb} = $mc->colpos($colb+$offb);
 	my $yb = $self->{yb} = $mc->rowpos($rowb);
 	$self->{x} = ($xa + $xb)/2;
 	$self->{y} = ($ya + $yb)/2;
@@ -7611,24 +9772,20 @@ sub init {
 	$self->{item} = $c->createLine($xa,$ya,$xb,$yb,
 		-arrow=>'last',
 		-capstyle=>'round',
-		-fill=>$self->{fill},
-		-activefill=>'green',
+		-fill=>$self->{fill}, -width=>0.1,
+		-activefill=>'cyan', -activewidth=>2,
 		-joinstyle=>'round',
 		-smooth=>0,
-		-tags=>['path'],
-		-width=>0.1,
-		-activewidth=>2,
+		-state=>($top->{show}->{channels}) ? 'normal' : 'hidden',
+		-tags=>['channel'],
 	);
-	my $state = ($top->{show}->{paths}) ? 'normal' : 'hidden';
-	$c->itemconfigure($self->{item},-state=>$state);
-	$c->bind($self->{item},'<ButtonPress-3>',[\&Clickable::button3,$self,$top,Tk::Ev('X'),Tk::Ev('Y')]);
+	push @{$self->{items}}, $self->{item};
 	$c->lower($self->{item},'node');
-	$mc->addballoon($self, $self->{item});
-	$top->statusbar->configure(-text=>"New ".$self->identify);
-	$top->{updatenow} = 1;
+	$c->lower($self->{item},'linkset');
+	$self->Clickable::attach($top,@args);
 }
 
-#package Path;
+#package Channel;
 sub new {
 	my ($type,@args) = @_;
 	my $self = {};
@@ -7637,31 +9794,33 @@ sub new {
 	return $self;
 }
 
-#package Path;
+#package Channel;
 sub get {
 	my ($type,$ppa,@args) = @_;
-	return $paths{$ppa} if exists $paths{$ppa};
+	return $channels{$ppa} if exists $channels{$ppa};
 	my $self = {};
 	bless $self, $type;
-	$paths{$ppa} = $self;
-	$pathno = $pathno + 1;
-	$self->init($pathno,$ppa,@args);
+	$channels{$ppa} = $self;
+	$channelno = $channelno + 1;
+	$self->init($channelno,$ppa,@args);
 	return $self;
 }
 
-#package Path;
+#package Channel;
 sub findalias {
-	my ($self,$top,$network,$node,@routes) = @_;
+	my ($self,$top,$network,$node,@paths) = @_;
 	return unless ref $node eq 'SSP' or ref $node eq 'SCP';
 	my $col = Linkset::COL_GTT;
-	foreach my $route (@routes) {
-		my $alias = $route->{node};
-		next unless $alias->{'pc'} != $node->{'pc'};
+	foreach my $path (@paths) {
+		my $alias = $path->{node};
+		next unless $alias->{pc} != $node->{pc};
 		if (abs($alias->{col}) != $col) {
 			my $newcol = $col;
 			if ($alias->{col} < 0) { $newcol = -$col; }
 			$alias->movesp($top,$newcol,$alias->{row});
 			$alias->{alias} = 1;
+			$alias->{primary} = $node;
+			$node->{aliases}->{$alias->{pc}} = $alias;
 			my $c = $top->canvas;
 			$c->itemconfigure($alias->{item}, -dash=>[5,2]);
 			$c->itemconfigure($alias->{scri}, -dash=>[5,2]);
@@ -7670,17 +9829,17 @@ sub findalias {
 	}
 }
 
-#package Path;
-sub bindpath {
-	my ($self,$top,$network,$nodea,$nodeb,$slc) = @_;
-	$self->{slc} = $slc;
+#package Channel;
+sub bindchannel {
+	my ($self,$top,$network,$nodea,$nodeb,$msg) = @_;
+	my $slc = $self->{slc} = $msg->{slc};
 	$self->{nodea} = $nodea;
 	$self->{nodeb} = $nodeb;
-	$self->{slc} = $slc;
-	my $linkset = $network->getLinkSet($top,$nodea,$nodeb);
-	my $link = $linkset->getLink($top,$nodea,$nodeb,$slc);
+	my $linkset = $network->getLinkset($top,$nodea,$nodeb);
+	my $link = $linkset->getLink($top,$slc);
 	$self->{link} = $link;
-	$link->addPath($self);
+	$link->addChannel($self);
+
 	$self->findalias($top,$network,$nodea,(values %{$self->{opcs}}));
 	$self->findalias($top,$network,$nodeb,(values %{$self->{dpcs}}));
 	my $c = $top->canvas;
@@ -7691,24 +9850,24 @@ sub bindpath {
 	$top->{updatenow} = 1;
 }
 
-#package Path;
+#package Channel;
 sub cardnum {
 	shift->{card};
 }
-#package Path;
+#package Channel;
 sub spannum {
 	shift->{span};
 }
-#package Path;
+#package Channel;
 sub slotnum {
 	shift->{slot};
 }
-#package Path;
+#package Channel;
 sub ppa {
 	shift->{ppa};
 }
-#package Path;
-sub add {
+#package Channel;
+sub add_msg {
 	my ($self,$top,$network,$msg,@args) = @_;
 	unless ($self->{detected}) {
 		if ($self->detecting) {
@@ -7725,61 +9884,75 @@ sub add {
 		$self->complete($top,$network,$msg);
 	}
 }
-#package Path;
+my %msghandler = (
+	0=>{
+	},
+	1=>{
+		0x11=>\&Channel::bindchannel,
+		0x12=>\&Channel::bindchannel,
+	},
+	2=>{
+		0x11=>\&Channel::bindchannel,
+		0x12=>\&Channel::bindchannel,
+	},
+);
+#package Channel;
 sub complete {
 	my ($self,$top,$network,$msg,@args) = @_;
-	my ($nodeb,$nodea,$pc,$route);
+	my ($nodeb,$nodea,$pc,$path,$link);
 	$self->inc($msg,0);
 	$self->pushmsg($msg);
 	$network->add_msg($top,$msg);
 	if (exists $msg->{opc}) {
 		$pc = $msg->{opc};
-		if ($route = $self->{opcs}->{$pc}) {
-			$nodea = $route->{node};
+		if ($path = $self->{opcs}->{$pc}) {
+			$nodea = $path->{node};
 			$self->swap($top) if $nodea->{col} < 0 && $self->{cola} > 0;
 		} else {
 			$nodea = $network->getSp($top,$pc, $self, $self->{cola},'O');
 			$self->swap($top) if $nodea->{col} < 0 && $self->{cola} > 0;
-			$route = Route->new($top,$self,'a',$nodea);
-			$self->{opcs}->{$pc} = $route;
+			$path = Path->new($top,$self,'a',$nodea);
+			$self->{opcs}->{$pc} = $path;
 			$self->findalias($top,$network,$self->{nodea},(values %{$self->{opcs}})) if $self->{nodea};
 			$self->findalias($top,$network,$self->{nodeb},(values %{$self->{dpcs}})) if $self->{nodeb};
 			$network->regroupsps($top);
 		}
-		$route->add_msg($top,$network,$msg,0);
+		$path->add_msg($top,$network,$msg,0);
 		$nodea->add_msg($top,$network,$msg,0);
 	}
 	if (exists $msg->{dpc}) {
 		$pc = $msg->{dpc};
-		if ($route = $self->{dpcs}->{$pc}) {
-			$nodeb = $route->{node};
+		if ($path = $self->{dpcs}->{$pc}) {
+			$nodeb = $path->{node};
 			$self->swap($top) if $nodeb->{col} < 0 && $self->{colb} > 0;
 		} else {
 			$nodeb = $network->getSp($top,$pc, $self, $self->{colb},'I');
 			$self->swap($top) if $nodeb->{col} < 0 && $self->{colb} > 0;
-			$route = Route->new($top,$self,'b',$nodeb);
-			$self->{dpcs}->{$pc} = $route;
+			$path = Path->new($top,$self,'b',$nodeb);
+			$self->{dpcs}->{$pc} = $path;
 			$self->findalias($top,$network,$self->{nodea},(values %{$self->{opcs}})) if $self->{nodea};
 			$self->findalias($top,$network,$self->{nodeb},(values %{$self->{dpcs}})) if $self->{nodeb};
 			$network->regroupsps($top);
 		}
-		$route->add_msg($top,$network,$msg,1);
+		$path->add_msg($top,$network,$msg,1);
 		$nodeb->add_msg($top,$network,$msg,1);
 	}
 	if (exists $msg->{dpc} && exists $msg->{opc}) {
-		my $rela = $network->getRelation($top,$nodea,$nodeb);
-		$rela->add_msg($top,$network,$msg);
-		if ($msg->{si} == 1 || $msg->{si} == 2) {
-			if ($msg->{mt} == 0x11 || $msg->{mt} == 0x12) {
-				$self->bindpath($top,$network,$nodea,$nodeb,$msg->{slc});
-			}
+		my $relation = $network->getRelation($top,$nodea,$nodeb);
+		$relation->add_msg($top,$network,$msg);
+		if ($link = $self->{link}) {
+			my $dir = ($self->{nodea}->{pc} == $link->{nodea}->{pc}) ? 0 : 1;
+			$link->add_msg($top,$network,$msg,$dir);
+		}
+		if (my $sub = $msghandler{$msg->{si}}->{$msg->{mt}}) {
+			&{$sub}($self,$top,$network,$nodea,$nodeb,$msg);
 		}
 	}
 }
-#package Path;
+#package Channel;
 sub swap {
 	my ($self,$top) = @_;
-	$self->movepath($top,-$self->{cola},$self->{rowa}, -$self->{colb},$self->{rowb});
+	$self->movechannel($top,-$self->{offa},-$self->{cola},$self->{rowa}, -$self->{offb},-$self->{colb},$self->{rowb});
 	while (my ($k,$node) = each %{$self->{opcs}}) {
 		$node->swap($top) if $self->{cola} < 0 && $node->{col} > 0;
 	}
@@ -7787,14 +9960,14 @@ sub swap {
 		$node->swap($top) if $self->{colb} < 0 && $node->{col} > 0;
 	}
 }
-#package Path;
+#package Channel;
 sub detecting {
 	my $self = shift;
 	return 0 if ($self->{ht} != 0 && $self->{pr} != 0 && $self->{rt} != 0);
 	return 1;
 }
 
-#package Path;
+#package Channel;
 sub setht {
 	my ($self,$ht) = @_;
 	$self->{ht} = $ht;
@@ -7806,7 +9979,7 @@ sub setht {
 		$self->{httext} = 'Extended';
 	}
 }
-#package Path;
+#package Channel;
 sub setrt {
 	my ($self,$rt) = @_;
 	$self->{rt} = $rt;
@@ -7818,7 +9991,7 @@ sub setrt {
 		$self->{rttext} = '24-bit point code';
 	}
 }
-#package Path;
+#package Channel;
 sub setpr {
 	my ($self,$pr) = @_;
 	$self->{pr} = $pr;
@@ -7833,7 +10006,7 @@ sub setpr {
 	}
 }
 
-#package Path;
+#package Channel;
 sub move {
 	my ($self,$top) = @_;
 	my $nodea = $self->{nodea};
@@ -7846,8 +10019,10 @@ sub move {
 		  $ya == $self->{ya} &&
 		  $xb == $self->{xb} &&
 		  $yb == $self->{yb};
+	$self->{offa} = $nodea->{off};
 	$self->{cola} = $nodea->{col};
 	$self->{rowa} = $nodea->{row};
+	$self->{offb} = $nodeb->{off};
 	$self->{colb} = $nodeb->{col};
 	$self->{rowb} = $nodeb->{row};
 	my $c = $top->canvas;
@@ -7858,20 +10033,20 @@ sub move {
 	$self->{yb} = $yb;
 	$self->{x} = ($xa + $xb)/2;
 	$self->{y} = ($ya + $yb)/2;
-	while (my ($k,$r) = each %{$self->{routes}}) { $r->move($top); }
+	foreach my $path (values %{$self->{paths}}) { $path->move($top); }
 }
 
-#package Path;
-sub movepath {
-	my ($self,$top,$cola,$rowa,$colb,$rowb) = @_;
-	return if $cola == $self->{cola} &&
+#package Channel;
+sub movechannel {
+	my ($self,$top,$offa,$cola,$rowa,$offb,$colb,$rowb) = @_;
+	return if $cola == $self->{cola} && $offa == $self->{offa} &&
 	          $rowa == $self->{rowa} &&
-		  $colb == $self->{colb} &&
+		  $colb == $self->{colb} && $offb == $self->{offb} &&
 		  $rowb == $self->{rowb};
 	my $mc = $top->mycanvas;
-	my $xa = $self->{xa} = $mc->colpos($cola);
+	my $xa = $self->{xa} = $mc->colpos($cola+$offa);
 	my $ya = $self->{ya} = $mc->rowpos($rowa);
-	my $xb = $self->{xb} = $mc->colpos($colb);
+	my $xb = $self->{xb} = $mc->colpos($colb+$offb);
 	my $yb = $self->{yb} = $mc->rowpos($rowb);
 	$self->{x} = ($xa + $xb)/2;
 	$self->{y} = ($ya + $yb)/2;
@@ -7882,24 +10057,25 @@ sub movepath {
 	my $c = $top->canvas;
 	$c->coords($self->{item},$xa,$ya,$xb,$yb);
 	$c->lower($self->{item},'node');
-	while (my ($k,$v) = each %{$self->{routes}}) { $v->move($top); }
+	$c->lower($self->{item},'linkset');
+	foreach my $path (values %{$self->{paths}}) { $path->move($top); }
 }
 
-#package Path;
+#package Channel;
 sub identify {
 	my $self = shift;
-	my $id = "Path $self->{card}:$self->{span}:$self->{slot},";
+	my $id = "Channel $self->{card}:$self->{span}:$self->{slot},";
 	$id .= " $self->{nodea}->{pcode} -> $self->{nodeb}->{pcode} link $self->{slc}" if $self->{nodea};
 	return ($self->{id} = $id);
 }
 
-#package Path;
+#package Channel;
 sub shortid {
 	my $self = shift;
 	return "$self->{card}:$self->{span}:$self->{slot}";
 }
 
-#package Path;
+#package Channel;
 sub fillprops {
 	my ($self,$tw,$row) = @_;
 
@@ -7912,9 +10088,9 @@ sub fillprops {
 	)->grid(-row=>$$row++,-column=>1,-sticky=>'ewns');
 }
 
-#package Path;
+#package Channel;
 sub fillstatus {
-	my ($self,$tw,$row) = @_;
+	my ($self,$top,$tw,$row) = @_;
 
 	my $ppa = "$self->{card}:$self->{span}:$self->{slot}";
 	if ($self->{nodea} && $self->{nodeb}) {
@@ -8961,35 +11137,35 @@ sub create {
 #package Message;
 sub process {
 	my ($self,$top,$network) = @_;
-	my $path = $network->getPath($top,$self->{ppa});
-	if ($self->decode($path) >= 0) {
-		$path->add($top,$network,$self);
+	my $channel = $network->getChannel($top,$self->{ppa});
+	if ($self->decode($channel) >= 0) {
+		$channel->add_msg($top,$network,$self);
 		return;
 	}
 	#print STDERR "decoding error\n";
 }
 #package Message;
 sub decode {
-	my ($self,$path,@args) = @_;
-	$self->{path} = $path;
+	my ($self,$channel,@args) = @_;
+	$self->{channel} = $channel;
 	my @b = (unpack('C*', substr($self->{dat}, 0, 8)));
 	if (!exists $self->{mtp2decode}) {
 		my $len = $self->{hdr}->{len};
 		if (3 <= $len && $len <= 5) {
-			$path->setht(HT_BASIC);
+			$channel->setht(HT_BASIC);
 		} elsif (6 <= $len && $len <= 8) {
-			$path->setht(HT_EXTENDED);
+			$channel->setht(HT_EXTENDED);
 		}
-		return 0 unless $path->{ht} != HT_UNKNOWN;
+		return 0 unless $channel->{ht} != HT_UNKNOWN;
 		my ($bsn,$bib,$fsn,$fib,$li,$li0);
-		if ($path->{ht} == HT_BASIC) {
+		if ($channel->{ht} == HT_BASIC) {
 			$self->{bsn} = $b[0] & 0x7f;
 			$self->{bib} = $b[0] >> 7;
 			$self->{fsn} = $b[1] & 0x7f;
 			$self->{fib} = $b[1] >> 7;
 			$self->{li} = $b[2] & 0x3f;
 			$self->{li0} = $b[2] >> 6;
-		} elsif ($path->{ht} == HT_EXTENDED) {
+		} elsif ($channel->{ht} == HT_EXTENDED) {
 			$self->{bsn} = $b[0];
 			$self->{bsn} |= ($b[1] & 0x0f) << 8;
 			$self->{bib} = $b[1] >> 7;
@@ -9000,32 +11176,32 @@ sub decode {
 			$self->{li} |= ($b[5] & 0x1) << 8;
 			$self->{li0} = $b[5] >> 6;
 		}
-		my $inf = $len - $path->{ht};
+		my $inf = $len - $channel->{ht};
 		if (($self->{li} != $inf) && ($inf <= 63 || $self->{li} != 63)) {
 			print STDERR "bad length indicator $self->{li} != $inf\n";
 		}
 		if ($self->{li0} != 0) {
-			$path->setrt(RT_24BIT_PC);
-			$path->setpr(MP_JAPAN);
+			$channel->setrt(RT_24BIT_PC);
+			$channel->setpr(MP_JAPAN);
 		}
 		$self->{mtp2decode} = 1;
 	}
 	return 1 if $self->{li} == 0;
-	@b = (unpack('C*', substr($self->{dat}, $path->{ht}, 11)));
+	@b = (unpack('C*', substr($self->{dat}, $channel->{ht}, 11)));
 	$self->{si} = $b[0];
 	return 1 if $self->{li} < 3;
 	$self->{ni} = ($b[0] & 0xc0) >> 6;
 	$self->{mp} = ($b[0] & 0x30) >> 4;
 	$self->{si} = ($b[0] & 0x0f);
 	if ($self->{ni} == 0) {
-		$path->setrt(RT_14BIT_PC);
-		$path->setpr(MP_INTERNATIONAL);
+		$channel->setrt(RT_14BIT_PC);
+		$channel->setpr(MP_INTERNATIONAL);
 	}
-	if ($path->{pr} == MP_UNKNOWN) {
-		$path->setpr(MP_NATIONAL) if $self->{mp} != 0;
-	} elsif ($path->{pr} == MP_JAPAN) {
+	if ($channel->{pr} == MP_UNKNOWN) {
+		$channel->setpr(MP_NATIONAL) if $self->{mp} != 0;
+	} elsif ($channel->{pr} == MP_JAPAN) {
 		$self->{mp} = $self->{li0};
-	} elsif ($path->{pr} == MP_INTERNATIONAL) {
+	} elsif ($channel->{pr} == MP_INTERNATIONAL) {
 		$self->{mp} = 0;
 	}
 	if ($self->{li} < HT_EXTENDED) {
@@ -9033,16 +11209,16 @@ sub decode {
 		return -1;
 	}
 	if ($self->{li} < 9 || ($self->{si} == 5 && $self->{li} < 11)) {
-		$path->setrt(RT_14BIT_PC);
+		$channel->setrt(RT_14BIT_PC);
 	}
-	if ($path->{rt} == RT_UNKNOWN) {
-		my $ret = $self->checkRoutingLabelType($self->{si},$path,$self->{li},\@b) < 0;
+	if ($channel->{rt} == RT_UNKNOWN) {
+		my $ret = $self->checkRoutingLabelType($self->{si},$channel,$self->{li},\@b) < 0;
 		return $ret if $ret <= 0;
 		print "check succeeded on si=$self->{si}, mt=$self->{mt}";
 	}
 	if (!exists $self->{mtp3decode}) {
-		return 0 if $path->detecting;
-		if ($path->{rt} == RT_14BIT_PC) {
+		return 0 if $channel->detecting;
+		if ($channel->{rt} == RT_14BIT_PC) {
 			if ($self->{li} < 6) {
 				print STDERR "too short for 14-bit RL, li = $self->{li}\n";
 				return -1;
@@ -9066,7 +11242,7 @@ sub decode {
 			$self->{opc} |= $b[6] << 16;
 			$self->{sls} = $b[7];
 		}
-		@b = (unpack('C*', substr($self->{dat}, $path->{ht} + 1 + $path->{rt}, 3)));
+		@b = (unpack('C*', substr($self->{dat}, $channel->{ht} + 1 + $channel->{rt}, 3)));
 		if ($self->{si} == 5) {
 			$self->{cic} = $b[0];
 			$self->{cic} |= $b[1] << 8;
@@ -9083,7 +11259,7 @@ sub decode {
 			print STDERR "no message type for si=$self->{si}, mt=$self->{mt}\n";
 		}
 		if ($self->{si} == 1 || $self->{si} == 2) {
-			if ($path->{rt} == RT_14BIT_PC) {
+			if ($channel->{rt} == RT_14BIT_PC) {
 				$self->{slc} = $self->{sls};
 				$self->{dlen0} = $b[1] & 0x0f;
 			} else {
@@ -9118,32 +11294,32 @@ use constant {
 };
 #package Message;
 sub checkSnmm {
-	my ($self,$path,@args) = @_;
-	my $ansi = $self->checkAnsiSnmm($path,@args);
-	my $itut = $self->checkItutSnmm($path,@args);
+	my ($self,$channel,@args) = @_;
+	my $ansi = $self->checkAnsiSnmm($channel,@args);
+	my $itut = $self->checkItutSnmm($channel,@args);
 	if ($ansi == PT_YES) {
 		return 0 if $itut == PT_YES;
-		$path->setrt(RT_24BIT_PC);
+		$channel->setrt(RT_24BIT_PC);
 		return 1;
 	}
 	elsif ($ansi == PT_MAYBE) {
 		return 0 if $itut == PT_MAYBE;
 		if ($itut == PT_YES) {
-			$path->setrt(RT_14BIT_PC);
+			$channel->setrt(RT_14BIT_PC);
 		} else {
-			$path->setrt(RT_24BIT_PC);
+			$channel->setrt(RT_24BIT_PC);
 		}
 		return 1;
 	}
 	else {
 		return -1 if $itut == PT_NO;
-		$path->setrt(RT_14BIT_PC);
+		$channel->setrt(RT_14BIT_PC);
 		return 1;
 	}
 }
 #package Message;
 sub checkItutSnmm {
-	my ($self,$path,$li,$b) = @_;
+	my ($self,$channel,$li,$b) = @_;
 	my $mt = (($b->[5] & 0x0f) << 4) | ($b->[5] >> 4);
 	if ($li == 6) {
 		return PT_YES if $mt == 0x17 || $mt == 0x27 || $mt == 0x13 || $mt == 0x28
@@ -9170,7 +11346,7 @@ sub checkItutSnmm {
 }
 #package Message;
 sub checkAnsiSnmm {
-	my ($self,$path,$li,$b) = @_;
+	my ($self,$channel,$li,$b) = @_;
 	my $mt = (($b->[8] & 0x0f) << 4) | ($b->[8] >> 4);
 	return PT_NO if $li < 9;
 	if ($li == 9) {
@@ -9201,32 +11377,32 @@ sub checkAnsiSnmm {
 }
 #package Message;
 sub checkSntm {
-	my ($self,$path,@args) = @_;
-	my $ansi = $self->checkAnsiSntm($path,@args);
-	my $itut = $self->checkItutSntm($path,@args);
+	my ($self,$channel,@args) = @_;
+	my $ansi = $self->checkAnsiSntm($channel,@args);
+	my $itut = $self->checkItutSntm($channel,@args);
 	if ($ansi == PT_YES) {
 		return 0 if $itut == PT_YES;
-		$path->setrt(RT_24BIT_PC);
+		$channel->setrt(RT_24BIT_PC);
 		return 1;
 	}
 	elsif ($ansi == PT_MAYBE) {
 		return 0 if $itut == PT_MAYBE;
 		if ($itut == PT_YES) {
-			$path->setrt(RT_14BIT_PC);
+			$channel->setrt(RT_14BIT_PC);
 		} else {
-			$path->setrt(RT_24BIT_PC);
+			$channel->setrt(RT_24BIT_PC);
 		}
 		return 1;
 	}
 	else {
 		return -1 if $itut == PT_NO;
-		$path->setrt(RT_14BIT_PC);
+		$channel->setrt(RT_14BIT_PC);
 		return 1;
 	}
 }
 #package Message;
 sub checkItutSntm {
-	my ($self,$path,$li,$b) = @_;
+	my ($self,$channel,$li,$b) = @_;
 	my $mt = (($b->[5] & 0x0f) << 4) | ($b->[5] >> 4);
 	return PT_NO if 7 > $li || $li > 22;
 	return PT_NO if $mt != 0x11 && $mt != 0x12;
@@ -9238,7 +11414,7 @@ sub checkItutSntm {
 }
 #package Message;
 sub checkAnsiSntm {
-	my ($self,$path,$li,$b) = @_;
+	my ($self,$channel,$li,$b) = @_;
 	my $mt = (($b->[8] & 0x0f) << 4) | ($b->[8] >> 4);
 	return PT_NO if 10 > $li || $li > 25;
 	return PT_NO if $mt != 0x11 && $mt != 0x12;
@@ -9250,26 +11426,26 @@ sub checkAnsiSntm {
 }
 #package Message;
 sub checkSnsm {
-	my ($self,$path,@args) = @_;
-	my $ansi = $self->checkAnsiSnsm($path,@args);
-	my $itut = $self->checkItutSntm($path,@args);
+	my ($self,$channel,@args) = @_;
+	my $ansi = $self->checkAnsiSnsm($channel,@args);
+	my $itut = $self->checkItutSntm($channel,@args);
 	if ($ansi == PT_YES) {
 		return 0 if $itut == PT_YES;
-		$path->setrt(RT_24BIT_PC);
+		$channel->setrt(RT_24BIT_PC);
 		return 1;
 	}
 	elsif ($ansi == PT_MAYBE) {
 		return 0 if $itut == PT_MAYBE;
 		if ($itut == PT_YES) {
-			$path->setrt(RT_14BIT_PC);
+			$channel->setrt(RT_14BIT_PC);
 		} else {
-			$path->setrt(RT_24BIT_PC);
+			$channel->setrt(RT_24BIT_PC);
 		}
 		return 1;
 	}
 	else {
 		return -1 if $itut == PT_NO;
-		$path->setrt(RT_14BIT_PC);
+		$channel->setrt(RT_14BIT_PC);
 		return 1;
 	}
 }
@@ -9284,71 +11460,71 @@ sub checkAnsiSnsm {
 }
 #package Message;
 sub checkSccp {
-	my ($self,$path,$li,$b) = @_;
-	my $ansi = $self->checkAnsiSccp($path,$b);
-	my $itut = $self->checkItutSccp($path,$b);
+	my ($self,$channel,$li,$b) = @_;
+	my $ansi = $self->checkAnsiSccp($channel,$b);
+	my $itut = $self->checkItutSccp($channel,$b);
 	if ($ansi == PT_YES) {
 		return 0 if $itut == PT_YES;
-		$path->setrt(RT_24BIT_PC);
+		$channel->setrt(RT_24BIT_PC);
 		return 1;
 	}
 	elsif ($ansi == PT_MAYBE) {
 		return 0 if $itut == PT_MAYBE;
 		if ($itut == PT_YES) {
-			$path->setrt(RT_14BIT_PC);
+			$channel->setrt(RT_14BIT_PC);
 		} else {
-			$path->setrt(RT_24BIT_PC);
+			$channel->setrt(RT_24BIT_PC);
 		}
 		return 1;
 	}
 	else {
 		return -1 if $itut == PT_NO;
-		$path->setrt(RT_14BIT_PC);
+		$channel->setrt(RT_14BIT_PC);
 		return 1;
 	}
 }
 #package Message;
 sub checkItutSccp {
-	my ($self,$path,$li,$b) = @_;
+	my ($self,$channel,$li,$b) = @_;
 	my $mt = $b->[5];
 	return PT_MAYBE if 0x01 <= $mt && $mt <= 0x14;
 	return PT_NO;
 }
 #package Message;
 sub checkAnsiSccp {
-	my ($self,$path,$li,$b) = @_;
+	my ($self,$channel,$li,$b) = @_;
 	my $mt = $b->[8];
 	return PT_MAYBE if 0x01 <= $mt && $mt <= 0x14;
 	return PT_NO;
 }
 #package Message;
 sub checkIsup {
-	my ($self,$path,@args) = @_;
-	my $ansi = $self->checkAnsiIsup($path,@args);
-	my $itut = $self->checkItutIsup($path,@args);
+	my ($self,$channel,@args) = @_;
+	my $ansi = $self->checkAnsiIsup($channel,@args);
+	my $itut = $self->checkItutIsup($channel,@args);
 	if ($ansi == PT_YES) {
 		return 0 if $itut == PT_YES;
-		$path->setrt(RT_24BIT_PC);
+		$channel->setrt(RT_24BIT_PC);
 		return 1;
 	}
 	elsif ($ansi == PT_MAYBE) {
 		return 0 if $itut == PT_MAYBE;
 		if ($itut == PT_YES) {
-			$path->setrt(RT_14BIT_PC);
+			$channel->setrt(RT_14BIT_PC);
 		} else {
-			$path->setrt(RT_24BIT_PC);
+			$channel->setrt(RT_24BIT_PC);
 		}
 		return 1;
 	}
 	else {
 		return -1 if $itut == PT_NO;
-		$path->setrt(RT_14BIT_PC);
+		$channel->setrt(RT_14BIT_PC);
 		return 1;
 	}
 }
 #package Message;
 sub checkItutIsup {
-	my ($self,$path,$li,$b) = @_;
+	my ($self,$channel,$li,$b) = @_;
 	my $mt = $b->[7];
 	return PT_NO if $li < 8;
 	if ($mt == 0x11 || $mt == 0x12 || $mt == 0x13 || $mt == 0x14 || $mt == 0x15 || $mt == 0x16 || $mt == 0x24 || $mt == 0x2e || $mt == 0x30 || $mt == 0x31) {
@@ -9417,7 +11593,7 @@ sub checkItutIsup {
 }
 #package Message;
 sub checkAnsiIsup {
-	my ($self,$path,$li,$b) = @_;
+	my ($self,$channel,$li,$b) = @_;
 	my $mt = $b->[10];
 	return PT_NO if $li < 11;
 	if ($mt == 0x10 || $mt == 0x11 || $mt == 0x12 || $mt == 0x13 || $mt == 0x14 || $mt == 0x15 || $mt == 0x16 || $mt == 0x24 || $mt == 0x2e || $mt == 0xe9 || $mt == 0xec) {
@@ -9446,11 +11622,11 @@ sub checkAnsiIsup {
 sub decodeit {
 	my $self = shift;
 	return if $self->{dec};
-	my $path = $self->{path};
+	my $channel = $self->{channel};
 	my @l2h = ();
 	my $p = 0;
 	my $li = 0;
-	if ($path->{ht} == HT_EXTENDED) {
+	if ($channel->{ht} == HT_EXTENDED) {
 		push @l2h, XBsnField->new($b,$p);
 		push @l2h, XBsn0Field->new($b,$p);
 		push @l2h, XBibField->new($b,$p);
@@ -9459,7 +11635,7 @@ sub decodeit {
 		push @l2h, XFibField->new($b,$p);
 		push @l2h, ($li = XliField->new($b,$p));
 		push @l2h, Xli0Field->new($b,$p);
-		push @l2h, XjmpField->new($b,$p) if $path->{pr} == MP_JAPAN;
+		push @l2h, XjmpField->new($b,$p) if $channel->{pr} == MP_JAPAN;
 		$p += HT_EXTENDED;
 	} else {
 		push @l2h, BsnField->new($b,$p);
@@ -9467,7 +11643,7 @@ sub decodeit {
 		push @l2h, FsnField->new($b,$p);
 		push @l2h, FibField->new($b,$p);
 		push @l2h, ($li = LiField->new($b,$p));
-		if ($path->{pr} == MP_JAPAN) {
+		if ($channel->{pr} == MP_JAPAN) {
 			push @l2h, JmpFiled->new($b,$p);
 		} else {
 			push @l2h, LiField->new($b,$p);
@@ -9490,7 +11666,7 @@ sub decodeit {
 	push @sio, NiField->new($b,$p);
 	$p++;
 	my @rl = ();
-	if ($path->{rt} == RT_24BIT_PC) {
+	if ($channel->{rt} == RT_24BIT_PC) {
 		push @rl, Dpc24Field->new($b,$p);
 		push @rl, Opc24Field->new($b,$p);
 		push @rl, Sls24Field->new($b,$p);
@@ -9688,7 +11864,7 @@ sub hlist {
 	$hl->itemCreate('1',3,-text=>'L2 Header');
 	$hl->indicator('create','1',-itemtype=>'image',-image=>$self->{tree}->{1});
 	my $sio;
-	if ($self->{path}->{ht} == HT_EXTENDED) {
+	if ($self->{channel}->{ht} == HT_EXTENDED) {
 		$self->makeentry($hl,0,0,11,$self->{bsn},'BSN','1.2','Backward Sequence Number');
 		$self->makeentry($hl,1,7,7,$self->{bib},'BIB','1.1','Backward Indicator Bit');
 		$self->makeentry($hl,2,0,11,$self->{fsn},'FSN','1.4','Forward Sequence Number');
@@ -9729,8 +11905,8 @@ sub hlist {
 				1=>'Network Indicator: International (spare)',
 				2=>'Network Indicator: National',
 				3=>'Network Indicator: National (spare)',});
-		$self->makeentry($hl,4,0,23,$self->{opc},"\nOPC\n",'2.4',"Originating Point Code",[\&main::pcstring,$self->{opc}]);
-		$self->makeentry($hl,7,0,23,$self->{dpc},"\nDPC\n",'2.5',"Destination Point Code",[\&main::pcstring,$self->{dpc}]);
+		$self->makeentry($hl,4,0,23,$self->{opc},"\nOPC\n",'2.4',"Originating Point Code",[\&SP::pcstring,$self->{opc}]);
+		$self->makeentry($hl,7,0,23,$self->{dpc},"\nDPC\n",'2.5',"Destination Point Code",[\&SP::pcstring,$self->{dpc}]);
 		$self->makeentry($hl,10,0,7,$self->{sls},'SLS','2.6','Signalling Link Selection');
 		$hl->add('3',-itemtype=>'text',-text=>$mtyp,);
 		$hl->itemCreate('3',1,-text=>' ********');
@@ -9745,7 +11921,7 @@ sub hlist {
 			$self->makeentry($hl,11,0,7,$self->{mt},'MT','3.1',$desc,);
 		} elsif ($self->{si} == 1 || $self->{si} == 2) {
 			$self->makeentry($hl,11,0,7,$self->{mt},'MT','3.1',$desc,);
-			if ($self->{path}->{rt} == RT_24BIT_PC) {
+			if ($self->{channel}->{rt} == RT_24BIT_PC) {
 				$self->makeentry($hl,12,0,3,$self->{slc},'SLC','3.2','Signalling Link Code');
 			} else {
 				$self->makeentry($hl,12,0,3,$self->{slc},'SLC','3.2','Signalling Link Code');
@@ -9807,7 +11983,7 @@ use constant {
 };
 sub decode {
 	my ($self,$b,$o) = @_;
-	if ($self->{path}->{rt} == RT_14BIT_PC) {
+	if ($self->{channel}->{rt} == RT_14BIT_PC) {
 		$self->{slc} = $self->{sls};
 		$self->{fsnl} = $b->[$$o] & 0x7f;
 		$self->{fsnl0} = $b->[$$o] >> 7;
@@ -9831,7 +12007,7 @@ use constant {
 };
 sub decode {
 	my ($self,$b,$o) = @_;
-	if ($self->{path}->{rt} == RT_14BIT_PC) {
+	if ($self->{channel}->{rt} == RT_14BIT_PC) {
 		$self->{slc} = $self->{sls};
 		$self->{cbc} = $b->[$$o];
 		$$o++;
@@ -9854,7 +12030,7 @@ use constant {
 };
 sub decode {
 	my ($self,$b,$o) = @_;
-	if ($self->{path}->{rt} == RT_14BIT_PC) {
+	if ($self->{channel}->{rt} == RT_14BIT_PC) {
 		$self->{slc} = $self->{sls};
 	} else {
 		$self->{slc} = $b->[$$o] & 0x0f;
@@ -9946,7 +12122,7 @@ use constant {
 };
 sub decode {
 	my ($self,$b,$o) = @_;
-	if ($self->{path}->{rt} == RT_14BIT_PC) {
+	if ($self->{channel}->{rt} == RT_14BIT_PC) {
 		$self->{dest} = $b->[$$o];
 		$$o++;
 		$self->{dest} |= ($b->[$$o] & 0x3f) << 8;
@@ -12574,11 +14750,13 @@ sub new {
 #	$c->bind('stp', '<ButtonPress-3>',[\&STP::popup,Tk::Ev('b'),Tk::Ev('x'),Tk::Ev('y'),Tk::Ev('X'),Tk::Ev('Y')]);
 #	$c->bind('scp', '<ButtonPress-3>',[\&SCP::popup,Tk::Ev('b'),Tk::Ev('x'),Tk::Ev('y'),Tk::Ev('X'),Tk::Ev('Y')]);
 #	$c->bind('node','<ButtonPress-3>',[\&SP::popup,Tk::Ev('b'),Tk::Ev('x'),Tk::Ev('y'),Tk::Ev('X'),Tk::Ev('Y')]);
+#	$c->bind('channel','<ButtonPress-3>',[\&Channel::popup,Tk::Ev('b'),Tk::Ev('x'),Tk::Ev('y'),Tk::Ev('X'),Tk::Ev('Y')]);
 #	$c->bind('path','<ButtonPress-3>',[\&Path::popup,Tk::Ev('b'),Tk::Ev('x'),Tk::Ev('y'),Tk::Ev('X'),Tk::Ev('Y')]);
-#	$c->bind('route','<ButtonPress-3>',[\&Route::popup,Tk::Ev('b'),Tk::Ev('x'),Tk::Ev('y'),Tk::Ev('X'),Tk::Ev('Y')]);
 #	$c->bind('relation','<ButtonPress-3>',[\&Relation::popup,Tk::Ev('b'),Tk::Ev('x'),Tk::Ev('y'),Tk::Ev('X'),Tk::Ev('Y')]);
 	my $w = $self->{w} = $c->width;
 	my $h = $self->{h} = $c->height;
+	$self->{maxcol} =  5;
+	$self->{mincol} = -5;
 	return $self;
 }
 
@@ -12589,10 +14767,9 @@ sub canvas {
 
 #package MyCanvas;
 sub addballoon {
-	my $self = shift;
-	my $obj  = shift;
+	my ($self,$obj,$items) = @_;
 	$obj->identify;
-	foreach (@_) { $self->{balloonmsgs}->{$_} = \$obj->{id}; }
+	foreach (@{$items}) { $self->{balloonmsgs}->{$_} = \$obj->{id}; }
 	$self->{balloon}->attach($self->widget,
 		-balloonposition=>'mouse',
 		-msg=>$self->{balloonmsgs},
@@ -12601,8 +14778,8 @@ sub addballoon {
 
 #package MyCanvas;
 sub delballoon {
-	my $self = shift;
-	foreach (@_) { delete $self->{balloonmsgs}->{$_}; }
+	my ($self,$items) = @_;
+	foreach (@{$items}) { delete $self->{balloonmsgs}->{$_}; }
 	$self->{balloon}->attach($self->widget,
 		-balloonposition=>'mouse',
 		-msg=>$self->{balloonmsgs},
@@ -12617,11 +14794,13 @@ sub relayer {
 	$c->raise('scri','node');
 	$c->raise('text','scri');
 	$c->lower('relation','node');
-	$c->lower('route','node');
 	$c->lower('path','node');
-	$c->lower('relation','path');
-	$c->lower('route','path');
-	$c->raise('linkset','path');
+	$c->lower('channel','node');
+	$c->lower('relation','linkset');
+	$c->lower('path','linkset');
+	$c->lower('channel','linkset');
+	$c->lower('relation','channel');
+	$c->lower('path','channel');
 }
 
 # unknown nodes are in columns +-7
@@ -12631,23 +14810,27 @@ sub relayer {
 # remote/alias STP nodes are in columns +-3
 # adjacent nodes are in columns +-2
 
+#package MyCanvas;
 sub colpos {
 	my ($self,$col) = @_;
 	my $w = $self->{w};
-	my $dw = $w / 12; # 12 columns
+	my $dw = $w / ($self->{maxcol} - $self->{mincol} + 1);
+	#my $dw = $w / 10; # 10 columns
+	my $off = (abs($self->{mincol}) - abs($self->{maxcol}))/2;
 	if ($col < 0) {
-		return $col * $dw + $dw/2 + $w/2;
+		return ($col+$off) * $dw + $dw/2 + $w/2;
 	} elsif ($col > 0) {
-		return $col * $dw - $dw/2 + $w/2;
+		return ($col+$off) * $dw - $dw/2 + $w/2;
 	} else {
-		return 0 + $w/2;
+		return (0+$off) * $dw + $w/2;
 	}
 }
 
+#package MyCanvas;
 sub rowpos {
 	my ($self,$row) = @_;
 	my $h = $self->{h};
-	return $row * 35 + $h/2;
+	return $row * 42 + $h/2;
 }
 
 # -------------------------------------
@@ -12826,7 +15009,7 @@ sub createmenubar {
 		-msg=>[
 			"Tearoff this menu.",
 			"Full view with all nodes and arcs.",
-			"Signalling view with linksets, adjacent SPs\nand signalling routes.",
+			"Signalling view with linksets, adjacent SPs\nand signalling paths.",
 			"Circuit view with SSPs and circuits.",
 			"Transaction view with SSPs, GTTs and SCPs.",
 		]);
@@ -12852,8 +15035,9 @@ sub createmenubar {
 		assocs=>1,
 		relations=>1,
 		routes=>1,
+		paths=>0,
 		linksets=>1,
-		paths=>1,
+		channels=>0,
 		sps=>1,
 		ssps=>1,
 		gtts=>1,
@@ -12870,14 +15054,16 @@ sub createmenubar {
 		-underline=>0,
 		-command=>[sub{
 				my $self = shift;
-				my $c = $self->{MyCanvas}->{Canvas};
+				my $c = $self->canvas;
 				foreach (keys %{$self->{show}}) {
 					$self->{show}->{$_} = 1;
 				}
 				$c->itemconfigure('all',-state=>'normal');
+				$self->{show}->{channels} = 0;
+				$c->itemconfigure('channel',-state=>'hidden');
 				$self->{show}->{paths} = 0;
 				$c->itemconfigure('path',-state=>'hidden');
-				$self->{MyCanvas}->relayer();
+				$self->mycanvas->relayer();
 			},$self],
 	);
 	$mi->add('radiobutton',
@@ -12887,17 +15073,19 @@ sub createmenubar {
 		-underline=>0,
 		-command=>[sub{
 				my $self = shift;
-				my $c = $self->{MyCanvas}->{Canvas};
+				my $c = $self->canvas;
 				foreach (keys %{$self->{show}}) {
 					$self->{show}->{$_} = 0;
 				}
 				$c->itemconfigure('all',-state=>'hidden');
 				$c->itemconfigure('route',-state=>'normal');
 				$self->{show}->{routes} = 1;
-				$c->itemconfigure('linkset',-state=>'normal');
-				$self->{show}->{linksets} = 1;
 				$c->itemconfigure('path',-state=>'normal');
 				$self->{show}->{paths} = 1;
+				$c->itemconfigure('linkset',-state=>'normal');
+				$self->{show}->{linksets} = 1;
+				$c->itemconfigure('channel',-state=>'normal');
+				$self->{show}->{channels} = 1;
 				$c->itemconfigure('SP',-state=>'normal');
 				$self->{show}->{sps} = 1;
 				$c->itemconfigure('SSP',-state=>'normal');
@@ -12908,7 +15096,7 @@ sub createmenubar {
 				$self->{show}->{gtts} = 1;
 				$c->itemconfigure('SCP',-state=>'normal');
 				$self->{show}->{scps} = 1;
-				$self->{MyCanvas}->relayer();
+				$self->mycanvas->relayer();
 			},$self],
 	);
 	$mi->add('radiobutton',
@@ -12918,7 +15106,7 @@ sub createmenubar {
 		-underline=>0,
 		-command=>[sub{
 				my $self = shift;
-				my $c = $self->{MyCanvas}->{Canvas};
+				my $c = $self->canvas;
 				foreach (keys %{$self->{show}}) {
 					$self->{show}->{$_} = 0;
 				}
@@ -12927,7 +15115,7 @@ sub createmenubar {
 				$self->{show}->{circuits} = 1;
 				$c->itemconfigure('SSP&&ISUP',-state=>'normal');
 				$self->{show}->{ssps} = 1;
-				$self->{MyCanvas}->relayer();
+				$self->mycanvas->relayer();
 			},$self],
 	);
 	$mi->add('radiobutton',
@@ -12937,7 +15125,7 @@ sub createmenubar {
 		-underline=>0,
 		-command=>[sub{
 				my $self = shift;
-				my $c = $self->{MyCanvas}->{Canvas};
+				my $c = $self->canvas;
 				foreach (keys %{$self->{show}}) {
 					$self->{show}->{$_} = 0;
 				}
@@ -12950,7 +15138,7 @@ sub createmenubar {
 				$self->{show}->{scps} = 1;
 				$c->itemconfigure('GTT',-state=>'normal');
 				$self->{show}->{gtts} = 1;
-				$self->{MyCanvas}->relayer();
+				$self->mycanvas->relayer();
 			},$self],
 	);
 	$mi->add('separator',);
@@ -12963,10 +15151,10 @@ sub createmenubar {
 					$self->{show}->{$_} = $v;
 				}
 				$self->{view} = $v ? 0 : 4;
-				my $c = $self->{MyCanvas}->{Canvas};
+				my $c = $self->canvas;
 				if ($self->{show}->{all}) {
 					$c->itemconfigure('all',-state=>'normal');
-					$self->{MyCanvas}->relayer();
+					$self->mycanvas->relayer();
 				} else {
 					$c->itemconfigure('all',-state=>'hidden');
 				}
@@ -12981,8 +15169,7 @@ sub createmenubar {
 				$self->{view} = 4;
 				$self->{show}->{circuits} = $v;
 				$self->{show}->{assocs} = $v;
-				$self->{show}->{linksets} = $v;
-				my $c = $self->{MyCanvas}->{Canvas};
+				my $c = $self->canvas;
 				my $s = $v ? 'normal' : 'hidden';
 				$c->itemconfigure('relation',-state=>$s) if $c->find('withtag', 'relation');
 			},$self],
@@ -12993,12 +15180,11 @@ sub createmenubar {
 				my $self = shift;
 				my $v = $self->{show}->{circuits};
 				$self->{view} = 4;
-				my $c = $self->{MyCanvas}->{Canvas};
+				my $c = $self->canvas;
 				my $s = $v ? 'normal' : 'hidden';
 				$c->itemconfigure('circuits',-state=>$s) if $c->find('withtag', 'circuits');
 				$self->{show}->{relations} = $v
-					if $self->{show}->{assocs} == $v and
-					   $self->{show}->{linksets} == $v;
+					if $self->{show}->{assocs} == $v;
 			},$self],
 	);
 	$mi->add('checkbutton', -label=>'Associations',
@@ -13007,12 +15193,11 @@ sub createmenubar {
 				my $self = shift;
 				my $v = $self->{show}->{assocs};
 				$self->{view} = 4;
-				my $c = $self->{MyCanvas}->{Canvas};
+				my $c = $self->canvas;
 				my $s = $v ? 'normal' : 'hidden';
 				$c->itemconfigure('association',-state=>$s) if $c->find('withtag', 'association');
 				$self->{show}->{relations} = $v
-					if $self->{show}->{circuits} == $v and
-					   $self->{show}->{linksets} == $v;
+					if $self->{show}->{circuits} == $v;
 			},$self],
 	);
 	$mi->add('checkbutton', -label=>'Link Sets',
@@ -13021,12 +15206,9 @@ sub createmenubar {
 				my $self = shift;
 				my $v = $self->{show}->{linksets};
 				$self->{view} = 4;
-				my $c = $self->{MyCanvas}->{Canvas};
+				my $c = $self->canvas;
 				my $s = $v ? 'normal' : 'hidden';
 				$c->itemconfigure('linkset',-state=>$s) if $c->find('withtag', 'linkset');
-				$self->{show}->{relations} = $v
-					if $self->{show}->{circuits} == $v and
-					   $self->{show}->{assocs} == $v;
 			},$self],
 	);
 	$mi->add('separator',);
@@ -13036,7 +15218,7 @@ sub createmenubar {
 				my $self = shift;
 				my $v = $self->{show}->{routes};
 				$self->{view} = 4;
-				my $c = $self->{MyCanvas}->{Canvas};
+				my $c = $self->canvas;
 				my $s = $v ? 'normal' : 'hidden';
 				$c->itemconfigure('route',-state=>$s) if $c->find('withtag', 'route');
 			},$self],
@@ -13047,9 +15229,21 @@ sub createmenubar {
 				my $self = shift;
 				my $v = $self->{show}->{paths};
 				$self->{view} = 4;
-				my $c = $self->{MyCanvas}->{Canvas};
+				my $c = $self->canvas;
 				my $s = $v ? 'normal' : 'hidden';
 				$c->itemconfigure('path',-state=>$s) if $c->find('withtag', 'path');
+			},$self],
+	);
+	$mi->add('checkbutton', -label=>'Channels',
+		-onvalue=>1, -offvalue=>0, -variable=>\$self->{show}->{channels},
+		-command=>[sub{
+				my $self = shift;
+				my $v = $self->{show}->{channels};
+				$self->{view} = 4;
+				my $c = $self->canvas;
+				my $s = $v ? 'normal' : 'hidden';
+				$c->itemconfigure('channel',-state=>$s) if $c->find('withtag',
+					'channel');
 			},$self],
 	);
 	$mi->add('separator',);
@@ -13059,7 +15253,7 @@ sub createmenubar {
 				my $self = shift;
 				my $v = $self->{show}->{sps};
 				$self->{view} = 4;
-				my $c = $self->{MyCanvas}->{Canvas};
+				my $c = $self->canvas;
 				my $s = $v ? 'normal' : 'hidden';
 				$c->itemconfigure('SP',-state=>$s) if $c->find('withtag', 'SP');
 			},$self],
@@ -13070,7 +15264,7 @@ sub createmenubar {
 				my $self = shift;
 				my $v = $self->{show}->{ssps};
 				$self->{view} = 4;
-				my $c = $self->{MyCanvas}->{Canvas};
+				my $c = $self->canvas;
 				my $s = $v ? 'normal' : 'hidden';
 				$c->itemconfigure('SSP',-state=>$s) if $c->find('withtag', 'SSP');
 			},$self],
@@ -13081,7 +15275,7 @@ sub createmenubar {
 				my $self = shift;
 				my $v = $self->{show}->{gtts};
 				$self->{view} = 4;
-				my $c = $self->{MyCanvas}->{Canvas};
+				my $c = $self->canvas;
 				my $s = $v ? 'normal' : 'hidden';
 				$c->itemconfigure('GTT',-state=>$s) if $c->find('withtag', 'GTT');
 			},$self],
@@ -13092,7 +15286,7 @@ sub createmenubar {
 				my $self = shift;
 				my $v = $self->{show}->{stps};
 				$self->{view} = 4;
-				my $c = $self->{MyCanvas}->{Canvas};
+				my $c = $self->canvas;
 				my $s = $v ? 'normal' : 'hidden';
 				$c->itemconfigure('STP',-state=>$s) if $c->find('withtag', 'STP');
 			},$self],
@@ -13103,7 +15297,7 @@ sub createmenubar {
 				my $self = shift;
 				my $v = $self->{show}->{scps};
 				$self->{view} = 4;
-				my $c = $self->{MyCanvas}->{Canvas};
+				my $c = $self->canvas;
 				my $s = $v ? 'normal' : 'hidden';
 				$c->itemconfigure('SCP',-state=>$s) if $c->find('withtag', 'SCP');
 			},$self],
@@ -13122,7 +15316,7 @@ sub createmenubar {
 			"Zoom out from canvas.",
 			undef, # separator
 			"Full view with all nodes and arcs.",
-			"Signalling view with linksets, adjacent SPs\nand signalling routes.",
+			"Signalling view with linksets, adjacent SPs\nand signalling paths.",
 			"Circuit view with SSPs and circuits.",
 			"Transaction view with SSPs, GTTs and SCPs.",
 			undef, # separator
@@ -13133,8 +15327,8 @@ sub createmenubar {
 			"Show/hide transaction associations.",
 			"Show/hide signalling linksets.",
 			undef, # separator
-			"Show/hide signalling routes.",
 			"Show/hide signalling paths.",
+			"Show/hide signalling channels.",
 			undef, # separator
 			"Show/hide SPs.",
 			"Show/hide SSPs.",
@@ -13327,7 +15521,7 @@ sub createstatusbar {
 	my $sb = $self->{StatusBar} = $self->toplevel->Message(
 		-text=>"Status bar.",
 		-justify=>'left',
-		-width=>'400',
+		-width=>'800',
 		-anchor=>'w',
 	);
 	$sb->pack(
@@ -13568,7 +15762,7 @@ my $t = MyTop->new;
 
 Tk::MainLoop;
 
-my $xml = XMLout($pc_assigments);
+my $xml = XMLout($pc_assignments);
 print $xml;
 
 #my $handler = MyParser->new();
