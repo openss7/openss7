@@ -82,6 +82,11 @@ static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
 
 #include <pcap/pcap.h>
 
+/*
+ * Simple program to set the direction to 2 on monitored links or to
+ * set the direction to 0 or 1 and merge spans in the ppa.
+ */
+
 int output = 1;
 int debug = 0;
 int lasterr = 0;
@@ -90,7 +95,7 @@ int infiles = 1;
 
 char outfile[256] = "/dev/stdout";
 char errfile[256] = "/dev/stderr";
-char inpfile[256][16] = { "/dev/stdin", };
+char inpfile[256] = "/dev/stdin";
 
 char errbuf[PCAP_ERRBUF_SIZE] = "";
 
@@ -99,40 +104,50 @@ struct message {
 	int valid;
 	struct pcap_pkthdr *hdr;
 	const u_char *dat;
-} msgs[16];
+} msgs;
+
+int settotwo = 3; // default
+int settodir = 0;
+
+#define MTP2_HDR_LEN			4	/* length of the pseudo-header */
+
+#define MTP2_SENT_OFFSET		0	/* 1 byte */
+#define MTP2_ANNEX_A_USED_OFFSET	1	/* 1 byte */
+#define MTP2_LINK_NUMBER_OFFSET		2	/* 2 bytes */
+
+#define MTP2_ANNEX_A_NOT_USED		0
+#define MTP2_ANNEX_A_USED		1
+#define MTP2_ANNEX_A_USED_UNKNOWN	2
 
 static void
-ss7capmerge(void)
+ss7capsetdir(void)
 {
 	pcap_t *p;
 	pcap_dumper_t *pd;
-	FILE *f[16];
-	pcap_t *pi[16];
-	int i;
+	FILE *f;
+	pcap_t *pi;
 
-	// open all input files
-	for (i = 0; i < infiles; i++) {
-		if (debug)
-			fprintf(stderr, "opening input file %d, %s\n", i + 1, inpfile[i]);
-		if ((f[i] = fopen(inpfile[i], "r")) == NULL) {
-			perror(__FUNCTION__);
-			exit(1);
-		}
-		if (debug)
-			fprintf(stderr, "opening pcap file %d, %s\n", i + 1, inpfile[i]);
-		if ((pi[i] = pcap_fopen_offline(f[i], errbuf)) == NULL) {
-			fprintf(stderr, "error: %s: %s\n", __FUNCTION__, errbuf);
-			exit(1);
-		}
-		msgs[i].eof = 0;
-		msgs[i].valid = 0;
-		msgs[i].hdr = NULL;
-		msgs[i].dat = NULL;
+	// open input file
+	if (debug)
+		fprintf(stderr, "opening input file %s\n", inpfile);
+	if ((f = fopen(inpfile, "r")) == NULL) {
+		perror(__FUNCTION__);
+		exit(1);
 	}
 	if (debug)
-		fprintf(stderr, "opening outfile file %s\n", outfile);
+		fprintf(stderr, "opening pcap file %s\n", inpfile);
+	if ((pi = pcap_fopen_offline(f, errbuf)) == NULL) {
+		fprintf(stderr, "error: %s: %s\n", __FUNCTION__, errbuf);
+		exit(1);
+	}
+	msgs.eof = 0;
+	msgs.valid = 0;
+	msgs.hdr = NULL;
+	msgs.dat = NULL;
+	if (debug)
+		fprintf(stderr, "opening output file %s\n", outfile);
 	if (strncmp(outfile, "/dev/stdout", sizeof(outfile) - 1) != 0) {
-		// redirect statndard output
+		// redirect standard output
 		if (freopen(outfile, "w", stdout) == NULL) {
 			perror(__FUNCTION__);
 			exit(1);
@@ -160,43 +175,49 @@ ss7capmerge(void)
 		exit(1);
 	}
 	for (;;) {
-		struct message *msg;
 		int rtn;
+		u_char *psu;
 
-		// get as many messages as we can
-		for (i = 0; i < infiles; i++) {
-			if (msgs[i].eof || msgs[i].valid)
-				continue;
+		if (debug > 3)
+			fprintf(stderr, "reading messages from input file\n");
+		rtn = pcap_next_ex(pi, &msgs.hdr, &msgs.dat);
+		msgs.eof = (rtn == -2);
+		if (msgs.eof) {
+			if (debug)
+				fprintf(stderr, "hit end of input file\n");
+			break;
+		}
+		msgs.valid = (rtn == 1);
+		if (!msgs.valid) {
 			if (debug > 3)
-				fprintf(stderr, "reading message from file %d\n", i + 1);
-			rtn = pcap_next_ex(pi[i], &msgs[i].hdr, &msgs[i].dat);
-			msgs[i].eof = (rtn == -2);
-			if (debug && msgs[i].eof)
-				fprintf(stderr, "hit end of file %d\n", i + 1);
-			msgs[i].valid = (rtn == 1);
-			if (debug > 3 && !msgs[i].valid)
-				fprintf(stderr, "error reading message from file %d\n", i + 1);
+				fprintf(stderr, "error reading message from input file\n");
+			break;
 		}
-		for (msg = NULL, i = 0; i < infiles; i++) {
-			if (!msgs[i].valid)
-				continue;
-			if (msg == NULL) {
-				msg = &msgs[i];
-				continue;
-			}
-			if ((msgs[i].hdr->ts.tv_sec < msg->hdr->ts.tv_sec)
-			    || ((msgs[i].hdr->ts.tv_sec == msg->hdr->ts.tv_sec) &&
-				(msgs[i].hdr->ts.tv_usec < msg->hdr->ts.tv_usec)))
-				msg = &msgs[i];
+		psu = (u_char *) msgs.dat;
+		if (settotwo) {
+			int dir = settotwo;
+
+			psu[MTP2_SENT_OFFSET] = dir;
+		} else if (settodir) {
+			int card, span, slot, dir;
+
+			// our link numbers are 2 bits for card number, 2 bits for span on card, and 5 bits
+			// for slot in span Note that a slot number of zero means entire span (Annex A).
+			card = ((psu[MTP2_LINK_NUMBER_OFFSET  ] & 0x01) << 1) |
+			       ((psu[MTP2_LINK_NUMBER_OFFSET+1] & 0x80) >> 7);
+			span = ((psu[MTP2_LINK_NUMBER_OFFSET+1] & 0x60) >> 5);
+			slot = ((psu[MTP2_LINK_NUMBER_OFFSET+1] & 0x1f) >> 0);
+
+			dir = span & 0x1;
+			span &= ~0x1;
+
+			psu[MTP2_SENT_OFFSET] = dir;
+			psu[MTP2_LINK_NUMBER_OFFSET] = (card >> 1) & 0x1;
+			psu[MTP2_LINK_NUMBER_OFFSET + 1] = ((card & 0x1) << 7) | ((span & 0x3) << 5) | (slot & 0x1f);
 		}
-		if (msg == NULL)
-			break;	// done
 		// write it out
-		pcap_dump((u_char *) pd, msg->hdr, msg->dat);
+		pcap_dump((u_char *) pd, msgs.hdr, msgs.dat);
 		pcap_dump_flush(pd);
-		msg->valid = 0;
-		msg->hdr = NULL;
-		msg->dat = NULL;
 	}
 	if (debug) {
 		fprintf(stderr, "closing pcap dump file\n");
@@ -204,7 +225,6 @@ ss7capmerge(void)
 	}
 	pcap_close(p);
 }
-
 
 static void
 copying(int argc, char *argv[])
@@ -282,7 +302,7 @@ usage(int argc, char *argv[])
 		return;
 	(void) fprintf(stderr, "\
 Usage:\n\
-    %1$s [options] [{-o|--outfile} outfile] [{-e|--errfile} errfile] [infile ...]\n\
+    %1$s [options] [{-o|--outfile} outfile] [{-e|--errfile} errfile] [infile]\n\
     %1$s {-h|--help}\n\
     %1$s {-V|--version}\n\
     %1$s {-C|--copying}\n\
@@ -296,14 +316,24 @@ help(int argc, char *argv[])
 		return;
 	(void) fprintf(stdout, "\
 Usage:\n\
-    %1$s [options] [{-o|--outfile} outfile] [{-e|--errfile} errfile] [infile ...]\n\
+    %1$s [options] [{-o|--outfile} outfile] [{-e|--errfile} errfile] [infile]\n\
     %1$s {-h|--help}\n\
     %1$s {-V|--version}\n\
     %1$s {-C|--copying}\n\
 Arguments:\n\
-    infile ...				(default: %2$s)\n\
-        input files to read pcap formatted data\n\
+    infile                              (default: %2$s)\n\
+        input file to read pcap formatted data\n\
 Options:\n\
+  Direction Options:\n\
+    -2, --settotwo                      (default: %7$d)\n\
+        set direction in MTP2 pseudo-header to 2\n\
+    -3, --settothr                      (default: %7$d)\n\
+        set direction in MTP2 pseudo-header to 3\n\
+    -4, --settofor                      (default: %7$d)\n\
+        set direction in MTP2 pseudo-header to 4\n\
+    -d, --settodir                      (default: %8$d)\n\
+        set direction in MTP2 pseudo-header to span\n\
+        and merge spans\n\
   File Options:\n\
     -o, --outfile outfile               (default: %3$s)\n\
         output file to write pcap formatted data\n\
@@ -322,7 +352,7 @@ Options:\n\
         print version and exit\n\
     -C, --copying\n\
         print copying permission and exit\n\
-", argv[0], inpfile[0], outfile, errfile, debug, output);
+", argv[0], inpfile, outfile, errfile, debug, output, settotwo, settodir);
 }
 
 int
@@ -335,6 +365,10 @@ main(int argc, char **argv)
 		int option_index = 0;
 		/* *INDENT-OFF* */
 		static struct option long_options[] = {
+			{"settotwo",	no_argument,		NULL,	'2'},
+			{"settothr",	no_argument,		NULL,	'3'},
+			{"settofor",	no_argument,		NULL,	'4'},
+			{"settodir",	no_argument,		NULL,	'd'},
 			{"outfile",	required_argument,	NULL,	'o'},
 			{"errfile",	required_argument,	NULL,	'e'},
 			{"quiet",	no_argument,		NULL,	'q'},
@@ -349,9 +383,9 @@ main(int argc, char **argv)
 		};
 		/* *INDENT-ON* */
 
-		c = getopt_long(argc, argv, "o:e:qD::v::hVC?W:", long_options, &option_index);
+		c = getopt_long(argc, argv, "234do:e:qD::v::hVC?W:", long_options, &option_index);
 #else				/* defined _GNU_SOURCE */
-		c = getopt(argc, argv, "o:e:qDvhVC?");
+		c = getopt(argc, argv, "234do:e:qDvhVC?");
 #endif				/* defined _GNU_SOURCE */
 		if (c == -1) {
 			break;
@@ -360,6 +394,20 @@ main(int argc, char **argv)
 		case 0:
 			usage(argc, argv);
 			exit(2);
+		case '2': /* -2, --settotwo */
+			settotwo = 2;
+			settodir = 0;
+		case '3': /* -3, --settothr */
+			settotwo = 3;
+			settodir = 0;
+		case '4': /* -4, --settofor */
+			settotwo = 4;
+			settodir = 0;
+			break;
+		case 'd': /* -d, --settodir */
+			settodir = 1;
+			settotwo = 0;
+			break;
 		case 'o':	/* -o, --outfile outfile */
 			if (debug)
 				fprintf(stderr, "%s: setting outfile to %s\n", argv[0], optarg);
@@ -440,18 +488,18 @@ main(int argc, char **argv)
 	}
 	if (optind < argc) {
 		infiles = 0;
-		for (;optind < argc && infiles < 16; optind++, infiles++) {
+		for (;optind < argc && infiles < 1; optind++, infiles++) {
 			if (debug)
-				fprintf(stderr, "%s: assigning input file %d to %s\n", argv[0], infiles+1, argv[optind]);
-			strncpy(inpfile[infiles], argv[optind], sizeof(inpfile[0]) - 1);
+				fprintf(stderr, "%s: assigning input file to %s\n", argv[0], argv[optind]);
+			strncpy(inpfile, argv[optind], sizeof(inpfile) - 1);
 		}
 		if (debug) {
 			int i;
 
 			for (i = 0; i < infiles; i++)
-				fprintf(stderr, "%s: input file %d was assigned %s\n", argv[0], i+1, inpfile[i]);
+				fprintf(stderr, "%s: input file was assigned %s\n", argv[0], inpfile);
 		}
 	}
-	ss7capmerge();
+	ss7capsetdir();
 	exit(4);
 }
