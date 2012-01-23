@@ -1,5 +1,5 @@
 
-all: ss72pcap ss7capmerge scapident
+all: ss72pcap ss7capmerge ss7capsetdir scapident
 
 ss72pcap: ss72pcap.c
 	gcc -g -Wall \
@@ -16,6 +16,14 @@ ss7capmerge: ss7capmerge.c
 	'-DVERSION="1.1.1.20110510"' \
 	-D_GNU_SOURCE \
 	ss7capmerge.c -o $@ -lpcap
+
+ss7capsetdir: ss7capsetdir.c
+	gcc -g -Wall \
+	'-DNAME="ss7capsetdir"' \
+	'-DPACKAGE="openss7"' \
+	'-DVERSION="1.1.1.20110510"' \
+	-D_GNU_SOURCE \
+	ss7capsetdir.c -o $@ -lpcap
 
 scapident: scapident.cpp
 	g++ -g -std=gnu++98 -Wall \
@@ -38,5 +46,6 @@ isupcre: isupcre.cpp
 clean:
 	rm -fv ss72pcap
 	rm -fv ss7capmerge
+	rm -fv ss7capsetdir
 	rm -fv scapident
 	rm -fv isupcre

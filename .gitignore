@@ -911,4 +911,5 @@ src/util/isupcre
 src/util/ss72pcap
 src/util/scapident
 src/util/ss7capmerge
+src/util/ss7capsetdir
 tags
