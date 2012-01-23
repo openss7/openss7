@@ -466,7 +466,52 @@ if (1) {
 	}
 }
 
-use constant { COL_NOD => 5, COL_SSP => 4, COL_SCP => 3, COL_GTT => 2, COL_ADJ => 1, };
+use constant {
+	COL_NOD => 5,
+	COL_SSP => 4,
+	COL_SCP => 3,
+	COL_GTT => 2,
+	COL_ADJ => 1,
+
+	CTS_UNINIT	=> 0,
+	CTS_IDLE	=> 1,
+	CTS_WAIT_ACM	=> 2,
+	CTS_WAIT_ANM	=> 3,
+	CTS_ANSWERED	=> 4,
+	CTS_SUSPENDED	=> 5,
+	CTS_WAIT_RLC	=> 6,
+	CTS_SEND_RLC	=> 7,
+	CTS_COMPLETE	=> 8,
+
+	RT_UNKNOWN => 0,
+	RT_14BIT_PC => 4,	# also RL length in octets
+	RT_24BIT_PC => 7,	# also RL length in octets
+
+	HT_UNKNOWN => 0,
+	HT_BASIC => 3,		# also link level header length
+	HT_EXTENDED => 6,	# also link level header length
+
+	MP_UNKNOWN => 0,
+	MP_JAPAN => 1,
+	MP_NATIONAL => 2,
+	MP_INTERNATIONAL => 3,
+};
+our @rtoptions = (
+	['Unknown'		=> RT_UNKNOWN		],
+	['14-bit point code'	=> RT_14BIT_PC		],
+	['24-bit point code'	=> RT_24BIT_PC		],
+);
+our @htoptions = (
+	['Unknown'		=> HT_UNKNOWN		],
+	['Basic'		=> HT_BASIC		],
+	['Extended'		=> HT_EXTENDED		],
+);
+our @mpoptions = (
+	['Unknown'		=> MP_UNKNOWN		],
+	['Japan'		=> MP_JAPAN		],
+	['National'		=> MP_NATIONAL		],
+	['International'	=> MP_INTERNATIONAL	],
+);
 
 # -------------------------------------
 package style;
@@ -547,8 +592,9 @@ use strict;
 
 #package Logging;
 sub init {
-	my $self = shift;
+	my ($self,$top) = @_;
 	$self->{logs} = [];
+	$self->{top} = $top;
 }
 
 #package Logging;
@@ -614,6 +660,7 @@ sub showlog {
 sub log {
 	my ($self,$text) = @_;
 	push @{$self->{logs}}, $text;
+	$self->{top}->setstatus($self->identify.' '.$text);
 }
 
 # -------------------------------------
@@ -2331,18 +2378,6 @@ use vars qw(@ISA);
 @ISA = qw(CallHistory);
 # -------------------------------------
 
-use constant {
-	CTS_UNINIT	=> 0,
-	CTS_IDLE	=> 1,
-	CTS_WAIT_ACM	=> 2,
-	CTS_WAIT_ANM	=> 3,
-	CTS_ANSWERED	=> 4,
-	CTS_SUSPENDED	=> 5,
-	CTS_WAIT_RLC	=> 6,
-	CTS_SEND_RLC	=> 7,
-	CTS_COMPLETE	=> 8,
-};
-
 #package CallStats;
 sub init {
 	my ($self,@args) = @_;
@@ -2784,13 +2819,13 @@ circuits and state for the study period.";
 			-text=>'Distribution',
 		)->grid(-row=>$row++,-column=>8,-sticky=>'ewns');
 		$balloon->attach($w,-balloonmsg=>$bmsg,);
-		$self->addcstat($top,$f,$balloon,\$row,$span,CTS_UNINIT,'Unused');
-		$self->addcstat($top,$f,$balloon,\$row,$span,CTS_IDLE,'Idle');
-		$self->addcstat($top,$f,$balloon,\$row,$span,CTS_WAIT_ACM,'Setup');
-		$self->addcstat($top,$f,$balloon,\$row,$span,CTS_WAIT_ANM,'Alerting');
-		$self->addcstat($top,$f,$balloon,\$row,$span,CTS_ANSWERED,'Connected');
-		$self->addcstat($top,$f,$balloon,\$row,$span,CTS_SUSPENDED,'Suspended');
-		$self->addcstat($top,$f,$balloon,\$row,$span,CTS_WAIT_RLC,'Releasing');
+		$self->addcstat($top,$f,$balloon,\$row,$span,::CTS_UNINIT,'Unused');
+		$self->addcstat($top,$f,$balloon,\$row,$span,::CTS_IDLE,'Idle');
+		$self->addcstat($top,$f,$balloon,\$row,$span,::CTS_WAIT_ACM,'Setup');
+		$self->addcstat($top,$f,$balloon,\$row,$span,::CTS_WAIT_ANM,'Alerting');
+		$self->addcstat($top,$f,$balloon,\$row,$span,::CTS_ANSWERED,'Connected');
+		$self->addcstat($top,$f,$balloon,\$row,$span,::CTS_SUSPENDED,'Suspended');
+		$self->addcstat($top,$f,$balloon,\$row,$span,::CTS_WAIT_RLC,'Releasing');
 	}
 }
 
@@ -2853,11 +2888,6 @@ use vars qw(@ISA);
 @ISA = qw(MsgStats);
 # -------------------------------------
 
-use constant {
-	RT_UNKNOWN => 0,
-	RT_14BIT_PC => 4, # also RL length in octets
-	RT_24BIT_PC => 7  # also RL length in octets
-};
 #package MsgCollector;
 sub init {
 	my ($self,@args) = @_;
@@ -3793,7 +3823,7 @@ sub attach {
 		$top->mycanvas->addballoon($self,[$self->{item}]);
 	}
 	#print STDERR "D: discovered ".$self->identify."\n";
-	$top->statusbar->configure(-text=>"Discovered ".$self->identify);
+	$top->setstatus("Discovered ".$self->identify);
 	$top->{updatenow} = 1;
 }
 
@@ -3897,7 +3927,6 @@ sub init {
 	$self->{options} = $options;
 	$self->{colors} = $colors;
 	$self->{state} = $self->{oldstate} = $state;
-	$self->{statetext} = $options->[$state]->[0];
 	$self->{color} = $colors->[$state];
 	my $tl = $top->widget;
 	$top->widget->traceVariable(\$self->{state},'w'=>[\&Stateful::tracestate,$self,$top]);
@@ -3907,15 +3936,14 @@ sub tracestate {
 	my ($ind,$val,$op,$self,$top) = @_;
 	if ($op eq 'w') {
 		if ($self->{oldstate} != $val) {
-			$self->{statetext} = $self->{options}->[$val]->[0];
 			my $color = $self->{colors}->[$val];
 			if ($self->{color} ne $color) {
 				$self->{color} = $color;
 				$top->canvas->itemconfigure($self->{items}->[0], -fill=>$color)
 					if exists $self->{items} and $self->{items}->[0];
 			}
-			$top->statusbar->configure(
-				-text=>$self->identify.' state changed from '.$self->{options}->[$self->{oldstate}]->[0].' to '.$self->{options}->[$val]->[0],
+			$top->setstatus(
+				$self->identify.' state changed from '.$self->{options}->[$self->{oldstate}]->[0].' to '.$self->{options}->[$val]->[0],
 			);
 			$self->statechange($top,$val);
 			$self->{oldstate} = $val;
@@ -3932,15 +3960,18 @@ sub updatestate {
 	my ($self,$top,$obj) = @_;
 }
 #package Stateful;
+sub statetext { my $self = shift; return $self->{options}->[$self->{state}]->[0]; }
+#package Stateful;
 sub fillstate {
 	my ($self,$top,$w,$row) = @_;
 	$w->Label(%labelright,
 		-text=>'State:',
 	)->grid(-row=>$$row,-column=>0,-sticky=>'ewns');
+	my $statetext = $self->statetext;
 	$w->Optionmenu(%optionleft,
 		-options=>$self->{options},
 		-variable=>\$self->{state},
-		-textvariable=>\$self->{statetext},
+		-textvariable=>\$statetext,
 	)->grid(-row=>$$row++,-column=>1,-sticky=>'ewns');
 }
 
@@ -4110,7 +4141,7 @@ use vars qw(@ISA);
 
 #package Nodeitem;
 sub new {
-	my ($type,$top,$row,$col,$off,@args) = @_;
+	my ($type,$top,$row,$col,$off,$nodeno,@args) = @_;
 	my $self = {};
 	bless $self,$type;
 	$self->{off} = $off;
@@ -4157,7 +4188,7 @@ sub new {
 	push @{$self->{items}}, $self->{text};
 	$self->{ownr} = $c->createText($x,$y+15,
 		-anchor=>'center', -fill=>'black', -justify=>'center',
-		-text=>'?',
+		-text=>$nodeno,
 		-state=>$state,
 		-tags=>[$type,'text'],
 	);
@@ -4230,7 +4261,7 @@ sub dashme {
 	$top->canvas->itemconfigure($self->{item},-dash=>[5,2]);
 	$top->canvas->itemconfigure($self->{scri},-dash=>[5,2]);
 	#print STDERR "D: discovered ".$self->identify."\n";
-	$top->statusbar->configure(-text=>"Discovered ".$self->identify." is an alias.\n");
+	$top->setstatus("Discovered ".$self->identify." is an alias.\n");
 }
 
 #package Nodeitem;
@@ -4356,7 +4387,7 @@ use vars qw(@ISA);
 sub init {
 	my ($self,$top,$relationno,$nodea,$nodeb,@args) = @_;
 	$self->Hexstate::init($top,'black');
-	$self->Logging::init(@args);
+	$self->Logging::init($top,@args);
 	$self->Properties::init(@args);
 	$self->Status::init(@args);
 	$self->Clickable::init(@args);
@@ -4796,10 +4827,10 @@ sub fillstatus {
 
 #package Relation;
 sub log {
-	my ($self,$text) = @_;
-	$self->Logging::log($text);
-	$self->{nodea}->log($text);
-	$self->{nodeb}->log($text);
+	my ($self,@args) = @_;
+	$self->Logging::log(@args);
+	$self->{nodea}->log(@args);
+	$self->{nodeb}->log(@args);
 }
 
 # -------------------------------------
@@ -4816,7 +4847,7 @@ use vars qw(@ISA);
 sub init {
 	my ($self,$top,$network,$routesetno,$nodea,$nodeb,@args) = @_;
 	$self->Hexstate::init($top,'black');
-	$self->Logging::init(@args);
+	$self->Logging::init($top,@args);
 	$self->Properties::init(@args);
 	$self->Status::init(@args);
 	$self->Clickable::init(@args);
@@ -4933,18 +4964,6 @@ use vars qw(@ISA);
 @ISA = qw(Logging Properties Status Clickable MsgCollector CallCollector);
 # -------------------------------------
 
-use constant {
-	CTS_UNINIT	=> 0,
-	CTS_IDLE	=> 1,
-	CTS_WAIT_ACM	=> 2,
-	CTS_WAIT_ANM	=> 3,
-	CTS_ANSWERED	=> 4,
-	CTS_SUSPENDED	=> 5,
-	CTS_WAIT_RLC	=> 6,
-	CTS_SEND_RLC	=> 7,
-	CTS_COMPLETE	=> 8,
-};
-
 #package Circuit;
 sub new {
 	my ($type,$top,$group,$cic,@args) = @_;
@@ -4952,7 +4971,7 @@ sub new {
 	bless $self,$type;
 	$self->{group} = $group;
 	$self->{cic} = $cic;
-	$self->Logging::init(@args);
+	$self->Logging::init($top,@args);
 	$self->Properties::init(@args);
 	$self->Status::init(@args);
 	$self->MsgCollector::init(@args);
@@ -4962,7 +4981,7 @@ sub new {
 	$group->{cics}->{$cic} = $self;
 	$self->cnt($top);
 	$self->{active} = 0;
-	$self->{state} = CTS_UNINIT;
+	$self->{state} = ::CTS_UNINIT;
 	return $self;
 }
 
@@ -4972,7 +4991,7 @@ sub setstate {
 	return if $self->{state} == $newstate;
 	my $oldstate = $self->{state};
 	my $olddir   = $self->{dir};
-	if ($oldstate == CTS_UNINIT) {
+	if ($oldstate == ::CTS_UNINIT) {
 		$self->act($top);
 		$olddir = $newdir;
 		$self->peg($top,$oldstate,$msg->{hdr},$olddir); # XXX
@@ -5064,26 +5083,26 @@ sub pushcall {
 #package Circuit;
 sub end_of_call {
 	my ($self,$top,$call,$msg,$dir) = @_;
-	$self->setstate($top,$msg,CTS_IDLE,$dir);
-	$call->add_msg($msg,CTS_IDLE);
+	$self->setstate($top,$msg,::CTS_IDLE,$dir);
+	$call->add_msg($msg,::CTS_IDLE);
 	$self->pushcall($top,$call);
 }
 
 #package Circuit;
 sub clear_call {
 	my ($self,$top,$call,$msg,$dir) = @_;
-	$self->setstate($top,$msg,CTS_IDLE,$dir);
-	$call->clear($msg,CTS_IDLE);
+	$self->setstate($top,$msg,::CTS_IDLE,$dir);
+	$call->clear($msg,::CTS_IDLE);
 }
 
 #package Circuit;
 sub restart_call {
 	my ($self,$top,$call,$msg,$dir) = @_;
-	$self->setstate($top,$msg,CTS_IDLE,$dir);
+	$self->setstate($top,$msg,::CTS_IDLE,$dir);
 	if ($self->msgcnt) {
 		$self->pushcall($top,$call);
 	} else {
-		$call->clear($msg,CTS_IDLE);
+		$call->clear($msg,::CTS_IDLE);
 	}
 }
 
@@ -5145,9 +5164,9 @@ sub add_msg {
 			$call = $self->{call} = Call->new($top,$self);
 		}
 		if ($mt == 0x01) { # iam
-			if ($self->{state} <= CTS_WAIT_ACM) {
+			if ($self->{state} <= ::CTS_WAIT_ACM) {
 				$dir = $self->activate($network,$msg);
-				$self->setstate($top,$msg,CTS_WAIT_ACM,$dir);
+				$self->setstate($top,$msg,::CTS_WAIT_ACM,$dir);
 				last;
 			}
 			$self->restart_call($top,$call,$msg,$dir);
@@ -5166,15 +5185,15 @@ sub add_msg {
 			last;
 		}
 		if ($mt == 0x06 || $mt == 0xed) { # acm exm
-			if ($self->{state} == CTS_WAIT_ACM) {
-				$self->setstate($top,$msg,CTS_WAIT_ANM,$dir);
+			if ($self->{state} == ::CTS_WAIT_ACM) {
+				$self->setstate($top,$msg,::CTS_WAIT_ANM,$dir);
 				last;
 			}
 			return;
 		}
 		if ($mt == 0x07) { # con
-			if ($self->{state} == CTS_WAIT_ANM) {
-				$self->setstate($top,$msg,CTS_ANSWERED,$dir);
+			if ($self->{state} == ::CTS_WAIT_ANM) {
+				$self->setstate($top,$msg,::CTS_ANSWERED,$dir);
 				last;
 			}
 			return;
@@ -5183,35 +5202,35 @@ sub add_msg {
 			last;
 		}
 		if ($mt == 0x09) { # anm
-			if ($self->{state} == CTS_WAIT_ANM) {
-				$self->setstate($top,$msg,CTS_ANSWERED,$dir);
+			if ($self->{state} == ::CTS_WAIT_ANM) {
+				$self->setstate($top,$msg,::CTS_ANSWERED,$dir);
 				last;
 			}
 			return;
 		}
 		if ($mt == 0x0c) { # rel
-			if ($self->{state} > CTS_IDLE) {
-				$self->setstate($top,$msg,CTS_WAIT_RLC,$dir);
+			if ($self->{state} > ::CTS_IDLE) {
+				$self->setstate($top,$msg,::CTS_WAIT_RLC,$dir);
 				last;
 			}
 			return;
 		}
 		if ($mt == 0x0d) { # sus
-			if ($self->{state} == CTS_ANSWERED || $self->{state} == CTS_SUSPENDED) {
-				$self->setstate($top,$msg,CTS_SUSPENDED,$dir);
+			if ($self->{state} == ::CTS_ANSWERED || $self->{state} == ::CTS_SUSPENDED) {
+				$self->setstate($top,$msg,::CTS_SUSPENDED,$dir);
 				last;
 			}
 			return;
 		}
 		if ($mt == 0x0e) { # res
-			if ($self->{state} == CTS_ANSWERED || $self->{state} == CTS_SUSPENDED) {
-				$self->setstate($top,$msg,CTS_ANSWERED,$dir);
+			if ($self->{state} == ::CTS_ANSWERED || $self->{state} == ::CTS_SUSPENDED) {
+				$self->setstate($top,$msg,::CTS_ANSWERED,$dir);
 				last;
 			}
 			return;
 		}
 		if ($mt == 0x10) { # rlc
-			if ($self->{state} == CTS_WAIT_RLC) {
+			if ($self->{state} == ::CTS_WAIT_RLC) {
 				$self->end_of_call($top,$call,$msg,$dir);
 				return;
 			}
@@ -5222,7 +5241,7 @@ sub add_msg {
 			return;
 		}
 		if ($mt == 0x12) { # rsc
-			if ($self->{state} > CTS_WAIT_ANM) {
+			if ($self->{state} > ::CTS_WAIT_ANM) {
 				$self->end_of_call($top,$call,$msg,$dir);
 				return;
 			}
@@ -5230,7 +5249,7 @@ sub add_msg {
 			return;
 		}
 		if ($mt == 0x13) { # blo
-			if ($self->{state} < CTS_WAIT_ANM) {
+			if ($self->{state} < ::CTS_WAIT_ANM) {
 				$self->clear_call($top,$call,$msg,$dir);
 				return;
 			}
@@ -5240,7 +5259,7 @@ sub add_msg {
 			return;
 		}
 		if ($mt == 0x15) { # bla
-			if ($self->{state} < CTS_WAIT_ANM) {
+			if ($self->{state} < ::CTS_WAIT_ANM) {
 				$self->clear_call($top,$call,$msg,$dir);
 				return;
 			}
@@ -5250,7 +5269,7 @@ sub add_msg {
 			return;
 		}
 		if ($mt == 0x17) { # grs
-			if ($self->{state} > CTS_WAIT_ANM) {
+			if ($self->{state} > ::CTS_WAIT_ANM) {
 				$self->end_of_call($top,$call,$msg,$dir);
 				return;
 			}
@@ -5261,7 +5280,7 @@ sub add_msg {
 			return;
 		}
 		if ($mt == 0x1a) { # cgba
-			if ($self->{state} < CTS_WAIT_ANM) {
+			if ($self->{state} < ::CTS_WAIT_ANM) {
 				$self->clear_call($top,$call,$msg,$dir);
 				return;
 			}
@@ -5310,7 +5329,7 @@ sub add_msg {
 			last;
 		}
 		if ($mt == 0x29) { # gra
-			if ($self->{state} > CTS_WAIT_ANM) {
+			if ($self->{state} > ::CTS_WAIT_ANM) {
 				$self->end_of_call($top,$call,$msg,$dir);
 				return;
 			}
@@ -5324,7 +5343,7 @@ sub add_msg {
 			return;
 		}
 		if ($mt == 0x2c) { # cpg
-			if ($self->{state} == CTS_WAIT_ACM || $self->{state} == CTS_WAIT_ANM) {
+			if ($self->{state} == ::CTS_WAIT_ACM || $self->{state} == ::CTS_WAIT_ANM) {
 				return;
 			}
 			last;
@@ -5337,7 +5356,7 @@ sub add_msg {
 			return;
 		}
 		if ($mt == 0x2f) { # cfn
-			if ($self->{state} < CTS_ANSWERED) {
+			if ($self->{state} < ::CTS_ANSWERED) {
 				$self->clear_call($top,$call,$msg,$dir);
 				return;
 			}
@@ -5371,18 +5390,18 @@ sub add_msg {
 			last;
 		}
 		if ($mt == 0xe9) { # cra
-			if ($self->{state} == CTS_WAIT_ACM) {
-				$self->setstate($top,$msg,CTS_WAIT_ACM,$dir);
+			if ($self->{state} == ::CTS_WAIT_ACM) {
+				$self->setstate($top,$msg,::CTS_WAIT_ACM,$dir);
 				last;
 			}
 			return;
 		}
 		if ($mt == 0xea) { # crm
-			if ($self->{state} != CTS_IDLE && $self->{state} != CTS_WAIT_ACM) {
+			if ($self->{state} != ::CTS_IDLE && $self->{state} != ::CTS_WAIT_ACM) {
 				$self->end_of_call($top,$call,$msg,$dir);
 				return;
 			}
-			$self->setstate($top,$msg,CTS_WAIT_ACM,$dir);
+			$self->setstate($top,$msg,::CTS_WAIT_ACM,$dir);
 			last;
 		}
 		if ($mt == 0xeb) { # cvr
@@ -5477,7 +5496,7 @@ use vars qw(@ISA);
 sub init {
 	my ($self,$top,$linksetno,$relation,@args) = @_;
 	$self->Tristate::init($top,'black');
-	$self->Logging::init(@args);
+	$self->Logging::init($top,@args);
 	$self->Properties::init(@args);
 	$self->Status::init(@args);
 	$self->Clickable::init(@args);
@@ -5488,8 +5507,9 @@ sub init {
 	$self->{links} = {};
 	my $nodea = $self->{nodea} = $relation->{nodea};
 	my $nodeb = $self->{nodeb} = $relation->{nodeb};
-	$self->{routesa} = {}; # routes from the a-side
-	$self->{routesb} = {}; # routes from the b-side
+	$self->{routes} = {};
+	$self->{routes}->{a} = {}; # routes from the a-side
+	$self->{routes}->{b} = {}; # routes from the b-side
 	$self->Arcitem::init($top,$nodea,$nodeb,['node'],[],'line',0);
 	$self->Clickable::attach($top,@args);
 }
@@ -5513,7 +5533,7 @@ sub new {
 #package Linkset;
 sub identify {
 	my $self = shift;
-	my $letter = $Linkset::letters[$self->checktype];
+	my $letter = ['?','A','B','C','D','E','F']->[$self->checktype];
 	my $id = "$letter-Linkset ";
 	$id .= $self->{nodea}->shortid;
 	$id .= ', ';
@@ -5531,11 +5551,10 @@ sub shortid {
 sub statechange {
 	my ($self,$top,$val) = @_;
 	my $c = $top->canvas;
-	foreach my $route (values %{$self->{routesa}}) {
-		$route->updatestate($top,$self);
-	}
-	foreach my $route (values %{$self->{routesb}}) {
-		$route->updatestate($top,$self);
+	foreach my $side (keys %{$self->{routes}}) {
+		foreach my $route (values %{$self->{routes}->{$side}}) {
+			$route->updatestate($top,$self);
+		}
 	}
 }
 
@@ -5566,23 +5585,29 @@ sub updatestate {
 }
 
 #package Linkset;
+sub getRoute {
+	my ($self,$top,$network,$side,$node,@args) = @_;
+	my $pc = $node->{pc};
+	return $self->{routes}->{$side}->{$pc} if $self->{routes}->{$side}->{$pc};
+	my $route = $network->getRoute($top,$self,$side,$node);
+	$self->{routes}->{$side}->{$pc} = $route;
+	return $route;
+}
+
+#package Linkset;
 sub add_msg {
 	my ($self,$top,$network,$msg,$dir) = @_;
 	$self->inc($msg,$dir);
 	$self->pushmsg($msg);
 	if (exists $msg->{dpc}) {
-		my ($pc,$side,$nodeb,$route);
+		my ($side,$col);
 		if ($dir) { # from b to a to dpc
-			$side = 'a'; $pc = $msg->{dpc};
-			$nodeb = $network->getSp($top,$pc,$self->{nodea}->{col},'I');
-			$route = $self->getRoute($top,$network,$side,$nodeb);
-			$route->add_msg($top,$network,$msg,2);
+			$side = 'a'; $col = $self->{nodea}->{col};
 		} else { # from a to b to dpc
-			$side = 'b'; $pc = $msg->{dpc};
-			$nodeb = $network->getSp($top,$pc,$self->{nodeb}->{col},'O');
-			$route = $self->getRoute($top,$network,$side,$nodeb);
-			$route->add_msg($top,$network,$msg,2);
+			$side = 'b'; $col = $self->{nodeb}->{col};
 		}
+		my $node = $network->getSp($top,$msg->{dpc},$col);
+		$self->getRoute($top,$network,$side,$node)->add_msg($top,$network,$msg,2);
 	}
 }
 
@@ -5603,47 +5628,28 @@ use constant {
 	LS_FLINK=>6,
 };
 
-@Linkset::letters = ( '?', 'A', 'B', 'C', 'D', 'E', 'F', );
-%Linkset::types = (
-	SP =>{ SP =>LS_UNKNOWN, SSP=>LS_UNKNOWN, STP=>LS_UNKNOWN, GTT=>LS_UNKNOWN, SCP=>LS_UNKNOWN, },
-	SSP=>{ SP =>LS_UNKNOWN, SSP=>LS_FLINK,   STP=>LS_ALINK,   GTT=>LS_ALINK,   SCP=>LS_ELINK,   },
-	STP=>{ SP =>LS_UNKNOWN, SSP=>LS_ALINK,   STP=>LS_BLINK,   GTT=>LS_BLINK,   SCP=>LS_ALINK,   },
-	GTT=>{ SP =>LS_UNKNOWN, SSP=>LS_ALINK,   STP=>LS_BLINK,   GTT=>LS_BLINK,   SCP=>LS_ALINK,   },
-	SCP=>{ SP =>LS_UNKNOWN, SSP=>LS_ELINK,   STP=>LS_ALINK,   GTT=>LS_ALINK,   SCP=>LS_FLINK,   },
-);
-
 #package Linkset;
 sub checktype {
 	my $self = shift;
 	my ($refa,$refb) = (ref $self->{nodea},ref $self->{nodeb});
-	return ($self->{type} = $Linkset::types{$refa}->{$refb});
-}
-
-#package Linkset;
-sub getRoute {
-	my ($self,$top,$network,$side,$node,@args) = @_;
-	my $pc = $node->{pc};
-	my $route;
-	if ($side eq 'a') {
-		return $self->{routesa}->{$pc} if $self->{routesa}->{$pc};
-		$route = $network->getRoute($top,$self,$side,$node);
-		$self->{routesa}->{$pc} = $route;
-	} else {
-		return $self->{routesb}->{$pc} if $self->{routesb}->{$pc};
-		$route = $network->getRoute($top,$self,$side,$node);
-		$self->{routesb}->{$pc} = $route;
-	}
-	return $route;
+	return ($self->{type} = {
+		SP =>{ SP =>LS_UNKNOWN, SSP=>LS_UNKNOWN, STP=>LS_UNKNOWN, GTT=>LS_UNKNOWN, SCP=>LS_UNKNOWN, },
+		SSP=>{ SP =>LS_UNKNOWN, SSP=>LS_FLINK,   STP=>LS_ALINK,   GTT=>LS_ALINK,   SCP=>LS_ELINK,   },
+		STP=>{ SP =>LS_UNKNOWN, SSP=>LS_ALINK,   STP=>LS_BLINK,   GTT=>LS_BLINK,   SCP=>LS_ALINK,   },
+		GTT=>{ SP =>LS_UNKNOWN, SSP=>LS_ALINK,   STP=>LS_BLINK,   GTT=>LS_BLINK,   SCP=>LS_ALINK,   },
+		SCP=>{ SP =>LS_UNKNOWN, SSP=>LS_ELINK,   STP=>LS_ALINK,   GTT=>LS_ALINK,   SCP=>LS_FLINK,   },
+	}->{$refa}->{$refb});
 }
 
 #package Linkset;
 sub getmore {
 	my ($self,$m,$top,$X,$Y) = @_;
-	my $havelinks = scalar keys %{$self->{links}};
-	my $haverouta = scalar keys %{$self->{routesa}};
-	my $haveroutb = scalar keys %{$self->{routesb}};
-	$m->add('separator') if $havelinks + $haverouta + $haveroutb;
-	if ($havelinks) {
+	my $have = {};
+	$have->{links} = scalar keys %{$self->{links}};
+	$have->{routes}->{a} = scalar keys %{$self->{routes}->{a}};
+	$have->{routes}->{b} = scalar keys %{$self->{routes}->{b}};
+	$m->add('separator') if $have->{links} + $have->{routes}->{a} + $have->{routes}->{b};
+	if ($have->{links}) {
 		my ($mc,$m3);
 		$mc = $m->Menu(-title=>'Links Menu');
 		$mc->configure(-postcommand=>[sub {
@@ -5659,14 +5665,14 @@ sub getmore {
 		},$self,$mc,$top,$X,$Y]);
 		$m->add('cascade',-menu=>$mc,-label=>'Links');
 	}
-	if ($haveroutb) {
+	if ($have->{routes}->{b}) {
 		my ($mc,$m3);
 		$mc = $m->Menu(-title=>'Routes Forward Menu');
 		$mc->configure(-postcommand=>[sub {
 			my ($self,$mc,$top,$X,$Y) = @_;
 			$mc->delete(0,'end');
-			foreach my $pc (sort {$a <=> $b} keys %{$self->{routesb}}) {
-				my $route = $self->{routesb}->{$pc};
+			foreach my $pc (sort {$a <=> $b} keys %{$self->{routes}->{b}}) {
+				my $route = $self->{routes}->{b}->{$pc};
 				$m3 = $mc->Menu(-title=>"Route $route->{nodeb}->{pcode} Menu");
 				$route->getmenu($m3,$top,$X,$Y);
 				$route->getmore($m3,$top,$X,$Y);
@@ -5676,14 +5682,14 @@ sub getmore {
 		},$self,$mc,$top,$X,$Y]);
 		$m->add('cascade',-menu=>$mc,-label=>'Routes Forward');
 	}
-	if ($haverouta) {
+	if ($have->{routes}->{a}) {
 		my ($mc,$m3);
 		$mc = $m->Menu(-title=>'Routes Reverse Menu');
 		$mc->configure(-postcommand=>[sub {
 			my ($self,$mc,$top,$X,$Y) = @_;
 			$mc->delete(0,'end');
-			foreach my $pc (sort {$a <=> $b} keys %{$self->{routesa}}) {
-				my $route = $self->{routesa}->{$pc};
+			foreach my $pc (sort {$a <=> $b} keys %{$self->{routes}->{a}}) {
+				my $route = $self->{routes}->{a}->{$pc};
 				$m3 = $mc->Menu(-title=>"Route $route->{nodeb}->{pcode} Menu");
 				$route->getmenu($m3,$top,$X,$Y);
 				$route->getmore($m3,$top,$X,$Y);
@@ -5768,7 +5774,7 @@ sub init {
 	my ($self,$top,$combinedno,$linkseta,$linksetb,@args) = @_;
 	my $type = ref $self;
 	$self->Tristate::init($top,'black');
-	$self->Logging::init(@args);
+	$self->Logging::init($top,@args);
 	$self->Properties::init(@args);
 	$self->Status::init(@args);
 	$self->Clickable::init(@args);
@@ -5795,7 +5801,7 @@ $Link::offsets = [ -3, 3, -8, 8, -13, 13, -18, 18, -23, 23, -28, 28, -33, 33, -3
 sub init {
 	my ($self,$top,$linkno,$linkset,$slc,@args) = @_;
 	$self->Tristate::init($top,'black');
-	$self->Logging::init(@args);
+	$self->Logging::init($top,@args);
 	$self->Properties::init(@args);
 	$self->Status::init(@args);
 	$self->Clickable::init(@args);
@@ -5926,7 +5932,7 @@ sub new {
 	my $self = {};
 	bless $self,$type;
 	$self->Tristate::init($top,'black');
-	$self->Logging::init(@args);
+	$self->Logging::init($top,@args);
 	$self->Properties::init(@args);
 	$self->Status::init(@args);
 	$self->Clickable::init(@args);
@@ -6061,7 +6067,7 @@ sub new {
 	my $self = {};
 	bless $self, $type;
 	$self->Tristate::init($top,'grey');
-	$self->Logging::init(@args);
+	$self->Logging::init($top,@args);
 	$self->Properties::init(@args);
 	$self->Status::init(@args);
 	$self->Clickable::init(@args);
@@ -6110,7 +6116,7 @@ sub statechange {
 sub identify {
 	my $self = shift;
 	my $id = "Path ";
-	$id .= "($self->{channel}->{card}:$self->{channel}->{span}:$self->{channel}->{slot})";
+	$id .= '('.$self->{channel}->shortid.')';
 	$id .= ($self->{side} eq 'a') ? ' <- ' : ' -> ';
 	$id .= $self->{node}->shortid;
 	return ($self->{id} = $id);
@@ -6119,7 +6125,7 @@ sub identify {
 #package Path;
 sub shortid {
 	my $self = shift;
-	my $id = "($self->{channel}->{card}:$self->{channel}->{span}:$self->{channel}->{slot})";
+	my $id = '('.$self->{channel}->shortid.')';
 	$id .= ($self->{side} eq 'a') ? '<-' : '->';
 	$id .= "($self->{node}->{pcode})";
 	return $id;
@@ -6168,7 +6174,7 @@ use vars qw(@ISA);
 #package Node;
 sub new {
 	my ($type,$top,$nodeno,$col,@args) = @_;
-	my $self = Nodeitem::new($type,$top,0,$col,0);
+	my $self = Nodeitem::new($type,$top,0,$col,0,$nodeno);
 	$self->Properties::init(@args);
 	$self->Status::init(@args);
 	$self->Clickable::init(@args);
@@ -6331,15 +6337,14 @@ use vars qw(@ISA);
 
 #package SP;
 sub new {
-	my ($type,$top,$nodeno,$pc,$half,$way,@args) = @_;
+	my ($type,$top,$nodeno,$pc,$half,@args) = @_;
 	my $col = ::COL_NOD; $col = -$col if $half < 0;
 	my $self = Node::new($type,$top,$nodeno,$col,@args);
 	$self->Tristate::init($top,'white');
-	$self->Logging::init(@args);
+	$self->Logging::init($top,@args);
 	$self->MsgCollector::init(@args);
 	$self->CallCollector::init(@args);
 	$self->{pc} = $pc;
-	$self->{way} = $way;
 	$self->{tqueries} = {};
 	$self->{circuits} = {};
 	$self->{responds} = {};
@@ -6695,19 +6700,6 @@ sub add_msg {
 	}
 }
 
-use constant {
-	N_UNKNOWN => 0, # not yet identified
-	N_GTT_CC  => 1, # GTT capability code
-	N_SCP_DB  => 2, # SCP database
-	N_SSP_TA  => 3, # SSP transaction alias
-	N_SSP_AP  => 4, # SSP alias point code
-	N_SSP_PP  => 5, # SSP primary point code
-	N_SSP_NT  => 6, # SSP w/o TCAP
-	N_SSP_WT  => 7, # SSP w/ TCAP
-	N_STP_NG  => 8, # STP w/o GTT
-	N_STP_WG  => 9, # STP w/ GTT
-};
-
 #package SP;
 sub reanalyze {
 	my ($self,$top,$network) = @_;
@@ -6946,29 +6938,23 @@ sub getmore {
 	}
 }
 
-use constant {
-	RT_UNKNOWN => 0,
-	RT_14BIT_PC => 4, # also RL length in octets
-	RT_24BIT_PC => 7  # also RL length in octets
-};
-
 #package SP;
 sub fillprops {
 	my ($self,$top,$tw,$row) = @_;
 
 	my ($rt,$rttext);
 	if ($self->{pc} < (1<<14)) {
-		$rt = RT_14BIT_PC;
-		$rttext = $Channel::rloptions[1]->[0];
+		$rt = ::RT_14BIT_PC;
+		$rttext = $rtoptions[1]->[0];
 	} else {
-		$rt = RT_24BIT_PC;
-		$rttext = $Channel::rloptions[2]->[0];
+		$rt = ::RT_24BIT_PC;
+		$rttext = $rtoptions[2]->[0];
 	}
 	$tw->Label(%labelright,
 		-text=>'Point code type:',
 	)->grid(-row=>$$row,-column=>0,-sticky=>'ewns');
 	$tw->Optionmenu(%optionleft,
-		-options=>\@Channel::rloptions,
+		-options=>\@rtoptions,
 		-variable=>\$rt,
 		-textvariable=>\$rttext, -width=>12,
 	)->grid(-row=>$$row++,-column=>1,-sticky=>'wns');
@@ -7192,10 +7178,6 @@ sub fillstatus {
 		$p->Label(%labelcenter, -text=>'2/W',
 		)->grid(-row=>$$row++,-column=>5,-sticky=>'ewns');
 		foreach my $pc (sort {$a <=> $b} keys %{$self->{circuits}}) {
-			my ($ogcol,$iccol);
-			if ($self->{way} eq 'O')
-			{ $ogcol = 3; $iccol = 4; } else
-			{ $ogcol = 4; $iccol = 3; }
 			my $node = $self->{circuits}->{$pc};
 			my $w = $p->Entry(%entrycenter, -text=>$node->shortid,
 			)->grid(-row=>$$row,-column=>0,-sticky=>'ewns');
@@ -7205,9 +7187,9 @@ sub fillstatus {
 			$p->Entry(%entryright, -textvariable=>\$self->{relate}->{$pc}->{actcnt}->{0},
 			)->grid(-row=>$$row,-column=>2,-sticky=>'ewns');
 			$p->Entry(%entryright, -textvariable=>\$self->{relate}->{$pc}->{actcnt}->{1},
-			)->grid(-row=>$$row,-column=>$ogcol,-sticky=>'ewns');
+			)->grid(-row=>$$row,-column=>3,-sticky=>'ewns');
 			$p->Entry(%entryright, -textvariable=>\$self->{relate}->{$pc}->{actcnt}->{2},
-			)->grid(-row=>$$row,-column=>$iccol,-sticky=>'ewns');
+			)->grid(-row=>$$row,-column=>4,-sticky=>'ewns');
 			$p->Entry(%entryright, -textvariable=>\$self->{relate}->{$pc}->{actcnt}->{3},
 			)->grid(-row=>$$row++,-column=>5,-sticky=>'ewns');
 		}
@@ -7400,7 +7382,7 @@ sub new {
 	my $self = {};
 	bless $self,$type;
 	$self->{top} = $top;
-	$self->Logging::init(@args);
+	$self->Logging::init($top,@args);
 	$self->Properties::init(@args);
 	$self->Status::init(@args);
 	$self->Clickable::init(@args);
@@ -7417,7 +7399,7 @@ sub new {
 	$c->CanvasBind('<ButtonPress-3>',[\&Network::button3,$self,$top,Tk::Ev('X'),Tk::Ev('Y'),Tk::Ev('x'),Tk::Ev('y')]);
 	$Network::network = $self;
 	#print STDERR "D: discovered ".$self->identify."\n";
-	$top->statusbar->configure(-text=>"Discovered ".$self->identify);
+	$top->setstatus("Discovered ".$self->identify);
 	return $self;
 }
 
@@ -7436,13 +7418,13 @@ sub shortid {
 
 #package Network;
 sub getChannel {
-	my ($self,$top,$ppa,@args) = @_;
+	my ($self,$top,$ppa,$dir,$xsn,@args) = @_;
 	return $self->{channels}->{$ppa} if $self->{channels}->{$ppa};
 	my $channelno = $self->{channelno} + 1;
 	my $loc = ::COL_ADJ;
 	my $nodea = $self->getNode($top,-$loc);
 	my $nodeb = $self->getNode($top, $loc);
-	my $channel = Channel->new($top,$channelno,$ppa,$nodea,$nodeb,@args);
+	my $channel = Channel->new($top,$self,$channelno,$ppa,$nodea,$nodeb,$dir,$xsn,@args);
 	$self->{channels}->{$ppa} = $channel;
 	$self->{channelno} = $channelno;
 	return $channel;
@@ -7822,43 +7804,16 @@ use vars qw(@ISA);
 # -------------------------------------
 
 use constant {
-	RT_UNKNOWN => 0,
-	RT_14BIT_PC => 4, # also RL length in octets
-	RT_24BIT_PC => 7  # also RL length in octets
+	MTP2_ANNEX_A_NOT_USED	    => 0,
+	MTP2_ANNEX_A_USED	    => 1,
+	MTP2_ANNEX_A_USED_UNKNOWN   => 2,
 };
-my @rloptions = (
-	['Unknown'	     => RT_UNKNOWN ],
-	['14-bit point code' => RT_14BIT_PC],
-	['24-bit point code' => RT_24BIT_PC],
-);
-use constant {
-	HT_UNKNOWN => 0,
-	HT_BASIC => 3,	 # also link level header length
-	HT_EXTENDED => 6 # also link level header length
-};
-my @htoptions = (
-	['Unknown'  => HT_UNKNOWN ],
-	['Basic'    => HT_BASIC	  ],
-	['Extended' => HT_EXTENDED],
-);
-use constant {
-	MP_UNKNOWN => 0,
-	MP_JAPAN => 1,
-	MP_NATIONAL => 2,
-	MP_INTERNATIONAL => 3
-};
-my @mpoptions = (
-	['Unknown'	    => MP_UNKNOWN	],
-	['Japan'	    => MP_JAPAN		],
-	['National'	    => MP_NATIONAL	],
-	['International'    => MP_INTERNATIONAL	],
-);
 
 #package Channel;
 sub init {
-	my ($self,$top,$channelno,$ppa,$nodea,$nodeb,$dir,$xsn,@args) = @_;
+	my ($self,$top,$network,$channelno,$ppa,$nodea,$nodeb,$dir,$xsn,@args) = @_;
 	$self->Pentastate::init($top,'black');
-	$self->Logging::init(@args);
+	$self->Logging::init($top,@args);
 	$self->Properties::init(@args);
 	$self->Status::init(@args);
 	$self->Clickable::init(@args);
@@ -7866,21 +7821,39 @@ sub init {
 	$self->MsgBuffer::init(@args);
 	$self->{no} = $channelno;
 	$self->{ppa} = $ppa;
-	$self->{slot} = (($ppa >> 0) & 0x1f);
-	$self->{span} = (($ppa >> 5) & 0x03);
-	$self->{card} = (($ppa >> 7) & 0x01);
+	my ($card,$span,$slot) = Channel::chan($ppa);
+	#print STDERR "D: creating channel\n";
+	#print STDERR "D: creation message direction is ", $dir & 0x1 ? 'received' : 'transmitted', "\n";
+	#print STDERR "D: will swap roles of ",$nodea->shortid," and ",$nodeb->shortid,"\n";
+	if ($dir & 0x2) {
+		# monitored half-duplex channel in a known direction
+		#print STDERR "D: channel is a monitored half-duplex channel in a known direction\n";
+		my $ppa2 = Channel::ppa($card,$span^0x1,$slot);
+		# tell messages from the other span how to find us
+		$network->{channels}->{$ppa2} = $self;
+		$self->{ppa} = $ppa2 unless $dir & 0x1;
+	} elsif ($dir & 0x4) {
+		# monitored half-duplex channel in an unknown direction
+		#print STDERR "D: channel is a monitored half-duplex channel in an unknown direction\n";
+	} else {
+		# active full-duplex channel in a known direction
+		#print STDERR "D: channel is an active full-duplex channel\n";
+	}
+	($nodea,$nodeb) = ($nodeb,$nodea) unless $dir & 0x1;
 	$self->{nodea} = $nodea;
 	$self->{nodeb} = $nodeb;
-	$self->{ht} = HT_UNKNOWN;
-	$self->{httext} = 'Unknown';
-	$self->{pr} = MP_UNKNOWN;
-	$self->{prtext} = 'Unknown';
-	$self->{rt} = RT_UNKNOWN;
-	$self->{rttext} = 'Unknown';
+	$self->{xsn} = $xsn; # just to save it
+	$xsn = MTP2_ANNEX_A_USED_UNKNOWN unless 0 <= $xsn and $xsn <= 2;
+	$xsn = MTP2_ANNEX_A_NOT_USED     if $xsn == 2 and $slot != 0;
+	$xsn = MTP2_ANNEX_A_USED	 if $xsn == 2 and $slot == 0;
+	$self->{ht}     = $htoptions[[1,2,0]->[$xsn]]->[1];
+	$self->{pr}     = ::MP_UNKNOWN;
+	$self->{rt}     = ::RT_UNKNOWN;
 	$self->{orig} = {};
 	$self->{dest} = {};
 	$self->Arcitem::init($top,$nodea,$nodeb,['node','relation','link','linkset'],[],'last',0);
 	$self->Clickable::attach($top,@args);
+	$self->log("header type set to ".$self->httext." by capture") if $self->{ht};
 }
 
 #package Channel;
@@ -7893,10 +7866,22 @@ sub new {
 }
 
 #package Channel;
+sub ppa {
+	my ($card,$span,$slot) = @_;
+	return (($card & 0x03) << 7) | (($span & 0x03) << 5) | (($slot & 0x1f) << 0);
+}
+#package Channel;
+sub chan {
+	my $ppa = shift;
+	return ((($ppa >> 0) & 0x1f), (($ppa >> 5) & 0x03), (($ppa >> 7) & 0x03));
+}
+
+#package Channel;
 sub bindchannel {
 	my ($self,$top,$network,$nodea,$nodeb,$msg) = @_;
 	return if $self->{link}; # already bound
 	#print STDERR "D: binding channel ".$self->identify."\n";
+	($nodea,$nodeb) = ($nodeb,$nodea) if $msg->{dir};
 	my $slc = $self->{slc} = $msg->{slc};
 	my ($pnodea,$pnodeb) = ($self->{nodea},$self->{nodeb});
 	$nodea->absorb($top,$pnodea);
@@ -7904,35 +7889,18 @@ sub bindchannel {
 	($self->{nodea},$self->{nodeb}) = ($nodea,$nodeb);
 	my $link = $network->getLink($top,$nodea,$nodeb,$slc);
 	$self->{link} = $link;
-	if ($self->{nodea}->{pc} == $link->{nodea}->{pc}) {
-		$link->{channelforw} = $self;
-		$self->{yoff} = $link->{yoff} - 1.5;
-		$self->{linkdir} = 0;
-	} else {
+	$self->{dir} = $nodea->{pc} == $link->{nodea}->{pc} ? 0 : 1;
+	if ($msg->{dir}^$self->{dir}) {
 		$link->{channelrevs} = $self;
 		$self->{yoff} = $link->{yoff} + 1.5;
-		$self->{linkdir} = 1;
+	} else {
+		$link->{channelforw} = $self;
+		$self->{yoff} = $link->{yoff} - 1.5;
 	}
 	$nodea->findaliases($top);
 	$nodeb->findaliases($top);
 }
 
-#package Channel;
-sub cardnum {
-	shift->{card};
-}
-#package Channel;
-sub spannum {
-	shift->{span};
-}
-#package Channel;
-sub slotnum {
-	shift->{slot};
-}
-#package Channel;
-sub ppa {
-	shift->{ppa};
-}
 #package Channel;
 sub add_msg {
 	my ($self,$top,$network,$msg,@args) = @_;
@@ -7966,20 +7934,28 @@ my %msghandler = (
 #package Channel;
 sub complete {
 	my ($self,$top,$network,$msg,@args) = @_;
-	$self->inc($msg,2);
+	$self->inc($msg,$msg->{dir});
 	$self->pushmsg($msg);
 	$network->add_msg($top,$msg);
 	if (exists $msg->{dpc}) {
-		my $nodea = $network->getSp($top,$msg->{opc},$self->{nodea}->{col},'O');
-		my $nodeb = $network->getSp($top,$msg->{dpc},$self->{nodeb}->{col},'I');
+		my ($cola,$colb,$sidea,$sideb,$dira,$dirb);
+		if ($msg->{dir}) {
+			$cola = $self->{nodeb}->{col}; $sidea = 'b'; $dira = 1;
+			$colb = $self->{nodea}->{col}; $sideb = 'a'; $dirb = 0;
+		} else {
+			$cola = $self->{nodea}->{col}; $sidea = 'a'; $dira = 0;
+			$colb = $self->{nodeb}->{col}; $sideb = 'b'; $dirb = 1;
+		}
+		my $nodea = $network->getSp($top,$msg->{opc},$cola);
+		my $nodeb = $network->getSp($top,$msg->{dpc},$colb);
 		if (my $sub = $msghandler{$msg->{si}}->{$msg->{mt}}) {
 			&{$sub}($self,$top,$network,$nodea,$nodeb,$msg);
 		}
-		$network->getPath($top,$self,'a',$nodea)->add_msg($top,$network,$msg,0);
-		$network->getPath($top,$self,'b',$nodeb)->add_msg($top,$network,$msg,1);
-		$network->getRouteset($top,$self,$nodea,$nodeb)->add_msg($top,$network,$msg);
+		$network->getPath($top,$self,$sidea,$nodea)->add_msg($top,$network,$msg,$dira);
+		$network->getPath($top,$self,$sideb,$nodeb)->add_msg($top,$network,$msg,$dirb);
+		$network->getRouteset($top,$self,$nodea,$nodeb)->add_msg($top,$network,$msg,0);
 	}
-	$self->{link}->add_msg($top,$network,$msg,$self->{linkdir}) if $self->{link};
+	$self->{link}->add_msg($top,$network,$msg,$msg->{dir}^$self->{dir}) if $self->{link};
 }
 #package Channel;
 sub swap {
@@ -8006,56 +7982,52 @@ sub detecting {
 }
 
 #package Channel;
+sub httext { return $htoptions[{0=>0,3=>1,6=>2}->{shift->{ht}}]->[0]; }
+#package Channel;
 sub setht {
-	my ($self,$ht) = @_;
-	$self->{ht} = $ht;
-	if ($ht == HT_UNKNOWN) {
-		$self->{httext} = 'Unknown';
-	} elsif ($ht == HT_BASIC) {
-		$self->{httext} = 'Basic';
-	} elsif ($ht == HT_EXTENDED) {
-		$self->{httext} = 'Extended';
+	my ($self,$ht,$oldht) = @_;
+	if (($oldht = $self->{ht}) != $ht) { $self->{ht} = $ht;
+		#print STDERR "D: detected header type ", $self->httext, " for ", $self->identify, "\n";
+		$self->log("detected header type ".$self->httext) if $oldht  == ::HT_UNKNOWN;
 	}
 }
+
+#package Channel;
+sub rttext { return $rtoptions[{0=>0,4=>1,7=>2}->{shift->{rt}}]->[0]; }
 #package Channel;
 sub setrt {
-	my ($self,$rt) = @_;
-	$self->{rt} = $rt;
-	if ($rt == RT_UNKNOWN) {
-		$self->{rttext} = 'Unknown';
-	} elsif ($rt == RT_14BIT_PC) {
-		$self->{rttext} = '14-bit point code';
-	} elsif ($rt == RT_24BIT_PC) {
-		$self->{rttext} = '24-bit point code';
+	my ($self,$rt,$oldrt) = @_;
+	if (($oldrt = $self->{rt}) != $rt) { $self->{rt} = $rt;
+		#print STDERR "D: detected routing label ", $self->rttext, " for ", $self->identify, "\n";
+		$self->log("detected routing label ".$self->rttext) if $oldrt  == ::RT_UNKNOWN;
 	}
 }
 #package Channel;
+sub prtext { return $mpoptions[shift->{pr}]->[0]; }
+#package Channel;
 sub setpr {
-	my ($self,$pr) = @_;
-	$self->{pr} = $pr;
-	if ($pr == MP_UNKNOWN) {
-		$self->{prtext} = 'Unknown';
-	} elsif ($pr == MP_JAPAN) {
-		$self->{prtext} = 'Japan';
-	} elsif ($pr == MP_NATIONAL) {
-		$self->{prtext} = 'National';
-	} elsif ($pr == MP_INTERNATIONAL) {
-		$self->{prtext} = 'International';
+	my ($self,$pr,$oldpr) = @_;
+	if (($oldpr = $self->{pr}) != $pr) { $self->{pr} = $pr;
+		#print STDERR "D: detected priority type ", $self->prtext, " for ", $self->identify, "\n";
+		$self->log("detected priority type ".$self->prtext) if $oldpr == ::MP_UNKNOWN;
 	}
 }
 
 #package Channel;
 sub identify {
 	my $self = shift;
-	my $id = "Channel $self->{card}:$self->{span}:$self->{slot},";
-	$id .= " $self->{nodea}->{pcode} -> $self->{nodeb}->{pcode} link $self->{slc}" if $self->{nodea};
+	my ($card,$span,$slot) = Channel::chan($self->{ppa});
+	my $id = "Channel $card:$span:$slot";
+	$id .= ", $self->{nodea}->{pcode} -> $self->{nodeb}->{pcode} link $self->{slc}"
+		if $self->{nodea} and $self->{nodea}->isa('SP');
 	return ($self->{id} = $id);
 }
 
 #package Channel;
 sub shortid {
 	my $self = shift;
-	return "$self->{card}:$self->{span}:$self->{slot}";
+	my ($card,$span,$slot) = Channel::chan($self->{ppa});
+	return "$card:$span:$slot";
 }
 
 #package Channel;
@@ -8082,7 +8054,7 @@ sub getmore {
 sub fillprops {
 	my ($self,$top,$tw,$row) = @_;
 
-	my $ppa = "$self->{card}:$self->{span}:$self->{slot}";
+	my $ppa = $self->shortid;
 	$tw->Label(%labelright,
 		-text=>'Channel:',
 	)->grid(-row=>$$row,-column=>0,-sticky=>'ewns');
@@ -8095,7 +8067,7 @@ sub fillprops {
 sub fillstatus {
 	my ($self,$top,$tw,$row) = @_;
 
-	my $ppa = "$self->{card}:$self->{span}:$self->{slot}";
+	my $ppa = $self->shortid;
 	if ($self->{nodea} && $self->{nodeb}) {
 		$tw->Label(%labelright,
 			-text=>'Signalling link code:',
@@ -8123,26 +8095,29 @@ sub fillstatus {
 	$tw->Label(%labelright,
 		-text=>'Header type:',
 	)->grid(-row=>$$row,-column=>0,-sticky=>'ewns');
+	my $httext = $self->httext;
 	$tw->Optionmenu(%optionleft,
 		-options=>\@htoptions,
 		-variable=>\$self->{ht},
-		-textvariable=>\$self->{httext},
+		-textvariable=>\$httext,
 	)->grid(-row=>$$row++,-column=>1,-sticky=>'ewns');
 	$tw->Label(%labelright,
 		-text=>'Message priority:',
 	)->grid(-row=>$$row,-column=>0,-sticky=>'ewns');
+	my $prtext = $self->prtext;
 	$tw->Optionmenu(%optionleft,
 		-options=>\@mpoptions,
 		-variable=>\$self->{pr},
-		-textvariable=>\$self->{prtext},
+		-textvariable=>\$prtext,
 	)->grid(-row=>$$row++,-column=>1,-sticky=>'ewns');
 	$tw->Label(%labelright,
 		-text=>'Routing label type:',
 	)->grid(-row=>$$row,-column=>0,-sticky=>'ewns');
+	my $rttext = $self->rttext;
 	$tw->Optionmenu(%optionleft,
-		-options=>\@rloptions,
+		-options=>\@rtoptions,
 		-variable=>\$self->{rt},
-		-textvariable=>\$self->{rttext},
+		-textvariable=>\$rttext,
 	)->grid(-row=>$$row++,-column=>1,-sticky=>'ewns');
 	$self->fillstate($top,$tw,$row);
 }
@@ -8561,14 +8536,9 @@ sub new {
 # -------------------------------------
 package SpcField; use strict; use vars qw(@ISA); @ISA = qw(BitField);
 # -------------------------------------
-use constant {
-	RT_UNKNOWN => 0,
-	RT_14BIT_PC => 4, # also RL length in octets
-	RT_24BIT_PC => 7  # also RL length in octets
-};
 sub new {
 	my ($type,$b,$p,$rt,@args) = @_;
-	if ($rt == RT_14BIT_PC) {
+	if ($rt == ::RT_14BIT_PC) {
 		return BitField::new($type,$b,$p,0,13,@args);
 	} else {
 		return BitField::new($type,$b,$p,0,23,@args);
@@ -9101,22 +9071,6 @@ package IcciIsupParameter; use strict; use vars qw(@ISA); @ISA = qw(VarIsupParam
 package Message;
 use strict;
 # -------------------------------------
-use constant {
-	RT_UNKNOWN => 0,
-	RT_14BIT_PC => 4, # also RL length in octets
-	RT_24BIT_PC => 7  # also RL length in octets
-};
-use constant {
-	HT_UNKNOWN => 0,
-	HT_BASIC => 3,	 # also link level header length
-	HT_EXTENDED => 6 # also link level header length
-};
-use constant {
-	MP_UNKNOWN => 0,
-	MP_JAPAN => 1,
-	MP_NATIONAL => 2,
-	MP_INTERNATIONAL => 3
-};
 # $msg = Message::create($pcap);
 #package Message;
 sub create {
@@ -9145,6 +9099,7 @@ sub create {
 sub process {
 	my ($self,$top,$network) = @_;
 	my $channel = $network->getChannel($top,$self->{ppa},$self->{dir},$self->{xsn});
+	$self->{dir} = ($self->{dir} ^ 0x1) & 0x1;
 	if ($self->decode($channel) >= 0) {
 		$channel->add_msg($top,$network,$self);
 		return;
@@ -9159,20 +9114,20 @@ sub decode {
 	if (!exists $self->{mtp2decode}) {
 		my $len = $self->{hdr}->{len};
 		if (3 <= $len && $len <= 5) {
-			$channel->setht(HT_BASIC);
+			$channel->setht(::HT_BASIC);
 		} elsif (6 <= $len && $len <= 8) {
-			$channel->setht(HT_EXTENDED);
+			$channel->setht(::HT_EXTENDED);
 		}
-		return 0 unless $channel->{ht} != HT_UNKNOWN;
+		return 0 unless $channel->{ht} != ::HT_UNKNOWN;
 		my ($bsn,$bib,$fsn,$fib,$li,$li0);
-		if ($channel->{ht} == HT_BASIC) {
+		if ($channel->{ht} == ::HT_BASIC) {
 			$self->{bsn} = $b[0] & 0x7f;
 			$self->{bib} = $b[0] >> 7;
 			$self->{fsn} = $b[1] & 0x7f;
 			$self->{fib} = $b[1] >> 7;
 			$self->{li} = $b[2] & 0x3f;
 			$self->{li0} = $b[2] >> 6;
-		} elsif ($channel->{ht} == HT_EXTENDED) {
+		} elsif ($channel->{ht} == ::HT_EXTENDED) {
 			$self->{bsn} = $b[0];
 			$self->{bsn} |= ($b[1] & 0x0f) << 8;
 			$self->{bib} = $b[1] >> 7;
@@ -9188,8 +9143,8 @@ sub decode {
 			print STDERR "W: bad length indicator $self->{li} != $inf\n";
 		}
 		if ($self->{li0} != 0) {
-			$channel->setrt(RT_24BIT_PC);
-			$channel->setpr(MP_JAPAN);
+			$channel->setrt(::RT_24BIT_PC);
+			$channel->setpr(::MP_JAPAN);
 		}
 		$self->{mtp2decode} = 1;
 	}
@@ -9201,31 +9156,34 @@ sub decode {
 	$self->{mp} = ($b[0] & 0x30) >> 4;
 	$self->{si} = ($b[0] & 0x0f);
 	if ($self->{ni} == 0) {
-		$channel->setrt(RT_14BIT_PC);
-		$channel->setpr(MP_INTERNATIONAL);
+		$channel->setrt(::RT_14BIT_PC);
+		$channel->setpr(::MP_INTERNATIONAL);
 	}
-	if ($channel->{pr} == MP_UNKNOWN) {
-		$channel->setpr(MP_NATIONAL) if $self->{mp} != 0;
-	} elsif ($channel->{pr} == MP_JAPAN) {
+	if ($channel->{pr} == ::MP_UNKNOWN) {
+		$channel->setpr(::MP_NATIONAL) if $self->{mp} != 0;
+	} elsif ($channel->{pr} == ::MP_JAPAN) {
 		$self->{mp} = $self->{li0};
-	} elsif ($channel->{pr} == MP_INTERNATIONAL) {
+	} elsif ($channel->{pr} == ::MP_INTERNATIONAL) {
 		$self->{mp} = 0;
 	}
-	if ($self->{li} < HT_EXTENDED) {
+	if ($self->{li} < ::HT_EXTENDED) {
 		print STDERR "W: too short for RL, li = $self->{li}\n";
 		return -1;
 	}
 	if ($self->{li} < 9 || ($self->{si} == 5 && $self->{li} < 11)) {
-		$channel->setrt(RT_14BIT_PC);
+		$channel->setrt(::RT_14BIT_PC);
 	}
-	if ($channel->{rt} == RT_UNKNOWN) {
-		my $ret = $self->checkRoutingLabelType($self->{si},$channel,$self->{li},\@b) < 0;
-		return $ret if $ret <= 0;
-		print "check succeeded on si=$self->{si}, mt=$self->{mt}";
+	if ($channel->{rt} == ::RT_UNKNOWN) {
+		my $ret = $self->checkRoutingLabelType($self->{si},$channel,$self->{li},\@b);
+		if ($ret <= 0) {
+			#print STDERR "D: check failed on si=$self->{si} for ",$channel->identify,"\n";
+			return $ret;
+		}
+		#print STDERR "D: check succeeded on si=$self->{si} for ",$channel->identify,"\n";
 	}
 	if (!exists $self->{mtp3decode}) {
 		return 0 if $channel->detecting;
-		if ($channel->{rt} == RT_14BIT_PC) {
+		if ($channel->{rt} == ::RT_14BIT_PC) {
 			if ($self->{li} < 6) {
 				print STDERR "W: too short for 14-bit RL, li = $self->{li}\n";
 				return -1;
@@ -9266,7 +9224,7 @@ sub decode {
 			print STDERR "W: no message type for si=$self->{si}, mt=$self->{mt}\n";
 		}
 		if ($self->{si} == 1 || $self->{si} == 2) {
-			if ($channel->{rt} == RT_14BIT_PC) {
+			if ($channel->{rt} == ::RT_14BIT_PC) {
 				$self->{slc} = $self->{sls};
 				$self->{dlen0} = $b[1] & 0x0f;
 			} else {
@@ -9306,21 +9264,21 @@ sub checkSnmm {
 	my $itut = $self->checkItutSnmm($channel,@args);
 	if ($ansi == PT_YES) {
 		return 0 if $itut == PT_YES;
-		$channel->setrt(RT_24BIT_PC);
+		$channel->setrt(::RT_24BIT_PC);
 		return 1;
 	}
 	elsif ($ansi == PT_MAYBE) {
 		return 0 if $itut == PT_MAYBE;
 		if ($itut == PT_YES) {
-			$channel->setrt(RT_14BIT_PC);
+			$channel->setrt(::RT_14BIT_PC);
 		} else {
-			$channel->setrt(RT_24BIT_PC);
+			$channel->setrt(::RT_24BIT_PC);
 		}
 		return 1;
 	}
 	else {
 		return -1 if $itut == PT_NO;
-		$channel->setrt(RT_14BIT_PC);
+		$channel->setrt(::RT_14BIT_PC);
 		return 1;
 	}
 }
@@ -9389,21 +9347,21 @@ sub checkSntm {
 	my $itut = $self->checkItutSntm($channel,@args);
 	if ($ansi == PT_YES) {
 		return 0 if $itut == PT_YES;
-		$channel->setrt(RT_24BIT_PC);
+		$channel->setrt(::RT_24BIT_PC);
 		return 1;
 	}
 	elsif ($ansi == PT_MAYBE) {
 		return 0 if $itut == PT_MAYBE;
 		if ($itut == PT_YES) {
-			$channel->setrt(RT_14BIT_PC);
+			$channel->setrt(::RT_14BIT_PC);
 		} else {
-			$channel->setrt(RT_24BIT_PC);
+			$channel->setrt(::RT_24BIT_PC);
 		}
 		return 1;
 	}
 	else {
 		return -1 if $itut == PT_NO;
-		$channel->setrt(RT_14BIT_PC);
+		$channel->setrt(::RT_14BIT_PC);
 		return 1;
 	}
 }
@@ -9438,21 +9396,21 @@ sub checkSnsm {
 	my $itut = $self->checkItutSntm($channel,@args);
 	if ($ansi == PT_YES) {
 		return 0 if $itut == PT_YES;
-		$channel->setrt(RT_24BIT_PC);
+		$channel->setrt(::RT_24BIT_PC);
 		return 1;
 	}
 	elsif ($ansi == PT_MAYBE) {
 		return 0 if $itut == PT_MAYBE;
 		if ($itut == PT_YES) {
-			$channel->setrt(RT_14BIT_PC);
+			$channel->setrt(::RT_14BIT_PC);
 		} else {
-			$channel->setrt(RT_24BIT_PC);
+			$channel->setrt(::RT_24BIT_PC);
 		}
 		return 1;
 	}
 	else {
 		return -1 if $itut == PT_NO;
-		$channel->setrt(RT_14BIT_PC);
+		$channel->setrt(::RT_14BIT_PC);
 		return 1;
 	}
 }
@@ -9472,21 +9430,21 @@ sub checkSccp {
 	my $itut = $self->checkItutSccp($channel,$b);
 	if ($ansi == PT_YES) {
 		return 0 if $itut == PT_YES;
-		$channel->setrt(RT_24BIT_PC);
+		$channel->setrt(::RT_24BIT_PC);
 		return 1;
 	}
 	elsif ($ansi == PT_MAYBE) {
 		return 0 if $itut == PT_MAYBE;
 		if ($itut == PT_YES) {
-			$channel->setrt(RT_14BIT_PC);
+			$channel->setrt(::RT_14BIT_PC);
 		} else {
-			$channel->setrt(RT_24BIT_PC);
+			$channel->setrt(::RT_24BIT_PC);
 		}
 		return 1;
 	}
 	else {
 		return -1 if $itut == PT_NO;
-		$channel->setrt(RT_14BIT_PC);
+		$channel->setrt(::RT_14BIT_PC);
 		return 1;
 	}
 }
@@ -9511,21 +9469,21 @@ sub checkIsup {
 	my $itut = $self->checkItutIsup($channel,@args);
 	if ($ansi == PT_YES) {
 		return 0 if $itut == PT_YES;
-		$channel->setrt(RT_24BIT_PC);
+		$channel->setrt(::RT_24BIT_PC);
 		return 1;
 	}
 	elsif ($ansi == PT_MAYBE) {
 		return 0 if $itut == PT_MAYBE;
 		if ($itut == PT_YES) {
-			$channel->setrt(RT_14BIT_PC);
+			$channel->setrt(::RT_14BIT_PC);
 		} else {
-			$channel->setrt(RT_24BIT_PC);
+			$channel->setrt(::RT_24BIT_PC);
 		}
 		return 1;
 	}
 	else {
 		return -1 if $itut == PT_NO;
-		$channel->setrt(RT_14BIT_PC);
+		$channel->setrt(::RT_14BIT_PC);
 		return 1;
 	}
 }
@@ -9633,7 +9591,7 @@ sub decodeit {
 	my @l2h = ();
 	my $p = 0;
 	my $li = 0;
-	if ($channel->{ht} == HT_EXTENDED) {
+	if ($channel->{ht} == ::HT_EXTENDED) {
 		push @l2h, XBsnField->new($b,$p);
 		push @l2h, XBsn0Field->new($b,$p);
 		push @l2h, XBibField->new($b,$p);
@@ -9642,20 +9600,20 @@ sub decodeit {
 		push @l2h, XFibField->new($b,$p);
 		push @l2h, ($li = XliField->new($b,$p));
 		push @l2h, Xli0Field->new($b,$p);
-		push @l2h, XjmpField->new($b,$p) if $channel->{pr} == MP_JAPAN;
-		$p += HT_EXTENDED;
+		push @l2h, XjmpField->new($b,$p) if $channel->{pr} == ::MP_JAPAN;
+		$p += ::HT_EXTENDED;
 	} else {
 		push @l2h, BsnField->new($b,$p);
 		push @l2h, BibField->new($b,$p);
 		push @l2h, FsnField->new($b,$p);
 		push @l2h, FibField->new($b,$p);
 		push @l2h, ($li = LiField->new($b,$p));
-		if ($channel->{pr} == MP_JAPAN) {
+		if ($channel->{pr} == ::MP_JAPAN) {
 			push @l2h, JmpFiled->new($b,$p);
 		} else {
 			push @l2h, LiField->new($b,$p);
 		}
-		$p += HT_BASIC;
+		$p += ::HT_BASIC;
 	}
 	$self->{dec}->{l2h} = \@l2h;
 	return if $li->{val} == 0;
@@ -9673,16 +9631,16 @@ sub decodeit {
 	push @sio, NiField->new($b,$p);
 	$p++;
 	my @rl = ();
-	if ($channel->{rt} == RT_24BIT_PC) {
+	if ($channel->{rt} == ::RT_24BIT_PC) {
 		push @rl, Dpc24Field->new($b,$p);
 		push @rl, Opc24Field->new($b,$p);
 		push @rl, Sls24Field->new($b,$p);
-		$p += RT_24BIT_PC;
+		$p += ::RT_24BIT_PC;
 	} else {
 		push @rl, Dpc14Field->new($b,$p);
 		push @rl, Opc14Field->new($b,$p);
 		push @rl, Slc14Field->new($b,$p);
-		$p += RT_14BIT_PC;
+		$p += ::RT_14BIT_PC;
 	}
 }
 #package Message;
@@ -9871,7 +9829,7 @@ sub hlist {
 	$hl->itemCreate('1',3,-text=>'L2 Header');
 	$hl->indicator('create','1',-itemtype=>'image',-image=>$self->{tree}->{1});
 	my $sio;
-	if ($self->{channel}->{ht} == HT_EXTENDED) {
+	if ($self->{channel}->{ht} == ::HT_EXTENDED) {
 		$self->makeentry($hl,0,0,11,$self->{bsn},'BSN','1.2','Backward Sequence Number');
 		$self->makeentry($hl,1,7,7,$self->{bib},'BIB','1.1','Backward Indicator Bit');
 		$self->makeentry($hl,2,0,11,$self->{fsn},'FSN','1.4','Forward Sequence Number');
@@ -9928,7 +9886,7 @@ sub hlist {
 			$self->makeentry($hl,11,0,7,$self->{mt},'MT','3.1',$desc,);
 		} elsif ($self->{si} == 1 || $self->{si} == 2) {
 			$self->makeentry($hl,11,0,7,$self->{mt},'MT','3.1',$desc,);
-			if ($self->{channel}->{rt} == RT_24BIT_PC) {
+			if ($self->{channel}->{rt} == ::RT_24BIT_PC) {
 				$self->makeentry($hl,12,0,3,$self->{slc},'SLC','3.2','Signalling Link Code');
 			} else {
 				$self->makeentry($hl,12,0,3,$self->{slc},'SLC','3.2','Signalling Link Code');
@@ -9983,14 +9941,9 @@ sub decode {
 # -------------------------------------
 package ComMessage; use strict; use vars qw(@ISA); @ISA = qw(SnmmMessage);
 # -------------------------------------
-use constant {
-	RT_UNKNOWN => 0,
-	RT_14BIT_PC => 4, # also RL length in octets
-	RT_24BIT_PC => 7  # also RL length in octets
-};
 sub decode {
 	my ($self,$b,$o) = @_;
-	if ($self->{channel}->{rt} == RT_14BIT_PC) {
+	if ($self->{channel}->{rt} == ::RT_14BIT_PC) {
 		$self->{slc} = $self->{sls};
 		$self->{fsnl} = $b->[$$o] & 0x7f;
 		$self->{fsnl0} = $b->[$$o] >> 7;
@@ -10007,14 +9960,9 @@ sub decode {
 # -------------------------------------
 package CbmMessage; use strict; use vars qw(@ISA); @ISA = qw(SnmmMessage);
 # -------------------------------------
-use constant {
-	RT_UNKNOWN => 0,
-	RT_14BIT_PC => 4, # also RL length in octets
-	RT_24BIT_PC => 7  # also RL length in octets
-};
 sub decode {
 	my ($self,$b,$o) = @_;
-	if ($self->{channel}->{rt} == RT_14BIT_PC) {
+	if ($self->{channel}->{rt} == ::RT_14BIT_PC) {
 		$self->{slc} = $self->{sls};
 		$self->{cbc} = $b->[$$o];
 		$$o++;
@@ -10030,14 +9978,9 @@ sub decode {
 # -------------------------------------
 package SlmMessage; use strict; use vars qw(@ISA); @ISA = qw(SnmmMessage);
 # -------------------------------------
-use constant {
-	RT_UNKNOWN => 0,
-	RT_14BIT_PC => 4, # also RL length in octets
-	RT_24BIT_PC => 7  # also RL length in octets
-};
 sub decode {
 	my ($self,$b,$o) = @_;
-	if ($self->{channel}->{rt} == RT_14BIT_PC) {
+	if ($self->{channel}->{rt} == ::RT_14BIT_PC) {
 		$self->{slc} = $self->{sls};
 	} else {
 		$self->{slc} = $b->[$$o] & 0x0f;
@@ -10048,14 +9991,9 @@ sub decode {
 # -------------------------------------
 package TfmMessage; use strict; use vars qw(@ISA); @ISA = qw(SnmmMessage);
 # -------------------------------------
-use constant {
-	RT_UNKNOWN => 0,
-	RT_14BIT_PC => 4, # also RL length in octets
-	RT_24BIT_PC => 7  # also RL length in octets
-};
 sub decode {
 	my ($self,$b,$o,$rt) = @_;
-	if ($rt == RT_14BIT_PC) {
+	if ($rt == ::RT_14BIT_PC) {
 		$self->{dest} = $b->[$$o];
 		$$o++;
 		$self->{dest} |= ($b->[$$o] & 0x3f) << 8;
@@ -10073,14 +10011,9 @@ sub decode {
 # -------------------------------------
 package UpmMessage; use strict; use vars qw(@ISA); @ISA = qw(SnmmMessage);
 # -------------------------------------
-use constant {
-	RT_UNKNOWN => 0,
-	RT_14BIT_PC => 4, # also RL length in octets
-	RT_24BIT_PC => 7  # also RL length in octets
-};
 sub decode {
 	my ($self,$b,$o,$rt) = @_;
-	if ($rt == RT_14BIT_PC) {
+	if ($rt == ::RT_14BIT_PC) {
 		$self->{dest} = $b->[$$o];
 		$$o++;
 		$self->{dest} |= ($b->[$$o] & 0x3f) << 8;
@@ -10122,14 +10055,9 @@ package RctMessage; use strict; use vars qw(@ISA); @ISA = qw(SnmmMessage);
 # -------------------------------------
 package TfcMessage; use strict; use vars qw(@ISA); @ISA = qw(SnmmMessage);
 # -------------------------------------
-use constant {
-	RT_UNKNOWN => 0,
-	RT_14BIT_PC => 4, # also RL length in octets
-	RT_24BIT_PC => 7  # also RL length in octets
-};
 sub decode {
 	my ($self,$b,$o) = @_;
-	if ($self->{channel}->{rt} == RT_14BIT_PC) {
+	if ($self->{channel}->{rt} == ::RT_14BIT_PC) {
 		$self->{dest} = $b->[$$o];
 		$$o++;
 		$self->{dest} |= ($b->[$$o] & 0x3f) << 8;
@@ -10210,14 +10138,9 @@ package TrwMessage; use strict; use vars qw(@ISA); @ISA = qw(SnmmMessage);
 # -------------------------------------
 package DlcMessage; use strict; use vars qw(@ISA); @ISA = qw(SnmmMessage);
 # -------------------------------------
-use constant {
-	RT_UNKNOWN => 0,
-	RT_14BIT_PC => 4, # also RL length in octets
-	RT_24BIT_PC => 7  # also RL length in octets
-};
 sub decode {
 	my ($self,$b,$o,$rt) = @_;
-	if ($rt == RT_14BIT_PC) {
+	if ($rt == ::RT_14BIT_PC) {
 		$self->{slc} = $self->{sls};
 		$self->{sdli} = $b->[$$o];
 		$$o++;
@@ -10257,14 +10180,9 @@ package UptMessage; use strict; use vars qw(@ISA); @ISA = qw(UpmMessage);
 # -------------------------------------
 package SntmMessage; use strict; use vars qw(@ISA); @ISA = qw(MsuMessage);
 # -------------------------------------
-use constant {
-	RT_UNKNOWN => 0,
-	RT_14BIT_PC => 4, # also RL length in octets
-	RT_24BIT_PC => 7  # also RL length in octets
-};
 sub decode {
 	my ($self,$b,$o,$rt) = @_;
-	if ($rt == RT_14BIT_PC) {
+	if ($rt == ::RT_14BIT_PC) {
 		$self->{slc} = $self->{sls};
 		$self->{dlen0} = $b->[$$o] & 0x0f;
 	} else {
@@ -10486,14 +10404,9 @@ sub oparms {
 # -------------------------------------
 package IamMessage; use strict; use vars qw(@ISA); @ISA = qw(IsupMessage);
 # -------------------------------------
-use constant {
-	RT_UNKNOWN => 0,
-	RT_14BIT_PC => 4, # also RL length in octets
-	RT_24BIT_PC => 7  # also RL length in octets
-};
 sub decode {
 	my ($self,$b,$p,$e,$rt) = @_;
-	if ($rt == RT_14BIT_PC) {
+	if ($rt == ::RT_14BIT_PC) {
 		$self->{nci} = NciIsupParameter->man($b,$p,$e,$rt);
 		$self->{fci} = FciIsupParameter->man($b,$p,$e,$rt);
 		$self->{cpc} = CpcIsupParameter->man($b,$p,$e,$rt);
@@ -10511,14 +10424,9 @@ sub decode {
 # -------------------------------------
 package SamMessage; use strict; use vars qw(@ISA); @ISA = qw(IsupMessage);
 # -------------------------------------
-use constant {
-	RT_UNKNOWN => 0,
-	RT_14BIT_PC => 4, # also RL length in octets
-	RT_24BIT_PC => 7  # also RL length in octets
-};
 sub decode {
 	my ($self,$b,$p,$e,$rt) = @_;
-	if ($rt == RT_14BIT_PC) {
+	if ($rt == ::RT_14BIT_PC) {
 		$self->{subn} = SubnIsupParameter->man($b,$p,$e,$rt);
 		$self->{oparms} = $self->oparms($b,$p,$e,$rt);
 	}
@@ -10557,14 +10465,9 @@ sub decode {
 # -------------------------------------
 package ConMessage; use strict; use vars qw(@ISA); @ISA = qw(IsupMessage);
 # -------------------------------------
-use constant {
-	RT_UNKNOWN => 0,
-	RT_14BIT_PC => 4, # also RL length in octets
-	RT_24BIT_PC => 7  # also RL length in octets
-};
 sub decode {
 	my ($self,$b,$p,$e,$rt) = @_;
-	if ($rt == RT_14BIT_PC) {
+	if ($rt == ::RT_14BIT_PC) {
 		$self->{bci} = BciIsupParameter->man($b,$p,$e,$rt);
 		$self->{oparms} = $self->oparms($b,$p,$e,$rt);
 	}
@@ -10610,14 +10513,9 @@ sub decode {
 # -------------------------------------
 package RlcMessage; use strict; use vars qw(@ISA); @ISA = qw(IsupMessage);
 # -------------------------------------
-use constant {
-	RT_UNKNOWN => 0,
-	RT_14BIT_PC => 4, # also RL length in octets
-	RT_24BIT_PC => 7  # also RL length in octets
-};
 sub decode {
 	my ($self,$b,$p,$e,$rt) = @_;
-	if ($rt == RT_14BIT_PC) {
+	if ($rt == ::RT_14BIT_PC) {
 		$self->{oparms} = $self->oparms($b,$p,$e,$rt);
 	}
 }
@@ -10681,14 +10579,9 @@ sub decode {
 # -------------------------------------
 package CmrMessage; use strict; use vars qw(@ISA); @ISA = qw(IsupMessage);
 # -------------------------------------
-use constant {
-	RT_UNKNOWN => 0,
-	RT_14BIT_PC => 4, # also RL length in octets
-	RT_24BIT_PC => 7  # also RL length in octets
-};
 sub decode {
 	my ($self,$b,$p,$e,$rt) = @_;
-	if ($rt == RT_14BIT_PC) {
+	if ($rt == ::RT_14BIT_PC) {
 		$self->{cmi} = CmiIsupParameter->man($b,$p,$e,$rt);
 		$self->{oparms} = $self->oparms($b,$p,$e,$rt);
 	}
@@ -10696,14 +10589,9 @@ sub decode {
 # -------------------------------------
 package CmcMessage; use strict; use vars qw(@ISA); @ISA = qw(IsupMessage);
 # -------------------------------------
-use constant {
-	RT_UNKNOWN => 0,
-	RT_14BIT_PC => 4, # also RL length in octets
-	RT_24BIT_PC => 7  # also RL length in octets
-};
 sub decode {
 	my ($self,$b,$p,$e,$rt) = @_;
-	if ($rt == RT_14BIT_PC) {
+	if ($rt == ::RT_14BIT_PC) {
 		$self->{cmi} = CmiIsupParameter->man($b,$p,$e,$rt);
 		$self->{oparms} = $self->oparms($b,$p,$e,$rt);
 	}
@@ -10711,14 +10599,9 @@ sub decode {
 # -------------------------------------
 package CmrjMessage; use strict; use vars qw(@ISA); @ISA = qw(IsupMessage);
 # -------------------------------------
-use constant {
-	RT_UNKNOWN => 0,
-	RT_14BIT_PC => 4, # also RL length in octets
-	RT_24BIT_PC => 7  # also RL length in octets
-};
 sub decode {
 	my ($self,$b,$p,$e,$rt) = @_;
-	if ($rt == RT_14BIT_PC) {
+	if ($rt == ::RT_14BIT_PC) {
 		$self->{cmi} = CmiIsupParameter->man($b,$p,$e,$rt);
 		$self->{oparms} = $self->oparms($b,$p,$e,$rt);
 	}
@@ -10751,14 +10634,9 @@ sub decode {
 # -------------------------------------
 package FadMessage; use strict; use vars qw(@ISA); @ISA = qw(IsupMessage);
 # -------------------------------------
-use constant {
-	RT_UNKNOWN => 0,
-	RT_14BIT_PC => 4, # also RL length in octets
-	RT_24BIT_PC => 7  # also RL length in octets
-};
 sub decode {
 	my ($self,$b,$p,$e,$rt) = @_;
-	if ($rt == RT_24BIT_PC) {
+	if ($rt == ::RT_24BIT_PC) {
 		$self->{faci} = FaciIsupParameter->man($b,$p,$e,$rt);
 		$self->{oparms} = $self->oparms($b,$p,$e,$rt);
 	}
@@ -10766,14 +10644,9 @@ sub decode {
 # -------------------------------------
 package FaiMessage; use strict; use vars qw(@ISA); @ISA = qw(IsupMessage);
 # -------------------------------------
-use constant {
-	RT_UNKNOWN => 0,
-	RT_14BIT_PC => 4, # also RL length in octets
-	RT_24BIT_PC => 7  # also RL length in octets
-};
 sub decode {
 	my ($self,$b,$p,$e,$rt) = @_;
-	if ($rt == RT_24BIT_PC) {
+	if ($rt == ::RT_24BIT_PC) {
 		$self->{faci} = FaciIsupParameter->man($b,$p,$e,$rt);
 		$self->{faii} = FaiiIsupParameter->man($b,$p,$e,$rt);
 		$self->{oparms} = $self->oparms($b,$p,$e,$rt);
@@ -10791,14 +10664,9 @@ package CsvrMessage; use strict; use vars qw(@ISA); @ISA = qw(IsupMessage);
 # -------------------------------------
 package DrsMessage; use strict; use vars qw(@ISA); @ISA = qw(IsupMessage);
 # -------------------------------------
-use constant {
-	RT_UNKNOWN => 0,
-	RT_14BIT_PC => 4, # also RL length in octets
-	RT_24BIT_PC => 7  # also RL length in octets
-};
 sub decode {
 	my ($self,$b,$p,$e,$rt) = @_;
-	if ($rt == RT_14BIT_PC) {
+	if ($rt == ::RT_14BIT_PC) {
 		$self->{oparms} = $self->oparms($b,$p,$e,$rt);
 	}
 }
@@ -10838,14 +10706,9 @@ sub decode {
 # -------------------------------------
 package UsrMessage; use strict; use vars qw(@ISA); @ISA = qw(IsupMessage);
 # -------------------------------------
-use constant {
-	RT_UNKNOWN => 0,
-	RT_14BIT_PC => 4, # also RL length in octets
-	RT_24BIT_PC => 7  # also RL length in octets
-};
 sub decode {
 	my ($self,$b,$p,$e,$rt) = @_;
-	if ($rt == RT_14BIT_PC) {
+	if ($rt == ::RT_14BIT_PC) {
 		$self->{uui} = UuiIsupParameter->man($b,$p,$e,$rt);
 		$self->{oparms} = $self->oparms($b,$p,$e,$rt);
 	}
@@ -10867,14 +10730,9 @@ package OlmMessage; use strict; use vars qw(@ISA); @ISA = qw(IsupMessage);
 # -------------------------------------
 package CrgMessage; use strict; use vars qw(@ISA); @ISA = qw(IsupMessage);
 # -------------------------------------
-use constant {
-	RT_UNKNOWN => 0,
-	RT_14BIT_PC => 4, # also RL length in octets
-	RT_24BIT_PC => 7  # also RL length in octets
-};
 sub decode {
 	my ($self,$b,$p,$e,$rt) = @_;
-	if ($rt == RT_14BIT_PC) {
+	if ($rt == ::RT_14BIT_PC) {
 		#FIXME only for Singapore
 		$self->{icci} = IcciIsupParameter->man($b,$p,$e,$rt);
 		#FIXME only for Singapore and Spain
@@ -10884,140 +10742,90 @@ sub decode {
 # -------------------------------------
 package NrmMessage; use strict; use vars qw(@ISA); @ISA = qw(IsupMessage);
 # -------------------------------------
-use constant {
-	RT_UNKNOWN => 0,
-	RT_14BIT_PC => 4, # also RL length in octets
-	RT_24BIT_PC => 7  # also RL length in octets
-};
 sub decode {
 	my ($self,$b,$p,$e,$rt) = @_;
-	if ($rt == RT_14BIT_PC) {
+	if ($rt == ::RT_14BIT_PC) {
 		$self->{oparms} = $self->oparms($b,$p,$e,$rt);
 	}
 }
 # -------------------------------------
 package FacMessage; use strict; use vars qw(@ISA); @ISA = qw(IsupMessage);
 # -------------------------------------
-use constant {
-	RT_UNKNOWN => 0,
-	RT_14BIT_PC => 4, # also RL length in octets
-	RT_24BIT_PC => 7  # also RL length in octets
-};
 sub decode {
 	my ($self,$b,$p,$e,$rt) = @_;
-	if ($rt == RT_14BIT_PC) {
+	if ($rt == ::RT_14BIT_PC) {
 		$self->{oparms} = $self->oparms($b,$p,$e,$rt);
 	}
 }
 # -------------------------------------
 package UptMessage; use strict; use vars qw(@ISA); @ISA = qw(IsupMessage);
 # -------------------------------------
-use constant {
-	RT_UNKNOWN => 0,
-	RT_14BIT_PC => 4, # also RL length in octets
-	RT_24BIT_PC => 7  # also RL length in octets
-};
 sub decode {
 	my ($self,$b,$p,$e,$rt) = @_;
-	if ($rt == RT_14BIT_PC) {
+	if ($rt == ::RT_14BIT_PC) {
 		$self->{oparms} = $self->oparms($b,$p,$e,$rt);
 	}
 }
 # -------------------------------------
 package UpaMessage; use strict; use vars qw(@ISA); @ISA = qw(IsupMessage);
 # -------------------------------------
-use constant {
-	RT_UNKNOWN => 0,
-	RT_14BIT_PC => 4, # also RL length in octets
-	RT_24BIT_PC => 7  # also RL length in octets
-};
 sub decode {
 	my ($self,$b,$p,$e,$rt) = @_;
-	if ($rt == RT_14BIT_PC) {
+	if ($rt == ::RT_14BIT_PC) {
 		$self->{oparms} = $self->oparms($b,$p,$e,$rt);
 	}
 }
 # -------------------------------------
 package IdrMessage; use strict; use vars qw(@ISA); @ISA = qw(IsupMessage);
 # -------------------------------------
-use constant {
-	RT_UNKNOWN => 0,
-	RT_14BIT_PC => 4, # also RL length in octets
-	RT_24BIT_PC => 7  # also RL length in octets
-};
 sub decode {
 	my ($self,$b,$p,$e,$rt) = @_;
-	if ($rt == RT_14BIT_PC) {
+	if ($rt == ::RT_14BIT_PC) {
 		$self->{oparms} = $self->oparms($b,$p,$e,$rt);
 	}
 }
 # -------------------------------------
 package IrsMessage; use strict; use vars qw(@ISA); @ISA = qw(IsupMessage);
 # -------------------------------------
-use constant {
-	RT_UNKNOWN => 0,
-	RT_14BIT_PC => 4, # also RL length in octets
-	RT_24BIT_PC => 7  # also RL length in octets
-};
 sub decode {
 	my ($self,$b,$p,$e,$rt) = @_;
-	if ($rt == RT_14BIT_PC) {
+	if ($rt == ::RT_14BIT_PC) {
 		$self->{oparms} = $self->oparms($b,$p,$e,$rt);
 	}
 }
 # -------------------------------------
 package SgmMessage; use strict; use vars qw(@ISA); @ISA = qw(IsupMessage);
 # -------------------------------------
-use constant {
-	RT_UNKNOWN => 0,
-	RT_14BIT_PC => 4, # also RL length in octets
-	RT_24BIT_PC => 7  # also RL length in octets
-};
 sub decode {
 	my ($self,$b,$p,$e,$rt) = @_;
-	if ($rt == RT_14BIT_PC) {
+	if ($rt == ::RT_14BIT_PC) {
 		$self->{oparms} = $self->oparms($b,$p,$e,$rt);
 	}
 }
 # -------------------------------------
 package CraMessage; use strict; use vars qw(@ISA); @ISA = qw(IsupMessage);
 # -------------------------------------
-use constant {
-	RT_UNKNOWN => 0,
-	RT_14BIT_PC => 4, # also RL length in octets
-	RT_24BIT_PC => 7  # also RL length in octets
-};
 sub decode {
 	my ($self,$b,$p,$e,$rt) = @_;
-	if ($rt == RT_24BIT_PC) {
+	if ($rt == ::RT_24BIT_PC) {
 		return;
 	}
 }
 # -------------------------------------
 package CrmMessage; use strict; use vars qw(@ISA); @ISA = qw(IsupMessage);
 # -------------------------------------
-use constant {
-	RT_UNKNOWN => 0,
-	RT_14BIT_PC => 4, # also RL length in octets
-	RT_24BIT_PC => 7  # also RL length in octets
-};
 sub decode {
 	my ($self,$b,$p,$e,$rt) = @_;
-	if ($rt == RT_24BIT_PC) {
+	if ($rt == ::RT_24BIT_PC) {
 		$self->{nci} = NciIsupParameter->man($b,$p,$e,$rt);
 	}
 }
 # -------------------------------------
 package CvrMessage; use strict; use vars qw(@ISA); @ISA = qw(IsupMessage);
 # -------------------------------------
-use constant {
-	RT_UNKNOWN => 0,
-	RT_14BIT_PC => 4, # also RL length in octets
-	RT_24BIT_PC => 7  # also RL length in octets
-};
 sub decode {
 	my ($self,$b,$p,$e,$rt) = @_;
-	if ($rt == RT_24BIT_PC) {
+	if ($rt == ::RT_24BIT_PC) {
 		$self->{cvri} = CvriIsupParameter->man($b,$p,$e,$rt);
 		$self->{cgci} = CgciIsupParameter->man($b,$p,$e,$rt);
 	}
@@ -11025,42 +10833,27 @@ sub decode {
 # -------------------------------------
 package CvtMessage; use strict; use vars qw(@ISA); @ISA = qw(IsupMessage);
 # -------------------------------------
-use constant {
-	RT_UNKNOWN => 0,
-	RT_14BIT_PC => 4, # also RL length in octets
-	RT_24BIT_PC => 7  # also RL length in octets
-};
 sub decode {
 	my ($self,$b,$p,$e,$rt) = @_;
-	if ($rt == RT_24BIT_PC) {
+	if ($rt == ::RT_24BIT_PC) {
 		return;
 	}
 }
 # -------------------------------------
 package ExmMessage; use strict; use vars qw(@ISA); @ISA = qw(IsupMessage);
 # -------------------------------------
-use constant {
-	RT_UNKNOWN => 0,
-	RT_14BIT_PC => 4, # also RL length in octets
-	RT_24BIT_PC => 7  # also RL length in octets
-};
 sub decode {
 	my ($self,$b,$p,$e,$rt) = @_;
-	if ($rt == RT_24BIT_PC) {
+	if ($rt == ::RT_24BIT_PC) {
 		$self->{oparms} = $self->oparms($b,$p,$e,$rt);
 	}
 }
 # -------------------------------------
 package NonMessage; use strict; use vars qw(@ISA); @ISA = qw(IsupMessage);
 # -------------------------------------
-use constant {
-	RT_UNKNOWN => 0,
-	RT_14BIT_PC => 4, # also RL length in octets
-	RT_24BIT_PC => 7  # also RL length in octets
-};
 sub decode {
 	my ($self,$b,$p,$e,$rt) = @_;
-	if ($rt == RT_14BIT_PC) {
+	if ($rt == ::RT_14BIT_PC) {
 		#FIXME Spain only
 		$self->{ton} = TonIsupParameter->man($b,$p,$e,$rt);
 	}
@@ -11068,14 +10861,9 @@ sub decode {
 # -------------------------------------
 package LlmMessage; use strict; use vars qw(@ISA); @ISA = qw(IsupMessage);
 # -------------------------------------
-use constant {
-	RT_UNKNOWN => 0,
-	RT_14BIT_PC => 4, # also RL length in octets
-	RT_24BIT_PC => 7  # also RL length in octets
-};
 sub decode {
 	my ($self,$b,$p,$e,$rt) = @_;
-	if ($rt == RT_14BIT_PC) {
+	if ($rt == ::RT_14BIT_PC) {
 		#FIXME Spain only
 		return;
 	}
@@ -11083,14 +10871,9 @@ sub decode {
 # -------------------------------------
 package CakMessage; use strict; use vars qw(@ISA); @ISA = qw(IsupMessage);
 # -------------------------------------
-use constant {
-	RT_UNKNOWN => 0,
-	RT_14BIT_PC => 4, # also RL length in octets
-	RT_24BIT_PC => 7  # also RL length in octets
-};
 sub decode {
 	my ($self,$b,$p,$e,$rt) = @_;
-	if ($rt == RT_14BIT_PC) {
+	if ($rt == ::RT_14BIT_PC) {
 		#FIXME Singapore only
 		return;
 	}
@@ -11098,14 +10881,9 @@ sub decode {
 # -------------------------------------
 package TcmMessage; use strict; use vars qw(@ISA); @ISA = qw(IsupMessage);
 # -------------------------------------
-use constant {
-	RT_UNKNOWN => 0,
-	RT_14BIT_PC => 4, # also RL length in octets
-	RT_24BIT_PC => 7  # also RL length in octets
-};
 sub decode {
 	my ($self,$b,$p,$e,$rt) = @_;
-	if ($rt == RT_14BIT_PC) {
+	if ($rt == ::RT_14BIT_PC) {
 		#FIXME Singapore only
 		$self->{cri} = CriIsupParameter->man($b,$p,$e,$rt);
 		return;
@@ -11114,14 +10892,9 @@ sub decode {
 # -------------------------------------
 package McpMessage; use strict; use vars qw(@ISA); @ISA = qw(IsupMessage);
 # -------------------------------------
-use constant {
-	RT_UNKNOWN => 0,
-	RT_14BIT_PC => 4, # also RL length in octets
-	RT_24BIT_PC => 7  # also RL length in octets
-};
 sub decode {
 	my ($self,$b,$p,$e,$rt) = @_;
-	if ($rt == RT_14BIT_PC) {
+	if ($rt == ::RT_14BIT_PC) {
 		#FIXME Singapore only
 		return;
 	}
@@ -13583,6 +13356,13 @@ sub createstatusbar {
 #package MyTop;
 sub statusbar {
 	return shift->{StatusBar};
+}
+
+#package MyTop;
+sub setstatus {
+	my ($self,@lines) = @_;
+	my $text = join("\n",@lines);
+	$self->{StatusBar}->configure(-text=>$text);
 }
 
 #package MyTop;
