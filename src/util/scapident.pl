@@ -443,7 +443,7 @@ if (0) {
 	my $pcassign;
 	eval { $pcassign = XMLin("$progdir/pc_assign.xml") };
 	unless ($@) {
-		print STDERR "D: using PC assignments from $progdir/pcassignments.xml\n";
+		#print STDERR "D: using PC assignments from $progdir/pcassignments.xml\n";
 		# XML::Simple does not like tag names of '0' so we save them as 256.
 		$pc_assignments = $pcassign;
 		foreach my $k (keys %{$pc_assignments->{5}}) {
@@ -461,7 +461,7 @@ if (1) {
 	my $dumper = new XML::Dumper;
 	eval { $pcassign = $dumper->xml2pl("$progdir/pc_assignments.xml.gz") };
 	unless ($@) {
-		print STDERR "D: using PC assignments from $progdir/pc_assignments.xml.gz\n";
+		#print STDERR "D: using PC assignments from $progdir/pc_assignments.xml.gz\n";
 		$pc_assignments = $pcassign;
 	}
 }
@@ -747,7 +747,7 @@ sub cnt {
 
 #package CallCounts;
 sub sim_up {
-	my ($self,$top,$event,$dir) = @_;
+	my ($self,$event,$dir) = @_;
 	if (my $new = $self->{sims}->{$dir}->{$event}) {
 		$new->{curr}++;
 		$new->{hiwa} = $new->{curr} if $new->{curr} > $new->{hiwa};
@@ -757,7 +757,7 @@ sub sim_up {
 }
 #package CallCounts;
 sub sim_dn {
-	my ($self,$top,$event,$dir) = @_;
+	my ($self,$event,$dir) = @_;
 	if (my $old = $self->{sims}->{$dir}->{$event}) {
 		$old->{curr}--;
 		$old->{lowa} = $old->{curr} if $old->{curr} < $old->{lowa} || $old->{lowa} <= 0;
@@ -3199,7 +3199,7 @@ sub updatelist {
 		}
 		my ($f,$l,$r,$t) = (0,$msgs-2,0);
 		while (($t = int(($f+$l)/2)) != $f && $t != $l) {
-			print STDERR "D: f=$f, t=$t, l=$l\n";
+			#print STDERR "D: f=$f, t=$t, l=$l\n";
 			$r = $func->($msg,$list->[$t]);
 			if ($r > 0) { $l = $t; } else { $f = $t; }
 		}
@@ -3627,6 +3627,31 @@ sub showcalls {
 }
 
 # -------------------------------------
+package MsgBuffer;
+use strict;
+# -------------------------------------
+#package MsgBuffer;
+sub init {
+	my ($self,@args) = @_;
+	$self->{msgbuf} = [];
+}
+
+sub pushbuf {
+	my ($self,$msg) = @_;
+	return push @{$self->{msgbuf}}, $msg;
+}
+
+sub shiftbuf {
+	my $self = shift;
+	return shift @{$self->{msgbuf}};
+}
+
+sub peekbuf {
+	my $self = shift;
+	return $self->{msgbuf}->[0];
+}
+
+# -------------------------------------
 package Properties;
 use strict;
 # -------------------------------------
@@ -3767,7 +3792,7 @@ sub attach {
 		$top->canvas->bind($self->{item},'<ButtonPress-3>',[\&Clickable::button3,$self,$top,Tk::Ev('X'),Tk::Ev('Y')]);
 		$top->mycanvas->addballoon($self,[$self->{item}]);
 	}
-	print STDERR "D: discovered ".$self->identify."\n";
+	#print STDERR "D: discovered ".$self->identify."\n";
 	$top->statusbar->configure(-text=>"Discovered ".$self->identify);
 	$top->{updatenow} = 1;
 }
@@ -3777,7 +3802,7 @@ sub getmenu {
 	my ($self,$m,$top,$X,$Y) = @_;
 	my $ref = ref $self;
 	my $len = length($ref) + 1;
-	if ($self->isa('Props')) {
+	if ($self->isa('Properties')) {
 		$m->add('command',
 			#-accelerator=>'p',
 			-command=>[\&Properties::props, $self, $top, $X, $Y],
@@ -4046,7 +4071,7 @@ sub moveit {
 	if ($self->{x} != $x or $self->{y} != $y) {
 		$self->{x} = $x;
 		$self->{y} = $y;
-		print STDERR "D: moving Arcend ".$self->identify."\n";
+		#print STDERR "D: moving Arcend ".$self->identify."\n";
 		foreach my $side (keys %{$self->{arcs}}) {
 			foreach my $arc (@{$self->{arcs}->{$side}}) {
 				$arc->moveit($top,$side,$x,$y);
@@ -4057,9 +4082,10 @@ sub moveit {
 	return undef;
 }
 
+#package Arcend;
 sub absorb {
 	my ($self,$top,$end) = @_;
-	print STDERR "D: absorbing Arcend ".$end->identify." into ".$self->identify."\n";
+	#print STDERR "D: absorbing Arcend ".$end->identify." into ".$self->identify."\n";
 	# move all the arcs from $end to attach instead to $self.
 	while (my $arc = shift @{$end->{arcs}->{a}}) {
 		print STDERR "E: object mismatch $end and $arc->{obja}\n" if $end ne $arc->{obja};
@@ -4141,8 +4167,9 @@ sub new {
 	$c->raise($self->{ttxt},$self->{scri});
 	$c->raise($self->{text},$self->{scri});
 	$c->raise($self->{ownr},$self->{scri});
+	#print STDERR "D: must regroup\n";
 	$top->{regroupnow} = 1;
-	$top->regroup();
+	#$top->regroup();
 	return $self;
 }
 
@@ -4150,7 +4177,7 @@ sub new {
 sub moveit {
 	my ($self,$top,$x,$y) = @_;
 	if ($self->{x} != $x or $self->{y} != $y) {
-		print STDERR "D: moving Nodeitem ".$self->identify."\n";
+		#print STDERR "D: moving Nodeitem ".$self->identify."\n";
 		my ($dx,$dy) = ($x-$self->{x},$y-$self->{y});
 		my $c = $top->canvas;
 		foreach my $item (@{$self->{items}}) { $c->move($item,$dx,$dy); }
@@ -4171,15 +4198,19 @@ sub movenode {
 sub makecol {
 	my ($self,$top,$col) = @_;
 	# move node to new column but on same side of canvas
-	$col = abs($col);
-	if (abs($self->{col}) != $col) {
-		$col = -$col if $self->{col} < 0;
-		$self->{col} = $col;
-		$top->{regroupnow} = 1;
-		$top->regroup();
-		return 1;
+	my $new = abs($col);
+	my $old = abs($self->{col});
+	if ($new != ::COL_ADJ) {
+		return undef if ($old == ::COL_ADJ); # stick to adjacent column
+		return undef if ($old == ::COL_GTT); # stick to alias column
 	}
-	return undef;
+	return undef if $old == $new;
+	$new = -$new if $self->{col} < 0;
+	$self->{col} = $new;
+	#print STDERR "D: must regroup\n";
+	$top->{regroupnow} = 1;
+	#$top->regroup();
+	return 1;
 }
 
 #package Nodeitem;
@@ -4187,8 +4218,9 @@ sub swapcol {
 	my ($self,$top) = @_;
 	# move node to opposite side of canvas
 	$self->{col} = -$self->{col};
+	#print STDERR "D: must regroup\n";
 	$top->{regroupnow} = 1;
-	$top->regroup();
+	#$top->regroup();
 	return 1;
 }
 
@@ -4197,14 +4229,14 @@ sub dashme {
 	my ($self,$top) = @_;
 	$top->canvas->itemconfigure($self->{item},-dash=>[5,2]);
 	$top->canvas->itemconfigure($self->{scri},-dash=>[5,2]);
-	print STDERR "D: discovered ".$self->identify."\n";
+	#print STDERR "D: discovered ".$self->identify."\n";
 	$top->statusbar->configure(-text=>"Discovered ".$self->identify." is an alias.\n");
 }
 
 #package Nodeitem;
 sub absorb {
 	my ($self,$top,$node) = @_;
-	print STDERR "D: absorbing Nodeitem ".$node->identify." into ".$self->identify."\n";
+	#print STDERR "D: absorbing Nodeitem ".$node->identify." into ".$self->identify."\n";
 	# put ourselves in the same place so arcs don't have to be moved
 	$self->movenode($top,$node->{col},$node->{row},$node->{off});
 	$self->Arcend::absorb($top,$node);
@@ -4213,8 +4245,9 @@ sub absorb {
 		$c->delete($item);
 	}
 	foreach (qw(item scri ttxt text ownr off col row)) { delete $node->{$_}; }
+	#print STDERR "D: must regroup\n";
 	$top->{regroupnow} = 1;
-	$top->regroup();
+	#$top->regroup();
 }
 
 # -------------------------------------
@@ -4293,7 +4326,7 @@ sub moveit {
 			$ya == $self->{ya} &&
 			$xb == $self->{xb} &&
 			$yb == $self->{yb};
-	print STDERR "D: moving Arcitem ".$self->identify."\n";
+			#print STDERR "D: moving Arcitem ".$self->identify."\n";
 	my $yoff = $self->{yoff};
 	$top->canvas->coords($self->{item},$xa,$ya+$yoff,$xb,$yb+$yoff);
 	$self->{xa} = $xa;
@@ -5769,6 +5802,7 @@ sub init {
 	$self->MsgCollector::init(@args);
 	$self->{no} = $linkno;
 	$self->{linkset} = $linkset;
+	$linkset->{links}->{$slc} = $self;
 	$self->{slc} = $slc;
 	my $nodea = $self->{nodea} = $linkset->{nodea};
 	my $nodeb = $self->{nodeb} = $linkset->{nodeb};
@@ -5822,30 +5856,49 @@ sub shortid {
 #package Link;
 sub getmore {
 	my ($self,$m,$top,$X,$Y) = @_;
-	my $haveforw = $self->{channelforw} ? 1 : 0;
-	my $haverevs = $self->{channelrevs} ? 1 : 0;
-	$m->add('separator') if $haveforw + $haverevs;
-	if ($haveforw) {
+	my $have = {};
+	$have->{linkset} = $self->{linkset} ? 1 : 0;
+	$have->{forw}    = $self->{channelforw} ? 1 : 0;
+	$have->{revs}    = $self->{channelrevs} ? 1 : 0;
+	$m->add('separator') if
+		$have->{linkset} +
+		$have->{forw} +
+		$have->{revs};
+	if ($have->{linkset}) {
+		my $linkset = $self->{linkset};
+		my $label = 'Linkset';
+		my $mc = $m->Menu(-title=>"$label Menu");
+		$mc->configure(-postcommand=>[sub {
+			my ($self,$mc,$top,$X,$Y) = @_;
+			$mc->delete(0,'end');
+			$linkset->getmenu($mc,$top,$X,$Y);
+			$linkset->getmore($mc,$top,$X,$Y);
+		},$self,$mc,$top,$X,$Y]);
+		$m->add('cascade', -menu=>$mc, -label=>$label);
+	}
+	if ($have->{forw}) {
 		my $channel = $self->{channelforw};
-		my $mc = $m->Menu(-title=>'Forward channel menu');
+		my $label = 'Forward channel';
+		my $mc = $m->Menu(-title=>"$label Menu");
 		$mc->configure(-postcommand=>[sub {
 			my ($self,$mc,$top,$X,$Y) = @_;
 			$mc->delete(0,'end');
 			$channel->getmenu($mc,$top,$X,$Y);
 			$channel->getmore($mc,$top,$X,$Y);
 		},$self,$mc,$top,$X,$Y]);
-		$m->add('cascade', -menu=>$mc, -label=>'Forward channel');
+		$m->add('cascade', -menu=>$mc, -label=>$label);
 	}
-	if ($haverevs) {
+	if ($have->{revs}) {
 		my $channel = $self->{channelrevs};
-		my $mc = $m->Menu(-title=>'Revers channel menu');
+		my $label = 'Reverse channel';
+		my $mc = $m->Menu(-title=>"$label Menu");
 		$mc->configure(-postcommand=>[sub {
 			my ($self,$mc,$top,$X,$Y) = @_;
 			$mc->delete(0,'end');
 			$channel->getmenu($mc,$top,$X,$Y) if $channel;
 			$channel->getmore($mc,$top,$X,$Y) if $channel;
 		},$self,$mc,$top,$X,$Y]);
-		$m->add('cascade', -menu=>$mc, -label=>'Reverse channel');
+		$m->add('cascade', -menu=>$mc, -label=>$label);
 	}
 }
 
@@ -6127,8 +6180,9 @@ sub new {
 	$self->{paths}->{a} = {}; # paths that originate here
 	$self->{paths}->{b} = {}; # paths that terminate here
 	$self->Clickable::attach($top,@args);
+	#print STDERR "D: must regroup\n";
 	$top->{regroupnow} = 1;
-	$top->regroup();
+	#$top->regroup();
 	return $self;
 }
 
@@ -6163,12 +6217,25 @@ sub makealias {
 #package Node;
 sub findaliases {
 	my ($self,$top) = @_;
-	my $ref = ref $self;
-	return unless $ref eq 'SSP' or $ref eq 'SCP';
+	#print STDERR "D: finding aliases of ".$self->identify."\n";
+	if (abs($self->{col}) != ::COL_ADJ) {
+		#print STDERR "D: cannot find aliases for ".$self->identify." (not adjacent)\n";
+		return;
+	}
+	unless ($self->isa('SSP') or $self->isa('SCP')) {
+		#print STDERR "D: cannot find aliases for ".$self->identify." (not SSP or SCP)\n";
+		return;
+	}
 	foreach my $side (keys %{$self->{paths}}) {
 		foreach my $path (values %{$self->{paths}->{$side}}) {
-			next unless $path->{adjacent} eq $self;
-			next if $path->{node} eq $self;
+			unless ($path->{adjacent} eq $self) {
+				#print STDERR "D: unusable alias path ".$path->identify." (wrong adjacent ".$path->{adjacent}->identify.")\n";
+				next;
+			}
+			if ($path->{node} eq $self) {
+				#print STDERR "D: unusable alias path ".$path->identify." (path to self ".$path->{node}->identify.")\n";
+				next;
+			}
 			$path->{node}->makealias($top,$self);
 		}
 	}
@@ -6177,7 +6244,7 @@ sub findaliases {
 #package Node;
 sub absorb {
 	my ($self,$top,$node) = @_;
-	print STDERR "D: absorbing Node ".$node->identify." into ".$self->identify."\n";
+	#print STDERR "D: absorbing Node ".$node->identify." into ".$self->identify."\n";
 	# handle arcs
 	$self->Nodeitem::absorb($top,$node);
 	foreach my $side (keys %{$node->{channels}}) {
@@ -6188,9 +6255,19 @@ sub absorb {
 	delete $node->{channels};
 	foreach my $side (keys %{$node->{paths}}) {
 		while (my ($ppa,$path) = each %{$node->{paths}->{$side}}) {
-			my $exnode = $path->{"node$side"};
-			print STDERR "D: object mismatch $node and $exnode\n" if $node ne $exnode;
-			$path->{"node$side"} = $self;
+			my $exnode;
+			$exnode = $path->{"node$side"};
+			if ($node ne $exnode) {
+				print STDERR "E: node$side mismatch $node and $exnode\n";
+			} else {
+				$path->{"node$side"} = $self;
+			}
+			$exnode = $path->{adjacent};
+			if ($node ne $exnode) {
+				print STDERR "E: adjacent mismatch $node and $exnode\n";
+			} else {
+				$path->{adjacent} = $self;
+			}
 			$self->{paths}->{$side}->{$ppa} = $path;
 		}
 	}
@@ -6277,8 +6354,9 @@ sub new {
 	$c->itemconfigure($self->{ttxt},-text=>$type);
 	$c->itemconfigure($self->{text},-text=>$self->{pcode});
 	$c->itemconfigure($self->{ownr},-text=>$self->{pownr});
+	#print STDERR "D: must regroup\n";
 	$top->{regroupnow} = 1;
-	$top->regroup();
+	#$top->regroup();
 	return $self;
 }
 
@@ -6655,17 +6733,15 @@ sub reanalyze {
 		$c->addtag('SLTM',withtag=>$self->{text});
 		$c->addtag('SLTM',withtag=>$self->{ownr});
 	}
-	unless ($self->{alias}) {
-		if ($self->{xchg_sltm}) {
-			$self->makecol($top,::COL_ADJ);
-		} elsif ($self->{xchg_isup} || ($self->{orig_tcap} && $self->{term_tcap})) {
-			$self->makecol($top,::COL_SSP);
-		} elsif ($self->{orig_tcap} && !$self->{term_tcap}) {
-			$self->makecol($top,::COL_SCP);
-		} elsif (!$self->{orig_tcap} && $self->{term_tcap}) {
-			$self->makecol($top,::COL_GTT);
-		} 
-	}
+	if ($self->{xchg_sltm}) {
+		$self->makecol($top,::COL_ADJ);
+	} elsif ($self->{xchg_isup} || ($self->{orig_tcap} && $self->{term_tcap})) {
+		$self->makecol($top,::COL_SSP);
+	} elsif ($self->{orig_tcap} && !$self->{term_tcap}) {
+		$self->makecol($top,::COL_SCP);
+	} elsif (!$self->{orig_tcap} && $self->{term_tcap}) {
+		$self->makecol($top,::COL_GTT);
+	} 
 	if ($self->{xchg_isup} || ($self->{orig_tcap} && $self->{term_tcap})) {
 		SP::xform('SSP',$self,$top);
 	} elsif ($self->{orig_tcap} && !$self->{term_tcap}) {
@@ -7340,7 +7416,7 @@ sub new {
 	my $c = $top->canvas;
 	$c->CanvasBind('<ButtonPress-3>',[\&Network::button3,$self,$top,Tk::Ev('X'),Tk::Ev('Y'),Tk::Ev('x'),Tk::Ev('y')]);
 	$Network::network = $self;
-	print STDERR "D: discovered ".$self->identify."\n";
+	#print STDERR "D: discovered ".$self->identify."\n";
 	$top->statusbar->configure(-text=>"Discovered ".$self->identify);
 	return $self;
 }
@@ -7742,7 +7818,7 @@ sub fillstatus {
 package Channel;
 use strict;
 use vars qw(@ISA);
-@ISA = qw(Arcitem Pentastate Logging Properties Status Clickable MsgCollector);
+@ISA = qw(Arcitem Pentastate Logging Properties Status Clickable MsgCollector MsgBuffer);
 # -------------------------------------
 
 use constant {
@@ -7787,6 +7863,7 @@ sub init {
 	$self->Status::init(@args);
 	$self->Clickable::init(@args);
 	$self->MsgCollector::init(@args);
+	$self->MsgBuffer::init(@args);
 	$self->{no} = $channelno;
 	$self->{ppa} = $ppa;
 	$self->{slot} = (($ppa >> 0) & 0x1f);
@@ -7802,7 +7879,6 @@ sub init {
 	$self->{rttext} = 'Unknown';
 	$self->{orig} = {};
 	$self->{dest} = {};
-	$self->{msgbuf} = [];
 	$self->Arcitem::init($top,$nodea,$nodeb,['node','relation','link','linkset'],[],'last',0);
 	$self->Clickable::attach($top,@args);
 }
@@ -7820,7 +7896,7 @@ sub new {
 sub bindchannel {
 	my ($self,$top,$network,$nodea,$nodeb,$msg) = @_;
 	return if $self->{link}; # already bound
-	print STDERR "D: binding channel ".$self->identify."\n";
+	#print STDERR "D: binding channel ".$self->identify."\n";
 	my $slc = $self->{slc} = $msg->{slc};
 	my ($pnodea,$pnodeb) = ($self->{nodea},$self->{nodeb});
 	$nodea->absorb($top,$pnodea);
@@ -7862,12 +7938,12 @@ sub add_msg {
 	my ($self,$top,$network,$msg,@args) = @_;
 	unless ($self->{detected}) {
 		if ($self->detecting) {
-			push @{$self->{msgbuf}}, $msg;
+			$self->pushbuf($msg);
 			return;
 		}
 		$self->{detected} = 1;
-		push @{$self->{msgbuf}}, $msg;
-		while ($msg = pop @{$self->{msgbuf}}) {
+		$self->pushbuf($msg);
+		while ($msg = $self->shiftbuf()) {
 			$msg->decode($self);
 			$self->complete($top,$network,$msg);
 		}
@@ -7980,6 +8056,26 @@ sub identify {
 sub shortid {
 	my $self = shift;
 	return "$self->{card}:$self->{span}:$self->{slot}";
+}
+
+#package Channel;
+sub getmore {
+	my ($self,$m,$top,$X,$Y) = @_;
+	my $have = {};
+	$have->{link} = $self->{link} ? 1 : 0;
+	$m->add('separator') if $have->{link};
+	if ($have->{link}) {
+		my $link = $self->{link};
+		my $label = 'Link';
+		my $mc = $m->Menu(-title=>"$label Menu");
+		$mc->configure(-postcommand=>[sub {
+			my ($self,$mc,$top,$X,$Y) = @_;
+			$mc->delete(0,'end');
+			$link->getmenu($mc,$top,$X,$Y);
+			$link->getmore($mc,$top,$X,$Y);
+		},$self,$mc,$top,$X,$Y]);
+		$m->add('cascade',-menu=>$mc,-label=>$label);
+	}
 }
 
 #package Channel;
@@ -13603,6 +13699,8 @@ sub menuFileOpen {
 #			$w->update;
 			if ($self->{regroupnow}) {
 				$self->regroup();
+				$self->canvas->update;
+				delete $self->{regroupnow};
 			}
 			if ($self->{updatenow}) {
 				$w->update;
@@ -13692,6 +13790,15 @@ sub contmsg {
 		if ($secs > 0 || ($secs == 0 && $usec > 0)) {
 			$self->{endtime} = $msg->{hdr};
 			$msg->process($self,$self->{network});
+			if ($self->{regroupnow}) {
+				$self->regroup();
+				$self->canvas->update;
+				delete $self->{regroupnow};
+			}
+			if ($self->{updatenow}) {
+				$w->update;
+				delete $self->{updatenow};
+			}
 		} else {
 			my $ms = (-$secs*1000) + int((-$usec+999)/1000);
 			$w->after($ms, [\&MyTop::contmsg, $self, $msg]);
@@ -13706,6 +13813,7 @@ sub contmsg {
 #package MyTop;
 sub regroup {
 	my $self = shift;
+	#print STDERR "D: regrouping...\n";
 	my $network = $self->{network};
 	return unless $network;
 	my $mc = $self->mycanvas;
@@ -13762,7 +13870,9 @@ sub regroup {
 		}
 		$node->movenode($self,$col,$row,$off/2);
 	}
+	#print STDERR "D: ...regrouped.\n";
 	delete $self->{regroupnow};
+	$self->{updatenow} = 1;
 }
 
 # -------------------------------------
