@@ -683,6 +683,12 @@ sub new {
 	return $self;
 }
 
+#package MsgCounts;
+sub addto {
+	my ($self,$othr,@args) = @_;
+	return $othr->addfrom($self,@args);
+}
+
 # -------------------------------------
 package MsgCounts;
 use strict;
@@ -732,6 +738,44 @@ sub inc {
 		$self->{incs}->{2}->{sis}->{$si}->{$mt}->{msus} += 1;
 		$self->{incs}->{2}->{sis}->{$si}->{$mt}->{$mp} += 1;
 		$self->{incs}->{2}->{mp}->{$mp} += 1;
+	}
+}
+
+#package MsgCounts;
+sub addfrom {
+	my ($self,$othr,$flip,@args) = @_;
+
+	return unless $othr->isa('MsgCounts');
+
+	foreach my $odir (keys %{$othr->{incs}}) {
+		my $sdir = $odir ^ $flip;
+		foreach my $su (qw/sus fisus lssus lss2s msus/) {
+			next unless exists $othr->{incs}->{$odir}->{$su};
+			$self->{incs}->{$sdir}->{$su} +=
+			$othr->{incs}->{$odir}->{$su};
+		}
+		if (exists $othr->{incs}->{$odir}->{mp}) {
+			foreach my $mp (keys %{$othr->{incs}->{$odir}->{mp}}) {
+				$self->{incs}->{$sdir}->{mp}->{$mp} +=
+				$othr->{incs}->{$odir}->{mp}->{$mp};
+			}
+		}
+		if (exists $othr->{incs}->{$odir}->{sis}) {
+			foreach my $si (keys %{$othr->{incs}->{$odir}->{sis}}) {
+				foreach my $mt (keys %{$othr->{incs}->{$odir}->{sis}->{$si}}) {
+					if ($mt eq 'msus') {
+						$self->{incs}->{$sdir}->{sis}->{$si}->{msus} +=
+						$othr->{incs}->{$odir}->{sis}->{$si}->{msus};
+						next;
+					}
+					foreach my $mp (keys %{$othr->{incs}->{$odir}->{sis}->{$si}->{$mt}}) {
+						$self->{incs}->{$sdir}->{sis}->{$si}->{$mt}->{$mp} +=
+						$othr->{incs}->{$odir}->{sis}->{$si}->{$mt}->{$mp};
+					}
+
+				}
+			}
+		}
 	}
 }
 
@@ -873,6 +917,15 @@ sub iat {
 	$self->iat_dir($event,$ts,2) unless $dir == 2;
 }
 
+#package CallCounts;
+sub addfrom {
+	my ($self,$othr,@args) = @_;
+
+	return unless $othr->isa('CallCounts');
+
+	# FIXME: complete this
+}
+
 # -------------------------------------
 package History;
 use strict;
@@ -915,10 +968,21 @@ sub hist {
 	return $obj;
 }
 
-#package History;
-sub newcounts {
-	my ($self,$int) = @_;
-	return Counts->new($int);
+##package History;
+#sub newcounts {
+#	my ($self,@args) = @_;
+#	return Counts->new(@args);
+#}
+
+sub addfrom {
+	my ($self,$othr,@args) = @_;
+
+	return unless $othr->isa('History');
+
+	foreach my $int (keys %{$othr->{hist}}) {
+		$self->{hist}->{$int} = $self->newcounts($int) unless $self->{hist}->{$int};
+		$self->{hist}->{$int}->addrom($othr->{hist}->{$int},@args);
+	}
 }
 
 # -------------------------------------
@@ -941,6 +1005,14 @@ sub newcounts {
 }
 
 #package MsgHistory;
+sub addfrom {
+	my ($self,$othr,@args) = @_;
+	$self->MsgCounts::addfrom($othr,@args);
+	$self->History::addfrom($othr,@args);
+}
+
+
+#package MsgHistory;
 sub inc { my ($self,$msg,$dir) = @_;
 #	my $int = $self->interval($msg->{hdr});
 #	my $hist = $self->hist($int);
@@ -961,11 +1033,19 @@ sub init {
 	$self->CallCounts::init(@args);
 }
 
-#package CalLHistory;
+#package CallHistory;
 sub newcounts {
 	my ($self,$int) = @_;
 	return CallCounts->new($int);
 }
+
+#package CallHistory;
+sub addfrom {
+	my ($self,$othr,@args) = @_;
+	$self->CallCounts::addfrom($othr,@args);
+	$self->History::addfrom($othr,@args);
+}
+
 
 #package CallHistory;
 sub inc { my ($self,$msg,$dir) = @_;
@@ -1969,6 +2049,11 @@ sub init {
 }
 
 #package MsgStats;
+sub addfrom {
+	shift->MsgHistory::addfrom(@_);
+}
+
+#package MsgStats;
 sub stats {
 	my ($self,$top,$X,$Y) = @_;
 	my $row = 0;
@@ -2383,6 +2468,11 @@ sub init {
 	my ($self,@args) = @_;
 	$self->CallHistory::init(@args);
 	$self->{dist} = {};
+}
+
+#package CallStats;
+sub addfrom {
+	shift->CallHistory::addfrom(@_);
 }
 
 #package CallStats;
@@ -2921,6 +3011,13 @@ sub clearmsgs {
 sub msgcnt {
 	my $self = shift;
 	return scalar(@{$self->{msgs}});
+}
+#package MsgCollector;
+sub addfrom {
+	my ($self,$othr,@args) = @_;
+	$self->MsgStats::addfrom($othr,@args);
+	return unless $othr->isa('MsgCollector');
+	splice(@{$self->{msgs}},@{$self->{msgs}},0,@{$othr->{msgs}});
 }
 #package MsgCollector;
 sub msgs {
@@ -3613,6 +3710,13 @@ sub pushcall {
 	$self->{call} = undef;
 }
 
+sub addfrom {
+	my ($self,$othr,@args) = @_;
+	$self->CallStats::addfrom($othr,@args);
+	return unless $othr->isa('CallCollector');
+	splice(@{$self->{calls}},@{$self->{calls}},0,@{$othr->{calls}});
+}
+
 sub calls {
 	my ($self,$top,$X,$Y) = @_;
 	my ($tw,$w,$bmsg);
@@ -3657,6 +3761,25 @@ sub showcalls {
 }
 
 # -------------------------------------
+package DualCollector;
+use strict;
+use vars qw(@ISA);
+@ISA = qw(MsgCollector CallCollector);
+# -------------------------------------
+#package DualCollector;
+sub init {
+	my ($self,@args) = @_;
+	$self->MsgCollector::init(@args);
+	$self->CallCollector::init(@args);
+}
+#package DualCollector;
+sub addfrom {
+	my ($self,$othr,@args) = @_;
+	$self->MsgCollector::addfrom($othr,@args);
+	$self->CallCollector::addfrom($othr,@args);
+}
+
+# -------------------------------------
 package MsgBuffer;
 use strict;
 # -------------------------------------
@@ -3665,17 +3788,17 @@ sub init {
 	my ($self,@args) = @_;
 	$self->{msgbuf} = [];
 }
-
+#package MsgBuffer;
 sub pushbuf {
 	my ($self,$msg) = @_;
 	return push @{$self->{msgbuf}}, $msg;
 }
-
+#package MsgBuffer;
 sub shiftbuf {
 	my $self = shift;
 	return shift @{$self->{msgbuf}};
 }
-
+#package MsgBuffer;
 sub peekbuf {
 	my $self = shift;
 	return $self->{msgbuf}->[0];
@@ -4376,7 +4499,7 @@ sub moveit {
 package Relation;
 use strict;
 use vars qw(@ISA);
-@ISA = qw(Hexstate Arcitem Logging Properties Status Clickable MsgCollector CallCollector);
+@ISA = qw(Hexstate Arcitem Logging Properties Status Clickable DualCollector);
 # -------------------------------------
 # A relation is an association between signalling points that communicate with
 # each other.  This object is used to track these interactions, primarily for
@@ -4391,13 +4514,12 @@ sub init {
 	$self->Properties::init(@args);
 	$self->Status::init(@args);
 	$self->Clickable::init(@args);
-	$self->MsgCollector::init(@args);
-	$self->CallCollector::init(@args);
+	$self->DualCollector::init(@args);
 	$self->{key} = "$nodea->{pc},$nodeb->{pc}";
 	$self->{cics} = {};
 	$self->{slccnt} = 0;
-	$self->{nodea} = $nodea;
-	$self->{nodeb} = $nodeb;
+	$self->{node}->{a} = $nodea;
+	$self->{node}->{b} = $nodeb;
 	$nodea->{relate}->{$nodeb->{pc}} = $self;
 	$nodeb->{relate}->{$nodea->{pc}} = $self;
 	$self->Arcitem::init($top,$nodea,$nodeb,['node'],[],'line',0);
@@ -4419,16 +4541,16 @@ sub new {
 sub identify {
 	my $self = shift;
 	my $id = $self->{ciccnt} ? 'Circuits ' : 'Relation ';
-	$id .= $self->{nodea}->shortid;
+	$id .= $self->{node}->{a}->shortid;
 	$id .= ', ';
-	$id .= $self->{nodeb}->shortid;
+	$id .= $self->{node}->{b}->shortid;
 	return ($self->{id} = $id);
 }
 
 #package Relation;
 sub shortid {
 	my $self = shift;
-	return "$self->{nodea}->{pcode}::$self->{nodeb}->{pcode}";
+	return "$self->{node}->{a}->{pcode}::$self->{node}->{b}->{pcode}";
 }
 
 #package Relation;
@@ -4646,24 +4768,24 @@ sub getmore {
 	my $have->{links} = scalar keys %{$self->{links}};
 	$m->add('separator'); # if $have->{linkset} + $have->{links};
 	{
-		my $label = $self->{nodea}->shortid;
+		my $label = $self->{node}->{a}->shortid;
 		my $mc = $m->Menu(-title=>"$label Menu");
 		$mc->configure(-postcommand=>[sub {
 			my ($self,$mc,$top,$X,$Y) = @_;
 			$mc->delete(0,'end');
-			$self->{nodea}->getmenu($mc,$top,$X,$Y);
-			$self->{nodea}->getmore($mc,$top,$X,$Y);
+			$self->{node}->{a}->getmenu($mc,$top,$X,$Y);
+			$self->{node}->{a}->getmore($mc,$top,$X,$Y);
 		},$self,$mc,$top,$X,$Y]);
 		$m->add('cascade',-menu=>$mc,-label=>$label);
 	}
 	{
-		my $label = $self->{nodeb}->shortid;
+		my $label = $self->{node}->{b}->shortid;
 		my $mc = $m->Menu(-title=>"$label Menu");
 		$mc->configure(-postcommand=>[sub {
 			my ($self,$mc,$top,$X,$Y) = @_;
 			$mc->delete(0,'end');
-			$self->{nodeb}->getmenu($mc,$top,$X,$Y);
-			$self->{nodeb}->getmore($mc,$top,$X,$Y);
+			$self->{node}->{b}->getmenu($mc,$top,$X,$Y);
+			$self->{node}->{b}->getmore($mc,$top,$X,$Y);
 		},$self,$mc,$top,$X,$Y]);
 		$m->add('cascade',-menu=>$mc,-label=>$label);
 	}
@@ -4732,13 +4854,13 @@ sub fillprops {
 		-text=>'SP A point code:',
 	)->grid(-row=>$$row,-column=>0,-sticky=>'ewns');
 	$tw->Entry(%entryleft,
-		-text=>$self->{nodea}->identify, -width=>32,
+		-text=>$self->{node}->{a}->identify, -width=>32,
 	)->grid(-row=>$$row++,-column=>1,-sticky=>'wns');
 	$tw->Label(%labelright,
 		-text=>'SP B point code:',
 	)->grid(-row=>$$row,-column=>0,-sticky=>'ewns');
 	$tw->Entry(%entryleft,
-		-text=>$self->{nodeb}->identify, -width=>32,
+		-text=>$self->{node}->{b}->identify, -width=>32,
 	)->grid(-row=>$$row++,-column=>1,-sticky=>'wns');
 }
 
@@ -4829,8 +4951,8 @@ sub fillstatus {
 sub log {
 	my ($self,@args) = @_;
 	$self->Logging::log(@args);
-	$self->{nodea}->log(@args);
-	$self->{nodeb}->log(@args);
+	$self->{node}->{a}->log(@args);
+	$self->{node}->{b}->log(@args);
 }
 
 # -------------------------------------
@@ -4854,13 +4976,13 @@ sub init {
 	$self->MsgCollector::init(@args);
 	$self->{no} = $routesetno;
 	$self->{key} = "$nodea->{pc},$nodeb->{pc}";
-	$self->{nodea} = $nodea;
-	$self->{nodeb} = $nodeb;
-	$nodea->{routesets}->{og}->{$nodeb->{pc}} = $self;
-	$nodeb->{routesets}->{ic}->{$nodea->{pc}} = $self;
+	$self->{node}->{a} = $nodea;
+	$self->{node}->{b} = $nodeb;
+	$nodea->{routesets}->{a}->{$nodeb->{pc}} = $self;
+	$nodeb->{routesets}->{b}->{$nodea->{pc}} = $self;
 	my $relation = $self->{relation} = $network->getRelation($top,$nodea,$nodeb,@args);
 	my $yoff = 0;
-	if ($relation->{nodea}->{pc} == $nodea->{pc}) {
+	if ($relation->{node}->{a}->{pc} == $nodea->{pc}) {
 		$relation->{routesetforw} = $self;
 		$self->{dir} = 0;
 		$yoff =  3;
@@ -4887,15 +5009,15 @@ sub identify {
 	my $self = shift;
 	my $type = ref $self;
 	my $id = "$type ";
-	$id .= $self->{nodea}->shortid;
+	$id .= $self->{node}->{a}->shortid;
 	$id .= ' -> ';
-	$id .= $self->{nodeb}->shortid;
+	$id .= $self->{node}->{b}->shortid;
 	return ($self->{id} = $id);
 }
 #package Routeset;
 sub shortid {
 	my $self = shift;
-	return "$self->{nodea}->{pcode}\->$self->{nodeb}->{pcode}";
+	return "$self->{node}->{a}->{pcode}\->$self->{node}->{b}->{pcode}";
 }
 
 #package Routeset;
@@ -4903,8 +5025,8 @@ sub add_msg {
 	my ($self,$top,$network,$msg) = @_;
 	$self->inc($msg,2);
 	$self->pushmsg($msg);
-	$self->{nodea}->add_msg($top,$network,$msg,0);
-	$self->{nodeb}->add_msg($top,$network,$msg,1);
+	$self->{node}->{a}->add_msg($top,$network,$msg,0);
+	$self->{node}->{b}->add_msg($top,$network,$msg,1);
 	$self->{relation}->add_msg($top,$network,$msg,$self->{dir});
 }
 
@@ -4961,7 +5083,7 @@ sub clear {
 package Circuit;
 use strict;
 use vars qw(@ISA);
-@ISA = qw(Logging Properties Status Clickable MsgCollector CallCollector);
+@ISA = qw(Logging Properties Status Clickable DualCollector);
 # -------------------------------------
 
 #package Circuit;
@@ -4974,8 +5096,7 @@ sub new {
 	$self->Logging::init($top,@args);
 	$self->Properties::init(@args);
 	$self->Status::init(@args);
-	$self->MsgCollector::init(@args);
-	$self->CallCollector::init(@args);
+	$self->DualCollector::init(@args);
 	$self->{dir} = 0;
 	$self->{ts} = $top->{begtime};
 	$group->{cics}->{$cic} = $self;
@@ -5009,8 +5130,8 @@ sub peg { my ($self,@args) = @_;
 	my ($top,$dir) = ($args[0],\$args[3]);
 	$self->CallHistory::peg(@args);
 	$self->{group}->peg(@args);
-	$self->{group}->{nodea}->peg(@args);
-	$$dir ^= 0x1; $self->{group}->{nodeb}->peg(@args);
+	$self->{group}->{node}->{a}->peg(@args);
+	$$dir ^= 0x1; $self->{group}->{node}->{b}->peg(@args);
 	$$dir = 0x02; $top->{network}->peg(@args);
 }
 #package Circuit;
@@ -5018,8 +5139,8 @@ sub act { my ($self,@args) = @_;
 	my $top = $args[0];
 	$self->CallHistory::act(@args);
 	$self->{group}->act(@args);
-	$self->{group}->{nodea}->act(@args);
-	$self->{group}->{nodeb}->act(@args);
+	$self->{group}->{node}->{a}->act(@args);
+	$self->{group}->{node}->{b}->act(@args);
 	$top->{network}->act(@args);
 }
 #package Circuit;
@@ -5027,8 +5148,8 @@ sub cnt { my ($self,@args) = @_;
 	my $top = $args[0];
 	$self->CallHistory::cnt(@args);
 	$self->{group}->cnt(@args);
-	$self->{group}->{nodea}->cnt(@args);
-	$self->{group}->{nodeb}->cnt(@args);
+	$self->{group}->{node}->{a}->cnt(@args);
+	$self->{group}->{node}->{b}->cnt(@args);
 	$top->{network}->cnt(@args);
 }
 #package Circuit;
@@ -5036,9 +5157,9 @@ sub sim { my ($self,@args) = @_;
 	my ($top,$olddir,$newdir) = ($args[0],\$args[2],\$args[4]);
 	$self->CallHistory::sim(@args);
 	$self->{group}->sim(@args);
-	$self->{group}->{nodea}->sim(@args);
+	$self->{group}->{node}->{a}->sim(@args);
 	$$olddir ^= 0x1; $$newdir ^= 0x1;
-	$self->{group}->{nodeb}->sim(@args);
+	$self->{group}->{node}->{b}->sim(@args);
 	$$olddir = 0x02; $$newdir = 0x02;
 	$top->{network}->sim(@args);
 }
@@ -5047,8 +5168,8 @@ sub itv { my ($self,@args) = @_;
 	my ($top,$dir) = ($args[0],\$args[4]);
 	$self->CallHistory::itv(@args);
 	$self->{group}->itv(@args);
-	$self->{group}->{nodea}->itv(@args);
-	$$dir ^= 0x1; $self->{group}->{nodeb}->itv(@args);
+	$self->{group}->{node}->{a}->itv(@args);
+	$$dir ^= 0x1; $self->{group}->{node}->{b}->itv(@args);
 	$$dir = 0x02; $top->{network}->itv(@args);
 }
 #package Circuit
@@ -5056,8 +5177,8 @@ sub dur { my ($self,@args) = @_;
 	my ($top,$dir) = ($args[0],\$args[4]);
 	$self->CallHistory::dur(@args);
 	$self->{group}->dur(@args);
-	$self->{group}->{nodea}->dur(@args);
-	$$dir ^= 0x1; $self->{group}->{nodeb}->dur(@args);
+	$self->{group}->{node}->{a}->dur(@args);
+	$$dir ^= 0x1; $self->{group}->{node}->{b}->dur(@args);
 	$$dir = 0x02; $top->{network}->dur(@args);
 }
 #package Circuit
@@ -5065,8 +5186,8 @@ sub iat { my ($self,@args) = @_;
 	my ($top,$dir) = ($args[0],\$args[2]);
 	$self->CallHistory::iat(@args);
 	$self->{group}->iat(@args);
-	$self->{group}->{nodea}->iat(@args);
-	$$dir ^= 0x1; $self->{group}->{nodeb}->iat(@args);
+	$self->{group}->{node}->{a}->iat(@args);
+	$$dir ^= 0x1; $self->{group}->{node}->{b}->iat(@args);
 	$$dir = 0x02; $top->{network}->iat(@args);
 }
 #package Circuit;
@@ -5075,8 +5196,8 @@ sub pushcall {
 	my $top = $args[0];
 	$self->CallCollector::pushcall(@args);
 	$self->{group}->pushcall(@args);
-	$self->{group}->{nodea}->pushcall(@args);
-	$self->{group}->{nodeb}->pushcall(@args);
+	$self->{group}->{node}->{a}->pushcall(@args);
+	$self->{group}->{node}->{b}->pushcall(@args);
 	$top->{network}->pushcall(@args);
 }
 
@@ -5109,22 +5230,22 @@ sub restart_call {
 #package Circuit;
 sub activate {
 	my ($self,$network,$msg) = @_;
-	if ($msg->{opc} == $self->{group}->{nodea}->{pc}) {
+	if ($msg->{opc} == $self->{group}->{node}->{a}->{pc}) {
 		unless ($self->{active} & 0x1) {
 			$self->{active} |= 0x1;
 			if ($self->{active} & 0x2) {
 				$self->{group}->{actcnt}->{3}++;
-				$self->{group}->{nodea}->{actcnt}->{3}++;
-				$self->{group}->{nodeb}->{actcnt}->{3}++;
+				$self->{group}->{node}->{a}->{actcnt}->{3}++;
+				$self->{group}->{node}->{b}->{actcnt}->{3}++;
 				$network->{actcnt}->{2}++;
 				$self->{group}->{actcnt}->{2}--;
-				$self->{group}->{nodea}->{actcnt}->{2}--;
-				$self->{group}->{nodeb}->{actcnt}->{1}--;
+				$self->{group}->{node}->{a}->{actcnt}->{2}--;
+				$self->{group}->{node}->{b}->{actcnt}->{1}--;
 				$network->{actcnt}->{1}--;
 			} else {
 				$self->{group}->{actcnt}->{1}++;
-				$self->{group}->{nodea}->{actcnt}->{1}++;
-				$self->{group}->{nodeb}->{actcnt}->{2}++;
+				$self->{group}->{node}->{a}->{actcnt}->{1}++;
+				$self->{group}->{node}->{b}->{actcnt}->{2}++;
 				$network->{actcnt}->{1}++;
 			}
 		}
@@ -5134,17 +5255,17 @@ sub activate {
 			$self->{active} |= 0x2;
 			if ($self->{active} & 0x1) {
 				$self->{group}->{actcnt}->{3}++;
-				$self->{group}->{nodea}->{actcnt}->{3}++;
-				$self->{group}->{nodeb}->{actcnt}->{3}++;
+				$self->{group}->{node}->{a}->{actcnt}->{3}++;
+				$self->{group}->{node}->{b}->{actcnt}->{3}++;
 				$network->{actcnt}->{2}++;
 				$self->{group}->{actcnt}->{1}--;
-				$self->{group}->{nodea}->{actcnt}->{1}--;
-				$self->{group}->{nodeb}->{actcnt}->{2}--;
+				$self->{group}->{node}->{a}->{actcnt}->{1}--;
+				$self->{group}->{node}->{b}->{actcnt}->{2}--;
 				$network->{actcnt}->{1}--;
 			} else {
 				$self->{group}->{actcnt}->{2}++;
-				$self->{group}->{nodea}->{actcnt}->{2}++;
-				$self->{group}->{nodeb}->{actcnt}->{1}++;
+				$self->{group}->{node}->{a}->{actcnt}->{2}++;
+				$self->{group}->{node}->{b}->{actcnt}->{1}++;
 				$network->{actcnt}->{1}++;
 			}
 		}
@@ -5436,9 +5557,9 @@ sub identify {
 	my $self = shift;
 	my $group = $self->{group};
 	my $id = "Circuit $self->{cic} ";
-	$id .= $group->{nodea}->shortid;
+	$id .= $group->{node}->{a}->shortid;
 	$id .= ', ';
-	$id .= $group->{nodeb}->shortid;
+	$id .= $group->{node}->{b}->shortid;
 	return ($self->{id} = $id);
 }
 
@@ -5446,7 +5567,7 @@ sub identify {
 sub shortid {
 	my $self = shift;
 	my $group = $self->{group};
-	return "$group->{nodea}->{pcode},$group->{nodeb}->{pcode}:$self->{cic}";
+	return "$group->{node}->{a}->{pcode},$group->{node}->{b}->{pcode}:$self->{cic}";
 }
 
 #package Circuit;
@@ -5463,13 +5584,13 @@ sub fillprops {
 		-text=>'SP A point code:',
 	)->grid(-row=>$$row,-column=>0,-sticky=>'ewns');
 	$tw->Entry(%entrycenter,
-		-text=>$self->{group}->{nodea}->identify, -width=>32,
+		-text=>$self->{group}->{node}->{a}->identify, -width=>32,
 	)->grid(-row=>$$row++,-column=>1,-sticky=>'wns');
 	$tw->Label(%labelright,
 		-text=>'SP B point code:',
 	)->grid(-row=>$$row,-column=>0,-sticky=>'ewns');
 	$tw->Entry(%entrycenter,
-		-text=>$self->{group}->{nodeb}->identify, -width=>32,
+		-text=>$self->{group}->{node}->{b}->identify, -width=>32,
 	)->grid(-row=>$$row++,-column=>1,-sticky=>'wns');
 }
 
@@ -5505,8 +5626,8 @@ sub init {
 	$self->{relation} = $relation; $relation->{linkset} = $self;
 	$self->{slccnt} = 0;
 	$self->{links} = {};
-	my $nodea = $self->{nodea} = $relation->{nodea};
-	my $nodeb = $self->{nodeb} = $relation->{nodeb};
+	my $nodea = $self->{node}->{a} = $relation->{node}->{a};
+	my $nodeb = $self->{node}->{b} = $relation->{node}->{b};
 	$self->{routes} = {};
 	$self->{routes}->{a} = {}; # routes from the a-side
 	$self->{routes}->{b} = {}; # routes from the b-side
@@ -5535,16 +5656,16 @@ sub identify {
 	my $self = shift;
 	my $letter = ['?','A','B','C','D','E','F']->[$self->checktype];
 	my $id = "$letter-Linkset ";
-	$id .= $self->{nodea}->shortid;
+	$id .= $self->{node}->{a}->shortid;
 	$id .= ', ';
-	$id .= $self->{nodeb}->shortid;
+	$id .= $self->{node}->{b}->shortid;
 	return ($self->{id} = $id);
 }
 
 #package Linkset;
 sub shortid {
 	my $self = shift;
-	return "$self->{nodea}->{pcode}:$self->{nodeb}->{pcode}";
+	return "$self->{node}->{a}->{pcode}:$self->{node}->{b}->{pcode}";
 }
 
 #package Linkset;
@@ -5602,9 +5723,9 @@ sub add_msg {
 	if (exists $msg->{dpc}) {
 		my ($side,$col);
 		if ($dir) { # from b to a to dpc
-			$side = 'a'; $col = $self->{nodea}->{col};
+			$side = 'a'; $col = $self->{node}->{a}->{col};
 		} else { # from a to b to dpc
-			$side = 'b'; $col = $self->{nodeb}->{col};
+			$side = 'b'; $col = $self->{node}->{b}->{col};
 		}
 		my $node = $network->getSp($top,$msg->{dpc},$col);
 		$self->getRoute($top,$network,$side,$node)->add_msg($top,$network,$msg,2);
@@ -5631,7 +5752,7 @@ use constant {
 #package Linkset;
 sub checktype {
 	my $self = shift;
-	my ($refa,$refb) = (ref $self->{nodea},ref $self->{nodeb});
+	my ($refa,$refb) = (ref $self->{node}->{a},ref $self->{node}->{b});
 	return ($self->{type} = {
 		SP =>{ SP =>LS_UNKNOWN, SSP=>LS_UNKNOWN, STP=>LS_UNKNOWN, GTT=>LS_UNKNOWN, SCP=>LS_UNKNOWN, },
 		SSP=>{ SP =>LS_UNKNOWN, SSP=>LS_FLINK,   STP=>LS_ALINK,   GTT=>LS_ALINK,   SCP=>LS_ELINK,   },
@@ -5673,10 +5794,10 @@ sub getmore {
 			$mc->delete(0,'end');
 			foreach my $pc (sort {$a <=> $b} keys %{$self->{routes}->{b}}) {
 				my $route = $self->{routes}->{b}->{$pc};
-				$m3 = $mc->Menu(-title=>"Route $route->{nodeb}->{pcode} Menu");
+				$m3 = $mc->Menu(-title=>"Route $route->{node}->{b}->{pcode} Menu");
 				$route->getmenu($m3,$top,$X,$Y);
 				$route->getmore($m3,$top,$X,$Y);
-				$mc->add('cascade',-menu=>$m3,-label=>"Route $route->{nodeb}->{pcode}");
+				$mc->add('cascade',-menu=>$m3,-label=>"Route $route->{node}->{b}->{pcode}");
 
 			}
 		},$self,$mc,$top,$X,$Y]);
@@ -5690,10 +5811,10 @@ sub getmore {
 			$mc->delete(0,'end');
 			foreach my $pc (sort {$a <=> $b} keys %{$self->{routes}->{a}}) {
 				my $route = $self->{routes}->{a}->{$pc};
-				$m3 = $mc->Menu(-title=>"Route $route->{nodeb}->{pcode} Menu");
+				$m3 = $mc->Menu(-title=>"Route $route->{node}->{b}->{pcode} Menu");
 				$route->getmenu($m3,$top,$X,$Y);
 				$route->getmore($m3,$top,$X,$Y);
-				$mc->add('cascade',-menu=>$m3,-label=>"Route $route->{nodeb}->{pcode}");
+				$mc->add('cascade',-menu=>$m3,-label=>"Route $route->{node}->{b}->{pcode}");
 
 			}
 		},$self,$mc,$top,$X,$Y]);
@@ -5709,13 +5830,13 @@ sub fillprops {
 		-text=>'SP A point code:',
 	)->grid(-row=>$$row,-column=>0,-sticky=>'ewns');
 	$tw->Entry(%entrycenter,
-		-text=>$self->{nodea}->identify, -width=>32,
+		-text=>$self->{node}->{a}->identify, -width=>32,
 	)->grid(-row=>$$row++,-column=>1,-sticky=>'wns');
 	$tw->Label(%labelright,
 		-text=>'SP B point code:',
 	)->grid(-row=>$$row,-column=>0,-sticky=>'ewns');
 	$tw->Entry(%entrycenter,
-		-text=>$self->{nodeb}->identify, -width=>32,
+		-text=>$self->{node}->{b}->identify, -width=>32,
 	)->grid(-row=>$$row++,-column=>1,-sticky=>'wns');
 }
 
@@ -5810,8 +5931,8 @@ sub init {
 	$self->{linkset} = $linkset;
 	$linkset->{links}->{$slc} = $self;
 	$self->{slc} = $slc;
-	my $nodea = $self->{nodea} = $linkset->{nodea};
-	my $nodeb = $self->{nodeb} = $linkset->{nodeb};
+	my $nodea = $self->{node}->{a} = $linkset->{node}->{a};
+	my $nodeb = $self->{node}->{b} = $linkset->{node}->{b};
 	$self->{channelforw} = undef;
 	$self->{channelrevs} = undef;
 	$self->Arcitem::init($top,$nodea,$nodeb,['node','linkset'],[],'line',$Link::offsets->[$slc]);
@@ -5828,6 +5949,13 @@ sub new {
 }
 
 #package Link;
+sub addfrom {
+	my ($self,$othr,@args) = @_;
+	$self->SUPER::addfrom($othr,@args);
+	$self->{linkset}->addfrom($othr,@args); # note dir is same as link
+}
+
+#package Link;
 sub statechange {
 	my ($self,$top,$val) = @_;
 	$self->{linkset}->updatestate($top,$self);
@@ -5836,8 +5964,6 @@ sub statechange {
 #package Link;
 sub add_msg {
 	my ($self,$top,$network,$msg,$dir) = @_;
-	# TODO: strap next line in when message directions corrected
-	#$dir = $msg->{dir} if $msg->{dir} == 0 or $msg->{dir} == 1;
 	$self->inc($msg,$dir);
 	$self->pushmsg($msg);
 	$self->{linkset}->add_msg($top,$network,$msg,$dir);
@@ -5847,16 +5973,16 @@ sub add_msg {
 sub identify {
 	my $self = shift;
 	my $id = "Link $self->{slc} ";
-	$id .= $self->{nodea}->shortid;
+	$id .= $self->{node}->{a}->shortid;
 	$id .= ', ';
-	$id .= $self->{nodeb}->shortid;
+	$id .= $self->{node}->{b}->shortid;
 	return ($self->{id} = $id);
 }
 
 #package Link;
 sub shortid {
 	my $self = shift;
-	return "$self->{slc}:$self->{nodea}->{pcode},$self->{nodeb}->{pcode}";
+	return "$self->{slc}:$self->{node}->{a}->{pcode},$self->{node}->{b}->{pcode}";
 }
 
 #package Link;
@@ -5940,11 +6066,12 @@ sub new {
 	$self->{no} = $routeno;
 	$self->{linkset} = $linkset;
 	$self->{side} = $side;
-	my $nodea = $linkset->{"node$side"};
-	$self->{nodea} = $nodea;
-	$self->{nodeb} = $nodeb;
-	$nodea->{routes}->{og}->{$nodeb->{pc}} = $self;
-	$nodeb->{routes}->{ic}->{$nodea->{pc}} = $self;
+	my $nodea = $linkset->{node}->{$side};
+	$self->{node}->{a} = $nodea;
+	$self->{node}->{b} = $nodeb;
+	$nodea->{routes}->{a}->{$nodeb->{pc}} = $self;
+	$nodeb->{routes}->{b}->{$nodea->{pc}} = $self;
+	$nodeb->makealias($top,$nodea);
 	$self->Arcitem::init($top,$nodea,$nodeb,['node','link','linkset'],[],'last',0);
 	$self->Clickable::attach($top,@args);
 	return $self;
@@ -5960,7 +6087,7 @@ sub add_msg {
 #package Route;
 sub statechange {
 	my ($self,$top,$val) = @_;
-	$self->{nodeb}->updatestate($top,$self);
+	$self->{node}->{b}->updatestate($top,$self);
 }
 
 #package Route;
@@ -5972,18 +6099,18 @@ sub updatestate {
 sub identify {
 	my $self = shift;
 	my $id = "Route ";
-	$id .= $self->{nodea}->shortid;
+	$id .= $self->{node}->{a}->shortid;
 	$id .= " -> ";
-	$id .= $self->{nodeb}->shortid;
+	$id .= $self->{node}->{b}->shortid;
 	return ($self->{id} = $id);
 }
 
 #package Route;
 sub shortid {
 	my $self = shift;
-	my $id = $self->{nodea}->{pcode};
+	my $id = $self->{node}->{a}->{pcode};
 	$id .= '->';
-	$id .= $self->{nodeb}->{pcode};
+	$id .= $self->{node}->{b}->{pcode};
 	return $id;
 }
 
@@ -6003,7 +6130,7 @@ sub getmore {
 	},$self,$mc,$top,$X,$Y]);
 	$m->add('cascade',-menu=>$mc,-label=>'Linkset');
 
-	$node =  $self->{nodea};
+	$node =  $self->{node}->{a};
 	$mc = $m->Menu(-title=>'Transit Node Menu');
 	$mc->configure(-postcommand=>[sub {
 		my ($self,$mc,$top,$X,$Y) = @_;
@@ -6013,7 +6140,7 @@ sub getmore {
 	},$self,$mc,$top,$X,$Y]);
 	$m->add('cascade',-menu=>$mc,-label=>'Transit Node');
 
-	$node = $self->{nodeb};
+	$node = $self->{node}->{b};
 	$mc = $m->Menu(-title=>'Destination Node Menu');
 	$mc->configure(-postcommand=>[sub {
 		my ($self,$mc,$top,$X,$Y) = @_;
@@ -6031,7 +6158,7 @@ sub fillprops {
 	$tw->Label(%labelright,
 		-text=>'Destination node:',
 	)->grid(-row=>$$row,-column=>0,-sticky=>'ewns');
-	$node = $self->{nodeb};
+	$node = $self->{node}->{b};
 	$id = $node->identify;
 	$w = $tw->Entry(%entryleft,
 		-text=>$id, -width=>length($id),
@@ -6040,7 +6167,7 @@ sub fillprops {
 	$tw->Label(%labelright,
 		-text=>'Transit node:',
 	)->grid(-row=>$$row,-column=>0,-sticky=>'ewns');
-	$node = $self->{nodea};
+	$node = $self->{node}->{a};
 	$id = $node->identify;
 	$w = $tw->Entry(%entryleft,
 		-text=>$id, -width=>length($id),
@@ -6078,19 +6205,17 @@ sub new {
 	$self->{node} = $node;
 	my ($nodea,$nodeb,$adjacent,$yoff);
 	if ($side eq 'a') {
-		$adjacent = $self->{adjacent} = $channel->{nodea};
-		$nodea = $self->{nodea} = $node;
-		$nodeb = $self->{nodeb} = $adjacent;
+		$adjacent = $self->{adjacent} = $channel->{node}->{a};
+		$nodea = $self->{node}->{a} = $node;
+		$nodeb = $self->{node}->{b} = $adjacent;
 		$yoff = -3;
 	} else {
-		$adjacent = $self->{adjacent} = $channel->{nodeb};
-		$nodea = $self->{nodea} = $adjacent;
-		$nodeb = $self->{nodeb} = $node;
+		$adjacent = $self->{adjacent} = $channel->{node}->{b};
+		$nodea = $self->{node}->{a} = $adjacent;
+		$nodeb = $self->{node}->{b} = $node;
 		$yoff =  3;
 	}
-	if ($adjacent->isa('SSP') or $adjacent->isa('SCP')) {
-		$node->makealias($top,$adjacent);
-	}
+	$node->makealias($top,$adjacent);
 	$nodea->{paths}->{a}->{$channel->{ppa}} = $self;
 	$nodeb->{paths}->{b}->{$channel->{ppa}} = $self;
 	$self->Arcitem::init($top,$nodea,$nodeb,['node','channel','route','link','linkset'],[],'last',$yoff);
@@ -6211,6 +6336,9 @@ sub shortid {
 #package Node;
 sub makealias {
 	my ($self,$top,$primary) = @_;
+	return if $primary->{pc} == $self->{pc};
+	return unless $primary->isa('SSP') or $primary->isa('SCP');
+	return unless abs($primary->{col}) == ::COL_ADJ;
 	unless ($self->{alias}) {
 		$self->{alias} = 1;
 		$self->{primary} = $primary;
@@ -6223,27 +6351,10 @@ sub makealias {
 #package Node;
 sub findaliases {
 	my ($self,$top) = @_;
-	#print STDERR "D: finding aliases of ".$self->identify."\n";
-	if (abs($self->{col}) != ::COL_ADJ) {
-		#print STDERR "D: cannot find aliases for ".$self->identify." (not adjacent)\n";
-		return;
-	}
-	unless ($self->isa('SSP') or $self->isa('SCP')) {
-		#print STDERR "D: cannot find aliases for ".$self->identify." (not SSP or SCP)\n";
-		return;
-	}
-	foreach my $side (keys %{$self->{paths}}) {
-		foreach my $path (values %{$self->{paths}->{$side}}) {
-			unless ($path->{adjacent} eq $self) {
-				#print STDERR "D: unusable alias path ".$path->identify." (wrong adjacent ".$path->{adjacent}->identify.")\n";
-				next;
-			}
-			if ($path->{node} eq $self) {
-				#print STDERR "D: unusable alias path ".$path->identify." (path to self ".$path->{node}->identify.")\n";
-				next;
-			}
-			$path->{node}->makealias($top,$self);
-		}
+	return unless abs($self->{col}) == ::COL_ADJ;
+	return unless $self->isa('SSP') or $self->isa('SCP');
+	foreach my $route (values %{$self->{routes}->{a}}) {
+		$route->{node}->{b}->makealias($top,$self);
 	}
 }
 
@@ -6262,11 +6373,11 @@ sub absorb {
 	foreach my $side (keys %{$node->{paths}}) {
 		while (my ($ppa,$path) = each %{$node->{paths}->{$side}}) {
 			my $exnode;
-			$exnode = $path->{"node$side"};
+			$exnode = $path->{node}->{$side};
 			if ($node ne $exnode) {
-				print STDERR "E: node$side mismatch $node and $exnode\n";
+				print STDERR "E: node $side mismatch $node and $exnode\n";
 			} else {
-				$path->{"node$side"} = $self;
+				$path->{node}->{$side} = $self;
 			}
 			$exnode = $path->{adjacent};
 			if ($node ne $exnode) {
@@ -6332,7 +6443,7 @@ sub fillstatus {
 package SP;
 use strict;
 use vars qw(@ISA);
-@ISA = qw(Node Tristate Logging MsgCollector CallCollector);
+@ISA = qw(Node Tristate Logging DualCollector);
 # -------------------------------------
 
 #package SP;
@@ -6342,15 +6453,14 @@ sub new {
 	my $self = Node::new($type,$top,$nodeno,$col,@args);
 	$self->Tristate::init($top,'white');
 	$self->Logging::init($top,@args);
-	$self->MsgCollector::init(@args);
-	$self->CallCollector::init(@args);
+	$self->DualCollector::init(@args);
 	$self->{pc} = $pc;
 	$self->{tqueries} = {};
 	$self->{circuits} = {};
 	$self->{responds} = {};
 	$self->{routes} = {}; # routes that term or orig here
-	$self->{routes}->{og} = {};
-	$self->{routes}->{ic} = {};
+	$self->{routes}->{a} = {}; # routes for which I am node-a (i.e. O/G route)
+	$self->{routes}->{b} = {}; # routes for which I am node-b (i.e. I/C route)
 	$self->{relate} = {}; # relations in which this is a node
 	$self->{linksets} = {}; # linksets that attach here
 	$self->{pcode} = SP::pcstring($pc);
@@ -6436,7 +6546,7 @@ sub statechange {
 sub updatestate {
 	my ($self,$top,$obj) = @_;
 	my ($avail,$degra,$unava) = (0,0,0);
-	foreach my $route (values %{$self->{routes}->{og}}) {
+	foreach my $route (values %{$self->{routes}->{a}}) {
 		my $rstate = $route->{state};
 		if ($rstate == Tristate::TS_AVAILABLE) {
 			$avail++;
@@ -6727,6 +6837,7 @@ sub reanalyze {
 	}
 	if ($self->{xchg_sltm}) {
 		$self->makecol($top,::COL_ADJ);
+		$self->findaliases($top);
 	} elsif ($self->{xchg_isup} || ($self->{orig_tcap} && $self->{term_tcap})) {
 		$self->makecol($top,::COL_SSP);
 	} elsif ($self->{orig_tcap} && !$self->{term_tcap}) {
@@ -6802,7 +6913,7 @@ sub getmore {
 	$have->{adjacent} = scalar keys %{$self->{adjacent}};
 	$have->{combined} = scalar keys %{$self->{combined}};
 	$have->{linksets} = scalar keys %{$self->{linksets}};
-	$have->{routes}   = scalar keys %{$self->{routes}->{og}};
+	$have->{routes}   = scalar keys %{$self->{routes}->{a}};
 	$have->{relate}   = scalar keys %{$self->{relate}};
 	$have->{circuits} = scalar keys %{$self->{circuits}};
 	$m->add('separator') if
@@ -6864,8 +6975,8 @@ sub getmore {
 			$mc->delete(0,'end');
 			foreach my $key (sort keys %{$self->{combined}}) {
 				my $combined = $self->{combined}->{$key};
-				my $nodea = $combined->{nodea};
-				my $nodeb = $combined->{nodeb};
+				my $nodea = $combined->{node}->{a};
+				my $nodeb = $combined->{node}->{b};
 				my $label = 'Combined Linkset to '.$nodea->shortid.' and '.$nodeb->shortid;
 				my $m3 = $mc->Menu(-title=>"$label Menu");
 				$combined->getmenu($m3,$top,$X,$Y);
@@ -6883,10 +6994,10 @@ sub getmore {
 			foreach my $pc (sort {$a <=> $b} keys %{$self->{linksets}}) {
 				my $linkset = $self->{linksets}->{$pc};
 				my $node;
-				if ($linkset->{nodea}->{pc} == $self->{pc}) {
-					$node = $linkset->{nodeb};
+				if ($linkset->{node}->{a}->{pc} == $self->{pc}) {
+					$node = $linkset->{node}->{b};
 				} else {
-					$node = $linkset->{nodea};
+					$node = $linkset->{node}->{a};
 				}
 				my $label = 'Linkset to '.$node->shortid;
 				my $m3 = $mc->Menu(-title=>"$label Menu");
@@ -6902,9 +7013,9 @@ sub getmore {
 		$mc->configure(-postcommand=>[sub {
 			my ($self,$mc,$top,$X,$Y) = @_;
 			$mc->delete(0,'end');
-			foreach my $pc (sort {$a <=> $b} keys %{$self->{routes}->{og}}) {
-				my $route = $self->{routes}->{og}->{$pc};
-				my $node = $route->{nodeb};
+			foreach my $pc (sort {$a <=> $b} keys %{$self->{routes}->{a}}) {
+				my $route = $self->{routes}->{a}->{$pc};
+				my $node = $route->{node}->{b};
 				my $label = 'Route to '.$node->shortid;
 				my $m3 = $mc->Menu(-title=>"$label Menu");
 				$route->getmenu($m3,$top,$X,$Y);
@@ -6922,10 +7033,10 @@ sub getmore {
 			foreach my $pc (sort {$a <=> $b} keys %{$self->{relate}}) {
 				my $relation = $self->{relate}->{$pc};
 				my $node;
-				if ($relation->{nodea}->{pc} == $self->{pc}) {
-					$node = $relation->{nodeb};
+				if ($relation->{node}->{a}->{pc} == $self->{pc}) {
+					$node = $relation->{node}->{b};
 				} else {
-					$node = $relation->{nodea};
+					$node = $relation->{node}->{a};
 				}
 				my $label = 'Routset to '.$node->shortid;
 				my $m3 = $mc->Menu( -title=>"$label Menu");
@@ -7081,10 +7192,10 @@ sub fillstatus {
 			)->grid(-row=>$$row,-column=>0,-sticky=>'ewns') if $col == 0; $col++;
 			my $linkset = $self->{linksets}->{$pc};
 			my $node;
-			if ($self->{pc} == $linkset->{nodea}->{pc}) {
-				$node = $linkset->{nodeb};
+			if ($self->{pc} == $linkset->{node}->{a}->{pc}) {
+				$node = $linkset->{node}->{b};
 			} else {
-				$node = $linkset->{nodea};
+				$node = $linkset->{node}->{a};
 			}
 			my $w = $f->Entry(%entrycenter,-text=>$node->shortid,
 			)->grid(-row=>$$row,-column=>$col,-sticky=>'ewns');
@@ -7092,10 +7203,10 @@ sub fillstatus {
 			if ($col > 4) { $col = 0; $$row++; }
 		}
 	}
-	if (keys %{$self->{routes}->{og}}) {
+	if (keys %{$self->{routes}->{a}}) {
 		$f = $tw->TFrame(%tframestyle, -label=>'Routes:');
 		my $p = $f;
-		if (keys %{$self->{routes}->{og}} > 16) {
+		if (keys %{$self->{routes}->{a}} > 16) {
 			$f->pack(%tframepack);
 			$p = $f->Scrolled('Pane',
 				-scrollbars=>'osoe',
@@ -7109,9 +7220,9 @@ sub fillstatus {
 		my $col = 0;
 		$p->Label(%labelright,-text=>'Routes to:',
 		)->grid(-row=>$$row,-column=>0,-sticky=>'ewns');
-		foreach my $pc (sort {$a <=> $b} keys %{$self->{routes}->{og}}) {
-			my $route = $self->{routes}->{og}->{$pc};
-			my $node = $route->{nodeb};
+		foreach my $pc (sort {$a <=> $b} keys %{$self->{routes}->{a}}) {
+			my $route = $self->{routes}->{a}->{$pc};
+			my $node = $route->{node}->{b};
 			$col++;
 			my $w = $p->Entry(%entrycenter,-text=>$node->shortid,
 			)->grid(-row=>$$row,-column=>$col,-sticky=>'ewns');
@@ -7139,10 +7250,10 @@ sub fillstatus {
 		foreach my $pc (sort {$a <=> $b} keys %{$self->{relate}}) {
 			my $relation = $self->{relate}->{$pc};
 			my $node;
-			if ($relation->{nodea}->{pc} == $self->{pc}) {
-				$node = $relation->{nodeb};
+			if ($relation->{node}->{a}->{pc} == $self->{pc}) {
+				$node = $relation->{node}->{b};
 			} else {
-				$node = $relation->{nodea};
+				$node = $relation->{node}->{a};
 			}
 			$col++;
 			my $w = $p->Entry(%entrycenter, -text=>$node->shortid,
@@ -7371,7 +7482,7 @@ sub fillstatus {
 package Network;
 use strict;
 use vars qw(@ISA);
-@ISA = qw(Logging Properties Status Clickable MsgCollector CallCollector);
+@ISA = qw(Logging Properties Status Clickable DualCollector);
 # -------------------------------------
 
 my $network;
@@ -7386,8 +7497,7 @@ sub new {
 	$self->Properties::init(@args);
 	$self->Status::init(@args);
 	$self->Clickable::init(@args);
-	$self->MsgCollector::init(@args);
-	$self->CallCollector::init(@args);
+	$self->DualCollector::init(@args);
 	$self->{msgnum} = 0;
 	$self->{nodes} = {};
 	$self->{nodeno} = 0;
@@ -7492,7 +7602,7 @@ sub getRouteset {
 #package Network;
 sub getRoute {
 	my ($self,$top,$linkset,$side,$nodeb,@args) = @_;
-	my $nodea = $linkset->{"node$side"};
+	my $nodea = $linkset->{node}->{$side};
 	my $key = "$nodea->{pc},$nodeb->{pc}";
 	return $self->{routes}->{$key} if $self->{routes}->{$key};
 	my $routeno = $self->{routeno} + 1;
@@ -7840,8 +7950,8 @@ sub init {
 		#print STDERR "D: channel is an active full-duplex channel\n";
 	}
 	($nodea,$nodeb) = ($nodeb,$nodea) unless $dir & 0x1;
-	$self->{nodea} = $nodea;
-	$self->{nodeb} = $nodeb;
+	$self->{node}->{a} = $nodea;
+	$self->{node}->{b} = $nodeb;
 	$self->{xsn} = $xsn; # just to save it
 	$xsn = MTP2_ANNEX_A_USED_UNKNOWN unless 0 <= $xsn and $xsn <= 2;
 	$xsn = MTP2_ANNEX_A_NOT_USED     if $xsn == 2 and $slot != 0;
@@ -7851,6 +7961,9 @@ sub init {
 	$self->{rt}     = ::RT_UNKNOWN;
 	$self->{orig} = {};
 	$self->{dest} = {};
+	$self->{paths} = {};
+	$self->{paths}->{a} = {};  # paths from the a-side
+	$self->{paths}->{b} = {};  # paths from the b-side
 	$self->Arcitem::init($top,$nodea,$nodeb,['node','relation','link','linkset'],[],'last',0);
 	$self->Clickable::attach($top,@args);
 	$self->log("header type set to ".$self->httext." by capture") if $self->{ht};
@@ -7883,13 +7996,13 @@ sub bindchannel {
 	#print STDERR "D: binding channel ".$self->identify."\n";
 	($nodea,$nodeb) = ($nodeb,$nodea) if $msg->{dir};
 	my $slc = $self->{slc} = $msg->{slc};
-	my ($pnodea,$pnodeb) = ($self->{nodea},$self->{nodeb});
+	my ($pnodea,$pnodeb) = ($self->{node}->{a},$self->{node}->{b});
 	$nodea->absorb($top,$pnodea);
 	$nodeb->absorb($top,$pnodeb);
-	($self->{nodea},$self->{nodeb}) = ($nodea,$nodeb);
+	($self->{node}->{a},$self->{node}->{b}) = ($nodea,$nodeb);
 	my $link = $network->getLink($top,$nodea,$nodeb,$slc);
 	$self->{link} = $link;
-	$self->{dir} = $nodea->{pc} == $link->{nodea}->{pc} ? 0 : 1;
+	$self->{dir} = $nodea->{pc} == $link->{node}->{a}->{pc} ? 0 : 1;
 	if ($msg->{dir}^$self->{dir}) {
 		$link->{channelrevs} = $self;
 		$self->{yoff} = $link->{yoff} + 1.5;
@@ -7897,8 +8010,28 @@ sub bindchannel {
 		$link->{channelforw} = $self;
 		$self->{yoff} = $link->{yoff} - 1.5;
 	}
-	$nodea->findaliases($top);
-	$nodeb->findaliases($top);
+	$link->addfrom($self,$self->{dir});
+	my $linkset = $link->{linkset};
+	foreach my $side (keys %{$self->{paths}}) {
+		foreach my $path (values %{$self->{paths}->{$side}}) {
+			my $lside = (($side eq 'a' and !$self->{dir}) or
+				     ($side eq 'b' and $self->{dir})) ? 'a' : 'b';
+			my $route = $linkset->getRoute($top,$network,$lside,$path->{node});
+			# TODO add path stats to route
+			my $pdir = ($path->{node}->{a} eq $route->{node}->{a}) ? 0 : 1;
+			$route->addfrom($path,$pdir);
+		}
+	}
+}
+
+#package Channel;
+sub getPath {
+	my ($self,$top,$network,$side,$node,@args) = @_;
+	my $pc = $node->{pc};
+	return $self->{paths}->{$side}->{$pc} if $self->{paths}->{$side}->{$pc};
+	my $path = $network->getPath($top,$self,$side,$node,@args);
+	$self->{paths}->{$side}->{$pc} = $path;
+	return $path;
 }
 
 #package Channel;
@@ -7940,19 +8073,19 @@ sub complete {
 	if (exists $msg->{dpc}) {
 		my ($cola,$colb,$sidea,$sideb,$dira,$dirb);
 		if ($msg->{dir}) {
-			$cola = $self->{nodeb}->{col}; $sidea = 'b'; $dira = 1;
-			$colb = $self->{nodea}->{col}; $sideb = 'a'; $dirb = 0;
+			$cola = $self->{node}->{b}->{col}; $sidea = 'b'; $dira = 1;
+			$colb = $self->{node}->{a}->{col}; $sideb = 'a'; $dirb = 0;
 		} else {
-			$cola = $self->{nodea}->{col}; $sidea = 'a'; $dira = 0;
-			$colb = $self->{nodeb}->{col}; $sideb = 'b'; $dirb = 1;
+			$cola = $self->{node}->{a}->{col}; $sidea = 'a'; $dira = 0;
+			$colb = $self->{node}->{b}->{col}; $sideb = 'b'; $dirb = 1;
 		}
 		my $nodea = $network->getSp($top,$msg->{opc},$cola);
 		my $nodeb = $network->getSp($top,$msg->{dpc},$colb);
 		if (my $sub = $msghandler{$msg->{si}}->{$msg->{mt}}) {
 			&{$sub}($self,$top,$network,$nodea,$nodeb,$msg);
 		}
-		$network->getPath($top,$self,$sidea,$nodea)->add_msg($top,$network,$msg,$dira);
-		$network->getPath($top,$self,$sideb,$nodeb)->add_msg($top,$network,$msg,$dirb);
+		$self->getPath($top,$network,$sidea,$nodea)->add_msg($top,$network,$msg,$dira);
+		$self->getPath($top,$network,$sideb,$nodeb)->add_msg($top,$network,$msg,$dirb);
 		$network->getRouteset($top,$self,$nodea,$nodeb)->add_msg($top,$network,$msg,0);
 	}
 	$self->{link}->add_msg($top,$network,$msg,$msg->{dir}^$self->{dir}) if $self->{link};
@@ -7961,8 +8094,8 @@ sub complete {
 sub swap {
 	my ($self,$top) = @_;
 
-	my $nodea = $self->{nodea}; $nodea->swapcol($top);
-	my $nodeb = $self->{nodeb}; $nodeb->swapcol($top);
+	my $nodea = $self->{node}->{a}; $nodea->swapcol($top);
+	my $nodeb = $self->{node}->{b}; $nodeb->swapcol($top);
 	foreach my $path (values %{$self->{opcs}}) {
 		my $node = $path->{node};
 		next if $node eq $nodea or $node eq $nodeb;
@@ -8018,8 +8151,8 @@ sub identify {
 	my $self = shift;
 	my ($card,$span,$slot) = Channel::chan($self->{ppa});
 	my $id = "Channel $card:$span:$slot";
-	$id .= ", $self->{nodea}->{pcode} -> $self->{nodeb}->{pcode} link $self->{slc}"
-		if $self->{nodea} and $self->{nodea}->isa('SP');
+	$id .= ", $self->{node}->{a}->{pcode} -> $self->{node}->{b}->{pcode} link $self->{slc}"
+		if $self->{node}->{a} and $self->{node}->{a}->isa('SP');
 	return ($self->{id} = $id);
 }
 
@@ -8068,7 +8201,7 @@ sub fillstatus {
 	my ($self,$top,$tw,$row) = @_;
 
 	my $ppa = $self->shortid;
-	if ($self->{nodea} && $self->{nodeb}) {
+	if ($self->{node}->{a} && $self->{node}->{b}) {
 		$tw->Label(%labelright,
 			-text=>'Signalling link code:',
 		)->grid(-row=>$$row,-column=>0,-sticky=>'ewns');
@@ -8076,20 +8209,20 @@ sub fillstatus {
 			-textvariable=>\$self->{slc},
 		)->grid(-row=>$$row++,-column=>1,-sticky=>'ewns');
 	}
-	if ($self->{nodea}) {
+	if ($self->{node}->{a}) {
 		$tw->Label(%labelright,
 			-text=>'SP A point code:',
 		)->grid(-row=>$$row,-column=>0,-sticky=>'ewns');
 		$tw->Entry(%entryleft,
-			-textvariable=>\$self->{nodea}->{pcode},
+			-textvariable=>\$self->{node}->{a}->{pcode},
 		)->grid(-row=>$$row++,-column=>1,-sticky=>'ewns');
 	}
-	if ($self->{nodeb}) {
+	if ($self->{node}->{b}) {
 		$tw->Label(%labelright,
 			-text=>'SP B point code:',
 		)->grid(-row=>$$row,-column=>0,-sticky=>'ewns');
 		$tw->Entry(%entryleft,
-			-textvariable=>\$self->{nodeb}->{pcode},
+			-textvariable=>\$self->{node}->{b}->{pcode},
 		)->grid(-row=>$$row++,-column=>1,-sticky=>'ewns');
 	}
 	$tw->Label(%labelright,
@@ -12811,10 +12944,10 @@ sub createmenubar {
 	);
 	$mi->add('separator',);
 	$self->{show} = {
-		circuits=>1,
-		assocs=>1,
-		relations=>1,
-		routesets=>1,
+		circuits=>0,
+		assocs=>0,
+		relations=>0,
+		routesets=>0,
 		routes=>1,
 		paths=>1,
 		combineds=>1,
@@ -12828,9 +12961,9 @@ sub createmenubar {
 		stps=>1,
 		scps=>1,
 		aliases=>1,
-		all=>1,
+		all=>0,
 	};
-	$self->{view} = 0; # full
+	$self->{view} = 1; # signalling
 	$mi->add('radiobutton',
 		-value=>0,
 		-label=>'Full view',
@@ -12862,14 +12995,19 @@ sub createmenubar {
 					$self->{show}->{$k} = 0;
 				}
 				$c->itemconfigure('all',-state=>'hidden');
+				$self->{show}->{all} = 0;
 				$c->itemconfigure('route',-state=>'normal');
 				$self->{show}->{routes} = 1;
 				$c->itemconfigure('path',-state=>'normal');
 				$self->{show}->{paths} = 1;
+				$c->itemconfigure('combined',-state=>'normal');
+				$self->{show}->{combineds} = 1;
 				$c->itemconfigure('linkset',-state=>'normal');
 				$self->{show}->{linksets} = 1;
 				$c->itemconfigure('channel',-state=>'normal');
 				$self->{show}->{channels} = 1;
+				$c->itemconfigure('Node',-state=>'normal');
+				$self->{show}->{nodes} = 1;
 				$c->itemconfigure('SP',-state=>'normal');
 				$self->{show}->{sps} = 1;
 				$c->itemconfigure('SSP',-state=>'normal');
@@ -12880,6 +13018,8 @@ sub createmenubar {
 				$self->{show}->{gtts} = 1;
 				$c->itemconfigure('SCP',-state=>'normal');
 				$self->{show}->{scps} = 1;
+				$c->itemconfigure('alias',-state=>'normal');
+				$self->{show}->{aliases} = 1;
 				$self->mycanvas->relayer();
 			},$self],
 	);
@@ -13063,6 +13203,17 @@ sub createmenubar {
 			},$self],
 	);
 	$mi->add('separator',);
+	$mi->add('checkbutton', -label=>'Nodes',
+		-onvalue=>1, -offvalue=>0, -variable=>\$self->{show}->{nodes},
+		-command=>[sub{
+				my $self = shift;
+				my $v = $self->{show}->{nodes};
+				$self->{view} = 4;
+				my $c = $self->canvas;
+				my $s = $v ? 'normal' : 'hidden';
+				$c->itemconfigure('Node',-state=>$s) if $c->find(withtag=>'Node');
+			},$self],
+	);
 	$mi->add('checkbutton', -label=>'SPs',
 		-onvalue=>1, -offvalue=>0, -variable=>\$self->{show}->{sps},
 		-command=>[sub{
@@ -13150,6 +13301,7 @@ sub createmenubar {
 			"Show/hide signalling paths.",
 			"Show/hide signalling channels.",
 			undef, # separator
+			"Show/hide Nodes.",
 			"Show/hide SPs.",
 			"Show/hide SSPs.",
 			"Show/hide GTTs.",
