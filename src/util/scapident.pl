@@ -683,7 +683,7 @@ sub new {
 	return $self;
 }
 
-#package MsgCounts;
+#package Counts;
 sub addto {
 	my ($self,$othr,@args) = @_;
 	return $othr->addfrom($self,@args);
@@ -698,17 +698,27 @@ use vars qw(@ISA);
 
 #package MsgCounts;
 sub init {
-	my ($self,@args) = @_;
+	my ($self,$top,@args) = @_;
 	$self->Counts::init(@args);
-	$self->{incs} = {0=>{},1=>{},2=>{}}
+	$self->{incs} = {0=>{},1=>{},2=>{}};
+	$self->{top} = $top;
+}
+
+sub DESTROY {
+	my $self = shift;
+	$self->{TopLevel}->traceVdelete(\$self->{mcnt_text});
 }
 
 #package MsgCounts;
 sub inc {
 	my ($self,$msg,$dir) = @_;
+	#print STDERR "MsgCounts::inc called by ", $self->identify, "\n";
 	my $li = $msg->{li};
 	$self->{incs}->{$dir}->{sus} += 1;
 	$self->{incs}->{2}->{sus} += 1 unless $dir == 2;
+	if (exists $self->{mcnt}) {
+		$self->{top}->canvas->itemconfigure($self->{mcnt},-text=>$self->{incs}->{2}->{sus});
+	}
 	if ($li == 0) {
 		$self->{incs}->{$dir}->{fisus} += 1;
 		$self->{incs}->{2}->{fisus} += 1 unless $dir == 2;
@@ -789,8 +799,7 @@ use vars qw(@ISA);
 
 #package CallCounts;
 sub init {
-	my ($self,@args) = @_;
-	$self->Counts::init(@args);
+	my ($self,$top,@args) = @_;
 	$self->{pegs} = {0=>{},1=>{},2=>{}};
 	$self->{sims} = {0=>{},1=>{},2=>{}};
 	$self->{durs} = {0=>{},1=>{},2=>{}};
@@ -805,6 +814,7 @@ sub init {
 	$self->{plots}->{phsa} = {0=>{},1=>{},2=>{}};
 	$self->{ciccnt} = 0;
 	$self->{actcnt} = {0=>0,1=>0,2=>0,3=>0};
+	$self->Counts::init(@args);
 }
 
 #package CallCounts;
@@ -941,15 +951,6 @@ sub init {
 }
 
 #package History;
-sub new {
-	my ($type,@args) = @_;
-	my $self = {};
-	bless $self,$type;
-	$self->init(@args);
-	return $self;
-}
-
-#package History;
 sub interval {
 	my ($self,$ts) = @_;
 	my $int = $ts->{tv_sec};
@@ -993,9 +994,9 @@ use vars qw(@ISA);
 # -------------------------------------
 
 sub init {
-	my ($self,@args) = @_;
+	my ($self,$top,@args) = @_;
 	$self->History::init(@args);
-	$self->MsgCounts::init(@args);
+	$self->MsgCounts::init($top,@args);
 }
 
 #package MsgHistory;
@@ -1014,6 +1015,7 @@ sub addfrom {
 
 #package MsgHistory;
 sub inc { my ($self,$msg,$dir) = @_;
+	#print STDERR "MsgHistory::inc called by ", $self->identify, "\n";
 #	my $int = $self->interval($msg->{hdr});
 #	my $hist = $self->hist($int);
 #	$hist->inc($msg,$dir);
@@ -1028,9 +1030,9 @@ use vars qw(@ISA);
 # -------------------------------------
 
 sub init {
-	my ($self,@args) = @_;
+	my ($self,$top,@args) = @_;
 	$self->History::init(@args);
-	$self->CallCounts::init(@args);
+	$self->CallCounts::init($top,@args);
 }
 
 #package CallHistory;
@@ -1044,15 +1046,6 @@ sub addfrom {
 	my ($self,$othr,@args) = @_;
 	$self->CallCounts::addfrom($othr,@args);
 	$self->History::addfrom($othr,@args);
-}
-
-
-#package CallHistory;
-sub inc { my ($self,$msg,$dir) = @_;
-#	my $int = $self->interval($msg->{hdr});
-#	my $hist = $self->hist($int);
-#	$hist->inc($msg,$dir);
-	$self->CallCounts::inc($msg,$dir);
 }
 
 #package CallHistory;
@@ -4277,7 +4270,7 @@ sub new {
 	$self->Arcend::init($top,$x,$y);
 	my $state = $top->{show}->{"\L$type\Es"} ? 'normal' : 'hidden';
 	my $c = $top->canvas;
-	$self->{item} = $c->createOval(
+	push @{$self->{items}}, $self->{item} = $c->createOval(
 		$x-40,$y-40,$x+40,$y+40,
 		-fill=>$self->{color},
 		-outline=>'blue', -width=>2,
@@ -4285,8 +4278,7 @@ sub new {
 		-state=>$state,
 		-tags=>[$type,'node'],
 	);
-	push @{$self->{items}}, $self->{item};
-	$self->{scri} = $c->createLine(
+	push @{$self->{items}}, $self->{scri} = $c->createLine(
 		$x-23,$y-23,$x+23,$y-23,$x+23,$y+23,$x-23,$y+23,$x-23,$y-23,
 		-arrow=>'none', -capstyle=>'round', -joinstyle=>'round', -smooth=>0,
 		-fill=>'gray', -width=>0.1,
@@ -4294,33 +4286,35 @@ sub new {
 		-state=>$state,
 		-tags=>[$type,'scri'],
 	);
-	push @{$self->{items}}, $self->{scri};
-	$self->{ttxt} = $c->createText($x,$y-15,
-		-anchor=>'center', -fill=>'black', -justify=>'center',
-		-text=>$type,
-		-state=>$state,
-		-tags=>[$type,'text'],
-	);
-	push @{$self->{items}}, $self->{ttxt};
-	$self->{text} = $c->createText($x,$y,
-		-anchor=>'center', -fill=>'black', -justify=>'center',
-		-text=>'?',
-		-state=>$state,
-		-tags=>[$type,'text'],
-	);
-	push @{$self->{items}}, $self->{text};
-	$self->{ownr} = $c->createText($x,$y+15,
+	push @{$self->{items}}, $self->{ownr} = $c->createText($x,$y+10,
 		-anchor=>'center', -fill=>'black', -justify=>'center',
 		-text=>$nodeno,
 		-state=>$state,
 		-tags=>[$type,'text'],
 	);
-	push @{$self->{items}}, $self->{ownr};
-	$c->raise($self->{item},'all');
-	$c->raise($self->{scri},$self->{item});
-	$c->raise($self->{ttxt},$self->{scri});
-	$c->raise($self->{text},$self->{scri});
-	$c->raise($self->{ownr},$self->{scri});
+	push @{$self->{items}}, $self->{ttxt} = $c->createText($x,$y-20,
+		-anchor=>'center', -fill=>'black', -justify=>'center',
+		-text=>$type,
+		-state=>$state,
+		-tags=>[$type,'text'],
+	);
+	push @{$self->{items}}, $self->{mcnt} = $c->createText($x,$y+25,
+		-anchor=>'center', -fill=>'blue', -justify=>'center',
+		-text=>'0',
+		-state=>$state,
+		-tags=>[$type,'text'],
+	);
+	push @{$self->{items}}, $self->{text} = $c->createText($x,$y-5,
+		-anchor=>'center', -fill=>'black', -justify=>'center',
+		-text=>'?',
+		-state=>$state,
+		-tags=>[$type,'text'],
+	);
+	my $olditem = 'all';
+	foreach (@{$self->{items}}) {
+		$c->raise($_,$olditem);
+		$olditem = $_;
+	}
 	#print STDERR "D: must regroup\n";
 	$top->{regroupnow} = 1;
 	#$top->regroup();
@@ -4398,7 +4392,7 @@ sub absorb {
 	while (my $item = shift @{$node->{items}}) {
 		$c->delete($item);
 	}
-	foreach (qw(item scri ttxt text ownr off col row)) { delete $node->{$_}; }
+	foreach (qw(item scri ttxt text ownr mcnt off col row)) { delete $node->{$_}; }
 	#print STDERR "D: must regroup\n";
 	$top->{regroupnow} = 1;
 	#$top->regroup();
@@ -4514,7 +4508,7 @@ sub init {
 	$self->Properties::init(@args);
 	$self->Status::init(@args);
 	$self->Clickable::init(@args);
-	$self->DualCollector::init(@args);
+	$self->DualCollector::init($top,@args);
 	$self->{key} = "$nodea->{pc},$nodeb->{pc}";
 	$self->{cics} = {};
 	$self->{slccnt} = 0;
@@ -4973,7 +4967,7 @@ sub init {
 	$self->Properties::init(@args);
 	$self->Status::init(@args);
 	$self->Clickable::init(@args);
-	$self->MsgCollector::init(@args);
+	$self->MsgCollector::init($top,@args);
 	$self->{no} = $routesetno;
 	$self->{key} = "$nodea->{pc},$nodeb->{pc}";
 	$self->{node}->{a} = $nodea;
@@ -5040,7 +5034,7 @@ use vars qw(@ISA);
 #package Call;
 sub init {
 	my ($self,$top,$circuit,@args) = @_;
-	$self->MsgCollector::init(@args);
+	$self->MsgCollector::init($top,@args);
 	$self->{circuit} = $circuit;
 	$self->{state} = 0;
 	if ($circuit->{call}) {
@@ -5096,7 +5090,7 @@ sub new {
 	$self->Logging::init($top,@args);
 	$self->Properties::init(@args);
 	$self->Status::init(@args);
-	$self->DualCollector::init(@args);
+	$self->DualCollector::init($top,@args);
 	$self->{dir} = 0;
 	$self->{ts} = $top->{begtime};
 	$group->{cics}->{$cic} = $self;
@@ -5621,7 +5615,7 @@ sub init {
 	$self->Properties::init(@args);
 	$self->Status::init(@args);
 	$self->Clickable::init(@args);
-	$self->MsgCollector::init(@args);
+	$self->MsgCollector::init($top,@args);
 	$self->{no} = $linksetno;
 	$self->{relation} = $relation; $relation->{linkset} = $self;
 	$self->{slccnt} = 0;
@@ -5899,7 +5893,7 @@ sub init {
 	$self->Properties::init(@args);
 	$self->Status::init(@args);
 	$self->Clickable::init(@args);
-	$self->MsgCollector::init(@args);
+	$self->MsgCollector::init($top,@args);
 	$self->{no} = $combinedno;
 	$self->{linkseta} = $linkseta;
 	$self->{linksetb} = $linksetb;
@@ -5926,7 +5920,7 @@ sub init {
 	$self->Properties::init(@args);
 	$self->Status::init(@args);
 	$self->Clickable::init(@args);
-	$self->MsgCollector::init(@args);
+	$self->MsgCollector::init($top,@args);
 	$self->{no} = $linkno;
 	$self->{linkset} = $linkset;
 	$linkset->{links}->{$slc} = $self;
@@ -6062,7 +6056,7 @@ sub new {
 	$self->Properties::init(@args);
 	$self->Status::init(@args);
 	$self->Clickable::init(@args);
-	$self->MsgCollector::init(@args);
+	$self->MsgCollector::init($top,@args);
 	$self->{no} = $routeno;
 	$self->{linkset} = $linkset;
 	$self->{side} = $side;
@@ -6198,7 +6192,7 @@ sub new {
 	$self->Properties::init(@args);
 	$self->Status::init(@args);
 	$self->Clickable::init(@args);
-	$self->MsgCollector::init(@args);
+	$self->MsgCollector::init($top,@args);
 	$self->{no} = $pathno;
 	$self->{channel} = $channel;
 	$self->{side} = $side;
@@ -6390,6 +6384,7 @@ sub absorb {
 	}
 	delete $node->{paths};
 	delete $top->{network}->{pnodes}->{$self->{no}};
+
 }
 
 #package Node;
@@ -6453,7 +6448,7 @@ sub new {
 	my $self = Node::new($type,$top,$nodeno,$col,@args);
 	$self->Tristate::init($top,'white');
 	$self->Logging::init($top,@args);
-	$self->DualCollector::init(@args);
+	$self->DualCollector::init($top,@args);
 	$self->{pc} = $pc;
 	$self->{tqueries} = {};
 	$self->{circuits} = {};
@@ -6485,11 +6480,10 @@ sub xform {
 	my $mc = $top->mycanvas;
 	$mc->delballoon($self->{items});
 
-	$c->dtag($self->{item},$oldtype); $c->addtag($type,withtag=>$self->{item});
-	$c->dtag($self->{scri},$oldtype); $c->addtag($type,withtag=>$self->{scri});
-	$c->dtag($self->{ttxt},$oldtype); $c->addtag($type,withtag=>$self->{ttxt});
-	$c->dtag($self->{text},$oldtype); $c->addtag($type,withtag=>$self->{text});
-	$c->dtag($self->{ownr},$oldtype); $c->addtag($type,withtag=>$self->{ownr});
+	foreach (@{$self->{items}}) {
+		$c->dtag($_,$oldtype);
+		$c->addtag($type,withtag=>$_);
+	}
 
 	my @oldtags = ();
 	push @oldtags, 'SLTM' if $self->{xchg_sltm};
@@ -6505,17 +6499,15 @@ sub xform {
 		$c->itemconfigure($self->{item}, -dash=>[5,2]);
 		$c->itemconfigure($self->{scri}, -dash=>[5,2]);
 	}
-	$c->raise($self->{item},'all');
-	$c->raise($self->{scri},$self->{item});
-	$c->raise($self->{ttxt},$self->{scri});
-	$c->raise($self->{text},$self->{scri});
-	$c->raise($self->{ownr},$self->{scri});
+	my $olditem = 'all';
+	foreach (@{$self->{items}}) {
+		$c->raise($_,$olditem);
+		$olditem = $_;
+	}
 	my $state = ($top->{show}->{"\L$type\Es"}) ? 'normal' : 'hidden';
-	$c->itemconfigure($self->{item},-state=>$state);
-	$c->itemconfigure($self->{scri},-state=>$state);
-	$c->itemconfigure($self->{ttxt},-state=>$state);
-	$c->itemconfigure($self->{text},-state=>$state);
-	$c->itemconfigure($self->{ownr},-state=>$state);
+	foreach (@{$self->{items}}) {
+		$c->itemconfigure($_,-state=>$state);
+	}
 	$self->Clickable::attach($top);
 	$self->findaliases($top);
 }
@@ -6815,25 +6807,13 @@ sub reanalyze {
 	my ($self,$top,$network) = @_;
 	my $c = $top->canvas;
 	if ($self->{xchg_isup}) {
-		$c->addtag('ISUP',withtag=>$self->{item});
-		$c->addtag('ISUP',withtag=>$self->{scri});
-		$c->addtag('ISUP',withtag=>$self->{ttxt});
-		$c->addtag('ISUP',withtag=>$self->{text});
-		$c->addtag('ISUP',withtag=>$self->{ownr});
+		foreach (@{$self->{items}}) { $c->addtag('ISUP',withtag=>$_); }
 	}
 	if ($self->{orig_tcap} or $self->{term_tcap}) {
-		$c->addtag('TCAP',withtag=>$self->{item});
-		$c->addtag('TCAP',withtag=>$self->{scri});
-		$c->addtag('TCAP',withtag=>$self->{ttxt});
-		$c->addtag('TCAP',withtag=>$self->{text});
-		$c->addtag('TCAP',withtag=>$self->{ownr});
+		foreach (@{$self->{items}}) { $c->addtag('TCAP',withtag=>$_); }
 	}
 	if ($self->{xchg_sltm}) {
-		$c->addtag('SLTM',withtag=>$self->{item});
-		$c->addtag('SLTM',withtag=>$self->{scri});
-		$c->addtag('SLTM',withtag=>$self->{ttxt});
-		$c->addtag('SLTM',withtag=>$self->{text});
-		$c->addtag('SLTM',withtag=>$self->{ownr});
+		foreach (@{$self->{items}}) { $c->addtag('SLTM',withtag=>$_); }
 	}
 	if ($self->{xchg_sltm}) {
 		$self->makecol($top,::COL_ADJ);
@@ -7497,7 +7477,7 @@ sub new {
 	$self->Properties::init(@args);
 	$self->Status::init(@args);
 	$self->Clickable::init(@args);
-	$self->DualCollector::init(@args);
+	$self->DualCollector::init($top,@args);
 	$self->{msgnum} = 0;
 	$self->{nodes} = {};
 	$self->{nodeno} = 0;
@@ -7927,7 +7907,7 @@ sub init {
 	$self->Properties::init(@args);
 	$self->Status::init(@args);
 	$self->Clickable::init(@args);
-	$self->MsgCollector::init(@args);
+	$self->MsgCollector::init($top,@args);
 	$self->MsgBuffer::init(@args);
 	$self->{no} = $channelno;
 	$self->{ppa} = $ppa;
