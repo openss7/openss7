@@ -1,0 +1,4818 @@
+ 	-
+01029	01029 Telecom GmbH
+01039	01039 Call by Call GmbH
+01051	01051 Telecom GmbH
+01058	01058 Telecom GmbH
+01059	01059 GmbH
+01066	01066 GmbH
+012	012 Smile
+1012-Festnetz-Service	1012-Festnetz-Service
+11811	11811 Nueva Información Tel, S.A.U.
+1582HK	1582HK Ltd
+1910	1910 S.A.
+21ST C Cable	21ST Century Cable
+2Connect	2Connect WLL
+30	30 Degrees East Telecoms (PTY) Ltd
+360	360 Communications
+365	365 Telecom (MVNO)
+3G	3G Infrastructure Services AB
+3GIS	3GIS Pty Ltd. (Telstra & Hutchison 3G)
+3G	3G Radio System/HKCSL3G
+3G	3G Radio System/Hutchison 3G
+3G	3G Radio System/SMT3G
+3G	3G Radio System/Sunday3G
+3G	3G Telecommunications Ltd
+3U	3U Telecom
+3U	3U Telecom AG
+3U	3U Telecom Inc
+42IT	42IT AB
+42	42 Telecom Limited
+4Call	4Call, s.r.o.
+4Consult	4Consult, s.r.o.
+AAPT	AAPT Ltd
+AAPT	AAPT Ltd.
+Abaion	Abaion Telecom IT AG
+Abiatar	Abiatar SA
+Lietuvos	AB Lietuvos gelezinkeliai
+Lietuvos	AB Lietuvos gelezinkelial
+ABS-CBN	ABS-CBN Telecom, North America Inc
+Absolute	Absolute Telecom P/L
+Acantho	Acantho S.p.A.
+Access	Access Long Distance
+Access	Access One
+ATG	Access Technologies Group
+Access	Access Telecom
+Access	Access Telecom Ireland Ltd.
+ACC	ACC Long Distance Corporation
+Accom	Accom GmbH
+ACC	ACC TeleCom
+Aces	Aces
+Ace	Ace Telephone Company of Michigan, Inc.
+Acris	Acris Telecom GmbH
+ACS	ACS Systems, Inc.
+Actel	Actel Telecommunication Ltd
+Action	Action Telcom Company
+ACT	ACT Mobile
+Adamasto	Adamasto
+Adamo	Adamo Europe, S.L.
+Aditya	Aditya Birla Telecom Ltd, Bihar
+Makedonski	AD Makedonski Telekomunikaci
+ANTEL	Administración nacional de Telecomunicaciones (ANTEL)
+ADR	ADR Tel S.p.A.
+T-Mobile	AD T-Mobile
+Advanced	Advanced Communication Network, S.A.
+Advanced	Advanced Communications Technologies Pty. Ltd.
+Advanced Tel	Advanced Tel., Inc.
+Advantage	Advantage Cellular Systems
+Advantage	Advantage Cellular Systems, Inc.
+Advantis	Advantis
+Aeris	Aeris Communications, Inc.
+Aerolite	Aerolite
+AeroMobile	AeroMobile AS
+AES	AES Communications Bolivia S.A.
+AESTEL	AESTEL Salvadoreña y Cía, S. en C. de C.V.
+Aexis	Aexis Telecom S.p.A.
+Afghan	Afghan Telecom
+Africanus.net	Africanus.net Limited/RDC
+AFRICELL	AFRICELL
+Africell	Africell
+Afrilink	Afrilink
+Agri-Valley	Agri-Valley Broadband Inc
+AGSM	AGSM Telecomunicazioni srl
+AIC	AIC Asia International Service Corp.
+AIC	AIC Asia International Services Corporation
+Aicent	Aicent, Inc
+AIC	AIC Telecom
+AIC	AIC Telecom UK Ltd
+AinaCom	AinaCom Oy
+AIN	AIN Globalcom Company Ltd
+AINMT	AINMT Sverige AB
+AirABA	AirABA d.o.o. Sarajevo
+Airadigm	Airadigm Communications
+Aircell	Aircell Cellular Ltd, Chennai
+Aircell	Aircell Digilink India Ltd., Haryana
+Aircell	Aircell Digilink India Ltd., Rajasthan
+Aircell	Aircell Digilink India Ltd., UP (East)
+Aircell	Aircell Ltd, Andhra Pradesh
+Aircell	Aircell Ltd, Delhi
+Aircell	Aircell Ltd, Gujarat
+Aircell	Aircell Ltd, Karnataka
+Aircell	Aircell Ltd, Maharashtra
+Aircell	Aircell Ltd, Mumbai
+Aircell	Aircell Ltd, Rajasthan
+Aircel	Aircel Ltd., Tamil Nadu
+Aircomm	Aircomm Côte d'Ivoire
+Airdata	Airdata AG
+Airnet	Airnet Commercial Australia Ltd.
+Airnet	Airnet NZ
+Airtel	Airtel Lanka Ltd
+Airtel	Airtel sprl
+AirTouch	AirTouch Satellite Serv.
+AirTouch	AirTouch Satellite Services
+Airwave	Airwave mmO2 Ltd
+AIS	AIS GSM
+Akkay	Akkay Haustechnik und Handels GmbH
+Aktel	Aktel
+AkTen	AkTen Ltd
+Akton	Akton
+Akton	Akton d.o.o.
+AKT.ONLINE	AKT.ONLINE d.o.o. Sarajevo
+Alamosa	Alamosa PCS LLC
+Alands	Alands Mobiltelefon AB
+Alands	Alands Mobiltelefon Ab
+Alascom	Alascom
+Alaska	Alaska Communications
+Alaska DigiTel	Alaska DigiTel
+Alaska	Alaska Digitel LLC
+Alaska Net Sys	Alaska Network Systems, Inc.
+Alaska	Alaska Wireless Communications LLC
+Albacom	Albacom S.p.A.
+AMC	Albanian Mobile Communications (AMC)
+ALBTelecom	ALBTelecom
+Alcotek	Alcotek S.p.A.
+Alec	Alec, Inc.
+Alenco	Alenco Communications, Inc.
+Alestra	Alestra, S. de R.L. de C.V.
+Alex	Alex Development Georgia Ltd
+Algonet	Algonet
+Algérie	Algérie Telecom
+Algérie	Algérie Télécom
+Alhambra-G	Alhambra-Grantfork Telephone Company
+Aliant	Aliant Mobility
+All	All America Cables & Radio Dominican Republic Inc.
+Allegiance	Allegiance Telcom, Inc.
+Allegiance	Allegiance Telecom, Inc.
+Allegiance	Allegiance Telecom,Inc.
+Allendale	Allendale Telephone Company
+Allied	Allied Communication Holdings, LLC
+Allnet	Allnet Communications Services, Inc.
+ALLTEL	ALLTEL
+All West	All West Communications
+Alma	Alma Telephone Company
+Alma	Alma Telephone Company, Inc.
+Al-Moakhah	Al-Moakhah for Telecom
+Alon	Alon Cellular Ltd
+Alpcom	Alpcom AG
+AlphaNet	AlphaNet Telecom Inc.
+Alphanet	Alphanet Telecom Inc
+Alphanet	Alphanet Telecom Inc.
+Alpha	Alpha Telecom pty
+Alpikom	Alpikom S.p.A.
+ANS	Alternative Network Services
+Amatole	Amatole Telecommunication Pty Ltd
+Ambitel	Ambitel
+AMC	AMC (Albanian Mobile Communications)
+AMD	AMD TELECOM
+Americana	Americana de Telecomunicaciones S.A. de C.V.
+American	American Alliance Corporation
+ACS	American Comm.Services,Inc.
+American	American Communications Services Inc.
+American	American Communications Services, Inc.
+AGT	American Gateway Telecommunications
+AIT	American International Tele.Co.,Inc.
+AIT	American International Telephone
+ALL	American Long Lines
+Amer MetroComm	American MetroComm Corporation
+American Per.	American Personal Communications
+APT	American Portable Telecom
+Amer Samoa	American Samoa Telecommunications
+ASTCA	American Samoa Telecommunications Authority (ASTCA)
+Amer Sharecom	American Sharecom
+American Telco	American Telco, Inc
+American	American Telecom Services S.A.C.
+American	American Telephone Company, Inc.
+ATG	American Telephone Group
+American	American Telesource International Inc
+ATI	American Telesource Int'l Inc.
+Americatel	Americatel Corporation
+Americatel	Americatel El Salvador
+Americatel	Americatel Guatemala, S.A.
+Americatel	Americatel Perú S.A.
+Americel	Americel
+AmeriCom	AmeriCom Communications, LLC
+Ameritech	Ameritech Cellular Services, Inc.
+Ameritech	Ameritech Communication Inc
+Ameritech	Ameritech Communication Inc.
+Ameritech	Ameritech Global Gateway Services
+AGGS	Ameritech Global Gateway Services (AGGS)
+Ameritech	Ameritech Services
+AmeriVision	AmeriVision Communications Inc.
+AmeriVision	AmeriVision Communications, Inc.
+Amery	Amery Telcom, Inc.
+Amherst	Amherst Telephone Company
+Amica	Amica Wireless Phone Service
+Amis	Amis d.o.o.
+AmisTelekom	AmisTelekom d.o.o.
+Amitelo	Amitelo AG
+Amnex	Amnex Network
+América	América Móvil Perú S.A.C.
+América	América Móvil Perú srl
+Amtelecom	Amtelecom, Inc.
+Amtel	Amtel Slovensko, s.r.o.
+AMWAJ	AMWAJ Telecom
+AM Wireless	AM Wireless Uruguay SA
+AMX	AMX Argentina S.A. (ex CTI Compañia de Teléfonos del Interior S.A.)
+Ancel	Ancel
+Ancel	Ancel - GSM
+Ancel	Ancel - TDMA
+Anchorage	Anchorage Telephone Utility
+Andinatel	Andinatel S.A.
+Andrew's	Andrew's Communications Ltd
+Aneks	Aneks d.o.o. Banja Luka
+Angola	Angola Telecom
+Animatele	Animatele Inc.
+Anishnabe	Anishnabe Comm. Enterprise,Inc.
+Antelecom	Antelecom
+Antigua	Antigua Public Utilities Authority
+Antik	Antik Computers and Communications, s.r.o.
+Antillean	Antillean Network Management
+Antilles	Antilles Crossing Ltd
+Anupam	Anupam Global Soft Uganda Ltd
+Apelby	Apelby GmbH
+Apollo	Apollo Telecom
+Applied Signal	Applied Signal Corporation
+APT	APT Telecom Services Ltd
+APUA	APUA PCS
+APUA/PCS	APUA/PCS
+(aq)	(aq) Limited T/A aql
+Networks	(aq) Networks Ltd
+Arbinet	Arbinet Communication, Inc
+Arbinet	Arbinet, Inc
+Arbinet	Arbinet-thexchange HK Ltd
+Arbinet	Arbinet-thexchange, Inc
+Arbinet	Arbinet-thexchange (UK) Ltd
+Arbit	Arbit Communications, Inc.
+Arch	Arch Communications Group, Inc.
+Arcor	Arcor AG & Co.
+Arctic	Arctic Slope Telephone Association Cooperative
+Ardmore	Ardmore Telephone Company
+Ardmore	Ardmore Telephone Company, Inc.
+Areeba	Areeba Afghanistan
+Areeba	Areeba Guinée
+Areeba	Areeba Ltd (MTN)
+Areeba-Sudan	Areeba-Sudan
+Aria	Aria
+ARINC	ARINC
+Arkansas	Arkansas Telephone Company, Inc.
+Arktel	Arktel LLC
+Armentel	Armentel JV CJSC
+Arminco	Arminco
+Armour Ind.	Armour Independent Telephone Company
+Armstrong	Armstrong Telephone Company
+Arobase	Arobase Telecom
+ARPT	ARPT
+AR Telecom	AR Telecom - Access os e Redes de Telecomunicações, S.A.
+AS	AS Bravocom Mobiil
+ASEAN	ASEAN Telecom, LLC
+EMT	AS EMT
+EVR Infra	AS EVR Infra
+ASGSM	ASGSM MOBI
+A.S.H.	A.S.H. Communication GmbH
+Asia	Asia Access Telecom, Inc
+Asia	Asia Cell
+Asia	Asia Cellular Satellite (AceS)
+Asia	Asia Communications International, Inc
+Asiakomnet	Asiakomnet Multimedia Pte Ltd
+Asia	Asia Netcom Australia Pty Ltd
+Asia	Asia Netcom Singapore Pte Ltd
+Asia	Asia Telecom
+ASN2P	ASN2P, S.A.
+STV	AS STV
+Telefant	AS Telefant
+Astelit	Astelit
+ATC	ATC Communications
+ATCI	ATCI Inc.
+ATC	ATC Teleports, Inc
+Atheer	Atheer
+Athena	Athena International LLC
+Athena	Athena International L.L.C.
+ATL	ATL Algar
+Atlanet	Atlanet S.p.A.
+Atlantic	Atlantic Cellular Company, L.P.
+Atlantic Conn	Atlantic Connections, Inc.
+ATLANTIC	ATLANTIC TELECOM
+Atlantic	Atlantic Telephone Membership Corporation
+Atlantique	Atlantique Cellulaire
+Atlantique	Atlantique Telecom
+Atlantique	Atlantique Telecom 2
+Atlantique	Atlantique Telecom - Côte d'Ivoire
+Atlantis	Atlantis Telecom Ltd
+Atlas	Atlas Communication
+Atlas	Atlas Interactive Group Ltd
+Atlas	Atlas Telecom Interactive
+Atlas	Atlas Telecom Network
+Atlas	Atlas Telephone Company
+AT&T	AT&T
+AT&T	AT&T Argentina S.A.
+AT&T Canada	AT&T Canada Long Distance Services
+AT&T	AT&T Chile S.A.
+AT&T	AT&T Communications
+AT&T	AT&T Communications Services Nederland B.V.
+AT&T	AT&T Global Network Services Nederland B.V.
+AT&T	AT&T Global Network Services (UK) B.V.
+Attiway	Attiway
+AT&T	AT&T Mobility Vanguard Services
+AT&T	AT&T Servicios de Comunicaciones Guatemala S.A.
+AT&T	AT&T (VSN)
+AT&T	AT&T Wireless (Antigua)
+AT&T	AT&T Wireless Services St. Lucia
+ATX	ATX Telecommunications Services
+Augustakom	Augustakom Telekommunikation GmbH & Co. KG.
+Auna	Auna Telecomunicaciones, S.A.
+Ausgrid	Ausgrid Corporation
+Bestline	Austin Bestline
+Australian	Australian Telecoms Exchange Pty. Ltd
+Authentix	Authentix Network, Inc.
+Automated	Automated Communications, Inc.
+Avantel	Avantel
+Avantel	Avantel S.A.
+Avantel	Avantel, SA
+Avantel	Avantel, S. de R.L. de C.V.
+Avantis	Avantis Telecom GmbH
+Avea	Avea
+Avirnex	Avirnex Communications Group
+AWCC	AWCC
+AXTEL	AXTEL, S.A.B. de C.V.
+Aycell	Aycell
+Ayersville	Ayersville Telephone Company
+Ayla	Ayla Lil Istisharat Wal Khadamat Al Istithmariyeh
+Azercell	Azercell Limited Liability Joint Venture
+Azercell	Azercell Telekom LLC
+Azerphone	Azerphone LLC
+Azertelekom	Azertelekom LLC
+Aztelekom	Aztelekom PU
+Azules	Azules y Platas S.A.
+Azurtel	Azurtel
+Azurtel	Azurtel Ltd
+Babillon-T	Babillon-T
+Baca Valley	Baca Valley Telephone Company
+Bahamas	Bahamas Telecommunications Company Ltd
+Batelco	Bahrain Telecommunications Company (Batelco)
+Bakcell	Bakcell Limited Liability Company
+Baldwin	Baldwin Telecom, Inc.
+Ballard R	Ballard Rural Telephone Cooperative
+Bangladesh	Bangladesh Telegraph and Telephone Board
+Bangla	Bangla Trac Communication Ltd
+Banglatrac	Banglatrac Communication Ltd
+Banverket	Banverket
+Barablu	Barablu Mobile Austria
+Barablu	Barablu Mobile Austria Ltd
+Barablu	Barablu Mobile Benelux Ltd
+Barablu	Barablu Mobile Ltd
+Barablu	Barablu Mobile Ltd.
+Barablu	Barablu Mobile Scandinavia Ltd
+Barablu	Barablu Móvil España, SLU
+Baraga	Baraga Telephone Company
+Baraka	Baraka Telecom Sdn Bhd
+Barak	Barak Ltd
+BCTI	Barash Communication Technologies (BCTI)
+Bartel	Barbados Telephone Company, Ltd., (Bartel)
+Barry Cty	Barry County Telephone Company
+Bascom M	Bascom Mutual Telephone Company
+Base	Base
+BASE	BASE sa/nv
+Bashair	Bashair Telecom Co.
+Basis	Basis
+BATELCO	BATELCO
+Batelco	Batelco Jordan
+Bayantel	Bayantel
+Baykal	Baykal Westcom
+Bay Springs	Bay Springs Telephone Company, Inc.
+BayStar	BayStar Communications
+ÖBB	ÖBB - Infrastruktur Bau
+bbned	bbned N.V.
+BCH	BCH Digital Limited
+BCP	BCP
+BC Tel	BC Tel
+Bebbicel	Bebbicel AG
+Bebbicell	Bebbicell AG
+Beehive	Beehive Telephone Company, Inc.
+Beeline	Beeline
+Beeline	Beeline VN/GTEL Mobile JSC
+Beepsend	Beepsend AB
+Beijing	Beijing Boat Communication Corporation
+BEK	BEK Communications Cooperative
+BelCel	BelCel Joint Venture
+Belgacom	Belgacom
+Belgacom	Belgacom International Carrier
+Belgacom	Belgacom International Carrier Services
+Belgacom	Belgacom International SA
+Belize	Belize Telecommunication Ltd.
+Belize	Belize Telecommunications Ltd., GSM 1900
+Bell Atlantic	Bell Atlantic
+Bell Atlantic	Bell Atlantic Global Networks
+Bell Atlantic	Bell Atlantic Mobile
+Bell Atlantic	Bell Atlantic Mobile, Inc.
+Bell Atlantic	Bell Atlantic Mobile Systems
+Bell Atlantic	Bell Atlantic NYNEX Mobile
+Bell Atlantic	Bell Atlantic - Virginia, Inc.
+Bell	Bell Baltia
+Bell	Bell Canada
+Bellingham	Bellingham Telecommunications Limited
+Bell	Bell Mobility
+Bell Mobility	Bell Mobility Cellular
+BellSouth	BellSouth
+BCPS	Bellsouth Carrier Professional Services, Inc (BCPS)
+BellSouth	BellSouth Cellular Corporation
+BellSouth	Bellsouth Chile S.A.
+Bellsouth	Bellsouth Colombia S.A.
+BellSouth	BellSouth Enterprises
+BellSouth	BellSouth International
+BellSouth	BellSouth Long Distance, Inc.
+BellSouth	BellSouth Mobility
+BellSouth	BellSouth PCS
+BellSouth	BellSouth Public Communications, Inc.
+BellTelecom	BellTelecom
+Beltelecom	Beltelecom
+Bemobile	Bemobile (Bmobile (SI)) Ltd
+Bend	Bend Cable Communications LLC
+B Lomand R	Ben Lomand Rural Telephone Cooperative, Inc.
+Benson	Benson Informatics Ltd
+Bentleyville	Bentleyville Telephone Company
+Benton	Benton Cooperative Telephone Company
+Beresford Mun	Beresford Municipal Telephone Company
+Berkshire	Berkshire Telephone Corporation
+BerMos	BerMos Com GmbH
+Bermuda	Bermuda Digital Communications Ltd.
+Best	Best Spain Telecom, SL
+Best	Best Spain Telecom, S.L.
+Beta	Beta Telecom
+Bethlehem	Bethlehem Technologies London
+Bezeq	Bezeq International Ltd
+Bhamas	Bhamas Telecommunications Corp
+BSNL	Bharat Sanchar Nigam Ltd (BSNL)
+Bharti	Bharti Airtel Ltd
+Bharti	Bharti Airtel Ltd., Andra Pradesh
+Bharti	Bharti Airtel Ltd, Assam
+Bharti	Bharti Airtel Ltd, Bihar
+Bharti	Bharti Airtel Ltd., Chennai
+Bharti	Bharti Airtel Ltd., Delhi
+Bharti	Bharti Airtel Ltd., Gujarat
+Bharti	Bharti Airtel Ltd., Haryana
+Bharti	Bharti Airtel Ltd., H.P.
+Bharti	Bharti Airtel Ltd, J&K
+Bharti	Bharti Airtel Ltd., Karnataka
+Bharti	Bharti Airtel Ltd., Kerala
+Bharti	Bharti Airtel Ltd., Kolkata
+Bharti	Bharti Airtel Ltd., Madhya Pradesh
+Bharti	Bharti Airtel Ltd., Maharashtra
+Bharti	Bharti Airtel Ltd., Mumbai
+Bharti	Bharti Airtel Ltd, North East
+Bharti	Bharti Airtel Ltd, Orissa
+Bharti	Bharti Airtel Ltd., Punjab
+Bharti	Bharti Airtel Ltd., Tamil Nadu
+Bharti	Bharti Airtel Ltd, UP (East)
+Bharti	Bharti Airtel Ltd., UP (West)
+Bharti	Bharti Hexacom Ltd, Rajasthan
+BH Telecom	BH Telecom d.d. Sarajevo
+Bhutan	Bhutan Telecom Ltd
+Bhutan	Bhutan Telecom Ltd.
+Big Bend	Big Bend Telephone
+Big Sandy	Big Sandy Telecom
+Bill	Bill Telecom AG
+Bintel	Bintel
+Bionet	Bionet
+Biper	Biper Express S.A.C.
+Birch	Birch Telecom
+Bitel	Bitel GSM
+Bite	Bite Mobile
+Bité	Bité GSM
+Bittel	Bittel Telecommunications Corporation
+Bixby	Bixby Telephone Company
+Blackfoot	Blackfoot Telephone Cooperative, Inc.
+Black	Black Sea Telecom Ltd
+Blanca	Blanca Telephone Company
+Blanchard	Blanchard Municipal Telephone System
+Blanchard	Blanchard Telephone Association, Inc.
+Bledsoe	Bledsoe Telephone Cooperative
+Blizoo	Blizoo media and broadband
+Bloomingdale H	Bloomingdale Home Telephone Company
+Bloomingdale	Bloomingdale Telephone Company
+Bloomingdale	Bloomingdale Telephone Company, Inc.
+Blossom	Blossom Telephone Co.,Inc.
+Bloutsville	Bloutsville Telephone Company
+Blu	Blu
+Bludot	Bludot Communications Pte Ltd
+Blueberry	Blueberry Telecom
+Blueberry	Blueberry Telecom Pte Ltd
+Bluecom	Bluecom Internet GmbH
+Bluegrass	Bluegrass Cellular LLC
+Bluestem	Bluestem Telephone Company
+Blue	Blue Two Chile SA
+Blue Valley	Blue Valley Telephone Company
+Blus	Blus Communications Ltd
+Blyk	Blyk N.V.
+Bmobile	Bmobile
+B-Mobile	B-Mobile Ltd
+B-Mobile	B-Mobile of Bhutan Telecom
+BM	BM Telecom
+BN1	BN1 Telecommunications
+Bokamoso	Bokamoso Consortium Pty Ltd
+Bokone	Bokone Telecoms Pty Ltd
+Bolitel	Bolitel s.r.l.
+BOLIVIATEL	BOLIVIATEL SA
+Border to Border	Border to Border Communications, Inc.
+Borusan	Borusan
+Bosphocom	Bosphocom
+BTC	Botswana Telecommunications Corporation
+BTC	Botswana Telecommunications Corporation (BTC)
+Bouygues	Bouygues Telecom
+Bouygues	Bouygues Telecom Caraïbe
+Bouygues	Bouygues Telecom (Zones Blanches)
+BPL	BPL Mobile Communications Ltd., Mumbai
+BPS	BPS Telephone Company
+Brandenburg	Brandenburg Telephone Company
+Brantley	Brantley Telephone Company
+Brasil	Brasil Telecom
+Brastel	Brastel Company Ltd.
+Brazoria	Brazoria Telephone Company
+Brazos	Brazos Telephone Cooperative, Inc.
+BRE	BRE Communications dba Phone Michigan
+Brennercom	Brennercom AG/SpA
+Brennercom	Brennercom S.p.A.
+Bretton Woods	Bretton Woods Telephone Company
+Bridgeport	Bridgeport Networks Inc
+Bridgewater-C	Bridgewater-Canistota Independent Telephone
+Brindlee Mtn.	Brindlee Mtn. Telephone Company
+Bristol Bay	Bristol Bay Telephone Cooperative, Inc.
+British	British Telecom
+BT	British Telecom
+Brooke	Brooke Municipal Telephone System
+Brooks Fiber	Brooks Fiber Communications
+Bruce	Bruce Municipal Telephone System
+Bruce	Bruce Telephone Company
+BSC	BSC de Panama
+BSC	BSC de Panama S.A.
+BSE	BSE
+BSNL,	BSNL, Andaman & Nicobar
+BSNL,	BSNL, Andhra Pradesh
+BSNL,	BSNL, Assam
+BSNL,	BSNL, Bihar
+BSNL,	BSNL, Chennai
+BSNL,	BSNL, Gujarat
+BSNL,	BSNL, Haryana
+BSNL,	BSNL, H.P.
+BSNL,	BSNL, J&K
+BSNL,	BSNL, Karnataka
+BSNL,	BSNL, Kerala
+BSNL,	BSNL, Kolkata
+BSNL,	BSNL, Madhya Pradesh
+BSNL,	BSNL, Maharashtra
+BSNL,	BSNL, North East
+BSNL,	BSNL, Orissa
+BSNL,	BSNL, Punjab
+BSNL,	BSNL, Rajasthan
+BSNL,	BSNL, Tamil Nadu
+BSNL,	BSNL, UP (East)
+BSNL,	BSNL, UP (West)
+BSNL,	BSNL, West Bengal
+BTA	BTA Cellcom Ltd., Madhya Pradesh
+BT	BT Americas Inc
+BT	BT Australasia PM-F2
+BT	BT Australasia Pty Ltd
+BT	BT Communications
+B.Tel	B.Tel, S.A. de C.V.
+BT	BT España Compañia de Servicios Globales de
+BT	BT España, S.A.
+BT	BT España, S.A.U.
+BT	BT Ignite GmbH & Co.
+BTI	BTI Telecommunications Services
+BT	BT Limited Hungarian Branch Office
+BT	BT Nederland B.V.
+BT	BT Nederland N.V.
+BT	BT North America
+BT	BT Poland Sp. Z.o.o
+BT	BT Singapore Pte Ltd
+BT	BT Slovakia, s.r.o.
+BT	BT (Worldwide) Ltd.
+BT	BT (Worldwide) Ltd., organizacni slozka
+Buckeye	Buckeye Telesystem
+Budget	Budget Phone Company B.V.
+Budget	Budget Telecom
+Buffalo Vly	Buffalo Valley Telephone
+Bug	Bug Tussel Wireless LLC
+BTC	Bulgarian Telecommunication Company
+Bulloch	Bulloch Telephone Cooperative, Inc.
+BTS	Business Technology Services, Inc.
+Business	Business Telecom
+Buztel	Buztel
+C2C	C2C Ltd
+C&W	Cable and Wireless
+C&W	Cable and Wireless (Barbados) Ltd
+C&W	Cable and Wireless (Energis)
+C&W	Cable and Wireless Guensey Ltd
+C&W	Cable and Wireless Guernsey Ltd
+C&W	Cable and Wireless Isle of Man Ltd
+C&W	Cable and Wireless Jamaica Ltd
+C&W	Cable and Wireless Panama S.A.
+C&W	Cable and Wireless (Seychelles) Ltd.
+C&W	Cable and Wireless UK
+Cablecom	Cablecom GmbH
+Cable	Cable & Communications Corporation dba Mid-Rivers Wireless
+CCS	Cablen et Communication Systems Ltd
+Cablenet	Cablenet S.A.
+Cable	Cable Onda S.A.
+Cable	Cable Onda, S.A.
+Cable Plus	Cable Plus Company LP
+Cableuropa	Cableuropa, S.A.
+Cableuropa,	Cableuropa, SAU
+Cablevision	Cablevision
+Cablevision	Cablevision Systems Corporation
+Cableway	Cableway S.A.
+C&W	Cable & Wireless
+C&W	Cable & Wireless (Antigua)
+C&W	Cable & Wireless (Barbados) Ltd.
+C&W	Cable & Wireless (BVI) Ltd
+C&W	Cable & Wireless (Cayman)
+C&W	Cable & Wireless Deutschland GmbH
+C&W	Cable & Wireless Dominica
+C&W	Cable & Wireless Global Network (HK) Ltd
+C&W	Cable & Wireless Global Pte Ltd
+C&W	Cable & Wireless Grenada
+C&W	Cable & Wireless, Inc (CWI)
+C&W	Cable & Wireless Jamaica Ltd.
+C&W	Cable & Wireless Jersey Ltd
+C&W	Cable & Wireless Ltd
+C&W	Cable & Wireless Panama S.A.
+C&W	Cable & Wireless (Schweiz) AG
+C&W	Cable & Wireless (Seychelles) Ltd.
+C&W	Cable & Wireless, S.L.U.
+C&W	Cable & Wireless S.p.A.
+C&W	Cable & Wireless St. Kitts-Nevis
+C&W	Cable & Wireless St. Lucia
+C&W	Cable & Wireless St. Vincent
+C&W	Cable & Wireless UK
+Cabo	Cabo TLC
+Cabo	Cabo Verde Telecom
+Cabovisão	Cabovisão - Televisão por Cabo, S.A.
+Cadcomms	Cadcomms
+Calcatel	Calcatel Rete S.p.A.
+CA-OR	California-Oregon Telephone Company
+California	California RSA No3 Ltd Partnership dba Golden State Cellular
+CallAmerica	CallAmerica
+Call America	Call America
+Callforeign	Callforeign Inc Pte Ltd
+Call-Net	Call-Net Telecom, Ltd.
+CallPlus	CallPlus
+Callsat	Callsat Telecom Cyprus
+Call Sciences	Call Sciences
+Calltrade	Calltrade Carrier Services AG
+Callworld	Callworld UK Ltd
+CALNET	CALNET
+Cal-North	Cal-North Cellular
+Cambridge	Cambridge Telephone Company
+Camden	Camden Telephone and Telegraph Company
+Camelot	Camelot Telecom Ltd.
+Cameron	Cameron Telephone Company
+Cameron	Cameron Telephone Company Texas Division
+Cam-Net	Cam-Net Communications, Inc.
+Camtel	Camtel
+Cantel	Cantel
+Capcom	Capcom International, S.L.
+Cape	Cape Town Metropolitan Council
+Capital	Capital Network Systems, Inc.
+Capital	Capital Telecom, Inc.
+Caprock	Caprock Cellular Ltd. Partnership
+CapRock	CapRock Communications
+CapRock	CapRock Communications, Inc.
+Capwire	CAPWIRE
+Capwire	Capwire
+Caribbean	Caribbean Cellular Telephone Ltd.
+Caribbean	Caribbean Cellular Tel. Ltd
+Caribbean	Caribbean Telephone and Telegraph, Inc.
+Caribcom	Caribcom
+Carib	Carib Comm, L.P.
+Caricall	Caricall Communications
+Cariglobe	Cariglobe Telecommunications
+Carnegie	Carnegie Telephone Company
+Carolina	Carolina West Wireless
+Carrier1	Carrier1 AG
+Carrier1	Carrier 1, Inc.
+Carrier1	Carrier1 International GmbH
+Carrier1	Carrier 1 Italia Network srl
+CarrierNet	CarrierNet Corporation Ltd
+Carrier	Carrier PB Telco Inc
+Carrier	Carrier to Carrier Telecom N.V.
+Carr	Carr Telephone
+Cascade	Cascade Utilities, Inc.
+Cass Cty	Cass County Telephone Company
+Cass	Cass telephone Company
+Catalana	Catalana de Telecomunicaciones, S.A.
+CAT	CAT CDMA
+Catel	Catel Carrier -und Telekommunikationsbörse Frankfurt AG
+Catel	Catel JV
+CAT	CAT Telecom Public Company Ltd
+Caucasus	Caucasus Digital Network Ltd
+CCI	C.C.I.
+CDMA/Hutchison	CDMA/Hutchison
+CD-Telematika	CD-Telematika a.s.
+Celca	Celca (Socatel)
+CelCom	CelCom (Malaysia) Berhad
+Celcom	Celcom (Malaysia) Berhad
+Cellco	Cellco GSM Cellulaire du Congo
+Cellcom	Cellcom Guinée
+Cellcom	Cellcom Guinée SA
+Cellcom	Cellcom Israel Ltd.
+Cell	Cell C (Pty) Ltd
+Cell	Cell C (Pty) Ltd.
+Cellis	Cellis
+Cellplus	Cellplus
+Cellular Hldg	Cellular Holding, Inc.
+St. Cloud	Cellular Mobile Systems of St. Cloud
+Cellular	Cellular Network Partnership dba Pioneer Cellular
+CellularOne	CellularONE
+CellularOne	Cellular One (Kansas City)
+CellularOne	CellularOne of Northeast Colorado
+CellularOne	CellularOne (Puerto Rico)
+Cellular	Cellular Properties Inc.
+Cellular	Cellular South Inc
+Cell	Cell Wireless Corporation
+Cel*Star	Cel*Star (Guyana) Inc.
+Celtel	Celtel
+Celtel	Celtel Congo sprl (RDC)
+Celtel	Celtel Gabon
+Celtel	Celtel Gabon S.A.
+Celtel	Celtel (Kenya) Ltd
+Celtel	Celtel Lanka Ltd.
+Celtel	Celtel ltd.
+Celtel	Celtel Madagascar GSM
+Celtel	Celtel Madagascar (Zain), GSM
+Celtel	CELTEL NIGER S.A.
+Celtel	Celtel (T) Ltd
+Celtel	Celtel (T) Ltd.
+Celtel	Celtel Uganda
+Celtel	Celtel Uganda Ltd (Zain)
+Celtel	Celtel Zambia Ltd.
+Celupago	Celupago S.A.
+Centennial	Centennial Cayman Corp. Chile S.A.
+Centennial	Centennial Cellular Corporation
+Centennial	Centennial Communications
+CentennialDominicana	CentennialDominicana
+CTP	Centrafrique Telecom Plus (CTP)
+C Arkansas	Central Arkansas Telephone Cooperative, Inc.
+Central	Central Georgian Communications Co. Ltd.
+C Oklahoma	Central Oklahoma Telephone Company
+Central	Central Telecom
+C Texas	Central Texas Telephone Cooperative
+C Utah	Central Utah Telephone, Inc.
+Centrex	Centrex Telecom Co. Ltd
+Centrica	Centrica Telecommunications
+Century	Century Telephone Enterprises, Inc.
+Cescom	Cescom
+Ceterp	Ceterp Cel
+CEZ	CEZ ITC Services a.s.
+CFW	CFW Telephone
+CFW	CFW Wireless
+Chadwick	Chadwick Telephone
+Champaign	Champaign Telephone Company
+Champlain	Champlain Telephone Company
+Champlain Vly	Champlain Valley Telecom
+Chapin	Chapin telephone Company
+Chariton	Chariton Valley Communications Corp., Inc.
+Chariton Vly	Chariton Valley Long Distance Corp.
+Chariton Vly	Chariton Valley Telephone Corporation
+Chase	Chase Communications,Inc.
+Chautauqua	Chautauqua & Erie Telephone Corp.
+Cheers	Cheers International Sales Ltd
+Chequamegon	Chequamegon Telephone
+Cherokee	Cherokee Telephone Company
+Cherry	Cherry Communications
+Chesnee	Chesnee Telephone Company
+Chester	Chester Telephone Company
+Chibardun	Chibardun Telephone Cooperative, Inc.
+Chickamauga	Chickamauga Telephone Company
+Chilesat	Chilesat S.A.
+Chillicothe	Chillicothe Telephone Company
+Chime	Chime Communications
+China Leader	China Leader International Ltd
+China Mobile	China Mobile
+China Mobile	China Mobile Hong Kong Ltd
+China Mobile	China Mobile People's Telephone Co. Ltd
+China Motion	China Motion Japan Ltd.
+China Netcom	China Netcom
+China Netcom	China Netcom (HK) Operations Co. Ltd
+China Netcom	China Netcom (USA) Operations Ltd
+China Satcom	China Satcom
+China Sattelite	China Satellite Global Star Network
+China Telecom	China Telecom
+China Telecom	China Telecom (Americas) Corporation
+China Telecom	China Telecom (Europe) Ltd
+China Telecom	China Telecom (Macau) Company Ltd
+China Telecom	China Telecom (USA) Corporation
+China Tel Co	China Telephone Company
+China Tietong	China Tietong
+China Tietong	China Tietong HongKong Telecom Co. Ltd.
+China Unicom	China Unicom
+China Unicom	China Unicom CDMA
+China Unicom	China Unicom International Ltd
+China Unicom	China Unicom USA Corporation
+China Virtual	China Virtual (Hong Kong) Ltd
+Chinguitel	Chinguitel SA
+Chinguitel	Chinguitel S.A.
+Chippewa City	Chippewa City Telephone Company
+Choctaw	Choctaw Telephone Company
+Choice One	Choice One Communications
+Choice	Choice Phone LLC
+Churchill City	Churchill City Telephone & Telegraph System
+CIFSA	CIFSA Telecom S.A.C.
+Cignal	Cignal Global Communications Germany GmbH
+Cignal	Cignal Telecommunications Japan K.K.
+Cimarron	Cimarron Telephone Company
+Cinc. Bell	Cincinnati Bell Long Distance
+Cinc, Bell	Cincinnati Bell Telephone
+Cincinnati	Cincinnati Bell Wireless LLC
+Cingular	Cingular Wireless
+Cingular	Cingular Wireless, Licensee Pacific Telesis Mobile Services, LLC
+CITIC	CITIC Telecom 1616 Ltd
+CITIC	CITIC Telecom 1616 (UK) Ltd
+Citizens	Citizens Telecom
+Citizens	Citizens Telephone
+Citizens	Citizens Telephone Company
+Citizens	Citizens Telephone Company, Inc.
+Citizens	Citizens Telephone Company of Kecksburg
+Citizens	Citizens Telephone Cooperative
+Citizens	Citizens Telephone Cooperative, Inc.
+Citrus	Citrus Telecommunications Ltd
+CIT	C.I.T. SA
+C. Lakewood	City of Lakewood
+City Telecom	City Telecom (HK) Ltd
+City Telecom	City Telecom (USA)Inc.
+CityTel	CityTel Mobility
+Civil	Civil Aviation Authority
+CJSC	CJSC Indigo Tajikistan
+CJSC	CJSC - Telesystems of Ukraine
+CK Telco Svc.	CK Telco Services GBR
+Clarence	Clarence Telephone Company
+Clarks	Clarks Telecommunications Co.
+Claro	Claro
+Claro	Claro CR Telecomuniocaciones S.A.
+Claro	Claro Panamá S.A.
+Claro	Claro Panamá, S.A.
+Classic	Classic Telephone
+Clay Cty	Clay County Rural Telephone Cooperative, Inc.
+Clearnet	Clearnet
+Clearnet	Clearnet Communications, Inc
+Clearnet	Clearnet Communications, Inc.
+Cleartel	Cleartel Communications
+Clever	Clever Communications Ltd.
+Climax	Climax Telephone Company
+Comstar	Closed Joint Stock Company Comstar-Ukraine
+Kyivstar	Closed joint stock company Kyivstar GSM
+Closed	Closed Joint Stock Company Ukranian Mobile Communications
+Closed	Closed JSC Belarussian Telecommunication network
+Cloud9	Cloud9
+CMG	CMG Telecommunications, Inc.
+CMPak	CMPak
+CMTEL	CMTEL (HK) Ltd
+CNI	CNI
+Coastal	Coastal Telephone Company
+Coastal	Coastal Utilities, Inc.
+Coast	Coast Media GmbH
+Coast to Coast	Coast to Coast
+Cobbosseecontee	Cobbosseecontee Telephone & Telegraph Company
+Cochrane Coop	Cochrane Cooperative Telephone Company
+Codenet	Codenet S.A.
+Codetel	Codetel
+Coleman Cty	Coleman County Telephone Cooperative, Inc.
+Colombia Movíl	Colombia Movíl S.A. ESP
+Colombia Movíl	Colombia Móvil S.A.
+Colombia	Colombia Telecomunicaciones S.A. ESP
+Colombia	Colombia Telecomunicaciones S.A. - Telecom
+Colorado Vly	Colorado Valley Telephone Cooperative
+Colt	Colt
+Colt	Colt Mobile Telecommunications Ltd
+Colt	Colt Technology Services - UNIPESSOAL, LDA
+Colt	COLT Telecom
+Colt	Colt Telecom
+Colt	Colt Telecom AB
+Colt	Colt Telecom AG
+Colt	Colt Telecom B.V.
+Colt	Colt Telecom España, S.A.
+Colt	Colt Telecom GmbH
+Colt	COLT Telecommunications
+Colt	Colt Telecommunications
+Colt	Colt Telecommunications France
+Colt	Colt Telecom S.p.A.
+Colt	Colt Telekom Austria
+Colubris	Colubris S.A.
+Columbia	Columbia Telecommunications, Inc.
+Columbine	Columbine Telecom Company
+Columbus	Columbus Communications Ltd
+Columbus	Columbus Telephone Company
+Comanche Cty	Comanche County Telephone Company, Inc.
+Comav	Comav Telco, Inc.
+Combellga	Combellga
+Combridge	Combridge
+Comcast	Comcast Cellular
+Comcel	Comcel
+Comcel	Comcel S.A. Occel S.A./Celcaribe
+Comfone	Comfone AG
+Comium	Comium
+Comium	Comium - Côte d'Ivoire
+Comium	Comium Côte d'Ivoire
+Comium	Comium Liberia
+Comium	Comium Services Ltd
+Comium	Comium (Sierra Leone) Ltd.
+Comm. Depot	Comm. Depot, Inc.
+Commnet	Commnet Cellular
+Commnet	Commnet Midwest LLC
+Commnet	Commnet Wireless LLC
+Commnet	Commnet Wireless, LLC
+Commonwealth	Commonwealth Telephone Company
+COMCEL	Communication Cellulaire d'Haiti S.A. (COMCEL)
+CCI	Communication Consultants, Inc.
+CGN	Communications Gateway Network, Inc.
+CNS	Communications Networking Services (UK)
+CTI	Communications Telesystems International dba
+CTI	Communications TeleSystems Int'l
+CTI	Communication Telesystems International
+CTI	Communication Telesystems, Int'l
+CommuniGroup	CommuniGroup, Inc.
+Communikationsnetze	Communikationsnetze Süd-West GmbH & Co. KG
+Communique	Communique Telecomm.
+Community Svc.	Community Service Telephone Company
+Community	Community Telephone
+ComNet	ComNet
+Com Net	Com Net
+ComNet	ComNet Telecom
+ComNet	ComNet Telecom International Limited
+ComNet	ComNet (USA) LLC
+ComoreTel	ComoreTel Holdings Ltd
+CANTV	Compañía Añnima Nacional Teléfonos de Venezuela (CANTV)
+CTI	Compañía de Telecomunicaciones Integrales S.A.
+CTDP	Compañía de Teléfonos Del Plata S.A.
+CDT	Compañía Dominicana de Teléfonos, C. por A.
+CRM	Compañia de Radiocomunicaciones Moviles S.A.
+CTCTR	Compañia de Telecomunicaciones de Chile Transmisiones Regionales S.A.
+CTC	Compañia de Telefonos de Chile - Mundo S.A.
+CTIN	Compañia de Telefonos del Interior Norte S.A.
+CTI	Compañia de Telefonos del Interior S.A.
+CPC	Compañia Privada de Comunicaciones S.A.
+CTA	Compañia Telefónica Andina S.A.
+CTM	Companhia de Telecomunicações de Macau sarl (CTM)
+Companhia	Companhia Santomese de Telecomunicações
+Compass	Compass Communications
+Compass	Compass Global, Inc
+Compatel	Compatel Ltd
+Completel	Completel
+CompleTel	CompleTel GmbH
+C-P Hill	Compti-Pleasant Hill Telephone Company
+Computel	Computel Sp. Z.o.o.
+Comsat	Comsat Argentina S.A.
+Comsat	Comsat Mobile Communications
+Comsat	Comsat Perú
+ComScape	ComScape Telecommunications, Inc.
+CTI	Com Tech International
+Comte	Comte Communications Technology S.A.
+Comunicaciones Celulares	Comunicaciones Celulares S.A.
+Comunicaciones	Comunicaciones Celulares S.A.
+Comunitel	Comunitel Global, S.A.
+Concept-T	Concept-T Sp. Z.o.o.
+Conduit	Conduit Europe SA
+Conecel	Conecel S.A.
+Conestoga	Conestoga Telephone & Telegraph Company
+Conestoga	Conestoga Wireless Company
+Conexión	Conexión Chile S.A.
+ConferTech	ConferTech International
+Congo-Chine	Congo-Chine Telecom s.a.r.l.
+Congo	Congo Telecom
+Conneaut	Conneaut Telephone Company
+Connect Amer	Connect America,Inc.
+Connect	Connect Holding Corporation
+Connect	Connect Net Inc
+Connex.com	Connex.com
+ConQuest	ConQuest
+Con Quest	Con Quest
+Consiagnet	Consiagnet S.p.A.
+Consolidated	Consolidated Comm. Inc.
+Consolidated	Consolidated Communications, Inc.
+Consolidated	Consolidated Telco, Inc.
+Consolidated	Consolidated Telcom
+Consolidated	Consolidated Telephone Cooperative
+Consorzio	Consorzio Terrecablate
+CONTEL	CONTEL (GTE Wireless)
+Contennial	Contennial Puerto Rio License Corp.
+Contoocook Vly	Contoocook Valley Telephone
+Convergía	Convergía de México, S.A. de C.V.
+Convergía	Convergía S.A.
+Convergent	Convergent Communications Services,Inc.
+Convergia	Convergia Argentina S.A.
+Convergia	Convergia España, S.L.
+Convergia	Convergia Inc
+Convergia	Convergia Panamá SA
+Convergia	Convergia Venezuela, SA
+Convey	Convey Communications Inc
+CoolTEL	CoolTEL Aps
+CoolTEL	CoolTEL Aps A.B.
+Coolwave	Coolwave Communications B.V.
+Coon Valley	Coon Valley Farmers Telephone Company
+Cooperative	Cooperative Communications Inc.
+Cooperative	Cooperative Communications, Inc
+Copaco	Copaco S.A.
+Copper	Copper Valley Wireless
+Cordova	Cordova Telephone Cooperative
+Cordova	Cordova Wireless Communications Inc
+Corisat	Corisat America Inc
+Cornet-AM	Cornet-AM
+Continental	Corporación Continental de Desarrollo S.A.
+Digitel	Corporación Digitel
+Digitel	Corporación Digitel, C.A.
+INTERCABLE	Corporación Telemig CA (INTERCABLE)
+CTG	Corporate Telemanagement Group
+Corr	Corr Wireless Communications
+Corr	Corr Wireless Communications LLC
+Coscom	Coscom
+CoServ	CoServ L.L.C.
+Cosmo	Cosmo Bulgaria Mobile
+Cosmofon	Cosmofon
+COSMOLINE	COSMOLINE
+Cosmoline	Cosmoline
+Cosmorom	Cosmorom
+COSMOTE	COSMOTE
+Cosmote	Cosmote
+Cosmote	Cosmote Romanian Mobile
+COTAS	COTAS LTDA
+COTEL	COTEL LTDA
+Council Grove	Council Grove Telephone Company
+Cowiche	Cowiche Telephone
+Cox	Cox Communication
+Cox	Cox TMI Wireless LLC
+CPS	CPS Technology
+CPS	CPS Telecom
+Craigville	Craigville Telephone Company, Inc.
+Crawford	Crawford Telephone Company
+Craw-Kan	Craw-Kan Telephone Cooperative, Inc.
+Cricket	Cricket Communications
+Criket	Criket Communications LLC
+Crockett	Crockett Telephone Company
+Crossnet	Crossnet
+Cross	Cross Telephone
+Cross	Cross Telephone Company
+Cross	Cross Valiant Cellular Partnership
+Crossville	Crossville Communications, Inc.
+Crown Point	Crown Point Telephone
+CRT	CRT Cellular
+C-R	C-R Telephone Company
+Crumb	Crumb Group d.o.o. Bijeljina
+CSC	CSC Iridium Technologies
+CSC	CSC Telecom
+CS Info	CS Info S.p.A.
+CSW/ICG	CSW/ICG ChoiceCom, L.P.
+CTBC	CTBC Cel
+CTBC	CTBC Celular
+CTC	CTC Communications Corp
+CTC	CTC Telecom Inc
+CTC	CTC Transmisiones Regionales, S.A.
+Côte	Côte d'Ivoire Telecom
+CTE	CTE, S.A. de C.V.
+CTE	CTE Telecom Personal, S.A. de C.V.
+CT	CT GSM
+CTIA	CTIA
+CTI	CTI Móvil
+CTI	CTI PCS S.A.
+CTI	CTI Telecom Inc.
+CTJTHSC	CTJTHSC Tajik-tel
+CTM	CTM GSM
+CTMR	CTMR Cel
+CTS	CTS
+CTS	CTS Gibraltar
+CTS	CTS Gibraltar (mobile service)
+Cuba City	Cuba City Telephone Exchange Company
+Cubic	Cubic Aktiengesellschaft
+Cumby	Cumby Telephone Cooperative,Inc.
+Cunningham	Cunningham Telephone Co.,Inc.
+CURE	CURE CMTS
+Curtis	Curtis Telephone Co.,Inc.
+Custer	Custer Telephone Cooperative, Inc.
+CV Telecom	CV Telecom
+Cyberlight	Cyberlight International, Inc.
+Cyberlink	Cyberlink
+Cypress	Cypress Telecommunications, Inc./Cytel
+Cypress	Cypress Telecommunications, Inc./Cytel.
+CYTA	Cyprus Telecommunications Authority (CYTA)
+CYTA	CYTA
+Dacom	Dacom
+Dacom	Dacom America, Inc
+Daewoo	Daewoo Information Systems
+Daewoo	Daewoo Unitel
+Dakota	Dakota Carrier Services
+Dakota Central	Dakota Central Telecommunication Cooperative
+Dakota C	Dakota Central Telecommunications Cooperative
+Dakota	Dakota Cooperative Telecommunications, Inc.
+Dallas NextFone	Dallas NextFone Systems, LC
+Dalton	Dalton Telephone Co.,Inc.
+Darien	Darien Telephone Company, Inc.
+DAAI	Data Access America Inc
+DataComm	DataComm. International Company, Ltd.
+Data & Elec	Data & Electronic Services, Inc.
+Datagrupa	Datagrupa 777
+Dataphone	Dataphone Scandinavia AB
+Datapro	Datapro (proprietary) Ltd
+Datatel	Datatel (SL) Ltd CDMA
+Datatel	Datatel (SL) Ltd GSM
+Datek	Datek Systems, Inc
+Datek	Datek Telecom
+Datu	Datu Tikli
+Dauphin	Dauphin Telecom
+Dauphin	Dauphin Télécom
+Daviess-M Cty	Daviess-Martin County Rural Telephone Corporation
+Dba	Dba Next Telecommunication Inc
+DB Netz	DB Netz AG
+D-COM	D-COM
+DD Conexión	DD Conexión Perú S.A.
+Decatur	Decatur Telephone Company, Inc.
+Deerfield F	Deerfield Farmers' Telephone Company
+Defense	Defense Communications Agency
+Degatel	Degatel S.r.l.
+Dekalb	Dekalb Telephone Cooperative
+Delcambre	Delcambre Telephone Company
+Dell Coop	Dell Telephone Cooperative
+Delta	Delta Telephone Company, Inc.
+México	de México, México, S.A. de C.V. Tlalnepantia
+Dentel	Dentel
+DNT	Dentel Netzwerk Telefonie GmbH
+D&ET&T	Denver & Ephrata Telephone & Telegraph
+Department	Department of Defence
+DeTeMobil	DeTeMobil Deutsche Telekom MobilNet GmbH
+Deutsche	Deutsche Telekom AG
+DhiMobile	DhiMobile
+Dhiraagu	Dhiraagu
+Dial-Around	Dial-Around Telecom, Inc
+Dialog	Dialog Broadband Networks
+Dialog	Dialog Telecom Plc
+Dialost	Dialost GmbH
+Dialost	Dialost Ltd.
+Dial	Dial Telecom
+Dial	Dial Telecom, a..s.
+Dial	Dial Telecom, a.s.
+Dial US	Dial US
+Diamond	Diamond Link, Inc
+Dickey Rural	Dickey Rural Telephone Company
+DiDaCom	DiDaCom GmbH
+Digicel	Digicel
+Digicel	Digicel (Barbados)
+Digicel	Digicel (BVI) Ltd
+Digicel	Digicel, C.A.
+Digicel	Digicel (Cayman Isl.) Ltd
+Digicel	Digicel (Fiji) Limited
+Digicel	Digicel (Fiji) Ltd
+Digicel	Digicel Fiji Ltd
+Digicel	Digicel Honduras
+Digicel	Digicel (Jamaica) Ltd
+Digicel	Digicel Ltd
+Digicel	Digicel MG INT
+Digicel	Digicel Nauru Backup
+Digicel	Digicel Nauru Ltd
+Digicel	Digicel (Panamá), S.A.
+Digicel	Digicel Panamá S.A.
+Digicel	Digicel PNG Ltd
+Digicel	Digicel, S.A. de C.V.
+Digicel,	Digicel, S.A. de C.V.
+Digicel	Digicel St. Lucia
+Digicel	Digicel Tahiti
+Digicel	Digicel (TCI) Ltd
+Digicel	Digicel (Tonga) Ltd
+Digicel	Digicel Trinidad and Tobago Ltd
+Digicel	Digicel Trinidad and Tobago Ltd.
+Digicel	Digicel USA, Inc
+Digicel	Digicel Vanuatu
+Digicel	Digicel Vanuatu Ltd
+Digifone	Digifone mm02 Ltd.
+DiGiPH FCS	DiGiPH FCS, Inc.
+Digiplus	Digiplus Pty Ltd
+DAC	Digital Alliance Consortium
+DDT	Digital Destinations Telecom
+Digital	Digital Network
+Digital Ntwk	Digital Network, Inc.
+Digital	Digital Pacific Ltd
+Digital	Digital Telecommunications, Inc.
+Digital Teleport	Digital Teleport, Inc.
+Digital	Digital Trunked Radio Network
+Digitech	Digitech Solutions Global Ltd
+Digitel	Digitel
+DIGI	DIGI Telecommunication Ltd
+DIGI	DIGI Telecommunications
+Digi	Digi Telecommunications
+Digitel	Digitel IGF
+Digitel	Digitel Italia S.r.l.
+Digitel	Digitel Mobile Srl
+Digitel	Digitel Mobile srl
+Diller	Diller Telephone Company
+Direct Net	Direct Net Telecommunications
+DirectNet	DirectNet Telecommunications
+Discovery	Discovery Telecommunications LLC
+Dishnet	Dishnet Wireless Ltd, Assam
+Dishnet	Dishnet Wireless Ltd, Bihar
+Dishnet	Dishnet Wireless Ltd, Haryana
+Dishnet	Dishnet Wireless Ltd, Himachal Pradesh
+Dishnet	Dishnet Wireless Ltd, J&K
+Dishnet	Dishnet Wireless Ltd, Kerala
+Dishnet	Dishnet Wireless Ltd, Kolkata
+Dishnet	Dishnet Wireless Ltd, Madhya Pradesh
+Dishnet	Dishnet Wireless Ltd, North East
+Dishnet	Dishnet Wireless Ltd, Punjab
+Dishnet	Dishnet Wireless Ltd, UP (East)
+Dishnet	Dishnet Wireless Ltd, UP (West)
+Dishnet	Dishnet Wireless Ltd, West Bengal
+Ditel	Ditel Corporation S.A.C.
+Diveo	Diveo Argentina S.A.
+Dizzocom	Dizzocom
+DJB	DJB Enterprises Inc.
+DJB	DJB Entterprises Inc.
+Djuice	Djuice Mobile Sweden, filial till Telenor Mobile Sweden AS
+DKA	DKA S.A.
+Dlugie	Dlugie Rozmowy S.A.
+DNA	DNA Oy
+Dobson	Dobson Telephone Company
+Dogan	Dogan
+Dollar	Dollar Phone Corp
+Dolphin	Dolphin Telecom (Deutschland) GmbH
+Dolphin	Dolphin Telecom N.V.
+Dominican	Dominican Communications
+Domtel	Domtel Comm.Inc. d/b/a Tricom USA
+Donghwa	Donghwa Telecom Co. Ltd
+Don	Don Telecom
+Dreamline	Dreamline
+Dryden Mun.	Dryden Municipal Telephone System
+DST	DST Com
+DST	DST Communications Sdn Bhd
+D.S.T.	D.S.T. Omega Telecom
+DTAC	DTAC Network Company Ltd
+DTH	DTH Television & Telecommunications N.V./MIO Aruba
+Dubois	Dubois Telephone Exchange, Inc
+Dumerton	Dumerton International Inc
+Dunbarton	Dunbarton Telephone Company
+Dunkerton	Dunkerton Telephone Cooperative
+Duocom	Duocom Europe, S.L.
+Duo Cty	Duo County Telephone Cooperative Corporation
+Durham	Durham Telephones Ltd.
+DV-IPX	DV-IPX
+DynacomSouth	DynacomSouth Dooel
+D.Y.	D.Y. Wordnet Ltd.
+Dzoraxbyur	Dzoraxbyur Hamalir
+Eagle	Eagle Mobile
+E Ascension	East Ascension Telephone Company, Inc.
+Eastern	Eastern Independent Telecomm. Ltd.
+E Nebraska	Eastern Nebraska Telephone Co.
+E Nebraska	Eastern Nebraska Telephone Company
+Eastern Telecom	Eastern Telecom Corporation
+ETC	Eastern TeleLogic Corporation
+Eastern	Eastern Telephone
+Eastex	Eastex Telephone Cooperative, Inc.
+East	East Kentucky Network LLC dba Appalachian Wireless
+Eastland	Eastland of Orlando Telephone Corp.
+East	East Telecommunication Company
+Easynet	Easynet Group Ltd
+Easyway	Easyway
+Eazi	Eazi Telecom Limited (mobile service)
+Eazi	Eazi Telecom Ltd
+ECC	ECC
+ECI	ECI Communications
+ECONET	ECONET
+Econet	Econet
+Econet	Econet EZI - CEL Lesotho
+Econet	Econet Ezin-cel
+Econet	Econet Satellite Services Ltd
+Econet	Econet Wireless
+Econet	Econet Wireless Nigeria Ltd.
+ATCI	Econo Call/ATCI (USA)
+Econo	Econo Deutschland GmbH
+EconoPhone	EconoPhone GmbH
+Econophone	Econophone Inc.
+Econophone	Econophone, Inc.
+Ecotel	Ecotel Communication AG
+Ecoway	Ecoway GmbH
+EC Telecom	EC Telecom Ltd
+Ectel	Ectel Ltd
+Ecuador	Ecuador Telecom S.A.
+Edatel	Edatel S.A.
+Edge	Edge Mobile Sp/F
+Edigen	Edigen Inc
+EDISY	EDISY
+EDS Personal	EDS Personal Communications Corporation
+EGN	EGN B.V.
+Egyptian	Egyptian Telephone Cooperative
+Einsteinet	Einsteinet AG
+Eircell	Eircell Ltd
+Eircom	Eircom
+Eircom	Eircom plc
+Eircom	Eircom UK Ltd
+ELCom	ELCom Management Ltd
+Electcoms	Electcoms Wireless Sdn Bhd
+Elec Lightwave	Electric Lightwave
+Elec Lightwave	Electric Lightwave, Inc.
+Elephant	Elephant Talk Comm Premium Rate Serv Neth B.V.
+Elephant	Elephant Talk Comm. Premium Rate Serv. Neth. B.V.
+Elephant	Elephant Talk Communication GmbH
+Elephant	Elephant Talk Communications Ltd.
+Elephant	Elephant Talk CPRS
+Elephant	Elephant Talk Inc
+Elinet	Elinet S.p.A.
+Elion	Elion Ettevötted AS
+Elisa	Elisa Andmesidesttnused AS
+Elisa	Elisa Oy
+Elisa	Elisa Oyj
+Elizabeth	Elizabeth Telephone Company
+Elkhart	Elkhart Telephone Co. Inc. dba Epic Touch Co.
+Elkhart	Elkhart Telephone Company
+Ellerbe	Ellerbe Telephone Company
+Ellijay	Ellijay Telephone Company
+Ellington	Ellington Telephone Company
+Elnath	Elnath S.A.
+El Paso Cty	El Paso County Telephone Company
+El Paso	El Paso Telephone Company
+Elsacom	Elsacom
+Elsacom	Elsacom S.p.A.
+ESN	El Salvador Network S.A.
+EST	El Salvador Telecom, S.A. de C.V.
+Elsie M	Elsie Mutual Telephone Company
+Ematel	Ematel Communications Inc
+EMBRATEL	EMBRATEL
+Embratel	Embratel Internacional S.A.
+Emcali	Emcali
+Emery-Telecom	Emery-Telecom Wireless Inc
+Emily Coop	Emily Cooperative Telephone Company
+EITC	Emirates Integrated Telecommunications Company (du)
+ETISALAT	Emirates Telecommunications Corporation (ETISALAT)
+Emobile	Emobile Ltd
+Emory Univ	Emory University
+HONDUTEL	Empresa Hondureña de Telecomunicaciones (HONDUTEL)
+ENTEL	Empresa Nacional de Telecomunicaciones
+ENTEL	Empresa Nacional de Telecomunicaciones S.A. (ENTEL-CHILE)
+ENITEL	Empresa Nicaragüense de Telecomunicaciones, S.A. (ENITEL)
+Emtel	Emtel
+Emtel	Emtel Ltd.
+Emtelsa	Emtelsa
+EMT	EMT GSM
+EMTS	EMTS
+Energ.it	Energ.it S.p.A.
+Energotel	Energotel, a.s.
+Enertel	Enertel NV
+ENITEL	ENITEL, S.A.
+ENTel	ENTel
+Entel	Entel
+ENTEL	ENTEL S.A.
+Entel	Entel S.A.
+Entel	Entel Telefónica Móvil
+Entel	Entel Venezuela, C.A.
+Enterprise	Enterprise Communications
+Enterprise	Enterprise Networks
+ETL	Enterprise of Telecommunications Lao
+EPT	Entreprise des Postes et Télécommunications
+envia.tel	envia.tel GmbH
+E-Plus	E-Plus Mobilfunk GmbH
+E-Plus	E-Plus Mobilfunk GmbH & Co. KG
+E-Plus	E-Plus Móviles, SL
+E-Plus	E-Plus Móviles Virtuales España S.L.U.
+Epsilon	Epsilon Telecommunications Ltd
+Epsilon	Epsilon Telecommunications Pte Ltd
+Equant	Equant
+Equant	Equant Hong Kong Ltd
+Equant	Equant Inc
+Equant	Equant Italy S.p.A.
+Equant	Equant Spain, S.A.
+Equant	Equant Telecommunications SA
+ERA	ERA GSM (Polska Telefonia Cyfrowa Sp. Z.o.o.)
+Eritel	Eritel Corporation
+E. Ritter	E. Ritter Telephone Company
+Ermak	Ermak RMS
+Eronet	Eronet Mobile Communications Ltd.
+Esat	Esat Telecom
+Escom	Escom
+Eser	Eser Telekom
+ESL	ESL Consulting (trading as VoIP Ireland)
+Esprit	Esprit Telecom
+Essar Spacetel	Essar Spacetel Ltd, Assam
+Essar Spacetel	Essar Spacetel Ltd, Bihar
+Essar Spacetel	Essar Spacetel Ltd, Himachal Pradesh
+Essar Spacetel	Essar Spacetel Ltd, J&K
+Essar Spacetel	Essar Spacetel Ltd, Maharashtra
+Essar Spacetel	Essar Spacetel Ltd, North East
+Essar Spacetel	Essar Spacetel Ltd, Orissa
+Essar Telecom	Essar Telecom Kenya Limited
+Esse	Esse Solutions Ltd
+ESS	ESS Ventures
+Etapa	Etapa Telecom S.A.
+E.T.B.	E.T.B. (Empresa de telecomunicaciones de Santafé de Bogota)
+E-Technologies	E-Technologies Cayman Islands Ltd
+ETECSA	ETECSA
+e-Tel	e-Tel GmbH
+E-Telko	E-Telko
+E-Telko	E-Telko Sp. Z.o.o.
+eTel	eTel Polska Sp. Z.o.o.
+eTel	eTel Slovensko, s.r.o.
+ETEX	ETEX Communications dba ETEX Wireless
+Etex	Etex Telephone Cooperative, Inc.
+Ethiopian	Ethiopian Telecommunications Corporation
+ETH	ETH MTN
+Etihad	Etihad Etisalat Company (Mobily)
+Etisalat	Etisalat
+Etisalat	Etisalat International
+Etisalat	Etisalat Lanka (vt) Ltd
+Etisalcom	Etisalcom WLL
+ETL	ETL Mobile
+ETN	ETN Singapore Pte Ltd
+ETNS	ETNS Singapore Pte Ltd
+ETPI	ETPI
+EUTEX	European Telco Exchange (EUTEX) AG
+ETH	European Telecommunication Holding AG (E.T.H.)
+European	European Telecommunication Holding E.T.H. AG
+Europronet	Europronet Bosnia d.o.o. Sarajevo
+Eurotel,	Eurotel, GSM & NMT
+Eurotel,	Eurotel, UMTS
+Eurotranstelecom	Eurotranstelecom Ltd
+Euroweb	Euroweb Romania
+Euskaltel,	Euskaltel, SA
+Euskaltel	Euskaltel, S.A.
+EuTel	EuTel AB
+Eutelia	Eutelia S.p.A.
+Evans	Evans Telephone Company
+Evatis	Evatis
+Eventis	Eventis Mobile GSM
+EVNTelecom	EVNTelecom
+EVNTelecom/	EVNTelecom/ 3G
+EVNT	EVN Telecom (EVNT)
+EWE	EWE TEL GmbH
+Exatel	Exatel S.A.
+Excelcomindo	Excelcomindo
+Excel	Excel Switch Facility, Inc
+Execulines	Execulines of the Northwest, Inc.
+ETI	Executive TeleCard International
+ExOp	ExOp of Missouri, Inc.
+Expo	Expo Communications Ltd
+Expresso	Expresso Senegal
+Express	Express Teleservice Corp.
+Express	Express Tone (HK) Ltd
+Extel	Extel
+extr@com	extr@com AG
+E-Z Connections	E-Z Connections, Inc
+FaciliCom	FaciliCom International
+Facilicom	Facilicom International, S.L.
+Fairwater-B-A	Fairwater-Brandon-Alto Telephone Company
+Falcon	Falcon Telecomms Limited
+Farber	Farber Telephone Company
+Far	Far East Gateway, Inc
+Farmers Ind.	Farmers Independent Telephone Company
+Farmers & Merch	Farmers & Merchants Mutual Telephone
+Farmers M	Farmers Mutual Telephone Company
+Farmers	Farmers Telephone
+Farmers	Farmers Telephone Co., Inc.
+Farmers	Farmers Telephone Cooperative (AL)
+Farmers	Farmers Telephone Cooperative, Inc
+Farmers	Farmers Telephone Cooperative (SC)
+Faroese	Faroese Telecom - GSM
+Faroese	Faroese Telecom P/F
+Fascel	Fascel Ltd., Gujarat
+Fast	Fast Corporation
+Fastlink	Fastlink
+Fastweb	Fastweb S.p.A.
+FCI	FCI Carrier Services
+FCI	FCI Int'l
+FDN	FDN Inc.
+FDN	FDN, Inc.
+Feist	Feist Long Distance
+Fibernet	Fibernet (UK) Ltd
+Fiber South	Fiber South Communications
+Fibertech	Fibertech Telecom, Inc.
+FIBERTEL/Fiber	FIBERTEL/Fiber Telecommunications, Inc.
+FiberWave	FiberWave
+Fidelity	Fidelity Telephone Company
+Filer Mutual	Filer Mutual Telephone Company
+Finors	Finors Telekom
+Fintel	Fintel
+FDC	First Data Corp.(FDC)
+FDC	First Data Corporation(FDC)
+FirstMark	FirstMark Communications GmbH
+Firstmark	Firstmark Luxembourg S.A.
+First	First Point Telecom
+Fisher	Fisher Wireless Services Inc
+Five Area	Five Area Telephone Cooperative, Inc.
+Five	Five Star Telecom
+Fixed	Fixed & Mobile Pte Ltd
+Fix	Fix Group Technologies
+Flat Rock	Flat Rock Telephone Company
+Fleet Call	Fleet Call
+Flex	Flex Communications
+Flextel	Flextel Ltd
+Florala	Florala Telephone Company
+FDN	Florida Digital Network, Inc.
+FMS	FMS Solutions Ltd
+Focal	Focal Communications Corp.
+Focal	Focal Communications Corporation
+Focal	Focal communications Corporation
+Fonecta	Fonecta Oy
+FoneTel	FoneTel
+Fonia.com	Fonia.com
+Fonorola	Fonorola
+fONOROLA	fONOROLA
+Fonyou	Fonyou Telecom, SL
+Foothills R	Foothills Rural Telephone Cooperative
+Fortaleza	Fortaleza Investment Group Corp.
+Fort Bend	Fort Bend Long Distance Co.
+Fort Bend	Fort Bend Telephone Company
+Forthnet	Forthnet
+Fort Mojave	Fort Mojave Telecommunications, Inc.
+Fox	Fox Communications Corporation
+France Telecom	France Telecom
+France Telecom	France Telecom España, SA
+France Telecom	France Telecom Long Distance (Singapore)
+France Telecom	France Telecom Long Distance USA, LLC
+France Telecom	France Telecom Orange
+Franklin	Franklin Telephone Company, Inc.
+Freedom Ring	Freedom Ring Communications, Inc.
+Free	Free Mobile
+Free	Free Telecom
+Free	Free Telecom (MVNO)
+Fremont	Fremont Telcom
+Fresh Start	Fresh Start Communications
+Frontenac	Frontenac Telephone Company
+Frontier	Frontier Communications Int'l, Inc.
+Frontier	Frontier Network Technology Ltd
+FSM	FSM Telecom
+FSMTC	FSM Telecoms (FSMTC)
+FTC	FTC Communications
+FTI	FTI Communications
+Ft. Jennings	Ft. Jennings Telephone Company
+Full	Full Line S.A.
+Fulton	Fulton Telephone Company, Inc.
+Fusion	Fusion Telecommunications International, Inc
+Future	Future Telephone Communications, Inc. dba FTC  Long Distance
+G9SA	G9SA - Telecomunicações S.A.
+Gabon	Gabon Telecom
+Gabriel	Gabriel Communications, Inc.
+Gabriel	Gabriel Communications,Inc.
+Galaxy	Galaxy Communications Network S.A.
+Galaxy	Galaxy Telesyst Inc
+Galena	Galena Sp. Z.o.o.
+Gale	Gale Phone (MVNO)
+Gallatin River	Gallatin River Communications
+Gamacom	Gamacom S.R.L.
+Gamcel	Gamcel
+Gamma	Gamma Telecom Holdings Ltd
+Gamma	Gamma Telecommunications Ltd
+Ganado	Ganado Telephone Company
+Gateway	Gateway Communications (UK) Ltd
+GCA	GCA Telecom, S.A. de C.V.
+G-Cell	G-Cell
+GCI	GCI Communications Corp.
+GC	GC Pan European Crossing Belgie
+GC	GC Pan European Crossing Deutschland GmbH
+GC	GC Pan European Crossing France
+GC	GC Pan European Crossing Italia S.r.l.
+GC	GC PEC Nederland BV
+GC	GC SAC Argentina s.r.l.
+GDS	GDS Gesellschaft für Dienstleistungen und Service GmbH
+gecco.net	gecco.net AG
+Geetingsville	Geetingsville Telepone Company, Inc.
+Gemtel	Gemtel Co Ltd (GT)
+General	General Communication, Inc.
+General	General Telecom
+General	General Telecom, Inc
+Generic	Generic Mobile Systems Sweden AB
+Geneseo	Geneseo Communications Services Inc
+Genesis	Genesis Communications International, Inc.
+Geocell	Geocell Ltd
+Geocell	Geocell Ltd.
+Georgetown	Georgetown Telephone Company
+Georgia	Georgia Independent PCS, Inc.
+Georgian	Georgian Communication Company Ltd.
+Georgian	Georgian Electrical Communications JSC
+Georgia	Georgia Telephone Corporation
+Germantown	Germantown Independent Telephone
+Germantown	Germantown Telephone Company, Inc.
+Ghana	Ghana Telecom Mobile
+Ghana	Ghana Telecommunications Company Ltd
+Gibtelecom	Gibtelecom (fixed service)
+Gibtelecom	Gibtelecom GSM
+Gibtelecom	Gibtelecom (mobile service)
+Gigsky	Gigsky Inc
+Gila River	Gila River Telecommunications, Inc.
+Gilat	Gilat To Home S.A.
+Gisad	Gisad
+Glandorf	Glandorf Telephone Company, Inc.
+Glasford	Glasford Telephone Company
+Glens Falls	Glens Falls Communications Corporation
+Glenwood	Glenwood Telephone Company
+Glenwood	Glenwood Telephone Membership Corp.
+Globacom	Globacom
+Globacom	Globacom Ghana Ltd
+Global	Global
+Global Callline	Global Callline
+GlobalCarrier	GlobalCarrier Telecom GmbH
+Global Commm.	Global communication net
+GCS	Global Communication Services, Inc
+Global Comm.	Global Communications GmbH
+Globalcom	Globalcom Telecomunicaciones, S.A.
+GCP	Global Connect Partners LLC
+Global Connect	Global Connect Partners L.L.C.
+Global Crossing	Global Crossing Hong Kong Ltd
+Global Crossing	Global Crossing PEC Switzerland
+Global Crossing	Global Crossing Telecommunications, Inc
+Global Crossing	Global Crossing (UK) Ltd
+Global Electroteks	Global Electroteks Ltd
+Global Gossip	Global Gossip Communications
+GMS	Global Mobility Systems, Inc.
+Global NAPS	Global NAPS
+Global Naps	Global Naps
+GNP	Global Network Providers
+GNP	Global Network Providers Grenada
+Global	Global Networks Switzerland AG
+GN Switzerland	Global Networks Switzerland Inc.
+GNT	Global Network Telephone GmbH
+Global One	Global One
+Global One	Global One Communication A/S
+Global One	Global One Communications
+Global One	Global One Communications Holding Ltd
+Global One	Global One Communications Pty Ltd
+Global One	Global One Communications S.A.
+Global One	Global One Telekommunikationsdienste GmbH
+Global Quest	Global Quest Communications Ltd
+Globalsim	Globalsim Ltd
+Globalstar	Globalstar
+Globalstar	Globalstar Australia Pty Ltd
+Globalstar	Globalstar Brasil
+Globalstar	Globalstar Canada Satellite Co.
+Globalstar	Globalstar Europe
+Globalstar	Globalstar, Inc.
+Globalstar	GlobalStar International, Inc
+Globalstar	Globalstar Nicaragua, S.A.
+Globalstar	Globalstar USA
+Globals	Globals Telekoms
+Global	Global Telecom
+Global Telecom.	Global Telecommunication Services GmbH
+Global Telecom.	Global Telecommunications Services, Inc (d/b/a Global Voicecom Inc.)
+Globoal Telemeida	Global Telemedia International Inc.
+Global TeleSystems	Global TeleSystems Luxembourg Sarl
+Global Tone	Global Tone Communications, Inc.
+Global Transit	Global Transit France
+Global Transmedia	Global Transmedia Communications Corporation
+Globaltron	Globaltron Communications Corporation
+Global Vision	Global Vision AG
+Globecomm	Globecomm Network Services Corp.
+Globecomm	Globecomm Network Services Corporation
+Globespan	Globespan Telecommunication LLC
+Globe	Globe Telecom
+GMCR	Globe Telecom Inc. (GMCR)
+Globetel	Globetel Oy
+Globul	Globul
+GNG	GNG Telecom
+Go2Tel.com	Go2Tel.com, Inc
+Golan	Golan Telecom Ltd
+Golden Belt	Golden Belt Telephone Association, Inc.
+Golden Lines	Golden Lines Ltd
+Golden	Golden Telecom
+Golden Telecom	Golden Telecom
+Gold Telecom	GoldTelecom
+Gold Telecom	Gold Telecom Ltd
+Golis	Golis Telecom
+Golis	Golis Telecommunications Company
+go	go mobile
+GoMobile	GoMobile SamoaTel Ltd
+Goodman	Goodman Telephone Company
+GoodWillComm	GoodWillComm Ltd
+Gosfield	Gosfield North Municipal Telephone System
+GOSS	Government of Southern Sudan (GOSS)
+Graceba	Graceba Total Communications, Inc.
+Grafton	Grafton Telephone Company
+Grameenphone	Grameenphone Ltd.
+GramenPhone	GramenPhone
+Granby	Granby Telephone and Telegraph Company
+Granby	Granby Telephone Company
+Grande River	Grande River Communications,Inc.
+Grand	Grand Telephone Company, Inc.
+Granite State	Granite State Telephone
+Grapes	Grapes Network Services S.p.A.
+Graphnet	Graphnet
+Graphnet	Graphnet Inc
+Graphnet	Graphnet, Inc.
+Great Plains	Great Plains Communications
+Great West	Great West Services
+Great West	Great West Services, Ltd.
+Greencom	Greencom
+GreenFly	GreenFly LLC
+Green Hills	Green Hills Telephone Corporation
+Greystone	Greystone Telecom Limited
+Gridley	Gridley Telephone Company
+Griggs City	Griggs City Telephone Company
+Group	Group 3G UMTS GmbH
+Group	Group 3G UMTS GmbH (Quam)
+Grupalia	Grupalia Internet S.A.
+Grupo	Grupo de Telecomunicaciones Méxicanas, S.A. de C.V
+GSC	GSC Global System Communications S.p.A.
+GSI	GSI Telecom
+GSM1800/Mandarin	GSM1800/Mandarin Communications Ltd.
+GSM1800New	GSM1800New World PCS Ltd.
+GSM1800/Peoples	GSM1800/Peoples Telephone Company Ltd.
+GSM7800/Hong	GSM7800/Hong Kong CSL Ltd.
+GSM900/GSM1800/Hutchison	GSM900/GSM1800/Hutchison
+GSM900/HKCSL	GSM900/HKCSL
+GSM900/SmarTone	GSM900/SmarTone
+GSMBIH	GSMBIH
+GSM	GSM Kazakhstan (roaming)
+GSM	GSM ProMonte Montenegro
+GSN	GSN International Telecom
+GS Retail	GS Retail
+GST	GST Telecom
+Götalandsnäet	Götalandsnäet AB
+Götalandsnätet	Götalandsnätet
+Götalandsnätet	Götalandsnätet AB
+GTA	GTA Wireless LLC
+Gtelecom	Gtelecom Ltd. (British Virgin Islands) filial
+GTE	GTE Service Corporation
+GT Group	GT Group Telecom Networks, Inc.
+GTI	GTI (HK) Ltd
+GTL	GTL GmbH
+GT Mobile	GT Mobile
+GTN	GTN Italia S.p.A.
+GTS	GTS
+GTS	GTS Czech s.r.o.
+GTS	GTS Datanet Telecommunications Ltd.
+GTS	GTS Energis Sp. Z.o.o
+GTS	GTS Nextra s.r.o.
+GTS	GTS Romania
+GTS	GTS Slovakia s.r.o.
+GTS	GTS (UK) Ltd
+Guadalupe Vly	Guadalupe Valley Telephone Cooperative
+Guadeloupe	Guadeloupe Téléphone Mobile
+Guamcell	Guamcell Cellular and Paging
+Guam Cell	Guam Cellular & Paging
+Guam	Guam Telephone Authority
+Guinea	Guinea Ecuatorial de Telecomunicaciones Sociedad Anónima
+Guinétel	Guinétel S.A.
+Gulfsat	Gulfsat Madagascar VSAT
+Gulf	Gulf Telephone Company
+Guyana	Guyana Telephone and Telegraph Co. Ltd.
+Guyane	Guyane Téléphone Mobile
+H1 Telekom	H1 Telekom d.d.
+H3G	H3G
+H3G	H3G Access AB
+H3G	H3G S.p.A.
+Hablando	Hablando Todos s.r.l.
+Hafslund	Hafslund Telekom Nettjenester AS
+HAITEL	Haiti International Telecommuncation S.A. (HAITEL)
+Hallo	Hallo Frjals Fjarskipti Ltd
+Hallotel	Hallotel Deutschland GmbH
+Hamilton Cty	Hamilton County Telephone Cooperative
+Hamilton	Hamilton Telecommunications
+Hanaro	Hanaro Telecom
+Hancock R	Hancock Rural Telephone Company
+Hanhwa	Hanhwa
+HanseNet	HanseNet Telekommunikation GmbH
+Hanse-X	Hanse-X GmbH
+Hanson	Hanson Communications
+HappyCom	HappyCom Sarl
+HappyTelecom	HappyTelecom
+Hardy	Hardy Telecommunications, Inc.
+Harold	Harold Telephone Company
+Harris Digital	Harris Digital Telephone Systems
+Harrisonville	Harrisonville Telephone Company
+Hartington	Hartington Telecomm. Co.,Inc.
+Hartman	Hartman Telephone Exchanges
+Hart	Hart Telephone Company
+Hay	Hay Communications Cooperative
+Hayneville	Hayneville Telephone Company, Inc.
+Hay	Hay Systems Ltd
+H&B	H&B Communications, Inc.
+Headwaters	Headwaters Telephone Company
+Hello	Hello
+Henderson	Henderson Co-Op Telephone Co.
+Hershey Coop	Hershey Cooperative Telephone Co.
+Hextel	Hextel Communications Limited
+Hi3G	Hi3G
+Hi3G	Hi3G Access AB
+Hiawatha	Hiawatha Telephone Company
+Hickory	Hickory Telephone Company
+Highland	Highland Telephone Cooperative, Inc.
+High	High Plains Midwest LLC, dba Wetlink Communications
+Highside	Highside Telecom B.V.
+Hilf	Hilf Telecom BV
+Hilf	Hilf Telecom B.V.
+Hill Cty	Hill Country Telephone Cooperative, Inc.
+Hinton	Hinton Telephone Company
+Hi-Rim	Hi-Rim Communications
+HIT	HIT
+HiTech	HiTech Telecom Pty Ltd
+HiTsGE	HiTsGE, S.A.
+HITS	HITS TELECOM
+HITS	HITS Telecom
+Hits-Unitel-Y	Hits-Unitel-Y
+HKC	HKC Network Ltd
+HK Telekom	HK Telecom
+HOIIO	HOIIO Pte LTD
+HOL	HOL
+Hola	Hola Paraguay S.A.
+Hollis	Hollis Telephone Company
+Home	Home Cellular (MVNO)
+Home	Home Telephone Company
+Home	Home Telephone Company, Inc.
+Home	Home Telephone Company of Nebraska
+Hongkong	Hongkong CSL Ltd
+Hongkong	Hongkong Telecom Canada
+Hong	Hong Kong Telecommunications (HK) Ltd
+Hongkong	Hongkong Telecom Pacific Ltd.
+Hooper	Hooper Telephone Company
+Hormuud	Hormuud Telecom
+Hargray	Horry Telephone/Hargray Telephone
+Hostbin	Hostbin, S.L.
+Hot	Hot Link
+House	House of Integrated Technology and Systems Uganda Ltd
+House	House of Integrated Technology & Systems (U) Ltd
+HSS	HSS Vending Distributors
+Mostar	HT d.o.o. Mostar
+HT-Hrvatske	HT-Hrvatske telekomunikacije d.d.
+Hudson Valley	Hudson Valley RSA Cellular Partnership
+HunTel	HunTel Systems
+Huntel	Huntel Systems, Inc.
+HURI	HURI - SNPT
+Hurontario	Hurontario Telephones Ltd.
+Huron	Huron Telecomm.Cooperative
+Hutchinson	Hutchinson 3G Melbourne
+Hutchinson	Hutchinson 3G Sydney
+Hutchinson	Hutchinson Essar Ltd, Mumbai
+Hutchinson	Hutchinson Essar South Ltd., Andhra Pradesh
+Hutchinson	Hutchinson Essar South Ltd., Chennai
+Hutchinson	Hutchinson Essar South Ltd., Karnataka
+Hutchison	Hutchison 3G Australia Pty. Ltd.
+Hutchison	Hutchison 3G Austria
+Hutchison	Hutchison 3G Austria GmbH
+Hutchison	Hutchison 3G UK Ltd
+Hutchison	Hutchison 3G UK Ltd.
+Hutchison	Hutchison Essar Cellular Ltd., Kerala
+Hutchison	Hutchison Essar Cellular Ltd., Maharashtra
+Hutchison	Hutchison Essar Cellular Ltd., Tamil Nadu
+Hutchison	Hutchison Essar Mobile Services Ltd, Delhi
+Hutchison	Hutchison Essar South Ltd, Orissa
+Hutchison	Hutchison Essar South Ltd, Punjab
+Hutchison	Hutchison Essar South Ltd, UP (West)
+Hutchison	Hutchison Global Communications Ltd
+Hutchison	Hutchison Global Communications (UK) Limited
+Hutchison	Hutchison Telecom
+Hutchison	Hutchison Telecom East Ltd, Kolkata
+Hutchison	Hutchison Telecommunication Ltd
+Hutchison	Hutchison Telecommunications (Australia) Pty. Ltd.
+Hutchison	Hutchison Telecom Paraguay S.A.
+Hutchison	Hutchison Telecom S.A.
+Hutchison	Hutchison Telephone Company Ltd
+Hutchison	Hutchison Telephone (Macau) Limitada
+Hyperion	Hyperion Telcommunications, Inc.
+Hyperion	Hyperion Telecomm, Inc.
+Hyperion	Hyperion Telecomm. Inc.
+Hyperion	Hyperion Telecomm.Inc.
+Hyperion	Hyperion Telecommunications, Inc.
+Hyundai	Hyundai Telecom
+I-21	I-21 Germany GmbH
+I-21	I-21 Limited
+I-21	I-21 Ltd
+I-21	I-21 USA Inc
+I2U	I2U Pte Ltd
+Ibasis	Ibasis
+iBasis	iBasis
+iBasis	iBasis, Inc
+Iberiatel	Iberiatel Ltd.
+iCard	iCard European Telecommunications (Ireland) Ltd
+IceCell	IceCell ehf
+Iceland	Iceland Telecom Ltd
+Iceland	Iceland Telecom Ltd.
+ICE	ICE Norge AS
+Ice	Ice Wireless
+ICG	ICG Network Services
+ICN	ICN Telecom
+ICO	ICO
+ICO	ICO Global Communications
+ICON	ICON
+iCON	iCON Communications
+IDD	IDD 1628 Ltd
+Idea	Idea Cellular Ltd., Andhra Pradesh
+Idea	Idea Cellular Ltd., Delhi
+Idea	Idea Cellular Ltd., Gujarat
+Idea	Idea Cellular Ltd, Maharashtra
+Idea	Idea Cellular Ltd., Maharashtra
+Idea	Idea Mobile Communications Ltd., Haryana
+Idea	Idea Mobile Communications Ltd., Kerala
+Idea	Idea Mobile Communications Ltd., UP (West)
+Idea	Idea (Polska Telefonia Komórkowa Centertel Sp. Z.o.o)
+Idea	Idea Telecommunications Ltd, H.P.
+Idea	Idea Telecommunications Ltd, Rajasthan
+Idea	Idea Telecommunications Ltd, UP (East)
+IDEA	IDEA (UMTS)/PTK Centertel sp. Z.o.o.
+IDS	IDS Long Distance, Inc.
+IDS	IDS Telcom
+IDT	IDT Corporation
+IDT	IDT Corporation de Argentina S.A.
+IDT	IDT Global Ltd
+IDT	IDT Perú srl
+IDT	IDT Telecom Asia Pacific Ltd
+IDT	IDT Telecom Asia Pcific (Australia) Pty Ltd
+IDT	IDT Telecom, Inc
+IEX	IEX's Corporation
+IFX	IFX Larga Distancia Chile S.A.
+IFX	IFX Networks Panamá
+iHub	iHub Ltd
+iiseven	iiseven GmbH
+ILD	ILD Teleservices, Inc.
+iLine	iLine, LLC
+Ilizwi	Ilizwi Telecommunications Pty Ltd
+Illinois Cons.	Illinois Consolidated Telephone Company
+Illinois	Illinois Valley Cellular
+IMC	IMC Islande ehf
+iMEZ	iMEZ AB
+Impsat	Impsat Perú S.A.
+Impsat	Impsat S.A.
+Impsat	Impsat USA, Inc
+Inclarity	Inclarity plc
+Independent	Independent Telecommunications Network
+Independent	Independent Telephone Company
+Indianhead	Indianhead Telephone Company
+Indiantown	Indiantown Telephone System, Inc.
+Indigo	Indigo Tajikistan
+Indigo	Indigo Wireless, Inc.
+Indosat	Indosat - M3
+Industry	Industry Telephone Company
+Ines	Ines Group
+INET	INET Interactive Network Sys.
+INET	INET Interactive Network System
+Inet	Inet Telecom
+Infiniroute	Infiniroute Networks Inc
+Infobip	Infobip Ltd
+Infoductos	Infoductos y Telecomunicaciones del Perú S.A.
+Infonet	Infonet
+Infonet	Infonet Broadband Service Corporation
+Infonet	Infonet Broadband Services Corporation
+Infonet	Infonet Redes de Información, C.A.
+Infonexión	Infonexión Argentina S.A.
+Info	Info Quest
+InfoTel	InfoTel
+InfoTel	Infotel BV
+InfoTel	Infotel Ltd
+Infracel	Infracel S.A. ESP
+Infracom	Infracom Italia S.p.A.
+Inland	Inland Cellular Telephone Company
+IN.LIFE	IN.LIFE druzba za internet storitve, d.d.
+Inmarsat	Inmarsat Ltd
+Inmarsat	Inmarsat Ltd.
+INMO	INMO B.V.
+Innosys	Innosys Communications, Inc.
+In	In & Phone
+IN & Phone	IN & Phone S.A.
+IN&Phone	IN&Phone SA
+Inspired	Inspired Sales Ltd
+Instafone	Instafone plc
+Instituto	Instituto Costarricense de Electricidad - ICE
+ISI	Integration Services International (ISI)
+Intelcom	Intelcom
+Intelig	Intelig
+Intellicom	Intellicom, Inc.
+Intelsur	Intelsur
+Intelvision	Intelvision
+Interactive	Interactive Communications, Europe, S.L.
+Interactive	Interactive TV
+InterAmerican	InterAmerican Telephone Company
+InterBel	InterBel Telephone Cooperative, Inc.
+Intercall	Intercall
+Intercel	Intercel
+Intercel	Intercel Congo
+Intercell	Intercell Guinée
+Intercellular	Intercellular
+Intercel	Intercel Madagascar AMPS
+Interchat	Interchat S.L.
+Inter-Community	Inter-Community Telephone Company
+Interconnect	Interconnect Technology Pte Ltd
+Intercont.	Intercontinental Communications Corp.
+Intercross	Intercross Deutschland GmbH
+Intergroup	Intergroup
+Intermatica	Intermatica
+Intermatica	Intermatica srl
+Intermedia	Intermedia Communication
+Intermedia	Intermedia Communications, Inc.
+Access Int'l	International Access, Inc (d/b/a Access international)
+IDTS	International Digital Telecommunications Systems
+IDT	International Discount Telecommunication (IDT)
+International	International Network Telecom Services GmbH
+INSATEL	International Satellite Telecommunications Inc (INSATEL)
+InternationalTalk.com	InternationalTalk.com, Inc
+International	International Telecom, Ltd.
+ITC	International Telecomm. Corporation
+International	International Telecommunications Ltd.
+INTELCO	International Tele communications Ltd. (INTELCO)
+INTELCO	International Telecommunications Ltd. (INTELCO)
+INTELCO	International Telecommunications Ltd. (INTELCO)
+ITG	International Telemanagement Group
+Interneta	Interneta pasaule
+Internet	Internet Computer Bureau Ltd
+Internet	Internet Gold - Golden Lines Ltd
+Internet	Internet Zahav
+Interoute	Interoute
+Interoute	Interoute Communications Ltd.
+Interoute	Interoute Irl
+Interoute	Interoute Managed Services
+Interoute	Interoute Managed Services Netherlands BV
+Interoute	Interoute S.p.A.
+Interoute	Interoute Telecom Deutschland GmbH
+Interoute	Interoute Telecommunications, Inc
+Interoute	Interoute Telecommunications, Inc.
+Interpath	Interpath Communications, Inc.
+Inter	Inter Promo XXI Sp. Z.o.o.
+Interstate	Interstate Telephone Company
+InterSviaz	InterSviaz, Inc
+Intertelekom	Intertelekom
+Interxion	Interxion
+InterXion	InterXion Holding N.V.
+InterXion	InterXion Telecom BV
+Intraconnect	Intraconnect
+Intra	Intra Global Communications, Inc
+IntraPower	IntraPower Terrestrial Pty Ltd
+Inversiones	Inversiones Nextel de México, S.A. de C.V.
+Inversiones	Inversiones Nextel de S.A. de C.V.
+Inversiones	Inversiones y Comunicaciones S.A.
+Investcom	Investcom
+Areeba	Investcom (dba Areeba)
+Invicta	Invicta Group FZE
+Invitel	Invitel Ltd
+Invoco	Invoco Ltd
+Invomo	Invomo Ltd
+ion-ip	ion-ip B.V.
+Iowa	Iowa Communications Network
+Iowa	Iowa RSA No.2 Ltd Partnership
+Iowa	Iowa Wireless Services LLC
+Iowa	Iowa Wireless Services LLC dba I Wireless
+IP	IP Communications GmbH
+IP Deliver	IP Deliver
+IP Fjarskipti	IP Fjarskipti Ltd
+IPIP	IPIP Corp.
+IPSE	IPSE 2000
+Ipse	Ipse 2000 S.p.A.
+IPS	IPS Inc.
+IP Systems	IP Systems Pty Ltd
+Iraq	Iraq Central Cooperative Association for Communication and Transportation
+ITPC	Iraqi Telecommunications & Post Company (ITPC)
+Iraqtel	Iraqtel
+Iraquna	Iraquna
+Iridium	Iridium
+Iridium	Iridium de México, S.A. de C.V.
+Iridium	Iridium LLC
+Iridium	Iridium Satellite LLC
+Iris	Iris Wireless LLC
+Iris	Iris Wireless, LLC
+Ironton	Ironton Telephone Company
+ISI	ISI Telecommunications
+Iskon	Iskon Internet d.d.
+Islacom	Islacom
+ISLACOM	Isla Communications (ISLACOM)
+IslandCom	IslandCom Communication Ltd
+IslandCom	IslandCom Communications Ltd
+IslandCom	IslandCom Communications Ltd.
+Islandssimi	Islandssimi Ltd
+ISP	ISP Communication GmbH
+Itassalat	Itassalat Al-Maghrib
+ITC	ITC Companies
+ITC	ITC Fanoos
+ITC	ITC, Inc
+ITC	ITC, Inc.
+ITC	ITC Transmission Systems
+ITD	ITD Network
+i-TEL	i-TEL Ltd
+i-Tel	i-Tel Ltd
+ItelNet	ItelNet
+IT&E	IT&E Overseas, Inc.
+IT Group	IT Group
+Itisaluna	Itisaluna
+ITL	ITL
+ITN	ITN France
+Itopia.Com	Itopia.Com Pte Ltd
+ITPC	ITPC
+ITPC	ITPC (Al-Mazaya)
+ITPC	ITPC (Al Nakheel)
+ITPC	ITPC (Al-Seraj)
+ITPC	ITPC (Al-Shams)
+ITPC	ITPC (Anwar Yagotat Alkhalee)
+ITPC	ITPC (Belad Babel)
+ITPC	ITPC (Eaamar Albasrah)
+ITPC	ITPC (Furatfone)
+ITPC	ITPC (High Link)
+ITPC	ITPC (Iraqcell)
+ITPC	ITPC (Sader Al-Iraq)
+ITPC	ITPC (Shaly)
+ITS	ITS
+IT TEL	IT TEL d.o.o.
+Ittissalat	Ittissalat Al Maghrid
+Ituran	Ituran Cellular Communications
+ITXC	ITXC Corp.
+ITXC	ITXC Data Transport Services, LLC
+Iusatel	IUSATEL Chile S.A.
+Iusatel	Iusatel, S.A. de C.V.
+Iusatel	Iusatel USA, Inc
+IVY	IVY Telecom SA
+IWL	IWL Comm. d.b.a. IWL Connect
+IWL	IWL Communications Inc
+IXC	IXC Communication, Inc
+IXC	IXC Communications, Inc
+IXC	IXC Communications, Inc.
+IXC	IXC Long Distance, Inc.
+IXE	IXE Corporation
+iXnet	iXnet
+IZZI	IZZI
+Jaina	Jaina Systems Network, Inc
+Jamaica	Jamaica Telephone Company
+James	James Valley Wireless LLC
+Jamii	Jamii Telecommunications Limited
+Japan Telecom	Japan Telecom America,Inc.
+Japan	Japan Telecom Co., Ltd
+Jasper	Jasper Wireless Inc
+Jasper	Jasper Wireless Inc.
+Jazz	Jazz Telecom, S.A.
+Jazz	Jazz Telecom, SAU
+JBN	JBN Telephone Company, Inc.
+JC	JC Somoncom
+Jernbaneverket	Jernbaneverket
+Jersey	Jersey Airtel Ltd
+Jersey	Jersey Telecom
+Jetmode	Jetmode Communications Ltd
+Jippi	Jippi GmbH
+Joint	Joint Stock Company Arna
+Joint	Joint Stock Company TransTelecom
+Jones Intercable	Jones Intercable
+Jordan	Jordan Mobile Telephone Services Company - Zain
+Jordan	Jordan Telecommunications Company
+Josa	Josa Babilon-T
+JSC	JSC Altel (roaming)
+JSC	JSC Arna
+JSC	JSC Astel
+JSC	JSC Egrisi
+JSC	JSC Kazakhtelecom
+JSC	JSC KazTransCom
+JSC	JSC Kyrgyztelecom
+JSC	JSC Moldtelecom
+JSC	JSC Moldtelecom/3G UMTS (W-CDMA)
+JSC	JSC TransTelecom
+JS Saima	JS Saima Telecom
+Justice	Justice Technology Corp.
+Justice	Justice Technology Corporation
+Kabel	Kabel Hessen GmbH & Co, KG
+Kadoka	Kadoka Telephone Co.
+Kadoka	Kadoka Telephone Company
+Kalida	Kalida Telephone Company, Inc.
+Kalimat	Kalimat
+Kallback	Kallback
+Kall	Kall GSM
+Kall	Kall P/F
+Kanartel	Kanartel Co.
+KanOkla	KanOkla Telephone Association, Inc.
+Kansas PCS	Kansas Personal Communication Services Ltd.
+Kaplan	Kaplan Telephone Company
+Kaplan	Kaplan Telephone Company Inc.
+Karabo	Karabo Telecoms (Pty) Ltd.
+Kar-Tel	Kar-Tel llc
+KaR-Tel	KaR-Tel LLP (roaming)
+Karupa	Karupa S.r.l.
+Kasapa	Kasapa Telecom Ltd.
+Kast	Kast Telecom
+Kast	Kast Telecom S.r.l.
+KCTC	KCTC
+KDD	KDD America Inc.
+KDD	KDD America, Inc
+KDD	KDD America, Inc.
+KDD	KDD Australia Pty Ltd
+KDD	KDD France
+KDDI	KDDI Corporation
+KDDI	KDDI Europe
+KDDI	KDDI Hong Kong Ltd
+KDD	KDD Telecomet Deutschland GmbH
+Kencell	Kencell Communications Ltd.
+Kendall	Kendall Telephone Inc.
+Kennebec	Kennebec Telephone Company
+Kenora M	Kenora Municipal Telephone Company
+Kenya	Kenya Data Network
+Kerman	Kerman Telephone Company
+Kerrville	Kerrville Telephone Company
+Keystane	Keystane Wireless LLC
+Keystone-A	Keystone-Arthur Telephone Company
+KeyWest	KeyWest Communications (HK) Ltd
+Kineto	Kineto Wireless Inc
+King.com	King.com S.p.A.
+Kingdom	Kingdom Communications Pty Ltd
+Kingdom	Kingdom Telephone Company
+KINNET	KINNET Fiber Optic Communications
+KIN	KIN Network, Inc.
+Kin Network	Kin Network, Inc.
+Kinnevik	Kinnevik Telecommunications International S.A.
+KLP	KLP, Inc. dba Call America.
+KMC	KMC Telecom II, Inc.
+KMC	KMC Telecom II,Inc.
+KMC	KMC Telecom Inc.
+K&M	K&M Telephone Company, Inc.
+Kocnet	Kocnet
+Komselindo	Komselindo
+Komtel	Komtel Gesellschaft fur Kommunikations -und Informationsdlenste GmbH
+Korea	Korea International Telephone
+Korea	Korea Telecom
+Korek	Korek Telecom
+KPN	KPN Belgium NV
+KPN	KPN B.V.
+KPN	KPN Eurovoice BV
+KPN	KPN International Network Services Inc
+KPN	KPN Luxembourg Sarl
+KPN	KPN Mobile The Netherlands B.V.
+KPN	KPN Orange Belgium
+KPN	KPN Telecom BV
+KPN	KPN Telecom B.V.
+KPU	KPU Telecommunications
+K Telecom	K Telecom
+KT	KT Freetel
+KT freetel	KT freetel
+KT Networks	KT Networks
+KT Powertel	KT Powertel
+KTT	KTT
+Kuban	Kuban GSM
+KVH	KVH Co. Ltd.
+Kyivstar	Kyivstar GSM
+Kyrghyztelecom	Kyrghyztelecom
+LACELL	LACELL
+Courcelles	La Cie de Telephone de Courcelles Inc.
+Lackawaxen	Lackawaxen Telephone Company
+La Compagnie	La Compagnie de Tel. de Warwick
+Lambton	La Compagnie de Telephone de Lambton
+St-Victor	La Compagnie de Telephone de St-Victor
+Baie	La Corporation de Telephone de la Baie
+LA&C	LA & C Sistemas S.A.
+La Fourche	La Fourche Telephone Company
+LaHarpe	LaHarpe Telephone Company
+La Harpe	La Harpe Telephone Company, Inc.
+LaJicarita R	LaJicarita Rural Telephone Coop
+Lakedale	Lakedale Telephone Company
+Lake Dallas	Lake Dallas Telephone Company
+Lakefield	Lakefield Telephone Company
+Lk. Livingston	Lake Livingston Telephone Company
+Lake States	Lake States Long Distance
+Lanka	Lanka Bell (Pvt) Ltd
+Lannet	Lannet
+Lan-Net	Lan-Net Telecommunications Ltd
+Lansdowne R	Lansdowne Rural Telephone Company Ltd.
+LAT	Lao Asia Telecom State Enterprise (LAT)
+Lao	Lao Telecommunications
+LaqTel	LaqTel Ltd.
+LNC	Large network code
+Lasilkee	Lasilkee
+Latin	Latin America Telecom, Inc. a/k/a BTS
+Latin	Latin Node, Inc
+Lattelekom	Lattelekom
+Latvenergo	Latvenergo
+Latvian	Latvian Mobile Telephone, LMT
+Latvijas	Latvijas dzelzcels
+Latvijas	Latvijas Mobilais Telefons SIA
+Laurel H	Laurel Highland Telephone Company
+Lavaca	Lavaca Telephone Company, Inc.
+Richland-G	LaValle Telephone Cooperative, Inc.
+La Ward	La Ward Telephone Exchange, Inc.
+LBC	LBC Telephony
+L. C.	L. C. Communications
+L.C.	L.C. Communications
+LC Comm.	LC Communications
+LCFR	LCFR LLC
+Litel	LCI International/Litel
+LCT	LCT Long Distance
+LDD	LDD, Inc.
+LDIP	LD International Provisioning
+LDM	LDM, Inc.
+LDTeleCom	LDTeleCom Comunicaciones, C.A.
+LD Telecom.	LD Telecommunications, Inc
+Leaco	Leaco Rural Telephone Company Inc
+Leaco R	Leaco Rural Telephone Cooperative, Inc.
+Leaf River	Leaf River Telephone Company
+Least	Least Cost Routing S.L.
+Lebara	Lebara Ltd
+LEC Unwired	LEC Unwired, LLC
+Lemontel	Lemontel Ltd
+Lemonweir Vly	Lemonweir Valley Telephone Co.
+St. Liboire	Le Tel de St. Liboire
+Level 3	LEVEL 3
+Level 3	LeveL 3
+Level 3	Level 3
+Level 3	Level 3 Communications
+Level 3	Level 3 Communications, LLC
+Level 3	Level 3 Communications Ltd
+Level 3	Level 3 Communications S.A.
+Lewis River	Lewis River Telephone
+LEXICOM	LEXICOM
+Libancell	Libancell
+Libercom	Libercom
+Libertis	Libertis
+Libertis	Libertis S.A.
+Libertis	Libertis Telecom
+Liberty	Liberty Cellular, Inc.
+Liberty	Liberty Voz S.L.
+LITC	Libyan International Telecommunication Company (LITC)
+Light	Light Speed Communications
+LightSquared	LightSquared LP
+Limited	Limited Liability Company Astelit
+Lincoln	Lincoln Telephone Company
+Linholmen	Linholmen Science Park AB
+LinkUSA	LinkUSA Corporation
+Lintel	Lintel (Sierra Leone) Ltd.
+Linx	Linx Telecom
+Lipan	Lipan Telephone Company, Inc.
+Lismore	Lismore Cooperative Telephone Co.
+LSS	Listing Services Solutions, Inc.
+Livingston	Livingston Telephone Company
+Ljubljana	Ljubljana 1 T-2 d.o.o.
+LLC	LLC Global Message Services Ukraine
+Lleida.net	Lleida.net Serveis Telematics Limited
+Lleida	Lleida Networks Serveis Telemátics, SL
+Lleida	Lleida Networks Serveis Tel, S.L.
+LLP	LLP KazinterCom
+LLP	LLP Technical Information Centre
+LLP	LLP TNS-Plus
+Local	Local Fiber, LLC
+Local Fiber	Local Fiber, L.L.C.
+Localstar	Localstar Holding Pty. Ltd.
+Logan	Logan Telephone Cooperative
+Logan	Logan Telephone Cooperative, Inc
+LogicStar	LogicStar Ltd
+Logix	Logix
+Logix	Logix Communications
+Logosoft	Logosoft d.o.o. Sarajevo
+LDI	Long Distance International Inc.
+LDI	Long Distance International, Inc
+LDI	Long Distance Int'l Provisioning
+LDM	Long Distance Management
+LDN	Long Distance Network
+Long Dist MI	Long Distance of Michigan
+LDS	Long Distance Savers, Inc./LDS
+LDS	Long Distance Service, Inc.
+Sprint	Long Distance USA/Sprint
+LongLines	LongLines Wireless
+Longphone	Longphone
+Loretto	Loretto Telephone Company, Inc.
+Los	Los Angeles InternetExchange
+Loteny	Loteny Telecom
+Louisiana U	Louisiana Unwired LLC
+LTN	LTN Liechtenstein Telenet AG
+LTS	LTS Le Telecomunicazioni Siciliane S.p.A.
+Luck	Luck Telephone Company
+Lucky	Lucky Tone Communications Ltd
+Lufkin-Conroe	Lufkin-Conroe Telephone Exch., Inc.
+Lycamobile	Lycamobile Denmark
+Lycamobile	Lycamobile Norway Ltd
+Lycamobile	Lycamobile P/L
+Lycamobile	Lycamobile Pty Ltd
+Lycamobile,	Lycamobile, SL
+Lycamobile	Lycamobile Sweden Ltd
+Lycamobile	Lycamobile UK Limited
+Lycamobile	Lycamobile UK Ltd
+Lynch	Lynch 3G Communications Corporation
+Montenegro	M
+m2m	m2m Wholesale Ltd
+M800	M800 Ltd
+Mabel Coop	Mabel Cooperative Telephone Company
+Macrocom	Macrocom Ltd
+Madamobil,	Madamobil, CDMA 2000
+Madison Cty	Madison County Telephone Company
+Madison	Madison Telephone Company
+Madison	Madison Telephone Company, Inc.
+Magnacom	Magnacom, LLC dba PCS Plus, Inc
+Magnet	Magnet Networks
+Magrathea	Magrathea Telecommunications Ltd
+MagtiCom	MagtiCom Ltd
+Magti	Magti GSM Ltd.
+Magyar	Magyar Telekom Plc
+Mahanagar	Mahanagar Telephone (Mauritius)
+Mahanagar	Mahanagar Telephone (Mauritius) Ltd
+Mahanagar	Mahanagar Telephone (Mauritius) Ltd.
+Maine	Maine PCS LLC
+Makedonski	Makedonski Telekom AD - Skopje
+Malaysian	Malaysian Mobile Services Sdn Bhd
+Malitel	Malitel
+Maltacom/GO	Maltacom/GO plc
+Manawa	Manawa Telephone Company, Inc.
+Mangotone	Mangotone International Ltd
+Manquehue	Manquehue Telecomunicaciones Larga Distancia
+Manx	Manx Telecom
+Mapesbury	Mapesbury Communications Ltd
+Mapesbury	Mapesbury Communications Ltd.
+Marabu	Marabu Ermögensverwaltung GmbH
+Marabu	Marabu Vermögensverwaltung GmbH
+Mara	Mara Telecom
+Marathon	Marathon Telecom Limited
+Marathon	Marathon Telecom Ltd
+Marcatel	Marcatel Com, S.A. de C.V.
+Margaretville	Margaretville Telephone Company, Inc.
+Verizon	Marianas Verizon Pacifica
+Marianna	Marianna and Scenery Hill Telephone Company
+Marin	Marin Telecom, S.L.U.
+Maritime	Maritime Communications Partner AS
+Maritime	Maritime Communications Partner A.S. (MCP network)
+Mark Twain R	Mark Twain Rural Telephone Company
+M & E Horn	Marne & Elk Horn Telephone Comapny
+Marpin	Marpin Telecoms & Broadcasting Co. Ltd.
+M Adams	Marquette Adams Telephone Cooperative
+Mars	Mars Communications Limited
+Martinique	Martinique Téléphone Mobile
+Mascom	Mascom Wireless
+Mascom	Mascom Wireless (Pty) Ltd.
+Master	Master Telecom
+Matanuska	Matanuska Telephone Association, Inc.
+Mattel	Mattel SA
+Mattel	Mattel S.A.
+Mauritel	Mauritel Mobiles
+Mauritel	Mauritel SA
+Mauritius	Mauritius Telecom
+Maxcom	Maxcom Telecomunicaciones, S.A.B. de C.V.
+Maxitel	Maxitel BA
+Maxitel	Maxitel MG
+Max	Max Tecom AG
+Maycan	Maycan Horizons Inc
+McDonald	McDonald Telephone Company
+McDonough	McDonough Telephone Company
+MCI	MCI International, Inc
+MCI	MCI Italia S.p.A.
+MCI	MCImetro
+MCI	MCI Telecommunications Corporation
+MCI	MCI WorldCom
+MCI	MCI Worldcom
+MCI	MCI Worldcom Korea
+MCI	MCI Worldcom Ltd
+MCI	MCI WorldCom Spain, S.A.
+McLeod	McLeod Network Services
+McLoud	McLoud Telephone Company
+McNabb	McNabb Telephone Company
+MDC	MDC Velcom
+Médiaserv	Médiaserv
+Méditélécom	Méditélécom (GSM)
+MD Telecom	MD Telecom, Inc
+MEANS/INS/SDN	MEANS/INS/SDN
+Mebtel	Mebtel Communications
+MediaLincc	MediaLincc GmbH
+MediaLincc	MediaLincc Ltd
+Media One	Media One
+MediaOne	MediaOne, Inc.
+Mediatech	Mediatech International Ltd.
+MediaTel	MediaTel Corporation
+MediaTel	MediaTel S.A.
+Medicine Park	Medicine Park Telephone Company
+Medi	Medi Telecom
+Medius	Medius Networks Ltd
+Mednet	Mednet
+Mega	Mega
+MeGaCom	MeGaCom Ltd
+Megafon	Megafon
+Mega	Mega M, d.o.o.
+Mega-Satellitenfernsehen	Mega-Satellitenfernsehen GmbH
+Megatel	Megatel
+Megawats	Megawats
+Megsinet	Megsinet, Inc.
+Meorat	Meorat Natan LLC d/b/a Universal 400
+Merchants & F	Merchants & Farmers Telephone Company
+Mercury Cell	Mercury Cellular & Paging
+Mercury	Mercury International Carrier Services
+Meretel	Meretel Communications, L.P.
+Merkur	Merkur Telecom services GmbH
+Merrimack Cty	Merrimack County Telephone
+Meteor	Meteor Communications Ltd.
+Meteor	Meteor Mobile Communications Ltd.
+MetroNet	MetroNet Communication Group, Inc.
+Metronet	Metronet telekomunikacije d.d.
+Metro One	Metro One Telecommunications
+Metro	Metro PCS Wireless Inc
+Metropol	Metropol Access Deutschland GmbH
+Metropol	Metropol Access Italia
+Metrored	Metrored, S.A.
+Metrored	Metrored Telecomunicaciones S.A.
+Mfone	Mfone
+MGC	MGC Communications Inc.
+MGC	MGC Communications, Inc.
+MGC	MGC Communications,Inc.
+MGI	MGI Media GmbH
+MGW	MGW Telephone
+M&H	M&H Company d.o.o. Sarajevo
+MiBroadband	MiBroadband
+MichTel	MichTel, Inc.
+MICL	MICL
+Microcell	Microcell
+MicroCell	MicroCell 1-2-1 Inc.
+MIC	MIC (T) Ltd
+MIC	MIC (T) Ltd.
+Frontier	Mid Atlantic/Frontier
+Mid-Century	Mid-Century Telephone Company
+Midco	Midco Communications
+MIDCOM	MIDCOM Communications, Inc.
+Middleburgh	Middleburgh Telephone Company
+Middle Point	Middle Point Home Telephone Company
+Mid-Iowa	Mid-Iowa Telephone Co-Op Association
+Midi	Midi Telecom
+Miditel	Miditel, S.A. de C.V.
+Mid-Maine	Mid-Maine Telecom
+Mid-Missouri	Mid-Missouri Telephone Company
+Mid-Plains R	Mid-Plains Rural Telephone Cooperative, Inc.
+Mid-Plains	Mid-Plains Telephone Company, Inc.
+Midstate	Midstate Telephone Company
+Mid-Tex	Mid-Tex Cellular Ltd.
+Ontonagon Cty	Midway Telephone Company
+Miguel	Miguel Percy Montalvo Moreno
+MIGway	MIGway A/S
+Millenicom	Millenicom
+Millenium	Millenium Telcom, L.L.C.
+Miller	Miller Telephone Company
+Millicom	Millicom
+Millicom	Millicom Ghana Ltd
+Millicom	Millicom Luxembourg S.A.
+Millicom/Tigo	Millicom/Tigo
+Millry	Millry Telephone Company, Inc
+Millry	Millry Telephone Company, Inc.
+Milltown	Milltown Mutual Telephone Company
+Minford	Minford Telephone Company
+Ministry	Ministry of Communications
+Ministry	Ministry of Communications and Information Technologies of Nakhchivan Autonomous Republic of the Republic of Azerbaijan
+Ministry	Ministry of Posts and Telecommunications
+Minkfort	Minkfort Intelligent Network
+MiNO	MiNO Wireless USA, Inc
+Mintaka	Mintaka Limited
+Miranda	Miranda TESAM de Venezuela, C.A.
+Mirs	Mirs Ltd
+Mir	Mir Telecom
+Missouri RSA	Missouri RSA #5
+Missouri	Missouri RSA No. 5 Partnership
+Missouri	Missouri RSA No 5 Partnership dba Chariton Valley Wireless
+MITACS	MITACS Telekomservice
+M-Link	M-Link Teleport S.A.
+MNI	MNI Telecom S.A.
+Moapa Valley	Moapa Valley Telephone Company
+Mobicom	Mobicom
+Mobifone	Mobifone
+Mobik	Mobik d.o.o.
+Mobik	Mobik Telekomunikacii dooel
+Mobiland	Mobiland
+Mobilcom	Mobilcom City Line GmbH
+MobilCom	MobilCom Multimedia GmbH
+Mobilcom	Mobilcom Multimedia GmbH
+Mobile	Mobile 2000
+Mobile	Mobile 4 AL
+Mobile	Mobile Arts AB
+MobileCom	MobileCom
+Mobilecom	Mobilecom
+Mobile	Mobile Comms System
+Mobile	Mobile Norway AS
+MobileOne	MobileOne
+MobileOne	MobileOne (Asia) Pte Ltd
+MobileOne	MobileOne Ltd
+Mobile	Mobile Telecommunications Company
+Mobile	Mobile Telecommunications Ltd.
+Mobile	Mobile Telecom Service LLP
+Mobile	Mobile Telecom Service LLP network (roaming)
+Mobile	Mobile Telephone Networks
+Mobile	Mobile Telephone Networks Cameroon
+Mobile	Mobile Telephone Networks (MTN) Pty Ltd
+Cellcom	Mobile Telephone Switching Office/Cellcom
+Mobile	Mobile TeleSystems
+Mobile	Mobile Telesystems
+MobileTel	MobileTel Inc.
+Mobilink	Mobilink
+Mobility Canada	Mobility Canada
+Mobilkom	Mobilkom a.s.
+Mobilkom	Mobilkom Austria
+Mobilkom	Mobilkom Austria Aktiengesellschaft
+Mobilkom	Mobilkom (Liechstein) AG
+mobilkom	mobilkom liechtenstein AG
+Mobiltel	Mobiltel
+Mobily	Mobily
+Mobimax	Mobimax AB
+Mobinil	Mobinil
+Mobisle	Mobisle Communications Ltd
+Mobistar	Mobistar
+MOBISTAR	MOBISTAR s.a.
+Mobistar	Mobistar s.a.
+Mobitel	Mobitel
+Mobitel	Mobitel (Cam GSM)
+Mobitel	Mobitel d.d.
+Mobitel	Mobitel Ltd
+Mobitel	Mobitel Ltd.
+Mobitel	Mobitel (Pvt) Ltd
+Mobitel	Mobitel Telekomunikacijske storitve d.d.
+MOBĮS	MOBĮS (Mobilina Srpske)
+Modus	Modus Telecom Ltd
+Mohave	Mohave Cellular L.P.
+MoKan Dial	MoKan Dial, Inc.
+Moldcell	Moldcell GSM
+Moldtelecom	Moldtelecom
+Moldtelecom	Moldtelecom CDMA
+Monaco	Monaco Telecom
+Monogram	Monogram Telecom Ltd
+Monon	Monon Telephone Company, Inc.
+Montana Cell	Montana Wireless, Inc.
+Montrose	Montrose Mutual Telephone Company
+Moov	Moov
+Mornington	Mornington Municipal Telephone System
+Mosinee	Mosinee Telephone Company
+Mossel	Mossel (Jamaica) Ltd.
+Mossel	Mossel Jamaica Ltd
+Motorola	Motorola
+Motorola	Motorola Corporation
+Motorola	Motorola, Inc.
+Mound Bayou	Mound Bayou Telephone & Communications
+Moundridge	Moundridge Telephone Company
+Moundville	Moundville Telephone Company, Inc.
+Mountaineer	Mountaineer Long Distance, Inc.
+Mountain R	Mountain Rural Telephone
+Mountain	Mountain Telecommunications
+Mountain View	Mountain View Telephone Company
+Movicel	Movicel
+Movistar	Movistar
+Movitel	Movitel, S.A.
+Mozambique	Mozambique Celular- mCel
+MRC	MRC Telecommunications, Inc.
+Gentel	M/s 4B Gentel
+Bharti Airtel	M/s Bharti Airtel Ltd
+Bharti Telesonic	M/s Bharti Telesonic Ltd
+Burraq	M/s Burraq Telecom Ltd
+Callmate	M/s Callmate Telips Telecom Ltd
+CircleNet	M/s CircleNet Comm
+Circle Nett	M/s Circle Nett Communications Pvt Ltd.
+Dancom	M/s Dancom Pak Pvt Ltd
+Data Access	M/s Data Access India Ltd
+Data Access	M/s Data Access Ltd
+Dishnet	M/s Dishnet Wireless Ltd
+DV Com	M/s DV Com Ltd
+Etisalat	M/s Etisalat DB Telecom Ltd
+Hutchison	M/s Hutchison Essar South Ltd
+Link Direct	M/s Link Direct
+Link Direct	M/s Link Direct International (Pvt) Ltd
+P3 Tech.	M/s P3 Technologies Pvt Ltd
+PTC	M/s Pakistan Telecom Company Ltd
+Redtone	M/s Redtone Pakistan Pvt Ltd
+Reliance	M/s Reliance Communications Ltd
+Reliance	M/s Reliance Infocomm Ltd
+SCO	M/s Special Communications Organization (SCO)
+Spice	M/s Spice Communications Ltd
+Tata	M/s Tata Communications Ltd
+Telecard	M/s Telecard Ltd
+Telenor	M/s Telenor Pak Ltd
+Vodafone	M/s Vodafone Essar South Ltd
+Warid	M/s Warid Telecom Pvt Ltd
+Wisecom	M/s Wisecom System Pvt Ltd
+Worldcall	M/s Worldcall Telecom Ltd
+MTA	MTA Communications dba MTA Wireless
+MTBC	MTBC Telecom Ltd.
+MTC	MTC
+MTC	MTC Telemanagement
+Vodafone	MTC Vodafone (Bahrain)
+MTEL	MTEL
+MTEL	MTEL d.o.o. Podgorica
+Mtelecom	Mtelecom Ltd
+M-Tel	M-Tel GSM BG
+Mt. Horeb	Mt. Horeb Telephone Company
+MTN	MTN
+MTN	MTN Cameroon
+MTN	MTN - Côte d'Ivoire
+MTN	MTN Cyprus Limited
+MTN	MTN Ghana Ltd
+MTNL,	MTNL, Delhi
+MTNL,	MTNL, Mumbai
+MTN	MTN Network Ltd.
+MTN	MTN Nigeria Communications
+MTN	MTN Rwandacell
+MTN	MTN Sudan
+MTN	MTN Uganda Ltd
+MTN	MTN Uganda Ltd.
+MTN	MTN Zambia
+M-Touch	M-Touch
+MTPCS	MTPCS LLC
+MTS	MTS
+MTS	MTS Mobility
+Mttel	Mttel AG
+Muenster	Muenster Telephone Corporation of Texas
+Mulberry Coop	Mulberry Cooperative Telephone Company, Inc.
+Multicoms	Multicoms
+MultiCorp	MultiCorp XIV Sp. Z.o.o.
+Multikom	Multikom S.A.
+Multilinks	Multilinks
+Multilink	Multilink S.p.A.
+Multimedia	Multimedia Polska - Mielec Sp. Z.o.o.
+Multimedia	Multimedia Polska SA
+Multimedia	Multimedia Telephone Service
+MACH	Multinatio nal Automated Clearing House S.A. (MACH)
+Multiphone	Multiphone Venezuela C.A.
+Mundetel	Mundetel Communications. Inc
+Mundio	Mundio Mobile Ltd
+Mundio	Mundio Mobile (Netherlands) Ltd
+Mundio	Mundio Mobile Norway Limited
+Mundio	Mundio Mobile Norway Ltd
+Mundio	Mundio Mobile Sweden Ltd
+Mundophone	Mundophone Telekommunikations GmbH
+Mundo	Mundo Startel
+Murex	Murex Telecom Ltd
+Mustang	Mustang Telecom, Inc.
+Mutual	Mutual Telephone Company
+China Motion	MVNO/China Motion Telecom (HK) Ltd.
+China Unicom	MVNO/China Unicom International Ltd.
+CHKTL	MVNO/CHKTL
+CITIC	MVNO/CITIC
+Trident	MVNO/Trident
+Myanmar	Myanmar Post and Telecommunication
+MyIndian	MyIndian AB
+MyTel	MyTel GmbH
+N + 1	N + 1, Inc.
+N+1	N + 1, Inc.,
+Naray	Naray Telecom
+Nashagak	Nashagak Telephone Cooperative, Inc.
+National	National Communications Association
+NDC	National Data Corporation
+NNC	National Network Corporation
+National	National Signalling Network Administration, Monitoring and Measurement
+Nat'l Austin	National Telecommunications of Austin
+NTF	National Telecom of Florida
+National	National Telephone
+NTX	National Telephone Exchange/NTX
+Nat'l AL	National Telephone of Alabama
+Nat.TeleSvc	National TeleService
+Nationlink	Nationlink
+Nationwide	Nationwide Communications, Inc.
+Natrindo	Natrindo (Lippo Telecom)
+Nawras	Nawras
+NBNCo	NBNCo Ltd
+Núcleo	Núcleo S.A.
+Nearly	Nearly, S.L.
+NebCom	NebCom, Inc.
+Nebraska C	Nebraska Central Telephone Company
+Nebular	Nebular Telecom Japan K.K.
+Nelson Ball	Nelson Ball Ground Telephone Company
+Nemont	Nemont Telephone Cooperative, Inc.
+Neo	Neo Sky 2002, S.A.
+Neotel	Neotel
+NEO	NEO Telecom Ltd
+Neo	Neo Telecom Sp. Z.o.o
+Neotel	Neotel Pty Ltd
+Nepal	Nepal Doorsanchar Co. Ltd
+Nepal	Nepal Telecommunications
+Nep	Nep Cellcorp Inc.
+Net2Phone	Net2Phone Inc
+Net44	Net44 Communication GmbH
+Net4Mobility	Net4Mobility HB
+Netafriques	Netafriques Dot Com Ltd
+NetAmerica	NetAmerica Alliance LLC
+Net	Net Business S.p.A.
+NetCologne	NetCologne Gesellschaft für Telekommunikation GmbH
+NetCom	NetCom AS
+Netcom	Netcom AS
+Net	Net Communications,Inc.
+Net	Net Communications Ventures Ltd.
+NetConnect	NetConnect Internet
+Netia	Netia Mobile
+Netia	Netia S.A.
+netLAUNCH	netLAUNCH Communication Services & Consulting GmbH
+NetOne	NetOne
+Net	Net One
+Netone	Netone
+NetOne	NetOne (Pvt) Ltd
+NetSat	NetSat Express Inc
+Netscalibur	Netscalibur S.r.l.
+Netstream	Netstream AG
+Netsys	Netsys
+Net	Net Telephone Marketing, Inc
+Net	Net Telephone Marketing Pty Ltd
+Netvision	Netvision Ltd
+Network	Network
+Network	Network Brokers Ltd
+Network	Network Communication International Corp
+Network	Network Norway AS
+NOW	Network of the World Ltd (NOW)
+NOW	Network of World Co (NOW)
+Network Plus	Network Plus
+Network	Network Plus Inc
+Network	Network Rail Infrastructure Limited
+Network	Network Rail Infrastructure Ltd
+Network Svcs.	Network Services
+NSS	Network Switching Services, Inc.
+NSS	Network Switching Services,Inc.
+Neutral	Neutral Tandem, Inc.
+Nevi	Nevi Cons (Nevi Telecom)
+NevTEL	NevTEL
+New1	New1
+Newcall	Newcall International
+New Cell	New Cell Inc. dba Cellcom
+New Cingular	New Cingular Wireless PCS, LLC
+New Com	New Com Telecomunicatii
+New Dimension	New Dimension Wireless Ltd
+New Florence	New Florence Telephone Company
+New Global	New Global Telecom
+New Global	New Global Telecom, Inc
+New Hope	New Hope Telephone Cooperative
+New Lisbon	New Lisbon Telephone Company
+New Mexico	New Mexico RSA 4 East Ltd. Partnership
+New Millennium	New Millennium Comm.Corp
+New Millennium	New Millennium Comm. Corp.
+New Millennium	New Millennium Comm.Corp.
+New Millennium	New Millennium Communications Corp.
+New Millennium	New Millennium Communications Corporation
+New Millennium	New Millennium Telecom Services N.V./Digicel Aruba
+NewSouth	NewSouth Comm.L.L.C.
+New Tel Co	New Telephone Company
+New Ulm	New Ulm Telecom, Inc.
+New Windsor	New Windsor Telephone Company
+New World	New World Telecom International Inc
+New World	New World Telecommunications Ltd
+Nexcom	Nexcom
+Nexcom	Nexcom Bulgaria
+Nexcom	Nexcom Telecommunications
+NextCarrier	NextCarrier Telecom, Inc
+Nex-Tech	Nex-Tech Wireless LLC
+Nextel	Nextel
+Nextel	Nextel Argentina srl
+Nextel	Nextel Communications Inc
+Nextel	Nextel (Was OneComm, Inc.)
+NextGen	NextGen Mobile Ltd
+NextWave	NextWave Telecom
+Nexus	Nexus
+Nexus	Nexus Communications Inc
+Nexus	Nexus Telecommunications plc
+Niagara	Niagara Telephone Company
+NITEL	Nigerian Telecommunications Limited (NITEL)
+nikotel	nikotel Deutschland AG
+Nizhegorodskaya	Nizhegorodskaya Cellular Communications
+Nodalis	Nodalis S.p.A.
+Nodalis	Nodalis s.p.a.
+Nokia	Nokia Siemens Networks Oy
+Nokia	Nokia Telecom
+NOM	NOM Sp. Z.o.o
+Noonan F	Noonan Farmers Telephone Company
+Nordisk	Nordisk Polska Sp. Z.o.o.
+Norfolk Cty	Norfolk County Internet
+Norfolk	Norfolk Island Administration (Norfolk Telecom)
+Norfolk	Norfolk Telecom
+Norte	Norte Brasil Tel
+Nortex	Nortex Telcom
+NACN	North American Cellular Network
+NAC	North American Comm (NAC)
+NA DigiCom	North American DigiCom Corporation
+NA Gateway	North American Gateway Inc.
+NAT Corp	North American Telecomm. Corp
+NA Telecom	North American Telecomm. Corp.
+N. Atl. Gateway	North Atlantic Gateway, Inc
+N Central	North Central Telephone Cooperative
+North	North Dakota Network Co.
+N Dakota	North Dakota Telephone Company
+North	North East Cellular Inc.
+NE Pennsylvania	North-Eastern Pennsylvania Telephone Company
+NE Florida	Northeast Florida Telephone Company, Inc.
+NE Louisana	Northeast Louisana Telephone Company
+NE Missouri	Northeast Missouri Rural Telephone Company
+NE Nebraska	Northeast Nebraska Telephone Co.
+Northeast	Northeast Telephone Company
+Northeast	Northeast Wireless Networks LLC
+N Arkansas	Northern Arkansas Telephone Company
+N Illinois Univ	Northern Illinois University
+Northern	Northern Telephone Cooperative, Inc.
+Northland	Northland Comm.Group
+Northland	Northland Telephone
+Northland	Northland Telephone Company
+N Norwich	North Norwich Telephones Ltd.
+N Pittsburgh	North Pittsburgh Telephone Company
+North	North Sight Communications Inc
+N State	North State Telephone Company
+North-State	North-State Telephone Company
+OJSC	North-West Branch of OJSC Megafon
+Northwest	Northwest Communications Cooperative
+Northwestel	Northwestel, Inc.
+NW Indiana	Northwestern Indiana Telephone Company
+Northwest	Northwest Missouri Cellular Limited Partnership
+Northwest	Northwest Telephone Company
+Nova	Nova ehf
+Nova	Nova Telefonía, S.L.
+Novolink	Novolink Communications Inc
+Nov	Nov Operator
+Novotel	Novotel Ltd
+Novus	Novus Telecom Inc.
+Nowtel	Nowtel UK Ltd
+NPI	NPI Wireless
+NP Telephony	NP Telephony
+N. Renfrew	N. Renfrew Telephone Company, Ltd.
+NRPT	NRPT Corporation
+Nsight	Nsight Spectrum LLC
+Nsighttel	Nsighttel Wireless LLC
+NSS	NSS S.A.
+n-Tel	n-Tel Communications Ltd
+nTELOS	nTELOS Communications Inc (Virginia PCS Alliance LC)
+Ntework	Ntework Rail Infrastructure Ltd
+NTI	NTI Telecom Incorporated
+NTL	NTL
+ntl	ntl Communications (Ireland) Ltd.
+ntl	ntl Group Ltd
+NTS	NTS Communications
+NTT	NTT Communications Corporation
+NTT	NTT DoCoMo Chugoku Inc.
+NTT	NTT DoCoMo Hokkaido
+NTT	NTT DoCoMo Hokkaido Inc.
+NTT	NTT DoCoMo Hokuriku Inc.
+NTT	NTT DoCoMo Hokuriku, Inc.
+NTT	NTT DoCoMo Inc.
+NTT	NTT DoCoMo, Inc.
+NTT	NTT DoCoMo Kansai Inc.
+NTT	NTT DoCoMo Kansai, Inc.
+NTT	NTT DoCoMo Kyushu Inc.
+NTT	NTT DoCoMo Shikoku Inc.
+NTT	NTT DoCoMo Tohoku Inc.
+NTT	NTT DoCoMoTohoku Inc.
+NTT	NTT DoCoMo Tokai Inc.
+Nucla-N	Nucla-Naturita Telephone Company
+Nuevatel	Nuevatel
+Nuevatel	Nuevatel S.A.
+NuLink	NuLink, Inc
+Numerex	Numerex Corp
+Numéricâble	Numéricâble
+Nur	Nur Telecom Ltd
+Nutel	Nutel Communications Ltd
+N.V.	N.V. Casema
+NVTS	NVTS Ameritel
+NxGentel	NxGentel de Panama S.A.
+NYNEX	NYNEX
+NYNEX Mobile	NYNEX Mobile Communications
+NZ Comm.	NZ Communications
+NZ	NZ Communications - UMTS Network
+O2	O2 (Germany) GmbH & Co.
+O2	O2 (Germany) GmbH & Co. OHG
+O2	O2 Ireland
+O2	O2 (UK) Ltd
+O2	O2 UK Ltd.
+Oasis	Oasis sprl
+OBB	OBB - Infrastruktur Bau AG
+Obicom	Obicom Swiss AG
+Ocean	Ocean
+Ocean	Ocean Network Pte Ltd
+OCI	OCI Communications of Minnesota, Inc.
+Odin	Odin Telephone Exchange, Inc.
+OCPT	Office Congolais des Postes et Télécommunications (OCPT)
+OPT	Office des postes et télécommunications
+Ogden	Ogden Telephone Company
+General Transit	OÜ General Transit Telecom
+Ogero	Ogero Telecom
+Og	Og fjarskipti hf (Vodafone Iceland)
+OGI	OGI Telecomm
+OJSC	OJSC Multiregional TransitTelecom
+OJSC	OJSC Rostelecom
+Okinawa	Okinawa Cellular Telephone
+Oklahoma	Oklahoma Telephone & Telegraph,Inc.
+Oklahoma	Oklahoma Western Telephone Company
+Oklahoma W	Oklahoma Western Telephone Company
+Oman	Oman Mobile Telecommunications Company (Oman Mobile)
+Oman	Oman Qatari Telecommunications Company (Nawras)
+Omantel	Omantel
+Omantel	Oman Telecommunications Company (Omantel)
+Omnipoint	Omnipoint Communications Inc.
+Omnitel	Omnitel
+OPI	Omnitel Pronto Italia (OPI)
+ON	ON
+OnAir	OnAir
+ONAMOB	ONAMOB
+ONATEL	ONATEL
+One	One AD
+One call	One call Communications, Inc.
+Oneida Cty	Oneida County Rural Tele. Co.
+Oneida Cty	Oneida County Rural Telephone Company
+Oneida	Oneida Telephone Company
+OnePhone	OnePhone (UK) Ltd
+OneSuite	OneSuite Corporation
+Onetel	Onetel
+One.Tel	One.Tel GSM 1800 Pty. Ltd.
+One. Tel	One. Tel, Inc.
+One.Tel	One.Tel Ltd.
+OneTel	OneTel Telecommunication GmbH
+One.Tel	One.Tel Telekommunikation GmbH
+Onitelecom	Onitelecom - Infocomunicações S.A.
+Oniway	Oniway - Inforcomunicaçôes, S.A.
+Onkod	Onkod Telecom Ltd
+On-net	On-net Skopje
+OnQue	OnQue Communications, Inc.
+Ontario	Ontario Telephone Company, Inc.
+Ontonagon Cty	Ontonagon County Telephone Company
+Ontus	Ontus Telecommunications Corp
+Opal	Opal Telecom Ltd
+Opal	Opal Telecom Ltd.
+Openline	Openline S.p.A.
+Opentel	Opentel Communications, Inc.
+Operadora	Operadora Protel, S.A. de C.V.
+Operbes	Operbes, S.A. de C.V.
+O.P.T.	O.P.T.
+OPTel	OPTel, Inc.
+OpTel	OpTel, Inc.
+OpTel	OpTel,Inc.
+Optel	Optel Technology Ltd
+Optimum	Optimum Network Service, LLC
+Optimus	Optimus - Telecomunicaçôes, S.A.
+OPT	OPT Mobilis
+Optus	Optus Ltd
+Optus	Optus Ltd.
+Optus	Optus Mobile Pty. Ltd.
+Optynex	Optynex Telecom, S.A.
+Orange	Orange
+Orange	Orange Armenia
+Orange	Orange Austria Telecommunication
+Orange	Orange Austria Telecommunication GmbH
+Orange	Orange Botswana
+Orange	Orange Botswana (Pty) Ltd.
+Orange	Orange Business Austria
+Orange	Orange Business Finland Oy
+Orange	Orange Business Netherlands B.V.
+Orange	Orange Business Norway AS
+Orange	Orange business Norway AS
+Orange	Orange Business Services
+Orange	Orange Business Sweden AB
+Orange	Orange Business Switzerland AG
+Orange	Orange Cameroun
+Orange	Orange Caraïbe Mobiles
+Orange	Orange Communications SA
+Orange	Orange - Côte d'Ivoire
+Orange	Orange Côte d'Ivoire
+Orange	Orange Dominicana, S.A.
+Orange	Orange France
+Orange	Orange (GETESA)
+Orange,	Orange, GSM
+Orange	Orange Guinée
+Orange	Orange La Réunion
+Orange	Orange (Liechtenstein) AG
+Orange	Orange Madagascar GSM
+Orange	Orange Madagascar, GSM
+Orange	Orange Moldova GSM
+Orange	Orange Nederland N.V.
+Orange	Orange Niger S.A.
+Orange	Orange Romania
+Orange	Orange Slovensko, a.s.
+Orange,	Orange, UMTS
+Orange	Orange Web Services, S.L.
+Orascom	Orascom Telecom
+Orascom	Orascom Telecom Algérie
+Orascom	Orascom Télécom Tunisie
+Orbistel	Orbistel S.A.
+Orbita	Orbita Perú S.A.C.
+Orbitel	Orbitel
+Orbitel	Orbitel Comunicaciones Latino, S.A.
+Orbitel	Orbitel S.A. ESP
+Orbitel	Orbitel S.A. E.S.P.
+Orcavoice	Orcavoice B.V.
+Orchard	Orchard Telecom/dba UTS
+Oregon F M	Oregon Farmers Mutual Telephone Company
+Oregon TSI	Oregon Telco Services, Inc
+OTS	Oregon Telco Services, Inc.
+OTC	Oregon Telephone Corporation
+Orensot	Orensot
+Oricel	Oricel - Côte d'Ivoire
+Oricel	Oricel Côte d'Ivoire
+Orlando	Orlando Telephone Company, Inc.
+Ormeño	Ormeño Comunicaciones S.A.
+Orobiacom	Orobiacom S.p.A.
+Orwell	Orwell Telephone Company
+OTE	OTE
+Otecel	Otecel S.A.
+Otecel	Otecel S.A. - Bellsouth
+Oteglobe	Oteglobe
+Otelco	Otelco
+OTENet	OTENet Telecommunications Ltd.
+OT-Optima	OT-Optima Telekom d.d.
+Otter	Otter Tail Telcom
+Ottoville M	Ottoville Mutual Telephone Company
+OTZ	OTZ Communications Inc
+OTZ	OTZ Telephone Cooperative, Inc.
+OU Top Connect	OU Top Connect
+Outremer	Outremer Telecom
+Outremer	Outremer Télécom
+Oxford City	Oxford City Telephone and Telegraph Company
+Cubio Comm.	Oy Cubio Communications Ltd.
+OY Teqli Telecom	OY Teqli Telecom
+OY	OY Top Connect
+OzEmail	OzEmail Interline Pty Limited
+OzEmail	OzEmail Interline Pty Ltd.
+P4	P4 Sp. Z.o.o.
+PBTL	Pacific Bangladesh Telecom Ltd. (PBTL)
+Pacific Bell	Pacific Bell Communications
+Pac Bell	Pacific Bell Mobile Services
+Pac Gateway	Pacific Gateway Exchange
+Pacific	Pacific IDD Ltd
+Pacific	Pacific Telecom
+Pacific	Pacific Telecom Co. Ltd.
+Pacific	Pacific Telecom Inc
+Pacific	Pacific Telekey Network, Inc
+PacificTelesis	PacificTelesis
+Pacifictel	Pacifictel S.A.
+Pacnet	Pacnet Services Asia Pacific Commercial (HK) Ltd
+Pac Tel	Pac Tel Corporation
+Pactel	Pactel International Pty Ltd
+Pac-West	Pac-West Telecomm, Inc.
+Pac-West	Pac-West Telecomm, Inc. dba AmeriCall
+PaeTec	PaeTec Communications, Inc.
+PaeTec	PaeTec Communications,Inc.
+Paging Net	Paging Network Inc.
+Paging Net	Paging Network Inc.,(AKA PageNet)
+UFONE	PAK Telecom Mobile Ltd. (UFONE)
+Palau	Palau National Communications Corp. (a.k.a. PNCC)
+Palmerton	Palmerton Telephone Company
+Palmetto R	Palmetto Rural Telephone Cooperative, Inc.
+Panamerican	Panamerican Wireless S.A.
+PanAmSat	PanAmSat Corporation
+Panam	Panam Wireless, Inc.
+Panhandle	Panhandle Telecommunication Systems Inc.
+Panhandle	Panhandle Telephone Cooperative
+Panhandle	Panhandle Telephone Cooperative,Inc.
+Panhandle	Panhandle telephone Cooperative, Inc.
+Pannon	Pannon GSM
+Pantel	Pantel Communications
+PAPOSH	PAPOSH, LLC
+Parla.it	Parla.it S.p.A.
+Partner	Partner
+Partner	Partner Communications Co. Ltd.
+Pass Word	Pass Word, Inc.
+Pattersonville	Pattersonville Telephone Company
+PCCW	PCCW Global (HK) Ltd
+PCCW	PCCW Pacific Ltd
+PC Mgmt	PC Management
+Pegaso	Pegaso Comunicaciones y Sistemas, S.A. de C.V.
+Pelephone	Pelephone Communications Ltd.
+Pella	Pella
+Pembroke	Pembroke Telephone Company
+Penasco Vly	Penasco Valley Telephone Cooperative, Inc.
+Pend Oreille	Pend Oreille Telephone
+Peninsula	Peninsula telephone Company
+Pennsylvania	Pennsylvania Telephone Company
+Pentatel	Pentatel GmbH
+Peoples Mutual	Peoples Mutual Telephone Company
+Peoples R	Peoples Rural Telephone Cooperative Corporation
+Peoples	Peoples Telephone Company
+Peoples	Peoples Telephone Company, Inc.
+People's	People's Telephone Company of Forest Ltd.
+Peoples	Peoples Telephone Cooperative, Inc.
+Perfect	Perfect Image Inc
+P Spencer R	Perry Spencer Rural Telephone Cooperative
+Personal	Personal Commun. Network, Inc.
+Perusat	Perusat S.A.
+PetroCom	PetroCom LLC
+P/F	P/F Kall
+P/F	P/F KALL, reg. No 2868 (Vodafone FO)
+PHILCOM	Philippine Global Communications Inc. (PHILCOM)
+PhilComsat	Philippine Global Communications Inc. (PhilComsat)
+PLDT	Philippine Long Distance Telephone Company (PLDT)
+Phillips Cty	Phillips County Telephone Company
+Phoenix	Phoenix Communication GmbH
+Phoenix	Phoenix Communications Pte Ltd
+Fiberlink	Phoenix Fiberlink of Utah, Inc.
+Phoenix	Phoenix Network
+Phone24	Phone24 AG
+PBSI	Phone Base Systems, Inc.
+Phone One	Phone One
+Phone	Phone Systems & Networks
+Phonetime	Phonetime, Inc.
+Phonetime	Phonetime International Inc.
+Pick	Pick Communications Corporation
+Piedmont R	Piedmont Rural Telephone Cooperative
+Piedmont	Piedmont Telephone Membership Corporation
+Pierce	Pierce Telephone Company, Inc.
+Pine	Pine Belt Cellular Inc dba Pine Belt Wireless
+Pine Belt	Pine Belt Telephone Company, Inc.
+Pine Drive	Pine Drive Telephone Company
+Pineland	Pineland Telephone Cooperative, Inc.
+Pine	Pine Telephone Company
+Pine	Pine Telephone Company dba Pine Cellular
+Pine Tree	Pine Tree Telephone & Telegraph Company
+Pineville	Pineville Telephone Company
+PinPoint	PinPoint Communications Inc.
+Pinpoint	Pinpoint Wireless Inc.
+Pioneer	Pioneer Telephone Association
+PKT	PKT Centertel Sp. Z.o.o.
+Plains	Plains Cooperative Telephone Association, Inc.
+Plainview	Plainview Telephone Company, Inc.
+Planters R	Planters Rural Telephone Cooperative, Inc.
+Plant	Plant Telephone Company
+PLD	PLD Telekom, Inc
+PLDT	PLDT (SG) Pte Ltd
+PLDT	PLDT (UK) Ltd
+PLDT	PLDT (US), Ltd
+Plug	Plug IT International
+Plus	Plus GSM (Polkomtel S.A.)
+Plus	Plus Telecom
+PM2	PM2 Telecommunication GmbH
+PMF-SAL	PMF-SAL
+Pocket	Pocket Communications, Inc.
+PCB	Point code blocks
+Polar	Polar Communications Mutual Aid Corporation
+Policom	Policom S.p.A.
+Polkomtel	Polkomtel S.A.
+Polska	Polska Telefonia Cyfrowa Sp. Z.o.o.
+Poltomtel	Poltomtel S.A.
+Polycom	Polycom
+Pond Branch	Pond Branch Telephone Company, Inc.
+Ponderosa	Ponderosa Telephone Company
+POPP	POPP Telecom
+Porta	Porta GSM
+Post-og	Post-og Teletilsynet
+Pottawatomie	Pottawatomie Telephone Company, Inc.
+Powercom	Powercom Pty Ltd
+Powernet	Powernet Telecom Ltd
+PowerTel	PowerTel Ltd
+Prairie Grove	Prairie Grove Telephone Company
+Premiere	Premiere Comm.
+Premiere	Premiere Communications
+Premium	Premium internet
+Premium	Premium Internet S.A.
+Pre-Paid Cell	Pre-Paid Cellular Services
+Prestel	Prestel
+Price Cty	Price County Telephone Company
+Primatel	Primatel d.o.o.
+PrimeCo	PrimeCo Personal Communications
+PrimeCO	PrimeCO Personal Communications , L.P.
+Primeira	Primeira Escolha
+Primetel	Primetel Ltd
+Primetel	Primetel PLC
+Primus	Primus Telecommunicationes Spain, S.A.
+Primus	Primus Telecommunications
+Primus	Primus Telecommunications Deutschland GmbH
+Primus	Primus Telecommunications, Inc
+Primus	Primus Telecommunications, Inc.
+Primus	Primus Telecommunications K.K.
+Primus	Primus Telecommunications Pty Ltd
+Primus	Primus Telecommunications SA
+Primus	Primus Telecommunications srl
+Prince Rupert	Prince Rupert City Telephone
+Printelefone	Printelefone
+Prioritel	Prioritel LLC
+Prism	Prism Communications
+Privet	Privet Network NEC
+Prodigy	Prodigy Telecom Pty Ltd
+Progetel	Progetel Distribuzione Italia S.p.A.
+Progressive R	Progressive Rural Telephone Cooperative, Inc.
+ProGroup	ProGroup Holding OY
+Project Mutual	Project Mutual Telephone Company
+Project	Project Telephone Co.
+ProRail	ProRail B.V.
+Prorail	Prorail B.V.
+Prosodie	Prosodie
+Protel	Protel GmbH
+Protel	Protel UK Ltd
+Proximiti	Proximiti Mobility Inc
+Proximus	Proximus
+PSN	PSN
+PT	PT. Bakrie Telecom Tbk.
+PT	PT Comunicações S.A.
+PTC	PTC Sp. Z.o.o.
+PT	PT Excelkomindo
+P.T.I.	P.T.I. GmbH
+PT	PT Indosat
+PT	PT Indosat - M3
+PT	PT Indosat (Persero) Tbk.
+PTK	PTK
+PTK	PTK Centertel Sp. Z.o.o.
+P&T	P&T Luxembourg
+PT	PT Natrindo Telepon Seluler
+PT	PT Novum Sp. Z.o.o.
+PT	PT Pasifik Satelit Nusantara
+PTR	PTR Centertel Sp. Z.o.o.
+PT	PT Satelindo
+PTT	PTT Chile S.A.
+PT	PT Telekomunikasi Indonesi TBK
+PT	PT Telkom
+PT	PT Telkomsel
+PTT	PTT Minex GmbH
+Public	Public Mobile Networks/Reserved
+Public	Public Service Cellular, Inc.
+Pub. Service	Public Service Telephone Company
+Publitel	Publitel S.p.A.
+Puerto Rico	Puerto Rico Telephone Company
+Pulaski-White	Pulaski-White Telephone Company
+P.V. Tel	P.V. Tel LLC
+Pymatuning	Pymatuning Independent Telephone Company
+QATARNET	QATARNET
+QTEL	Qatar Telecom (QTEL)
+QIComm	QIComm Ltd
+QiComm	QiComm Ltd
+Qtel	Qtel S.p.A.
+Qualtel	Qualtel, S.A. de C.V.
+Quantum	Quantum Communications Ltd.
+Quantum	Quantum Sistemas, S.A.
+Queensland	Queensland Rail Limited
+Quest	Quest Communications
+Quidex	Quidex GmbH
+Quinsy	Quinsy B.V.
+Qwest	Qwest Communications
+Qwest	Qwest Communications Corporation
+Qwest	Qwest Communications International Corp
+Qwest	Qwest Hong Kong Telecommunications Ltd
+QXTEL	QXTEL Ltd
+Radcomm	Radcomm
+Radiofone	Radiofone, Inc.
+RadioMóvel	RadioMóvel - Telecomunicações, S.A.
+Radiomóvil	Radiomóvil DIPSA, S.A. de C.V.
+Ragland	Ragland Telephone Co., Inc.
+Railcorp	Railcorp
+Rainbow	Rainbow Internet Services group N.V./Scarlet
+Rainbow	Rainbow Telephone Cooperative Association, Inc.
+Rami	Rami Levi (MVNO)
+RAM Tech	RAM Technologies, Inc.
+Randolph	Randolph Telephone Company
+Range	Range Telephone Cooperative
+Rapidlink	Rapidlink Telecommunications GmbH
+Rawal	Rawal Telecom s.r.l.
+R	R Cable y Telecomunicaciones Galicia, SA
+RCC	RCC Com Inc.
+RCC	RCC Network, Inc.
+RC	RC Communications, Inc.
+RCI	RCI Corporation
+RCN	RCN Telecom of California
+RCN	RCN Telecom Services,Inc.
+RCS	RCS & RDS
+Reach	Reach Europe Ltd
+Reach	Reach Networks HongKong Ltd
+Reams Comm	Reams Commun.,Inc.dba Valuline Long
+Rectel	Rectel
+Red	Red Alternativa S.A.
+Redes	Redes y Servicios Liberalizados, S.A.
+Redtone	Redtone Technology Pte Ltd
+Redwood Cty	Redwood County Telephone Company/Clements Telephone Company
+Refer	Refer Telecom - Serviços de Telecomunicações, S.A.
+Reliable	Reliable Internet Services Ltd., Kolkata
+Reliance	Reliance Communications, Inc
+Reliance	Reliance Infocomm Ltd, Andhra Pradesh
+Reliance	Reliance Infocomm Ltd, Bihar
+Reliance	Reliance Infocomm Ltd, Chennai
+Reliance	Reliance Infocomm Ltd, Delhi
+Reliance	Reliance Infocomm Ltd, Gujarat
+Reliance	Reliance Infocomm Ltd, Haryana
+Reliance	Reliance Infocomm Ltd, Himachal Pradesh
+Reliance	Reliance Infocomm Ltd, J&K
+Reliance	Reliance Infocomm Ltd, Karnataka
+Reliance	Reliance Infocomm Ltd, Kerala
+Reliance	Reliance Infocomm Ltd, Kolkata
+Reliance	Reliance Infocomm Ltd, Madhya Pradesh
+Reliance	Reliance Infocomm Ltd, Maharashtra
+Reliance	Reliance Infocomm Ltd, Mumbai
+Reliance	Reliance Infocomm Ltd, Orissa
+Reliance	Reliance Infocomm Ltd, Punjab
+Reliance	Reliance Infocomm Ltd, Tamilnadu
+Reliance	Reliance Infocomm Ltd, UP (East)
+Reliance	Reliance Infocomm Ltd, UP (West)
+Reliance	Reliance Infocomm Ltd, West bengal
+Reliance	Reliance Telecom Ltd., Assam
+Reliance	Reliance Telecom Ltd., Bihar
+Reliance	Reliance Telecom Ltd., H.P.
+Reliance	Reliance Telecom Ltd., Madhya Pradesh
+Reliance	Reliance Telecom Ltd., North East
+Reliance	Reliance TelecomLtd., Orissa
+Reliance	Reliance Telecom Ltd., W.B. & A.N.
+Republican	Republican Unitary Telecommunication Enterprise Beltelecom
+Reserved	Reserved
+reserved	reserved
+Reserved	Reserved for AMPS MIN based IMSI's
+First	reserved for First Telecom GmbH
+Reserve	Reserve Telephone Company, Inc.
+Residential	Residential Communications Network, Inc.
+Residential	Residential Communications Netwprk, Inc.
+Retecal	Retecal, S.A.
+Rete	Rete Ferroviaria Italiana S.p.A.
+Rete	Rete Italiana Assicurativa di TLC. S.r.l.
+Retevisión	Retevisión Móvil, S.A.U.
+Reval	Reval Vara OÜ
+Revenue	Revenue Communications, Inc.
+ReWiCom	ReWiCom Scandinavia AB
+Reynolds	Reynolds Telephone Company
+RFE	RFE Technologies UK Ltd
+RG Comm.	RG Communications
+Rhema	Rhema Telecom
+Rhinos	Rhinos International Ltd. Co.
+Rib Lake	Rib Lake Telephone Company
+Richland-G	Richland-Grant Telephone Cooperative, Inc.
+Ridgeville	Ridgeville Telephone Company
+Rigatta	Rigatta
+Ringgold	Ringgold Telephone Company
+Ringgold	Ringgold Telephone Company, Inc.
+Rio	Rio Communications
+Rio	Rio Communications, Inc.
+Rio Virgin	Rio Virgin Telephone Co.
+Riviera	Riviera Telephone Company Inc.
+Rix	Rix Telecom AB
+RLE	RLE
+RNK	RNK, Inc.
+Roanoke & B	Roanoke & Botetourt Telephone Company
+Roanoke	Roanoke Telephone Company
+Roberts City	Roberts City Telephone Cooperative Association
+Rochester	Rochester Telephone
+Rochester	Rochester Telephone Company
+Rock Cty	Rock County Telephone Company
+Rock Hill	Rock Hill Telephone Company
+Rockland	Rockland Telephone Company, Inc.
+Rogers	Rogers Cable Communications Incorporated
+Rogers	Rogers Communications Inc.
+Rogers	Rogers Wireless
+Romtelecom	Romtelecom (CDMA)
+Romtelecom	Romtelecom S.A.
+Ronan	Ronan Telephone Company
+Ronhill	Ronhill
+Roosevelt Cty	Roosevelt County Rural Telephone Coop., Inc.
+ROPIR	ROPIR Communications, Inc.
+Roseville	Roseville Telephone Company
+Roshan	Roshan
+Routo	Routo Telecommunications Ltd
+Royal	Royal Court
+RTI	Royal Telecom International (RTI)
+RTI	Royal Telecom International (RTI1)
+RTI	Royal Telecom International (RTI2)
+RSA	RSA 1 Limited Partnership dba Cellular 29 Plus
+RSLCom	RSLCom Australia
+RSLCom	RSLCom Australia Pty. Ltd
+RSLCom	RSLCom Japan K.K.
+RSL	RSL Com Net de México, S.A. de C.V.
+RT	RT Communications
+RT	RT Communications, Inc.
+Rural	Rural Cellular Corporation
+RTSC	Rural Telephone Service Company, Inc.
+Rustavi2	Rustavi2 Online Ltd
+Rye	Rye Telephone Company
+Serbia	S
+SABA	SABA FON
+Sabal	Sabal Telec Integra, S.L.
+Sabanci	Sabanci Telekomuniasyon Hizmetieri A.S.
+Saco Riv Cell	Saco River Cellular Tele. Co.(DBA S/C)
+Saco River	Saco River Telephone & Telegraph Company
+Safaricom	Safaricom Ltd
+Safaricom	Safaricom Ltd.
+Sagebrush	Sagebrush Cellular Inc dba Nemont
+SAHELCOM	SAHELCOM
+Sahel.Com	Sahel.Com
+SPT	Saigon Postel Corporation (SPT)
+Saiki-Tech	Saiki-Tech Communication Japan Co. Ltd.
+Saipan Cell	Saipan Cellular & Paging
+SAIT	SAIT Telecom
+Sakon	Sakon, LLC
+Saktelcom	Saktelcom Plus Ltd
+S Spavinaw	Salina Spavinaw Telephone Company, Inc.
+Samitel	Samitel Ltd
+SamoaTel	SamoaTel
+San Carlos	San Carlos Apache Telecommunications Utility
+Sand Creek	Sand Creek Telephone Company
+Sandhill	Sandhill Telephone Coop
+Sandwich Isles	Sandwich Isles Communications,Inc.
+San Marcos	San Marcos Telephone Company
+Santa Rosa	Santa Rosa Telephone Cooperative
+Sapphire	Sapphire AG
+Sapphire	Sapphire Networks (fixed service)
+SAPS	SAPS Gauteng
+Sask	Sask Tel Mobility
+SA	SA Telecommunications
+Satelindo	Satelindo
+SATEL	SATEL U.S.A. LLC
+Saudi	Saudi Telecom
+STC	Saudi Telecom Company (STC)
+Saunalahti	Saunalahti Group Oyj
+Savannah	Savannah Independent PCS, Inc.
+Savontel	Savontel Communications
+SBB	SBB AG
+SBB	SBB AG Telecom SBB
+SBMA	SBMA
+Scala	Scala Telecom Ltd
+Scancom	Scancom (Cyprus) Ltd.
+Scandicom	Scandicom Oy
+Scherers	Scherers Communication Group, Inc.
+Schneider	Schneider Communications
+Schrego	Schrego Communications Ltd.
+SCNL	SCNL Truphone
+Scott Cty	Scott County Telephone Company
+Scott-Rice	Scott-Rice Telephone Company, Inc.
+Scranton	Scranton Telephone Company
+S.C.	S.C. Romtelecom S.A.
+SD	SD Mobitel
+Seanet	Seanet Maritime Communications AB
+Searsboro	Searsboro Telephone Company
+Sears	Sears Technology Services
+Secos	Secostelecomunicaciones S.A.C.
+SEC	SEC Service AG
+Secure	Secure IP Telecom, Inc
+Sekom	Sekom Telecom OY
+Select	Select One GmbH
+Seneca	Seneca Telephone Company
+Sense	Sense Communications International AS
+Sentech	Sentech (Pty) Ltd
+Sentech	Sentech (Pty) Ltd.
+Sentel	Sentel GSM
+Sercom	Sercom
+SERCOM	SERCOM, S.A.
+Sercontel	Sercontel Cel
+SERMATEL	SERMATEL
+Serome	Serome
+Servei	Servei de Telecomunicacions d'Andorra
+Service	Service Ltd
+Servicios	Servicios de Comunicaciones Personales Inalámbricas S.A.
+Servicios	Servicios de Comunicaciones Personales Inalámbricas, S.A.
+SERCOM	Servicios de Comunicaciones, S.A. (SERCOM)
+Servis	Servis Svyaz Komplect
+SES	SES Sistemas Electrónicos S.A.
+Setar	Setar GSM
+Setar	Setar N.V.
+Setel	Setel
+SETEL	SETEL GSM
+Setel	Setel S.A.
+Setera	Setera Oy
+SevenL	SevenL Communications GmbH
+S. F. C.	S. F. C. Enterprises
+Sferia	Sferia S.A.
+SFR	SFR
+S.F.R.	S.F.R.
+S.F.R.	S.F.R. (UMTS)
+SFR	SFR (Zones Blanches)
+SG Networks	SG Networks Ltd
+Shawnee	Shawnee Telephone Company
+Sheba	Sheba Telecom (pvt) Ltd.
+Shell	Shell Offshore Services, Co.
+Shyam	Shyam Telelink Ltd, Rajasthan
+SIA	SIA 10 1/2
+SIA	SIA Advem
+SIA	SIA Baltkom TV SIA
+SIA	SIA ECO Solutions
+SIA	SIA IT Baltija
+SIA	SIA MPE NETS
+SIA	SIA MWTV
+SIA	SIA Rigatta
+SIA	SIA Sotus Communications
+SIA	SIA Stream Networks
+SIA	SIA Tele2
+SIA	SIA Telia Latvija
+Sibchallenge	Sibchallenge
+Siemens	Siemens AG, ICMNPGUSTA
+Sierra	Sierra Cellular, Inc.
+Sierratel	Sierratel
+Sigis	Sigis
+Silknet	Silknet JSC
+Silver Star	Silver Star Telephone Co.
+SIM2Tranvel	SIM2Tranvel (HK) Ltd
+SI	SI Mobil
+Si.Mobil	Si.Mobil d.d.
+SI.Mobil	SI.Mobil telekomunikacijske storitve, d.d.
+Simple	Simple Communications Technologies, Inc
+Sinergie	Sinergie srl
+Singapore	Singapore Pte Ltd
+Singapore	Singapore Smart Telecommunications Pte Ltd.
+Singapore	Singapore Telecom Hong Kong Ltd
+Singapore	Singapore Telecommunications Ltd
+Singapore	Singapore Telecom USA Inc
+SingTel	SingTel ST GSM1800
+SingTel	SingTel ST GSM900
+Siren	Siren Telephone Company, Inc.
+Sirius	Sirius Telecommunications, Inc
+Siseministeerium	Siseministeerium (Ministry of Interior)
+Siskiyou	Siskiyou Telephone Company
+SITA	SITA
+Sita	Sita
+Six	Six Telecoms Company Ltd
+SKAT	SKAT TV
+SK Networks	SK Networks
+SK	SK Telecom
+SK Telecom	SK Telecom
+SK Telink America	SK Telink America, Inc
+SK Tellink	SK Tellink
+Skycom	Skycom Communications, SA
+Skycompiler	Skycompiler OÜ
+Skyline	Skyline Telephone Membership Corporation
+Skyline	Skyline Tel. Membership Corporation
+Sky	Sky Mobile Ltd
+Sky	Sky Technologies de El Salvador, S.A. de C.V.
+Sky	Sky Telecom AG
+Sky	Sky Telecom Co., Ltd
+Sledge	Sledge Telephone Company
+SLO	SLO Cellular Inc. dba CellularOne of San Luis Obispo
+Slovak	Slovak Telekom, a.s.
+Slovanet	Slovanet, a.s.
+SLT	SLT Hong Kong Ltd
+Sl	Sl Wireless LLC
+SNC	Small network code
+SMART	SMART
+Smart	Smart
+Smartcom	Smartcom
+Smart	Smart Communications
+Smart	Smart Communications, Inc
+SmarTone	SmarTone - Comunicações Móveis, S.A.
+SmarTone	SmarTone Mobile Communications Ltd
+Smartone	Smartone Mobile Communications (Macao) Ltd.
+SMILE	SMILE
+Smile	Smile Communications Uganda Ltd
+Smile	Smile Communications (U) Ltd
+Smile	Smile Telecommunications Ltd
+SMiLOUS	SMiLOUS GmbH
+Smitcoms	Smitcoms
+Smith	Smith Bagley Inc, dba Cellular One
+Smithville	Smithville Telephone
+Smithville	Smithville Telephone Company, Inc.
+SMT-San	SMT-San Marino Telecom
+SNET	SNET Protocol Conversion
+SNO	SNO Telecommunications
+SNR	SNRadiocomunicatii
+SNS	SNS Shared Network Svcs. Inc.
+Socatel	Socatel
+Société	Société Française du Radiotéléphone
+SITA	Société Internationale de Télécommunications Aeronautiques (SITA)
+SONATEL	Société Nationale des Télécommunications du Sénégal (SONATEL)
+Société	Société Réunionnaise du Radiotéléphone
+Softbank	Softbank Telecom Corp.
+Softel	Softel Communications GmbH
+Softnet	Softnet d.o.o.
+Software	Software Cellular Network Limited
+Software	Software Cellular Network Ltd
+Sogetel	Sogetel, Inc.
+Solesys	Solesys S.A.
+Somerset	Somerset Telephone Company, Inc.
+Somoncom	Somoncom
+Sonaecom	Sonaecom - Serviços de Comunicações, S.A.
+Sonatel	Sonatel
+Songa	Songa Telecom
+SONITEL	SONITEL S.A.
+Sonofon	Sonofon
+Sonofon	Sonofon A/S
+Sotelgui	Sotelgui
+Sound	Sound Advertising Ltd
+Souris River	Souris River Telecommunications Cooperative
+S Arkansas	South Arkansas Telephone Company
+South	South Canaan Cellular Communications Co. LP
+S Canaan	South Canaan Telephone Company
+S Carolina Net	South Carolina Net, Inc.
+S C Rural	South Central Rural Telephone Cooperative Corporation, Inc.
+S Central	South Central Telephone Association, Inc.
+S C Utah	South Central Utah Telephone Association
+South	South China Telecommunications (HK) Ltd.
+SE IN R	Southeastern IN Rural Telephone Cooperative Inc.
+SouthEast	SouthEast Telephone
+Southeast	Southeast Telephone of WI, Inc.
+Southern	Southern Communications Services Inc.
+Southernet	Southernet
+S Illinois RSA	Southern Illinois RSA Partnership
+SIS	Southern Interexchange Services, Inc.
+S Kansas	Southern Kansas Telephone Company
+SNET	Southern New England Telephone
+S Plains	South Plains Telephone Cooperative, Inc.
+Southside	Southside Communications,Inc.
+SW Arkansas	Southwest Arkansas Telephone Cooperative
+SWB	Southwestern Bell Mobile Systems
+SWB	Southwestern Bell Telephone
+SW Oklahoma	Southwest Oklahoma Telephone Company
+SW Texas	Southwest Texas Telephone Company
+Space	Space Data Corporation
+Spacefon	Spacefon
+Spacetel	Spacetel
+Spacetel	Spacetel Benin
+Space	Space Telecomm. Systems, S.L.
+Spacetel	Spacetel Guiné-Bissau S.A.
+Spacetel	Spacetel Syria
+Spacetel	Spacetel UK Ltd
+Spacetel	Spacetel Yemen
+STS	Specialized Telecommunication Services
+SpectraNet	SpectraNet Anaheim International
+SpectraNet	SpectraNet Orange
+Spectrum	Spectrum Net
+Spice	Spice Communications PVT Ltd., Karnataka
+Spice	Spice Communications PVT Ltd., Punjab
+Spice	Spice Nepal Pvt Ltd
+SpiriTel	SpiriTel Technologies Ltd
+Sprava	Sprava zeleznicni cesty, st org.
+Sprava	Sprava Zeleznicni Dopravni Cesty
+Spring Grove	Spring Grove Cooperative Telephone
+Spring	Spring Mobil AB
+Springport	Springport Telephone Company
+Sprint	Sprint
+Sprint Canada	Sprint Canada
+Sprint	Sprint Cellular
+Sprintcom	Sprintcom
+Sprintcom	Sprintcom Inc
+Sprint	Sprint Local Telecommunications Division
+Sprint	Sprint Spectrum L.P.
+SPTC	SPTC
+SP Telecom	SP Telecom
+SRT	Sri Lanka Telecom Ltd
+SRR	SRR
+SS7 NMC	SS-7 Network Management Centre
+SS7 NMMC	SS-7 Network Monitoring and Measurement Centre
+Standard	Standard Network Ltd
+Standard	Standard Telephone Company
+Standing	Standing Rock Telecommunications
+Standish	Standish Telephone Company
+Stanford Univ.	Stanford University Communications Services
+Starcell	Starcell
+Starcomm	Starcomm Ltd
+Starcomms	Starcomms
+Starhub	Starhub
+StarHub	StarHub Ltd
+Startec	Startec Global Commun. Corp.
+Startec	Startec Global Communications Corp.
+Startec	Startec Global Communications Corporation
+Startec	Startec, Inc.
+Startec's	Startec's
+Startel	Startel
+Star	Star Telecom
+Star	Star Telecommunications Deutschland GmbH
+STAR	STAR Telecommunications, Inc.
+Star	Star Telecommunications Inc
+Star	Star Telephone
+Star	Star Telephone Company
+Star	Star Telephone Membership Corporation
+Star	Star/UniSource Carrier Services
+State LD	State Long Distance Telephone Company
+Statesboro	Statesboro Telephone Company
+State	State Telephone Company
+STC	STC
+STC	STC Bahrain
+STC	STC Bahrain B.S.C. (Closed)
+Steelville	Steelville Telephone Exchange
+S	S Telecom (CDMA)
+Stelera	Stelera Wireless LLC
+Stellars	Stellars Telecommunications Services
+Stentor	Stentor
+St. John	St. John Telephone Company
+St. Joseph	St. Joseph Telephone and Telegraph Company
+St. Joseph	St. Joseph Telephone Company
+SKCC	St. Kitts Cable Communications
+SM&SBTC	St. Martin et St. Barthélémy Tel Cell
+STM	STM Telecom Sanchar Pvt. Ltd
+Storm	Storm Telecommunications
+Stour	Stour Marine Ltd
+St.	St. Pierre-et-Miquelon Télécom
+Stratos	Stratos Global Ltd
+Stratos	Stratos Mobile Networks
+Strikenet	Strikenet
+STSJ	STSJ Telephone Company
+S&T	S&T Telephone Cooperative Assn.
+S&T	S&T Telephone Cooperative Association
+Stuvtelesot	Stuvtelesot
+Sudatel	Sudanese Telephone Company Ltd. (Sudatel)
+Sugarland	Sugarland Telephone Company
+Sunbeach	Sunbeach Communications
+Sunbeach	Sunbeach Inc.
+Sunflower	Sunflower Tele. Co., Inc.
+Sunflower	Sunflower Telephone Co.,Inc.
+Sunman	Sunman Telephone
+SunPage	SunPage Communications Pte Ltd
+Sunrise	Sunrise Communications AG
+Suntel	Suntel Ltd.
+Suntel	Suntel Network
+Supercell	Supercell Sprl
+Superfone	Superfone S.A.
+SuperLine	SuperLine Telecommunications Ltd
+Superonline	Superonline
+SuperTel	SuperTel Network, Inc
+SuperTel	Supertel Oy
+Sur	Sur Comunicaciones S.A.
+Sure	Sure Telecom Uganda Ltd
+Surry	Surry Telephone Membership Corporation
+Svenska	Svenska UMTS-Nät AB
+Swan	Swan, s.r.o.
+Swayzee	Swayzee Telephone Company, Inc.
+SPTC	Swaziland Posts & Telecommunications Co. (SPTC)
+Swazi	Swazi MTN
+Sweetser	Sweetser Telephone Company, Inc.
+Swiftcall	Swiftcall
+Swiftcall	Swiftcall (USA) Inc.
+Swisscom	Swisscom Mobile AG
+Swisscom	Swisscom North America, Inc
+Swisscom	Swisscom (Schweiz) AG
+Swiss	Swiss Telecom Carrier
+Switch 2000	Switch 2000
+Switch Tel	Switch Tel, Inc
+Switchward	Switchward Ltd
+Switchware	Switchware Ltd
+S&W	S&W Telephone Company, Inc.
+Syfin	Syfin S.r.l.
+Symacom	Symacom
+Symbio	Symbio Networks P/L
+Symbio	Symbio Networks Pty Ltd
+Symmetric	Symmetric Quorum Ltd
+Synectiv	Synectiv Ltd
+Syniverse	Syniverse Technologies Asia Pacific Ltd
+Syniverse	Syniverse Technologies Inc
+Syniverse	Syniverse Technologies Inc.
+Syniverse	Syniverse Technologies, Inc
+Syniverse	Syniverse Technologies, Inc.
+Synterra	Synterra UK Ltd
+Synterra	Synterra UK Ltd.
+Syrian	Syrian Telecom
+STE	Syrian Telecommunications Establishment
+Syriatel	Syriatel
+Systech	Systech Telecom Ltd
+System House	System House S.r.l.
+Systemnet	Systemnet AS
+System One	System One World Communication Iberia
+System One	System One World Communication Network, S.A.
+System One	System One World Communication Perú S.A.
+ARTEL	Système ARTEL
+T-2	T-2
+T2	T2 Belgium NV
+T-2	T-2 d.o.o.
+T3	T3 d.o.o. Sarajevo
+Table Top	Table Top Telephone Company, Inc.
+Tacom	Tacom
+Taconic	Taconic Telephone Corporation
+Tajiktelecom	Tajiktelecom
+Talkline	Talkline GmbH
+Talk	Talk Point
+Tango	Tango
+Tanzania	Tanzania Telecommunications Company Ltd.
+Tata	TATA Communication Lanka Ltd
+Tata	TaTa Communications (Australia) Pty Ltd
+Tata	Tata Communications (Canada) ULC
+Tata	Tata Communications (Japan) K.K.
+Tata	Tata Communications P/L
+Tata	Tata Communications (UK) Ltd
+Tata	Tata Teleservices Ltd, Andhra Pradesh
+Tata	Tata Teleservices Ltd, Bihar
+Tata	Tata Teleservices Ltd, Chennai
+Tata	Tata Teleservices Ltd, Delhi
+Tata	Tata Teleservices Ltd, Gujarat
+Tata	Tata Teleservices Ltd, Haryana
+Tata	Tata Teleservices Ltd, Himachal Pradesh
+Tata	Tata Teleservices Ltd, Karnataka
+Tata	Tata Teleservices Ltd, Kerala
+Tata	Tata Teleservices Ltd, Kolkata
+Tata	Tata Teleservices Ltd, Madhya Pradesh
+Tata	Tata Teleservices Ltd, Maharashtra
+Tata	Tata Teleservices Ltd, Mumbai
+Tata	Tata Teleservices Ltd, Orissa
+Tata	Tata Teleservices Ltd, Punjab
+Tata	Tata Teleservices Ltd, Rajasthan
+Tata	Tata Teleservices Ltd, Tamilnadu
+Tata	Tata Teleservices Ltd, UP (East)
+Tata	Tata Teleservices Ltd, UP (West)
+Tata	Tata Teleservices Ltd, West Bengal
+Taylor	Taylor Communications Group, Inc.
+Tbay	Tbay Mobility
+TCA	TCA Long Distance
+TCA	TCA Services Corp.
+TCAST	TCAST Communications, Inc.
+TCC	TCC Communications
+Tchad	Tchad Mobile
+TCT West	TCT West, Inc.
+Roshan	TDCA (dba Roshan)
+TDC	TDC AS
+TDC	TDC A/S
+TDC	TDC Mobil
+TDC	TDC Mobil A/S
+TDC	TDC Oy Finland
+TDC	TDC Song AB
+TDC	TDC Sverige AB
+TDC	TDC Switzerland AG
+T.D.M.	T.D.M. GSM
+TDS	TDS TELECOM
+Team	Team Telecom Holdings, Inc
+Technical	Technical Information Centre LLP
+Tech Ctrl	Technology Control, Inc.
+Tech	Tech Telephone Company, Ltd.
+Techtel	Techtel LMDS Comunicaciones Interactivas S.A.
+Techtel	Techtel S.A.
+TECNet	TECNet, Inc
+Tecnet	Tecnet, Inc.
+Tecnomatix	Tecnomatix Telecomunicaciones, S.L.
+Tecoar	Tecoar S.A.
+Teknodel	Teknodel ta Telekomunikasyon Hizmetleri Ltd
+Telaima	Telaima Cel
+Telalaska	Telalaska Cellular
+TelAlaska	TelAlaska, Inc.
+TelAmerica	TelAmerica Long Distance
+Telasa	Telasa Cel
+Telbo	Telbo
+Telcel	Telcel
+Telcel,	Telcel, C.A.
+Telcel	Telcel Celular, C.A.
+TELCELL	TELCELL GSM
+Telcell	Telcell Sarl
+Telco	Telco 214, Inc
+Telco	Telco Communications Group
+Telco	Telco Communications, Inc.
+Telco	Telco Global Network Services Ltd
+Telco	Telco Group, Inc
+Telcom Int	Telcom International
+TII	Telcom International Inc.
+TelCommunication	TelCommunication Services AG
+Telcomnet	Telcomnet
+TelcomUnited	TelcomUnited (S) Pte Ltd
+Telco	Telco Partners GmbH
+Telcotech	Telcotech Gateway
+TelDaFax	TelDaFax AG
+Tele1	Tele1 Europe
+Tele2	Tele2
+Tele2	Tele2 AG
+Tele2	Tele2 Belgium
+Tele2	Tele 2 d.o.o.
+Tele2	Tele2 Eesti AS
+Tele2	Tele2 Italia S.p.A.
+Tele2	Tele2 Luxembourg S.A.
+Tele2	Tele2 Nederland BV
+Tele2	Tele2 (Netherlands) B.V.
+Tele2	Tele2 Norge AS
+Tele2	Tele2 Polska Sp. Z.o.o.
+Tele2	Tele2 Polska (Tele2 Polska Sp. Z.o.o.)
+Tele2	Tele2 Sverige AB
+Tele2/Tele2	Tele2/Tele2 d.o.o.
+Tele2	Tele2Telecom
+Tele2	Tele2 Telecommunication
+Tele2	Tele2 Telecommunications AG
+Tele2	Tele2 Telecommunication Services GmbH
+Tele2	Tele2 Telecommunication Services, S.L.
+Tele2	Tele2 UK Services Ltd
+Tele	Tele 5 Worldwide Oy
+Teleacre	Teleacre Cel
+Teleamapa	Teleamapa Cel
+Teleamazon	Teleamazon Cel
+Telebahia	Telebahia Cel
+TeleBarbados	TeleBarbados Inc
+TeleBeeper	TeleBeeper of New Mexico Inc
+TeleBel	TeleBel GmbH
+TeleBermuda	TeleBermuda International Ltd.
+Telebrasilia	Telebrasilia Cel
+Telecable	Telecable de Asturias, SAU
+Teleceara	Teleceara Cel
+Telecel	Telecel
+Telecel	Telecel Centrafrique (TC)
+Telecel	Telecel Gabon S.A.
+Telecel	TELECEL SA
+Telecel	Telecel S.A.
+Telecel	Telecel Zambia Ltd.
+Telecel	Telecel Zimbabwe
+Telecentrs	Telecentrs
+Telecode	Telecode Communications Inc.
+Telecom AG	Telecom Argentina S.A.
+Telecom AG	Telecom Argentina STET France Telecom S.A.
+Telecom AG	Telecom Argentina USA, Inc
+Telecom Baltija	Telecom Baltija
+Telecom KH	Telecom Cambodia
+Telecom Cook	Telecom Cook
+Telecom EG	Telecom Egypt
+Telecom Fiji	Telecom Fiji Ltd (CDMA)
+Telecom FL	Telecom FL AG
+Telecom GE	Telecom Georgia Ltd
+Telecom IT	Telecom Italia
+Telecom IT	Telecom Italia
+TIM	Telecom Italia Mobile (TIM)
+Telecom IT	Telecom Italia S.p.A.
+Telecom IT	Telecom Italia Sparkle
+Telecom LS	Telecom Lesotho pty Ltd.
+Telecom LI	Telecom Liechtenstein AG
+Telecom Malagasy	Telecom Malagasy (fixe)
+Telecom Malagasy	Telecom Malagasy Mobile GSM
+Telecom Malagasy	Telecom Malagasy Mobile, GSM
+TCI	Telecommunication Company of Iran (TCI)
+TCI	Telecommunication Company of Iran (TCI)
+TCI	Telecommunication Company of Iran (TCI) - Isfahan Celcom
+KIFZO	Telecommunication Kish Co. (KIFZO)
+TSI	Telecommunication Services, Inc.
+Trinidad/Tobago	Telecommunication Services of Trinidad/Tobago
+TSTT	Telecommunication Services of Trinidad & Tobago Ltd. (TSTT)
+TSC	Telecommunications Service Center, Inc (TSC)
+TSI	Telecommunications Services, Inc
+TeleCommunication	TeleCommunication Systems, Inc.
+TSI	Telecommunication Systems, Inc.
+Telecom	Telecom Namibia
+Telecom Namibia	Telecom Namibia Ltd.
+Telecom NZ	Telecom New Zealand
+Telecom NZ	Telecom New Zealand Australia Pty Ltd
+Telecom NZ	Telecom New Zealand Mobile
+Telecom NZ	Telecom New Zealand Singapore Pte Ltd
+Telecom NZ	Telecom New Zealand UK Ltd
+Telecom	Telecom New Zealand - UMTS Ntework
+New Zealand	Telecom New Zealand USA Limited
+Telecom NZ	Telecom New Zealand USA Ltd
+Telecom	Telecom Niue
+Telecom	Telecom North America Mobile Inc
+TNAM	Telecom North America Mobile, Inc.
+Telecom Personal	Telecom Personal S.A.
+Telecom	Telecom Personal S.A.
+Telecom	Telecom Samoa Cellular Ltd.
+Telecom	Telecom (Seychelles) Ltd.
+Telecom SC	Telecom Seychelles Ltd
+Telecom Tech.	Telecom Technology
+TCP	Telecomunicaciones Corporativas Panameñas S.A.
+Telecom. de Ameríca	Telecomunicaciones de Ameríca S.A. de C.V.
+Telecom. de Guatemala	Telecomunicaciones de Guatemala S.A.
+Telecom. de México	Telecomunicaciones de México
+TLP	Telecomunicaciones Las Perdices S.A.
+Telecom. Movilnet	Telecomunicaciones Movilnet, CA
+Telecomunicaciones	Telecomunicaciones Movilnet, C.A.
+NetUno	Telecomunicaciones NetUno de Panama SA
+NGTV	Telecomunicaciones NGTV, S.A. (new Global Telecom)
+Telecom. de Moçambique	Telecomunicações de Moçambique
+Telecom VU	Telecom Vanuatu Limited
+Telecom	Telecom XXI
+Teleconnect	Teleconnect Company
+Teleconnect	Teleconnect Comunicaciones, S.A.
+Telecontact	Telecontact GmbH
+C Florida	Tele. Co. of Central Florida, Inc.
+TelCo C FL	Tele. Co. of Central Florida,Inc.
+Tele.Co. C FL	Tele.Co. of Central Florida,Inc.
+TelCo C FL	Tele.Co.of Central Florida,Inc.
+Telecorp	Telecorp Holding Corporation, Inc.
+Telecorp	Telecorp Ltd
+Telecsa	Telecsa S.A.
+Tele	Tele Danmark USA, Inc
+Teledata	Teledata S.A.
+Teledial	Teledial America
+Teledirect	Teledirect Telecommunications Group, LLC
+Teledome	Teledome
+Teleena	Teleena holding B.V.
+Teleena	Teleena UK Ltd
+Telefónica	Telefónica
+Telefónica	Telefónica Centroamérica Guatemala S.A.
+Telefónica	Telefónica Comunicaciones Personales S.A.
+Telefónica	Telefónica de España, S.A.U.
+Telefónica	Telefónica del Perú S.A.A.
+Telefónica	Telefónica Deutschland GmbH
+Telefónica	Telefónica El Salvador, S.A. de C.V.
+TLDA	Telefónica Larga Distancia de Argentina S.A. (TLDA)
+Telefónica	Telefónica Móvil
+Telefónica	Telefónica Móviles Chile S.A.
+Telefónica	Telefónica Móviles Colombia S.A.
+Telefónica	Telefónica Móviles de Panamá
+Telefónica	Telefónica Móviles El Salvador, S.A. de C.V.
+Telefónica	Telefónica Móviles España, SAU
+Telefónica	Telefónica Móviles España, S.A.U.
+Telefónica	Telefónica Móviles Guatemala S.A.
+Telefónica	Telefónica Móviles Panamá S.A.
+Telefónica	Telefónica Móviles S.A.
+O2	Telefónica O2 Czech Republic a.s.
+Telefónica	Telefónica O2 Czech Republic a.s.
+O2	Telefónica O2 Ireland Ltd
+O2	Telefónica O2 Slovakia, s.r.o.
+BellSouth	Telefonía Celular de Nicaragua - (Bellsouth)
+Dialog	Telefonia Dialog S.A.
+O2	Telefonica 02 Czech Republic a.s.
+IWSUS	Telefonica International Wholesales Services United States, Inc
+Telefonica	Telefonica Larga Distancia
+Telefónica	Telefonica UK Ltd
+Telefonwelt	Telefonwelt GmbH
+Telefony	Telefony Opalenickie
+Telegate	Telegate AG
+Telegate	Telegate Italia
+Teleglobe	Teleglobe America, Inc
+Teleglobe	Teleglobe Canada
+Teleglobe	Teleglobe GmbH & Co
+Teleglobe	Teleglobe Spain Communications, S.L.U.
+Teleglobe	Teleglobe USA
+Telegoias	Telegoias Cel
+Tele	Tele Greenland
+Telegroup	Telegroup
+Telegroup	Telegroup Inc
+Telegroup	Telegroup, Inc.
+Telegrupa Baltija	Telegrupa Baltija
+Telegrupa Globala	Telegrupa Globala
+Telehop	Telehop Communications, Inc.
+TeleHub	TeleHub Network Services Corporation
+TA	Telekom Austria TA
+Telekom	Telekom Baltija
+Telekom Brunei Berhad	Telekom Brunei Berhad
+Telekom Malaysia	Telekom Malaysia Berhad
+Telekom	Telekom Malaysia Berhad
+Telekom Malaysia	Telekom Malaysia (Hong Kong) Ltd
+Telekom Malaysia	Telekom Malaysia (S) Pte Ltd
+Telekom Malaysia	Telekom Malaysia (UK) Ltd
+Telekom Malaysia	Telekom Malaysia (USA) Inc
+Telekom	Telekom Network Ltd.
+Telekom Slovenija	Telekom Slovenija p.o.
+Telekom Slovenija	Telekom Slovenije d.d.
+Telekom Srbija	Telekom Srbija a.d.
+Telekom	Telekom Srbija a.d.
+Telekom. RS	Telekomunikacije RS, a.d. Banja Luka
+Telekomunikacja	Telekomunikacja Kolejowa (GSM-R)
+Telekom. Kolejowa	Telekomunikacja Kolejowa Sp. Z.o.o.
+Telekom. PL	Telekomunikacja Polska S.A.
+Telekom. ID	Telekomunikasi Indonesia International Pte Ltd
+Telekomunikäciju	Telekomunikäciju grupa
+Telemach	Telemach d.o.o.
+Telemat	Telemat Cel
+Telemax	Telemax Enterprises Inc.
+Telemedia	Telemedia
+Telemedia	Telemedia International USA Inc
+Telemig	Telemig Cel
+Telemig	Telemig Celular
+Telemobil	Telemobil
+Telems	Telems Cel
+Telemó	Telemó vil El Salvador, S.A.
+Telemóvil	Telemóvil El Salvador, S.A.
+Telenational	Telenational Communications
+Telenet	Telenet
+Telenet	Telenet N.V.
+Telenor	Telenor
+Telenor	Telenor Connexion AB
+Telenor	Telenor d.o.o.
+Telenor	Telenor Global Services AS
+Telenor	Telenor Global Services A.S.
+Telenor	Telenor Hungary Ltd
+Telenor	Telenor Norge AS
+Telenor	Telenor Pakistan
+Telenor	Telenor Sverige AB
+Teleom	Teleom New Zealand CDMA Network
+Teleone	Teleone (HK) Ltd
+Teleone	Teleone (Singapore)
+TelePacific	TelePacific Networks Inc.
+Telepara	Telepara Cel
+Telepar	Telepar Cel
+Telepassport	Telepassport
+TelePassport	TelePassport AG
+Tele	Tele Passport Service GmbH
+TelePassport	TelePassport Service GmbH
+Telephone2	Telephone2 S.A.
+Telco C FL	Telephone Co. of Central Florida,Inc.
+St-Ephrem	Telephone de St-Ephrem
+Tel.Express	Telephone Express
+Guevremont	Telephone Guevremont Inc.
+Milot	Telephone Milot, Inc.
+Telepisa	Telepisa Cel
+Teleplus	Teleplus Communications Ltd.
+Teleport	Teleport Comm. Group
+Teleport	Teleport Communications Group
+Teleque	Teleque Communications S.p.A.
+Telergipe	Telergipe Cel
+Telergy	Telergy
+Telerj	Telerj Cel
+Telern	Telern Cel
+Teleron	Teleron Cel
+Telescan	Telescan, Inc.
+Telescape	Telescape International, Inc.
+Telesc	Telesc Cel
+Teleselect	Teleselect Group, Inc.
+Telesmart	Telesmart S.A.
+Telesom	Telesom Telecom
+Telespazio	Telespazio S.p.A.
+Telesp	Telesp Cel
+Telestar	Telestar Móvil S.A.
+Telest	Telest Cel
+Telestrella	Telestrella Spain, S.L.
+Telesur	Telesur
+Telesur	Telesur (CDMA)
+Telesystems	Telesystems of Ukraine
+Telet	Telet
+Teletalk	Teletalk Bangladesh Ltd
+Teletopia	Teletopia Gruppen AS
+Teleunit	Teleunit S.p.A.
+Televeiling	Televeiling International BV
+Televõrgu	Televõrgu AS
+Teleware	Teleware plc
+Telewest	Telewest Communications Group Limited
+Teleworld	Teleworld International Ltd.
+TeleYemen	TeleYemen
+Teléfonos	Teléfonos del Noroeste, S.A. de C.V.
+Teléfonos	Teléfonos de México, S.A.B. de C.V.
+Telfort	Telfort B.V.
+TelHawaii	TelHawaii, Inc.
+Telia	Telia
+Telia	Telia France
+Telia	Telia Mobile
+Telia	Telia North America Inc
+Telia	Telia North America Inc.
+Telia	Telias
+Telia	TeliaSonera AB
+TeliaSonera	TeliaSonera Finland Oyj
+Telia	TeliaSonera Finland Oyj
+Telia	TeliaSonera International Carrier UK Ltd
+Telia	Telia Sonera Sverige AB
+Telia	TeliaSonera Sverige AB
+Teligent	Teligent
+Telikom	Telikom PNG
+Telinker	Telinker
+Telio	Telio Telecom AS
+Telkom	Telkom Kenya Ltd
+Telkom	Telkom S.A. Ltd
+Telkom	Telkom SA Ltd
+Telkomsel	Telkomsel
+Tellas	Tellas
+Tellcom	Tellcom
+Telma	Telma Cel
+Telmex	Telmex Colombia S.A.
+Telmex	Telmex International Ventures USA, Inc (DBA Telmex USA)
+Telmex	Telmex Perú S.A.
+Telmex	Telmex USA, LLC
+Telnex	Telnex, Inc.
+TelOne	TelOne (Pvt) Ltd
+Telpa	Telpa Cel
+Tel.Pacific	Tel.Pacific Ltd
+Tel.Pacific	Tel.Pacific Pty Ltd
+Telpe	Telpe Cel
+TelRoute	TelRoute Communications, Inc.
+Tel-Save	Tel-Save, Inc.
+TSCP	Telscape International, Inc (DBA TSCP International, Inc.)
+Telshine	Telshine Sdn Bhd
+Telsim	Telsim GSM
+Telsocomm	Telsocomm - Telecomunicações, Marketing e Informática Ltda
+Telsoft	Telsoft
+Telstar	Telstar Capital Corp.
+Telstar	Telstar Communications, Inc.
+Telstra	TelstraClear
+TelstraClear	TelstraClear - GSM Network
+Telstra	Telstra Corporation Ltd
+Telstra	Telstra Corporation Ltd.
+Telstra	Telstra Europe Ltd
+Telstra	Telstra Inc
+Telstra	Telstra Singapore PTE Ltd.
+Teltac	Teltac Worldwide Offshore
+Teltrust	Teltrust
+Teltrust	Teltrust Communications Services, Inc.
+Telus	TELUS Communications (Edmonton) Inc (TCE)
+Telus	Telus Communications Inc.
+Telus	Telus Communications Inc., London UK
+Telus	Telus DMS
+Telus	Telus Mobility
+Templeton	Templeton Telephone Company
+LT	TEO LT, AB (former Lietuvos Telekomas)
+Terrestar	Terrestar Networks
+Terrestar	Terrestar Networks Inc
+Tesaco	Tesaco Ltd
+TE.S.A.M.	TE.S.A.M. Perú S.A.
+TE.S.A.M.	TE.S.A.M. Perú srl
+CSW	tesion Communikationsnetze Südwest GmbH & Co. KG
+Tess	Tess
+TEST	TEST CODE (T1S1)
+Tex 97	Tex 97 S.p.A.
+Texas	Texas RSA 1 dba XIT Wireless
+Texas	Texas RSA 7B3 dba Peoples Wireless Services
+TGI	TGI GmbH
+TG Transit	TG Transit
+Thacker-G	Thacker-Grigsby Telephone Company, Inc.
+Arthur Mutual	The Arthur Mutual Telephone Company
+Bijou	The Bijou Telephone Co-op Association
+Concord	The Concord Telephone Company
+Curtis	The Curtis Telephone Company
+Global TeleExchange	The Global TeleExchange Inc
+IT Group	The I.T. Group
+Lincoln Cty	The Lincoln County Telephone System, Inc.
+McClure	The McClure Telephone Company
+Knoxville	The New Knoxville Telephone Company
+Nova	The Nova Telephone Company
+The	The Ozitel Network Pty. Ltd.
+TPC	The Phone Company
+Stanton	The Stanton Telephone Company
+Tel. Co.	The Telephone Company S.A.
+Voice Box	The Voice Box Corp.
+Thinta	Thinta Thinta Telecommunications Pty Ltd
+Third	Third Wave Int.
+Three River	Three River Telco
+Thrifty Call	Thrifty Call Inc.
+Thrifty	Thrifty Call, Inc. L.D.
+Thrifty	Thrifty Telephone, Inc.
+Thumb	Thumb Cellular Limited Partnership
+Thumb	Thumb Cellular LLC
+Thunder Bay	Thunder Bay Telephone
+Thunder	Thunder S.p.A.
+Thuraya	Thuraya RMSS Network
+Thuraya	Thuraya Satellite Network
+Thuraya	Thuraya Satellite Telecommunications Company
+Tidewater	Tidewater Telecom
+Tigo	Tigo Lanka (Pvt) Ltd
+Tigo	Tigo Ltd
+Tikiphone	Tikiphone
+TIM	TIM
+Timanfaya	Timanfaya Telecom, S.L.
+Time Warner	Time Warner Communications
+TimeWarner	TimeWarner Communications
+TIM	TIM Italia S.p.A.
+Timor	Timor Telecom, S.A.
+TIM	TIM Peru
+Tiscali	Tiscali S.p.A.
+Tiscali	Tiscali Telecomunicaciones, S.A.
+Tismi	Tismi BV
+TELECO	Télécommunications d'Haiti S.A.M. (TELECO)
+TLDI	TLDI
+Télésonique	Télésonique SA
+Télésonique	Télésonique SA, Genève
+TM-Cell	TM-Cell
+TMC	TMC of Lexington
+TMC	TMC of San Diego
+TMEX	TMEX USA Inc
+TM Int'l	TM International (Bangladesh) Ltd.
+TMN	TMN - Telecomunicaçôes Movéis Nacionais, S.A.
+TMN	TMN - Telecomunicações Móveis Nacionais, S.A.
+T-Mobile	T-Mobile
+T-Mobile	T-Mobile Austria
+T-Mobile	T-Mobile Austria GmbH
+T-Mobile	T-Mobile Crna Gora Ltd
+T-Mobile	T-Mobile Czech Republic a.s.
+T-Mobile	T-Mobile Deutschland GmbH
+T-Mobile	T-mobile Hrvatska d.o.o.
+T-Mobile	T-Mobile Hrvatska d.o.o./T-Mobile Croatia LLC
+T-Mobile	T- Mobile Netherlands B.V.
+T-Mobile	T-Mobile Netherlands B.V.
+T-Mobile	T-Mobile Slovensko, a.s.
+T-Mobile	T-Mobile UK
+T-Mobile	T-Mobile (UK) Ltd
+T-Mobile	T-Mobile USA
+TMP	TMP Corporation
+TNE	TNE AG
+TNL	TNL PCS - Oi
+TNR	TNR Holdings, Inc.
+Togo	Togo Telecom
+Togo	Togo Télécom
+T-One	T-One Corporation
+Tonga	Tonga Communications Corporation
+Tonica	Tonica Telephone Company
+Topbest	Topbest Technology Holdings Ltd
+Totah	Totah Telephone Company
+TotalNet	TotalNet Communications, Inc.
+TotalSolutions	TotalSolutions Telecom LLC
+TotalTel	TotalTel
+Total	Total Telecom International Inc
+Total-Tel	Total-Tel USA
+Total	Total World Telecom
+TOT	TOT Public Company Ltd
+Touch	Touch
+Touch-Tel	Touch-Tel USA, L.P.
+Touchtone	Touchtone Pte Ltd
+Township	Township Telephone Company
+Tracey	Tracey Corp. II d/b/a Western Total
+Tradingcom	Tradingcom Europe
+Transact	Transact Communications Pty. Ltd
+Transaction	Transaction Network Services, Inc.
+Transactions	Transactions Network Services
+TransAm	TransAm S.A.
+Transatel	Transatel
+Trans Global	Trans Global Communications
+Transit	Transit
+Transit	Transit Telecom, Sociedade Unipessoal Ltda
+Transmedes	Transmedes S.A.
+TransPacific	TransPacific Telecom
+Transtel	Transtel Corporation
+Trans Telecom	Trans Telecom
+Transtel	Transtel Services
+Transwire	Transwire LLC
+Trans World Comm.	Trans World Communications Italia S.p.A.
+TransWorld	TransWorld Telecommunications Grenada
+Trans World Telecom.	Trans World Telecommunications srl
+TRA	TRA (UK) Ltd
+Travel Telekom.	Travel Telekommunikation s.r.o.
+Travel	Travel Telekommunikation, sro
+TRCommunication	TRCommunication
+Trenton	Trenton Telephone Company/Ringgold Telephone Company
+TresCom Int	TresCom International
+TresCom	TresCom International, Inc
+TresCom	TresCom U.S.A., Inc.
+Triangle	Triangle Communications AG
+Tricom	Tricom S.A.
+Tricom	Tricom USA, Inc
+Tri-County	Tri-County Telephone Association, Inc.
+Tri-County	Tri-County Telephone Company, Inc.
+Tri-County	Tri-County Telephone Cooperative
+Tri-County	Tri-County Telephone Membership Corporation
+Tridor	Tridor Pte Ltd
+Trilogy	Trilogy International Enterprises, LLC
+Trinton	Trinton PCS Inc.
+Triotel	Triotel Telecommunications Ltd
+Triple T	Triple T Global Net Company Ltd
+TRI	TRI Touch America
+Türk Telekom	Türk Telekom
+Tropolys	Tropolys Service GmbH
+TICC	True International Communication Company Ltd
+TICC	True International Company Ltd
+TSC	TSC Kazak Telecom
+TS Connect	TS Connect Ltd
+TSI	TSI Telecommunication Services, Inc
+TSPP	TSPP Sp. Z.o.o.
+TSTT	TSTT Mobile
+T-Systems	T-Systems Austria
+T-Systems	T-Systems Czech Republic, a.s.
+T-Systems	T-Systems International GmbH
+T-Systems	T-Systems Japan K.K.
+T-Systems	T-Systems Ltd
+T-Systems	T-Systems North America, Inc
+T-Systems	T-Systems S.p.A.
+TT docom	TT dotcom Sdn Bhd
+T+Telecomunicaçôes	T+Telecomunicaçôes
+TTI	TTI Telecommunications
+TT	TT mobile
+TT-mobile	TT-mobile
+TTN	TTN S.A.
+Tuckersmith	Tuckersmith Communications Cooperative, Ltd.
+TU-KA	TU-KA Cellular Tokai Inc.
+TU-KA	TU-KA Cellular Tokyo Inc.
+TU-KA	TU-KA Phone Kansai Inc.
+Tularosa	Tularosa Basin Telephone Co.,Inc.
+Tune	Tune Talk Sdn Bhd
+Tunisie	Tunisie Telecom
+Turkcell	Turkcell
+Turkmentelecom	Turkmentelecom
+Tusmobil	Tusmobil d.o.o.
+Tus Telekom	Tus Telekom d.d.
+Tuvalu	Tuvalu Telecommunications Corporation
+TVI	TVI Connect BV
+TVI	TVI milleni.com GmbH
+Twin Lakes	Twin Lakes Telephone Cooperative Corporation
+Twin Valley	Twin Valley Telephone, Inc.
+Twister	Twister Comm. Network, Inc.
+TX-11	TX-11 Acquistion LLC
+TX	TX RSA 15B2, LP dba Five Star Wireless
+TYNTEC	TYNTEC GmbH
+Alterkomas	UAB Alterkomas
+Bité Lietuva	UAB Bité Lietuva
+CSC Telecom	UAB CSC Telecom
+EcoFon	UAB EcoFon
+Mediafon	UAB Mediafon
+NTT	UAB Nacionanalinis telekomunikaciju tinklas
+Omnitel	UAB Omnitel
+Telco Cons. Grp.	UAB Telco Consulting Group
+Tele2	UAB Tele2
+Tele2	UAB Tele2 fiksuotas rysys
+Telekom. Grp.	UAB Telekomunikaciju grupa
+UBET	UBET Wireless
+UCOM	UCOM
+U.COM	U.COM
+Ucomline	Ucomline JSC
+Uganda	Uganda Telecom Ltd
+Uganda	Uganda Telecom Ltd.
+Uintah	Uintah Basin Electronic Telecommunications
+UIS	UIS Telecom Ltd
+UMC	Ukrainian Mobile Communication, UMC
+Ukrainian	Ukrainian Telecommunication
+URS	Ukranian Radio Systems, URS
+Ukrtelecom	Ukrtelecom
+Ukrtelecom	Ukrtelecom JSC
+Ukrtelecom	Ukrtelecom UMTS
+VNCM	Ukrvincom Private Enterprise (VNCM)
+Ultra	Ultra Communications Ltd
+Umniah	Umniah
+Umniah	Umniah Mobile Company (Umniah)
+U Mobile	U Mobile Sdn Bhd
+U Mobile	U Mobile Sdn. Bhd.
+UNETE	UNETE LTDA
+Uni2	Uni2 Telecomunicaciones, S.A.
+Uni2	Uni2 Telecomunicaciones, S.A.U.
+Unicall	Unicall Communications, Inc.
+UWT	Unified Worldwide Transport, LLC
+DIGICEL	Unigestion Holding S.A. (DIGICEL)
+Union River	Union River Telephone Company
+Union Springs	Union Springs Telephone Company
+Union	Union Telephone Company
+UniPlex	UniPlex Telecom Technologies, Inc
+Unisource	Unisource Belgium
+Unistars	Unistars
+Unicom	United Communications (UNICOM)
+United Connect	United Connect Ltd
+United Hubbing	United Hubbing Inc.
+United Networks	United Networks International
+United PEC	United Pan-Europe Communications AG
+US Cellular	United States Cellular
+US Cellular	United States Cellular
+United	United Telecom
+United	United Telecom Ltd
+United	United Telephone Association, Inc.
+United	United Telephone Company, Inc.
+United	United Wireless Inc
+Unitel	Unitel
+Unitel	Unitel Incorporated
+UniversalCom	UniversalCom, Inc.
+UniversalCom	UniversalCom,Inc.
+Universal	Universal Communications Network, Inc.
+Uno	Uno Communications S.p.A.
+OCHA	UN Office for the Coordination of Humanitarian Affairs (OCHA)
+Hungary	UPC Hungary Ltd
+Nederland Bus	UPC Nederland Business BV
+Romania	UPC Romania
+Slovensko	UPC Slovensko, s.r.o.
+Telekabel Wien	UPC Telekabel Wien
+Upsala	Upsala Cooperative Telephone Assoc.
+Upton	Upton, Inc. (La Cie de Telephone)
+Uralsvyazinform	Uralsvyazinform
+URS	URS MSC
+GlobalLink	USA Global Link
+USAN	USAN Gabon
+US Cambridge	US Cambridge Group LLC
+US Cellular	US Cellular
+USFI	USFI, Inc.
+US LEC FL	US LEC of Florida Inc.
+US LEC NC	US LEC of North Carolina
+US LEC NC	US LEC of North Carolina, LLC
+U.S. Leo Services	U.S. Leo Services, Inc
+USLink	USLink Long Distance
+US One	US One Communications, Inc.
+U.S. Oper	U.S. Operations, Inc.
+US South	US South Communications, Inc.
+Sprint	US SPRINT
+Sprint	US Sprint
+Arcada	USTel dba Arcada Commun.
+USTel	USTel dba Arcada Communications
+USTelenet	USTelenet, LLC
+US TelePacific	US TelePacific Corp.dba TelePacific
+US WATS	US WATS
+US WATS	US Wats
+U S WEST	U S WEST Communications
+U S WEST	U S WEST New Vector Group
+US Xchange	US Xchange LLC
+US Xchange	US Xchange, L.L.C
+UTECOM	UTECOM SA
+Utelco	Utelco, Inc.
+Uzdunrobita	Uzdunrobita
+Uzintel	UzInter Telecom (JSC Uzintel)
+Uzmacom	Uzmacom
+V1 Telecom	V1 Telecom Ltd
+Vadacom	Vadacom
+Valcourt	Valcourt (Co-op de Telephone de)
+Valley	Valley Telephone Cooperative, Inc.
+Valliant	Valliant Telephone Company
+Valu-Line	Valu-Line
+Valu-Line	Valu-Line Long Distance
+Vancouver	Vancouver Telephone Co. Ltd.
+Vanguard	Vanguard S.r.L.
+Vartec	VarTec National, Inc.
+VarTec	VarTec Telecom Europe Ltd.
+VarTec	VarTec Telecom, Inc
+Vaughnsville	Vaughnsville Telephone Company, Inc.
+Vectone	Vectone Network Ltd
+VEE	VEE Networks (Zain)
+Veninfotel	Veninfotel Comunicaciones Vitcom, C.A.
+Ventelo	Ventelo Bedrift AS
+Ventelo	Ventelo GmbH
+Ventelo	Ventelo Sverige AB
+Venus	Venus Telephone Corp.
+Verisign	Verisign Inc
+Verizon	Verizon Austria
+Verizon	Verizon Business Group
+Verizon	Verizon Dominicana S.A.
+Verizon	Verizon Hawaii International Inc
+Verizon	Verizon Hong Kong Ltd
+Verizon	Verizon Japan Ltd.
+Verizon	Verizon Nederland B.V.
+Verizon	Verizon Norway AS
+Verizon	Verizon Sweden AB
+Verizon	Verizon Switzerland
+Verizon	Verizon UK Ltd
+Verizon	Verizon Wireless
+Vermont	Vermont Telephone Company, Inc.
+Vernon	Vernon Telephone Cooperative
+Versatel	Versatel Deutschland GmbH & Co. KG
+Versatel	Versatel Nederland B.V.
+Versatel	Versatel Telecom Belgium
+Vertex	Vertex Group, Inc
+Vestitel	Vestitel
+VGM	VGM International
+Viag	Viag Europlatform AG
+Vianet	Vianet
+Viaphone	Viaphone GmbH
+Viatel	Viatel Communications GmbH
+Viatel	Viatel Global Communications
+Viatel	Viatel Global Communications-
+Viatel	Viatel GmbH
+Viatel	Viatel Operations SA
+Vic	Vic Telehome, S.L.
+Victorian	Victorian Rail Track
+Videotron	Videotron Telecom Ltee
+VSNL	Videsh Sanchar Nigam Ltd (VSNL)
+Vietel	Vietel Corporation (Vietel)
+VNPT	Vietnam Posts and Telecommunications Corporation (VNPT)
+Viettel	Viettel
+VTC	Viettel Company (VTC)
+Vigra	Vigra Telecommunications V.O.F.
+Villisca F	Villisca Farmers Telephone Company
+Vinaphone	Vinaphone
+Vinus	Vinus Telecom GmbH
+Viola	Viola Telephone Company
+VIP Calling	VIP Calling
+Vip	Vip Mobile d.o.o.
+Vip	Vip mobile d.o.o.
+VIPnet	VIPnet d.o.o.
+VIPnet	VIPnet/VIPnet d.o.o.
+VIP	VIP Operator
+Virtualis	Virtualis
+Visafone	Visafone
+Visiontel	Visiontel V.O.F.
+Vista Int'l	Vista International
+Vista Tel	Vista Telephone
+Vista-United	Vista-United Telcom
+Vistream	Vistream GmbH
+Vital	Vital Inc.
+Vital	Vital Phone Ltd
+Vitcom	Vitcom Perú S.A.
+Vitelcom	Vitelcom Cellular Inc dba Innovative Wireless
+Vitts	Vitts Corporation
+Viva	Viva
+Vivavoip	Vivavoip, Inc
+Vivid	Vivid Wireless Pty Ltd
+Vivo	Vivo
+Vivodi	Vivodi
+Vivodi	Vivodi Telecom S.A.
+Vizada	Vizada Networks AS
+Vizzavi	Vizzavi España, SL
+VM	VM Sarl
+VM sarl	VM sarl
+VMS	VMS Technology Ltd
+VM Telekom	VM Telekom d.o.o.
+Vodacom	Vodacom Congo RDC sprl
+Vodacom	Vodacom Lesotho (pty) Ltd.
+Vodacom	Vodacom Lesotho (pty) ltd.
+Vodacom	Vodacom (Pty) Ltd.
+Vodacom	Vodacom Pty Ltd
+Vodacom	Vodacom (T) Ltd
+Vodacom	Vodacom (T) Ltd.
+Vodafone	Vodafone
+Vodafone	Vodafone Albania
+Vodafone	Vodafone Czech Republic a.s.
+Vodafone	Vodafone Czech Republic a.s. R&D Centre
+Vodafone	Vodafone D2 GmbH
+Vodafone	Vodafone España
+Vodafone	Vodafone España S.A.
+Vodafone	Vodafone España, SAU
+Vodafone	Vodafone España, S.L.
+Vodafone	Vodafone (Fiji) Ltd
+Vodafone	Vodafone Fiji Ltd
+Vodafone	Vodafone Group
+Vodafone	Vodafone Hungary Ltd
+Vodafone	Vodafone Ireland Plc
+Vodafone	Vodafone Libertel N.V.
+Vodafone	Vodafone Ltd
+Vodafone	Vodafone Ltd.
+Vodafone	Vodafone Malta
+Vodafone	Vodafone Malta Ltd.
+Vodafone	Vodafone Malta (Vodafone Group)
+Vodafone	Vodafone Network Pty Ltd
+Vodafone	Vodafone Network Pty. Ltd.
+Vodafone	Vodafone New Zealand GSM Network
+Vodafone	Vodafone NZ
+Vodafone	Vodafone - Panafon
+Vodafone	Vodafone Portugal, Comunicações Pessoais, S.A.
+Vodafone	Vodafone Pty Ltd
+Vodafone	Vodafone Qatar
+Vodafone	Vodafone Romania
+Vodafone	Vodafone Romania SA
+Vodafone	Vodafone S.p.A.
+Vodafone	Vodafone Telecel - Comunicaçôes Pessoais, S.A.
+Vodafone	Vodafone Telecel, Comunicações Pessoais, S.A.
+Vodaphone	Vodaphone/Hutchison, Madhya Pradesh
+Voice2Voice	Voice2Voice Carrier Services Ltd.
+Voice and Data	Voice and Data Communications
+Voice Data	Voice Data Communicationsl
+Voice Exchange	Voice Exchange Ltd
+Voicenet	Voicenet
+Voicetec	Voicetec Systems Ltd
+Voice Track	Voice Track
+Voiceware	Voiceware Systems
+Voinet	Voinet s.r.o.
+VoIP	VoIP Comunicaciones de Panamá
+Volgograd	Volgograd Mobile
+Voljatel	Voljatel telekommunikacije d.o.o.
+Voxbone	Voxbone SA
+Voxmobile	Voxmobile S.A,
+Voxmobile	Voxmobile S.A.
+Vox	Vox Mundi d.o.o.
+Vox	VOX Telecom SA
+Voyager	Voyager Networks, Inc
+VSE	VSE Net GmbH
+VSNL	VSNL International Pte Ltd
+VSNL	VSNL Lanka Ltd
+VSNL	VSNL Singapore Ltd
+VTR	VTR Móvil S.A.
+V.T.R.	V.T.R. Telecomunicaciones S.A.
+Wabash	Wabash Telephone Company
+Waitsfield	Waitsfield-Flayston Telephone Company
+Waldron	Waldron Telephone Company
+Walnut Hill	Walnut Hill Telephone Company, Inc.
+Wamego	Wamego Telephone Company, Inc.
+Wanatel	Wanatel
+Warid	WARID
+Warid	Warid Telecom
+Warid	Warid Telecom Georgia Ltd
+Warid	Warid Telecom International L.I.C
+Warid	Warid Telecom Uganda Ltd
+Warid	Warid Telecom Uganda Ltd.
+Warwick Valley	Warwick Valley Telephone Company
+Washington City	Washington City Rural Telephone Cooperative, Inc.
+WITS	Washington Interagency Telecommunications Service
+Wataniya	Wataniya
+Wataniya	Wataniya Telecom
+Wataniya	Wataniya Telecom Maldives
+Wauneta	Wauneta Telephone Co.,Inc.
+Wauneta	Wauneta Telephone Company
+Wavecrest	Wavecrest Communications France
+Wavecrest	Wavecrest Italia S.p.A.
+Wavecrest	Wavecrest (UK) Ltd
+Waverly Hall	Waverly Hall Telephone Co.,Inc.
+Wave	Wave Runner LLC
+WDT	WDT World Discount Telecommunications Co
+Weblinks	Weblinks Limited
+Webstar	Webstar Ltd
+Webster Calhoun	Webster Calhoun Cooperative Telephone Association
+Welcome	Welcome Italia S.p.A.
+W Carolina R	West Carolina Rural Telephone Cooperative, Inc.
+West	West Central Wireless
+West Coast	West Coast Telecom
+Westel	Westel
+Westel	Westel Ltd
+Westel	Westel Mobile
+WesTel	WesTel Telecommunications, Ltd.
+W New Mexico	Western New Mexico Telephone Company, Inc.
+Western	Western Telephone Company
+W Wireless	Western Wireless
+W Wireless	Western Wireless Corporation
+Wes-Tex	Wes-Tex Telephone Cooperative Inc.
+Westinghouse	Westinghouse Communications
+W Kentucky R	West Kentucky Rural Telephone Cooperative
+Westphalia	Westphalia Telephone Company
+West Point	West Point Telephone Company
+Westport	Westport Telephone Company, Ltd.
+West River	West River Telecommunications Cooperative
+West Side	West Side Telephone
+W Tennessee	West Tennessee Telephone Company
+W Texas R	West Texas Rural Tele.Cooperative
+W Texas R	West Texas Rural Tele. Cooperative
+W Wisconsin	West Wisconsin Telcommunications Cooperative, Inc.
+W Wisconsin	West Wisconsin Telecom Cooperative, Inc.
+Wharf	Wharf T&T Ltd
+Wheat State	Wheat State Telephone, Inc.
+Wholesale	Wholesale Telecom Corporation
+Wightman	Wightman Telephone Ltd.
+Wilkes	Wilkes Cellular Inc.
+Wilkes	Wilkes Telephone & Electric Company
+Wilkes	Wilkes Telephone Membership Corporation
+Wilkinson Cty	Wilkinson County Telephone Company
+Willaf	Willaf Ltd.
+Wilson	Wilson Construcciones S.A.
+Wilson	Wilson Telephone Company
+WilTel	WilTel
+Wilton	Wilton Telephone Company
+Wind	WIND
+Wind	Wind
+Wind	Wind International Services SA Belgium
+Wind	Wind Telecomunicazioni S.p.A.
+Winn	Winn Telephone Company
+Winstar	Winstar Telecommunications Group
+Wireless 2000	Wireless 2000 PCS
+Wireless	Wireless Communications Venture
+Wireless II	Wireless II
+Wireless	Wireless Maingate Nordic AB
+Wireless	Wireless Solutions International
+Wireless	Wireless Solutions International Inc.
+Wireless	Wireless Ventures (Cayman Islands) Ltd.
+Wisconsin	Wisconsin RSA#7 Ltd Patnership
+Withdraw	Withdraw S.L.
+WNT	WNT Telecommunication
+Wood Cty	Wood County Telephone Company
+Woodhull	Woodhull Telephone Company
+Woodstock	Woodstock Telephone Company
+Woosh	Woosh Wireless - CDMA Network
+WAC	World Access Commun. Corp.
+Worldcall	Worldcall Interconnect
+World	World Change Communications S.A.
+WorldCom	WorldCom
+WorldCom	WorldCom.
+WorldCom	WorldCom Asia Pacific Limited
+WorldCom	WorldCom Australia Pty Ltd
+WorldCom	Worldcom GmbH
+WorldCom	WorldCom, Inc
+WorldCom	WorldCom S.A.
+WorldCom	Worldcom Telecommunications Services GmbH
+WDT	World Discount Telecommunications, Inc (WDT)
+World Exchange	World Exchange
+WorldHub	WorldHub Inc
+World-Link	World-Link, Inc
+World	World Network Telecoms Ltd.
+WorldPass	WorldPass
+WorldPoint	WorldPoint Communications, Inc
+WorldPort	WorldPort Communications, Inc
+Worldport	Worldport Communications, Inc.
+Worldport	Worldport Communications,Inc.
+Worldstar	Worldstar Telecom Inc
+WTS	World Telecommunications Services
+World	World Telecom Network
+World	World Teleconnect
+World Touch	World Touch Communications
+Worldwide	Worldwide Communications Network LLC
+Worldwide	Worldwide Telecom, S.A.
+Worldwide	Worldwide Telecom Services, LLC
+WorldxChange	WorldxChange
+WorldxChange	Worldxchange
+WorldxChange	WORLDxCHANGE GmbH
+WTI	WTI Macedonia
+WTN	WTN GmbH
+WT	WT Services, Inc.
+Xantic	Xantic B.V.
+Xcom	XCOM Technologies
+Xcom	Xcom Technologies, Inc.
+Xfera	Xfera Móviles S.A.
+Xfera	Xfera Móviles, SA
+Xfone	Xfone Communications Ltd
+Xintel	Xintel Sdn Bhd
+Xpress	Xpress
+Xtec	Xtec Communication Ltd.
+Xtec	Xtec Communications Ltd
+Xtel	Xtel Communications, Inc.
+Xtra	Xtra Telecom, S.A.
+X-Xchange	X-Xchange Telecommunications Signalling Services GmbH
+XYPOINT	XYPOINT Corporation
+Yaana	Yaana Technologies LLC
+Yadkin Vly	Yadkin Valley Telephone Membership Corporation
+Yanna	Yanna Technologies LLC
+Yelcot	Yelcot Telephone Company
+Yell Cty	Yell County Telephone Company
+Yemen ITC	Yemen International Telecommunications Company
+Yemen	Yemen Mobile Phone Company
+Yeoman	Yeoman Telephone Company
+York	York Telephone Company
+Yorkville	Yorkville Telephone Cooperative
+YotaBel	YotaBel Foreign Ltd Liability Company
+Yozma	Yozma Timerus sprl
+YTL	YTL Communication Sdn Bhd
+Yukon-Waltz	Yukon-Waltz Telephone Company
+Zain	ZAIN
+Zain	Zain
+Zain	Zain Bahrain
+Zain	Zain Communications Ghana Ltd
+Zain	Zain (ex Mobitel)
+Zain	Zain Iraq (previously Atheer)
+Zain	Zain Iraq (previously Iraqna)
+Zain	Zain Sudan
+Zamcell	Zamcell
+Zamir	Zamir Telecom Limited
+Zamtel	Zamtel
+Zantel	Zantel
+Zanzibar	Zanzibar Telecom Ltd
+Zeleznice	Zeleznice Slovenskej republiky
+Zenda	Zenda Telephone Company, Inc.
+Zenex	Zenex Long Distance
+Zephyr	Zephyr Telecommunications GmbH
+Ziggo	Ziggo B.V.
+ZON TV	ZON TV CABO Portugal, S.A.

@@ -1,0 +1,224 @@
+# Source http://en.wikipedia.org/wiki/Local_access_and_transport_area
+120	Maine	ME
+122	New Hampshire	NH	Includes part of Vermont around Groton; includes part of Maine around Kittery and Wilsons Mills.
+124	Vermont	VT	Includes West Lebanon and West Chesterfield, New Hampshire.
+126	Western Massachusetts	MA
+128	Eastern Massachusetts	MA
+130	Rhode Island	RI
+132	New York City and surrounding metropolitan area	NY	Includes Greenwich, Connecticut.
+133	Poughkeepsie	NY	Includes Milford, Pennsylvania and surrounding area.
+134	Albany	NY	Includes Hancock, Massachusetts.
+136	Syracuse	NY
+138	Binghamton	NY	Includes Sayre, Pennsylvania and surrounding area.
+140	Buffalo	NY	Includes Ulysses, Pennsylvania and surrounding area.
+220	Atlantic Coastal New Jersey	NJ
+222	Delaware Valley	NJ
+224	North Jersey	NJ
+226	Harrisburg	PA
+228	Delaware	Delaware
+228	Philadelphia	PA
+230	Altoona	PA
+232	Northeast Pennsylvania	PA
+234	Pittsburgh	PA
+236	Arlington, Fairfax, Prince William, and Stafford counties, and enclosed cities.	VA	See Washington, D.C.
+236	Washington, D.C.	MD	Most of this LATA is actually in Maryland
+236	Washington, D.C.	DC	Includes the west portion of the West Bay of Maryland, as far north as Damascus, Maryland (roughly Montgomery, Prince George's, Charles, and St. Mary's counties of Maryland); includes the northeasternmost portion of Virginia, from Leesburg to just north of Fredericksburg (roughly Northern Virginia); may include Springtown, Pennsylvania.
+238	Baltimore	MD
+240	Hagerstown	MD	Includes the easternmost part of West Virginia around Martinsburg as far as Route 9; includes the northwestern part of the Eastern Panhandle of West Virginia including Keyser, from Grant County to Short Gap; includes area of Pennsylvania just north of Hancock, Maryland.
+242	Salisbury	MD
+244	Roanoke	VA
+246	Culpeper	VA
+248	Richmond	VA
+250	Lynchburg	VA
+252	Norfolk	VA
+254	Charleston	WV	Includes part of Virginia east of White Sulphur Springs, West Virginia.
+256	Clarksburg	WV
+320	Cleveland	OH
+322	Youngstown	OH
+324	Columbus	OH
+325	Akron	OH
+326	Toledo	OH
+328	Dayton	OH
+330	Evansville	IN
+332	South Bend	IN
+334	Auburn-Huntington	IN
+336	Indianapolis	IN	Extends into Illinois near Dana, Indiana.
+338	Bloomington	IN
+340	Detroit	MI
+342	Upper Peninsula of Michigan	MI	Includes portion of Wisconsin around Iron Mountain, Michigan as far as Rhinelander and Townsend, Wisconsin.
+344	Saginaw	MI
+346	Lansing	MI
+348	Grand Rapids	MI
+350	Northeast Wisconsin	WI	Includes the southern corner of Michigan's Upper Peninsula.
+352	Northwest Wisconsin	WI
+354	Southwest Wisconsin	WI
+356	Southeast Wisconsin	WI
+358	Chicago	IL	Includes Lake County and Newton County, Indiana, especially the Gary, Indiana area; includes Demotte, Hebron, and Lakes of the Four Seasons, Indiana; extends into Wisconsin Salem Township.
+360	Rockford	IL	Extends into Wisconsin near Apple River, Illinois.
+362	Cairo	IL
+364	Sterling	IL
+366	Forrest	IL
+368	Peoria	IL
+370	Champaign	IL	May include areas of Indiana near Danville, Illinois.
+374	Springfield	IL
+376	Quincy	IL
+420	Asheville	NC
+422	Charlotte	NC	Includes York County and Lancaster County, South Carolina.
+424	Greensboro-Winston-Salem area	NC
+426	Raleigh	NC
+428	Wilmington	NC
+430	Greenville	SC	Includes Polk County, North Carolina.
+432	Florence	SC
+434	Columbia	SC
+436	Charleston	SC
+438	Atlanta	GA	Includes portion of Alabama from Oakland to Huguley; includes Phenix City, Alabama; includes Ranburne, Alabama.
+440	Savannah	GA	Includes part of southern South Carolina as far north as Hardeeville and Hilton Head Island.
+442	Augusta	GA	Includes Aiken County and Edgefield County, South Carolina.
+444	Albany	GA
+446	Macon	GA
+448	Pensacola	FL	Includes Clear Springs, Wing and Florala, Alabama.
+450	Panama City	FL	Includes a small portion of Georgia near Tallahassee.
+452	Jacksonville	FL
+454	Gainesville	FL
+456	Daytona Beach	FL
+458	Orlando	FL
+460	Southeast Florida	FL
+462	Louisville	KY	Includes the central southern area of Indiana around Salem.
+464	Owensboro	KY
+466	Winchester	KY
+468	Memphis	TN	Includes part of Mississippi from south of Memphis to as far south as Hernando.
+470	Nashville	TN
+472	Chattanooga	TN	Includes northwestern tip of Georgia.
+474	Knoxville	TN
+476	Birmingham	AL
+477	Huntsville	AL
+478	Mongomery	AL	Includes Georgetown, Georgia.
+480	Mobile	AL	Includes areas of Mississippi north of Pascagoula.  Includes part of northern Escambia Country, Florida in the Century and Walnut Hill areas.
+482	Jackson	MS	Includes parts of Alabama around Columbus, Mississippi.
+484	Biloxi	MS
+486	Shreveport	LA
+488	Lafayette	LA
+490	New Orleans	LA
+492	Baton Rouge	LA
+520	St. Louis	MO	Includes part of south-central Illinois southwest of Springfield.
+521	Westphalia	MO
+522	Springfield	MO
+524	Kansas City	MO	Includes eastern portion of Kansas as far out as U.S. 73 and U.S. 59 and south as far as U.S. 54.
+526	Fort Smith	AR	Includes part of Oklahoma from Pocola to Moffet; includes section of Oklahoma from Colcord to Watts; includes Colcord, Missouri; includes area of Oklahoma near Maysville, Arkansas; includes area of Oklahoma near Uniontown, Arkansas.
+528	Little Rock	AR	Includes Blythevill, Missouri; includes New Home, Oklahoma.
+530	Pine Bluff	AR	Includes parts of Louisiana around Dodge Citry and Junction City, Arkansas.
+532	Wichita	KS
+534	Topeka	KS
+536	Oklahoma City	OK
+538	Tulsa	OK
+540	El Paso	TX
+542	Midland	TX
+544	Lubbock	TX
+546	Amarillo	TX	Includes the southern half of the Oklahoma Panhandle.
+548	Wichita Falls	TX
+550	Abilene	TX
+552	Dallas	TX
+554	Longview	TX	Includes Miller County, Arkansas.
+556	Waco	TX
+558	Austin	TX
+560	Houston	TX
+562	Beaumont	TX
+564	Corpus Christi	TX
+566	San Antonio	TX
+568	Brownsville	TX
+570	Hearne	TX
+620	Rochester	MN
+624	Duluth	MN
+626	St. Cloud	MN
+628	Minneapolis	MN
+630	Sioux City	IA	Extends into Minnesota near incorporated areas of Iowa along its length; includes the eastern portions of Dakota and Thurston counties of Nebraska; includes North Sioux City, South Dakota, and extends into South Dakota near Akron and Hawader, Iowa.
+632	Des Moines	IA	Extends into Missouri from Andover, Missouri to south of Davis City, Iowa.
+634	Davenport	IA	Includes portion of Illinois as far as Geneseo and Aledo; includes the Galena, Illinois area.
+635	Cedar Rapids	IA
+636	Brainerd, Minnesota-Fargo, North Dakota	MN
+636	Brainerd, Minnesota-Fargo, North Dakota	ND
+638	Bismarck	ND	Includes portions of Montana near Beach and Squaw Gap, North Dakota.
+640	South Dakota	SD
+644	Omaha	NE
+646	Grand Island	NE
+648	Great Falls	MT
+650	Billings	MT
+652	Southern Idaho	ID	Includes Malheur County, Oregon, especially the Ontario area; includes Jackpot, Jarbidge, and Owyhee, Nevada; includes Alta and Border, Wyoming.
+654	Wyoming	WY
+656	Denver	CO	Extends into Nebraska near Peetz and Julesburg, Colorado
+658	Colorado Springs	CO
+660	Utah	UT	May include Mesquite and Partoun, Nevada; may include Fredonia and Colorado City, Arizona.
+664	New Mexico	NM
+666	Phoenix	AZ	Includes Winterhaven, California.  Includes Spirit Mountain, Nevada.  Includes Glen Canyon, Utah.
+668	Tuscon	AZ	Includes Rodeo and Virden, New Mexico.
+670	Eugene	OR
+672	Portland	OR	Includes Southwestern Washington from Willapa Bay to Goldendale.
+674	Seattle	WA
+676	Spokane	WA	Includes parts of Oregon including Milton-Freewater and Troy; includes a section of Idaho from Lewiston to Grangeville, up to Troy, and possibly Elk City; may include Tensed, Idaho.
+720	Reno	NV	May include Alpine, Verdi and Coleville, California.
+721	Pahrump	NV
+722	San Francisco	CA
+724	Chico	CA
+726	Sacramento	CA
+728	Fresno	CA
+730	Los Angeles	CA	Includes La Paz County, Arizona.
+732	San Diego	CA
+734	Bakersfield	CA
+736	Monterey	CA
+738	Stockton	CA
+740	San Luis Obispo	CA
+820	Puerto Rico	PR
+822	U.S. Virgin Islands	VI
+824	Bahamas	BB
+826	Jamaica	JM
+828	Dominican Republic	DO
+830	Other Caribbean	Other SA
+832	Alaska	AK
+834	Hawaii	HI
+836	Wake Island	Wake Island
+838	Mexico	MX
+850	Quebec	QC
+851	Ontario	ON
+870	Northern Mariana Islands	Northern Mariana Islands
+871	Guam	Guam
+881	Alberta	AB
+883	Quebec	QC
+884	Alberta	AB
+884	American Samoa	AS
+885	Newfoundland	NL
+886	British Columbia	BC
+887	Nova Scotia	NS
+888	Canada	CA
+888	Manitoba	MB
+889	P.E.I.	PE
+890	New Brunswick	NB
+891	Saskatchewan	SK
+892	Yukon Territory	YT
+920	Connecticut	CT
+921	Fishers Island	NY
+922	Cincinnati	OH	Includes Rising Sun, Indiana and surrounding area; includes the northern tip of Kentucky as far south as Williamstown.
+923	Lima-Mansfield	OH
+924	Erie	PA
+927	Harrisonburg	VA
+928	Charlottesville	VA
+929	Edinburg	VA
+932	Bluefield	WV	Includes a strip of Virginia from south of Bluefield to the Kentucky border.
+937	Richmond	IN	Includes Union City, Ohio.
+938	Terre Haute	IN	Includes Edgar and Clark counties of Illinois; may include Robinson, Illinois.
+939	Fort Myers	FL
+949	Fayetteville	NC
+951	Rocky Mount	NC
+952	Tampa	FL
+953	Tallahassee	FL
+956	Bristol-Johnson County	TN	Includes part of Virginia from Abingdon to Wytheville.
+958	Lincoln	NE
+960	Coeur d'Alene	ID	Includes part of northwest Montana as far east as Eureka and as far south as Libby; includes Pullman, Washington and surrounding area; includes Pend Oreille County, Washington.
+961	San Angelo	TX
+963	Kalispell	MT	Note: LATA 963 appears on many LATA lists, and at least one map, is no longer a separate LATA-equivalent area. It is now part of LATA 648.
+973	Palm Springs	CA
+974	Rochester	NY
+976	Mattoon	IL
+977	Macomb	IL
+978	Olney	IL
+980	Navaho Nation	AZ	Arizona portion.  Includes Shiprock, New Mexico.
+981	Navajo Nation (Utah portion)	UT

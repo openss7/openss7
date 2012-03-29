@@ -1,0 +1,12 @@
+#!/bin/bash
+
+cat /dev/null > county.tmp
+LANG=C.UTF-8 lynx -nolist -width=200 -dump 'http://www.gbet.com/AtoZ_counties/' >> county.tmp
+
+cat /dev/null > city.tmp
+LANG=C.UTF-8 lynx -nolist -width=200 -dump 'http://www.gbet.com/AtoZ_cities/' >> city.tmp
+
+cat /dev/null > town.tmp
+for l in A B C D E F G H I J K L M N O P Q R S T U V W X Y Z; do
+	LANG=C.UTF-8 lynx -nolist -width=200 -dump 'http://www.gbet.com/AtoZ_'$l'/' >> town.tmp
+done

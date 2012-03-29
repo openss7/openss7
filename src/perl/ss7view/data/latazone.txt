@@ -1,0 +1,12 @@
+#Prefix	Area/Use	RBOC(then) LERG5.1	RBOC(now)
+1	New York and New England	NYNEX	Verizon
+2	Mid-Atlantic	Bell Atlantic	Verizon
+3	Great Lakes	Ameritech	AT&T
+4	Southeast	Bell South	AT&T
+5	South-central	SouthWestern Bell Telephone	AT&T
+6	Pacific Northwest, Midwest and Rocky Mountains	US West	CenturyLink
+7	California and Nevada	Pacific Telesis Group	AT&T
+8	Non-continguous and international areas	Off Shore and International	
+888	Canada	Canada	Canada
+9	Other/Expansion	Independents	    
+99999	LATA not applicable		
