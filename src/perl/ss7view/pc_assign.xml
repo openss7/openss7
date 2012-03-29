@@ -1,0 +1,5321 @@
+<opt>
+  <1>
+    <1>Puerto Rico</1>
+    <1>Puerto Rico Telephone Company</1>
+    <10>WorldCom</10>
+    <10>WorldCom</10>
+    <100>C Texas</100>
+    <100>Central Texas Telephone Cooperative</100>
+    <101>LinkUSA</101>
+    <101>LinkUSA Corporation</101>
+    <102>LinkUSA</102>
+    <102>LinkUSA Corporation</102>
+    <103>Standish</103>
+    <103>Standish Telephone Company</103>
+    <104>China</104>
+    <104>China Telephone Company</104>
+    <105>WorldCom</105>
+    <105>WorldCom</105>
+    <106>WorldCom</106>
+    <106>WorldCom</106>
+    <107>WorldCom</107>
+    <107>WorldCom</107>
+    <108>WorldCom</108>
+    <108>WorldCom</108>
+    <109>WorldCom</109>
+    <109>WorldCom</109>
+    <11>Sprint</11>
+    <11>Long Distance USA/Sprint</11>
+    <110>WorldCom</110>
+    <110>WorldCom</110>
+    <111>Commonwealth</111>
+    <111>Commonwealth Telephone Company</111>
+    <112>WorldCom</112>
+    <112>WorldCom</112>
+    <113>Matanuska</113>
+    <113>Matanuska Telephone Association, Inc.</113>
+    <114>Reserve</114>
+    <114>Reserve Telephone Company, Inc.</114>
+    <115>Brazoria</115>
+    <115>Brazoria Telephone Company</115>
+    <116>Commonwealth</116>
+    <116>Commonwealth Telephone Company</116>
+    <117>Commonwealth</117>
+    <117>Commonwealth Telephone Company</117>
+    <118>US Cellular</118>
+    <118>United States Cellular</118>
+    <119>US Cellular</119>
+    <119>United States Cellular</119>
+    <12>RCI</12>
+    <12>RCI Corporation</12>
+    <120>Videotron</120>
+    <120>Videotron Telecom Ltee</120>
+    <121>Novus</121>
+    <121>Novus Telecom Inc.</121>
+    <122>Bell Atlantic</122>
+    <122>Bell Atlantic Mobile</122>
+    <123>USLink</123>
+    <123>USLink Long Distance</123>
+    <124>NE Pennsylvania</124>
+    <124>North-Eastern Pennsylvania Telephone Company</124>
+    <125>Gulf</125>
+    <125>Gulf Telephone Company</125>
+    <126>Gulf</126>
+    <126>Gulf Telephone Company</126>
+    <127>Bell Atlantic</127>
+    <127>Bell Atlantic Mobile</127>
+    <128>Bell Atlantic</128>
+    <128>Bell Atlantic Mobile</128>
+    <129>Bell Atlantic</129>
+    <129>Bell Atlantic Mobile</129>
+    <13>Phoenix</13>
+    <13>Phoenix Network</13>
+    <130>NYNEX Mobile</130>
+    <130>NYNEX Mobile Communications</130>
+    <131>Ameritech</131>
+    <131>Ameritech Cellular Services, Inc.</131>
+    <132>Yadkin Vly</132>
+    <132>Yadkin Valley Telephone Membership Corporation</132>
+    <133>Intermedia</133>
+    <133>Intermedia Communications, Inc.</133>
+    <134>Advantis</134>
+    <134>Advantis</134>
+    <135>Advantis</135>
+    <135>Advantis</135>
+    <136>Advantis</136>
+    <136>Advantis</136>
+    <137>Skyline</137>
+    <137>Skyline Tel. Membership Corporation</137>
+    <138>Pac Tel</138>
+    <138>Pac Tel Corporation</138>
+    <139>Com Net</139>
+    <139>Com Net</139>
+    <14>Teledial</14>
+    <14>Teledial America</14>
+    <140>Hickory</140>
+    <140>Hickory Telephone Company</140>
+    <141>Bartel</141>
+    <141>Barbados Telephone Company, Ltd., (Bartel)</141>
+    <142>Bartel</142>
+    <142>Barbados Telephone Company, Ltd., (Bartel)</142>
+    <143>WorldCom</143>
+    <143>WorldCom</143>
+    <144>WorldCom</144>
+    <144>WorldCom</144>
+    <145>WorldCom</145>
+    <145>WorldCom</145>
+    <146>WorldCom</146>
+    <146>WorldCom</146>
+    <147>WorldCom</147>
+    <147>WorldCom</147>
+    <148>Thunder Bay</148>
+    <148>Thunder Bay Telephone</148>
+    <149>Wilkes</149>
+    <149>Wilkes Telephone Membership Corporation</149>
+    <15>Antigua</15>
+    <15>Antigua Public Utilities Authority</15>
+    <150>Wilkes</150>
+    <150>Wilkes Telephone Membership Corporation</150>
+    <151>BellSouth</151>
+    <151>BellSouth Cellular Corporation</151>
+    <152>BellSouth</152>
+    <152>BellSouth Cellular Corporation</152>
+    <153>ITC</153>
+    <153>ITC Transmission Systems</153>
+    <154>BTI</154>
+    <154>BTI Telecommunications Services</154>
+    <155>WorldCom</155>
+    <155>WorldCom</155>
+    <156>WorldCom</156>
+    <156>WorldCom</156>
+    <157>Transaction</157>
+    <157>Transaction Network Services, Inc.</157>
+    <158>Trinidad/Tobago</158>
+    <158>Telecommunication Services of Trinidad/Tobago</158>
+    <159>Project Mutual</159>
+    <159>Project Mutual Telephone Company</159>
+    <16>Litel</16>
+    <16>LCI International/Litel</16>
+    <160>Sprint Canada</160>
+    <160>Sprint Canada</160>
+    <161>Webster Calhoun</161>
+    <161>Webster Calhoun Cooperative Telephone Association</161>
+    <162>Trenton</162>
+    <162>Trenton Telephone Company/Ringgold Telephone Company</162>
+    <163>WilTel</163>
+    <163>WilTel</163>
+    <164>fONOROLA</164>
+    <164>fONOROLA</164>
+    <165>Comcast</165>
+    <165>Comcast Cellular</165>
+    <166>MicroCell</166>
+    <166>MicroCell 1-2-1 Inc.</166>
+    <167>Independent</167>
+    <167>Independent Telephone Company</167>
+    <168>Ameritech</168>
+    <168>Ameritech Communication Inc.</168>
+    <169>Ameritech</169>
+    <169>Ameritech Communication Inc</169>
+    <17>Chadwick</17>
+    <17>Chadwick Telephone</17>
+    <170>Ameritech</170>
+    <170>Ameritech Communication Inc</170>
+    <171>Ameritech</171>
+    <171>Ameritech Communication Inc</171>
+    <172>Pembroke</172>
+    <172>Pembroke Telephone Company</172>
+    <173>Pac Bell</173>
+    <173>Pacific Bell Mobile Services</173>
+    <174>BellSouth</174>
+    <174>BellSouth PCS</174>
+    <175>Brooks Fiber</175>
+    <175>Brooks Fiber Communications</175>
+    <176>Intermedia</176>
+    <176>Intermedia Communication</176>
+    <177>PrimeCO</177>
+    <177>PrimeCO Personal Communications , L.P.</177>
+    <178>Vital</178>
+    <178>Vital Inc.</178>
+    <179>W Wireless</179>
+    <179>Western Wireless Corporation</179>
+    <18>LDS</18>
+    <18>Long Distance Service, Inc.</18>
+    <180>SNS</180>
+    <180>SNS Shared Network Svcs. Inc.</180>
+    <181>BellSouth</181>
+    <181>BellSouth Cellular Corporation</181>
+    <182>BellSouth</182>
+    <182>BellSouth Cellular Corporation</182>
+    <183>Pine Belt</183>
+    <183>Pine Belt Telephone Company, Inc.</183>
+    <184>Avantel</184>
+    <184>Avantel, SA</184>
+    <185>Classic</185>
+    <185>Classic Telephone</185>
+    <186>US One</186>
+    <186>US One Communications, Inc.</186>
+    <187>Clearnet</187>
+    <187>Clearnet Communications, Inc.</187>
+    <188>Clearnet</188>
+    <188>Clearnet Communications, Inc</188>
+    <189>Sierra</189>
+    <189>Sierra Cellular, Inc.</189>
+    <19>WITS</19>
+    <19>Washington Interagency Telecommunications Service</19>
+    <190>American Telco</190>
+    <190>American Telco, Inc</190>
+    <191>APT</191>
+    <191>American Portable Telecom</191>
+    <192>APT</192>
+    <192>American Portable Telecom</192>
+    <193>APT</193>
+    <193>American Portable Telecom</193>
+    <194>WorldCom</194>
+    <194>WorldCom</194>
+    <195>WorldCom</195>
+    <195>WorldCom</195>
+    <196>WorldCom</196>
+    <196>WorldCom</196>
+    <197>WorldCom</197>
+    <197>WorldCom</197>
+    <198>WorldCom</198>
+    <198>WorldCom</198>
+    <199>WorldCom</199>
+    <199>WorldCom</199>
+    <2>Standard</2>
+    <2>Standard Telephone Company</2>
+    <20>PBSI</20>
+    <20>Phone Base Systems, Inc.</20>
+    <200>WorldCom</200>
+    <200>WorldCom</200>
+    <201>WorldCom</201>
+    <201>WorldCom</201>
+    <202>WorldCom</202>
+    <202>WorldCom</202>
+    <203>Globoal Telemeida</203>
+    <203>Global Telemedia International Inc.</203>
+    <204>Bell Atlantic</204>
+    <204>Bell Atlantic NYNEX Mobile</204>
+    <205>Bell Atlantic</205>
+    <205>Bell Atlantic NYNEX Mobile</205>
+    <206>Bell Atlantic</206>
+    <206>Bell Atlantic NYNEX Mobile</206>
+    <207>Bell Atlantic</207>
+    <207>Bell Atlantic NYNEX Mobile</207>
+    <208>Bell Atlantic</208>
+    <208>Bell Atlantic NYNEX Mobile</208>
+    <209>Bell Atlantic</209>
+    <209>Bell Atlantic NYNEX Mobile</209>
+    <21>General</21>
+    <21>General Communication, Inc.</21>
+    <210>Bell Atlantic</210>
+    <210>Bell Atlantic NYNEX Mobile</210>
+    <211>Bell Atlantic</211>
+    <211>Bell Atlantic NYNEX Mobile</211>
+    <212>Headwaters</212>
+    <212>Headwaters Telephone Company</212>
+    <213>Wood Cty</213>
+    <213>Wood County Telephone Company</213>
+    <214>Pocket</214>
+    <214>Pocket Communications, Inc.</214>
+    <215>Bell Atlantic</215>
+    <215>Bell Atlantic - Virginia, Inc.</215>
+    <216>360</216>
+    <216>360 Communications</216>
+    <217>TeleBermuda</217>
+    <217>TeleBermuda International Ltd.</217>
+    <218>Cox</218>
+    <218>Cox Communication</218>
+    <219>Winstar</219>
+    <219>Winstar Telecommunications Group</219>
+    <22>CTI</22>
+    <22>CTI Telecom Inc.</22>
+    <220>MIDCOM</220>
+    <220>MIDCOM Communications, Inc.</220>
+    <221>Excel</221>
+    <221>Excel Switch Facility, Inc</221>
+    <222>Western Wireless</222>
+    <222>Western Wireless Corporation</222>
+    <223>TeleHub</223>
+    <223>TeleHub Network Services Corporation</223>
+    <224>IXC</224>
+    <224>IXC Communication, Inc</224>
+    <225>PrimeCo</225>
+    <225>PrimeCo Personal Communications</225>
+    <226>PrimeCo</226>
+    <226>PrimeCo Personal Communications</226>
+    <227>TPC</227>
+    <227>The Phone Company</227>
+    <228>Iridium</228>
+    <228>Iridium LLC</228>
+    <229>Teligent</229>
+    <229>Teligent</229>
+    <23>MetroNet</23>
+    <23>MetroNet Communication Group, Inc.</23>
+    <230>SpectraNet</230>
+    <230>SpectraNet Orange</230>
+    <231>US Xchange</231>
+    <231>US Xchange, L.L.C</231>
+    <232>Bell Atlantic</232>
+    <232>Bell Atlantic Mobile, Inc.</232>
+    <233>Bell Atlantic</233>
+    <233>Bell Atlantic Mobile, Inc.</233>
+    <234>Bell Atlantic</234>
+    <234>Bell Atlantic Mobile, Inc.</234>
+    <235>Bell Atlantic</235>
+    <235>Bell Atlantic Mobile, Inc.</235>
+    <236>Pac Bell</236>
+    <236>Pacific Bell Mobile Services</236>
+    <237>Oregon TSI</237>
+    <237>Oregon Telco Services, Inc</237>
+    <238>Telecorp</238>
+    <238>Telecorp Holding Corporation, Inc.</238>
+    <239>Magnacom</239>
+    <239>Magnacom, LLC dba PCS Plus, Inc</239>
+    <24>Roseville</24>
+    <24>Roseville Telephone Company</24>
+    <240>Global Naps</240>
+    <240>Global Naps</240>
+    <241>Trinton</241>
+    <241>Trinton PCS Inc.</241>
+    <242>Strikenet</242>
+    <242>Strikenet</242>
+    <243>Connect</243>
+    <243>Connect Holding Corporation</243>
+    <244>Network Plus</244>
+    <244>Network Plus</244>
+    <245>CapRock</245>
+    <245>CapRock Communications, Inc.</245>
+    <25>Rio</25>
+    <25>Rio Communications</25>
+    <26>WorldCom</26>
+    <26>WorldCom</26>
+    <27>Capital</27>
+    <27>Capital Telecom, Inc.</27>
+    <28>Transtel</28>
+    <28>Transtel Corporation</28>
+    <29>WorldCom</29>
+    <29>WorldCom</29>
+    <3>WorldCom</3>
+    <3>WorldCom</3>
+    <30>Frontier</30>
+    <30>Mid Atlantic/Frontier</30>
+    <31>LDM</31>
+    <31>Long Distance Management</31>
+    <32>Bhamas</32>
+    <32>Bhamas Telecommunications Corp</32>
+    <33>WorldCom</33>
+    <33>WorldCom</33>
+    <34>NDC</34>
+    <34>National Data Corporation</34>
+    <35>FTC</35>
+    <35>FTC Communications</35>
+    <36>Media One</36>
+    <36>Media One</36>
+    <37>Alascom</37>
+    <37>Alascom</37>
+    <38>Motorola</38>
+    <38>Motorola, Inc.</38>
+    <39>West Coast</39>
+    <39>West Coast Telecom</39>
+    <4>Schneider</4>
+    <4>Schneider Communications</4>
+    <40>LDS</40>
+    <40>Long Distance Savers, Inc./LDS</40>
+    <41>TELUS</41>
+    <41>TELUS Communications (Edmonton) Inc (TCE)</41>
+    <42>N Pittsburgh</42>
+    <42>North Pittsburgh Telephone Company</42>
+    <43>Rock Hill</43>
+    <43>Rock Hill Telephone Company</43>
+    <44>Teleglobe</44>
+    <44>Teleglobe Canada</44>
+    <45>Jamaica</45>
+    <45>Jamaica Telephone Company</45>
+    <46>Sugarland</46>
+    <46>Sugarland Telephone Company</46>
+    <47>Lakedale</47>
+    <47>Lakedale Telephone Company</47>
+    <48>Chillicothe</48>
+    <48>Chillicothe Telephone Company</48>
+    <49>N State</49>
+    <49>North State Telephone Company</49>
+    <5>WorldCom</5>
+    <5>WorldCom.</5>
+    <50>Pub. Service</50>
+    <50>Public Service Telephone Company</50>
+    <51>Cinc. Bell</51>
+    <51>Cincinnati Bell Long Distance</51>
+    <52>NTX</52>
+    <52>National Telephone Exchange/NTX</52>
+    <53>Lake States</53>
+    <53>Lake States Long Distance</53>
+    <54>NTF</54>
+    <54>National Telecom of Florida</54>
+    <55>D&amp;ET&amp;T</55>
+    <55>Denver &amp; Ephrata Telephone &amp; Telegraph</55>
+    <56>Vartec</56>
+    <56>VarTec National, Inc.</56>
+    <57>Eastern</57>
+    <57>Eastern Telephone</57>
+    <58>Tel.Express</58>
+    <58>Telephone Express</58>
+    <59>SNET</59>
+    <59>SNET Protocol Conversion</59>
+    <6>ACC</6>
+    <6>ACC Long Distance Corporation</6>
+    <60>E Ascension</60>
+    <60>East Ascension Telephone Company, Inc.</60>
+    <61>Codetel</61>
+    <61>Codetel</61>
+    <62>Kerrville</62>
+    <62>Kerrville Telephone Company</62>
+    <63>Barry Cty</63>
+    <63>Barry County Telephone Company</63>
+    <64>CALNET</64>
+    <64>CALNET</64>
+    <65>D&amp;ET&amp;T</65>
+    <65>Denver &amp; Ephrata Telephone &amp; Telegraph</65>
+    <66>D&amp;ET&amp;T</66>
+    <66>Denver &amp; Ephrata Telephone &amp; Telegraph</66>
+    <67>Network Svcs.</67>
+    <67>Network Services</67>
+    <68>Redwood Cty</68>
+    <68>Redwood County Telephone Company/Clements Telephone Company</68>
+    <69>Hargray</69>
+    <69>Horry Telephone/Hargray Telephone</69>
+    <7>Southernet</7>
+    <7>Southernet</7>
+    <70>Hargray</70>
+    <70>Horry Telephone/Hargray Telephone</70>
+    <71>Hargray</71>
+    <71>Horry Telephone/Hargray Telephone</71>
+    <72>Hargray</72>
+    <72>Horry Telephone/Hargray Telephone</72>
+    <73>CommuniGroup</73>
+    <73>CommuniGroup, Inc.</73>
+    <74>Concord</74>
+    <74>The Concord Telephone Company</74>
+    <75>Concord</75>
+    <75>The Concord Telephone Company</75>
+    <76>Concord</76>
+    <76>The Concord Telephone Company</76>
+    <77>Concord</77>
+    <77>The Concord Telephone Company</77>
+    <78>W Kentucky R</78>
+    <78>West Kentucky Rural Telephone Cooperative</78>
+    <79>Pioneer</79>
+    <79>Pioneer Telephone Association</79>
+    <8>Teleconnect</8>
+    <8>Teleconnect Company</8>
+    <80>Duo Cty</80>
+    <80>Duo County Telephone Cooperative Corporation</80>
+    <81>CFW</81>
+    <81>CFW Telephone</81>
+    <82>Lufkin-Conroe</82>
+    <82>Lufkin-Conroe Telephone Exch., Inc.</82>
+    <83>Lufkin-Conroe</83>
+    <83>Lufkin-Conroe Telephone Exch., Inc.</83>
+    <84>Lufkin-Conroe</84>
+    <84>Lufkin-Conroe Telephone Exch., Inc.</84>
+    <85>Puerto Rico</85>
+    <85>Puerto Rico Telephone Company</85>
+    <86>Puerto Rico</86>
+    <86>Puerto Rico Telephone Company</86>
+    <87>Puerto Rico</87>
+    <87>Puerto Rico Telephone Company</87>
+    <88>Illinois Cons.</88>
+    <88>Illinois Consolidated Telephone Company</88>
+    <89>Westinghouse</89>
+    <89>Westinghouse Communications</89>
+    <9>WorldCom</9>
+    <9>WorldCom</9>
+    <90>Anchorage</90>
+    <90>Anchorage Telephone Utility</90>
+    <91>U S WEST</91>
+    <91>U S WEST New Vector Group</91>
+    <92>U S WEST</92>
+    <92>U S WEST New Vector Group</92>
+    <93>U S WEST</93>
+    <93>U S WEST New Vector Group</93>
+    <94>U S WEST</94>
+    <94>U S WEST New Vector Group</94>
+    <95>Lakedale</95>
+    <95>Lakedale Telephone Company</95>
+    <96>Lakedale</96>
+    <96>Lakedale Telephone Company</96>
+    <97>Lakedale</97>
+    <97>Lakedale Telephone Company</97>
+    <98>C Texas</98>
+    <98>Central Texas Telephone Cooperative</98>
+    <99>C Texas</99>
+    <99>Central Texas Telephone Cooperative</99>
+  </1>
+  <2></2>
+  <208>GST</208>
+  <208>GST Telecom</208>
+  <209>BellSouth</209>
+  <209>BellSouth Enterprises</209>
+  <210>NextWave</210>
+  <210>NextWave Telecom</210>
+  <211>Omnipoint</211>
+  <211>Omnipoint Communications Inc.</211>
+  <212>Teleglobe</212>
+  <212>Teleglobe USA</212>
+  <213>Mobility Canada</213>
+  <213>Mobility Canada</213>
+  <214>Sprint</214>
+  <214>Sprint Spectrum L.P.</214>
+  <215>AT&amp;T</215>
+  <215>AT&amp;T</215>
+  <216>MCI</216>
+  <216>MCImetro</216>
+  <217>ICG</217>
+  <217>ICG Network Services</217>
+  <218>Citizens</218>
+  <218>Citizens Telecom</218>
+  <219>Nextel</219>
+  <219>Nextel (Was OneComm, Inc.)</219>
+  <220>SWB</220>
+  <220>Southwestern Bell Mobile Systems</220>
+  <221>CTIA</221>
+  <221>CTIA</221>
+  <222>MEANS/INS/SDN</222>
+  <222>MEANS/INS/SDN</222>
+  <223>TDS</223>
+  <223>TDS TELECOM</223>
+  <224>Cinc, Bell</224>
+  <224>Cincinnati Bell Telephone</224>
+  <225>Lincoln</225>
+  <225>Lincoln Telephone Company</225>
+  <226>Cantel</226>
+  <226>Cantel</226>
+  <227>NACN</227>
+  <227>North American Cellular Network</227>
+  <228>PacTel</228>
+  <228>Pacific Telecom</228>
+  <229>TEST</229>
+  <229>TEST CODE (T1S1)</229>
+  <230>Sprint</230>
+  <230>Sprint Local Telecommunications Division</230>
+  <231>AT&amp;T</231>
+  <231>AT&amp;T (VSN)</231>
+  <232>Century</232>
+  <232>Century Telephone Enterprises, Inc.</232>
+  <233>Frontier</233>
+  <233>Frontier Communications Int'l, Inc.</233>
+  <234>ALLTEL</234>
+  <234>ALLTEL</234>
+  <235>CONTEL</235>
+  <235>CONTEL (GTE Wireless)</235>
+  <236>AT&amp;T Canada</236>
+  <236>AT&amp;T Canada Long Distance Services</236>
+  <237>C&amp;W</237>
+  <237>Cable &amp; Wireless</237>
+  <238>Independent</238>
+  <238>Independent Telecommunications Network</238>
+  <239>Sprint</239>
+  <239>Sprint Local Telecommunications Division</239>
+  <240>GTE</240>
+  <240>GTE Service Corporation</240>
+  <241>Defense</241>
+  <241>Defense Communications Agency</241>
+  <242>Allnet</242>
+  <242>Allnet Communications Services, Inc.</242>
+  <243>SNET</243>
+  <243>Southern New England Telephone</243>
+  <244>MCI</244>
+  <244>MCI Telecommunications Corporation</244>
+  <245>AT&amp;T Canada</245>
+  <245>AT&amp;T Canada Long Distance Services</245>
+  <246>Bell Atlantic</246>
+  <246>Bell Atlantic</246>
+  <247>NYNEX</247>
+  <247>NYNEX</247>
+  <248>U S WEST</248>
+  <248>U S WEST Communications</248>
+  <249>SWB</249>
+  <249>Southwestern Bell Telephone</249>
+  <250>Ameritech</250>
+  <250>Ameritech Services</250>
+  <251>PacificTelesis</251>
+  <251>PacificTelesis</251>
+  <252>BellSouth</252>
+  <252>BellSouth</252>
+  <253>US SPRINT</253>
+  <253>US SPRINT</253>
+  <254>AT&amp;T</254>
+  <254>AT&amp;T Communications</254>
+  <3></3>
+  <4></4>
+  <5 name="1">
+    <104>Chesnee</104>
+    <104>Chesnee Telephone Company</104>
+    <108>Access</108>
+    <108>Access Long Distance</108>
+    <112>La Fourche</112>
+    <112>La Fourche Telephone Company</112>
+    <116>Evans</116>
+    <116>Evans Telephone Company</116>
+    <12>National</12>
+    <12>National Telephone</12>
+    <120>JBN</120>
+    <120>JBN Telephone Company, Inc.</120>
+    <124>Iowa</124>
+    <124>Iowa Communications Network</124>
+    <128>Roanoke</128>
+    <128>Roanoke Telephone Company</128>
+    <132>IEX</132>
+    <132>IEX's Corporation</132>
+    <136>Telefonica</136>
+    <136>Telefonica Larga Distancia</136>
+    <140>Nat'l AL</140>
+    <140>National Telephone of Alabama</140>
+    <144>Sears</144>
+    <144>Sears Technology Services</144>
+    <148>PHone One</148>
+    <148>Phone One</148>
+    <152>Orwell</152>
+    <152>Orwell Telephone Company</152>
+    <156>Call-Net</156>
+    <156>Call-Net Telecom, Ltd.</156>
+    <160>Fort Bend</160>
+    <160>Fort Bend Telephone Company</160>
+    <164>Capital</164>
+    <164>Capital Network Systems, Inc.</164>
+    <168>Northwestel</168>
+    <168>Northwestel, Inc.</168>
+    <172>Northwestel</172>
+    <172>Northwestel, Inc.</172>
+    <176>Gulf</176>
+    <176>Gulf Telephone Company</176>
+    <180>Florala</180>
+    <180>Florala Telephone Company</180>
+    <184>Marianna</184>
+    <184>Marianna and Scenery Hill Telephone Company</184>
+    <188>Panhandle</188>
+    <188>Panhandle Telephone Cooperative</188>
+    <192>Panhandle</192>
+    <192>Panhandle Telephone Cooperative</192>
+    <196>Panhandle</196>
+    <196>Panhandle Telephone Cooperative</196>
+    <20>Nat'l Austin</20>
+    <20>National Telecommunications of Austin</20>
+    <200>Peoples Mutual</200>
+    <200>Peoples Mutual Telephone Company</200>
+    <204>Bell Atlantic</204>
+    <204>Bell Atlantic Mobile Systems</204>
+    <208>Logan</208>
+    <208>Logan Telephone Cooperative</208>
+    <212>TresCom</212>
+    <212>TresCom U.S.A., Inc.</212>
+    <216>Rochester</216>
+    <216>Rochester Telephone Company</216>
+    <220>Ponderosa</220>
+    <220>Ponderosa Telephone Company</220>
+    <224>Ponderosa</224>
+    <224>Ponderosa Telephone Company</224>
+    <228>Ponderosa</228>
+    <228>Ponderosa Telephone Company</228>
+    <232>Ellijay</232>
+    <232>Ellijay Telephone Company</232>
+    <236>American</236>
+    <236>American Telephone Company, Inc.</236>
+    <24>WorldCom</24>
+    <24>WorldCom</24>
+    <240>Loretto</240>
+    <240>Loretto Telephone Company, Inc.</240>
+    <244>Millry</244>
+    <244>Millry Telephone Company, Inc.</244>
+    <248>NW Indiana</248>
+    <248>Northwestern Indiana Telephone Company</248>
+    <252>Pond Branch</252>
+    <252>Pond Branch Telephone Company, Inc.</252>
+    <256>Cleartel</256>
+    <256>Cleartel Communications</256>
+    <28>SIS</28>
+    <28>Southern Interexchange Services, Inc.</28>
+    <32>NTS</32>
+    <32>NTS Communications</32>
+    <36>Digital Ntwk</36>
+    <36>Digital Network, Inc.</36>
+    <4>Business</4>
+    <4>Business Telecom</4>
+    <40>ATX</40>
+    <40>ATX Telecommunications Services</40>
+    <48>NNC</48>
+    <48>National Network Corporation</48>
+    <52>Startel</52>
+    <52>Startel</52>
+    <56>TMC</56>
+    <56>TMC of San Diego</56>
+    <64>CNI</64>
+    <64>CNI</64>
+    <72>Wilkes</72>
+    <72>Wilkes Telephone &amp; Electric Company</72>
+    <76>Sandhill</76>
+    <76>Sandhill Telephone Coop</76>
+    <8>WorldCom</8>
+    <8>WorldCom</8>
+    <80>Chester</80>
+    <80>Chester Telephone Company</80>
+    <84>St. Joseph</84>
+    <84>St. Joseph Telephone Company</84>
+    <88>Interstate</88>
+    <88>Interstate Telephone Company</88>
+    <92>Vista-United</92>
+    <92>Vista-United Telcom</92>
+    <96>Brandenburg</96>
+    <96>Brandenburg Telephone Company</96>
+  </5>
+  <5 name="10">
+    <100>Pac-West</100>
+    <100>Pac-West Telecomm, Inc. dba AmeriCall</100>
+    <112>Clay Cty</112>
+    <112>Clay County Rural Telephone Cooperative, Inc.</112>
+    <116>Clay Cty</116>
+    <116>Clay County Rural Telephone Cooperative, Inc.</116>
+    <12>Great Plains</12>
+    <12>Great Plains Communications</12>
+    <120>CCI</120>
+    <120>Communication Consultants, Inc.</120>
+    <124>Mornington</124>
+    <124>Mornington Municipal Telephone System</124>
+    <128>Blanchard</128>
+    <128>Blanchard Municipal Telephone System</128>
+    <132>Citizens</132>
+    <132>Citizens Telephone</132>
+    <136>Siren</136>
+    <136>Siren Telephone Company, Inc.</136>
+    <140>TimeWarner</140>
+    <140>TimeWarner Communications</140>
+    <144>TimeWarner</144>
+    <144>TimeWarner Communications</144>
+    <148>Minkfort</148>
+    <148>Minkfort Intelligent Network</148>
+    <152>Surry</152>
+    <152>Surry Telephone Membership Corporation</152>
+    <156>Surry</156>
+    <156>Surry Telephone Membership Corporation</156>
+    <16>Great Plains</16>
+    <16>Great Plains Communications</16>
+    <160>Wes-Tex</160>
+    <160>Wes-Tex Telephone Cooperative Inc.</160>
+    <164>Cypress</164>
+    <164>Cypress Telecommunications, Inc./Cytel.</164>
+    <168>Cypress</168>
+    <168>Cypress Telecommunications, Inc./Cytel</168>
+    <172>Cypress</172>
+    <172>Cypress Telecommunications, Inc./Cytel</172>
+    <176>LaJicarita R</176>
+    <176>LaJicarita Rural Telephone Coop</176>
+    <180>Rye</180>
+    <180>Rye Telephone Company</180>
+    <184>Alma</184>
+    <184>Alma Telephone Company</184>
+    <188>Cal-North</188>
+    <188>Cal-North Cellular</188>
+    <192>Five Area</192>
+    <192>Five Area Telephone Cooperative, Inc.</192>
+    <196>Eastex</196>
+    <196>Eastex Telephone Cooperative, Inc.</196>
+    <20>Great Plains</20>
+    <20>Great Plains Communications</20>
+    <200>Wood Cty</200>
+    <200>Wood County Telephone Company</200>
+    <204>La Compagnie</204>
+    <204>La Compagnie de Tel. de Warwick</204>
+    <208>Amtelecom</208>
+    <208>Amtelecom, Inc.</208>
+    <212>Granby</212>
+    <212>Granby Telephone Company</212>
+    <216>CellularONE</216>
+    <216>CellularONE</216>
+    <220>Thrifty</220>
+    <220>Thrifty Telephone, Inc.</220>
+    <224>Kaplan</224>
+    <224>Kaplan Telephone Company</224>
+    <228>SW Texas</228>
+    <228>Southwest Texas Telephone Company</228>
+    <232>Shawnee</232>
+    <232>Shawnee Telephone Company</232>
+    <236>S Canaan</236>
+    <236>South Canaan Telephone Company</236>
+    <24>Great Plains</24>
+    <24>Great Plains Communications</24>
+    <240>ATG</240>
+    <240>American Telephone Group</240>
+    <244>Bruce</244>
+    <244>Bruce Municipal Telephone System</244>
+    <248>MTC</248>
+    <248>MTC Telemanagement</248>
+    <252>MTC</252>
+    <252>MTC</252>
+    <256>Great Plains</256>
+    <256>Great Plains Communications</256>
+    <28>Northland</28>
+    <28>Northland Telephone</28>
+    <32>Brooke</32>
+    <32>Brooke Municipal Telephone System</32>
+    <36>LCT</36>
+    <36>LCT Long Distance</36>
+    <4>Great Plains</4>
+    <4>Great Plains Communications</4>
+    <40>Cablevision</40>
+    <40>Cablevision</40>
+    <44>Oxford City</44>
+    <44>Oxford City Telephone and Telegraph Company</44>
+    <48>Oxford City</48>
+    <48>Oxford City Telephone and Telegraph Company</48>
+    <52>Oxford City</52>
+    <52>Oxford City Telephone and Telegraph Company</52>
+    <56>Logan</56>
+    <56>Logan Telephone Cooperative, Inc</56>
+    <60>Logan</60>
+    <60>Logan Telephone Cooperative, Inc</60>
+    <64>ETI</64>
+    <64>Executive TeleCard International</64>
+    <68>Farmers</68>
+    <68>Farmers Telephone</68>
+    <7>Great Plains</7>
+    <7>Great Plains Communications</7>
+    <72>S C Utah</72>
+    <72>South Central Utah Telephone Association</72>
+    <76>Griggs City</76>
+    <76>Griggs City Telephone Company</76>
+    <80>Teltrust</80>
+    <80>Teltrust</80>
+    <84>Teltrust</84>
+    <84>Teltrust</84>
+    <88>Western</88>
+    <88>Western Telephone Company</88>
+    <92>Tidewater</92>
+    <92>Tidewater Telecom</92>
+    <96>Glens Falls</96>
+    <96>Glens Falls Communications Corporation</96>
+  </5>
+  <5 name="11">
+    <100>Hyperion</100>
+    <100>Hyperion Telecommunications, Inc.</100>
+    <104>Hyperion</104>
+    <104>Hyperion Telecommunications, Inc.</104>
+    <108>Brantley</108>
+    <108>Brantley Telephone Company</108>
+    <112>TelRoute</112>
+    <112>TelRoute Communications, Inc.</112>
+    <116>TelRoute</116>
+    <116>TelRoute Communications, Inc.</116>
+    <120>Star</120>
+    <120>Star Telephone</120>
+    <124>Star</124>
+    <124>Star Telephone</124>
+    <128>Star</128>
+    <128>Star Telephone</128>
+    <132>S Carolina Net</132>
+    <132>South Carolina Net, Inc.</132>
+    <136>Armour Ind.</136>
+    <136>Armour Independent Telephone Company</136>
+    <140>Union</140>
+    <140>Union Telephone Company</140>
+    <144>Baldwin</144>
+    <144>Baldwin Telecom, Inc.</144>
+    <148>Cass Cty</148>
+    <148>Cass County Telephone Company</148>
+    <152>C-R</152>
+    <152>C-R Telephone Company</152>
+    <156>ETC</156>
+    <156>Eastern TeleLogic Corporation</156>
+    <160>Tri-County</160>
+    <160>Tri-County Telephone Cooperative</160>
+    <164>Citizens</164>
+    <164>Citizens Telephone Company</164>
+    <168>M Adams</168>
+    <168>Marquette Adams Telephone Cooperative</168>
+    <172>St. Liboire</172>
+    <172>Le Tel de St. Liboire</172>
+    <176>Bestline</176>
+    <176>Austin Bestline</176>
+    <180>N Dakota</180>
+    <180>North Dakota Telephone Company</180>
+    <184>TSC</184>
+    <184>Telecommunications Service Center, Inc (TSC)</184>
+    <188>TSC</188>
+    <188>Telecommunications Service Center, Inc (TSC)</188>
+    <192>Elec Lightwave</192>
+    <192>Electric Lightwave, Inc.</192>
+    <196>Elec Lightwave</196>
+    <196>Electric Lightwave, Inc.</196>
+    <20>Econophone</20>
+    <20>Econophone Inc.</20>
+    <204>Lansdowne R</204>
+    <204>Lansdowne Rural Telephone Company Ltd.</204>
+    <208>People's</208>
+    <208>People's Telephone Company of Forest Ltd.</208>
+    <212>Home</212>
+    <212>Home Telephone Company, Inc.</212>
+    <216>Commnet</216>
+    <216>Commnet Cellular</216>
+    <220>Commnet</220>
+    <220>Commnet Cellular</220>
+    <224>Commnet</224>
+    <224>Commnet Cellular</224>
+    <228>ISI</228>
+    <228>ISI Telecommunications</228>
+    <232>Pulaski-White</232>
+    <232>Pulaski-White Telephone Company</232>
+    <236>Oregon F M</236>
+    <236>Oregon Farmers Mutual Telephone Company</236>
+    <24>Econophone</24>
+    <24>Econophone Inc.</24>
+    <240>Mulberry Coop</240>
+    <240>Mulberry Cooperative Telephone Company, Inc.</240>
+    <244>ITC</244>
+    <244>International Telecomm. Corporation</244>
+    <248>Mountaineer</248>
+    <248>Mountaineer Long Distance, Inc.</248>
+    <252>Champaign</252>
+    <252>Champaign Telephone Company</252>
+    <256>Winn</256>
+    <256>Winn Telephone Company</256>
+    <28>Econophone</28>
+    <28>Econophone Inc.</28>
+    <32>SE IN R</32>
+    <32>Southeastern IN Rural Telephone Cooperative Inc.</32>
+    <36>Leaco R</36>
+    <36>Leaco Rural Telephone Cooperative, Inc.</36>
+    <4>Orwell</4>
+    <4>Orwell Telephone Company</4>
+    <40>Mt. Horeb</40>
+    <40>Mt. Horeb Telephone Company</40>
+    <44>Otelco</44>
+    <44>Otelco</44>
+    <48>CallAmerica</48>
+    <48>CallAmerica</48>
+    <52>CallAmerica</52>
+    <52>CallAmerica</52>
+    <56>Alhambra-G</56>
+    <56>Alhambra-Grantfork Telephone Company</56>
+    <60>Grafton</60>
+    <60>Grafton Telephone Company</60>
+    <64>Home</64>
+    <64>Home Telephone Company</64>
+    <68>McDonald</68>
+    <68>McDonald Telephone Company</68>
+    <72>McLeod</72>
+    <72>McLeod Network Services</72>
+    <76>Westphalia</76>
+    <76>Westphalia Telephone Company</76>
+    <8>CellularOne</8>
+    <8>CellularOne (Puerto Rico)</8>
+    <80>Amherst</80>
+    <80>Amherst Telephone Company</80>
+    <84>Carr</84>
+    <84>Carr Telephone</84>
+    <88>Carr</88>
+    <88>Carr Telephone</88>
+    <92>Cyberlink</92>
+    <92>Cyberlink</92>
+    <96>Pine Drive</96>
+    <96>Pine Drive Telephone Company</96>
+  </5>
+  <5 name="12">
+    <100>Fulton</100>
+    <100>Fulton Telephone Company, Inc.</100>
+    <104>Brazos</104>
+    <104>Brazos Telephone Cooperative, Inc.</104>
+    <108>McNabb</108>
+    <108>McNabb Telephone Company</108>
+    <112>Cam-Net</112>
+    <112>Cam-Net Communications, Inc.</112>
+    <116>El Paso</116>
+    <116>El Paso Telephone Company</116>
+    <12>Kennebec</12>
+    <12>Kennebec Telephone Company</12>
+    <120>Primus</120>
+    <120>Primus Telecommunications</120>
+    <124>Riviera</124>
+    <124>Riviera Telephone Company Inc.</124>
+    <128>Northern</128>
+    <128>Northern Telephone Cooperative, Inc.</128>
+    <132>Chickamauga</132>
+    <132>Chickamauga Telephone Company</132>
+    <136>Mid-Maine</136>
+    <136>Mid-Maine Telecom</136>
+    <140>Mid-Maine</140>
+    <140>Mid-Maine Telecom</140>
+    <144>CellularONE</144>
+    <144>CellularONE</144>
+    <148>WesTel</148>
+    <148>WesTel Telecommunications, Ltd.</148>
+    <152>TSI</152>
+    <152>Telecommunication Services, Inc.</152>
+    <156>Vermont</156>
+    <156>Vermont Telephone Company, Inc.</156>
+    <16>Feist</16>
+    <16>Feist Long Distance</16>
+    <160>Swayzee</160>
+    <160>Swayzee Telephone Company, Inc.</160>
+    <164>Sweetser</164>
+    <164>Sweetser Telephone Company, Inc.</164>
+    <168>Bixby</168>
+    <168>Bixby Telephone Company</168>
+    <172>Champlain Vly</172>
+    <172>Champlain Valley Telecom</172>
+    <176>Champlain Vly</176>
+    <176>Champlain Valley Telecom</176>
+    <180>Cellcom</180>
+    <180>Mobile Telephone Switching Office/Cellcom</180>
+    <184>ESS</184>
+    <184>ESS Ventures</184>
+    <188>NE Louisana</188>
+    <188>Northeast Louisana Telephone Company</188>
+    <192>AmeriVision</192>
+    <192>AmeriVision Communications Inc.</192>
+    <196>AmeriVision</196>
+    <196>AmeriVision Communications, Inc.</196>
+    <20>Cherry</20>
+    <20>Cherry Communications</20>
+    <200>Blanca</200>
+    <200>Blanca Telephone Company</200>
+    <204>Lavaca</204>
+    <204>Lavaca Telephone Company, Inc.</204>
+    <208>Five Star</208>
+    <208>Five Star Telecom</208>
+    <212>Orwell</212>
+    <212>Orwell Telephone Company</212>
+    <216>Bascom M</216>
+    <216>Bascom Mutual Telephone Company</216>
+    <220>Delcambre</220>
+    <220>Delcambre Telephone Company</220>
+    <224>Bloomingdale</224>
+    <224>Bloomingdale Telephone Company, Inc.</224>
+    <228>Cellular One</228>
+    <228>Cellular One (Kansas City)</228>
+    <232>Scherers</232>
+    <232>Scherers Communication Group, Inc.</232>
+    <236>Scherers</236>
+    <236>Scherers Communication Group, Inc.</236>
+    <24>Cherry</24>
+    <24>Cherry Communications</24>
+    <240>Cowiche</240>
+    <240>Cowiche Telephone</240>
+    <244>RT</244>
+    <244>RT Communications</244>
+    <248>RT</248>
+    <248>RT Communications</248>
+    <252>Seneca</252>
+    <252>Seneca Telephone Company</252>
+    <256>CTI</256>
+    <256>Communication Telesystems, Int'l</256>
+    <28>S Plains</28>
+    <28>South Plains Telephone Cooperative, Inc.</28>
+    <32>Hollis</32>
+    <32>Hollis Telephone Company</32>
+    <36>IXC</36>
+    <36>IXC Long Distance, Inc.</36>
+    <4>CTI</4>
+    <4>Communication Telesystems, Int'l</4>
+    <40>IXC</40>
+    <40>IXC Long Distance, Inc.</40>
+    <44>Premiere</44>
+    <44>Premiere Comm.</44>
+    <48>LDN</48>
+    <48>Long Distance Network</48>
+    <52>Council Grove</52>
+    <52>Council Grove Telephone Company</52>
+    <56>Sledge</56>
+    <56>Sledge Telephone Company</56>
+    <60>CTI</60>
+    <60>Com Tech International</60>
+    <64>CapRock</64>
+    <64>CapRock Communications</64>
+    <68>Telenational</68>
+    <68>Telenational Communications</68>
+    <72>Baraga</72>
+    <72>Baraga Telephone Company</72>
+    <76>American Per.</76>
+    <76>American Personal Communications</76>
+    <8>Fresh Start</8>
+    <8>Fresh Start Communications</8>
+    <80>Merrimack Cty</80>
+    <80>Merrimack County Telephone</80>
+    <84>Contoocook Vly</84>
+    <84>Contoocook Valley Telephone</84>
+    <88>Contoocook Vly</88>
+    <88>Contoocook Valley Telephone</88>
+    <92>Phillips Cty</92>
+    <92>Phillips County Telephone Company</92>
+    <96>T-One</96>
+    <96>T-One Corporation</96>
+  </5>
+  <5 name="13">
+    <100>Tri-County</100>
+    <100>Tri-County Telephone Membership Corporation</100>
+    <104>Crossville</104>
+    <104>Crossville Communications, Inc.</104>
+    <108>Dell Coop</108>
+    <108>Dell Telephone Cooperative</108>
+    <112>Automated</112>
+    <112>Automated Communications, Inc.</112>
+    <116>Noonan F</116>
+    <116>Noonan Farmers Telephone Company</116>
+    <12>STAR</12>
+    <12>STAR Telecommunications, Inc.</12>
+    <120>Telco</120>
+    <120>Telco Communications Group</120>
+    <124>New Florence</124>
+    <124>New Florence Telephone Company</124>
+    <128>N Central</128>
+    <128>North Central Telephone Cooperative</128>
+    <132>Farber</132>
+    <132>Farber Telephone Company</132>
+    <136>Northwest</136>
+    <136>Northwest Communications Cooperative</136>
+    <140>ITS</140>
+    <140>ITS</140>
+    <144>Intercel</144>
+    <144>Intercel</144>
+    <148>Valliant</148>
+    <148>Valliant Telephone Company</148>
+    <152>LDM</152>
+    <152>LDM, Inc.</152>
+    <156>Star</156>
+    <156>Star Telephone Company</156>
+    <16>Access</16>
+    <16>Access Long Distance</16>
+    <160>Georgia</160>
+    <160>Georgia Telephone Corporation</160>
+    <164>Carib</164>
+    <164>Carib Comm, L.P.</164>
+    <168>Cherry</168>
+    <168>Cherry Communications</168>
+    <172>Cherry</172>
+    <172>Cherry Communications</172>
+    <176>Valu-Line</176>
+    <176>Valu-Line</176>
+    <180>C Utah</180>
+    <180>Central Utah Telephone, Inc.</180>
+    <184>TelAmerica</184>
+    <184>TelAmerica Long Distance</184>
+    <188>Thrifty</188>
+    <188>Thrifty Call, Inc. L.D.</188>
+    <192>Thrifty</192>
+    <192>Thrifty Call, Inc. L.D.</192>
+    <196>IT Group</196>
+    <196>The I.T. Group</196>
+    <20>C-P Hill</20>
+    <20>Compti-Pleasant Hill Telephone Company</20>
+    <200>Mid-Plains R</200>
+    <200>Mid-Plains Rural Telephone Cooperative, Inc.</200>
+    <204>Direct Net</204>
+    <204>Direct Net Telecommunications</204>
+    <208>Dallas NextFone</208>
+    <208>Dallas NextFone Systems, LC</208>
+    <212>State LD</212>
+    <212>State Long Distance Telephone Company</212>
+    <216>Dobson</216>
+    <216>Dobson Telephone Company</216>
+    <220>McLoud</220>
+    <220>McLoud Telephone Company</220>
+    <224>Tri-County</224>
+    <224>Tri-County Telephone Company, Inc.</224>
+    <228>Tri-County</228>
+    <228>Tri-County Telephone Company, Inc.</228>
+    <232>Rock Cty</232>
+    <232>Rock County Telephone Company</232>
+    <236>E Nebraska</236>
+    <236>Eastern Nebraska Telephone Company</236>
+    <24>C Arkansas</24>
+    <24>Central Arkansas Telephone Cooperative, Inc.</24>
+    <240>Chariton Vly</240>
+    <240>Chariton Valley Telephone Corporation</240>
+    <244>Pennsylvania</244>
+    <244>Pennsylvania Telephone Company</244>
+    <248>Pineland</248>
+    <248>Pineland Telephone Cooperative, Inc.</248>
+    <252>Jones Intercable</252>
+    <252>Jones Intercable</252>
+    <256>Goodman</256>
+    <256>Goodman Telephone Company</256>
+    <28>N. Renfrew</28>
+    <28>N. Renfrew Telephone Company, Ltd.</28>
+    <32>Westport</32>
+    <32>Westport Telephone Company, Ltd.</32>
+    <36>Harold</36>
+    <36>Harold Telephone Company</36>
+    <4>Frontenac</4>
+    <4>Frontenac Telephone Company</4>
+    <40>National</40>
+    <40>National Communications Association</40>
+    <44>Nelson Ball</44>
+    <44>Nelson Ball Ground Telephone Company</44>
+    <48>Brindlee Mtn.</48>
+    <48>Brindlee Mtn. Telephone Company</48>
+    <52>Hill Cty</52>
+    <52>Hill Country Telephone Cooperative, Inc.</52>
+    <56>Hill Cty</56>
+    <56>Hill Country Telephone Cooperative, Inc.</56>
+    <60>Hill Cty</60>
+    <60>Hill Country Telephone Cooperative, Inc.</60>
+    <64>STS</64>
+    <64>Specialized Telecommunication Services</64>
+    <68>Upton</68>
+    <68>Upton, Inc. (La Cie de Telephone)</68>
+    <72>Valcourt</72>
+    <72>Valcourt (Co-op de Telephone de)</72>
+    <76>Milot</76>
+    <76>Telephone Milot, Inc.</76>
+    <8>Harold</8>
+    <8>Harold Telephone Company</8>
+    <80>Athena</80>
+    <80>Athena International L.L.C.</80>
+    <84>Athena</84>
+    <84>Athena International L.L.C.</84>
+    <88>Athena</88>
+    <88>Athena International L.L.C.</88>
+    <92>Tecnet</92>
+    <92>Tecnet, Inc.</92>
+    <96>Tecnet</96>
+    <96>Tecnet, Inc.</96>
+  </5>
+  <5 name="14">
+    <100>JBN</100>
+    <100>JBN Telephone Company, Inc.</100>
+    <104>Qwest</104>
+    <104>Qwest Communications</104>
+    <108>Qwest</108>
+    <108>Qwest Communications</108>
+    <112>Qwest</112>
+    <112>Qwest Communications</112>
+    <116>Kadoka</116>
+    <116>Kadoka Telephone Company</116>
+    <12>Voyager</12>
+    <12>Voyager Networks, Inc</12>
+    <120>Dominican</120>
+    <120>Dominican Communications</120>
+    <124>SITA</124>
+    <124>SITA</124>
+    <128>Beresford Mun</128>
+    <128>Beresford Municipal Telephone Company</128>
+    <132>Table Top</132>
+    <132>Table Top Telephone Company, Inc.</132>
+    <136>Table Top</136>
+    <136>Table Top Telephone Company, Inc.</136>
+    <140>Lipan</140>
+    <140>Lipan Telephone Company, Inc.</140>
+    <144>Centennial</144>
+    <144>Centennial Cellular Corporation</144>
+    <148>Coast to Coast</148>
+    <148>Coast to Coast</148>
+    <152>Cooperative</152>
+    <152>Cooperative Communications Inc.</152>
+    <156>Egyptian</156>
+    <156>Egyptian Telephone Cooperative</156>
+    <16>Apollo</16>
+    <16>Apollo Telecom</16>
+    <160>MICL</160>
+    <160>MICL</160>
+    <164>Searsboro</164>
+    <164>Searsboro Telephone Company</164>
+    <168>US WATS</168>
+    <168>US WATS</168>
+    <172>Sprint</172>
+    <172>Sprint Cellular</172>
+    <176>Sprint</176>
+    <176>Sprint Cellular</176>
+    <180>Sprint</180>
+    <180>Sprint Cellular</180>
+    <184>Ellington</184>
+    <184>Ellington Telephone Company</184>
+    <188>Ellington</188>
+    <188>Ellington Telephone Company</188>
+    <192>Telnex</192>
+    <192>Telnex, Inc.</192>
+    <196>Telnex</196>
+    <196>Telnex, Inc.</196>
+    <20>Apollo</20>
+    <20>Apollo Telecom</20>
+    <200>Atlantic</200>
+    <200>Atlantic Cellular Company, L.P.</200>
+    <204>TCAST</204>
+    <204>TCAST Communications, Inc.</204>
+    <208>TCAST</208>
+    <208>TCAST Communications, Inc.</208>
+    <212>TCAST</212>
+    <212>TCAST Communications, Inc.</212>
+    <216>Liberty</216>
+    <216>Liberty Cellular, Inc.</216>
+    <220>Geetingsville</220>
+    <220>Geetingsville Telepone Company, Inc.</220>
+    <224>Laurel H</224>
+    <224>Laurel Highland Telephone Company</224>
+    <228>Nokia</228>
+    <228>Nokia Telecom</228>
+    <232>FCI</232>
+    <232>FCI Int'l</232>
+    <236>Huron</236>
+    <236>Huron Telecomm.Cooperative</236>
+    <24>Sprint</24>
+    <24>Sprint Cellular</24>
+    <240>Hay</240>
+    <240>Hay Communications Cooperative</240>
+    <244>KCTC</244>
+    <244>KCTC</244>
+    <248>Mosinee</248>
+    <248>Mosinee Telephone Company</248>
+    <252>Montrose</252>
+    <252>Montrose Mutual Telephone Company</252>
+    <28>Merchants &amp; F</28>
+    <28>Merchants &amp; Farmers Telephone Company</28>
+    <32>Choctaw</32>
+    <32>Choctaw Telephone Company</32>
+    <36>W Wireless</36>
+    <36>Western Wireless</36>
+    <4>Voyager</4>
+    <4>Voyager Networks, Inc</4>
+    <40>W Wireless</40>
+    <40>Western Wireless</40>
+    <44>W Wireless</44>
+    <44>Western Wireless</44>
+    <48>Kallback</48>
+    <48>Kallback</48>
+    <52>Kallback</52>
+    <52>Kallback</52>
+    <56>Kallback</56>
+    <56>Kallback</56>
+    <60>Tel-Save</60>
+    <60>Tel-Save, Inc.</60>
+    <64>Tel-Save</64>
+    <64>Tel-Save, Inc.</64>
+    <68>Tel-Save</68>
+    <68>Tel-Save, Inc.</68>
+    <72>UTA</72>
+    <72>United Telephone Association, Inc.</72>
+    <76>NVTS</76>
+    <76>NVTS Ameritel</76>
+    <8>Voyager</8>
+    <8>Voyager Networks, Inc</8>
+    <80>CCI</80>
+    <80>C.C.I.</80>
+    <84>CCI</84>
+    <84>C.C.I.</84>
+    <88>CCI</88>
+    <88>C.C.I.</88>
+    <92>York</92>
+    <92>York Telephone Company</92>
+    <96>Midstate</96>
+    <96>Midstate Telephone Company</96>
+  </5>
+  <5 name="15">
+    <100>Network Plus</100>
+    <100>Network Plus</100>
+    <104>Network Plus</104>
+    <104>Network Plus</104>
+    <108>KINNET</108>
+    <108>KINNET Fiber Optic Communications</108>
+    <112>Peoples</112>
+    <112>Peoples Telephone Company</112>
+    <116>Fairwater-B-A</116>
+    <116>Fairwater-Brandon-Alto Telephone Company</116>
+    <12>iXnet</12>
+    <12>iXnet</12>
+    <120>Lackawaxen</120>
+    <120>Lackawaxen Telephone Company</120>
+    <124>HSS</124>
+    <124>HSS Vending Distributors</124>
+    <128>HSS</128>
+    <128>HSS Vending Distributors</128>
+    <132>Eastex</132>
+    <132>Eastex Telephone Cooperative, Inc.</132>
+    <136>Eastex</136>
+    <136>Eastex Telephone Cooperative, Inc.</136>
+    <140>Eastex</140>
+    <140>Eastex Telephone Cooperative, Inc.</140>
+    <144>Eastex</144>
+    <144>Eastex Telephone Cooperative, Inc.</144>
+    <148>Eastex</148>
+    <148>Eastex Telephone Cooperative, Inc.</148>
+    <152>Eastex</152>
+    <152>Eastex Telephone Cooperative, Inc.</152>
+    <156>Ringgold</156>
+    <156>Ringgold Telephone Company, Inc.</156>
+    <16>iXnet</16>
+    <16>iXnet</16>
+    <160>Farmers</160>
+    <160>Farmers Telephone Cooperative, Inc</160>
+    <164>US South</164>
+    <164>US South Communications, Inc.</164>
+    <168>MediaOne</168>
+    <168>MediaOne, Inc.</168>
+    <172>POPP</172>
+    <172>POPP Telecom</172>
+    <176>POPP</176>
+    <176>POPP Telecom</176>
+    <180>WTS</180>
+    <180>World Telecommunications Services</180>
+    <184>Teleport</184>
+    <184>Teleport Communications Group</184>
+    <188>Livingston</188>
+    <188>Livingston Telephone Company</188>
+    <192>Peoples</192>
+    <192>Peoples Telephone Cooperative, Inc.</192>
+    <196>New Hope</196>
+    <196>New Hope Telephone Cooperative</196>
+    <20>iXnet</20>
+    <20>iXnet</20>
+    <200>DataComm</200>
+    <200>DataComm. International Company, Ltd.</200>
+    <204>Vista</204>
+    <204>Vista International</204>
+    <208>Startec's</208>
+    <208>Startec's</208>
+    <212>Cable Plus</212>
+    <212>Cable Plus Company LP</212>
+    <216>Cable Plus</216>
+    <216>Cable Plus Company LP</216>
+    <220>Venus</220>
+    <220>Venus Telephone Corp.</220>
+    <224>S. F. C.</224>
+    <224>S. F. C. Enterprises</224>
+    <228>Tech Ctrl</228>
+    <228>Technology Control, Inc.</228>
+    <232>Tech Ctrl</232>
+    <232>Technology Control, Inc.</232>
+    <236>Mark Twain R</236>
+    <236>Mark Twain Rural Telephone Company</236>
+    <24>iXnet</24>
+    <24>iXnet</24>
+    <240>Mark Twain R</240>
+    <240>Mark Twain Rural Telephone Company</240>
+    <244>Mark Twain R</244>
+    <244>Mark Twain Rural Telephone Company</244>
+    <248>Mark Twain R</248>
+    <248>Mark Twain Rural Telephone Company</248>
+    <252>RAM Tech</252>
+    <252>RAM Technologies, Inc.</252>
+    <28>iXnet</28>
+    <28>iXnet</28>
+    <32>Motorola</32>
+    <32>Motorola</32>
+    <36>Motorola</36>
+    <36>Motorola</36>
+    <4>Caribbean</4>
+    <4>Caribbean Telephone and Telegraph, Inc.</4>
+    <40>General</40>
+    <40>General Telecom</40>
+    <44>Western</44>
+    <44>Western Wireless</44>
+    <48>Western</48>
+    <48>Western Wireless</48>
+    <52>Western</52>
+    <52>Western Wireless</52>
+    <56>Western</56>
+    <56>Western Wireless</56>
+    <60>Western</60>
+    <60>Western Wireless</60>
+    <64>Yorkville</64>
+    <64>Yorkville Telephone Cooperative</64>
+    <68>Tuckersmith</68>
+    <68>Tuckersmith Communications Cooperative, Ltd.</68>
+    <72>Telegroup</72>
+    <72>Telegroup</72>
+    <76>NAC</76>
+    <76>North American Comm (NAC)</76>
+    <8>Caribbean</8>
+    <8>Caribbean Telephone and Telegraph, Inc.</8>
+    <80>Wilkinson Cty</80>
+    <80>Wilkinson County Telephone Company</80>
+    <84>WorldPass</84>
+    <84>WorldPass</84>
+    <88>BayStar</88>
+    <88>BayStar Communications</88>
+    <92>Filer Mutual</92>
+    <92>Filer Mutual Telephone Company</92>
+    <96>Elec Lightwave</96>
+    <96>Electric Lightwave</96>
+  </5>
+  <5 name="16">
+    <100>Consolidated</100>
+    <100>Consolidated Telco, Inc.</100>
+    <104>Consolidated</104>
+    <104>Consolidated Telco, Inc.</104>
+    <108>IDS</108>
+    <108>IDS Long Distance, Inc.</108>
+    <112>W New Mexico</112>
+    <112>Western New Mexico Telephone Company, Inc.</112>
+    <116>Minford</116>
+    <116>Minford Telephone Company</116>
+    <12>La Harpe</12>
+    <12>La Harpe Telephone Company, Inc.</12>
+    <120>STAR</120>
+    <120>STAR Telecommunications, Inc.</120>
+    <124>American</124>
+    <124>American Communications Services, Inc.</124>
+    <128>American</128>
+    <128>American Communications Services, Inc.</128>
+    <132>NAGI</132>
+    <132>North American Gateway Inc.</132>
+    <136>Bloomingdale</136>
+    <136>Bloomingdale Telephone Company</136>
+    <140>NevTEL</140>
+    <140>NevTEL</140>
+    <16>United</16>
+    <16>United Telephone Association, Inc.</16>
+    <20>Dubois</20>
+    <20>Dubois Telephone Exchange, Inc</20>
+    <24>Northland</24>
+    <24>Northland Telephone Company</24>
+    <28>Northland</28>
+    <28>Northland Telephone Company</28>
+    <32>Northland</32>
+    <32>Northland Telephone Company</32>
+    <36>Northland</36>
+    <36>Northland Telephone Company</36>
+    <4>Ironton</4>
+    <4>Ironton Telephone Company</4>
+    <40>Time Warner</40>
+    <40>Time Warner Communications</40>
+    <44>Time Warner</44>
+    <44>Time Warner Communications</44>
+    <48>Time Warner</48>
+    <48>Time Warner Communications</48>
+    <52>AIC</52>
+    <52>AIC Asia International Services Corporation</52>
+    <56>Zenex</56>
+    <56>Zenex Long Distance</56>
+    <60>El Paso Cty</60>
+    <60>El Paso County Telephone Company</60>
+    <64>W Wisconsin</64>
+    <64>West Wisconsin Telecom Cooperative, Inc.</64>
+    <68>W Wisconsin</68>
+    <68>West Wisconsin Telecom Cooperative, Inc.</68>
+    <72>American Per.</72>
+    <72>American Personal Communications</72>
+    <76>Telescan</76>
+    <76>Telescan, Inc.</76>
+    <8>TCT West</8>
+    <8>TCT West, Inc.</8>
+    <80>St. Cloud</80>
+    <80>Cellular Mobile Systems of St. Cloud</80>
+    <84>Consolidated</84>
+    <84>Consolidated Telco, Inc.</84>
+    <88>Consolidated</88>
+    <88>Consolidated Telco, Inc.</88>
+    <92>Consolidated</92>
+    <92>Consolidated Telco, Inc.</92>
+    <96>Consolidated</96>
+    <96>Consolidated Telco, Inc.</96>
+  </5>
+  <5 name="17">
+    <12>DiGiPH FCS</12>
+    <12>DiGiPH FCS, Inc.</12>
+    <12></12>
+    <16>KMC</16>
+    <16>KMC Telecom Inc.</16>
+    <16></16>
+    <20>Moundville</20>
+    <20>Moundville Telephone Company, Inc.</20>
+    <20></20>
+    <24>BellSouth</24>
+    <24>BellSouth Public Communications, Inc.</24>
+    <24></24>
+    <28>ROPIR</28>
+    <28>ROPIR Communications, Inc.</28>
+    <28></28>
+    <32>PC Mgmt</32>
+    <32>PC Management</32>
+    <32></32>
+    <36>PC Mgmt</36>
+    <36>PC Management</36>
+    <36></36>
+    <4>Teleport</4>
+    <4>Teleport Communications Group</4>
+    <4></4>
+    <40>UniversalCom</40>
+    <40>UniversalCom,Inc.</40>
+    <40></40>
+    <44>Ragland</44>
+    <44>Ragland Telephone Co., Inc.</44>
+    <44></44>
+    <8>American</8>
+    <8>American Communications Services, Inc.</8>
+    <8></8>
+    <state>AL</state>
+    <state>Alabama</state>
+  </5>
+  <5 name="18">
+    <12>TelAlaska</12>
+    <12>TelAlaska, Inc.</12>
+    <12></12>
+    <16>TelAlaska</16>
+    <16>TelAlaska, Inc.</16>
+    <16></16>
+    <20>TelAlaska</20>
+    <20>TelAlaska, Inc.</20>
+    <20></20>
+    <24>Cordova</24>
+    <24>Cordova Telephone Cooperative</24>
+    <24></24>
+    <32>Alaska Net Sys</32>
+    <32>Alaska Network Systems, Inc.</32>
+    <32></32>
+    <36>Bristol Bay</36>
+    <36>Bristol Bay Telephone Cooperative, Inc.</36>
+    <36></36>
+    <4>TelAlaska</4>
+    <4>TelAlaska, Inc.</4>
+    <4></4>
+    <40>Bristol Bay</40>
+    <40>Bristol Bay Telephone Cooperative, Inc.</40>
+    <40></40>
+    <44>Bristol Bay</44>
+    <44>Bristol Bay Telephone Cooperative, Inc.</44>
+    <44></44>
+    <48>OTZ</48>
+    <48>OTZ Telephone Cooperative, Inc.</48>
+    <48></48>
+    <52>OTZ</52>
+    <52>OTZ Telephone Cooperative, Inc.</52>
+    <52></52>
+    <56>OTZ</56>
+    <56>OTZ Telephone Cooperative, Inc.</56>
+    <56></56>
+    <60>Nashagak</60>
+    <60>Nashagak Telephone Cooperative, Inc.</60>
+    <60></60>
+    <64>KPU</64>
+    <64>KPU Telecommunications</64>
+    <64></64>
+    <68>Alaska DigiTel</68>
+    <68>Alaska DigiTel</68>
+    <68></68>
+    <8>TelAlaska</8>
+    <8>TelAlaska, Inc.</8>
+    <8></8>
+    <state>AK</state>
+    <state>Alaska</state>
+  </5>
+  <5 name="19">
+    <12>Valley</12>
+    <12>Valley Telephone Cooperative, Inc.</12>
+    <12></12>
+    <16>FTI</16>
+    <16>FTI Communications</16>
+    <16></16>
+    <20>Valley</20>
+    <20>Valley Telephone Cooperative, Inc.</20>
+    <20></20>
+    <24>Valley</24>
+    <24>Valley Telephone Cooperative, Inc.</24>
+    <24></24>
+    <28>Valley</28>
+    <28>Valley Telephone Cooperative, Inc.</28>
+    <28></28>
+    <32>Valley</32>
+    <32>Valley Telephone Cooperative, Inc.</32>
+    <32></32>
+    <36>Mountain</36>
+    <36>Mountain Telecommunications</36>
+    <36></36>
+    <4>KLP</4>
+    <4>KLP, Inc. dba Call America.</4>
+    <4></4>
+    <40>Metro One</40>
+    <40>Metro One Telecommunications</40>
+    <40></40>
+    <44>Dakota</44>
+    <44>Dakota Carrier Services</44>
+    <44></44>
+    <48>Dakota</48>
+    <48>Dakota Carrier Services</48>
+    <48></48>
+    <52>Dakota</52>
+    <52>Dakota Carrier Services</52>
+    <52></52>
+    <56>Dakota</56>
+    <56>Dakota Carrier Services</56>
+    <56></56>
+    <60>OPTel</60>
+    <60>OPTel, Inc.</60>
+    <60></60>
+    <64>Authentix</64>
+    <64>Authentix Network, Inc.</64>
+    <64></64>
+    <68>Authentix</68>
+    <68>Authentix Network, Inc.</68>
+    <68></68>
+    <72>San Carlos</72>
+    <72>San Carlos Apache Telecommunications Utility</72>
+    <72></72>
+    <76>Alphanet</76>
+    <76>Alphanet Telecom Inc.</76>
+    <76></76>
+    <8>Teleport</8>
+    <8>Teleport Communications Group</8>
+    <8></8>
+    <state>AZ</state>
+    <state>Arizona</state>
+  </5>
+  <5 name="2">
+    <100>Berkshire</100>
+    <100>Berkshire Telephone Corporation</100>
+    <104>Cobbosseecontee</104>
+    <104>Cobbosseecontee Telephone &amp; Telegraph Company</104>
+    <108>Siskiyou</108>
+    <108>Siskiyou Telephone Company</108>
+    <112>Siskiyou</112>
+    <112>Siskiyou Telephone Company</112>
+    <116>Millry</116>
+    <116>Millry Telephone Company, Inc</116>
+    <12>Farmers</12>
+    <12>Farmers Telephone Cooperative (SC)</12>
+    <120>Mountain R</120>
+    <120>Mountain Rural Telephone</120>
+    <124>Taconic</124>
+    <124>Taconic Telephone Corporation</124>
+    <128>Champlain</128>
+    <128>Champlain Telephone Company</128>
+    <132>Planters R</132>
+    <132>Planters Rural Telephone Cooperative, Inc.</132>
+    <136>Dekalb</136>
+    <136>Dekalb Telephone Cooperative</136>
+    <140>Citizens</140>
+    <140>Citizens Telephone Cooperative</140>
+    <144>Bulloch</144>
+    <144>Bulloch Telephone Cooperative, Inc.</144>
+    <148>NE Florida</148>
+    <148>Northeast Florida Telephone Company, Inc.</148>
+    <152>Camden</152>
+    <152>Camden Telephone and Telegraph Company</152>
+    <156>N Arkansas</156>
+    <156>Northern Arkansas Telephone Company</156>
+    <16>Farmers</16>
+    <16>Farmers Telephone Cooperative (SC)</16>
+    <160>Access</160>
+    <160>Access Long Distance</160>
+    <164>Access</164>
+    <164>Access Long Distance</164>
+    <168>Access</168>
+    <168>Access Long Distance</168>
+    <172>Ballard R</172>
+    <172>Ballard Rural Telephone Cooperative</172>
+    <176>Hancock R</176>
+    <176>Hancock Rural Telephone Company</176>
+    <180>Madison Cty</180>
+    <180>Madison County Telephone Company</180>
+    <184>Valu-Line</184>
+    <184>Valu-Line Long Distance</184>
+    <188>Mountain View</188>
+    <188>Mountain View Telephone Company</188>
+    <192>Mountain View</192>
+    <192>Mountain View Telephone Company</192>
+    <196>Pine Tree</196>
+    <196>Pine Tree Telephone &amp; Telegraph Company</196>
+    <20>Farmers</20>
+    <20>Farmers Telephone Cooperative (SC)</20>
+    <200>McLoud</200>
+    <200>McLoud Telephone Company</200>
+    <204>Ardmore</204>
+    <204>Ardmore Telephone Company</204>
+    <208>Cimarron</208>
+    <208>Cimarron Telephone Company</208>
+    <212>Cimarron</212>
+    <212>Cimarron Telephone Company</212>
+    <216>Cimarron</216>
+    <216>Cimarron Telephone Company</216>
+    <220>Statesboro</220>
+    <220>Statesboro Telephone Company</220>
+    <224>Waitsfield</224>
+    <224>Waitsfield-Flayston Telephone Company</224>
+    <228>Mid-Plains</228>
+    <228>Mid-Plains Telephone Company, Inc.</228>
+    <232>Mid-Plains</232>
+    <232>Mid-Plains Telephone Company, Inc.</232>
+    <236>Columbus</236>
+    <236>Columbus Telephone Company</236>
+    <24>Bentleyville</24>
+    <24>Bentleyville Telephone Company</24>
+    <240>KanOkla</240>
+    <240>KanOkla Telephone Association, Inc.</240>
+    <244>KanOkla</244>
+    <244>KanOkla Telephone Association, Inc.</244>
+    <248>S Central</248>
+    <248>South Central Telephone Association, Inc.</248>
+    <252>S Central</252>
+    <252>South Central Telephone Association, Inc.</252>
+    <256>Farmers</256>
+    <256>Farmers Telephone Cooperative (AL)</256>
+    <28>Communique</28>
+    <28>Communique Telecomm.</28>
+    <32>Santa Rosa</32>
+    <32>Santa Rosa Telephone Cooperative</32>
+    <36>SW Oklahoma</36>
+    <36>Southwest Oklahoma Telephone Company</36>
+    <4>Total-Tel</4>
+    <4>Total-Tel USA</4>
+    <40>SW Oklahoma</40>
+    <40>Southwest Oklahoma Telephone Company</40>
+    <44>Piedmont R</44>
+    <44>Piedmont Rural Telephone Cooperative</44>
+    <48>Piedmont R</48>
+    <48>Piedmont Rural Telephone Cooperative</48>
+    <52>LDD</52>
+    <52>LDD, Inc.</52>
+    <56>Saco River</56>
+    <56>Saco River Telephone &amp; Telegraph Company</56>
+    <60>Bruce</60>
+    <60>Bruce Telephone Company</60>
+    <64>Bledsoe</64>
+    <64>Bledsoe Telephone Cooperative</64>
+    <68>Bledsoe</68>
+    <68>Bledsoe Telephone Cooperative</68>
+    <72>Foothills R</72>
+    <72>Foothills Rural Telephone Cooperative</72>
+    <76>Germantown</76>
+    <76>Germantown Telephone Company, Inc.</76>
+    <8>Farmers</8>
+    <8>Farmers Telephone Cooperative (SC)</8>
+    <80>Elkhart</80>
+    <80>Elkhart Telephone Company</80>
+    <84>Yell Cty</84>
+    <84>Yell County Telephone Company</84>
+    <88>Yell Cty</88>
+    <88>Yell County Telephone Company</88>
+    <92>CA-OR</92>
+    <92>California-Oregon Telephone Company</92>
+    <96>Crown Point</96>
+    <96>Crown Point Telephone</96>
+  </5>
+  <5 name="20">
+    <12>Yell Cty</12>
+    <12>Yell County Telephone Company</12>
+    <12></12>
+    <16>Hyperion</16>
+    <16>Hyperion Telecommunications, Inc.</16>
+    <16></16>
+    <20>S Arkansas</20>
+    <20>South Arkansas Telephone Company</20>
+    <20></20>
+    <24>Gabriel</24>
+    <24>Gabriel Communications, Inc.</24>
+    <24>Arkansas Site</24>
+    <4>Walnut Hill</4>
+    <4>Walnut Hill Telephone Company, Inc.</4>
+    <4></4>
+    <8>Walnut Hill</8>
+    <8>Walnut Hill Telephone Company, Inc.</8>
+    <8></8>
+    <state>AR</state>
+    <state>Arkansas</state>
+  </5>
+  <5 name="21">
+    <100>Pacific</100>
+    <100>Pacific Telecom</100>
+    <100></100>
+    <104>Econophone</104>
+    <104>Econophone, Inc.</104>
+    <104>California site</104>
+    <108>GNP</108>
+    <108>Global Network Providers</108>
+    <108>California site</108>
+    <112>Opentel</112>
+    <112>Opentel Communications, Inc.</112>
+    <112></112>
+    <116>Global One</116>
+    <116>Global One</116>
+    <116>California site</116>
+    <12>Genesis</12>
+    <12>Genesis Communications International, Inc.</12>
+    <12></12>
+    <120>Pac-West</120>
+    <120>Pac-West Telecomm, Inc.</120>
+    <120></120>
+    <124>Pac-West</124>
+    <124>Pac-West Telecomm, Inc.</124>
+    <124></124>
+    <128>Teltrust</128>
+    <128>Teltrust Communications Services, Inc.</128>
+    <128></128>
+    <132>Telegroup</132>
+    <132>Telegroup, Inc.</132>
+    <132>California site</132>
+    <136>ACS Systems</136>
+    <136>ACS Systems, Inc.</136>
+    <136>California site</136>
+    <140>Megawats</140>
+    <140>Megawats</140>
+    <140></140>
+    <144>LDIP</144>
+    <144>LD International Provisioning</144>
+    <144>California</144>
+    <148>FDN</148>
+    <148>FDN, Inc. - California site</148>
+    <148></148>
+    <152>New Millennium</152>
+    <152>New Millennium Comm. Corp.</152>
+    <152>California</152>
+    <156>MGC</156>
+    <156>MGC Communications, Inc.</156>
+    <156>California site</156>
+    <16>Primus</16>
+    <16>Primus Telecommunications, Inc.</16>
+    <16></16>
+    <160>MGC</160>
+    <160>MGC Communications, Inc.</160>
+    <160>California site</160>
+    <164>C Florida</164>
+    <164>Tele. Co. of Central Florida, Inc.</164>
+    <164>California</164>
+    <168>Allegiance</168>
+    <168>Allegiance Telecom, Inc.</168>
+    <168>California site</168>
+    <172>Justice</172>
+    <172>Justice Technology Corp.</172>
+    <172>California</172>
+    <180>FaciliCom</180>
+    <180>FaciliCom International</180>
+    <180>CA site</180>
+    <184>AirTouch</184>
+    <184>AirTouch Satellite Services</184>
+    <184>CA site</184>
+    <188>Focal</188>
+    <188>Focal Communications Corp.</188>
+    <188></188>
+    <192>New Global</192>
+    <192>New Global Telecom</192>
+    <192></192>
+    <196>PanAmSat</196>
+    <196>PanAmSat Corporation</196>
+    <196>CA site</196>
+    <20>CTI</20>
+    <20>Communications Telesystems International dba</20>
+    <20></20>
+    <200>Worldport</200>
+    <200>Worldport Communications,Inc.</200>
+    <200>CA site</200>
+    <204>AirTouch</204>
+    <204>AirTouch Satellite Services</204>
+    <204>CA site</204>
+    <208>One. Tel</208>
+    <208>One. Tel, Inc.</208>
+    <208></208>
+    <212>OzEmail</212>
+    <212>OzEmail Interline Pty Ltd.</212>
+    <212>CA site</212>
+    <216>Japan Telecom</216>
+    <216>Japan Telecom America,Inc.</216>
+    <216>CA site</216>
+    <220>Focal</220>
+    <220>Focal Communications Corp.</220>
+    <220>CA site</220>
+    <224>DJB</224>
+    <224>DJB Entterprises Inc.</224>
+    <224>CA site</224>
+    <228>DJB</228>
+    <228>DJB Enterprises Inc.</228>
+    <228>CA site</228>
+    <232>INET</232>
+    <232>INET Interactive Network System</232>
+    <232>CA site</232>
+    <236>New Zealand</236>
+    <236>Telecom New Zealand USA Limited</236>
+    <236></236>
+    <24>Teleport</24>
+    <24>Teleport Communications Group</24>
+    <24></24>
+    <240>Level 3</240>
+    <240>Level 3</240>
+    <240>CA site</240>
+    <244>Voice and Data</244>
+    <244>Voice and Data Communications</244>
+    <244>CA site</244>
+    <248>LEC Unwired</248>
+    <248>LEC Unwired, LLC</248>
+    <248></248>
+    <252>Teleselect</252>
+    <252>Teleselect Group, Inc.</252>
+    <252>CA site</252>
+    <28>Teleport</28>
+    <28>Teleport Communications Group</28>
+    <28></28>
+    <32>Phonetime</32>
+    <32>Phonetime, Inc.</32>
+    <32></32>
+    <36>New Global</36>
+    <36>New Global Telecom</36>
+    <36></36>
+    <4>Harris Digital</4>
+    <4>Harris Digital Telephone Systems</4>
+    <4></4>
+    <40>Intellicom</40>
+    <40>Intellicom, Inc.</40>
+    <40></40>
+    <44>Stanford Univ.</44>
+    <44>Stanford University Communications Services</44>
+    <44></44>
+    <48>SpectraNet</48>
+    <48>SpectraNet Anaheim International</48>
+    <48></48>
+    <52>Cyberlight</52>
+    <52>Cyberlight International, Inc.</52>
+    <52></52>
+    <56>Pacific Bell</56>
+    <56>Pacific Bell Communications</56>
+    <56></56>
+    <60>Five Star</60>
+    <60>Five Star Telecom</60>
+    <60></60>
+    <64>World Touch</64>
+    <64>World Touch Communications</64>
+    <64></64>
+    <68>Pac Gateway</68>
+    <68>Pacific Gateway Exchange</68>
+    <68></68>
+    <72>Paging Net</72>
+    <72>Paging Network Inc.,(AKA PageNet)</72>
+    <72></72>
+    <76>AmeriCom</76>
+    <76>AmeriCom Communications, LLC</76>
+    <76></76>
+    <8>Universal</8>
+    <8>Universal Communications Network, Inc.</8>
+    <8></8>
+    <80>Metro One</80>
+    <80>Metro One Telecommunications</80>
+    <80></80>
+    <84>MGC</84>
+    <84>MGC Communications, Inc.</84>
+    <84></84>
+    <88>World Exchange</88>
+    <88>World Exchange</88>
+    <88></88>
+    <92>ILD</92>
+    <92>ILD Teleservices, Inc.</92>
+    <92></92>
+    <96>Avirnex</96>
+    <96>Avirnex Communications Group</96>
+    <96></96>
+    <state>CA</state>
+    <state>California</state>
+  </5>
+  <5 name="22">
+    <100>OpTel</100>
+    <100>OpTel, Inc.</100>
+    <100>CO site</100>
+    <12>Intellicom</12>
+    <12>Intellicom, Inc.</12>
+    <12></12>
+    <16>American</16>
+    <16>American Communications Services, Inc.</16>
+    <16></16>
+    <20>Bijou</20>
+    <20>The Bijou Telephone Co-op Association</20>
+    <20></20>
+    <24>NA DigiCom</24>
+    <24>North American DigiCom Corporation</24>
+    <24></24>
+    <28>NA DigiCom</28>
+    <28>North American DigiCom Corporation</28>
+    <28></28>
+    <32>Nucla-N</32>
+    <32>Nucla-Naturita Telephone Company</32>
+    <32></32>
+    <36>Nucla-N</36>
+    <36>Nucla-Naturita Telephone Company</36>
+    <36></36>
+    <4>Plains</4>
+    <4>Plains Cooperative Telephone Association, Inc.</4>
+    <4></4>
+    <40>ConferTech</40>
+    <40>ConferTech International</40>
+    <40></40>
+    <44>ConferTech</44>
+    <44>ConferTech International</44>
+    <44></44>
+    <48>Metro One</48>
+    <48>Metro One Telecommunications</48>
+    <48></48>
+    <52>Sunflower</52>
+    <52>Sunflower Tele. Co., Inc.</52>
+    <52>Colorado</52>
+    <56>Columbine</56>
+    <56>Columbine Telecom Company</56>
+    <56></56>
+    <60>Convergent</60>
+    <60>Convergent Communications Services,Inc.</60>
+    <60></60>
+    <64>ACS</64>
+    <64>ACS Systems, Inc.</64>
+    <64>Colorado site</64>
+    <68>Optimum</68>
+    <68>Optimum Network Service, LLC</68>
+    <68></68>
+    <72>Great West</72>
+    <72>Great West Services, Ltd.</72>
+    <72></72>
+    <76>Farmers</76>
+    <76>Farmers Telephone Co., Inc.</76>
+    <76></76>
+    <8>Teleport</8>
+    <8>Teleport Communications Group</8>
+    <8></8>
+    <80>Level 3</80>
+    <80>LeveL 3</80>
+    <80>CO site</80>
+    <84>Voice and Data</84>
+    <84>Voice and Data Communications</84>
+    <84>CO site</84>
+    <88>CellularOne</88>
+    <88>CellularOne of Northeast Colorado</88>
+    <88></88>
+    <92>Level 3</92>
+    <92>Level 3 Communications</92>
+    <92>CO site</92>
+    <96>GlobalLink</96>
+    <96>USA Global Link</96>
+    <96>CO site</96>
+    <state>CO</state>
+    <state>Colorado</state>
+    <state></state>
+  </5>
+  <5 name="23">
+    <4>Teleport</4>
+    <4>Teleport Communications Group</4>
+    <4></4>
+    <state>CT</state>
+    <state>Connecticut</state>
+  </5>
+  <5 name="24">
+    <state>DE</state>
+    <state>Delaware</state>
+  </5>
+  <5 name="25">
+    <4>Teleport</4>
+    <4>Teleport Communications Group</4>
+    <4></4>
+    <state>DC</state>
+    <state>District of Columbia</state>
+  </5>
+  <5 name="26">
+    <100>Americatel</100>
+    <100>Americatel Corporation</100>
+    <100></100>
+    <104>C. Lakewood</104>
+    <104>City of Lakewood</104>
+    <104></104>
+    <108>FDN</108>
+    <108>FDN Inc.</108>
+    <108>Florida site</108>
+    <112>MGC</112>
+    <112>MGC Communications,Inc.</112>
+    <112>Florida site</112>
+    <116>Tele.Co. C FL</116>
+    <116>Tele.Co. of Central Florida,Inc.</116>
+    <116>Florida</116>
+    <12>Intellicom</12>
+    <12>Intellicom, Inc.</12>
+    <12></12>
+    <120>Voiceware</120>
+    <120>Voiceware Systems</120>
+    <120></120>
+    <124>FDC</124>
+    <124>First Data Corp.(FDC)</124>
+    <124>Florida site</124>
+    <128>PanAmSat</128>
+    <128>PanAmSat Corporation</128>
+    <128>Florida site</128>
+    <132>Worldport</132>
+    <132>Worldport Communications,Inc.</132>
+    <132>FL site</132>
+    <136>Call Sciences</136>
+    <136>Call Sciences</136>
+    <136>Florida site</136>
+    <140>AIT</140>
+    <140>American International Telephone</140>
+    <140></140>
+    <144>INET</144>
+    <144>INET Interactive Network Sys.</144>
+    <144>FL site</144>
+    <148>Thrifty Call</148>
+    <148>Thrifty Call Inc.</148>
+    <148>Florida site</148>
+    <152>Voice and Data</152>
+    <152>Voice and Data Communications</152>
+    <152>FL site</152>
+    <156>KMC</156>
+    <156>KMC Telecom II,Inc.</156>
+    <156>FL site</156>
+    <16>Phonetime</16>
+    <16>Phonetime, Inc.</16>
+    <16></16>
+    <160>BTS</160>
+    <160>Business Technology Services, Inc.</160>
+    <160></160>
+    <164>PaeTec</164>
+    <164>PaeTec Communications,Inc.</164>
+    <164>FL site</164>
+    <168>NAT Corp</168>
+    <168>North American Telecomm. Corp</168>
+    <168></168>
+    <172>USTel</172>
+    <172>USTel dba Arcada Commun.</172>
+    <172>FLsite</172>
+    <176>Premiere</176>
+    <176>Premiere Communications</176>
+    <176>FL site</176>
+    <180>US LEC FL</180>
+    <180>US LEC of Florida Inc.</180>
+    <180>FL site</180>
+    <184>Eastland</184>
+    <184>Eastland of Orlando Telephone Corp.</184>
+    <184></184>
+    <188>OpTel</188>
+    <188>OpTel, Inc.</188>
+    <188>Florita site</188>
+    <192>FDN</192>
+    <192>Florida Digital Network, Inc.</192>
+    <192></192>
+    <196>WAC</196>
+    <196>World Access Commun. Corp.</196>
+    <196></196>
+    <20>American</20>
+    <20>American Communications Services, Inc.</20>
+    <20></20>
+    <200>Startec</200>
+    <200>Startec Global Commun. Corp.</200>
+    <200></200>
+    <24>IDTS</24>
+    <24>International Digital Telecommunications Systems</24>
+    <24></24>
+    <28>TresCom Int</28>
+    <28>TresCom International</28>
+    <28></28>
+    <32>BellSouth</32>
+    <32>BellSouth Long Distance, Inc.</32>
+    <32></32>
+    <36>Orlando</36>
+    <36>Orlando Telephone Company, Inc.</36>
+    <36></36>
+    <4>Universal</4>
+    <4>Universal Communications Network, Inc.</4>
+    <4></4>
+    <40>Hyperion</40>
+    <40>Hyperion Telecommunications, Inc.</40>
+    <40></40>
+    <44>Time Warner</44>
+    <44>Time Warner Communications</44>
+    <44></44>
+    <48>Teleport</48>
+    <48>Teleport Communications Group</48>
+    <48></48>
+    <52>Teleport</52>
+    <52>Teleport Communications Group</52>
+    <52></52>
+    <56>LDI</56>
+    <56>Long Distance International Inc.</56>
+    <56></56>
+    <60>L. C.</60>
+    <60>L. C. Communications</60>
+    <60></60>
+    <64>UniversalCom</64>
+    <64>UniversalCom, Inc.</64>
+    <64></64>
+    <68>Metro One</68>
+    <68>Metro One Telecommunications</68>
+    <68></68>
+    <72>Pick</72>
+    <72>Pick Communications Corporation</72>
+    <72></72>
+    <76>US LEC NC</76>
+    <76>US LEC of North Carolina</76>
+    <76>Florida</76>
+    <8>Teleport</8>
+    <8>Teleport Communications Group</8>
+    <8></8>
+    <80>Star</80>
+    <80>Star Telecom</80>
+    <80>Miami, Florida site</80>
+    <84>Econophone</84>
+    <84>Econophone, Inc.</84>
+    <84>Florida site</84>
+    <88>New Millennium</88>
+    <88>New Millennium Communications Corp.</88>
+    <88></88>
+    <92>Telegroup</92>
+    <92>Telegroup, Inc.</92>
+    <92>Florida site</92>
+    <96>KMC</96>
+    <96>KMC Telecom Inc.</96>
+    <96>Florida site</96>
+    <state>FL</state>
+    <state>Florida</state>
+  </5>
+  <5 name="27">
+    <100>Five Star</100>
+    <100>Five Star Telecom</100>
+    <100>Georgia site</100>
+    <104>Enterprise</104>
+    <104>Enterprise Communications</104>
+    <104></104>
+    <108>FaciliCom</108>
+    <108>FaciliCom International</108>
+    <108>GA site</108>
+    <112>Call Sciences</112>
+    <112>Call Sciences</112>
+    <112>GA site</112>
+    <116>N + 1</116>
+    <116>N + 1, Inc.</116>
+    <116>GA site</116>
+    <12>Intellicom</12>
+    <12>Intellicom, Inc.</12>
+    <12></12>
+    <120>Level 3</120>
+    <120>Level 3 Communications</120>
+    <120>GA site</120>
+    <124>Pre-Paid Cell</124>
+    <124>Pre-Paid Cellular Services</124>
+    <124></124>
+    <128>USTel</128>
+    <128>USTel dba Arcada Commun.</128>
+    <128>GA site</128>
+    <132>WorldxChange</132>
+    <132>WorldxChange</132>
+    <132>GA site</132>
+    <136>NSS</136>
+    <136>Network Switching Services,Inc.</136>
+    <136>GA site</136>
+    <140>Waverly Hall</140>
+    <140>Waverly Hall Telephone Co.,Inc.</140>
+    <140></140>
+    <16>Phonetime</16>
+    <16>Phonetime, Inc.</16>
+    <16></16>
+    <20>American</20>
+    <20>American Communications Services, Inc.</20>
+    <20></20>
+    <24>BellSouth</24>
+    <24>BellSouth Long Distance, Inc.</24>
+    <24></24>
+    <28>Citizens</28>
+    <28>Citizens Telephone Company, Inc.</28>
+    <28></28>
+    <32>KMC</32>
+    <32>KMC Telecom Inc.</32>
+    <32></32>
+    <36>Teleport</36>
+    <36>Teleport Communications Group</36>
+    <36></36>
+    <4>Darien</4>
+    <4>Darien Telephone Company, Inc.</4>
+    <4></4>
+    <40>Teleport</40>
+    <40>Teleport Communications Group</40>
+    <40></40>
+    <44>Plant</44>
+    <44>Plant Telephone Company</44>
+    <44></44>
+    <48>Plant</48>
+    <48>Plant Telephone Company</48>
+    <48></48>
+    <52>Plant</52>
+    <52>Plant Telephone Company</52>
+    <52></52>
+    <56>Coastal</56>
+    <56>Coastal Telephone Company</56>
+    <56></56>
+    <60>Emory Univ</60>
+    <60>Emory University</60>
+    <60></60>
+    <64>MGC</64>
+    <64>MGC Communications, Inc.</64>
+    <64></64>
+    <68>ILD</68>
+    <68>ILD Teleservices, Inc.</68>
+    <68></68>
+    <72>Teltrust</72>
+    <72>Teltrust Communications Services, Inc.</72>
+    <72></72>
+    <76>Savannah</76>
+    <76>Savannah Independent PCS, Inc.</76>
+    <76></76>
+    <8>Glenwood</8>
+    <8>Glenwood Telephone Company</8>
+    <8></8>
+    <80>Georgia</80>
+    <80>Georgia Independent PCS, Inc.</80>
+    <80></80>
+    <84>US LEC NC</84>
+    <84>US LEC of North Carolina</84>
+    <84>Georgia</84>
+    <88>SITA</88>
+    <88>SITA</88>
+    <88>Georgia location</88>
+    <92>Allegiance</92>
+    <92>Allegiance Telecom,Inc.</92>
+    <92>Georgia site</92>
+    <96>Econophone</96>
+    <96>Econophone, Inc.</96>
+    <96>Georgia site</96>
+    <state>GA</state>
+    <state>Georgia</state>
+  </5>
+  <5 name="28">
+    <12>Sandwich Isles</12>
+    <12>Sandwich Isles Communications,Inc.</12>
+    <12></12>
+    <16>Sandwich Isles</16>
+    <16>Sandwich Isles Communications,Inc.</16>
+    <16></16>
+    <20>USTel</20>
+    <20>USTel dba Arcada Commun.</20>
+    <20>HI site</20>
+    <4>Time Warner</4>
+    <4>Time Warner Communications</4>
+    <4></4>
+    <8>TelHawaii</8>
+    <8>TelHawaii, Inc.</8>
+    <8></8>
+    <state>HI</state>
+    <state>Hawaii</state>
+  </5>
+  <5 name="29">
+    <12>USTel</12>
+    <12>USTel dba Arcada Commun.</12>
+    <12>ID site</12>
+    <4>American</4>
+    <4>American Communications Services, Inc.</4>
+    <4></4>
+    <8>Fremont</8>
+    <8>Fremont Telcom</8>
+    <8></8>
+    <state>ID</state>
+    <state>Idaho</state>
+  </5>
+  <5 name="3">
+    <100>S C Rural</100>
+    <100>South Central Rural Telephone Cooperative Corporation, Inc.</100>
+    <104>United</104>
+    <104>United Telephone Company, Inc.</104>
+    <108>Nat.TeleSvc</108>
+    <108>National TeleService</108>
+    <112>Execulines</112>
+    <112>Execulines of the Northwest, Inc.</112>
+    <116>Wilson</116>
+    <116>Wilson Telephone Company</116>
+    <12>Dobson</12>
+    <12>Dobson Telephone Company</12>
+    <120>Rochester</120>
+    <120>Rochester Telephone</120>
+    <124>Rochester</124>
+    <124>Rochester Telephone</124>
+    <128>Rochester</128>
+    <128>Rochester Telephone</128>
+    <132>Rochester</132>
+    <132>Rochester Telephone</132>
+    <136>Rochester</136>
+    <136>Rochester Telephone</136>
+    <140>Rochester</140>
+    <140>Rochester Telephone</140>
+    <144>Vernon</144>
+    <144>Vernon Telephone Cooperative</144>
+    <148>Vernon</148>
+    <148>Vernon Telephone Cooperative</148>
+    <152>Union</152>
+    <152>Union Telephone Company</152>
+    <156>Union</156>
+    <156>Union Telephone Company</156>
+    <16>Dobson</16>
+    <16>Dobson Telephone Company</16>
+    <160>Dunbarton</160>
+    <160>Dunbarton Telephone Company</160>
+    <164>Palmetto R</164>
+    <164>Palmetto Rural Telephone Cooperative, Inc.</164>
+    <168>Green Hills</168>
+    <168>Green Hills Telephone Corporation</168>
+    <172>Conestoga</172>
+    <172>Conestoga Telephone &amp; Telegraph Company</172>
+    <176>Roanoke &amp; B</176>
+    <176>Roanoke &amp; Botetourt Telephone Company</176>
+    <180>C Oklahoma</180>
+    <180>Central Oklahoma Telephone Company</180>
+    <184>C Oklahoma</184>
+    <184>Central Oklahoma Telephone Company</184>
+    <188>Pierce</188>
+    <188>Pierce Telephone Company, Inc.</188>
+    <192>Mid-Missouri</192>
+    <192>Mid-Missouri Telephone Company</192>
+    <196>Mid-Missouri</196>
+    <196>Mid-Missouri Telephone Company</196>
+    <20>Etex</20>
+    <20>Etex Telephone Cooperative, Inc.</20>
+    <200>Mid-Missouri</200>
+    <200>Mid-Missouri Telephone Company</200>
+    <204>Mid-Missouri</204>
+    <204>Mid-Missouri Telephone Company</204>
+    <208>Chequamegon</208>
+    <208>Chequamegon Telephone</208>
+    <212>Chequamegon</212>
+    <212>Chequamegon Telephone</212>
+    <216>Chequamegon</216>
+    <216>Chequamegon Telephone</216>
+    <220>Fidelity</220>
+    <220>Fidelity Telephone Company</220>
+    <224>P Spencer R</224>
+    <224>Perry Spencer Rural Telephone Cooperative</224>
+    <228>Utelco</228>
+    <228>Utelco, Inc.</228>
+    <232>Ontario</232>
+    <232>Ontario Telephone Company, Inc.</232>
+    <236>Germantown</236>
+    <236>Germantown Independent Telephone</236>
+    <24>Etex</24>
+    <24>Etex Telephone Cooperative, Inc.</24>
+    <240>Kerman</240>
+    <240>Kerman Telephone Company</240>
+    <244>Hayneville</244>
+    <244>Hayneville Telephone Company, Inc.</244>
+    <248>Bruce Mun.</248>
+    <248>Bruce Municipal Telephone System</248>
+    <252>Granite State</252>
+    <252>Granite State Telephone</252>
+    <256>S Kansas</256>
+    <256>Southern Kansas Telephone Company</256>
+    <28>Wheat State</28>
+    <28>Wheat State Telephone, Inc.</28>
+    <32>Wheat State</32>
+    <32>Wheat State Telephone, Inc.</32>
+    <36>Westel</36>
+    <36>Westel</36>
+    <4>S Kansas</4>
+    <4>Southern Kansas Telephone Company</4>
+    <40>Westel</40>
+    <40>Westel</40>
+    <44>Westel</44>
+    <44>Westel</44>
+    <48>Smithville</48>
+    <48>Smithville Telephone</48>
+    <52>Smithville</52>
+    <52>Smithville Telephone</52>
+    <56>Smithville</56>
+    <56>Smithville Telephone</56>
+    <60>Blackfoot</60>
+    <60>Blackfoot Telephone Cooperative, Inc.</60>
+    <64>Blackfoot</64>
+    <64>Blackfoot Telephone Cooperative, Inc.</64>
+    <68>Blackfoot</68>
+    <68>Blackfoot Telephone Cooperative, Inc.</68>
+    <72>Amer Sharecom</72>
+    <72>American Sharecom</72>
+    <76>Amer Sharecom</76>
+    <76>American Sharecom</76>
+    <8>Dobson</8>
+    <8>Dobson Telephone Company</8>
+    <80>Amer Sharecom</80>
+    <80>American Sharecom</80>
+    <84>P Spencer R</84>
+    <84>Perry Spencer Rural Telephone Cooperative</84>
+    <88>Steelville</88>
+    <88>Steelville Telephone Exchange</88>
+    <92>Chibardun</92>
+    <92>Chibardun Telephone Cooperative, Inc.</92>
+    <96>Chibardun</96>
+    <96>Chibardun Telephone Cooperative, Inc.</96>
+  </5>
+  <5 name="30">
+    <100>Gallatin River</100>
+    <100>Gallatin River Communications</100>
+    <100>IL site</100>
+    <104>Gallatin River</104>
+    <104>Gallatin River Communications</104>
+    <104>IL site</104>
+    <108>USTel</108>
+    <108>USTel dba Arcada Commun.</108>
+    <108>IL site</108>
+    <112>WorldxChange</112>
+    <112>WorldxChange</112>
+    <112>IL site</112>
+    <116>Megsinet</116>
+    <116>Megsinet, Inc.</116>
+    <116></116>
+    <12>Teleport</12>
+    <12>Teleport Communications Group</12>
+    <12></12>
+    <120>OpTel</120>
+    <120>OpTel, Inc.</120>
+    <120>IL site</120>
+    <16>Teleport</16>
+    <16>Teleport Communications Group</16>
+    <16></16>
+    <20>Focal</20>
+    <20>Focal communications Corporation</20>
+    <20></20>
+    <24>Intellicom</24>
+    <24>Intellicom, Inc.</24>
+    <24></24>
+    <28>Phonetime</28>
+    <28>Phonetime, Inc.</28>
+    <28></28>
+    <32>Odin</32>
+    <32>Odin Telephone Exchange, Inc.</32>
+    <32></32>
+    <36>FTI</36>
+    <36>FTI Communications</36>
+    <36></36>
+    <4>Pantel</4>
+    <4>Pantel Communications</4>
+    <4></4>
+    <40>Metro One</40>
+    <40>Metro One Telecommunications</40>
+    <40></40>
+    <44>World Exchange</44>
+    <44>World Exchange</44>
+    <44></44>
+    <48>Connect Amer</48>
+    <48>Connect America,Inc.</48>
+    <48>IL site</48>
+    <52>Econophone</52>
+    <52>Econophone, Inc.</52>
+    <52>IL site</52>
+    <56>21ST C Cable</56>
+    <56>21ST Century Cable</56>
+    <56>IL site</56>
+    <60>Telegroup</60>
+    <60>Telegroup, Inc.</60>
+    <60>IL site</60>
+    <64>LDI</64>
+    <64>Long Distance Int'l Provisioning</64>
+    <64>IL</64>
+    <68>Net</68>
+    <68>Net Communications,Inc.</68>
+    <68>IL site</68>
+    <72>TelCo C FL</72>
+    <72>Tele. Co. of Central Florida,Inc.</72>
+    <72>IL</72>
+    <76>Allegiance</76>
+    <76>Allegiance Telecom,Inc.</76>
+    <76>IL site</76>
+    <8>IXC</8>
+    <8>IXC Communications, Inc.</8>
+    <8></8>
+    <80>Motorola</80>
+    <80>Motorola Corporation</80>
+    <80></80>
+    <84>FaciliCom</84>
+    <84>FaciliCom International</84>
+    <84>IL site</84>
+    <88>S Illinois RSA</88>
+    <88>Southern Illinois RSA Partnership</88>
+    <88></88>
+    <92>Thrifty Call</92>
+    <92>Thrifty Call Inc.</92>
+    <92>IL site</92>
+    <96>Level 3</96>
+    <96>Level 3</96>
+    <96>IL site</96>
+    <state>IL</state>
+    <state>Illinois</state>
+  </5>
+  <5 name="31">
+    <12>Teleport</12>
+    <12>Teleport Communications Group</12>
+    <12></12>
+    <16>Time Warner</16>
+    <16>Time Warner Communications</16>
+    <16></16>
+    <20>US Xchange</20>
+    <20>US Xchange LLC</20>
+    <20>Indiana site</20>
+    <24>Pend Oreille</24>
+    <24>Pend Oreille Telephone</24>
+    <24></24>
+    <28>KMC</28>
+    <28>KMC Telecom II, Inc.</28>
+    <28>IN site</28>
+    <4>Bloomingdale H</4>
+    <4>Bloomingdale Home Telephone Company</4>
+    <4></4>
+    <8>West Point</8>
+    <8>West Point Telephone Company</8>
+    <8></8>
+    <state>IN</state>
+    <state>Indiana</state>
+  </5>
+  <5 name="32">
+    <12>M &amp; E Horn</12>
+    <12>Marne &amp; Elk Horn Telephone Comapny</12>
+    <12></12>
+    <16>Farmers &amp; Merch</16>
+    <16>Farmers &amp; Merchants Mutual Telephone</16>
+    <16></16>
+    <20>Miller</20>
+    <20>Miller Telephone Company</20>
+    <20></20>
+    <24>Farmers M</24>
+    <24>Farmers Mutual Telephone Company</24>
+    <24></24>
+    <28>Consolidated</28>
+    <28>Consolidated Comm. Inc.</28>
+    <28>Iowa site</28>
+    <32>Amica</32>
+    <32>Amica Wireless Phone Service</32>
+    <32></32>
+    <36>Dunkerton</36>
+    <36>Dunkerton Telephone Cooperative</36>
+    <36></36>
+    <4>Scranton</4>
+    <4>Scranton Telephone Company</4>
+    <4></4>
+    <8>Templeton</8>
+    <8>Templeton Telephone Company</8>
+    <8></8>
+    <state>IA</state>
+    <state>Iowa</state>
+  </5>
+  <5 name="33">
+    <12>KIN</12>
+    <12>KIN Network, Inc.</12>
+    <12></12>
+    <16>S&amp;T</16>
+    <16>S&amp;T Telephone Cooperative Assn.</16>
+    <16></16>
+    <20>Kansas PCS</20>
+    <20>Kansas Personal Communication Services Ltd.</20>
+    <20></20>
+    <24>Home</24>
+    <24>Home Telephone Company, Inc.</24>
+    <24></24>
+    <28>Hyperion</28>
+    <28>Hyperion Telecommunications, Inc.</28>
+    <28></28>
+    <32>Sunflower</32>
+    <32>Sunflower Telephone Co.,Inc.</32>
+    <32>Kansas</32>
+    <36>Bluestem</36>
+    <36>Bluestem Telephone Company</36>
+    <36>Kansas</36>
+    <4>Peoples Mutual</4>
+    <4>Peoples Mutual Telephone Company</4>
+    <4></4>
+    <40>Mercury Cell</40>
+    <40>Mercury Cellular &amp; Paging</40>
+    <40>KS location</40>
+    <44>Cunningham</44>
+    <44>Cunningham Telephone Co.,Inc.</44>
+    <44></44>
+    <48>MoKan Dial</48>
+    <48>MoKan Dial, Inc.</48>
+    <48>Kansas site</48>
+    <52>Birch</52>
+    <52>Birch Telecom</52>
+    <52>Kansas site</52>
+    <56>Sunflower</56>
+    <56>Sunflower Telephone Co.,Inc.</56>
+    <56>Kansas</56>
+    <60>KMC</60>
+    <60>KMC Telecom II, Inc.</60>
+    <60>Kansas site</60>
+    <64>Mutual</64>
+    <64>Mutual Telephone Company</64>
+    <64>KS site</64>
+    <68>Gabriel</68>
+    <68>Gabriel Communications,Inc.</68>
+    <68>KS site</68>
+    <8>S&amp;T</8>
+    <8>S&amp;T Telephone Cooperative Association</8>
+    <8></8>
+    <state>KS</state>
+    <state>Kansas</state>
+  </5>
+  <5 name="34">
+    <12>Hyperion</12>
+    <12>Hyperion Telecomm. Inc.</12>
+    <12>Kentucky</12>
+    <16>Wireless 2000</16>
+    <16>Wireless 2000 PCS</16>
+    <16>Kentucky site</16>
+    <20>Wireless 2000</20>
+    <20>Wireless 2000 PCS</20>
+    <20>Kentucky site</20>
+    <24>SouthEast</24>
+    <24>SouthEast Telephone</24>
+    <24></24>
+    <8>Alec</8>
+    <8>Alec, Inc.</8>
+    <8></8>
+    <state>KY</state>
+    <state>Kentucky</state>
+  </5>
+  <5 name="35">
+    <12>American</12>
+    <12>American Communications Services, Inc.</12>
+    <12></12>
+    <16>MobileTel</16>
+    <16>MobileTel Inc.</16>
+    <16></16>
+    <20>Mercury Cell</20>
+    <20>Mercury Cellular &amp; Paging</20>
+    <20></20>
+    <24>Amer MetroComm</24>
+    <24>American MetroComm Corporation</24>
+    <24></24>
+    <28>BellSouth</28>
+    <28>BellSouth Long Distance, Inc.</28>
+    <28></28>
+    <32>Advanced Tel</32>
+    <32>Advanced Tel., Inc.</32>
+    <32></32>
+    <36>Meretel</36>
+    <36>Meretel Communications, L.P.</36>
+    <36></36>
+    <4>Elizabeth</4>
+    <4>Elizabeth Telephone Company</4>
+    <4></4>
+    <40>Hyperion</40>
+    <40>Hyperion Telecommunications, Inc.</40>
+    <40></40>
+    <44>KMC</44>
+    <44>KMC Telecom Inc.</44>
+    <44></44>
+    <48>Data &amp; Elec</48>
+    <48>Data &amp; Electronic Services, Inc.</48>
+    <48></48>
+    <52>Shell</52>
+    <52>Shell Offshore Services, Co.</52>
+    <52></52>
+    <56>Columbia</56>
+    <56>Columbia Telecommunications, Inc.</56>
+    <56></56>
+    <60>Louisiana U</60>
+    <60>Louisiana Unwired LLC</60>
+    <60></60>
+    <64>Louisiana U</64>
+    <64>Louisiana Unwired LLC</64>
+    <64></64>
+    <8>Radiofone</8>
+    <8>Radiofone, Inc.</8>
+    <8></8>
+    <state>LA</state>
+    <state>Louisiana</state>
+    <state></state>
+  </5>
+  <5 name="36">
+    <4>Unitel</4>
+    <4>Unitel Incorporated</4>
+    <4></4>
+    <8>Saco Riv Cell</8>
+    <8>Saco River Cellular Tele. Co.(DBA S/C)</8>
+    <8></8>
+    <state>ME</state>
+    <state>Maine</state>
+  </5>
+  <5 name="37">
+    <12>Metro One</12>
+    <12>Metro One Telecommunications</12>
+    <12></12>
+    <16>RCN</16>
+    <16>RCN Telecom Services,Inc.</16>
+    <16>MD site</16>
+    <20>Bell Atlantic</20>
+    <20>Bell Atlantic</20>
+    <20>MD</20>
+    <24>PaeTec</24>
+    <24>PaeTec Communications,Inc.</24>
+    <24>MD site</24>
+    <28>Comav</28>
+    <28>Comav Telco, Inc.</28>
+    <28>MD site</28>
+    <4>Teleport</4>
+    <4>Teleport Communications Group</4>
+    <4></4>
+    <8>American</8>
+    <8>American Communications Services, Inc.</8>
+    <8></8>
+    <state>MD</state>
+    <state>Maryland</state>
+  </5>
+  <5 name="38">
+    <12>Teleport</12>
+    <12>Teleport Communications Group</12>
+    <12></12>
+    <16>Residential</16>
+    <16>Residential Communications Netwprk, Inc.</16>
+    <16></16>
+    <20>Arch</20>
+    <20>Arch Communications Group, Inc.</20>
+    <20></20>
+    <24>Atlantic Conn</24>
+    <24>Atlantic Connections, Inc.</24>
+    <24></24>
+    <28>RNK</28>
+    <28>RNK, Inc.</28>
+    <28></28>
+    <32>Global NAPS</32>
+    <32>Global NAPS</32>
+    <32></32>
+    <36>XCOM</36>
+    <36>XCOM Technologies</36>
+    <36></36>
+    <4>Xcom</4>
+    <4>Xcom Technologies, Inc.</4>
+    <4></4>
+    <44>Norfolk Cty</44>
+    <44>Norfolk County Internet</44>
+    <44></44>
+    <48>Thrifty Call</48>
+    <48>Thrifty Call Inc.</48>
+    <48>MA site</48>
+    <52>Bell Atlantic</52>
+    <52>Bell Atlantic Global Networks</52>
+    <52>MA site</52>
+    <56>Level 3</56>
+    <56>LEVEL 3</56>
+    <56>MA site</56>
+    <60>LBC</60>
+    <60>LBC Telephony</60>
+    <60>MA site</60>
+    <64>Allegiance</64>
+    <64>Allegiance Telecom, Inc.</64>
+    <64>MA site</64>
+    <68>PaeTec</68>
+    <68>PaeTec Communications, Inc.</68>
+    <68>MA site</68>
+    <8>Teleport</8>
+    <8>Teleport Communications Group</8>
+    <8></8>
+    <state>MA</state>
+    <state>Massachusetts</state>
+  </5>
+  <5 name="39">
+    <12>Ontonagon Cty</12>
+    <12>Midway Telephone Company</12>
+    <12></12>
+    <16>Chapin</16>
+    <16>Chapin telephone Company</16>
+    <16></16>
+    <20>Peninsula</20>
+    <20>Peninsula telephone Company</20>
+    <20></20>
+    <24>Nationwide</24>
+    <24>Nationwide Communications, Inc.</24>
+    <24></24>
+    <28>BRE</28>
+    <28>BRE Communications dba Phone Michigan</28>
+    <28></28>
+    <32>FoneTel</32>
+    <32>FoneTel</32>
+    <32></32>
+    <36>NPI</36>
+    <36>NPI Wireless</36>
+    <36></36>
+    <4>Ontonagon Cty</4>
+    <4>Ontonagon County Telephone Company</4>
+    <4></4>
+    <40>NPI</40>
+    <40>NPI Wireless</40>
+    <40></40>
+    <44>Metro One</44>
+    <44>Metro One Telecommunications</44>
+    <44></44>
+    <48>Hiawatha</48>
+    <48>Hiawatha Telephone Company</48>
+    <48></48>
+    <52>Anishnabe</52>
+    <52>Anishnabe Comm. Enterprise,Inc.</52>
+    <52>MI</52>
+    <56>Long Dist MI</56>
+    <56>Long Distance of Michigan</56>
+    <56></56>
+    <60>MichTel</60>
+    <60>MichTel, Inc.</60>
+    <60>MI site</60>
+    <64>KMC</64>
+    <64>KMC Telecom II, Inc.</64>
+    <64>MI site</64>
+    <68>Level 3</68>
+    <68>Level 3 Communications</68>
+    <68>MI site</68>
+    <72>USTel</72>
+    <72>USTel dba Arcada Commun.</72>
+    <72>MI site</72>
+    <76>Focal</76>
+    <76>Focal Communications Corporation</76>
+    <76></76>
+    <8>Ontonagon Cty</8>
+    <8>Ontonagon County Telephone Company</8>
+    <8></8>
+    <state>MI</state>
+    <state>Michigan</state>
+  </5>
+  <5 name="4">
+    <100>Highland</100>
+    <100>Highland Telephone Cooperative, Inc.</100>
+    <104>RTSC</104>
+    <104>Rural Telephone Service Company, Inc.</104>
+    <108>RTSC</108>
+    <108>Rural Telephone Service Company, Inc.</108>
+    <112>Peoples R</112>
+    <112>Peoples Rural Telephone Cooperative Corporation</112>
+    <116>EDS Personal</116>
+    <116>EDS Personal Communications Corporation</116>
+    <12>Skyline</12>
+    <12>Skyline Telephone Membership Corporation</12>
+    <120>EDS Personal</120>
+    <120>EDS Personal Communications Corporation</120>
+    <124>West Side</124>
+    <124>West Side Telephone</124>
+    <128>Citizens</128>
+    <128>Citizens Telephone Cooperative, Inc.</128>
+    <132>W Carolina R</132>
+    <132>West Carolina Rural Telephone Cooperative, Inc.</132>
+    <136>W Carolina R</136>
+    <136>West Carolina Rural Telephone Cooperative, Inc.</136>
+    <140>Twin Valley</140>
+    <140>Twin Valley Telephone, Inc.</140>
+    <144>Twin Valley</144>
+    <144>Twin Valley Telephone, Inc.</144>
+    <156>Teleport</156>
+    <156>Teleport Communications Group</156>
+    <16>Community Svc.</16>
+    <16>Community Service Telephone Company</16>
+    <160>Teleport</160>
+    <160>Teleport Communications Group</160>
+    <164>Teleport</164>
+    <164>Teleport Communications Group</164>
+    <168>Teleport</168>
+    <168>Teleport Communications Group</168>
+    <172>Atlas</172>
+    <172>Atlas Telephone Company</172>
+    <176>Atlas</176>
+    <176>Atlas Telephone Company</176>
+    <180>Hickory</180>
+    <180>Hickory Telephone Company</180>
+    <184>S Spavinaw</184>
+    <184>Salina Spavinaw Telephone Company, Inc.</184>
+    <188>S Spavinaw</188>
+    <188>Salina Spavinaw Telephone Company, Inc.</188>
+    <192>La Ward</192>
+    <192>La Ward Telephone Exchange, Inc.</192>
+    <196>Rib Lake</196>
+    <196>Rib Lake Telephone Company</196>
+    <20>Community Svc.</20>
+    <20>Community Service Telephone Company</20>
+    <200>Citizens</200>
+    <200>Citizens Telephone Company of Kecksburg</200>
+    <204>Kingdom</204>
+    <204>Kingdom Telephone Company</204>
+    <208>Kingdom</208>
+    <208>Kingdom Telephone Company</208>
+    <212>Kingdom</212>
+    <212>Kingdom Telephone Company</212>
+    <216>Kingdom</216>
+    <216>Kingdom Telephone Company</216>
+    <220>Carnegie</220>
+    <220>Carnegie Telephone Company</220>
+    <224>Ace</224>
+    <224>Ace Telephone Company of Michigan, Inc.</224>
+    <228>Ace</228>
+    <228>Ace Telephone Company of Michigan, Inc.</228>
+    <232>Hurontario</232>
+    <232>Hurontario Telephones Ltd.</232>
+    <236>N Norwich</236>
+    <236>North Norwich Telephones Ltd.</236>
+    <24>Headwaters</24>
+    <24>Headwaters Telephone Company</24>
+    <240>Durham</240>
+    <240>Durham Telephones Ltd.</240>
+    <244>Vadacom</244>
+    <244>Vadacom</244>
+    <248>Vadacom</248>
+    <248>Vadacom</248>
+    <252>Gosfield</252>
+    <252>Gosfield North Municipal Telephone System</252>
+    <256>Skyline</256>
+    <256>Skyline Telephone Membership Corporation</256>
+    <28>W Tennessee</28>
+    <28>West Tennessee Telephone Company</28>
+    <32>Peoples</32>
+    <32>Peoples Telephone Company, Inc.</32>
+    <36>Crockett</36>
+    <36>Crockett Telephone Company</36>
+    <4>Skyline</4>
+    <4>Skyline Telephone Membership Corporation</4>
+    <40>Bay Springs</40>
+    <40>Bay Springs Telephone Company, Inc.</40>
+    <44>Ellerbe</44>
+    <44>Ellerbe Telephone Company</44>
+    <48>Pineville</48>
+    <48>Pineville Telephone Company</48>
+    <52>Randolph</52>
+    <52>Randolph Telephone Company</52>
+    <56>B Lomand R</56>
+    <56>Ben Lomand Rural Telephone Cooperative, Inc.</56>
+    <60>B Lomand R</60>
+    <60>Ben Lomand Rural Telephone Cooperative, Inc.</60>
+    <64>B Lomand R</64>
+    <64>Ben Lomand Rural Telephone Cooperative, Inc.</64>
+    <68>B Lomand R</68>
+    <68>Ben Lomand Rural Telephone Cooperative, Inc.</68>
+    <72>Mountain R</72>
+    <72>Mountain Rural Telephone</72>
+    <76>Gila River</76>
+    <76>Gila River Telecommunications, Inc.</76>
+    <8>Skyline</8>
+    <8>Skyline Telephone Membership Corporation</8>
+    <80>Gila River</80>
+    <80>Gila River Telecommunications, Inc.</80>
+    <84>Gila River</84>
+    <84>Gila River Telecommunications, Inc.</84>
+    <88>NE Missouri R</88>
+    <88>Northeast Missouri Rural Telephone Company</88>
+    <92>Highland</92>
+    <92>Highland Telephone Cooperative, Inc.</92>
+    <96>Highland</96>
+    <96>Highland Telephone Cooperative, Inc.</96>
+  </5>
+  <5 name="40">
+    <12>OCI</12>
+    <12>OCI Communications of Minnesota, Inc.</12>
+    <12></12>
+    <16>Woodstock</16>
+    <16>Woodstock Telephone Company</16>
+    <16></16>
+    <20>Metro One</20>
+    <20>Metro One Telecommunications</20>
+    <20></20>
+    <24>Upsala</24>
+    <24>Upsala Cooperative Telephone Assoc.</24>
+    <24></24>
+    <32>Teleport</32>
+    <32>Teleport Comm. Group</32>
+    <32>Minnesota site</32>
+    <36>Otter</36>
+    <36>Otter Tail Telcom</36>
+    <36></36>
+    <4>American</4>
+    <4>American Communications Services, Inc.</4>
+    <4></4>
+    <40>Five Star</40>
+    <40>Five Star Telecom</40>
+    <40>MN site</40>
+    <44>Lismore</44>
+    <44>Lismore Cooperative Telephone Co.</44>
+    <44></44>
+    <48>KMC</48>
+    <48>KMC Telecom II, Inc.</48>
+    <48>MN site</48>
+    <52>USTel</52>
+    <52>USTel dba Arcada Commun.</52>
+    <52>MN site</52>
+    <56>Digital</56>
+    <56>Digital Telecommunications, Inc.</56>
+    <56></56>
+    <8>RCC</8>
+    <8>RCC Network, Inc.</8>
+    <8></8>
+    <state>MN</state>
+    <state>Minnesota</state>
+  </5>
+  <5 name="41">
+    <12>American</12>
+    <12>American Communications Services Inc.</12>
+    <12></12>
+    <16>Mound Bayou</16>
+    <16>Mound Bayou Telephone &amp; Communications</16>
+    <16></16>
+    <20>Cellular Hldg</20>
+    <20>Cellular Holding, Inc.</20>
+    <20></20>
+    <24>Georgetown</24>
+    <24>Georgetown Telephone Company</24>
+    <24></24>
+    <4>Hyperion</4>
+    <4>Hyperion Telecomm, Inc.</4>
+    <4></4>
+    <8>Teleport</8>
+    <8>Teleport Communications Group</8>
+    <8></8>
+    <state>MS</state>
+    <state>Mississippi</state>
+  </5>
+  <5 name="42">
+    <12>Intellicom</12>
+    <12>Intellicom, Inc.</12>
+    <12></12>
+    <16>Phonetime</16>
+    <16>Phonetime, Inc.</16>
+    <16></16>
+    <20>American</20>
+    <20>American Communications Services Inc.</20>
+    <20></20>
+    <24>Consolidated</24>
+    <24>Consolidated Communications, Inc.</24>
+    <24></24>
+    <28>Metro One</28>
+    <28>Metro One Telecommunications</28>
+    <28></28>
+    <32>Miller</32>
+    <32>Miller Telephone Company</32>
+    <32></32>
+    <36>MoKan Dial</36>
+    <36>MoKan Dial, Inc.</36>
+    <36>Missouri site</36>
+    <4>Cass</4>
+    <4>Cass telephone Company</4>
+    <4></4>
+    <40>Digital Teleport</40>
+    <40>Digital Teleport, Inc.</40>
+    <40></40>
+    <44>Alma</44>
+    <44>Alma Telephone Company, Inc.</44>
+    <44></44>
+    <48>Birch</48>
+    <48>Birch Telecom</48>
+    <48>Missouri site</48>
+    <52>USTel</52>
+    <52>USTel dba Arcada Commun.</52>
+    <52>MO site</52>
+    <56>ExOp</56>
+    <56>ExOp of Missouri, Inc.</56>
+    <56></56>
+    <60>BPS</60>
+    <60>BPS Telephone Company</60>
+    <60></60>
+    <64>Gabriel</64>
+    <64>Gabriel Communications, Inc.</64>
+    <64>MO site</64>
+    <68>Gabriel</68>
+    <68>Gabriel Communications,Inc.</68>
+    <68>MO site</68>
+    <72>Chariton Vly</72>
+    <72>Chariton Valley Long Distance Corp.</72>
+    <72></72>
+    <76>Missouri RSA</76>
+    <76>Missouri RSA #5</76>
+    <76></76>
+    <8>Teleport</8>
+    <8>Teleport Communications Group</8>
+    <8></8>
+    <state>MO</state>
+    <state>Missouri</state>
+  </5>
+  <5 name="43">
+    <12>Ronan</12>
+    <12>Ronan Telephone Company</12>
+    <12></12>
+    <16>Project</16>
+    <16>Project Telephone Co.</16>
+    <16>Montana</16>
+    <20>Project</20>
+    <20>Project Telephone Co.</20>
+    <20>Montana</20>
+    <24>Nemont</24>
+    <24>Nemont Telephone Cooperative, Inc.</24>
+    <24></24>
+    <28>Nemont</28>
+    <28>Nemont Telephone Cooperative, Inc.</28>
+    <28></28>
+    <32>Nemont</32>
+    <32>Nemont Telephone Cooperative, Inc.</32>
+    <32></32>
+    <36>Nemont</36>
+    <36>Nemont Telephone Cooperative, Inc.</36>
+    <36></36>
+    <4>Range</4>
+    <4>Range Telephone Cooperative</4>
+    <4></4>
+    <40>Nemont</40>
+    <40>Nemont Telephone Cooperative, Inc.</40>
+    <40></40>
+    <44>Wireless II</44>
+    <44>Wireless II</44>
+    <44></44>
+    <48>Arcada</48>
+    <48>USTel dba Arcada Commun.</48>
+    <48>MT site</48>
+    <52>InterBel</52>
+    <52>InterBel Telephone Cooperative, Inc.</52>
+    <52></52>
+    <8>Montana Cell</8>
+    <8>Montana Wireless, Inc.</8>
+    <8></8>
+    <state>MT</state>
+    <state>Montana</state>
+  </5>
+  <5 name="44">
+    <100>Glenwood</100>
+    <100>Glenwood Telephone Membership Corp.</100>
+    <100></100>
+    <12>Keystone-A</12>
+    <12>Keystone-Arthur Telephone Company</12>
+    <12></12>
+    <16>USA Global Link</16>
+    <16>USA Global Link</16>
+    <16></16>
+    <20>Three River</20>
+    <20>Three River Telco</20>
+    <20></20>
+    <24>Plainview</24>
+    <24>Plainview Telephone Company, Inc.</24>
+    <24></24>
+    <28>Elsie M</28>
+    <28>Elsie Mutual Telephone Company</28>
+    <28></28>
+    <32>Hamilton</32>
+    <32>Hamilton Telecommunications</32>
+    <32></32>
+    <36>Stanton</36>
+    <36>The Stanton Telephone Company</36>
+    <36></36>
+    <4>Teleport</4>
+    <4>Teleport Communications Group</4>
+    <4></4>
+    <40>Wauneta</40>
+    <40>Wauneta Telephone Co.,Inc.</40>
+    <40></40>
+    <44>Hartington</44>
+    <44>Hartington Telecomm. Co.,Inc.</44>
+    <44></44>
+    <48>ATC</48>
+    <48>ATC Communications</48>
+    <48></48>
+    <52>Henderson</52>
+    <52>Henderson Co-Op Telephone Co.</52>
+    <52></52>
+    <56>FDC</56>
+    <56>First Data Corporation(FDC)</56>
+    <56>NE site</56>
+    <60>Dalton</60>
+    <60>Dalton Telephone Co.,Inc.</60>
+    <60></60>
+    <64>Curtis</64>
+    <64>Curtis Telephone Co.,Inc.</64>
+    <64></64>
+    <68>Clarks</68>
+    <68>Clarks Telecommunications Co.</68>
+    <68></68>
+    <72>Hershey Coop</72>
+    <72>Hershey Cooperative Telephone Co.</72>
+    <72></72>
+    <76>NE Nebraska</76>
+    <76>Northeast Nebraska Telephone Co.</76>
+    <76></76>
+    <8>Wauneta</8>
+    <8>Wauneta Telephone Company</8>
+    <8></8>
+    <80>NE Nebraska</80>
+    <80>Northeast Nebraska Telephone Co.</80>
+    <80></80>
+    <84>NebCom</84>
+    <84>NebCom, Inc.</84>
+    <84></84>
+    <88>Tracey</88>
+    <88>Tracey Corp. II d/b/a Western Total</88>
+    <88></88>
+    <92>E Nebraska</92>
+    <92>Eastern Nebraska Telephone Co.</92>
+    <92>NE site</92>
+    <96>Home</96>
+    <96>Home Telephone Company of Nebraska</96>
+    <96></96>
+    <state>NE</state>
+    <state>Nebraska</state>
+  </5>
+  <5 name="45">
+    <12>Moapa Valley</12>
+    <12>Moapa Valley Telephone Company</12>
+    <12></12>
+    <16>Lincoln Cty</16>
+    <16>The Lincoln County Telephone System, Inc.</16>
+    <16></16>
+    <20>NTI</20>
+    <20>NTI Telecom Incorporated</20>
+    <20></20>
+    <24>ILD</24>
+    <24>ILD Teleservices, Inc.</24>
+    <24></24>
+    <28>ACS</28>
+    <28>American Comm.Services,Inc.</28>
+    <28>Nevada</28>
+    <32>MGC</32>
+    <32>MGC Communications Inc.</32>
+    <32></32>
+    <36>Net</36>
+    <36>Net Communications,Inc.</36>
+    <36>Nevada site</36>
+    <4>Fiberlink</4>
+    <4>Phoenix Fiberlink of Utah, Inc.</4>
+    <4></4>
+    <40>USTel</40>
+    <40>USTel dba Arcada Commun.</40>
+    <40>NV site</40>
+    <44>Rio Virgin</44>
+    <44>Rio Virgin Telephone Co.</44>
+    <44>NV site</44>
+    <8>Moapa Valley</8>
+    <8>Moapa Valley Telephone Company</8>
+    <8></8>
+    <state>NV</state>
+    <state>Nevada</state>
+  </5>
+  <5 name="46">
+    <12>Freedom Ring</12>
+    <12>Freedom Ring Communications, Inc.</12>
+    <12></12>
+    <16>CMG</16>
+    <16>CMG Telecommunications, Inc.</16>
+    <16></16>
+    <4>Vitts</4>
+    <4>Vitts Corporation</4>
+    <4></4>
+    <8>XCOM</8>
+    <8>XCOM Technologies</8>
+    <8>(NH site)</8>
+    <state>NH</state>
+    <state>New Hampshire</state>
+  </5>
+  <5 name="47">
+    <12>Intellicom</12>
+    <12>Intellicom, Inc.</12>
+    <12></12>
+    <16>Phonetime</16>
+    <16>Phonetime, Inc.</16>
+    <16></16>
+    <20>Graphnet</20>
+    <20>Graphnet, Inc.</20>
+    <20></20>
+    <24>Metro One</24>
+    <24>Metro One Telecommunications</24>
+    <24></24>
+    <28>Pick</28>
+    <28>Pick Communications Corporation</28>
+    <28></28>
+    <32>Caricall</32>
+    <32>Caricall Communications</32>
+    <32>NJ site</32>
+    <36>GSI</36>
+    <36>GSI Telecom</36>
+    <36>NJ site</36>
+    <4>Primus</4>
+    <4>Primus Telecommunications</4>
+    <4></4>
+    <40>Telco C FL</40>
+    <40>Telephone Co. of Central Florida,Inc.</40>
+    <40>NJ</40>
+    <44>Call Sciences</44>
+    <44>Call Sciences</44>
+    <44>NJ site</44>
+    <48>Thrifty Call</48>
+    <48>Thrifty Call Inc.</48>
+    <48>NJ site</48>
+    <52>Viatel</52>
+    <52>Viatel Global Communications-</52>
+    <52>NJ site</52>
+    <56>Premiere</56>
+    <56>Premiere Communications</56>
+    <56>NJ site</56>
+    <60>L.C.</60>
+    <60>L.C. Communications</60>
+    <60>NJ site</60>
+    <64>Cooperative</64>
+    <64>Cooperative Communications, Inc</64>
+    <64>NJ site</64>
+    <68>PAPOSH</68>
+    <68>PAPOSH, LLC</68>
+    <68>NJ site</68>
+    <8>Teleport</8>
+    <8>Teleport Communications Group</8>
+    <8></8>
+    <state>NJ</state>
+    <state>New Jersey</state>
+  </5>
+  <5 name="48">
+    <12>Valley</12>
+    <12>Valley Telephone Cooperative, Inc.</12>
+    <12></12>
+    <16>Tularosa</16>
+    <16>Tularosa Basin Telephone Co.,Inc.</16>
+    <16></16>
+    <20>Valley</20>
+    <20>Valley Telephone Cooperative, Inc.</20>
+    <20></20>
+    <24>Valley</24>
+    <24>Valley Telephone Cooperative, Inc.</24>
+    <24></24>
+    <28>Roosevelt Cty</28>
+    <28>Roosevelt County Rural Telephone Coop., Inc.</28>
+    <28></28>
+    <32>Reams Comm</32>
+    <32>Reams Commun.,Inc.dba Valuline Long</32>
+    <32></32>
+    <4>Baca Valley</4>
+    <4>Baca Valley Telephone Company</4>
+    <4></4>
+    <8>Penasco Vly</8>
+    <8>Penasco Valley Telephone Cooperative, Inc.</8>
+    <8></8>
+    <state>NM</state>
+    <state>New Mexico</state>
+  </5>
+  <5 name="49">
+    <100>SITA</100>
+    <100>SITA - New York location</100>
+    <100></100>
+    <104>Startec</104>
+    <104>Startec, Inc.</104>
+    <104>NY location</104>
+    <108>XCOM</108>
+    <108>XCOM Technologies</108>
+    <108>NY site</108>
+    <112>Graphnet</112>
+    <112>Graphnet, Inc.</112>
+    <112>NY site</112>
+    <116>Northland</116>
+    <116>Northland Comm.Group</116>
+    <116>Syracuse &amp; Utica</116>
+    <120>Oneida Cty</120>
+    <120>Oneida County Rural Tele. Co.</120>
+    <120></120>
+    <124>Hudson Valley</124>
+    <124>Hudson Valley RSA Cellular Partnership</124>
+    <124></124>
+    <128>Econophone</128>
+    <128>Econophone, Inc.</128>
+    <128>NY site</128>
+    <132>Chautauqua</132>
+    <132>Chautauqua &amp; Erie Telephone Corp.</132>
+    <132></132>
+    <136>AIT</136>
+    <136>American International Tele.Co.,Inc.</136>
+    <136>NY</136>
+    <140>KDD</140>
+    <140>KDD America, Inc.</140>
+    <140></140>
+    <144>Allegiance</144>
+    <144>Allegiance Telecom,Inc.</144>
+    <144>NY site</144>
+    <148>AlphaNet</148>
+    <148>AlphaNet Telecom Inc.</148>
+    <148>NY site</148>
+    <152>LDI</152>
+    <152>Long Distance Int'l Provisioning</152>
+    <152>NY</152>
+    <156>Domtel</156>
+    <156>Domtel Comm.Inc. d/b/a Tricom USA</156>
+    <156>NY</156>
+    <16>Inter-Community</16>
+    <16>Inter-Community Telephone Company</16>
+    <16></16>
+    <160>FDN</160>
+    <160>FDN, Inc.</160>
+    <160>NY site</160>
+    <164>New Millennium</164>
+    <164>New Millennium Comm.Corp</164>
+    <164>NY</164>
+    <168>Trans Global</168>
+    <168>Trans Global Communications</168>
+    <168>NY site</168>
+    <172>Arbit</172>
+    <172>Arbit Communications, Inc.</172>
+    <172>NY site</172>
+    <176>Arbit</176>
+    <176>Arbit Communications, Inc.</176>
+    <176>Y site</176>
+    <180>Local Fiber</180>
+    <180>Local Fiber, L.L.C.</180>
+    <180></180>
+    <184>Telcom Int</184>
+    <184>Telcom International</184>
+    <184>NY site</184>
+    <188>Net</188>
+    <188>Net Communications,Inc.</188>
+    <188>NY site</188>
+    <192>Justice</192>
+    <192>Justice Technology Corp.</192>
+    <192>NY</192>
+    <196>NA Gateway</196>
+    <196>North American Gateway Inc.</196>
+    <196>NY site</196>
+    <20>Teleport</20>
+    <20>Teleport Communications Group</20>
+    <20></20>
+    <200>NA Telecom</200>
+    <200>North American Telecomm. Corp.</200>
+    <200></200>
+    <204>Transwire</204>
+    <204>Transwire LLC</204>
+    <204></204>
+    <208>Transwire</208>
+    <208>Transwire LLC</208>
+    <208></208>
+    <212>Transwire</212>
+    <212>Transwire LLC</212>
+    <212></212>
+    <216>Transwire</216>
+    <216>FaciliCom International</216>
+    <216>NY site</216>
+    <220>Worldport</220>
+    <220>Worldport Communications, Inc.</220>
+    <220>NY site</220>
+    <228>OzEmail</228>
+    <228>OzEmail Interline Pty Limited</228>
+    <228>NY site</228>
+    <232>ITC</232>
+    <232>ITC, Inc.</232>
+    <232>NY site</232>
+    <236>INET</236>
+    <236>INET Interactive Network System</236>
+    <236>NY</236>
+    <24>Teleport</24>
+    <24>Teleport Communications Group</24>
+    <24></24>
+    <240>Thrifty Call</240>
+    <240>Thrifty Call Inc.</240>
+    <240>NY site</240>
+    <244>Bell Atlantic</244>
+    <244>Bell Atlantic Global Networks</244>
+    <244>NY site</244>
+    <248>Voice Data</248>
+    <248>Voice Data Communicationsl</248>
+    <248>NY site</248>
+    <28>Residential</28>
+    <28>Residential Communications Network, Inc.</28>
+    <28></28>
+    <32>TII</32>
+    <32>Telcom International Inc.</32>
+    <32></32>
+    <36>Cyberlight</36>
+    <36>Cyberlight International, Inc.</36>
+    <36></36>
+    <4>Universal</4>
+    <4>Universal Communications Network, Inc.</4>
+    <4></4>
+    <40>ATG</40>
+    <40>Access Technologies Group</40>
+    <40></40>
+    <44>Five Star</44>
+    <44>Five Star Telecom</44>
+    <44></44>
+    <48>TresCom</48>
+    <48>TresCom International</48>
+    <48></48>
+    <52>USFI</52>
+    <52>USFI, Inc.</52>
+    <52></52>
+    <56>Viatel</56>
+    <56>Viatel Global Communications</56>
+    <56></56>
+    <60>Time Warner</60>
+    <60>Time Warner Communications</60>
+    <60></60>
+    <64>USA Global Link</64>
+    <64>USA Global Link</64>
+    <64></64>
+    <68>PGE</68>
+    <68>Pacific Gateway Exchange</68>
+    <68></68>
+    <72>Unicall</72>
+    <72>Unicall Communications, Inc.</72>
+    <72></72>
+    <76>Focal</76>
+    <76>Focal Communications Corporation</76>
+    <76></76>
+    <8>Athena</8>
+    <8>Athena International LLC</8>
+    <8></8>
+    <80>World Exchange</80>
+    <80>World Exchange</80>
+    <80></80>
+    <84>Hyperion</84>
+    <84>Hyperion Telecommunications, Inc.</84>
+    <84></84>
+    <88>DirectNet</88>
+    <88>DirectNet Telecommunications</88>
+    <88>NY</88>
+    <92>DirectNet</92>
+    <92>DirectNet Telecommunications</92>
+    <92>NY</92>
+    <96>Telia</96>
+    <96>Telia North America Inc.</96>
+    <96>NY</96>
+    <state>NY</state>
+    <state>New York</state>
+  </5>
+  <5 name="5">
+    <100>W Wisconsin</100>
+    <100>West Wisconsin Telcommunications Cooperative, Inc.</100>
+    <104>Northeast</104>
+    <104>Northeast Telephone Company</104>
+    <108>Coon Valley</108>
+    <108>Coon Valley Farmers Telephone Company</108>
+    <112>Coon Valley</112>
+    <112>Coon Valley Farmers Telephone Company</112>
+    <116>Cross</116>
+    <116>Cross Telephone</116>
+    <12>CTG</12>
+    <12>Corporate Telemanagement Group</12>
+    <120>Cross</120>
+    <120>Cross Telephone</120>
+    <124>Cross</124>
+    <124>Cross Telephone</124>
+    <128>Cambridge</128>
+    <128>Cambridge Telephone Company</128>
+    <132>Peoples Mutual</132>
+    <132>Peoples Mutual Telephone Company</132>
+    <136>Craw-Kan</136>
+    <136>Craw-Kan Telephone Cooperative, Inc.</136>
+    <140>Craw-Kan</140>
+    <140>Craw-Kan Telephone Cooperative, Inc.</140>
+    <144>Craw-Kan</144>
+    <144>Craw-Kan Telephone Cooperative, Inc.</144>
+    <148>Monon</148>
+    <148>Monon Telephone Company, Inc.</148>
+    <152>Muenster</152>
+    <152>Muenster Telephone Corporation of Texas</152>
+    <156>Blue Valley</156>
+    <156>Blue Valley Telephone Company</156>
+    <16>CTG</16>
+    <16>Corporate Telemanagement Group</16>
+    <160>Moundridge</160>
+    <160>Moundridge Telephone Company</160>
+    <164>Vaughnsville</164>
+    <164>Vaughnsville Telephone Company, Inc.</164>
+    <168>Kalida</168>
+    <168>Kalida Telephone Company, Inc.</168>
+    <172>Grand</172>
+    <172>Grand Telephone Company, Inc.</172>
+    <176>Scott-Rice</176>
+    <176>Scott-Rice Telephone Company, Inc.</176>
+    <180>Tri-County</180>
+    <180>Tri-County Telephone Association, Inc.</180>
+    <184>US Wats</184>
+    <184>US Wats</184>
+    <188>Richland-G</188>
+    <188>Richland-Grant Telephone Cooperative, Inc.</188>
+    <192>Richland-G</192>
+    <192>Richland-Grant Telephone Cooperative, Inc.</192>
+    <196>Richland-G</196>
+    <196>LaValle Telephone Cooperative, Inc.</196>
+    <20>Mustang</20>
+    <20>Mustang Telecom, Inc.</20>
+    <200>Arthur Mutual</200>
+    <200>The Arthur Mutual Telephone Company</200>
+    <204>Price Cty</204>
+    <204>Price County Telephone Company</204>
+    <208>Nova</208>
+    <208>The Nova Telephone Company</208>
+    <212>New Ulm</212>
+    <212>New Ulm Telecom, Inc.</212>
+    <216>Pottawatomie</216>
+    <216>Pottawatomie Telephone Company, Inc.</216>
+    <220>Pottawatomie</220>
+    <220>Pottawatomie Telephone Company, Inc.</220>
+    <224>Pottawatomie</224>
+    <224>Pottawatomie Telephone Company, Inc.</224>
+    <228>H&amp;B</228>
+    <228>H&amp;B Communications, Inc.</228>
+    <232>Milltown</232>
+    <232>Milltown Mutual Telephone Company</232>
+    <236>Wamego</236>
+    <236>Wamego Telephone Company, Inc.</236>
+    <24>Mustang</24>
+    <24>Mustang Telecom, Inc.</24>
+    <240>Luck</240>
+    <240>Luck Telephone Company</240>
+    <244>Farmers Ind.</244>
+    <244>Farmers Independent Telephone Company</244>
+    <248>Mid-Iowa</248>
+    <248>Mid-Iowa Telephone Co-Op Association</248>
+    <252>Lewis River</252>
+    <252>Lewis River Telephone</252>
+    <256>NE Missouri</256>
+    <256>Northeast Missouri Rural Telephone Company</256>
+    <28>Mustang</28>
+    <28>Mustang Telecom, Inc.</28>
+    <32>Zenda</32>
+    <32>Zenda Telephone Company, Inc.</32>
+    <36>San Marcos</36>
+    <36>San Marcos Telephone Company</36>
+    <4>NE Missouri</4>
+    <4>Northeast Missouri Rural Telephone Company</4>
+    <40>Pymatuning</40>
+    <40>Pymatuning Independent Telephone Company</40>
+    <44>Pine</44>
+    <44>Pine Telephone Company</44>
+    <48>Pine</48>
+    <48>Pine Telephone Company</48>
+    <52>Fort Mojave</52>
+    <52>Fort Mojave Telecommunications, Inc.</52>
+    <56>Fort Mojave</56>
+    <56>Fort Mojave Telecommunications, Inc.</56>
+    <60>Oklahoma W</60>
+    <60>Oklahoma Western Telephone Company</60>
+    <64>Oklahoma W</64>
+    <64>Oklahoma Western Telephone Company</64>
+    <68>Oklahoma W</68>
+    <68>Oklahoma Western Telephone Company</68>
+    <72>Oklahoma W</72>
+    <72>Oklahoma Western Telephone Company</72>
+    <76>Hinton</76>
+    <76>Hinton Telephone Company</76>
+    <8>NE Missouri</8>
+    <8>Northeast Missouri Rural Telephone Company</8>
+    <80>Hinton</80>
+    <80>Hinton Telephone Company</80>
+    <84>Hinton</84>
+    <84>Hinton Telephone Company</84>
+    <88>ALL</88>
+    <88>American Long Lines</88>
+    <92>Vernon</92>
+    <92>Vernon Telephone Cooperative</92>
+    <96>W Wisconsin</96>
+    <96>West Wisconsin Telcommunications Cooperative, Inc.</96>
+  </5>
+  <5 name="50">
+    <12>Fiber South</12>
+    <12>Fiber South Communications</12>
+    <12></12>
+    <16>BellSouth</16>
+    <16>BellSouth Long Distance, Inc.</16>
+    <16></16>
+    <20>Time Warner</20>
+    <20>Time Warner Communications</20>
+    <20></20>
+    <24>Teleport</24>
+    <24>Teleport Communications Group</24>
+    <24></24>
+    <28>US LEC NC</28>
+    <28>US LEC of North Carolina</28>
+    <28>NC</28>
+    <32>KMC</32>
+    <32>KMC Telecom Inc.</32>
+    <32>NC</32>
+    <36>LDI</36>
+    <36>Long Distance Int'l Provisioning</36>
+    <36>NC</36>
+    <4>US LEC NC</4>
+    <4>US LEC of North Carolina, LLC</4>
+    <4></4>
+    <40>Citizens</40>
+    <40>Citizens Telephone Company</40>
+    <40></40>
+    <44>LSS</44>
+    <44>Listing Services Solutions, Inc.</44>
+    <44>NC site</44>
+    <48>Interpath</48>
+    <48>Interpath Communications, Inc.</48>
+    <48></48>
+    <52>USTel</52>
+    <52>USTel dba Arcada Communications</52>
+    <52>NC</52>
+    <56>PC Mgmt</56>
+    <56>PC Management</56>
+    <56>NC site</56>
+    <60>PC Mgmt</60>
+    <60>PC Management</60>
+    <60>NC site</60>
+    <8>American</8>
+    <8>American Communications Services, Inc.</8>
+    <8></8>
+    <state>NC</state>
+    <state>North Carolina</state>
+  </5>
+  <5 name="51">
+    <12>Dakota C</12>
+    <12>Dakota Central Telecommunications Cooperative</12>
+    <12></12>
+    <4>Dickey Rural</4>
+    <4>Dickey Rural Telephone Company</4>
+    <4></4>
+    <8>Consolidated</8>
+    <8>Consolidated Telephone Cooperative</8>
+    <8></8>
+    <state>ND</state>
+    <state>North Dakota</state>
+  </5>
+  <5 name="52">
+    <12>Buckeye</12>
+    <12>Buckeye Telesystem</12>
+    <12>Ohio site</12>
+    <16>Con Quest</16>
+    <16>Con Quest</16>
+    <16></16>
+    <20>Con Quest</20>
+    <20>Con Quest</20>
+    <20></20>
+    <24>Con Quest</24>
+    <24>Con Quest</24>
+    <24></24>
+    <4>Teleport</4>
+    <4>Teleport Communications Group</4>
+    <4></4>
+    <8>Time Warner</8>
+    <8>Time Warner Communications</8>
+    <8></8>
+    <state>OH</state>
+    <state>Ohio</state>
+  </5>
+  <5 name="53">
+    <12>Scott Cty</12>
+    <12>Scott County Telephone Company</12>
+    <12></12>
+    <16>American</16>
+    <16>American Communications Services, Inc.</16>
+    <16></16>
+    <20>LDI</20>
+    <20>Long Distance Int'l Provisioning</20>
+    <20>OK</20>
+    <24>Oklahoma</24>
+    <24>Oklahoma Telephone &amp; Telegraph,Inc.</24>
+    <24></24>
+    <28>Panhandle</28>
+    <28>Panhandle Telephone Cooperative,Inc.</28>
+    <28></28>
+    <4>Panhandle</4>
+    <4>Panhandle telephone Cooperative, Inc.</4>
+    <4></4>
+    <8>OnQue</8>
+    <8>OnQue Communications, Inc.</8>
+    <8></8>
+    <state>OK</state>
+    <state>Oklahoma</state>
+  </5>
+  <5 name="54">
+    <12>Metro One</12>
+    <12>Metro One Telecommunications</12>
+    <12></12>
+    <16>OGI</16>
+    <16>OGI Telecomm</16>
+    <16></16>
+    <20>Great West</20>
+    <20>Great West Services, Ltd.</20>
+    <20></20>
+    <24>OTS</24>
+    <24>Oregon Telco Services, Inc.</24>
+    <24></24>
+    <28>Rio</28>
+    <28>Rio Communications, Inc.</28>
+    <28>OR site</28>
+    <32>USTel</32>
+    <32>USTel dba Arcada Communications</32>
+    <32>OR</32>
+    <36>Cascade</36>
+    <36>Cascade Utilities, Inc.</36>
+    <36>OR site</36>
+    <4>ECI</4>
+    <4>ECI Communications</4>
+    <4></4>
+    <40>OTC</40>
+    <40>Oregon Telephone Corporation</40>
+    <40></40>
+    <44>North-State</44>
+    <44>North-State Telephone Company</44>
+    <44></44>
+    <8>Teleport</8>
+    <8>Teleport Communications Group</8>
+    <8></8>
+    <state>OR</state>
+    <state>Oregon</state>
+  </5>
+  <5 name="55">
+    <12>Teleport</12>
+    <12>Teleport Communications Group</12>
+    <12></12>
+    <16>Residential</16>
+    <16>Residential Communications Network, Inc.</16>
+    <16></16>
+    <20>Buffalo Vly</20>
+    <20>Buffalo Valley Telephone</20>
+    <20></20>
+    <24>Conestoga</24>
+    <24>Conestoga Wireless Company</24>
+    <24></24>
+    <28>Metro One</28>
+    <28>Metro One Telecommunications</28>
+    <28></28>
+    <32>Xtel</32>
+    <32>Xtel Communications, Inc.</32>
+    <32></32>
+    <36>Hyperion</36>
+    <36>Hyperion Telecomm.Inc.</36>
+    <36>PA</36>
+    <4>Palmerton</4>
+    <4>Palmerton Telephone Company</4>
+    <4></4>
+    <40>Hyperion</40>
+    <40>Hyperion Telecomm. Inc.</40>
+    <40>PA</40>
+    <44>Hyperion</44>
+    <44>Hyperion Telecomm. Inc.</44>
+    <44>PA</44>
+    <48>Focal</48>
+    <48>Focal Communications Corp.</48>
+    <48>PA site</48>
+    <52>Bell Atlantic</52>
+    <52>Bell Atlantic Global Networks</52>
+    <52>PA site</52>
+    <56>PaeTec</56>
+    <56>PaeTec Communications, Inc.</56>
+    <56>PA site</56>
+    <60>Level 3</60>
+    <60>Level 3 Communications</60>
+    <60>PA site</60>
+    <64>USTel</64>
+    <64>USTel dba Arcada Communications</64>
+    <64>PA</64>
+    <68>Allegiance</68>
+    <68>Allegiance Telcom, Inc.</68>
+    <68>PA site</68>
+    <72>Comav</72>
+    <72>Comav Telco, Inc.</72>
+    <72>PA site</72>
+    <8>Teleport</8>
+    <8>Teleport Communications Group</8>
+    <8></8>
+    <state>PA</state>
+    <state>Pennsylavania</state>
+  </5>
+  <5 name="56">
+    <4>Teleport</4>
+    <4>Teleport Communications Group</4>
+    <4></4>
+    <8>XCOM</8>
+    <8>XCOM Technologies</8>
+    <8>Rhode Island</8>
+    <state>RI</state>
+    <state>Rhode Island</state>
+  </5>
+  <5 name="57">
+    <12>American</12>
+    <12>American Communications Services, Inc.</12>
+    <12></12>
+    <16>NewSouth</16>
+    <16>NewSouth Comm.L.L.C.</16>
+    <16>SC</16>
+    <20>Rhinos</20>
+    <20>Rhinos International Ltd. Co.</20>
+    <20></20>
+    <24>Rhinos</24>
+    <24>Rhinos International Ltd. Co.</24>
+    <24></24>
+    <28>Rhinos</28>
+    <28>Rhinos International Ltd. Co.</28>
+    <28></28>
+    <32>P.V. Tel</32>
+    <32>P.V. Tel LLC</32>
+    <32>SC site</32>
+    <4>Pond Branch</4>
+    <4>Pond Branch Telephone Company, Inc.</4>
+    <4></4>
+    <8>W Carolina R</8>
+    <8>West Carolina Rural Telephone Cooperative, Inc.</8>
+    <8></8>
+    <state>SC</state>
+    <state>South Carolina</state>
+  </5>
+  <5 name="58">
+    <12>Midco</12>
+    <12>Midco Communications</12>
+    <12></12>
+    <16>Kadoka</16>
+    <16>Kadoka Telephone Co.</16>
+    <16>South Dakota</16>
+    <4>RC</4>
+    <4>RC Communications, Inc.</4>
+    <4></4>
+    <8>Bridgewater-C</8>
+    <8>Bridgewater-Canistota Independent Telephone</8>
+    <8></8>
+    <state>SD</state>
+    <state>South Dakota</state>
+  </5>
+  <5 name="59">
+    <12>Advantage</12>
+    <12>Advantage Cellular Systems</12>
+    <12></12>
+    <16>BellSouth</16>
+    <16>BellSouth Long Distance, Inc.</16>
+    <16></16>
+    <20>US LEC NC</20>
+    <20>US LEC of North Carolina</20>
+    <20>Tennessee</20>
+    <24>Teleport</24>
+    <24>Teleport Comm. Group</24>
+    <24>Tennessee</24>
+    <28>Chase</28>
+    <28>Chase Communications,Inc.</28>
+    <28>Tennessee</28>
+    <32>Chase</32>
+    <32>Chase Communications,Inc.</32>
+    <32>Tennessee</32>
+    <36>Chase</36>
+    <36>Chase Communications,Inc.</36>
+    <36>Tennessee</36>
+    <4>Teleport</4>
+    <4>Teleport Communications Group</4>
+    <4></4>
+    <40>Chase</40>
+    <40>Chase Communications,Inc.</40>
+    <40>Tennessee</40>
+    <44>Comm. Depot</44>
+    <44>Comm. Depot, Inc.</44>
+    <44>TN site</44>
+    <48>P.V. Tel</48>
+    <48>P.V. Tel LLC</48>
+    <48>TN site</48>
+    <8>American</8>
+    <8>American Communications Services, Inc.</8>
+    <8></8>
+    <state>TN</state>
+    <state>Tennessee</state>
+  </5>
+  <5 name="6">
+    <100>Intercont.</100>
+    <100>Intercontinental Communications Corp.</100>
+    <104>Switch 2000</104>
+    <104>Switch 2000</104>
+    <108>Switch 2000</108>
+    <108>Switch 2000</108>
+    <112>Colorado Vly</112>
+    <112>Colorado Valley Telephone Cooperative</112>
+    <116>Colorado Vly</116>
+    <116>Colorado Valley Telephone Cooperative</116>
+    <12>Hartman</12>
+    <12>Hartman Telephone Exchanges</12>
+    <120>Hooper</120>
+    <120>Hooper Telephone Company</120>
+    <124>Ottoville M</124>
+    <124>Ottoville Mutual Telephone Company</124>
+    <128>Keystone-Arthur</128>
+    <128>Keystone-Arthur Telephone Company</128>
+    <132>S&amp;W</132>
+    <132>S&amp;W Telephone Company, Inc.</132>
+    <136>Cochrane Coop</136>
+    <136>Cochrane Cooperative Telephone Company</136>
+    <140>Knoxville</140>
+    <140>The New Knoxville Telephone Company</140>
+    <144>Climax</144>
+    <144>Climax Telephone Company</144>
+    <148>Middle Point</148>
+    <148>Middle Point Home Telephone Company</148>
+    <152>E. Ritter</152>
+    <152>E. Ritter Telephone Company</152>
+    <156>Union</156>
+    <156>Union Telephone Company</156>
+    <16>Rainbow</16>
+    <16>Rainbow Telephone Cooperative Association, Inc.</16>
+    <160>Atlantic</160>
+    <160>Atlantic Telephone Membership Corporation</160>
+    <164>Ayersville</164>
+    <164>Ayersville Telephone Company</164>
+    <168>Arkansas</168>
+    <168>Arkansas Telephone Company, Inc.</168>
+    <172>Daviess-M Cty</172>
+    <172>Daviess-Martin County Rural Telephone Corporation</172>
+    <176>Granite State</176>
+    <176>Granite State Telephone</176>
+    <180>Totah</180>
+    <180>Totah Telephone Company</180>
+    <184>Totah</184>
+    <184>Totah Telephone Company</184>
+    <188>Totah</188>
+    <188>Totah Telephone Company</188>
+    <192>Villisca F</192>
+    <192>Villisca Farmers Telephone Company</192>
+    <196>Standard</196>
+    <196>Standard Telephone Company</196>
+    <20>Golden Belt</20>
+    <20>Golden Belt Telephone Association, Inc.</20>
+    <200>N Central</200>
+    <200>North Central Telephone Cooperative</200>
+    <204>N Central</204>
+    <204>North Central Telephone Cooperative</204>
+    <208>TMC</208>
+    <208>TMC of Lexington</208>
+    <212>Network</212>
+    <212>Network</212>
+    <216>McClure</216>
+    <216>The McClure Telephone Company</216>
+    <220>Yukon-Waltz</220>
+    <220>Yukon-Waltz Telephone Company</220>
+    <224>Fonorola</224>
+    <224>Fonorola</224>
+    <228>Glasford</228>
+    <228>Glasford Telephone Company</228>
+    <232>Benton</232>
+    <232>Benton Cooperative Telephone Company</232>
+    <236>Union Springs</236>
+    <236>Union Springs Telephone Company</236>
+    <24>Middleburgh</24>
+    <24>Middleburgh Telephone Company</24>
+    <240>Ft. Jennings</240>
+    <240>Ft. Jennings Telephone Company</240>
+    <244>Farmers Mutual</244>
+    <244>Farmers Mutual Telephone Company</244>
+    <248>Pattersonville</248>
+    <248>Pattersonville Telephone Company</248>
+    <252>ITG</252>
+    <252>International Telemanagement Group</252>
+    <256>Kin Network</256>
+    <256>Kin Network, Inc.</256>
+    <28>Ganado</28>
+    <28>Ganado Telephone Company</28>
+    <32>Coleman Cty</32>
+    <32>Coleman County Telephone Cooperative, Inc.</32>
+    <36>Comanche Cty</36>
+    <36>Comanche County Telephone Company, Inc.</36>
+    <4>Conneaut</4>
+    <4>Conneaut Telephone Company</4>
+    <40>Comanche Cty</40>
+    <40>Comanche County Telephone Company, Inc.</40>
+    <44>Lake Dallas</44>
+    <44>Lake Dallas Telephone Company</44>
+    <48>Curtis</48>
+    <48>The Curtis Telephone Company</48>
+    <52>Gridley</52>
+    <52>Gridley Telephone Company</52>
+    <56>SP Telecom</56>
+    <56>SP Telecom</56>
+    <60>Guadalupe Vly</60>
+    <60>Guadalupe Valley Telephone Cooperative</60>
+    <64>Guadalupe Vly</64>
+    <64>Guadalupe Valley Telephone Cooperative</64>
+    <68>Guadalupe Vly</68>
+    <68>Guadalupe Valley Telephone Cooperative</68>
+    <72>Guadalupe Vly</72>
+    <72>Guadalupe Valley Telephone Cooperative</72>
+    <76>Twin Lakes</76>
+    <76>Twin Lakes Telephone Cooperative Corporation</76>
+    <8>Madison</8>
+    <8>Madison Telephone Company, Inc.</8>
+    <80>Twin Lakes</80>
+    <80>Twin Lakes Telephone Cooperative Corporation</80>
+    <84>Twin Lakes</84>
+    <84>Twin Lakes Telephone Cooperative Corporation</84>
+    <88>Twin Lakes</88>
+    <88>Twin Lakes Telephone Cooperative Corporation</88>
+    <92>Stellars</92>
+    <92>Stellars Telecommunications Services</92>
+    <96>Intercont.</96>
+    <96>Intercontinental Communications Corp.</96>
+  </5>
+  <5 name="60">
+    <100>Time Warner</100>
+    <100>Time Warner Communications</100>
+    <100></100>
+    <104>KMC</104>
+    <104>KMC Telecom Inc.</104>
+    <104></104>
+    <108>Telco</108>
+    <108>Telco Communications Group</108>
+    <108></108>
+    <112>SA</112>
+    <112>SA Telecommunications</112>
+    <112></112>
+    <116>Alenco</116>
+    <116>Alenco Communications, Inc.</116>
+    <116></116>
+    <12>Cameron</12>
+    <12>Cameron Telephone Company Texas Division</12>
+    <12></12>
+    <120>Alenco</120>
+    <120>Alenco Communications, Inc.</120>
+    <120></120>
+    <124>World Exchange</124>
+    <124>World Exchange</124>
+    <124></124>
+    <128>ILD</128>
+    <128>ILD Teleservices, Inc.</128>
+    <128></128>
+    <132>CoServ</132>
+    <132>CoServ L.L.C.</132>
+    <132></132>
+    <136>IWL</136>
+    <136>IWL Comm. d.b.a. IWL Connect</136>
+    <136>Texas</136>
+    <140>Star</140>
+    <140>Star Telecom</140>
+    <140>Dallas,Texas site</140>
+    <144>Allegiance</144>
+    <144>Allegiance Telecom,Inc.</144>
+    <144>Texas site</144>
+    <148>Econophone</148>
+    <148>Econophone, Inc.</148>
+    <148>Texas site</148>
+    <152>FiberWave</152>
+    <152>FiberWave</152>
+    <152></152>
+    <156>W Texas R</156>
+    <156>West Texas Rural Tele.Cooperative</156>
+    <156></156>
+    <16>Lk. Livingston</16>
+    <16>Lake Livingston Telephone Company</16>
+    <16></16>
+    <160>W Texas R</160>
+    <160>West Texas Rural Tele. Cooperative</160>
+    <160></160>
+    <164>W Texas R</164>
+    <164>West Texas Rural Tele. Cooperative</164>
+    <164></164>
+    <168>WT</168>
+    <168>WT Services, Inc.</168>
+    <168></168>
+    <172>Revenue</172>
+    <172>Revenue Communications, Inc.</172>
+    <172>Texas</172>
+    <176>Great West</176>
+    <176>Great West Services, Ltd.</176>
+    <176></176>
+    <180>Industry</180>
+    <180>Industry Telephone Company</180>
+    <180></180>
+    <184>Telescape</184>
+    <184>Telescape International, Inc.</184>
+    <184></184>
+    <188>FDN</188>
+    <188>FDN, Inc.</188>
+    <188>Texas site</188>
+    <192>New Millennium</192>
+    <192>New Millennium Comm.Corp.</192>
+    <192>Texas</192>
+    <196>TelCo C FL</196>
+    <196>Tele.Co.of Central Florida,Inc.</196>
+    <196>Texas</196>
+    <20>IXC</20>
+    <20>IXC Communications, Inc.</20>
+    <20></20>
+    <200>Blossom</200>
+    <200>Blossom Telephone Co.,Inc.</200>
+    <200></200>
+    <204>ATI</204>
+    <204>American Telesource Int'l Inc.</204>
+    <204></204>
+    <208>AGT</208>
+    <208>American Gateway Telecommunications</208>
+    <208></208>
+    <212>FaciliCom</212>
+    <212>FaciliCom International</212>
+    <212>Texas site</212>
+    <216>AirTouch</216>
+    <216>AirTouch Satellite Services</216>
+    <216>Texas site</216>
+    <220>Tech</220>
+    <220>Tech Telephone Company, Ltd.</220>
+    <220></220>
+    <224>IXE</224>
+    <224>IXE Corporation</224>
+    <224></224>
+    <228>Worldport</228>
+    <228>Worldport Communications,Inc.</228>
+    <228>TX site</228>
+    <232>Logix</232>
+    <232>Logix Communications</232>
+    <232></232>
+    <236>Logix</236>
+    <236>Logix Communications</236>
+    <236></236>
+    <24>Crawford</24>
+    <24>Crawford Telephone Company</24>
+    <24></24>
+    <240>Thrifty Call</240>
+    <240>Thrifty Call Inc.</240>
+    <240>TX site</240>
+    <244>Paging Net</244>
+    <244>Paging Network Inc.</244>
+    <244>TX site</244>
+    <248>Nortex</248>
+    <248>Nortex Telcom</248>
+    <248></248>
+    <252>Twister</252>
+    <252>Twister Comm. Network, Inc.</252>
+    <252></252>
+    <28>Teleport</28>
+    <28>Teleport Communications Group</28>
+    <28></28>
+    <32>Teleport</32>
+    <32>Teleport Communications Group</32>
+    <32></32>
+    <36>NRPT</36>
+    <36>NRPT Corporation</36>
+    <36></36>
+    <4>Future</4>
+    <4>Future Telephone Communications, Inc. dba FTC  Long Distance</4>
+    <4></4>
+    <40>Intellicom</40>
+    <40>Intellicom, Inc.</40>
+    <40></40>
+    <44>Phonetime</44>
+    <44>Phonetime, Inc.</44>
+    <44></44>
+    <48>American</48>
+    <48>American Communications Services, Inc.</48>
+    <48></48>
+    <52>American</52>
+    <52>American Communications Services, Inc.</52>
+    <52></52>
+    <56>Border to Border</56>
+    <56>Border to Border Communications, Inc.</56>
+    <56></56>
+    <60>OpTel</60>
+    <60>OpTel, Inc.</60>
+    <60></60>
+    <64>Five Star</64>
+    <64>Five Star Telecom</64>
+    <64></64>
+    <68>Voice Track</68>
+    <68>Voice Track</68>
+    <68></68>
+    <72>Taylor</72>
+    <72>Taylor Communications Group, Inc.</72>
+    <72></72>
+    <76>FTI</76>
+    <76>FTI Communications</76>
+    <76></76>
+    <8>Universal</8>
+    <8>Universal Communications Network, Inc.</8>
+    <8></8>
+    <80>Hill Cty</80>
+    <80>Hill Country Telephone Cooperative, Inc.</80>
+    <80></80>
+    <84>TCA</84>
+    <84>TCA Long Distance</84>
+    <84></84>
+    <88>CSW/ICG</88>
+    <88>CSW/ICG ChoiceCom, L.P.</88>
+    <88></88>
+    <92>CSW/ICG</92>
+    <92>CSW/ICG ChoiceCom, L.P.</92>
+    <92></92>
+    <96>CSW/ICG</96>
+    <96>CSW/ICG ChoiceCom, L.P.</96>
+    <96></96>
+    <state>TX</state>
+    <state>Texas</state>
+  </5>
+  <5 name="61">
+    <12>Teleport</12>
+    <12>Teleport Communications Group</12>
+    <12></12>
+    <16>FTI</16>
+    <16>FTI Communications</16>
+    <16></16>
+    <20>Teltrust</20>
+    <20>Teltrust Communications Services, Inc.</20>
+    <20></20>
+    <24>Access</24>
+    <24>Access Long Distance</24>
+    <24></24>
+    <28>Access</28>
+    <28>Access Long Distance</28>
+    <28></28>
+    <32>Access</32>
+    <32>Access Long Distance</32>
+    <32></32>
+    <36>Teltrust</36>
+    <36>Teltrust Communications Services, Inc.</36>
+    <36></36>
+    <4>All West</4>
+    <4>All West Communications</4>
+    <4></4>
+    <40>USTel</40>
+    <40>USTel dba Arcada Commun.</40>
+    <40>UT side</40>
+    <8>Phoenix</8>
+    <8>Phoenix Fiberlink of Utah, Inc.</8>
+    <8></8>
+    <state>UT</state>
+    <state>Utah</state>
+  </5>
+  <5 name="62">
+    <12>Personal</12>
+    <12>Personal Commun. Network, Inc.</12>
+    <12>VT</12>
+    <16>Personal</16>
+    <16>Personal Commun. Network, Inc.</16>
+    <16>VT</16>
+    <4>Hyperion</4>
+    <4>Hyperion Telcommunications, Inc.</4>
+    <4></4>
+    <8>Personal</8>
+    <8>Personal Commun. Network, Inc.</8>
+    <8>VT</8>
+    <state>VT</state>
+    <state>Vermont</state>
+  </5>
+  <5 name="63">
+    <12>Hyperion</12>
+    <12>Hyperion Telecommunications, Inc.</12>
+    <12></12>
+    <16>US LEC NC</16>
+    <16>US LEC of North Carolina</16>
+    <16>Virginia</16>
+    <20>XCOM</20>
+    <20>XCOM Technologies</20>
+    <20>Virginia site</20>
+    <24>KMC</24>
+    <24>KMC Telecom Inc.</24>
+    <24>Virginia site</24>
+    <28>CFW</28>
+    <28>CFW Wireless</28>
+    <28></28>
+    <32>Level 3</32>
+    <32>Level 3</32>
+    <32>VA site</32>
+    <36>Allegiance</36>
+    <36>Allegiance Telecom, Inc.</36>
+    <36>VA site</36>
+    <4>Swiftcall</4>
+    <4>Swiftcall (USA) Inc.</4>
+    <4></4>
+    <40>Ameritech</40>
+    <40>Ameritech Global Gateway Services</40>
+    <40></40>
+    <8>Global Tone</8>
+    <8>Global Tone Communications, Inc.</8>
+    <8></8>
+    <state>VA</state>
+    <state>Virginia</state>
+  </5>
+  <5 name="64">
+    <4>ComScape</4>
+    <4>ComScape Telecommunications, Inc.</4>
+    <4></4>
+    <8>Hardy</8>
+    <8>Hardy Telecommunications, Inc.</8>
+    <8></8>
+    <state>WV</state>
+    <state>West Virginia</state>
+  </5>
+  <5 name="65">
+    <12>Five Star</12>
+    <12>Five Star Telecom</12>
+    <12></12>
+    <16>Phonetime</16>
+    <16>Phonetime, Inc.</16>
+    <16></16>
+    <20>St. John</20>
+    <20>St. John Telephone Company</20>
+    <20></20>
+    <24>USA Global Link</24>
+    <24>USA Global Link</24>
+    <24></24>
+    <28>GCP</28>
+    <28>Global Connect Partners LLC</28>
+    <28></28>
+    <32>Metro One</32>
+    <32>Metro One Telecommunications</32>
+    <32></32>
+    <36>World Exchange</36>
+    <36>World Exchange</36>
+    <36></36>
+    <4>XYPOINT</4>
+    <4>XYPOINT Corporation</4>
+    <4></4>
+    <40>XYPOINT</40>
+    <40>XYPOINT Corporation</40>
+    <40></40>
+    <44>XYPOINT</44>
+    <44>XYPOINT Corporation</44>
+    <44></44>
+    <48>AlphaNet</48>
+    <48>AlphaNet Telecom Inc.</48>
+    <48>Seattle site</48>
+    <52>GMS</52>
+    <52>Global Mobility Systems, Inc.</52>
+    <52></52>
+    <56>Pass Word</56>
+    <56>Pass Word, Inc.</56>
+    <56></56>
+    <60>Cable Plus</60>
+    <60>Cable Plus Company LP</60>
+    <60></60>
+    <64>Great West</64>
+    <64>Great West Services</64>
+    <64></64>
+    <68>USTel</68>
+    <68>USTel dba Arcada Commun.</68>
+    <68>WA site</68>
+    <8>Teleport</8>
+    <8>Teleport Communications Group</8>
+    <8></8>
+    <state>WA</state>
+    <state>Washington</state>
+  </5>
+  <5 name="66">
+    <12>Airadigm</12>
+    <12>Airadigm Communications</12>
+    <12></12>
+    <16>Airadigm</16>
+    <16>Airadigm Communications</16>
+    <16></16>
+    <20>Airadigm</20>
+    <20>Airadigm Communications</20>
+    <20></20>
+    <24>Airadigm</24>
+    <24>Airadigm Communications</24>
+    <24></24>
+    <28>Airadigm</28>
+    <28>Airadigm Communications</28>
+    <28></28>
+    <32>Kendall</32>
+    <32>Kendall Telephone Inc.</32>
+    <32></32>
+    <36>Cuba City</36>
+    <36>Cuba City Telephone Exchange Company</36>
+    <36></36>
+    <4>Somerset</4>
+    <4>Somerset Telephone Company, Inc.</4>
+    <4></4>
+    <40>KMC</40>
+    <40>KMC Telecom Inc.</40>
+    <40></40>
+    <44>Manawa</44>
+    <44>Manawa Telephone Company, Inc.</44>
+    <44></44>
+    <48>US Xchange</48>
+    <48>US Xchange LLC</48>
+    <48>Wisconsin site</48>
+    <52>Lemonweir Vly</52>
+    <52>Lemonweir Valley Telephone Co.</52>
+    <52></52>
+    <56>Amery</56>
+    <56>Amery Telcom, Inc.</56>
+    <56></56>
+    <8>Airadigm</8>
+    <8>Airadigm Communications</8>
+    <8></8>
+    <state>WI</state>
+    <state>Wisconsin</state>
+  </5>
+  <5 name="67">
+    <12>RT</12>
+    <12>RT Communications, Inc.</12>
+    <12></12>
+    <4>Range</4>
+    <4>Range Telephone Cooperative</4>
+    <4></4>
+    <8>Silver Star</8>
+    <8>Silver Star Telephone Co.</8>
+    <8>WY site</8>
+    <state>WY</state>
+    <state>Wyoming</state>
+  </5>
+  <5 name="68">
+    <4>AirTouch</4>
+    <4>AirTouch Satellite Services</4>
+    <4>Calgary site</4>
+    <state>AB</state>
+    <state>Alberta</state>
+  </5>
+  <5 name="69">
+    <12>GT Group</12>
+    <12>GT Group Telecom Networks, Inc.</12>
+    <12></12>
+    <16>Vancouver</16>
+    <16>Vancouver Telephone Co. Ltd.</16>
+    <16></16>
+    <4>Hongkong</4>
+    <4>Hongkong Telecom Canada</4>
+    <4></4>
+    <8>Prince Rupert</8>
+    <8>Prince Rupert City Telephone</8>
+    <8></8>
+    <state>BC</state>
+    <state>British Columbia</state>
+  </5>
+  <5 name="7">
+    <100>Cameron</100>
+    <100>Cameron Telephone Company</100>
+    <104>Action</104>
+    <104>Action Telcom Company</104>
+    <108>TCC</108>
+    <108>TCC Communications</108>
+    <112>Smithville</112>
+    <112>Smithville Telephone Company, Inc.</112>
+    <116>Oneida Cty</116>
+    <116>Oneida County Rural Telephone Company</116>
+    <12>Allendale</12>
+    <12>Allendale Telephone Company</12>
+    <120>Emily Coop</120>
+    <120>Emily Cooperative Telephone Company</120>
+    <124>Beehive</124>
+    <124>Beehive Telephone Company, Inc.</124>
+    <128>Custer</128>
+    <128>Custer Telephone Cooperative, Inc.</128>
+    <132>MGW</132>
+    <132>MGW Telephone</132>
+    <136>Call America</136>
+    <136>Call America</136>
+    <140>Blanchard</140>
+    <140>Blanchard Telephone Association, Inc.</140>
+    <144>Tonica</144>
+    <144>Tonica Telephone Company</144>
+    <148>Pine Belt</148>
+    <148>Pine Belt Telephone Company, Inc.</148>
+    <152>Rockland</152>
+    <152>Rockland Telephone Company, Inc.</152>
+    <156>Sogetel</156>
+    <156>Sogetel, Inc.</156>
+    <16>Decatur</16>
+    <16>Decatur Telephone Company, Inc.</16>
+    <160>Hamilton Cty</160>
+    <160>Hamilton County Telephone Cooperative</160>
+    <164>Fleet Call</164>
+    <164>Fleet Call</164>
+    <168>New Lisbon</168>
+    <168>New Lisbon Telephone Company</168>
+    <172>West River</172>
+    <172>West River Telecommunications Cooperative</172>
+    <176>West River</176>
+    <176>West River Telecommunications Cooperative</176>
+    <180>Nebraska C</180>
+    <180>Nebraska Central Telephone Company</180>
+    <184>Coastal</184>
+    <184>Coastal Utilities, Inc.</184>
+    <188>Diller</188>
+    <188>Diller Telephone Company</188>
+    <192>HunTel</192>
+    <192>HunTel Systems</192>
+    <196>Progressive R</196>
+    <196>Progressive Rural Telephone Cooperative, Inc.</196>
+    <20>Bell Mobility</20>
+    <20>Bell Mobility Cellular</20>
+    <200>Delta</200>
+    <200>Delta Telephone Company, Inc.</200>
+    <204>K&amp;M</204>
+    <204>K&amp;M Telephone Company, Inc.</204>
+    <208>Washington City</208>
+    <208>Washington City Rural Telephone Cooperative, Inc.</208>
+    <212>Hanson</212>
+    <212>Hanson Communications</212>
+    <216>Hanson</216>
+    <216>Hanson Communications</216>
+    <220>Leaf River</220>
+    <220>Leaf River Telephone Company</220>
+    <224>New Windsor</224>
+    <224>New Windsor Telephone Company</224>
+    <228>Lakefield</228>
+    <228>Lakefield Telephone Company</228>
+    <232>Hart</232>
+    <232>Hart Telephone Company</232>
+    <236>Margaretville</236>
+    <236>Margaretville Telephone Company, Inc.</236>
+    <24>Five Star</24>
+    <24>Five Star Telecom</24>
+    <240>Warwick Valley</240>
+    <240>Warwick Valley Telephone Company</240>
+    <244>Cherokee</244>
+    <244>Cherokee Telephone Company</244>
+    <248>Cherokee</248>
+    <248>Cherokee Telephone Company</248>
+    <252>Cherokee</252>
+    <252>Cherokee Telephone Company</252>
+    <256>Pac Gateway</256>
+    <256>Pacific Gateway Exchange</256>
+    <28>TTI</28>
+    <28>TTI Telecommunications</28>
+    <32>Graceba</32>
+    <32>Graceba Total Communications, Inc.</32>
+    <36>SW Arkansas</36>
+    <36>Southwest Arkansas Telephone Cooperative</36>
+    <4>Pac Gateway</4>
+    <4>Pacific Gateway Exchange</4>
+    <40>SW Arkansas</40>
+    <40>Southwest Arkansas Telephone Cooperative</40>
+    <44>Ogden</44>
+    <44>Ogden Telephone Company</44>
+    <48>Township</48>
+    <48>Township Telephone Company</48>
+    <52>Bloutsville</52>
+    <52>Bloutsville Telephone Company</52>
+    <56>Coastal</56>
+    <56>Coastal Telephone Company</56>
+    <60>Armstrong</60>
+    <60>Armstrong Telephone Company</60>
+    <64>Armstrong</64>
+    <64>Armstrong Telephone Company</64>
+    <68>Delta</68>
+    <68>Delta Telephone Company, Inc.</68>
+    <72>Franklin</72>
+    <72>Franklin Telephone Company, Inc.</72>
+    <76>Ridgeville</76>
+    <76>Ridgeville Telephone Company</76>
+    <8>Elec Lightwave</8>
+    <8>Electric Lightwave</8>
+    <80>Community</80>
+    <80>Community Telephone</80>
+    <84>St. Joseph</84>
+    <84>St. Joseph Telephone and Telegraph Company</84>
+    <88>St. Joseph</88>
+    <88>St. Joseph Telephone and Telegraph Company</88>
+    <92>St. Joseph</92>
+    <92>St. Joseph Telephone and Telegraph Company</92>
+    <96>Peoples Mutual</96>
+    <96>Peoples Mutual Telephone Company</96>
+  </5>
+  <5 name="70">
+    <state>MB</state>
+    <state>Manitoba</state>
+  </5>
+  <5 name="71">
+    <state>NB</state>
+    <state>New Brunswick</state>
+  </5>
+  <5 name="72">
+    <state>NL</state>
+    <state>Newfoundland</state>
+  </5>
+  <5 name="73">
+    <state>NT</state>
+    <state>Northwest Territories</state>
+  </5>
+  <5 name="74">
+    <state>NS</state>
+    <state>Nova Scotia</state>
+  </5>
+  <5 name="75">
+    <12>Dryden Mun.</12>
+    <12>Dryden Municipal Telephone System</12>
+    <12></12>
+    <16>Econophone</16>
+    <16>Econophone, Inc.</16>
+    <16>Ontario site</16>
+    <20>Kenora M</20>
+    <20>Kenora Municipal Telephone Company</20>
+    <20></20>
+    <24>AlphaNet</24>
+    <24>AlphaNet Telecom Inc.</24>
+    <24></24>
+    <28>Eastern</28>
+    <28>Eastern Independent Telecomm. Ltd.</28>
+    <28></28>
+    <32>AirTouch</32>
+    <32>AirTouch Satellite Services</32>
+    <32>Ontario site</32>
+    <36>Wightman</36>
+    <36>Wightman Telephone Ltd.</36>
+    <36></36>
+    <4>Primus</4>
+    <4>Primus Telecommunications, Inc</4>
+    <4></4>
+    <40>Premiere</40>
+    <40>Premiere Communications</40>
+    <40>Ontario site</40>
+    <8>Telehop</8>
+    <8>Telehop Communications, Inc.</8>
+    <8></8>
+    <state>ON</state>
+    <state>Ontario</state>
+  </5>
+  <5 name="76">
+    <state>PE</state>
+    <state>Prince Edward Island</state>
+  </5>
+  <5 name="77">
+    <12>Guevremont</12>
+    <12>Telephone Guevremont Inc.</12>
+    <12></12>
+    <16>Videotron</16>
+    <16>Videotron Telecom Ltee</16>
+    <16></16>
+    <20>Baie</20>
+    <20>La Corporation de Telephone de la Baie</20>
+    <20></20>
+    <24>Videotron</24>
+    <24>Videotron Telecom Ltee</24>
+    <24></24>
+    <28>Lambton</28>
+    <28>La Compagnie de Telephone de Lambton</28>
+    <28></28>
+    <32>Courcelles</32>
+    <32>La Cie de Telephone de Courcelles Inc.</32>
+    <32></32>
+    <4>St-Victor</4>
+    <4>La Compagnie de Telephone de St-Victor</4>
+    <4></4>
+    <8>St-Ephrem</8>
+    <8>Telephone de St-Ephrem</8>
+    <8></8>
+    <state>QC</state>
+    <state>Quebec</state>
+  </5>
+  <5 name="78">
+    <state>SK</state>
+    <state>Saskatchewan</state>
+  </5>
+  <5 name="79">
+    <state>YT</state>
+    <state>Yukon</state>
+  </5>
+  <5 name="8">
+    <100>ICON</100>
+    <100>ICON</100>
+    <104>Bittel</104>
+    <104>Bittel Telecommunications Corporation</104>
+    <108>Bittel</108>
+    <108>Bittel Telecommunications Corporation</108>
+    <112>CTI</112>
+    <112>Communications TeleSystems Int'l</112>
+    <116>Thacker-G</116>
+    <116>Thacker - Grigsby Telephone Company, Inc.</116>
+    <12>Mid-Century</12>
+    <12>Mid-Century Telephone Company</12>
+    <120>Thrifty</120>
+    <120>Thrifty Telephone, Inc.</120>
+    <124>Telco</124>
+    <124>Telco Communications, Inc.</124>
+    <128>Applied Signal</128>
+    <128>Applied Signal Corporation</128>
+    <132>Wilton</132>
+    <132>Wilton Telephone Company</132>
+    <136>ANS</136>
+    <136>Alternative Network Services</136>
+    <140>ANS</140>
+    <140>Alternative Network Services</140>
+    <144>Telstar</144>
+    <144>Telstar Communications, Inc.</144>
+    <148>Telstar</148>
+    <148>Telstar Communications, Inc.</148>
+    <152>ITC</152>
+    <152>ITC Companies</152>
+    <156>ITC</156>
+    <156>ITC Companies</156>
+    <16>Madison</16>
+    <16>Madison Telephone Company</16>
+    <160>United</160>
+    <160>United Communications (UNICOM)</160>
+    <164>BN1</164>
+    <164>BN1 Telecommunications</164>
+    <168>Wabash</168>
+    <168>Wabash Telephone Company</168>
+    <172>Flat Rock</172>
+    <172>Flat Rock Telephone Company</172>
+    <176>Woodhull</176>
+    <176>Woodhull Telephone Company</176>
+    <180>BellSouth</180>
+    <180>BellSouth Mobility</180>
+    <184>BellSouth</184>
+    <184>BellSouth Mobility</184>
+    <188>BellSouth</188>
+    <188>BellSouth Mobility</188>
+    <192>BellSouth</192>
+    <192>BellSouth Mobility</192>
+    <196>Hi-Rim</196>
+    <196>Hi-Rim Communications</196>
+    <20>Amnex</20>
+    <20>Amnex Network</20>
+    <200>Hi-Rim</200>
+    <200>Hi-Rim Communications</200>
+    <204>Prairie Grove</204>
+    <204>Prairie Grove Telephone Company</204>
+    <208>Prairie Grove</208>
+    <208>Prairie Grove Telephone Company</208>
+    <212>Dakota</212>
+    <212>Dakota Cooperative Telecommunications, Inc.</212>
+    <216>Dakota</216>
+    <216>Dakota Cooperative Telecommunications, Inc.</216>
+    <220>Dakota</220>
+    <220>Dakota Cooperative Telecommunications, Inc.</220>
+    <224>Dakota</224>
+    <224>Dakota Cooperative Telecommunications, Inc.</224>
+    <228>Mebtel</228>
+    <228>Mebtel Communications</228>
+    <232>Glandorf</232>
+    <232>Glandorf Telephone Company, Inc.</232>
+    <236>Waldron</236>
+    <236>Waldron Telephone Company</236>
+    <24>Amnex</24>
+    <24>Amnex Network</24>
+    <240>Indiantown</240>
+    <240>Indiantown Telephone System, Inc.</240>
+    <244>Big Bend</244>
+    <244>Big Bend Telephone</244>
+    <248>Fibertech</248>
+    <248>Fibertech Telecom, Inc.</248>
+    <252>Fibertech</252>
+    <252>Fibertech Telecom, Inc.</252>
+    <256>Cherokee</256>
+    <256>Cherokee Telephone Company</256>
+    <28>ConQuest</28>
+    <28>ConQuest</28>
+    <32>Thunder Bay</32>
+    <32>Thunder Bay Telephone</32>
+    <36>Viola</36>
+    <36>Viola Telephone Company</36>
+    <4>Deerfield F</4>
+    <4>Deerfield Farmers' Telephone Company</4>
+    <40>Reynolds</40>
+    <40>Reynolds Telephone Company</40>
+    <44>Yeoman</44>
+    <44>Yeoman Telephone Company</44>
+    <48>Harrisonville</48>
+    <48>Harrisonville Telephone Company</48>
+    <52>Craigville</52>
+    <52>Craigville Telephone Company, Inc.</52>
+    <56>Clarence</56>
+    <56>Clarence Telephone Company</56>
+    <60>N Illinois Univ</60>
+    <60>Northern Illinois University</60>
+    <64>One call</64>
+    <64>One call Communications, Inc.</64>
+    <68>One call</68>
+    <68>One call Communications, Inc.</68>
+    <72>Churchill City</72>
+    <72>Churchill City Telephone &amp; Telegraph System</72>
+    <76>Chippewa City</76>
+    <76>Chippewa City Telephone Company</76>
+    <8>Suntel</8>
+    <8>Suntel Network</8>
+    <80>Roberts City</80>
+    <80>Roberts City Telephone Cooperative Association</80>
+    <84>Bretton Woods</84>
+    <84>Bretton Woods Telephone Company</84>
+    <88>Eastern Telecom</88>
+    <88>Eastern Telecom Corporation</88>
+    <92>Northwest</92>
+    <92>Northwest Telephone Company</92>
+    <96>Northwest</96>
+    <96>Northwest Telephone Company</96>
+  </5>
+  <5 name="80">
+    <12>Quantum</12>
+    <12>Quantum Communications Ltd.</12>
+    <12></12>
+    <16>Quantum</16>
+    <16>Quantum Communications Ltd.</16>
+    <16></16>
+    <20>AirTouch</20>
+    <20>AirTouch Satellite Serv.</20>
+    <20>Puerto Rico site</20>
+    <24>Bermuda</24>
+    <24>Bermuda Digital Communications Ltd.</24>
+    <24></24>
+    <28>Caribcom</28>
+    <28>Caribcom</28>
+    <28></28>
+    <4>Panam</4>
+    <4>Panam Wireless, Inc.</4>
+    <4></4>
+    <8>IT&amp;E</8>
+    <8>IT&amp;E Overseas, Inc.</8>
+    <8></8>
+    <state>Atlantic</state>
+    <state>ATLANTIC and CARIBBEAN ISLANDS (U.S. Territories)</state>
+  </5>
+  <5 name="81">
+    <12>Amer Samoa</12>
+    <12>American Samoa Telecommunications</12>
+    <12></12>
+    <16>Amer Samoa</16>
+    <16>American Samoa Telecommunications</16>
+    <16></16>
+    <20>Guam Cell</20>
+    <20>Guam Cellular &amp; Paging</20>
+    <20></20>
+    <24>Saipan Cell</24>
+    <24>Saipan Cellular &amp; Paging</24>
+    <24></24>
+    <4>Guam</4>
+    <4>Guam Telephone Authority</4>
+    <4></4>
+    <8>Access</8>
+    <8>Access Telecom</8>
+    <8></8>
+    <state>Pacific</state>
+    <state>PACIFIC ISLANDS (U.S. Territories)</state>
+  </5>
+  <5 name="82">
+    <12>Fort Bend</12>
+    <12>Fort Bend Long Distance Co.</12>
+    <12>TX site</12>
+    <16>USTel</16>
+    <16>USTel dba Arcada Commun.</16>
+    <16>TX site</16>
+    <20>NSS</20>
+    <20>Network Switching Services,Inc.</20>
+    <20>TX site</20>
+    <24>Grande River</24>
+    <24>Grande River Communications,Inc.</24>
+    <24></24>
+    <28>Southside</28>
+    <28>Southside Communications,Inc.</28>
+    <28>TX site</28>
+    <32>Alamosa</32>
+    <32>Alamosa PCS LLC</32>
+    <32>TX site</32>
+    <36>Allegiance</36>
+    <36>Allegiance Telecom, Inc.</36>
+    <36>TX site</36>
+    <4>N+1</4>
+    <4>N + 1, Inc.,</4>
+    <4>TX site</4>
+    <40>Millenium</40>
+    <40>Millenium Telcom, L.L.C.</40>
+    <40></40>
+    <44>Logix</44>
+    <44>Logix</44>
+    <44></44>
+    <48>Logix</48>
+    <48>Logix</48>
+    <48></48>
+    <52>Cumby</52>
+    <52>Cumby Telephone Cooperative,Inc.</52>
+    <52></52>
+    <56>U.S. Oper</56>
+    <56>U.S. Operations, Inc.</56>
+    <56></56>
+    <8>Level 3</8>
+    <8>Level 3 Communications</8>
+    <8>TX site</8>
+    <state>TX</state>
+    <state>Texas</state>
+  </5>
+  <5 name="83">
+    <12>Level 3</12>
+    <12>Level 3 Communications</12>
+    <12>CA site</12>
+    <16>KDD</16>
+    <16>KDD America Inc.</16>
+    <16>CA site</16>
+    <20>USTel</20>
+    <20>USTel dba Arcada Commun.</20>
+    <20>CA site</20>
+    <24>WorldxChange</24>
+    <24>WorldxChange</24>
+    <24>CA site</24>
+    <28>Premiere</28>
+    <28>Premiere Communications</28>
+    <28>CA site</28>
+    <32>NSS</32>
+    <32>Network Switching Services,Inc.</32>
+    <32>CA site</32>
+    <36>US TelePacific</36>
+    <36>US TelePacific Corp.dba TelePacific</36>
+    <36></36>
+    <4>Allegiance</4>
+    <4>Allegiance Telecom, Inc.</4>
+    <4>CA site</4>
+    <40>OpTel</40>
+    <40>OpTel,Inc.</40>
+    <40>CA site</40>
+    <48>VIP Calling</48>
+    <48>VIP Calling</48>
+    <48>CA site</48>
+    <52>Alphanet</52>
+    <52>Alphanet Telecom Inc</52>
+    <52>CA site</52>
+    <56>RCN</56>
+    <56>RCN Telecom of California</56>
+    <56></56>
+    <60>Startec</60>
+    <60>Startec Global Communications Corp.</60>
+    <60></60>
+    <8>PaeTec</8>
+    <8>PaeTec Communications,Inc.</8>
+    <8>CA site</8>
+    <state>CA</state>
+    <state>California</state>
+  </5>
+  <5 name="84">
+    <12>USTel</12>
+    <12>USTel dba Arcada Commun.</12>
+    <12>NY site</12>
+    <16>City Telecom</16>
+    <16>City Telecom (USA)Inc.</16>
+    <16>NY site</16>
+    <20>NSS</20>
+    <20>Network Switching Services, Inc.</20>
+    <20>NY site</20>
+    <24>Interoute</24>
+    <24>Interoute Telecommunications, Inc.</24>
+    <24></24>
+    <28>Interoute</28>
+    <28>Interoute Telecommunications, Inc.</28>
+    <28></28>
+    <32>Choice One</32>
+    <32>Choice One Communications</32>
+    <32>NY site</32>
+    <36>Star</36>
+    <36>Star/UniSource Carrier Services</36>
+    <36></36>
+    <4>Carrier 1</4>
+    <4>Carrier 1, Inc.</4>
+    <4>NY site</4>
+    <40>Choice One</40>
+    <40>Choice One Communications</40>
+    <40></40>
+    <44>Comav</44>
+    <44>Comav Telco, Inc.</44>
+    <44>NY site</44>
+    <8>Telergy</8>
+    <8>Telergy</8>
+    <8></8>
+    <state>NY</state>
+    <state>New York</state>
+  </5>
+  <5 name="9">
+    <100>TRI</100>
+    <100>TRI Touch America</100>
+    <104>Star</104>
+    <104>Star Telephone Membership Corporation</104>
+    <108>Star</108>
+    <108>Star Telephone Membership Corporation</108>
+    <112>Star</112>
+    <112>Star Telephone Membership Corporation</112>
+    <116>Indianhead</116>
+    <116>Indianhead Telephone Company</116>
+    <12>MRC</12>
+    <12>MRC Telecommunications, Inc.</12>
+    <120>Polar</120>
+    <120>Polar Communications Mutual Aid Corporation</120>
+    <124>Multimedia</124>
+    <124>Multimedia Telephone Service</124>
+    <128>Multimedia</128>
+    <128>Multimedia Telephone Service</128>
+    <136>Total</136>
+    <136>Total World Telecom</136>
+    <140>Total</140>
+    <140>Total World Telecom</140>
+    <144>Total</144>
+    <144>Total World Telecom</144>
+    <148>Total</148>
+    <148>Total World Telecom</148>
+    <152>ATCI</152>
+    <152>ATCI Inc.</152>
+    <156>ATCI</156>
+    <156>Econo Call/ATCI (USA)</156>
+    <16>Telco</16>
+    <16>Telco Communications Group</16>
+    <160>ATCI</160>
+    <160>Econo Call/ATCI (USA)</160>
+    <164>Ardmore</164>
+    <164>Ardmore Telephone Company, Inc.</164>
+    <168>Niagara</168>
+    <168>Niagara Telephone Company</168>
+    <172>Mabel Coop</172>
+    <172>Mabel Cooperative Telephone Company</172>
+    <176>Fox</176>
+    <176>Fox Communications Corporation</176>
+    <180>Spring Grove</180>
+    <180>Spring Grove Cooperative Telephone</180>
+    <184>Ogden</184>
+    <184>Ogden Telephone Company</184>
+    <188>Souris River</188>
+    <188>Souris River Telecommunications Cooperative</188>
+    <192>Medicine Park</192>
+    <192>Medicine Park Telephone Company</192>
+    <196>Yelcot</196>
+    <196>Yelcot Telephone Company</196>
+    <20>Telco</20>
+    <20>Telco Communications Group</20>
+    <200>Sunman</200>
+    <200>Sunman Telephone</200>
+    <204>Home</204>
+    <204>Home Telephone Company</204>
+    <208>Southeast</208>
+    <208>Southeast Telephone of WI, Inc.</208>
+    <212>Springport</212>
+    <212>Springport Telephone Company</212>
+    <216>Valley</216>
+    <216>Valley Telephone Cooperative, Inc.</216>
+    <220>CGN</220>
+    <220>Communications Gateway Network, Inc.</220>
+    <224>CGN</224>
+    <224>Communications Gateway Network, Inc.</224>
+    <228>CGN</228>
+    <228>Communications Gateway Network, Inc.</228>
+    <232>Vista</232>
+    <232>Vista Telephone</232>
+    <236>Clay Cty</236>
+    <236>Clay County Rural Telephone Cooperative, Inc.</236>
+    <24>Granby</24>
+    <24>Granby Telephone and Telegraph Company</24>
+    <244>McDonough</244>
+    <244>McDonough Telephone Company</244>
+    <248>Oneida</248>
+    <248>Oneida Telephone Company</248>
+    <252>LaHarpe</252>
+    <252>LaHarpe Telephone Company</252>
+    <256>Fibertech</256>
+    <256>Fibertech Telecom, Inc.</256>
+    <28>STSJ</28>
+    <28>STSJ Telephone Company</28>
+    <32>Big Sandy</32>
+    <32>Big Sandy Telecom</32>
+    <36>State</36>
+    <36>State Telephone Company</36>
+    <4>Dial US</4>
+    <4>Dial US</4>
+    <40>Ringgold</40>
+    <40>Ringgold Telephone Company</40>
+    <44>InterAmerican</44>
+    <44>InterAmerican Telephone Company</44>
+    <48>Union River</48>
+    <48>Union River Telephone Company</48>
+    <52>Flex</52>
+    <52>Flex Communications</52>
+    <56>Sand Creek</56>
+    <56>Sand Creek Telephone Company</56>
+    <60>TotalNet</60>
+    <60>TotalNet Communications, Inc.</60>
+    <64>BEK</64>
+    <64>BEK Communications Cooperative</64>
+    <68>Dakota Central</68>
+    <68>Dakota Central Telecommunication Cooperative</68>
+    <72>Teleport</72>
+    <72>Teleport Communications Group</72>
+    <76>Teleport</76>
+    <76>Teleport Communications Group</76>
+    <8>Piedmont</8>
+    <8>Piedmont Telephone Membership Corporation</8>
+    <80>Teleport</80>
+    <80>Teleport Communications Group</80>
+    <84>Teleport</84>
+    <84>Teleport Communications Group</84>
+    <88>Teleport</88>
+    <88>Teleport Communications Group</88>
+    <92>Huntel</92>
+    <92>Huntel Systems, Inc.</92>
+    <96>TRI</96>
+    <96>TRI Touch America</96>
+  </5>
+</opt>
