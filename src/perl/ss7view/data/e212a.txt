@@ -1,0 +1,584 @@
+# 
+# 
+# Annex to
+# 
+# 
+# 
+# 
+#  INTERNATIONAL TELECOMMUNICATION UNION
+# 
+# 
+# 
+# 
+# 
+#  ITU-T TELECOMMUNICATION
+# 
+# STANDARDIZATION SECTOR OF ITU
+#  COMPLEMENT TO ITU-T RECOMMENDATION E.212 (05/2008)
+# _________________________________________________________________
+#    LIST OF MOBILE COUNTRY OR
+# 
+# GEOGRAPHICAL AREA CODES   (POSITION ON 1 APRIL 2010)
+# 
+#   _________________________________________________________________
+# 
+# 
+# Geneva, 2010
+# 
+# Annex to
+# 
+#   List of Mobile Country or Geographical Area Codes
+#
+# Note from TSB
+#
+# 1.  This List of mobile country or geographical area codes replaces the previous one published as
+#     Annex to ITU Operational Bulletin No. 897 of 1 December 2007. Since then, various new
+#     assignments have been made, and they have been published in the ITU Operational Bulletin .
+#
+# 2.  This List includes :
+#     - a list of mobile country or geographical area codes - in numerical order;
+#     - a list of mobile country or geographical area codes - in alphabetical order.
+#
+# 3.  This List will be updated by numbered series of amendments published in the ITU Operational
+#     Bulletin. Furthermore, the information contained in this Annex is also available on the ITU
+#     website www.itu.int/itu-t/bulletin/annex.html.
+#
+# 4.  Please address any comments concerning this publication to the Director of TSB:
+#
+#           Tel:  +41 22 730 5887
+#           Fax:  +41 22 730 5853
+#           Email: tsbmail@itu.int
+#
+# 5.  The designations employed and the presentation of material in this List do not imply the
+#     expression of any opinion whatsoever on the part of  ITU concerning the legal status of any
+#     country or geographical area, or of its authorities.
+#
+
+Numerical order
+0	Reserved	a
+1	Reserved	a
+202	Greece
+204	Netherlands (Kingdom of the)
+206	Belgium
+208	France
+212	Monaco (Principality of)
+213	Andorra (Principality of)
+214	Spain
+216	Hungary (Republic of)
+218	Bosnia and Herzegovina
+219	Croatia (Republic of)
+220	Serbia (Republic of)
+222	Italy
+225	Vatican City State
+226	Romania
+228	Switzerland (Confederation of)
+230	Czech Republic
+231	Slovak Republic
+232	Austria
+234	United Kingdom of Great Britain and Northern Ireland
+235	United Kingdom of Great Britain and Northern Ireland
+238	Denmark
+240	Sweden
+242	Norway
+244	Finland
+246	Lithuania (Republic of)
+247	Latvia (Republic of)
+248	Estonia (Republic of)
+250	Russian Federation
+255	Ukraine
+257	Belarus (Republic of)
+259	Moldova (Republic of)
+260	Poland (Republic of)
+262	Germany (Federal Republic of)
+266	Gibraltar
+268	Portugal
+270	Luxembourg
+272	Ireland
+274	Iceland
+276	Albania (Republic of)
+278	Malta
+280	Cyprus (Republic of)
+282	Georgia
+283	Armenia (Republic of)
+284	Bulgaria (Republic of)
+286	Turkey
+288	Faroe Islands
+290	Greenland (Denmark)
+292	San Marino (Republic of)
+293	Slovenia (Republic of)
+294	The Former Yugoslav Republic of Macedonia
+295	Liechtenstein (Principality of)
+297	Montenegro (Republic of)
+302	Canada
+308	Saint Pierre and Miquelon (Collectivité territoriale de la République française)
+310	United States of America
+311	United States of America
+312	United States of America
+313	United States of America
+314	United States of America
+315	United States of America
+316	United States of America
+330	Puerto Rico
+332	United States Virgin Islands
+334	Mexico
+338	Jamaica
+340	Martinique (French Department of)
+340	Guadeloupe (French Department of)
+342	Barbados
+344	Antigua and Barbuda
+346	Cayman Islands
+348	British Virgin Islands
+350	Bermuda
+352	Grenada
+354	Montserrat
+356	Saint Kitts and Nevis
+358	Saint Lucia
+360	Saint Vincent and the Grenadines
+362	Netherlands Antilles
+363	Aruba
+364	Bahamas (Commonwealth of the)
+365	Anguilla
+366	Dominica (Commonwealth of)
+368	Cuba
+370	Dominican Republic
+372	Haiti (Republic of)
+374	Trinidad and Tobago
+376	Turks and Caicos Islands
+400	Azerbaijani Republic
+401	Kazakhstan (Republic of)
+402	Bhutan (Kingdom of)
+404	India (Republic of)
+405	India (Republic of)
+406	India (Republic of)
+410	Pakistan (Islamic Republic of)
+412	Afghanistan
+413	Sri Lanka (Democratic Socialist Republic of)
+414	Myanmar (Union of)
+415	Lebanon
+416	Jordan (Hashemite Kingdom of)
+417	Syrian Arab Republic
+418	Iraq (Republic of)
+419	Kuwait (State of)
+420	Saudi Arabia (Kingdom of)
+421	Yemen (Republic of)
+422	Oman (Sultanate of)
+424	United Arab Emirates
+425	Israel (State of)
+426	Bahrain (Kingdom of)
+427	Qatar (State of)
+428	Mongolia
+429	Nepal (Federal Democratic Republic of)
+430	United Arab Emirates	b
+431	United Arab Emirates	b
+432	Iran (Islamic Republic of)
+434	Uzbekistan (Republic of)
+436	Tajikistan (Republic of)
+437	Kyrgyz Republic
+438	Turkmenistan
+440	Japan
+441	Japan
+450	Korea (Republic of)
+452	Viet Nam (Socialist Republic of)
+454	Hong Kong, China
+455	Macao, China
+456	Cambodia (Kingdom of)
+457	Lao People's Democratic Republic
+460	China (People's Republic of)
+461	China (People's Republic of)
+466	Taiwan, China
+467	Democratic People's Republic of Korea
+470	Bangladesh (People's Republic of)
+472	Maldives (Republic of)
+502	Malaysia
+505	Australia
+510	Indonesia (Republic of)
+514	Democratic Republic of Timor-Leste
+515	Philippines (Republic of the)
+520	Thailand
+525	Singapore (Republic of)
+528	Brunei Darussalam
+530	New Zealand
+536	Nauru (Republic of)
+537	Papua New Guinea
+539	Tonga (Kingdom of)
+540	Solomon Islands
+541	Vanuatu (Republic of)
+542	Fiji (Republic of)
+543	Wallis and Futuna (Territoire français d'outre-mer)
+544	American Samoa
+545	Kiribati (Republic of)
+546	New Caledonia (Territoire français d'outre-mer)
+547	French Polynesia (Territoire français d'outre-mer)
+548	Cook Islands
+549	Samoa (Independent State of)
+550	Micronesia (Federated States of)
+551	Marshall Islands (Republic of the)
+552	Palau (Republic of)
+602	Egypt (Arab Republic of)
+603	Algeria (People's Democratic Republic of)
+604	Morocco (Kingdom of)
+605	Tunisia
+606	Libya (Socialist People's Libyan Arab Jamahiriya)
+607	Gambia (Republic of the)
+608	Senegal (Republic of)
+609	Mauritania (Islamic Republic of)
+610	Mali (Republic of)
+611	Guinea (Republic of)
+612	Côte d'Ivoire (Republic of)
+613	Burkina Faso
+614	Niger (Republic of the)
+615	Togolese Republic
+616	Benin (Republic of)
+617	Mauritius (Republic of)
+618	Liberia (Republic of)
+619	Sierra Leone
+620	Ghana
+621	Nigeria (Federal Republic of)
+622	Chad (Republic of)
+623	Central African Republic
+624	Cameroon (Republic of)
+625	Cape Verde (Republic of)
+626	Sao Tome and Principe (Democratic Republic of)
+627	Equatorial Guinea (Republic of)
+628	Gabonese Republic
+629	Congo (Republic of the)
+630	Democratic Republic of the Congo
+631	Angola (Republic of)
+632	Guinea-Bissau (Republic of)
+633	Seychelles (Republic of)
+634	Sudan (Republic of the)
+635	Rwanda (Republic of)
+636	Ethiopia (Federal Democratic Republic of)
+637	Somali Democratic Republic
+638	Djibouti (Republic of)
+639	Kenya (Republic of)
+640	Tanzania (United Republic of)
+641	Uganda (Republic of)
+642	Burundi (Republic of)
+643	Mozambique (Republic of)
+645	Zambia (Republic of)
+646	Madagascar (Republic of)
+647	French Departments and Territories in the Indian Ocean
+648	Zimbabwe (Republic of)
+649	Namibia (Republic of)
+650	Malawi
+651	Lesotho (Kingdom of)
+652	Botswana (Republic of)
+653	Swaziland (Kingdom of)
+654	Comoros (Union of the)
+655	South Africa (Republic of)
+657	Eritrea
+702	Belize
+704	Guatemala (Republic of)
+706	El Salvador (Republic of)
+708	Honduras (Republic of)
+710	Nicaragua
+712	Costa Rica
+714	Panama (Republic of)
+716	Peru
+722	Argentine Republic
+724	Brazil (Federative Republic of)
+730	Chile
+732	Colombia (Republic of)
+734	Venezuela (Bolivarian Republic of)
+736	Bolivia (Plurinational State of)
+738	Guyana
+740	Ecuador
+742	French Guiana (French Department of)
+744	Paraguay (Republic of)
+746	Suriname (Republic of)
+748	Uruguay (Eastern Republic of)
+750	Falkland Islands (Malvinas)
+8	Reserved	a
+901	International Mobile, shared code	c	shared
+
+Alphabetical order
+412	Afghanistan
+276	Albania (Republic of)
+603	Algeria (People's Democratic Republic of)
+544	American Samoa
+213	Andorra (Principality of)
+631	Angola (Republic of)
+365	Anguilla
+344	Antigua and Barbuda
+722	Argentine Republic
+283	Armenia (Republic of)
+363	Aruba
+505	Australia
+232	Austria
+400	Azerbaijani Republic
+364	Bahamas (Commonwealth of the)
+426	Bahrain (Kingdom of)
+470	Bangladesh (People's Republic of)
+342	Barbados
+257	Belarus (Republic of)
+206	Belgium
+702	Belize
+616	Benin (Republic of)
+350	Bermuda
+402	Bhutan (Kingdom of)
+736	Bolivia (Plurinational State of)
+218	Bosnia and Herzegovina
+652	Botswana (Republic of)
+724	Brazil (Federative Republic of)
+348	British Virgin Islands
+528	Brunei Darussalam
+284	Bulgaria (Republic of)
+613	Burkina Faso
+642	Burundi (Republic of)
+456	Cambodia (Kingdom of)
+624	Cameroon (Republic of)
+302	Canada
+625	Cape Verde (Republic of)
+346	Cayman Islands
+623	Central African Republic
+622	Chad (Republic of)
+730	Chile
+461	China (People's Republic of)
+460	China (People's Republic of)
+732	Colombia (Republic of)
+654	Comoros (Union of the)
+629	Congo (Republic of the)
+548	Cook Islands
+712	Costa Rica
+612	Côte d'Ivoire (Republic of)
+219	Croatia (Republic of)
+368	Cuba
+280	Cyprus (Republic of)
+230	Czech Republic
+467	Democratic People's Republic of Korea
+630	Democratic Republic of the Congo
+514	Democratic Republic of Timor-Leste
+238	Denmark
+638	Djibouti (Republic of)
+366	Dominica (Commonwealth of)
+370	Dominican Republic
+740	Ecuador
+602	Egypt (Arab Republic of)
+706	El Salvador (Republic of)
+627	Equatorial Guinea (Republic of)
+657	Eritrea
+248	Estonia (Republic of)
+636	Ethiopia (Federal Democratic Republic of)
+750	Falkland Islands (Malvinas)
+288	Faroe Islands
+542	Fiji (Republic of)
+244	Finland
+208	France
+647	French Departments and Territories in the Indian Ocean
+742	French Guiana (French Department of)
+547	French Polynesia (Territoire français d'outre-mer)
+628	Gabonese Republic
+607	Gambia (Republic of the)
+282	Georgia
+262	Germany (Federal Republic of)
+620	Ghana
+266	Gibraltar
+202	Greece
+290	Greenland (Denmark)
+352	Grenada
+340	Guadeloupe (French Department of)
+704	Guatemala (Republic of)
+611	Guinea (Republic of)
+632	Guinea-Bissau (Republic of)
+738	Guyana
+372	Haiti (Republic of)
+708	Honduras (Republic of)
+454	Hong Kong, China
+216	Hungary (Republic of)
+274	Iceland
+404	India (Republic of)
+405	India (Republic of)
+406	India (Republic of)
+510	Indonesia (Republic of)
+901	International Mobile, shared code	c	shared
+432	Iran (Islamic Republic of)
+418	Iraq (Republic of)
+272	Ireland
+425	Israel (State of)
+222	Italy
+338	Jamaica
+440	Japan
+441	Japan
+416	Jordan (Hashemite Kingdom of)
+401	Kazakhstan (Republic of)
+639	Kenya (Republic of)
+545	Kiribati (Republic of)
+450	Korea (Republic of)
+419	Kuwait (State of)
+437	Kyrgyz Republic
+457	Lao People's Democratic Republic
+247	Latvia (Republic of)
+415	Lebanon
+651	Lesotho (Kingdom of)
+618	Liberia (Republic of)
+606	Libya (Socialist People's Libyan Arab Jamahiriya)
+295	Liechtenstein (Principality of)
+246	Lithuania (Republic of)
+270	Luxembourg
+455	Macao, China
+646	Madagascar (Republic of)
+650	Malawi
+502	Malaysia
+472	Maldives (Republic of)
+610	Mali (Republic of)
+278	Malta
+551	Marshall Islands (Republic of the)
+340	Martinique (French Department of)
+609	Mauritania (Islamic Republic of)
+617	Mauritius (Republic of)
+334	Mexico
+550	Micronesia (Federated States of)
+259	Moldova (Republic of)
+212	Monaco (Principality of)
+428	Mongolia
+297	Montenegro (Republic of)
+354	Montserrat
+604	Morocco (Kingdom of)
+643	Mozambique (Republic of)
+414	Myanmar (Union of)
+649	Namibia (Republic of)
+536	Nauru (Republic of)
+429	Nepal (Federal Democratic Republic of)
+204	Netherlands (Kingdom of the)
+362	Netherlands Antilles
+546	New Caledonia (Territoire français d'outre-mer)
+530	New Zealand
+710	Nicaragua
+614	Niger (Republic of the)
+621	Nigeria (Federal Republic of)
+242	Norway
+422	Oman (Sultanate of)
+410	Pakistan (Islamic Republic of)
+552	Palau (Republic of)
+714	Panama (Republic of)
+537	Papua New Guinea
+744	Paraguay (Republic of)
+716	Peru
+515	Philippines (Republic of the)
+260	Poland (Republic of)
+268	Portugal
+330	Puerto Rico
+427	Qatar (State of)
+0	Reserved	a
+1	Reserved	a
+8	Reserved	a
+226	Romania
+250	Russian Federation
+635	Rwanda (Republic of)
+356	Saint Kitts and Nevis
+358	Saint Lucia
+308	Saint Pierre and Miquelon (Collectivité territoriale de la République française)
+360	Saint Vincent and the Grenadines
+549	Samoa (Independent State of)
+292	San Marino (Republic of)
+626	Sao Tome and Principe (Democratic Republic of)
+420	Saudi Arabia (Kingdom of)
+608	Senegal (Republic of)
+220	Serbia (Republic of)
+633	Seychelles (Republic of)
+619	Sierra Leone
+525	Singapore (Republic of)
+231	Slovak Republic
+293	Slovenia (Republic of)
+540	Solomon Islands
+637	Somali Democratic Republic
+655	South Africa (Republic of)
+214	Spain
+413	Sri Lanka (Democratic Socialist Republic of)
+634	Sudan (Republic of the)
+746	Suriname (Republic of)
+653	Swaziland (Kingdom of)
+240	Sweden
+228	Switzerland (Confederation of)
+417	Syrian Arab Republic
+466	Taiwan, China
+436	Tajikistan (Republic of)
+640	Tanzania (United Republic of)
+520	Thailand
+294	The Former Yugoslav Republic of Macedonia
+615	Togolese Republic
+539	Tonga (Kingdom of)
+374	Trinidad and Tobago
+605	Tunisia
+286	Turkey
+438	Turkmenistan
+376	Turks and Caicos Islands
+641	Uganda (Republic of)
+255	Ukraine
+424	United Arab Emirates
+430	United Arab Emirates	b
+431	United Arab Emirates	b
+235	United Kingdom of Great Britain and Northern Ireland
+234	United Kingdom of Great Britain and Northern Ireland
+310	United States of America
+316	United States of America
+311	United States of America
+313	United States of America
+314	United States of America
+315	United States of America
+312	United States of America
+332	United States Virgin Islands
+748	Uruguay (Eastern Republic of)
+434	Uzbekistan (Republic of)
+541	Vanuatu (Republic of)
+225	Vatican City State
+734	Venezuela (Bolivarian Republic of)
+452	Viet Nam (Socialist Republic of)
+543	Wallis and Futuna (Territoire français d'outre-mer)
+421	Yemen (Republic of)
+645	Zambia (Republic of)
+648	Zimbabwe (Republic of)
+
+# Notes common to Numerical and Alphabetical Lists of ITU_T Recommendation E.212 Mobile Country or Geographical Area Codes (MCCs)
+Notes
+a	Mobile Country or Geographical Area Codes (MCCs) that begin with the digits 0, 1 and 8 are reserved for future use.
+b	United Arab Emirates, Dubai: 431; Abu Dhabi: 430.
+c	Associated with shared mobile country code 901, the following two-digit mobile network codes (MNC) have been reserved for or assigned to the international mobile networks:
+
+# 	Network  Mobile Country code (MCC) and Mobile Network code (MNC) Status
+#
+# 901	01	ICO Global Communications
+# 901	02	Sense Communications International AS
+# 901	03	Iridium Satellite LLC
+# 901	05	Thuraya RMSS Network
+# 901	06	Thuraya Satellite Telecommunications Company
+# 901	09	Tele1 Europe
+# 901	10	Asia Cellular Satellite (AceS)
+# 901	11	Inmarsat Ltd.
+# 901	12	Maritime Communications Partner A.S. (MCP network)
+# 901	13	Global Networks Switzerland AG
+# 901	14	Telenor
+# 901	15	OnAir
+# 901	16	Jasper Wireless Inc
+# 901	17	Jersey Telecom
+# 901	18	Cingular Wireless
+# 901	19	Vodafone Malta
+# 901	20	Intermatica
+# 901	21	Seanet Maritime Communications AB
+# 901	22	MediaLincc Ltd
+# 901	23	Beeline
+# 901	24	Voxbone SA
+# 901	25	In & Phone
+# 901	26	Telecom Italia
+# 901	27	OnAir
+# 901	28	Vodafone Group
+# 901	29	Telenor Connexion AB
+# 901	30	Terrestar Networks
+# 901	88	UN Office for the Coordination of Humanitarian Affairs (OCHA)
+
+# Number of spare E.212 Mobile Country or Geographical Area Codes (MCCs)  Mobile Country or Geographical Area
+
+# Codes, number range   Number of spare codes
+# 
+# 000 - 099  reserved
+# 100 - 199  reserved
+# 200 - 299  49
+# 300 - 399  66
+# 400 - 499  56
+# 500 - 599  75
+# 600 - 699  46
+# 700 - 799  79
+# 800 - 899  reserved
+# 900 - 999  99
+

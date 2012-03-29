@@ -1,0 +1,92 @@
+ISO2	ISO2/3	LERG	CLLI	Location
+CA	AB	AB	AB	Alberta
+CA	BC	BC	BC	British Columbia
+CA	MB	MB	MB	Manitoba
+CA	NB	NB	NB	New Brunswick
+CA	NL	NF	NF	Newfoundland
+CA	NT	NT	NT	Northwest Territories
+CA	NS	NS	NS	Nova Scotia
+CA	NU	VU	VU	Nunavut Territory
+CA	ON	ON	ON	Ontario
+CA	PE	PE	PE	Prince Edward Island
+CA	QC	PQ	PQ	Quebec
+CA	SK	SK	SK	Saskatchewan
+CA	YT	YT	YT	Yukon Territory
+
+MX	MX	MX	MX	Mexico
+
+AS	AS	AS	AM	American Samoa
+AI	AI	AI	AI	Anguilla
+AG	AG	AN	AN	Antigua
+BS	BS	BA	BA	Bahamas
+BB	BB	BD	BD	Barbados
+BM	BM	BM	BM	Bermuda
+VG	VG	BV	BV	British Virgin Islands
+KY	KY	CQ	CQ	Cayman Islands
+MP	MP	NN	NN	CNMI (N. Marianas)
+DM	DM	DM	DM	Dominica
+DO	DO	DR	DR	Dominican Republic
+GD	GD	GN	GN	Grenada
+GU	GU	GU	GU	Guam
+JM	JM	JM	JM	Jamaica
+MS	MS	RT	RT	Montserrat
+PR	PR	PR	PR	Puerto Rico
+KN	KN	KA	KA	St. Kitts & Nevis
+LC	LC	SA	SA	St. Lucia
+SX	SX	SF	SF	St. Maarten
+VC	VC	ZF	ZF	St. Vincent
+TT	TT	TR	TR	Trinidad & Tobago
+TC	TC	TC	TC	Turks & Caicos
+VI	VI	VI	VI	US Virgin Islands
+
+US	AL	AL	AL	Alabama
+US	AK	AK	AK	Alaska
+US	AZ	AZ	AZ	Arizona
+US	AR	AR	AR	Arkansas
+US	CA	CA	CA	California
+US	CO	CO	CO	Colorado
+US	CT	CT	CT	Connecticut
+US	DE	DE	DE	Delaware
+US	FL	FL	FL	Florida
+US	GA	GA	GA	Georgia
+US	HI	HI	HI	Hawaii
+US	ID	ID	ID	Idaho
+US	IL	IL	IL	Illinois
+US	IN	IN	IN	Indiana
+US	IA	IA	IA	Iowa
+US	KS	KS	KS	Kansas
+US	KY	KY	KY	Kentucky
+US	LA	LA	LA	Louisiana
+US	ME	ME	ME	Maine
+US	MD	MD	MD	Maryland
+US	MA	MA	MA	Massachusetts
+US	MI	MI	MI	Michigan
+US	MN	MN	MN	Minnesota
+US	MS	MS	MS	Mississippi
+US	MO	MO	MO	Missouri
+US	MT	MT	MT	Montana
+US	NE	NE	NE	Nebraska
+US	NV	NV	NV	Nevada
+US	NH	NH	NH	New Hampshire
+US	NJ	NJ	NJ	New Jersey
+US	NM	NM	NM	New Mexico
+US	NY	NY	NY	New York
+US	NC	NC	NC	North Carolina
+US	ND	ND	ND	North Dakota
+US	OH	OH	OH	Ohio
+US	OK	OK	OK	Oklahoma
+US	OR	OR	OR	Oregon
+US	PA	PA	PA	Pennsylvania
+US	RI	RI	RI	Rhode Island
+US	SC	SC	SC	South Carolina
+US	SD	SD	SD	South Dakota
+US	TN	TN	TN	Tennessee
+US	TX	TX	TX	Texas
+US	UT	UT	UT	Utah
+US	VT	VT	VT	Vermont
+US	VA	VA	VA	Virginia
+US	WA	WA	WA	Washington
+US	DC	DC	DC	Washington, D.C.
+US	WV	WV	WV	West Virginia
+US	WI	WI	WI	Wisconsin
+US	WY	WY	WY	Wyoming

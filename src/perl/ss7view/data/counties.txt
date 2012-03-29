@@ -1,0 +1,95 @@
+Aberdeenshire	Aberdeen,Peterhead,Fraserburgh,Inverurie,Huntley,Ellon,Turriff
+Anglesey/Sir Fon	Beaumaris,Holyhead,Llangefni,Amlwch,Menai Bridge
+Angus/Forfarshire	Forfar,Dundee,Arbroath,Brechin,Montrose,Carnoustie,Kirriemuir
+Antrim	Antrim,Ballymena,Carrickfergus,Larne,Lisburn,Newtownabbey
+Argyllshire	Inveraray,Oban,Dunoon,Campbeltown,Lochgilphead,Tobermory
+Armagh	Armagh,Newry,Craigavon
+Ayrshire	Ayr,Kilmarnock,Irvine,Saltcoats,Kilwinning,Largs,Troon,Cumnock
+Banffshire	Banff,Buckie,Keith,Macduff,Portsoy,Dufftown
+Bedfordshire	Bedford,Luton,Dunstable,Leighton Buzzard,Biggleswade,Sandy
+Berkshire	Reading,Bracknell,Maidenhead,Newbury,Windsor,Wokingham,Abingdon
+Berwickshire	Greenlaw,Duns,Eyemouth,Lauder,Coldstream
+Brecknockshire/Sir Frycheiniog	Brecon,Builth Wells,Hay-on-Wye,Talgarth,Llanwrtwd Wells
+Buckinghamshire	Aylesbury,Milton Keynes,Slough,Buckingham,High Wycombe
+Buteshire	Rothesay,Millport,Brodick,Lochranza
+Caernarfonshire/Sir Gaernarfon	Caernarfon,Bangor,Llandudno,Conwy,Pwllheli,Porthmadog
+Caithness	Wick,Thurso,Halkirk,Castletown
+Cambridgeshire	Cambridge,Wisbech,Ely,March,Whittlesey,Chatteris,Linton
+Cardiganshire/Ceredigion	Cardigan,Aberystwyth,Lampeter,New Quay,Tregaron
+Carmarthenshire/Sir Gaerfyrddin	Carmarthen,Llanelli,Ammanford,Llandovery,Kidwelly,St. Clears
+Cheshire	Chester,Stockport,Ellesmere Port,Birkenhead,Wallasey,Runcorn,Macclesfield,Crewe
+Clackmannanshire	Clackmannan,Alloa,Tillicoultry,Tullibody
+Cornwall	Bodmin,Truro,Camborne,Redruth,St. Austell,Falmouth,Penzance,Newquay
+Cromartyshire	Cromarty,Ullapool
+Cumberland	Carlisle,Whitehaven,Workington,Penrith,Keswick,Brampton
+Denbighshire/Sir Ddinbych	Denbigh,Wrexham,Ruthin,Abergele,Llangollen
+Derbyshire	Derby,Chesterfield,Glossop,Ilkeston,Long Eaton,Swadlincote,Buxton,Matlock,Ashbourne
+Devon	Exeter,Plymouth,Torquay,Paignton,Barnstaple,Tiverton,Newton Abbot,Tavistock
+Dorset	Dorchester,Poole,Weymouth,Sherborne,Wimborne Minster,Shaftesbury
+Down	Belfast,Newry,Dundonald,Newtownards,Bangor
+Dumfriesshire	Dumfries,Annan,Lockerbie,Moffat,Sanquhar,Langholm,Gretna
+Dunbartonshire/Dumbartonshire	Dumbarton,Clydebank,Cumbernauld,Helensburgh,Alexandria,Kirkintilloch
+Durham	Durham,Sunderland,Stockton-on-Tees,Darlington,Hartlepool,Gateshead,Washington
+East Lothian/Haddingtonshire	Haddington,North Berwick,Dunbar,Tranent,East Linton
+Essex	Chelmsford,Basildon,Romford,Southend,Colchester,Harlow,Brentwood,West Ham
+Fermanagh	Enniskillen,Lisnaskea
+Fife	Cupar,Dunfermline,Glenrothes,Kirkcaldy,St. Andrews,Cowdenbeath,Burntisland
+Flintshire/Sir Fflint	Mold,Flint,Rhyl,Prestatyn,Connah's Quay,Holywell,Buckley,St. Asaph
+Glamorgan/Morgannwg	Cardiff,Swansea,Merthyr Tydfil,Barry,Caerphilly,Bridgend,Neath,Pontypridd
+Gloucestershire	Gloucester,Bristol,Cheltenham,Stroud,Cirencester,Tewkesbury
+Hampshire	Winchester,Southampton,Portsmouth,Bournemouth,Basingstoke,Newport
+Herefordshire	Hereford,Ross-on-Wye,Leominster,Ledbury,Bromyard,Kington
+Hertfordshire	Hertford,Watford,St. Albans,Hemel Hempstead,Stevenage,Hatfield
+Huntingdonshire	Huntingdon,St. Ives,St. Neots,Ramsey,Yaxley
+Inverness-shire	Inverness,Fort William,Kingussie,Newtonmore,Portree
+Kent	Maidstone,Canterbury,Bromley,Rochester,Margate,Folkestone,Dover,Greenwich
+Kincardineshire	Stonehaven,Banchory,Laurencekirk,Inverbervie
+Kinross-shire	Kinross,Milnathort
+Kirkcudbrightshire	Kircudbright,Castle Douglas,Dalbeattie,New Galloway
+Lanarkshire	Lanark,Glasgow,East Kilbride,Hamilton,Motherwell,Coatbridge,Carluke
+Lancashire	Lancaster,Liverpool,Manchester,Preston,Bolton,Warrington,Barrow-in-Furness
+Leicestershire	Leicester,Loughborough,Hinckley,Melton Mowbray,Coalville,Lutterworth
+Lincolnshire	Lincoln,Grimsby,Scunthorpe,Boston,Grantham,Stamford,Skegness,Louth
+Londonderry	Londonderry,Coleraine,Limavady
+Merioneth/Meirionnydd	Dolgellau,Bala,Tywyn,Blaenau Ffestiniog,Barmouth,Harlech
+Middlesex	City of London,Harrow,Enfield,Staines,Ealing,Potters Bar,Westminster 
+Midlothian/Edinburghshire	Edinburgh,Musselburgh,Penicuik,Dalkeith,Bonnyrigg
+Monmouthshire/Sir Fynwy	Monmouth,Newport,Blackwood,Cwmbran,Abergavenny,Chepstow,Tredegar
+Montgomeryshire/Sir Drefaldwyn	Montgomery,Newtown,Welshpool,Machynlleth,Llanidloes
+Morayshire	Elgin,Forres,Rothes,Lossiemouth,Fochabers
+Nairnshire	Nairn,Auldearn,Cawdor,Ferness
+Norfolk	Norwich,Great Yarmouth,King's Lynn,Dereham,Cromer,Hunstanton
+Northamptonshire	Northampton,Peterborough,Corby,Kettering,Wellingborough
+Northumberland	Alnwick,Newcastle-upon-Tyne,Morpeth,Hexham,Berwick-upon-Tweed
+Nottinghamshire	Nottingham,Mansfield,Worksop,Newark,Retford,Southwell
+Orkney	Kirkwall,Sromness,Balfour
+Oxfordshire	Oxford,Banbury,Witney,Bicester,Henley-on-Thames,Carterton,Thame
+Peeblesshire	Peebles,Innerleithen,West Linton
+Pembrokeshire/Sir Benfro	Pembroke,Milford Haven,Haverfordwest,Fishguard,Tenby,St. David's
+Perthshire	Perth,Crieff,Pitlochry,Callander,Blairgowrie,Rattray,Coupar Angus,Kincardine
+Radnorshire/Sir Faesyfed	Presteigne,Llandrindod Wells,Knighton,Rhayader,New Radnor
+Renfrewshire	Renfrew,Paisley,Greenock,Johnstone,Port Glasgow,Barrhead,Kilmalcolm
+Ross-shire	Dingwall,Stornaway,Tain,Alness,Invergordon
+Roxburghshire	Jedburgh,Hawick,Kelso,Melrose,Roxburgh
+Rutland	Oakham,Uppingham. Cottesmore
+Selkirkshire	Selkirk,Clovenfords,Galashiels
+Shetland	Lerwick,Scalloway,Baltasound
+Shropshire	Shrewsbury,Telford,Oswestry,Bridgnorth,Whitchurch,Market Drayton,Ludlow
+Somerset	Taunton,Bath,Weston-super-Mare,Yeovil,Bridgwater,Wells,Glastonbury
+Staffordshire	Stafford,Stoke-on-Trent,Wolverhampton,Walsall,Cannock,Lichfield
+Stirlingshire	Stirling,Falkirk,Grangemouth,Kilsyth,Bridge of Allan,Denny,Alva
+Suffolk	Ipswich,Bury St. Edmunds,Lowestoft,Felixstowe,Sudbury,Haverhill,Bungay
+Surrey	Guildford,Croydon,Woking,Sutton,Kingston-on-Thames,Wandsworth,Wimbledon,Brixton
+Sussex	Chichester,Brighton,Worthing,Crawley,Hastings,Eastbourne,Bognor Regis,Horsham
+Sutherland	Dornoch,Helmsdale,Brora,Golspie,Lairg,Durness,Tongue
+Tyrone	Omagh,Cookstown,Dungannon,Strabane
+Warwickshire	Warwick,Birmingham,Coventry,Nuneaton,Rugby,Solihull,Stratford-upon-Avon
+West Lothian/Linlithgowshire	Linlithgow,Livingston,Bo'ness,Broxburn,Whitburn,Armadale,Bathgate
+Westmorland	Appleby,Kendal,Windermere,Ambleside,Kirkby Lonsdale
+Wigtownshire	Wigtown,Stranraer,Newton Stewart,Whithorn
+Wiltshire	Trowbridge,Salisbury,Swindon,Chippenham,Devizes,Marlborough,Warminster
+Worcestershire	Worcester,Dudley,Kidderminster,Stourbridge,Halesowen,Malvern,Evesham
+Yorkshire	York
+Yorkshire West Riding	Wakefield,Leeds,Sheffield,Bradford,Halifax,Harrogate
+Yorkshire East Riding	Beverley,Hull,Bridlington,Driffield,Hornsea,Filey
+Yorkshire North Riding	Northallerton,Middlesbrough,Scarborough,Whitby

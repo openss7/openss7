@@ -1,0 +1,806 @@
+Numerical order
+0	Reserved
+1-684	American Samoa	b
+1-264	Anguilla	b
+1-268	Antigua and Barbuda	b
+1-242	Bahamas (Commonwealth of the)	b
+1-246	Barbados	b
+1-441	Bermuda	b
+1-284	British Virgin Islands	b
+1-403	Canada	b
+1-587	Canada	b
+1-780	Canada	b
+1-825	Canada	b
+1-236	Canada	b
+1-250	Canada	b
+1-604	Canada	b
+1-672	Canada	b
+1-778	Canada	b
+1-204	Canada	b
+1-431	Canada	b
+1-506	Canada	b
+1-709	Canada	b
+1-902	Canada	b
+1-226	Canada	b
+1-249	Canada	b
+1-289	Canada	b
+1-343	Canada	b
+1-365	Canada	b
+1-416	Canada	b
+1-437	Canada	b
+1-519	Canada	b
+1-613	Canada	b
+1-647	Canada	b
+1-705	Canada	b
+1-807	Canada	b
+1-905	Canada	b
+1-418	Canada	b
+1-438	Canada	b
+1-450	Canada	b
+1-514	Canada	b
+1-579	Canada	b
+1-581	Canada	b
+1-819	Canada	b
+1-873	Canada	b
+1-306	Canada	b
+1-639	Canada	b
+1-867	Canada	b
+1-345	Cayman Islands	b
+1-767	Dominica (Commonwealth of)	b
+1-809	Dominican Republic	b
+1-473	Grenada	b
+1-671	Guam	b
+1-876	Jamaica	b
+1-664	Montserrat	b
+1-670	Northern Mariana Islands (Commonwealth of the)	b
+1-787	Puerto Rico	b
+1-939	Puerto Rico	b
+1-869	Saint Kitts and Nevis	b
+1-758	Saint Lucia	b
+1-784	Saint Vincent and the Grenadines	b
+1-721	Sint Maarten (Dutch part)	b
+1-868	Trinidad and Tobago	b
+1-649	Turks and Caicos Islands	b
+1	United States of America	b
+1-340	United States Virgin Islands	b
+20	Egypt (Arab Republic of)
+210	Spare code
+211	South Sudan (Republic of)
+212	Morocco (Kingdom of)
+213	Algeria (People's Democratic Republic of)
+214	Spare code
+215	Spare code
+216	Tunisia
+217	Spare code
+218	Libya (Socialist People's Libyan Arab Jamahiriya)
+219	Spare code
+220	Gambia (Republic of the)
+221	Senegal (Republic of)
+222	Mauritania (Islamic Republic of)
+223	Mali (Republic of)
+224	Guinea (Republic of)
+225	Côte d'Ivoire (Republic of)
+226	Burkina Faso
+227	Niger (Republic of the)
+228	Togolese Republic
+229	Benin (Republic of)
+230	Mauritius (Republic of)
+231	Liberia (Republic of)
+232	Sierra Leone
+233	Ghana
+234	Nigeria (Federal Republic of)
+235	Chad (Republic of)
+236	Central African Republic
+237	Cameroon (Republic of)
+238	Cape Verde (Republic of)
+239	Sao Tome and Principe (Democratic Republic of)
+240	Equatorial Guinea (Republic of)
+241	Gabonese Republic
+242	Congo (Republic of the)
+243	Democratic Republic of the Congo
+244	Angola (Republic of)
+245	Guinea-Bissau (Republic of)
+246	Diego Garcia
+247	Saint Helena, Ascension and Tristan da Cunha	a
+248	Seychelles (Republic of)
+249	Sudan (Republic of the)
+250	Rwanda (Republic of)
+251	Ethiopia (Federal Democratic Republic of)
+252	Somali Democratic Republic
+253	Djibouti (Republic of)
+254	Kenya (Republic of)
+255	Tanzania (United Republic of)
+256	Uganda (Republic of)
+257	Burundi (Republic of)
+258	Mozambique (Republic of)
+259	Spare code
+260	Zambia (Republic of)
+261	Madagascar (Republic of)
+262	French Departments and Territories in the Indian Ocean	j
+263	Zimbabwe (Republic of)
+264	Namibia (Republic of)
+265	Malawi
+266	Lesotho (Kingdom of)
+267	Botswana (Republic of)
+268	Swaziland (Kingdom of)
+269	Comoros (Union of the)
+27	South Africa (Republic of)
+280	Spare code	m
+281	Spare code	m
+282	Spare code	m
+283	Spare code	m
+284	Spare code	m
+285	Spare code	m
+286	Spare code	m
+287	Spare code	m
+288	Spare code	m
+289	Spare code	m
+290	Saint Helena, Ascension and Tristan da Cunha	a
+291	Eritrea
+292	Spare code
+293	Spare code
+294	Spare code
+295	Spare code
+296	Spare code
+297	Aruba
+298	Faroe Islands
+299	Greenland (Denmark)
+30	Greece
+31	Netherlands (Kingdom of the)
+32	Belgium
+33	France
+34	Spain
+350	Gibraltar
+351	Portugal
+352	Luxembourg
+353	Ireland
+354	Iceland
+355	Albania (Republic of)
+356	Malta
+357	Cyprus (Republic of)
+358	Finland
+359	Bulgaria (Republic of)
+36	Hungary (Republic of)
+370	Lithuania (Republic of)
+371	Latvia (Republic of)
+372	Estonia (Republic of)
+373	Moldova (Republic of)
+374	Armenia (Republic of)
+375	Belarus (Republic of)
+376	Andorra (Principality of)
+377	Monaco (Principality of)
+378	San Marino (Republic of)
+379	Vatican City State	f
+380	Ukraine
+381	Serbia (Republic of)
+382	Montenegro (Republic of)
+383	Spare code
+384	Spare code
+385	Croatia (Republic of)
+386	Slovenia (Republic of)
+387	Bosnia and Herzegovina
+388	Group of countries, shared code		shared
+389	The Former Yugoslav Republic of Macedonia
+39	Italy
+39	Vatican City State
+40	Romania
+41	Switzerland (Confederation of)
+420	Czech Republic
+421	Slovak Republic
+422	Spare code
+423	Liechtenstein (Principality of)
+424	Spare code
+425	Spare code
+426	Spare code
+427	Spare code
+428	Spare code
+429	Spare code
+43	Austria
+44	United Kingdom of Great Britain and Northern Ireland
+45	Denmark
+46	Sweden
+47	Norway
+48	Poland (Republic of)
+49	Germany (Federal Republic of)
+500	Falkland Islands (Malvinas)
+501	Belize
+502	Guatemala (Republic of)
+503	El Salvador (Republic of)
+504	Honduras (Republic of)
+505	Nicaragua
+506	Costa Rica
+507	Panama (Republic of)
+508	Saint Pierre and Miquelon (Collectivité territoriale de la République française)
+509	Haiti (Republic of)
+51	Peru
+52	Mexico
+53	Cuba
+54	Argentine Republic
+55	Brazil (Federative Republic of)
+56	Chile
+57	Colombia (Republic of)
+58	Venezuela (Bolivarian Republic of)
+590	Guadeloupe (French Department of)
+591	Bolivia (Plurinational State of)
+592	Guyana
+593	Ecuador
+594	French Guiana (French Department of)
+595	Paraguay (Republic of)
+596	Martinique (French Department of)
+597	Suriname (Republic of)
+598	Uruguay (Eastern Republic of)
+599	Bonaire, Saint Eustatius and Saba	c
+599	Curaçao	c
+60	Malaysia
+61	Australia	i
+62	Indonesia (Republic of)
+63	Philippines (Republic of the)
+64	New Zealand
+65	Singapore (Republic of)
+66	Thailand
+670	Democratic Republic of Timor-Leste
+671	Spare code
+672	Australian External Territories	g
+673	Brunei Darussalam
+674	Nauru (Republic of)
+675	Papua New Guinea
+676	Tonga (Kingdom of)
+677	Solomon Islands
+678	Vanuatu (Republic of)
+679	Fiji (Republic of)
+680	Palau (Republic of)
+681	Wallis and Futuna (Territoire français d'outre-mer)
+682	Cook Islands
+683	Niue
+684	Spare code
+685	Samoa (Independent State of)
+686	Kiribati (Republic of)
+687	New Caledonia (Territoire français d'outre-mer)
+688	Tuvalu
+689	French Polynesia (Territoire français d'outre-mer)
+690	Tokelau
+691	Micronesia (Federated States of)
+692	Marshall Islands (Republic of the)
+693	Spare code
+694	Spare code
+695	Spare code
+696	Spare code
+697	Spare code
+698	Spare code
+699	Spare code
+7-6	Kazakhstan (Republic of)	b
+7-7	Kazakhstan (Republic of)	b
+7	Russian Federation	b
+800	International Freephone Service		intl
+801	Spare code	d
+802	Spare code	d
+803	Spare code	d
+804	Spare code	d
+805	Spare code	d
+806	Spare code	d
+807	Spare code	d
+808	International Shared Cost Service (ISCS)		intl
+809	Spare code	d
+81	Japan
+82	Korea (Republic of)
+830	Spare code	m
+831	Spare code	m
+832	Spare code	m
+833	Spare code	m
+834	Spare code	m
+835	Spare code	m
+836	Spare code	m
+837	Spare code	m
+838	Spare code	m
+839	Spare code	m
+84	Viet Nam (Socialist Republic of)
+850	Democratic People's Republic of Korea
+851	Spare code
+852	Hong Kong, China
+853	Macao, China
+854	Spare code
+855	Cambodia (Kingdom of)
+856	Lao People's Democratic Republic
+857	Spare code
+858	Spare code
+859	Spare code
+86	China (People's Republic of)
+870	Inmarsat SNAC		intl
+871	Spare code
+872	Spare code
+873	Spare code
+874	Spare code
+875	Reserved - Maritime Mobile Service Applications
+876	Reserved - Maritime Mobile Service Applications
+877	Reserved - Maritime Mobile Service Applications
+878	Universal Personal Telecommunication Service (UPT)	e	intl
+879	Reserved for national non-commercial purposes
+880	Bangladesh (People's Republic of)
+881	Global Mobile Satellite System (GMSS), shared code	n	shared
+882	International Networks, shared code	o	shared
+883	International Networks, shared code	p, q	shared
+884	Spare code
+885	Spare code
+886	Taiwan, China
+887	Spare code
+888	Telecommunications for Disaster Relief (TDR)	k	intl
+889	Spare code
+890	Spare code	m
+891	Spare code	m
+892	Spare code	m
+893	Spare code	m
+894	Spare code	m
+895	Spare code	m
+896	Spare code	m
+897	Spare code	m
+898	Spare code	m
+899	Spare code	m
+90	Turkey
+91	India (Republic of)
+92	Pakistan (Islamic Republic of)
+93	Afghanistan
+94	Sri Lanka (Democratic Socialist Republic of)
+95	Myanmar (the Republic of the Union of)
+960	Maldives (Republic of)
+961	Lebanon
+962	Jordan (Hashemite Kingdom of)
+963	Syrian Arab Republic
+964	Iraq (Republic of)
+965	Kuwait (State of)
+966	Saudi Arabia (Kingdom of)
+967	Yemen (Republic of)
+968	Oman (Sultanate of)
+969	Reserved - reservation currently under investigation
+970	Palestinian Territories	l
+971	United Arab Emirates	h
+972	Israel (State of)
+973	Bahrain (Kingdom of)
+974	Qatar (State of)
+975	Bhutan (Kingdom of)
+976	Mongolia
+977	Nepal (Federal Democratic Republic of)
+978	Spare code
+979	International Premium Rate Service (IPRS)		intl
+98	Iran (Islamic Republic of)
+990	Spare code
+991	Trial of a proposed new international telecommunication public correspondence service, shared code		shared
+992	Tajikistan (Republic of)
+993	Turkmenistan
+994	Azerbaijani Republic
+995	Georgia
+996	Kyrgyz Republic
+997	Spare code
+998	Uzbekistan (Republic of)
+999	Reserved for future global service
+
+Alphabetical order
+93	Afghanistan
+355	Albania (Republic of)
+213	Algeria (People's Democratic Republic of)
+1-684	American Samoa	b
+376	Andorra (Principality of)
+244	Angola (Republic of)
+1-264	Anguilla	b
+1-268	Antigua and Barbuda	b
+54	Argentine Republic
+374	Armenia (Republic of)
+297	Aruba
+61	Australia	i
+672	Australian External Territories	g
+43	Austria
+994	Azerbaijani Republic
+1-242	Bahamas (Commonwealth of the)	b
+973	Bahrain (Kingdom of)
+880	Bangladesh (People's Republic of)
+1-246	Barbados	b
+375	Belarus (Republic of)
+32	Belgium
+501	Belize
+229	Benin (Republic of)
+1-441	Bermuda	b
+975	Bhutan (Kingdom of)
+591	Bolivia (Plurinational State of)
+599	Bonaire, Saint Eustatius and Saba	c
+387	Bosnia and Herzegovina
+267	Botswana (Republic of)
+55	Brazil (Federative Republic of)
+1-284	British Virgin Islands	b
+673	Brunei Darussalam
+359	Bulgaria (Republic of)
+226	Burkina Faso
+257	Burundi (Republic of)
+855	Cambodia (Kingdom of)
+237	Cameroon (Republic of)
+1-403	Canada	b
+1-587	Canada	b
+1-780	Canada	b
+1-825	Canada	b
+1-236	Canada	b
+1-250	Canada	b
+1-604	Canada	b
+1-672	Canada	b
+1-778	Canada	b
+1-204	Canada	b
+1-431	Canada	b
+1-506	Canada	b
+1-709	Canada	b
+1-902	Canada	b
+1-226	Canada	b
+1-249	Canada	b
+1-289	Canada	b
+1-343	Canada	b
+1-365	Canada	b
+1-416	Canada	b
+1-437	Canada	b
+1-519	Canada	b
+1-613	Canada	b
+1-647	Canada	b
+1-705	Canada	b
+1-807	Canada	b
+1-905	Canada	b
+1-418	Canada	b
+1-438	Canada	b
+1-450	Canada	b
+1-514	Canada	b
+1-579	Canada	b
+1-581	Canada	b
+1-819	Canada	b
+1-873	Canada	b
+1-306	Canada	b
+1-639	Canada	b
+1-867	Canada	b
+238	Cape Verde (Republic of)
+1-345	Cayman Islands	b
+236	Central African Republic
+235	Chad (Republic of)
+56	Chile
+86	China (People's Republic of)
+57	Colombia (Republic of)
+269	Comoros (Union of the)
+242	Congo (Republic of the)
+682	Cook Islands
+506	Costa Rica
+225	Côte d'Ivoire (Republic of)
+385	Croatia (Republic of)
+53	Cuba
+599	Curaçao	c
+357	Cyprus (Republic of)
+420	Czech Republic
+850	Democratic People's Republic of Korea
+243	Democratic Republic of the Congo
+670	Democratic Republic of Timor-Leste
+45	Denmark
+246	Diego Garcia
+253	Djibouti (Republic of)
+1-767	Dominica (Commonwealth of)	b
+1-809	Dominican Republic	b
+593	Ecuador
+20	Egypt (Arab Republic of)
+503	El Salvador (Republic of)
+240	Equatorial Guinea (Republic of)
+291	Eritrea
+372	Estonia (Republic of)
+251	Ethiopia (Federal Democratic Republic of)
+500	Falkland Islands (Malvinas)
+298	Faroe Islands
+679	Fiji (Republic of)
+358	Finland
+33	France
+262	French Departments and Territories in the Indian Ocean	j
+594	French Guiana (French Department of)
+689	French Polynesia (Territoire français d'outre-mer)
+241	Gabonese Republic
+220	Gambia (Republic of the)
+995	Georgia
+49	Germany (Federal Republic of)
+233	Ghana
+350	Gibraltar
+881	Global Mobile Satellite System (GMSS), shared code	n	shared
+30	Greece
+299	Greenland (Denmark)
+1-473	Grenada	b
+388	Group of countries, shared code		shared
+590	Guadeloupe (French Department of)
+1-671	Guam	b
+502	Guatemala (Republic of)
+224	Guinea (Republic of)
+245	Guinea-Bissau (Republic of)
+592	Guyana
+509	Haiti (Republic of)
+504	Honduras (Republic of)
+852	Hong Kong, China
+36	Hungary (Republic of)
+354	Iceland
+91	India (Republic of)
+62	Indonesia (Republic of)
+870	Inmarsat SNAC		intl
+800	International Freephone Service		intl
+882	International Networks, shared code	o	shared
+883	International Networks, shared code	p, q	shared
+979	International Premium Rate Service (IPRS)		intl
+808	International Shared Cost Service (ISCS)		intl
+98	Iran (Islamic Republic of)
+964	Iraq (Republic of)
+353	Ireland
+972	Israel (State of)
+39	Italy
+1-876	Jamaica	b
+81	Japan
+962	Jordan (Hashemite Kingdom of)
+7-6	Kazakhstan (Republic of)	b
+7-7	Kazakhstan (Republic of)	b
+254	Kenya (Republic of)
+686	Kiribati (Republic of)
+82	Korea (Republic of)
+965	Kuwait (State of)
+996	Kyrgyz Republic
+856	Lao People's Democratic Republic
+371	Latvia (Republic of)
+961	Lebanon
+266	Lesotho (Kingdom of)
+231	Liberia (Republic of)
+218	Libya (Socialist People's Libyan Arab Jamahiriya)
+423	Liechtenstein (Principality of)
+370	Lithuania (Republic of)
+352	Luxembourg
+853	Macao, China
+261	Madagascar (Republic of)
+265	Malawi
+60	Malaysia
+960	Maldives (Republic of)
+223	Mali (Republic of)
+356	Malta
+692	Marshall Islands (Republic of the)
+596	Martinique (French Department of)
+222	Mauritania (Islamic Republic of)
+230	Mauritius (Republic of)
+52	Mexico
+691	Micronesia (Federated States of)
+373	Moldova (Republic of)
+377	Monaco (Principality of)
+976	Mongolia
+382	Montenegro (Republic of)
+1-664	Montserrat	b
+212	Morocco (Kingdom of)
+258	Mozambique (Republic of)
+95	Myanmar (the Republic of the Union of)
+264	Namibia (Republic of)
+674	Nauru (Republic of)
+977	Nepal (Federal Democratic Republic of)
+31	Netherlands (Kingdom of the)
+687	New Caledonia (Territoire français d'outre-mer)
+64	New Zealand
+505	Nicaragua
+227	Niger (Republic of the)
+234	Nigeria (Federal Republic of)
+683	Niue
+1-670	Northern Mariana Islands (Commonwealth of the)	b
+47	Norway
+968	Oman (Sultanate of)
+92	Pakistan (Islamic Republic of)
+680	Palau (Republic of)
+507	Panama (Republic of)
+675	Papua New Guinea
+595	Paraguay (Republic of)
+51	Peru
+63	Philippines (Republic of the)
+48	Poland (Republic of)
+351	Portugal
+1-787	Puerto Rico	b
+1-939	Puerto Rico	b
+974	Qatar (State of)
+40	Romania
+7	Russian Federation	b
+250	Rwanda (Republic of)
+247	Saint Helena, Ascension and Tristan da Cunha	a
+290	Saint Helena, Ascension and Tristan da Cunha	a
+1-869	Saint Kitts and Nevis	b
+1-758	Saint Lucia	b
+508	Saint Pierre and Miquelon (Collectivité territoriale de la République française)
+1-784	Saint Vincent and the Grenadines	b
+685	Samoa (Independent State of)
+378	San Marino (Republic of)
+239	Sao Tome and Principe (Democratic Republic of)
+966	Saudi Arabia (Kingdom of)
+221	Senegal (Republic of)
+381	Serbia (Republic of)
+248	Seychelles (Republic of)
+232	Sierra Leone
+65	Singapore (Republic of)
+1-721	Sint Maarten (Dutch part)	b
+421	Slovak Republic
+386	Slovenia (Republic of)
+677	Solomon Islands
+252	Somali Democratic Republic
+27	South Africa (Republic of)
+211	South Sudan (Republic of)
+34	Spain
+94	Sri Lanka (Democratic Socialist Republic of)
+249	Sudan (Republic of the)
+597	Suriname (Republic of)
+268	Swaziland (Kingdom of)
+46	Sweden
+41	Switzerland (Confederation of)
+963	Syrian Arab Republic
+886	Taiwan, China
+992	Tajikistan (Republic of)
+255	Tanzania (United Republic of)
+66	Thailand
+389	The Former Yugoslav Republic of Macedonia
+228	Togolese Republic
+690	Tokelau
+676	Tonga (Kingdom of)
+991	Trial of a proposed new international telecommunication public correspondence service, shared code		shared
+1-868	Trinidad and Tobago	b
+216	Tunisia
+90	Turkey
+993	Turkmenistan
+1-649	Turks and Caicos Islands	b
+688	Tuvalu
+256	Uganda (Republic of)
+380	Ukraine
+971	United Arab Emirates	h
+44	United Kingdom of Great Britain and Northern Ireland
+1	United States of America	b
+1-340	United States Virgin Islands	b
+878	Universal Personal Telecommunication Service (UPT)	e	intl
+598	Uruguay (Eastern Republic of)
+998	Uzbekistan (Republic of)
+678	Vanuatu (Republic of)
+379	Vatican City State	f
+39	Vatican City State
+58	Venezuela (Bolivarian Republic of)
+84	Viet Nam (Socialist Republic of)
+681	Wallis and Futuna (Territoire français d'outre-mer)
+967	Yemen (Republic of)
+260	Zambia (Republic of)
+263	Zimbabwe (Republic of)
+0	Reserved
+970	Palestinian Territories	l
+875	Reserved - Maritime Mobile Service Applications
+876	Reserved - Maritime Mobile Service Applications
+877	Reserved - Maritime Mobile Service Applications
+969	Reserved - reservation currently under investigation
+999	Reserved for future global service
+879	Reserved for national non-commercial purposes
+888	Telecommunications for Disaster Relief (TDR)	k	intl
+210	Spare code
+214	Spare code
+215	Spare code
+217	Spare code
+219	Spare code
+259	Spare code
+280	Spare code	m
+281	Spare code	m
+282	Spare code	m
+283	Spare code	m
+284	Spare code	m
+285	Spare code	m
+286	Spare code	m
+287	Spare code	m
+288	Spare code	m
+289	Spare code	m
+292	Spare code
+293	Spare code
+294	Spare code
+295	Spare code
+296	Spare code
+383	Spare code
+384	Spare code
+422	Spare code
+424	Spare code
+425	Spare code
+426	Spare code
+427	Spare code
+428	Spare code
+429	Spare code
+671	Spare code
+684	Spare code
+693	Spare code
+694	Spare code
+695	Spare code
+696	Spare code
+697	Spare code
+698	Spare code
+699	Spare code
+801	Spare code	d
+802	Spare code	d
+803	Spare code	d
+804	Spare code	d
+805	Spare code	d
+806	Spare code	d
+807	Spare code	d
+809	Spare code	d
+830	Spare code	m
+831	Spare code	m
+832	Spare code	m
+833	Spare code	m
+834	Spare code	m
+835	Spare code	m
+836	Spare code	m
+837	Spare code	m
+838	Spare code	m
+839	Spare code	m
+851	Spare code
+854	Spare code
+857	Spare code
+858	Spare code
+859	Spare code
+871	Spare code
+872	Spare code
+873	Spare code
+874	Spare code
+884	Spare code
+885	Spare code
+887	Spare code
+889	Spare code
+890	Spare code	m
+891	Spare code	m
+892	Spare code	m
+893	Spare code	m
+894	Spare code	m
+895	Spare code	m
+896	Spare code	m
+897	Spare code	m
+898	Spare code	m
+899	Spare code	m
+978	Spare code
+990	Spare code
+997	Spare code
+Notes
+a	Ascension is using country code +247 and Saint Helena and Tristan da Cuhna country code +290.
+b	Integrated numbering plan.
+c	Code shared between Curaçao and Bonaire, Saint Eustatius and Saba.
+d	Will be allocated, only after all three digit codes from groups of ten are exhausted.
+e	Associated with shared country code 878 for Universal personal telecommunications (UPT), the identification code 10 has been assigned to the network of VISIONng, +878 10.
+f	Reserved for future use.
+g	Including Australian Antarctic Territory, and Norfolk Island.
+h	U.A.E.: Abu Dhabi, Ajman, Dubai, Fujeirah, Ras Al Khaimah, Sharjah, Umm Al Qaiwain.
+i	Including Christmas Island and Cocos-Keeling Islands.
+j	French departments and territories in the Indian Ocean include Reunion, the Southern and Antartic territories and other islands.
+k	United Nations Office of the Coordinator for Humanitarian Affairs (OCHA), for the purpose of facilitating disaster relief activities.
+l	Reserved for the Palestinian Authority.
+m	Reserved for E.164 country code expansion.
+n	Associated with shared country code 881, the following one-digit identification code have been made for the GMSS networks:
+	Network Country Code and Identification Code Status
+	Iridium Satellite LLC	+881 6 and +881 7	Assigned
+	Globalstar			+881 8 and +881 9	Assigned
+o	Associated with shared country code 882, the following two-digit identification code reservations or assignments have been made for the international networks of:
+	Applicant Network Country Code and Identification Code Status
+	British Telecommunications plc	Global Office Application	+882 10	Assigned
+	MCI (Verizon)	HyperStream International (HSI) Data Network	+882 12	Assigned
+	Telespazio S.p.A.	EMS Regional Mobile Satellite System	+882 13	Assigned
+	Telstra (formerly Reach)	Global international ATM Network	+882 15	Assigned
+	Thuraya	Thuraya RMSS Network	+882 16	Assigned
+	Asia Cellular Satellite (ACeS)	Garuda Mobile Telecommunication Satellite System	+882 20	Assigned
+	Cable & Wireless plc	Cable & Wireless Global Network	+882 22	Assigned
+	Sita-Equant Joint Venture	Sita-Equant Network	+882 23	Assigned
+	TeliaSonera AB	TeliaSonera multinational ATM Network	+882 24	Assigned
+	Deutsche Telekom	Deutsche Telekom's Next Generation Network	+882 28	Assigned
+	Telekom Malaysia	Global International ATM Network	+882 31	Assigned
+	Maritime Communications Partner A.S.	MCP network	+882 32	Assigned
+	Oration Technologies, Inc.	Oration Technologies Network	+882 33	Assigned
+	BebbiCell AG	BebbiCell AG	+882 34	Assigned
+	Jasper Systems, Inc.	Jasper Systems	+882 35	Assigned
+	Jersey Telecom	Jersey Telecom	+882 36	Assigned
+	Cingular Wireless (AT&T)	Cingular Wireless network	+882 37	Assigned
+	Vodafone Malta	Vodafone Malta +882 39 Assigned
+	Oy Cubio Communications	Oy Communications	+882 40	Assigned
+	Intermatica Intermatica	+882 41 Assigned
+	Seanet Maritime Communications	Seanet Maritime Communications	+882 42	Assigned
+	Ukrainian Radiosystems	Ukrainian Radiosystems (Beeline)	+882 43	Assigned
+	Telecom Italia S.p.A.	Telecom Italia	+882 45	Assigned
+	Smart Communications Inc	Smart Communications Inc	+882 97	Assigned
+	ONAIR N.V.	Onair GSM services	+882 98	Assigned
+	Telenor	Telenor GSM network - services in aircraft	+882 99	Assigned
+p	Associated with shared country code 883, the following three-digit identification code reservations or assignments have been made for the international networks of:
+	Applicant Network Country Code and Identification Code Status
+	MediaLincc Ltd	MediaLincc Ltd	+883 100	Assigned
+	Aicent Inc	Aicent Inc	+883 110	Assigned
+	Telenor Connexion AB	Telenor Connexion AB	+883 120	Assigned
+	France Telecom Orange	France Telecom Orange	+883 130	Assigned
+	Multiregional TransitTelecom (MTT)	Multiregional TransitTelecom (MTT)	+883 140	Assigned
+q	Associated with shared country code 883, the following four-digit identification code reservations or assignments have been made for the international networks of:
+	Applicant Network Country Code and Identification Code Status
+	Voxbone SA	Voxbone SA	+883 5100	Assigned
+	Bandwith.com Inc	Bandwith.com Inc	+883 5110	Assigned

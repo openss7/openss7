@@ -1,0 +1,385 @@
+201	US	New Jersey
+202	US	Washington, D.C.
+203	US	Connecticut
+204	CA	Manitoba
+205	US	Alabama
+206	US	Washington
+207	US	Maine
+208	US	Idaho
+209	US	California
+210	US	Texas
+211	ZZ	Service Access Code	nongeo
+212	US	New York
+213	US	California
+214	US	Texas
+215	US	Pennsylvania
+216	US	Ohio
+217	US	Illinois
+218	US	Minnesota
+219	US	Indiana
+224	US	Illinois
+225	US	Louisiana
+226	CA	Ontario
+227	US	Maryland
+228	US	Mississippi
+229	US	Georgia
+231	US	Michigan
+234	US	Ohio
+236	CA	British Columbia
+239	US	Florida
+240	US	Maryland
+242	BS	Bahamas
+246	BB	Barbados
+248	US	Michigan
+249	CA	Ontario
+250	CA	British Columbia
+251	US	Alabama
+252	US	North Carolina
+253	US	Washington
+254	US	Texas
+256	US	Alabama
+260	US	Indiana
+262	US	Wisconsin
+264	AI	Anguilla
+267	US	Pennsylvania
+268	AG	Antigua and Barbuda
+269	US	Michigan
+270	US	Kentucky
+272	US	Pennsylvania
+274	US	Wisconsin
+276	US	Virginia
+281	US	Texas
+283	US	Ohio
+284	VG	British Virgin Islands
+289	CA	Ontario
+301	US	Maryland
+302	US	Delaware
+303	US	Colorado
+304	US	West Virginia
+305	US	Florida
+306	CA	Saskatchewan
+307	US	Wyoming
+308	US	Nebraska
+309	US	Illinois
+310	US	California
+311	ZZ	Service Access Code	nongeo
+312	US	Illinois
+313	US	Michigan
+314	US	Missouri
+315	US	New York
+316	US	Kansas
+317	US	Indiana
+318	US	Louisiana
+319	US	Iowa
+320	US	Minnesota
+321	US	Florida
+323	US	California
+325	US	Texas
+327	US	Arkansas
+330	US	Ohio
+331	US	Illinois
+334	US	Alabama
+336	US	North Carolina
+337	US	Louisiana
+339	US	Massachusetts
+340	VI	U.S. Virgin Islands
+343	CA	Ontario
+345	KY	Cayman Islands
+347	US	New York
+351	US	Massachusetts
+352	US	Florida
+360	US	Washington
+361	US	Texas
+364	US	Kentucky
+365	CA	Ontario
+385	US	Utah
+386	US	Florida
+401	US	Rhode Island
+402	US	Nebraska
+403	CA	Alberta
+404	US	Georgia
+405	US	Oklahoma
+406	US	Montana
+407	US	Florida
+408	US	California
+409	US	Texas
+410	US	Maryland
+411	ZZ	Service Access Code	nongeo
+412	US	Pennsylvania
+413	US	Massachusetts
+414	US	Wisconsin
+415	US	California
+416	CA	Ontario
+417	US	Missouri
+418	CA	Quebec
+419	US	Ohio
+423	US	Tennessee
+424	US	California
+425	US	Washington
+430	US	Texas
+431	CA	Manitoba
+432	US	Texas
+434	US	Virginia
+435	US	Utah
+437	CA	Ontario
+438	CA	Quebec
+440	US	Ohio
+441	BM	Bermuda
+442	US	California
+443	US	Maryland
+447	US	Illinois
+450	CA	Quebec
+458	US	Oregon
+464	US	Illinois
+469	US	Texas
+470	US	Georgia
+473	GD	Grenada
+475	US	Connecticut
+478	US	Georgia
+479	US	Arkansas
+480	US	Arizona
+484	US	Pennsylvania
+500	ZZ	Personal Communications Services	nongeo
+501	US	Arkansas
+502	US	Kentucky
+503	US	Oregon
+504	US	Louisiana
+505	US	New Mexico
+506	CA	New Brunswick
+507	US	Minnesota
+508	US	Massachusetts
+509	US	Washington
+510	US	California
+511	ZZ	Service Access Code	nongeo
+512	US	Texas
+513	US	Ohio
+514	CA	Quebec
+515	US	Iowa
+516	US	New York
+517	US	Michigan
+518	US	New York
+519	CA	Ontario
+520	US	Arizona
+530	US	California
+531	US	Nebraska
+533	ZZ	Personal Communications Services	nongeo
+534	US	Wisconsin
+539	US	Oklahoma
+540	US	Virginia
+541	US	Oregon
+544	ZZ	Personal Communications Services	nongeo
+551	US	New Jersey
+557	US	Missouri
+559	US	California
+561	US	Florida
+562	US	California
+563	US	Iowa
+564	US	Washington
+567	US	Ohio
+570	US	Pennsylvania
+571	US	Virginia
+573	US	Missouri
+574	US	Indiana
+575	US	New Mexico
+579	CA	Quebec
+580	US	Oklahoma
+581	CA	Quebec
+582	US	Pennsylvania
+585	US	New York
+586	US	Michigan
+587	CA	Alberta
+600	CA	Special telecommunications needs in Canada	nongeo
+601	US	Mississippi
+602	US	Arizona
+603	US	New Hampshire
+604	CA	British Columbia
+605	US	South Dakota
+606	US	Kentucky
+607	US	New York
+608	US	Wisconsin
+609	US	New Jersey
+610	US	Pennsylvania
+611	ZZ	Service Access Code	nongeo
+612	US	Minnesota
+613	CA	Ontario
+614	US	Ohio
+615	US	Tennessee
+616	US	Michigan
+617	US	Massachusetts
+618	US	Illinois
+619	US	California
+620	US	Kansas
+623	US	Arizona
+626	US	California
+630	US	Illinois
+631	US	New York
+636	US	Missouri
+641	US	Iowa
+646	US	New York
+647	CA	Ontario
+649	TC	Turks and Caicos Islands
+650	US	California
+651	US	Minnesota
+657	US	California
+660	US	Missouri
+661	US	California
+662	US	Mississippi
+664	MS	Montserrat
+667	US	Maryland
+670	MP	Northern Mariana Islands
+671	GU	Guam
+678	US	Georgia
+681	US	West Virginia
+682	US	Texas
+684	AS	American Samoa
+701	US	North Dakota
+702	US	Nevada
+703	US	Virginia
+704	US	North Carolina
+705	CA	Ontario
+706	US	Georgia
+707	US	California
+708	US	Illinois
+709	CA	Newfoundland and Labrador
+710	US	U.S. Government Special Services	nongeo
+711	ZZ	Service Access Code	nongeo
+712	US	Iowa
+713	US	Texas
+714	US	California
+715	US	Wisconsin
+716	US	New York
+717	US	Pennsylvania
+718	US	New York
+719	US	Colorado
+720	US	Colorado
+721	SX	Sint Maarten
+724	US	Pennsylvania
+727	US	Florida
+730	US	Illinois
+731	US	Tennessee
+732	US	New Jersey
+734	US	Michigan
+740	US	Ohio
+747	US	California
+754	US	Florida
+757	US	Virginia
+758	LC	Saint Lucia
+760	US	California
+762	US	Georgia
+763	US	Minnesota
+765	US	Indiana
+767	DM	Commonwealth of Dominica
+769	US	Mississippi
+770	US	Georgia
+772	US	Florida
+773	US	Illinois
+774	US	Massachusetts
+775	US	Nevada
+778	CA	British Columbia
+779	US	Illinois
+780	CA	Alberta
+781	US	Massachusetts
+784	VC	Saint Vincent and the Grenadines
+785	US	Kansas
+786	US	Florida
+787	PR	Puerto Rico
+800	ZZ	Toll-free telephone service	nongeo
+801	US	Utah
+802	US	Vermont
+803	US	South Carolina
+804	US	Virginia
+805	US	California
+806	US	Texas
+807	CA	Ontario
+808	US	Hawaii
+809	DO	Dominican Republic
+810	US	Michigan
+811	ZZ	Service Access Code	nongeo
+812	US	Indiana
+813	US	Florida
+814	US	Pennsylvania
+815	US	Illinois
+816	US	Missouri
+817	US	Texas
+818	US	California
+819	CA	Quebec
+828	US	North Carolina
+829	DO	Dominican Republic
+830	US	Texas
+831	US	California
+832	US	Texas
+843	US	South Carolina
+845	US	New York
+847	US	Illinois
+848	US	New Jersey
+849	DO	Dominican Republic
+850	US	Florida
+855	ZZ	Toll-free telephone service	nongeo
+856	US	New Jersey
+857	US	Massachusetts
+858	US	California
+859	US	Kentucky
+860	US	Connecticut
+862	US	New Jersey
+863	US	Florida
+864	US	South Carolina
+865	US	Tennessee
+866	ZZ	Toll-free telephone service	nongeo
+867	CA	Yukon, Northwest Territories, and Nunavut
+868	TT	Trinidad and Tobago
+869	KN	Saint Kitts and Nevis
+870	US	Arkansas
+872	US	Illinois
+873	CA	Quebec
+876	JM	Jamaica
+877	ZZ	Toll-free telephone service	nongeo
+878	US	Pennsylvania
+888	ZZ	Toll-free telephone service	nongeo
+900	ZZ	Premium-rate telephone numbers	nongeo
+901	US	Tennessee
+902	CA	Nova Scotia and Prince Edward Island
+903	US	Texas
+904	US	Florida
+905	CA	Ontario
+906	US	Michigan
+907	US	Alaska
+908	US	New Jersey
+909	US	California
+910	US	North Carolina
+911	ZZ	Service Access Code	nongeo
+912	US	Georgia
+913	US	Kansas
+914	US	New York
+915	US	Texas
+916	US	California
+917	US	New York
+918	US	Oklahoma
+919	US	North Carolina
+920	US	Wisconsin
+925	US	California
+928	US	Arizona
+929	US	New York
+931	US	Tennessee
+936	US	Texas
+937	US	Ohio
+938	US	Alabama
+939	PR	Puerto Rico
+940	US	Texas
+941	US	Florida
+947	US	Michigan
+949	US	California
+951	US	California
+952	US	Minnesota
+954	US	Florida
+956	US	Texas
+959	US	Connecticut
+970	US	Colorado
+971	US	Oregon
+972	US	Texas
+973	US	New Jersey
+978	US	Massachusetts
+979	US	Texas
+980	US	North Carolina
+984	US	North Carolina
+985	US	Louisiana
+989	US	Michigan
