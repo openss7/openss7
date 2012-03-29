@@ -1,0 +1,376 @@
+201	New Jersey
+202	Washington, D.C.
+203	Connecticut
+204	Manitoba
+205	Alabama
+206	Washington
+207	Maine
+208	Idaho
+209	California
+210	Texas
+212	New York
+213	California
+214	Texas
+215	Pennsylvania
+216	Ohio
+217	Illinois
+218	Minnesota
+219	Indiana
+224	Illinois
+225	Louisiana
+226	Ontario
+227	Maryland
+228	Mississippi
+229	Georgia
+231	Michigan
+234	Ohio
+236	British Columbia
+239	Florida
+240	Maryland
+242	Bahamas
+246	Barbados
+248	Michigan
+249	Ontario
+250	British Columbia
+251	Alabama
+252	North Carolina
+253	Washington
+254	Texas
+256	Alabama
+260	Indiana
+262	Wisconsin
+264	Anguilla
+267	Pennsylvania
+268	Antigua and Barbuda
+269	Michigan
+270	Kentucky
+272	Pennsylvania
+274	Wisconsin
+276	Virginia
+281	Texas
+283	Ohio
+284	British Virgin Islands
+289	Ontario
+301	Maryland
+302	Delaware
+303	Colorado
+304	West Virginia
+305	Florida
+306	Saskatchewan
+307	Wyoming
+308	Nebraska
+309	Illinois
+310	California
+312	Illinois
+313	Michigan
+314	Missouri
+315	New York
+316	Kansas
+317	Indiana
+318	Louisiana
+319	Iowa
+320	Minnesota
+321	Florida
+323	California
+325	Texas
+327	Arkansas
+330	Ohio
+331	Illinois
+334	Alabama
+336	North Carolina
+337	Louisiana
+339	Massachusetts
+340	U.S. Virgin Islands
+343	Ontario
+345	Cayman Islands
+347	New York
+351	Massachusetts
+352	Florida
+360	Washington
+361	Texas
+364	Kentucky
+365	Ontario
+385	Utah
+386	Florida
+401	Rhode Island
+402	Nebraska
+403	Alberta
+404	Georgia
+405	Oklahoma
+406	Montana
+407	Florida
+408	California
+409	Texas
+410	Maryland
+412	Pennsylvania
+413	Massachusetts
+414	Wisconsin
+415	California
+416	Ontario
+417	Missouri
+418	Quebec
+419	Ohio
+423	Tennessee
+424	California
+425	Washington
+430	Texas
+431	Manitoba
+432	Texas
+434	Virginia
+435	Utah
+437	Ontario
+438	Quebec
+440	Ohio
+441	Bermuda
+442	California
+443	Maryland
+447	Illinois
+450	Quebec
+458	Oregon
+464	Illinois
+469	Texas
+470	Georgia
+473	Grenada
+475	Connecticut
+478	Georgia
+479	Arkansas
+480	Arizona
+484	Pennsylvania
+500	Personal Communications Services
+501	Arkansas
+502	Kentucky
+503	Oregon
+504	Louisiana
+505	New Mexico
+506	New Brunswick
+507	Minnesota
+508	Massachusetts
+509	Washington
+510	California
+512	Texas
+513	Ohio
+514	Quebec
+515	Iowa
+516	New York
+517	Michigan
+518	New York
+519	Ontario
+520	Arizona
+530	California
+531	Nebraska
+533	Personal Communications Services
+534	Wisconsin
+539	Oklahoma
+540	Virginia
+541	Oregon
+544	Personal Communications Services
+551	New Jersey
+557	Missouri
+559	California
+561	Florida
+562	California
+563	Iowa
+564	Washington
+567	Ohio
+570	Pennsylvania
+571	Virginia
+573	Missouri
+574	Indiana
+575	New Mexico
+579	Quebec
+580	Oklahoma
+581	Quebec
+582	Pennsylvania
+585	New York
+586	Michigan
+587	Alberta
+600	Special telecommunications needs in Canada
+601	Mississippi
+602	Arizona
+603	New Hampshire
+604	British Columbia
+605	South Dakota
+606	Kentucky
+607	New York
+608	Wisconsin
+609	New Jersey
+610	Pennsylvania
+612	Minnesota
+613	Ontario
+614	Ohio
+615	Tennessee
+616	Michigan
+617	Massachusetts
+618	Illinois
+619	California
+620	Kansas
+623	Arizona
+626	California
+630	Illinois
+631	New York
+636	Missouri
+641	Iowa
+646	New York
+647	Ontario
+649	Turks and Caicos Islands
+650	California
+651	Minnesota
+657	California
+660	Missouri
+661	California
+662	Mississippi
+664	Montserrat
+667	Maryland
+670	Northern Mariana Islands
+671	Guam
+678	Georgia
+681	West Virginia
+682	Texas
+684	American Samoa
+701	North Dakota
+702	Nevada
+703	Virginia
+704	North Carolina
+705	Ontario
+706	Georgia
+707	California
+708	Illinois
+709	Newfoundland and Labrador
+710	U.S. Government Special Services
+712	Iowa
+713	Texas
+714	California
+715	Wisconsin
+716	New York
+717	Pennsylvania
+718	New York
+719	Colorado
+720	Colorado
+721	Sint Maarten
+724	Pennsylvania
+727	Florida
+730	Illinois
+731	Tennessee
+732	New Jersey
+734	Michigan
+740	Ohio
+747	California
+754	Florida
+757	Virginia
+758	Saint Lucia
+760	California
+762	Georgia
+763	Minnesota
+765	Indiana
+767	Commonwealth of Dominica
+769	Mississippi
+770	Georgia
+772	Florida
+773	Illinois
+774	Massachusetts
+775	Nevada
+778	British Columbia
+779	Illinois
+780	Alberta
+781	Massachusetts
+784	Saint Vincent and the Grenadines
+785	Kansas
+786	Florida
+787	Puerto Rico
+800	Toll-free telephone service
+801	Utah
+802	Vermont
+803	South Carolina
+804	Virginia
+805	California
+806	Texas
+807	Ontario
+808	Hawaii
+809	Dominican Republic
+810	Michigan
+812	Indiana
+813	Florida
+814	Pennsylvania
+815	Illinois
+816	Missouri
+817	Texas
+818	California
+819	Quebec
+828	North Carolina
+829	Dominican Republic
+830	Texas
+831	California
+832	Texas
+843	South Carolina
+845	New York
+847	Illinois
+848	New Jersey
+849	Dominican Republic
+850	Florida
+855	Toll-free telephone service
+856	New Jersey
+857	Massachusetts
+858	California
+859	Kentucky
+860	Connecticut
+862	New Jersey
+863	Florida
+864	South Carolina
+865	Tennessee
+866	Toll-free telephone service
+867	Yukon, Northwest Territories, and Nunavut
+868	Trinidad and Tobago
+869	Saint Kitts and Nevis
+870	Arkansas
+872	Illinois
+873	Quebec
+876	Jamaica
+877	Toll-free telephone service
+878	Pennsylvania
+888	Toll-free telephone service
+900	Premium-rate telephone numbers
+901	Tennessee
+902	Nova Scotia and Prince Edward Island
+903	Texas
+904	Florida
+905	Ontario
+906	Michigan
+907	Alaska
+908	New Jersey
+909	California
+910	North Carolina
+912	Georgia
+913	Kansas
+914	New York
+915	Texas
+916	California
+917	New York
+918	Oklahoma
+919	North Carolina
+920	Wisconsin
+925	California
+928	Arizona
+929	New York
+931	Tennessee
+936	Texas
+937	Ohio
+938	Alabama
+939	Puerto Rico
+940	Texas
+941	Florida
+947	Michigan
+949	California
+951	California
+952	Minnesota
+954	Florida
+956	Texas
+959	Connecticut
+970	Colorado
+971	Oregon
+972	Texas
+973	New Jersey
+978	Massachusetts
+979	Texas
+980	North Carolina
+985	Louisiana
+989	Michigan
