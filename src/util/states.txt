@@ -1,0 +1,94 @@
+AG		Antigua and Barbuda	-4
+AI		Anguilla	-4
+AS		American Samoa	-11
+BB		Barbados	-4
+BM		Bermuda	-4/-3
+BS		Bahamas	-5/-4
+CA	--	Special telecommunications needs in Canada
+CA	AB	Alberta	-7/-6
+CA	BC	British Columbia	-8/-7
+CA	MB	Manitoba	-6/-5
+CA	NB	New Brunswick	-4/-3
+CA	NL	Newfoundland and Labrador	-3.30/-2.30
+CA	NS,PE	Nova Scotia and Prince Edward Island	4/-3
+CA	NS	Nova Scotia	-4/-3
+CA	NT	Northwest Territories	-7/-6
+CA	NU	Nunavut	-6/-5
+CA	ON	Ontario	-5/-4
+CA	PE	Prince Edward Island	4/-3
+CA	QC	Quebec	-5/-4
+CA	SK	Saskatchewan	-6
+CA	YT,NT,NU	Yukon, Northwest Territories, and Nunavut	-7/-6
+CA	YT	Yukon	-8/-7
+DM		Commonwealth of Dominica	-4
+DO		Dominican Republic	-4
+GD		Grenada	-4
+GU		Guam	+10
+JM		Jamaica	-5
+KN		Saint Kitts and Nevis	-4
+KY		Cayman Islands	-5
+LC		Saint Lucia	-4
+MP		Northern Mariana Islands	+10
+MS		Montserrat	-4
+PR		Puerto Rico	-4
+SX		Sint Maarten	-4
+TC		Turks and Caicos Islands	-5/-4
+TT		Trinidad and Tobago	-4
+US	--	U.S. Government Special Services
+US	AK	Alaska	-9/-8
+US	AL	Alabama	-6/-5
+US	AR	Arkansas	-6/-5
+US	AZ	Arizona	-7
+US	CA	California	-8/-7
+US	CO	Colorado	-7/-6
+US	CT	Connecticut	-5/-4
+US	DC	Washington, D.C.	-5/-4
+US	DE	Delaware	-5/-4
+US	FL	Florida	-5/-4
+US	GA	Georgia	-5/-4
+US	HI	Hawaii	-10
+US	IA	Iowa	-6/-5
+US	ID	Idaho	-7/-6
+US	IL	Illinois	-6/-5
+US	IN	Indiana	-5/-4
+US	KS	Kansas	-6/-5
+US	KY	Kentucky	-6/-5
+US	LA	Louisiana	-6/-5
+US	MA	Massachusetts	-5/-4
+US	MD	Maryland	-5/-4
+US	ME	Maine	-5/-4
+US	MI	Michigan	-5/-4
+US	MN	Minnesota	-6/-5
+US	MO	Missouri	-6/-5
+US	MS	Mississippi	-6/-5
+US	MT	Montana	-7/-6
+US	MV	Nevada	-8/-7
+US	NC	North Carolina	-5/-4
+US	ND	North Dakota	-6/-5
+US	NE	Nebraska	-6/-5
+US	NH	New Hampshire	-5/-4
+US	NJ	New Jersey	-5/-4
+US	NM	New Mexico	-7/-6
+US	NY	New York	-5/-4
+US	OH	Ohio	-5/-4
+US	OK	Oklahoma	-6/-5
+US	OR	Oregon	-8/-7
+US	PA	Pennsylvania	-5/-4
+US	RI	Rhode Island	-5/-4
+US	SC	South Carolina	-5/-4
+US	SD	South Dakota	-6/-5
+US	TN	Tennessee	-6/-5
+US	TX	Texas	-6/-5
+US	UT	Utah	-7/-6
+US	VA	Virginia	-5/-4
+US	VT	Vermont	-5/-4
+US	WA	Washington	-8/-7
+US	WI	Wisconsin	-6/-5
+US	WV	West Virginia	-5/-4
+US	WY	Wyoming	-7/-6
+VC		Saint Vincent and the Grenadines	-4
+VG		British Virgin Islands	-4
+VI		U.S. Virgin Islands	-4
+ZZ	--	Personal Communications Services
+ZZ	--	Premium-rate telephone numbers
+ZZ	--	Toll-free telephone service

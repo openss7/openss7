@@ -25,6 +25,7 @@ my $do_m2pa	= 0;
 my $do_m2ua	= 0;
 my $do_m3ua	= 0;
 my $do_sua	= 0;
+my $cooked	= 0;
 
 while (@ARGV) {
 	$_ = shift;
@@ -40,6 +41,7 @@ while (@ARGV) {
 	if (/^-d/) { $debug = 1;    next; }
 	if (/^-t/) { $trace = 1;    next; }
 	if (/^-v/) { $verbose = 1;  next; }
+	if (/^-c/) { $cooked = 1;   next; }
 	if (/^-m2pa/) { $do_m2pa = 1;  next; }
 	if (/^-m2ua/) { $do_m2ua = 1;  next; }
 	if (/^-m3ua/) { $do_m3ua = 1;  next; }
@@ -202,12 +204,12 @@ use Date::Parse;
 use Data::Dumper;
 
 #---------------------------------
-package EthPair;
+package Cooked;
 use strict;
 #---------------------------------
 
 sub new {
-	my ($type,$ppa) = @_;
+	my ($type,$ppa,$cook) = @_;
 	my $self = {};
 	bless $self,$type;
 
@@ -215,6 +217,44 @@ sub new {
 	$self->{card} = ($ppa >> 7) & 0x03;
 	$self->{span} = ($ppa >> 5) & 0x03;
 	$self->{slot} = ($ppa >> 0) & 0x1f;
+
+	$self->{cook} = $cook;
+
+	return $self;
+}
+
+sub wrap {
+	my ($self,$msg) = @_;
+
+	return unless $self->{cook};
+
+	# add a linux cooked header to the packet
+	my $dat = '';
+	$dat .= pack('n', 3); # sent by somebody else to somebody else
+	$dat .= pack('n', 1); # ARPHRD_ value for link layer
+	$dat .= pack('n', 6); # 6-byte ethernet address
+	if ($msg->{dir}) {
+		$dat .= $self->{ohwa} . pack('C*', 0, 0);
+	} else {
+		$dat .= $self->{thwa} . pack('C*', 0, 0);
+	}
+	$dat .= pack('C*', 0x08, 0x00); # IP ethernet frame
+	$msg->{dat} = $dat . $msg->{dat};
+}
+
+
+
+#---------------------------------
+package EthPair;
+use strict;
+use vars qw(@ISA);
+@ISA = qw(Cooked);
+#---------------------------------
+
+sub new {
+	my ($type,$ppa,$cook,@args) = @_;
+
+	my $self = Cooked::new($type,$ppa,$cook,@args);
 
 	$self->{ohwa} = pack('C*', 0x00, 0x1c, 0xf0, 0x9f, 0x11, 0x5c+$self->{span});
 	$self->{thwa} = pack('C*', 0x00, 0x15, 0x58, 0xd7, 0xd6, 0x2e+$self->{span});
@@ -229,6 +269,8 @@ sub new {
 
 sub wrap {
 	my ($self,$msg) = @_;
+
+	return $self->SUPER::wrap($msg) if $self->{cook};
 
 	# adds an ethernet header to a message
 	my $dat = '';
@@ -249,8 +291,9 @@ use vars qw(@ISA);
 #---------------------------------
 
 sub new {
-	my ($type,$ppa) = @_;
-	my $self = EthPair::new($type,$ppa);
+	my ($type,$ppa,$cook,@args) = @_;
+
+	my $self = EthPair::new($type,$ppa,$cook,@args);
 
 	$self->{orig} = pack('N', (192<<24)|(168<<16)|(0<<8)|($self->{span}+0));
 	$self->{term} = pack('N', (192<<24)|(168<<16)|(0<<8)|($self->{span}+1));
@@ -297,8 +340,9 @@ use vars qw(@ISA);
 #---------------------------------
 
 sub new {
-	my ($type,$ppa,$sport,$dport,$ppi) = @_;
-	my $self = IPPair::new($type,$ppa);
+	my ($type,$ppa,$sport,$dport,$ppi,$cook,@args) = @_;
+
+	my $self = IPPair::new($type,$ppa,$cook,@args);
 
 	$self->{oport} = pack('n',$sport);
 	$self->{tport} = pack('n',$dport);
@@ -398,11 +442,12 @@ use vars qw(@ISA);
 my $m2pas = {};
 
 sub new {
-	my ($type,$msg) = @_;
+	my ($type,$msg,$cook,@args) = @_;
+
 	my $ppa = $msg->{ppa};
 	return $m2pas->{$ppa} if $m2pas->{$ppa};
 	print STDERR "\rI: discovered new m2pa $ppa\n";
-	my $self = SCTPAssoc::new($type,$ppa,3565,3565,5);
+	my $self = SCTPAssoc::new($type,$ppa,3565,3565,5,$cook,@args);
 
 	$self->{osno} = 0;
 	$self->{tsno} = 0;
@@ -452,11 +497,12 @@ use vars qw(@ISA);
 my $m2ua;
 
 sub new {
-	my ($type,$msg) = @_;
+	my ($type,$msg,$cook,@args) = @_;
+
 	return $m2ua if $m2ua;
 	print STDERR "\rI: discovered new m2ua\n";
 	my $ppa = $msg->{ppa};
-	my $self = SCTPAssoc::new($type,$ppa,2904,2904,2);
+	my $self = SCTPAssoc::new($type,$ppa,2904,2904,2,$cook,@args);
 
 	$m2ua = $self;
 	return $self;
@@ -490,11 +536,12 @@ use vars qw(@ISA);
 my $m3uas = {};
 
 sub new {
-	my ($type,$msg) = @_;
+	my ($type,$msg,$cook,@args) = @_;
+
 	my $ppa = $msg->{ppa};
 	return $m3uas->{$ppa} if $m3uas->{$ppa};
 	print STDERR "\rI: discovered new m3ua $ppa\n";
-	my $self = SCTPAssoc::new($type,$ppa,2905,2905,3);
+	my $self = SCTPAssoc::new($type,$ppa,2905,2905,3,$cook,@args);
 
 	$m3uas->{$ppa} = $self;
 	return $self;
@@ -534,11 +581,12 @@ use vars qw(@ISA);
 my $suas = {};
 
 sub new {
-	my ($type,$msg) = @_;
+	my ($type,$msg,$cook,@args) = @_;
+
 	my $ppa = $msg->{ppa};
 	return $suas->{$ppa} if $suas->{$ppa};
 	print STDERR "\rI: discovered new sua $ppa\n";
-	my $self = SCTPAssoc::new($type,$ppa,14001,14001,4);
+	my $self = SCTPAssoc::new($type,$ppa,14001,14001,4,$cook,@args);
 
 	$suas->{$ppa} = $self;
 	return $self;
@@ -645,11 +693,16 @@ use strict;
 #---------------------------------
 
 sub new {
-	my ($type,$file) = @_;
+	my ($type,$file,$cook) = @_;
+
 	my $self = {};
 	bless $self,$type;
 
-	$self->{type} = 1;
+	if ($cook) {
+		$self->{type} = 113;  # linux cooked capture
+	} else {
+		$self->{type} = 1; # ethernet
+	}
 	$self->{snap} = 9000;
 	unless ($self->{pcap} = Net::Pcap::pcap_open_dead($self->{type},$self->{snap})) {
 		die "E: ".ref($self).": could not get pcap descriptor\n".
@@ -810,12 +863,13 @@ use strict;
 #---------------------------------
 
 sub new {
-	my ($type,$infile,$outfile) = @_;
+	my ($type,$infile,$outfile,$cook) = @_;
 	my $self = {};
 	bless $self,$type;
 
+	$self->{cook} = $cook;
 	$self->{i} = new PcapInput($infile);
-	$self->{o} = new PcapOutput($outfile);
+	$self->{o} = new PcapOutput($outfile,$cook);
 
 	return $self;
 }
@@ -833,23 +887,24 @@ sub process {
 		next unless $ss7_msg->{li} >= 3;
 		if ($do_m2pa) {
 			my $m2pa_msg = $ss7_msg->copy();
-			M2PALink->new($m2pa_msg)->wrap($m2pa_msg);
+			M2PALink->new($m2pa_msg,$self->{cook})->wrap($m2pa_msg);
 			$self->{o}->putmsg($m2pa_msg);
 		}
 		if ($do_m2ua) {
 			my $m2ua_msg = $ss7_msg->copy();
-			M2UALink->new($m2ua_msg)->wrap($m2ua_msg);
+			M2UALink->new($m2ua_msg,$self->{cook})->wrap($m2ua_msg);
 			$self->{o}->putmsg($m2ua_msg);
 		}
+		next if $ss7_msg->{si} < 3;
 		if ($do_m3ua) {
 			my $m3ua_msg = $ss7_msg->copy();
-			M3UALink->new($m3ua_msg)->wrap($m3ua_msg);
+			M3UALink->new($m3ua_msg,$self->{cook})->wrap($m3ua_msg);
 			$self->{o}->putmsg($m3ua_msg);
 		}
 		next unless $ss7_msg->{si} == 3;
 		if ($do_sua) {
 			my $sua_msg = $ss7_msg->copy();
-			SUALink->new($sua_msg)->wrap($sua_msg);
+			SUALink->new($sua_msg,$self->{cook})->wrap($sua_msg);
 			$self->{o}->putmsg($sua_msg);
 		}
 	}
@@ -860,7 +915,7 @@ sub process {
 package main;
 #---------------------------------
 
-my $translator = new Conversion($infile,$outfile);
+my $translator = new Conversion($infile,$outfile,$cooked);
 $translator->process($do_m2pa,$do_m2ua,$do_m3ua,$do_sua);
 
 exit;

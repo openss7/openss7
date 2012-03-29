@@ -1,0 +1,1822 @@
+# ANSI T1.111.8 Point Code Blocks
+# Table B3/T1.111.8 -  List of Signalling Point Code Blocks
+# Organization by block
+1	0	Cleartel Communications
+1	4	Business Telecom
+1	8	WorldCom
+1	12	National Telephone
+#1	16	SPARE - UNASSIGNED (was Vyvx Telephone)
+1	20	National Telecommunications of Austin
+1	24	WorldCom
+1	28	Southern Interexchange Services, Inc.
+1	32	NTS Communications
+1	36	Digital Network, Inc.
+1	40	ATX Telecommunications Services
+#1	44	SPARE - UNASSIGNED (was Vyvx Telephone)
+1	48	National Network Corporation
+1	52	Startel
+1	56	TMC of San Diego
+#1	60	SPARE - UNASSIGNED (was First Phone)
+1	64	CNI
+#1	68	SPARE - UNASSIGNED (was WorldCom)
+1	72	Wilkes Telephone & Electric Company
+1	76	Sandhill Telephone Coop
+1	80	Chester Telephone Company
+1	84	St. Joseph Telephone Company
+1	88	Interstate Telephone Company
+1	92	Vista-United Telcom
+1	96	Brandenburg Telephone Company
+#1	100	SPARE - UNASSIGNED (was FirstPhone)
+1	104	Chesnee Telephone Company
+1	108	Access Long Distance
+1	112	La Fourche Telephone Company
+1	116	Evans Telephone Company
+1	120	JBN Telephone Company, Inc.
+1	124	Iowa Communications Network
+1	128	Roanoke Telephone Company
+1	132	IEX's Corporation
+1	136	Telefonica Larga Distancia
+1	140	National Telephone of Alabama
+1	144	Sears Technology Services
+1	148	Phone One
+1	152	Orwell Telephone Company
+1	156	Call-Net Telecom, Ltd.
+1	160	Fort Bend Telephone Company
+1	164	Capital Network Systems, Inc.
+1	168	Northwestel, Inc.
+1	172	Northwestel, Inc.
+1	176	Gulf Telephone Company
+1	180	Florala Telephone Company
+1	184	Marianna and Scenery Hill Telephone Company
+1	188	Panhandle Telephone Cooperative
+1	192	Panhandle Telephone Cooperative
+1	196	Panhandle Telephone Cooperative
+1	200	Peoples Mutual Telephone Company
+1	204	Bell Atlantic Mobile Systems
+1	208	Logan Telephone Cooperative
+1	212	TresCom U.S.A., Inc.
+1	216	Rochester Telephone Company
+1	220	Ponderosa Telephone Company
+1	224	Ponderosa Telephone Company
+1	228	Ponderosa Telephone Company
+1	232	Ellijay Telephone Company
+1	236	American Telephone Company, Inc.
+1	240	Loretto Telephone Company, Inc.
+1	244	Millry Telephone Company, Inc.
+1	248	Northwestern Indiana Telephone Company
+1	252	Pond Branch Telephone Company, Inc.
+2	0	Farmers Telephone Cooperative (AL)
+2	4	Total-Tel USA
+2	8	Farmers Telephone Cooperative (SC)
+2	12	Farmers Telephone Cooperative (SC)
+2	16	Farmers Telephone Cooperative (SC)
+2	20	Farmers Telephone Cooperative (SC)
+2	24	Bentleyville Telephone Company
+2	28	Communique Telecomm.
+2	32	Santa Rosa Telephone Cooperative
+2	36	Southwest Oklahoma Telephone Company
+2	40	Southwest Oklahoma Telephone Company
+2	44	Piedmont Rural Telephone Cooperative
+2	48	Piedmont Rural Telephone Cooperative
+2	52	LDD, Inc.
+2	56	Saco River Telephone & Telegraph Company
+2	60	Bruce Telephone Company
+2	64	Bledsoe Telephone Cooperative
+2	68	Bledsoe Telephone Cooperative
+2	72	Foothills Rural Telephone Cooperative
+2	76	Germantown Telephone Company, Inc.
+2	80	Elkhart Telephone Company
+2	84	Yell County Telephone Company
+2	88	Yell County Telephone Company
+2	92	California-Oregon Telephone Company
+2	96	Crown Point Telephone
+2	100	Berkshire Telephone Corporation
+2	104	Cobbosseecontee Telephone & Telegraph Company
+2	108	Siskiyou Telephone Company
+2	112	Siskiyou Telephone Company
+2	116	Millry Telephone Company, Inc
+2	120	Mountain Rural Telephone
+2	124	Taconic Telephone Corporation
+2	128	Champlain Telephone Company
+2	132	Planters Rural Telephone Cooperative, Inc.
+2	136	Dekalb Telephone Cooperative
+2	140	Citizens Telephone Cooperative
+2	144	Bulloch Telephone Cooperative, Inc.
+2	148	Northeast Florida Telephone Company, Inc.
+2	152	Camden Telephone and Telegraph Company
+2	156	Northern Arkansas Telephone Company
+2	160	Access Long Distance
+2	164	Access Long Distance
+2	168	Access Long Distance
+2	172	Ballard Rural Telephone Cooperative
+2	176	Hancock Rural Telephone Company
+2	180	Madison County Telephone Company
+2	184	Valu-Line Long Distance
+2	188	Mountain View Telephone Company
+2	192	Mountain View Telephone Company
+2	196	Pine Tree Telephone & Telegraph Company
+2	200	McLoud Telephone Company
+2	204	Ardmore Telephone Company
+2	208	Cimarron Telephone Company
+2	212	Cimarron Telephone Company
+2	216	Cimarron Telephone Company
+2	220	Statesboro Telephone Company
+2	224	Waitsfield-Flayston Telephone Company
+2	228	Mid-Plains Telephone Company, Inc.
+2	232	Mid-Plains Telephone Company, Inc.
+2	236	Columbus Telephone Company
+2	240	KanOkla Telephone Association, Inc.
+2	244	KanOkla Telephone Association, Inc.
+2	248	South Central Telephone Association, Inc.
+2	252	South Central Telephone Association, Inc.
+3	0	Southern Kansas Telephone Company
+3	4	Southern Kansas Telephone Company
+3	8	Dobson Telephone Company
+3	12	Dobson Telephone Company
+3	16	Dobson Telephone Company
+3	20	Etex Telephone Cooperative, Inc.
+3	24	Etex Telephone Cooperative, Inc.
+3	28	Wheat State Telephone, Inc.
+3	32	Wheat State Telephone, Inc.
+3	36	Westel
+3	40	Westel
+3	44	Westel
+3	48	Smithville Telephone
+3	52	Smithville Telephone
+3	56	Smithville Telephone
+3	60	Blackfoot Telephone Cooperative, Inc.
+3	64	Blackfoot Telephone Cooperative, Inc.
+3	68	Blackfoot Telephone Cooperative, Inc.
+3	72	American Sharecom
+3	76	American Sharecom
+3	80	American Sharecom
+3	84	Perry Spencer Rural Telephone Cooperative
+3	88	Steelville Telephone Exchange
+3	92	Chibardun Telephone Cooperative, Inc.
+3	96	Chibardun Telephone Cooperative, Inc.
+3	100	South Central Rural Telephone Cooperative Corporation, Inc.
+3	104	United Telephone Company, Inc.
+3	108	National TeleService
+3	112	Execulines of the Northwest, Inc.
+3	116	Wilson Telephone Company
+3	120	Rochester Telephone
+3	124	Rochester Telephone
+3	128	Rochester Telephone
+3	132	Rochester Telephone
+3	136	Rochester Telephone
+3	140	Rochester Telephone
+3	144	Vernon Telephone Cooperative
+3	148	Vernon Telephone Cooperative
+3	152	Union Telephone Company
+3	156	Union Telephone Company
+3	160	Dunbarton Telephone Company
+3	164	Palmetto Rural Telephone Cooperative, Inc.
+3	168	Green Hills Telephone Corporation
+3	172	Conestoga Telephone & Telegraph Company
+3	176	Roanoke & Botetourt Telephone Company
+3	180	Central Oklahoma Telephone Company
+3	184	Central Oklahoma Telephone Company
+3	188	Pierce Telephone Company, Inc.
+3	192	Mid-Missouri Telephone Company
+3	196	Mid-Missouri Telephone Company
+3	200	Mid-Missouri Telephone Company
+3	204	Mid-Missouri Telephone Company
+3	208	Chequamegon Telephone
+3	212	Chequamegon Telephone
+3	216	Chequamegon Telephone
+3	220	Fidelity Telephone Company
+3	224	Perry Spencer Rural Telephone Cooperative
+3	228	Utelco, Inc.
+3	232	Ontario Telephone Company, Inc.
+3	236	Germantown Independent Telephone
+3	240	Kerman Telephone Company
+3	244	Hayneville Telephone Company, Inc.
+3	248	Bruce Municipal Telephone System
+3	252	Granite State Telephone
+4	0	Skyline Telephone Membership Corporation
+4	4	Skyline Telephone Membership Corporation
+4	8	Skyline Telephone Membership Corporation
+4	12	Skyline Telephone Membership Corporation
+4	16	Community Service Telephone Company
+4	20	Community Service Telephone Company
+4	24	Headwaters Telephone Company
+4	28	West Tennessee Telephone Company
+4	32	Peoples Telephone Company, Inc.
+4	36	Crockett Telephone Company
+4	40	Bay Springs Telephone Company, Inc.
+4	44	Ellerbe Telephone Company
+4	48	Pineville Telephone Company
+4	52	Randolph Telephone Company
+4	56	Ben Lomand Rural Telephone Cooperative, Inc.
+4	60	Ben Lomand Rural Telephone Cooperative, Inc.
+4	64	Ben Lomand Rural Telephone Cooperative, Inc.
+4	68	Ben Lomand Rural Telephone Cooperative, Inc.
+4	72	Mountain Rural Telephone
+4	76	Gila River Telecommunications, Inc.
+4	80	Gila River Telecommunications, Inc.
+4	84	Gila River Telecommunications, Inc.
+4	88	Northeast Missouri Rural Telephone Company
+4	92	Highland Telephone Cooperative, Inc.
+4	96	Highland Telephone Cooperative, Inc.
+4	100	Highland Telephone Cooperative, Inc.
+4	104	Rural Telephone Service Company, Inc.
+4	108	Rural Telephone Service Company, Inc.
+4	112	Peoples Rural Telephone Cooperative Corporation
+4	116	EDS Personal Communications Corporation
+4	120	EDS Personal Communications Corporation
+4	124	West Side Telephone
+4	128	Citizens Telephone Cooperative, Inc.
+4	132	West Carolina Rural Telephone Cooperative, Inc.
+4	136	West Carolina Rural Telephone Cooperative, Inc.
+4	140	Twin Valley Telephone, Inc.
+4	144	Twin Valley Telephone, Inc.
+#4	148	SPARE - UNASSIGNED
+#4	152	SPARE - UNASSIGNED
+4	156	Teleport Communications Group
+4	160	Teleport Communications Group
+4	164	Teleport Communications Group
+4	168	Teleport Communications Group
+4	172	Atlas Telephone Company
+4	176	Atlas Telephone Company
+4	180	Hickory Telephone Company
+4	184	Salina Spavinaw Telephone Company, Inc.
+4	188	Salina Spavinaw Telephone Company, Inc.
+4	192	La Ward Telephone Exchange, Inc.
+4	196	Rib Lake Telephone Company
+4	200	Citizens Telephone Company of Kecksburg
+4	204	Kingdom Telephone Company
+4	208	Kingdom Telephone Company
+4	212	Kingdom Telephone Company
+4	216	Kingdom Telephone Company
+4	220	Carnegie Telephone Company
+4	224	Ace Telephone Company of Michigan, Inc.
+4	228	Ace Telephone Company of Michigan, Inc.
+4	232	Hurontario Telephones Ltd.
+4	236	North Norwich Telephones Ltd.
+4	240	Durham Telephones Ltd.
+4	244	Vadacom
+4	248	Vadacom
+4	252	Gosfield North Municipal Telephone System
+5	0	Northeast Missouri Rural Telephone Company
+5	4	Northeast Missouri Rural Telephone Company
+5	8	Northeast Missouri Rural Telephone Company
+5	12	Corporate Telemanagement Group
+5	16	Corporate Telemanagement Group
+5	20	Mustang Telecom, Inc.
+5	24	Mustang Telecom, Inc.
+5	28	Mustang Telecom, Inc.
+5	32	Zenda Telephone Company, Inc.
+5	36	San Marcos Telephone Company
+5	40	Pymatuning Independent Telephone Company
+5	44	Pine Telephone Company
+5	48	Pine Telephone Company
+5	52	Fort Mojave Telecommunications, Inc.
+5	56	Fort Mojave Telecommunications, Inc.
+5	60	Oklahoma Western Telephone Company
+5	64	Oklahoma Western Telephone Company
+5	68	Oklahoma Western Telephone Company
+5	72	Oklahoma Western Telephone Company
+5	76	Hinton Telephone Company
+5	80	Hinton Telephone Company
+5	84	Hinton Telephone Company
+5	88	American Long Lines
+5	92	Vernon Telephone Cooperative
+5	96	West Wisconsin Telcommunications Cooperative, Inc.
+5	100	West Wisconsin Telcommunications Cooperative, Inc.
+5	104	Northeast Telephone Company
+5	108	Coon Valley Farmers Telephone Company
+5	112	Coon Valley Farmers Telephone Company
+5	116	Cross Telephone
+5	120	Cross Telephone
+5	124	Cross Telephone
+5	128	Cambridge Telephone Company
+5	132	Peoples Mutual Telephone Company
+5	136	Craw-Kan Telephone Cooperative, Inc.
+5	140	Craw-Kan Telephone Cooperative, Inc.
+5	144	Craw-Kan Telephone Cooperative, Inc.
+5	148	Monon Telephone Company, Inc.
+5	152	Muenster Telephone Corporation of Texas
+5	156	Blue Valley Telephone Company
+5	160	Moundridge Telephone Company
+5	164	Vaughnsville Telephone Company, Inc.
+5	168	Kalida Telephone Company, Inc.
+5	172	Grand Telephone Company, Inc.
+5	176	Scott-Rice Telephone Company, Inc.
+5	180	Tri-County Telephone Association, Inc.
+5	184	US Wats
+5	188	Richland-Grant Telephone Cooperative, Inc.
+5	192	Richland-Grant Telephone Cooperative, Inc.
+5	196	LaValle Telephone Cooperative, Inc.
+5	200	The Arthur Mutual Telephone Company
+5	204	Price County Telephone Company
+5	208	The Nova Telephone Company
+5	212	New Ulm Telecom, Inc.
+5	216	Pottawatomie Telephone Company, Inc.
+5	220	Pottawatomie Telephone Company, Inc.
+5	224	Pottawatomie Telephone Company, Inc.
+5	228	H&B Communications, Inc.
+5	232	Milltown Mutual Telephone Company
+5	236	Wamego Telephone Company, Inc.
+5	240	Luck Telephone Company
+5	244	Farmers Independent Telephone Company
+5	248	Mid-Iowa Telephone Co-Op Association
+5	252	Lewis River Telephone
+6	0	Kin Network, Inc.
+6	4	Conneaut Telephone Company
+6	8	Madison Telephone Company, Inc.
+6	12	Hartman Telephone Exchanges
+6	16	Rainbow Telephone Cooperative Association, Inc.
+6	20	Golden Belt Telephone Association, Inc.
+6	24	Middleburgh Telephone Company
+6	28	Ganado Telephone Company
+6	32	Coleman County Telephone Cooperative, Inc.
+6	36	Comanche County Telephone Company, Inc.
+6	40	Comanche County Telephone Company, Inc.
+6	44	Lake Dallas Telephone Company
+6	48	The Curtis Telephone Company
+6	52	Gridley Telephone Company
+6	56	SP Telecom
+6	60	Guadalupe Valley Telephone Cooperative
+6	64	Guadalupe Valley Telephone Cooperative
+6	68	Guadalupe Valley Telephone Cooperative
+6	72	Guadalupe Valley Telephone Cooperative
+6	76	Twin Lakes Telephone Cooperative Corporation
+6	80	Twin Lakes Telephone Cooperative Corporation
+6	84	Twin Lakes Telephone Cooperative Corporation
+6	88	Twin Lakes Telephone Cooperative Corporation
+6	92	Stellars Telecommunications Services
+6	96	Intercontinental Communications Corp.
+6	100	Intercontinental Communications Corp.
+6	104	Switch 2000
+6	108	Switch 2000
+6	112	Colorado Valley Telephone Cooperative
+6	116	Colorado Valley Telephone Cooperative
+6	120	Hooper Telephone Company
+6	124	Ottoville Mutual Telephone Company
+6	128	Keystone-Arthur Telephone Company
+6	132	S&W Telephone Company, Inc.
+6	136	Cochrane Cooperative Telephone Company
+6	140	The New Knoxville Telephone Company
+6	144	Climax Telephone Company
+6	148	Middle Point Home Telephone Company
+6	152	E. Ritter Telephone Company
+6	156	Union Telephone Company
+6	160	Atlantic Telephone Membership Corporation
+6	164	Ayersville Telephone Company
+6	168	Arkansas Telephone Company, Inc.
+6	172	Daviess-Martin County Rural Telephone Corporation
+6	176	Granite State Telephone
+6	180	Totah Telephone Company
+6	184	Totah Telephone Company
+6	188	Totah Telephone Company
+6	192	Villisca Farmers Telephone Company
+6	196	Standard Telephone Company
+6	200	North Central Telephone Cooperative
+6	204	North Central Telephone Cooperative
+6	208	TMC of Lexington
+6	212	Network
+6	216	The McClure Telephone Company
+6	220	Yukon-Waltz Telephone Company
+6	224	Fonorola
+6	228	Glasford Telephone Company
+6	232	Benton Cooperative Telephone Company
+6	236	Union Springs Telephone Company
+6	240	Ft. Jennings Telephone Company
+6	244	Farmers Mutual Telephone Company
+6	248	Pattersonville Telephone Company
+6	252	International Telemanagement Group
+7	0	Pacific Gateway Exchange
+7	4	Pacific Gateway Exchange
+7	8	Electric Lightwave
+7	12	Allendale Telephone Company
+7	16	Decatur Telephone Company, Inc.
+7	20	Bell Mobility Cellular
+7	24	Five Star Telecom
+7	28	TTI Telecommunications
+7	32	Graceba Total Communications, Inc.
+7	36	Southwest Arkansas Telephone Cooperative
+7	40	Southwest Arkansas Telephone Cooperative
+7	44	Ogden Telephone Company
+7	48	Township Telephone Company
+7	52	Bloutsville Telephone Company
+7	56	Coastal Telephone Company
+7	60	Armstrong Telephone Company
+7	64	Armstrong Telephone Company
+7	68	Delta Telephone Company, Inc.
+7	72	Franklin Telephone Company, Inc.
+7	76	Ridgeville Telephone Company
+7	80	Community Telephone
+7	84	St. Joseph Telephone and Telegraph Company
+7	88	St. Joseph Telephone and Telegraph Company
+7	92	St. Joseph Telephone and Telegraph Company
+7	96	Peoples Mutual Telephone Company
+7	100	Cameron Telephone Company
+7	104	Action Telcom Company
+7	108	TCC Communications
+7	112	Smithville Telephone Company, Inc.
+7	116	Oneida County Rural Telephone Company
+7	120	Emily Cooperative Telephone Company
+7	124	Beehive Telephone Company, Inc.
+7	128	Custer Telephone Cooperative, Inc.
+7	132	MGW Telephone
+7	136	Call America
+7	140	Blanchard Telephone Association, Inc.
+7	144	Tonica Telephone Company
+7	148	Pine Belt Telephone Company, Inc.
+7	152	Rockland Telephone Company, Inc.
+7	156	Sogetel, Inc.
+7	160	Hamilton County Telephone Cooperative
+7	164	Fleet Call
+7	168	New Lisbon Telephone Company
+7	172	West River Telecommunications Cooperative
+7	176	West River Telecommunications Cooperative
+7	180	Nebraska Central Telephone Company
+7	184	Coastal Utilities, Inc.
+7	188	Diller Telephone Company
+7	192	HunTel Systems
+7	196	Progressive Rural Telephone Cooperative, Inc.
+7	200	Delta Telephone Company, Inc.
+7	204	K&M Telephone Company, Inc.
+7	208	Washington City Rural Telephone Cooperative, Inc.
+7	212	Hanson Communications
+7	216	Hanson Communications
+7	220	Leaf River Telephone Company
+7	224	New Windsor Telephone Company
+7	228	Lakefield Telephone Company
+7	232	Hart Telephone Company
+7	236	Margaretville Telephone Company, Inc.
+7	240	Warwick Valley Telephone Company
+7	244	Cherokee Telephone Company
+7	248	Cherokee Telephone Company
+7	252	Cherokee Telephone Company
+8	0	Cherokee Telephone Company
+8	4	Deerfield Farmers' Telephone Company
+8	8	Suntel Network
+8	12	Mid-Century Telephone Company
+8	16	Madison Telephone Company
+8	20	Amnex Network
+8	24	Amnex Network
+8	28	ConQuest
+8	32	Thunder Bay Telephone
+8	36	Viola Telephone Company
+8	40	Reynolds Telephone Company
+8	44	Yeoman Telephone Company
+8	48	Harrisonville Telephone Company
+8	52	Craigville Telephone Company, Inc.
+8	56	Clarence Telephone Company
+8	60	Northern Illinois University
+8	64	One call Communications, Inc.
+8	68	One call Communications, Inc.
+8	72	Churchill City Telephone & Telegraph System
+8	76	Chippewa City Telephone Company
+8	80	Roberts City Telephone Cooperative Association
+8	84	Bretton Woods Telephone Company
+8	88	Eastern Telecom Corporation
+8	92	Northwest Telephone Company
+8	96	Northwest Telephone Company
+8	100	ICON
+8	104	Bittel Telecommunications Corporation
+8	108	Bittel Telecommunications Corporation
+8	112	Communications TeleSystems Int'l
+8	116	Thacker-Grigsby Telephone Company, Inc.
+8	120	Thrifty Telephone, Inc.
+8	124	Telco Communications, Inc.
+8	128	Applied Signal Corporation
+8	132	Wilton Telephone Company
+8	136	Alternative Network Services
+8	140	Alternative Network Services
+8	144	Telstar Communications, Inc.
+8	148	Telstar Communications, Inc.
+8	152	ITC Companies
+8	156	ITC Companies
+8	160	United Communications (UNICOM)
+8	164	BN1 Telecommunications
+8	168	Wabash Telephone Company
+8	172	Flat Rock Telephone Company
+8	176	Woodhull Telephone Company
+8	180	BellSouth Mobility
+8	184	BellSouth Mobility
+8	188	BellSouth Mobility
+8	192	BellSouth Mobility
+8	196	Hi-Rim Communications
+8	200	Hi-Rim Communications
+8	204	Prairie Grove Telephone Company
+8	208	Prairie Grove Telephone Company
+8	212	Dakota Cooperative Telecommunications, Inc.
+8	216	Dakota Cooperative Telecommunications, Inc.
+8	220	Dakota Cooperative Telecommunications, Inc.
+8	224	Dakota Cooperative Telecommunications, Inc.
+8	228	Mebtel Communications
+8	232	Glandorf Telephone Company, Inc.
+8	236	Waldron Telephone Company
+8	240	Indiantown Telephone System, Inc.
+8	244	Big Bend Telephone
+8	248	Fibertech Telecom, Inc.
+8	252	Fibertech Telecom, Inc.
+9	0	Fibertech Telecom, Inc.
+9	4	Dial US
+9	8	Piedmont Telephone Membership Corporation
+9	12	MRC Telecommunications, Inc.
+9	16	Telco Communications Group
+9	20	Telco Communications Group
+9	24	Granby Telephone and Telegraph Company
+9	28	STSJ Telephone Company
+9	32	Big Sandy Telecom
+9	36	State Telephone Company
+9	40	Ringgold Telephone Company
+9	44	InterAmerican Telephone Company
+9	48	Union River Telephone Company
+9	52	Flex Communications
+9	56	Sand Creek Telephone Company
+9	60	TotalNet Communications, Inc.
+9	64	BEK Communications Cooperative
+9	68	Dakota Central Telecommunication Cooperative
+9	72	Teleport Communications Group
+9	76	Teleport Communications Group
+9	80	Teleport Communications Group
+9	84	Teleport Communications Group
+9	88	Teleport Communications Group
+9	92	Huntel Systems, Inc.
+9	96	TRI Touch America
+9	100	TRI Touch America
+9	104	Star Telephone Membership Corporation
+9	108	Star Telephone Membership Corporation
+9	112	Star Telephone Membership Corporation
+9	116	Indianhead Telephone Company
+9	120	Polar Communications Mutual Aid Corporation
+9	124	Multimedia Telephone Service
+9	128	Multimedia Telephone Service
+#9	132	SPARE - UNASSIGNED
+9	136	Total World Telecom
+9	140	Total World Telecom
+9	144	Total World Telecom
+9	148	Total World Telecom
+9	152	ATCI Inc.
+9	156	Econo Call/ATCI (USA)
+9	160	Econo Call/ATCI (USA)
+9	164	Ardmore Telephone Company, Inc.
+9	168	Niagara Telephone Company
+9	172	Mabel Cooperative Telephone Company
+9	176	Fox Communications Corporation
+9	180	Spring Grove Cooperative Telephone
+9	184	Ogden Telephone Company
+9	188	Souris River Telecommunications Cooperative
+9	192	Medicine Park Telephone Company
+9	196	Yelcot Telephone Company
+9	200	Sunman Telephone
+9	204	Home Telephone Company
+9	208	Southeast Telephone of WI, Inc.
+9	212	Springport Telephone Company
+9	216	Valley Telephone Cooperative, Inc.
+9	220	Communications Gateway Network, Inc.
+9	224	Communications Gateway Network, Inc.
+9	228	Communications Gateway Network, Inc.
+9	232	Vista Telephone
+9	236	Clay County Rural Telephone Cooperative, Inc.
+9	244	McDonough Telephone Company
+9	248	Oneida Telephone Company
+9	252	LaHarpe Telephone Company
+10	0	Great Plains Communications
+10	4	Great Plains Communications
+10	7	Great Plains Communications
+10	12	Great Plains Communications
+10	16	Great Plains Communications
+10	20	Great Plains Communications
+10	24	Great Plains Communications
+10	28	Northland Telephone
+10	32	Brooke Municipal Telephone System
+10	36	LCT Long Distance
+10	40	Cablevision
+10	44	Oxford City Telephone and Telegraph Company
+10	48	Oxford City Telephone and Telegraph Company
+10	52	Oxford City Telephone and Telegraph Company
+10	56	Logan Telephone Cooperative, Inc
+10	60	Logan Telephone Cooperative, Inc
+10	64	Executive TeleCard International
+10	68	Farmers Telephone
+10	72	South Central Utah Telephone Association
+10	76	Griggs City Telephone Company
+10	80	Teltrust
+10	84	Teltrust
+10	88	Western Telephone Company
+10	92	Tidewater Telecom
+10	96	Glens Falls Communications Corporation
+10	100	Pac-West Telecomm, Inc. dba AmeriCall
+#10	104	SPARE - UNASSIGNED
+#10	108	SPARE - UNASSIGNED
+10	112	Clay County Rural Telephone Cooperative, Inc.
+10	116	Clay County Rural Telephone Cooperative, Inc.
+10	120	Communication Consultants, Inc.
+10	124	Mornington Municipal Telephone System
+10	128	Blanchard Municipal Telephone System
+10	132	Citizens Telephone
+10	136	Siren Telephone Company, Inc.
+10	140	TimeWarner Communications
+10	144	TimeWarner Communications
+10	148	Minkfort Intelligent Network
+10	152	Surry Telephone Membership Corporation
+10	156	Surry Telephone Membership Corporation
+10	160	Wes-Tex Telephone Cooperative Inc.
+10	164	Cypress Telecommunications, Inc./Cytel.
+10	168	Cypress Telecommunications, Inc./Cytel
+10	172	Cypress Telecommunications, Inc./Cytel
+10	176	LaJicarita Rural Telephone Coop
+10	180	Rye Telephone Company
+10	184	Alma Telephone Company
+10	188	Cal-North Cellular
+10	192	Five Area Telephone Cooperative, Inc.
+10	196	Eastex Telephone Cooperative, Inc.
+10	200	Wood County Telephone Company
+10	204	La Compagnie de Tel. de Warwick
+10	208	Amtelecom, Inc.
+10	212	Granby Telephone Company
+10	216	CellularONE
+10	220	Thrifty Telephone, Inc.
+10	224	Kaplan Telephone Company
+10	228	Southwest Texas Telephone Company
+10	232	Shawnee Telephone Company
+10	236	South Canaan Telephone Company
+10	240	American Telephone Group
+10	244	Bruce Municipal Telephone System
+10	248	MTC Telemanagement
+10	252	MTC
+11	0	Winn Telephone Company
+11	4	Orwell Telephone Company
+11	8	CellularOne (Puerto Rico)
+#11	12	SPARE - UNASSIGNED
+#11	16	SPARE - UNASSIGNED
+11	20	Econophone Inc.
+11	24	Econophone Inc.
+11	28	Econophone Inc.
+11	32	Southeastern IN Rural Telephone Cooperative Inc.
+11	36	Leaco Rural Telephone Cooperative, Inc.
+11	40	Mt. Horeb Telephone Company
+11	44	Otelco
+11	48	CallAmerica
+11	52	CallAmerica
+11	56	Alhambra-Grantfork Telephone Company
+11	60	Grafton Telephone Company
+11	64	Home Telephone Company
+11	68	McDonald Telephone Company
+11	72	McLeod Network Services
+11	76	Westphalia Telephone Company
+11	80	Amherst Telephone Company
+11	84	Carr Telephone
+11	88	Carr Telephone
+11	92	Cyberlink
+11	96	Pine Drive Telephone Company
+11	100	Hyperion Telecommunications, Inc.
+11	104	Hyperion Telecommunications, Inc.
+11	108	Brantley Telephone Company
+11	112	TelRoute Communications, Inc.
+11	116	TelRoute Communications, Inc.
+11	120	Star Telephone
+11	124	Star Telephone
+11	128	Star Telephone
+11	132	South Carolina Net, Inc.
+11	136	Armour Independent Telephone Company
+11	140	Union Telephone Company
+11	144	Baldwin Telecom, Inc.
+11	148	Cass County Telephone Company
+11	152	C-R Telephone Company
+11	156	Eastern TeleLogic Corporation
+11	160	Tri-County Telephone Cooperative
+11	164	Citizens Telephone Company
+11	168	Marquette Adams Telephone Cooperative
+11	172	Le Tel de St. Liboire
+11	176	Austin Bestline
+11	180	North Dakota Telephone Company
+11	184	Telecommunications Service Center, Inc (TSC)
+11	188	Telecommunications Service Center, Inc (TSC)
+11	192	Electric Lightwave, Inc.
+11	196	Electric Lightwave, Inc.
+#11	200	SPARE - UNASSIGNED
+11	204	Lansdowne Rural Telephone Company Ltd.
+11	208	People's Telephone Company of Forest Ltd.
+11	212	Home Telephone Company, Inc.
+11	216	Commnet Cellular
+11	220	Commnet Cellular
+11	224	Commnet Cellular
+11	228	ISI Telecommunications
+11	232	Pulaski-White Telephone Company
+11	236	Oregon Farmers Mutual Telephone Company
+11	240	Mulberry Cooperative Telephone Company, Inc.
+11	244	International Telecomm. Corporation
+11	248	Mountaineer Long Distance, Inc.
+11	252	Champaign Telephone Company
+12	0	Communication Telesystems, Int'l
+12	4	Communication Telesystems, Int'l
+12	8	Fresh Start Communications
+12	12	Kennebec Telephone Company
+12	16	Feist Long Distance
+12	20	Cherry Communications
+12	24	Cherry Communications
+12	28	South Plains Telephone Cooperative, Inc.
+12	32	Hollis Telephone Company
+12	36	IXC Long Distance, Inc.
+12	40	IXC Long Distance, Inc.
+12	44	Premiere Comm.
+12	48	Long Distance Network
+12	52	Council Grove Telephone Company
+12	56	Sledge Telephone Company
+12	60	Com Tech International
+12	64	CapRock Communications
+12	68	Telenational Communications
+12	72	Baraga Telephone Company
+12	76	American Personal Communications
+12	80	Merrimack County Telephone
+12	84	Contoocook Valley Telephone
+12	88	Contoocook Valley Telephone
+12	92	Phillips County Telephone Company
+12	96	T-One Corporation
+12	100	Fulton Telephone Company, Inc.
+12	104	Brazos Telephone Cooperative, Inc.
+12	108	McNabb Telephone Company
+12	112	Cam-Net Communications, Inc.
+12	116	El Paso Telephone Company
+12	120	Primus Telecommunications
+12	124	Riviera Telephone Company Inc.
+12	128	Northern Telephone Cooperative, Inc.
+12	132	Chickamauga Telephone Company
+12	136	Mid-Maine Telecom
+12	140	Mid-Maine Telecom
+12	144	CellularONE
+12	148	WesTel Telecommunications, Ltd.
+12	152	Telecommunication Services, Inc.
+12	156	Vermont Telephone Company, Inc.
+12	160	Swayzee Telephone Company, Inc.
+12	164	Sweetser Telephone Company, Inc.
+12	168	Bixby Telephone Company
+12	172	Champlain Valley Telecom
+12	176	Champlain Valley Telecom
+12	180	Mobile Telephone Switching Office/Cellcom
+12	184	ESS Ventures
+12	188	Northeast Louisana Telephone Company
+12	192	AmeriVision Communications Inc.
+12	196	AmeriVision Communications, Inc.
+12	200	Blanca Telephone Company
+12	204	Lavaca Telephone Company, Inc.
+12	208	Five Star Telecom
+12	212	Orwell Telephone Company
+12	216	Bascom Mutual Telephone Company
+12	220	Delcambre Telephone Company
+12	224	Bloomingdale Telephone Company, Inc.
+12	228	Cellular One (Kansas City)
+12	232	Scherers Communication Group, Inc.
+12	236	Scherers Communication Group, Inc.
+12	240	Cowiche Telephone
+12	244	RT Communications
+12	248	RT Communications
+12	252	Seneca Telephone Company
+13	0	Goodman Telephone Company
+13	4	Frontenac Telephone Company
+13	8	Harold Telephone Company
+13	12	STAR Telecommunications, Inc.
+13	16	Access Long Distance
+13	20	Compti-Pleasant Hill Telephone Company
+13	24	Central Arkansas Telephone Cooperative, Inc.
+13	28	N. Renfrew Telephone Company, Ltd.
+13	32	Westport Telephone Company, Ltd.
+13	36	Harold Telephone Company
+13	40	National Communications Association
+13	44	Nelson Ball Ground Telephone Company
+13	48	Brindlee Mtn. Telephone Company
+13	52	Hill Country Telephone Cooperative, Inc.
+13	56	Hill Country Telephone Cooperative, Inc.
+13	60	Hill Country Telephone Cooperative, Inc.
+13	64	Specialized Telecommunication Services
+13	68	Upton, Inc. (La Cie de Telephone)
+13	72	Valcourt (Co-op de Telephone de)
+13	76	Telephone Milot, Inc.
+13	80	Athena International L.L.C.
+13	84	Athena International L.L.C.
+13	88	Athena International L.L.C.
+13	92	Tecnet, Inc.
+13	96	Tecnet, Inc.
+13	100	Tri-County Telephone Membership Corporation
+13	104	Crossville Communications, Inc.
+13	108	Dell Telephone Cooperative
+13	112	Automated Communications, Inc.
+13	116	Noonan Farmers Telephone Company
+13	120	Telco Communications Group
+13	124	New Florence Telephone Company
+13	128	North Central Telephone Cooperative
+13	132	Farber Telephone Company
+13	136	Northwest Communications Cooperative
+13	140	ITS
+13	144	Intercel
+13	148	Valliant Telephone Company
+13	152	LDM, Inc.
+13	156	Star Telephone Company
+13	160	Georgia Telephone Corporation
+13	164	Carib Comm, L.P.
+13	168	Cherry Communications
+13	172	Cherry Communications
+13	176	Valu-Line
+13	180	Central Utah Telephone, Inc.
+13	184	TelAmerica Long Distance
+13	188	Thrifty Call, Inc. L.D.
+13	192	Thrifty Call, Inc. L.D.
+13	196	The I.T. Group
+13	200	Mid-Plains Rural Telephone Cooperative, Inc.
+13	204	Direct Net Telecommunications
+13	208	Dallas NextFone Systems, LC
+13	212	State Long Distance Telephone Company
+13	216	Dobson Telephone Company
+13	220	McLoud Telephone Company
+13	224	Tri-County Telephone Company, Inc.
+13	228	Tri-County Telephone Company, Inc.
+13	232	Rock County Telephone Company
+13	236	Eastern Nebraska Telephone Company
+13	240	Chariton Valley Telephone Corporation
+13	244	Pennsylvania Telephone Company
+13	248	Pineland Telephone Cooperative, Inc.
+13	252	Jones Intercable
+#14	0	NOT USED
+14	4	Voyager Networks, Inc
+14	8	Voyager Networks, Inc
+14	12	Voyager Networks, Inc
+14	16	Apollo Telecom
+14	20	Apollo Telecom
+14	24	Sprint Cellular
+14	28	Merchants & Farmers Telephone Company
+14	32	Choctaw Telephone Company
+14	36	Western Wireless
+14	40	Western Wireless
+14	44	Western Wireless
+14	48	Kallback
+14	52	Kallback
+14	56	Kallback
+14	60	Tel-Save, Inc.
+14	64	Tel-Save, Inc.
+14	68	Tel-Save, Inc.
+14	72	United Telephone Association, Inc.
+14	76	NVTS Ameritel
+14	80	C.C.I.
+14	84	C.C.I.
+14	88	C.C.I.
+14	92	York Telephone Company
+14	96	Midstate Telephone Company
+14	100	JBN Telephone Company, Inc.
+14	104	Qwest Communications
+14	108	Qwest Communications
+14	112	Qwest Communications
+14	116	Kadoka Telephone Company
+14	120	Dominican Communications
+14	124	SITA
+14	128	Beresford Municipal Telephone Company
+14	132	Table Top Telephone Company, Inc.
+14	136	Table Top Telephone Company, Inc.
+14	140	Lipan Telephone Company, Inc.
+14	144	Centennial Cellular Corporation
+14	148	Coast to Coast
+14	152	Cooperative Communications Inc.
+14	156	Egyptian Telephone Cooperative
+14	160	MICL
+14	164	Searsboro Telephone Company
+14	168	US WATS
+14	172	Sprint Cellular
+14	176	Sprint Cellular
+14	180	Sprint Cellular
+14	184	Ellington Telephone Company
+14	188	Ellington Telephone Company
+14	192	Telnex, Inc.
+14	196	Telnex, Inc.
+14	200	Atlantic Cellular Company, L.P.
+14	204	TCAST Communications, Inc.
+14	208	TCAST Communications, Inc.
+14	212	TCAST Communications, Inc.
+14	216	Liberty Cellular, Inc.
+14	220	Geetingsville Telepone Company, Inc.
+14	224	Laurel Highland Telephone Company
+14	228	Nokia Telecom
+14	232	FCI Int'l
+14	236	Huron Telecomm.Cooperative
+14	240	Hay Communications Cooperative
+14	244	KCTC
+14	248	Mosinee Telephone Company
+14	252	Montrose Mutual Telephone Company
+#15	0	NOT USED
+15	4	Caribbean Telephone and Telegraph, Inc.
+15	8	Caribbean Telephone and Telegraph, Inc.
+15	12	iXnet
+15	16	iXnet
+15	20	iXnet
+15	24	iXnet
+15	28	iXnet
+15	32	Motorola
+15	36	Motorola
+15	40	General Telecom
+15	44	Western Wireless
+15	44	Western Wireless
+15	48	Western Wireless
+15	52	Western Wireless
+15	56	Western Wireless
+15	60	Western Wireless
+15	64	Yorkville Telephone Cooperative
+15	68	Tuckersmith Communications Cooperative, Ltd.
+15	72	Telegroup
+15	76	North American Comm (NAC)
+15	80	Wilkinson County Telephone Company
+15	84	WorldPass
+15	88	BayStar Communications
+15	92	Filer Mutual Telephone Company
+15	96	Electric Lightwave
+15	100	Network Plus
+15	104	Network Plus
+15	108	KINNET Fiber Optic Communications
+15	112	Peoples Telephone Company
+15	116	Fairwater-Brandon-Alto Telephone Company
+15	120	Lackawaxen Telephone Company
+15	124	HSS Vending Distributors
+15	128	HSS Vending Distributors
+15	132	Eastex Telephone Cooperative, Inc.
+15	136	Eastex Telephone Cooperative, Inc.
+15	140	Eastex Telephone Cooperative, Inc.
+15	144	Eastex Telephone Cooperative, Inc.
+15	148	Eastex Telephone Cooperative, Inc.
+15	152	Eastex Telephone Cooperative, Inc.
+15	156	Ringgold Telephone Company, Inc.
+15	160	Farmers Telephone Cooperative, Inc
+15	164	US South Communications, Inc.
+15	168	MediaOne, Inc.
+15	172	POPP Telecom
+15	176	POPP Telecom
+15	180	World Telecommunications Services
+15	184	Teleport Communications Group
+15	188	Livingston Telephone Company
+15	192	Peoples Telephone Cooperative, Inc.
+15	196	New Hope Telephone Cooperative
+15	200	DataComm. International Company, Ltd.
+15	204	Vista International
+15	208	Startec's
+15	212	Cable Plus Company LP
+15	216	Cable Plus Company LP
+15	220	Venus Telephone Corp.
+15	224	S. F. C. Enterprises
+15	228	Technology Control, Inc.
+15	232	Technology Control, Inc.
+15	236	Mark Twain Rural Telephone Company
+15	240	Mark Twain Rural Telephone Company
+15	244	Mark Twain Rural Telephone Company
+15	248	Mark Twain Rural Telephone Company
+15	252	RAM Technologies, Inc.
+#16	0	NOT USED
+16	4	Ironton Telephone Company
+16	8	TCT West, Inc.
+16	12	La Harpe Telephone Company, Inc.
+16	16	United Telephone Association, Inc.
+16	20	Dubois Telephone Exchange, Inc
+16	24	Northland Telephone Company
+16	28	Northland Telephone Company
+16	32	Northland Telephone Company
+16	36	Northland Telephone Company
+16	40	Time Warner Communications
+16	44	Time Warner Communications
+16	48	Time Warner Communications
+16	52	AIC Asia International Services Corporation
+16	56	Zenex Long Distance
+16	60	El Paso County Telephone Company
+16	64	West Wisconsin Telecom Cooperative, Inc.
+16	68	West Wisconsin Telecom Cooperative, Inc.
+16	72	American Personal Communications
+16	76	Telescan, Inc.
+16	80	Cellular Mobile Systems of St. Cloud
+16	84	Consolidated Telco, Inc.
+16	88	Consolidated Telco, Inc.
+16	92	Consolidated Telco, Inc.
+16	96	Consolidated Telco, Inc.
+16	100	Consolidated Telco, Inc.
+16	104	Consolidated Telco, Inc.
+16	108	IDS Long Distance, Inc.
+16	112	Western New Mexico Telephone Company, Inc.
+16	116	Minford Telephone Company
+16	120	STAR Telecommunications, Inc.
+16	124	American Communications Services, Inc.
+16	128	American Communications Services, Inc.
+16	132	North American Gateway Inc.
+16	136	Bloomingdale Telephone Company
+16	140	NevTEL
+17	4	Teleport Communications Group
+17	8	American Communications Services, Inc.
+17	12	DiGiPH FCS, Inc.
+17	16	KMC Telecom Inc.
+17	20	Moundville Telephone Company, Inc.
+17	24	BellSouth Public Communications, Inc.
+17	28	ROPIR Communications, Inc.
+17	32	PC Management
+17	36	PC Management
+17	40	UniversalCom,Inc.
+17	44	Ragland Telephone Co., Inc.
+18	4	TelAlaska, Inc.
+18	8	TelAlaska, Inc.
+18	12	TelAlaska, Inc.
+18	16	TelAlaska, Inc.
+18	20	TelAlaska, Inc.
+18	24	Cordova Telephone Cooperative
+18	32	Alaska Network Systems, Inc.
+18	36	Bristol Bay Telephone Cooperative, Inc.
+18	40	Bristol Bay Telephone Cooperative, Inc.
+18	44	Bristol Bay Telephone Cooperative, Inc.
+18	48	OTZ Telephone Cooperative, Inc.
+18	52	OTZ Telephone Cooperative, Inc.
+18	56	OTZ Telephone Cooperative, Inc.
+18	60	Nashagak Telephone Cooperative, Inc.
+18	64	KPU Telecommunications
+18	68	Alaska DigiTel
+19	4	KLP, Inc. dba Call America.
+19	8	Teleport Communications Group
+19	12	Valley Telephone Cooperative, Inc.
+19	16	FTI Communications
+19	20	Valley Telephone Cooperative, Inc.
+19	24	Valley Telephone Cooperative, Inc.
+19	28	Valley Telephone Cooperative, Inc.
+19	32	Valley Telephone Cooperative, Inc.
+19	36	Mountain Telecommunications
+19	40	Metro One Telecommunications
+19	44	Dakota Carrier Services
+19	48	Dakota Carrier Services
+19	52	Dakota Carrier Services
+19	56	Dakota Carrier Services
+19	60	OPTel, Inc.
+19	64	Authentix Network, Inc.
+19	68	Authentix Network, Inc.
+19	72	San Carlos Apache Telecommunications Utility
+19	76	Alphanet Telecom Inc.
+20	4	Walnut Hill Telephone Company, Inc.
+20	8	Walnut Hill Telephone Company, Inc.
+20	12	Yell County Telephone Company
+20	16	Hyperion Telecommunications, Inc.
+20	20	South Arkansas Telephone Company
+20	24	Gabriel Communications, Inc.	Arkansas Site
+21	4	Harris Digital Telephone Systems
+21	8	Universal Communications Network, Inc.
+21	12	Genesis Communications International, Inc.
+21	16	Primus Telecommunications, Inc.
+21	20	Communications Telesystems International dba
+21	24	Teleport Communications Group
+21	28	Teleport Communications Group
+21	32	Phonetime, Inc.
+21	36	New Global Telecom
+21	40	Intellicom, Inc.
+21	44	Stanford University Communications Services
+21	48	SpectraNet Anaheim International
+21	52	Cyberlight International, Inc.
+21	56	Pacific Bell Communications
+21	60	Five Star Telecom
+21	64	World Touch Communications
+21	68	Pacific Gateway Exchange
+21	72	Paging Network Inc.,(AKA PageNet)
+21	76	AmeriCom Communications, LLC
+21	80	Metro One Telecommunications
+21	84	MGC Communications, Inc.
+21	88	World Exchange
+21	92	ILD Teleservices, Inc.
+21	96	Avirnex Communications Group
+21	100	Pacific Telecom
+21	104	Econophone, Inc.	California site
+21	108	Global Network Providers	California site
+21	112	Opentel Communications, Inc.
+21	116	Global One	California site
+21	120	Pac-West Telecomm, Inc.
+21	124	Pac-West Telecomm, Inc.
+21	128	Teltrust Communications Services, Inc.
+21	132	Telegroup, Inc.	California site
+21	136	ACS Systems, Inc.	California site
+21	140	Megawats
+21	144	LD International Provisioning	California
+21	148	FDN, Inc.	California site
+21	152	New Millennium Comm. Corp.	California
+21	156	MGC Communications, Inc.	California site
+21	160	MGC Communications, Inc.	California site
+21	164	Tele. Co. of Central Florida, Inc.	California
+21	168	Allegiance Telecom, Inc.	California site
+21	172	Justice Technology Corp.	California
+#21	176	SPARE - UNASSIGNED
+21	180	FaciliCom International	CA site
+21	184	AirTouch Satellite Services	CA site
+21	188	Focal Communications Corp.
+21	192	New Global Telecom
+21	196	PanAmSat Corporation	CA site
+21	200	Worldport Communications,Inc.	CA site
+21	204	AirTouch Satellite Services	CA site
+21	208	One. Tel, Inc.
+21	212	OzEmail Interline Pty Ltd.	CA site
+21	216	Japan Telecom America,Inc.	CA site
+21	220	Focal Communications Corp.	CA site
+21	224	DJB Entterprises Inc.	CA site
+21	228	DJB Enterprises Inc.	CA site
+21	232	INET Interactive Network System	CA site
+21	236	Telecom New Zealand USA Limited
+21	240	Level 3	CA site
+21	244	Voice and Data Communications	CA site
+21	248	LEC Unwired, LLC
+21	252	Teleselect Group, Inc.	CA site
+22	4	Plains Cooperative Telephone Association, Inc.
+22	8	Teleport Communications Group
+22	12	Intellicom, Inc.
+22	16	American Communications Services, Inc.
+22	20	The Bijou Telephone Co-op Association
+22	24	North American DigiCom Corporation
+22	28	North American DigiCom Corporation
+22	32	Nucla-Naturita Telephone Company
+22	36	Nucla-Naturita Telephone Company
+22	40	ConferTech International
+22	44	ConferTech International
+22	48	Metro One Telecommunications
+22	52	Sunflower Tele. Co., Inc.	Colorado
+22	56	Columbine Telecom Company
+22	60	Convergent Communications Services,Inc.
+22	64	ACS Systems, Inc.	Colorado site
+22	68	Optimum Network Service, LLC
+22	72	Great West Services, Ltd.
+22	76	Farmers Telephone Co., Inc.
+22	80	LeveL 3	CO site
+22	84	Voice and Data Communications	CO site
+22	88	CellularOne of Northeast Colorado
+22	92	Level 3 Communications	CO site
+22	96	USA Global Link	CO site
+22	100	OpTel, Inc.	CO site
+23	4	Teleport Communications Group
+25	4	Teleport Communications Group
+26	4	Universal Communications Network, Inc.
+26	8	Teleport Communications Group
+26	12	Intellicom, Inc.
+26	16	Phonetime, Inc.
+26	20	American Communications Services, Inc.
+26	24	International Digital Telecommunications Systems
+26	28	TresCom International
+26	32	BellSouth Long Distance, Inc.
+26	36	Orlando Telephone Company, Inc.
+26	40	Hyperion Telecommunications, Inc.
+26	44	Time Warner Communications
+26	48	Teleport Communications Group
+26	52	Teleport Communications Group
+26	56	Long Distance International Inc.
+26	60	L. C. Communications
+26	64	UniversalCom, Inc.
+26	68	Metro One Telecommunications
+26	72	Pick Communications Corporation
+26	76	US LEC of North Carolina	Florida
+26	80	Star Telecom	Miami, Florida site
+26	84	Econophone, Inc.	Florida site
+26	88	New Millennium Communications Corp.
+26	92	Telegroup, Inc.	Florida site
+26	96	KMC Telecom Inc.	Florida site
+26	100	Americatel Corporation
+26	104	City of Lakewood
+26	108	FDN Inc.	Florida site
+26	112	MGC Communications,Inc.	Florida site
+26	116	Tele.Co. of Central Florida,Inc.	Florida
+26	120	Voiceware Systems
+26	124	First Data Corp.(FDC)	Florida site
+26	128	PanAmSat Corporation	Florida site
+26	132	Worldport Communications,Inc.	FL site
+26	136	Call Sciences	Florida site
+26	140	American International Telephone
+26	144	INET Interactive Network Sys.	FL site
+26	148	Thrifty Call Inc.	Florida site
+26	152	Voice and Data Communications	FL site
+26	156	KMC Telecom II,Inc.	FL site
+26	160	Business Technology Services, Inc.
+26	164	PaeTec Communications,Inc.	FL site
+26	168	North American Telecomm. Corp
+26	172	USTel dba Arcada Commun.	FLsite
+26	176	Premiere Communications	FL site
+26	180	US LEC of Florida Inc.	FL site
+26	184	Eastland of Orlando Telephone Corp.
+26	188	OpTel, Inc.	Florita site
+26	192	Florida Digital Network, Inc.
+26	196	World Access Commun. Corp.
+26	200	Startec Global Commun. Corp.
+27	4	Darien Telephone Company, Inc.
+27	8	Glenwood Telephone Company
+27	12	Intellicom, Inc.
+27	16	Phonetime, Inc.
+27	20	American Communications Services, Inc.
+27	24	BellSouth Long Distance, Inc.
+27	28	Citizens Telephone Company, Inc.
+27	32	KMC Telecom Inc.
+27	36	Teleport Communications Group
+27	40	Teleport Communications Group
+27	44	Plant Telephone Company
+27	48	Plant Telephone Company
+27	52	Plant Telephone Company
+27	56	Coastal Telephone Company
+27	60	Emory University
+27	64	MGC Communications, Inc.
+27	68	ILD Teleservices, Inc.
+27	72	Teltrust Communications Services, Inc.
+27	76	Savannah Independent PCS, Inc.
+27	80	Georgia Independent PCS, Inc.
+27	84	US LEC of North Carolina	Georgia
+27	88	SITA	Georgia location
+27	92	Allegiance Telecom,Inc.	Georgia site
+27	96	Econophone, Inc.	Georgia site
+27	100	Five Star Telecom	Georgia site
+27	104	Enterprise Communications
+27	108	FaciliCom International	GA site
+27	112	Call Sciences	GA site
+27	116	N + 1, Inc.	GA site
+27	120	Level 3 Communications	GA site
+27	124	Pre-Paid Cellular Services
+27	128	USTel dba Arcada Commun.	GA site
+27	132	WorldxChange	GA site
+27	136	Network Switching Services,Inc.	GA site
+27	140	Waverly Hall Telephone Co.,Inc.
+28	4	Time Warner Communications
+28	8	TelHawaii, Inc.
+28	12	Sandwich Isles Communications,Inc.
+28	16	Sandwich Isles Communications,Inc.
+28	20	USTel dba Arcada Commun.	HI site
+29	4	American Communications Services, Inc.
+29	8	Fremont Telcom
+29	12	USTel dba Arcada Commun.	ID site
+30	4	Pantel Communications
+30	8	IXC Communications, Inc.
+30	12	Teleport Communications Group
+30	16	Teleport Communications Group
+30	20	Focal communications Corporation
+30	24	Intellicom, Inc.
+30	28	Phonetime, Inc.
+30	32	Odin Telephone Exchange, Inc.
+30	36	FTI Communications
+30	40	Metro One Telecommunications
+30	44	World Exchange
+30	48	Connect America,Inc.	IL site
+30	52	Econophone, Inc.	IL site
+30	56	21ST Century Cable	IL site
+30	60	Telegroup, Inc.	IL site
+30	64	Long Distance Int'l Provisioning	IL
+30	68	Net Communications,Inc.	IL site
+30	72	Tele. Co. of Central Florida,Inc.	IL
+30	76	Allegiance Telecom,Inc.	IL site
+30	80	Motorola Corporation
+30	84	FaciliCom International	IL site
+30	88	Southern Illinois RSA Partnership
+30	92	Thrifty Call Inc.	IL site
+30	96	Level 3	IL site
+30	100	Gallatin River Communications	IL site
+30	104	Gallatin River Communications	IL site
+30	108	USTel dba Arcada Commun.	IL site
+30	112	WorldxChange	IL site
+30	116	Megsinet, Inc.
+30	120	OpTel, Inc.	IL site
+31	4	Bloomingdale Home Telephone Company
+31	8	West Point Telephone Company
+31	12	Teleport Communications Group
+31	16	Time Warner Communications
+31	20	US Xchange LLC	Indiana site
+31	24	Pend Oreille Telephone
+31	28	KMC Telecom II, Inc.	IN site
+32	4	Scranton Telephone Company
+32	8	Templeton Telephone Company
+32	12	Marne & Elk Horn Telephone Comapny
+32	16	Farmers & Merchants Mutual Telephone
+32	20	Miller Telephone Company
+32	24	Farmers Mutual Telephone Company
+32	28	Consolidated Comm. Inc.	Iowa site
+32	32	Amica Wireless Phone Service
+32	36	Dunkerton Telephone Cooperative
+33	4	Peoples Mutual Telephone Company
+33	8	S&T Telephone Cooperative Association
+33	12	KIN Network, Inc.
+33	16	S&T Telephone Cooperative Assn.
+33	20	Kansas Personal Communication Services Ltd.
+33	24	Home Telephone Company, Inc.
+33	28	Hyperion Telecommunications, Inc.
+33	32	Sunflower Telephone Co.,Inc.	Kansas
+33	36	Bluestem Telephone Company	Kansas
+33	40	Mercury Cellular & Paging	KS location
+33	44	Cunningham Telephone Co.,Inc.
+33	48	MoKan Dial, Inc.	Kansas site
+33	52	Birch Telecom	Kansas site
+33	56	Sunflower Telephone Co.,Inc.	Kansas
+33	60	KMC Telecom II, Inc.	Kansas site
+33	64	Mutual Telephone Company	KS site
+33	68	Gabriel Communications,Inc.	KS site
+34	8	Alec, Inc.
+34	12	Hyperion Telecomm. Inc.	Kentucky
+34	16	Wireless 2000 PCS	Kentucky site
+34	20	Wireless 2000 PCS	Kentucky site
+34	24	SouthEast Telephone
+35	4	Elizabeth Telephone Company
+35	8	Radiofone, Inc.
+35	12	American Communications Services, Inc.
+35	16	MobileTel Inc.
+35	20	Mercury Cellular & Paging
+35	24	American MetroComm Corporation
+35	28	BellSouth Long Distance, Inc.
+35	32	Advanced Tel., Inc.
+35	36	Meretel Communications, L.P.
+35	40	Hyperion Telecommunications, Inc.
+35	44	KMC Telecom Inc.
+35	48	Data & Electronic Services, Inc.
+35	52	Shell Offshore Services, Co.
+35	56	Columbia Telecommunications, Inc.
+35	60	Louisiana Unwired LLC
+35	64	Louisiana Unwired LLC
+36	4	Unitel Incorporated
+36	8	Saco River Cellular Tele. Co.(DBA S/C)
+37	4	Teleport Communications Group
+37	8	American Communications Services, Inc.
+37	12	Metro One Telecommunications
+37	16	RCN Telecom Services,Inc.	MD site
+37	20	Bell Atlantic	MD
+37	24	PaeTec Communications,Inc.	MD site
+37	28	Comav Telco, Inc.	MD site
+38	4	Xcom Technologies, Inc.
+38	8	Teleport Communications Group
+38	12	Teleport Communications Group
+38	16	Residential Communications Netwprk, Inc.
+38	20	Arch Communications Group, Inc.
+38	24	Atlantic Connections, Inc.
+38	28	RNK, Inc.
+38	32	Global NAPS
+38	36	XCOM Technologies
+38	44	Norfolk County Internet
+38	48	Thrifty Call Inc.	MA site
+38	52	Bell Atlantic Global Networks	MA site
+38	56	LEVEL 3	MA site
+38	60	LBC Telephony	MA site
+38	64	Allegiance Telecom, Inc.	MA site
+38	68	PaeTec Communications, Inc.	MA site
+39	4	Ontonagon County Telephone Company
+39	8	Ontonagon County Telephone Company
+39	12	Midway Telephone Company
+39	16	Chapin telephone Company
+39	20	Peninsula telephone Company
+39	24	Nationwide Communications, Inc.
+39	28	BRE Communications dba Phone Michigan
+39	32	FoneTel
+39	36	NPI Wireless
+39	40	NPI Wireless
+39	44	Metro One Telecommunications
+39	48	Hiawatha Telephone Company
+39	52	Anishnabe Comm. Enterprise,Inc.	MI
+39	56	Long Distance of Michigan
+39	60	MichTel, Inc.	MI site
+39	64	KMC Telecom II, Inc.	MI site
+39	68	Level 3 Communications	MI site
+39	72	USTel dba Arcada Commun.	MI site
+39	76	Focal Communications Corporation
+40	4	American Communications Services, Inc.
+40	8	RCC Network, Inc.
+40	12	OCI Communications of Minnesota, Inc.
+40	16	Woodstock Telephone Company
+40	20	Metro One Telecommunications
+40	24	Upsala Cooperative Telephone Assoc.
+40	32	Teleport Comm. Group	Minnesota site
+40	36	Otter Tail Telcom
+40	40	Five Star Telecom	MN site
+40	44	Lismore Cooperative Telephone Co.
+40	48	KMC Telecom II, Inc.	MN site
+40	52	USTel dba Arcada Commun.	MN site
+40	56	Digital Telecommunications, Inc.
+41	4	Hyperion Telecomm, Inc.
+41	8	Teleport Communications Group
+41	12	American Communications Services Inc.
+41	16	Mound Bayou Telephone & Communications
+41	20	Cellular Holding, Inc.
+41	24	Georgetown Telephone Company
+42	4	Cass telephone Company
+42	8	Teleport Communications Group
+42	12	Intellicom, Inc.
+42	16	Phonetime, Inc.
+42	20	American Communications Services Inc.
+42	24	Consolidated Communications, Inc.
+42	28	Metro One Telecommunications
+42	32	Miller Telephone Company
+42	36	MoKan Dial, Inc.	Missouri site
+42	40	Digital Teleport, Inc.
+42	44	Alma Telephone Company, Inc.
+42	48	Birch Telecom	Missouri site
+42	52	USTel dba Arcada Commun.	MO site
+42	56	ExOp of Missouri, Inc.
+42	60	BPS Telephone Company
+42	64	Gabriel Communications, Inc.	MO site
+42	68	Gabriel Communications,Inc.	MO site
+42	72	Chariton Valley Long Distance Corp.
+42	76	Missouri RSA #5
+43	4	Range Telephone Cooperative
+43	8	Montana Wireless, Inc.
+43	12	Ronan Telephone Company
+43	16	Project Telephone Co.	Montana
+43	20	Project Telephone Co.	Montana
+43	24	Nemont Telephone Cooperative, Inc.
+43	28	Nemont Telephone Cooperative, Inc.
+43	32	Nemont Telephone Cooperative, Inc.
+43	36	Nemont Telephone Cooperative, Inc.
+43	40	Nemont Telephone Cooperative, Inc.
+43	44	Wireless II
+43	48	USTel dba Arcada Commun.	MT site
+43	52	InterBel Telephone Cooperative, Inc.
+44	4	Teleport Communications Group
+44	8	Wauneta Telephone Company
+44	12	Keystone-Arthur Telephone Company
+44	16	USA Global Link
+44	20	Three River Telco
+44	24	Plainview Telephone Company, Inc.
+44	28	Elsie Mutual Telephone Company
+44	32	Hamilton Telecommunications
+44	36	The Stanton Telephone Company
+44	40	Wauneta Telephone Co.,Inc.
+44	44	Hartington Telecomm. Co.,Inc.
+44	48	ATC Communications
+44	52	Henderson Co-Op Telephone Co.
+44	56	First Data Corporation(FDC)	NE site
+44	60	Dalton Telephone Co.,Inc.
+44	64	Curtis Telephone Co.,Inc.
+44	68	Clarks Telecommunications Co.
+44	72	Hershey Cooperative Telephone Co.
+44	76	Northeast Nebraska Telephone Co.
+44	80	Northeast Nebraska Telephone Co.
+44	84	NebCom, Inc.
+44	88	Tracey Corp. II d/b/a Western Total
+44	92	Eastern Nebraska Telephone Co.	NE site
+44	96	Home Telephone Company of Nebraska
+44	100	Glenwood Telephone Membership Corp.
+45	4	Phoenix Fiberlink of Utah, Inc.
+45	8	Moapa Valley Telephone Company
+45	12	Moapa Valley Telephone Company
+45	16	The Lincoln County Telephone System, Inc.
+45	20	NTI Telecom Incorporated
+45	24	ILD Teleservices, Inc.
+45	28	American Comm.Services,Inc.	Nevada
+45	32	MGC Communications Inc.
+45	36	Net Communications,Inc.	Nevada site
+45	40	USTel dba Arcada Commun.	NV site
+45	44	Rio Virgin Telephone Co.	NV site
+46	4	Vitts Corporation
+46	8	XCOM Technologies	(NH site)
+46	12	Freedom Ring Communications, Inc.
+46	16	CMG Telecommunications, Inc.
+47	4	Primus Telecommunications
+47	8	Teleport Communications Group
+47	12	Intellicom, Inc.
+47	16	Phonetime, Inc.
+47	20	Graphnet, Inc.
+47	24	Metro One Telecommunications
+47	28	Pick Communications Corporation
+47	32	Caricall Communications	NJ site
+47	36	GSI Telecom	NJ site
+47	40	Telephone Co. of Central Florida,Inc.	NJ
+47	44	Call Sciences	NJ site
+47	48	Thrifty Call Inc.	NJ site
+47	52	Viatel Global Communications-	NJ site
+47	56	Premiere Communications	NJ site
+47	60	L.C. Communications	NJ site
+47	64	Cooperative Communications, Inc	NJ site
+47	68	PAPOSH, LLC	NJ site
+48	4	Baca Valley Telephone Company
+48	8	Penasco Valley Telephone Cooperative, Inc.
+48	12	Valley Telephone Cooperative, Inc.
+48	16	Tularosa Basin Telephone Co.,Inc.
+48	20	Valley Telephone Cooperative, Inc.
+48	24	Valley Telephone Cooperative, Inc.
+48	28	Roosevelt County Rural Telephone Coop., Inc.
+48	32	Reams Commun.,Inc.dba Valuline Long
+49	4	Universal Communications Network, Inc.
+49	8	Athena International LLC
+49	16	Inter-Community Telephone Company
+49	20	Teleport Communications Group
+49	24	Teleport Communications Group
+49	28	Residential Communications Network, Inc.
+49	32	Telcom International Inc.
+49	36	Cyberlight International, Inc.
+49	40	Access Technologies Group
+49	44	Five Star Telecom
+49	48	TresCom International
+49	52	USFI, Inc.
+49	56	Viatel Global Communications
+49	60	Time Warner Communications
+49	64	USA Global Link
+49	68	Pacific Gateway Exchange
+49	72	Unicall Communications, Inc.
+49	76	Focal Communications Corporation
+49	80	World Exchange
+49	84	Hyperion Telecommunications, Inc.
+49	88	DirectNet Telecommunications	NY
+49	92	DirectNet Telecommunications	NY
+49	96	Telia North America Inc.	NY
+49	100	SITA	New York location
+49	104	Startec, Inc.	NY location
+49	108	XCOM Technologies	NY site
+49	112	Graphnet, Inc.	NY site
+49	116	Northland Comm.Group	Syracuse & Utica
+49	120	Oneida County Rural Tele. Co.
+49	124	Hudson Valley RSA Cellular Partnership
+49	128	Econophone, Inc.	NY site
+49	132	Chautauqua & Erie Telephone Corp.
+49	136	American International Tele.Co.,Inc.	NY
+49	140	KDD America, Inc.
+49	144	Allegiance Telecom,Inc.	NY site
+49	148	AlphaNet Telecom Inc.	NY site
+49	152	Long Distance Int'l Provisioning	NY
+49	156	Domtel Comm.Inc. d/b/a Tricom USA	NY
+49	160	FDN, Inc.	NY site
+49	164	New Millennium Comm.Corp	NY
+49	168	Trans Global Communications	NY site
+49	172	Arbit Communications, Inc.	NY site
+49	176	Arbit Communications, Inc.	Y site
+49	180	Local Fiber, L.L.C.
+49	184	Telcom International	NY site
+49	188	Net Communications,Inc.	NY site
+49	192	Justice Technology Corp.	NY
+49	196	North American Gateway Inc.	NY site
+49	200	North American Telecomm. Corp.
+49	204	Transwire LLC
+49	208	Transwire LLC
+49	212	Transwire LLC
+49	216	FaciliCom International	NY site
+49	220	Worldport Communications, Inc.	NY site
+49	228	OzEmail Interline Pty Limited	NY site
+49	232	ITC, Inc.	NY site
+49	236	INET Interactive Network System	NY
+49	240	Thrifty Call Inc.	NY site
+49	244	Bell Atlantic Global Networks	NY site
+49	248	Voice Data Communicationsl	NY site
+50	4	US LEC of North Carolina, LLC
+50	8	American Communications Services, Inc.
+50	12	Fiber South Communications
+50	16	BellSouth Long Distance, Inc.
+50	20	Time Warner Communications
+50	24	Teleport Communications Group
+50	28	US LEC of North Carolina	NC
+50	32	KMC Telecom Inc.	NC
+50	36	Long Distance Int'l Provisioning	NC
+50	40	Citizens Telephone Company
+50	44	Listing Services Solutions, Inc.	NC site
+50	48	Interpath Communications, Inc.
+50	52	USTel dba Arcada Communications	NC
+50	56	PC Management	NC site
+50	60	PC Management	NC site
+51	4	Dickey Rural Telephone Company
+51	8	Consolidated Telephone Cooperative
+51	12	Dakota Central Telecommunications Cooperative
+52	4	Teleport Communications Group
+52	8	Time Warner Communications
+52	12	Buckeye Telesystem	Ohio site
+52	16	Con Quest
+52	20	Con Quest
+52	24	Con Quest
+53	4	Panhandle telephone Cooperative, Inc.
+53	8	OnQue Communications, Inc.
+53	12	Scott County Telephone Company
+53	16	American Communications Services, Inc.
+53	20	Long Distance Int'l Provisioning	OK
+53	24	Oklahoma Telephone & Telegraph,Inc.
+53	28	Panhandle Telephone Cooperative,Inc.
+54	4	ECI Communications
+54	8	Teleport Communications Group
+54	12	Metro One Telecommunications
+54	16	OGI Telecomm
+54	20	Great West Services, Ltd.
+54	24	Oregon Telco Services, Inc.
+54	28	Rio Communications, Inc.	OR site
+54	32	USTel dba Arcada Communications	OR
+54	36	Cascade Utilities, Inc.	OR site
+54	40	Oregon Telephone Corporation
+54	44	North-State Telephone Company
+55	4	Palmerton Telephone Company
+55	8	Teleport Communications Group
+55	12	Teleport Communications Group
+55	16	Residential Communications Network, Inc.
+55	20	Buffalo Valley Telephone
+55	24	Conestoga Wireless Company
+55	28	Metro One Telecommunications
+55	32	Xtel Communications, Inc.
+55	36	Hyperion Telecomm.Inc.	PA
+55	40	Hyperion Telecomm. Inc.	PA
+55	44	Hyperion Telecomm. Inc.	PA
+55	48	Focal Communications Corp.	PA site
+55	52	Bell Atlantic Global Networks	PA site
+55	56	PaeTec Communications, Inc.	PA site
+55	60	Level 3 Communications	PA site
+55	64	USTel dba Arcada Communications	PA
+55	68	Allegiance Telcom, Inc.	PA site
+55	72	Comav Telco, Inc.	PA site
+56	4	Teleport Communications Group
+56	8	XCOM Technologies	Rhode Island
+57	4	Pond Branch Telephone Company, Inc.
+57	8	West Carolina Rural Telephone Cooperative, Inc.
+57	12	American Communications Services, Inc.
+57	16	NewSouth Comm.L.L.C.	SC
+57	20	Rhinos International Ltd. Co.
+57	24	Rhinos International Ltd. Co.
+57	28	Rhinos International Ltd. Co.
+57	32	P.V. Tel LLC	SC site
+58	4	RC Communications, Inc.
+58	8	Bridgewater-Canistota Independent Telephone
+58	12	Midco Communications
+58	16	Kadoka Telephone Co.	South Dakota
+59	4	Teleport Communications Group
+59	8	American Communications Services, Inc.
+59	12	Advantage Cellular Systems
+59	16	BellSouth Long Distance, Inc.
+59	20	US LEC of North Carolina	Tennessee
+59	24	Teleport Comm. Group	Tennessee
+59	28	Chase Communications,Inc.	Tennessee
+59	32	Chase Communications,Inc.	Tennessee
+59	36	Chase Communications,Inc.	Tennessee
+59	40	Chase Communications,Inc.	Tennessee
+59	44	Comm. Depot, Inc.	TN site
+59	48	P.V. Tel LLC	TN site
+60	4	Future Telephone Communications, Inc. dba FTC  Long Distance
+60	8	Universal Communications Network, Inc.
+60	12	Cameron Telephone Company Texas Division
+60	16	Lake Livingston Telephone Company
+60	20	IXC Communications, Inc.
+60	24	Crawford Telephone Company
+60	28	Teleport Communications Group
+60	32	Teleport Communications Group
+60	36	NRPT Corporation
+60	40	Intellicom, Inc.
+60	44	Phonetime, Inc.
+60	48	American Communications Services, Inc.
+60	52	American Communications Services, Inc.
+60	56	Border to Border Communications, Inc.
+60	60	OpTel, Inc.
+60	64	Five Star Telecom
+60	68	Voice Track
+60	72	Taylor Communications Group, Inc.
+60	76	FTI Communications
+60	80	Hill Country Telephone Cooperative, Inc.
+60	84	TCA Long Distance
+60	88	CSW/ICG ChoiceCom, L.P.
+60	92	CSW/ICG ChoiceCom, L.P.
+60	96	CSW/ICG ChoiceCom, L.P.
+60	100	Time Warner Communications
+60	104	KMC Telecom Inc.
+60	108	Telco Communications Group
+60	112	SA Telecommunications
+60	116	Alenco Communications, Inc.
+60	120	Alenco Communications, Inc.
+60	124	World Exchange
+60	128	ILD Teleservices, Inc.
+60	132	CoServ L.L.C.
+60	136	IWL Comm. d.b.a. IWL Connect	Texas
+60	140	Star Telecom	Dallas,Texas site
+60	144	Allegiance Telecom,Inc.	Texas site
+60	148	Econophone, Inc.	Texas site
+60	152	FiberWave
+60	156	West Texas Rural Tele.Cooperative
+60	160	West Texas Rural Tele. Cooperative
+60	164	West Texas Rural Tele. Cooperative
+60	168	WT Services, Inc.
+60	172	Revenue Communications, Inc.	Texas
+60	176	Great West Services, Ltd.
+60	180	Industry Telephone Company
+60	184	Telescape International, Inc.
+60	188	FDN, Inc.	Texas site
+60	192	New Millennium Comm.Corp.	Texas
+60	196	Tele.Co.of Central Florida,Inc.	Texas
+60	200	Blossom Telephone Co.,Inc.
+60	204	American Telesource Int'l Inc.
+60	208	American Gateway Telecommunications
+60	212	FaciliCom International	Texas site
+60	216	AirTouch Satellite Services	Texas site
+60	220	Tech Telephone Company, Ltd.
+60	224	IXE Corporation
+60	228	Worldport Communications,Inc.	TX site
+60	232	Logix Communications
+60	236	Logix Communications
+60	240	Thrifty Call Inc.	TX site
+60	244	Paging Network Inc.	TX site
+60	248	Nortex Telcom
+60	252	Twister Comm. Network, Inc.
+61	4	All West Communications
+61	8	Phoenix Fiberlink of Utah, Inc.
+61	12	Teleport Communications Group
+61	16	FTI Communications
+61	20	Teltrust Communications Services, Inc.
+61	24	Access Long Distance
+61	28	Access Long Distance
+61	32	Access Long Distance
+61	36	Teltrust Communications Services, Inc.
+61	40	USTel dba Arcada Commun.	UT side
+62	4	Hyperion Telcommunications, Inc.
+62	8	Personal Commun. Network, Inc.	VT
+62	12	Personal Commun. Network, Inc.	VT
+62	16	Personal Commun. Network, Inc.	VT
+63	4	Swiftcall (USA) Inc.
+63	8	Global Tone Communications, Inc.
+63	12	Hyperion Telecommunications, Inc.
+63	16	US LEC of North Carolina	Virginia
+63	20	XCOM Technologies	Virginia site
+63	24	KMC Telecom Inc.	Virginia site
+63	28	CFW Wireless
+63	32	Level 3	VA site
+63	36	Allegiance Telecom, Inc.	VA site
+63	40	Ameritech Global Gateway Services
+64	4	ComScape Telecommunications, Inc.
+64	8	Hardy Telecommunications, Inc.
+65	4	XYPOINT Corporation
+65	8	Teleport Communications Group
+65	12	Five Star Telecom
+65	16	Phonetime, Inc.
+65	20	St. John Telephone Company
+65	24	USA Global Link
+65	28	Global Connect Partners LLC
+65	32	Metro One Telecommunications
+65	36	World Exchange
+65	40	XYPOINT Corporation
+65	44	XYPOINT Corporation
+65	48	AlphaNet Telecom Inc.	Seattle site
+65	52	Global Mobility Systems, Inc.
+65	56	Pass Word, Inc.
+65	60	Cable Plus Company LP
+65	64	Great West Services
+65	68	USTel dba Arcada Commun.	WA site
+66	4	Somerset Telephone Company, Inc.
+66	8	Airadigm Communications
+66	12	Airadigm Communications
+66	16	Airadigm Communications
+66	20	Airadigm Communications
+66	24	Airadigm Communications
+66	28	Airadigm Communications
+66	32	Kendall Telephone Inc.
+66	36	Cuba City Telephone Exchange Company
+66	40	KMC Telecom Inc.
+66	44	Manawa Telephone Company, Inc.
+66	48	US Xchange LLC	Wisconsin site
+66	52	Lemonweir Valley Telephone Co.
+66	56	Amery Telcom, Inc.
+67	4	Range Telephone Cooperative
+67	8	Silver Star Telephone Co.	WY site
+67	12	RT Communications, Inc.
+68	4	AirTouch Satellite Services	Calgary site
+69	4	Hongkong Telecom Canada
+69	8	Prince Rupert City Telephone
+69	12	GT Group Telecom Networks, Inc.
+69	16	Vancouver Telephone Co. Ltd.
+75	4	Primus Telecommunications, Inc
+75	8	Telehop Communications, Inc.
+75	12	Dryden Municipal Telephone System
+75	16	Econophone, Inc.	Ontario site
+75	20	Kenora Municipal Telephone Company
+75	24	AlphaNet Telecom Inc.
+75	28	Eastern Independent Telecomm. Ltd.
+75	32	AirTouch Satellite Services	Ontario site
+75	36	Wightman Telephone Ltd.
+75	40	Premiere Communications	Ontario site
+77	4	La Compagnie de Telephone de St-Victor
+77	8	Telephone de St-Ephrem
+77	12	Telephone Guevremont Inc.
+77	16	Videotron Telecom Ltee
+77	20	La Corporation de Telephone de la Baie
+77	24	Videotron Telecom Ltee
+77	28	La Compagnie de Telephone de Lambton
+77	32	La Cie de Telephone de Courcelles Inc.
+80	4	Panam Wireless, Inc.
+80	8	IT&E Overseas, Inc.
+80	12	Quantum Communications Ltd.
+80	16	Quantum Communications Ltd.
+80	20	AirTouch Satellite Serv.	Puerto Rico site
+80	24	Bermuda Digital Communications Ltd.
+80	28	Caribcom
+81	4	Guam Telephone Authority
+81	8	Access Telecom
+81	12	American Samoa Telecommunications
+81	16	American Samoa Telecommunications
+81	20	Guam Cellular & Paging
+81	24	Saipan Cellular & Paging
+82	4	N + 1, Inc.,	TX site
+82	8	Level 3 Communications	TX site
+82	12	Fort Bend Long Distance Co.	TX site
+82	16	USTel dba Arcada Commun.	TX site
+82	20	Network Switching Services,Inc.	TX site
+82	24	Grande River Communications,Inc.
+82	28	Southside Communications,Inc.	TX site
+82	32	Alamosa PCS LLC	TX site
+82	36	Allegiance Telecom, Inc.	TX site
+82	40	Millenium Telcom, L.L.C.
+82	44	Logix
+82	48	Logix
+82	52	Cumby Telephone Cooperative,Inc.
+82	56	U.S. Operations, Inc.
+83	4	Allegiance Telecom, Inc.	CA site
+83	8	PaeTec Communications,Inc.	CA site
+83	12	Level 3 Communications	CA site
+83	16	KDD America Inc.	CA site
+83	20	USTel dba Arcada Commun.	CA site
+83	24	WorldxChange	CA site
+83	28	Premiere Communications	CA site
+83	32	Network Switching Services,Inc.	CA site
+83	36	US TelePacific Corp.dba TelePacific
+83	40	OpTel,Inc.	CA site
+83	48	VIP Calling	CA site
+83	52	Alphanet Telecom Inc	CA site
+83	56	RCN Telecom of California
+83	60	Startec Global Communications Corp.
+84	4	Carrier 1, Inc.	NY site
+84	8	Telergy
+84	12	USTel dba Arcada Commun.	NY site
+84	16	City Telecom (USA)Inc.	NY site
+84	20	Network Switching Services, Inc.	NY site
+84	24	Interoute Telecommunications, Inc.
+84	28	Interoute Telecommunications, Inc.
+84	32	Choice One Communications	NY site
+84	36	Star/UniSource Carrier Services
+84	40	Choice One Communications
+84	44	Comav Telco, Inc.	NY site

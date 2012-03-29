@@ -1,0 +1,74 @@
+# ANSI T1.111.8 Large Network Codes
+# Table B1/T1.111.8 -  List of Large Network Codes
+#255	RESERVED - FUTURE USE
+254	AT&T Communications
+253	US SPRINT
+252	BellSouth
+#251	Pacific Bell
+251	PacificTelesis
+#250	Ameritech
+250	Ameritech Services
+249	Southwestern Bell Telephone
+#248	Bell Tri-Co Services
+248	U S WEST Communications
+#247	Nynex Service Co.
+247	NYNEX
+246	Bell Atlantic
+#245	Telecom Canada
+245	AT&T Canada Long Distance Services
+#244	MCI Telecommunications Group
+244	MCI Telecommunications Corporation
+243	Southern New England Telephone
+242	Allnet Communications Services, Inc.
+241	Defense Communications Agency
+#240	GTE Service Corporation/Telephone Operations
+240	GTE Service Corporation
+#239	United Telephone Sys
+239	Sprint Local Telecommunications Division
+238	Independent Telecommunications Network
+237	Cable & Wireless
+#236	CNCP Telecommunications
+236	AT&T Canada Long Distance Services
+#235	Comtel
+235	CONTEL (GTE Wireless)
+234	ALLTEL
+#233	Rochester Telephone
+233	Frontier Communications Int'l, Inc.
+232	Century Telephone Enterprises, Inc.
+231	AT&T (VSN)
+#230	Centel
+230	Sprint Local Telecommunications Division
+229	TEST CODE (T1S1)
+# Point codes with this network identifier may be assigned by
+# any network operator to real or simulated signalling points
+# for test purposes.  Due to possible duplicate assignments of
+# these codes, messages addressed with one of these point codes
+# should not be sent across network boundaries except with
+# agreements of the networks involved.
+228	Pacific Telecom
+227	North American Cellular Network
+226	Cantel
+225	Lincoln Telephone Company
+224	Cincinnati Bell Telephone
+223	TDS TELECOM
+222	MEANS/INS/SDN
+221	CTIA
+220	Southwestern Bell Mobile Systems
+219	Nextel (Was OneComm, Inc.)
+218	Citizens Telecom
+217	ICG Network Services
+216	MCImetro
+215	AT&T
+214	Sprint Spectrum L.P.
+213	Mobility Canada
+212	Teleglobe USA
+211	Omnipoint Communications Inc.
+210	NextWave Telecom
+209	BellSouth Enterprises
+208	GST Telecom
+#207-6	Large network code
+5	Point code blocks
+4	Small network code
+3	Small network code
+2	Small network code
+1	Small network code
