@@ -140,6 +140,27 @@ sub readlerg7 {
 	}
 	close($fh);
 }
+sub readlerg8 {
+	my ($self) = @_;
+	my $fh = \*INFILE;
+	open($fh,"<","$datadir/LERG8.DAT") or die "can't open file";
+	while (<$fh>) { chomp;
+		next if /^#/;
+		my $lata = substr($_, 0, 5); $lata =~ s/^\s+//; $lata =~ s/\s+$//;
+		my $stat = substr($_,32, 2); $stat =~ s/^\s+//; $stat =~ s/\s+$//;
+		my $abbv = substr($_,34,10); $abbv =~ s/^\s+//; $abbv =~ s/\s+$//;
+		my $name = substr($_,45,50); $name =~ s/^\s+//; $name =~ s/\s+$//;
+		my $v = substr($_, 95,5); $v =~ s/^\s+0*//; $v =~ s/\s+$//; $v = int($v);
+		my $h = substr($_,100,5); $h =~ s/^\s+0*//; $h =~ s/\s+$//; $h = int($h);
+		$self->{db}{lerg8}{$stat}{$abbv}{lata} = $lata;
+		$self->{db}{lerg8}{$stat}{$abbv}{stat} = $stat;
+		$self->{db}{lerg8}{$stat}{$abbv}{abbv} = $abbv;
+		$self->{db}{lerg8}{$stat}{$abbv}{name} = $name;
+		$self->{db}{lerg8}{$stat}{$abbv}{rcv} = $v;
+		$self->{db}{lerg8}{$stat}{$abbv}{rch} = $h;
+	}
+	close($fh);
+}
 sub readwire {
 	my ($self) = @_;
 	if (my $db = do "$datadir/cllis.pm") {
@@ -234,8 +255,44 @@ sub plotlerg7 {
 			'fill-color'=>'orange',
 			'line-width'=>0,
 			'stroke-color'=>'white',
+			'pointer-events'=>'all',
 		);
+		$item->signal_connect('enter_notify_event'=>sub{
+				my ($item,$targ,$ev,$rec) = @_;
+				print STDERR "entering clli: $rec->{clli}\n";
+			},$_);
 		push @{$self->{items}}, $item;
+	}
+}
+sub plotlerg8 {
+	my $self = shift;
+	my $scalex = 1920/360;
+	my $scaley = 1200/180;
+	my $root = $self->{Canvas}->get_root_item;
+	my $blah = new Geo::Coordinates::VandH;
+	foreach my $st (values %{$self->{db}{lerg8}}) {
+		foreach (values %{$st}) {
+			my $r = 0.5;
+			my ($v,$h) = ($_->{rcv},$_->{rch});
+			my ($y,$x) = $blah->vh2ll($v,$h);
+			$x += 180; $x -= 360 if $x > 360;
+			$x = 360 - $x;
+			$x *= $scalex;
+			$y = 90 - $y;
+			$y *= $scaley;
+			my $item = Goo::Canvas::Ellipse->new($root,$x,$y,$r,$r,
+				'antialias'=>'default',
+				'fill-color'=>'green4',
+				'line-width'=>0,
+				'stroke-color'=>'white',
+				'pointer-events'=>'all',
+			);
+			$item->signal_connect('enter_notify_event'=>sub{
+					my ($item,$targ,$ev,$rec) = @_;
+					print STDERR "entering rc: $rec->{abbv}\n";
+				},$_);
+			push @{$self->{items}}, $item;
+		}
 	}
 }
 sub plotwire {
@@ -258,7 +315,11 @@ sub plotwire {
 			'fill-color'=>'green',
 			'line-width'=>0,
 			'stroke-color'=>'white',
+			'pointer-events'=>'all',
 		);
+		$item->signal_connect('enter_notify_event'=>sub{
+				my ($item,$targ,$ev,$rec) = @_;
+			},$_);
 		push @{$self->{items}}, $item;
 	}
 }
@@ -396,12 +457,14 @@ sub menuFileNew {
 	@lines = `pscoast -Rd -I2 -Di -m`;
 	$self->plotdata('blue4',0.05,@lines);
 	$self->readarea;
-	$self->readwire;
+#	$self->readwire;
 	$self->readlerg7;
+	$self->readlerg8;
 	$self->plotcity;
 	$self->plotrate;
-	$self->plotwire;
+#	$self->plotwire;
 	$self->plotlerg7;
+	$self->plotlerg8;
 	$self->plotgrid;
 }
 sub menuFileOpen {

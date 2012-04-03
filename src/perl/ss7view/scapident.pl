@@ -875,7 +875,7 @@ sub uncnt {
 	my ($self,$top) = @_;
 	if (($self->{ciccnt} -= 1) == 0) {
 		if ($self->isa('Relation')) {
-			$top->canvas;->dtag('circuits',withtag=>$self->{item}) if $self->{item};
+			$top->canvas->dtag('circuits',withtag=>$self->{item}) if $self->{item};
 		}
 	}
 }
@@ -977,9 +977,9 @@ package PktCounts; use strict;
 
 #package PktCounts;
 sub init {
-	my ($self,$top,$args) = @_;
+	my ($self,$top,@args) = @_;
 	$self->Counts::init(@args);
-	$self->{hits} = {0=>{},1->{},2=>{}};
+	$self->{hits} = {0=>{},1=>{},2=>{}};
 	$self->{top} = $top;
 }
 sub destroy {
@@ -3146,9 +3146,9 @@ sub pstat {
 		my $f = $p->Subwidget('scrolled');
 		my $s = $f->Frame->pack(%tframepack);
 		my @show = ();
-		my $show[0] = $self->{hits}->{0}->{pkts} != 0;
-		my $show[1] = $self->{hits}->{1}->{pkts} != 0;
-		my $show[2] = $self->{hits}->{2}->{pkts} != 0 and (($show[0] and $show[1]) or (!$show[0] and !$show[1]));
+		$show[0] = $self->{hits}->{0}->{pkts} != 0;
+		$show[1] = $self->{hits}->{1}->{pkts} != 0;
+		$show[2] = $self->{hits}->{2}->{pkts} != 0 and (($show[0] and $show[1]) or (!$show[0] and !$show[1]));
 		if ($self->{hits}->{2}->{pkts}) {
 			my $col = 0;
 			$w = $s->Label(%labelright,
@@ -4058,7 +4058,7 @@ sub pushpkt {
 	push @{$self->{pkts}}, $pkt;
 	$self->{pkt} = undef;
 	$self->{pktcnt}++;
-	$self->updatelist($msg) if $self->{show};
+	$self->updatelist($pkt) if $self->{show};
 }
 #package PktCollector;
 sub deletepkt {
@@ -4086,7 +4086,7 @@ sub clearpkts {
 #package PktCollector;
 sub pktcnt {
 	my $self = shift;
-	return scalar(@{$self->{pkts});
+	return scalar(@{$self->{pkts}});
 }
 #package PktCollector;
 sub addfrom {
@@ -4111,6 +4111,11 @@ sub pkts {
 	my $title = $self->identify." Packets";
 	my $tl = $top->widget->toplevel;
 	$tw = $tl->Toplevel(
+		-title=>$title,
+		Name=>'packetsTable',
+		-class=>'SS7view',
+	);
+	my $wi = $tw->toplevel->Toplevel(
 		-title=>$title,
 		Name=>'packetsTable',
 		-class=>'SS7view',
@@ -4555,7 +4560,7 @@ sub init {
 #package Stateful;
 sub destroy {
 	my ($self,$top) = @_;
-	$top->widget->traceVdelete(\$self->{state}};
+	$top->widget->traceVdelete(\$self->{state});
 }
 #package Stateful;
 sub tracestate {
@@ -4732,10 +4737,10 @@ sub init {
 #package Arcend;
 sub destroy {
 	my ($self,$top) = @_;
-	while (my $arc = shift @{$end->{arcs}->{a}}) {
+	while (my $arc = shift @{$self->{arcs}->{a}}) {
 		$arc->destroy($top);
 	}
-	while (my $arc = shift @{$end->{arcs}->{b}}) {
+	while (my $arc = shift @{$self->{arcs}->{b}}) {
 		$arc->destroy($top);
 	}
 }
@@ -5628,7 +5633,7 @@ sub get {
 	return $relation->{cics}->{$cic} if $relation->{cics}->{$cic};
 	my $self = {
 		cic=>$cic,
-		relation=>$relation
+		relation=>$relation,
 		ts=>$top->{begtime},
 		dir=>0,
 		active=>0,
@@ -6317,7 +6322,7 @@ sub getmore {
 		my $node = $self->{node}->{a};
 		my $label = 'Node A '.$node->shortid;
 		my $mc = $m->Menu(-title=>"$label Menu");
-		$mc->configure(-postcommand->[sub {
+		$mc->configure(-postcommand=>[sub {
 			my ($self,$mc,$top,$X,$Y) = @_;
 			$mc->delete(0,'end');
 			my $node = $self->{node}->{a};
@@ -6330,7 +6335,7 @@ sub getmore {
 		my $node = $self->{node}->{b};
 		my $label = 'Node B '.$node->shortid;
 		my $mc = $m->Menu(-title=>"$label Menu");
-		$mc->configure(-postcommand->[sub {
+		$mc->configure(-postcommand=>[sub {
 			my ($self,$mc,$top,$X,$Y) = @_;
 			$mc->delete(0,'end');
 			my $node = $self->{node}->{b};
@@ -6531,7 +6536,7 @@ sub getmore {
 			$mc->delete(0,'end');
 			foreach my $dli (sort {$a <=> $b} keys %{$self->{datalinks}}) {
 				my $datalink = $self->{datalinks}->{$dli};
-				my $type = ref($datalink); $type~=s/_/ /g;
+				my $type = ref($datalink); $type =~ s/_/ /g;
 				my $label = $type.' '.$datalink->shortid;
 				$m3 = $mc->Menu(-title=>"$label Menu");
 				$datalink->getmenu($m3,$top,$X,$Y);
@@ -6796,7 +6801,7 @@ sub xform {
 
 	$c->delete($self->{item});
 	shift @{$self->{items}};
-	$self->adjitems($top,$c,\@oldtags);
+	$self->adjitems($type,$top,$c,\@oldtags);
 	$c->itemconfigure($self->{ttxt}, -text=>ref($self));
 	if ($self->{alias}) {
 		$c->itemconfigure($self->{item}, -dash=>[5,2]);
@@ -6951,7 +6956,7 @@ sub addipaddr {
 		return $self->absorb($host);
 	}
 	$self->{ipaddrs}->{$ipaddr} = 1;
-	$ipaddr = [sort {$a<=>$b} keys @{$self->{ipaddrs}}]->[0];
+	$ipaddr = [sort {$a<=>$b} keys %{$self->{ipaddrs}}]->[0];
 	if ($self->{ipaddr} != $ipaddr) {
 		$self->{ipaddr} = $ipaddr;
 		$self->{iaddr} = Host::iaddr($ipaddr);
@@ -6965,15 +6970,15 @@ sub addipaddr {
 sub makeone {
 	my ($node,$top,$network,$ipaddr) = @_;
 	if (ref $node eq 'Node') {
-		$self->{ipaddr} = $ipaddr;
-		$self->{ipaddrs}->{$ipaddr} = 1;
-		$self->{iaddr} = Host::iaddr($ipaddr);
-		$self->{iname} = Host::iname($ipaddr);
-		SUPER::xform('Host',$self,$top);
+		$node->{ipaddr} = $ipaddr;
+		$node->{ipaddrs}->{$ipaddr} = 1;
+		$node->{iaddr} = Host::iaddr($ipaddr);
+		$node->{iname} = Host::iname($ipaddr);
+		SUPER::xform('Host',$node,$top);
 	} else {
 		print STDERR "E: $node: attempt to make a Host DENIED\n";
 	}
-	return $self;
+	return $node;
 }
 
 #package Host;
@@ -6992,7 +6997,7 @@ sub mergefrom {
 
 #package Host;
 sub adjitems {
-	my ($self,$top,$c,$oldtags) = @_;
+	my ($self,$type,$top,$c,$oldtags) = @_;
 	my ($x,$y) = ($self->{x},$self->{y});
 	$self->{item} = $c->createRectangle(
 		$x-40,$y-30,$x+40,$y+30,
@@ -7082,7 +7087,7 @@ sub addfrom {
 sub mergefrom {
 	my ($self,$top,$node) = @_;
 
-	if ($node->isa{'SP'}) {
+	if ($node->isa('SP')) {
 		print STDERR "E: $self and $node attempt to merge DENIED\n";
 		return;
 	}
@@ -7093,7 +7098,7 @@ sub mergefrom {
 
 #package SP;
 sub adjitems {
-	my ($self,$top,$c,$oldtags) = @_;
+	my ($self,$type,$top,$c,$oldtags) = @_;
 	my ($x,$y) = ($self->{x},$self->{y});
 	$self->{item} = $c->createOval(
 		$x-40,$y-40,$x+40,$y+40,
@@ -7912,7 +7917,7 @@ package SSP; use strict;
 # -------------------------------------
 
 sub adjitems {
-	my ($self,$top,$c,$oldtags) = @_;
+	my ($self,$type,$top,$c,$oldtags) = @_;
 	my ($x,$y) = ($self->{x},$self->{y});
 	$self->{item} = $c->createOval(
 		$x-40,$y-40,$x+40,$y+40,
@@ -7950,7 +7955,7 @@ package SCP; use strict;
 # -------------------------------------
 
 sub adjitems {
-	my ($self,$top,$c,$oldtags) = @_;
+	my ($self,$type,$top,$c,$oldtags) = @_;
 	my ($x,$y) = ($self->{x},$self->{y});
 	$self->{item} = $c->createOval(
 		$x-40,$y-30,$x+40,$y+30,
@@ -7988,7 +7993,7 @@ package STP; use strict;
 # -------------------------------------
 
 sub adjitems {
-	my ($self,$top,$c,$oldtags) = @_;
+	my ($self,$type,$top,$c,$oldtags) = @_;
 	my ($x,$y) = ($self->{x},$self->{y});
 	$self->{item} = $c->createRectangle(
 		$x-38,$y-38,$x+38,$y+38,
@@ -8026,7 +8031,7 @@ package GTT; use strict;
 # -------------------------------------
 
 sub adjitems {
-	my ($self,$top,$c,$oldtags) = @_;
+	my ($self,$type,$top,$c,$oldtags) = @_;
 	my ($x,$y) = ($self->{x},$self->{y});
 	$self->{alias} = 1;
 	$self->{item} = $c->createRectangle(
@@ -8530,8 +8535,8 @@ sub get {
 	my $self = $network->{datalinks}->{$dli};
 	return $self if $self;
 	my $way = $msg->{dir};
-	my $nodea = Node->get($top,$network,0 - ::COL_ADJ);
-	my $nodeb = Node->get($top,$network,0 + ::COL_ADJ);
+	my $nodea = Node->get($top,$network,0 - &::COL_ADJ);
+	my $nodeb = Node->get($top,$network,0 + &::COL_ADJ);
 	($nodea,$nodeb) = ($nodeb,$nodea) unless $way & 0x1;
 	$self = Datalink::new($type,$top,$network,$dli,$nodea,$nodeb,$msg,@args);
 	$self->{ppa} = $ppa;
@@ -8749,7 +8754,7 @@ sub dli {
 #package Association;
 sub find {
 	my ($type,$top,$network,$msg,@args) = @_;
-	my $dli = $type::dli($msg);
+	my $dli = Association::dli($msg);
 	return $network->{datalinks}->{$dli} if $network->{datalinks}->{$dli};
 	return undef;
 }
@@ -8761,15 +8766,15 @@ sub get {
 	return $self if $self;
 	my ($addra,$addrb,$cola,$colb);
 	if ($msg->{dir} == ::SLL_DIR_RECEIVED) {
-		$addra = $msg->{daddr}; $cola = 0 + ::COL_ADJ;
-		$addrb = $msg->{saddr}; $colb = 0 - ::COL_ADJ;
+		$addra = $msg->{daddr}; $cola = 0 + &::COL_ADJ;
+		$addrb = $msg->{saddr}; $colb = 0 - &::COL_ADJ;
 	} else {
-		$addra = $msg->{saddr}; $cola = 0 - ::COL_ADJ;
-		$addrb = $msg->{daddr}; $colb = 0 + ::COL_ADJ;
+		$addra = $msg->{saddr}; $cola = 0 - &::COL_ADJ;
+		$addrb = $msg->{daddr}; $colb = 0 + &::COL_ADJ;
 	}
 	my $hosta = Host->get($top,$network,$addra,$cola);
 	my $hostb = Host->get($top,$network,$addrb,$colb);
-	$self = Datalink::new($type,$top,$network,$dli,$nodea,$nodeb,$msg,@args);
+	$self = Datalink::new($type,$top,$network,$dli,$hosta,$hostb,$msg,@args);
 	$self->PktCollector::init($top,@args);
 	$self->PktBuffer::init(@args);
 	$self->{sport} = $msg->{sport};
@@ -8795,12 +8800,12 @@ sub bindit {
 #package Association;
 sub identify {
 	my $self = shift;
-	my $name = ref($self); $name~=s/_/ /g;
+	my $name = ref($self); $name=~s/_/ /g;
 	my $id = sprintf("$name %d::%d(%08x)", $self->{sport},$self->{dport},$self->{vtag});
 	$id .= ", $self->{node}->{a}->{pcode} <=> $self->{node}->{b}->{pcode} link $self->{slc}"
 		if $self->{node}->{a} and $self->{node}->{a}->isa('SP');
 	$id .= ", $self->{node}->{a}->{ipaddr} <=> $self->{node}->{b}->{ipaddr}"
-		if $self->{node}->{a} and $self->{node}->{a}->isa('Host'};
+		if $self->{node}->{a} and $self->{node}->{a}->isa('Host');
 	return ($self->{id} = $id);
 }
 
@@ -8934,7 +8939,7 @@ sub add_pkt {
 				$self->add_msg($top,$network,$msg,$dir);
 				next;
 			}
-			print STDERR "W: $m: decoding error, message discarded\n";
+			print STDERR "W: $msg: decoding error, message discarded\n";
 		}
 	}
 }
@@ -9002,7 +9007,7 @@ sub add_pkt {
 				$msg->{interface}->add_msg($top,$network,$msg,$dir);
 				next;
 			}
-			print STDERR "W: $m: decoding error, message discarded\n";
+			print STDERR "W: $msg: decoding error, message discarded\n";
 		}
 	}
 }
@@ -9068,7 +9073,7 @@ sub add_pkt {
 				$msg->{routing}->add_msg($top,$network,$msg,$dir);
 				next;
 			}
-			print STDERR "W: $m: decoding error, message discarded\n";
+			print STDERR "W: $msg: decoding error, message discarded\n";
 		}
 	}
 }
@@ -9132,7 +9137,7 @@ sub add_pkt {
 				$msg->{routing}->add_msg($top,$network,$msg,$dir);
 				next;
 			}
-			print STDERR "W: $m: decoding error, message discarded\n";
+			print STDERR "W: $msg: decoding error, message discarded\n";
 		}
 	}
 }
@@ -9160,7 +9165,7 @@ sub new {
 	my $pcap;
 
 	unless ($pcap = Net::Pcap::pcap_open_offline($file, \$err)) {
-		my $d = $w->Dialog(
+		my $d = $top->Dialog(
 			-text=>"Non-Fatal Error",
 			-text=>"Could not open file:\n\n\t$file\n\nError was: $err",
 			-default_button=>'Dismiss',
@@ -9211,7 +9216,7 @@ sub getmsg {
 sub service {
 	my ($self,$top,$network) = @_;
 
-	my %hdr = ();
+	my $hdr = {};
 	my $dat = '';
 	my $ret;
 
@@ -11338,7 +11343,7 @@ sub decode {
 	$self->Setpr(::MP_NATIONAL) if $self->{mp} != 0;
 
 	$self->{rc} = 0 unless exists $self->{rc};
-	my $routing = M3UA_Routing->get($top,$network,$datalink,$self->{rc},@self);
+	my $routing = M3UA_Routing->get($top,$network,$datalink,$self->{rc},$self);
 	$self->{routing} = $routing;
 	return 1;
 }
@@ -11380,7 +11385,7 @@ sub decode {
 
 		$self->{bib} = ($self->{bsn} >> 7) & 0x01; $self->{bsn} &= 0x7f;
 		$self->{fib} = ($self->{fsn} >> 7) & 0x01; $self->{fsn} &= 0x7f;
-		$self->{li0} = ($self->{li}  >> 6} & 0x03; $self->{li}  &= 0x3f;
+		$self->{li0} = ($self->{li}  >> 6) & 0x03; $self->{li}  &= 0x3f;
 		$$off += 3; $$len -= 3;
 	} else {
 		(
@@ -11392,7 +11397,7 @@ sub decode {
 
 		$self->{bib} = ($self->{bsn} >> 15) & 0x0001; $self->{bsn} &= 0x0fff;
 		$self->{fib} = ($self->{fsn} >> 15) & 0x0001; $self->{fsn} &= 0x0fff;
-		$self->{li0} = ($self->{li}  >> 14} & 0x0003; $self->{li}  &= 0x01ff;
+		$self->{li0} = ($self->{li}  >> 14) & 0x0003; $self->{li}  &= 0x01ff;
 		$$off += 6; $$len -= 6;
 	}
 	if (($self->{li} != $$len) && ($$len <= 63 || $self->{li} != 63)) {
@@ -11708,7 +11713,7 @@ package IPLayer; use strict;
 sub create {
 	my ($type,$top,$network,$msg) = @_;
 	return 2 if 20 > $msg->{len};
-	my $byte = unpack('C',$msg->{dat},$off,1);
+	my $byte = unpack('C',substr($msg->{dat},$msg->{off},1));
 	my $vers = ($byte & 0xf0) >> 4;
 	if ($vers != 4) {
 		printf STDERR "E: $msg: only IPv4 supported but vers is $vers\n";
@@ -11819,7 +11824,7 @@ sub decode {
 		$self->{stream},
 		$self->{ssn},
 		$self->{ppi},
-	) = unpack('NnnN', $pkt->{dat}, $self->{off}, 12);
+	) = unpack('NnnN', substr($pkt->{dat}, $self->{off}, 12));
 	$self->{off} += 12; $self->{len} -= 12;
 	$pkt->{ppi} = $self->{ppi};
 	return $self;
@@ -11838,7 +11843,7 @@ sub decode {
 		$self->{a_rwnd},
 		$self->{nacks},
 		$self->{ndups},
-	) = unpack('NNnn', $pkt->{dat}, $self->{off}, 12);
+	) = unpack('NNnn', substr($pkt->{dat}, $self->{off}, 12));
 	$self->{off} += 12; $self->{len} -= 12;
 	return $self;
 }
@@ -11853,7 +11858,7 @@ sub decode {
 	return undef if 4 > $self->{len};
 	(
 		$self->{cumm},
-	) = unpack('N', $pkt->{dat}, $self->{off}, 4);
+	) = unpack('N', substr($pkt->{dat}, $self->{off}, 4));
 	$self->{off} += 4; $self->{len} -= 4;
 	return $self;
 }

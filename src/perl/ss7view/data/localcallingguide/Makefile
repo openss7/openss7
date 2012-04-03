@@ -1,6 +1,10 @@
 #!/usr/bin/make -f
 
-all: db.pm
+all: csv
+
+csv: host.csv ocn.csv clli.csv rc.csv switches.csv db.csv
+
+pm: db.pm
 
 clean:
 	rm -f tmp.log db.pm process.log db.csv ocn.csv clli.csv convert.log
@@ -9,10 +13,16 @@ cleaner: clean
 
 real-clean: cleaner
 
-.PHONY: all clean cleaner real-clean
+.PHONY: all clean cleaner real-clean csv pm
 
-db.csv ocn.csv clli.csv rc.csv: convert.pl Makefile results/*.A.xml.xz
+db.csv ocn.csv clli.csv rc.csv: host.csv convert.pl Makefile results/*.A.xml.xz
 	./convert.pl 2>&1 | tee convert.log
+
+host.csv: convert.clli.pl Makefile switches/*/*/*/*/data.html.xz
+	./convert.clli.pl 2>&1 | tee convert.clli.log
+
+switches.csv: clli.csv convert.switches.pl Makefile switches/*/*/data.html.xz
+	./convert.switches.pl 2>&1 | tee convert.switches.log
 
 db.pm: process.pl ../database.pm Makefile results/*.A.xml.xz
 	./process.pl 2>&1 | tee tmp.log
