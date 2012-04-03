@@ -384,7 +384,7 @@ sub do_nxx {
 
 do_rc();
 do_clli();
-#do_ocn();
-#do_nxx();
+do_ocn();
+do_nxx();
 
 exit;

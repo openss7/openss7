@@ -1,6 +1,6 @@
 
 
-all: db.pm
+all: db.csv
 
 clean:
 	rm -f tmp.log db.pm process.log db.csv clli.csv convert.log
