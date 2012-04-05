@@ -2,14 +2,16 @@
 
 all: csv
 
-csv: host.csv ocn.csv clli.csv rc.csv switches.csv db.csv
+csv: db.csv host.csv switches.csv
 
 pm: db.pm
 
 clean:
-	rm -f tmp.log db.pm process.log db.csv ocn.csv clli.csv convert.log
+	rm -f tmp.log db.pm process.log db.csv ocn.csv clli.csv switches.csv host.csv rc.csv
+	rm -f convert.log
 
 cleaner: clean
+	rm -f *.log
 
 real-clean: cleaner
 

@@ -2,7 +2,7 @@
 
 all: csv
 
-csv: db.csv ocn.csv rc.csv special.csv discon.csv
+csv: db.csv special.csv discon.csv
 
 pm: db.pm
 

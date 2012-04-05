@@ -7,7 +7,7 @@ csv: db.csv
 pm: db.pm
 
 clean:
-	rm -f tmp.log db.pm process.log db.csv clli.csv convert.log
+	rm -f tmp.log db.pm process.log db.csv clli.csv ocn.csv convert.log
 	rm -f NECA-4-1.txt NECA-4-12.txt NECA-4-44.txt NECA-4-400.txt
 
 real-clean: clean
@@ -26,7 +26,7 @@ NECA-4-44.txt: NECA-4-44.pdf
 NECA-4-400.txt: NECA-4-400.pdf
 	pdftotext -layout $<
 
-db.csv clli.csv: convert.pl Makefile NECA-4-1.txt NECA-4-12.txt NECA-4-44.txt NECA-4-400.txt
+db.csv clli.csv ocn.csv: convert.pl Makefile NECA-4-1.txt NECA-4-12.txt NECA-4-44.txt NECA-4-400.txt
 	./convert.pl 2>&1 | tee convert.log
 
 db.pm: NECA-4-1.txt NECA-4-12.txt NECA-4-44.txt NECA-4-400.txt process.pl ../database.pm Makefile
