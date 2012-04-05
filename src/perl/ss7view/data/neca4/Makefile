@@ -1,6 +1,10 @@
 
 
-all: db.csv
+all: csv
+
+csv: db.csv
+
+pm: db.pm
 
 clean:
 	rm -f tmp.log db.pm process.log db.csv clli.csv convert.log
@@ -8,7 +12,7 @@ clean:
 
 real-clean: clean
 
-.PHONY: all clean real-clean
+.PHONY: all clean real-clean csv pm
 
 NECA-4-1.txt: NECA-4-1.pdf
 	pdftotext -layout $<

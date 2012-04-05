@@ -132,11 +132,13 @@ sub readlerg7 {
 		my $socn = substr($_,53, 4); $socn =~ s/^\s+//; $socn =~ s/\s+$//;
 		my $v = substr($_,57,5); $v =~ s/^\s+0*//; $v =~ s/\s+$//; $v = int($v);
 		my $h = substr($_,62,5); $h =~ s/^\s+0*//; $h =~ s/\s+$//; $h = int($h);
+		my $st = substr($_,158,2); $st =~ s/^\s+//; $st =~ s/\s+$//;
 		$self->{db}{lerg7}{$clli}{clli} = $clli;
 		$self->{db}{lerg7}{$clli}{lata} = $lata;
 		$self->{db}{lerg7}{$clli}{wcv}  = $v;
 		$self->{db}{lerg7}{$clli}{wch}  = $h;
 		$self->{db}{lerg7}{$clli}{cc}   = $socn;
+		$self->{db}{lerg7}{$clli}{st}   = $st;
 	}
 	close($fh);
 }
@@ -158,6 +160,105 @@ sub readlerg8 {
 		$self->{db}{lerg8}{$stat}{$abbv}{name} = $name;
 		$self->{db}{lerg8}{$stat}{$abbv}{rcv} = $v;
 		$self->{db}{lerg8}{$stat}{$abbv}{rch} = $h;
+	}
+	close($fh);
+}
+sub readneca4 {
+	my ($self) = @_;
+	my $fh = \*INFILE;
+	my $header = 1;
+	my @fields = ();
+	open($fh,"<","$datadir/neca4/clli.csv");
+	while (<$fh>) { chomp;
+		s/^"//; s/"$//; my @tokens = split(/","/,$_);
+		if ($header) {
+			@fields = @tokens;
+			$header = undef;
+			next;
+		}
+		my $clli = $tokens[0];
+		for (my $i=0;$i<@fields;$i++) {
+			$self->{db}{neca4}{$clli}{$fields[$i]} = $tokens[$i];
+		}
+	}
+	close($fh);
+}
+sub readnpanxxsource {
+	my ($self) = @_;
+	my $fh = \*INFILE;
+	my $header = 1;
+	my @fields = ();
+	open($fh,"<","$datadir/npanxxsource/clli.csv");
+	while (<$fh>) { chomp;
+		s/^"//; s/"$//; my @tokens = split(/","/,$_);
+		if ($header) {
+			@fields = @tokens;
+			$header = undef;
+			next;
+		}
+		my $clli = $tokens[0];
+		for (my $i=0;$i<@fields;$i++) {
+			$self->{db}{npanxxsource}{clli}{$clli}{$fields[$i]} = $tokens[$i];
+		}
+	}
+	close($fh);
+	$header = 1;
+	@fields = ();
+	open($fh,"<","$datadir/npanxxsource/rc.csv");
+	while (<$fh>) { chomp;
+		s/^"//; s/"$//; my @tokens = split(/","/,$_);
+		if ($header) {
+			@fields = @tokens;
+			$header = undef;
+			next;
+		}
+		my $rcshort = $tokens[0];
+		my $region  = $tokens[1];
+		for (my $i=0;$i<@fields;$i++) {
+			$self->{db}{npanxxsource}{rate}{$region}{$rcshort}{$fields[$i]} = $tokens[$i];
+		}
+	}
+	close($fh);
+	close($fh);
+}
+sub readareacodes {
+	my ($self) = @_;
+	my $fh = \*INFILE;
+	my $header = 1;
+	my @fields = ();
+	open($fh,"<","$datadir/areacodes/clli.csv");
+	while (<$fh>) { chomp;
+		s/^"//; s/"$//; my @tokens = split(/","/,$_);
+		if ($header) {
+			@fields = @tokens;
+			$header = undef;
+			next;
+		}
+		my $clli = $tokens[0];
+		for (my $i=0;$i<@fields;$i++) {
+			$self->{db}{areacodes}{$clli}{$fields[$i]} = $tokens[$i];
+		}
+	}
+	close($fh);
+}
+sub readlocal {
+	my ($self) = @_;
+	my $fh = \*INFILE;
+	my $header = 1;
+	my @fields = ();
+	open($fh,"<","$datadir/localcallingguide/rc.csv");
+	while (<$fh>) { chomp;
+		s/^"//; s/"$//; my @tokens = split(/","/,$_);
+		if ($header) {
+			@fields = @tokens;
+			$header = undef;
+			next;
+		}
+		my $rcshort = $tokens[0];
+		my $region = $tokens[1];
+		for (my $i=0;$i<@fields;$i++) {
+			$self->{db}{localcallingguide}{$region}{$rcshort}{$fields[$i]} = $tokens[$i];
+		}
 	}
 	close($fh);
 }
@@ -232,7 +333,7 @@ sub plotcity {
 			'line-width'=>0,
 			'stroke-color'=>'white',
 		);
-		push @{$self->{items}}, $item;
+		push @{$self->{items}{city}}, $item;
 	}
 }
 sub plotlerg7 {
@@ -259,9 +360,10 @@ sub plotlerg7 {
 		);
 		$item->signal_connect('enter_notify_event'=>sub{
 				my ($item,$targ,$ev,$rec) = @_;
-				print STDERR "entering clli: $rec->{clli}\n";
+				print STDERR "entering clli: $rec->{clli} ($rec->{wcv},$rec->{wch})\n";
 			},$_);
-		push @{$self->{items}}, $item;
+		my $st = $_->{st};
+		push @{$self->{items}{$st}}, $item;
 	}
 }
 sub plotlerg8 {
@@ -289,9 +391,174 @@ sub plotlerg8 {
 			);
 			$item->signal_connect('enter_notify_event'=>sub{
 					my ($item,$targ,$ev,$rec) = @_;
-					print STDERR "entering rc: $rec->{abbv}\n";
+					print STDERR "entering rc: $rec->{abbv} ($rec->{rcv},$rec->{rch})\n";
 				},$_);
-			push @{$self->{items}}, $item;
+			my $st = $_->{stat};
+			push @{$self->{items}{$st}}, $item;
+		}
+	}
+}
+sub plotneca4 {
+	my $self = shift;
+	my $scalex = 1920/360;
+	my $scaley = 1200/180;
+	my $root = $self->{Canvas}->get_root_item;
+	my $blah = new Geo::Coordinates::VandH;
+	foreach (values %{$self->{db}{neca4}}) {
+		#my $r = 0.3;
+		my $r = 0.8;
+		my ($v,$h) = split(/,/,$_->{wcvh});
+		$v =~ s/^\s+0*//; $v =~ s/\s+$//; $v = int($v);
+		$h =~ s/^\s+0*//; $h =~ s/\s+$//; $h = int($h);
+		next unless $v and $h;
+		my ($y,$x) = $blah->vh2ll($v,$h);
+		$x += 180; $x -= 360 if $x > 360;
+		$x = 360 - $x;
+		$x *= $scalex;
+		$y = 90 - $y;
+		$y *= $scaley;
+		my $item = Goo::Canvas::Ellipse->new($root,$x,$y,$r,$r,
+			'antialias'=>'default',
+			#'fill-color'=>'yellow',
+			'fill-color'=>'red',
+			'line-width'=>0,
+			'stroke-color'=>'white',
+			'pointer-events'=>'all',
+		);
+		$item->signal_connect('enter_notify_event'=>sub{
+				my ($item,$targ,$ev,$rec) = @_;
+				print STDERR "entering clli: $rec->{CLLI} ($rec->{wcvh})\n";
+			},$_);
+		my $st = substr($_->{CLLI},4,2);
+		push @{$self->{items}{$st}}, $item;
+	}
+}
+sub plotnpanxxsource {
+	my $self = shift;
+	my $scalex = 1920/360;
+	my $scaley = 1200/180;
+	my $root = $self->{Canvas}->get_root_item;
+	my $blah = new Geo::Coordinates::VandH;
+	foreach my $region (values %{$self->{db}{npanxxsource}{rate}}) {
+		foreach (values %{$region}) {
+			my $r = 0.25;
+			my ($v,$h) = split(/,/,$_->{RCVH});
+			$v =~ s/^\s+0*//; $v =~ s/\s+$//; $v = int($v);
+			$h =~ s/^\s+0*//; $h =~ s/\s+$//; $h = int($h);
+			next unless $v and $h;
+			my ($y,$x) = $blah->vh2ll($v,$h);
+			$x += 180; $x -= 360 if $x > 360;
+			$x = 360 - $x;
+			$x *= $scalex;
+			$y = 90 - $y;
+			$y *= $scaley;
+			my $item = Goo::Canvas::Ellipse->new($root,$x,$y,$r,$r,
+				'antialias'=>'default',
+				'fill-color'=>'cyan',
+				'line-width'=>0,
+				'stroke-color'=>'white',
+				'pointer-events'=>'all',
+			);
+			$item->signal_connect('enter_notify_event'=>sub{
+					my ($item,$targ,$ev,$rec) = @_;
+					print STDERR "entering rc: $rec->{RCSHORT} ($rec->{RCVH})\n";
+				},$_);
+			my $st = $_->{REGION};
+			push @{$self->{items}{$st}}, $item;
+		}
+	}
+	foreach (values %{$self->{db}{npanxxsource}{clli}}) {
+		my $r = 0.2;
+		my ($v,$h) = split(/,/,$_->{'Wire Center V&H'});
+		$v =~ s/^\s+0*//; $v =~ s/\s+$//; $v = int($v);
+		$h =~ s/^\s+0*//; $h =~ s/\s+$//; $h = int($h);
+		next unless $v and $h;
+		my ($y,$x) = $blah->vh2ll($v,$h);
+		$x += 180; $x -= 360 if $x > 360;
+		$x = 360 - $x;
+		$x *= $scalex;
+		$y = 90 - $y;
+		$y *= $scaley;
+		my $item = Goo::Canvas::Ellipse->new($root,$x,$y,$r,$r,
+			'antialias'=>'default',
+			'fill-color'=>'magenta',
+			'line-width'=>0,
+			'stroke-color'=>'white',
+			'pointer-events'=>'all',
+		);
+		$item->signal_connect('enter_notify_event'=>sub{
+				my ($item,$targ,$ev,$rec) = @_;
+				print STDERR "entering clli: $rec->{CLLI} ($rec->{'Wire Center V&H'})\n";
+			},$_);
+		my $st = $_->{'Wire Center State'};
+		push @{$self->{items}{$st}}, $item;
+	}
+}
+sub plotareacodes {
+	my $self = shift;
+	my $scalex = 1920/360;
+	my $scaley = 1200/180;
+	my $root = $self->{Canvas}->get_root_item;
+	my $blah = new Geo::Coordinates::VandH;
+	foreach (values %{$self->{db}{areacodes}}) {
+		my $r = 0.8;
+		my ($v,$h) = ($_->{RC_VERTICAL},$_->{RC_HORIZONTAL});
+		$v =~ s/^\s+0*//; $v =~ s/\s+$//; $v = int($v);
+		$h =~ s/^\s+0*//; $h =~ s/\s+$//; $h = int($h);
+		next unless $v and $h;
+		my ($y,$x) = $blah->vh2ll($v,$h);
+		$x += 180; $x -= 360 if $x > 360;
+		$x = 360 - $x;
+		$x *= $scalex;
+		$y = 90 - $y;
+		$y *= $scaley;
+		my $item = Goo::Canvas::Ellipse->new($root,$x,$y,$r,$r,
+			'antialias'=>'default',
+			'fill-color'=>'blue',
+			'line-width'=>0,
+			'stroke-color'=>'white',
+			'pointer-events'=>'all',
+		);
+		$item->signal_connect('enter_notify_event'=>sub{
+				my ($item,$targ,$ev,$rec) = @_;
+				print STDERR "entering clli: $rec->{CLLI} ($rec->{RC_VERTICAL},$rec->{RC_HORIZONTAL})\n";
+			},$_);
+		my $st = substr($_->{CLLI},4,2);
+		push @{$self->{items}{$st}}, $item;
+	}
+}
+sub plotlocal {
+	my $self = shift;
+	my $scalex = 1920/360;
+	my $scaley = 1200/180;
+	my $root = $self->{Canvas}->get_root_item;
+	my $blah = new Geo::Coordinates::VandH;
+	foreach my $region (values %{$self->{db}{localcallingguide}}) {
+		foreach (values %{$region}) {
+			my $r = 0.5;
+			my ($v,$h) = ($_->{'RC-V'},$_->{'RC-H'});
+			$v =~ s/^\s+0*//; $v =~ s/\s+$//; $v = int($v);
+			$h =~ s/^\s+0*//; $h =~ s/\s+$//; $h = int($h);
+			next unless $v and $h;
+			my ($y,$x) = $blah->vh2ll($v,$h);
+			$x += 180; $x -= 360 if $x > 360;
+			$x = 360 - $x;
+			$x *= $scalex;
+			$y = 90 - $y;
+			$y *= $scaley;
+			my $item = Goo::Canvas::Ellipse->new($root,$x,$y,$r,$r,
+				'antialias'=>'default',
+				'fill-color'=>'green4',
+				'line-width'=>0,
+				'stroke-color'=>'white',
+				'pointer-events'=>'all',
+			);
+			$item->signal_connect('enter_notify_event'=>sub{
+					my ($item,$targ,$ev,$rec) = @_;
+					print STDERR "entering rc: $rec->{RCSHORT} ($rec->{'RC-V'},$rec->{'RC-H'})\n";
+				},$_);
+			my $st = $_->{'REGION'};
+			push @{$self->{items}{$st}}, $item;
 		}
 	}
 }
@@ -319,8 +586,10 @@ sub plotwire {
 		);
 		$item->signal_connect('enter_notify_event'=>sub{
 				my ($item,$targ,$ev,$rec) = @_;
+				print STDERR "entering clli: $rec->{clli} ($rec->{wcv},$rec->{wch})\n";
 			},$_);
-		push @{$self->{items}}, $item;
+		my $st = substr($_->{clli},4,2);
+		push @{$self->{items}{$st}}, $item;
 	}
 }
 sub plotrate {
@@ -346,7 +615,7 @@ sub plotrate {
 			'line-width'=>0,
 			'stroke-color'=>'white',
 		);
-		push @{$self->{items}}, $item;
+		push @{$self->{items}{rate}}, $item;
 	}
 }
 sub plotgrid {
@@ -402,7 +671,7 @@ sub plotdata {
 	my $scalex = 1920/360;
 	my $scaley = 1200/180;
 	my $root = $self->{Canvas}->get_root_item;
-	$self->{items} = [];
+	$self->{items} = {};
 	my $line = 0;
 	while ($_ = shift @lines) {
 		$line++;
@@ -418,7 +687,7 @@ sub plotdata {
 					'line-join'=>'round',
 					'stroke-color'=>$color,
 				);
-				push @{$self->{items}}, $item;
+				push @{$self->{items}{gmt}}, $item;
 				@coords = ();
 			}
 		} else {
@@ -440,7 +709,7 @@ sub plotdata {
 			'line-join'=>'round',
 			'stroke-color'=>$color,
 		);
-		push @{$self->{items}}, $item;
+		push @{$self->{items}{gmt}}, $item;
 	}
 }
 sub menuFileNew {
@@ -456,15 +725,23 @@ sub menuFileNew {
 	$self->plotdata('black',0.15,@lines);
 	@lines = `pscoast -Rd -I2 -Di -m`;
 	$self->plotdata('blue4',0.05,@lines);
-	$self->readarea;
+	$self->readareacodes;
+#	$self->readarea;
 #	$self->readwire;
-	$self->readlerg7;
-	$self->readlerg8;
-	$self->plotcity;
-	$self->plotrate;
+#	$self->readlerg7;
+#	$self->readlerg8;
+	$self->readlocal;
+	$self->readneca4;
+	$self->readnpanxxsource;
+#	$self->plotcity;
+#	$self->plotrate;
 #	$self->plotwire;
-	$self->plotlerg7;
-	$self->plotlerg8;
+	$self->plotareacodes;
+#	$self->plotlerg7;
+#	$self->plotlerg8;
+	$self->plotlocal;
+	$self->plotneca4;
+	$self->plotnpanxxsource;
 	$self->plotgrid;
 }
 sub menuFileOpen {
