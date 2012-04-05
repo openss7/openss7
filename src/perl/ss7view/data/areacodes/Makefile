@@ -1,5 +1,9 @@
 
-all: db.pm
+all: csv
+
+csv: db.csv ocn.csv clli.csv
+
+pm: db.pm
 
 clean:
 	rm -f tmp.log db.pm process.log db.csv convert.log
@@ -9,12 +13,12 @@ cleaner: clean
 
 real-clean: cleaner
 
-.PHONY: all clean cleaner real-clean
+.PHONY: all clean cleaner real-clean csv pm
 
 AREACODEWORLD-GOLD-SAMPLE.CSV: AREACODEWORLD-GOLD-SAMPLES.zip
 	unzip -p $< $@ > $@
 
-db.csv: convert.pl Makefile
+db.csv ocn.csv clli.csv: convert.pl Makefile
 	./convert.pl 2>&1 | tee convert.log
 
 db.pm: AREACODEWORLD-GOLD-SAMPLES.zip process.pl ../database.pm Makefile
