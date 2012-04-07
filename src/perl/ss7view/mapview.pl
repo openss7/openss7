@@ -47,6 +47,13 @@ sub new {
 	$mc = Gtk2::MenuItem->new('_File');
 	$mc->set_submenu($me);
 	$mb->append($mc);
+	$me = $self->{ViewMenu} = Gtk2::Menu->new;
+	$mi = Gtk2::ImageMenuItem->new_from_stock('gtk-open',undef);
+	$mi->signal_connect('activate'=>\&MyTop::viewStates,$self);
+	$me->append($mi);
+	$mc = Gtk2::MenuItem->new('_View');
+	$mc->set_submenu($me);
+	$mb->append($mc);
 	$vbox->pack_start($mb,FALSE,FALSE,0);
 	$sw = $self->{ScrolledWindow} = Gtk2::ScrolledWindow->new();
 	$sw->set_policy('always','always');
@@ -770,6 +777,80 @@ sub menuFileOpen {
 	Gtk2->main_iteration;
 	return unless $self->{BOARD} = BOARD->new($file);
 	$self->draw;
+}
+#package MyTop;
+sub togglestate {
+	my ($b,$d) = @_;
+	my ($self,$st) = @$d;
+	my $vis;
+	print STDERR "$st toggled\n";
+	if ($b->get_active) {
+		print STDERR "$st is now active\n";
+		$vis = 'visible';
+	} else {
+		print STDERR "$st is now inactive\n";
+		$vis = 'hidden';
+	}
+	if (exists $self->{items}{$st}) {
+		foreach (@{$self->{items}{$st}}) {
+			$_->set('visibility'=>$vis);
+		}
+	}
+}
+#package MyTop;
+sub viewStates {
+	my ($menuitem,$self) = @_;
+	my $w = $self->{ViewStates};
+	if ($w) {
+		$w->show_all if !$w->visible;
+		return;
+	}
+	$w = $self->{ViewStates} = Gtk2::Window->new;
+	$w->set_title('State Chooser');
+	$w->signal_connect(destroy=>sub{
+			my ($window,$self) = @_;
+			$self->{ViewStates} = undef;
+			1;
+		},$self);
+	$w->set_border_width(4);
+	my $f = Gtk2::Frame->new('States Chooser');
+	$w->add($f);
+	my $v = Gtk2::VBox->new(FALSE,8);
+	#$v->set_border_width(8);
+	$f->add($v);
+	my $h = Gtk2::HBox->new(FALSE,8);
+	$v->pack_start($h,FALSE,FALSE,0);
+	my $t = Gtk2::Table->new(24,4,TRUE);
+	#$t->set_row_spacings(4);
+	#$t->set_col_spacings(4);
+	$h->pack_start($t,TRUE,TRUE,0);
+	my ($r,$c) = (0,0);
+	foreach (
+		'AB', 'AG', 'AI', 'AK', 'AL', 'AR', 'AS', 'AZ', 'BB', 'BC',
+		'BM', 'BS', 'CA', 'CO', 'CT', 'DC', 'DE', 'DM', 'DO', 'FL',
+		'GA', 'GD', 'GU', 'HI', 'IA', 'ID', 'IL', 'IN', 'JM', 'KN',
+		'KS', 'KY', 'KY', 'LA', 'LC', 'MA', 'MB', 'MD', 'ME', 'MI',
+		'MN', 'MO', 'MP', 'MS', 'MS', 'MT', 'NB', 'NC', 'ND', 'NE',
+		'NH', 'NJ', 'NL', 'NM', 'NS', 'NT', 'NU', 'NV', 'NY', 'OH',
+		'OK', 'ON', 'OR', 'PA', 'PE', 'PR', 'QC', 'RI', 'SC', 'SD',
+		'SK', 'SX', 'TC', 'TN', 'TT', 'TX', 'UT', 'VA', 'VC', 'VG',
+		'VI', 'VT', 'WA', 'WI', 'WV', 'WY', 'YT',
+	) {
+		$self->{items}{$_} = [] unless exists $self->{items}{$_};
+	}
+	foreach (sort keys %{$self->{items}}) {
+		my $b = Gtk2::CheckButton->new_with_label($_);
+		$self->{vs}{$_} = 1 unless exists $self->{vs}{$_};
+		$b->set_active(TRUE) if $self->{vs}{$_};
+		$b->signal_connect('toggled'=>\&MyTop::togglestate,[$self,$_]);
+		$t->attach_defaults($b,$c,$c+1,$r,$r+1);
+		$r++;
+		if ($r >= 24) {
+			$r = 0;
+			$c++;
+		}
+	}
+	$w->show_all;
 }
 #package MyTop;
 sub draw {
