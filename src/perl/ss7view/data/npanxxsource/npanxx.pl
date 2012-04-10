@@ -29,7 +29,7 @@ close($fh);
 
 my $nclli = 0;
 my $cllis = {};
-open($fh,"<","$telcdir/cllinpanxx.txt");
+open($fh,"<","$datadir/cllinpanxx.txt");
 while (<$fh>) { chomp;
 	next unless /^[A-Z0-9]{11}\t/;
 	my ($clli,$npa,$nxx) = split(/\t/,$_);
@@ -363,12 +363,12 @@ while (my $state = getstate()) {
 	my $fn = getfn($npa,$nxx);
 	my $url = geturl($npa,$nxx);
 	my $cmd = getcmd($npa,$nxx);
-	my $sec = 60 + int(rand(120));
-	warn "would download $fn from $url";
+	#my $sec = 60 + int(rand(120));
+	#warn "would download $fn from $url";
 	warn "using command $cmd";
-	warn "sleeping for $sec seconds";
+	#warn "sleeping for $sec seconds";
 	system($cmd);
-	sleep($sec);
+	#sleep($sec);
 }
 
 while (my $lata = getlata()) {
@@ -376,12 +376,12 @@ while (my $lata = getlata()) {
 	my $fn = getfn($npa,$nxx);
 	my $url = geturl($npa,$nxx);
 	my $cmd = getcmd($npa,$nxx);
-	my $sec = 60 + int(rand(120));
-	warn "would download $fn from $url";
+	#my $sec = 60 + int(rand(120));
+	#warn "would download $fn from $url";
 	warn "using command $cmd";
-	warn "sleeping for $sec seconds";
+	#warn "sleeping for $sec seconds";
 	system($cmd);
-	sleep($sec);
+	#sleep($sec);
 }
 
 while (my $npanxx = getnpa()) {
@@ -389,12 +389,12 @@ while (my $npanxx = getnpa()) {
 	my $fn = getfn($npa,$nxx);
 	my $url = geturl($npa,$nxx);
 	my $cmd = getcmd($npa,$nxx);
-	my $sec = 60 + int(rand(120));
-	warn "would download $fn from $url";
+	#my $sec = 60 + int(rand(120));
+	#warn "would download $fn from $url";
 	warn "using command $cmd";
-	warn "sleeping for $sec seconds";
+	#warn "sleeping for $sec seconds";
 	system($cmd);
-	sleep($sec);
+	#sleep($sec);
 }
 
 while (my $statenpa = getstatenpa()) {
@@ -402,12 +402,12 @@ while (my $statenpa = getstatenpa()) {
 	my $fn = getfn($npa,$nxx);
 	my $url = geturl($npa,$nxx);
 	my $cmd = getcmd($npa,$nxx);
-	my $sec = 60 + int(rand(120));
-	warn "would download $fn from $url";
+	#my $sec = 60 + int(rand(120));
+	#warn "would download $fn from $url";
 	warn "using command $cmd";
-	warn "sleeping for $sec seconds";
+	#warn "sleeping for $sec seconds";
 	system($cmd);
-	sleep($sec);
+	#sleep($sec);
 }
 
 while (my $latanpa = getlatanpa()) {
@@ -415,12 +415,12 @@ while (my $latanpa = getlatanpa()) {
 	my $fn = getfn($npa,$nxx);
 	my $url = geturl($npa,$nxx);
 	my $cmd = getcmd($npa,$nxx);
-	my $sec = 60 + int(rand(120));
-	warn "would download $fn from $url";
+	#my $sec = 60 + int(rand(120));
+	#warn "would download $fn from $url";
 	warn "using command $cmd";
-	warn "sleeping for $sec seconds";
+	#warn "sleeping for $sec seconds";
 	system($cmd);
-	sleep($sec);
+	#sleep($sec);
 }
 
 while (my $ocn = getocn()) {
@@ -428,12 +428,12 @@ while (my $ocn = getocn()) {
 	my $fn = getfn($npa,$nxx);
 	my $url = geturl($npa,$nxx);
 	my $cmd = getcmd($npa,$nxx);
-	my $sec = 60 + int(rand(120));
-	warn "would download $fn from $url";
+	#my $sec = 60 + int(rand(120));
+	#warn "would download $fn from $url";
 	warn "using command $cmd";
-	warn "sleeping for $sec seconds";
+	#warn "sleeping for $sec seconds";
 	system($cmd);
-	sleep($sec);
+	#sleep($sec);
 }
 
 while (my $clli = getclli()) {
@@ -441,12 +441,12 @@ while (my $clli = getclli()) {
 	my $fn = getfn($npa,$nxx);
 	my $url = geturl($npa,$nxx);
 	my $cmd = getcmd($npa,$nxx);
-	my $sec = 60 + int(rand(120));
-	warn "would download $fn from $url";
+	#my $sec = 60 + int(rand(120));
+	#warn "would download $fn from $url";
 	warn "using command $cmd";
-	warn "sleeping for $sec seconds";
+	#warn "sleeping for $sec seconds";
 	system($cmd);
-	sleep($sec);
+	#sleep($sec);
 }
 
 while (my $rate = getrate()) {
@@ -454,12 +454,12 @@ while (my $rate = getrate()) {
 	my $fn = getfn($npa,$nxx);
 	my $url = geturl($npa,$nxx);
 	my $cmd = getcmd($npa,$nxx);
-	my $sec = 60 + int(rand(120));
-	warn "would download $fn from $url";
+	#my $sec = 60 + int(rand(120));
+	#warn "would download $fn from $url";
 	warn "using command $cmd";
-	warn "sleeping for $sec seconds";
+	#warn "sleeping for $sec seconds";
 	system($cmd);
-	sleep($sec);
+	#sleep($sec);
 }
 
 while (1) {
@@ -471,11 +471,11 @@ while (1) {
 	my $url = geturl($npa,$nxx);
 	my $cmd = getcmd($npa,$nxx);
 	unless (-f $fn) {
-		my $sec = 60 + int(rand(120));
-		warn "would download $fn from $url";
+		#my $sec = 60 + int(rand(120));
+		#warn "would download $fn from $url";
 		warn "using command $cmd";
-		warn "sleeping for $sec seconds";
+		#warn "sleeping for $sec seconds";
 		system($cmd);
-		sleep($sec);
+		#sleep($sec);
 	}
 }

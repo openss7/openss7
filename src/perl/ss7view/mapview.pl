@@ -19,6 +19,22 @@ use Gtk2 '-init';
 use Glib qw(TRUE FALSE);
 use Goo::Canvas;
 
+use Convert::Color;
+
+our    $blue_rgba = hex(Convert::Color->new("x11:blue"   )->as_rgb8->hex.'70');
+our   $blue4_rgba = hex(Convert::Color->new("x11:blue4"  )->as_rgb8->hex.'70');
+our  $orange_rgba = hex(Convert::Color->new("x11:orange" )->as_rgb8->hex.'70');
+our $orange4_rgba = hex(Convert::Color->new("x11:orange4")->as_rgb8->hex.'70');
+our  $green4_rgba = hex(Convert::Color->new("x11:green4" )->as_rgb8->hex.'70');
+our  $yellow_rgba = hex(Convert::Color->new("x11:yellow" )->as_rgb8->hex.'70');
+our $yellow4_rgba = hex(Convert::Color->new("x11:yellow4")->as_rgb8->hex.'70');
+our   $black_rgba = hex(Convert::Color->new("x11:black"  )->as_rgb8->hex.'70');
+our     $red_rgba = hex(Convert::Color->new("x11:red"    )->as_rgb8->hex.'70');
+our    $cyan_rgba = hex(Convert::Color->new("x11:cyan"   )->as_rgb8->hex.'70');
+our $magenta_rgba = hex(Convert::Color->new("x11:magenta")->as_rgb8->hex.'70');
+our   $green_rgba = hex(Convert::Color->new("x11:green"  )->as_rgb8->hex.'70');
+our    $grey_rgba = hex(Convert::Color->new("x11:grey"   )->as_rgb8->hex.'70');
+
 #------------------------------
 package MyTop; use strict;
 use Gtk2;
@@ -336,7 +352,7 @@ sub plotcity {
 		$y *= $scaley;
 		my $item = Goo::Canvas::Ellipse->new($root,$x,$y,$r,$r,
 			'antialias'=>'default',
-			'fill-color'=>'blue',
+			'fill-color-rgba'=>$blue_rgba,
 			'line-width'=>0,
 			'stroke-color'=>'white',
 		);
@@ -360,14 +376,16 @@ sub plotlerg7 {
 		$y *= $scaley;
 		my $item = Goo::Canvas::Ellipse->new($root,$x,$y,$r,$r,
 			'antialias'=>'default',
-			'fill-color'=>'orange',
+			'fill-color-rgba'=>$orange_rgba,
 			'line-width'=>0,
 			'stroke-color'=>'white',
-			'pointer-events'=>'all',
+			'pointer-events'=>'visible',
 		);
 		$item->signal_connect('enter_notify_event'=>sub{
 				my ($item,$targ,$ev,$rec) = @_;
-				print STDERR "entering clli: $rec->{clli} ($rec->{wcv},$rec->{wch})\n";
+				my ($v,$h) = ($rec->{wcv},$rec->{wch});
+				my ($y,$x) = Geo::Coordinates::VandH->new()->vh2ll($v,$h);
+				print STDERR "entering clli: $rec->{clli} ($v,$h) [$y,$x]\n";
 			},$_);
 		my $st = $_->{st};
 		push @{$self->{items}{$st}}, $item;
@@ -391,14 +409,16 @@ sub plotlerg8 {
 			$y *= $scaley;
 			my $item = Goo::Canvas::Ellipse->new($root,$x,$y,$r,$r,
 				'antialias'=>'default',
-				'fill-color'=>'green4',
+				'fill-color-rgba'=>$green4_rgba,
 				'line-width'=>0,
 				'stroke-color'=>'white',
-				'pointer-events'=>'all',
+				'pointer-events'=>'visible',
 			);
 			$item->signal_connect('enter_notify_event'=>sub{
 					my ($item,$targ,$ev,$rec) = @_;
-					print STDERR "entering rc: $rec->{abbv} ($rec->{rcv},$rec->{rch})\n";
+					my ($v,$h) = ($rec->{rcv},$rec->{rch});
+					my ($y,$x) = Geo::Coordinates::VandH->new()->vh2ll($v,$h);
+					print STDERR "entering rc: $rec->{abbv} ($v,$h) [$y,$x]\n";
 				},$_);
 			my $st = $_->{stat};
 			push @{$self->{items}{$st}}, $item;
@@ -412,8 +432,8 @@ sub plotneca4 {
 	my $root = $self->{Canvas}->get_root_item;
 	my $blah = new Geo::Coordinates::VandH;
 	foreach (values %{$self->{db}{neca4}}) {
-		#my $r = 0.3;
-		my $r = 0.8;
+		my $r = 0.3;
+		#my $r = 0.8;
 		my ($v,$h) = split(/,/,$_->{wcvh});
 		$v =~ s/^\s+0*//; $v =~ s/\s+$//; $v = int($v);
 		$h =~ s/^\s+0*//; $h =~ s/\s+$//; $h = int($h);
@@ -426,15 +446,17 @@ sub plotneca4 {
 		$y *= $scaley;
 		my $item = Goo::Canvas::Ellipse->new($root,$x,$y,$r,$r,
 			'antialias'=>'default',
-			#'fill-color'=>'yellow',
-			'fill-color'=>'red',
+			#'fill-color-rgba'=>$yellow_rgba,
+			'fill-color-rgba'=>$red_rgba,
 			'line-width'=>0,
 			'stroke-color'=>'white',
-			'pointer-events'=>'all',
+			'pointer-events'=>'visible',
 		);
 		$item->signal_connect('enter_notify_event'=>sub{
 				my ($item,$targ,$ev,$rec) = @_;
-				print STDERR "entering clli: $rec->{CLLI} ($rec->{wcvh})\n";
+				my ($v,$h) = split(/,/,$rec->{wcvh});
+				my ($y,$x) = Geo::Coordinates::VandH->new()->vh2ll($v,$h);
+				print STDERR "entering clli: $rec->{CLLI} ($v,$h) [$y,$x]\n";
 			},$_);
 		my $st = substr($_->{CLLI},4,2);
 		push @{$self->{items}{$st}}, $item;
@@ -461,14 +483,16 @@ sub plotnpanxxsource {
 			$y *= $scaley;
 			my $item = Goo::Canvas::Ellipse->new($root,$x,$y,$r,$r,
 				'antialias'=>'default',
-				'fill-color'=>'cyan',
+				'fill-color-rgba'=>$cyan_rgba,
 				'line-width'=>0,
 				'stroke-color'=>'white',
-				'pointer-events'=>'all',
+				'pointer-events'=>'visible',
 			);
 			$item->signal_connect('enter_notify_event'=>sub{
 					my ($item,$targ,$ev,$rec) = @_;
-					print STDERR "entering rc: $rec->{RCSHORT} ($rec->{RCVH})\n";
+					my ($v,$h) = split(/,/,$rec->{RCVH});
+					my ($y,$x) = Geo::Coordinates::VandH->new()->vh2ll($v,$h);
+					print STDERR "entering rc: $rec->{RCSHORT} ($v,$h) [$y,$x]\n";
 				},$_);
 			my $st = $_->{REGION};
 			push @{$self->{items}{$st}}, $item;
@@ -488,14 +512,16 @@ sub plotnpanxxsource {
 		$y *= $scaley;
 		my $item = Goo::Canvas::Ellipse->new($root,$x,$y,$r,$r,
 			'antialias'=>'default',
-			'fill-color'=>'magenta',
+			'fill-color-rgba'=>$magenta_rgba,
 			'line-width'=>0,
 			'stroke-color'=>'white',
-			'pointer-events'=>'all',
+			'pointer-events'=>'visible',
 		);
 		$item->signal_connect('enter_notify_event'=>sub{
 				my ($item,$targ,$ev,$rec) = @_;
-				print STDERR "entering clli: $rec->{CLLI} ($rec->{'Wire Center V&H'})\n";
+				my ($v,$h) = split(/,/,$rec->{'Wire Center V&H'});
+				my ($y,$x) = Geo::Coordinates::VandH->new()->vh2ll($v,$h);
+				print STDERR "entering clli: $rec->{CLLI} ($v,$h) [$y,$x]\n";
 			},$_);
 		my $st = $_->{'Wire Center State'};
 		push @{$self->{items}{$st}}, $item;
@@ -521,14 +547,16 @@ sub plotareacodes {
 		$y *= $scaley;
 		my $item = Goo::Canvas::Ellipse->new($root,$x,$y,$r,$r,
 			'antialias'=>'default',
-			'fill-color'=>'blue',
+			'fill-color-rgba'=>$blue_rgba,
 			'line-width'=>0,
 			'stroke-color'=>'white',
-			'pointer-events'=>'all',
+			'pointer-events'=>'visible',
 		);
 		$item->signal_connect('enter_notify_event'=>sub{
 				my ($item,$targ,$ev,$rec) = @_;
-				print STDERR "entering clli: $rec->{CLLI} ($rec->{RC_VERTICAL},$rec->{RC_HORIZONTAL})\n";
+				my ($v,$h) = ($rec->{RC_VERTICAL},$rec->{RC_HORIZONTAL});
+				my ($y,$x) = Geo::Coordinates::VandH->new()->vh2ll($v,$h);
+				print STDERR "entering clli: $rec->{CLLI} ($v,$h) [$y,$x]\n";
 			},$_);
 		my $st = substr($_->{CLLI},4,2);
 		push @{$self->{items}{$st}}, $item;
@@ -555,14 +583,16 @@ sub plotlocal {
 			$y *= $scaley;
 			my $item = Goo::Canvas::Ellipse->new($root,$x,$y,$r,$r,
 				'antialias'=>'default',
-				'fill-color'=>'green4',
+				'fill-color-rgba'=>$green4_rgba,
 				'line-width'=>0,
 				'stroke-color'=>'white',
-				'pointer-events'=>'all',
+				'pointer-events'=>'visible',
 			);
 			$item->signal_connect('enter_notify_event'=>sub{
 					my ($item,$targ,$ev,$rec) = @_;
-					print STDERR "entering rc: $rec->{RCSHORT} ($rec->{'RC-V'},$rec->{'RC-H'})\n";
+					my ($v,$h) = ($rec->{'RC-V'},$rec->{'RC-H'});
+					my ($y,$x) = Geo::Coordinates::VandH->new()->vh2ll($v,$h);
+					print STDERR "entering rc: $rec->{RCSHORT} ($v,$h) [$y,$x]\n";
 				},$_);
 			my $st = $_->{'REGION'};
 			push @{$self->{items}{$st}}, $item;
@@ -586,14 +616,16 @@ sub plotwire {
 		$y *= $scaley;
 		my $item = Goo::Canvas::Ellipse->new($root,$x,$y,$r,$r,
 			'antialias'=>'default',
-			'fill-color'=>'green',
+			'fill-color-rgba'=>$green_rgba,
 			'line-width'=>0,
 			'stroke-color'=>'white',
-			'pointer-events'=>'all',
+			'pointer-events'=>'visible',
 		);
 		$item->signal_connect('enter_notify_event'=>sub{
 				my ($item,$targ,$ev,$rec) = @_;
-				print STDERR "entering clli: $rec->{clli} ($rec->{wcv},$rec->{wch})\n";
+				my ($v,$h) = ($rec->{wcv},$rec->{wch});
+				my ($y,$x) = Geo::Coordinates::VandH->new()->vh2ll($v,$h);
+				print STDERR "entering clli: $rec->{clli} ($v,$h) [$y,$x]\n";
 			},$_);
 		my $st = substr($_->{clli},4,2);
 		push @{$self->{items}{$st}}, $item;
@@ -618,7 +650,7 @@ sub plotrate {
 		$y *= $scaley;
 		my $item = Goo::Canvas::Ellipse->new($root,$x,$y,$r,$r,
 			'antialias'=>'default',
-			'fill-color'=>'red',
+			'fill-color-rgba'=>$red_rgba,
 			'line-width'=>0,
 			'stroke-color'=>'white',
 		);
@@ -648,7 +680,7 @@ sub plotgrid {
 			'line-width'=>0.2,
 			'line-cap'=>'round',
 			'line-join'=>'round',
-			'stroke-color'=>'grey',
+			'stroke-color-rgba'=>$grey_rgba,
 		);
 		@coords = ();
 	}
@@ -667,7 +699,7 @@ sub plotgrid {
 			'line-width'=>0.2,
 			'line-cap'=>'round',
 			'line-join'=>'round',
-			'stroke-color'=>'grey',
+			'stroke-color-rgba'=>$grey_rgba,
 		);
 		@coords = ();
 	}
@@ -692,7 +724,7 @@ sub plotdata {
 					'line-width'=>$width,
 					'line-cap'=>'round',
 					'line-join'=>'round',
-					'stroke-color'=>$color,
+					'stroke-color-rgba'=>$color,
 				);
 				push @{$self->{items}{gmt}}, $item;
 				@coords = ();
@@ -714,7 +746,7 @@ sub plotdata {
 			'line-width'=>$width,
 			'line-cap'=>'round',
 			'line-join'=>'round',
-			'stroke-color'=>$color,
+			'stroke-color-rgba'=>$color,
 		);
 		push @{$self->{items}{gmt}}, $item;
 	}
@@ -725,13 +757,13 @@ sub menuFileNew {
 	#print STDERR "getting coastline...\n";
 	my @lines;
 	@lines = `pscoast -Rd -N1 -Dl -m`;
-	$self->plotdata('orange4',0.3,@lines);
+	$self->plotdata($orange4_rgba,0.3,@lines);
 	@lines = `pscoast -Rd -N2 -Di -m`;
-	$self->plotdata('yellow4',0.2,@lines);
+	$self->plotdata($yellow4_rgba,0.2,@lines);
 	@lines = `pscoast -Rd -W1 -Dl -m`;
-	$self->plotdata('black',0.15,@lines);
+	$self->plotdata($black_rgba,0.15,@lines);
 	@lines = `pscoast -Rd -I2 -Di -m`;
-	$self->plotdata('blue4',0.05,@lines);
+	$self->plotdata($blue4_rgba,0.05,@lines);
 	$self->readareacodes;
 #	$self->readarea;
 #	$self->readwire;
@@ -789,7 +821,7 @@ sub togglestate {
 		$vis = 'visible';
 	} else {
 		print STDERR "$st is now inactive\n";
-		$vis = 'hidden';
+		$vis = 'invisible';
 	}
 	if (exists $self->{items}{$st}) {
 		foreach (@{$self->{items}{$st}}) {
