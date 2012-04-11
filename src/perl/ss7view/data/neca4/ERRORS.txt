@@ -1,0 +1,101 @@
+NECA TARIFF F.C.C. NO. 4  ISSUED: MARCH 16, 2012  EFFECTIVE: APRIL 01, 2012
+
+SECTION 27  PAGE 100
+> .........................................................................
+> SIOUX CITY                 SXCTIZXO1MD 06339 04781 8593 630 AA BA DA GC
+>    712/463(1000-1999)                                        GD GI GK GL
+>                                                              GN GP GQ GR
+>                                                              HB HD HJ IA
+>                                                              IB IC ID IE
+>                                                              IF IG II SH
+>                                                              SQ T8 T9 TI
+>                                                              TJ UG UP UR
+>                                                              UX WE
+>                        COMPANY: 8593 HAS A PRESENCE ON THIS SWITCH
+
+SXCTIZX01MD is not a valid CLLI code.  It should likely be SXCTIAX01MD.
+
+SECTION 15  PAGE 60
+> .........................................................................
+> WDRW                       WDRWARXARS0 04521 03509 1712 528 DA T3 T8 TJ
+>    ___/___                                                   WE
+
+V: 04521 would place this switch somewhere in Ontario instead of
+Arkanasas.  The V coordinate should likely be 07521.
+
+SECTION 15  PAGE 35
+> .........................................................................
+> LITTLE ROCK                LTRKARGGOMD 00722 03448 7264 528 BA DA
+>    501/534
+
+V: 00722 would place this switch somewhere in the North Atlantic off of
+Baffin Island insted of in Little Rock Arkansas.  The V coordinace
+should likely by 07722 (as it is for other switches in Arkansas).
+
+SECTION 18  PAGE 7
+> .........................................................................
+> CONNECTICUT                HRFRCTBCDS1 04897 00138 639C 920 DA DD GE GL
+>    ___/___                                                   GN GP GR IA
+>                                                              IB
+
+The V: 00138 coordinate places this switch in the Altantic Ocean instead
+of in Hartford CT.  Other sources show the V&H of this wire center as
+04686,01372 or at 960 Main Street Hartford CT.  Also, this switch serves
+exchange 860/970.
+
+SECTION 35  PAGE 131
+> .........................................................................
+> ST CLOUD                   STCDMITOXUX 05721 04703 8405 626 DA HD SH
+>    320/200(6000-6999),403(6000-6999),460(6000-6999)
+
+CLLI STCDMITOXUX is incorrect: should be STCDMNTOXUX.
+
+SECTION 34  PAGE 31
+> .........................................................................
+> DETROIT                    DTRTMIBADS0 05536 00829 770E 340 DA HD SH
+>    248/677(9000-9999),687(1000-1999),687(5000-5999)
+>    248/732(0000-1999)
+>    313/324(0000-1999),324(3000-3999),324(5000-5999)
+>    313/324(9000-9999),429(2000-2999)
+>    586/430(9000-9999),738(9000-9999),879(2000-2999)
+>    586/884(9000-9999)
+>    734/396(5000-5999),780(2000-2999),780(8000-8999)
+>    734/781(4000-4999),781(9000-9999)
+>    810/269(9000-9999),525(9000-9999)
+
+H: 00829 is incorrect: should be 02829.
+
+SECTION 40  PAGE 20
+> .........................................................................
+> RENO                       RENONV023MD 08372 08542 7521 720 BA DA GE GJ
+>    ___/___                                                    GR HB IB RC
+>                                                               RD SH SQ T1
+>                                                               T2 UG UP UR
+>                                                               US
+
+H: 7521 is incorrect.  This horizontal value places the switch somwhere
+in the middle of CA instead of NV.  It should likely be 05172 instead.
+
+SECTION 54  PAGE 37
+> .........................................................................
+> SIOUX FLS                  SXFLSDCOQMD 06278 06278 327C 640 BA DA
+>    605/252(3000-3999),299(3000-3999),301(3000-3999)
+>    605/412(3000-3999),553(9000-9999),655(3000-3999)
+>    605/836(3000-3999),877(3000-3999),884(7000-7999)
+
+H: 06278 is incorrect an places this switch in MT instead of SD.  The
+correct H coordinate is 04901 (from other sources).
+
+SECTION 40  PAGE 20
+> .........................................................................
+> RENO                       RENONV023MD 08372 08542 7521 720 BA DA GE GJ
+>    ___/___                                                    GR HB IB RC
+>                                                               RD SH SQ T1
+>                                                               T2 UG UP UR
+>                                                               US
+
+V: 08372 and H: 08542 places this switch in Galt California instead of
+Reno NV.  The coordinates should be 08064,08323 based on other switches
+in the wire center.
+
+SECTION 40  PAGE 27
