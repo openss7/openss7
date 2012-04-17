@@ -5,6 +5,89 @@ use Glib qw(TRUE FALSE);
 
 our $geo = new Geo::Coordinates::VandH;
 
+sub closest {
+	my ($lat,$lon) = @_;
+	$lon -= 360 if $lon > 0;
+	my ($dd,$td,$cv,$ch);
+	my ($gv,$gh);
+	for (my $v=0;$v<=10000;$v+=1000) {
+		for (my $h=-5000;$h<=27000;$h+=1000) {
+			my ($y,$x) = $geo->vh2ll($v,$h);
+			$x = -$x;
+			if (defined $dd) {
+				$td = ($lat-$y)**2 + ($lon-$x)**2;
+				if ($td < $dd) {
+					$cv = $v;
+					$ch = $h;
+					$dd = $td;
+				}
+			} else {
+				$cv = $v;
+				$ch = $h;
+				$dd = ($lat-$y)**2 + ($lon-$x)**2;
+			}
+		}
+	}
+	($gv,$gh) = ($cv,$ch);
+	for (my $v=$gv-2000;$v<=$gv+2000;$v+=100) {
+		for (my $h=$gh-2000;$h<=$gh+2000;$h+=100) {
+			my ($y,$x) = $geo->vh2ll($v,$h);
+			$x = -$x;
+			if (defined $dd) {
+				$td = ($lat-$y)**2 + ($lon-$x)**2;
+				if ($td < $dd) {
+					$cv = $v;
+					$ch = $h;
+					$dd = $td;
+				}
+			} else {
+				$cv = $v;
+				$ch = $h;
+				$dd = ($lat-$y)**2 + ($lon-$x)**2;
+			}
+		}
+	}
+	($gv,$gh) = ($cv,$ch);
+	for (my $v=$gv-200;$v<=$gv+200;$v+=10) {
+		for (my $h=$gh-200;$h<=$gh+200;$h+=10) {
+			my ($y,$x) = $geo->vh2ll($v,$h);
+			$x = -$x;
+			if (defined $dd) {
+				$td = ($lat-$y)**2 + ($lon-$x)**2;
+				if ($td < $dd) {
+					$cv = $v;
+					$ch = $h;
+					$dd = $td;
+				}
+			} else {
+				$cv = $v;
+				$ch = $h;
+				$dd = ($lat-$y)**2 + ($lon-$x)**2;
+			}
+		}
+	}
+	($gv,$gh) = ($cv,$ch);
+	for (my $v=$gv-20;$v<=$gv+20;$v+=1) {
+		for (my $h=$gh-20;$h<=$gh+20;$h+=1) {
+			my ($y,$x) = $geo->vh2ll($v,$h);
+			$x = -$x;
+			if (defined $dd) {
+				$td = ($lat-$y)**2 + ($lon-$x)**2;
+				if ($td < $dd) {
+					$cv = $v;
+					$ch = $h;
+					$dd = $td;
+				}
+			} else {
+				$cv = $v;
+				$ch = $h;
+				$dd = ($lat-$y)**2 + ($lon-$x)**2;
+			}
+		}
+	}
+	return ($cv,$ch);
+}
+
 #------------------------------
 package MyTop; use strict;
 use Gtk2;
@@ -24,7 +107,7 @@ sub new {
 	$f->add($v);
 	my $h = Gtk2::HBox->new;
 	$v->pack_start($h,FALSE,FALSE,0);
-	my $t = Gtk2::Table->new(4,2,TRUE);
+	my $t = Gtk2::Table->new(5,2,TRUE);
 	$h->pack_start($t,TRUE,TRUE,0);
 	my ($l,$b,$e);
 	$l = Gtk2::Label->new('Vertical');
@@ -55,6 +138,12 @@ sub new {
 	$e->set_editable(TRUE);
 	$e->signal_connect(activate=>\&MyTop::activate,[$self,'Longitude']);
 	$t->attach_defaults($e,1,2,3,4);
+	$l = Gtk2::Label->new('Google');
+	$t->attach_defaults($l,0,1,4,5);
+	$b = $self->{Google} = Gtk2::EntryBuffer->new('');
+	$e = Gtk2::Entry->new_with_buffer($b);
+	$e->set_editable(FALSE);
+	$t->attach_defaults($e,1,2,4,5);
 	$w->show_all;
 }
 
@@ -68,16 +157,22 @@ sub activate {
 		my $ver = $self->{Vertical}->get_text;
 		my $hor = $self->{Horizontal}->get_text;
 		my ($lat,$lon) = $geo->vh2ll($ver,$hor);
+		$lon = -$lon;
+		$lon += 360 if $lon < -180;
 		$self->{Vertical}->set_text(sprintf("%05d",$ver));
 		$self->{Horizontal}->set_text(sprintf("%05d",$hor));
 		$self->{Latitude}->set_text($lat);
-		$self->{Longitude}->set_text(-$lon);
+		$self->{Longitude}->set_text($lon);
+		$self->{Google}->set_text("$lat,$lon ($ver,$hor)");
+			
 	}
 	if ($label eq 'Latitude' or $label eq 'Longitude') {
 		my $lat = $self->{Latitude}->get_text;
 		my $lon = $self->{Longitude}->get_text;
-		my ($vmin,$ver,$vmax) = (0,0,10000);
-		my ($hmin,$hor,$hmax) = (0,0,10000);
+		my ($ver,$hor) = main::closest($lat,$lon);
+		$self->{Vertical}->set_text(sprintf("%05d",$ver));
+		$self->{Horizontal}->set_text(sprintf("%05d",$hor));
+		$self->{Google}->set_text("$lat,$lon ($ver,$hor)");
 	}
 }
 

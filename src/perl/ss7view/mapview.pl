@@ -104,7 +104,7 @@ sub eventScroll {
 	my $state = $event->get_state;
 	my $dir = $event->direction;
 	my $states = join(',',@{$state});
-	warn "$canvas $states $dir";
+	#warn "$canvas $states $dir";
 	if ($dir eq 'up' or $dir eq 'down') {
 		if ($states=~/control-mask/) {
 			if ($dir eq 'up') {
@@ -143,6 +143,89 @@ sub eventScroll {
 	$self->{ScrolledWindow}->signal_emit('scroll-event',$event)
 		unless $self->{ScrolledWindow} eq $canvas;
 	return FALSE;
+}
+sub closest {
+	my ($self,$lat,$lon) = @_;
+	my $geo = new Geo::Coordinates::VandH;
+	$lon -= 360 if $lon > 0;
+	my ($dd,$td,$cv,$ch);
+	my ($gv,$gh);
+	for (my $v=0;$v<=10000;$v+=1000) {
+		for (my $h=-5000;$h<=27000;$h+=1000) {
+			my ($y,$x) = $geo->vh2ll($v,$h);
+			$x = -$x;
+			if (defined $dd) {
+				$td = ($lat-$y)**2 + ($lon-$x)**2;
+				if ($td < $dd) {
+					$cv = $v;
+					$ch = $h;
+					$dd = $td;
+				}
+			} else {
+				$cv = $v;
+				$ch = $h;
+				$dd = ($lat-$y)**2 + ($lon-$x)**2;
+			}
+		}
+	}
+	($gv,$gh) = ($cv,$ch);
+	for (my $v=$gv-2000;$v<=$gv+2000;$v+=100) {
+		for (my $h=$gh-2000;$h<=$gh+2000;$h+=100) {
+			my ($y,$x) = $geo->vh2ll($v,$h);
+			$x = -$x;
+			if (defined $dd) {
+				$td = ($lat-$y)**2 + ($lon-$x)**2;
+				if ($td < $dd) {
+					$cv = $v;
+					$ch = $h;
+					$dd = $td;
+				}
+			} else {
+				$cv = $v;
+				$ch = $h;
+				$dd = ($lat-$y)**2 + ($lon-$x)**2;
+			}
+		}
+	}
+	($gv,$gh) = ($cv,$ch);
+	for (my $v=$gv-200;$v<=$gv+200;$v+=10) {
+		for (my $h=$gh-200;$h<=$gh+200;$h+=10) {
+			my ($y,$x) = $geo->vh2ll($v,$h);
+			$x = -$x;
+			if (defined $dd) {
+				$td = ($lat-$y)**2 + ($lon-$x)**2;
+				if ($td < $dd) {
+					$cv = $v;
+					$ch = $h;
+					$dd = $td;
+				}
+			} else {
+				$cv = $v;
+				$ch = $h;
+				$dd = ($lat-$y)**2 + ($lon-$x)**2;
+			}
+		}
+	}
+	($gv,$gh) = ($cv,$ch);
+	for (my $v=$gv-20;$v<=$gv+20;$v+=1) {
+		for (my $h=$gh-20;$h<=$gh+20;$h+=1) {
+			my ($y,$x) = $geo->vh2ll($v,$h);
+			$x = -$x;
+			if (defined $dd) {
+				$td = ($lat-$y)**2 + ($lon-$x)**2;
+				if ($td < $dd) {
+					$cv = $v;
+					$ch = $h;
+					$dd = $td;
+				}
+			} else {
+				$cv = $v;
+				$ch = $h;
+				$dd = ($lat-$y)**2 + ($lon-$x)**2;
+			}
+		}
+	}
+	return ($cv,$ch);
 }
 sub readlerg7 {
 	my ($self) = @_;
@@ -191,7 +274,7 @@ sub readneca4 {
 	my $fh = \*INFILE;
 	my $header = 1;
 	my @fields = ();
-	open($fh,"<","$datadir/neca4/clli.csv");
+	open($fh,"<","$datadir/neca4/sw.csv");
 	while (<$fh>) { chomp;
 		s/^"//; s/"$//; my @tokens = split(/","/,$_);
 		if ($header) {
@@ -211,7 +294,7 @@ sub readnpanxxsource {
 	my $fh = \*INFILE;
 	my $header = 1;
 	my @fields = ();
-	open($fh,"<","$datadir/npanxxsource/clli.csv");
+	open($fh,"<","$datadir/npanxxsource/sw.csv");
 	while (<$fh>) { chomp;
 		s/^"//; s/"$//; my @tokens = split(/","/,$_);
 		if ($header) {
@@ -249,7 +332,7 @@ sub readareacodes {
 	my $fh = \*INFILE;
 	my $header = 1;
 	my @fields = ();
-	open($fh,"<","$datadir/areacodes/clli.csv");
+	open($fh,"<","$datadir/areacodes/sw.csv");
 	while (<$fh>) { chomp;
 		s/^"//; s/"$//; my @tokens = split(/","/,$_);
 		if ($header) {
@@ -385,7 +468,8 @@ sub plotlerg7 {
 				my ($item,$targ,$ev,$rec) = @_;
 				my ($v,$h) = ($rec->{wcv},$rec->{wch});
 				my ($y,$x) = Geo::Coordinates::VandH->new()->vh2ll($v,$h);
-				print STDERR "entering clli: $rec->{clli} ($v,$h) [$y,$x]\n";
+				$x = -$x;
+				print STDERR "entering clli: $rec->{clli} $y,$x ($v,$h)\n";
 			},$_);
 		my $st = $_->{st};
 		push @{$self->{items}{$st}}, $item;
@@ -418,7 +502,8 @@ sub plotlerg8 {
 					my ($item,$targ,$ev,$rec) = @_;
 					my ($v,$h) = ($rec->{rcv},$rec->{rch});
 					my ($y,$x) = Geo::Coordinates::VandH->new()->vh2ll($v,$h);
-					print STDERR "entering rc: $rec->{abbv} ($v,$h) [$y,$x]\n";
+					$x = -$x;
+					print STDERR "entering rc: $rec->{abbv} $y,$x ($v,$h)\n";
 				},$_);
 			my $st = $_->{stat};
 			push @{$self->{items}{$st}}, $item;
@@ -456,7 +541,8 @@ sub plotneca4 {
 				my ($item,$targ,$ev,$rec) = @_;
 				my ($v,$h) = split(/,/,$rec->{wcvh});
 				my ($y,$x) = Geo::Coordinates::VandH->new()->vh2ll($v,$h);
-				print STDERR "entering clli: $rec->{CLLI} ($v,$h) [$y,$x]\n";
+				$x = -$x;
+				print STDERR "entering clli: $rec->{CLLI} $y,$x ($v,$h)\n";
 			},$_);
 		my $st = substr($_->{CLLI},4,2);
 		push @{$self->{items}{$st}}, $item;
@@ -470,10 +556,16 @@ sub plotnpanxxsource {
 	my $blah = new Geo::Coordinates::VandH;
 	foreach my $region (values %{$self->{db}{npanxxsource}{rate}}) {
 		foreach (values %{$region}) {
-			my $r = 0.25;
+			my $r = 0.25 * 6;
 			my ($v,$h) = split(/,/,$_->{RCVH});
 			$v =~ s/^\s+0*//; $v =~ s/\s+$//; $v = int($v);
 			$h =~ s/^\s+0*//; $h =~ s/\s+$//; $h = int($h);
+			unless ($v and $h) {
+				my ($y,$x) = split(/,/,$_->{'Rate Center Latitude/Logitude'});
+				next unless $y and $x;
+				($v,$h) = $self->closest($y,$x);
+				$_->{RCVH} = sprintf('%05d,%05d',$v,$h);
+			}
 			next unless $v and $h;
 			my ($y,$x) = $blah->vh2ll($v,$h);
 			$x += 180; $x -= 360 if $x > 360;
@@ -492,14 +584,15 @@ sub plotnpanxxsource {
 					my ($item,$targ,$ev,$rec) = @_;
 					my ($v,$h) = split(/,/,$rec->{RCVH});
 					my ($y,$x) = Geo::Coordinates::VandH->new()->vh2ll($v,$h);
-					print STDERR "entering rc: $rec->{RCSHORT} ($v,$h) [$y,$x]\n";
+					$x = -$x;
+					print STDERR "entering rc: $rec->{RCSHORT} $y,$x ($v,$h)\n";
 				},$_);
 			my $st = $_->{REGION};
 			push @{$self->{items}{$st}}, $item;
 		}
 	}
 	foreach (values %{$self->{db}{npanxxsource}{clli}}) {
-		my $r = 0.2;
+		my $r = 0.2 * 6;
 		my ($v,$h) = split(/,/,$_->{'Wire Center V&H'});
 		$v =~ s/^\s+0*//; $v =~ s/\s+$//; $v = int($v);
 		$h =~ s/^\s+0*//; $h =~ s/\s+$//; $h = int($h);
@@ -521,7 +614,8 @@ sub plotnpanxxsource {
 				my ($item,$targ,$ev,$rec) = @_;
 				my ($v,$h) = split(/,/,$rec->{'Wire Center V&H'});
 				my ($y,$x) = Geo::Coordinates::VandH->new()->vh2ll($v,$h);
-				print STDERR "entering clli: $rec->{CLLI} ($v,$h) [$y,$x]\n";
+				$x = -$x;
+				print STDERR "entering clli: $rec->{CLLI} $y,$x ($v,$h)\n";
 			},$_);
 		my $st = $_->{'Wire Center State'};
 		push @{$self->{items}{$st}}, $item;
@@ -556,7 +650,8 @@ sub plotareacodes {
 				my ($item,$targ,$ev,$rec) = @_;
 				my ($v,$h) = ($rec->{RC_VERTICAL},$rec->{RC_HORIZONTAL});
 				my ($y,$x) = Geo::Coordinates::VandH->new()->vh2ll($v,$h);
-				print STDERR "entering clli: $rec->{CLLI} ($v,$h) [$y,$x]\n";
+				$x = -$x;
+				print STDERR "entering clli: $rec->{CLLI} $y,$x ($v,$h)\n";
 			},$_);
 		my $st = substr($_->{CLLI},4,2);
 		push @{$self->{items}{$st}}, $item;
@@ -592,7 +687,8 @@ sub plotlocal {
 					my ($item,$targ,$ev,$rec) = @_;
 					my ($v,$h) = ($rec->{'RC-V'},$rec->{'RC-H'});
 					my ($y,$x) = Geo::Coordinates::VandH->new()->vh2ll($v,$h);
-					print STDERR "entering rc: $rec->{RCSHORT} ($v,$h) [$y,$x]\n";
+					$x = -$x;
+					print STDERR "entering rc: $rec->{RCSHORT} $y,$x ($v,$h)\n";
 				},$_);
 			my $st = $_->{'REGION'};
 			push @{$self->{items}{$st}}, $item;
@@ -625,7 +721,8 @@ sub plotwire {
 				my ($item,$targ,$ev,$rec) = @_;
 				my ($v,$h) = ($rec->{wcv},$rec->{wch});
 				my ($y,$x) = Geo::Coordinates::VandH->new()->vh2ll($v,$h);
-				print STDERR "entering clli: $rec->{clli} ($v,$h) [$y,$x]\n";
+				$x = -$x;
+				print STDERR "entering clli: $rec->{clli} $y,$x ($v,$h)\n";
 			},$_);
 		my $st = substr($_->{clli},4,2);
 		push @{$self->{items}{$st}}, $item;
@@ -666,13 +763,23 @@ sub plotgrid {
 	my @coords = ();
 	my ($v,$h);
 	for ($v=0;$v<=10000;$v+=1000) {
-		for ($h=0;$h<=10000;$h+=1000) {
+		for ($h=-5000;$h<=27000;$h+=1000) {
 			my ($y,$x) = $blah->vh2ll($v,$h);
 			$x += 180; $x -= 360 if $x > 360;
 			$x = 360 - $x;
 			$x *= $scalex;
 			$y = 90 - $y;
 			$y *= $scaley;
+			if (($coords[-2] > 180 and $x < 180) or ($coords[-2] < 180 and $x > 180)) {
+				my $item = Goo::Canvas::Polyline->new($root,FALSE,\@coords,
+					'antialias'=>'default',
+					'line-width'=>0.2,
+					'line-cap'=>'round',
+					'line-join'=>'round',
+					'stroke-color-rgba'=>$grey_rgba,
+				);
+				@coords = ();
+			}
 			push @coords, $x, $y;
 		}
 		my $item = Goo::Canvas::Polyline->new($root,FALSE,\@coords,
@@ -684,7 +791,7 @@ sub plotgrid {
 		);
 		@coords = ();
 	}
-	for ($h=0;$h<=10000;$h+=1000) {
+	for ($h=-5000;$h<=27000;$h+=1000) {
 		for ($v=0;$v<=10000;$v+=1000) {
 			my ($y,$x) = $blah->vh2ll($v,$h);
 			$x += 180; $x -= 360 if $x > 360;
@@ -692,6 +799,16 @@ sub plotgrid {
 			$x *= $scalex;
 			$y = 90 - $y;
 			$y *= $scaley;
+			if (($coords[-2] > 180 and $x < 180) or ($coords[-2] < 180 and $x > 180)) {
+				my $item = Goo::Canvas::Polyline->new($root,FALSE,\@coords,
+					'antialias'=>'default',
+					'line-width'=>0.2,
+					'line-cap'=>'round',
+					'line-join'=>'round',
+					'stroke-color-rgba'=>$grey_rgba,
+				);
+				@coords = ();
+			}
 			push @coords, $x, $y;
 		}
 		my $item = Goo::Canvas::Polyline->new($root,FALSE,\@coords,
@@ -815,12 +932,12 @@ sub togglestate {
 	my ($b,$d) = @_;
 	my ($self,$st) = @$d;
 	my $vis;
-	print STDERR "$st toggled\n";
+	#print STDERR "$st toggled\n";
 	if ($b->get_active) {
-		print STDERR "$st is now active\n";
+		#print STDERR "$st is now active\n";
 		$vis = 'visible';
 	} else {
-		print STDERR "$st is now inactive\n";
+		#print STDERR "$st is now inactive\n";
 		$vis = 'invisible';
 	}
 	if (exists $self->{items}{$st}) {
@@ -857,6 +974,7 @@ sub viewStates {
 	#$t->set_col_spacings(4);
 	$h->pack_start($t,TRUE,TRUE,0);
 	my ($r,$c) = (0,0);
+	if (0) {
 	foreach (
 		'AB', 'AG', 'AI', 'AK', 'AL', 'AR', 'AS', 'AZ', 'BB', 'BC',
 		'BM', 'BS', 'CA', 'CO', 'CT', 'DC', 'DE', 'DM', 'DO', 'FL',
@@ -869,6 +987,7 @@ sub viewStates {
 		'VI', 'VT', 'WA', 'WI', 'WV', 'WY', 'YT',
 	) {
 		$self->{items}{$_} = [] unless exists $self->{items}{$_};
+	}
 	}
 	foreach (sort keys %{$self->{items}}) {
 		my $b = Gtk2::CheckButton->new_with_label($_);
