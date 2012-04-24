@@ -479,4 +479,5 @@ ZW	ZWE	716	Zimbabwe (Republic of)
 #ZZ	-	-	Reserved
 #ZZ	-	-	Telecommunications for Disaster Relief (TDR)
 #ZZ	-	-	Trial of a proposed new international telecommunication public correspondence service, shared code
+#ZZ	-	-	Trial of a proposed new international service, shared code
 #ZZ	-	-	Universal Personal Telecommunication Service (UPT)

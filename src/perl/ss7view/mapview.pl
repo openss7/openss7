@@ -302,10 +302,12 @@ sub readnpanxxsource {
 			$header = undef;
 			next;
 		}
-		my $clli = $tokens[0];
+		my $rec = {};
 		for (my $i=0;$i<@fields;$i++) {
-			$self->{db}{npanxxsource}{clli}{$clli}{$fields[$i]} = $tokens[$i];
+			$rec->{$fields[$i]} = $tokens[$i];
 		}
+		my $clli = $rec->{CLLI};
+		$self->{db}{npanxxsource}{clli}{$clli} = $rec;
 	}
 	close($fh);
 	$header = 1;
@@ -318,10 +320,17 @@ sub readnpanxxsource {
 			$header = undef;
 			next;
 		}
-		my $rcshort = $tokens[0];
-		my $region  = $tokens[1];
+		my $rec = {};
 		for (my $i=0;$i<@fields;$i++) {
-			$self->{db}{npanxxsource}{rate}{$region}{$rcshort}{$fields[$i]} = $tokens[$i];
+			$rec->{$fields[$i]} = $tokens[$i];
+		}
+		my $rcshort = $rec->{RCSHORT};
+		my $region  = $rec->{REGION};
+		unless ($rec->{'Rate Center Country'} =~ /^(US|CA)$/) {
+			$region = $rec->{REGION} = $rec->{'Rate Center Country'};
+		}
+		for (my $i=0;$i<@fields;$i++) {
+			$self->{db}{npanxxsource}{rate}{$region}{$rcshort} = $rec;
 		}
 	}
 	close($fh);
@@ -419,6 +428,50 @@ sub readarea {
 	$self->{db} = $db;
 	close($fh);
 
+}
+sub readuk {
+	my ($self) = @_;
+	my $fh = \*INFILE;
+	my $header = 1;
+	my @fields = ();
+	open($fh,"<","$datadir/england/numplan.csv");
+	while (<$fh>) { chomp;
+		s/^"//; s/"$//; my @tokens = split(/","/,$_);
+		if ($header) {
+			@fields = @tokens;
+			$header = undef;
+			next;
+		}
+		my $rec = {};
+		for (my $i=0;$i<@fields;$i++) {
+			$rec->{$fields[$i]} = $tokens[$i];
+		}
+		my $rc = $rec->{'Rate Center'};
+		$self->{db}{uk}{rate}{$rc} = $rec;
+	}
+	close($fh);
+}
+sub readcc {
+	my ($self) = @_;
+	my $fh = \*INFILE;
+	my $header = 1;
+	my @fields = ();
+	open($fh,"<","$datadir/geonames/countries.csv");
+	while (<$fh>) { chomp;
+		s/^"//; s/"$//; my @tokens = split(/","/,$_);
+		if ($header) {
+			@fields = @tokens;
+			$header = undef;
+			next;
+		}
+		my $rec = {};
+		for (my $i=0;$i<@fields;$i++) {
+			$rec->{$fields[$i]} = $tokens[$i];
+		}
+		my $cc = $rec->{'country code'};
+		$self->{db}{cc}{country}{$cc} = $rec;
+	}
+	close($fh);
 }
 sub plotcity {
 	my $self = shift;
@@ -618,6 +671,7 @@ sub plotnpanxxsource {
 				print STDERR "entering clli: $rec->{CLLI} $y,$x ($v,$h)\n";
 			},$_);
 		my $st = $_->{'Wire Center State'};
+		$st = $_->{'Wire Center Country'} unless $_->{'Wire Center Country'} =~ /^(US|CA)$/;
 		push @{$self->{items}{$st}}, $item;
 	}
 }
@@ -868,6 +922,62 @@ sub plotdata {
 		push @{$self->{items}{gmt}}, $item;
 	}
 }
+sub plotuk {
+	my $self = shift;
+	my $scalex = 1920/360;
+	my $scaley = 1200/180;
+	my $root = $self->{Canvas}->get_root_item;
+	foreach (values %{$self->{db}{uk}{rate}}) {
+		my $r = 0.40;
+		my ($y,$x) = ($_->{latitude},$_->{longitude});
+		next unless defined $x and defined $y and $x and $y and $x != 0 and $y != 0;
+		$x += 180; $x -= 360 if $x > 360;
+		$x *= $scalex;
+		$y = 90 - $y;
+		$y *= $scaley;
+		my $item = Goo::Canvas::Ellipse->new($root,$x,$y,$r,$r,
+			'antialias'=>'default',
+			'fill-color-rgba'=>$blue_rgba,
+			'line-width'=>0,
+			'stroke-color'=>'white',
+			'pointer-events'=>'visible',
+		);
+		$item->signal_connect('enter_notify_event'=>sub{
+				my ($item,$targ,$ev,$rec) = @_;
+				my ($y,$x) = ($rec->{latitude},$rec->{longitude});
+				print STDERR "entering rc: $rec->{'Rate Center'} $y,$x\n";
+			},$_);
+		push @{$self->{items}{GB}}, $item;
+	}
+}
+sub plotcc {
+	my $self = shift;
+	my $scalex = 1920/360;
+	my $scaley = 1200/180;
+	my $root = $self->{Canvas}->get_root_item;
+	foreach (values %{$self->{db}{cc}{country}}) {
+		my $r = 2.0;
+		my ($y,$x) = ($_->{latitude},$_->{longitude});
+		next unless defined $x and defined $y and $x and $y and $x != 0 and $y != 0;
+		$x += 180; $x -= 360 if $x > 360;
+		$x *= $scalex;
+		$y = 90 - $y;
+		$y *= $scaley;
+		my $item = Goo::Canvas::Ellipse->new($root,$x,$y,$r,$r,
+			'antialias'=>'default',
+			'fill-color-rgba'=>$yellow_rgba,
+			'line-width'=>0,
+			'stroke-color'=>'white',
+			'pointer-events'=>'visible',
+		);
+		$item->signal_connect('enter_notify_event'=>sub{
+				my ($item,$targ,$ev,$rec) = @_;
+				my ($y,$x) = ($rec->{latitude},$rec->{longitude});
+				print STDERR "entering cc: $rec->{'country code'} $y,$x\n";
+			},$_);
+		push @{$self->{items}{cc}}, $item;
+	}
+}
 sub menuFileNew {
 	my ($menuitem,$self) = @_;
 	#warn join(', ',@_).": menu item invoked";
@@ -889,6 +999,8 @@ sub menuFileNew {
 	$self->readlocal;
 	$self->readneca4;
 	$self->readnpanxxsource;
+	$self->readuk;
+	$self->readcc;
 #	$self->plotcity;
 #	$self->plotrate;
 #	$self->plotwire;
@@ -898,6 +1010,8 @@ sub menuFileNew {
 	$self->plotlocal;
 	$self->plotneca4;
 	$self->plotnpanxxsource;
+	$self->plotuk;
+	$self->plotcc;
 	$self->plotgrid;
 }
 sub menuFileOpen {

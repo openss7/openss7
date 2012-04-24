@@ -56,15 +56,41 @@ my @ocn_keys = (
 	'COMPANY',
 );
 
-my @clli_keys = (
+my @sw_keys = (
 	'CLLI',
+	'NPA',
+	'NXX',
+	'SWVH',
+	'SWLL',
 	'LATA',
-	'RC_VERTICAL',
-	'RC_HORIZONTAL',
+	'OCN',
+);
+
+my @wc_keys = (
+	'WC',
+	'NPA',
+	'NXX',
+	'WCVH',
+	'WCLL',
+	'LATA',
+	'OCN',
+);
+
+my @rc_keys = (
+	'REGION',
+	'RCSHORT',
+	'NPA',
+	'NXX',
+	'RCVH',
+	'RCLL',
+	'LATA',
+	'OCN',
 );
 
 my %ocns = ();
-my %cllis = ();
+my %sws = ();
+my %wcs = ();
+my %rcs = ();
 
 sub closerecord {
 	my $data = shift;
@@ -87,17 +113,70 @@ sub closerecord {
 			}
 		}
 	}
-	if (my $clli = $data->{SWITCH_CLLI}) {
-		$cllis{$clli} = {} unless exists $cllis{$clli};
-		my $rec = $cllis{$clli};
-		$rec->{CLLI} = $clli;
-		for (my $i=1;$i<@clli_keys;$i++) {
-			my $k = $clli_keys[$i];
-			if ($data->{$k}) {
-				if ($rec->{$k} and $rec->{$k} ne $data->{$k}) {
-					print STDERR "E: $k changing from $rec->{$k} to $data->{$k}\n";
+	if (my $sw = $data->{SWITCH_CLLI}) {
+		$sws{$sw} = {} unless exists $sws{$sw};
+		my $rec = $sws{$sw};
+		$data->{CLLI} = $sw;
+		$data->{SWVH} = sprintf('%05d,%05d',$data->{RC_VERTICAL},$data->{RC_HORIZONTAL});
+		$data->{SWLL} = "$data->{LATITUDE},$data->{LONGITUDE}";
+		foreach my $k (@sw_keys) {
+			if ($k eq 'NPA' or $k eq 'LATA' or $k eq 'OCN') {
+				$rec->{$k}{$data->{$k}}++ if $data->{$k};
+			} elsif ($k eq 'NXX') {
+				$rec->{$k}{"$data->{NPA}->$data->{NXX}"}++ if $data->{NPA} and $data->{NXX};
+			} else {
+				if ($data->{$k}) {
+					if ($rec->{$k} and $rec->{$k} ne $data->{$k}) {
+						print STDERR "E: SW $sw $k changing from $rec->{$k} to $data->{$k}\n";
+					}
+					$rec->{$k} = $data->{$k};
 				}
-				$rec->{$k} = $data->{$k};
+			}
+		}
+	}
+	if (my $wc = substr($data->{SWITCH_CLLI},0,8)) {
+		$wcs{$wc} = {} unless exists $wcs{$wc};
+		my $rec = $wcs{$wc};
+		$data->{WC} = $wc;
+		$data->{WCVH} = sprintf('%05d,%05d',$data->{RC_VERTICAL},$data->{RC_HORIZONTAL});
+		$data->{WCLL} = "$data->{LATITUDE},$data->{LONGITUDE}";
+		foreach my $k (@wc_keys) {
+			if ($k eq 'NPA' or $k eq 'LATA' or $k eq 'OCN') {
+				$rec->{$k}{$data->{$k}}++ if $data->{$k};
+			} elsif ($k eq 'NXX') {
+				$rec->{$k}{"$data->{NPA}->$data->{NXX}"}++ if $data->{NPA} and $data->{NXX};
+			} else {
+				if ($data->{$k}) {
+					if ($rec->{$k} and $rec->{$k} ne $data->{$k}) {
+						print STDERR "E: WC $wc $k changing from $rec->{$k} to $data->{$k}\n";
+					}
+					$rec->{$k} = $data->{$k};
+				}
+			}
+		}
+	}
+	if (my $rc = $data->{RATE_CENTER}) {
+		$rc = substr("\U$rc\E",0,10);
+		if (my $st = $data->{STATE}) {
+			$rcs{$st}{$rc} = {} unless exists $rcs{$st}{$rc};
+			my $rec = $rcs{$st}{$rc};
+			$data->{RCSHORT} = $rc;
+			$data->{REGION} = $st;
+			$data->{RCVH} = sprintf('%05d,%05d',$data->{RC_VERTICAL},$data->{RC_HORIZONTAL});
+			$data->{RCLL} = "$data->{LATITUDE},$data->{LONGITUDE}";
+			foreach my $k (@rc_keys) {
+				if ($k eq 'NPA' or $k eq 'LATA' or $k eq 'OCN') {
+					$rec->{$k}{$data->{$k}}++ if $data->{$k};
+				} elsif ($k eq 'NXX') {
+					$rec->{$k}{"$data->{NPA}->$data->{NXX}"}++ if $data->{NPA} and $data->{NXX};
+				} else {
+					if ($data->{$k}) {
+						if ($rec->{$k} and $rec->{$k} ne $data->{$k}) {
+							print STDERR "E: RC $st-$rc $k changing from $rec->{$k} to $data->{$k}\n";
+						}
+						$rec->{$k} = $data->{$k};
+					}
+				}
 			}
 		}
 	}
@@ -322,15 +401,59 @@ foreach my $k (sort keys %ocns) {
 }
 close($of);
 
-$fn = "$datadir/clli.csv";
+$fn = "$datadir/sw.csv";
 print STDERR "I: writing $fn...\n";
 open($of,">",$fn) or die "can't open $fn";
-print $of '"', join('","',@clli_keys), '"', "\n";
-foreach my $k (sort keys %cllis) {
-	my $clli = $cllis{$k};
+print $of '"', join('","',@sw_keys), '"', "\n";
+foreach my $k (sort keys %sws) {
+	my $rec = $sws{$k};
 	my @values = ();
-	foreach (@clli_keys) { push @values, $clli->{$_} }
+	foreach (@sw_keys) {
+		if (exists $rec->{$_} and ref $rec->{$_} eq 'HASH') {
+			push @values, join(',',sort keys %{$rec->{$_}});
+		} else {
+			push @values, $rec->{$_};
+		}
+	}
 	print $of '"', join('","',@values), '"', "\n";
+}
+close($of);
+
+$fn = "$datadir/wc.csv";
+print STDERR "I: writing $fn...\n";
+open($of,">",$fn) or die "can't open $fn";
+print $of '"', join('","',@wc_keys), '"', "\n";
+foreach my $k (sort keys %wcs) {
+	my $rec = $wcs{$k};
+	my @values = ();
+	foreach (@wc_keys) {
+		if (exists $rec->{$_} and ref $rec->{$_} eq 'HASH') {
+			push @values, join(',',sort keys %{$rec->{$_}});
+		} else {
+			push @values, $rec->{$_};
+		}
+	}
+	print $of '"', join('","',@values), '"', "\n";
+}
+close($of);
+
+$fn = "$datadir/rc.csv";
+print STDERR "I: writing $fn...\n";
+open($of,">",$fn) or die "can't open $fn";
+print $of '"', join('","',@rc_keys), '"', "\n";
+foreach my $k (sort keys %rcs) {
+	foreach my $k2 (sort keys %{$rcs{$k}}) {
+		my $rec = $rcs{$k}{$k2};
+		my @values = ();
+		foreach (@rc_keys) {
+			if (exists $rec->{$_} and ref $rec->{$_} eq 'HASH') {
+				push @values, join(',',sort keys %{$rec->{$_}});
+			} else {
+				push @values, $rec->{$_};
+			}
+		}
+		print $of '"', join('","',@values), '"', "\n";
+	}
 }
 close($of);
 

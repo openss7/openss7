@@ -9,6 +9,7 @@ my $program = $0; $program =~ s/^.*\///;
 my $progdir = $0; $progdir = '.' unless $progdir =~ /\//; $progdir =~ s/\/[^\/]*$//;
 my $datadir = "$progdir/..";
 my $telcdir = "$progdir/../telcodata";
+my $nanpdir = "$progdir/../nanpa";
 
 my $fh = \*INFILE;
 
@@ -27,19 +28,19 @@ while (<$fh>) { chomp;
 }
 close($fh);
 
-my $nclli = 0;
-my $cllis = {};
+my $nsw = 0;
+my $sws = {};
 open($fh,"<","$datadir/cllinpanxx.txt");
 while (<$fh>) { chomp;
 	next unless /^[A-Z0-9]{11}\t/;
-	my ($clli,$npa,$nxx) = split(/\t/,$_);
-	$nclli++ unless exists $cllis->{$clli};
-	$cllis->{$clli}{$npa}{$nxx} = "$npa-$nxx";
+	my ($sw,$npa,$nxx) = split(/\t/,$_);
+	$nsw++ unless exists $sws->{$sw};
+	$sws->{$sw}{$npa}{$nxx} = "$npa-$nxx";
 }
 close($fh);
 
-my $neca_cllis = do "$datadir/cllis.pm";
-$neca_cllis = $neca_cllis->{clli};
+my $neca_sws = do "$datadir/cllis.pm";
+$neca_sws = $neca_sws->{clli};
 
 my $nstate = 0;
 my $states = {};
@@ -54,11 +55,34 @@ close($fh);
 
 my $nrate = 0;
 my $rates = {};
-open($fh,"<","$telcdir/ratenpanxx.txt");
-while (<$fh>) { chomp;
-	my ($rate,$npa,$nxx) = split(/\t/,$_);
-	$nrate++ unless exists $rates->{$rate};
-	$rates->{$rate}{$npa}{$nxx} = "$npa-$nxx";
+if (0) {
+	open($fh,"<","$telcdir/ratenpanxx.txt");
+	while (<$fh>) { chomp;
+		my ($rate,$npa,$nxx) = split(/\t/,$_);
+		$nrate++ unless exists $rates->{$rate};
+		$rates->{$rate}{$npa}{$nxx} = "$npa-$nxx";
+	}
+	close($fh);
+}
+
+open($fh,"<","$nanpdir/rc.csv");
+{
+	my $header = 1;
+	while (<$fh>) { chomp;
+		if ($header) {
+			$header = undef;
+			next;
+		}
+		s/^"//; s/"$//; my @tokens = split(/","/,$_);
+		my $rcshort = $tokens[0];
+		my $region  = $tokens[1];
+		my $rcvh    = $tokens[2];
+		foreach my $npanxx (split(/,/,$tokens[4])) {
+			my ($npa,$nxx) = split(/-/,$npanxx);
+			$nrate++ unless exists $rates->{$region}{$rcshort};
+			$rates->{$region}{$rcshort}{$npa}{$nxx} = $npanxx;
+		}
+	}
 }
 close($fh);
 
@@ -246,26 +270,28 @@ sub getlatanpa {
 
 sub getrate {
 	my $numb = 0;
-	foreach my $rate (keys %{$rates}) {
-		my ($found,$first);
-		foreach my $npa (keys %{$rates->{$rate}}) {
-			foreach my $nxx (keys %{$rates->{$rate}{$npa}}) {
-				my $fn = getfn($npa,$nxx);
-				if (-f $fn) {
-					$found = 1;
-					last;
+	foreach my $region (keys %{$rates}) {
+		foreach my $rcshort (keys %{$rates->{$region}}) {
+			my ($found,$first);
+			foreach my $npa (keys %{$rates->{$region}{$rcshort}}) {
+				foreach my $nxx (keys %{$rates->{$region}{$rcshort}{$npa}}) {
+					my $fn = getfn($npa,$nxx);
+					if (-f $fn) {
+						$found = 1;
+						last;
+					}
+					$first = [ $npa, $nxx ] unless $first;
 				}
-				$first = [ $npa, $nxx ] unless $first;
+				last if $found;
 			}
-			last if $found;
+			if ($found) {
+				$numb++;
+				next;
+			}
+			warn "need to fetch $first->[0]-$first->[1] to establish Rate Center $region $rcshort";
+			warn "found $numb (of $nrate) RCs";
+			return $first;
 		}
-		if ($found) {
-			$numb++;
-			next;
-		}
-		warn "need to fetch $first->[0]-$first->[1] to establish Rate Center $rate";
-		warn "found $numb (of $nrate) RCs";
-		return $first;
 	}
 	warn "found $numb (of $nrate) RCs";
 	return undef;
@@ -302,16 +328,16 @@ sub getocn {
 	return undef;
 }
 
-sub getclli {
+sub getsw {
 	my $numb = 0;
-	foreach my $clli (keys %{$cllis}) {
+	foreach my $sw (keys %{$sws}) {
 		my ($found,$first);
-		if (exists $neca_cllis->{$clli}) {
+		if (exists $neca_sws->{$sw}) {
 			$numb++;
 			next;
 		}
-		foreach my $npa (keys %{$cllis->{$clli}}) {
-			foreach my $nxx (keys %{$cllis->{$clli}{$npa}}) {
+		foreach my $npa (keys %{$sws->{$sw}}) {
+			foreach my $nxx (keys %{$sws->{$sw}{$npa}}) {
 				my $fn = getfn($npa,$nxx);
 				if (-f $fn) {
 					$found = 1;
@@ -325,11 +351,11 @@ sub getclli {
 			$numb++;
 			next;
 		}
-		warn "need to fetch $first->[0]-$first->[1] to establish CLLI $clli";
-		warn "found $numb (of $nclli) CLLIs";
+		warn "need to fetch $first->[0]-$first->[1] to establish CLLI $sw";
+		warn "found $numb (of $nsw) CLLIs";
 		return $first;
 	}
-	warn "found $numb (of $nclli) CLLIs";
+	warn "found $numb (of $nsw) CLLIs";
 	return undef;
 }
 
@@ -436,8 +462,8 @@ while (my $ocn = getocn()) {
 	#sleep($sec);
 }
 
-while (my $clli = getclli()) {
-	my ($npa,$nxx) = @{$clli};
+while (my $sw = getsw()) {
+	my ($npa,$nxx) = @{$sw};
 	my $fn = getfn($npa,$nxx);
 	my $url = geturl($npa,$nxx);
 	my $cmd = getcmd($npa,$nxx);
