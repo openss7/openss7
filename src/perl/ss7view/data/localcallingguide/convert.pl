@@ -16,11 +16,27 @@ my $fh = \*INFILE;
 my $of = \*OUTFILE;
 my $fn;
 
+my %lergcc = ();
+my %lergst = ();
+
+$fn = "$codedir/lergst.txt";
+print STDERR "I: reading $fn\n";
+open($fh,"<",$fn) or die "can't open $fn";
+while (<$fh>) { chomp;
+	next if /^ISO2/;
+	next if /^\s*$/;
+	my @tokens = split(/\t/,$_);
+	$lergcc{$tokens[2]} = $tokens[0];
+	$lergst{$tokens[2]} = $tokens[1];
+}
+close($fh);
+
 my @rc_keys = (
-	'RCSHORT',
 	'REGION',
+	'RCSHORT',
 	'RCVH',
 	'NPA',
+	'NXX',
 	'RC',
 	'EXCH',
 	'SEE-REGION',
@@ -72,7 +88,6 @@ sub do_rc {
 						push @values,$rec->{$k};
 					}
 					print $of '"',join('","',@values),'"',"\n";
-
 				}
 				$inrecord = 0;
 			} elsif (/^<rcdata>/) {
@@ -109,9 +124,10 @@ sub do_wc {
 	$fn = "$datadir/wc.csv";
 }
 
-my %cllis = ();
-
-sub do_clli {
+sub do_sw {
+	my %sws = ();
+	my %dbsw = ();
+	my %dbwc = ();
 	my $fn;
 	my @keys = (
 		'CLLI',
@@ -125,6 +141,12 @@ sub do_clli {
 		'HOST',
 		'REMOTES',
 		'UPDATED',
+	);
+	my @wc_keys = (
+		'WC',
+		'NPA',
+		'NXX',
+		'LATA',
 	);
 	my %fieldmap = (
 		'Switch'=>'CLLI',
@@ -146,10 +168,10 @@ sub do_clli {
 			$header = undef;
 			next;
 		}
-		my $clli = $tokens[0];
-		$cllis{$clli} = {} unless exists $cllis{$clli};
-		my $rec = $cllis{$clli};
-		$rec->{CLLI} = $clli;
+		my $sw = $tokens[0];
+		$sws{$sw} = {} unless exists $sws{$sw};
+		my $rec = $sws{$sw};
+		$rec->{CLLI} = $sw;
 		for (my $i=1;$i<@fields;$i++) {
 			$rec->{$fieldmap{$fields[$i]}}{$tokens[$i]}++;
 		}
@@ -173,16 +195,19 @@ sub do_clli {
 						}
 						if ($data->{NPA}) {
 							$rec->{NPA}{$data->{NPA}}++;
+							if ($data->{NXX}) {
+								$rec->{NXX}{"$data->{NPA}-$data->{NXX}"}++;
+							}
 						}
 					}
 				}
-				my $clli = $data->{SWITCH};
-				if ($clli and $clli ne '99999999999' and $clli ne 'XXXXXXXXXXX') {
-					$clli =~ s/-/ /g;
-					$cllis{$clli} = {} unless exists $cllis{$clli};
-					my $rec = $cllis{$clli};
-					$rec->{CLLI} = $clli;
-					$data->{STATE} = substr($clli,4,2);
+				my $sw = $data->{SWITCH};
+				if ($sw and $sw ne '99999999999' and $sw ne 'XXXXXXXXXXX') {
+					$sw =~ s/-/ /g;
+					$sws{$sw} = {} unless exists $sws{$sw};
+					my $rec = $sws{$sw};
+					$rec->{CLLI} = $sw;
+					$data->{STATE} = substr($sw,4,2);
 					if ($data->{STATE} eq 'AM') { $data->{STATE} = 'AS' }
 					if ($data->{NPA} and $data->{NXX}) {
 						$data->{'NPA-NXX'} = "$data->{NPA}-$data->{NXX}";
@@ -192,11 +217,34 @@ sub do_clli {
 						if ($data->{$k}) {
 						#	if ($rec->{$k} and $rec->{$k} ne $data->{$k}) {
 						#		printf STDERR "E: CLLI %-11.11s %-10.10s changing from %-24.24s to %-24.24s\n",
-						#		$clli, $k, $rec->{$k}, $data->{$k};
+						#		$sw, $k, $rec->{$k}, $data->{$k};
 						#	}
 						#	$rec->{$k} = $data->{$k};
 							$rec->{$k}{$data->{$k}}++;
 						}
+					}
+					my $wc = substr($sw,0,8);
+					$wcs{$wc} = {} unless exists $wcs{$wc};
+					$rec = $wcs{$wc};
+					$rec->{WC} = $wc;
+					$rec->{NPA}{$data->{NPA}}++ if $data->{NPA};
+					$rec->{NXX}{"$data->{NPA}-$data->{NXX}"}++ if $data->{NPA} and $data->{NXX};
+					$rec->{LATA}{$data->{LATA}}++ if $data->{LATA};
+					if ($data->{NPA} and $data->{NXX}) {
+						$dbsw{$data->{NPA}}{$data->{NXX}} = {} unless exists
+						$dbsw{$data->{NPA}}{$data->{NXX}};
+						$rec = $dbsw{$data->{NPA}}{$data->{NXX}};
+						$rec->{NPA} = $data->{NPA};
+						$rec->{NXX} = $data->{NXX};
+						$rec->{CLLI} = $sw;
+						$rec->{LATA} = $data->{LATA};
+						$dbwc{$data->{NPA}}{$data->{NXX}} = {} unless exists
+						$dbwc{$data->{NPA}}{$data->{NXX}};
+						$rec = $dbwc{$data->{NPA}}{$data->{NXX}};
+						$rec->{NPA} = $data->{NPA};
+						$rec->{NXX} = $data->{NXX};
+						$rec->{WC} = $wc;
+						$rec->{LATA} = $data->{LATA};
 					}
 				}
 				$inrecord = 0;
@@ -209,23 +257,59 @@ sub do_clli {
 		}
 		close($fh);
 	}
-	$fn = "$datadir/clli.csv";
+	$fn = "$datadir/sw.csv";
 	print STDERR "I: writing $fn...\n";
 	open($of,">",$fn) or die "can't open $fn";
 	print $of '"',join('","',@keys),'"',"\n";
-	foreach my $k (sort keys %cllis) {
-		my $rec = $cllis{$k};
+	foreach my $k (sort keys %sws) {
+		my $rec = $sws{$k};
 		my @values = ();
-		push @values, $rec->{CLLI};
-		for (my $i=1;$i<@keys;$i++) {
-			my $k = $keys[$i];
-			if (exists $rec->{$k} and ref $rec->{$k} eq 'HASH') {
-				push @values,join(',',sort keys %{$rec->{$k}});
+		foreach (@keys) {
+			if (exists $rec->{$_} and ref $rec->{$_} eq 'HASH') {
+				push @values,join(',',sort keys %{$rec->{$_}});
 			} else {
-				push @values,$rec->{$k};
+				push @values,$rec->{$_};
 			}
 		}
-		#foreach (@keys) { push @values, $rec->{$_} }
+		print $of '"',join('","',@values),'"',"\n";
+	}
+	close($of);
+	$fn = "$datadir/db.sw.csv";
+	print STDERR "I: writing $fn...\n";
+	open($of,">",$fn) or die "can't open $fn";
+	print $of '"',join('","',qw/NPA NXX CLLI LATA/),'"',"\n";
+	foreach my $npa (sort keys %dbsw) {
+		foreach my $nxx (sort keys %{$dbsw{$npa}}) {
+			my $rec = $dbsw{$npa}{$nxx};
+			print $of '"',join('","',($npa,$nxx,$rec->{CLLI},$rec->{LATA})),'"',"\n";
+		}
+	}
+	close($of);
+	$fn = "$datadir/db.wc.csv";
+	print STDERR "I: writing $fn...\n";
+	open($of,">",$fn) or die "can't open $fn";
+	print $of '"',join('","',qw/NPA NXX WC LATA/),'"',"\n";
+	foreach my $npa (sort keys %dbwc) {
+		foreach my $nxx (sort keys %{$dbwc{$npa}}) {
+			my $rec = $dbwc{$npa}{$nxx};
+			print $of '"',join('","',($npa,$nxx,$rec->{WC},$rec->{LATA})),'"',"\n";
+		}
+	}
+	close($of);
+	$fn = "$datadir/wc.csv";
+	print STDERR "I: writing $fn...\n";
+	open($of,">",$fn) or die "can't open $fn";
+	print $of '"',join('","',@wc_keys),'"',"\n";
+	foreach my $k (sort keys %wcs) {
+		my $rec = $wcs{$k};
+		my @values = ();
+		foreach (@wc_keys) {
+			if (exists $rec->{$_} and ref $rec->{$_} eq 'HASH') {
+				push @values,join(',',sort keys %{$rec->{$_}});
+			} else {
+				push @values,$rec->{$_};
+			}
+		}
 		print $of '"',join('","',@values),'"',"\n";
 	}
 	close($of);
@@ -236,15 +320,13 @@ sub do_clli {
 	foreach my $exch (sort keys %rcs) {
 		my $rec = $rcs{$exch};
 		my @values = ();
-		for (my $i=0;$i<@rc_keys;$i++) {
-			my $k = $rc_keys[$i];
-			if (exists $rec->{$k} and ref $rec->{$k} eq 'HASH') {
-				push @values,join(',',sort keys %{$rec->{$k}});
+		foreach (@rc_keys) {
+			if (exists $rec->{$_} and ref $rec->{$_} eq 'HASH') {
+				push @values,join(',',sort keys %{$rec->{$_}});
 			} else {
-				push @values,$rec->{$k};
+				push @values,$rec->{$_};
 			}
 		}
-		#foreach (@rc_keys) { push @values, $rec->{$_} }
 		print $of '"',join('","',@values),'"',"\n";
 	}
 	close($of);
@@ -313,6 +395,7 @@ sub do_ocn {
 }
 
 sub do_nxx {
+	my %dbrc = ();
 	my $fn;
 	my @keys = (
 		'NPA',
@@ -342,6 +425,15 @@ sub do_nxx {
 		'DISCDATE',
 		'UDATE',
 	);
+	my @dbrc_keys = (
+		'NPA',
+		'NXX',
+		'REGION',
+		'RCSHORT',
+		'RCCC',
+		'RCST',
+		'RCNAME',
+	);
 	$fn = "$datadir/db.csv";
 	print STDERR "I: writing $fn...\n";
 	open($of,">",$fn) or die "can't open $fn";
@@ -364,10 +456,33 @@ sub do_nxx {
 						}
 					}
 				}
+				my $rg = $data->{REGION};
+				$rg = 'NN' if $rg eq 'MP';
+				$rg = 'NF' if $rg eq 'NL';
+				$rg = 'VU' if $rg eq 'NU';
+				$rg = 'PQ' if $rg eq 'QC';
+				$rg = 'SF' if $rg eq 'SM';
+				$data->{REGION} = $rg;
+				my ($cc,$st) = ($rg,$rg);
+				$cc = $lergcc{$rg} if exists $lergcc{$rg};
+				$st = $lergst{$rg} if exists $lergst{$rg};
+				$data->{RCCC} = $cc;
+				$data->{RCST} = $st;
+				$data->{RCNAME} = $data->{RC};
 				if (exists $data->{NPA} and exists $data->{NXX}) {
 					my @values = ();
 					foreach my $k (@keys) { push @values, $data->{$k} }
 					print $of '"',join('","',@values),'"',"\n";
+					$dbrc{$data->{NPA}}{$data->{NXX}} = {} unless exists
+					$dbrc{$data->{NPA}}{$data->{NXX}};
+					my $rec = $dbrc{$data->{NPA}}{$data->{NXX}};
+					$rec->{NPA} = $data->{NPA};
+					$rec->{NXX} = $data->{NXX};
+					$rec->{REGION} = $data->{REGION};
+					$rec->{RCSHORT} = $data->{RCSHORT};
+					$rec->{RCNAME} = $data->{RCNAME};
+					$rec->{RCCC} = $data->{RCCC};
+					$rec->{RCST} = $data->{RCST};
 				}
 				$inrecord = 0;
 			} elsif (/^<prefixdata>/) {
@@ -380,10 +495,30 @@ sub do_nxx {
 		close($fh);
 	}
 	close($of);
+
+	$fn = "$datadir/db.rc.csv";
+	print STDERR "I: writing $fn...\n";
+	open($of,">",$fn) or die "can't open $fn";
+	print $of '"',join('","',@dbrc_keys),'"',"\n";
+	foreach my $npa (sort keys %dbrc) {
+		foreach my $nxx (sort keys %{$dbrc{$npa}}) {
+			my $rec = $dbrc{$npa}{$nxx};
+			my @values = ();
+			foreach (@dbrc_keys) {
+				if (exists $rec->{$_} and ref $rec->{$_} eq 'HASH') {
+					push @values,join(',',sort keys %{$rec->{$_}});
+				} else {
+					push @values,$rec->{$_};
+				}
+			}
+			print $of '"',join('","',@values),'"',"\n";
+		}
+	}
+	close($of);
 }
 
 do_rc();
-do_clli();
+do_sw();
 do_ocn();
 do_nxx();
 

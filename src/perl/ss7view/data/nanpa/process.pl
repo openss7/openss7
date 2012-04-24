@@ -38,8 +38,8 @@ print STDERR "reading $fn\n";
 open($fh,"<",$fn) or die "can't open $fn";
 while (<$fh>) { chomp;
 	next if /^#/;
-	my ($iso,$lerg,$clli,$name) = split(/\t/,$_);
-	$nanpast{$name} = {iso=>$iso,lerg=>$lerg,clli=>$clli};
+	my ($iso,$lerg,$sw,$name) = split(/\t/,$_);
+	$nanpast{$name} = {iso=>$iso,lerg=>$lerg,sw=>$sw};
 }
 close($fh);
 

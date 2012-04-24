@@ -33,8 +33,8 @@ my @files = `find switches -name 'data.html.xz' | sort`;
 foreach $fn (@files) { chomp $fn;
 	next unless $fn =~ /switches\/([^\/]+)\/([^\/]+)\/([^\/]+)\/([^\/]+)\/data.html.xz/;
 	next unless $4;
-	my $clli = "$2$1$3$4";
-	$clli =~ s/-/ /g;
+	my $sw = "$2$1$3$4";
+	$sw =~ s/-/ /g;
 	my $data = {};
 	my $inrecord = 0;
 	$fn =~ s/ /\\ /g;
@@ -66,8 +66,8 @@ foreach $fn (@files) { chomp $fn;
 			}
 		} elsif ($inrecord == 2 and /<\/ul>/) {
 			$inrecord = 0;
-			$hosts{$clli} = {} unless exists $hosts{$clli};
-			my $rec = $hosts{$clli};
+			$hosts{$sw} = {} unless exists $hosts{$sw};
+			my $rec = $hosts{$sw};
 			foreach my $k (sort keys %{$data}) {
 				if (exists $rec->{$k}) {
 					if (ref $rec->{$k}) {
@@ -91,7 +91,7 @@ foreach $fn (@files) { chomp $fn;
 			if (my $host = $data->{Host}) {
 				$host =~ s/-/ /g;
 				$hosts{$host}{Switch} = $host;
-				$hosts{$host}{Remotes}{$clli}++;
+				$hosts{$host}{Remotes}{$sw}++;
 			}
 			foreach my $k (@keys) { delete $data->{$k} }
 			foreach my $k (sort keys %{$data}) { push @keys, $k }

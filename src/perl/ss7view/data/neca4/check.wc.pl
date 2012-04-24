@@ -37,8 +37,8 @@ while (<$fh>) { chomp;
 	for (my $i=0;$i<@fields;$i++) {
 		$data->{$fields[$i]} = $tokens[$i];
 	}
-	my $clli = $data->{clli};
-	my $wc = substr($clli,0,8);
+	my $sw = $data->{clli};
+	my $wc = substr($sw,0,8);
 	unless (exists $wcs{$wc}) {
 		$wcs{$wc}{recs} = [];
 		$wcs_count++;
@@ -53,14 +53,13 @@ while (<$fh>) { chomp;
 	if (exists $wcs{$wc}{wcvh} and $wcs{$wc}{wcvh} and $wcs{$wc}{wcvh} ne $data->{wcvh}) {
 		my ($v1,$h1) = split(/,/,$wcs{$wc}{wcvh});
 		unless (defined $v1 and defined $h1) {
-			print STDERR "E: $clli has V&H of '$wcs{$wc}{wcvh}'\n";
+			print STDERR "E: $sw has V&H of '$wcs{$wc}{wcvh}'\n";
 			next;
 		}
 		my ($v2,$h2) = split(/,/,$data->{wcvh});
 		my $vd = abs($v2-$v1);
 		my $hd = abs($h2-$h1);
-		my $dd = $vd > $hd ? $vd : $hd;
-		my $ad = sqrt((($vd**2)+($hd**2))/10)*5280;
+		my $ad = sqrt((($vd**2)+($hd**2))/10)*5820;
 		if ($ad > 20000) {
 			unless (exists $bad{$wc}) {
 				$bad{$wc}++;
@@ -78,7 +77,6 @@ while (<$fh>) { chomp;
 					$inc_count -= delete $inc{$wc};
 				}
 			}
-			#} elsif ($dd > 2) {
 		} elsif ($ad > 10000) {
 			unless (exists $bad{$wc}) {
 				unless (exists $of3{$wc}) {
@@ -95,7 +93,6 @@ while (<$fh>) { chomp;
 					}
 				}
 			}
-			#} elsif ($dd > 1) {
 		} elsif ($ad > 5000) {
 			unless (exists $bad{$wc} or exists $of3{$wc}) {
 				unless (exists $of2{$wc}) {
@@ -109,7 +106,6 @@ while (<$fh>) { chomp;
 					}
 				}
 			}
-			#} elsif ($dd > 0) {
 		} elsif ($ad > 2602.7831) {
 			unless (exists $bad{$wc} or exists $of3{$wc} or exists $of2{$wc}) {
 				unless (exists $of1{$wc}) {
@@ -141,9 +137,6 @@ print STDERR "I: there are $bad_count wire centers in conflict\n";
 
 my $geo = new Geo::Coordinates::VandH;
 
-#push @fields, 'lat';
-#push @fields, 'lon';
-
 foreach my $wc (sort keys %inc) {
 	print STDERR "V: -------------------\n";
 	print STDERR "V: $wc inconsistent\n";
@@ -153,9 +146,6 @@ foreach my $wc (sort keys %inc) {
 		print STDERR "V: $key has $wcs{$wc}{where}{$key} hits $y,$x\n";
 	}
 	foreach my $rec (@{$wcs{$wc}{recs}}) {
-		#my ($v,$h) = split(/,/,$rec->{wcvh});
-		#my ($y,$x) = $geo->vh2ll($v,$h);
-		#$rec->{lat} = $y; $rec->{lon} = -$x;
 		my @tokens = ();
 		foreach my $k (@fields) {
 			push @tokens, $rec->{$k};
@@ -173,9 +163,6 @@ foreach my $wc (sort keys %of1) {
 		print STDERR "V: $key has $wcs{$wc}{where}{$key} hits $y,$x\n";
 	}
 	foreach my $rec (@{$wcs{$wc}{recs}}) {
-		#my ($v,$h) = split(/,/,$rec->{wcvh});
-		#my ($y,$x) = $geo->vh2ll($v,$h);
-		#$rec->{lat} = $y; $rec->{lon} = -$x;
 		my @tokens = ();
 		foreach my $k (@fields) {
 			push @tokens, $rec->{$k};
@@ -193,9 +180,6 @@ foreach my $wc (sort keys %of2) {
 		print STDERR "V: $key has $wcs{$wc}{where}{$key} hits $y,$x\n";
 	}
 	foreach my $rec (@{$wcs{$wc}{recs}}) {
-		#my ($v,$h) = split(/,/,$rec->{wcvh});
-		#my ($y,$x) = $geo->vh2ll($v,$h);
-		#$rec->{lat} = $y; $rec->{lon} = -$x;
 		my @tokens = ();
 		foreach my $k (@fields) {
 			push @tokens, $rec->{$k};
@@ -213,9 +197,6 @@ foreach my $wc (sort keys %of3) {
 		print STDERR "V: $key has $wcs{$wc}{where}{$key} hits $y,$x\n";
 	}
 	foreach my $rec (@{$wcs{$wc}{recs}}) {
-		#my ($v,$h) = split(/,/,$rec->{wcvh});
-		#my ($y,$x) = $geo->vh2ll($v,$h);
-		#$rec->{lat} = $y; $rec->{lon} = -$x;
 		my @tokens = ();
 		foreach my $k (@fields) {
 			push @tokens, $rec->{$k};
@@ -233,9 +214,6 @@ foreach my $wc (sort keys %bad) {
 		print STDERR "V: $key has $wcs{$wc}{where}{$key} hits $y,$x\n";
 	}
 	foreach my $rec (@{$wcs{$wc}{recs}}) {
-		#my ($v,$h) = split(/,/,$rec->{wcvh});
-		#my ($y,$x) = $geo->vh2ll($v,$h);
-		#$rec->{lat} = $y; $rec->{lon} = -$x;
 		my @tokens = ();
 		foreach my $k (@fields) {
 			push @tokens, $rec->{$k};

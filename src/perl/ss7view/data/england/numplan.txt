@@ -1,0 +1,761 @@
+Prefix	Rate Center	Conservation	geonameid	name	asciiname	alternatenames	latitude	longitude	feature class	feature code	country code	cc2	admin1 code	admin2 code	admin3 code	admin4 code	population	elevation	dem	timezone modification date
+0113	Leeds	N	2644688	Leeds	Leeds	Leeds,Lids,Lidsa,Lijds,Lydsas,Līdsa,lyds,lydz,rizu,Лидс,Лийдс,לידס,ليدز,لیدز,リーズ	53.79648	-1.54785	P	PPLA2	GB		ENG	H3			455123		50	Europe/London	2010-08-13
+0114	Sheffield	N	2638077	Sheffield	Sheffield	Sefilda,Sefildas,Sheffield,Sheffild,Shefild,she fei er de,shefirudo,Šefildas,Šefīlda,Шефилд,Шеффилд,シェフィールド,设菲尔德	53.38297	-1.4659	P	PPLA2	GB		ENG	L9			447047		75	Europe/London	2010-10-16
+0115	Nottingham	N	2641170	Nottingham	Nottingham	NQT,Nottigham,Nottingem,Nottingham,nottingamu,nuo ding han,nuo ding xian,nwtnghham,Ноттингем,Ноттингҳам,נוטינגהאם,نوتنغهام,ノッティンガム,諾定咸,诺丁汉	52.9536	-1.15047	P	PPLA2	GB		ENG	J8			246654		61	Europe/London	2012-03-22
+0116	Leicester	N	2644668	Leicester	Leicester	Caerlyr,Caerlŷr,Leicester,Leiscester,Lester,laystr,lstr,lystr,resuta,Лестер,לסטר,لايستر,ليستر,レスター	52.6386	-1.13169	P	PPLA2	GB		ENG	H4	31UC		339239		65	Europe/London	2011-03-03
+0117	Bristol	N	2654675	Bristol	Bristol	BRS,Bricgstoƿ,Bricgstōƿ,Briosto,Briostó,Bristo,Bristol,Bristol',Bristole,Bristolis,Bristolium,Briston,Bristul,Bristullu,Bristón,Bryste,beuliseuteul,bristala,brystwl,bu li si tuo er,burisutoru,Μπρίστολ,Бристол,Бристоль,Бристъл,בריסטאל,בריסטול,برسٹل نگر,بريستول,بریستول,ब्रिस्टल,ಬ್ರಿಸ್ಟಲ್‌,ბრისტოლი,ブリストル,布里斯托尔,브리스틀	51.45523	-2.59665	P	PPLA2	GB		ENG	B7	00HC023		430713		21	Europe/London	2011-06-16
+0118	Reading	N	2639577	Reading	Reading	Reading,Reding,Рединг	51.45625	-0.97113	P	PPLA2	GB		ENG	K7			244070		51	Europe/London	2010-08-13
+01200	Clitheroe	Y	2652819	Clitheroe	Clitheroe	Clitheroe	53.86667	-2.4	P	PPL	GB		ENG	H2	30UL		15024		76	Europe/London	2012-02-28
+01202	Bournemouth	Y	2655095	Bournemouth	Bournemouth	Bornmut,Bournemouth,bonmasu,Борнмут,ボーンマス	50.72048	-1.8795	P	PPLA2	GB		ENG	B2	19UC		163600		19	Europe/London	2011-03-03
+01204	Bolton	Y	2655237	Bolton	Bolton	Bolton,Болтон	53.58333	-2.43333	P	PPLA2	GB		ENG	B1			141331		105	Europe/London	2010-10-16
+01205	Boston	Y	2655138	Boston	Boston	Boston,Бостон	52.97633	-0.02664	P	PPL	GB		ENG	H7	32UB		35859		9	Europe/London	2011-03-03
+01206	Colchester	Y	2652618	Colchester	Colchester	Colchester,Kolchest"r,Колчестър	51.88921	0.90421	P	PPL	GB		ENG	E4	22UG		109414		29	Europe/London	2011-03-03
+01207	Consett	Y	2652437	Consett	Consett	Consett,Consetti,Konsett,Консетт	54.85404	-1.8316	P	PPL	GB		ENG	D8	00EJ053		21016		272	Europe/London	2011-03-03
+01208	Bodmin	Y	2655273	Bodmin	Bodmin		50.47151	-4.7243	P	PPL	GB		ENG	C6	00HE006		13063		98	Europe/London	2011-03-03
+01209	Redruth	Y	2639524	Redruth	Redruth	Ryd Ruth	50.23315	-5.22434	P	PPLA3	GB		ENG	C6	00HE118		0		135	Europe/London	2011-07-31
+0121	Birmingham	N	2655603	Birmingham	Birmingham	BHX,Birmin'gxam,Birmingam,Birmingamas,Birmingem,Birmingema,Birmingham,Birminghamia,Mpermincham,bamingamu,barming'hyam,barmingahama,barmingahema,barminghama,beoming-eom,birmingemi,bo ming han,bo ming han shi,brmngm,brmynghham,byrmngam,parminkam,Μπέρμιγχαμ,Бирмингам,Бирмингем,Бірмінгем,בירמינגהאם,ברמינגהאם,برمنگم,برمينغهام,بیرمنگام,बर्मिंगहॅम,बर्मिंघम,બર્મિંગહામ,பர்மிங்காம்,బర్మింగ్‌హామ్,ಬರ್ಮಿಂಗ್ಹ್ಯಾಮ್,เบอร์มิงแฮม,ბირმინგემი,バーミンガム,伯明翰,伯明翰市,버밍엄	52.48142	-1.89983	P	PPLA2	GB		ENG	A7	47UB		984333		149	Europe/London	2011-06-16
+01223	Cambridge	Y	2653941	Cambridge	Cambridge	Caergrawnt,Cambridge,Cantabrigia,Grantanbrycg,Kejmbridzh,Kembridz,Kembridzas,Kembridzh,Kembridžas,Kembrigo,Kembriĝo,jian qiao,kambrydj,keimbeuliji,kenburijji,khem bridc,kmbryj,qyymbrydg',Кеймбридж,Кембридж,Кембриџ,Кембрідж,קיימברידג',كامبريدج,کمبریج,เคมบริดจ์,ケンブリッジ,劍橋,케임브리지	52.2	0.11667	P	PPLA2	GB		ENG	C3	12UB		128488		12	Europe/London	2010-10-16
+01224	Aberdeen	Y	2657832	Aberdeen	Aberdeen	Aberdeen,Aberdin,Aberdonia,Aburdijn,Aiberdeen,Devanha,Ehberdin,Obar Dheathain,a bo ding,abadin,abrdyn,Абердин,Абърдийн,Эбердин,ابردین,アバディーン,阿伯丁	57.14369	-2.09814	P	PPLA2	GB		SCT	T5			183790		13	Europe/London	2011-03-03
+01225	Bath	Y	2656173	Bath	Bath	Aquae Sulis,Ba,Badanceaster,Bat,Bath,Baðanceaster,Caerfaddon,ba si,basu,bath,Бат,באת',باث,バース,巴斯	51.37795	-2.35907	P	PPLA2	GB		ENG	A4	00HA001		93238		24	Europe/London	2011-03-03
+01226	Barnsley	Y	2656284	Barnsley	Barnsley	Barnsley,Barnsli,Барнсли	53.55	-1.48333	P	PPLA2	GB		ENG	A3			71447		112	Europe/London	2010-10-16
+01227	Canterbury	Y	2653877	Canterbury	Canterbury	Caergaint,Canterbury,Cantorbery,Cantorbéry,Cantuaria,Cantuária,Cantwarebyrig,Dorwitceaster,Durovernum,Durovernum Canticorum,Kantaraborg,Kenterberi,kan te bo lei,kantaberi,kantrbyry,qntrbry,Кентербери,קנטרברי,كانتربيري,カンタベリー,堪特伯雷	51.27904	1.07992	P	PPL	GB		ENG	G5			46978		19	Europe/London	2010-08-03
+01228	Carlisle	Y	2653775	Carlisle	Carlisle	Caerliwelydd,Carlisle,Cathair Luail,Karlajl,Карлайл	54.8951	-2.9382	P	PPLA2	GB		ENG	C9	16UD		72633		29	Europe/London	2010-10-16
+012292	Barrow-in-Furness	Y	2656241	Barrow in Furness	Barrow in Furness	Barrow,Barrow in Furness,Barrow-in-Furness	54.11667	-3.23333	P	PPL	GB		ENG	C9	16UC		47264		17	Europe/London	2012-01-17
+012294	Barrow-in-Furness	Y	2656241	Barrow in Furness	Barrow in Furness	Barrow,Barrow in Furness,Barrow-in-Furness	54.11667	-3.23333	P	PPL	GB		ENG	C9	16UC		47264		17	Europe/London	2012-01-17
+012295	Barrow-in-Furness	Y	2656241	Barrow in Furness	Barrow in Furness	Barrow,Barrow in Furness,Barrow-in-Furness	54.11667	-3.23333	P	PPL	GB		ENG	C9	16UC		47264		17	Europe/London	2012-01-17
+012296	Barrow-in-Furness	Y	2656241	Barrow in Furness	Barrow in Furness	Barrow,Barrow in Furness,Barrow-in-Furness	54.11667	-3.23333	P	PPL	GB		ENG	C9	16UC		47264		17	Europe/London	2012-01-17
+012298	Barrow-in-Furness	Y	2656241	Barrow in Furness	Barrow in Furness	Barrow,Barrow in Furness,Barrow-in-Furness	54.11667	-3.23333	P	PPL	GB		ENG	C9	16UC		47264		17	Europe/London	2012-01-17
+012293	Millom	Y	2642505	Millom	Millom		54.21072	-3.272	P	PPL	GB		ENG	C9	16UE		6239		12	Europe/London	2011-03-03
+012297	Millom	Y	2642505	Millom	Millom		54.21072	-3.272	P	PPL	GB		ENG	C9	16UE		6239		12	Europe/London	2011-03-03
+012299	Millom	Y	2642505	Millom	Millom		54.21072	-3.272	P	PPL	GB		ENG	C9	16UE		6239		12	Europe/London	2011-03-03
+01233	Ashford (Kent)	Y	2656955	Ashford	Ashford	Ashford,Ehshford,Эшфорд	51.14586	0.87281	P	PPL	GB		ENG	G5	29UB		62787		45	Europe/London	2010-08-03
+01234	Bedford	Y	2656046	Bedford	Bedford	Bedford,Бедфорд	52.13459	-0.46632	P	PPLA2	GB		ENG	Z5			86658		30	Europe/London	2010-10-22
+01235	Abingdon	Y	2657780	Abingdon	Abingdon	Abingdon,Abingdon-on-Thames,Абингдон	51.67109	-1.28278	P	PPL	GB		ENG	K2	38UE		37192		57	Europe/London	2010-08-03
+01236	Coatbridge	Y	2652696	Coatbridge	Coatbridge	Coatbridge	55.86216	-4.02469	P	PPL	GB		SCT	V8			41170		88	Europe/London	2012-03-29
+01237	Bideford	Y	2655707	Bideford	Bideford	Bideford	51.01787	-4.20458	P	PPL	GB		ENG	D4	18UK		16624		7	Europe/London	2011-03-03
+01239	Cardigan	Y	2653818	Cardigan	Cardigan	Aberteifi,Cardigan	52.08473	-4.65906	P	PPLA3	GB		WLS	X6	00NQ007		0		13	Europe/London	2011-07-31
+01241	Arbroath	Y	2657215	Arbroath	Arbroath	Arbroath	56.56317	-2.58736	P	PPL	GB		SCT	T7			22291		10	Europe/London	2011-03-03
+01242	Cheltenham	Y	2653261	Cheltenham	Cheltenham	Cheltenham,cherutonamu,チェルトナム	51.9	-2.08333	P	PPL	GB		ENG	E6	23UB		103249		62	Europe/London	2012-01-17
+01243	Chichester	Y	2653192	Chichester	Chichester	Chichester,Чичестер	50.83673	-0.78003	P	PPLA2	GB		ENG	P6	45UD		28222		20	Europe/London	2010-10-16
+01244	Chester	Y	2653228	Chester	Chester	Caer,Chester,Chestur,Честер,Честър	53.1905	-2.89189	P	PPLA2	GB		ENG	Z8			77040		34	Europe/London	2011-10-14
+01245	Chelmsford	Y	2653266	Chelmsford	Chelmsford	Chelmsford,Челмсфорд	51.73575	0.46958	P	PPLA2	GB		ENG	E4	22UF		102671		33	Europe/London	2011-02-12
+01246	Chesterfield	Y	2653225	Chesterfield	Chesterfield	Chesterfield	53.25	-1.41667	P	PPL	GB		ENG	D3	17UD		70679		89	Europe/London	2012-01-17
+01248	Bangor (Gwynedd)	Y	2656397	Bangor	Bangor	Bangon,Bangor,Бангор	53.22647	-4.13459	P	PPL	GB		WLS	Y2	00NC006		15449		60	Europe/London	2011-03-03
+01249	Chippenham	Y	2653144	Chippenham	Chippenham	Chippenem,Chippenham,Чиппенем	51.46	-2.12472	P	PPLA3	GB		ENG	P8	00HY056		36890		61	Europe/London	2011-07-31
+01250	Blairgowrie	Y	2655394	Blairgowrie	Blairgowrie		56.59157	-3.34045	P	PPL	GB		SCT	W1			8081		80	Europe/London	2011-03-03
+01252	Aldershot	Y	2657540	Aldershot	Aldershot	Aldershot	51.24827	-0.76389	P	PPL	GB		ENG	F2	24UL		61339		99	Europe/London	2011-03-03
+01253	Blackpool	Y	2655459	Blackpool	Blackpool	Blackpool,Blehkpul,Blekpulis,burakkupuru,hei tan,Блэкпул,ব্ল্যাক্‌পুল,ブラックプール,黑潭	53.81667	-3.05	P	PPLA2	GB		ENG	A9			143101		21	Europe/London	2010-10-16
+01254	Blackburn	Y	2655524	Blackburn	Blackburn	Blackburn,Blehkbern,bu lai ke ben,Блэкберн,布莱克本,布萊克本	53.75	-2.48333	P	PPLA2	GB		ENG	A8			106154		121	Europe/London	2010-10-16
+01255	Clacton-on-Sea	Y	2652974	Clacton-on-Sea	Clacton-on-Sea	Clacton,Clacton-on-Sea	51.78967	1.15597	P	PPL	GB		ENG	E4	22UN		54674		17	Europe/London	2010-08-03
+01256	Basingstoke	Y	2656192	Basingstoke	Basingstoke	Basingstoke	51.26249	-1.08708	P	PPL	GB		ENG	F2	24UB		96348		96	Europe/London	2011-03-03
+01257	Coppull	Y	2652389	Coppull	Coppull		53.62527	-2.65854	P	PPL	GB		ENG	H2	30UE		7417		75	Europe/London	2011-03-03
+01258	Blandford	Y	2655378	Blandford Forum	Blandford Forum	Blandford,Blandford Forum	50.86073	-2.16174	P	PPL	GB		ENG	D6	19UE		10073		52	Europe/London	2011-03-03
+01259	Alloa	Y	2657471	Alloa	Alloa	Alloa,Aloa,Аллоа,Алоа	56.11586	-3.78997	P	PPLA2	GB		SCT	U1			18885		22	Europe/London	2011-03-03
+01260	Congleton	Y	2652464	Congleton	Congleton	Konglton,Конглтон	53.16314	-2.21253	P	PPL	GB		ENG	Z7	00EQ043		26030		90	Europe/London	2011-03-03
+01261	Banff	Y	2656402	Banff	Banff		57.66477	-2.52964	P	PPL	GB		SCT	T6			3914		51	Europe/London	2011-03-03
+01262	Bridlington	Y	2654728	Bridlington	Bridlington		54.08306	-0.19192	P	PPLA3	GB		ENG	E1	00FB169		35057		14	Europe/London	2011-07-31
+01263	Cromer	Y	2651930	Cromer	Cromer		52.93123	1.29892	P	PPL	GB		ENG	I9	33UF		9033		22	Europe/London	2010-05-24
+01264	Andover	Y	2657324	Andover	Andover	Andover	51.20828	-1.48246	P	PPL	GB		ENG	F2	24UN		39951		60	Europe/London	2011-03-03
+01267	Carmarthen	Y	2653755	Carmarthen	Carmarthen	Caerfyrddin,Caermarthen,Carmarthen	51.85552	-4.30535	P	PPLA2	GB		WLS	X7	00NU006		15244		23	Europe/London	2011-03-03
+01268	Basildon	Y	2656194	Basildon	Basildon	Basildon,Басилдон	51.56844	0.45782	P	PPL	GB		ENG	E4	22UB		101362		31	Europe/London	2011-03-03
+01269	Ammanford	Y	2657345	Ammanford	Ammanford	Ammanford,Rhydaman	51.79279	-3.98833	P	PPL	GB		WLS	X7	00NU003		12755		39	Europe/London	2011-03-03
+01270	Crewe	Y	2652002	Crewe	Crewe	Crewe,Krju,Крю	53.09787	-2.44161	P	PPL	GB		ENG	Z7	00EQ114		70455		60	Europe/London	2011-03-03
+01271	Barnstaple	Y	2656281	Barnstaple	Barnstaple	Barnstaple	51.08022	-4.05808	P	PPL	GB		ENG	D4	18UE		32532		12	Europe/London	2011-03-03
+01273	Brighton	Y	2654710	Brighton	Brighton	Brajton,Brajtono,Brighton,bra'itana,braytwn,bryytwn,bu lai dun,buraiton,Брайтон,ברייטון,برايتون,ব্রাইটন,ブライトン,布赖顿	50.82838	-0.13947	P	PPL	GB		ENG	E2			139001		29	Europe/London	2010-08-03
+01274	Bradford	Y	2654993	Bradford	Bradford	Bradford,Brehdford,Брэдфорд	53.79391	-1.75206	P	PPLA2	GB		ENG	B4			299310		110	Europe/London	2012-01-09
+01275	Clevedon	Y	2652861	Clevedon	Clevedon	Clevedon	51.44057	-2.85745	P	PPL	GB		ENG	J4	00HC013		22413		28	Europe/London	2011-03-03
+01276	Camberley	Y	2653947	Camberley	Camberley	Camberley,Camberly,Kemberli,Кемберли	51.33705	-0.74261	P	PPL	GB		ENG	N7	43UJ		30155		84	Europe/London	2010-08-03
+01277	Brentwood	Y	2654782	Brentwood	Brentwood	Brentwood	51.62127	0.30556	P	PPL	GB		ENG	E4	22UD		47606		108	Europe/London	2010-08-03
+01278	Bridgwater	Y	2654730	Bridgwater	Bridgwater	Bridgewater,Bridgwater,Bridzhuoter,Бриджуотер	51.12837	-3.00356	P	PPL	GB		ENG	M3	40UC		38020		15	Europe/London	2011-03-03
+01279	Bishops Stortford	Y	2655562	Bishops Stortford	Bishops Stortford	Bishop's Stortford,Bishops Stortford,Bishops Strotford	51.87113	0.15868	P	PPL	GB		ENG	F8	26UD		45001		70	Europe/London	2010-08-03
+01280	Buckingham	Y	2654410	Buckingham	Buckingham	Buckingham	51.99968	-0.98779	P	PPL	GB		ENG	B9	11UB		12791		89	Europe/London	2011-03-03
+01282	Burnley	Y	2654264	Burnley	Burnley	Bernli,Burnley,brnly,Бернли,ברנלי	53.8	-2.23333	P	PPL	GB		ENG	H2	30UD		73480		140	Europe/London	2012-01-17
+01283	Burton-on-Trent	Y	2654200	Burton upon Trent	Burton upon Trent	Burton upon Trent,Burton-on-Trent	52.80728	-1.64263	P	PPL	GB		ENG	M9	41UC		40039		49	Europe/London	2010-08-03
+01284	Bury St Edmunds	Y	2654186	Bury St Edmunds	Bury St Edmunds	Bury Saint Edmunds,Bury St,Bury St Edmunds	52.2463	0.71111	P	PPL	GB		ENG	N5	42UF		38622		52	Europe/London	2010-08-03
+01285	Cirencester	Y	2652995	Cirencester	Cirencester	Cicester,Cirencester	51.71708	-1.96825	P	PPL	GB		ENG	E6	23UC		16214		116	Europe/London	2011-03-03
+01286	Caernarfon	Y	2654092	Caernarfon	Caernarfon	Caernarfon,Carnarvon	53.14126	-4.27016	P	PPLA2	GB		WLS	Y2			9836		33	Europe/London	2010-10-16
+01287	Guisborough	Y	2647785	Guisborough	Guisborough		54.53478	-1.05606	P	PPLA3	GB		ENG	K9	00EE001		17569		95	Europe/London	2011-07-31
+01288	Bude	Y	2654380	Bude	Bude		50.82435	-4.5413	P	PPL	GB		ENG	C6			6113		10	Europe/London	2010-02-13
+01289	Berwick-upon-Tweed	Y	2655819	Berwick-Upon-Tweed	Berwick-Upon-Tweed	Bervik-apon-Tvid,Berwick,Berwick on Tweed,Berwick-Upon-Tweed,Berwick-upon-Tweed,Бервик-апон-Твид	55.78333	-2	P	PPL	GB		ENG	J6			26000		-9999	Europe/London	2012-03-29
+01290	Cumnock	Y	2651706	Cumnock	Cumnock	Cumnock	55.45445	-4.26644	P	PPL	GB		SCT	U4			9189		115	Europe/London	2011-03-03
+01291	Chepstow	Y	2653256	Chepstow	Chepstow	Chepstow	51.64087	-2.67683	P	PPL	GB		WLS	Y4	00PP004		11062		45	Europe/London	2011-03-03
+01292	Ayr	Y	2656708	Ayr	Ayr	Ajr,Ayr,Ayr - Inbhir Air,Ayr - Inbhir Àir,Ehjr,Айр,Эйр	55.46273	-4.63393	P	PPLA2	GB		SCT	W4			45513		13	Europe/London	2011-03-03
+01293	Crawley	Y	2652053	Crawley	Crawley	Crawley,Krouli,Кроули	51.11303	-0.18312	P	PPL	GB		ENG	P6	45UE		107061		84	Europe/London	2011-02-05
+01294	Ardrossan	Y	2657125	Ardrossan	Ardrossan	Ardrossan	55.65018	-4.80659	P	PPL	GB		SCT	V7			10000		21	Europe/London	2011-03-03
+01295	Banbury	Y	2656406	Banbury	Banbury	Banberi,Banbury,Банбери	52.0602	-1.34029	P	PPL	GB		ENG	K2	38UB		46075		107	Europe/London	2010-08-03
+01296	Aylesbury	Y	2656719	Aylesbury	Aylesbury	AEgeles burg,Aylesbury,Ehjlsberi,ai er si bo li,Ægeles burg,Эйлсбери,艾爾斯伯里	51.81665	-0.81458	P	PPLA2	GB		ENG	B9	11UB		74565		93	Europe/London	2010-10-16
+01297	Axminster	Y	2656725	Axminster	Axminster	Axminster	50.78259	-2.99787	P	PPL	GB		ENG	D4	18UB		5062		44	Europe/London	2011-03-03
+01298	Buxton	Y	2654141	Buxton	Buxton		53.25741	-1.90982	P	PPL	GB		ENG	D3	17UH		21300		316	Europe/London	2010-11-07
+01299	Bewdley	Y	2655781	Bewdley	Bewdley	Bewdley	52.37539	-2.31717	P	PPL	GB		ENG	Q4	47UG		9168		38	Europe/London	2010-08-03
+01300	Cerne Abbas	Y	2653423	Cerne Abbas	Cerne Abbas	Cerne Abbas	50.80893	-2.47583	P	PPL	GB		ENG	D6	19UH		0		121	Europe/London	2011-03-03
+01301	Arrochar	Y	2657018	Arrochar	Arrochar	Arrochan,Arrochar	56.19609	-4.74559	P	PPL	GB		SCT	T8			0		16	Europe/London	2011-03-03
+01302	Doncaster	Y	2651123	Doncaster	Doncaster	Doncaster,Donkaster,donkasuta,dxn khas texr,Донкастер,ดอนคาสเตอร์,ドンカスター	53.52327	-1.13691	P	PPLA2	GB		ENG	D5			67670		23	Europe/London	2010-10-16
+01303	Folkestone	Y	2649258	Folkestone	Folkestone	Folkestone,Folkston,Фолкстон	51.08333	1.18333	P	PPL	GB		ENG	G5	6945806		45992		23	Europe/London	2012-01-17
+01304	Dover	Y	2651048	Dover	Dover	Dofere,Douvres,Dover,Dovero,Dubris,Duvr,doba,dobeo,duo fu er,dwbr,dwfr,Дувр,דובר,آبنائے ڈوور,دوفر,ドーバー,多佛尔,도버	51.13333	1.3	P	PPL	GB		ENG	G5	29UE		28156		22	Europe/London	2012-01-17
+01305	Dorchester	Y	2651101	Dorchester	Dorchester	Dorchester,Dornwara ceaster	50.71667	-2.43333	P	PPLA2	GB		ENG	D6	19UH		16879		55	Europe/London	2010-10-16
+01306	Dorking	Y	2651095	Dorking	Dorking	Dorking	51.2329	-0.32942	P	PPL	GB		ENG	N7	43UE		16429		68	Europe/London	2011-02-05
+01307	Forfar	Y	2649207	Forfar	Forfar		56.64313	-2.89026	P	PPLA2	GB		SCT	T7			13237		66	Europe/London	2011-03-03
+01308	Bridport	Y	2654726	Bridport	Bridport		50.7338	-2.75831	P	PPL	GB		ENG	D6	19UH		13266		16	Europe/London	2011-03-03
+01309	Forres	Y	2649192	Forres	Forres	Forres	57.61125	-3.61078	P	PPL	GB		SCT	V6			9134		23	Europe/London	2011-03-03
+0131	Edinburgh	N	2650225	Edinburgh	Edinburgh	Caeredin,Dinedin,Dun Eideann,Dùn Èideann,Dún Éideann,EDI,Edimborg,Edimbourg,Edimbourgo,Edimburg,Edimburgo,Edimburgo - Dun Eideann,Edimburgo - Dùn Èideann,Edimburgu,Edimburgum,Edinborg,Edinburg,Edinburga,Edinburgas,Edinburgh,Edinburgo,Edinburrie,Edynburg,Ehdinburg,Embra,adynbwrg,ai ding bao,edeunbeoleo,edinabara,edinbara,xedinbara,Édimbourg,Εδιμβούργο,Единбург,Эдинбург,אדינבורו,ئېدىنبۇرگ,ادینبورگ,एडिनबरा,এডিনবরা,เอดินบะระ,エディンバラ,爱丁堡,에든버러	55.95206	-3.19648	P	PPLA	GB		SCT	U8			435791		66	Europe/London	2011-06-16
+01320	Fort Augustus	Y	2649183	Fort Augustus	Fort Augustus		57.14313	-4.68224	P	PPL	GB		SCT	V3			499		34	Europe/London	2010-05-17
+01322	Dartford	Y	2651500	Dartford	Dartford	Dartford,Dartforde,Дартфорде	51.44352	0.21964	P	PPL	GB		ENG	G5	29UD		56694		8	Europe/London	2011-02-12
+01323	Eastbourne	Y	2650497	Eastbourne	Eastbourne	Eastbourne,Istborn,Истборн	50.76871	0.28453	P	PPL	GB		ENG	E2	21UC		112906		8	Europe/London	2010-08-03
+01324	Falkirk	Y	2649723	Falkirk	Falkirk	Falkirk,Фалкирк	55.99917	-3.78713	P	PPLA2	GB		SCT	U9			32479		37	Europe/London	2011-03-03
+01325	Darlington	Y	2651513	Darlington	Darlington	Darlington,Дарлингтон	54.52429	-1.55039	P	PPLA2	GB		ENG	D1	00EH013		87204		40	Europe/London	2011-03-03 2651514	Dartington	Dartington		50.45067	-3.70842	P	PPL	GB		ENG	D4	18UG		0		31	Europe/London	2011-03-03
+01326	Falmouth	Y	2649715	Falmouth	Falmouth	Aberfal,Falmouth,Falmut,Фалмут	50.15441	-5.07113	P	PPLA3	GB		ENG	C6	00HE035		22222		34	Europe/London	2011-07-31
+01327	Daventry	Y	2651485	Daventry	Daventry	Daventri,Daventry,Давентри	52.25688	-1.16066	P	PPL	GB		ENG	J1	34UC		22215		152	Europe/London	2011-03-03
+01328	Fakenham	Y	2649730	Fakenham	Fakenham		52.82996	0.8477	P	PPL	GB		ENG	I9	33UF		7902		42	Europe/London	2010-05-24
+01329	Fareham	Y	2649692	Fareham	Fareham		50.85162	-1.17929	P	PPL	GB		ENG	F2	24UE		57390		10	Europe/London	2011-03-03
+01330	Banchory	Y	2656405	Banchory	Banchory	Banchory	57.05168	-2.48824	P	PPL	GB		SCT	T6			5978		60	Europe/London	2011-03-03
+01332	Derby	Y	2651347	Derby	Derby	Derbi,Derby,dabi,dyrby,Дерби,ديربي,ダービー	52.92277	-1.47663	P	PPLA2	GB		ENG	D2			235029		55	Europe/London	2010-10-16
+01333	Peat Inn	Y		Peat Inn	Peat Inn		56.275341	-2.88241
+01334	St Andrews	Y	2638864	Saint Andrews	Saint Andrews	Saint Andrews,Sejnt Andrjus,Sent-Ehndrjus,St Andrews,St. Andrews,Сейнт Андрюс,Сент-Эндрюс,セント・アンドリュース	56.33871	-2.79902	P	PPL	GB		SCT	V1			15435		22	Europe/London	2009-09-11
+01335	Ashbourne	Y	2656981	Ashbourne	Ashbourne	Ashbourne	53.01667	-1.73333	P	PPL	GB		ENG	D3	17UF		5132		126	Europe/London	2012-01-17
+01337	Ladybank	Y	2645064	Ladybank	Ladybank	Ladybank	56.27421	-3.1239	P	PPL	GB		SCT	V1			1519		40	Europe/London	2011-03-03
+013392	Aboyne	Y	2657775	Aboyne	Aboyne	Aboine,Aboyne	57.07546	-2.78023	P	PPL	GB		SCT	T6			2236		128	Europe/London	2010-08-09
+013393	Aboyne	Y	2657775	Aboyne	Aboyne	Aboine,Aboyne	57.07546	-2.78023	P	PPL	GB		SCT	T6			2236		128	Europe/London	2010-08-09
+013395	Aboyne	Y	2657775	Aboyne	Aboyne	Aboine,Aboyne	57.07546	-2.78023	P	PPL	GB		SCT	T6			2236		128	Europe/London	2010-08-09
+013398	Aboyne	Y	2657775	Aboyne	Aboyne	Aboine,Aboyne	57.07546	-2.78023	P	PPL	GB		SCT	T6			2236		128	Europe/London	2010-08-09
+013394	Ballater	Y	2656565	Ballater	Ballater	Ballater	57.0493	-3.04023	P	PPL	GB		SCT	T6			1466		202	Europe/London	2011-03-03
+013396	Ballater	Y	2656565	Ballater	Ballater	Ballater	57.0493	-3.04023	P	PPL	GB		SCT	T6			1466		202	Europe/London	2011-03-03
+013397	Ballater	Y	2656565	Ballater	Ballater	Ballater	57.0493	-3.04023	P	PPL	GB		SCT	T6			1466		202	Europe/London	2011-03-03
+013399	Ballater	Y	2656565	Ballater	Ballater	Ballater	57.0493	-3.04023	P	PPL	GB		SCT	T6			1466		202	Europe/London	2011-03-03
+01340	Craigellachie	Y	2652144	Craigellachie	Craigellachie	Craigellachie	57.48989	-3.18836	P	PPL	GB		SCT	V6			0		93	Europe/London	2011-03-03
+01341	Barmouth	Y	2656311	Barmouth	Barmouth	Abermaw,Barmouth	52.72377	-4.05748	P	PPL	GB		WLS	Y2	00NC007		2276		17	Europe/London	2011-10-14
+01342	East Grinstead	Y	2650435	East Grinstead	East Grinstead	East Grinstead	51.12382	-0.0061	P	PPL	GB		ENG	P6	45UG		26523		137	Europe/London	2011-03-03
+01343	Elgin	Y	2650122	Elgin	Elgin	Ehlgin,Elgin,Елгин,Элгин	57.65	-3.33333	P	PPLA2	GB		SCT	V6			21236		20	Europe/London	2010-10-16
+01344	Bracknell	Y	2655009	Bracknell	Bracknell	Bracknell	51.41363	-0.75054	P	PPLA2	GB		ENG	B3	00MA002		76103		81	Europe/London	2011-03-03
+01346	Fraserburgh	Y	2649089	Fraserburgh	Fraserburgh	Fraserburgh	57.68744	-2.01844	P	PPL	GB		SCT	T6			12249		25	Europe/London	2011-03-03
+01347	Easingwold	Y	2650517	Easingwold	Easingwold	Easingwold	54.1191	-1.19225	P	PPL	GB		ENG	J7	36UC		4064		31	Europe/London	2011-03-03
+01348	Fishguard	Y	2649372	Fishguard	Fishguard	Abergwaun,Fishguard	51.99376	-4.97631	P	PPL	GB		WLS	Y7			3228		63	Europe/London	2008-07-21
+01349	Dingwall	Y	2651245	Dingwall	Dingwall	Dingwall	57.59531	-4.42721	P	PPL	GB		SCT	V3			5025		9	Europe/London	2011-03-03
+01350	Dunkeld	Y	2650716	Dunkeld	Dunkeld	Dunkeld	56.5655	-3.58559	P	PPL	GB		SCT	W1			0		59	Europe/London	2011-03-03
+01352	Mold	Y	2642372	Mold	Mold	Mold,Yr Wyddgrug	53.16674	-3.14143	P	PPLA2	GB		WLS	Y1	00NJ019		9995		115	Europe/London	2012-03-29
+01353	Ely	Y	2650023	Ely	Ely	Ely,yi li,伊利	52.39857	0.25811	P	PPL	GB		ENG	C3	2650488		14265		23	Europe/London	2012-01-08
+01354	Chatteris	Y	2653298	Chatteris	Chatteris		52.45405	0.05006	P	PPL	GB		ENG	C3	12UD		8655		11	Europe/London	2010-05-24
+01355	East Kilbride	Y	2650405	East Kilbride	East Kilbride	East Kilbride,East Kilbridge	55.76667	-4.16667	P	PPL	GB		SCT	W5			74231		172	Europe/London	2012-01-17
+01356	Brechin	Y	2654824	Brechin	Brechin	Brechin	56.72993	-2.65729	P	PPL	GB		SCT	T7			6977		40	Europe/London	2011-03-03
+01357	Strathaven	Y	2636710	Strathaven	Strathaven	Strathaven	55.6771	-4.0668	P	PPL	GB		SCT	W5			8190		182	Europe/London	2011-03-03
+01358	Ellon	Y	2650086	Ellon	Ellon		57.36405	-2.07313	P	PPL	GB		SCT	T6			8750		12	Europe/London	2011-03-03
+01359	Pakenham	Y	2640674	Pakenham	Pakenham	Pakenham	52.27051	0.82103	P	PPL	GB		ENG	N5	42UF		0		45	Europe/London	2010-08-03
+01360	Killearn	Y	2645645	Killearn	Killearn	Killearn	56.04239	-4.3684	P	PPL	GB		SCT	W6			1753		95	Europe/London	2011-03-03
+01361	Duns	Y	2650673	Duns	Duns	Duns	55.77704	-2.34575	P	PPL	GB		SCT	T9	00EM033		2630		134	Europe/London	2011-03-03
+01362	Dereham	Y	2650470	East Dereham	East Dereham	Dereham	52.68333	0.93333	P	PPL	GB		ENG	I9	33UB		18175		41	Europe/London	2012-04-12
+01363	Crediton	Y	2652034	Crediton	Crediton	Crediton	50.78333	-3.65	P	PPL	GB		ENG	D4	18UD		7250		43	Europe/London	2012-01-17
+01364	Ashburton	Y	2656977	Ashburton	Ashburton	Ashburton	50.51559	-3.75572	P	PPL	GB		ENG	D4	18UH		3383		76	Europe/London	2011-03-03
+01366	Downham Market	Y	2651030	Downham Market	Downham Market		52.60289	0.37899	P	PPL	GB		ENG	I9	33UE		6880		37	Europe/London	2010-05-24
+01367	Faringdon	Y	2649686	Faringdon	Faringdon	Faringdon	51.65644	-1.58676	P	PPL	GB		ENG	K2	38UE		6325		109	Europe/London	2011-03-03
+01368	Dunbar	Y	2650776	Dunbar	Dunbar	Dunbar	56.00062	-2.51418	P	PPL	GB		SCT	U6			6414		21	Europe/London	2011-03-03
+01369	Dunoon	Y	2650681	Dunoon	Dunoon		55.94698	-4.92303	P	PPL	GB		SCT	T8			7981		10	Europe/London	2011-03-03
+01371	Great Dunmow	Y	2648117	Great Dunmow	Great Dunmow	Dunmow,Great Dunmow	51.8723	0.36255	P	PPL	GB		ENG	E4	22UQ		6075		74	Europe/London	2010-08-03
+01372	Esher	Y	2649911	Esher	Esher	Ehsher,Esher,Эшер	51.36926	-0.36572	P	PPL	GB		ENG	N7	43UB		52392		40	Europe/London	2011-02-08
+01373	Frome	Y	2649024	Frome	Frome	Frome	51.22834	-2.32211	P	PPL	GB		ENG	M3	40UB		24948		104	Europe/London	2011-03-03
+01375	Grays Thurrock	Y	2648182	Grays	Grays	Grays,Grays Thurrock	51.47566	0.32521	P	PPLA2	GB		ENG	O3	29UG		70934		13	Europe/London	2011-02-12
+01376	Braintree	Y	2654938	Braintree	Braintree	Braintree	51.87819	0.55292	P	PPL	GB		ENG	E4	22UC		46765		68	Europe/London	2010-08-03
+01377	Driffield	Y	2648120	Driffield	Driffield	Driffield	54.00489	-0.43872	P	PPLA3	GB		ENG	E1	00FB038		11495		19	Europe/London	2011-07-31
+01379	Diss	Y	2651214	Diss	Diss	Diss	52.37675	1.1091	P	PPL	GB		ENG	I9	33UH		7610		31	Europe/London	2010-08-03
+01380	Devizes	Y	2651294	Devizes	Devizes	Devizes	51.35084	-1.99421	P	PPL	GB		ENG	P8	00HY079		14699		130	Europe/London	2011-03-03
+01381	Fortrose	Y	2649171	Fortrose	Fortrose	Fortrose	57.58087	-4.13263	P	PPL	GB		SCT	V3			1206		25	Europe/London	2011-03-03
+01382	Dundee	Y	2650752	Dundee	Dundee	Dandi,Dun Deagh,Dundee,Dundi,Dùn Dèagh,dandi,dandy,deng di,Данди,Дънди,داندی,ダンディー,邓迪	56.5	-2.96667	P	PPLA2	GB		SCT	U3			151592		122	Europe/London	2010-10-16
+01383	Dunfermline	Y	2650732	Dunfermline	Dunfermline	Danfermlin,Dunfermline,Данфермлин	56.07156	-3.45887	P	PPL	GB		SCT	V1			38960		107	Europe/London	2011-03-03
+01384	Dudley	Y	2650839	Dudley	Dudley	Dadli,Dudley,Дадли	52.5	-2.08333	P	PPLA2	GB		ENG	D7			199059		161	Europe/London	2010-10-16
+01386	Evesham	Y	2649833	Evesham	Evesham	Evesham	52.09237	-1.94887	P	PPL	GB		ENG	Q4	47UF		22673		35	Europe/London	2010-10-20
+01387	Dumfries	Y	2650798	Dumfries	Dumfries		55.06959	-3.61139	P	PPLA2	GB		SCT	U2			0		21	Europe/London	2011-03-03
+013873	Langholm	Y	2644927	Langholm	Langholm		55.15101	-2.99889	P	PPL	GB		SCT	U2	16UD		2213		80	Europe/London	2011-03-03
+013883	Bishop Auckland	Y	2655583	Bishop Auckland	Bishop Auckland	Bishop Auckland,Bishop-Oklend,Бишоп-Окленд	54.65554	-1.67706	P	PPL	GB		ENG	D8	00EJ006		25665		110	Europe/London	2011-03-03
+013884	Bishop Auckland	Y	2655583	Bishop Auckland	Bishop Auckland	Bishop Auckland,Bishop-Oklend,Бишоп-Окленд	54.65554	-1.67706	P	PPL	GB		ENG	D8	00EJ006		25665		110	Europe/London	2011-03-03
+013886	Bishop Auckland	Y	2655583	Bishop Auckland	Bishop Auckland	Bishop Auckland,Bishop-Oklend,Бишоп-Окленд	54.65554	-1.67706	P	PPL	GB		ENG	D8	00EJ006		25665		110	Europe/London	2011-03-03
+013887	Bishop Auckland	Y	2655583	Bishop Auckland	Bishop Auckland	Bishop Auckland,Bishop-Oklend,Бишоп-Окленд	54.65554	-1.67706	P	PPL	GB		ENG	D8	00EJ006		25665		110	Europe/London	2011-03-03
+013888	Bishop Auckland	Y	2655583	Bishop Auckland	Bishop Auckland	Bishop Auckland,Bishop-Oklend,Бишоп-Окленд	54.65554	-1.67706	P	PPL	GB		ENG	D8	00EJ006		25665		110	Europe/London	2011-03-03
+013889	Stanhope	Y	2637078	Stanhope	Stanhope	Stanhope	54.75	-2.01667	P	PPL	GB		ENG	D8			1681		208	Europe/London	2012-01-17
+013882	Stanhope	Y	2637078	Stanhope	Stanhope	Stanhope	54.75	-2.01667	P	PPL	GB		ENG	D8			1681		208	Europe/London	2012-01-17
+013885	Stanhope	Y	2637078	Stanhope	Stanhope	Stanhope	54.75	-2.01667	P	PPL	GB		ENG	D8			1681		208	Europe/London	2012-01-17
+01389	Dumbarton	Y	2650802	Dumbarton	Dumbarton	Dambarton,Dumbarton,Дамбартон	55.94433	-4.57061	P	PPLA2	GB		SCT	W7			19878		4	Europe/London	2011-03-03
+01392	Exeter	Y	2649808	Exeter	Exeter	Ehkseter,Exeter,Exonia,Karesk,ai xi te,aksytr,ekuseta,xek se texr,xek si texr,Эксетер,إكسيتر,เอกเซเตอร์,เอ็กซีเตอร์,エクセター,艾希特	50.7236	-3.52751	P	PPLA2	GB		ENG	D4	18UC		113118		46	Europe/London	2010-10-08
+01394	Felixstowe	Y	2649579	Felixstowe	Felixstowe	Felixstowe	51.96375	1.3511	P	PPL	GB		ENG	N5	42UG		29349		22	Europe/London	2011-03-03
+01395	Budleigh Salterton	Y	2654376	Budleigh Salterton	Budleigh Salterton	Budleigh,Budleigh Salterton	50.62983	-3.32181	P	PPL	GB		ENG	D4	18UB		4908		22	Europe/London	2011-03-03
+01397	Fort William	Y	2649169	Fort William	Fort William	An Gearasdan,Fort Vil'jam,Fort William,Форт Вильям,פורט ויליאם	56.81648	-5.11208	P	PPL	GB		SCT	V3	2646086		9652		24	Europe/London	2010-04-08
+01398	Dulverton	Y	2650804	Dulverton	Dulverton	Dulverton	51.04007	-3.55035	P	PPL	GB		ENG	M3	40UF		0		144	Europe/London	2011-03-03
+01400	Honington	Y	2646660	Honington	Honington		52.97831	-0.59584	P	PPL	GB		ENG	H7	32UG		0		61	Europe/London	2010-05-24
+01403	Horsham	Y	2646557	Horsham	Horsham	Horsham,Khorshehm,West Horsham,Хоршэм	51.06395	-0.32719	P	PPL	GB		ENG	P6	45UF		50680		51	Europe/London	2011-02-05
+01404	Honiton	Y	2646658	Honiton	Honiton	Honiton	50.7996	-3.18899	P	PPL	GB		ENG	D4	18UB		11463		113	Europe/London	2011-03-03
+01405	Goole	Y	2648319	Goole	Goole		53.71667	-0.86667	P	PPLA3	GB		ENG	E1	00FB059		19158		3	Europe/London	2011-07-31
+01406	Holbeach	Y	2646787	Holbeach	Holbeach		52.80401	0.01442	P	PPL	GB		ENG	H7	32UF		7408		6	Europe/London	2010-05-24
+01407	Holyhead	Y	2646686	Holyhead	Holyhead	Caergybi,Holyhead	53.30621	-4.63211	P	PPLA3	GB		WLS	X1	00NA010		11362		8	Europe/London	2011-07-31
+01408	Golspie	Y	2648341	Golspie	Golspie	Golspie	57.97266	-3.97798	P	PPL	GB		SCT	V3			1381		7	Europe/London	2011-03-03
+01409	Holsworthy	Y	2646704	Holsworthy	Holsworthy		50.81196	-4.35383	P	PPL	GB		ENG	D4	18UK		2306		138	Europe/London	2011-03-03
+0141	Glasgow	N	2648579	Glasgow	Glasgow	GLA,Glaschu,Glaschú,Glasgovia,Glasgovo,Glasgow,Glaskobe,Glazgas,Glazgo,Glazgou,Glazgov,Glazgova,Glesca,Glāzgova,ge la si ge,geullaeseugo,glasago,glasgw,glasgwv,glazgo,gurasugo,klas kow,Γλασκώβη,Глазго,Глазгов,Глазгоу,גלאזגו,گلاسگو,گلاسگوۋ,ग्लासगो,กลาสโกว์,გლაზგო,グラスゴー,格拉斯哥,글래스고	55.86515	-4.25763	P	PPLA2	GB		SCT	V2			610268		40	Europe/London	2011-06-16
+01420	Alton	Y	2657408	Alton	Alton	Alton	51.14931	-0.97469	P	PPL	GB		ENG	F2	24UC		16584		104	Europe/London	2010-08-03
+01422	Halifax	Y	2647632	Halifax	Halifax	Galifaks,Halifax,Галифакс	53.71667	-1.85	P	PPLA2	GB		ENG	C2			82624		150	Europe/London	2010-10-16
+014233	Boroughbridge	Y	2655173	Boroughbridge	Boroughbridge		54.0895	-1.4011	P	PPL	GB		ENG	J7	36UD		3385		23	Europe/London	2010-05-24
+014234	Boroughbridge	Y	2655173	Boroughbridge	Boroughbridge		54.0895	-1.4011	P	PPL	GB		ENG	J7	36UD		3385		23	Europe/London	2010-05-24
+014239	Boroughbridge	Y	2655173	Boroughbridge	Boroughbridge		54.0895	-1.4011	P	PPL	GB		ENG	J7	36UD		3385		23	Europe/London	2010-05-24
+014232	Harrogate	Y	2647428	Harrogate	Harrogate	Harrogate,Kharrogejt,Харрогейт	53.99078	-1.5373	P	PPL	GB		ENG	J7	36UD		87024		127	Europe/London	2011-03-03
+014235	Harrogate	Y	2647428	Harrogate	Harrogate	Harrogate,Kharrogejt,Харрогейт	53.99078	-1.5373	P	PPL	GB		ENG	J7	36UD		87024		127	Europe/London	2011-03-03
+014236	Harrogate	Y	2647428	Harrogate	Harrogate	Harrogate,Kharrogejt,Харрогейт	53.99078	-1.5373	P	PPL	GB		ENG	J7	36UD		87024		127	Europe/London	2011-03-03
+014237	Harrogate	Y	2647428	Harrogate	Harrogate	Harrogate,Kharrogejt,Харрогейт	53.99078	-1.5373	P	PPL	GB		ENG	J7	36UD		87024		127	Europe/London	2011-03-03
+014238	Harrogate	Y	2647428	Harrogate	Harrogate	Harrogate,Kharrogejt,Харрогейт	53.99078	-1.5373	P	PPL	GB		ENG	J7	36UD		87024		127	Europe/London	2011-03-03
+01424	Hastings	Y	2647356	Hastings	Hastings	Gastings,Hastings,Khejstings,hystnghs,Гастингс,Хейстингс,هيستنغس	50.85519	0.57292	P	PPL	GB		ENG	E2	21UD		89100		29	Europe/London	2011-05-17
+01425	Ringwood	Y	2639334	Ringwood	Ringwood		50.8465	-1.79214	P	PPL	GB		ENG	F2	24UJ		13685		17	Europe/London	2011-03-03
+01427	Gainsborough	Y	2648945	Gainsborough	Gainsborough	Gainesborough,Gainsborough	53.38333	-0.76667	P	PPL	GB		ENG	H7	32UH		19871		11	Europe/London	2012-01-17
+01428	Haslemere	Y	2647365	Haslemere	Haslemere		51.09015	-0.70785	P	PPL	GB		ENG	N7	43UL		11923		157	Europe/London	2010-05-24
+01429	Hartlepool	Y	2647400	Hartlepool	Hartlepool	Hartlepool,Khartlpul,Хартлпул	54.68611	-1.2125	P	PPLA2	GB		ENG	F5			86713		14	Europe/London	2010-10-16
+014306	Market Weighton	Y	2643021	Market Weighton	Market Weighton		53.8631	-0.66505	P	PPL	GB		ENG	E1	00FB093		4712		26	Europe/London	2011-03-03
+014307	Market Weighton	Y	2643021	Market Weighton	Market Weighton		53.8631	-0.66505	P	PPL	GB		ENG	E1	00FB093		4712		26	Europe/London	2011-03-03
+014308	Market Weighton	Y	2643021	Market Weighton	Market Weighton		53.8631	-0.66505	P	PPL	GB		ENG	E1	00FB093		4712		26	Europe/London	2011-03-03
+014309	Market Weighton	Y	2643021	Market Weighton	Market Weighton		53.8631	-0.66505	P	PPL	GB		ENG	E1	00FB093		4712		26	Europe/London	2011-03-03
+014302	North Cave	Y	2641404	North Cave	North Cave		53.78012	-0.64965	P	PPLA3	GB		ENG	E1	00FB102		0		16	Europe/London	2011-07-31
+014303	North Cave	Y	2641404	North Cave	North Cave		53.78012	-0.64965	P	PPLA3	GB		ENG	E1	00FB102		0		16	Europe/London	2011-07-31
+014304	North Cave	Y	2641404	North Cave	North Cave		53.78012	-0.64965	P	PPLA3	GB		ENG	E1	00FB102		0		16	Europe/London	2011-07-31
+014305	North Cave	Y	2641404	North Cave	North Cave		53.78012	-0.64965	P	PPLA3	GB		ENG	E1	00FB102		0		16	Europe/London	2011-07-31
+01431	Helmsdale	Y	2647152	Helmsdale	Helmsdale	Helmsdale	58.11683	-3.65335	P	PPL	GB		SCT	V3			637		12	Europe/London	2011-03-03
+01432	Hereford	Y	2647074	Hereford	Hereford	Henffordd,Hereford,Khereforde,Херефорде	52.05684	-2.71482	P	PPLA2	GB		ENG	F7	00GA240		58281		61	Europe/London	2011-03-03
+01433	Hathersage	Y	2647338	Hathersage	Hathersage	Hathersage	53.3303	-1.65398	P	PPL	GB		ENG	D3	17UF		1617		160	Europe/London	2011-03-03
+014342	Bellingham	Y	2655958	Bellingham	Bellingham	Bellingham	55.14464	-2.25383	P	PPL	GB		ENG	J6	00EM018		0		123	Europe/London	2011-07-29
+014344	Bellingham	Y	2655958	Bellingham	Bellingham	Bellingham	55.14464	-2.25383	P	PPL	GB		ENG	J6	00EM018		0		123	Europe/London	2011-07-29
+014349	Bellingham	Y	2655958	Bellingham	Bellingham	Bellingham	55.14464	-2.25383	P	PPL	GB		ENG	J6	00EM018		0		123	Europe/London	2011-07-29
+014343	Haltwhistle	Y	2647593	Haltwhistle	Haltwhistle		54.97101	-2.45682	P	PPLA3	GB		ENG	J6	00EM065		3896		124	Europe/London	2011-07-31
+014345	Haltwhistle	Y	2647593	Haltwhistle	Haltwhistle		54.97101	-2.45682	P	PPLA3	GB		ENG	J6	00EM065		3896		124	Europe/London	2011-07-31
+014346	Hexham	Y	2647007	Hexham	Hexham	Hexham	54.96986	-2.104	P	PPL	GB		ENG	J6	00EM080		10920		61	Europe/London	2011-03-03
+014347	Hexham	Y	2647007	Hexham	Hexham	Hexham	54.96986	-2.104	P	PPL	GB		ENG	J6	00EM080		10920		61	Europe/London	2011-03-03
+014348	Hexham	Y	2647007	Hexham	Hexham	Hexham	54.96986	-2.104	P	PPL	GB		ENG	J6	00EM080		10920		61	Europe/London	2011-03-03
+01435	Heathfield	Y	2647218	Heathfield	Heathfield		50.96718	0.25612	P	PPL	GB		ENG	E2	21UH		1001		148	Europe/London	2012-03-29
+01436	Helensburgh	Y	2647178	Helensburgh	Helensburgh	Helensburgh	56.00614	-4.72648	P	PPL	GB		SCT	T8			14108		27	Europe/London	2011-03-03
+014372	Clynderwen	Y	2652725	Clunderwen	Clunderwen	Clunderwen,Clynderwen	51.84056	-4.73167	P	PPL	GB	GB	WLS	X7			0		67	Europe/London	2012-01-17
+014373	Clynderwen	Y	2652725	Clunderwen	Clunderwen	Clunderwen,Clynderwen	51.84056	-4.73167	P	PPL	GB	GB	WLS	X7			0		67	Europe/London	2012-01-17
+014374	Clynderwen	Y	2652725	Clunderwen	Clunderwen	Clunderwen,Clynderwen	51.84056	-4.73167	P	PPL	GB	GB	WLS	X7			0		67	Europe/London	2012-01-17
+014375	Clynderwen	Y	2652725	Clunderwen	Clunderwen	Clunderwen,Clynderwen	51.84056	-4.73167	P	PPL	GB	GB	WLS	X7			0		67	Europe/London	2012-01-17
+014376	Haverfordwest	Y	2647311	Haverfordwest	Haverfordwest	Hwlffordd	51.80169	-4.96914	P	PPLA2	GB		WLS	Y7	00NS022		13469		17	Europe/London	2012-03-29
+014377	Haverfordwest	Y	2647311	Haverfordwest	Haverfordwest	Hwlffordd	51.80169	-4.96914	P	PPLA2	GB		WLS	Y7	00NS022		13469		17	Europe/London	2012-03-29
+014378	Haverfordwest	Y	2647311	Haverfordwest	Haverfordwest	Hwlffordd	51.80169	-4.96914	P	PPLA2	GB		WLS	Y7	00NS022		13469		17	Europe/London	2012-03-29
+014379	Haverfordwest	Y	2647311	Haverfordwest	Haverfordwest	Hwlffordd	51.80169	-4.96914	P	PPLA2	GB		WLS	Y7	00NS022		13469		17	Europe/London	2012-03-29
+01438	Stevenage	Y	2636940	Stevenage	Stevenage	Stevenage,Stivenedzh,Стивенедж	51.90224	-0.20256	P	PPL	GB		ENG	F8	26UH		84651		95	Europe/London	2010-08-03
+01439	Helmsley	Y	2647149	Helmsley	Helmsley		54.24577	-1.05683	P	PPL	GB		ENG	J7	36UF		1594		55	Europe/London	2010-12-09
+01440	Haverhill	Y	2647310	Haverhill	Haverhill		52.08226	0.43891	P	PPL	GB		ENG	N5	42UF		22500		70	Europe/London	2011-03-03
+01442	Hemel Hempstead	Y	2647138	Hemel Hempstead	Hemel Hempstead	Hemel,Hemel Hempstead	51.75369	-0.47517	P	PPL	GB		ENG	F8	26UC		85629		88	Europe/London	2011-03-03
+01443	Pontypridd	Y	2640104	Pontypridd	Pontypridd	Pontiprite,Pontypridd,Понтиприте	51.6021	-3.34211	P	PPL	GB		WLS	Y9	00PF023		30420		68	Europe/London	2011-03-03
+01444	Haywards Heath	Y	2647248	Haywards Heath	Haywards Heath	Baywards Heath,Haywards Heath	50.99769	-0.10313	P	PPL	GB		ENG	P6	45UG		29660		78	Europe/London	2011-02-06
+01445	Gairloch	Y	2648941	Gairloch	Gairloch		57.72029	-5.67924	P	PPL	GB		SCT	V3			0		131	Europe/London	2007-11-12
+01446	Barry	Y	2656235	Barry	Barry	Barri,Barry,Y Barri,Барри	51.40667	-3.26944	P	PPLA2	GB		WLS	Z3			51681		36	Europe/London	2011-10-14
+01449	Stowmarket	Y	2636749	Stowmarket	Stowmarket		52.18893	0.99774	P	PPL	GB		ENG	N5	42UE		15394		32	Europe/London	2010-05-24
+01450	Hawick	Y	2647297	Hawick	Hawick	Haaick,Hamhaig	55.42273	-2.78666	P	PPL	GB		SCT	T9			14053		116	Europe/London	2012-03-29
+01451	Stow-on-the-Wold	Y	2636748	Stow on the Wold	Stow on the Wold	Stow on the Wold	51.93008	-1.72382	P	PPL	GB		ENG	E6	23UC		2120		235	Europe/London	2010-08-03
+01452	Gloucester	Y	2648404	Gloucester	Gloucester	Caerloyw,Gloster,Gloucester,ge luo si te,ghlwshstr,gurosuta,Глостер,غلوشستر,グロスター,格洛斯特	51.86568	-2.2431	P	PPLA2	GB		ENG	E6	23UE		128721		24	Europe/London	2010-10-16
+01453	Dursley	Y	2650613	Dursley	Dursley	Dursley	51.68139	-2.35333	P	PPL	GB		ENG	E6	23UF		13652		73	Europe/London	2012-01-17
+01454	Chipping Sodbury	Y	2653137	Chipping Sodbury	Chipping Sodbury		51.53813	-2.39379	P	PPL	GB		ENG	M6	00HD034		36108		99	Europe/London	2011-03-03
+01455	Hinckley	Y	2646867	Hinckley	Hinckley	Hinckley,Khinkli,Хинкли	52.5389	-1.37613	P	PPL	GB		ENG	H5	31UE		45130		113	Europe/London	2011-03-03
+01456	Glenurquhart	Y		Glenurquhart	Glenurquhart		57.62739	-4.11306
+01457	Glossop	Y	2648405	Glossop	Glossop	Glossop	53.44325	-1.949	P	PPL	GB		ENG	D3	17UH		33243		156	Europe/London	2011-03-03
+01458	Glastonbury	Y	2648559	Glastonbury	Glastonbury	Glastonbury,glstwnbwry,גלסטונבורי	51.14729	-2.71797	P	PPL	GB		ENG	M3	40UB		8617		20	Europe/London	2011-03-03
+01460	Chard	Y	2653346	Chard	Chard	Chard	50.8727	-2.96597	P	PPL	GB		ENG	M3	40UD		12275		118	Europe/London	2011-03-03
+01461	Gretna	Y	2647910	Gretna	Gretna		54.9938	-3.06594	P	PPL	GB		SCT	U2	16UD		2692		17	Europe/London	2011-03-03
+01462	Hitchin	Y	2646826	Hitchin	Hitchin	Hitchin	51.95314	-0.26519	P	PPL	GB		ENG	F8	26UF		33830		70	Europe/London	2011-03-03
+01463	Inverness	Y	2646088	Inverness	Inverness	Inbhir Nis,Innerness,Inverness,Invurnes,aynwrns,in'vu~anesu,yin wei nei si,Инвернесс,Инвърнес,اینورنس,インヴァネス,印威內斯	57.47908	-4.22398	P	PPLA2	GB		SCT	V3			40755		15	Europe/London	2011-03-03
+01464	Insch	Y	2646157	Insch	Insch		57.34273	-2.61321	P	PPL	GB		SCT	T6			1504		129	Europe/London	2011-03-03
+01465	Girvan	Y	2648626	Girvan	Girvan		55.24255	-4.85551	P	PPL	GB		SCT	W4			6821		12	Europe/London	2011-03-03
+01466	Huntly	Y	2646384	Huntly	Huntly	Huntly	57.44741	-2.78608	P	PPL	GB		SCT	T6			4390		127	Europe/London	2011-03-03
+01467	Inverurie	Y	2646073	Inverurie	Inverurie	Inverurie	57.28446	-2.37736	P	PPL	GB		SCT	T6			11323		63	Europe/London	2011-03-03
+01469	Killingholme	Y	2641323	North Killingholme	North Killingholme	Killingholme,North Killingholme	53.58333	-0.26667	P	PPL	GB	GB	ENG	H7	32UH		0		31	Europe/London	2012-01-17
+01470	Isle of Skye - Edinbane	Y	6619382	Edinbane	Edinbane		57.47128	-6.43001	P	PPL	GB		SCT	V3			0		9	Europe/London	2011-03-03
+01471	Isle of Skye - Broadford	Y	2654653	Broadford	Broadford		57.23996	-5.91734	P	PPL	GB		SCT	V3			522		4	Europe/London	2010-04-15
+01472	Grimsby	Y	2647878	Grimsby	Grimsby	Great Grimsby,Grimsby	53.56539	-0.07553	P	PPLA2	GB	GB	ENG	J2	00FC005		0		4	Europe/London	2012-01-07
+01473	Ipswich	Y	2646057	Ipswich	Ipswich	Ipsuich,Ipswich,abswytsh,Ипсуич,إبسويتش	52.05917	1.15545	P	PPLA2	GB		ENG	N5	42UD		143767		18	Europe/London	2010-10-16
+01474	Gravesend	Y	2648187	Gravesend	Gravesend	Gravesend	51.44138	0.37371	P	PPL	GB		ENG	G5	29UG		54263		18	Europe/London	2011-02-05
+01475	Greenock	Y	2647948	Greenock	Greenock	Greenock,Grijnok,Grinok,Грийнок,Гринок	55.94838	-4.76121	P	PPLA2	GB		SCT	V4			43495		12	Europe/London	2011-03-03
+01476	Grantham	Y	2648208	Grantham	Grantham	Grantham,Granty,Гранты	52.91149	-0.64184	P	PPL	GB		ENG	H7	32UG		35720		64	Europe/London	2010-08-03
+01477	Holmes Chapel	Y	2646720	Holmes Chapel	Holmes Chapel		53.2014	-2.35742	P	PPL	GB		ENG	Z7	00EQ066		5795		62	Europe/London	2011-03-03
+01478	Isle of Skye - Portree	Y	2640006	Portree	Portree	Portree	57.41288	-6.19418	P	PPL	GB		SCT	V3			1886		15	Europe/London	2011-03-03
+01479	Grantown-on-Spey	Y	2648205	Grantown on Spey	Grantown on Spey	Grantown,Grantown on Spey	57.31667	-3.61667	P	PPL	GB		SCT	V3			2122		202	Europe/London	2012-01-17
+01480	Huntingdon	Y	2646393	Huntingdon	Huntingdon	Huntingdon	52.33049	-0.18651	P	PPL	GB		ENG	C3	12UE	12UE046	21059		18	Europe/London	2012-01-08
+01481	Guernsey	N		Guernsey	Guernsey		49.4333333	-2.6
+01482	Hull	Y	2645425	Hull	Hull	Hull,Kingston upon Hull,Kingston-apon-Khall,Kingston-upon-Hull,he er,Кингстон-апон-Халл,האל,赫爾	53.7446	-0.33525	P	PPLA2	GB		ENG	G6			302296		8	Europe/London	2010-10-16
+01483	Guildford	Y	2647793	Guildford	Guildford	Gilford,Guildford,Guilford,jylfwrd,Гилфорд,جيلفورد	51.23536	-0.57427	P	PPL	GB		ENG	N7	43UD		71873	45	46	Europe/London	2010-08-03
+01484	Huddersfield	Y	2646458	Huddersfield	Huddersfield	Huddersfield,Khaddersfild,Хаддерсфилд	53.64904	-1.78416	P	PPLA2	GB		ENG	G8	00CZ003		149017		90	Europe/London	2011-03-03
+01485	Hunstanton	Y	2646403	Hunstanton	Hunstanton	Hunstanton	52.95	0.5	P	PPL	GB		ENG	I9	33UE		4605		24	Europe/London	2012-02-01
+01487	Warboys	Y	2634796	Warboys	Warboys	Warboys	52.40352	-0.07931	P	PPL	GB		ENG	C3	12UE		3786		32	Europe/London	2010-08-03
+01488	Hungerford	Y	2646411	Hungerford	Hungerford		51.41513	-1.51556	P	PPL	GB		ENG	P4	00MB032		5048		103	Europe/London	2011-03-05
+01489	Bishops Waltham	Y	2655551	Bishops Waltham	Bishops Waltham		50.95	-1.21667	P	PPL	GB		ENG	F2	24UP		6221		42	Europe/London	2010-05-24
+01490	Corwen	Y	2652302	Corwen	Corwen		52.98005	-3.37736	P	PPL	GB		WLS	X9	00NG008		0		170	Europe/London	2011-03-03
+01491	Henley-on-Thames	Y	2647101	Henley on Thames	Henley on Thames	Henley on Thames	51.53333	-0.9	P	PPL	GB		ENG	K2	38UD		10747		34	Europe/London	2012-01-17
+01492	Colwyn Bay	Y	2652513	Colwyn Bay	Colwyn Bay	Bae Colwyn,Colwyn Bay	53.29483	-3.72674	P	PPL	GB		WLS	X8	00NE009		30829		25	Europe/London	2011-03-03
+01493	Great Yarmouth	Y	2647984	Great Yarmouth	Great Yarmouth	Yarmouth	52.60831	1.73052	P	PPL	GB		ENG	I9	33UD		59601		6	Europe/London	2010-05-24
+01494	High Wycombe	Y	2646914	High Wycombe	High Wycombe	Chepping,High Wycombe,Wycombe	51.62907	-0.74934	P	PPL	GB		ENG	B9	11UF		80357		76	Europe/London	2011-02-16
+01495	Pontypool	Y	2640106	Pontypool	Pontypool	Pont-y-pwl,Pont-y-pŵl	51.70111	-3.04444	P	PPLA2	GB		WLS	Z2			35686		173	Europe/London	2012-03-29
+01496	Port Ellen	Y	2640067	Port Ellen	Port Ellen	Port Eilein,Port Ellen,Port Ilein,Port Ìlein	55.63333	-6.18333	P	PPL	GB		SCT	T8			779		31	Europe/London	2012-01-17
+01497	Hay-on-Wye	Y	
+01499	Inveraray	Y	2646140	Inveraray	Inveraray		56.23052	-5.07474	P	PPL	GB		SCT	T8			568		7	Europe/London	2010-01-20
+01501	Harthill	Y	2647406	Harthill	Harthill	Harthill	55.86667	-3.75	P	PPL	GB		SCT	00			3464		179	Europe/London	2010-08-03
+01502	Lowestoft	Y	2643490	Lowestoft	Lowestoft	Loustoft,Lowestoft,Лоустофт	52.4752	1.75159	P	PPL	GB		ENG	N5	42UH		71479		7	Europe/London	2011-03-03
+01503	Looe	Y	3345093	Looe	Looe		50.35778	-4.45418	P	PPL	GB		ENG	C6	00HE075		5398		40	Europe/London	2010-08-24
+01505	Johnstone	Y	2645951	Johnstone	Johnstone	Johnstone	55.82906	-4.51605	P	PPL	GB		SCT	W2			15705		36	Europe/London	2011-03-03
+01506	Bathgate	Y	2656169	Bathgate	Bathgate	Bathgate	55.90204	-3.64398	P	PPL	GB		SCT	W9			15337		141	Europe/London	2011-03-03
+015074	Alford (Lincs)	Y	2657509	Alford	Alford	Alford	57.23257	-2.70298	P	PPL	GB		SCT	T6			2237		149	Europe/London	2011-10-30
+015078	Alford (Lincs)	Y	2657509	Alford	Alford	Alford	57.23257	-2.70298	P	PPL	GB		SCT	T6			2237		149	Europe/London	2011-10-30
+015079	Alford (Lincs)	Y	2657509	Alford	Alford	Alford	57.23257	-2.70298	P	PPL	GB		SCT	T6			2237		149	Europe/London	2011-10-30
+015073	Louth	Y	2643553	Louth	Louth	Laut,Louth,Лаут	53.36664	-0.00438	P	PPL	GB		ENG	H7	32UC		16635		32	Europe/London	2010-08-03
+015076	Louth	Y	2643553	Louth	Louth	Laut,Louth,Лаут	53.36664	-0.00438	P	PPL	GB		ENG	H7	32UC		16635		32	Europe/London	2010-08-03
+015077	Louth	Y	2643553	Louth	Louth	Laut,Louth,Лаут	53.36664	-0.00438	P	PPL	GB		ENG	H7	32UC		16635		32	Europe/London	2010-08-03
+015072	Spilsby	Y	2637224	Spilsby	Spilsby		53.17363	0.09373	P	PPL	GB		ENG	H7	32UC		2807		50	Europe/London	2010-05-24
+015075	Spilsby	Y	2637224	Spilsby	Spilsby		53.17363	0.09373	P	PPL	GB		ENG	H7	32UC		2807		50	Europe/London	2010-05-24
+01508	Brooke	Y	2654566	Brooke	Brooke		52.64317	-0.74638	P	PPLA3	GB		ENG	L4	00FP010		0		114	Europe/London	2011-07-31
+01509	Loughborough	Y	2643567	Loughborough	Loughborough	Loughborough	52.76667	-1.2	P	PPL	GB		ENG	H5	31UC		59317		49	Europe/London	2012-01-17
+0151	Liverpool	N	2644210	Liverpool	Liverpool	LPL,Learpholl,Lerpwl,Liberpoul,Liverpool,Liverpul,Liverpul',Liverpule,Liverpulis,Liverpūle,Livurpul,Poll a' Ghruthain,li wu pu,libeopul,liwexrphul,lybrpwl,lyfrbwl,lywrpwl,rivu~apuru,Λίβερπουλ,Ливерпул,Ливерпуль,Ливърпул,ליברפול,لىۋېرپۇل,ليفربول,لیورپول,ܠܝܒܪܦܘܠ,ลิเวอร์พูล,ლივერპული,リヴァプール,利物浦,리버풀	53.41058	-2.97794	P	PPLA2	GB		ENG	H8			468945		30	Europe/London	2011-06-16
+01520	Lochcarron	Y	2643842	Lochcarron	Lochcarron	Jean Town,Lochcarron	57.39833	-5.49895	P	PPL	GB		SCT	V3			0		11	Europe/London	2011-03-03
+01522	Lincoln	Y	2644487	Lincoln	Lincoln	Lincoln,Linkol'n,lingkeon,rinkan,Линкольн,リンカン,링컨	53.22683	-0.53792	P	PPLA2	GB		ENG	H7	32UD		89228		9	Europe/London	2011-03-03
+01524	Lancaster	Y	2644972	Lancaster	Lancaster	Lancaster,Lankaster,Ланкастер	54.06667	-2.83333	P	PPL	GB		ENG	H2	30UH		47162		8	Europe/London	2012-01-17
+015242	Hornby	Y	2646596	Hornby	Hornby		54.43333	-1.43333	P	PPL	GB		ENG	J7	36UC		0		58	Europe/London	2010-05-24 2646597	Hornby	Hornby	Hornby	54.33333	-1.66667	P	PPL	GB		ENG	J7	36UE		0		83	Europe/London	2012-01-17
+01525	Leighton Buzzard	Y	2644652	Leighton Buzzard	Leighton Buzzard		51.91722	-0.65802	P	PPL	GB		ENG	Z6	00KC042		33467		97	Europe/London	2011-03-03
+01526	Martin	Y	2642958	Martin	Martin	Martin	50.96667	-1.9	P	PPL	GB		ENG	F2	24UJ		0		75	Europe/London	2012-02-01
+01527	Redditch	Y	2639557	Redditch	Redditch	Radditch,Redditch,reditchi,Реддитч,レディッチ	52.3065	-1.94569	P	PPL	GB		ENG	Q4	47UD		77128		115	Europe/London	2011-03-03
+01528	Laggan	Y	2645046	Laggan	Laggan		57.03333	-4.26667	P	PPL	GB		SCT	V3			0		414	Europe/London	2004-10-19
+01529	Sleaford	Y	2637659	Sleaford	Sleaford	Sleaford	52.99826	-0.40941	P	PPL	GB		ENG	H7	32UE		15558		17	Europe/London	2010-08-03
+01530	Coalville	Y	2652698	Coalville	Coalville	Coalville	52.71667	-1.36667	P	PPL	GB		ENG	H5	6896157		33288		161	Europe/London	2012-01-17
+01531	Ledbury	Y	2644707	Ledbury	Ledbury		52.03639	-2.42635	P	PPLA3	GB		ENG	F7	00GA116		8680		67	Europe/London	2011-07-31
+01534	Jersey	N	
+01535	Keighley	Y	2645889	Keighley	Keighley	Keighley,Kejli,Кейли	53.86791	-1.90664	P	PPLA3	GB		ENG	B4	00CX009		50171		108	Europe/London	2011-07-31
+01536	Kettering	Y	2645753	Kettering	Kettering	Kettering,Кеттеринг	52.39836	-0.72571	P	PPL	GB		ENG	J1	34UE		53329		95	Europe/London	2011-03-03
+01538	Ipstones	Y	2646058	Ipstones	Ipstones	Ipstones	53.04683	-1.97016	P	PPL	GB		ENG	M9	41UH		0		258	Europe/London	2011-03-03
+01539	Kendal	Y	2645826	Kendal	Kendal	Kendal,Kendall,Кендал	54.32681	-2.74757	P	PPL	GB		ENG	C9	16UG		29468		55	Europe/London	2011-01-29
+015394	Hawkshead	Y	2647285	Hawkshead	Hawkshead	Hawkshead	54.37503	-2.999	P	PPL	GB		ENG	C9	16UG		0		78	Europe/London	2011-03-03
+015395	Grange-over-Sands	Y	6931071	Grange-over-Sands	Grange-over-Sands		54.19647	-2.90433	P	PPL	GB		ENG	C9	16UG		4042		13	Europe/London	2011-03-03
+015396	Sedbergh	Y	2638262	Sedbergh	Sedbergh		54.32123	-2.52514	P	PPL	GB		ENG	C9	16UG		0		134	Europe/London	2010-05-24
+01540	Kingussie	Y	2645409	Kingussie	Kingussie	Kingussie	57.07996	-4.05231	P	PPL	GB		SCT	V3			1442		235	Europe/London	2011-03-03
+01542	Keith	Y	2645880	Keith	Keith	Keith,Kieth	57.53633	-2.94811	P	PPL	GB		SCT	V6			4396		152	Europe/London	2010-08-09
+01543	Cannock	Y	2653883	Cannock	Cannock	Cannock,Kannok,Каннок	52.69045	-2.03085	P	PPL	GB		ENG	M9	41UB		68067		154	Europe/London	2011-03-03
+01544	Kington	Y	2645411	Kington	Kington	Ceintun,Kington	52.2	-2.01667	P	PPL	GB		ENG	Q4	47UF		2655		59	Europe/London	2012-01-17
+01545	Llanarth	Y	
+01546	Lochgilphead	Y	2643825	Lochgilphead	Lochgilphead		56.03796	-5.43206	P	PPLA2	GB		SCT	T8			2272		8	Europe/London	2011-03-03
+01547	Knighton	Y	2645155	Knighton	Knighton	Knighton,Trefyclo	52.35	-3.05	P	PPL	GB		ENG	L6			2773		283	Europe/London	2012-01-17
+01548	Kingsbridge	Y	2645486	Kingsbridge	Kingsbridge	Kingsbridge	50.28451	-3.77638	P	PPL	GB		ENG	D4	18UG		5644		7	Europe/London	2010-08-03
+01549	Lairg	Y	2645027	Lairg	Lairg	Lairg	58.02369	-4.39958	P	PPL	GB		SCT	V3			0		95	Europe/London	2011-03-03
+01550	Llandovery	Y	2644127	Llandovery	Llandovery	Llandovery,Llanymddyfri	51.99415	-3.79637	P	PPL	GB		WLS	X7	00NU027		2260		68	Europe/London	2011-03-03
+01553	Kings Lynn	Y	2645456	King's Lynn	King's Lynn	Kings Lynn,Kingslinn,Lynn,Lynn Regis,Кингслинн	52.75172	0.39516	P	PPL	GB	GB	ENG	I9	33UE		34564		10	Europe/London	2010-12-08
+01554	Llanelli	Y	2644100	Llanelli	Llanelli	Llanelli,Llanelly,Лланелли	51.68195	-4.16191	P	PPL	GB		WLS	X7	00NU032		47206		13	Europe/London	2011-03-03
+01555	Lanark	Y	2644976	Lanark	Lanark		55.67371	-3.7817	P	PPL	GB		SCT	00			8151		199	Europe/London	2007-01-21
+01556	Castle Douglas	Y	2653590	Castle Douglas	Castle Douglas	Castle Douglas	54.94095	-3.92784	P	PPL	GB		SCT	U2			3631		59	Europe/London	2011-03-03
+01557	Kirkcudbright	Y	2645287	Kirkcudbright	Kirkcudbright	Kircudbright,Kirkcudbright	54.8383	-4.04908	P	PPL	GB		SCT	U2			3367		4	Europe/London	2011-03-03
+01558	Llandeilo	Y	2644135	Llandeilo	Llandeilo	Llandeilo,Llandilo	51.88459	-3.99154	P	PPL	GB		WLS	X7	00NU026		1750		59	Europe/London	2011-03-03
+01559	Llandysul	Y	2644107	Llandysul	Llandysul	Llandyssil,Llandyssul	52.04166	-4.30909	P	PPL	GB		WLS	X7			2902		80	Europe/London	2012-04-12
+01560	Moscow	Y	
+01561	Laurencekirk	Y	2644809	Laurencekirk	Laurencekirk	Laurencekirk	56.83338	-2.4654	P	PPL	GB		SCT	T6			1916		85	Europe/London	2011-03-03
+01562	Kidderminster	Y	2645724	Kidderminster	Kidderminster	Kidderminster	52.38819	-2.25	P	PPL	GB		ENG	Q4	47UG		56657		37	Europe/London	2011-03-03
+01563	Kilmarnock	Y	2645605	Kilmarnock	Kilmarnock	Cill Mhearnag,Cill Mheàrnag,Kilmarnok,Килмарнок	55.61171	-4.49581	P	PPLA2	GB		SCT	U4			42904		39	Europe/London	2010-10-16
+01564	Lapworth	Y	2644868	Lapworth	Lapworth	Lapworth	52.33649	-1.76116	P	PPL	GB		ENG	P3	44UF		0		128	Europe/London	2010-08-03
+01565	Knutsford	Y	2645093	Knutsford	Knutsford		53.30289	-2.37482	P	PPL	GB		ENG	Z7	00EQ072		12938		68	Europe/London	2011-03-03
+01566	Launceston	Y	2644811	Launceston	Launceston		50.63699	-4.36006	P	PPLA3	GB		ENG	C6	00HE068		7294		135	Europe/London	2011-07-31
+01567	Killin	Y	2645632	Killin	Killin	Killin	56.46667	-4.31667	P	PPL	GB		SCT	W6			666		116	Europe/London	2012-01-17
+01568	Leominster	Y	2644613	Leominster	Leominster	Llanllieni	52.22652	-2.73907	P	PPL	GB		ENG	F7	00GA119		10673		80	Europe/London	2011-09-19
+01569	Stonehaven	Y	2636814	Stonehaven	Stonehaven		56.96365	-2.21177	P	PPL	GB		SCT	T6			9592		11	Europe/London	2007-10-09
+01570	Lampeter	Y	2644981	Lampeter	Lampeter	Lampeter,Llanbedr Pont Steffan	52.11285	-4.08039	P	PPL	GB		WLS	X6	00NQ014		2926		123	Europe/London	2011-03-03
+01571	Lochinver	Y	2643818	Lochinver	Lochinver	Lochinver	58.1486	-5.24075	P	PPL	GB		SCT	V3			0		5	Europe/London	2011-03-03
+01572	Oakham	Y	2641128	Oakham	Oakham		52.66667	-0.73333	P	PPLA2	GB		ENG	L4			10150		111	Europe/London	2010-10-16
+01573	Kelso	Y	2645849	Kelso	Kelso	Kelso	55.59814	-2.43382	P	PPL	GB		SCT	T9	00EM033		5154		40	Europe/London	2010-08-03
+01575	Kirriemuir	Y	2645191	Kirriemuir	Kirriemuir	Kirriemuir	56.67398	-3.00343	P	PPL	GB		SCT	T7			6108		133	Europe/London	2011-03-03
+01576	Lockerbie	Y	2643791	Lockerbie	Lockerbie	Lockerbie,Lokerbi,lwkrby,lxk ke xrbi,lxkh ke xrbi,Локерби,لوكربي,ล็อกเกอร์บี,ล็อคเกอร์บี	55.12302	-3.35635	P	PPL	GB		SCT	U2	16UB		3985		85	Europe/London	2011-03-03
+01577	Kinross	Y	2645365	Kinross	Kinross	Kinross	56.20466	-3.42138	P	PPL	GB		SCT	W1			4691		121	Europe/London	2011-03-03
+01578	Lauder	Y	2644818	Lauder	Lauder	Lauder	55.71908	-2.74755	P	PPL	GB		SCT	T9			1078		184	Europe/London	2011-03-03
+01579	Liskeard	Y	2644409	Liskeard	Liskeard	Liskeard	50.4545	-4.46517	P	PPL	GB		ENG	C6	00HE074		8667		129	Europe/London	2011-03-03
+01580	Cranbrook	Y	2652088	Cranbrook	Cranbrook		51.09662	0.53567	P	PPL	GB		ENG	G5	29UQ		4319		77	Europe/London	2011-02-03
+01581	New Luce	Y	2641622	New Luce	New Luce		54.94258	-4.85074	P	PPL	GB		SCT	U2			0		51	Europe/London	2011-03-03
+01582	Luton	Y	2643338	Luton Hoo	Luton Hoo	Luton Hoo	51.85	-0.4	S	EST	GB		ENG	00			0		168	Europe/London	2012-01-17 2643339	Luton	Luton	Luton,Лутон	51.87967	-0.41748	P	PPLA2	GB		ENG	I1	00KC039		193669		117	Europe/London	2010-10-16
+01583	Carradale	Y	2653694	Carradale	Carradale	Carradale	55.58926	-5.47197	P	PPL	GB		SCT	T8			497		21	Europe/London	2011-03-03
+01584	Ludlow	Y	2643425	Ludlow	Ludlow	Llwydlo,Ludlow	52.37431	-2.71311	P	PPL	GB		ENG	L6	00GG113		9761		117	Europe/London	2011-03-03
+01586	Campbeltown	Y	2653915	Campbeltown	Campbeltown	Campbeltown	55.42583	-5.60764	P	PPL	GB		SCT	T8			4939		5	Europe/London	2011-03-03
+01588	Bishops Castle	Y	2655572	Bishops Castle	Bishops Castle		52.49208	-3.0021	P	PPL	GB		ENG	L6			0		200	Europe/London	2010-04-14
+01590	Lymington	Y	2643312	Lymington	Lymington	Lymington	50.75767	-1.5443	P	PPL	GB		ENG	F2	24UJ		14544		22	Europe/London	2011-03-03
+01591	Llanwrtyd Wells	Y	2643905	Llanwrtyd Wells	Llanwrtyd Wells	Llanwrtyd,Llanwrtyd Wells	52.10659	-3.63924	P	PPL	GB		WLS	Y8	00NN077		0		199	Europe/London	2011-03-03
+01592	Kirkcaldy	Y	2645298	Kirkcaldy	Kirkcaldy	Kirkcaldy,Kirkcaudy	56.10982	-3.16149	P	PPL	GB		SCT	V1			46912		25	Europe/London	2011-03-03
+01593	Lybster	Y	2643331	Lybster	Lybster	Lybster	58.29894	-3.28464	P	PPL	GB		SCT	V3			0		59	Europe/London	2011-03-03
+01594	Lydney	Y	2643318	Lydney	Lydney	Lydney	51.72598	-2.52605	P	PPL	GB		ENG	E6	23UD		9160		16	Europe/London	2011-03-03
+0159575	Lerwick Foula	Y	
+0159576	Fair Isle	Y	
+01597	Llandrindod Wells	Y	2644122	Llandrindod Wells	Llandrindod Wells		52.24164	-3.37868	P	PPLA2	GB		WLS	Y8	00NN047		5350		216	Europe/London	2011-03-03
+01598	Lynton	Y	2643285	Lynton	Lynton	Linton,Lynton	51.22949	-3.83547	P	PPL	GB		ENG	D4	18UE		0		134	Europe/London	2010-08-03
+01599	Kyle	Y	
+01600	Monmouth	Y	2642313	Monmouth	Monmouth	Monmouth,Monmut,Trefynwy,Монмут	51.81265	-2.71363	P	PPL	GB		WLS	Y4	00PP025		8547		27	Europe/London	2011-09-19
+01603	Norwich	Y	2641181	Norwich	Norwich	Noridzh,Norwich,nwrwytsh,Норидж,نورويتش	52.62783	1.29834	P	PPLA2	GB		ENG	I9	33UG		177636		19	Europe/London	2010-10-16
+01604	Northampton	Y	2641430	Northampton	Northampton	Nortgempton,Northampton,Nortkhempton,Nortkhemptun,Нортгемптон,Нортхемптон,Нортхемптън	52.25	-0.88333	P	PPLA2	GB		ENG	J1	34UF		197322		97	Europe/London	2010-10-16
+01606	Northwich	Y	2641224	Northwich	Northwich	Northwick,Nortvich,Нортвич	53.26138	-2.51225	P	PPL	GB		ENG	Z8	00EW119		42113		18	Europe/London	2011-03-03
+01608	Chipping Norton	Y	2653139	Chipping Norton	Chipping Norton		51.94109	-1.5453	P	PPL	GB		ENG	K2	38UF		5815		205	Europe/London	2011-02-24
+01609	Northallerton	Y	2641435	Northallerton	Northallerton		54.33901	-1.43243	P	PPLA2	GB		ENG	J7	36UC		16480		43	Europe/London	2011-03-03
+0161	Manchester	N	2643123	Manchester	Manchester	MAN,Mamucium,Manceinion,Mancesteris,Manchain,Manchester,Manchestur,Mančesteris,man che si te,manchesuta,mantshstr,mnchstr,mnz'str,Манчестер,Манчестър,מנצ'סטר,مانتشستر,مانچېستېر,منچستر,แมนเชสเตอร์,მანჩესტერი,マンチェスター,曼彻斯特	53.48095	-2.23743	P	PPLA2	GB		ENG	I2			395515		51	Europe/London	2011-06-16
+01620	North Berwick	Y	2641419	North Berwick	North Berwick	North Berwick	56.05825	-2.7229	P	PPL	GB		SCT	U6			6439		8	Europe/London	2011-03-03
+01621	Maldon	Y	2643160	Maldon	Maldon	Malden,Maldon,Meldona,Мелдона	51.7311	0.67463	P	PPL	GB		ENG	E4	22UK		21193		34	Europe/London	2010-08-03
+01622	Maidstone	Y	2643179	Maidstone	Maidstone	Maidstone,Mejdston,Мейдстон	51.26667	0.51667	P	PPLA2	GB		ENG	G5	29UH		90894		9	Europe/London	2010-10-16
+01623	Mansfield	Y	2643097	Mansfield	Mansfield	Mansfield,Mehnsfild,Мэнсфилд	53.13333	-1.2	P	PPL	GB		ENG	J9	37UF		70447		122	Europe/London	2012-01-17
+01624	Isle of Man	Y	
+01625	Macclesfield	Y	2643266	Macclesfield	Macclesfield		53.26023	-2.12564	P	PPL	GB		ENG	Z7	00EQ124		51739		156	Europe/London	2011-03-03
+01626	Newton Abbot	Y	2641557	Newton Abbot	Newton Abbot	Newton Abbot	50.52858	-3.61186	P	PPL	GB		ENG	D4	18UH		25789		14	Europe/London	2011-03-03
+01628	Maidenhead	Y	2643186	Maidenhead	Maidenhead	Maidenhead	51.52279	-0.71986	P	PPLA2	GB		ENG	P9			59463		32	Europe/London	2010-10-16
+01629	Matlock	Y	2642910	Matlock	Matlock		53.13838	-1.5556	P	PPLA2	GB		ENG	D3	17UF		11516		97	Europe/London	2011-03-07
+01630	Market Drayton	Y	2643028	Market Drayton	Market Drayton		52.90538	-2.49012	P	PPLA3	GB		ENG	L6	00GG117		10639		105	Europe/London	2011-07-31
+01631	Oban	Y	2641108	Oban	Oban	An t-Oban,An t-Òban,Oban,Oub"n,Обан,Оубън	56.41269	-5.47062	P	PPL	GB		SCT	T8			8081		11	Europe/London	2011-03-03
+01633	Newport	Y	2641598	Newport	Newport	Casnewydd,N'juport,Newport,Novus Burgus,Ньюпорт	51.58774	-2.99835	P	PPLA2	GB		WLS	Y6			117326		16	Europe/London	2011-09-19
+01634	Medway	Y	
+01635	Newbury	Y	2641689	Newbury	Newbury	N'juberi,Ньюбери	51.40033	-1.32059	P	PPLA2	GB		ENG	P4	00MB062		33065		80	Europe/London	2011-02-23
+01636	Newark	Y	2641731	Newark on Trent	Newark on Trent	Newark,Newark on Trent,Newark upon Trent	53.06667	-0.81667	P	PPL	GB		ENG	J9	37UG		25376		16	Europe/London	2010-08-03
+01637	Newquay	Y	2641589	Newquay	Newquay	Newquay	50.41317	-5.08186	P	PPLA3	GB		ENG	C6	00HE097		19998		38	Europe/London	2011-07-31
+01638	Newmarket	Y	2641616	Newmarket	Newmarket	Newmarket	52.24467	0.40418	P	PPL	GB		ENG	N5	42UC		17324		28	Europe/London	2010-08-03
+01639	Neath	Y	2641843	Neath	Neath	Castell Nedd,Castell-nedd,Neath,Nit,Нит	51.66317	-3.80443	P	PPL	GB		WLS	Y5	00NZ020		46126		13	Europe/London	2011-03-03
+01641	Strathy	Y	2636688	Strathy	Strathy		58.5621	-4.01318	P	PPL	GB		SCT	V3			0		63	Europe/London	2011-03-03
+01642	Middlesbrough	Y	2642607	Middlesbrough	Middlesbrough	Middlebrough,Middlesborough,Middlesbrough,Midulsbro,mydlsbrw,Мидълсбро,מידלסברו	54.57623	-1.23483	P	PPLA2	GB		ENG	I5	00EF019		142707		15	Europe/London	2011-03-03
+01643	Minehead	Y	2642450	Minehead	Minehead	Minehead	51.20565	-3.47875	P	PPL	GB		ENG	M3	40UF		11960		20	Europe/London	2011-03-03
+01644	New Galloway	Y	2641645	New Galloway	New Galloway	Galloway,New Galloway	55.07356	-4.14083	P	PPL	GB		SCT	U2			0		65	Europe/London	2011-03-03
+01646	Milford Haven	Y	2642534	Milford Haven	Milford Haven	Aberdaugleddau,Milford,Milford Haven	51.71278	-5.0341	P	PPL	GB		WLS	Y7	00NS045		12972		33	Europe/London	2011-03-03
+01647	Moretonhampstead	Y	2642201	Moretonhampstead	Moretonhampstead		50.66077	-3.76495	P	PPL	GB		ENG	D4	18UH		0		202	Europe/London	2011-03-03
+01650	Cemmaes Road	Y	2653434	Cemmaes Road	Cemmaes Road	Cemmaes Road,Cemmes Road	52.62395	-3.74509	P	PPL	GB		WLS	Y8	00NN029		0		48	Europe/London	2011-03-03
+01651	Oldmeldrum	Y	2641007	Oldmeldrum	Oldmeldrum	Oldmeldrum	57.33492	-2.3199	P	PPL	GB		SCT	T6			2023		116	Europe/London	2011-03-03
+01652	Brigg	Y	2654721	Brigg	Brigg		53.55201	-0.49214	P	PPL	GB		ENG	J3	00FD010		5988		7	Europe/London	2011-03-03
+01653	Malton	Y	2643142	Malton	Malton	Malton	54.13454	-0.79669	P	PPL	GB		ENG	J7	36UF		5135		24	Europe/London	2011-03-03
+01654	Machynlleth	Y	2643251	Machynlleth	Machynlleth	Machynlleth	52.59097	-3.85051	P	PPL	GB		WLS	Y8	00NN080		2171		17	Europe/London	2011-03-03
+01655	Maybole	Y	2642882	Maybole	Maybole	Maybole	55.35503	-4.68026	P	PPL	GB		SCT	W4			4447		84	Europe/London	2011-03-03
+01656	Bridgend	Y	2654755	Bridgend	Bridgend	Bridgend,Pen-y-bont ar Ogwr	51.50583	-3.57722	P	PPLA2	GB		WLS	X3			39429		23	Europe/London	2012-04-02
+01659	Sanquhar	Y	2638520	Sanquhar	Sanquhar	Sanquhar	55.36527	-3.9216	P	PPL	GB		SCT	U2			1987		141	Europe/London	2011-03-03
+01661	Prudhoe	Y	2639874	Prudhoe	Prudhoe		54.96154	-1.85168	P	PPL	GB		ENG	J6	00EM128		10669		99	Europe/London	2011-03-03
+01663	New Mills	Y	2641612	New Mills	New Mills		53.36592	-1.99986	P	PPL	GB		ENG	D3	17UH		9114		156	Europe/London	2010-05-24
+01664	Melton Mowbray	Y	2642763	Melton Mowbray	Melton Mowbray	Melton Mowbray	52.76588	-0.88693	P	PPL	GB		ENG	H5	31UG		26405		79	Europe/London	2011-03-03
+01665	Alnwick	Y	2657438	Alnwick	Alnwick	Almwick,Alnwick	55.41318	-1.70563	P	PPL	GB		ENG	J6	00EM008		7940		62	Europe/London	2011-03-03
+01666	Malmesbury	Y	2643146	Malmesbury	Malmesbury	Malmesbury,Malmsbury	51.58175	-2.09708	P	PPL	GB		ENG	P8	00HY149		5207		82	Europe/London	2011-03-03
+01667	Nairn	Y	2641910	Nairn	Nairn	Nairn	57.58094	-3.87973	P	PPL	GB		SCT	V3			8551		20	Europe/London	2011-03-03
+01668	Bamburgh	Y	2656425	Bamburgh	Bamburgh	Bamburgh	55.60652	-1.71704	P	PPLA3	GB		ENG	J6	00EM013		0		26	Europe/London	2011-07-31
+01669	Rothbury	Y	2639101	Rothbury	Rothbury		55.31059	-1.90845	P	PPLA3	GB		ENG	J6	00EM132		2007		84	Europe/London	2011-07-31
+01670	Morpeth	Y	2642182	Morpeth	Morpeth		55.16765	-1.6912	P	PPLA2	GB		ENG	J6	00EM110		13857		31	Europe/London	2011-03-03
+01671	Newton Stewart	Y	2641528	Newton Stewart	Newton Stewart		54.95784	-4.48315	P	PPL	GB		SCT	U2			3548		17	Europe/London	2011-03-03
+01672	Marlborough	Y	2643010	Marlborough	Marlborough		51.42062	-1.72751	P	PPLA3	GB		ENG	P8	00HY153		7885		128	Europe/London	2011-07-31
+01673	Market Rasen	Y	2643023	Market Rasen	Market Rasen	Market Rasen	53.38764	-0.33781	P	PPL	GB		ENG	H7	32UH		3569		28	Europe/London	2011-03-03
+01674	Montrose	Y	2642302	Montrose	Montrose	Montrose	56.7	-2.45	P	PPL	GB		SCT	T7			10620		34	Europe/London	2012-01-17
+01675	Coleshill	Y	2652582	Coleshill	Coleshill	Coleshill	52.49997	-1.70722	P	PPL	GB		ENG	P3	44UB		0		97	Europe/London	2011-03-09
+01676	Meriden	Y	2642727	Meriden	Meriden		52.4377	-1.64366	P	PPLA3	GB		ENG	M2	00CT011		1841		121	Europe/London	2011-07-31
+01677	Bedale	Y	2656051	Bedale	Bedale	Bedale	54.28811	-1.59181	P	PPL	GB		ENG	J7	36UC		4537		43	Europe/London	2011-03-03
+01678	Bala	Y	2656615	Bala	Bala		52.91111	-3.59722	P	PPL	GB		WLS	Y2	00NC005		2002		168	Europe/London	2011-03-03
+01680	Isle of Mull - Craignure	Y	2652120	Craignure	Craignure		56.46775	-5.69924	P	PPL	GB		SCT	T8			0		16	Europe/London	2008-05-28
+01681	Isle of Mull - Fionnphort	Y	6695514	Fionnphort	Fionnphort		56.32496	-6.36503	P	PPL	GB		SCT	T8			0		14	Europe/London	2010-05-25
+01683	Moffat	Y	2642384	Moffat	Moffat		55.33227	-3.44542	P	PPL	GB		SCT	U2			2077		109	Europe/London	2007-11-12
+01684	Malvern	Y	7290434	Malvern	Malvern		52.10751	-2.3243	P	PPL	GB		ENG	Q4	47UC		0		111	Europe/London	2010-05-24
+01685	Merthyr Tydfil	Y	2642705	Merthyr Tydfil	Merthyr Tydfil	M"rt"r Tidfil,Merthyr Tudful,Merthyr Tydfil,Mertir Tidfil,Mertir Tidvil,Mertyr Tydfil,Мертир Тидвил,Мертир Тидфил,Мъртър Тидфил	51.74794	-3.37779	P	PPLA2	GB		WLS	Y3	00PH009		30821		186	Europe/London	2011-03-03
+016862	Llanidloes	Y	2643990	Llanidloes	Llanidloes	Llanidloes	52.44977	-3.53997	P	PPL	GB		WLS	Y8	00NN069		2838		169	Europe/London	2011-03-03
+016863	Llanidloes	Y	2643990	Llanidloes	Llanidloes	Llanidloes	52.44977	-3.53997	P	PPL	GB		WLS	Y8	00NN069		2838		169	Europe/London	2011-03-03
+016864	Llanidloes	Y	2643990	Llanidloes	Llanidloes	Llanidloes	52.44977	-3.53997	P	PPL	GB		WLS	Y8	00NN069		2838		169	Europe/London	2011-03-03
+016867	Llanidloes	Y	2643990	Llanidloes	Llanidloes	Llanidloes	52.44977	-3.53997	P	PPL	GB		WLS	Y8	00NN069		2838		169	Europe/London	2011-03-03
+016865	Newtown	Y	2641523	Newtown	Newtown	Newtown,Tre-Newydd,Y Drenewydd	52.51667	-3.3	P	PPL	GB		WLS	Y8			12783		111	Europe/London	2012-03-29
+016866	Newtown	Y	2641523	Newtown	Newtown	Newtown,Tre-Newydd,Y Drenewydd	52.51667	-3.3	P	PPL	GB		WLS	Y8			12783		111	Europe/London	2012-03-29
+016868	Newtown	Y	2641523	Newtown	Newtown	Newtown,Tre-Newydd,Y Drenewydd	52.51667	-3.3	P	PPL	GB		WLS	Y8			12783		111	Europe/London	2012-03-29
+016869	Newtown	Y	2641523	Newtown	Newtown	Newtown,Tre-Newydd,Y Drenewydd	52.51667	-3.3	P	PPL	GB		WLS	Y8			12783		111	Europe/London	2012-03-29
+01687	Mallaig	Y	2643156	Mallaig	Mallaig	Mallaig Beg	57.00293	-5.83082	P	PPL	GB		SCT	V3	2646086		742		11	Europe/London	2010-04-15
+01688	Isle of Mull - Tobermory	Y	2635754	Tobermory	Tobermory		56.62489	-6.06943	P	PPL	GB		SCT	T8			993		57	Europe/London	2010-05-15
+01689	Orpington	Y	2640894	Orpington	Orpington		51.37457	0.09785	P	PPL	GB		ENG	GLA	B8		15248		62	Europe/London	2012-03-29
+01690	Betws-y-Coed	Y	2655793	Betws-y-Coed	Betws-y-Coed	Bettws-y-coed	53.09382	-3.80668	P	PPLA3	GB		WLS	X8	00NE002		1200		30	Europe/London	2011-07-31
+01691	Oswestry	Y	2640861	Oswestry	Oswestry	Croesoswallt,Oswestry	52.86195	-3.05497	P	PPL	GB		ENG	L6	00GG140		17031		136	Europe/London	2011-03-03
+01692	North Walsham	Y	2641233	North Walsham	North Walsham	North Walsham	52.82121	1.38746	P	PPL	GB		ENG	I9	33UF		12109		39	Europe/London	2011-03-03
+01694	Church Stretton	Y	2653021	Church Stretton	Church Stretton	Church Stretton	52.53778	-2.80149	P	PPL	GB		ENG	L6	00GG048		3927		189	Europe/London	2011-03-03
+01695	Skelmersdale	Y	2637752	Skelmersdale	Skelmersdale	Skelmersdale	53.55024	-2.77348	P	PPL	GB		ENG	H2	30UP		38944		71	Europe/London	2011-03-03
+01697	Brampton	Y	2654919	Brampton	Brampton	Brampton,Brampton Grange,Bramptone,Brantone,Brantune,Brauntone	52.32039	-0.22007	P	PPL	GB		ENG	C3	12UE		5001		14	Europe/London	2012-04-12
+016973	Wigton	Y	2633933	Wigton	Wigton		54.82482	-3.16114	P	PPL	GB		ENG	C9	16UB		5479		33	Europe/London	2010-05-24
+016974	Raughton Head	Y	2639601	Raughton	Raughton		54.81989	-2.94961	P	PPL	GB		ENG	C9	16UD		0		109	Europe/London	2011-03-03
+01698	Motherwell	Y	2642135	Motherwell	Motherwell	Mazervell,Мазервелл	55.78924	-3.99187	P	PPLA2	GB		SCT	V8			29908		83	Europe/London	2011-03-03
+01700	Rothesay	Y	2639083	Rothesay	Rothesay	Baile Bhoid,Baile Bhòid,Rothesay,Rothesay, Bute	55.83648	-5.05508	P	PPL	GB		SCT	00			4912		9	Europe/London	2010-08-03
+01702	Southend-on-Sea	Y	2637433	Southend-on-Sea	Southend-on-Sea	Sautend-on-Si,Southend,Southend-on-Sea,Саутенд-он-Си	51.53782	0.71433	P	PPLA2	GB		ENG	M5			163377		31	Europe/London	2010-10-16
+01704	Southport	Y	2637343	Southport	Southport	Southport	53.64779	-3.00648	P	PPLA2	GB		ENG	L8			93044		12	Europe/London	2010-10-16
+01706	Rochdale	Y	2639272	Rochdale	Rochdale	Rochdale,Rochdejl,Рочдейл	53.61766	-2.1552	P	PPLA2	GB		ENG	L2	30UM		97550		127	Europe/London	2011-03-03
+01707	Welwyn Garden City	Y	2634552	Welwyn Garden City	Welwyn Garden City	Garden City,Welwyn Garden,Welwyn Garden City	51.80174	-0.20691	P	PPL	GB		ENG	F8	26UL		44725		92	Europe/London	2011-03-03
+01708	Romford	Y	2639192	Romford	Romford		51.57515	0.18582	P	PPLA3	GB		ENG	GLA	F6		0		20	Europe/London	2010-10-17
+01709	Rotherham	Y	2639093	Rotherham	Rotherham	Roterem,Rotherdam,Rotherham,Ротерем	53.43012	-1.35678	P	PPLA2	GB		ENG	L3	00CF004		117618		41	Europe/London	2011-03-03
+01720	Isles of Scilly	Y	2638384	Isles of Scilly	Isles of Scilly	Ilhas Scilly,Illes Scilly,Inizi Sillan,Insulele Scilly,Islas Sorlingas,Isles of Scilly,Isllas Sorlingas,Isole Scilly,Scilly,Scilly Adalari,Scilly Adaları,Scilly Islands,Scilly Isles,Scilly saared,Scilly-Inseln,Scilly-eilanden,Scillynsaaret,Scillyoearna,Scillyoyene,Scillyöarna,Scillyøyene,Sillies,Sorlingues,Ynysek Syllan,shiri zhu dao,silli jedo,シリー諸島,실리 제도	49.92117	-6.29431	A	ADM2	GB	GB	ENG	Z9			0		23	Europe/London	2011-12-23
+01721	Peebles	Y	2640526	Peebles	Peebles	Peebles	55.6519	-3.1888	P	PPL	GB		SCT	T9			8403		170	Europe/London	2011-03-03
+01722	Salisbury	Y	2638664	Salisbury	Salisbury	New Sarum,Salisbury,Solsb"ri,Solsberi,soruzuberi,swlsbry,Солсбери,Солсбъри,סולסברי,ソールズベリー	51.06931	-1.79569	P	PPLA3	GB		ENG	P8	00HY261		45600		50	Europe/London	2011-07-31
+01723	Scarborough	Y	2638419	Scarborough	Scarborough	Scarborough,Skarb"ro,Скарбъро	54.27966	-0.40443	P	PPL	GB		ENG	J7	36UG		38909		48	Europe/London	2010-08-03
+01724	Scunthorpe	Y	2638324	Scunthorpe	Scunthorpe	Scunthorpe,Skantorpe,si ken suo pu,Сканторпе,斯肯索普	53.57905	-0.65437	P	PPLA2	GB		ENG	J3			72514		46	Europe/London	2012-01-08
+01725	Rockbourne	Y	2639258	Rockbourne	Rockbourne	Rockbourne	50.96116	-1.83807	P	PPL	GB		ENG	F2	24UJ		0		48	Europe/London	2011-03-03
+01726	St Austell	Y	2638853	Saint Austell	Saint Austell	Saint Austell,St Austell	50.33833	-4.76583	P	PPL	GB		ENG	C6			23432		58	Europe/London	2012-01-17
+01727	St Albans	Y	2638867	Saint Albans	Saint Albans	Saint Albans,Sent-Ehlbans,Sent-Olbans,St Albans,St. Albans,Сент-Олбанс,Сент-Элбанс	51.75	-0.33333	P	PPL	GB		ENG	F8	6615330		84561		98	Europe/London	2012-01-17
+01728	Saxmundham	Y	2638464	Saxmundham	Saxmundham		52.21497	1.48805	P	PPL	GB		ENG	N5	42UG		2772		23	Europe/London	2010-05-24
+01729	Settle	Y	2638192	Settle	Settle	Settle	54.06865	-2.2772	P	PPL	GB		ENG	J7	36UB		3702		158	Europe/London	2011-03-03
+01730	Petersfield	Y	2640348	Petersfield	Petersfield	Petersfield	51.00495	-0.93375	P	PPL	GB		ENG	F2	24UC		13384		62	Europe/London	2011-02-16
+01732	Sevenoaks	Y	2638187	Sevenoaks	Sevenoaks		51.26997	0.19278	P	PPL	GB		ENG	G5			27871		154	Europe/London	2010-05-09
+01733	Peterborough	Y	2640354	Peterborough	Peterborough	Peterborough,Peterbrough,Petersborough,Petroburgum,Piterboro,pitaboro,Питерборо,ピーターボロー	52.57364	-0.24777	P	PPLA2	GB		ENG	K3	00JA016		140141		12	Europe/London	2011-03-03
+01736	Penzance	Y	2640377	Penzance	Penzance	Pennsans,Penzance	50.11861	-5.53715	P	PPLA3	GB		ENG	C6	00HE107		20812		32	Europe/London	2011-07-31
+01737	Redhill	Y	2639545	Redhill	Redhill	Redhill	51.24048	-0.17044	P	PPL	GB		ENG	N7	43UF		51559		89	Europe/London	2011-02-05
+01738	Perth	Y	2640358	Perth	Perth	P"rt,Peairt,Pert,Perth,Перт,Пърт	56.39522	-3.43139	P	PPLA2	GB		SCT	W1			43633		10	Europe/London	2011-03-03
+01740	Sedgefield	Y	2638259	Sedgefield	Sedgefield		54.65329	-1.44952	P	PPL	GB		ENG	D8	00EJ098		4263		112	Europe/London	2011-03-03
+01743	Shrewsbury	Y	2637891	Shrewsbury	Shrewsbury	Amwythig,Shrewsbury,Shrjusburi,Shrusberi,Шрусбери,Шрюсбъри	52.71009	-2.75208	P	PPLA2	GB		ENG	L6			69519		75	Europe/London	2010-10-16
+01744	St Helens	Y	2638785	Saint Helens	Saint Helens	Helens,Saint Helens,Sent-Khelens,St Helens,St. Helens,Сент-Хеленс	53.45	-2.73333	P	PPLA2	GB		ENG	N1			102555		31	Europe/London	2010-10-15
+01745	Rhyl	Y	2639409	Rhyl	Rhyl	Rhyl,Ril,Y Rhyl,Рил	53.31955	-3.48862	P	PPL	GB		WLS	X9	00NG035		25874		7	Europe/London	2011-03-03
+01746	Bridgnorth	Y	2654731	Bridgnorth	Bridgnorth	Bridgnorth	52.53661	-2.42033	P	PPL	GB		ENG	L6	00GG032		12156		74	Europe/London	2011-03-03
+01747	Shaftesbury	Y	2638157	Shaftesbury	Shaftesbury	Shaftesbury	51.00528	-2.19333	P	PPL	GB		ENG	D6	19UE		6813		207	Europe/London	2012-01-17
+01748	Richmond	Y	2639389	Richmond	Richmond		51.46005	-0.30075	P	PPL	GB		ENG	GLA	L1		8360		20	Europe/London	2010-05-24
+01749	Shepton Mallet	Y	2638035	Shepton Mallet	Shepton Mallet	Shepton Mallet,Shepun	51.18972	-2.54722	P	PPL	GB		ENG	M3	40UB		9027		144	Europe/London	2012-01-17
+01750	Selkirk	Y	2638229	Selkirk	Selkirk		55.54738	-2.83911	P	PPL	GB		SCT	T9			5629		178	Europe/London	2010-06-29
+01751	Pickering	Y	2640312	Pickering	Pickering	Pickering	54.25	-0.76667	P	PPL	GB		ENG	J7	36UF		6763		62	Europe/London	2012-02-01
+01752	Plymouth	Y	2640194	Plymouth	Plymouth	Aberplymm,Pliemue,Plimut,Pliémue,Plymouth,pu li mao si,purimasu,Плимут,プリマス,普利茅斯	50.37153	-4.14305	P	PPLA2	GB		ENG	K4			247297		14	Europe/London	2010-10-16
+01753	Slough	Y	2637627	Slough	Slough	Slau,Slough,Слау	51.50949	-0.59541	P	PPLA2	GB		ENG	M1			134072		33	Europe/London	2011-05-28
+01754	Skegness	Y	2637762	Skegness	Skegness		53.14362	0.3363	P	PPL	GB		ENG	H7	32UC		17072		6	Europe/London	2011-03-03
+01756	Skipton	Y	2637702	Skipton	Skipton	Skipton	53.96144	-2.01676	P	PPL	GB		ENG	J7	36UB		14632		113	Europe/London	2010-08-03
+01757	Selby	Y	2638235	Selby	Selby	Selby	53.78333	-1.06667	P	PPL	GB		ENG	J7	36UH		16159		9	Europe/London	2012-01-17
+01758	Pwllheli	Y	2639828	Pwllheli	Pwllheli	Pwllbeli,Pwllheli	52.8899	-4.41451	P	PPL	GB		WLS	Y2	00NC058		3904		7	Europe/London	2011-03-03
+01759	Pocklington	Y	2640185	Pocklington	Pocklington		53.93335	-0.78106	P	PPLA3	GB		ENG	E1	00FB110		7802		37	Europe/London	2011-07-31
+01760	Swaffham	Y	2636464	Swaffham	Swaffham		52.64692	0.68871	P	PPL	GB		ENG	I9	33UB		6884		77	Europe/London	2010-05-24
+01761	Temple Cloud	Y	3345398	Temple Cloud	Temple Cloud		51.32007	-2.54197	P	PPL	GB		ENG	A4	00HA004		0		129	Europe/London	2011-03-03
+01763	Royston	Y	2639018	Royston	Royston		52.04832	-0.02438	P	PPL	GB		ENG	F8	26UF		14895		65	Europe/London	2010-05-24
+01764	Crieff	Y	2651983	Crieff	Crieff		56.37268	-3.83891	P	PPL	GB		SCT	W1			6685		84	Europe/London	2011-03-03
+01765	Ripon	Y	2639323	Ripon	Ripon	Ripon,Рипон	54.13521	-1.52122	P	PPL	GB		ENG	J7	36UD		16835		37	Europe/London	2010-08-03
+01766	Porthmadog	Y	2640045	Porthmadog	Porthmadog	Porthmadog,Portmadoc	52.92924	-4.13137	P	PPLA3	GB		WLS	Y2	00NC057		3041		4	Europe/London	2011-07-31
+01767	Sandy	Y	2638530	Sandy	Sandy		52.12927	-0.28925	P	PPLA3	GB		ENG	Z6	00KC056		11129		30	Europe/London	2011-07-31
+01768	Penrith	Y	2640416	Penrith	Penrith	Penrith	54.66579	-2.75757	P	PPL	GB		ENG	C9	16UF		14793		146	Europe/London	2010-08-03
+017683	Appleby	Y	2657240	Appleby	Appleby		53.61667	-0.56667	P	PPLA3	GB		ENG	J3	00FD003		2926		17	Europe/London	2011-07-31
+017684	Pooley Bridge	Y	2640096	Pooley Bridge	Pooley Bridge	Pooley Bridge	54.61085	-2.81525	P	PPL	GB		ENG	C9	16UF		0		162	Europe/London	2010-08-03
+017687	Keswick	Y	2645756	Keswick	Keswick	Kesvik,Keswick,Koswick,Кесвик	54.59947	-3.13256	P	PPL	GB		ENG	C9	16UB		4281		93	Europe/London	2010-08-03
+01769	South Molton	Y	2637373	South Molton	South Molton	South Molton	51.01667	-3.83333	P	PPL	GB		ENG	D4	18UE		4184		131	Europe/London	2012-01-17
+01770	Isle of Arran	Y	2657023	Isle of Arran	Isle of Arran	Arainn,Arran,Island of Arran,Isle of Arran,aran dao,Арран,アラン島	55.6	-5.25	T	ISL	GB	GB	SCT	00			0		438	Europe/London	2010-08-03
+01771	Maud	Y	2642903	Maud	Maud	Maud	57.52165	-2.1257	P	PPL	GB		SCT	T6			673		73	Europe/London	2011-03-03
+01772	Preston	Y	2639912	Preston	Preston	Preston,prstwn,pu lei si dun,Престон,פרסטון,普雷斯顿	53.76667	-2.71667	P	PPLA2	GB		ENG	H2	30UK		190687		22	Europe/London	2010-10-16
+01773	Ripley	Y	2639325	Ripley	Ripley	Ripley	53.03333	-1.4	P	PPL	GB		ENG	D3	17UB		21097		126	Europe/London	2012-02-01
+01775	Spalding	Y	2637265	Spalding	Spalding		52.78709	-0.15141	P	PPL	GB		ENG	H7	32UF		22357		11	Europe/London	2010-05-24
+01776	Stranraer	Y	2636719	Stranraer	Stranraer	Stanraer,Stranraer	54.90234	-5.02731	P	PPL	GB		SCT	U2			10581		12	Europe/London	2011-03-03
+01777	Retford	Y	2650346	Retford	Retford	East Retford	53.32213	-0.94315	P	PPL	GB		ENG	J9	37UC		21897		19	Europe/London	2012-03-29
+01778	Bourne	Y	2655099	Bourne	Bourne	Bourn,Bourne	52.76667	-0.38333	P	PPL	GB		ENG	H7	32UG		12060		16	Europe/London	2012-01-17
+01779	Peterhead	Y	2640351	Peterhead	Peterhead		57.50584	-1.79806	P	PPL	GB		SCT	T6			17627		19	Europe/London	2011-03-03
+01780	Stamford	Y	2637104	Stamford	Stamford	Stamford	52.65	-0.48333	P	PPL	GB		ENG	H7	32UG		20526		28	Europe/London	2012-02-01
+01782	Stoke-on-Trent	Y	2636841	Stoke-on-Trent	Stoke-on-Trent	Stok-on-Trent,Stoke,Stoke-on-Trent,Stoke-upon-Trent,The Potteries,Сток-он-Трент	53.00415	-2.18538	P	PPLA2	GB		ENG	N4			260419		114	Europe/London	2012-01-08
+01784	Staines	Y	2637126	Staines	Staines	Staines	51.43092	-0.50606	P	PPL	GB		ENG	N7	43UH		51040		16	Europe/London	2011-03-03
+01785	Stafford	Y	2637142	Stafford	Stafford	Staefford,Stafford,Stæfford,Стаффорд	52.80521	-2.11636	P	PPLA2	GB		ENG	M9	41UG		65290		77	Europe/London	2011-03-03
+01786	Stirling	Y	2636910	Stirling	Stirling	Srivling,Sruighle,Sruighlea,Sterling,Stirling,Stirlingum,astyrlyng,shi te ling,Стерлинг,استیرلینگ,史特靈	56.11903	-3.93682	P	PPLA2	GB		SCT	W6			33012		24	Europe/London	2011-03-03
+01787	Sudbury	Y	2636564	Sudbury	Sudbury		52.0389	0.73117	P	PPL	GB		ENG	N5	42UB		12080		36	Europe/London	2012-03-29
+01788	Rugby	Y	2638978	Rugby	Rugby		52.37092	-1.26417	P	PPL	GB		ENG	P3	44UD		63323		120	Europe/London	2011-03-03
+01789	Stratford-upon-Avon	Y	2636713	Stratford-upon-Avon	Stratford-upon-Avon	Stratford,Stratford na Ejv"n,Stratford on Avon,Stratford-na-Ehjvone,Stratford-upon-Avon,Stratfordia super Avonam,seuteulaespeodeu eopeon eibeon,Стратфорд на Ейвън,Стратфорд-на-Эйвоне,ストラットフォード・アポン・エイヴォン,스트랫퍼드 어펀 에이번	52.19166	-1.70734	P	PPL	GB		ENG	P3	44UE		22576		44	Europe/London	2011-03-03
+01790	Spilsby	Y	2637224	Spilsby	Spilsby		53.17363	0.09373	P	PPL	GB		ENG	H7	32UC		2807		50	Europe/London	2010-05-24
+01792	Swansea	Y	2636432	Swansea	Swansea	Abertawe,Suonsi,Suonzi,Swansea,si wang xi,suu~onji,Суонзи,Суонси,スウæォンジ,スウォンジ,斯旺西	51.62079	-3.94323	P	PPLA2	GB		WLS	Z1			170883		18	Europe/London	2010-10-16
+01793	Swindon	Y	2636389	Swindon	Swindon	Svindon,Swindon,suu~indon,Свиндон,スウィンドン	51.55797	-1.78116	P	PPLA2	GB		ENG	N9	00HX015		155432		113	Europe/London	2010-10-16
+01794	Romsey	Y	2639189	Romsey	Romsey	Romsey	50.98906	-1.49989	P	PPL	GB		ENG	F2	24UN		17773		20	Europe/London	2011-02-24
+01795	Sittingbourne	Y	2637802	Sittingbourne	Sittingbourne		51.34128	0.73282	P	PPL	GB		ENG	G5	29UM		41148		16	Europe/London	2010-05-24
+01796	Pitlochry	Y	2640255	Pitlochry	Pitlochry	Pitlochry	56.70514	-3.73432	P	PPL	GB		SCT	W1			2551		120	Europe/London	2010-08-18
+01797	Rye	Y	2638909	Rye	Rye	Rye	50.95114	0.7337	P	PPL	GB		ENG	E2	21UG		4288		19	Europe/London	2010-08-03
+01798	Pulborough	Y	2639864	Pulborough	Pulborough	Pulborough,Pulborough village hall	50.95735	-0.49902	P	PPL	GB		ENG	P6	45UF		3993		23	Europe/London	2010-08-03
+01799	Saffron Walden	Y	2638878	Saffron Walden	Saffron Walden		52.02337	0.24234	P	PPL	GB		ENG	E4	22UQ		14632		59	Europe/London	2010-05-24
+01803	Torquay	Y	2635650	Torquay	Torquay	Torcaium,Torkej,Torkvej,Torquay,toki,Торквей,Торкей,トーキー	50.46384	-3.51434	P	PPLA2	GB		ENG	O4			65388		49	Europe/London	2010-10-16
+01805	Torrington	Y	2648004	Great Torrington	Great Torrington	Great Torrington,Torrington	50.95309	-4.14401	P	PPL	GB		ENG	D4	18UK		5590		99	Europe/London	2011-03-03
+01806	Shetland	Y	2638010	Shetland Islands	Shetland Islands	Hetland,Illas Shetland,Islas Shetland,Isole Shetland,Sealtainn,Setlandaj Insuloj,Setlando salos,Shetland,Shetland Islands,Shetland Islands Area,Shetland-szigetek,Shetlandeilanden,Shetlandi saared,Shetlandinsaaret,Shetlandinseln,Shetlandski ostrovi,Shetlandsoearna,Shetlandsoerne,Shetlandsoyane,Shetlandsöarna,Shetlandsøerne,Shetlandsøyane,Shetlandy,Shetlendskie ostrova,Szetlandy,ZET,Zetland,shetorando zhu dao,syeteullaendeu jedo,Ŝetlandaj Insuloj,Šetlando salos,Шетландски острови,Шетлендские острова,איי שטלנד,シェトランド諸島,셰틀랜드 제도	60.33333	-1.33333	A	ADM2	GB	GB	SCT	W3			0		134	Europe/London	2011-01-06
+01807	Ballindalloch	Y	
+01808	Tomatin	Y	2635710	Tomatin	Tomatin	Tomatin	57.33449	-3.99073	P	PPL	GB		SCT	V3			0		305	Europe/London	2011-03-03
+01809	Tomdoun	Y	2635708	Tomdoun	Tomdoun		57.06132	-5.03105	P	PPL	GB		SCT	V3			0		115	Europe/London	2009-08-30
+01821	Kinrossie	Y	
+01822	Tavistock	Y	2636174	Tavistock	Tavistock		50.54944	-4.14418	P	PPL	GB		ENG	D4	18UL		11493		85	Europe/London	2011-03-03
+01823	Taunton	Y	2636177	Taunton	Taunton	Taunton	51.02111	-3.10472	P	PPLA2	GB		ENG	M3	40UE		60433		18	Europe/London	2010-10-16
+01824	Ruthin	Y	2638925	Ruthin	Ruthin	Rhuthun	53.11368	-3.31782	P	PPLA2	GB		WLS	X9	00NG036		5344		60	Europe/London	2012-04-12
+01825	Uckfield	Y	2635243	Uckfield	Uckfield		50.96948	0.09589	P	PPL	GB		ENG	E2	21UH		15716		19	Europe/London	2010-05-24
+01827	Tamworth	Y	2636276	Tamworth	Tamworth	Tamworth	52.63399	-1.69587	P	PPL	GB		ENG	M9	41UK		74129		73	Europe/London	2011-03-03
+01828	Coupar Angus	Y	2652236	Coupar Angus	Coupar Angus	Coupar Angus	56.54552	-3.26774	P	PPL	GB		SCT	W1			2160		57	Europe/London	2011-03-03
+01829	Tarporley	Y	2636209	Tarporley	Tarporley		53.15918	-2.66867	P	PPL	GB		ENG	Z8	00EW142		2693		98	Europe/London	2011-03-03
+01830	Kirkwhelpington	Y	2645196	Kirkwhelpington	Kirkwhelpington	Kirkwhelpington	55.15465	-2.00625	P	PPL	GB		ENG	J6	00EM093		0		176	Europe/London	2011-03-03
+01832	Clopton	Y	2652789	Clopton	Clopton	Clopton	52.11667	1.25	P	PPL	GB		ENG	N5	42UG		0		20	Europe/London	2012-01-17
+01833	Barnard Castle	Y	2656305	Barnard Castle	Barnard Castle		54.5415	-1.919	P	PPLA3	GB		ENG	D8	00EJ002		6864		164	Europe/London	2011-07-31
+01834	Narberth	Y	2641885	Narberth	Narberth	Arberth,Narberth	51.79784	-4.74275	P	PPL	GB		WLS	Y7	00NS047		1890		82	Europe/London	2011-03-03
+01835	St Boswells	Y	2638848	Saint Boswells	Saint Boswells		55.57301	-2.6441	P	PPL	GB		SCT	T9			1062		96	Europe/London	2008-04-02
+01837	Okehampton	Y	2641049	Okehampton	Okehampton	Okehampton	50.73841	-4.0016	P	PPL	GB		ENG	D4	18UL		5976		156	Europe/London	2010-08-03
+01838	Dalmally	Y	2651577	Dalmally	Dalmally	Dalmally	56.40223	-4.9778	P	PPL	GB		SCT	T8			0		41	Europe/London	2011-03-03
+01840	Camelford	Y	2653927	Camelford	Camelford	Camelford	50.62185	-4.67963	P	PPL	GB		ENG	C6	00HE016		1649		199	Europe/London	2011-03-03
+01841	Newquay	Y	2641589	Newquay	Newquay	Newquay	50.41317	-5.08186	P	PPLA3	GB		ENG	C6	00HE097		19998		38	Europe/London	2011-07-31
+01842	Thetford	Y	2636032	Thetford	Thetford	Tetford,Thetford,Тетфорд	52.41667	0.75	P	PPL	GB		ENG	I9	33UB		21588		24	Europe/London	2012-01-17
+01843	Thanet	Y	2638703	Saint Peters	Saint Peters	Saint Peter Extra,Saint Peters,Thanet	51.36667	1.41667	P	PPL	GB	GB	ENG	G5			0		43	Europe/London	2012-01-17
+01844	Thame	Y	2636066	Thame	Thame	Thame	51.7484	-0.97624	P	PPL	GB		ENG	K2	38UD		11128		72	Europe/London	2011-02-16
+01845	Thirsk	Y	2636021	Thirsk	Thirsk		54.23298	-1.34411	P	PPL	GB		ENG	J7	36UC		9302		37	Europe/London	2010-05-24
+018472	Thurso	Y	2635881	Thurso	Thurso	Thurso	58.59271	-3.52594	P	PPL	GB		SCT	V3			7492		22	Europe/London	2011-03-03
+018473	Thurso	Y	2635881	Thurso	Thurso	Thurso	58.59271	-3.52594	P	PPL	GB		SCT	V3			7492		22	Europe/London	2011-03-03
+018474	Thurso	Y	2635881	Thurso	Thurso	Thurso	58.59271	-3.52594	P	PPL	GB		SCT	V3			7492		22	Europe/London	2011-03-03
+018475	Thurso	Y	2635881	Thurso	Thurso	Thurso	58.59271	-3.52594	P	PPL	GB		SCT	V3			7492		22	Europe/London	2011-03-03
+018478	Thurso	Y	2635881	Thurso	Thurso	Thurso	58.59271	-3.52594	P	PPL	GB		SCT	V3			7492		22	Europe/London	2011-03-03
+018476	Tongue	Y	2635693	Tongue	Tongue		58.47629	-4.41719	P	PPL	GB		SCT	V3			0		51	Europe/London	2009-07-21
+018477	Tongue	Y	2635693	Tongue	Tongue		58.47629	-4.41719	P	PPL	GB		SCT	V3			0		51	Europe/London	2009-07-21
+018479	Tongue	Y	2635693	Tongue	Tongue		58.47629	-4.41719	P	PPL	GB		SCT	V3			0		51	Europe/London	2009-07-21
+01848	Thornhill	Y	2635981	Thornhill	Thornhill	Thornhill	55.23333	-3.76667	P	PPL	GB		SCT	U2			1504		52	Europe/London	2012-01-17
+018514	Great Bernera	Y	2648161	Great Bernera	Great Bernera	Bernera Island,Great Bernera,Great Berneray	58.21667	-6.81667	T	ISL	GB	GB	SCT	W8			0		38	Europe/London	2012-01-17
+018516	Great Bernera	Y	2648161	Great Bernera	Great Bernera	Bernera Island,Great Bernera,Great Berneray	58.21667	-6.81667	T	ISL	GB	GB	SCT	W8			0		38	Europe/London	2012-01-17
+018519	Great Bernera	Y	2648161	Great Bernera	Great Bernera	Bernera Island,Great Bernera,Great Berneray	58.21667	-6.81667	T	ISL	GB	GB	SCT	W8			0		38	Europe/London	2012-01-17
+018512	Stornoway	Y	2636790	Stornoway	Stornoway	Steornabhagh,Steòrnabhagh,Stornovejus,Stornovėjus,Stornoway	58.20925	-6.38649	P	PPLA2	GB		SCT	W8			5423		12	Europe/London	2011-08-21
+018513	Stornoway	Y	2636790	Stornoway	Stornoway	Steornabhagh,Steòrnabhagh,Stornovejus,Stornovėjus,Stornoway	58.20925	-6.38649	P	PPLA2	GB		SCT	W8			5423		12	Europe/London	2011-08-21
+018515	Stornoway	Y	2636790	Stornoway	Stornoway	Steornabhagh,Steòrnabhagh,Stornovejus,Stornovėjus,Stornoway	58.20925	-6.38649	P	PPLA2	GB		SCT	W8			5423		12	Europe/London	2011-08-21
+018517	Stornoway	Y	2636790	Stornoway	Stornoway	Steornabhagh,Steòrnabhagh,Stornovejus,Stornovėjus,Stornoway	58.20925	-6.38649	P	PPLA2	GB		SCT	W8			5423		12	Europe/London	2011-08-21
+018518	Stornoway	Y	2636790	Stornoway	Stornoway	Steornabhagh,Steòrnabhagh,Stornovejus,Stornovėjus,Stornoway	58.20925	-6.38649	P	PPLA2	GB		SCT	W8			5423		12	Europe/London	2011-08-21
+01852	Kilmelford	Y	
+01854	Ullapool	Y	2635199	Ullapool	Ullapool	Allapul,Ulapul,Ulapulis,Ullapool,Аллапул	57.89872	-5.16039	P	PPL	GB		SCT	V3			1327		16	Europe/London	2011-03-03
+01855	Ballachulish	Y	2656569	Ballachulish	Ballachulish	Ballachuhsh	56.67575	-5.13851	P	PPL	GB		SCT	V3			633		7	Europe/London	2010-04-23
+01856	Orkney	Y	2640923	Orkney Islands	Orkney Islands	Arcaibh,Illes Orcades,Illes Òrcades,Inizi Orc'h,Isole Orcadi,ORK,Orcadas,Orcades,Orkada uharteak,Orkadoj,Orkady,Orkneje,Orknejskie ostrova,Orkney,Orkney Adalari,Orkney Adaları,Orkney Islands,Orkney Islands Area,Orkney saared,Orkney-eilanden,Orkney-szigetek,Orkneyjar,Orkneyoearna,Orkneysaaret,Orkneyski otoci,Orkneyöarna,Orknio salos,Orknoyane,Orknoyene,Orknøyane,Orknøyene,okeuni jedo,okuni zhu dao,Àrcaibh,Órcadas,Órcades,Оркнейские острова,Оркнейські острови,オークニー諸島,오크니 제도	59	-3	A	ADM2	GB	GB	SCT	V9			0		29	Europe/London	2011-01-06
+01857	Sanday	Y	2638602	Sanday Island	Sanday Island	Sanday Island	59.25	-2.58333	T	ISL	GB		SCT	V9			0		13	Europe/London	2012-01-17
+01858	Market Harborough	Y	2643027	Market Harborough	Market Harborough	Market Harborough	52.4776	-0.92053	P	PPL	GB		ENG	H5	31UD		20575		81	Europe/London	2011-03-03
+01859	Harris	Y	
+01862	Tain	Y	2636321	Tain	Tain	Tain	57.80903	-4.05991	P	PPL	GB		SCT	V3			3409		47	Europe/London	2011-03-03
+01863	Ardgay	Y	8260058	Ardgay	Ardgay	Aird Gaoith,Aird Ghaoithe,Àird Gaoith,Àird Ghaoithe	57.88113	-4.3629	P	PPL	GB		SCT	V3			496		1	Europe/London	2012-04-12
+01864	Abington	Y	2657778	Abington	Abington		55.48333	-3.7	P	PPL	GB		SCT	00			0		258	Europe/London	1994-01-13
+01865	Oxford	Y	2640729	Oxford	Oxford	OXF,Oksford,Oksfordas,Oksfordo,Oxford,Oxonia,Oxphorde,Rhydychen,Rysoghen,aksfwrd,ogseupeodeu,okkusufodo,Οξφόρδη,Оксфорд,אוקספורד,أكسفورد,オックスフォード,옥스퍼드	51.75222	-1.25596	P	PPLA2	GB		ENG	K2	38UC		154566		72	Europe/London	2012-03-27
+01866	Kilchrenan	Y	2645689	Kilchrenan	Kilchrenan		56.35681	-5.1763	P	PPL	GB		SCT	T8			0		69	Europe/London	2011-03-03
+01869	Bicester	Y	2655729	Bicester	Bicester		51.89998	-1.15357	P	PPL	GB		ENG	K2	38UB		35902		75	Europe/London	2011-03-03
+01870	Isle of Benbecula	Y	
+01871	Castlebay	Y	2653609	Castlebay	Castlebay	Castlebay	56.95	-7.46667	P	PPL	GB		SCT	W8			0		93	Europe/London	2012-01-17
+01872	Truro	Y	2635412	Truro	Truro	Truro,Truru,Труро	50.26526	-5.05436	P	PPLA2	GB		ENG	C6	00HE202		22044		15	Europe/London	2011-03-03
+01873	Abergavenny	Y	2657815	Abergavenny	Abergavenny	Abergavenny,Y Fenni	51.82098	-3.01743	P	PPL	GB		WLS	Y4	00PP001		14211		60	Europe/London	2011-03-03
+01874	Brecon	Y	2654817	Brecon	Brecon	Aberhonddu,Brecknock,Brecon,Brycheiniog	51.94612	-3.38887	P	PPL	GB		WLS	Y8	00NN009		7989		136	Europe/London	2012-03-29
+01875	Tranent	Y	2635563	Tranent	Tranent	Tranent	55.94439	-2.95412	P	PPL	GB		SCT	00			9042		90	Europe/London	2011-01-06
+01876	Lochmaddy	Y	2643811	Lochmaddy	Lochmaddy	Lochmaddy	57.6	-7.18333	P	PPL	GB		SCT	W8			0		2	Europe/London	2012-01-17
+01877	Callander	Y	2653989	Callander	Callander	Callander	56.2441	-4.21637	P	PPL	GB		SCT	W6			2782		75	Europe/London	2011-03-03
+01878	Lochboisdale	Y	2643844	Lochboisdale	Lochboisdale	Lochboisdale	57.16667	-7.31667	P	PPL	GB		SCT	W8			0		5	Europe/London	2012-01-17
+01879	Scarinish	Y	2638409	Scarinish	Scarinish	Scarnish	56.50098	-6.80869	P	PPL	GB	GB	SCT	T8			0		8	Europe/London	2010-04-23
+01880	Tarbert	Y	
+01882	Kinloch Rannoch	Y	2645391	Kinloch Rannoch	Kinloch Rannoch	Kinloch Rannoch	56.70105	-4.18698	P	PPL	GB		SCT	W1			0		211	Europe/London	2011-03-03
+01883	Caterham	Y	2653520	Caterham	Caterham		51.2823	-0.07889	P	PPL	GB		ENG	N7	43UK		20957		140	Europe/London	2012-04-12
+01884	Tiverton	Y	2635762	Tiverton	Tiverton	Tiverton	50.9	-3.48333	P	PPL	GB		ENG	D4	18UD		16799		88	Europe/London	2012-01-17
+01885	Pencombe	Y	2640483	Pencombe	Pencombe		52.17132	-2.58756	P	PPL	GB		ENG	F7	00GA168		0		148	Europe/London	2011-03-03
+01886	Bromyard	Y	2654578	Bromyard	Bromyard	Bromyard	52.19019	-2.50875	P	PPL	GB		ENG	00			3997		128	Europe/London	2010-08-03
+01887	Aberfeldy	Y	2657820	Aberfeldy	Aberfeldy	Aberfeldy	56.62	-3.86453	P	PPL	GB		SCT	W1			1937		96	Europe/London	2010-08-18
+01888	Turriff	Y	2635329	Turriff	Turriff		57.5384	-2.45932	P	PPL	GB		SCT	T6			4711		55	Europe/London	2011-03-03
+01889	Rugeley	Y	2638977	Rugeley	Rugeley		52.7593	-1.93694	P	PPL	GB		ENG	M9	41UB		22937		78	Europe/London	2011-03-03
+018905	Ayton	Y	
+018906	Ayton	Y	
+018907	Ayton	Y	
+018909	Ayton	Y	
+018902	Coldstream	Y	2652601	Coldstream	Coldstream	Coldstream	55.65111	-2.25295	P	PPL	GB		SCT	T9	00EM040		1823		27	Europe/London	2011-03-03
+018903	Coldstream	Y	2652601	Coldstream	Coldstream	Coldstream	55.65111	-2.25295	P	PPL	GB		SCT	T9	00EM040		1823		27	Europe/London	2011-03-03
+018904	Coldstream	Y	2652601	Coldstream	Coldstream	Coldstream	55.65111	-2.25295	P	PPL	GB		SCT	T9	00EM040		1823		27	Europe/London	2011-03-03
+018908	Coldstream	Y	2652601	Coldstream	Coldstream	Coldstream	55.65111	-2.25295	P	PPL	GB		SCT	T9	00EM040		1823		27	Europe/London	2011-03-03
+01892	Tunbridge Wells	Y	2639022	Royal Tunbridge Wells	Royal Tunbridge Wells	Royal Tunbridge Wells,Tunbridge Wells,Turnbridge Wells	51.13245	0.26333	P	PPL	GB		ENG	G5	29UQ		61075		118	Europe/London	2010-08-03
+01895	Uxbridge	Y	7645989	Uxbridge	Uxbridge		51.54639	-0.47473	P	PPL	GB		ENG	GLA	F9		0		50	Europe/London	2011-01-14
+01896	Galashiels	Y	2648928	Galashiels	Galashiels	Gafashiels,Galashiels	55.61458	-2.80695	P	PPL	GB		SCT	T9			14351		119	Europe/London	2011-03-03
+01899	Biggar	Y	2655692	Biggar	Biggar		55.61667	-3.51667	P	PPL	GB		SCT	00			2120		200	Europe/London	2006-01-17
+01900	Workington	Y	2633553	Workington	Workington		54.6425	-3.54413	P	PPL	GB		ENG	C9	16UB		20618		20	Europe/London	2011-03-03
+01902	Wolverhampton	Y	2633691	Wolverhampton	Wolverhampton	Uulvurkhjamptun,Wolverhampton,wwlbrhmptwn,Уулвърхямптън,וולברהמפטון	52.58547	-2.12296	P	PPLA2	GB		ENG	Q3	41UF		252791		160	Europe/London	2011-03-03
+01903	Worthing	Y	2633521	Worthing	Worthing	Worthing,washingu,ワーシング	50.81448	-0.37126	P	PPL	GB		ENG	P6	45UH		99110		12	Europe/London	2011-02-14
+01904	York	Y	2633352	York	York	Aebura,Eboracum,Efrog,Everoui,Jork,Jorvik,Jórvík,York,yoku,yue ke,ywrq,Évèroui,Йорк,יורק,ヨーク,約克	53.95763	-1.08271	P	PPLA2	GB		ENG	Q5			144202		17	Europe/London	2012-03-30
+01905	Worcester	Y	2633563	Worcester	Worcester	Caerwrangon,Worcester,Worcester UK,vuster,Вустер	52.18935	-2.22001	P	PPLA2	GB		ENG	Q4	47UE		100023		29	Europe/London	2010-10-16
+01908	Milton Keynes	Y	2642465	Milton Keynes	Milton Keynes	MK,Milton Keynes,Milton-Kins,Милтон-Кинс	52.04172	-0.75583	P	PPLA2	GB		ENG	I6			184506		114	Europe/London	2010-10-16
+01909	Worksop	Y	2633551	Worksop	Worksop	Worksop	53.30182	-1.12404	P	PPL	GB		ENG	J9	37UC		40443		46	Europe/London	2011-03-03
+01912	Tyneside	N	2635268	Tyneside	Tyneside	Tyneside	54.98333	-1.5	L	AREA	GB		ENG	00			0		17	Europe/London	2012-01-17
+01914	Tyneside	N	2635268	Tyneside	Tyneside	Tyneside	54.98333	-1.5	L	AREA	GB		ENG	00			0		17	Europe/London	2012-01-17
+01916	Tyneside	N	2635268	Tyneside	Tyneside	Tyneside	54.98333	-1.5	L	AREA	GB		ENG	00			0		17	Europe/London	2012-01-17
+01918	Tyneside	N	2635268	Tyneside	Tyneside	Tyneside	54.98333	-1.5	L	AREA	GB		ENG	00			0		17	Europe/London	2012-01-17
+01913	Durham	N	2650628	Durham	Durham	Darem,Dunelm,Dunholm,Durham,Dūnholm,Дарем,เดอแรม	54.77676	-1.57566	P	PPLA2	GB		ENG	D8			45696		52	Europe/London	2010-10-16
+01919	Durham	N	2650628	Durham	Durham	Darem,Dunelm,Dunholm,Durham,Dūnholm,Дарем,เดอแรม	54.77676	-1.57566	P	PPLA2	GB		ENG	D8			45696		52	Europe/London	2010-10-16
+01915	Sunderland	N	2636531	Sunderland	Sunderland	Sanderlend,Sanderlenda,Sunderland,Сандерленд	54.90465	-1.38222	P	PPLA2	GB		ENG	N6			177965		36	Europe/London	2010-10-16
+01917	Sunderland	N	2636531	Sunderland	Sunderland	Sanderlend,Sanderlenda,Sunderland,Сандерленд	54.90465	-1.38222	P	PPLA2	GB		ENG	N6			177965		36	Europe/London	2010-10-16
+01920	Ware	Y	2634777	Ware	Ware		51.81265	-0.02832	P	PPL	GB		ENG	F8	26UD		17576		37	Europe/London	2010-05-24
+01922	Walsall	Y	2634853	Walsall	Walsall	Uolsol,Wallsall,Walsall,Уолсол	52.58528	-1.98396	P	PPLA2	GB		ENG	O8	41UF		172141		129	Europe/London	2011-03-03
+01923	Watford	Y	2634677	Watford	Watford	Uotford,Watford,wtpwrd,wwtpwrd,Уотфорд,ווטפורד,וטפורד	51.65531	-0.39602	P	PPL	GB		ENG	F8	26UK		125707		77	Europe/London	2010-08-03
+01924	Wakefield	Y	2634910	Wakefield	Wakefield	Wakefield	53.68331	-1.49768	P	PPLA2	GB		ENG	O7			78978		50	Europe/London	2010-10-15
+01925	Warrington	Y	2634739	Warrington	Warrington	Uorrington,Warrington,Уоррингтон	53.39254	-2.58024	P	PPLA2	GB		ENG	P2			81238		15	Europe/London	2010-10-16
+01926	Warwick	Y	2634725	Warwick	Warwick	Uorik,Warwick,Уорик	52.28333	-1.58333	P	PPLA2	GB		ENG	P3	44UF		24040		57	Europe/London	2010-10-16
+01928	Runcorn	Y	2638960	Runcorn	Runcorn	Runcorn	53.34174	-2.73124	P	PPL	GB		ENG	E9	00ET005		59679		18	Europe/London	2011-03-03
+01929	Wareham	Y	2634776	Wareham	Wareham	Wareham	50.68886	-2.1104	P	PPL	GB		ENG	D6	19UG		2625		18	Europe/London	2012-02-15
+01931	Shap	Y	2638135	Shap	Shap		54.53149	-2.67551	P	PPL	GB		ENG	C9	16UF		0		261	Europe/London	2010-05-24
+01932	Weybridge	Y	2634204	Weybridge	Weybridge	Weybridge	51.37216	-0.45297	P	PPL	GB		ENG	N7	43UB		19463		25	Europe/London	2012-03-01
+01933	Wellingborough	Y	2634578	Wellingborough	Wellingborough	Vellingboro,Wellingborough,Веллингборо	52.30273	-0.69446	P	PPL	GB		ENG	J1	34UH		49783		70	Europe/London	2011-03-03
+01934	Weston-super-Mare	Y	2634308	Weston-super-Mare	Weston-super-Mare	Uest"n sjup"r Me"r,Uestun-Sjupur-Meur,Weston super Mare,Weston-super-Mare,Уестън сюпър Меър,Уестън-Сюпър-Меър	51.34603	-2.97665	P	PPLA2	GB		ENG	J4	00HC038		82903		13	Europe/London	2011-03-03
+01935	Yeovil	Y	2633373	Yeovil	Yeovil	Jeovil',Yeovil,Йеовиль	50.94159	-2.63211	P	PPL	GB		ENG	M3	40UD		43733		55	Europe/London	2011-03-03
+01937	Wetherby	Y	2634217	Wetherby	Wetherby		53.92836	-1.38672	P	PPLA3	GB		ENG	H3	00DA028		10797		30	Europe/London	2011-07-31
+01938	Welshpool	Y	2634560	Welshpool	Welshpool	Welshpool,Y Trallwng	52.65973	-3.1471	P	PPL	GB		WLS	Y8	00NN106		5600		84	Europe/London	2012-03-29
+01939	Wem	Y	2634550	Wem	Wem		52.85835	-2.71826	P	PPL	GB		ENG	L6			5257		82	Europe/London	2007-06-16
+01942	Wigan	Y	2633948	Wigan	Wigan	Uigan,Wigan,wei gan,Уиган,维甘	53.53333	-2.61667	P	PPLA2	GB		ENG	P7			80788		41	Europe/London	2010-10-16
+01943	Guiseley	Y	2647784	Guiseley	Guiseley	Guiseley	53.87561	-1.71232	P	PPL	GB		ENG	H3			21000		140	Europe/London	2012-03-29
+01944	West Heslerton	Y	2634391	West Heslerton	West Heslerton	Heslerton,West Heslerton	54.17222	-0.60755	P	PPL	GB		ENG	J7	36UF		0		45	Europe/London	2011-03-03
+01945	Wisbech	Y	2633771	Wisbech	Wisbech	Vizbich,Wisbech,Визбич	52.66622	0.15938	P	PPL	GB		ENG	C3	12UD		20200		6	Europe/London	2011-03-03
+01946	Whitehaven	Y	2634096	Whitehaven	Whitehaven		54.54897	-3.58412	P	PPL	GB		ENG	C9	16UE		24803		19	Europe/London	2010-05-24
+019467	Gosforth	Y	2648273	Gosforth	Gosforth		55	-1.61667	P	PPL	GB		ENG	00			23975		67	Europe/London	2006-01-17
+01947	Whitby	Y	2634135	Whitby	Whitby	Whitby	54.48774	-0.61498	P	PPL	GB		ENG	J7	36UG		13897		14	Europe/London	2010-08-03
+01948	Whitchurch	Y	2634124	Whitchurch	Whitchurch	Whitchurch	52.96667	-2.68333	P	PPL	GB		ENG	L6			8944		101	Europe/London	2012-04-05
+01949	Whatton	Y	2634175	Whatton	Whatton		52.94605	-0.8917	P	PPL	GB		ENG	J9	37UJ		0		31	Europe/London	2011-03-03
+01950	Sandwick	Y	2638534	Sandwick	Sandwick		60	-1.25	P	PPL	GB		SCT	W3			1217		14	Europe/London	2006-01-17
+01951	Colonsay	Y	2652533	Colonsay	Colonsay	Colonsay	56.06667	-6.21667	T	ISL	GB		SCT	T8			0		82	Europe/London	2012-01-17
+01952	Telford	Y	3345439	Telford	Telford	Telford,Телфорд	52.67659	-2.44926	P	PPLA2	GB		ENG	O2			138241		163	Europe/London	2010-10-16
+01953	Wymondham	Y	2633445	Wymondham	Wymondham		52.75978	-0.74055	P	PPL	GB		ENG	H5	31UG		11674		108	Europe/London	2010-05-24
+01954	Madingley	Y	2643231	Madingley	Madingley		52.2279	0.0427	P	PPL	GB		ENG	C3	12UG		0		31	Europe/London	2010-05-24
+01955	Wick	Y	2633982	Wick	Wick	Wick	58.43333	-3.08333	P	PPL	GB		SCT	V3	2654041		7147		35	Europe/London	2012-01-17
+01957	Mid Yell	Y	2642554	Mid Yell	Mid Yell	Mid Yell	60.6	-1.06667	P	PPL	GB		SCT	W3			0		9	Europe/London	2012-01-17
+01959	Westerham	Y	2634434	Westerham	Westerham	Westerham	51.26632	0.06892	P	PPL	GB		ENG	G5	43UK		3048		116	Europe/London	2011-02-05
+01962	Winchester	Y	2633858	Winchester	Winchester	Uinchest"r,Vincester,Vinchester,Winchester,u~inchesuta,Винчестер,Вінчестер,Уинчестър,ウィンチェスター	51.06513	-1.3187	P	PPLA2	GB		ENG	F2	24UP		40000		61	Europe/London	2010-10-16
+01963	Wincanton	Y	2633861	Wincanton	Wincanton	Wincanton	51.05676	-2.40574	P	PPL	GB		ENG	M3	40UD		4910		110	Europe/London	2011-03-03
+019642	Hornsea	Y	2646583	Hornsea	Hornsea		53.91041	-0.16806	P	PPLA3	GB		ENG	E1	00FB073		8427		7	Europe/London	2011-07-31
+019645	Hornsea	Y	2646583	Hornsea	Hornsea		53.91041	-0.16806	P	PPLA3	GB		ENG	E1	00FB073		8427		7	Europe/London	2011-07-31
+019648	Hornsea	Y	2646583	Hornsea	Hornsea		53.91041	-0.16806	P	PPLA3	GB		ENG	E1	00FB073		8427		7	Europe/London	2011-07-31
+019649	Hornsea	Y	2646583	Hornsea	Hornsea		53.91041	-0.16806	P	PPLA3	GB		ENG	E1	00FB073		8427		7	Europe/London	2011-07-31
+019643	Patrington	Y	2640571	Patrington	Patrington		53.68395	-0.0133	P	PPLA3	GB		ENG	E1	00FB108		0		14	Europe/London	2011-07-31
+019644	Patrington	Y	2640571	Patrington	Patrington		53.68395	-0.0133	P	PPLA3	GB		ENG	E1	00FB108		0		14	Europe/London	2011-07-31
+019646	Patrington	Y	2640571	Patrington	Patrington		53.68395	-0.0133	P	PPLA3	GB		ENG	E1	00FB108		0		14	Europe/London	2011-07-31
+019647	Patrington	Y	2640571	Patrington	Patrington		53.68395	-0.0133	P	PPLA3	GB		ENG	E1	00FB108		0		14	Europe/London	2011-07-31
+01967	Strontian	Y	2636621	Strontian	Strontian	Strontian	56.69576	-5.57019	P	PPL	GB		SCT	V3			0		9	Europe/London	2011-03-03
+01968	Penicuik	Y	2640465	Penicuik	Penicuik		55.83166	-3.22423	P	PPL	GB		SCT	00			17011		185	Europe/London	2007-06-07
+01969	Leyburn	Y	2644548	Leyburn	Leyburn	Leyburn	54.31004	-1.83041	P	PPL	GB		ENG	J7	36UE		1885		199	Europe/London	2011-03-03
+01970	Aberystwyth	Y	2657782	Aberystwyth	Aberystwyth	Aberistuit,Aberystwyth,a bo li si te wei si,Аберистуит,阿伯里斯特威斯	52.41548	-4.08292	P	PPLA3	GB		WLS	X6	00NQ003		18392		10	Europe/London	2011-07-31
+01971	Scourie	Y	2638344	Scourie	Scourie	Scourie	58.35181	-5.15191	P	PPL	GB		SCT	V3			0		18	Europe/London	2011-03-03
+01972	Glenborrodale	Y	2648522	Glenborrodale	Glenborrodale		56.67982	-5.90339	P	PPL	GB		SCT	V3			0		10	Europe/London	2011-03-03
+01974	Llanon	Y	2643971	Llanon	Llanon	Llannon,Llanon	52.28333	-4.18333	P	PPL	GB	GB	WLS	00			0		13	Europe/London	2012-01-17
+019752	Alford (Aberdeen)	Y	
+019754	Alford (Aberdeen)	Y	
+019755	Alford (Aberdeen)	Y	
+019759	Alford (Aberdeen)	Y	
+019753	Strathdon	Y	2636701	Strathdon	Strathdon		57.1999	-3.07102	P	PPL	GB		SCT	T6			0		315	Europe/London	2007-11-09
+019756	Strathdon	Y	2636701	Strathdon	Strathdon		57.1999	-3.07102	P	PPL	GB		SCT	T6			0		315	Europe/London	2007-11-09
+019757	Strathdon	Y	2636701	Strathdon	Strathdon		57.1999	-3.07102	P	PPL	GB		SCT	T6			0		315	Europe/London	2007-11-09
+019758	Strathdon	Y	2636701	Strathdon	Strathdon		57.1999	-3.07102	P	PPL	GB		SCT	T6			0		315	Europe/London	2007-11-09
+01977	Pontefract	Y	2640132	Pontefract	Pontefract		53.69107	-1.31269	P	PPL	GB		ENG	45			28620		69	Europe/London	2010-05-11
+01978	Wrexham	Y	2633485	Wrexham	Wrexham	Wrecsam,Wrexham	53.04664	-2.99132	P	PPLA2	GB		WLS	Z4	00NL007		43649		87	Europe/London	2011-03-03
+01980	Amesbury	Y	2657355	Amesbury	Amesbury	Amesbury	51.17172	-1.77897	P	PPLA3	GB		ENG	P8	00HY007		8497		69	Europe/London	2011-07-31
+01981	Wormbridge	Y	7294753	Wormbridge	Wormbridge		51.97396	-2.84803	A	ADM3	GB		ENG	F7	00GA235		0		81	Europe/London	2010-05-25
+01982	Builth Wells	Y	2654359	Builth Wells	Builth Wells	Builth,Builth Wells,Llanfair-ym-Muallt	52.1494	-3.40469	P	PPL	GB		WLS	Y8	00NN011		2669		130	Europe/London	2011-03-03
+01983	Isle of Wight	Y	2633939	Isle of Wight	Isle of Wight	Ile de Wight,Ilha de Wight,Illa de Wight,Insel Wight,Isla de Wight,Isle of Wight,Islla de Wight,Isola di Wight,Ostrov Uajt,Ostrov Wight,Wight,Wightsaari,Wiht,Wique,Ynys Wyth,waito dao,Île de Wight,Остров Уайт,ワイト島	50.66667	-1.33333	T	ISL	GB		ENG	00			0		113	Europe/London	2011-10-14
+01984	Watchet	Y	2634704	Watchet	Watchet	Watchet	51.18189	-3.33079	P	PPL	GB		ENG	M3	40UF		3793		11	Europe/London	2011-03-03
+01985	Warminster	Y	2634755	Warminster	Warminster	Warminster	51.20434	-2.17873	P	PPL	GB		ENG	P8	00HY231		17875		120	Europe/London	2011-03-03
+01986	Bungay	Y	2654327	Bungay	Bungay		52.45434	1.43818	P	PPL	GB		ENG	N5	42UH		5004		14	Europe/London	2010-05-24
+01987	Ebbsfleet	Y	6640312	Ebbsfleet	Ebbsfleet		51.31398	1.35209	P	PPL	GB		ENG	G5			0	0	7	Europe/London	2010-03-30
+01988	Wigtown	Y	2633932	Wigtown	Wigtown	Wigton,Wigtown	54.86783	-4.44489	P	PPL	GB		SCT	U2			934		45	Europe/London	2011-03-03
+01989	Ross-on-Wye	Y	2639110	Ross on Wye	Ross on Wye	Rhosan ar Wy,Ross,Ross on Wye	51.91667	-2.56667	P	PPL	GB		ENG	00			10310		39	Europe/London	2011-09-19
+01992	Lea Valley	Y	
+01993	Witney	Y	2633729	Witney	Witney	Uitni,Witney,Уитни	51.7836	-1.4854	P	PPL	GB		ENG	K2	38UF		24103		87	Europe/London	2011-03-03
+01994	St Clears	Y	2638833	Saint Clears	Saint Clears	Sancler,Sanclêr	51.81989	-4.49783	P	PPL	GB		WLS	X7			1605		7	Europe/London	2008-06-11
+01995	Garstang	Y	2648829	Garstang	Garstang		53.90081	-2.77417	P	PPL	GB		ENG	H2	30UQ		6433	19	22	Europe/London	2010-09-16
+01997	Strathpeffer	Y	2636689	Strathpeffer	Strathpeffer	Strathpeffer	57.58847	-4.53832	P	PPL	GB		SCT	V3			893		63	Europe/London	2011-03-03
+020	London	N	2643743	London	London	City of London,LON,Ljondan,Llundain,Londain,Londan,Londe,Londen,Londinium,Londino,London,London City,Londona,Londonas,Londoni,Londono,Londra,Londres,Londres - London,Londrez,Londyn,Londýn,Lontoo,Loundres,Luan GJon,Lunden,Lundunir,Lundúnir,Lunnainn,Lunnon,Luân Đôn,The City,ilantan,landana,leondeon,lndn,londoni,lun dun,lwndwn,lxndxn,rondon,Λονδίνο,Лондан,Лондон,Лёндан,Լոնդոն,לאנדאן,לונדון,لندن,لوندون,ܠܘܢܕܘܢ,लंडन,लंदन,লন্ডন,લંડન,இலண்டன்,ลอนดอน,ლონდონი,ለንደን,ロンドン,伦敦,런던	51.50853	-0.12574	P	PPLC	GB		ENG	GLA	P5		7556900		25	Europe/London	2012-02-10
+021	London	N	2643743	London	London	City of London,LON,Ljondan,Llundain,Londain,Londan,Londe,Londen,Londinium,Londino,London,London City,Londona,Londonas,Londoni,Londono,Londra,Londres,Londres - London,Londrez,Londyn,Londýn,Lontoo,Loundres,Luan GJon,Lunden,Lundunir,Lundúnir,Lunnainn,Lunnon,Luân Đôn,The City,ilantan,landana,leondeon,lndn,londoni,lun dun,lwndwn,lxndxn,rondon,Λονδίνο,Лондан,Лондон,Лёндан,Լոնդոն,לאנדאן,לונדון,لندن,لوندون,ܠܘܢܕܘܢ,लंडन,लंदन,লন্ডন,લંડન,இலண்டன்,ลอนดอน,ლონდონი,ለንደን,ロンドン,伦敦,런던	51.50853	-0.12574	P	PPLC	GB		ENG	GLA	P5		7556900		25	Europe/London	2012-02-10
+022	London	N	2643743	London	London	City of London,LON,Ljondan,Llundain,Londain,Londan,Londe,Londen,Londinium,Londino,London,London City,Londona,Londonas,Londoni,Londono,Londra,Londres,Londres - London,Londrez,Londyn,Londýn,Lontoo,Loundres,Luan GJon,Lunden,Lundunir,Lundúnir,Lunnainn,Lunnon,Luân Đôn,The City,ilantan,landana,leondeon,lndn,londoni,lun dun,lwndwn,lxndxn,rondon,Λονδίνο,Лондан,Лондон,Лёндан,Լոնդոն,לאנדאן,לונדון,لندن,لوندون,ܠܘܢܕܘܢ,लंडन,लंदन,লন্ডন,લંડન,இலண்டன்,ลอนดอน,ლონდონი,ለንደን,ロンドン,伦敦,런던	51.50853	-0.12574	P	PPLC	GB		ENG	GLA	P5		7556900		25	Europe/London	2012-02-10
+0231	London	N	2643743	London	London	City of London,LON,Ljondan,Llundain,Londain,Londan,Londe,Londen,Londinium,Londino,London,London City,Londona,Londonas,Londoni,Londono,Londra,Londres,Londres - London,Londrez,Londyn,Londýn,Lontoo,Loundres,Luan GJon,Lunden,Lundunir,Lundúnir,Lunnainn,Lunnon,Luân Đôn,The City,ilantan,landana,leondeon,lndn,londoni,lun dun,lwndwn,lxndxn,rondon,Λονδίνο,Лондан,Лондон,Лёндан,Լոնդոն,לאנדאן,לונדון,لندن,لوندون,ܠܘܢܕܘܢ,लंडन,लंदन,লন্ডন,લંડન,இலண்டன்,ลอนดอน,ლონდონი,ለንደን,ロンドン,伦敦,런던	51.50853	-0.12574	P	PPLC	GB		ENG	GLA	P5		7556900		25	Europe/London	2012-02-10
+0232	London	N	2643743	London	London	City of London,LON,Ljondan,Llundain,Londain,Londan,Londe,Londen,Londinium,Londino,London,London City,Londona,Londonas,Londoni,Londono,Londra,Londres,Londres - London,Londrez,Londyn,Londýn,Lontoo,Loundres,Luan GJon,Lunden,Lundunir,Lundúnir,Lunnainn,Lunnon,Luân Đôn,The City,ilantan,landana,leondeon,lndn,londoni,lun dun,lwndwn,lxndxn,rondon,Λονδίνο,Лондан,Лондон,Лёндан,Լոնդոն,לאנדאן,לונדון,لندن,لوندون,ܠܘܢܕܘܢ,लंडन,लंदन,লন্ডন,લંડન,இலண்டன்,ลอนดอน,ლონდონი,ለንደን,ロンドン,伦敦,런던	51.50853	-0.12574	P	PPLC	GB		ENG	GLA	P5		7556900		25	Europe/London	2012-02-10
+0233	London	N	2643743	London	London	City of London,LON,Ljondan,Llundain,Londain,Londan,Londe,Londen,Londinium,Londino,London,London City,Londona,Londonas,Londoni,Londono,Londra,Londres,Londres - London,Londrez,Londyn,Londýn,Lontoo,Loundres,Luan GJon,Lunden,Lundunir,Lundúnir,Lunnainn,Lunnon,Luân Đôn,The City,ilantan,landana,leondeon,lndn,londoni,lun dun,lwndwn,lxndxn,rondon,Λονδίνο,Лондан,Лондон,Лёндан,Լոնդոն,לאנדאן,לונדון,لندن,لوندون,ܠܘܢܕܘܢ,लंडन,लंदन,লন্ডন,લંડન,இலண்டன்,ลอนดอน,ლონდონი,ለንደን,ロンドン,伦敦,런던	51.50853	-0.12574	P	PPLC	GB		ENG	GLA	P5		7556900		25	Europe/London	2012-02-10
+0234	London	N	2643743	London	London	City of London,LON,Ljondan,Llundain,Londain,Londan,Londe,Londen,Londinium,Londino,London,London City,Londona,Londonas,Londoni,Londono,Londra,Londres,Londres - London,Londrez,Londyn,Londýn,Lontoo,Loundres,Luan GJon,Lunden,Lundunir,Lundúnir,Lunnainn,Lunnon,Luân Đôn,The City,ilantan,landana,leondeon,lndn,londoni,lun dun,lwndwn,lxndxn,rondon,Λονδίνο,Лондан,Лондон,Лёндан,Լոնդոն,לאנדאן,לונדון,لندن,لوندون,ܠܘܢܕܘܢ,लंडन,लंदन,লন্ডন,લંડન,இலண்டன்,ลอนดอน,ლონდონი,ለንደን,ロンドン,伦敦,런던	51.50853	-0.12574	P	PPLC	GB		ENG	GLA	P5		7556900		25	Europe/London	2012-02-10
+0235	London	N	2643743	London	London	City of London,LON,Ljondan,Llundain,Londain,Londan,Londe,Londen,Londinium,Londino,London,London City,Londona,Londonas,Londoni,Londono,Londra,Londres,Londres - London,Londrez,Londyn,Londýn,Lontoo,Loundres,Luan GJon,Lunden,Lundunir,Lundúnir,Lunnainn,Lunnon,Luân Đôn,The City,ilantan,landana,leondeon,lndn,londoni,lun dun,lwndwn,lxndxn,rondon,Λονδίνο,Лондан,Лондон,Лёндан,Լոնդոն,לאנדאן,לונדון,لندن,لوندون,ܠܘܢܕܘܢ,लंडन,लंदन,লন্ডন,લંડન,இலண்டன்,ลอนดอน,ლონდონი,ለንደን,ロンドン,伦敦,런던	51.50853	-0.12574	P	PPLC	GB		ENG	GLA	P5		7556900		25	Europe/London	2012-02-10
+0236	London	N	2643743	London	London	City of London,LON,Ljondan,Llundain,Londain,Londan,Londe,Londen,Londinium,Londino,London,London City,Londona,Londonas,Londoni,Londono,Londra,Londres,Londres - London,Londrez,Londyn,Londýn,Lontoo,Loundres,Luan GJon,Lunden,Lundunir,Lundúnir,Lunnainn,Lunnon,Luân Đôn,The City,ilantan,landana,leondeon,lndn,londoni,lun dun,lwndwn,lxndxn,rondon,Λονδίνο,Лондан,Лондон,Лёндан,Լոնդոն,לאנדאן,לונדון,لندن,لوندون,ܠܘܢܕܘܢ,लंडन,लंदन,লন্ডন,લંડન,இலண்டன்,ลอนดอน,ლონდონი,ለንደን,ロンドン,伦敦,런던	51.50853	-0.12574	P	PPLC	GB		ENG	GLA	P5		7556900		25	Europe/London	2012-02-10
+0237	London	N	2643743	London	London	City of London,LON,Ljondan,Llundain,Londain,Londan,Londe,Londen,Londinium,Londino,London,London City,Londona,Londonas,Londoni,Londono,Londra,Londres,Londres - London,Londrez,Londyn,Londýn,Lontoo,Loundres,Luan GJon,Lunden,Lundunir,Lundúnir,Lunnainn,Lunnon,Luân Đôn,The City,ilantan,landana,leondeon,lndn,londoni,lun dun,lwndwn,lxndxn,rondon,Λονδίνο,Лондан,Лондон,Лёндан,Լոնդոն,לאנדאן,לונדון,لندن,لوندون,ܠܘܢܕܘܢ,लंडन,लंदन,লন্ডন,લંડન,இலண்டன்,ลอนดอน,ლონდონი,ለንደን,ロンドン,伦敦,런던	51.50853	-0.12574	P	PPLC	GB		ENG	GLA	P5		7556900		25	Europe/London	2012-02-10
+0238	Southampton	N	2637487	Southampton	Southampton	Hantonne,Sautgempton,Sautkhempt"n,Southampton,sausuhanputon,Саутгемптон,Саутхемптън,サウスハンプトン	50.90395	-1.40428	P	PPLA2	GB		ENG	M4	24UJ		246201		19	Europe/London	2011-03-03
+0239	Portsmouth	N	2639996	Portsmouth	Portsmouth	Porchemue,Porchémue,Portsmouth,Portsmut,potsumasu,pu ci mao si,Портсмут,ポーツマス,朴次茅斯	50.79899	-1.09125	P	PPLA2	GB		ENG	K6	00MR001		194150		6	Europe/London	2011-02-17
+024	Coventry	N	2652221	Coventry	Coventry	Coventry,Koventri,kao wen chui,kovu~entori,kwfntry,qwbntry,Ковентри,קובנטרי,كوفنتري,コヴェントリー,考文垂	52.40656	-1.51217	P	PPLA2	GB		ENG	C7			308313		89	Europe/London	2010-10-16
+02820	Ballycastle	N	2656531	Ballycastle	Ballycastle	Baile an Chaistil,Ballycastle	55.20444	-6.24298	P	PPLA2	GB		NIR	S8			5566		11	Europe/London	2010-10-16
+02821	Martinstown	N	
+02825	Ballymena	N	2656490	Ballymena	Ballymena	Behllimena,Бэллимена	54.86357	-6.27628	P	PPLA2	GB		NIR	Q9			28932		49	Europe/London	2010-10-16
+02827	Ballymoney	N	2656488	Ballymoney	Ballymoney		55.0708	-6.51009	P	PPLA2	GB		NIR	R1			9625		43	Europe/London	2010-10-16
+02828	Larne	N	2644849	Larne	Larne		54.85	-5.81667	P	PPLA2	GB		NIR	S3			18421		4	Europe/London	2010-10-16
+02829	Kilrea	N	2645555	Kilrea	Kilrea		54.95091	-6.55695	P	PPL	GB		NIR	00			1616		49	Europe/London	2007-04-13
+02830	Newry	N	2641581	Newry	Newry	An tiur,An tïúr,Iubhar Cinn Tragha,Iubhar Cinn Trágha,N'juri,Ньюри	54.17841	-6.33739	P	PPLA2	GB		NIR	S9			27757		6	Europe/London	2010-10-16
+02837	Armagh	N	2657060	Armagh	Armagh	Ard Mhacha,Armagh,ama,アーマー	54.35	-6.66667	P	PPLA2	GB		NIR	Q8			14801		37	Europe/London	2010-10-16
+02838	Portadown	N	2640085	Portadown	Portadown	Portavogie	54.41344	-6.44743	P	PPL	GB	GB	NIR	Q8			0		14	Europe/London	2010-04-12
+02840	Banbridge	N	2656407	Banbridge	Banbridge		54.35	-6.28333	P	PPLA2	GB		NIR	R2			16173		94	Europe/London	2010-10-16
+02841	Rostrevor	N	2639106	Rostrevor	Rostrevor	Rosstrevor,Rostrevor	54.1	-6.2	P	PPL	GB		NIR	00			2515		8	Europe/London	2010-08-09
+02842	Kircubbin	N	2645329	Kircubbin	Kircubbin		54.48333	-5.53333	P	PPL	GB		NIR	00			1237		10	Europe/London	2006-01-17
+02843	Newcastle (Co. Down)	N	6695976	Newcastle	Newcastle	Newcastle,Newcastle County Down	54.21804	-5.88979	P	PPL	GB		NIR				0		5	Europe/London	2012-02-09
+02844	Downpatrick	N	2651023	Downpatrick	Downpatrick		54.32633	-5.70345	P	PPLA2	GB		NIR	R9			10507		49	Europe/London	2010-10-16
+02866	Enniskillen	N	2649984	Enniskillen	Enniskillen	Enniskillen,Inis Ceithlann	54.34615	-7.64133	P	PPLA2	GB		NIR	S2			14472		52	Europe/London	2010-10-16
+02867	Lisnaskea	N	2644400	Lisnaskea	Lisnaskea		54.25	-7.45	P	PPL	GB		NIR	00			2895		56	Europe/London	2006-01-17
+02868	Kesh	N	2645763	Kesh	Kesh	Kesh	54.53333	-7.71667	P	PPL	GB		NIR	00			0		68	Europe/London	2012-01-17
+02870	Coleraine	N	2652586	Coleraine	Coleraine	Colepaine,Cuil Rathain,Cúil Rathain,Kolrehjn,Колрэйн	55.13333	-6.66667	P	PPLA2	GB		NIR	R6			25681		5	Europe/London	2010-10-16
+02871	Londonderry	N	2643736	Derry	Derry	Derri,Derry,Derry / Londonderry,Derry City,Dhoire,Doire,Doire Choluim Chille,Ker Dherow,Londonderry,dry,rondonderi,Дерри,דרי,ロンドンデリー	54.9981	-7.30934	P	PPLA2	GB	GB	NIR	S6			83652		24	Europe/London	2010-10-16
+02877	Limavady	N	2644501	Limavady	Limavady	Newtown Limavady	55.05045	-6.95074	P	PPLA2	GB		NIR	S4			12970		20	Europe/London	2010-10-16
+02879	Magherafelt	N	2643208	Magherafelt	Magherafelt		54.75356	-6.60656	P	PPLA2	GB		NIR	S7			9157		76	Europe/London	2010-10-16
+02880	Carrickmore	N	2653676	Carrickmore	Carrickmore	Carrickmore,Termon Rock	54.6	-7.05	P	PPL	GB	GB	NIR	00			0		182	Europe/London	2012-01-17
+02881	Newtownstewart	N	2641511	Newtownstewart	Newtownstewart		54.71778	-7.37886	P	PPL	GB		NIR	00			1465		53	Europe/London	2007-04-13
+02882	Omagh	N	2640967	Omagh	Omagh	An Oghmagh,An Omaigh,An Ómaigh,Oma,Ома	54.6	-7.3	P	PPLA2	GB		NIR	T3			21056		72	Europe/London	2010-10-16
+02885	Ballygawley	N	2656512	Ballygawley	Ballygawley	Ballygawley	54.46667	-7.03333	P	PPL	GB		NIR	00			0		95	Europe/London	2012-01-17
+02886	Cookstown	N	2652417	Cookstown	Cookstown		54.64305	-6.74595	P	PPLA2	GB		NIR	R7			11081		78	Europe/London	2010-10-16
+02887	Dungannon	N	2650729	Dungannon	Dungannon		54.50344	-6.76723	P	PPLA2	GB		NIR	S1			11935		105	Europe/London	2010-10-16
+02889	Fivemiletown	N	2649347	Fivemiletown	Fivemiletown		54.38333	-7.3	P	PPL	GB		NIR	00			1109		117	Europe/London	2006-01-17
+02890	Belfast	N	2655984	Belfast	Belfast	BFS,Beal Feirste,Behlfast,Belfast,Belfast City,Belfasta,Belfasto,Belffast,Belfāsta,Beul-Feirste,Béal Feirste,Mpelphast,baelpaseuteu,bei er fa si te,belpaseuteu,berufasuto,blfast,Μπέλφαστ,Белфаст,Бэлфаст,בלפאסט,بلفاست,ベルファスト,貝爾法斯特,贝尔法斯特,밸파스트,벨파스트	54.58333	-5.93333	P	PPLA	GB		NIR	R3			274770		17	Europe/London	2012-01-17
+02895	Belfast	N	2655984	Belfast	Belfast	BFS,Beal Feirste,Behlfast,Belfast,Belfast City,Belfasta,Belfasto,Belffast,Belfāsta,Beul-Feirste,Béal Feirste,Mpelphast,baelpaseuteu,bei er fa si te,belpaseuteu,berufasuto,blfast,Μπέλφαστ,Белфаст,Бэлфаст,בלפאסט,بلفاست,ベルファスト,貝爾法斯特,贝尔法斯特,밸파스트,벨파스트	54.58333	-5.93333	P	PPLA	GB		NIR	R3			274770		17	Europe/London	2012-01-17
+02891	Bangor (Co. Down)	N	2656396	Bangor	Bangor	Bangor,Beannchar,Бангор	54.65338	-5.66895	P	PPLA2	GB		NIR	T2			60385		45	Europe/London	2010-10-16
+02892	Lisburn	N	2644411	Lisburn	Lisburn	Lios na gCearrbhach,Lisbern,Lisburn,Лисберн	54.52337	-6.03527	P	PPLA2	GB		NIR	S5			77506		53	Europe/London	2010-10-16
+02893	Ballyclare	N	2656528	Ballyclare	Ballyclare	Ballyclare	54.76667	-6.01667	P	PPL	GB		NIR	00			9472		117	Europe/London	2010-08-09
+02894	Antrim	N	2657255	Antrim	Antrim		54.7	-6.2	P	PPLA2	GB		NIR	Q6			19661		42	Europe/London	2010-10-16
+02897	Saintfield	N	2638800	Saintfield	Saintfield		54.46046	-5.83065	P	PPL	GB		NIR	00			3327		74	Europe/London	2007-04-13
+029	Cardiff	N	2653822	Cardiff	Cardiff	Caerdydd,Cardiff,Kardiff,Kerdiz,Кардифф	51.48	-3.18	P	PPLA	GB		WLS	X5			302139		17	Europe/London	2011-12-03

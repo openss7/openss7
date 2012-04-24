@@ -18,7 +18,7 @@ my $fn;
 
 my %switches = ();
 
-$fn = "clli.csv";
+$fn = "sw.csv";
 my @fields = ();
 my $header = 1;
 open($fh,"<",$fn) or die "can't open $fn";
@@ -30,9 +30,9 @@ while (<$fh>) { chomp;
 		$header = undef;
 		next;
 	}
-	if (my $clli = $tokens[0]) {
+	if (my $sw = $tokens[0]) {
 		for (my $i=0;$i<@fields;$i++) {
-			$switches{$clli}{$fields[$i]} = $tokens[$i] if $tokens[$i];
+			$switches{$sw}{$fields[$i]} = $tokens[$i] if $tokens[$i];
 		}
 	}
 }
@@ -50,14 +50,14 @@ my @keys = (
 
 sub closerecord {
 	my $data = shift;
-	if (my $clli = $data->{CLLI}) {
-		$switches{$clli} = {} unless exists $switches{$clli};
-		my $rec = $switches{$clli};
+	if (my $sw = $data->{CLLI}) {
+		$switches{$sw} = {} unless exists $switches{$sw};
+		my $rec = $switches{$sw};
 		for (my $i=0;$i<4;$i++) {
 			my $k = $keys[$i];
 			if ($data->{$k}) {
 				if ($rec->{$k} and $rec->{$k} ne $data->{$k}) {
-					print STDERR "E: $clli $k changing from $rec->{$k} to $data->{$k}\n";
+					print STDERR "E: $sw $k changing from $rec->{$k} to $data->{$k}\n";
 				}
 				$rec->{$k} = $data->{$k};
 			}
@@ -117,12 +117,12 @@ $fn = "switches.csv";
 print STDERR "I: writing $fn\n";
 open($of,">",$fn) or die "can't open $fn";
 print $of '"', join('","',@keys), '"', "\n";
-foreach my $clli (sort keys %switches) {
-	foreach my $sub (@{$switches{$clli}{rcs}}) {
+foreach my $sw (sort keys %switches) {
+	foreach my $sub (@{$switches{$sw}{rcs}}) {
 		my @values = ();
 		for (my $i=0;$i<4;$i++) {
 			my $k = $keys[$i];
-			push @values,$switches{$clli}{$k};
+			push @values,$switches{$sw}{$k};
 		}
 		for (my $i=4;$i<@keys;$i++) {
 			my $k = $keys[$i];

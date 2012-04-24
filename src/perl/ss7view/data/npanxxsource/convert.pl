@@ -135,8 +135,10 @@ my @ocn_keys = (
 	'Carrier Country',
 );
 
-my @clli_keys = (
+my @sw_keys = (
 	'CLLI',
+	'NPA',
+	'NXX',
 	'LATA',
 	'OCN',
 	'Class 4/5 Switch',
@@ -183,15 +185,35 @@ my @clli_keys = (
 	'Is Feature Group D EO',
 );
 
-my @wire_keys = (
-	'Wire Center CLLI',
+my @wc_keys = (
+	'WC',
+	'NPA',
+	'NXX',
+	'LATA',
+	'OCN',
+	'Wire Center Address',
+	'Wire Center County',
+	'Wire Center City',
+	'Wire Center State',
+	'Wire Center Zip',
+	'Wire Center Latitude/Longitude',
+	'Wire Center V&H',
+	'Wire Center Country',
+	'Wire Center Name',
 );
 
 my @rc_keys = (
-	'RCSHORT',
+	'RCCC',
+	'RCST',
+	'RCNAME',
 	'REGION',
+	'RCSHORT',
 	'RCVH',
+	'RCLL',
 	'NPA',
+	'NXX',
+	'LATA',
+	'OCN',
 	'Zone',
 	'Rate Center LATA',
 	'Rate Center Name',
@@ -235,8 +257,13 @@ my %this_keys = (
 );
 
 my %ocns = ();
-my %cllis = ();
+my %sws = ();
+my %wcs = ();
 my %rcs = ();
+
+my %dbsw = ();
+my %dbwc = ();
+my %dbrc = ();
 
 sub closerecord {
 	my $data = shift;
@@ -259,23 +286,28 @@ sub closerecord {
 			}
 		}
 	}
-	if (my $clli = $data->{Switch}) {
-		$cllis{$clli} = {} unless exists $cllis{$clli};
-		my $rec = $cllis{$clli};
-		$rec->{CLLI} = $clli;
-		for (my $i=1;$i<@clli_keys;$i++) {
-			my $k = $clli_keys[$i];
-			if ($data->{$k}) {
-				if ($rec->{$k} and $rec->{$k} ne $data->{$k}) {
-					print STDERR "E: CLLI $clli $k changing from $rec->{$k} to $data->{$k}\n";
+	if (my $sw = $data->{Switch}) {
+		$sws{$sw} = {} unless exists $sws{$sw};
+		my $rec = $sws{$sw};
+		$data->{CLLI} = $sw;
+		foreach my $k (@sw_keys) {
+			if ($k eq 'NPA' or $k eq 'LATA' or $k eq 'OCN') {
+				$rec->{$k}{$data->{$k}}++ if $data->{$k};
+			} elsif ($k eq 'NXX') {
+				$rec->{$k}{"$data->{NPA}-$data->{NXX}"}++ if $data->{NPA} and $data->{NXX};
+			} else {
+				if ($data->{$k}) {
+					if ($rec->{$k} and $rec->{$k} ne $data->{$k}) {
+						print STDERR "E: SW $sw $k changing from $rec->{$k} to $data->{$k}\n";
+					}
+					$rec->{$k} = $data->{$k};
 				}
-				$rec->{$k} = $data->{$k};
 			}
 		}
 		foreach my $k (keys %feat_keys) {
 			if ($data->{$k} and length($data->{$k}) == 11) {
-				$cllis{$data->{$k}}{CLLI} = $data->{$k};
-				$cllis{$data->{$k}}{$feat_keys{$k}} = 'X';
+				$sws{$data->{$k}}{CLLI} = $data->{$k};
+				$sws{$data->{$k}}{$feat_keys{$k}} = 'X';
 			}
 		}
 		foreach my $k (keys %this_keys) {
@@ -283,23 +315,91 @@ sub closerecord {
 				$rec->{$this_keys{$k}} = 'X';
 			}
 		}
+		if ($data->{NPA} and $data->{NXX}) {
+			$dbsw{$data->{NPA}}{$data->{NXX}} = {} unless exists
+			$dbsw{$data->{NPA}}{$data->{NXX}};
+			my $rec = $dbsw{$data->{NPA}}{$data->{NXX}};
+			$rec->{NPA} = $data->{NPA};
+			$rec->{NXX} = $data->{NXX};
+			$rec->{CLLI} = $sw;
+		}
 	}
+	if (my $wc = substr($data->{Switch},0,8)) {
+		$wcs{$wc} = {} unless exists $wcs{$wc};
+		my $rec = $wcs{$wc};
+		$data->{WC} = $wc;
+		$data->{LATA} = $data->{'Wire Center LATA'};
+		foreach my $k (@wc_keys) {
+			if ($k eq 'NPA' or $k eq 'LATA' or $k eq 'OCN') {
+				$rec->{$k}{$data->{$k}}++ if $data->{$k};
+			} elsif ($k eq 'NXX') {
+				$rec->{$k}{"$data->{NPA}-$data->{NXX}"}++ if $data->{NPA} and $data->{NXX};
+			} else {
+				if ($data->{$k}) {
+					if ($rec->{$k} and $rec->{$k} ne $data->{$k}) {
+						print STDERR "E: WC $wc $k changing from $rec->{$k} to $data->{$k}\n";
+					}
+					$rec->{$k} = $data->{$k};
+				}
+			}
+		}
+		if ($data->{NPA} and $data->{NXX}) {
+			$dbwc{$data->{NPA}}{$data->{NXX}} = {} unless exists
+			$dbwc{$data->{NPA}}{$data->{NXX}};
+			my $rec = $dbwc{$data->{NPA}}{$data->{NXX}};
+			$rec->{NPA} = $data->{NPA};
+			$rec->{NXX} = $data->{NXX};
+			$rec->{WC} = $wc;
+		}
+	}
+	my %cor = (
+		'AG.AN'=>'AG.AG.AN',
+		'BS.BA'=>'BS.BS.BA',
+		'BB.BD'=>'BB.BB.BD',
+		'VG.BV'=>'VG.VG.BV',
+		'KY.CQ'=>'KY.KY.CQ',
+		'DO.DR'=>'DO.DO.DR',
+		'GD.GN'=>'GD.GD.GN',
+		'US.GU'=>'GU.GU.GU',
+		'KN.KA'=>'KN.KN.KA',
+		'US.MP'=>'MP.MP.NN',
+		'CA.NL'=>'CA.NL.NF',
+		'CA.NU'=>'CA.NU.VU',
+		'US.PR'=>'PR.PR.PR',
+		'CA.QC'=>'CA.QC.PQ',
+		'MS.RT'=>'MS.MS.RT',
+		'LC.SA'=>'LC.LC.SA',
+		'SX.SF'=>'SX.SX.SF',
+		'US.SK'=>'CA.SK.SK',
+		'TT.TR'=>'TT.TT.TR',
+		'US.AS'=>'AS.AS.AS',
+		'US.VI'=>'VI.VI.VI',
+		'VC.ZF'=>'VC.VC.ZF',
+	);
+	my $st = $data->{'Rate Center State'};
+	my $cc = $data->{'Rate Center Country'};
+	my $rg = $st;
+	($cc,$st,$rg) = split(/\./,$cor{"$cc.$st"}) if exists $cor{"$cc.$st"};
 	my $rc = $data->{'LERG Abbreviation'};
 	if ($rc and $rc ne 'XXXXXXXXXX') {
-		if (my $st = $data->{'Rate Center State'}) {
-			$rcs{$st}{$rc} = {} unless exists $rcs{$st}{$rc};
-			my $rec = $rcs{$st}{$rc};
+		if ($rg) {
+			$rcs{$rg}{$rc} = {} unless exists $rcs{$rg}{$rc};
+			my $rec = $rcs{$rg}{$rc};
 			$data->{RCSHORT} = $rc;
-			$data->{REGION} = $st;
+			$data->{REGION} = $rg;
+			$data->{RCCC} = $cc;
+			$data->{RCST} = $st;
+			$rec->{RCNAME} = $data->{'Rate Center Name'};
+			$data->{LATA} = $data->{'Rate Center LATA'};
 			if ($data->{'Major V&H'}) {
 				$data->{RCVH} = sprintf "%05d,%05d", split(/,/,$data->{'Major V&H'});
 			}
-			for (my $i=0;$i<@rc_keys;$i++) {
-				my $k = $rc_keys[$i];
+			$data->{RCLL} = $data->{'Rate Center Latitude/Longitude'};
+			foreach my $k (@rc_keys) {
 				if ($k eq 'NPA') {
-					if ($data->{$k}) {
-						$rec->{$k}{$data->{$k}}++;
-					}
+					$rec->{$k}{$data->{$k}}++ if $data->{$k};
+				} elsif ($k eq 'NXX') {
+					$rec->{$k}{"$data->{NPA}-$data->{NXX}"}++ if $data->{NPA} and $data->{NXX};
 				} else {
 					if ($data->{$k}) {
 						if ($rec->{$k} and $rec->{$k} ne $data->{$k}) {
@@ -310,6 +410,17 @@ sub closerecord {
 				}
 			}
 		}
+	}
+	if ($data->{NPA} and $data->{NXX}) {
+		$dbrc{$data->{NPA}}{$data->{NXX}} = {} unless exists $dbrc{$data->{NPA}}{$data->{NXX}};
+		my $rec = $dbrc{$data->{NPA}}{$data->{NXX}};
+		$rec->{NPA} = $data->{NPA};
+		$rec->{NXX} = $data->{NXX};
+		$rec->{REGION} = $rg;
+		$rec->{RCSHORT} = $data->{'LERG Abbreviation'};
+		$rec->{RCNAME} = $data->{'Rate Center Name'};
+		$rec->{RCCC} = $cc;
+		$rec->{RCST} = $st;
 	}
 }
 
@@ -1069,15 +1180,63 @@ foreach my $k (sort keys %ocns) {
 }
 close($of);
 
-$fn = "$datadir/clli.csv";
+$fn = "$datadir/sw.csv";
 print STDERR "I: writing $fn...\n";
 open($of,">",$fn) or die "can't open $fn";
-print $of '"', join('","',@clli_keys), '"', "\n";
-foreach my $k (sort keys %cllis) {
-	my $clli = $cllis{$k};
+print $of '"', join('","',@sw_keys), '"', "\n";
+foreach my $k (sort keys %sws) {
+	my $rec = $sws{$k};
 	my @values = ();
-	foreach (@clli_keys) { push @values, $clli->{$_} }
-	print $of '"', join('","',@values), '"', "\n";
+	foreach (@sw_keys) {
+		if (exists $rec->{$_} and ref $rec->{$_} eq 'HASH') {
+			push @values, join(',',sort keys %{$rec->{$_}});
+		} else {
+			push @values, $rec->{$_};
+		}
+	}
+	print $of '"',join('","',@values),'"',"\n";
+}
+close($of);
+
+$fn = "$datadir/db.sw.csv";
+print STDERR "I: writing $fn...\n";
+open($of,">",$fn) or die "can't open $fn";
+print $of '"',join('","',qw/NPA NXX CLLI/),'"',"\n";
+foreach my $npa (sort keys %dbsw) {
+	foreach my $nxx (sort keys %{$dbsw{$npa}}) {
+		my $rec = $dbsw{$npa}{$nxx};
+		print $of '"',join('","',($npa,$nxx,$rec->{CLLI})),'"',"\n";
+	}
+}
+close($of);
+
+$fn = "$datadir/wc.csv";
+print STDERR "I: writing $fn...\n";
+open($of,">",$fn) or die "can't open $fn";
+print $of '"', join('","',@wc_keys), '"', "\n";
+foreach my $k (sort keys %wcs) {
+	my $rec = $wcs{$k};
+	my @values = ();
+	foreach (@wc_keys) {
+		if (exists $rec->{$_} and ref $rec->{$_} eq 'HASH') {
+			push @values, join(',',sort keys %{$rec->{$_}});
+		} else {
+			push @values, $rec->{$_};
+		}
+	}
+	print $of '"',join('","',@values),'"',"\n";
+}
+close($of);
+
+$fn = "$datadir/db.wc.csv";
+print STDERR "I: writing $fn...\n";
+open($of,">",$fn) or die "can't open $fn";
+print $of '"',join('","',qw/NPA NXX WC/),'"',"\n";
+foreach my $npa (sort keys %dbwc) {
+	foreach my $nxx (sort keys %{$dbwc{$npa}}) {
+		my $rec = $dbwc{$npa}{$nxx};
+		print $of '"',join('","',($npa,$nxx,$rec->{WC})),'"',"\n";
+	}
 }
 close($of);
 
@@ -1085,18 +1244,48 @@ $fn = "$datadir/rc.csv";
 print STDERR "I: writing $fn...\n";
 open($of,">",$fn) or die "can't open $fn";
 print $of '"', join('","',@rc_keys), '"', "\n";
-foreach my $s (sort keys %rcs) {
-	foreach my $k (sort keys %{$rcs{$s}}) {
-		my $rc = $rcs{$s}{$k};
+foreach my $rg (sort keys %rcs) {
+	foreach my $rc (sort keys %{$rcs{$rg}}) {
+		my $rec = $rcs{$rg}{$rc};
 		my @values = ();
 		foreach (@rc_keys) {
-			if (exists $rc->{$_} and ref $rc->{$_} eq 'HASH') {
-				push @values, join(',',sort keys %{$rc->{$_}});
+			if (exists $rec->{$_} and ref $rec->{$_} eq 'HASH') {
+				push @values, join(',',sort keys %{$rec->{$_}});
 			} else {
-				push @values, $rc->{$_};
+				push @values, $rec->{$_};
 			}
 		}
-		print $of '"', join('","',@values), '"', "\n";
+		print $of '"',join('","',@values),'"',"\n";
+	}
+}
+close($of);
+
+my @dbrc_keys = (
+	'NPA',
+	'NXX',
+	'REGION',
+	'RCSHORT',
+	'RCCC',
+	'RCST',
+	'RCNAME',
+);
+
+$fn = "$datadir/db.rc.csv";
+print STDERR "I: writing $fn...\n";
+open($of,">",$fn) or die "can't open $fn";
+print $of '"',join('","',@dbrc_keys),'"',"\n";
+foreach my $npa (sort keys %dbrc) {
+	foreach my $nxx (sort keys %{$dbrc{$npa}}) {
+		my $rec = $dbrc{$npa}{$nxx};
+		my @values = ();
+		foreach (@dbrc_keys) {
+			if (exists $rec->{$_} and ref $rec->{$_} eq 'HASH') {
+				push @values, join(',',sort keys %{$rec->{$_}});
+			} else {
+				push @values, $rec->{$_};
+			}
+		}
+		print $of '"',join('","',@values),'"',"\n";
 	}
 }
 close($of);

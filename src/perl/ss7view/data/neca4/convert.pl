@@ -11,6 +11,7 @@ my $codedir = "$progdir/..";
 use strict;
 use Data::Dumper;
 use Encode qw(encode decode);
+use Geo::Coordinates::VandH;
 
 my $fh = \*INFILE;
 my $of = \*OUTFILE;
@@ -21,6 +22,8 @@ my @keys = (
 	'NXX',
 	'X',
 	'rng',
+	'lines',
+	'total',
 	'loc',
 	'state',
 	'clli',
@@ -28,6 +31,7 @@ my @keys = (
 	'ocn',
 	'lata',
 	'feat',
+	'sect',
 );
 
 my @ocn_keys = (
@@ -38,22 +42,133 @@ my @ocn_keys = (
 	'trgt',
 );
 
-my @clli_keys = (
+my @sw_keys = (
 	'CLLI',
 	'wcvh',
 	'ocn',
 	'lata',
 	'feat',
+	'NPA',
+	'NXX',
+);
+
+my @wc_keys = (
+	'WC',
+	'wcvh',
+	'clli',
+	'ocn',
+	'lata',
+	'feat',
+	'state',
+	'NPA',
+	'NXX',
+);
+
+my @rc_keys = (
+	'RCSHORT',
+	'REGION',
+	'RCVH',
+	'RCLL',
+	'NPA',
+	'NXX',
+	'RCNAME',
 );
 
 my %ocns = ();
-my %cllis = ();
+my %sws = ();
+my %wcs = ();
+my %dbsw = ();
+my %dbwc = ();
+
+my @swcor_keys = ();
+my %swcor = ();
+$fn = "$datadir/swcor.csv";
+if (-f $fn) {
+	open($fh,"<",$fn) or die "can't open $fn";
+	my $heading = 1;
+	while (<$fh>) { chomp;
+		next if /^#/;
+		s/^"//; s/"$//; my @tokens = split(/","/,$_);
+		if ($heading) {
+			@swcor_keys = @tokens;
+			$heading = undef;
+			next;
+		}
+		if (my $sw = $tokens[0]) {
+			$swcor{$sw} = {} unless exists $swcor{$sw};
+			my $rec = $swcor{$sw};
+			for (my $i=0;$i<@swcor_keys;$i++) {
+				$swcor{$sw}{$swcor_keys[$i]} = $tokens[$i] if $tokens[$i];
+			}
+		}
+	}
+	close($fh);
+}
+
+
+my @wccor_keys = ();
+my %wccor = ();
+$fn = "$datadir/wccor.csv";
+if (-f $fn) {
+	open($fh,"<",$fn) or die "can't open $fn";
+	my $heading = 1;
+	while (<$fh>) { chomp;
+		next if /^#/;
+		s/^"//; s/"$//; my @tokens = split(/","/,$_);
+		if ($heading) {
+			@wccor_keys = @tokens;
+			$heading = undef;
+			next;
+		}
+		if (my $wc = $tokens[0]) {
+			$wccor{$wc} = {} unless exists $wccor{$wc};
+			my $rec = $wccor{$wc};
+			for (my $i=0;$i<@wccor_keys;$i++) {
+				$wccor{$wc}{$wccor_keys[$i]} = $tokens[$i] if $tokens[$i];
+			}
+		}
+	}
+	close($fh);
+}
 
 sub closerecord {
 	my $data = shift;
 	if (exists $data->{feat} and ref $data->{feat} eq 'HASH') {
 		$data->{feat} = join(' ',sort keys %{$data->{feat}});
 	}
+	$data->{clli} = 'SXCTIAXO1MD' if $data->{clli} eq 'SXCTIZXO1MD';
+	$data->{clli} = 'STCDMNTOXUX' if $data->{clli} eq 'STCDMITOXUX';
+	$data->{clli} = 'WCHSSCXARS0' if $data->{clli} eq 'SALDSCXARS0';
+	$data->{clli} = ''            if $data->{clli} eq 'TBAYARXARS0';
+	$data->{clli} = ''            if $data->{clli} eq 'BREWARXARS0';
+	$data->{clli} = ''            if $data->{clli} eq 'WDRWARXARS0';
+	if (my $sw = $data->{clli}) {
+		if (exists $swcor{$sw}) {
+			foreach my $k (@swcor_keys) {
+				next if $k eq 'CLLI';
+				if ($swcor{$sw}{$k} and $swcor{$sw}{$k} ne $data->{$k}) {
+					printf STDERR "W: SW  %-7.7s %-11.11s %-8.8s corrected from %-24.24s to %-24.24s\n",
+						$data->{sect}, $sw, $k, $data->{$k}, $swcor{$sw}{$k};
+					$data->{$k} = $swcor{$sw}{$k};
+				}
+			}
+		}
+		if (my $wc = substr($sw,0,8)) {
+			if (exists $wccor{$wc}) {
+				foreach my $k (@wccor_keys) {
+					next if $k eq 'WC';
+					if ($wccor{$wc}{$k} and $wccor{$wc}{$k} ne $data->{$k}) {
+						printf STDERR "W: WC  %-7.7s %-11.11s %-8.8s corrected from %-24.24s to %-24.24s\n",
+							$data->{sect}, $wc, $k, $data->{$k}, $wccor{$wc}{$k};
+						$data->{$k} = $wccor{$wc}{$k};
+					}
+				}
+			}
+		}
+	}
+#	printf STDERR "I: %-32.32s %-11.11s %-5.5s %-5.5s %-4.4s %-5.5s %s\n",
+#		$data->{loc}, $data->{clli}, $data->{wcv}, $data->{wch},
+#		$data->{ocn}, $data->{lata}, $data->{feat};
 	if (exists $data->{NPA} and exists $data->{NXX}) {
 		my @values = ();
 		foreach (@keys) { push @values, $data->{$_}; }
@@ -62,42 +177,90 @@ sub closerecord {
 	if (my $ocn = $data->{ocn}) {
 		$ocns{$ocn} = {} unless exists $ocns{$ocn};
 		my $rec = $ocns{$ocn};
-		$rec->{OCN} = $ocn;
-		for (my $i=1;$i<@ocn_keys;$i++) {
-			my $k = $ocn_keys[$i];
+		$data->{OCN} = $ocn;
+		foreach my $k (@ocn_keys) {
 			if ($data->{$k}) {
 				if ($rec->{$k} and $rec->{$k} ne $data->{$k}) {
-					printf STDERR "E: OCN %-4.4s %-8.8s changing from %-24.24s to %-24.24s\n",
+					printf STDERR "E: OCN %-11.11s %-8.8s changing from %-24.24s to %-24.24s\n",
 						$ocn, $k, $rec->{$k}, $data->{$k};
-					#print STDERR "E: $k changing from $rec->{$k} to $data->{$k}\n";
 				}
 				$rec->{$k} = $data->{$k};
 			}
 		}
 	}
-	if (my $clli = $data->{clli}) {
-		$cllis{$clli} = {} unless exists $cllis{$clli};
-		my $rec = $cllis{$clli};
-		$rec->{CLLI} = $clli;
-		for (my $i=1;$i<@clli_keys;$i++) {
-			my $k = $clli_keys[$i];
+	if (my $sw = $data->{clli}) {
+		$sws{$sw} = {} unless exists $sws{$sw};
+		my $rec = $sws{$sw};
+		$data->{CLLI} = $sw;
+		foreach my $k (@sw_keys) {
 			if ($data->{$k}) {
-				if ($rec->{$k} and $rec->{$k} ne $data->{$k}) {
-					printf STDERR "E: CLLI %-11.11s %-8.8s changing from %-24.24s to %-24.24s\n",
-						$clli, $k, $rec->{$k}, $data->{$k};
-					#print STDERR "E: $k changing from $rec->{$k} to $data->{$k}\n";
+				if ($k eq 'CLLI') {
+					if ($rec->{$k} and $rec->{$k} ne $data->{$k}) {
+						printf STDERR "E: SW  %-11.11s %-8.8s changing from %-24.24s to %-24.24s\n",
+							$sw, $k, $rec->{$k}, $data->{$k};
+					}
+					$rec->{$k} = $data->{$k};
+				} elsif ($k eq 'feat') {
+					foreach my $f (split(/\s+/,$data->{$k})) {
+						$rec->{$k}{$f}++;
+					}
+				} elsif ($k eq 'NXX') {
+					$rec->{$k}{"$data->{NPA}-$data->{NXX}"}++ if $data->{NPA} and $data->{NXX};
+				} else {
+					$rec->{$k}{$data->{$k}}++ if $data->{$k};
 				}
-				$rec->{$k} = $data->{$k};
+			}
+		}
+		if ($data->{NPA} and $data->{NXX}) {
+			$dbsw{$data->{NPA}}{$data->{NXX}} = {} unless exists
+			$dbsw{$data->{NPA}}{$data->{NXX}};
+			my $rec = $dbsw{$data->{NPA}}{$data->{NXX}};
+			$rec->{NPA} = $data->{NPA};
+			$rec->{NXX} = $data->{NXX};
+			$rec->{CLLI} = $sw;
+		}
+		if (my $wc = substr($sw,0,8)) {
+			$wcs{$wc} = {} unless exists $wcs{$wc};
+			my $rec = $wcs{$wc};
+			$data->{WC} = $wc;
+			foreach my $k (@wc_keys) {
+				if ($data->{$k}) {
+					if ($k eq 'WC') {
+						if ($rec->{$k} and $rec->{$k} ne $data->{$k}) {
+							printf STDERR "E: WC  %-11.11s %-8.8s changing from %-24.24s to %-24.24s\n",
+								$wc, $k, $rec->{$k}, $data->{$k};
+						}
+						$rec->{$k} = $data->{$k};
+					} elsif ($k eq 'feat') {
+						foreach my $f (split(/\s+/,$data->{$k})) {
+							$rec->{$k}{$f}++;
+						}
+					} elsif ($k eq 'NXX') {
+						$rec->{$k}{"$data->{NPA}-$data->{NXX}"}++ if $data->{NPA} and $data->{NXX};
+					} else {
+						$rec->{$k}{$data->{$k}}++ if $data->{$k};
+					}
+				}
+			}
+			if ($data->{NPA} and $data->{NXX}) {
+				$dbwc{$data->{NPA}}{$data->{NXX}} = {} unless exists
+				$dbwc{$data->{NPA}}{$data->{NXX}};
+				my $rec = $dbwc{$data->{NPA}}{$data->{NXX}};
+				$rec->{NPA} = $data->{NPA};
+				$rec->{NXX} = $data->{NXX};
+				$rec->{WC} = $wc;
 			}
 		}
 	}
 }
 
-$fn = "$codedir/NECA-4-1.txt";
+$fn = "$datadir/NECA-4-1.txt";
 print STDERR "processing $fn\n";
 open($fh,"<",$fn) or die "can't open $fn";
 
 my $start = 0;
+
+my $frag = '';
 
 while (<$fh>) { chomp;
 	my $data = {};
@@ -106,6 +269,10 @@ while (<$fh>) { chomp;
 		next unless /^\s+COMPANY CODES FOR/;
 		$start = 1;
 		next;
+	}
+	if ($frag) {
+		$_ = $frag.' '.$_;
+		$frag = '';
 	}
 	last if /^\s+END OF SECTION/;
 	#next unless /^\s/;
@@ -125,21 +292,23 @@ while (<$fh>) { chomp;
 	next if /^\s*CODE\s*$/;
 	next if /^\s*$/;
 	#print "USING: $_\n";
-	$_ =~ s/\([CDSN]\)//g; $_ =~ s/^\s+//; $_ =~ s/\s+$//;
+	s/\([CDSN]\)//g; s/^\s+//; s/\s+$//;
 	next if $_ eq '';
-	if (/^\s*([0-9][0-9][0-9][A-Z0-9] +)?([0-9][0-9][0-9][A-Z0-9])\s+(.*?)\s+\(OVERALL\)\s*$/) {
+	if (/^([0-9][0-9][0-9][A-Z0-9] +)?([0-9][0-9][0-9][A-Z0-9])\s+(.*?)\s+\(OVERALL\)$/) {
 		$data->{trgt} = $1 if $1;
 		$data->{ocn} = $2;
 		$data->{company} = $3;
 		$data->{overall} = 1;
 		closerecord($data);
-	} elsif (/^\s*([0-9][0-9][0-9][A-Z0-9] +)?([0-9][0-9][0-9][A-Z0-9])\s+([YN])\s+([A-Z]+)\s+(.*?)\s*$/) {
+	} elsif (/^([0-9][0-9][0-9][A-Z0-9] +)?([0-9][0-9][0-9][A-Z0-9])\s+([YN])\s+(CAP|[A-Z]+ )\s*(.*?)$/) {
 		$data->{trgt} = $1 if $1;
 		$data->{ocn} = $2;
 		$data->{neca} = $3;
 		$data->{category} = $4;
 		$data->{company} = $5;
 		closerecord($data);
+	} elsif (/^([0-9][0-9][0-9][A-Z0-9] +)?([0-9][0-9][0-9][A-Z0-9])(\s+([YN])\s+([A-Z]+))?$/) {
+		$frag = $_;
 	} else {
 		warn "cannot parse line '$_'";
 	}
@@ -147,6 +316,8 @@ while (<$fh>) { chomp;
 close($fh);
 
 my $state = undef;
+my $section = undef;
+my $page = undef;
 
 sub mydoneit {
 	my $data = shift;
@@ -194,27 +365,43 @@ print $of '"', join('","',@keys), '"', "\n";
 
 foreach my $fname (qw/NECA-4-12.txt NECA-4-44.txt NECA-4-400.txt/) {
 
-$fn = "$codedir/$fname";
+$fn = "$datadir/$fname";
 print STDERR "processing $fn\n";
 open($fh,"<",$fn) or die "can't open $fn";
 
+my $flineno = 0;
 my $inheader = 1;
 my $infooter = 0;
 my $lineno = 0;
 my $data = {};
+my $changing = 0;
+my $willchange = 0;
+my $couldchange = 0;
+my $changenxx = 0;
+my $pending = 0;
 
-while (<$fh>) { chomp;
-	#print STDERR "HEADER: $_\n" if $inheader;
+while (<$fh>) { chomp; $flineno++;
+	#print STDERR "HEADER: $fname($flineno) $_\n" if $inheader;
 	if ($inheader) {
 		if (/SERVING WIRE CENTER V AND H COORDINATE INFORMATION - (.*)$/) {
 			$state = $1;
 		}
-		next unless /^---/;
+		if (/^\s+SECTION\s+([0-9]+)/) {
+			$section = $1;
+			$page = 1;
+		}
+		if (/\sPAGE\s+([0-9]+)/) {
+			$page = $1;
+		}
+		if (/PENDING CHANGES/) {
+			$pending = 1;
+		}
+		next unless /^\s?-----/;
 		$inheader = 0;
 		next;
 	}
-	if (/^\.\.\.\.\./) {
-		#print STDERR "CLOSING RECORD: $_\n";
+	if (/^\s?\.\.\.\.\./) {
+		#print STDERR "CLOSING RECORD: $fname($flineno) $_\n";
 		# close record
 		#print STDERR "-------- /^...../\n";
 		my $line = $_;
@@ -222,34 +409,95 @@ while (<$fh>) { chomp;
 		$_ = $line;
 		$data = {};
 		$lineno = 0;
+		$changing = 0;
+		$couldchange = 0;
+		$willchange = 0;
+		$changenxx = 0;
 		next;
 	}
 	if (/^\s*\(x\) / or /\=====/ or /PRINTED IN U.S.A./ or /END OF SECTION/) {
-		#print STDERR "FOOTER: $_\n";
+		#print STDERR "FOOTER: $fname($flineno) $_\n";
 		$inheader = 1;
 		next;
 	}
+	if (/END OF REPORT/) {
+		if ($pending) {
+			$pending = 0;
+			next;
+		}
+	}
+	if ($pending) {
+		#print STDERR "PENDING: $fname($flineno): $_\n";
+		next;
+	}
 	next if /^\s*$/;
-	if (/^[A-Z]/) {
+	next if /--- Continued/;
+	if (/^\s?[A-Z]/) {
 		if ($lineno) {
 			# close record
 			#print STDERR "-------- /^[A-Z]/\n";
 			$lineno = 0;
+			$changing = 0;
+			$couldchange = 0;
+			$willchange = 0;
+			$changenxx = 0;
 			mydoneit($data);
 			$data = {};
 		}
 	} else {
-		unless ($lineno) {
+		unless ($lineno or /\(D\)/) {
 			if (/SERVING WIRE CENTER V AND H COORDINATE INFORMATION - (.*)$/) {
 				$state = $1;
 			}
-			#print STDERR "SKIPPING: $_\n";
+			print STDERR "SKIPPING: $fname($flineno) $_\n";
 			next;
 		}
 	}
+	if (/\(D\)/) {
+		#print STDERR "DELETED: $fname($flineno) $_\n";
+		next;
+	}
 	$lineno++;
-	#printf STDERR "DATA %2d: %s\n", $lineno, $_;
+	#printf STDERR "DATA %2d: $fname($flineno) %s\n", $lineno, $_;
 	my $ugly = 1;
+	if (/\(S\)/) {
+		$willchange = 0;
+		$couldchange = 1;
+		$changing = 0;
+		$changenxx = 0;
+	} elsif (/\(C\)/) {
+		$willchange = 1;
+		$couldchange = 0;
+		$changing = 0;
+		$changenxx = 0;
+	} elsif ($willchange) {
+		$willchange = 0;
+		$couldchange = 0;
+		$changing = 1;
+		$changenxx = 0;
+		$lineno = 1;
+		if (/\b[A-Z][A-Z0-9]\b/) {
+			# feature codes are changing too, clear old codes
+			$data->{feat} = {};
+		}
+	} elsif ($couldchange) {
+		if (/"/) {
+			$willchange = 0;
+			$couldchange = 0;
+			$changing = 1;
+			$changenxx = 0;
+			$lineno = 1;
+			if (/\b[A-Z][A-Z0-9]\b/) {
+				# feature codes are changing too, clear old codes
+				$data->{feat} = {};
+			}
+		} else {
+			$willchange = 0;
+			$couldchange = 0;
+			$changing = 0;
+			$changenxx = 0;
+		}
+	}
 	if ($lineno >= 1) {
 		while (/\b([A-Z][A-Z0-9])\b/g) {
 			$data->{feat}{$1} = 1;
@@ -257,27 +505,61 @@ while (<$fh>) { chomp;
 		}
 	}
 	if ($lineno == 1) {
-		if (/^([A-Z]+.*?)\s+([A-Z][A-Z0-9]{2}[A-Z0-9 ][A-Z0-9]{7})\s+([-0-9][0-9]{4})\s+([-0-9][0-9]{4})\s+([0-9]{3}[A-Z0-9])\s+([0-9]{3,})/) {
-			$data->{state} = $state if $state;
-			$data->{loc} = $1;
-			$data->{stloc} = "$state: $1" if $state;
-			$data->{clli} = $2;
-			$data->{wcv} = $3;
-			$data->{wch} = $4;
-			$data->{wcvh} = "$3,$4";
-			$data->{ocn} = $5;
-			$data->{lata} = $6;
-		} elsif (/^([A-Z]+.*?)\s+([A-Z][A-Z0-9]{2}[A-Z0-9 ][A-Z0-9]{7})\s+XXXXX\s+XXXXX\s+XXXX\s+XXX\s+/) {
-			$data->{state} = $state if $state;
-			$data->{loc} = $1;
-			$data->{stloc} = "$state: $1" if $state;
-			$data->{clli} = $2;
+		if ($changing) {
+			if (/^\s?([A-Z]+.*?|\s*")\s+([A-Z][A-Z0-9]{2}[A-Z0-9 ][A-Z0-9]{7}|")\s+([-0-9][0-9]{4}|")\s+([-0-9][0-9]{4}|")\s+([0-9]{3}[A-Z0-9]|")\s+([0-9]{3,}|")/) {
+				$data->{state} = $state if $state;
+				$data->{loc} = $1 unless $1 =~ /"/;
+				$data->{stloc} = "$state: $1" if $state and $1 !~ /"/;
+				$data->{clli} = $2 unless $2 eq '"';
+				$data->{wcv} = $3 unless $3 eq '"';
+				$data->{wch} = $4 unless $4 eq '"';
+				$data->{wcvh} = "$data->{wcv},$data->{wch}" if $data->{wcv} and $data->{wch};
+				$data->{ocn} = $5 unless $5 eq '"';
+				$data->{lata} = $6 unless $6 eq '"';
+			} elsif (/--- Continued/) {
+				# skip these lines
+			} else {
+				print STDERR "E: $fname($flineno) can't grok line '$_'\n";
+			}
 		} else {
-			print STDERR "E: can't grok line '$_'\n";
+			if (/^\s?([A-Z]+.*?)\s+([A-Z][A-Z0-9]{2}[A-Z0-9 ][A-Z0-9]{7})\s+([-0-9][0-9]{4})\s+([-0-9][0-9]{4})\s+([0-9]{3}[A-Z0-9])\s+([0-9]{3,})/) {
+				$data->{state} = $state if $state;
+				$data->{loc} = $1;
+				$data->{stloc} = "$state: $1" if $state;
+				$data->{clli} = $2;
+				$data->{wcv} = $3;
+				$data->{wch} = $4;
+				$data->{wcvh} = "$3,$4";
+				$data->{ocn} = $5;
+				$data->{lata} = $6;
+				$data->{sect} = "$section-$page" if $section and $page;
+# these are only formatted this way for deleted (D) records
+#			} elsif (/^\s?([A-Z]+.*?)\s+([A-Z][A-Z0-9]{2}[A-Z0-9 ][A-Z0-9]{7})\s+XXXXX\s+XXXXX\s+XXXX\s+XXX\s+/) {
+#				$data->{state} = $state if $state;
+#				$data->{loc} = $1;
+#				$data->{stloc} = "$state: $1" if $state;
+#				$data->{clli} = $2;
+			} elsif (/--- Continued/) {
+				# skip these lines
+			} else {
+				print STDERR "E: $fname($flineno) can't grok line '$_'\n";
+			}
 		}
 	} elsif ($lineno > 1) {
 		if (/^\s*([2-9][0-9][0-9])\//) {
 			my $npa = $1;
+			if ($changing) {
+				unless ($changenxx) {
+					# changing NXXs, must clear old data
+					$data->{npas} = [];
+					$data->{nxxs} = [];
+					$data->{blks} = [];
+					$data->{rngs} = [];
+					$data->{lins} = [];
+					$data->{total} = 0;
+					$changenxx = 1;
+				}
+			}
 			s/^\s*[2-9][0-9]{2}\///;
 			s/\s+[A-Z][A-Z0-9]\b//g;
 			s/\s*\([A-Za-z]\)\b//g;
@@ -288,8 +570,9 @@ while (<$fh>) { chomp;
 					push @{$data->{npas}}, $npa;
 					push @{$data->{nxxs}}, $nxx;
 					push @{$data->{blks}}, '';
-					push @{$data->{rngs}}, '';
+					push @{$data->{rngs}}, '0000-9999';
 					push @{$data->{lins}}, 10000;
+					$data->{total} += 10000;
 				} elsif ($nxx =~ /^([2-9][0-9]{2})\((([0-9])[0-9]{3})-(([0-9])[0-9]{3})\)$/) {
 					$nxx = $1;
 					my ($s,$e) = ($2,$4);
@@ -298,23 +581,55 @@ while (<$fh>) { chomp;
 						push @{$data->{npas}}, $npa;
 						push @{$data->{nxxs}}, $nxx;
 						push @{$data->{blks}}, $i;
-						push @{$data->{rngs}}, sprintf("%04d-%04d",$s,$e);
-						push @{$data->{lins}}, $e - $s + 1;
+						my $bs = $i * 1000;
+						my $be = $bs + 999;
+						my ($ns,$ne) = ($s,$e);
+						$ns = $bs if $s < $bs;
+						$ne = $be if $e > $be;
+						push @{$data->{rngs}}, sprintf("%04d-%04d",$ns,$ne);
+						push @{$data->{lins}}, $ne - $ns + 1;
+						$data->{total} += $ne - $ns + 1;
 					}
 				} else {
-					print STDERR "E: BAD NXX: $nxx\n";
+					print STDERR "E: $fname($flineno) BAD NXX: $nxx\n";
 				}
 			}
 		} elsif (/COMPANY:\s+([0-9]{3}[0-9A-Z])\s+HAS A PRESENCE ON THIS SWITCH/) {
 			$data->{ocn} = $1;
 		} elsif (/\b___\/___\b/) {
 			# skip these lines
+			if ($changing) {
+				unless ($changenxx) {
+					# changing NXXs, must clear old data
+					$data->{npas} = [];
+					$data->{nxxs} = [];
+					$data->{blks} = [];
+					$data->{rngs} = [];
+					$data->{lins} = [];
+					$data->{total} = 0;
+					$changenxx = 1;
+				}
+			}
+		} elsif (/"\s+\/\s+"/) {
+			# skip these lines
+			if ($changing) {
+				$changenxx = 1;
+			} else {
+				if ($ugly) {
+					printf STDERR "E: $fname($flineno) UGLY(A) %2d: %s\n", $lineno,$_;
+					printf STDERR "E: $fname($flineno) UGLY(A) %2d: %s\n", $lineno,"changing: $changing, willchange: $willchange, couldchange: $couldchange, changenxx: $changenxx";
+				}
+			}
 		} elsif (/--- Continued/) {
 			# skip these lines
-		} elsif (/"/) {
-			# skip these lines
+# these lines should be handled by changes now...
+#		} elsif (/"/) {
+#			# skip these lines
 		} else {
-			printf STDERR "E: UGLY %2d: %s\n", $lineno,$_ if $ugly;
+			if ($ugly) {
+				printf STDERR "E: $fname($flineno) UGLY(B) %2d: %s\n", $lineno,$_;
+				printf STDERR "E: $fname($flineno) UGLY(B) %2d: %s\n", $lineno,"changing: $changing, willchange: $willchange, couldchange: $couldchange, changenxx: $changenxx";
+			}
 		}
 	}
 }
@@ -331,20 +646,144 @@ print $of '"', join('","',@ocn_keys), '"', "\n";
 foreach my $k (sort keys %ocns) {
 	my $ocn = $ocns{$k};
 	my @values = ();
-	foreach (@ocn_keys) { push @values, $ocn->{$_} }
+	foreach (@ocn_keys) {
+		if (exists $ocn->{$_} and ref $ocn->{$_} eq 'HASH') {
+			push @values,join(',',sort keys %{$ocn->{$_}});
+		} else {
+			push @values, $ocn->{$_};
+		}
+	}
 	print $of '"', join('","',@values), '"', "\n";
 }
 close($of);
 
-$fn = "$datadir/clli.csv";
+my %bads;
+
+%bads = ();
+
+$fn = "$datadir/sw.csv";
 print STDERR "I: writing $fn...\n";
 open($of,">",$fn) or die "can't open $fn";
-print $of '"', join('","',@clli_keys), '"', "\n";
-foreach my $k (sort keys %cllis) {
-	my $clli = $cllis{$k};
+print $of '"', join('","',@sw_keys), '"', "\n";
+foreach my $k (sort keys %sws) {
+	my $rec = $sws{$k};
 	my @values = ();
-	foreach (@clli_keys) { push @values, $clli->{$_} }
+	foreach (@sw_keys) {
+		if (exists $rec->{$_} and ref $rec->{$_} eq 'HASH') {
+			if ($_ eq 'feat') {
+				push @values,join(' ',sort keys %{$rec->{$_}});
+			} elsif ($_ eq 'wcvh') {
+				push @values,join(';',sort keys %{$rec->{$_}});
+				$bads{$k}++ if $values[-1] =~ /;/;
+			} else {
+				push @values,join(',',sort keys %{$rec->{$_}});
+			}
+		} else {
+			push @values, $rec->{$_};
+		}
+	}
 	print $of '"', join('","',@values), '"', "\n";
+}
+close($of);
+
+$fn = "$datadir/db.sw.csv";
+print STDERR "I: writing $fn...\n";
+open($of,">",$fn) or die "can't open $fn";
+print $of '"',join('","',qw/NPA NXX CLLI/),'"',"\n";
+foreach my $npa (sort keys %dbsw) {
+	foreach my $nxx (sort keys %{$dbsw{$npa}}) {
+		my $rec = $dbsw{$npa}{$nxx};
+		print $of '"',join('","',($npa,$nxx,$rec->{CLLI})),'"',"\n";
+	}
+}
+close($of);
+
+$fn = "$datadir/swfix.csv";
+print STDERR "I: writing $fn...\n";
+open($of,">",$fn) or die "can't open $fn";
+print $of '"',join('","',qw/CLLI wcvh/),'"',"\n";
+foreach my $k (sort keys %bads) {
+	my $rec = $sws{$k};
+	my @values = ();
+	foreach (qw/CLLI wcvh/) {
+		if (exists $rec->{$_} and ref $rec->{$_} eq 'HASH') {
+			if ($_ eq 'feat') {
+				push @values,join(' ',sort keys %{$rec->{$_}});
+			} elsif ($_ eq 'wcvh') {
+				push @values,join(';',sort keys %{$rec->{$_}});
+				$bads{$k}++ if $values[-1] =~ /;/;
+			} else {
+				push @values,join(',',sort keys %{$rec->{$_}});
+			}
+		} else {
+			push @values, $rec->{$_};
+		}
+	}
+	print $of '"',join('","',@values),'"',"\n";
+}
+close($of);
+
+%bads = ();
+
+$fn = "$datadir/wc.csv";
+print STDERR "I: writing $fn...\n";
+open($of,">",$fn) or die "can't open $fn";
+print $of '"', join('","',@wc_keys), '"', "\n";
+foreach my $k (sort keys %wcs) {
+	my $rec = $wcs{$k};
+	my @values = ();
+	foreach (@wc_keys) {
+		if (exists $rec->{$_} and ref $rec->{$_} eq 'HASH') {
+			if ($_ eq 'feat') {
+				push @values,join(' ',sort keys %{$rec->{$_}});
+			} elsif ($_ eq 'wcvh') {
+				push @values,join(';',sort keys %{$rec->{$_}});
+				$bads{$k}++ if $values[-1] =~ /;/;
+			} else {
+				push @values,join(',',sort keys %{$rec->{$_}});
+			}
+		} else {
+			push @values, $rec->{$_};
+		}
+	}
+	print $of '"', join('","',@values), '"', "\n";
+}
+close($of);
+
+$fn = "$datadir/db.wc.csv";
+print STDERR "I: writing $fn...\n";
+open($of,">",$fn) or die "can't open $fn";
+print $of '"',join('","',qw/NPA NXX WC/),'"',"\n";
+foreach my $npa (sort keys %dbwc) {
+	foreach my $nxx (sort keys %{$dbwc{$npa}}) {
+		my $rec = $dbwc{$npa}{$nxx};
+		print $of '"',join('","',($npa,$nxx,$rec->{WC})),'"',"\n";
+	}
+}
+close($of);
+
+$fn = "$datadir/wcfix.csv";
+print STDERR "I: writing $fn...\n";
+open($of,">",$fn) or die "can't open $fn";
+print $of '"',join('","',qw/WC wcvh/),'"',"\n";
+foreach my $k (sort keys %bads) {
+	my $rec = $wcs{$k};
+	my @values = ();
+	foreach (qw/WC wcvh/) {
+		if (exists $rec->{$_} and ref $rec->{$_} eq 'HASH') {
+			if ($_ eq 'feat') {
+				push @values,join(' ',sort keys %{$rec->{$_}});
+			} elsif ($_ eq 'wcvh') {
+				push @values,join(';',sort keys %{$rec->{$_}});
+				$bads{$k}++ if $values[-1] =~ /;/;
+			} else {
+				push @values,join(',',sort keys %{$rec->{$_}});
+			}
+		} else {
+			push @values, $rec->{$_};
+		}
+	}
+	print $of '"',join('","',@values),'"',"\n";
 }
 close($of);
 
