@@ -1237,21 +1237,7 @@ sub getrg {
 	my $data = shift;
 	my $rg = $data->{State};
 	return $rg unless $rg;
-	if ($rg eq 'NT') {
-		$rg = $nxxst{$data->{NXX}} if exists $nxxst{$data->{NXX}};
-	}
-	if ($rg eq 'NS') {
-		$rg = $nsxst{$data->{NXX}} if exists $nsxst{$data->{NXX}};
-	}
-	# State is LERG except for the following:
-	$rg = 'NF' if $rg eq 'NL';
-	$rg = 'PQ' if $rg eq 'QC';
-	$rg = 'VU' if $rg eq 'NU';
-	$rg = 'NN' if $rg eq 'MP';
-	$rg = 'PQ' if $rg eq 'ON' and $data->{'Rate Center'} eq 'St-Regis';
-	if ($rg ne $data->{State}) {
-		print STDERR "E: $data->{NPA}-$data->{NXX} State: $data->{State} \-> $rg\n";
-	}
+	$rg = $statrg{$rg} if exists $statrg{$rg};
 	return $rg;
 }
 
@@ -1297,7 +1283,7 @@ while (<$fh>) { chomp;
 	my $rg = getrg($data);
 	my $cc = getcc($rg);
 	my $st = getst($rg);
-	my $nm = $data->{'Rate Center'};
+	my $nm = $data->{'RateCenter'};
 	my $rc = substr("\U$nm\E",0,10) if length($nm) <= 10;
 	my $rn = $nm if not $rc or $nm =~ /[a-z]/;
 	$data->{RCSHORT} = $rc;

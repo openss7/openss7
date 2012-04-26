@@ -2,13 +2,13 @@
 
 all: csv
 
-csv: db.csv special.csv discon.csv
+csv: db.csv special.csv discon.csv rc.csv
 
 pm: db.pm
 
 clean:
-	rm -f tmp.log process.log convert.log
-	rm -f db.pm db.csv ocn.csv rc.csv special.csv discon.csv
+	rm -f tmp.log process.log convert.log process.rc.log
+	rm -f db.pm db.csv rc.csv special.csv discon.csv
 	rm -f AllNPAs.txt allutlzd.txt NPANXX.csv
 
 cleaner: clean
@@ -54,15 +54,14 @@ NPANXX.zip:
 NPANXX.csv: NPANXX.zip
 	unzip -p $< cygdrive/d/cna/COCode-ESRDData/NPANXX.csv >$@
 
-db.csv ocn.csv rc.csv: AllNPA.mdb allutlzd.zip NPANXX.zip convert.pl Makefile
+db.csv: AllNPA.mdb allutlzd.zip NPANXX.zip convert.pl
 	./convert.pl 2>&1 | tee convert.log
 
-db.pm: AllNPAs.mdb allutlzd.zip NPANXX.zip process.pl ../database.pm Makefile
-	./process.pl 2>&1 | tee tmp.log
+rc.csv: db.csv process.rc.pl
+	./process.rc.pl 2>&1 | tee process.rc.log
 
-AllNPAs.mdb: Makefile
-AllNPAs.txt: Makefile
-allutlzd.txt: Makefile
+db.pm: AllNPAs.mdb allutlzd.zip NPANXX.zip process.pl ../database.pm
+	./process.pl 2>&1 | tee tmp.log
 
 %::
 	@echo "nothing to do for $@"

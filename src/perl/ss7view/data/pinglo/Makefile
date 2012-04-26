@@ -1,21 +1,24 @@
 #!/usr/bin/make -f
 
-all: db.pm
+all: rc.csv
 
 clean:
-	rm -f tmp.log db.pm process.log db.csv convert.log
+	rm -f db.csv
+	rm -f rc.csv db.rc.csv rn.csv db.rn.csv
 
 cleaner: clean
+	rm -f convert.log process.rc.log
 
 real-clean: cleaner
+	rm -f *.log
 
 .PHONY: all clean cleaner real-clean
 
-db.csv: convert.pl Makefile
+db.csv: convert.pl results/*/*.html.xz
 	./convert.pl 2>&1 | tee convert.log
 
-db.pm: process.pl ../database.pm Makefile
-	./process.pl 2>&1 | tee tmp.log
+rc.csv: process.rc.log db.csv
+	./process.rc.pl 2>&1 | tee process.rc.log
 
 %::
 	@echo "nothing to do for $@"
