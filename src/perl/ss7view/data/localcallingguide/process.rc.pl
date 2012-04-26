@@ -23,6 +23,15 @@ my $fn;
 binmode(INFILE,':utf8');
 binmode(OUTFILE,':utf8');
 
+sub vh2ll {
+	my ($v,$h) = @_;
+	my ($la,$lo) = Geo::Coordinates::VandH->vh2ll($v,$h);
+	$lo = -$lo;
+	$lo += 360 if $lo < -180;
+	$lo -= 360 if $lo >  180;
+	return ($la,$lo);
+}
+
 my %nanpst = ();
 
 $fn = "$codedir/nanpst.txt";
@@ -1067,11 +1076,10 @@ foreach my $code (qw/cities1000 AG AI AS BB BM BS CA DM DO GD GU JM KN KY LC MP 
 sub closestname {
 	my ($v,$h,$nm) = @_;
 	my ($geo,$delta);
-	foreach my $fc (qw/C P A L S T/) {
-		next unless exists $features{$fc};
-		for (my $lev=0;$lev>=-4;$lev--) {
-			my $vf = POSIX::floor($v*(10**$lev)+0.5)/(10**$lev);
-			my $hf = POSIX::floor($h*(10**$lev)+0.5)/(10**$lev);
+	for (my $lev=0;$lev>=-4;$lev--) {
+		my $vf = POSIX::floor($v*(10**$lev)+0.5)/(10**$lev);
+		my $hf = POSIX::floor($h*(10**$lev)+0.5)/(10**$lev);
+		foreach my $fc (qw/C P A L S T/) {
 			next unless exists $features{$fc}{$lev}{"$vf,$hf"};
 			foreach (@{$features{$fc}{$lev}{"$vf,$hf"}}) {
 				next unless cmpnames($nm,$_->{asciiname}) or cmpnames($nm,$_->{name});
@@ -1218,6 +1226,22 @@ sub geoassign {
 	$data->{RCGEOLL} = "$geo->{latitude},$geo->{longitude}";
 	$data->{RCCODE} = "$geo->{'feature class'}.$geo->{'feature code'}";
 	$data->{RCNAME} = $geo->{name} unless $data->{RCNAME};
+	$data->{RCCC} = $geo->{'country code'} if $geo->{'country code'};
+	$data->{RCST} = $geo->{'admin1 code'} if length($geo->{'admin1 code'});
+	$data->{RCST} = $a1codes{$data->{RCST}} if $data->{RCCC} eq 'CA' and exists $a1codes{$data->{RCST}};
+}
+
+sub geoshowfail {
+	my ($cc,$st,$nm,$data,$geo,$kind,$dist) = @_;
+	my $vh = sprintf('%05d,%05d',$geo->{vertical},$geo->{horizontal});
+	my $ll = "$geo->{latitude},$geo->{longitude}";
+	my $gn = $geo->{asciiname};
+	my $fc = "$geo->{'feature class'}.$geo->{'feature code'}";
+	$cc = $geo->{'country code'};
+	$st = $geo->{'admin1 code'};
+	$st = $a1codes{$st} if $cc eq 'CA' and exists $a1codes{$st};
+	my $mi = sprintf(' %.2f mi', $dist) if defined $dist;
+	printf STDERR "W: $data->{NPA}-$data->{NXX}($data->{X}) $cc-$st '$nm' $kind: $fc$mi $ll ($vh $gn)\n", $dist;
 }
 
 sub geofound {
@@ -1227,8 +1251,9 @@ sub geofound {
 }
 
 sub georecover {
-	my ($cc,$st,$nm,$data,$geo,$kind) = @_;
+	my ($cc,$st,$nm,$data,$geo,$kind,$dist) = @_;
 	geoassign($data,$geo);
+	geoshowfail($cc,$st,$nm,$data,$geo,$kind,$dist);
 	$found++; $failed--; $recovered++;
 	print STDERR "W: $data->{NPA}-$data->{NXX}($data->{X}) $cc-$st '$nm' recovered as $kind $geo->{'feature class'}.$geo->{'feature code'} '$geo->{name}' ($geo->{asciiname})\n";
 }
@@ -1319,11 +1344,16 @@ while (<$fh>) { chomp;
 			$data->{RCVH} = sprintf('%05d,%05d',$v,$h);
 			$data->{RCLL} = "$data->{'RC-LAT'},$data->{'RC-LON'}";
 			unless ($rec or exists $data->{RCGEOID}) {
+				my ($vh,$ll,$gn,$fc) = ($data->{RCVH},$data->{RCLL},$nm);
+				print STDERR "W: $data->{NPA}-$data->{NXX}($data->{X}) $cc-$st '$nm' targ: $ll ($vh $gn)\n";
+			}
+			unless ($rec or exists $data->{RCGEOID}) {
 				my ($geo,$dist) = closestname($v,$h,$nm);
 				if ($geo) { $aname++;
 					if ($dist < $maxradius) {
-						georecover($cc,$st,$nm,$data,$geo,'name');
+						georecover($cc,$st,$nm,$data,$geo,'name',$dist);
 					} else {
+						geoshowfail($cc,$st,$nm,$data,$geo,'name',$dist);
 					}
 				} else {
 					#print STDERR "W: $data->{NPA}-$data->{NXX}($data->{X}) $cc-$st '$nm' could not find closest name\n";
@@ -1331,39 +1361,37 @@ while (<$fh>) { chomp;
 				}
 			}
 			unless ($rec or exists $data->{RCGEOID}) {
-				my ($vh,$ll,$gn,$fc) = ($data->{RCVH},$data->{RCLL},$nm);
-				print STDERR "W: $data->{NPA}-$data->{NXX}($data->{X}) $cc-$st '$nm' cannot find geoname\n";
-				print STDERR "W: $data->{NPA}-$data->{NXX}($data->{X}) $cc-$st '$nm' targ: $ll ($vh $gn)\n";
 				my ($geo,$dist) = closestcity($v,$h);
 				if ($geo) { $acity++;
 					if ($dist < $maxradius and (cmpnames($nm,$geo->{asciiname}) or cmpnames($nm,$geo->{name}))) {
-						georecover($cc,$st,$nm,$data,$geo,'city');
+						georecover($cc,$st,$nm,$data,$geo,'city',$dist);
+					} elsif ($dist < 1) {
+						georecover($cc,$st,$nm,$data,$geo,'city',$dist);
 					} else {
-						$vh = sprintf('%05d,%05d',$geo->{vertical},$geo->{horizontal});
-						$ll = "$geo->{latitude},$geo->{longitude}";
-						$gn = $geo->{asciiname};
-						$fc = "$geo->{'feature class'}.$geo->{'feature code'}";
-						printf STDERR "W: $data->{NPA}-$data->{NXX}($data->{X}) $cc-$st '$nm' city: $fc %-5.2f mi $ll ($vh $gn)\n", $dist;
+						geoshowfail($cc,$st,$nm,$data,$geo,'city',$dist);
 					}
 				} else {
 					#print STDERR "W: $data->{NPA}-$data->{NXX}($data->{X}) $cc-$st '$nm' could not find closest city\n";
 					$nocity++;
 				}
+			}
+			unless ($rec or exists $data->{RCGEOID}) {
 				my ($geo,$dist) = closestfeat($v,$h);
 				if ($geo) { $afeat++;
 					if ($dist < $maxradius and (cmpnames($nm,$geo->{asciiname}) or cmpnames($nm,$geo->{name}))) {
-						georecover($cc,$st,$nm,$data,$geo,'feat');
+						georecover($cc,$st,$nm,$data,$geo,'feat',$dist);
+					} elsif ($dist < 1) {
+						georecover($cc,$st,$nm,$data,$geo,'feat',$dist);
 					} else {
-						$vh = sprintf('%05d,%05d',$geo->{vertical},$geo->{horizontal});
-						$ll = "$geo->{latitude},$geo->{longitude}";
-						$gn = $geo->{asciiname};
-						$fc = "$geo->{'feature class'}.$geo->{'feature code'}";
-						printf STDERR "W: $data->{NPA}-$data->{NXX}($data->{X}) $cc-$st '$nm' feat: $fc %-5.2f mi $ll ($vh $gn)\n", $dist;
+						geoshowfail($cc,$st,$nm,$data,$geo,'feat',$dist);
 					}
 				} else {
 					#print STDERR "W: $data->{NPA}-$data->{NXX}($data->{X}) $cc-$st '$nm' could not find closest feat\n";
 					$nofeat++;
 				}
+			}
+			unless ($rec or exists $data->{RCGEOID}) {
+				print STDERR "W: $data->{NPA}-$data->{NXX}($data->{X}) $cc-$st '$nm' cannot find geoname\n";
 			}
 		} else {
 			unless ($rec or exists $data->{RCGEOID}) {

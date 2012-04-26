@@ -4,7 +4,7 @@ all: rc.csv
 
 clean:
 	rm -f db.csv
-	rm -f rc.csv db.rc.csv rn.csv db.rn.csv
+	rm -f rc.csv db.rc.csv rn.csv
 
 cleaner: clean
 	rm -f convert.log process.rc.log
@@ -17,7 +17,7 @@ real-clean: cleaner
 db.csv: convert.pl results/*/data.html.xz
 	./convert.pl 2>&1 | tee convert.log
 
-rc.csv: process.rc.log db.csv
+rc.csv: process.rc.pl db.csv
 	./process.rc.pl 2>&1 | tee process.rc.log
 
 %::

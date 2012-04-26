@@ -1202,7 +1202,7 @@ sub lookupgeo {
 					$geo = $geonames{$cc}{$st}{$ln}{$fc}[0];
 				}
 				unless (defined $geo) {
-					print STDERR "W: cannot use geoname for $cc-$st-$nm\n";
+						print STDERR "W: cannot use geoname for $cc-$st-$nm\n";
 					$unusable++;
 				}
 			}
@@ -1258,25 +1258,38 @@ sub georecover {
 	print STDERR "W: $data->{NPA}-$data->{NXX}($data->{X}) $cc-$st '$nm' recovered as $kind $geo->{'feature class'}.$geo->{'feature code'} '$geo->{name}' ($geo->{asciiname})\n";
 }
 
+my %cor = (
+	'AG.AN'=>'AG.AG.AN',
+	'BS.BA'=>'BS.BS.BA',
+	'BB.BD'=>'BB.BB.BD',
+	'VG.BV'=>'VG.VG.BV',
+	'KY.CQ'=>'KY.KY.CQ',
+	'DO.DR'=>'DO.DO.DR',
+	'GD.GN'=>'GD.GD.GN',
+	'US.GU'=>'GU.GU.GU',
+	'KN.KA'=>'KN.KN.KA',
+	'US.MP'=>'MP.MP.NN',
+	'CA.NL'=>'CA.NL.NF',
+	'CA.NU'=>'CA.NU.VU',
+	'US.PR'=>'PR.PR.PR',
+	'CA.QC'=>'CA.QC.PQ',
+	'MS.RT'=>'MS.MS.RT',
+	'LC.SA'=>'LC.LC.SA',
+	'SX.SF'=>'SX.SX.SF',
+	'US.SK'=>'CA.SK.SK',
+	'TT.TR'=>'TT.TT.TR',
+	'US.AS'=>'AS.AS.AS',
+	'US.VI'=>'VI.VI.VI',
+	'VC.ZF'=>'VC.VC.ZF',
+);
+
 sub getrg {
 	my $data = shift;
-	my $rg = $data->{State};
-	return $rg unless $rg;
-	if ($rg eq 'NT') {
-		$rg = $nxxst{$data->{NXX}} if exists $nxxst{$data->{NXX}};
-	}
-	if ($rg eq 'NS') {
-		$rg = $nsxst{$data->{NXX}} if exists $nsxst{$data->{NXX}};
-	}
-	# State is LERG except for the following:
-	$rg = 'NF' if $rg eq 'NL';
-	$rg = 'PQ' if $rg eq 'QC';
-	$rg = 'VU' if $rg eq 'NU';
-	$rg = 'NN' if $rg eq 'MP';
-	$rg = 'PQ' if $rg eq 'ON' and $data->{'Rate Center'} eq 'St-Regis';
-	if ($rg ne $data->{State}) {
-		print STDERR "E: $data->{NPA}-$data->{NXX} State: $data->{State} \-> $rg\n";
-	}
+	my $st = $data->{'Rate Center State'};
+	my $cc = $data->{'Rate Center Country'};
+	$data->{LATA} = $data->{'Rate Center LATA'} if $data->{'Rate Center LATA'};
+	my $rg = $st;
+	($cc,$st,$rg) = split(/\./,$cor{"$cc.$st"}) if exists $cor{"$cc.$st"};
 	return $rg;
 }
 
@@ -1322,9 +1335,11 @@ while (<$fh>) { chomp;
 	my $rg = getrg($data);
 	my $cc = getcc($rg);
 	my $st = getst($rg);
-	my $nm = $data->{'Rate Center'};
-	my $rc = substr("\U$nm\E",0,10) if length($nm) <= 10;
-	my $rn = $nm if not $rc or $nm =~ /[a-z]/;
+	my $nm = $data->{'Rate Center Name'};
+	my $rc = $data->{'LERG Abbreviation'};
+	$nm = $rc unless $nm;
+	my $rn = $data->{'Rate Center Name'};
+	#$rn .= " ($data->{'Location within Rate Center Name'})" if $data->{'Location within Rate Center Name'};
 	$data->{RCSHORT} = $rc;
 	$data->{REGION} = $rg;
 	$data->{RCCC} = $cc;
@@ -1348,7 +1363,7 @@ while (<$fh>) { chomp;
 				}
 			}
 		}
-		my ($v,$h);
+		my ($v,$h) = split(/,/,$data->{'Major V&H'}); ($v,$h) = (int($v),int($h));
 		unless ($rec or exists $data->{RCGEOID}) {
 			if (my $geo = lookupgeo($cc,$st,$nm,$v,$h)) { $alook++;
 				geofound($cc,$st,$nm,$data,$geo);
@@ -1359,7 +1374,7 @@ while (<$fh>) { chomp;
 		}
 		if ($v and $h) {
 			$data->{RCVH} = sprintf('%05d,%05d',$v,$h);
-			$data->{RCLL} = join(',',vh2ll($v,$h));
+			$data->{RCLL} = $data->{'Rate Center Latitude/Longitude'};
 			unless ($rec or exists $data->{RCGEOID}) {
 				my ($vh,$ll,$gn,$fc) = ($data->{RCVH},$data->{RCLL},$nm);
 				print STDERR "W: $data->{NPA}-$data->{NXX}($data->{X}) $cc-$st '$nm' targ: $ll ($vh $gn)\n";
