@@ -1265,13 +1265,11 @@ sub getst {
 my %rcs = ();
 my %rns = ();
 my %dbrc = ();
-my %dbrn = ();
 
 my @rc_keys = qw/RCSHORT REGION RCGEOID RCVH RCLL NPA NXX X RCCC RCST RCNAME RCGN/;
 my @rn_keys = qw/RCCC RCST RCNAME RCGN RCGEOID RCVH RCLL NPA NXX X REGION RCSHORT/;
 
 my @dbrc_keys = qw/NPA NXX X REGION RCSHORT RCCC RCST RCNAME RCGN RCGEOID/;
-my @dbrn_keys = qw/NPA NXX X RCCC RCST RCNAME RCGN RCGEOID REGION RCSHORT/;
 
 my ($nolook,$noname,$nocity,$nofeat);
 my ($alook,$aname,$acity,$afeat);
@@ -1432,19 +1430,6 @@ while (<$fh>) { chomp;
 			}
 		}
 	}
-	{
-		$dbrn{$data->{NPA}}{$data->{NXX}}{$data->{X}} = {} unless exists
-		$dbrn{$data->{NPA}}{$data->{NXX}}{$data->{X}};
-		my $rec = $dbrn{$data->{NPA}}{$data->{NXX}}{$data->{X}};
-		foreach my $k (@dbrn_keys) {
-			if ($data->{$k}) {
-				if ($rec->{$k} and $rec->{$k} ne $data->{$k}) {
-					print STDERR "E: $data->{NPA}-$data->{NXX}($data->{X}) DBRN $data->{NPA}-$data->{NXX}-$data->{X} $k changing from '$rec->{$k}' to '$data->{$k}'\n";
-				}
-				$rec->{$k} = $data->{$k};
-			}
-		}
-	}
 }
 close($fh);
 
@@ -1521,38 +1506,6 @@ foreach my $cc (sort keys %rns) {
 			my $rec = $rns{$cc}{$st}{$rn};
 			my @values = ();
 			foreach (@rn_keys) {
-				if (exists $rec->{$_}) {
-					if (ref $rec->{$_} eq 'HASH') {
-						if (/^(RCVH|RCLL)$/) {
-							push @values, join(';',sort keys %{$rec->{$_}});
-						} else {
-							push @values, join(',',sort keys %{$rec->{$_}});
-						}
-					} elsif (ref $rec->{$_} eq 'ARRAY') {
-						push @values, join(';',@{$rec->{$_}});
-					} else {
-						push @values, $rec->{$_};
-					}
-				} else {
-					push @values, $rec->{$_};
-				}
-			}
-			print $of '"',join('","',@values),'"',"\n";
-		}
-	}
-}
-close($of);
-
-$fn = "$datadir/db.rn.csv";
-print STDERR "I: writing $fn\n";
-open($of,">:utf8",$fn) or die "can't write $fn";
-print $of '"',join('","',@dbrn_keys),'"',"\n";
-foreach my $npa (sort keys %dbrn) {
-	foreach my $nxx (sort keys %{$dbrn{$npa}}) {
-		foreach my $x (sort keys %{$dbrn{$npa}{$nxx}}) {
-			my $rec = $dbrn{$npa}{$nxx}{$x};
-			my @values = ();
-			foreach (@dbrn_keys) {
 				if (exists $rec->{$_}) {
 					if (ref $rec->{$_} eq 'HASH') {
 						if (/^(RCVH|RCLL)$/) {

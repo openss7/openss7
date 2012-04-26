@@ -7,7 +7,6 @@ my $program = $0; $program =~ s/^.*\///;
 my $progdir = $0; $progdir =~ s/\/[^\/]*$//;
 my $datadir = $progdir;
 my $codedir = "$progdir/..";
-my $geondir = "$progdir/../geonames";
 my $npandir = "$progdir/../npanxxsource";
 
 use strict;
@@ -18,8 +17,6 @@ use Geo::Coordinates::VandH;
 my $fh = \*INFILE;
 my $of = \*OUTFILE;
 my $fn;
-
-my %fcount = ();
 
 my @keys = (
 	'NPA',
@@ -35,41 +32,6 @@ my @keys = (
 	'Use',
 	'AssignDate',
 	'Initial/Growth',
-);
-
-my @ocn_keys = (
-	'OCN',
-	'Company',
-);
-
-my %ocns = ();
-
-my @rc_keys = (
-	'RCSHORT',
-	'REGION',
-	'RCGEOID',
-	'RCVH',
-	'RCLL',
-	'NPA',
-	'NXX',
-	'RCCC',
-	'RCST',
-	'RCNAME',
-	'RCGN',
-);
-
-my @rn_keys = (
-	'RCCC',
-	'RCST',
-	'RCNAME',
-	'RCGN',
-	'RCGEOID',
-	'RCVH',
-	'RCLL',
-	'NPA',
-	'NXX',
-	'REGION',
-	'RCSHORT',
 );
 
 my %nsxst = (
@@ -844,7 +806,6 @@ my %nxxst = (
 );
 
 my %nanpst = ();
-my %nanpcc = ();
 
 $fn = "nanpst.txt";
 print STDERR "I: reading $fn...\n";
@@ -853,143 +814,39 @@ while (<$fh>) { chomp;
 	next if /^#/;
 	my @tokens = split(/\t/,$_);
 	$nanpst{$tokens[0]} = $tokens[2];
-	$nanpcc{$tokens[0]} = $tokens[1];
 }
 close($fh);
-
-my %rcs = ();
-my %rns = ();
-
-my %dbrc = ();
-
-sub closerecord {
-	my $data = shift;
-	if (exists $data->{NPA} and exists $data->{NXX}) {
-		my @values = ();
-		foreach (@keys) { push @values, $data->{$_}; }
-		print $of '"', join('","', @values), '"', "\n";
-	}
-	if (my $ocn = $data->{OCN}) {
-		$ocns{$ocn} = {} unless exists $ocns{$ocn};
-		my $rec = $ocns{$ocn};
-		$rec->{OCN} = $ocn;
-		for (my $i=1;$i<@ocn_keys;$i++) {
-			my $k = $ocn_keys[$i];
-			if ($data->{$k}) {
-				if ($rec->{$k} and $rec->{$k} ne $data->{$k}) {
-					print STDERR "E: $k changing from $rec->{$k} to $data->{$k}\n";
-				}
-				$rec->{$k} = $data->{$k};
-			}
-		}
-	}
-	my $cc = $data->{RCCC};
-	my $st = $data->{RCST};
-	my ($rc,$rn);
-	if ($cc eq 'CA' or $nanpcc{$data->{NPA}} eq 'CA') {
-		$cc = 'CA';
-		$rc = undef;
-		$rn = $data->{RateCenter};
-	} else {
-		$rc = $data->{RateCenter};
-		$rn = undef;
-	}
-	next if $rc eq 'XXXXXXXXXX' or
-		$rc eq 'DIR ASST' or
-		$rc eq '7 DIGIT SE' or
-#		($nanpcc{$data->{NPA}} eq 'CA' and
-#			($data->{NXX} eq '310' or $data->{NXX} eq '610' or $data->{NXX} eq '810')) or
-#		(($nanpcc{$data->{NPA}} eq 'US' or $nanpcc{$data->{NPA}} eq 'CA') and
-#			($data->{NXX} eq '950' or $data->{NXX} eq '958' or $data->{NXX} eq '959')) or
-		$data->{NXX} eq '555' or
-		$data->{NXX} =~ /[2-9]11/ or
-		$rn eq '7 Digit Service';
-	my %cor = ( 'NL'=>'NF', 'NU'=>'VU', 'QC'=>'PQ' );
-	my $rg = $data->{State}; $rg = $cor{$rg} if exists $cor{$rg};
-	$rg = 'PQ' if $rg eq 'ON' and $rn eq 'St-Regis';
-	if ($rc) {
-		$rcs{$rg}{$rc} = {} unless exists $rcs{$rg}{$rc};
-		my $rec = $rcs{$rg}{$rc};
-		$rec->{REGION} = $rg;
-		$rec->{RCSHORT} = $rc;
-		$rec->{RCGEOID} = $data->{RCGEOID} if $data->{RCGEOID};
-		$rec->{RCGN} = $data->{RCGN} if $data->{RCGN};
-		$rec->{RCVH} = $data->{RCVH} if $data->{RCVH};
-		$rec->{RCLL} = $data->{RCLL} if $data->{RCLL};
-		$rec->{NPA}{$data->{NPA}}++ if $data->{NPA};
-		$rec->{NXX}{"$data->{NPA}-$data->{NXX}"}++ if $data->{NPA} and $data->{NXX};
-		$rec->{RCCC} = $data->{RCCC} if $data->{RCCC};
-		$rec->{RCST} = $data->{RCST} if $data->{RCST};
-		$rec->{RCNAME} = $rn if $rn;
-	}
-	if ($rn) {
-		$rns{$cc}{$st}{$rn} = {} unless exists $rns{$cc}{$st}{$rc};
-		my $rec = $rns{$cc}{$st}{$rn};
-		$rec->{RCCC} = $cc;
-		$rec->{RCST} = $st;
-		$rec->{RCNAME} = $rn;
-		$rec->{RCGEOID} = $data->{RCGEOID} if $data->{RCGEOID};
-		$rec->{RCGN} = $data->{RCGN} if $data->{RCGN};
-		$rec->{RCVH} = $data->{RCVH} if $data->{RCVH};
-		$rec->{RCLL} = $data->{RCLL} if $data->{RCLL};
-		$rec->{NPA}{$data->{NPA}}++ if $data->{NPA};
-		$rec->{NXX}{"$data->{NPA}-$data->{NXX}"}++ if $data->{NPA} and $data->{NXX};
-		$rec->{REGION} = $rg;
-		$rec->{RCSHORT} = $rc if $rc;
-	}
-	if ($data->{NPA} and $data->{NXX}) {
-		$dbrc{$data->{NPA}}{$data->{NXX}} = {} unless exists $dbrc{$data->{NPA}}{$data->{NXX}};
-		my $rec = $dbrc{$data->{NPA}}{$data->{NXX}};
-		$rec->{NPA} = $data->{NPA};
-		$rec->{NXX} = $data->{NXX};
-		$rec->{REGION} = $rg;
-		$rec->{RCSHORT} = $rc if $rc;
-		$rec->{RCCC} = $data->{RCCC} if $data->{RCCC};
-		$rec->{RCST} = $data->{RCST} if $data->{RCST};
-		$rec->{RCNAME} = $rn if $rn;
-		$rec->{RCGEOID} = $data->{RCGEOID} if $data->{RCGEOID};
-		$rec->{RCGN} = $data->{RCGN} if $data->{RCGN};
-	}
-}
 
 my %mapping = (
 	'NPA'=>sub{
 		my ($dat,$val,$fld) = @_;
 		return unless $val;
-		$fcount{$fld}{count}++;
 		$dat->{$fld} = $val;
 		my $st = $nanpst{$val};
 		$dat->{State} = $st;
-		$dat->{RCST} = $st;
-		$dat->{RCCC} = 'CA';
 	},
 	'NXX'=>sub{
 		my ($dat,$val,$fld) = @_;
 		return unless $val;
-		$fcount{$fld}{count}++;
 		if ($dat->{State} eq 'NT') {
 			my $st = 'NT';
 			$st = $nxxst{$val} if exists $nxxst{$val};
 			$dat->{State} = $st;
-			$dat->{RCST} = $st;
 		} elsif ($dat->{State} eq 'NS') {
 			my $st = 'NS';
 			$st = $nsxst{$val} if exists $nsxst{$val};
 			$dat->{State} = $st;
-			$dat->{RCST} = $st;
 		}
 		$dat->{$fld} = $val;
 	},
 	'OCN'=>sub{
 		my ($dat,$val,$fld) = @_;
 		return unless $val;
-		$fcount{$fld}{count}++;
 		$dat->{$fld} = $val;
 	},
 	'Company'=>sub{
 		my ($dat,$val,$fld) = @_;
 		return unless $val;
-		$fcount{$fld}{count}++;
 		$dat->{$fld} = $val;
 	},
 	'Status'=>sub{
@@ -1000,7 +857,6 @@ my %mapping = (
 		$dat->{Use} =~ s/Not Available/UA/;
 		$dat->{Use} =~ s/Available/UA/;
 		$dat->{Use} =~ s/Recovered\/Aging/UA/;
-		$fcount{$fld}{count}++;
 		$dat->{$fld} = $val;
 	},
 	'RateCenter'=>sub{
@@ -1011,179 +867,19 @@ my %mapping = (
 		#$val =~ s/\s{2,}/ /g;
 		#$val =~ s/^STE /ST /i;
 		#$val =~ s/^SAINT /ST /i;
-		$fcount{$fld}{count}++;
 		$dat->{$fld} = $val;
 	},
 	'Remarks'=>sub{
 		my ($dat,$val,$fld) = @_;
 		return unless $val;
-		$fcount{$fld}{count}++;
 		$dat->{$fld} = $val;
 	},
 );
-
-my @gn_fields = (
-	'geonameid',
-	'name',
-	'asciiname',
-	'alternatenames',
-	'latitude',
-	'longitude',
-	'feature class',
-	'feature code',
-	'country code',
-	'cc2',
-	'admin1 code',
-	'admin2 code',
-	'admin3 code',
-	'admin4 code',
-	'population',
-	'elevation',
-	'dem',
-	'timezone',
-	'modification date',
-);
-
-sub normalize {
-	my $nm = shift;
-	$nm =~ s/-/ /g;
-	$nm =~ s/\.//g;
-	$nm =~ s/'//g;
-	$nm =~ s/^\s+$//;
-	$nm =~ s/\bSaint\b/St/gi;
-	$nm =~ s/\bFort\b/Ft/gi;
-	$nm =~ s/\bSainte\b/Ste/gi;
-	$nm =~ s/\bRoad\b/Rd/gi;
-	$nm =~ s/\bCenter\b/Ctr/gi;
-	$nm =~ s/\bMount\b/Mt/gi;
-	$nm =~ s/\bJunction\b/Jct/gi;
-	$nm =~ s/\bCourt\b/Ct/gi;
-	$nm =~ s/\bCompany\b/Co/gi;
-	$nm =~ s/\bFalls\b/Fls/gi;
-	$nm =~ s/\bSprints\b/Spg/gi;
-	$nm =~ s/\bBuilding\b/Bldg/gi;
-	$nm =~ s/\bCreek\b/Cr/gi;
-	$nm =~ s/\bLake\b/Lk/gi;
-	$nm =~ s/\bValey\b/Vly/gi;
-	$nm =~ s/\bNorth.?East\b/NE/gi;
-	$nm =~ s/\bNorth.?West\b/NW/gi;
-	$nm =~ s/\bSouth.?East\b/SE/gi;
-	$nm =~ s/\bSouth.?West\b/SW/gi;
-	$nm =~ s/\bEast\b/E/gi;
-	$nm =~ s/\bWest\b/W/gi;
-	$nm =~ s/\bNorth\b/N/gi;
-	$nm =~ s/\bSouth\b/S/gi;
-	$nm =~ s/\bAir Force Base\fb/AFB/gi;
-	$nm =~ s/\bAir Force Station\fb/AS/gi;
-	$nm = "\U$nm\E";
-	return $nm;
-}
-
-my %geonames = ();
-
-my %a1codes = (
-	'01'=>'AB',
-	'02'=>'BC',
-	'03'=>'MB',
-	'04'=>'NB',
-	'13'=>'NT',
-	'07'=>'NS',
-	'14'=>'NU',
-	'08'=>'ON',
-	'09'=>'PE',
-	'10'=>'QC',
-	'11'=>'SK',
-	'12'=>'YT',
-	'05'=>'NL',
-);
-
-foreach my $code (qw/AS CA GU MP PR US VI/) {
-	my ($good,$bad) = (0,0);
-	$fn = "$geondir/$code.zip";
-	print STDERR "I: processing $fn\n";
-	open($fh,"unzip -p $fn $code.txt |") or die "can't process $fn";
-	while (<$fh>) { chomp; s/\r//g;
-		my @tokens = split(/\t/,$_);
-		my $data = {};
-		for (my $i=0;$i<@gn_fields;$i++) {
-			$data->{$gn_fields[$i]} = $tokens[$i] if $tokens[$i] or length($tokens[$i]);
-		}
-		my $fs = $data->{'feature class'};
-		next unless $fs =~ /^(P|L|S|T|A)$/;
-		my $fc = $data->{'feature code'};
-		next unless $fc =~ /^(PPL|AREA|RESV|ISL|MILB|INSM|AIR|ADM)/;
-		my $on = $data->{asciiname};
-		my $nm = normalize($on);
-		my $cc = $data->{'country code'};
-		my $st = $cc; $st = $data->{'admin1 code'} if $cc eq 'US' or $cc eq 'CA';
-		$st = $a1codes{$st} if $cc eq 'CA' and exists $a1codes{$st};
-		my $dt = $data->{'modification date'};
-		if (exists $geonames{$cc}{$st}{$nm}) {
-			my $rec = $geonames{$cc}{$st}{$nm};
-			if (ref $rec eq 'ARRAY') {
-				if ($rec->[0]{'feature class'} ne 'P' and $fs eq 'P') {
-					$geonames{$cc}{$st}{$nm} = $data; $bad--; $good++;
-				} else {
-					push @{$rec}, $data;
-					#printf STDERR "W: %d conflicting records for $cc-$st-$on\n",
-					scalar(@{$rec});
-				}
-			} else {
-				if ($rec->{'feature class'} ne $fs) {
-					if ($rec->{'feature class'} ne 'P' and $fs eq 'P') {
-						$geonames{$cc}{$st}{$nm} = $data;
-					}
-				} elsif ($rec->{'modification date'} eq $dt) {
-					unless ($rec->{latitude} == $data->{latitude} and $rec->{longitude} == $data->{longitude}) {
-						$geonames{$cc}{$st}{$nm} = [ $rec, $data ];
-						$good--; $bad++;
-						#print STDERR "W: 2 conflicting records for $cc-$st-$on\n";
-					}
-				} elsif ($rec->{'modification date'} lt $dt) {
-					$geonames{$cc}{$st}{$nm} = $data;
-				}
-			}
-		} else {
-			$geonames{$cc}{$st}{$nm} = $data; $good++;
-		}
-	}
-	close($fh);
-	print STDERR "I: $code: $good good records; $bad bad records\n";
-}
-
-my %rcmap = ();
-my %rnmap = ();
-{
-	$fn = "$npandir/rcmap.csv";
-	print STDERR "I: reading $fn\n";
-	open($fh,"<",$fn) or die "can't open $fn";
-	my $heading = 1;
-	my @fields = ();
-	while (<$fh>) { chomp;
-		next unless /^"/;
-		last if /^$/;
-		s/^"//; s/"$//; my @tokens = split(/","/,$_);
-		if ($heading) {
-			@fields = @tokens;
-			$heading = undef;
-			next;
-		}
-		my $data = {};
-		for (my $i=0;$i<@fields;$i++) {
-			$data->{$fields[$i]} = $tokens[$i] if $tokens[$i];
-		}
-		$rcmap{$data->{REGION}}{$data->{RCSHORT}} = $data;
-		$rnmap{$data->{RCCC}}{$data->{RCST}}{$data->{RCNAME}} = $data;
-	}
-	close($fh);
-}
-
 
 $fn = "$datadir/db.csv";
 open($of,">",$fn) or die "can't open $fn";
 print $of '"', join('","', @keys), '"', "\n";
 {
-my ($found,$unusable,$failed);
 $fn = "$datadir/NPANXX.zip";
 print STDERR "processing $fn\n";
 open($fh,"unzip -p $fn cygdrive/d/cna/COCode-ESRDData/NPANXX.csv |") or die "can't process $fn";
@@ -1213,43 +909,15 @@ while (<$fh>) { chomp; s/\r//g;
 		$data->{State} = $nsxst{$data->{NXX}} if exists $nsxst{$data->{NXX}};
 	}
 	$data->{State} = 'QC' if $data->{State} eq 'ON' and $data->{RateCenter} eq 'St-Regis';
-	$data->{RCST} = $data->{State};
-	$data->{RCCC} = 'CA';
-	if (my $nm = $data->{RateCenter}) {
-		$data->{RCNAME} = $nm;
-		if (my $st = $data->{State}) {
-			$nm = normalize($nm);
-			if (exists $geonames{CA}{$st}{$nm}) {
-				if (ref $geonames{CA}{$st}{$nm} ne 'ARRAY') {
-					my $geo = $geonames{CA}{$st}{$nm};
-					#print STDERR "I: found geoname for $st-$nm\n";
-					if ($geo->{latitude} and $geo->{longitude}) {
-						$data->{RCLL} = "$geo->{latitude},$geo->{longitude}";
-					}
-					$data->{RCGEOID} = $geo->{geonameid};
-					$data->{RCGN} = $geo->{name};
-					$found++;
-				} else {
-					#print STDERR "W: cannot use geoname for $st-$nm\n";
-					$unusable++;
-				}
-			} else {
-				#print STDERR "W: cannot find geoname for $st-$nm\n";
-				$failed++;
-			}
-		} else {
-			print STDERR "E: no state for $nm\n";
-		}
+	if (exists $data->{NPA} and exists $data->{NXX}) {
+		my @values = ();
+		foreach (@keys) { push @values, $data->{$_}; }
+		print $of '"', join('","', @values), '"', "\n";
 	}
-	closerecord($data);
 }
 close($fh);
-printf STDERR "I: CA %-8.8d matches found\n", $found;
-printf STDERR "I: CA %-8.8d matches unusable\n", $unusable;
-printf STDERR "I: CA %-8.8d matches failed\n", $failed;
 }
 {
-my ($found,$unusable,$failed);
 $fn = "$datadir/allutlzd.zip";
 print STDERR "processing $fn\n";
 open($fh,"unzip -p $fn allutlzd.txt | expand |") or die "can't process $fn";
@@ -1284,123 +952,15 @@ while (<$fh>) { chomp;
 	$data->{Use} = $tokens[6];
 	$data->{AssignDate} = $tokens[7];
 	$data->{'Initial/Growth'} = $tokens[8];
-	my $st = $data->{State} if $data->{State};
-	my $cc = 'US';
-	my %cor = ( 'AS'=>'AS', 'GU'=>'GU', 'PR'=>'PR', 'VI'=>'VI', 'NN'=>'MP' );
-	$cc = $cor{$st} if exists $cor{$st};
-	$st = $cc unless $cc eq 'CA' or $cc eq 'US';
-	$data->{RCCC} = $cc;
-	$data->{RCST} = $st;
-	if (my $nm = $data->{RateCenter}) {
-		if (my $st = $data->{State}) {
-			$nm = normalize($nm);
-			if (exists $geonames{$cc}{$st}{$nm}) {
-				if (ref $geonames{$cc}{$st}{$nm} ne 'ARRAY') {
-					my $rec = $geonames{$cc}{$st}{$nm};
-					#print STDERR "I: found geoname for $st-$nm\n";
-					if ($rec->{latitude} and $rec->{longitude}) {
-						$data->{RCLL} = "$rec->{latitude},$rec->{longitude}";
-					}
-					$data->{RCGEOID} = $rec->{geonameid};
-					$data->{RCGN} = $rec->{name};
-					$found++;
-				} else {
-					#print STDERR "W: cannot use geoname for $st-$nm\n";
-					$unusable++;
-				}
-			} else {
-				#print STDERR "W: cannot find geoname for $st-$nm\n";
-				$failed++;
-			}
-		} else {
-			print STDERR "E: no state for $nm\n";
-		}
+	if (exists $data->{NPA} and exists $data->{NXX}) {
+		my @values = ();
+		foreach (@keys) { push @values, $data->{$_}; }
+		print $of '"', join('","', @values), '"', "\n";
 	}
-	closerecord($data);
 }
 close($fh);
-printf STDERR "I: US %-8.8d matches found\n", $found;
-printf STDERR "I: US %-8.8d matches unusable\n", $unusable;
-printf STDERR "I: US %-8.8d matches failed\n", $failed;
 }
 close($of);
-
-$fn = "$datadir/ocn.csv";
-print STDERR "I: writing $fn...\n";
-open($of,">",$fn) or die "can't open $fn";
-print $of '"', join('","',@ocn_keys), '"', "\n";
-foreach my $k (sort keys %ocns) {
-	my $ocn = $ocns{$k};
-	my @values = ();
-	foreach (@ocn_keys) { push @values, $ocn->{$_} }
-	print $of '"', join('","',@values), '"', "\n";
-}
-close($of);
-
-$fn = "$datadir/rc.csv";
-print STDERR "I: writing $fn...\n";
-open($of,">",$fn) or die "can't open $fn";
-print $of '"', join('","',@rc_keys), '"', "\n";
-foreach my $s (sort keys %rcs) {
-	foreach my $k (sort keys %{$rcs{$s}}) {
-		my $rc = $rcs{$s}{$k};
-		my @values = ();
-		foreach (@rc_keys) {
-			if (ref $rc->{$_} eq 'HASH') {
-				push @values, join(',',sort keys %{$rc->{$_}});
-			} else {
-				push @values, $rc->{$_};
-			}
-		}
-		print $of '"', join('","',@values), '"', "\n";
-	}
-}
-close($of);
-
-$fn = "$datadir/rn.csv";
-print STDERR "I: writing $fn...\n";
-open($of,">",$fn) or die "can't open $fn";
-print $of '"', join('","',@rn_keys), '"', "\n";
-foreach my $cc (sort keys %rns) {
-	foreach my $st (sort keys %{$rns{$cc}}) {
-		foreach my $rn (sort keys %{$rns{$cc}{$st}}) {
-			my $rec = $rns{$cc}{$st}{$rn};
-			my @values = ();
-			foreach (@rn_keys) {
-				if (ref $rec->{$_} eq 'HASH') {
-					push @values, join(',',sort keys %{$rec->{$_}});
-				} else {
-					push @values, $rec->{$_};
-				}
-			}
-			print $of '"', join('","',@values), '"', "\n";
-		}
-	}
-}
-close($of);
-
-my @dbrc_keys = qw/NPA NXX REGION RCSHORT RCCC RCST RCNAME RCGN RCGEOID/;
-
-$fn = "$datadir/db.rc.csv";
-print STDERR "I: writing $fn...\n";
-open($of,">",$fn) or die "can't open $fn";
-print $of '"', join('","',@dbrc_keys), '"', "\n";
-foreach my $npa (sort keys %dbrc) {
-	foreach my $nxx (sort keys %{$dbrc{$npa}}) {
-		my $rec = $dbrc{$npa}{$nxx};
-		my @values = ();
-		foreach (@dbrc_keys) {
-			if (exists $rec->{$_} and ref $rec->{$_} eq 'HASH') {
-				push @values, join(',',sort keys %{$rec->{$_}});
-			} else {
-				push @values, $rec->{$_};
-			}
-		}
-		print $of '"',join('","',@values),'"',"\n";
-	}
-}
-close($of);
-
 exit;
 
 1;
