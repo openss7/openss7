@@ -493,6 +493,7 @@ close($fh);
 $fn = "$datadir/db.sw.csv";
 print STDERR "I: writing $fn\n";
 open($of,">:utf8",$fn) or die "can't write $fn";
+print $of '"',join('","',@dbsw_keys),'"',"\n";
 foreach my $npa (sort keys %dbsw) {
 	foreach my $nxx (sort keys %{$dbsw{$npa}}) {
 		foreach my $x (sort keys %{$dbsw{$npa}{$nxx}}) {
