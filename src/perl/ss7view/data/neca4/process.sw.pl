@@ -379,7 +379,8 @@ sub normalize {
 	$nm =~ s/\bBuilding\b/Bldg/gi;
 	$nm =~ s/\bCreek\b/Cr/gi;
 	$nm =~ s/\bLake\b/Lk/gi;
-	$nm =~ s/\bValey\b/Vly/gi;
+	$nm =~ s/\bValley\b/Vly/gi;
+	$nm =~ s/\bTownship\b/Twp/gi;
 	$nm =~ s/\bNorth.?East\b/NE/gi;
 	$nm =~ s/\bNorth.?West\b/NW/gi;
 	$nm =~ s/\bSouth.?East\b/SE/gi;
@@ -519,10 +520,8 @@ sub clliize {
 	return $nm;
 }
 
-sub cmpcllis {
-	my ($ct,$nm) = @_;
-	my $c = $ct; $c =~ s/[ _]//g;
-	my $n = clliize($nm); $n =~ s/ //g;
+sub cmpclli {
+	my ($c,$n) = @_;
 	my ($ic,$in) = (0,-1);
 	if (substr($c,0,1) eq substr($n,0,1)) {
 		while ($ic<length($c) and $in<length($n)) {
@@ -533,6 +532,18 @@ sub cmpcllis {
 		# ok if last unmatched letter is X, Y or Z or a number
 		if ($ic==3 and $ic==length($c)-1 and substr($c,$ic,1) =~ /[XYZ0-9]/) { return 1; }
 		if ($ic>=length($c)) { return 1; }
+	}
+	return 0;
+}
+
+sub cmpcllis {
+	my ($ct,$nm) = @_;
+	my $c = $ct; $c =~ s/[ _]//g;
+	my $n = clliize($nm); $n =~ s/ //g;
+	return 1 if cmpclli($c,$n);
+	foreach my $w (split(/\s+/,$nm)) {
+		$w = clliize($w);
+		return 1 if cmpclli($c,$w);
 	}
 	return 0;
 }
@@ -553,7 +564,7 @@ my %a1codes = (
 	'05'=>'NL',
 );
 
-my $maxradius = 5; # maximum of 100 miles (50 mile radius)
+my $maxradius = 50; # maximum of 100 miles (50 mile radius)
 
 my %geonames = ();
 my %features = ();
@@ -956,7 +967,7 @@ while (<$fh>) { chomp;
 				unless ($rec or exists $data->{WCGEOID}) {
 					my ($geo,$dist) = closestname($v,$h,$nm);
 					if ($geo) { $aname++;
-						if ($dist < $maxradius) {
+						if ($dist <= $maxradius) {
 							georecover($cc,$st,$ct,$nm,$data,$geo,'name',$dist); last;
 						} else {
 							geoshowfail($cc,$st,$ct,$nm,$data,$geo,'name',$dist);
@@ -968,7 +979,7 @@ while (<$fh>) { chomp;
 				unless ($rec or exists $data->{WCGEOID}) {
 					my ($geo,$dist) = closestcity($v,$h);
 					if ($geo) { $acity++;
-						if ($dist < $maxradius and (cmpnames($nm,$geo->{asciiname}) or cmpnames($nm,$geo->{name}))) {
+						if ($dist <= $maxradius and (cmpnames($nm,$geo->{asciiname}) or cmpnames($nm,$geo->{name}))) {
 							georecover($cc,$st,$ct,$nm,$data,$geo,'city',$dist); last;
 						} else {
 							geoshowfail($cc,$st,$ct,$nm,$data,$geo,'city',$dist);
@@ -980,7 +991,7 @@ while (<$fh>) { chomp;
 				unless ($rec or exists $data->{WCGEOID}) {
 					my ($geo,$dist) = closestfeat($v,$h);
 					if ($geo) { $afeat++;
-						if ($dist < $maxradius and (cmpnames($nm,$geo->{asciiname}) or cmpnames($nm,$geo->{name}))) {
+						if ($dist <= $maxradius and (cmpnames($nm,$geo->{asciiname}) or cmpnames($nm,$geo->{name}))) {
 							georecover($cc,$st,$ct,$nm,$data,$geo,'feat',$dist); last;
 						} else {
 							geoshowfail($cc,$st,$ct,$nm,$data,$geo,'feat',$dist);
@@ -997,7 +1008,7 @@ while (<$fh>) { chomp;
 				unless ($rec or exists $data->{WCGEOID}) {
 					my ($geo,$dist) = closestclli($v,$h,$ct);
 					if ($geo) { $aclli++;
-						if ($dist < $maxradius) {
+						if ($dist <= $maxradius/5) {
 							georecover($cc,$st,$ct,$nm,$data,$geo,'clli',$dist); last;
 						} else {
 							geoshowfail($cc,$st,$ct,$nm,$data,$geo,'clli',$dist);
@@ -1009,7 +1020,7 @@ while (<$fh>) { chomp;
 				unless ($rec or exists $data->{WCGEOID}) {
 					my ($geo,$dist) = closestcity($v,$h);
 					if ($geo) { $acity++;
-						if ($dist < $maxradius and (cmpcllis($ct,$geo->{asciiname}) or cmpcllis($ct,$geo->{name}))) {
+						if ($dist <= $maxradius/5 and (cmpcllis($ct,$geo->{asciiname}) or cmpcllis($ct,$geo->{name}))) {
 							georecover($cc,$st,$ct,$nm,$data,$geo,'city',$dist); last;
 						} else {
 							geoshowfail($cc,$st,$ct,$nm,$data,$geo,'city',$dist);
@@ -1022,7 +1033,7 @@ while (<$fh>) { chomp;
 				unless ($rec or exists $data->{WCGEOID}) {
 					my ($geo,$dist) = closestfeat($v,$h);
 					if ($geo) { $afeat++;
-						if ($dist < $maxradius and (cmpcllis($ct,$geo->{asciiname}) or cmpcllis($ct,$geo->{name}))) {
+						if ($dist <= $maxradius/5 and (cmpcllis($ct,$geo->{asciiname}) or cmpcllis($ct,$geo->{name}))) {
 							georecover($cc,$st,$ct,$nm,$data,$geo,'feat',$dist); last;
 						} else {
 							geoshowfail($cc,$st,$ct,$nm,$data,$geo,'feat',$dist);
@@ -1033,20 +1044,22 @@ while (<$fh>) { chomp;
 				}
 			}
 		}
-		if ($nm) {
-			unless ($rec or exists $data->{WCGEOID}) {
-				if (my $geo = bestname($cc,$st,$nm)) { $aname++;
-					georecover($cc,$st,$ct,$nm,$data,$geo,'best');
-				} else {
-					$noname++;
+		unless ($data->{WCVH}) {
+			if ($nm) {
+				unless ($rec or exists $data->{WCGEOID}) {
+					if (my $geo = bestname($cc,$st,$nm)) { $aname++;
+						georecover($cc,$st,$ct,$nm,$data,$geo,'best');
+					} else {
+						$noname++;
+					}
 				}
-			}
-		} else {
-			unless ($rec or exists $data->{WCGEOID}) {
-				if (my $geo = bestclli($cc,$st,$ct)) { $aclli++;
-					georecover($cc,$st,$ct,$nm,$data,$geo,'best');
-				} else {
-					$noclli++;
+			} else {
+				unless ($rec or exists $data->{WCGEOID}) {
+					if (my $geo = bestclli($cc,$st,$ct)) { $aclli++;
+						georecover($cc,$st,$ct,$nm,$data,$geo,'best');
+					} else {
+						$noclli++;
+					}
 				}
 			}
 		}

@@ -21,7 +21,7 @@ my %db = ();
 
 my @dirs = (
 	'neca4',
-	'npanxxsource',
+#	'npanxxsource',
 	'telcodata',
 	'localcallingguide',
 	'pinglo',
