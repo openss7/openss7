@@ -22,10 +22,10 @@ my %db = ();
 my @dirs = (
 	'neca4',
 	'npanxxsource',
-#	'telcodata',
-#	'localcallingguide',
-#	'pinglo',
-#	'areacodes',
+	'telcodata',
+	'localcallingguide',
+	'pinglo',
+	'areacodes',
 );
 
 my %fields = ();
@@ -47,6 +47,9 @@ foreach my $dir (@dirs) {
 		for (my $i=0;$i<@{$fields{$dir}};$i++) {
 			$data{$fields{$dir}[$i]} = $tokens[$i] if $tokens[$i];
 		}
+		$data{WCCLLI} = substr($data{SWCLLI},0,8);
+		$data{PLCLLI} = substr($data{SWCLLI},0,6);
+		$data{STCLLI} = substr($data{SWCLLI},4,2);
 		push @{$db{$dir}{$data{NPA}}{$data{NXX}}{$data{X}}}, \%data;
 		$db{mark}{$data{NPA}}{$data{NXX}}{$data{X}}++;
 		if ($npa != int($data{NPA}/100)*100) {
@@ -66,9 +69,39 @@ my %compares = (
 			if (defined $$val) { if ($$val ne $tst) { $mismatches++; return undef } else { $matches++ } } else { $$val = $tst }
 			return 1;
 		},
+		WCCLLI=>sub{
+			my ($val,$tst,$npa,$nxx,$x) = @_;
+			if (defined $$val) { if ($$val ne $tst) { $mismatches++; return undef } else { $matches++ } } else { $$val = $tst }
+			return 1;
+		},
+		PLCLLI=>sub{
+			my ($val,$tst,$npa,$nxx,$x) = @_;
+			if (defined $$val) { if ($$val ne $tst) { $mismatches++; return undef } else { $matches++ } } else { $$val = $tst }
+			return 1;
+		},
+		STCLLI=>sub{
+			my ($val,$tst,$npa,$nxx,$x) = @_;
+			if (defined $$val) { if ($$val ne $tst) { $mismatches++; return undef } else { $matches++ } } else { $$val = $tst }
+			return 1;
+		},
 	},
 	'telcodata'=>{
 		SWCLLI=>sub{
+			my ($val,$tst,$npa,$nxx,$x) = @_;
+			if (defined $$val) { if ($$val ne $tst) { $mismatches++; return undef } else { $matches++ } } else { $$val = $tst }
+			return 1;
+		},
+		WCCLLI=>sub{
+			my ($val,$tst,$npa,$nxx,$x) = @_;
+			if (defined $$val) { if ($$val ne $tst) { $mismatches++; return undef } else { $matches++ } } else { $$val = $tst }
+			return 1;
+		},
+		PLCLLI=>sub{
+			my ($val,$tst,$npa,$nxx,$x) = @_;
+			if (defined $$val) { if ($$val ne $tst) { $mismatches++; return undef } else { $matches++ } } else { $$val = $tst }
+			return 1;
+		},
+		STCLLI=>sub{
 			my ($val,$tst,$npa,$nxx,$x) = @_;
 			if (defined $$val) { if ($$val ne $tst) { $mismatches++; return undef } else { $matches++ } } else { $$val = $tst }
 			return 1;
@@ -80,9 +113,39 @@ my %compares = (
 			if (defined $$val) { if ($$val ne $tst) { $mismatches++; return undef } else { $matches++ } } else { $$val = $tst }
 			return 1;
 		},
+		WCCLLI=>sub{
+			my ($val,$tst,$npa,$nxx,$x) = @_;
+			if (defined $$val) { if ($$val ne $tst) { $mismatches++; return undef } else { $matches++ } } else { $$val = $tst }
+			return 1;
+		},
+		PLCLLI=>sub{
+			my ($val,$tst,$npa,$nxx,$x) = @_;
+			if (defined $$val) { if ($$val ne $tst) { $mismatches++; return undef } else { $matches++ } } else { $$val = $tst }
+			return 1;
+		},
+		STCLLI=>sub{
+			my ($val,$tst,$npa,$nxx,$x) = @_;
+			if (defined $$val) { if ($$val ne $tst) { $mismatches++; return undef } else { $matches++ } } else { $$val = $tst }
+			return 1;
+		},
 	},
 	'pinglo'=>{
 		SWCLLI=>sub{
+			my ($val,$tst,$npa,$nxx,$x) = @_;
+			if (defined $$val) { if ($$val ne $tst) { $mismatches++; return undef } else { $matches++ } } else { $$val = $tst }
+			return 1;
+		},
+		WCCLLI=>sub{
+			my ($val,$tst,$npa,$nxx,$x) = @_;
+			if (defined $$val) { if ($$val ne $tst) { $mismatches++; return undef } else { $matches++ } } else { $$val = $tst }
+			return 1;
+		},
+		PLCLLI=>sub{
+			my ($val,$tst,$npa,$nxx,$x) = @_;
+			if (defined $$val) { if ($$val ne $tst) { $mismatches++; return undef } else { $matches++ } } else { $$val = $tst }
+			return 1;
+		},
+		STCLLI=>sub{
 			my ($val,$tst,$npa,$nxx,$x) = @_;
 			if (defined $$val) { if ($$val ne $tst) { $mismatches++; return undef } else { $matches++ } } else { $$val = $tst }
 			return 1;
@@ -94,6 +157,21 @@ my %compares = (
 			if (defined $$val) { if ($$val ne $tst) { $mismatches++; return undef } else { $matches++ } } else { $$val = $tst }
 			return 1;
 		},
+		WCCLLI=>sub{
+			my ($val,$tst,$npa,$nxx,$x) = @_;
+			if (defined $$val) { if ($$val ne $tst) { $mismatches++; return undef } else { $matches++ } } else { $$val = $tst }
+			return 1;
+		},
+		PLCLLI=>sub{
+			my ($val,$tst,$npa,$nxx,$x) = @_;
+			if (defined $$val) { if ($$val ne $tst) { $mismatches++; return undef } else { $matches++ } } else { $$val = $tst }
+			return 1;
+		},
+		STCLLI=>sub{
+			my ($val,$tst,$npa,$nxx,$x) = @_;
+			if (defined $$val) { if ($$val ne $tst) { $mismatches++; return undef } else { $matches++ } } else { $$val = $tst }
+			return 1;
+		},
 	},
 	'areacodes'=>{
 		SWCLLI=>sub{
@@ -101,10 +179,26 @@ my %compares = (
 			if (defined $$val) { if ($$val ne $tst) { $mismatches++; return undef } else { $matches++ } } else { $$val = $tst }
 			return 1;
 		},
+		WCCLLI=>sub{
+			my ($val,$tst,$npa,$nxx,$x) = @_;
+			if (defined $$val) { if ($$val ne $tst) { $mismatches++; return undef } else { $matches++ } } else { $$val = $tst }
+			return 1;
+		},
+		PLCLLI=>sub{
+			my ($val,$tst,$npa,$nxx,$x) = @_;
+			if (defined $$val) { if ($$val ne $tst) { $mismatches++; return undef } else { $matches++ } } else { $$val = $tst }
+			return 1;
+		},
+		STCLLI=>sub{
+			my ($val,$tst,$npa,$nxx,$x) = @_;
+			if (defined $$val) { if ($$val ne $tst) { $mismatches++; return undef } else { $matches++ } } else { $$val = $tst }
+			return 1;
+		},
 	},
 );
 
-foreach my $field (qw/SWCLLI/) {
+foreach my $field (qw/STCLLI PLCLLI WCCLLI SWCLLI WCVH/) {
+	($checks,$matches,$mismatches) = (0,0,0);
 	print STDERR "I: checking $field...\n";
 	foreach my $npa (sort keys %{$db{mark}}) {
 		foreach my $nxx (sort keys %{$db{mark}{$npa}}) {
@@ -143,16 +237,15 @@ foreach my $field (qw/SWCLLI/) {
 			}
 		}
 	}
+	print STDERR "I: ---------------------\n";
+	printf STDERR "I: there were %10d checks\n", $checks;
+	printf STDERR "I: there were %10d matches\n", $matches;
+	printf STDERR "I: there were %10d mismatches\n", $mismatches;
+	printf STDERR "I: accuracy = %5.2f percent\n", ($matches/($matches+$mismatches))*100;
+	print STDERR "I: ---------------------\n";
 }
 
 print STDERR "I: key ",'"',join('","',@dirs),'"',"\n";
-
-print STDERR "I: ---------------------\n";
-printf STDERR "I: there were %10d checks\n", $checks;
-printf STDERR "I: there were %10d matches\n", $matches;
-printf STDERR "I: there were %10d mismatches\n", $mismatches;
-printf STDERR "I: accuracy = %5.2f percent\n", ($matches/($matches+$mismatches))*100;
-print STDERR "I: ---------------------\n";
 
 exit;
 
