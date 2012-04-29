@@ -272,7 +272,7 @@ our %nanpst = ();
 
 $fn = "$codedir/nanpst.txt";
 print STDERR "I: reading $fn...\n";
-open($fh,"<",$fn) or die "can't open $fn";
+open($fh,"<:utf8",$fn) or die "can't open $fn";
 while (<$fh>) { chomp;
 	my ($npa,$cc,$st,$name) = split(/\t/,$_);
 	$nanpst{$npa} = $st;
@@ -289,7 +289,7 @@ our %countries = ();
 
 $fn = "$codedir/lergst.txt";
 print STDERR "I: reading $fn\n";
-open($fh,"<",$fn) or die "can't open $fn";
+open($fh,"<:utf8",$fn) or die "can't open $fn";
 while (<$fh>) { chomp;
 	next if /^ISO2/;
 	next if /^\s*$/;
@@ -1075,535 +1075,13 @@ our %nxxst = (
 	'999'=>'NT',
 );
 
-my @gn_fields = (
-	'geonameid',
-	'name',
-	'asciiname',
-	'alternatenames',
-	'latitude',
-	'longitude',
-	'feature class',
-	'feature code',
-	'country code',
-	'cc2',
-	'admin1 code',
-	'admin2 code',
-	'admin3 code',
-	'admin4 code',
-	'population',
-	'elevation',
-	'dem',
-	'timezone',
-	'modification date',
-);
-
-my %gn_dontneed = (
-	'alternatenames'=>1,
-	'admin2 code'=>1,
-	'admin3 code'=>1,
-	'admin4 code'=>1,
-	'population'=>1,
-	'elevation'=>1,
-	'dem'=>1,
-	'timezone'=>1,
-);
-
-sub normalize {
-	my $nm = shift;
-	$nm =~ s/-/ /g;
-	$nm =~ s/[[:punct:]]//g;
-	$nm =~ s/^\s+$//;
-	$nm =~ s/^\s+//;
-	$nm =~ s/\s+$//;
-	$nm =~ s/ \([^\)]*\)//g;
-	$nm =~ s/ \(historical\)//i;
-	$nm =~ s/\b(The )?Villages? of (the )?//i;
-	$nm =~ s/\bIsle of //i;
-	$nm =~ s/\bCity of //i;
-	$nm =~ s/\bEstates of //i;
-	$nm =~ s/\bUnorganized Territory of //i;
-	$nm =~ s/\bTown(ship)? of //i;
-	$nm =~ s/\bBorough of //i;
-	$nm =~ s/\bPoint of //i;
-	$nm =~ s/\BLakes? of the //i;
-	$nm =~ s/\bHead of (the )?//i;
-	#$nm =~ s/ Subdivision\b//i;
-	#$nm =~ s/ County$//i;
-	#$nm =~ s/ (Military|Indian)? Reservation$//i;
-	#$nm =~ s/ Town(ship)?$//i;
-	#$nm =~ s/ City$//i;
-	#$nm =~ s/ Village$//i;
-	#$nm =~ s/^New //i;
-	#$nm =~ s/^Old //i unless $nm =~ /Old Rural Town/i;
-	$nm =~ s/\bD\s+C\b/DC/;
-	$nm =~ s/\bSaint\b/St/gi;
-	$nm =~ s/\bFort\b/Ft/gi;
-	$nm =~ s/\bSainte\b/Ste/gi;
-	$nm =~ s/\bRoad\b/Rd/gi;
-	$nm =~ s/\bCenter\b/Ctr/gi;
-	$nm =~ s/\bMount\b/Mt/gi;
-	$nm =~ s/\bJunction\b/Jct/gi;
-	$nm =~ s/\bCourt\b/Ct/gi;
-	$nm =~ s/\bCompany\b/Co/gi;
-	$nm =~ s/\bFalls\b/Fls/gi;
-	$nm =~ s/\bSprints\b/Spg/gi;
-	$nm =~ s/\bBuilding\b/Bldg/gi;
-	$nm =~ s/\bCreek\b/Cr/gi;
-	$nm =~ s/\bLake\b/Lk/gi;
-	$nm =~ s/\bValey\b/Vly/gi;
-	$nm =~ s/\bNorth.?East\b/NE/gi;
-	$nm =~ s/\bNorth.?West\b/NW/gi;
-	$nm =~ s/\bSouth.?East\b/SE/gi;
-	$nm =~ s/\bSouth.?West\b/SW/gi;
-	$nm =~ s/\bEast\b/E/gi;
-	$nm =~ s/\bWest\b/W/gi;
-	$nm =~ s/\bNorth\b/N/gi;
-	$nm =~ s/\bSouth\b/S/gi;
-	$nm =~ s/\bAir Force Base\b/AFB/gi;
-	$nm =~ s/\bAir Force Station\b/AFS/gi;
-	$nm =~ s/\bAir Station\b/AS/gi;
-	$nm = "\U$nm\E";
-	return $nm;
-}
-
-sub cmpnames {
-	my ($nm1,$nm2) = @_;
-	my $n1 = normalize($nm1);
-	my $n2 = normalize($nm2);
-	return 1 if $n1 eq $n2;
-	($n1,$n2) = ($n2,$n1) if length($n2) < length($n1);
-	my $dist = distance($n1,$n2);
-	return 1 if $dist <= 3 and $dist < length($n1)/3;
-	#return 1 if $dist < 3 or $dist < length($n2)/3 or $dist < length($n2) - length($n1) + 3;
-	{
-		my $a1 = $n1; $a1 =~ s/[AEIOU ]//gi; $a1 =~ s/([A-Z])\1/\1/gi;
-		my $a2 = $n2; $a2 =~ s/[AEIOU ]//gi; $a2 =~ s/([A-Z])\1/\1/gi;
-		($a1,$a2) = ($a2,$a1) if length($a2) < length($a1);
-		if (length($a1) > 4) {
-			return 1 if $a1 eq $a2;
-			return 1 if index($a2,$a1) != -1 and length($a1) >= length($a2)/3;
-		}
-	}
-	my @t1 = split(/\s+/,$n1);
-	my @t2 = split(/\s+/,$n2);
-	my (@c1,@c2);
-	if (scalar @t1 < scalar @t2) {
-		@c1 = @t1; @c2 = @t2;
-	} else {
-		@c1 = @t2; @c2 = @t1;
-	}
-	my $cnt = scalar @c1;
-	my $mtc = 0;
-	foreach my $k1 (@c1) {
-		foreach my $k2 (@c2) {
-			if ($k1 eq $k2) {
-				$mtc++;
-				last;
-			} else {
-				my ($i1,$i2,$good) = (0,0,0);
-				my ($s1,$s2);
-				if (length($k1)<length($k2)) {
-					($s1,$s2) = ($k1,$k2);
-				} else {
-					($s1,$s2) = ($k2,$k1);
-				}
-				while ($i1<length($s1)) {
-					if (substr($s1,$i1,1) eq substr($s2,$i2,1)) {
-						$good++; $i1++; $i2++;
-					} elsif (substr($s1,$i1,1) eq substr($s2,$i2+1,1)) {
-						$good++; $i1++; $i2+=2;
-					} elsif (substr($s1,$i1+1,1) eq substr($s2,$i2,1)) {
-						$good++; $i1+=2; $i2++;
-					} elsif (substr($s1,$i1,1) eq substr($s2,$i2+2,1)) {
-						$good++; $i1++; $i2+=3;
-					} else {
-						$i1++; $i2++;
-					}
-				}
-				if ($good/length($s1) > 0.8 and $good/length($s2) > 0.3) {
-					$mtc += 0.5;
-					last;
-				}
-			}
-		}
-	}
-	return 1 if $mtc > $cnt/2;
-	#print STDERR "I: no match: '$nm1' '$nm2'\n";
-	return 0;
-}
-
-my %a1codes = (
-	'01'=>'AB',
-	'02'=>'BC',
-	'03'=>'MB',
-	'04'=>'NB',
-	'13'=>'NT',
-	'07'=>'NS',
-	'14'=>'NU',
-	'08'=>'ON',
-	'09'=>'PE',
-	'10'=>'QC',
-	'11'=>'SK',
-	'12'=>'YT',
-	'05'=>'NL',
-);
-
-my $maxradius = 50; # maximum of 100 miles (50 mile radius)
-
-my %geonmids = ();
-my %geonames = ();
-my %features = ();
-
-foreach my $code (qw/cities1000 AG AI AS BB BM BS CA DM DO GD GU JM KN KY LC MP MS PR SX TC TT US VC VG VI/) {
-	my ($good,$bad) = (0,0);
-	$fn = "$geondir/$code.csv";
-	print STDERR "I: reading $fn\n";
-	open($fh,"<:utf8",$fn) or die "can't read $fn";
-	my $totals = `wc -l $fn`; chomp $totals; $totals = int($totals); $totals--;
-	my $heading = 1;
-	my @fields = ();
-	my $count = 0;
-	while (<$fh>) { chomp; s/\r//g;
-		s/^"//; s/"$//; my @tokens = split('","',$_);
-		if ($heading) { @fields = @tokens; $heading = undef; next; }
-		my %data = ();
-		for (my $i=0;$i<@fields;$i++) {
-			next if exists $gn_dontneed{$fields[$i]};
-			$data{$fields[$i]} = $tokens[$i] if $tokens[$i] or length($tokens[$i]);
-		}
-		$count++;
-		print STDERR "I: uniq: $good, dupl: $bad, totl: $count/$totals\r" if $count % 1000 == 0;
-		my $cc = $data{'country code'};
-		my $st = $cc; $st = $data{'admin1 code'} if $cc eq 'US' or $cc eq 'CA';
-		$st = $a1codes{$st} if $cc eq 'CA' and exists $a1codes{$st};
-		my $fc = $data{'feature class'};
-		$fc = 'C' if $code eq 'cities1000';
-		my $id = $data{geonameid};
-		$geonmids{$id} = \%data if $id;
-		my $nm = normalize($data{asciiname});
-		if (exists $geonames{$cc}{$st}{$nm}{$fc}) {
-			my $rec = $geonames{$cc}{$st}{$nm}{$fc};
-			if (ref $rec eq 'ARRAY') {
-				if ($rec->[0]{'modification date'} le $data{'modification date'}) {
-					unshift @{$rec}, \%data;
-				} else {
-					push @{$rec}, \%data;
-				}
-			} else {
-				if ($rec->{'modification date'} le $data{'modification date'}) {
-					$geonames{$cc}{$st}{$nm}{$fc} = [ \%data, $rec ];
-				} else {
-					$geonames{$cc}{$st}{$nm}{$fc} = [ $rec, \%data ];
-				}
-				$good--; $bad++;
-			}
-		} else {
-			$geonames{$cc}{$st}{$nm}{$fc} = \%data; $good++;
-		}
-		my ($v,$h) = ($data{vertical},$data{horizontal});
-		for (my $lev=-2;$lev<=0;$lev++) {
-			my $vf = POSIX::floor($v*(10**$lev)+0.5)/(10**$lev);
-			my $hf = POSIX::floor($h*(10**$lev)+0.5)/(10**$lev);
-			$features{$fc}{$lev}{"$vf,$hf"} = [] unless exists $features{$fc}{$lev}{"$vf,$hf"};
-			push @{$features{$fc}{$lev}{"$vf,$hf"}}, \%data;
-		}
-	}
-	close($fh);
-	print STDERR "I: uniq: $good, dupl: $bad, totl: $count/$totals\n";
-}
-
-sub closestname {
-	my ($v,$h,$nm) = @_;
-	my ($geo,$delta);
-	for (my $lev=0;$lev>=-2;$lev--) {
-		my $vf = POSIX::floor($v*(10**$lev)+0.5)/(10**$lev);
-		my $hf = POSIX::floor($h*(10**$lev)+0.5)/(10**$lev);
-		foreach my $fc (qw/C P A L S T/) {
-			next unless exists $features{$fc}{$lev}{"$vf,$hf"};
-			foreach (@{$features{$fc}{$lev}{"$vf,$hf"}}) {
-				next unless cmpnames($nm,$_->{asciiname}) or cmpnames($nm,$_->{name});
-				my ($vp,$hp) = ($_->{vertical},$_->{horizontal});
-				my $d = sqrt(((($vp-$v)**2)+(($hp-$h)**2))/10);
-				if (defined $delta) {
-					if ($d < $delta) { $delta = $d; $geo = $_; }
-				} else { $delta = $d; $geo = $_; }
-			}
-			last if defined $geo;
-		}
-		last if defined $geo;
-	}
-	return ($geo,$delta);
-}
-
-sub closestcity {
-	my ($v,$h) = @_;
-	my ($geo,$delta);
-	for (my $lev=0;$lev>=-2;$lev--) {
-		my $vf = POSIX::floor($v*(10**$lev)+0.5)/(10**$lev);
-		my $hf = POSIX::floor($h*(10**$lev)+0.5)/(10**$lev);
-		foreach my $fc (qw/C/) {
-			next unless exists $features{$fc}{$lev}{"$vf,$hf"};
-			foreach (@{$features{$fc}{$lev}{"$vf,$hf"}}) {
-				my ($vp,$hp) = ($_->{vertical},$_->{horizontal});
-				my $d = sqrt(((($vp-$v)**2)+(($hp-$h)**2))/10);
-				if (defined $delta) {
-					if ($d < $delta) { $delta = $d; $geo = $_; }
-				} else { $delta = $d; $geo = $_; }
-			}
-			last if defined $geo;
-		}
-		last if defined $geo;
-	}
-	return ($geo,$delta);
-}
-
-sub closestfeat {
-	my ($v,$h) = @_;
-	my ($geo,$delta);
-	for (my $lev=0;$lev>=-2;$lev--) {
-		my $vf = POSIX::floor($v*(10**$lev)+0.5)/(10**$lev);
-		my $hf = POSIX::floor($h*(10**$lev)+0.5)/(10**$lev);
-		foreach my $fc (qw/P A L S T/) {
-			next unless exists $features{$fc}{$lev}{"$vf,$hf"};
-			foreach (@{$features{$fc}{$lev}{"$vf,$hf"}}) {
-				my ($vp,$hp) = ($_->{vertical},$_->{horizontal});
-				my $d = sqrt(((($vp-$v)**2)+(($hp-$h)**2))/10);
-				if (defined $delta) {
-					if ($d < $delta) { $delta = $d; $geo = $_; }
-				} else { $delta = $d; $geo = $_; }
-			}
-			last if defined $geo;
-		}
-		last if defined $geo;
-	}
-	return ($geo,$delta);
-}
-
-sub bestname {
-	my ($cc,$st,$nm) = @_;
-	my $geo;
-	foreach my $fc (qw/C P A L S T/) {
-		foreach my $ln (keys %{$geonames{$cc}{$st}}) {
-			next unless exists $geonames{$cc}{$st}{$ln}{$fc};
-			$_ = $geonames{$cc}{$st}{$ln}{$fc};
-			if (ref $_ ne 'ARRAY' or $_ = $_->[0]) {
-				unless (cmpnames($nm,$_->{asciiname}) or cmpnames($nm,$_->{name})) {
-					#print STDERR "I: $cc-$st '$nm' does not match name $_->{'feature class'}.$_->{'feature code'} '$_->{name}'\n" unless defined $geo;
-					next;
-				} else {
-					#printf STDERR "I: $cc-$st '$nm' matches %3.6f miles $_->{'feature class'}.$_->{'feature code'} '$_->{name}'\n", $d;
-				}
-				$geo = $_;
-			}
-			last if $geo;
-		}
-		last if $geo;
-	}
-	return $geo;
-}
-
-my ($found,$unusable,$failed,$recovered,$toofar);
-
-sub lookupgeo {
-	my ($cc,$st,$nm,$v,$h) = @_;
-	my $ln = normalize($nm);
-	my $geo;
-	if (exists $geonames{$cc}{$st}{$ln}) {
-		foreach my $fc (qw/C P A L S T/) {
-			next unless exists $geonames{$cc}{$st}{$ln}{$fc};
-			if (ref $geonames{$cc}{$st}{$ln}{$fc} ne 'ARRAY') {
-				$geo = $geonames{$cc}{$st}{$ln}{$fc};
-				if ($v and $h) {
-					my ($vp,$hp) = ($geo->{vertical},$geo->{horizontal});
-					my $d = sqrt(((($vp-$v)**2)+(($hp-$h)**2))/10);
-					if ($d > $maxradius) {
-						#printf STDERR "I: $cc-$st '$nm' too far %3.6f miles $geo->{'feature class'}.$geo->{'feature code'} '$geo->{name}'\n", $d;
-						$geo = undef;
-						$toofar++;
-					}
-				}
-			} else {
-				if ($v and $h) {
-					my $delta;
-					foreach (@{$geonames{$cc}{$st}{$ln}{$fc}}) {
-						my ($vp,$hp) = ($_->{vertical},$_->{horizontal});
-						my $d = sqrt(((($vp-$v)**2)+(($hp-$h)**2))/10);
-						if ($d > $maxradius) {
-							#printf STDERR "I: $cc-$st '$nm' too far %3.6f miles $_->{'feature class'}.$_->{'feature code'} '$_->{name}'\n", $d;
-							next;
-						}
-						if (defined $delta) {
-							if ($d < $delta) { $delta = $d; $geo = $_; }
-						} else { $delta = $d; $geo = $_; }
-					}
-				} else {
-					# just have to take the first one on the list
-					$geo = $geonames{$cc}{$st}{$ln}{$fc}[0];
-				}
-				unless (defined $geo) {
-						print STDERR "W: cannot use geoname for $cc-$st-$nm\n";
-					$unusable++;
-				}
-			}
-			if (defined $geo) { $found++; last; }
-		}
-	} else {
-		#print STDERR "W: cannot find geoname for $cc-$st-$nm\n";
-		$failed++;
-	}
-	return $geo;
-}
-
-my ($nolook,$noname,$nocity,$nofeat);
-my ($alook,$aname,$acity,$afeat);
-
-sub geoassign {
-	my ($data,$geo) = @_;
-	$data->{RCGEOID} = $geo->{geonameid};
-	$data->{RCGN} = $geo->{name};
-	$data->{RCGEOVH} = sprintf('%05d,%05d', $geo->{vertical}, $geo->{horizontal});
-	$data->{RCGEOLL} = "$geo->{latitude},$geo->{longitude}";
-	$data->{RCCODE} = "$geo->{'feature class'}.$geo->{'feature code'}";
-	$data->{RCNAME} = $geo->{name} unless $data->{RCNAME} and "\U$data->{RCNAME}\E" ne "\U$geo->{asciiname}\E";
-	$data->{RCCITY} = $geo->{name} unless $data->{RCNAME} and "\U$data->{RCCITY}\E" ne "\U$geo->{asciiname}\E";
-	$data->{RCCC} = $geo->{'country code'} if $geo->{'country code'};
-	$data->{RCST} = $geo->{'admin1 code'} if length($geo->{'admin1 code'});
-	$data->{RCST} = $a1codes{$data->{RCST}} if $data->{RCCC} eq 'CA' and exists $a1codes{$data->{RCST}};
-}
-
-sub geoshowfail {
-	my ($cc,$st,$nm,$data,$geo,$kind,$dist) = @_;
-	my $vh = sprintf('%05d,%05d',$geo->{vertical},$geo->{horizontal});
-	my $ll = "$geo->{latitude},$geo->{longitude}";
-	my $gn = $geo->{asciiname};
-	my $fc = "$geo->{'feature class'}.$geo->{'feature code'}";
-	$cc = $geo->{'country code'};
-	$st = $geo->{'admin1 code'};
-	$st = $a1codes{$st} if $cc eq 'CA' and exists $a1codes{$st};
-	my $mi = sprintf(' %.2f mi', $dist) if defined $dist;
-	printf STDERR "W: $data->{NPA}-$data->{NXX}($data->{X}) $cc-$st '$nm' $kind: $fc$mi $ll ($vh $gn)\n", $dist;
-}
-
-sub geofound {
-	my ($cc,$st,$nm,$data,$geo,$kind) = @_;
-	geoassign($data,$geo);
-	print STDERR "I: $data->{NPA}-$data->{NXX}($data->{X}) $cc-$st '$nm' found as $kind $geo->{'feature class'}.$geo->{'feature code'} '$geo->{name}' ($geo->{asciiname})\n";
-}
-
-sub georestore {
-	my ($cc,$st,$nm,$data,$id,$kind) = @_;
-	if (my $geo = $geonmids{$id}) {
-		geoassign($data,$geo);
-		#print STDERR "I: $data->{NPA}-$data->{NXX}($data->{X}) $cc-$st '$nm' restored as $kind $geo->{'feature class'}.$geo->{'feature code'} '$geo->{name}' ($geo->{asciiname})\n";
-	}
-}
-
-sub georecover {
-	my ($cc,$st,$nm,$data,$geo,$kind,$dist) = @_;
-	geoassign($data,$geo);
-	geoshowfail($cc,$st,$nm,$data,$geo,$kind,$dist);
-	$found++; $failed--; $recovered++;
-	print STDERR "W: $data->{NPA}-$data->{NXX}($data->{X}) $cc-$st '$nm' recovered as $kind $geo->{'feature class'}.$geo->{'feature code'} '$geo->{name}' ($geo->{asciiname})\n";
-}
-
 my %rcs = ();
 my %rns = ();
 my %dbrc = ();
 
-$fn = "$datadir/rc.save.csv";
-$fp = "$datadir/rc.csv";
-system("mv -v $fp $fn") if -f $fp and not -f $fn;
-if ( -f $fn ) {
-	print STDERR "I: reading $fn\n";
-	open($fh,"<:utf8",$fn) or die "can't open $fn";
-	my $heading = 1;
-	my @fields = ();
-	while (<$fh>) { chomp;
-		next unless /^"/;
-		s/^"//; s/"$//; my @tokens = split(/","/,$_);
-		if ($heading) { @fields = @tokens; $heading = undef; next }
-		my %data = ();
-		for (my $i=0;$i<@fields;$i++) {
-			my $k = $fields[$i];
-			my $v = $tokens[$i];
-			if ($k =~ /^(RCVH|RCLL|WCVH|WCLL)$/) {
-				if (length($v)) {
-					my $K = substr($k,2,2);
-					foreach my $m (split(/;/,$v)) {
-						next if not $m or exists $data{$K}{$m};
-						$data{$K}{$m}++;
-						$data{$k} = $data{$k} ? join(';',$data{$k},$m) : $m;
-					}
-				}
-			} elsif ($k =~ /^(NPA|NXX|X|LATA|OCN)$/) {
-				foreach my $m (split(/,/,$v)) { $data{$k}{$m}++ if $m }
-			} else {
-				$data{$k} = $v if length($v);
-			}
-		}
-		$rcs{$data{REGION}}{$data{RCSHORT}} = \%data;
-	}
-	close($fh);
-}
-
-$fn = "$datadir/rn.save.csv";
-$fp = "$datadir/rn.csv";
-system("mv -v $fp $fn") if -f $fp and not -f $fn;
-if ( -f $fn ) {
-	print STDERR "I: reading $fn\n";
-	open($fh,"<:utf8",$fn) or die "can't open $fn";
-	my $heading = 1;
-	my @fields = ();
-	while (<$fh>) { chomp;
-		next unless /^"/;
-		s/^"//; s/"$//; my @tokens = split(/","/,$_);
-		if ($heading) { @fields = @tokens; $heading = undef; next }
-		my %data = ();
-		for (my $i=0;$i<@fields;$i++) {
-			my $k = $fields[$i];
-			my $v = $tokens[$i];
-			if ($k =~ /^(RCVH|RCLL|WCVH|WCLL)$/) {
-				if (length($v)) {
-					my $K = substr($k,2,2);
-					foreach my $m (split(/;/,$v)) {
-						next if not $m or exists $data{$K}{$m};
-						$data{$K}{$m}++;
-						$data{$k} = $data{$k} ? join(';',$data{$k},$m) : $m;
-					}
-				}
-			} elsif ($k =~ /^(NPA|NXX|X|LATA|OCN)$/) {
-				foreach my $m (split(/,/,$v)) { $data{$k}{$m}++ if $m }
-			} else {
-				$data{$k} = $v if length($v);
-			}
-		}
-		$rns{$data{RCCC}}{$data{RCST}}{"\U$data{RCNAME}\E"} = \%data;
-	}
-	close($fh);
-}
-
-$fn = "$datadir/db.rc.save.csv";
-$fp = "$datadir/db.rc.csv";
-system("mv -v $fp $fn") if -f $fp and not -f $fn;
-if ( -f $fn ) {
-	print STDERR "I: reading $fn\n";
-	open($fh,"<:utf8",$fn) or die "can't open $fn";
-	my $heading = 1;
-	my @fields = ();
-	while (<$fh>) { chomp;
-		next unless /^"/;
-		s/^"//; s/"$//; my @tokens = split(/","/,$_);
-		if ($heading) { @fields = @tokens; $heading = undef; next }
-		my %data = ();
-		for (my $i=0;$i<@fields;$i++) { $data{$fields[$i]} = $tokens[$i] if length($tokens[$i]) }
-		$dbrc{$data{NPA}}{$data{NXX}}{$data{X}} = \%data;
-	}
-	close($fh);
-}
-
-my @rc_keys = qw/RCSHORT REGION RCVH RCLL WCVH WCLL RCGEOID RCCODE RCGN RCGEOVH RCGEOLL RCCITY RCCOUNTY NPA NXX X RCCC RCST RCNAME/;
-my @rn_keys = qw/RCCC RCST RCNAME RCVH RCLL WCVH WCLL RCGEOID RCCODE RCGN RCGEOVH RCGEOLL RCCITY RCCOUNTY NPA NXX X REGION RCSHORT/;
-my @dbrc_keys = qw/NPA NXX X REGION RCSHORT RCCC RCST RCNAME/;
+my @rc_keys = qw/RCSHORT REGION RCCC RCST RCNAME RCCITY RCCOUNTY RCVH RCLL WCVH WCLL NPA NXX X LATA OCN/;
+my @rn_keys = qw/RCCC RCST RCNAME REGION RCSHORT RCCITY RCCOUNTY RCVH RCLL WCVH WCLL NPA NXX X LATA OCN/;
+my @dbrc_keys = qw/NPA NXX X REGION RCSHORT RCCC RCST RCNAME RCCITY RCCOUNTY LATA OCN/;
 
 require "$progdir/mapping.rc.pm";
 
@@ -1611,7 +1089,7 @@ my ($oldnpa,$oldrg);
 
 $fn = "$progdir/db.csv";
 print STDERR "I: processing $fn\n";
-open($fh,"<",$fn) or die "can't open $fn";
+open($fh,"<:utf8",$fn) or die "can't open $fn";
 my $heading = 1;
 my @fields = ();
 while (<$fh>) { chomp;
@@ -1642,133 +1120,7 @@ while (<$fh>) { chomp;
 	my $rc = $data->{RCSHORT};
 	my $rn = $data->{RCNAME};
 	my $rt = $data->{RCCITY};
-	my $nm = $rn ? $rn : ( $rc ? $rc : $rt );
 	$rn = "\U$rn\E";
-	if ($cc and $st and $nm) {
-		my $rec;
-		unless ($rec or exists $data->{RCGEOID}) {
-			if ($rg and $rc and exists $rcs{$rg}{$rc}) {
-				$rec = $rcs{$rg}{$rc};
-				#print STDERR "I: $data->{NPA}-$data->{NXX}($data->{X}) RC '$rc' found '$rg-$rc'\n";
-				if ($rec->{RCGEOID}) {
-					$data->{RCGEOID} = $rec->{RCGEOID};
-					georestore($cc,$st,$nm,$data,$rec->{RCGEOID},'save');
-				} else {
-					foreach my $vh (split(/;/,$data->{VH})) {
-						next unless $vh;
-						next if exists $rec->{VH}{$vh};
-						my $tested = join(';',sort keys %{$rec->{VH}});
-						print STDERR "W: $data->{NPA}-$data->{NXX}($data->{X}) RC '$rc' '$vh' not tested in '$tested'\n";
-						$rec = undef; last;
-					}
-				}
-			}
-		}
-		unless ($rec or exists $data->{RCGEOID}) {
-			if ($cc and $st and $rn and exists $rns{$cc}{$st}{$rn}) {
-				$rec = $rns{$cc}{$st}{$rn};
-				#print STDERR "I: $data->{NPA}-$data->{NXX}($data->{X}) RN '$rn' found '$cc-$st-$rn'\n";
-				if ($rec->{RCGEOID}) {
-					$data->{RCGEOID} = $rec->{RCGEOID};
-					georestore($cc,$st,$nm,$data,$rec->{RCGEOID},'save');
-				} else {
-					foreach my $vh (split(/;/,$data->{VH})) {
-						next unless $vh;
-						next if exists $rec->{VH}{$vh};
-						my $tested = join(';',sort keys %{$rec->{VH}});
-						print STDERR "W: $data->{NPA}-$data->{NXX}($data->{X}) RN '$rn' '$vh' not tested in '$tested'\n";
-						$rec = undef; last;
-					}
-				}
-			}
-		}
-		unless ($rec or exists $data->{RCGEOID}) {
-			foreach my $vh (split(/;/,$data->{VH})) {
-				my ($v,$h) = split(/,/,$vh);
-				if (my $geo = lookupgeo($cc,$st,$nm,$v,$h)) { $alook++;
-					geofound($cc,$st,$nm,$data,$geo);
-				} else {
-					#print STDERR "W: $data->{NPA}-$data->{NXX}($data->{X}) $cc-$st '$nm' could not find closest look\n";
-					$nolook++;
-				}
-			}
-			unless ($data->{VH}) {
-				unless ($rec or exists $data->{RCGEOID}) {
-					if (my $geo = lookupgeo($cc,$st,$nm)) { $alook++;
-						geofound($cc,$st,$nm,$data,$geo);
-					} else {
-						#print STDERR "W: $data->{NPA}-$data->{NXX}($data->{X}) $cc-$st '$nm' could not find closest look\n";
-						$nolook++;
-					}
-				}
-			}
-		}
-		unless ($rec or exists $data->{RCGEOID}) {
-			foreach my $vh (split(/;/,$data->{VH})) {
-				my ($v,$h) = split(/,/,$vh);
-				next unless $v and $h;
-				unless ($rec or exists $data->{RCGEOID}) {
-					print STDERR "W: $data->{NPA}-$data->{NXX}($data->{X}) $cc-$st '$nm' targ: $data->{LL} ($data->{VH} $nm)\n";
-				}
-				unless ($rec or exists $data->{RCGEOID}) {
-					my ($geo,$dist) = closestname($v,$h,$nm);
-					if ($geo) { $aname++;
-						if ($dist < $maxradius) {
-							georecover($cc,$st,$nm,$data,$geo,'name',$dist);
-						} else {
-							geoshowfail($cc,$st,$nm,$data,$geo,'name',$dist);
-						}
-					} else {
-						#print STDERR "W: $data->{NPA}-$data->{NXX}($data->{X}) $cc-$st '$nm' could not find closest name\n";
-						$noname++;
-					}
-				}
-				unless ($rec or exists $data->{RCGEOID}) {
-					my ($geo,$dist) = closestcity($v,$h);
-					if ($geo) { $acity++;
-						if ($dist < $maxradius and (cmpnames($nm,$geo->{asciiname}) or cmpnames($nm,$geo->{name}))) {
-							georecover($cc,$st,$nm,$data,$geo,'city',$dist);
-						} elsif ($dist < 1) {
-							georecover($cc,$st,$nm,$data,$geo,'city',$dist);
-						} else {
-							geoshowfail($cc,$st,$nm,$data,$geo,'city',$dist);
-						}
-					} else {
-						#print STDERR "W: $data->{NPA}-$data->{NXX}($data->{X}) $cc-$st '$nm' could not find closest city\n";
-						$nocity++;
-					}
-				}
-				unless ($rec or exists $data->{RCGEOID}) {
-					my ($geo,$dist) = closestfeat($v,$h);
-					if ($geo) { $afeat++;
-						if ($dist < $maxradius and (cmpnames($nm,$geo->{asciiname}) or cmpnames($nm,$geo->{name}))) {
-							georecover($cc,$st,$nm,$data,$geo,'feat',$dist);
-						} elsif ($dist < 1) {
-							georecover($cc,$st,$nm,$data,$geo,'feat',$dist);
-						} else {
-							geoshowfail($cc,$st,$nm,$data,$geo,'feat',$dist);
-						}
-					} else {
-						#print STDERR "W: $data->{NPA}-$data->{NXX}($data->{X}) $cc-$st '$nm' could not find closest feat\n";
-						$nofeat++;
-					}
-				}
-			}
-			unless ($data->{VH}) {
-				unless ($rec or exists $data->{RCGEOID}) {
-					if (my $geo = bestname($cc,$st,$nm)) { $aname++;
-						georecover($cc,$st,$nm,$data,$geo,'best');
-					} else {
-						#print STDERR "W: $data->{NPA}-$data->{NXX}($data->{X}) $cc-$st '$nm' could not find closest name\n";
-						$noname++;
-					}
-				}
-			}
-			unless ($rec or exists $data->{RCGEOID}) {
-				print STDERR "W: $data->{NPA}-$data->{NXX}($data->{X}) $cc-$st '$nm' cannot find geoname\n";
-			}
-		}
-	}
 	{
 		$dbrc{$data->{NPA}}{$data->{NXX}}{$data->{X}} = {} unless exists
 		$dbrc{$data->{NPA}}{$data->{NXX}}{$data->{X}};
@@ -1796,10 +1148,14 @@ while (<$fh>) { chomp;
 						next if not $m or exists $rec->{$K}{$m};
 						$rec->{$K}{$m}++;
 						if ($rec->{$k}) {
-							unless ($K eq 'LL') {
-								my $sects = join(';',sort keys %{$rec->{SECT}}) if $rec->{SECT};
-								print STDERR "E: $data->{NPA}-$data->{NXX}($data->{X}) RC $rc $k old value '$rec->{$k}' ($sects)\n" unless $rec->{$k} =~ /;/;
-								print STDERR "E: $data->{NPA}-$data->{NXX}($data->{X}) RC $rc $k new value '$m' ($data->{SECT})\n";
+							unless ($K eq 'LL' or substr($k,0,2) eq 'WC') {
+								if ($rec->{$k} =~ /;/) {
+									print STDERR "E: $data->{NPA}-$data->{NXX}($data->{X}) RC $rc $k extra value '$m' ($data->{SECT})\n";
+								} else {
+									#my $sects = join(';',sort keys %{$rec->{SECT}}) if $rec->{SECT};
+									#print STDERR "E: $data->{NPA}-$data->{NXX}($data->{X}) RC $rc $k old value '$rec->{$k}' ($sects)\n";
+									#print STDERR "E: $data->{NPA}-$data->{NXX}($data->{X}) RC $rc $k new value '$m' ($data->{SECT})\n";
+								}
 							}
 							$rec->{$k} = join(';',$rec->{$k},$m);
 						} else {
@@ -1833,10 +1189,14 @@ while (<$fh>) { chomp;
 						next if not $m or exists $rec->{$K}{$m};
 						$rec->{$K}{$m}++;
 						if ($rec->{$k}) {
-							unless ($K eq 'LL') {
-								my $sects = join(';',sort keys %{$rec->{SECT}}) if $rec->{SECT};
-								print STDERR "E: $data->{NPA}-$data->{NXX}($data->{X}) RN $rn $k old value '$rec->{$k}' ($sects)\n" unless $rec->{$k} =~ /;/;
-								print STDERR "E: $data->{NPA}-$data->{NXX}($data->{X}) RN $rn $k new value '$m' ($data->{SECT})\n";
+							unless ($K eq 'LL' or substr($k,0,2) eq 'WC') {
+								if ($rec->{$k} =~ /;/) {
+									print STDERR "E: $data->{NPA}-$data->{NXX}($data->{X}) RN $rn $k extra value '$m' ($data->{SECT})\n";
+								} else {
+									#my $sects = join(';',sort keys %{$rec->{SECT}}) if $rec->{SECT};
+									#print STDERR "E: $data->{NPA}-$data->{NXX}($data->{X}) RN $rn $k old value '$rec->{$k}' ($sects)\n";
+									#print STDERR "E: $data->{NPA}-$data->{NXX}($data->{X}) RN $rn $k new value '$m' ($data->{SECT})\n";
+								}
 							}
 							$rec->{$k} = join(';',$rec->{$k},$m);
 						} else {
@@ -1862,19 +1222,8 @@ while (<$fh>) { chomp;
 close($fh);
 
 printf STDERR "I: --------------------------\n";
-printf STDERR "I: %8d matches found\n", $found;
-printf STDERR "I: %8d matches unusable\n", $unusable;
-printf STDERR "I: %8d matches failed\n", $failed;
-printf STDERR "I: %8d matches recovered\n", $recovered;
-printf STDERR "I: %8d matches too far\n", $toofar;
-printf STDERR "I: --------------------------\n";
-printf STDERR "I: %8d/%8d found/unfound look\n", $alook,$nolook;
-printf STDERR "I: %8d/%8d found/unfound name\n", $aname,$noname;
-printf STDERR "I: %8d/%8d found/unfound city\n", $acity,$nocity;
-printf STDERR "I: %8d/%8d found/unfound feat\n", $afeat,$nofeat;
-printf STDERR "I: --------------------------\n";
 
-$fn = "$datadir/rc.csv";
+$fn = "$datadir/rc.nogeo.csv";
 print STDERR "I: writing $fn\n";
 open($of,">:utf8",$fn) or die "can't write $fn";
 print $of '"',join('","',@rc_keys),'"',"\n";
@@ -1898,7 +1247,7 @@ foreach my $rg (sort keys %rcs) {
 }
 close($of);
 
-$fn = "$datadir/db.rc.csv";
+$fn = "$datadir/db.rc.nogeo.csv";
 print STDERR "I: writing $fn\n";
 open($of,">:utf8",$fn) or die "can't write $fn";
 print $of '"',join('","',@dbrc_keys),'"',"\n";
@@ -1924,7 +1273,7 @@ foreach my $npa (sort keys %dbrc) {
 }
 close($of);
 
-$fn = "$datadir/rn.csv";
+$fn = "$datadir/rn.nogeo.csv";
 print STDERR "I: writing $fn\n";
 open($of,">:utf8",$fn) or die "can't write $fn";
 print $of '"',join('","',@rn_keys),'"',"\n";

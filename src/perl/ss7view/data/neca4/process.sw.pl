@@ -268,7 +268,7 @@ sub ll2vh {
 	return ($cv,$ch);
 }
 
-my %nanpst = ();
+our %nanpst = ();
 
 $fn = "$codedir/nanpst.txt";
 print STDERR "I: reading $fn...\n";
@@ -279,13 +279,13 @@ while (<$fh>) { chomp;
 }
 close($fh);
 
-my %lergcc = ();
-my %lergst = ();
-my %cllist = ();
-my %cllicc = ();
-my %cllirg = ();
-my %statrg = ();
-my %countries = ();
+our %lergcc = ();
+our %lergst = ();
+our %cllist = ();
+our %cllicc = ();
+our %cllirg = ();
+our %statrg = ();
+our %countries = ();
 
 $fn = "$codedir/lergst.txt";
 print STDERR "I: reading $fn\n";
@@ -1029,85 +1029,13 @@ my @wc_keys = qw/WCCLLI NPA NXX X LATA OCN SWCLLI WCVH WCLL RCVH RCLL WCADDR WCC
 my @pl_keys = qw/PLCLLI NPA NXX X LATA OCN WCCLLI/;
 my @dbsw_keys = qw/NPA NXX X SWCLLI LATA OCN/;
 
-my %skipcllis = (
+our %skipcllis = (
 	'NOCLLIKNOWN'=>1,
 	'XXXXXXXXXXX'=>1,
 	'__VARIOUS__'=>1,
 );
 
-my %mapping = (
-	'NPA'=>sub{
-		my ($dat,$fld,$val) = @_;
-		$dat->{"\U$fld\E"} = $val if length($val);
-	},
-	'NXX'=>sub{
-		my ($dat,$fld,$val) = @_;
-		$dat->{"\U$fld\E"} = $val if length($val);
-	},
-	'X'=>sub{
-		my ($dat,$fld,$val) = @_;
-		$dat->{"\U$fld\E"} = $val if length($val);
-	},
-	'rng'=>sub{
-	},
-	'lines'=>sub{
-	},
-	'total'=>sub{
-	},
-	'loc'=>sub{
-		my ($dat,$fld,$val) = @_;
-		$dat->{NAME} = $val if length($val);
-	},
-	'state'=>sub{
-		my ($dat,$fld,$val) = @_;
-		$dat->{"\U$fld\E"} = $val if length($val);
-	},
-	'clli'=>sub{
-		my ($dat,$fld,$val) = @_;
-		if ($val and length($val) == 11) {
-			$dat->{SWCLLI} = $val;
-			unless (exists $skipcllis{$val}) {
-				$dat->{WCCLLI} = substr($val,0,8);
-				$dat->{PLCLLI} = substr($val,0,6);
-				$dat->{STCLLI} = substr($val,4,2);
-				$dat->{CTCLLI} = substr($val,0,4);
-				my $cs = $dat->{STCLLI};
-				unless (exists $cllicc{$cs}) {
-					print STDERR "E: $dat->{NPA}-$dat->{NXX}($dat->{X}) CLLI '$val' has invalid state code '$cs'\n";
-				}
-				$dat->{WCCC} = $cllicc{$cs} if exists $cllicc{$cs};
-				$dat->{WCST} = $cllist{$cs} if exists $cllist{$cs};
-				$dat->{WCRG} = $cllirg{$cs} if exists $cllirg{$cs};
-			}
-		}
-	},
-	'wcvh'=>sub{
-		my ($dat,$fld,$val) = @_;
-		if (length($val)) {
-			my ($v,$h) = split(/,/,$val);
-			if ($v and $h) {
-				$dat->{VH} = $dat->{WCVH} = sprintf('%05d,%05d',$v,$h);
-				$dat->{LL} = $dat->{WCLL} = join(',',vh2ll($v,$h));
-			}
-		}
-	},
-	'ocn'=>sub{
-		my ($dat,$fld,$val) = @_;
-		$dat->{"\U$fld\E"} = $val if length($val);
-	},
-	'lata'=>sub{
-		my ($dat,$fld,$val) = @_;
-		$dat->{"\U$fld\E"} = $val if length($val);
-	},
-	'feat'=>sub{
-		my ($dat,$fld,$val) = @_;
-		$dat->{"\U$fld\E"} = $val if length($val);
-	},
-	'sect'=>sub{
-		my ($dat,$fld,$val) = @_;
-		$dat->{"\U$fld\E"} = $val if length($val);
-	},
-);
+require "$progdir/mapping.sw.pm";
 
 my ($oldnpa,$oldrg);
 
