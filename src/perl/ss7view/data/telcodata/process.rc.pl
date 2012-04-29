@@ -268,7 +268,7 @@ sub ll2vh {
 	return ($cv,$ch);
 }
 
-my %nanpst = ();
+our %nanpst = ();
 
 $fn = "$codedir/nanpst.txt";
 print STDERR "I: reading $fn...\n";
@@ -279,13 +279,13 @@ while (<$fh>) { chomp;
 }
 close($fh);
 
-my %lergcc = ();
-my %lergst = ();
-my %cllist = ();
-my %cllicc = ();
-my %cllirg = ();
-my %statrg = ();
-my %countries = ();
+our %lergcc = ();
+our %lergst = ();
+our %cllist = ();
+our %cllicc = ();
+our %cllirg = ();
+our %statrg = ();
+our %countries = ();
 
 $fn = "$codedir/lergst.txt";
 print STDERR "I: reading $fn\n";
@@ -304,7 +304,7 @@ while (<$fh>) { chomp;
 }
 close($fh);
 
-my %nsxst = (
+our %nsxst = (
 	'202'=>'NS',
 	'203'=>'NS',
 	'204'=>'NS',
@@ -955,7 +955,7 @@ my %nsxst = (
 	'999'=>'NS',
 );
 
-my %nxxst = (
+our %nxxst = (
 	'206'=>'NT',
 	'211'=>'YT',
 	'222'=>'NU',
@@ -1441,7 +1441,7 @@ sub lookupgeo {
 					$geo = $geonames{$cc}{$st}{$ln}{$fc}[0];
 				}
 				unless (defined $geo) {
-					print STDERR "W: cannot use geoname for $cc-$st-$nm\n";
+						print STDERR "W: cannot use geoname for $cc-$st-$nm\n";
 					$unusable++;
 				}
 			}
@@ -1605,85 +1605,7 @@ my @rc_keys = qw/RCSHORT REGION RCVH RCLL WCVH WCLL RCGEOID RCCODE RCGN RCGEOVH 
 my @rn_keys = qw/RCCC RCST RCNAME RCVH RCLL WCVH WCLL RCGEOID RCCODE RCGN RCGEOVH RCGEOLL RCCITY RCCOUNTY NPA NXX X REGION RCSHORT/;
 my @dbrc_keys = qw/NPA NXX X REGION RCSHORT RCCC RCST RCNAME/;
 
-my %mapping = (
-	'NPA'=>sub{
-		my ($dat,$fld,$val) = @_;
-		$dat->{"\U$fld\E"} = $val if length($val);
-	},
-	'NXX'=>sub{
-		my ($dat,$fld,$val) = @_;
-		$dat->{"\U$fld\E"} = $val if length($val);
-	},
-	'X'=>sub{
-		my ($dat,$fld,$val) = @_;
-		$dat->{"\U$fld\E"} = $val if length($val);
-	},
-	'State'=>sub{
-		my ($dat,$fld,$val) = @_;
-		if (length($val)) {
-			my $rg = $val;
-			if ($rg eq 'CN' and $dat->{NPA}) {
-				if (exists $nanpst{$dat->{NPA}}) {
-					$rg = $nanpst{$dat->{NPA}};
-				}
-			}
-			if ($rg eq 'NT') {
-				$rg = $nxxst{$dat->{NXX}} if exists $nxxst{$dat->{NXX}};
-			}
-			if ($rg eq 'NS') {
-				$rg = $nsxst{$dat->{NXX}} if exists $nsxst{$dat->{NXX}};
-			}
-			# State is LERG except for the following:
-			$rg = 'NF' if $rg eq 'NL';
-			$rg = 'PQ' if $rg eq 'QC';
-			$rg = 'VU' if $rg eq 'NU';
-			$rg = 'NN' if $rg eq 'MP';
-			if ($rg ne $val) {
-				print STDERR "E: $dat->{NPA}-$dat->{NXX} State: $val \-> $rg\n";
-			}
-			$dat->{REGION} = $rg;
-			$dat->{RCCC} = $lergcc{$rg} if exists $lergcc{$rg};
-			$dat->{RCST} = $lergst{$rg} if exists $lergst{$rg};
-		}
-	},
-	'Company'=>sub{
-	},
-	'OCN'=>sub{
-		my ($dat,$fld,$val) = @_;
-		$dat->{"\U$fld\E"} = $val if length($val);
-	},
-	'Rate Center'=>sub{
-		my ($dat,$fld,$val) = @_;
-		if (length($val)) {
-			$dat->{RCSHORT} = substr("\U$val\E",0,10) if length($val)<=10;
-			$dat->{RCNAME} = $val if not $dat->{RCSHORT} or $val =~ /[a-z]/;
-			if ($dat->{REGION} eq 'ON' and $val eq 'St-Regis') {
-				$dat->{RCCC} = 'CA';
-				$dat->{RCST} = 'QC';
-				$dat->{REGION} = 'PQ';
-			}
-		}
-	},
-	'Switch'=>sub{
-	},
-	'Date'=>sub{
-	},
-	'Prefix Type'=>sub{
-	},
-	'Switch Name'=>sub{
-	},
-	'Switch Type'=>sub{
-	},
-	'LATA'=>sub{
-		my ($dat,$fld,$val) = @_;
-		$dat->{"\U$fld\E"} = $val if length($val);
-		if ($dat->{RCCC} eq 'CA' or $val eq 'Manitoba (888)') {
-			$dat->{LATA} = 'Canada (888)';
-		}
-	},
-	'Tandem'=>sub{
-	},
-);
+require "$progdir/mapping.rc.pm";
 
 my ($oldnpa,$oldrg);
 
@@ -1702,8 +1624,8 @@ while (<$fh>) { chomp;
 	}
 	my $data = {};
 	for (my $i=0;$i<@fields;$i++) {
-		if (exists $mapping{$fields[$i]}) {
-			&{$mapping{$fields[$i]}}($data,$fields[$i],$tokens[$i]);
+		if (exists $mapping::mapping{$fields[$i]}) {
+			&{$mapping::mapping{$fields[$i]}}($data,$fields[$i],$tokens[$i]);
 		} else {
 			print STDERR "E: no mapping for '$fields[$i]'\n";
 		}
