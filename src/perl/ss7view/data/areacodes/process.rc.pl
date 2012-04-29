@@ -1859,6 +1859,16 @@ while (<$fh>) { chomp;
 					$nolook++;
 				}
 			}
+			unless ($data->{VH}) {
+				unless ($rec or exists $data->{RCGEOID}) {
+					if (my $geo = lookupgeo($cc,$st,$nm)) { $alook++;
+						geofound($cc,$st,$nm,$data,$geo);
+					} else {
+						#print STDERR "W: $data->{NPA}-$data->{NXX}($data->{X}) $cc-$st '$nm' could not find closest look\n";
+						$nolook++;
+					}
+				}
+			}
 		}
 		unless ($rec or exists $data->{RCGEOID}) {
 			foreach my $vh (split(/;/,$data->{VH})) {

@@ -1242,6 +1242,15 @@ while (<$fh>) { chomp;
 						$nolook++;
 					}
 				}
+				unless ($data->{VH}) {
+					unless ($rec or exists $data->{RCGEOID}) {
+						if (my $geo = lookupgeo($cc,$st,$nm)) { $alook++;
+							geofound($cc,$st,$ct,$nm,$data,$geo); last;
+						} else {
+							$nolook++;
+						}
+					}
+				}
 			}
 		}
 		unless ($rec or exists $data->{WCGEOID}) {
