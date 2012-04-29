@@ -18,7 +18,7 @@ use POSIX;
 
 my $fh = \*INFILE;
 my $of = \*OUTFILE;
-my $fn;
+my ($fn,$fp);
 
 binmode(INFILE,':utf8');
 binmode(OUTFILE,':utf8');
@@ -272,7 +272,7 @@ my %nanpst = ();
 
 $fn = "$codedir/nanpst.txt";
 print STDERR "I: reading $fn...\n";
-open($fh,"<",$fn) or die "can't open $fn";
+open($fh,"<:utf8",$fn) or die "can't open $fn";
 while (<$fh>) { chomp;
 	my ($npa,$cc,$st,$name) = split(/\t/,$_);
 	$nanpst{$npa} = $st;
@@ -289,7 +289,7 @@ my %countries = ();
 
 $fn = "$codedir/lergst.txt";
 print STDERR "I: reading $fn\n";
-open($fh,"<",$fn) or die "can't open $fn";
+open($fh,"<:utf8",$fn) or die "can't open $fn";
 while (<$fh>) { chomp;
 	next if /^ISO2/;
 	next if /^\s*$/;
@@ -566,6 +566,7 @@ my %a1codes = (
 
 my $maxradius = 50; # maximum of 100 miles (50 mile radius)
 
+my %geonmids = ();
 my %geonames = ();
 my %features = ();
 
@@ -593,6 +594,8 @@ foreach my $code (qw/cities1000 AG AI AS BB BM BS CA DM DO GD GU JM KN KY LC MP 
 		$st = $a1codes{$st} if $cc eq 'CA' and exists $a1codes{$st};
 		my $fc = $data{'feature class'};
 		$fc = 'C' if $code eq 'cities1000';
+		my $id = $data{geonameid};
+		$geonmids{$id} = \%data if $id;
 		my $nm = normalize($data{asciiname});
 		if (exists $geonames{$cc}{$st}{$nm}{$fc}) {
 			my $rec = $geonames{$cc}{$st}{$nm}{$fc};
@@ -614,7 +617,7 @@ foreach my $code (qw/cities1000 AG AI AS BB BM BS CA DM DO GD GU JM KN KY LC MP 
 			$geonames{$cc}{$st}{$nm}{$fc} = \%data; $good++;
 		}
 		my ($v,$h) = ($data{vertical},$data{horizontal});
-		for (my $lev=-4;$lev<=0;$lev++) {
+		for (my $lev=-2;$lev<=0;$lev++) {
 			my $vf = POSIX::floor($v*(10**$lev)+0.5)/(10**$lev);
 			my $hf = POSIX::floor($h*(10**$lev)+0.5)/(10**$lev);
 			$features{$fc}{$lev}{"$vf,$hf"} = [] unless exists $features{$fc}{$lev}{"$vf,$hf"};
@@ -628,7 +631,7 @@ foreach my $code (qw/cities1000 AG AI AS BB BM BS CA DM DO GD GU JM KN KY LC MP 
 sub closestname {
 	my ($v,$h,$nm) = @_;
 	my ($geo,$delta);
-	for (my $lev=0;$lev>=-4;$lev--) {
+	for (my $lev=0;$lev>=-2;$lev--) {
 		my $vf = POSIX::floor($v*(10**$lev)+0.5)/(10**$lev);
 		my $hf = POSIX::floor($h*(10**$lev)+0.5)/(10**$lev);
 		foreach my $fc (qw/C P A L S T/) {
@@ -651,7 +654,7 @@ sub closestname {
 sub closestclli {
 	my ($v,$h,$ct) = @_;
 	my ($geo,$delta);
-	for (my $lev=0;$lev>=-4;$lev--) {
+	for (my $lev=0;$lev>=-2;$lev--) {
 		my $vf = POSIX::floor($v*(10**$lev)+0.5)/(10**$lev);
 		my $hf = POSIX::floor($h*(10**$lev)+0.5)/(10**$lev);
 		foreach my $fc (qw/C P A L S T/) {
@@ -674,7 +677,7 @@ sub closestclli {
 sub closestcity {
 	my ($v,$h) = @_;
 	my ($geo,$delta);
-	for (my $lev=0;$lev>=-4;$lev--) {
+	for (my $lev=0;$lev>=-2;$lev--) {
 		my $vf = POSIX::floor($v*(10**$lev)+0.5)/(10**$lev);
 		my $hf = POSIX::floor($h*(10**$lev)+0.5)/(10**$lev);
 		foreach my $fc (qw/C/) {
@@ -696,7 +699,7 @@ sub closestcity {
 sub closestfeat {
 	my ($v,$h) = @_;
 	my ($geo,$delta);
-	for (my $lev=0;$lev>=-4;$lev--) {
+	for (my $lev=0;$lev>=-2;$lev--) {
 		my $vf = POSIX::floor($v*(10**$lev)+0.5)/(10**$lev);
 		my $hf = POSIX::floor($h*(10**$lev)+0.5)/(10**$lev);
 		foreach my $fc (qw/P A L S T/) {
@@ -848,6 +851,15 @@ sub geofound {
 	print STDERR "I: $data->{NPA}-$data->{NXX}($data->{X}) $cc-$st-$ct '$nm' found as $kind $geo->{'feature class'}.$geo->{'feature code'} '$geo->{name}' ($geo->{asciiname})\n";
 }
 
+sub georestore {
+	my ($cc,$st,$ct,$nm,$data,$id,$kind,$geo) = @_;
+	if (my $geo = $geonmids{$id}) {
+		geoassign($data,$geo);
+		#print STDERR "I: $data->{NPA}-$data->{NXX}($data->{X}) $cc-$st-$ct '$nm' restored as $kind $geo->{'feature class'}.$geo->{'feature code'} '$geo->{name}' ($geo->{asciiname})\n";
+
+	}
+}
+
 sub georecover {
 	my ($cc,$st,$ct,$nm,$data,$geo,$kind,$dist) = @_;
 	geoassign($data,$geo);
@@ -856,52 +868,479 @@ sub georecover {
 	print STDERR "W: $data->{NPA}-$data->{NXX}($data->{X}) $cc-$st-$ct '$nm' recovered as $kind $geo->{'feature class'}.$geo->{'feature code'} '$geo->{name}' ($geo->{asciiname})\n";
 }
 
-sub getll {
-	my $data = shift;
-	my ($la,$lo) = split(/,/,$data->{'Wire Center Latitude/Longitude'});
-	my $ll = "$la,$lo" if $la and $lo;
-	return $ll;
-}
-
-sub getvh {
-	my $data = shift;
-	my ($v,$h) = split(/,/,$data->{'Wire Center V&H'});
-	my $vh = sprintf('%05d,%05d',$v,$h) if $v and $h;
-	my ($la2,$lo2) = split(/,/,$data->{'Wire Center Latitude/Longitude'});
-	if ($la2 and $lo2) {
-		my ($v2,$h2) = ll2vh($la2,$lo2);
-		my $vh2 = sprintf('%05d,%05d',$v2,$h2);
-		if ($vh ne $vh2) {
-			my ($la,$lo) = vh2ll($v,$h);
-			my $d = sqrt(((($v2-$v)**2) + (($h2-$h)**2))/10);
-			printf STDERR "E: $data->{NPA}-$data->{NXX}($data->{X}) WC $data->{WCCLLI} $la,$lo ($vh) is %.2f miles from $la2,$lo2 ($vh2)\n", $d if $d > 2;
-			$vh = "$vh;$vh2";
-		}
-	}
-	return $vh;
-}
-
 my %sws = ();
 my %wcs = ();
 my %pls = ();
 my %dbsw = ();
 
-my @sw_keys = qw/SWCLLI NPA NXX X LATA OCN NAME TYPE WCVH WCLL SPC SECT/;
-my @wc_keys = qw/WCCLLI NPA NXX X LATA OCN SWCLLI WCVH WCLL WCADDR WCCITY WCCOUNTY SECT WCGEOID WCGN WCGEOVH WCGEOLL WCCODE WCNAME WCCC WCST/;
-my @pl_keys = qw/PLCLLI NPA NXX X LATA OCN WCCLLI/;
+$fn = "$progdir/sw.save.csv";
+$fp = "$progdir/sw.csv";
+system("mv -v $fp $fn") if -f $fp and not -f $fn;
+if ( -f $fn ) {
+	print STDERR "I: reading $fn\n";
+	open($fh,"<:utf8",$fn) or die "can't open $fn";
+	my $heading = 1;
+	my @fields = ();
+	while (<$fh>) { chomp;
+		next unless /^"/;
+		s/^"//; s/"$//; my @tokens = split(/","/,$_);
+		if ($heading) { @fields = @tokens; $heading = undef; next }
+		my %data = ();
+		for (my $i=0;$i<@fields;$i++) {
+			my $k = $fields[$i];
+			my $v = $tokens[$i];
+			if ($k =~ /^(WCVH|WCLL|RCVH|RCLL)$/) {
+				if (length($v)) {
+					my $K = substr($k,2,2);
+					foreach my $m (split(/;/,$v)) {
+						next if not $m or exists $data{$K}{$m};
+						$data{$K}{$m}++;
+						$data{$k} = $data{$k} ? join(';',$data{$k},$m) : $m;
+					}
+				}
+			} elsif ($k =~ /^(NAME)$/) {
+				foreach my $m (split(/;/,$v)) { $data{$k}{$m}++ if $m }
+			} elsif ($k =~ /^(NPA|NXX|X|LATA|OCN|SECT)$/) {
+				foreach my $m (split(/,/,$v)) { $data{$k}{$m}++ if $m }
+			} elsif ($k =~ /^(FEAT)$/) {
+				foreach my $m (split(/ /,$v)) { $data{$k}{$m}++ if $m }
+			} else {
+				$data{$k} = $v if length($v);
+			}
+		}
+		my $sw = $data{SWCLLI};
+		my $cs = substr($sw,4,2);
+		my $cc = $cllicc{$cs} if exists $cllicc{$cs};
+		my $st = $cllist{$cs} if exists $cllist{$cs};
+		$sws{$cc}{$st}{$sw} = \%data;
+	}
+	close($fh);
+}
 
+$fn = "$progdir/wc.save.csv";
+$fp = "$progdir/wc.csv";
+system("mv -v $fp $fn") if -f $fp and not -f $fn;
+if ( -f $fn ) {
+	print STDERR "I: reading $fn\n";
+	open($fh,"<:utf8",$fn) or die "can't open $fn";
+	my $heading = 1;
+	my @fields = ();
+	while (<$fh>) { chomp;
+		next unless /^"/;
+		s/^"//; s/"$//; my @tokens = split(/","/,$_);
+		if ($heading) { @fields = @tokens; $heading = undef; next }
+		my %data = ();
+		for (my $i=0;$i<@fields;$i++) {
+			my $k = $fields[$i];
+			my $v = $tokens[$i];
+			if ($k =~ /^(WCVH|WCLL|RCVH|RCLL)$/) {
+				if (length($v)) {
+					my $K = substr($k,2,2);
+					foreach my $m (split(/;/,$v)) {
+						next if not $m or exists $data{$K}{$m};
+						$data{$K}{$m}++;
+						$data{$k} = $data{$k} ? join(';',$data{$k},$m) : $m;
+					}
+				}
+			} elsif ($k =~ /^(NPA|NXX|X|LATA|OCN|SECT|SWCLLI)$/) {
+				foreach my $m (split(/,/,$v)) { $data{$k}{$m}++ if $m }
+			} else {
+				$data{$k} = $v if length($v);
+			}
+		}
+		my $wc = $data{WCCLLI};
+		my $cs = substr($wc,4,2);
+		my $cc = $cllicc{$cs} if exists $cllicc{$cs};
+		my $st = $cllist{$cs} if exists $cllist{$cs};
+		$wcs{$cc}{$st}{$wc} = \%data;
+	}
+	close($fh);
+}
+
+$fn = "$progdir/pl.save.csv";
+$fp = "$progdir/pl.csv";
+system("mv -v $fp $fn") if -f $fp and not -f $fn;
+if ( -f $fn ) {
+	print STDERR "I: reading $fn\n";
+	open($fh,"<:utf8",$fn) or die "can't open $fn";
+	my $heading = 1;
+	my @fields = ();
+	while (<$fh>) { chomp;
+		next unless /^"/;
+		s/^"//; s/"$//; my @tokens = split(/","/,$_);
+		if ($heading) { @fields = @tokens; $heading = undef; next }
+		my %data = ();
+		for (my $i=0;$i<@fields;$i++) {
+			my $k = $fields[$i];
+			my $v = $tokens[$i];
+			if ($k =~ /^(WCVH|WCLL|RCVH|RCLL)$/) {
+				if (length($v)) {
+					my $K = substr($k,2,2);
+					foreach my $m (split(/;/,$v)) {
+						next if not $m or exists $data{$K}{$m};
+						$data{$K}{$m}++;
+						$data{$k} = $data{$k} ? join(';',$data{$k},$m) : $m;
+					}
+				}
+			} elsif ($k =~ /^(NPA|NXX|X|LATA|OCN|SECT|WCCLLI)$/) {
+				foreach my $m (split(/,/,$v)) { $data{$k}{$m}++ if $m }
+			} else {
+				$data{$k} = $v if length($v);
+			}
+		}
+		my $pl = $data{PLCLLI};
+		my $cs = substr($pl,4,2);
+		my $cc = $cllicc{$cs} if exists $cllicc{$cs};
+		my $st = $cllist{$cs} if exists $cllist{$cs};
+		$pls{$cc}{$st}{$pl} = \%data;
+	}
+	close($fh);
+}
+
+$fn = "$progdir/db.sw.save.csv";
+$fp = "$progdir/db.sw.csv";
+system("mv -v $fp $fn") if -f $fp and not -f $fn;
+if ( -f $fn ) {
+	print STDERR "I: reading $fn\n";
+	open($fh,"<:utf8",$fn) or die "can't open $fn";
+	my $heading = 1;
+	my @fields = ();
+	while (<$fh>) { chomp;
+		next unless /^"/;
+		s/^"//; s/"$//; my @tokens = split(/","/,$_);
+		if ($heading) { @fields = @tokens; $heading = undef; next }
+		my %data = ();
+		for (my $i=0;$i<@fields;$i++) {
+			my $k = $fields[$i];
+			my $v = $tokens[$i];
+			if ($k =~ /^(SWCLLI)$/) {
+				foreach my $m (split(/,/,$v)) { $data{$k}{$m}++ if $m }
+			} else {
+				$data{$k} = $v if length($v);
+			}
+		}
+		$dbsw{$data{NPA}}{$data{NXX}}{$data{X}} = \%data;
+	}
+	close($fh);
+}
+
+my @sw_keys = qw/SWCLLI NPA NXX X LATA OCN NAME TYPE WCVH WCLL RCVH RCLL SPC SECT FEAT STP1 STP2 ACTUAL AGENT HOST/;
+my @wc_keys = qw/WCCLLI NPA NXX X LATA OCN SWCLLI WCVH WCLL RCVH RCLL WCADDR WCCITY WCCOUNTY WCZIP SECT WCGEOID WCGN WCGEOVH WCGEOLL WCCODE WCNAME WCCC WCST/;
+my @pl_keys = qw/PLCLLI NPA NXX X LATA OCN WCCLLI/;
 my @dbsw_keys = qw/NPA NXX X SWCLLI LATA OCN/;
 
 my %skipcllis = (
+	'NOCLLIKNOWN'=>1,
 	'XXXXXXXXXXX'=>1,
 	'__VARIOUS__'=>1,
 );
 
-my $olddata;
+my %mapping = (
+	'NPA'=>sub{
+		my ($dat,$fld,$val) = @_;
+		$dat->{"\U$fld\E"} = $val if length($val);
+	},
+	'NXX'=>sub{
+		my ($dat,$fld,$val) = @_;
+		$dat->{"\U$fld\E"} = $val if length($val);
+	},
+	'X'=>sub{
+		my ($dat,$fld,$val) = @_;
+		$dat->{"\U$fld\E"} = $val if length($val);
+	},
+	'NPA NXX Record'=>sub{
+	},
+	'Line From'=>sub{
+	},
+	'Line To'=>sub{
+	},
+	'Wireless Block'=>sub{
+	},
+	'NXX Type'=>sub{
+	},
+	'Portable Block'=>sub{
+	},
+	'1,000 Block Pooling'=>sub{
+	},
+	'Block Contaminated'=>sub{
+	},
+	'Block Retained'=>sub{
+	},
+	'Date Assigned'=>sub{
+	},
+	'Effective Date'=>sub{
+	},
+	'Date Activated'=>sub{
+	},
+	'Last Modified'=>sub{
+	},
+	'Common Name'=>sub{
+	},
+	'OCN'=>sub{
+		my ($dat,$fld,$val) = @_;
+		$dat->{"\U$fld\E"} = $val if length($val);
+	},
+	'OCN Type'=>sub{
+	},
+	'Carrier Name'=>sub{
+	},
+	'Abbreviation'=>sub{
+	},
+	'DBA'=>sub{
+	},
+	'FKA'=>sub{
+	},
+	'Carrier Address'=>sub{
+	},
+	'Carrier City'=>sub{
+	},
+	'Carrier State'=>sub{
+	},
+	'Carrier Zip'=>sub{
+	},
+	'Carrier Country'=>sub{
+	},
+	'Wire Center LATA'=>sub{
+	},
+	'Other switches in WC'=>sub{
+	},
+	'Wire Center Address'=>sub{
+		my ($dat,$fld,$val) = @_;
+		$dat->{WCADDR} = $val if length($val);
+	},
+	'Wire Center County'=>sub{
+		my ($dat,$fld,$val) = @_;
+		$dat->{WCCOUNTY} = $val if length($val);
+	},
+	'Wire Center City'=>sub{
+		my ($dat,$fld,$val) = @_;
+		$dat->{WCCITY} = $val if length($val);
+	},
+	'Class 4/5 Switch'=>sub{
+	},
+	'Wire Center State'=>sub{
+		my ($dat,$fld,$val) = @_;
+		$dat->{ST} = $val if length($val);
+	},
+	'Trunk Gateway'=>sub{
+	},
+	'Point Code'=>sub{
+		my ($dat,$fld,$val) = @_;
+		$dat->{SPC} = $val if length($val);
+	},
+	'Switch type'=>sub{
+		my ($dat,$fld,$val) = @_;
+		$dat->{TYPE} = $val if length($val);
+	},
+	'Tandem IntraLATA'=>sub{
+		my ($dat,$fld,$val) = @_;
+		$dat->{TDMILT} = $val if length($val);
+	},
+	'Tandem Feature Group C'=>sub{
+		my ($dat,$fld,$val) = @_;
+		$dat->{TDMFGC} = $val if length($val);
+	},
+	'Tandem Feature Group D'=>sub{
+		my ($dat,$fld,$val) = @_;
+		$dat->{TDMFGD} = $val if length($val);
+	},
+	'Tandem Local'=>sub{
+		my ($dat,$fld,$val) = @_;
+		$dat->{TDMLCL} = $val if length($val);
+	},
+	'Tandem Feature Group B'=>sub{
+		my ($dat,$fld,$val) = @_;
+		$dat->{TDMFGB} = $val if length($val);
+	},
+	'Tandem Operator Services'=>sub{
+		my ($dat,$fld,$val) = @_;
+		$dat->{TDMOPS} = $val if length($val);
+	},
+	'Wire Center Zip'=>sub{
+		my ($dat,$fld,$val) = @_;
+		$dat->{WCZIP} = $val if length($val);
+	},
+	'SS7 STP 1'=>sub{
+	},
+	'Wire Center Google maps'=>sub{
+	},
+	'Wire Center Latitude/Longitude'=>sub{
+		my ($dat,$fld,$val) = @_;
+		if (length($val)) {
+			my ($la,$lo) = split(/,/,$val);
+			if ($la and $lo) {
+				$dat->{LL} = $dat->{WCLL} = join(',',$la,$lo);
+				$dat->{VH} = $dat->{WCVH} = sprintf('%05d,%05d',ll2vh($la,$lo));
+			}
+		}
+	},
+	'Wire Center V&H'=>sub{
+		my ($dat,$fld,$val) = @_;
+		if (length($val)) {
+			my ($v,$h) = split(/,/,$val);
+			($v,$h) = (int($v),int($h));
+			if ($v and $h) {
+				$dat->{WCVH} = sprintf('%05d,%05d',$v,$h);
+				$dat->{WCLL} = join(',',vh2ll($v,$h));
+				if ($dat->{VH}) {
+					if ($dat->{VH} ne $dat->{WCVH}) {
+						$dat->{VH} = $dat->{WCVH} = join(';',$dat->{VH},$dat->{WCVH});
+					}
+				} else {
+					$dat->{VH} = $dat->{WCVH};
+				}
+				if ($dat->{LL}) {
+					if ($dat->{LL} ne $dat->{WCLL2}) {
+						$dat->{LL} = $dat->{WCLL} = join(';',$dat->{LL},$dat->{WCLL2});
+					}
+				} else {
+					$dat->{LL} = $dat->{WCLL};
+				}
+			}
+		}
+	},
+	'Wire Center CLLI'=>sub{
+		my ($dat,$fld,$val) = @_;
+		if (length($val)) {
+			$dat->{WCCLLI} = $val;
+		}
+	},
+	'Switch'=>sub{
+		my ($dat,$fld,$val) = @_;
+		if ($val and length($val) == 11) {
+			$dat->{SWCLLI} = $val;
+			unless (exists $skipcllis{$val}) {
+				$dat->{WCCLLI} = substr($val,0,8);
+				$dat->{PLCLLI} = substr($val,0,6);
+				$dat->{STCLLI} = substr($val,4,2);
+				$dat->{CTCLLI} = substr($val,0,4);
+				my $cs = $dat->{STCLLI};
+				unless (exists $cllicc{$cs}) {
+					print STDERR "E: $dat->{NPA}-$dat->{NXX}($dat->{X}) CLLI '$val' has invalid state code '$cs'\n";
+				}
+				$dat->{WCCC} = $cllicc{$cs} if exists $cllicc{$cs};
+				$dat->{WCST} = $cllist{$cs} if exists $cllist{$cs};
+				$dat->{WCRG} = $cllirg{$cs} if exists $cllirg{$cs};
+			}
+		}
+	},
+	'SS7 STP 2'=>sub{
+		my ($dat,$fld,$val) = @_;
+		$dat->{STP2} = $val if length($val);
+	},
+	'Actual Switch'=>sub{
+		my ($dat,$fld,$val) = @_;
+		$dat->{ACTUAL} = $val if length($val);
+	},
+	'Wire Center Country'=>sub{
+		my ($dat,$fld,$val) = @_;
+		$dat->{CC} = $val if length($val);
+	},
+	'Call Agent'=>sub{
+		my ($dat,$fld,$val) = @_;
+		$dat->{AGENT} = $val if length($val);
+	},
+	'Host'=>sub{
+		my ($dat,$fld,$val) = @_;
+		$dat->{HOST} = $val if length($val);
+	},
+	'Wire Center Name'=>sub{
+		my ($dat,$fld,$val) = @_;
+		$dat->{NAME} = $val if length($val);
+	},
+	'LATA'=>sub{
+		my ($dat,$fld,$val) = @_;
+		$dat->{LATA} = $val if length($val);
+	},
+	'LATA Name'=>sub{
+	},
+	'Historical Region'=>sub{
+	},
+	'Area Codes in LATA'=>sub{
+	},
+	'Remark'=>sub{
+	},
+	'Rate Center LATA'=>sub{
+	},
+	'Rate Center Name'=>sub{
+	},
+	'Rate Center State'=>sub{
+	},
+	'Rate Center Country'=>sub{
+	},
+	'LERG Abbreviation'=>sub{
+	},
+	'Zone'=>sub{
+	},
+	'Zone Type'=>sub{
+	},
+	'Number Pooling'=>sub{
+	},
+	'Point Identifier'=>sub{
+	},
+	'Rate Step'=>sub{
+	},
+	'Area Codes in Rate Center'=>sub{
+	},
+	'Embedded Overlays'=>sub{
+	},
+	'Major V&H'=>sub{
+	},
+	'Minor V&H'=>sub{
+	},
+	'Rate Center Latitude/Longitude'=>sub{
+	},
+	'Rate Center Google maps'=>sub{
+	},
+	'Time Zone'=>sub{
+	},
+	'DST Recognized'=>sub{
+	},
+	'Location within Rate Center Type'=>sub{
+	},
+	'Location within Rate Center Name'=>sub{
+	},
+	'County or Equivalent'=>sub{
+	},
+	'Federal Feature ID'=>sub{
+	},
+	'FIPS County Code'=>sub{
+	},
+	'FIPS Place Code'=>sub{
+	},
+	'Land Area'=>sub{
+	},
+	'Water Area'=>sub{
+	},
+	'Population 2000'=>sub{
+	},
+	'Population 2009'=>sub{
+	},
+	'Rural-Urban Continuum Code'=>sub{
+	},
+	'CBSA'=>sub{
+	},
+	'CBSA Level'=>sub{
+	},
+	'County Relation to CBSA'=>sub{
+	},
+	'Metro Division'=>sub{
+	},
+	'Part of CSA'=>sub{
+	},
+	'Cellular Market'=>sub{
+	},
+	'Major Trading Area'=>sub{
+	},
+	'Basic Trading Area'=>sub{
+	},
+);
+
+my ($oldnpa,$oldrg);
 
 $fn = "$progdir/db.csv";
 print STDERR "I: processing $fn\n";
-open($fh,"<",$fn) or die "can't open $fn";
+open($fh,"<:utf8",$fn) or die "can't open $fn";
 my $heading = 1;
 my @fields = ();
 while (<$fh>) { chomp;
@@ -914,67 +1353,56 @@ while (<$fh>) { chomp;
 	}
 	my $data = {};
 	for (my $i=0;$i<@fields;$i++) {
-		$data->{$fields[$i]} = $tokens[$i] if length($tokens[$i]);
-	}
-	if ($olddata ne $data->{NPA}) {
-		$olddata = $data->{NPA};
-		print STDERR "I: processing $olddata\n";
+		if (exists $mapping{$fields[$i]}) {
+			&{$mapping{$fields[$i]}}($data,$fields[$i],$tokens[$i]);
+		} else {
+			$data->{$fields[$i]} = $tokens[$i] if length($tokens[$i]);
+		}
 	}
 	#print STDERR "I: processing $data->{NPA} $data->{NXX} $data->{X}\n";
-	my $sw = $data->{Switch};
+	my $npa = $data->{NPA};
+	my $rg = $data->{WCRG};
+	if ($npa ne $oldnpa and $rg ne $oldrg) {
+		print STDERR "I: processing $npa $rg...\n";
+	}
+	($oldnpa,$oldrg) = ($npa,$rg);
+	my $cc = $data->{WCCC};
+	my $st = $data->{WCST};
+	my $sw = $data->{SWCLLI};
 	next unless length($sw) == 11;
 	next if exists $skipcllis{$sw};
-	my $wc = substr($sw,0,8);
-	my $pl = substr($sw,0,6);
-	my $cs = substr($sw,4,2);
-	my $ct = substr($sw,0,4);
-	my $rg = $cllirg{$cs} if exists $cllirg{$cs};
-	my $cc = $cllicc{$cs} if exists $cllicc{$cs};
-	my $st = $cllist{$cs} if exists $cllist{$cs};
-	$data->{NAME} = $data->{'Wire Center Name'} if $data->{'Wire Center Name'};
-	$data->{TYPE} = $data->{'Switch type'} if $data->{'Switch Type'};
-	$data->{SWCLLI} = $sw;
-	$data->{WCCLLI} = $wc;
-	$data->{PLCLLI} = $pl;
-	$data->{CTCLLI} = $ct;
-	$data->{WCVH} = getvh($data);
-	$data->{WCLL} = getll($data);
-	$data->{SPC} = $data->{'Point Code'} if $data->{'Point Code'};
-	$data->{WCCOUNTY} = $data->{'Wire Center County'} if $data->{'Wire Center County'};
-	$data->{WCCITY} = $data->{'Wire Center City'} if $data->{'Wire Center City'};
-	$data->{WCADDR} = $data->{'Wire Center Address'} if $data->{'Wire Center Address'};
-	if ($data->{'Wire Center State'} and $data->{'Wire Center State'} ne $st) {
-		print STDERR "E: $data->{NPA}-$data->{NXX}($data->{X}) WC $wc Wire Center State '$data->{'Wire Center State'}' but CLLI State is '$st'\n";
-	}
-	if ($data->{'Wire Center Country'} and $data->{'Wire Center Country'} ne $cc) {
-		print STDERR "E: $data->{NPA}-$data->{NXX}($data->{X}) WC $wc Wire Center Country '$data->{'Wire Center Country'}' but CLLI Country is '$cc'\n";
-	}
-	$data->{CC} = $cc;
-	$data->{ST} = $st;
-	$data->{RG} = $rg;
-	my $nm = $data->{'Wire Center City'};
+	my $wc = $data->{WCCLLI};
+	my $pl = $data->{PLCLLI};
+	my $ct = $data->{CTCLLI};
+	my $nm = $data->{WCCITY};
 	if ($cc and $st and $sw) {
 		my $rec;
 		unless ($rec or exists $data->{WCGEOID}) {
 			if ($wc and exists $wcs{$cc}{$st}{$wc}) {
 				$rec = $wcs{$cc}{$st}{$wc};
-				foreach my $k (qw/WCGEOID WCGN WCGEOVH WCGEOLL WCCODE WCNAME/) {
-					$data->{$k} = $rec->{$k} if $rec->{$k} or length($rec->{$k});
+				if ($rec->{WCGEOID}) {
+					$data->{WCGEOID} = $rec->{WCGEOID};
+					georestore($cc,$st,$ct,$nm,$data,$rec->{WCGEOID},'save');
+				} else {
+					foreach my $vh (split(/;/,$data->{VH})) {
+						next unless $vh;
+						next if exists $rec->{VH}{$vh};
+						my $tested = join(';',sort keys %{$rec->{VH}});
+						print STDERR "W: $data->{NPA}-$data->{NXX}($data->{X}) WC '$wc' '$vh' not tested in '$tested'\n";
+						$rec = undef; last;
+					}
 				}
 			}
 		}
 		unless ($rec or exists $data->{WCGEOID}) {
-			if ($nm and not cmpcllis($ct,$nm)) {
-				print STDERR "E: $data->{NPA}-$data->{NXX}($data->{X}) WC $wc Wire Center City '$nm' is not consistent with CLLI '$pl'\n";
-				$nm = undef;
-			}
-			$nm = $data->{'Wire Center Name'} unless $nm;
-			if ($nm and not cmpcllis($ct,$nm)) {
-				print STDERR "E: $data->{NPA}-$data->{NXX}($data->{X}) WC $wc Wire Center Name '$nm' is not consistent with CLLI '$pl'\n";
-				$nm = undef;
+			$nm = undef;
+			foreach my $k (qw/WCCITY NAME RCCITY/) {
+				next unless $data->{$k};
+				if (cmpcllis($ct,$data->{$k})) { $nm = $data->{$k}; last }
+				print STDERR "E: $data->{NPA}-$data->{NXX}($data->{X}) WC $wc $k '$data->{$k}' is not consistent with CLLI '$pl'\n";
 			}
 			if ($nm) {
-				foreach my $vh (split(/;/,$data->{WCVH})) {
+				foreach my $vh (split(/;/,$data->{VH})) {
 					my ($v,$h) = split(/,/,$vh);
 					if (my $geo = lookupgeo($cc,$st,$nm,$v,$h)) { $alook++;
 						geofound($cc,$st,$ct,$nm,$data,$geo); last;
@@ -984,114 +1412,115 @@ while (<$fh>) { chomp;
 				}
 			}
 		}
-		foreach my $vh (split(/;/,$data->{WCVH})) {
-			my ($v,$h) = split(/,/,$vh);
-			if ($nm) {
-				unless ($rec or exists $data->{WCGEOID}) {
-					my ($vh,$ll) = ($data->{WCVH},$data->{WCLL});
-					print STDERR "W: $data->{NPA}-$data->{NXX}($data->{X}) $cc-$st-$ct '$nm' targ: $ll ($vh $nm)\n";
-				}
-				unless ($rec or exists $data->{WCGEOID}) {
-					my ($geo,$dist) = closestname($v,$h,$nm);
-					if ($geo) { $aname++;
-						if ($dist <= $maxradius) {
-							georecover($cc,$st,$ct,$nm,$data,$geo,'name',$dist); last;
-						} else {
-							geoshowfail($cc,$st,$ct,$nm,$data,$geo,'name',$dist);
-						}
-					} else {
-						$noname++;
-					}
-				}
-				unless ($rec or exists $data->{WCGEOID}) {
-					my ($geo,$dist) = closestcity($v,$h);
-					if ($geo) { $acity++;
-						if ($dist <= $maxradius and (cmpnames($nm,$geo->{asciiname}) or cmpnames($nm,$geo->{name}))) {
-							georecover($cc,$st,$ct,$nm,$data,$geo,'city',$dist); last;
-						} else {
-							geoshowfail($cc,$st,$ct,$nm,$data,$geo,'city',$dist);
-						}
-					} else {
-						$nocity++;
-					}
-				}
-				unless ($rec or exists $data->{WCGEOID}) {
-					my ($geo,$dist) = closestfeat($v,$h);
-					if ($geo) { $afeat++;
-						if ($dist <= $maxradius and (cmpnames($nm,$geo->{asciiname}) or cmpnames($nm,$geo->{name}))) {
-							georecover($cc,$st,$ct,$nm,$data,$geo,'feat',$dist); last;
-						} else {
-							geoshowfail($cc,$st,$ct,$nm,$data,$geo,'feat',$dist);
-						}
-					} else {
-						$nofeat++;
-					}
-				}
-			} else {
-				unless ($rec or exists $data->{WCGEOID}) {
-					my ($vh,$ll) = ($data->{WCVH},$data->{WCLL});
-					print STDERR "W: $data->{NPA}-$data->{NXX}($data->{X}) $cc-$st-$ct '$nm' targ: $ll ($vh $ct)\n";
-				}
-				unless ($rec or exists $data->{WCGEOID}) {
-					my ($geo,$dist) = closestclli($v,$h,$ct);
-					if ($geo) { $aclli++;
-						if ($dist <= $maxradius/5) {
-							georecover($cc,$st,$ct,$nm,$data,$geo,'clli',$dist); last;
-						} else {
-							geoshowfail($cc,$st,$ct,$nm,$data,$geo,'clli',$dist);
-						}
-					} else {
-						$noclli++;
-					}
-				}
-				unless ($rec or exists $data->{WCGEOID}) {
-					my ($geo,$dist) = closestcity($v,$h);
-					if ($geo) { $acity++;
-						if ($dist <= $maxradius/5 and (cmpcllis($ct,$geo->{asciiname}) or cmpcllis($ct,$geo->{name}))) {
-							georecover($cc,$st,$ct,$nm,$data,$geo,'city',$dist); last;
-						} else {
-							geoshowfail($cc,$st,$ct,$nm,$data,$geo,'city',$dist);
-						}
-					} else {
-						$nocity++;
-					}
-
-				}
-				unless ($rec or exists $data->{WCGEOID}) {
-					my ($geo,$dist) = closestfeat($v,$h);
-					if ($geo) { $afeat++;
-						if ($dist <= $maxradius/5 and (cmpcllis($ct,$geo->{asciiname}) or cmpcllis($ct,$geo->{name}))) {
-							georecover($cc,$st,$ct,$nm,$data,$geo,'feat',$dist); last;
-						} else {
-							geoshowfail($cc,$st,$ct,$nm,$data,$geo,'feat',$dist);
-						}
-					} else {
-						$nofeat++;
-					}
-				}
-			}
-		}
-		unless ($data->{WCVH}) {
-			if ($nm) {
-				unless ($rec or exists $data->{WCGEOID}) {
-					if (my $geo = bestname($cc,$st,$nm)) { $aname++;
-						georecover($cc,$st,$ct,$nm,$data,$geo,'best');
-					} else {
-						$noname++;
-					}
-				}
-			} else {
-				unless ($rec or exists $data->{WCGEOID}) {
-					if (my $geo = bestclli($cc,$st,$ct)) { $aclli++;
-						georecover($cc,$st,$ct,$nm,$data,$geo,'best');
-					} else {
-						$noclli++;
-					}
-				}
-			}
-		}
 		unless ($rec or exists $data->{WCGEOID}) {
-			print STDERR "W: $data->{NPA}-$data->{NXX}($data->{X}) $cc-$st-$ct '$nm' cannot find geoname\n";
+			foreach my $vh (split(/;/,$data->{VH})) {
+				my ($v,$h) = split(/,/,$vh);
+				next unless $v and $h;
+				if ($nm) {
+					unless ($rec or exists $data->{WCGEOID}) {
+						print STDERR "W: $data->{NPA}-$data->{NXX}($data->{X}) $cc-$st-$ct '$nm' targ: $data->{LL} ($vh $nm)\n";
+					}
+					unless ($rec or exists $data->{WCGEOID}) {
+						my ($geo,$dist) = closestname($v,$h,$nm);
+						if ($geo) { $aname++;
+							if ($dist <= $maxradius) {
+								georecover($cc,$st,$ct,$nm,$data,$geo,'name',$dist); last;
+							} else {
+								geoshowfail($cc,$st,$ct,$nm,$data,$geo,'name',$dist);
+							}
+						} else {
+							$noname++;
+						}
+					}
+					unless ($rec or exists $data->{WCGEOID}) {
+						my ($geo,$dist) = closestcity($v,$h);
+						if ($geo) { $acity++;
+							if ($dist <= $maxradius and (cmpnames($nm,$geo->{asciiname}) or cmpnames($nm,$geo->{name}))) {
+								georecover($cc,$st,$ct,$nm,$data,$geo,'city',$dist); last;
+							} else {
+								geoshowfail($cc,$st,$ct,$nm,$data,$geo,'city',$dist);
+							}
+						} else {
+							$nocity++;
+						}
+					}
+					unless ($rec or exists $data->{WCGEOID}) {
+						my ($geo,$dist) = closestfeat($v,$h);
+						if ($geo) { $afeat++;
+							if ($dist <= $maxradius and (cmpnames($nm,$geo->{asciiname}) or cmpnames($nm,$geo->{name}))) {
+								georecover($cc,$st,$ct,$nm,$data,$geo,'feat',$dist); last;
+							} else {
+								geoshowfail($cc,$st,$ct,$nm,$data,$geo,'feat',$dist);
+							}
+						} else {
+							$nofeat++;
+						}
+					}
+				} else {
+					unless ($rec or exists $data->{WCGEOID}) {
+						print STDERR "W: $data->{NPA}-$data->{NXX}($data->{X}) $cc-$st-$ct '$nm' targ: $data->{LL} ($vh $ct)\n";
+					}
+					unless ($rec or exists $data->{WCGEOID}) {
+						my ($geo,$dist) = closestclli($v,$h,$ct);
+						if ($geo) { $aclli++;
+							if ($dist <= $maxradius/5) {
+								georecover($cc,$st,$ct,$nm,$data,$geo,'clli',$dist); last;
+							} else {
+								geoshowfail($cc,$st,$ct,$nm,$data,$geo,'clli',$dist);
+							}
+						} else {
+							$noclli++;
+						}
+					}
+					unless ($rec or exists $data->{WCGEOID}) {
+						my ($geo,$dist) = closestcity($v,$h);
+						if ($geo) { $acity++;
+							if ($dist <= $maxradius/5 and (cmpcllis($ct,$geo->{asciiname}) or cmpcllis($ct,$geo->{name}))) {
+								georecover($cc,$st,$ct,$nm,$data,$geo,'city',$dist); last;
+							} else {
+								geoshowfail($cc,$st,$ct,$nm,$data,$geo,'city',$dist);
+							}
+						} else {
+							$nocity++;
+						}
+
+					}
+					unless ($rec or exists $data->{WCGEOID}) {
+						my ($geo,$dist) = closestfeat($v,$h);
+						if ($geo) { $afeat++;
+							if ($dist <= $maxradius/5 and (cmpcllis($ct,$geo->{asciiname}) or cmpcllis($ct,$geo->{name}))) {
+								georecover($cc,$st,$ct,$nm,$data,$geo,'feat',$dist); last;
+							} else {
+								geoshowfail($cc,$st,$ct,$nm,$data,$geo,'feat',$dist);
+							}
+						} else {
+							$nofeat++;
+						}
+					}
+				}
+			}
+			unless ($data->{VH}) {
+				if ($nm) {
+					unless ($rec or exists $data->{WCGEOID}) {
+						if (my $geo = bestname($cc,$st,$nm)) { $aname++;
+							georecover($cc,$st,$ct,$nm,$data,$geo,'best');
+						} else {
+							$noname++;
+						}
+					}
+				} else {
+					unless ($rec or exists $data->{WCGEOID}) {
+						if (my $geo = bestclli($cc,$st,$ct)) { $aclli++;
+							georecover($cc,$st,$ct,$nm,$data,$geo,'best');
+						} else {
+							$noclli++;
+						}
+					}
+				}
+			}
+			unless ($rec or exists $data->{WCGEOID}) {
+				print STDERR "W: $data->{NPA}-$data->{NXX}($data->{X}) $cc-$st-$ct '$nm' cannot find geoname\n";
+			}
 		}
 	}
 	{
@@ -1115,23 +1544,28 @@ while (<$fh>) { chomp;
 		$sws{$cc}{$st}{$sw} = {} unless exists $sws{$cc}{$st}{$sw};
 		my $rec = $sws{$cc}{$st}{$sw};
 		foreach my $k (@sw_keys) {
-			if ($k =~ /^(NPA|LATA|OCN|SECT|WCLL|NAME)$/) {
+			if ($k =~ /^(NPA|LATA|OCN|SECT|NAME)$/) {
 				$rec->{$k}{$data->{$k}}++ if $data->{$k};
-			} elsif ($k eq 'WCVH') {
-				foreach my $vh (split(/;/,$data->{$k})) {
-					if (exists $rec->{$k}) {
-						if (ref $rec->{$k} eq 'HASH') {
-							print STDERR "E: $data->{NPA}-$data->{NXX}($data->{X}) SW $sw $k extra value '$vh' ($data->{SECT})\n"
-							unless exists $rec->{$k}{$vh};
-							$rec->{$k}{$vh}++;
-						} elsif ($rec->{$k} ne $vh) {
-							my $sects = join(';',sort keys %{$rec->{SECT}}) if $rec->{SECT};
-							print STDERR "E: $data->{NPA}-$data->{NXX}($data->{X}) SW $sw $k extra value '$rec->{$k}' ($sects)\n";
-							print STDERR "E: $data->{NPA}-$data->{NXX}($data->{X}) SW $sw $k extra value '$vh' ($data->{SECT})\n";
-							$rec->{$k} = { $rec->{$k}=>1, $vh=>1 };
+			} elsif ($k eq 'FEAT') {
+				foreach my $f (split(/\s+/,$data->{$k})) {
+					$rec->{$k}{$f}++ if $f;
+				}
+			} elsif ($k =~ /^(WCVH|WCLL|RCVH|RCLL)$/) {
+				if ($data->{$k}) {
+					my $K = substr($k,2,2);
+					foreach my $m (split(/;/,$data->{$k})) {
+						next if not $m or exists $rec->{$K}{$m};
+						$rec->{$K}{$m}++;
+						if ($rec->{$k}) {
+							unless ($K eq 'LL') {
+								my $sects = join(';',sort keys %{$rec->{SECT}}) if $rec->{SECT};
+								print STDERR "E: $data->{NPA}-$data->{NXX}($data->{X}) WC $wc $k old value '$rec->{$k}' ($sects)\n" unless $rec->{$k} =~ /;/;
+								print STDERR "E: $data->{NPA}-$data->{NXX}($data->{X}) WC $wc $k new value '$m' ($data->{SECT})\n";
+							}
+							$rec->{$k} = join(';',$rec->{$k},$m);
+						} else {
+							$rec->{$k} = $m;
 						}
-					} else {
-						$rec->{$k} = $vh;
 					}
 				}
 			} elsif ($k eq 'NXX') {
@@ -1152,23 +1586,24 @@ while (<$fh>) { chomp;
 		$wcs{$cc}{$st}{$wc} = {} unless exists $wcs{$cc}{$st}{$wc};
 		my $rec = $wcs{$cc}{$st}{$wc};
 		foreach my $k (@wc_keys) {
-			if ($k =~ /^(NPA|LATA|OCN|SECT|SWCLLI|WCLL)$/) {
+			if ($k =~ /^(NPA|LATA|OCN|SECT|SWCLLI)$/) {
 				$rec->{$k}{$data->{$k}}++ if $data->{$k};
-			} elsif ($k eq 'WCVH') {
-				foreach my $vh (split(/;/,$data->{$k})) {
-					if (exists $rec->{$k}) {
-						if (ref $rec->{$k} eq 'HASH') {
-							print STDERR "E: $data->{NPA}-$data->{NXX}($data->{X}) WC $wc $k extra value '$vh' ($data->{SECT})\n"
-							unless exists $rec->{$k}{$vh};
-							$rec->{$k}{$vh}++;
-						} elsif ($rec->{$k} ne $vh) {
-							my $sects = join(';',sort keys %{$rec->{SECT}}) if $rec->{SECT};
-							print STDERR "E: $data->{NPA}-$data->{NXX}($data->{X}) WC $wc $k extra value '$rec->{$k}' ($sects)\n";
-							print STDERR "E: $data->{NPA}-$data->{NXX}($data->{X}) WC $wc $k extra value '$vh' ($data->{SECT})\n";
-							$rec->{$k} = { $rec->{$k}=>1, $vh=>1 };
+			} elsif ($k =~ /^(WCVH|WCLL|RCVH|RCLL)$/) {
+				if ($data->{$k}) {
+					my $K = substr($k,2,2);
+					foreach my $m (split(/;/,$data->{$k})) {
+						next if not $m or exists $rec->{$K}{$m};
+						$rec->{$K}{$m}++;
+						if ($rec->{$k}) {
+							unless ($K eq 'LL') {
+								my $sects = join(';',sort keys %{$rec->{SECT}}) if $rec->{SECT};
+								print STDERR "E: $data->{NPA}-$data->{NXX}($data->{X}) WC $wc $k old value '$rec->{$k}' ($sects)\n" unless $rec->{$k} =~ /;/;
+								print STDERR "E: $data->{NPA}-$data->{NXX}($data->{X}) WC $wc $k new value '$m' ($data->{SECT})\n";
+							}
+							$rec->{$k} = join(';',$rec->{$k},$m);
+						} else {
+							$rec->{$k} = $m;
 						}
-					} else {
-						$rec->{$k} = $vh;
 					}
 				}
 			} elsif ($k eq 'NXX') {
@@ -1189,7 +1624,7 @@ while (<$fh>) { chomp;
 		$pls{$cc}{$st}{$pl} = {} unless exists $pls{$cc}{$st}{$pl};
 		my $rec = $pls{$cc}{$st}{$pl};
 		foreach my $k (@pl_keys) {
-			if ($k =~ /^(NPA|LATA|OCN|WCCLLI)$/) {
+			if ($k =~ /^(NPA|LATA|OCN|SECT|WCCLLI)$/) {
 				$rec->{$k}{$data->{$k}}++ if $data->{$k};
 			} elsif ($k eq 'NXX') {
 				$rec->{$k}{"$data->{NPA}-$data->{NXX}"}++ if $data->{NPA} and $data->{NXX};
@@ -1271,8 +1706,14 @@ foreach my $cc (sort keys %sws) {
 				if (exists $rec->{$_}) {
 					if (ref $rec->{$_} eq 'HASH') {
 						my $sep = ',';
-						foreach my $k (keys %{$rec->{$_}}) {
-							if ($k =~ /,/) { $sep = ';'; last; }
+						if ($_ eq 'FEAT') {
+							$sep = ' ';
+						} elsif ($_ eq 'NAME') {
+							$sep = ';';
+						} else {
+							foreach my $k (keys %{$rec->{$_}}) {
+								if ($k =~ /,/) { $sep = ';'; last; }
+							}
 						}
 						push @values, join($sep,sort keys %{$rec->{$_}});
 					} elsif (ref $rec->{$_} eq 'ARRAY') {
@@ -1372,103 +1813,3 @@ exit;
 
 __END__
 
-     1	"NPA"
-     2	"NXX"
-     3	"X"
-     4	"NPA NXX Record"
-     5	"Line From"
-     6	"Line To"
-     7	"Wireless Block"
-     8	"NXX Type"
-     9	"Portable Block"
-    10	"1
-    11	000 Block Pooling"
-    12	"Block Contaminated"
-    13	"Block Retained"
-    14	"Date Assigned"
-    15	"Effective Date"
-    16	"Date Activated"
-    17	"Last Modified"
-    18	"Common Name"
-    19	"OCN"
-    20	"OCN Type"
-    21	"Carrier Name"
-    22	"Abbreviation"
-    23	"DBA"
-    24	"FKA"
-    25	"Carrier Address"
-    26	"Carrier City"
-    27	"Carrier State"
-    28	"Carrier Zip"
-    29	"Carrier Country"
-    30	"Wire Center LATA"
-    31	"Other switches in WC"
-    32	"Wire Center Address"
-    33	"Wire Center County"
-    34	"Wire Center City"
-    35	"Class 4/5 Switch"
-    36	"Wire Center State"
-    37	"Trunk Gateway"
-    38	"Point Code"
-    39	"Switch type"
-    40	"Tandem IntraLATA"
-    41	"Tandem Feature Group C"
-    42	"Tandem Feature Group D"
-    43	"Tandem Local"
-    44	"Tandem Feature Group B"
-    45	"Tandem Operator Services"
-    46	"Wire Center Zip"
-    47	"SS7 STP 1"
-    48	"Wire Center Google maps"
-    49	"Wire Center Latitude/Longitude"
-    50	"Wire Center V&H"
-    51	"Wire Center CLLI"
-    52	"Switch"
-    53	"SS7 STP 2"
-    54	"Actual Switch"
-    55	"Wire Center Country"
-    56	"Call Agent"
-    57	"Host"
-    58	"Wire Center Name"
-    59	"LATA"
-    60	"LATA Name"
-    61	"Historical Region"
-    62	"Area Codes in LATA"
-    63	"Remark"
-    64	"Rate Center LATA"
-    65	"Rate Center Name"
-    66	"Rate Center State"
-    67	"Rate Center Country"
-    68	"LERG Abbreviation"
-    69	"Zone"
-    70	"Zone Type"
-    71	"Number Pooling"
-    72	"Point Identifier"
-    73	"Rate Step"
-    74	"Area Codes in Rate Center"
-    75	"Embedded Overlays"
-    76	"Major V&H"
-    77	"Minor V&H"
-    78	"Rate Center Latitude/Longitude"
-    79	"Rate Center Google maps"
-    80	"Time Zone"
-    81	"DST Recognized"
-    82	"Location within Rate Center Type"
-    83	"Location within Rate Center Name"
-    84	"County or Equivalent"
-    85	"Federal Feature ID"
-    86	"FIPS County Code"
-    87	"FIPS Place Code"
-    88	"Land Area"
-    89	"Water Area"
-    90	"Population 2000"
-    91	"Population 2009"
-    92	"Rural-Urban Continuum Code"
-    93	"CBSA"
-    94	"CBSA Level"
-    95	"County Relation to CBSA"
-    96	"Metro Division"
-    97	"Part of CSA"
-    98	"Cellular Market"
-    99	"Major Trading Area"
-   100	"Basic Trading Area"
