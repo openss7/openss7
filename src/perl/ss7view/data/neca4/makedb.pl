@@ -865,9 +865,10 @@ sub updatedata {
 
 sub doocndata {
 	$dbh->begin_work;
-	$fn = "$datadir/NECA-4-1.txt";
+	$fn = "$datadir/NECA-4-1.pdf";
 	print STDERR "I: processing $fn\n";
-	open($fh,"<:utf8",$fn) or die "can't process $fn";
+	open($fh,"pdftotext -layout -nopgbrk $fn - |") or die "can't process $fn";
+	binmode($fh,':utf8');
 	my $start = 0;
 	my $frag = '';
 	my $fdate = stat($fn)->mtime;
@@ -998,9 +999,10 @@ my %states = (
 
 sub docontactdata {
 	$dbh->begin_work;
-	$fn = "$datadir/NECA-4-1.txt";
+	$fn = "$datadir/NECA-4-1.pdf";
 	print STDERR "I: processing $fn\n";
-	open($fh,"<:utf8",$fn) or die "can't process $fn";
+	open($fh,"pdftotext -layout -nopgbrk $fn - |") or die "can't process $fn";
+	binmode($fh,':utf8');
 	my $fdate = stat($fn)->mtime;
 	my @lines1 = (); my $wasblank1 = 1;
 	my @lines2 = (); my $wasblank2 = 1;
@@ -1020,6 +1022,8 @@ sub docontactdata {
 		next if /PRINTED IN U.S.A./;
 		next if /^====/;
 		next if /^\f/;
+		next if /TARIFF F\.C\.C\. NO\.\s+4/;
+		next if /^NATIONAL EXCHANGE CARRIER ASSOCIATION, INC\./;
 		next if /^DIRECTOR - ACCESS TARIFFS/;
 		next if /^80 S. JEFFERSON/;
 		next if /^WHIPPANY, N.J./;
@@ -1283,10 +1287,11 @@ sub mydoneit {
 
 sub donecadata {
 	$dbh->begin_work;
-	foreach my $fname (qw/NECA-4-12.txt NECA-4-44.txt NECA-4-400.txt/) {
+	foreach my $fname (qw/NECA-4-12.pdf NECA-4-44.pdf NECA-4-400.pdf/) {
 		$fn = "$datadir/$fname";
 		print STDERR "I: processing $fn\n";
-		open($fh,"<:utf8",$fn) or die "can't process $fn";
+		open($fh,"pdftotext -layout -nopgbrk $fn - |") or die "can't process $fn";
+		binmode($fh,':utf8');
 		my $fdate = stat($fn)->mtime;
 		my $sect = '0-0';
 		my $flineno = 0;
