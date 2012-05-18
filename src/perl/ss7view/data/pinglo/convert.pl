@@ -6,10 +6,12 @@ eval 'exec /usr/bin/perl -S $0 ${1+"$@"}'
 my $program = $0; $program =~ s/^.*\///;
 my $progdir = $0; $progdir =~ s/\/[^\/]*$//;
 my $datadir = $progdir;
+my $rsltdir = "$progdir/results";
 
 use strict;
 use Data::Dumper;
 use Encode qw(encode decode);
+use File::stat;
 
 my $fh = \*INFILE;
 my $of = \*OUTFILE;
@@ -19,6 +21,8 @@ my @keys = (
 	'NPA',
 	'NXX',
 	'X',
+	'XXXX',
+	'YYYY',
 	'Type',
 	'Carrier',
 	'Switch',
@@ -33,13 +37,20 @@ open($of,">:utf8",$fn) or die "can't open $fn";
 print $of '"',join('","',@keys),'"',"\n";
 
 print STDERR "I: reading results...\n";
-open($fh,"xzgrep '^<tr>' results/*.xz | grep -v '<th' | grep '<a href' | cut -f2- -d: |") or die "can't process files";
-while (<$fh>) { chomp;
-	my $data = {};
-	next unless /^<tr><td><a href=[0-9]{3}-[0-9]{3}>([0-9]{3})-([0-9]{3})-0000<\/a><\/td><td>([^<]*)<\/td><td>([^<]*)<\/td><td>([^<]*)<\/td><td>([^<]*)<\/td><td>([^<]*)<\/td>/;
-	print $of '"',join('","',$1,$2,'',$3,$4,$5,$6,$7),'"',"\n";
+print STDERR "I: finding results files...\n";
+my @files = `find $rsltdir -name '*.html.xz' | sort`;
+foreach $fn (@files) { chomp $fn;
+	print STDERR "I: processing $fn...\n";
+	open($fh,"xzgrep '^<tr>' $fn | grep -v '<th' | grep '<a href' | cut -f2- -d: |") or die "can't process files";
+	while (<$fh>) { chomp;
+		my $data = {};
+		$data->{FDATE} = stat($fn)->mtime;
+		next unless /^<tr><td><a href=[0-9]{3}-[0-9]{3}>([0-9]{3})-([0-9]{3})-0000<\/a><\/td><td>([^<]*)<\/td><td>([^<]*)<\/td><td>([^<]*)<\/td><td>([^<]*)<\/td><td>([^<]*)<\/td>/;
+		print $of '"',join('","',$1,$2,'','','',$3,$4,$5,$6,$7),'"',"\n";
+	}
+	close($fh);
 }
-close($fh);
+
 close($of);
 
 exit;

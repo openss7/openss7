@@ -1,0 +1,25 @@
+:vim se ft=README fo+=tcqlorn tw=80 noci
+From NPA-NXX(X) determine:
+
+- local call or toll call
+- local call or extended area service call
+- national toll call or international toll call
+- intralata toll call or interlata toll call
+- calculate the distance of the call (rate-center to rate center)
+- determine originating and terminating switch
+- determine host switch if switch is a remote
+- determine HNPA of swtich
+- determine switches to which point codes belong (if possible, really mostly
+  just for well known tandems)
+
+1.  From this information determine trunk groups (groups of circuits with
+    distinct routing, IC, OG, 2W)
+
+2.  From this information determine the role of an attached switch: e.g. local
+    tandem, intralata tandem, access tandem, equal access (FGB,C,D) tandem.
+
+3.  Count calls to and from any given LATA (by carrier) to determine toll
+    bypass.
+
+
+

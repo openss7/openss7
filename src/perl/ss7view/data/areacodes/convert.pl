@@ -11,6 +11,7 @@ my $codedir = "$progdir/..";
 use strict;
 use Data::Dumper;
 use Encode qw(encode decode);
+use File::stat;
 
 my $fh = \*INFILE;
 my $of = \*OUTFILE;
@@ -20,6 +21,8 @@ my @keys = (
 	'NPA',
 	'NXX',
 	'X',
+	'XXXX',
+	'YYYY',
 	'COUNTRY',
 	'STATE',
 	'CITY',
@@ -47,12 +50,14 @@ my @keys = (
 	'SWITCH_CLLI',
 	'RC_VERTICAL',
 	'RC_HORIZONTAL',
+	'FDATE',
 );
 
 $fn = "$datadir/db.csv";
 open($of,">",$fn) or die "can't open $fn";
 print $of '"', join('","',@keys), '"', "\n";
 $fn = "$datadir/AREACODEWORLD-GOLD-SAMPLES.zip";
+my $udate = stat($fn)->mtime;
 print STDERR "I: processing $fn...\n";
 open($fh,"unzip -p $fn AREACODEWORLD-GOLD-SAMPLE.CSV |") or die "can't process $fn";
 my $header = 1;
@@ -67,6 +72,7 @@ while (<$fh>) { chomp; s/\r//g;
 		next;
 	}
 	my $data = {};
+	$data->{FDATE} = $udate;
 	for (my $i=0;$i<@fields;$i++) {
 		$data->{$fields[$i]} = $tokens[$i] if $tokens[$i];
 	}

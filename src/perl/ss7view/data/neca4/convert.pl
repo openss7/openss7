@@ -12,6 +12,7 @@ use strict;
 use Data::Dumper;
 use Encode qw(encode decode);
 use Geo::Coordinates::VandH;
+use File::stat;
 
 my $fh = \*INFILE;
 my $of = \*OUTFILE;
@@ -21,6 +22,8 @@ my @keys = (
 	'NPA',
 	'NXX',
 	'X',
+	'XXXX',
+	'YYYY',
 	'rng',
 	'lines',
 	'total',
@@ -32,6 +35,7 @@ my @keys = (
 	'lata',
 	'feat',
 	'sect',
+	'FDATE',
 );
 
 my @ocn_keys = (
@@ -40,6 +44,7 @@ my @ocn_keys = (
 	'overall',
 	'neca',
 	'trgt',
+	'FDATE',
 );
 
 my @sw_keys = (
@@ -50,7 +55,12 @@ my @sw_keys = (
 	'feat',
 	'NPA',
 	'NXX',
+	'sect',
+	'FDATE',
 );
+
+my @swx_keys = qw/CLLI NPA NXX X lata ocn SWNAME SWTYPE SWFUNC wcvh WCLL RCVH RCLL SPC sect feat/;
+my @swo_keys = qw/SWCLLI NPA NXX X LATA OCN SWNAME SWTYPE SWFUNC WCVH WCLL RCVH RCLL SPC SECT FEAT/;
 
 my @wc_keys = (
 	'WC',
@@ -62,6 +72,7 @@ my @wc_keys = (
 	'state',
 	'NPA',
 	'NXX',
+	'FDATE',
 );
 
 my @rc_keys = (
@@ -72,6 +83,7 @@ my @rc_keys = (
 	'NPA',
 	'NXX',
 	'RCNAME',
+	'FDATE',
 );
 
 my %ocns = ();
@@ -82,6 +94,7 @@ my %dbwc = ();
 
 my @swcor_keys = ();
 my %swcor = ();
+if (0) {
 $fn = "$datadir/swcor.csv";
 if (-f $fn) {
 	open($fh,"<",$fn) or die "can't open $fn";
@@ -104,10 +117,12 @@ if (-f $fn) {
 	}
 	close($fh);
 }
+}
 
 
 my @wccor_keys = ();
 my %wccor = ();
+if (0) {
 $fn = "$datadir/wccor.csv";
 if (-f $fn) {
 	open($fh,"<",$fn) or die "can't open $fn";
@@ -130,18 +145,19 @@ if (-f $fn) {
 	}
 	close($fh);
 }
+}
 
 sub closerecord {
 	my $data = shift;
 	if (exists $data->{feat} and ref $data->{feat} eq 'HASH') {
 		$data->{feat} = join(' ',sort keys %{$data->{feat}});
 	}
-	$data->{clli} = 'SXCTIAXO1MD' if $data->{clli} eq 'SXCTIZXO1MD';
-	$data->{clli} = 'STCDMNTOXUX' if $data->{clli} eq 'STCDMITOXUX';
-	$data->{clli} = 'WCHSSCXARS0' if $data->{clli} eq 'SALDSCXARS0';
-	$data->{clli} = ''            if $data->{clli} eq 'TBAYARXARS0';
-	$data->{clli} = ''            if $data->{clli} eq 'BREWARXARS0';
-	$data->{clli} = ''            if $data->{clli} eq 'WDRWARXARS0';
+	#$data->{clli} = 'SXCTIAXO1MD' if $data->{clli} eq 'SXCTIZXO1MD';
+	#$data->{clli} = 'STCDMNTOXUX' if $data->{clli} eq 'STCDMITOXUX';
+	#$data->{clli} = 'WCHSSCXARS0' if $data->{clli} eq 'SALDSCXARS0';
+	#$data->{clli} = ''            if $data->{clli} eq 'TBAYARXARS0';
+	#$data->{clli} = ''            if $data->{clli} eq 'BREWARXARS0';
+	#$data->{clli} = ''            if $data->{clli} eq 'WDRWARXARS0';
 	if (my $sw = $data->{clli}) {
 		if (exists $swcor{$sw}) {
 			foreach my $k (@swcor_keys) {
@@ -181,10 +197,18 @@ sub closerecord {
 		foreach my $k (@ocn_keys) {
 			if ($data->{$k}) {
 				if ($rec->{$k} and $rec->{$k} ne $data->{$k}) {
-					printf STDERR "E: OCN %-11.11s %-8.8s changing from %-24.24s to %-24.24s\n",
-						$ocn, $k, $rec->{$k}, $data->{$k};
+					if ($rec->{FDATE} < $data->{FDATE}) {
+						$rec->{$k} = $data->{$k};
+						printf STDERR "W: OCN %-11.11s %-8.8s changing from %-24.24s to %-24.24s\n", $ocn, $k, $rec->{$k}, $data->{$k} unless $k eq 'FDATE';
+					} elsif ($rec->{FDATE} > $data->{FDATE}) {
+						printf STDERR "W: OCN %-11.11s %-8.8s not changing from %-24.24s to %-24.24s\n", $ocn, $k, $rec->{$k}, $data->{$k} unless $k eq 'FDATE';
+					} else {
+						printf STDERR "E: OCN %-11.11s %-8.8s changing from %-24.24s to %-24.24s\n", $ocn, $k, $rec->{$k}, $data->{$k} unless $k eq 'FDATE';
+						$rec->{$k} = $data->{$k};
+					}
+				} else {
+					$rec->{$k} = $data->{$k};
 				}
-				$rec->{$k} = $data->{$k};
 			}
 		}
 	}
@@ -196,10 +220,18 @@ sub closerecord {
 			if ($data->{$k}) {
 				if ($k eq 'CLLI') {
 					if ($rec->{$k} and $rec->{$k} ne $data->{$k}) {
-						printf STDERR "E: SW  %-11.11s %-8.8s changing from %-24.24s to %-24.24s\n",
-							$sw, $k, $rec->{$k}, $data->{$k};
+						if ($rec->{FDATE} < $data->{FDATE}) {
+							printf STDERR "W: SW  %-11.11s %-8.8s changing from %-24.24s to %-24.24s\n", $sw, $k, $rec->{$k}, $data->{$k} unless $k eq 'FDATE';
+							$rec->{$k} = $data->{$k};
+						} elsif ($rec->{FDATE} > $data->{FDATE}) {
+							printf STDERR "W: SW  %-11.11s %-8.8s not changing from %-24.24s to %-24.24s\n", $sw, $k, $rec->{$k}, $data->{$k} unless $k eq 'FDATE';
+						} else {
+							printf STDERR "E: SW  %-11.11s %-8.8s changing from %-24.24s to %-24.24s\n", $sw, $k, $rec->{$k}, $data->{$k} unless $k eq 'FDATE';
+							$rec->{$k} = $data->{$k};
+						}
+					} else {
+						$rec->{$k} = $data->{$k};
 					}
-					$rec->{$k} = $data->{$k};
 				} elsif ($k eq 'feat') {
 					foreach my $f (split(/\s+/,$data->{$k})) {
 						$rec->{$k}{$f}++;
@@ -227,10 +259,18 @@ sub closerecord {
 				if ($data->{$k}) {
 					if ($k eq 'WC') {
 						if ($rec->{$k} and $rec->{$k} ne $data->{$k}) {
-							printf STDERR "E: WC  %-11.11s %-8.8s changing from %-24.24s to %-24.24s\n",
-								$wc, $k, $rec->{$k}, $data->{$k};
+							if ($rec->{FDATE} < $data->{FDATE}) {
+								printf STDERR "W: WC  %-11.11s %-8.8s changing from %-24.24s to %-24.24s\n", $wc, $k, $rec->{$k}, $data->{$k} unless $k eq 'FDATE';
+								$rec->{$k} = $data->{$k};
+							} elsif ($rec->{FDATE} > $data->{FDATE}) {
+								printf STDERR "W: WC  %-11.11s %-8.8s not changing from %-24.24s to %-24.24s\n", $wc, $k, $rec->{$k}, $data->{$k} unless $k eq 'FDATE';
+							} else {
+								printf STDERR "E: WC  %-11.11s %-8.8s changing from %-24.24s to %-24.24s\n", $wc, $k, $rec->{$k}, $data->{$k} unless $k eq 'FDATE';
+								$rec->{$k} = $data->{$k};
+							}
+						} else {
+							$rec->{$k} = $data->{$k};
 						}
-						$rec->{$k} = $data->{$k};
 					} elsif ($k eq 'feat') {
 						foreach my $f (split(/\s+/,$data->{$k})) {
 							$rec->{$k}{$f}++;
@@ -264,6 +304,7 @@ my $frag = '';
 
 while (<$fh>) { chomp;
 	my $data = {};
+	$data->{FDATE} = stat($fn)->mtime;
 	unless ($start) {
 		#print "IGNORED: $_\n";
 		next unless /^\s+COMPANY CODES FOR/;
@@ -329,6 +370,16 @@ sub mydoneit {
 			$data->{X}     = $data->{blks}[$i];
 			$data->{rng}   = $data->{rngs}[$i];
 			$data->{lines} = $data->{lins}[$i];
+			($data->{XXXX},$data->{YYYY}) = split(/-/,$data->{rng})
+			if length($data->{X}) and length($data->{rng});
+			if ($data->{XXXX} eq '0000' and $data->{YYYY} eq '9999') {
+				delete $data->{X};
+				delete $data->{XXXX};
+				delete $data->{YYYY};
+			} elsif ($data->{XXXX} eq "$data->{X}000" and $data->{YYYY} eq "$data->{X}999") {
+				delete $data->{XXXX};
+				delete $data->{YYYY};
+			}
 			#my $npa = $data->{npa};
 			#my $st = $nanpst{$npa} if exists $nanpst{$npa};
 			#my $st = $db->{npa}{$npa}{state} if exists $db->{npa}{$npa}{state};
@@ -374,6 +425,7 @@ my $inheader = 1;
 my $infooter = 0;
 my $lineno = 0;
 my $data = {};
+$data->{FDATE} = stat($fn)->mtime;
 my $changing = 0;
 my $willchange = 0;
 my $couldchange = 0;
@@ -408,6 +460,7 @@ while (<$fh>) { chomp; $flineno++;
 		mydoneit($data);
 		$_ = $line;
 		$data = {};
+		$data->{FDATE} = stat($fn)->mtime;
 		$lineno = 0;
 		$changing = 0;
 		$couldchange = 0;
@@ -443,6 +496,7 @@ while (<$fh>) { chomp; $flineno++;
 			$changenxx = 0;
 			mydoneit($data);
 			$data = {};
+			$data->{FDATE} = stat($fn)->mtime;
 		}
 	} else {
 		unless ($lineno or /\(D\)/) {
@@ -657,6 +711,7 @@ foreach my $k (sort keys %ocns) {
 }
 close($of);
 
+my %extras = ();
 my %bads;
 
 %bads = ();
@@ -667,6 +722,7 @@ open($of,">",$fn) or die "can't open $fn";
 print $of '"', join('","',@sw_keys), '"', "\n";
 foreach my $k (sort keys %sws) {
 	my $rec = $sws{$k};
+	$extras{$k} = $rec unless length($rec->{NPA});
 	my @values = ();
 	foreach (@sw_keys) {
 		if (exists $rec->{$_} and ref $rec->{$_} eq 'HASH') {
@@ -675,6 +731,30 @@ foreach my $k (sort keys %sws) {
 			} elsif ($_ eq 'wcvh') {
 				push @values,join(';',sort keys %{$rec->{$_}});
 				$bads{$k}++ if $values[-1] =~ /;/;
+			} else {
+				push @values,join(',',sort keys %{$rec->{$_}});
+			}
+		} else {
+			push @values, $rec->{$_};
+		}
+	}
+	print $of '"', join('","',@values), '"', "\n";
+}
+close($of);
+
+$fn = "$datadir/swx.csv";
+print STDERR "I: writing $fn...\n";
+open($of,">",$fn) or die "can't open $fn";
+print $of '"', join('","',@swo_keys), '"', "\n";
+foreach my $k (sort keys %extras) {
+	my $rec = $extras{$k};
+	my @values = ();
+	foreach (@swx_keys) {
+		if (exists $rec->{$_} and ref $rec->{$_} eq 'HASH') {
+			if ($_ eq 'feat') {
+				push @values,join(' ',sort keys %{$rec->{$_}});
+			} elsif ($_ eq 'wcvh') {
+				push @values,join(';',sort keys %{$rec->{$_}});
 			} else {
 				push @values,join(',',sort keys %{$rec->{$_}});
 			}
@@ -724,6 +804,7 @@ foreach my $k (sort keys %bads) {
 close($of);
 
 %bads = ();
+
 
 $fn = "$datadir/wc.csv";
 print STDERR "I: writing $fn...\n";

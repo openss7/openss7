@@ -92,6 +92,7 @@
 361	US	TX	Texas
 364	US	KY	Kentucky
 365	CA	ON	Ontario
+380	US	OH	Ohio
 385	US	UT	Utah
 386	US	FL	Florida
 401	US	RI	Rhode Island
@@ -129,6 +130,7 @@
 443	US	MD	Maryland
 447	US	IL	Illinois
 450	CA	QC	Quebec
+456	ZZ	ZZ	Reserved
 458	US	OR	Oregon
 464	US	IL	Illinois
 469	US	TX	Texas
@@ -160,27 +162,51 @@
 518	US	NY	New York
 519	CA	ON	Ontario
 520	US	AZ	Arizona
+521	ZZ	ZZ	Reserved
+522	ZZ	ZZ	Reserved
+523	ZZ	ZZ	Reserved
+524	ZZ	ZZ	Reserved
+525	ZZ	ZZ	Reserved
+526	ZZ	ZZ	Reserved
+527	ZZ	ZZ	Reserved
+528	ZZ	ZZ	Reserved
+529	ZZ	ZZ	Reserved
 530	US	CA	California
 531	US	NE	Nebraska
+532	ZZ	ZZ	Reserved
 533	ZZ	ZZ	Personal Communications Services
 534	US	WI	Wisconsin
+538	ZZ	ZZ	Reserved
 539	US	OK	Oklahoma
 540	US	VA	Virginia
 541	US	OR	Oregon
+542	ZZ	ZZ	Reserved
+543	ZZ	ZZ	Reserved
 544	ZZ	ZZ	Personal Communications Services
+545	ZZ	ZZ	Reserved
+547	ZZ	ZZ	Reserved
+549	ZZ	ZZ	Reserved
 551	US	NJ	New Jersey
-557	US	MI	Michigan
+552	ZZ	ZZ	Reserved
+553	ZZ	ZZ	Reserved
+554	ZZ	ZZ	Reserved
+556	ZZ	ZZ	Reserved
+557	US	MO	Missouri
 559	US	CA	California
 561	US	FL	Florida
 562	US	CA	California
 563	US	IA	Iowa
 564	US	WA	Washington
+566	ZZ	ZZ	Reserved
 567	US	OH	Ohio
+569	ZZ	ZZ	Reserved
 570	US	PA	Pennsylvania
 571	US	VA	Virginia
 573	US	MO	Missouri
 574	US	IN	Indiana
 575	US	NM	New Mexico
+577	ZZ	ZZ	Reserved
+578	ZZ	ZZ	Reserved
 579	CA	QC	Quebec
 580	US	OK	Oklahoma
 581	CA	QC	Quebec
@@ -188,6 +214,8 @@
 585	US	NY	New York
 586	US	MI	Michigan
 587	CA	AB	Alberta
+588	ZZ	ZZ	Reserved
+589	ZZ	ZZ	Reserved
 600	CA	ZZ	Special telecommunications needs in Canada
 601	US	MS	Mississippi
 602	US	AZ	Arizona
@@ -214,6 +242,7 @@
 630	US	IL	Illinois
 631	US	NY	New York
 636	US	MO	Missouri
+639	CA	SK	Saskatchewan
 641	US	IA	Iowa
 646	US	NY	New York
 647	CA	ON	Ontario
@@ -221,17 +250,23 @@
 650	US	CA	California
 651	US	MN	Minnesota
 657	US	CA	California
+658	JM	JM	Jamaica
+659	US	AL	Alabama
 660	US	MO	Missouri
 661	US	CA	California
 662	US	MS	Mississippi
 664	MS	MS	Montserrat
 667	US	MD	Maryland
+669	US	CA	California
 670	MP	MP	Northern Mariana Islands
 671	GU	GU	Guam
 678	US	GA	Georgia
+679	US	MI	Michigan
 681	US	WV	West Virginia
 682	US	TX	Texas
 684	AS	AS	American Samoa
+689	US	FL	Florida
+700	ZZ	ZZ	Reserved
 701	US	ND	North Dakota
 702	US	NV	Nevada
 703	US	VA	Virginia
@@ -259,6 +294,7 @@
 731	US	TN	Tennessee
 732	US	NJ	New Jersey
 734	US	MI	Michigan
+737	US	TX	Texas
 740	US	OH	Ohio
 747	US	CA	California
 754	US	FL	Florida
@@ -377,6 +413,7 @@
 971	US	OR	Oregon
 972	US	TX	Texas
 973	US	NJ	New Jersey
+975	US	MO	Missouri
 978	US	MA	Massachusetts
 979	US	TX	Texas
 980	US	NC	North Carolina

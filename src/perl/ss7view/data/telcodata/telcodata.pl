@@ -11,6 +11,8 @@ use strict;
 
 my $fh = \*INFILE;
 
+my $total = 0;
+
 my @npas = ();
 
 open($fh,"<","$datadir/nanp.txt");
@@ -18,7 +20,8 @@ while (<$fh>) { chomp;
 	next if /^#/;
 	next unless /^[0-9][0-9][0-9]\t/;
 	my ($npa,$cc,$loc,$geo) = split(/\t/,$_);
-	next if $geo;
+	#next if $geo;
+	next if -f "results/$npa/data.html.xz";
 	push @npas, $npa;
 }
 close($fh);
@@ -38,8 +41,8 @@ print "Need to query one per $pers seconds to be done in a week.\n";
 
 while (1) {
 	my $npa = $npas[int(rand($nnpa))];
-	my $dir = sprintf("%03d",$npa);
-	my $fn = sprintf("%03d/data.html.xz",$npa);
+	my $dir = sprintf("results/%03d",$npa);
+	my $fn = sprintf("results/%03d/data.html.xz",$npa);
 	my $url = sprintf("'http://www.telcodata.us/search-area-code-exchange-detail?npa=%03d&exchange='",$npa);
 	my $cmd = "mkdir -p $dir; wget -O - $url | xz > $fn";
 	unless (-f $fn) {

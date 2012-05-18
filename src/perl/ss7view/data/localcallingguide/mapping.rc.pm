@@ -27,14 +27,25 @@ our %mapping = (
 	},
 	'REGION'=>sub{
 		my ($dat,$fld,$val) = @_;
-		if (length($val)) {
-			my $rg = $val;
-			$rg = 'PQ' if $rg eq 'ON' and $dat->{RCNAME} eq 'St-Regis';
+		my ($cc,$st,$rg,$pc,$ps) = ::getnxxccst($dat);
+		if ($rg) {
 			$dat->{REGION} = $rg;
-			$dat->{RCCC} = $::lergcc{$rg} if exists $::lergcc{$rg};
-			$dat->{RCST} = $::lergst{$rg} if exists $::lergst{$rg};
+			$dat->{RCCC} = $cc if $cc;
+			$dat->{RCST} = $st if $st;
+			if ($rg ne $val) {
+				::correct($dat,$fld,$val,$rg,'autocorrect by NPA-NXX');
+			}
+		} elsif (length($val)) {
+			$dat->{"\U$fld\E"} = $val;
+			$rg = $val;
+			if (exists $::lergcc{$rg} and exists $::lergst{$rg}) {
+				$dat->{REGION} = $rg;
+				$cc = $dat->{RCCC} = $::lergcc{$rg};
+				$st = $dat->{RCST} = $::lergst{$rg};
+			} else {
+				::correct($dat,$fld,$val,$val,'FIXME: bad state');
+			}
 		}
-		$dat->{"\U$fld\E"} = $val if length($val);
 	},
 	'SEE-EXCH'=>sub{
 	},
@@ -43,10 +54,42 @@ our %mapping = (
 	'SEE-REGION'=>sub{
 	},
 	'SWITCH'=>sub{
+		my ($dat,$fld,$val) = @_;
+		if ($val and length($val) == 11) {
+			my $pfx = "$dat->{NPA}-$dat->{NXX}($dat->{X}):";
+			my $result = ::checkclli($val,$pfx,$dat);
+			::correct($dat,$fld,$val,$val,$dat->{BADCLLI}) if $dat->{BADCLLI};
+			return unless $result;
+			$dat->{SWCLLI} = $val;
+			$dat->{WCCLLI} = substr($val,0,8);
+			$dat->{PLCLLI} = substr($val,0,6);
+			$dat->{CTCLLI} = substr($val,0,4);
+			my $cs = $dat->{STCLLI} = substr($val,4,2);
+			$dat->{WCCC} = $::cllicc{$cs} if exists $::cllicc{$cs};
+			$dat->{WCST} = $::cllist{$cs} if exists $::cllist{$cs};
+			$dat->{WCRG} = $::cllirg{$cs} if exists $::cllirg{$cs};
+			print STDERR "E: $pfx CLLI $val: no CC for CLLI region $cs\n" unless exists $::cllicc{$cs};
+			print STDERR "E: $pfx CLLI $val: no ST for CLLI region $cs\n" unless exists $::cllist{$cs};
+			print STDERR "E: $pfx CLLI $val: no RG for CLLI region $cs\n" unless exists $::cllirg{$cs};
+		}
 	},
 	'SWITCHNAME'=>sub{
+		my ($dat,$fld,$val) = @_;
+		if (length($val)) {
+			$dat->{NAME} = $val;
+			if ($dat->{BADCLLI}) {
+				print STDERR "W: $dat->{NPA}-$dat->{NXX}($dat->{X}): switch equipment name is '$val'\n";
+			}
+		}
 	},
 	'SWITCHTYPE'=>sub{
+		my ($dat,$fld,$val) = @_;
+		if (length($val)) {
+			$dat->{TYPE} = $val;
+			if ($dat->{BADCLLI}) {
+				print STDERR "W: $dat->{NPA}-$dat->{NXX}($dat->{X}): switch equipment type is '$val'\n";
+			}
+		}
 	},
 	'LATA'=>sub{
 		my ($dat,$fld,$val) = @_;
@@ -88,7 +131,6 @@ our %mapping = (
 			my ($la,$lo) = (delete $dat->{RCLA},$val);
 			if ($la and $lo) {
 				$dat->{RCVH} = sprintf('%05d,%05d',::ll2vh($la,$lo));
-				$dat->{RCLL} = join(',',$la,$lo);
 				if ($dat->{VH}) {
 					if ($dat->{VH} ne $dat->{RCVH}) {
 						$dat->{VH} = $dat->{RCVH} = join(';',$dat->{VH},$dat->{RCVH});
@@ -96,6 +138,7 @@ our %mapping = (
 				} else {
 					$dat->{VH} = $dat->{RCVH};
 				}
+				$dat->{RCLL} = join(',',$la,$lo);
 				if ($dat->{LL}) {
 					if ($dat->{LL} ne $dat->{RCLL}) {
 						$dat->{LL} = $dat->{RCLL} = join(';',$dat->{LL},$dat->{RCLL});
@@ -113,4 +156,3 @@ our %mapping = (
 	'UDATE'=>sub{
 	},
 );
-

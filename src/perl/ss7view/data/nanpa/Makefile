@@ -25,13 +25,13 @@ discon.xls:
 	wget -O $@ http://nanpa.com/nanp1/P3Disconnects.xls
 
 discon.csv: discon.xls
-	py_xls2csv $< | sed -e 's/", "/","/g;s/\.0"/"/g' >$@
+	py_xls2csv $< | sed -e 's/, ,/,"",/g;s/, ,/,"",/g;s/^,/"",/;s/,$$/,""/;s/", "/","/g;s/\.0"/"/g' >$@
 
 special.xls:
 	wget -O $@ http://nanpa.com/reports/Codes_requiring_special_handling.xls
 
 special.csv: special.xls
-	py_xls2csv $< | sed -e 's/", "/","/g;s/\.0"/"/g' >$@
+	py_xls2csv $< | sed -e 's/, ,/,"",/g;s/, ,/,"",/g;s/^,/"",/;s/,$$/,""/;s/", "/","/g;s/\.0"/"/g' >$@
 
 AllNPAs.zip:
 	wget -O $@ http://nanpa.com/npa/AllNPAs.zip
