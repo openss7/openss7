@@ -22,4 +22,6 @@ From NPA-NXX(X) determine:
     bypass.
 
 
+For links to carrier network disclosure cites, see:
 
+	http://transition.fcc.gov/Document_Indexes/2012_annual_index.html
