@@ -585,10 +585,10 @@ sub updateit {
 		if (@new or @old) {
 			my @bounds = ();
 			foreach my $k (@{$keys{$tab}}) { push @bounds,"$k=='$dat{$k}'"; }
-			my $sql = "UPDATE $tab SET ".join(',',@old)." WHERE ".join(' AND ',@new,@bounds)."; -- FIXME: (A) pick one! ($dat{sect})\n";
+			my $sql = "UPDATE $tab SET ".join(',',@old)." WHERE ".join(' AND ',@bounds)."; -- FIXME: (A) pick one! ($dat{sect})\n";
 			print STDERR "S: $sql";
 			print $of $sql;
-			my $sql = "UPDATE $tab SET ".join(',',@new)." WHERE ".join(' AND ',@old,@bounds)."; -- FIXME: (B) pick one! ($dat{sect})\n";
+			my $sql = "UPDATE $tab SET ".join(',',@new)." WHERE ".join(' AND ',@bounds)."; -- FIXME: (B) pick one! ($dat{sect})\n";
 			print STDERR "S: $sql";
 			print $of $sql;
 		}
@@ -724,11 +724,12 @@ sub updatedata {
 		updateit($dat,'wcdata',[$dat->{wc}]);
 	}
 	if (exists $keys{switchdata} and $dat->{switch}) {
-		if (exists $dat->{feat} and ref $dat->{feat} eq 'HASH') {
-			$dat->{feat} = join(' ',sort keys %{$dat->{feat}});
+		my %data = %$dat;
+		if (exists $data{feat} and ref $data{feat} eq 'HASH') {
+			$data{feat} = join(' ',sort keys %{$data{feat}});
 		}
-		if (my $func = delete $dat->{swfunc}) {
-			$dat->{swfunc} = {};
+		if (my $func = delete $data{swfunc}) {
+			$data{swfunc} = {};
 			foreach my $f (split(/[,;\/ ]\s*/,$func)) {
 				my $g = {
 					TDMILT=>'IAL',
@@ -785,13 +786,13 @@ sub updatedata {
 				} else {
 					print STDERR "E: no mapping for swfunc '$f'\n";
 				}
-				$dat->{swfunc}{$f}++ if $f;
+				$data{swfunc}{$f}++ if $f;
 			}
 		}
 		foreach my $f (qw/cls45sw e911sw stp1 stp2 actual agent host mate tdm tdmilt tdmfgc tdmfgd tdmlcl tdmfgb tdmops tdm911/) {
-			next unless $dat->{$f};
+			next unless $data{$f};
 			my %rec = (sect=>$sect,fdate=>$fdate);
-			$rec{switch} = $dat->{$f};
+			$rec{switch} = $data{$f};
 			$rec{swfunc} = {
 				cls45sw=>'CLS45SW',
 				e911sw=>'E911',
@@ -817,49 +818,51 @@ sub updatedata {
 				host=>'REMOTE',
 				mate=>'MATE,STP',
 			}->{$f};
-			$dat->{swfunc}{$func}++ if $func;
+			$data{swfunc}{$func}++ if $func;
 			updateit(\%rec,'switchdata',[$rec{switch}]) if $rec{switch};
 		}
-		$dat->{swfunc} = join(',',sort keys %{$dat->{swfunc}}) if $dat->{swfunc} and ref $dat->{swfunc} eq 'HASH';
-		updateit($dat,'switchdata',[$dat->{switch}]);
+		$data{swfunc} = join(',',sort keys %{$data{swfunc}}) if $data{swfunc} and ref $data{swfunc} eq 'HASH';
+		updateit(\%data,'switchdata',[$data{switch}]);
 	}
 	if (exists $keys{prefixdata} and $dat->{npa} and $dat->{nxx}) {
-		if (exists $keys{linedata} and length($dat->{xxxx}) and length($dat->{yyyy})) {
-			updateit($dat,'linedata',[$dat->{npa},$dat->{nxx},$dat->{xxxx},$dat->{yyyy}]);
-			delete $dat->{switch};
-			delete $dat->{ocn};
-			delete $dat->{udate};
-			delete $dat->{fdate};
-			updateit($dat,'pooldata',[$dat->{npa},$dat->{nxx},$dat->{x}]);
-			updateit($dat,'prefixdata',[$dat->{npa},$dat->{nxx}]);
-		} elsif (exists $keys{pooldata} and length($dat->{x})) {
-			updateit($dat,'pooldata',[$dat->{npa},$dat->{nxx},$dat->{x}]);
-			delete $dat->{switch};
-			delete $dat->{ocn};
-			delete $dat->{udate};
-			delete $dat->{fdate};
-			updateit($dat,'prefixdata',[$dat->{npa},$dat->{nxx}]);
+		my %data = %$dat;
+		if (exists $keys{linedata} and length($data{xxxx}) and length($data{yyyy})) {
+			updateit(\%data,'linedata',[$data{npa},$data{nxx},$data{xxxx},$data{yyyy}]);
+			delete $data{switch};
+			delete $data{ocn};
+			delete $data{udate};
+			delete $data{fdate};
+			updateit(\%data,'pooldata',[$data{npa},$data{nxx},$data{x}]);
+			updateit(\%data,'prefixdata',[$data{npa},$data{nxx}]);
+		} elsif (exists $keys{pooldata} and length($data{x})) {
+			updateit(\%data,'pooldata',[$data{npa},$data{nxx},$data{x}]);
+			delete $data{switch};
+			delete $data{ocn};
+			delete $data{udate};
+			delete $data{fdate};
+			updateit(\%data,'prefixdata',[$data{npa},$data{nxx}]);
 		} else {
-			updateit($dat,'prefixdata',[$dat->{npa},$dat->{nxx}]);
+			updateit(\%data,'prefixdata',[$data{npa},$data{nxx}]);
 		}
 	}
 	if (exists $keys{pcdata} and $dat->{spc}) {
+		my %data = %$dat;
 		foreach my $s (qw/host cls45sw e911sw/) {
-			$dat->{apc} = delete $dat->{spc} if $dat->{$s};
+			$data{apc} = delete $data{spc} if $data{$s};
 		}
-		if ($dat->{switch}) {
-			if ($dat->{switch} =~ /[0-9A-Z]ED$/) {
-				$dat->{e911sw} = delete $dat->{switch};
+		if ($data{switch}) {
+			if ($data{switch} =~ /[0-9A-Z]ED$/) {
+				$data{e911sw} = delete $data{switch};
 			}
-			if ($dat->{cls45sw}) {
-				if ($dat->{switch} =~ /([0-9][0-9G]T|CT[0-9A-F])$/ and $dat->{cls45sw} !~ /([0-9][0-9G]T|CT[0-9A-F])$/) {
-					($dat->{cls45sw},$dat->{switch}) = ($dat->{switch},$dat->{cls45sw});
+			if ($data{cls45sw}) {
+				if ($data{switch} =~ /([0-9][0-9G]T|CT[0-9A-F])$/ and $data{cls45sw} !~ /([0-9][0-9G]T|CT[0-9A-F])$/) {
+					($data{cls45sw},$data{switch}) = ($data{switch},$data{cls45sw});
 				}
-			} elsif ($dat->{switch} =~ /([0-9][0-9G]T|CT[0-9A-F])$/) {
-				$dat->{cls45sw} = delete $dat->{switch};
+			} elsif ($data{switch} =~ /([0-9][0-9G]T|CT[0-9A-F])$/) {
+				$data{cls45sw} = delete $data{switch};
 			}
 		}
-		updateit($dat,'pcdata',[$dat->{spc}]);
+		updateit(\%data,'pcdata',[$data{spc}]) if $data{spc};
 	}
 }
 
@@ -1264,23 +1267,24 @@ sub mydoneit {
 	my ($dat,$fdate,$sect) = @_;
 	updatedata($dat,$fdate,$sect);
 	if ($dat->{blks}) {
-		for (my $i=0;$i<@{$dat->{blks}};$i++) {
-			$dat->{npa}   = $dat->{npas}[$i];
-			$dat->{nxx}   = $dat->{nxxs}[$i];
-			$dat->{x}     = $dat->{blks}[$i];
-			$dat->{rng}   = $dat->{rngs}[$i];
-			$dat->{lines} = $dat->{lins}[$i];
-			($dat->{xxxx},$dat->{yyyy}) = split(/-/,$dat->{rng})
-			if length($dat->{x}) and length($dat->{rng});
-			if ($dat->{xxxx} eq '0000' and $dat->{yyyy} eq '9999') {
-				delete $dat->{x};
-				delete $dat->{xxxx};
-				delete $dat->{yyyy};
-			} elsif ($dat->{xxxx} eq "$dat->{x}000" and $dat->{yyyy} eq "$dat->{x}999") {
-				delete $dat->{xxxx};
-				delete $dat->{yyyy};
+		my %data = %$dat;
+		for (my $i=0;$i<@{$data{blks}};$i++) {
+			$data{npa}   = $data{npas}[$i];
+			$data{nxx}   = $data{nxxs}[$i];
+			$data{x}     = $data{blks}[$i];
+			$data{rng}   = $data{rngs}[$i];
+			$data{lines} = $data{lins}[$i];
+			($data{xxxx},$data{yyyy}) = split(/-/,$data{rng})
+			if length($data{x}) and length($data{rng});
+			if ($data{xxxx} eq '0000' and $data{yyyy} eq '9999') {
+				delete $data{x};
+				delete $data{xxxx};
+				delete $data{yyyy};
+			} elsif ($data{xxxx} eq "$data{x}000" and $data{yyyy} eq "$data{x}999") {
+				delete $data{xxxx};
+				delete $data{yyyy};
 			}
-			updatedata($dat,$fdate,$sect);
+			updatedata(\%data,$fdate,$sect);
 		}
 	}
 }
@@ -1308,7 +1312,11 @@ sub donecadata {
 		while (<$fh>) { chomp; $flineno++;
 			if ($inheader) {
 				if (/SERVING WIRE CENTER V AND H COORDINATE INFORMATION - (.*)$/) {
-					$state = $1;
+					if ($state ne $1) {
+						$state = $1;
+						$dbh->commit;
+						$dbh->begin_work;
+					}
 				}
 				if (/^\s+SECTION\s+([0-9]+)/) {
 					$section = $1;
@@ -1366,7 +1374,11 @@ sub donecadata {
 			} else {
 				unless ($lineno or /\(D\)/) {
 					if (/SERVING WIRE CENTER V AND H COORDINATE INFORMATION - (.*)$/) {
-						$state = $1;
+						if ($state ne $1) {
+							$state = $1;
+							$dbh->commit;
+							$dbh->begin_work;
+						}
 					}
 					print STDERR "SKIPPING: $fname($flineno) $_\n";
 					next;
@@ -1425,7 +1437,7 @@ sub donecadata {
 				if ($changing) {
 					if (/^\s?([A-Z]+.*?|\s*")\s+([A-Z][A-Z0-9]{2}[A-Z0-9 ][A-Z0-9]{7}|")\s+([-0-9][0-9]{4}|")\s+([-0-9][0-9]{4}|")\s+([0-9]{3}[A-Z0-9]|")\s+([0-9]{3,}|")/) {
 						my ($loc,$clli,$wcv,$wch,$ocn,$lata) = ($1,$2,$3,$4,$5,$6);
-						$data{state} = $state if $state;
+						#$data{state} = $state if $state;
 						$data{st} = $states{$state} if exists $states{$state};
 						if ($state and not $data{st}) {
 							print STDERR "E: no mapping for state '$state'\n";
@@ -1447,7 +1459,7 @@ sub donecadata {
 				} else {
 					if (/^\s?([A-Z]+.*?)\s+([A-Z][A-Z0-9]{2}[A-Z0-9 ][A-Z0-9]{7})\s+([-0-9][0-9]{4})\s+([-0-9][0-9]{4})\s+([0-9]{3}[A-Z0-9])\s+([0-9]{3,})/) {
 						my ($loc,$clli,$wcv,$wch,$ocn,$lata) = ($1,$2,$3,$4,$5,$6);
-						$data{state} = $state if $state;
+						#$data{state} = $state if $state;
 						$data{st} = $states{$state} if exists $states{$state};
 						if ($state and not $data{st}) {
 							print STDERR "E: no mapping for state '$state'\n";
