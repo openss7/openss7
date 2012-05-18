@@ -48,7 +48,7 @@ my %cols = (
 #	exdata=>    [ qw/exch rc region rcshort seeexch seerc seeregion ilecocn lata rcv rch rclat rclon udate sect fdate/ ],
 #	lcadata=>   [ qw/exchob exchib plantype calltype monthlylimit note effdate sect fdate/ ],
 	wcdata=>    [ qw/wc wcname wclata wcv wch wclat wclon wcaddr wczip wccity wccounty wcst wccc sect fdate/ ],
-	switchdata=>[ qw/switch switchname switchtype switchdesc npa nxx swlata swoocn swocn swabbv swdesc swfunc wcv wch wclat wclon tgclli cls45sw e911sw spc apc stp1 stp2 actual agent host mate tdm tdmilt tdmfgc tdmfgd tdmlcl tdmfgb tdmops tdm911 sect fdate/ ],
+	switchdata=>[ qw/switch switchname switchtype switchdesc npa nxx swlata swoocn swocn swabbv swdesc swfunc wcv wch wclat wclon feat tgclli cls45sw e911sw spc apc stp1 stp2 actual agent host mate tdm tdmilt tdmfgc tdmfgd tdmlcl tdmfgb tdmops tdm911 tdmchk tdmblv udate sect fdate/ ],
 	prefixdata=>[ qw/npa nxx nxxtype use wirelessblock portableblock tbpooling nbpooling contaminated retained overlays switch ocn carrier exch region rcshort rc lata loc st newnpa overlay assigndate effdate actdate discdate udate sect fdate/ ],
 #	pooldata=>  [ qw/npa nxx x switch ocn udate sect fdate/ ],
 #	linedata=>  [ qw/npa nxx xxxx yyyy switch ocn sect fdate/ ],
@@ -324,6 +324,8 @@ $sql = q{
 		tdmfgb CHARACTER(11),
 		tdmops CHARACTER(11),
 		tdm911 CHARACTER(11),
+		tdmchk CHARACTER(11),
+		tdmblv CHARACTER(11),
 		udate DOUBLE,
 		sect TEXT,
 		fdate DOUBLE,
@@ -585,10 +587,10 @@ sub updateit {
 		if (@new or @old) {
 			my @bounds = ();
 			foreach my $k (@{$keys{$tab}}) { push @bounds,"$k=='$dat{$k}'"; }
-			my $sql = "UPDATE $tab SET ".join(',',@old)." WHERE ".join(' AND ',@new,@bounds)."; -- FIXME: (A) pick one! ($dat{sect})\n";
+			my $sql = "UPDATE $tab SET ".join(',',@old)." WHERE ".join(' AND ',@bounds)."; -- FIXME: (A) pick one! ($dat{sect})\n";
 			print STDERR "S: $sql";
 			print $of $sql;
-			my $sql = "UPDATE $tab SET ".join(',',@new)." WHERE ".join(' AND ',@old,@bounds)."; -- FIXME: (B) pick one! ($dat{sect})\n";
+			my $sql = "UPDATE $tab SET ".join(',',@new)." WHERE ".join(' AND ',@bounds)."; -- FIXME: (B) pick one! ($dat{sect})\n";
 			print STDERR "S: $sql";
 			print $of $sql;
 		}
@@ -666,8 +668,52 @@ sub booleanfield {
 			'Y'=>1,
 			'0'=>0,
 			'1'=>1,
+			'X'=>0,
 		});
 }
+
+my %swfuncmap = (
+	TDMILT=>'IAL', TDMFGB=>'FGB', TDMFGC=>'FGC', TDMFGD=>'FGD', TDMLCL=>'LCL', LOC=>'LCL',
+	ILT=>'IAL', TDM=>'EAT', '800'=>'800', TDMLOC=>'LCL', TOPS=>'OPS', TDMOPS=>'OPS',
+	TDM911=>'911', CHK=>'CHK', TDMCHK=>'CHK', CLS5=>'', ACS=>'EAT', BLVI=>'BLVI',
+	'HOST-NO'=>'HOST', BLV=>'BLV', ITL=>'ILT', HUB=>'', ISP=>'', LINE=>'', ONLY=>'', SSP=>'',
+	IAL=>'IAL', IAT=>'IAL', EAT=>'EAT', IXC=>'IXC', FGB=>'FGB', FGC=>'FGC', FGD=>'FGD',
+	LCL=>'LCL', OPS=>'OPS', '911'=>'911', E911=>'E911', CLS45SW=>'CLS45SW', STP=>'STP',
+	MATE=>'MATE', ACTUAL=>'ACTUAL', AGENT=>'AGENT', HOST=>'HOST', REMOTE=>'REMOTE',
+	'SMART-REMOTE'=>'REMOTE', STANDALONE=>'', TANDEM=>'EAT',
+);
+
+my @swcllis = qw/cls45sw e911sw stp1 stp2 actual agent host mate tdm tdmilt tdmfgc tdmfgd tdmlcl tdmfgb tdmops tdm911 tdmchk tdmblv/;
+my @allcllis = (qw/switch tgclli/,@swcllis);
+
+my %swfuncflg = (
+	cls45sw=>'CLS45SW',
+	e911sw=>'E911',
+	stp1=>'STP',
+	stp2=>'STP',
+	actual=>'ACTUAL',
+	agent=>'AGENT',
+	host=>'HOST',
+	mate=>'MATE,STP',
+	tdm=>'TDM',
+	tdmilt=>'IAL',
+	tdmfgc=>'FGC',
+	tdmfgd=>'FGD',
+	tdmlcl=>'LCL',
+	tdmfgb=>'FGB',
+	tdmops=>'OPS',
+	tdm911=>'911',
+	tdmchk=>'CHK',
+	tdmblv=>'BLVI',
+);
+
+my %swfuncoth = (
+	cls45sw=>'CLS45SW',
+	actual=>'POI',
+	agent=>'TGW',
+	host=>'REMOTE',
+	mate=>'MATE,STP',
+);
 
 sub updatedata {
 	my ($dat,$fdate,$sect) = @_;
@@ -724,142 +770,73 @@ sub updatedata {
 		updateit($dat,'wcdata',[$dat->{wc}]);
 	}
 	if (exists $keys{switchdata} and $dat->{switch}) {
-		if (exists $dat->{feat} and ref $dat->{feat} eq 'HASH') {
-			$dat->{feat} = join(' ',sort keys %{$dat->{feat}});
+		my %data = %$dat;
+		if (exists $data{feat} and ref $data{feat} eq 'HASH') {
+			$data{feat} = join(' ',sort keys %{$data{feat}});
 		}
-		if (my $func = delete $dat->{swfunc}) {
-			$dat->{swfunc} = {};
+		if (my $func = delete $data{swfunc}) {
+			$data{swfunc} = {};
 			foreach my $f (split(/[,;\/ ]\s*/,$func)) {
-				my $g = {
-					TDMILT=>'IAL',
-					TDMFGB=>'FGB',
-					TDMFGC=>'FGC',
-					TDMFGD=>'FGD',
-					TDMLCL=>'LCL',
-					LOC=>'LCL',
-					ILT=>'IAL',
-					TDM=>'EAT',
-					'800'=>'800',
-					TDMLOC=>'LCL',
-					TOPS=>'OPS',
-					TDMOPS=>'OPS',
-					TDM911=>'911',
-					CHK=>'CHK',
-					TDMCHK=>'CHK',
-					CLS5=>'',
-					ACS=>'EAT',
-					BLVI=>'BLVI',
-					'HOST-NO'=>'HOST',
-					BLV=>'BLV',
-					ITL=>'ILT',
-					HUB=>'',
-					ISP=>'',
-					LINE=>'',
-					ONLY=>'',
-					SSP=>'',
-					IAL=>'IAL',
-					IAT=>'IAL',
-					EAT=>'EAT',
-					IXC=>'IXC',
-					FGB=>'FGB',
-					FGC=>'FGC',
-					FGD=>'FGD',
-					LCL=>'LCL',
-					OPS=>'OPS',
-					'911'=>'911',
-					E911=>'E911',
-					CLS45SW=>'CLS45SW',
-					STP=>'STP',
-					MATE=>'MATE',
-					ACTUAL=>'ACTUAL',
-					AGENT=>'AGENT',
-					HOST=>'HOST',
-					REMOTE=>'REMOTE',
-					'SMART-REMOTE'=>'REMOTE',
-					STANDALONE=>'',
-					TANDEM=>'EAT',
-					
-				}->{$f};
+				my $g = $swfuncmap{$f};
 				if (defined $g) {
 					$f = $g;
 				} else {
 					print STDERR "E: no mapping for swfunc '$f'\n";
 				}
-				$dat->{swfunc}{$f}++ if $f;
+				$data{swfunc}{$f}++ if $f;
 			}
 		}
-		foreach my $f (qw/cls45sw e911sw stp1 stp2 actual agent host mate tdm tdmilt tdmfgc tdmfgd tdmlcl tdmfgb tdmops tdm911/) {
-			next unless $dat->{$f};
+		foreach my $f (@swcllis) {
+			next unless $data{$f};
 			my %rec = (sect=>$sect,fdate=>$fdate);
-			$rec{switch} = $dat->{$f};
-			$rec{swfunc} = {
-				cls45sw=>'CLS45SW',
-				e911sw=>'E911',
-				stp1=>'STP',
-				stp2=>'STP',
-				actual=>'ACTUAL',
-				agent=>'AGENT',
-				host=>'HOST',
-				mate=>'MATE,STP',
-				tdm=>'TDM',
-				tdmilt=>'IAL',
-				tdmfgc=>'FGC',
-				tdmfgd=>'FGD',
-				tdmlcl=>'LCL',
-				tdmfgb=>'FGB',
-				tdmops=>'OPS',
-				tdm911=>'911',
-			}->{$f};
-			my $func = {
-				cls45sw=>'CLS45SW',
-				actual=>'POI',
-				agent=>'TGW',
-				host=>'REMOTE',
-				mate=>'MATE,STP',
-			}->{$f};
-			$dat->{swfunc}{$func}++ if $func;
+			$rec{switch} = $data{$f};
+			$rec{swfunc} = $swfuncflg{$f};
+			my $func = $swfuncoth{$f};
+			$data{swfunc}{$func}++ if $func;
 			updateit(\%rec,'switchdata',[$rec{switch}]) if $rec{switch};
 		}
-		$dat->{swfunc} = join(',',sort keys %{$dat->{swfunc}}) if $dat->{swfunc} and ref $dat->{swfunc} eq 'HASH';
-		updateit($dat,'switchdata',[$dat->{switch}]);
+		$data{swfunc} = join(',',sort keys %{$data{swfunc}}) if $data{swfunc} and ref $data{swfunc} eq 'HASH';
+		updateit(\%data,'switchdata',[$data{switch}]);
 	}
 	if (exists $keys{prefixdata} and $dat->{npa} and $dat->{nxx}) {
-		if (exists $keys{linedata} and length($dat->{xxxx}) and length($dat->{yyyy})) {
-			updateit($dat,'linedata',[$dat->{npa},$dat->{nxx},$dat->{xxxx},$dat->{yyyy}]);
-			delete $dat->{switch};
-			delete $dat->{ocn};
-			delete $dat->{udate};
-			delete $dat->{fdate};
-			updateit($dat,'pooldata',[$dat->{npa},$dat->{nxx},$dat->{x}]);
-			updateit($dat,'prefixdata',[$dat->{npa},$dat->{nxx}]);
-		} elsif (exists $keys{pooldata} and length($dat->{x})) {
-			updateit($dat,'pooldata',[$dat->{npa},$dat->{nxx},$dat->{x}]);
-			delete $dat->{switch};
-			delete $dat->{ocn};
-			delete $dat->{udate};
-			delete $dat->{fdate};
-			updateit($dat,'prefixdata',[$dat->{npa},$dat->{nxx}]);
+		my %data = %$dat;
+		if (exists $keys{linedata} and length($data{xxxx}) and length($data{yyyy})) {
+			updateit(\%data,'linedata',[$data{npa},$data{nxx},$data{xxxx},$data{yyyy}]);
+			delete $data{switch};
+			delete $data{ocn};
+			delete $data{udate};
+			delete $data{fdate};
+			updateit(\%data,'pooldata',[$data{npa},$data{nxx},$data{x}]);
+			updateit(\%data,'prefixdata',[$data{npa},$data{nxx}]);
+		} elsif (exists $keys{pooldata} and length($data{x})) {
+			updateit(\%data,'pooldata',[$data{npa},$data{nxx},$data{x}]);
+			delete $data{switch};
+			delete $data{ocn};
+			delete $data{udate};
+			delete $data{fdate};
+			updateit(\%data,'prefixdata',[$data{npa},$data{nxx}]);
 		} else {
-			updateit($dat,'prefixdata',[$dat->{npa},$dat->{nxx}]);
+			updateit(\%data,'prefixdata',[$data{npa},$data{nxx}]);
 		}
 	}
 	if (exists $keys{pcdata} and $dat->{spc}) {
+		my %data = %$dat;
 		foreach my $s (qw/host cls45sw e911sw/) {
-			$dat->{apc} = delete $dat->{spc} if $dat->{$s};
+			$data{apc} = delete $data{spc} if $data{$s};
 		}
-		if ($dat->{switch}) {
-			if ($dat->{switch} =~ /[0-9A-Z]ED$/) {
-				$dat->{e911sw} = delete $dat->{switch};
+		if ($data{switch}) {
+			if ($data{switch} =~ /[0-9A-Z]ED$/) {
+				$data{e911sw} = delete $data{switch};
 			}
-			if ($dat->{cls45sw}) {
-				if ($dat->{switch} =~ /([0-9][0-9G]T|CT[0-9A-F])$/ and $dat->{cls45sw} !~ /([0-9][0-9G]T|CT[0-9A-F])$/) {
-					($dat->{cls45sw},$dat->{switch}) = ($dat->{switch},$dat->{cls45sw});
+			if ($data{cls45sw}) {
+				if ($data{switch} =~ /([0-9][0-9G]T|CT[0-9A-F])$/ and $data{cls45sw} !~ /([0-9][0-9G]T|CT[0-9A-F])$/) {
+					($data{cls45sw},$data{switch}) = ($data{switch},$data{cls45sw});
 				}
-			} elsif ($dat->{switch} =~ /([0-9][0-9G]T|CT[0-9A-F])$/) {
-				$dat->{cls45sw} = delete $dat->{switch};
+			} elsif ($data{switch} =~ /([0-9][0-9G]T|CT[0-9A-F])$/) {
+				$data{cls45sw} = delete $data{switch};
 			}
 		}
-		updateit($dat,'pcdata',[$dat->{spc}]);
+		updateit(\%data,'pcdata',[$data{spc}]) if $data{spc};
 	}
 }
 
