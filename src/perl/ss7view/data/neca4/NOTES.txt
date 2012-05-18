@@ -1,0 +1,20 @@
+To download current NECA-4 tariffs, go to the Wireline Competition Bureau
+page at:
+
+	http://fjallfoss.fcc.gov/cgi-bin/ws.exe/prod/cbb/etfs/webpublic/selectbrowse.hts
+
+Choose browse documents filed by an ILEC, then choose National Exchange
+Carrier Association, then choose the links.
+
+or, just go straight here:
+
+	http://fjallfoss.fcc.gov/cgi-bin/ws.exe/prod/ccb/etfs/webpublic/selecttariff.hts?IdLec=43&User_Type=2&IdLec_User=&id_user=
+
+And then choose FCC 4, or go straight here:
+
+	http://fjallfoss.fcc.gov/cgi-bin/ws.exe/prod/ccb/etfs/webpublic/browse.hts?IdTariff=99&IdLec=43&User_Type=2&IdLec_User=&id_user=
+
+NECA-4-1.pdf   comes from most recent 'Administrative Sections 1-11'
+NECA-4-12.pdf  comes from most recent 'Wire Center Sections 12-43'
+NECA-4-44.pdf  comes from most recent 'Wire Center Sections 44-64'
+NECA-4-400.pdf comes form most recent 'Wire Center Sections 400-401'
