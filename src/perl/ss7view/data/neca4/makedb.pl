@@ -48,7 +48,7 @@ my %cols = (
 #	exdata=>    [ qw/exch rc region rcshort seeexch seerc seeregion ilecocn lata rcv rch rclat rclon udate sect fdate/ ],
 #	lcadata=>   [ qw/exchob exchib plantype calltype monthlylimit note effdate sect fdate/ ],
 	wcdata=>    [ qw/wc wcname wclata wcv wch wclat wclon wcaddr wczip wccity wccounty wcst wccc sect fdate/ ],
-	switchdata=>[ qw/switch switchname switchtype switchdesc npa nxx swlata swoocn swocn swabbv swdesc swfunc wcv wch wclat wclon feat tgclli cls45sw e911sw spc apc stp1 stp2 actual agent host mate tdm tdmilt tdmfgc tdmfgd tdmlcl tdmfgb tdmops tdm911 udate sect fdate/ ],
+	switchdata=>[ qw/switch switchname switchtype switchdesc npa nxx swlata swoocn swocn swabbv swdesc swfunc wcv wch wclat wclon feat tgclli cls45sw e911sw spc apc stp1 stp2 actual agent host mate tdm tdmilt tdmfgc tdmfgd tdmlcl tdmfgb tdmops tdm911 tdmchk tdmblv udate sect fdate/ ],
 	prefixdata=>[ qw/npa nxx nxxtype use wirelessblock portableblock tbpooling nbpooling contaminated retained overlays switch ocn carrier exch region rcshort rc lata loc st newnpa overlay assigndate effdate actdate discdate udate sect fdate/ ],
 	pooldata=>  [ qw/npa nxx x switch ocn udate sect fdate/ ],
 	linedata=>  [ qw/npa nxx xxxx yyyy switch ocn sect fdate/ ],
@@ -324,6 +324,8 @@ $sql = q{
 		tdmfgb CHARACTER(11),
 		tdmops CHARACTER(11),
 		tdm911 CHARACTER(11),
+		tdmchk CHARACTER(11),
+		tdmblv CHARACTER(11),
 		udate DOUBLE,
 		sect TEXT,
 		fdate DOUBLE,
@@ -666,8 +668,52 @@ sub booleanfield {
 			'Y'=>1,
 			'0'=>0,
 			'1'=>1,
+			'X'=>0,
 		});
 }
+
+my %swfuncmap = (
+	TDMILT=>'IAL', TDMFGB=>'FGB', TDMFGC=>'FGC', TDMFGD=>'FGD', TDMLCL=>'LCL', LOC=>'LCL',
+	ILT=>'IAL', TDM=>'EAT', '800'=>'800', TDMLOC=>'LCL', TOPS=>'OPS', TDMOPS=>'OPS',
+	TDM911=>'911', CHK=>'CHK', TDMCHK=>'CHK', CLS5=>'', ACS=>'EAT', BLVI=>'BLVI',
+	'HOST-NO'=>'HOST', BLV=>'BLV', ITL=>'ILT', HUB=>'', ISP=>'', LINE=>'', ONLY=>'', SSP=>'',
+	IAL=>'IAL', IAT=>'IAL', EAT=>'EAT', IXC=>'IXC', FGB=>'FGB', FGC=>'FGC', FGD=>'FGD',
+	LCL=>'LCL', OPS=>'OPS', '911'=>'911', E911=>'E911', CLS45SW=>'CLS45SW', STP=>'STP',
+	MATE=>'MATE', ACTUAL=>'ACTUAL', AGENT=>'AGENT', HOST=>'HOST', REMOTE=>'REMOTE',
+	'SMART-REMOTE'=>'REMOTE', STANDALONE=>'', TANDEM=>'EAT',
+);
+
+my @swcllis = qw/cls45sw e911sw stp1 stp2 actual agent host mate tdm tdmilt tdmfgc tdmfgd tdmlcl tdmfgb tdmops tdm911 tdmchk tdmblv/;
+my @allcllis = (qw/switch tgclli/,@swcllis);
+
+my %swfuncflg = (
+	cls45sw=>'CLS45SW',
+	e911sw=>'E911',
+	stp1=>'STP',
+	stp2=>'STP',
+	actual=>'ACTUAL',
+	agent=>'AGENT',
+	host=>'HOST',
+	mate=>'MATE,STP',
+	tdm=>'TDM',
+	tdmilt=>'IAL',
+	tdmfgc=>'FGC',
+	tdmfgd=>'FGD',
+	tdmlcl=>'LCL',
+	tdmfgb=>'FGB',
+	tdmops=>'OPS',
+	tdm911=>'911',
+	tdmchk=>'CHK',
+	tdmblv=>'BLVI',
+);
+
+my %swfuncoth = (
+	cls45sw=>'CLS45SW',
+	actual=>'POI',
+	agent=>'TGW',
+	host=>'REMOTE',
+	mate=>'MATE,STP',
+);
 
 sub updatedata {
 	my ($dat,$fdate,$sect) = @_;
@@ -731,56 +777,7 @@ sub updatedata {
 		if (my $func = delete $data{swfunc}) {
 			$data{swfunc} = {};
 			foreach my $f (split(/[,;\/ ]\s*/,$func)) {
-				my $g = {
-					TDMILT=>'IAL',
-					TDMFGB=>'FGB',
-					TDMFGC=>'FGC',
-					TDMFGD=>'FGD',
-					TDMLCL=>'LCL',
-					LOC=>'LCL',
-					ILT=>'IAL',
-					TDM=>'EAT',
-					'800'=>'800',
-					TDMLOC=>'LCL',
-					TOPS=>'OPS',
-					TDMOPS=>'OPS',
-					TDM911=>'911',
-					CHK=>'CHK',
-					TDMCHK=>'CHK',
-					CLS5=>'',
-					ACS=>'EAT',
-					BLVI=>'BLVI',
-					'HOST-NO'=>'HOST',
-					BLV=>'BLV',
-					ITL=>'ILT',
-					HUB=>'',
-					ISP=>'',
-					LINE=>'',
-					ONLY=>'',
-					SSP=>'',
-					IAL=>'IAL',
-					IAT=>'IAL',
-					EAT=>'EAT',
-					IXC=>'IXC',
-					FGB=>'FGB',
-					FGC=>'FGC',
-					FGD=>'FGD',
-					LCL=>'LCL',
-					OPS=>'OPS',
-					'911'=>'911',
-					E911=>'E911',
-					CLS45SW=>'CLS45SW',
-					STP=>'STP',
-					MATE=>'MATE',
-					ACTUAL=>'ACTUAL',
-					AGENT=>'AGENT',
-					HOST=>'HOST',
-					REMOTE=>'REMOTE',
-					'SMART-REMOTE'=>'REMOTE',
-					STANDALONE=>'',
-					TANDEM=>'EAT',
-					
-				}->{$f};
+				my $g = $swfuncmap{$f};
 				if (defined $g) {
 					$f = $g;
 				} else {
@@ -789,35 +786,12 @@ sub updatedata {
 				$data{swfunc}{$f}++ if $f;
 			}
 		}
-		foreach my $f (qw/cls45sw e911sw stp1 stp2 actual agent host mate tdm tdmilt tdmfgc tdmfgd tdmlcl tdmfgb tdmops tdm911/) {
+		foreach my $f (@swcllis) {
 			next unless $data{$f};
 			my %rec = (sect=>$sect,fdate=>$fdate);
 			$rec{switch} = $data{$f};
-			$rec{swfunc} = {
-				cls45sw=>'CLS45SW',
-				e911sw=>'E911',
-				stp1=>'STP',
-				stp2=>'STP',
-				actual=>'ACTUAL',
-				agent=>'AGENT',
-				host=>'HOST',
-				mate=>'MATE,STP',
-				tdm=>'TDM',
-				tdmilt=>'IAL',
-				tdmfgc=>'FGC',
-				tdmfgd=>'FGD',
-				tdmlcl=>'LCL',
-				tdmfgb=>'FGB',
-				tdmops=>'OPS',
-				tdm911=>'911',
-			}->{$f};
-			my $func = {
-				cls45sw=>'CLS45SW',
-				actual=>'POI',
-				agent=>'TGW',
-				host=>'REMOTE',
-				mate=>'MATE,STP',
-			}->{$f};
+			$rec{swfunc} = $swfuncflg{$f};
+			my $func = $swfuncoth{$f};
 			$data{swfunc}{$func}++ if $func;
 			updateit(\%rec,'switchdata',[$rec{switch}]) if $rec{switch};
 		}
