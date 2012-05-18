@@ -30,7 +30,10 @@ XLSFILES = 	Abilene_NIS.xls \
 		St_Louis.xls \
 		Tyler.xls \
 		Waco.xls \
-		Wichita_Falls.xls
+		Wichita_Falls.xls \
+		8-1-08SubCICWorkbook2-14-2008.xls \
+		TestlineReport.xls \
+		SE0ZZCodes.xls
 
 CSVFILES = $(XLSFILES:%.xls=%.csv)
 
@@ -43,3 +46,12 @@ clean:
 	rm -f $(CSVFILES)
 
 .PHONY: all csv clean
+
+SE0ZZCodes.xls:
+	wget -O $@ 'https://clec.att.com/clec_documents//unrestr/hb/Nb/721/ioc/ioc_guides/SE%200ZZ%20Codes.xls'
+
+ACNA_BNA.pdf:
+	wget -O $@ 'https://apps.wholesale.att.com/acna_bna/generate_pdf.jsp'
+
+ACNA_BNA.txt: ACNA_BNA.pdf
+	pdftotext -layout -nopgbrk $< $@

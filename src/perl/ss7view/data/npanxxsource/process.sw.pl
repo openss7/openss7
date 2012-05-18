@@ -1054,8 +1054,8 @@ while (<$fh>) { chomp;
 	}
 	my $data = {};
 	for (my $i=0;$i<@fields;$i++) {
-		if (exists $mapping{$fields[$i]}) {
-			&{$mapping{$fields[$i]}}($data,$fields[$i],$tokens[$i]);
+		if (exists $mapping::mapping{$fields[$i]}) {
+			&{$mapping::mapping{$fields[$i]}}($data,$fields[$i],$tokens[$i]);
 		} else {
 			$data->{$fields[$i]} = $tokens[$i] if length($tokens[$i]);
 		}
@@ -1114,7 +1114,7 @@ while (<$fh>) { chomp;
 				unless ($data->{VH}) {
 					unless ($rec or exists $data->{RCGEOID}) {
 						if (my $geo = lookupgeo($cc,$st,$nm)) { $alook++;
-							geofound($cc,$st,$ct,$nm,$data,$geo); last;
+							geofound($cc,$st,$ct,$nm,$data,$geo);
 						} else {
 							$nolook++;
 						}

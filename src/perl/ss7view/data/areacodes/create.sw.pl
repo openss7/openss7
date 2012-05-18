@@ -57,8 +57,8 @@ sub ll2vh {
 		}
 	}
 	($gv,$gh) = ($cv,$ch);
-	for (my $v=$gv-6000;$v<=$gv+6000;$v+=2000) {
-		for (my $h=$gh-6000;$h<=$gh+6000;$h+=2000) {
+	for (my $v=$gv-8000;$v<=$gv+8000;$v+=2000) {
+		for (my $h=$gh-8000;$h<=$gh+8000;$h+=2000) {
 			my ($y,$x) = Geo::Coordinates::VandH->vh2ll($v,$h);
 			$x = -$x;
 			if (defined $dd) {
@@ -76,8 +76,8 @@ sub ll2vh {
 		}
 	}
 	($gv,$gh) = ($cv,$ch);
-	for (my $v=$gv-3000;$v<=$gv+3000;$v+=1000) {
-		for (my $h=$gh-3000;$h<=$gh+3000;$h+=1000) {
+	for (my $v=$gv-4000;$v<=$gv+4000;$v+=1000) {
+		for (my $h=$gh-4000;$h<=$gh+4000;$h+=1000) {
 			my ($y,$x) = Geo::Coordinates::VandH->vh2ll($v,$h);
 			$x = -$x;
 			if (defined $dd) {
@@ -95,8 +95,8 @@ sub ll2vh {
 		}
 	}
 	($gv,$gh) = ($cv,$ch);
-	for (my $v=$gv-1500;$v<=$gv+1500;$v+=500) {
-		for (my $h=$gh-1500;$h<=$gh+1500;$h+=500) {
+	for (my $v=$gv-2000;$v<=$gv+2000;$v+=500) {
+		for (my $h=$gh-2000;$h<=$gh+2000;$h+=500) {
 			my ($y,$x) = Geo::Coordinates::VandH->vh2ll($v,$h);
 			$x = -$x;
 			if (defined $dd) {
@@ -114,8 +114,8 @@ sub ll2vh {
 		}
 	}
 	($gv,$gh) = ($cv,$ch);
-	for (my $v=$gv-600;$v<=$gv+600;$v+=200) {
-		for (my $h=$gh-600;$h<=$gh+600;$h+=200) {
+	for (my $v=$gv-800;$v<=$gv+800;$v+=200) {
+		for (my $h=$gh-800;$h<=$gh+800;$h+=200) {
 			my ($y,$x) = Geo::Coordinates::VandH->vh2ll($v,$h);
 			$x = -$x;
 			if (defined $dd) {
@@ -133,8 +133,8 @@ sub ll2vh {
 		}
 	}
 	($gv,$gh) = ($cv,$ch);
-	for (my $v=$gv-300;$v<=$gv+300;$v+=100) {
-		for (my $h=$gh-300;$h<=$gh+300;$h+=100) {
+	for (my $v=$gv-400;$v<=$gv+400;$v+=100) {
+		for (my $h=$gh-400;$h<=$gh+400;$h+=100) {
 			my ($y,$x) = Geo::Coordinates::VandH->vh2ll($v,$h);
 			$x = -$x;
 			if (defined $dd) {
@@ -152,8 +152,8 @@ sub ll2vh {
 		}
 	}
 	($gv,$gh) = ($cv,$ch);
-	for (my $v=$gv-150;$v<=$gv+150;$v+=50) {
-		for (my $h=$gh-150;$h<=$gh+150;$h+=50) {
+	for (my $v=$gv-200;$v<=$gv+200;$v+=50) {
+		for (my $h=$gh-200;$h<=$gh+200;$h+=50) {
 			my ($y,$x) = Geo::Coordinates::VandH->vh2ll($v,$h);
 			$x = -$x;
 			if (defined $dd) {
@@ -171,8 +171,8 @@ sub ll2vh {
 		}
 	}
 	($gv,$gh) = ($cv,$ch);
-	for (my $v=$gv-60;$v<=$gv+60;$v+=20) {
-		for (my $h=$gh-60;$h<=$gh+60;$h+=20) {
+	for (my $v=$gv-80;$v<=$gv+80;$v+=20) {
+		for (my $h=$gh-80;$h<=$gh+80;$h+=20) {
 			my ($y,$x) = Geo::Coordinates::VandH->vh2ll($v,$h);
 			$x = -$x;
 			if (defined $dd) {
@@ -190,8 +190,8 @@ sub ll2vh {
 		}
 	}
 	($gv,$gh) = ($cv,$ch);
-	for (my $v=$gv-30;$v<=$gv+30;$v+=10) {
-		for (my $h=$gh-30;$h<=$gh+30;$h+=10) {
+	for (my $v=$gv-40;$v<=$gv+40;$v+=10) {
+		for (my $h=$gh-40;$h<=$gh+40;$h+=10) {
 			my ($y,$x) = Geo::Coordinates::VandH->vh2ll($v,$h);
 			$x = -$x;
 			if (defined $dd) {
@@ -209,8 +209,8 @@ sub ll2vh {
 		}
 	}
 	($gv,$gh) = ($cv,$ch);
-	for (my $v=$gv-15;$v<=$gv+15;$v+=5) {
-		for (my $h=$gh-15;$h<=$gh+15;$h+=5) {
+	for (my $v=$gv-20;$v<=$gv+20;$v+=5) {
+		for (my $h=$gh-20;$h<=$gh+20;$h+=5) {
 			my ($y,$x) = Geo::Coordinates::VandH->vh2ll($v,$h);
 			$x = -$x;
 			if (defined $dd) {
@@ -228,8 +228,8 @@ sub ll2vh {
 		}
 	}
 	($gv,$gh) = ($cv,$ch);
-	for (my $v=$gv-6;$v<=$gv+6;$v+=2) {
-		for (my $h=$gh-6;$h<=$gh+6;$h+=2) {
+	for (my $v=$gv-8;$v<=$gv+8;$v+=2) {
+		for (my $h=$gh-8;$h<=$gh+8;$h+=2) {
 			my ($y,$x) = Geo::Coordinates::VandH->vh2ll($v,$h);
 			$x = -$x;
 			if (defined $dd) {
@@ -247,8 +247,8 @@ sub ll2vh {
 		}
 	}
 	($gv,$gh) = ($cv,$ch);
-	for (my $v=$gv-3;$v<=$gv+3;$v+=1) {
-		for (my $h=$gh-3;$h<=$gh+3;$h+=1) {
+	for (my $v=$gv-4;$v<=$gv+4;$v+=1) {
+		for (my $h=$gh-4;$h<=$gh+4;$h+=1) {
 			my ($y,$x) = Geo::Coordinates::VandH->vh2ll($v,$h);
 			$x = -$x;
 			if (defined $dd) {
@@ -268,6 +268,7 @@ sub ll2vh {
 	return ($cv,$ch);
 }
 
+my %npaccst = ();
 our %nanpst = ();
 
 $fn = "$codedir/nanpst.txt";
@@ -276,15 +277,31 @@ open($fh,"<:utf8",$fn) or die "can't open $fn";
 while (<$fh>) { chomp;
 	my ($npa,$cc,$st,$name) = split(/\t/,$_);
 	$nanpst{$npa} = $st;
+	$npaccst{$npa} = [ $cc, $st ];
+}
+close($fh);
+
+my %nxxccst = ();
+
+$fn = "$codedir/nxxst.txt";
+print STDER "I: reading $fn\n";
+open ($fh,"<:utf8",$fn) or die "can't open $fn";
+while (<$fh>) { chomp;
+	next unless /^[0-9]+/;
+	my ($npa,$nxx,$cc,$st,$name) = split(/\t/,$_);
+	$nxxccst{$npa}{$nxx} = [ $cc, $st ];
 }
 close($fh);
 
 our %lergcc = ();
 our %lergst = ();
+our %lergps = ();
 our %cllist = ();
 our %cllicc = ();
 our %cllirg = ();
 our %statrg = ();
+our %ccstrg = ();
+our %pcpsda = ();
 our %countries = ();
 
 $fn = "$codedir/lergst.txt";
@@ -294,15 +311,122 @@ while (<$fh>) { chomp;
 	next if /^ISO2/;
 	next if /^\s*$/;
 	my @tokens = split(/\t/,$_);
+	$pcpsda{$tokens[4]}{$tokens[5]} = [ $tokens[0], $tokens[1], $tokens[2], $tokens[3] ];
+	$ccstrg{$tokens[0]}{$tokens[1]} = $tokens[2];
 	$statrg{$tokens[1]} = $tokens[2];
 	$lergcc{$tokens[2]} = $tokens[0];
 	$lergst{$tokens[2]} = $tokens[1];
+	$lergps{$tokens[2]} = [ $tokens[4], $tokens[5] ];
 	$cllicc{$tokens[3]} = $tokens[0];
 	$cllist{$tokens[3]} = $tokens[1];
 	$cllirg{$tokens[3]} = $tokens[2];
 	$countries{$tokens[0]}++;
 }
 close($fh);
+
+sub getnxxccst {
+	my $dat = shift;
+	my ($npa,$nxx) = ($dat->{NPA},$dat->{NXX});
+	my ($cc,$st,$rg,$pc,$ps);
+	($cc,$st) = @{$npaccst{$npa}} if exists $npaccst{$npa};
+	($cc,$st) = @{$nxxccst{$npa}{$nxx}} if exists $nxxccst{$npa}{$nxx};
+	if ($cc and $st) {
+		if (exists $ccstrg{$cc}{$st}) {
+			$rg = $ccstrg{$cc}{$st};
+			if (exists $lergps{$rg}) {
+				($pc,$ps) = @{$lergps{$rg}};
+			} else {
+				print STDERR "E: $npa-$nxx: no PC/PS for REGION $rg\n";
+			}
+		} else {
+			print STDERR "E: $npa-$nxx: no REGION for CC/ST $cc-$st\n";
+		}
+	}
+	return ($cc,$st,$rg,$pc,$ps);
+}
+
+my $corrected = 0;
+my %corrections = ();
+
+$fn = "$datadir/db.cor.csv";
+if (-f $fn) {
+	print STDERR "I: reading $fn\n";
+	open($fh,"<:utf8",$fn) or die "can't read $fn";
+	my $heading = 1;
+	my @cfields = ();
+	while (<$fh>) { chomp;
+		s/^"//; s/"$//; my @tokens = split(/","/,$_);
+		if ($heading) {
+			@cfields = @tokens;
+			$heading = undef;
+			next;
+		}
+		my ($npa,$nxx,$x,$fld,$old,$new,$com) = @tokens;
+		$corrections{$npa}{$nxx}{$x} = [] unless exists $corrections{$npa}{$nxx}{$x};
+		push @{$corrections{$npa}{$nxx}{$x}}, [$fld,$old,$new,$com];
+	}
+	close($fh);
+}
+
+sub correct {
+	my ($dat,$fld,$old,$new,$com) = @_;
+	my ($npa,$nxx,$x) = ($dat->{NPA},$dat->{NXX},$dat->{X});
+	my $numb = "$npa-$nxx"; $numb .= "($x)" if exists $dat->{X} and length($dat->{X});
+	$corrections{$npa}{$nxx}{$x} = [] unless exists $corrections{$npa}{$nxx}{$x};
+	foreach (@{$corrections{$npa}{$nxx}{$x}}) {
+		if ($_->[0] eq $fld and $_->[2] eq $new) { return; }
+	}
+	print STDERR "C: $numb: $fld: $old \-> $new ($com)\n";
+	push @{$corrections{$npa}{$nxx}{$x}}, [$fld,$old,$new,$com];
+	$corrected++;
+}
+
+my $pattern = '^........(';
+
+{
+$fn = "$codedir/matching.txt";
+print STDERR "I: reading $fn\n";
+open($fh,"<:utf8",$fn) or die "can't open $fn";
+my $sep = '';
+while (<$fh>) { chomp;
+	my ($numb,$pat,$regex) = split(/\t/,$_);
+	next unless $numb >= 50 or $pat =~ /[x]/ or ($pat =~ /[an]/ and $numb >= 5);
+	next if $pat =~ /[a]/;
+	$pattern .= "$sep$regex";
+	$sep = '|';
+}
+close($fh);
+$pattern .= ')$';
+}
+
+sub checkclli {
+	my ($clli,$pfx,$dat) = @_;
+	my $result = 1;
+	my %skipcllis = (
+		'XXXXXXXXXXX'=>1,
+		'NOCLLIKNOWN'=>1,
+		'__VARIOUS__'=>1,
+		'99999999999'=>1,
+		'ALL SWITCHE'=>1,
+		'ALLSWITCHES'=>1,
+	);
+	return 0 if exists $skipcllis{$clli};
+	if (length($clli) != 11) {
+		print STDERR "E: $pfx CLLI $clli is not 11 characters long\n";
+		$dat->{BADCLLI} = 'FIXME: wrong length';
+		return 0;
+	}
+	unless (exists $cllicc{substr($clli,4,2)}) {
+		print STDERR "E: $pfx CLLI $clli has bad region ",substr($clli,4,2),"\n";
+		$dat->{BADCLLI} = 'FIXME: bad region';
+		$result = 0;
+	}
+	unless ($clli =~ /$pattern/) {
+		print STDERR "W: $pfx CLLI $clli has equip ",substr($clli,8,3)," that is poorly formatted\n";
+		$dat->{BADCLLI} = 'FIXME: poor equip';
+	}
+	return $result;
+}
 
 my %sws = ();
 my %wcs = ();
@@ -314,12 +438,6 @@ my @wc_keys = qw/WCCLLI NPA NXX X LATA OCN SWCLLI WCVH WCLL RCVH RCLL WCADDR WCC
 my @pl_keys = qw/PLCLLI NPA NXX X LATA OCN WCCLLI/;
 my @dbsw_keys = qw/NPA NXX X SWCLLI LATA OCN/;
 
-our %skipcllis = (
-	'NOCLLIKNOWN'=>1,
-	'XXXXXXXXXXX'=>1,
-	'__VARIOUS__'=>1,
-);
-
 require "$progdir/mapping.sw.pm";
 
 my ($oldnpa,$oldrg);
@@ -329,14 +447,28 @@ print STDERR "I: processing $fn\n";
 open($fh,"<:utf8",$fn) or die "can't open $fn";
 my $heading = 1;
 my @fields = ();
+my %fieldnos = ();
 while (<$fh>) { chomp;
 	next unless /^"/;
 	s/^"//; s/"$//; my @tokens = split(/","/,$_);
 	if ($heading) {
 		@fields = @tokens;
+		for (my $i=0;$i<@fields;$i++) {
+			$fieldnos{$fields[$i]} = $i;
+		}
 		$heading = undef;
 		next;
 	}
+	my ($npa,$nxx,$x) = @tokens;
+	if (exists $corrections{$npa}{$nxx}{$x}) {
+		foreach my $cor (@{$corrections{$npa}{$nxx}{$x}}) {
+			if ($cor->[0] eq '**DELETE**') { $npa = undef; last; }
+			if (exists $fieldnos{$cor->[0]}) {
+				$tokens[$fieldnos{$cor->[0]}] = $cor->[2];
+			}
+		}
+	}
+	next unless defined $npa;
 	my $data = {};
 	for (my $i=0;$i<@fields;$i++) {
 		if (exists $mapping::mapping{$fields[$i]}) {
@@ -346,8 +478,7 @@ while (<$fh>) { chomp;
 		}
 	}
 	#print STDERR "I: processing $data->{NPA} $data->{NXX} $data->{X}\n";
-	my $npa = $data->{NPA};
-	my $rg = $data->{WCRG};
+	my $rg = $data->{REGION};
 	if ($npa ne $oldnpa and $rg ne $oldrg) {
 		print STDERR "I: processing $npa $rg...\n";
 	}
@@ -356,7 +487,6 @@ while (<$fh>) { chomp;
 	my $st = $data->{WCST};
 	my $sw = $data->{SWCLLI};
 	next unless length($sw) == 11;
-	next if exists $skipcllis{$sw};
 	my $wc = $data->{WCCLLI};
 	my $pl = $data->{PLCLLI};
 	my $ct = $data->{CTCLLI};
@@ -366,9 +496,9 @@ while (<$fh>) { chomp;
 		my $rec = $dbsw{$data->{NPA}}{$data->{NXX}}{$data->{X}};
 		foreach my $k (@dbsw_keys) {
 			if ($k eq 'SWCLLI') {
-				$rec->{$k}{$data->{$k}}++ if $data->{$k};
+				$rec->{$k}{$data->{$k}}++ if length($data->{$k});
 			} else {
-				if ($data->{$k}) {
+				if (length($data->{$k})) {
 					if ($rec->{$k} and $rec->{$k} ne $data->{$k}) {
 							print STDERR "E: $data->{NPA}-$data->{NXX}($data->{X}) DBRC $data->{NPA}-$data->{NXX}-$data->{X} $k changing from '$rec->{$k}' to '$data->{$k}'\n";
 					}
@@ -382,13 +512,13 @@ while (<$fh>) { chomp;
 		my $rec = $sws{$cc}{$st}{$sw};
 		foreach my $k (@sw_keys) {
 			if ($k =~ /^(NPA|LATA|OCN|SECT|NAME)$/) {
-				$rec->{$k}{$data->{$k}}++ if $data->{$k};
+				$rec->{$k}{$data->{$k}}++ if length($data->{$k});
 			} elsif ($k eq 'FEAT') {
 				foreach my $f (split(/\s+/,$data->{$k})) {
 					$rec->{$k}{$f}++ if $f;
 				}
 			} elsif ($k =~ /^(WCVH|WCLL|RCVH|RCLL)$/) {
-				if ($data->{$k}) {
+				if (length($data->{$k})) {
 					my $K = substr($k,2,2);
 					foreach my $m (split(/;/,$data->{$k})) {
 						next if not $m or exists $rec->{$K}{$m};
@@ -412,9 +542,9 @@ while (<$fh>) { chomp;
 			} elsif ($k eq 'NXX') {
 				$rec->{$k}{"$data->{NPA}-$data->{NXX}"}++ if $data->{NPA} and $data->{NXX};
 			} elsif ($k eq 'X') {
-				$rec->{$k}{"$data->{NPA}-$data->{NXX}-$data->{X}"}++ if $data->{NPA} and $data->{NXX} and $data->{X};
+				$rec->{$k}{"$data->{NPA}-$data->{NXX}-$data->{X}"}++ if $data->{NPA} and $data->{NXX} and length($data->{X});
 			} else {
-				if ($data->{$k}) {
+				if (length($data->{$k})) {
 					if ($rec->{$k} and $rec->{$k} ne $data->{$k}) {
 						print STDERR "E: $data->{NPA}-$data->{NXX}($data->{X}) SW $sw $k  changing from '$rec->{$k}' to '$data->{$k}'\n";
 					}
@@ -428,9 +558,9 @@ while (<$fh>) { chomp;
 		my $rec = $wcs{$cc}{$st}{$wc};
 		foreach my $k (@wc_keys) {
 			if ($k =~ /^(NPA|LATA|OCN|SECT|SWCLLI)$/) {
-				$rec->{$k}{$data->{$k}}++ if $data->{$k};
+				$rec->{$k}{$data->{$k}}++ if length($data->{$k});
 			} elsif ($k =~ /^(WCVH|WCLL|RCVH|RCLL)$/) {
-				if ($data->{$k}) {
+				if (length($data->{$k})) {
 					my $K = substr($k,2,2);
 					foreach my $m (split(/;/,$data->{$k})) {
 						next if not $m or exists $rec->{$K}{$m};
@@ -454,9 +584,9 @@ while (<$fh>) { chomp;
 			} elsif ($k eq 'NXX') {
 				$rec->{$k}{"$data->{NPA}-$data->{NXX}"}++ if $data->{NPA} and $data->{NXX};
 			} elsif ($k eq 'X') {
-				$rec->{$k}{"$data->{NPA}-$data->{NXX}-$data->{X}"}++ if $data->{NPA} and $data->{NXX} and $data->{X};
+				$rec->{$k}{"$data->{NPA}-$data->{NXX}-$data->{X}"}++ if $data->{NPA} and $data->{NXX} and length($data->{X});
 			} else {
-				if ($data->{$k}) {
+				if (length($data->{$k})) {
 					if ($rec->{$k} and $rec->{$k} ne $data->{$k}) {
 						print STDERR "E: $data->{NPA}-$data->{NXX}($data->{X}) WC $wc $k  changing from '$rec->{$k}' to '$data->{$k}'\n";
 					}
@@ -470,13 +600,13 @@ while (<$fh>) { chomp;
 		my $rec = $pls{$cc}{$st}{$pl};
 		foreach my $k (@pl_keys) {
 			if ($k =~ /^(NPA|LATA|OCN|SECT|WCCLLI)$/) {
-				$rec->{$k}{$data->{$k}}++ if $data->{$k};
+				$rec->{$k}{$data->{$k}}++ if length($data->{$k});
 			} elsif ($k eq 'NXX') {
 				$rec->{$k}{"$data->{NPA}-$data->{NXX}"}++ if $data->{NPA} and $data->{NXX};
 			} elsif ($k eq 'X') {
-				$rec->{$k}{"$data->{NPA}-$data->{NXX}-$data->{X}"}++ if $data->{NPA} and $data->{NXX} and $data->{X};
+				$rec->{$k}{"$data->{NPA}-$data->{NXX}-$data->{X}"}++ if $data->{NPA} and $data->{NXX} and length($data->{X});
 			} else {
-				if ($data->{$k}) {
+				if (length($data->{$k})) {
 					if ($rec->{$k} and $rec->{$k} ne $data->{$k}) {
 						print STDERR "E: $data->{NPA}-$data->{NXX}($data->{X}) PL $pl $k  changing from '$rec->{$k}' to '$data->{$k}'\n";
 					}
@@ -639,6 +769,24 @@ foreach my $cc (sort keys %pls) {
 	}
 }
 close($of);
+
+if ($corrected > 0) {
+	my @cor_keys = qw/NPA NXX X FIELD OLD NEW COMMENT/;
+	$fn = "$datadir/db.cor.csv";
+	print STDERR "I: writing $fn\n";
+	open($of,">:utf8",$fn) or die "can't write $fn";
+	print $of '"',join('","',@cor_keys),'"',"\n";
+	foreach my $npa (sort keys %corrections) {
+		foreach my $nxx (sort keys %{$corrections{$npa}}) {
+			foreach my $x (sort keys %{$corrections{$npa}{$nxx}}) {
+				foreach my $rec (@{$corrections{$npa}{$nxx}{$x}}) {
+					print $of '"',join('","',$npa,$nxx,$x,@{$rec}),'"',"\n";
+				}
+			}
+		}
+	}
+	close($of);
+}
 
 exit;
 

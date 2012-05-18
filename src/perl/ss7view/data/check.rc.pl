@@ -31,7 +31,7 @@ my @dirs = (
 my %fields = ();
 
 foreach my $dir (@dirs) {
-	$fn = "$codedir/$dir/db.rc.csv";
+	$fn = "$codedir/$dir/db.rc.nogeo.csv";
 	print STDERR "I: reading $fn\n";
 	open($fh,"<",$fn) or die "can't read $fn";
 	my $heading = 1;

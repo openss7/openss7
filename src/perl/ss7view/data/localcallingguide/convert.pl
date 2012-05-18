@@ -11,6 +11,7 @@ my $codedir = "$progdir/..";
 use strict;
 use Data::Dumper;
 use Encode qw(encode decode);
+use File::stat;
 
 my $fh = \*INFILE;
 my $of = \*OUTFILE;
@@ -52,6 +53,7 @@ my @rc_keys = (
 	'RC-LAT',
 	'RC-LON',
 	'UDATE',
+	'FDATE',
 );
 
 my %rcs = ();
@@ -68,6 +70,7 @@ sub do_rc {
 	foreach $fn (@files) { chomp $fn;
 		print STDERR "I: processing $fn...\n";
 		open($fh,"xzcat $fn |") or die "can't process $fn";
+		$data->{FDATE} = stat($fn)->mtime;
 		while (<$fh>) { chomp;
 			if (/^<\/rcdata>/) {
 				if ($data->{'RC-V'} and $data->{'RC-H'}) {
@@ -81,9 +84,18 @@ sub do_rc {
 						my $k = $rc_keys[$i];
 						if ($data->{$k}) {
 							if ($rec->{$k} and $rec->{$k} ne $data->{$k}) {
-								print STDERR "E: $exch $k changing from $rec->{$k} to $data->{$k}\n";
+								if ($data->{FDATE} > $rec->{FDATE}) {
+									$rec->{$k} = $data->{$k};
+									print STDERR "W: $exch $k changing from $rec->{$k} to $data->{$k}\n" unless $k eq 'FDATE';
+								} elsif ($data->{FDATE} < $rec->{FDATE}) {
+									print STDERR "W: $exch $k not changing from $rec->{$k} to $data->{$k}\n" unless $k eq 'FDATE';
+								} else {
+									print STDERR "E: $exch $k changing from $rec->{$k} to $data->{$k}\n" unless $k eq 'FDATE';
+									$rec->{$k} = $data->{$k};
+								}
+							} else {
+								$rec->{$k} = $data->{$k};
 							}
-							$rec->{$k} = $data->{$k};
 						}
 						push @values,$rec->{$k};
 					}
@@ -92,6 +104,7 @@ sub do_rc {
 				$inrecord = 0;
 			} elsif (/^<rcdata>/) {
 				$data = {};
+				$data->{FDATE} = stat($fn)->mtime;
 				$inrecord = 1;
 			} elsif ($inrecord and /^<([-a-z]+)>\s*([^<]*?)\s*</) {
 				$data->{"\U$1\E"} = $2 if $2;
@@ -120,6 +133,7 @@ sub do_wc {
 		'SEE-REGION',
 		'RC-V',
 		'RC-H',
+		'FDATE',
 	);
 	$fn = "$datadir/wc.csv";
 }
@@ -141,12 +155,16 @@ sub do_sw {
 		'HOST',
 		'REMOTES',
 		'UPDATED',
+		'FDATE',
 	);
+	my @swx_keys = qw/CLLI NPA NPA-NXX X LATA OCN SWITCHNAME SWITCHTYPE SWFUNC WCVH WCLL RCVH RCLL SPC SECT FEAT STP1 STP2 ACTUAL AGENT HOST/;
+	my @swo_keys = qw/SWCLLI NPA NXX X LATA OCN SWNAME SWTYPE SWFUNC WCVH WCLL RCVH RCLL SPC SECT FEAT STP1 STP2 ACTUAL AGENT HOST/;
 	my @wc_keys = (
 		'WC',
 		'NPA',
 		'NXX',
 		'LATA',
+		'FDATE',
 	);
 	my %fieldmap = (
 		'Switch'=>'CLLI',
@@ -183,6 +201,7 @@ sub do_sw {
 	foreach $fn (@files) { chomp $fn;
 		print STDERR "I: processing $fn...\n";
 		open($fh,"xzcat $fn |") or die "can't process $fn";
+		$data->{FDATE} = stat($fn)->mtime;
 		while (<$fh>) { chomp; s/\r//g;
 			if (/^<\/prefixdata>/) {
 				if (my $exch = $data->{EXCH}) {
@@ -250,6 +269,7 @@ sub do_sw {
 				$inrecord = 0;
 			} elsif (/^<prefixdata>/) {
 				$data = {};
+				$data->{FDATE} = stat($fn)->mtime;
 				$inrecord = 1;
 			} elsif ($inrecord and /^<([-a-z]+)>\s*([^<]*?)\s*</) {
 				$data->{"\U$1\E"} = $2 if length($2);
@@ -257,14 +277,40 @@ sub do_sw {
 		}
 		close($fh);
 	}
+	my %extras = ();
 	$fn = "$datadir/sw.csv";
 	print STDERR "I: writing $fn...\n";
 	open($of,">",$fn) or die "can't open $fn";
 	print $of '"',join('","',@keys),'"',"\n";
 	foreach my $k (sort keys %sws) {
 		my $rec = $sws{$k};
+		$extras{$k} = $rec unless length($rec->{NPA});
+		$extras{$k} = $rec if length($rec->{HOST}) or length($rec->{REMOTES});
 		my @values = ();
 		foreach (@keys) {
+			if (exists $rec->{$_} and ref $rec->{$_} eq 'HASH') {
+				push @values,join(',',sort keys %{$rec->{$_}});
+			} else {
+				push @values,$rec->{$_};
+			}
+		}
+		print $of '"',join('","',@values),'"',"\n";
+	}
+	close($of);
+	$fn = "$datadir/swx.csv";
+	print STDERR "I: writing $fn...\n";
+	open($of,">:utf8",$fn) or die "can't open $fn";
+	print $of '"',join('","',@swo_keys),'"',"\n";
+	foreach my $k (sort keys %extras) {
+		my $rec = $extras{$k};
+		delete $rec->{NPA};
+		delete $rec->{NXX};
+		delete $rec->{'NPA-NXX'};
+		delete $rec->{X};
+		delete $rec->{LATA};
+		delete $rec->{OCN};
+		my @values = ();
+		foreach (@swx_keys) {
 			if (exists $rec->{$_} and ref $rec->{$_} eq 'HASH') {
 				push @values,join(',',sort keys %{$rec->{$_}});
 			} else {
@@ -340,6 +386,7 @@ sub do_ocn {
 		'OCN',
 		'COMPANY-NAME',
 		'COMPANY-TYPE',
+		'FDATE',
 	);
 	my @files = `find results -name '*.A.xml.xz' | sort`;
 	my $data = {};
@@ -347,6 +394,7 @@ sub do_ocn {
 	foreach $fn (@files) { chomp $fn;
 		print STDERR "I: processing $fn...\n";
 		open($fh,"xzcat $fn |") or die "can't process $fn";
+		$data->{FDATE} = stat($fn)->mtime;
 		while (<$fh>) { chomp; s/\r//g;
 			if (/^<\/prefixdata>/) {
 				if (my $ocn = $data->{OCN}) {
@@ -357,10 +405,18 @@ sub do_ocn {
 						my $k = $keys[$i];
 						if ($data->{$k}) {
 							if ($rec->{$k} and $rec->{$k} ne $data->{$k}) {
-								printf STDERR "E: OCN %-4.4s %-10.10s changing from %-24.24s to %-24.24s\n",
-								$ocn, $k, $rec->{$k}, $data->{$k};
+								if ($data->{FDATE} > $rec->{FDATE}) {
+									printf STDERR "W: OCN %-4.4s %-10.10s changing from %-24.24s to %-24.24s\n", $ocn, $k, $rec->{$k}, $data->{$k} unless $k eq 'FDATE';
+									$rec->{$k} = $data->{$k};
+								} elsif ($data->{FDATE} < $rec->{FDATE}) {
+									printf STDERR "W: OCN %-4.4s %-10.10s not changing from %-24.24s to %-24.24s\n", $ocn, $k, $rec->{$k}, $data->{$k} unless $k eq 'FDATE';
+								} else {
+									printf STDERR "E: OCN %-4.4s %-10.10s changing from %-24.24s to %-24.24s\n", $ocn, $k, $rec->{$k}, $data->{$k} unless $k eq 'FDATE';
+									$rec->{$k} = $data->{$k};
+								}
+							} else {
+								$rec->{$k} = $data->{$k};
 							}
-							$rec->{$k} = $data->{$k};
 						}
 					}
 				}
@@ -374,6 +430,7 @@ sub do_ocn {
 				$inrecord = 0;
 			} elsif (/^<prefixdata>/) {
 				$data = {};
+				$data->{FDATE} = stat($fn)->mtime;
 				$inrecord = 1;
 			} elsif ($inrecord and /^<([-a-z]+)>\s*([^<]*?)\s*</) {
 				$data->{"\U$1\E"} = $2 if length($2);
@@ -401,6 +458,8 @@ sub do_nxx {
 		'NPA',
 		'NXX',
 		'X',
+		'XXXX',
+		'YYYY',
 		'EXCH',
 		'RC',
 		'RCSHORT',
@@ -424,6 +483,7 @@ sub do_nxx {
 		'EFFDATE',
 		'DISCDATE',
 		'UDATE',
+		'FDATE',
 	);
 	my @dbrc_keys = (
 		'NPA',
@@ -433,6 +493,7 @@ sub do_nxx {
 		'RCCC',
 		'RCST',
 		'RCNAME',
+		'FDATE',
 	);
 	$fn = "$datadir/db.csv";
 	print STDERR "I: writing $fn...\n";
@@ -444,6 +505,7 @@ sub do_nxx {
 	foreach $fn (@files) { chomp $fn;
 		print STDERR "I: processing $fn...\n";
 		open($fh,"xzcat $fn |") or die "can't process $fn";
+		$data->{FDATE} = stat($fn)->mtime;
 		while (<$fh>) { chomp; s/\r//g;
 			if (/^<\/prefixdata>/) {
 				if (my $exch = $data->{EXCH}) {
@@ -487,6 +549,7 @@ sub do_nxx {
 				$inrecord = 0;
 			} elsif (/^<prefixdata>/) {
 				$data = {};
+				$data->{FDATE} = stat($fn)->mtime;
 				$inrecord = 1;
 			} elsif ($inrecord and /^<([-a-z]+)>\s*([^<]*?)\s*</) {
 				$data->{"\U$1\E"} = $2 if length($2);

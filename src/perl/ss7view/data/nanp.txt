@@ -92,6 +92,7 @@
 361	US	Texas
 364	US	Kentucky
 365	CA	Ontario
+380	US	Ohio
 385	US	Utah
 386	US	Florida
 401	US	Rhode Island
@@ -129,6 +130,7 @@
 443	US	Maryland
 447	US	Illinois
 450	CA	Quebec
+456	ZZ	Reserved
 458	US	Oregon
 464	US	Illinois
 469	US	Texas
@@ -160,27 +162,51 @@
 518	US	New York
 519	CA	Ontario
 520	US	Arizona
+521	ZZ	Reserved
+522	ZZ	Reserved
+523	ZZ	Reserved
+524	ZZ	Reserved
+525	ZZ	Reserved
+526	ZZ	Reserved
+527	ZZ	Reserved
+528	ZZ	Reserved
+529	ZZ	Reserved
 530	US	California
 531	US	Nebraska
+532	ZZ	Reserved
 533	ZZ	Personal Communications Services	nongeo
 534	US	Wisconsin
+538	ZZ	Reserved
 539	US	Oklahoma
 540	US	Virginia
 541	US	Oregon
+542	ZZ	Reserved
+543	ZZ	Reserved
 544	ZZ	Personal Communications Services	nongeo
+545	ZZ	Reserved
+547	ZZ	Reserved
+549	ZZ	Reserved
 551	US	New Jersey
+552	ZZ	Reserved
+553	ZZ	Reserved
+554	ZZ	Reserved
+556	ZZ	Reserved
 557	US	Missouri
 559	US	California
 561	US	Florida
 562	US	California
 563	US	Iowa
 564	US	Washington
+566	ZZ	Reserved
 567	US	Ohio
+569	ZZ	Reserved
 570	US	Pennsylvania
 571	US	Virginia
 573	US	Missouri
 574	US	Indiana
 575	US	New Mexico
+577	ZZ	Reserved
+578	ZZ	Reserved
 579	CA	Quebec
 580	US	Oklahoma
 581	CA	Quebec
@@ -188,6 +214,8 @@
 585	US	New York
 586	US	Michigan
 587	CA	Alberta
+588	ZZ	Reserved
+589	ZZ	Reserved
 600	CA	Special telecommunications needs in Canada	nongeo
 601	US	Mississippi
 602	US	Arizona
@@ -214,6 +242,7 @@
 630	US	Illinois
 631	US	New York
 636	US	Missouri
+639	CA	Saskatchewan
 641	US	Iowa
 646	US	New York
 647	CA	Ontario
@@ -221,17 +250,23 @@
 650	US	California
 651	US	Minnesota
 657	US	California
+658	JM	Jamaica
+659	US	Alabama
 660	US	Missouri
 661	US	California
 662	US	Mississippi
 664	MS	Montserrat
 667	US	Maryland
+669	US	California
 670	MP	Northern Mariana Islands
 671	GU	Guam
 678	US	Georgia
+679	US	Michigan
 681	US	West Virginia
 682	US	Texas
 684	AS	American Samoa
+689	US	Florida
+700	ZZ	Reserved
 701	US	North Dakota
 702	US	Nevada
 703	US	Virginia
@@ -259,6 +294,7 @@
 731	US	Tennessee
 732	US	New Jersey
 734	US	Michigan
+737	US	Texas
 740	US	Ohio
 747	US	California
 754	US	Florida
@@ -377,6 +413,7 @@
 971	US	Oregon
 972	US	Texas
 973	US	New Jersey
+975	US	Missouri
 978	US	Massachusetts
 979	US	Texas
 980	US	North Carolina

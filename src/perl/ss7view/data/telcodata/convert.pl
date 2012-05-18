@@ -11,6 +11,7 @@ my $rsltdir = "$datadir/results";
 use strict;
 use Data::Dumper;
 use Encode qw(encode decode);
+use File::stat;
 
 my $fh = \*INFILE;
 my $of = \*OUTFILE;
@@ -32,12 +33,15 @@ my $names = [
 	'Switch Type',
 	'LATA',
 	'Tandem',
+	'FDATE',
 ];
 
 my @keys = (
 	'NPA',
 	'NXX',
 	'X',
+	'XXXX',
+	'YYYY',
 	'State',
 	'Company',
 	'OCN',
@@ -49,6 +53,7 @@ my @keys = (
 	'Switch Type',
 	'LATA',
 	'Tandem',
+	'FDATE',
 );
 
 my %mapping = (
@@ -141,6 +146,7 @@ foreach $fn (@files) { chomp $fn;
 		/<tr class="results">(.*?)<\/tr>/;
 		$_ = $1;
 		my $data = {};
+		$data->{FDATE} = stat($fn)->mtime;
 		my $fno = 0;
 		while (/<td.*?>(.*?)<\/td>/g) {
 			my $fld = $1; $fno++;

@@ -13,6 +13,7 @@ use strict;
 use Data::Dumper;
 use Encode qw(encode decode);
 use Geo::Coordinates::VandH;
+use File::stat;
 
 my $fh = \*INFILE;
 my $of = \*OUTFILE;
@@ -22,6 +23,8 @@ my @keys = (
 	'NPA',
 	'NXX',
 	'X',
+	'XXXX',
+	'YYYY',
 	'OCN',
 	'Company',
 	'Status',
@@ -32,6 +35,7 @@ my @keys = (
 	'Use',
 	'AssignDate',
 	'Initial/Growth',
+	'FDATE',
 );
 
 my %nsxst = (
@@ -894,6 +898,7 @@ while (<$fh>) { chomp; s/\r//g;
 		next;
 	}
 	my $data = {};
+	$data->{FDATE} = stat($fn)->mtime;
 	for (my $i=0;$i<@fields;$i++) {
 		if (exists $mapping{$fields[$i]}) {
 			&{$mapping{$fields[$i]}}($data,$tokens[$i],$fields[$i]);
@@ -943,6 +948,7 @@ while (<$fh>) { chomp;
 		$tokens[$i] =~ s/"?\s*$//;
 	}
 	my $data = {};
+	$data->{FDATE} = stat($fn)->mtime;
 	$data->{State} = $tokens[0];
 	($data->{NPA},$data->{NXX}) = split(/-/,$tokens[1]);
 	$data->{OCN} = $tokens[2];
