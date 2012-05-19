@@ -240,7 +240,7 @@ sub modifyit {
 }
 
 sub updateit {
-	my ($dat,$tab,$binds) = @_;
+	my ($data,$tab,$binds) = @_;
 	unless ($sth{$tab}{select}->execute(@$binds)) {
 		warn $sth{$tab}{select}->errstr;
 		return;
