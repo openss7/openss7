@@ -38,7 +38,7 @@ sub dodata {
 					$dat->{x} = $4 if length($4);
 				}
 			},
-			'NPA NXX Record'=>\&simplefield,
+			'NPA NXX Record'=>\&makedb::simplefield,
 			'Line From'=>sub{
 				my ($dat,$fld,$val) = @_;
 				#$dat->{$fld} = $val if length($val);
@@ -77,9 +77,9 @@ sub dodata {
 					delete $dat->{yyyy};
 				}
 			},
-			'Wireless Block'=>\&booleanfield,
-			'NXX Type'=>\&simplefield,
-			'Portable Block'=>\&booleanfield,
+			'Wireless Block'=>\&makedb::booleanfield,
+			'NXX Type'=>\&makedb::simplefield,
+			'Portable Block'=>\&makedb::booleanfield,
 			'1,000 Block Pooling'=>sub{
 				my ($dat,$fld,$val) = @_;
 				makedb::booleanfield($dat,'tbpooling',$val);
@@ -110,9 +110,9 @@ sub dodata {
 			},
 		},
 		'Carrier'=>{
-			'Common Name'=>\&simplefield,
-			'OCN'=>\&simplefield,
-			'OCN Type'=>\&simplefield,
+			'Common Name'=>\&makedb::simplefield,
+			'OCN'=>\&makedb::simplefield,
+			'OCN Type'=>\&makedb::simplefield,
 			'Name'=>sub{
 				my ($dat,$fld,$val) = @_;
 				makedb::simplefield($dat,'carrier',$val);
@@ -121,16 +121,16 @@ sub dodata {
 				my ($dat,$fld,$val) = @_;
 				makedb::simplefield($dat,'abbv',$val);
 			},
-			'DBA'=>\&simplefield,
-			'FKA'=>\&simplefield,
+			'DBA'=>\&makedb::simplefield,
+			'FKA'=>\&makedb::simplefield,
 			'Address'=>sub{
 				my ($dat,$fld,$val) = @_;
 				makedb::simplefield($dat,'addr',$val);
 			},
-			'City'=>\&simplefield,
-			'State'=>\&simplefield,
-			'Zip'=>\&simplefield,
-			'Country'=>\&simplefield,
+			'City'=>\&makedb::simplefield,
+			'State'=>\&makedb::simplefield,
+			'Zip'=>\&makedb::simplefield,
+			'Country'=>\&makedb::simplefield,
 		},
 		'Wire Center'=>{
 			'LATA'=>sub{
@@ -236,7 +236,7 @@ sub dodata {
 				my ($dat,$fld,$val) = @_;
 				makedb::simplefield($dat,'wc',$val);
 			},
-			'Switch'=>\&simplefield,
+			'Switch'=>\&makedb::simplefield,
 			'SS7 STP 2'=>sub{
 				my ($dat,$fld,$val) = @_;
 				makedb::simplefield($dat,'stp2',$val);
@@ -253,14 +253,14 @@ sub dodata {
 				my ($dat,$fld,$val) = @_;
 				makedb::simplefield($dat,'agent',$val);
 			},
-			'Host'=>\&simplefield,
+			'Host'=>\&makedb::simplefield,
 			'Wire Center Name'=>sub{
 				my ($dat,$fld,$val) = @_;
 				makedb::simplefield($dat,'wcname',$val);
 			},
 		},
 		'LATA'=>{
-			'LATA'=>\&simplefield,
+			'LATA'=>\&makedb::simplefield,
 			'Name'=>sub{
 				my ($dat,$fld,$val) = @_;
 				makedb::simplefield($dat,'ltname',$val);
@@ -300,8 +300,8 @@ sub dodata {
 				my ($dat,$fld,$val) = @_;
 				makedb::simplefield($dat,'rcshort',$val);
 			},
-			'Zone'=>\&simplefield,
-			'Zone Type'=>\&simplefield,
+			'Zone'=>\&makedb::simplefield,
+			'Zone Type'=>\&makedb::simplefield,
 			'Number Pooling'=>sub{
 				my ($dat,$fld,$val) = @_;
 				makedb::simplefield($dat,'nbpooling',$val);
@@ -310,7 +310,7 @@ sub dodata {
 				my ($dat,$fld,$val) = @_;
 				makedb::simplefield($dat,'pointid',$val);
 			}, # Canada only
-			'Rate Step'=>\&simplefield,
+			'Rate Step'=>\&makedb::simplefield,
 			'Area Codes in Rate Center'=>sub{
 				my ($dat,$fld,$val) = @_;
 				makedb::simplefield($dat,'rcnpa',$val);
@@ -369,10 +369,10 @@ sub dodata {
 				my ($dat,$fld,$val) = @_;
 				makedb::simplefield($dat,'fedfeatid',$val);
 			},
-			'FIPS County Code'=>\&simplefield,
-			'FIPS Place Code'=>\&simplefield,
-			'Land Area'=>\&simplefield,
-			'Water Area'=>\&simplefield,
+			'FIPS County Code'=>\&makedb::simplefield,
+			'FIPS Place Code'=>\&makedb::simplefield,
+			'Land Area'=>\&makedb::simplefield,
+			'Water Area'=>\&makedb::simplefield,
 			'Latitude/Longitude'=>sub{
 				my ($dat,$fld,$val) = @_;
 				if (length($val)) {
@@ -394,8 +394,8 @@ sub dodata {
 				makedb::simplefield($dat,'rucc',$val);
 			},
 			'Core Based Statistical Area'=>{
-				'CBSA'=>\&simplefield,
-				'CBSA Level'=>\&simplefield,
+				'CBSA'=>\&makedb::simplefield,
+				'CBSA Level'=>\&makedb::simplefield,
 				'County Relation to CBSA'=>sub{
 					my ($dat,$fld,$val) = @_;
 					makedb::simplefield($dat,'cbsarel',$val);
