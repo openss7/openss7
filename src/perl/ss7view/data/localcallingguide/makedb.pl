@@ -1038,7 +1038,7 @@ sub dolcadata {
 
 sub dodata {
 	dorcdata;
-	dolcadata;
+	#dolcadata;
 	doswitchdata;
 	doprefixdata;
 }
