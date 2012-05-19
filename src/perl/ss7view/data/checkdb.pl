@@ -81,6 +81,7 @@ if (exists $tables{switchdata}) {
 			next if $row->{$cf} eq 'ASGNPCSOCNX';
 			next if $row->{$cf} =~ /^ASGNPCS[0-9]{3}[0-9A-Z]$/;
 			next if $row->{$cf} eq 'RTGETSAGENT';
+			next if $row->{$cf} eq 'N/A';
 			if (length($row->{$cf}) != 11) {
 				my %rec = %$row;
 				if (exists $tables{linedata}) {
