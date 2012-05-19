@@ -512,7 +512,7 @@ sub cmpfields {
 	my ($k,$dat,$rec) = @_;
 	if ($k eq 'wcaddr') {
 		return (addrnorm($dat) ne addrnorm($rec));
-	} elsif ($k =~ /^(wccity|wccounty)$/) {
+	} elsif ($k =~ /^(wccity|wccounty|switchname)$/) {
 		return ("\U$dat\E" ne "\U$rec\E");
 	} elsif ($k =~ /^(wcv|wch|wclat|wclon|rcv|rch|rclat|rclon)$/) {
 		return $dat != $rec;
@@ -680,7 +680,8 @@ my %swfuncmap = (
 	IAL=>'IAL', IAT=>'IAL', EAT=>'EAT', IXC=>'IXC', FGB=>'FGB', FGC=>'FGC', FGD=>'FGD',
 	LCL=>'LCL', OPS=>'OPS', '911'=>'911', E911=>'E911', CLS45SW=>'CLS45SW', STP=>'STP',
 	MATE=>'MATE', ACTUAL=>'ACTUAL', AGENT=>'AGENT', HOST=>'HOST', REMOTE=>'REMOTE',
-	'SMART-REMOTE'=>'REMOTE', STANDALONE=>'', TANDEM=>'EAT',
+	'SMART-REMOTE'=>'REMOTE', STANDALONE=>'', TANDEM=>'EAT', 'LIDB'=>'LIDB', 'SCP'=>'SCP',
+	'TGW'=>'TGW',
 );
 
 my @swcllis = qw/cls45sw e911sw stp1 stp2 actual agent host mate tdm tdmilt tdmfgc tdmfgd tdmlcl tdmfgb tdmops tdm911 tdmchk tdmblv/;
@@ -840,6 +841,115 @@ sub updatedata {
 	}
 }
 
+sub dodatacsv {
+	$dbh->begin_work;
+	$fn = "$progdir/data.csv";
+	print STDERR "I: processing $fn\n";
+	open($fh,"<:utf8",$fn) or die "can't process $fn";
+	my $fdate = stat($fn)->mtime;
+	my $header = 1;
+	my @fields = ();
+	my $lineno = 0;
+	while (<$fh>) { chomp; $lineno++;
+		if (/^Sheet[ =]+(.*?)$/) {
+			print STDERR "I: processing sheet $1\n";
+			next;
+		}
+		if (/^---/) {
+			$header = 1;
+			@fields = ();
+			next;
+		}
+		s/^"//; s/"$//; my @tokens = split(/","/,$_);
+		if ($header) {
+			@fields = @tokens;
+			$header = undef;
+			next;
+		}
+		if (scalar @tokens != scalar @fields) {
+			print STDERR "E: bad line $lineno: ",scalar(@tokens)," tokens instead of ",scalar(@fields),"\n";
+			next;
+		}
+		my $sect = "XLS-$lineno";
+		my %data = (sect=>$sect,fdate=>$fdate);
+		for (my $i=0;$i<@fields;$i++) {
+			$tokens[$i] =~ s/^\s+//;
+			$tokens[$i] =~ s/\s+$//;
+			$tokens[$i] = '' if $tokens[$i] eq '-';
+			$data{"\L$fields[$i]\E"} = $tokens[$i] if length($tokens[$i]);
+		}
+		delete $data{tdmlcl} if $data{tdmlcl} eq 'No Local Tandem';
+		delete $data{tdm911} if $data{tdm911} eq 'NO E-911';
+		$data{switch}	    = delete $data{swclli} if $data{swclli};
+		$data{switchname}   = delete $data{swname} if $data{swname};
+		$data{switchtype}   = delete $data{swtype} if $data{swtype};
+		$data{wc}	    = delete $data{wcclli} if $data{wcclli};
+		$data{wc}	    = substr($data{switch},0,8) unless $data{wc};
+		$data{swocn}	    = delete $data{ocn} if $data{ocn};
+		$data{swoocn}	    = delete $data{oocn} if $data{oocn};
+		$data{swlata}	    = delete $data{lata} if $data{lata};
+		my $f = 'switch';
+		unless (not $data{$f} or length($data{$f}) == 11) {
+			print STDERR "E: bad value at $lineno in field $f '$data{$f}'\n";
+			next;
+		}
+		my $f = 'wc';
+		unless (length($data{$f}) == 8) {
+			print STDERR "E: bad value at $lineno in field $f '$data{$f}'\n";
+			next;
+		}
+		for $f (@allcllis) {
+			if (length($data{$f})) {
+				$data{$f} =~ s/[-_]/ /g;
+				foreach my $pc (split(/,/,$data{$f})) {
+					if (length($pc) and length($pc) != 11) {
+						print STDERR "E: bad value at $lineno in field $f '$data{$f}'\n";
+						next;
+					}
+				}
+			}
+		}
+		$f = 'npa';
+		if (length($data{$f})) {
+			foreach my $npa (split(/,/,$data{$f})) {
+				if (length($npa) and $npa !~ /^[0-9]{3}$/) {
+					print STDERR "E: bad value at $lineno in field $f '$data{$f}'\n";
+					next;
+				}
+			}
+		}
+		for $f (qw/spc apc/) {
+			if (length($data{$f}) and $data{$f} !~ /^[0-9]{3}-[0-9]{3}-[0-9]{3}$/) {
+				print STDERR "E: bad value at $lineno in field $f '$data{$f}'\n";
+				next;
+			}
+		}
+		$f = 'swlata';
+		if (length($data{$f}) and $data{$f} !~ /^[0-9]{3}$/ and $data{$f} !~ /^[0-9]{5}$/) {
+			print STDERR "E: bad value at $lineno in field $f '$data{$f}'\n";
+			next;
+		}
+		$f = 'wczip';
+		if (length($data{$f}) and $data{$f} !~ /^[0-9]{5}$/) {
+			print STDERR "E: bad value at $lineno in field $f '$data{$f}'\n";
+			next;
+		}
+		$f = 'wcst';
+		if (length($data{$f}) and $data{$f} !~ /^[A-Z]{2}$/) {
+			print STDERR "E: bad value at $lineno in field $f '$data{$f}'\n";
+			next;
+		}
+		$f = 'wcvh';
+		if (length($data{$f}) and $data{$f} !~ /^0[0-9]{4},0[0-9]{4}$/) {
+			print STDERR "E: bad value at $lineno in field $f '$data{$f}'\n";
+			next;
+		}
+		updatedata(\%data,$fdate,$sect);
+	}
+	close($fh);
+	$dbh->commit;
+}
+
 sub doe911data {
 	$dbh->begin_work;
 	$fn = "$progdir/E911_ActGuide_March2007_X.pdf";
@@ -899,6 +1009,7 @@ sub dopchangedata {
 }
 
 sub dodata {
+	dodatacsv;
 	dopchangedata;
 	doe911data;
 }
