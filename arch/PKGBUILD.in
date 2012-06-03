@@ -6,7 +6,8 @@
 PACKAGER="${PACKAGER:-Brian Bidulock <bidulock@openss7.org>}"
 
 case "@kversion@" in
-	(3.0-ARCH)	kpkg='linux'	    ;;
+	(3.*-ARCH)	kpkg='linux'	    ;;
+	(3.*-lts)	kpkg='linux-lts'    ;;
 	(2.6.*-lts)	kpkg='kernel26-lts' ;;
 	(2.6.*)		kpkg='kernel26'	    ;;
 	(*) echo "*** Bad kernel version @kversion@" >&2
@@ -166,6 +167,14 @@ package_@PACKAGE@() {
 	( cd $pkgdir; find . | sort ) >@PACKAGE@.list
 	join -v 1 unused.list @PACKAGE@.list >unused.tmp
 	mv -f -- unused.tmp unused.list
+}
+
+package_@PACKAGE@-repo() {
+	pkgdesc='OpenSS7 Fast-STREAMS and Protocol Suites (Repository)'
+	groups=('@PACKAGE@')
+	backup=('etc/pacman.conf')
+	install=@PACKAGE@-repo.install
+	package
 }
 
 package_@PACKAGE@-devel() {

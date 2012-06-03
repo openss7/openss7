@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2012  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -65,7 +65,7 @@ static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
  */
 
 #ifdef NEED_LINUX_AUTOCONF_H
-#include <linux/autoconf.h>
+#include NEED_LINUX_AUTOCONF_H
 #endif
 #include <linux/version.h>
 #include <linux/module.h>
@@ -82,7 +82,7 @@ static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
 #include "sys/config.h"
 
 #define NIT_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
-#define NIT_COPYRIGHT	"Copyright (c) 2008-2011  Monavacon Limited.  All Rights Reserved."
+#define NIT_COPYRIGHT	"Copyright (c) 2008-2012  Monavacon Limited.  All Rights Reserved."
 #define NIT_REVISION	"LfS $RCSfile$ $Name$($Revision$) $Date$"
 #define NIT_DEVICE	"SVR 4.2 MP STREAMS NIT Driver"
 #define NIT_CONTACT	"Brian Bidulock <bidulock@openss7.org>"

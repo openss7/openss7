@@ -222,25 +222,45 @@ _post() {
     fi
 }
 
+# pre_install($newver) - Run right before files are extracted.  One argument is
+#   passed: new package full version string.
+#
 pre_install() {
     _pre $*
 }
 
+# post_install($newver) - Run right after files are extracted.  One argument is
+#   passed: new package full version string.
+#
 post_install() {
     _post $*
 }
 
+# pre_upgrade($newver,$oldver) - Run right before files are extracted.  Two
+#   arguments are passed in this order: new package ful version string, old
+#   package full version string.
+#
 pre_upgrade() {
     _pre $*
 }
 
+# post_upgrade($newver,$oldver) - Run after files are extracted.  Two arguments
+#   are passed in this order: new package full version string, old package full
+#   version string.
+#
 post_upgrade() {
     _post $*
 }
 
+# pre_remove($oldver) - Run right before files are removed.  One argument is
+#   passed: old package full version string.
+#
 pre_remove() {
 }
 
+# post_remove($oldver) - Run right after files are removed.  One argument is
+#   passed: old package full version string.
+#
 post_remove() {
 }
 

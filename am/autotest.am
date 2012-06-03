@@ -154,8 +154,10 @@ if PKG_BUILD_INDEP
 ## PKG_BUILD_INDEP
 
 ## Test suites are actually architecture independent!
-pkglibexec_DATA		= atlocal
+nodist_pkglibexec_SCRIPTS = atlocal
 dist_pkglibexec_SCRIPTS	= $(TESTSUITE)
+
+AM_INSTALLCHECK_STD_OPTIONS_EXEMPT += atlocal
 
 ## PKG_BUILD_INDEP
 endif

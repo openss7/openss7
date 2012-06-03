@@ -115,8 +115,10 @@ if PKG_BUILD_INDEP
 ## PKG_BUILD_INDEP
 
 ## Problem report script is architecture independent!
-pkglibexec_DATA		= $(AP_CONFIG)
+nodist_pkglibexec_SCRIPTS = $(AP_CONFIG)
 dist_pkglibexec_SCRIPTS	= $(AP_SCRIPT)
+
+AM_INSTALLCHECK_STD_OPTIONS_EXEMPT += $(AP_CONFIG)
 
 ## PKG_BUILD_INDEP
 endif

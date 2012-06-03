@@ -766,11 +766,11 @@ AC_DEFUN([_OPENSS7_OPTIONS_PKG_REPODIR], [dnl
     AC_ARG_WITH([pkg-repodir],
 	[AS_HELP_STRING([--with-pkg-repodir=DIR],
 	    [package repository directory @<:@default=DISTDIR@:>@])],
-	[], [with_pkg_repodir='$(DISTDIR)'])
+	[], [with_pkg_repodir='${DISTDIR}'])
     AC_MSG_CHECKING([for pkg repodir])
     if test ":${REPODIR+set}" != :set ; then
 	case :"${with_pkg_repodir:-no}" in
-	    (:no|:yes) REPODIR='$(DISTDIR)' ;;
+	    (:no|:yes) REPODIR='${DISTDIR}' ;;
 	    (*)        REPODIR="$with_pkg_repodir" ;;
 	esac
     fi
@@ -790,11 +790,11 @@ AC_DEFUN([_OPENSS7_OPTIONS_PKG_TARDIR], [dnl
     AC_ARG_WITH([pkg-tardir],
 	[AS_HELP_STRING([--with-pkg-tardir=DIR],
 	    [tarball directory @<:@default=PKG-DISTDIR/tarballs@:>@])],
-	[], [with_pkg_tardir='$(DISTDIR)/tarballs'])
+	[], [with_pkg_tardir='${DISTDIR}/tarballs'])
     AC_MSG_CHECKING([for pkg tardir])
     if test ":${tardir+set}" != :set ; then
 	case :"${with_pkg_tardir:-no}" in
-	    (:no|:yes)	tardir='$(DISTDIR)/tarballs'	;;
+	    (:no|:yes)	tardir='${DISTDIR}/tarballs'	;;
 	    (*)		tardir="$with_pkg_tardir"	;;
 	esac
     fi

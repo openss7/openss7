@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2012  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -62,7 +62,7 @@ static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
  */
 
 #ifdef NEED_LINUX_AUTOCONF_H
-#include <linux/autoconf.h>
+#include NEED_LINUX_AUTOCONF_H
 #endif
 #include <linux/version.h>
 #include <linux/module.h>
@@ -87,7 +87,7 @@ static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
 #include "sys/config.h"
 
 #define PFMOD_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
-#define PFMOD_COPYRIGHT		"Copyright (c) 2008-2011  Monavacon Limited.  All Rights Reserved."
+#define PFMOD_COPYRIGHT		"Copyright (c) 2008-2012  Monavacon Limited.  All Rights Reserved."
 #define PFMOD_REVISION		"Lfs $RCSfile$ $Name$($Revision$) $Date$"
 #define PFMOD_DEVICE		"SVR 4.2 Packet Filter Module (PFMOD) for STREAMS"
 #define PFMOD_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
@@ -1472,7 +1472,7 @@ pfmod_ioctl32_unregister(void)
 {
 	struct pfmod_trans *t;
 
-	for (t = pfmod_trans_map, t->cmd != 0; t++) {
+	for (t = pfmod_trans_map; t->cmd != 0; t++) {
 		unregister_ioctl32(t->opaque);
 		t->opaque = NULL;
 	}
@@ -1480,7 +1480,7 @@ pfmod_ioctl32_unregister(void)
 }
 
 STATIC __unlikely int
-pfmod_ioct32_register(void)
+pfmod_ioctl32_register(void)
 {
 	struct pfmod_trans *t;
 

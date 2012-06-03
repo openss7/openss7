@@ -400,7 +400,7 @@ reupload:
 			k=`basename $$k`; \
 			test -e $(DESTDIR)$(rootdir)/lib/modules/$$k/build || { $(ECHO) "D: $@: skipping $$k (no build directory)"; continue; }; \
 			test -e $(DESTDIR)$(rootdir)/boot/System.map-$$k || { $(ECHO) "D: $@: skipping $$k (no system mamp)"; continue; }; \
-			test -n '$(DESTDIR)' || $(DPKG) -S `(cd /lib/modules/$$k/build; /bin/pwd)` >/dev/null 2>&1 || { $(ECHO) "D: $@: skipping $$k (no build provides)"; continue; }; \
+			test -n '$(DESTDIR)$(rootdir)' || $(DPKG) -S `(cd /lib/modules/$$k/build; /bin/pwd)` >/dev/null 2>&1 || { $(ECHO) "D: $@: skipping $$k (no build provides)"; continue; }; \
 			ks=`echo $$k | sed 's,-,.,g;s,_,.,g'`; \
 			debs="`(find $(debdir) -name '$(PACKAGE_LCNAME)-$$k*_$(VERSION)-$(PACKAGE_DEBRELEASE)_*[ud.]deb' | LANG= sort -u | grep -v '_all\..*deb$$') 2>/dev/null`"; \
 			if test -z "$$debs" -o -n '$(FORCE)'; then \
@@ -525,7 +525,7 @@ update-k-deb:
 	test \( "$$a" != noarch -a "$$a" != all \) || exit 0; \
 	test -e $(DESTDIR)$(rootdir)/lib/modules/$(kversion)/build || { $(ECHO) "D: $@: skipping $(kversion) (no build directory)"; exit 0; }; \
 	test -e $(DESTDIR)$(rootdir)/boot/System.map-$(kversion) || { $(ECHO) "D: $@: skipping $(kversion) (no system map)"; exit 0; }; \
-	test -n '$(DESTDIR)' || $(DPKG) -S `(cd /lib/modules/$(kversion)/build; /bin/pwd)` >/dev/null 2>&1 || { $(ECHO) "D: $@: skipping $(kversion) (no build provides)"; exit 0; }; \
+	test -n '$(DESTDIR)$(rootdir)' || $(DPKG) -S `(cd /lib/modules/$(kversion)/build; /bin/pwd)` >/dev/null 2>&1 || { $(ECHO) "D: $@: skipping $(kversion) (no build provides)"; exit 0; }; \
 	rebuild=yes; \
 	ks=`echo '$(kversion)' | sed 's,-,.,g;s,_,.,g'`; \
 	repodir=`echo '$(debdir)' | sed 's,^$(DISTDIR),$(REPODIR),'` ; \
@@ -609,7 +609,7 @@ update-all-debs:
 			k=`basename $$k`; \
 			test -e $(DESTDIR)$(rootdir)/lib/modules/$$k/build || { $(ECHO) "D: $@: skipping $$k (no build directory)"; continue; }; \
 			test -e $(DESTDIR)$(rootdir)/boot/System.map-$$k || { $(ECHO) "D: $@: skipping $$k (no system map)"; continue; }; \
-			test -n '$(DESTDIR)' || $(DPKG) -S `(cd /lib/modules/$$k/build; /bin/pwd)` >/dev/null 2>&1 || { $(ECHO) "D: $@: skippping $$k (no build provides)"; continue; }; \
+			test -n '$(DESTDIR)$(rootdir)' || $(DPKG) -S `(cd /lib/modules/$$k/build; /bin/pwd)` >/dev/null 2>&1 || { $(ECHO) "D: $@: skippping $$k (no build provides)"; continue; }; \
 			$(ECHO) "D: $@: rebuild binary-$$k"; \
 			$(ECHO) "  $(MAKE) $(AM_MAKEFLAGS) $(ALL_EXPORT_OPTS) kversion=\"$$k\" ARCH=\"$$t\" all-update-k-deb"; \
 			$(MAKE) $(AM_MAKEFLAGS) $(ALL_EXPORT_OPTS) kversion="$$k" ARCH="$$t" all-update-k-deb || :; \

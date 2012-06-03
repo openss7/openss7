@@ -84,9 +84,9 @@ AC_DEFUN([_LINUX_DEVFS], [dnl
 	devfs_cv_modprobe=no
 	if test :"$linux_cv_k_ko_modules" = :yes
 	then
-	    eval "devfs_where=\"${DESTDIR}${sysconfdir}/modprobe.devfs\""
+	    eval "devfs_where=\"${sysconfdir}/modprobe.devfs\""
 	else
-	    eval "devfs_where=\"${DESTDIR}${sysconfdir}/modules.devfs\""
+	    eval "devfs_where=\"${sysconfdir}/modules.devfs\""
 	fi
 	if test -f "$devfs_where"
 	then
@@ -95,7 +95,7 @@ AC_DEFUN([_LINUX_DEVFS], [dnl
     ])
     AC_CACHE_CHECK([for devfs daemon config], [devfs_cv_daemon_config], [dnl
 	devfs_cv_daemon_config=no
-	eval "devfs_where=\"${DESTDIR}${sysconfdir}/devfsd.conf\""
+	eval "devfs_where=\"${sysconfdir}/devfsd.conf\""
 	if test -f "$devfs_where"
 	then
 	    devfs_cv_daemon_config="yes (${devfs_where})"
@@ -103,7 +103,7 @@ AC_DEFUN([_LINUX_DEVFS], [dnl
     ])
     AC_CACHE_CHECK([for devfs daemon], [devfs_cv_daemon], [dnl
 	devfs_cv_daemon=no
-	eval "devfs_where=\"${DESTDIR}${rootdir}/sbin/devfsd\""
+	eval "devfs_where=\"${rootdir}/sbin/devfsd\""
 	if test -x "$devfs_where"
 	then
 	    devfs_cv_daemon="yes (${devfs_where})"

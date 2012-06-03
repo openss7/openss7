@@ -76,30 +76,30 @@ install-updates:
 	@$(ECHO_V) "D: Making $@ in `pwd`"
 	@$(NORMAL_INSTALL)
 	@test -n '$(kupdatedir)' || exit 0
-	$(mkinstalldirs) $(DESTDIR)$(rootdir)$(kupdatedir)/preinst.d
-	( cd $(DESTDIR)$(rootdir)$(kupdatedir)/preinst.d ; $(LN_S) -fn /sbin/openss7-update .)
-	$(mkinstalldirs) $(DESTDIR)$(rootdir)$(kupdatedir)/postinst.d
-	( cd $(DESTDIR)$(rootdir)$(kupdatedir)/postinst.d ; $(LN_S) -fn /sbin/openss7-update .)
-	$(mkinstalldirs) $(DESTDIR)$(rootdir)$(kupdatedir)/prerm.d
-	( cd $(DESTDIR)$(rootdir)$(kupdatedir)/prerm.d ; $(LN_S) -fn /sbin/openss7-update .)
-	$(mkinstalldirs) $(DESTDIR)$(rootdir)$(kupdatedir)/postrm.d
-	( cd $(DESTDIR)$(rootdir)$(kupdatedir)/postrm.d ; $(LN_S) -fn /sbin/openss7-update .)
-	$(mkinstalldirs) $(DESTDIR)$(rootdir)$(kupdatedir)/header_postinst.d
-	( cd $(DESTDIR)$(rootdir)$(kupdatedir)/header_postinst.d ; $(LN_S) -fn /sbin/openss7-update .)
-	$(mkinstalldirs) $(DESTDIR)$(rootdir)$(kupdatedir)/src_postinst.d
-	( cd $(DESTDIR)$(rootdir)$(kupdatedir)/src_postinst.d   ; $(LN_S) -fn /sbin/openss7-update .)
+	$(mkinstalldirs) $(DESTDIR)$(kupdatedir)/preinst.d
+	( cd $(DESTDIR)$(kupdatedir)/preinst.d ; $(LN_S) -fn /sbin/openss7-update .)
+	$(mkinstalldirs) $(DESTDIR)$(kupdatedir)/postinst.d
+	( cd $(DESTDIR)$(kupdatedir)/postinst.d ; $(LN_S) -fn /sbin/openss7-update .)
+	$(mkinstalldirs) $(DESTDIR)$(kupdatedir)/prerm.d
+	( cd $(DESTDIR)$(kupdatedir)/prerm.d ; $(LN_S) -fn /sbin/openss7-update .)
+	$(mkinstalldirs) $(DESTDIR)$(kupdatedir)/postrm.d
+	( cd $(DESTDIR)$(kupdatedir)/postrm.d ; $(LN_S) -fn /sbin/openss7-update .)
+	$(mkinstalldirs) $(DESTDIR)$(kupdatedir)/header_postinst.d
+	( cd $(DESTDIR)$(kupdatedir)/header_postinst.d ; $(LN_S) -fn /sbin/openss7-update .)
+	$(mkinstalldirs) $(DESTDIR)$(kupdatedir)/src_postinst.d
+	( cd $(DESTDIR)$(kupdatedir)/src_postinst.d   ; $(LN_S) -fn /sbin/openss7-update .)
 
 INSTALL_EXEC_LOCAL	+= install-updates
 
 uninstall-updates:
 	@$(ECHO_V) "D: Making $@ in `pwd`"
 	@$(NORMAL_UNINSTALL)
-	rm -f -- "$(DESTDIR)$(rootdir)$(kupdatedir)/preinst.d/openss7-update"
-	rm -f -- "$(DESTDIR)$(rootdir)$(kupdatedir)/postinst.d/openss7-update"
-	rm -f -- "$(DESTDIR)$(rootdir)$(kupdatedir)/prerm.d/openss7-update"
-	rm -f -- "$(DESTDIR)$(rootdir)$(kupdatedir)/postrm.d/openss7-update"
-	rm -f -- "$(DESTDIR)$(rootdir)$(kupdatedir)/header_postinst.d/openss7-update"
-	rm -f -- "$(DESTDIR)$(rootdir)$(kupdatedir)/src_postinst.d/openss7-update"
+	rm -f -- "$(DESTDIR)$(kupdatedir)/preinst.d/openss7-update"
+	rm -f -- "$(DESTDIR)$(kupdatedir)/postinst.d/openss7-update"
+	rm -f -- "$(DESTDIR)$(kupdatedir)/prerm.d/openss7-update"
+	rm -f -- "$(DESTDIR)$(kupdatedir)/postrm.d/openss7-update"
+	rm -f -- "$(DESTDIR)$(kupdatedir)/header_postinst.d/openss7-update"
+	rm -f -- "$(DESTDIR)$(kupdatedir)/src_postinst.d/openss7-update"
 
 UNINSTALL_LOCAL		+= uninstall-updates
 
@@ -653,7 +653,7 @@ if WITH_KO_MODULES
 ##
 post-updates:
 	@$(ECHO_V) "D: Making $@ in `pwd`"
-	@test -n "$(UPDATES)" -a -x "$(UPDATES_SCRIPT)" -a -f "$(DESTDIR)$(kmoduledir)/modules.dep" -a -r "$(DESTDIR)$(rootdir)$(ksysmap)" -a -r "$(DESTDIR)$(rootdir)$(ksymvers)" || exit 0 ; \
+	@test -n "$(UPDATES)" -a -x "$(UPDATES_SCRIPT)" -a -f "$(DESTDIR)$(kmoduledir)/modules.dep" -a -r "$(DESTDIR)$(ksysmap)" -a -r "$(DESTDIR)$(ksymvers)" || exit 0 ; \
 	$(ECHO) "$(UPDATES) -v 2 $(UPDATES_OPTIONS) -c "$(DESTDIR)$(rootdir)" -b "$(DESTDIR)" -k "$(kversion)" --add-modules" ; \
 	$(UPDATES) -v 2 $(UPDATES_OPTIONS) -c "$(DESTDIR)$(rootdir)" -b "$(DESTDIR)" -k "$(kversion)" --add-modules
 
@@ -665,9 +665,9 @@ post-updates:
 ##
 post-depmod:
 	@$(ECHO_V) "D: Making $@ in `pwd`"
-	@test -n "$(DEPMOD)" -a -x "$(DEPMOD)" -a -f "$(DESTDIR)$(kmoduledir)/modules.dep" -a -f "$(DESTDIR)$(rootdir)$(ksysmap)" || exit 0 ; \
-	$(ECHO) "UNAME_MACHINE=$(target_cpu) $(DEPMOD) -Ae -b $(DESTDIR)$(rootdir)/ -F $(DESTDIR)$(rootdir)$(ksysmap) $(kversion)" ; \
-	UNAME_MACHINE=$(target_cpu) $(DEPMOD) -Ae -b $(DESTDIR)$(rootdir)/ -F $(DESTDIR)$(rootdir)$(ksysmap) $(kversion)
+	@test -n "$(DEPMOD)" -a -x "$(DEPMOD)" -a -f "$(DESTDIR)$(kmoduledir)/modules.dep" -a -f "$(DESTDIR)$(ksysmap)" || exit 0 ; \
+	$(ECHO) "UNAME_MACHINE=$(target_cpu) $(DEPMOD) -Ae -b $(DESTDIR)$(rootdir)/ -F $(DESTDIR)$(ksysmap) $(kversion)" ; \
+	UNAME_MACHINE=$(target_cpu) $(DEPMOD) -Ae -b $(DESTDIR)$(rootdir)/ -F $(DESTDIR)$(ksysmap) $(kversion)
 else
 ##
 # If we have a usable depmod command and the modules.dep file already exists in the modules
@@ -677,9 +677,9 @@ else
 ##
 post-depmod:
 	@$(ECHO_V) "D: Making $@ in `pwd`"
-	@test -n "$(DEPMOD)" -a -x "$(DEPMOD)" -a -f "$(DESTDIR)$(kmoduledir)/modules.dep" -a -f "$(DESTDIR)$(rootdir)$(ksysmap)" -a -f "$(DESTDIR)$(sysconfdir)/modules.conf" || exit 0 ; \
-	$(ECHO) "UNAME_MACHINE=$(target_cpu) $(DEPMOD) -Ae -b $(DESTDIR)$(rootdir)/ -C $(DESTDIR)$(sysconfdir)/modules.conf -F $(DESTDIR)$(rootdir)$(ksysmap) $(kversion)" ; \
-	UNAME_MACHINE=$(target_cpu) $(DEPMOD) -Ae -b $(DESTDIR)$(rootdir)/ -C $(DESTDIR)$(sysconfdir)/modules.conf -F $(DESTDIR)$(rootdir)$(ksysmap) $(kversion)
+	@test -n "$(DEPMOD)" -a -x "$(DEPMOD)" -a -f "$(DESTDIR)$(kmoduledir)/modules.dep" -a -f "$(DESTDIR)$(ksysmap)" -a -f "$(DESTDIR)$(sysconfdir)/modules.conf" || exit 0 ; \
+	$(ECHO) "UNAME_MACHINE=$(target_cpu) $(DEPMOD) -Ae -b $(DESTDIR)$(rootdir)/ -C $(DESTDIR)$(sysconfdir)/modules.conf -F $(DESTDIR)$(ksysmap) $(kversion)" ; \
+	UNAME_MACHINE=$(target_cpu) $(DEPMOD) -Ae -b $(DESTDIR)$(rootdir)/ -C $(DESTDIR)$(sysconfdir)/modules.conf -F $(DESTDIR)$(ksysmap) $(kversion)
 endif
 
 ##
@@ -824,7 +824,7 @@ if WITH_KO_MODULES
 ##
 postun-updates:
 	@$(ECHO_V) "D: Making $@ in `pwd`"
-	@test -n "$(UPDATES)" -a -x "$(UPDATES_SCRIPT)" -a -f "$(DESTDIR)$(kmoduledir)/modules.dep" -a -r "$(DESTDIR)$(rootdir)$(ksysmap)" -a -r "$(DESTDIR)$(rootdir)$(ksymvers)" || exit 0 ; \
+	@test -n "$(UPDATES)" -a -x "$(UPDATES_SCRIPT)" -a -f "$(DESTDIR)$(kmoduledir)/modules.dep" -a -r "$(DESTDIR)$(ksysmap)" -a -r "$(DESTDIR)$(ksymvers)" || exit 0 ; \
 	$(ECHO) "$(UPDATES) -v 2 $(UPDATES_OPTIONS) -c "$(DESTDIR)$(rootdir)" -b "$(DESTDIR)" -k $(kversion)" --remove-modules ; \
 	$(UPDATES) -v 2 $(UPDATES_OPTIONS) -c "$(DESTDIR)$(rootdir)" -b "$(DESTDIR)" -k $(kversion) --remove-modules
 
@@ -838,9 +838,9 @@ postun-updates:
 ##
 postun-depmod:
 	@$(ECHO_V) "D: Making $@ in `pwd`"
-	@test -n "$(DEPMOD)" -a -x "$(DEPMOD)" -a -f "$(DESTDIR)$(kmoduledir)/modules.dep" -a -f "$(DESTDIR)$(rootdir)$(ksysmap)" || exit 0 ; \
-	$(ECHO) "UNAME_MACHINE=$(target_cpu) $(DEPMOD) -ae -b $(DESTDIR)$(rootdir)/ -F $(DESTDIR)$(rootdir)$(ksysmap) $(kversion)" ; \
-	UNAME_MACHINE=$(target_cpu) $(DEPMOD) -ae -b $(DESTDIR)$(rootdir)/ -F $(DESTDIR)$(rootdir)$(ksysmap) $(kversion)
+	@test -n "$(DEPMOD)" -a -x "$(DEPMOD)" -a -f "$(DESTDIR)$(kmoduledir)/modules.dep" -a -f "$(DESTDIR)$(ksysmap)" || exit 0 ; \
+	$(ECHO) "UNAME_MACHINE=$(target_cpu) $(DEPMOD) -ae -b $(DESTDIR)$(rootdir)/ -F $(DESTDIR)$(ksysmap) $(kversion)" ; \
+	UNAME_MACHINE=$(target_cpu) $(DEPMOD) -ae -b $(DESTDIR)$(rootdir)/ -F $(DESTDIR)$(ksysmap) $(kversion)
 else
 ##
 # If we have a usable system map file and an executable depmod, we perform the depmod.
@@ -851,9 +851,9 @@ else
 ##
 postun-depmod:
 	@$(ECHO_V) "D: Making $@ in `pwd`"
-	@test -n "$(DEPMOD)" -a -x "$(DEPMOD)" -a -f "$(DESTDIR)$(kmoduledir)/modules.dep" -a -f "$(DESTDIR)$(rootdir)$(ksysmap)" -a -f "$(DESTDIR)$(sysconfdir)/modules.conf" || exit 0 ; \
-	$(ECHO) "UNAME_MACHINE=$(target_cpu) $(DEPMOD) -ae -b $(DESTDIR)$(rootdir)/ -C $(DESTDIR)$(sysconfdir)/modules.conf -F $(DESTDIR)$(rootdir)$(ksysmap) $(kversion)" ; \
-	UNAME_MACHINE=$(target_cpu) $(DEPMOD) -ae -b $(DESTDIR)$(rootdir)/ -C $(DESTDIR)$(sysconfdir)/modules.conf -F $(DESTDIR)$(rootdir)$(ksysmap) $(kversion)
+	@test -n "$(DEPMOD)" -a -x "$(DEPMOD)" -a -f "$(DESTDIR)$(kmoduledir)/modules.dep" -a -f "$(DESTDIR)$(ksysmap)" -a -f "$(DESTDIR)$(sysconfdir)/modules.conf" || exit 0 ; \
+	$(ECHO) "UNAME_MACHINE=$(target_cpu) $(DEPMOD) -ae -b $(DESTDIR)$(rootdir)/ -C $(DESTDIR)$(sysconfdir)/modules.conf -F $(DESTDIR)$(ksysmap) $(kversion)" ; \
+	UNAME_MACHINE=$(target_cpu) $(DEPMOD) -ae -b $(DESTDIR)$(rootdir)/ -C $(DESTDIR)$(sysconfdir)/modules.conf -F $(DESTDIR)$(ksysmap) $(kversion)
 endif
 
 postun-source:

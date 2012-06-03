@@ -162,26 +162,9 @@ AC_DEFUN([_REPO_SETUP_URL], [dnl
 # _REPO_SETUP_RPM
 # -----------------------------------------------------------------------------
 AC_DEFUN([_REPO_SETUP_RPM], [dnl
-    AC_CACHE_CHECK([for rpm gpg directory], [repo_cv_rpm_gpgdir], [dnl
-	eval "repo_search_path=\"
-	    ${DESTDIR}${sysconfdir}/pki/rpm-gpg
-	    ${DESTDIR}${rootdir}/etc/pki/rpm-gpg
-	    ${DESTDIR}/etc/pki/rpm-gpg\""
-	repo_search_path=`echo "$repo_search_path" | sed -e 's,\<NONE\>,'$ac_default_prefix',g;s,//,/,g' | awk '{if(!([$]0 in seen)){print[$]0;seen[[$ 0]]=1}}'`
-	AC_MSG_RESULT([searching])
-	for repo_dir in $repo_search_path ; do
-	    AC_MSG_CHECKING([for rpm gpg directory... $repo_dir])
-	    if test -d "$repo_dir" ; then
-		repo_cv_rpm_gpgdir="$repo_dir"
-		AC_MSG_RESULT([yes])
-		break
-	    else
-		AC_MSG_RESULT([no])
-	    fi
-	done
-	test -n "$repo_cv_rpm_gpgdir" || repo_cv_rpm_gpgdir=no
-	AC_MSG_CHECKING([for rpm gpg directory])
-    ])
+    _BLD_FIND_DIR([for rpm gpg directory], [repo_cv_rpm_gpgdir], [dnl
+	    ${sysconfdir}/pki/rpm-gpg
+	    ${rootdir}/etc/pki/rpm-gpg], [] [no])
 ])# _REPO_SETUP_RPM
 # =============================================================================
 
@@ -189,61 +172,16 @@ AC_DEFUN([_REPO_SETUP_RPM], [dnl
 # _REPO_SETUP_YUM
 # -----------------------------------------------------------------------------
 AC_DEFUN([_REPO_SETUP_YUM], [dnl
-    AC_CACHE_CHECK([for yum repo directory], [repo_cv_yum_repodir], [dnl
-	case "${with_install_source_yum:-search}" in
-	    (no) repo_cv_yum_repodir=no ;;
-	    (yes|search) ;;
-	    (*) if test -d "$with_install_source_yum" ; then
-		    repo_cv_yum_repodir="$with_install_source_yum"
-		fi ;;
-	esac
-	if test -z "$repo_cv_yum_repodir" ; then
-	    eval "repo_search_path=\"
-		${DESTDIR}${sysconfdir}/yum.repos.d
-		${DESTDIR}${sysconfdir}/yum/repos.d
-		${DESTDIR}${rootdir}/etc/yum.repos.d
-		${DESTDIR}${rootdir}/etc/yum/repos.d
-		${DESTDIR}/etc/yum.repos.d
-		${DESTDIR}/etc/yum/repos.d\""
-	    repo_search_path=`echo "$repo_search_path" | sed -e 's,\<NONE\>,'$ac_default_prefix',g;s,//,/,g' | awk '{if(!([$]0 in seen)){print[$]0;seen[[$ 0]]=1}}'`
-	    AC_MSG_RESULT([searching])
-	    for repo_dir in $repo_search_path ; do
-		AC_MSG_CHECKING([for yum repo directory... $repo_dir])
-		if test -d "$repo_dir" ; then
-		    repo_cv_yum_repodir="$repo_dir"
-		    AC_MSG_RESULT([yes])
-		    break
-		else
-		    AC_MSG_RESULT([no])
-		fi
-	    done
-	    test -n "$repo_cv_yum_repodir" || repo_cv_yum_repodir=no
-	    AC_MSG_CHECKING([for yum repo directory])
-	fi
-    ])
-    AC_CACHE_CHECK([for yum kmod config file], [repo_cv_yum_kmodconf], [dnl
-	eval "repo_search_path=\"
-		${DESTDIR}${sysconfdir}/yum/pluginconf.d/kmod.conf
-		${DESTDIR}${sysconfdir}/yum/pluginconf.d/fedorakmod.conf
-		${DESTDIR}${rootdir}/etc/yum/pluginconf.d/kmod.conf
-		${DESTDIR}${rootdir}/etc/yum/pluginconf.d/fedorakmod.conf
-		${DESTDIR}/etc/yum/pluginconf.d/kmod.conf
-		${DESTDIR}/etc/yum/pluginconf.d/fedorakmod.conf\""
-	repo_search_path=`echo "$repo_search_path" | sed -e 's,\<NONE\>,'$ac_default_prefix',g;s,//,/,g' | awk '{if(!([$]0 in seen)){print[$]0;seen[[$ 0]]=1}}'`
-	AC_MSG_RESULT([searching])
-	for repo_dir in $repo_search_path ; do
-	    AC_MSG_CHECKING([for yum kmod config file... $repo_dir])
-	    if test -f "$repo_dir" ; then
-		repo_cv_yum_kmodconf="$repo_dir"
-		AC_MSG_RESULT([yes])
-		break
-	    else
-		AC_MSG_RESULT([no])
-	    fi
-	done
-	test -n "$repo_cv_yum_kmodconf" || repo_cv_yum_kmodconf=no
-	AC_MSG_CHECKING([for yum kmod config file])
-    ])
+    _BLD_FIND_DIR([for yum repo directory], [repo_cv_yum_repodir], [
+	    ${sysconfdir}/yum.repos.d
+	    ${sysconfdir}/yum/repos.d
+	    ${rootdir}/etc/yum.repos.d
+	    ${rootdir}/etc/yum/repos.d], [], [no], [], [], [with_install_source_yum])
+    _BLD_FIND_FILE([for yum kmod config file], [repo_cv_yum_kmodconf], [
+	    ${sysconfdir}/yum/pluginconf.d/kmod.conf
+	    ${sysconfdir}/yum/pluginconf.d/fedorakmod.conf
+	    ${rootdir}/etc/yum/pluginconf.d/kmod.conf
+	    ${rootdir}/etc/yum/pluginconf.d/fedorakmod.conf], [no])
 ])# _REPO_SETUP_YUM
 # =============================================================================
 
@@ -251,113 +189,18 @@ AC_DEFUN([_REPO_SETUP_YUM], [dnl
 # _REPO_SETUP_ZYPP
 # -----------------------------------------------------------------------------
 AC_DEFUN([_REPO_SETUP_ZYPP], [dnl
-    AC_CACHE_CHECK([for zypp cred directory], [repo_cv_zypp_creddir], [dnl
-	case "${with_credentials_zypp:-search}" in
-	    (no) repo_cv_zypp_creddir=no ;;
-	    (yes|search) ;;
-	    (*) if test -d "$with_credentials_zypp" ; then
-		repo_cv_zypp_creddir="$with_credentials_zypp"
-		fi ;;
-	esac
-	if test -z "$repo_cv_zypp_creddir" ; then
-	    eval "repo_search_path=\"
-		${DESTDIR}${sysconfdir}/zypp/credentials.d
-		${DESTDIR}${rootdir}/etc/zypp/credentials.d
-		${DESTDIR}/etc/zypp/credentials.d\""
-	    repo_search_path=`echo "$repo_search_path" | sed -e 's,\<NONE\>,'$ac_default_prefix',g;s,//,/,g' | awk '{if(!([$]0 in seen)){print[$]0;seen[[$ 0]]=1}}'`
-	    AC_MSG_RESULT([searching])
-	    for repo_dir in $repo_search_path ; do
-		AC_MSG_CHECKING([for zypp cred directory... $repo_dir])
-		if test -d "$repo_dir" ; then
-		    repo_cv_zypp_creddir="$repo_dir"
-		    AC_MSG_RESULT([yes])
-		    break
-		else
-		    AC_MSG_RESULT([no])
-		fi
-	    done
-	    test -n "$repo_cv_zypp_creddir" || repo_cv_zypp_creddir=no
-	    AC_MSG_CHECKING([for zypp cred directory])
-	fi
-    ])
-    AC_CACHE_CHECK([for zypp serv directory], [repo_cv_zypp_servdir], [dnl
-	case "${with_services_zypp:-search}" in
-	    (no) repo_cv_zypp_servdir=no ;;
-	    (yes|search) ;;
-	    (*) if test -d "$with_services_zypp" ; then
-		repo_cv_zypp_servdir="$with_services_zypp"
-		fi ;;
-	esac
-	if test -z "$repo_cv_zypp_servdir" ; then
-	    eval "repo_search_path=\"
-		${DESTDIR}${sysconfdir}/zypp/services.d
-		${DESTDIR}${rootdir}/etc/zypp/services.d
-		${DESTDIR}/etc/zypp/services.d\""
-	    repo_search_path=`echo "$repo_search_path" | sed -e 's,\<NONE\>,'$ac_default_prefix',g;s,//,/,g' | awk '{if(!([$]0 in seen)){print[$]0;seen[[$ 0]]=1}}'`
-	    AC_MSG_RESULT([searching])
-	    for repo_dir in $repo_search_path ; do
-		AC_MSG_CHECKING([for zypp serv directory... $repo_dir])
-		if test -d "$repo_dir" ; then
-		    repo_cv_zypp_servdir="$repo_dir"
-		    AC_MSG_RESULT([yes])
-		    break
-		else
-		    AC_MSG_RESULT([no])
-		fi
-	    done
-	    test -n "$repo_cv_zypp_servdir" || repo_cv_zypp_servdir=no
-	    AC_MSG_CHECKING([for zypp serv directory])
-	fi
-    ])
-    AC_CACHE_CHECK([for zypp repo directory], [repo_cv_zypp_repodir], [dnl
-	case "${with_install_source_zypp:-search}" in
-	    (no) repo_cv_zypp_repodir=no ;;
-	    (yes|search) ;;
-	    (*) if test -d "$with_install_source_zypp" ; then
-		    repo_cv_zypp_repodir="$with_install_source_zypp"
-		fi ;;
-	esac
-	if test -z "$repo_cv_zypp_repodir" ; then
-	    eval "repo_search_path=\"
-		${DESTDIR}${sysconfdir}/zypp/repos.d
-		${DESTDIR}${rootdir}/etc/zypp/repos.d
-		${DESTDIR}/etc/zypp/repos.d\""
-	    repo_search_path=`echo "$repo_search_path" | sed -e 's,\<NONE\>,'$ac_default_prefix',g;s,//,/,g' | awk '{if(!([$]0 in seen)){print[$]0;seen[[$ 0]]=1}}'`
-	    AC_MSG_RESULT([searching])
-	    for repo_dir in $repo_search_path ; do
-		AC_MSG_CHECKING([for zypp repo directory... $repo_dir])
-		if test -d "$repo_dir" ; then
-		    repo_cv_zypp_repodir="$repo_dir"
-		    AC_MSG_RESULT([yes])
-		    break
-		else
-		    AC_MSG_RESULT([no])
-		fi
-	    done
-	    test -n "$repo_cv_zypp_repodir" || repo_cv_zypp_repodir=no
-	    AC_MSG_CHECKING([for zypp repo directory])
-	fi
-    ])
-    AC_CACHE_CHECK([for zypp config file], [repo_cv_zypp_config], [dnl
-	eval "repo_search_path=\"
-	    ${DESTDIR}${sysconfdir}/zypp/zypp.conf
-	    ${DESTDIR}${rootdir}/etc/zypp/zypp.conf
-	    ${DESTDIR}/etc/zypp/zypp.conf\""
-	repo_search_path=`echo "$repo_search_path" | sed -e 's,\<NONE\>,'$ac_default_prefix',g;s,//,/,g' | awk '{if(!([$]0 in seen)){print[$]0;seen[[$ 0]]=1}}'`
-	AC_MSG_RESULT([searching])
-	for repo_dir in $repo_search_path ; do
-	    AC_MSG_CHECKING([for zypp config file... $repo_dir])
-	    if test -f "$repo_dir" ; then
-		repo_cv_zypp_config="$repo_dir"
-		AC_MSG_RESULT([yes])
-		break
-	    else
-		AC_MSG_RESULT([no])
-	    fi
-	done
-	test -n "$repo_cv_zypp_config" || repo_cv_zypp_config=no
-	AC_MSG_CHECKING([for zypp config file])
-    ])
+    _BLD_FIND_DIR([for zypp cred directory], [repo_cv_zypp_creddir], [
+	    ${sysconfdir}/zypp/credentials.d
+	    ${rootdir}/etc/zypp/credentials.d], [], [no], [], [], [with_credentials_zypp])
+    _BLD_FIND_DIR([for zypp serv directory], [repo_cv_zypp_servdir], [
+	    ${sysconfdir}/zypp/services.d
+	    ${rootdir}/etc/zypp/services.d], [], [no], [], [], [with_services_zypp])
+    _BLD_FIND_DIR([for zypp repo directory], [repo_cv_zypp_repodir], [
+	    ${sysconfdir}/zypp/repos.d
+	    ${rootdir}/etc/zypp/repos.d], [], [no], [], [], [with_install_source_zypp])
+    _BLD_FIND_FILE([for zypp config file], [repo_cv_zypp_config], [
+	    ${sysconfdir}/zypp/zypp.conf
+	    ${rootdir}/etc/zypp/zypp.conf], [no])
 ])# _REPO_SETUP_ZYPP
 # =============================================================================
 
@@ -365,74 +208,15 @@ AC_DEFUN([_REPO_SETUP_ZYPP], [dnl
 # _REPO_SETUP_URPMI
 # -----------------------------------------------------------------------------
 AC_DEFUN([_REPO_SETUP_URPMI], [dnl
-    AC_CACHE_CHECK([for urpmi media directory], [repo_cv_urpmi_repodir], [dnl
-	case "${with_install_source_urpmi:-search}" in
-	    (no) repo_cv_urpmi_repodir=no ;;
-	    (yes|search) ;;
-	    (*) if test -d "$with_install_source_urpmi" ; then
-		    repo_cv_urpmi_repodir="$with_install_source_urpmi"
-		fi ;;
-	esac
-	if test -z "$repo_cv_urpmi_repodir" ; then
-	    eval "repo_search_path=\"
-		${DESTDIR}${sysconfdir}/urpmi/mediacfg.d
-		${DESTDIR}${rootdir}/etc/urpmi/mediacfg.d
-		${DESTDIR}/etc/urpmi/mediacfg.d\""
-	    repo_search_path=`echo "$repo_search_path" | sed -e 's,\<NONE\>,'$ac_default_prefix',g;s,//,/,g' | awk '{if(!([$]0 in seen)){print[$]0;seen[[$ 0]]=1}}'`
-	    AC_MSG_RESULT([searching])
-	    for repo_dir in $repo_search_path ; do
-		AC_MSG_CHECKING([for urpmi media directory... $repo_dir])
-		if test -d "$repo_dir" ; then
-		    repo_cv_urpmi_repodir="$repo_dir"
-		    AC_MSG_RESULT([yes])
-		    break
-		else
-		    AC_MSG_RESULT([no])
-		fi
-	    done
-	    test -n "$repo_cv_urpmi_repodir" || repo_cv_urpmi_repodir=no
-	    AC_MSG_CHECKING([for urpmi media directory])
-	fi
-    ])
-    AC_CACHE_CHECK([for urpmi config directory], [repo_cv_urpmi_confdir], [dnl
-	eval "repo_search_path=\"
-	    ${DESTDIR}${sysconfdir}/urpmi
-	    ${DESTDIR}${rootdir}/etc/urpmi
-	    ${DESTDIR}/etc/urpmi\""
-	repo_search_path=`echo "$repo_search_path" | sed -e 's,\<NONE\>,'$ac_default_prefix',g;s,//,/,g' | awk '{if(!([$]0 in seen)){print[$]0;seen[[$ 0]]=1}}'`
-	AC_MSG_RESULT([searching])
-	for repo_dir in $repo_search_path ; do
-	    AC_MSG_CHECKING([for urpmi config directory... $repo_dir])
-	    if test -d "$repo_dir" ; then
-		repo_cv_urpmi_confdir="$repo_dir"
-		AC_MSG_RESULT([yes])
-		break
-	    else
-		AC_MSG_RESULT([no])
-	    fi
-	done
-	test -n "$repo_cv_urpmi_confdir" || repo_cv_urpmi_confdir=no
-	AC_MSG_CHECKING([for urpmi config directory])
-    ])
-    AC_CACHE_CHECK([for urpmi config file], [repo_cv_uprmi_config], [dnl
-	eval "repo_search_path=\"
-	    ${DESTDIR}${sysconfdir}/urpmi/urpmi.cfg
-	    ${DESTDIR}${rootdir}/etc/urpmi/urpmi.cfg
-	    ${DESTDIR}/etc/urpmi/urpmi.cfg\""
-	repo_search_path=`echo "$repo_search_path" | sed -e 's,\<NONE\>,'$ac_default_prefix',g;s,//,/,g' | awk '{if(!([$]0 in seen)){print[$]0;seen[[$ 0]]=1}}'`
-	AC_MSG_RESULT([searching])
-	for repo_dir in $repo_search_path ; do
-	    AC_MSG_CHECKING([for urpmi config file... $repo_dir])
-	    if test -f "$repo_dir" ; then
-		repo_cv_urpmi_config="$repo_dir"
-		AC_MSG_RESULT([yes])
-		break
-	    else
-		AC_MSG_RESULT([no])
-	    fi
-	done
-	test -n "$repo_cv_urpmi_config" || repo_cv_urpmi_config=no
-	AC_MSG_CHECKING([for urpmi config file])
+    _BLD_FIND_DIR([for urpmi media directory], [repo_cv_urpmi_repodir], [
+	    ${sysconfdir}/urpmi/mediacfg.d
+	    ${rootdir}/etc/urpmi/mediacfg.d], [], [no], [], [], [with_install_source_uprmi])
+    _BLD_FIND_DIR([for urpmi config directory], [repo_cv_urpmi_confdir], [
+	    ${sysconfdir}/urpmi
+	    ${rootdir}/etc/urpmi], [], [no])
+    _BLD_FIND_FILE([for urpmi config file], [repo_cv_uprmi_config], [
+	    ${sysconfdir}/urpmi/urpmi.cfg
+	    ${rootdir}/etc/urpmi/urpmi.cfg], [no])
     ])
 ])# _REPO_SETUP_URPMI
 # =============================================================================
@@ -441,143 +225,32 @@ AC_DEFUN([_REPO_SETUP_URPMI], [dnl
 # _REPO_SETUP_APT
 # -----------------------------------------------------------------------------
 AC_DEFUN([_REPO_SETUP_APT], [dnl
-    AC_CACHE_CHECK([for apt directory], [repo_cv_apt_dir], [dnl
-	eval "repo_search_path=\"
-	    ${DESTDIR}${sysconfdir}/apt
-	    ${DESTDIR}${rootdir}/etc/apt
-	    ${DESTDIR}/etc/apt\""
-	repo_search_path=`echo "$repo_search_path" | sed -e 's,\<NONE\>,'$ac_default_prefix',g;s,//,/,g' | awk '{if(!([$]0 in seen)){print[$]0;seen[[$ 0]]=1}}'`
-	AC_MSG_RESULT([searching])
-	for repo_dir in $repo_search_path ; do
-	    AC_MSG_CHECKING([for apt directory... $repo_dir])
-	    if test -d "$repo_dir" ; then
-		repo_cv_apt_dir="$repo_dir"
-		AC_MSG_RESULT([yes])
-		break
-	    else
-		AC_MSG_RESULT([no])
-	    fi
-	done
-	test -n "$repo_cv_apt_dir" || repo_cv_apt_dir=no
-	AC_MSG_CHECKING([for apt directory])
-    ])
-    AC_CACHE_CHECK([for apt sources directory], [repo_cv_apt_repodir], [dnl
-	case "${with_install_source_apt:-search}" in
-	    (no) repo_cv_apt_repodir=no ;;
-	    (yes|search) ;;
-	    (*) if test -d "$with_install_source_apt" ; then
-		    repo_cv_apt_repodir="$with_install_source_apt"
-		fi ;;
-	esac
-	if test -z "$repo_cv_apt_repodir" ; then
-	    eval "repo_search_path=\"
-		${DESTDIR}${sysconfdir}/apt/sources.list.d
-		${DESTDIR}${rootdir}/etc/apt/sources.list.d
-		${DESTDIR}/etc/apt/sources.list.d\""
-	    repo_search_path=`echo "$repo_search_path" | sed -e 's,\<NONE\>,'$ac_default_prefix',g;s,//,/,g' | awk '{if(!([$]0 in seen)){print[$]0;seen[[$ 0]]=1}}'`
-	    AC_MSG_RESULT([searching])
-	    for repo_dir in $repo_search_path ; do
-		AC_MSG_CHECKING([for apt sources directory... $repo_dir])
-		if test -d "$repo_dir" ; then
-		    repo_cv_apt_repodir="$repo_dir"
-		    AC_MSG_RESULT([yes])
-		    break
-		else
-		    AC_MSG_RESULT([no])
-		fi
-	    done
-	    test -n "$repo_cv_apt_repodir" || repo_cv_apt_repodir=no
-	    AC_MSG_CHECKING([for apt sources directory])
-	fi
-    ])
+    _BLD_FIND_DIR([for apt directory], [repo_cv_apt_dir], [
+	    ${sysconfdir}/apt
+	    ${rootdir}/etc/apt], [], [no])
+    _BLD_FIND_DIR([for apt sources directory], [repo_cv_apt_repodir], [
+	    ${sysconfdir}/apt/sources.list.d
+	    ${rootdir}/etc/apt/sources.list.d], [], [no], [], [], [with_install_source_apt])
 dnl
 dnl The Connectiva apt-rpm distribution does not come equipped with a source directory, just a
 dnl sources list.
 dnl
-    AC_CACHE_CHECK([for apt sources list], [repo_cv_apt_srclist], [dnl
-	eval "repo_search_path=\"
-	    ${DESTDIR}${sysconfdir}/apt
-	    ${DESTDIR}${rootdir}/etc/apt
-	    ${DESTDIR}/etc/apt\""
-	repo_search_path=`echo "$repo_search_path" | sed -e 's,\<NONE\>,'$ac_default_prefix',g;s,//,/,g' | awk '{if(!([$]0 in seen)){print[$]0;seen[[$ 0]]=1}}'`
-	AC_MSG_RESULT([searching])
-	for repo_dir in $repo_search_path ; do
-	    AC_MSG_CHECKING([for apt sources list... $repo_dir/sources.list])
-	    if test -f "$repo_dir/sources.list" ; then
-		repo_cv_apt_srclist="$repo_dir/sources.list"
-		AC_MSG_RESULT([yes])
-		break
-	    else
-		AC_MSG_RESULT([no])
-	    fi
-	done
-	test -n "$repo_cv_apt_srclist" || repo_cv_apt_srclist=no
-	AC_MSG_CHECKING([for apt sources list])
-    ])
-    AC_CACHE_CHECK([for apt vendors directory], [repo_cv_apt_venddir], [dnl
-	eval "repo_search_path=\"
-	    ${DESTDIR}${sysconfdir}/apt/vendors.list.d
-	    ${DESTDIR}${rootdir}/etc/apt/vendors.list.d
-	    ${DESTDIR}/etc/apt/vendors.list.d\""
-	repo_search_path=`echo "$repo_search_path" | sed -e 's,\<NONE\>,'$ac_default_prefix',g;s,//,/,g' | awk '{if(!([$]0 in seen)){print[$]0;seen[[$ 0]]=1}}'`
-	AC_MSG_RESULT([searching])
-	for repo_dir in $repo_search_path ; do
-	    AC_MSG_CHECKING([for apt vendors directory... $repo_dir])
-	    if test -d "$repo_dir" ; then
-		repo_cv_apt_venddir="$repo_dir"
-		AC_MSG_RESULT([yes])
-		break
-	    else
-		AC_MSG_RESULT([no])
-	    fi
-	done
-	test -n "$repo_cv_apt_venddir" || repo_cv_apt_venddir=no
-	AC_MSG_CHECKING([for apt vendors directory])
-    ])
+    _BLD_FIND_FILE([for apt sources list], [repo_cv_apt_srclist], [
+	    ${sysconfdir}/apt/sources.list
+	    ${rootdir}/etc/apt/sources.list], [no])
+    _BLD_FIND_DIR([for apt vendors directory], [repo_cv_apt_venddir], [
+	    ${sysconfdir}/apt/vendors.list.d
+	    ${rootdir}/etc/apt/vendors.list.d], [], [no])
 dnl 
 dnl The Connectiva apt-rpm distribution diverged from Debian apt on the means for handling GPG keys:
 dnl it uses /etc/apt/vendors.list to identify the keys.
 dnl 
-    AC_CACHE_CHECK([for apt vendors list], [repo_cv_apt_vndlist], [dnl
-	eval "repo_search_path=\"
-	    ${DESTDIR}${sysconfdir}/apt
-	    ${DESTDIR}${rootdir}/etc/apt
-	    ${DESTDIR}/etc/apt\""
-	repo_search_path=`echo "$repo_search_path" | sed -e 's,\<NONE\>,'$ac_default_prefix',g;s,//,/,g' | awk '{if(!([$]0 in seen)){print[$]0;seen[[$ 0]]=1}}'`
-	AC_MSG_RESULT([searching])
-	for repo_dir in $repo_search_path ; do
-	    AC_MSG_CHECKING([for apt vendors list... $repo_dir/vendors.list])
-	    if test -f "$repo_dir/vendors.list" ; then
-		repo_cv_apt_vndlist="$repo_dir/vendors.list"
-		AC_MSG_RESULT([yes])
-		break
-	    else
-		AC_MSG_RESULT([no])
-	    fi
-	done
-	test -n "$repo_cv_apt_vndlist" || repo_cv_apt_vndlist=no
-	AC_MSG_CHECKING([for apt vendors list])
-    ])
-    AC_CACHE_CHECK([for apt gpg directory], [repo_cv_apt_gpgdir], [dnl
-	eval "repo_search_path=\"
-	    ${DESTDIR}${sysconfdir}/apt/trusted.gpg.d
-	    ${DESTDIR}${rootdir}/etc/apt/trusted.gpg.d
-	    ${DESTDIR}/etc/apt/trusted.gpg.d\""
-	repo_search_path=`echo "$repo_search_path" | sed -e 's,\<NONE\>,'$ac_default_prefix',g;s,//,/,g' | awk '{if(!([$]0 in seen)){print[$]0;seen[[$ 0]]=1}}'`
-	AC_MSG_RESULT([searching])
-	for repo_dir in $repo_search_path ; do
-	    AC_MSG_CHECKING([for apt gpg directory... $repo_dir])
-	    if test -d "$repo_dir" ; then
-		repo_cv_apt_gpgdir="$repo_dir"
-		AC_MSG_RESULT([yes])
-		break
-	    else
-		AC_MSG_RESULT([no])
-	    fi
-	done
-	test -n "$repo_cv_apt_gpgdir" || repo_cv_apt_gpgdir=no
-	AC_MSG_CHECKING([for apt gpg directory])
-    ])
+    _BLD_FIND_FILE([for apt vendors list], [repo_cv_apt_vndlist], [
+	    ${sysconfdir}/apt/vendors.list
+	    ${rootdir}/etc/apt/vendors.list], [no])
+    _BLD_FIND_DIR([for apt gpg directory], [repo_cv_apt_gpgdir], [
+	    ${sysconfdir}/apt/trusted.gpg.d
+	    ${rootdir}/etc/apt/trusted.gpg.d], [], [no])
 ])# _REPO_SETUP_APT
 # =============================================================================
 
@@ -585,55 +258,12 @@ dnl
 # _REPO_SETUP_PACMAN
 # -----------------------------------------------------------------------------
 AC_DEFUN([_REPO_SETUP_PACMAN], [dnl
-    AC_CACHE_CHECK([for pacman mirrors directory], [repo_cv_pacman_repodir], [dnl
-	case "${with_install_source_pacman:-search}" in
-	    (no) repo_cv_pacman_repodir=no ;;
-	    (yes|search) ;;
-	    (*) if test -d "$with_install_source_pacman" ; then
-		    repo_cv_pacman_repodir="$with_install_source_pacman"
-		fi ;;
-	esac
-	if test -z "$repo_cv_pacman_repodir" ; then
-	    eval "repo_search_path=\"
-		${DESTDIR}${sysconfdir}/pacman.d
-		${DESTDIR}${rootdir}/etc/pacman.d
-		${DESTDIR}/etc/pacman.d\""
-	    repo_search_path=`echo "$repo_search_path" | sed -e 's,\<NONE\>,'$ac_default_prefix',g;s,//,/,g' | awk '{if(!([$]0 in seen)){print[$]0;seen[[$ 0]]=1}}'`
-	    AC_MSG_RESULT([searching])
-	    for repo_dir in $repo_search_path ; do
-		AC_MSG_CHECKING([for pacman mirrors directory... $repo_dir])
-		if test -d "$repo_dir" ; then
-		    repo_cv_pacman_repodir="$repo_dir"
-		    AC_MSG_RESULT([yes])
-		    break
-		else
-		    AC_MSG_RESULT([no])
-		fi
-	    done
-	    test -n "$repo_cv_pacman_repodir" || repo_cv_pacman_repodir=no
-	    AC_MSG_CHECKING([for pacman mirrors directory])
-	fi
-    ])
-    AC_CACHE_CHECK([for pacman config file], [repo_cv_pacman_config], [dnl
-	eval "repo_search_path=\"
-	    ${DESTDIR}${sysconfdir}/pacman.conf
-	    ${DESTDIR}${rootdir}/etc/pacman.conf
-	    ${DESTDIR}/etc/pacman.conf\""
-	repo_search_path=`echo "$repo_search_path" | sed -e 's,\<NONE\>,'$ac_default_prefix',g;s,//,/,g' | awk '{if(!([$]0 in seen)){print[$]0;seen[[$ 0]]=1}}'`
-	AC_MSG_RESULT([searching])
-	for repo_dir in $repo_search_path ; do
-	    AC_MSG_CHECKING([for pacman config file... $repo_dir])
-	    if test -f "$repo_dir" ; then
-		repo_cv_pacman_config="$repo_dir"
-		AC_MSG_RESULT([yes])
-		break
-	    else
-		AC_MSG_RESULT([no])
-	    fi
-	done
-	test -n "$repo_cv_pacman_config" || repo_cv_pacman_config=no
-	AC_MSG_CHECKING([for pacman config file])
-    ])
+    _BLD_FIND_DIR([for pacman mirrors directory], [repo_cv_pacman_repodir], [
+	    ${sysconfdir}/pacman.d
+	    ${rootdir}/etc/pacman.d], [], [no], [], [], [with_install_source_pacman])
+    _BLD_FIND_FILE([for pacman config file], [repo_cv_pacman_config], [
+	    ${sysconfdir}/pacman.conf
+	    ${rootdir}/etc/pacman.conf], [no])
 ])# _REPO_SETUP_PACMAN
 # =============================================================================
 
@@ -641,75 +271,15 @@ AC_DEFUN([_REPO_SETUP_PACMAN], [dnl
 # _REPO_SETUP_SLAPT
 # -----------------------------------------------------------------------------
 AC_DEFUN([_REPO_SETUP_SLAPT], [dnl
-    AC_CACHE_CHECK([for slapt directory], [repo_cv_slapt_repodir], [dnl
-	case "${with_install_source_slapt:-search}" in
-	    (no) repo_cv_slapt_repodir=no ;;
-	    (yes|search) ;;
-	    (*) if test -d "$with_install_source_slapt" ; then
-		    repo_cv_slapt_repodir="$with_install_source_slapt"
-		fi ;;
-	esac
-	if test -z "$repo_cv_slapt_repodir" ; then
-	    eval "repo_search_path=\"
-		${DESTDIR}${sysconfdir}/slapt-get
-		${DESTDIR}${rootdir}/etc/slapt-get
-		${DESTDIR}/etc/slapt-get\""
-	    repo_search_path=`echo "$repo_search_path" | sed -e 's,\<NONE\>,'$ac_default_prefix',g;s,//,/,g' | awk '{if(!([$]0 in seen)){print[$]0;seen[[$ 0]]=1}}'`
-	    AC_MSG_RESULT([searching])
-	    for repo_dir in $repo_search_path ; do
-		AC_MSG_CHECKING([for slapt directory... $repo_dir])
-		if test -d "$repo_dir" ; then
-		    repo_cv_slapt_repodir="$repo_dir"
-		    AC_MSG_RESULT([yes])
-		    break
-		else
-		    AC_MSG_RESULT([no])
-		fi
-	    done
-	    test -n "$repo_cv_slapt_repodir" || repo_cv_slapt_repodir=no
-	    AC_MSG_CHECKING([for slapt directory])
-	fi
-    ])
-    AC_CACHE_CHECK([for slapt-get rc file], [repo_cv_slapt_getrc], [dnl
-	eval "repo_search_path=\"
-	    ${DESTDIR}${sysconfdir}/slapt-get
-	    ${DESTDIR}${rootdir}/etc/slapt-get
-	    ${DESTDIR}/etc/slapt-get\""
-	repo_search_path=`echo "$repo_search_path" | sed -e 's,\<NONE\>,'$ac_default_prefix',g;s,//,/,g' | awk '{if(!([$]0 in seen)){print[$]0;seen[[$ 0]]=1}}'`
-	AC_MSG_RESULT([searching])
-	for repo_dir in $repo_search_path ; do
-	    AC_MSG_CHECKING([for slapt-get rc file... $repo_dir/slapt-getrc])
-	    if test -f "$repo_dir/slapt-getrc" ; then
-		repo_cv_slapt_getrc="$repo_dir/slapt-getrc"
-		AC_MSG_RESULT([yes])
-		break
-	    else
-		AC_MSG_RESULT([no])
-	    fi
-	done
-	test -n "$repo_cv_slapt_getrc" || repo_cv_slapt_getrc=no
-	AC_MSG_CHECKING([for slapt-get rc file])
-    ])
-    AC_CACHE_CHECK([for slapt-src rc file], [repo_cv_slapt_srcrc], [dnl
-	eval "repo_search_path=\"
-	    ${DESTDIR}${sysconfdir}/slapt-get
-	    ${DESTDIR}${rootdir}/etc/slapt-get
-	    ${DESTDIR}/etc/slapt-get\""
-	repo_search_path=`echo "$repo_search_path" | sed -e 's,\<NONE\>,'$ac_default_prefix',g;s,//,/,g' | awk '{if(!([$]0 in seen)){print[$]0;seen[[$ 0]]=1}}'`
-	AC_MSG_RESULT([searching])
-	for repo_dir in $repo_search_path ; do
-	    AC_MSG_CHECKING([for slapt-src rc file... $repo_dir/slapt-srcrc])
-	    if test -f "$repo_dir/slapt-srcrc" ; then
-		repo_cv_slapt_srcrc="$repo_dir/slapt-srcrc"
-		AC_MSG_RESULT([yes])
-		break
-	    else
-		AC_MSG_RESULT([no])
-	    fi
-	done
-	test -n "$repo_cv_slapt_srcrc" || repo_cv_slapt_srcrc=no
-	AC_MSG_CHECKING([for slapt-src rc file])
-    ])
+    _BLD_FIND_DIR([for slapt directory], [repo_cv_slapt_repodir], [
+	    ${sysconfdir}/slapt-get
+	    ${rootdir}/etc/slapt-get], [], [no], [], [], [with_install_source_slapt])
+    _BLD_FIND_FILE([for slapt-get rc file], [repo_cv_slapt_getrc], [
+	    ${sysconfdir}/slapt-get/slapt-getrc
+	    ${rootdir}/etc/slapt-get/slapt-getrc], [no])
+    _BLD_FIND_FILE([for slapt-src rc file], [repo_cv_slapt_srcrc], [dnl
+	    ${sysconfdir}/slapt-get/slapt-srcrc
+	    ${rootdir}/etc/slapt-get/slapt-srcrc], [no])
 ])# _REPO_SETUP_SLAPT
 # =============================================================================
 
@@ -743,42 +313,42 @@ AC_DEFUN([_REPO_OUTPUT], [dnl
 	reposubdir="$repo_cv_dist_subdir"
     fi
     AC_SUBST([reposubdir])dnl
-    yumrepodir='${DESTDIR}${rootdir}/etc/yum.repos.d'
+    yumrepodir='${rootdir}/etc/yum.repos.d'
     if test :"${repo_cv_yum_repodir:-no}" != :no ; then
 	yumrepodir="$repo_cv_yum_repodir"
     fi
     AC_SUBST([yumrepodir])dnl
-    yumkmodconf='${DESTDIR}${rootdir}/etc/yum/pluginconf.d/kmod.conf'
+    yumkmodconf='${rootdir}/etc/yum/pluginconf.d/kmod.conf'
     if test :"${repo_cv_yum_kmodconf:-no}" != :no ; then
 	yumkmodconf="$repo_cv_yum_kmodconf"
     fi
     AC_SUBST([yumkmodconf])dnl
-    rpmgpgdir='${DESTDIR}${rootdir}/etc/pki/rpm-gpg'
+    rpmgpgdir='${rootdir}/etc/pki/rpm-gpg'
     if test :"${repo_cv_rpm_gpgdir:-no}" != :no ; then
 	rpmgpgdir="$repo_cv_rpm_gpgdir"
     fi
     AC_SUBST([rpmgpgdir])dnl
-    zyppcreddir='${DESTDIR}${rootdir}/etc/zypp/credentials.d'
+    zyppcreddir='${rootdir}/etc/zypp/credentials.d'
     if test :"${repo_cv_zypp_creddir:-no}" != :no ; then
 	zyppcreddir="$repo_cv_zypp_creddir"
     fi
     AC_SUBST([zyppcreddir])dnl
-    zyppservdir='${DESTDIR}${rootdir}/etc/zypp/services.d'
+    zyppservdir='${rootdir}/etc/zypp/services.d'
     if test :"${repo_cv_zypp_servdir:-no}" != :no ; then
 	zyppservdir="$repo_cv_zypp_servdir"
     fi
     AC_SUBST([zyppservdir])dnl
-    zypprepodir='${DESTDIR}${rootdir}/etc/zypp/repos.d'
+    zypprepodir='${rootdir}/etc/zypp/repos.d'
     if test :"${repo_cv_zypp_repodir:-no}" != :no ; then
 	zypprepodir="$repo_cv_zypp_repodir"
     fi
     AC_SUBST([zypprepodir])dnl
-    zyppconfig='${DESTDIR}${rootdir}/etc/zypp/zypp.conf'
+    zyppconfig='${rootdir}/etc/zypp/zypp.conf'
     if test :"${repo_cv_zypp_config:-no}" != :no ; then
 	zyppconfig="$repo_cv_zypp_config"
     fi
     AC_SUBST([zyppconfig])dnl
-    urpmirepodir='${DESTDIR}${rootdir}/etc/urpmi/mediacfg.d'
+    urpmirepodir='${rootdir}/etc/urpmi/mediacfg.d'
     urpmimediadir='${urpmirepodir}/${PACKAGE_NAME}-${target_edition}-${target_arch}'
     if test :"${repo_cv_urpmi_repodir:-no}" != :no ; then
 	urpmirepodir="$repo_cv_urpmi_repodir"
@@ -786,22 +356,22 @@ AC_DEFUN([_REPO_OUTPUT], [dnl
     fi
     AC_SUBST([urpmirepodir])dnl
     AC_SUBST([urpmimediadir])dnl
-    urpmiconfig='${DESTDIR}${rootdir}/etc/urpmi/urpmi.cfg'
+    urpmiconfig='${rootdir}/etc/urpmi/urpmi.cfg'
     if test :"${repo_cv_urpmi_config:-no}" != :no ; then
 	urpmiconfig="$repo_cv_urpmi_config"
     fi
     AC_SUBST([urpmiconfig])
-    urpmiconfdir='${DESTDIR}${rootdir}/etc/urpmi'
+    urpmiconfdir='${rootdir}/etc/urpmi'
     if test :"${repo_cv_urpmi_confdir:-no}" != :no ; then
 	urpmiconfdir="$repo_cv_urpmi_confdir"
     fi
     AC_SUBST([urpmiconfdir])dnl
-    aptconfdir='${DESTDIR}${rootdir}/etc/apt'
+    aptconfdir='${rootdir}/etc/apt'
     if test :"${repo_cv_apt_dir:-no}" != :no ; then
 	aptconfdir="$repo_cv_apt_dir"
     fi
     AC_SUBST([aptconfdir])
-    aptrepodir='${DESTDIR}${rootdir}/etc/apt/sources.list.d'
+    aptrepodir='${rootdir}/etc/apt/sources.list.d'
     if test :"${repo_cv_apt_repodir:-no}" != :no ; then
 	aptrepodir="$repo_cv_apt_repodir"
     elif test :"${repo_cv_apt_srclist:-no}" != :no ; then
@@ -810,12 +380,12 @@ AC_DEFUN([_REPO_OUTPUT], [dnl
 	aptrepodir="$repo_cv_apt_dir/sources.list.d"
     fi
     AC_SUBST([aptrepodir])dnl
-    aptsrclist='${DESTDIR}${rootdir}/etc/apt/sources.list'
+    aptsrclist='${rootdir}/etc/apt/sources.list'
     if test :"${repo_cv_apt_srclist:-no}" != :no ; then
 	aptsrclist="$repo_cv_apt_srclist"
     fi
     AC_SUBST([aptsrclist])dnl
-    aptvenddir='${DESTDIR}${rootdir}/etc/apt/vendors.list.d'
+    aptvenddir='${rootdir}/etc/apt/vendors.list.d'
     if test :"${repo_cv_apt_venddir:-no}" != :no  ; then
 	aptvenddir="$repo_cv_apt_venddir"
     elif test :"${repo_cv_apt_vndlist:-no}" != :no ; then
@@ -824,37 +394,37 @@ AC_DEFUN([_REPO_OUTPUT], [dnl
 	aptvenddir="$repo_cv_apt_dir/vendors.list.d"
     fi
     AC_SUBST([aptvenddir])
-    aptvndlist='${DESTDIR}${rootdir}/etc/apt/vendors.list'
+    aptvndlist='${rootdir}/etc/apt/vendors.list'
     if test :"${repo_cv_apt_vndlist:-no}" != :no ; then
 	aptvndlist="$repo_cv_apt_vndlist"
     fi
     AC_SUBST([aptvndlist])dnl
-    aptgpgdir='${DESTDIR}${rootdir}/etc/apt/trusted.gpg.d'
+    aptgpgdir='${rootdir}/etc/apt/trusted.gpg.d'
     if test :"${repo_cv_apt_gpgdir:-no}" != :no ; then
 	aptgpgdir="$repo_cv_apt_gpgdir"
     fi
     AC_SUBST([aptgpgdir])dnl
-    slaptrepodir='${DESTDIR}${rootdir}/etc/slapt-get'
+    slaptrepodir='${rootdir}/etc/slapt-get'
     if test :"${repo_cv_slapt_repodir:-no}" != :no ; then
 	slaptrepodir="$repo_cv_slapt_repodir"
     fi
     AC_SUBST([slaptrepodir])dnl
-    slaptgetrc='${DESTDIR}${rootdir}/etc/slapt-get/slapt-getrc'
+    slaptgetrc='${rootdir}/etc/slapt-get/slapt-getrc'
     if test :"${repo_cv_slapt_getrc:-no}" != :no ; then
 	slaptgetrc="$repo_cv_slapt_getrc"
     fi
     AC_SUBST([slaptgetrc])dnl
-    slaptsrcrc='${DESTDIR}${rootdir}/etc/slapt-get/slapt-srcrc'
+    slaptsrcrc='${rootdir}/etc/slapt-get/slapt-srcrc'
     if test :"${repo_cv_slapt_srcrc:-no}" != :no ; then
 	slaptsrcrc="$repo_cv_slapt_srcrc"
     fi
     AC_SUBST([slaptsrcrc])dnl
-    pacmanrepodir='${DESTDIR}${rootdir}/etc/slapt-get'
+    pacmanrepodir='${rootdir}/etc/slapt-get'
     if test :"${repo_cv_pacman_repodir:-no}" != :no ; then
 	pacmanrepodir="$repo_cv_pacman_repodir"
     fi
     AC_SUBST([pacmanrepodir])dnl
-    pacmanconfig='${DESTDIR}${rootdir}/etc/pacman.conf'
+    pacmanconfig='${rootdir}/etc/pacman.conf'
     if test :"${repo_cv_pacman_config:-no}" != :no ; then
 	pacmanconfig="$repo_cv_pacman_config"
     fi

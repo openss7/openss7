@@ -632,16 +632,12 @@ dnl
 ***])
 	fi])
     AC_REQUIRE_SHELL_FN([bld_path_check])dnl
-    AC_CACHE_CHECK([for libgcj javadoc directory], [ac_cv_libgcj_doc], [dnl
+    AC_CACHE_CHECK([for libgcj javadoc directory], [ac_cv_libgcj_doc_eval], [dnl
 	eval "gcj_search_path=\"
-	    ${DESTDIR}${rootdir}${javadocdir}
-	    ${DESTDIR}${rootdir}/usr/share/javadoc
-	    ${DESTDIR}${rootdir}${docdir}
-	    ${DESTDIR}${rootdir}/usr/share/doc
-	    ${DESTDIR}${javadocdir}
-	    ${DESTDIR}/usr/share/javadoc
-	    ${DESTDIR}${docdir}
-	    ${DESTDIR}/usr/share/doc\""
+	    ${javadocdir}
+	    ${rootdir}/usr/share/javadoc
+	    ${docdir}
+	    ${rootdir}/usr/share/doc\""
 	gcj_search_path=`echo "$gcj_search_path" | sed -e 's,\<NONE\>,'$ac_default_prefix',g;s,//,/,g' | awk '{if(!([$]0 in seen)){print[$]0;seen[[$ 0]]=1}}'`
 	AC_MSG_RESULT([searching])
 	for gcj_dir in $gcj_search_path ; do
@@ -651,7 +647,7 @@ dnl
 		    for gcj_sdir in $gcj_sub $gcj_sub/html ; do
 			AC_MSG_CHECKING([for libgcj javadoc directory... $gcj_sdir])
 			if test -d "$gcj_sdir" -a \( -r $gcj_sdir/package-list -o -r $gcj_sdir/package-list.gz \) ; then
-			    ac_cv_libgcj_doc="$gcj_sdir"
+			    ac_cv_libgcj_doc='${rootdir}'"${gcj_sdir#$rootdir}"
 			    AC_MSG_RESULT([yes])
 			    break 3
 			else
@@ -663,6 +659,7 @@ dnl
 	done
 	test -n "$ac_cv_libgcj_doc" || ac_cv_libgcj_doc=no
 	AC_MSG_CHECKING([for libgcj javadoc directory])
+	eval "ac_cv_libgcj_doc_eval=\"$ac_cv_libgcj_doc\""
     ])
     if test :"${ac_cv_libgcj_doc:-no}" = :no ; then
 	_BLD_INSTALL_WARN([PACKAGE_LIST], [
@@ -686,7 +683,7 @@ dnl
 *** ])
 	gcjdocdir=
     else
-	bld_path_check "ac_cv_libgcj_doc" "package-list"
+	bld_path_check "ac_cv_libgcj_doc_eval" "package-list"
 	gcjdocdir="$ac_cv_libgcj_doc"
     fi
     AC_SUBST([gcjdocdir])dnl
@@ -696,7 +693,7 @@ dnl
 	JAVADOCFLAGS="${JAVADOCFLAGS:+$JAVADOCFLAGS }-licensetext"
     fi
     if test -n "$gcjdocdir" ; then
-	JAVADOCFLAGS="${JAVADOCFLAGS:+$JAVADOCFLAGS }"'-linkoffline http://developer.classpath.org/doc/ $(gcjdocdir)'
+	JAVADOCFLAGS="${JAVADOCFLAGS:+$JAVADOCFLAGS }"'-linkoffline http://developer.classpath.org/doc/ ${gcjdocdir}'
     else
 	JAVADOCFLAGS="${JAVADOCFLAGS:+$JAVADOCFLAGS }"'-link http://developer.classpath.org/doc/'
     fi
@@ -793,14 +790,10 @@ AC_DEFUN([_GCJ_SETUP], [dnl
 	    [GCJ library header directory @<:@default=search@:>@])],
 	[], [with_libgcj=search])
     _BLD_FIND_DIR([libgcj include directory], [gcj_cv_includedir], [
-	    ${DESTDIR}${rootdir}${includedir}
-	    ${DESTDIR}${rootdir}${oldincludedir}
-	    ${DESTDIR}${rootdir}/usr/include
-	    ${DESTDIR}${rootdir}/usr/local/include
-	    ${DESTDIR}${includedir}
-	    ${DESTDIR}${oldincludedir}
-	    ${DESTDIR}/usr/include
-	    ${DESTDIR}/usr/local/include], [gcj/cni.h], [no], [dnl
+	    ${includedir}
+	    ${rootdir}${oldincludedir}
+	    ${rootdir}/usr/include
+	    ${rootdir}/usr/local/include], [gcj/cni.h], [no], [dnl
 	if test ${with_libgcj:-search} != no ; then
 	    _BLD_INSTALL_WARN([GCJ_CNI_H], [
 ***
@@ -833,7 +826,7 @@ AC_DEFUN([_GCJ_SETUP], [dnl
     AC_SUBST([gcjincludedir])dnl
     AC_CACHE_CHECK([for libgcj cxxflags], [gcj_cv_cxxflags], [dnl
 	if test -n "$gcjincludedir" ; then
-	    gcj_cv_cxxflags="-I$gcjincludedir"
+	    gcj_cv_cxxflags="-I${gcjincludedir}"
 	else
 	    gcj_cv_cxxflags=
 	fi

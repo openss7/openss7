@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2012  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -75,7 +75,7 @@
 static char const ident[] = "$RCSfile: spx.c,v $ $Name:  $($Revision: 1.1.2.6 $) $Date: 2011-09-20 09:51:37 $";
 
 #ifdef NEED_LINUX_AUTOCONF_H
-#include <linux/autoconf.h>
+#include NEED_LINUX_AUTOCONF_H
 #endif
 #include <linux/version.h>
 #include <linux/module.h>
@@ -91,7 +91,7 @@ static char const ident[] = "$RCSfile: spx.c,v $ $Name:  $($Revision: 1.1.2.6 $)
 #include "src/kernel/strreg.h"
 
 #define SPX_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
-#define SPX_COPYRIGHT	"Copyright (c) 2008-2011  Monavacon Limited.  All Rights Reserved."
+#define SPX_COPYRIGHT	"Copyright (c) 2008-2012  Monavacon Limited.  All Rights Reserved."
 #define SPX_REVISION	"LfS $RCSfile: spx.c,v $ $Name:  $($Revision: 1.1.2.6 $) $Date: 2011-09-20 09:51:37 $"
 #define SPX_DEVICE	"SVR 4.2 MP STREAMS Pipe Driver"
 #define SPX_CONTACT	"Brian Bidulock <bidulock@openss7.org>"

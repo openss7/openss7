@@ -3246,6 +3246,11 @@ include am/rpm.am
 include am/deb.am
 
 ##
+## Rules for making arch packages
+##
+include am/pkg.am
+
+##
 ## Rules for repo install sources
 ##
 include am/repo.am

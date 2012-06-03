@@ -109,6 +109,18 @@
 #define SB_FRCVD		1		/**< First message in time window received. */
 /** @} */
 
+#ifndef HAVE_STRUCT_TIMEVAL32
+#if defined(_LP64) || defined (_IL32LPx)
+typedef int __time32_t;
+typedef int __suseconds32_t;
+struct timeval32 {
+    __time32_t tv_sec;
+    __suseconds32_t tv_usec;
+};
+#define HAVE_STRUCT_TIMEVAL32
+#endif
+#endif
+
 /** Structure for use with M_DATA message blocks.
   *
   * When adding a given message to an accumulating chunk, the module first converts any leading

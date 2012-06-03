@@ -136,14 +136,10 @@ AC_DEFUN([_SNMP_HEADERS], [dnl
 	    [SNMP header directory @<:@default=search@:>@])],
 	[], [with_snmp=search])
     _BLD_FIND_DIR([snmp include directory], [snmp_cv_includedir], [
-	    ${DESTDIR}${rootdir}${includedir}
-	    ${DESTDIR}${rootdir}${oldincludedir}
-	    ${DESTDIR}${rootdir}/usr/include
-	    ${DESTDIR}${rootdir}/usr/local/include
-	    ${DESTDIR}${includedir}
-	    ${DESTDIR}${oldincludedir}
-	    ${DESTDIR}/usr/include
-	    ${DESTDIR}/usr/local/include], [ucd-snmp/ucd-snmp-config.h], [no], [dnl
+	    ${includedir}
+	    ${rootdir}${oldincludedir}
+	    ${rootdir}/usr/include
+	    ${rootdir}/usr/local/include], [ucd-snmp/ucd-snmp-config.h], [no], [dnl
 	if test ${with_snmp:-search} != no ; then
 	    _BLD_INSTALL_WARN([UCD_SNMP_UCD_SNMP_CONFIG_H], [
 *** 
@@ -184,7 +180,7 @@ AC_DEFUN([_SNMP_HEADERS], [dnl
     AC_SUBST([snmpincludedir])dnl
     AC_CACHE_CHECK([for snmp cppflags], [snmp_cv_cppflags], [dnl
 	if test -n "$snmpincludedir" ; then
-	    snmp_cv_cppflags="-I$snmpincludedir"
+	    snmp_cv_cppflags="-I${snmpincludedir}"
 	else
 	    snmp_cv_cppflags=
 	fi
@@ -193,7 +189,7 @@ AC_DEFUN([_SNMP_HEADERS], [dnl
     AC_SUBST([SNMP_CPPFLAGS])dnl
     snmp_save_CPPFLAGS="$CPPFLAGS"
     if test -n "$SNMP_CPPFLAGS" ; then
-	CPPFLAGS="${CPPFLAGS:+$CPPFLAGS }$SNMP_CPPFLAGS"
+	eval "CPPFLAGS=\"${CPPFLAGS:+$CPPFLAGS }$SNMP_CPPFLAGS\""
     fi
     AC_CHECK_HEADERS([ucd-snmp/ucd-snmp-config.h], [], [dnl
 	_SNMP_MSG_WARN([ucd-snmp/ucd-snmp-config.h]) ])

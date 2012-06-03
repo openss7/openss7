@@ -211,7 +211,7 @@ $(my_jar_LINKS): %.jar : %-$(VERSION).jar
 ##
 # A rule to make the package jar file.
 ##
-$(PACKAGE)-$(VERSION).jar: classdist_java.stamp $(my_jar_CLASSFILES)
+$(PACKAGE)-$(VERSION).jar: classjava.stamp $(my_jar_CLASSFILES)
 	$(AM_V_GEN)$(JAR) cf $@ $^
 
 ##

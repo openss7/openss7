@@ -85,134 +85,49 @@ dnl
 dnl first find the inittab: we can always figure out the initial
 dnl init script from the inittab
 dnl
-    AC_CACHE_CHECK([for init SysV inittab], [init_cv_inittab], [dnl
-	init_cv_inittab='no'
-	eval "init_search_path=\"
-	    ${DESTDIR}${sysconfdir}/inittab\""
-	init_search_path=`echo "$init_search_path" | sed -e 's|\<NONE\>||g;s|//|/|g' | awk '{if(!([$]0 in seen)){print[$]0;seen[[$ 0]]=1}}'`
-	for init_tmp in $init_search_path ; do
-	    if test -f $init_tmp ; then
-		init_cv_inittab="$init_tmp"
-		break
-	    fi
-	done
-    ])
+    _BLD_FIND_FILE([for init SysV inittab], [init_cv_inittab], [
+	    ${sysconfdir}/inittab], [no])
+    AC_ARG_WITH([initial_init_script],
+	[AS_HELP_STRING([--with-initial-init-script=PATH],
+	    [initial system init script @<:@default=search@:>@])], [], [dnl
 dnl 
-dnl next check for the initial init script from inittab
+dnl check for the initial init script from inittab
 dnl 
-    AC_CACHE_CHECK([for init SysV script], [init_cv_script], [dnl
-	init_cv_script='no'
+	with_initial_init_script=no
 	if test :"$init_cv_inittab" != :no ; then
 	    init_tmp="$(< $init_cv_inittab | grep -c1 '^si::sysinit:' | sed -e 's|^si::sysinit:||;s|[[[:space:]]].*||')"
-	    init_tmp=`echo "${DESTDIR}${rootdir}$init_tmp" | sed -e 's|\<NONE\>||g;s|//|/|g' | awk '{if(!([$]0 in seen)){print[$]0;seen[[$ 0]]=1}}'`
+	    init_tmp=`echo "${rootdir}$init_tmp" | sed -e 's|\<NONE\>||g;s|//|/|g' | awk '{if(!([$]0 in seen)){print[$]0;seen[[$ 0]]=1}}'`
 	    if test -f "$init_tmp" ; then
-		init_cv_script="$init_tmp"
+		with_initial_init_script="$init_tmp"
 	    fi
-	fi
+	fi])
 dnl
-dnl     fallback is to go looking for it in the usual places
+dnl fallback is to go looking for it in the usual places
 dnl
-	if test :"${init_cv_script:-no}" = :no ; then
-	    AC_MSG_RESULT([searching...])
-	    eval "init_search_path=\"
-		${DESTDIR}${sysconfdir}/init.d/rcS
-		${DESTDIR}${sysconfdir}/rc.d/rc.sysinit\""
-	    init_search_path=`echo "$init_search_path" | sed -e 's|\<NONE\>||g;s|//|/|g' | awk '{if(!([$]0 in seen)){print[$]0;seen[[$ 0]]=1}}'`
-	    for init_tmp in $init_search_path ; do
-		AC_MSG_CHECKING([for init SysV script... $init_tmp])
-		if test -f $init_tmp ; then
-		    init_cv_script="$init_tmp"
-		    AC_MSG_RESULT([yes])
-		    break
-		fi
-		AC_MSG_RESULT([no])
-	    done
-	    AC_MSG_CHECKING([for init SysV script])
-	fi
-    ])
-    AC_CACHE_CHECK([for init SysV rcS.d directory], [init_cv_rcs_dir], [dnl
-	AC_MSG_RESULT([searching...])
-	init_cv_rcs_dir='no'
-	eval "init_search_path=\"
-	    ${DESTDIR}${sysconfdir}/rcS.d
-	    ${sysconfdir}/rcS.d
-	    /etc/rcS.d\""
-	init_search_path=`echo "$init_search_path" | sed -e 's|\<NONE\>||g;s|//|/|g' | awk '{if(!([$]0 in seen)){print[$]0;seen[[$ 0]]=1}}'`
-	for init_tmp in $init_search_path ; do
-	    AC_MSG_CHECKING([for init SysV rcS.d directory... $init_tmp])
-	    if test -d $init_tmp ; then
-		init_cv_rcs_dir="$init_tmp"
-		AC_MSG_RESULT([yes])
-		break
-	    fi
-	    AC_MSG_RESULT([no])
-	done
-	AC_MSG_CHECKING([for init SysV rcS.d directory])
-    ])
-    AC_CACHE_CHECK([for init SysV rc.d directory], [init_cv_rc_dir], [dnl
-	init_cv_rc_dir='no'
-	eval "init_search_path=\"
-	    ${DESTDIR}${sysconfdir}/rc.d\""
-	init_search_path=`echo "$init_search_path" | sed -e 's|\<NONE\>||g;s|//|/|g' | awk '{if(!([$]0 in seen)){print[$]0;seen[[$ 0]]=1}}'`
-	for init_tmp in $init_search_path ; do
-	    if test -d $init_tmp ; then
-		init_cv_rc_dir="$init_tmp"
-		break
-	    fi
-	done
-    ])
+    _BLD_FIND_FILE([for init SysV script], [init_cv_script], [dnl
+	    ${sysconfdir}/init.d/rcS
+	    ${sysconfdir}/rc.d/rc.sysinit], [no], [], [], [with_initial_init_script])
+    _BLD_FIND_DIR([for init SysV rcS.d directory], [init_cv_rcs_dir], [
+	    ${sysconfdir}/rcS.d], [], [no])
+    _BLD_FIND_DIR([for init SysV rc.d directory], [init_cv_rc_dir], [
+	    ${sysconfdir}/rc.d], [], [no])
 dnl
 dnl This script needs to exist to add to /etc/modules successfully
 dnl
-    AC_CACHE_CHECK([for init SysV rc.modules script], [init_cv_rc_modules], [dnl
-	init_cv_rc_modules='no'
-	eval "init_search_path=\"
-	    ${DESTDIR}${sysconfdir}/rc.d/rc.modules\""
-	init_search_path=`echo "$init_search_path" | sed -e 's|\<NONE\>||g;s|//|/|g' | awk '{if(!([$]0 in seen)){print[$]0;seen[[$ 0]]=1}}'`
-	for init_tmp in $init_search_path ; do
-	    if test -f $init_tmp ; then
-		init_cv_rc_modules="$init_tmp"
-		break
-	    fi
-	done
-    ])
+    _BLD_FIND_FILE([for init SysV rc.modules script], [init_cv_rc_modules], [
+	    ${sysconfdir}/rc.d/rc.modules], [no])
 dnl
 dnl This is where we are going to add preloaded modules
 dnl
-    AC_CACHE_CHECK([for init SysV modules file], [init_cv_modules], [dnl
-	init_cv_modules='no'
-	eval "init_search_path=\"
-	    ${DESTDIR}${sysconfdir}/modules\""
-	init_search_path=`echo "$init_search_path" | sed -e 's|\<NONE\>||g;s|//|/|g' | awk '{if(!([$]0 in seen)){print[$]0;seen[[$ 0]]=1}}'`
-	for init_tmp in $init_search_path ; do
-	    if test -f $init_tmp ; then
-		init_cv_modules="$init_tmp"
-		break
-	    fi
-	done
-    ])
+    _BLD_FIND_FILE([for init SysV modules file], [init_cv_modules], [
+	    ${sysconfdir}/modules], [no])
 dnl
 dnl This is where we are going to have to generate symbolic links if chkconfig
 dnl does not exist
 dnl
-    AC_CACHE_CHECK([for init SysV rcX.d directory], [init_cv_rcx_dir], [dnl
-	AC_MSG_RESULT([searching...])
-	init_cv_rcx_dir='no'
-	eval "init_search_path=\"
-	    ${DESTDIR}${sysconfdir}/rc.d/rc[[S0-6]].d
-	    ${DESTDIR}${sysconfdir}/rc[[S0-6]].d\""
-	init_search_path=`echo "$init_search_path" | sed -e 's|\<NONE\>||g;s|//|/|g' | awk '{if(!([$]0 in seen)){print[$]0;seen[[$ 0]]=1}}'`
-	for init_tmp in $init_search_path ; do
-	    AC_MSG_CHECKING([for init SysV rcX.d directory... $init_tmp])
-	    if test -d $init_tmp ; then
-		init_cv_rcx_dir="$init_tmp"
-		AC_MSG_RESULT([yes])
-		break
-	    fi
-	    AC_MSG_RESULT([no])
-	done
-	AC_MSG_CHECKING([for init SysV rcX.d directory])
-    ])
+    _BLD_FIND_DIR([for init SysV rcX.d directory], [init_cv_rcx_dir], [
+	    ${sysconfdir}/rc.d/rc[[S0-6]].d
+	    ${sysconfdir}/rc[[S0-6]].d], [], [no])
 dnl
 dnl I suppose we really don't care about these.  It is funny, though, that SuSE
 dnl used to use insserv (SuSE wrote it!), but now, SuSE uses service.  Debian
@@ -230,49 +145,17 @@ dnl
 dnl
 dnl initrddir is where we are going to put init scripts
 dnl
-    AC_CACHE_CHECK([for init SysV init.d directory], [init_cv_initrddir], [dnl
-	AC_MSG_RESULT([searching...])
-	init_cv_initrddir='no'
-	eval "init_search_path=\"
-	    ${DESTDIR}${sysconfdir}/rc.d/init.d
-	    ${DESTDIR}${sysconfdir}/init.d
-	    ${DESTDIR}${sysconfdir}/rc.d\""
-	for init_tmp in $init_search_path ; do
-	    eval "init_dir=\"$init_tmp\""
-	    init_dir=`echo "$init_dir" | sed -e 's|\<NONE\>||g;s|//|/|g' | awk '{if(!([$]0 in seen)){print[$]0;seen[[$ 0]]=1}}'`
-	    AC_MSG_CHECKING([for init SysV init.d directory... $init_dir])
-	    if test -d $init_dir -a ! -L $init_dir ; then
-		init_cv_initrddir="$init_tmp"
-		AC_MSG_RESULT([yes])
-		break
-	    fi
-	    AC_MSG_RESULT([no])
-	done
-	AC_MSG_CHECKING([for init SysV init.d directory])
-    ])
+    _BLD_FIND_DIR([for init SysV init.d directory], [init_cv_initrddir], [
+	    ${sysconfdir}/rc.d/init.d
+	    ${sysconfdir}/init.d
+	    ${sysconfdir}/rc.d], [], [no], [], [], [], [-a ! -L "$bld_dir"])
 dnl
 dnl configdir is where we are going to put init script default files
 dnl
-    AC_CACHE_CHECK([for init SysV config directory], [init_cv_configdir], [dnl
-	AC_MSG_RESULT([searching...])
-	init_cv_configdir='no'
-	eval "init_search_path=\"
-	    ${DESTDIR}${sysconfdir}/sysconfig
-	    ${DESTDIR}${sysconfdir}/conf.d
-	    ${DESTDIR}${sysconfdir}/default\""
-	for init_tmp in $init_search_path ; do
-	    eval "init_dir=\"$init_tmp\""
-	    init_dir=`echo "$init_dir" | sed -e 's|\<NONE\>||g;s|//|/|g' | awk '{if(!([$]0 in seen)){print[$]0;seen[[$ 0]]=1}}'`
-	    AC_MSG_CHECKING([for init SysV config directory... $init_dir])
-	    if test -d $init_dir ; then
-		init_cv_configdir="$init_tmp"
-		AC_MSG_RESULT([yes])
-		break
-	    fi
-	    AC_MSG_RESULT([no])
-	done
-	AC_MSG_CHECKING([for init SysV config directory])
-    ])
+    _BLD_FIND_DIR([for init SysV config directory], [init_cv_configdir], [
+	    ${sysconfdir}/sysconfig
+	    ${sysconfdir}/conf.d
+	    ${sysconfdir}/default], [], [no])
     AC_CACHE_CHECK([for init SysV installation], [init_cv_install], [dnl
 	init_cv_install='yes'
 	test :"${enable_initscripts:-yes}" = :no && init_cv_install='no'
@@ -287,11 +170,10 @@ AC_DEFUN([_INIT_SCRIPTS_OUTPUT], [dnl
     AM_CONDITIONAL([INSTALL_INITSCRIPTS], [test :"${init_cv_install:-yes}" = :yes])dnl
     AM_CONDITIONAL([WITH_RCSD_DIRECTORY], [test :${init_cv_rcs_dir:-no} != :no])dnl
 dnl
-dnl initrddir is where we are going to put init scripts relative to DESTDIR
+dnl initrddir is where we are going to put init scripts
 dnl
     if test :"${init_cv_initrddir:-no}" != :no ; then
-	init_tmp=`echo "${DESTDIR}" | sed -e 's|\<NONE\>||g;s|//|/|g' | awk '{if(!([$]0 in seen)){print[$]0;seen[[$ 0]]=1}}'`
-	initrddir="${init_cv_initrddir#$init_tmp}"
+	initrddir="${init_cv_initrddir}"
     else
 	if test :${init_cv_rcs_dir:-no} = :no ; then
 dnl         redhat style
@@ -303,11 +185,10 @@ dnl         debian style
     fi
     AC_SUBST([initrddir])
 dnl
-dnl configdir is where we are going to put init script default files relative to DESTDIR
+dnl configdir is where we are going to put init script default files
 dnl
     if test :"${init_cv_configdir:-no}" != :no ; then
-	init_tmp=`echo "${DESTDIR}" | sed -e 's|\<NONE\>||g;s|//|/|g' | awk '{if(!([$]0 in seen)){print[$]0;seen[[$ 0]]=1}}'`
-	configdir="${init_cv_configdir#$init_tmp}"
+	configdir="${init_cv_configdir}"
     else
 	if test :${init_cv_rcs_dir:-no} = :no ; then
 dnl         redhat style

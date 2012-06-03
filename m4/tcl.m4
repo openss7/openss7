@@ -70,14 +70,10 @@ AC_DEFUN([_TCL_EXTENSIONS], [dnl
 	    [the TCL header directory @<:@default=search@:>@])],
 	[], [with_tcl=search])
     _BLD_FIND_DIR([tcl include directory], [tcl_cv_includedir], [
-	    ${DESTDIR}${rootdir}${includedir}
-	    ${DESTDIR}${rootdir}${oldincludedir}
-	    ${DESTDIR}${rootdir}/usr/include
-	    ${DESTDIR}${rootdir}/usr/local/include
-	    ${DESTDIR}${includedir}
-	    ${DESTDIR}${oldincludedir}
-	    ${DESTDIR}/usr/include
-	    ${DESTDIR}/usr/local/include], [tcl.h], [no], [dnl
+	    ${includedir}
+	    ${rootdir}${oldincludedir}
+	    ${rootdir}/usr/include
+	    ${rootdir}/usr/local/include], [tcl.h], [no], [dnl
 	if test ${with_tcl:-search} != no ; then
 	    _BLD_INSTALL_WARN([TCL_H], [
 ***
