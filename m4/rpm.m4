@@ -474,11 +474,11 @@ AC_DEFUN([_RPM_SPEC_SETUP_TOPDIR], [dnl
     AC_ARG_WITH([rpm-distdir],
 	[AS_HELP_STRING([--with-rpm-distdir=DIR],
 	    [rpm dist directory @<:@default=PKG-DISTDIR/rpms/PKG-SUBDIR@:>@])],
-	[], [with_rpm_distdir='$(DISTDIR)/rpms/$(reposubdir)'])
+	[], [with_rpm_distdir='${DISTDIR}/rpms/${reposubdir}'])
     AC_MSG_CHECKING([for rpm distribution directory])
     if test ":${rpmdistdir+set}" != :set ; then
 	case ":${with_rpm_distdir:-no}" in
-	    (:no|:yes)	rpmdistdir='$(DISTDIR)/rpms/$(reposubdir)' ;;
+	    (:no|:yes)	rpmdistdir='${DISTDIR}/rpms/${reposubdir}' ;;
 	    (*)		rpmdistdir="$with_rpm_distdir" ;;
 	esac
     fi
@@ -487,31 +487,31 @@ AC_DEFUN([_RPM_SPEC_SETUP_TOPDIR], [dnl
     AC_ARG_WITH([rpm-topdir],
 	[AS_HELP_STRING([--with-rpm-topdir=DIR],
 	    [rpm top directory @<:@default=RPM-DISTDIR/BRANCH@:>@])],
-	[], [with_rpm_topdir='$(rpmdistdir)$(repobranch)'])
+	[], [with_rpm_topdir='${rpmdistdir}${repobranch}'])
     AC_MSG_CHECKING([for rpm top build directory])
     if test ":${topdir+set}" != :set ; then
 	case ":${with_rpm_topdir:-no}" in
-	    (:no|:yes)	topdir='$(rpmdistdir)$(repobranch)' ;;
+	    (:no|:yes)	topdir='${rpmdistdir}${repobranch}' ;;
 	    (*)		topdir="$with_rpm_topdir" ;;
 	esac
     fi
     AC_MSG_RESULT([$topdir])
     AC_SUBST([topdir])dnl
-    topfulldir='$(topdir)'
+    topfulldir='${topdir}'
     AC_SUBST([topfulldir])dnl
-    topmaindir='$(topdir)/main'
+    topmaindir='${topdir}/main'
     AC_SUBST([topmaindir])dnl
-    topdebgdir='$(topdir)/debug'
+    topdebgdir='${topdir}/debug'
     AC_SUBST([topdebgdir])dnl
-    topdevldir='$(topdir)/devel'
+    topdevldir='${topdir}/devel'
     AC_SUBST([topdevldir])dnl
-    topsrcsdir='$(topdir)/source'
+    topsrcsdir='${topdir}/source'
     AC_SUBST([topsrcsdir])dnl
     # set defaults for the rest
     AC_REQUIRE([_OPENSS7_OPTIONS_PKG_TARDIR])
     AC_MSG_CHECKING([for rpm SOURCES directory])
     if test ":${sourcedir+set}" != :set ; then
-	sourcedir='$(tardir)'
+	sourcedir='${tardir}'
     fi
     AC_MSG_RESULT([$sourcedir])
     AC_SUBST([sourcedir])dnl
@@ -533,19 +533,19 @@ AC_DEFUN([_RPM_SPEC_SETUP_TOPDIR], [dnl
     AC_SUBST([rpmbuildrootdir])dnl
     AC_MSG_CHECKING([for rpm RPMS directory])
     if test ":${rpmdir+set}" != :set ; then
-	rpmdir='$(topdir)/RPMS'
+	rpmdir='${topdir}/RPMS'
     fi
     AC_MSG_RESULT([$rpmdir])
     AC_SUBST([rpmdir])dnl
     AC_MSG_CHECKING([for rpm SRPMS directory])
     if test ":${srcrpmdir+set}" != :set ; then
-	srcrpmdir='$(DISTDIR)/rpms/SRPMS'
+	srcrpmdir='${DISTDIR}/rpms/SRPMS'
     fi
     AC_MSG_RESULT([$srcrpmdir])
     AC_SUBST([srcrpmdir])dnl
     AC_MSG_CHECKING([for rpm SPECS directory])
     if test ":${specdir+set}" != :set ; then
-	specdir='$(DISTDIR)/rpms/SPECS'
+	specdir='${DISTDIR}/rpms/SPECS'
     fi
     AC_MSG_RESULT([$specdir])
     AC_SUBST([specdir])dnl
@@ -766,17 +766,17 @@ AC_DEFUN([_RPM_REPO_SETUP_YUM], [dnl
     AC_CACHE_CHECK([for rpm yum repo construction], [rpm_cv_repo_yum], [dnl
 	rpm_cv_repo_yum=${enable_repo_yum:-no}
     ])
-    repodir='$(rpmdistdir)/repodata'
+    repodir='${rpmdistdir}/repodata'
     AC_SUBST([repodir])dnl
-    repofulldir='$(topfulldir)/repodata'
+    repofulldir='${topfulldir}/repodata'
     AC_SUBST([repofulldir])dnl
-    repomaindir='$(topmaindir)/repodata'
+    repomaindir='${topmaindir}/repodata'
     AC_SUBST([repomaindir])dnl
-    repodebgdir='$(topdebgdir)/repodata'
+    repodebgdir='${topdebgdir}/repodata'
     AC_SUBST([repodebgdir])dnl
-    repodevldir='$(topdevldir)/repodata'
+    repodevldir='${topdevldir}/repodata'
     AC_SUBST([repodevldir])dnl
-    reposrcsdir='$(topsrcsdir)/repodata'
+    reposrcsdir='${topsrcsdir}/repodata'
     AC_SUBST([reposrcsdir])dnl
 ])# _RPM_REPO_SETUP_YUM
 # =============================================================================
@@ -876,17 +876,17 @@ AC_DEFUN([_RPM_REPO_SETUP_URPMI], [dnl
     AC_CACHE_CHECK([for rpm urpmi repo construction], [rpm_cv_repo_urpmi], [dnl
 	rpm_cv_repo_urpmi=${enable_repo_urpmi:-no}
     ])
-    mediadir='$(rpmdistdir)/media/media_info'
+    mediadir='${rpmdistdir}/media/media_info'
     AC_SUBST([mediadir])dnl
-    mediafulldir='$(rpmdistdir)/media$(repobranch)/media_info'
+    mediafulldir='${rpmdistdir}/media${repobranch}/media_info'
     AC_SUBST([mediafulldir])dnl
-    mediamaindir='$(rpmdistdir)/media$(repobranch)/main/media_info'
+    mediamaindir='${rpmdistdir}/media${repobranch}/main/media_info'
     AC_SUBST([mediamaindir])dnl
-    mediadebgdir='$(rpmdistdir)/media$(repobranch)/debug/media_info'
+    mediadebgdir='${rpmdistdir}/media${repobranch}/debug/media_info'
     AC_SUBST([mediadebgdir])dnl
-    mediadevldir='$(rpmdistdir)/media$(repobranch)/devel/media_info'
+    mediadevldir='${rpmdistdir}/media${repobranch}/devel/media_info'
     AC_SUBST([mediadevldir])dnl
-    mediasrcsdir='$(rpmdistdir)/media$(repobranch)/source/media_info'
+    mediasrcsdir='${rpmdistdir}/media${repobranch}/source/media_info'
     AC_SUBST([mediasrcsdir])dnl
 ])# _RPM_REPO_SETUP_URPMI
 # =============================================================================
@@ -974,23 +974,23 @@ dnl
     AC_CACHE_CHECK([for rpm apt repo construction], [rpm_cv_repo_apt], [dnl
 	rpm_cv_repo_apt=${enable_repo_apt_rpm:-no}
     ])
-    aptrdir='$(rpmdistdir)'
+    aptrdir='${rpmdistdir}'
     AC_SUBST([aptrdir])dnl
-    aptrbasedir='$(topdir)/base'
+    aptrbasedir='${topdir}/base'
     AC_SUBST([aptrbasedir])dnl
-    aptrfulldir='$(topdir)/RPMS.full'
+    aptrfulldir='${topdir}/RPMS.full'
     AC_SUBST([aptrfulldir])dnl
-    aptrmaindir='$(topdir)/RPMS.main'
+    aptrmaindir='${topdir}/RPMS.main'
     AC_SUBST([aptrmaindir])dnl
-    aptrdebgdir='$(topdir)/RPMS.debug'
+    aptrdebgdir='${topdir}/RPMS.debug'
     AC_SUBST([aptrdebgdir])dnl
-    aptrdevldir='$(topdir)/RPMS.devel'
+    aptrdevldir='${topdir}/RPMS.devel'
     AC_SUBST([aptrdevldir])dnl
-    aptrsrcsdir='$(topdir)/RPMS.source'
+    aptrsrcsdir='${topdir}/RPMS.source'
     AC_SUBST([aptrsrcsdir])dnl
-    aptrsrpmdir='$(topdir)/SRPMS.source'
+    aptrsrpmdir='${topdir}/SRPMS.source'
     AC_SUBST([aptrsrpmdir])dnl
-    aptrfsrcdir='$(topdir)/SRPMS.full'
+    aptrfsrcdir='${topdir}/SRPMS.full'
     AC_SUBST([aptrfsrcdir])dnl
 ])# _RPM_REPO_SETUP_APT
 # =============================================================================

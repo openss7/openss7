@@ -172,11 +172,11 @@ AC_DEFUN([_TXZ_ARCH_SETUP_TOPDIR], [dnl
     AC_ARG_WITH([txz-distdir],
 	[AS_HELP_STRING([--with-txz-distdir=DIR],
 	    [txz dist directory @<:@default=PKG-DISTDIR/slackware/PKG-SUBDIR@:>@])],
-	[], [with_txz_distdir='$(DISTDIR)/$(target_distro)/$(reposubdir)'])
+	[], [with_txz_distdir='${DISTDIR}/${target_distro}/${reposubdir}'])
     AC_MSG_CHECKING([for txz distribution directory])
     if test ":${txzdistdir+set}" != :set ; then
 	case ":${with_txz_distdir:-no}" in
-	    (:no|:yes)	txzdistdir='$(DISTDIR)/$(target_distro)/$(reposubdir)' ;;
+	    (:no|:yes)	txzdistdir='${DISTDIR}/${target_distro}/${reposubdir}' ;;
 	    (*)		txzdistdir="$with_txz_distdir" ;;
 	esac
     fi
@@ -185,33 +185,33 @@ AC_DEFUN([_TXZ_ARCH_SETUP_TOPDIR], [dnl
     AC_ARG_WITH([txz_topdir],
 	[AS_HELP_STRING([--with-txz-topdir=DIR],
 	    [txz top directory @<:@default=TXZ-DISTDIR/BRANCH@:>@])],
-	[], [with_txz_topdir='$(txzdistdir)$(repobranch)'])
+	[], [with_txz_topdir='${txzdistdir}${repobranch}'])
     AC_MSG_CHECKING([for txz top build directory])
     if test ":${txzdir+set}" != :set ; then
 	case ":${with_txz_topdir:-no}" in
-	    (:no|:yes)	txzdir='$(txzkdistdir)$(repobranch)' ;;
+	    (:no|:yes)	txzdir='${txzkdistdir}${repobranch}' ;;
 	    (*)		txzdir="${with_txz_topdir}" ;;
 	esac
     fi
     AC_MSG_RESULT([$txzdir])
     AC_SUBST([txzdir])dnl
-    spkgdir='$(txzdistdir)'
+    spkgdir='${txzdistdir}'
     AC_SUBST([spkgdir])dnl
-    spkgfulldir='$(txzdir)'
+    spkgfulldir='${txzdir}'
     AC_SUBST([spkgfulldir])dnl
-    spkgmaindir='$(txzdir)/main'
+    spkgmaindir='${txzdir}/main'
     AC_SUBST([spkgmaindir])dnl
-    spkgdebgdir='$(txzdir)/debug'
+    spkgdebgdir='${txzdir}/debug'
     AC_SUBST([spkgdebgdir])dnl
-    spkgdevldir='$(txzdir)/devel'
+    spkgdevldir='${txzdir}/devel'
     AC_SUBST([spkgdevldir])dnl
-    spkgsrcsdir='$(txzdir)/source'
+    spkgsrcsdir='${txzdir}/source'
     AC_SUBST([spkgsrcsdir])dnl
     AC_MSG_CHECKING([for makepkg BUILD directory])
     if test ":${spkgtopdir+set}" != :set ; then
 	# spkgtopdir needs to be absolute: always build in the top build
 	# directory on the local machine
-	spkgtopdir=`pwd`/$(target_distro)
+	spkgtopdir="`pwd`/${target_distro}"
     fi
     AC_MSG_RESULT([$spkgtopdir])
     AC_SUBST([spkgtopdir])dnl
@@ -411,19 +411,19 @@ AC_DEFUN([_TXZ_REPO_SETUP_SLACKPKG], [dnl
     AC_CACHE_CHECK([for slackpkg repo construction], [txz_cv_repo_slackpkg], [dnl
 	txz_cv_repo_slackpkg=${enable_repo_slackpkg:-no}
     ])
-    slackdir='$(txzdistdir)'
+    slackdir='${txzdistdir}'
     AC_SUBST([slackdir])dnl
-    slackfulldir='$(topdir)/full'
+    slackfulldir='${topdir}/full'
     AC_SUBST([slackfulldir])dnl
-    slackmaindir='$(topdir)/main'
+    slackmaindir='${topdir}/main'
     AC_SUBST([slackmaindir])dnl
-    slackdebgdir='$(topdir)/debug'
+    slackdebgdir='${topdir}/debug'
     AC_SUBST([slackdebgdir])dnl
-    slackdevldir='$(topdir)/devel'
+    slackdevldir='${topdir}/devel'
     AC_SUBST([slackdevldir])dnl
-    slacksrcsdir='$(topdir)/source'
+    slacksrcsdir='${topdir}/source'
     AC_SUBST([slacksrcsdir])dnl
-    slacksrcedir='$(topdir)/source'
+    slacksrcedir='${topdir}/source'
     AC_SUBST([slacksrcedir])dnl
 
 ])# _TXZ_REPO_SETUP_SLACKPKG

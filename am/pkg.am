@@ -53,10 +53,13 @@
 ## =============================================================================
 
 ##
-## These are the rules that I use for bulding ArchLinux source and binary packages using automake.
+## These are the rules that I use for building ArchLinux source and binary packages using automake.
 ## As a maintainer I need to package releases using makepkg.  The following rules accomplish that
 ## for all packages.
 ##
+
+if MAINTAINER_MODE
+## MAINTAINER_MODE
 
 ##
 ## For better speed when building package binaries, we skip these rules to invoke package building.
@@ -66,9 +69,6 @@
 
 if BUILD_PKGS
 ## BUILD_PKGS
-
-if MAINTAINER_MODE
-## MAINTAINER_MODE
 
 ##
 ## ArchLinux builds are a little different from rpm and deb builds.  We use the same bootstrapping
@@ -93,13 +93,77 @@ mpkg_base_file		= $(mpkgpkg).pkg.tar.gz
 pkg_build_file		= arch/PKGBUILD
 pkg_source_files	= arch/$(PACKAGE)-$(VERSION).tar.gz
 
-$(pkg_build_file)::
-	( cd $(pacman_dir); $(MAKEPKG) -g >>$@ )
+archpkg			= $(PACKAGE)-$(VERSION)
+pkg_dir			= $(mpkgtopdir)/$(PACKAGE)-$(VERSION)
+pkg_dir_stamp		= $(mpkgtopdir)/stamp-$(PACKAGE)-$(VERSION)
+pkg_cache_files		= $(mpkgtopdir)/*config.cache \
+			  $(mpkgtopdir)/*config.site \
+			  $(mpkgtopdir)/*modpost.cache
 
-each-pkg: $(pkg_build_file) $(pkg_source_files)
-	[ -d $(pacman_dir) ] || $(MAKE) $(AM_MAKEFLAGS) -- $(pacman_dir)
+pkg_base_file		= $(PACKAGE)-$(VERSION)-$(PACKAGE_PACRELEASE)-$(target_cpu).pkg.tar.xz
+pkg_devl_file		= $(PACKAGE)-devel-$(VERSION)-$(PACKAGE_PACRELEASE)-$(target_cpu).pkg.tar.xz
+pkg_kern_file		= $(PACKAGE)-*-$(VERSION)-$(PACKAGE_PACRELEASE)-$(target_cpu).pkg.tar.xz
+pkg_kdev_file		= $(PACKAGE)-*-devel-$(VERSION)-$(PACKAGE_PACRELEASE)-$(target_cpu).pkg.tar.xz
+pkg_java_file		= $(PACKAGE)-java-$(VERSION)-$(PACKAGE_PACRELEASE)-$(target_cpu).pkg.tar.xz
+
+pkg_base_file_sig	= $(PACKAGE)-$(VERSION)-$(PACKAGE_PACRELEASE)-$(target_cpu).pkg.tar.xz
+pkg_devl_file_sig	= $(PACKAGE)-devel-$(VERSION)-$(PACKAGE_PACRELEASE)-$(target_cpu).pkg.tar.xz
+pkg_kern_file_sig	= $(PACKAGE)-*-$(VERSION)-$(PACKAGE_PACRELEASE)-$(target_cpu).pkg.tar.xz
+pkg_kdev_file_sig	= $(PACKAGE)-*-devel-$(VERSION)-$(PACKAGE_PACRELEASE)-$(target_cpu).pkg.tar.xz
+pkg_java_file_sig	= $(PACKAGE)-java-$(VERSION)-$(PACKAGE_PACRELEASE)-$(target_cpu).pkg.tar.xz
+
+pkg_tar_file		= $(mpkgtopdir)/$(archpkg).tar.gz
+pkg_sig_file		= $(mpkgtopdir)/$(archpkg).tar.gz.sig
+pkg_source_files	= $(pkg_tar_file) $(pkg_sig_file)
+pkg_update_files	= $(mpkgtopdir)/$(pkg_kern_file) \
+			  $(mpkgtopdir)/$(pkg_kern_file_sig) \
+			  $(mpkgtopdir)/$(pkg_kdev_file) \
+			  $(mpkgtopdir)/$(pkg_kdev_file_sig)
+pkg_binary_files	= $(mpkgtopdir)/$(pkg_base_file) \
+			  $(mpkgtopdir)/$(pkg_base_file_sig) \
+			  $(mpkgtopdir)/$(pkg_devl_file) \
+			  $(mpkgtopdir)/$(pkg_devl_file_sig) \
+			  $(mpkgtopdir)/$(pkg_java_file) \
+			  $(mpkgtopdir)/$(pkg_java_file_sig) \
+			  $(pkg_update_files)
+
+pkgtop_tar_file		= $(pacdir)/source/$(archpkg).tar.gz
+pkgtop_sig_file		= $(pacdir)/source/$(archpkg).tar.gz.sig
+pkgtop_source_files	= $(pkgtop_tar_file) $(pkgtop_sig_file)
+pkgtop_update_files	= $(pacdir)/*/$(pkg_kern_file) \
+			  $(pacdir)/*/$(pkg_kern_file_sig) \
+			  $(pacdir)/*/$(pkg_kdev_file) \
+			  $(pacdir)/*/$(pkg_kdev_file_sig)
+pkgtop_binary_files	= $(pacdir)/*/$(pkg_base_file) \
+			  $(pacdir)/*/$(pkg_base_file_sig) \
+			  $(pacdir)/*/$(pkg_devl_file) \
+			  $(pacdir)/*/$(pkg_devl_file_sig) \
+			  $(pacdir)/*/$(pkg_java_file) \
+			  $(pacdir)/*/$(pkg_java_file_sig) \
+			  $(pkgtop_update_files)
+
+checksummed-PKGBUILD: $(pkg_build_file)
+	@$(ECHO_V) "D: Making $@ in `pwd`"
+	$(AM_V_GEN)\
+	grep md5sums $< >/dev/null 2>&1 || \
+	(cd $(mpkgtopdir); $(MAKEPKG) -g >>$<)
+
+MY_PHONY		+= checksummed-PKGBUILD
+
+#!
+#! ArchLinux Build Targets:
+#! ------------------------
+#!
+#! On ArchLinux systems, or systems sporting pacman packaging tools, the
+#! following targets are used to generate archlinux release packages.  The
+#! release number can be controlled in the contents of the .pacrelease file, or
+#! with the --with-pac-release=RELEASENUMBER option to 'configure'.  See
+#! 'configure --help' for more information on options.
+#!
+each-pkg: checksummed-PKGBUILD $(pkg_source_files)
+	[ -d $(mpkgtopdir) ] || $(MAKE) $(AM_MAKEFLAGS) -- $(mpkgtopdir)
 	( \
-		cd $(pacman_dir); \
+		cd $(mpkgtopdir); \
 		case ' $(AM_PKGBOPTS) ' in \
 			(*" --without-arch "*) \
 				packages= ;; \
@@ -151,10 +215,70 @@ pkgs:
 	@$(ECHO) "D: $@: rebuild $(PKGTARGET)"; \
 	$(MAKE) $(AM_MAKEFLAGS) PKGXOPTS='$(PKGXOPTS)' kversion='$(kversion)' PKGTARGET="$(PKGTARGET)" one-t-pkg || :
 
-## MAINTAINER_MODE
-endif
+
+$(pkg_sigs): %.sig: %
+	$(AM_V_GEN)\
+	user="$(GNUPGUSER)"; user="$${user:+ -u }$$user"; \
+	home="$(GNUPGHOME)"; home="$${home:+ --homedir }$$home"; \
+	pass="$(GNUPGPASS)"; pass="$${pass:+ --batch }"; \
+	pipe="$(GNUPGPASS)"; pipe="$${pipe:+$(ECHO) $$pipe |}"; \
+	$(ECHO) "$(GPG) -ba --passphrase-fd 0$$user$$home$$pass -o- -- $< >$@ 2>/dev/null"; \
+	eval "$$pipe $(GPG) -ba --passphrase-fd 0$$user$$home$$pass -o- -- $< >$@ 2>/dev/null"
+
+
+## Because the build directory is in the autoconf top build directory on the local machine, it needs
+## to be cleaned when a distclean is performed.  We use makepkg to do this for us, and makepkg will
+## complain if the directory does not exist, so we ignore errors.  The PKGBUILD file must still
+## exist for use to do this too.  The same is true for build files.
+##
+distclean-pkg:
+	@$(ECHO_V) "D: Making $@ in `pwd`"
+	@if test -f $(pkg_build_file); then \
+		echo '(cd $(mpkgtopdir); $(MAKEPKG) -c)'; \
+		(cd $(mpkgtopdir); $(MAKEPKG) -c); \
+	fi
+
+DISTCLEAN_LOCAL		+= distclean-pkg
+DISTCLEANFILES		+= $(pkg_cache_files) \
+			   $(pkg_dir_stamp) \
+			   $(pkg_source_files) \
+			   $(pkg_binary_files)
+
+
+
+release-clean-pkg: distclean-pkg
+
+RELEASE_DIRECTORIES	+= $(pacdir) $(pacfulldir) $(pacmaindir) $(pacdebgdir) $(pacdevldir) $(packsrcsdir)
+RELEASE			+= all-pkgs
+
+
+repo-pacman: $(RELEASE_DIRECTORIES) $(pacman_files)
+
+repo-sign-pacman: $(RELEASE_DIRECTORIES) $(pacman_signs) $(pacman_keys)
+
+repo-clean-pacman:
+
+REPO_DIRECTORIES	+= $(pacmandirs)
+#REPO_LINKS		+=
+REPO			+= repo-pacman
+REPO_SIGN		+= repo-sign-pacman
+REPO_CLEAN		+= repo-clean-pacman
+REPOCLEANFILES		+= $(pacman_files) $(pacman_signs) $(pacman_keys)
+
+UPDATE_DIRECTORIES	+= $(pacmandirs)
+#UPDATE_LINKS		+=
+UPDATE			+= repo-pacman
+UPDATE_SIGN		+= repo-sign-pacman
+UPDATE_CLEAN_LOCAL	+= repo-clean-pacman
+UPDATECLEANFILES	+=
+
+
+
 
 ## BUILD_PKGS
+endif
+
+## MAINTAINER_MODE
 endif
 
 ## =============================================================================

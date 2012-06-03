@@ -298,9 +298,9 @@ endif
 ## yum-fedorakmod plugin and change the 'pinkernels' and 'installforallkernels' options.
 ##
 post-yum:
-	if test -n "$(yumkmodconf)" -a -f "$(DESTDIR)/$(yumkmodconf)" ; then \
+	if test -n "$(yumkmodconf)" -a -f "$(DESTDIR)$(yumkmodconf)" ; then \
 		sed -r -e 's/^[[:space:]]*pinkernels.*$$/pinkernels = 1/;s/^[[:space:]]*installforallkernels.*$$/installforallkernels = 1/' \
-			"$(DESTDIR)/$(yumkmodconf)" ; \
+			"$(DESTDIR)$(yumkmodconf)" ; \
 		yum makecache ; \
 	fi
 
@@ -616,9 +616,9 @@ endif
 ## multiversion = provides:multiversion(kernel).
 ##
 post-zypp:
-	if test -n "$(zyppconfig)" - a -f "$(DESTDIR)/$(zyppconfig)" ; then \
+	if test -n "$(zyppconfig)" - a -f "$(DESTDIR)$(zyppconfig)" ; then \
 		sed -r -e 's/^[[:space:]]*multiversion.*$$/mulversion = provides:multiversion(kernel)/' \
-			"$(DESTDIR)/$(zyppconfig)" ; \
+			"$(DESTDIR)$(zyppconfig)" ; \
 		zypper refresh ; \
 	fi
 

@@ -86,18 +86,12 @@ AC_DEFUN([_PERL_EXTENSIONS], [dnl
 	    [PERL header directory @<:@default=search@:>@])],
 	[], [with_perl=search])
     _BLD_FIND_DIR([perl headers], [perl_cv_includedir], [
-	    ${DESTDIR}${rootdir}${libdir}/perl5
-	    ${DESTDIR}${rootdir}${libdir}/perl
-	    ${DESTDIR}${rootdir}/usr/lib/perl5
-	    ${DESTDIR}${rootdir}/usr/lib/perl
-	    ${DESTDIR}${rootdir}/usr/local/lib/perl5
-	    ${DESTDIR}${rootdir}/usr/local/lib/perl
-	    ${DESTDIR}${libdir}/perl5
-	    ${DESTDIR}${libdir}/perl
-	    ${DESTDIR}/usr/lib/perl5
-	    ${DESTDIR}/usr/lib/perl
-	    ${DESTDIR}/usr/local/lib/perl5
-	    ${DESTDIR}/usr/local/lib/perl], [EXTERN.h], [no], [dnl
+	    ${libdir}/perl5
+	    ${libdir}/perl
+	    ${rootdir}/usr/lib/perl5
+	    ${rootdir}/usr/lib/perl
+	    ${rootdir}/usr/local/lib/perl5
+	    ${rootdir}/usr/local/lib/perl], [EXTERN.h], [no], [dnl
 	if test ${with_perl:-search} != no ; then
 	    _BLD_INSTALL_WARN([EXTERN_H], [
 ***
@@ -173,12 +167,9 @@ AC_DEFUN([_PERL_LIBRARIES], [dnl
     AC_CACHE_CHECK([for perl ldflags], [perl_cv_ldflags], [dnl
 	perl_cv_ldflags=
 	eval "perl_search_path=\"
-	    ${DESTDIR}${rootdir}${libdir}
-	    ${DESTDIR}${rootdir}/usr/lib
-	    ${DESTDIR}${rootdir}/usr/local/lib
-	    ${DESTDIR}${libdir}
-	    ${DESTDIR}/usr/lib
-	    ${DESTDIR}/usr/local/lib\""
+	    ${libdir}
+	    ${rootdir}/usr/lib
+	    ${rootdir}/usr/local/lib\""
 	perl_search_path=`echo "$perl_search_path" | sed -e 's,\<NONE\>,'$ac_default_prefix',g;s,//,/,g' | awk '{if(!([$]0 in seen)){print[$]0;seen[[$ 0]]=1}}'`
 	case "$host_cpu" in
 	    (*64) perl_targ=elf64 ;;
@@ -194,9 +185,8 @@ AC_DEFUN([_PERL_LIBRARIES], [dnl
 		if (${OBJDUMP:-objdump} -f "$perl_lib" | grep $perl_targ >/dev/null) 2>/dev/null
 		then
 		    perl_dir="${perl_lib%/libperl.*}"
-		    perl_dir="${perl_dir#$DESTDIR}"
 		    perl_dir="${perl_dir#$rootdir}"
-		    perl_cv_ldflags="${perl_cv_ldflags:+$perl_cv_ldflags }-L$perl_dir -Wl,-rpath -Wl,$perl_dir"
+		    perl_cv_ldflags="${perl_cv_ldflags:+$perl_cv_ldflags }-L${rootdir}$perl_dir -Wl,-rpath -Wl,$perl_dir"
 		    AC_MSG_RESULT([yes])
 		    break 2
 		fi
@@ -237,12 +227,9 @@ AC_DEFUN([_PERL_LIBRARIES], [dnl
     AC_CACHE_CHECK([for perl ldadd], [perl_cv_ldadd], [dnl
 	perl_cv_ldadd=
 	eval "perl_search_path=\"
-	    ${DESTDIR}${rootdir}${libdir}
-	    ${DESTDIR}${rootdir}/usr/lib
-	    ${DESTDIR}${rootdir}/usr/local/lib
-	    ${DESTDIR}${libdir}
-	    ${DESTDIR}/usr/lib
-	    ${DESTDIR}/usr/local/lib\""
+	    ${libdir}
+	    ${rootdir}/usr/lib
+	    ${rootdir}/usr/local/lib\""
 	perl_search_path=`echo "$perl_search_path" | sed -e 's,\<NONE\>,'$ac_default_prefix',g;s,//,/,g' | awk '{if(!([$]0 in seen)){print[$]0;seen[[$ 0]]=1}}'`
 	case "$host_cpu" in
 	    (*64) perl_targ=elf64 ;;
@@ -257,7 +244,7 @@ AC_DEFUN([_PERL_LIBRARIES], [dnl
 		AC_MSG_CHECKING([for perl ldadd... $perl_lib])
 		if (${OBJDUMP:-objdump} -f "$perl_lib" | grep $perl_targ >/dev/null) 2>/dev/null
 		then
-		    perl_cv_ldadd="$perl_lib"
+		    perl_cv_ldadd='${rootdir}'"${perl_lib#$rootdir}"
 		    AC_MSG_RESULT([yes])
 		    break 2
 		fi

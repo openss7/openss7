@@ -786,7 +786,7 @@ dnl----------------------------------------------------------------------------
 	], [:], [:], [
 #include <linux/compiler.h>
 #ifdef NEED_LINUX_AUTOCONF_H
-#include <linux/autoconf.h>
+#include NEED_LINUX_AUTOCONF_H
 #endif
 #include <linux/version.h>
 #include <linux/types.h>
@@ -936,7 +936,7 @@ dnl----------------------------------------------------------------------------
 			esac ], [
 #include <linux/compiler.h>
 #ifdef NEED_LINUX_AUTOCONF_H
-#include <linux/autoconf.h>
+#include NEED_LINUX_AUTOCONF_H
 #endif
 #include <linux/version.h>
 #include <linux/types.h>
@@ -1022,7 +1022,7 @@ dnl----------------------------------------------------------------------------
     ], [:], [:], [
 #include <linux/compiler.h>
 #ifdef NEED_LINUX_AUTOCONF_H
-#include <linux/autoconf.h>
+#include NEED_LINUX_AUTOCONF_H
 #endif
 #include <linux/version.h>
 #include <linux/types.h>
@@ -1085,7 +1085,7 @@ dnl----------------------------------------------------------------------------
 	struct net_device_ops], [:], [:], [
 #include <linux/compiler.h>
 #ifdef NEED_LINUX_AUTOCONF_H
-#include <linux/autoconf.h>
+#include NEED_LINUX_AUTOCONF_H
 #endif
 #include <linux/version.h>
 #include <linux/types.h>
@@ -1205,7 +1205,7 @@ dnl----------------------------------------------------------------------------
 	struct nameidata.mnt], [:], [:], [
 #include <linux/compiler.h>
 #ifdef NEED_LINUX_AUTOCONF_H
-#include <linux/autoconf.h>
+#include NEED_LINUX_AUTOCONF_H
 #endif
 #include <linux/version.h>
 #include <linux/types.h>
@@ -1701,7 +1701,7 @@ dnl----------------------------------------------------------------------------
 		AC_LANG_PROGRAM([[
 #include <linux/compiler.h>
 #ifdef NEED_LINUX_AUTOCONF_H
-#include <linux/autoconf.h>
+#include NEED_LINUX_AUTOCONF_H
 #endif
 #include <linux/version.h>
 #include <linux/types.h>
@@ -1751,7 +1751,7 @@ dnl----------------------------------------------------------------------------
 		AC_LANG_PROGRAM([[
 #include <linux/compiler.h>
 #ifdef NEED_LINUX_AUTOCONF_H
-#include <linux/autoconf.h>
+#include NEED_LINUX_AUTOCONF_H
 #endif
 #include <linux/version.h>
 #include <linux/types.h>
@@ -1813,7 +1813,7 @@ dnl----------------------------------------------------------------------------
 		    AC_LANG_PROGRAM([[
 #include <linux/compiler.h>
 #ifdef NEED_LINUX_AUTOCONF_H
-#include <linux/autoconf.h>
+#include NEED_LINUX_AUTOCONF_H
 #endif
 #include <linux/version.h>
 #include <linux/types.h>
@@ -1853,7 +1853,7 @@ dnl----------------------------------------------------------------------------
 		    AC_LANG_PROGRAM([[
 #include <linux/compiler.h>
 #ifdef NEED_LINUX_AUTOCONF_H
-#include <linux/autoconf.h>
+#include NEED_LINUX_AUTOCONF_H
 #endif
 #include <linux/version.h>
 #include <linux/types.h>
@@ -1893,7 +1893,7 @@ dnl----------------------------------------------------------------------------
 		    AC_LANG_PROGRAM([[
 #include <linux/compiler.h>
 #ifdef NEED_LINUX_AUTOCONF_H
-#include <linux/autoconf.h>
+#include NEED_LINUX_AUTOCONF_H
 #endif
 #include <linux/version.h>
 #include <linux/types.h>
@@ -1933,7 +1933,7 @@ dnl----------------------------------------------------------------------------
 		    AC_LANG_PROGRAM([[
 #include <linux/compiler.h>
 #ifdef NEED_LINUX_AUTOCONF_H
-#include <linux/autoconf.h>
+#include NEED_LINUX_AUTOCONF_H
 #endif
 #include <linux/version.h>
 #include <linux/types.h>
@@ -1973,7 +1973,7 @@ dnl----------------------------------------------------------------------------
 		    AC_LANG_PROGRAM([[
 #include <linux/compiler.h>
 #ifdef NEED_LINUX_AUTOCONF_H
-#include <linux/autoconf.h>
+#include NEED_LINUX_AUTOCONF_H
 #endif
 #include <linux/version.h>
 #include <linux/types.h>
@@ -2030,7 +2030,7 @@ dnl----------------------------------------------------------------------------
 		    AC_LANG_PROGRAM([[
 #include <linux/compiler.h>
 #ifdef NEED_LINUX_AUTOCONF_H
-#include <linux/autoconf.h>
+#include NEED_LINUX_AUTOCONF_H
 #endif
 #include <linux/version.h>
 #include <linux/types.h>
@@ -2081,7 +2081,7 @@ dnl----------------------------------------------------------------------------
 		    AC_LANG_PROGRAM([[
 #include <linux/compiler.h>
 #ifdef NEED_LINUX_AUTOCONF_H
-#include <linux/autoconf.h>
+#include NEED_LINUX_AUTOCONF_H
 #endif
 #include <linux/version.h>
 #include <linux/types.h>
@@ -2136,7 +2136,7 @@ dnl----------------------------------------------------------------------------
 	    AC_COMPILE_IFELSE([
 		AC_LANG_PROGRAM([[
 #ifdef NEED_LINUX_AUTOCONF_H
-#include <linux/autoconf.h>
+#include NEED_LINUX_AUTOCONF_H
 #endif
 #include <linux/version.h>
 #include <linux/types.h>
@@ -2157,7 +2157,7 @@ dnl----------------------------------------------------------------------------
 	    AC_COMPILE_IFELSE([
 		AC_LANG_PROGRAM([[
 #ifdef NEED_LINUX_AUTOCONF_H
-#include <linux/autoconf.h>
+#include NEED_LINUX_AUTOCONF_H
 #endif
 #include <linux/version.h>
 #include <linux/types.h>
@@ -2206,7 +2206,7 @@ dnl----------------------------------------------------------------------------
 	    AC_COMPILE_IFELSE([
 		AC_LANG_PROGRAM([[
 #ifdef NEED_LINUX_AUTOCONF_H
-#include <linux/autoconf.h>
+#include NEED_LINUX_AUTOCONF_H
 #endif
 #include <linux/version.h>
 #include <linux/types.h>
@@ -2232,7 +2232,7 @@ dnl----------------------------------------------------------------------------
 		AC_COMPILE_IFELSE([
 		    AC_LANG_PROGRAM([[
 #ifdef NEED_LINUX_AUTOCONF_H
-#include <linux/autoconf.h>
+#include NEED_LINUX_AUTOCONF_H
 #endif
 #include <linux/version.h>
 #include <linux/types.h>
@@ -2265,7 +2265,7 @@ dnl----------------------------------------------------------------------------
 		    AC_LANG_PROGRAM([[
 #include <linux/compiler.h>
 #ifdef NEED_LINUX_AUTOCONF_H
-#include <linux/autoconf.h>
+#include NEED_LINUX_AUTOCONF_H
 #endif
 #include <linux/version.h>
 #include <linux/types.h>
@@ -2297,7 +2297,7 @@ dnl----------------------------------------------------------------------------
 	    AC_COMPILE_IFELSE([
 		AC_LANG_PROGRAM([[
 #ifdef NEED_LINUX_AUTOCONF_H
-#include <linux/autoconf.h>
+#include NEED_LINUX_AUTOCONF_H
 #endif
 #include <linux/version.h>
 #include <linux/types.h>
@@ -2324,7 +2324,7 @@ dnl----------------------------------------------------------------------------
 	    AC_COMPILE_IFELSE([
 		AC_LANG_PROGRAM([[
 #ifdef NEED_LINUX_AUTOCONF_H
-#include <linux/autoconf.h>
+#include NEED_LINUX_AUTOCONF_H
 #endif
 #include <linux/version.h>
 #include <linux/types.h>
@@ -2360,7 +2360,7 @@ dnl 	fi
 	    AC_COMPILE_IFELSE([
 		AC_LANG_PROGRAM([[
 #ifdef NEED_LINUX_AUTOCONF_H
-#include <linux/autoconf.h>
+#include NEED_LINUX_AUTOCONF_H
 #endif
 #include <linux/version.h>
 #include <linux/types.h>
@@ -2378,7 +2378,7 @@ dnl 	fi
 		AC_LANG_PROGRAM([[
 #include <linux/compiler.h>
 #ifdef NEED_LINUX_AUTOCONF_H
-#include <linux/autoconf.h>
+#include NEED_LINUX_AUTOCONF_H
 #endif
 #include <linux/version.h>
 #include <linux/types.h>
@@ -2407,7 +2407,7 @@ dnl 	fi
 		AC_LANG_PROGRAM([[
 #include <linux/compiler.h>
 #ifdef NEED_LINUX_AUTOCONF_H
-#include <linux/autoconf.h>
+#include NEED_LINUX_AUTOCONF_H
 #endif
 #include <linux/version.h>
 #include <linux/types.h>
@@ -2437,7 +2437,7 @@ dnl 	fi
 		AC_LANG_PROGRAM([[
 #include <linux/compiler.h>
 #ifdef NEED_LINUX_AUTOCONF_H
-#include <linux/autoconf.h>
+#include NEED_LINUX_AUTOCONF_H
 #endif
 #include <linux/version.h>
 #include <linux/types.h>
@@ -2466,7 +2466,7 @@ dnl 	fi
 		AC_LANG_PROGRAM([[
 #include <linux/compiler.h>
 #ifdef NEED_LINUX_AUTOCONF_H
-#include <linux/autoconf.h>
+#include NEED_LINUX_AUTOCONF_H
 #endif
 #include <linux/version.h>
 #include <linux/types.h>
@@ -2496,7 +2496,7 @@ dnl----------------------------------------------------------------------------
 	[linux_cv_inet_protocol_style='old'],
 	[:], [
 #ifdef NEED_LINUX_AUTOCONF_H
-#include <linux/autoconf.h>
+#include NEED_LINUX_AUTOCONF_H
 #endif
 #include <linux/version.h>
 #include <linux/types.h>
@@ -2510,7 +2510,7 @@ dnl----------------------------------------------------------------------------
 	[linux_cv_inet_protocol_style='new'],
 	[:], [
 #ifdef NEED_LINUX_AUTOCONF_H
-#include <linux/autoconf.h>
+#include NEED_LINUX_AUTOCONF_H
 #endif
 #include <linux/version.h>
 #include <linux/types.h>
@@ -2524,7 +2524,7 @@ dnl----------------------------------------------------------------------------
 	[linux_cv_dst_entry_path='yes'],
 	[linux_cv_dst_entry_path='no'], [
 #ifdef NEED_LINUX_AUTOCONF_H
-#include <linux/autoconf.h>
+#include NEED_LINUX_AUTOCONF_H
 #endif
 #include <linux/version.h>
 #include <linux/types.h>
@@ -2575,7 +2575,7 @@ dnl----------------------------------------------------------------------------
 	    supports struct sockaddr_storage.])],
 	[:], [
 #ifdef NEED_LINUX_AUTOCONF_H
-#include <linux/autoconf.h>
+#include NEED_LINUX_AUTOCONF_H
 #endif
 #include <linux/version.h>
 #include <linux/types.h>
@@ -2593,7 +2593,7 @@ dnl----------------------------------------------------------------------------
 	    AC_COMPILE_IFELSE([
 		AC_LANG_PROGRAM([[
 #ifdef NEED_LINUX_AUTOCONF_H
-#include <linux/autoconf.h>
+#include NEED_LINUX_AUTOCONF_H
 #endif
 #include <linux/version.h>
 #include <linux/types.h>
@@ -2618,7 +2618,7 @@ dnl----------------------------------------------------------------------------
 	    AC_COMPILE_IFELSE([
 		AC_LANG_PROGRAM([[
 #ifdef NEED_LINUX_AUTOCONF_H
-#include <linux/autoconf.h>
+#include NEED_LINUX_AUTOCONF_H
 #endif
 #include <linux/version.h>
 #include <linux/types.h>
@@ -2643,7 +2643,7 @@ dnl----------------------------------------------------------------------------
 	    AC_COMPILE_IFELSE([
 		AC_LANG_PROGRAM([[
 #ifdef NEED_LINUX_AUTOCONF_H
-#include <linux/autoconf.h>
+#include NEED_LINUX_AUTOCONF_H
 #endif
 #include <linux/version.h>
 #include <linux/types.h>
@@ -2668,7 +2668,7 @@ dnl----------------------------------------------------------------------------
 	    AC_COMPILE_IFELSE([
 		AC_LANG_PROGRAM([[
 #ifdef NEED_LINUX_AUTOCONF_H
-#include <linux/autoconf.h>
+#include NEED_LINUX_AUTOCONF_H
 #endif
 #include <linux/version.h>
 #include <linux/types.h>
@@ -2693,7 +2693,7 @@ dnl----------------------------------------------------------------------------
 	    AC_COMPILE_IFELSE([
 		AC_LANG_PROGRAM([[
 #ifdef NEED_LINUX_AUTOCONF_H
-#include <linux/autoconf.h>
+#include NEED_LINUX_AUTOCONF_H
 #endif
 #include <linux/version.h>
 #include <linux/types.h>
@@ -2718,7 +2718,7 @@ dnl----------------------------------------------------------------------------
 	    AC_COMPILE_IFELSE([
 		AC_LANG_PROGRAM([[
 #ifdef NEED_LINUX_AUTOCONF_H
-#include <linux/autoconf.h>
+#include NEED_LINUX_AUTOCONF_H
 #endif
 #include <linux/version.h>
 #include <linux/types.h>
@@ -2743,7 +2743,7 @@ dnl----------------------------------------------------------------------------
 	    AC_COMPILE_IFELSE([
 		AC_LANG_PROGRAM([[
 #ifdef NEED_LINUX_AUTOCONF_H
-#include <linux/autoconf.h>
+#include NEED_LINUX_AUTOCONF_H
 #endif
 #include <linux/version.h>
 #include <linux/types.h>
@@ -2768,7 +2768,7 @@ dnl----------------------------------------------------------------------------
 	    AC_COMPILE_IFELSE([
 		AC_LANG_PROGRAM([[
 #ifdef NEED_LINUX_AUTOCONF_H
-#include <linux/autoconf.h>
+#include NEED_LINUX_AUTOCONF_H
 #endif
 #include <linux/version.h>
 #include <linux/types.h>
@@ -2793,7 +2793,7 @@ dnl----------------------------------------------------------------------------
 	    AC_COMPILE_IFELSE([
 		AC_LANG_PROGRAM([[
 #ifdef NEED_LINUX_AUTOCONF_H
-#include <linux/autoconf.h>
+#include NEED_LINUX_AUTOCONF_H
 #endif
 #include <linux/version.h>
 #include <linux/types.h>
@@ -2821,7 +2821,7 @@ dnl----------------------------------------------------------------------------
 	    AC_COMPILE_IFELSE([
 		AC_LANG_PROGRAM([[
 #ifdef NEED_LINUX_AUTOCONF_H
-#include <linux/autoconf.h>
+#include NEED_LINUX_AUTOCONF_H
 #endif
 #include <linux/version.h>
 #include <linux/types.h>
@@ -2852,7 +2852,7 @@ dnl----------------------------------------------------------------------------
     ], [
 #include <linux/compiler.h>
 #ifdef NEED_LINUX_AUTOCONF_H
-#include <linux/autoconf.h>
+#include NEED_LINUX_AUTOCONF_H
 #endif
 #include <linux/version.h>
 #include <linux/types.h>
@@ -2870,7 +2870,7 @@ dnl----------------------------------------------------------------------------
     ], [
 #include <linux/compiler.h>
 #ifdef NEED_LINUX_AUTOCONF_H
-#include <linux/autoconf.h>
+#include NEED_LINUX_AUTOCONF_H
 #endif
 #include <linux/version.h>
 #include <linux/types.h>
@@ -2887,7 +2887,7 @@ dnl----------------------------------------------------------------------------
 	    AC_COMPILE_IFELSE([
 		AC_LANG_PROGRAM([[
 #ifdef NEED_LINUX_AUTOCONF_H
-#include <linux/autoconf.h>
+#include NEED_LINUX_AUTOCONF_H
 #endif
 #include <linux/version.h>
 #include <linux/types.h>
@@ -2920,7 +2920,7 @@ dnl----------------------------------------------------------------------------
 	    AC_COMPILE_IFELSE([
 		AC_LANG_PROGRAM([[
 #ifdef NEED_LINUX_AUTOCONF_H
-#include <linux/autoconf.h>
+#include NEED_LINUX_AUTOCONF_H
 #endif
 #include <linux/version.h>
 #include <linux/types.h>
@@ -2948,7 +2948,7 @@ dnl----------------------------------------------------------------------------
 	    AC_COMPILE_IFELSE([
 		AC_LANG_PROGRAM([[
 #ifdef NEED_LINUX_AUTOCONF_H
-#include <linux/autoconf.h>
+#include NEED_LINUX_AUTOCONF_H
 #endif
 #include <linux/version.h>
 #include <linux/types.h>
@@ -2976,7 +2976,7 @@ dnl----------------------------------------------------------------------------
 	    AC_COMPILE_IFELSE([
 		AC_LANG_PROGRAM([[
 #ifdef NEED_LINUX_AUTOCONF_H
-#include <linux/autoconf.h>
+#include NEED_LINUX_AUTOCONF_H
 #endif
 #include <linux/version.h>
 #include <linux/types.h>
@@ -3009,7 +3009,7 @@ dnl----------------------------------------------------------------------------
 	    AC_COMPILE_IFELSE([
 		AC_LANG_PROGRAM([[
 #ifdef NEED_LINUX_AUTOCONF_H
-#include <linux/autoconf.h>
+#include NEED_LINUX_AUTOCONF_H
 #endif
 #include <linux/version.h>
 #include <linux/types.h>
@@ -3037,7 +3037,7 @@ dnl----------------------------------------------------------------------------
 	    AC_COMPILE_IFELSE([
 		AC_LANG_PROGRAM([[
 #ifdef NEED_LINUX_AUTOCONF_H
-#include <linux/autoconf.h>
+#include NEED_LINUX_AUTOCONF_H
 #endif
 #include <linux/version.h>
 #include <linux/types.h>
@@ -3070,7 +3070,7 @@ dnl----------------------------------------------------------------------------
 		AC_LANG_PROGRAM([[
 #include <linux/compiler.h>
 #ifdef NEED_LINUX_AUTOCONF_H
-#include <linux/autoconf.h>
+#include NEED_LINUX_AUTOCONF_H
 #endif
 #include <linux/version.h>
 #include <linux/types.h>

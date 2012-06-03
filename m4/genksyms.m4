@@ -366,41 +366,13 @@ AC_DEFUN([_KSYMS_OUTPUT_UPDATES_CONFIG], [dnl
 	esac])
     UPDATES_OPTIONS="${ksyms_cv_updates_options:+ $ksyms_cv_updates_options}"
     AC_SUBST([UPDATES_OPTIONS])dnl
-    AC_CACHE_CHECK([for updates directory], [ksyms_cv_updates_directory], [dnl
-	AC_ARG_WITH([k-updates],
-	    [AS_HELP_STRING([--with-k-updates=DIR],
-		[kernel update script directory @<:@default=/etc/kernel@:>@])])
-	if test :"${with_k_updates:-no}" != :no
-	then
-	    ksyms_cv_updates_directory="$with_k_updates"
-	else
-	    eval "k_updatedir_search_path=\"
-		${DESTDIR}${rootdir}/etc/kernel
-		${DESTDIR}/etc/kernel\""
-	    k_updatedir_search_path=`echo "$k_updatedir_search_path" | sed -e 's,\<NONE\>,,g;s,//,/,g' | awk '{if(!([$]0 in seen)){print[$]0;seen[[$ 0]]=1}}'`
-	    ksyms_cv_updates_directory=
-	    for ksyms_dir in $k_updatedir_search_path
-	    do
-		AC_MSG_CHECKING([for updates directory... $ksyms_dir])
-		if test -d "$ksyms_dir" -a \( \
-		    -d "$ksyms_dir/preinst.d" -o \
-		    -d "$ksyms_dir/postinst.d" -o \
-		    -d "$ksyms_dir/prerm.d" -o \
-		    -d "$ksyms_dir/postrm.d" -o \
-		    -d "$ksyms_dir/header_postinst.d" -o \
-		    -d "$ksyms_dir/src_postinst.d" \)
-		then
-		    ksyms_cv_updates_directory="$ksyms_dir"
-		    AC_MSG_RESULT([yes])
-		    break
-		fi
-		AC_MSG_RESULT([no])
-	    done
-	fi
-	if test :"${ksyms_cv_updates_directory:-no}" = :no -o ! -d "$ksyms_cv_updates_directory"
-	then
-	    if test -x "${DESTDIR}${rootdir}/sbin/new-kernel-pkg" ; then
-		if test -z "${DESTDIR}${rootdir}" ; then
+    AC_ARG_WITH([k-updates],
+	[AS_HELP_STRING([--with-k-updates=DIR],
+	    [kernel update script directory @<:@default=/etc/kernel@:>@])])
+    _BLD_FIND_DIR([for updates directory], [ksyms_cv_updates_directory], [
+	    ${rootdir}/etc/kernel], [], [], [dnl
+	    if test -x "${rootdir}/sbin/new-kernel-pkg" ; then
+		if test -z "${rootdir}" ; then
 		    AC_MSG_WARN([
 *** 
 *** Configure cannot find the kernel updates directory, /etc/kernel,
@@ -413,7 +385,7 @@ AC_DEFUN([_KSYMS_OUTPUT_UPDATES_CONFIG], [dnl
 	    else
 		case "$target_vendor" in
 		    (debian|unbuntu|mint)
-			if test -z "${DESTDIR}${rootdir}" ; then
+			if test -z "${rootdir}" ; then
 			    AC_MSG_WARN([
 ***
 *** Configure cannot find the kernel updates directory, /etc/kernel,
@@ -424,7 +396,7 @@ AC_DEFUN([_KSYMS_OUTPUT_UPDATES_CONFIG], [dnl
 			ksyms_cv_updates_directory=/etc/kernel
 			;;
 		    (mes|fedora|redhat|oracle|puias|centos|scientific|lineox|whitebox)
-			if test -z "${DESTDIR}${rootdir}" ; then
+			if test -z "${rootdir}" ; then
 			    AC_MSG_WARN([
 ***
 *** Configure cannot find the kernel updates directory, /etc/kernel, and
@@ -440,7 +412,7 @@ AC_DEFUN([_KSYMS_OUTPUT_UPDATES_CONFIG], [dnl
 			;;
 		    (mandrake|mandriva|mageia)
 			;;
-		    (*) if test -z "${DESTDIR}${rootdir}" ; then
+		    (*) if test -z "${rootdir}" ; then
 			    AC_MSG_WARN([
 ***
 *** Configure cannot find the kernel updates directory, /etc/kernel.
@@ -451,10 +423,8 @@ AC_DEFUN([_KSYMS_OUTPUT_UPDATES_CONFIG], [dnl
 			fi
 			;;
 		esac
-	    fi
-	fi
-	AC_MSG_CHECKING([for updates directory])
-    ])
+	    fi],[],[with_k_updates],
+	    [-a \( -d "$bld_dir/preinst.d" -o -d "$bld_dir/postinst.d" -o -d "$bld_dir/prerm.d" -o -d "$bld_dir/postrm.d" -o -d "$bld_dir/header_postinst.d" -o -d "$bld_dir/src_postinst.d" \)])
     kupdatedir="$ksyms_cv_updates_directory"
     AC_SUBST([kupdatedir])dnl
     AM_CONDITIONAL([KERNEL_UPDATES], [test :"${ksyms_cv_updates_directory:-no}" != :no])dnl

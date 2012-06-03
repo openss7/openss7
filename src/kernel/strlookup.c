@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2012  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -80,7 +80,7 @@ static char const ident[] =
 
 #include <linux/compiler.h>
 #ifdef NEED_LINUX_AUTOCONF_H
-#include <linux/autoconf.h>
+#include NEED_LINUX_AUTOCONF_H
 #endif
 #include <linux/version.h>
 #include <linux/module.h>

@@ -147,11 +147,11 @@ AC_DEFUN([_DEB_DPKG_SETUP_TOPDIR], [dnl
     AC_ARG_WITH([deb-distdir],
 	[AS_HELP_STRING([--with-deb-distdir=DIR],
 	    [deb dist directory @<:@default=PKG-DISTDIR/debs/PKG-SUBDIR@:>@])],
-	[], [with_deb_distdir='$(DISTDIR)/debs/$(reposubdir)'])
+	[], [with_deb_distdir='${DISTDIR}/debs/${reposubdir}'])
     AC_MSG_CHECKING([for deb distribution directory])
     if test ":${debdistdir+set}" != :set ; then
 	case ":${with_deb_distdir:-no}" in
-	    (:no|:yes)	debdistdir='$(DISTDIR)/debs/$(reposubdir)' ;;
+	    (:no|:yes)	debdistdir='${DISTDIR}/debs/${reposubdir}' ;;
 	    (*)		debdistdir="$with_deb_distdir" ;;
 	esac
     fi
@@ -160,27 +160,27 @@ AC_DEFUN([_DEB_DPKG_SETUP_TOPDIR], [dnl
     AC_ARG_WITH([deb-topdir],
 	[AS_HELP_STRING([--with-deb-topdir=DIR],
 	    [deb top directory @<:@default=DEB-DISTDIR/BRANCH@:>@])],
-	[], [with_deb_topdir='$(debdistdir)$(repobranch)'])
+	[], [with_deb_topdir='${debdistdir}${repobranch}'])
     AC_MSG_CHECKING([for deb top build directory])
     if test ":${debdir+set}" != :set ; then
 	case ":${with_deb_topdir:-no}" in
-	    (:no|:yes)	debdir='$(debdistdir)$(repobranch)' ;;
+	    (:no|:yes)	debdir='${debdistdir}${repobranch}' ;;
 	    (*)		debdir="$with_deb_topdir" ;;
 	esac
     fi
     AC_MSG_RESULT([$debdir])
     AC_SUBST([debdir])dnl
-    aptdir='$(debdistdir)'
+    aptdir='${debdistdir}'
     AC_SUBST([aptdir])dnl
-    aptfulldir='$(debdir)'
+    aptfulldir='${debdir}'
     AC_SUBST([aptfulldir])dnl
-    aptmaindir='$(debdir)/main'
+    aptmaindir='${debdir}/main'
     AC_SUBST([aptmaindir])dnl
-    aptdebgdir='$(debdir)/debug'
+    aptdebgdir='${debdir}/debug'
     AC_SUBST([aptdebgdir])dnl
-    aptdevldir='$(debdir)/devel'
+    aptdevldir='${debdir}/devel'
     AC_SUBST([aptdevldir])dnl
-    aptsrcsdir='$(debdir)/source'
+    aptsrcsdir='${debdir}/source'
     AC_SUBST([aptsrcsdir])dnl
     AC_MSG_CHECKING([for deb BUILD directory])
     if test ":${debbuilddir+set}" != :set ; then

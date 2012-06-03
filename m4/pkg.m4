@@ -171,11 +171,11 @@ AC_DEFUN([_PAC_ARCH_SETUP_TOPDIR], [dnl
     AC_ARG_WITH([pac-distdir],
 	[AS_HELP_STRING([--with-pac-distdir=DIR],
 	    [pacman dist directory @<:@default=PKG-DISTDIR/arch/PKG-SUBDIR@:>@])],
-	[], [with_pac_distdir='$(DISTDIR)/arch/$(reposubdir)'])
+	[], [with_pac_distdir='${DISTDIR}/arch/${reposubdir}'])
     AC_MSG_CHECKING([for pacman distribution directory])
     if test ":${pacdistdir+set}" != :set ; then
 	case ":${with_pac_distdir:-no}" in
-	    (:no|:yes)	pacdistdir='$(DISTDIR)/arch/$(reposubdir)' ;;
+	    (:no|:yes)	pacdistdir='${DISTDIR}/arch/${reposubdir}' ;;
 	    (*)		pacdistdir="$with_pac_distdir" ;;
 	esac
     fi
@@ -184,27 +184,27 @@ AC_DEFUN([_PAC_ARCH_SETUP_TOPDIR], [dnl
     AC_ARG_WITH([pac_topdir],
 	[AS_HELP_STRING([--with-pac-topdir=DIR],
 	    [pacman top directory @<:@default=PAC-DISTDIR/BRANCH@:>@])],
-	[], [with_pac_topdir='$(pacdistdir)$(repobranch)'])
+	[], [with_pac_topdir='${pacdistdir}${repobranch}'])
     AC_MSG_CHECKING([for pacman top build directory])
     if test ":${pacdir+set}" != :set ; then
 	case ":${with_pac_topdir:-no}" in
-	    (:no|:yes)	pacdir='$(packdistdir)$(repobranch)' ;;
+	    (:no|:yes)	pacdir='${packdistdir}${repobranch}' ;;
 	    (*)		pacdir="${with_pac_topdir}" ;;
 	esac
     fi
     AC_MSG_RESULT([$pacdir])
     AC_SUBST([pacdir])dnl
-    pkgdir='$(pacdistdir)'
+    pkgdir='${pacdistdir}'
     AC_SUBST([pkgdir])dnl
-    pkgfulldir='$(pacdir)'
+    pkgfulldir='${pacdir}'
     AC_SUBST([pkgfulldir])dnl
-    pkgmaindir='$(pacdir)/main'
+    pkgmaindir='${pacdir}/main'
     AC_SUBST([pkgmaindir])dnl
-    pkgdebgdir='$(pacdir)/debug'
+    pkgdebgdir='${pacdir}/debug'
     AC_SUBST([pkgdebgdir])dnl
-    pkgdevldir='$(pacdir)/devel'
+    pkgdevldir='${pacdir}/devel'
     AC_SUBST([pkgdevldir])dnl
-    pkgsrcsdir='$(pacdir)/source'
+    pkgsrcsdir='${pacdir}/source'
     AC_SUBST([pkgsrcsdir])dnl
     AC_MSG_CHECKING([for pacman BUILD directory])
     if test ":${mpkgtopdir+set}" != :set ; then

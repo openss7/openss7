@@ -70,7 +70,7 @@ install-initscripts: $(dist_initrd_SCRIPTS)
 
 post-initscripts:
 	@$(ECHO_V) "D: Making $@ in `pwd`"
-	@if test -z '$(DESTDIR)' -a \( -f $(DESTDIR)$(initrddir)/rc -o -f $(DESTDIR)$(initrddir)/../rc \) ; then \
+	@if test -z '$(DESTDIR)$(rootdir)' -a \( -f $(DESTDIR)$(initrddir)/rc -o -f $(DESTDIR)$(initrddir)/../rc \) ; then \
 		if runlevel >/dev/null 2>&1 ; then \
 			list='$(dist_initrd_SCRIPTS)' ; for p in $$list ; do \
 				f=`$(ECHO) $$p | sed 's|^.*/||'` ; \
@@ -101,7 +101,7 @@ post-initscripts:
 
 preun-initscripts:
 	@$(ECHO_V) "D: Making $@ in `pwd`"
-	@if test -z '$(DESTDIR)' -a \( -f $(DESTDIR)$(initrddir)/rc -o -f $(DESTDIR)$(initrddir)/../rc \) ; then \
+	@if test -z '$(DESTDIR)$(rootdir)' -a \( -f $(DESTDIR)$(initrddir)/rc -o -f $(DESTDIR)$(initrddir)/../rc \) ; then \
 		if runlevel >/dev/null 2>&1 ; then \
 			list='$(dist_initrd_SCRIPTS)' ; for p in $$list ; do \
 				rlist="$$p $$rlist" ; \

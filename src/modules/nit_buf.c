@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2012  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -62,7 +62,7 @@ static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
  */
 
 #ifdef NEED_LINUX_AUTOCONF_H
-#include <linux/autoconf.h>
+#include NEED_LINUX_AUTOCONF_H
 #endif
 #include <linux/version.h>
 #include <linux/module.h>
@@ -86,7 +86,7 @@ static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
 #include "sys/config.h"
 
 #define NBUF_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
-#define NBUF_COPYRIGHT	"Copyright (c) 2008-2011  Monavacon Limited.  All Rights Reserved."
+#define NBUF_COPYRIGHT	"Copyright (c) 2008-2012  Monavacon Limited.  All Rights Reserved."
 #define NBUF_REVISION	"Lfs $RCSfile$ $Name$($Revision$) $Date$"
 #define NBUF_DEVICE	"SVR 4.1 SNIT Buffer Module (NBUF) for STREAMS."
 #define NBUF_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -1127,6 +1127,19 @@ STATIC struct nbuf_trans nbuf_trans_map[] = {
 	, {.cmd = NIOCGCHUNK,}
 	, {.cmd = 0,}
 };
+
+STATIC __unlikely void
+nbuf_ioctl32_unregister(void)
+{
+	struct nbuf_trans *t;
+
+	for (t = nbuf_trans_map; t->cmd != 0; t++) {
+		unregister_ioctl32(t->opaque);
+		t->opaque = NULL;
+	}
+	return;
+}
+
 
 STATIC __unlikely int
 nbuf_ioctl32_register(void)

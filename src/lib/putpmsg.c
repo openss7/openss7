@@ -133,7 +133,7 @@ __putpmsg_error(int fd)
   * Stream head to distriguish between 32-bit calls and 64-bit calls.  ioctl()
   * is much easier, especially since ioctl_compat() was added to the kernel.
   */
-static inline __hot int
+static __inline__ __hot int
 __old_putpmsg(int fd, const struct strbuf *ctlptr, const struct strbuf *datptr, int band, int flags)
 {
 	int err;
@@ -164,7 +164,7 @@ __old_putpmsg(int fd, const struct strbuf *ctlptr, const struct strbuf *datptr, 
   * efficient.  This is the only way that works on newer kernels and the old
   * method will fail.
   */
-static inline __hot int
+static __inline__ __hot int
 __putpmsg(int fd, const struct strbuf *ctlptr, const struct strbuf *datptr, int band, int flags)
 {
 	int err;

@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2012  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -91,7 +91,7 @@ static char const ident[] = "$RCSfile: strutil.c,v $ $Name:  $($Revision: 1.1.2.
 #endif
 
 #ifdef NEED_LINUX_AUTOCONF_H
-#include <linux/autoconf.h>
+#include NEED_LINUX_AUTOCONF_H
 #endif
 #ifdef HAVE_KINC_LINUX_COMPILE_H
 /* some brain-dead distributions such as SuSE do not distribute linux/compile.h */

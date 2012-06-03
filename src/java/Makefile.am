@@ -311,7 +311,7 @@ my_javax_jain_CLASSFILES = \
 
 MY_SECONDARY		+= $(my_javax_jain_CLASSFILES)
 
-javax-jain-$(VERSION).jar: classdist_java.stamp $(my_javax_jain_CLASSFILES)
+javax-jain-$(VERSION).jar: classjava.stamp $(my_javax_jain_CLASSFILES)
 	$(AM_V_GEN)d='javax/jain -maxdepth 1' ; \
 	find $$d -name '*.class' -type f | sort -u | $(JAR) c@f $@
 
@@ -386,7 +386,7 @@ my_javax_jain_ss7_CLASSFILES = \
 
 MY_SECONDARY += $(my_javax_jain_ss7_CLASSFILES)
 
-javax-jain-ss7-$(VERSION).jar: classdist_java.stamp javax-jain.jar $(my_javax_jain_ss7_CLASSFILES)
+javax-jain-ss7-$(VERSION).jar: classjava.stamp javax-jain.jar $(my_javax_jain_ss7_CLASSFILES)
 	$(AM_V_GEN)d='javax/jain/ss7 -maxdepth 1' ; \
 	find $$d -name '*.class' -type f | sort -u | $(JAR) c@f $@
 
@@ -450,7 +450,7 @@ my_javax_jain_protocol_ss7_CLASSFILES = \
 
 MY_SECONDARY		+= $(my_javax_jain_protocol_ss7_CLASSFILES)
 
-javax-jain-protocol-ss7-$(VERSION).jar: classdist_java.stamp javax-jain.jar $(my_javax_jain_protocol_ss7_CLASSFILES)
+javax-jain-protocol-ss7-$(VERSION).jar: classjava.stamp javax-jain.jar $(my_javax_jain_protocol_ss7_CLASSFILES)
 	$(AM_V_GEN)d='javax/jain/protocol/ss7 -maxdepth 1' ; \
 	find $$d -name '*.class' -type f | sort -u | $(JAR) c@f $@
 
@@ -515,7 +515,7 @@ my_jain_CLASSFILES = \
 
 MY_SECONDARY		+= $(my_jain_CLASSFILES)
 
-jain-$(VERSION).jar: classdist_java.stamp $(my_jain_CLASSFILES)
+jain-$(VERSION).jar: classjava.stamp $(my_jain_CLASSFILES)
 	$(AM_V_GEN)d='jain -maxdepth 1' ; \
 	find $$d -name '*.class' -type f | sort -u | $(JAR) c@f $@
 
@@ -594,7 +594,7 @@ my_jain_protocol_ss7_CLASSFILES = \
 
 MY_SECONDARY		+= $(my_jain_protocol_ss7_CLASSFILES)
 
-jain-protocol-ss7-$(VERSION).jar: classdist_java.stamp jain.jar $(my_jain_protocol_ss7_CLASSFILES)
+jain-protocol-ss7-$(VERSION).jar: classjava.stamp jain.jar $(my_jain_protocol_ss7_CLASSFILES)
 	$(AM_V_GEN)d='jain/protocol/ss7 -maxdepth 1' ; \
 	find $$d -name '*.class' -type f | sort -u | $(JAR) c@f $@
 
@@ -910,7 +910,7 @@ my_javax_jain_ss7_isup_CLASSFILES = \
 MY_SECONDARY		+= $(my_javax_jain_ss7_isup_CLASSFILES)
 my_jar_CLASSFILES	+= $(my_javax_jain_ss7_isup_CLASSFILES)
 
-javax-jain-ss7-isup-$(VERSION).jar: classdist_java.stamp javax-jain-ss7.jar $(my_javax_jain_ss7_isup_CLASSFILES)
+javax-jain-ss7-isup-$(VERSION).jar: classjava.stamp javax-jain-ss7.jar $(my_javax_jain_ss7_isup_CLASSFILES)
 	$(AM_V_GEN)d='javax/jain/ss7/isup' ; \
 	find $$d -name '*.class' -type f | sort -u | $(JAR) c@f $@
 
@@ -1550,7 +1550,7 @@ my_javax_jain_ss7_inap_CLASSFILES = \
 MY_SECONDARY		+= $(my_javax_jain_ss7_inap_CLASSFILES)
 my_jar_CLASSFILES	+= $(my_javax_jain_ss7_inap_CLASSFILES)
 
-javax-jain-ss7-inap-$(VERSION).jar: classdist_java.stamp javax-jain-ss7.jar $(my_javax_jain_ss7_inap_CLASSFILES)
+javax-jain-ss7-inap-$(VERSION).jar: classjava.stamp javax-jain-ss7.jar $(my_javax_jain_ss7_inap_CLASSFILES)
 	$(AM_V_GEN)d='javax/jain/ss7/inap' ; \
 	find $$d -name '*.class' -type f | sort -u | $(JAR) c@f $@
 
@@ -1737,7 +1737,7 @@ my_javax_jain_protocol_ss7_map_CLASSFILES = \
 MY_SECONDARY		+= $(my_javax_jain_protocol_ss7_map_CLASSFILES)
 my_jar_CLASSFILES	+= $(my_javax_jain_protocol_ss7_map_CLASSFILES)
 
-javax-jain-protocol-ss7-map-$(VERSION).jar: classdist_java.stamp javax-jain-protocol-ss7.jar $(my_javax_jain_protocol_ss7_map_CLASSFILES)
+javax-jain-protocol-ss7-map-$(VERSION).jar: classjava.stamp javax-jain-protocol-ss7.jar $(my_javax_jain_protocol_ss7_map_CLASSFILES)
 	$(AM_V_GEN)d='javax/jain/protocol/ss7/map' ; \
 	find $$d -name '*.class' -type f | sort -u | $(JAR) c@f $@
 
@@ -1982,7 +1982,7 @@ my_javax_sip_CLASSFILES = \
 MY_SECONDARY		+= $(my_javax_sip_CLASSFILES)
 my_jar_CLASSFILES	+= $(my_javax_sip_CLASSFILES)
 
-javax-sip-$(VERSION).jar: classdist_java.stamp $(my_javax_sip_CLASSFILES)
+javax-sip-$(VERSION).jar: classjava.stamp $(my_javax_sip_CLASSFILES)
 	$(AM_V_GEN)d='javax/sip' ; \
 	find $$d -name '*.class' -type f | sort -u | $(JAR) c@f $@
 
@@ -2072,7 +2072,7 @@ my_javax_csapi_cc_jcc_CLASSFILES = \
 MY_SECONDARY		+= $(my_javax_csapi_cc_jcc_CLASSFILES)
 my_jar_CLASSFILES	+= $(my_javax_csapi_cc_jcc_CLASSFILES)
 
-javax-csapi-cc-jcc-$(VERSION).jar: classdist_java.stamp $(my_javax_csapi_cc_jcc_CLASSFILES)
+javax-csapi-cc-jcc-$(VERSION).jar: classjava.stamp $(my_javax_csapi_cc_jcc_CLASSFILES)
 	$(AM_V_GEN)d='javax/csapi/cc/jcc' ; \
 	find $$d -name '*.class' -type f | sort -u | $(JAR) c@f $@
 
@@ -2145,7 +2145,7 @@ my_javax_jcat_CLASSFILES = \
 MY_SECONDARY		+= $(my_javax_jcat_CLASSFILES)
 my_jar_CLASSFILES	+= $(my_javax_jcat_CLASSFILES)
 
-javax-jcat-$(VERSION).jar: classdist_java.stamp $(my_javax_jcat_CLASSFILES)
+javax-jcat-$(VERSION).jar: classjava.stamp $(my_javax_jcat_CLASSFILES)
 	$(AM_V_GEN)d='javax/jcat' ; \
 	find $$d -name '*.class' -type f | sort -u | $(JAR) c@f $@
 
@@ -2280,7 +2280,7 @@ my_jain_protocol_ss7_tcap_CLASSFILES = \
 MY_SECONDARY		+= $(my_jain_protocol_ss7_tcap_CLASSFILES)
 my_jar_CLASSFILES	+= $(my_jain_protocol_ss7_tcap_CLASSFILES)
 
-jain-protocol-ss7-tcap-$(VERSION).jar: classdist_java.stamp jain-protocol-ss7.jar $(my_jain_protocol_ss7_tcap_CLASSFILES)
+jain-protocol-ss7-tcap-$(VERSION).jar: classjava.stamp jain-protocol-ss7.jar $(my_jain_protocol_ss7_tcap_CLASSFILES)
 	$(AM_V_GEN)d='jain/protocol/ss7/tcap' ; \
 	find $$d -name '*.class' -type f | sort -u | $(JAR) c@f $@
 
@@ -2423,7 +2423,7 @@ my_jain_protocol_ss7_oam_CLASSFILES = \
 MY_SECONDARY		+= $(my_jain_protocol_ss7_oam_CLASSFILES)
 my_jar_CLASSFILES	+= $(my_jain_protocol_ss7_oam_CLASSFILES)
 
-jain-protocol-ss7-oam-$(VERSION).jar: classdist_java.stamp $(my_jain_protocol_ss7_oam_CLASSFILES)
+jain-protocol-ss7-oam-$(VERSION).jar: classjava.stamp $(my_jain_protocol_ss7_oam_CLASSFILES)
 	$(AM_V_GEN)d='jain/protocol/ss7/oam' ; \
 	find $$d -name '*.class' -type f | sort -u | $(JAR) c@f $@
 
@@ -2821,7 +2821,7 @@ lib_org_openss7_jain_protocol_ss7_oam_la_LDFLAGS	= $(USER_LDFLAGS) -module -expo
 
 $(lib_org_openss7_jain_protocol_ss7_oam_la_OBJECTS): org-openss7-jain-protocol-ss7-oam.jar $(my_oam_INCLUDES)
 
-org-openss7-jain-protocol-ss7-oam-$(VERSION).jar: classdist_java.stamp $(my_oam_CLASSFILES)
+org-openss7-jain-protocol-ss7-oam-$(VERSION).jar: classjava.stamp $(my_oam_CLASSFILES)
 	$(AM_V_GEN)d='org/openss7/jain/protocol/ss7/oam' ; \
 	find $$d -name '*.class' -type f | sort -u | $(JAR) c@f $@
 
@@ -2894,7 +2894,7 @@ lib_org_openss7_jain_protocol_ss7_tcap_la_LDFLAGS	 = $(USER_LDFLAGS) -module -ex
 
 $(lib_org_openss7_jain_protocol_ss7_tcap_la_OBJECTS): org-openss7-jain-protocol-ss7-tcap.jar $(my_jtcap_INCLUDES)
 
-org-openss7-jain-protocol-ss7-tcap-$(VERSION).jar: classdist_java.stamp jain-protocol-ss7.jar $(my_jtcap_CLASSFILES)
+org-openss7-jain-protocol-ss7-tcap-$(VERSION).jar: classjava.stamp jain-protocol-ss7.jar $(my_jtcap_CLASSFILES)
 	$(AM_V_GEN)d='org/openss7/jain/protocol/ss7/tcap' ; \
 	find $$d -name '*.class' -type f | sort -u | $(JAR) c@f $@
 
@@ -2967,7 +2967,7 @@ lib_org_openss7_javax_sip_la_LDFLAGS	    = $(USER_LDFLAGS) -module -export-dynam
 
 $(lib_org_openss7_javax_sip_la_OBJECTS): org-openss7-javax-sip.jar $(my_jsip_INCLUDES)
 
-org-openss7-javax-sip-$(VERSION).jar: classdist_java.stamp $(my_jsip_CLASSFILES)
+org-openss7-javax-sip-$(VERSION).jar: classjava.stamp $(my_jsip_CLASSFILES)
 	$(AM_V_GEN)d='org/openss7/javax/sip' ; \
 	find $$d -name '*.class' -type f | sort -u | $(JAR) c@f $@
 
@@ -3039,7 +3039,7 @@ lib_org_openss7_javax_jcat_la_LDFLAGS	     = $(USER_LDFLAGS) -module -export-dyn
 
 $(lib_org_openss7_javax_jcat_la_OBJECTS): org-openss7-javax-jcat.jar $(my_jcat_INCLUDES) $(my_jcat_DEPENDS)
 
-org-openss7-javax-jcat-$(VERSION).jar: classdist_java.stamp $(my_jcat_CLASSFILES)
+org-openss7-javax-jcat-$(VERSION).jar: classjava.stamp $(my_jcat_CLASSFILES)
 	$(AM_V_GEN)d='org/openss7/javax/jcat' ; \
 	find $$d -name '*.class' -type f | sort -u | $(JAR) c@f $@
 
@@ -3112,7 +3112,7 @@ lib_org_openss7_javax_jain_ss7_isup_la_LDFLAGS	      = $(USER_LDFLAGS) -module -
 
 $(lib_org_openss7_javax_jain_ss7_isup_la_OBJECTS): org-openss7-javax-jain-ss7-isup.jar $(my_jisup_INCLUDES)
 
-org-openss7-javax-jain-ss7-isup-$(VERSION).jar: classdist_java.stamp $(my_jisup_CLASSFILES)
+org-openss7-javax-jain-ss7-isup-$(VERSION).jar: classjava.stamp $(my_jisup_CLASSFILES)
 	$(AM_V_GEN)d='org/openss7/javax/jain/ss7/isup' ; \
 	find $$d -name '*.class' -type f | sort -u | $(JAR) c@f $@
 
@@ -3185,7 +3185,7 @@ lib_org_openss7_javax_jain_ss7_inap_la_LDFLAGS	      = $(USER_LDFLAGS) -module -
 
 $(lib_org_openss7_javax_jain_ss7_inap_la_OBJECTS): org-openss7-javax-jain-ss7-inap.jar $(my_jinap_INCLUDES)
 
-org-openss7-javax-jain-ss7-inap-$(VERSION).jar: classdist_java.stamp $(my_jinap_CLASSFILES)
+org-openss7-javax-jain-ss7-inap-$(VERSION).jar: classjava.stamp $(my_jinap_CLASSFILES)
 	$(AM_V_GEN)d='org/openss7/javax/jain/ss7/inap' ; \
 	find $$d -name '*.class' -type f | sort -u | $(JAR) c@f $@
 
@@ -3286,7 +3286,7 @@ lib_org_openss7_javax_jain_protocol_ss7_map_la_LDFLAGS	      = $(USER_LDFLAGS) -
 
 $(lib_org_openss7_javax_jain_protocol_ss7_map_la_OBJECTS): org-openss7-javax-jain-protocol-ss7-map.jar $(my_jmap_INCLUDES)
 
-org-openss7-javax-jain-protocol-ss7-map-$(VERSION).jar: classdist_java.stamp $(my_jmap_CLASSFILES)
+org-openss7-javax-jain-protocol-ss7-map-$(VERSION).jar: classjava.stamp $(my_jmap_CLASSFILES)
 	$(AM_V_GEN)d='org/openss7/javax/jain/protocol/ss7/map' ; \
 	find $$d -name '*.class' -type f | sort -u | $(JAR) c@f $@
 
@@ -3359,7 +3359,7 @@ lib_org_openss7_javax_csapi_cc_jcc_la_LDFLAGS	     = $(USER_LDFLAGS) -module -ex
 
 $(lib_org_openss7_javax_csapi_cc_jcc_la_OBJECTS): org-openss7-javax-csapi-cc-jcc.jar $(my_jcc_INCLUDES)
 
-org-openss7-javax-csapi-cc-jcc-$(VERSION).jar: classdist_java.stamp $(my_jcc_CLASSFILES)
+org-openss7-javax-csapi-cc-jcc-$(VERSION).jar: classjava.stamp $(my_jcc_CLASSFILES)
 	$(AM_V_GEN)d='org/openss7/javax/csapi/cc/jcc' ; \
 	find $$d -name '*.class' -type f | sort -u | $(JAR) c@f $@
 
@@ -3477,7 +3477,7 @@ objectlink_objects += ${lib_org_openss7_streams_la_OBJECTS}
 my_streams_LIBFILE = lib-org-openss7-streams.la
 $(my_streams_LIBFILE): objectlink_fix.stamp
 
-org-openss7-streams-$(VERSION).jar: classdist_java.stamp $(my_streams_CLASSFILES)
+org-openss7-streams-$(VERSION).jar: classjava.stamp $(my_streams_CLASSFILES)
 	$(AM_V_GEN)d='org/openss7/streams' ; \
 	find $$d -name '*.class' -type f | sort -u | $(JAR) c@f $@
 
@@ -3589,7 +3589,7 @@ objectlink_objects += $(lib_org_openss7_xti_la_OBJECTS)
 my_xti_LIBFILE = lib-org-openss7-xti.la
 $(my_xti_LIBFILE): objectlink_fix.stamp
 
-org-openss7-xti-$(VERSION).jar: classdist_java.stamp $(my_xti_CLASSFILES)
+org-openss7-xti-$(VERSION).jar: classjava.stamp $(my_xti_CLASSFILES)
 	$(AM_V_GEN)d='org/openss7/xti' ; \
 	find $$d -name '*.class' -type f | sort -u | $(JAR) c@f $@
 
@@ -3722,7 +3722,7 @@ objectlink_objects += $(lib_org_openss7_tcap_la_OBJECTS)
 my_tcap_LIBFILE = lib-org-openss7-tcap.la
 $(my_tcap_LIBFILE): objectlink_fix.stamp
 
-org-openss7-tcap-$(VERSION).jar: classdist_java.stamp $(my_xti_CLASSFILES)
+org-openss7-tcap-$(VERSION).jar: classjava.stamp $(my_xti_CLASSFILES)
 	$(AM_V_GEN)d='org/openss7/tcap'; \
 	find $$d -name '*.class' -type f | sort -u | $(JAR) c@f $@
 
@@ -3822,7 +3822,7 @@ objectlink_objects += $(lib_org_openss7_xtcap_la_OBJECTS)
 my_xtcap_LIBFILE = lib-org-openss7-xtcap.la
 $(my_xtcap_LIBFILE): objectlink_fix.stamp
 
-org-openss7-xtcap-$(VERSION).jar: classdist_java.stamp $(my_xtcap_CLASSFILES)
+org-openss7-xtcap-$(VERSION).jar: classjava.stamp $(my_xtcap_CLASSFILES)
 	$(AM_V_GEN)d='org/openss7/xtcap'; \
 	find $$d -name '*.class' -type f | sort -u | $(JAR) c@f $@
 

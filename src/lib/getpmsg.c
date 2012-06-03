@@ -174,7 +174,7 @@ __old_getpmsg(int fd, struct strbuf *ctlptr, struct strbuf *datptr, int *bandp, 
   * efficient.  This is the only way that works on newer kernels and the old
   * method will fail.
   */
-static inline __hot int
+static __inline__ __hot int
 __getpmsg(int fd, struct strbuf *ctlptr, struct strbuf *datptr, int *bandp, int *flagsp)
 {
 	int err;

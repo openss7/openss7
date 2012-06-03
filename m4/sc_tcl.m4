@@ -602,13 +602,13 @@ AC_DEFUN([SC_ENABLE_SYMBOLS], [
     AC_ARG_ENABLE(symbols, [  --enable-symbols        build with debugging symbols [--disable-symbols]],    [tcl_ok=$enableval], [tcl_ok=no])
 # FIXME: Currently, LDFLAGS_DEFAULT is not used, it should work like CFLAGS_DEFAULT.
     if test "$tcl_ok" = "no"; then
-	CFLAGS_DEFAULT='$(CFLAGS_OPTIMIZE)'
-	LDFLAGS_DEFAULT='$(LDFLAGS_OPTIMIZE)'
+	CFLAGS_DEFAULT='${CFLAGS_OPTIMIZE}'
+	LDFLAGS_DEFAULT='${LDFLAGS_OPTIMIZE}'
 	DBGX=""
 	AC_MSG_RESULT([no])
     else
-	CFLAGS_DEFAULT='$(CFLAGS_DEBUG)'
-	LDFLAGS_DEFAULT='$(LDFLAGS_DEBUG)'
+	CFLAGS_DEFAULT='${CFLAGS_DEBUG}'
+	LDFLAGS_DEFAULT='${LDFLAGS_DEBUG}'
 	DBGX=g
 	if test "$tcl_ok" = "yes"; then
 	    AC_MSG_RESULT([yes (standard debugging)])
@@ -1886,7 +1886,7 @@ dnl AC_CHECK_TOOL(AR, ar)
     fi
 
     if test "x$DL_OBJS" != "x" ; then
-	BUILD_DLTEST="\$(DLTEST_TARGETS)"
+	BUILD_DLTEST="\${DLTEST_TARGETS}"
     else
 	echo "Can't figure out how to do dynamic loading or shared libraries"
 	echo "on this system."
@@ -1941,16 +1941,16 @@ dnl AC_CHECK_TOOL(AR, ar)
     if test "${SHARED_BUILD}" = "1" && test "${SHLIB_SUFFIX}" != "" ; then
         LIB_SUFFIX=${SHARED_LIB_SUFFIX}
         MAKE_LIB='${SHLIB_LD} -o [$]@ ${OBJS} ${SHLIB_LD_LIBS} ${TCL_SHLIB_LD_EXTRAS} ${TK_SHLIB_LD_EXTRAS} ${LD_SEARCH_FLAGS}'
-        INSTALL_LIB='$(INSTALL_LIBRARY) $(LIB_FILE) $(LIB_INSTALL_DIR)/$(LIB_FILE)'
+        INSTALL_LIB='${INSTALL_LIBRARY} ${LIB_FILE} ${LIB_INSTALL_DIR}/${LIB_FILE}'
     else
         LIB_SUFFIX=${UNSHARED_LIB_SUFFIX}
 
         if test "$RANLIB" = "" ; then
-            MAKE_LIB='$(STLIB_LD) [$]@ ${OBJS}'
-            INSTALL_LIB='$(INSTALL_LIBRARY) $(LIB_FILE) $(LIB_INSTALL_DIR)/$(LIB_FILE)'
+            MAKE_LIB='${STLIB_LD} [$]@ ${OBJS}'
+            INSTALL_LIB='${INSTALL_LIBRARY} ${LIB_FILE} ${LIB_INSTALL_DIR}/${LIB_FILE}'
         else
             MAKE_LIB='${STLIB_LD} [$]@ ${OBJS} ; ${RANLIB} [$]@'
-            INSTALL_LIB='$(INSTALL_LIBRARY) $(LIB_FILE) $(LIB_INSTALL_DIR)/$(LIB_FILE) ; (cd $(LIB_INSTALL_DIR) ; $(RANLIB) $(LIB_FILE))'
+            INSTALL_LIB='${INSTALL_LIBRARY} ${LIB_FILE} ${LIB_INSTALL_DIR}/${LIB_FILE} ; (cd ${LIB_INSTALL_DIR} ; ${RANLIB} ${LIB_FILE})'
         fi
 
 dnl        Not at all clear what this was doing in Tcl's configure.in
@@ -1972,10 +1972,10 @@ dnl        esac
     # Stub lib does not depend on shared/static configuration
     if test "$RANLIB" = "" ; then
         MAKE_STUB_LIB='${STLIB_LD} [$]@ ${STUB_LIB_OBJS}'
-        INSTALL_STUB_LIB='$(INSTALL_LIBRARY) $(STUB_LIB_FILE) $(LIB_INSTALL_DIR)/$(STUB_LIB_FILE)'
+        INSTALL_STUB_LIB='${INSTALL_LIBRARY} ${STUB_LIB_FILE} ${LIB_INSTALL_DIR}/${STUB_LIB_FILE}'
     else
         MAKE_STUB_LIB='${STLIB_LD} [$]@ ${STUB_LIB_OBJS} ; ${RANLIB} [$]@'
-        INSTALL_STUB_LIB='$(INSTALL_LIBRARY) $(STUB_LIB_FILE) $(LIB_INSTALL_DIR)/$(STUB_LIB_FILE) ; (cd $(LIB_INSTALL_DIR) ; $(RANLIB) $(STUB_LIB_FILE))'
+        INSTALL_STUB_LIB='${INSTALL_LIBRARY} ${STUB_LIB_FILE} ${LIB_INSTALL_DIR}/${STUB_LIB_FILE} ; (cd ${LIB_INSTALL_DIR} ; ${RANLIB} ${STUB_LIB_FILE})'
     fi
 
 

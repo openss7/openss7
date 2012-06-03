@@ -56,7 +56,7 @@
 dnl                                               -*- Autoconf -*-
 dnl Process this file with autoconf to produce a configure script.
 dnl
-AC_PREREQ(2.68)
+AC_PREREQ(2.69)
 AC_INIT([OpenSS7],[1.1],[bugs@openss7.org],[openss7])
 AC_REVISION([$Name:  $($Revision: 1.1.2.13 $) $Date: 2011-07-21 04:35:56 $])
 
@@ -80,7 +80,7 @@ AC_MSG_NOTICE([+-------------------------+])
 AC_MSG_NOTICE([| General Autoconf Checks |])
 AC_MSG_NOTICE([+-------------------------+])
 
-AM_INIT_AUTOMAKE([gnits 1.11 dist-bzip2 no-dist-gzip std-options -Wall color-tests silent-rules tar-pax])
+AM_INIT_AUTOMAKE([gnits 1.12 dist-bzip2 no-dist-gzip std-options -Wall color-tests silent-rules tar-pax])
 AM_MAINTAINER_MODE
 dnl
 dnl Default to --enable-silent-rules.  Let the user specify
@@ -113,6 +113,7 @@ dnl
 dnl Checks for programs.
 dnl
 AM_PROG_AS
+AM_PROG_AR
 AC_PROG_AWK
 AC_PROG_CXX([g++3 g++])
 AC_PROG_CC

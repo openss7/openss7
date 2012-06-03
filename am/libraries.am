@@ -105,7 +105,7 @@ PRE_INSTALL_AM		+= pre-libraries
 ##
 post-libraries:
 	@$(ECHO_V) "D: Making $@ in `pwd`"
-	@if test -n "$(LDCONFIG)" -a -x "$(LDCONFIG)" -a -r $(DESTDIR)$(rootdir)$(sysconfdir)/ld.so.conf -a -r $(DESTDIR)$(rootdir)$(sysconfdir)/ld.so.cache ; then \
+	@if test -n "$(LDCONFIG)" -a -x "$(LDCONFIG)" -a -r $(DESTDIR)$(sysconfdir)/ld.so.conf -a -r $(DESTDIR)$(sysconfdir)/ld.so.cache ; then \
 		$(ECHO_Q) "LDCONFIG" ld.so.cache ; \
 		$(ECHO_V) "$(LDCONFIG) -n -r $(DESTDIR)$(rootdir)/ -f $(sysconfdir)/ld.so.conf -C $(sysconfdir)/ld.so.cache $(libdir)" ; \
 		$(LDCONFIG) -n -r $(DESTDIR)$(rootdir)/ -f $(sysconfdir)/ld.so.conf -C $(sysconfdir)/ld.so.cache $(libdir) || : ; \
@@ -126,7 +126,7 @@ POST_INSTALL_AM		+= post-libraries
 ##
 postun-libraries:
 	@$(ECHO_V) "D: Making $@ in `pwd`"
-	@if test -n "$(LDCONFIG)" -a -x "$(LDCONFIG)" -a -r $(DESTDIR)$(rootdir)$(sysconfdir)/ld.so.conf -a -r $(DESTDIR)$(rootdir)$(sysconfdir)/ld.so.cache ; then \
+	@if test -n "$(LDCONFIG)" -a -x "$(LDCONFIG)" -a -r $(DESTDIR)$(sysconfdir)/ld.so.conf -a -r $(DESTDIR)$(sysconfdir)/ld.so.cache ; then \
 		$(ECHO) "$(LDCONFIG) -n -r $(DESTDIR)$(rootdir)/ -f $(sysconfdir)/ld.so.conf -C $(sysconfdir)/ld.so.cache $(libdir)" ; \
 		$(LDCONFIG) -n -r $(DESTDIR)$(rootdir)/ -f $(sysconfdir)/ld.so.conf -C $(sysconfdir)/ld.so.cache $(libdir) || : ; \
 	fi

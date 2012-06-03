@@ -73,6 +73,18 @@
 #define NIOC ('p' << 8)
 #endif
 
+#ifndef HAVE_STRUCT_TIMEVAL32
+#if defined(_LP64) || defined (_IL32LPx)
+typedef int __time32_t;
+typedef int __suseconds32_t;
+struct timeval32 {
+    __time32_t tv_sec;
+    __suseconds32_t tv_usec;
+};
+#define HAVE_STRUCT_TIMEVAL32
+#endif
+#endif
+
 /** @name Old SNIT buffer input-output controls.
   * @{ */
 #define NIOCSTIME	_IOW('p', 6, struct timeval)	/**< Set timeout value.  */

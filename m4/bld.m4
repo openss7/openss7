@@ -521,7 +521,7 @@ AC_DEFUN([_BLD_FILE_CHECK],
 # what package name and package version provides the program (if any).
 # -----------------------------------------------------------------------------
 AC_DEFUN([_BLD_VAR_PATH_PROG], [dnl
-    AC_REQUIRE([_BLD])dnl
+    AC_REQUIRE([_BLD_PROG_CHECK])dnl
     AC_ARG_VAR([$1], [$4])dnl
     AC_PATH_PROG([$1], [$2], [], [$3])
     if test :"${$1:-no}" = :no ; then
@@ -541,7 +541,7 @@ AC_DEFUN([_BLD_VAR_PATH_PROG], [dnl
 # when the program is found, the package containing the message is cached.
 # -----------------------------------------------------------------------------
 AC_DEFUN([_BLD_PATH_PROG], [dnl
-    AC_REQUIRE([_BLD])dnl
+    AC_REQUIRE([_BLD_PROG_CHECK])dnl
     AC_PATH_PROG([$1], [$2], [], [$4])
     if test :"${$1:-no}" = :no ; then
 	$1="$3"
@@ -561,7 +561,7 @@ AC_DEFUN([_BLD_PATH_PROG], [dnl
 # when the program is found, the package containing the message is cached.
 # -----------------------------------------------------------------------------
 AC_DEFUN([_BLD_PATH_PROGS], [dnl
-    AC_REQUIRE([_BLD])dnl
+    AC_REQUIRE([_BLD_PROG_CHECK])dnl
     AC_PATH_PROGS([$1], [$2], [], [$4])
     if test :"${$1:-no}" = :no ; then
 	$1="$3"
@@ -623,7 +623,7 @@ AC_DEFUN([_BLD_INSTALL_ERROR], [dnl
 
 # =============================================================================
 # _BLD_FIND_DIR (DESC, VARIABLE, SEARCH-PATH, [FILE-PATH], [VALUE-IF-NOT-FOUND],
-#		 [IF-NOT-FOUND], [IF-FOUND], [OPTION-VARIABLE])
+#		 [IF-NOT-FOUND], [IF-FOUND], [OPTION-VARIABLE], [TEST])
 # -----------------------------------------------------------------------------
 # Finds a directory by searching the directories specified in SEARCH-PATH for
 # one that exists.  When [FILE-PATH] is specified, the specified subdirectory
@@ -637,8 +637,8 @@ AC_DEFUN([_BLD_INSTALL_ERROR], [dnl
 # VARIABLE.
 # -----------------------------------------------------------------------------
 AC_DEFUN([_BLD_FIND_DIR], [dnl
-    AC_REQUIRE([_BLD])dnl
-    AC_CACHE_CHECK([for $1], [$2], [dnl
+    AC_REQUIRE([_BLD_PATH_CHECK])dnl
+    AC_CACHE_CHECK([for $1], [$2]_eval, [dnl
 	m4_if([$8], [], [],
 [	case "${$8:-search}" in
 	    (no) $2=no ;;
@@ -653,17 +653,27 @@ AC_DEFUN([_BLD_FIND_DIR], [dnl
 	    AC_MSG_RESULT([searching])
 	    for bld_dir in $bld_search_path ; do
 		AC_MSG_CHECKING([for $1... $bld_dir])
-		if test -d "$bld_dir" ; then
+		if test -d "$bld_dir" $9; then
 		    m4_if([$4], [],
-    [		$2="$bld_dir"
+    [		if test -z "$rootdir" -o "${bld_dir#$rootdir}" = "$bld_dir"
+		then
+		    $2="$bld_dir"
+		else
+		    $2='${rootdir}'"${bld_dir#$rootdir}"
+		fi
 		    AC_MSG_RESULT([yes])
 		    break],
     [		bld_files=`find $bld_dir -follow -type f -name $(basename '$4') 2>/dev/null | grep -F '$4' | sort -ru`
 		    for bld_file in $bld_files ; do
 			test -r "$bld_file" || continue
 			bld_dir="${bld_file%/$4}"
-			test -d "$bld_dir" || continue
-			$2="$bld_dir"
+			test -d "$bld_dir" $9 || continue
+			if test -z "$rootdir" -o "${bld_dir#$rootdir}" = "${bld_dir}"
+			then
+			    $2="${bld_dir}"
+			else
+			    $2='${rootdir}'"${bld_dir#$rootdir}"
+			fi
 			AC_MSG_RESULT([yes])
 			break 2
 		    done])
@@ -673,8 +683,10 @@ AC_DEFUN([_BLD_FIND_DIR], [dnl
 	    if test -z "${$2}" ; then
 		$2="$5"
 		m4_if([$6], [], [AC_MSG_WARN([Cannot find $1.])], [$6])
+		eval "[$2]_eval=\"${$2}\""
 	    else
-		bld_path_check "$2" "$4"
+		eval "[$2]_eval=\"${$2}\""
+		bld_path_check "[$2]_eval" "$4"
 		m4_if([$7], [], [:], [$7])
 	    fi
 	    AC_MSG_CHECKING([for $1])
@@ -696,8 +708,8 @@ AC_DEFUN([_BLD_FIND_DIR], [dnl
 # VARIABLE.
 # -----------------------------------------------------------------------------
 AC_DEFUN([_BLD_FIND_FILE], [dnl
-    AC_REQUIRE([_BLD])dnl
-    AC_CACHE_CHECK([for $1], [$2], [dnl
+    AC_REQUIRE([_BLD_FILE_CHECK])dnl
+    AC_CACHE_CHECK([for $1], [$2]_eval, [dnl
 	m4_if([$7], [], [],
 [	case "${$7:-search}" in
 	    (no) $2=no ;;
@@ -711,7 +723,12 @@ AC_DEFUN([_BLD_FIND_FILE], [dnl
 	    for bld_file in $bld_search_path ; do
 		AC_MSG_CHECKING([for $1... $bld_file])
 		if test -f "$bld_file" ; then
-		    $2="$bld_file"
+		    if test -z "$rootdir" -o "${bld_file#$rootdir}" = "${bld_file}"
+		    then
+			$2="${bld_file}"
+		    else
+			$2='${rootdir}'"${bld_file#$rootdir}"
+		    fi
 		    AC_MSG_RESULT([yes])
 		    break
 		fi
@@ -720,8 +737,10 @@ AC_DEFUN([_BLD_FIND_FILE], [dnl
 	    if test -z "${$2}" ; then
 		$2="$4"
 		m4_if([$5], [], [AC_MSG_WARN([Cannot find $1.])], [$5])
+		eval "[$2]_eval=\"${$2}\""
 	    else
-		bld_file_check "$2"
+		eval "[$2]_eval=\"${$2}\""
+		bld_file_check "[$2]_eval"
 		m4_if([$6], [], [:], [$6])
 	    fi
 	    AC_MSG_CHECKING([for $1])

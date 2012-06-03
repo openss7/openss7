@@ -135,24 +135,9 @@ AC_DEFUN([_DISTRO_OPTIONS], [dnl
 # -----------------------------------------------------------------------------
 AC_DEFUN([_DISTRO_SETUP], [dnl
     # first we look for a release info file
-    AC_CACHE_CHECK([for dist build lsb release file], [dist_cv_build_lsb_file], [dnl
-	eval "dist_search_path=\"
-	    /etc/lsb-release\""
-	dist_search_path=$(echo "$dist_search_path" | sed 's|\<NONE\>||g;s|//|/|g' | awk '{if(!([$]0 in seen)){print[$]0;seen[[$ 0]]=1}}')
-	for dist_file in $dist_search_path
-	do
-	    if test -f "$dist_file"
-	    then
-		dist_cv_build_lsb_file="$dist_file"
-		break
-	    fi
-	done
-	if test -z "$dist_cv_build_lsb_file" ; then
-	    dist_cv_build_lsb_file='no'
-	fi
-    ])
-    AC_CACHE_CHECK([for dist build release file], [dist_cv_build_rel_file], [dnl
-	eval "dist_search_path=\"
+    _BLD_FIND_FILE([for dist build lsb release file], [dist_cv_build_lsb_file], [
+	    /etc/lsb-release], [no])
+    _BLD_FIND_FILE([for dist build release file], [dist_cv_build_rel_file], [
 	    /etc/slackware-version
 	    /etc/arch-release
 	    /etc/oracle-release
@@ -170,37 +155,10 @@ AC_DEFUN([_DISTRO_SETUP], [dnl
 	    /etc/SuSE-release
 	    /etc/system-release
 	    /etc/debian_version
-	    /etc/release\""
-	dist_search_path=$(echo "$dist_search_path" | sed 's|\<NONE\>||g;s|//|/|g' | awk '{if(!([$]0 in seen)){print[$]0;seen[[$ 0]]=1}}')
-	for dist_file in $dist_search_path
-	do
-	    if test -f "$dist_file"
-	    then
-		dist_cv_build_rel_file="$dist_file"
-		break
-	    fi
-	done
-	if test -z "$dist_cv_build_rel_file" ; then
-	    dist_cv_build_rel_file='no'
-	fi
-    ])
-    AC_CACHE_CHECK([for dist build issue file], [dist_cv_build_issue_file], [dnl
-	eval "dist_search_path=\"
+	    /etc/release], [no])
+    _BLD_FIND_FILE([for dist build issue file], [dist_cv_build_issue_file], [
 	    /etc/issue
-	    /etc/issue.net\""
-	dist_search_path=$(echo "$dist_search_path" | sed 's|\<NONE\>||g;s|//|/|g' | awk '{if(!([$]0 in seen)){print[$]0;seen[[$ 0]]=1}}')
-	for dist_file in $dist_search_path
-	do
-	    if test -f "$dist_file"
-	    then
-		dist_cv_build_issue_file="$dist_file"
-		break
-	    fi
-	done
-	if test -z "$dist_cv_build_issue_file" ; then
-	    dist_cv_build_issue_file='no'
-	fi
-    ])
+	    /etc/issue.net], [no])
     AC_REQUIRE_SHELL_FN([dist_get_flavor],
 	[AS_FUNCTION_DESCRIBE([dist_get_flavor], [STRING], [Checks the string for linux distribution
 	 flavor.  Note: check for capitalized versions now too: SuSE 10 uses SUSE LINUX (all caps
@@ -494,72 +452,30 @@ dnl AC_MSG_WARN([checking for cpu in $[1]])
 	    dist_cv_build_arch="$dist_cv_build_cpu"
 	fi
     ])
-    AC_CACHE_CHECK([for dist host lsb release file], [dist_cv_host_lsb_file], [dnl
-	eval "dist_search_path=\"
-	    ${DESTDIR}${sysconfdir}/lsb-release\""
-	dist_search_path=$(echo "$dist_search_path" | sed 's|\<NONE\>||g;s|//|/|g' | awk '{if(!([$]0 in seen)){print[$]0;seen[[$ 0]]=1}}')
-	for dist_file in $dist_search_path
-	do
-	    if test -f "$dist_file"
-	    then
-		dist_cv_host_lsb_file="$dist_file"
-		break
-	    fi
-	done
-	if test -z "$dist_cv_host_lsb_file" ; then
-	    dist_cv_host_lsb_file='no'
-	fi
-    ])
-    AC_CACHE_CHECK([for dist host release file], [dist_cv_host_rel_file], [dnl
-	eval "dist_search_path=\"
-	    ${DESTDIR}${sysconfdir}/slackware-version
-	    ${DESTDIR}${sysconfdir}/arch-release
-	    ${DESTDIR}${sysconfdir}/oracle-release
-	    ${DESTDIR}${sysconfdir}/puias-release
-	    ${DESTDIR}${sysconfdir}/centos-release
-	    ${DESTDIR}${sysconfdir}/lineox-release
-	    ${DESTDIR}${sysconfdir}/whitebox-release
-	    ${DESTDIR}${sysconfdir}/PU_IAS-release
-	    ${DESTDIR}${sysconfdir}/fedora-release
-	    ${DESTDIR}${sysconfdir}/manbo-release
-	    ${DESTDIR}${sysconfdir}/mandriva-release
-	    ${DESTDIR}${sysconfdir}/mandrake-release
-	    ${DESTDIR}${sysconfdir}/mandrakelinux-release
-	    ${DESTDIR}${sysconfdir}/redhat-release
-	    ${DESTDIR}${sysconfdir}/SuSE-release
-	    ${DESTDIR}${sysconfdir}/system-release
-	    ${DESTDIR}${sysconfdir}/debian_version
-	    ${DESTDIR}${sysconfdir}/release\""
-	dist_search_path=$(echo "$dist_search_path" | sed 's|\<NONE\>||g;s|//|/|g' | awk '{if(!([$]0 in seen)){print[$]0;seen[[$ 0]]=1}}')
-	for dist_file in $dist_search_path
-	do
-	    if test -f "$dist_file"
-	    then
-		dist_cv_host_rel_file="$dist_file"
-		break
-	    fi
-	done
-	if test -z "$dist_cv_host_rel_file" ; then
-	    dist_cv_host_rel_file='no'
-	fi
-    ])
-    AC_CACHE_CHECK([for dist host issue file], [dist_cv_host_issue_file], [dnl
-	eval "dist_search_path=\"
-	    ${DESTDIR}${sysconfdir}/issue
-	    ${DESTDIR}${sysconfdir}/issue.net\""
-	dist_search_path=$(echo "$dist_search_path" | sed 's|\<NONE\>||g;s|//|/|g' | awk '{if(!([$]0 in seen)){print[$]0;seen[[$ 0]]=1}}')
-	for dist_file in $dist_search_path
-	do
-	    if test -f "$dist_file"
-	    then
-		dist_cv_host_issue_file="$dist_file"
-		break
-	    fi
-	done
-	if test -z "$dist_cv_host_issue_file" ; then
-	    dist_cv_host_issue_file='no'
-	fi
-    ])
+    _BLD_FIND_FILE([for dist host lsb release file], [dist_cv_host_lsb_file], [
+	    ${sysconfdir}/lsb-release], [no])
+    _BLD_FIND_FILE([for dist host release file], [dist_cv_host_rel_file], [
+	    ${sysconfdir}/slackware-version
+	    ${sysconfdir}/arch-release
+	    ${sysconfdir}/oracle-release
+	    ${sysconfdir}/puias-release
+	    ${sysconfdir}/centos-release
+	    ${sysconfdir}/lineox-release
+	    ${sysconfdir}/whitebox-release
+	    ${sysconfdir}/PU_IAS-release
+	    ${sysconfdir}/fedora-release
+	    ${sysconfdir}/manbo-release
+	    ${sysconfdir}/mandriva-release
+	    ${sysconfdir}/mandrake-release
+	    ${sysconfdir}/mandrakelinux-release
+	    ${sysconfdir}/redhat-release
+	    ${sysconfdir}/SuSE-release
+	    ${sysconfdir}/system-release
+	    ${sysconfdir}/debian_version
+	    ${sysconfdir}/release], [no])
+    _BLD_FIND_FILE([for dist host issue file], [dist_cv_host_issue_file], [
+	    ${sysconfdir}/issue
+	    ${sysconfdir}/issue.net], [no])
     AC_CACHE_CHECK([for dist host flavor], [dist_cv_host_flavor], [dnl
 	if test -z "$dist_cv_host_flavor" -a ":${dist_cv_host_rel_file:-no}" != :no ; then
 	    if test `echo "$dist_cv_host_rel_file" | sed 's|.*/||'` != 'debian_version' ; then
@@ -591,7 +507,7 @@ dnl AC_MSG_WARN([checking for cpu in $[1]])
 	# cannot get host flavor using build system compiler
 	# distinguish slackware from salix
 	if test "$dist_cv_host_flavor" = slackware; then
-	    eval "dist_path=\"${DESTDIR}${localstatedir}/log/packages\""
+	    eval "dist_path=\"${localstatedir}/log/packages\""
 	    dist_path=$(echo "$dist_path" | sed 's|\<NONE\>||g;s|//|/|g')
 	    if test "`find $dist_path -name 'salix*' 2>/dev/null | head -1`" != ""; then
 		dist_cv_host_flavor='salix'
@@ -892,49 +808,23 @@ AC_DEFUN([_DISTRO_ADJUST_64BIT_LIBDIR], [dnl
     syslib32dir="$syslibdir"
     case $host_cpu in
 	(*64)
-	    eval "dist_search_path=\"
-		${DESTDIR}${libdir}32
-		${DESTDIR}${rootdir}/usr/lib32
-		${DESTDIR}/usr/lib32
-		/usr/lib32\""
-	    dist_search_path=$(echo "$dist_search_path" | sed 's|\<NONE\>||g;s|//|/|g' | awk '{if(!([$]0 in seen)){print[$]0;seen[[$ 0]]=1}}')
-	    dist_found=
-	    for dist_dir in $dist_search_path; do
-		if test -d "$dist_dir"; then
-		    dist_found=yes
-		    break
-		fi
-	    done
-	    if test ${dist_found:-no} = yes; then
-		lib64dir=`echo $libdir | sed -r -e 's|\<lib64\>|lib|g'`
-		lib32dir=`echo $libdir | sed -r -e 's|\<lib\>|lib32|g'`
-	    else
+	    _BLD_FIND_DIR([for 32-bit and 64-bit lib name], [dist_cv_libdirs], [
+		    ${libdir}32
+		    ${rootdir}/usr/lib32], [], [], [dnl
 		lib64dir=`echo $libdir | sed -r -e 's|\<lib\>|lib64|g'`
-		lib32dir=`echo $libdir | sed -r -e 's|\<lib64\>|lib|g'`
-	    fi
+		lib32dir=`echo $libdir | sed -r -e 's|\<lib64\>|lib|g'`],[dnl
+		lib64dir=`echo $libdir | sed -r -e 's|\<lib64\>|lib|g'`
+		lib32dir=`echo $libdir | sed -r -e 's|\<lib\>|lib32|g'`])
 	    libdir="$lib64dir"
 	    pkglib32dir='${lib32dir}/${PACKAGE}'
 	    pkglibexec32dir='${pkglibexecdir}/lib32'
-	    eval "dist_search_path=\"
-		${DESTDIR}${syslibdir}32
-		${DESTDIR}${rootdir}/lib32
-		${DESTDIR}/lib32
-		/lib32\""
-	    dist_search_path=$(echo "$dist_search_path" | sed 's|\<NONE\>||g;s|//|/|g' | awk '{if(!([$]0 in seen)){print[$]0;seen[[$ 0]]=1}}')
-	    dist_found=
-	    for dist_dir in $dist_search_path; do
-		if test -d "$dist_dir"; then
-		    dist_found=yes
-		    break
-		fi
-	    done
-	    if test ${dist_found:-no} = yes; then
-		syslib64dir=`echo $syslibdir | sed -r -e 's|\<lib64\>|lib|g'`
-		syslib32dir=`echo $syslibdir | sed -r -e 's|\<lib\>|lib32|g'`
-	    else
+	    _BLD_FIND_DIR([for 32-bit and 64-bit syslib name], [dist_cv_syslibdirs], [
+		    ${syslibdir}32
+		    ${rootdir}/lib32], [], [], [dnl
 		syslib64dir=`echo $syslibdir | sed -r -e 's|\<lib\>|lib64|g'`
-		syslib32dir=`echo $syslibdir | sed -r -e 's|\<lib64\>|lib|g'`
-	    fi
+		syslib32dir=`echo $syslibdir | sed -r -e 's|\<lib64\>|lib|g'`],[dnl
+		syslib64dir=`echo $syslibdir | sed -r -e 's|\<lib64\>|lib|g'`
+		syslib32dir=`echo $syslibdir | sed -r -e 's|\<lib\>|lib32|g'`])
 	    syslibdir="$syslib64dir"
 	    have_32bit_libs=yes
 	    ;;

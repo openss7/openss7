@@ -179,8 +179,8 @@ AC_LINK_IFELSE([AC_LANG_CALL([$6], [$2])],
  AS_VAR_SET(ac_Lib, no)
  AC_MSG_RESULT([searching])
  eval "ac_search_path=\"
-    ${DESTDIR}${syslibdir}
-    ${DESTDIR}${libdir}\""
+    ${syslibdir}
+    ${libdir}\""
  ac_search_path=`echo "$ac_search_path" | sed -e 's,\<NONE\>,'$ac_default_prefix',g;s,//,/,g' | awk '{if(!([$]0 in seen)){print[$]0;seen[[$ 0]]=1}}'`
  for ac_dir in $ac_search_path ; do
      for ac_lib in $ac_dir/lib$1.so.* ; do
@@ -240,8 +240,8 @@ AC_LINK_IFELSE([AC_LANG_CALL([$6], [$2])],
  AS_VAR_SET(ac_Lib, no)
  AC_MSG_RESULT([searching])
  eval "ac_search_path=\"
-    ${DESTDIR}${syslib32dir}
-    ${DESTDIR}${lib32dir}\""
+    ${syslib32dir}
+    ${lib32dir}\""
  ac_search_path=`echo "$ac_search_path" | sed -e 's,\<NONE\>,'$ac_default_prefix',g;s,//,/,g' | awk '{if(!([$]0 in seen)){print[$]0;seen[[$ 0]]=1}}'`
  for ac_dir in $ac_search_path ; do
      for ac_lib in $ac_dir/lib$1.so.* ; do

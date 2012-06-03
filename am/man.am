@@ -434,7 +434,7 @@ post-manpages:
 			fi ; \
 		fi ; \
 	done ; \
-	if test -z "$(DESTDIR)" -a -n "$(MAKEWHATIS)" -a -x "$(MAKEWHATIS)" ; then \
+	if test -z "$(DESTDIR)$(rootdir)" -a -n "$(MAKEWHATIS)" -a -x "$(MAKEWHATIS)" ; then \
 		$(ECHO_Q) "  GEN   " makewhatis ; \
 		if test -n '$(mandir)' ; then \
 			$(ECHO_V) "LANGUAGE= $(MAKEWHATIS) -v -u $(DESTDIR)$(mandir)" ; \
@@ -472,7 +472,7 @@ postun-manpages:
 			fi ; \
 		fi ; \
 	done | $(am__base_remove) ; \
-	if test -z "$(DESTDIR)" -a -n "$(MAKEWHATIS)" -a -x "$(MAKEWHATIS)" ; then \
+	if test -z "$(DESTDIR)$(rootdir)" -a -n "$(MAKEWHATIS)" -a -x "$(MAKEWHATIS)" ; then \
 		if test -n "$(mandir)" ; then \
 			$(ECHO) "LANGUAGE= $(MAKEWHATIS) -v -u $(DESTDIR)$(mandir)" ; \
 			LANGUAGE= $(MAKEWHATIS) -v -u $(DESTDIR)$(mandir) || retval=$$? ; \
@@ -492,7 +492,7 @@ else
 ## ! COMPRESS_MANPAGES
 
 post-manpages:
-	@if test -z "$(DESTDIR)" -a -n "$(MAKEWHATIS)" -a -x "$(MAKEWHATIS)" ; then \
+	@if test -z "$(DESTDIR)$(rootdir)" -a -n "$(MAKEWHATIS)" -a -x "$(MAKEWHATIS)" ; then \
 		$(ECHO_Q) "  GEN   " makewhatis ; \
 		if test -n "$(mandir)" ; then \
 			$(ECHO_V) "LANGUAGE= $(MAKEWHATIS) -v -u $(DESTDIR)$(mandir)" ; \
@@ -509,7 +509,7 @@ post-manpages:
 ##
 
 postun-manpages:
-	@if test -z '$(DESTDIR)' -a -n '$(MAKEWHATIS)' -a -x '$(MAKEWHATIS)' ; then \
+	@if test -z '$(DESTDIR)$(rootdir)' -a -n '$(MAKEWHATIS)' -a -x '$(MAKEWHATIS)' ; then \
 		if test -n '$(mandir)' ; then \
 			$(ECHO) "LANGUAGE= $(MAKEWHATIS) -v -u $(mandir)" ; \
 			LANGUAGE= $(MAKEWHATIS) -v -u $(mandir) || retval=$$? ; \

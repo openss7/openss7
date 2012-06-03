@@ -87,7 +87,7 @@ STRIP_KERNEL_MODULES		= $(STRIP) --strip-debug -X -x
 install-modules: $(KERNEL_MODULES)
 	@$(ECHO_V) "D: Making $@ in `pwd`"
 	@$(NORMAL_INSTALL)
-	@r='$(DESTDIR)$(rootdir)' ; k="$$r$(kmoduledir)" ; d="$$k/$(KERNEL_SUBDIR)" ; \
+	@k="$(DESTDIR)$(kmoduledir)" ; d="$$k/$(KERNEL_SUBDIR)" ; \
 	if test -n "$(COMPRESS_KERNEL_MODULES)" ; then kext='.gz' ; else kext='' ; fi ; \
 	if test -n "$(KERNEL_PRELOADS)" ; then \
 		$(ECHO) "$(mkinstalldirs) $$d/boot" ; \
@@ -153,20 +153,20 @@ INSTALL_EXEC_LOCAL	+= install-modules
 ##
 post-modules:
 	@$(ECHO_V) "D: Making $@ in `pwd`"
-	@r='$(DESTDIR)$(rootdir)' ; k="$$r$(kmoduledir)" ; conf_fil="$$r/etc/modules.conf" ; \
+	@k="$(DESTDIR)$(kmoduledir)" ; conf_fil="$(DESTDIR)$(rootdir)/etc/modules.conf" ; \
 	if test -n "$(COMPRESS_KERNEL_MODULES)" ; then kext='.gz' ; else kext='' ; fi ; \
 	if test -f "$$conf_fil" ; then \
 		if test -e "$$k/net/sctp/sctp.o$$kext" ; then \
 			$(am__mv) "$$k/net/sctp/sctp.o$$kext" "$$k/net/sctp/sctp_deprecated.o$$kext" ; \
 		fi ; \
 		if test -n "$(DEPMOD)" -a -x "$(DEPMOD)"; then \
-			s="$$r$(ksysmap)" ; \
+			s="$(DESTDIR)$(ksysmap)" ; \
 			if test -f "$$s" ; then \
-				$(ECHO) "UNAME_MACHINE=$(target_cpu) $(DEPMOD) -ae -b $$r/ -C $$conf_fil -F $$s $(kversion)" ; \
-				UNAME_MACHINE=$(target_cpu) $(DEPMOD) -ae -b $$r/ -C $$conf_fil -F $$s $(kversion) ; \
+				$(ECHO) "UNAME_MACHINE=$(target_cpu) $(DEPMOD) -ae -b $(DESTDIR)$(rootdir)/ -C $$conf_fil -F $$s $(kversion)" ; \
+				UNAME_MACHINE=$(target_cpu) $(DEPMOD) -ae -b $(DESTDIR)$(rootdir)/ -C $$conf_fil -F $$s $(kversion) ; \
 			fi ; \
 		fi ; \
-		prel_fil="$$r/etc/modules" ; \
+		prel_fil="$(DESTDIR)$(rootdir)/etc/modules" ; \
 		if test -n "$(KERNEL_PRELOADS)" -a -f "$$prel_fil" ; then \
 			prel_tmp="$$prel_fil.tmp.$$$$" ; \
 			prel_new="$$prel_fil.new.$$$$" ; \
@@ -212,7 +212,7 @@ POST_INSTALL_AM		+= post-modules post-source
 uninstall-modules:
 	@$(ECHO_V) "D: Making $@ in `pwd`"
 	@$(NORMAL_UNINSTALL)
-	@r='$(DESTDIR)$(rootdir)' ; k="$$r$(kmoduledir)" ; d="$$k/$(KERNEL_SUBDIR)" ; \
+	@k="$(DESTDIR)$(kmoduledir)" ; d="$$k/$(KERNEL_SUBDIR)" ; \
 	if test -n "$(COMPRESS_KERNEL_MODULES)" ; then kext='.gz' ; else kext='' ; fi ; \
 	list='$(KERNEL_MODULES)'; for p in $$list; do \
 		p="`$(ECHO) $$p | sed 's|^.*/||;s|lib.*_a-||'`" ; \
@@ -252,18 +252,18 @@ UNINSTALL_LOCAL		+= uninstall-modules
 ##
 postun-modules:
 	@$(ECHO_V) "D: Making $@ in `pwd`"
-	@r='$(DESTDIR)$(rootdir)' ; k="$$r$(kmoduledir)" ; conf_fil="$$r/etc/modules.conf" ; \
+	@k="$(DESTDIR)$(kmoduledir)" ; conf_fil="$(DESTDIR)$(rootdir)/etc/modules.conf" ; \
 	if test -n "$(COMPRESS_KERNEL_MODULES)" ; then kext='.gz' ; else kext='' ; fi ; \
 	if test -f "$$conf_fil" ; then \
 		l=yes ; \
-		for f in $$r/lib/modules/*/$(KERNEL_SUBDIR)/sctp.o* ; do \
+		for f in $(DESTDIR)$(rootdir)/lib/modules/*/$(KERNEL_SUBDIR)/sctp.o* ; do \
 			if test -f $$f ; then l=no ; break ; fi ; \
 		done ; \
 		if test ":$$l" = :yes ; then \
 			if test -e "$$k/net/sctp/sctp_deprecated.o$$kext" ; then \
 				$(am__mv) "$$k/net/sctp/sctp_deprecated.o$$kext" "$$k/net/sctp/sctp.o$$kext" ; \
 			fi ; \
-			prel_fil="$$r/etc/modules" ; \
+			prel_fil="$(DESTDIR)$(rootdir)/etc/modules" ; \
 			if test -n "$(KERNEL_PRELOADS)" -a -f "$$prel_fil" ; then \
 				prel_tmp="$$prel_fil.tmp.$$$$" ; \
 				prel_new="$$prel_fil.new.$$$$" ; \
@@ -279,10 +279,10 @@ postun-modules:
 			fi ; \
 		fi ; \
 		if test -n "$(DEPMOD)" -a -x "$(DEPMOD)"; then \
-			s="$$r$(ksysmap)" ; \
+			s="$(DESTDIR)$(ksysmap)" ; \
 			if test -f $$s ; then \
-				$(ECHO) "UNAME_MACHINE=$(target_cpu) $(DEPMOD) -ae -b $$r/ -C $$conf_fil -F $$s $(kversion)" ; \
-				UNAME_MACHINE=$(target_cpu) $(DEPMOD) -ae -b $$r/ -C $$conf_fil -F $$s $(kversion) ; \
+				$(ECHO) "UNAME_MACHINE=$(target_cpu) $(DEPMOD) -ae -b $(DESTDIR)$(rootdir)/ -C $$conf_fil -F $$s $(kversion)" ; \
+				UNAME_MACHINE=$(target_cpu) $(DEPMOD) -ae -b $(DESTDIR)$(rootdir)/ -C $$conf_fil -F $$s $(kversion) ; \
 			fi ; \
 		fi ; \
 	fi
