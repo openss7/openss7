@@ -222,7 +222,7 @@ ss7_fast_freemsg(struct ss7_bufpool *pool, mblk_t *mp)
  *  Initialized the buffer pool for operation.
  */
 /* if you need local irq or bottom half suppression, do it yourself */
-static __inline__ void
+static __inline__ streamscall void
 ss7_bufpool_init(struct ss7_bufpool *pool)
 {
 	if (!pool->initialized) {
@@ -247,7 +247,7 @@ ss7_bufpool_init(struct ss7_bufpool *pool)
  *  Reserves n more FASTBUF sized blocks in the buffer pool and precharges
  *  those n blocks into the buffer pool.
  */
-static __inline__ void
+static __inline__ streamscall void
 ss7_bufpool_reserve(struct ss7_bufpool *pool, int n)
 {
 	mblk_t *mp;
@@ -268,7 +268,7 @@ ss7_bufpool_reserve(struct ss7_bufpool *pool, int n)
  *  Releases reservation of n FASTBUF sized blocks.  We do not release them
  *  here, we wait for them to be used normally, or freed on termination.
  */
-static __inline__ void
+static __inline__ streamscall void
 ss7_bufpool_release(struct ss7_bufpool *pool, int n)
 {
 	atomic_sub(n, &pool->reserve);
@@ -280,7 +280,7 @@ ss7_bufpool_release(struct ss7_bufpool *pool, int n)
  *  Terminate the buffer pool and free any blocks in the pool.
  */
 /* if you need local irq or bottom half suppression, do it yourself */
-static __inline__ void
+static __inline__ streamscall void
 ss7_bufpool_term(struct ss7_bufpool *pool)
 {
 	spin_lock(&pool->lock);

@@ -1654,7 +1654,7 @@ EXPORT_SYMBOL(streams_module_address);
 
 #elif defined HAVE___MODULE_ADDRESS_SUPPORT
 extern struct module *__module_address(unsigned long addr);
-struct module *
+streams_fastcall struct module *
 streams_module_address(unsigned long addr)
 {
 	struct module *mod;

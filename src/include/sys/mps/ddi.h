@@ -90,7 +90,7 @@
 
 #if defined(CONFIG_STREAMS_COMPAT_MPS) || defined(CONFIG_STREAMS_COMPAT_MPS_MODULE)
 
-static __inline__ int
+static __inline__ streamscall int
 mi_bcmp(const void *s1, const void *s2, size_t len)
 {
 	return bcmp(s1, s2, len);
@@ -118,7 +118,7 @@ mi_alloc_sleep(size_t size, unsigned int pri)
 		*sp++ = size;
 	return (sp);
 }
-static __inline__ caddr_t
+static __inline__ streamscall caddr_t
 mi_zalloc(size_t size)
 {
 	caddr_t memp;
@@ -127,7 +127,7 @@ mi_zalloc(size_t size)
 		bzero(memp, size);
 	return (memp);
 }
-static __inline__ caddr_t
+static __inline__ streamscall caddr_t
 mi_zalloc_sleep(size_t size)
 {
 	caddr_t memp;

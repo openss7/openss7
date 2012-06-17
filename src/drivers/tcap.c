@@ -13111,7 +13111,7 @@ static int tcap_majors[CMAJORS] = { CMAJOR_0, };
  *	Fast-STREAMS.  This corresponds to the /dev/streams/tcap/NNNN minor device node where NNNN
  *	is the minor device number.
  */
-static int
+static streamscall int
 tcap_qopen(queue_t *q, dev_t *devp, int oflags, int sflag, cred_t *crp)
 {
 	psw_t flags;
@@ -13231,7 +13231,7 @@ tcap_qopen(queue_t *q, dev_t *devp, int oflags, int sflag, cred_t *crp)
  * @oflags: flags to the open(2s) call
  * @crp: pointer to the credentials of the closing process
  */
-static int
+static streamscall int
 tcap_qclose(queue_t *q, int oflags, cred_t *crp)
 {
 	struct tc *tc = TC_PRIV(q);

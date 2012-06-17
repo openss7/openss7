@@ -3177,8 +3177,8 @@ EXPORT_SYMBOL(mi_offset_paramc);
 __MPS_EXTERN void
 mps_become_writer(queue_t *q, mblk_t *mp, proc_ptr_t proc)
 {
-	extern void __strwrit(queue_t *q, mblk_t *mp, void (*func) (queue_t *, mblk_t *),
-			      int perim);
+	extern void __strwrit(queue_t *q, mblk_t *mp,
+			      void streamscall (*func) (queue_t *, mblk_t *), int perim);
 	__strwrit(q, mp, proc, PERIM_INNER | PERIM_OUTER);
 }
 

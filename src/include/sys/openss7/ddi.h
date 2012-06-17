@@ -144,14 +144,14 @@ int umount2(char *pathname, int flags);
 int unlink(char *pathname);
 #endif
 
-static __inline__ int
+static __inline__ streamscall int
 copyin(const void *from, void *to, size_t len)
 {
 	if (!copy_from_user(to, from, len))
 		return (0);
 	return (-EFAULT);
 }
-static __inline__ int
+static __inline__ streamscall int
 copyout(const void *from, void *to, size_t len)
 {
 	if (!copy_to_user(to, from, len))
@@ -236,7 +236,7 @@ drv_usecwait(unsigned long usec)
 	return (udelay(usec));
 }
 
-static __inline__ void
+static __inline__ streamscall void
 delay(unsigned long ticks)
 {
 	set_current_state(TASK_UNINTERRUPTIBLE);

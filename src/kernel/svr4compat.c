@@ -387,7 +387,7 @@ etoimajor(major_t emajor)
 
 EXPORT_SYMBOL(etoimajor);	/* uw7/ddi.h */
 
-int
+__SVR4_EXTERN int
 itoemajor(major_t imajor, int prevemaj)
 {
 	struct cdevsw *cdev;
@@ -437,7 +437,7 @@ EXPORT_SYMBOL(RW_DEALLOC);	/* svr4/ddi.h */
 __SVR4_EXTERN_INLINE pl_t RW_RDLOCK(rwlock_t *lockp, pl_t pl);
 
 EXPORT_SYMBOL(RW_RDLOCK);	/* svr4/ddi.h */
-pl_t
+__SVR4_EXTERN pl_t
 RW_TRYRDLOCK(rwlock_t *lockp, pl_t pl)
 {
 	pl_t old_pl = spl(pl);
@@ -547,7 +547,7 @@ __SVR4_EXTERN_INLINE void SV_DEALLOC(sv_t * svp);
 
 EXPORT_SYMBOL(SV_DEALLOC);	/* svr4/ddi.h */
 #if   defined HAVE___WAKE_UP_SYNC_SYMBOL
-extern void FASTCALL(__wake_up_sync(wait_queue_head_t *q, unsigned int mode, int nr));
+extern void __wake_up_sync(wait_queue_head_t *q, unsigned int mode, int nr);
 #define __wake_up_sync(a,b,c) __wake_up_sync(a,b,c)
 #else
 #undef	__wake_up_sync

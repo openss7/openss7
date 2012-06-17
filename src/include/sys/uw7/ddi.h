@@ -90,7 +90,7 @@
 #endif
 #include <sys/svr4/ddi.h>
 
-int printf_UW7(char *fmt, ...) __attribute__ ((format(printf, 1, 2)));
+__UW7_EXTERN int printf_UW7(char *fmt, ...) __attribute__ ((format(printf, 1, 2)));
 
 typedef atomic_t atomic_int_t;
 

@@ -100,9 +100,9 @@ time(void)
 	return tv.tv_sec;
 }
 
-int uprintf(const char *fmt, ...) __attribute__ ((format(printf, 1, 2)));
+__OSF_EXTERN int uprintf(const char *fmt, ...) __attribute__ ((format(printf, 1, 2)));
 
-static __inline__ void
+static __inline__ streamscall void
 DELAY(time_t ticks)
 {
 	delay(ticks);

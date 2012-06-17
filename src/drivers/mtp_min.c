@@ -7203,7 +7203,7 @@ sl_rput(queue_t *q, mblk_t *mp)
  *  -------------------------------------------------------------------------
  */
 static caddr_t mt_opens = NULL;
-static int
+static streamscall int
 mt_qopen(queue_t *q, dev_t *devp, int oflags, int sflag, cred_t *crp)
 {
 	struct mt *mt;
@@ -7249,7 +7249,7 @@ mt_qopen(queue_t *q, dev_t *devp, int oflags, int sflag, cred_t *crp)
  *  CLOSE
  *  -------------------------------------------------------------------------
  */
-static int
+static streamscall int
 mt_qclose(queue_t *q, int flag, cred_t *crp)
 {
 	struct mt *mt = MT_PRIV(q);
