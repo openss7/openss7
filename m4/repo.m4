@@ -261,6 +261,9 @@ AC_DEFUN([_REPO_SETUP_PACMAN], [dnl
     _BLD_FIND_DIR([for pacman mirrors directory], [repo_cv_pacman_repodir], [
 	    ${sysconfdir}/pacman.d
 	    ${rootdir}/etc/pacman.d], [], [no], [], [], [with_install_source_pacman])
+    _BLD_FIND_DIR([for pacman keyrings directory], [repo_cv_pacman_keyrings], [
+	    ${datarootdir}/pacman/keyrings
+	    ${rootdir}/usr/share/pacman/keyrings], [], [no])
     _BLD_FIND_FILE([for pacman config file], [repo_cv_pacman_config], [
 	    ${sysconfdir}/pacman.conf
 	    ${rootdir}/etc/pacman.conf], [no])
@@ -422,6 +425,10 @@ AC_DEFUN([_REPO_OUTPUT], [dnl
     pacmanrepodir='${rootdir}/etc/slapt-get'
     if test :"${repo_cv_pacman_repodir:-no}" != :no ; then
 	pacmanrepodir="$repo_cv_pacman_repodir"
+    fi
+    pacmankeyrings='${rootdir}/usr/share/pacman/keyrings'
+    if test :"${repo_cv_pacman_keyrings:-no}" != :no ; then
+	pacmankeyrings="$repo_cv_pacman_keyrings";
     fi
     AC_SUBST([pacmanrepodir])dnl
     pacmanconfig='${rootdir}/etc/pacman.conf'

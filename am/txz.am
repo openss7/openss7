@@ -340,33 +340,13 @@ $(slack_bzips): %.bz2 : %
 $(slack_xzips): %.xz : %
 	$(AM_V_GEN)$(XZ_CMD) $(XZ) -c $< >$@
 
-GPGVERIFYSIGN = \
-	if test ! -f $@ || ! $(GPG) --verify -- $@ >/dev/null 2>&1; then \
-		test ! -f $@ || $(ECHO) "D: gpg BAD $@" ; \
-		user="$(GNUPGUSER)"; user="$${user:+ -u }$$user"; \
-		home="$(GNUPGHOME)"; home="$${home:+ --homedir }$$home"; \
-		pass="$(GNUPGPASS)"; pass="$${pass:+ --batch }"; \
-		pipe="$(GNUPGPASS)"; pipe="$${pipe:+$(ECHO) $$pipe |}"; \
-		$(ECHO) "$(GPG) -ba --passphrase-fd 0$$user$$home$$pass -o- -- $< >$@ 2>/dev/null"; \
-		eval "$$pipe $(GPG) -ba --passphrase-fd 0$$user$$home$$pass -o- -- $< >$@ 2>/dev/null"; \
-	else \
-		$(ECHO) "D: gpg OK  $@" ; \
-		touch "$@"; \
-	fi
-
 $(slack_signs): %.asc : %
 	@$(ECHO_V) "Making $@ in `pwd`"
-	$(AM_V_GEN)$(GPGVERIFYSIGN)
-
-GPGEXPORTKEY = \
-	user="$(GNUPGUSER)"; user="$${user:+ -u }$$user"; \
-	home="$(GNUPGHOME)"; home="$${home:+ --homedir }$$home"; \
-	$(ECHO) "$(GPG) -a$$user$$home --export $(GNUPGUSER) >$@"; \
-	$(GPG) -a$$user$$home --export $(GNUPGUSER) >$@
+	$(am__gpg_verify_sign)
 
 $(slack_keys):
 	@$(ECHO_V) "Making $@ in `pwd`"
-	$(AM_V_GEN)$(GPGEXPORTKEY)
+	$(am__gpg_export_key)
 
 ## BUILD_REPO_SLACKPKG
 endif
@@ -407,40 +387,13 @@ UPDATE_SIGN		+= repo-sign-slack
 UPDATE_CLEAN_LOCAL	+= repo-clean-slack
 UPDATECLEANFILES	+=
 
-GENCOMPRESSEDDATA = \
-	if test -s $$f ; then \
-		$(ECHO) " $(GZIP_CMD) $(GZIP) -c $$f >$$f.gz" ; \
-		$(GZIP_CMD) $(GZIP) -c $$f >$$f.gz ; \
-		$(ECHO) " $(BZIP2_CMD) $(BZIP2) -c $$f >$$f.bz2" ; \
-		$(BZIP2_CMD) $(BZIP2) -c $$f >$$f.bz2 ; \
-		$(ECHO) " $(XZ_CMD) $(XZ) -c $$f >$$f.xz" ; \
-		$(XZ_CMD) $(XZ) -c $$f >$$f.xz ; \
-	fi
-
-GENSIGNEDDATA = \
-	for s in '' .gz .bz2 .lzma .xz; do \
-		rm -f -- $$f$$s.asc ; \
-		test -s $$f$$s || continue ; \
-		if test ! -f $$f$$s || ! $(GPG) --verify -- $$f$$s >/dev/null 2>&1; then \
-			$(ECHO_Q) "  GEN   $$(basename $$f$$s)" ; \
-			$(ECHO_V) "$(GPG) -ba --passphrase-fd 0$$user$$home$$pass -o- -- $$f$$s >$$f$$s.asc 2>/dev/null"; \
-			eval "$$pipe $(GPG) -ba --passphrase-fd 0$$user$$home$$pass -o- -- $$f$$s >$$f$$s.asc 2>/dev/null"; \
-		else \
-			$(ECHO) "D: gpg OK  $$f$$s.asc" ; \
-			touch "$$f$$s.asc" ; \
-		fi ; \
-	done
-
 ## Release or update txzs have been added to or removed from the repository:
 ## update the slackware metadata for the repository.
 ##
 release-update-slack:
 	@$(ECHO_V) "D: Making $@ in `pwd`"
 	test '$(DISTDIR)' != '$(REPODIR)' || exit 0 ; \
-	user='$(GNUPGUSER)'; user="$${user:+ -u }$$user" ; \
-	home='$(GNUPGHOME)'; home="$${home:+ --homedir }$$home" ; \
-	pass='$(GNUPGPASS)'; pass="$${pass:+ --batch }" ; \
-	pipe='$(GNUPGPASS)'; pipe="$${pipe:+$(ECHO) $$pipe |}" ; \
+	$(am__gpg_prepare) ; \
 	empty_repo=yes; \
 	repodir=`echo '$(txzdistdir)' | sed -e 's,^$(DISTDIR),$(REPODIR),'` ; \
 	tardir=`echo '$(tardir)' | sed 's,^$(DISTDIR),$(REPODIR),'` ; \
@@ -500,7 +453,7 @@ release-update-slack:
 					$(ECHO) "cd $$base" ; cd $$base ; \
 					$(ECHO) "$(GENPKGLIST) --index srpm_idx --meta $$comp --bloat $$dir $$comp" ; \
 					$(GENPKGLIST) --index srpm_idx --meta $$comp --bloat $$dir $$comp ; \
-					$(GENCOMPRESSEDDATA) ; \
+					$(am__compress_data_file) ; \
 				) ; \
 				empty_subrepo=no; \
 				empty_repo=no; \
@@ -553,7 +506,7 @@ release-update-slack:
 					done; \
 				) 	2>&1 >$$f.new; \
 				$(ECHO_V) "mv -f -- $$f.new $$f" ; mv -f -- $$f.new $$f ; \
-				$(GENCOMPRESSEDDATA) ; \
+				$(am__compress_data_file) ; \
 				f=MANIFEST ; \
 				$(ECHO_Q) "  GEN   $$(basename $$f)" ; \
 				( \
@@ -569,12 +522,8 @@ release-update-slack:
 					done ; \
 				)	2>&1 >$$f.new ; 
 				$(ECHO_V) "mv -f -- $$f.new $$f" ; mv -f -- $$f.new $$f ; \
-				$(GENCOMPRESSEDDATA) ; \
-				f=GPG-KEY ; \
-				$(ECHO_Q) "  GEN   $$(basename $$f)" ; \
-				$(ECHO_V) "$(GPG) -a$$user$$home --export $(GNUPGUSER) >$$f.new" ; \
-				$(GPG) -a$$user$$home --export $(GNUPGUSER) >$$f.new ; \
-				$(ECHO_V) "mv -f -- $$f.new $$f" ; mv -f -- $$f.new $$f ; \
+				$(am__compress_data_file) ; \
+				k=GPG-KEY ; $(am__gpg_export_key_file) ; \
 				f=CHECKSUMS.md5 ; \
 				$(ECHO_Q) "  GEN   $$(basename $$f)" ; \
 				( \
@@ -592,8 +541,8 @@ release-update-slack:
 					find . -type f | grep -v $$f | xargs md5sum; \
 				)	2>&1 >$$f.new ; \
 				$(ECHO_V) "mv -f -- $$f.new $$f" ; mv -f -- $$f.new $$f ; \
-				$(GENCOMPRESSEDDATA) ; \
-				$(GENSIGNEDDATA) ; \
+				$(am__compress_data_file) ; \
+				$(am__gpg_sign_compressed_file) ; \
 				f=FILE_LIST ; \
 				$(ECHO_Q) "  GEN  $$(basename $$f)" ; \
 				( \
@@ -628,8 +577,8 @@ release-update-slack:
 					find . -type f | grep -v $$f | xargs md5sum; \
 				)	2>&1 >$$f.new ; \
 				$(ECHO_V) "mv -f -- $$f.new $$f" ; mv -f -- $$f.new $$f ; \
-				$(GENCOMPRESSEDDATA) ; \
-				$(GENSIGNEDDATA) ; \
+				$(am__compress_data_file) ; \
+				$(am__gpg_sign_compressed_file) ; \
 			done ; \
 		) ; \
 		else \
@@ -670,33 +619,13 @@ $(txzdistdir)/$(PACKAGE)-getrc:: Makefile
 
 $(txzdistdir)/$(PACKAGE)-local-getrc:: Makefile
 
-GPGVERIFYSIGN = \
-	if test ! -f $@ || ! $(GPG) --verify -- $@ >/dev/null 2>&1; then \
-		test ! -f $@ || $(ECHO) "D: gpg BAD $@" ; \
-		user="$(GNUPGUSER)"; user="$${user:+ -u }$$user"; \
-		home="$(GNUPGHOME)"; home="$${home:+ --homedir }$$home"; \
-		pass="$(GNUPGPASS)"; pass="$${pass:+ --batch }"; \
-		pipe="$(GNUPGPASS)"; pipe="$${pipe:+$(ECHO) $$pipe |}"; \
-		$(ECHO) "$(GPG) -ba --passphrase-fd 0$$user$$home$$pass -o- -- $< >$@ 2>/dev/null"; \
-		eval "$$pipe $(GPG) -ba --passphrase-fd 0$$user$$home$$pass -o- -- $< >$@ 2>/dev/null"; \
-	else \
-		$(ECHO) "D: gpg OK  $@" ; \
-		touch "$@"; \
-	fi
-
 $(slapt_signs): %.asc : %
 	@$(ECHO_V) "Making $@ in `pwd`"
-	$(AM_V_GEN)$(GPGVERIFYSIGN)
-
-GPGEXPORTKEY = \
-	user="$(GNUPGUSER)"; user="$${user:+ -u }$$user"; \
-	home="$(GNUPGHOME)"; home="$${home:+ --homedir }$$home"; \
-	$(ECHO) "$(GPG) -a$$user$$home --export $(GNUPGUSER) >$@"; \
-	$(GPG) -a$$user$$home --export $(GNUPGUSER) >$@
+	$(am__gpg_verify_sign)
 
 $(slapt_keys):
 	@$(ECHO_V) "Making $@ in `pwd`"
-	$(AM_V_GEN)$(GPGEXPORTKEY)
+	$(am__gpg_export_key)
 
 repo-slapt: $(RELEASE_DIRECTORIES) $(slapt_files)
 

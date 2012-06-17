@@ -1448,33 +1448,13 @@ $(reposrcsdir)/repomd.xml:
 		$(CREATEREPO) -i /dev/stdin -p $(REPOFLAGS) . \
 	)
 
-GPGVERIFYSIGN = \
-	if test ! -f $@ || ! $(GPG) --verify -- $@ >/dev/null 2>&1; then \
-		test ! -f $@ || $(ECHO) "D: gpg BAD $@" ; \
-		user="$(GNUPGUSER)"; user="$${user:+ -u }$$user"; \
-		home="$(GNUPGHOME)"; home="$${home:+ --homedir }$$home"; \
-		pass="$(GNUPGPASS)"; pass="$${pass:+ --batch }"; \
-		pipe="$(GNUPGPASS)"; pipe="$${pipe:+$(ECHO) $$pipe |}"; \
-		$(ECHO) "$(GPG) -ba --passphrase-fd 0$$user$$home$$pass -o- -- $< >$@ 2>/dev/null"; \
-		eval "$$pipe $(GPG) -ba --passphrase-fd 0$$user$$home$$pass -o- -- $< >$@ 2>/dev/null"; \
-	else \
-		$(ECHO) "D: gpg OK  $@" ; \
-		touch "$@"; \
-	fi
-
 $(repomd_signs):: %.asc : %
 	@$(ECHO_V) "D: Making $@ in `pwd`"
-	$(AM_V_GEN)$(GPGVERIFYSIGN)
-
-GPGEXPORTKEY = \
-	user="$(GNUPGUSER)"; user="$${user:+ -u }$$user"; \
-	home="$(GNUPGHOME)"; home="$${home:+ --homedir }$$home"; \
-	$(ECHO) "$(GPG) -a$$user$$home --export $(GNUPGUSER) >$@"; \
-	$(GPG) -a$$user$$home --export $(GNUPGUSER) >$@
+	$(am__gpg_verify_sign)
 
 $(repomd_keys):: %.key : %
 	@$(ECHO_V) "D: Making $@ in `pwd`"
-	$(AM_V_GEN)$(GPGEXPORTKEY)
+	$(am__gpg_export_key)
 
 repo-yum: $(RELEASE_DIRECTORIES) $(repomd_repos) $(repomd_heads)
 
@@ -1519,10 +1499,7 @@ UPDATECLEANFILES	+=
 release-update-yum:
 	@$(ECHO_V) "D: Making $@ in `pwd`"; \
 	test '$(DISTDIR)' != '$(REPODIR)' || exit 0; \
-	user="$(GNUPGUSER)"; user="$${user:+ -u }$$user"; \
-	home="$(GNUPGHOME)"; home="$${home:+ --homedir }$$home"; \
-	pass="$(GNUPGPASS)"; pass="$${pass:+ --batch }"; \
-	pipe="$(GNUPGPASS)"; pipe="$${pipe:+$(ECHO) $$pipe |}"; \
+	$(am__gpg_prepare) ; \
 	empty_repo=yes; \
 	repodir=`echo '$(rpmdistdir)' | sed -e 's,$(DISTDIR),$(REPODIR),'` ; \
 	tardir=`echo '$(tardir)' | sed 's,^$(DISTDIR),$(REPODIR),'` ; \
@@ -1726,16 +1703,9 @@ release-update-yum:
 				$(ECHO) "    rm -f -- products.xml" ; \
 				rm -f -- products.xml ; \
 				f="$$dir/repodata/repomd.xml" ; \
-				if test -f $$f ; then a="$$f.asc" ; k="$$f.key" ; \
-					if test ! -f $$a || ! $(GPG) --verify -- $$a >/dev/null 2>&1 ; then \
-						test ! -f $$a || $(ECHO) "  D: gpg BAD $$a" ; \
-						$(ECHO) "  $(GPG) -ba --passphrase-fd 0$$user$$home$$pass -o- -- $$f >$$a 2>/dev/null"; \
-						eval "$$pipe $(GPG) -ba --passphrase-fd 0$$user$$home$$pass -o- -- $$f >$$a 2>/dev/null"; \
-						$(ECHO) "  $(GPG) -a$$user$$home --export $(GNUPGUSER) >$$k"; \
-						$(GPG) -a$$user$$home --export $(GNUPGUSER) >$$k; \
-					else \
-						$(ECHO) "  D: gpg OK  $$a" ; \
-					fi ; \
+				if test -f $$f ; then \
+					a="$$f.asc" ; $(am__gpg_verify_sign_file) ; \
+					k="$$f.key" ; $(am__gpg_export_key_file) ; \
 				fi ; \
 			fi ; \
 		done ; \
@@ -1871,11 +1841,11 @@ $(yastdir)/content:
 $(yastdir)/content.asc:: \
 $(yastdir)/content
 	@$(ECHO_V) "D: Making $@ in `pwd`"
-	$(AM_V_GEN)$(GPGVERIFYSIGN)
+	$(am__gpg_verify_sign)
 
 $(yastdir)/content.key:
 	@$(ECHO_V) "D: Making $@ in `pwd`"
-	$(AM_V_GEN)$(GPGEXPORTKEY)
+	$(am__gpg_export_key)
 
 yast_meta_files		= $(yastdir)/media.1/media \
 			  $(yastdir)/content
@@ -1978,23 +1948,8 @@ release-update-yast:
 		$(ECHO) "DESCRDIR setup/descr"; \
 		$(ECHO) "DATADIR RPMS"; \
 	) >$$f ; \
-	if test ! -f $$f.asc || ! $(GPG) --verify -- $$f.asc >/dev/null 2>&1 ; then \
-		test ! -f $$f.asc || $(ECHO) "D: gpg BAD $$f.asc" ; \
-		user="$(GNUPGUSER)"; user="$${user:+ -u }$$user"; \
-		home="$(GNUPGHOME)"; home="$${home:+ --homedir }$$home"; \
-		pass="$(GNUPGPASS)"; pass="$${pass:+ --batch }"; \
-		pipe="$(GNUPGPASS)"; pipe="$${pipe:+$(ECHO) $$pipe |}"; \
-		$(ECHO) "$(GPG) -ba --passphrase-fd 0$$user$$home$$pass -o- -- $$f >$$f.asc 2>/dev/null"; \
-		eval "$$pipe $(GPG) -ba --passphrase-fd 0$$user$$home$$pass -o- -- $$f >$$f.asc 2>/dev/null"; \
-	else \
-		$(ECHO) "D: gpg OK  $$f.asc" ; \
-	fi ; \
-	if test ! -f $$f.key ; then \
-		user="$(GNUPGUSER)"; user="$${user:+ -u }$$user"; \
-		home="$(GNUPGHOME)"; home="$${home:+ --homedir }$$home"; \
-		$(ECHO) "$(GPG) -a$$user$$home --export $(GNUPGUSER) >$$f.key"; \
-		$(GPG) -a$$user$$home --export $(GNUPGUSER) >$$f.key ; \
-	fi ; \
+	a="$$f.asc" ; $(am__gpg_verify_sign_file) ; \
+	k="$$f.key" ; $(am__gpg_export_key_file) ; \
 	$(ECHO) "( cd $$yastdir ; $(CREATE_PACKAGE_DESC) -Z -V -C -K -F -B -d RPMS/ )" ; \
 	( cd $$yastdir ; $(CREATE_PACKAGE_DESC) -Z -V -C -K -F -B -d RPMS/ ) ; \
 	dir=`(cd $$yastdir; pwd)` ; \
@@ -2054,7 +2009,7 @@ $(DISTDIR)/repoindex.xml:
 $(DISTDIR)/repoindex.xml.asc:: \
 $(DISTDIR)/repoindex.xml
 	@$(ECHO_V) "D: Making $@ in `pwd`"
-	$(AM_V_GEN)$(GPGVERIFYSIGN)
+	$(am__gpg_verify_sign)
 
 repo-ris: $(DISTDIR) $(reporis_files)
 
@@ -2080,8 +2035,8 @@ UPDATECLEANFILES	+=
 release-update-ris:
 	@$(ECHO_V) "D: Making $@ in `pwd`"; \
 	test '$(DISTDIR)' != '$(REPODIR)' || exit 0; \
-	t=$(REPODIR)/repoindex.xml ; \
-	$(ECHO) "D: $@: generating $$t" ; \
+	f=$(REPODIR)/repoindex.xml ; \
+	$(ECHO) "D: $@: generating $$f" ; \
 	( \
 		$(ECHO) '<?xml version="1.0" encoding="UTF-8"?>' ; \
 		$(ECHO) '<repoindex>' ; \
@@ -2101,19 +2056,8 @@ release-update-ris:
 			$(ECHO) "        pub=\"0\" />" ; \
 		done ; \
 		$(ECHO) '</repoindex>' ; \
-	) >$$t ; \
-	if test ! -f $$t.asc || ! $(GPG) --verify -- $$t.asc >/dev/null 2>&1; then \
-		test ! -f $$t.asc || $(ECHO) "D: gpg BAD $$t.asc" ; \
-		user="$(GNUPGUSER)"; user="$${user:+ -u }$$user"; \
-		home="$(GNUPGHOME)"; home="$${home:+ --homedir }$$home"; \
-		pass="$(GNUPGPASS)"; pass="$${pass:+ --batch }"; \
-		pipe="$(GNUPGPASS)"; pipe="$${pipe:+$(ECHO) $$pipe |}"; \
-		$(ECHO) "$(GPG) -ba --passphrase-fd 0$$user$$home$$pass -o- -- $$t >$$t.asc 2>/dev/null"; \
-		eval "$$pipe $(GPG) -ba --passphrase-fd 0$$user$$home$$pass -o- -- $$t >$$t.asc 2>/dev/null"; \
-	else \
-		$(ECHO) "D: gpg OK  $$t.asc" ; \
-	fi
-
+	) >$$f ; \
+	a="$$f.asc"; $(am__gpg_verify_sign_file)
 
 RELEASE_INSTALL		+= release-update-ris
 RELEASE_UNINSTALL	+= release-update-ris
@@ -2236,8 +2180,7 @@ $(urpmi_cfgs):
 $(urpmi_config):
 	@$(ECHO_V) "D: Making $@ in `pwd`"
 	$(AM_V_GEN)( \
-		user="$(GNUPGUSER)"; user="$${user:+ -u }$$user"; \
-		home="$(GNUPGHOME)"; home="$${home:+ --homedir }$$home"; \
+		$(am__gpg_prepare) ; \
 		keyid="`$(GPG) $$user$$home --list-keys $(GNUPGUSER) 2>/dev/null | sed -n 's,^pub[^/]*/,,;T;s,[[:space:]].*$$,,;y,ABCDEF,abcdef,;p'`" ; \
 		numb=1 ; \
 		if test '$(target_distro)' = 'mageia' ; then \
@@ -2276,8 +2219,7 @@ $(urpmi_config):
 $(urpmi_local):
 	@$(ECHO_V) "D: Making $@ in `pwd`"
 	$(AM_V_GEN)( \
-		user="$(GNUPGUSER)"; user="$${user:+ -u }$$user"; \
-		home="$(GNUPGHOME)"; home="$${home:+ --homedir }$$home"; \
+		$(am__gpg_prepare) ; \
 		keyid="`$(GPG) $$user$$home --list-keys $(GNUPGUSER) 2>/dev/null | sed -n 's,^pub[^/]*/,,;T;s,[[:space:]].*$$,,;y,ABCDEF,abcdef,;p'`" ; \
 		numb=1 ; \
 		if test '$(target_distro)' = 'mageia' ; then \
@@ -2313,15 +2255,9 @@ $(urpmi_local):
 		done ; \
 	) >$@
 
-GPGEXPORTKEY = \
-	user="$(GNUPGUSER)"; user="$${user:+ -u }$$user"; \
-	home="$(GNUPGHOME)"; home="$${home:+ --homedir }$$home"; \
-	$(ECHO) "$(GPG) -a$$user$$home --export $(GNUPGUSER) >$@"; \
-	$(GPG) -a$$user$$home --export $(GNUPGUSER) >$@
-
 $(urpmi_keys)::
 	@$(ECHO_V) "D: Making $@ in `pwd`"
-	$(AM_V_GEN)$(GPGEXPORTKEY)
+	$(am__gpg_export_key)
 
 repo-urpmi: $(RELEASE_DIRECTORIES) $(urpmi_cfgs) $(urpmi_configs)
 	@$(ECHO_V) "D: Making $@ in `pwd`"; \
@@ -2379,18 +2315,14 @@ release-update-urpmi:
 	test '$(DISTDIR)' != '$(REPODIR)' || exit 0; \
 	repodir=`echo '$(rpmdistdir)' | sed -e 's,$(DISTDIR),$(REPODIR),'` ; \
 	rb=`echo '$(repobranch)' | sed -e 's,^//*,,'` ; \
-	user="$(GNUPGUSER)"; user="$${user:+ -u }$$user"; \
-	home="$(GNUPGHOME)"; home="$${home:+ --homedir }$$home"; \
+	$(am__gpg_prepare) ; \
 	made_list=no; \
 	for b in '' updates extras testing $$rb ; do \
 		for r in '' main debug devel source ; do \
 			dir="$${repodir}/media$${b:+/$$b}$${r:+/$$r}" ; \
 			$(ECHO) "D: processing directory $$dir" ; \
 			test -d $$dir/media_info || { $(ECHO) "$(MKDIR_P) -- $$dir/media_info" ; $(MKDIR_P) -- $$dir/media_info ; } ; \
-			test -f $$dir/media_info/pubkey || { \
-				$(ECHO) "$(GPG) -a$$user$$home --export $(GNUPGUSER) >$$dir/media_info/pubkey"; \
-				$(GPG) -a$$user$$home --export $(GNUPGUSER) >$$dir/media_info/pubkey ; \
-			} ; \
+			k="$$dir/media_info/pubkey"; $(am__gpg_export_key_file) ; \
 			rpms=`find $$dir -name '*.rpm'` ; \
 			for f in $$rpms ; do \
 				if test -L $$f ; then \
@@ -2741,19 +2673,6 @@ $(aptr_xzips): %.xz : %
 	@$(ECHO_V) "D: Making $@ in `pwd`"
 	cat $< | $(XZ_CMD) $(xz) -c >$@
 
-GENCOMPRESSEDDATA = \
-	if test -s $$f ; then \
-		$(ECHO_Q) "  GEN   $$f.gz" ; \
-		$(ECHO_V) " $(GZIP_CMD) $(GZIP) -c $$f >$$f.gz" ; \
-		$(GZIP_CMD) $(GZIP) -c $$f >$$f.gz ; \
-		$(ECHO_Q) "  GEN   $$f.bz2" ; \
-		$(ECHO_V) " $(BZIP2_CMD) $(BZIP2) -c $$f >$$f.bz2" ; \
-		$(BZIP2_CMD) $(BZIP2) -c $$f >$$f.bz2 ; \
-		$(ECHO_Q) "  GEN   $$f.xz" ; \
-		$(ECHO_V) " $(XZ_CMD) $(XZ) -c $$f >$$f.xz" ; \
-		$(XZ_CMD) $(XZ) -c $$f >$$f.xz ; \
-	fi
-
 $(aptr_releases): $(aptr_nonrel_files)
 	@$(ECHO_V) "D: Making $@ in `pwd`"; \
 	ext=`echo "$@" | sed 's,.*\.,,'` ; \
@@ -2958,8 +2877,7 @@ $(aptrbasedir)/$(PACKAGE)-local.list: Makefile
 $(rpmdistdir)/$(PACKAGE).vendor.list \
 $(aptrbasedir)/$(PACKAGE).vendor.list: Makefile
 	$(AM_V_GEN)\
-	user="$(GNUPGUSER)"; user="$${user:+ -u }$$user"; \
-	home="$(GNUPGHOME)"; home="$${home:+ --homedir }$$home"; \
+	$(am__gpg_prepare) ; \
 	{ \
 		$(ECHO) 'simple-key "$(PACKAGE_NAME)" {' ; \
 		$(GPG) $$user$$home --fingerprint $(GNUPGUSER) | sed -r -n '/Key fingerprint/{s,^.*Key fingerprint = ,,;s, ,,g;s,^,\tFingerprint ",;s,$$,";,;p};/^uid/{s,^uid *,,;s, *$$,,;s,^,\tName ",;s,$$,";,;p}' ; \
@@ -3078,43 +2996,17 @@ $(rpmdistdir)/$(PACKAGE)-local.list: Makefile
 	} >$@
 
 $(aptr_sigs): %.sig: %
-	$(AM_V_GEN)\
-	user="$(GNUPGUSER)"; user="$${user:+ -u }$$user"; \
-	home="$(GNUPGHOME)"; home="$${home:+ --homedir }$$home"; \
-	pass="$(GNUPGPASS)"; pass="$${pass:+ --batch }"; \
-	pipe="$(GNUPGPASS)"; pipe="$${pipe:+$(ECHO) $$pipe |}"; \
-	$(ECHO) "$(GPG) -ba --passphrase-fd 0$$user$$home$$pass -o- -- $< >$@ 2>/dev/null"; \
-	eval "$$pipe $(GPG) -ba --passphrase-fd 0$$user$$home$$pass -o- -- $< >$@ 2>/dev/null"; \
+	$(am__gpg_verify_sign) ; \
 	cat $@ >>$< ; \
 	touch $@
 
-GPGVERIFYSIGN = \
-	if test ! -f $@ || ! $(GPG) --verify -- $@ >/dev/null 2>&1; then \
-		test ! -f $@ || $(ECHO) "D: gpg BAD $@" ; \
-		user="$(GNUPGUSER)"; user="$${user:+ -u }$$user"; \
-		home="$(GNUPGHOME)"; home="$${home:+ --homedir }$$home"; \
-		pass="$(GNUPGPASS)"; pass="$${pass:+ --batch }"; \
-		pipe="$(GNUPGPASS)"; pipe="$${pipe:+$(ECHO) $$pipe |}"; \
-		$(ECHO) "$(GPG) -ba --passphrase-fd 0$$user$$home$$pass -o- -- $< >$@ 2>/dev/null"; \
-		eval "$$pipe $(GPG) -ba --passphrase-fd 0$$user$$home$$pass -o- -- $< >$@ 2>/dev/null"; \
-	else \
-		$(ECHO) "D: gpg OK  $@" ; \
-		touch "$@"; \
-	fi
-
 $(aptr_signs): %.gpg : %
 	@$(ECHO_V) "D: Making $@ in `pwd`"
-	$(AM_V_GEN)$(GPGVERIFYSIGN)
-
-GPGEXPORTKEY = \
-	user="$(GNUPGUSER)"; user="$${user:+ -u }$$user"; \
-	home="$(GNUPGHOME)"; home="$${home:+ --homedir }$$home"; \
-	$(ECHO) "$(GPG) -a$$user$$home --export $(GNUPGUSER) >$@"; \
-	$(GPG) -a$$user$$home --export $(GNUPGUSER) >$@
+	$(am__gpg_verify_sign)
 
 $(aptr_keys):
 	@$(ECHO_V) "D: Making $@ in `pwd`"
-	$(AM_V_GEN)$(GPGEXPORTKEY)
+	$(am__gpg_export_key)
 
 repo-aptrpm: $(RELEASE_DIRECTORIES) $(aptr_files)
 
@@ -3149,10 +3041,7 @@ UPDATECLEANFILES	+=
 release-update-aptrpm:
 	@$(ECHO_V) "D: Making $@ in `pwd`" ; \
 	test '$(DISTDIR)' != '$(REPODIR)' || exit 0 ; \
-	user='$(GNUPGUSER)'; user="$${user:+ -u }$$user" ; \
-	home='$(GNUPGHOME)'; home="$${home:+ --homedir }$$home" ; \
-	pass='$(GNUPGPASS)'; pass="$${pass:+ --batch }" ; \
-	pipe='$(GNUPGPASS)'; pipe="$${pipe:+$(ECHO) $$pipe |}" ; \
+	$(am__gpg_prepare) ; \
 	empty_repo=yes; \
 	repodir=`echo '$(rpmdistdir)' | sed -e 's,^$(DISTDIR),$(REPODIR),'` ; \
 	rb=`echo '$(repobranch)' | sed -e s',^//*,,'` ; \
@@ -3244,7 +3133,7 @@ release-update-aptrpm:
 					$(ECHO) "cd $$base" ; cd $$base ; \
 					$(ECHO) "$(GENPKGLIST) --index srpm_idx --meta $$comp --bloat $$dir $$comp" ; \
 					$(GENPKGLIST) --index srpm_idx --meta $$comp --bloat $$dir $$comp ; \
-					$(GENCOMPRESSEDDATA) ; \
+					$(am__compress_data_file) ; \
 				) ; \
 				empty_subrepo=no; \
 				empty_repo=no; \
@@ -3265,7 +3154,7 @@ release-update-aptrpm:
 					$(ECHO) "cd $$base" ; cd $$base ; \
 					$(ECHO) "$(GENSRCLIST) --flat --meta $$comp $$dir $$comp srpm_idx" ; \
 					$(GENSRCLIST) --flat --meta $$comp $$dir $$comp srpm_idx ; \
-					$(GENCOMPRESSEDDATA) ; \
+					$(am__compress_data_file) ; \
 				) ; \
 				empty_subrepo=no; \
 				empty_repo=no; \
@@ -3304,7 +3193,7 @@ release-update-aptrpm:
 						$(ECHO) "SourceCount: `$(COUNTPKGLIST) srclist.$$comp`" ; \
 					fi ; \
 				} >$$f ; \
-				$(GENCOMPRESSEDDATA) ; \
+				$(am__compress_data_file) ; \
 				comps="$${comps:+$$comps }$$comp" ; \
 			done ; \
 			f=release ; \
@@ -3331,12 +3220,7 @@ release-update-aptrpm:
 					done ; \
 				done ; \
 			} >$$f ; \
-			$(ECHO) "$(GPG) -ba --passphrase-fd 0$$user$$home$$pass -o- -- $$f >$$f.gpg 2>/dev/null" ; \
-			eval "$$pipe $(GPG) -ba --passphrase-fd 0$$user$$home$$pass -o- -- $$f >$$f.gpg 2>/dev/null" ; \
-			cat $$f.gpg >>$$f ; \
-			touch $$f.gpg ; \
-			$(ECHO) "$(GPG) -a$$user$$home --export $(GNUPGUSER) >$$f.key" ; \
-			$(GPG) -a$$user$$home --export $(GNUPGUSER) >$$f.key ; \
+			k="$$f.key" ; $(am__gpg_export_key_file) ; \
 			f=hashfile ; \
 			$(ECHO) "  GEN   $$(basename $$f)" ; \
 			{ \
@@ -3351,10 +3235,7 @@ release-update-aptrpm:
 					done ; \
 				done ; \
 			} >$$f ; \
-			$(ECHO) "$(GPG) -ba --passphrase-fd 0$$user$$home$$pass -o- -- $$f >$$f.gpg 2>/dev/null" ; \
-			eval "$$pipe $(GPG) -ba --passphrase-fd 0$$user$$home$$pass -o- -- $$f >$$f.gpg 2>/dev/null" ; \
-			$(ECHO) "$(GPG) -a$$user$$home --export $(GNUPGUSER) >$$f.key" ; \
-			$(GPG) -a$$user$$home --export $(GNUPGUSER) >$$f.key ; \
+			k="$$f.key" ; $(am__gpg_export_key_file) ; \
 			f=contents_index ; \
 			$(ECHO) "  GEN   $$(basename $$f)" ; \
 			{ \
@@ -3373,7 +3254,7 @@ release-update-aptrpm:
 					fi ; \
 				done | LANG= sort -u ; \
 			} >$$f ; \
-			$(GENCOMPRESSEDDATA) ; \
+			$(am__compress_data_file) ; \
 			f=$(PACKAGE).list ; \
 			$(ECHO) "  GEN   $$(basename $$f)" ; \
 			{ \

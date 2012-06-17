@@ -52,8 +52,6 @@
 ##
 ## =============================================================================
 
-pkgcachedir	= $(rootdir)/var/cache/$(PACKAGE)
-
 if PKG_BUILD_INDEP
 ## PKG_BUILD_INDEP
 
@@ -327,14 +325,14 @@ repo-install-yum:
 		$(ECHO) "$(MKDIR_P) $(DESTDIR)$(yumrepodir)" ; \
 		$(MKDIR_P) $(DESTDIR)$(yumrepodir) ; \
 	fi
-	@if test ! -d '$(DESTDIR)$(rootdir)/var/cache/$(PACKAGE)' ; then \
-		$(ECHO) "$(MKDIR_P) $(DESTDIR)$(rootdir)/var/cache/$(PACKAGE)" ; \
-		$(MKDIR_P) $(DESTDIR)$(rootdir)/var/cache/$(PACKAGE) ; \
+	@if test ! -d '$(DESTDIR)$(pkgcachedir)' ; then \
+		$(ECHO) "$(MKDIR_P) $(DESTDIR)$(pkgcachedir)" ; \
+		$(MKDIR_P) $(DESTDIR)$(pkgcachedir) ; \
 	fi
 	@( \
 		umask 0077 ; \
 		un=; pw=; \
-		cd '$(DESTDIR)$(rootdir)/var/cache/$(PACKAGE)' ; \
+		cd '$(DESTDIR)$(pkgcachedir)' ; \
 		o=; f='credentials' ; \
 		for s in '' .rpmsave .rpmnew ; do \
 			for p in $(DISTDIR)/ $(DESTDIR)$(zyppcreddir)/$(PACKAGE_UCNAME) $(DESTDIR)$(zyppcreddir)/NCC ; do \
@@ -1589,8 +1587,7 @@ repo-install-local-apt-rpm:
 		d=$$(dirname $$f) ; \
 		test -d $$d || { $(ECHO) "$(MKDIR_P) $$d" ; $(MKDIR_P) $$d ; } ; \
 		test -f $$f || cat /dev/null >$$f ; \
-		user="$(GNUPGUSER)"; user="$${user:+ -u }$$user"; \
-		home="$(GNUPGHOME)"; home="$${home:+ --homedir }$$home"; \
+		$(am__gpg_prepare) ; \
 		{ \
 			sed '/simple-key "$(PACKAGE_NAME)"/,/}/d' $$f | cat -s ; \
 			$(ECHO) '' ; \
@@ -1647,6 +1644,10 @@ endif
 
 if WITH_INSTALL_SOURCE_PACMAN
 ## WITH_INSTALL_SOURCE_PACMAN
+
+REPO_INSTALL			+= repo-install-pacman
+REPO_INSTALL_LOCAL		+= repo-install-local-pacman
+REPO_UNINSTALL			+= repo-uninstall-pacman
 
 ## WITH_INSTALL_SOURCE_PACMAN
 endif
