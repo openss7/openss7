@@ -62,22 +62,23 @@ datarootdir=@datarootdir@
 #   systems.  This must remove lines before including them because it may also be run from
 #   reconfigure.
 #
-@WITH_KO_MODULES_FALSE@postinst_modconf () { :
-@WITH_KO_MODULES_FALSE@    local conf_old conf_tmp conf_new
-@WITH_KO_MODULES_FALSE@    conf_old=@sysconfdir@/modules.conf
-@WITH_KO_MODULES_FALSE@    conf_tmp=${tmppath:-/var/tmp}/modules.conf.tmp.$$
-@WITH_KO_MODULES_FALSE@    conf_new=${tmppath:-/var/tmp}/modules.conf.new.$$
-@WITH_KO_MODULES_FALSE@    if [ -f $conf_old ] ; then
-@WITH_KO_MODULES_FALSE@        cp -f -- $conf_old $conf_new
-@WITH_KO_MODULES_FALSE@        ( sed -e '\|^include[[:space:]].*@modutildir@/@PACKAGE_LCNAME@|d' $conf_new
-@WITH_KO_MODULES_FALSE@          echo "include @modutildir@/@PACKAGE_LCNAME@" ) > $conf_tmp
-@WITH_KO_MODULES_FALSE@        mv -f -- $conf_tmp $conf_new
-@WITH_KO_MODULES_FALSE@        if ! diff $conf_new $conf_old >/dev/null 2>&1; then
-@WITH_KO_MODULES_FALSE@            cp -f -b --suffix=.dpkg-old -- $conf_new $conf_old
-@WITH_KO_MODULES_FALSE@        fi
-@WITH_KO_MODULES_FALSE@        rm -f -- $conf_new || :
-@WITH_KO_MODULES_FALSE@    fi
-@WITH_KO_MODULES_FALSE@}
+postinst_modconf () { :
+    local conf_old conf_tmp conf_new
+    [ -z '@WITH_KO_MODULES_FALSE@' ] || return 0
+    conf_old=${sysconfdir}/modules.conf
+    conf_tmp=${tmppath:-/var/tmp}/modules.conf.tmp.$$
+    conf_new=${tmppath:-/var/tmp}/modules.conf.new.$$
+    if [ -f $conf_old ] ; then
+        cp -f -- $conf_old $conf_new
+        ( sed -e '\|^include[[:space:]].*'${modutildir}/'@PACKAGE_LCNAME@|d' $conf_new
+          echo "include ${modutildir}/@PACKAGE_LCNAME@" ) > $conf_tmp
+        mv -f -- $conf_tmp $conf_new
+        if ! diff $conf_new $conf_old >/dev/null 2>&1; then
+            cp -f -b --suffix=.dpkg-old -- $conf_new $conf_old
+        fi
+        rm -f -- $conf_new || :
+    fi
+}
 #
 # postinst_preloads() - At the end of a fresh install or upgrade, check that our preload modules have
 #   been added to the modprobe.preload file.  Note, however, that the modprobe.preload does not
@@ -88,7 +89,7 @@ postinst_preloads () { :
     local prel_tmp prel_new prel_old
     prel_tmp=${tmppath:-/var/tmp}/modprobe.preload.tmp.$$
     prel_new=${tmppath:-/var/tmp}/modprobe.preload.new.$$
-    for prel_old in @sysconfdir@/modules @sysconfdir@/modprobe.preload; do
+    for prel_old in ${sysconfdir}/modules ${sysconfdir}/modprobe.preload; do
 	if [ -f $prel_old ] ; then
 	    cp -f -- $prel_old $prel_new
 	    missing=no
@@ -118,11 +119,11 @@ postinst_initscripts () {
     local list i args r
     list="${initfiles}"
     for i in $list; do
-	if [ -f @initrddir@/$i ]; then
+	if [ -f ${initrddir}/$i ]; then
 	    [ -x /sbin/insserv              ] && { /sbin/insserv              $i       2>&1 && continue || true; }
 	    [ -x /sbin/chkconfig            ] && { /sbin/chkconfig --add      $i       2>&1 && continue || true; }
 	    [ -x /usr/lib/lsb/install_initd ] && { /usr/lib/lsb/install_initd $i       2>&1 && continue || true; }
-	    args="`grep '^#[[:space:]]*update-rc.d:' @initrddir@/$i | sed -e 's,#[[:space:]]*update-rc.d:[[:space:]]*,,'`"
+	    args="`grep '^#[[:space:]]*update-rc.d:' ${initrddir}/$i | sed -e 's,#[[:space:]]*update-rc.d:[[:space:]]*,,'`"
 	    [ -x /usr/sbin/update-rc.d      ] && { /usr/sbin/update-rc.d      $i $args 2>&1 && continue || true; }
 	fi
     done
@@ -135,8 +136,8 @@ postinst_initscripts () {
 postinst_manrefs () {
     local m
     for m in ${manrefs}; do
-	[ ! -f @mandir@/$m.gz  ] || gzip  -dc @mandir@/$m.gz  > @mandir@/$m || :
-	[ ! -f @mandir@/$m.bz2 ] || bzip2 -dc @mandir@/$m.bz2 > @mandir@/$m || :
+	[ ! -f ${mandir}/$m.gz  ] || gzip  -dc ${mandir}/$m.gz  > ${mandir}/$m || :
+	[ ! -f ${mandir}/$m.bz2 ] || bzip2 -dc ${mandir}/$m.bz2 > ${mandir}/$m || :
     done
 }
 #
@@ -147,8 +148,8 @@ postinst_manrefs () {
 postinst_manmacros () {
     local m
     for m in ${manmacros}; do
-	[ ! -f @mandir@/$m.gz  ] || gzip  -dc @mandir@/$m.gz  > @mandir@/$m || :
-	[ ! -f @mandir@/$m.bz2 ] || bzip2 -dc @mandir@/$m.bz2 > @mandir@/$m || :
+	[ ! -f ${mandir}/$m.gz  ] || gzip  -dc ${mandir}/$m.gz  > ${mandir}/$m || :
+	[ ! -f ${mandir}/$m.bz2 ] || bzip2 -dc ${mandir}/$m.bz2 > ${mandir}/$m || :
     done
 }
 #
@@ -160,13 +161,13 @@ postinst_manmacros () {
 #
 postinst_manpages () { :; return
     if   [ -x "`which mandb      2>/dev/null`" ]; then
-	LANGUAGE= LANG= mandb   -q -p @mandir@ || :
+	LANGUAGE= LANG= mandb   -q -p ${mandir} || :
     elif [ -x "`which makewhatis 2>/dev/null`" ]; then
-	LANGUAGE= LANG= makewhatis -u @mandir@ || :
+	LANGUAGE= LANG= makewhatis -u ${mandir} || :
     fi
 }
 postinst_base_configure () { :
-@WITH_KO_MODULES_FALSE@    postinst_modconf
+    [ -z '@WITH_KO_MODULES_TRUE@' ] || postinst_modconf
     postinst_preloads
     postinst_initscripts
     postinst_manrefs

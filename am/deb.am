@@ -191,17 +191,7 @@ $(debtop_dsc_file) $(debtop_tar_file)::
 
 $(debtop_sig_file): $(debtop_dsc_file)
 	@$(ECHO_V) "D: Making $@ in `pwd`"
-	@\
-	user="$(GNUPGUSER)"; user="$${user:+ -u $$user}"; \
-	home="$(GNUPGHOME)"; home="$${home:+ --homedir $$home}"; \
-	pass="$(GNUPGPASS)"; pass="$${pass:+ --batch }"; \
-	pipe="$(GNUPGPASS)"; pipe="$${pipe:+ $(ECHO) "$$pipe" |}"; \
-	$(ECHO) "rm -f -- $@"; \
-	rm -f -- $@; \
-	$(ECHO) "$(GPG) --clearsign -a --passphrase-fd 0$$user$$home$$pass -o- -- $< > $@"; \
-	eval "$$pipe $(GPG) --clearsign -a --passphrase-fd 0$$user$$home$$pass -o- -- $< > $@" || { rm -f -- $< $@; exit 1; }
-	cp -fp $@ $<
-	touch $@
+	$(am__gpg_clear_sign)
 
 #! dsc:
 #!     This target will build the debian source change package (.dsc file).  We
@@ -358,19 +348,7 @@ csig:
 	@$(ECHO_V) "D: Making $@ in `pwd`"
 	@list="$(debtop_change_files)"; for f in $$list; do \
 		test -f $$f || continue; \
-		t=`echo $$f | sed -r -e 's|\.changes(\.asc)?$$|.changes.asc|'`; \
-		if test ! -f $$t -o $$t -ot $$f; then \
-			user="$(GNUPGUSER)"; user="$${user:+ -u $$user}"; \
-			home="$(GNUPGHOME)"; home="$${home:+ --homedir $$home}"; \
-			pass="$(GNUPGPASS)"; pass="$${pass:+ --batch }"; \
-			pipe="$(GNUPGPASS)"; pipe="$${pipe:+ $(ECHO) "$$pipe" |}"; \
-			$(ECHO) "rm -f -- $$t"; \
-			rm -f -- $$t; \
-			$(ECHO) "$(GPG) --clearsign -a --passphrase-fd 0$$user$$home$$pass -o- -- $$f > $$t"; \
-			eval "$$pipe $(GPG) --clearsign -a --passphrase-fd 0$$user$$home$$pass -o- -- $$f > $$t" || { rm -f -- $$f $$t; exit 1; }; \
-			cp -fp $$t $$f; \
-			touch $$t; \
-		fi; \
+		$(am__gpg_clear_sign_file) ; \
 	done
 
 #! reupload:
@@ -743,23 +721,13 @@ release-install-debs:
 	@$(ECHO_V) "D: Making $@ in `pwd`"
 	@test '$(DISTDIR)' != '$(REPODIR)' || exit 0
 	@\
-	user="$(GNUPGUSER)"; user="$${user:+ -u }$$user"; \
-	home="$(GNUPGHOME)"; home="$${home:+ --homedir }$$home"; \
-	pass="$(GNUPGPASS)"; pass="$${pass:+ --batch }"; \
-	pipe="$(GNUPGPASS)"; pipe="$${pipe:+$(ECHO) $$pipe |}"; \
 	list='$(debtop_change_files)' ; for f in $$list ; do \
 		test -s $$f || continue ; \
-		if test ! -s $$f.asc -o ! $(GPG) --verify -- $$f.asc >/dev/null 2>&1 ; then \
-			$(ECHO) "$(GPG) -ba --passphrase-fd 0$$user$$home$$pass -o- -- $$f >$$f.asc 2>/dev/null"; \
-			eval "$$pipe $(GPG) -ba --passphrase-fd 0$$user$$home$$pass -o- -- $$f >$$f.asc 2>/dev/null"; \
-		fi ; \
+		a="$$f.asc" ; $(am__gpg_verify_sign_file) ; \
 	done ; \
 	list='$(debtop_dsc_file)' ; for f in $$list ; do \
 		test -s $$f || continue ; \
-		if test ! $(GPG) --verify -- $$f >/dev/null 2>&1 ; then \
-			$(ECHO) "$(GPG) --clearsign -a --passphrase-fd 0$$user$$home$$pass -- $$f" ; \
-			eval "$$pipe $(GPG) --clearsign -a --passphrase-fd 0$$user$$home$$pass -- $$f" || : ; \
-		fi ; \
+		$(am__gpg_clear_sign_file) ; \
 	done ; \
 	for f in $(debtop_source_files) $(debtop_change_files) $(debtop_binary_files) $(debtop_product_file) ; do \
 		test -s $$f || continue ; \
@@ -1096,29 +1064,13 @@ $(debdistdir)/$(PACKAGE)-local.list:: Makefile
 		done ; \
 	done >$@
 
-GPGVERIFYSIGN = \
-	if test ! -f $@ || ! $(GPG) --verify -- $@ >/dev/null 2>&1; then \
-		user="$(GNUPGUSER)"; user="$${user:+ -u }$$user"; \
-		home="$(GNUPGHOME)"; home="$${home:+ --homedir }$$home"; \
-		pass="$(GNUPGPASS)"; pass="$${pass:+ --batch }"; \
-		pipe="$(GNUPGPASS)"; pipe="$${pipe:+$(ECHO) $$pipe |}"; \
-		$(ECHO) "$(GPG) -ba --passphrase-fd 0$$user$$home$$pass -o- -- $< >$@ 2>/dev/null"; \
-		eval "$$pipe $(GPG) -ba --passphrase-fd 0$$user$$home$$pass -o- -- $< >$@ 2>/dev/null"; \
-	else touch "$@"; fi
-
 $(apt_release_gpgs): %.gpg : %
 	@$(ECHO_V) "D: Making $@ in `pwd`"
-	$(AM_V_GEN)$(GPGVERIFYSIGN)
-
-GPGEXPORTKEY = \
-	user="$(GNUPGUSER)"; user="$${user:+ -u }$$user"; \
-	home="$(GNUPGHOME)"; home="$${home:+ --homedir }$$home"; \
-	$(ECHO) "$(GPG) -a$$user$$home --export $(GNUPGUSER) >$@"; \
-	$(GPG) -a$$user$$home --export $(GNUPGUSER) >$@
+	$(am__gpg_verify_sign)
 
 $(apt_release_keys):
 	@$(ECHO_V) "D: Making $@ in `pwd`"
-	$(AM_V_GEN)$(GPGEXPORTKEY)
+	$(am__gpg_export_key)
 
 repo-apt: $(RELEASE_DIRECTORIES) $(apt_files)
 
@@ -1224,14 +1176,8 @@ release-update-apt:
 			$(ECHO) "rm -f -- $$f.gpg $$f.key" ; \
 			rm -f -- $$f.gpg $$f.key ; \
 			if test -f $$dir/Release ; then \
-				user="$(GNUPGUSER)"; user="$${user:+ -u $$user}"; \
-				home="$(GNUPGHOME)"; home="$${home:+ --homedir $$home}"; \
-				pass="$(GNUPGPASS)"; pass="$${pass:+ --batch }"; \
-				pipe="$(GNUPGPASS)"; pipe="$${pipe:+ $(ECHO) "$$pipe" |}"; \
-				$(ECHO) "  $(GPG) -ba --passphrase-fd 0$$user$$home$$pass -o- -- $$dir/Release >$$f.gpg 2>/dev/null"; \
-				eval "$$pipe $(GPG) -ba --passphrase-fd 0$$user$$home$$pass -o- -- $$dir/Release >$$f.gpg 2>/dev/null"; \
-				$(ECHO) "  $(GPG) -a$$user$$home --export $(GNUPGUSER) >$$f.key" ; \
-				$(GPG) -a$$user$$home --export $(GNUPGUSER) >$$f.key ; \
+				a="$$f.gpg" ; $(am__gpg_verify_sign_file) ; \
+				k="$$f.key" ; $(am__gpg_export_key_file) ; \
 				empty_subrepo=no ; \
 			fi ; \
 			if test $${empty_subrepo:-yes} = yes ; then \

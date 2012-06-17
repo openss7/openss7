@@ -135,7 +135,7 @@ struct strevent {
 #endif
 			long events;
 			int fd;
-#if defined HAVE_KILL_PROC_INFO_AS_UID_SYMBOL || HAVE_KILL_PID_INFO_AS_UID_SYMBOL
+#if defined HAVE_KILL_PROC_INFO_AS_UID_SYMBOL || defined HAVE_KILL_PID_INFO_AS_UID_SYMBOL
 			uid_t uid;
 			uid_t euid;
 			uint32_t secid;

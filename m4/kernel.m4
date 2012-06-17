@@ -172,7 +172,7 @@ dnl protect against nesting
 # DEPMOD, KALLSYMS, PERL and CHECK.
 # -----------------------------------------------------------------------------
 AC_DEFUN([_LINUX_KBUILD_ENV], [dnl
-	cp -f "$linux_cv_k_config_eval" .config
+	cp -f "$_kconfig" .config
 	echo "CC = \$(CROSS_COMPILE)$KCC" > .kernelvariables
 	$1
 	rm -f .kernelvariables
@@ -524,22 +524,31 @@ AC_DEFUN([_LINUX_CHECK_KERNEL_TOOLS], [dnl
 # directory.  Therefore, this directory does not need to exist.
 # -------------------------------------------------------------------------
 AC_DEFUN([_LINUX_CHECK_KERNEL_MODULES], [dnl
-    AC_CACHE_CHECK([for kernel modules install directory], [linux_cv_k_modules_eval], [dnl
-	AC_ARG_WITH([k-modules],
-	    [AS_HELP_STRING([--with-k-modules=DIR],
-		[kernel module install directory @<:@default=/lib/modules/K-RELEASE/misc@:>@])])
-	if test :"${with_k_modules:-no}" != :no
-	then
-	    linux_cv_k_modules="$with_k_modules"
-	else
-	    linux_cv_k_modules='${rootdir}/lib/modules/${kversion}'
-	fi
-	eval "linux_cv_k_modules_eval=\"$linux_cv_k_modules\"" ])
-    _BLD_FIND_DIR([for kernel modules directory], [linux_cv_k_moddir], [
-		${rootdir}/lib/modules/${kversion}], [modules.dep], [], [dnl
-	AC_MSG_WARN([
+    AC_ARG_WITH([k-modules],
+	[AS_HELP_STRING([--with-k-modules=DIR],
+	    [kernel module install directory @<:@default=/lib/modules/K-RELEASE/misc@:>@])])
+    _BLD_FIND_DIR([for kernel modules install directory], [linux_cv_k_modules], [
+	    ${rootdir}/lib/modules/${kversion}], [], [${rootdir}/lib/modules/${kversion}], [dnl
+		AC_MSG_ERROR([
+*** 
+*** Configure could not find the kernel modules directory for the
+*** specified kerne version.  The directories search were:
+***	"$with_k_modules"
+***	"$bld_search_path"
 ***
-*** Strange, the modules directory is $linux_cv_k_modules_eval
+*** Check the settings of the following options before repeating:
+***	--with-k-release=${kversion}
+***	--with-k-modules=${with_k_modules}
+*** ])],
+	    [], [with_k_modules])
+    _kmoduledir="$linux_cv_k_modules_eval"
+    kmoduledir="$linux_cv_k_modules"
+    AC_SUBST([kmoduledir])dnl
+    _BLD_FIND_DIR([for kernel modules directory], [linux_cv_k_moddir], [
+	    ${rootdir}/lib/modules/${kversion}], [modules.dep], [], [dnl
+		AC_MSG_WARN([
+***
+*** Strange, the modules directory is $kmoduledir
 *** but the file modules.dep could not be found in
 ***	"$with_k_modules"
 ***	"$bld_search_path"
@@ -549,13 +558,15 @@ AC_DEFUN([_LINUX_CHECK_KERNEL_MODULES], [dnl
 ***	--with-k-modules ${kmoduledir:-no}
 ***
 *** This could cause some problems later.
-*** ]) ], [], [with_k_modules])
+*** ])],
+	    [], [with_k_modules])
+    _kmoddir="$linux_cv_k_moddir_eval"
     kmoddir="$linux_cv_k_moddir"
     AC_SUBST([kmoddir])dnl
     AC_CACHE_CHECK([for kernel module compression], [linux_cv_k_compress], [dnl
-	if test -r $linux_cv_k_moddir_eval/modules.dep
+	if test -r $_kmoddir/modules.dep
 	then
-	    if ( egrep -q '\.(k)?o\.gz:' $linux_cv_k_moddir_eval/modules.dep )
+	    if ( egrep -q '\.(k)?o\.gz:' $_kmoddir/modules.dep )
 	    then
 		linux_cv_k_compress='yes'
 	    else
@@ -570,16 +581,14 @@ AC_DEFUN([_LINUX_CHECK_KERNEL_MODULES], [dnl
 	(unknown|*)	COMPRESS_KERNEL_MODULES= ; kzip=
 		AC_MSG_WARN([
 *** 
-*** Strange, the modules directory is $linux_cv_k_moddir_eval
-*** but the file $linux_cv_k_moddir_eval/modules.dep
+*** Strange, the modules directory is $_kmoddir
+*** but the file $_kmoddir/modules.dep
 *** does not exist.  This could cause some problems later.
 *** ])
 	    ;;
     esac
     AC_SUBST([COMPRESS_KERNEL_MODULES])dnl
     AC_SUBST([kzip])dnl
-    kmoduledir="${linux_cv_k_modules}"
-    AC_SUBST([kmoduledir])dnl
 ])# _LINUX_CHECK_KERNEL_MODULES
 # =========================================================================
 
@@ -891,6 +900,7 @@ AC_DEFUN([_LINUX_CHECK_KERNEL_BUILDDIR], [dnl
 		linux_cv_k_autoconf='<linux/autoconf.h>'
 	    fi],[with_k_build],
 	    [-a \( -f "$bld_dir/include/linux/autoconf.h" -o -f "$bld_dir/include/generated/autoconf.h" \) -a -f "$bld_dir/include/linux/version.h"])
+    _kbuilddir="$linux_cv_k_build_eval"
     kbuilddir="$linux_cv_k_build"
     AC_SUBST([kbuilddir])dnl
 ])# _LINUX_CHECK_KERNEL_BUILDDIR
@@ -926,6 +936,7 @@ dnl
 	    ${rootdir}/usr/src/linux-headers-${knumber}-${kextra}-common/include/asm-generic
 	    ${rootdir}/usr/src/linux-headers-${knumber}-${kextra}-common-${kflavor}/include/asm-generic],
 	    [], [$kbuilddir], [], [], [with_k_hdrdir], [-a -d "$bld_dir/include/asm-generic"])
+    _khdrdir="$linux_cv_k_hdrdir_eval"
     khdrdir="$linux_cv_k_hdrdir"
     AC_SUBST([khdrdir])
 ])# _LINUX_CHECK_KERNEL_HDRDIR
@@ -967,6 +978,7 @@ dnl
 	    ${rootdir}/usr/src/linux-headers-${knumber}-${kextra}],
 	    [], [$khdrdir], [], [], [with_k_source],
 	    [-a -f "$bld_dir/Makefile" -a -d "$bld_dir/kernel" -a -f "$bld_dir/kernel/sched.c"])
+    _ksrcdir="$linux_cv_k_source_eval"
     ksrcdir="$linux_cv_k_source"
     AC_SUBST([ksrcdir])dnl
 ])# _LINUX_CHECK_KERNEL_SRCDIR
@@ -1061,26 +1073,27 @@ AC_DEFUN([_LINUX_CHECK_KERNEL_VMLINUX], [dnl
 	[AS_HELP_STRING([--with-k-vmlinux=IMAGE],
 	    [kernel vmlinux image @<:@default=K-BUILD-DIR/vmlinux@:>@])])
     _BLD_FIND_FILE([for kernel vmlinux image], [linux_cv_k_vmlinux], [
-		${kbuilddir}/vmlinux-${kversion}.xz
-		${kbuilddir}/vmlinux-${kversion}.lzma
-		${kbuilddir}/vmlinux-${kversion}.bz2
-		${kbuilddir}/vmlinux-${kversion}.gz
-		${kbuilddir}/vmlinux-${kversion}
-		${kbuilddir}/vmlinux.xz
-		${kbuilddir}/vmlinux.lzma
-		${kbuilddir}/vmlinux.bz2
-		${kbuilddir}/vmlinux.gz
-		${kbuilddir}/vmlinux
-		${rootdir}/boot/vmlinux-${kversion}.xz
-		${rootdir}/boot/vmlinux-${kversion}.lzma
-		${rootdir}/boot/vmlinux-${kversion}.bz2
-		${rootdir}/boot/vmlinux-${kversion}.gz
-		${rootdir}/boot/vmlinux-${kversion}
-		${rootdir}/boot/vmlinux.xz
-		${rootdir}/boot/vmlinux.lzma
-		${rootdir}/boot/vmlinux.bz2
-		${rootdir}/boot/vmlinux.gz
-		${rootdir}/boot/vmlinux])
+	    ${kbuilddir}/vmlinux-${kversion}.xz
+	    ${kbuilddir}/vmlinux-${kversion}.lzma
+	    ${kbuilddir}/vmlinux-${kversion}.bz2
+	    ${kbuilddir}/vmlinux-${kversion}.gz
+	    ${kbuilddir}/vmlinux-${kversion}
+	    ${kbuilddir}/vmlinux.xz
+	    ${kbuilddir}/vmlinux.lzma
+	    ${kbuilddir}/vmlinux.bz2
+	    ${kbuilddir}/vmlinux.gz
+	    ${kbuilddir}/vmlinux
+	    ${rootdir}/boot/vmlinux-${kversion}.xz
+	    ${rootdir}/boot/vmlinux-${kversion}.lzma
+	    ${rootdir}/boot/vmlinux-${kversion}.bz2
+	    ${rootdir}/boot/vmlinux-${kversion}.gz
+	    ${rootdir}/boot/vmlinux-${kversion}
+	    ${rootdir}/boot/vmlinux.xz
+	    ${rootdir}/boot/vmlinux.lzma
+	    ${rootdir}/boot/vmlinux.bz2
+	    ${rootdir}/boot/vmlinux.gz
+	    ${rootdir}/boot/vmlinux])
+    _kvmlinux="$linux_cv_k_vmlinux_eval"
     kvmlinux="$linux_cv_k_vmlinux"
     AC_SUBST([kvmlinux])dnl
 ])# _LINUX_CHECK_KERNEL_VMLINUX
@@ -1124,56 +1137,56 @@ dnl change because it is a different compilation.  For the running kernel use
 dnl /proc/kallsyms for detection and addresses instead.
 dnl
     _BLD_FIND_FILE([for kernel system map], [linux_cv_k_sysmap], [
-		${kbuilddir}/System.map-generic-${kversion}.xz
-		${kbuilddir}/System.map-generic-${kversion}.lzma
-		${kbuilddir}/System.map-generic-${kversion}.bz2
-		${kbuilddir}/System.map-generic-${kversion}.gz
-		${kbuilddir}/System.map-generic.xz
-		${kbuilddir}/System.map-generic.lzma
-		${kbuilddir}/System.map-generic.bz2
-		${kbuilddir}/System.map-generic.gz
-		${kbuilddir}/System.map-huge-${kversion}.xz
-		${kbuilddir}/System.map-huge-${kversion}.lzma
-		${kbuilddir}/System.map-huge-${kversion}.bz2
-		${kbuilddir}/System.map-huge-${kversion}.gz
-		${kbuilddir}/System.map-huge.xz
-		${kbuilddir}/System.map-huge.lzma
-		${kbuilddir}/System.map-huge.bz2
-		${kbuilddir}/System.map-huge.gz
-		${kbuilddir}/System.map-${kversion}.xz
-		${kbuilddir}/System.map-${kversion}.lzma
-		${kbuilddir}/System.map-${kversion}.bz2
-		${kbuilddir}/System.map-${kversion}.gz
-		${kbuilddir}/System.map.xz
-		${kbuilddir}/System.map.lzma
-		${kbuilddir}/System.map.bz2
-		${kbuilddir}/System.map.gz
-		${rootdir}/boot/System.map-generic-${kversion}.xz
-		${rootdir}/boot/System.map-generic-${kversion}.lzma
-		${rootdir}/boot/System.map-generic-${kversion}.bz2
-		${rootdir}/boot/System.map-generic-${kversion}.gz
-		${rootdir}/boot/System.map-generic.xz
-		${rootdir}/boot/System.map-generic.lzma
-		${rootdir}/boot/System.map-generic.bz2
-		${rootdir}/boot/System.map-generic.gz
-		${rootdir}/boot/System.map-huge-${kversion}.xz
-		${rootdir}/boot/System.map-huge-${kversion}.lzma
-		${rootdir}/boot/System.map-huge-${kversion}.bz2
-		${rootdir}/boot/System.map-huge-${kversion}.gz
-		${rootdir}/boot/System.map-huge.xz
-		${rootdir}/boot/System.map-huge.lzma
-		${rootdir}/boot/System.map-huge.bz2
-		${rootdir}/boot/System.map-huge.gz
-		${rootdir}/boot/System.map-${kversion}.xz
-		${rootdir}/boot/System.map-${kversion}.lzma
-		${rootdir}/boot/System.map-${kversion}.bz2
-		${rootdir}/boot/System.map-${kversion}.gz
-		${rootdir}/boot/System.map.xz
-		${rootdir}/boot/System.map.lzma
-		${rootdir}/boot/System.map.bz2
-		${rootdir}/boot/System.map.gz], [], [dnl
-	    if test -z "$kvmlinux" ; then
-		AC_MSG_ERROR([
+	    ${kbuilddir}/System.map-generic-${kversion}.xz
+	    ${kbuilddir}/System.map-generic-${kversion}.lzma
+	    ${kbuilddir}/System.map-generic-${kversion}.bz2
+	    ${kbuilddir}/System.map-generic-${kversion}.gz
+	    ${kbuilddir}/System.map-generic.xz
+	    ${kbuilddir}/System.map-generic.lzma
+	    ${kbuilddir}/System.map-generic.bz2
+	    ${kbuilddir}/System.map-generic.gz
+	    ${kbuilddir}/System.map-huge-${kversion}.xz
+	    ${kbuilddir}/System.map-huge-${kversion}.lzma
+	    ${kbuilddir}/System.map-huge-${kversion}.bz2
+	    ${kbuilddir}/System.map-huge-${kversion}.gz
+	    ${kbuilddir}/System.map-huge.xz
+	    ${kbuilddir}/System.map-huge.lzma
+	    ${kbuilddir}/System.map-huge.bz2
+	    ${kbuilddir}/System.map-huge.gz
+	    ${kbuilddir}/System.map-${kversion}.xz
+	    ${kbuilddir}/System.map-${kversion}.lzma
+	    ${kbuilddir}/System.map-${kversion}.bz2
+	    ${kbuilddir}/System.map-${kversion}.gz
+	    ${kbuilddir}/System.map.xz
+	    ${kbuilddir}/System.map.lzma
+	    ${kbuilddir}/System.map.bz2
+	    ${kbuilddir}/System.map.gz
+	    ${rootdir}/boot/System.map-generic-${kversion}.xz
+	    ${rootdir}/boot/System.map-generic-${kversion}.lzma
+	    ${rootdir}/boot/System.map-generic-${kversion}.bz2
+	    ${rootdir}/boot/System.map-generic-${kversion}.gz
+	    ${rootdir}/boot/System.map-generic.xz
+	    ${rootdir}/boot/System.map-generic.lzma
+	    ${rootdir}/boot/System.map-generic.bz2
+	    ${rootdir}/boot/System.map-generic.gz
+	    ${rootdir}/boot/System.map-huge-${kversion}.xz
+	    ${rootdir}/boot/System.map-huge-${kversion}.lzma
+	    ${rootdir}/boot/System.map-huge-${kversion}.bz2
+	    ${rootdir}/boot/System.map-huge-${kversion}.gz
+	    ${rootdir}/boot/System.map-huge.xz
+	    ${rootdir}/boot/System.map-huge.lzma
+	    ${rootdir}/boot/System.map-huge.bz2
+	    ${rootdir}/boot/System.map-huge.gz
+	    ${rootdir}/boot/System.map-${kversion}.xz
+	    ${rootdir}/boot/System.map-${kversion}.lzma
+	    ${rootdir}/boot/System.map-${kversion}.bz2
+	    ${rootdir}/boot/System.map-${kversion}.gz
+	    ${rootdir}/boot/System.map.xz
+	    ${rootdir}/boot/System.map.lzma
+	    ${rootdir}/boot/System.map.bz2
+	    ${rootdir}/boot/System.map.gz], [], [dnl
+	if test -z "$kvmlinux" ; then
+	    AC_MSG_ERROR([
 *** 
 *** Configure could not find the system map file for kernel version
 *** "$kversion".  The locations searched were:
@@ -1183,36 +1196,36 @@ dnl
 *** Please specify the absolute location of your kernel system map
 *** file with option --with-k-sysmap before repeating.
 *** ])
-	    fi],[dnl
-	    if test -z "$kvmlinux" ; then
-		if test :$linux_cv_k_running != :yes
-		then
-		    case "$linux_cv_k_sysmap_eval" in
-			(*/usr/src/kernels/*)
-			    ;;
-			(*/boot/*|*/usr/src/*|*/lib/modules/*)
-			    case "$target_vendor" in
-				(mandrake|mandriva|mageia)
-    dnl
-    dnl				Mandrakelinux blends the debian architecture name in the kernel
-    dnl				image name approach with the Redhat kernel version number in the
-    dnl				kernel image name approach to yeild reliable system map files.
-    dnl
-				    ;;
-				(redhat|oracle|puias|centos|whitebox|scientific|debian|ubuntu|suse|*)
-    dnl
-    dnl				Unfortunately the redhat system map files are unreliable because the
-    dnl				are not unique for each architecture.  The system map file has to be
-    dnl				checked against the architecture for which we are building.
-    dnl
-    dnl				Unfortunately the debian system map files are unreliable because
-    dnl				they are not unique by kernel version.  The system map file has to
-    dnl				be checked against the kernel version for which we are building.
-    dnl
-    dnl				I don't really know how SuSE or others fair in this situation yet,
-    dnl				but I assume it is like the rest.
-    dnl
-				    AC_MSG_WARN([
+	fi],[dnl
+	if test -z "$kvmlinux" ; then
+	    if test :$linux_cv_k_running != :yes
+	    then
+		case "$linux_cv_k_sysmap_eval" in
+		    (*/usr/src/kernels/*)
+			;;
+		    (*/boot/*|*/usr/src/*|*/lib/modules/*)
+			case "$target_vendor" in
+			    (mandrake|mandriva|mageia)
+dnl
+dnl				Mandrakelinux blends the debian architecture name in the kernel
+dnl				image name approach with the Redhat kernel version number in the
+dnl				kernel image name approach to yeild reliable system map files.
+dnl
+				;;
+			    (redhat|oracle|puias|centos|whitebox|scientific|debian|ubuntu|suse|*)
+dnl
+dnl				Unfortunately the redhat system map files are unreliable because the
+dnl				are not unique for each architecture.  The system map file has to be
+dnl				checked against the architecture for which we are building.
+dnl
+dnl				Unfortunately the debian system map files are unreliable because
+dnl				they are not unique by kernel version.  The system map file has to
+dnl				be checked against the kernel version for which we are building.
+dnl
+dnl				I don't really know how SuSE or others fair in this situation yet,
+dnl				but I assume it is like the rest.
+dnl
+				AC_MSG_WARN([
 *** 
 *** Configuration information is being read from an unreliable source:
 *** 
@@ -1221,12 +1234,13 @@ dnl
 *** This may cause problems later if you have mismatches between the
 *** target kernel and the kernel symbols contained in that file.
 *** ])
-				    ;;
-			    esac
-			    ;;
-		    esac
-		fi
-	    fi],[with_k_sysmap])
+				;;
+			esac
+			;;
+		esac
+	    fi
+	fi],[with_k_sysmap])
+    _ksysmap="$linux_cv_k_sysmap_eval"
     ksysmap="$linux_cv_k_sysmap"
     AC_SUBST([ksysmap])dnl
 ])# _LINUX_CHECK_KERNEL_SYSMAP
@@ -1608,7 +1622,7 @@ dnl Just grep linux/kdev_t.h for #define MINORBITS.
 dnl
 	AC_MSG_RESULT([searching...])
 	linux_cv_minorbits=
-	linux_dirs="${linux_cv_k_hdrdir_eval} ${linux_cv_k_build_eval} ${linux_cv_k_source_eval}"
+	linux_dirs="${_khdrdir} ${_kbuilddir} ${_ksrcdir}"
 	for linux_dir in $linux_dirs
 	do
 	    AC_MSG_CHECKING([for kernel minor device number bits...  $linux_dir])
@@ -1668,7 +1682,7 @@ dnl
 dnl
 dnl	    not all distros leave this hanging around
 dnl
-	    linux_dirs="${linux_cv_k_hdrdir_eval} ${linux_cv_k_build_eval} ${linux_cv_k_source_eval}"
+	    linux_dirs="${_khdrdir} ${_kbuilddir} ${_ksrcdir}"
 	    for linux_dir in $linux_dirs
 	    do
 		for linux_file in $linux_dir/include/{linux,generated}/compile.h
@@ -1679,7 +1693,7 @@ dnl
 			break 2
 		    fi
 		done
-		eval "linux_dir=\"$kmoduledir/kernel/arch\""
+		linux_dir="$_kmoduledir/kernel/arch"
 		if test -d $linux_dir
 		then
 		    linux_mods=`find $linux_dir -type f -name '*'$kext$kzip 2>/dev/null`
@@ -1785,40 +1799,24 @@ dnl
 # _LINUX_CHECK_KERNEL_ARCHDIR
 # -------------------------------------------------------------------------
 AC_DEFUN([_LINUX_CHECK_KERNEL_ARCHDIR], [dnl
-    AC_CACHE_CHECK([for kernel arch directory], [linux_cv_k_archdir], [dnl
-	AC_ARG_WITH([k-archdir],
-	    [AS_HELP_STRING([--with-k-archdir=DIR],
-		[kernel architecture directory @<:@default=K-BUILD-DIR/arch@:>@])])
-	if test :"${with_k_archdir:-no}" != :no
-	then
-	    linux_cv_k_archdir="$with_k_archdir"
-	else
-	    linux_dirs="${linux_cv_k_hdrdir_eval} ${linux_cv_k_build_eval} ${linux_cv_k_source_eval}"
-	    linux_cv_k_archdir=
-	    for linux_dir in $linux_dirs
-	    do
-		if test -d $linux_dir
-		then
-		    linux_cv_k_archdir="$linux_dir"
-		    break
-		fi
-	    done
-	    if test -z "$linux_cv_k_archdir"
-	    then
-		linux_cv_k_archdir="${khdrdir}/arch"
-	    fi
-	fi
-	if test :"${linux_cv_k_archdir:-no}" != :no -a ! -d "$linux_cv_k_archdir"
-	then
-	    AC_MSG_ERROR([
+    AC_ARG_WITH([k-archdir],
+	[AS_HELP_STRING([--with-k-archdir=DIR],
+	    [kernel architecture directory @<:@default=K-BUILD-DIR/arch@:>@])])
+    _BLD_FIND_DIR([for kernel arch directory], [linux_cv_k_archdir], [
+	    ${khdrdir}/arch
+	    ${kbuilddir}/arch
+	    ${ksrcdir}/arch], [], [${khdrdir}/arch], [dnl
+		AC_MSG_ERROR([
+*** 
+*** Configure cannot find the kernel architecture directory.  The
+*** directories searched were:
+***	"$with_k_archdir"
+***	"$bld_search_path"
 ***
-*** Kernel architecture directory:
-***     "$linux_cv_k_archdir"
-*** does not exist.  Specify the correct kernel architecture directory
-*** using the --with-k-archdir option to configure before attempting
+*** Specify the absolute location of the kernel architecture directory
+*** with the --with-k-archdir option to configure before attempting
 *** again.
-*** ])
-	fi])dnl
+*** ])], [], [with_k_archdir])
 ])# _LINUX_CHECK_KERNEL_ARCHDIR
 # =========================================================================
 
@@ -1911,6 +1909,7 @@ dnl
 	    ${khdrdir}/include/asm-${khdrarch}
 	    ${kbuilddir}/include/asm-${khdrarch}], [asm-offsets.h],
 	    [$ksrcdir/include/asm], [], [], [with_k_asm])
+    _kasmdir="$linux_cv_k_asmdir_eval"
     kasmdir="$linux_cv_k_asmdir"
     AC_SUBST([kasmdir])dnl
 dnl
@@ -1927,7 +1926,7 @@ dnl	the kernel makefiles.  Without it, recent Makefiles will attempt to
 dnl	create one.
 dnl
 	test -d include2 || mkdir include2
-	ln -snf "$linux_cv_k_asmdir_eval" include2/asm
+	ln -snf "$_kasmdir" include2/asm
 ])# _LINUX_CHECK_KERNEL_ASMDIR
 # =========================================================================
 
@@ -2047,6 +2046,7 @@ dnl
 *** ])
 		    ;;
 	    esac], [with_k_config])
+    _kconfig="$linux_cv_k_config_eval"
     kconfig="$linux_cv_k_config"
     AC_SUBST([kconfig])dnl
 ])# _LINUX_CHECK_KERNEL_DOT_CONFIG
@@ -2063,7 +2063,7 @@ dnl
 AC_DEFUN([_LINUX_CHECK_KERNEL_FILES], [dnl
     AC_CACHE_CHECK([for kernel package release], [linux_cv_k_version], [dnl
 	linux_ver=
-	for linux_file in $linux_cv_k_sysmap_eval $linux_cv_k_vmlinux_eval ; do
+	for linux_file in $_ksysmap $_kvmlinux ; do
 	    if test -z "$linux_ver" -a -x "`which rpm 2>/dev/null`"
 	    then
 		linux_ver=`rpm -q --qf "%{VERSION}" --whatprovides $linux_file 2>/dev/null | head -1`
@@ -2134,7 +2134,7 @@ AC_DEFUN([_LINUX_CHECK_KERNEL_FILES], [dnl
     AC_SUBST([kernel_source])
     AC_SUBST([kernel_headers])
     AC_CACHE_CHECK([for kernel file sanity], [linux_cv_kernel_sanity], [dnl
-	linux_cv_files="$linux_cv_k_sysmap_eval $linux_cv_k_vmlinux_eval $linux_cv_k_build_eval $linux_cv_k_source_eval $linux_cv_k_config_eval"
+	linux_cv_files="$_ksysmap $_kvmlinux $_kbuilddir $_ksrcdir $_kconfig"
 	case "$target_vendor" in
 	    (mandrake|mandriva|mageia)
 dnl
@@ -2212,7 +2212,7 @@ dnl	Added in KBUILD_EXTMOD because on newer makefiles this keeps the makefile fr
 dnl	rebuild intermediate makefiles not necessary for an external module build.
 dnl
 	linux_builddir=`pwd`
-	linux_cv_k_cflags="`(export -n ARCH; ${srcdir}/scripts/cflagcheck ${linux_tmp:+$linux_tmp }srctree=${linux_cv_k_source_eval} objtree=${linux_cv_k_build_eval} KERNELRELEASE=${kversion} KERNEL_CONFIG=${linux_cv_k_config_eval} SPEC_CFLAGS='-g' KERNEL_TOPDIR=${linux_cv_k_source_eval} TOPDIR=${linux_cv_k_source_eval} KBUILD_SRC=${linux_cv_k_source_eval} KBUILD_OUTPUT=${linux_cv_k_build_eval} KBUILD_EXTMOD=${linux_builddir} -I${linux_cv_k_source_eval} -I${linux_cv_k_hdrdir_eval} -I${linux_cv_k_build_eval} cflag-check | tail -1)`"
+	linux_cv_k_cflags="`(export -n ARCH; ${srcdir}/scripts/cflagcheck ${linux_tmp:+$linux_tmp }srctree=${_ksrcdir} objtree=${_kbuilddir} KERNELRELEASE=${kversion} KERNEL_CONFIG=${_kconfig} SPEC_CFLAGS='-g' KERNEL_TOPDIR=${_ksrcdir} TOPDIR=${_ksrcdir} KBUILD_SRC=${_ksrcdir} KBUILD_OUTPUT=${_kbuilddir} KBUILD_EXTMOD=${linux_builddir} -I${_ksrcdir} -I${_khdrdir} -I${_kbuilddir} cflag-check | tail -1)`"
 	linux_cv_k_cflags_orig="$linux_cv_k_cflags"])
 	linux_cflags=
 	AC_ARG_WITH([k-optimize],
@@ -2322,16 +2322,16 @@ dnl	    linux_cflags="${linux_cflags}${linux_cflags:+ }-Wdisabled-optimization"
 	then
 	    linux_cflags="$linux_cflags${linux_cflags:+ }-finline-functions"
 	fi
-	linux_cv_k_cflags=`echo " $linux_cv_k_cflags " | sed -e "s| -Iinclude | -I${linux_cv_k_build_eval}/include |g;s|^[[[:space:]]]*||;s|[[[:space:]]]*$||"`
-	linux_dir="${linux_cv_k_build_eval}/include2" ; if test -d "$linux_dir" ; then
-	linux_cv_k_cflags=`echo " $linux_cv_k_cflags " | sed -e "s| -Iinclude2 | -I${linux_cv_k_build_eval}/include2 |g;s|^[[[:space:]]]*||;s|[[[:space:]]]*$||"`
+	linux_cv_k_cflags=`echo " $linux_cv_k_cflags " | sed -e "s| -Iinclude | -I${_kbuilddir}/include |g;s|^[[[:space:]]]*||;s|[[[:space:]]]*$||"`
+	linux_dir="${_kbuilddir}/include2" ; if test -d "$linux_dir" ; then
+	linux_cv_k_cflags=`echo " $linux_cv_k_cflags " | sed -e "s| -Iinclude2 | -I${_kbuilddir}/include2 |g;s|^[[[:space:]]]*||;s|[[[:space:]]]*$||"`
 	fi
 dnl
 dnl	Only ppc and um currently include architecture directories.  The rest include asm
 dnl	directories.
 dnl
-	linux_cv_k_cflags=`echo " $linux_cv_k_cflags " | sed -e "s| -Iinclude/asm| -I${linux_cv_k_source_eval}/include/asm|g;s|^[[[:space:]]]*||;s|[[[:space:]]]*$||"`
-	linux_cv_k_cflags=`echo " $linux_cv_k_cflags " | sed -e "s| -Iarch/| -I${linux_cv_k_source_eval}/arch/|g;s|^[[[:space:]]]*||;s|[[[:space:]]]*$||"`
+	linux_cv_k_cflags=`echo " $linux_cv_k_cflags " | sed -e "s| -Iinclude/asm| -I${_ksrcdir}/include/asm|g;s|^[[[:space:]]]*||;s|[[[:space:]]]*$||"`
+	linux_cv_k_cflags=`echo " $linux_cv_k_cflags " | sed -e "s| -Iarch/| -I${_ksrcdir}/arch/|g;s|^[[[:space:]]]*||;s|[[[:space:]]]*$||"`
 dnl
 dnl	We now always include -g for debugging information on kernel modules due to SLES 10.  Use
 dnl	install-strip instead of install to remove it when unnecessary.
@@ -2398,7 +2398,7 @@ dnl	Added in KBUILD_EXTMOD because on newer makefiles this keeps the makefile fr
 dnl	rebuild intermediate makefiles not necessary for an external module build.
 dnl
 	linux_builddir=`pwd`
-	linux_cv_k_cppflags="`(export -n ARCH; ${srcdir}/scripts/cflagcheck srctree=${linux_cv_k_source_eval} objtree=${linux_cv_k_build_eval} KERNELRELEASE=${kversion} KERNEL_CONFIG=${linux_cv_k_config_eval} SPEC_CFLAGS='-g' KERNEL_TOPDIR=${linux_cv_k_source_eval} TOPDIR=${linux_cv_k_source_eval} KBUILD_SRC=${linux_cv_k_source_eval} KBUILD_OUTPUT=${linux_cv_k_build_eval} KBUILD_EXTMOD=${linux_builddir} -I${linux_cv_k_source_eval} -I${linux_cv_k_hdrdir_eval} -I${linux_cv_k_build_eval} cppflag-check | tail -1)`"
+	linux_cv_k_cppflags="`(export -n ARCH; ${srcdir}/scripts/cflagcheck srctree=${_ksrcdir} objtree=${_kbuilddir} KERNELRELEASE=${kversion} KERNEL_CONFIG=${_kconfig} SPEC_CFLAGS='-g' KERNEL_TOPDIR=${_ksrcdir} TOPDIR=${_ksrcdir} KBUILD_SRC=${_ksrcdir} KBUILD_OUTPUT=${_kbuilddir} KBUILD_EXTMOD=${linux_builddir} -I${_ksrcdir} -I${_khdrdir} -I${_kbuilddir} cppflag-check | tail -1)`"
 	linux_cv_k_cppflags_orig="$linux_cv_k_cppflags"])
 	linux_cv_k_cppflags="-nostdinc -isystem `$KCC -print-file-name=include` -iwithprefix include -DLINUX $linux_cv_k_cppflags"
 dnl
@@ -2407,16 +2407,16 @@ dnl	location of the source directory.  include2 on the otherhand is properly
 dnl	set up for the asm directory.
 dnl
 	linux_cv_k_cppflags="$linux_cv_k_cppflags $linux_cv_k_more_cppflags"
-	linux_cv_k_cppflags=`echo " $linux_cv_k_cppflags " | sed -e "s| -Iinclude | -Iinclude -I${linux_cv_k_build_eval}/include -I${linux_cv_k_hdrdir_eval}/include -I${linux_cv_k_source_eval}/include |g;s|^[[[:space:]]]*||;s|[[[:space:]]]*$||"`
-	linux_dir="${linux_cv_k_build_eval}/include2" ; if test -d "$linux_dir" ; then
-	linux_cv_k_cppflags=`echo " $linux_cv_k_cppflags " | sed -e "s| -Iinclude2 | -I${linux_cv_k_build_eval}/include2 |g;s|^[[[:space:]]]*||;s|[[[:space:]]]*$||"`
+	linux_cv_k_cppflags=`echo " $linux_cv_k_cppflags " | sed -e "s| -Iinclude | -Iinclude -I${_kbuilddir}/include -I${_khdrdir}/include -I${_ksrcdir}/include |g;s|^[[[:space:]]]*||;s|[[[:space:]]]*$||"`
+	linux_dir="${_kbuilddir}/include2" ; if test -d "$linux_dir" ; then
+	linux_cv_k_cppflags=`echo " $linux_cv_k_cppflags " | sed -e "s| -Iinclude2 | -I${_kbuilddir}/include2 |g;s|^[[[:space:]]]*||;s|[[[:space:]]]*$||"`
 	fi
 dnl
 dnl	Only ppc and um currently include architecture directories.  The rest include asm
 dnl	directories.
 dnl
-	linux_cv_k_cppflags=`echo " $linux_cv_k_cppflags " | sed -e "s| -Iinclude/asm| -I${linux_cv_k_source_eval}/include/asm|g;s|^[[[:space:]]]*||;s|[[[:space:]]]*$||"`
-	linux_cv_k_cppflags=`echo " $linux_cv_k_cppflags " | sed -e "s| -Iarch/| -I${linux_cv_k_source_eval}/arch/|g;s|^[[[:space:]]]*||;s|[[[:space:]]]*$||"`
+	linux_cv_k_cppflags=`echo " $linux_cv_k_cppflags " | sed -e "s| -Iinclude/asm| -I${_ksrcdir}/include/asm|g;s|^[[[:space:]]]*||;s|[[[:space:]]]*$||"`
+	linux_cv_k_cppflags=`echo " $linux_cv_k_cppflags " | sed -e "s| -Iarch/| -I${_ksrcdir}/arch/|g;s|^[[[:space:]]]*||;s|[[[:space:]]]*$||"`
 dnl
 dnl	Recent 2.6.15+ kernels include autoconf.h from the build directory instead of the source
 dnl	directory.  I suppose the idea is to allow you to configure in a separate directory as
@@ -2425,16 +2425,16 @@ dnl	reason expands the current working directory in the autoconf.h include, so w
 dnl	leading junk in the autoconf.h argument.  Note that Mandriva puts autoconf.h in
 dnl	<generated/autoconf.h>.
 dnl
-	linux_cv_k_cppflags=`echo " $linux_cv_k_cppflags " | sed -r -e "s, -include (\.*/.*/)?include/(linux|generated)/autoconf.h, -include ${linux_cv_k_build_eval}/include/\2/autoconf.h,;s,^[[[:space:]]]*,,;s,[[[:space:]]]*$,,"`
+	linux_cv_k_cppflags=`echo " $linux_cv_k_cppflags " | sed -r -e "s, -include (\.*/.*/)?include/(linux|generated)/autoconf.h, -include ${_kbuilddir}/include/\2/autoconf.h,;s,^[[[:space:]]]*,,;s,[[[:space:]]]*$,,"`
 dnl
 dnl	Non-kbuild (2.4 kernel) always needs include directories to be in the
 dnl	build directory.
 dnl
 	if test :"$linux_cv_k_ko_modules" != :yes ; then
-	    linux_src="$linux_cv_k_source_eval"
-	    linux_bld="$linux_cv_k_build_eval"
+	    linux_src="$_ksrcdir"
+	    linux_bld="$_kbuilddir"
 	    if test "$linux_src" != "$linux_bld" ; then
-		linux_cv_k_cppflags=`echo " $linux_cv_k_cppflags " | sed -e "s| -I${linux_cv_k_source_eval}/include| -I${linux_cv_k_build_eval}/include|g;s|^[[[:space:]]]*||;s|[[[:space:]]]*$||"`
+		linux_cv_k_cppflags=`echo " $linux_cv_k_cppflags " | sed -e "s| -I${_ksrcdir}/include| -I${_kbuilddir}/include|g;s|^[[[:space:]]]*||;s|[[[:space:]]]*$||"`
 	    fi
 	fi
     ])
@@ -2461,7 +2461,7 @@ dnl	Added in KBUILD_EXTMOD because on newer makefiles this keeps the makefile fr
 dnl	rebuild intermediate makefiles not necessary for an external module build.
 dnl
 	linux_builddir=`pwd`
-	linux_cv_k_modflags="`(export -n ARCH; ${srcdir}/scripts/cflagcheck srctree=${linux_cv_k_source_eval} objtree=${linux_cv_k_build_eval} KERNELRELEASE=${kversion} KERNEL_CONFIG=${linux_cv_k_config_eval} SPEC_CFLAGS='-g' KERNEL_TOPDIR=${linux_cv_k_source_eval} TOPDIR=${linux_cv_k_source_eval} KBUILD_SRC=${linux_cv_k_source_eval} KBUILD_OUTPUT=${linux_cv_k_build_eval} KBUILD_EXTMOD=${linux_builddir} -I${linux_cv_k_source_eval} -I${linux_cv_k_hdrdir_eval} -I${linux_cv_k_build_eval} modflag-check | tail -1)`"
+	linux_cv_k_modflags="`(export -n ARCH; ${srcdir}/scripts/cflagcheck srctree=${_ksrcdir} objtree=${_kbuilddir} KERNELRELEASE=${kversion} KERNEL_CONFIG=${_kconfig} SPEC_CFLAGS='-g' KERNEL_TOPDIR=${_ksrcdir} TOPDIR=${_ksrcdir} KBUILD_SRC=${_ksrcdir} KBUILD_OUTPUT=${_kbuilddir} KBUILD_EXTMOD=${linux_builddir} -I${_ksrcdir} -I${_khdrdir} -I${_kbuilddir} modflag-check | tail -1)`"
 	linux_cv_k_modflags_orig="$linux_cv_k_modflags"])
 dnl
 dnl	Unfortunately we need to rip the module flags from the kernel source
@@ -2473,10 +2473,8 @@ dnl	to build directory unless they are the same.  Debian and Ubuntu seem to
 dnl	handle this properly now for 2.6 kernels.
 dnl
 	if test :"$linux_cv_k_ko_modules" != :yes ; then
-	    linux_src="$linux_cv_k_source_eval"
-	    linux_bld="$linux_cv_k_build_eval"
-	    if test "$linux_src" != "$linux_bld" ; then
-		linux_cv_k_modflags=`echo " $linux_cv_k_modflags " | sed -e "s| ${linux_cv_k_source_eval}/include| ${linux_cv_k_build_eval}/include|g;s|^[[[:space:]]]*||;s|[[[:space:]]]*$||"`
+	    if test "$_ksrcdir" != "$_kbuilddir" ; then
+		linux_cv_k_modflags=`echo " $linux_cv_k_modflags " | sed -e "s| ${_ksrcdir}/include| ${_kbuilddir}/include|g;s|^[[[:space:]]]*||;s|[[[:space:]]]*$||"`
 	    fi
 	fi
     ])
@@ -2499,7 +2497,7 @@ dnl	Added in KBUILD_EXTMOD because on newer makefiles this keeps the makefile fr
 dnl	rebuild intermediate makefiles not necessary for an external module build.
 dnl
 	linux_builddir=`pwd`
-	linux_cv_k_bldflags="`(export -n ARCH; ${srcdir}/scripts/cflagcheck srctree=${linux_cv_k_source_eval} objtree=${linux_cv_k_build_eval} KERNELRELEASE=${kversion} KERNEL_CONFIG=${linux_cv_k_config_eval} SPEC_CFLAGS='-g' KERNEL_TOPDIR=${linux_cv_k_source_eval} TOPDIR=${linux_cv_k_source_eval} KBUILD_SRC=${linux_cv_k_source_eval} KBUILD_OUTPUT=${linux_cv_k_build_eval} KBUILD_EXTMOD=${linux_builddir} -I${linux_cv_k_source_eval} -I${linux_cv_k_hdrdir_eval} -I${linux_cv_k_build_eval} bldflag-check | tail -1)`"
+	linux_cv_k_bldflags="`(export -n ARCH; ${srcdir}/scripts/cflagcheck srctree=${_ksrcdir} objtree=${_kbuilddir} KERNELRELEASE=${kversion} KERNEL_CONFIG=${_kconfig} SPEC_CFLAGS='-g' KERNEL_TOPDIR=${_ksrcdir} TOPDIR=${_ksrcdir} KBUILD_SRC=${_ksrcdir} KBUILD_OUTPUT=${_kbuilddir} KBUILD_EXTMOD=${linux_builddir} -I${_ksrcdir} -I${_khdrdir} -I${_kbuilddir} bldflag-check | tail -1)`"
 	linux_cv_k_bldflags_orig="$linux_cv_k_bldflags"])
 dnl
 dnl	As of 2.6.16+ the KBUILD_BASENAME is stringified on the command line and is no longer
@@ -2530,7 +2528,7 @@ dnl	performed on them).  The target modnameflag-check was added to cflagcheck to
 dnl	from the makefile.
 dnl
 	linux_builddir=`pwd`
-	linux_cv_k_mnflags="`(export -n ARCH; ${srcdir}/scripts/cflagcheck modname=phony srctree=${linux_cv_k_source_eval} objtree=${linux_cv_k_build_eval} KERNELRELEASE=${kversion} KERNEL_CONFIG=${linux_cv_k_config_eval} SPEC_CFLAGS='-g' KERNEL_TOPDIR=${linux_cv_k_source_eval} TOPDIR=${linux_cv_k_source_eval} KBUILD_SRC=${linux_cv_k_source_eval} KBUILD_OUTPUT=${linux_cv_k_build_eval} KBUILD_EXTMOD=${linux_builddir} -I${linux_cv_k_source_eval} -I${linux_cv_k_hdrdir_eval} -I${linux_cv_k_build_eval} mnflag-check | tail -1)`"
+	linux_cv_k_mnflags="`(export -n ARCH; ${srcdir}/scripts/cflagcheck modname=phony srctree=${_ksrcdir} objtree=${_kbuilddir} KERNELRELEASE=${kversion} KERNEL_CONFIG=${_kconfig} SPEC_CFLAGS='-g' KERNEL_TOPDIR=${_ksrcdir} TOPDIR=${_ksrcdir} KBUILD_SRC=${_ksrcdir} KBUILD_OUTPUT=${_kbuilddir} KBUILD_EXTMOD=${linux_builddir} -I${_ksrcdir} -I${_khdrdir} -I${_kbuilddir} mnflag-check | tail -1)`"
 	linux_cv_k_mnflags_orig="$linux_cv_k_mnflags"])
 	case "$linux_cv_k_mnflags" in
 	    (*KBUILD_MODNAME*)
@@ -2559,7 +2557,7 @@ dnl	debugflag-check was added to cflagcheck to rip these flags from the makefile
 dnl	copyright on the hash.c program, RedHat is responsible for this commerical idiocy.
 dnl
 	linux_builddir=`pwd`
-	linux_cv_k_dhflags="`(export -n ARCH; ${srcdir}/scripts/cflagcheck modname=phony srctree=${linux_cv_k_source_eval} objtree=${linux_cv_k_build_eval} KERNELRELEASE=${kversion} KERNEL_CONFIG=${linux_cv_k_config_eval} SPEC_CFLAGS='-g' KERNEL_TOPDIR=${linux_cv_k_source_eval} TOPDIR=${linux_cv_k_source_eval} KBUILD_SRC=${linux_cv_k_source_eval} KBUILD_OUTPUT=${linux_cv_k_build_eval} KBUILD_EXTMOD=${linux_builddir} -I${linux_cv_k_source_eval} -I${linux_cv_k_hdrdir_eval} -I${linux_cv_k_build_eval} dhflag-check | tail -1)`"
+	linux_cv_k_dhflags="`(export -n ARCH; ${srcdir}/scripts/cflagcheck modname=phony srctree=${_ksrcdir} objtree=${_kbuilddir} KERNELRELEASE=${kversion} KERNEL_CONFIG=${_kconfig} SPEC_CFLAGS='-g' KERNEL_TOPDIR=${_ksrcdir} TOPDIR=${_ksrcdir} KBUILD_SRC=${_ksrcdir} KBUILD_OUTPUT=${_kbuilddir} KBUILD_EXTMOD=${linux_builddir} -I${_ksrcdir} -I${_khdrdir} -I${_kbuilddir} dhflag-check | tail -1)`"
 	linux_cv_k_dhflags_orig="$linux_cv_k_dhflags"])
 	case "$linux_cv_k_dhflags" in
 	    (*DEBUG_HASH*)
@@ -3110,18 +3108,18 @@ AC_CACHE_CHECK([for kernel symbol $[]2 address], [linux_cv_$[]{2}_addr], [dnl
     if test -z "$linux_tmp" -a -n "$kallsyms" -a -r "$kallsyms"; then
 	linux_tmp="`($EGREP '\<'${2}'\>' $kallsyms | head -1 | sed -e 's| .*||;s|^0[xX]||') 2>/dev/null`"
     fi
-    if test -z "$linux_tmp" -a -n "$linux_cv_k_sysmap_eval" -a -r "$linux_cv_k_sysmap_eval"; then
-	linux_tmp="`($EGREP '\<'${2}'\>' $linux_cv_k_sysmap_eval | sed -e 's| .*||;s|^0[xX]||') 2>/dev/null`"
+    if test -z "$linux_tmp" -a -n "$_ksysmap" -a -r "$_ksysmap"; then
+	linux_tmp="`($EGREP '\<'${2}'\>' $_ksysmap | sed -e 's| .*||;s|^0[xX]||') 2>/dev/null`"
     fi
-    if test -z "$linux_tmp" -a -n "$linux_cv_k_vmlinux_eval" -a -r "$linux_cv_k_vmlinux_eval"; then
-	case "$linux_cv_k_vmlinux_eval" in
-	    (*.gz)  linux_img="/var/tmp/.tmp.$$.`basename $linux_cv_k_vmlinux_eval .gz`"
-		    test -r $linux_img || gzip -dc $linux_cv_k_vmlinux_eval >$linux_img ;;
-	    (*.bz2) linux_img="/var/tmp/.tmp.$$.`basename $linux_cv_k_vmlinux_eval .bz2`"
-		    test -r $linux_img || bzip2 -dc $linux_cv_k_vmlinux_eval >$linux_img ;;
-	    (*.xz)  linux_img="/var/tmp/.tmp.$$.`basename $linux_cv_k_vmlinux_eval .xz`"
-		    test -r $linux_img || xz -dc $linux_cv_k_vmlinux_eval >$linux_img ;;
-	    (*)	    linux_img="$linux_cv_k_vmlinux_eval" ;;
+    if test -z "$linux_tmp" -a -n "$_kvmlinux" -a -r "$_kvmlinux"; then
+	case "$_kvmlinux" in
+	    (*.gz)  linux_img="/var/tmp/.tmp.$$.`basename $_kvmlinux .gz`"
+		    test -r $linux_img || gzip -dc $_kvmlinux >$linux_img ;;
+	    (*.bz2) linux_img="/var/tmp/.tmp.$$.`basename $_kvmlinux .bz2`"
+		    test -r $linux_img || bzip2 -dc $_kvmlinux >$linux_img ;;
+	    (*.xz)  linux_img="/var/tmp/.tmp.$$.`basename $_kvmlinux .xz`"
+		    test -r $linux_img || xz -dc $_kvmlinux >$linux_img ;;
+	    (*)	    linux_img="$_kvmlinux" ;;
 	esac
 	linux_tmp="`(nm -Bs $linux_img | $EGREP '\<'${2}'\>' | sed -e 's| .*||;s|^0[xX]||') 2>/dev/null`"
     fi
@@ -3176,21 +3174,21 @@ AC_CACHE_CHECK([for kernel symbol $[]2 export], [linux_cv_$[]{2}_export],
     if test -z "$linux_tmp" -a -n "$kallsyms" -a -r "$kallsyms"; then
 	if ( $EGREP -q '\<__ksymtab_'${2}'\>' $kallsyms 2>/dev/null ); then
 	    linux_tmp="yes ($kallsyms)"; fi; fi
-    if test -z "$linux_tmp" -a -n "$linux_cv_k_sysmap_eval" -a -r "$linux_cv_k_sysmap_eval"; then
-	if ( $EGREP -q '\<__ksymtab_'${2}'\>' $linux_cv_k_sysmap_eval 2>/dev/null ); then
-	    linux_tmp="yes ($linux_cv_k_sysmap_eval)"; fi; fi
-    if test -z "$linux_tmp" -a -n "$linux_cv_k_vmlinux_eval" -a -r "$linux_cv_k_vmlinux_eval"; then
-	case "$linux_cv_k_vmlinux_eval" in
-	    (*.gz)  linux_img="/var/tmp/.tmp.$$.`basename $linux_cv_k_vmlinux_eval .gz`"
-		    test -r $linux_img || gzip -dc $linux_cv_k_vmlinux_eval >$linux_img ;;
-	    (*.bz2) linux_img="/var/tmp/.tmp.$$.`basename $linux_cv_k_vmlinux_eval .bz2`"
-		    test -r $linux_img || bzip2 -dc $linux_cv_k_vmlinux_eval >$linux_img ;;
-	    (*.xz)  linux_img="/var/tmp/.tmp.$$.`basename $linux_cv_k_vmlinux_eval .xz`"
-		    test -r $linux_img || xz -dc $linux_cv_k_vmlinux_eval >$linux_img ;;
-	    (*)	    linux_img="$linux_cv_k_vmlinux_eval" ;;
+    if test -z "$linux_tmp" -a -n "$_ksysmap" -a -r "$_ksysmap"; then
+	if ( $EGREP -q '\<__ksymtab_'${2}'\>' $_ksysmap 2>/dev/null ); then
+	    linux_tmp="yes ($_ksysmap)"; fi; fi
+    if test -z "$linux_tmp" -a -n "$_kvmlinux" -a -r "$_kvmlinux"; then
+	case "$_kvmlinux" in
+	    (*.gz)  linux_img="/var/tmp/.tmp.$$.`basename $_kvmlinux .gz`"
+		    test -r $linux_img || gzip -dc $_kvmlinux >$linux_img ;;
+	    (*.bz2) linux_img="/var/tmp/.tmp.$$.`basename $_kvmlinux .bz2`"
+		    test -r $linux_img || bzip2 -dc $_kvmlinux >$linux_img ;;
+	    (*.xz)  linux_img="/var/tmp/.tmp.$$.`basename $_kvmlinux .xz`"
+		    test -r $linux_img || xz -dc $_kvmlinux >$linux_img ;;
+	    (*)	    linux_img="$_kvmlinux" ;;
 	esac
 	if ( nm -Bs $linux_img | $EGREP -q '\<__ksymtab_'${2}'\>' 2>/dev/null ); then
-	    linux_tmp="yes ($linux_cv_k_vmlinux_eval)"
+	    linux_tmp="yes ($_kvmlinux)"
 	fi
     fi
     if test -z "$linux_tmp" -a -n "$kmodver" -a -r "$kmodver"; then

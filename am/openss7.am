@@ -98,6 +98,75 @@ am__list_install = \
 		echo "$$d$$p"; \
 	done | $(am__base_install)
 
+am__gpg_prepare = \
+	user="$(GNUPGUSER)"; user="$${user:+ -u }$$user"; \
+	home="$(GNUPGHOME)"; home="$${home:+ --homedir }$$home"; \
+	pass="$(GNUPGPASS)"; pass="$${pass:+ --batch }"; \
+	pipe="$(GNUPGPASS)"; pipe="$${pipe:+$(ECHO) $$pipe |}"
+
+am__gpg_clear_sign_file = \
+	if test ! -s $$f || ! $(GPG) --verify -- $$f >/dev/null 2>&1; then \
+		test ! -s $$f || $(ECHO) "D: gpg BAD $$f" ; \
+		$(am__gpg_prepare) ; \
+		$(ECHO) "$(GPG) --clearsign -a --passphrase-fd 0$$user$$home$$pass -- $$f 2>/dev/null"; \
+		eval "$$pipe $(GPG) --clearsign -a --passphrase-fd 0$$user$$home$$pass -- $$f 2>/dev/null"; \
+	else \
+		$(ECHO) "D: gpg OK  $$f" ; \
+		touch "$$f"; \
+	fi
+
+am__gpg_verify_sign_file = \
+	if test ! -s $$a || ! $(GPG) --verify -- $$a >/dev/null 2>&1; then \
+		test ! -s $$a || $(ECHO) "D: gpg BAD $$a" ; \
+		$(am__gpg_prepare) ; \
+		$(ECHO) "$(GPG) -ba --passphrase-fd 0$$user$$home$$pass -o- -- $$f >$$a 2>/dev/null"; \
+		eval "$$pipe $(GPG) -ba --passphrase-fd 0$$user$$home$$pass -o- -- $$f >$$a 2>/dev/null"; \
+	else \
+		$(ECHO) "D: gpg OK  $$a" ; \
+		touch "$$a"; \
+	fi
+
+am__gpg_export_key_file = \
+	test -s $$k || { \
+		$(am__gpg_prepare) ; \
+		$(ECHO) "$(GPG) -a$$user$$home --export $(GNUPGUSER) >$$k"; \
+		$(GPG) -a$$user$$home --export $(GNUPGUSER) >$$k ; \
+	}
+
+am__gpg_clear_sign = \
+	$(AM_V_GEN) f='$@'; $(am__gpg_clear_sign_file)
+
+am__gpg_verify_sign = \
+	$(AM_V_GEN) a='$@';f='$<'; $(am__gpg_verify_sign_file)
+
+am__gpg_export_key = \
+	$(AM_V_GEN) k='$@'; $(am__gpg_export_key_file)
+
+am__compress_data_file = \
+	if test -s $$f ; then \
+		$(ECHO_Q) "  GEN   $$f.gz" ; \
+		$(ECHO_V) " $(GZIP_CMD) $(GZIP) -c $$f >$$f.gz" ; \
+		$(GZIP_CMD) $(GZIP) -c $$f >$$f.gz ; \
+		$(ECHO_Q) "  GEN   $$f.bz2" ; \
+		$(ECHO_V) " $(BZIP2_CMD) $(BZIP2) -c $$f >$$f.bz2" ; \
+		$(BZIP2_CMD) $(BZIP2) -c $$f >$$f.bz2 ; \
+		$(ECHO_Q) "  GEN   $$f.xz" ; \
+		$(ECHO_V) " $(XZ_CMD) $(XZ) -c $$f >$$f.xz" ; \
+		$(XZ_CMD) $(XZ) -c $$f >$$f.xz ; \
+	fi
+
+am__gpg_sign_compressed_file = \
+	am__fsave="$$f" ; \
+	am__ssave="$$s" ; \
+	for s in '' .gz .bz2 .lzma .xz ; do \
+		f="$$am__fsave$$s" ; \
+		test -s "$$f" || continue ; \
+		a="$$f.asc" ; \
+		$(am__gpg_verify_sign_file) ; \
+	done ; \
+	f="$$am__fsave" ; \
+	s="$$am__ssave"
+
 ##
 # Accumulate these 'till the end
 ##

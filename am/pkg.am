@@ -91,7 +91,7 @@ mpkg_insdir		= $(mpkginstalldir)/$(PACKAGE_LCNAME)-$(VERSION)
 mpkg_base_file		= $(mpkgpkg).pkg.tar.gz
 
 pkg_build_file		= arch/PKGBUILD
-pkg_source_files	= arch/$(PACKAGE)-$(VERSION).tar.gz
+#pkg_source_files	= arch/$(PACKAGE)-$(VERSION).tar.gz
 
 archpkg			= $(PACKAGE)-$(VERSION)
 pkg_dir			= $(mpkgtopdir)/$(PACKAGE)-$(VERSION)
@@ -105,6 +105,8 @@ pkg_devl_file		= $(PACKAGE)-devel-$(VERSION)-$(PACKAGE_PACRELEASE)-$(target_cpu)
 pkg_kern_file		= $(PACKAGE)-*-$(VERSION)-$(PACKAGE_PACRELEASE)-$(target_cpu).pkg.tar.xz
 pkg_kdev_file		= $(PACKAGE)-*-devel-$(VERSION)-$(PACKAGE_PACRELEASE)-$(target_cpu).pkg.tar.xz
 pkg_java_file		= $(PACKAGE)-java-$(VERSION)-$(PACKAGE_PACRELEASE)-$(target_cpu).pkg.tar.xz
+pkg_aur_file		= $(PACKAGE).tar.gz
+#pkg_sig_file		= $(PACKAGE).tar.gz.sig
 
 pkg_base_file_sig	= $(PACKAGE)-$(VERSION)-$(PACKAGE_PACRELEASE)-$(target_cpu).pkg.tar.xz
 pkg_devl_file_sig	= $(PACKAGE)-devel-$(VERSION)-$(PACKAGE_PACRELEASE)-$(target_cpu).pkg.tar.xz
@@ -141,6 +143,7 @@ pkgtop_binary_files	= $(pacdir)/*/$(pkg_base_file) \
 			  $(pacdir)/*/$(pkg_java_file) \
 			  $(pacdir)/*/$(pkg_java_file_sig) \
 			  $(pkgtop_update_files)
+pkgtop_signed_files	= $(pkgtop_sig_file)
 
 checksummed-PKGBUILD: $(pkg_build_file)
 	@$(ECHO_V) "D: Making $@ in `pwd`"
@@ -217,13 +220,29 @@ pkgs:
 
 
 $(pkg_sigs): %.sig: %
-	$(AM_V_GEN)\
-	user="$(GNUPGUSER)"; user="$${user:+ -u }$$user"; \
-	home="$(GNUPGHOME)"; home="$${home:+ --homedir }$$home"; \
-	pass="$(GNUPGPASS)"; pass="$${pass:+ --batch }"; \
-	pipe="$(GNUPGPASS)"; pipe="$${pipe:+$(ECHO) $$pipe |}"; \
-	$(ECHO) "$(GPG) -ba --passphrase-fd 0$$user$$home$$pass -o- -- $< >$@ 2>/dev/null"; \
-	eval "$$pipe $(GPG) -ba --passphrase-fd 0$$user$$home$$pass -o- -- $< >$@ 2>/dev/null"
+	@$(ECHO_V) "D: Making $@ in `pwd`"
+	$(am__gpg_verify_sign)
+
+#! aur:
+#! 	This target will build the ABS/AUR source tarball (without signing the
+#! 	ABS/AUR source tarball).  The ABS/AUR source tarball will be named:
+#! 	@PACKAGE@.tar.gz
+#!
+aur: $(pkg_aur_file)
+
+$(pkgtop_signed_files): %.sig: %
+	@$(ECHO_V) "D: Making $@ in `pwd`"
+	$(am__gpg_verify_sign)
+
+#! aur-sign:
+#! 	This target will create detached signature for the ABS/AUR source
+#! 	tarball, provided that the file does not already have a valid signature.
+#! 	You will be prompted for a password if a signature is required.
+#! 	Automated or unattended builds can be acheived by using the `emake'
+#! 	expect script, included in `@abs_srcdir@/scripts/email'.
+#!
+aur-sign: $(pkg_sig_file)
+
 
 
 ## Because the build directory is in the autoconf top build directory on the local machine, it needs
@@ -248,25 +267,97 @@ DISTCLEANFILES		+= $(pkg_cache_files) \
 
 release-clean-pkg: distclean-pkg
 
-RELEASE_DIRECTORIES	+= $(pacdir) $(pacfulldir) $(pacmaindir) $(pacdebgdir) $(pacdevldir) $(packsrcsdir)
-RELEASE			+= all-pkgs
+## BUILD_PKGS
+endif
 
+## Repository organization:
+##
+## Standard archlinux repository organization is:
+##
+## 	archlinux/$repo/os/$arch
+##
+## 	Note that both '$arch' and 'any' packages are included in the same repository at the same
+## 	level.  '$repo' is something like 'core', 'extra', 'testing'...  Note that the database in
+## 	the directory must have the same root name as '$repo'.  Archlinux just uses 'os' where other
+## 	distros use a version number due to rolling release.
+##
+## OpenSS7 repository organization is as follows:
+##
+## 	https://www.openss7.org/repo/pkgs/arch/os/$arch/$repo
+##
+## 	Note that both '$arch' and 'any' packages are included in the same repository at the same
+## 	level.  '$repo' can be:
+##
+## 		openss7
+## 		openss7-debug
+## 		openss7-devel
+## 		openss7-source
+##
+## 	For extras, updates and testing we also have
+##
+## 		openss7-extras
+## 		openss7-extras-debug
+## 		openss7-extras-devel
+## 		openss7-extras-source
+##
+## 		openss7-updates
+## 		openss7-updates-debug
+## 		openss7-updates-devel
+## 		openss7-updates-source
+##
+## 		openss7-testing
+## 		openss7-testing-debug
+## 		openss7-testing-devel
+## 		openss7-testing-source
+##
+## 	This organization is complex to provide separate authenticated access to the various
+## 	repositories and components within the repositories.
+##
+## 	We have an openss7-mirrors file that resides in /etc/pacman.d that contains repository
+## 	definitions for inclusion from the opensss7.defs file as:
+##
+## 	Server = https://www.openss7.org/repo/pkgs/arch/os/$arch/$repo
+##
+## 	We have an openss7.defs file that resides in /etc/pacman.d that contains repository
+## 	definitions for inclusion into /etc/pacman.conf.  They look like:
+##
+## 	[openss7]
+## 	Include = /etc/pacman.d/openss7-mirrors
+##
+
+if BUILD_REPO_PACMAN
+## BUILD_REPO_PACMAN
+
+$(pacman_signs): %.sig : %
+	@$(ECHO_V) "Making $@ in `pwd`"
+	$(am__gpg_verify_sign)
+
+$(pacman_keys):
+	@$(ECHO_V) "Making $@ in `pwd`"
+	$(am__gpg_export_key)
 
 repo-pacman: $(RELEASE_DIRECTORIES) $(pacman_files)
 
-repo-sign-pacman: $(RELEASE_DIRECTORIES) $(pacman_signs) $(pacman_keys)
+repo-sign-pacman: $(RELEASE_DIRECTORIES) $(pacman_signs) $(pacman_keys) $(pacman_sigs)
 
 repo-clean-pacman:
+	@$(ECHO_V) "Making $@ in `pwd`"
+
+pacmandirs		= $(pacdir) $(pacbasedir) $(pacfulldir) $(pacmaindir) $(pacdebgdir) $(pacdevldir) $(packsrcsdir)
 
 REPO_DIRECTORIES	+= $(pacmandirs)
-#REPO_LINKS		+=
 REPO			+= repo-pacman
 REPO_SIGN		+= repo-sign-pacman
 REPO_CLEAN		+= repo-clean-pacman
 REPOCLEANFILES		+= $(pacman_files) $(pacman_signs) $(pacman_keys)
 
+RELEASE_DIRECTORIES	+= $(pacdir) $(pacfulldir) $(pacmaindir) $(pacdebgdir) $(pacdevldir) $(packsrcsdir)
+RELEASE			+= all-pkgs
+RELEASE_SIGN		+= 
+RELEASE_CLEAN_LOCAL	+= 
+RELEASECLEANFILES	+= 
+
 UPDATE_DIRECTORIES	+= $(pacmandirs)
-#UPDATE_LINKS		+=
 UPDATE			+= repo-pacman
 UPDATE_SIGN		+= repo-sign-pacman
 UPDATE_CLEAN_LOCAL	+= repo-clean-pacman
@@ -275,8 +366,10 @@ UPDATECLEANFILES	+=
 
 
 
-## BUILD_PKGS
+## BUILD_REPO_PACMAN
 endif
+
+
 
 ## MAINTAINER_MODE
 endif
