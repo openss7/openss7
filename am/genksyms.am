@@ -248,7 +248,7 @@ $(DEPDIR)/modversions.Ph: $(EXPORT_SRCFILES)
 	@$(ECHO_Q) "  GEN   " `basename $@` ; \
 	$(ECHO_V) "Creating $@ dependencies..." ; \
 	v=`echo "$(MODVERSIONS_H)" | sed s',/[^/]*$$,,'`/versions ; \
-	$(mkdir_p) $$v ; \
+	$(MKDIR_P) $$v ; \
 	( \
 		vers='' ; \
 		list='$(EXPORT_SRCFILES)'; \
@@ -314,7 +314,7 @@ $(MODVERSIONS_H): $(EXPORT_SRCFILES) $(EXPORT_VERFILES)
 	@$(ECHO_Q) "  GEN   " `basename $@` ; \
 	$(ECHO_V) "Creating $@ header file..." ; \
 	v=`echo "$(MODVERSIONS_H)" | sed 's,/[^/]*$$,,'`/versions ; \
-	$(mkdir_p) $$v ; \
+	$(MKDIR_P) $$v ; \
 	( \
 		echo "#ifndef _SYS_$(PACKAGE_UCNAME)_MODVERSIONS_H" ; \
 		echo "#define _SYS_$(PACKAGE_UCNAME)_MODVERSIONS_H" ; \
@@ -335,7 +335,7 @@ if am__fastdepCC
 ## am__fastdepCC
 $(EXPORT_VERFILES): $(EXPORT_SRCFILES) $(STRCONF_CONFIG)
 	@v=`echo "$(MODVERSIONS_H)" | sed 's,/[^/]*$$,,'`/versions ; \
-	$(mkdir_p) $$v ; \
+	$(MKDIR_P) $$v ; \
 	list="$(EXPORT_SRCFILES)"; for s in $$list ; do \
 		if test -f "$$s" ; then d=; else d="$(srcdir)/"; fi; \
 		r=`echo "$$s" | sed 's,^.*/,,;s,\.c$$,,'` ; \
@@ -350,7 +350,7 @@ if AMDEP
 ## AMDEP
 $(EXPORT_VERFILES): $(EXPORT_SRCFILES) $(STRCONF_CONFIG)
 	@v=`echo "$(MODVERSIONS_H)" | sed s',/[^/]*$$,,'`/versions ; \
-	$(mkdir_p) $$v ; \
+	$(MKDIR_P) $$v ; \
 	list="$(EXPORT_SRCFILES)"; for s in $$list ; do \
 		if test -f "$$s" ; then d=; else d="$(srcdir)/"; fi; \
 		r=`echo "$$s" | sed 's,^.*/,,;s,\.c$$,,'` ; \
@@ -365,7 +365,7 @@ else
 ## !AMDEP
 $(EXPORT_VERFILES): $(EXPORT_SRCFILES) $(STRCONF_CONFIG)
 	@v=`echo "$(MODVERSIONS_H)" | sed s',/[^/]*$$,,'`/versions ; \
-	$(mkdir_p) $$v ; \
+	$(MKDIR_P) $$v ; \
 	list="$(EXPORT_SRCFILES)"; for s in $$list ; do \
 		if test -f "$$s" ; then d=; else d="$(srcdir)/"; fi; \
 		r=`echo "$$s" | sed 's,^.*/,,;s,\.c$$,,'` ; \
@@ -385,7 +385,7 @@ else
 ## !KERNEL_VERSIONS
 
 $(MODVERSIONS_H):
-	$(AM_V_GEN)$(mkdir_p) $(PKGINCL) ; \
+	$(AM_V_GEN)$(MKDIR_P) $(PKGINCL) ; \
 	echo "#ifndef _SYS_$(PACKAGE_UCNAME)_MODVERSIONS_H"	>  $(MODVERSIONS_H) ; \
 	echo "#define _SYS_$(PACKAGE_UCNAME)_MODVERSIONS_H"	>> $(MODVERSIONS_H) ; \
 	echo "#endif /* _SYS_$(PACKAGE_UCNAME)_MODVERSIONS_H */"	>> $(MODVERSIONS_H)
@@ -439,9 +439,9 @@ maintainer-clean-ksyms:
 install-ksyms: $(BUILD_SPECIFIC_FILES)
 	@$(ECHO_V) "D: Making $@ in `pwd`"
 	@$(NORMAL_INSTALL)
-	test -z "$(pkgincludedir)" || $(mkdir_p) "$(DESTDIR)$(pkgincludedir)"
-	test -z "$(kversion)" || $(mkdir_p) "$(DESTDIR)$(pkgincludedir)/$(kversion)"
-	test -z "$(target_cpu)" || $(mkdir_p) "$(DESTDIR)$(pkgincludedir)/$(kversion)/$(target_cpu)"
+	test -z "$(pkgincludedir)" || $(MKDIR_P) "$(DESTDIR)$(pkgincludedir)"
+	test -z "$(kversion)" || $(MKDIR_P) "$(DESTDIR)$(pkgincludedir)/$(kversion)"
+	test -z "$(target_cpu)" || $(MKDIR_P) "$(DESTDIR)$(pkgincludedir)/$(kversion)/$(target_cpu)"
 	@pkgstrip=`echo "sys/$(PACKAGE_TARNAME)" | sed 's,.,.,g'`; \
 	dirstrip=`echo "$(PKGINCL)" | sed "s,^$$pkgstrip,,"`; \
 	incstrip=`echo "$$dirstrip" | sed 's,.,.,g'`; \

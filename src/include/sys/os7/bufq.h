@@ -85,7 +85,7 @@ typedef struct bufq {
 	size_t q_count;
 } bufq_t;
 
-static __inline__ void
+static __inline__ streamscall void
 bufq_init(bufq_t * q)
 {
 #ifdef SPIN_LOCK_UNLOCKED
@@ -108,7 +108,7 @@ bufq_lock(bufq_t * q)
 	spin_lock_irqsave(&q->q_lock, flags);
 	return (flags);
 }
-static __inline__ void
+static __inline__ streamscall void
 bufq_unlock(bufq_t * q, unsigned long flags)
 {
 	spin_unlock_irqrestore(&q->q_lock, flags);
@@ -187,7 +187,7 @@ __bufq_queue(bufq_t * q, mblk_t *mp)
 	__bufq_add(q, mp);
 }
 
-static __inline__ void
+static __inline__ streamscall void
 bufq_queue(bufq_t * q, mblk_t *mp)
 {
 	psw_t pl;
@@ -198,7 +198,7 @@ bufq_queue(bufq_t * q, mblk_t *mp)
 	bufq_unlock(q, pl);
 }
 
-static __inline__ void
+static __inline__ streamscall void
 bufq_queue_head(bufq_t * q, mblk_t *mp)
 {
 	psw_t pl;
@@ -215,7 +215,7 @@ bufq_queue_head(bufq_t * q, mblk_t *mp)
 	bufq_unlock(q, pl);
 }
 
-static __inline__ void
+static __inline__ streamscall void
 bufq_insert(bufq_t * q, mblk_t *mp, mblk_t *np)
 {
 	psw_t pl;
@@ -232,7 +232,7 @@ bufq_insert(bufq_t * q, mblk_t *mp, mblk_t *np)
 	bufq_unlock(q, pl);
 }
 
-static __inline__ void
+static __inline__ streamscall void
 bufq_append(bufq_t * q, mblk_t *mp, mblk_t *np)
 {
 	psw_t pl;
@@ -266,7 +266,7 @@ __bufq_dequeue(bufq_t * q)
 	return mp;
 }
 
-static __inline__ mblk_t *
+static __inline__ streamscall mblk_t *
 bufq_dequeue(bufq_t * q)
 {
 	mblk_t *mp;
@@ -296,7 +296,7 @@ __bufq_dequeue_tail(bufq_t * q)
 	return (mp);
 }
 
-static __inline__ mblk_t *
+static __inline__ streamscall mblk_t *
 bufq_dequeue_tail(bufq_t * q)
 {
 	mblk_t *mp;
@@ -335,7 +335,7 @@ __bufq_unlink(bufq_t * q, mblk_t *mp)
 	return mp;
 }
 
-static __inline__ mblk_t *
+static __inline__ streamscall mblk_t *
 bufq_unlink(bufq_t * q, mblk_t *mp)
 {
 	psw_t pl;
@@ -350,7 +350,7 @@ bufq_unlink(bufq_t * q, mblk_t *mp)
 /*
    splice bufq2 onto the head of bufq1 
  */
-static __inline__ void
+static __inline__ streamscall void
 bufq_splice_head(bufq_t * q1, bufq_t * q2)
 {
 	mblk_t *mp;
@@ -364,7 +364,7 @@ bufq_splice_head(bufq_t * q1, bufq_t * q2)
 /*
    splice bufq2 onto the tail of bufq1 
  */
-static __inline__ void
+static __inline__ streamscall void
 bufq_splice_tail(bufq_t * q1, bufq_t * q2)
 {
 	mblk_t *mp;
@@ -374,7 +374,7 @@ bufq_splice_tail(bufq_t * q1, bufq_t * q2)
 		bufq_queue(q1, mp);
 }
 
-static __inline__ void
+static __inline__ streamscall void
 bufq_freehead(bufq_t * q)
 {
 	psw_t pl;
@@ -385,7 +385,7 @@ bufq_freehead(bufq_t * q)
 	bufq_unlock(q, pl);
 }
 
-static __inline__ void
+static __inline__ streamscall void
 bufq_purge(bufq_t * q)
 {
 	psw_t pl;
@@ -409,7 +409,7 @@ __bufq_supply(bufq_t * q, mblk_t *mp)
 	}
 }
 
-static __inline__ void
+static __inline__ streamscall void
 bufq_supply(bufq_t * q, mblk_t *mp)
 {
 	psw_t pl;
@@ -419,7 +419,7 @@ bufq_supply(bufq_t * q, mblk_t *mp)
 	bufq_unlock(q, pl);
 }
 
-static __inline__ mblk_t *
+static __inline__ streamscall mblk_t *
 bufq_resupply(bufq_t * q, mblk_t *mp, int maxsize, int maxcount)
 {
 	psw_t pl;

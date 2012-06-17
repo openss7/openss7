@@ -4714,7 +4714,7 @@ sl_muxrput(queue_t *q, mblk_t *mp)
  * @sflag: STREAMS flag
  * @crp: credentials of opening process
  */
-static int
+static streamscall int
 sl_qopen(queue_t *q, dev_t *devp, int oflags, int sflag, cred_t *crp)
 {
 	minor_t cminor = getminor(*devp);
@@ -4741,7 +4741,7 @@ sl_qopen(queue_t *q, dev_t *devp, int oflags, int sflag, cred_t *crp)
  * @oflags: flags to open(2s) call
  * @crp: credentials of closing process
  */
-static int
+static streamscall int
 sl_qclose(queue_t *q, int oflags, cred_t *crp)
 {
 	unsigned long flags;

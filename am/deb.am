@@ -144,7 +144,7 @@ ARCH		= $(target_arch)
 $(debian_dir):: $(debian_dir_stamp)
 $(debian_dir_stamp): $(tardir)/$(PACKAGE)-$(VERSION).tar.bz2
 	rm -rf $(debbuilddir)/$(PACKAGE)-$(VERSION) $(debian_dir)
-	$(mkdir_p) $(debbuilddir)/$(PACKAGE)-$(VERSION)
+	$(MKDIR_P) $(debbuilddir)/$(PACKAGE)-$(VERSION)
 	$(BZIP2_CMD) -dc $< | tar xf - -C $(debbuilddir)
 	@if test "$(debbuilddir)/$(PACKAGE)-$(VERSION)" != "$(debian_dir)"; then \
 		$(ECHO) "$(am__mv) -- $(debbuilddir)/$(PACKAGE)-$(VERSION) $(debian_dir)"; \

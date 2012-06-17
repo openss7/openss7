@@ -184,7 +184,7 @@ merror(queue_t *q, mblk_t *mp, int error)
 	mp->b_rptr[0] = mp->b_rptr[1] = error;
 	qreply(q, mp);
 }
-static __inline__ void
+static __inline__ streamscall void
 mioc2ack(mblk_t *mp, mblk_t *db, size_t count, int rval)
 {
 	union ioctypes *iocp;
@@ -225,7 +225,7 @@ miocnak(queue_t *q, mblk_t *mp, int count, int error)
 	iocp->iocblk.ioc_error = error;
 	qreply(q, mp);
 }
-static __inline__ mblk_t *
+static __inline__ streamscall mblk_t *
 mexchange(queue_t *q, mblk_t *mp, size_t size, int type, uint32_t primtype)
 {
 	if (unlikely(mp == NULL ||
@@ -292,7 +292,7 @@ msgsize(mblk_t *mp)
 	return s;
 }
 #endif
-static __inline__ void
+static __inline__ streamscall void
 mcopymsg(mblk_t *mp, unsigned char *buf)
 {
 	mblk_t *bp;
@@ -309,7 +309,7 @@ mcopymsg(mblk_t *mp, unsigned char *buf)
 	freemsg(mp);
 	return;
 }
-static __inline__ void
+static __inline__ streamscall void
 mcopyin(mblk_t *mp, void *priv, size_t size, void *uaddr)
 {
 	union ioctypes *iocp = (typeof(iocp)) mp->b_rptr;
@@ -326,7 +326,7 @@ mcopyin(mblk_t *mp, void *priv, size_t size, void *uaddr)
 	iocp->copyreq.cq_flag = 0;
 	mp->b_wptr = mp->b_rptr + sizeof(iocp->copyreq);
 }
-static __inline__ void
+static __inline__ streamscall void
 mcopyout(mblk_t *mp, void *priv, size_t size, void *uaddr, mblk_t *dp)
 {
 	union ioctypes *iocp = (typeof(iocp)) mp->b_rptr;

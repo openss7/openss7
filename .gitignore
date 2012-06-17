@@ -612,6 +612,7 @@ po/insert-header.sin
 po/openss7.pot
 po/quot.sed
 po/remove-potcdate.sin
+scripts/ar-lib
 scripts/compile
 scripts/config.guess
 scripts/config.rpath

@@ -169,7 +169,7 @@ __SVR4_EXTERN int itoemajor(major_t imajor, int prevemaj);
 #ifdef LOCK_ALLOC
 #undef LOCK_ALLOC
 #endif
-static __inline__ lock_t *
+static __inline__ streamscall lock_t *
 LOCK_ALLOC(unsigned char hierarchy, pl_t min_pl, lkinfo_t * lkinfop, int flag)
 {
 	lock_t *lockp;
@@ -206,7 +206,7 @@ LOCK_OWNED(lock_t * lockp)
 #ifdef TRYLOCK
 #undef TRYLOCK
 #endif
-static __inline__ pl_t
+static __inline__ streamscall pl_t
 TRYLOCK(lock_t * lockp, pl_t pl)
 {
 	pl_t old_pl = spl(pl);
@@ -220,7 +220,7 @@ TRYLOCK(lock_t * lockp, pl_t pl)
 #ifdef UNLOCK
 #undef UNLOCK
 #endif
-static __inline__ void
+static __inline__ streamscall void
 UNLOCK(lock_t * lockp, pl_t pl)
 {
 	spin_unlock(lockp);
@@ -230,7 +230,7 @@ UNLOCK(lock_t * lockp, pl_t pl)
 #ifdef LOCK
 #undef LOCK
 #endif
-static __inline__ pl_t
+static __inline__ streamscall pl_t
 LOCK(lock_t * lockp, pl_t pl)
 {
 	pl_t old_pl = spl(pl);
@@ -283,7 +283,7 @@ RW_WRLOCK(rwlock_t *lockp, pl_t pl)
 
 typedef struct semaphore sleep_t;
 
-static __inline__ sleep_t *
+static __inline__ streamscall sleep_t *
 SLEEP_ALLOC(int arg, lkinfo_t * lkinfop, int flag)
 {
 	sleep_t *lockp;
@@ -302,7 +302,7 @@ SLEEP_DEALLOC(sleep_t * lockp)
 {
 	kmem_free(lockp, sizeof(*lockp));
 }
-static __inline__ int
+static __inline__ streamscall int
 SLEEP_LOCKAVAIL(sleep_t * lockp)
 {
 	if (!down_trylock(lockp)) {
@@ -311,7 +311,7 @@ SLEEP_LOCKAVAIL(sleep_t * lockp)
 	}
 	return (0);
 }
-static __inline__ void
+static __inline__ streamscall void
 SLEEP_LOCK(sleep_t * lockp, int priority)
 {
 	down(lockp);
@@ -321,23 +321,23 @@ SLEEP_LOCKOWNED(sleep_t * lockp)
 {
 	return (1);
 }
-static __inline__ int
+static __inline__ streamscall int
 SLEEP_LOCK_SIG(sleep_t * lockp, int priority)
 {
 	return down_interruptible(lockp);
 }
-static __inline__ int
+static __inline__ streamscall int
 SLEEP_TRYLOCK(sleep_t * lockp)
 {
 	return (down_trylock(lockp) == 0);
 }
-static __inline__ void
+static __inline__ streamscall void
 SLEEP_UNLOCK(sleep_t * lockp)
 {
 	up(lockp);
 }
 
-static __inline__ sv_t *
+static __inline__ streamscall sv_t *
 SV_ALLOC(int flag)
 {
 	sv_t *svp;

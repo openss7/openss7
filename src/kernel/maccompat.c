@@ -165,21 +165,21 @@ MODULE_VERSION(PACKAGE_ENVR);
  *  -------------------------------------------------------------------------
  *  implemented in the mpscompat module, just a declaration here
  */
-extern void mi_copyin(queue_t *q, mblk_t *mp, caddr_t uaddr, size_t len);
+__MAC_EXTERN void mi_copyin(queue_t *q, mblk_t *mp, caddr_t uaddr, size_t len);
 
 /*
  *  MI_COPYOUT
  *  -------------------------------------------------------------------------
  *  implemented in the mpscompat module, just a declaration here
  */
-extern void mi_copyout(queue_t *q, mblk_t *mp);
+__MAC_EXTERN void mi_copyout(queue_t *q, mblk_t *mp);
 
 /*
  *  MI_COPYOUT_ALLOC
  *  -------------------------------------------------------------------------
  *  implemented in the mpscompat module, just a declaration here
  */
-extern mblk_t *mi_copyout_alloc(queue_t *q, mblk_t *mp, caddr_t uaddr, size_t len,
+__MAC_EXTERN mblk_t *mi_copyout_alloc(queue_t *q, mblk_t *mp, caddr_t uaddr, size_t len,
 				int free_on_error);
 /*
  *  MI_COPY_SET_RVAL

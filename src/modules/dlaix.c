@@ -2458,7 +2458,7 @@ cd_rput(queue_t *q, mblk_t *mp)
 
 caddr_t dl_opens = NULL;
 
-static int
+static streamscall int
 dl_qopen(queue_t *q, dev_t *devp, int oflags, int sflag, cred_t *crp)
 {
 	struct priv *p;
@@ -2539,7 +2539,7 @@ dl_qopen(queue_t *q, dev_t *devp, int oflags, int sflag, cred_t *crp)
 	return (0);
 }
 
-static int
+static streamscall int
 dl_qclose(queue_t *q, int oflags, cred_t *crp)
 {
 	struct priv *p = PRIV(q);

@@ -114,6 +114,7 @@ dnl Checks for programs.
 dnl
 AM_PROG_AS
 AM_PROG_AR
+AC_PROG_RANLIB
 AC_PROG_AWK
 AC_PROG_CXX([g++3 g++])
 AC_PROG_CC
@@ -226,7 +227,7 @@ AC_FUNC_STRFTIME
 AC_FUNC_STRNLEN
 AC_FUNC_STRTOD
 AC_FUNC_VPRINTF
-AC_CHECK_FUNCS([__argz_count __argz_next __argz_stringify alarm atexit bzero clock_gettime getcwd gethostbyaddr gethostbyname gethostname gethrtime gettimeofday inet_ntoa localeconv localtime_r mempcpy memset munmap nl_langinfo pow pstat_getdynamic select setlocale socket sqrt stpcpy strcasecmp strchr strcspn strdup strerror strncasecmp strpbrk strrchr strspn strstr strtol strtoul uname])
+AC_CHECK_FUNCS([__argz_count __argz_next __argz_stringify alarm atexit bzero clock_gettime getcwd gethostbyaddr gethostbyname gethostname gethrtime gettimeofday inet_ntoa localeconv localtime_r mempcpy memset memmove munmap nl_langinfo pow pstat_getdynamic select setlocale socket sqrt stpcpy strcasecmp strchr strcspn strdup strndup strerror strncasecmp strpbrk strrchr strspn strstr strtol strtoul uname])
 
 
 

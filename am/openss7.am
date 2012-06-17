@@ -939,7 +939,7 @@ MY_REVERSIVE_TARGETS	+= remove-reversive
 MY_PHONY		+= remove remove-ma
 
 $(REPO_DIRECTORIES)::
-	$(AM_V_GEN)test -d $@ || { $(ECHO_V) " $(mkdir_p) $@"; $(mkdir_p) $@; }
+	$(AM_V_GEN)test -d $@ || { $(ECHO_V) " $(MKDIR_P) $@"; $(MKDIR_P) $@; }
 
 #! Repository targets:
 #! -------------------
@@ -1026,7 +1026,7 @@ MY_PHONY		+= repo-uninstall $(REPO_UNINSTALL)
 FORCED_TARGETS		+= forced-repo-uninstall
 
 $(RELEASE_DIRECTORIES)::
-	$(AM_V_GEN)test -d $@ || { $(ECHO_V) " $(mkdir_p) $@"; $(mkdir_p) $@; }
+	$(AM_V_GEN)test -d $@ || { $(ECHO_V) " $(MKDIR_P) $@"; $(MKDIR_P) $@; }
 
 #!
 #! Release Targets:
@@ -1139,7 +1139,7 @@ MY_PHONY		+= release-uninstall $(RELEASE_UNINSTALL)
 FORCED_TARGETS		+= forced-release-uninstall
 
 $(UPDATE_DIRECTORIES)::
-	$(AM_V_GEN)test -d $@ || { $(ECHO_V) " $(mkdir_p) $@"; $(mkdir_p) $@; }
+	$(AM_V_GEN)test -d $@ || { $(ECHO_V) " $(MKDIR_P) $@"; $(MKDIR_P) $@; }
 
 #! Update Targets:
 #! ---------------

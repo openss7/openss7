@@ -92,7 +92,7 @@
 
 #if defined(CONFIG_STREAMS_COMPAT_SUN) || defined(CONFIG_STREAMS_COMPAT_SUN_MODULE)
 
-static __inline__ cred_t *
+static __inline__ streamscall cred_t *
 ddi_get_cred(void)
 {
 	return (current_creds);
@@ -102,7 +102,7 @@ ddi_get_lbolt(void)
 {
 	return (jiffies);
 }
-static __inline__ pid_t
+static __inline__ streamscall pid_t
 ddi_get_pid(void)
 {
 	return (current->pid);

@@ -25725,7 +25725,7 @@ mtp_r_hangup(queue_t *q, mblk_t *mp)
  *
  *  =========================================================================
  */
-STATIC INLINE int
+STATIC INLINE streamscall int
 isup_r_prim(queue_t *q, mblk_t *mp)
 {
 	switch (mp->b_datap->db_type) {
@@ -25734,7 +25734,7 @@ isup_r_prim(queue_t *q, mblk_t *mp)
 	}
 	return (QR_PASSFLOW);
 }
-STATIC INLINE int
+STATIC INLINE streamscall int
 isup_w_prim(queue_t *q, mblk_t *mp)
 {
 	/* 
@@ -25755,7 +25755,7 @@ isup_w_prim(queue_t *q, mblk_t *mp)
 	seldom();
 	return (QR_PASSFLOW);
 }
-STATIC INLINE int
+STATIC INLINE streamscall int
 mtp_r_prim(queue_t *q, mblk_t *mp)
 {
 	/* 
@@ -25778,7 +25778,7 @@ mtp_r_prim(queue_t *q, mblk_t *mp)
 	seldom();
 	return (QR_PASSFLOW);
 }
-STATIC INLINE int
+STATIC INLINE streamscall int
 mtp_w_prim(queue_t *q, mblk_t *mp)
 {
 	switch (mp->b_datap->db_type) {
