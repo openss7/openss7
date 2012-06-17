@@ -181,7 +181,7 @@ AC_LINK_IFELSE([AC_LANG_CALL([$6], [$2])],
  eval "ac_search_path=\"
     ${syslibdir}
     ${libdir}\""
- ac_search_path=`echo "$ac_search_path" | sed -e 's,\<NONE\>,'$ac_default_prefix',g;s,//,/,g' | awk '{if(!([$]0 in seen)){print[$]0;seen[[$ 0]]=1}}'`
+ ac_search_path=`echo "$ac_search_path" | sed -e "s,\<NONE\>,$ac_default_prefix,g;s,//,/,g" | awk '{if(!([$]0 in seen)){print[$]0;seen[[$ 0]]=1}}'`
  for ac_dir in $ac_search_path ; do
      for ac_lib in $ac_dir/lib$1.so.* ; do
 	 if test -r $ac_lib ; then
@@ -242,7 +242,7 @@ AC_LINK_IFELSE([AC_LANG_CALL([$6], [$2])],
  eval "ac_search_path=\"
     ${syslib32dir}
     ${lib32dir}\""
- ac_search_path=`echo "$ac_search_path" | sed -e 's,\<NONE\>,'$ac_default_prefix',g;s,//,/,g' | awk '{if(!([$]0 in seen)){print[$]0;seen[[$ 0]]=1}}'`
+ ac_search_path=`echo "$ac_search_path" | sed -e "s,\<NONE\>,$ac_default_prefix,g;s,//,/,g" | awk '{if(!([$]0 in seen)){print[$]0;seen[[$ 0]]=1}}'`
  for ac_dir in $ac_search_path ; do
      for ac_lib in $ac_dir/lib$1.so.* ; do
 	 if test -r $ac_lib ; then

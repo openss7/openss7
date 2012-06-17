@@ -508,7 +508,7 @@ dnl AC_MSG_WARN([checking for cpu in $[1]])
 	# distinguish slackware from salix
 	if test "$dist_cv_host_flavor" = slackware; then
 	    eval "dist_path=\"${localstatedir}/log/packages\""
-	    dist_path=$(echo "$dist_path" | sed 's|\<NONE\>||g;s|//|/|g')
+	    dist_path=$(echo "$dist_path" | sed "s,\<NONE\>,$ac_default_prefix,g;s,//,/,g")
 	    if test "`find $dist_path -name 'salix*' 2>/dev/null | head -1`" != ""; then
 		dist_cv_host_flavor='salix'
 	    fi
@@ -810,21 +810,53 @@ AC_DEFUN([_DISTRO_ADJUST_64BIT_LIBDIR], [dnl
 	(*64)
 	    _BLD_FIND_DIR([for 32-bit and 64-bit lib name], [dist_cv_libdirs], [
 		    ${libdir}32
-		    ${rootdir}/usr/lib32], [], [], [dnl
-		lib64dir=`echo $libdir | sed -r -e 's|\<lib\>|lib64|g'`
-		lib32dir=`echo $libdir | sed -r -e 's|\<lib64\>|lib|g'`],[dnl
-		lib64dir=`echo $libdir | sed -r -e 's|\<lib64\>|lib|g'`
-		lib32dir=`echo $libdir | sed -r -e 's|\<lib\>|lib32|g'`])
+		    ${rootdir}/usr/lib32], [], [], [:])
+	    AC_CACHE_CHECK([for 32-bit lib name], [dist_cv_lib32dir_eval], [dnl
+		if test -z "$dist_cv_libdirs" ; then
+		    dist_cv_lib32dir=`echo "$libdir" | sed -r -e 's|\<lib64\>|lib|g'`
+		else
+		    dist_cv_lib32dir=`echo "$libdir" | sed -r -e 's|\<lib\>|lib32|g'`
+		fi
+		eval "dist_cv_lib32dir_eval=\"$dist_cv_lib32dir\""
+		dist_cv_lib32dir_eval=`echo "$dist_cv_lib32dir_eval" | sed -e "s,\<NONE\>,$ac_default_prefix,g;s,//,/,g"`
+	    ])
+	    lib32dir="$dist_cv_lib32dir"
+	    AC_CACHE_CHECK([for 64-bit lib name], [dist_cv_lib64dir_eval], [dnl
+		if test -z "$dist_cv_libdirs" ; then
+		    dist_cv_lib64dir=`echo "$libdir" | sed -r -e 's|\<lib\>|lib64|g'`
+		else
+		    dist_cv_lib64dir=`echo "$libdir" | sed -r -e 's|\<lib64\>|lib|g'`
+		fi
+		eval "dist_cv_lib64dir_eval=\"$dist_cv_lib64dir\""
+		dist_cv_lib64dir_eval=`echo "$dist_cv_lib64dir_eval" | sed -e "s,\<NONE\>,$ac_default_prefix,g;s,//,/,g"`
+	    ])
+	    lib64dir="$dist_cv_lib64dir"
 	    libdir="$lib64dir"
 	    pkglib32dir='${lib32dir}/${PACKAGE}'
 	    pkglibexec32dir='${pkglibexecdir}/lib32'
 	    _BLD_FIND_DIR([for 32-bit and 64-bit syslib name], [dist_cv_syslibdirs], [
 		    ${syslibdir}32
-		    ${rootdir}/lib32], [], [], [dnl
-		syslib64dir=`echo $syslibdir | sed -r -e 's|\<lib\>|lib64|g'`
-		syslib32dir=`echo $syslibdir | sed -r -e 's|\<lib64\>|lib|g'`],[dnl
-		syslib64dir=`echo $syslibdir | sed -r -e 's|\<lib64\>|lib|g'`
-		syslib32dir=`echo $syslibdir | sed -r -e 's|\<lib\>|lib32|g'`])
+		    ${rootdir}/lib32], [], [], [:])
+	    AC_CACHE_CHECK([for 32-bit syslib name],[dist_cv_syslib32dir_eval], [dnl
+		if test -z "$dist_cv_syslibdirs" ; then
+		    dist_cv_syslib32dir=`echo "$syslibdir" | sed -r -e 's|\<lib64\>|lib|g'`
+		else
+		    dist_cv_syslib32dir=`echo "$syslibdir" | sed -r -e 's|\<lib\>|lib32|g'`
+		fi
+		eval "dist_cv_syslib32dir_eval=\"$dist_cv_syslib32dir\""
+		dist_cv_syslib32dir_eval=`echo "$dist_cv_syslib32dir_eval" | sed -e "s,\<NONE\>,$ac_default_prefix,g;s,//,/,g"`
+	    ])
+	    syslib32dir="$dist_cv_syslib32dir"
+	    AC_CACHE_CHECK([for 64-bit syslib name],[dist_cv_syslib64dir_eval], [dnl
+		if test -z "$dist_cv_syslibdirs" ; then
+		    dist_cv_syslib64dir=`echo "$syslibdir" | sed -r -e 's|\<lib\>|lib64|g'`
+		else
+		    dist_cv_syslib64dir=`echo "$syslibdir" | sed -r -e 's|\<lib64\>|lib|g'`
+		fi
+		eval "dist_cv_syslib64dir_eval=\"$dist_cv_syslib64dir\""
+		dist_cv_syslib64dir_eval=`echo "$dist_cv_syslib64dir_eval" | sed -e "s,\<NONE\>,$ac_default_prefix,g;s,//,/,g"`
+	    ])
+	    syslib64dir="$dist_cv_syslib64dir"
 	    syslibdir="$syslib64dir"
 	    have_32bit_libs=yes
 	    ;;

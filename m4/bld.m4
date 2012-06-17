@@ -638,7 +638,7 @@ AC_DEFUN([_BLD_INSTALL_ERROR], [dnl
 # -----------------------------------------------------------------------------
 AC_DEFUN([_BLD_FIND_DIR], [dnl
     AC_REQUIRE([_BLD_PATH_CHECK])dnl
-    AC_CACHE_CHECK([for $1], [$2]_eval, [dnl
+    AC_CACHE_CHECK([$1], [$2]_eval, [dnl
 	m4_if([$8], [], [],
 [	case "${$8:-search}" in
 	    (no) $2=no ;;
@@ -649,7 +649,7 @@ AC_DEFUN([_BLD_FIND_DIR], [dnl
 	esac])
 	if test -z "${$2}" ; then
 	    eval "bld_search_path=\"$3\""
-	    bld_search_path=`echo "$bld_search_path" | sed -e 's,\<NONE\>,'$ac_default_prefix',g;s,//,/,g' | awk '{if(!([$]0 in seen)){print[$]0;seen[[$ 0]]=1}}'`
+	    bld_search_path=`echo "$bld_search_path" | sed -e "s,\<NONE\>,$ac_default_prefix,g;s,//,/,g" | awk '{if(!([$]0 in seen)){print[$]0;seen[[$ 0]]=1}}'`
 	    AC_MSG_RESULT([searching])
 	    for bld_dir in $bld_search_path ; do
 		AC_MSG_CHECKING([for $1... $bld_dir])
@@ -709,7 +709,7 @@ AC_DEFUN([_BLD_FIND_DIR], [dnl
 # -----------------------------------------------------------------------------
 AC_DEFUN([_BLD_FIND_FILE], [dnl
     AC_REQUIRE([_BLD_FILE_CHECK])dnl
-    AC_CACHE_CHECK([for $1], [$2]_eval, [dnl
+    AC_CACHE_CHECK([$1], [$2]_eval, [dnl
 	m4_if([$7], [], [],
 [	case "${$7:-search}" in
 	    (no) $2=no ;;
@@ -718,7 +718,7 @@ AC_DEFUN([_BLD_FIND_FILE], [dnl
 	esac])
 	if test -z "${$2}" ; then
 	    eval "bld_search_path=\"$3\""
-	    bld_search_path=`echo "$bld_search_path" | sed -e 's,\<NONE\>,'$ac_default_prefix',g;s,//,/,g' | awk '{if(!([$]0 in seen)){print[$]0;seen[[$ 0]]=1}}'`
+	    bld_search_path=`echo "$bld_search_path" | sed -e "s,\<NONE\>,$ac_default_prefix,g;s,//,/,g" | awk '{if(!([$]0 in seen)){print[$]0;seen[[$ 0]]=1}}'`
 	    AC_MSG_RESULT([searching])
 	    for bld_file in $bld_search_path ; do
 		AC_MSG_CHECKING([for $1... $bld_file])

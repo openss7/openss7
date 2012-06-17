@@ -96,7 +96,7 @@ dnl
 	with_initial_init_script=no
 	if test :"$init_cv_inittab" != :no ; then
 	    init_tmp="$(< $init_cv_inittab | grep -c1 '^si::sysinit:' | sed -e 's|^si::sysinit:||;s|[[[:space:]]].*||')"
-	    init_tmp=`echo "${rootdir}$init_tmp" | sed -e 's|\<NONE\>||g;s|//|/|g' | awk '{if(!([$]0 in seen)){print[$]0;seen[[$ 0]]=1}}'`
+	    init_tmp=`echo "${rootdir}$init_tmp" | sed -e "s,\<NONE\>,$ac_default_prefix,g;s,//,/,g" | awk '{if(!([$]0 in seen)){print[$]0;seen[[$ 0]]=1}}'`
 	    if test -f "$init_tmp" ; then
 		with_initial_init_script="$init_tmp"
 	    fi

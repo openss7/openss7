@@ -34,7 +34,12 @@ url='http://www.openss7.org/'
 license=('AGPL3' 'GPL3' 'BSD')
 groups=('openss7')
 depends=()
-makedepends=()
+makedepends=(
+	'linux-api-headers' "${kpkg:-linux}=$_kvr"
+	"${kpkg:-linux}-headers=$_kvr" 'bzip2' 'coreutils' 'gcc-gcj'
+	'ghostscript' 'glibc' 'gnupg' 'gnuplot' 'groff' 'gzip' 'imagemagick'
+	'kmod' 'latex2html' 'lsof' 'man-db' 'net-snmp' 'pacman' 'perl' 'tcl'
+	'texlive-bin' 'texlive-core' 'transfig' 'zip')
 checkdepends=()
 optdepends=()
 provides=()
@@ -134,9 +139,18 @@ package() {
 	( cd $srcdir/_install; find . | sort ) |tee installed.list >unused.list
 }
 
+package_@PACKAGE@-repo() {
+	pkgdesc='OpenSS7 Fast-STREAMS and Protocol Suites (Repository)'
+	groups=('@PACKAGE@')
+	backup=('etc/pacman.conf')
+	install=@PACKAGE@-repo.install
+	package
+}
+
 package_@PACKAGE@() {
 	pkgdesc='OpenSS7 Fast-STREAMS and Protocol Suites'
 	groups=('@PACKAGE@')
+	depends=('@PACKAGE@-repo=@VERSION@-@PACKAGE_PACRELEASE@')
 	optdepends=(
 		'net-snmp: for SNMP agent support'
 		'perl-tk: for graphical utilities'
@@ -169,18 +183,12 @@ package_@PACKAGE@() {
 	mv -f -- unused.tmp unused.list
 }
 
-package_@PACKAGE@-repo() {
-	pkgdesc='OpenSS7 Fast-STREAMS and Protocol Suites (Repository)'
-	groups=('@PACKAGE@')
-	backup=('etc/pacman.conf')
-	install=@PACKAGE@-repo.install
-	package
-}
-
 package_@PACKAGE@-devel() {
 	pkgdesc='OpenSS7 Fast-STREAMS and Protocol Suites (Development)'
 	groups=('@PACKAGE@-devel')
-	depends=('@PACKAGE@=@VERSION@-@PACKAGE_PACRELEASE@')
+	depends=(
+		'@PACKAGE@=@VERSION@-@PACKAGE_PACRELEASE@'
+		'linux-api-headers')
 	install=@PACKAGE@-devel.install
 	package
 	cd $srcdir/_install
@@ -235,7 +243,6 @@ EOF
 	cp -av usr/lib/openss7 $pkgdir/usr/lib
 	mkdir -p $pkgdir/usr/share
 	cp -av usr/share/info $pkgdir/usr/share
-	cp -av usr/share/javadoc $pkgdir/usr/share
 	mkdir -p $pkgdir/usr/share/man
 	cp -av usr/share/man/man{2,3,7} $pkgdir/usr/share/man
 	cd $startdir
@@ -286,7 +293,7 @@ package_@PACKAGE@-@kversion@-devel() {
 	depends=(
 		'@PACKAGE@-devel=@VERSION@-@PACKAGE_PACRELEASE@'
 		"@PACKAGE@-@kversion@=@VERSION@.$_kv-@PACKAGE_PACRELEASE@.$_kr"
-		"${kpkg:-linux}=$_kvr")
+		"${kpkg:-linux}-headers=$_kvr")
 	install=@PACKAGE@-kernel-devel.install
 	package
 	cd $srcdir/_install
@@ -347,9 +354,10 @@ package_@PACKAGE@-java() {
 	cd $srcdir/_install
 	mkdir -p $pkgdir/usr/lib
 	mkdir -p $pkgdir/usr/share
-	cp -av usr/lib/java   $pkgdir/usr/lib
-	cp -av usr/lib/gcj    $pkgdir/usr/lib
+	cp -av usr/lib/java $pkgdir/usr/lib
+	cp -av usr/lib/gcj $pkgdir/usr/lib
 	cp -av usr/share/java $pkgdir/usr/share
+	cp -av usr/share/javadoc $pkgdir/usr/share
 	cd $startdir
 	( cd $pkgdir; find . | sort ) >@PACKAGE@-java.list
 	join -v 1 unused.list @PACKAGE@-java.list >unused.tmp
