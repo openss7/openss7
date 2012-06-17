@@ -1384,8 +1384,8 @@ _post_remove_lib_snmpconf () {
 	ln -L @sysconfdir@/snmpd.conf @sysconfdir@/snmp/snmpd.conf
 	touch @sysconfdir@/snmpd.local.conf
     fi
-    if [ ! -e @sysconfdir@/snmsysconfdir@/snmpl.conf -a -e @sysconfdir@/snmpd.local.conf ]; then
-	ln -L @sysconfdir@/snmpd.local.conf @sysconfdir@/snmp/snmpd.conf
+    if [ ! -e @sysconfdir@/snmp/snmpd.local.conf -a -e @sysconfdir@/snmpd.local.conf ]; then
+	ln -L @sysconfdir@/snmpd.local.conf @sysconfdir@/snmp/snmpd.local.conf
     fi
     if [ -s $snmp_fil ]; then
 	if grep '^# Generated from snmp.d' $snmp_fil >/dev/null 2>&1; then

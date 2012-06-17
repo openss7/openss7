@@ -339,151 +339,145 @@ AC_DEFUN([_OPENSS7_OUTPUT], [dnl
     eval "PACKAGE_BINDIR=\"${bindir}\""
     eval "PACKAGE_BINDIR=\"${PACKAGE_BINDIR}\""
     eval "PACKAGE_BINDIR=\"${PACKAGE_BINDIR}\""
-    PACKAGE_BINDIR=`echo "$PACKAGE_BINDIR" | sed -e 's,\<NONE\>,,g;s,//,/,g'`
+    PACKAGE_BINDIR=`echo "$PACKAGE_BINDIR" | sed -e "s,\<NONE\>,$ac_default_prefix,g;s,//,/,g"`
     AC_DEFINE_UNQUOTED([PACKAGE_BINDIR], ["${PACKAGE_BINDIR}"], [Define to
 	the location of the bindir.])
     eval "PACKAGE_SBINDIR=\"${sbindir}\""
     eval "PACKAGE_SBINDIR=\"${PACKAGE_SBINDIR}\""
     eval "PACKAGE_SBINDIR=\"${PACKAGE_SBINDIR}\""
-    PACKAGE_SBINDIR=`echo "$PACKAGE_SBINDIR" | sed -e 's,\<NONE\>,,g;s,//,/,g'`
+    PACKAGE_SBINDIR=`echo "$PACKAGE_SBINDIR" | sed -e "s,\<NONE\>,$ac_default_prefix,g;s,//,/,g"`
     AC_DEFINE_UNQUOTED([PACKAGE_SBINDIR], ["${PACKAGE_SBINDIR}"], [Define to
 	the location of the sbindir.])
     eval "PACKAGE_LIBEXECDIR=\"${libexecdir}\""
     eval "PACKAGE_LIBEXECDIR=\"${PACKAGE_LIBEXECDIR}\""
     eval "PACKAGE_LIBEXECDIR=\"${PACKAGE_LIBEXECDIR}\""
-    PACKAGE_LIBEXECDIR=`echo "$PACKAGE_LIBEXECDIR" | sed -e 's,\<NONE\>,,g;s,//,/,g'`
+    PACKAGE_LIBEXECDIR=`echo "$PACKAGE_LIBEXECDIR" | sed -e "s,\<NONE\>,$ac_default_prefix,g;s,//,/,g"`
     AC_DEFINE_UNQUOTED([PACKAGE_LIBEXECDIR], ["${PACKAGE_LIBEXECDIR}"], [Define to
 	the location of the libexecdir.])
-    eval "PACKAGE_LIBEXEC32DIR=\"${libexec32dir}\""
-    eval "PACKAGE_LIBEXEC32DIR=\"${PACKAGE_LIBEXEC32DIR}\""
-    eval "PACKAGE_LIBEXEC32DIR=\"${PACKAGE_LIBEXEC32DIR}\""
-    PACKAGE_LIBEXEC32DIR=`echo "$PACKAGE_LIBEXEC32DIR" | sed -e 's,\<NONE\>,,g;s,//,/,g'`
-    AC_DEFINE_UNQUOTED([PACKAGE_LIBEXEC32DIR], ["${PACKAGE_LIBEXEC32DIR}"], [Define to
-	the location of the libexec32dir.])
     eval "PACKAGE_DATAROOTDIR=\"${datarootdir}\""
     eval "PACKAGE_DATAROOTDIR=\"${PACKAGE_DATAROOTDIR}\""
     eval "PACKAGE_DATAROOTDIR=\"${PACKAGE_DATAROOTDIR}\""
-    PACKAGE_DATAROOTDIR=`echo "$PACKAGE_DATAROOTDIR" | sed -e 's,\<NONE\>,,g;s,//,/,g'`
+    PACKAGE_DATAROOTDIR=`echo "$PACKAGE_DATAROOTDIR" | sed -e "s,\<NONE\>,$ac_default_prefix,g;s,//,/,g"`
     AC_DEFINE_UNQUOTED([PACKAGE_DATAROOTDIR], ["${PACKAGE_DATAROOTDIR}"], [Define to
 	the location of the datarootdir.])
     eval "PACKAGE_DATADIR=\"${datadir}\""
     eval "PACKAGE_DATADIR=\"${PACKAGE_DATADIR}\""
     eval "PACKAGE_DATADIR=\"${PACKAGE_DATADIR}\""
-    PACKAGE_DATADIR=`echo "$PACKAGE_DATADIR" | sed -e 's,\<NONE\>,,g;s,//,/,g'`
+    PACKAGE_DATADIR=`echo "$PACKAGE_DATADIR" | sed -e "s,\<NONE\>,$ac_default_prefix,g;s,//,/,g"`
     AC_DEFINE_UNQUOTED([PACKAGE_DATADIR], ["${PACKAGE_DATADIR}"], [Define to
 	the location of the datadir.])
     eval "PACKAGE_SYSCONFDIR=\"${sysconfdir}\""
     eval "PACKAGE_SYSCONFDIR=\"${PACKAGE_SYSCONFDIR}\""
     eval "PACKAGE_SYSCONFDIR=\"${PACKAGE_SYSCONFDIR}\""
-    PACKAGE_SYSCONFDIR=`echo "$PACKAGE_SYSCONFDIR" | sed -e 's,\<NONE\>,,g;s,//,/,g'`
+    PACKAGE_SYSCONFDIR=`echo "$PACKAGE_SYSCONFDIR" | sed -e "s,\<NONE\>,$ac_default_prefix,g;s,//,/,g"`
     AC_DEFINE_UNQUOTED([PACKAGE_SYSCONFDIR], ["${PACKAGE_SYSCONFDIR}"], [Define to
 	the location of the sysconfdir.])
     eval "PACKAGE_SHAREDSTATEDIR=\"${sharedstatedir}\""
     eval "PACKAGE_SHAREDSTATEDIR=\"${PACKAGE_SHAREDSTATEDIR}\""
     eval "PACKAGE_SHAREDSTATEDIR=\"${PACKAGE_SHAREDSTATEDIR}\""
-    PACKAGE_SHAREDSTATEDIR=`echo "$PACKAGE_SHAREDSTATEDIR" | sed -e 's,\<NONE\>,,g;s,//,/,g'`
+    PACKAGE_SHAREDSTATEDIR=`echo "$PACKAGE_SHAREDSTATEDIR" | sed -e "s,\<NONE\>,$ac_default_prefix,g;s,//,/,g"`
     AC_DEFINE_UNQUOTED([PACKAGE_SHAREDSTATEDIR], ["${PACKAGE_SHAREDSTATEDIR}"], [Define to
 	the location of the sharedstatedir.])
     eval "PACKAGE_LOCALSTATEDIR=\"${localstatedir}\""
     eval "PACKAGE_LOCALSTATEDIR=\"${PACKAGE_LOCALSTATEDIR}\""
     eval "PACKAGE_LOCALSTATEDIR=\"${PACKAGE_LOCALSTATEDIR}\""
-    PACKAGE_LOCALSTATEDIR=`echo "$PACKAGE_LOCALSTATEDIR" | sed -e 's,\<NONE\>,,g;s,//,/,g'`
+    PACKAGE_LOCALSTATEDIR=`echo "$PACKAGE_LOCALSTATEDIR" | sed -e "s,\<NONE\>,$ac_default_prefix,g;s,//,/,g"`
     AC_DEFINE_UNQUOTED([PACKAGE_LOCALSTATEDIR], ["${PACKAGE_LOCALSTATEDIR}"], [Define to
 	the location of the localstatedir.])
     eval "PACKAGE_INCLUDEDIR=\"${includedir}\""
     eval "PACKAGE_INCLUDEDIR=\"${PACKAGE_INCLUDEDIR}\""
     eval "PACKAGE_INCLUDEDIR=\"${PACKAGE_INCLUDEDIR}\""
-    PACKAGE_INCLUDEDIR=`echo "$PACKAGE_INCLUDEDIR" | sed -e 's,\<NONE\>,,g;s,//,/,g'`
+    PACKAGE_INCLUDEDIR=`echo "$PACKAGE_INCLUDEDIR" | sed -e "s,\<NONE\>,$ac_default_prefix,g;s,//,/,g"`
     AC_DEFINE_UNQUOTED([PACKAGE_INCLUDEDIR], ["${PACKAGE_INCLUDEDIR}"], [Define to
 	the location of the includedir.])
     eval "PACKAGE_OLDINCLUDEDIR=\"${oldincludedir}\""
     eval "PACKAGE_OLDINCLUDEDIR=\"${PACKAGE_OLDINCLUDEDIR}\""
     eval "PACKAGE_OLDINCLUDEDIR=\"${PACKAGE_OLDINCLUDEDIR}\""
-    PACKAGE_OLDINCLUDEDIR=`echo "$PACKAGE_OLDINCLUDEDIR" | sed -e 's,\<NONE\>,,g;s,//,/,g'`
+    PACKAGE_OLDINCLUDEDIR=`echo "$PACKAGE_OLDINCLUDEDIR" | sed -e "s,\<NONE\>,$ac_default_prefix,g;s,//,/,g"`
     AC_DEFINE_UNQUOTED([PACKAGE_OLDINCLUDEDIR], ["${PACKAGE_OLDINCLUDEDIR}"], [Define to
 	the location of the oldincludedir.])
     eval "PACKAGE_DOCDIR=\"${docdir}\""
     eval "PACKAGE_DOCDIR=\"${PACKAGE_DOCDIR}\""
     eval "PACKAGE_DOCDIR=\"${PACKAGE_DOCDIR}\""
-    PACKAGE_DOCDIR=`echo "$PACKAGE_DOCDIR" | sed -e 's,\<NONE\>,,g;s,//,/,g'`
+    PACKAGE_DOCDIR=`echo "$PACKAGE_DOCDIR" | sed -e "s,\<NONE\>,$ac_default_prefix,g;s,//,/,g"`
     AC_DEFINE_UNQUOTED([PACKAGE_DOCDIR], ["${PACKAGE_DOCDIR}"], [Define to
 			the location of the docdir.])
     eval "PACKAGE_INFODIR=\"${infodir}\""
     eval "PACKAGE_INFODIR=\"${PACKAGE_INFODIR}\""
     eval "PACKAGE_INFODIR=\"${PACKAGE_INFODIR}\""
-    PACKAGE_INFODIR=`echo "$PACKAGE_INFODIR" | sed -e 's,\<NONE\>,,g;s,//,/,g'`
+    PACKAGE_INFODIR=`echo "$PACKAGE_INFODIR" | sed -e "s,\<NONE\>,$ac_default_prefix,g;s,//,/,g"`
     AC_DEFINE_UNQUOTED([PACKAGE_INFODIR], ["${PACKAGE_INFODIR}"], [Define to
 	the location of the infodir.])
     eval "PACKAGE_HTMLDIR=\"${htmldir}\""
     eval "PACKAGE_HTMLDIR=\"${PACKAGE_HTMLDIR}\""
     eval "PACKAGE_HTMLDIR=\"${PACKAGE_HTMLDIR}\""
-    PACKAGE_HTMLDIR=`echo "$PACKAGE_HTMLDIR" | sed -e 's,\<NONE\>,,g;s,//,/,g'`
+    PACKAGE_HTMLDIR=`echo "$PACKAGE_HTMLDIR" | sed -e "s,\<NONE\>,$ac_default_prefix,g;s,//,/,g"`
     AC_DEFINE_UNQUOTED([PACKAGE_HTMLDIR], ["${PACKAGE_HTMLDIR}"], [Define to
 	the location of the htmldir.])
     eval "PACKAGE_DVIDIR=\"${dvidir}\""
     eval "PACKAGE_DVIDIR=\"${PACKAGE_DVIDIR}\""
     eval "PACKAGE_DVIDIR=\"${PACKAGE_DVIDIR}\""
-    PACKAGE_DVIDIR=`echo "$PACKAGE_DVIDIR" | sed -e 's,\<NONE\>,,g;s,//,/,g'`
+    PACKAGE_DVIDIR=`echo "$PACKAGE_DVIDIR" | sed -e "s,\<NONE\>,$ac_default_prefix,g;s,//,/,g"`
     AC_DEFINE_UNQUOTED([PACKAGE_DVIDIR], ["${PACKAGE_DVIDIR}"], [Define to
 	the location of the dvidir.])
     eval "PACKAGE_PDFDIR=\"${pdfdir}\""
     eval "PACKAGE_PDFDIR=\"${PACKAGE_PDFDIR}\""
     eval "PACKAGE_PDFDIR=\"${PACKAGE_PDFDIR}\""
-    PACKAGE_PDFDIR=`echo "$PACKAGE_PDFDIR" | sed -e 's,\<NONE\>,,g;s,//,/,g'`
+    PACKAGE_PDFDIR=`echo "$PACKAGE_PDFDIR" | sed -e "s,\<NONE\>,$ac_default_prefix,g;s,//,/,g"`
     AC_DEFINE_UNQUOTED([PACKAGE_PDFDIR], ["${PACKAGE_PDFDIR}"], [Define to
 	the location of the pdfdir.])
     eval "PACKAGE_PSDIR=\"${psdir}\""
     eval "PACKAGE_PSDIR=\"${PACKAGE_PSDIR}\""
     eval "PACKAGE_PSDIR=\"${PACKAGE_PSDIR}\""
-    PACKAGE_PSDIR=`echo "$PACKAGE_PSDIR" | sed -e 's,\<NONE\>,,g;s,//,/,g'`
+    PACKAGE_PSDIR=`echo "$PACKAGE_PSDIR" | sed -e "s,\<NONE\>,$ac_default_prefix,g;s,//,/,g"`
     AC_DEFINE_UNQUOTED([PACKAGE_PSDIR], ["${PACKAGE_PSDIR}"], [Define to
 	the location of the psdir.])
     eval "PACKAGE_LIBDIR=\"${libdir}\""
     eval "PACKAGE_LIBDIR=\"${PACKAGE_LIBDIR}\""
     eval "PACKAGE_LIBDIR=\"${PACKAGE_LIBDIR}\""
-    PACKAGE_LIBDIR=`echo "$PACKAGE_LIBDIR" | sed -e 's,\<NONE\>,,g;s,//,/,g'`
+    PACKAGE_LIBDIR=`echo "$PACKAGE_LIBDIR" | sed -e "s,\<NONE\>,$ac_default_prefix,g;s,//,/,g"`
     AC_DEFINE_UNQUOTED([PACKAGE_LIBDIR], ["${PACKAGE_LIBDIR}"], [Define to
 	the location of the libdir.])
     eval "PACKAGE_LIB32DIR=\"${lib32dir}\""
     eval "PACKAGE_LIB32DIR=\"${PACKAGE_LIB32DIR}\""
     eval "PACKAGE_LIB32DIR=\"${PACKAGE_LIB32DIR}\""
-    PACKAGE_LIB32DIR=`echo "$PACKAGE_LIB32DIR" | sed -e 's,\<NONE\>,,g;s,//,/,g'`
+    PACKAGE_LIB32DIR=`echo "$PACKAGE_LIB32DIR" | sed -e "s,\<NONE\>,$ac_default_prefix,g;s,//,/,g"`
     AC_DEFINE_UNQUOTED([PACKAGE_LIB32DIR], ["${PACKAGE_LIB32DIR}"], [Define to
 	the location of the lib32dir.])
     eval "PACKAGE_LOCALEDIR=\"${localedir}\""
     eval "PACKAGE_LOCALEDIR=\"${PACKAGE_LOCALEDIR}\""
     eval "PACKAGE_LOCALEDIR=\"${PACKAGE_LOCALEDIR}\""
-    PACKAGE_LOCALEDIR=`echo "$PACKAGE_LOCALEDIR" | sed -e 's,\<NONE\>,,g;s,//,/,g'`
+    PACKAGE_LOCALEDIR=`echo "$PACKAGE_LOCALEDIR" | sed -e "s,\<NONE\>,$ac_default_prefix,g;s,//,/,g"`
     AC_DEFINE_UNQUOTED([PACKAGE_LOCALEDIR], ["${PACKAGE_LOCALEDIR}"], [Define to
 	the location of the localedir.])
     eval "PACKAGE_MANDIR=\"${mandir}\""
     eval "PACKAGE_MANDIR=\"${PACKAGE_MANDIR}\""
     eval "PACKAGE_MANDIR=\"${PACKAGE_MANDIR}\""
-    PACKAGE_MANDIR=`echo "$PACKAGE_MANDIR" | sed -e 's,\<NONE\>,,g;s,//,/,g'`
+    PACKAGE_MANDIR=`echo "$PACKAGE_MANDIR" | sed -e "s,\<NONE\>,$ac_default_prefix,g;s,//,/,g"`
     AC_DEFINE_UNQUOTED([PACKAGE_MANDIR], ["${PACKAGE_MANDIR}"], [Define to
 	the location of the mandir.])
     eval "PACKAGE_INITRDDIR=\"${initrddir}\""
     eval "PACKAGE_INITRDDIR=\"${PACKAGE_INITRDDIR}\""
     eval "PACKAGE_INITRDDIR=\"${PACKAGE_INITRDDIR}\""
-    PACKAGE_INITRDDIR=`echo "$PACKAGE_INITRDDIR" | sed -e 's,\<NONE\>,,g;s,//,/,g'`
+    PACKAGE_INITRDDIR=`echo "$PACKAGE_INITRDDIR" | sed -e "s,\<NONE\>,$ac_default_prefix,g;s,//,/,g"`
     AC_DEFINE_UNQUOTED([PACKAGE_INITRDDIR], ["${PACKAGE_INITRDDIR}"], [Define to
 	the location of the initrddir.])
     eval "PACKAGE_CONFIGDIR=\"${configdir}\""
     eval "PACKAGE_CONFIGDIR=\"${PACKAGE_CONFIGDIR}\""
     eval "PACKAGE_CONFIGDIR=\"${PACKAGE_CONFIGDIR}\""
-    PACKAGE_CONFIGDIR=`echo "$PACKAGE_CONFIGDIR" | sed -e 's,\<NONE\>,,g;s,//,/,g'`
+    PACKAGE_CONFIGDIR=`echo "$PACKAGE_CONFIGDIR" | sed -e "s,\<NONE\>,$ac_default_prefix,g;s,//,/,g"`
     AC_DEFINE_UNQUOTED([PACKAGE_CONFIGDIR], ["${PACKAGE_CONFIGDIR}"], [Define to
 	the location of the configdir.])
     eval "PACKAGE_KMODULEDIR=\"${kmoduledir}\""
     eval "PACKAGE_KMODULEDIR=\"${PACKAGE_KMODULEDIR}\""
     eval "PACKAGE_KMODULEDIR=\"${PACKAGE_KMODULEDIR}\""
-    PACKAGE_KMODULEDIR=`echo "$PACKAGE_KMODULEDIR" | sed -e 's,\<NONE\>,,g;s,//,/,g'`
+    PACKAGE_KMODULEDIR=`echo "$PACKAGE_KMODULEDIR" | sed -e "s,\<NONE\>,$ac_default_prefix,g;s,//,/,g"`
     AC_DEFINE_UNQUOTED([PACKAGE_KMODULEDIR], ["${PACKAGE_KMODULEDIR}"], [Define to
 	the location of the kmoduledir.])
     eval "PACKAGE_MODUTILDIR=\"${modutildir}\""
     eval "PACKAGE_MODUTILDIR=\"${PACKAGE_MODUTILDIR}\""
     eval "PACKAGE_MODUTILDIR=\"${PACKAGE_MODUTILDIR}\""
-    PACKAGE_MODUTILDIR=`echo "$PACKAGE_MODUTILDIR" | sed -e 's,\<NONE\>,,g;s,//,/,g'`
+    PACKAGE_MODUTILDIR=`echo "$PACKAGE_MODUTILDIR" | sed -e "s,\<NONE\>,$ac_default_prefix,g;s,//,/,g"`
     AC_DEFINE_UNQUOTED([PACKAGE_MODUTILDIR], ["${PACKAGE_MODUTILDIR}"], [Define to
 	the location of the modutildir.])
 ])# _OPENSS7_OUTPUT
