@@ -51,8 +51,10 @@
 #
 # =============================================================================
 subpkg=repo
+_set_vars() {
 @package_archhdr@
 datarootdir=@datarootdir@
+}
 
 _pre() {
     un=; pw=; o=
@@ -226,14 +228,16 @@ _post() {
 #   passed: new package full version string.
 #
 pre_install() {
-    _pre $*
+    _set_vars
+    #_pre $*
 }
 
 # post_install($newver) - Run right after files are extracted.  One argument is
 #   passed: new package full version string.
 #
 post_install() {
-    _post $*
+    _set_vars
+    #_post $*
 }
 
 # pre_upgrade($newver,$oldver) - Run right before files are extracted.  Two
@@ -241,7 +245,8 @@ post_install() {
 #   package full version string.
 #
 pre_upgrade() {
-    _pre $*
+    _set_vars
+    #_pre $*
 }
 
 # post_upgrade($newver,$oldver) - Run after files are extracted.  Two arguments
@@ -249,22 +254,26 @@ pre_upgrade() {
 #   version string.
 #
 post_upgrade() {
-    _post $*
+    _set_vars
+    #_post $*
 }
 
 # pre_remove($oldver) - Run right before files are removed.  One argument is
 #   passed: old package full version string.
 #
 pre_remove() {
+    _set_vars
 }
 
 # post_remove($oldver) - Run right after files are removed.  One argument is
 #   passed: old package full version string.
 #
 post_remove() {
+    _set_vars
 }
 
 # =============================================================================
 #
 # $Log$
 # =============================================================================
+# vim: sw=4 tw=80

@@ -24,6 +24,7 @@ pkgname=(
 	'@PACKAGE@-@kversion@'
 	'@PACKAGE@-@kversion@-devel'
 	'@PACKAGE@-java'
+	'@PACKAGE@-repo'
 	)
 pkgver='@VERSION@'
 pkgrel='@PACKAGE_PACRELEASE@'
