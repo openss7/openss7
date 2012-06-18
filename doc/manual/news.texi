@@ -91,6 +91,7 @@ The sections that follow provide information on OpenSS7 releases of the
 @ifnothtml
 @menu
 * Release @value{PACKAGE}-@value{VERSION}::	Release @value{PACKAGE_RELEASE}@value{PACKAGE_PATCHLEVEL}
+* Release @value{PACKAGE}-1.1.1.20110510::	Release 1.20110510
 * Release @value{PACKAGE}-1.1.1.20110111::	Release 1.20110111
 * Release @value{PACKAGE}-1.1.1.20090908::	Release 1.20090908
 * Release @value{PACKAGE}-1.1.1.20090901::	Release 1.20090901
@@ -115,6 +116,35 @@ The sections that follow provide information on OpenSS7 releases of the
 @node Release @value{PACKAGE}-@value{VERSION}
 @unnumberedsubsec Major changes for release @value{PACKAGE}-@value{VERSION}
 @cindex release @value{PACKAGE}-@value{VERSION}
+
+This is the sixth release of the @cite{@value{PACKAGE_TITLE}} package.  THis is a production grade
+release.  All existing validation test suites run clean on supported distributions, production
+kernels and architectures.
+
+Major features since the last release are as follows:
+
+@itemize -
+@item
+Updated GNU build chain to m4-1.4.16, autoconf-2.69, automake 1.12.1, libtool 2.4.2, gettext 0.18.1,
+flex 2.5.35, bison 2.5, swig 2.0.7, autobuild 45.3, texinfo 4.13a, xz 5.0.3.
+
+@item
+Support for Archlinux.
+
+@item
+Support for Slackware.
+
+@item
+Support for 3.0.4-1-lts kernel from Archlinux.
+
+@item
+Support for OpenSS7 Live.
+
+@end itemize
+
+@node Release @value{PACKAGE}-1.1.1.20110510
+@unnumberedsubsec Major changes for release @value{PACKAGE}-1.1.1.20110510
+@cindex release @value{PACKAGE}-1.1.1.20110510
 
 This is the fifth release of the @cite{@value{PACKAGE_TITLE}} package.  This is a production grade
 release.  All existing validation test suites run clean on supported distributions, production
