@@ -1687,6 +1687,8 @@ MODULE_INFO(vermagic, VERMAGIC_STRING);\n\
 MODULE_INFO(supported, \"yes\");\n\
 #endif\n\
 \n\
+MODULE_INFO(intree, \"Y\");\n\
+\n\
 #undef unix\n\
 \n\
 #ifndef __attribute_used__\n\
@@ -1705,6 +1707,7 @@ __attribute__((section(\".gnu.linkonce.this_module\"))) = {\n\
 	    print "\t.init = init_module," > file
 	if (mod in mod_exit)
 	    print "#ifdef CONFIG_MODULE_UNLOAD\n\t.exit = cleanup_module,\n#endif" > file
+	print "#ifdef MODULE_ARCH_INIT\n\t.arch = MODULE_ARCH_INIT,\n#endif" > file
 	print "};\n#endif" > file
 }
 function write_modversions(file, mod, base,	count_unds,count_weak,pair,ind,name,sym,add,fmt)

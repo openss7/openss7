@@ -206,7 +206,7 @@ clean-verfiles:
 CLEAN_LOCAL		+= clean-verfiles
 
 stamp-verobjs: stamp-verfiles $(KERNEL_OBJECTS) $(PKG_LDS) $(PKG_ABI)
-	@test -z '$(PKG_LDS)' || pkg_lds='-q -T $(PKG_LDS)' ; \
+	@test -z '$(PKG_LDS)' || pkg_lds='-T $(PKG_LDS)' ; \
 	 test -z '$(PKG_ABI)' || pkg_abi='--version-script $(PKG_ABI)' ; \
 	list="$?" ; for obj in $$list ; do \
 		test :$$obj != :$(PKG_LDS) || continue ; \
@@ -216,13 +216,13 @@ stamp-verobjs: stamp-verfiles $(KERNEL_OBJECTS) $(PKG_LDS) $(PKG_ABI)
 			a=`echo "$$obj" | sed 's,^lib.*_a-,$(kpre),'` ; \
 			v=`echo "$$obj" | sed 's,^lib.*_a-,,;s,\.o$$,,'` ; \
 			$(ECHO_Q) "  LD    " $$a ; \
-			$(ECHO_V) "$(LD) -r $$pkg_abi -o a.$$$$.out $$pkg_lds $$obj $$v.ver && $(am__mv) -- a.$$$$.out $$a" ; \
-			$(LD) -r $$pkg_abi -o a.$$$$.out $$pkg_lds $$obj $$v.ver && $(am__mv) -- a.$$$$.out $$a ; \
+			$(ECHO_V) "$(LD) -r $$pkg_lds $$pkg_abi -o a.$$$$.out $$obj $$v.ver && $(am__mv) -- a.$$$$.out $$a" ; \
+			$(LD) -r $$pkg_lds $$pkg_abi -o a.$$$$.out $$obj $$v.ver && $(am__mv) -- a.$$$$.out $$a ; \
 		else \
 			a=`echo "$$obj" | sed 's,^lib.*_a-,$(kpre),'` ; \
 			$(ECHO_Q) "  LD    " $$a ; \
-			$(ECHO_V) "$(LD) -r $$pkg_abi -o a.$$$$.out $$pkg_lds $$obj && $(am__mv) -- a.$$$$.out $$a" ; \
-			$(LD) -r $$pkg_abi -o a.$$$$.out $$pkg_lds $$obj && $(am__mv) -- a.$$$$.out $$a ; \
+			$(ECHO_V) "$(LD) -r $$pkg_lds $$pkg_abi -o a.$$$$.out $$obj && $(am__mv) -- a.$$$$.out $$a" ; \
+			$(LD) -r $$pkg_lds $$pkg_abi -o a.$$$$.out $$obj && $(am__mv) -- a.$$$$.out $$a ; \
 		fi ; \
 	done ; \
 	date -uIseconds > $@
@@ -396,15 +396,15 @@ BUILD_SPECIFIC_FILES = $(AUTOCONFIG_H) $(MODVERSIONS_H)
 endif
 
 stamp-verobjs: $(KERNEL_OBJECTS) $(PKG_LDS) $(PKG_ABI)
-	@test -z '$(PKG_LDS)' || pkg_lds='-q -T $(PKG_LDS)' ; \
+	@test -z '$(PKG_LDS)' || pkg_lds='-T $(PKG_LDS)' ; \
 	 test -z '$(PKG_ABI)' || pkg_abi='--version-script $(PKG_ABI)' ; \
 	list="$?" ; for obj in $$list ; do \
 		test :$$obj != :$(PKG_LDS) || continue ; \
 		test :$$obj != :$(PKG_ABI) || continue ; \
 		a=`echo "$$obj" | sed 's,^lib.*_a-,$(kpre),'` ; \
 		$(ECHO_Q) "  LD    " $$a ; \
-		$(ECHO_V) "$(LD) -r $$pkg_abi -o a.$$$$.out $$pkg_lds $$obj && $(am__mv) -- a.$$$$.out $$a" ; \
-		$(LD) -r $$pkg_abi -o a.$$$$.out $$pkg_lds $$obj && $(am__mv) -- a.$$$$.out $$a ; \
+		$(ECHO_V) "$(LD) -r $$pkg_lds $$pkg_abi -o a.$$$$.out $$obj && $(am__mv) -- a.$$$$.out $$a" ; \
+		$(LD) -r $$pkg_lds $$pkg_abi -o a.$$$$.out $$obj && $(am__mv) -- a.$$$$.out $$a ; \
 	done ; \
 	date -uIseconds > $@
 
