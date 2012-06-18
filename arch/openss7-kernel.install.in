@@ -383,11 +383,11 @@ _post_kernel_weakmods() {
         scripts=`echo "$initfiles" | sed -e 's/ /,/g'`
         v="`set -o | sed -n -e 's,xtrace[[:space:]]*on$,--verbose=2 --debug=2,p;s,xtrace[[:space:]]*off$,--verbose=1,p'`"
         if [ -n "$scripts" ] ; then
-            @sbindir@/${name}-modules -- $v -e \
+            V=1 @sbindir@/${name}-modules -- $v -e \
                 --initscripts="$scripts" \
                 --add-modules @kversion@ || :
         else
-            @sbindir@/${name}-modules -- $v -e \
+            V=1 @sbindir@/${name}-modules -- $v -e \
                 --add-modules @kversion@ || :
         fi
     fi
@@ -415,12 +415,12 @@ _post_remove_kernel_weakmods() {
         scripts=`echo "$initfiles" | sed -e 's/ /,/g'`
         v="`set -o | sed -n -e 's,xtrace[[:space:]]*on$,--verbose=2 --debug=2,p;s,xtrace[[:space:]]*off$,--verbose=1,p'`"
         if [ -n "$scripts" ]; then
-            @sbindir@/${name}-modules -- $v -e \
+            V=1 @sbindir@/${name}-modules -- $v -e \
                 --initscripts="$scripts" \
                 --delete-modules \
                 --remove-modules @kversion@ || :
         else
-            @sbindir@/${name}-modules -- $v -e \
+            V=1 @sbindir@/${name}-modules -- $v -e \
                 --delete-modules \
                 --remove-modules @kversion@ || :
         fi
