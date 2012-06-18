@@ -52,7 +52,7 @@
 # =============================================================================
 subpkg=kernel
 _set_vars() {
-@openss7_header@
+@package_archhdr@
 datarootdir=@datarootdir@
 }
 
@@ -95,6 +95,9 @@ _remove_warn_dirs() {
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # OLD KERNEL MODULES
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# Note that we really don't support way-old versions of archlinux and these
+# scripts are never used.
+# ---------------------------------------------------------------------------
 # _post_kernel_oldmods() -   Perform a depmod on the kernel for which we have
 #   installed, upgraded or removed kernels modules.  This can only be performed
 #   for 2.4 module systems.  The debhelper scriptlets will perform this
@@ -150,7 +153,7 @@ _pre_install_kernel_preloads() {
 	done
 	if ! diff $prel_new $prel_old >/dev/null 2>&1; then
 	    echo "$script: warning: Removing non-pkg lines from preload file, $prel_old" >&2
-	    cp -f -b --suffix=.pacold -- $prel_new $prel_old
+	    cp -f -b --suffix=.pacorig -- $prel_new $prel_old
 	fi
 	rm -f -- $prel_new || :
     fi
@@ -171,7 +174,7 @@ _post_kernel_preloads() {
     ( cat $prel_new; for p in ${preloads}; do echo "$p"; done ) >$prel_tmp
     mv -f -- $prel_tmp $prel_new
     if ! diff $prel_new $prel_old >/dev/null 2>&1; then
-        cp -f -b --suffix=.pacold -- $prel_new $prel_old
+        cp -f -b --suffix=.pacorig -- $prel_new $prel_old
     fi
     rm -f -- $prel_new
 }
@@ -204,7 +207,7 @@ _pre_kernel_preloads() {
 		grep -v '^[[:space:]]*'"$p"'[[:space:]]*$' $prel_new >$prel_tmp
 		mv -f -- $prel_tmp $prel_new
 	    done
-	    cp -f -b --suffix=.pacold -- $prel_new $prel_old
+	    cp -f -b --suffix=.pacorig -- $prel_new $prel_old
 	fi
 	rm -f -- $prel_new || :
     fi
@@ -241,7 +244,7 @@ _remove_depends() {
 #   other installed packages.
 #
 #   Note that the kernel routine differs from the base routine of similar name
-#   and function.  THis kernel routine only removes modules from kernel-specific
+#   and function.  This kernel routine only removes modules from kernel-specific
 #   directories.  The _pre_install_base_modules() routine removes from
 #   non-kernel-specific directories.
 #
@@ -301,6 +304,9 @@ _pre_install_kernel_modules() {
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # INITSCRIPTS
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# Note that we really don't support way-old versions of archlinux and these
+# scripts are never used.
+# ---------------------------------------------------------------------------
 # _post_kernel_initscripts() - For old modules attempt to start init
 #   scripts when they are not already started and they are supposed to be
 #   started in the current run level.
@@ -359,6 +365,11 @@ _post_remove_kernel_initscripts() {
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # WEAK KERNEL MODULES
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# Note for arch that openss7-modules only starts or stops init scripts when
+# tools or an /etc/init.d/file exists.  Because arch (and slackware for that
+# matter) do not have an /etc/init.d directory, initscripts will neither be
+# started nor stopped.
+# ---------------------------------------------------------------------------
 # _post_kernel_weakmods() - Perform weak-updates on modules, perform depmod, and
 #   signal init scripts when a relink is required on shutdown or reboot.  Note
 #   that pacman is way smarter than rpm about installation order so the

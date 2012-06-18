@@ -51,7 +51,7 @@
 #
 # =============================================================================
 subpkg=compat
-@openss7_header@
+@package_archhdr@
 datarootdir=@datarootdir@
 
 pre_install() {

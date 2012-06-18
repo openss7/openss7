@@ -52,7 +52,7 @@
 # =============================================================================
 subpkg=
 _set_vars() {
-@openss7_header@
+@package_archhdr@
 datarootdir=@datarootdir@
 }
 
@@ -100,7 +100,7 @@ _remove_warn_dirs() {
 #   for this machine.  When reinstalling (previous package was not purged), this
 #   function gets the existing credentials from the persistent configuration
 #   file.  Even when a package is purged, we like to keep a copy of the
-#   credentials lying around in a .pacold file so that the machine credentials
+#   credentials lying around in a .pacorig file so that the machine credentials
 #   don't get lost.
 #
 #   Note that because the credentials are really machine credentials, we should
@@ -111,7 +111,7 @@ _pre_install_repo_creds() { :
     local d un pw o f s ext u p m
     return 0
     echo ">>> Checking credentials..." >&2
-    for s in '' .pacold .pacnew; do
+    for s in '' .pacorig .pacnew; do
     for p in credentials; do
     for d in $localstatedir/lib/$name/; do
         o=$d$p$s
@@ -252,7 +252,7 @@ _pre_remove_repo_creds() {
     for f in openss7.list; do
 	f="$d/$f"
 	if [ -r $f ]; then
-	    mv -f -- $f $f.pacold
+	    mv -f -- $f $f.pacorig
 	fi
 	rm -f -- $f
     done
@@ -262,7 +262,7 @@ _pre_remove_repo_creds() {
 # _post_remove_repo_creds() - After we remove (and purge) this repository
 #   package, we need to adjust whatever definitions are required in
 #   configuration files.  When we changed them on installation, we save an
-#   original copy in $f.pacold.  Therefore, if $f.pacold exists, copy it back.
+#   original copy in $f.pacorig  Therefore, if $f.pacorig exists, copy it back.
 #
 #   FIXME: For the rpm version this is much more than this.  It is moving back
 #	common configuration files that were altered by the installation.  Short
@@ -274,12 +274,12 @@ _post_remove_repo_creds() {
     echo ">>> Removing credentials..." >&2
     d=$aptrepodir
     for f in openss7.list ; do f="$d/$f"
-        if [ -f $f -a -f $f.pacold ] ; then
-            if ! diff $f $f.pacold >/dev/null 2>&1 ; then
-                mv -f -- $f.pacold $f || true
+        if [ -f $f -a -f $f.pacorig ] ; then
+            if ! diff $f $f.pacorig >/dev/null 2>&1 ; then
+                mv -f -- $f.pacorig $f || true
             fi
         fi
-        rm -f -- $f.pacold || true
+        rm -f -- $f.pacorig || true
     done
 }
 # -----------------------------------------------------------------------------
@@ -427,7 +427,7 @@ _pre_install_base_modconf() {
         done
         if ! diff $conf_old $conf_new >/dev/null 2>&1; then
             echo ">>> warning: Removing non-pkg entries from $conf_old" >&2
-            cp -f -b --suffix=.pacold -- $conf_new $conf_old
+            cp -f -b --suffix=.pacorig -- $conf_new $conf_old
         fi
         rm -f -- $conf_new || :
     fi
@@ -449,7 +449,7 @@ _post_base_modconf() { :
           echo "include @modutildir@/@PACKAGE_LCNAME@" ) > $conf_tmp
         mv -f -- $conf_tmp $conf_new
         if ! diff $conf_new $conf_old >/dev/null 2>&1; then
-            cp -f -b --suffix=.pacold -- $conf_new $conf_old
+            cp -f -b --suffix=.pacorig -- $conf_new $conf_old
         fi
         rm -f -- $conf_new || :
     fi
@@ -483,7 +483,7 @@ n
 b loop' $conf_new >$conf_tmp
         mv -f -- $conf_tmp $conf_new
         if ! diff $conf_new $conf_old >/dev/null 2>&1; then
-            cp -f -b --suffix=.pacold -- $conf_new $conf_old
+            cp -f -b --suffix=.pacorig -- $conf_new $conf_old
         fi
         rm -f -- $conf_new || :
     fi
@@ -516,7 +516,7 @@ _post_remove_base_modconf() {
         if grep '^include[[:space:]].*'@modutildir@/@PACKAGE_LCNAME@ $conf_new >/dev/null 2>&1; then
             sed -e '\|^include[[:space:]].*'@modutildir@/@PACKAGE_LCNAME@'|d' $conf_new > $conf_tmp
             mv -f -- $conf_tmp $conf_new
-            cp -f -b --suffix=.pacold -- $conf_new $conf_old
+            cp -f -b --suffix=.pacorig -- $conf_new $conf_old
         fi
         rm -f -- $conf_new || :
     fi
@@ -546,7 +546,7 @@ _pre_install_base_preloads() {
 	    done
 	    if ! diff $prel_new $prel_old >/dev/null 2>&1; then
 		echo ">>> warning: Removing non-pkg entries from preloads file, $prel_old" >&2
-		cp -f -b --suffix=.pacold -- $prel_new $prel_old
+		cp -f -b --suffix=.pacorig -- $prel_new $prel_old
 	    fi
 	    rm -f -- $prel_new || :
 	fi
@@ -578,7 +578,7 @@ _post_base_preloads() {
 		      echo "$m" ) >$prel_tmp
 		    mv -f -- $prel_tmp $prel_new
 		done
-		cp -f -b --suffix=.pacold -- $prel_new $prel_old
+		cp -f -b --suffix=.pacorig -- $prel_new $prel_old
 	    fi
 	    rm -f -- $prel_new || :
 	fi
@@ -616,7 +616,7 @@ _pre_base_preloads() {
 		    grep -v '^[[:space:]]*'"$p"'[[:space:]]*$' $prel_new >$prel_tmp
 		    mv -f -- $prel_tmp $prel_new
 		done
-		cp -f -b --suffix=.pacold -- $prel_new $prel_old
+		cp -f -b --suffix=.pacorig -- $prel_new $prel_old
 	    fi
 	    rm -f -- $prel_new || :
 	fi
@@ -638,6 +638,7 @@ _pre_upgrade_base_preloads() {
 #
 _pre_install_base_initscripts() {
     local list reverse i
+    return 0 # far too invasive for Archlinux
     echo ">>> Updating initscripts..." >&2
     list="$nonrpminit"
     reverse=
@@ -699,6 +700,7 @@ _post_install_base_initscripts() {
 #
 _post_remove_base_initscripts() {
     local reverse list i
+    return 0 # far too invasive for Archlinux
     echo ">>> Updating initscripts..." >&2
     reverse=
     list="${initfiles}"
@@ -999,7 +1001,7 @@ _post_lib_netconfig() {
     for f in $files; do
 	if [ -f $f -a $f = "$netc_dir/strnsl" ]; then
 	    case $f in
-		(*.pacold|*.pacnew) ;;
+		(*.pacorig|*.pacnew) ;;
 		(*) (   echo '# Generated from nslconfig.d/'`basename $f`
 			sed '/^[[:space:]]*##/d;/^[[:space:]]*$/d' $f
 		    ) >>$netc_tmp
@@ -1010,7 +1012,7 @@ _post_lib_netconfig() {
     for f in $files; do
 	if [ -f $f -a $f != "$netc_dir/strnsl" ]; then
 	    case $f in
-		(*.pacold|*.pacnew) ;;
+		(*.pacorig|*.pacnew) ;;
 		(*) (   echo '# Generated from nslconfig.d/'`basename $f`
 			sed '/^[[:space:]]*##/d;/^[[:space:]]*$/d' $f
 		    ) >>$netc_tmp
@@ -1023,7 +1025,7 @@ _post_lib_netconfig() {
 	rmdir $netc_dir 2>/dev/null || :
     else
 	if ! diff $netc_tmp $netc_fil >/dev/null 2>&1; then
-	    cp -f -b --suffix=.pacold -- $netc_tmp $netc_fil
+	    cp -f -b --suffix=.pacorig -- $netc_tmp $netc_fil
 	fi
     fi
     rm -f -- $netc_tmp || :
@@ -1097,7 +1099,7 @@ _post_remove_lib_netconfig () {
     for f in $files; do
 	if [ -f $f -a $f = "$netc_dir/strnsl" ]; then
 	    case $f in
-		(*.pacold|*.pacnew) ;;
+		(*.pacorig|*.pacnew) ;;
 		(*) (   echo '# Generated from nslconfig.d/'`basename $f`
 			sed '/^[[:space:]]*##/d;/^[[:space:]]*$/d' $f
 		    ) >>$netc_tmp
@@ -1108,7 +1110,7 @@ _post_remove_lib_netconfig () {
     for f in $files; do
 	if [ -f $f -a $f != "$netc_dir/strnsl" ]; then
 	    case $f in
-		(*.pacold|*.pacnew) ;;
+		(*.pacorig|*.pacnew) ;;
 		(*) (   echo '# Generated from nslconfig.d/'`basename $f`
 			sed '/^[[:space:]]*##/d;/^[[:space:]]*$/d' $f
 		    ) >>$netc_tmp
@@ -1121,7 +1123,7 @@ _post_remove_lib_netconfig () {
 	rmdir $netc_dir 2>/dev/null || :
     else
 	if ! diff $netc_tmp $netc_fil >/dev/null 2>&1; then
-	    cp -f -b --suffix=.pacold -- $netc_tmp $netc_fil
+	    cp -f -b --suffix=.pacorig -- $netc_tmp $netc_fil
 	fi
     fi
     rm -f -- $netc_tmp || :
@@ -1156,7 +1158,7 @@ _post_lib_sock2path() {
     for f in $files; do
 	if [ -f $f ]; then
 	    case $f in
-		(*.pacold|*.pacnew) ;;
+		(*.pacorig|*.pacnew) ;;
 		(*) (   echo '# Generated from sock2path.d/'`basename $f`
 			sed '/^[[:space:]]*##/d;/^[[:space:]]*$/d' $f
 		    ) >>$s2pa_tmp
@@ -1169,7 +1171,7 @@ _post_lib_sock2path() {
 	rmdir $s2pa_dir 2>/dev/null || :
     else
 	if ! diff $s2pa_tmp $s2pa_fil >/dev/null 2>&1; then
-	    cp -f -b --suffix=.pacold -- $s2pa_tmp $s2pa_fil
+	    cp -f -b --suffix=.pacorig -- $s2pa_tmp $s2pa_fil
 	fi
     fi
     rm -f -- $s2pa_tmp || :
@@ -1230,7 +1232,7 @@ _post_remove_lib_sock2path () {
     for f in $files; do
 	if [ -f $f ]; then
 	    case $f in
-		(*.pacold|*.pacnew) ;;
+		(*.pacorig|*.pacnew) ;;
 		(*) (   echo '# Generated from sock2path.d/'`basename $f`
 			sed '/^[[:space:]]*##/d;/^[[:space:]]*$/d' $f
 		    ) >>$s2pa_tmp
@@ -1243,7 +1245,7 @@ _post_remove_lib_sock2path () {
 	rmdir $s2pa_dir 2>/dev/null || :
     else
 	if ! diff $s2pa_tmp $s2pa_fil >/dev/null 2>&1; then
-	    cp -f -b --suffix=.pacold -- $s2pa_tmp $s2pa_fil
+	    cp -f -b --suffix=.pacorig -- $s2pa_tmp $s2pa_fil
 	fi
     fi
     rm -f -- $s2pa_tmp || :
@@ -1265,7 +1267,7 @@ _post_remove_lib_sock2path () {
 #
 #   When we have not aborted as part of previous operations, we rebuild
 #   /etc/snmp/snmp.local.conf from the files available in the snmp.d directory
-#   (skipping any with the .pacold or .pacnew suffixes), placing our 'Generation' lines in the
+#   (skipping any with the .pacorig or .pacnew suffixes), placing our 'Generation' lines in the
 #   file, starting with 00local, and continuing through with the remaining files
 #   in snmp.d in lexical order.  If 00local is the only file causing
 #   snmp.local.conf to be regenerated, 00local is moved back to snmp.local.conf.
@@ -1277,6 +1279,10 @@ _post_remove_lib_sock2path () {
 #   /var/run/net-snmp instead of /var/net-snmp.  This can be detected and
 #   repaired by symbolic linking /etc/snmp/snmpd.conf to /etc/snmpd.conf and
 #   linking /etc/snmpd.local.conf to /etc/snmp/snmpd.local.conf.
+#
+#   Note for Archlinux (and slackware for that matter) that this script will not
+#   attempt to restart the snmp daemon because their is no SysV initscript
+#   directory structure.
 #
 _post_lib_snmpconf() {
     local snmp_fil snmp_dir snmp_lcl snmp_tmp wrote_one changed_local files f
@@ -1297,7 +1303,7 @@ _post_lib_snmpconf() {
     fi
     if [ -s $snmp_fil ]; then
 	if ! grep '^# Generated from snmp.d' $snmp_fil >/dev/null 2>&1; then
-	    cp -f -b --suffix=.pacold -- $snmp_fil $snmp_lcl
+	    cp -f -b --suffix=.pacorig -- $snmp_fil $snmp_lcl
 	fi
     fi
     (   echo '# Generated from snmp.d by @PACKAGE_LCNAME@'
@@ -1307,7 +1313,7 @@ _post_lib_snmpconf() {
     for f in $files; do
 	if [ -f $f -a $f = $snmp_lcl ]; then
 	    case $f in
-		(*.pacold|*.pacnew) ;;
+		(*.pacorig|*.pacnew) ;;
 		(*) (   echo '# Generated from snmp.d/'`basename $f`
 			sed '/^[[:space:]]*##/d;/^[[:space:]]*$/d' $f
 		    ) >>$snmp_tmp
@@ -1318,7 +1324,7 @@ _post_lib_snmpconf() {
     for f in $files ; do
 	if [ -f $f -a $f != $snmp_lcl ]; then
 	    case $f in
-		(*.pacold|*.pacnew) ;;
+		(*.pacorig|*.pacnew) ;;
 		(*) (   echo '# Generated from snmp.d/'`basename $f`
 			sed '/^[[:space:]]*##/d;/^[[:space:]]*$/d' $f
 		    ) >>$snmp_tmp
@@ -1329,7 +1335,7 @@ _post_lib_snmpconf() {
     done
     if [ $wrote_one = yes ]; then
 	if ! diff $snmp_tmp $snmp_fil >/dev/null 2>&1; then
-	    cp -f -b --suffix=.pacold -- $snmp_tmp $snmp_fil
+	    cp -f -b --suffix=.pacorig -- $snmp_tmp $snmp_fil
 	    changed_local=yes
 	fi
     elif [ -f $snmp_lcl ]; then
@@ -1390,7 +1396,7 @@ _post_remove_lib_snmpconf () {
     if [ -s $snmp_fil ]; then
 	if grep '^# Generated from snmp.d' $snmp_fil >/dev/null 2>&1; then
 	    if [ -d $snmp_dir ]; then
-		cp -f -b --suffix=.pacold -- $snmp_fil $snmp_lcl
+		cp -f -b --suffix=.pacorig -- $snmp_fil $snmp_lcl
 	    fi
 	fi
     fi
@@ -1401,7 +1407,7 @@ _post_remove_lib_snmpconf () {
     for f in $files; do
 	if [ -f $f -a $f = $snmp_lcl ]; then
 	    case $f in
-		(*.pacold|*.pacnew) ;;
+		(*.pacorig|*.pacnew) ;;
 		(*) (   echo '# Generated from snmp.d/'`basename $f`
 			sed '/^[[:space:]]*##/d;/^[[:space:]]*$/d' $f
 		    ) >>$snmp_tmp
@@ -1412,7 +1418,7 @@ _post_remove_lib_snmpconf () {
     for f in $files ; do
 	if [ -f $f -a $f != $snmp_lcl ]; then
 	    case $f in
-		(*.pacold|*.pacnew) ;;
+		(*.pacorig|*.pacnew) ;;
 		(*) (   echo '# Generated from snmp.d/'`basename $f`
 			sed '/^[[:space:]]*##/d;/^[[:space:]]*$/d' $f
 		    ) >>$snmp_tmp
@@ -1423,7 +1429,7 @@ _post_remove_lib_snmpconf () {
     done
     if [ $wrote_one = yes ]; then
 	if ! diff $snmp_tmp $snmp_fil >/dev/null 2>&1; then
-	    cp -f -b --suffix=.pacold -- $snmp_tmp $snmp_fil
+	    cp -f -b --suffix=.pacorig -- $snmp_tmp $snmp_fil
 	    changed_local=yes
 	fi
     elif [ -f $snmp_lcl ]; then
@@ -1556,7 +1562,7 @@ _pre_install_compat() {
 #
 pre_install() {
     _set_vars
-    _pre_install_repo			|| return $?
+    #_pre_install_repo			|| return $?
     _pre_install_base			|| :
     _pre_install_lib			|| :
     _pre_install_compat			|| :
@@ -1597,7 +1603,7 @@ _post_install_compat() {
 #
 post_install() {
     _set_vars
-    _post_install_repo			|| :
+    #_post_install_repo			|| :
     _post_install_base			|| :
     _post_install_lib			|| :
     _post_install_compat		|| :
@@ -1633,7 +1639,7 @@ _pre_remove_compat() {
 #
 pre_remove() {
     _set_vars
-    _pre_remove_repo			|| :
+    #_pre_remove_repo			|| :
     _pre_remove_base			|| :
     _pre_remove_lib			|| :
     _pre_remove_compat			|| :
@@ -1671,7 +1677,7 @@ _post_remove_compat() {
 #
 post_remove() {
     _set_vars
-    _post_remove_repo			|| :
+    #_post_remove_repo			|| :
     _post_remove_base			|| :
     _post_remove_lib			|| :
     _post_remove_compat			|| :
@@ -1703,7 +1709,7 @@ _pre_upgrade_compat() {
 #
 pre_upgrade() {
     _set_vars
-    _pre_upgrade_repo			|| return $?
+    #_pre_upgrade_repo			|| return $?
     _pre_upgrade_base			|| :
     _pre_upgrade_lib			|| :
     _pre_upgrade_compat			|| :
@@ -1741,7 +1747,7 @@ _post_upgrade_compat() {
 #
 post_upgrade() {
     _set_vars
-    _post_upgrade_repo			|| return $?
+    #_post_upgrade_repo			|| return $?
     _post_upgrade_base			|| :
     _post_upgrade_lib			|| :
     _post_upgrade_compat		|| :

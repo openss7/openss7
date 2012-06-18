@@ -51,7 +51,7 @@
 #
 # =============================================================================
 subpkg=base
-@openss7_header@
+@package_archhdr@
 datarootdir=@datarootdir@
 # -----------------------------------------------------------------------------
 # Auxiliary functions:
@@ -76,7 +76,7 @@ _pre_install_preloads () {
 	    done
 	    if ! diff $prel_new $prel_old >/dev/null 2>&1; then
 		echo "warning: Removing non-pkg entries from preloads file, $prel_old" >&2
-		cp -f -b --suffix=.pacold -- $prel_new $prel_old
+		cp -f -b --suffix=.pacorig -- $prel_new $prel_old
 	    fi
 	    rm -f -- $prel_new || :
 	fi
@@ -235,7 +235,7 @@ _pre_install_modconf () { |
         done
         if ! diff $conf_old $conf_new >/dev/null 2>&1; then
             echo "warning: Removing non-pkg entries from $conf_old" >&2
-            cp -f -b --suffix=.pacold -- $conf_new $conf_old
+            cp -f -b --suffix=.pacorig -- $conf_new $conf_old
         fi
         rm -f -- $conf_new || :
     fi
@@ -318,7 +318,7 @@ _post_install_modconf () { :
           echo "include ${modutildir}/@PACKAGE_LCNAME@" ) > $conf_tmp
         mv -f -- $conf_tmp $conf_new
         if ! diff $conf_new $conf_old >/dev/null 2>&1; then
-            cp -f -b --suffix=.pacold -- $conf_new $conf_old
+            cp -f -b --suffix=.pacorig -- $conf_new $conf_old
         fi
         rm -f -- $conf_new || :
     fi
@@ -348,7 +348,7 @@ _post_install_preloads () { :
 		      echo "$m" ) >$prel_tmp
 		    mv -f -- $prel_tmp $prel_new
 		done
-		cp -f -b --suffix=.pacold -- $prel_new $prel_old
+		cp -f -b --suffix=.pacorig -- $prel_new $prel_old
 	    fi
 	    rm -f -- $prel_new || :
 	fi
@@ -448,7 +448,7 @@ _post_upgrade_preloads () { :
 		      echo "$m" ) >$prel_tmp
 		    mv -f -- $prel_tmp $prel_new
 		done
-		cp -f -b --suffix=.pacold -- $prel_new $prel_old
+		cp -f -b --suffix=.pacorig -- $prel_new $prel_old
 	    fi
 	    rm -f -- $prel_new || :
 	fi
@@ -504,7 +504,7 @@ _pre_remove_preloads () { :
 		    grep -v '^[[:space:]]*'"$p"'[[:space:]]*$' $prel_new >$prel_tmp
 		    mv -f -- $prel_tmp $prel_new
 		done
-		cp -f -b --suffix=.pacold -- $prel_new $prel_old
+		cp -f -b --suffix=.pacorig -- $prel_new $prel_old
 	    fi
 	    rm -f -- $prel_new || :
 	fi
@@ -558,7 +558,7 @@ _post_remove_oldmods () { :
         if grep '^include[[:space:]].*'${modutildir}'/@PACKAGE_LCNAME@' $conf_new >/dev/null 2>&1; then
             sed -e '\|^include[[:space:]].*'${modutildir}'/@PACKAGE_LCNAME@|d' $conf_new > $conf_tmp
             mv -f -- $conf_tmp $conf_new
-            cp -f -b --suffix=.pacold -- $conf_new $conf_old
+            cp -f -b --suffix=.pacorig -- $conf_new $conf_old
         fi
         rm -f -- $conf_new || :
     fi

@@ -52,7 +52,7 @@
 # =============================================================================
 subpkg=kernel-devel
 _set_vars() {
-@openss7_header@
+@package_archhdr@
 datarootdir=@datarootdir@
 }
 

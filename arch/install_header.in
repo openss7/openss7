@@ -7,8 +7,6 @@
 # This software is licensed under the GNU Affero General Public License (AGPL)
 # Version 3, 19 November 2007, available at <http://www.gnu.org/licenses/>.
 # -----------------------------------------------------------------------------
-# This is now the same as the debian/openss7_header.in so it is not used.
-# -----------------------------------------------------------------------------
 set -e
 tmppath=/var/tmp
 PACKAGE=@PACKAGE@

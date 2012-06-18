@@ -410,7 +410,8 @@ AC_DEFUN([_PAC_ARCH_OUTPUT], [dnl
 dnl the conditional confuses automake forcing extra config.status runs.
 dnl if test ":${REPO_ADD:-no}" != :no -a ":${REPO_REMOVE:-no}" != :no; then
 	AC_CONFIG_FILES([arch/PKGBUILD
-			 arch/install_header])
+			 arch/install_header
+			 arch/package_archhdr])
 	AC_CONFIG_FILES([arch/]AC_PACKAGE_TARNAME[.install
 			 arch/]AC_PACKAGE_TARNAME[-repo.install
 			 arch/]AC_PACKAGE_TARNAME[-base.install
@@ -426,6 +427,8 @@ dnl if test ":${REPO_ADD:-no}" != :no -a ":${REPO_REMOVE:-no}" != :no; then
 			 arch/]AC_PACKAGE_TARNAME[-kernel-source.install])
 	install_header="arch/install_header"
 	AC_SUBST_FILE([install_header])
+	package_archhdr="arch/package_archhdr"
+	AC_SUBST_FILE([package_archhdr])
 dnl fi
 ])# _PAC_ARCH_OUTPUT
 # =============================================================================
