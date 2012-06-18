@@ -51,7 +51,7 @@
 #
 # =============================================================================
 subpkg=repo
-@openss7_header@
+@package_archhdr@
 datarootdir=@datarootdir@
 
 _pre() {
