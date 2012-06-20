@@ -214,7 +214,7 @@ AC_DEFUN([_MAN_CONVERSION_SETUP], [dnl
 *** appropriate program with the MAKEWHATIS environment variable to
 *** 'configure'.
 *** ])], [dnl
-	tmp_program=`echo "$MAKEWHATIS" | sed 's,.*[^ ][^$-],,;s,.*/,,;s, *$,,'`
+	tmp_program=`echo "$MAKEWHATIS" | sed 's,.*[[^ ][^$-]],,;s,.*/,,;s, *$,,'`
 	if test :"$tmp_program" = :mandb ; then
 	    MANDBFLAGS='-u'
 	elif test :"$tmp_program" = :makewhatis ; then

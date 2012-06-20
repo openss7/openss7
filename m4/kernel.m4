@@ -3103,13 +3103,13 @@ m4_define([_LINUX_KERNEL_SYMBOL_ADDR_BODY],
 AC_CACHE_CHECK([for kernel symbol $[]2 address], [linux_cv_$[]{2}_addr], [dnl
     linux_tmp=
     if test -z "$linux_tmp" -a -n "$ksyms" -a -r "$ksyms"; then
-	linux_tmp="`($EGREP '\<'${2}'\>' $ksyms | sed -e 's| .*||;s|^0[xX]||') 2>/dev/null`"
+	linux_tmp="`($EGREP '\<'${2}'\>' $ksyms | sed -e 's| .*||;s|^0[[xX]]||') 2>/dev/null`"
     fi
     if test -z "$linux_tmp" -a -n "$kallsyms" -a -r "$kallsyms"; then
-	linux_tmp="`($EGREP '\<'${2}'\>' $kallsyms | head -1 | sed -e 's| .*||;s|^0[xX]||') 2>/dev/null`"
+	linux_tmp="`($EGREP '\<'${2}'\>' $kallsyms | head -1 | sed -e 's| .*||;s|^0[[xX]]||') 2>/dev/null`"
     fi
     if test -z "$linux_tmp" -a -n "$_ksysmap" -a -r "$_ksysmap"; then
-	linux_tmp="`($EGREP '\<'${2}'\>' $_ksysmap | sed -e 's| .*||;s|^0[xX]||') 2>/dev/null`"
+	linux_tmp="`($EGREP '\<'${2}'\>' $_ksysmap | sed -e 's| .*||;s|^0[[xX]]||') 2>/dev/null`"
     fi
     if test -z "$linux_tmp" -a -n "$_kvmlinux" -a -r "$_kvmlinux"; then
 	case "$_kvmlinux" in
@@ -3121,7 +3121,7 @@ AC_CACHE_CHECK([for kernel symbol $[]2 address], [linux_cv_$[]{2}_addr], [dnl
 		    test -r $linux_img || xz -dc $_kvmlinux >$linux_img ;;
 	    (*)	    linux_img="$_kvmlinux" ;;
 	esac
-	linux_tmp="`(nm -Bs $linux_img | $EGREP '\<'${2}'\>' | sed -e 's| .*||;s|^0[xX]||') 2>/dev/null`"
+	linux_tmp="`(nm -Bs $linux_img | $EGREP '\<'${2}'\>' | sed -e 's| .*||;s|^0[[xX]]||') 2>/dev/null`"
     fi
     linux_tmp="${linux_tmp:+0x}$linux_tmp"
     AS_VAR_SET([linux_cv_$[]{2}_addr], ["${linux_tmp:-no}"]) ])
