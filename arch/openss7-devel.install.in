@@ -127,7 +127,7 @@ _pre_install_devel_libs() {
 #   distributions have placed header files.  We go and clean out all of them.
 #
 _pre_install_devel_headers() {
-    locald d
+    local d
     echo ">>> Removing conflicting development headers..." >&2
     for d in /include /usr/include /usr/local/include @includedir@ @oldincludedir@ ; do
 	_remove_warn_dirs "header" \
