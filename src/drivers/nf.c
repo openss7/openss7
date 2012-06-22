@@ -257,6 +257,14 @@ struct nf {
 #define NF_PRIV(__q) ((struct nf *)((__q)->q_ptr))
 
 STATIC struct nf *nf_opens = NULL;
+#if	defined DEFINE_SPINLOCK
+STATIC DEFINE_SPINLOCK(nf_lock);
+#elif	defined __SPIN_LOCK_UNLOCKED
+STATIC spinlock_t nf_lock = __SPIN_LOCK_UNLOCKED(nf_lock);
+#elif	defined SPIN_LOCK_UNLOCKED
 STATIC spinlock_t nf_lock = SPIN_LOCK_UNLOCKED;
+#else
+#error cannot initialize spin locks
+#endif
 
 /* FIXME: much more to write here... */

@@ -963,7 +963,15 @@ xp_esballoc(queue_t *q, unsigned char *base, size_t size, int prior, frtn_t *frt
  *  -------------------------------------------------------------------------
  */
 STATIC mblk_t *xp_bufpool = NULL;
+#if	defined DEFINE_SPINLOCK
+STATIC DEFINE_SPINLOCK(xp_bufpool_lock);
+#elif	defined __SPIN_LOCK_UNLOCKED
+STATIC spinlock_t xp_bufpool_lock = __SPIN_LOCK_UNLOCKED(xp_bufpool_lock);
+#elif	defined SPIN_LOCK_UNLOCKED
 STATIC spinlock_t xp_bufpool_lock = SPIN_LOCK_UNLOCKED;
+#else
+#error cannot initialize spin locks
+#endif
 
 /*
  *  FAST ALLOCB
@@ -6235,7 +6243,15 @@ xp_wsrv(queue_t *q)
  *  Open is called on the first open of a character special device stream
  *  head; close is called on the last close of the same device.
  */
+#if	defined DEFINE_SPINLOCK
+STATIC DEFINE_SPINLOCK(xp_lock);
+#elif	defined __SPIN_LOCK_UNLOCKED
+STATIC spinlock_t xp_lock = __SPIN_LOCK_UNLOCKED(xp_lock);
+#elif	defined SPIN_LOCK_UNLOCKED
 STATIC spinlock_t xp_lock = SPIN_LOCK_UNLOCKED;
+#else
+#error cannot initialize spin locks
+#endif
 STATIC struct xp *xp_list = NULL;
 STATIC major_t xp_majors[CMAJORS] = { CMAJOR_0, };
 

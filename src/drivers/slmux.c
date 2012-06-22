@@ -99,7 +99,15 @@ static caddr_t sl_opens = NULL;
 static caddr_t sl_links = NULL;
 static size_t sl_links_num = 0;
 
+#if	defined DEFINE_RWLOCK
+static DEFINE_RWLOCK(sl_mux_lock);
+#elif	defined __RW_LOCK_UNLOCKED
+static rwlock_t sl_mux_lock = __RW_LOCK_UNLOCKED(sl_mux_lock);
+#elif	defined RW_LOCK_UNLOCKED
 static rwlock_t sl_mux_lock = RW_LOCK_UNLOCKED;
+#else
+#error cannot initialize read-write locks
+#endif
 
 #define SL_PRIV(q) ((struct sl *)(q)->q_ptr)
 

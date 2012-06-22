@@ -817,12 +817,15 @@ dl_set_state(struct xp *xp, dl_ulong state)
 	}
 }
 
-#ifdef RW_LOCK_UNLOCKED
+#if	defined DEFINE_RWLOCK
+static DEFINE_RWLOCK(xp_core_lock);
+static DEFINE_RWLOCK(xp_list_lock);
+#elif	defined __RW_LOCK_UNLOCKED
+static rwlock_t xp_core_lock = __RW_LOCK_UNLOCKED(xp_core_lock);	/* protects ch->sp linkage */
+static rwlock_t xp_list_lock = __RW_LOCK_UNLOCKED(xp_list_lock);	/* protects open list */
+#elif	defined RW_LOCK_UNLOCKED
 static rwlock_t xp_core_lock = RW_LOCK_UNLOCKED;	/* protect cd,sp,ch linkage */
 static rwlock_t xp_list_lock = RW_LOCK_UNLOCKED;	/* protect open list */
-#elif defined __RW_LOCK_UNLOCKED
-static rwlock_t xp_core_lock = __RW_LOCK_UNLOCKED(&xp_core_lock);	/* protects ch->sp linkage */
-static rwlock_t xp_list_lock = __RW_LOCK_UNLOCKED(&xp_list_lock);	/* protects open list */
 #else
 #error cannot initialize read-write locks
 #endif
@@ -1088,7 +1091,15 @@ STATIC struct cd *x400p_cards[X400_CARDS] = { NULL, };	/* master card list */
 STATIC int x400p_groups = 0;
 STATIC struct sg *x400p_syncs[X400_SYNCS] = { NULL, };	/* master sync list */
 
-rwlock_t x400p_lock;
+#if	defined DEFINE_RWLOCK
+STATIC DEFINE_RWLOCK(x400p_lock);
+#elif	defined __RW_LOCK_UNLOCKED
+STATIC rwlock_t x400p_lock = __RW_LOCK_UNLOCKED(x400p_lock);
+#elif	deinfed RW_LOCK_UNLOCKED
+STATIC rwlock_t x400p_lock = RW_LOCK_UNLOCKED;
+#else
+#error cannot initialize read-write locks
+#endif
 STATIC struct xp *x400p_xrays;		/* xraying streams for this driver */
 
 #define X400P_EBUFNO (1<<7)	/* 128k elastic buffers */

@@ -592,7 +592,15 @@ typedef struct df {
 	isdn_stats_df_t stats;		/* default statistics */
 	isdn_stats_df_t statsp;		/* default statistics periods */
 } df_t;
-STATIC struct df master;
+STATIC struct df master = {
+#if	defined __SPIN_LOCK_UNLOCKED
+	.lock = __SPIN_LOCK_UNLOCKED(master.lock),
+#elif	defined SPIN_LOCK_UNLOCKED
+	.lock = SPIN_LOCK_UNLOCKED,
+#else
+#error cannot initialize spin locks
+#endif
+};
 
 /*
  *  ========================================================================
@@ -14872,7 +14880,15 @@ dl_w_prim(queue_t *q, mblk_t *mp)
  *  =========================================================================
  */
 // STATIC isdn_t *isdn_list = NULL;
+#if	defined DEFINE_SPINLOCK
+STATIC DEFINE_SPINLOCK(isdn_lock);
+#elif	defined __SPIN_LOCK_UNLOCKED
+STATIC spinlock_t isdn_lock = __SPIN_LOCK_UNLOCKED(isdn_lock);
+#elif	defined SPIN_LOCK_UNLOCKED
 STATIC spinlock_t isdn_lock = SPIN_LOCK_UNLOCKED;
+#else
+#error cannot initialize spin locks
+#endif
 STATIC major_t isdn_majors[ISDN_CMAJORS] = { ISDN_CMAJOR_0, };
 
 /*

@@ -184,7 +184,15 @@ STATIC struct mx no_mx = {
 	.dev = 0,
 };
 
+#if	defined DEFINE_RWLOCK
+STATIC DEFINE_RWLOCK(mx_lock);
+#elif	defined __RW_LOCK_UNLOCKED
+STATIC rwlock_t mx_lock = __RW_LOCK_UNLOCKED(mx_lock);
+#elif	defined RW_LOCK_UNLOCKED
 STATIC rwlock_t mx_lock = RW_LOCK_UNLOCKED;
+#else
+#error cannot initialize read-write locks
+#endif
 STATIC struct mx *mx_opens = NULL;
 STATIC struct mx *mx_links = NULL;
 

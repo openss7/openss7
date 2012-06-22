@@ -684,7 +684,15 @@ struct vp {
 };
 
 #ifdef CONFIG_SMP
+#if	defined DEFINE_SPINLOCK
+STATIC DEFINE_SPINLOCK(vp_daccs_lock);
+#elif	defined __SPIN_LOCK_UNLOCKED
+STATIC spinlock_t vp_daccs_lock = __SPIN_LOCK_UNLOCKED(vp_daccs_lock);
+#elif	defined SPIN_LOCK_UNLOCKED
 STATIC spinlock_t vp_daccs_lock = SPIN_LOCK_UNLOCKED;
+#else
+#error cannot initialize spin locks
+#endif
 #endif
 
 #define V400P_EBUFNO	(1<<7)	/* 128k of elastic buffers per card. */

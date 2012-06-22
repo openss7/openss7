@@ -453,13 +453,15 @@ typedef struct df {
 	SLIST_HEAD (tp, tp);		/* master list of tp (open) structures */
 } df_t;
 
-#ifdef RW_LOCK_UNLOCKED
-static struct df master = {.lock = RW_LOCK_UNLOCKED, };
-#elif defined __RW_LOCK_UNLOCKED
-static struct df master = {.lock = __RW_LOCK_UNLOCKED(&master.lock), };
+static struct df master = {
+#if	defined __RW_LOCK_UNLOCKED
+	.lock = __RW_LOCK_UNLOCKED(master.lock),
+#elif	defined RW_LOCK_UNLOCKED
+	.lock = RW_LOCK_UNLOCKED,
 #else
 #error cannot initialize read-write locks
 #endif
+};
 
 //extern __u32 sysctl_rmem_default;
 //extern __u32 sysctl_wmem_default;
@@ -582,10 +584,12 @@ struct tp_prot_bucket {
 	int clrefs;			/* T_CLTS references */
 	struct ipnet_protocol prot;	/* Linux registration structure */
 };
-#ifdef RW_LOCK_UNLOCKED
+#if	defined DEFINE_RWLOCK
+STATIC DEFINE_RWLOCK(tp_prot_lock);
+#elif	defined __RW_LOCK_UNLOCKED
+STATIC rwlock_t tp_prot_lock = __RW_LOCK_UNLOCKED(tp_prot_lock);
+#elif	defined RW_LOCK_UNLOCKED
 STATIC rwlock_t tp_prot_lock = RW_LOCK_UNLOCKED;
-#elif defined __RW_LOCK_UNLOCKED
-STATIC rwlock_t tp_prot_lock = __RW_LOCK_UNLOCKED(&tp_prot_lock);
 #else
 #error cannot initialize read-write locks
 #endif

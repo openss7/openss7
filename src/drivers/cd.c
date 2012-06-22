@@ -235,7 +235,15 @@ struct cd_device {
 	major_t cd_major;
 };
 
+#if	defined DEFINE_RWLOCK
+STATIC DEFINE_RWLOCK(cd_devices_lock);
+#elif	defined __RW_LOCK_UNLOCKED
+STATIC rwlock_t cd_devices_lock = __RW_LOCK_UNLOCKED(cd_devices_lock);
+#elif	defined RW_LOCK_UNLOCKED
 STATIC rwlock_t cd_devices_lock = RW_LOCK_UNLOCKED;
+#else
+#error cannot initialize read-write locks
+#endif
 STATIC struct cd_device cd_devices[MAX_MINORS + 1] = { };
 
 int
