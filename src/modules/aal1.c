@@ -164,10 +164,12 @@ struct priv {
 	struct dl dl;
 };
 
-#ifdef RW_LOCK_UNLOCKED
+#if	defined DEFINE_RWLOCK
+static DEFINE_RWLOCK(a1_lock);
+#elif	defined __RW_LOCK_UNLOCKED
+static rwlock_t a1_lock = __RW_LOCK_UNLOCKED(a1_lock);
+#elif	defined RW_LOCK_UNLOCKED
 static rwlock_t a1_lock = RW_LOCK_UNLOCKED;
-#elif defined __RW_LOCK_UNLOCKED
-static rwlock_t a1_lock = __RW_LOCK_UNLOCKED(&a1_lock);
 #else
 #error cannot iniitalize read-write locks
 #endif

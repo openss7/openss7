@@ -528,10 +528,12 @@ sl_restore_m_state(struct sl *sl)
  * its put procedures and interrupt suppression is not necessary when taking these locks (making
  * them disappear on UP).
  */
-#ifdef RW_LOCK_UNLOCKED
+#if	defined DEFINE_RWLOCK
+static DEFINE_RWLOCK(sl_mux_lock);
+#elif	defined __RW_LOCK_UNLOCKED
+static rwlock_t sl_mux_lock = __RW_LOCK_UNLOCKED(sl_mux_lock);
+#elif	defined RW_LOCK_UNLOCKED
 static rwlock_t sl_mux_lock = RW_LOCK_UNLOCKED;
-#elif defined __RW_LOCK_UNLOCKED
-static rwlock_t sl_mux_lock = __RW_LOCK_UNLOCKED(&sl_mux_lock);
 #else
 #error cannot initialize read-write lock
 #endif

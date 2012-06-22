@@ -268,7 +268,15 @@ do_spipe(int *fds)
 #undef makedevice
 #define makedevice(__maj,__min) ((((__maj)<<16)&0xffff0000)|(((__min)<<0)&0x0000ffff))
 
+#if	defined DEFINE_SPINLOCK
+STATIC DEFINE_SPINLOCK(pipe_ino_lock);
+#elif	defined __SPIN_LOCK_UNLOCKED
+STATIC spinlock_t pipe_ino_lock = __SPIN_LOCK_UNLOCKED(pipe_ino_lock);
+#elif	defined SPIN_LOCK_UNLOCKED
 STATIC spinlock_t pipe_ino_lock = SPIN_LOCK_UNLOCKED;
+#else
+#error cannot initialize spin locks
+#endif
 STATIC int pipe_ino = 0;
 
 #if   defined HAVE_FILE_KILL_SYMBOL

@@ -219,7 +219,15 @@ static kmem_cachep_t mx_lk_cachep = NULL;
 static kmem_cachep_t mx_mx_cachep = NULL;
 static kmem_cachep_t mx_ch_cachep = NULL;
 
+#if	defined DEFINE_RWLOCK
+static DEFINE_RWLOCK(mx_lock);
+#elif	defined __RW_LOCK_UNLOCKED
+static rwlock_t mx_lock = __RW_LOCK_UNLOCKED(mx_lock);
+#elif	defined RW_LOCK_UNLOCKED
 static rwlock_t mx_lock = RW_LOCK_UNLOCKED;
+#else
+#error cannot initialize read-write locks
+#endif
 static caddr_t mx_opens = NULL;		/* list of opened STREAMS */
 static caddr_t mx_links = NULL;		/* list of linked STREAMS */
 

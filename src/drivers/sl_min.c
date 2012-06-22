@@ -236,7 +236,15 @@ typedef struct df {
 	SLIST_HEAD (sl, sl);
 	SLIST_HEAD (ls, ls);
 } df_t;
-STATIC struct df master;
+STATIC struct df master = {
+#if	defined __SPIN_LOCK_UNLOCKED
+	.lock = __SPIN_LOCK_UNLOCKED(master.lock),
+#elif	defined SPIN_LOCK_UNLOCKED
+	.lock = SPIN_LOCK_UNLOCKED,
+#else
+#error cannot initialize spin locks
+#endif
+};
 
 /*
  *  -------------------------------------------------------------------------

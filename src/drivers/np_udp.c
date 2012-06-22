@@ -406,13 +406,15 @@ typedef struct df {
 	SLIST_HEAD (np, np);		/* master list of np (open) structures */
 } df_t;
 
-#ifdef RW_LOCK_UNLOCKED
-static struct df master = {.lock = RW_LOCK_UNLOCKED, };
-#elif defined __RW_LOCK_UNLOCKED
-static struct df master = {.lock = __RW_LOCK_UNLOCKED(&master.lock), };
+static struct df master = {
+#if	defined __RW_LOCK_UNLOCKED
+	.lock = __RW_LOCK_UNLOCKED(master.lock),
+#elif	defined RW_LOCK_UNLOCKED
+	.lock = RW_LOCK_UNLOCKED,
 #else
 #error cannot initialize read-write locks
 #endif
+};
 
 /*
  *  Bind buckets, caches and hashes.
@@ -483,10 +485,12 @@ struct np_prot_bucket {
 	int clrefs;			/* N_CLNS references */
 	struct ipnet_protocol prot;	/* Linux registration structure */
 };
-#ifdef RW_LOCK_UNLOCKED
+#if	defined DEFINE_RWLOCK
+STATIC DEFINE_RWLOCK(np_prot_lock);
+#elif	defined __RW_LOCK_UNLOCKED
+STATIC rwlock_t np_prot_lock = __RW_LOCK_UNLOCKED(np_prot_lock);
+#elif	defined RW_LOCK_UNLOCKED
 STATIC rwlock_t np_prot_lock = RW_LOCK_UNLOCKED;
-#elif defined __RW_LOCK_UNLOCKED
-STATIC rwlock_t np_prot_lock = __RW_LOCK_UNLOCKED(&np_prot_lock);
 #else
 #error cannot initialize read-write locks
 #endif

@@ -196,7 +196,16 @@ static struct module_info trmod_minfo = {
 static struct module_stat tr_mstat __attribute__ ((__aligned__(SMP_CACHE_BYTES)));
 static struct module_stat sc_mstat __attribute__ ((__aligned__(SMP_CACHE_BYTES)));
 
+#if	defined DEFINE_RWLOCK
+static DEFINE_RWLOCK(tr_lock);
+#elif	defined __RW_LOCK_UNLOCKED
+static rwlock_t tr_lock = __RW_LOCK_UNLOCKED(tr_lock);
+#elif	defined RW_LOCK_UNLOCKED
 static rwlock_t tr_lock = RW_LOCK_UNLOCKED;
+#else
+#error cannot initialize read-write locks
+#endif
+
 static caddr_t tr_opens = NULL;
 static caddr_t sc_links = NULL;
 

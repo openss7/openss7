@@ -413,7 +413,15 @@ struct vp {
 	volatile uint8_t *map[32][4];	/* Digital cross-connect map from this card. */
 };
 
+#if	defined DEFINE_SPINLOCK
+static DEFINE_SPINLOCK(vp_daccs_lock);
+#elif	defined __SPIN_LOCK_UNLOCKED
+static spinlock_t vp_daccs_lock = __SPIN_LOCK_UNLOCKED(vp_daccs_lock);
+#elif	defined SPIN_LOCK_UNLOCKED
 static spinlock_t vp_daccs_lock = SPIN_LOCK_UNLOCKED;
+#else
+#error cannot initialize spin locks
+#endif
 
 #define V400P_EBUFNO	(1<<7)	/* 128k of elastic buffers per card. */
 
@@ -1136,7 +1144,15 @@ vp_wsrv(queue_t *q)
  *  =======================
  */
 
+#if	defined DEFINE_SPINLOCK
+static DEFINE_SPINLOCK(vp_lock);
+#elif	defined __SPIN_LOCK_UNLOCKED
+static spinlock_t vp_lock = __SPIN_LOCK_UNLOCKED(vp_lock);
+#elif	defined SPIN_LOCK_UNLOCKED
 static spinlock_t vp_lock = SPIN_LOCK_UNLOCKED;
+#else
+#error cannot intiialize spin locks
+#endif
 static struct vp *vp_list = NULL;
 static major_t vp_majors[CMAJORS] = { CMAJOR_0, };
 

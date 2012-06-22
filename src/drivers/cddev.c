@@ -1125,7 +1125,16 @@ cd_other_ind(struct cd *cd, queue_t *q, mblk_t *mp)
  * --------------------------------------------------------------------------
  */
 static caddr_t cd_links = NULL;
+
+#if	defined DEFINE_RWLOCK
+static DEFINE_RWLOCK(cd_mux_lock);
+#elif	defined __RW_LOCK_UNLOCKED
+static rwlock_t cd_mux_lock = __RW_LOCK_UNLOCKED(cd_mux_lock);
+#elif	defined RW_LOCK_UNLOCKED
 static rwlock_t cd_mux_lock = RW_LOCK_UNLOCKED;
+#else
+#error cannot initialize read-write locks
+#endif
 
 static fastcall noinline int
 cd_i_plink(struct cd *cd, queue_t *q, mblk_t *mp)

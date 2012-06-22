@@ -1424,10 +1424,12 @@ linkinfo_ctor(void *obj, kmem_cachep_t cachep, unsigned long flags)
 	if ((flags & (SLAB_CTOR_VERIFY | SLAB_CTOR_CONSTRUCTOR)) == SLAB_CTOR_CONSTRUCTOR)
 #endif
 	{
-#if	defined SPIN_LOCK_UNLOCKED
-		static spinlock_t link_index_lock = SPIN_LOCK_UNLOCKED;
+#if	defined DEFINE_SPINLOCK
+		static DEFINE_SPINLOCK(link_index_lock);
 #elif	defined __SPIN_LOCK_UNLOCKED
-		static spinlock_t link_index_lock = __SPIN_LOCK_UNLOCKED(&link_index_lock);
+		static spinlock_t link_index_lock = __SPIN_LOCK_UNLOCKED(link_index_lock);
+#elif	defined SPIN_LOCK_UNLOCKED
+		static spinlock_t link_index_lock = SPIN_LOCK_UNLOCKED;
 #else
 #error cannot initialize spin lock
 #endif
@@ -1559,10 +1561,12 @@ sq_alloc(void)
 }
 
 static struct syncq *elsewhere_list = NULL;
-#if	defined SPIN_LOCK_UNLOCKED
-static spinlock_t elsewhere_lock = SPIN_LOCK_UNLOCKED;
+#if	defined DEFINE_SPINLOCK
+static DEFINE_SPINLOCK(elsewhere_lock);
 #elif	defined __SPIN_LOCK_UNLOCKED
-static spinlock_t elsewhere_lock = __SPIN_LOCK_UNLOCKED(&elsewhere_lock);
+static spinlock_t elsewhere_lock = __SPIN_LOCK_UNLOCKED(elsewhere_lock);
+#elif	defined SPIN_LOCK_UNLOCKED
+static spinlock_t elsewhere_lock = SPIN_LOCK_UNLOCKED;
 #else
 #error cannot initialize spin locks
 #endif
@@ -1720,10 +1724,12 @@ sq_release(struct syncq **sqp)
 #define EVENT_LIMIT (1<<16)
 #define EVENT_HASH_SIZE (1<<10)
 #define EVENT_HASH_MASK (EVENT_HASH_SIZE-1)
-#if	defined SPIN_LOCK_UNLOCKED
-STATIC spinlock_t event_hash_lock = SPIN_LOCK_UNLOCKED;
+#if	defined DEFINE_SPINLOCK
+STATIC DEFINE_SPINLOCK(event_hash_lock);
 #elif	defined __SPIN_LOCK_UNLOCKED
-STATIC spinlock_t event_hash_lock = __SPIN_LOCK_UNLOCKED(&even_hash_lock);
+STATIC spinlock_t event_hash_lock = __SPIN_LOCK_UNLOCKED(event_hash_lock);
+#elif	defined SPIN_LOCK_UNLOCKED
+STATIC spinlock_t event_hash_lock = SPIN_LOCK_UNLOCKED;
 #else
 #error cannot initialize spin locks
 #endif
@@ -2010,10 +2016,12 @@ strsched_bufcall(struct strevent *se)
 	return (id);
 }
 
-#if defined SPIN_LOCK_UNLOCKED
+#if	defined DEFINE_SPINLOCK
+static DEFINE_SPINLOCK(timeout_list_lock);
+#elif	defined __SPIN_LOCK_UNLOCKED
+static spinlock_t timeout_list_lock = __SPIN_LOCK_UNLOCKED(timeout_list_lock );
+#elif	defined SPIN_LOCK_UNLOCKED
 static spinlock_t timeout_list_lock = SPIN_LOCK_UNLOCKED;
-#elif defined __SPIN_LOCK_UNLOCKED
-static spinlock_t timeout_list_lock = __SPIN_LOCK_UNLOCKED(&timeout_list_lock );
 #else
 #error cannot initialize spin locks
 #endif

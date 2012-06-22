@@ -259,7 +259,15 @@ typdef struct df {
 	SLIST_HEAD (nip, nip);		/* master list of nip (link) structures */
 } df_t;
 
-STATIC struct df master;
+STATIC struct df master = {
+#if	defined __RW_LOCK_UNLOCKED
+	.lock = __RW_LOCK_UNLOCKED(master.lock),
+#elif	defined RW_LOCK_UNLOCKED
+	.lock = RW_LOCK_UNLOCKED,
+#else
+#error cannot initialize read-write locks
+#endif
+};
 
 /*
  *  =========================================================================

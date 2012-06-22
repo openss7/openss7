@@ -163,7 +163,16 @@ static struct module_stat tc_rstat
 static struct module_stat tc_wstat
     __attribute__ ((__aligned__(SMP_CACHE_BYTES)));
 
+#if	defined DEFINE_RWLOCK
+static DEFINE_RWLOCK(tc_lock);
+#elif	defined __RW_LOCK_UNLOCKED
+static rwlock_t tc_lock = __RW_LOCK_UNLOCKED(tc_lock);
+#elif	defined RW_LOCK_UNLOCKED
 static rwlock_t tc_lock = RW_LOCK_UNLOCKED;
+#else
+#error cannot initialize read-write locks
+#endif
+
 static caddr_t tc_opens = NULL;
 
 /*

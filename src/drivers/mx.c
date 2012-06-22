@@ -265,8 +265,18 @@ STATIC struct mx *mx_links = NULL;
 #define MUX_UP		1
 #define MUX_DOWN	2
 
+#if	defined DEFINE_RWLOCK
+STATIC DEFINE_RWLOCK(mx_lock);
+STATIC DEFINE_RWLOCK(mx_spin);
+#elif	defined __RW_LOCK_UNLOCKED
+STATIC rwlock_t mx_lock = __RW_LOCK_UNLOCKED(mx_lock);
+STATIC rwlock_t mx_spin = __RW_LOCK_UNLOCKED(mx_spin);
+#elif	defined RW_LOCK_UNLOCKED
 STATIC rwlock_t mx_lock = RW_LOCK_UNLOCKED;
 STATIC rwlock_t mx_spin = RW_LOCK_UNLOCKED;
+#else
+#error cannot initalize read-write locks
+#endif
 
 /*
  * Locking discussion: Most MX STREAMS are persistently in the active state and the state is stable.

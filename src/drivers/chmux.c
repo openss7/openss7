@@ -201,7 +201,15 @@ struct ch {
 	struct CH_info_ack info;
 };
 
+#if	defined DEFINE_RWLOCK
+static DEFINE_RWLOCK(ch_lock);
+#elif	defined __RW_LOCK_UNLOCKED
+static rwlock_t ch_lock = __RW_LOCK_UNLOCKED(ch_lock);
+#elif	defined RW_LOCK_UNLOCKED
 static rwlock_t ch_lock = RW_LOCK_UNLOCKED;
+#else
+#error cannot initialize read-write locks
+#endif
 static caddr_t ch_opens = NULL;
 static caddr_t ch_links = NULL;
 

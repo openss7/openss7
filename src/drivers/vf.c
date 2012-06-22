@@ -192,7 +192,15 @@ struct vf {
 	int index;			/* multiplex index */
 };
 
+#if	defined DEFINE_SPINLOCK
+STATIC DEFINE_SPINLOCK(vf_lock);
+#elif	defined __SPIN_LOCK_UNLOCKED
+STATIC spinlock_t vf_lock = __SPIN_LOCK_UNLOCKED(vf_lock);
+#elif	defined SPIN_LOCK_UNLOCKED
 STATIC spinlock_t vf_lock = SPIN_LOCK_UNLOCKED;
+#else
+#error cannot initialize spin locks
+#endif
 STATIC struct vf *vf_opens = NULL;
 STATIC struct vf *vf_links = NULL;
 

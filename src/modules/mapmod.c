@@ -727,7 +727,17 @@ static struct module_info mc_minfo = {
 static struct module_stat tc_mstat __attribute__ ((__aligned__(SMP_CACHE_BYTES)));
 static struct module_stat mc_mstat __attribute__ ((__aligned__(SMP_CACHE_BYTES)));
 
+
+#if	defined DEFINE_RWLOCK
+static DEFINE_RWLOCK(mc_lock);
+#elif	defined __RW_LOCK_UNLOCKED
+static rwlock_t mc_lock = __RW_LOCK_UNLOCKED(mc_lock);
+#elif	defined RW_LOCK_UNLOCKED
 static rwlock_t mc_lock = RW_LOCK_UNLOCKED;
+#else
+#error cannot initialize read-write locks
+#endif
+
 static caddr_t mc_opens = NULL;
 static caddr_t mc_links = NULL;
 

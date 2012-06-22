@@ -158,12 +158,15 @@ static char const ident[] =
 #define strnod_hash_slot(_minor) \
 	(cminsw_hash + (((_minor) + ((_minor) >> STRNOD_HASH_ORDER) + ((_minor) >> 2 * STRNOD_HASH_ORDER)) & STRNOD_HASH_MASK))
 
-#if	defined RW_LOCK_UNLOCKED
+#if	defined DEFINE_RWLOCK
+DEFINE_RWLOCK(cdevsw_lock);
+DEFINE_RWLOCK(fmodsw_lock);
+#elif	defined __RW_LOCK_UNLOCKED
+rwlock_t cdevsw_lock = __RW_LOCK_UNLOCKED(cdevsw_lock);
+rwlock_t fmodsw_lock = __RW_LOCK_UNLOCKED(fmodsw_lock);
+#elif	defined RW_LOCK_UNLOCKED
 rwlock_t cdevsw_lock = RW_LOCK_UNLOCKED;
 rwlock_t fmodsw_lock = RW_LOCK_UNLOCKED;
-#elif	defined __RW_LOCK_UNLOCKED
-rwlock_t cdevsw_lock = __RW_LOCK_UNLOCKED(&cdevsw_lock);
-rwlock_t fmodsw_lock = __RW_LOCK_UNLOCKED(&fmodsw_lock);
 #else
 #error cannot ininitalized read-write locks
 #endif

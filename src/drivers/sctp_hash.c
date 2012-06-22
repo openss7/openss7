@@ -787,7 +787,15 @@ sctp_lookup(struct sctphdr * sh, uint32_t daddr, uint32_t saddr)
 	return (NULL);
 }
 
-rwlock_t sctp_hash_lock;
+#if	defined DEFINE_RWLOCK
+DEFINE_RWLOCK(hash_lock);
+#elif	defined __RW_LOCK_UNLOCKED
+rwlock_t sctp_hash_lock = __RW_LOCK_UNLOCKED(sctp_hash_lock);
+#elif	defined RW_LOCK_UNLOCKED
+rwlock_t sctp_hash_lock = RW_LOCK_UNLOCKED;
+#else
+#error cannot initialize read-write locks
+#endif
 
 void
 sctp_init_locks(void)

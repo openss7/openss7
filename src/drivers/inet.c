@@ -1293,10 +1293,12 @@ enum {
 #endif				/* defined HAVE_OPENSS7_SCTP */
 };
 
-#ifdef RW_LOCK_UNLOCKED
+#if	defined DEFINE_RWLOCK
+static DEFINE_RWLOCK(ss_lock);
+#elif	defined __RW_LOCK_UNLOCKED
+static rwlock_t ss_lock = __RW_LOCK_UNLOCKED(ss_lock);	/* protects ss_opens lists */
+#elif	defined RW_LOCK_UNLOCKED
 static rwlock_t ss_lock = RW_LOCK_UNLOCKED;	/* protects ss_opens lists */
-#elif defined __RW_LOCK_UNLOCKED
-static rwlock_t ss_lock = __RW_LOCK_UNLOCKED(&ss_lock);	/* protects ss_opens lists */
 #else
 #error cannot initialize read-write locks
 #endif

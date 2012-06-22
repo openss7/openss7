@@ -597,7 +597,15 @@ typedef struct df {
 	struct sccp_stats_df stamp;	/* default statistics timestamps */
 	struct sccp_stats_df statsp;	/* default statistics periods */
 } df_t;
-static struct df master;
+static struct df master = {
+#if	defined __SPIN_LOCK_UNLOCKED
+	.lock = __SPIN_LOCK_UNLOCKED(master.lock),
+#elif	defined SPIN_LOCK_UNLOCKED
+	.lock = SPIN_LOCK_UNLOCKED,
+#else
+#error cannot initialize spin locks
+#endif
+};
 
 /*
  *  =========================================================================
@@ -1673,10 +1681,12 @@ typedef struct sccp_msg {
  *
  *  =========================================================================
  */
-#ifdef RW_LOCK_UNLOCKED
+#if	defined DEFINE_RWLOCK
+static DEFINE_RWLOCK(sccp_mux_lock);
+#elif	defined __RW_LOCK_UNLOCKED
+static rwlock_t sccp_mux_lock = __RW_LOCK_UNLOCKED(sccp_mux_lock);
+#elif	defined RW_LOCK_UNLOCKED
 static rwlock_t sccp_mux_lock = RW_LOCK_UNLOCKED;
-#elif defined __RW_LOCK_UNLOCKED
-static rwlock_t sccp_mux_lock = __RW_LOCK_UNLOCKED(&sccp_mux_lock);
 #else
 #error cannot initialize read-write locks
 #endif
