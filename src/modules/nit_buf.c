@@ -184,10 +184,12 @@ struct nb {
 
 #define MSGHEADER	(1<<15)
 
-#ifdef RW_LOCK_UNLOCKED
+#if	defined DEFINE_RWLOCK
+static DEFINE_RWLOCK(nb_lock);
+#elif	defined __RW_LOCK_UNLOCKED
+static rwlock_t nb_lock = __RW_LOCK_UNLOCKED(nb_lock);
+#elif	defined RW_LOCK_UNLOCKED
 static rwlock_t nb_lock = RW_LOCK_UNLOCKED;
-#elif defined __RW_LOCK_UNLOCKED
-static rwlock_t nb_lock = __RW_LOCK_UNLOCKED(&nb_lock);
 #else
 #error cannot initialize read-write locks
 #endif

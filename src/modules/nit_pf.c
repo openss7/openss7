@@ -176,10 +176,12 @@ struct pf {
 	ushort pf_Order;
 };
 
-#ifdef RW_LOCK_UNLOCKED
+#if	defined DEFINE_RWLOCK
+static DEFINE_RWLOCK(pf_lock);
+#elif	defined __RW_LOCK_UNLOCKED
+static rwlock_t pf_lock = __RW_LOCK_UNLOCKED(pf_lock);
+#elif	defined RW_LOCK_UNLOCKED
 static rwlock_t pf_lock = RW_LOCK_UNLOCKED;
-#elif defined __RW_LOCK_UNLOCKED
-static rwlock_t pf_lock = __RW_LOCK_UNLOCKED(&pf_lock);
 #else
 #error cannot initialize read-write locks
 #endif

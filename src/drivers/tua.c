@@ -319,7 +319,15 @@ struct df {
 	SLIST_HEAD (tcap, tcap);
 };
 
-STATIC struct df master = { SPIN_LOCK_UNLOCKED, };
+STATIC struct df master = {
+#if	defined __SPIN_LOCK_UNLOCKED
+	.lock = __SPIN_LOCK_UNLOCKED(master.lock),
+#elif	defined SPIN_LOCK_UNLOCKED
+	.lock = SPIN_LOCK_UNLOCKED,
+#else
+#error cannot initialize spin locks
+#endif
+};
 
 /*
  *  =========================================================================

@@ -137,10 +137,12 @@ struct str_comm {
 	char priv[0];			/* followed by private data */
 };
 
-#ifdef SPIN_LOCK_UNLOCKED
+#if	defined DEFINE_SPINLOCK
+static DEFINE_SPINLOCK(str_list_lock);
+#elif	defined __SPIN_LOCK_UNLOCKED
+static spinlock_t str_list_lock = __SPIN_LOCK_UNLOCKED(str_list_lock);
+#elif	defined SPIN_LOCK_UNLOCKED
 static spinlock_t str_list_lock = SPIN_LOCK_UNLOCKED;
-#elif defined __SPIN_LOCK_UNLOCKED
-static spinlock_t str_list_lock = __SPIN_LOCK_UNLOCKED(&str_list_lock);
 #else
 #error cannot initialize spin locks
 #endif

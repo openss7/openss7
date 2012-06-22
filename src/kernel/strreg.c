@@ -124,10 +124,12 @@ static char const ident[] = "$RCSfile: strreg.c,v $ $Name:  $($Revision: 1.1.2.5
  *  -------------------------------------------------------------------------
  */
 
-#if	defined RW_LOCK_UNLOCKED
-rwlock_t strreg_lock = RW_LOCK_UNLOCKED;
+#if	defined DEFINE_RWLOCK
+DEFINE_RWLOCK(strreg_lock);
 #elif	defined __RW_LOCK_UNLOCKED
-rwlock_t strreg_lock = __RW_LOCK_UNLOCKED(&strreg_lock);
+rwlock_t strreg_lock = __RW_LOCK_UNLOCKED(strreg_lock);
+#elif	defined RW_LOCK_UNLOCKED
+rwlock_t strreg_lock = RW_LOCK_UNLOCKED;
 #else
 #error cannot initialize read-write locks
 #endif

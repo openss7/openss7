@@ -181,10 +181,12 @@ struct priv {
 	struct ch ch;
 };
 
-#ifdef RW_LOCK_UNLOCKED
+#if	defined DEFINE_RWLOCK
+static DEFINE_RWLOCK(ph_lock);
+#elif	defined __RW_LOCK_UNLOCKED
+static rwlock_t ph_lock = __RW_LOCK_UNLOCKED(ph_lock);
+#elif	defined RW_LOCK_UNLOCKED
 static rwlock_t ph_lock = RW_LOCK_UNLOCKED;
-#elif defined __RW_LOCK_UNLOCKED
-static rwlock_t ph_lock = __RW_LOCK_UNLOCKED(&ph_lock);
 #else
 #error cannot initialize read-write locks
 #endif

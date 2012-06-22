@@ -11718,10 +11718,12 @@ str_open(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
 		q->q_nbsrv = _WR(q);
 	} else if (sd->sd_flag & STRISPIPE) {
 		static int pipe_minor = 0;
-#ifdef SPIN_LOCK_UNLOCKED
+#if	defined DEFINE_SPINLOCK
+		static DEFINE_SPINLOCK(pipe_lock);
+#elif	defined __SPIN_LOCK_UNLOCKED
+		static spinlock_t pipe_lock = __SPIN_LOCK_UNLOCKED(pipe_lock);
+#elif	defined SPIN_LOCK_UNLOCKED
 		static spinlock_t pipe_lock = SPIN_LOCK_UNLOCKED;
-#elif defined __SPIN_LOCK_UNLOCKED
-		static spinlock_t pipe_lock = __SPIN_LOCK_UNLOCKED(&pipe_lock);
 #else
 #error cannot intialize spin locks
 #endif

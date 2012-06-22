@@ -243,7 +243,15 @@ atomic_t errlog_sequence = ATOMIC_INIT(0);
 atomic_t trclog_sequence = ATOMIC_INIT(0);
 
 #if !defined HAVE_KFUNC_ATOMIC_ADD_RETURN
+#if	defined DEFINE_SPINLOCK
+static DEFINE_SPINLOCK(my_atomic_lock);
+#elif	defined __SPIN_LOCK_UNLOCKED
+static spinlock_t my_atomic_lock = __SPIN_LOCK_UNLOCKED(my_atomic_lock);
+#elif	defined SPIN_LOCK_UNLOCKED
 static spinlock_t my_atomic_lock = SPIN_LOCK_UNLOCKED;
+#else
+#error cannot initialize spin locks
+#endif
 int
 my_atomic_add_return(int val, atomic_t *atomic)
 {
@@ -536,10 +544,12 @@ log_wput(queue_t *q, mblk_t *mp)
 	return (0);
 }
 
-#ifdef SPIN_LOCK_UNLOCKED
+#if	defined DEFINE_SPINLOCK
+static DEFINE_SPINLOCK(log_lock);
+#elif	defined __SPIN_LOCK_UNLOCKED
+static spinlock_t log_lock = __SPIN_LOCK_UNLOCKED(log_lock);
+#elif	defined SPIN_LOCK_UNLOCKED
 static spinlock_t log_lock = SPIN_LOCK_UNLOCKED;
-#elif defined __SPIN_LOCK_UNLOCKED
-static spinlock_t log_lock = __SPIN_LOCK_UNLOCKED(&log_lock);
 #else
 #error cannot initialise spin locks
 #endif

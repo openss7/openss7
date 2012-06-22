@@ -525,10 +525,12 @@ mi_prev_ptr(caddr_t ptr)
 
 EXPORT_SYMBOL(mi_prev_ptr);	/* mps/ddi.h, aix/ddi.h */
 
-#ifdef SPIN_LOCK_UNLOCKED
+#if	defined DEFINE_SPINLOCK
+static DEFINE_SPINLOCK(mi_list_lock);
+#elif	defined __SPIN_LOCK_UNLOCKED
+static spinlock_t mi_list_lock = __SPIN_LOCK_UNLOCKED(mi_list_lock);
+#elif	defined SPIN_LOCK_UNLOCKED
 static spinlock_t mi_list_lock = SPIN_LOCK_UNLOCKED;
-#elif defined __SPIN_LOCK_UNLOCKED
-static spinlock_t mi_list_lock = __SPIN_LOCK_UNLOCKED(&mi_list_lock);
 #else
 #error cannot initialize spin locks
 #endif

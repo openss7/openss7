@@ -305,7 +305,15 @@ typedef struct df {
 	SLIST_HEAD (np, np);		/* master list of np (open) structures */
 } df_t;
 
-STATIC struct df master = {.lock = RW_LOCK_UNLOCKED, };
+STATIC struct df master = {
+#if	defined __RW_LOCK_UNLOCKED
+	.lock = __RW_LOCK_UNLOCKED(master.lock),
+#elif	defined RW_LOCK_UNLOCKED
+	.lock = RW_LOCK_UNLOCKED,
+#else
+#error cannot initialize read-write locks
+#endif
+};
 
 typedef int (*ip_rcv_fnc_t) (struct sk_buff *);
 
@@ -358,7 +366,18 @@ npi_chashfn(unsigned char proto, unsigned short sport, unsigned short dport)
 	return ((npi_chash_size - 1) & (proto + sport + dport));
 }
 
-rwlock_t np_hash_lock = RW_LOCK_UNLOCKED;
+#if	defined DEFINE_RWLOCK
+STATIC DEFINE_RWLOCK(np_hash_lock);
+STATIC DEFINE_RWLOCK(np_prot_lock);
+#elif	defined __RW_LOCK_UNLOCKED
+STATIC rwlock_t np_hash_lock = __RW_LOCK_UNLOCKED(np_hash_lock);
+STATIC rwlock_t np_prot_lock = __RW_LOCK_UNLOCKED(np_prot_lock);
+#elif	defined RW_LOCK_UNLOCKED
+STATIC rwlock_t np_hash_lock = RW_LOCK_UNLOCKED;
+STATIC rwlock_t np_prot_lock = RW_LOCK_UNLOCKED;
+#else
+#error cannot initialize read-write locks
+#endif
 
 #ifdef LINUX
 #if defined HAVE_KTYPE_STRUCT_NET_PROTOCOL
@@ -377,7 +396,6 @@ struct np_prot_bucket {
 	int clrefs;			/* N_CLNS references */
 	struct inet_protocol prot;	/* Linux registration structure */
 };
-STATIC rwlock_t np_prot_lock = RW_LOCK_UNLOCKED;
 STATIC struct np_prot_bucket *np_prots[256];
 
 STATIC kmem_cachep_t npi_bind_cachep;

@@ -16772,10 +16772,12 @@ xp_w_prim(queue_t *q, mblk_t *mp)
  *  Open is called on the first open of a character special device stream
  *  head; close is called on the last close of the same device.
  */
-#ifdef SPIN_LOCK_UNLOCKED
+#if	defined DEFINE_SPINLOCK
+STATIC DEFINE_SPINLOCK(xp_lock);
+#elif	defined __SPIN_LOCK_UNLOCKED
+STATIC spinlock_t xp_lock = __SPIN_LOCK_UNLOCKED(xp_lock);
+#elif	defined SPIN_LOCK_UNLOCKED
 STATIC spinlock_t xp_lock = SPIN_LOCK_UNLOCKED;
-#elif defined __SPIN_LOCK_UNLOCKED
-STATIC spinlock_t xp_lock = __SPIN_LOCK_UNLOCKED(&xp_lock);
 #else
 #error cannot initialize spin locks
 #endif

@@ -160,10 +160,12 @@ struct dl {
 	dl_info_ack_t info;
 };
 
-#ifdef RW_LOCK_UNLOCKED
+#if	defined DEFINE_RWLOCK
+DEFINE_RWLOCK(atm_lock);
+#elif	defined __RW_LOCK_UNLOCKED
+rwlock_t atm_lock = __RW_LOCK_UNLOCKED(atm_lock);
+#elif	defined RW_LOCK_UNLOCKED
 rwlock_t atm_lock = RW_LOCK_UNLOCKED;
-#elif defined __RW_LOCK_UNLOCKED
-rwlock_t atm_lock = __RW_LOCK_UNLOCKED(&atm_lock);
 #else
 #error cannot initialize read-write locks
 #endif

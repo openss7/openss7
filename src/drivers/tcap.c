@@ -1066,7 +1066,15 @@ typedef struct df {
 	struct tcap_stats_df stamp;	/* default statistics timestamps */
 	struct tcap_stats_df stats;	/* default statistics */
 } df_t;
-static struct df master;
+static struct df master = {
+#if	defined __SPIN_LOCK_UNLOCKED
+	.lock = __SPIN_LOCK_UNLOCKED(master.lock),
+#elif	defined SPIN_LOCK_UNLOCKED
+	.lock = SPIN_LOCK_UNLOCKED,
+#else
+#error cannot initialize spin locks
+#endif
+};
 
 static inline struct df *
 df_lookup(struct tc *tc, uint id)
@@ -10191,10 +10199,12 @@ n_other_ind(struct sc *sc, queue_t *q, mblk_t *mp)
  *  =========================================================================
  */
 
-#ifdef RW_LOCK_UNLOCKED
+#if	defined DEFINE_RWLOCK
+static DEFINE_RWLOCK(tcap_mux_lock);
+#elif	defined __RW_LOCK_UNLOCKED
+static rwlock_t tcap_mux_lock = __RW_LOCK_UNLOCKED(tcap_mux_lock);
+#elif	defined RW_LOCK_UNLOCKED
 static rwlock_t tcap_mux_lock = RW_LOCK_UNLOCKED;
-#elif defined __RW_LOCK_UNLOCKED
-static rwlock_t tcap_mux_lock = __RW_LOCK_UNLOCKED(&tcap_mux_lock);
 #else
 #error cannot initialize read-write locks
 #endif

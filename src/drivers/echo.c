@@ -290,10 +290,12 @@ typedef struct echo {
 	dev_t dev;
 } echo_t;
 
-#ifdef SPIN_LOCK_UNLOCKED
+#if	defined DEFINE_SPINLOCK
+static DEFINE_SPINLOCK(echo_lock);
+#elif	defined __SPIN_LOCK_UNLOCKED
+static spinlock_t echo_lock = __SPIN_LOCK_UNLOCKED(echo_lock);
+#elif	defined SPIN_LOCK_UNLOCKED
 static spinlock_t echo_lock = SPIN_LOCK_UNLOCKED;
-#elif defined __SPIN_LOCK_UNLOCKED
-static spinlock_t echo_lock = __SPIN_LOCK_UNLOCKED(&echo_lock);
 #else
 #error cannot initialize spin locks
 #endif

@@ -237,7 +237,15 @@ static struct module_stat np_lwstat __attribute__ ((__aligned__(SMP_CACHE_BYTES)
  * altered during the bind and unbind operations.  This driver is protected from interrupts and
  * interrupt suppression is not necessary when taking these locks (making them disappear on UP).
  */
+#if	defined DEFINE_RWLOCK
+static DEFINE_RWLOCK(np_mux_lock);
+#elif	defined __RW_LOCK_UNLOCKED
+static rwlock_t np_mux_lock = __RW_LOCK_UNLOCKED(np_mux_lock);
+#elif	defined RWLOCK_UNLOCKED
 static rwlock_t np_mux_lock = RWLOCK_UNLOCKED;
+#else
+#error cannot initialize read-write locks
+#endif
 
 /*
  * Here is the locking strategy.  Upper multiplex queue pairs use np_acquire() and np_release().

@@ -2247,7 +2247,16 @@ ch_rput(queue_t *q, mblk_t *mp)
  */
 
 caddr_t hdlc_opens = NULL;
+
+#if	defined DEFINE_RWLOCK
+DEFINE_RWLOCK(hdlc_rwlock);
+#elif	defined __RW_LOCK_UNLOCKED
+rwlock_t hdlc_rwlock = __RW_LOCK_UNLOCKED(hdlc_rwlock);
+#elif	defined RW_LOCK_UNLOCKED
 rwlock_t hdlc_rwlock = RW_LOCK_UNLOCKED;
+#else
+#error cannot initialize read-write locks
+#endif
 
 static int
 hdlc_qopen(queue_t *q, dev_t *devp, int oflags, int sflag, cred_t *crp)

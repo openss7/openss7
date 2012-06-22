@@ -179,7 +179,15 @@ struct cd {
 	struct CD_info_ack info;	/* information */
 };
 
+#if	defined DEFINE_SPINLOCK
+static DEFINE_SPINLOCK(cd_lock);	/* lock for lists */
+#elif	defined __SPIN_LOCK_UNLOCKED
+static spinlock_t cd_lock = __SPIN_LOCK_UNLOCKED(cd_lock);	/* lock for lists */
+#elif	defined SPIN_LOCK_UNLOCKED
 static spinlock_t cd_lock = SPIN_LOCK_UNLOCKED;	/* lock for lists */
+#else
+#error cannot initialize spin locks
+#endif
 
 static caddr_t cd_opens = NULL;		/* list for opens */
 static caddr_t cd_links = NULL;		/* list for links */

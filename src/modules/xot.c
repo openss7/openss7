@@ -249,7 +249,16 @@ struct priv {
 #define DL_PRIV(q) (&PRIV(q)->w_priv)
 #define TP_PRIV(q) (&PRIV(q)->r_priv)
 
+#if	defined DEFINE_RWLOCK
+DEFINE_RWLOCK(xot_rwlock);
+#elif	defined __RW_LOCK_UNLOCKED
+rwlock_t xot_rwlock = __RW_LOCK_UNLOCKED(xot_rwlock);
+#elif	defined RW_LOCK_UNLOCKED
 rwlock_t xot_rwlock = RW_LOCK_UNLOCKED;
+#else
+#error cannot initialize read-write locks
+#endif
+
 caddr_t xot_opens = NULL;
 
 static void

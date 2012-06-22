@@ -113,10 +113,12 @@ MODULE_VERSION(PACKAGE_ENVR);
 #endif
 #endif
 
-#ifdef SPIN_LOCK_UNLOCKED
+#if	defined DEFINE_SPINLOCK
+static DEFINE_SPINLOCK(sleep_lock);
+#elif	defined __SPIN_LOCK_UNLOCKED
+static lock_t sleep_lock = __SPIN_LOCK_UNLOCKED(sleep_lock);
+#elif	defined SPIN_LOCK_UNLOCKED
 static lock_t sleep_lock = SPIN_LOCK_UNLOCKED;
-#elif defined __SPIN_LOCK_UNLOCKED
-static lock_t sleep_lock = __SPIN_LOCK_UNLOCKED(&sleep_lock);
 #else
 #error cannot initialize spin locks
 #endif

@@ -636,7 +636,15 @@ struct xp {
 };
 
 #ifdef CONFIG_SMP
+#if	defined DEFINE_SPINLOCK
+STATIC DEFINE_SPINLOCK(xp_daccs_lock);
+#elif	defined __SPIN_LOCK_UNLOCKED
+STATIC spinlock_t xp_daccs_lock = __SPIN_LOCK_UNLOCKED(xp_daccs_lock);
+#elif	defined SPIN_LOCK_UNLOCKED
 STATIC spinlock_t xp_daccs_lock = SPIN_LOCK_UNLOCKED;
+#else
+#error cannot initialize spin locks
+#endif
 #endif
 
 #define X400P_EBUFNO	(1<<7)	/* 128k of elastic buffers per card. */

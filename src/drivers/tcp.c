@@ -453,10 +453,12 @@ typedef struct tpi {
 #define TPI_PRIV(__q) ((struct tpi *)((__q)->q_ptr))
 
 STATIC struct tpi *tpi_opens = NULL;
-#ifdef RW_LOCK_UNLOCKED
+#if	defined DEFINE_RWLOCK
+STATIC DEFINE_RWLOCK(tpi_lock);
+#elif	defined __RW_LOCK_UNLOCKED
+STATIC rwlock_t tpi_lock = __RW_LOCK_UNLOCKED(tpi_lock);
+#elif	defined RW_LOCK_UNLOCKED
 STATIC rwlock_t tpi_lock = RW_LOCK_UNLOCKED;
-#elif defined __RW_LOCK_UNLOCKED
-STATIC rwlock_t tpi_lock = __RW_LOCK_UNLOCKED(&tpi_lock);
 #else
 #error cannot initialize read-write locks
 #endif

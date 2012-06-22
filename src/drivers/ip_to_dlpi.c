@@ -280,7 +280,15 @@ int ip2xinet_send_down_bind(queue_t *q);
 int init_linuxip(void);
 void cleanup_linuxip(void);
 int ip2xinet_num_ip_opened;
-spinlock_t *ip2xinet_lock;
+#if	defined DEFINE_SPINLOCK
+DEFINE_SPINLOCK(ip2xinet_lock);
+#elif	defined __SPIN_LOCK_UNLOCKED
+spinlock_t ip2xinet_lock = __SPIN_LOCK_UNLOCKED(ip2xinet_lock);
+#elif	defined SPIN_LOCK_UNLOCKED
+spinlock_t ip2xinet_lock = SPIN_LOCK_UNLOCKED;
+#else
+#error cannot initialize spin locks
+#endif
 int ip2_m_number;
 
 int ip2xinetinit(void);
@@ -328,11 +336,11 @@ ip2xinet_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *credp)
 	if (sflag != CLONEOPEN)
 		return ENXIO;
 
-	spin_lock(ip2xinet_lock);
+	spin_lock(&ip2xinet_lock);
 
 	/* Can only open one time */
 	if (ip2xinet_numopen) {
-		spin_unlock(ip2xinet_lock);
+		spin_unlock(&ip2xinet_lock);
 		return ENXIO;
 	} else
 		ip2xinet_numopen = 1;
@@ -343,7 +351,7 @@ ip2xinet_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *credp)
 	/* Set up the flow control parameters and send them up to the stream head.  */
 	minor = getminor(*devp);
 	if ((bp = allocb(sizeof(struct stroptions), BPRI_LO)) == NULL) {
-		spin_unlock(ip2xinet_lock);
+		spin_unlock(&ip2xinet_lock);
 		printk("%s: allocb failed", __FUNCTION__);
 		return ENOMEM;
 	}
@@ -355,7 +363,7 @@ ip2xinet_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *credp)
 	q->q_ptr = (char *) &ip2xinet_numopen;
 	WR(q)->q_ptr = (char *) &ip2xinet_numopen;
 
-	spin_unlock(ip2xinet_lock);
+	spin_unlock(&ip2xinet_lock);
 
 	bp->b_datap->db_type = M_SETOPTS;
 	bp->b_wptr += sizeof(struct stroptions);
@@ -392,12 +400,12 @@ ip2xinet_close(queue_t *q, int oflag, cred_t *credp)
 	(void) oflag;
 	(void) credp;
 	qprocsoff(q);
-	spin_lock(ip2xinet_lock);
+	spin_lock(&ip2xinet_lock);
 	ip2xinet_numopen = 0;
 	flushq(WR(q), FLUSHALL);
 	q->q_ptr = NULL;
 	WR(q)->q_ptr = NULL;
-	spin_unlock(ip2xinet_lock);
+	spin_unlock(&ip2xinet_lock);
 	goto quit;
       quit:
 	return (0);
@@ -427,7 +435,7 @@ ip2xinet_uwput(queue_t *q, mblk_t *mp)
 
 	int i;
 
-	spin_lock(ip2xinet_lock);
+	spin_lock(&ip2xinet_lock);
 
 	switch (mp->b_datap->db_type) {
 	case M_FLUSH:
@@ -502,7 +510,7 @@ ip2xinet_uwput(queue_t *q, mblk_t *mp)
 					mp->b_band = 0;
 					putq(RD(q), mp);
 				}
-				spin_unlock(ip2xinet_lock);
+				spin_unlock(&ip2xinet_lock);
 				printk("pktioctl: I_LINK failed: allocb failed");
 				return (0);
 			}
@@ -586,7 +594,7 @@ ip2xinet_uwput(queue_t *q, mblk_t *mp)
 		freemsg(mp);
 		break;
 	}
-	spin_unlock(ip2xinet_lock);
+	spin_unlock(&ip2xinet_lock);
 	return (0);
 }
 
@@ -655,7 +663,7 @@ ip2xinet_lwsrv(queue_t *q)
 	/* Handle the flow control.  If we were able to send everything then it is ok for the
 	   kernel to send us more stuff.  Otherwise it is not ok.  Go through all of the devices
 	   and set the appropriate state. */
-	spin_lock(ip2xinet_lock);
+	spin_lock(&ip2xinet_lock);
 	for (i = 0; i < NUMIP2XINET; i++, dev++) {
 		privp = &dev->priv;
 		if (privp->state == 1 && ip2xinet_status.ip2x_dlstate == DL_IDLE) {
@@ -666,7 +674,7 @@ ip2xinet_lwsrv(queue_t *q)
 			}
 		}
 	}
-	spin_unlock(ip2xinet_lock);
+	spin_unlock(&ip2xinet_lock);
 
 	return (0);
 }
@@ -699,7 +707,7 @@ ip2xinet_lrput(queue_t *q, mblk_t *mp)
 	struct net_device *dev;
 	int i;
 
-	spin_lock(ip2xinet_lock);
+	spin_lock(&ip2xinet_lock);
 
 	/* use the first open ip device */
 	for (i = 0; i < NUMIP2XINET; i++) {
@@ -957,7 +965,7 @@ ip2xinet_lrput(queue_t *q, mblk_t *mp)
 		break;
 	}
 
-	spin_unlock(ip2xinet_lock);
+	spin_unlock(&ip2xinet_lock);
 	return (0);
 }
 
@@ -1020,7 +1028,7 @@ ip2xinet_devopen(struct net_device *dev)
 	int err;
 	struct ip2xinet_priv *privp = &((struct ip2xinet_dev *) dev)->priv;
 
-	spin_lock(ip2xinet_lock);
+	spin_lock(&ip2xinet_lock);
 
 	/* BEFORE ANYTHING CHECK THAT the streams I_LINK SUCCEEDED */
 	if (!
@@ -1029,13 +1037,13 @@ ip2xinet_devopen(struct net_device *dev)
 		/* Normally we'd do the I_LINK, this would set us up into the UNBOUND state but
 		   something went wrong.  Either the I_LINK has not completed yet, or it failed. In 
 		   any case we're not in the shape to succeed so return a failure code and exit. */
-		spin_unlock(ip2xinet_lock);
+		spin_unlock(&ip2xinet_lock);
 		return -EAGAIN;	/* Other drivers seem to return this on error */
 	}
 	/* Send a DL_BIND DOWN */
 	if (ip2xinet_num_ip_opened == 0) {
 		if ((err = ip2xinet_send_down_bind(ip2xinet_status.lowerq)) != 0) {
-			spin_unlock(ip2xinet_lock);
+			spin_unlock(&ip2xinet_lock);
 			return err;
 		}
 	}
@@ -1053,7 +1061,7 @@ ip2xinet_devopen(struct net_device *dev)
 	else
 		netif_stop_queue(dev);	/* wait until DL_IDLE, then kernel can tx */
 
-	spin_unlock(ip2xinet_lock);
+	spin_unlock(&ip2xinet_lock);
 	return 0;
 }
 
@@ -1064,7 +1072,7 @@ ip2xinet_release(struct net_device *dev)
 	mblk_t *mp;
 	struct ip2xinet_priv *privp = &((struct ip2xinet_dev *) dev)->priv;
 
-	spin_lock(ip2xinet_lock);
+	spin_lock(&ip2xinet_lock);
 	privp->state = 0;
 	netif_stop_queue(dev);	/* can't transmit any more */
 	ip2xinet_num_ip_opened--;
@@ -1073,7 +1081,7 @@ ip2xinet_release(struct net_device *dev)
 
 		/* Normally we'd do the I_UNBIND, from DL_IDLE In all other cases we ignore the
 		   dlpi state as we'll unlink soon */
-		spin_unlock(ip2xinet_lock);
+		spin_unlock(&ip2xinet_lock);
 		return 0;
 	}
 	/* Send a DL_UNBIND DOWN */
@@ -1081,7 +1089,7 @@ ip2xinet_release(struct net_device *dev)
 		q = ip2xinet_status.lowerq;
 		if ((mp = allocb(sizeof(union DL_primitives), BPRI_LO)) == NULL) {
 			printk("ip2xopen: failed: allocb failed");
-			spin_unlock(ip2xinet_lock);
+			spin_unlock(&ip2xinet_lock);
 			return 0;	/* Other drivers seem to return this on error */
 		}
 		ip2xinet_status.ip2x_dlstate = DL_UNBIND_PENDING;
@@ -1098,7 +1106,7 @@ ip2xinet_release(struct net_device *dev)
 			}
 		}
 	}
-	spin_unlock(ip2xinet_lock);
+	spin_unlock(&ip2xinet_lock);
 	return 0;
 }
 
@@ -1109,28 +1117,28 @@ ip2xinet_release(struct net_device *dev)
 int
 ip2xinet_config(struct net_device *dev, struct ifmap *map)
 {
-	spin_lock(ip2xinet_lock);
+	spin_lock(&ip2xinet_lock);
 	if (dev->flags & IFF_UP) {	/* can't act on a running interface */
-		spin_unlock(ip2xinet_lock);
+		spin_unlock(&ip2xinet_lock);
 		return -EBUSY;
 	}
 
 	/* Don't allow changing the I/O address */
 	if (map->base_addr != dev->base_addr) {
-		spin_unlock(ip2xinet_lock);
+		spin_unlock(&ip2xinet_lock);
 		printk(KERN_WARNING "ip2xinet: Can't change I/O address\n");
 		return -EOPNOTSUPP;
 	}
 
 	/* Don't allow changing the IRQ */
 	if (map->irq != dev->irq) {
-		spin_unlock(ip2xinet_lock);
+		spin_unlock(&ip2xinet_lock);
 		printk(KERN_WARNING "ip2xinet: Can't change IRQ\n");
 		return -EOPNOTSUPP;
 	}
 
 	/* ignore other fields */
-	spin_unlock(ip2xinet_lock);
+	spin_unlock(&ip2xinet_lock);
 	return 0;
 }
 
@@ -1257,15 +1265,15 @@ ip2xinet_tx(struct sk_buff *skb, struct net_device *dev)
 		dev_kfree_skb(skb);
 		return 0;
 	}
-	spin_lock(ip2xinet_lock);
+	spin_lock(&ip2xinet_lock);
 	if (netif_queue_stopped(dev)) {
-		spin_unlock(ip2xinet_lock);
+		spin_unlock(&ip2xinet_lock);
 		return -EBUSY;
 	}
 
 	dev->trans_start = jiffies;	/* save the timestamp */
 	ip2xinet_hw_tx(skb->data, skb->len, (struct ip2xinet_dev*) dev);
-	spin_unlock(ip2xinet_lock);
+	spin_unlock(&ip2xinet_lock);
 	dev_kfree_skb(skb);	/* release it */
 
 	return 0;		/* zero == done */
@@ -1365,9 +1373,9 @@ ip2xinet_change_mtu(struct net_device *dev, int new_mtu)
 
 	/* Do anything you need, and accept the value */
 
-	spin_lock(ip2xinet_lock);
+	spin_lock(&ip2xinet_lock);
 	dev->mtu = new_mtu;	/* accept the new value */
-	spin_unlock(ip2xinet_lock);
+	spin_unlock(&ip2xinet_lock);
 	return 0;
 }
 

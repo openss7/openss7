@@ -204,7 +204,16 @@ static kmem_cachep_t dl_priv_cachep = NULL;
 #define STRLOGTE	6	/* log Streams timer events */
 #define STRLOGDA	7	/* log Streams data */
 
-static rwlock_t dl_drv_lock = RWLOCK_UNLOCKED;
+
+#if	defined DEFINE_RWLOCK
+static DEFINE_RWLOCK(dl_drv_lock);
+#elif	defined __RW_LOCK_UNLOCKED
+static rwlock_t dl_drv_lock = __RW_LOCK_UNLOCKED(dl_drv_lock);
+#elif	defined RW_LOCK_UNLOCKED
+static rwlock_t dl_drv_lock = RW_LOCK_UNLOCKED;
+#else
+#error cannot initialize read-write locks
+#endif
 
 /**
  * dl_iocname: display DL ioctl command name

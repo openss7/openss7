@@ -199,10 +199,12 @@ typedef struct spx {
 	dev_t dev;
 } spx_t;
 
-#ifdef SPIN_LOCK_UNLOCKED
+#if	defined DEFINE_SPINLOCK
+static DEFINE_SPINLOCK(spx_lock);
+#elif	defined __SPIN_LOCK_UNLOCKED
+static spinlock_t spx_lock = __SPIN_LOCK_UNLOCKED(spx_lock);
+#elif	defined SPIN_LOCK_UNLOCKED
 static spinlock_t spx_lock = SPIN_LOCK_UNLOCKED;
-#elif defined __SPIN_LOCK_UNLOCKED
-static spinlock_t spx_lock = __SPIN_LOCK_UNLOCKED(&spx_lock);
 #else
 #error cannot initialize spin locks
 #endif
