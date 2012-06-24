@@ -306,15 +306,15 @@ struct streamtab sthinfo = {
 /* Unfortunately we cannot use the spin lock.  In stropen() we need to call qopen() (that can sleep)
  * with the lock held.  Therefore, use the more efficient mutex if available, otherwise, the big old
  * semaphore. */
-#if defined HAVE_KMEMB_STRUCT_INODE_I_LOCK
-#define stri_trylock(__i)   (int)({ spin_lock(&(__i)->i_lock); 0; })
-#define stri_lock(__i)	    spin_lock(&(__i)->i_lock)
-#define stri_unlock(__i)    spin_unlock(&(__i)->i_lock)
-#else
 #if defined HAVE_KMEMB_STRUCT_INODE_I_MUTEX
 #define stri_trylock(__i)   mutex_lock_interruptible(&(__i)->i_mutex)
 #define stri_lock(__i)	    mutex_lock(&(__i)->i_mutex)
 #define stri_unlock(__i)    mutex_unlock(&(__i)->i_mutex)
+#else
+#if defined HAVE_KMEMB_STRUCT_INODE_I_LOCK
+#define stri_trylock(__i)   (int)({ spin_lock(&(__i)->i_lock); 0; })
+#define stri_lock(__i)	    spin_lock(&(__i)->i_lock)
+#define stri_unlock(__i)    spin_unlock(&(__i)->i_lock)
 #else
 #define stri_trylock(__i)   down_interruptible(&(__i)->i_sem)
 #define stri_lock(__i)	    down(&(__i)->i_sem)
@@ -346,11 +346,11 @@ stri_insert(struct file *file, struct stdata *sd)
 }
 
 /**
- *  stri_acquire:   - acquire a reference to a stream head from a file pointer
+ *  stri_acquire_ok:   - acquire a reference to a stream head from a file pointer
  *  @file:	file pointer to stream
  */
 STATIC streams_inline streams_fastcall struct stdata *
-stri_acquire(struct file *file)
+stri_acquire_ok(struct file *file)
 {
 	struct stdata *sd;
 	struct inode *inode = file->f_dentry->d_inode;
@@ -362,6 +362,25 @@ stri_acquire(struct file *file)
 	_printd(("%s: unlocking inode %p\n", __FUNCTION__, inode));
 	stri_unlock(inode);
 	return (sd);
+}
+
+static volatile int sthunlocked;
+
+/**
+ *  stri_acquire:	- acquire a reference to a stream header from a file pointer
+ *  @file:	file pointer to stream
+ *
+ *  This version checks for access privilege, otherwise returns null which will return
+ *  -ENOSTR from all streams system calls except open, close, and ioctl.  We leave open,
+ *  close and ioctl open so that the STREAMS administrative driver sad(4) can reauthorize
+ *  the stack.
+ */
+STATIC streams_inline streams_fastcall struct stdata *
+stri_acquire(struct file *file)
+{
+	if (sthunlocked)
+		return stri_acquire_ok(file);
+	return NULL;
 }
 
 /**
@@ -11824,6 +11843,7 @@ sthinit(void)
 #if defined WITH_32BIT_CONVERSION && !defined HAVE_COMPAT_IOCTL
 	streams_register_ioctl32_conversions();
 #endif
+	sthunlocked = 1;
 	return (0);
       no_strmod:
 	return (result);

@@ -829,6 +829,7 @@ dnl----------------------------------------------------------------------------
 	cpu_raise_softirq \
 	cpumask_scnprintf \
 	create_proc_info_entry \
+	d_alloc_pseudo \
 	dev_init_buffers \
 	dst_mtu \
 	dst_output \
@@ -848,6 +849,7 @@ dnl----------------------------------------------------------------------------
 	ip_route_output_flow \
 	ip_route_output_key \
 	kern_umount \
+	kill_litter_super \
 	kill_proc \
 	ksize \
 	module_put \
@@ -1134,6 +1136,7 @@ dnl----------------------------------------------------------------------------
 	struct ctl_table.de,
 	struct ctl_table.parent,
 	struct ctl_table.strategy,
+	struct dentry_operations.d_dname,
 	struct dst_entry.path,
 	struct file.f_cred,
 	struct file.f_gid,
@@ -1185,7 +1188,9 @@ dnl----------------------------------------------------------------------------
 	struct sock.sk_debug,
 	struct sock.sk_localroute,
 	struct sock.tp_pinfo.af_sctp,
+	struct super_block.s_d_op,
 	struct super_block.s_fs_info,
+	struct super_block.s_time_gran,
 	struct super_block.u.generic_sbp,
 	struct super_operations.drop_inode,
 	struct super_operations.put_inode,
