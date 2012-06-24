@@ -316,8 +316,9 @@ MODULE_ALIAS("/dev/streams/*");
 
 #if   defined HAVE_FILE_MOVE_SYMBOL
 extern void file_move(struct file *file, struct list_head *list);
-#elif defined HAVE_FILE_SB_LIST_ADD_SYMBOL
+#elif defined HAVE_FILE_SB_LIST_ADD_SYMBOL && defined HAVE_FILE_SB_LIST_DEL_SYMBOL
 extern void file_sb_list_add(struct file *file, struct super_block *sb);
+extern void file_sb_list_del(struct file *file);
 #else
 #error Need a way to move a file pointer.
 #endif
@@ -366,6 +367,10 @@ spec_snode(dev_t dev, struct cdevsw *cdev)
 	return (snode);
 }
 
+#if defined HAVE_KMEMB_STRUCT_DENTRY_OPERATIONS_D_DNAME && ! defined HAVE_KMEMB_STRUCT_SUPER_BLOCK_S_D_OP
+static const struct dentry_operations spec_root_d_ops;
+#endif
+
 streams_fastcall int
 spec_reparent(struct file *file, struct cdevsw *cdev, dev_t dev)
 {
@@ -388,6 +393,9 @@ spec_reparent(struct file *file, struct cdevsw *cdev, dev_t dev)
 		return (-ENODEV);
 	}
 	{
+#ifdef HAVE_KMEMB_STRUCT_DENTRY_OPERATIONS_D_DNAME
+		struct qstr name = { .name = "" };
+#else				/* HAVE_KMEMB_STRUCT_DENTRY_OPERATIONS_D_DNAME */
 		struct devnode *cmin;
 		struct qstr name;
 		char buf[25];
@@ -399,14 +407,30 @@ spec_reparent(struct file *file, struct cdevsw *cdev, dev_t dev)
 		else
 			name.len = snprintf(buf, sizeof(buf), "STR %s/%lu",
 					    cdev->d_name, getminor(dev));
-
+#endif				/* HAVE_KMEMB_STRUCT_DENTRY_OPERATIONS_D_DNAME */
+#ifdef HAVE_KFUNC_D_ALLOC_PSEUDO
+		if (!(dentry = d_alloc_pseudo(mnt->mnt_sb, &name))) {
+			ptrace(("Error path taken!\n"));
+			err = -ENOMEM;
+			goto mnt_error;
+		}
+#else				/* HAVE_KFUNC_D_ALLOC_PSEUDO */
 		if (!(dentry = d_alloc(NULL, &name))) {
 			ptrace(("Error path taken!\n"));
 			err = -ENOMEM;
 			goto mnt_error;
 		}
 		dentry->d_sb = mnt->mnt_sb;
-		dentry->d_parent = dentry;  /* XXX */
+		dentry->d_parent = dentry;  /* root dentry */
+#ifdef DCACHE_DISCONNECTED
+		dentry->d_flags |= DCACHE_DISCONNECTED;
+#else
+		dentry->d_flags &= ~(DCACHE_UNHASHED);
+#endif
+#endif				/* HAVE_KFUNC_D_ALLOC_PSEUDO */
+#if defined HAVE_KMEMB_STRUCT_DENTRY_OPERATIONS_D_DNAME && ! defined HAVE_KMEMB_STRUCT_SUPER_BLOCK_S_D_OP
+		dentry->d_op = &spec_root_d_ops;
+#endif
 	}
 
 	if (IS_ERR((snode = spec_snode(dev, cdev)))) {
@@ -455,6 +479,7 @@ spec_reparent(struct file *file, struct cdevsw *cdev, dev_t dev)
 #if   defined HAVE_FILE_MOVE_SYMBOL
 	file_move(file, &mnt->mnt_sb->s_files);
 #elif defined HAVE_FILE_SB_LIST_ADD_SYMBOL
+	file_sb_list_del(file);
 	file_sb_list_add(file, mnt->mnt_sb);
 #else
 #error Need a way to move a file pointer.
@@ -839,7 +864,7 @@ spec_root_readdir(struct file *file, void *dirent, filldir_t filldir)
 					err = filldir(dirent, cdev->d_name,
 						      strnlen(cdev->d_name, FMNAMESZ), file->f_pos,
 						      cdev->d_inode->i_ino,
-						      cdev->d_inode->i_mode >> 12);
+						      (cdev->d_inode->i_mode >> 12) & 15);
 					read_lock(&cdevsw_lock);
 				}
 			}
@@ -856,6 +881,55 @@ STATIC struct file_operations spec_root_f_ops = {
 	.readdir = spec_root_readdir,
 };
 
+/*
+ *  Shadow Special Filesystem Dentry operations
+ *  -------------------------------------------------------------------------
+ */
+
+#if defined HAVE_KMEMB_STRUCT_DENTRY_OPERATIONS_D_DNAME || !defined DCACHE_DISCONNECTED
+#ifdef HAVE_KMEMB_STRUCT_DENTRY_OPERATIONS_D_DNAME
+/**
+ *  spec_dname:	- provide dynamic dentry path name
+ *  @dentry:	dentry for which to provide path name
+ */
+static char *
+specfs_dname(struct dentry *dentry, char *buffer, int buflen)
+{
+	struct cdevsw *cdev;
+
+	if ((cdev = cdrv_get(getmajor(dentry->d_inode->i_ino)))) {
+		struct devnode *cmin;
+
+		if ((cmin = cmin_get(cdev, getminor(dentry->d_inode->i_ino)))) {
+			return dynamic_dname(dentry, buffer, buflen, "STR %s/%s", cdev->d_name, cmin->n_name);
+		} else {
+			return dynamic_dname(dentry, buffer, buflen, "STR %s/%lu", cdev->d_name,
+					     getminor(dentry->d_inode->i_ino));
+		}
+	} else {
+		return dynamic_dname(dentry, buffer, buflen, "STR ???/???");
+	}
+}
+#endif				/* CONFIG_KMEMB_STRUCT_DENTRY_OPERATIONS_D_DNAME */
+
+#ifndef DCACHE_DISCONNECTED
+static int specfs_delete_dentry(struct dentry *dentry)
+{
+	dentry->d_flags |= DCACHE_UNHASHED;
+	return 0;
+}
+#endif
+
+static const struct dentry_operations spec_root_d_ops = {
+#ifndef DCACHE_DISCONNECTED
+	.d_delete = specfs_delete_dentry,
+#endif
+#ifdef HAVE_KMEMB_STRUCT_DENTRY_OPERATIONS_D_DNAME
+	.d_dname = specfs_dname,
+#endif
+};
+#endif
+
 /* 
  *  =========================================================================
  *
@@ -867,6 +941,15 @@ STATIC struct file_operations spec_root_f_ops = {
  *  Shadow Special Filesystem super block.
  *  -------------------------------------------------------------------------
  */
+
+#if defined HAVE_KMEMB_STRUCT_SUPER_BLOCK_S_FS_INFO
+#define SPECFS_SB(s) s->s_fs_info
+#elif defined HAVE_KMEMB_STRUCT_SUPER_BLOCK_U_GENERIC_SBP
+#define SPECFS_SB(s) s->u.generic_sbp
+#else
+#error HAVE_KMEMB_STRUCT_SUPER_BLOCK_S_FS_INFO or HAVE_KMEMB_STRUCT_SUPER_BLOCK_U_GENERIC_SBP must be defined.
+#endif
+
 STATIC struct spec_sb_info *
 spec_sbi_alloc(void)
 {
@@ -951,6 +1034,31 @@ spec_parse_options(char *options, struct spec_sb_info *sbi)
 	goto done_options;
 }
 
+#if defined HAVE_KMEMB_STRUCT_SUPER_OPERATIONS_SHOW_OPTIONS
+
+/**
+ *  spec_show_options:	- show shadow special filesystem options
+ *  @seq:		sequence file
+ *  @vfs:		vfs mount
+ */
+STATIC int
+spec_show_options(struct seq_file *seq, struct vfsmount *vfs)
+{
+	struct spec_sb_info *sbi = SPECFS_SB(vfs->mnt_sb);
+	
+	if (sbi != NULL) {
+		if (sbi->sbi_setuid)
+			seq_printf(seq, ",uid=%u", sbi->sbi_uid);
+		if (sbi->sbi_setgid)
+			seq_printf(seq, ",gid=%u", sbi->sbi_gid);
+		if (sbi->sbi_setmod)
+			seq_printf(seq, ",mode=%03o", sbi->sbi_mode);
+	}
+	return 0;
+}
+
+#endif				/* defined HAVE_KMEMB_STRUCT_SUPER_OPERATIONS_SHOW_OPTIONS */
+
 /**
  *  spec_read_inode: - read a inode from the filesystem
  *  @inode:	initialized inode to read
@@ -980,15 +1088,8 @@ spec_read_inode(struct inode *inode)
 	if (!cdev)
 		goto bad_inode;
 	else {
-#ifdef HAVE_KMEMB_STRUCT_SUPER_BLOCK_S_FS_INFO
-		struct spec_sb_info *sbi = inode->i_sb->s_fs_info;
-#else
-#ifdef HAVE_KMEMB_STRUCT_SUPER_BLOCK_U_GENERIC_SBP
-		struct spec_sb_info *sbi = inode->i_sb->u.generic_sbp;
-#else
-#error HAVE_KMEMB_STRUCT_SUPER_BLOCK_S_FS_INFO or HAVE_KMEMB_STRUCT_SUPER_BLOCK_U_GENERIC_SBP must be defined.
-#endif
-#endif
+		struct spec_sb_info *sbi = SPECFS_SB(inode->i_sb);
+
 		inode->i_mode = (sbi->sbi_mode & ~S_IFMT);
 		inode->i_uid = sbi->sbi_uid;
 		inode->i_gid = sbi->sbi_gid;
@@ -1109,15 +1210,8 @@ STATIC void
 spec_put_super(struct super_block *sb)
 {
 	/* just free our optional mount information */
-#ifdef HAVE_KMEMB_STRUCT_SUPER_BLOCK_S_FS_INFO
-	spec_sbi_free(sb->s_fs_info);
-	sb->s_fs_info = NULL;
-#else
-#ifdef HAVE_KMEMB_STRUCT_SUPER_BLOCK_U_GENERIC_SBP
-	spec_sbi_free(sb->u.generic_sbp);
-	sb->u.generic_sbp = NULL;
-#endif
-#endif
+	spec_sbi_free(SPECFS_SB(sb));
+	SPECFS_SB(sb) = NULL;
 }
 
 #define SPECFS_MAGIC 0xDEADBEEF
@@ -1163,13 +1257,8 @@ spec_statfs(struct super_block *sb, struct statfs *buf)
 STATIC int
 spec_remount_fs(struct super_block *sb, int *flags, char *data)
 {
-#ifdef HAVE_KMEMB_STRUCT_SUPER_BLOCK_S_FS_INFO
-	struct spec_sb_info *sbi = sb->s_fs_info;
-#else
-#ifdef HAVE_KMEMB_STRUCT_SUPER_BLOCK_U_GENERIC_SBP
-	struct spec_sb_info *sbi = sb->u.generic_sbp;
-#endif
-#endif
+	struct spec_sb_info *sbi = SPECFS_SB(sb);
+
 	(void) flags;
 	return (data ? spec_parse_options(data, sbi) : 0);
 }
@@ -1238,6 +1327,9 @@ STATIC struct super_operations spec_s_ops ____cacheline_aligned = {
 #if 0
 	.umount_begin = spec_umount_begin,
 #endif
+#if defined HAVE_KMEMB_STRUCT_SUPER_OPERATIONS_SHOW_OPTIONS
+	.show_options = spec_show_options,
+#endif				/* defined HAVE_KMEMB_STRUCT_SUPER_OPERATIONS_SHOW_OPTIONS */
 };
 
 /* TODO: handle extended attributes */
@@ -1260,6 +1352,9 @@ specfs_fill_super(struct super_block *sb, void *data, int silent)
 	sb->s_blocksize = 1024;
 	sb->s_blocksize_bits = 10;
 	sb->s_magic = SPECFS_MAGIC;
+#ifdef HAVE_KMEMB_STRUCT_SUPER_BLOCK_S_TIME_GRAN
+	sb->s_time_gran = 1;
+#endif
 	sb->s_op = &spec_s_ops;
 	err = -ENOMEM;
 	/* need to read options on mount */
@@ -1283,12 +1378,9 @@ specfs_fill_super(struct super_block *sb, void *data, int silent)
 	inode->i_nlink = 2;
 	if (!(sb->s_root = d_alloc_root(inode)))
 		goto iput_error;
-#ifdef HAVE_KMEMB_STRUCT_SUPER_BLOCK_S_FS_INFO
-	sb->s_fs_info = sbi;
-#else
-#ifdef HAVE_KMEMB_STRUCT_SUPER_BLOCK_U_GENERIC_SBP
-	sb->u.generic_sbp = sbi;
-#endif
+	SPECFS_SB(sb) = sbi;
+#ifdef HAVE_KMEMB_STRUCT_SUPER_BLOCK_S_D_OP
+	sb->s_d_op = &spec_root_d_ops;
 #endif
 	return (0);
       iput_error:
@@ -1312,7 +1404,11 @@ STATIC void
 specfs_kill_sb(struct super_block *sb)
 {
 	_ptrace(("killing superblock %p\n", sb));
+#ifdef HAVE_KFUNC_KILL_LITTER_SUPER
+	return kill_litter_super(sb);
+#else
 	return kill_anon_super(sb);
+#endif
 }
 
 struct file_system_type spec_fs_type = {
@@ -1343,7 +1439,11 @@ STATIC void
 specfs_kill_sb(struct super_block *sb)
 {
 	_ptrace(("killing superblock %p\n", sb));
+#ifdef HAVE_KFUNC_KILL_LITTER_SUPER
+	return kill_litter_super(sb);
+#else
 	return kill_anon_super(sb);
+#endif
 }
 
 struct file_system_type spec_fs_type = {
