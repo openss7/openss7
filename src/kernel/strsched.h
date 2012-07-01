@@ -233,7 +233,7 @@ current_context(void)
 		return (CTX_STREAMS);
 	if (in_interrupt())
 		return (CTX_INT);
-#if defined HAVE_KFUNC_IN_ATOMIC
+#if defined HAVE_KFUNC_IN_ATOMIC || defined in_atomic
 	if (in_atomic())
 		return (CTX_ATOMIC);
 #endif

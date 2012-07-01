@@ -128,6 +128,9 @@ qwait(queue_t *rq)
 
 	DECLARE_WAITQUEUE(wait, current);
 	dassert(!in_interrupt());
+#if defined HAVE_KFUNC_IN_ATOMIC || defined in_atomic
+	dassert(!in_atomic());
+#endif
 	ensure(!test_bit(QHLIST_BIT, &rq->q_flag), qprocson(rq));
 	add_wait_queue(&qu->qu_qwait, &wait);
 	set_current_state(TASK_UNINTERRUPTIBLE);
@@ -152,6 +155,9 @@ qwait_sig(queue_t *rq)
 
 	DECLARE_WAITQUEUE(wait, current);
 	dassert(!in_interrupt());
+#if defined HAVE_KFUNC_IN_ATOMIC || defined in_atomic
+	dassert(!in_atomic());
+#endif
 	ensure(!test_bit(QHLIST_BIT, &rq->q_flag), qprocson(rq));
 	add_wait_queue(&qu->qu_qwait, &wait);
 	set_current_state(TASK_UNINTERRUPTIBLE);

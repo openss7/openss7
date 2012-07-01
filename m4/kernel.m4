@@ -532,7 +532,7 @@ AC_DEFUN([_LINUX_CHECK_KERNEL_MODULES], [dnl
 		AC_MSG_ERROR([
 *** 
 *** Configure could not find the kernel modules directory for the
-*** specified kerne version.  The directories search were:
+*** specified kernel version.  The directories search were:
 ***	"$with_k_modules"
 ***	"$bld_search_path"
 ***
@@ -2190,9 +2190,9 @@ AC_DEFUN([_LINUX_SETUP_KERNEL_CFLAGS], [dnl
     AC_CACHE_CHECK([for kernel CFLAGS], [linux_cv_k_cflags], [dnl
 	if test :"${cross_compiling:-no}" = :no
 	then
-	    linux_tmp=""
+	    linux_setup_kernel_cflags_tmp=""
 	else
-	    linux_tmp="CROSS_COMPILING=`dirname $KCC` ARCH=${linux_cv_k_mach}"
+	    linux_setup_kernel_cflags_tmp="CROSS_COMPILING=`dirname $KCC` ARCH=${linux_cv_k_mach}"
 	fi
 	_LINUX_KBUILD_ENV([dnl
 dnl
@@ -2212,7 +2212,7 @@ dnl	Added in KBUILD_EXTMOD because on newer makefiles this keeps the makefile fr
 dnl	rebuild intermediate makefiles not necessary for an external module build.
 dnl
 	linux_builddir=`pwd`
-	linux_cv_k_cflags="`(export -n ARCH; ${srcdir}/scripts/cflagcheck ${linux_tmp:+$linux_tmp }srctree=${_ksrcdir} objtree=${_kbuilddir} KERNELRELEASE=${kversion} KERNEL_CONFIG=${_kconfig} SPEC_CFLAGS='-g' KERNEL_TOPDIR=${_ksrcdir} TOPDIR=${_ksrcdir} KBUILD_SRC=${_ksrcdir} KBUILD_OUTPUT=${_kbuilddir} KBUILD_EXTMOD=${linux_builddir} -I${_ksrcdir} -I${_khdrdir} -I${_kbuilddir} cflag-check | tail -1)`"
+	linux_cv_k_cflags="`(export -n ARCH; ${srcdir}/scripts/cflagcheck ${linux_setup_kernel_cflags_tmp:+$linux_setup_kernel_cflags_tmp }srctree=${_ksrcdir} objtree=${_kbuilddir} KERNELRELEASE=${kversion} KERNEL_CONFIG=${_kconfig} SPEC_CFLAGS='-g' KERNEL_TOPDIR=${_ksrcdir} TOPDIR=${_ksrcdir} KBUILD_SRC=${_ksrcdir} KBUILD_OUTPUT=${_kbuilddir} KBUILD_EXTMOD=${linux_builddir} -I${_ksrcdir} -I${_khdrdir} -I${_kbuilddir} cflag-check | tail -1)`"
 	linux_cv_k_cflags_orig="$linux_cv_k_cflags"])
 	linux_cflags=
 	AC_ARG_WITH([k-optimize],
@@ -2989,9 +2989,9 @@ AC_DEFUN([_LINUX_CHECK_HEADERS], [dnl
 # _LINUX_CHECK_KERNEL_CONFIG_internal([CHECKING-LABEL], CONFIG-NAME, [ACTION-IF-FOUND], [ACTION-IF-NOT-FOUND])
 # -----------------------------------------------------------------------------
 AC_DEFUN([_LINUX_CHECK_KERNEL_CONFIG_internal], [dnl
-    if test -n "$1" ; then linux_tmp="$1" ; else linux_tmp="for kernel config $2" ; fi
+    if test -n "$1" ; then linux_check_kernel_config_tmp="$1" ; else linux_check_kernel_config_tmp="for kernel config $2" ; fi
     AS_VAR_PUSHDEF([linux_config], [linux_cv_$2])dnl
-    AC_CACHE_CHECK([$linux_tmp], [linux_cv_$2], [dnl
+    AC_CACHE_CHECK([$linux_check_kernel_config_tmp], [linux_cv_$2], [dnl
 	AC_EGREP_CPP([\<yes_we_have_$2_defined\>], [
 #include <linux/version.h>
 #ifdef NEED_LINUX_AUTOCONF_H
@@ -3101,17 +3101,17 @@ AC_DEFUN([_LINUX_CHECK_KERNEL_MODULE_PRELOAD], [dnl
 m4_define([_LINUX_KERNEL_SYMBOL_ADDR_BODY],
 [AS_LINENO_PUSH([$[]1])
 AC_CACHE_CHECK([for kernel symbol $[]2 address], [linux_cv_$[]{2}_addr], [dnl
-    linux_tmp=
-    if test -z "$linux_tmp" -a -n "$ksyms" -a -r "$ksyms"; then
-	linux_tmp="`($EGREP '\<'${2}'\>' $ksyms | sed -e 's| .*||;s|^0[[xX]]||') 2>/dev/null`"
+    linux_kernel_symbol_addr_tmp=
+    if test -z "$linux_kernel_symbol_addr_tmp" -a -n "$ksyms" -a -r "$ksyms"; then
+	linux_kernel_symbol_addr_tmp="`($EGREP '\<'${2}'\>' $ksyms | sed -e 's| .*||;s|^0[[xX]]||') 2>/dev/null`"
     fi
-    if test -z "$linux_tmp" -a -n "$kallsyms" -a -r "$kallsyms"; then
-	linux_tmp="`($EGREP '\<'${2}'\>' $kallsyms | head -1 | sed -e 's| .*||;s|^0[[xX]]||') 2>/dev/null`"
+    if test -z "$linux_kernel_symbol_addr_tmp" -a -n "$kallsyms" -a -r "$kallsyms"; then
+	linux_kernel_symbol_addr_tmp="`($EGREP '\<'${2}'\>' $kallsyms | head -1 | sed -e 's| .*||;s|^0[[xX]]||') 2>/dev/null`"
     fi
-    if test -z "$linux_tmp" -a -n "$_ksysmap" -a -r "$_ksysmap"; then
-	linux_tmp="`($EGREP '\<'${2}'\>' $_ksysmap | sed -e 's| .*||;s|^0[[xX]]||') 2>/dev/null`"
+    if test -z "$linux_kernel_symbol_addr_tmp" -a -n "$_ksysmap" -a -r "$_ksysmap"; then
+	linux_kernel_symbol_addr_tmp="`($EGREP '\<'${2}'\>' $_ksysmap | sed -e 's| .*||;s|^0[[xX]]||') 2>/dev/null`"
     fi
-    if test -z "$linux_tmp" -a -n "$_kvmlinux" -a -r "$_kvmlinux"; then
+    if test -z "$linux_kernel_symbol_addr_tmp" -a -n "$_kvmlinux" -a -r "$_kvmlinux"; then
 	case "$_kvmlinux" in
 	    (*.gz)  linux_img="/var/tmp/.tmp.$$.`basename $_kvmlinux .gz`"
 		    test -r $linux_img || gzip -dc $_kvmlinux >$linux_img ;;
@@ -3121,10 +3121,10 @@ AC_CACHE_CHECK([for kernel symbol $[]2 address], [linux_cv_$[]{2}_addr], [dnl
 		    test -r $linux_img || xz -dc $_kvmlinux >$linux_img ;;
 	    (*)	    linux_img="$_kvmlinux" ;;
 	esac
-	linux_tmp="`(nm -Bs $linux_img | $EGREP '\<'${2}'\>' | sed -e 's| .*||;s|^0[[xX]]||') 2>/dev/null`"
+	linux_kernel_symbol_addr_tmp="`(nm -Bs $linux_img | $EGREP '\<'${2}'\>' | sed -e 's| .*||;s|^0[[xX]]||') 2>/dev/null`"
     fi
-    linux_tmp="${linux_tmp:+0x}$linux_tmp"
-    AS_VAR_SET([linux_cv_$[]{2}_addr], ["${linux_tmp:-no}"]) ])
+    linux_kernel_symbol_addr_tmp="${linux_kernel_symbol_addr_tmp:+0x}$linux_kernel_symbol_addr_tmp"
+    AS_VAR_SET([linux_cv_$[]{2}_addr], ["${linux_kernel_symbol_addr_tmp:-no}"]) ])
     AS_VAR_IF([linux_cv_$[]{2}_addr],[no],[],[dnl
 	AC_DEFINE_UNQUOTED(AS_TR_CPP(HAVE_$[]{2}[]_SYMBOL), [1])dnl
 	AS_VAR_SET([linux_cv_$[]{2}_symbol], ['yes'])
@@ -3167,17 +3167,17 @@ AC_DEFUN([_LINUX_KERNEL_SYMBOL_ADDR], [dnl
 m4_define([_LINUX_KERNEL_EXPORT_ONLY_BODY],
 [AS_LINENO_PUSH([$[]1])
 AC_CACHE_CHECK([for kernel symbol $[]2 export], [linux_cv_$[]{2}_export],
-    [linux_tmp=
-    if test -z "$linux_tmp" -a -n "$ksyms" -a -r "$ksyms"; then
+    [linux_kernel_export_only_tmp=
+    if test -z "$linux_kernel_export_only_tmp" -a -n "$ksyms" -a -r "$ksyms"; then
 	if ( $EGREP -q  '(\<'${2}'_R(smp_)?........\>|\<'${2}'\>)' $ksyms 2>/dev/null ); then
-	    linux_tmp="yes ($ksyms)"; fi; fi
-    if test -z "$linux_tmp" -a -n "$kallsyms" -a -r "$kallsyms"; then
+	    linux_kernel_export_only_tmp="yes ($ksyms)"; fi; fi
+    if test -z "$linux_kernel_export_only_tmp" -a -n "$kallsyms" -a -r "$kallsyms"; then
 	if ( $EGREP -q '\<__ksymtab_'${2}'\>' $kallsyms 2>/dev/null ); then
-	    linux_tmp="yes ($kallsyms)"; fi; fi
-    if test -z "$linux_tmp" -a -n "$_ksysmap" -a -r "$_ksysmap"; then
+	    linux_kernel_export_only_tmp="yes ($kallsyms)"; fi; fi
+    if test -z "$linux_kernel_export_only_tmp" -a -n "$_ksysmap" -a -r "$_ksysmap"; then
 	if ( $EGREP -q '\<__ksymtab_'${2}'\>' $_ksysmap 2>/dev/null ); then
-	    linux_tmp="yes ($_ksysmap)"; fi; fi
-    if test -z "$linux_tmp" -a -n "$_kvmlinux" -a -r "$_kvmlinux"; then
+	    linux_kernel_export_only_tmp="yes ($_ksysmap)"; fi; fi
+    if test -z "$linux_kernel_export_only_tmp" -a -n "$_kvmlinux" -a -r "$_kvmlinux"; then
 	case "$_kvmlinux" in
 	    (*.gz)  linux_img="/var/tmp/.tmp.$$.`basename $_kvmlinux .gz`"
 		    test -r $linux_img || gzip -dc $_kvmlinux >$linux_img ;;
@@ -3188,16 +3188,16 @@ AC_CACHE_CHECK([for kernel symbol $[]2 export], [linux_cv_$[]{2}_export],
 	    (*)	    linux_img="$_kvmlinux" ;;
 	esac
 	if ( nm -Bs $linux_img | $EGREP -q '\<__ksymtab_'${2}'\>' 2>/dev/null ); then
-	    linux_tmp="yes ($_kvmlinux)"
+	    linux_kernel_export_only_tmp="yes ($_kvmlinux)"
 	fi
     fi
-    if test -z "$linux_tmp" -a -n "$kmodver" -a -r "$kmodver"; then
+    if test -z "$linux_kernel_export_only_tmp" -a -n "$kmodver" -a -r "$kmodver"; then
 	if ( $EGREP -q '\<'${2}'\>' $kmodver 2>/dev/null ); then
-	    linux_tmp="yes ($kmodver)"; fi; fi
-    if test -z "$linux_tmp" -a -n "$ksymvers" -a -r "$ksymvers"; then
+	    linux_kernel_export_only_tmp="yes ($kmodver)"; fi; fi
+    if test -z "$linux_kernel_export_only_tmp" -a -n "$ksymvers" -a -r "$ksymvers"; then
 	if ( zcat $ksymvers | $EGREP -q '\<'${2}'\>' 2>/dev/null ); then
-	    linux_tmp="yes ($ksymvers)"; fi; fi
-    if test -z "$linux_tmp" -a ":$linux_cv_k_ko_modules" != :yes; then
+	    linux_kernel_export_only_tmp="yes ($ksymvers)"; fi; fi
+    if test -z "$linux_kernel_export_only_tmp" -a ":$linux_cv_k_ko_modules" != :yes; then
 	AC_EGREP_CPP([\<yes_symbol_${2}_is_exported\>],
 [#ifdef NEED_LINUX_AUTOCONF_H
 #include NEED_LINUX_AUTOCONF_H
@@ -3206,9 +3206,9 @@ AC_CACHE_CHECK([for kernel symbol $[]2 export], [linux_cv_$[]{2}_export],
 #include <linux/module.h>
 #ifdef $[]2
 	yes_symbol_${2}_is_exported
-#endif], [linux_tmp='yes (linux/modversions.h)'])
+#endif], [linux_kernel_export_only_tmp='yes (linux/modversions.h)'])
     fi
-    AS_VAR_SET([linux_cv_$[]{2}_export],["${linux_tmp:-no}"])])
+    AS_VAR_SET([linux_cv_$[]{2}_export],["${linux_kernel_export_only_tmp:-no}"])])
     AS_VAR_IF([linux_cv_$[]{2}_export],[no],[],[dnl
 	AC_DEFINE_UNQUOTED(AS_TR_CPP(HAVE_$[]{2}_SYMBOL), [1])dnl
 	AS_VAR_SET([linux_cv_$[]{2}_symbol], [yes])
@@ -3280,25 +3280,25 @@ AC_DEFUN([_LINUX_KERNEL_SYMBOLS], [dnl
 m4_define([_LINUX_KERNEL_SUPPORT_ONLY_BODY],
 [AS_LINENO_PUSH([$[]1])
 AC_CACHE_CHECK([for kernel symbol $[]2 support], [linux_cv_$[]{2}_support], [dnl
-    linux_tmp=
-    if test -z "$linux_tmp" -a -n "$kmodabi" -a -r "$kmodabi"; then
+    linux_kernel_support_only_tmp=
+    if test -z "$linux_kernel_support_only_tmp" -a -n "$kmodabi" -a -r "$kmodabi"; then
 	if ( $EGREP -q '\<'${2}'\>' $kmodabi 2>/dev/null ); then
-	    linux_tmp="yes ($kmodabi)"; fi; fi
-    if test -z "$linux_tmp" -a -n "$ksymsets" -a -r "$ksymsets"; then
+	    linux_kernel_support_only_tmp="yes ($kmodabi)"; fi; fi
+    if test -z "$linux_kernel_support_only_tmp" -a -n "$ksymsets" -a -r "$ksymsets"; then
 	if ( tar -xzOf $ksymsets | $EGREP -q '\<'${2}'\>' 2>/dev/null ); then
-	    linux_tmp="yes ($ksymsets)"; fi; fi
-    if test -z "$linux_tmp" -a -z "$kmodabi" -a -z "$ksymsets"; then
-	if test -z "$linux_tmp" -a -n "$kmodver" -a -r "$kmodver"; then
+	    linux_kernel_support_only_tmp="yes ($ksymsets)"; fi; fi
+    if test -z "$linux_kernel_support_only_tmp" -a -z "$kmodabi" -a -z "$ksymsets"; then
+	if test -z "$linux_kernel_support_only_tmp" -a -n "$kmodver" -a -r "$kmodver"; then
 	    if ( $EGREP -q '\<'${2}'\>' $kmodver 2>/dev/null ); then
-		linux_tmp="yes ($kmodver)"; fi; fi
-	if test -z "$linux_tmp" -a -n "$ksymvers" -a -r "$ksymvers"; then
+		linux_kernel_support_only_tmp="yes ($kmodver)"; fi; fi
+	if test -z "$linux_kernel_support_only_tmp" -a -n "$ksymvers" -a -r "$ksymvers"; then
 	    if ( zcat $ksymvers | $EGREP -q '\<'${2}'\>' 2>/dev/null ); then
-		linux_tmp="yes ($ksymvers)"; fi; fi
+		linux_kernel_support_only_tmp="yes ($ksymvers)"; fi; fi
     fi
-    AS_VAR_SET([linux_cv_$[]{2}_support], ["${linux_tmp:-no}"]) ])
+    AS_VAR_SET([linux_cv_$[]{2}_support], ["${linux_kernel_support_only_tmp:-no}"]) ])
     AS_VAR_IF([linux_cv_$[]{2}_support],[no],[],[dnl
 	AC_DEFINE_UNQUOTED(AS_TR_CPP(HAVE_$[]{2}_EXPORT), [1])dnl
-	AS_VAR_SET([linux_cv_$[]{2}_export], ["$linux_tmp"])
+	AS_VAR_SET([linux_cv_$[]{2}_export], ["$linux_kernel_support_only_tmp"])
 	AC_DEFINE_UNQUOTED(AS_TR_CPP(HAVE_$[]{2}_SYMBOL), [1])dnl
 	AS_VAR_SET([linux_cv_$[]{2}_symbol], ['yes'])
 	AC_DEFINE_UNQUOTED(AS_TR_CPP(HAVE_$[]{2}_USABLE), [1])dnl

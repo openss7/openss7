@@ -19845,7 +19845,9 @@ test_case_3_10_1(int child)
 	int oldfd = test_fd[child];
 	short revents = 0;
 
-	test_fd[child] = -1;
+	test_fd[child] = 45;
+	// test_fd[child] = -1;
+	// 3.0.36 kernel does not dislike -1, try 45.
 	if (test_poll(child, POLLNVAL, &revents, 0) != __RESULT_SUCCESS) {
 		test_fd[child] = oldfd;
 		return (__RESULT_FAILURE);

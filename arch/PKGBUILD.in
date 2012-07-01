@@ -79,7 +79,6 @@ build() {
 		--libexecdir='${exec_prefix}/lib' \
 		--disable-maintainer-mode \
 		--with-k-release=@kversion@ \
-		--with-k-modules=@kmoddir@ \
 		--with-k-subdir=@ksubdir@ \
 		--with-k-optimize=speed \
 		--with-optimize=speed \

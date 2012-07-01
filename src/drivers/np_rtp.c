@@ -2103,7 +2103,12 @@ np_bind(struct np *np, unsigned char *PROTOID_buffer, size_t PROTOID_length,
 		np->baddrs[i].addr = ADDR_buffer[i].sin_addr.s_addr;
 	write_unlock_str2(&hp->lock, flags);
 #if defined HAVE_KFUNC_SYNCHRONIZE_NET
-	synchronize_net();	/* might sleep */
+#if defined HAVE_KFUNC_IN_ATOMIC || defined in_atomic
+	if (!in_interrupt() && !in_atomic())
+#else
+	if (!in_interrupt())
+#endif
+		synchronize_net();	/* might sleep */
 #endif				/* defined HAVE_KFUNC_SYNCHRONIZE_NET */
 	return (0);
 }
@@ -3052,7 +3057,12 @@ np_unbind(struct np *np)
 		np_put(np);
 		write_unlock_str2(&hp->lock, flags);
 #if defined HAVE_KFUNC_SYNCHRONIZE_NET
-		synchronize_net();	/* might sleep */
+#if defined HAVE_KFUNC_IN_ATOMIC || defined in_atomic
+		if (!in_interrupt() && !in_atomic())
+#else
+		if (!in_interrupt())
+#endif
+			synchronize_net();	/* might sleep */
 #endif				/* defined HAVE_KFUNC_SYNCHRONIZE_NET */
 		return (0);
 	}
@@ -3086,7 +3096,12 @@ nc_unbind(struct np *np, struct nc *nc)
 		nc_set_state(np->oq, nc, NS_UNBND);
 		write_unlock_str2(&hp->lock, flags);
 #if defined HAVE_KFUNC_SYNCHRONIZE_NET
-		synchronize_net();	/* might sleep */
+#if defined HAVE_KFUNC_IN_ATOMIC || defined in_atomic
+		if (!in_interrupt() && !in_atomic())
+#else
+		if (!in_interrupt())
+#endif
+			synchronize_net();	/* might sleep */
 #endif				/* defined HAVE_KFUNC_SYNCHRONIZE_NET */
 		return (0);
 	}

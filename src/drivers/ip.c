@@ -741,7 +741,12 @@ npi_init_nproto(unsigned char proto, unsigned int type)
 		}
 		inet_protosp[hash] = &pp->proto;
 		spin_unlock_bh(inet_proto_lockp);
-		synchronize_net();
+#if defined HAVE_KFUNC_IN_ATOMIC || defined in_atomic
+		if (!in_interrupt() && !in_atomic())
+#else
+		if (!in_interrupt())
+#endif
+			synchronize_net();
 #endif				/* defined HAVE_KTYPE_STRUCT_NET_PROTOCOL */
 		/* link into hash slot */
 		np_prots[proto] = pb;
@@ -785,7 +790,12 @@ npi_term_nproto(unsigned char proto, unsigned int type)
 			spin_lock_bh(inet_proto_lockp);
 			inet_protosp[proto] = pp->next;
 			spin_unlock_bh(inet_proto_lockp);
-			synchronize_net();
+#if defined HAVE_KFUNC_IN_ATOMIC || defined in_atomic
+			if (!in_interrupt() && !in_atomic())
+#else
+			if (!in_interrupt())
+#endif
+				synchronize_net();
 			if (pp->next != NULL && pp->kmod != NULL && pp->kmod != THIS_MODULE)
 				module_put(pp->kmod);
 #else
