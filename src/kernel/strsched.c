@@ -150,6 +150,12 @@ static char const ident[] = "$RCSfile: strsched.c,v $ $Name:  $($Revision: 1.1.2
 #include "src/kernel/strutil.h"	/* for q locking and puts and gets */
 #include "src/kernel/strsched.h"	/* verification of externs */
 
+#if defined HAVE_KFUNC_IN_ATOMIC || defined in_atomic
+#define can_sleep() (!in_interrupt()&&!in_atomic())
+#else				/* defined HAVE_KFUNC_IN_ATOMIC || defined in_atomic */
+#define can_sleep() (!in_interrupt())
+#endif				/* defined HAVE_KFUNC_IN_ATOMIC || defined in_atomic */
+
 #ifdef SLAB_DESTROY_BY_RCU
 #define CONFIG_STREAMS_NORECYCLE 1
 #else
@@ -3434,7 +3440,7 @@ STATIC streams_inline streams_fastcall void
 qstrwrit(queue_t *q, mblk_t *mp, void streamscall (*func) (queue_t *, mblk_t *), int perim)
 {
 	if (unlikely(test_bit(QSYNCH_BIT, &q->q_flag))) {
-		if (likely(!in_interrupt()) || likely(!test_bit(QBLKING_BIT, &q->q_flag))
+		if (likely(can_sleep()) || likely(!test_bit(QBLKING_BIT, &q->q_flag))
 		    || likely(!in_irq()))
 			qstrwrit_sync(q, mp, func, perim);
 		else
@@ -3485,7 +3491,7 @@ STATIC streams_inline streams_fastcall void
 qstrfunc(void streamscall (*func) (void *, mblk_t *), queue_t *q, mblk_t *mp, void *arg)
 {
 	if (unlikely(test_bit(QSYNCH_BIT, &q->q_flag))) {
-		if (likely(!in_interrupt()) || likely(!test_bit(QBLKING_BIT, &q->q_flag))
+		if (likely(can_sleep()) || likely(!test_bit(QBLKING_BIT, &q->q_flag))
 		    || likely(!in_irq()))
 			qstrfunc_sync(func, q, mp, arg);
 		else
@@ -3539,7 +3545,7 @@ STATIC streams_inline streams_fastcall __hot void
 qputp(queue_t *q, mblk_t *mp)
 {
 	if (unlikely(test_bit(QSYNCH_BIT, &q->q_flag))) {
-		if (likely(!in_interrupt()) || likely(!test_bit(QBLKING_BIT, &q->q_flag))
+		if (likely(can_sleep()) || likely(!test_bit(QBLKING_BIT, &q->q_flag))
 		    || likely(!in_irq()))
 			qputp_sync(q, mp);
 		else
@@ -5392,7 +5398,7 @@ streams_fastcall __hot void
 runqueues(void)
 {				/* PROFILED */
 #if defined HAVE_KINC_LINUX_KTHREAD_H
-	preempt_disable();
+	// preempt_disable();
 #endif
 	enter_streams();	/* simulate STREAMS context */
 #if defined CONFIG_STREAMS_KTHREADS
@@ -5403,7 +5409,7 @@ runqueues(void)
 	leave_streams();	/* go back to user context */
 #if defined HAVE_KINC_LINUX_KTHREAD_H
 	/* going to sleep or exit system call anyway */
-	preempt_enable_no_resched();
+	// preempt_enable_no_resched();
 #endif
 }
 
@@ -5839,9 +5845,9 @@ kstreamd(void *__bind_cpu)
 
 		if (cpu_is_offline((long) __bind_cpu))
 			goto wait_to_die;
+		preempt_enable_no_resched();
 		__runqueues();
 
-		preempt_enable_no_resched();
 		cond_resched();
 		preempt_disable();
 		preempt_enable();

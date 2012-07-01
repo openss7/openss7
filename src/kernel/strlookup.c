@@ -124,6 +124,12 @@ static char const ident[] =
 #include "src/kernel/strspecfs.h"	/* for spec_snode */
 #include "src/kernel/strlookup.h"	/* extern verification */
 
+#if defined HAVE_KFUNC_IN_ATOMIC || defined in_atomic
+#define can_sleep() (!in_interrupt()&&!in_atomic())
+#else				/* defined HAVE_KFUNC_IN_ATOMIC || defined in_atomic */
+#define can_sleep() (!in_interrupt())
+#endif				/* defined HAVE_KFUNC_IN_ATOMIC || defined in_atomic */
+
 /* we want macro versions of these */
 
 #undef getmajor
@@ -953,7 +959,7 @@ EXPORT_SYMBOL_GPL(cdev_str);
 streams_fastcall struct cdevsw *
 sdev_get(major_t major)
 {
-	return cdev_lookup(major, !in_interrupt());
+	return cdev_lookup(major, can_sleep());
 }
 
 EXPORT_SYMBOL_GPL(sdev_get);
@@ -988,7 +994,7 @@ EXPORT_SYMBOL_GPL(sdev_put);
 streams_fastcall struct cdevsw *
 cdrv_get(modID_t modid)
 {
-	return cdrv_lookup(modid, !in_interrupt());
+	return cdrv_lookup(modid, can_sleep());
 }
 
 EXPORT_SYMBOL_GPL(cdrv_get);
@@ -1015,7 +1021,7 @@ EXPORT_SYMBOL_GPL(cdrv_put);
 streams_fastcall struct fmodsw *
 fmod_get(modID_t modid)
 {
-	return fmod_lookup(modid, !in_interrupt());
+	return fmod_lookup(modid, can_sleep());
 }
 
 EXPORT_SYMBOL_GPL(fmod_get);
@@ -1082,7 +1088,7 @@ EXPORT_SYMBOL_GPL(cmin_get);
 streams_fastcall struct cdevsw *
 cdev_find(const char *name)
 {
-	return cdev_search(name, !in_interrupt());
+	return cdev_search(name, can_sleep());
 }
 
 EXPORT_SYMBOL_GPL(cdev_find);
@@ -1129,7 +1135,7 @@ EXPORT_SYMBOL_GPL(cdev_match);
 streams_fastcall struct fmodsw *
 fmod_find(const char *name)
 {
-	return fmod_search(name, !in_interrupt());
+	return fmod_search(name, can_sleep());
 }
 
 EXPORT_SYMBOL_GPL(fmod_find);
@@ -1137,7 +1143,7 @@ EXPORT_SYMBOL_GPL(fmod_find);
 streams_fastcall struct devnode *
 cmin_find(struct cdevsw *cdev, const char *name)
 {
-	return cmin_search(cdev, name, !in_interrupt());
+	return cmin_search(cdev, name, can_sleep());
 }
 
 EXPORT_SYMBOL_GPL(cmin_find);

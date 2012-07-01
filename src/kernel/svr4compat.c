@@ -247,7 +247,7 @@ spl(const pl_t level)
 			local_irq_disable();
 		return (pl_bh);
 	}
-#if defined HAVE_KFUNC_IN_ATOMIC
+#if defined HAVE_KFUNC_IN_ATOMIC || defined in_atomic
 	if (in_atomic()) {
 		if (level >= pl_irq)
 			local_irq_disable();
@@ -255,15 +255,15 @@ spl(const pl_t level)
 			local_bh_disable();
 		return (pl_atomic);
 	}
-#endif				/* defined HAVE_KFUNC_IN_ATOMIC */
+#endif				/* defined HAVE_KFUNC_IN_ATOMIC || defined in_atomic */
 	if (level >= pl_irq)
 		local_irq_disable();
 	else if (level >= pl_bh)
 		local_bh_disable();
-#if defined HAVE_KFUNC_IN_ATOMIC
+#if defined HAVE_KFUNC_IN_ATOMIC || defined in_atomic
 	else if (level >= pl_atomic)
 		preempt_disable();
-#endif				/* defined HAVE_KFUNC_IN_ATOMIC */
+#endif				/* defined HAVE_KFUNC_IN_ATOMIC || defined in_atomic */
 	return (pl_base);
 }
 
@@ -348,10 +348,10 @@ splx(const pl_t level)
 			local_irq_enable();
 		else if (likely(level < pl_bh) && likely(in_interrupt()))
 			local_bh_enable();
-#if defined HAVE_KFUNC_IN_ATOMIC
+#if defined HAVE_KFUNC_IN_ATOMIC || defined in_atomic
 		else if (likely(level < pl_atomic) && likely(in_atomic()))
 			preempt_enable();
-#endif				/* defined HAVE_KFUNC_IN_ATOMIC */
+#endif				/* defined HAVE_KFUNC_IN_ATOMIC || defined in_atomic */
 	} else
 		swerr();
 	return;

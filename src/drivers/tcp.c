@@ -4128,7 +4128,12 @@ tpi_init_nproto(unsigned char proto)
 	}
 	inet_protos[hash] = &ip->proto;
 	net_protocol_unlock();
-	synchronize_net();
+#if defined HAVE_KFUNC_IN_ATOMIC || defined in_atomic
+	if (!in_interrupt() && !in_atomic())
+#else
+	if (!in_interrupt())
+#endif
+		synchronize_net();
 	return (0);
 }
 
@@ -4152,7 +4157,12 @@ tpi_term_nproto(unsigned char proto)
 	net_protocol_lock();
 	inet_protos[hash] = ip->next;
 	net_protocol_unlock();
-	synchronize_net();
+#if defined HAVE_KFUNC_IN_ATOMIC || defined in_atomic
+	if (!in_interrupt() && !in_atomic())
+#else
+	if (!in_interrupt())
+#endif
+		synchronize_net();
 	tpi_bhash[slot].ipproto = NULL;
 	if (ip->next != NULL && ip->kmod != NULL && ip->kmod != THIS_MODULE)
 		module_put(ip->kmod);

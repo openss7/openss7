@@ -115,12 +115,12 @@ AT_CLEANUP
 
 AT_SETUP([raw2 test 1.4.2])
 AT_KEYWORDS([T_ADDR_REQ])
-AT_CHECK([test_inet_raw2 1.4.2], [], [ignore], [], [], [])
+AT_CHECK([test_inet_raw2_root 1.4.2], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([raw2 test 1.4.3])
 AT_KEYWORDS([T_ADDR_REQ])
-AT_CHECK([test_inet_raw2 1.4.3], [], [ignore], [], [], [])
+AT_CHECK([test_inet_raw2_root 1.4.3], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([raw2 test 1.5.1.1])
@@ -1095,312 +1095,312 @@ AT_CLEANUP
 
 AT_SETUP([raw2 test 1.8.1.3])
 AT_KEYWORDS([T_OPTMGMT_REQ T_NEGOTIATE XTI_LINGER])
-AT_CHECK([test_inet_raw2 1.8.1.3], [], [ignore], [], [], [])
+AT_CHECK([test_inet_raw2_root 1.8.1.3], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([raw2 test 1.8.1.4])
 AT_KEYWORDS([T_OPTMGMT_REQ T_NEGOTIATE XTI_RCVBUF])
-AT_CHECK([test_inet_raw2 1.8.1.4], [], [ignore], [], [], [])
+AT_CHECK([test_inet_raw2_root 1.8.1.4], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([raw2 test 1.8.1.5])
 AT_KEYWORDS([T_OPTMGMT_REQ T_NEGOTIATE XTI_RCVLOWAT])
-AT_CHECK([test_inet_raw2 1.8.1.5], [], [ignore], [], [], [])
+AT_CHECK([test_inet_raw2_root 1.8.1.5], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([raw2 test 1.8.1.6])
 AT_KEYWORDS([T_OPTMGMT_REQ T_NEGOTIATE XTI_SNDBUF])
-AT_CHECK([test_inet_raw2 1.8.1.6], [], [ignore], [], [], [])
+AT_CHECK([test_inet_raw2_root 1.8.1.6], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([raw2 test 1.8.1.7])
 AT_KEYWORDS([T_OPTMGMT_REQ T_NEGOTIATE XTI_SNDLOWAT])
-AT_CHECK([test_inet_raw2 1.8.1.7], [], [ignore], [], [], [])
+AT_CHECK([test_inet_raw2_root 1.8.1.7], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([raw2 test 1.8.2.1])
 AT_KEYWORDS([T_OPTMGMT_REQ T_NEGOTIATE T_IP_TOS])
-AT_CHECK([test_inet_raw2 1.8.2.1], [], [ignore], [], [], [])
+AT_CHECK([test_inet_raw2_root 1.8.2.1], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([raw2 test 1.8.2.2])
 AT_KEYWORDS([T_OPTMGMT_REQ T_NEGOTIATE T_IP_TTL])
-AT_CHECK([test_inet_raw2 1.8.2.2], [], [ignore], [], [], [])
+AT_CHECK([test_inet_raw2_root 1.8.2.2], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([raw2 test 1.8.2.3])
 AT_KEYWORDS([T_OPTMGMT_REQ T_NEGOTIATE T_IP_DONTROUTE])
-AT_CHECK([test_inet_raw2 1.8.2.3], [], [ignore], [], [], [])
+AT_CHECK([test_inet_raw2_root 1.8.2.3], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([raw2 test 1.8.2.4])
 AT_KEYWORDS([T_OPTMGMT_REQ T_NEGOTIATE T_IP_BROADCAST])
-AT_CHECK([test_inet_raw2 1.8.2.4], [], [ignore], [], [], [])
+AT_CHECK([test_inet_raw2_root 1.8.2.4], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([raw2 test 1.8.2.5])
 AT_KEYWORDS([T_OPTMGMT_REQ T_NEGOTIATE T_IP_REUSEADDR])
-AT_CHECK([test_inet_raw2 1.8.2.5], [], [ignore], [], [], [])
+AT_CHECK([test_inet_raw2_root 1.8.2.5], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([raw2 test 1.8.3.1])
 AT_KEYWORDS([T_OPTMGMT_REQ T_NEGOTIATE T_UDP_CHECKSUM])
-AT_CHECK([test_inet_raw2 1.8.3.1], [], [ignore], [], [], [])
+AT_CHECK([test_inet_raw2_root 1.8.3.1], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([raw2 test 1.8.4.1])
 AT_KEYWORDS([T_OPTMGMT_REQ T_NEGOTIATE T_TCP_NODELAY])
-AT_CHECK([test_inet_raw2 1.8.4.1], [], [ignore], [], [], [])
+AT_CHECK([test_inet_raw2_root 1.8.4.1], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([raw2 test 1.8.4.2])
 AT_KEYWORDS([T_OPTMGMT_REQ T_NEGOTIATE T_TCP_MAXSEG])
-AT_CHECK([test_inet_raw2 1.8.4.2], [], [ignore], [], [], [])
+AT_CHECK([test_inet_raw2_root 1.8.4.2], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([raw2 test 1.8.4.3])
 AT_KEYWORDS([T_OPTMGMT_REQ T_NEGOTIATE T_TCP_KEEPALIVE])
-AT_CHECK([test_inet_raw2 1.8.4.3], [], [ignore], [], [], [])
+AT_CHECK([test_inet_raw2_root 1.8.4.3], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([raw2 test 1.8.4.4])
 AT_KEYWORDS([T_OPTMGMT_REQ T_NEGOTIATE T_TCP_CORK])
-AT_CHECK([test_inet_raw2 1.8.4.4], [], [ignore], [], [], [])
+AT_CHECK([test_inet_raw2_root 1.8.4.4], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([raw2 test 1.8.4.5])
 AT_KEYWORDS([T_OPTMGMT_REQ T_NEGOTIATE T_TCP_KEEPIDLE])
-AT_CHECK([test_inet_raw2 1.8.4.5], [], [ignore], [], [], [])
+AT_CHECK([test_inet_raw2_root 1.8.4.5], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([raw2 test 1.8.4.6])
 AT_KEYWORDS([T_OPTMGMT_REQ T_NEGOTIATE T_TCP_KEEPINTVL])
-AT_CHECK([test_inet_raw2 1.8.4.6], [], [ignore], [], [], [])
+AT_CHECK([test_inet_raw2_root 1.8.4.6], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([raw2 test 1.8.4.7])
 AT_KEYWORDS([T_OPTMGMT_REQ T_NEGOTIATE T_TCP_KEEPCNT])
-AT_CHECK([test_inet_raw2 1.8.4.7], [], [ignore], [], [], [])
+AT_CHECK([test_inet_raw2_root 1.8.4.7], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([raw2 test 1.8.4.8])
 AT_KEYWORDS([T_OPTMGMT_REQ T_NEGOTIATE T_TCP_SYNCNT])
-AT_CHECK([test_inet_raw2 1.8.4.8], [], [ignore], [], [], [])
+AT_CHECK([test_inet_raw2_root 1.8.4.8], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([raw2 test 1.8.4.9])
 AT_KEYWORDS([T_OPTMGMT_REQ T_NEGOTIATE T_TCP_LINGER2])
-AT_CHECK([test_inet_raw2 1.8.4.9], [], [ignore], [], [], [])
+AT_CHECK([test_inet_raw2_root 1.8.4.9], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([raw2 test 1.8.4.10])
 AT_KEYWORDS([T_OPTMGMT_REQ T_NEGOTIATE T_TCP_DEFER_ACCEPT])
-AT_CHECK([test_inet_raw2 1.8.4.10], [], [ignore], [], [], [])
+AT_CHECK([test_inet_raw2_root 1.8.4.10], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([raw2 test 1.8.4.11])
 AT_KEYWORDS([T_OPTMGMT_REQ T_NEGOTIATE T_TCP_WINDOW_CLAMP])
-AT_CHECK([test_inet_raw2 1.8.4.11], [], [ignore], [], [], [])
+AT_CHECK([test_inet_raw2_root 1.8.4.11], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([raw2 test 1.8.4.12])
 AT_KEYWORDS([T_OPTMGMT_REQ T_NEGOTIATE T_TCP_INFO])
-AT_CHECK([test_inet_raw2 1.8.4.12], [], [ignore], [], [], [])
+AT_CHECK([test_inet_raw2_root 1.8.4.12], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([raw2 test 1.8.4.13])
 AT_KEYWORDS([T_OPTMGMT_REQ T_NEGOTIATE T_TCP_QUICKACK])
-AT_CHECK([test_inet_raw2 1.8.4.13], [], [ignore], [], [], [])
+AT_CHECK([test_inet_raw2_root 1.8.4.13], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([raw2 test 1.8.5.1])
 AT_KEYWORDS([T_OPTMGMT_REQ T_NEGOTIATE T_SCTP_NODELAY])
-AT_CHECK([test_inet_raw2 1.8.5.1], [], [ignore], [], [], [])
+AT_CHECK([test_inet_raw2_root 1.8.5.1], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([raw2 test 1.8.5.2])
 AT_KEYWORDS([T_OPTMGMT_REQ T_NEGOTIATE T_SCTP_CORK])
-AT_CHECK([test_inet_raw2 1.8.5.2], [], [ignore], [], [], [])
+AT_CHECK([test_inet_raw2_root 1.8.5.2], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([raw2 test 1.8.5.3])
 AT_KEYWORDS([T_OPTMGMT_REQ T_NEGOTIATE T_SCTP_PPI])
-AT_CHECK([test_inet_raw2 1.8.5.3], [], [ignore], [], [], [])
+AT_CHECK([test_inet_raw2_root 1.8.5.3], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([raw2 test 1.8.5.4])
 AT_KEYWORDS([T_OPTMGMT_REQ T_NEGOTIATE T_SCTP_SID])
-AT_CHECK([test_inet_raw2 1.8.5.4], [], [ignore], [], [], [])
+AT_CHECK([test_inet_raw2_root 1.8.5.4], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([raw2 test 1.8.5.5])
 AT_KEYWORDS([T_OPTMGMT_REQ T_NEGOTIATE T_SCTP_SSN])
-AT_CHECK([test_inet_raw2 1.8.5.5], [], [ignore], [], [], [])
+AT_CHECK([test_inet_raw2_root 1.8.5.5], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([raw2 test 1.8.5.6])
 AT_KEYWORDS([T_OPTMGMT_REQ T_NEGOTIATE T_SCTP_TSN])
-AT_CHECK([test_inet_raw2 1.8.5.6], [], [ignore], [], [], [])
+AT_CHECK([test_inet_raw2_root 1.8.5.6], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([raw2 test 1.8.5.7])
 AT_KEYWORDS([T_OPTMGMT_REQ T_NEGOTIATE T_SCTP_RECVOPT])
-AT_CHECK([test_inet_raw2 1.8.5.7], [], [ignore], [], [], [])
+AT_CHECK([test_inet_raw2_root 1.8.5.7], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([raw2 test 1.8.5.8])
 AT_KEYWORDS([T_OPTMGMT_REQ T_NEGOTIATE T_SCTP_COOKIE_LIFE])
-AT_CHECK([test_inet_raw2 1.8.5.8], [], [ignore], [], [], [])
+AT_CHECK([test_inet_raw2_root 1.8.5.8], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([raw2 test 1.8.5.9])
 AT_KEYWORDS([T_OPTMGMT_REQ T_NEGOTIATE T_SCTP_SACK_DELAY])
-AT_CHECK([test_inet_raw2 1.8.5.9], [], [ignore], [], [], [])
+AT_CHECK([test_inet_raw2_root 1.8.5.9], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([raw2 test 1.8.5.10])
 AT_KEYWORDS([T_OPTMGMT_REQ T_NEGOTIATE T_SCTP_PATH_MAX_RETRANS])
-AT_CHECK([test_inet_raw2 1.8.5.10], [], [ignore], [], [], [])
+AT_CHECK([test_inet_raw2_root 1.8.5.10], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([raw2 test 1.8.5.11])
 AT_KEYWORDS([T_OPTMGMT_REQ T_NEGOTIATE T_SCTP_ASSOC_MAX_RETRANS])
-AT_CHECK([test_inet_raw2 1.8.5.11], [], [ignore], [], [], [])
+AT_CHECK([test_inet_raw2_root 1.8.5.11], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([raw2 test 1.8.5.12])
 AT_KEYWORDS([T_OPTMGMT_REQ T_NEGOTIATE T_SCTP_MAX_INIT_RETRIES])
-AT_CHECK([test_inet_raw2 1.8.5.12], [], [ignore], [], [], [])
+AT_CHECK([test_inet_raw2_root 1.8.5.12], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([raw2 test 1.8.5.13])
 AT_KEYWORDS([T_OPTMGMT_REQ T_NEGOTIATE T_SCTP_HEARTBEAT_ITVL])
-AT_CHECK([test_inet_raw2 1.8.5.13], [], [ignore], [], [], [])
+AT_CHECK([test_inet_raw2_root 1.8.5.13], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([raw2 test 1.8.5.14])
 AT_KEYWORDS([T_OPTMGMT_REQ T_NEGOTIATE T_SCTP_RTO_INITIAL])
-AT_CHECK([test_inet_raw2 1.8.5.14], [], [ignore], [], [], [])
+AT_CHECK([test_inet_raw2_root 1.8.5.14], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([raw2 test 1.8.5.15])
 AT_KEYWORDS([T_OPTMGMT_REQ T_NEGOTIATE T_SCTP_RTO_MIN])
-AT_CHECK([test_inet_raw2 1.8.5.15], [], [ignore], [], [], [])
+AT_CHECK([test_inet_raw2_root 1.8.5.15], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([raw2 test 1.8.5.16])
 AT_KEYWORDS([T_OPTMGMT_REQ T_NEGOTIATE T_SCTP_RTO_MAX])
-AT_CHECK([test_inet_raw2 1.8.5.16], [], [ignore], [], [], [])
+AT_CHECK([test_inet_raw2_root 1.8.5.16], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([raw2 test 1.8.5.17])
 AT_KEYWORDS([T_OPTMGMT_REQ T_NEGOTIATE T_SCTP_OSTREAMS])
-AT_CHECK([test_inet_raw2 1.8.5.17], [], [ignore], [], [], [])
+AT_CHECK([test_inet_raw2_root 1.8.5.17], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([raw2 test 1.8.5.18])
 AT_KEYWORDS([T_OPTMGMT_REQ T_NEGOTIATE T_SCTP_ISTREAMS])
-AT_CHECK([test_inet_raw2 1.8.5.18], [], [ignore], [], [], [])
+AT_CHECK([test_inet_raw2_root 1.8.5.18], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([raw2 test 1.8.5.19])
 AT_KEYWORDS([T_OPTMGMT_REQ T_NEGOTIATE T_SCTP_COOKIE_INC])
-AT_CHECK([test_inet_raw2 1.8.5.19], [], [ignore], [], [], [])
+AT_CHECK([test_inet_raw_root2 1.8.5.19], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([raw2 test 1.8.5.20])
 AT_KEYWORDS([T_OPTMGMT_REQ T_NEGOTIATE T_SCTP_THROTTLE_ITVL])
-AT_CHECK([test_inet_raw2 1.8.5.20], [], [ignore], [], [], [])
+AT_CHECK([test_inet_raw_root2 1.8.5.20], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([raw2 test 1.8.5.21])
 AT_KEYWORDS([T_OPTMGMT_REQ T_NEGOTIATE T_SCTP_MAC_TYPE])
-AT_CHECK([test_inet_raw2 1.8.5.21], [], [ignore], [], [], [])
+AT_CHECK([test_inet_raw2_root 1.8.5.21], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([raw2 test 1.8.5.22])
 AT_KEYWORDS([T_OPTMGMT_REQ T_NEGOTIATE T_SCTP_CKSUM_TYPE])
-AT_CHECK([test_inet_raw2 1.8.5.22], [], [ignore], [], [], [])
+AT_CHECK([test_inet_raw2_root 1.8.5.22], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([raw2 test 1.8.5.23])
 AT_KEYWORDS([T_OPTMGMT_REQ T_NEGOTIATE T_SCTP_ECN])
-AT_CHECK([test_inet_raw2 1.8.5.23], [], [ignore], [], [], [])
+AT_CHECK([test_inet_raw2_root 1.8.5.23], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([raw2 test 1.8.5.24])
 AT_KEYWORDS([T_OPTMGMT_REQ T_NEGOTIATE T_SCTP_ALI])
-AT_CHECK([test_inet_raw2 1.8.5.24], [], [ignore], [], [], [])
+AT_CHECK([test_inet_raw2_root 1.8.5.24], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([raw2 test 1.8.5.25])
 AT_KEYWORDS([T_OPTMGMT_REQ T_NEGOTIATE T_SCTP_ADD])
-AT_CHECK([test_inet_raw2 1.8.5.25], [], [ignore], [], [], [])
+AT_CHECK([test_inet_raw2_root 1.8.5.25], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([raw2 test 1.8.5.26])
 AT_KEYWORDS([T_OPTMGMT_REQ T_NEGOTIATE T_SCTP_SET])
-AT_CHECK([test_inet_raw2 1.8.5.26], [], [ignore], [], [], [])
+AT_CHECK([test_inet_raw2_root 1.8.5.26], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([raw2 test 1.8.5.27])
 AT_KEYWORDS([T_OPTMGMT_REQ T_NEGOTIATE T_SCTP_ADD_IP])
-AT_CHECK([test_inet_raw2 1.8.5.27], [], [ignore], [], [], [])
+AT_CHECK([test_inet_raw2_root 1.8.5.27], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([raw2 test 1.8.5.28])
 AT_KEYWORDS([T_OPTMGMT_REQ T_NEGOTIATE T_SCTP_DEL_IP])
-AT_CHECK([test_inet_raw2 1.8.5.28], [], [ignore], [], [], [])
+AT_CHECK([test_inet_raw2_root 1.8.5.28], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([raw2 test 1.8.5.29])
 AT_KEYWORDS([T_OPTMGMT_REQ T_NEGOTIATE T_SCTP_SET_IP])
-AT_CHECK([test_inet_raw2 1.8.5.29], [], [ignore], [], [], [])
+AT_CHECK([test_inet_raw2_root 1.8.5.29], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([raw2 test 1.8.5.30])
 AT_KEYWORDS([T_OPTMGMT_REQ T_NEGOTIATE T_SCTP_PR])
-AT_CHECK([test_inet_raw2 1.8.5.30], [], [ignore], [], [], [])
+AT_CHECK([test_inet_raw2_root 1.8.5.30], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([raw2 test 1.8.5.31])
 AT_KEYWORDS([T_OPTMGMT_REQ T_NEGOTIATE T_SCTP_LIFETIME])
-AT_CHECK([test_inet_raw2 1.8.5.31], [], [ignore], [], [], [])
+AT_CHECK([test_inet_raw2_root 1.8.5.31], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([raw2 test 1.8.5.32])
 AT_KEYWORDS([T_OPTMGMT_REQ T_NEGOTIATE T_SCTP_DISPOSITION])
-AT_CHECK([test_inet_raw2 1.8.5.32], [], [ignore], [], [], [])
+AT_CHECK([test_inet_raw2_root 1.8.5.32], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([raw2 test 1.8.5.33])
 AT_KEYWORDS([T_OPTMGMT_REQ T_NEGOTIATE T_SCTP_MAX_BURST])
-AT_CHECK([test_inet_raw2 1.8.5.33], [], [ignore], [], [], [])
+AT_CHECK([test_inet_raw2_root 1.8.5.33], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([raw2 test 1.8.5.34])
 AT_KEYWORDS([T_OPTMGMT_REQ T_NEGOTIATE T_SCTP_HB])
-AT_CHECK([test_inet_raw2 1.8.5.34], [], [ignore], [], [], [])
+AT_CHECK([test_inet_raw2_root 1.8.5.34], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([raw2 test 1.8.5.35])
 AT_KEYWORDS([T_OPTMGMT_REQ T_NEGOTIATE T_SCTP_RTO])
-AT_CHECK([test_inet_raw2 1.8.5.35], [], [ignore], [], [], [])
+AT_CHECK([test_inet_raw2_root 1.8.5.35], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([raw2 test 1.8.5.36])
 AT_KEYWORDS([T_OPTMGMT_REQ T_NEGOTIATE T_SCTP_MAXSEG])
-AT_CHECK([test_inet_raw2 1.8.5.36], [], [ignore], [], [], [])
+AT_CHECK([test_inet_raw2_root 1.8.5.36], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([raw2 test 1.8.5.37])
 AT_KEYWORDS([T_OPTMGMT_REQ T_NEGOTIATE T_SCTP_STATUS])
-AT_CHECK([test_inet_raw2 1.8.5.37], [], [ignore], [], [], [])
+AT_CHECK([test_inet_raw2_root 1.8.5.37], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([raw2 test 1.8.5.38])
 AT_KEYWORDS([T_OPTMGMT_REQ T_NEGOTIATE T_SCTP_DEBUG])
-AT_CHECK([test_inet_raw2 1.8.5.38], [], [ignore], [], [], [])
+AT_CHECK([test_inet_raw2_root 1.8.5.38], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([raw2 test 1.9.1.1])
@@ -1420,7 +1420,7 @@ AT_CLEANUP
 
 AT_SETUP([raw2 test 1.9.1.4])
 AT_KEYWORDS([T_OPTMGMT_REQ T_NEGOTIATE (none)])
-AT_CHECK([test_inet_raw2 1.9.1.4], [], [ignore], [], [], [])
+AT_CHECK([test_inet_raw2_root 1.9.1.4], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([raw2 test 1.9.2.1])
@@ -1440,7 +1440,7 @@ AT_CLEANUP
 
 AT_SETUP([raw2 test 1.9.2.4])
 AT_KEYWORDS([T_OPTMGMT_REQ T_NEGOTIATE T_ALLOPT])
-AT_CHECK([test_inet_raw2 1.9.2.4], [], [ignore], [], [], [])
+AT_CHECK([test_inet_raw2_root 1.9.2.4], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([raw2 test 1.9.3.1])

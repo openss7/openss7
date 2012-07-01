@@ -9410,7 +9410,6 @@ strioctl_compat(struct file *file, unsigned int cmd, unsigned long arg)
 {
 	struct stdata *sd = stri_lookup(file);
 	int access = FNDELAY;		/* default access check is for io */
-	int locking = FREAD;		/* default locking is head read lock */
 	int length = TRANSPARENT;	/* default size */
 	int err;
 
@@ -9869,16 +9868,8 @@ strioctl_compat(struct file *file, unsigned int cmd, unsigned long arg)
 		}
 		break;
 	}
-	if (locking & FWRITE)
-		swlock(sd);
-	else if (locking & FREAD)
-		srlock(sd);
 	if ((access != (FREAD | FWRITE)) || unlikely((err = straccess_noinline(sd, access)) != 0))
 		err = str_i_default(file, sd, cmd, arg, length, access, IOC_ILP32);
-	if (locking & FWRITE)
-		swunlock(sd);
-	else if (locking & FREAD)
-		srunlock(sd);
 	return (err);
 }
 #endif				/* defined WITH_32BIT_CONVERSION */
@@ -9921,7 +9912,6 @@ strioctl_slow(struct file *file, unsigned int cmd, unsigned long arg)
 {
 	struct stdata *sd = stri_lookup(file);
 	int access = FNDELAY;		/* default access check is for io */
-	int locking = FREAD;		/* default locking is head read lock */
 	int length = TRANSPARENT;	/* default size */
 	int err;
 
@@ -10373,16 +10363,8 @@ strioctl_slow(struct file *file, unsigned int cmd, unsigned long arg)
 		}
 		break;
 	}
-	if (locking & FWRITE)
-		swlock(sd);
-	else if (locking & FREAD)
-		srlock(sd);
 	if ((access != (FREAD | FWRITE)) || unlikely((err = straccess_noinline(sd, access)) != 0))
 		err = str_i_default(file, sd, cmd, arg, length, access, IOC_NATIVE);
-	if (locking & FWRITE)
-		swunlock(sd);
-	else if (locking & FREAD)
-		srunlock(sd);
 	return (err);
 }
 

@@ -3745,7 +3745,12 @@ tp_bind(struct tp *tp, struct sockaddr_in *ADDR_buffer, const t_uscalar_t ADDR_l
 		tp->baddrs[i].addr = ADDR_buffer[i].sin_addr.s_addr;
 	write_unlock_str2(&hp->lock, flags);
 #if defined HAVE_KFUNC_SYNCHRONIZE_NET
-	synchronize_net();	/* might sleep */
+#if defined HAVE_KFUNC_IN_ATOMIC || defined in_atomic
+	if (!in_interrupt() && !in_atomic())
+#else
+	if (!in_interrupt())
+#endif
+		synchronize_net();	/* might sleep */
 #endif				/* defined HAVE_KFUNC_SYNCHRONIZE_NET */
 	return (0);
 }
@@ -4636,7 +4641,12 @@ tp_unbind(struct tp *tp)
 		tp_put(tp);
 		write_unlock_str2(&hp->lock, flags);
 #if defined HAVE_KFUNC_SYNCHRONIZE_NET
-		synchronize_net();	/* might sleep */
+#if defined HAVE_KFUNC_IN_ATOMIC || defined in_atomic
+		if (!in_interrupt() && !in_atomic())
+#else
+		if (!in_interrupt())
+#endif
+			synchronize_net();	/* might sleep */
 #endif				/* defined HAVE_KFUNC_SYNCHRONIZE_NET */
 		return (0);
 	}

@@ -1356,6 +1356,7 @@ AS_LINENO_POP])dnl
 	proc_dointvec,
 	proc_dointvec_jiffies,
 	proc_dointvec_minmax,
+	proc_doulongvec_ms_jiffies,
 	proc_doulongvec_ms_jiffies_minmax,
 	put_cmsg,
 	register_sysctl_table,
