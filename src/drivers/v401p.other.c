@@ -2209,15 +2209,15 @@ vp_probe(struct pci_dev *dev, const struct pci_device_id *id)
 		printd(("%s: ERROR: Driver does not support %s device.\n", DRV_NAME, name));
 		return (-ENXIO);
 	}
+	if (pci_enable_dev(dev)) {
+		printd(("%s: ERROR: Could not enable %s pci device\n", DRV_NAME, name));
+		return (-ENODEV);
+	}
 	if (dev->irq < 1) {
 		printd(("%s: ERROR: No IRQ allocated for %s device.\n", DRV_NAME, name));
 		return (-ENXIO);
 	}
 	printd(("%s: %s device allocated IRQ %d\n", DRV_NAME, name, dev->irq));
-	if (pci_enable_dev(dev)) {
-		printd(("%s: ERROR: Could not enable %s pci device\n", DRV_NAME, name));
-		return (-ENODEV);
-	}
 	if (!(vp = vp_init_card(vp_card))) {
 		/* do not print debug messages when out of memory */
 		return (-ENOMEM);

@@ -202,8 +202,8 @@ STATIC ctl_table streams_table[] = {
 #ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_PARENT
 	 NULL,
 #endif
-#ifdef HAVE_PROC_DOULONGVEC_MS_JIFFIES_USABLE
-	 &proc_doulongvec_ms_jiffies,
+#ifdef HAVE_PROC_DOINTVEC_MS_JIFFIES_USABLE
+	 &proc_dointvec_ms_jiffies,
 #else
 	 &proc_doulongvec_ms_jiffies_minmax,
 #endif
@@ -223,8 +223,8 @@ STATIC ctl_table streams_table[] = {
 #ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_PARENT
 	 NULL,
 #endif
-#ifdef HAVE_PROC_DOULONGVEC_MS_JIFFIES_USABLE
-	 &proc_doulongvec_ms_jiffies,
+#ifdef HAVE_PROC_DOINTVEC_MS_JIFFIES_USABLE
+	 &proc_dointvec_ms_jiffies,
 #else
 	 &proc_doulongvec_ms_jiffies_minmax,
 #endif
@@ -244,8 +244,8 @@ STATIC ctl_table streams_table[] = {
 #ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_PARENT
 	 NULL,
 #endif
-#ifdef HAVE_PROC_DOULONGVEC_MS_JIFFIES_USABLE
-	 &proc_doulongvec_ms_jiffies,
+#ifdef HAVE_PROC_DOINTVEC_MS_JIFFIES_USABLE
+	 &proc_dointvec_ms_jiffies,
 #else
 	 &proc_doulongvec_ms_jiffies_minmax,
 #endif
@@ -299,8 +299,8 @@ STATIC ctl_table streams_table[] = {
 #ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_PARENT
 	 NULL,
 #endif
-#ifdef HAVE_PROC_DOULONGVEC_MS_JIFFIES_USABLE
-	 &proc_doulongvec_ms_jiffies,
+#ifdef HAVE_PROC_DOINTVEC_MS_JIFFIES_USABLE
+	 &proc_dointvec_ms_jiffies,
 #else
 	 &proc_doulongvec_ms_jiffies_minmax,
 #endif

@@ -1305,12 +1305,12 @@ AT_CLEANUP
 
 AT_SETUP([raw2 test 1.8.5.19])
 AT_KEYWORDS([T_OPTMGMT_REQ T_NEGOTIATE T_SCTP_COOKIE_INC])
-AT_CHECK([test_inet_raw_root2 1.8.5.19], [], [ignore], [], [], [])
+AT_CHECK([test_inet_raw2_root 1.8.5.19], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([raw2 test 1.8.5.20])
 AT_KEYWORDS([T_OPTMGMT_REQ T_NEGOTIATE T_SCTP_THROTTLE_ITVL])
-AT_CHECK([test_inet_raw_root2 1.8.5.20], [], [ignore], [], [], [])
+AT_CHECK([test_inet_raw2_root 1.8.5.20], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([raw2 test 1.8.5.21])
