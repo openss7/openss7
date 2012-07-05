@@ -9695,16 +9695,16 @@ xp_probe(struct pci_dev *dev, const struct pci_device_id *id)
 			id->driver_data));
 		return (-ENXIO);
 	}
-	if (dev->irq < 1) {
-		ptrace(("%s: ERROR: No IRQ allocated for device\n", DRV_NAME));
-		return (-ENXIO);
-	}
-	printd(("%s: device allocated IRQ %d\n", DRV_NAME, dev->irq));
 	if (pci_enable_device(dev)) {
 		ptrace(("%s: ERROR: Could not enable pci device\n", DRV_NAME));
 		return (-ENODEV);
 	}
 	printd(("%s: enabled x400p-ss7 pci device type %ld\n", DRV_NAME, id->driver_data));
+	if (dev->irq < 1) {
+		ptrace(("%s: ERROR: No IRQ allocated for device\n", DRV_NAME));
+		return (-ENXIO);
+	}
+	printd(("%s: device allocated IRQ %d\n", DRV_NAME, dev->irq));
 	if (!(cd = xp_alloc_cd()))
 		return (-ENOMEM);
 	pci_set_drvdata(dev, cd);

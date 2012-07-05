@@ -5132,7 +5132,7 @@ sctp_rate_route(sctp_t * sp, struct sctp_daddr *sd)
 	if (sd->dst_cache == NULL)
 		goto done;
 #if 0
-	if (sd->dst_cache->obsolete) {
+	if (sd->dst_cache->obsolete > 0) {
 		dst_release(xchg(&sd->dst_cache, NULL));
 		goto done;
 	}
@@ -5277,35 +5277,37 @@ sctp_update_routes(struct sctp *sp, int force_reselect)
 		LOGDA(sp, "checking route %d.%d.%d.%d",
 			  (sd->daddr >> 0) & 0xff, (sd->daddr >> 8) & 0xff,
 			  (sd->daddr >> 16) & 0xff, (sd->daddr >> 24) & 0xff);
-		if (!sd->dst_cache || (sd->dst_cache->obsolete && !my_dst_check(&sd->dst_cache))) {
+		if (!sd->dst_cache || (sd->dst_cache->obsolete > 0 && !my_dst_check(&sd->dst_cache))) {
 			rt = NULL;
 			sd->saddr = 0;
 			route_changed = 1;
 			/* try wildcard saddr and dif routing */
 #if defined HAVE_KMEMB_STRUCT_INET_PROTOCOL_PROTOCOL
 			err = ip_route_connect(&rt, sd->daddr, 0, RT_CONN_FLAGS(sp), 0);
-#else
-#if defined HAVE_KFUNC_IP_ROUTE_CONNECT_9_ARGS
+#elif defined HAVE_KFUNC_IP_ROUTE_CONNECT_9_ARGS
 			err = ip_route_connect(&rt, sd->daddr, 0, RT_CONN_FLAGS(sp), 0,
 					       IPPROTO_SCTP, sp->sport, sp->dport, NULL);
-#else
-#if defined HAVE_KFUNC_IP_ROUTE_CONNECT_10_ARGS || defined HAVE_KFUNC_IP_ROUTE_CONNECT_RTABLE_RETURN
+#elif defined HAVE_KFUNC_IP_ROUTE_CONNECT_10_ARGS
 #if !defined HAVE_KFUNC_IP_ROUTE_OUTPUT_KEY_3_ARGS
 			err = ip_route_connect(&rt, sd->daddr, 0, RT_CONN_FLAGS(sp), 0,
 					       IPPROTO_SCTP, sp->sport, sp->dport, NULL, 0);
 #else
 			err = ip_route_output(&rt, sd->daddr, 0, RT_CONN_FLAGS(sp), 0);
 #endif
+#elif defined HAVE_KFUNC_IP_ROUTE_CONNECT_RTABLE_RETURN
+			err = ip_route_connect(&rt, sd->daddr, 0, RT_CONN_FLAGS(sp), 0,
+					       IPPROTO_SCTP, sp->sport, sp->dport, NULL, 0);
 #else
 #error Need a usable ip_route_connect() prototype.
 #endif
-#endif
-#endif
-			if (err < 0 || !rt || rt_dst(rt)->obsolete) {
+			if (err < 0 || !rt || rt_dst(rt)->obsolete > 0) {
 				rare();
-				LOGERR(sp, "%s() no route", __FUNCTION__);
-				if (rt)
+				if (rt) {
+					LOGERR(sp, "%s() no route, err=%d, obsolete=%d", __FUNCTION__, -err, rt_dst(rt)->obsolete);
 					ip_rt_put(rt);
+				} else {
+					LOGERR(sp, "%s() no route, err=%d", __FUNCTION__, -err);
+				}
 				if (err == 0)
 					err = -EHOSTUNREACH;
 				continue;
@@ -5369,22 +5371,21 @@ sctp_update_routes(struct sctp *sp, int force_reselect)
 
 #if defined HAVE_KMEMB_STRUCT_INET_PROTOCOL_PROTOCOL
 			if (!ip_route_connect(&rt2, rt->rt_dst, 0, RT_CONN_FLAGS(sp), sd->dif))
-#else
-#if defined HAVE_KFUNC_IP_ROUTE_CONNECT_9_ARGS
+#elif defined HAVE_KFUNC_IP_ROUTE_CONNECT_9_ARGS
 			if (!ip_route_connect(&rt2, rt->rt_dst, 0, RT_CONN_FLAGS(sp), sd->dif,
 					      IPPROTO_SCTP, sp->sport, sp->dport, NULL))
-#else
-#if defined HAVE_KFUNC_IP_ROUTE_CONNECT_10_ARGS || defined HAVE_KFUNC_IP_ROUTE_CONNECT_RTABLE_RETURN
+#elif defined HAVE_KFUNC_IP_ROUTE_CONNECT_10_ARGS
 #if !defined HAVE_KFUNC_IP_ROUTE_OUTPUT_KEY_3_ARGS
 			if (!ip_route_connect(&rt2, rt->rt_dst, 0, RT_CONN_FLAGS(sp), sd->dif,
 					      IPPROTO_SCTP, sp->sport, sp->dport, NULL, 0))
 #else
 			if (!ip_route_output(&rt2, rt->rt_dst, 0, RT_CONN_FLAGS(sp), sd->dif))
 #endif
+#elif defined HAVE_KFUNC_IP_ROUTE_CONNECT_RTABLE_RETURN
+			if (!ip_route_connect(&rt2, rt->rt_dst, 0, RT_CONN_FLAGS(sp), sd->dif,
+					      IPPROTO_SCTP, sp->sport, sp->dport, NULL, 0))
 #else
 #error Need a usable ip_route_connect() prototype.
-#endif
-#endif
 #endif
 			{
 				if (rt2->rt_src != rt->rt_src) {
@@ -5792,7 +5793,7 @@ sctp_send_msg(struct sctp *sp, struct sctp_daddr *sd, mblk_t *mp)
 	ensure(sd, return);
 	ensure(mp, return);
 	ensure(sd->dst_cache, return);
-	ensure(!sd->dst_cache->obsolete, return);
+	ensure(sd->dst_cache->obsolete <= 0, return);
 	dev = sd->dst_cache->dev;
 	plen = SCTP_TCB(mp)->dlen;
 	hlen = (dev->hard_header_len + 15) & ~15;
@@ -6993,7 +6994,7 @@ sctp_route_response(struct sctp *sp)
 
 	assert(sp);
 	sd = sp->caddr;
-	if (!sd || !sd->dst_cache || sd->dst_cache->obsolete || sd->retransmits || sd->dups)
+	if (!sd || !sd->dst_cache || sd->dst_cache->obsolete > 0 || sd->retransmits || sd->dups)
 		sd = sctp_route_normal(sp);
 	normal(sd);
 	return (sd);

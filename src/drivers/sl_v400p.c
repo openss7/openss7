@@ -11522,16 +11522,16 @@ xp_probe(struct pci_dev *dev, const struct pci_device_id *id)
 		ptrace(("%s: ERROR: Driver does not support %s card.\n", DRV_NAME, name));
 		return (-ENXIO);
 	}
-	if (dev->irq < 1) {
-		ptrace(("%s: ERROR: No IRQ allocated for %s card.\n", DRV_NAME, name));
-		return (-ENXIO);
-	}
-	printd(("%s: card %s allocated IRQ %d\n", DRV_NAME, name, dev->irq));
 	if (pci_enable_device(dev)) {
 		ptrace(("%s: ERROR: Could not enable %s pci card\n", DRV_NAME, name));
 		return (-ENODEV);
 	}
 	printd(("%s: enabled %s pci card type %ld\n", DRV_NAME, name, id->driver_data));
+	if (dev->irq < 1) {
+		ptrace(("%s: ERROR: No IRQ allocated for %s card.\n", DRV_NAME, name));
+		return (-ENXIO);
+	}
+	printd(("%s: card %s allocated IRQ %d\n", DRV_NAME, name, dev->irq));
 	if (!(cd = xp_alloc_cd()))
 		return (-ENOMEM);
 	pci_set_drvdata(dev, cd);

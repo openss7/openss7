@@ -118,11 +118,11 @@ at_target_vendor="@target_vendor@"
 #echo "at_target_os     =\"$at_target_os\""
 #echo "at_target_vendor =\"$at_target_vendor\""
 
-at_test=`@top_srcdir@/scripts/config.guess`
-at_test_alias=
-at_test_cpu=`echo $at_test | sed -e 's|-.*||g'`
-at_test_vendor=`echo $at_test | sed -e 's|^[^-]*-||;s|-.*||g'`
-at_test_os=`echo $at_test | sed -e 's|^[^-]*-[^-]*-||'`
+#at_test=`@top_srcdir@/scripts/config.guess`
+#at_test_alias=
+#at_test_cpu=`echo $at_test | sed -e 's|-.*||g'`
+#at_test_vendor=`echo $at_test | sed -e 's|^[^-]*-||;s|-.*||g'`
+#at_test_os=`echo $at_test | sed -e 's|^[^-]*-[^-]*-||'`
 
 #echo "at_test          =\"$at_test\""
 #echo "at_test_alias    =\"$at_test_alias\""

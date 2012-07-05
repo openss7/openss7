@@ -6307,16 +6307,16 @@ vp_probe(struct pci_dev *dev, const struct pci_device_id *id)
 		cmn_err(DRV_ID, card, 0, SL_ERROR | SL_TRACE, "ERROR: driver does not support %s device.", name);
 		return (-ENXIO);
 	}
-	if (dev->irq < 1) {
-		cmn_err(DRV_ID, card, 0, SL_ERROR | SL_TRACE, "ERROR: no IRQ allocated for %s device.", name);
-		return (-ENXIO);
-	}
-	cmn_err(DRV_ID, card, 0, SL_TRACE, "%s device allocated IRQ %d", name, dev->irq);
 	if (pci_enable_dev(dev)) {
 		cmn_err(DRV_ID, card, 0, SL_ERROR | SL_TRACE, "ERROR: could not enable %s pci device.", name);
 		return (-ENODEV);
 	}
 	cmn_err(DRV_ID, card, 0, SL_TRACE, "enable %s pci card type %ld", name id->driver_data);
+	if (dev->irq < 1) {
+		cmn_err(DRV_ID, card, 0, SL_ERROR | SL_TRACE, "ERROR: no IRQ allocated for %s device.", name);
+		return (-ENXIO);
+	}
+	cmn_err(DRV_ID, card, 0, SL_TRACE, "%s device allocated IRQ %d", name, dev->irq);
 	if (!(vp = vp_init_card(card)))
 		return (-ENOMEM);
 	pci_set_drvdata(dev, vp);

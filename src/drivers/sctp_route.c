@@ -321,7 +321,7 @@ sctp_update_routes(sp, force_reselect)
 	for (sd = sp->daddr; sd; sd = sd->next) {
 		struct rtable *rt = (struct rtable *) sd->dst_cache;
 
-		if (rt && (rt_dst(rt)->obsolete || rt_dst(rt)->ops->check(rt_dst(rt), 0))) {
+		if (rt && (rt_dst(rt)->obsolete > 0 || rt_dst(rt)->ops->check(rt_dst(rt), 0))) {
 			rare();
 			sd->dst_cache = NULL;
 			ip_rt_put(rt);

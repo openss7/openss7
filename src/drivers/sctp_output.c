@@ -396,7 +396,7 @@ sctp_send_msg(sp, sd, mp)
 
 	for (tried_update = 0; !tried_update; sctp_update_routes(sp, 1), tried_update++) {
 		if (sd && sd->dst_cache &&
-		    (!sd->dst_cache->obsolete || sd->dst_cache->ops->check(sd->dst_cache, 0))) {
+		    (sd->dst_cache->obsolete <= 0 || sd->dst_cache->ops->check(sd->dst_cache, 0))) {
 
 			struct sk_buff *skb;
 			struct net_device *dev;
@@ -522,7 +522,7 @@ sctp_send_msg(sp, sd, mp)
 				rare();
 		} else
 			usual(sd && sd->dst_cache &&
-			      (!sd->dst_cache->obsolete
+			      (sd->dst_cache->obsolete <= 0
 			       || sd->dst_cache->ops->check(sd->dst_cache, 0)));
 	}
 }

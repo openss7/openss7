@@ -17534,18 +17534,21 @@ xp_probe(struct pci_dev *dev, const struct pci_device_id *id)
 		cmn_err(CE_WARN, "%s: ERROR: Driver does not support %s card.", DRV_NAME, name);
 		return (-ENXIO);
 	}
-	if (dev->irq < 1) {
-		cmn_err(CE_WARN, "%s: ERROR: No IRQ allocated for %s card.", DRV_NAME, name);
-		return (-ENXIO);
-	}
-	printd(("%s: card %s allocated IRQ %d\n", DRV_NAME, name, dev->irq));
 	if (pci_enable_device(dev)) {
 		cmn_err(CE_WARN, "%s: ERROR: Could not enable %s pci card", DRV_NAME, name);
 		return (-ENODEV);
 	}
 	printd(("%s: enabled %s pci card type %ld\n", DRV_NAME, name, id->driver_data));
-	if (!(cd = xp_alloc_cd()))
+	if (dev->irq < 1) {
+		cmn_err(CE_WARN, "%s: ERROR: No IRQ allocated for %s card (irq=%d).", DRV_NAME, name, dev->irq);
+		pci_disable_device(dev);
+		return (-ENXIO);
+	}
+	printd(("%s: card %s allocated IRQ %d\n", DRV_NAME, name, dev->irq));
+	if (!(cd = xp_alloc_cd())) {
+		pci_disable_device(dev);
 		return (-ENOMEM);
+	}
 	pci_set_drvdata(dev, cd);
 	if ((pci_resource_flags(dev, 0) & IORESOURCE_IO)
 	    || !(cd->plx_region = pci_resource_start(dev, 0))
@@ -18011,6 +18014,7 @@ xp_probe(struct pci_dev *dev, const struct pci_device_id *id)
 	return (-ENODEV);
 }
 
+#if 0
 #ifdef CONFIG_PM
 #ifndef HAVE_KTYPE_PM_MESSAGE_T
 typedef u32 pm_message_t;
@@ -18038,16 +18042,19 @@ xp_resume(struct pci_dev *pdev)
 	return 0;
 }
 #endif				/* CONFIG_PM */
+#endif
 
 STATIC struct pci_driver xp_driver = {
 	.name = DRV_NAME,
 	.probe = xp_probe,
 	.remove = __devexit_p(xp_remove),
 	.id_table = xp_pci_tbl,
+#if 0
 #ifdef CONFIG_PM
 	.suspend = xp_suspend,
 	.resume = xp_resume,
 #endif				/* CONFIG_PM */
+#endif
 };
 
 /* 

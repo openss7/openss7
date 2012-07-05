@@ -2429,7 +2429,7 @@ function chcksolution(kversion, kver,
     }
     if (change == 0) {
 	print_vinfo(2, pfx "solution for " kversion " is no change")
-	return 0
+	return 1
     }
     if (kversion == krunning) {
 	altered = 0
@@ -2908,20 +2908,17 @@ function add_kernel(kversion,
     print_vinfo(2, pfx sprintf("%04d solutions, kversion = %-20s", s, kversion))
     chckunneeded(kversion, solution, creates, unlinks, changes, relinks, dolinks, removes, retains, inserts)
     if (chcksolution(kversion, solution, creates, unlinks, changes, relinks, dolinks, removes, retains, inserts)) {
-	if (makesolution(kversion, solution, creates, unlinks, changes, relinks, dolinks, removes, retains, inserts)) {
-	    dodepmod(kversion)
-	    if ("initscripts" in values && values["initscripts"]) {
-		if ( kversion == krunning ) {
-		    if (kversion in kremoved)
-			initstop()
-		    if (kversion in kinserts)
-			initstart()
-		} else {
-		    print_vinfo(2, "not running init scripts for kversion = " kversion)
-		}
+	makesolution(kversion, solution, creates, unlinks, changes, relinks, dolinks, removes, retains, inserts)
+	dodepmod(kversion)
+	if ("initscripts" in values && values["initscripts"]) {
+	    if ( kversion == krunning ) {
+		if (kversion in kremoved)
+		    initstop()
+		if (kversion in kinserts)
+		    initstart()
+	    } else {
+		print_vinfo(2, "not running init scripts for kversion = " kversion)
 	    }
-	} else {
-	    print_vinfo(2, "not performing depmod for kversion = " kversion)
 	}
     } else {
 	print_vinfo(2, "not making solution for kversion = " kversion)

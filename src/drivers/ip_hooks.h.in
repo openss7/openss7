@@ -157,23 +157,39 @@ extern struct icmp_mib *icmp_statistics[];
 /* Symbol ip_route_output_flow is available. */
 #undef HAVE_IP_ROUTE_OUTPUT_FLOW_SYMBOL
 #ifdef HAVE_IP_ROUTE_OUTPUT_FLOW_SYMBOL
+/* Define if function ip_route_output_flow takes 4 arguments which was
+   normally the case up to 2.6.20. */
+#undef HAVE_KFUNC_IP_ROUTE_OUTPUT_FLOW_4_ARGS
+/* Define if function ip_route_output_flow takes 5 arguments which is the case
+   from 2.6.21. */
+#undef HAVE_KFUNC_IP_ROUTE_OUTPUT_FLOW_5_ARGS
+/* Define if function ip_route_output_flow() returns a pointer to struct
+   rtable. */
+#undef HAVE_KFUNC_IP_ROUTE_OUTPUT_FLOW_RTABLE_RETURN
+#if !defined HAVE_KFUNC_IP_ROUTE_OUTPUT_FLOW_4_ARGS && \
+    !defined HAVE_KFUNC_IP_ROUTE_OUTPUT_FLOW_5_ARGS && \
+    !defined HAVE_KFUNC_IP_ROUTE_OUTPUT_FLOW_RTABLE_RETURN
+#error Do not know how many arguments ip_route_output_flow() takes.
+#endif
 /* Symbol ip_route_output_flow is supported. */
 #undef HAVE_IP_ROUTE_OUTPUT_FLOW_SUPPORT
 #if defined HAVE_IP_ROUTE_OUTPUT_FLOW_SUPPORT || !defined CONFIG_KERNEL_WEAK_SYMBOLS
-#ifdef HAVE_IP_ROUTE_OUTPUT_FLOW_4_ARGS
+#if defined HAVE_KFUNC_IP_ROUTE_OUTPUT_FLOW_4_ARGS
 extern int ip_route_output_flow(struct rtable **rp, struct flowi *flp, struct sock *sk, int flags);
-#endif
-#ifdef HAVE_IP_ROUTE_OUTPUT_FLOW_5_ARGS
+#elif defined HAVE_KFUNC_IP_ROUTE_OUTPUT_FLOW_5_ARGS
 extern int ip_route_output_flow(struct net *, struct rtable **rp, struct flowi *flp,
 				struct sock *sk, int flags);
+#elif defined HAVE_KFUNC_IP_ROUTE_OUTPUT_FLOW_RTABLE_RETURN
+extern struct rtable *ip_route_output_flow(struct net *, struct flowi4 *, struct sock *);
 #endif
 #else
-#ifdef HAVE_IP_ROUTE_OUTPUT_FLOW_4_ARGS
+#if defined HAVE_KFUNC_IP_ROUTE_OUTPUT_FLOW_4_ARGS
 extern int ip_route_output_flow(struct rtable **rp, struct flowi *flp, struct sock *sk, int flags);
-#endif
-#ifdef HAVE_IP_ROUTE_OUTPUT_FLOW_5_ARGS
+#elif defined HAVE_KFUNC_IP_ROUTE_OUTPUT_FLOW_5_ARGS
 extern int ip_route_output_flow(struct net *, struct rtable **rp, struct flowi *flp,
 				struct sock *sk, int flags);
+#elif defined HAVE_KFUNC_IP_ROUTE_OUTPUT_FLOW_RTABLE_RETURN
+extern struct rtable *ip_route_output_flow(struct net *, struct flowi4 *, struct sock *);
 #endif
 #endif
 #endif
@@ -398,6 +414,7 @@ dst_update_pmtu(struct dst_entry *dst, uint32_t mtu)
 #undef HAVE_KFUNC_IP_ROUTE_CONNECT_RTABLE_RETURN
 #ifdef HAVE_KFUNC_IP_ROUTE_CONNECT_RTABLE_RETURN
 #undef ip_route_connect
+#if 0
 static __inline__ int
 ip_route_connect_(struct rtable **rp, __be32 dst, __be32 src, u32 tos, int oif,
 		  u8 protocol, __be16 sport, __be16 dport, struct sock *sk, int flags)
@@ -420,6 +437,34 @@ ip_route_connect_(struct rtable **rp, __be32 dst, __be32 src, u32 tos, int oif,
 	}
 	return (0);
 }
+#else
+static __inline__ int
+ip_route_connect_(struct rtable **rp, __be32 dst, __be32 src, u32 tos, int oif,
+		  u8 protocol, __be16 sport, __be16 dport, struct sock *sk, int flags)
+{
+	struct flowi4 fl4;
+	struct rtable *rt;
+
+	flowi4_init_output(&fl4, oif, 0, tos, RT_SCOPE_UNIVERSE, protocol, flags,
+			   dst, src, dport, sport);
+	if (!dst || !src) {
+		rt = __ip_route_output_key(&init_net, &fl4);
+		if (IS_ERR(rt)) {
+			return PTR_ERR(rt);
+		}
+		ip_rt_put(rt);
+		flowi4_update_output(&fl4, oif, tos, fl4.daddr, fl4.saddr);
+	}
+	rt = __ip_route_output_key(&init_net, &fl4);
+	if (IS_ERR(rt)) {
+		return PTR_ERR(rt);
+	}
+	if (rp != NULL) {
+		*rp = rt;
+	}
+	return (0);
+}
+#endif
 #define ip_route_connect(rp,dst,src,tos,oif,protocol,sport,dport,sk,flags) ip_route_connect_(rp,dst,src,tos,oif,protocol,sport,dport,sk,flags)
 #endif
 

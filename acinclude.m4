@@ -1356,7 +1356,7 @@ AS_LINENO_POP])dnl
 	proc_dointvec,
 	proc_dointvec_jiffies,
 	proc_dointvec_minmax,
-	proc_doulongvec_ms_jiffies,
+	proc_dointvec_ms_jiffies,
 	proc_doulongvec_ms_jiffies_minmax,
 	put_cmsg,
 	register_sysctl_table,
@@ -2817,7 +2817,7 @@ dnl----------------------------------------------------------------------------
 	])
 	if test :$linux_cv_ip_route_output_key_rtable_return = :yes ; then
 	    AC_DEFINE([HAVE_KFUNC_IP_ROUTE_OUTPUT_KEY_RTABLE_RETURN], [1], [Define if function
-		       ip_route-output_key() returns a pointer to struct rtable.])
+		       ip_route_output_key() returns a pointer to struct rtable.])
 	fi
     ])
 dnl----------------------------------------------------------------------------
@@ -3066,6 +3066,33 @@ dnl----------------------------------------------------------------------------
 	    AC_DEFINE([HAVE_KFUNC_IP_ROUTE_OUTPUT_FLOW_5_ARGS], [1], [Define if
 		function ip_route_output_flow takes 5 arguments which is the case
 		from 2.6.21.])
+	fi
+	AC_CACHE_CHECK([for kernel ip_route_output_flow with rtable return], [linux_cv_have_ip_route_output_flow_rtable_return], [dnl
+	    AC_COMPILE_IFELSE([
+		AC_LANG_PROGRAM([[
+#ifdef NEED_LINUX_AUTOCONF_H
+#include NEED_LINUX_AUTOCONF_H
+#endif
+#include <linux/version.h>
+#include <linux/types.h>
+#include <linux/net.h>
+#include <linux/in.h>
+#include <linux/inet.h>
+#include <net/ip.h>
+#include <net/icmp.h>
+#include <net/route.h>
+#include <net/inet_ecn.h>
+#include <linux/skbuff.h>
+#include <linux/netfilter.h>
+#include <linux/netfilter_ipv4.h>
+#include <linux/ip.h>]],
+		    [[struct rtable *(*my_autoconf_function_pointer)(struct net *, struct flowi4 *, struct sock *) = &ip_route_output_flow;]]) ],
+		    [linux_cv_have_ip_route_output_flow_rtable_return='yes'],
+		    [linux_cv_have_ip_route_output_flow_rtable_return='no'])
+	])
+	if test :$linux_cv_have_ip_route_output_flow_rtable_return = :yes ; then
+	    AC_DEFINE([HAVE_KFUNC_IP_ROUTE_OUTPUT_FLOW_RTABLE_RETURN], [1], [Define if function
+	    ip_route_output_flow() returns a pointer to struct rtable.])
 	fi
     ])
     fi

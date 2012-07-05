@@ -2694,7 +2694,6 @@ AT_CLEANUP
 AT_SETUP([posix streams test 3.10.1])
 AT_KEYWORDS([streams poll POLLNVAL])
 AT_CHECK([test_streams 3.10.1], [], [ignore], [], [], [])
-AT_XFAIL_IF(true)
 AT_CLEANUP
 
 AT_SETUP([posix streams test 3.10.2])
