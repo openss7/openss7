@@ -94,6 +94,7 @@ dnl m4_include([m4/gcj.m4])
 AC_DEFUN([AC_OPENSS7], [dnl
     _OPENSS7_PACKAGE([OpenSS7], [OpenSS7])
     PKGINCL="src/include/sys/${PACKAGE_LCNAME}"
+    _BLD
     _AUTOPR
     _PUBLIC_RELEASE
     _REPO

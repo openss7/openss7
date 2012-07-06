@@ -114,7 +114,6 @@ dnl Checks for programs.
 dnl
 AM_PROG_AS
 AM_PROG_AR
-AC_PROG_RANLIB
 AC_PROG_AWK
 AC_PROG_CXX([g++3 g++])
 AC_PROG_CC
