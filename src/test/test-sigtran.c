@@ -469,7 +469,7 @@ struct test_stats {
 	sdl_stats_t sdl;
 	sdt_stats_t sdt;
 	sl_stats_t sl;
-} iutstat;
+} iutstat = {};
 
 /*
  *  -------------------------------------------------------------------------

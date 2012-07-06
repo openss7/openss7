@@ -401,7 +401,7 @@ static int ss7_pvar = SS7_PVAR_ITUT_00;
 struct test_stats {
 	sdl_stats_t sdl;
 	sdt_stats_t sdt;
-} iutstat;
+} iutstat = {};
 
 struct test_config {
 	lmi_option_t opt;
