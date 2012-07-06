@@ -3300,9 +3300,10 @@ endif
 ##
 ## Build cache files for intelligent warnings.
 ##
-EXTRA_DIST			+= cache/arch-os-x86_64-config.cache \
-				   cache/centos-5-x86_64-config.cache \
+EXTRA_DIST			+= cache/arch-os-i686-config.cache \
+				   cache/arch-os-x86_64-config.cache \
 				   cache/centos-5.5-x86_64-config.cache \
+				   cache/centos-5-x86_64-config.cache \
 				   cache/centos-6-x86_64-config.cache \
 				   cache/debian-lenny-i386-config.cache \
 				   cache/debian-lenny-i686-config.cache \
@@ -3323,9 +3324,9 @@ EXTRA_DIST			+= cache/arch-os-x86_64-config.cache \
 				   cache/redhat-6.0-x86_64-config.cache \
 				   cache/redhat-7.2-i686-config.cache \
 				   cache/rhel-6-x86_64-config.cache \
+				   cache/salix-13.37-i686-config.cache \
 				   cache/scientific-5-x86_64-config.cache \
 				   cache/scientific-6-x86_64-config.cache \
-				   cache/salix-13.37-i686-config.cache \
 				   cache/slackware-13.37-x86_64-config.cache \
 				   cache/sle-11-x86_64-config.cache \
 				   cache/suse-11-x86_64-config.cache \
