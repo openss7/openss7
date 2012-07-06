@@ -5225,7 +5225,7 @@ do_signal(int child, int action)
 		ic.ic_timout = 0;
 		ic.ic_len = sizeof(stats->sl);
 		ic.ic_dp = (char *) &stats->sl;
-		if ((err = test_ioctl(child, I_STR, (intptr_t) &ic)))
+		if (!(err = test_ioctl(child, I_STR, (intptr_t) &ic)))
 			if (show && verbose > 1)
 				print_sl_stats(child, &stats->sl);
 		return (err);
