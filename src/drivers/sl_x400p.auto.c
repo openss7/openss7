@@ -69,8 +69,7 @@
 
  *****************************************************************************/
 
-static char const ident[] =
-    "$RCSfile: sl_x400p.c,v $ $Name:  $($Revision: 1.1.2.5 $) $Date: 2011-09-20 09:51:37 $";
+static char const ident[] = "$RCSfile: sl_x400p.c,v $ $Name:  $($Revision: 1.1.2.5 $) $Date: 2011-09-20 09:51:37 $";
 
 /*
  *  This is an SL (Signalling Link) kernel module which provides all of the
@@ -184,10 +183,8 @@ MODULE_ALIAS("/dev/streams/x400p-sl");
 MODULE_ALIAS("/dev/streams/x400p-sl/*");
 MODULE_ALIAS("/dev/streams/clone/x400p-sl");
 MODULE_ALIAS("char-major-" __stringify(SL_X400P_CMAJOR_0));
-MODULE_ALIAS("char-major-" __stringify(SL_X400P_CMAJOR_0)
-	     "-*");
-MODULE_ALIAS("char-major-" __stringify(SL_X400P_CMAJOR_0)
-	     "-0");
+MODULE_ALIAS("char-major-" __stringify(SL_X400P_CMAJOR_0) "-*");
+MODULE_ALIAS("char-major-" __stringify(SL_X400P_CMAJOR_0) "-0");
 MODULE_ALIAS("/dev/x400p-sl");
 #endif				/* MODULE_ALIAS */
 #endif				/* LINUX */
@@ -892,8 +889,7 @@ static rwlock_t xp_list_lock = RW_LOCK_UNLOCKED;	/* protect open list */
 #define TEST2		(1<<0)	/* TSTREG.0: drives TEST2 pin */
 
 #define CTLREG1	0x404
-#define NONREVA		(1<<0)	/* CTLREG1.0: non-REV.A mode (set this bit for Dallas chips later than Rev.
-				   A) */
+#define NONREVA		(1<<0)	/* CTLREG1.0: non-REV.A mode (set this bit for Dallas chips later than Rev.  A) */
 
 #define X400_ABIT 8
 #define X400_BBIT 4
@@ -907,6 +903,7 @@ static rwlock_t xp_list_lock = RW_LOCK_UNLOCKED;	/* protect open list */
 #define X400P_SDL_ALARM_SETTLE_E1	    80
 #define X400P_SDL_ALARM_SETTLE_T1	    120
 #define X400P_SDL_ALARM_SETTLE_TIME	    5000
+
 enum xp_board {
 	PLX9030 = 0,
 	PLXDEVBRD,
@@ -996,7 +993,6 @@ STATIC struct {
 	{ "Unknown ID 1111",	0 }
 };
 
-
 STATIC struct pci_device_id xp_pci_tbl[] __devinitdata = {
 	{PCI_VENDOR_ID_PLX, 0x9030, PCI_ANY_ID, PCI_ANY_ID, PCI_CLASS_BRIDGE_OTHER << 8, 0xffff00, PLX9030},
 	{PCI_VENDOR_ID_PLX, 0x3001, PCI_ANY_ID, PCI_ANY_ID, PCI_CLASS_BRIDGE_OTHER << 8, 0xffff00, PLXDEVBRD},
@@ -1039,8 +1035,7 @@ module_param(ansi, ushort, 0444);
 module_param(etsi, ushort, 0444);
 module_param(japan, ushort, 0444);
 #endif
-MODULE_PARM_DESC(japan,
-		 "Configure any T1/J1 or E1/T1/J1 devices for J1 (only) operation (overrides ansi=1).");
+MODULE_PARM_DESC(japan, "Configure any T1/J1 or E1/T1/J1 devices for J1 (only) operation (overrides ansi=1).");
 MODULE_PARM_DESC(ansi, "Configure any T1/J1 or E1/T1/J1 devices for T1 (only) operation.");
 MODULE_PARM_DESC(etsi, "Configure all E1 or E1/T1/J1 devices for E1 (only) operation (overrides ansi=1).");
 
@@ -2077,11 +2072,11 @@ sl_in_service_ind(struct ch *ch)
   * context.
   *
   * The only reason that timeout processing would ever fail in the SL state machine is because this
-  * funciton returns non-zero (fails to allocate a buffer).  Therefore, when we have an active
+  * function returns non-zero (fails to allocate a buffer).  Therefore, when we have an active
   * stream associated with the signalling link state machine, we use mi_allocb(9) to allocate the
   * message block and schedule the read queue for enabling on the bufcall(9) callback.  This way,
   * the read service procedure will run when a buffer is available.  A wakeup flag is set indicating
-  * that a link out of service condition has occured so that the wakeup routine of the read service
+  * that a link out of service condition has occurred so that the wakeup routine of the read service
   * procedure can attempt to issue the indication at that time.  This is a better approach than
   * attempting to defer timeouts.  Care should be taken that the read service wakeup procedure is
   * run *before* the queue is processed for messages, otherwise, a message order reversal could
@@ -2421,7 +2416,7 @@ sdt_rc_signal_unit_ind(struct ch *ch, mblk_t *dp, sl_ulong count)
 	return (-ENXIO);
 }
 
-/* Note: none of the following SDT primitives are acutally issued.  They are signals that are
+/* Note: none of the following SDT primitives are actually issued.  They are signals that are
  * delivered to the signalling link level internally when required.  Implementing them requires
  * splitting the signalling terminal state machine from the signalling link state machine. */
 
@@ -2663,7 +2658,7 @@ sdl_received_bits_ind(struct ch *ch, mblk_t *dp)
 }
 
 /* Note: none of the following SDL primitives are actually issued.  We do not provide disconnect
- * indiciations because SS7 does not examine "leads". */
+ * indications because SS7 does not examine "leads". */
 
 #if 1
 /** sdl_disconnect_ind: - issue SDL_DISCONNECT_IND primitive
@@ -31212,6 +31207,8 @@ xp_wsrv(queue_t *q)
  *  OPEN and CLOSE
  *
  *  =========================================================================
+ *  Open is called on the first open of a character special device stream
+ *  head; close is called on the last close of the same device.
  */
 
 #define FIRST_CMINOR	 0
@@ -31425,22 +31422,24 @@ xp_init_caches(void)
 {
 	if (!xp_priv_cachep
 	    && !(xp_priv_cachep =
-		 kmem_create_cache("xp_priv_cachep", mi_open_size(sizeof(struct xp)), 0, SLAB_HWCACHE_ALIGN,
-				   NULL, NULL))) {
+		 kmem_create_cache("xp_priv_cachep", mi_open_size(sizeof(struct xp)), 0, SLAB_HWCACHE_ALIGN, NULL,
+				   NULL))) {
 		cmn_err(CE_PANIC, "%s: Cannot allocate xp_priv_cachep", __FUNCTION__);
 		goto error;
 	} else
 		printd(("%s: initialized device private structure cache\n", DRV_NAME));
 	if (!xp_span_cachep
 	    && !(xp_span_cachep =
-		 kmem_create_cache("xp_span_cachep", sizeof(struct sp), 0, SLAB_HWCACHE_ALIGN, NULL, NULL))) {
+		 kmem_create_cache("xp_span_cachep", sizeof(struct sp), 0, SLAB_HWCACHE_ALIGN, NULL,
+				   NULL))) {
 		cmn_err(CE_PANIC, "%s: Cannot allocate xp_span_cachep", __FUNCTION__);
 		goto error;
 	} else
 		printd(("%s: initialized span private structure cache\n", DRV_NAME));
 	if (!xp_card_cachep
 	    && !(xp_card_cachep =
-		 kmem_create_cache("xp_card_cachep", sizeof(struct cd), 0, SLAB_HWCACHE_ALIGN, NULL, NULL))) {
+		 kmem_create_cache("xp_card_cachep", sizeof(struct cd), 0, SLAB_HWCACHE_ALIGN, NULL,
+				   NULL))) {
 		cmn_err(CE_PANIC, "%s: Cannot allocate xp_card_cachep", __FUNCTION__);
 		goto error;
 	} else
@@ -31454,8 +31453,8 @@ xp_init_caches(void)
 		printd(("%s: initialized sync private structure cache\n", DRV_NAME));
 	if (!xp_xbuf_cachep
 	    && !(xp_xbuf_cachep =
-		 kmem_create_cache("xp_xbuf_cachep", X400P_EBUFNO * 1024, 0, SLAB_HWCACHE_ALIGN, NULL,
-				   NULL))) {
+		 kmem_create_cache("xp_xbuf_cachep", X400P_EBUFNO * 1024, 0, SLAB_HWCACHE_ALIGN,
+				   NULL, NULL))) {
 		cmn_err(CE_PANIC, "%s: Cannot allocate xp_xbuf_cachep", __FUNCTION__);
 		goto error;
 	} else
@@ -31896,11 +31895,9 @@ xp_free_cd(struct cd *cd)
 		if (cd->tasklet.func)
 			tasklet_kill(&cd->tasklet);
 		if (cd->rbuf)
-			kmem_cache_free(xp_xbuf_cachep, (uint32_t *)
-					xchg(&cd->rbuf, NULL));
+			kmem_cache_free(xp_xbuf_cachep, (uint32_t *) xchg(&cd->rbuf, NULL));
 		if (cd->wbuf)
-			kmem_cache_free(xp_xbuf_cachep, (uint32_t *)
-					xchg(&cd->wbuf, NULL));
+			kmem_cache_free(xp_xbuf_cachep, (uint32_t *) xchg(&cd->wbuf, NULL));
 		/* remove any remaining spans */
 		for (span = 0; span < X400_SPANS; span++) {
 			struct sp *sp;
@@ -32150,11 +32147,14 @@ xp_probe(struct pci_dev *dev, const struct pci_device_id *id)
 	printd(("%s: enabled %s pci card type %ld\n", DRV_NAME, name, id->driver_data));
 	if (dev->irq < 1) {
 		cmn_err(CE_WARN, "%s: ERROR: No IRQ allocated for %s card.", DRV_NAME, name);
+		pci_disable_device(dev);
 		return (-ENXIO);
 	}
 	printd(("%s: card %s allocated IRQ %d\n", DRV_NAME, name, dev->irq));
-	if (!(cd = xp_alloc_cd()))
+	if (!(cd = xp_alloc_cd())) {
+		pci_disable_device(dev);
 		return (-ENOMEM);
+	}
 	pci_set_drvdata(dev, cd);
 	if ((pci_resource_flags(dev, 0) & IORESOURCE_IO)
 	    || !(cd->plx_region = pci_resource_start(dev, 0))
@@ -32163,8 +32163,8 @@ xp_probe(struct pci_dev *dev, const struct pci_device_id *id)
 		cmn_err(CE_WARN, "%s: ERROR: Invalid PLX 9030 base resource", DRV_NAME);
 		goto error_remove;
 	}
-	printd(("%s: plx region %ld bytes at %lx, remapped %p\n", DRV_NAME, cd->plx_length, cd->plx_region,
-		cd->plx));
+	printd(("%s: plx region %ld bytes at %lx, remapped %p\n", DRV_NAME, cd->plx_length,
+		cd->plx_region, cd->plx));
 	if ((pci_resource_flags(dev, 2) & IORESOURCE_IO)
 	    || !(cd->xll_region = pci_resource_start(dev, 2))
 	    || !(cd->xll_length = pci_resource_len(dev, 2))
@@ -32172,8 +32172,8 @@ xp_probe(struct pci_dev *dev, const struct pci_device_id *id)
 		cmn_err(CE_WARN, "%s: ERROR: Invalid Xilinx 32-bit base resource", DRV_NAME);
 		goto error_remove;
 	}
-	printd(("%s: xll region %ld bytes at %lx, remapped %p\n", DRV_NAME, cd->xll_length, cd->xll_region,
-		cd->xll));
+	printd(("%s: xll region %ld bytes at %lx, remapped %p\n", DRV_NAME, cd->xll_length,
+		cd->xll_region, cd->xll));
 	if ((pci_resource_flags(dev, 3) & IORESOURCE_IO)
 	    || !(cd->xlb_region = pci_resource_start(dev, 3))
 	    || !(cd->xlb_length = pci_resource_len(dev, 3))
@@ -32181,24 +32181,27 @@ xp_probe(struct pci_dev *dev, const struct pci_device_id *id)
 		cmn_err(CE_WARN, "%s: ERROR: Invalid Xilinx 8-bit base resource", DRV_NAME);
 		goto error_remove;
 	}
-	printd(("%s: xlb region %ld bytes at %lx, remapped %p\n", DRV_NAME, cd->xlb_length, cd->xlb_region,
-		cd->xlb));
+	printd(("%s: xlb region %ld bytes at %lx, remapped %p\n", DRV_NAME, cd->xlb_length,
+		cd->xlb_region, cd->xlb));
 	cd->config.ifname = xp_board_info[id->driver_data].name;
 	if (!request_mem_region(cd->plx_region, cd->plx_length, cd->config.ifname)) {
 		cmn_err(CE_WARN, "%s: ERROR: Unable to reserve PLX memory", DRV_NAME);
 		goto error_remove;
 	}
-	printd(("%s: plx region %lx reserved %ld bytes\n", DRV_NAME, cd->plx_region, cd->plx_length));
+	printd(("%s: plx region %lx reserved %ld bytes\n", DRV_NAME, cd->plx_region,
+		cd->plx_length));
 	if (!request_mem_region(cd->xll_region, cd->xll_length, cd->config.ifname)) {
 		cmn_err(CE_WARN, "%s: ERROR: Unable to reserve Xilinx 32-bit memory", DRV_NAME);
 		goto error_remove;
 	}
-	printd(("%s: xll region %lx reserved %ld bytes\n", DRV_NAME, cd->xll_region, cd->xll_length));
+	printd(("%s: xll region %lx reserved %ld bytes\n", DRV_NAME, cd->xll_region,
+		cd->xll_length));
 	if (!request_mem_region(cd->xlb_region, cd->xlb_length, cd->config.ifname)) {
 		cmn_err(CE_WARN, "%s: ERROR: Unable to reserve Xilinx 8-bit memory", DRV_NAME);
 		goto error_remove;
 	}
-	printd(("%s: xlb region %lx reserved %ld bytes\n", DRV_NAME, cd->xlb_region, cd->xlb_length));
+	printd(("%s: xlb region %lx reserved %ld bytes\n", DRV_NAME, cd->xlb_region,
+		cd->xlb_length));
 	cmn_err(CE_NOTE, "%s: card detected %s at 0x%lx/0x%lx irq %d", DRV_NAME, cd->config.ifname,
 		cd->xll_region, cd->xlb_region, dev->irq);
 #ifdef X400P_DOWNLOAD_FIRMWARE
@@ -32318,7 +32321,8 @@ xp_probe(struct pci_dev *dev, const struct pci_device_id *id)
 	cd->irq = dev->irq;
 	cd->bus = dev->bus->number;
 	cd->slot = PCI_SLOT(dev->devfn);
-	printd(("%s: acquired IRQ %ld for %s card\n", DRV_NAME, cd->irq, xp_board_info[cd->board].name));
+	printd(("%s: acquired IRQ %ld for %s card\n", DRV_NAME, cd->irq,
+		xp_board_info[cd->board].name));
 
 	if (xp_card_config(cd) != 0)
 		goto error_remove;
@@ -32330,6 +32334,7 @@ xp_probe(struct pci_dev *dev, const struct pci_device_id *id)
 	return (-ENODEV);
 }
 
+#if 0
 #ifdef CONFIG_PM
 #ifndef HAVE_KTYPE_PM_MESSAGE_T
 typedef u32 pm_message_t;
@@ -32356,16 +32361,19 @@ xp_resume(struct pci_dev *pdev)
 	return 0;
 }
 #endif				/* CONFIG_PM */
+#endif
 
 STATIC struct pci_driver xp_driver = {
 	.name = DRV_NAME,
 	.probe = xp_probe,
 	.remove = __devexit_p(xp_remove),
 	.id_table = xp_pci_tbl,
+#if 0
 #ifdef CONFIG_PM
 	.suspend = xp_suspend,
 	.resume = xp_resume,
 #endif				/* CONFIG_PM */
+#endif
 };
 
 /** xp_pci_init: - X400P-SS7 PCI Init
@@ -32521,14 +32529,14 @@ sl_x400pinit(void)
 	}
 	ss7_bufpool_init(&xp_bufpool);
 	for (mindex = 0; mindex < CMAJORS; mindex++) {
-		if ((err = xp_register_strdev(xp_majors[mindex]))
-		    < 0) {
+		if ((err = xp_register_strdev(xp_majors[mindex])) < 0) {
 			if (mindex) {
 				cmn_err(CE_WARN, "%s: could not register major %d", DRV_NAME,
 					xp_majors[mindex]);
 				continue;
 			} else {
-				cmn_err(CE_WARN, "%s: could not register driver, err = %d", DRV_NAME, err);
+				cmn_err(CE_WARN, "%s: could not register driver, err = %d",
+					DRV_NAME, err);
 				sl_x400pterminate();
 				return (err);
 			}
