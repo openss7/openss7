@@ -821,6 +821,11 @@ libOS7drivers_a_SOURCES		= src/drivers/pty.c \
 				  src/drivers/x400p-ss7.c \
 				  src/drivers/x100p-ss7.c \
 				  src/drivers/sl_x400p.c \
+				  src/include/net/bpf.h \
+				  src/include/net/lif.h \
+				  src/include/net/nit_buf.h \
+				  src/include/net/nit_if.h \
+				  src/include/net/nit_pf.h \
 				  src/drivers/sl_x100p.c \
 				  src/drivers/v400pfw.h \
 				  src/drivers/v401pfw.h \
