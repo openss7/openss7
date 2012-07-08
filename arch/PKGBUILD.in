@@ -129,6 +129,7 @@ package() {
 	cp -pv ${mpost_file} $d
 	cp -pv System.symvers $d
 	cp -pv Module.symvers $d
+	cp -pv config.h $d
 	cat System.symvers Module.symvers | gzip -9 -c >$d/symvers-@kversion@.gz
 	cp -pv $d/symvers-@kversion@.gz $b
 	cat System.symvers Module.symvers | awk '{print$4"\t"$3"\t"$1"\t"$2}' > $d/abi-@kversion@
@@ -297,6 +298,7 @@ package_@PACKAGE@-@kversion@-devel() {
 	cd $srcdir/_install
 	mkdir -p $pkgdir/usr
 	cp -av usr/src $pkgdir/usr
+	(cd $pkgdir/usr/src; ln -s @PACKAGE@-@VERSION@-@PACKAGE_PACRELEASE@ @PACKAGE@)
 	mkdir -p $pkgdir/usr/share/man
 	cp -av usr/share/man/man9 $pkgdir/usr/share/man
 	( cat <<-EOF

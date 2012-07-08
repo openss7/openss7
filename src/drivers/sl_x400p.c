@@ -83,6 +83,7 @@ static char const ident[] = "$RCSfile: sl_x400p.c,v $ $Name:  $($Revision: 1.1.2
 #define _MPS_SOURCE	1
 #define _SVR4_SOURCE	1
 #define _SUN_SOURCE	1
+#define _HPUX_SOURCE	1
 
 #define X400P_DOWNLOAD_FIRMWARE 1
 
@@ -108,17 +109,29 @@ static char const ident[] = "$RCSfile: sl_x400p.c,v $ $Name:  $($Revision: 1.1.2
 #endif				/* _MPS_SOURCE */
 #endif				/* LINUX */
 
+#include <linux/if.h>
+#include <net/lif.h>
+#include <net/nit_if.h>
+#include <net/bpf.h>
+
+#undef LMI_DEFAULT
+
 #include <ss7/lmi.h>
 #include <ss7/lmi_ioctl.h>
+//#undef _MPS_SOURCE		/* get the right sdl/sdt/sl_timers_t */
 #include <ss7/sdli.h>
 #include <ss7/sdli_ioctl.h>
 #include <ss7/sdti.h>
 #include <ss7/sdti_ioctl.h>
 #include <ss7/sli.h>
 #include <ss7/sli_ioctl.h>
+//#define _MPS_SOURCE 1
 #include <sys/mxi.h>
 #include <sys/mxi_ioctl2.h>
 #include <sys/dsx_ioctl.h>
+
+#include <sys/dlpi.h>
+#include <sys/dlpi_ioctl.h>
 
 #ifdef X400P_DOWNLOAD_FIRMWARE
 #include "v401pfw.h"
@@ -155,6 +168,28 @@ MODULE_VERSION(PACKAGE_ENVR);
 #endif
 #endif				/* LINUX */
 
+#ifndef CONFIG_STREAMS_SL_X400P_NAME
+#define CONFIG_STREAMS_SL_X400P_NAME    	"x400p-sl"
+#endif
+#ifndef CONFIG_STREAMS_SL_X400P_MODID
+#define CONFIG_STREAMS_SL_X400P_MODID   	2083
+#endif
+#ifndef CONFIG_STREAMS_SL_X400P_NMINORS
+#define CONFIG_STREAMS_SL_X400P_NMINORS 	1
+#endif
+#ifndef CONFIG_STREAMS_SL_X400P_NMAJORS
+#define CONFIG_STREAMS_SL_X400P_NMAJORS 	1
+#endif
+#ifndef CONFIG_STREAMS_SL_X400P_MAJOR
+#define CONFIG_STREAMS_SL_X400P_MAJOR   	2083
+#endif
+#ifndef CONFIG_STREAMS_SL_X400P_MAJOR_0
+#define CONFIG_STREAMS_SL_X400P_MAJOR_0 	2083
+#endif
+#ifndef CONFIG_STREAMS_SL_X400P_MODULE
+#define CONFIG_STREAMS_SL_X400P_MODULE  	1
+#endif
+
 #define SL_X400P_DRV_ID		CONFIG_STREAMS_SL_X400P_MODID
 #define SL_X400P_DRV_NAME	CONFIG_STREAMS_SL_X400P_NAME
 #define SL_X400P_CMAJORS	CONFIG_STREAMS_SL_X400P_NMAJORS
@@ -175,6 +210,37 @@ MODULE_ALIAS("char-major-" __stringify(SL_X400P_CMAJOR_0) "-0");
 MODULE_ALIAS("/dev/x400p-sl");
 #endif				/* MODULE_ALIAS */
 #endif				/* LINUX */
+
+#ifdef _OPTIMIZE_SPEED
+#define X400LOG(sid, level, flags, fmt, ...) \
+	do { } while (0)
+#else
+#define X400LOG(sid, level, flags, fmt, ...) \
+	strlog(SL_X400P_DRV_ID, sid, level, flags, fmt, ##__VA_ARGS__)
+#endif
+
+#define STRLOGERR	0	/* log X400 error information */
+#define STRLOGNO	0	/* log X400 notice information */
+#define STRLOGST	1	/* log X400 state transitions */
+#define STRLOGTO	2	/* log X400 timeouts */
+#define STRLOGRX	3	/* log X400 primitives received */
+#define STRLOGTX	4	/* log X400 primitives issued */
+#define STRLOGTE	5	/* log X400 timer events */
+#define STRLOGIO	6	/* log X400 additional data */
+#define STRLOGDA	7	/* log X400 data */
+
+#define LOGERR(sid, fmt, ...) X400LOG(sid, STRLOGERR, SL_TRACE | SL_ERROR | SL_CONSOLE, fmt, ##__VA_ARGS__)
+#define LOGNO(sid, fmt, ...)  X400LOG(sid, STRLOGNO,  SL_TRACE, fmt, ##__VA_ARGS__)
+#define LOGST(sid, fmt, ...)  X400LOG(sid, STRLOGNO,  SL_TRACE, fmt, ##__VA_ARGS__)
+#define LOGTO(sid, fmt, ...)  X400LOG(sid, STRLOGNO,  SL_TRACE, fmt, ##__VA_ARGS__)
+#define LOGRX(sid, fmt, ...)  X400LOG(sid, STRLOGNO,  SL_TRACE, fmt, ##__VA_ARGS__)
+#define LOGTX(sid, fmt, ...)  X400LOG(sid, STRLOGNO,  SL_TRACE, fmt, ##__VA_ARGS__)
+#define LOGTE(sid, fmt, ...)  X400LOG(sid, STRLOGNO,  SL_TRACE, fmt, ##__VA_ARGS__)
+#define LOGIO(sid, fmt, ...)  X400LOG(sid, STRLOGNO,  SL_TRACE, fmt, ##__VA_ARGS__)
+#define LOGDA(sid, fmt, ...)  X400LOG(sid, STRLOGNO,  SL_TRACE, fmt, ##__VA_ARGS__)
+
+#define ch2sid(ch) (ch->ppa + (1<<12))
+#define xp2sid(xp) (xp->cminor)
 
 /*
  *  =======================================================================
@@ -336,6 +402,11 @@ typedef struct cd {
 	ulong plx_region;		/* PLX 9030 memory region */
 	ulong plx_length;		/* PLX 9030 memory length */
 	volatile uint16_t *plx;		/* PLX 9030 memory map */
+	volatile uint8_t synreg;	/* local copy of synreg contents */
+	volatile uint8_t ctlreg;	/* local copy of ctlreg contents (static bits) */
+	volatile uint8_t ledreg;	/* local copy of ledreg contents */
+	volatile uint8_t tstreg;	/* local copy of tstreg contents */
+	volatile uint8_t clkreg;	/* local copy of need for E1DIV for local clock */
 	uint frame;			/* frame number */
 	struct sp *spans[4];		/* structures for spans */
 	uint32_t *wbuf;			/* wr buffer */
@@ -400,76 +471,61 @@ STATIC struct ss7_bufpool xp_bufpool = { 0, };
 #define PLX_INTENA 0x43
 
 #define STAREG	0x400
-/* STAREG.0: interrupt enabled */
-/* STAREG.1: interrupt active */
-/* STAREG.2: dallas interrupt active */
+#define INTENABLED	(1<<0)	/* STAREG.0: interrupt enabled */
+#define INTACTIVE	(1<<1)	/* STAREG.1: interrupt active */
+#define DINTACT		(1<<2)	/* STAREG.2: dallas interrupt active */
 
 #define SYNREG	0x400
-/* SYNREG: 0x00 = free run */
-/* SYNREG: 0x01 = sync source span 1 */
-/* SYNREG: 0x02 = sync source span 2 */
-/* SYNREG: 0x03 = sync source span 3 */
-/* SYNREG: 0x04 = sync source span 4 */
-/* SYNREG: 0x05 = sync to timing bus */
+#define SYNCSELF	0	/* SYNREG: 0x00 = sync to local clock (free run) */
+#define SYNC1		1	/* SYNREG: 0x01 = sync source span 1 */
+#define SYNC2		2	/* SYNREG: 0x02 = sync source span 2 */
+#define SYNC3		3	/* SYNREG: 0x03 = sync source span 3 */
+#define SYNC4		4	/* SYNREG: 0x04 = sync source span 4 */
+#define SYNCEXTERN	5	/* SYNREG: 0x05 = sync to timing bus */
+#define SYNCAUTO	6	/* SYNREG: 0x06 = sync to local clock (free run) */
 
 #define CTLREG	0x401
-/* CTLREG.0: interrupt enable */
-/* CTLREG.1: drives "TEST1" signal ("Interrupt" outbit) */
-/* CTLREG.2: dallas interrupt enable (allows DINT signal to drive INT) */
-/* CTLREG.3: external syncrhonization enable (MASTER signal) */
-/* CTLREG.4: select E1 divisor mode (0 for T1, 1 for E1) */
-/* CTLREG.5: remote serial loopback (when set, TSER is driven from RSER) */
-/* CTLREG.6: local serial loopback (when set, Rx buffers driven from Tx buffers) */
-/* CTLREG.7: interrupt acknolwedge (set to 1 to acknowledge interrupt  */
+#define INTENA		(1<<0)	/* CTLREG.0: interrupt enable */
+#define OUTBIT		(1<<1)	/* CTLREG.1: drives "TEST1" signal ("Interrupt" outbit) */
+#define DINTENA		(1<<2)	/* CTLREG.2: dallas interrupt enable (allows DINT signal to drive INT) */
+#define MASTER		(1<<3)	/* CTLREG.3: external syncrhonization enable (MASTER signal). */
+#define E1DIV		(1<<4)	/* CTLREG.4: select E1 divisor mode (0 to T1, 1 for E1). */
+#define RSERLB		(1<<5)	/* CTLREG.5: remote serial loopback (TSER from RSER). */
+#define LSERLB		(1<<6)	/* CTLREG.6: local serial loopback (Rx buffers from Tx buffers). */
+#define INTACK		(1<<7)	/* CTLREG.7: interrupt acknowledge (set to 1 to acknowledge interrupt) */
 
 #define LEDREG	0x402
 /* LEDREG.0: span 1 green */
 /* LEDREG.1: span 1 red */
+#define LEDBLK 0
 /* LEDREG.2: span 2 green */
 /* LEDREG.3: span 2 red */
+#define LEDGRN 1
 /* LEDREG.4: span 3 green */
 /* LEDREG.5: span 3 red */
+#define LEDRED 2
 /* LEDREG.6: span 4 green */
 /* LEDREG.7: span 1 red */
+#define LEDYEL 3
 
 #define TSTREG	0x403
-/* TSTREG.0: drives TEST2 pin */
+#define TEST2		(1<<0)	/* TSTREG.0: drives TEST2 pin */
 
 #define CTLREG1	0x404
-/* CTLREG1.0: non-REV.A mode (set this bit for Dallas chips later than Rev. A) */
-
-#define LOOPUP	0x80
-#define LOOPDN	0x40
-
-#define INTENA	0x01		/* Interrupt Enable */
-#define OUTBIT	0x02		/* Drives "TEST1" signal ("Interrupt" outbit) */
-#define DINTENA	0x04		/* Dallas Interrupt Enable (Allows DINT signal to driver INT) */
-#define MASTER	0x08		/* External Syncrhonization Enable (MASTER signal). */
-#define E1DIV	0x10		/* Select E1 Divisor Mode (0 to T1, 1 for E1). */
-#define RSERLB	0x20		/* Local serial loopback. */
-#define LSERLB	0x40		/* Remote serial loopback. */
-#define INTACK	0x80		/* Interrupt Acknowledge (set to 1 to acknowledge interrupt) */
-
-#define INTACTIVE 2
-
-#define SYNCSELF 0
-#define SYNC1 1
-#define SYNC2 2
-#define SYNC3 3
-#define SYNC4 4
-#define SYNCEXTERN 5
-
-#define LEDBLK 0
-#define LEDGRN 1
-#define LEDRED 2
-#define LEDYEL 3
+#define NONREVA		(1<<0)	/* CTLREG1.0: non-REV.A mode (set this bit for Dallas chips later than Rev.  A) */
 
 #define X400_ABIT 8
 #define X400_BBIT 4
 
+#define X400_CARDS 16		/* 16 cards per system */
+#define X400_SYNCS 16		/* 16 sync groups per system */
 #define X400_SPANS 4		/* 4 spans per card */
 
-#define X400P_SDL_ALARM_SETTLE_TIME	    5000	/* allow alarms to settle for 5 seconds */
+/* allow alarms to settle for 5 seconds */
+#define X400P_SDL_ALARM_SETTLE_SECONDS	    5
+#define X400P_SDL_ALARM_SETTLE_E1	    80
+#define X400P_SDL_ALARM_SETTLE_T1	    120
+#define X400P_SDL_ALARM_SETTLE_TIME	    5000
 
 enum xp_board {
 	PLX9030 = 0,
@@ -485,6 +541,11 @@ enum xp_board {
 	V400PT,
 	V401PE,
 	V401PT,
+	AE400P,
+	AT400P,
+	A400P,
+	A400PE,
+	A400PT
 };
 
 /* indexed by xp_board above */
@@ -508,6 +569,11 @@ static struct {
 	{ "V400PT",			1, 0xfefefefe },
 	{ "V401PE",			1, 0xffffffff },
 	{ "V401PT",			1, 0xfefefefe },
+	{ "AE400P",			1, 0xffffffff },
+	{ "AT400P",			1, 0xfefefefe },
+	{ "A400P",			1, 0xffffffff },
+	{ "A400PE",			1, 0xffffffff },
+	{ "A400PT",			1, 0xfefefefe },
 };
 
 #define XPF_SUPPORTED	(1<<0)
@@ -515,20 +581,24 @@ static struct {
 #define XP_DEV_IDMASK	0xf0
 #define XP_DEV_SHIFT	4
 #define XP_DEV_REVMASK	0x0f
-#define XP_DEV_DS2152	0x00
-#define XP_DEV_DS21352	0x01
-#define XP_DEV_DS21552	0x02
-#define XP_DEV_DS2154	0x08
-#define XP_DEV_DS21354	0x09
-#define XP_DEV_DS21554	0x0a
-#define XP_DEV_DS2155	0x0b
-#define XP_DEV_DS2156	0x0c
+#define XP_DEV_DS2152	0x00	/* '0000XXXX'B DS2152  */
+#define XP_DEV_DS21352	0x01	/* '0001XXXX'B DS21352 */
+#define XP_DEV_DS21552	0x02	/* '0010XXXX'B DS21552 */
+#define XP_DEV_DS21458	0x08	/* '1000XXXX'B DS21458 */
+#define XP_DEV_DS21354	0x09	/* '1001XXXX'B DS21354 */
+#define XP_DEV_DS21554	0x0a	/* '1010XXXX'B DS21554 */
+#define XP_DEV_DS2155	0x0b	/* '1011XXXX'B DS2155  */
+#define XP_DEV_DS21455	0x0c	/* '1100XXXX'B DS21455 */
+
+#define XP_DEV_DS2153	0x10	/* '00000000'B DS2153  */ /* make this 0x10: it really conflicts with 0x00 */
+#define XP_DEV_DS2156	0x1c	/* '1010XXXX'B DS2156  */ /* make this 0x1c: it really conflicts with 0x0c */
+#define XP_DEV_DS2154	0x18	/* '1000XXXX'B DS2154  */ /* make this 0x18: it really conflicts with 0x08 */
 
 STATIC struct {
 	char *name;
 	uint32_t hw_flags;
 } xp_device_info[] __devinitdata = {
-	{ "DS2152 (T1)",	1 },
+	{ "DS2152 (T1)",	0 },	/* { "DS2153 (E1)", 0 }, */
 	{ "DS21352 (T1)",	1 },
 	{ "DS21552 (T1)",	1 },
 	{ "Unknown ID 0011",	0 },
@@ -536,11 +606,11 @@ STATIC struct {
 	{ "Unknown ID 0101",	0 },
 	{ "Unknown ID 0110",	0 },
 	{ "Unknown ID 0111",	0 },
-	{ "DS2154 (E1)",	1 },
+	{ "DS21458 (E1/T1/J1)", 1 },	/* { "DS2154 (E1)", 0 }, */
 	{ "DS21354 (E1)",	1 },
 	{ "DS21554 (E1)",	1 },
 	{ "DS2155 (E1/T1/J1)",	1 },
-	{ "DS2156 (E1/T1/J1)",	1 },
+	{ "DS21455 (E1/T1/J1)",	1 },	/* { "DS2156 (E1/T1/J1)", 1 }, */
 	{ "Unknown ID 1101",	0 },
 	{ "Unknown ID 1110",	0 },
 	{ "Unknown ID 1111",	0 }
@@ -554,6 +624,10 @@ STATIC struct pci_device_id xp_pci_tbl[] __devinitdata = {
 	{PCI_VENDOR_ID_PLX, 0x4000, PCI_ANY_ID, PCI_ANY_ID, PCI_CLASS_BRIDGE_OTHER << 8, 0xffff00, V400P},
 	{PCI_VENDOR_ID_PLX, 0xD33D, PCI_ANY_ID, PCI_ANY_ID, PCI_CLASS_BRIDGE_OTHER << 8, 0xffff00, V401PT},
 	{PCI_VENDOR_ID_PLX, 0xD44D, PCI_ANY_ID, PCI_ANY_ID, PCI_CLASS_BRIDGE_OTHER << 8, 0xffff00, V401PE},
+	{PCI_VENDOR_ID_PLX, 0x1000, PCI_ANY_ID, PCI_ANY_ID, PCI_CLASS_BRIDGE_OTHER << 8, 0xffff00, AT400P},
+	{PCI_VENDOR_ID_PLX, 0x2000, PCI_ANY_ID, PCI_ANY_ID, PCI_CLASS_BRIDGE_OTHER << 8, 0xffff00, AE400P},
+	{PCI_VENDOR_ID_PLX, 0x4001, PCI_ANY_ID, PCI_ANY_ID, PCI_CLASS_BRIDGE_OTHER << 8, 0xffff00, A400PE},
+	{PCI_VENDOR_ID_PLX, 0x4002, PCI_ANY_ID, PCI_ANY_ID, PCI_CLASS_BRIDGE_OTHER << 8, 0xffff00, A400PT},
 	{0,}
 };
 /* *INDENT-ON* */
@@ -570,6 +644,23 @@ MODULE_ALIAS("pci:v000010B5d00000D33Dsv*sd*bc06sc80i*");
 MODULE_ALIAS("pci:v000010B5d00000D44Dsv*sd*bc06sc80i*");
 #endif				/* MODULE_ALIAS */
 #endif				/* MODULE_DEVICE_TABLE */
+
+unsigned short ansi = 0;
+unsigned short etsi = 0;
+unsigned short japan = 0;
+
+#ifndef module_param
+MODULE_PARM(ansi, "h");
+MODULE_PARM(etsi, "h");
+MODULE_PARM(japan, "h");
+#else
+module_param(ansi, ushort, 0444);
+module_param(etsi, ushort, 0444);
+module_param(japan, ushort, 0444);
+#endif
+MODULE_PARM_DESC(japan, "Configure any T1/J1 or E1/T1/J1 devices for J1 (only) operation (overrides ansi=1).");
+MODULE_PARM_DESC(ansi, "Configure any T1/J1 or E1/T1/J1 devices for T1 (only) operation.");
+MODULE_PARM_DESC(etsi, "Configure all E1 or E1/T1/J1 devices for E1 (only) operation (overrides ansi=1).");
 
 /* Map from T1 time slot (less 1) to Tormenta channel. */
 STATIC int xp_t1_chan_map[] = {
@@ -622,10 +713,15 @@ STATIC struct cd *x400p_cards;
  *
  *  ========================================================================
  */
-/*
- *  M_ERROR
- *  -----------------------------------
- */
+/** m_error: issue M_ERROR message
+  * @xp: private structure (locked)
+  * @q: active queue (write queue)
+  * @mp: message to reuse
+  * @err: +'ve or -'ve error to return
+  *
+  * Note that this is only ever called in response to a message on the write queue.  The passed in
+  * message is always consumed.
+  */
 STATIC noinline __unlikely int
 m_error(struct xp *xp, queue_t *q, int err)
 {
@@ -643,11 +739,13 @@ m_error(struct xp *xp, queue_t *q, int err)
 	return (-ENOBUFS);
 }
 
-/*
- *  SL_PDU_IND
- *  -----------------------------------
- *  We don't actually use SL_PDU_INDs, we pass along M_DATA messages.
- */
+/** sl_pdu_ind: issue SL_PDU_IND message upstream
+  * @ch: channel structure (locked)
+  * @dp: data portion of message
+  *
+  * We don't actually use SL_PDU_INDs, we pass along M_DATA messages.  This function is never
+  * called.
+  */
 STATIC inline fastcall __hot_read int
 sl_pdu_ind(struct xp *xp, queue_t *q, mblk_t *dp)
 {
@@ -668,10 +766,18 @@ sl_pdu_ind(struct xp *xp, queue_t *q, mblk_t *dp)
 	return (-ENOBUFS);
 }
 
-/*
- *  SL_LINK_CONGESTED_IND
- *  -----------------------------------
- */
+/** sl_link_congested_ind: - issue SL_LINK_CONGESTED_IND primitive
+  * @ch: channel structure (locked)
+  * @q: active queue (write queue) or NULL
+  * @mp: message to reuse or NULL
+  *
+  * There are two ways that SL_LINK_CONGESTED_IND can be issued: (1) in response adding a message
+  * for transmision (SL_PDU_REQ or M_DATA); (2) in response to an autonomous event within the state
+  * machine.  In the first case, @q and @mp will be non-null and the xp structure will be locked
+  * because we are called from the context of the write queue put or service procedure.  In the
+  * later case, @q and @mp are NULL, xp is unlocked (and might not exist), and we are being called
+  * from the tasklet.
+  */
 STATIC noinline fastcall __unlikely int
 sl_link_congested_ind(struct xp *xp, queue_t *q, sl_ulong cong, sl_ulong disc)
 {
@@ -693,10 +799,11 @@ sl_link_congested_ind(struct xp *xp, queue_t *q, sl_ulong cong, sl_ulong disc)
 	return (-ENOBUFS);
 }
 
-/*
- *  SL_LINK_CONGESTION_CEASED_IND
- *  -----------------------------------
- */
+/** sl_link_congestion_ceased_ind: - issue SL_LINK_CONGESTION_CEASED_IND
+  * @ch: channel structure (locked)
+  * @q: active queue (write queue) or NULL
+  * @mp: message to reuse or NULL
+  */
 STATIC noinline fastcall __unlikely int
 sl_link_congestion_ceased_ind(struct xp *xp, queue_t *q, sl_ulong cong, sl_ulong disc)
 {
@@ -719,10 +826,14 @@ sl_link_congestion_ceased_ind(struct xp *xp, queue_t *q, sl_ulong cong, sl_ulong
 	return (-ENOBUFS);
 }
 
-/*
- *  SL_RETRIEVED_MESSAGE_IND
- *  -----------------------------------
- */
+/** sl_retrieved_message_ind: - issue SL_RETRIEVED_MESSAGE_IND primitive
+  * @ch: channel structure (locked)
+  * @q: active queue (write queue)
+  * @dp: data portion of message
+  *
+  * This is called in response to SL_RETRIEVAL_REQUEST_AND_FSNC_REQ received on write queue from
+  * within the write put or service procedure.  The xp structure is locked.
+  */
 STATIC noinline fastcall __unlikely int
 sl_retrieved_message_ind(struct xp *xp, queue_t *q, mblk_t *dp)
 {
@@ -743,10 +854,14 @@ sl_retrieved_message_ind(struct xp *xp, queue_t *q, mblk_t *dp)
 	return (-ENOBUFS);
 }
 
-/*
- *  SL_RETRIEVAL_COMPLETE_IND
- *  -----------------------------------
- */
+/** sl_retrieval_complete_ind: - issue SL_RETRIEVAL_COMPLETE_IND primitive
+  * @ch: channel structure (locked)
+  * @q: active queue (write queue)
+  * @mp: SL_RETRIEVAL_REQUEST_AND_FSNC_REQ primitive
+  *
+  * This is called in response to SL_RETRIEVAL_REQUEST_AND_FSNC_REQ received on write queue from
+  * within the write put or service procedure.  The xp structure is locked.
+  */
 STATIC noinline fastcall __unlikely int
 sl_retrieval_complete_ind(struct xp *xp, queue_t *q)
 {
@@ -766,10 +881,14 @@ sl_retrieval_complete_ind(struct xp *xp, queue_t *q)
 	return (-ENOBUFS);
 }
 
-/*
- *  SL_RB_CLEARED_IND
- *  -----------------------------------
- */
+/** sl_rb_cleared_ind: - issue SL_RB_CLEARED_IND primitive
+  * @ch: channel structure (locked)
+  * @q: active queue (write queue)
+  * @mp: message to reuse
+  *
+  * This is called in response to SL_CLEAR_BUFFERS_REQ received on write queue from within the write
+  * put or service procedure.  The xp structure is locked.
+  */
 STATIC noinline fastcall __unlikely int
 sl_rb_cleared_ind(struct xp *xp, queue_t *q)
 {
@@ -789,10 +908,14 @@ sl_rb_cleared_ind(struct xp *xp, queue_t *q)
 	return (-ENOBUFS);
 }
 
-/*
- *  SL_BSNT_IND
- *  -----------------------------------
- */
+/** sl_bsnt_ind: - issue SL_BSNT_IND primitive
+  * @ch: channel structure (locked)
+  * @q: active queue (write queue)
+  * @mp: SL_RETRIEVE_BSNT_REQ primitive
+  *
+  * This is called in response to SL_RETRIEVE_BSNT_REQ received on write queue, from within the
+  * write put or service procedure.  The xp structure is locked.
+  */
 STATIC noinline fastcall __unlikely int
 sl_bsnt_ind(struct xp *xp, queue_t *q, sl_ulong bsnt)
 {
@@ -813,10 +936,12 @@ sl_bsnt_ind(struct xp *xp, queue_t *q, sl_ulong bsnt)
 	return (-ENOBUFS);
 }
 
-/*
- *  SL_IN_SERVICE_IND
- *  -----------------------------------
- */
+/** sl_in_service_ind: - issue an SL_IN_SERVICE_IND primitive
+  * @ch: channel structure (locked)
+  *
+  * This primitive is only issued from the bottom-half tasklet as a result of receiving the
+  * appropriate message sequence for initial alignement.
+  */
 STATIC noinline fastcall int
 sl_in_service_ind(struct xp *xp, queue_t *q)
 {
@@ -836,10 +961,27 @@ sl_in_service_ind(struct xp *xp, queue_t *q)
 	return (-ENOBUFS);
 }
 
-/*
- *  SL_OUT_OF_SERVICE_IND
- *  -----------------------------------
- */
+/** sl_out_of_service_ind: - issue SL_OUT_OF_SERVICE_IND primitive
+  * @ch: channel structure (locked)
+  *
+  * This primitive is issued from two contexts: either the primitive is issued as a result of a
+  * timeout; otherwise, it is issued as a result of autonomous events within the signalling link
+  * state machine.  For the timeout, the execution context is the timer callback procedure.  For the
+  * autonomous event, the execution context is the bottom-half tasklet.  Both are technically
+  * running at bottom half and bottom half suppression is sufficient for ch->lock from process
+  * context.
+  *
+  * The only reason that timeout processing would ever fail in the SL state machine is because this
+  * function returns non-zero (fails to allocate a buffer).  Therefore, when we have an active
+  * stream associated with the signalling link state machine, we use mi_allocb(9) to allocate the
+  * message block and schedule the read queue for enabling on the bufcall(9) callback.  This way,
+  * the read service procedure will run when a buffer is available.  A wakeup flag is set indicating
+  * that a link out of service condition has occurred so that the wakeup routine of the read service
+  * procedure can attempt to issue the indication at that time.  This is a better approach than
+  * attempting to defer timeouts.  Care should be taken that the read service wakeup procedure is
+  * run *before* the queue is processed for messages, otherwise, a message order reversal could
+  * occur.
+  */
 STATIC noinline fastcall int
 sl_out_of_service_ind(struct xp *xp, queue_t *q, sl_ulong reason)
 {
@@ -861,10 +1003,16 @@ sl_out_of_service_ind(struct xp *xp, queue_t *q, sl_ulong reason)
 	return (-ENOBUFS);
 }
 
-/*
- *  SL_REMOTE_PROCESSOR_OUTAGE_IND
- *  -----------------------------------
- */
+/** sl_remote_processor_outage_ind: - issue SL_REMOTE_PROCESSOR_OUTAGE_IND
+  * @ch: channel structure (locked)
+  * @q: active queue (write queue) or NULL
+  *
+  * This primitive is issued from two contexts: either the primitive is issued as a result of a
+  * SL_RESUME_REQ being received on the write queue, in which case @q will be non-NULL; otherwise,
+  * it is issued as a result of autonomous events (receiving SIPO) within the signalling link state
+  * machine.  For the SL_RESUME_REQ, the execution context is the write queue put or service
+  * procedure.  For the autonomous event, the execution context is the bottom-half tasklet.
+  */
 STATIC noinline fastcall __unlikely int
 sl_remote_processor_outage_ind(struct xp *xp, queue_t *q)
 {
@@ -885,10 +1033,11 @@ sl_remote_processor_outage_ind(struct xp *xp, queue_t *q)
 	return (-ENOBUFS);
 }
 
-/*
- *  SL_REMOTE_PROCESSOR_RECOVERED_IND
- *  -----------------------------------
- */
+/** sl_remote_processor_recovered_ind: - issue SL_REMOTE_PROCESSOR_RECOVERED_IND
+  * @ch: channel structure (locked)
+  *
+  * This primitive is only issued from the bottom-half tasklet.
+  */
 STATIC noinline fastcall __unlikely int
 sl_remote_processor_recovered_ind(struct xp *xp, queue_t *q)
 {
@@ -909,10 +1058,13 @@ sl_remote_processor_recovered_ind(struct xp *xp, queue_t *q)
 	return (-ENOBUFS);
 }
 
-/*
- *  SL_RTB_CLEARED_IND
- *  -----------------------------------
- */
+/** sl_rtb_cleared_ind: - issue SL_RTB_CLEARED_IND primitive
+  * @ch: channel structure (locked)
+  * @q: active queue (write queue) or NULL
+  * @mp: message to reuse or NULL
+  *
+  * This is called in response to 
+  */
 STATIC noinline fastcall __unlikely int
 sl_rtb_cleared_ind(struct xp *xp, queue_t *q)
 {
@@ -933,10 +1085,13 @@ sl_rtb_cleared_ind(struct xp *xp, queue_t *q)
 }
 
 #if 0
-/*
- *  SL_RETRIEVAL_NOT_POSSIBLE_IND
- *  -----------------------------------
- */
+/** sl_retrieval_not_possible_ind: - issue SL_RETREIVAL_NOT_POSSIBLE_IND primitive
+  * @ch: channel structure (locked)
+  * @q: active queue (write queue) or NULL
+  * @mp: message to reuse or NULL
+  *
+  * This message is never issued because in the integrated driver retrieval is always possible.
+  */
 STATIC noinline fastcall __unlikely int
 sl_retrieval_not_possible_ind(struct xp *xp, queue_t *q)
 {
@@ -956,10 +1111,13 @@ sl_retrieval_not_possible_ind(struct xp *xp, queue_t *q)
 	return (-ENOBUFS);
 }
 
-/*
- *  SL_BSNT_NOT_RETRIEVABLE_IND
- *  -----------------------------------
- */
+/** sl_bsnt_not_retrievable_ind: - issue SL_BSNT_NOT_RETRIEVABLE_IND primitive
+  * @ch: channel structure (locked)
+  * @q: active queue (write queue) or NULL
+  * @mp: message to reuse or NULL
+  *
+  * This message is never issued because in the integrated driver BSNT retrieval is always possible.
+  */
 STATIC noinline fastcall __unlikely int
 sl_bsnt_not_retrievable_ind(struct xp *xp, queue_t *q, sl_ulong bsnt)
 {
@@ -1010,10 +1168,17 @@ sl_optmgmt_ack(struct xp *xp, queue_t *q, caddr_t opt_ptr, size_t opt_len, sl_ul
 	return (-ENOBUFS);
 }
 
-/*
- *  SL_NOTIFY_IND
- *  -----------------------------------
- */
+/** sl_notify_ind: - issue SL_NOTIFY_IND primitive
+  * @xp: private structure (locked)
+  * @q: active queue (or NULL)
+  * @oid: object identifier
+  * @level: severity level
+  *
+  * Currently this primitive is never issued.
+  *
+  * TODO: We should use this primitive (or LMI_EVENT_IND) to deliver notification of first-and-delta
+  * events and other SS7 management events.
+  */
 STATIC noinline fastcall __unlikely int
 sl_notify_ind(struct xp *xp, queue_t *q)
 {
@@ -1070,16 +1235,21 @@ lmi_info_ack(struct xp *xp, queue_t *q, caddr_t ppa_ptr, size_t ppa_len)
 	return (-ENOBUFS);
 }
 
-/*
- *  SDT_RC_SIGNAL_UNIT_IND
- *  -----------------------------------
- *  We prefer to send M_DATA blocks.  When the count is 1, we simply send
- *  M_DATA.  When the count is greater than one, we send an
- *  SDT_RC_SIGNAL_UNIT_IND which also includes the count.  This is so that
- *  upper layer modules can collect SU statistics.
- *
- *  Can't use buffer service.
- */
+/** sdt_rc_signal_unit_ind: - issue SDT_RC_SIGNAL_UNIT_IND primitive
+  * @ch: channel structure (locked)
+  * @dp: the M_DATA portion of the message
+  * @count: the number of repetitions of a FISU or LSSU
+  *
+  * We prefer to send M_DATA blocks.  When the count is 1, we simply send M_DATA.  When the count is
+  * greater than one, we send an SDT_RC_SIGNAL_UNIT_IND which also includes the count.  This is so
+  * that upper layer modules can collect SU statistics.
+  *
+  *  Can't use buffer service.
+  *
+  * Note: this is the wrong place to do buffer duping: this is executed within a tasklet and needs
+  * to return fast to keep soft-HDLC caches hot.  The proper place to perform the duping is in the
+  * read side service procedure.
+  */
 STATIC inline fastcall __hot_in int
 sdt_rc_signal_unit_ind(struct xp *xp, queue_t *q, mblk_t *dp, sl_ulong count)
 {
@@ -1109,11 +1279,16 @@ sdt_rc_signal_unit_ind(struct xp *xp, queue_t *q, mblk_t *dp, sl_ulong count)
 	return (-EFAULT);
 }
 
+/* Note: none of the following SDT primitives are actually issued.  They are signals that are
+ * delivered to the signalling link level internally when required.  Implementing them requires
+ * splitting the signalling terminal state machine from the signalling link state machine. */
+
 #if 0
-/*
- *  SDT_RC_CONGESTION_ACCEPT_IND
- *  -----------------------------------
- */
+/** sdt_rc_congestion_accept_ind: - issue SDT_RC_CONGESTION_ACCEPT_IND primitive
+  * @ch: channel structure (locked)
+  *
+  * This primitive is never issued.  TODO: generate this primitive when operating in SDT-only mode.
+  */
 STATIC noinline fastcall __unlikely int
 sdt_rc_congestion_accept_ind(struct xp *xp, queue_t *q)
 {
@@ -1133,10 +1308,11 @@ sdt_rc_congestion_accept_ind(struct xp *xp, queue_t *q)
 	return (-ENOBUFS);
 }
 
-/*
- *  SDT_RC_CONGESTION_DISCARD_IND
- *  -----------------------------------
- */
+/** sdt_rc_congestion_discard_ind: - issue SDT_RC_CONGESTION_DISCARD_IND primitive
+  * @ch: channel structure (locked)
+  *
+  * This primitive is never issued.  TODO: generate this primitive when operating in SDT-only mode.
+  */
 STATIC noinline fastcall __unlikely int
 sdt_rc_congestion_discard_ind(struct xp *xp, queue_t *q)
 {
@@ -1156,10 +1332,11 @@ sdt_rc_congestion_discard_ind(struct xp *xp, queue_t *q)
 	return (-ENOBUFS);
 }
 
-/*
- *  SDT_RC_NO_CONGESTION_IND
- *  -----------------------------------
- */
+/** sdt_rc_no_congestion_ind: - issue SDT_RC_NO_CONGESTION_IND primitive
+  * @ch: channel structure (locked)
+  *
+  * This primitive is never issued.  TODO: generate this primitive when operating in SDT-only mode.
+  */
 STATIC noinline fastcall __unlikely int
 sdt_rc_no_congestion_ind(struct xp *xp, queue_t *q)
 {
@@ -1180,10 +1357,11 @@ sdt_rc_no_congestion_ind(struct xp *xp, queue_t *q)
 }
 #endif
 
-/*
- *  SDT_IAC_CORRECT_SU_IND
- *  -----------------------------------
- */
+/** sdt_iac_correct_su_ind: - issue SDT_IAC_CORRECT_SU_IND primitive
+  * @ch: channel structure (locked)
+  *
+  * This primitive is never issued.  TODO: generate this primitive when operating in SDT-only mode.
+  */
 STATIC inline fastcall __hot_read int
 sdt_iac_correct_su_ind(struct xp *xp, queue_t *q)
 {
@@ -1208,10 +1386,11 @@ sdt_iac_correct_su_ind(struct xp *xp, queue_t *q)
 }
 
 #if 0
-/*
- *  SDT_IAC_ABORT_PROVING_IND
- *  -----------------------------------
- */
+/** sdt_iac_abort_proving_ind: - issue SDT_IAC_ABORT_PROVING_IND primitive
+  * @ch: channel structure (locked)
+  *
+  * This primitive is never issued.  TODO: generate this primitive when operating in SDT-only mode.
+  */
 STATIC noinline fastcall int
 sdt_iac_abort_proving_ind(struct xp *xp, queue_t *q)
 {
@@ -1231,10 +1410,11 @@ sdt_iac_abort_proving_ind(struct xp *xp, queue_t *q)
 	return (-ENOBUFS);
 }
 
-/*
- *  SDT_LSC_LINK_FAILURE_IND
- *  -----------------------------------
- */
+/** sdt_lsc_link_failure_ind: - issue SDT_LSC_LINK_FAILURE_IND primitive
+  * @ch: channel structure (locked)
+  *
+  * This primitive is never issued.  TODO: generate this primitive when operating in SDT-only mode.
+  */
 STATIC noinline fastcall __unlikely int
 sdt_lsc_link_failure_ind(struct xp *xp, queue_t *q)
 {
@@ -1255,10 +1435,11 @@ sdt_lsc_link_failure_ind(struct xp *xp, queue_t *q)
 }
 #endif
 
-/*
- *  SDT_TXC_TRANSMISSION_REQUEST_IND
- *  -----------------------------------
- */
+/** sdt_txc_transmission_request_ind: - issue SDT_TXC_TRANSMISSION_REQUEST_IND primitive
+  * @ch: channel structure (locked)
+  *
+  * This primitive is never issued.  TODO: generate this primitive when operating in SDT-only mode.
+  */
 STATIC inline fastcall __hot_out int
 sdt_txc_transmission_request_ind(struct xp *xp, queue_t *q)
 {
@@ -1279,11 +1460,14 @@ sdt_txc_transmission_request_ind(struct xp *xp, queue_t *q)
 }
 
 /*
- *  SDL_RECEIVED_BITS_IND
- *  -----------------------------------
- *  Quickly we just copy the buffer and leave the original for the lower level
- *  driver.
+ *  SDLI PRIMITIVES ISSUED UPSTREAM
+ *  -------------------------------------------------------------------------
  */
+
+/** sdl_received_bits_ind: - issue SDL_RECEIVED_BITS_IND primitive
+  * @ch: channel structure (locked)
+  * @dp: M_DATA portion of message
+  */
 STATIC inline fastcall __hot_in int
 sdl_received_bits_ind(struct xp *xp, queue_t *q, mblk_t *dp)
 {
@@ -1297,11 +1481,15 @@ sdl_received_bits_ind(struct xp *xp, queue_t *q, mblk_t *dp)
 	return (-EBUSY);
 }
 
+/* Note: none of the following SDL primitives are actually issued.  We do not provide disconnect
+ * indications because SS7 does not examine "leads". */
+
 #if 0
-/*
- *  SDL_DISCONNECT_IND
- *  -----------------------------------
- */
+/** sdl_disconnect_ind: - issue SDL_DISCONNECT_IND primitive
+  * @ch: channel structure (locked)
+  *
+  * This primitive is never issued.  TODO: generate this primitive when operating in SDL-only mode.
+  */
 STATIC noinline fastcall __unlikely int
 sdl_disconnect_ind(struct xp *xp, queue_t *q)
 {
@@ -1324,9 +1512,17 @@ sdl_disconnect_ind(struct xp *xp, queue_t *q)
 #endif
 
 /*
- *  LMI_OK_ACK
- *  -----------------------------------
+ *  LMI PRIMITIVES ISSUED UPSTREAM
+ *  -------------------------------------------------------------------------
  */
+
+/** lmi_ok_ack: - issue LMI_OK_ACK primitive
+  * @xp: private structure (locked)
+  * @q: active queue (write queue)
+  * @mp: the correct primitive
+  * @state: the new state to set
+  * @prim: the primitive type of the correct primitive
+  */
 STATIC noinline fastcall __unlikely int
 lmi_ok_ack(struct xp *xp, queue_t *q, sl_ulong state, sl_long prim)
 {
@@ -1348,10 +1544,15 @@ lmi_ok_ack(struct xp *xp, queue_t *q, sl_ulong state, sl_long prim)
 	return (-ENOBUFS);
 }
 
-/*
- *  LMI_ERROR_ACK
- *  -----------------------------------
- */
+/** lmi_error_ack: - issue LMI_ERROR_ACK primitive
+  * @xp: private structure (locked)
+  * @q: active queue (write queue)
+  * @mp: primitive in error
+  * @state: the new state to set
+  * @prim: the primitive type of the primitive in error
+  * @errno: the UNIX error number
+  * @reason: the DLPI error number
+  */
 STATIC noinline fastcall __unlikely int
 lmi_error_ack(struct xp *xp, queue_t *q, sl_ulong state, sl_long prim, sl_ulong errno,
 	      sl_ulong reason)
@@ -1376,10 +1577,13 @@ lmi_error_ack(struct xp *xp, queue_t *q, sl_ulong state, sl_long prim, sl_ulong 
 	return (-ENOBUFS);
 }
 
-/*
- *  LMI_ENABLE_CON
- *  -----------------------------------
- */
+/** lmi_info_ack: - issue LMI_INFO_ACK primitive
+  * @xp: private structure (locked)
+  * @q: active queue (write queue)
+  * @rp: message to reuse
+  * @ppa_ptr: pointer to ppa (or NULL)
+  * @ppa_len: length of ppa (or zero)
+  */
 STATIC noinline fastcall __unlikely int
 lmi_enable_con(struct xp *xp, queue_t *q)
 {
@@ -1400,10 +1604,11 @@ lmi_enable_con(struct xp *xp, queue_t *q)
 	return (-ENOBUFS);
 }
 
-/*
- *  LMI_DISABLE_CON
- *  -----------------------------------
- */
+/** lmi_enable_con: - issue LMI_ENABLE_CON primitive
+  * @xp: private structure (locked)
+  * @q: active queue (write queue)
+  * @mp: the LMI_ENABLE_REQ primitive
+  */
 STATIC noinline fastcall __unlikely int
 lmi_disable_con(struct xp *xp, queue_t *q)
 {
@@ -1427,10 +1632,16 @@ lmi_disable_con(struct xp *xp, queue_t *q)
 }
 
 #if 0
-/*
- *  LMI_OPTMGMT_ACK
- *  -----------------------------------
- */
+/** lmi_optmgmt_ack: - issue LMI_OPTMGMT_ACK primitive
+  * @xp: private structure (locked)
+  * @q: active queue (write queue)
+  * @rp: the LMI_OPTMGMT_REQ primitive
+  * @flags: management flags
+  * @opt_ptr: options pointer (or NULL)
+  * @opt_len: options length (or zero)
+  *
+  * Currently this primitive is never issued.
+  */
 STATIC noinline fastcall __unlikely int
 lmi_optmgmt_ack(struct xp *xp, queue_t *q, sl_ulong flags, caddr_t opt_ptr, size_t opt_len)
 {
@@ -1453,10 +1664,15 @@ lmi_optmgmt_ack(struct xp *xp, queue_t *q, sl_ulong flags, caddr_t opt_ptr, size
 	return (-ENOBUFS);
 }
 
-/*
- *  LMI_ERROR_IND
- *  -----------------------------------
- */
+/** lmi_error_ind: - issue LMI_ERROR_IND primitive
+  * @xp: private structure (locked)
+  * @q: active queue
+  * @rp: message to reuse (or NULL)
+  * @errno: UNIX error number
+  * @reason: LMI error number
+  *
+  * Currently this primitive is never issued.
+  */
 STATIC noinline fastcall __unlikely int
 lmi_error_ind(struct xp *xp, queue_t *q, sl_ulong errno, sl_ulong reason)
 {
@@ -1479,10 +1695,18 @@ lmi_error_ind(struct xp *xp, queue_t *q, sl_ulong errno, sl_ulong reason)
 	return (-ENOBUFS);
 }
 
-/*
- *  LMI_STATS_IND
- *  -----------------------------------
- */
+/** lmi_stats_ind: - issue LMI_STATS_IND primitive
+  * @xp: private structure (locked)
+  * @q: active queue
+  * @interval: statistics interval number
+  * @sta_ptr: pointer to specific statistics structure
+  * @sta_len: length of specific statistics structure
+  *
+  * Currently this primitive is never issued.
+  *
+  * TODO: We should use this primitive to deliver 5-minute statistics at the end of every 5-minute
+  * interval.
+  */
 STATIC noinline fastcall __unlikely int
 lmi_stats_ind(struct xp *xp, queue_t *q, sl_ulong interval)
 {
@@ -1508,10 +1732,17 @@ lmi_stats_ind(struct xp *xp, queue_t *q, sl_ulong interval)
 	return (-EBUSY);
 }
 
-/*
- *  LMI_EVENT_IND
- *  -----------------------------------
- */
+/** lmi_event_ind: - issue LMI_EVENT_IND primitive
+  * @xp: private structure (locked)
+  * @q: active queue (or NULL)
+  * @oid: object identifier
+  * @level: severity level
+  *
+  * Currently this primitive is never issued.
+  *
+  * TODO: We should use this primitive (or SL_NOTIFY_IND) to deliver notification of first-and-delta
+  * events and other SS7 management events.
+  */
 STATIC noinline fastcall __unlikely int
 lmi_event_ind(struct xp *xp, queue_t *q, sl_ulong oid, sl_ulong level)
 {
@@ -1557,26 +1788,38 @@ STATIC lmi_option_t lmi_default_e1_chan = {
 	.pvar = SS7_PVAR_ITUT_00,
 	.popt = 0,
 };
+
 STATIC lmi_option_t lmi_default_t1_chan = {
 	.pvar = SS7_PVAR_ANSI_00,
 	.popt = SS7_POPT_MPLEV,
 };
+
 STATIC lmi_option_t lmi_default_j1_chan = {
 	.pvar = SS7_PVAR_JTTC_94,
 	.popt = SS7_POPT_MPLEV,
 };
+
 STATIC lmi_option_t lmi_default_e1_span = {
 	.pvar = SS7_PVAR_ITUT_00,
 	.popt = SS7_POPT_HSL | SS7_POPT_XSN,
 };
+
 STATIC lmi_option_t lmi_default_t1_span = {
 	.pvar = SS7_PVAR_ANSI_00,
 	.popt = SS7_POPT_MPLEV | SS7_POPT_HSL | SS7_POPT_XSN,
 };
+
 STATIC lmi_option_t lmi_default_j1_span = {
 	.pvar = SS7_PVAR_JTTC_94,
 	.popt = SS7_POPT_MPLEV | SS7_POPT_HSL | SS7_POPT_XSN,
 };
+
+#if 1
+#define UPS HZ
+#else
+#define UPS 1000
+#endif
+
 STATIC sl_config_t sl_default_e1_chan = {
 	.t1 = 45 * 1000,
 	.t2 = 5 * 1000,
@@ -1604,6 +1847,7 @@ STATIC sl_config_t sl_default_e1_chan = {
 	.N2 = 8192,
 	.M = 5,
 };
+
 STATIC sl_config_t sl_default_e1_span = {
 	.t1 = 45 * 1000,
 	.t2 = 5 * 1000,
@@ -1631,6 +1875,7 @@ STATIC sl_config_t sl_default_e1_span = {
 	.N2 = 8192,
 	.M = 5,
 };
+
 STATIC sl_config_t sl_default_t1_chan = {
 	.t1 = 45 * 1000,
 	.t2 = 5 * 1000,
@@ -1658,6 +1903,7 @@ STATIC sl_config_t sl_default_t1_chan = {
 	.N2 = 8192,
 	.M = 5,
 };
+
 STATIC sl_config_t sl_default_t1_span = {
 	.t1 = 45 * 1000,
 	.t2 = 5 * 1000,
@@ -1685,6 +1931,7 @@ STATIC sl_config_t sl_default_t1_span = {
 	.N2 = 8192,
 	.M = 5,
 };
+
 STATIC sl_config_t sl_default_j1_chan = {
 	.t1 = 45 * 1000,
 	.t2 = 5 * 1000,
@@ -1712,6 +1959,7 @@ STATIC sl_config_t sl_default_j1_chan = {
 	.N2 = 8192,
 	.M = 5,
 };
+
 STATIC sl_config_t sl_default_j1_span = {
 	.t1 = 45 * 1000,
 	.t2 = 5 * 1000,
@@ -1739,6 +1987,7 @@ STATIC sl_config_t sl_default_j1_span = {
 	.N2 = 8192,
 	.M = 5,
 };
+
 STATIC sdt_config_t sdt_default_e1_span = {
 	.Tin = 4,
 	.Tie = 1,
@@ -1753,6 +2002,7 @@ STATIC sdt_config_t sdt_default_e1_span = {
 	.b = 8,
 	.f = SDT_FLAGS_ONE,
 };
+
 STATIC sdt_config_t sdt_default_t1_span = {
 	.Tin = 4,
 	.Tie = 1,
@@ -1767,6 +2017,7 @@ STATIC sdt_config_t sdt_default_t1_span = {
 	.b = 8,
 	.f = SDT_FLAGS_ONE,
 };
+
 STATIC sdt_config_t sdt_default_j1_span = {
 	.Tin = 4,
 	.Tie = 1,
@@ -1781,6 +2032,7 @@ STATIC sdt_config_t sdt_default_j1_span = {
 	.b = 8,
 	.f = SDT_FLAGS_ONE,
 };
+
 STATIC sdt_config_t sdt_default_e1_chan = {
 	.Tin = 4,
 	.Tie = 1,
@@ -1795,6 +2047,7 @@ STATIC sdt_config_t sdt_default_e1_chan = {
 	.b = 8,
 	.f = SDT_FLAGS_ONE,
 };
+
 STATIC sdt_config_t sdt_default_t1_chan = {
 	.Tin = 4,
 	.Tie = 1,
@@ -1809,6 +2062,7 @@ STATIC sdt_config_t sdt_default_t1_chan = {
 	.b = 8,
 	.f = SDT_FLAGS_ONE,
 };
+
 STATIC sdt_config_t sdt_default_j1_chan = {
 	.Tin = 4,
 	.Tie = 1,
@@ -1823,6 +2077,7 @@ STATIC sdt_config_t sdt_default_j1_chan = {
 	.b = 8,
 	.f = SDT_FLAGS_ONE,
 };
+
 STATIC sdl_config_t sdl_default_e1_chan = {
 	.ifname = NULL,
 	.ifflags = 0,
@@ -1843,9 +2098,9 @@ STATIC sdl_config_t sdl_default_e1_chan = {
 	.ifrxlevel = 0,
 	.iftxlevel = 1,
 	.ifsync = 0,
-	.ifsyncsrc = {0, 0, 0, 0}
-	,
+	.ifsyncsrc = {0, 0, 0, 0},
 };
+
 STATIC sdl_config_t sdl_default_t1_chan = {
 	.ifname = NULL,
 	.ifflags = 0,
@@ -1866,9 +2121,9 @@ STATIC sdl_config_t sdl_default_t1_chan = {
 	.ifrxlevel = 0,
 	.iftxlevel = 0,
 	.ifsync = 0,
-	.ifsyncsrc = {0, 0, 0, 0}
-	,
+	.ifsyncsrc = {0, 0, 0, 0},
 };
+
 STATIC sdl_config_t sdl_default_j1_chan = {
 	.ifname = NULL,
 	.ifflags = 0,
@@ -1889,8 +2144,76 @@ STATIC sdl_config_t sdl_default_j1_chan = {
 	.ifrxlevel = 0,
 	.iftxlevel = 0,
 	.ifsync = 0,
+	.ifsyncsrc = {0, 0, 0, 0},
+};
+
+STATIC sdl_config_t sdl_default_e1_span = {
+	.ifname = NULL,
+	.ifflags = 0,
+	.iftype = SDL_TYPE_E1,
+	.ifrate = 2048000,
+	.ifgtype = SDL_GTYPE_E1,
+	.ifgrate = 2048000,
+	.ifmode = SDL_MODE_PEER,
+	.ifgmode = SDL_GMODE_NONE,
+	.ifgcrc = SDL_GCRC_CRC4,
+	.ifclock = SDL_CLOCK_SLAVE,
+	.ifcoding = SDL_CODING_HDB3,
+	.ifframing = SDL_FRAMING_CCS,
+	.ifblksize = 64,
+	.ifleads = 0,
+	.ifbpv = 0,
+	.ifalarms = 0,
+	.ifrxlevel = 0,
+	.iftxlevel = 1,
+	.ifsync = 0,
 	.ifsyncsrc = {0, 0, 0, 0}
-	,
+};
+
+STATIC sdl_config_t sdl_default_t1_span = {
+	.ifname = NULL,
+	.ifflags = 0,
+	.iftype = SDL_TYPE_T1,
+	.ifrate = 1544000,
+	.ifgtype = SDL_GTYPE_T1,
+	.ifgrate = 1544000,
+	.ifmode = SDL_MODE_PEER,
+	.ifgmode = SDL_GMODE_NONE,
+	.ifgcrc = SDL_GCRC_CRC6,
+	.ifclock = SDL_CLOCK_LOOP,
+	.ifcoding = SDL_CODING_B8ZS,
+	.ifframing = SDL_FRAMING_ESF,
+	.ifblksize = 64,
+	.ifleads = 0,
+	.ifbpv = 0,
+	.ifalarms = 0,
+	.ifrxlevel = 0,
+	.iftxlevel = 0,
+	.ifsync = 0,
+	.ifsyncsrc = {0, 0, 0, 0}
+};
+
+STATIC sdl_config_t sdl_default_j1_span = {
+	.ifname = NULL,
+	.ifflags = 0,
+	.iftype = SDL_TYPE_J1,
+	.ifrate = 1544000,
+	.ifgtype = SDL_GTYPE_J1,
+	.ifgrate = 1544000,
+	.ifmode = SDL_MODE_PEER,
+	.ifgmode = SDL_GMODE_NONE,
+	.ifgcrc = SDL_GCRC_CRC6J,
+	.ifclock = SDL_CLOCK_LOOP,
+	.ifcoding = SDL_CODING_B8ZS,
+	.ifframing = SDL_FRAMING_ESF,
+	.ifblksize = 64,
+	.ifleads = 0,
+	.ifbpv = 0,
+	.ifalarms = 0,
+	.ifrxlevel = 0,
+	.iftxlevel = 0,
+	.ifsync = 0,
+	.ifsyncsrc = {0, 0, 0, 0}
 };
 
 /**
@@ -6682,11 +7005,13 @@ bc_table_value(int bit_string, int bit_length)
 	return (bit_string);
 }
 
-/*
- *  TX (Transmission) Table Entries:
- *  -----------------------------------
- *  TX table performs zero insertion and bit reversal on frame and CRC bit streams.
- */
+/** tx_table_valueN: - TX (Transmission) Table Entries:
+  * @state: transmitter state
+  * @byte: byte to transmit
+  * @len: number of bits in byte (7 or 8).
+  *
+  * TX table performs zero insertion and bit reversal on frame and CRC bit streams.
+  */
 static __devinit struct tx_entry
 tx_table_valueN(int state, uint8_t byte, int len)
 {
@@ -6711,18 +7036,26 @@ tx_table_valueN(int state, uint8_t byte, int len)
 	return result;
 }
 
+/** tx_table_value: - TX (Transmission) Table Entries
+  * @state: transmitter state
+  * @byte: byte to transmit
+  *
+  * TX table performs zero insertion and bit reversal on frame and CRC bit streams.
+  */
 STATIC __devinit tx_entry_t
 tx_table_value(int state, uint8_t byte)
 {
 	return tx_table_valueN(state, byte, 8);
 }
 
-/*
- *  RX (Receive) Table Entries:
- *  -----------------------------------
- *  RX table performs zero deletion, flag and abort detection, BOF and EOF
- *  detection, residue, and bit reversal on received bit streams.
- */
+/** rx_table_valueN: - RX (Receive) Table Entries:
+  * @state: receiver state
+  * @byte: byte received
+  * @len: number of bits in byte (7 or 8)
+  *
+  * RX table performs zero deletion, flag and abort detection, BOF and EOF detection, residue, and
+  * bit reversal on received bit streams.
+  */
 static __devinit struct rx_entry
 rx_table_valueN(int state, uint8_t byte, int len)
 {
@@ -6958,25 +7291,37 @@ rx_table_valueN(int state, uint8_t byte, int len)
 	return result;
 }
 
+/** rx_table_value7: - RX (Receive) Table Entries (7-bit table)
+  * @state: receiver state
+  * @byte: byte received
+  *
+  * RX table performs zero deletion, flag and abort detection, BOF and EOF detection, residue, and
+  * bit reversal on received bit streams.
+  */
 STATIC __devinit rx_entry_t
 rx_table_value7(int state, uint8_t byte)
 {
 	return rx_table_valueN(state, byte, 7);
 }
 
+/** rx_table_value7: - RX (Receive) Table Entries (8-bit table)
+  * @state: receiver state
+  * @byte: byte received
+  *
+  * RX table performs zero deletion, flag and abort detection, BOF and EOF detection, residue, and
+  * bit reversal on received bit streams.
+  */
 STATIC __devinit rx_entry_t
 rx_table_value8(int state, uint8_t byte)
 {
 	return rx_table_valueN(state, byte, 8);
 }
 
-/*
- *  TX (Transmit) Table:
- *  -----------------------------------
- *  There is one TX table for 8-bit (octet) output values.  The table has 256
- *  entries and is used to perform, for one sample, zero insertion on frame
- *  bits for the transmitted bitstream.
- */
+/** tx_table_generate: - TX (Transmit) Table
+  *
+  * There is one TX table for 8-bit (octet) output values.  The table has 256 entries and is used to
+  * perform, for one sample, zero insertion on frame bits for the transmitted bitstream.
+  */
 STATIC __devinit void
 tx_table_generate(void)
 {
@@ -6987,14 +7332,12 @@ tx_table_generate(void)
 			*tx_index(j, k) = tx_table_value(j, k);
 }
 
-/*
- *  RX (Received) Tables:
- *  -----------------------------------
- *  There are two RX tables: one for 8 bit (octet) values, another for 7 bit
- *  (DS0A operation).  Each table has 256 entries and is used to perform, for
- *  one sample, zero deletion, abort detection, flag detection and residue
- *  calculation on the received bitstream.
- */
+/** rx_table_generate7: - RX (Received) Tables (7-bit table)
+  *
+  * There are two RX tables: one for 8 bit (octet) values, another for 7 bit (DS0A operation).  Each
+  * table has 256 entries and is used to perform, for one sample, zero deletion, abort detection,
+  * flag detection and residue calculation on the received bitstream.
+  */
 STATIC __devinit void
 rx_table_generate7(void)
 {
@@ -7004,6 +7347,13 @@ rx_table_generate7(void)
 		for (k = 0; k < 256; k++)
 			*rx_index7(j, k) = rx_table_value7(j, k);
 }
+
+/** rx_table_generate8: - RX (Received) Tables (8-bit table)
+  *
+  * There are two RX tables: one for 8 bit (octet) values, another for 7 bit (DS0A operation).  Each
+  * table has 256 entries and is used to perform, for one sample, zero deletion, abort detection,
+  * flag detection and residue calculation on the received bitstream.
+  */
 STATIC __devinit void
 rx_table_generate8(void)
 {
@@ -7014,14 +7364,12 @@ rx_table_generate8(void)
 			*rx_index8(j, k) = rx_table_value8(j, k);
 }
 
-/*
- *  BC (CRC) Tables:
- *  -----------------------------------
- *  CRC table organization:  This is a CRC table which contains lookups for
- *  all bit lengths less than or equal to 8.  There are 512 entries.  The
- *  first 256 entries are for 8-bit bit lengths, the next 128 entries are for
- *  7-bit bit lengths, the next 64 entries for 6-bit bit lengths, etc.
- */
+/** bc_table_generate: - BC (CRC) Tables
+  *
+  * CRC table organization:  This is a CRC table which contains lookups for all bit lengths less
+  * than or equal to 8.  There are 512 entries.  The first 256 entries are for 8-bit bit lengths,
+  * the next 128 entries are for 7-bit bit lengths, the next 64 entries for 6-bit bit lengths, etc.
+  */
 STATIC __devinit void
 bc_table_generate(void)
 {
@@ -7034,11 +7382,12 @@ bc_table_generate(void)
 	} while ((bit_mask >>= 1));
 }
 
-/*
- *  Table allocation
- *  -------------------------------------------------------------------------
- */
-STATIC noinline __devinit int
+/** xp_init_tables: - Table allocation and generation.
+  *
+  * There are 4 mostly read-only tables to allocate and initialize for SOFT-HDLC operation.  This
+  * procedure allocated and initializes (calculates) the tables.
+  */
+noinline __devinit int
 xp_init_tables(void)
 {
 	size_t length;
@@ -7083,7 +7432,13 @@ xp_init_tables(void)
       bc_failed:
 	return (-ENOMEM);
 }
-STATIC noinline __devexit int
+
+/** xp_free_tables: - Table free.
+  *
+  * There are 4 mostly read-only tables that were allocated and initialized for SOFT-HDLC operation.
+  * These tables are freed here.
+  */
+STATIC noinline int
 xp_free_tables(void)
 {
 	free_pages((unsigned long) bc_table, bc_order);
@@ -7102,10 +7457,21 @@ xp_free_tables(void)
  *
  *  =========================================================================
  */
+
 /*
  *  M_DATA
  *  -----------------------------------
  */
+
+/** xp_send_data: - process M_DATA message
+  * @xp: private structure (locked)
+  * @q: active queue (write queue)
+  * @mp: the M_DATA message
+  *
+  * Note that we discard M_DATA messages when we are in the wrong state because the state may have
+  * changed with data in queue.  In reality, we should always send a M_FLUSH message upstream in
+  * such a case before changing the state, so it still represents a software error.
+  */
 STATIC inline fastcall __hot_write int
 xp_send_data(queue_t *q, mblk_t *mp)
 {
@@ -7148,10 +7514,11 @@ xp_send_data(queue_t *q, mblk_t *mp)
 	return m_error(xp, q, EPROTO);
 }
 
-/*
- *  SL_PDU_REQ
- *  -----------------------------------
- */
+/** sl_pdu_req: - process SL_PDU_REQ primitive
+  * @xp: private structure (locked)
+  * @q: active queue (write queue)
+  * @mp: the SL_PDU_REQ primitive
+  */
 STATIC inline fastcall __hot_write int
 sl_pdu_req(queue_t *q, mblk_t *mp)
 {
@@ -7171,10 +7538,14 @@ sl_pdu_req(queue_t *q, mblk_t *mp)
 	return (QR_DONE);
 }
 
-/*
- *  SL_EMERGENCY_REQ
- *  -----------------------------------
- */
+/** sl_emergency_req: - process SL_EMERGENCY_REQ primitive
+  * @ch: channel structure (locked)
+  * @q: active queue (write queue)
+  * @mp: the SL_EMERGENCY_REQ primitive
+  *
+  * Emergency can be set or cleared on a signalling link at any time that the interface is enabled:
+  * even before starting the signalling link.
+  */
 STATIC noinline fastcall __unlikely int
 sl_emergency_req(queue_t *q, mblk_t *mp)
 {
@@ -7194,10 +7565,14 @@ sl_emergency_req(queue_t *q, mblk_t *mp)
 	return m_error(xp, q, EPROTO);
 }
 
-/*
- *  SL_EMERGENCY_CEASES_REQ
- *  -----------------------------------
- */
+/** sl_emergency_ceases_req: - process SL_EMERGENCY_CEASES_REQ primitive
+  * @ch: channel structure (locked)
+  * @q: active queue (write queue)
+  * @mp: the SL_EMERGENCY_CEASES_REQ primitive
+  *
+  * Emergency can be set or cleared on a signalling link at any time that the interface is enabled:
+  * even before starting the signalling link.
+  */
 STATIC noinline fastcall __unlikely int
 sl_emergency_ceases_req(queue_t *q, mblk_t *mp)
 {
@@ -7217,10 +7592,13 @@ sl_emergency_ceases_req(queue_t *q, mblk_t *mp)
 	return m_error(xp, q, EPROTO);
 }
 
-/*
- *  SL_START_REQ
- *  -----------------------------------
- */
+/** sl_start_req: - process SL_START_REQ primitive
+  * @ch: channel structure (locked)
+  * @q: active queue (write queue)
+  * @mp: the SL_START_REQ primitive
+  *
+  * SL_START_REQ can be issued on an interface at any time that it is enabled.
+  */
 STATIC noinline fastcall __unlikely int
 sl_start_req(queue_t *q, mblk_t *mp)
 {
@@ -7240,10 +7618,13 @@ sl_start_req(queue_t *q, mblk_t *mp)
 	return m_error(xp, q, EPROTO);
 }
 
-/*
- *  SL_STOP_REQ
- *  -----------------------------------
- */
+/** sl_stop_req: - process SL_STOP_REQ primitive
+  * @ch: channel structure (locked)
+  * @q: active queue (write queue)
+  * @mp: the SL_STOP_REQ primitive
+  *
+  * SL_STOP_REQ can be issued on an interface at any time that it is enabled.
+  */
 STATIC noinline fastcall __unlikely int
 sl_stop_req(queue_t *q, mblk_t *mp)
 {
@@ -7263,10 +7644,13 @@ sl_stop_req(queue_t *q, mblk_t *mp)
 	return m_error(xp, q, EPROTO);
 }
 
-/*
- *  SL_RETRIEVE_BSNT_REQ
- *  -----------------------------------
- */
+/** sl_retrieve_bsnt_req: - process SL_RETRIEVE_BSNT_REQ primitive
+  * @ch: channel structure (locked)
+  * @q: active queue (write queue)
+  * @mp: the SL_RETRIEVE_BSNT_REQ primitive
+  *
+  * SL_RETRIEVE_BSNT_REQ can be issued on an interface at any time that it is enabled.
+  */
 STATIC noinline fastcall __unlikely int
 sl_retrieve_bsnt_req(queue_t *q, mblk_t *mp)
 {
@@ -7287,10 +7671,13 @@ sl_retrieve_bsnt_req(queue_t *q, mblk_t *mp)
 	return m_error(xp, q, EPROTO);
 }
 
-/*
- *  SL_RETRIEVAL_REQUEST_AND_FSNC_REQ
- *  -----------------------------------
- */
+/** sl_retrieval_request_and_fsnc_req: - process SL_RETRIEVAL_REQUEST_AND_FSNC_REQ
+  * @ch: channel structure (locked)
+  * @q: active queue (write queue)
+  * @mp: the SL_RETRIEVAL_REQUEST_AND_FSNC_REQ primitive
+  *
+  * SL_RETRIEVAL_REQUEST_AND_FSNC_REQ can be issued on an interface at any time that it is enabled.
+  */
 STATIC noinline fastcall __unlikely int
 sl_retrieval_request_and_fsnc_req(queue_t *q, mblk_t *mp)
 {
@@ -7317,10 +7704,13 @@ sl_retrieval_request_and_fsnc_req(queue_t *q, mblk_t *mp)
 	return m_error(xp, q, EPROTO);
 }
 
-/*
- *  SL_CLEAR_BUFFERS_REQ
- *  -----------------------------------
- */
+/** sl_clear_buffers_req: - process SL_CLEAR_BUFFERS_REQ primitive
+  * @ch: channel structure (locked)
+  * @q: active queue (write queue)
+  * @mp: the SL_CLEAR_BUFFERS_REQ primitive
+  *
+  * SL_CLEAR_BUFFERS_REQ can be issued on an interface at any time that it is enabled.
+  */
 STATIC noinline fastcall __unlikely int
 sl_clear_buffers_req(queue_t *q, mblk_t *mp)
 {
@@ -7340,10 +7730,13 @@ sl_clear_buffers_req(queue_t *q, mblk_t *mp)
 	return m_error(xp, q, EPROTO);
 }
 
-/*
- *  SL_CLEAR_RTB_REQ
- *  -----------------------------------
- */
+/** sl_clear_rtb_req: - process SL_CLEAR_RTB_REQ primitive
+  * @ch: channel structure (locked)
+  * @q: active queue (write queue)
+  * @mp: the SL_CLEAR_RTB_REQ primitive
+  *
+  * SL_CLEAR_RTB_REQ can be issued on an interface at any time that it is enabled.
+  */
 STATIC noinline fastcall __unlikely int
 sl_clear_rtb_req(queue_t *q, mblk_t *mp)
 {
@@ -7363,10 +7756,13 @@ sl_clear_rtb_req(queue_t *q, mblk_t *mp)
 	return m_error(xp, q, EPROTO);
 }
 
-/*
- *  SL_CONTINUE_REQ
- *  -----------------------------------
- */
+/** sl_continue_req: - process SL_CONTINUE_REQ primitive
+  * @ch: channel structure (locked)
+  * @q: active queue (write queue)
+  * @mp: the SL_CONTINUE_REQ primitive
+  *
+  * SL_CONTINUE_REQ can be issued on an interface any time that the interface is enabled.
+  */
 STATIC noinline fastcall __unlikely int
 sl_continue_req(queue_t *q, mblk_t *mp)
 {
@@ -7386,10 +7782,21 @@ sl_continue_req(queue_t *q, mblk_t *mp)
 	return m_error(xp, q, EPROTO);
 }
 
-/*
- *  SL_LOCAL_PROCESSOR_OUTAGE_REQ
- *  -----------------------------------
- */
+/** sl_local_processor_outage_req: - process SL_LOCAL_PROCESSOR_OUTAGE primitive
+  * @ch: channel structure (locked)
+  * @q: active queue (write queue)
+  * @mp: the SL_LOCAL_PROCESSOR_OUTAGE_REQ primitive
+  *
+  * SL_LOCAL_PROCESSOR_OUTAGE_REQ can be issued on an interface any time that the interface is
+  * enabled.  For a signalling link in the out-of-service or initial-alignment state, this primitive
+  * has no effect other than setting the local processor outage flag.
+  *
+  * The actions taken by this primitive should also be taken when the interface closes while the
+  * interace is enabled.
+  *
+  * Note: this signal is largely synthetic and is provided to support M2UA where the connection to
+  * level 3 exists remote to the signalling link implementation.
+  */
 STATIC noinline fastcall __unlikely int
 sl_local_processor_outage_req(queue_t *q, mblk_t *mp)
 {
@@ -7409,10 +7816,21 @@ sl_local_processor_outage_req(queue_t *q, mblk_t *mp)
 	return m_error(xp, q, EPROTO);
 }
 
-/*
- *  SL_RESUME_REQ
- *  -----------------------------------
- */
+/** sl_resume_req: - process SL_RESUME_REQ primitive
+  * @ch: channel structure (locked)
+  * @q: active queue (write queue)
+  * @mp: the SL_RESUME_REQ primitive
+  *
+  * SL_RESUME_REQ can be issued on an interface any time that the interface is enabled.  When the
+  * link is not running, this has no effect other than to reset local processor outage condition.
+  * When the link is in service without a local processor outage condition, this primitive has no
+  * effect.
+  *
+  * To support detaching from signalling links that are left operating, an SL_RESUME_REQ should be
+  * considered as the same as SL_START_REQ when the LSC state is out-of-service.  Also, the
+  * SL_START_REQ should be considered as the same as SL_RESUME_REQ when the LSC state is
+  * processor-outage with a local-processor-outage marked.
+  */
 STATIC noinline fastcall __unlikely int
 sl_resume_req(queue_t *q, mblk_t *mp)
 {
@@ -7432,10 +7850,23 @@ sl_resume_req(queue_t *q, mblk_t *mp)
 	return m_error(xp, q, EPROTO);
 }
 
-/*
- *  SL_CONGESTION_DISCARD_REQ
- *  -----------------------------------
- */
+/** sl_congestion_discard_req: - process SL_CONGESTION_DISCARD_REQ primitive
+  * @ch: channel structure (locked)
+  * @q: active queue (write queue)
+  * @mp: the SL_CONGESTION_DISCARD_REQ primitive
+  *
+  * SL_CONGESTION_DISCARD_REQ can be issued on an interface any time that the interface is enabled.
+  * When the link is not running, this has no effect other than to set the congestion-discard and
+  * marking level 3 congestion detected.
+  *
+  * There are two receive congestion methods: (1) external, where level 3 detects congestion; and,
+  * (2) internal, where level 2 automatically detects congestion.  SL_CONGESTION_DISCARD_REQ marks
+  * level 3 congestion as congestion discard and the internal method is no longer used to detect
+  * congestion.
+  *
+  * Note: this signal is largely synthetic and is provided to support M2UA where a buffer exists
+  * remote to the signalling link implementation.
+  */
 STATIC noinline fastcall __unlikely int
 sl_congestion_discard_req(queue_t *q, mblk_t *mp)
 {
@@ -7455,10 +7886,23 @@ sl_congestion_discard_req(queue_t *q, mblk_t *mp)
 	return m_error(xp, q, EPROTO);
 }
 
-/*
- *  SL_CONGESTION_ACCEPT_REQ
- *  -----------------------------------
- */
+/** sl_congestion_accept_req: - process SL_CONGESTION_ACCEPT_REQ primitive
+  * @ch: channel structure (locked)
+  * @q: active queue (write queue)
+  * @mp: the SL_CONGESTION_ACCEPT_REQ primitive
+  *
+  * SL_CONGESTION_ACCEPT_REQ can be issued on an interface any time that the interface is enabled.
+  * When the link is not running, this has no effect other than to set the congestion-discard and
+  * marking level 3 congestion detected.
+  *
+  * There are two receive congestion methods: (1) external, where level 3 detects congestion; and,
+  * (2) internal, where level 2 automatically detects congestion.  SL_CONGESTION_ACCEPT_REQ marks
+  * level 3 congestion as congestion accept and the internal method is no longer used to detect
+  * congestion.
+  *
+  * Note: this signal is largely synthetic and is provided to support M2UA where a buffer exists
+  * remote to the signalling link implementation.
+  */
 STATIC noinline fastcall __unlikely int
 sl_congestion_accept_req(queue_t *q, mblk_t *mp)
 {
@@ -7478,10 +7922,22 @@ sl_congestion_accept_req(queue_t *q, mblk_t *mp)
 	return m_error(xp, q, EPROTO);
 }
 
-/*
- *  SL_NO_CONGESTION_REQ
- *  -----------------------------------
- */
+/** sl_no_congestion_req: - process SL_NO_CONGESTION_REQ primitive
+  * @ch: channel structure (locked)
+  * @q: active queue (write queue)
+  * @mp: the SL_NO_CONGESTION_REQ primitive
+  *
+  * SL_NO_CONGESTION_REQ can be issued on an interface any time that the interface is enabled.  When
+  * the link is not running, this has no effect other than to clear congestion-discard and
+  * congestion-accept and clearing level 3 congestion detected.
+  *
+  * There are two receive congestion methods: (1) external, where level 3 detects congestion; and,
+  * (2) internal, where level 2 automatically detects congestion.  SL_NO_CONGESTION_REQ marks level
+  * 3 congestion as no congestion and the internal method is used to detect congestion.
+  *
+  * Note: this signal is largely synthetic and is provided to support M2UA where a buffer exists
+  * remote to the signalling link implementation.
+  */
 STATIC noinline fastcall __unlikely int
 sl_no_congestion_req(queue_t *q, mblk_t *mp)
 {
@@ -7501,10 +7957,15 @@ sl_no_congestion_req(queue_t *q, mblk_t *mp)
 	return m_error(xp, q, EPROTO);
 }
 
-/*
- *  SL_POWER_ON_REQ
- *  -----------------------------------
- */
+/** sl_power_on_req: - process SL_POWER_ON_REQ primitive
+  * @ch: channel structure (locked)
+  * @q: active queue (write queue)
+  * @mp: the SL_POWER_ON_REQ primitive
+  *
+  * SL_POWER_ON_REQ can be issued on an interface any time that the interface is enabled.  Any time
+  * that the LSC state is other than SL_STATE_POWER_OFF, this primitive has no effect on the state
+  * machine.
+  */
 STATIC noinline fastcall __unlikely int
 sl_power_on_req(queue_t *q, mblk_t *mp)
 {
@@ -7545,11 +8006,21 @@ sl_notify_req(queue_t *q, mblk_t *mp)
 #endif
 
 /*
- *  SDT_DAEDT_TRANSMISSION_REQ:
- *  -----------------------------------
- *  Non-preferred way of sending frames.  One should just send M_DATA blocks.
- *  We strip the redundant M_PROTO and put the M_DATA on the queue.
+ *  -------------------------------------------------------------------------
+ *
+ *  SDT Primitives
+ *
+ *  -------------------------------------------------------------------------
  */
+
+/** sdt_daedt_transmission_req: - process SDT_DAEDT_TRANSMISSION_REQ primitive
+  * @xp: private structure (locked)
+  * @q: active queue (write queue)
+  * @mp: the SDT_DAEDT_TRANSMISSION_REQ primitive
+  *
+  * Non-preferred way of sending frames.  One should just send M_DATA blocks.  We used to just strip
+  * the redundant M_PROTO and put the M_DATA on the queue, but now we handle it here.
+  */
 STATIC noinline fastcall __hot_write int
 sdt_daedt_transmission_req(queue_t *q, mblk_t *mp)
 {
@@ -7558,10 +8029,11 @@ sdt_daedt_transmission_req(queue_t *q, mblk_t *mp)
 	return (QR_STRIP);
 }
 
-/*
- *  SDT_DAEDT_START_REQ:
- *  -----------------------------------
- */
+/** sdt_daedt_start_req: - process SDT_DAEDT_START_REQ primitive
+  * @ch: channel structure (locked)
+  * @q: active queue (write queue)
+  * @mp: the SDT_DAEDT_START_REQ primitive
+  */
 STATIC noinline fastcall __unlikely int
 sdt_daedt_start_req(queue_t *q, mblk_t *mp)
 {
@@ -7580,10 +8052,11 @@ sdt_daedt_start_req(queue_t *q, mblk_t *mp)
 	return m_error(xp, q, EPROTO);
 }
 
-/*
- *  SDT_DAEDR_START_REQ:
- *  -----------------------------------
- */
+/** sdt_daedr_start_req: - process SDT_DAEDR_START_REQ primitive
+  * @ch: channel structure (locked)
+  * @q: active queue (write queue)
+  * @mp: the SDT_DAEDR_START_REQ primitive
+  */
 STATIC noinline fastcall __unlikely int
 sdt_daedr_start_req(queue_t *q, mblk_t *mp)
 {
@@ -7602,10 +8075,11 @@ sdt_daedr_start_req(queue_t *q, mblk_t *mp)
 	return m_error(xp, q, EPROTO);
 }
 
-/*
- *  SDT_AERM_START_REQ:
- *  -----------------------------------
- */
+/** sdt_aerm_start_req: - process SDT_AERM_START_REQ primitive
+  * @ch: channel structure (locked)
+  * @q: active queue (write queue)
+  * @mp: the SDT_AERM_START_REQ primitive
+  */
 STATIC noinline fastcall __unlikely int
 sdt_aerm_start_req(queue_t *q, mblk_t *mp)
 {
@@ -7624,10 +8098,11 @@ sdt_aerm_start_req(queue_t *q, mblk_t *mp)
 	return m_error(xp, q, EPROTO);
 }
 
-/*
- *  SDT_AERM_STOP_REQ:
- *  -----------------------------------
- */
+/** sdt_aerm_stop_req: - process SDT_AERM_STOP_REQ primitive
+  * @ch: channel structure (locked)
+  * @q: active queue (write queue)
+  * @mp: the SDT_AERM_STOP_REQ primitive
+  */
 STATIC noinline fastcall __unlikely int
 sdt_aerm_stop_req(queue_t *q, mblk_t *mp)
 {
@@ -7646,10 +8121,11 @@ sdt_aerm_stop_req(queue_t *q, mblk_t *mp)
 	return m_error(xp, q, EPROTO);
 }
 
-/*
- *  SDT_AERM_SET_TI_TO_TIN_REQ:
- *  -----------------------------------
- */
+/** sdt_aerm_set_ti_to_tin_req: - process SDT_AERM_SET_TI_TO_TIN_REQ primitive
+  * @ch: channel structure (locked)
+  * @q: active queue (write queue)
+  * @mp: the SDT_AERM_SET_TI_TO_TIN_REQ primitive
+  */
 STATIC noinline fastcall __unlikely int
 sdt_aerm_set_ti_to_tin_req(queue_t *q, mblk_t *mp)
 {
@@ -7668,10 +8144,11 @@ sdt_aerm_set_ti_to_tin_req(queue_t *q, mblk_t *mp)
 	return m_error(xp, q, EPROTO);
 }
 
-/*
- *  SDT_AERM_SET_TI_TO_TIE_REQ:
- *  -----------------------------------
- */
+/** sdt_aerm_set_ti_to_tie_req: - process SDT_AERM_SET_TI_TO_TIE_REQ primitive
+  * @ch: channel structure (locked)
+  * @q: active queue (write queue)
+  * @mp: the SDT_AERM_SET_TI_TO_TIE_REQ primitive
+  */
 STATIC noinline fastcall __unlikely int
 sdt_aerm_set_ti_to_tie_req(queue_t *q, mblk_t *mp)
 {
@@ -7690,10 +8167,11 @@ sdt_aerm_set_ti_to_tie_req(queue_t *q, mblk_t *mp)
 	return m_error(xp, q, EPROTO);
 }
 
-/*
- *  SDT_SUERM_START_REQ:
- *  -----------------------------------
- */
+/** sdt_suerm_start_req: - process SDT_SUERM_START_REQ primitive
+  * @ch: channel structure (locked)
+  * @q: active queue (write queue)
+  * @mp: the SDT_SUERM_START_REQ primitive
+  */
 STATIC noinline fastcall __unlikely int
 sdt_suerm_start_req(queue_t *q, mblk_t *mp)
 {
@@ -7712,10 +8190,11 @@ sdt_suerm_start_req(queue_t *q, mblk_t *mp)
 	return m_error(xp, q, EPROTO);
 }
 
-/*
- *  SDT_SUERM_STOP_REQ:
- *  -----------------------------------
- */
+/** sdt_suerm_stop_req: - process SDT_SUERM_STOP_REQ primitive
+  * @ch: private structure (locked)
+  * @q: active queue (write queue)
+  * @mp: the SDT_SUERM_STOP_REQ primitive
+  */
 STATIC noinline fastcall __unlikely int
 sdt_suerm_stop_req(queue_t *q, mblk_t *mp)
 {
@@ -7735,11 +8214,21 @@ sdt_suerm_stop_req(queue_t *q, mblk_t *mp)
 }
 
 /*
- *  SDL_BITS_FOR_TRANSMISSION_REQ
- *  -----------------------------------
- *  Non-preferred method.  Normally one should just send M_DATA blocks.  We
- *  just strip off the redundant M_PROTO and put it on the queue.
+ *  -------------------------------------------------------------------------
+ *
+ *  SDL Primitives
+ *
+ *  -------------------------------------------------------------------------
  */
+
+/** sdl_bits_for_transmission_req: - process SDL_BITS_FOR_TRANSMISSION_REQ primitive
+  * @xp: private structure (locked)
+  * @q: active queue (write queue)
+  * @mp: the SDL_BITS_FOR_TRANSMISSION_REQ primitive
+  *
+  * Non-preferred method.  Normally one should just send M_DATA blocks.  We used to just strip off
+  * the redundant M_PROTO and put it back on the queue, but now we handle it here.
+  */
 STATIC noinline fastcall __hot_write int
 sdl_bits_for_transmission_req(queue_t *q, mblk_t *mp)
 {
@@ -7748,10 +8237,11 @@ sdl_bits_for_transmission_req(queue_t *q, mblk_t *mp)
 	return (QR_STRIP);
 }
 
-/*
- *  SDL_CONNECT_REQ
- *  -----------------------------------
- */
+/** sdl_connect_req: - process SDL_CONNECT_REQ primitive
+  * @ch: channel structure (locked)
+  * @q: active queue (write queue)
+  * @mp: the SDL_CONNECT_REQ primitive
+  */
 STATIC noinline fastcall __unlikely int
 sdl_connect_req(queue_t *q, mblk_t *mp)
 {
@@ -7786,10 +8276,11 @@ sdl_connect_req(queue_t *q, mblk_t *mp)
 	return m_error(xp, q, EPROTO);
 }
 
-/*
- *  SDL_DISCONNECT_REQ
- *  -----------------------------------
- */
+/** sdl_disconnect_req: - process SDL_DISCONNECT_REQ primitive
+  * @ch: channel structure (locked)
+  * @q: active queue (write queue)
+  * @mp: the SDL_DISCONNECT_REQ primitive
+  */
 STATIC noinline fastcall __unlikely int
 sdl_disconnect_req(queue_t *q, mblk_t *mp)
 {
@@ -7825,9 +8316,18 @@ sdl_disconnect_req(queue_t *q, mblk_t *mp)
 }
 
 /* 
- *  LMI_INFO_REQ
- *  -----------------------------------
+ *  -------------------------------------------------------------------------
+ *
+ *  LMI primitives
+ *
+ *  -------------------------------------------------------------------------
  */
+
+/** lmi_info_req: - process LMI_INFO_REQ primitive
+  * @xp: private structure (locked)
+  * @q: active queue (write queue)
+  * @mp: the LMI_INFO_REQ primitive
+  */
 STATIC noinline fastcall __unlikely int
 lmi_info_req(queue_t *q, mblk_t *mp)
 {
@@ -7852,10 +8352,19 @@ lmi_info_req(queue_t *q, mblk_t *mp)
 	return lmi_info_ack(xp, q, NULL, 0);
 }
 
-/* 
- *  LMI_ATTACH_REQ
- *  -----------------------------------
- */
+/** lmi_attach_req: - process LMI_ATTACH_REQ primitive
+  * @xp: private structure (locked)
+  * @q: active queue (write queue)
+  * @mp: the LMI_ATTACH_REQ primitive
+  *
+  * LMI_ATTACH_REQ results in attaching the xp structure to the appropriate ch structure.
+  *
+  * We used to bind the xp structure to the ch structure when performing an attach.  However, this
+  * meant that one could not open a signalling link, attach to a ppa, perform some ioctls, and then
+  * detach and close.  What we do now is a semi-attachment: we link the xp structure to the ch
+  * structure but not vise versa.  The difference is that the ch structure can be attached to a
+  * different xp structure in an active connection.
+  */
 STATIC noinline fastcall __unlikely int
 lmi_attach_req(queue_t *q, mblk_t *mp)
 {
@@ -8204,10 +8713,14 @@ lmi_attach_req(queue_t *q, mblk_t *mp)
 	}
 }
 
-/* 
- *  LMI_DETACH_REQ
- *  -----------------------------------
- */
+/** lmi_detach_req: - process LMI_DETACH_REQ primtive
+  * @xp: private structure (locked)
+  * @q: active queue (write queue)
+  * @mp: the LMI_DETACH_REQ primitive
+  *
+  * LMI_DETACH_REQ results in detaching the xp structure from the ch structure to which it is
+  * attached.
+  */
 STATIC noinline fastcall __unlikely int
 lmi_detach_req(queue_t *q, mblk_t *mp)
 {
@@ -8240,10 +8753,14 @@ lmi_detach_req(queue_t *q, mblk_t *mp)
 	return (QR_DONE);
 }
 
-/* 
- *  LMI_ENABLE_REQ
- *  -----------------------------------
- */
+/** lmi_enable_req: - process LMI_ENABLE_REQ primitive
+  * @xp: private structure (locked)
+  * @q: active queue (write queue)
+  * @mp: the LMI_ENABLE_REQ primitive
+  *
+  * LMI_ENABLE_REQ used to configure the timeslot for operation and start up the span if it was not
+  * already started, 
+  */
 STATIC noinline fastcall __unlikely int
 lmi_enable_req(queue_t *q, mblk_t *mp)
 {
@@ -8377,10 +8894,11 @@ lmi_enable_req(queue_t *q, mblk_t *mp)
 	return lmi_error_ack(xp, q, xp->i_state, LMI_ENABLE_REQ, 0, LMI_OUTSTATE);
 }
 
-/* 
- *  LMI_DISABLE_REQ
- *  -----------------------------------
- */
+/** lmi_disable_req: - process LMI_DISABLE_REQ primitive
+  * @xp: private structure (locked)
+  * @q: active queue (write queue)
+  * @mp: the LMI_DISABLE_REQ primitive
+  */
 STATIC noinline fastcall __unlikely int
 lmi_disable_req(queue_t *q, mblk_t *mp)
 {
@@ -8457,10 +8975,11 @@ lmi_disable_req(queue_t *q, mblk_t *mp)
 	return lmi_error_ack(xp, q, xp->i_state, LMI_DISABLE_REQ, 0, LMI_OUTSTATE);
 }
 
-/* 
- *  LMI_OPTMGMT_REQ
- *  -----------------------------------
- */
+/** lmi_optmgmt_req: - process LMI_OPTMGMT_REQ primitive
+  * @xp: private structure (locked)
+  * @q: active queue (write queue)
+  * @mp: the LMI_OPTMGMT_REQ primitive
+  */
 STATIC noinline fastcall __unlikely int
 lmi_optmgmt_req(queue_t *q, mblk_t *mp)
 {
@@ -8471,107 +8990,621 @@ lmi_optmgmt_req(queue_t *q, mblk_t *mp)
 }
 
 /* 
+ *  -------------------------------------------------------------------------
+ *
+ *  DLPI PRIMITIVES
+ *
+ *  -------------------------------------------------------------------------
+ */
+
+/** dl_info_req: - process DL_INFO_REQ primtive
+  * @xp: private structure (locked)
+  * @q: active queue (write queue)
+  * @mp: the DL_INFO_REQ primitive
+  */
+
+/** dl_attach_req: - process DL_ATTACH_REQ primtive
+  * @xp: private structure (locked)
+  * @q: active queue (write queue)
+  * @mp: the DL_ATTACH_REQ primitive
+  *
+  *  This is not quite the same as the LMI.  When we attach, we do not do anything more than
+  *  validate the PPA.  While LMI binds to the ch structure at this point, we do not bind to the ch
+  *  until the DL_BIND_REQ.  That is because there are a couple of ways of specifying that
+  *  monitoring is to be performed (dl_sap == 0, dl_service_mode of DL_HP_RAWDLS with a
+  *  dl_max_conind of 1), etc.
+  */
+
+/** dl_detach_req: - process DL_DETACH_REQ primtive
+  * @xp: private structure (locked)
+  * @q: active queue (write queue)
+  * @mp: the DL_DETACH_REQ primitive
+  *
+  * This is largely a state transition: when we are attached (but unbound) to an interface, we
+  * simply have the card, span, chan and slot numbers set to what was a valid interface at the time
+  * of the attach.  (Because, in general, interfaces do not disappear while the driver is loaded, an
+  * interface, once validated, is persistently valid.)
+  */
+
+/** dl_bind_req: - process DL_BIND_REQ primtive
+  * @xp: private structure (locked)
+  * @q: active queue (write queue)
+  * @mp: the DL_BIND_REQ primitive
+  *
+  * This is where we actually bind the xp structure to the appropriate ch structure (if any).
+  */
+
+/** dl_unbind_req: - process DL_UNBIND_REQ primtive
+  * @xp: private structure (locked)
+  * @q: active queue (write queue)
+  * @mp: the DL_UNBIND_REQ primitive
+  */
+
+/** dl_subs_bind_req: - process DL_SUBS_BIND_REQ primtive
+  * @xp: private structure (locked)
+  * @q: active queue (write queue)
+  * @mp: the DL_SUBS_BIND_REQ primitive
+  */
+static inline fastcall __unlikely int
+dl_subs_bind_req(struct xp *xp, queue_t *q, mblk_t *mp)
+{
+	return (-EOPNOTSUPP);
+}
+
+/** dl_subs_unbind_req: - process DL_SUBS_UNBIND_REQ primtive
+  * @xp: private structure (locked)
+  * @q: active queue (write queue)
+  * @mp: the DL_SUBS_UNBIND_REQ primitive
+  */
+static inline fastcall __unlikely int
+dl_subs_unbind_req(struct xp *xp, queue_t *q, mblk_t *mp)
+{
+	/* can never be in the right state */
+	return (-EPROTO);
+}
+
+/** dl_unitdata_req: - process DL_UNITDATA_REQ primtive
+  * @xp: private structure (locked)
+  * @q: active queue (write queue)
+  * @mp: the DL_UNITDATA_REQ primitive
+  */
+static inline fastcall __unlikely int
+dl_unitdata_req(struct xp *xp, queue_t *q, mblk_t *mp)
+{
+	return (-EOPNOTSUPP);
+}
+
+/** dl_udqos_req: - process DL_UDQOS_REQ primtive
+  * @xp: private structure (locked)
+  * @q: active queue (write queue)
+  * @mp: the DL_UDQOS_REQ primitive
+  */
+static inline fastcall __unlikely int
+dl_udqos_req(struct xp *xp, queue_t *q, mblk_t *mp)
+{
+	return (-EOPNOTSUPP);
+}
+
+/** dl_connect_req: - process DL_CONNECT_REQ primtive
+  * @xp: private structure (locked)
+  * @q: active queue (write queue)
+  * @mp: the DL_CONNECT_REQ primitive
+  */
+
+/** dl_connect_res: - process DL_CONNECT_RES primtive
+  * @xp: private structure (locked)
+  * @q: active queue (write queue)
+  * @mp: the DL_CONNECT_RES primitive
+  */
+static inline fastcall __unlikely int
+dl_connect_res(struct xp *xp, queue_t *q, mblk_t *mp)
+{
+	/* can never be in correct state */
+	return (-EPROTO);
+}
+
+/** dl_token_req: - process DL_TOKEN_REQ primtive
+  * @xp: private structure (locked)
+  * @q: active queue (write queue)
+  * @mp: the DL_TOKEN_REQ primitive
+  */
+
+/** dl_disconnect_req: - process DL_DISCONNECT_REQ primtive
+  * @xp: private structure (locked)
+  * @q: active queue (write queue)
+  * @mp: the DL_DISCONNECT_REQ primitive
+  */
+
+/** dl_reset_req: - process DL_RESET_REQ primtive
+  * @xp: private structure (locked)
+  * @q: active queue (write queue)
+  * @mp: the DL_RESET_REQ primitive
+  */
+static inline fastcall __unlikely int
+dl_reset_req(struct xp *xp, queue_t *q, mblk_t *mp)
+{
+	return (-EOPNOTSUPP);
+}
+
+/** dl_reset_res: - process DL_RESET_RES primtive
+  * @xp: private structure (locked)
+  * @q: active queue (write queue)
+  * @mp: the DL_RESET_RES primitive
+  */
+static inline fastcall __unlikely int
+dl_reset_res(struct xp *xp, queue_t *q, mblk_t *mp)
+{
+	return (-EPROTO);
+}
+
+/** dl_xid_req: - process DL_XID_REQ primtive
+  * @xp: private structure (locked)
+  * @q: active queue (write queue)
+  * @mp: the DL_XID_REQ primitive
+  */
+static inline fastcall __unlikely int
+dl_xid_req(struct xp *xp, queue_t *q, mblk_t *mp)
+{
+	return (-EOPNOTSUPP);
+}
+
+/** dl_xid_res: - process DL_XID_RES primtive
+  * @xp: private structure (locked)
+  * @q: active queue (write queue)
+  * @mp: the DL_XID_RES primitive
+  */
+static inline fastcall __unlikely int
+dl_xid_res(struct xp *xp, queue_t *q, mblk_t *mp)
+{
+	return (-EPROTO);
+}
+
+/** dl_test_req: - process DL_TEST_REQ primtive
+  * @xp: private structure (locked)
+  * @q: active queue (write queue)
+  * @mp: the DL_TEST_REQ primitive
+  */
+static inline fastcall __unlikely int
+dl_test_req(struct xp *xp, queue_t *q, mblk_t *mp)
+{
+	return (-EOPNOTSUPP);
+}
+
+/** dl_test_res: - process DL_TEST_RES primtive
+  * @xp: private structure (locked)
+  * @q: active queue (write queue)
+  * @mp: the DL_TEST_RES primitive
+  */
+static inline fastcall __unlikely int
+dl_test_res(struct xp *xp, queue_t *q, mblk_t *mp)
+{
+	return (-EPROTO);
+}
+
+/** dl_enabmulti_req: - process DL_ENABMULTI_REQ primtive
+  * @xp: private structure (locked)
+  * @q: active queue (write queue)
+  * @mp: the DL_ENABMULTI_REQ primitive
+  */
+static inline fastcall __unlikely int
+dl_enabmulti_req(struct xp *xp, queue_t *q, mblk_t *mp)
+{
+	return (-EOPNOTSUPP);
+}
+
+/** dl_disabmulti_req: - process DL_DISABMULTI_REQ primtive
+  * @xp: private structure (locked)
+  * @q: active queue (write queue)
+  * @mp: the DL_DISABMULTI_REQ primitive
+  */
+static inline fastcall __unlikely int
+dl_disabmulti_req(struct xp *xp, queue_t *q, mblk_t *mp)
+{
+	return (-ENOENT);
+}
+
+/** dl_promsicon_req: - process DL_PROMISCON_REQ primtive
+  * @xp: private structure (locked)
+  * @q: active queue (write queue)
+  * @mp: the DL_PROMISCON_REQ primitive
+  */
+static inline fastcall __unlikely int
+dl_promiscon_req(struct xp *xp, queue_t *q, mblk_t *mp)
+{
+	return (-EOPNOTSUPP);
+}
+
+/** dl_promiscoff_req: - process DL_PROMISCOFF_REQ primtive
+  * @xp: private structure (locked)
+  * @q: active queue (write queue)
+  * @mp: the DL_PROMISCOFF_REQ primitive
+  */
+static inline fastcall __unlikely int
+dl_promiscoff_req(struct xp *xp, queue_t *q, mblk_t *mp)
+{
+	return (-EOPNOTSUPP);
+}
+
+/** dl_phys_addr_req: - process DL_PHYS_ADDR_REQ primtive
+  * @xp: private structure (locked)
+  * @q: active queue (write queue)
+  * @mp: the DL_PHYS_ADDR_REQ primitive
+  *
+  * TODO: There is no reason why we shouldn't deliver the signalling datalink/terminal identifier in
+  * response to this message.
+  */
+static inline fastcall __unlikely int
+dl_phys_addr_req(struct xp *xp, queue_t *q, mblk_t *mp)
+{
+	return (-EOPNOTSUPP);
+}
+
+/** dl_set_phys_addr_req: - process DL_SET_PHYS_ADDR_REQ primtive
+  * @xp: private structure (locked)
+  * @q: active queue (write queue)
+  * @mp: the DL_SET_PHYS_ADDR_REQ primitive
+  *
+  * TODO: There is no reason why we shouldn't set the signalling datalink/terminal identifier in
+  * response to this message.
+  */
+static inline fastcall __unlikely int
+dl_set_phys_addr_req(struct xp *xp, queue_t *q, mblk_t *mp)
+{
+	return (-EOPNOTSUPP);
+}
+
+/** dl_get_statistics_req: - process DL_GET_STATISTICS_REQ primtive
+  * @xp: private structure (locked)
+  * @q: active queue (write queue)
+  * @mp: the DL_GET_STATISTICS_REQ primitive
+  *
+  * TODO: There is no reason why we should not provide the current link statistics in response to
+  * this primitive.
+  */
+static inline fastcall __unlikely int
+dl_get_statistics_req(struct xp *xp, queue_t *q, mblk_t *mp)
+{
+	return (-EOPNOTSUPP);
+}
+
+/** dl_monitor_link_layer: - process DL_MONITOR_LINK_LAYER primtive
+  * @xp: private structure (locked)
+  * @q: active queue (write queue)
+  * @mp: the DL_MONITOR_LINK_LAYER primitive
+  *
+  * This primitive is a Spider extension that we support with Linux Fast-STREAMS as well.  It
+  * requests that link layer monitoring be performed.  I have no idea what the contents of the
+  * primitive are, but I assume that it is empty other than the primitve type itself.  We want the
+  * stream to be attached to an interface, but not yet bound to it.  I assume that the response to
+  * the message is a DL_OK_ACK primtive.
+  *
+  * TODO: Implement this primitive.
+  */
+static inline fastcall __unlikely int
+dl_monitor_link_layer(struct xp *xp, queue_t *q, mblk_t *mp)
+{
+	return (-EOPNOTSUPP);
+}
+
+#ifdef _SUN_SOURCE
+
+#ifdef DL_NOTIFY_REQ
+/** dl_notify_req: - process DL_NOTIFY_REQ primtive
+  * @xp: private structure (locked)
+  * @q: active queue (write queue)
+  * @mp: the DL_NOTIFY_REQ primitive
+  *
+  * There are several notifications that are pertinent to SS7 signalling links: DL_NOTE_LINK_DOWN,
+  * DL_NOTE_LINK_UP, DL_NOTE_SDU_SIZE, DL_NOTE_PHYS_ADDR, DL_NOTE_PROMISC_ON_PHYS,
+  * DL_NOTE_PROMISC_OFF_PHYS, DL_NOTE_CAPAB_RENEG.
+  *
+  * TODO: Implement this primitive.
+  */
+static inline fastcall __unlikely int
+dl_notify_req(struct xp *xp, queue_t *q, mblk_t *mp)
+{
+	return (-EOPNOTSUPP);
+}
+#endif				/* DL_NOTIFY_REQ */
+
+#ifdef DL_AGGR_REQ
+/** dl_aggr_req: - process DL_AGGR_REQ primtive
+  * @xp: private structure (locked)
+  * @q: active queue (write queue)
+  * @mp: the DL_AGGR_REQ primitive
+  *
+  * This primitive is unsupported as it has no equivalent for SS7.
+  */
+static inline fastcall __unlikely int
+dl_aggr_req(struct xp *xp, queue_t *q, mblk_t *mp)
+{
+	return (-EOPNOTSUPP);
+}
+#endif				/* DL_AGGR_REQ */
+
+#ifdef DL_UNAGGR_REQ
+/** dl_unaggr_req: - process DL_UNAGGR_REQ primtive
+  * @xp: private structure (locked)
+  * @q: active queue (write queue)
+  * @mp: the DL_UNAGGR_REQ primitive
+  *
+  * This primitive is unsupported as it has no equivalent for SS7.
+  */
+static inline fastcall __unlikely int
+dl_unaggr_req(struct xp *xp, queue_t *q, mblk_t *mp)
+{
+	return (-EOPNOTSUPP);
+}
+#endif				/* DL_UNAGGR_REQ */
+
+#ifdef DL_CAPABILITY_REQ
+/** dl_capability_req: - process DL_CAPABILITY_REQ primtive
+  * @xp: private structure (locked)
+  * @q: active queue (write queue)
+  * @mp: the DL_CAPABILITY_REQ primitive
+  *
+  * This primitive is unsupported as it has no equivalent for SS7.
+  */
+static inline fastcall __unlikely int
+dl_capability_req(struct xp *xp, queue_t *q, mblk_t *mp)
+{
+	return (-EOPNOTSUPP);
+}
+#endif				/* DL_CAPABILITY_REQ */
+
+#ifdef DL_CONTROL_REQ
+/** dl_control_req: - process DL_CONTROL_REQ primtive
+  * @xp: private structure (locked)
+  * @q: active queue (write queue)
+  * @mp: the DL_CONTROL_REQ primitive
+  *
+  * This primitive is unsupported as it has no equivalent for SS7.
+  */
+static inline fastcall __unlikely int
+dl_control_req(struct xp *xp, queue_t *q, mblk_t *mp)
+{
+	return (-EOPNOTSUPP);
+}
+#endif				/* DL_CONTROL_REQ */
+
+#ifdef DL_PASSIVE_REQ
+/** dl_passive_req: - process DL_PASSIVE_REQ primtive
+  * @xp: private structure (locked)
+  * @q: active queue (write queue)
+  * @mp: the DL_PASSIVE_REQ primitive
+  *
+  * This primitive is unsupported as it has no equivalent for SS7.
+  */
+static inline fastcall __unlikely int
+dl_passive_req(struct xp *xp, queue_t *q, mblk_t *mp)
+{
+	return (-EOPNOTSUPP);
+}
+#endif				/* DL_PASSIVE_REQ */
+
+#ifdef DL_INTR_MODE_REQ
+/** dl_intr_mode_req: - process DL_INTR_MODE_REQ primtive
+  * @xp: private structure (locked)
+  * @q: active queue (write queue)
+  * @mp: the DL_INTR_MODE_REQ primitive
+  *
+  * This primitive is unsupported as it has no equivalent for SS7.
+  */
+static inline fastcall __unlikely int
+dl_intr_mode_req(struct xp *xp, queue_t *q, mblk_t *mp)
+{
+	return (-EOPNOTSUPP);
+}
+#endif				/* DL_INTR_MODE_REQ */
+
+#endif				/* SUN_SOURCE */
+
+#ifdef _HPUX_SOURCE
+
+#ifdef DL_HP_PPA_REQ
+/** dl_hp_ppa_req: - process DL_HP_PPA_REQ primtive
+  * @xp: private structure (locked)
+  * @q: active queue (write queue)
+  * @mp: the DL_HP_PPA_REQ primitive
+  *
+  * See DL_HP_PPA_REQ(7).  The DL_HP_PPA_REQ primitive is used to obtain a list of all of the valid
+  * Physical Points of Attachment (PPA) currently installed in the system and known to the DLS
+  * provider.  The primitive requests that the DLS provider assemble a list of all PPA known to the
+  * provider and acknowledge the successful receipt of the primitive by issuing a DL_HP_PPA_ACK(7)
+  * primitive containing the list of PPA and PPA associated information.
+  *
+  * TODO: Implement this primitive.
+  */
+static inline fastcall __unlikely int
+dl_hp_ppa_req(struct xp *xp, queue_t *q, mblk_t *mp)
+{
+	return (-EOPNOTSUPP);
+}
+#endif				/* DL_HP_PPA_REQ */
+
+#ifdef DL_HP_MULTICAST_LIST_REQ
+/** dl_hp_multicast_list_req: - process DL_HP_MULTICAST_LIST_REQ primtive
+  * @xp: private structure (locked)
+  * @q: active queue (write queue)
+  * @mp: the DL_HP_MULTICAST_LIST_REQ primitive
+  *
+  * This primitive is unsupported as it has no equivalent for SS7.
+  */
+static inline fastcall __unlikely int
+dl_hp_multicast_list_req(struct xp *xp, queue_t *q, mblk_t *mp)
+{
+	return (-EOPNOTSUPP);
+}
+#endif				/* DL_HP_MULTICAST_LIST_REQ */
+
+#ifdef DL_HP_RAWDATA_REQ
+/** dl_hp_rawdata_req: - process DL_HP_RAWDATA_REQ primtive
+  * @xp: private structure (locked)
+  * @q: active queue (write queue)
+  * @mp: the DL_HP_RAWDATA_REQ primitive
+  *
+  * TODO: Implement this primitive.
+  */
+static inline fastcall __unlikely int
+dl_hp_rawdata_req(struct xp *xp, queue_t *q, mblk_t *mp)
+{
+	return (-EOPNOTSUPP);
+}
+#endif				/* DL_HP_RAWDATA_REQ */
+
+#ifdef DL_HP_HW_RESET_REQ
+/** dl_hp_hw_reset_req: - process DL_HP_HW_RESET_REQ primtive
+  * @xp: private structure (locked)
+  * @q: active queue (write queue)
+  * @mp: the DL_HP_HW_RESET_REQ primitive
+  *
+  * TODO: Implement this primitive.
+  */
+static inline fastcall __unlikely int
+dl_hp_hw_reset_req(struct xp *xp, queue_t *q, mblk_t *mp)
+{
+	return (-EOPNOTSUPP);
+}
+#endif				/* DL_HP_HW_RESET_REQ */
+
+#endif				/* _HPUX_SOURCE */
+
+/* 
  *  =========================================================================
  *
  *  IO Controls
  *
  *  =========================================================================
  */
+STATIC __unlikely int
+dsx_info_size(dsx_info_t * arg)
+{
+	int size = sizeof(*arg);
+
+	switch (arg->type) {
+	case DSX_OBJ_TYPE_DFLT:
+		size += sizeof(arg->info->dflt);
+		break;
+	case DSX_OBJ_TYPE_SPAN:
+		size += sizeof(arg->info->span);
+		break;
+	case DSX_OBJ_TYPE_CHAN:
+		size += sizeof(arg->info->chan);
+		break;
+	case DSX_OBJ_TYPE_FRAC:
+		size += sizeof(arg->info->frac);
+		break;
+	default:
+		return (-EINVAL);
+	}
+	return (size);
+}
+
 STATIC noinline __unlikely int
 dsx_iocginfo_dflt(dsx_info_t * arg)
 {
 	return (0);
 }
+
 STATIC noinline __unlikely int
 dsx_iocginfo_span(struct sp *sp, dsx_info_t * arg)
 {
 	return (0);
 }
+
 STATIC noinline __unlikely int
 dsx_iocginfo_chan(struct sp *sp, struct xp *xp, dsx_info_t * arg)
 {
 	return (0);
 }
+
 STATIC noinline __unlikely int
 dsx_iocginfo_frac(struct sp *sp, struct xp *xp, dsx_info_t * arg)
 {
 	return (0);
 }
+
 STATIC noinline __unlikely int
 dsx_iocginfo(queue_t *q, mblk_t *mp)
 {
 	dsx_info_t *arg = (typeof(arg)) mp->b_cont->b_wptr;
 	int ret;
+	int size;
+
+	if ((size = dsx_info_size(arg)) < 0)
+		return (size);
+	if (((unsigned char *) (&arg->info)) + size > mp->b_cont->b_wptr)
+		return (-EMSGSIZE);
+
+	switch (arg->type) {
+		struct sp *sp;
+		struct xp *xp;
+
+	case DSX_OBJ_TYPE_DFLT:
+		if (arg->id != 0)
+			return (-ESRCH);
+		if ((ret = dsx_iocginfo_dflt(arg)) < 0)
+			return (ret);
+		break;
+	case DSX_OBJ_TYPE_SPAN:
+		if (!(sp = sp_find(arg->id)))
+			return (-ESRCH);
+		if ((ret = dsx_iocginfo_span(sp, arg)) < 0)
+			return (ret);
+		break;
+	case DSX_OBJ_TYPE_CHAN:
+		if (!(sp = sp_find(arg->id)))
+			return (-ESRCH);
+		if (IS_ERR((xp = xp_find(arg->id))))
+			return (-ESRCH);
+		if ((ret = dsx_iocginfo_chan(sp, xp, arg)) < 0)
+			return (ret);
+		break;
+	case DSX_OBJ_TYPE_FRAC:
+		if (!(sp = sp_find(arg->id)))
+			return (-ESRCH);
+		if (IS_ERR((xp = xp_find(arg->id))))
+			return (-ESRCH);
+		if ((ret = dsx_iocginfo_frac(sp, xp, arg)) < 0)
+			return (ret);
+		break;
+	default:
+		return (-EINVAL);
+	}
+	mp->b_cont->b_wptr = ((unsigned char *) &arg->info) + size;
+	return (0);
+}
+
+STATIC __unlikely int
+dsx_option_size(dsx_option_t * arg)
+{
+	int size = sizeof(*arg);
 
 	switch (arg->type) {
 	case DSX_OBJ_TYPE_DFLT:
-	{
-		if (arg->id != 0)
-			goto esrch;
-		if ((unsigned char *) (&arg->info->dflt + 1) > mp->b_cont->b_wptr)
-			goto emsgsize;
-		if ((ret = dsx_iocginfo_dflt(arg)) >= 0)
-			mp->b_cont->b_wptr = (unsigned char *) (&arg->info->dflt + 1);
+		size += sizeof(arg->option->dflt);
 		break;
-	}
 	case DSX_OBJ_TYPE_SPAN:
-	{
-		struct sp *sp;
-
-		if (!(sp = sp_find(arg->id)))
-			goto esrch;
-		if ((unsigned char *) (&arg->info->span + 1) > mp->b_cont->b_wptr)
-			goto emsgsize;
-		if ((ret = dsx_iocginfo_span(sp, arg)) >= 0)
-			mp->b_cont->b_wptr = (unsigned char *) (&arg->info->span + 1);
+		size += sizeof(arg->option->span);
 		break;
-	}
 	case DSX_OBJ_TYPE_CHAN:
-	{
-		struct sp *sp;
-		struct xp *xp;
-
-		if (!(sp = sp_find(arg->id)))
-			goto esrch;
-		if (IS_ERR((xp = xp_find(arg->id))))
-			goto esrch;
-		if ((unsigned char *) (&arg->info->chan + 1) > mp->b_cont->b_wptr)
-			goto emsgsize;
-		if ((ret = dsx_iocginfo_chan(sp, xp, arg)) >= 0)
-			mp->b_cont->b_wptr = (unsigned char *) (&arg->info->chan + 1);
+		size += sizeof(arg->option->chan);
 		break;
-	}
 	case DSX_OBJ_TYPE_FRAC:
-	{
-		struct sp *sp;
-		struct xp *xp;
-
-		if (!(sp = sp_find(arg->id)))
-			goto esrch;
-		if (IS_ERR((xp = xp_find(arg->id))))
-			goto esrch;
-		if ((unsigned char *) (&arg->info->frac + 1) > mp->b_cont->b_wptr)
-			goto emsgsize;
-		if ((ret = dsx_iocginfo_frac(sp, xp, arg)) >= 0)
-			mp->b_cont->b_wptr = (unsigned char *) (&arg->info->frac + 1);
+		size += sizeof(arg->option->frac);
 		break;
-	}
 	default:
-		goto einval;
+		return (-EINVAL);
 	}
-	return (ret);
-      emsgsize:
-	return (-EMSGSIZE);
-      esrch:
-	return (-ESRCH);
-      einval:
-	return (-EINVAL);
+	return (size);
 }
+
 STATIC noinline __unlikely int
 dsx_iocgoption_dflt(dsx_option_t * arg)
 {
 	return (0);
 }
+
 STATIC noinline __unlikely int
 dsx_iocgoption_span(struct sp *sp, dsx_option_t * arg)
 {
@@ -8681,6 +9714,7 @@ dsx_iocgoption_span(struct sp *sp, dsx_option_t * arg)
 	}
 	return (0);
 }
+
 STATIC noinline __unlikely int
 dsx_iocgoption_chan(struct sp *sp, struct xp *xp, dsx_option_t * arg)
 {
@@ -8689,87 +9723,71 @@ dsx_iocgoption_chan(struct sp *sp, struct xp *xp, dsx_option_t * arg)
 	val->dsx0TransmitCodesEnable = DSX0TRANSMITCODESENABLE_FALSE;
 	return (0);
 }
+
 STATIC noinline __unlikely int
 dsx_iocgoption_frac(struct sp *sp, struct xp *xp, dsx_option_t * arg)
 {
 	return (0);
 }
+
 STATIC noinline __unlikely int
 dsx_iocgoption(queue_t *q, mblk_t *mp)
 {
 	dsx_option_t *arg = (typeof(arg)) mp->b_cont->b_wptr;
 	int ret;
+	int size;
+
+	if ((size = dsx_option_size(arg)) < 0)
+		return (size);
+	if (((unsigned char *) (&arg->option)) + size > mp->b_cont->b_wptr)
+		return (-EMSGSIZE);
 
 	switch (arg->id) {
+		struct sp *sp;
+		struct xp *xp;
+
 	case DSX_OBJ_TYPE_DFLT:
-	{
 		if (arg->id != 0)
-			goto esrch;
-		if ((unsigned char *) (&arg->option->dflt + 1) > mp->b_cont->b_wptr)
-			goto emsgsize;
-		if ((ret = dsx_iocgoption_dflt(arg)) >= 0)
-			mp->b_cont->b_wptr = (unsigned char *) (&arg->option->dflt + 1);
+			return (-ESRCH);
+		if ((ret = dsx_iocgoption_dflt(arg)) < 0)
+			return (ret);
 		break;
-	}
 	case DSX_OBJ_TYPE_SPAN:
-	{
-		struct sp *sp;
-
 		if (!(sp = sp_find(arg->id)))
-			goto esrch;
-		if ((unsigned char *) (&arg->option->span + 1) > mp->b_cont->b_wptr)
-			goto emsgsize;
-		if ((ret = dsx_iocgoption_span(sp, arg)) >= 0)
-			mp->b_cont->b_wptr = (unsigned char *) (&arg->option->span + 1);
+			return (-ESRCH);
+		if ((ret = dsx_iocgoption_span(sp, arg)) < 0)
+			return (ret);
 		break;
-	}
 	case DSX_OBJ_TYPE_CHAN:
-	{
-		struct sp *sp;
-		struct xp *xp;
-
 		if (!(sp = sp_find(arg->id)))
-			goto esrch;
+			return (-ESRCH);
 		if (IS_ERR((xp = xp_find(arg->id))))
-			goto esrch;
-		if ((unsigned char *) (&arg->option->chan + 1) > mp->b_cont->b_wptr)
-			goto emsgsize;
-		if ((ret = dsx_iocgoption_chan(sp, xp, arg)) >= 0)
-			mp->b_cont->b_wptr = (unsigned char *) (&arg->option->chan + 1);
+			return (-ESRCH);
+		if ((ret = dsx_iocgoption_chan(sp, xp, arg)) < 0)
+			return (ret);
 		break;
-	}
 	case DSX_OBJ_TYPE_FRAC:
-	{
-		struct sp *sp;
-		struct xp *xp;
-
 		if (!(sp = sp_find(arg->id)))
-			goto esrch;
+			return (-ESRCH);
 		if (IS_ERR((xp = xp_find(arg->id))))
-			goto esrch;
-		if ((unsigned char *) (&arg->option->frac + 1) > mp->b_cont->b_wptr)
-			goto emsgsize;
-		if ((ret = dsx_iocgoption_frac(sp, xp, arg)) >= 0)
-			mp->b_cont->b_wptr = (unsigned char *) (&arg->option->frac + 1);
+			return (-ESRCH);
+		if ((ret = dsx_iocgoption_frac(sp, xp, arg)) < 0)
+			return (ret);
 		break;
-	}
 	default:
-		goto einval;
+		return (-EINVAL);
 	}
-	return (ret);
-      emsgsize:
-	return (-EMSGSIZE);
-      esrch:
-	return (-ESRCH);
-      einval:
-	return (-EINVAL);
+	mp->b_cont->b_wptr = ((unsigned char *) (&arg->option)) + size;
+	return (0);
 }
+
 STATIC noinline __unlikely int
 dsx_test_options_dflt(dsx_option_t * arg)
 {
 	return (0);
 
 }
+
 STATIC noinline __unlikely int
 dsx_test_options_span(struct sp *sp, dsx_option_t * arg)
 {
@@ -8875,6 +9893,7 @@ dsx_test_options_span(struct sp *sp, dsx_option_t * arg)
       einval:
 	return (-EINVAL);
 }
+
 STATIC noinline __unlikely int
 dsx_test_options_chan(struct sp *sp, struct xp *xp, dsx_option_t * arg)
 {
@@ -8894,11 +9913,13 @@ dsx_test_options_chan(struct sp *sp, struct xp *xp, dsx_option_t * arg)
       einval:
 	return (-EINVAL);
 }
+
 STATIC noinline __unlikely int
 dsx_test_options_frac(struct sp *sp, struct xp *xp, dsx_option_t * arg)
 {
 	return (0);
 }
+
 STATIC noinline __unlikely int
 dsx_test_options(queue_t *q, mblk_t *mp, dsx_option_t * arg)
 {
@@ -8964,6 +9985,7 @@ dsx_test_options(queue_t *q, mblk_t *mp, dsx_option_t * arg)
       einval:
 	return (-EINVAL);
 }
+
 STATIC noinline __unlikely int
 dsx_set_options_dflt(dsx_option_t * arg)
 {
@@ -8973,6 +9995,7 @@ dsx_set_options_dflt(dsx_option_t * arg)
       esrch:
 	return (-ESRCH);
 }
+
 STATIC noinline __unlikely int
 dsx_set_options_span(dsx_option_t * arg)
 {
@@ -9068,16 +10091,19 @@ dsx_set_options_span(dsx_option_t * arg)
       esrch:
 	return (-ESRCH);
 }
+
 STATIC noinline __unlikely int
 dsx_set_options_chan(dsx_option_t * arg)
 {
 	return (0);
 }
+
 STATIC noinline __unlikely int
 dsx_set_options_frac(dsx_option_t * arg)
 {
 	return (0);
 }
+
 STATIC noinline __unlikely int
 dsx_set_options(queue_t *q, mblk_t *mp, dsx_option_t * arg)
 {
@@ -9096,6 +10122,7 @@ dsx_set_options(queue_t *q, mblk_t *mp, dsx_option_t * arg)
       einval:
 	return (-EINVAL);
 }
+
 STATIC noinline __unlikely int
 dsx_iocsoption(queue_t *q, mblk_t *mp)
 {
@@ -9145,22 +10172,14 @@ dsx_ioclconfig(queue_t *q, mblk_t *mp)
 					switch (sp->config.ifgtype) {
 					case SDL_GTYPE_E1:
 						for (chan = 1; chan <= 31; chan++, val++, num++)
-							if ((unsigned char *) (val + 1) <=
-							    mp->b_cont->b_wptr)
-								*val =
-								    (DRV_ID << 16) | (cd->
-										      card << 12) |
-								    (span << 8) | (chan << 0);
+							if ((unsigned char *) (val + 1) <= mp->b_cont->b_wptr)
+								*val = (DRV_ID << 16) | (cd-> card << 12) | (span << 8) | (chan << 0);
 						break;
 					case SDL_GTYPE_T1:
 					case SDL_GTYPE_J1:
 						for (chan = 1; chan <= 24; chan++, val++, num++)
-							if ((unsigned char *) (val + 1) <=
-							    mp->b_cont->b_wptr)
-								*val =
-								    (DRV_ID << 16) | (cd->
-										      card << 12) |
-								    (span << 8) | (chan << 0);
+							if ((unsigned char *) (val + 1) <= mp->b_cont->b_wptr)
+								*val = (DRV_ID << 16) | (cd-> card << 12) | (span << 8) | (chan << 0);
 						break;
 					}
 				}
@@ -9177,11 +10196,13 @@ dsx_ioclconfig(queue_t *q, mblk_t *mp)
       einval:
 	return (-EINVAL);
 }
+
 STATIC noinline __unlikely int
 dsx_iocgconfig_dflt(dsx_config_t * arg)
 {
 	return (0);
 }
+
 STATIC noinline __unlikely int
 dsx_iocgconfig_span(struct sp *sp, dsx_config_t * arg)
 {
@@ -9275,6 +10296,7 @@ dsx_iocgconfig_span(struct sp *sp, dsx_config_t * arg)
 	val->dsx1Channelization = DSX1CHANNELIZATION_ENABLEDDS0;
 	return (0);
 }
+
 STATIC noinline __unlikely int
 dsx_iocgconfig_chan(struct sp *sp, struct xp *xp, dsx_config_t * arg)
 {
@@ -9298,6 +10320,7 @@ dsx_iocgconfig_chan(struct sp *sp, struct xp *xp, dsx_config_t * arg)
 	val->dsx0SeizedCode = 0x0f;
 	return (0);
 }
+
 STATIC noinline __unlikely int
 dsx_iocgconfig_frac(struct sp *sp, struct xp *xp, dsx_config_t * arg)
 {
@@ -9380,96 +10403,115 @@ dsx_iocgconfig(queue_t *q, mblk_t *mp)
       einval:
 	return (-EINVAL);
 }
+
 STATIC noinline __unlikely int
 dsx_iocsconfig(queue_t *q, mblk_t *mp)
 {
 	return (-EOPNOTSUPP);
 }
+
 STATIC noinline __unlikely int
 dsx_ioctconfig(queue_t *q, mblk_t *mp)
 {
 	return (-EOPNOTSUPP);
 }
+
 STATIC noinline __unlikely int
 dsx_ioccconfig(queue_t *q, mblk_t *mp)
 {
 	return (-EOPNOTSUPP);
 }
+
 STATIC noinline __unlikely int
 dsx_iocgstatem(queue_t *q, mblk_t *mp)
 {
 	return (-EOPNOTSUPP);
 }
+
 STATIC noinline __unlikely int
 dsx_ioccmreset(queue_t *q, mblk_t *mp)
 {
 	return (-EOPNOTSUPP);
 }
+
 STATIC noinline __unlikely int
 dsx_iocgstatus(queue_t *q, mblk_t *mp)
 {
 	return (-EOPNOTSUPP);
 }
+
 STATIC noinline __unlikely int
 dsx_iocsstatus(queue_t *q, mblk_t *mp)
 {
 	return (-EOPNOTSUPP);
 }
+
 STATIC noinline __unlikely int
 dsx_ioccstatus(queue_t *q, mblk_t *mp)
 {
 	return (-EOPNOTSUPP);
 }
+
 STATIC noinline __unlikely int
 dsx_iocgstatsp(queue_t *q, mblk_t *mp)
 {
 	return (-EOPNOTSUPP);
 }
+
 STATIC noinline __unlikely int
 dsx_iocsstatsp(queue_t *q, mblk_t *mp)
 {
 	return (-EOPNOTSUPP);
 }
+
 STATIC noinline __unlikely int
 dsx_iocgstats(queue_t *q, mblk_t *mp)
 {
 	return (-EOPNOTSUPP);
 }
+
 STATIC noinline __unlikely int
 dsx_ioccstats(queue_t *q, mblk_t *mp)
 {
 	return (-EOPNOTSUPP);
 }
+
 STATIC noinline __unlikely int
 dsx_iocgnotify(queue_t *q, mblk_t *mp)
 {
 	return (-EOPNOTSUPP);
 }
+
 STATIC noinline __unlikely int
 dsx_iocsnotify(queue_t *q, mblk_t *mp)
 {
 	return (-EOPNOTSUPP);
 }
+
 STATIC noinline __unlikely int
 dsx_ioccnotify(queue_t *q, mblk_t *mp)
 {
 	return (-EOPNOTSUPP);
 }
+
 STATIC noinline __unlikely int
 dsx_iocgattr(queue_t *q, mblk_t *mp)
 {
 	return (-EOPNOTSUPP);
 }
+
 STATIC noinline __unlikely int
 dsx_ioccmgmt(queue_t *q, mblk_t *mp)
 {
 	return (-EOPNOTSUPP);
 }
+
 STATIC noinline __unlikely int
 dsx_ioccpass(queue_t *q, mblk_t *mp)
 {
 	return (-EOPNOTSUPP);
 }
+
 STATIC noinline __unlikely int
 mx_iocginfo_dflt(mx_info_t * arg)
 {
@@ -9486,6 +10528,7 @@ mx_iocginfo_dflt(mx_info_t * arg)
 	memcpy(val->mxDrivDate, "\x07\xd9\x01\x0e\x0c\x21\x08\x00\x00\x00\x00\x00", 12);
 	return (0);
 }
+
 STATIC noinline __unlikely int
 mx_iocginfo_card(struct cd *cd, mx_info_t * arg)
 {
@@ -9577,18 +10620,21 @@ mx_iocginfo_card(struct cd *cd, mx_info_t * arg)
 	val->mxCardName[0] = '\0';
 	return (0);
 }
+
 STATIC noinline __unlikely int
 mx_iocginfo_span(struct sp *sp, mx_info_t * arg)
 {
 	/* there is no span information */
 	return (0);
 }
+
 STATIC noinline __unlikely int
 mx_iocginfo_chan(struct sp *sp, struct xp *xp, mx_info_t * arg)
 {
 	/* there is no channel information */
 	return (0);
 }
+
 STATIC noinline __unlikely int
 mx_iocginfo(queue_t *q, mblk_t *mp)
 {
@@ -9668,12 +10714,14 @@ mx_iocginfo(queue_t *q, mblk_t *mp)
       einval:
 	return (-EINVAL);
 }
+
 STATIC noinline __unlikely int
 mx_iocgoption_dflt(mx_option_t * arg)
 {
 	/* this is no default options */
 	return (0);
 }
+
 STATIC noinline __unlikely int
 mx_iocgoption_card(struct cd *cd, mx_option_t * arg)
 {
@@ -9708,6 +10756,7 @@ mx_iocgoption_card(struct cd *cd, mx_option_t * arg)
 	}
 	return (0);
 }
+
 STATIC noinline __unlikely int
 mx_iocgoption_span(struct sp *sp, mx_option_t * arg)
 {
@@ -9893,6 +10942,7 @@ mx_iocgoption_span(struct sp *sp, mx_option_t * arg)
 	val->mxSpanReceiveThreshold = 0;	/* not supported this driver */
 	return (0);
 }
+
 STATIC noinline __unlikely int
 mx_iocgoption_chan(struct sp *sp, struct xp *xp, mx_option_t * arg)
 {
@@ -9945,6 +10995,7 @@ mx_iocgoption_chan(struct sp *sp, struct xp *xp, mx_option_t * arg)
 	}
 	return (0);
 }
+
 STATIC noinline __unlikely int
 mx_iocgoption(queue_t *q, mblk_t *mp)
 {
@@ -10031,6 +11082,7 @@ mx_test_options_dflt(mx_option_t * arg)
       esrch:
 	return (-ESRCH);
 }
+
 STATIC noinline __unlikely int
 mx_test_options_card(mx_option_t * arg)
 {
@@ -10067,6 +11119,7 @@ mx_test_options_card(mx_option_t * arg)
       einval:
 	return (-EINVAL);
 }
+
 STATIC noinline __unlikely int
 mx_test_options_span(mx_option_t * arg)
 {
@@ -10301,6 +11354,7 @@ mx_test_options_span(mx_option_t * arg)
       einval:
 	return (-EINVAL);
 }
+
 STATIC noinline __unlikely int
 mx_test_options_chan(mx_option_t * arg)
 {
@@ -10469,6 +11523,7 @@ mx_set_options_dflt(mx_option_t * arg)
       esrch:
 	return (-ESRCH);
 }
+
 STATIC noinline __unlikely int
 mx_set_options_card(mx_option_t * arg)
 {
@@ -10543,6 +11598,7 @@ mx_set_options_card(mx_option_t * arg)
       esrch:
 	return (-ESRCH);
 }
+
 STATIC noinline __unlikely int
 mx_set_options_span(mx_option_t * arg)
 {
@@ -10819,6 +11875,7 @@ mx_set_options_span(mx_option_t * arg)
       esrch:
 	return (-ESRCH);
 }
+
 STATIC noinline __unlikely int
 mx_set_options_chan(mx_option_t * arg)
 {
@@ -16592,6 +17649,17 @@ xp_w_proto(queue_t *q, mblk_t *mp)
  *  M_SIG/M_PCSIG Handling
  *  -------------------------------------------------------------------------
  */
+
+/** __xp_r_sig: - process M_(PC)SIG message
+  * @xp: private structure (locked)
+  * @q: active queue (read queue)
+  * @mp: the M_(PC)SIG message
+  *
+  * This really needs to be worked back to the point where the timeout invocations of the state
+  * machine are independent of any Streams queue being present.  This is because we would like the
+  * signalling link state machine to be able to run without an attached Stream.  This would permit
+  * placing a signalling link into a local processor outage state when a Stream closes unexpectedly.
+  */
 static noinline fastcall __unlikely int
 xp_r_sig(queue_t *q, mblk_t *mp)
 {
@@ -16655,11 +17723,39 @@ xp_r_sig(queue_t *q, mblk_t *mp)
  *  M_DATA Handling
  *  -------------------------------------------------------------------------
  */
+/** __xp_w_data: - process M_DATA message
+  * @xp: private structure (locked)
+  * @q: active queue (write queue)
+  * @mp: the M_DATA message
+  *
+  * This function either returns zero (0) when the message is consumed, or a negative error number
+  * when the message is to be (re)queued.  This non-locking version is used by the service
+  * procedure.
+  */
 STATIC noinline fastcall __hot_write int
 xp_w_data(queue_t *q, mblk_t *mp)
 {
 	return xp_send_data(q, mp);
 }
+
+/** xp_w_data: - process M_DATA message (put procedure)
+  * @q: active queue (write queue)
+  * @mp: the M_DATA message
+  *
+  * This function always returns -%EAGAIN for performance.  This version is used by the put
+  * procedure.  Note that we do not actually call this function: we use a fastpath check for M_DATA
+  * message types.  See xp_wput().
+  */
+
+/** __xp_r_data: - process M_DATA message (service procedure)
+  * @xp: private structure (locked)
+  * @q: active queue (read queue)
+  * @mp: the M_DATA message
+  *
+  * Note that SL-level packets are always sent upstream as M_DATA messages.  SDT-level packets are
+  * always sent as M_DATA when they do not have a repetition number, M_PROTO otherwise.  SDL-level
+  * packets are always sent as M_DATA.
+  */
 STATIC noinline fastcall __hot_read int
 xp_r_data(queue_t *q, mblk_t *mp)
 {
@@ -16677,6 +17773,23 @@ xp_r_data(queue_t *q, mblk_t *mp)
  *  M_FLUSH Handling
  *  -------------------------------------------------------------------------
  */
+
+/** xp_w_flush: - process M_FLUSH
+  * @q: active queue (write queue)
+  * @mp: the M_FLUSH message
+  *
+  * This canonical driver write flush procedure flushes the write side queue if requested and
+  * cancels write flush.  If read side flush is also requeested, the read side is flushed and the
+  * message is passed upward.  If read side flush is not requested, the message is freeed.  There is
+  * the added wrinkle that FISU/LSSU compression buffers are cleared on the transmit and the receive
+  * when the corresponding queue is flushed.
+  *
+  * There is a little bit of a problem here: the dereference to acquire the xp pointer is ok because
+  * the private structure cannot disappear while the flush is being processed, however, the xp->ch
+  * dereference is problematic: the pointer might exist at one point and not at another because the
+  * xp structure is not locked (has not been acquired).  If we are going to support ch structures
+  * going away while streams are open, this could cause crashes.
+  */
 STATIC noinline fastcall __unlikely int
 xp_w_flush(queue_t *q, mblk_t *mp)
 {
@@ -16784,10 +17897,13 @@ STATIC spinlock_t xp_lock = SPIN_LOCK_UNLOCKED;
 STATIC struct xp *xp_list = NULL;
 STATIC major_t xp_majors[CMAJORS] = { CMAJOR_0, };
 
-/*
- *  OPEN
- *  -------------------------------------------------------------------------
- */
+/** xp_qopen: - each open of a stream
+  * @q: queue pair
+  * @devp: device pointer
+  * @flag: open flags
+  * @sflag: STREAMS flag
+  * @crp: credentials pointer
+  */
 STATIC streamscall __unlikely int
 xp_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
 {
@@ -16850,10 +17966,11 @@ xp_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
 	return (0);
 }
 
-/*
- *  CLOSE
- *  -------------------------------------------------------------------------
- */
+/** xp_qclose: - last close of a stream
+  * @q: queue pair
+  * @flag: open flags
+  * @crp: credentials
+  */
 STATIC streamscall __unlikely int
 xp_close(queue_t *q, int flag, cred_t *crp)
 {
@@ -16889,7 +18006,7 @@ STATIC kmem_cachep_t xp_xbuf_cachep = NULL;
  *  Cache allocation
  *  -------------------------------------------------------------------------
  */
-STATIC noinline __devexit int
+STATIC noinline int
 xp_term_caches(void)
 {
 	int err = 0;
@@ -17166,6 +18283,17 @@ xp_find(uint ppa)
  *  Span allocation and deallocation
  *  -------------------------------------------------------------------------
  */
+STATIC noinline __unlikely void
+xp_init_sp(struct cd *cd, struct sp *sp, uint8_t span)
+{
+	sp->iobase = cd->iobase + (span << 8);
+	sp->span = span;
+	sp->config = cd->config;
+	sp->config.ifflags = 0;
+	sp->config.ifalarms = 0;
+	sp->config.ifrxlevel = 0;
+}
+
 STATIC noinline __unlikely struct sp *
 xp_alloc_sp(struct cd *cd, uint8_t span)
 {
@@ -17181,12 +18309,7 @@ xp_alloc_sp(struct cd *cd, uint8_t span)
 		sp->cd = cd_get(cd);
 		/* fill out span structure */
 		printd(("%s: linked span private structure\n", DRV_NAME));
-		sp->iobase = cd->iobase + (span << 8);
-		sp->span = span;
-		sp->config = cd->config;
-		sp->config.ifflags = 0;
-		sp->config.ifalarms = 0;
-		sp->config.ifrxlevel = 0;
+		xp_init_sp(cd, sp, span);
 		printd(("%s: set span private structure defaults\n", DRV_NAME));
 	} else
 		ptrace(("%s: ERROR: Could not allocate span private structure\n", DRV_NAME));
@@ -17223,6 +18346,7 @@ xp_free_sp(struct sp *sp)
 	assure(atomic_read(&sp->refcnt) == 1);
 	sp_put(sp);		/* final put */
 }
+
 STATIC struct sp *
 sp_get(struct sp *sp)
 {
@@ -17230,6 +18354,7 @@ sp_get(struct sp *sp)
 		atomic_inc(&sp->refcnt);
 	return (sp);
 }
+
 STATIC void
 sp_put(struct sp *sp)
 {
@@ -17238,6 +18363,7 @@ sp_put(struct sp *sp)
 		kmem_cache_free(xp_span_cachep, sp);
 	}
 }
+
 STATIC struct sp *
 sp_find(uint ppa)
 {
@@ -17300,11 +18426,11 @@ xp_free_cd(struct cd *cd)
 {
 	psw_t flags;
 
+	ensure(cd, return);
 	spin_lock_irqsave(&cd->lock, flags);
 	{
 		int span;
 
-		ensure(cd, return);
 		if (cd->tasklet.func)
 			tasklet_kill(&cd->tasklet);
 		if (cd->rbuf)
@@ -17330,6 +18456,7 @@ xp_free_cd(struct cd *cd)
 	assure(atomic_read(&cd->refcnt) == 1);
 	cd_put(cd);		/* final put */
 }
+
 STATIC struct cd *
 cd_get(struct cd *cd)
 {
@@ -17337,6 +18464,7 @@ cd_get(struct cd *cd)
 		atomic_inc(&cd->refcnt);
 	return (cd);
 }
+
 STATIC void
 cd_put(struct cd *cd)
 {
@@ -17345,10 +18473,11 @@ cd_put(struct cd *cd)
 		printd(("%s: freed card private structure\n", DRV_NAME));
 	}
 }
+
 STATIC struct cd *
 cd_find(uint ppa)
 {
-	struct cd *cd;
+	struct cd *cd = NULL;
 	uint card = (ppa >> 12) & 0x0f;
 
 	for (cd = x400p_cards; cd && cd->card != card; cd = cd->next) ;
@@ -17362,15 +18491,14 @@ cd_find(uint ppa)
  *
  *  =========================================================================
  */
-/*
- *  X400P-SS7 Remove
- *  -----------------------------------
- *  These cards do not support hotplug, so removes only occur after all the
- *  channels have been closed, so we only have to stop interrupts and
- *  deallocate board-level resources.  Nevertheless, if we get a hot removal
- *  of a card, we must be prepared to deallocate the span structures.
- */
-STATIC void __devexit
+
+/** xp_remove: - X400P-SS7 Remove
+  *
+  * These cards do not support hotplug, so removes only occur after all the channels have been
+  * closed, so we only have to stop interrupts and deallocate board-level resources.  Nevertheless,
+  * if we get a hot removal of a card, we must be prepared to deallocate the span structures.
+  */
+STATIC void
 xp_remove(struct pci_dev *dev)
 {
 	struct cd *cd;
@@ -17381,11 +18509,11 @@ xp_remove(struct pci_dev *dev)
 		cd->plx[INTCSR] = 0;	/* disable interrupts */
 	}
 	if (cd->xlb) {
-		cd->xlb[SYNREG] = SYNCSELF;
-		cd->xlb[CTLREG] = 0;
-		cd->xlb[LEDREG] = 0;
-		cd->xlb[TSTREG] = 0;
-		cd->xlb[TSTREG] = 0;
+		cd->xlb[SYNREG] = cd->synreg = SYNCSELF;
+		cd->xlb[CTLREG] = cd->ctlreg = 0;
+		cd->xlb[LEDREG] = cd->ledreg = 0;
+		cd->xlb[TSTREG] = cd->tstreg = 0;
+		cd->xlb[CTLREG1] = 0;
 	}
 	if (cd->irq) {
 		free_irq(cd->irq, cd);
@@ -17424,6 +18552,14 @@ xp_remove(struct pci_dev *dev)
 }
 
 #ifdef X400P_DOWNLOAD_FIRMWARE
+/** xp_download_fw: - download Xilinx firmware to card.
+  * @cd: card structure
+  * @board: board number (not used)
+  *
+  * This procedure downloads firmware to the card.  It is usually not necessary to download firmware
+  * to the card.  Only a very ancient and experimental Tormenta card would not already have the
+  * proper firmware loaded.
+  */
 STATIC int __devinit
 xp_download_fw(struct cd *cd, enum xp_board board)
 {
@@ -17440,13 +18576,13 @@ xp_download_fw(struct cd *cd, enum xp_board board)
 		volatile unsigned char *c;
 		int i, offs = 0;
 
-		for (c = (volatile unsigned char *)cd->plx, i = 0; i < cd->plx_length; i++, c++) {
+		for (c = (volatile unsigned char *) cd->plx, i = 0; i < cd->plx_length; i++, c++) {
 			if (i && !(i & 0x0f)) {
 				__printd(("%s\n", buf));
 				buf[0] = '\0';
 				offs = 0;
 			}
-			offs += snprintf(buf + offs, sizeof(buf)-offs, "%02x ", *c);
+			offs += snprintf(buf + offs, sizeof(buf) - offs, "%02x ", *c);
 		}
 		if (offs) {
 			__printd(("%s\n", buf));
@@ -17508,13 +18644,13 @@ xp_download_fw(struct cd *cd, enum xp_board board)
 #define SA_SHIRQ IRQF_SHARED
 #endif
 
-/*
- *  X400P-SS7 Probe
- *  -----------------------------------
- *  Probes will be called for all PCI devices which match our criteria at pci
- *  init time (module load).  Successful return from the probe function will
- *  have the device configured for operation.
- */
+/** xp_probe: - X400P-SS7 Probe
+  * @dev: PCI device
+  * @id: PCI device id
+  *
+  * Probes will be called for all PCI devices which match our criteria at pci init time (module
+  * load).  Successful return from the probe function will have the device configured for operation.
+  */
 STATIC int __devinit
 xp_probe(struct pci_dev *dev, const struct pci_device_id *id)
 {
@@ -17540,7 +18676,7 @@ xp_probe(struct pci_dev *dev, const struct pci_device_id *id)
 	}
 	printd(("%s: enabled %s pci card type %ld\n", DRV_NAME, name, id->driver_data));
 	if (dev->irq < 1) {
-		cmn_err(CE_WARN, "%s: ERROR: No IRQ allocated for %s card (irq=%d).", DRV_NAME, name, dev->irq);
+		cmn_err(CE_WARN, "%s: ERROR: No IRQ allocated for %s card.", DRV_NAME, name);
 		pci_disable_device(dev);
 		return (-ENXIO);
 	}
@@ -17606,10 +18742,10 @@ xp_probe(struct pci_dev *dev, const struct pci_device_id *id)
 
 	/* all boards have these registers regardless of framer */
 
-	cd->xlb[SYNREG] = SYNCSELF;	/* default autosync */
-	cd->xlb[CTLREG] = 0;	/* interrupts disabled */
-	cd->xlb[LEDREG] = 0;	/* turn off leds */
-	cd->xlb[TSTREG] = 0;	/* do not drive TEST2 pin */
+	cd->xlb[SYNREG] = cd->synreg = SYNCSELF;	/* default autosync */
+	cd->xlb[CTLREG] = cd->ctlreg = 0;	/* interrupts disabled */
+	cd->xlb[LEDREG] = cd->ledreg = 0;	/* turn off leds */
+	cd->xlb[TSTREG] = cd->tstreg = 0;	/* do not drive TEST2 pin */
 	cd->xlb[CTLREG1] = 0;	/* Rev. A mode */
 
 	/* Note: only check the device id of the first framer of 4. */
@@ -17627,8 +18763,11 @@ xp_probe(struct pci_dev *dev, const struct pci_device_id *id)
 	case XP_DEV_DS2154:
 	case XP_DEV_DS21354:
 	case XP_DEV_DS21554:
+		/* The only way to tell whether E1 from T1 boards; i.e., by chipset. */
 		switch (board) {
 		case V400P:
+			/* This will also handle any older ATCOM cards that also used the '4000'H PCI id yet
+			   had these chipsets. */
 			cd->board = V400PE;
 			break;
 		case X400P:
@@ -17645,8 +18784,11 @@ xp_probe(struct pci_dev *dev, const struct pci_device_id *id)
 	case XP_DEV_DS2152:
 	case XP_DEV_DS21352:
 	case XP_DEV_DS21552:
+		/* The only way to tell whether E1 from T1 boards; i.e., by chipset. */
 		switch (board) {
 		case V400P:
+			/* This will also handle any older ATCOM cards that also used the '4000'H PCI id yet
+			   had these chipsets. */
 			cd->board = V400PT;
 			break;
 		case X400P:
@@ -17661,13 +18803,26 @@ xp_probe(struct pci_dev *dev, const struct pci_device_id *id)
 		}
 		break;
 	case XP_DEV_DS2155:
+	case XP_DEV_DS21455:
+	case XP_DEV_DS21458:
 	case XP_DEV_DS2156:
 		switch (board) {
+		case V400P:
+			/* This is the only way to distinguish a ATCOM TE400P card from an old tor3 Varion
+			   card: i.e., by chipset. */
+			cd->board = A400P;
+			break;
 		case V401PE:
 			cd->board = V401PE;
 			break;
+		case A400PE:
+			cd->board = A400PE;
+			break;
 		case V401PT:
 			cd->board = V401PT;
+			break;
+		case A400PT:
+			cd->board = A400PT;
 			break;
 		default:
 			cd->board = -1;
@@ -18020,10 +19175,10 @@ xp_probe(struct pci_dev *dev, const struct pci_device_id *id)
 typedef u32 pm_message_t;
 #endif
 
-/*
- *  X400P-SS7 Suspend
- *  -----------------------------------
- */
+/** xp_suspend: - X400P-SS7 Suspend
+  * @pdev: PCI device
+  * @state: suspend state
+  */
 STATIC int
 xp_suspend(struct pci_dev *pdev, pm_message_t state)
 {
@@ -18031,10 +19186,9 @@ xp_suspend(struct pci_dev *pdev, pm_message_t state)
 	return 0;
 }
 
-/*
- *  X400P-SS7 Resume
- *  -----------------------------------
- */
+/** xp_resume: - X400P-SS7 Resume
+  * @pdev: PCI device
+  */
 STATIC int
 xp_resume(struct pci_dev *pdev)
 {
@@ -18057,19 +19211,16 @@ STATIC struct pci_driver xp_driver = {
 #endif
 };
 
-/* 
- *  X400P-SS7 PCI Init
- *  -----------------------------------
- *  Here we need to scan for all available boards, configure the board-level
- *  structures, and then release all system resources.  The purpose of this is
- *  to identify the boards in the system at module startup or LiS
- *  initialization.
- *
- *  Later, when a stream is opened for any span, the span is configured, the
- *  drivers will be enabled and all channels in the span will have their
- *  power-on sequence completed and each channel will idle SIOS.  Closing
- *  channels will result in the transmitters resuming idle SIOS operation.
- */
+/** xp_pci_init: - X400P-SS7 PCI Init
+  *
+  * Here we need to scan for all available boards, configure the board-level structures, and then
+  * release all system resources.  The purpose of this is to identify the boards in the system at
+  * module startup or Linux Fast-STREAMS initialization.
+  *
+  * Later, when a stream is opened for any span, the span is configured, the drivers will be enabled
+  * and all channels in the span will have their power-on sequence completed and each channel will
+  * idle SIOS.  Closing channels will result in the transmitters resuming idle SIOS operation.
+  */
 STATIC noinline __devinit int
 xp_pci_init(void)
 {
@@ -18080,14 +19231,12 @@ xp_pci_init(void)
 #endif				/* HAVE_KFUNC_PCI_MODULE_INIT */
 }
 
-/* 
- *  X400P-SS7 PCI Cleanup
- *  -----------------------------------
- *  Because this is a style 2 driver, if there are any boards that are atill
- *  configured, we need to stop the boards and deallocate the board-level
- *  resources and structures.
- */
-STATIC noinline __devexit int
+/** xp_pci_cleanup: - X400P-SS7 PCI Cleanup
+  *
+  * Because this is a style 2 driver, if there are any boards that are atill configured, we need to
+  * stop the boards and deallocate the board-level resources and structures.
+  */
+STATIC noinline int
 xp_pci_cleanup(void)
 {
 	pci_unregister_driver(&xp_driver);
@@ -18148,7 +19297,7 @@ xp_register_strdev(major_t major)
 	return (0);
 }
 
-STATIC noinline __devexit int
+STATIC noinline int
 xp_unregister_strdev(major_t major)
 {
 	int err;
@@ -18158,7 +19307,7 @@ xp_unregister_strdev(major_t major)
 	return (0);
 }
 
-MODULE_STATIC void __exit
+MODULE_STATIC void
 sl_x400pterminate(void)
 {
 	int err, mindex;
@@ -18186,6 +19335,10 @@ MODULE_STATIC int __init
 sl_x400pinit(void)
 {
 	int err, mindex = 0;
+
+	(void) sdl_default_e1_span;
+	(void) sdl_default_t1_span;
+	(void) sdl_default_j1_span;
 
 	cmn_err(CE_NOTE, DRV_BANNER);	/* console splash */
 	if ((err = xp_init_caches())) {
