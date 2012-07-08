@@ -213,7 +213,9 @@ struct {
 static int show_msg = 0;
 static int show_acks = 0;
 static int show_timeout = 0;
+#if TEST_M2PA || TEST_X400
 static int show_fisus = 1;
+#endif				/* TEST_M2PA || TEST_X400 */
 
 #if TEST_X400
 static int show_msus = 1;
@@ -247,14 +249,14 @@ static int ERROR_type = 0;
 static int RESERVED_field[2] = { 0, 0 };
 #endif				/* TEST_M2PA */
 
-#if TEST_M2UA
+#if 0
 static int PRIM_type = 0;
 static int CONIND_number = 2;
 static int TOKEN_value = 0;
 static int SEQ_number = 1;
 static int SERV_type = T_COTS_ORD;
 static int CURRENT_state = TS_UNBND;
-struct T_info_ack_t last_info = { 0, };
+struct T_info_ack last_info = { 0, };
 
 static int DATA_xfer_flags = 0;
 static int BIND_flags = 0;
@@ -326,11 +328,13 @@ static int test_gband = 0;
 static int test_timout = 200;
 
 #if TEST_M2PA || TEST_M2UA
+static struct sockaddr_in *ADDR_buffer = NULL;
+static socklen_t ADDR_length = sizeof(*ADDR_buffer);
+#endif				/* TEST_M2PA || TEST_M2UA */
+#if TEST_M2PA
 static int test_bufsize = 256;
 static int test_nidu = 256;
 static int OPTMGMT_flags = 0;
-static struct sockaddr_in *ADDR_buffer = NULL;
-static socklen_t ADDR_length = sizeof(*ADDR_buffer);
 static struct sockaddr_in *DEST_buffer = NULL;
 static socklen_t DEST_length = 0;
 static struct sockaddr_in *SRC_buffer = NULL;
@@ -342,7 +346,13 @@ static size_t DATA_length = 0;
 static int test_resfd = -1;
 static void *QOS_buffer = NULL;
 static int QOS_length = 0;
-#else
+#elif TEST_X400
+static unsigned short ptu_test_slot = PTU_TEST_SLOT;
+static unsigned short ptu_test_span = PTU_TEST_SPAN;
+static unsigned short ptu_test_chan = PTU_TEST_CHAN;
+static unsigned short iut_test_slot = IUT_TEST_SLOT;
+static unsigned short iut_test_span = IUT_TEST_SPAN;
+static unsigned short iut_test_chan = IUT_TEST_CHAN;
 static unsigned short addrs[3][1] = {
 	{(PTU_TEST_SLOT << 12) | (PTU_TEST_SPAN << 8) | (PTU_TEST_CHAN << 0)},
 	{(IUT_TEST_SLOT << 12) | (IUT_TEST_SPAN << 8) | (IUT_TEST_CHAN << 0)},
@@ -468,6 +478,8 @@ enum {
 	__TEST_DISABLE_REQ, __TEST_DISABLE_CON, __TEST_ERROR_IND, __TEST_SDL_OPTIONS,
 	__TEST_SDL_CONFIG, __TEST_SDT_OPTIONS, __TEST_SDT_CONFIG, __TEST_SL_OPTIONS,
 	__TEST_SL_CONFIG, __TEST_SDL_STATS, __TEST_SDT_STATS, __TEST_SL_STATS,
+	__TEST_SDL_GOPTIONS, __TEST_SDL_GCONFIG, __TEST_SDT_GOPTIONS, __TEST_SDT_GCONFIG,
+	__TEST_SL_GOPTIONS, __TEST_SL_GCONFIG,
 };
 
 /*
@@ -478,13 +490,22 @@ enum {
  *  -------------------------------------------------------------------------
  */
 
+#if TEST_M2PA || TEST_X400
 static int ss7_pvar = SS7_PVAR_ITUT_00;
+#endif				/* TEST_M2PA || TEST_X400 */
 
 struct test_stats {
 	sdl_stats_t sdl;
 	sdt_stats_t sdt;
 	sl_stats_t sl;
 } iutstat = {};
+
+#if TEST_M2UA
+#define M2UA_VERSION_RFC3331	0xc5
+#define M2UA_VERSION_DEFAULT	M2UA_VERSION_RFC3331
+
+static int m2ua_version = M2UA_VERSION_DEFAULT;
+#endif				/* TEST_M2UA */
 
 #if TEST_M2PA
 #define M2PA_VERSION_DRAFT3	0x30
@@ -569,6 +590,491 @@ struct {
 },};
 #endif				/* TEST_M2PA */
 
+#if TEST_X400
+lmi_option_t lmi_default_e1_chan = {
+	.pvar = SS7_PVAR_ITUT_00,
+	.popt = 0,
+};
+lmi_option_t lmi_default_t1_chan = {
+	.pvar = SS7_PVAR_ANSI_00,
+	.popt = SS7_POPT_MPLEV,
+};
+lmi_option_t lmi_default_j1_chan = {
+	.pvar = SS7_PVAR_JTTC_94,
+	.popt = SS7_POPT_MPLEV,
+};
+lmi_option_t lmi_default_e1_span = {
+	.pvar = SS7_PVAR_ITUT_00,
+	.popt = SS7_POPT_HSL | SS7_POPT_XSN,
+};
+lmi_option_t lmi_default_t1_span = {
+	.pvar = SS7_PVAR_ANSI_00,
+	.popt = SS7_POPT_MPLEV | SS7_POPT_HSL | SS7_POPT_XSN,
+};
+lmi_option_t lmi_default_j1_span = {
+	.pvar = SS7_PVAR_JTTC_94,
+	.popt = SS7_POPT_MPLEV | SS7_POPT_HSL | SS7_POPT_XSN,
+};
+sl_config_t sl_default_e1_chan = {
+	.t1 = 45 * 1000,
+	.t2 = 5 * 1000,
+	.t2l = 20 * 1000,
+	.t2h = 100 * 1000,
+	.t3 = 1 * 1000,
+	.t4n = 8 * 1000,
+	.t4e = 500,
+	.t5 = 125,
+	.t6 = 4 * 1000,
+	.t7 = 2 * 1000,
+	.rb_abate = 3,
+	.rb_accept = 6,
+	.rb_discard = 9,
+	.tb_abate_1 = 128 * 272,
+	.tb_onset_1 = 256 * 272,
+	.tb_discd_1 = 384 * 272,
+	.tb_abate_2 = 512 * 272,
+	.tb_onset_2 = 640 * 272,
+	.tb_discd_2 = 768 * 272,
+	.tb_abate_3 = 896 * 272,
+	.tb_onset_3 = 1024 * 272,
+	.tb_discd_3 = 1152 * 272,
+	.N1 = 31,
+	.N2 = 8192,
+	.M = 5,
+};
+sl_config_t sl_default_e1_span = {
+	.t1 = 45 * 1000,
+	.t2 = 5 * 1000,
+	.t2l = 20 * 1000,
+	.t2h = 100 * 1000,
+	.t3 = 1 * 1000,
+	.t4n = 8 * 1000,
+	.t4e = 500,
+	.t5 = 125,
+	.t6 = 4 * 1000,
+	.t7 = 2 * 1000,
+	.rb_abate = 3,
+	.rb_accept = 6,
+	.rb_discard = 9,
+	.tb_abate_1 = 128 * 272,
+	.tb_onset_1 = 256 * 272,
+	.tb_discd_1 = 384 * 272,
+	.tb_abate_2 = 512 * 272,
+	.tb_onset_2 = 640 * 272,
+	.tb_discd_2 = 768 * 272,
+	.tb_abate_3 = 896 * 272,
+	.tb_onset_3 = 1024 * 272,
+	.tb_discd_3 = 1152 * 272,
+	.N1 = 31,
+	.N2 = 8192,
+	.M = 5,
+};
+sl_config_t sl_default_t1_chan = {
+	.t1 = 45 * 1000,
+	.t2 = 5 * 1000,
+	.t2l = 20 * 1000,
+	.t2h = 100 * 1000,
+	.t3 = 1 * 1000,
+	.t4n = 8 * 1000,
+	.t4e = 500,
+	.t5 = 125,
+	.t6 = 4 * 1000,
+	.t7 = 2 * 1000,
+	.rb_abate = 3,
+	.rb_accept = 6,
+	.rb_discard = 9,
+	.tb_abate_1 = 128 * 272,
+	.tb_onset_1 = 256 * 272,
+	.tb_discd_1 = 384 * 272,
+	.tb_abate_2 = 512 * 272,
+	.tb_onset_2 = 640 * 272,
+	.tb_discd_2 = 768 * 272,
+	.tb_abate_3 = 896 * 272,
+	.tb_onset_3 = 1024 * 272,
+	.tb_discd_3 = 1152 * 272,
+	.N1 = 31,
+	.N2 = 8192,
+	.M = 5,
+};
+sl_config_t sl_default_t1_span = {
+	.t1 = 45 * 1000,
+	.t2 = 5 * 1000,
+	.t2l = 20 * 1000,
+	.t2h = 100 * 1000,
+	.t3 = 1 * 1000,
+	.t4n = 8 * 1000,
+	.t4e = 500,
+	.t5 = 125,
+	.t6 = 4 * 1000,
+	.t7 = 2 * 1000,
+	.rb_abate = 3,
+	.rb_accept = 6,
+	.rb_discard = 9,
+	.tb_abate_1 = 128 * 272,
+	.tb_onset_1 = 256 * 272,
+	.tb_discd_1 = 384 * 272,
+	.tb_abate_2 = 512 * 272,
+	.tb_onset_2 = 640 * 272,
+	.tb_discd_2 = 768 * 272,
+	.tb_abate_3 = 896 * 272,
+	.tb_onset_3 = 1024 * 272,
+	.tb_discd_3 = 1152 * 272,
+	.N1 = 31,
+	.N2 = 8192,
+	.M = 5,
+};
+sl_config_t sl_default_j1_chan = {
+	.t1 = 45 * 1000,
+	.t2 = 5 * 1000,
+	.t2l = 20 * 1000,
+	.t2h = 100 * 1000,
+	.t3 = 1 * 1000,
+	.t4n = 8 * 1000,
+	.t4e = 500,
+	.t5 = 125,
+	.t6 = 4 * 1000,
+	.t7 = 2 * 1000,
+	.rb_abate = 3,
+	.rb_accept = 6,
+	.rb_discard = 9,
+	.tb_abate_1 = 128 * 272,
+	.tb_onset_1 = 256 * 272,
+	.tb_discd_1 = 384 * 272,
+	.tb_abate_2 = 512 * 272,
+	.tb_onset_2 = 640 * 272,
+	.tb_discd_2 = 768 * 272,
+	.tb_abate_3 = 896 * 272,
+	.tb_onset_3 = 1024 * 272,
+	.tb_discd_3 = 1152 * 272,
+	.N1 = 31,
+	.N2 = 8192,
+	.M = 5,
+};
+sl_config_t sl_default_j1_span = {
+	.t1 = 45 * 1000,
+	.t2 = 5 * 1000,
+	.t2l = 20 * 1000,
+	.t2h = 100 * 1000,
+	.t3 = 1 * 1000,
+	.t4n = 8 * 1000,
+	.t4e = 500,
+	.t5 = 125,
+	.t6 = 4 * 1000,
+	.t7 = 2 * 1000,
+	.rb_abate = 3,
+	.rb_accept = 6,
+	.rb_discard = 9,
+	.tb_abate_1 = 128 * 272,
+	.tb_onset_1 = 256 * 272,
+	.tb_discd_1 = 384 * 272,
+	.tb_abate_2 = 512 * 272,
+	.tb_onset_2 = 640 * 272,
+	.tb_discd_2 = 768 * 272,
+	.tb_abate_3 = 896 * 272,
+	.tb_onset_3 = 1024 * 272,
+	.tb_discd_3 = 1152 * 272,
+	.N1 = 31,
+	.N2 = 8192,
+	.M = 5,
+};
+#endif					/* TEST_X400 */
+#if TEST_M2PA
+sl_config_t sl_default_m2pa = {
+	.t1 = 45 * 1000,
+	.t2 = 5 * 1000,
+	.t2l = 20 * 1000,
+	.t2h = 100 * 1000,
+	.t3 = 1 * 1000,
+	.t4n = 8 * 1000,
+	.t4e = 500,
+	.t5 = 125,
+	.t6 = 4 * 1000,
+	.t7 = 2 * 1000,
+	.rb_abate = 3,
+	.rb_accept = 6,
+	.rb_discard = 9,
+	.tb_abate_1 = 128 * 272,
+	.tb_onset_1 = 256 * 272,
+	.tb_discd_1 = 384 * 272,
+	.tb_abate_2 = 512 * 272,
+	.tb_onset_2 = 640 * 272,
+	.tb_discd_2 = 768 * 272,
+	.tb_abate_3 = 896 * 272,
+	.tb_onset_3 = 1024 * 272,
+	.tb_discd_3 = 1152 * 272,
+	.N1 = 31,
+	.N2 = 8192,
+	.M = 5,
+};
+#endif					/* TEST_M2PA */
+#if TEST_X400
+sdt_config_t sdt_default_e1_span = {
+	.Tin = 4,
+	.Tie = 1,
+	.T = 64,
+	.D = 256,
+	.t8 = 100,
+	.Te = 793544,
+	.De = 11328,
+	.Ue = 198384,
+	.N = 16,
+	.m = 272,
+	.b = 8,
+	.f = SDT_FLAGS_ONE,
+};
+sdt_config_t sdt_default_t1_span = {
+	.Tin = 4,
+	.Tie = 1,
+	.T = 64,
+	.D = 256,
+	.t8 = 100,
+	.Te = 577169,
+	.De = 9308,
+	.Ue = 144292,
+	.N = 16,
+	.m = 272,
+	.b = 8,
+	.f = SDT_FLAGS_ONE,
+};
+sdt_config_t sdt_default_j1_span = {
+	.Tin = 4,
+	.Tie = 1,
+	.T = 64,
+	.D = 256,
+	.t8 = 100,
+	.Te = 577169,
+	.De = 9308,
+	.Ue = 144292,
+	.N = 16,
+	.m = 272,
+	.b = 8,
+	.f = SDT_FLAGS_ONE,
+};
+sdt_config_t sdt_default_e1_chan = {
+	.Tin = 4,
+	.Tie = 1,
+	.T = 64,
+	.D = 256,
+	.t8 = 100,
+	.Te = 793544,
+	.De = 11328,
+	.Ue = 198384,
+	.N = 16,
+	.m = 272,
+	.b = 8,
+	.f = SDT_FLAGS_ONE,
+};
+sdt_config_t sdt_default_t1_chan = {
+	.Tin = 4,
+	.Tie = 1,
+	.T = 64,
+	.D = 256,
+	.t8 = 100,
+	.Te = 577169,
+	.De = 9308,
+	.Ue = 144292,
+	.N = 16,
+	.m = 272,
+	.b = 8,
+	.f = SDT_FLAGS_ONE,
+};
+sdt_config_t sdt_default_j1_chan = {
+	.Tin = 4,
+	.Tie = 1,
+	.T = 64,
+	.D = 256,
+	.t8 = 100,
+	.Te = 577169,
+	.De = 9308,
+	.Ue = 144292,
+	.N = 16,
+	.m = 272,
+	.b = 8,
+	.f = SDT_FLAGS_ONE,
+};
+#endif					/* TEST_X400 */
+#if TEST_M2PA
+sdt_config_t sdt_default_m2pa = {
+	.Tin = 4,
+	.Tie = 1,
+	.T = 64,
+	.D = 256,
+	.t8 = 100,
+	.Te = 577169,
+	.De = 9308,
+	.Ue = 144292,
+	.N = 16,
+	.m = 272,
+	.b = 8,
+	.f = SDT_FLAGS_ONE,
+};
+#endif					/* TEST_M2PA */
+#if TEST_X400
+sdl_config_t sdl_default_e1_chan = {
+	.ifname = NULL,
+	.ifflags = 0,
+	.iftype = SDL_TYPE_DS0,
+	.ifrate = 64000,
+	.ifgtype = SDL_GTYPE_E1,
+	.ifgrate = 2048000,
+	.ifmode = SDL_MODE_PEER,
+	.ifgmode = SDL_GMODE_NONE,
+	.ifgcrc = SDL_GCRC_CRC5,
+	.ifclock = SDL_CLOCK_SLAVE,
+	.ifcoding = SDL_CODING_HDB3,
+	.ifframing = SDL_FRAMING_CCS,
+	.ifblksize = 8,
+	.ifleads = 0,
+	.ifbpv = 0,
+	.ifalarms = 0,
+	.ifrxlevel = 0,
+	.iftxlevel = SDL_TXLEVEL_120OHM_NM,
+	.ifsync = 0,
+	.ifsyncsrc = {0, 0, 0, 0}
+	,
+};
+sdl_config_t sdl_default_t1_chan = {
+	.ifname = NULL,
+	.ifflags = 0,
+	.iftype = SDL_TYPE_DS0,
+	.ifrate = 64000,
+	.ifgtype = SDL_GTYPE_T1,
+	.ifgrate = 1544000,
+	.ifmode = SDL_MODE_PEER,
+	.ifgmode = SDL_GMODE_NONE,
+	.ifgcrc = SDL_GCRC_CRC6,
+	.ifclock = SDL_CLOCK_LOOP,
+	.ifcoding = SDL_CODING_B8ZS,
+	.ifframing = SDL_FRAMING_ESF,
+	.ifblksize = 8,
+	.ifleads = 0,
+	.ifbpv = 0,
+	.ifalarms = 0,
+	.ifrxlevel = 0,
+	.iftxlevel = SDL_TXLEVEL_DSX_133FT,
+	.ifsync = 0,
+	.ifsyncsrc = {0, 0, 0, 0}
+	,
+};
+sdl_config_t sdl_default_j1_chan = {
+	.ifname = NULL,
+	.ifflags = 0,
+	.iftype = SDL_TYPE_DS0A,
+	.ifrate = 64000,
+	.ifgtype = SDL_GTYPE_J1,
+	.ifgrate = 1544000,
+	.ifmode = SDL_MODE_PEER,
+	.ifgmode = SDL_GMODE_NONE,
+	.ifgcrc = SDL_GCRC_CRC6J,
+	.ifclock = SDL_CLOCK_LOOP,
+	.ifcoding = SDL_CODING_B8ZS,
+	.ifframing = SDL_FRAMING_ESF,
+	.ifblksize = 8,
+	.ifleads = 0,
+	.ifbpv = 0,
+	.ifalarms = 0,
+	.ifrxlevel = 0,
+	.iftxlevel = SDL_TXLEVEL_DSX_133FT,
+	.ifsync = 0,
+	.ifsyncsrc = {0, 0, 0, 0}
+	,
+};
+sdl_config_t sdl_default_e1_span = {
+	.ifname = NULL,
+	.ifflags = 0,
+	.iftype = SDL_TYPE_E1,
+	.ifrate = 2048000,
+	.ifgtype = SDL_GTYPE_E1,
+	.ifgrate = 2048000,
+	.ifmode = SDL_MODE_PEER,
+	.ifgmode = SDL_GMODE_NONE,
+	.ifgcrc = SDL_GCRC_CRC5,
+	.ifclock = SDL_CLOCK_SLAVE,
+	.ifcoding = SDL_CODING_HDB3,
+	.ifframing = SDL_FRAMING_CCS,
+	.ifblksize = 64,
+	.ifleads = 0,
+	.ifbpv = 0,
+	.ifalarms = 0,
+	.ifrxlevel = 0,
+	.iftxlevel = SDL_TXLEVEL_120OHM_NM,
+	.ifsync = 0,
+	.ifsyncsrc = {0, 0, 0, 0}
+	,
+};
+sdl_config_t sdl_default_t1_span = {
+	.ifname = NULL,
+	.ifflags = 0,
+	.iftype = SDL_TYPE_T1,
+	.ifrate = 1544000,
+	.ifgtype = SDL_GTYPE_T1,
+	.ifgrate = 1544000,
+	.ifmode = SDL_MODE_PEER,
+	.ifgmode = SDL_GMODE_NONE,
+	.ifgcrc = SDL_GCRC_CRC6,
+	.ifclock = SDL_CLOCK_LOOP,
+	.ifcoding = SDL_CODING_B8ZS,
+	.ifframing = SDL_FRAMING_ESF,
+	.ifblksize = 64,
+	.ifleads = 0,
+	.ifbpv = 0,
+	.ifalarms = 0,
+	.ifrxlevel = 0,
+	.iftxlevel = SDL_TXLEVEL_DSX_133FT,
+	.ifsync = 0,
+	.ifsyncsrc = {0, 0, 0, 0}
+	,
+};
+sdl_config_t sdl_default_j1_span = {
+	.ifname = NULL,
+	.ifflags = 0,
+	.iftype = SDL_TYPE_J1,
+	.ifrate = 1544000,
+	.ifgtype = SDL_GTYPE_J1,
+	.ifgrate = 1544000,
+	.ifmode = SDL_MODE_PEER,
+	.ifgmode = SDL_GMODE_NONE,
+	.ifgcrc = SDL_GCRC_CRC6J,
+	.ifclock = SDL_CLOCK_LOOP,
+	.ifcoding = SDL_CODING_B8ZS,
+	.ifframing = SDL_FRAMING_ESF,
+	.ifblksize = 64,
+	.ifleads = 0,
+	.ifbpv = 0,
+	.ifalarms = 0,
+	.ifrxlevel = 0,
+	.iftxlevel = SDL_TXLEVEL_DSX_133FT,
+	.ifsync = 0,
+	.ifsyncsrc = {0, 0, 0, 0}
+	,
+};
+#endif					/* TEST_X400 */
+#if TEST_M2PA
+sdl_config_t sdl_default_m2pa = {
+	.ifname = NULL,
+	.ifflags = 0,
+	.iftype = SDL_TYPE_PACKET,
+	.ifrate = 10000000,
+	.ifgtype = SDL_GTYPE_SCTP,
+	.ifgrate = 10000000,
+	.ifmode = SDL_MODE_PEER,
+	.ifgmode = SDL_GMODE_NONE,
+	.ifgcrc = SDL_GCRC_NONE,
+	.ifclock = SDL_CLOCK_NONE,
+	.ifcoding = SDL_CODING_NONE,
+	.ifframing = SDL_FRAMING_NONE,
+	.ifblksize = 0,
+	.ifleads = 0,
+	.ifbpv = 0,
+	.ifalarms = 0,
+	.ifrxlevel = 0,
+	.iftxlevel = 0,
+	.ifsync = 0,
+	.ifsyncsrc = {0, 0, 0, 0}
+	,
+};
+#endif					/* TEST_M2PA */
+
 struct test_config {
 	lmi_option_t opt;
 	sdl_config_t sdl;
@@ -630,8 +1136,8 @@ struct test_config {
 		    .t2h = 100 * 1000,	/* t2h - timer t2h duration (milliseconds) */
 		    .t3 = 1 * 1000,	/* t3 - timer t3 duration (milliseconds) */
 		    .t4n = 8 * 1000,	/* t4n - timer t4n duration (milliseconds) */
-		    .t4e = 500 * 1000 / 1000,	/* t4e - timer t4e duration (milliseconds) */
-		    .t5 = 125 * 1000 / 1000,	/* t5 - timer t5 duration (milliseconds) */
+		    .t4e = 500,	/* t4e - timer t4e duration (milliseconds) */
+		    .t5 = 125,	/* t5 - timer t5 duration (milliseconds) */
 		    .t6 = 4 * 1000,	/* t6 - timer t6 duration (milliseconds) */
 		    .t7 = 2 * 1000,	/* t7 - timer t7 duration (milliseconds) */
 		    .rb_abate = 3,	/* rb_abate - RB cong abatement (#msgs) */
@@ -679,6 +1185,7 @@ typedef struct timer_range {
 
 enum { t1 = 0, t2, t3, t4n, t4e, t5, t6, t7, tmax };
 
+#if TEST_M2PA || TEST_X400
 static timer_range_t timer[tmax] = {
 	{40000, 50000, "T1"},	/* Timer T1 30000 */
 	{5000, 150000, "T2"},	/* Timer T2 5000 */
@@ -689,6 +1196,7 @@ static timer_range_t timer[tmax] = {
 	{3000, 6000, "T6"},	/* Timer T6 300 */
 	{500, 2000, "T7"}	/* Timer T7 50 */
 };
+#endif				/* TEST_M2PA || TEST_X400 */
 
 long test_start = 0;
 
@@ -699,11 +1207,13 @@ static const char *failure_string = NULL;
 #define __stringify(x) __stringify_1(x)
 #define FAILURE_STRING(string) "[" __stringify(__LINE__) "] " string
 
+/* lockf does not work well on SMP for some reason */
 #if 1
 #undef lockf
 #define lockf(x,y,z) 0
 #endif
 
+#if TEST_M2PA || TEST_X400
 /*
  *  Return the current time in milliseconds.
  */
@@ -831,6 +1341,7 @@ check_time(int child, const char *t, long beg, long lo, long hi)
 	else
 		return __RESULT_FAILURE;
 }
+#endif				/* TEST_M2PA || TEST_X400 */
 
 static int
 time_event(int child, int event)
@@ -984,7 +1495,9 @@ stop_tt(void)
 	return (result);
 }
 
+#if TEST_M2PA || TEST_X400
 static long beg_time = 0;
+#endif				/* TEST_M2PA || TEST_X400 */
 
 #if TEST_X400
 static int event = 0;
@@ -1036,7 +1549,9 @@ static int cntret = 0;
 #define M2PA_STATUS_OUT_OF_SERVICE		(__constant_htonl(9))
 #define M2PA_STATUS_NONE			(__constant_htonl(10))
 #define M2PA_STATUS_INVALID			(__constant_htonl(11))
+#endif				/* TEST_M2PA */
 
+#if TEST_M2PA || TEST_M2UA
 /*
  *  Addresses
  */
@@ -1054,7 +1569,9 @@ int anums[4] = { 3, 3, 3, 3 };
 #define TEST_PORT_NUMBER 18000
 unsigned short ports[4] = { TEST_PORT_NUMBER + 0, TEST_PORT_NUMBER + 1, TEST_PORT_NUMBER + 2, TEST_PORT_NUMBER + 3 };
 const char *addr_strings[4] = { "127.0.0.1", "127.0.0.2", "127.0.0.3", "127.0.0.4" };
+#endif				/* TEST_M2PA || TEST_M2UA */
 
+#if TEST_M2PA
 /*
  *  Options
  */
@@ -1095,6 +1612,14 @@ N_qos_sel_info_sctp_t qos_info = {
 	.options = 0,
 };
 #endif				/* TEST_M2PA */
+
+/*
+ *  -------------------------------------------------------------------------
+ *
+ *  Printing things
+ *
+ *  -------------------------------------------------------------------------
+ */
 
 char *
 errno_string(long err)
@@ -2116,6 +2641,10 @@ ioctl_string(int cmd, intptr_t arg)
 		return ("I_HEAP_REPORT");
 	case I_FIFO:
 		return ("I_FIFO");
+	case I_GETMSG:
+		return ("I_GETMSG");
+	case I_PUTMSG:
+		return ("I_PUTMSG");
 	case I_PUTPMSG:
 		return ("I_PUTPMSG");
 	case I_GETPMSG:
@@ -2361,6 +2890,73 @@ print_ppa(int child, ppa_t * ppa)
 }
 #endif				/* TEST_X400 */
 void print_string_val(int child, const char *string, ulong val);
+#if TEST_X400
+void print_string(int child, const char *string);
+void
+print_lmi_options(int child, lmi_option_t *o)
+{
+	switch (o->pvar) {
+	case SS7_PVAR_ITUT_88:
+		print_string(child, "SS7_PVAR_ITUT_88");
+		break;
+	case SS7_PVAR_ITUT_93:
+		print_string(child, "SS7_PVAR_ITUT_93");
+		break;
+	case SS7_PVAR_ITUT_96:
+		print_string(child, "SS7_PVAR_ITUT_96");
+		break;
+	case SS7_PVAR_ITUT_00:
+		print_string(child, "SS7_PVAR_ITUT_00");
+		break;
+	case SS7_PVAR_ETSI_88:
+		print_string(child, "SS7_PVAR_ETSI_88");
+		break;
+	case SS7_PVAR_ETSI_93:
+		print_string(child, "SS7_PVAR_ETSI_93");
+		break;
+	case SS7_PVAR_ETSI_96:
+		print_string(child, "SS7_PVAR_ETSI_96");
+		break;
+	case SS7_PVAR_ETSI_00:
+		print_string(child, "SS7_PVAR_ETSI_00");
+		break;
+	case SS7_PVAR_ANSI_92:
+		print_string(child, "SS7_PVAR_ANSI_92");
+		break;
+	case SS7_PVAR_ANSI_96:
+		print_string(child, "SS7_PVAR_ANSI_96");
+		break;
+	case SS7_PVAR_ANSI_00:
+		print_string(child, "SS7_PVAR_ANSI_00");
+		break;
+	case SS7_PVAR_JTTC_94:
+		print_string(child, "SS7_PVAR_JTTC_94");
+		break;
+	case SS7_PVAR_CHIN_00:
+		print_string(child, "SS7_PVAR_CHIN_00");
+		break;
+	case SS7_PVAR_SING | SS7_PVAR_88:
+		print_string(child, "SS7_PVAR_SING_88");
+		break;
+	case SS7_PVAR_SPAN | SS7_PVAR_88:
+		print_string(child, "SS7_PVAR_SPAN_88");
+		break;
+	default:
+		print_string(child, "SS7_PVAR_UNKNOWN");
+		break;
+	}
+	if (o->popt & SS7_POPT_MPLEV)
+		print_string(child, "SS7_POPT_MPLEV");
+	if (o->popt & SS7_POPT_PCR)
+		print_string(child, "SS7_POPT_PCR");
+	if (o->popt & SS7_POPT_HSL)
+		print_string(child, "SS7_POPT_HSL");
+	if (o->popt & SS7_POPT_XSN)
+		print_string(child, "SS7_POPT_XSN");
+	if (o->popt & SS7_POPT_NOPR)
+		print_string(child, "SS7_POPT_NOPR");
+}
+#endif				/* TEST_X400 */
 void
 print_sdl_stats(int child, sdl_stats_t * s)
 {
@@ -2383,6 +2979,374 @@ print_sdl_stats(int child, sdl_stats_t * s)
 	if (s->carrier_lost)
 		print_string_val(child, "carrier_lost", s->carrier_lost);
 }
+#if TEST_X400
+void
+print_sdl_config(int child, sdl_config_t * c)
+{
+	if (c->ifflags & SDL_IF_UP)
+		print_string(child, "SDL_IF_UP");
+	if (c->ifflags & SDL_IF_RX_RUNNING)
+		print_string(child, "SDL_IF_RX_RUNNING");
+	if (c->ifflags & SDL_IF_TX_RUNNING)
+		print_string(child, "SDL_IF_TX_RUNNING");
+	switch (c->iftype) {
+	case SDL_TYPE_NONE:
+		print_string(child, "SDL_TYPE_NONE");
+		break;
+	case SDL_TYPE_V35:
+		print_string(child, "SDL_TYPE_V35");
+		break;
+	case SDL_TYPE_DS0:
+		print_string(child, "SDL_TYPE_DS0");
+		break;
+	case SDL_TYPE_DS0A:
+		print_string(child, "SDL_TYPE_DS0A");
+		break;
+	case SDL_TYPE_E1:
+		print_string(child, "SDL_TYPE_E1");
+		break;
+	case SDL_TYPE_T1:
+		print_string(child, "SDL_TYPE_T1");
+		break;
+	case SDL_TYPE_J1:
+		print_string(child, "SDL_TYPE_J1");
+		break;
+	case SDL_TYPE_ATM:
+		print_string(child, "SDL_TYPE_ATM");
+		break;
+	case SDL_TYPE_PACKET:
+		print_string(child, "SDL_TYPE_PACKET");
+		break;
+	default:
+		print_string(child, "SDL_TYPE_UNKNOWN");
+		break;
+	}
+	print_string_val(child, "ifrate", c->ifrate);
+	switch (c->ifgtype) {
+	case SDL_GTYPE_NONE:
+		print_string(child, "SDL_GTYPE_NONE");
+		break;
+	case SDL_GTYPE_T1:
+		print_string(child, "SDL_GTYPE_T1");
+		break;
+	case SDL_GTYPE_E1:
+		print_string(child, "SDL_GTYPE_E1");
+		break;
+	case SDL_GTYPE_J1:
+		print_string(child, "SDL_GTYPE_J1");
+		break;
+	case SDL_GTYPE_ATM:
+		print_string(child, "SDL_GTYPE_ATM");
+		break;
+	case SDL_GTYPE_ETH:
+		print_string(child, "SDL_GTYPE_ETH");
+		break;
+	case SDL_GTYPE_IP:
+		print_string(child, "SDL_GTYPE_IP");
+		break;
+	case SDL_GTYPE_UDP:
+		print_string(child, "SDL_GTYPE_UDP");
+		break;
+	case SDL_GTYPE_TCP:
+		print_string(child, "SDL_GTYPE_TCP");
+		break;
+	case SDL_GTYPE_RTP:
+		print_string(child, "SDL_GTYPE_RTP");
+		break;
+	case SDL_GTYPE_SCTP:
+		print_string(child, "SDL_GTYPE_SCTP");
+		break;
+	case SDL_GTYPE_T2:
+		print_string(child, "SDL_GTYPE_T2");
+		break;
+	case SDL_GTYPE_E2:
+		print_string(child, "SDL_GTYPE_E2");
+		break;
+	case SDL_GTYPE_E3:
+		print_string(child, "SDL_GTYPE_E3");
+		break;
+	case SDL_GTYPE_T3:
+		print_string(child, "SDL_GTYPE_T3");
+		break;
+	case SDL_GTYPE_OC3:
+		print_string(child, "SDL_GTYPE_OC3");
+		break;
+	case SDL_GTYPE_OC12:
+		print_string(child, "SDL_GTYPE_OC12");
+		break;
+	case SDL_GTYPE_OC48:
+		print_string(child, "SDL_GTYPE_OC48");
+		break;
+	case SDL_GTYPE_OC192:
+		print_string(child, "SDL_GTYPE_OC192");
+		break;
+	default:
+		print_string(child, "SDL_GTYPE_UNKNOWN");
+		break;
+	}
+	print_string_val(child, "ifgrate", c->ifgrate);
+	switch (c->ifmode) {
+	case SDL_MODE_NONE:
+		print_string(child, "SDL_MODE_NONE");
+		break;
+	case SDL_MODE_DSU:
+		print_string(child, "SDL_MODE_DSU");
+		break;
+	case SDL_MODE_CSU:
+		print_string(child, "SDL_MODE_CSU");
+		break;
+	case SDL_MODE_DTE:
+		print_string(child, "SDL_MODE_DTE");
+		break;
+	case SDL_MODE_DCE:
+		print_string(child, "SDL_MODE_DCE");
+		break;
+	case SDL_MODE_CLIENT:
+		print_string(child, "SDL_MODE_CLIENT");
+		break;
+	case SDL_MODE_SERVER:
+		print_string(child, "SDL_MODE_SERVER");
+		break;
+	case SDL_MODE_PEER:
+		print_string(child, "SDL_MODE_PEER");
+		break;
+	case SDL_MODE_ECHO:
+		print_string(child, "SDL_MODE_ECHO");
+		break;
+	case SDL_MODE_REM_LB:
+		print_string(child, "SDL_MODE_REM_LB");
+		break;
+	case SDL_MODE_LOC_LB:
+		print_string(child, "SDL_MODE_LOC_LB");
+		break;
+	case SDL_MODE_LB_ECHO:
+		print_string(child, "SDL_MODE_LB_ECHO");
+		break;
+	case SDL_MODE_TEST:
+		print_string(child, "SDL_MODE_TEST");
+		break;
+	default:
+		print_string(child, "SDL_MODE_UNKNOWN");
+		break;
+	}
+	switch (c->ifgmode) {
+	case SDL_GMODE_NONE:
+		print_string(child, "SDL_GMODE_NONE");
+		break;
+	case SDL_GMODE_LOC_LB:
+		print_string(child, "SDL_GMODE_LOC_LB");
+		break;
+	case SDL_GMODE_REM_LB:
+		print_string(child, "SDL_GMODE_REM_LB");
+		break;
+	case SDL_GMODE_BOTH_LB:
+		print_string(child, "SDL_GMODE_BOTH_LB");
+		break;
+	default:
+		print_string(child, "SDL_GMODE_UNKNOWN");
+		break;
+	}
+	switch (c->ifgcrc) {
+	case SDL_GCRC_NONE:
+		print_string(child, "SDL_GCRC_NONE");
+		break;
+	case SDL_GCRC_CRC4:
+		print_string(child, "SDL_GCRC_CRC4");
+		break;
+	case SDL_GCRC_CRC5:
+		print_string(child, "SDL_GCRC_CRC5");
+		break;
+	case SDL_GCRC_CRC6:
+		print_string(child, "SDL_GCRC_CRC6");
+		break;
+	case SDL_GCRC_CRC6J:
+		print_string(child, "SDL_GCRC_CRC6J");
+		break;
+	default:
+		print_string(child, "SDL_GCRC_UNKNOWN");
+		break;
+	}
+	switch (c->ifclock) {
+	case SDL_CLOCK_NONE:
+		print_string(child, "SDL_CLOCK_NONE");
+		break;
+	case SDL_CLOCK_INT:
+		print_string(child, "SDL_CLOCK_INT");
+		break;
+	case SDL_CLOCK_EXT:
+		print_string(child, "SDL_CLOCK_EXT");
+		break;
+	case SDL_CLOCK_LOOP:
+		print_string(child, "SDL_CLOCK_LOOP");
+		break;
+	case SDL_CLOCK_MASTER:
+		print_string(child, "SDL_CLOCK_MASTER");
+		break;
+	case SDL_CLOCK_SLAVE:
+		print_string(child, "SDL_CLOCK_SLAVE");
+		break;
+	case SDL_CLOCK_DPLL:
+		print_string(child, "SDL_CLOCK_DPLL");
+		break;
+	case SDL_CLOCK_ABR:
+		print_string(child, "SDL_CLOCK_ABR");
+		break;
+	case SDL_CLOCK_SHAPER:
+		print_string(child, "SDL_CLOCK_SHAPER");
+		break;
+	case SDL_CLOCK_TICK:
+		print_string(child, "SDL_CLOCK_TICK");
+		break;
+	default:
+		print_string(child, "SDL_CLOCK_UNKNOWN");
+		break;
+	}
+	switch (c->ifcoding) {
+	case SDL_CODING_NONE:
+		print_string(child, "SDL_CODING_NONE");
+		break;
+	case SDL_CODING_NRZ:
+		print_string(child, "SDL_CODING_NRZ");
+		break;
+	case SDL_CODING_NRZI:
+		print_string(child, "SDL_CODING_NRZI");
+		break;
+	case SDL_CODING_AMI:
+		print_string(child, "SDL_CODING_AMI");
+		break;
+	case SDL_CODING_B6ZS:
+		print_string(child, "SDL_CODING_B6ZS");
+		break;
+	case SDL_CODING_B8ZS:
+		print_string(child, "SDL_CODING_B8ZS");
+		break;
+	case SDL_CODING_HDB3:
+		print_string(child, "SDL_CODING_HDB3");
+		break;
+	case SDL_CODING_AAL1:
+		print_string(child, "SDL_CODING_AAL1");
+		break;
+	case SDL_CODING_AAL2:
+		print_string(child, "SDL_CODING_AAL2");
+		break;
+	case SDL_CODING_AAL5:
+		print_string(child, "SDL_CODING_AAL5");
+		break;
+	default:
+		print_string(child, "SDL_CODING_UNKNOWN");
+		break;
+	}
+	switch (c->ifframing) {
+	case SDL_FRAMING_NONE:
+		print_string(child, "SDL_FRAMING_NONE");
+		break;
+	case SDL_FRAMING_CCS:
+		print_string(child, "SDL_FRAMING_CCS");
+		break;
+	case SDL_FRAMING_CAS:
+		print_string(child, "SDL_FRAMING_CAS");
+		break;
+	case SDL_FRAMING_SF:
+	// case SDL_FRAMING_D4:
+		print_string(child, "SDL_FRAMING_SF");
+		print_string(child, "SDL_FRAMING_D4");
+		break;
+	case SDL_FRAMING_ESF:
+		print_string(child, "SDL_FRAMING_ESF");
+		break;
+	default:
+		print_string(child, "SDL_FRAMING_UNKNOWN");
+		break;
+	}
+	print_string_val(child, "ifblksize", c->ifblksize);
+	if (c->ifleads & SDL_LEAD_DTR)
+		print_string(child, "SDL_LEAD_DTR");
+	if (c->ifleads & SDL_LEAD_RTS)
+		print_string(child, "SDL_LEAD_RTS");
+	if (c->ifleads & SDL_LEAD_DCD)
+		print_string(child, "SDL_LEAD_DCD");
+	if (c->ifleads & SDL_LEAD_CTS)
+		print_string(child, "SDL_LEAD_CTS");
+	if (c->ifleads & SDL_LEAD_DSR)
+		print_string(child, "SDL_LEAD_DSR");
+	print_string_val(child, "ifbpv", c->ifbpv);
+	if (c->ifalarms & SDL_ALARM_RED)
+		print_string(child, "SDL_ALARM_RED");
+	if (c->ifalarms & SDL_ALARM_BLU)
+		print_string(child, "SDL_ALARM_BLU");
+	if (c->ifalarms & SDL_ALARM_YEL)
+		print_string(child, "SDL_ALARM_YEL");
+	if (c->ifalarms & SDL_ALARM_REC)
+		print_string(child, "SDL_ALARM_REC");
+	switch (c->iftxlevel) {
+	case SDL_TXLEVEL_NONE:
+		print_string(child, "SDL_TXLEVEL_NONE");
+		break;
+	case SDL_TXLEVEL_DSX_133FT:
+		// case SDL_TXLEVEL_CSU_0DB:
+		// case SDL_TXLEVEL_75OHM_NM:
+		print_string(child, "SDL_TXLEVEL_DSX_133FT");
+		print_string(child, "SDL_TXLEVEL_CSU_0DB");
+		print_string(child, "SDL_TXLEVEL_75OHM_NM");
+		break;
+	case SDL_TXLEVEL_DSX_266FT:
+		// case SDL_TXLEVEL_120OHM_NM:
+		print_string(child, "SDL_TXLEVEL_DSX_266FT");
+		print_string(child, "SDL_TXLEVEL_120OHM_NM");
+		break;
+	case SDL_TXLEVEL_DSX_399FT:
+		// case SDL_TXLEVEL_75OHM_PR:
+		print_string(child, "SDL_TXLEVEL_DSX_399FT");
+		print_string(child, "SDL_TXLEVEL_75OHM_PR");
+		break;
+	case SDL_TXLEVEL_DSX_533FT:
+		// case SDL_TXLEVEL_120OHM_PR:
+		print_string(child, "SDL_TXLEVEL_DSX_533FT");
+		print_string(child, "SDL_TXLEVEL_120OHM_PR");
+		break;
+	case SDL_TXLEVEL_DSX_666FT:
+		// case SDL_TXLEVEL_75OHM_HRL:
+		print_string(child, "SDL_TXLEVEL_DSX_666FT");
+		print_string(child, "SDL_TXLEVEL_75OHM_HRL");
+		break;
+	case SDL_TXLEVEL_CSU_8DB:
+		// case SDL_TXLEVEL_120OHM_HRL:
+		print_string(child, "SDL_TXLEVEL_CSU_8DB");
+		print_string(child, "SDL_TXLEVEL_120OHM_HRL");
+		break;
+	case SDL_TXLEVEL_CSU_15DB:
+		print_string(child, "SDL_TXLEVEL_CSU_15DB");
+		break;
+	case SDL_TXLEVEL_CSU_23DB:
+		print_string(child, "SDL_TXLEVEL_CSU_23DB");
+		break;
+	case SDL_TXLEVEL_MON_0DB:
+		print_string(child, "SDL_TXLEVEL_MON_0DB");
+		break;
+	case SDL_TXLEVEL_MON_12DB:
+		print_string(child, "SDL_TXLEVEL_MOD_12DB");
+		break;
+	case SDL_TXLEVEL_MON_20DB:
+		// case SDL_TXLEVEL_MON_26DB:
+		// case SDL_TXLEVEL_MON_30DB:
+		print_string(child, "SDL_TXLEVEL_MON_20DB");
+		print_string(child, "SDL_TXLEVEL_MON_26DB");
+		print_string(child, "SDL_TXLEVEL_MON_30DB");
+		break;
+	case SDL_TXLEVEL_MON_32DB:
+		print_string(child, "SDL_TXLEVEL_MON_32DB");
+		break;
+	default:
+		print_string(child, "SDL_TXLEVEL_UNKNOWN");
+		break;
+	}
+	print_string_val(child, "ifsync", c->ifsync);
+	print_string_val(child, "ifsyncsrc[0]", c->ifsyncsrc[0]);
+	print_string_val(child, "ifsyncsrc[1]", c->ifsyncsrc[1]);
+	print_string_val(child, "ifsyncsrc[2]", c->ifsyncsrc[2]);
+	print_string_val(child, "ifsyncsrc[3]", c->ifsyncsrc[3]);
+}
+#endif					/* TEST_X400 */
 
 void
 print_sdt_stats(int child, sdt_stats_t * s)
@@ -2440,9 +3404,43 @@ print_sdt_stats(int child, sdt_stats_t * s)
 	if (s->carrier_lost)
 		print_string_val(child, "carrier_lost", s->carrier_lost);
 }
+#if TEST_X400
+void
+print_sdt_config(int child, sdt_config_t * c)
+{
+	print_string_val(child, "t8", c->t8);
+	print_string_val(child, "Tin", c->Tin);
+	print_string_val(child, "Tie", c->Tie);
+	print_string_val(child, "T", c->T);
+	print_string_val(child, "D", c->D);
+	print_string_val(child, "Te", c->Te);
+	print_string_val(child, "De", c->De);
+	print_string_val(child, "Ue", c->Ue);
+	print_string_val(child, "N", c->N);
+	print_string_val(child, "m", c->m);
+	print_string_val(child, "b", c->b);
+	switch (c->f) {
+	case SDT_FLAGS_ONE:
+		print_string(child, "SDT_FLAGS_ONE");
+		break;
+	case SDT_FLAGS_SHARED:
+		print_string(child, "SDT_FLAGS_SHARED");
+		break;
+	case SDT_FLAGS_TWO:
+		print_string(child, "SDT_FLAGS_TWO");
+		break;
+	case SDT_FLAGS_THREE:
+		print_string(child, "SDT_FLAGS_THREE");
+		break;
+	default:
+		print_string_val(child, "f", c->f);
+		break;
+	}
+}
+#endif					/* TEST_X400 */
 
 void
-print_sl_stats(int child, sl_stats_t * s)
+print_sl_stats(int child, sl_stats_t *s)
 {
 	if (s->sl_dur_in_service)
 		print_string_val(child, "sl_dur_in_service", s->sl_dur_in_service);
@@ -2489,6 +3487,37 @@ print_sl_stats(int child, sl_stats_t * s)
 	if (s->sl_cong_discd_ind[3])
 		print_string_val(child, "sl_cong_discd_ind[3]", s->sl_cong_discd_ind[3]);
 }
+#if TEST_X400
+void
+print_sl_config(int child, sl_config_t * c)
+{
+	print_string_val(child, "t1", c->t1);
+	print_string_val(child, "t2", c->t2);
+	print_string_val(child, "t2l", c->t2l);
+	print_string_val(child, "t2h", c->t2h);
+	print_string_val(child, "t3", c->t3);
+	print_string_val(child, "t4n", c->t4n);
+	print_string_val(child, "t4e", c->t4e);
+	print_string_val(child, "t5", c->t5);
+	print_string_val(child, "t6", c->t6);
+	print_string_val(child, "t7", c->t7);
+	print_string_val(child, "rb_abate", c->rb_abate);
+	print_string_val(child, "rb_accept", c->rb_accept);
+	print_string_val(child, "rb_discard", c->rb_discard);
+	print_string_val(child, "tb_abate_1", c->tb_abate_1);
+	print_string_val(child, "tb_onset_1", c->tb_onset_1);
+	print_string_val(child, "tb_discd_1", c->tb_discd_1);
+	print_string_val(child, "tb_abate_2", c->tb_abate_2);
+	print_string_val(child, "tb_onset_2", c->tb_onset_2);
+	print_string_val(child, "tb_discd_2", c->tb_discd_2);
+	print_string_val(child, "tb_abate_3", c->tb_abate_3);
+	print_string_val(child, "tb_onset_3", c->tb_onset_3);
+	print_string_val(child, "tb_discd_3", c->tb_discd_3);
+	print_string_val(child, "N1", c->N1);
+	print_string_val(child, "N2", c->N2);
+	print_string_val(child, "M", c->M);
+}
+#endif					/* TEST_X400 */
 
 #if TEST_M2PA
 const char *
@@ -2563,7 +3592,9 @@ state_string(np_ulong state)
 		return ("(unknown)");
 	}
 }
+#endif				/* TEST_M2PA */
 
+#if TEST_M2PA || TEST_M2UA
 #ifndef SCTP_VERSION_2
 void
 print_addr(char *add_ptr, size_t add_len)
@@ -2715,7 +3746,7 @@ print_prots(int child, char *pro_ptr, size_t pro_len)
 	}
 }
 
-#if 0
+#if TEST_M2UA
 char *
 status_string(struct t_opthdr *oh)
 {
@@ -3118,7 +4149,7 @@ value_string(int child, struct t_opthdr *oh)
 }
 #endif
 
-#if 0
+#if TEST_M2UA
 void
 parse_options(int fd, char *opt_ptr, size_t opt_len)
 {
@@ -3175,7 +4206,7 @@ mgmtflag_string(t_uscalar_t flag)
 	return "(unknown flag)";
 }
 #endif				/* TEST_M2UA */
-#if TEST_M2PA
+#if TEST_M2PA || TEST_X400
 const char *
 mgmtflag_string(np_ulong flag)
 {
@@ -3188,7 +4219,7 @@ mgmtflag_string(np_ulong flag)
 		return ("(unknown flags)");
 	}
 }
-#endif				/* TEST_M2PA */
+#endif				/* TEST_M2PA || TEST_X400 */
 
 #if TEST_M2UA
 char *
@@ -3208,8 +4239,10 @@ size_string(t_uscalar_t size)
 	return buf;
 }
 #endif
+#endif				/* TEST_M2PA || TEST_M2UA */
 
 #if TEST_M2UA
+#if 0
 const char *
 prim_string(t_uscalar_t prim)
 {
@@ -3278,7 +4311,10 @@ prim_string(t_uscalar_t prim)
 		return ("T_????_??? -----");
 	}
 }
+#endif
+#endif				/* TEST_M2UA */
 
+#if TEST_M2UA
 char *
 t_errno_string(t_scalar_t err, t_scalar_t syserr)
 {
@@ -3388,6 +4424,7 @@ t_look_string(int look)
 }
 #endif				/* TEST_M2UA */
 
+#if TEST_M2PA
 const char *
 reset_reason_string(np_ulong RESET_reason)
 {
@@ -3673,6 +4710,68 @@ prim_string(int prim)
 	case N_DATACK_IND:
 		return ("N_DATACK_IND----");
 #endif				/* TEST_M2PA */
+#if TEST_M2UA
+	case T_CONN_REQ:
+		return ("T_CONN_REQ------");
+	case T_CONN_RES:
+		return ("T_CONN_RES------");
+	case T_DISCON_REQ:
+		return ("T_DISCON_REQ----");
+	case T_DATA_REQ:
+		return ("T_DATA_REQ------");
+	case T_EXDATA_REQ:
+		return ("T_EXDATA_REQ----");
+	case T_INFO_REQ:
+		return ("T_INFO_REQ------");
+	case T_BIND_REQ:
+		return ("T_BIND_REQ------");
+	case T_UNBIND_REQ:
+		return ("T_UNBIND_REQ----");
+	case T_UNITDATA_REQ:
+		return ("T_UNITDATA_REQ--");
+	case T_OPTMGMT_REQ:
+		return ("T_OPTMGMT_REQ---");
+	case T_ORDREL_REQ:
+		return ("T_ORDREL_REQ----");
+	case T_OPTDATA_REQ:
+		return ("T_OPTDATA_REQ---");
+	case T_ADDR_REQ:
+		return ("T_ADDR_REQ------");
+	case T_CAPABILITY_REQ:
+		return ("T_CAPABILITY_REQ");
+	case T_CONN_IND:
+		return ("T_CONN_IND------");
+	case T_CONN_CON:
+		return ("T_CONN_CON------");
+	case T_DISCON_IND:
+		return ("T_DISCON_IND----");
+	case T_DATA_IND:
+		return ("T_DATA_IND------");
+	case T_EXDATA_IND:
+		return ("T_EXDATA_IND----");
+	case T_INFO_ACK:
+		return ("T_INFO_ACK------");
+	case T_BIND_ACK:
+		return ("T_BIND_ACK------");
+	case T_ERROR_ACK:
+		return ("T_ERROR_ACK-----");
+	case T_OK_ACK:
+		return ("T_OK_ACK--------");
+	case T_UNITDATA_IND:
+		return ("T_UNITDATA_IND--");
+	case T_UDERROR_IND:
+		return ("T_UDERROR_IND---");
+	case T_OPTMGMT_ACK:
+		return ("T_OPTMGMT_ACK---");
+	case T_ORDREL_IND:
+		return ("T_ORDREL_IND----");
+	case T_OPTDATA_IND:
+		return ("T_OPTDATA_IND---");
+	case T_ADDR_ACK:
+		return ("T_ADDR_ACK------");
+	case T_CAPABILITY_ACK:
+		return ("T_CAPABILITY_ACK");
+#endif				/* TEST_M2UA */
 	case SL_REMOTE_PROCESSOR_OUTAGE_IND:
 		return ("!rpo");
 	case SL_REMOTE_PROCESSOR_RECOVERED_IND:
@@ -4247,6 +5346,7 @@ print_rx_msg_sn(int child, const char *string, uint32_t bsn, uint32_t fsn)
 		print_string_state_sn(child, msgs, string, bsn, fsn);
 }
 
+#if TEST_X400 || TEST_M2PA
 void
 print_tx_msg(int child, const char *string)
 {
@@ -4324,6 +5424,7 @@ print_rx_msg(int child, const char *string)
 #endif				/* TEST_M2PA */
 	}
 }
+#endif				/* TEST_X400 || TEST_M2PA */
 
 void
 print_ack_prim(int child, const char *command)
@@ -4757,6 +5858,43 @@ print_opt_value(int child, struct t_opthdr *oh)
 }
 #endif				/* TEST_M2UA */
 
+#if TEST_M2UA
+void
+print_options(int child, const char *cmd_buf, size_t opt_ofs, size_t opt_len)
+{
+	struct t_opthdr *oh;
+	const char *opt_ptr = cmd_buf + opt_ofs;
+	char buf[64];
+
+	if (verbose < 4)
+		return;
+	snprintf(buf, sizeof(buf), "opt len = %lu", (ulong) opt_len);
+	print_string(child, buf);
+	snprintf(buf, sizeof(buf), "opt ofs = %lu", (ulong) opt_ofs);
+	print_string(child, buf);
+	oh = _T_OPT_FIRSTHDR_OFS(opt_ptr, opt_len, 0);
+	if (oh) {
+		for (; oh; oh = _T_OPT_NEXTHDR_OFS(opt_ptr, opt_len, oh, 0)) {
+			int len = oh->len - sizeof(*oh);
+
+			print_opt_level(child, oh);
+			print_opt_name(child, oh);
+			print_opt_status(child, oh);
+			print_opt_length(child, oh);
+			if (len < 0)
+				break;
+			print_opt_value(child, oh);
+		}
+	} else {
+		oh = (typeof(oh)) opt_ptr;
+		print_opt_level(child, oh);
+		print_opt_name(child, oh);
+		print_opt_status(child, oh);
+		print_opt_length(child, oh);
+	}
+}
+#endif				/* TEST_M2UA */
+
 #if 0
 void
 print_options(int child, const char *cmd_buf, size_t qos_ofs, size_t qos_len)
@@ -4841,7 +5979,7 @@ print_options(int child, const char *cmd_buf, size_t qos_ofs, size_t qos_len)
 
 #if TEST_M2PA
 void
-print_info(int child, N_info_ack_t * info)
+print_info(int child, N_info_ack_t *info)
 {
 	char buf[64];
 
@@ -4938,6 +6076,36 @@ ip_datack_req(int fd)
 	return (ret);
 }
 #endif
+#if TEST_M2UA
+void
+print_info(int child, struct T_info_ack *info)
+{
+	char buf[64];
+
+	if (verbose < 4)
+		return;
+	snprintf(buf, sizeof(buf), "TSDU  = %ld", (long) info->TSDU_size);
+	print_string(child, buf);
+	snprintf(buf, sizeof(buf), "ETSDU = %ld", (long) info->ETSDU_size);
+	print_string(child, buf);
+	snprintf(buf, sizeof(buf), "CDATA = %ld", (long) info->CDATA_size);
+	print_string(child, buf);
+	snprintf(buf, sizeof(buf), "DDATA = %ld", (long) info->DDATA_size);
+	print_string(child, buf);
+	snprintf(buf, sizeof(buf), "ADDR  = %ld", (long) info->ADDR_size);
+	print_string(child, buf);
+	snprintf(buf, sizeof(buf), "OPT   = %ld", (long) info->OPT_size);
+	print_string(child, buf);
+	snprintf(buf, sizeof(buf), "TIDU  = %ld", (long) info->TIDU_size);
+	print_string(child, buf);
+	snprintf(buf, sizeof(buf), "<%s>", service_type(info->SERV_type));
+	print_string(child, buf);
+	snprintf(buf, sizeof(buf), "<%s>", state_string(info->CURRENT_state));
+	print_string(child, buf);
+	snprintf(buf, sizeof(buf), "PROV  = %ld", (long) info->PROVIDER_flag);
+	print_string(child, buf);
+}
+#endif				/* TEST_M2UA */
 
 /*
  *  -------------------------------------------------------------------------
@@ -5671,6 +6839,12 @@ test_pop(int child)
  *  -------------------------------------------------------------------------
  */
 
+/*
+ *  For M2UA, for diagramtic purposes, stream 0 is the SG stream (PTU); stream 1 and 2 are AS
+ *  streams (IUT).  Stream 0 starts as a listening SCTP stream (unless server connects is
+ *  specified).
+ */
+
 static int
 stream_start(int child, int index)
 {
@@ -5765,9 +6939,84 @@ test_msleep(int child, unsigned long m)
  *  -------------------------------------------------------------------------
  */
 
+/*
+ * First step is to perform an I_PUNLINK operation with MUXID_ALL on the m2ua-as to remove any
+ * previous linked streams from a previous failed test case run.  To begin tests requires the
+ * opening of an sctp_t stream for the ASP and an sctp_t stream for the SG.  The ASP stream connects
+ * and the SG stream listens (unless reversed with options).  Once the ASP stream is connecting to
+ * the SG stream, the ASP stream is I_PLINKed under the the m2ua-as driver and configured at SG
+ * position 1.  Then the two AS streams are opened on m2ua-as.  Then, children test case processes
+ * are spawned and the test proceeds.  Once the test case completes, the AS and SCTP streams are
+ * closed.  An m2ua-as stream is opened and an I_PUNLINK operation with the muxid of the linked
+ * stream used to unlink the previously linked SCTP stream.  Another possibility is to allow the
+ * linked SCTP to attempt to reconnect until it is successful.
+ */
+
 static int
 begin_tests(int index)
 {
+#if TEST_X400
+	switch (ss7_pvar) {
+	case SS7_PVAR_ITUT_88:
+	case SS7_PVAR_ITUT_93:
+	case SS7_PVAR_ITUT_96:
+	case SS7_PVAR_ITUT_00:
+	case SS7_PVAR_ETSI_88:
+	case SS7_PVAR_ETSI_93:
+	case SS7_PVAR_ETSI_96:
+	case SS7_PVAR_ETSI_00:
+	case SS7_PVAR_SING | SS7_PVAR_88:
+	case SS7_PVAR_SPAN | SS7_PVAR_88:
+	case SS7_PVAR_CHIN_00:
+	default:
+		if (iut_test_chan == 0) {
+			config->opt = lmi_default_e1_span;
+			config->sl = sl_default_e1_span;
+			config->sdt = sdt_default_e1_span;
+			config->sdl = sdl_default_e1_span;
+		} else {
+			config->opt = lmi_default_e1_chan;
+			config->sl = sl_default_e1_chan;
+			config->sdt = sdt_default_e1_chan;
+			config->sdl = sdl_default_e1_chan;
+		}
+		break;
+	case SS7_PVAR_ANSI_92:
+	case SS7_PVAR_ANSI_96:
+	case SS7_PVAR_ANSI_00:
+		if (iut_test_chan == 0) {
+			config->opt = lmi_default_t1_span;
+			config->sl = sl_default_t1_span;
+			config->sdt = sdt_default_t1_span;
+			config->sdl = sdl_default_t1_span;
+		} else {
+			config->opt = lmi_default_t1_chan;
+			config->sl = sl_default_t1_chan;
+			config->sdt = sdt_default_t1_chan;
+			config->sdl = sdl_default_t1_chan;
+		}
+		break;
+	case SS7_PVAR_JTTC_94:
+		if (iut_test_chan == 0) {
+			config->opt = lmi_default_j1_span;
+			config->sl = sl_default_j1_span;
+			config->sdt = sdt_default_j1_span;
+			config->sdl = sdl_default_j1_span;
+		} else {
+			config->opt = lmi_default_j1_chan;
+			config->sl = sl_default_j1_chan;
+			config->sdt = sdt_default_j1_chan;
+			config->sdl = sdl_default_j1_chan;
+		}
+		break;
+	}
+	config->opt.pvar = ss7_pvar;
+#endif				/* TEST_X400 */
+#if TEST_M2PA
+	config->sl = sl_default_m2pa;
+	config->sdt = sdt_default_m2pa;
+	config->sdl = sdl_default_m2pa;
+#endif				/* TEST_M2PA */
 	state = 0;
 	if (stream_start(0, index) != __RESULT_SUCCESS)
 		goto failure;
@@ -6626,7 +7875,8 @@ do_signal(int child, int action)
 
 	case __TEST_POWER_ON:
 		if (child == CHILD_PTU) {
-#ifndef TEST_M2PA
+#if TEST_M2PA
+#else
 			ctrl->len = sizeof(p->sdt.daedt_start_req);
 			p->sdt.daedt_start_req.sdt_primitive = SDT_DAEDT_START_REQ;
 			data = NULL;
@@ -6643,7 +7893,7 @@ do_signal(int child, int action)
 			test_pband = 0;
 		}
 		print_command_state(child, ":power on");
-#ifdef TEST_M2PA
+#if TEST_M2PA
 		if (child != CHILD_PTU)
 			return test_putpmsg(child, ctrl, data, test_pband, test_pflags);
 		return __RESULT_SUCCESS;
@@ -6919,6 +8169,30 @@ do_signal(int child, int action)
 			if (show && verbose > 1)
 				print_sdl_stats(child, &stats->sdl);
 		return (err);
+#if TEST_X400
+	case __TEST_SDL_GOPTIONS:
+		if (show && verbose > 1)
+			print_command_state(child, "!options sdl");
+		ic.ic_cmd = SDL_IOCGOPTIONS;
+		ic.ic_timout = 0;
+		ic.ic_len = sizeof(config->opt);
+		ic.ic_dp = (char *) &config->opt;
+		if (!(err = test_ioctl(child, I_STR, (intptr_t) &ic)))
+			if (show && verbose > 1)
+				print_lmi_options(child, &config->opt);
+		return (err);
+	case __TEST_SDL_GCONFIG:
+		if (show && verbose > 1)
+			print_command_state(child, "!config sdl");
+		ic.ic_cmd = SDL_IOCGCONFIG;
+		ic.ic_timout = 0;
+		ic.ic_len = sizeof(config->sdl);
+		ic.ic_dp = (char *) &config->sdl;
+		if (!(err = test_ioctl(child, I_STR, (intptr_t) &ic)))
+			if (show && verbose > 1)
+				print_sdl_config(child, &config->sdl);
+		return (err);
+#endif				/* TEST_X400 */
 	case __TEST_SDT_OPTIONS:
 		if (show && verbose > 1)
 			print_command_state(child, ":options sdt");
@@ -6946,6 +8220,30 @@ do_signal(int child, int action)
 			if (show && verbose > 1)
 				print_sdt_stats(child, &stats->sdt);
 		return (err);
+#if TEST_X400
+	case __TEST_SDT_GOPTIONS:
+		if (show && verbose > 1)
+			print_command_state(child, "!options sdt");
+		ic.ic_cmd = SDT_IOCGOPTIONS;
+		ic.ic_timout = 0;
+		ic.ic_len = sizeof(config->opt);
+		ic.ic_dp = (char *) &config->opt;
+		if (!(err = test_ioctl(child, I_STR, (intptr_t) &ic)))
+			if (show && verbose > 1)
+				print_lmi_options(child, &config->opt);
+		return (err);
+	case __TEST_SDT_GCONFIG:
+		if (show && verbose > 1)
+			print_command_state(child, "!config sdt");
+		ic.ic_cmd = SDT_IOCGCONFIG;
+		ic.ic_timout = 0;
+		ic.ic_len = sizeof(config->sdt);
+		ic.ic_dp = (char *) &config->sdt;
+		if (!(err = test_ioctl(child, I_STR, (intptr_t) &ic)))
+			if (show && verbose > 1)
+				print_sdt_config(child, &config->sdt);
+		return (err);
+#endif				/* TEST_X400 */
 	case __TEST_SL_OPTIONS:
 		if (show && verbose > 1)
 			print_command_state(child, ":options sl");
@@ -6973,7 +8271,30 @@ do_signal(int child, int action)
 			if (show && verbose > 1)
 				print_sl_stats(child, &stats->sl);
 		return (err);
-
+#if TEST_X400
+	case __TEST_SL_GOPTIONS:
+		if (show && verbose > 1)
+			print_command_state(child, "!options sl");
+		ic.ic_cmd = SL_IOCGOPTIONS;
+		ic.ic_timout = 0;
+		ic.ic_len = sizeof(config->opt);
+		ic.ic_dp = (char *) &config->opt;
+		if (!(err = test_ioctl(child, I_STR, (intptr_t) &ic)))
+			if (show && verbose > 1)
+				print_lmi_options(child, &config->opt);
+		return (err);
+	case __TEST_SL_GCONFIG:
+		if (show && verbose > 1)
+			print_command_state(child, "!config sl");
+		ic.ic_cmd = SL_IOCGCONFIG;
+		ic.ic_timout = 0;
+		ic.ic_len = sizeof(config->sl);
+		ic.ic_dp = (char *) &config->sl;
+		if (!(err = test_ioctl(child, I_STR, (intptr_t) &ic)))
+			if (show && verbose > 1)
+				print_sl_config(child, &config->sl);
+		return (err);
+#endif				/* TEST_X400 */
 	case __TEST_ATTACH_REQ:
 		ctrl->len = sizeof(p->lmi.attach_req) + (ADDR_buffer ? ADDR_length : 0);
 		p->lmi.attach_req.lmi_primitive = LMI_ATTACH_REQ;
@@ -6993,7 +8314,9 @@ do_signal(int child, int action)
 			print_addrs(child, cbuf + sizeof(p->lmi.attach_req), ADDR_length);
 #endif
 #else				/* TEST_M2PA */
+#if TEST_X400
 			print_ppa(child, (ppa_t *) p->lmi.attach_req.lmi_ppa);
+#endif				/* TEST_X400 */
 #endif				/* TEST_M2PA */
 		}
 		return test_putpmsg(child, ctrl, data, test_pband, test_pflags);
@@ -7025,7 +8348,9 @@ do_signal(int child, int action)
 			print_addrs(child, cbuf + sizeof(p->lmi.enable_req), ADDR_length);
 #endif
 #else				/* TEST_M2PA */
+#if TEST_X400
 			print_ppa(child, (ppa_t *) p->lmi.enable_req.lmi_rem);
+#endif				/* TEST_X400 */
 #endif				/* TEST_M2PA */
 		}
 		return test_putpmsg(child, ctrl, data, test_pband, test_pflags);
@@ -7131,7 +8456,10 @@ static int
 do_decode_data(int child, struct strbuf *ctrl, struct strbuf *data)
 {
 	int event = __RESULT_DECODE_ERROR;
+
+#if TEST_X400 || TEST_M2PA
 	int other = (child + 1) % 2;
+#endif				/* TEST_X400 || TEST_M2PA */
 
 	if (data->len >= 0) {
 		switch (child) {
@@ -7672,22 +9000,19 @@ do_decode_ctrl(int child, struct strbuf *ctrl, struct strbuf *data)
 			DATA_xfer_flags = p->npi.data_ind.DATA_xfer_flags;
 			print_rx_prim(child, prim_string(p->npi.type));
 			sid[child] = ((N_qos_sel_data_sctp_t *) (cbuf + sizeof(p->npi.data_ind)))->sid;
-			// print_options(child, cbuf, sizeof(p->npi.data_ind),
-			// sizeof(N_qos_sel_data_sctp_t));
+			//print_options(child, cbuf, sizeof(p->npi.data_ind), sizeof(N_qos_sel_data_sctp_t));
 			break;
 		case N_EXDATA_IND:
 			event = __TEST_EXDATA_IND;
 			print_rx_prim(child, prim_string(p->npi.type));
 			sid[child] = ((N_qos_sel_data_sctp_t *) (cbuf + sizeof(p->npi.exdata_ind)))->sid;
-			// print_options(child, cbuf, sizeof(p->npi.exdata_ind),
-			// sizeof(N_qos_sel_data_sctp_t));
+			//print_options(child, cbuf, sizeof(p->npi.exdata_ind), sizeof(N_qos_sel_data_sctp_t));
 			break;
 		case N_DATACK_IND:
 			event = __TEST_DATACK_IND;
 			print_rx_prim(child, prim_string(p->npi.type));
 			sid[child] = ((N_qos_sel_data_sctp_t *) (cbuf + sizeof(p->npi.datack_ind)))->sid;
-			// print_options(child, cbuf, sizeof(p->npi.datack_ind),
-			// sizeof(N_qos_sel_data_sctp_t));
+			//print_options(child, cbuf, sizeof(p->npi.datack_ind), sizeof(N_qos_sel_data_sctp_t));
 			break;
 		case N_INFO_ACK:
 			event = __TEST_INFO_ACK;
@@ -8380,6 +9705,10 @@ preamble_attach(int child)
 		state++;
 		if (expect(child, NORMAL_WAIT, __TEST_OK_ACK))
 			failed = failed ? : state;
+		if (failed) {
+			state = failed;
+			goto failure;
+		}
 	}
 #if TEST_M2PA
 	if (child == CHILD_PTU) {
@@ -8419,10 +9748,56 @@ preamble_config(int child)
 		if (do_signal(child, __TEST_SL_CONFIG))
 			goto failure;
 	}
+#if TEST_X400
+	if (child == CHILD_PTU) {
+		if (do_signal(child, __TEST_SDT_OPTIONS))
+			goto failure;
+		if (do_signal(child, __TEST_SDT_CONFIG))
+			goto failure;
+	}
+#endif
 	return __RESULT_SUCCESS;
       failure:
 	return __RESULT_FAILURE;
 }
+
+#if TEST_X400
+static int
+postamble_config(int child)
+{
+	int failed = 0;
+
+	if (child != CHILD_PTU) {
+		state++;
+		if (do_signal(child, __TEST_SL_GOPTIONS))
+			failed = failed ? : state;
+		state++;
+		if (do_signal(child, __TEST_SL_GCONFIG))
+			failed = failed ? : state;
+	}
+	state++;
+#if TEST_X400
+	if (do_signal(child, __TEST_SDT_GOPTIONS))
+		failed = failed ? : state;
+	state++;
+	if (do_signal(child, __TEST_SDT_GCONFIG))
+		failed = failed ? : state;
+	state++;
+	if (do_signal(child, __TEST_SDL_GOPTIONS))
+		failed = failed ? : state;
+	state++;
+	if (do_signal(child, __TEST_SDL_GCONFIG))
+		failed = failed ? : state;
+#endif				/* TEST_X400 */
+	if (failed) {
+		state = failed;
+		goto failure;
+	}
+	return __RESULT_SUCCESS;
+      failure:
+	return __RESULT_FAILURE;
+}
+#endif				/* TEST_X400 */
 
 static int
 postamble_detach(int child)
@@ -8522,6 +9897,10 @@ postamble_disable(int child)
 {
 	int failed = 0;
 
+#if TEST_X400
+	if (postamble_config(child))
+		failed = failed ? : state;
+#endif				/* TEST_X400 */
 	state++;
 #if TEST_M2PA
 	if (child == CHILD_IUT)
@@ -8926,16 +10305,18 @@ struct test_stream {
 	int (*postamble) (int);		/* test postamble */
 };
 
-#if TEST_X400
 static int
 check_snibs(int child, unsigned char bsnib, unsigned char fsnib)
 {
+#if TEST_X400
 	print_rx_msg_sn(child, "check b/f sn/ib", bsnib, fsnib);
 	if ((bib[1] | bsn[1]) == bsnib && (fib[1] | fsn[1]) == fsnib)
 		return __RESULT_SUCCESS;
 	return __RESULT_FAILURE;
-}
+#else
+	return __RESULT_SUCCESS;
 #endif
+}
 
 /*
  *  Check test case guard timer.
@@ -9208,6 +10589,9 @@ test_power_on_pt(int child)
 		if (expect(child, INFINITE_WAIT, __STATUS_OUT_OF_SERVICE))
 			goto failure;
 		state++;
+		if (check_snibs(child, 0xff, 0xff))
+			goto failure;
+		state++;
 		test_msleep(child, LONG_WAIT);
 		break;
 	case CHILD_IUT:
@@ -9272,6 +10656,9 @@ test_power_on_sut(int child)
 		if (expect(child, INFINITE_WAIT, __STATUS_OUT_OF_SERVICE))
 			goto failure;
 		state++;
+		if (check_snibs(child, 0xff, 0xff))
+			goto failure;
+		state++;
 		test_msleep(child, LONG_WAIT);
 		break;
 	case CHILD_IUT:
@@ -9332,6 +10719,9 @@ test_out_of_service_sut(int child)
 			goto failure;
 		state++;
 		if (expect(child, INFINITE_WAIT, __STATUS_OUT_OF_SERVICE))
+			goto failure;
+		state++;
+		if (check_snibs(child, 0xff, 0xff))
 			goto failure;
 		state++;
 		test_msleep(child, LONG_WAIT);
@@ -14882,6 +16272,10 @@ test_4_1a_11_ptu(int child)
 					goto failure;
 				break;
 			case __TEST_ACK:
+#if TEST_X400
+				if (bsn[1] != fsn[0] - 1 && bsn[1] != fsn[0])
+					continue;
+#endif				/* TEST_X400 */
 				if (ack == 0) {
 					ack++;
 					if (dat != 2)
@@ -14984,6 +16378,10 @@ test_4_1a_11_iut(int child)
 	if (expect(child, INFINITE_WAIT, __EVENT_IUT_DATA))
 		goto failure;
 	state++;
+#if TEST_X400
+	test_msleep(child, NORMAL_WAIT);
+	state++;
+#endif				/* TEST_X400 */
 	if (do_signal(child, __TEST_LPO))
 		goto failure;
 	state++;
@@ -17079,8 +18477,15 @@ test_8_1_ptu(int child)
 				goto failure;
 			state++;
 		case 1:
-			if (expect(child, INFINITE_WAIT, __TEST_ACK))
+			if (expect(child, INFINITE_WAIT, __TEST_ACK)) {
+#if TEST_X400
+				if (last_event == __TEST_MSU) {
+					state++;
+					goto got_msu;
+				}
+#endif				/* TEST_X400 */
 				goto failure;
+			}
 #if TEST_X400
 			if ((bib[1] | bsn[1]) == 0xff && (fib[1] | fsn[1]) == 0xff) {
 				if (do_signal(child, __TEST_FISU))
@@ -17107,6 +18512,7 @@ test_8_1_ptu(int child)
 				goto failure;
 			}
 #if TEST_X400
+		      got_msu:
 			if (check_snibs(child, 0x80, 0x80))
 				goto failure;
 			if (do_signal(child, __TEST_FISU))
@@ -17541,7 +18947,6 @@ test_8_4_ptu(int child)
 			if (do_signal(child, __TEST_ACK))
 				goto failure;
 			state++;
-			continue;
 		case 1:
 			switch (get_event(child)) {
 			case __TEST_DATA:
@@ -17622,11 +19027,13 @@ test_8_5_ptu(int child)
 {
 	int origin = state;
 
+#if TEST_M2PA
 	switch (m2pa_version) {
 	case M2PA_VERSION_DRAFT3:
 	case M2PA_VERSION_DRAFT3_1:
 		return __RESULT_NOTAPPL;	/* can't do this */
 	}
+#endif				/* TEST_M2PA */
 	for (;;) {
 		switch (state - origin) {
 		case 0:
@@ -18203,11 +19610,13 @@ test_8_10_ptu(int child)
 {
 	int origin = state;
 
+#if TEST_M2PA
 	switch (m2pa_version) {
 	case M2PA_VERSION_DRAFT3:
 	case M2PA_VERSION_DRAFT3_1:
 		return __RESULT_NOTAPPL;	/* can't do this */
 	}
+#endif				/* TEST_M2PA */
 	for (;;) {
 		switch (state - origin) {
 		case 0:
@@ -18729,11 +20138,13 @@ test_8_14_ptu(int child)
 static int
 test_8_14_iut(int child)
 {
+#if TEST_M2PA
 	switch (m2pa_version) {
 	case M2PA_VERSION_DRAFT3:
 	case M2PA_VERSION_DRAFT3_1:
 		return __RESULT_NOTAPPL;	/* can't do this */
 	}
+#endif				/* TEST_M2PA */
 	if (expect(child, INFINITE_WAIT, __EVENT_IUT_DATA))
 		goto failure;
 	state++;
@@ -21495,12 +22906,12 @@ Symbols:\n\
         SS7_PVAR_ITUT_96  SS7_PVAR_ETSI_96  SS7_PVAR_ANSI_96\n\
         SS7_PVAR_ITUT_00  SS7_PVAR_ETSI_00  SS7_PVAR_ANSI_00  SS7_PVAR_CHIN_00\n\
     [DRAFT]\n\
-	M2PA_VERSION_DRAFT3   M2PA_VERSION_DRAFT3_1\n\
-	M2PA_VERSION_DRAFT4   M2PA_VERSION_DRAFT4_1   M2PA_VERSION_DRAFT4_9\n\
-	M2PA_VERSION_DRAFT5   M2PA_VERSION_DRAFT5_1\n\
-	M2PA_VERSION_DRAFT6   M2PA_VERSION_DRAFT6_1   M2PA_VERSION_DRAFT6_9\n\
-	M2PA_VERSION_DRAFT7   M2PA_VERSION_DRAFT9     M2PA_VERSION_DRAFT10\n\
-	M2PA_VERSION_DRAFT11  M2PA_VERSION_RFC4165\n\
+        M2PA_VERSION_DRAFT3   M2PA_VERSION_DRAFT3_1\n\
+        M2PA_VERSION_DRAFT4   M2PA_VERSION_DRAFT4_1   M2PA_VERSION_DRAFT4_9\n\
+        M2PA_VERSION_DRAFT5   M2PA_VERSION_DRAFT5_1\n\
+        M2PA_VERSION_DRAFT6   M2PA_VERSION_DRAFT6_1   M2PA_VERSION_DRAFT6_9\n\
+        M2PA_VERSION_DRAFT7   M2PA_VERSION_DRAFT9     M2PA_VERSION_DRAFT10\n\
+        M2PA_VERSION_DRAFT11  M2PA_VERSION_RFC4165\n\
 \n\
 ", argv[0], devname, TEST_PORT_NUMBER);
 }
@@ -21536,9 +22947,11 @@ main(int argc, char *argv[])
 		int option_index = 0;
 		/* *INDENT-OFF* */
 		static struct option long_options[] = {
+#if TEST_M2UA
 			{"iids",	required_argument,	NULL, 'T'},
 			{"text",	required_argument,	NULL, 'T'},
 			{"aspid",	required_argument,	NULL, 'A'},
+#endif				/* TEST_M2UA */
 			{"iut",		no_argument,		NULL, 'u'},
 			{"draft",	required_argument,	NULL, 'D'},
 			{"decl-std",	required_argument,	NULL, 'F'},
@@ -21546,14 +22959,25 @@ main(int argc, char *argv[])
 			{"server",	no_argument,		NULL, 'S'},
 			{"again",	no_argument,		NULL, 'a'},
 			{"wait",	no_argument,		NULL, 'w'},
+#if TEST_X400
+			{"iut-card",	required_argument,	NULL, 'k'},
+			{"ptu-card",	required_argument,	NULL, 'K'},
+			{"iut-span",	required_argument,	NULL, 'p'},
+			{"ptu-span",	required_argument,	NULL, 'P'},
+			{"iut-chan",	required_argument,	NULL, 'i'},
+			{"ptu-chan",	required_argument,	NULL, 'I'},
+#elif TEST_M2PA || TEST_M2UA
 			{"client-port",	required_argument,	NULL, 'p'},
 			{"server-port",	required_argument,	NULL, 'P'},
 			{"client-host",	required_argument,	NULL, 'i'},
 			{"server-host",	required_argument,	NULL, 'I'},
+#endif
 			{"repeat",	no_argument,		NULL, 'r'},
 			{"repeat-fail",	no_argument,		NULL, 'R'},
 			{"device",	required_argument,	NULL, 'd'},
+#if TEST_M2PA || TEST_M2UA
 			{"transport",	required_argument,	NULL, 'x'},
+#endif				/* TEST_M2PA || TEST_M2UA */
 			{"exit",	no_argument,		NULL, 'e'},
 			{"list",	optional_argument,	NULL, 'l'},
 			{"fast",	optional_argument,	NULL, 'f'},
@@ -21571,9 +22995,17 @@ main(int argc, char *argv[])
 		};
 		/* *INDENT-ON* */
 
+#if TEST_M2PA || TEST_M2UA
 		c = getopt_long(argc, argv, "T:A:uD:F:cSawp:P:i:I:rRd:x:el::f::so:t:mqvhVC?", long_options, &option_index);
+#elif TEST_X400
+		c = getopt_long(argc, argv, "uF:cSawk:K:p:P:i:I:rRd:el::f::so:t:mqvhVC?", long_options, &option_index);
+#endif
 #else				/* defined _GNU_SOURCE */
+#if TEST_M2PA || TEST_M2UA
 		c = getopt(argc, argv, "T:A:uD:F:cSawp:P:i:I:rRd:x:el::f::so:t:mqvhVC?");
+#elif TEST_X400
+		c = getopt(argc, argv, "uF:cSawk:K:p:P:i:I:rRd:el::f::so:t:mqvhVC?");
+#endif
 #endif				/* defined _GNU_SOURCE */
 		if (c == -1)
 			break;
@@ -21590,12 +23022,12 @@ main(int argc, char *argv[])
 			if (strtoul(optarg, NULL, 0) != 0)
 				iids[0].num = strtoul(optarg, NULL, 0);
 			else
-				iids[0].text = strncpy(iids[0].text, optarg, sizeof(iids[0].text));
+				strncpy(iids[0].text, optarg, sizeof(iids[0].text));
 			if (token) {
 				if (strtoul(token, NULL, 0) != 0)
 					iids[1].num = strtoul(token, NULL, 0);
 				else
-					iids[1].text = strncpy(iids[1].text, token, sizeof(iids[1].text));
+					strncpy(iids[1].text, token, sizeof(iids[1].text));
 				token--;
 				token[0] = ',';
 			}
@@ -21608,6 +23040,7 @@ main(int argc, char *argv[])
 		case 'u':	/* -u, --iut */
 			iut_connects = 1;
 			break;
+#if TEST_X400 || TEST_M2PA
 		case 'F':	/* -F, --decl-std */
 			ss7_pvar = strtoul(optarg, NULL, 0);
 			switch (ss7_pvar) {
@@ -21662,8 +23095,10 @@ main(int argc, char *argv[])
 					goto bad_option;
 			}
 			break;
+#endif				/* TEST_X400 || TEST_M2PA */
 #if TEST_M2PA || TEST_M2UA
 		case 'D':	/* -D, --draft */
+#if TEST_M2PA
 			m2pa_version = strtoul(optarg, NULL, 0);
 			switch (m2pa_version) {
 			case M2PA_VERSION_DRAFT3:
@@ -21716,6 +23151,19 @@ main(int argc, char *argv[])
 				else
 					goto bad_option;
 			}
+#endif				/* TEST_M2PA */
+#if TEST_M2UA
+			m2ua_version = strtoul(optarg, NULL, 0);
+			switch (m2ua_version) {
+			case M2UA_VERSION_RFC3331:
+				break;
+			default:
+				if (!strcmp(optarg, "M2UA_VERSION_RFC3331"))
+					m2ua_version = M2UA_VERSION_RFC3331;
+				else
+					goto bad_option;
+			}
+#endif				/* TEST_M2UA */
 			break;
 #endif				/* TEST_M2PA || TEST_M2UA */
 		case 'c':	/* -c, --client */
@@ -21730,7 +23178,59 @@ main(int argc, char *argv[])
 		case 'w':	/* -w, --wait */
 			test_duration = INFINITE_WAIT;
 			break;
-#if TEST_M2PA || TEST_M2UA
+#if TEST_X400
+		case 'k':	/* -k, --iut-card */
+			val = atoi(optarg);
+			if (val >= 1 && val <= 16) {
+				iut_test_slot = val - 1;
+				addrs[1][0] = (((iut_test_slot & 0x0f) << 12) | ((iut_test_span & 0x0f) << 8) | ((iut_test_chan & 0x0ff) << 0));
+				addrs[2][0] = (((iut_test_slot & 0x0f) << 12) | ((iut_test_span & 0x0f) << 8) | ((iut_test_chan & 0x0ff) << 0));
+				break;
+			}
+			goto bad_option;
+		case 'K':	/* -k, --ptu-card */
+			val = atoi(optarg);
+			if (val >= 1 && val <= 16) {
+				ptu_test_slot = val - 1;
+				addrs[0][0] = (((ptu_test_slot & 0x0f) << 12) | ((ptu_test_span & 0x0f) << 8) | ((ptu_test_chan & 0x0ff) << 0));
+				break;
+			}
+			goto bad_option;
+		case 'p':	/* -p, --iut-span */
+			val = atoi(optarg);
+			if (val >= 1 && val <= 4) {
+				iut_test_span = val - 1;
+				addrs[1][0] = (((iut_test_slot & 0x0f) << 12) | ((iut_test_span & 0x0f) << 8) | ((iut_test_chan & 0x0ff) << 0));
+				addrs[2][0] = (((iut_test_slot & 0x0f) << 12) | ((iut_test_span & 0x0f) << 8) | ((iut_test_chan & 0x0ff) << 0));
+				break;
+			}
+			goto bad_option;
+		case 'P':	/* -P, --ptu-span */
+			val = atoi(optarg);
+			if (val >= 1 && val <= 4) {
+				ptu_test_span = val - 1;
+				addrs[0][0] = (((ptu_test_slot & 0x0f) << 12) | ((ptu_test_span & 0x0f) << 8) | ((ptu_test_chan & 0x0ff) << 0));
+				break;
+			}
+			goto bad_option;
+		case 'i':	/* -i, --iut-chan */
+			val = atoi(optarg);
+			if (val >= 0 && val <= 31) {
+				iut_test_chan = val;
+				addrs[1][0] = (((iut_test_slot & 0x0f) << 12) | ((iut_test_span & 0x0f) << 8) | ((iut_test_chan & 0x0ff) << 0));
+				addrs[2][0] = (((iut_test_slot & 0x0f) << 12) | ((iut_test_span & 0x0f) << 8) | ((iut_test_chan & 0x0ff) << 0));
+				break;
+			}
+			goto bad_option;
+		case 'I':	/* -I, --ptu-chan */
+			val = atoi(optarg);
+			if (val >= 0 && val <= 31) {
+				ptu_test_chan = val;
+				addrs[0][0] = (((ptu_test_slot & 0x0f) << 12) | ((ptu_test_span & 0x0f) << 8) | ((ptu_test_chan & 0x0ff) << 0));
+				break;
+			}
+			goto bad_option;
+#elif TEST_M2PA || TEST_M2UA
 		case 'p':	/* -p, --client-port [PORT] */
 			client_port_specified = 1;
 			ports[3] = atoi(optarg);
@@ -21956,7 +23456,7 @@ main(int argc, char *argv[])
 	if (server_ppa_specified) {
 	}
 #endif
-#if TEST_M2PA
+#if TEST_M2PA || TEST_M2UA
 	if (client_host_specified) {
 		char *token = hostc, *next_token, *delim = NULL;
 
@@ -22018,6 +23518,6 @@ main(int argc, char *argv[])
 		anums[3] = count;
 		fprintf(stdout, "%d server addresses assigned\n", count);
 	}
-#endif				/* TEST_M2PA */
+#endif				/* TEST_M2PA || TEST_M2UA */
 	exit(do_tests(tests_to_run));
 }

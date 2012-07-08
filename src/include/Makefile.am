@@ -135,6 +135,7 @@ nobase_pkginclude_HEADERS = \
 	xti_osi.h \
 	xti_xx25.h \
 	net/bpf.h \
+	net/lif.h \
 	net/nit_if.h \
 	net/nit_buf.h \
 	net/nit_pf.h \

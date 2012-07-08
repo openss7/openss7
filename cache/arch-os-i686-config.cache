@@ -110,6 +110,7 @@ bld_cv_pkg_path_LSB_RELEASE=${bld_cv_pkg_path_LSB_RELEASE=/etc/lsb-release}
 bld_cv_pkg_path_MODULES_DEP=${bld_cv_pkg_path_MODULES_DEP=/lib/modules/3.0.36-1-lts/modules.dep}
 bld_cv_pkg_path_MODULE_SYMVERS=${bld_cv_pkg_path_MODULE_SYMVERS=/lib/modules/3.0.36-1-lts/build/Module.symvers}
 bld_cv_pkg_path_PACMAN_CONF=${bld_cv_pkg_path_PACMAN_CONF=/etc/pacman.conf}
+bld_cv_pkg_path_SYMVERS_3_0_36_1_LTS_GZ=${bld_cv_pkg_path_SYMVERS_3_0_36_1_LTS_GZ=/boot/symvers-3.0.36-1-lts.gz}
 bld_cv_pkg_path_TCL_H=${bld_cv_pkg_path_TCL_H=/usr/include/tcl.h}
 bld_cv_pkg_path_UCD_SNMP_UCD_SNMP_CONFIG_H=${bld_cv_pkg_path_UCD_SNMP_UCD_SNMP_CONFIG_H=/usr/include/ucd-snmp/ucd-snmp-config.h}
 bld_cv_pkg_path_VMLINUX=${bld_cv_pkg_path_VMLINUX=/lib/modules/3.0.36-1-lts/build/vmlinux}
