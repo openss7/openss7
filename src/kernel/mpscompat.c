@@ -1313,7 +1313,7 @@ mi_copyin(queue_t *q, mblk_t *mp, caddr_t uaddr, size_t len)
 {
 	union ioctypes *ioc = (typeof(ioc)) mp->b_rptr;
 	struct mi_iocblk *mi;
-	mblk_t *bp, *dp;
+	mblk_t *db, *bp, *dp;
 
 	switch (mp->b_datap->db_type) {
 	case M_IOCTL:
@@ -1337,6 +1337,8 @@ mi_copyin(queue_t *q, mblk_t *mp, caddr_t uaddr, size_t len)
 			qreply(q, mp);
 			return;
 		}
+		if (!(db = mp->b_cont))
+			return mi_copy_done(q, mp, EPROTO);
 		/* for a non-transparent ioctl the first copyin is already performed for us, fake
 		   out an M_IOCDATA response.  However, only place the requested data from the
 		   implicit copyin into the data block.  Save the rest for a subsequent
@@ -1345,17 +1347,21 @@ mi_copyin(queue_t *q, mblk_t *mp, caddr_t uaddr, size_t len)
 		/* If the amount copied in implicitly is less than that requested in the
 		   input-output control operation, then it is the user's fault and EINVAL is
 		   returned. */
-		if (msgdsize(mp->b_cont) < len)
+		if (msgdsize(db) < len)
 			return mi_copy_done(q, mp, EINVAL);
-
-		if (!pullupmsg(mp->b_cont, -1) || !(dp = copyb(mp->b_cont)))
-			return mi_copy_done(q, mp, ENOBUFS);
+#if 0
+		if (!pullupmsg(db, -1) || !(dp = copyb(db)))
+			return mi_copy_done(q, mp, ENOSR);
+#else
+		if (!(dp = copyb(db)))
+			return mi_copy_done(q, mp, ENOSR);
+#endif
 		if (!(bp = allocb(sizeof(*mi), BPRI_MED))) {
-			freemsg(dp);
-			return mi_copy_done(q, mp, ENOBUFS);
+			freeb(dp);
+			return mi_copy_done(q, mp, ENOSR);
 		}
 		dp->b_wptr = dp->b_rptr + len;
-		bp->b_cont = mp->b_cont;	/* save original */
+		bp->b_cont = db;    /* save original */
 		mp->b_cont = dp;
 		mi = (typeof(mi)) bp->b_rptr;
 		mp->b_datap->db_type = M_IOCDATA;
@@ -1369,7 +1375,9 @@ mi_copyin(queue_t *q, mblk_t *mp, caddr_t uaddr, size_t len)
 		putq(q, mp);
 		/* There are two clues to the fact that an implicit copyin was performed to
 		   subsequent operations: mi->mi_uaddr == NULL and cp_private->b_cont != NULL while 
-		   mi->mi_dir == MI_COPY_IN.  When the operation switches over to copyout, this
+		   mi->mi_dir == MI_COPY_IN.  This fact is used by mi_copyin_n() to determine
+		   whether to issue another M_COPYIN or whether to get the data from the buffer
+		   saved at cp_private->b_cont.  When the operation switches over to copyout, this
 		   copied in buffer will be discarded. */
 		return;
 	case M_IOCDATA:
@@ -1547,9 +1555,11 @@ mi_copyout(queue_t *q, mblk_t *mp)
 
 	if (mp->b_datap->db_type != M_IOCDATA || !mp->b_cont || !(bp = ioc->copyresp.cp_private))
 		return mi_copy_done(q, mp, EPROTO);
+#if 0
 	/* This is for LiS that puts an error code in the cp_rval and expects an M_IOCNAK. */
 	if (ioc->copyresp.cp_rval)
 		return mi_copy_done(q, mp, (int) (long) ioc->copyresp.cp_rval);
+#endif
 	mi = (typeof(mi)) bp->b_rptr;
 	if (!(db = bp->b_cont) || mi->mi_dir == MI_COPY_IN)
 		return mi_copy_done(q, mp, 0);
@@ -1608,14 +1618,18 @@ mi_copy_state(queue_t *q, mblk_t *mp, mblk_t **mpp)
 	if (mp->b_datap->db_type != M_IOCDATA || !(db = mp->b_cont)
 	    || !(bp = ioc->copyresp.cp_private))
 		goto error;
+#if 0
 	/* This is for LiS that puts an error code in the cp_rval and expects an M_IOCNAK. */
 	if ((err = (int) (long) ioc->copyresp.cp_rval))
 		goto error;
+#endif
 	switch (mp->b_datap->db_type) {
 	case M_IOCDATA:
 		err = ENOMEM;
+#if 0
 		if (!pullupmsg(db, -1))
 			goto error;
+#endif
 		mi = (typeof(mi)) bp->b_rptr;
 		if (mi->mi_dir == MI_COPY_IN)
 			*mpp = db;
