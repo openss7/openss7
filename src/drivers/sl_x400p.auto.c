@@ -168,6 +168,28 @@ MODULE_VERSION(PACKAGE_ENVR);
 #endif
 #endif				/* LINUX */
 
+#ifndef CONFIG_STREAMS_SL_X400P_NAME
+#define CONFIG_STREAMS_SL_X400P_NAME    	"x400p-sl"
+#endif
+#ifndef CONFIG_STREAMS_SL_X400P_MODID
+#define CONFIG_STREAMS_SL_X400P_MODID   	2083
+#endif
+#ifndef CONFIG_STREAMS_SL_X400P_NMINORS
+#define CONFIG_STREAMS_SL_X400P_NMINORS 	1
+#endif
+#ifndef CONFIG_STREAMS_SL_X400P_NMAJORS
+#define CONFIG_STREAMS_SL_X400P_NMAJORS 	1
+#endif
+#ifndef CONFIG_STREAMS_SL_X400P_MAJOR
+#define CONFIG_STREAMS_SL_X400P_MAJOR   	2083
+#endif
+#ifndef CONFIG_STREAMS_SL_X400P_MAJOR_0
+#define CONFIG_STREAMS_SL_X400P_MAJOR_0 	2083
+#endif
+#ifndef CONFIG_STREAMS_SL_X400P_MODULE
+#define CONFIG_STREAMS_SL_X400P_MODULE  	1
+#endif
+
 #define SL_X400P_DRV_ID		CONFIG_STREAMS_SL_X400P_MODID
 #define SL_X400P_DRV_NAME	CONFIG_STREAMS_SL_X400P_NAME
 #define SL_X400P_CMAJORS	CONFIG_STREAMS_SL_X400P_NMAJORS
@@ -494,7 +516,6 @@ STATIC void ch_put(struct ch *);
 STATIC struct ch *ch_find(uint);
 
 typedef struct st {
-	uint32_t Index;			/* interval index */
 	uint32_t SECs;			/* elapsed [seconds] */
 	uint32_t ESs;			/* errored [seconds] */
 	uint32_t SESs;			/* severely errored [seconds] */
@@ -523,8 +544,6 @@ typedef struct sp {
 	ulong iobase;			/* span iobase */
 	int span;			/* index (span) */
 	volatile ulong loopcnt;		/* loop command count */
-	struct st *hist;		/* historical statistics */
-	uint curr;			/* current history index */
 	sdl_config_t config;		/* span configuration */
 	struct {
 		uint count;
@@ -589,7 +608,9 @@ typedef struct sp {
 		uint nses;		/* consecutive non-severely errored seconds */
 		uint config;
 	} status;			/* state structure */
+	uint curr;			/* current history index */
 	struct st stats[3];		/* current statistics, 1 sec, 1 min. 15 min. */
+	struct st hist[96];		/* historical statistics */
 } sp_t;
 
 STATIC void xp_init_sp(struct cd *, struct sp *, uint8_t);
@@ -1090,7 +1111,7 @@ STATIC struct sg *x400p_syncs[X400_SYNCS] = { NULL, };	/* master sync list */
 STATIC DEFINE_RWLOCK(x400p_lock);
 #elif	defined __RW_LOCK_UNLOCKED
 STATIC rwlock_t x400p_lock = __RW_LOCK_UNLOCKED(x400p_lock);
-#elif	deinfed RW_LOCK_UNLOCKED
+#elif	defined RW_LOCK_UNLOCKED
 STATIC rwlock_t x400p_lock = RW_LOCK_UNLOCKED;
 #else
 #error cannot initialize read-write locks
@@ -1788,11 +1809,6 @@ sl_count_rq(struct ch *ch)
 		return (0);
 }
 
-/*
- *  SLI PRIMITIVES ISSUED UPSTREAM
- *  -------------------------------------------------------------------------
- */
-
 /** sl_data_ind: issue M_DATA message upstream
   * @ch: channel structure (locked)
   * @mp: the M_DATA message
@@ -1977,7 +1993,6 @@ sl_retrieval_complete_ind(struct ch *ch, queue_t *q, mblk_t *mp)
 	p->sl_primitive = SL_RETRIEVAL_COMPLETE_IND;
 	LOGTX(xp2sid(xp), "<- SL_RETIREVAL_COMPLETE_IND");
 	putq(xp->rq, mp);
-	return;
 }
 
 /** sl_rb_cleared_ind: - issue SL_RB_CLEARED_IND primitive
@@ -2001,7 +2016,6 @@ sl_rb_cleared_ind(struct ch *ch, queue_t *q, mblk_t *mp)
 	p->sl_primitive = SL_RB_CLEARED_IND;
 	LOGTX(xp2sid(xp), "<- SL_RB_CLEARED_IND");
 	putq(xp->rq, mp);
-	return;
 }
 
 /** sl_bsnt_ind: - issue SL_BSNT_IND primitive
@@ -2026,7 +2040,6 @@ sl_bsnt_ind(struct ch *ch, queue_t *q, mblk_t *mp)
 	p->sl_bsnt = ch->sl.statem.rx.T.bsn;
 	LOGTX(xp2sid(xp), "<- SL_BSNT_IND");
 	putq(xp->rq, mp);
-	return;
 }
 
 /** sl_in_service_ind: - issue an SL_IN_SERVICE_IND primitive
@@ -2270,7 +2283,7 @@ sl_bsnt_not_retrievable_ind(struct ch *ch, queue_t *q, mblk_t *mp, sl_ulong bsnt
 	if (likely((xp = ch->xp) != NULL)) {
 		sl_bsnt_not_retr_ind_t *p;
 
-		if ((mp = mi_allocb(q, sizeof(*p), BPRI_MED))) {
+		if (mp || (mp = mi_allocb(q, sizeof(*p), BPRI_MED))) {
 			mp->b_band = 0;
 			DB_TYPE(mp) = M_PROTO;
 			p = (typeof(p)) mp->b_rptr;
@@ -2289,7 +2302,7 @@ sl_bsnt_not_retrievable_ind(struct ch *ch, queue_t *q, mblk_t *mp, sl_ulong bsnt
 }
 #endif
 
-#if 1
+#if 0
 /*
  *  SL_OPTMGMT_ACK
  *  -----------------------------------
@@ -2718,7 +2731,6 @@ lmi_ok_ack(struct xp *xp, queue_t *q, mblk_t *mp, sl_ulong state, sl_long prim)
 	xp_set_state(xp, state);
 	LOGTX(xp2sid(xp), "<- LMI_OK_ACK");
 	qreply(q, mp);
-	return;
 }
 
 /** lmi_error_ack: - issue LMI_ERROR_ACK primitive
@@ -2748,7 +2760,6 @@ lmi_error_ack(struct xp *xp, queue_t *q, mblk_t *mp, sl_ulong state, sl_long pri
 	xp_set_state(xp, state);
 	LOGTX(xp2sid(xp), "<- LMI_ERROR_ACK");
 	qreply(q, mp);
-	return;
 }
 
 /** lmi_info_ack: - issue LMI_INFO_ACK primitive
@@ -2832,7 +2843,6 @@ lmi_enable_con(struct xp *xp, queue_t *q, mblk_t *mp)
 	xp_set_state(xp, LMI_ENABLED);
 	LOGTX(xp2sid(xp), "<- LMI_ENABLE_CON");
 	qreply(q, mp);
-	return;
 }
 
 /** lmi_disable_con: - issue LMI_DISABLE_CON primitive
@@ -2856,7 +2866,6 @@ lmi_disable_con(struct xp *xp, queue_t *q, mblk_t *mp)
 	xp_set_state(xp, LMI_DISABLED);
 	LOGTX(xp2sid(xp), "<- LMI_DISABLE_CON");
 	qreply(q, mp);
-	return;
 }
 
 #if 1
@@ -4212,6 +4221,7 @@ xp_e1_span_config(struct sp *sp, bool timeouts)
 		if (sp->config.ifframing == SDL_FRAMING_CAS)
 			tcr1 |= (1 << 1);	/* TCR1.1: 1 = CAS and CRC4 multiframe mode */
 #endif
+		break;
 	case SDL_GCRC_CRC5:
 		ccr1 &= ~(1 << 4);	/* CRC1.4: 0 = Tx CRC4 disabled */
 		ccr1 &= ~(1 << 0);	/* CRC1.0: 0 = Rx CRC4 disabled */
@@ -5385,20 +5395,7 @@ noinline __unlikely int xp_x1_card_config(struct cd *cd);
 noinline __unlikely int
 xp_card_config(struct cd *cd)
 {
-	int span, chan;
 	int err;
-
-	/* allocate span structures */
-	for (span = 0; span < X400_SPANS; span++) {
-		struct sp *sp;
-
-		if ((sp = xp_alloc_sp(cd, span)) == NULL)
-			return (-ENOMEM);
-
-		for (chan = 0; chan < 32; chan++)
-			if (!xp_alloc_ch(sp, chan))
-				return (-ENOMEM);
-	}
 
 	switch (cd->device) {
 	case XP_DEV_DS21352:
@@ -7376,7 +7373,6 @@ sl_lsc_rtb_cleared(struct ch *ch)
 		sl_txc_send_msu(ch);
 		ch->sl.statem.lsc_state = SL_STATE_IN_SERVICE;
 	}
-	return;
 }
 
 STATIC fastcall __hot_write int sl_check_congestion(struct ch *ch, queue_t *q, mblk_t *mp);
@@ -7467,8 +7463,7 @@ sl_txc_clear_rtb(struct ch *ch, queue_t *q, mblk_t *mp)
 	ch->sl.statem.Ct = 0;
 	ch->sl.statem.clear_rtb = 1;
 	ch->sl.statem.rtb_full = 0;	/* added */
-	/* FIXME: should probably follow more of the ITUT flush_buffers stuff like reseting Z and FSNF, FSNL, 
-	   FSNT. */
+	/* FIXME: should probably follow more of the ITUT flush_buffers stuff like reseting Z and FSNF, FSNL, FSNT. */
 	sl_check_congestion(ch, q, mp);
 }
 
@@ -8044,7 +8039,6 @@ sl_lsc_fisu_msu_received(struct ch *ch)
 		}
 		break;
 	}
-	return;
 }
 
 noinline fastcall __unlikely void
@@ -8616,7 +8610,8 @@ sl_lsc_clear_rtb(struct ch *ch, queue_t *q, mblk_t *mp)
 		ch->sl.statem.local_processor_outage = 0;
 		sl_txc_send_fisu(ch);
 		sl_txc_clear_rtb(ch, q, mp);
-	}
+	} else
+		freemsg(mp);
 }
 
 noinline fastcall void
@@ -9886,8 +9881,7 @@ xp_tx_block(struct ch *ch, uchar *bp, uchar *be, sdt_stats_t * stats, const sl_u
 					/* continuing in message */
 					uint byte = *tx->nxt->b_rptr++;
 
-					tx->bcc = (tx->bcc >> 8) ^ bc_table[(tx->bcc ^ byte)
-									    & 0x00ff];
+					tx->bcc = (tx->bcc >> 8) ^ bc_table[(tx->bcc ^ byte) & 0x00ff];
 					xp_tx_bitstuff(tx, byte);
 					stats->tx_bytes++;
 					goto drain_rbits;
@@ -9972,19 +9966,19 @@ xp_tx_idle(uchar *bp, uchar *be, const sl_ulong type)
 		default:
 		case SDL_TYPE_DS0:
 			*bp = 0xff;
-			break;
+			continue;
 		case SDL_TYPE_DS0A:
 			*bp = 0x7f;
-			break;
+			continue;
 		case SDL_TYPE_T1:
 		case SDL_TYPE_J1:
 			for (chan = 1; chan <= 24; chan++)
 				*(bp + (xp_t1_chan_map[chan] << 2)) = 0x7f;
-			break;
+			continue;
 		case SDL_TYPE_E1:
 			for (chan = 1; chan <= 31; chan++)
 				*(bp + (xp_e1_chan_map[chan] << 2)) = 0xff;
-			break;
+			continue;
 		}
 	}
 }
@@ -10090,8 +10084,7 @@ xp_rx_block(struct ch *ch, uchar *bp, uchar *be, sdt_stats_t * stats, const sl_u
 							 ss7_fast_allocb(&xp_bufpool, FASTBUF, BPRI_HI)))
 							goto buffer_overflow;
 						rx->bcc = (rx->bcc >> 8)
-						    ^ bc_table[(rx->bcc ^ rx->residue)
-							       & 0x00ff];
+						    ^ bc_table[(rx->bcc ^ rx->residue) & 0x00ff];
 						*rx->nxt->b_wptr++ = rx->residue;
 						stats->rx_bytes++;
 						rx->residue >>= 8;
@@ -10105,8 +10098,7 @@ xp_rx_block(struct ch *ch, uchar *bp, uchar *be, sdt_stats_t * stats, const sl_u
 
 					if (rx->rbits != 16)
 						goto residue_error;
-					if (((~rx->bcc) & 0xffff)
-					    != (rx->residue & 0xffff))
+					if (((~rx->bcc) & 0xffff) != (rx->residue & 0xffff))
 						goto crc_error;
 					if (rx->bytes < hlen)
 						goto frame_too_short;
@@ -10114,9 +10106,7 @@ xp_rx_block(struct ch *ch, uchar *bp, uchar *be, sdt_stats_t * stats, const sl_u
 					if (!xsn)
 						li = rx->msg->b_rptr[2] & mlen;
 					else
-						li = ((rx->msg->b_rptr[5]
-						       << 8)
-						      | rx->msg->b_rptr[4]) & mlen;
+						li = ((rx->msg->b_rptr[5] << 8) | rx->msg->b_rptr[4]) & mlen;
 					len = rx->bytes - hlen;
 					if (len != li && (li != mlen || len <= li))
 						goto length_error;
@@ -10716,7 +10706,7 @@ xp_init_tables(void)
   * There are 4 mostly read-only tables that were allocated and initialized for SOFT-HDLC operation.
   * These tables are freed here.
   */
-noinline __devexit int
+noinline int
 xp_free_tables(void)
 {
 	free_pages((unsigned long) bc_table, bc_order);
@@ -11434,6 +11424,7 @@ lmi_attach_req(struct xp *xp, queue_t *q, mblk_t *mp)
 	struct cd *cd;
 	struct sp *sp;
 	struct ch *ch;
+	psw_t flags;
 
 	if (!MBLKIN(mp, 0, sizeof(*p)))
 		goto badprim;
@@ -11445,32 +11436,32 @@ lmi_attach_req(struct xp *xp, queue_t *q, mblk_t *mp)
 		goto badppa;
 	xp_set_state(xp, LMI_ATTACH_PENDING);
 	ppa = *(typeof(ppa) *) (mp->b_rptr + p->lmi_ppa_offset);
-	read_lock(&xp_core_lock);
+	write_lock_irqsave(&xp_core_lock, flags);
 	{
 		/* check card */
 		card = (ppa >> 12) & 0x0f;
 		if (card < 0 || card > X400_CARDS - 1) {
-			read_unlock(&xp_core_lock);
+			write_unlock_irqrestore(&xp_core_lock, flags);
 			goto badcard;
 		}
 		if (!(cd = x400p_cards[card])) {
-			read_unlock(&xp_core_lock);
+			write_unlock_irqrestore(&xp_core_lock, flags);
 			goto nocard;
 		}
 		/* check span */
 		span = (ppa >> 8) & 0x0f;
 		if (span < 0 || span > X400_SPANS - 1) {
-			read_unlock(&xp_core_lock);
+			write_unlock_irqrestore(&xp_core_lock, flags);
 			goto badspan;
 		}
 		if (!(sp = cd->spans[span])) {
-			read_unlock(&xp_core_lock);
+			write_unlock_irqrestore(&xp_core_lock, flags);
 			goto nospan;
 		}
 #ifdef DEBUG
 		if (sp->config.ifgtype != SDL_GTYPE_E1 && sp->config.ifgtype != SDL_GTYPE_T1
 		    && sp->config.ifgtype != SDL_GTYPE_J1) {
-			read_unlock(&xp_core_lock);
+			write_unlock_irqrestore(&xp_core_lock, flags);
 			swerr();
 			goto efault;
 		}
@@ -11480,71 +11471,67 @@ lmi_attach_req(struct xp *xp, queue_t *q, mblk_t *mp)
 		switch (sp->config.ifgtype) {
 		case SDL_GTYPE_E1:
 			if (chan < 0 || chan > 31) {
-				read_unlock(&xp_core_lock);
+				write_unlock_irqrestore(&xp_core_lock, flags);
 				goto badchan;
 			}
 			break;
 		case SDL_GTYPE_T1:
 		case SDL_GTYPE_J1:
 			if (chan < 0 || chan > 24) {
-				read_unlock(&xp_core_lock);
+				write_unlock_irqrestore(&xp_core_lock, flags);
 				goto badchan;
 			}
 			break;
 		default:
-			read_unlock(&xp_core_lock);
+			write_unlock_irqrestore(&xp_core_lock, flags);
 			goto badppa;
 		}
 		if (!(ch = sp->chans[chan])) {
-			read_unlock(&xp_core_lock);
+			write_unlock_irqrestore(&xp_core_lock, flags);
 			goto nochan;
 		}
+		if ((ch = sp->chans[0]) && ch->xp) {
+			write_unlock_irqrestore(&xp_core_lock, flags);
+			goto chanbusy;
+		}
+		if (chan == 0) {
+			int c;
+
+			switch (sp->config.ifgtype) {
+			case SDL_GTYPE_E1:
+				for (c = 1; c < 32; c++) {
+					if (!(ch = sp->chans[c]))
+						continue;
+					if (ch->xp)
+						goto chanbusy;
+				}
+				break;
+			case SDL_GTYPE_T1:
+			case SDL_GTYPE_J1:
+				for (c = 1; c < 25; c++) {
+					if (!(ch = sp->chans[c]))
+						continue;
+					if (ch->xp)
+						goto chanbusy;
+				}
+				break;
+			default:
+				goto badppa;
+			}
+		} else {
+			if ((ch = sp->chans[chan]))
+				if (ch->xp)
+					goto chanbusy;
+		}
+		ch = sp->chans[chan];
 		xp->card = card;
 		xp->span = span;
 		xp->chan = chan;
 		xp->ch = ch_get(ch);
+		ch->xp = xp;
 	}
-	read_unlock(&xp_core_lock);
+	write_unlock_irqrestore(&xp_core_lock, flags);
 	LOGNO(xp2sid(xp), "INFO: attached card %d, span %d, chan %d", card, span, chan);
-#if 0
-	LOGNO(xp2sid(xp), "INFO: attaching card %d, span %d, chan %d", card, span, chan);
-	if (ch->xp != NULL) {
-		goto chanbusy;
-	}
-	if (chan == 0) {
-		int c;
-
-		switch (sp->config.ifgtype) {
-		case SDL_GTYPE_E1:
-			for (c = 1; c < 32; c++) {
-				if (sp->chans[c]->ch != NULL) {
-					goto chanbusy;
-				}
-			}
-			break;
-		case SDL_GTYPE_T1:
-		case SDL_GTYPE_J1:
-			for (c = 1; c < 25; c++) {
-				if (sp->chans[c]->ch != NULL) {
-					goto chanbusy;
-				}
-			}
-			break;
-		default:
-			goto badppa;
-		}
-	} else {
-		if (sp->chans[0]->ch != NULL) {
-			goto chanbusy;
-		}
-	}
-	xp->card = card;
-	xp->span = span;
-	xp->chan = chan;
-	xp->ch = ch_get(ch);
-	ch->xp = xp;
-	LOGNO(xp2sid(xp), "INFO: attached card %d, span %d, chan %d", card, span, chan);
-#endif
 	lmi_ok_ack(xp, q, mp, LMI_DISABLED, LMI_ATTACH_REQ);
 	return (0);
 #ifdef DEBUG
@@ -11575,11 +11562,9 @@ lmi_attach_req(struct xp *xp, queue_t *q, mblk_t *mp)
       nochan:
 	LOGNO(xp2sid(xp), "%s: ERROR: unallocated chan %d", __FUNCTION__, chan);
 	goto badppa;
-#if 0
       chanbusy:
 	LOGNO(xp2sid(xp), "%s: ERROR: already in use, chan %d", __FUNCTION__, chan);
 	goto badppa;
-#endif
       badppa:
 	return (-EADDRNOTAVAIL);
 }
@@ -11595,21 +11580,32 @@ lmi_attach_req(struct xp *xp, queue_t *q, mblk_t *mp)
 noinline fastcall __unlikely int
 lmi_detach_req(struct xp *xp, queue_t *q, mblk_t *mp)
 {
-	struct ch *ch = xp->ch;
+	struct ch *ch;
+	psw_t flags;
 
+	/* validate detach */
 	if (xp_get_state(xp) != LMI_DISABLED)
 		goto outstate;
 	xp_set_state(xp, LMI_DETACH_PENDING);
 
+	write_lock_irqsave(&xp_core_lock, flags);
+	{
+		ch = XCHG(&xp->ch, NULL);
 #ifdef DEBUG
-	if (ch == NULL)
-		goto efault;
+		if (ch == NULL) {
+			write_unlock_irqrestore(&xp_core_lock, flags);
+			goto efault;
+		}
 #endif
-	ch->xp = NULL;
-	ch_put(xchg(&xp->ch, NULL));
-	xp->card = -1;
-	xp->span = -1;
-	xp->chan = -1;
+		/*  FIXME: This is not enough: when we detach from the channel we must hold a plumbing write lock
+		 *  that is held by the channel code as a plumbing read lock when dereferencing ch->xp. */
+		ch->xp = NULL;
+		ch_put(ch);
+		xp->card = -1;
+		xp->span = -1;
+		xp->chan = -1;
+	}
+	write_unlock_irqrestore(&xp_core_lock, flags);
 	lmi_ok_ack(xp, q, mp, LMI_UNATTACHED, LMI_DETACH_REQ);
 	return (0);
       outstate:
@@ -11622,37 +11618,22 @@ lmi_detach_req(struct xp *xp, queue_t *q, mblk_t *mp)
 #endif
 }
 
+/** startup_span: - startup span if not already running
+  * @sp: span structure pointer
+  */
 noinline fastcall __unlikely void
 startup_span(struct sp *sp)
 {
 	if (!(sp->config.ifflags & SDL_IF_UP)) {
+		/* need to bring up span */
 		struct cd *cd = sp->cd;
 		psw_t flags = 0;
 
-		switch (cd->config.ifgtype) {
-		case SDL_GTYPE_E1:
-		default:
-			spin_lock_irqsave(&cd->lock, flags);
-			cd->xlb[SYNREG] = SYNCSELF;
-			cd->eval_syncsrc = 1;
-			cd->xlb[CTLREG] = cd->ctlreg;
-			xp_span_reconfig(sp);
-			sp->config.ifflags |= (SDL_IF_UP | SDL_IF_TX_RUNNING | SDL_IF_RX_RUNNING);
-			cd->xlb[CTLREG] = cd->ctlreg | (INTENA | DINTENA);
-			spin_unlock_irqrestore(&cd->lock, flags);
-			break;
-		case SDL_GTYPE_T1:
-		case SDL_GTYPE_J1:
-			spin_lock_irqsave(&cd->lock, flags);
-			// cd->xlb[SYNREG] = SYNCSELF;
-			cd->eval_syncsrc = 1;
-			cd->xlb[CTLREG] = cd->ctlreg;
-			xp_span_reconfig(sp);
-			sp->config.ifflags |= (SDL_IF_UP | SDL_IF_TX_RUNNING | SDL_IF_RX_RUNNING);
-			cd->xlb[CTLREG] = cd->ctlreg | (INTENA | DINTENA);
-			spin_unlock_irqrestore(&cd->lock, flags);
-			break;
-		}
+		spin_lock_irqsave(&cd->lock, flags);
+		sp->config.ifflags |= (SDL_IF_UP | SDL_IF_TX_RUNNING | SDL_IF_RX_RUNNING);
+		/* enable interrupts */
+		cd->xlb[CTLREG] = cd->ctlreg | (INTENA | DINTENA);
+		spin_unlock_irqrestore(&cd->lock, flags);
 	}
 }
 
@@ -11671,6 +11652,7 @@ lmi_enable_req(struct xp *xp, queue_t *q, mblk_t *mp)
 	struct cd *cd;
 	struct sp *sp;
 
+	/* validate enable */
 	if (xp_get_state(xp) != LMI_DISABLED)
 		goto outstate;
 	if (!(sp = ch->sp)) {
@@ -11695,8 +11677,15 @@ lmi_enable_req(struct xp *xp, queue_t *q, mblk_t *mp)
 	/* commit enable */
 	printd(("%s: %p: performing enable\n", DRV_NAME, xp));
 	xp_set_state(xp, LMI_ENABLE_PENDING);
+#if 0
+	/* Don't do this here.  Previously we configured the channels when they were enabled;
+	 * however, this was because the channel data was part of the xp structure.  Defaults
+	 * are now set when channel is allocated. */
 	ch->sdl.config.ifname = sp->config.ifname;
+#endif
 	ch->sdl.config.ifflags |= SDL_IF_UP;
+#if 0
+	/* Same as above. */
 	ch->sdl.config.iftype = ch->sdl.config.iftype;
 	switch (ch->sdl.config.iftype) {
 	case SDL_TYPE_DS0A:
@@ -11735,6 +11724,7 @@ lmi_enable_req(struct xp *xp, queue_t *q, mblk_t *mp)
 	ch->sdl.config.ifrxlevel = sp->config.ifrxlevel;
 	ch->sdl.config.iftxlevel = sp->config.iftxlevel;
 	ch->sdl.config.ifsync = cd->config.ifsync;
+#endif
 	xp_set_state(xp, LMI_ENABLED);
 	startup_span(sp);
 	lmi_enable_con(xp, q, mp);
@@ -11766,7 +11756,6 @@ lmi_disable_req(struct xp *xp, queue_t *q, mblk_t *mp)
 
 		spin_lock_irqsave(&cd->lock, flags);
 		{
-			struct ch *ch = xp->ch;
 			int chan, boff;
 			uchar idle, *base = (uchar *) cd->wbuf + span_to_byte(sp->span);
 
@@ -11777,8 +11766,7 @@ lmi_disable_req(struct xp *xp, queue_t *q, mblk_t *mp)
 				for (chan = 1; chan < 32; chan++)
 					if (sp->chans[chan] == ch)
 						for (boff = 0; boff < X400P_EBUFNO; boff++)
-							*(base + (boff << 10) + (xp_t1_chan_map[chan] << 2)) =
-							    idle;
+							*(base + (boff << 10) + (xp_t1_chan_map[chan] << 2)) = idle;
 				break;
 			default:
 			case SDL_GTYPE_E1:
@@ -11786,8 +11774,7 @@ lmi_disable_req(struct xp *xp, queue_t *q, mblk_t *mp)
 				for (chan = 1; chan < 32; chan++)
 					if (sp->chans[chan] == ch)
 						for (boff = 0; boff < X400P_EBUFNO; boff++)
-							*(base + (boff << 10) + (xp_e1_chan_map[chan] << 2)) =
-							    idle;
+							*(base + (boff << 10) + (xp_e1_chan_map[chan] << 2)) = idle;
 				break;
 			}
 			/* stop transmitters and receivers */
@@ -13647,19 +13634,13 @@ dsx_ioclconfig(queue_t *q, mblk_t *mp, mblk_t *dp)
 				case SDL_GTYPE_E1:
 					for (chan = 1; chan <= 31; chan++, val++, num++)
 						if ((unsigned char *) (val + 1) <= mp->b_cont->b_wptr)
-							*val =
-							    (DRV_ID << 16) | (cd->
-									      card << 12) | (span << 8) |
-							    (chan << 0);
+							*val = (DRV_ID << 16) | (cd-> card << 12) | (span << 8) | (chan << 0);
 					break;
 				case SDL_GTYPE_T1:
 				case SDL_GTYPE_J1:
 					for (chan = 1; chan <= 24; chan++, val++, num++)
 						if ((unsigned char *) (val + 1) <= mp->b_cont->b_wptr)
-							*val =
-							    (DRV_ID << 16) | (cd->
-									      card << 12) | (span << 8) |
-							    (chan << 0);
+							*val = (DRV_ID << 16) | (cd-> card << 12) | (span << 8) | (chan << 0);
 					break;
 				}
 			}
@@ -14458,11 +14439,17 @@ mx_iocginfo_card(struct cd *cd, mx_info_t * arg)
 	/* this driver does not support board revision yet */
 	val->mxCardRevision = 0;
 	switch (cd->device) {
+	case XP_DEV_DS2152:
+		val->mxCardChipType = X400PCARDCHIPTYPE_DS2152;
+		break;
 	case XP_DEV_DS21352:
 		val->mxCardChipType = X400PCARDCHIPTYPE_DS21352;
 		break;
 	case XP_DEV_DS21552:
 		val->mxCardChipType = X400PCARDCHIPTYPE_DS21552;
+		break;
+	case XP_DEV_DS2154:
+		val->mxCardChipType = X400PCARDCHIPTYPE_DS2154;
 		break;
 	case XP_DEV_DS21354:
 		val->mxCardChipType = X400PCARDCHIPTYPE_DS21354;
@@ -14478,6 +14465,9 @@ mx_iocginfo_card(struct cd *cd, mx_info_t * arg)
 		break;
 	case XP_DEV_DS21458:
 		val->mxCardChipType = X400PCARDCHIPTYPE_DS21458;
+		break;
+	case XP_DEV_DS2156:
+		val->mxCardChipType = X400PCARDCHIPTYPE_DS2156;
 		break;
 	default:
 		val->mxCardChipType = X400PCARDCHIPTYPE_NONE;
@@ -14725,6 +14715,7 @@ mx_iocgoption_span(struct sp *sp, mx_option_t * arg)
 		case XP_DEV_DS2155:
 		case XP_DEV_DS21455:
 		case XP_DEV_DS21458:
+		case XP_DEV_DS2156:
 		default:
 			switch (sp->config.iftxlevel & 0x3) {
 			case 0:	/* 0 */
@@ -14741,6 +14732,7 @@ mx_iocgoption_span(struct sp *sp, mx_option_t * arg)
 				break;
 			}
 			break;
+		case XP_DEV_DS2152:
 		case XP_DEV_DS21352:
 		case XP_DEV_DS21552:
 			switch (sp->config.iftxlevel & 0x3) {
@@ -14756,6 +14748,7 @@ mx_iocgoption_span(struct sp *sp, mx_option_t * arg)
 				break;
 			}
 			break;
+		case XP_DEV_DS2154:
 		case XP_DEV_DS21354:
 		case XP_DEV_DS21554:
 			switch (sp->config.iftxlevel & 0x3) {
@@ -15142,6 +15135,7 @@ mx_test_options_span(mx_option_t * arg)
 			case XP_DEV_DS2155:
 			case XP_DEV_DS21455:
 			case XP_DEV_DS21458:
+			case XP_DEV_DS2156:
 			default:
 				switch (sp->config.iftxlevel & 0x3) {
 				case 0:	/* 0 */
@@ -15158,6 +15152,7 @@ mx_test_options_span(mx_option_t * arg)
 					break;
 				}
 				break;
+			case XP_DEV_DS2152:
 			case XP_DEV_DS21352:
 			case XP_DEV_DS21552:
 				switch (sp->config.iftxlevel & 0x3) {
@@ -15173,6 +15168,7 @@ mx_test_options_span(mx_option_t * arg)
 					break;
 				}
 				break;
+			case XP_DEV_DS2154:
 			case XP_DEV_DS21354:
 			case XP_DEV_DS21554:
 				switch (sp->config.iftxlevel & 0x3) {
@@ -15584,6 +15580,7 @@ mx_set_options_span(struct sp *sp, mx_option_t * arg)
 			case XP_DEV_DS2155:
 			case XP_DEV_DS21455:
 			case XP_DEV_DS21458:
+			case XP_DEV_DS2156:
 				txlevel += 0;
 				/* nearest lower */
 				val->mxSpanLineGain = MXSPANLINEGAIN_MON0DB;
@@ -15598,12 +15595,15 @@ mx_set_options_span(struct sp *sp, mx_option_t * arg)
 			case XP_DEV_DS2155:
 			case XP_DEV_DS21455:
 			case XP_DEV_DS21458:
+			case XP_DEV_DS2156:
 				txlevel += 1;
 				break;
+			case XP_DEV_DS2152:
 			case XP_DEV_DS21352:
 			case XP_DEV_DS21552:
 				txlevel += 2;
 				break;
+			case XP_DEV_DS2154:
 			case XP_DEV_DS21354:
 			case XP_DEV_DS21554:
 				txlevel += 1;
@@ -15617,14 +15617,17 @@ mx_set_options_span(struct sp *sp, mx_option_t * arg)
 			case XP_DEV_DS2155:
 			case XP_DEV_DS21455:
 			case XP_DEV_DS21458:
+			case XP_DEV_DS2156:
 				txlevel += 2;
 				break;
+			case XP_DEV_DS2152:
 			case XP_DEV_DS21352:
 			case XP_DEV_DS21552:
 				txlevel += 2;
 				/* nearest lower */
 				val->mxSpanLineGain = MXSPANLINEGAIN_MON20DB;
 				break;
+			case XP_DEV_DS2154:
 			case XP_DEV_DS21354:
 			case XP_DEV_DS21554:
 				txlevel += 1;
@@ -15638,16 +15641,19 @@ mx_set_options_span(struct sp *sp, mx_option_t * arg)
 			case XP_DEV_DS2155:
 			case XP_DEV_DS21455:
 			case XP_DEV_DS21458:
+			case XP_DEV_DS2156:
 				txlevel += 2;
 				/* nearest lower */
 				val->mxSpanLineGain = MXSPANLINEGAIN_MON26DB;
 				break;
+			case XP_DEV_DS2152:
 			case XP_DEV_DS21352:
 			case XP_DEV_DS21552:
 				txlevel += 2;
 				/* nearest lower */
 				val->mxSpanLineGain = MXSPANLINEGAIN_MON20DB;
 				break;
+			case XP_DEV_DS2154:
 			case XP_DEV_DS21354:
 			case XP_DEV_DS21554:
 				txlevel += 2;
@@ -15659,14 +15665,17 @@ mx_set_options_span(struct sp *sp, mx_option_t * arg)
 			case XP_DEV_DS2155:
 			case XP_DEV_DS21455:
 			case XP_DEV_DS21458:
+			case XP_DEV_DS2156:
 				txlevel += 3;
 				break;
+			case XP_DEV_DS2152:
 			case XP_DEV_DS21352:
 			case XP_DEV_DS21552:
 				txlevel += 2;
 				/* nearest lower */
 				val->mxSpanLineGain = MXSPANLINEGAIN_MON20DB;
 				break;
+			case XP_DEV_DS2154:
 			case XP_DEV_DS21354:
 			case XP_DEV_DS21554:
 				txlevel += 2;
@@ -16350,6 +16359,7 @@ mx_test_config_card(struct cd *cd, mx_config_t * arg)
 	switch (val->mxCardSpanType) {
 	case MXSPANTYPE_E1:
 		switch (cd->device) {
+		case XP_DEV_DS2152:
 		case XP_DEV_DS21352:
 		case XP_DEV_DS21552:
 			/* These chips do not support E1. */
@@ -16374,6 +16384,12 @@ mx_test_config_card(struct cd *cd, mx_config_t * arg)
 	case MXSPANTYPE_T1:
 	case MXSPANTYPE_J1:
 		switch (cd->device) {
+		case XP_DEV_DS2152:
+			/* This chip does not support J1. */
+			if (val->mxCardSpanType == MXSPANTYPE_J1)
+				goto einval;
+			break;
+		case XP_DEV_DS2154:
 		case XP_DEV_DS21354:
 		case XP_DEV_DS21554:
 			/* These chips do not support T1 or J1. */
@@ -21615,15 +21631,6 @@ dl_set_no_loopback(struct xp *xp, mblk_t *dp)
  *  it is static for the board.  That is: boards do not change type from E1 to T1 or visa versa.
  */
 
-/*
- *  X400P Tasklet
- *  -----------------------------------
- *  This tasklet is scheduled before the ISR returns to feed the next buffer of data into the write
- *  buffer and read the buffer of data from the read buffer.  This will run the soft-HDLC on each
- *  channel for 8 more bytes, or if full span will run the soft-HDLC for 192 bytes (T1) or 256 bytes
- *  (E1).
- */
-
 /** xp_span_process: - process E1/T1/J1 span
   * @sp: span structure
   * @wspan: beg tx block pointer
@@ -21678,6 +21685,11 @@ xp_span_process(struct sp *sp, uchar *wspan, uchar *rspan, uchar *wend, uchar *r
   * Process an entire E1/T1/J1 card as a tasklet.  Each span is processed in order.  Only one tx and
   * one rx elastic buffer block (8 frames for 4 spans) is processed at a time to avoid latency
   * issues.
+  *
+  * This tasklet is scheduled before the ISR returns to feed the next buffer of data into the write
+  * buffer and read the buffer of data from the read buffer.  This will run the soft-HDLC on each
+  * channel for 8 more bytes, or if full span will run the soft-HDLC for 192 bytes (T1) or 256 bytes
+  * (E1).
   */
 STATIC __hot void
 xp_card_tasklet(unsigned long data)
@@ -23329,14 +23341,14 @@ xp_t1_process_stats(struct sp *sp, register uint errors)
 		bzero(&sp->stats[1], sizeof(sp->stats[1]));
 
 		if ((sp->stats[2].SECs += 60) == 900) {
-			uint index = sp->stats[2].Index;
+			uint index = sp->curr;
 
 			sp->hist[index] = sp->stats[2];
 			sp->hist[index].ValidData = 2;	/* true(2) */
 			bzero(&sp->stats[2], sizeof(sp->stats[2]));
 			if (++index == 96)
 				index = 0;
-			sp->stats[2].Index = index;
+			sp->curr = index;
 		}
 	}
 	return;
@@ -24922,14 +24934,14 @@ xp_e1_process_stats(struct sp *sp, register uint errors)
 		bzero(&sp->stats[1], sizeof(sp->stats[1]));
 
 		if ((sp->stats[2].SECs += 60) == 900) {
-			uint index = sp->stats[2].Index;
+			uint index = sp->curr;
 
 			sp->hist[index] = sp->stats[2];
 			sp->hist[index].ValidData = 2;	/* true(2) */
 			bzero(&sp->stats[2], sizeof(sp->stats[2]));
 			if (++index == 96)
 				index = 0;
-			sp->stats[2].Index = index;
+			sp->curr = index;
 		}
 	}
 	return;
@@ -25815,7 +25827,7 @@ xp_x1_process_span(struct cd *cd, struct sp *sp, register volatile uint8_t *xlb,
 	if (timeout)
 		xp_x1_process_timeout(cd, sp, xlb, flags);
 
-	/* Note that alarms are processed asyncrhonously whereas interface state is only processed during
+	/* Note that alarms are processed asynchronously whereas interface state is only processed during
 	   timeouts. This keeps the interface state from thrashing around and detection mechanisms falsely
 	   triggering on transient conditions. */
 	if ((flags ^ sp->status.flags) != 0)
@@ -27604,14 +27616,14 @@ xp_x1_process_stats(struct sp *sp, register uint errors)
 		bzero(&sp->stats[1], sizeof(sp->stats[1]));
 
 		if ((sp->stats[2].SECs += 60) == 900) {
-			uint index = sp->stats[2].Index;
+			uint index = sp->curr;
 
 			sp->hist[index] = sp->stats[2];
 			sp->hist[index].ValidData = 2;	/* true(2) */
 			bzero(&sp->stats[2], sizeof(sp->stats[2]));
 			if (++index == 96)
 				index = 0;
-			sp->stats[2].Index = index;
+			sp->curr = index;
 		}
 	}
 	return;
@@ -31343,7 +31355,7 @@ STATIC kmem_cachep_t xp_xbuf_cachep = NULL;
  *  Cache allocation
  *  -------------------------------------------------------------------------
  */
-noinline __devexit int
+noinline int
 xp_term_caches(void)
 {
 	int err = 0;
@@ -31428,6 +31440,14 @@ xp_init_caches(void)
 		goto error;
 	} else
 		printd(("%s: initialized device private structure cache\n", DRV_NAME));
+	if (!xp_chan_cachep
+	    && !(xp_chan_cachep =
+		 kmem_create_cache("xp_chan_cachep", sizeof(struct ch), 0, SLAB_HWCACHE_ALIGN, NULL,
+				   NULL))) {
+		cmn_err(CE_PANIC, "%s: Cannot allocate xp_chan_cachep", __FUNCTION__);
+		goto error;
+	} else
+		printd(("%s: initialized chan private structure cache\n", DRV_NAME));
 	if (!xp_span_cachep
 	    && !(xp_span_cachep =
 		 kmem_create_cache("xp_span_cachep", sizeof(struct sp), 0, SLAB_HWCACHE_ALIGN, NULL,
@@ -31465,7 +31485,7 @@ xp_init_caches(void)
 }
 
 /*
- *  Span allocation and deallocation
+ *  Channel allocation and deallocation
  *  -------------------------------------------------------------------------
  */
 noinline __unlikely void
@@ -31712,14 +31732,12 @@ xp_free_sp(struct sp *sp)
 		cd_put(xchg(&sp->cd, NULL));
 		sp->span = 0;
 		printd(("%s: unlinked span private structure from card\n", DRV_NAME));
-		/* remove channel linkage */
+		/* remove any remaining chans */
 		for (chan = 0; chan < 32; chan++) {
 			struct ch *ch;
 
-			if ((ch = sp->chans[chan])) {
-				sp_put(xchg(&ch->sp, NULL));
-				ch_put(xchg(&sp->chans[chan], NULL));
-			}
+			if ((ch = sp->chans[chan]))
+				xp_free_ch(ch);
 		}
 		printd(("%s: unlinked span private structure from slots\n", DRV_NAME));
 	} else
@@ -31819,7 +31837,7 @@ sg_put(struct sg *sg)
 	}
 }
 
-static struct sg *
+STATIC struct sg *
 sg_find(uint group)
 {
 	struct sg *sg = NULL;
@@ -31969,7 +31987,7 @@ cd_find(uint ppa)
   * closed, so we only have to stop interrupts and deallocate board-level resources.  Nevertheless,
   * if we get a hot removal of a card, we must be prepared to deallocate the span structures.
   */
-STATIC void __devexit
+STATIC void
 xp_remove(struct pci_dev *dev)
 {
 	struct cd *cd;
@@ -32183,6 +32201,7 @@ xp_probe(struct pci_dev *dev, const struct pci_device_id *id)
 	}
 	printd(("%s: xlb region %ld bytes at %lx, remapped %p\n", DRV_NAME, cd->xlb_length,
 		cd->xlb_region, cd->xlb));
+	cd->iobase = (ulong) cd->xlb;
 	cd->config.ifname = xp_board_info[id->driver_data].name;
 	if (!request_mem_region(cd->plx_region, cd->plx_length, cd->config.ifname)) {
 		cmn_err(CE_WARN, "%s: ERROR: Unable to reserve PLX memory", DRV_NAME);
@@ -32230,6 +32249,7 @@ xp_probe(struct pci_dev *dev, const struct pci_device_id *id)
 		goto error_remove;
 	}
 	switch (cd->device) {
+	case XP_DEV_DS2154:
 	case XP_DEV_DS21354:
 	case XP_DEV_DS21554:
 		/* ISR depends only on device type. */
@@ -32252,6 +32272,7 @@ xp_probe(struct pci_dev *dev, const struct pci_device_id *id)
 			break;
 		}
 		break;
+	case XP_DEV_DS2152:
 	case XP_DEV_DS21352:
 	case XP_DEV_DS21552:
 		/* ISR depends only on device type. */
@@ -32277,6 +32298,7 @@ xp_probe(struct pci_dev *dev, const struct pci_device_id *id)
 	case XP_DEV_DS2155:
 	case XP_DEV_DS21455:
 	case XP_DEV_DS21458:
+	case XP_DEV_DS2156:
 		/* ISR depends only on device type. */
 		cd->isr = &xp_x1_interrupt;
 		switch (board) {
@@ -32401,7 +32423,7 @@ xp_pci_init(void)
   * Because this is a style 2 driver, if there are any boards that are atill configured, we need to
   * stop the boards and deallocate the board-level resources and structures.
   */
-noinline __devexit int
+noinline int
 xp_pci_cleanup(void)
 {
 	pci_unregister_driver(&xp_driver);
@@ -32462,7 +32484,7 @@ xp_register_strdev(major_t major)
 	return (0);
 }
 
-noinline __devexit int
+noinline int
 xp_unregister_strdev(major_t major)
 {
 	int err;
@@ -32472,7 +32494,7 @@ xp_unregister_strdev(major_t major)
 	return (0);
 }
 
-MODULE_STATIC void __exit
+MODULE_STATIC void
 sl_x400pterminate(void)
 {
 	int err, mindex;
@@ -32550,10 +32572,12 @@ sl_x400pinit(void)
 			major = xp_majors[0];
 	}
 	if ((err = register_nit(&xp_cdev)) < 0) {
+		cmn_err(CE_WARN, "%s: Could not register with nit driver, err = %d", DRV_NAME, err);
 		sl_x400pterminate();
 		return (err);
 	}
 	if ((err = register_bpf(&xp_cdev)) < 0) {
+		cmn_err(CE_WARN, "%s: Could not register with bpf driver, err = %d", DRV_NAME, err);
 		sl_x400pterminate();
 		return (err);
 	}
