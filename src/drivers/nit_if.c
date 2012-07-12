@@ -329,3 +329,103 @@ unregister_nit(struct cdevsw *cdev)
 }
 
 EXPORT_SYMBOL_GPL(unregister_nit);
+
+/* 
+ *  -------------------------------------------------------------------------
+ *
+ *  Special open for nit devices.
+ *
+ *  -------------------------------------------------------------------------
+ */
+
+/*
+ *  nit_open: - open a nit device node
+ *  @inode: the external filesystem inode
+ *  @file: the external filesystem file pointer
+ *
+ *  nit_open() is only used to open a nit device from a character device node in an external
+ *  filesystem.  This is never called for direct opens of a specfs device node (for direct opens see
+ *  spec_dev_open() in strspecfs.c).  The character device number from the inode is used to
+ *  determine the shadow special filesystem (internal) inode and chain the open call.
+ *
+ *  This is the separation point where we convert the external device number to an internal device
+ *  number.  The external device number is contained in inode->i_rdev.
+ */
+STATIC int
+nit_open(struct inode *inode, struct file *file)
+{
+	int err;
+	struct cdevsw *cdev;
+	major_t major;
+	minor_t minor;
+	modID_t modid, instance;
+
+#if defined HAVE_KFUNC_TO_KDEV_T
+	minor = MINOR(kdev_t_to_nr(inode->i_rdev));
+	major = MAJOR(kdev_t_to_nr(inode->i_rdev));
+#else
+	minor = MINOR(inode->i_rdev);
+	major = MAJOR(inode->i_rdev);
+#endif
+	minor = cdev_minor(&nit_cdev, major, minor);
+	major = nit_cdev.d_major;
+	modid = nit_cdev.d_modid;
+	err = -ENXIO;
+	if (!(cdev = sdev_get(minor))) {
+		goto exit;
+	}
+	instance = cdev->d_modid;
+	err = spec_open(file, cdev, makedevice(modid, instance), CLONEOPEN);
+	sdev_put(cdev);
+      exit:
+	return (err);
+}
+
+STATIC struct file_operations nit_f_ops ____cacheline_aligned = {
+	.owner = NULL,		/* yes NULL */
+	.open = nit_open,
+};
+
+/* 
+ *  -------------------------------------------------------------------------
+ *
+ *  INITIALIZATION
+ *
+ *  -------------------------------------------------------------------------
+ */
+
+#ifdef CONFIG_STREAMS_NIT_MODULE
+static
+#endif
+int __init
+nitinit(void)
+{
+	int err;
+
+#ifdef CONFIG_STREAMS_NIT_MODULE
+	printk(KERN_INFO NIT_BANNER);
+#else
+	printk(KERN_INFO NIT_SPLASH);
+#endif
+	nit_minfo.mi_idnum = nit_modid;
+	if ((err = register_cmajor(&nit_cdev, major, &nit_f_ops)) < 0)
+		return (err);
+	if (major == 0 && err > 0)
+		major = err;
+	return (0);
+};
+
+#ifdef CONFIG_STREAMS_NIT_MODULE
+static
+#endif
+void __exit
+nitexit(void)
+{
+	if (unregister_cmajor(&nit_cdev, major) != 0)
+		swerr();
+};
+
+#ifdef CONFIG_STREAMS_NIT_MODULE
+module_init(nitinit);
+module_exit(nitexit);
+#endif
