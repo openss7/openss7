@@ -348,3 +348,103 @@ unregister_bpf(struct cdevsw *cdev)
 }
 
 EXPORT_SYMBOL_GPL(unregister_bpf);
+
+/* 
+ *  -------------------------------------------------------------------------
+ *
+ *  Special open for bpf devices.
+ *
+ *  -------------------------------------------------------------------------
+ */
+
+/*
+ *  bpf_open: - open a bpf device node
+ *  @inode: the external filesystem inode
+ *  @file: the external filesystem file pointer
+ *
+ *  bpf_open() is only used to open a bpf device from a character device node in an external
+ *  filesystem.  This is never called for direct opens of a specfs device node (for direct opens see
+ *  spec_dev_open() in strspecfs.c).  The character device number from the inode is used to
+ *  determine the shadow special filesystem (internal) inode and chain the open call.
+ *
+ *  This is the separation point where we convert the external device number to an internal device
+ *  number.  The external device number is contained in inode->i_rdev.
+ */
+STATIC int
+bpf_open(struct inode *inode, struct file *file)
+{
+	int err;
+	struct cdevsw *cdev;
+	major_t major;
+	minor_t minor;
+	modID_t modid, instance;
+
+#if defined HAVE_KFUNC_TO_KDEV_T
+	minor = MINOR(kdev_t_to_nr(inode->i_rdev));
+	major = MAJOR(kdev_t_to_nr(inode->i_rdev));
+#else
+	minor = MINOR(inode->i_rdev);
+	major = MAJOR(inode->i_rdev);
+#endif
+	minor = cdev_minor(&bpf_cdev, major, minor);
+	major = bpf_cdev.d_major;
+	modid = bpf_cdev.d_modid;
+	err = -ENXIO;
+	if (!(cdev = sdev_get(minor))) {
+		goto exit;
+	}
+	instance = cdev->d_modid;
+	err = spec_open(file, cdev, makedevice(modid, instance), CLONEOPEN);
+	sdev_put(cdev);
+      exit:
+	return (err);
+}
+
+STATIC struct file_operations bpf_f_ops ____cacheline_aligned = {
+	.owner = NULL,		/* yes NULL */
+	.open = bpf_open,
+};
+
+/* 
+ *  -------------------------------------------------------------------------
+ *
+ *  INITIALIZATION
+ *
+ *  -------------------------------------------------------------------------
+ */
+
+#ifdef CONFIG_STREAMS_BPF_MODULE
+static
+#endif
+int __init
+bpfinit(void)
+{
+	int err;
+
+#ifdef CONFIG_STREAMS_BPF_MODULE
+	printk(KERN_INFO BPF_BANNER);
+#else
+	printk(KERN_INFO BPF_SPLASH);
+#endif
+	bpf_minfo.mi_idnum = bpf_modid;
+	if ((err = register_cmajor(&bpf_cdev, major, &bpf_f_ops)) < 0)
+		return (err);
+	if (major == 0 && err > 0)
+		major = err;
+	return (0);
+};
+
+#ifdef CONFIG_STREAMS_BPF_MODULE
+static
+#endif
+void __exit
+bpfexit(void)
+{
+	if (unregister_cmajor(&bpf_cdev, major) != 0)
+		swerr();
+};
+
+#ifdef CONFIG_STREAMS_BPF_MODULE
+module_init(bpfinit);
+module_exit(bpfexit);
+#endif
