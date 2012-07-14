@@ -872,7 +872,7 @@ mxMIB_add(struct mxMIB_data *thedata)
  * @param line line from configuration file matching the token.
  * @brief parse configuration file for mxMIB entries.
  *
- * This callback is called by UCD-SNMP when it prases a configuration file and finds a configuration
+ * This callback is called by UCD-SNMP when it parses a configuration file and finds a configuration
  * file line for the registsred token (in this case mxMIB).  This routine is invoked by
  * UCD-SNMP to read the values of scalars in the MIB from the configuration file.  Note that this
  * procedure may exist regardless of the persistence of the MIB.  If there are no configured entries
@@ -1156,7 +1156,7 @@ mxSyncTable_del(struct mxSyncTable_data *thedata)
  * @param line line from configuration file matching the token.
  * @brief parse configuration file for mxSyncTable entries.
  *
- * This callback is called by UCD-SNMP when it prases a configuration file and finds a configuration
+ * This callback is called by UCD-SNMP when it parses a configuration file and finds a configuration
  * file line for the registsred token (in this case mxSyncTable).  This routine is invoked by UCD-SNMP
  * to read the values of each row in the table from the configuration file.  Note that this
  * procedure may exist regardless of the persistence of the table.  If there are no configured
@@ -1396,7 +1396,7 @@ mxDrivTable_del(struct mxDrivTable_data *thedata)
  * @param line line from configuration file matching the token.
  * @brief parse configuration file for mxDrivTable entries.
  *
- * This callback is called by UCD-SNMP when it prases a configuration file and finds a configuration
+ * This callback is called by UCD-SNMP when it parses a configuration file and finds a configuration
  * file line for the registsred token (in this case mxDrivTable).  This routine is invoked by UCD-SNMP
  * to read the values of each row in the table from the configuration file.  Note that this
  * procedure may exist regardless of the persistence of the table.  If there are no configured
@@ -1703,7 +1703,7 @@ mxCardTable_del(struct mxCardTable_data *thedata)
  * @param line line from configuration file matching the token.
  * @brief parse configuration file for mxCardTable entries.
  *
- * This callback is called by UCD-SNMP when it prases a configuration file and finds a configuration
+ * This callback is called by UCD-SNMP when it parses a configuration file and finds a configuration
  * file line for the registsred token (in this case mxCardTable).  This routine is invoked by UCD-SNMP
  * to read the values of each row in the table from the configuration file.  Note that this
  * procedure may exist regardless of the persistence of the table.  If there are no configured
@@ -2101,7 +2101,7 @@ mxSpanTable_del(struct mxSpanTable_data *thedata)
  * @param line line from configuration file matching the token.
  * @brief parse configuration file for mxSpanTable entries.
  *
- * This callback is called by UCD-SNMP when it prases a configuration file and finds a configuration
+ * This callback is called by UCD-SNMP when it parses a configuration file and finds a configuration
  * file line for the registsred token (in this case mxSpanTable).  This routine is invoked by UCD-SNMP
  * to read the values of each row in the table from the configuration file.  Note that this
  * procedure may exist regardless of the persistence of the table.  If there are no configured
@@ -2481,7 +2481,7 @@ mxBertTable_del(struct mxBertTable_data *thedata)
  * @param line line from configuration file matching the token.
  * @brief parse configuration file for mxBertTable entries.
  *
- * This callback is called by UCD-SNMP when it prases a configuration file and finds a configuration
+ * This callback is called by UCD-SNMP when it parses a configuration file and finds a configuration
  * file line for the registsred token (in this case mxBertTable).  This routine is invoked by UCD-SNMP
  * to read the values of each row in the table from the configuration file.  Note that this
  * procedure may exist regardless of the persistence of the table.  If there are no configured
@@ -2744,7 +2744,7 @@ mxChanTable_del(struct mxChanTable_data *thedata)
  * @param line line from configuration file matching the token.
  * @brief parse configuration file for mxChanTable entries.
  *
- * This callback is called by UCD-SNMP when it prases a configuration file and finds a configuration
+ * This callback is called by UCD-SNMP when it parses a configuration file and finds a configuration
  * file line for the registsred token (in this case mxChanTable).  This routine is invoked by UCD-SNMP
  * to read the values of each row in the table from the configuration file.  Note that this
  * procedure may exist regardless of the persistence of the table.  If there are no configured
@@ -3017,7 +3017,7 @@ mxXconTable_del(struct mxXconTable_data *thedata)
  * @param line line from configuration file matching the token.
  * @brief parse configuration file for mxXconTable entries.
  *
- * This callback is called by UCD-SNMP when it prases a configuration file and finds a configuration
+ * This callback is called by UCD-SNMP when it parses a configuration file and finds a configuration
  * file line for the registsred token (in this case mxXconTable).  This routine is invoked by UCD-SNMP
  * to read the values of each row in the table from the configuration file.  Note that this
  * procedure may exist regardless of the persistence of the table.  If there are no configured
@@ -3248,7 +3248,7 @@ mxNearEndCurrentTable_del(struct mxNearEndCurrentTable_data *thedata)
  * @param line line from configuration file matching the token.
  * @brief parse configuration file for mxNearEndCurrentTable entries.
  *
- * This callback is called by UCD-SNMP when it prases a configuration file and finds a configuration
+ * This callback is called by UCD-SNMP when it parses a configuration file and finds a configuration
  * file line for the registsred token (in this case mxNearEndCurrentTable).  This routine is invoked by UCD-SNMP
  * to read the values of each row in the table from the configuration file.  Note that this
  * procedure may exist regardless of the persistence of the table.  If there are no configured
@@ -3489,7 +3489,7 @@ mxNearEndIntervalTable_del(struct mxNearEndIntervalTable_data *thedata)
  * @param line line from configuration file matching the token.
  * @brief parse configuration file for mxNearEndIntervalTable entries.
  *
- * This callback is called by UCD-SNMP when it prases a configuration file and finds a configuration
+ * This callback is called by UCD-SNMP when it parses a configuration file and finds a configuration
  * file line for the registsred token (in this case mxNearEndIntervalTable).  This routine is invoked by UCD-SNMP
  * to read the values of each row in the table from the configuration file.  Note that this
  * procedure may exist regardless of the persistence of the table.  If there are no configured
@@ -3731,7 +3731,7 @@ mxNearEndTotalTable_del(struct mxNearEndTotalTable_data *thedata)
  * @param line line from configuration file matching the token.
  * @brief parse configuration file for mxNearEndTotalTable entries.
  *
- * This callback is called by UCD-SNMP when it prases a configuration file and finds a configuration
+ * This callback is called by UCD-SNMP when it parses a configuration file and finds a configuration
  * file line for the registsred token (in this case mxNearEndTotalTable).  This routine is invoked by UCD-SNMP
  * to read the values of each row in the table from the configuration file.  Note that this
  * procedure may exist regardless of the persistence of the table.  If there are no configured
@@ -3971,7 +3971,7 @@ mxFarEndCurrentTable_del(struct mxFarEndCurrentTable_data *thedata)
  * @param line line from configuration file matching the token.
  * @brief parse configuration file for mxFarEndCurrentTable entries.
  *
- * This callback is called by UCD-SNMP when it prases a configuration file and finds a configuration
+ * This callback is called by UCD-SNMP when it parses a configuration file and finds a configuration
  * file line for the registsred token (in this case mxFarEndCurrentTable).  This routine is invoked by UCD-SNMP
  * to read the values of each row in the table from the configuration file.  Note that this
  * procedure may exist regardless of the persistence of the table.  If there are no configured
@@ -4209,7 +4209,7 @@ mxFarEndIntervalTable_del(struct mxFarEndIntervalTable_data *thedata)
  * @param line line from configuration file matching the token.
  * @brief parse configuration file for mxFarEndIntervalTable entries.
  *
- * This callback is called by UCD-SNMP when it prases a configuration file and finds a configuration
+ * This callback is called by UCD-SNMP when it parses a configuration file and finds a configuration
  * file line for the registsred token (in this case mxFarEndIntervalTable).  This routine is invoked by UCD-SNMP
  * to read the values of each row in the table from the configuration file.  Note that this
  * procedure may exist regardless of the persistence of the table.  If there are no configured
@@ -4448,7 +4448,7 @@ mxFarEndTotalTable_del(struct mxFarEndTotalTable_data *thedata)
  * @param line line from configuration file matching the token.
  * @brief parse configuration file for mxFarEndTotalTable entries.
  *
- * This callback is called by UCD-SNMP when it prases a configuration file and finds a configuration
+ * This callback is called by UCD-SNMP when it parses a configuration file and finds a configuration
  * file line for the registsred token (in this case mxFarEndTotalTable).  This routine is invoked by UCD-SNMP
  * to read the values of each row in the table from the configuration file.  Note that this
  * procedure may exist regardless of the persistence of the table.  If there are no configured
