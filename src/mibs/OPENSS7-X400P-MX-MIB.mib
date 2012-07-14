@@ -2509,7 +2509,7 @@ x400pSpanAlarms OBJECT-TYPE
     ::= { x400pSpanEntry 40 }
 
 x400pSpanEvents OBJECT-TYPE
-    SYNTAX      BITS { rlos(0), frcl(1), rual(2), ryel(3), rra(4), 
+    SYNTAX      BITS { rlos(0), frcl(1), rua1(2), ryel(3), rra(4), 
                     rdma(5), v52lnk(6), lorc(7), lotc(8), lup(9), 
                     ldn(10), lspare(11), tocd(12), tcle(13) }
     MAX-ACCESS  read-only
