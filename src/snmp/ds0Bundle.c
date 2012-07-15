@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2012  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -370,7 +370,7 @@ ds0Bundle_add(struct ds0Bundle_data *thedata)
  * @param line line from configuration file matching the token.
  * @brief parse configuration file for ds0Bundle entries.
  *
- * This callback is called by UCD-SNMP when it prases a configuration file and finds a configuration
+ * This callback is called by UCD-SNMP when it parses a configuration file and finds a configuration
  * file line for the registsred token (in this case ds0Bundle).  This routine is invoked by
  * UCD-SNMP to read the values of scalars in the MIB from the configuration file.  Note that this
  * procedure may exist regardless of the persistence of the MIB.  If there are no configured entries
@@ -644,7 +644,7 @@ dsx0BondingTable_del(struct dsx0BondingTable_data *thedata)
  * @param line line from configuration file matching the token.
  * @brief parse configuration file for dsx0BondingTable entries.
  *
- * This callback is called by UCD-SNMP when it prases a configuration file and finds a configuration
+ * This callback is called by UCD-SNMP when it parses a configuration file and finds a configuration
  * file line for the registsred token (in this case dsx0BondingTable).  This routine is invoked by UCD-SNMP
  * to read the values of each row in the table from the configuration file.  Note that this
  * procedure may exist regardless of the persistence of the table.  If there are no configured
@@ -843,7 +843,7 @@ dsx0BundleTable_del(struct dsx0BundleTable_data *thedata)
  * @param line line from configuration file matching the token.
  * @brief parse configuration file for dsx0BundleTable entries.
  *
- * This callback is called by UCD-SNMP when it prases a configuration file and finds a configuration
+ * This callback is called by UCD-SNMP when it parses a configuration file and finds a configuration
  * file line for the registsred token (in this case dsx0BundleTable).  This routine is invoked by UCD-SNMP
  * to read the values of each row in the table from the configuration file.  Note that this
  * procedure may exist regardless of the persistence of the table.  If there are no configured
