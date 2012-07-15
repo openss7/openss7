@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2012  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -626,7 +626,7 @@ ds1EXT_add(struct ds1EXT_data *thedata)
  * @param line line from configuration file matching the token.
  * @brief parse configuration file for ds1EXT entries.
  *
- * This callback is called by UCD-SNMP when it prases a configuration file and finds a configuration
+ * This callback is called by UCD-SNMP when it parses a configuration file and finds a configuration
  * file line for the registsred token (in this case ds1EXT).  This routine is invoked by
  * UCD-SNMP to read the values of scalars in the MIB from the configuration file.  Note that this
  * procedure may exist regardless of the persistence of the MIB.  If there are no configured entries
@@ -921,7 +921,7 @@ dsx1ConfigTable_del(struct dsx1ConfigTable_data *thedata)
  * @param line line from configuration file matching the token.
  * @brief parse configuration file for dsx1ConfigTable entries.
  *
- * This callback is called by UCD-SNMP when it prases a configuration file and finds a configuration
+ * This callback is called by UCD-SNMP when it parses a configuration file and finds a configuration
  * file line for the registsred token (in this case dsx1ConfigTable).  This routine is invoked by UCD-SNMP
  * to read the values of each row in the table from the configuration file.  Note that this
  * procedure may exist regardless of the persistence of the table.  If there are no configured
@@ -1182,7 +1182,7 @@ dsx1CurrentTable_del(struct dsx1CurrentTable_data *thedata)
  * @param line line from configuration file matching the token.
  * @brief parse configuration file for dsx1CurrentTable entries.
  *
- * This callback is called by UCD-SNMP when it prases a configuration file and finds a configuration
+ * This callback is called by UCD-SNMP when it parses a configuration file and finds a configuration
  * file line for the registsred token (in this case dsx1CurrentTable).  This routine is invoked by UCD-SNMP
  * to read the values of each row in the table from the configuration file.  Note that this
  * procedure may exist regardless of the persistence of the table.  If there are no configured
@@ -1402,7 +1402,7 @@ dsx1IntervalTable_del(struct dsx1IntervalTable_data *thedata)
  * @param line line from configuration file matching the token.
  * @brief parse configuration file for dsx1IntervalTable entries.
  *
- * This callback is called by UCD-SNMP when it prases a configuration file and finds a configuration
+ * This callback is called by UCD-SNMP when it parses a configuration file and finds a configuration
  * file line for the registsred token (in this case dsx1IntervalTable).  This routine is invoked by UCD-SNMP
  * to read the values of each row in the table from the configuration file.  Note that this
  * procedure may exist regardless of the persistence of the table.  If there are no configured
@@ -1623,7 +1623,7 @@ dsx1TotalTable_del(struct dsx1TotalTable_data *thedata)
  * @param line line from configuration file matching the token.
  * @brief parse configuration file for dsx1TotalTable entries.
  *
- * This callback is called by UCD-SNMP when it prases a configuration file and finds a configuration
+ * This callback is called by UCD-SNMP when it parses a configuration file and finds a configuration
  * file line for the registsred token (in this case dsx1TotalTable).  This routine is invoked by UCD-SNMP
  * to read the values of each row in the table from the configuration file.  Note that this
  * procedure may exist regardless of the persistence of the table.  If there are no configured
@@ -1842,7 +1842,7 @@ dsx1FarEndCurrentTable_del(struct dsx1FarEndCurrentTable_data *thedata)
  * @param line line from configuration file matching the token.
  * @brief parse configuration file for dsx1FarEndCurrentTable entries.
  *
- * This callback is called by UCD-SNMP when it prases a configuration file and finds a configuration
+ * This callback is called by UCD-SNMP when it parses a configuration file and finds a configuration
  * file line for the registsred token (in this case dsx1FarEndCurrentTable).  This routine is invoked by UCD-SNMP
  * to read the values of each row in the table from the configuration file.  Note that this
  * procedure may exist regardless of the persistence of the table.  If there are no configured
@@ -2065,7 +2065,7 @@ dsx1FarEndIntervalTable_del(struct dsx1FarEndIntervalTable_data *thedata)
  * @param line line from configuration file matching the token.
  * @brief parse configuration file for dsx1FarEndIntervalTable entries.
  *
- * This callback is called by UCD-SNMP when it prases a configuration file and finds a configuration
+ * This callback is called by UCD-SNMP when it parses a configuration file and finds a configuration
  * file line for the registsred token (in this case dsx1FarEndIntervalTable).  This routine is invoked by UCD-SNMP
  * to read the values of each row in the table from the configuration file.  Note that this
  * procedure may exist regardless of the persistence of the table.  If there are no configured
@@ -2283,7 +2283,7 @@ dsx1FarEndTotalTable_del(struct dsx1FarEndTotalTable_data *thedata)
  * @param line line from configuration file matching the token.
  * @brief parse configuration file for dsx1FarEndTotalTable entries.
  *
- * This callback is called by UCD-SNMP when it prases a configuration file and finds a configuration
+ * This callback is called by UCD-SNMP when it parses a configuration file and finds a configuration
  * file line for the registsred token (in this case dsx1FarEndTotalTable).  This routine is invoked by UCD-SNMP
  * to read the values of each row in the table from the configuration file.  Note that this
  * procedure may exist regardless of the persistence of the table.  If there are no configured
@@ -2491,7 +2491,7 @@ dsx1FracTable_del(struct dsx1FracTable_data *thedata)
  * @param line line from configuration file matching the token.
  * @brief parse configuration file for dsx1FracTable entries.
  *
- * This callback is called by UCD-SNMP when it prases a configuration file and finds a configuration
+ * This callback is called by UCD-SNMP when it parses a configuration file and finds a configuration
  * file line for the registsred token (in this case dsx1FracTable).  This routine is invoked by UCD-SNMP
  * to read the values of each row in the table from the configuration file.  Note that this
  * procedure may exist regardless of the persistence of the table.  If there are no configured
@@ -2687,7 +2687,7 @@ dsx1ChanMappingTable_del(struct dsx1ChanMappingTable_data *thedata)
  * @param line line from configuration file matching the token.
  * @brief parse configuration file for dsx1ChanMappingTable entries.
  *
- * This callback is called by UCD-SNMP when it prases a configuration file and finds a configuration
+ * This callback is called by UCD-SNMP when it parses a configuration file and finds a configuration
  * file line for the registsred token (in this case dsx1ChanMappingTable).  This routine is invoked by UCD-SNMP
  * to read the values of each row in the table from the configuration file.  Note that this
  * procedure may exist regardless of the persistence of the table.  If there are no configured
