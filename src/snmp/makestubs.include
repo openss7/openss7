@@ -2111,3 +2111,146 @@ rs232_openss7.c rs232_openss7.h: mib2c mib2c.conf ../mibs/RS-232-MIB.mib
 	indent -nhnl rs232_openss7.[ch]
 
 
+MIBPREFIXES += isdnMib
+
+isdnMib.mib: ../mibs/RFC2127-MIB.txt
+	smidump -k ISDN-MIB>$@ || :
+
+isdnMib.lint: ../mibs/RFC2127-MIB.txt
+	smilint $(SMILINTIGNORES) -ms ISDN-MIB>$@ 2>&1 || :
+
+isdnMib.tree: ../mibs/RFC2127-MIB.txt
+	snmptranslate -Tp ISDN-MIB::isdnMib>$@ || :
+
+isdnMib_simple.c isdnMib_simple.h: mib2c mib2c.conf ../mibs/RFC2127-MIB.txt
+	./mib2c -c ./mib2c.conf -f isdnMib_simple ISDN-MIB::isdnMib
+	indent -nhnl isdnMib_simple.[ch]
+
+isdnMib_storage.c isdnMib_storage.h: mib2c mib2c.conf ../mibs/RFC2127-MIB.txt
+	./mib2c -c ./mib2c.storage.conf -f isdnMib_storage ISDN-MIB::isdnMib
+	indent -nhnl isdnMib_storage.[ch]
+
+isdnMib_openss7.c isdnMib_openss7.h: mib2c mib2c.conf ../mibs/RFC2127-MIB.txt
+	./mib2c -c ./mib2c.openss7.conf -f isdnMib_openss7 ISDN-MIB::isdnMib
+	indent -nhnl isdnMib_openss7.[ch]
+
+
+MIBPREFIXES += dialControlMib
+
+dialControlMib.mib: ../mibs/RFC2128-MIB.txt
+	smidump -k DIAL-CONTROL-MIB>$@ || :
+
+dialControlMib.lint: ../mibs/RFC2128-MIB.txt
+	smilint $(SMILINTIGNORES) -ms DIAL-CONTROL-MIB>$@ 2>&1 || :
+
+dialControlMib.tree: ../mibs/RFC2128-MIB.txt
+	snmptranslate -Tp DIAL-CONTROL-MIB::dialControlMib>$@ || :
+
+dialControlMib_simple.c dialControlMib_simple.h: mib2c mib2c.conf ../mibs/RFC2128-MIB.txt
+	./mib2c -c ./mib2c.conf -f dialControlMib_simple DIAL-CONTROL-MIB::dialControlMib
+	indent -nhnl dialControlMib_simple.[ch]
+
+dialControlMib_storage.c dialControlMib_storage.h: mib2c mib2c.conf ../mibs/RFC2128-MIB.txt
+	./mib2c -c ./mib2c.storage.conf -f dialControlMib_storage DIAL-CONTROL-MIB::dialControlMib
+	indent -nhnl dialControlMib_storage.[ch]
+
+dialControlMib_openss7.c dialControlMib_openss7.h: mib2c mib2c.conf ../mibs/RFC2128-MIB.txt
+	./mib2c -c ./mib2c.openss7.conf -f dialControlMib_openss7 DIAL-CONTROL-MIB::dialControlMib
+	indent -nhnl dialControlMib_openss7.[ch]
+
+
+MIBPREFIXES += sctpMIB
+
+sctpMIB.mib: ../mibs/RFC3873-MIB.txt
+	smidump -k SCTP-MIB>$@ || :
+
+sctpMIB.lint: ../mibs/RFC3873-MIB.txt
+	smilint $(SMILINTIGNORES) -ms SCTP-MIB>$@ 2>&1 || :
+
+sctpMIB.tree: ../mibs/RFC3873-MIB.txt
+	snmptranslate -Tp SCTP-MIB::sctpMIB>$@ || :
+
+sctpMIB_simple.c sctpMIB_simple.h: mib2c mib2c.conf ../mibs/RFC3873-MIB.txt
+	./mib2c -c ./mib2c.conf -f sctpMIB_simple SCTP-MIB::sctpMIB
+	indent -nhnl sctpMIB_simple.[ch]
+
+sctpMIB_storage.c sctpMIB_storage.h: mib2c mib2c.conf ../mibs/RFC3873-MIB.txt
+	./mib2c -c ./mib2c.storage.conf -f sctpMIB_storage SCTP-MIB::sctpMIB
+	indent -nhnl sctpMIB_storage.[ch]
+
+sctpMIB_openss7.c sctpMIB_openss7.h: mib2c mib2c.conf ../mibs/RFC3873-MIB.txt
+	./mib2c -c ./mib2c.openss7.conf -f sctpMIB_openss7 SCTP-MIB::sctpMIB
+	indent -nhnl sctpMIB_openss7.[ch]
+
+
+MIBPREFIXES += ds1
+
+ds1.mib: ../mibs/RFC4805-MIB.txt
+	smidump -k DS1-MIB>$@ || :
+
+ds1.lint: ../mibs/RFC4805-MIB.txt
+	smilint $(SMILINTIGNORES) -ms DS1-MIB>$@ 2>&1 || :
+
+ds1.tree: ../mibs/RFC4805-MIB.txt
+	snmptranslate -Tp DS1-MIB::ds1>$@ || :
+
+ds1_simple.c ds1_simple.h: mib2c mib2c.conf ../mibs/RFC4805-MIB.txt
+	./mib2c -c ./mib2c.conf -f ds1_simple DS1-MIB::ds1
+	indent -nhnl ds1_simple.[ch]
+
+ds1_storage.c ds1_storage.h: mib2c mib2c.conf ../mibs/RFC4805-MIB.txt
+	./mib2c -c ./mib2c.storage.conf -f ds1_storage DS1-MIB::ds1
+	indent -nhnl ds1_storage.[ch]
+
+ds1_openss7.c ds1_openss7.h: mib2c mib2c.conf ../mibs/RFC4805-MIB.txt
+	./mib2c -c ./mib2c.openss7.conf -f ds1_openss7 DS1-MIB::ds1
+	indent -nhnl ds1_openss7.[ch]
+
+
+MIBPREFIXES += ds0
+
+ds0.mib: ../mibs/RFC2494-MIB.txt
+	smidump -k DS0-MIB>$@ || :
+
+ds0.lint: ../mibs/RFC2494-MIB.txt
+	smilint $(SMILINTIGNORES) -ms DS0-MIB>$@ 2>&1 || :
+
+ds0.tree: ../mibs/RFC2494-MIB.txt
+	snmptranslate -Tp DS0-MIB::ds0>$@ || :
+
+ds0_simple.c ds0_simple.h: mib2c mib2c.conf ../mibs/RFC2494-MIB.txt
+	./mib2c -c ./mib2c.conf -f ds0_simple DS0-MIB::ds0
+	indent -nhnl ds0_simple.[ch]
+
+ds0_storage.c ds0_storage.h: mib2c mib2c.conf ../mibs/RFC2494-MIB.txt
+	./mib2c -c ./mib2c.storage.conf -f ds0_storage DS0-MIB::ds0
+	indent -nhnl ds0_storage.[ch]
+
+ds0_openss7.c ds0_openss7.h: mib2c mib2c.conf ../mibs/RFC2494-MIB.txt
+	./mib2c -c ./mib2c.openss7.conf -f ds0_openss7 DS0-MIB::ds0
+	indent -nhnl ds0_openss7.[ch]
+
+
+MIBPREFIXES += ds0Bundle
+
+ds0Bundle.mib: ../mibs/RFC2494-EXT-MIB.mib
+	smidump -k DS0BUNDLE-MIB>$@ || :
+
+ds0Bundle.lint: ../mibs/RFC2494-EXT-MIB.mib
+	smilint $(SMILINTIGNORES) -ms DS0BUNDLE-MIB>$@ 2>&1 || :
+
+ds0Bundle.tree: ../mibs/RFC2494-EXT-MIB.mib
+	snmptranslate -Tp DS0BUNDLE-MIB::ds0Bundle>$@ || :
+
+ds0Bundle_simple.c ds0Bundle_simple.h: mib2c mib2c.conf ../mibs/RFC2494-EXT-MIB.mib
+	./mib2c -c ./mib2c.conf -f ds0Bundle_simple DS0BUNDLE-MIB::ds0Bundle
+	indent -nhnl ds0Bundle_simple.[ch]
+
+ds0Bundle_storage.c ds0Bundle_storage.h: mib2c mib2c.conf ../mibs/RFC2494-EXT-MIB.mib
+	./mib2c -c ./mib2c.storage.conf -f ds0Bundle_storage DS0BUNDLE-MIB::ds0Bundle
+	indent -nhnl ds0Bundle_storage.[ch]
+
+ds0Bundle_openss7.c ds0Bundle_openss7.h: mib2c mib2c.conf ../mibs/RFC2494-EXT-MIB.mib
+	./mib2c -c ./mib2c.openss7.conf -f ds0Bundle_openss7 DS0BUNDLE-MIB::ds0Bundle
+	indent -nhnl ds0Bundle_openss7.[ch]
+
