@@ -18,10 +18,10 @@ BEGIN {
 		print "MIBPREFIXES += " root;
 		print "";
 		print root ".mib: " FILENAME;
-		print "\tsmidump -k " name ">$@ || :";
+		print "\tsmidump -k " FILENAME ">$@ || :";
 		print "";
 		print root ".lint: " FILENAME;
-		print "\tsmilint $(SMILINTIGNORES) -ms " name ">$@ 2>&1 || :";
+		print "\tsmilint $(SMILINTIGNORES) -ms " FILENAME ">$@ 2>&1 || :";
 		print "";
 		print root ".tree: " FILENAME;
 		print "\tsnmptranslate -Tp " name "::" root ">$@ || :";

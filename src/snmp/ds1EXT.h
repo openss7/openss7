@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2012  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -126,7 +126,7 @@ struct ds1EXT_data {
 struct dsx1ConfigTable_data {
 	uint dsx1ConfigTable_request;
 	uint dsx1ConfigTable_refs;
-	long dsx1LineIndex;		/* ReadOnly */
+	long dsx1LineIndex;		/* NoAccess */
 	long dsx1IfIndex;		/* ReadOnly */
 	long dsx1TimeElapsed;		/* ReadOnly */
 	long dsx1ValidIntervals;	/* ReadOnly */
@@ -157,7 +157,7 @@ struct dsx1ConfigTable_data {
 struct dsx1CurrentTable_data {
 	uint dsx1CurrentTable_request;
 	uint dsx1CurrentTable_refs;
-	long dsx1CurrentIndex;		/* ReadOnly */
+	long dsx1CurrentIndex;		/* NoAccess */
 	long dsx1CurrentESs;		/* ReadOnly */
 	long dsx1CurrentSESs;		/* ReadOnly */
 	long dsx1CurrentSEFSs;		/* ReadOnly */
@@ -172,8 +172,8 @@ struct dsx1CurrentTable_data {
 struct dsx1IntervalTable_data {
 	uint dsx1IntervalTable_request;
 	uint dsx1IntervalTable_refs;
-	long dsx1IntervalIndex;		/* ReadOnly */
-	long dsx1IntervalNumber;	/* ReadOnly */
+	long dsx1IntervalIndex;		/* NoAccess */
+	long dsx1IntervalNumber;	/* NoAccess */
 	long dsx1IntervalESs;		/* ReadOnly */
 	long dsx1IntervalSESs;		/* ReadOnly */
 	long dsx1IntervalSEFSs;		/* ReadOnly */
@@ -189,7 +189,7 @@ struct dsx1IntervalTable_data {
 struct dsx1TotalTable_data {
 	uint dsx1TotalTable_request;
 	uint dsx1TotalTable_refs;
-	long dsx1TotalIndex;		/* ReadOnly */
+	long dsx1TotalIndex;		/* NoAccess */
 	long dsx1TotalESs;		/* ReadOnly */
 	long dsx1TotalSESs;		/* ReadOnly */
 	long dsx1TotalSEFSs;		/* ReadOnly */
@@ -204,7 +204,7 @@ struct dsx1TotalTable_data {
 struct dsx1FarEndCurrentTable_data {
 	uint dsx1FarEndCurrentTable_request;
 	uint dsx1FarEndCurrentTable_refs;
-	long dsx1FarEndCurrentIndex;	/* ReadOnly */
+	long dsx1FarEndCurrentIndex;	/* NoAccess */
 	long dsx1FarEndTimeElapsed;	/* ReadOnly */
 	long dsx1FarEndValidIntervals;	/* ReadOnly */
 	long dsx1FarEndCurrentESs;	/* ReadOnly */
@@ -221,8 +221,8 @@ struct dsx1FarEndCurrentTable_data {
 struct dsx1FarEndIntervalTable_data {
 	uint dsx1FarEndIntervalTable_request;
 	uint dsx1FarEndIntervalTable_refs;
-	long dsx1FarEndIntervalIndex;	/* ReadOnly */
-	long dsx1FarEndIntervalNumber;	/* ReadOnly */
+	long dsx1FarEndIntervalIndex;	/* NoAccess */
+	long dsx1FarEndIntervalNumber;	/* NoAccess */
 	long dsx1FarEndIntervalESs;	/* ReadOnly */
 	long dsx1FarEndIntervalSESs;	/* ReadOnly */
 	long dsx1FarEndIntervalSEFSs;	/* ReadOnly */
@@ -237,7 +237,7 @@ struct dsx1FarEndIntervalTable_data {
 struct dsx1FarEndTotalTable_data {
 	uint dsx1FarEndTotalTable_request;
 	uint dsx1FarEndTotalTable_refs;
-	long dsx1FarEndTotalIndex;	/* ReadOnly */
+	long dsx1FarEndTotalIndex;	/* NoAccess */
 	long dsx1FarEndTotalESs;	/* ReadOnly */
 	long dsx1FarEndTotalSESs;	/* ReadOnly */
 	long dsx1FarEndTotalSEFSs;	/* ReadOnly */
@@ -251,8 +251,8 @@ struct dsx1FarEndTotalTable_data {
 struct dsx1FracTable_data {
 	uint dsx1FracTable_request;
 	uint dsx1FracTable_refs;
-	long dsx1FracIndex;		/* ReadOnly */
-	long dsx1FracNumber;		/* ReadOnly */
+	long dsx1FracIndex;		/* NoAccess */
+	long dsx1FracNumber;		/* NoAccess */
 	long dsx1FracIfIndex;		/* ReadWrite */
 };
 struct dsx1ChanMappingTable_data {
