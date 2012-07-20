@@ -141,12 +141,15 @@ mxMIB MODULE-IDENTITY
          enterprise object identifier arc: 1.3.6.1.4.1.29591.  
          Modifications must be made only within an object identifier arc 
          under your control."
+    REVISION    "201207171622Z"
+    DESCRIPTION
+        "Added near end error counts."
     REVISION    "201112101120Z"
     DESCRIPTION 
         "Corrections an smilint workup."
     REVISION    "201112072346Z"
     DESCRIPTION 
-	"Reformatted and corrected using smilint."
+        "Reformatted and corrected using smilint."
     REVISION    "201111050944Z"
     DESCRIPTION 
         "Added new card types for ATCOM cards."
@@ -622,11 +625,11 @@ mxCardType OBJECT-TYPE
          - mxCardTypeV400PT,
          - mxCardTypeV401PE,
          - mxCardTypeV401PT,
-	 - mxCardTypeAT400P,
-	 - mxCardTypeAE400P,
-	 - mxCardTypeA400P,
-	 - mxCardTypeA400PT,
-	 - mxCardTypeA400PE,"
+         - mxCardTypeAT400P,
+         - mxCardTypeAE400P,
+         - mxCardTypeA400P,
+         - mxCardTypeA400PT,
+         - mxCardTypeA400PE,"
     ::= { mxCardEntry 2 }
 
 mxCardIdentifier OBJECT-TYPE
@@ -2855,7 +2858,7 @@ mxChanEntry OBJECT-TYPE
         "For T1 spans, there can be 24 channels numbered 1 
          through 24.  For E1 spans there can be 31 channels 
          numbered 1 through 31.  Channels are neither created 
-         nor deleted by managemention stations but exist 
+         nor deleted by management stations but exist 
          inherently as a part of system operation.
          
          Rows are neither created nor deleted explicitly by 
@@ -3751,7 +3754,10 @@ MxNearEndCurrentEntry ::= SEQUENCE {
     mxNearEndCurrentLESs            PerfCurrentCount,
     mxNearEndCurrentBESs            PerfCurrentCount,
     mxNearEndCurrentDMs             PerfCurrentCount,
-    mxNearEndCurrentLCVs            PerfCurrentCount
+    mxNearEndCurrentLCVs            PerfCurrentCount,
+    mxNearEndCurrentFASEs           PerfCurrentCount,
+    mxNearEndCurrentFABEs           PerfCurrentCount,
+    mxNearEndCurrentFEBEs           PerfCurrentCount
 }
 
 mxNearEndCurrentTimeElapsed OBJECT-TYPE
@@ -3894,6 +3900,42 @@ mxNearEndCurrentLCVs OBJECT-TYPE
          Violation (BPV) or Excessive Zeroes (EXZ) error event."
     ::= { mxNearEndCurrentEntry 11 }
 
+mxNearEndCurrentFASEs OBJECT-TYPE
+    SYNTAX      PerfCurrentCount
+    UNITS       "errors"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of Frame Alignment Signal Errors (FASEs) in the 
+         current interval.  The FASE is a count of the number of 
+         multi-frames for which the receiver has been out of 
+         synchronization in the current interval."
+    ::= { mxNearEndCurrentEntry 12 }
+
+mxNearEndCurrentFABEs OBJECT-TYPE
+    SYNTAX      PerfCurrentCount
+    UNITS       "errors"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of Frame Alignment Bit Errors (FABEs) in the current 
+         interval.  The FABE is a count of the number of frame alignment 
+         bit errors in the current interval."
+    ::= { mxNearEndCurrentEntry 13 }
+
+mxNearEndCurrentFEBEs OBJECT-TYPE
+    SYNTAX      PerfCurrentCount
+    UNITS       "errors"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of Far End Block Errors (FEBEs) in the current 
+         interval.  This is only applicable to E1 and counts the number 
+         of error-bits received from the far end indicating a block 
+         error.  It is indication of the number of blocks (frames) that 
+         the far end considered to be in error."
+    ::= { mxNearEndCurrentEntry 14 }
+
 mxNearEndInterval OBJECT IDENTIFIER
     ::= { mxNearEndStats 2 }
 
@@ -3935,6 +3977,9 @@ MxNearEndIntervalEntry ::= SEQUENCE {
     mxNearEndIntervalBESs       PerfIntervalCount,
     mxNearEndIntervalDMs        PerfIntervalCount,
     mxNearEndIntervalLCVs       PerfIntervalCount,
+    mxNearEndIntervalFASEs      PerfIntervalCount,
+    mxNearEndIntervalFABEs      PerfIntervalCount,
+    mxNearEndIntervalFEBEs      PerfIntervalCount,
     mxNearEndIntervalValidData  TruthValue
 }
 
@@ -4048,6 +4093,42 @@ mxNearEndIntervalLCVs OBJECT-TYPE
          indexed interval."
     ::= { mxNearEndIntervalEntry 11 }
 
+mxNearEndIntervalFASEs OBJECT-TYPE
+    SYNTAX      PerfIntervalCount
+    UNITS       "errors"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of Frame Alignment Signal Errors (FASEs) in the 
+         indexed interval.  The FASE is a count of the number of 
+         multi-frames for which the receiver has been out of 
+         synchronization in the indexed interval."
+    ::= { mxNearEndIntervalEntry 12 }
+
+mxNearEndIntervalFABEs OBJECT-TYPE
+    SYNTAX      PerfIntervalCount
+    UNITS       "errors"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of Frame Alignment Bit Errors (FABEs) in the indexed 
+         interval.  The FABE is a count of the number of frame alignment 
+         bit errors in the indexed interval."
+    ::= { mxNearEndIntervalEntry 13 }
+
+mxNearEndIntervalFEBEs OBJECT-TYPE
+    SYNTAX      PerfIntervalCount
+    UNITS       "errors"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of Far End Block Errors (FEBEs) in the indexed 
+         interval.  This is only applicable to E1 and counts the number 
+         of error-bits received from the far end indicating a block 
+         error.  It is indication of the number of blocks (frames) that 
+         the far end considered to be in error."
+    ::= { mxNearEndIntervalEntry 14 }
+
 mxNearEndIntervalValidData OBJECT-TYPE
     SYNTAX      TruthValue
     MAX-ACCESS  read-only
@@ -4055,7 +4136,7 @@ mxNearEndIntervalValidData OBJECT-TYPE
     DESCRIPTION 
         "Indicates whether the performance interval counts are 
          valid for the indexed interval."
-    ::= { mxNearEndIntervalEntry 12 }
+    ::= { mxNearEndIntervalEntry 15 }
 
 mxNearEndTotal OBJECT IDENTIFIER
     ::= { mxNearEndStats 3 }
@@ -4095,7 +4176,10 @@ MxNearEndTotalEntry ::= SEQUENCE {
     mxNearEndTotalLESs              PerfTotalCount,
     mxNearEndTotalBESs              PerfTotalCount,
     mxNearEndTotalDMs               PerfTotalCount,
-    mxNearEndTotalLCVs              PerfTotalCount
+    mxNearEndTotalLCVs              PerfTotalCount,
+    mxNearEndTotalFASEs             PerfTotalCount,
+    mxNearEndTotalFABEs             PerfTotalCount,
+    mxNearEndTotalFEBEs             PerfTotalCount
 }
 
 mxNearEndTotalValidIntervals OBJECT-TYPE
@@ -4216,6 +4300,36 @@ mxNearEndTotalLCVs OBJECT-TYPE
         "The total number of Line Coding Violations (LCVs) in 
          all available intervals over the last 24-hour period."
     ::= { mxNearEndTotalEntry 12 }
+
+mxNearEndTotalFASEs OBJECT-TYPE
+    SYNTAX      PerfTotalCount
+    UNITS       "errors"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The total number of Frame Alignment Signal Errors (FASEs) in 
+         all available intervals over the last 24-hour period."
+    ::= { mxNearEndTotalEntry 13 }
+
+mxNearEndTotalFABEs OBJECT-TYPE
+    SYNTAX      PerfTotalCount
+    UNITS       "errors"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The total number of Frame Aligment Bit Errors (FABEs) in all 
+         available intervals over the last 24-hour period."
+    ::= { mxNearEndTotalEntry 14 }
+
+mxNearEndTotalFEBEs OBJECT-TYPE
+    SYNTAX      PerfTotalCount
+    UNITS       "errors"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The total number of Far End Block Errors (FEBEs) in all 
+         available intervals over the last 24-hour period."
+    ::= { mxNearEndTotalEntry 15 }
 
 mxFarEndStats OBJECT IDENTIFIER
     ::= { mxStats 2 }
@@ -4776,8 +4890,9 @@ mxNearEndCurrentGroup OBJECT-GROUP
                   mxNearEndCurrentSESs, mxNearEndCurrentSEFSs, 
                   mxNearEndCurrentUASs, mxNearEndCurrentCSSs, 
                   mxNearEndCurrentPCVs, mxNearEndCurrentLESs, 
-                  mxNearEndCurrentBESs, mxNearEndCurrentDMs, 
-                  mxNearEndCurrentLCVs }
+                  mxNearEndCurrentBESs, mxNearEndCurrentDMs,
+                  mxNearEndCurrentLCVs, mxNearEndCurrentFASEs, 
+                  mxNearEndCurrentFABEs, mxNearEndCurrentFEBEs }
     STATUS      current
     DESCRIPTION 
         "A collection of objects implementing the near end 
@@ -4790,7 +4905,8 @@ mxNearEndIntervalGroup OBJECT-GROUP
                   mxNearEndIntervalCSSs, mxNearEndIntervalPCVs, 
                   mxNearEndIntervalLESs, mxNearEndIntervalBESs, 
                   mxNearEndIntervalDMs, mxNearEndIntervalLCVs, 
-                  mxNearEndIntervalValidData }
+                  mxNearEndIntervalFASEs, mxNearEndIntervalFABEs, 
+                  mxNearEndIntervalFEBEs, mxNearEndIntervalValidData }
     STATUS      current
     DESCRIPTION 
         "A collection of objects implementing the near end 
@@ -4804,7 +4920,8 @@ mxNearEndTotalGroup OBJECT-GROUP
                   mxNearEndTotalUASs, mxNearEndTotalCSSs, 
                   mxNearEndTotalPCVs, mxNearEndTotalLESs, 
                   mxNearEndTotalBESs, mxNearEndTotalDMs, 
-                  mxNearEndTotalLCVs }
+                  mxNearEndTotalLCVs, mxNearEndTotalFASEs, 
+                  mxNearEndTotalFABEs, mxNearEndTotalFEBEs }
     STATUS      current
     DESCRIPTION 
         "A collection of objects implementing the near end total 
@@ -4866,8 +4983,8 @@ mxBasicCompliance MODULE-COMPLIANCE
     MODULE      -- this module
 
         MANDATORY-GROUPS        { mxSyncMandatoryGroup, 
-	          mxCardIdGroup, mxChipGroup, mxCardGroup, 
-		  mxDrivGroup }
+                  mxCardIdGroup, mxChipGroup, mxCardGroup, 
+                  mxDrivGroup }
 
         GROUP   mxPciGroup
         DESCRIPTION   

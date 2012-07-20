@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2012  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -109,6 +109,10 @@ extern int sa_request;			/* request number for per-request actions */
 
 /* our storage structure(s) */
 struct sccpOmMIB_data {
+	struct sccpOmMIB_data *sccpOmMIB_old;
+	uint sccpOmMIB_rsvs;
+	uint sccpOmMIB_tsts;
+	uint sccpOmMIB_sets;
 	uint sccpOmMIB_request;
 	oid *sccpOm1stAndIntervalActivate;	/* ReadWrite */
 	size_t sccpOm1stAndIntervalActivateLen;
@@ -131,8 +135,13 @@ struct sccpOmMIB_data {
 	long sccpOmNrOfRestrictionLevelsDefault;	/* ReadWrite */
 };
 struct sccpOmErrorsTable_data {
+	struct sccpOmErrorsTable_data *sccpOmErrorsTable_old;
+	uint sccpOmErrorsTable_rsvs;
+	uint sccpOmErrorsTable_tsts;
+	uint sccpOmErrorsTable_sets;
 	uint sccpOmErrorsTable_request;
 	uint sccpOmErrorsTable_refs;
+	uint sccpOmErrorsTable_id;
 	uint8_t *sccpNetworkEntityId;	/* NoAccess */
 	size_t sccpNetworkEntityIdLen;
 	long sccpOmNoTranslatorForAddress;	/* ReadOnly */
@@ -160,8 +169,13 @@ struct sccpOmErrorsTable_data {
 	long sccpOmErrors15MinValidIntervals;	/* ReadOnly */
 };
 struct sccpOmMessageTable_data {
+	struct sccpOmMessageTable_data *sccpOmMessageTable_old;
+	uint sccpOmMessageTable_rsvs;
+	uint sccpOmMessageTable_tsts;
+	uint sccpOmMessageTable_sets;
 	uint sccpOmMessageTable_request;
 	uint sccpOmMessageTable_refs;
+	uint sccpOmMessageTable_id;
 	uint8_t *sccpNetworkEntityId;	/* NoAccess */
 	size_t sccpNetworkEntityIdLen;
 	long sccpOmTotalMessagesHandled;	/* ReadOnly */
@@ -191,8 +205,13 @@ struct sccpOmMessageTable_data {
 	long sccpOmMessage15MinValidIntervals;	/* ReadOnly */
 };
 struct sccpOmAccessibilityTable_data {
+	struct sccpOmAccessibilityTable_data *sccpOmAccessibilityTable_old;
+	uint sccpOmAccessibilityTable_rsvs;
+	uint sccpOmAccessibilityTable_tsts;
+	uint sccpOmAccessibilityTable_sets;
 	uint sccpOmAccessibilityTable_request;
 	uint sccpOmAccessibilityTable_refs;
+	uint sccpOmAccessibilityTable_id;
 	uint8_t *sccpNetworkEntityId;	/* NoAccess */
 	size_t sccpNetworkEntityIdLen;
 	long sccpOmSSCMessageReceived;	/* ReadOnly */
@@ -202,8 +221,13 @@ struct sccpOmAccessibilityTable_data {
 	long sccpOmAccessibility15MinValidIntervals;	/* ReadOnly */
 };
 struct sccpOmUtilizationTable_data {
+	struct sccpOmUtilizationTable_data *sccpOmUtilizationTable_old;
+	uint sccpOmUtilizationTable_rsvs;
+	uint sccpOmUtilizationTable_tsts;
+	uint sccpOmUtilizationTable_sets;
 	uint sccpOmUtilizationTable_request;
 	uint sccpOmUtilizationTable_refs;
+	uint sccpOmUtilizationTable_id;
 	uint8_t *sccpNetworkEntityId;	/* NoAccess */
 	size_t sccpNetworkEntityIdLen;
 	long sccpOmSsn;			/* NoAccess */
@@ -222,8 +246,13 @@ struct sccpOmUtilizationTable_data {
 	long sccpOmUtilization15MinValidIntervals;	/* ReadOnly */
 };
 struct sccpOm5MinHistoryTable_data {
+	struct sccpOm5MinHistoryTable_data *sccpOm5MinHistoryTable_old;
+	uint sccpOm5MinHistoryTable_rsvs;
+	uint sccpOm5MinHistoryTable_tsts;
+	uint sccpOm5MinHistoryTable_sets;
 	uint sccpOm5MinHistoryTable_request;
 	uint sccpOm5MinHistoryTable_refs;
+	uint sccpOm5MinHistoryTable_id;
 	uint8_t *sccpNetworkEntityId;	/* NoAccess */
 	size_t sccpNetworkEntityIdLen;
 	long sccpOmInterval;		/* NoAccess */
@@ -275,8 +304,13 @@ struct sccpOm5MinHistoryTable_data {
 	long sccpOm5MinSSPMessageReceived;	/* ReadOnly */
 };
 struct sccpOm15MinHistoryTable_data {
+	struct sccpOm15MinHistoryTable_data *sccpOm15MinHistoryTable_old;
+	uint sccpOm15MinHistoryTable_rsvs;
+	uint sccpOm15MinHistoryTable_tsts;
+	uint sccpOm15MinHistoryTable_sets;
 	uint sccpOm15MinHistoryTable_request;
 	uint sccpOm15MinHistoryTable_refs;
+	uint sccpOm15MinHistoryTable_id;
 	uint8_t *sccpNetworkEntityId;	/* NoAccess */
 	size_t sccpNetworkEntityIdLen;
 	long sccpOmInterval;		/* NoAccess */
@@ -327,8 +361,13 @@ struct sccpOm15MinHistoryTable_data {
 	ulong sccpOm15MinSccpUnavailableDuration;	/* ReadOnly */
 };
 struct sccpOm5MinSsnHistoryTable_data {
+	struct sccpOm5MinSsnHistoryTable_data *sccpOm5MinSsnHistoryTable_old;
+	uint sccpOm5MinSsnHistoryTable_rsvs;
+	uint sccpOm5MinSsnHistoryTable_tsts;
+	uint sccpOm5MinSsnHistoryTable_sets;
 	uint sccpOm5MinSsnHistoryTable_request;
 	uint sccpOm5MinSsnHistoryTable_refs;
+	uint sccpOm5MinSsnHistoryTable_id;
 	uint8_t *sccpNetworkEntityId;	/* NoAccess */
 	size_t sccpNetworkEntityIdLen;
 	long sccpOmSsn;			/* NoAccess */
@@ -346,8 +385,13 @@ struct sccpOm5MinSsnHistoryTable_data {
 	long sccpOm5MinEDMessagesReceived;	/* ReadOnly */
 };
 struct sccpOm15MinSsnHistoryTable_data {
+	struct sccpOm15MinSsnHistoryTable_data *sccpOm15MinSsnHistoryTable_old;
+	uint sccpOm15MinSsnHistoryTable_rsvs;
+	uint sccpOm15MinSsnHistoryTable_tsts;
+	uint sccpOm15MinSsnHistoryTable_sets;
 	uint sccpOm15MinSsnHistoryTable_request;
 	uint sccpOm15MinSsnHistoryTable_refs;
+	uint sccpOm15MinSsnHistoryTable_id;
 	uint8_t *sccpNetworkEntityId;	/* NoAccess */
 	size_t sccpNetworkEntityIdLen;
 	long sccpOmSsn;			/* NoAccess */
@@ -384,10 +428,10 @@ extern struct header_complex_index *sccpOm15MinSsnHistoryTableStorage;
 #define SCCPOMSYNTAXERRORTYPE_INVALIDVALUEFORENCODINGSCHEME 3
 #define SCCPOMSYNTAXERRORTYPE_INVALIDPARAMETERLENGTH 4
 #define SCCPOMSYNTAXERRORTYPE_INVALIDPOINTERTOOPTIONALPARAMETER 5
-#define SCCPOMSYNTAXERRORTYPE_OPTIONALPARAMETERTOOLONG 6
+#define SCCPOMSYNTAXERRORTYPE_OPTIONALPARAMETERTOLONG 6
 #define SCCPOMSYNTAXERRORTYPE_POINTERINCONSISTENTWITHLENGTHS 7
 #define SCCPOMSYNTAXERRORTYPE_INCOMPATIBLEADDRESSLENGTH 8
-#define SCCPOMSYNTAXERRORTYPE_EXPECTEDSSNOTFOUND 9
+#define SCCPOMSYNTAXERRORTYPE_EXPECTEDSSNNOTFOUND 9
 
 /* notifications */
 extern oid sccpOm5minReport_oid[12];
@@ -431,6 +475,10 @@ void init_sccpOmMIB(void);
 void deinit_sccpOmMIB(void);
 int term_sccpOmMIB(int majorID, int minorID, void *serverarg, void *clientarg);
 FindVarMethod var_sccpOmMIB;
+struct sccpOmMIB_data *sccpOmMIB_create(void);
+struct sccpOmMIB_data *sccpOmMIB_duplicate(struct sccpOmMIB_data *);
+int sccpOmMIB_destroy(struct sccpOmMIB_data **);
+int sccpOmMIB_add(struct sccpOmMIB_data *);
 void parse_sccpOmMIB(const char *, char *);
 SNMPCallback store_sccpOmMIB;
 void refresh_sccpOmMIB(int);

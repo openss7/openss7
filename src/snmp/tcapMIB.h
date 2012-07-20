@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2012  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -103,26 +103,45 @@ extern int sa_request;			/* request number for per-request actions */
 
 /* our storage structure(s) */
 struct tcapMIB_data {
+	struct tcapMIB_data *tcapMIB_old;
+	uint tcapMIB_rsvs;
+	uint tcapMIB_tsts;
+	uint tcapMIB_sets;
 	uint tcapMIB_request;
 };
 struct tcapApplicationSubsystemTable_data {
+	struct tcapApplicationSubsystemTable_data *tcapApplicationSubsystemTable_old;
+	uint tcapApplicationSubsystemTable_rsvs;
+	uint tcapApplicationSubsystemTable_tsts;
+	uint tcapApplicationSubsystemTable_sets;
 	uint tcapApplicationSubsystemTable_request;
 	uint tcapApplicationSubsystemTable_refs;
+	uint tcapApplicationSubsystemTable_id;
 	long tcapSystemId;		/* NoAccess */
 	uint8_t *tcapApplicationSubsystemId;	/* NoAccess */
 	size_t tcapApplicationSubsystemIdLen;
 	long tcapApplicationSubsystemRowStatus;	/* Create */
 };
 struct tcapTransactionCopmTable_data {
+	struct tcapTransactionCopmTable_data *tcapTransactionCopmTable_old;
+	uint tcapTransactionCopmTable_rsvs;
+	uint tcapTransactionCopmTable_tsts;
+	uint tcapTransactionCopmTable_sets;
 	uint tcapTransactionCopmTable_request;
 	uint tcapTransactionCopmTable_refs;
+	uint tcapTransactionCopmTable_id;
 	ulong tcapTransactionCopmId;	/* NoAccess */
 	long tcapTransactionCopmOperationalState;	/* NoAccess */
 	long tcapTransactionCopmRowStatus;	/* Create */
 };
 struct tcapTransactionTable_data {
+	struct tcapTransactionTable_data *tcapTransactionTable_old;
+	uint tcapTransactionTable_rsvs;
+	uint tcapTransactionTable_tsts;
+	uint tcapTransactionTable_sets;
 	uint tcapTransactionTable_request;
 	uint tcapTransactionTable_refs;
+	uint tcapTransactionTable_id;
 	long tcapApInvocationId;	/* NoAccess */
 	long tcapTransactionId;		/* NoAccess */
 	oid *tcapTransactionUnderlyingConnectionNames;	/* ReadOnly */
@@ -140,8 +159,13 @@ struct tcapTransactionTable_data {
 	ulong tcapTransactionMaxTSDUsize;	/* ReadOnly */
 };
 struct tcapDialogueTable_data {
+	struct tcapDialogueTable_data *tcapDialogueTable_old;
+	uint tcapDialogueTable_rsvs;
+	uint tcapDialogueTable_tsts;
+	uint tcapDialogueTable_sets;
 	uint tcapDialogueTable_request;
 	uint tcapDialogueTable_refs;
+	uint tcapDialogueTable_id;
 	long tcapApInvocationId;	/* NoAccess */
 	long tcapTransactionId;		/* NoAccess */
 	ulong tcapDialogueId;		/* NoAccess */
@@ -159,8 +183,13 @@ struct tcapDialogueTable_data {
 	size_t tcapDialogueCalledAEtitleLen;
 };
 struct tcapTcUserTable_data {
+	struct tcapTcUserTable_data *tcapTcUserTable_old;
+	uint tcapTcUserTable_rsvs;
+	uint tcapTcUserTable_tsts;
+	uint tcapTcUserTable_sets;
 	uint tcapTcUserTable_request;
 	uint tcapTcUserTable_refs;
+	uint tcapTcUserTable_id;
 	long tcapSystemId;		/* NoAccess */
 	uint8_t *tcapApplicationSubsystemId;	/* NoAccess */
 	size_t tcapApplicationSubsystemIdLen;
@@ -169,8 +198,13 @@ struct tcapTcUserTable_data {
 	size_t tcapTcUserInvocationOfPointerLen;
 };
 struct tcapApplicationProcessTable_data {
+	struct tcapApplicationProcessTable_data *tcapApplicationProcessTable_old;
+	uint tcapApplicationProcessTable_rsvs;
+	uint tcapApplicationProcessTable_tsts;
+	uint tcapApplicationProcessTable_sets;
 	uint tcapApplicationProcessTable_request;
 	uint tcapApplicationProcessTable_refs;
+	uint tcapApplicationProcessTable_id;
 	long tcapSystemId;		/* NoAccess */
 	uint8_t *tcapApplicationSubsystemId;	/* NoAccess */
 	size_t tcapApplicationSubsystemIdLen;
@@ -183,8 +217,13 @@ struct tcapApplicationProcessTable_data {
 	long tcapApplicationProcessRowStatus;	/* Create */
 };
 struct tcapSupportEntityNameTable_data {
+	struct tcapSupportEntityNameTable_data *tcapSupportEntityNameTable_old;
+	uint tcapSupportEntityNameTable_rsvs;
+	uint tcapSupportEntityNameTable_tsts;
+	uint tcapSupportEntityNameTable_sets;
 	uint tcapSupportEntityNameTable_request;
 	uint tcapSupportEntityNameTable_refs;
+	uint tcapSupportEntityNameTable_id;
 	long tcapSystemId;		/* NoAccess */
 	uint8_t *tcapApplicationSubsystemId;	/* NoAccess */
 	size_t tcapApplicationSubsystemIdLen;
@@ -196,8 +235,13 @@ struct tcapSupportEntityNameTable_data {
 	long tcapSupportEntityRowStatus;	/* Create */
 };
 struct tcapApplicationEntityTable_data {
+	struct tcapApplicationEntityTable_data *tcapApplicationEntityTable_old;
+	uint tcapApplicationEntityTable_rsvs;
+	uint tcapApplicationEntityTable_tsts;
+	uint tcapApplicationEntityTable_sets;
 	uint tcapApplicationEntityTable_request;
 	uint tcapApplicationEntityTable_refs;
+	uint tcapApplicationEntityTable_id;
 	uint8_t *tcapApplicationSubsystemId;	/* NoAccess */
 	size_t tcapApplicationSubsystemIdLen;
 	uint8_t *tcapApplicationEntityId;	/* NoAccess */
@@ -228,8 +272,13 @@ struct tcapApplicationEntityTable_data {
 	long tcapApplicationEntityRowStatus;	/* Create */
 };
 struct tcapLocalSapNameTable_data {
+	struct tcapLocalSapNameTable_data *tcapLocalSapNameTable_old;
+	uint tcapLocalSapNameTable_rsvs;
+	uint tcapLocalSapNameTable_tsts;
+	uint tcapLocalSapNameTable_sets;
 	uint tcapLocalSapNameTable_request;
 	uint tcapLocalSapNameTable_refs;
+	uint tcapLocalSapNameTable_id;
 	uint8_t *tcapApplicationSubsystemId;	/* NoAccess */
 	size_t tcapApplicationSubsystemIdLen;
 	uint8_t *tcapApplicationEntityId;	/* NoAccess */
@@ -240,8 +289,13 @@ struct tcapLocalSapNameTable_data {
 	long tcapLocalSapNameRowStatus;	/* Create */
 };
 struct tcapApplicationContextNameTable_data {
+	struct tcapApplicationContextNameTable_data *tcapApplicationContextNameTable_old;
+	uint tcapApplicationContextNameTable_rsvs;
+	uint tcapApplicationContextNameTable_tsts;
+	uint tcapApplicationContextNameTable_sets;
 	uint tcapApplicationContextNameTable_request;
 	uint tcapApplicationContextNameTable_refs;
+	uint tcapApplicationContextNameTable_id;
 	uint8_t *tcapApplicationSubsystemId;	/* NoAccess */
 	size_t tcapApplicationSubsystemIdLen;
 	uint8_t *tcapApplicationEntityId;	/* NoAccess */
@@ -253,8 +307,13 @@ struct tcapApplicationContextNameTable_data {
 	long tcapApplicationContextRowStatus;	/* Create */
 };
 struct tcapAbstractSyntaxTable_data {
+	struct tcapAbstractSyntaxTable_data *tcapAbstractSyntaxTable_old;
+	uint tcapAbstractSyntaxTable_rsvs;
+	uint tcapAbstractSyntaxTable_tsts;
+	uint tcapAbstractSyntaxTable_sets;
 	uint tcapAbstractSyntaxTable_request;
 	uint tcapAbstractSyntaxTable_refs;
+	uint tcapAbstractSyntaxTable_id;
 	uint8_t *tcapApplicationEntityId;	/* NoAccess */
 	size_t tcapApplicationEntityIdLen;
 	ulong tcapAbstractSyntaxId;	/* NoAccess */
@@ -263,8 +322,13 @@ struct tcapAbstractSyntaxTable_data {
 	long tcapAbstractSyntaxRowStatus;	/* Create */
 };
 struct tcapTransferSyntaxTable_data {
+	struct tcapTransferSyntaxTable_data *tcapTransferSyntaxTable_old;
+	uint tcapTransferSyntaxTable_rsvs;
+	uint tcapTransferSyntaxTable_tsts;
+	uint tcapTransferSyntaxTable_sets;
 	uint tcapTransferSyntaxTable_request;
 	uint tcapTransferSyntaxTable_refs;
+	uint tcapTransferSyntaxTable_id;
 	uint8_t *tcapApplicationEntityId;	/* NoAccess */
 	size_t tcapApplicationEntityIdLen;
 	oid *tcapTransferSyntaxId;	/* NoAccess */
@@ -357,6 +421,10 @@ void init_tcapMIB(void);
 void deinit_tcapMIB(void);
 int term_tcapMIB(int majorID, int minorID, void *serverarg, void *clientarg);
 FindVarMethod var_tcapMIB;
+struct tcapMIB_data *tcapMIB_create(void);
+struct tcapMIB_data *tcapMIB_duplicate(struct tcapMIB_data *);
+int tcapMIB_destroy(struct tcapMIB_data **);
+int tcapMIB_add(struct tcapMIB_data *);
 void parse_tcapMIB(const char *, char *);
 SNMPCallback store_tcapMIB;
 void refresh_tcapMIB(int);

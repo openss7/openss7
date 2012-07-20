@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2012  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -109,11 +109,20 @@ extern int sa_request;			/* request number for per-request actions */
 
 /* our storage structure(s) */
 struct ss7MIB_data {
+	struct ss7MIB_data *ss7MIB_old;
+	uint ss7MIB_rsvs;
+	uint ss7MIB_tsts;
+	uint ss7MIB_sets;
 	uint ss7MIB_request;
 };
 struct ss7NetworkTable_data {
+	struct ss7NetworkTable_data *ss7NetworkTable_old;
+	uint ss7NetworkTable_rsvs;
+	uint ss7NetworkTable_tsts;
+	uint ss7NetworkTable_sets;
 	uint ss7NetworkTable_request;
 	uint ss7NetworkTable_refs;
+	uint ss7NetworkTable_id;
 	long ss7NetworkId;		/* NoAccess */
 	oid *ss7NetworkProtocolVariant;	/* Create */
 	size_t ss7NetworkProtocolVariantLen;
@@ -217,6 +226,10 @@ void init_ss7MIB(void);
 void deinit_ss7MIB(void);
 int term_ss7MIB(int majorID, int minorID, void *serverarg, void *clientarg);
 FindVarMethod var_ss7MIB;
+struct ss7MIB_data *ss7MIB_create(void);
+struct ss7MIB_data *ss7MIB_duplicate(struct ss7MIB_data *);
+int ss7MIB_destroy(struct ss7MIB_data **);
+int ss7MIB_add(struct ss7MIB_data *);
 void parse_ss7MIB(const char *, char *);
 SNMPCallback store_ss7MIB;
 void refresh_ss7MIB(int);

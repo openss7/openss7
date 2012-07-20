@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2012  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -418,6 +418,31 @@ phyMIB_create(void)
 }
 
 /**
+ * @fn struct phyMIB_data *phyMIB_duplicate(struct phyMIB_data *thedata)
+ * @param thedata the mib structure to duplicate
+ * @brief duplicate a mib structure for the mib
+ *
+ * Duplicates the specified mib structure @param thedata and returns a pointer to the newly
+ * allocated mib structure on success, or NULL on failure.
+ */
+struct phyMIB_data *
+phyMIB_duplicate(struct phyMIB_data *thedata)
+{
+	struct phyMIB_data *StorageNew = SNMP_MALLOC_STRUCT(phyMIB_data);
+
+	DEBUGMSGTL(("phyMIB", "phyMIB_duplicate: duplicating mib... "));
+	if (StorageNew != NULL) {
+	}
+      done:
+	DEBUGMSGTL(("phyMIB", "done.\n"));
+	return (StorageNew);
+	goto destroy;
+      destroy:
+	phyMIB_destroy(&StorageNew);
+	goto done;
+}
+
+/**
  * @fn int phyMIB_destroy(struct phyMIB_data **thedata)
  * @param thedata pointer to the data structure in phyMIB.
  * @brief delete a scalars structure from phyMIB.
@@ -465,7 +490,7 @@ phyMIB_add(struct phyMIB_data *thedata)
  * @param line line from configuration file matching the token.
  * @brief parse configuration file for phyMIB entries.
  *
- * This callback is called by UCD-SNMP when it prases a configuration file and finds a configuration
+ * This callback is called by UCD-SNMP when it parses a configuration file and finds a configuration
  * file line for the registsred token (in this case phyMIB).  This routine is invoked by
  * UCD-SNMP to read the values of scalars in the MIB from the configuration file.  Note that this
  * procedure may exist regardless of the persistence of the MIB.  If there are no configured entries
@@ -517,6 +542,62 @@ store_phyMIB(int majorID, int minorID, void *serverarg, void *clientarg)
 	}
 	DEBUGMSGTL(("phyMIB", "done.\n"));
 	return SNMPERR_SUCCESS;
+}
+
+/**
+ * @fn int check_phyMIB(struct phyMIB_data *StorageTmp, struct phyMIB_data *StorageOld)
+ * @param StorageTmp the data as updated
+ * @param StorageOld the data previous to update
+ *
+ * This function is used by mibs.  It is used to check, all scalars at a time, the varbinds
+ * belonging to the mib.  This function is called for the first varbind in a mib at the beginning of
+ * the ACTION phase.  The COMMIT phase does not ensue unless this check passes.  This function can
+ * return SNMP_ERR_NOERR or a specific SNMP error value.  Values in StorageOld are the values before
+ * the varbinds on the mib were applied; the values in StorageTmp are the new values.  The function
+ * is permitted to change the values in StorageTmp to correct them; however, preferences should be
+ * made for setting values that were not in the varbinds.
+ */
+int
+check_phyMIB(struct phyMIB_data *StorageTmp, struct phyMIB_data *StorageOld)
+{
+	/* XXX: provide code to check the scalars for consistency */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int update_phyMIB(struct phyMIB_data *StorageTmp, struct phyMIB_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the set operation (ACTION phase)
+ *
+ * This function is used by mibs.  It is used to update, all scalars at a time, the varbinds
+ * belonging to the mib.  This function is called for the first varbind in a mib at the beginning of
+ * the COMMIT phase.  The start of the ACTION phase performs a consistency check on the mib before
+ * allowing the request to proceed to the COMMIT phase.  The COMMIT phase then arrives here with
+ * consistency already checked (see check_phyMIB()).  This function can
+ * return SNMP_ERR_NOERROR or SNMP_ERR_COMMITFAILED.  Values in StorageOld are the values before the
+ * varbinds on the mib were applied: the values in StorageTmp are the new values.
+ */
+int
+update_phyMIB(struct phyMIB_data *StorageTmp, struct phyMIB_data *StorageOld)
+{
+	/* XXX: provide code to update the row with the underlying device */
+	phyMIB_refresh = 1;
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn revert_phyMIB(struct 
+ * @fn void revert_phyMIB(struct phyMIB_data *StorageTmp, struct phyMIB_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the undo operation (UNDO phase)
+ */
+void
+revert_phyMIB(struct phyMIB_data *StorageTmp, struct phyMIB_data *StorageOld)
+{
+	/* XXX: provide code to revert the row with the underlying device */
+	update_phyMIB(StorageOld, NULL);
 }
 
 /**
@@ -612,21 +693,27 @@ physicalEntityTable_create(void)
 	DEBUGMSGTL(("phyMIB", "physicalEntityTable_create: creating row...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
-		if ((StorageNew->physicalEntityLocalSapNames = snmp_duplicate_objid(zeroDotZero_oid, 2)))
-			StorageNew->physicalEntityLocalSapNamesLen = 2;
+		if ((StorageNew->physicalEntityLocalSapNames = snmp_duplicate_objid(zeroDotZero_oid, 2)) == NULL)
+			goto nomem;
+		StorageNew->physicalEntityLocalSapNamesLen = 2;
 		StorageNew->physicalEntityOperationalState = 0;
-		if ((StorageNew->physicalEntityTitles = snmp_duplicate_objid(zeroDotZero_oid, 2)))
-			StorageNew->physicalEntityTitlesLen = 2;
-
+		if ((StorageNew->physicalEntityTitles = snmp_duplicate_objid(zeroDotZero_oid, 2)) == NULL)
+			goto nomem;
+		StorageNew->physicalEntityTitlesLen = 2;
 	}
+      done:
 	DEBUGMSGTL(("phyMIB", "done.\n"));
 	return (StorageNew);
+	goto nomem;
+      nomem:
+	physicalEntityTable_destroy(&StorageNew);
+	goto done;
 }
 
 /**
  * @fn struct physicalEntityTable_data *physicalEntityTable_duplicate(struct physicalEntityTable_data *thedata)
  * @param thedata the row structure to duplicate.
- * @brief duplicat a row structure for a table.
+ * @brief duplicate a row structure for a table.
  *
  * Duplicates the specified row structure @param thedata and returns a pointer to the newly
  * allocated row structure on success, or NULL on failure.
@@ -638,6 +725,13 @@ physicalEntityTable_duplicate(struct physicalEntityTable_data *thedata)
 
 	DEBUGMSGTL(("phyMIB", "physicalEntityTable_duplicate: duplicating row...  "));
 	if (StorageNew != NULL) {
+		if (!(StorageNew->physicalEntityLocalSapNames = snmp_duplicate_objid(thedata->physicalEntityLocalSapNames, thedata->physicalEntityLocalSapNamesLen / sizeof(oid))))
+			goto destroy;
+		StorageNew->physicalEntityLocalSapNamesLen = thedata->physicalEntityLocalSapNamesLen;
+		StorageNew->physicalEntityOperationalState = thedata->physicalEntityOperationalState;
+		if (!(StorageNew->physicalEntityTitles = snmp_duplicate_objid(thedata->physicalEntityTitles, thedata->physicalEntityTitlesLen / sizeof(oid))))
+			goto destroy;
+		StorageNew->physicalEntityTitlesLen = thedata->physicalEntityTitlesLen;
 	}
       done:
 	DEBUGMSGTL(("phyMIB", "done.\n"));
@@ -737,7 +831,7 @@ physicalEntityTable_del(struct physicalEntityTable_data *thedata)
  * @param line line from configuration file matching the token.
  * @brief parse configuration file for physicalEntityTable entries.
  *
- * This callback is called by UCD-SNMP when it prases a configuration file and finds a configuration
+ * This callback is called by UCD-SNMP when it parses a configuration file and finds a configuration
  * file line for the registsred token (in this case physicalEntityTable).  This routine is invoked by UCD-SNMP
  * to read the values of each row in the table from the configuration file.  Note that this
  * procedure may exist regardless of the persistence of the table.  If there are no configured
@@ -831,22 +925,30 @@ physicalSAPTable_create(void)
 	DEBUGMSGTL(("phyMIB", "physicalSAPTable_create: creating row...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
-		if ((StorageNew->physicalEntityId = (uint8_t *) strdup("")) != NULL)
-			StorageNew->physicalEntityIdLen = strlen("");
+		if ((StorageNew->physicalEntityId = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->physicalEntityIdLen = 0;
+		StorageNew->physicalEntityId[StorageNew->physicalEntityIdLen] = 0;
 		StorageNew->physicalSAPsap1Address = 0;
-		if ((StorageNew->physicalSAPuserEntityNames = snmp_duplicate_objid(zeroDotZero_oid, 2)))
-			StorageNew->physicalSAPuserEntityNamesLen = 2;
+		if ((StorageNew->physicalSAPuserEntityNames = snmp_duplicate_objid(zeroDotZero_oid, 2)) == NULL)
+			goto nomem;
+		StorageNew->physicalSAPuserEntityNamesLen = 2;
 		StorageNew->physicalSAPRowStatus = 0;
 		StorageNew->physicalSAPRowStatus = RS_NOTREADY;
 	}
+      done:
 	DEBUGMSGTL(("phyMIB", "done.\n"));
 	return (StorageNew);
+	goto nomem;
+      nomem:
+	physicalSAPTable_destroy(&StorageNew);
+	goto done;
 }
 
 /**
  * @fn struct physicalSAPTable_data *physicalSAPTable_duplicate(struct physicalSAPTable_data *thedata)
  * @param thedata the row structure to duplicate.
- * @brief duplicat a row structure for a table.
+ * @brief duplicate a row structure for a table.
  *
  * Duplicates the specified row structure @param thedata and returns a pointer to the newly
  * allocated row structure on success, or NULL on failure.
@@ -858,6 +960,11 @@ physicalSAPTable_duplicate(struct physicalSAPTable_data *thedata)
 
 	DEBUGMSGTL(("phyMIB", "physicalSAPTable_duplicate: duplicating row...  "));
 	if (StorageNew != NULL) {
+		StorageNew->physicalSAPsap1Address = thedata->physicalSAPsap1Address;
+		if (!(StorageNew->physicalSAPuserEntityNames = snmp_duplicate_objid(thedata->physicalSAPuserEntityNames, thedata->physicalSAPuserEntityNamesLen / sizeof(oid))))
+			goto destroy;
+		StorageNew->physicalSAPuserEntityNamesLen = thedata->physicalSAPuserEntityNamesLen;
+		StorageNew->physicalSAPRowStatus = thedata->physicalSAPRowStatus;
 	}
       done:
 	DEBUGMSGTL(("phyMIB", "done.\n"));
@@ -959,7 +1066,7 @@ physicalSAPTable_del(struct physicalSAPTable_data *thedata)
  * @param line line from configuration file matching the token.
  * @brief parse configuration file for physicalSAPTable entries.
  *
- * This callback is called by UCD-SNMP when it prases a configuration file and finds a configuration
+ * This callback is called by UCD-SNMP when it parses a configuration file and finds a configuration
  * file line for the registsred token (in this case physicalSAPTable).  This routine is invoked by UCD-SNMP
  * to read the values of each row in the table from the configuration file.  Note that this
  * procedure may exist regardless of the persistence of the table.  If there are no configured
@@ -1055,39 +1162,57 @@ dataCircuitTable_create(void)
 	DEBUGMSGTL(("phyMIB", "dataCircuitTable_create: creating row...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
-		if ((StorageNew->physicalEntityId = (uint8_t *) strdup("")) != NULL)
-			StorageNew->physicalEntityIdLen = strlen("");
+		if ((StorageNew->physicalEntityId = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->physicalEntityIdLen = 0;
+		StorageNew->physicalEntityId[StorageNew->physicalEntityIdLen] = 0;
 		StorageNew->dataCircuitOperationalState = 0;
 		StorageNew->dataCircuitBitErrorsReceived = (struct counter64) {
 		0, 0};
 		StorageNew->dataCircuitBitErrorsTransmitted = (struct counter64) {
 		0, 0};
-		if ((StorageNew->dataCircuitBitErrorsThreshold = (uint8_t *) strdup("")) != NULL)
-			StorageNew->dataCircuitBitErrorsThresholdLen = strlen("");
+		if ((StorageNew->dataCircuitBitErrorsThreshold = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->dataCircuitBitErrorsThresholdLen = 0;
+		StorageNew->dataCircuitBitErrorsThreshold[StorageNew->dataCircuitBitErrorsThresholdLen] = 0;
 		StorageNew->dataCircuitType = 0;
-		if ((StorageNew->dataCircuitPhysicalMediaNames = (uint8_t *) strdup("")) != NULL)
-			StorageNew->dataCircuitPhysicalMediaNamesLen = strlen("");
-		if ((StorageNew->dataCircuitPhysicalInterfaceType = (uint8_t *) strdup("")) != NULL)
-			StorageNew->dataCircuitPhysicalInterfaceTypeLen = strlen("");
-		if ((StorageNew->dataCircuitPhysicalInterfaceStandard = snmp_duplicate_objid(zeroDotZero_oid, 2)))
-			StorageNew->dataCircuitPhysicalInterfaceStandardLen = 2;
+		if ((StorageNew->dataCircuitPhysicalMediaNames = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->dataCircuitPhysicalMediaNamesLen = 0;
+		StorageNew->dataCircuitPhysicalMediaNames[StorageNew->dataCircuitPhysicalMediaNamesLen] = 0;
+		if ((StorageNew->dataCircuitPhysicalInterfaceType = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->dataCircuitPhysicalInterfaceTypeLen = 0;
+		StorageNew->dataCircuitPhysicalInterfaceType[StorageNew->dataCircuitPhysicalInterfaceTypeLen] = 0;
+		if ((StorageNew->dataCircuitPhysicalInterfaceStandard = snmp_duplicate_objid(zeroDotZero_oid, 2)) == NULL)
+			goto nomem;
+		StorageNew->dataCircuitPhysicalInterfaceStandardLen = 2;
 		StorageNew->dataCircuitSynchronizationMode = 0;
-		if ((StorageNew->dataCircuitTransmissionCoding = (uint8_t *) strdup("")) != NULL)
-			StorageNew->dataCircuitTransmissionCodingLen = strlen("");
+		if ((StorageNew->dataCircuitTransmissionCoding = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->dataCircuitTransmissionCodingLen = 0;
+		StorageNew->dataCircuitTransmissionCoding[StorageNew->dataCircuitTransmissionCodingLen] = 0;
 		StorageNew->dataCircuitTransmissionMode = 0;
-		if ((StorageNew->dataCircuitTransmissionRate = (uint8_t *) strdup("")) != NULL)
-			StorageNew->dataCircuitTransmissionRateLen = strlen("");
+		if ((StorageNew->dataCircuitTransmissionRate = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->dataCircuitTransmissionRateLen = 0;
+		StorageNew->dataCircuitTransmissionRate[StorageNew->dataCircuitTransmissionRateLen] = 0;
 		StorageNew->dataCircuitRowStatus = 0;
 		StorageNew->dataCircuitRowStatus = RS_NOTREADY;
 	}
+      done:
 	DEBUGMSGTL(("phyMIB", "done.\n"));
 	return (StorageNew);
+	goto nomem;
+      nomem:
+	dataCircuitTable_destroy(&StorageNew);
+	goto done;
 }
 
 /**
  * @fn struct dataCircuitTable_data *dataCircuitTable_duplicate(struct dataCircuitTable_data *thedata)
  * @param thedata the row structure to duplicate.
- * @brief duplicat a row structure for a table.
+ * @brief duplicate a row structure for a table.
  *
  * Duplicates the specified row structure @param thedata and returns a pointer to the newly
  * allocated row structure on success, or NULL on failure.
@@ -1099,6 +1224,43 @@ dataCircuitTable_duplicate(struct dataCircuitTable_data *thedata)
 
 	DEBUGMSGTL(("phyMIB", "dataCircuitTable_duplicate: duplicating row...  "));
 	if (StorageNew != NULL) {
+		StorageNew->dataCircuitOperationalState = thedata->dataCircuitOperationalState;
+		StorageNew->dataCircuitBitErrorsReceived = thedata->dataCircuitBitErrorsReceived;
+		StorageNew->dataCircuitBitErrorsTransmitted = thedata->dataCircuitBitErrorsTransmitted;
+		if (!(StorageNew->dataCircuitBitErrorsThreshold = malloc(thedata->dataCircuitBitErrorsThresholdLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->dataCircuitBitErrorsThreshold, thedata->dataCircuitBitErrorsThreshold, thedata->dataCircuitBitErrorsThresholdLen);
+		StorageNew->dataCircuitBitErrorsThresholdLen = thedata->dataCircuitBitErrorsThresholdLen;
+		StorageNew->dataCircuitBitErrorsThreshold[StorageNew->dataCircuitBitErrorsThresholdLen] = 0;
+		StorageNew->dataCircuitType = thedata->dataCircuitType;
+		if (!(StorageNew->dataCircuitPhysicalMediaNames = malloc(thedata->dataCircuitPhysicalMediaNamesLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->dataCircuitPhysicalMediaNames, thedata->dataCircuitPhysicalMediaNames, thedata->dataCircuitPhysicalMediaNamesLen);
+		StorageNew->dataCircuitPhysicalMediaNamesLen = thedata->dataCircuitPhysicalMediaNamesLen;
+		StorageNew->dataCircuitPhysicalMediaNames[StorageNew->dataCircuitPhysicalMediaNamesLen] = 0;
+		if (!(StorageNew->dataCircuitPhysicalInterfaceType = malloc(thedata->dataCircuitPhysicalInterfaceTypeLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->dataCircuitPhysicalInterfaceType, thedata->dataCircuitPhysicalInterfaceType, thedata->dataCircuitPhysicalInterfaceTypeLen);
+		StorageNew->dataCircuitPhysicalInterfaceTypeLen = thedata->dataCircuitPhysicalInterfaceTypeLen;
+		StorageNew->dataCircuitPhysicalInterfaceType[StorageNew->dataCircuitPhysicalInterfaceTypeLen] = 0;
+		if (!
+		    (StorageNew->dataCircuitPhysicalInterfaceStandard =
+		     snmp_duplicate_objid(thedata->dataCircuitPhysicalInterfaceStandard, thedata->dataCircuitPhysicalInterfaceStandardLen / sizeof(oid))))
+			goto destroy;
+		StorageNew->dataCircuitPhysicalInterfaceStandardLen = thedata->dataCircuitPhysicalInterfaceStandardLen;
+		StorageNew->dataCircuitSynchronizationMode = thedata->dataCircuitSynchronizationMode;
+		if (!(StorageNew->dataCircuitTransmissionCoding = malloc(thedata->dataCircuitTransmissionCodingLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->dataCircuitTransmissionCoding, thedata->dataCircuitTransmissionCoding, thedata->dataCircuitTransmissionCodingLen);
+		StorageNew->dataCircuitTransmissionCodingLen = thedata->dataCircuitTransmissionCodingLen;
+		StorageNew->dataCircuitTransmissionCoding[StorageNew->dataCircuitTransmissionCodingLen] = 0;
+		StorageNew->dataCircuitTransmissionMode = thedata->dataCircuitTransmissionMode;
+		if (!(StorageNew->dataCircuitTransmissionRate = malloc(thedata->dataCircuitTransmissionRateLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->dataCircuitTransmissionRate, thedata->dataCircuitTransmissionRate, thedata->dataCircuitTransmissionRateLen);
+		StorageNew->dataCircuitTransmissionRateLen = thedata->dataCircuitTransmissionRateLen;
+		StorageNew->dataCircuitTransmissionRate[StorageNew->dataCircuitTransmissionRateLen] = 0;
+		StorageNew->dataCircuitRowStatus = thedata->dataCircuitRowStatus;
 	}
       done:
 	DEBUGMSGTL(("phyMIB", "done.\n"));
@@ -1210,7 +1372,7 @@ dataCircuitTable_del(struct dataCircuitTable_data *thedata)
  * @param line line from configuration file matching the token.
  * @brief parse configuration file for dataCircuitTable entries.
  *
- * This callback is called by UCD-SNMP when it prases a configuration file and finds a configuration
+ * This callback is called by UCD-SNMP when it parses a configuration file and finds a configuration
  * file line for the registsred token (in this case dataCircuitTable).  This routine is invoked by UCD-SNMP
  * to read the values of each row in the table from the configuration file.  Note that this
  * procedure may exist regardless of the persistence of the table.  If there are no configured
@@ -1351,28 +1513,41 @@ physicalConnectionTable_create(void)
 	DEBUGMSGTL(("phyMIB", "physicalConnectionTable_create: creating row...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
-		if ((StorageNew->physicalEntityId = (uint8_t *) strdup("")) != NULL)
-			StorageNew->physicalEntityIdLen = strlen("");
-		if ((StorageNew->dataCircuitCoProtocolMachineId = (uint8_t *) strdup("")) != NULL)
-			StorageNew->dataCircuitCoProtocolMachineIdLen = strlen("");
-		if ((StorageNew->physicalConnectionUnderlyingConnectionNames = snmp_duplicate_objid(zeroDotZero_oid, 2)))
-			StorageNew->physicalConnectionUnderlyingConnectionNamesLen = 2;
-		if ((StorageNew->physicalConnectionSupportedConnectionNames = snmp_duplicate_objid(zeroDotZero_oid, 2)))
-			StorageNew->physicalConnectionSupportedConnectionNamesLen = 2;
-		if ((StorageNew->physicalConnectionEndpointIdentifier = (uint8_t *) strdup("")) != NULL)
-			StorageNew->physicalConnectionEndpointIdentifierLen = strlen("");
+		if ((StorageNew->physicalEntityId = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->physicalEntityIdLen = 0;
+		StorageNew->physicalEntityId[StorageNew->physicalEntityIdLen] = 0;
+		if ((StorageNew->dataCircuitCoProtocolMachineId = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->dataCircuitCoProtocolMachineIdLen = 0;
+		StorageNew->dataCircuitCoProtocolMachineId[StorageNew->dataCircuitCoProtocolMachineIdLen] = 0;
+		if ((StorageNew->physicalConnectionUnderlyingConnectionNames = snmp_duplicate_objid(zeroDotZero_oid, 2)) == NULL)
+			goto nomem;
+		StorageNew->physicalConnectionUnderlyingConnectionNamesLen = 2;
+		if ((StorageNew->physicalConnectionSupportedConnectionNames = snmp_duplicate_objid(zeroDotZero_oid, 2)) == NULL)
+			goto nomem;
+		StorageNew->physicalConnectionSupportedConnectionNamesLen = 2;
+		if ((StorageNew->physicalConnectionEndpointIdentifier = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->physicalConnectionEndpointIdentifierLen = 0;
+		StorageNew->physicalConnectionEndpointIdentifier[StorageNew->physicalConnectionEndpointIdentifierLen] = 0;
 		StorageNew->physicalConnectionPortNumber = 0;
 		StorageNew->physicalConnectionRowStatus = 0;
 		StorageNew->physicalConnectionRowStatus = RS_NOTREADY;
 	}
+      done:
 	DEBUGMSGTL(("phyMIB", "done.\n"));
 	return (StorageNew);
+	goto nomem;
+      nomem:
+	physicalConnectionTable_destroy(&StorageNew);
+	goto done;
 }
 
 /**
  * @fn struct physicalConnectionTable_data *physicalConnectionTable_duplicate(struct physicalConnectionTable_data *thedata)
  * @param thedata the row structure to duplicate.
- * @brief duplicat a row structure for a table.
+ * @brief duplicate a row structure for a table.
  *
  * Duplicates the specified row structure @param thedata and returns a pointer to the newly
  * allocated row structure on success, or NULL on failure.
@@ -1384,6 +1559,23 @@ physicalConnectionTable_duplicate(struct physicalConnectionTable_data *thedata)
 
 	DEBUGMSGTL(("phyMIB", "physicalConnectionTable_duplicate: duplicating row...  "));
 	if (StorageNew != NULL) {
+		if (!
+		    (StorageNew->physicalConnectionUnderlyingConnectionNames =
+		     snmp_duplicate_objid(thedata->physicalConnectionUnderlyingConnectionNames, thedata->physicalConnectionUnderlyingConnectionNamesLen / sizeof(oid))))
+			goto destroy;
+		StorageNew->physicalConnectionUnderlyingConnectionNamesLen = thedata->physicalConnectionUnderlyingConnectionNamesLen;
+		if (!
+		    (StorageNew->physicalConnectionSupportedConnectionNames =
+		     snmp_duplicate_objid(thedata->physicalConnectionSupportedConnectionNames, thedata->physicalConnectionSupportedConnectionNamesLen / sizeof(oid))))
+			goto destroy;
+		StorageNew->physicalConnectionSupportedConnectionNamesLen = thedata->physicalConnectionSupportedConnectionNamesLen;
+		if (!(StorageNew->physicalConnectionEndpointIdentifier = malloc(thedata->physicalConnectionEndpointIdentifierLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->physicalConnectionEndpointIdentifier, thedata->physicalConnectionEndpointIdentifier, thedata->physicalConnectionEndpointIdentifierLen);
+		StorageNew->physicalConnectionEndpointIdentifierLen = thedata->physicalConnectionEndpointIdentifierLen;
+		StorageNew->physicalConnectionEndpointIdentifier[StorageNew->physicalConnectionEndpointIdentifierLen] = 0;
+		StorageNew->physicalConnectionPortNumber = thedata->physicalConnectionPortNumber;
+		StorageNew->physicalConnectionRowStatus = thedata->physicalConnectionRowStatus;
 	}
       done:
 	DEBUGMSGTL(("phyMIB", "done.\n"));
@@ -1493,7 +1685,7 @@ physicalConnectionTable_del(struct physicalConnectionTable_data *thedata)
  * @param line line from configuration file matching the token.
  * @brief parse configuration file for physicalConnectionTable entries.
  *
- * This callback is called by UCD-SNMP when it prases a configuration file and finds a configuration
+ * This callback is called by UCD-SNMP when it parses a configuration file and finds a configuration
  * file line for the registsred token (in this case physicalConnectionTable).  This routine is invoked by UCD-SNMP
  * to read the values of each row in the table from the configuration file.  Note that this
  * procedure may exist regardless of the persistence of the table.  If there are no configured
@@ -1595,6 +1787,166 @@ store_physicalConnectionTable(int majorID, int minorID, void *serverarg, void *c
 }
 
 /**
+ * @fn int activate_physicalSAPTable_row(struct physicalSAPTable_data *StorageTmp)
+ * @param StorageTmp the data row to activate
+ * @brief commit activation of a row to the underlying device
+ *
+ * This function is used by tables that contain a RowStatus object.  It is used to move the row from
+ * the RS_NOTINSERVICE state to the RS_ACTIVE state.  It is also used when transitioning from the
+ * RS_CREATEANDGO state to the RS_ACTIVE state.  If activation fails, the function should return
+ * SNMP_ERR_COMMITFAILED; otherwise, SNMP_ERR_NOERROR.
+ */
+int
+activate_physicalSAPTable_row(struct physicalSAPTable_data *StorageTmp)
+{
+	/* XXX: provide code to activate the row with the underlying device */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int deactivate_physicalSAPTable_row(struct physicalSAPTable_data *StorageTmp)
+ * @param StorageTmp the data row to deactivate
+ * @brief commit deactivation of a row to the underlying device
+ *
+ * This function is used by tables that contain a RowStatus object.  It is used to move the row from
+ * the RS_ACTIVE state to the RS_NOTINSERVICE state.  It is also used when transitioning from the
+ * RS_ACTIVE state to the RS_DESTROY state.  If deactivation fails, the function should return
+ * SNMP_ERR_COMMITFAILED; otherwise, SNMP_ERR_NOERROR.
+ */
+int
+deactivate_physicalSAPTable_row(struct physicalSAPTable_data *StorageTmp)
+{
+	/* XXX: provide code to deactivate the row with the underlying device */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int activate_dataCircuitTable_row(struct dataCircuitTable_data *StorageTmp)
+ * @param StorageTmp the data row to activate
+ * @brief commit activation of a row to the underlying device
+ *
+ * This function is used by tables that contain a RowStatus object.  It is used to move the row from
+ * the RS_NOTINSERVICE state to the RS_ACTIVE state.  It is also used when transitioning from the
+ * RS_CREATEANDGO state to the RS_ACTIVE state.  If activation fails, the function should return
+ * SNMP_ERR_COMMITFAILED; otherwise, SNMP_ERR_NOERROR.
+ */
+int
+activate_dataCircuitTable_row(struct dataCircuitTable_data *StorageTmp)
+{
+	/* XXX: provide code to activate the row with the underlying device */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int deactivate_dataCircuitTable_row(struct dataCircuitTable_data *StorageTmp)
+ * @param StorageTmp the data row to deactivate
+ * @brief commit deactivation of a row to the underlying device
+ *
+ * This function is used by tables that contain a RowStatus object.  It is used to move the row from
+ * the RS_ACTIVE state to the RS_NOTINSERVICE state.  It is also used when transitioning from the
+ * RS_ACTIVE state to the RS_DESTROY state.  If deactivation fails, the function should return
+ * SNMP_ERR_COMMITFAILED; otherwise, SNMP_ERR_NOERROR.
+ */
+int
+deactivate_dataCircuitTable_row(struct dataCircuitTable_data *StorageTmp)
+{
+	/* XXX: provide code to deactivate the row with the underlying device */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int activate_physicalConnectionTable_row(struct physicalConnectionTable_data *StorageTmp)
+ * @param StorageTmp the data row to activate
+ * @brief commit activation of a row to the underlying device
+ *
+ * This function is used by tables that contain a RowStatus object.  It is used to move the row from
+ * the RS_NOTINSERVICE state to the RS_ACTIVE state.  It is also used when transitioning from the
+ * RS_CREATEANDGO state to the RS_ACTIVE state.  If activation fails, the function should return
+ * SNMP_ERR_COMMITFAILED; otherwise, SNMP_ERR_NOERROR.
+ */
+int
+activate_physicalConnectionTable_row(struct physicalConnectionTable_data *StorageTmp)
+{
+	/* XXX: provide code to activate the row with the underlying device */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int deactivate_physicalConnectionTable_row(struct physicalConnectionTable_data *StorageTmp)
+ * @param StorageTmp the data row to deactivate
+ * @brief commit deactivation of a row to the underlying device
+ *
+ * This function is used by tables that contain a RowStatus object.  It is used to move the row from
+ * the RS_ACTIVE state to the RS_NOTINSERVICE state.  It is also used when transitioning from the
+ * RS_ACTIVE state to the RS_DESTROY state.  If deactivation fails, the function should return
+ * SNMP_ERR_COMMITFAILED; otherwise, SNMP_ERR_NOERROR.
+ */
+int
+deactivate_physicalConnectionTable_row(struct physicalConnectionTable_data *StorageTmp)
+{
+	/* XXX: provide code to deactivate the row with the underlying device */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int check_physicalEntityTable_row(struct physicalEntityTable_data *StorageTmp, struct physicalEntityTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to check, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the ACTION phase.  The start of the ACTION pahse performs this consitency check
+ * on the row before allowing the request to proceed to the COMMIT phase.  This function can return
+ * SNMP_ERR_NOERR or a specific SNMP error value.  Values in StorageOld are the values before the
+ * varbinds on the mib were applied; the values in StorageTmp are the new values.  The function is
+ * permitted to change the values in StorageTmp to correct them; however, preference should be made
+ * for setting values where were not in the varbinds.
+ */
+int
+check_physicalEntityTable_row(struct physicalEntityTable_data *StorageTmp, struct physicalEntityTable_data *StorageOld)
+{
+	/* XXX: provide code to check the row for consistency */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int update_physicalEntityTable_row(struct physicalEntityTable_data *StorageTmp, struct physicalEntityTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the set operation (ACTION phase) on a row
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to update, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the COMMIT phase.  The start of the ACTION phase performs a consistency check on
+ * the row before allowing the request to proceed to the COMMIT phase.  The COMMIT phase then
+ * arrives here with consistency already checked (see check_physicalEntityTable_row()).  This function can
+ * return SNMP_ERR_NOERROR or SNMP_ERR_COMMITFAILED.  Values in StorageOld are the values before the
+ * varbinds on the row were applied: the values in StorageTmp are the new values.
+ */
+int
+update_physicalEntityTable_row(struct physicalEntityTable_data *StorageTmp, struct physicalEntityTable_data *StorageOld)
+{
+	/* XXX: provide code to update the row with the underlying device */
+	physicalEntityTable_refresh = 1;
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int revert_physicalEntityTable_row(struct physicalEntityTable_data *StorageTmp, struct physicalEntityTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the undo operation (UNDO phase) on a row
+ */
+void
+revert_physicalEntityTable_row(struct physicalEntityTable_data *StorageTmp, struct physicalEntityTable_data *StorageOld)
+{
+	/* XXX: provide code to revert the row with the underlying device */
+	update_physicalEntityTable_row(StorageOld, NULL);
+}
+
+/**
  * @fn void refresh_physicalEntityTable_row(struct physicalEntityTable_data *StorageTmp, int force)
  * @param StorageTmp the data row to refresh.
  * @param force force refresh if non-zero.
@@ -1681,6 +2033,64 @@ var_physicalEntityTable(struct variable *vp, oid * name, size_t *length, int exa
 		ERROR_MSG("");
 	}
 	return (rval);
+}
+
+/**
+ * @fn int check_physicalSAPTable_row(struct physicalSAPTable_data *StorageTmp, struct physicalSAPTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to check, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the ACTION phase.  The start of the ACTION pahse performs this consitency check
+ * on the row before allowing the request to proceed to the COMMIT phase.  This function can return
+ * SNMP_ERR_NOERR or a specific SNMP error value.  Values in StorageOld are the values before the
+ * varbinds on the mib were applied; the values in StorageTmp are the new values.  The function is
+ * permitted to change the values in StorageTmp to correct them; however, preference should be made
+ * for setting values where were not in the varbinds.
+ */
+int
+check_physicalSAPTable_row(struct physicalSAPTable_data *StorageTmp, struct physicalSAPTable_data *StorageOld)
+{
+	/* XXX: provide code to check the row for consistency */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int update_physicalSAPTable_row(struct physicalSAPTable_data *StorageTmp, struct physicalSAPTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the set operation (ACTION phase) on a row
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to update, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the COMMIT phase.  The start of the ACTION phase performs a consistency check on
+ * the row before allowing the request to proceed to the COMMIT phase.  The COMMIT phase then
+ * arrives here with consistency already checked (see check_physicalSAPTable_row()).  This function can
+ * return SNMP_ERR_NOERROR or SNMP_ERR_COMMITFAILED.  Values in StorageOld are the values before the
+ * varbinds on the row were applied: the values in StorageTmp are the new values.
+ */
+int
+update_physicalSAPTable_row(struct physicalSAPTable_data *StorageTmp, struct physicalSAPTable_data *StorageOld)
+{
+	/* XXX: provide code to update the row with the underlying device */
+	physicalSAPTable_refresh = 1;
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int revert_physicalSAPTable_row(struct physicalSAPTable_data *StorageTmp, struct physicalSAPTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the undo operation (UNDO phase) on a row
+ */
+void
+revert_physicalSAPTable_row(struct physicalSAPTable_data *StorageTmp, struct physicalSAPTable_data *StorageOld)
+{
+	/* XXX: provide code to revert the row with the underlying device */
+	update_physicalSAPTable_row(StorageOld, NULL);
 }
 
 /**
@@ -1771,6 +2181,64 @@ var_physicalSAPTable(struct variable *vp, oid * name, size_t *length, int exact,
 		ERROR_MSG("");
 	}
 	return (rval);
+}
+
+/**
+ * @fn int check_dataCircuitTable_row(struct dataCircuitTable_data *StorageTmp, struct dataCircuitTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to check, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the ACTION phase.  The start of the ACTION pahse performs this consitency check
+ * on the row before allowing the request to proceed to the COMMIT phase.  This function can return
+ * SNMP_ERR_NOERR or a specific SNMP error value.  Values in StorageOld are the values before the
+ * varbinds on the mib were applied; the values in StorageTmp are the new values.  The function is
+ * permitted to change the values in StorageTmp to correct them; however, preference should be made
+ * for setting values where were not in the varbinds.
+ */
+int
+check_dataCircuitTable_row(struct dataCircuitTable_data *StorageTmp, struct dataCircuitTable_data *StorageOld)
+{
+	/* XXX: provide code to check the row for consistency */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int update_dataCircuitTable_row(struct dataCircuitTable_data *StorageTmp, struct dataCircuitTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the set operation (ACTION phase) on a row
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to update, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the COMMIT phase.  The start of the ACTION phase performs a consistency check on
+ * the row before allowing the request to proceed to the COMMIT phase.  The COMMIT phase then
+ * arrives here with consistency already checked (see check_dataCircuitTable_row()).  This function can
+ * return SNMP_ERR_NOERROR or SNMP_ERR_COMMITFAILED.  Values in StorageOld are the values before the
+ * varbinds on the row were applied: the values in StorageTmp are the new values.
+ */
+int
+update_dataCircuitTable_row(struct dataCircuitTable_data *StorageTmp, struct dataCircuitTable_data *StorageOld)
+{
+	/* XXX: provide code to update the row with the underlying device */
+	dataCircuitTable_refresh = 1;
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int revert_dataCircuitTable_row(struct dataCircuitTable_data *StorageTmp, struct dataCircuitTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the undo operation (UNDO phase) on a row
+ */
+void
+revert_dataCircuitTable_row(struct dataCircuitTable_data *StorageTmp, struct dataCircuitTable_data *StorageOld)
+{
+	/* XXX: provide code to revert the row with the underlying device */
+	update_dataCircuitTable_row(StorageOld, NULL);
 }
 
 /**
@@ -1925,6 +2393,64 @@ var_dataCircuitTable(struct variable *vp, oid * name, size_t *length, int exact,
 }
 
 /**
+ * @fn int check_physicalConnectionTable_row(struct physicalConnectionTable_data *StorageTmp, struct physicalConnectionTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to check, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the ACTION phase.  The start of the ACTION pahse performs this consitency check
+ * on the row before allowing the request to proceed to the COMMIT phase.  This function can return
+ * SNMP_ERR_NOERR or a specific SNMP error value.  Values in StorageOld are the values before the
+ * varbinds on the mib were applied; the values in StorageTmp are the new values.  The function is
+ * permitted to change the values in StorageTmp to correct them; however, preference should be made
+ * for setting values where were not in the varbinds.
+ */
+int
+check_physicalConnectionTable_row(struct physicalConnectionTable_data *StorageTmp, struct physicalConnectionTable_data *StorageOld)
+{
+	/* XXX: provide code to check the row for consistency */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int update_physicalConnectionTable_row(struct physicalConnectionTable_data *StorageTmp, struct physicalConnectionTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the set operation (ACTION phase) on a row
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to update, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the COMMIT phase.  The start of the ACTION phase performs a consistency check on
+ * the row before allowing the request to proceed to the COMMIT phase.  The COMMIT phase then
+ * arrives here with consistency already checked (see check_physicalConnectionTable_row()).  This function can
+ * return SNMP_ERR_NOERROR or SNMP_ERR_COMMITFAILED.  Values in StorageOld are the values before the
+ * varbinds on the row were applied: the values in StorageTmp are the new values.
+ */
+int
+update_physicalConnectionTable_row(struct physicalConnectionTable_data *StorageTmp, struct physicalConnectionTable_data *StorageOld)
+{
+	/* XXX: provide code to update the row with the underlying device */
+	physicalConnectionTable_refresh = 1;
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int revert_physicalConnectionTable_row(struct physicalConnectionTable_data *StorageTmp, struct physicalConnectionTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the undo operation (UNDO phase) on a row
+ */
+void
+revert_physicalConnectionTable_row(struct physicalConnectionTable_data *StorageTmp, struct physicalConnectionTable_data *StorageOld)
+{
+	/* XXX: provide code to revert the row with the underlying device */
+	update_physicalConnectionTable_row(StorageOld, NULL);
+}
+
+/**
  * @fn void refresh_physicalConnectionTable_row(struct physicalConnectionTable_data *StorageTmp, int force)
  * @param StorageTmp the data row to refresh.
  * @param force force refresh if non-zero.
@@ -2041,17 +2567,17 @@ var_physicalConnectionTable(struct variable *vp, oid * name, size_t *length, int
 int
 write_dataCircuitBitErrorsThreshold(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static uint8_t *old_value;
-	struct dataCircuitTable_data *StorageTmp = NULL;
+	struct dataCircuitTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 15;
-	static size_t old_length = 0;
-	static uint8_t *string = NULL;
+	uint8_t *string = NULL;
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("phyMIB", "write_dataCircuitBitErrorsThreshold entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(dataCircuitTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
-		string = NULL;
 		if (StorageTmp != NULL && statP == NULL) {
 			/* have row but no column */
 			switch (StorageTmp->dataCircuitRowStatus) {
@@ -2073,33 +2599,73 @@ write_dataCircuitBitErrorsThreshold(int action, u_char *var_val, u_char var_val_
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to dataCircuitBitErrorsThreshold: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
-		break;
-	case RESERVE2:		/* memory reseveration, final preparation... */
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->dataCircuitTable_old) == NULL)
+			if (StorageTmp->dataCircuitTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->dataCircuitTable_old = dataCircuitTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->dataCircuitTable_rsvs++;
 		if ((string = malloc(var_val_len + 1)) == NULL)
 			return SNMP_ERR_RESOURCEUNAVAILABLE;
 		memcpy((void *) string, (void *) var_val, var_val_len);
 		string[var_val_len] = 0;
+		SNMP_FREE(StorageTmp->dataCircuitBitErrorsThreshold);
+		StorageTmp->dataCircuitBitErrorsThreshold = string;
+		StorageTmp->dataCircuitBitErrorsThresholdLen = var_val_len;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
+		break;
+	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->dataCircuitTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->dataCircuitTable_tsts == 0)
+				if ((ret = check_dataCircuitTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->dataCircuitTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->dataCircuitBitErrorsThreshold for you to use, and you have just been asked to do something with it.  Note that anything
 				   done here must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->dataCircuitBitErrorsThreshold;
-		old_length = StorageTmp->dataCircuitBitErrorsThresholdLen;
-		StorageTmp->dataCircuitBitErrorsThreshold = string;
-		StorageTmp->dataCircuitBitErrorsThresholdLen = var_val_len;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->dataCircuitTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->dataCircuitTable_sets == 0)
+				if ((ret = update_dataCircuitTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->dataCircuitTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
-		SNMP_FREE(old_value);
-		old_length = 0;
-		string = NULL;
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->dataCircuitTable_old) != NULL) {
+			dataCircuitTable_destroy(&StorageTmp->dataCircuitTable_old);
+			StorageTmp->dataCircuitTable_rsvs = 0;
+			StorageTmp->dataCircuitTable_tsts = 0;
+			StorageTmp->dataCircuitTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->dataCircuitBitErrorsThreshold = old_value;
-		StorageTmp->dataCircuitBitErrorsThresholdLen = old_length;
+		if ((StorageOld = StorageTmp->dataCircuitTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->dataCircuitTable_sets == 0)
+			revert_dataCircuitTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
-		SNMP_FREE(string);
+		if ((StorageOld = StorageTmp->dataCircuitTable_old) == NULL)
+			break;
+		if (StorageOld->dataCircuitBitErrorsThreshold != NULL) {
+			SNMP_FREE(StorageTmp->dataCircuitBitErrorsThreshold);
+			StorageTmp->dataCircuitBitErrorsThreshold = StorageOld->dataCircuitBitErrorsThreshold;
+			StorageTmp->dataCircuitBitErrorsThresholdLen = StorageOld->dataCircuitBitErrorsThresholdLen;
+			StorageOld->dataCircuitBitErrorsThreshold = NULL;
+			StorageOld->dataCircuitBitErrorsThresholdLen = 0;
+		}
+		if (--StorageTmp->dataCircuitTable_rsvs == 0)
+			dataCircuitTable_destroy(&StorageTmp->dataCircuitTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -2119,17 +2685,17 @@ write_dataCircuitBitErrorsThreshold(int action, u_char *var_val, u_char var_val_
 int
 write_physicalConnectionEndpointIdentifier(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static uint8_t *old_value;
-	struct physicalConnectionTable_data *StorageTmp = NULL;
+	struct physicalConnectionTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 15;
-	static size_t old_length = 0;
-	static uint8_t *string = NULL;
+	uint8_t *string = NULL;
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("phyMIB", "write_physicalConnectionEndpointIdentifier entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(physicalConnectionTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
-		string = NULL;
 		if (StorageTmp != NULL && statP == NULL) {
 			/* have row but no column */
 			switch (StorageTmp->physicalConnectionRowStatus) {
@@ -2151,108 +2717,178 @@ write_physicalConnectionEndpointIdentifier(int action, u_char *var_val, u_char v
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to physicalConnectionEndpointIdentifier: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
-		break;
-	case RESERVE2:		/* memory reseveration, final preparation... */
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->physicalConnectionTable_old) == NULL)
+			if (StorageTmp->physicalConnectionTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->physicalConnectionTable_old = physicalConnectionTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->physicalConnectionTable_rsvs++;
 		if ((string = malloc(var_val_len + 1)) == NULL)
 			return SNMP_ERR_RESOURCEUNAVAILABLE;
 		memcpy((void *) string, (void *) var_val, var_val_len);
 		string[var_val_len] = 0;
+		SNMP_FREE(StorageTmp->physicalConnectionEndpointIdentifier);
+		StorageTmp->physicalConnectionEndpointIdentifier = string;
+		StorageTmp->physicalConnectionEndpointIdentifierLen = var_val_len;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
+		break;
+	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->physicalConnectionTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->physicalConnectionTable_tsts == 0)
+				if ((ret = check_physicalConnectionTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->physicalConnectionTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->physicalConnectionEndpointIdentifier for you to use, and you have just been asked to do something with it.  Note that
 				   anything done here must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->physicalConnectionEndpointIdentifier;
-		old_length = StorageTmp->physicalConnectionEndpointIdentifierLen;
-		StorageTmp->physicalConnectionEndpointIdentifier = string;
-		StorageTmp->physicalConnectionEndpointIdentifierLen = var_val_len;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->physicalConnectionTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->physicalConnectionTable_sets == 0)
+				if ((ret = update_physicalConnectionTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->physicalConnectionTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
-		SNMP_FREE(old_value);
-		old_length = 0;
-		string = NULL;
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->physicalConnectionTable_old) != NULL) {
+			physicalConnectionTable_destroy(&StorageTmp->physicalConnectionTable_old);
+			StorageTmp->physicalConnectionTable_rsvs = 0;
+			StorageTmp->physicalConnectionTable_tsts = 0;
+			StorageTmp->physicalConnectionTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->physicalConnectionEndpointIdentifier = old_value;
-		StorageTmp->physicalConnectionEndpointIdentifierLen = old_length;
+		if ((StorageOld = StorageTmp->physicalConnectionTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->physicalConnectionTable_sets == 0)
+			revert_physicalConnectionTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
-		SNMP_FREE(string);
+		if ((StorageOld = StorageTmp->physicalConnectionTable_old) == NULL)
+			break;
+		if (StorageOld->physicalConnectionEndpointIdentifier != NULL) {
+			SNMP_FREE(StorageTmp->physicalConnectionEndpointIdentifier);
+			StorageTmp->physicalConnectionEndpointIdentifier = StorageOld->physicalConnectionEndpointIdentifier;
+			StorageTmp->physicalConnectionEndpointIdentifierLen = StorageOld->physicalConnectionEndpointIdentifierLen;
+			StorageOld->physicalConnectionEndpointIdentifier = NULL;
+			StorageOld->physicalConnectionEndpointIdentifierLen = 0;
+		}
+		if (--StorageTmp->physicalConnectionTable_rsvs == 0)
+			physicalConnectionTable_destroy(&StorageTmp->physicalConnectionTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
 }
 
 /**
- * @fn int physicalEntityTable_consistent(struct physicalEntityTable_data *thedata)
- * @param thedata the row data to check for consistency.
- * @brief check the internal consistency of a table row.
+ * @fn int can_act_physicalSAPTable_row(struct physicalSAPTable_data *StorageTmp)
+ * @param StorageTmp the data (as updated)
+ * @brief check whether an inactive table row can be activated
  *
- * This function checks the internal consistency of a table row for the physicalEntityTable table.  If the
- * table row is internally consistent, then this function returns SNMP_ERR_NOERROR, otherwise the
- * function returns an SNMP error code and it will not be possible to activate the row until the
- * row's internal consistency is corrected.  This function might use a 'test' operation against the
- * driver to ensure that the commit phase will succeed.
+ * This function is used by the ACTION phase of a RowStatus object to test whether an inactive table
+ * row can be activated.  Returns SNMP_ERR_NOERROR when activation is permitted; an SNMP error
+ * value, otherwise.  This function might use a 'test' operation against the driver to ensure that
+ * the commit phase will succeed.
  */
 int
-physicalEntityTable_consistent(struct physicalEntityTable_data *thedata)
+can_act_physicalSAPTable_row(struct physicalSAPTable_data *StorageTmp)
 {
-	/* XXX: check row consistency return SNMP_ERR_NOERROR if consistent, or an SNMP error code if not. */
-	return (SNMP_ERR_NOERROR);
+	/* XXX: provide code to check whether the new or inactive table row can be activated */
+	return SNMP_ERR_NOERROR;
 }
 
 /**
- * @fn int physicalSAPTable_consistent(struct physicalSAPTable_data *thedata)
- * @param thedata the row data to check for consistency.
- * @brief check the internal consistency of a table row.
+ * @fn int can_deact_physicalSAPTable_row(struct physicalSAPTable_data *StorageTmp)
+ * @param StorageTmp the data (as updated)
+ * @brief check whether an active table row can be deactivated
  *
- * This function checks the internal consistency of a table row for the physicalSAPTable table.  If the
- * table row is internally consistent, then this function returns SNMP_ERR_NOERROR, otherwise the
- * function returns an SNMP error code and it will not be possible to activate the row until the
- * row's internal consistency is corrected.  This function might use a 'test' operation against the
- * driver to ensure that the commit phase will succeed.
+ * This function is used by the ACTION phase of a RowStatus object to test whether an active table
+ * row can be deactivated.  Returns SNMP_ERR_NOERROR when deactivation is permitted; an SNMP error
+ * value, otherwise.  This function might use a 'test' operation against the driver to ensure that
+ * the commit phase will succeed.
  */
 int
-physicalSAPTable_consistent(struct physicalSAPTable_data *thedata)
+can_deact_physicalSAPTable_row(struct physicalSAPTable_data *StorageTmp)
 {
-	/* XXX: check row consistency return SNMP_ERR_NOERROR if consistent, or an SNMP error code if not. */
-	return (SNMP_ERR_NOERROR);
+	/* XXX: provide code to check whether the active table row can be deactivated */
+	return SNMP_ERR_NOERROR;
 }
 
 /**
- * @fn int dataCircuitTable_consistent(struct dataCircuitTable_data *thedata)
- * @param thedata the row data to check for consistency.
- * @brief check the internal consistency of a table row.
+ * @fn int can_act_dataCircuitTable_row(struct dataCircuitTable_data *StorageTmp)
+ * @param StorageTmp the data (as updated)
+ * @brief check whether an inactive table row can be activated
  *
- * This function checks the internal consistency of a table row for the dataCircuitTable table.  If the
- * table row is internally consistent, then this function returns SNMP_ERR_NOERROR, otherwise the
- * function returns an SNMP error code and it will not be possible to activate the row until the
- * row's internal consistency is corrected.  This function might use a 'test' operation against the
- * driver to ensure that the commit phase will succeed.
+ * This function is used by the ACTION phase of a RowStatus object to test whether an inactive table
+ * row can be activated.  Returns SNMP_ERR_NOERROR when activation is permitted; an SNMP error
+ * value, otherwise.  This function might use a 'test' operation against the driver to ensure that
+ * the commit phase will succeed.
  */
 int
-dataCircuitTable_consistent(struct dataCircuitTable_data *thedata)
+can_act_dataCircuitTable_row(struct dataCircuitTable_data *StorageTmp)
 {
-	/* XXX: check row consistency return SNMP_ERR_NOERROR if consistent, or an SNMP error code if not. */
-	return (SNMP_ERR_NOERROR);
+	/* XXX: provide code to check whether the new or inactive table row can be activated */
+	return SNMP_ERR_NOERROR;
 }
 
 /**
- * @fn int physicalConnectionTable_consistent(struct physicalConnectionTable_data *thedata)
- * @param thedata the row data to check for consistency.
- * @brief check the internal consistency of a table row.
+ * @fn int can_deact_dataCircuitTable_row(struct dataCircuitTable_data *StorageTmp)
+ * @param StorageTmp the data (as updated)
+ * @brief check whether an active table row can be deactivated
  *
- * This function checks the internal consistency of a table row for the physicalConnectionTable table.  If the
- * table row is internally consistent, then this function returns SNMP_ERR_NOERROR, otherwise the
- * function returns an SNMP error code and it will not be possible to activate the row until the
- * row's internal consistency is corrected.  This function might use a 'test' operation against the
- * driver to ensure that the commit phase will succeed.
+ * This function is used by the ACTION phase of a RowStatus object to test whether an active table
+ * row can be deactivated.  Returns SNMP_ERR_NOERROR when deactivation is permitted; an SNMP error
+ * value, otherwise.  This function might use a 'test' operation against the driver to ensure that
+ * the commit phase will succeed.
  */
 int
-physicalConnectionTable_consistent(struct physicalConnectionTable_data *thedata)
+can_deact_dataCircuitTable_row(struct dataCircuitTable_data *StorageTmp)
 {
-	/* XXX: check row consistency return SNMP_ERR_NOERROR if consistent, or an SNMP error code if not. */
-	return (SNMP_ERR_NOERROR);
+	/* XXX: provide code to check whether the active table row can be deactivated */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int can_act_physicalConnectionTable_row(struct physicalConnectionTable_data *StorageTmp)
+ * @param StorageTmp the data (as updated)
+ * @brief check whether an inactive table row can be activated
+ *
+ * This function is used by the ACTION phase of a RowStatus object to test whether an inactive table
+ * row can be activated.  Returns SNMP_ERR_NOERROR when activation is permitted; an SNMP error
+ * value, otherwise.  This function might use a 'test' operation against the driver to ensure that
+ * the commit phase will succeed.
+ */
+int
+can_act_physicalConnectionTable_row(struct physicalConnectionTable_data *StorageTmp)
+{
+	/* XXX: provide code to check whether the new or inactive table row can be activated */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int can_deact_physicalConnectionTable_row(struct physicalConnectionTable_data *StorageTmp)
+ * @param StorageTmp the data (as updated)
+ * @brief check whether an active table row can be deactivated
+ *
+ * This function is used by the ACTION phase of a RowStatus object to test whether an active table
+ * row can be deactivated.  Returns SNMP_ERR_NOERROR when deactivation is permitted; an SNMP error
+ * value, otherwise.  This function might use a 'test' operation against the driver to ensure that
+ * the commit phase will succeed.
+ */
+int
+can_deact_physicalConnectionTable_row(struct physicalConnectionTable_data *StorageTmp)
+{
+	/* XXX: provide code to check whether the active table row can be deactivated */
+	return SNMP_ERR_NOERROR;
 }
 
 /**
@@ -2269,10 +2905,9 @@ physicalConnectionTable_consistent(struct physicalConnectionTable_data *thedata)
 int
 write_physicalSAPRowStatus(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	struct physicalSAPTable_data *StorageTmp = NULL;
+	struct physicalSAPTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	static struct physicalSAPTable_data *StorageNew, *StorageDel;
 	size_t newlen = name_len - 15;
-	static int old_value;
 	int set_value, ret;
 	static struct variable_list *vars, *vp;
 
@@ -2299,40 +2934,6 @@ write_physicalSAPRowStatus(int action, u_char *var_val, u_char var_val_type, siz
 			if (StorageTmp != NULL)
 				/* cannot create existing row */
 				return SNMP_ERR_INCONSISTENTVALUE;
-			break;
-		case RS_ACTIVE:
-		case RS_NOTINSERVICE:
-			if (StorageTmp == NULL)
-				/* cannot change state of non-existent row */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			if (StorageTmp->physicalSAPRowStatus == RS_NOTREADY)
-				/* cannot change state of row that is not ready */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			/* XXX: interaction with row storage type needed */
-			if (set_value == RS_NOTINSERVICE && StorageTmp->physicalSAPTable_refs > 0)
-				/* row is busy and cannot be moved to the RS_NOTINSERVICE state */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			break;
-		case RS_DESTROY:
-			/* destroying existent or non-existent row is ok */
-			if (StorageTmp == NULL)
-				break;
-			/* XXX: interaction with row storage type needed */
-			if (StorageTmp->physicalSAPTable_refs > 0)
-				/* row is busy and cannot be deleted */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			break;
-		case RS_NOTREADY:
-			/* management station cannot set this, only agent can */
-		default:
-			return SNMP_ERR_INCONSISTENTVALUE;
-		}
-		break;
-	case RESERVE2:
-		/* memory reseveration, final preparation... */
-		switch (set_value) {
-		case RS_CREATEANDGO:
-		case RS_CREATEANDWAIT:
 			/* creation */
 			vars = NULL;
 			/* physicalEntityId */
@@ -2370,6 +2971,7 @@ write_physicalSAPRowStatus(int action, u_char *var_val, u_char var_val_type, siz
 				snmp_free_varbind(vars);
 				return SNMP_ERR_RESOURCEUNAVAILABLE;
 			}
+			StorageNew->physicalSAPTable_rsvs = 1;
 			vp = vars;
 			memdup((void *) &StorageNew->physicalEntityId, vp->val.string, vp->val_len);
 			StorageNew->physicalEntityIdLen = vp->val_len;
@@ -2379,7 +2981,37 @@ write_physicalSAPRowStatus(int action, u_char *var_val, u_char var_val_type, siz
 			vp = vp->next_variable;
 			header_complex_add_data(&physicalSAPTableStorage, vars, StorageNew);	/* frees vars */
 			break;
+		case RS_ACTIVE:
+		case RS_NOTINSERVICE:
+			if (StorageTmp == NULL)
+				/* cannot change state of non-existent row */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			if (StorageTmp->physicalSAPRowStatus == RS_NOTREADY)
+				/* cannot change state of row that is not ready */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			/* XXX: interaction with row storage type needed */
+			if (set_value == RS_NOTINSERVICE && StorageTmp->physicalSAPTable_refs > 0)
+				/* row is busy and cannot be moved to the RS_NOTINSERVICE state */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			/* activate or deactivate */
+			if (StorageTmp == NULL)
+				return SNMP_ERR_NOSUCHNAME;
+			/* one allocation for the whole row */
+			if ((StorageOld = StorageTmp->physicalSAPTable_old) == NULL)
+				if (StorageTmp->physicalSAPTable_rsvs == 0)
+					if ((StorageOld = StorageTmp->physicalSAPTable_old = physicalSAPTable_duplicate(StorageTmp)) == NULL)
+						return SNMP_ERR_RESOURCEUNAVAILABLE;
+			if (StorageOld != NULL)
+				StorageTmp->physicalSAPTable_rsvs++;
+			break;
 		case RS_DESTROY:
+			if (StorageTmp == NULL)
+				/* cannot destroy non-existent row */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			/* XXX: interaction with row storage type needed */
+			if (StorageTmp->physicalSAPTable_refs > 0)
+				/* row is busy and cannot be deleted */
+				return SNMP_ERR_INCONSISTENTVALUE;
 			/* destroy */
 			if (StorageTmp != NULL) {
 				/* exists, extract it for now */
@@ -2389,78 +3021,127 @@ write_physicalSAPRowStatus(int action, u_char *var_val, u_char var_val_type, siz
 				StorageDel = NULL;
 			}
 			break;
+		case RS_NOTREADY:
+			/* management station cannot set this, only agent can */
+		default:
+			return SNMP_ERR_INCONSISTENTVALUE;
 		}
 		break;
-	case ACTION:
-		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the UNDO case */
+	case RESERVE2:
+		/* memory reseveration, final preparation... */
 		switch (set_value) {
 		case RS_CREATEANDGO:
 			/* check that activation is possible */
-			if ((ret = physicalSAPTable_consistent(StorageNew)) != SNMP_ERR_NOERROR)
+			if ((ret = can_act_physicalSAPTable_row(StorageNew)) != SNMP_ERR_NOERROR)
 				return (ret);
 			break;
 		case RS_CREATEANDWAIT:
-			/* row does not have to be consistent */
 			break;
 		case RS_ACTIVE:
-			old_value = StorageTmp->physicalSAPRowStatus;
-			StorageTmp->physicalSAPRowStatus = set_value;
-			if (old_value != RS_ACTIVE) {
-				/* check that activation is possible */
-				if ((ret = physicalSAPTable_consistent(StorageTmp)) != SNMP_ERR_NOERROR) {
-					StorageTmp->physicalSAPRowStatus = old_value;
+			/* check that activation is possible */
+			if (StorageTmp->physicalSAPRowStatus != RS_ACTIVE)
+				if ((ret = can_act_physicalSAPTable_row(StorageTmp)) != SNMP_ERR_NOERROR)
 					return (ret);
-				}
+			break;
+		case RS_NOTINSERVICE:
+			/* check that deactivation is possible */
+			if (StorageTmp->physicalSAPRowStatus != RS_NOTINSERVICE)
+				if ((ret = can_deact_physicalSAPTable_row(StorageTmp)) != SNMP_ERR_NOERROR)
+					return (ret);
+			break;
+		case RS_DESTROY:
+			/* check that deactivation is possible */
+			if (StorageTmp->physicalSAPRowStatus != RS_NOTINSERVICE)
+				if ((ret = can_deact_physicalSAPTable_row(StorageTmp)) != SNMP_ERR_NOERROR)
+					return (ret);
+			break;
+		default:
+			return SNMP_ERR_WRONGVALUE;
+		}
+		break;
+	case ACTION:
+		/* The variable has been stored in StorageTmp->physicalSAPRowStatus for you to use, and you have just been asked to do something with it.  Note that anything done here must be
+		   reversable in the UNDO case */
+		switch (set_value) {
+		case RS_CREATEANDGO:
+			/* activate with underlying device */
+			if (activate_physicalSAPTable_row(StorageNew) != SNMP_ERR_NOERROR)
+				return SNMP_ERR_COMMITFAILED;
+			break;
+		case RS_CREATEANDWAIT:
+			break;
+		case RS_ACTIVE:
+			/* state change already performed */
+			if (StorageTmp->physicalSAPRowStatus != RS_ACTIVE) {
+				/* activate with underlying device */
+				if (activate_physicalSAPTable_row(StorageTmp) != SNMP_ERR_NOERROR)
+					return SNMP_ERR_COMMITFAILED;
 			}
 			break;
 		case RS_NOTINSERVICE:
-			/* set the flag? */
-			old_value = StorageTmp->physicalSAPRowStatus;
-			StorageTmp->physicalSAPRowStatus = set_value;
+			/* state change already performed */
+			if (StorageTmp->physicalSAPRowStatus != RS_NOTINSERVICE) {
+				/* deactivate with underlying device */
+				if (deactivate_physicalSAPTable_row(StorageTmp) != SNMP_ERR_NOERROR)
+					return SNMP_ERR_COMMITFAILED;
+			}
 			break;
+		case RS_DESTROY:
+			/* commit destrution to underlying device */
+			if (StorageDel == NULL)
+				break;
+			/* deactivate with underlying device */
+			if (deactivate_physicalSAPTable_row(StorageDel) != SNMP_ERR_NOERROR)
+				return SNMP_ERR_COMMITFAILED;
+			break;
+		default:
+			return SNMP_ERR_WRONGVALUE;
 		}
 		break;
 	case COMMIT:
 		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		switch (set_value) {
 		case RS_CREATEANDGO:
-			/* row creation, set final state */
-			/* XXX: commit creation to underlying device */
-			/* XXX: activate with underlying device */
 			StorageNew->physicalSAPRowStatus = RS_ACTIVE;
 			break;
 		case RS_CREATEANDWAIT:
-			/* row creation, set final state */
 			StorageNew->physicalSAPRowStatus = RS_NOTINSERVICE;
 			break;
 		case RS_ACTIVE:
 		case RS_NOTINSERVICE:
-			/* state change already performed */
-			if (old_value != set_value) {
-				switch (set_value) {
-				case RS_ACTIVE:
-					/* XXX: activate with underlying device */
-					break;
-				case RS_NOTINSERVICE:
-					/* XXX: deactivate with underlying device */
-					break;
-				}
+			StorageNew->physicalSAPRowStatus = set_value;
+			if ((StorageOld = StorageTmp->physicalSAPTable_old) != NULL) {
+				physicalSAPTable_destroy(&StorageTmp->physicalSAPTable_old);
+				StorageTmp->physicalSAPTable_rsvs = 0;
+				StorageTmp->physicalSAPTable_tsts = 0;
+				StorageTmp->physicalSAPTable_sets = 0;
 			}
 			break;
 		case RS_DESTROY:
-			/* row deletion, free it its dead */
 			physicalSAPTable_destroy(&StorageDel);
-			/* physicalSAPTable_destroy() can handle NULL pointers. */
 			break;
 		}
 		break;
 	case UNDO:
 		/* Back out any changes made in the ACTION case */
 		switch (set_value) {
+		case RS_CREATEANDGO:
+			/* deactivate with underlying device */
+			deactivate_physicalSAPTable_row(StorageNew);
+			break;
+		case RS_CREATEANDWAIT:
+			break;
 		case RS_ACTIVE:
+			if (StorageTmp->physicalSAPRowStatus == RS_NOTINSERVICE)
+				/* deactivate with underlying device */
+				deactivate_physicalSAPTable_row(StorageTmp);
+			break;
 		case RS_NOTINSERVICE:
-			/* restore state */
-			StorageTmp->physicalSAPRowStatus = old_value;
+			if (StorageTmp->physicalSAPRowStatus == RS_ACTIVE)
+				/* activate with underlying device */
+				activate_physicalSAPTable_row(StorageTmp);
+			break;
+		case RS_DESTROY:
 			break;
 		}
 		/* fall through */
@@ -2474,6 +3155,13 @@ write_physicalSAPRowStatus(int action, u_char *var_val, u_char var_val_type, siz
 				physicalSAPTable_del(StorageNew);
 				physicalSAPTable_destroy(&StorageNew);
 			}
+			break;
+		case RS_ACTIVE:
+		case RS_NOTINSERVICE:
+			if ((StorageOld = StorageTmp->physicalSAPTable_old) == NULL)
+				break;
+			if (--StorageTmp->physicalSAPTable_rsvs == 0)
+				physicalSAPTable_destroy(&StorageTmp->physicalSAPTable_old);
 			break;
 		case RS_DESTROY:
 			/* row deletion, so add it again */
@@ -2500,10 +3188,9 @@ write_physicalSAPRowStatus(int action, u_char *var_val, u_char var_val_type, siz
 int
 write_dataCircuitRowStatus(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	struct dataCircuitTable_data *StorageTmp = NULL;
+	struct dataCircuitTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	static struct dataCircuitTable_data *StorageNew, *StorageDel;
 	size_t newlen = name_len - 15;
-	static int old_value;
 	int set_value, ret;
 	static struct variable_list *vars, *vp;
 
@@ -2530,40 +3217,6 @@ write_dataCircuitRowStatus(int action, u_char *var_val, u_char var_val_type, siz
 			if (StorageTmp != NULL)
 				/* cannot create existing row */
 				return SNMP_ERR_INCONSISTENTVALUE;
-			break;
-		case RS_ACTIVE:
-		case RS_NOTINSERVICE:
-			if (StorageTmp == NULL)
-				/* cannot change state of non-existent row */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			if (StorageTmp->dataCircuitRowStatus == RS_NOTREADY)
-				/* cannot change state of row that is not ready */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			/* XXX: interaction with row storage type needed */
-			if (set_value == RS_NOTINSERVICE && StorageTmp->dataCircuitTable_refs > 0)
-				/* row is busy and cannot be moved to the RS_NOTINSERVICE state */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			break;
-		case RS_DESTROY:
-			/* destroying existent or non-existent row is ok */
-			if (StorageTmp == NULL)
-				break;
-			/* XXX: interaction with row storage type needed */
-			if (StorageTmp->dataCircuitTable_refs > 0)
-				/* row is busy and cannot be deleted */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			break;
-		case RS_NOTREADY:
-			/* management station cannot set this, only agent can */
-		default:
-			return SNMP_ERR_INCONSISTENTVALUE;
-		}
-		break;
-	case RESERVE2:
-		/* memory reseveration, final preparation... */
-		switch (set_value) {
-		case RS_CREATEANDGO:
-		case RS_CREATEANDWAIT:
 			/* creation */
 			vars = NULL;
 			/* physicalEntityId */
@@ -2601,6 +3254,7 @@ write_dataCircuitRowStatus(int action, u_char *var_val, u_char var_val_type, siz
 				snmp_free_varbind(vars);
 				return SNMP_ERR_RESOURCEUNAVAILABLE;
 			}
+			StorageNew->dataCircuitTable_rsvs = 1;
 			vp = vars;
 			memdup((void *) &StorageNew->physicalEntityId, vp->val.string, vp->val_len);
 			StorageNew->physicalEntityIdLen = vp->val_len;
@@ -2610,7 +3264,37 @@ write_dataCircuitRowStatus(int action, u_char *var_val, u_char var_val_type, siz
 			vp = vp->next_variable;
 			header_complex_add_data(&dataCircuitTableStorage, vars, StorageNew);	/* frees vars */
 			break;
+		case RS_ACTIVE:
+		case RS_NOTINSERVICE:
+			if (StorageTmp == NULL)
+				/* cannot change state of non-existent row */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			if (StorageTmp->dataCircuitRowStatus == RS_NOTREADY)
+				/* cannot change state of row that is not ready */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			/* XXX: interaction with row storage type needed */
+			if (set_value == RS_NOTINSERVICE && StorageTmp->dataCircuitTable_refs > 0)
+				/* row is busy and cannot be moved to the RS_NOTINSERVICE state */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			/* activate or deactivate */
+			if (StorageTmp == NULL)
+				return SNMP_ERR_NOSUCHNAME;
+			/* one allocation for the whole row */
+			if ((StorageOld = StorageTmp->dataCircuitTable_old) == NULL)
+				if (StorageTmp->dataCircuitTable_rsvs == 0)
+					if ((StorageOld = StorageTmp->dataCircuitTable_old = dataCircuitTable_duplicate(StorageTmp)) == NULL)
+						return SNMP_ERR_RESOURCEUNAVAILABLE;
+			if (StorageOld != NULL)
+				StorageTmp->dataCircuitTable_rsvs++;
+			break;
 		case RS_DESTROY:
+			if (StorageTmp == NULL)
+				/* cannot destroy non-existent row */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			/* XXX: interaction with row storage type needed */
+			if (StorageTmp->dataCircuitTable_refs > 0)
+				/* row is busy and cannot be deleted */
+				return SNMP_ERR_INCONSISTENTVALUE;
 			/* destroy */
 			if (StorageTmp != NULL) {
 				/* exists, extract it for now */
@@ -2620,78 +3304,127 @@ write_dataCircuitRowStatus(int action, u_char *var_val, u_char var_val_type, siz
 				StorageDel = NULL;
 			}
 			break;
+		case RS_NOTREADY:
+			/* management station cannot set this, only agent can */
+		default:
+			return SNMP_ERR_INCONSISTENTVALUE;
 		}
 		break;
-	case ACTION:
-		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the UNDO case */
+	case RESERVE2:
+		/* memory reseveration, final preparation... */
 		switch (set_value) {
 		case RS_CREATEANDGO:
 			/* check that activation is possible */
-			if ((ret = dataCircuitTable_consistent(StorageNew)) != SNMP_ERR_NOERROR)
+			if ((ret = can_act_dataCircuitTable_row(StorageNew)) != SNMP_ERR_NOERROR)
 				return (ret);
 			break;
 		case RS_CREATEANDWAIT:
-			/* row does not have to be consistent */
 			break;
 		case RS_ACTIVE:
-			old_value = StorageTmp->dataCircuitRowStatus;
-			StorageTmp->dataCircuitRowStatus = set_value;
-			if (old_value != RS_ACTIVE) {
-				/* check that activation is possible */
-				if ((ret = dataCircuitTable_consistent(StorageTmp)) != SNMP_ERR_NOERROR) {
-					StorageTmp->dataCircuitRowStatus = old_value;
+			/* check that activation is possible */
+			if (StorageTmp->dataCircuitRowStatus != RS_ACTIVE)
+				if ((ret = can_act_dataCircuitTable_row(StorageTmp)) != SNMP_ERR_NOERROR)
 					return (ret);
-				}
+			break;
+		case RS_NOTINSERVICE:
+			/* check that deactivation is possible */
+			if (StorageTmp->dataCircuitRowStatus != RS_NOTINSERVICE)
+				if ((ret = can_deact_dataCircuitTable_row(StorageTmp)) != SNMP_ERR_NOERROR)
+					return (ret);
+			break;
+		case RS_DESTROY:
+			/* check that deactivation is possible */
+			if (StorageTmp->dataCircuitRowStatus != RS_NOTINSERVICE)
+				if ((ret = can_deact_dataCircuitTable_row(StorageTmp)) != SNMP_ERR_NOERROR)
+					return (ret);
+			break;
+		default:
+			return SNMP_ERR_WRONGVALUE;
+		}
+		break;
+	case ACTION:
+		/* The variable has been stored in StorageTmp->dataCircuitRowStatus for you to use, and you have just been asked to do something with it.  Note that anything done here must be
+		   reversable in the UNDO case */
+		switch (set_value) {
+		case RS_CREATEANDGO:
+			/* activate with underlying device */
+			if (activate_dataCircuitTable_row(StorageNew) != SNMP_ERR_NOERROR)
+				return SNMP_ERR_COMMITFAILED;
+			break;
+		case RS_CREATEANDWAIT:
+			break;
+		case RS_ACTIVE:
+			/* state change already performed */
+			if (StorageTmp->dataCircuitRowStatus != RS_ACTIVE) {
+				/* activate with underlying device */
+				if (activate_dataCircuitTable_row(StorageTmp) != SNMP_ERR_NOERROR)
+					return SNMP_ERR_COMMITFAILED;
 			}
 			break;
 		case RS_NOTINSERVICE:
-			/* set the flag? */
-			old_value = StorageTmp->dataCircuitRowStatus;
-			StorageTmp->dataCircuitRowStatus = set_value;
+			/* state change already performed */
+			if (StorageTmp->dataCircuitRowStatus != RS_NOTINSERVICE) {
+				/* deactivate with underlying device */
+				if (deactivate_dataCircuitTable_row(StorageTmp) != SNMP_ERR_NOERROR)
+					return SNMP_ERR_COMMITFAILED;
+			}
 			break;
+		case RS_DESTROY:
+			/* commit destrution to underlying device */
+			if (StorageDel == NULL)
+				break;
+			/* deactivate with underlying device */
+			if (deactivate_dataCircuitTable_row(StorageDel) != SNMP_ERR_NOERROR)
+				return SNMP_ERR_COMMITFAILED;
+			break;
+		default:
+			return SNMP_ERR_WRONGVALUE;
 		}
 		break;
 	case COMMIT:
 		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		switch (set_value) {
 		case RS_CREATEANDGO:
-			/* row creation, set final state */
-			/* XXX: commit creation to underlying device */
-			/* XXX: activate with underlying device */
 			StorageNew->dataCircuitRowStatus = RS_ACTIVE;
 			break;
 		case RS_CREATEANDWAIT:
-			/* row creation, set final state */
 			StorageNew->dataCircuitRowStatus = RS_NOTINSERVICE;
 			break;
 		case RS_ACTIVE:
 		case RS_NOTINSERVICE:
-			/* state change already performed */
-			if (old_value != set_value) {
-				switch (set_value) {
-				case RS_ACTIVE:
-					/* XXX: activate with underlying device */
-					break;
-				case RS_NOTINSERVICE:
-					/* XXX: deactivate with underlying device */
-					break;
-				}
+			StorageNew->dataCircuitRowStatus = set_value;
+			if ((StorageOld = StorageTmp->dataCircuitTable_old) != NULL) {
+				dataCircuitTable_destroy(&StorageTmp->dataCircuitTable_old);
+				StorageTmp->dataCircuitTable_rsvs = 0;
+				StorageTmp->dataCircuitTable_tsts = 0;
+				StorageTmp->dataCircuitTable_sets = 0;
 			}
 			break;
 		case RS_DESTROY:
-			/* row deletion, free it its dead */
 			dataCircuitTable_destroy(&StorageDel);
-			/* dataCircuitTable_destroy() can handle NULL pointers. */
 			break;
 		}
 		break;
 	case UNDO:
 		/* Back out any changes made in the ACTION case */
 		switch (set_value) {
+		case RS_CREATEANDGO:
+			/* deactivate with underlying device */
+			deactivate_dataCircuitTable_row(StorageNew);
+			break;
+		case RS_CREATEANDWAIT:
+			break;
 		case RS_ACTIVE:
+			if (StorageTmp->dataCircuitRowStatus == RS_NOTINSERVICE)
+				/* deactivate with underlying device */
+				deactivate_dataCircuitTable_row(StorageTmp);
+			break;
 		case RS_NOTINSERVICE:
-			/* restore state */
-			StorageTmp->dataCircuitRowStatus = old_value;
+			if (StorageTmp->dataCircuitRowStatus == RS_ACTIVE)
+				/* activate with underlying device */
+				activate_dataCircuitTable_row(StorageTmp);
+			break;
+		case RS_DESTROY:
 			break;
 		}
 		/* fall through */
@@ -2705,6 +3438,13 @@ write_dataCircuitRowStatus(int action, u_char *var_val, u_char var_val_type, siz
 				dataCircuitTable_del(StorageNew);
 				dataCircuitTable_destroy(&StorageNew);
 			}
+			break;
+		case RS_ACTIVE:
+		case RS_NOTINSERVICE:
+			if ((StorageOld = StorageTmp->dataCircuitTable_old) == NULL)
+				break;
+			if (--StorageTmp->dataCircuitTable_rsvs == 0)
+				dataCircuitTable_destroy(&StorageTmp->dataCircuitTable_old);
 			break;
 		case RS_DESTROY:
 			/* row deletion, so add it again */
@@ -2731,10 +3471,9 @@ write_dataCircuitRowStatus(int action, u_char *var_val, u_char var_val_type, siz
 int
 write_physicalConnectionRowStatus(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	struct physicalConnectionTable_data *StorageTmp = NULL;
+	struct physicalConnectionTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	static struct physicalConnectionTable_data *StorageNew, *StorageDel;
 	size_t newlen = name_len - 15;
-	static int old_value;
 	int set_value, ret;
 	static struct variable_list *vars, *vp;
 
@@ -2761,40 +3500,6 @@ write_physicalConnectionRowStatus(int action, u_char *var_val, u_char var_val_ty
 			if (StorageTmp != NULL)
 				/* cannot create existing row */
 				return SNMP_ERR_INCONSISTENTVALUE;
-			break;
-		case RS_ACTIVE:
-		case RS_NOTINSERVICE:
-			if (StorageTmp == NULL)
-				/* cannot change state of non-existent row */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			if (StorageTmp->physicalConnectionRowStatus == RS_NOTREADY)
-				/* cannot change state of row that is not ready */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			/* XXX: interaction with row storage type needed */
-			if (set_value == RS_NOTINSERVICE && StorageTmp->physicalConnectionTable_refs > 0)
-				/* row is busy and cannot be moved to the RS_NOTINSERVICE state */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			break;
-		case RS_DESTROY:
-			/* destroying existent or non-existent row is ok */
-			if (StorageTmp == NULL)
-				break;
-			/* XXX: interaction with row storage type needed */
-			if (StorageTmp->physicalConnectionTable_refs > 0)
-				/* row is busy and cannot be deleted */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			break;
-		case RS_NOTREADY:
-			/* management station cannot set this, only agent can */
-		default:
-			return SNMP_ERR_INCONSISTENTVALUE;
-		}
-		break;
-	case RESERVE2:
-		/* memory reseveration, final preparation... */
-		switch (set_value) {
-		case RS_CREATEANDGO:
-		case RS_CREATEANDWAIT:
 			/* creation */
 			vars = NULL;
 			/* physicalEntityId */
@@ -2845,6 +3550,7 @@ write_physicalConnectionRowStatus(int action, u_char *var_val, u_char var_val_ty
 				snmp_free_varbind(vars);
 				return SNMP_ERR_RESOURCEUNAVAILABLE;
 			}
+			StorageNew->physicalConnectionTable_rsvs = 1;
 			vp = vars;
 			memdup((void *) &StorageNew->physicalEntityId, vp->val.string, vp->val_len);
 			StorageNew->physicalEntityIdLen = vp->val_len;
@@ -2857,7 +3563,37 @@ write_physicalConnectionRowStatus(int action, u_char *var_val, u_char var_val_ty
 			vp = vp->next_variable;
 			header_complex_add_data(&physicalConnectionTableStorage, vars, StorageNew);	/* frees vars */
 			break;
+		case RS_ACTIVE:
+		case RS_NOTINSERVICE:
+			if (StorageTmp == NULL)
+				/* cannot change state of non-existent row */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			if (StorageTmp->physicalConnectionRowStatus == RS_NOTREADY)
+				/* cannot change state of row that is not ready */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			/* XXX: interaction with row storage type needed */
+			if (set_value == RS_NOTINSERVICE && StorageTmp->physicalConnectionTable_refs > 0)
+				/* row is busy and cannot be moved to the RS_NOTINSERVICE state */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			/* activate or deactivate */
+			if (StorageTmp == NULL)
+				return SNMP_ERR_NOSUCHNAME;
+			/* one allocation for the whole row */
+			if ((StorageOld = StorageTmp->physicalConnectionTable_old) == NULL)
+				if (StorageTmp->physicalConnectionTable_rsvs == 0)
+					if ((StorageOld = StorageTmp->physicalConnectionTable_old = physicalConnectionTable_duplicate(StorageTmp)) == NULL)
+						return SNMP_ERR_RESOURCEUNAVAILABLE;
+			if (StorageOld != NULL)
+				StorageTmp->physicalConnectionTable_rsvs++;
+			break;
 		case RS_DESTROY:
+			if (StorageTmp == NULL)
+				/* cannot destroy non-existent row */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			/* XXX: interaction with row storage type needed */
+			if (StorageTmp->physicalConnectionTable_refs > 0)
+				/* row is busy and cannot be deleted */
+				return SNMP_ERR_INCONSISTENTVALUE;
 			/* destroy */
 			if (StorageTmp != NULL) {
 				/* exists, extract it for now */
@@ -2867,78 +3603,127 @@ write_physicalConnectionRowStatus(int action, u_char *var_val, u_char var_val_ty
 				StorageDel = NULL;
 			}
 			break;
+		case RS_NOTREADY:
+			/* management station cannot set this, only agent can */
+		default:
+			return SNMP_ERR_INCONSISTENTVALUE;
 		}
 		break;
-	case ACTION:
-		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the UNDO case */
+	case RESERVE2:
+		/* memory reseveration, final preparation... */
 		switch (set_value) {
 		case RS_CREATEANDGO:
 			/* check that activation is possible */
-			if ((ret = physicalConnectionTable_consistent(StorageNew)) != SNMP_ERR_NOERROR)
+			if ((ret = can_act_physicalConnectionTable_row(StorageNew)) != SNMP_ERR_NOERROR)
 				return (ret);
 			break;
 		case RS_CREATEANDWAIT:
-			/* row does not have to be consistent */
 			break;
 		case RS_ACTIVE:
-			old_value = StorageTmp->physicalConnectionRowStatus;
-			StorageTmp->physicalConnectionRowStatus = set_value;
-			if (old_value != RS_ACTIVE) {
-				/* check that activation is possible */
-				if ((ret = physicalConnectionTable_consistent(StorageTmp)) != SNMP_ERR_NOERROR) {
-					StorageTmp->physicalConnectionRowStatus = old_value;
+			/* check that activation is possible */
+			if (StorageTmp->physicalConnectionRowStatus != RS_ACTIVE)
+				if ((ret = can_act_physicalConnectionTable_row(StorageTmp)) != SNMP_ERR_NOERROR)
 					return (ret);
-				}
+			break;
+		case RS_NOTINSERVICE:
+			/* check that deactivation is possible */
+			if (StorageTmp->physicalConnectionRowStatus != RS_NOTINSERVICE)
+				if ((ret = can_deact_physicalConnectionTable_row(StorageTmp)) != SNMP_ERR_NOERROR)
+					return (ret);
+			break;
+		case RS_DESTROY:
+			/* check that deactivation is possible */
+			if (StorageTmp->physicalConnectionRowStatus != RS_NOTINSERVICE)
+				if ((ret = can_deact_physicalConnectionTable_row(StorageTmp)) != SNMP_ERR_NOERROR)
+					return (ret);
+			break;
+		default:
+			return SNMP_ERR_WRONGVALUE;
+		}
+		break;
+	case ACTION:
+		/* The variable has been stored in StorageTmp->physicalConnectionRowStatus for you to use, and you have just been asked to do something with it.  Note that anything done here must be
+		   reversable in the UNDO case */
+		switch (set_value) {
+		case RS_CREATEANDGO:
+			/* activate with underlying device */
+			if (activate_physicalConnectionTable_row(StorageNew) != SNMP_ERR_NOERROR)
+				return SNMP_ERR_COMMITFAILED;
+			break;
+		case RS_CREATEANDWAIT:
+			break;
+		case RS_ACTIVE:
+			/* state change already performed */
+			if (StorageTmp->physicalConnectionRowStatus != RS_ACTIVE) {
+				/* activate with underlying device */
+				if (activate_physicalConnectionTable_row(StorageTmp) != SNMP_ERR_NOERROR)
+					return SNMP_ERR_COMMITFAILED;
 			}
 			break;
 		case RS_NOTINSERVICE:
-			/* set the flag? */
-			old_value = StorageTmp->physicalConnectionRowStatus;
-			StorageTmp->physicalConnectionRowStatus = set_value;
+			/* state change already performed */
+			if (StorageTmp->physicalConnectionRowStatus != RS_NOTINSERVICE) {
+				/* deactivate with underlying device */
+				if (deactivate_physicalConnectionTable_row(StorageTmp) != SNMP_ERR_NOERROR)
+					return SNMP_ERR_COMMITFAILED;
+			}
 			break;
+		case RS_DESTROY:
+			/* commit destrution to underlying device */
+			if (StorageDel == NULL)
+				break;
+			/* deactivate with underlying device */
+			if (deactivate_physicalConnectionTable_row(StorageDel) != SNMP_ERR_NOERROR)
+				return SNMP_ERR_COMMITFAILED;
+			break;
+		default:
+			return SNMP_ERR_WRONGVALUE;
 		}
 		break;
 	case COMMIT:
 		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		switch (set_value) {
 		case RS_CREATEANDGO:
-			/* row creation, set final state */
-			/* XXX: commit creation to underlying device */
-			/* XXX: activate with underlying device */
 			StorageNew->physicalConnectionRowStatus = RS_ACTIVE;
 			break;
 		case RS_CREATEANDWAIT:
-			/* row creation, set final state */
 			StorageNew->physicalConnectionRowStatus = RS_NOTINSERVICE;
 			break;
 		case RS_ACTIVE:
 		case RS_NOTINSERVICE:
-			/* state change already performed */
-			if (old_value != set_value) {
-				switch (set_value) {
-				case RS_ACTIVE:
-					/* XXX: activate with underlying device */
-					break;
-				case RS_NOTINSERVICE:
-					/* XXX: deactivate with underlying device */
-					break;
-				}
+			StorageNew->physicalConnectionRowStatus = set_value;
+			if ((StorageOld = StorageTmp->physicalConnectionTable_old) != NULL) {
+				physicalConnectionTable_destroy(&StorageTmp->physicalConnectionTable_old);
+				StorageTmp->physicalConnectionTable_rsvs = 0;
+				StorageTmp->physicalConnectionTable_tsts = 0;
+				StorageTmp->physicalConnectionTable_sets = 0;
 			}
 			break;
 		case RS_DESTROY:
-			/* row deletion, free it its dead */
 			physicalConnectionTable_destroy(&StorageDel);
-			/* physicalConnectionTable_destroy() can handle NULL pointers. */
 			break;
 		}
 		break;
 	case UNDO:
 		/* Back out any changes made in the ACTION case */
 		switch (set_value) {
+		case RS_CREATEANDGO:
+			/* deactivate with underlying device */
+			deactivate_physicalConnectionTable_row(StorageNew);
+			break;
+		case RS_CREATEANDWAIT:
+			break;
 		case RS_ACTIVE:
+			if (StorageTmp->physicalConnectionRowStatus == RS_NOTINSERVICE)
+				/* deactivate with underlying device */
+				deactivate_physicalConnectionTable_row(StorageTmp);
+			break;
 		case RS_NOTINSERVICE:
-			/* restore state */
-			StorageTmp->physicalConnectionRowStatus = old_value;
+			if (StorageTmp->physicalConnectionRowStatus == RS_ACTIVE)
+				/* activate with underlying device */
+				activate_physicalConnectionTable_row(StorageTmp);
+			break;
+		case RS_DESTROY:
 			break;
 		}
 		/* fall through */
@@ -2952,6 +3737,13 @@ write_physicalConnectionRowStatus(int action, u_char *var_val, u_char var_val_ty
 				physicalConnectionTable_del(StorageNew);
 				physicalConnectionTable_destroy(&StorageNew);
 			}
+			break;
+		case RS_ACTIVE:
+		case RS_NOTINSERVICE:
+			if ((StorageOld = StorageTmp->physicalConnectionTable_old) == NULL)
+				break;
+			if (--StorageTmp->physicalConnectionTable_rsvs == 0)
+				physicalConnectionTable_destroy(&StorageTmp->physicalConnectionTable_old);
 			break;
 		case RS_DESTROY:
 			/* row deletion, so add it again */

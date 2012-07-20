@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2012  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -121,11 +121,20 @@ extern int sa_request;			/* request number for per-request actions */
 
 /* our storage structure(s) */
 struct phyMIB_data {
+	struct phyMIB_data *phyMIB_old;
+	uint phyMIB_rsvs;
+	uint phyMIB_tsts;
+	uint phyMIB_sets;
 	uint phyMIB_request;
 };
 struct physicalEntityTable_data {
+	struct physicalEntityTable_data *physicalEntityTable_old;
+	uint physicalEntityTable_rsvs;
+	uint physicalEntityTable_tsts;
+	uint physicalEntityTable_sets;
 	uint physicalEntityTable_request;
 	uint physicalEntityTable_refs;
+	uint physicalEntityTable_id;
 	uint8_t *physicalEntityId;	/* NoAccess */
 	size_t physicalEntityIdLen;
 	oid *physicalEntityLocalSapNames;	/* ReadOnly */
@@ -135,8 +144,13 @@ struct physicalEntityTable_data {
 	size_t physicalEntityTitlesLen;
 };
 struct physicalSAPTable_data {
+	struct physicalSAPTable_data *physicalSAPTable_old;
+	uint physicalSAPTable_rsvs;
+	uint physicalSAPTable_tsts;
+	uint physicalSAPTable_sets;
 	uint physicalSAPTable_request;
 	uint physicalSAPTable_refs;
+	uint physicalSAPTable_id;
 	uint8_t *physicalEntityId;	/* NoAccess */
 	size_t physicalEntityIdLen;
 	uint8_t *physicalSAPsapId;	/* NoAccess */
@@ -147,8 +161,13 @@ struct physicalSAPTable_data {
 	long physicalSAPRowStatus;	/* Create */
 };
 struct dataCircuitTable_data {
+	struct dataCircuitTable_data *dataCircuitTable_old;
+	uint dataCircuitTable_rsvs;
+	uint dataCircuitTable_tsts;
+	uint dataCircuitTable_sets;
 	uint dataCircuitTable_request;
 	uint dataCircuitTable_refs;
+	uint dataCircuitTable_id;
 	uint8_t *physicalEntityId;	/* NoAccess */
 	size_t physicalEntityIdLen;
 	uint8_t *dataCircuitCoProtocolMachineId;	/* NoAccess */
@@ -174,8 +193,13 @@ struct dataCircuitTable_data {
 	long dataCircuitRowStatus;	/* Create */
 };
 struct physicalConnectionTable_data {
+	struct physicalConnectionTable_data *physicalConnectionTable_old;
+	uint physicalConnectionTable_rsvs;
+	uint physicalConnectionTable_tsts;
+	uint physicalConnectionTable_sets;
 	uint physicalConnectionTable_request;
 	uint physicalConnectionTable_refs;
+	uint physicalConnectionTable_id;
 	uint8_t *physicalEntityId;	/* NoAccess */
 	size_t physicalEntityIdLen;
 	uint8_t *dataCircuitCoProtocolMachineId;	/* NoAccess */
@@ -240,6 +264,10 @@ void init_phyMIB(void);
 void deinit_phyMIB(void);
 int term_phyMIB(int majorID, int minorID, void *serverarg, void *clientarg);
 FindVarMethod var_phyMIB;
+struct phyMIB_data *phyMIB_create(void);
+struct phyMIB_data *phyMIB_duplicate(struct phyMIB_data *);
+int phyMIB_destroy(struct phyMIB_data **);
+int phyMIB_add(struct phyMIB_data *);
 void parse_phyMIB(const char *, char *);
 SNMPCallback store_phyMIB;
 void refresh_phyMIB(int);

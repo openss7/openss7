@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2012  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -85,11 +85,20 @@ extern int sa_request;			/* request number for per-request actions */
 
 /* our storage structure(s) */
 struct ds0_data {
+	struct ds0_data *ds0_old;
+	uint ds0_rsvs;
+	uint ds0_tsts;
+	uint ds0_sets;
 	uint ds0_request;
 };
 struct dsx0ConfigTable_data {
+	struct dsx0ConfigTable_data *dsx0ConfigTable_old;
+	uint dsx0ConfigTable_rsvs;
+	uint dsx0ConfigTable_tsts;
+	uint dsx0ConfigTable_sets;
 	uint dsx0ConfigTable_request;
 	uint dsx0ConfigTable_refs;
+	uint dsx0ConfigTable_id;
 	long ifIndex;			/* ReadOnly */
 	long dsx0Ds0ChannelNumber;	/* ReadOnly */
 	long dsx0RobbedBitSignalling;	/* ReadWrite */
@@ -102,8 +111,13 @@ struct dsx0ConfigTable_data {
 	long dsx0Ds0BundleMappedIfIndex;	/* ReadOnly */
 };
 struct dsx0ChanMappingTable_data {
+	struct dsx0ChanMappingTable_data *dsx0ChanMappingTable_old;
+	uint dsx0ChanMappingTable_rsvs;
+	uint dsx0ChanMappingTable_tsts;
+	uint dsx0ChanMappingTable_sets;
 	uint dsx0ChanMappingTable_request;
 	uint dsx0ChanMappingTable_refs;
+	uint dsx0ChanMappingTable_id;
 	long ifIndex;			/* ReadOnly */
 	long dsx0Ds0ChannelNumber;	/* ReadOnly */
 	long dsx0ChanMappedIfIndex;	/* ReadOnly */
@@ -138,6 +152,10 @@ void init_ds0(void);
 void deinit_ds0(void);
 int term_ds0(int majorID, int minorID, void *serverarg, void *clientarg);
 FindVarMethod var_ds0;
+struct ds0_data *ds0_create(void);
+struct ds0_data *ds0_duplicate(struct ds0_data *);
+int ds0_destroy(struct ds0_data **);
+int ds0_add(struct ds0_data *);
 void parse_ds0(const char *, char *);
 SNMPCallback store_ds0;
 void refresh_ds0(int);

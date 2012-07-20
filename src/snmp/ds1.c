@@ -229,177 +229,177 @@ static oid snmpTrapOID_oid[11] = { 1, 3, 6, 1, 6, 3, 1, 1, 4, 1, 0 };
  */
 struct variable4 ds1_variables[] = {
 	/* magic number, variable type, ro/rw, callback fn, L, oidsuffix */
-#define   DSX1IFINDEX           2
+#define   DSX1IFINDEX           1
 	{(u_char) DSX1IFINDEX, ASN_INTEGER, RONLY, var_dsx1ConfigTable, 3, {6, 1, 2}},
-#define   DSX1TIMEELAPSED       3
+#define   DSX1TIMEELAPSED       2
 	{(u_char) DSX1TIMEELAPSED, ASN_INTEGER, RONLY, var_dsx1ConfigTable, 3, {6, 1, 3}},
-#define   DSX1VALIDINTERVALS    4
+#define   DSX1VALIDINTERVALS    3
 	{(u_char) DSX1VALIDINTERVALS, ASN_INTEGER, RONLY, var_dsx1ConfigTable, 3, {6, 1, 4}},
-#define   DSX1LINETYPE          5
+#define   DSX1LINETYPE          4
 	{(u_char) DSX1LINETYPE, ASN_INTEGER, RWRITE, var_dsx1ConfigTable, 3, {6, 1, 5}},
-#define   DSX1LINECODING        6
+#define   DSX1LINECODING        5
 	{(u_char) DSX1LINECODING, ASN_INTEGER, RWRITE, var_dsx1ConfigTable, 3, {6, 1, 6}},
-#define   DSX1SENDCODE          7
+#define   DSX1SENDCODE          6
 	{(u_char) DSX1SENDCODE, ASN_INTEGER, RWRITE, var_dsx1ConfigTable, 3, {6, 1, 7}},
-#define   DSX1CIRCUITIDENTIFIER  8
+#define   DSX1CIRCUITIDENTIFIER  7
 	{(u_char) DSX1CIRCUITIDENTIFIER, ASN_OCTET_STR, RWRITE, var_dsx1ConfigTable, 3, {6, 1, 8}},
-#define   DSX1LOOPBACKCONFIG    9
+#define   DSX1LOOPBACKCONFIG    8
 	{(u_char) DSX1LOOPBACKCONFIG, ASN_INTEGER, RWRITE, var_dsx1ConfigTable, 3, {6, 1, 9}},
-#define   DSX1LINESTATUS        10
+#define   DSX1LINESTATUS        9
 	{(u_char) DSX1LINESTATUS, ASN_INTEGER, RONLY, var_dsx1ConfigTable, 3, {6, 1, 10}},
-#define   DSX1SIGNALMODE        11
+#define   DSX1SIGNALMODE        10
 	{(u_char) DSX1SIGNALMODE, ASN_INTEGER, RWRITE, var_dsx1ConfigTable, 3, {6, 1, 11}},
-#define   DSX1TRANSMITCLOCKSOURCE  12
+#define   DSX1TRANSMITCLOCKSOURCE  11
 	{(u_char) DSX1TRANSMITCLOCKSOURCE, ASN_INTEGER, RWRITE, var_dsx1ConfigTable, 3, {6, 1, 12}},
-#define   DSX1FDL               13
+#define   DSX1FDL               12
 	{(u_char) DSX1FDL, ASN_INTEGER, RWRITE, var_dsx1ConfigTable, 3, {6, 1, 13}},
-#define   DSX1INVALIDINTERVALS  14
+#define   DSX1INVALIDINTERVALS  13
 	{(u_char) DSX1INVALIDINTERVALS, ASN_INTEGER, RONLY, var_dsx1ConfigTable, 3, {6, 1, 14}},
-#define   DSX1LINELENGTH        15
+#define   DSX1LINELENGTH        14
 	{(u_char) DSX1LINELENGTH, ASN_INTEGER, RWRITE, var_dsx1ConfigTable, 3, {6, 1, 15}},
-#define   DSX1LINESTATUSLASTCHANGE  16
+#define   DSX1LINESTATUSLASTCHANGE  15
 	{(u_char) DSX1LINESTATUSLASTCHANGE, ASN_TIMETICKS, RONLY, var_dsx1ConfigTable, 3, {6, 1, 16}},
-#define   DSX1LINESTATUSCHANGETRAPENABLE  17
+#define   DSX1LINESTATUSCHANGETRAPENABLE  16
 	{(u_char) DSX1LINESTATUSCHANGETRAPENABLE, ASN_INTEGER, RWRITE, var_dsx1ConfigTable, 3, {6, 1, 17}},
-#define   DSX1LOOPBACKSTATUS    18
+#define   DSX1LOOPBACKSTATUS    17
 	{(u_char) DSX1LOOPBACKSTATUS, ASN_INTEGER, RONLY, var_dsx1ConfigTable, 3, {6, 1, 18}},
-#define   DSX1DS1CHANNELNUMBER  19
+#define   DSX1DS1CHANNELNUMBER  18
 	{(u_char) DSX1DS1CHANNELNUMBER, ASN_INTEGER, RONLY, var_dsx1ConfigTable, 3, {6, 1, 19}},
-#define   DSX1CHANNELIZATION    20
+#define   DSX1CHANNELIZATION    19
 	{(u_char) DSX1CHANNELIZATION, ASN_INTEGER, RWRITE, var_dsx1ConfigTable, 3, {6, 1, 20}},
-#define   DSX1LINEMODE          21
+#define   DSX1LINEMODE          20
 	{(u_char) DSX1LINEMODE, ASN_INTEGER, RWRITE, var_dsx1ConfigTable, 3, {6, 1, 21}},
-#define   DSX1LINEBUILDOUT      22
+#define   DSX1LINEBUILDOUT      21
 	{(u_char) DSX1LINEBUILDOUT, ASN_INTEGER, RWRITE, var_dsx1ConfigTable, 3, {6, 1, 22}},
-#define   DSX1LINEIMPEDANCE     23
+#define   DSX1LINEIMPEDANCE     22
 	{(u_char) DSX1LINEIMPEDANCE, ASN_INTEGER, RWRITE, var_dsx1ConfigTable, 3, {6, 1, 23}},
-#define   DSX1CURRENTESS        25
+#define   DSX1CURRENTESS        23
 	{(u_char) DSX1CURRENTESS, ASN_GAUGE, RONLY, var_dsx1CurrentTable, 3, {7, 1, 2}},
-#define   DSX1CURRENTSESS       26
+#define   DSX1CURRENTSESS       24
 	{(u_char) DSX1CURRENTSESS, ASN_GAUGE, RONLY, var_dsx1CurrentTable, 3, {7, 1, 3}},
-#define   DSX1CURRENTSEFSS      27
+#define   DSX1CURRENTSEFSS      25
 	{(u_char) DSX1CURRENTSEFSS, ASN_GAUGE, RONLY, var_dsx1CurrentTable, 3, {7, 1, 4}},
-#define   DSX1CURRENTUASS       28
+#define   DSX1CURRENTUASS       26
 	{(u_char) DSX1CURRENTUASS, ASN_GAUGE, RONLY, var_dsx1CurrentTable, 3, {7, 1, 5}},
-#define   DSX1CURRENTCSSS       29
+#define   DSX1CURRENTCSSS       27
 	{(u_char) DSX1CURRENTCSSS, ASN_GAUGE, RONLY, var_dsx1CurrentTable, 3, {7, 1, 6}},
-#define   DSX1CURRENTPCVS       30
+#define   DSX1CURRENTPCVS       28
 	{(u_char) DSX1CURRENTPCVS, ASN_GAUGE, RONLY, var_dsx1CurrentTable, 3, {7, 1, 7}},
-#define   DSX1CURRENTLESS       31
+#define   DSX1CURRENTLESS       29
 	{(u_char) DSX1CURRENTLESS, ASN_GAUGE, RONLY, var_dsx1CurrentTable, 3, {7, 1, 8}},
-#define   DSX1CURRENTBESS       32
+#define   DSX1CURRENTBESS       30
 	{(u_char) DSX1CURRENTBESS, ASN_GAUGE, RONLY, var_dsx1CurrentTable, 3, {7, 1, 9}},
-#define   DSX1CURRENTDMS        33
+#define   DSX1CURRENTDMS        31
 	{(u_char) DSX1CURRENTDMS, ASN_GAUGE, RONLY, var_dsx1CurrentTable, 3, {7, 1, 10}},
-#define   DSX1CURRENTLCVS       34
+#define   DSX1CURRENTLCVS       32
 	{(u_char) DSX1CURRENTLCVS, ASN_GAUGE, RONLY, var_dsx1CurrentTable, 3, {7, 1, 11}},
-#define   DSX1INTERVALESS       37
+#define   DSX1INTERVALESS       33
 	{(u_char) DSX1INTERVALESS, ASN_GAUGE, RONLY, var_dsx1IntervalTable, 3, {8, 1, 3}},
-#define   DSX1INTERVALSESS      38
+#define   DSX1INTERVALSESS      34
 	{(u_char) DSX1INTERVALSESS, ASN_GAUGE, RONLY, var_dsx1IntervalTable, 3, {8, 1, 4}},
-#define   DSX1INTERVALSEFSS     39
+#define   DSX1INTERVALSEFSS     35
 	{(u_char) DSX1INTERVALSEFSS, ASN_GAUGE, RONLY, var_dsx1IntervalTable, 3, {8, 1, 5}},
-#define   DSX1INTERVALUASS      40
+#define   DSX1INTERVALUASS      36
 	{(u_char) DSX1INTERVALUASS, ASN_GAUGE, RONLY, var_dsx1IntervalTable, 3, {8, 1, 6}},
-#define   DSX1INTERVALCSSS      41
+#define   DSX1INTERVALCSSS      37
 	{(u_char) DSX1INTERVALCSSS, ASN_GAUGE, RONLY, var_dsx1IntervalTable, 3, {8, 1, 7}},
-#define   DSX1INTERVALPCVS      42
+#define   DSX1INTERVALPCVS      38
 	{(u_char) DSX1INTERVALPCVS, ASN_GAUGE, RONLY, var_dsx1IntervalTable, 3, {8, 1, 8}},
-#define   DSX1INTERVALLESS      43
+#define   DSX1INTERVALLESS      39
 	{(u_char) DSX1INTERVALLESS, ASN_GAUGE, RONLY, var_dsx1IntervalTable, 3, {8, 1, 9}},
-#define   DSX1INTERVALBESS      44
+#define   DSX1INTERVALBESS      40
 	{(u_char) DSX1INTERVALBESS, ASN_GAUGE, RONLY, var_dsx1IntervalTable, 3, {8, 1, 10}},
-#define   DSX1INTERVALDMS       45
+#define   DSX1INTERVALDMS       41
 	{(u_char) DSX1INTERVALDMS, ASN_GAUGE, RONLY, var_dsx1IntervalTable, 3, {8, 1, 11}},
-#define   DSX1INTERVALLCVS      46
+#define   DSX1INTERVALLCVS      42
 	{(u_char) DSX1INTERVALLCVS, ASN_GAUGE, RONLY, var_dsx1IntervalTable, 3, {8, 1, 12}},
-#define   DSX1INTERVALVALIDDATA  47
+#define   DSX1INTERVALVALIDDATA  43
 	{(u_char) DSX1INTERVALVALIDDATA, ASN_INTEGER, RONLY, var_dsx1IntervalTable, 3, {8, 1, 13}},
-#define   DSX1TOTALESS          49
+#define   DSX1TOTALESS          44
 	{(u_char) DSX1TOTALESS, ASN_GAUGE, RONLY, var_dsx1TotalTable, 3, {9, 1, 2}},
-#define   DSX1TOTALSESS         50
+#define   DSX1TOTALSESS         45
 	{(u_char) DSX1TOTALSESS, ASN_GAUGE, RONLY, var_dsx1TotalTable, 3, {9, 1, 3}},
-#define   DSX1TOTALSEFSS        51
+#define   DSX1TOTALSEFSS        46
 	{(u_char) DSX1TOTALSEFSS, ASN_GAUGE, RONLY, var_dsx1TotalTable, 3, {9, 1, 4}},
-#define   DSX1TOTALUASS         52
+#define   DSX1TOTALUASS         47
 	{(u_char) DSX1TOTALUASS, ASN_GAUGE, RONLY, var_dsx1TotalTable, 3, {9, 1, 5}},
-#define   DSX1TOTALCSSS         53
+#define   DSX1TOTALCSSS         48
 	{(u_char) DSX1TOTALCSSS, ASN_GAUGE, RONLY, var_dsx1TotalTable, 3, {9, 1, 6}},
-#define   DSX1TOTALPCVS         54
+#define   DSX1TOTALPCVS         49
 	{(u_char) DSX1TOTALPCVS, ASN_GAUGE, RONLY, var_dsx1TotalTable, 3, {9, 1, 7}},
-#define   DSX1TOTALLESS         55
+#define   DSX1TOTALLESS         50
 	{(u_char) DSX1TOTALLESS, ASN_GAUGE, RONLY, var_dsx1TotalTable, 3, {9, 1, 8}},
-#define   DSX1TOTALBESS         56
+#define   DSX1TOTALBESS         51
 	{(u_char) DSX1TOTALBESS, ASN_GAUGE, RONLY, var_dsx1TotalTable, 3, {9, 1, 9}},
-#define   DSX1TOTALDMS          57
+#define   DSX1TOTALDMS          52
 	{(u_char) DSX1TOTALDMS, ASN_GAUGE, RONLY, var_dsx1TotalTable, 3, {9, 1, 10}},
-#define   DSX1TOTALLCVS         58
+#define   DSX1TOTALLCVS         53
 	{(u_char) DSX1TOTALLCVS, ASN_GAUGE, RONLY, var_dsx1TotalTable, 3, {9, 1, 11}},
-#define   DSX1FARENDTIMEELAPSED  60
+#define   DSX1FARENDTIMEELAPSED  54
 	{(u_char) DSX1FARENDTIMEELAPSED, ASN_INTEGER, RONLY, var_dsx1FarEndCurrentTable, 3, {10, 1, 2}},
-#define   DSX1FARENDVALIDINTERVALS  61
+#define   DSX1FARENDVALIDINTERVALS  55
 	{(u_char) DSX1FARENDVALIDINTERVALS, ASN_INTEGER, RONLY, var_dsx1FarEndCurrentTable, 3, {10, 1, 3}},
-#define   DSX1FARENDCURRENTESS  62
+#define   DSX1FARENDCURRENTESS  56
 	{(u_char) DSX1FARENDCURRENTESS, ASN_GAUGE, RONLY, var_dsx1FarEndCurrentTable, 3, {10, 1, 4}},
-#define   DSX1FARENDCURRENTSESS  63
+#define   DSX1FARENDCURRENTSESS  57
 	{(u_char) DSX1FARENDCURRENTSESS, ASN_GAUGE, RONLY, var_dsx1FarEndCurrentTable, 3, {10, 1, 5}},
-#define   DSX1FARENDCURRENTSEFSS  64
+#define   DSX1FARENDCURRENTSEFSS  58
 	{(u_char) DSX1FARENDCURRENTSEFSS, ASN_GAUGE, RONLY, var_dsx1FarEndCurrentTable, 3, {10, 1, 6}},
-#define   DSX1FARENDCURRENTUASS  65
+#define   DSX1FARENDCURRENTUASS  59
 	{(u_char) DSX1FARENDCURRENTUASS, ASN_GAUGE, RONLY, var_dsx1FarEndCurrentTable, 3, {10, 1, 7}},
-#define   DSX1FARENDCURRENTCSSS  66
+#define   DSX1FARENDCURRENTCSSS  60
 	{(u_char) DSX1FARENDCURRENTCSSS, ASN_GAUGE, RONLY, var_dsx1FarEndCurrentTable, 3, {10, 1, 8}},
-#define   DSX1FARENDCURRENTLESS  67
+#define   DSX1FARENDCURRENTLESS  61
 	{(u_char) DSX1FARENDCURRENTLESS, ASN_GAUGE, RONLY, var_dsx1FarEndCurrentTable, 3, {10, 1, 9}},
-#define   DSX1FARENDCURRENTPCVS  68
+#define   DSX1FARENDCURRENTPCVS  62
 	{(u_char) DSX1FARENDCURRENTPCVS, ASN_GAUGE, RONLY, var_dsx1FarEndCurrentTable, 3, {10, 1, 10}},
-#define   DSX1FARENDCURRENTBESS  69
+#define   DSX1FARENDCURRENTBESS  63
 	{(u_char) DSX1FARENDCURRENTBESS, ASN_GAUGE, RONLY, var_dsx1FarEndCurrentTable, 3, {10, 1, 11}},
-#define   DSX1FARENDCURRENTDMS  70
+#define   DSX1FARENDCURRENTDMS  64
 	{(u_char) DSX1FARENDCURRENTDMS, ASN_GAUGE, RONLY, var_dsx1FarEndCurrentTable, 3, {10, 1, 12}},
-#define   DSX1FARENDINVALIDINTERVALS  71
+#define   DSX1FARENDINVALIDINTERVALS  65
 	{(u_char) DSX1FARENDINVALIDINTERVALS, ASN_INTEGER, RONLY, var_dsx1FarEndCurrentTable, 3, {10, 1, 13}},
-#define   DSX1FARENDINTERVALESS  74
+#define   DSX1FARENDINTERVALESS  66
 	{(u_char) DSX1FARENDINTERVALESS, ASN_GAUGE, RONLY, var_dsx1FarEndIntervalTable, 3, {11, 1, 3}},
-#define   DSX1FARENDINTERVALSESS  75
+#define   DSX1FARENDINTERVALSESS  67
 	{(u_char) DSX1FARENDINTERVALSESS, ASN_GAUGE, RONLY, var_dsx1FarEndIntervalTable, 3, {11, 1, 4}},
-#define   DSX1FARENDINTERVALSEFSS  76
+#define   DSX1FARENDINTERVALSEFSS  68
 	{(u_char) DSX1FARENDINTERVALSEFSS, ASN_GAUGE, RONLY, var_dsx1FarEndIntervalTable, 3, {11, 1, 5}},
-#define   DSX1FARENDINTERVALUASS  77
+#define   DSX1FARENDINTERVALUASS  69
 	{(u_char) DSX1FARENDINTERVALUASS, ASN_GAUGE, RONLY, var_dsx1FarEndIntervalTable, 3, {11, 1, 6}},
-#define   DSX1FARENDINTERVALCSSS  78
+#define   DSX1FARENDINTERVALCSSS  70
 	{(u_char) DSX1FARENDINTERVALCSSS, ASN_GAUGE, RONLY, var_dsx1FarEndIntervalTable, 3, {11, 1, 7}},
-#define   DSX1FARENDINTERVALLESS  79
+#define   DSX1FARENDINTERVALLESS  71
 	{(u_char) DSX1FARENDINTERVALLESS, ASN_GAUGE, RONLY, var_dsx1FarEndIntervalTable, 3, {11, 1, 8}},
-#define   DSX1FARENDINTERVALPCVS  80
+#define   DSX1FARENDINTERVALPCVS  72
 	{(u_char) DSX1FARENDINTERVALPCVS, ASN_GAUGE, RONLY, var_dsx1FarEndIntervalTable, 3, {11, 1, 9}},
-#define   DSX1FARENDINTERVALBESS  81
+#define   DSX1FARENDINTERVALBESS  73
 	{(u_char) DSX1FARENDINTERVALBESS, ASN_GAUGE, RONLY, var_dsx1FarEndIntervalTable, 3, {11, 1, 10}},
-#define   DSX1FARENDINTERVALDMS  82
+#define   DSX1FARENDINTERVALDMS  74
 	{(u_char) DSX1FARENDINTERVALDMS, ASN_GAUGE, RONLY, var_dsx1FarEndIntervalTable, 3, {11, 1, 11}},
-#define   DSX1FARENDINTERVALVALIDDATA  83
+#define   DSX1FARENDINTERVALVALIDDATA  75
 	{(u_char) DSX1FARENDINTERVALVALIDDATA, ASN_INTEGER, RONLY, var_dsx1FarEndIntervalTable, 3, {11, 1, 12}},
-#define   DSX1FARENDTOTALESS    85
+#define   DSX1FARENDTOTALESS    76
 	{(u_char) DSX1FARENDTOTALESS, ASN_GAUGE, RONLY, var_dsx1FarEndTotalTable, 3, {12, 1, 2}},
-#define   DSX1FARENDTOTALSESS   86
+#define   DSX1FARENDTOTALSESS   77
 	{(u_char) DSX1FARENDTOTALSESS, ASN_GAUGE, RONLY, var_dsx1FarEndTotalTable, 3, {12, 1, 3}},
-#define   DSX1FARENDTOTALSEFSS  87
+#define   DSX1FARENDTOTALSEFSS  78
 	{(u_char) DSX1FARENDTOTALSEFSS, ASN_GAUGE, RONLY, var_dsx1FarEndTotalTable, 3, {12, 1, 4}},
-#define   DSX1FARENDTOTALUASS   88
+#define   DSX1FARENDTOTALUASS   79
 	{(u_char) DSX1FARENDTOTALUASS, ASN_GAUGE, RONLY, var_dsx1FarEndTotalTable, 3, {12, 1, 5}},
-#define   DSX1FARENDTOTALCSSS   89
+#define   DSX1FARENDTOTALCSSS   80
 	{(u_char) DSX1FARENDTOTALCSSS, ASN_GAUGE, RONLY, var_dsx1FarEndTotalTable, 3, {12, 1, 6}},
-#define   DSX1FARENDTOTALLESS   90
+#define   DSX1FARENDTOTALLESS   81
 	{(u_char) DSX1FARENDTOTALLESS, ASN_GAUGE, RONLY, var_dsx1FarEndTotalTable, 3, {12, 1, 7}},
-#define   DSX1FARENDTOTALPCVS   91
+#define   DSX1FARENDTOTALPCVS   82
 	{(u_char) DSX1FARENDTOTALPCVS, ASN_GAUGE, RONLY, var_dsx1FarEndTotalTable, 3, {12, 1, 8}},
-#define   DSX1FARENDTOTALBESS   92
+#define   DSX1FARENDTOTALBESS   83
 	{(u_char) DSX1FARENDTOTALBESS, ASN_GAUGE, RONLY, var_dsx1FarEndTotalTable, 3, {12, 1, 9}},
-#define   DSX1FARENDTOTALDMS    93
+#define   DSX1FARENDTOTALDMS    84
 	{(u_char) DSX1FARENDTOTALDMS, ASN_GAUGE, RONLY, var_dsx1FarEndTotalTable, 3, {12, 1, 10}},
-#define   DSX1FRACIFINDEX       96
+#define   DSX1FRACIFINDEX       85
 	{(u_char) DSX1FRACIFINDEX, ASN_INTEGER, RWRITE, var_dsx1FracTable, 3, {13, 1, 3}},
-#define   DSX1CHANMAPPEDIFINDEX  99
+#define   DSX1CHANMAPPEDIFINDEX  88
 	{(u_char) DSX1CHANMAPPEDIFINDEX, ASN_INTEGER, RONLY, var_dsx1ChanMappingTable, 3, {16, 1, 1}},
 };
 
@@ -558,6 +558,31 @@ ds1_create(void)
 }
 
 /**
+ * @fn struct ds1_data *ds1_duplicate(struct ds1_data *thedata)
+ * @param thedata the mib structure to duplicate
+ * @brief duplicate a mib structure for the mib
+ *
+ * Duplicates the specified mib structure @param thedata and returns a pointer to the newly
+ * allocated mib structure on success, or NULL on failure.
+ */
+struct ds1_data *
+ds1_duplicate(struct ds1_data *thedata)
+{
+	struct ds1_data *StorageNew = SNMP_MALLOC_STRUCT(ds1_data);
+
+	DEBUGMSGTL(("ds1", "ds1_duplicate: duplicating mib... "));
+	if (StorageNew != NULL) {
+	}
+      done:
+	DEBUGMSGTL(("ds1", "done.\n"));
+	return (StorageNew);
+	goto destroy;
+      destroy:
+	ds1_destroy(&StorageNew);
+	goto done;
+}
+
+/**
  * @fn int ds1_destroy(struct ds1_data **thedata)
  * @param thedata pointer to the data structure in ds1.
  * @brief delete a scalars structure from ds1.
@@ -660,6 +685,62 @@ store_ds1(int majorID, int minorID, void *serverarg, void *clientarg)
 }
 
 /**
+ * @fn int check_ds1(struct ds1_data *StorageTmp, struct ds1_data *StorageOld)
+ * @param StorageTmp the data as updated
+ * @param StorageOld the data previous to update
+ *
+ * This function is used by mibs.  It is used to check, all scalars at a time, the varbinds
+ * belonging to the mib.  This function is called for the first varbind in a mib at the beginning of
+ * the ACTION phase.  The COMMIT phase does not ensue unless this check passes.  This function can
+ * return SNMP_ERR_NOERR or a specific SNMP error value.  Values in StorageOld are the values before
+ * the varbinds on the mib were applied; the values in StorageTmp are the new values.  The function
+ * is permitted to change the values in StorageTmp to correct them; however, preferences should be
+ * made for setting values that were not in the varbinds.
+ */
+int
+check_ds1(struct ds1_data *StorageTmp, struct ds1_data *StorageOld)
+{
+	/* XXX: provide code to check the scalars for consistency */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int update_ds1(struct ds1_data *StorageTmp, struct ds1_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the set operation (ACTION phase)
+ *
+ * This function is used by mibs.  It is used to update, all scalars at a time, the varbinds
+ * belonging to the mib.  This function is called for the first varbind in a mib at the beginning of
+ * the COMMIT phase.  The start of the ACTION phase performs a consistency check on the mib before
+ * allowing the request to proceed to the COMMIT phase.  The COMMIT phase then arrives here with
+ * consistency already checked (see check_ds1()).  This function can
+ * return SNMP_ERR_NOERROR or SNMP_ERR_COMMITFAILED.  Values in StorageOld are the values before the
+ * varbinds on the mib were applied: the values in StorageTmp are the new values.
+ */
+int
+update_ds1(struct ds1_data *StorageTmp, struct ds1_data *StorageOld)
+{
+	/* XXX: provide code to update the row with the underlying device */
+	ds1_refresh = 1;
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn revert_ds1(struct 
+ * @fn void revert_ds1(struct ds1_data *StorageTmp, struct ds1_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the undo operation (UNDO phase)
+ */
+void
+revert_ds1(struct ds1_data *StorageTmp, struct ds1_data *StorageOld)
+{
+	/* XXX: provide code to revert the row with the underlying device */
+	update_ds1(StorageOld, NULL);
+}
+
+/**
  * @fn void refresh_ds1(int force)
  * @param force forced refresh when non-zero.
  * @brief refresh the scalar values of ds1.
@@ -758,8 +839,10 @@ dsx1ConfigTable_create(void)
 		StorageNew->dsx1LineType = 0;
 		StorageNew->dsx1LineCoding = 0;
 		StorageNew->dsx1SendCode = 0;
-		if ((StorageNew->dsx1CircuitIdentifier = (uint8_t *) strdup("")) != NULL)
-			StorageNew->dsx1CircuitIdentifierLen = strlen("");
+		if ((StorageNew->dsx1CircuitIdentifier = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->dsx1CircuitIdentifierLen = 0;
+		StorageNew->dsx1CircuitIdentifier[StorageNew->dsx1CircuitIdentifierLen] = 0;
 		StorageNew->dsx1LoopbackConfig = 0;
 		StorageNew->dsx1LineStatus = 0;
 		StorageNew->dsx1SignalMode = 0;
@@ -775,16 +858,20 @@ dsx1ConfigTable_create(void)
 		StorageNew->dsx1LineMode = 0;
 		StorageNew->dsx1LineBuildOut = 0;
 		StorageNew->dsx1LineImpedance = 0;
-
 	}
+      done:
 	DEBUGMSGTL(("ds1", "done.\n"));
 	return (StorageNew);
+	goto nomem;
+      nomem:
+	dsx1ConfigTable_destroy(&StorageNew);
+	goto done;
 }
 
 /**
  * @fn struct dsx1ConfigTable_data *dsx1ConfigTable_duplicate(struct dsx1ConfigTable_data *thedata)
  * @param thedata the row structure to duplicate.
- * @brief duplicat a row structure for a table.
+ * @brief duplicate a row structure for a table.
  *
  * Duplicates the specified row structure @param thedata and returns a pointer to the newly
  * allocated row structure on success, or NULL on failure.
@@ -796,6 +883,33 @@ dsx1ConfigTable_duplicate(struct dsx1ConfigTable_data *thedata)
 
 	DEBUGMSGTL(("ds1", "dsx1ConfigTable_duplicate: duplicating row...  "));
 	if (StorageNew != NULL) {
+		StorageNew->dsx1LineIndex = thedata->dsx1LineIndex;
+		StorageNew->dsx1IfIndex = thedata->dsx1IfIndex;
+		StorageNew->dsx1TimeElapsed = thedata->dsx1TimeElapsed;
+		StorageNew->dsx1ValidIntervals = thedata->dsx1ValidIntervals;
+		StorageNew->dsx1LineType = thedata->dsx1LineType;
+		StorageNew->dsx1LineCoding = thedata->dsx1LineCoding;
+		StorageNew->dsx1SendCode = thedata->dsx1SendCode;
+		if (!(StorageNew->dsx1CircuitIdentifier = malloc(thedata->dsx1CircuitIdentifierLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->dsx1CircuitIdentifier, thedata->dsx1CircuitIdentifier, thedata->dsx1CircuitIdentifierLen);
+		StorageNew->dsx1CircuitIdentifierLen = thedata->dsx1CircuitIdentifierLen;
+		StorageNew->dsx1CircuitIdentifier[StorageNew->dsx1CircuitIdentifierLen] = 0;
+		StorageNew->dsx1LoopbackConfig = thedata->dsx1LoopbackConfig;
+		StorageNew->dsx1LineStatus = thedata->dsx1LineStatus;
+		StorageNew->dsx1SignalMode = thedata->dsx1SignalMode;
+		StorageNew->dsx1TransmitClockSource = thedata->dsx1TransmitClockSource;
+		StorageNew->dsx1Fdl = thedata->dsx1Fdl;
+		StorageNew->dsx1InvalidIntervals = thedata->dsx1InvalidIntervals;
+		StorageNew->dsx1LineLength = thedata->dsx1LineLength;
+		StorageNew->dsx1LineStatusLastChange = thedata->dsx1LineStatusLastChange;
+		StorageNew->dsx1LineStatusChangeTrapEnable = thedata->dsx1LineStatusChangeTrapEnable;
+		StorageNew->dsx1LoopbackStatus = thedata->dsx1LoopbackStatus;
+		StorageNew->dsx1Ds1ChannelNumber = thedata->dsx1Ds1ChannelNumber;
+		StorageNew->dsx1Channelization = thedata->dsx1Channelization;
+		StorageNew->dsx1LineMode = thedata->dsx1LineMode;
+		StorageNew->dsx1LineBuildOut = thedata->dsx1LineBuildOut;
+		StorageNew->dsx1LineImpedance = thedata->dsx1LineImpedance;
 	}
       done:
 	DEBUGMSGTL(("ds1", "done.\n"));
@@ -1023,16 +1137,20 @@ dsx1CurrentTable_create(void)
 		StorageNew->dsx1CurrentBESs = 0;
 		StorageNew->dsx1CurrentDMs = 0;
 		StorageNew->dsx1CurrentLCVs = 0;
-
 	}
+      done:
 	DEBUGMSGTL(("ds1", "done.\n"));
 	return (StorageNew);
+	goto nomem;
+      nomem:
+	dsx1CurrentTable_destroy(&StorageNew);
+	goto done;
 }
 
 /**
  * @fn struct dsx1CurrentTable_data *dsx1CurrentTable_duplicate(struct dsx1CurrentTable_data *thedata)
  * @param thedata the row structure to duplicate.
- * @brief duplicat a row structure for a table.
+ * @brief duplicate a row structure for a table.
  *
  * Duplicates the specified row structure @param thedata and returns a pointer to the newly
  * allocated row structure on success, or NULL on failure.
@@ -1044,6 +1162,17 @@ dsx1CurrentTable_duplicate(struct dsx1CurrentTable_data *thedata)
 
 	DEBUGMSGTL(("ds1", "dsx1CurrentTable_duplicate: duplicating row...  "));
 	if (StorageNew != NULL) {
+		StorageNew->dsx1CurrentIndex = thedata->dsx1CurrentIndex;
+		StorageNew->dsx1CurrentESs = thedata->dsx1CurrentESs;
+		StorageNew->dsx1CurrentSESs = thedata->dsx1CurrentSESs;
+		StorageNew->dsx1CurrentSEFSs = thedata->dsx1CurrentSEFSs;
+		StorageNew->dsx1CurrentUASs = thedata->dsx1CurrentUASs;
+		StorageNew->dsx1CurrentCSSs = thedata->dsx1CurrentCSSs;
+		StorageNew->dsx1CurrentPCVs = thedata->dsx1CurrentPCVs;
+		StorageNew->dsx1CurrentLESs = thedata->dsx1CurrentLESs;
+		StorageNew->dsx1CurrentBESs = thedata->dsx1CurrentBESs;
+		StorageNew->dsx1CurrentDMs = thedata->dsx1CurrentDMs;
+		StorageNew->dsx1CurrentLCVs = thedata->dsx1CurrentLCVs;
 	}
       done:
 	DEBUGMSGTL(("ds1", "done.\n"));
@@ -1241,16 +1370,20 @@ dsx1IntervalTable_create(void)
 		StorageNew->dsx1IntervalDMs = 0;
 		StorageNew->dsx1IntervalLCVs = 0;
 		StorageNew->dsx1IntervalValidData = 0;
-
 	}
+      done:
 	DEBUGMSGTL(("ds1", "done.\n"));
 	return (StorageNew);
+	goto nomem;
+      nomem:
+	dsx1IntervalTable_destroy(&StorageNew);
+	goto done;
 }
 
 /**
  * @fn struct dsx1IntervalTable_data *dsx1IntervalTable_duplicate(struct dsx1IntervalTable_data *thedata)
  * @param thedata the row structure to duplicate.
- * @brief duplicat a row structure for a table.
+ * @brief duplicate a row structure for a table.
  *
  * Duplicates the specified row structure @param thedata and returns a pointer to the newly
  * allocated row structure on success, or NULL on failure.
@@ -1262,6 +1395,19 @@ dsx1IntervalTable_duplicate(struct dsx1IntervalTable_data *thedata)
 
 	DEBUGMSGTL(("ds1", "dsx1IntervalTable_duplicate: duplicating row...  "));
 	if (StorageNew != NULL) {
+		StorageNew->dsx1IntervalIndex = thedata->dsx1IntervalIndex;
+		StorageNew->dsx1IntervalNumber = thedata->dsx1IntervalNumber;
+		StorageNew->dsx1IntervalESs = thedata->dsx1IntervalESs;
+		StorageNew->dsx1IntervalSESs = thedata->dsx1IntervalSESs;
+		StorageNew->dsx1IntervalSEFSs = thedata->dsx1IntervalSEFSs;
+		StorageNew->dsx1IntervalUASs = thedata->dsx1IntervalUASs;
+		StorageNew->dsx1IntervalCSSs = thedata->dsx1IntervalCSSs;
+		StorageNew->dsx1IntervalPCVs = thedata->dsx1IntervalPCVs;
+		StorageNew->dsx1IntervalLESs = thedata->dsx1IntervalLESs;
+		StorageNew->dsx1IntervalBESs = thedata->dsx1IntervalBESs;
+		StorageNew->dsx1IntervalDMs = thedata->dsx1IntervalDMs;
+		StorageNew->dsx1IntervalLCVs = thedata->dsx1IntervalLCVs;
+		StorageNew->dsx1IntervalValidData = thedata->dsx1IntervalValidData;
 	}
       done:
 	DEBUGMSGTL(("ds1", "done.\n"));
@@ -1464,16 +1610,20 @@ dsx1TotalTable_create(void)
 		StorageNew->dsx1TotalBESs = 0;
 		StorageNew->dsx1TotalDMs = 0;
 		StorageNew->dsx1TotalLCVs = 0;
-
 	}
+      done:
 	DEBUGMSGTL(("ds1", "done.\n"));
 	return (StorageNew);
+	goto nomem;
+      nomem:
+	dsx1TotalTable_destroy(&StorageNew);
+	goto done;
 }
 
 /**
  * @fn struct dsx1TotalTable_data *dsx1TotalTable_duplicate(struct dsx1TotalTable_data *thedata)
  * @param thedata the row structure to duplicate.
- * @brief duplicat a row structure for a table.
+ * @brief duplicate a row structure for a table.
  *
  * Duplicates the specified row structure @param thedata and returns a pointer to the newly
  * allocated row structure on success, or NULL on failure.
@@ -1485,6 +1635,17 @@ dsx1TotalTable_duplicate(struct dsx1TotalTable_data *thedata)
 
 	DEBUGMSGTL(("ds1", "dsx1TotalTable_duplicate: duplicating row...  "));
 	if (StorageNew != NULL) {
+		StorageNew->dsx1TotalIndex = thedata->dsx1TotalIndex;
+		StorageNew->dsx1TotalESs = thedata->dsx1TotalESs;
+		StorageNew->dsx1TotalSESs = thedata->dsx1TotalSESs;
+		StorageNew->dsx1TotalSEFSs = thedata->dsx1TotalSEFSs;
+		StorageNew->dsx1TotalUASs = thedata->dsx1TotalUASs;
+		StorageNew->dsx1TotalCSSs = thedata->dsx1TotalCSSs;
+		StorageNew->dsx1TotalPCVs = thedata->dsx1TotalPCVs;
+		StorageNew->dsx1TotalLESs = thedata->dsx1TotalLESs;
+		StorageNew->dsx1TotalBESs = thedata->dsx1TotalBESs;
+		StorageNew->dsx1TotalDMs = thedata->dsx1TotalDMs;
+		StorageNew->dsx1TotalLCVs = thedata->dsx1TotalLCVs;
 	}
       done:
 	DEBUGMSGTL(("ds1", "done.\n"));
@@ -1683,16 +1844,20 @@ dsx1FarEndCurrentTable_create(void)
 		StorageNew->dsx1FarEndCurrentBESs = 0;
 		StorageNew->dsx1FarEndCurrentDMs = 0;
 		StorageNew->dsx1FarEndInvalidIntervals = 0;
-
 	}
+      done:
 	DEBUGMSGTL(("ds1", "done.\n"));
 	return (StorageNew);
+	goto nomem;
+      nomem:
+	dsx1FarEndCurrentTable_destroy(&StorageNew);
+	goto done;
 }
 
 /**
  * @fn struct dsx1FarEndCurrentTable_data *dsx1FarEndCurrentTable_duplicate(struct dsx1FarEndCurrentTable_data *thedata)
  * @param thedata the row structure to duplicate.
- * @brief duplicat a row structure for a table.
+ * @brief duplicate a row structure for a table.
  *
  * Duplicates the specified row structure @param thedata and returns a pointer to the newly
  * allocated row structure on success, or NULL on failure.
@@ -1704,6 +1869,19 @@ dsx1FarEndCurrentTable_duplicate(struct dsx1FarEndCurrentTable_data *thedata)
 
 	DEBUGMSGTL(("ds1", "dsx1FarEndCurrentTable_duplicate: duplicating row...  "));
 	if (StorageNew != NULL) {
+		StorageNew->dsx1FarEndCurrentIndex = thedata->dsx1FarEndCurrentIndex;
+		StorageNew->dsx1FarEndTimeElapsed = thedata->dsx1FarEndTimeElapsed;
+		StorageNew->dsx1FarEndValidIntervals = thedata->dsx1FarEndValidIntervals;
+		StorageNew->dsx1FarEndCurrentESs = thedata->dsx1FarEndCurrentESs;
+		StorageNew->dsx1FarEndCurrentSESs = thedata->dsx1FarEndCurrentSESs;
+		StorageNew->dsx1FarEndCurrentSEFSs = thedata->dsx1FarEndCurrentSEFSs;
+		StorageNew->dsx1FarEndCurrentUASs = thedata->dsx1FarEndCurrentUASs;
+		StorageNew->dsx1FarEndCurrentCSSs = thedata->dsx1FarEndCurrentCSSs;
+		StorageNew->dsx1FarEndCurrentLESs = thedata->dsx1FarEndCurrentLESs;
+		StorageNew->dsx1FarEndCurrentPCVs = thedata->dsx1FarEndCurrentPCVs;
+		StorageNew->dsx1FarEndCurrentBESs = thedata->dsx1FarEndCurrentBESs;
+		StorageNew->dsx1FarEndCurrentDMs = thedata->dsx1FarEndCurrentDMs;
+		StorageNew->dsx1FarEndInvalidIntervals = thedata->dsx1FarEndInvalidIntervals;
 	}
       done:
 	DEBUGMSGTL(("ds1", "done.\n"));
@@ -1904,16 +2082,20 @@ dsx1FarEndIntervalTable_create(void)
 		StorageNew->dsx1FarEndIntervalBESs = 0;
 		StorageNew->dsx1FarEndIntervalDMs = 0;
 		StorageNew->dsx1FarEndIntervalValidData = 0;
-
 	}
+      done:
 	DEBUGMSGTL(("ds1", "done.\n"));
 	return (StorageNew);
+	goto nomem;
+      nomem:
+	dsx1FarEndIntervalTable_destroy(&StorageNew);
+	goto done;
 }
 
 /**
  * @fn struct dsx1FarEndIntervalTable_data *dsx1FarEndIntervalTable_duplicate(struct dsx1FarEndIntervalTable_data *thedata)
  * @param thedata the row structure to duplicate.
- * @brief duplicat a row structure for a table.
+ * @brief duplicate a row structure for a table.
  *
  * Duplicates the specified row structure @param thedata and returns a pointer to the newly
  * allocated row structure on success, or NULL on failure.
@@ -1925,6 +2107,18 @@ dsx1FarEndIntervalTable_duplicate(struct dsx1FarEndIntervalTable_data *thedata)
 
 	DEBUGMSGTL(("ds1", "dsx1FarEndIntervalTable_duplicate: duplicating row...  "));
 	if (StorageNew != NULL) {
+		StorageNew->dsx1FarEndIntervalIndex = thedata->dsx1FarEndIntervalIndex;
+		StorageNew->dsx1FarEndIntervalNumber = thedata->dsx1FarEndIntervalNumber;
+		StorageNew->dsx1FarEndIntervalESs = thedata->dsx1FarEndIntervalESs;
+		StorageNew->dsx1FarEndIntervalSESs = thedata->dsx1FarEndIntervalSESs;
+		StorageNew->dsx1FarEndIntervalSEFSs = thedata->dsx1FarEndIntervalSEFSs;
+		StorageNew->dsx1FarEndIntervalUASs = thedata->dsx1FarEndIntervalUASs;
+		StorageNew->dsx1FarEndIntervalCSSs = thedata->dsx1FarEndIntervalCSSs;
+		StorageNew->dsx1FarEndIntervalLESs = thedata->dsx1FarEndIntervalLESs;
+		StorageNew->dsx1FarEndIntervalPCVs = thedata->dsx1FarEndIntervalPCVs;
+		StorageNew->dsx1FarEndIntervalBESs = thedata->dsx1FarEndIntervalBESs;
+		StorageNew->dsx1FarEndIntervalDMs = thedata->dsx1FarEndIntervalDMs;
+		StorageNew->dsx1FarEndIntervalValidData = thedata->dsx1FarEndIntervalValidData;
 	}
       done:
 	DEBUGMSGTL(("ds1", "done.\n"));
@@ -2124,16 +2318,20 @@ dsx1FarEndTotalTable_create(void)
 		StorageNew->dsx1FarEndTotalPCVs = 0;
 		StorageNew->dsx1FarEndTotalBESs = 0;
 		StorageNew->dsx1FarEndTotalDMs = 0;
-
 	}
+      done:
 	DEBUGMSGTL(("ds1", "done.\n"));
 	return (StorageNew);
+	goto nomem;
+      nomem:
+	dsx1FarEndTotalTable_destroy(&StorageNew);
+	goto done;
 }
 
 /**
  * @fn struct dsx1FarEndTotalTable_data *dsx1FarEndTotalTable_duplicate(struct dsx1FarEndTotalTable_data *thedata)
  * @param thedata the row structure to duplicate.
- * @brief duplicat a row structure for a table.
+ * @brief duplicate a row structure for a table.
  *
  * Duplicates the specified row structure @param thedata and returns a pointer to the newly
  * allocated row structure on success, or NULL on failure.
@@ -2145,6 +2343,16 @@ dsx1FarEndTotalTable_duplicate(struct dsx1FarEndTotalTable_data *thedata)
 
 	DEBUGMSGTL(("ds1", "dsx1FarEndTotalTable_duplicate: duplicating row...  "));
 	if (StorageNew != NULL) {
+		StorageNew->dsx1FarEndTotalIndex = thedata->dsx1FarEndTotalIndex;
+		StorageNew->dsx1FarEndTotalESs = thedata->dsx1FarEndTotalESs;
+		StorageNew->dsx1FarEndTotalSESs = thedata->dsx1FarEndTotalSESs;
+		StorageNew->dsx1FarEndTotalSEFSs = thedata->dsx1FarEndTotalSEFSs;
+		StorageNew->dsx1FarEndTotalUASs = thedata->dsx1FarEndTotalUASs;
+		StorageNew->dsx1FarEndTotalCSSs = thedata->dsx1FarEndTotalCSSs;
+		StorageNew->dsx1FarEndTotalLESs = thedata->dsx1FarEndTotalLESs;
+		StorageNew->dsx1FarEndTotalPCVs = thedata->dsx1FarEndTotalPCVs;
+		StorageNew->dsx1FarEndTotalBESs = thedata->dsx1FarEndTotalBESs;
+		StorageNew->dsx1FarEndTotalDMs = thedata->dsx1FarEndTotalDMs;
 	}
       done:
 	DEBUGMSGTL(("ds1", "done.\n"));
@@ -2330,16 +2538,20 @@ dsx1FracTable_create(void)
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
 		StorageNew->dsx1FracIfIndex = 0;
-
 	}
+      done:
 	DEBUGMSGTL(("ds1", "done.\n"));
 	return (StorageNew);
+	goto nomem;
+      nomem:
+	dsx1FracTable_destroy(&StorageNew);
+	goto done;
 }
 
 /**
  * @fn struct dsx1FracTable_data *dsx1FracTable_duplicate(struct dsx1FracTable_data *thedata)
  * @param thedata the row structure to duplicate.
- * @brief duplicat a row structure for a table.
+ * @brief duplicate a row structure for a table.
  *
  * Duplicates the specified row structure @param thedata and returns a pointer to the newly
  * allocated row structure on success, or NULL on failure.
@@ -2351,6 +2563,9 @@ dsx1FracTable_duplicate(struct dsx1FracTable_data *thedata)
 
 	DEBUGMSGTL(("ds1", "dsx1FracTable_duplicate: duplicating row...  "));
 	if (StorageNew != NULL) {
+		StorageNew->dsx1FracIndex = thedata->dsx1FracIndex;
+		StorageNew->dsx1FracNumber = thedata->dsx1FracNumber;
+		StorageNew->dsx1FracIfIndex = thedata->dsx1FracIfIndex;
 	}
       done:
 	DEBUGMSGTL(("ds1", "done.\n"));
@@ -2526,16 +2741,20 @@ dsx1ChanMappingTable_create(void)
 		StorageNew->ifIndex = 0;
 		StorageNew->dsx1Ds1ChannelNumber = 0;
 		StorageNew->dsx1ChanMappedIfIndex = 0;
-
 	}
+      done:
 	DEBUGMSGTL(("ds1", "done.\n"));
 	return (StorageNew);
+	goto nomem;
+      nomem:
+	dsx1ChanMappingTable_destroy(&StorageNew);
+	goto done;
 }
 
 /**
  * @fn struct dsx1ChanMappingTable_data *dsx1ChanMappingTable_duplicate(struct dsx1ChanMappingTable_data *thedata)
  * @param thedata the row structure to duplicate.
- * @brief duplicat a row structure for a table.
+ * @brief duplicate a row structure for a table.
  *
  * Duplicates the specified row structure @param thedata and returns a pointer to the newly
  * allocated row structure on success, or NULL on failure.
@@ -2547,6 +2766,9 @@ dsx1ChanMappingTable_duplicate(struct dsx1ChanMappingTable_data *thedata)
 
 	DEBUGMSGTL(("ds1", "dsx1ChanMappingTable_duplicate: duplicating row...  "));
 	if (StorageNew != NULL) {
+		StorageNew->ifIndex = thedata->ifIndex;
+		StorageNew->dsx1Ds1ChannelNumber = thedata->dsx1Ds1ChannelNumber;
+		StorageNew->dsx1ChanMappedIfIndex = thedata->dsx1ChanMappedIfIndex;
 	}
       done:
 	DEBUGMSGTL(("ds1", "done.\n"));
@@ -2701,6 +2923,64 @@ store_dsx1ChanMappingTable(int majorID, int minorID, void *serverarg, void *clie
 	}
 	DEBUGMSGTL(("ds1", "done.\n"));
 	return SNMPERR_SUCCESS;
+}
+
+/**
+ * @fn int check_dsx1ConfigTable_row(struct dsx1ConfigTable_data *StorageTmp, struct dsx1ConfigTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to check, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the ACTION phase.  The start of the ACTION pahse performs this consitency check
+ * on the row before allowing the request to proceed to the COMMIT phase.  This function can return
+ * SNMP_ERR_NOERR or a specific SNMP error value.  Values in StorageOld are the values before the
+ * varbinds on the mib were applied; the values in StorageTmp are the new values.  The function is
+ * permitted to change the values in StorageTmp to correct them; however, preference should be made
+ * for setting values where were not in the varbinds.
+ */
+int
+check_dsx1ConfigTable_row(struct dsx1ConfigTable_data *StorageTmp, struct dsx1ConfigTable_data *StorageOld)
+{
+	/* XXX: provide code to check the row for consistency */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int update_dsx1ConfigTable_row(struct dsx1ConfigTable_data *StorageTmp, struct dsx1ConfigTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the set operation (ACTION phase) on a row
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to update, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the COMMIT phase.  The start of the ACTION phase performs a consistency check on
+ * the row before allowing the request to proceed to the COMMIT phase.  The COMMIT phase then
+ * arrives here with consistency already checked (see check_dsx1ConfigTable_row()).  This function can
+ * return SNMP_ERR_NOERROR or SNMP_ERR_COMMITFAILED.  Values in StorageOld are the values before the
+ * varbinds on the row were applied: the values in StorageTmp are the new values.
+ */
+int
+update_dsx1ConfigTable_row(struct dsx1ConfigTable_data *StorageTmp, struct dsx1ConfigTable_data *StorageOld)
+{
+	/* XXX: provide code to update the row with the underlying device */
+	dsx1ConfigTable_refresh = 1;
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int revert_dsx1ConfigTable_row(struct dsx1ConfigTable_data *StorageTmp, struct dsx1ConfigTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the undo operation (UNDO phase) on a row
+ */
+void
+revert_dsx1ConfigTable_row(struct dsx1ConfigTable_data *StorageTmp, struct dsx1ConfigTable_data *StorageOld)
+{
+	/* XXX: provide code to revert the row with the underlying device */
+	update_dsx1ConfigTable_row(StorageOld, NULL);
 }
 
 /**
@@ -2921,6 +3201,64 @@ var_dsx1ConfigTable(struct variable *vp, oid * name, size_t *length, int exact, 
 }
 
 /**
+ * @fn int check_dsx1CurrentTable_row(struct dsx1CurrentTable_data *StorageTmp, struct dsx1CurrentTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to check, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the ACTION phase.  The start of the ACTION pahse performs this consitency check
+ * on the row before allowing the request to proceed to the COMMIT phase.  This function can return
+ * SNMP_ERR_NOERR or a specific SNMP error value.  Values in StorageOld are the values before the
+ * varbinds on the mib were applied; the values in StorageTmp are the new values.  The function is
+ * permitted to change the values in StorageTmp to correct them; however, preference should be made
+ * for setting values where were not in the varbinds.
+ */
+int
+check_dsx1CurrentTable_row(struct dsx1CurrentTable_data *StorageTmp, struct dsx1CurrentTable_data *StorageOld)
+{
+	/* XXX: provide code to check the row for consistency */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int update_dsx1CurrentTable_row(struct dsx1CurrentTable_data *StorageTmp, struct dsx1CurrentTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the set operation (ACTION phase) on a row
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to update, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the COMMIT phase.  The start of the ACTION phase performs a consistency check on
+ * the row before allowing the request to proceed to the COMMIT phase.  The COMMIT phase then
+ * arrives here with consistency already checked (see check_dsx1CurrentTable_row()).  This function can
+ * return SNMP_ERR_NOERROR or SNMP_ERR_COMMITFAILED.  Values in StorageOld are the values before the
+ * varbinds on the row were applied: the values in StorageTmp are the new values.
+ */
+int
+update_dsx1CurrentTable_row(struct dsx1CurrentTable_data *StorageTmp, struct dsx1CurrentTable_data *StorageOld)
+{
+	/* XXX: provide code to update the row with the underlying device */
+	dsx1CurrentTable_refresh = 1;
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int revert_dsx1CurrentTable_row(struct dsx1CurrentTable_data *StorageTmp, struct dsx1CurrentTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the undo operation (UNDO phase) on a row
+ */
+void
+revert_dsx1CurrentTable_row(struct dsx1CurrentTable_data *StorageTmp, struct dsx1CurrentTable_data *StorageOld)
+{
+	/* XXX: provide code to revert the row with the underlying device */
+	update_dsx1CurrentTable_row(StorageOld, NULL);
+}
+
+/**
  * @fn void refresh_dsx1CurrentTable_row(struct dsx1CurrentTable_data *StorageTmp, int force)
  * @param StorageTmp the data row to refresh.
  * @param force force refresh if non-zero.
@@ -3049,6 +3387,64 @@ var_dsx1CurrentTable(struct variable *vp, oid * name, size_t *length, int exact,
 		ERROR_MSG("");
 	}
 	return (rval);
+}
+
+/**
+ * @fn int check_dsx1IntervalTable_row(struct dsx1IntervalTable_data *StorageTmp, struct dsx1IntervalTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to check, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the ACTION phase.  The start of the ACTION pahse performs this consitency check
+ * on the row before allowing the request to proceed to the COMMIT phase.  This function can return
+ * SNMP_ERR_NOERR or a specific SNMP error value.  Values in StorageOld are the values before the
+ * varbinds on the mib were applied; the values in StorageTmp are the new values.  The function is
+ * permitted to change the values in StorageTmp to correct them; however, preference should be made
+ * for setting values where were not in the varbinds.
+ */
+int
+check_dsx1IntervalTable_row(struct dsx1IntervalTable_data *StorageTmp, struct dsx1IntervalTable_data *StorageOld)
+{
+	/* XXX: provide code to check the row for consistency */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int update_dsx1IntervalTable_row(struct dsx1IntervalTable_data *StorageTmp, struct dsx1IntervalTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the set operation (ACTION phase) on a row
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to update, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the COMMIT phase.  The start of the ACTION phase performs a consistency check on
+ * the row before allowing the request to proceed to the COMMIT phase.  The COMMIT phase then
+ * arrives here with consistency already checked (see check_dsx1IntervalTable_row()).  This function can
+ * return SNMP_ERR_NOERROR or SNMP_ERR_COMMITFAILED.  Values in StorageOld are the values before the
+ * varbinds on the row were applied: the values in StorageTmp are the new values.
+ */
+int
+update_dsx1IntervalTable_row(struct dsx1IntervalTable_data *StorageTmp, struct dsx1IntervalTable_data *StorageOld)
+{
+	/* XXX: provide code to update the row with the underlying device */
+	dsx1IntervalTable_refresh = 1;
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int revert_dsx1IntervalTable_row(struct dsx1IntervalTable_data *StorageTmp, struct dsx1IntervalTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the undo operation (UNDO phase) on a row
+ */
+void
+revert_dsx1IntervalTable_row(struct dsx1IntervalTable_data *StorageTmp, struct dsx1IntervalTable_data *StorageOld)
+{
+	/* XXX: provide code to revert the row with the underlying device */
+	update_dsx1IntervalTable_row(StorageOld, NULL);
 }
 
 /**
@@ -3189,6 +3585,64 @@ var_dsx1IntervalTable(struct variable *vp, oid * name, size_t *length, int exact
 }
 
 /**
+ * @fn int check_dsx1TotalTable_row(struct dsx1TotalTable_data *StorageTmp, struct dsx1TotalTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to check, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the ACTION phase.  The start of the ACTION pahse performs this consitency check
+ * on the row before allowing the request to proceed to the COMMIT phase.  This function can return
+ * SNMP_ERR_NOERR or a specific SNMP error value.  Values in StorageOld are the values before the
+ * varbinds on the mib were applied; the values in StorageTmp are the new values.  The function is
+ * permitted to change the values in StorageTmp to correct them; however, preference should be made
+ * for setting values where were not in the varbinds.
+ */
+int
+check_dsx1TotalTable_row(struct dsx1TotalTable_data *StorageTmp, struct dsx1TotalTable_data *StorageOld)
+{
+	/* XXX: provide code to check the row for consistency */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int update_dsx1TotalTable_row(struct dsx1TotalTable_data *StorageTmp, struct dsx1TotalTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the set operation (ACTION phase) on a row
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to update, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the COMMIT phase.  The start of the ACTION phase performs a consistency check on
+ * the row before allowing the request to proceed to the COMMIT phase.  The COMMIT phase then
+ * arrives here with consistency already checked (see check_dsx1TotalTable_row()).  This function can
+ * return SNMP_ERR_NOERROR or SNMP_ERR_COMMITFAILED.  Values in StorageOld are the values before the
+ * varbinds on the row were applied: the values in StorageTmp are the new values.
+ */
+int
+update_dsx1TotalTable_row(struct dsx1TotalTable_data *StorageTmp, struct dsx1TotalTable_data *StorageOld)
+{
+	/* XXX: provide code to update the row with the underlying device */
+	dsx1TotalTable_refresh = 1;
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int revert_dsx1TotalTable_row(struct dsx1TotalTable_data *StorageTmp, struct dsx1TotalTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the undo operation (UNDO phase) on a row
+ */
+void
+revert_dsx1TotalTable_row(struct dsx1TotalTable_data *StorageTmp, struct dsx1TotalTable_data *StorageOld)
+{
+	/* XXX: provide code to revert the row with the underlying device */
+	update_dsx1TotalTable_row(StorageOld, NULL);
+}
+
+/**
  * @fn void refresh_dsx1TotalTable_row(struct dsx1TotalTable_data *StorageTmp, int force)
  * @param StorageTmp the data row to refresh.
  * @param force force refresh if non-zero.
@@ -3317,6 +3771,64 @@ var_dsx1TotalTable(struct variable *vp, oid * name, size_t *length, int exact, s
 		ERROR_MSG("");
 	}
 	return (rval);
+}
+
+/**
+ * @fn int check_dsx1FarEndCurrentTable_row(struct dsx1FarEndCurrentTable_data *StorageTmp, struct dsx1FarEndCurrentTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to check, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the ACTION phase.  The start of the ACTION pahse performs this consitency check
+ * on the row before allowing the request to proceed to the COMMIT phase.  This function can return
+ * SNMP_ERR_NOERR or a specific SNMP error value.  Values in StorageOld are the values before the
+ * varbinds on the mib were applied; the values in StorageTmp are the new values.  The function is
+ * permitted to change the values in StorageTmp to correct them; however, preference should be made
+ * for setting values where were not in the varbinds.
+ */
+int
+check_dsx1FarEndCurrentTable_row(struct dsx1FarEndCurrentTable_data *StorageTmp, struct dsx1FarEndCurrentTable_data *StorageOld)
+{
+	/* XXX: provide code to check the row for consistency */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int update_dsx1FarEndCurrentTable_row(struct dsx1FarEndCurrentTable_data *StorageTmp, struct dsx1FarEndCurrentTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the set operation (ACTION phase) on a row
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to update, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the COMMIT phase.  The start of the ACTION phase performs a consistency check on
+ * the row before allowing the request to proceed to the COMMIT phase.  The COMMIT phase then
+ * arrives here with consistency already checked (see check_dsx1FarEndCurrentTable_row()).  This function can
+ * return SNMP_ERR_NOERROR or SNMP_ERR_COMMITFAILED.  Values in StorageOld are the values before the
+ * varbinds on the row were applied: the values in StorageTmp are the new values.
+ */
+int
+update_dsx1FarEndCurrentTable_row(struct dsx1FarEndCurrentTable_data *StorageTmp, struct dsx1FarEndCurrentTable_data *StorageOld)
+{
+	/* XXX: provide code to update the row with the underlying device */
+	dsx1FarEndCurrentTable_refresh = 1;
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int revert_dsx1FarEndCurrentTable_row(struct dsx1FarEndCurrentTable_data *StorageTmp, struct dsx1FarEndCurrentTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the undo operation (UNDO phase) on a row
+ */
+void
+revert_dsx1FarEndCurrentTable_row(struct dsx1FarEndCurrentTable_data *StorageTmp, struct dsx1FarEndCurrentTable_data *StorageOld)
+{
+	/* XXX: provide code to revert the row with the underlying device */
+	update_dsx1FarEndCurrentTable_row(StorageOld, NULL);
 }
 
 /**
@@ -3463,6 +3975,64 @@ var_dsx1FarEndCurrentTable(struct variable *vp, oid * name, size_t *length, int 
 }
 
 /**
+ * @fn int check_dsx1FarEndIntervalTable_row(struct dsx1FarEndIntervalTable_data *StorageTmp, struct dsx1FarEndIntervalTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to check, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the ACTION phase.  The start of the ACTION pahse performs this consitency check
+ * on the row before allowing the request to proceed to the COMMIT phase.  This function can return
+ * SNMP_ERR_NOERR or a specific SNMP error value.  Values in StorageOld are the values before the
+ * varbinds on the mib were applied; the values in StorageTmp are the new values.  The function is
+ * permitted to change the values in StorageTmp to correct them; however, preference should be made
+ * for setting values where were not in the varbinds.
+ */
+int
+check_dsx1FarEndIntervalTable_row(struct dsx1FarEndIntervalTable_data *StorageTmp, struct dsx1FarEndIntervalTable_data *StorageOld)
+{
+	/* XXX: provide code to check the row for consistency */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int update_dsx1FarEndIntervalTable_row(struct dsx1FarEndIntervalTable_data *StorageTmp, struct dsx1FarEndIntervalTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the set operation (ACTION phase) on a row
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to update, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the COMMIT phase.  The start of the ACTION phase performs a consistency check on
+ * the row before allowing the request to proceed to the COMMIT phase.  The COMMIT phase then
+ * arrives here with consistency already checked (see check_dsx1FarEndIntervalTable_row()).  This function can
+ * return SNMP_ERR_NOERROR or SNMP_ERR_COMMITFAILED.  Values in StorageOld are the values before the
+ * varbinds on the row were applied: the values in StorageTmp are the new values.
+ */
+int
+update_dsx1FarEndIntervalTable_row(struct dsx1FarEndIntervalTable_data *StorageTmp, struct dsx1FarEndIntervalTable_data *StorageOld)
+{
+	/* XXX: provide code to update the row with the underlying device */
+	dsx1FarEndIntervalTable_refresh = 1;
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int revert_dsx1FarEndIntervalTable_row(struct dsx1FarEndIntervalTable_data *StorageTmp, struct dsx1FarEndIntervalTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the undo operation (UNDO phase) on a row
+ */
+void
+revert_dsx1FarEndIntervalTable_row(struct dsx1FarEndIntervalTable_data *StorageTmp, struct dsx1FarEndIntervalTable_data *StorageOld)
+{
+	/* XXX: provide code to revert the row with the underlying device */
+	update_dsx1FarEndIntervalTable_row(StorageOld, NULL);
+}
+
+/**
  * @fn void refresh_dsx1FarEndIntervalTable_row(struct dsx1FarEndIntervalTable_data *StorageTmp, int force)
  * @param StorageTmp the data row to refresh.
  * @param force force refresh if non-zero.
@@ -3594,6 +4164,64 @@ var_dsx1FarEndIntervalTable(struct variable *vp, oid * name, size_t *length, int
 }
 
 /**
+ * @fn int check_dsx1FarEndTotalTable_row(struct dsx1FarEndTotalTable_data *StorageTmp, struct dsx1FarEndTotalTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to check, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the ACTION phase.  The start of the ACTION pahse performs this consitency check
+ * on the row before allowing the request to proceed to the COMMIT phase.  This function can return
+ * SNMP_ERR_NOERR or a specific SNMP error value.  Values in StorageOld are the values before the
+ * varbinds on the mib were applied; the values in StorageTmp are the new values.  The function is
+ * permitted to change the values in StorageTmp to correct them; however, preference should be made
+ * for setting values where were not in the varbinds.
+ */
+int
+check_dsx1FarEndTotalTable_row(struct dsx1FarEndTotalTable_data *StorageTmp, struct dsx1FarEndTotalTable_data *StorageOld)
+{
+	/* XXX: provide code to check the row for consistency */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int update_dsx1FarEndTotalTable_row(struct dsx1FarEndTotalTable_data *StorageTmp, struct dsx1FarEndTotalTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the set operation (ACTION phase) on a row
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to update, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the COMMIT phase.  The start of the ACTION phase performs a consistency check on
+ * the row before allowing the request to proceed to the COMMIT phase.  The COMMIT phase then
+ * arrives here with consistency already checked (see check_dsx1FarEndTotalTable_row()).  This function can
+ * return SNMP_ERR_NOERROR or SNMP_ERR_COMMITFAILED.  Values in StorageOld are the values before the
+ * varbinds on the row were applied: the values in StorageTmp are the new values.
+ */
+int
+update_dsx1FarEndTotalTable_row(struct dsx1FarEndTotalTable_data *StorageTmp, struct dsx1FarEndTotalTable_data *StorageOld)
+{
+	/* XXX: provide code to update the row with the underlying device */
+	dsx1FarEndTotalTable_refresh = 1;
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int revert_dsx1FarEndTotalTable_row(struct dsx1FarEndTotalTable_data *StorageTmp, struct dsx1FarEndTotalTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the undo operation (UNDO phase) on a row
+ */
+void
+revert_dsx1FarEndTotalTable_row(struct dsx1FarEndTotalTable_data *StorageTmp, struct dsx1FarEndTotalTable_data *StorageOld)
+{
+	/* XXX: provide code to revert the row with the underlying device */
+	update_dsx1FarEndTotalTable_row(StorageOld, NULL);
+}
+
+/**
  * @fn void refresh_dsx1FarEndTotalTable_row(struct dsx1FarEndTotalTable_data *StorageTmp, int force)
  * @param StorageTmp the data row to refresh.
  * @param force force refresh if non-zero.
@@ -3719,6 +4347,64 @@ var_dsx1FarEndTotalTable(struct variable *vp, oid * name, size_t *length, int ex
 }
 
 /**
+ * @fn int check_dsx1FracTable_row(struct dsx1FracTable_data *StorageTmp, struct dsx1FracTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to check, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the ACTION phase.  The start of the ACTION pahse performs this consitency check
+ * on the row before allowing the request to proceed to the COMMIT phase.  This function can return
+ * SNMP_ERR_NOERR or a specific SNMP error value.  Values in StorageOld are the values before the
+ * varbinds on the mib were applied; the values in StorageTmp are the new values.  The function is
+ * permitted to change the values in StorageTmp to correct them; however, preference should be made
+ * for setting values where were not in the varbinds.
+ */
+int
+check_dsx1FracTable_row(struct dsx1FracTable_data *StorageTmp, struct dsx1FracTable_data *StorageOld)
+{
+	/* XXX: provide code to check the row for consistency */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int update_dsx1FracTable_row(struct dsx1FracTable_data *StorageTmp, struct dsx1FracTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the set operation (ACTION phase) on a row
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to update, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the COMMIT phase.  The start of the ACTION phase performs a consistency check on
+ * the row before allowing the request to proceed to the COMMIT phase.  The COMMIT phase then
+ * arrives here with consistency already checked (see check_dsx1FracTable_row()).  This function can
+ * return SNMP_ERR_NOERROR or SNMP_ERR_COMMITFAILED.  Values in StorageOld are the values before the
+ * varbinds on the row were applied: the values in StorageTmp are the new values.
+ */
+int
+update_dsx1FracTable_row(struct dsx1FracTable_data *StorageTmp, struct dsx1FracTable_data *StorageOld)
+{
+	/* XXX: provide code to update the row with the underlying device */
+	dsx1FracTable_refresh = 1;
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int revert_dsx1FracTable_row(struct dsx1FracTable_data *StorageTmp, struct dsx1FracTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the undo operation (UNDO phase) on a row
+ */
+void
+revert_dsx1FracTable_row(struct dsx1FracTable_data *StorageTmp, struct dsx1FracTable_data *StorageOld)
+{
+	/* XXX: provide code to revert the row with the underlying device */
+	update_dsx1FracTable_row(StorageOld, NULL);
+}
+
+/**
  * @fn void refresh_dsx1FracTable_row(struct dsx1FracTable_data *StorageTmp, int force)
  * @param StorageTmp the data row to refresh.
  * @param force force refresh if non-zero.
@@ -3794,6 +4480,64 @@ var_dsx1FracTable(struct variable *vp, oid * name, size_t *length, int exact, si
 		ERROR_MSG("");
 	}
 	return (rval);
+}
+
+/**
+ * @fn int check_dsx1ChanMappingTable_row(struct dsx1ChanMappingTable_data *StorageTmp, struct dsx1ChanMappingTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to check, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the ACTION phase.  The start of the ACTION pahse performs this consitency check
+ * on the row before allowing the request to proceed to the COMMIT phase.  This function can return
+ * SNMP_ERR_NOERR or a specific SNMP error value.  Values in StorageOld are the values before the
+ * varbinds on the mib were applied; the values in StorageTmp are the new values.  The function is
+ * permitted to change the values in StorageTmp to correct them; however, preference should be made
+ * for setting values where were not in the varbinds.
+ */
+int
+check_dsx1ChanMappingTable_row(struct dsx1ChanMappingTable_data *StorageTmp, struct dsx1ChanMappingTable_data *StorageOld)
+{
+	/* XXX: provide code to check the row for consistency */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int update_dsx1ChanMappingTable_row(struct dsx1ChanMappingTable_data *StorageTmp, struct dsx1ChanMappingTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the set operation (ACTION phase) on a row
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to update, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the COMMIT phase.  The start of the ACTION phase performs a consistency check on
+ * the row before allowing the request to proceed to the COMMIT phase.  The COMMIT phase then
+ * arrives here with consistency already checked (see check_dsx1ChanMappingTable_row()).  This function can
+ * return SNMP_ERR_NOERROR or SNMP_ERR_COMMITFAILED.  Values in StorageOld are the values before the
+ * varbinds on the row were applied: the values in StorageTmp are the new values.
+ */
+int
+update_dsx1ChanMappingTable_row(struct dsx1ChanMappingTable_data *StorageTmp, struct dsx1ChanMappingTable_data *StorageOld)
+{
+	/* XXX: provide code to update the row with the underlying device */
+	dsx1ChanMappingTable_refresh = 1;
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int revert_dsx1ChanMappingTable_row(struct dsx1ChanMappingTable_data *StorageTmp, struct dsx1ChanMappingTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the undo operation (UNDO phase) on a row
+ */
+void
+revert_dsx1ChanMappingTable_row(struct dsx1ChanMappingTable_data *StorageTmp, struct dsx1ChanMappingTable_data *StorageOld)
+{
+	/* XXX: provide code to revert the row with the underlying device */
+	update_dsx1ChanMappingTable_row(StorageOld, NULL);
 }
 
 /**
@@ -3887,12 +4631,14 @@ var_dsx1ChanMappingTable(struct variable *vp, oid * name, size_t *length, int ex
 int
 write_dsx1LineType(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static long old_value;
-	struct dsx1ConfigTable_data *StorageTmp = NULL;
+	struct dsx1ConfigTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 11;
 	long set_value = *((long *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("ds1", "write_dsx1LineType entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(dsx1ConfigTableStorage, NULL, &name[11], &newlen, 1, NULL, NULL);
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
@@ -3927,20 +4673,59 @@ write_dsx1LineType(int action, u_char *var_val, u_char var_val_type, size_t var_
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to dsx1LineType: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->dsx1ConfigTable_old) == NULL)
+			if (StorageTmp->dsx1ConfigTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->dsx1ConfigTable_old = dsx1ConfigTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->dsx1ConfigTable_rsvs++;
+		StorageTmp->dsx1LineType = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->dsx1ConfigTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->dsx1ConfigTable_tsts == 0)
+				if ((ret = check_dsx1ConfigTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->dsx1ConfigTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->dsx1LineType for you to use, and you have just been asked to do something with it.  Note that anything done here must be 
 				   reversable in the UNDO case */
-		old_value = StorageTmp->dsx1LineType;
-		StorageTmp->dsx1LineType = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->dsx1ConfigTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->dsx1ConfigTable_sets == 0)
+				if ((ret = update_dsx1ConfigTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->dsx1ConfigTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->dsx1ConfigTable_old) != NULL) {
+			dsx1ConfigTable_destroy(&StorageTmp->dsx1ConfigTable_old);
+			StorageTmp->dsx1ConfigTable_rsvs = 0;
+			StorageTmp->dsx1ConfigTable_tsts = 0;
+			StorageTmp->dsx1ConfigTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->dsx1LineType = old_value;
+		if ((StorageOld = StorageTmp->dsx1ConfigTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->dsx1ConfigTable_sets == 0)
+			revert_dsx1ConfigTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->dsx1ConfigTable_old) == NULL)
+			break;
+		StorageTmp->dsx1LineType = StorageOld->dsx1LineType;
+		if (--StorageTmp->dsx1ConfigTable_rsvs == 0)
+			dsx1ConfigTable_destroy(&StorageTmp->dsx1ConfigTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -3960,12 +4745,14 @@ write_dsx1LineType(int action, u_char *var_val, u_char var_val_type, size_t var_
 int
 write_dsx1LineCoding(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static long old_value;
-	struct dsx1ConfigTable_data *StorageTmp = NULL;
+	struct dsx1ConfigTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 11;
 	long set_value = *((long *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("ds1", "write_dsx1LineCoding entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(dsx1ConfigTableStorage, NULL, &name[11], &newlen, 1, NULL, NULL);
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
@@ -3992,20 +4779,59 @@ write_dsx1LineCoding(int action, u_char *var_val, u_char var_val_type, size_t va
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to dsx1LineCoding: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->dsx1ConfigTable_old) == NULL)
+			if (StorageTmp->dsx1ConfigTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->dsx1ConfigTable_old = dsx1ConfigTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->dsx1ConfigTable_rsvs++;
+		StorageTmp->dsx1LineCoding = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->dsx1ConfigTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->dsx1ConfigTable_tsts == 0)
+				if ((ret = check_dsx1ConfigTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->dsx1ConfigTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->dsx1LineCoding for you to use, and you have just been asked to do something with it.  Note that anything done here must
 				   be reversable in the UNDO case */
-		old_value = StorageTmp->dsx1LineCoding;
-		StorageTmp->dsx1LineCoding = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->dsx1ConfigTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->dsx1ConfigTable_sets == 0)
+				if ((ret = update_dsx1ConfigTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->dsx1ConfigTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->dsx1ConfigTable_old) != NULL) {
+			dsx1ConfigTable_destroy(&StorageTmp->dsx1ConfigTable_old);
+			StorageTmp->dsx1ConfigTable_rsvs = 0;
+			StorageTmp->dsx1ConfigTable_tsts = 0;
+			StorageTmp->dsx1ConfigTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->dsx1LineCoding = old_value;
+		if ((StorageOld = StorageTmp->dsx1ConfigTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->dsx1ConfigTable_sets == 0)
+			revert_dsx1ConfigTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->dsx1ConfigTable_old) == NULL)
+			break;
+		StorageTmp->dsx1LineCoding = StorageOld->dsx1LineCoding;
+		if (--StorageTmp->dsx1ConfigTable_rsvs == 0)
+			dsx1ConfigTable_destroy(&StorageTmp->dsx1ConfigTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -4025,12 +4851,14 @@ write_dsx1LineCoding(int action, u_char *var_val, u_char var_val_type, size_t va
 int
 write_dsx1SendCode(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static long old_value;
-	struct dsx1ConfigTable_data *StorageTmp = NULL;
+	struct dsx1ConfigTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 11;
 	long set_value = *((long *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("ds1", "write_dsx1SendCode entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(dsx1ConfigTableStorage, NULL, &name[11], &newlen, 1, NULL, NULL);
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
@@ -4058,20 +4886,59 @@ write_dsx1SendCode(int action, u_char *var_val, u_char var_val_type, size_t var_
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to dsx1SendCode: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->dsx1ConfigTable_old) == NULL)
+			if (StorageTmp->dsx1ConfigTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->dsx1ConfigTable_old = dsx1ConfigTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->dsx1ConfigTable_rsvs++;
+		StorageTmp->dsx1SendCode = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->dsx1ConfigTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->dsx1ConfigTable_tsts == 0)
+				if ((ret = check_dsx1ConfigTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->dsx1ConfigTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->dsx1SendCode for you to use, and you have just been asked to do something with it.  Note that anything done here must be 
 				   reversable in the UNDO case */
-		old_value = StorageTmp->dsx1SendCode;
-		StorageTmp->dsx1SendCode = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->dsx1ConfigTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->dsx1ConfigTable_sets == 0)
+				if ((ret = update_dsx1ConfigTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->dsx1ConfigTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->dsx1ConfigTable_old) != NULL) {
+			dsx1ConfigTable_destroy(&StorageTmp->dsx1ConfigTable_old);
+			StorageTmp->dsx1ConfigTable_rsvs = 0;
+			StorageTmp->dsx1ConfigTable_tsts = 0;
+			StorageTmp->dsx1ConfigTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->dsx1SendCode = old_value;
+		if ((StorageOld = StorageTmp->dsx1ConfigTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->dsx1ConfigTable_sets == 0)
+			revert_dsx1ConfigTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->dsx1ConfigTable_old) == NULL)
+			break;
+		StorageTmp->dsx1SendCode = StorageOld->dsx1SendCode;
+		if (--StorageTmp->dsx1ConfigTable_rsvs == 0)
+			dsx1ConfigTable_destroy(&StorageTmp->dsx1ConfigTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -4091,19 +4958,19 @@ write_dsx1SendCode(int action, u_char *var_val, u_char var_val_type, size_t var_
 int
 write_dsx1CircuitIdentifier(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static uint8_t *old_value;
-	struct dsx1ConfigTable_data *StorageTmp = NULL;
+	struct dsx1ConfigTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 11;
-	static size_t old_length = 0;
-	static uint8_t *string = NULL;
+	uint8_t *string = NULL;
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("ds1", "write_dsx1CircuitIdentifier entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(dsx1ConfigTableStorage, NULL, &name[11], &newlen, 1, NULL, NULL);
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	switch (action) {
 	case RESERVE1:
-		string = NULL;
 		if (var_val_type != ASN_OCTET_STR) {
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to dsx1CircuitIdentifier not ASN_OCTET_STR\n");
 			return SNMP_ERR_WRONGTYPE;
@@ -4113,31 +4980,71 @@ write_dsx1CircuitIdentifier(int action, u_char *var_val, u_char var_val_type, si
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to dsx1CircuitIdentifier: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
-		break;
-	case RESERVE2:		/* memory reseveration, final preparation... */
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->dsx1ConfigTable_old) == NULL)
+			if (StorageTmp->dsx1ConfigTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->dsx1ConfigTable_old = dsx1ConfigTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->dsx1ConfigTable_rsvs++;
 		if ((string = malloc(var_val_len + 1)) == NULL)
 			return SNMP_ERR_RESOURCEUNAVAILABLE;
 		memcpy((void *) string, (void *) var_val, var_val_len);
 		string[var_val_len] = 0;
+		SNMP_FREE(StorageTmp->dsx1CircuitIdentifier);
+		StorageTmp->dsx1CircuitIdentifier = string;
+		StorageTmp->dsx1CircuitIdentifierLen = var_val_len;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
+		break;
+	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->dsx1ConfigTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->dsx1ConfigTable_tsts == 0)
+				if ((ret = check_dsx1ConfigTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->dsx1ConfigTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->dsx1CircuitIdentifier for you to use, and you have just been asked to do something with it.  Note that anything done
 				   here must be reversable in the UNDO case */
-		old_value = StorageTmp->dsx1CircuitIdentifier;
-		old_length = StorageTmp->dsx1CircuitIdentifierLen;
-		StorageTmp->dsx1CircuitIdentifier = string;
-		StorageTmp->dsx1CircuitIdentifierLen = var_val_len;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->dsx1ConfigTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->dsx1ConfigTable_sets == 0)
+				if ((ret = update_dsx1ConfigTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->dsx1ConfigTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
-		SNMP_FREE(old_value);
-		old_length = 0;
-		string = NULL;
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->dsx1ConfigTable_old) != NULL) {
+			dsx1ConfigTable_destroy(&StorageTmp->dsx1ConfigTable_old);
+			StorageTmp->dsx1ConfigTable_rsvs = 0;
+			StorageTmp->dsx1ConfigTable_tsts = 0;
+			StorageTmp->dsx1ConfigTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->dsx1CircuitIdentifier = old_value;
-		StorageTmp->dsx1CircuitIdentifierLen = old_length;
+		if ((StorageOld = StorageTmp->dsx1ConfigTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->dsx1ConfigTable_sets == 0)
+			revert_dsx1ConfigTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
-		SNMP_FREE(string);
+		if ((StorageOld = StorageTmp->dsx1ConfigTable_old) == NULL)
+			break;
+		if (StorageOld->dsx1CircuitIdentifier != NULL) {
+			SNMP_FREE(StorageTmp->dsx1CircuitIdentifier);
+			StorageTmp->dsx1CircuitIdentifier = StorageOld->dsx1CircuitIdentifier;
+			StorageTmp->dsx1CircuitIdentifierLen = StorageOld->dsx1CircuitIdentifierLen;
+			StorageOld->dsx1CircuitIdentifier = NULL;
+			StorageOld->dsx1CircuitIdentifierLen = 0;
+		}
+		if (--StorageTmp->dsx1ConfigTable_rsvs == 0)
+			dsx1ConfigTable_destroy(&StorageTmp->dsx1ConfigTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -4157,12 +5064,14 @@ write_dsx1CircuitIdentifier(int action, u_char *var_val, u_char var_val_type, si
 int
 write_dsx1LoopbackConfig(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static long old_value;
-	struct dsx1ConfigTable_data *StorageTmp = NULL;
+	struct dsx1ConfigTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 11;
 	long set_value = *((long *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("ds1", "write_dsx1LoopbackConfig entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(dsx1ConfigTableStorage, NULL, &name[11], &newlen, 1, NULL, NULL);
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
@@ -4188,20 +5097,59 @@ write_dsx1LoopbackConfig(int action, u_char *var_val, u_char var_val_type, size_
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to dsx1LoopbackConfig: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->dsx1ConfigTable_old) == NULL)
+			if (StorageTmp->dsx1ConfigTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->dsx1ConfigTable_old = dsx1ConfigTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->dsx1ConfigTable_rsvs++;
+		StorageTmp->dsx1LoopbackConfig = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->dsx1ConfigTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->dsx1ConfigTable_tsts == 0)
+				if ((ret = check_dsx1ConfigTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->dsx1ConfigTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->dsx1LoopbackConfig for you to use, and you have just been asked to do something with it.  Note that anything done here
 				   must be reversable in the UNDO case */
-		old_value = StorageTmp->dsx1LoopbackConfig;
-		StorageTmp->dsx1LoopbackConfig = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->dsx1ConfigTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->dsx1ConfigTable_sets == 0)
+				if ((ret = update_dsx1ConfigTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->dsx1ConfigTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->dsx1ConfigTable_old) != NULL) {
+			dsx1ConfigTable_destroy(&StorageTmp->dsx1ConfigTable_old);
+			StorageTmp->dsx1ConfigTable_rsvs = 0;
+			StorageTmp->dsx1ConfigTable_tsts = 0;
+			StorageTmp->dsx1ConfigTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->dsx1LoopbackConfig = old_value;
+		if ((StorageOld = StorageTmp->dsx1ConfigTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->dsx1ConfigTable_sets == 0)
+			revert_dsx1ConfigTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->dsx1ConfigTable_old) == NULL)
+			break;
+		StorageTmp->dsx1LoopbackConfig = StorageOld->dsx1LoopbackConfig;
+		if (--StorageTmp->dsx1ConfigTable_rsvs == 0)
+			dsx1ConfigTable_destroy(&StorageTmp->dsx1ConfigTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -4221,12 +5169,14 @@ write_dsx1LoopbackConfig(int action, u_char *var_val, u_char var_val_type, size_
 int
 write_dsx1SignalMode(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static long old_value;
-	struct dsx1ConfigTable_data *StorageTmp = NULL;
+	struct dsx1ConfigTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 11;
 	long set_value = *((long *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("ds1", "write_dsx1SignalMode entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(dsx1ConfigTableStorage, NULL, &name[11], &newlen, 1, NULL, NULL);
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
@@ -4251,20 +5201,59 @@ write_dsx1SignalMode(int action, u_char *var_val, u_char var_val_type, size_t va
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to dsx1SignalMode: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->dsx1ConfigTable_old) == NULL)
+			if (StorageTmp->dsx1ConfigTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->dsx1ConfigTable_old = dsx1ConfigTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->dsx1ConfigTable_rsvs++;
+		StorageTmp->dsx1SignalMode = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->dsx1ConfigTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->dsx1ConfigTable_tsts == 0)
+				if ((ret = check_dsx1ConfigTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->dsx1ConfigTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->dsx1SignalMode for you to use, and you have just been asked to do something with it.  Note that anything done here must
 				   be reversable in the UNDO case */
-		old_value = StorageTmp->dsx1SignalMode;
-		StorageTmp->dsx1SignalMode = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->dsx1ConfigTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->dsx1ConfigTable_sets == 0)
+				if ((ret = update_dsx1ConfigTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->dsx1ConfigTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->dsx1ConfigTable_old) != NULL) {
+			dsx1ConfigTable_destroy(&StorageTmp->dsx1ConfigTable_old);
+			StorageTmp->dsx1ConfigTable_rsvs = 0;
+			StorageTmp->dsx1ConfigTable_tsts = 0;
+			StorageTmp->dsx1ConfigTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->dsx1SignalMode = old_value;
+		if ((StorageOld = StorageTmp->dsx1ConfigTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->dsx1ConfigTable_sets == 0)
+			revert_dsx1ConfigTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->dsx1ConfigTable_old) == NULL)
+			break;
+		StorageTmp->dsx1SignalMode = StorageOld->dsx1SignalMode;
+		if (--StorageTmp->dsx1ConfigTable_rsvs == 0)
+			dsx1ConfigTable_destroy(&StorageTmp->dsx1ConfigTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -4284,12 +5273,14 @@ write_dsx1SignalMode(int action, u_char *var_val, u_char var_val_type, size_t va
 int
 write_dsx1TransmitClockSource(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static long old_value;
-	struct dsx1ConfigTable_data *StorageTmp = NULL;
+	struct dsx1ConfigTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 11;
 	long set_value = *((long *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("ds1", "write_dsx1TransmitClockSource entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(dsx1ConfigTableStorage, NULL, &name[11], &newlen, 1, NULL, NULL);
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
@@ -4313,20 +5304,59 @@ write_dsx1TransmitClockSource(int action, u_char *var_val, u_char var_val_type, 
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to dsx1TransmitClockSource: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->dsx1ConfigTable_old) == NULL)
+			if (StorageTmp->dsx1ConfigTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->dsx1ConfigTable_old = dsx1ConfigTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->dsx1ConfigTable_rsvs++;
+		StorageTmp->dsx1TransmitClockSource = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->dsx1ConfigTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->dsx1ConfigTable_tsts == 0)
+				if ((ret = check_dsx1ConfigTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->dsx1ConfigTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->dsx1TransmitClockSource for you to use, and you have just been asked to do something with it.  Note that anything done
 				   here must be reversable in the UNDO case */
-		old_value = StorageTmp->dsx1TransmitClockSource;
-		StorageTmp->dsx1TransmitClockSource = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->dsx1ConfigTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->dsx1ConfigTable_sets == 0)
+				if ((ret = update_dsx1ConfigTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->dsx1ConfigTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->dsx1ConfigTable_old) != NULL) {
+			dsx1ConfigTable_destroy(&StorageTmp->dsx1ConfigTable_old);
+			StorageTmp->dsx1ConfigTable_rsvs = 0;
+			StorageTmp->dsx1ConfigTable_tsts = 0;
+			StorageTmp->dsx1ConfigTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->dsx1TransmitClockSource = old_value;
+		if ((StorageOld = StorageTmp->dsx1ConfigTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->dsx1ConfigTable_sets == 0)
+			revert_dsx1ConfigTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->dsx1ConfigTable_old) == NULL)
+			break;
+		StorageTmp->dsx1TransmitClockSource = StorageOld->dsx1TransmitClockSource;
+		if (--StorageTmp->dsx1ConfigTable_rsvs == 0)
+			dsx1ConfigTable_destroy(&StorageTmp->dsx1ConfigTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -4346,12 +5376,14 @@ write_dsx1TransmitClockSource(int action, u_char *var_val, u_char var_val_type, 
 int
 write_dsx1Fdl(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static long old_value;
-	struct dsx1ConfigTable_data *StorageTmp = NULL;
+	struct dsx1ConfigTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 11;
 	long set_value = *((long *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("ds1", "write_dsx1Fdl entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(dsx1ConfigTableStorage, NULL, &name[11], &newlen, 1, NULL, NULL);
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
@@ -4370,20 +5402,59 @@ write_dsx1Fdl(int action, u_char *var_val, u_char var_val_type, size_t var_val_l
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to dsx1Fdl: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->dsx1ConfigTable_old) == NULL)
+			if (StorageTmp->dsx1ConfigTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->dsx1ConfigTable_old = dsx1ConfigTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->dsx1ConfigTable_rsvs++;
+		StorageTmp->dsx1Fdl = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->dsx1ConfigTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->dsx1ConfigTable_tsts == 0)
+				if ((ret = check_dsx1ConfigTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->dsx1ConfigTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->dsx1Fdl for you to use, and you have just been asked to do something with it.  Note that anything done here must be
 				   reversable in the UNDO case */
-		old_value = StorageTmp->dsx1Fdl;
-		StorageTmp->dsx1Fdl = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->dsx1ConfigTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->dsx1ConfigTable_sets == 0)
+				if ((ret = update_dsx1ConfigTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->dsx1ConfigTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->dsx1ConfigTable_old) != NULL) {
+			dsx1ConfigTable_destroy(&StorageTmp->dsx1ConfigTable_old);
+			StorageTmp->dsx1ConfigTable_rsvs = 0;
+			StorageTmp->dsx1ConfigTable_tsts = 0;
+			StorageTmp->dsx1ConfigTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->dsx1Fdl = old_value;
+		if ((StorageOld = StorageTmp->dsx1ConfigTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->dsx1ConfigTable_sets == 0)
+			revert_dsx1ConfigTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->dsx1ConfigTable_old) == NULL)
+			break;
+		StorageTmp->dsx1Fdl = StorageOld->dsx1Fdl;
+		if (--StorageTmp->dsx1ConfigTable_rsvs == 0)
+			dsx1ConfigTable_destroy(&StorageTmp->dsx1ConfigTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -4403,12 +5474,14 @@ write_dsx1Fdl(int action, u_char *var_val, u_char var_val_type, size_t var_val_l
 int
 write_dsx1LineLength(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static long old_value;
-	struct dsx1ConfigTable_data *StorageTmp = NULL;
+	struct dsx1ConfigTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 11;
 	long set_value = *((long *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("ds1", "write_dsx1LineLength entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(dsx1ConfigTableStorage, NULL, &name[11], &newlen, 1, NULL, NULL);
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
@@ -4427,20 +5500,59 @@ write_dsx1LineLength(int action, u_char *var_val, u_char var_val_type, size_t va
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to dsx1LineLength: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->dsx1ConfigTable_old) == NULL)
+			if (StorageTmp->dsx1ConfigTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->dsx1ConfigTable_old = dsx1ConfigTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->dsx1ConfigTable_rsvs++;
+		StorageTmp->dsx1LineLength = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->dsx1ConfigTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->dsx1ConfigTable_tsts == 0)
+				if ((ret = check_dsx1ConfigTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->dsx1ConfigTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->dsx1LineLength for you to use, and you have just been asked to do something with it.  Note that anything done here must
 				   be reversable in the UNDO case */
-		old_value = StorageTmp->dsx1LineLength;
-		StorageTmp->dsx1LineLength = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->dsx1ConfigTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->dsx1ConfigTable_sets == 0)
+				if ((ret = update_dsx1ConfigTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->dsx1ConfigTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->dsx1ConfigTable_old) != NULL) {
+			dsx1ConfigTable_destroy(&StorageTmp->dsx1ConfigTable_old);
+			StorageTmp->dsx1ConfigTable_rsvs = 0;
+			StorageTmp->dsx1ConfigTable_tsts = 0;
+			StorageTmp->dsx1ConfigTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->dsx1LineLength = old_value;
+		if ((StorageOld = StorageTmp->dsx1ConfigTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->dsx1ConfigTable_sets == 0)
+			revert_dsx1ConfigTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->dsx1ConfigTable_old) == NULL)
+			break;
+		StorageTmp->dsx1LineLength = StorageOld->dsx1LineLength;
+		if (--StorageTmp->dsx1ConfigTable_rsvs == 0)
+			dsx1ConfigTable_destroy(&StorageTmp->dsx1ConfigTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -4460,12 +5572,14 @@ write_dsx1LineLength(int action, u_char *var_val, u_char var_val_type, size_t va
 int
 write_dsx1LineStatusChangeTrapEnable(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static long old_value;
-	struct dsx1ConfigTable_data *StorageTmp = NULL;
+	struct dsx1ConfigTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 11;
 	long set_value = *((long *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("ds1", "write_dsx1LineStatusChangeTrapEnable entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(dsx1ConfigTableStorage, NULL, &name[11], &newlen, 1, NULL, NULL);
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
@@ -4488,20 +5602,59 @@ write_dsx1LineStatusChangeTrapEnable(int action, u_char *var_val, u_char var_val
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to dsx1LineStatusChangeTrapEnable: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->dsx1ConfigTable_old) == NULL)
+			if (StorageTmp->dsx1ConfigTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->dsx1ConfigTable_old = dsx1ConfigTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->dsx1ConfigTable_rsvs++;
+		StorageTmp->dsx1LineStatusChangeTrapEnable = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->dsx1ConfigTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->dsx1ConfigTable_tsts == 0)
+				if ((ret = check_dsx1ConfigTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->dsx1ConfigTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->dsx1LineStatusChangeTrapEnable for you to use, and you have just been asked to do something with it.  Note that anything 
 				   done here must be reversable in the UNDO case */
-		old_value = StorageTmp->dsx1LineStatusChangeTrapEnable;
-		StorageTmp->dsx1LineStatusChangeTrapEnable = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->dsx1ConfigTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->dsx1ConfigTable_sets == 0)
+				if ((ret = update_dsx1ConfigTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->dsx1ConfigTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->dsx1ConfigTable_old) != NULL) {
+			dsx1ConfigTable_destroy(&StorageTmp->dsx1ConfigTable_old);
+			StorageTmp->dsx1ConfigTable_rsvs = 0;
+			StorageTmp->dsx1ConfigTable_tsts = 0;
+			StorageTmp->dsx1ConfigTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->dsx1LineStatusChangeTrapEnable = old_value;
+		if ((StorageOld = StorageTmp->dsx1ConfigTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->dsx1ConfigTable_sets == 0)
+			revert_dsx1ConfigTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->dsx1ConfigTable_old) == NULL)
+			break;
+		StorageTmp->dsx1LineStatusChangeTrapEnable = StorageOld->dsx1LineStatusChangeTrapEnable;
+		if (--StorageTmp->dsx1ConfigTable_rsvs == 0)
+			dsx1ConfigTable_destroy(&StorageTmp->dsx1ConfigTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -4521,12 +5674,14 @@ write_dsx1LineStatusChangeTrapEnable(int action, u_char *var_val, u_char var_val
 int
 write_dsx1Channelization(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static long old_value;
-	struct dsx1ConfigTable_data *StorageTmp = NULL;
+	struct dsx1ConfigTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 11;
 	long set_value = *((long *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("ds1", "write_dsx1Channelization entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(dsx1ConfigTableStorage, NULL, &name[11], &newlen, 1, NULL, NULL);
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
@@ -4549,20 +5704,59 @@ write_dsx1Channelization(int action, u_char *var_val, u_char var_val_type, size_
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to dsx1Channelization: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->dsx1ConfigTable_old) == NULL)
+			if (StorageTmp->dsx1ConfigTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->dsx1ConfigTable_old = dsx1ConfigTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->dsx1ConfigTable_rsvs++;
+		StorageTmp->dsx1Channelization = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->dsx1ConfigTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->dsx1ConfigTable_tsts == 0)
+				if ((ret = check_dsx1ConfigTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->dsx1ConfigTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->dsx1Channelization for you to use, and you have just been asked to do something with it.  Note that anything done here
 				   must be reversable in the UNDO case */
-		old_value = StorageTmp->dsx1Channelization;
-		StorageTmp->dsx1Channelization = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->dsx1ConfigTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->dsx1ConfigTable_sets == 0)
+				if ((ret = update_dsx1ConfigTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->dsx1ConfigTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->dsx1ConfigTable_old) != NULL) {
+			dsx1ConfigTable_destroy(&StorageTmp->dsx1ConfigTable_old);
+			StorageTmp->dsx1ConfigTable_rsvs = 0;
+			StorageTmp->dsx1ConfigTable_tsts = 0;
+			StorageTmp->dsx1ConfigTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->dsx1Channelization = old_value;
+		if ((StorageOld = StorageTmp->dsx1ConfigTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->dsx1ConfigTable_sets == 0)
+			revert_dsx1ConfigTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->dsx1ConfigTable_old) == NULL)
+			break;
+		StorageTmp->dsx1Channelization = StorageOld->dsx1Channelization;
+		if (--StorageTmp->dsx1ConfigTable_rsvs == 0)
+			dsx1ConfigTable_destroy(&StorageTmp->dsx1ConfigTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -4582,12 +5776,14 @@ write_dsx1Channelization(int action, u_char *var_val, u_char var_val_type, size_
 int
 write_dsx1LineMode(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static long old_value;
-	struct dsx1ConfigTable_data *StorageTmp = NULL;
+	struct dsx1ConfigTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 11;
 	long set_value = *((long *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("ds1", "write_dsx1LineMode entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(dsx1ConfigTableStorage, NULL, &name[11], &newlen, 1, NULL, NULL);
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
@@ -4609,20 +5805,59 @@ write_dsx1LineMode(int action, u_char *var_val, u_char var_val_type, size_t var_
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to dsx1LineMode: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->dsx1ConfigTable_old) == NULL)
+			if (StorageTmp->dsx1ConfigTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->dsx1ConfigTable_old = dsx1ConfigTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->dsx1ConfigTable_rsvs++;
+		StorageTmp->dsx1LineMode = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->dsx1ConfigTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->dsx1ConfigTable_tsts == 0)
+				if ((ret = check_dsx1ConfigTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->dsx1ConfigTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->dsx1LineMode for you to use, and you have just been asked to do something with it.  Note that anything done here must be 
 				   reversable in the UNDO case */
-		old_value = StorageTmp->dsx1LineMode;
-		StorageTmp->dsx1LineMode = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->dsx1ConfigTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->dsx1ConfigTable_sets == 0)
+				if ((ret = update_dsx1ConfigTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->dsx1ConfigTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->dsx1ConfigTable_old) != NULL) {
+			dsx1ConfigTable_destroy(&StorageTmp->dsx1ConfigTable_old);
+			StorageTmp->dsx1ConfigTable_rsvs = 0;
+			StorageTmp->dsx1ConfigTable_tsts = 0;
+			StorageTmp->dsx1ConfigTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->dsx1LineMode = old_value;
+		if ((StorageOld = StorageTmp->dsx1ConfigTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->dsx1ConfigTable_sets == 0)
+			revert_dsx1ConfigTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->dsx1ConfigTable_old) == NULL)
+			break;
+		StorageTmp->dsx1LineMode = StorageOld->dsx1LineMode;
+		if (--StorageTmp->dsx1ConfigTable_rsvs == 0)
+			dsx1ConfigTable_destroy(&StorageTmp->dsx1ConfigTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -4642,12 +5877,14 @@ write_dsx1LineMode(int action, u_char *var_val, u_char var_val_type, size_t var_
 int
 write_dsx1LineBuildOut(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static long old_value;
-	struct dsx1ConfigTable_data *StorageTmp = NULL;
+	struct dsx1ConfigTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 11;
 	long set_value = *((long *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("ds1", "write_dsx1LineBuildOut entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(dsx1ConfigTableStorage, NULL, &name[11], &newlen, 1, NULL, NULL);
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
@@ -4672,20 +5909,59 @@ write_dsx1LineBuildOut(int action, u_char *var_val, u_char var_val_type, size_t 
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to dsx1LineBuildOut: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->dsx1ConfigTable_old) == NULL)
+			if (StorageTmp->dsx1ConfigTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->dsx1ConfigTable_old = dsx1ConfigTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->dsx1ConfigTable_rsvs++;
+		StorageTmp->dsx1LineBuildOut = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->dsx1ConfigTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->dsx1ConfigTable_tsts == 0)
+				if ((ret = check_dsx1ConfigTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->dsx1ConfigTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->dsx1LineBuildOut for you to use, and you have just been asked to do something with it.  Note that anything done here
 				   must be reversable in the UNDO case */
-		old_value = StorageTmp->dsx1LineBuildOut;
-		StorageTmp->dsx1LineBuildOut = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->dsx1ConfigTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->dsx1ConfigTable_sets == 0)
+				if ((ret = update_dsx1ConfigTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->dsx1ConfigTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->dsx1ConfigTable_old) != NULL) {
+			dsx1ConfigTable_destroy(&StorageTmp->dsx1ConfigTable_old);
+			StorageTmp->dsx1ConfigTable_rsvs = 0;
+			StorageTmp->dsx1ConfigTable_tsts = 0;
+			StorageTmp->dsx1ConfigTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->dsx1LineBuildOut = old_value;
+		if ((StorageOld = StorageTmp->dsx1ConfigTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->dsx1ConfigTable_sets == 0)
+			revert_dsx1ConfigTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->dsx1ConfigTable_old) == NULL)
+			break;
+		StorageTmp->dsx1LineBuildOut = StorageOld->dsx1LineBuildOut;
+		if (--StorageTmp->dsx1ConfigTable_rsvs == 0)
+			dsx1ConfigTable_destroy(&StorageTmp->dsx1ConfigTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -4705,12 +5981,14 @@ write_dsx1LineBuildOut(int action, u_char *var_val, u_char var_val_type, size_t 
 int
 write_dsx1LineImpedance(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static long old_value;
-	struct dsx1ConfigTable_data *StorageTmp = NULL;
+	struct dsx1ConfigTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 11;
 	long set_value = *((long *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("ds1", "write_dsx1LineImpedance entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(dsx1ConfigTableStorage, NULL, &name[11], &newlen, 1, NULL, NULL);
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
@@ -4734,20 +6012,59 @@ write_dsx1LineImpedance(int action, u_char *var_val, u_char var_val_type, size_t
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to dsx1LineImpedance: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->dsx1ConfigTable_old) == NULL)
+			if (StorageTmp->dsx1ConfigTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->dsx1ConfigTable_old = dsx1ConfigTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->dsx1ConfigTable_rsvs++;
+		StorageTmp->dsx1LineImpedance = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->dsx1ConfigTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->dsx1ConfigTable_tsts == 0)
+				if ((ret = check_dsx1ConfigTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->dsx1ConfigTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->dsx1LineImpedance for you to use, and you have just been asked to do something with it.  Note that anything done here
 				   must be reversable in the UNDO case */
-		old_value = StorageTmp->dsx1LineImpedance;
-		StorageTmp->dsx1LineImpedance = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->dsx1ConfigTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->dsx1ConfigTable_sets == 0)
+				if ((ret = update_dsx1ConfigTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->dsx1ConfigTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->dsx1ConfigTable_old) != NULL) {
+			dsx1ConfigTable_destroy(&StorageTmp->dsx1ConfigTable_old);
+			StorageTmp->dsx1ConfigTable_rsvs = 0;
+			StorageTmp->dsx1ConfigTable_tsts = 0;
+			StorageTmp->dsx1ConfigTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->dsx1LineImpedance = old_value;
+		if ((StorageOld = StorageTmp->dsx1ConfigTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->dsx1ConfigTable_sets == 0)
+			revert_dsx1ConfigTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->dsx1ConfigTable_old) == NULL)
+			break;
+		StorageTmp->dsx1LineImpedance = StorageOld->dsx1LineImpedance;
+		if (--StorageTmp->dsx1ConfigTable_rsvs == 0)
+			dsx1ConfigTable_destroy(&StorageTmp->dsx1ConfigTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -4767,12 +6084,14 @@ write_dsx1LineImpedance(int action, u_char *var_val, u_char var_val_type, size_t
 int
 write_dsx1FracIfIndex(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static long old_value;
-	struct dsx1FracTable_data *StorageTmp = NULL;
+	struct dsx1FracTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 11;
 	long set_value = *((long *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("ds1", "write_dsx1FracIfIndex entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(dsx1FracTableStorage, NULL, &name[11], &newlen, 1, NULL, NULL);
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
@@ -4791,185 +6110,62 @@ write_dsx1FracIfIndex(int action, u_char *var_val, u_char var_val_type, size_t v
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to dsx1FracIfIndex: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->dsx1FracTable_old) == NULL)
+			if (StorageTmp->dsx1FracTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->dsx1FracTable_old = dsx1FracTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->dsx1FracTable_rsvs++;
+		StorageTmp->dsx1FracIfIndex = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->dsx1FracTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->dsx1FracTable_tsts == 0)
+				if ((ret = check_dsx1FracTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->dsx1FracTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->dsx1FracIfIndex for you to use, and you have just been asked to do something with it.  Note that anything done here must 
 				   be reversable in the UNDO case */
-		old_value = StorageTmp->dsx1FracIfIndex;
-		StorageTmp->dsx1FracIfIndex = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->dsx1FracTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->dsx1FracTable_sets == 0)
+				if ((ret = update_dsx1FracTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->dsx1FracTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->dsx1FracTable_old) != NULL) {
+			dsx1FracTable_destroy(&StorageTmp->dsx1FracTable_old);
+			StorageTmp->dsx1FracTable_rsvs = 0;
+			StorageTmp->dsx1FracTable_tsts = 0;
+			StorageTmp->dsx1FracTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->dsx1FracIfIndex = old_value;
+		if ((StorageOld = StorageTmp->dsx1FracTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->dsx1FracTable_sets == 0)
+			revert_dsx1FracTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->dsx1FracTable_old) == NULL)
+			break;
+		StorageTmp->dsx1FracIfIndex = StorageOld->dsx1FracIfIndex;
+		if (--StorageTmp->dsx1FracTable_rsvs == 0)
+			dsx1FracTable_destroy(&StorageTmp->dsx1FracTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
-}
-
-/**
- * @fn int dsx1ConfigTable_consistent(struct dsx1ConfigTable_data *thedata)
- * @param thedata the row data to check for consistency.
- * @brief check the internal consistency of a table row.
- *
- * This function checks the internal consistency of a table row for the dsx1ConfigTable table.  If the
- * table row is internally consistent, then this function returns SNMP_ERR_NOERROR, otherwise the
- * function returns an SNMP error code and it will not be possible to activate the row until the
- * row's internal consistency is corrected.  This function might use a 'test' operation against the
- * driver to ensure that the commit phase will succeed.
- */
-int
-dsx1ConfigTable_consistent(struct dsx1ConfigTable_data *thedata)
-{
-	/* XXX: check row consistency return SNMP_ERR_NOERROR if consistent, or an SNMP error code if not. */
-	return (SNMP_ERR_NOERROR);
-}
-
-/**
- * @fn int dsx1CurrentTable_consistent(struct dsx1CurrentTable_data *thedata)
- * @param thedata the row data to check for consistency.
- * @brief check the internal consistency of a table row.
- *
- * This function checks the internal consistency of a table row for the dsx1CurrentTable table.  If the
- * table row is internally consistent, then this function returns SNMP_ERR_NOERROR, otherwise the
- * function returns an SNMP error code and it will not be possible to activate the row until the
- * row's internal consistency is corrected.  This function might use a 'test' operation against the
- * driver to ensure that the commit phase will succeed.
- */
-int
-dsx1CurrentTable_consistent(struct dsx1CurrentTable_data *thedata)
-{
-	/* XXX: check row consistency return SNMP_ERR_NOERROR if consistent, or an SNMP error code if not. */
-	return (SNMP_ERR_NOERROR);
-}
-
-/**
- * @fn int dsx1IntervalTable_consistent(struct dsx1IntervalTable_data *thedata)
- * @param thedata the row data to check for consistency.
- * @brief check the internal consistency of a table row.
- *
- * This function checks the internal consistency of a table row for the dsx1IntervalTable table.  If the
- * table row is internally consistent, then this function returns SNMP_ERR_NOERROR, otherwise the
- * function returns an SNMP error code and it will not be possible to activate the row until the
- * row's internal consistency is corrected.  This function might use a 'test' operation against the
- * driver to ensure that the commit phase will succeed.
- */
-int
-dsx1IntervalTable_consistent(struct dsx1IntervalTable_data *thedata)
-{
-	/* XXX: check row consistency return SNMP_ERR_NOERROR if consistent, or an SNMP error code if not. */
-	return (SNMP_ERR_NOERROR);
-}
-
-/**
- * @fn int dsx1TotalTable_consistent(struct dsx1TotalTable_data *thedata)
- * @param thedata the row data to check for consistency.
- * @brief check the internal consistency of a table row.
- *
- * This function checks the internal consistency of a table row for the dsx1TotalTable table.  If the
- * table row is internally consistent, then this function returns SNMP_ERR_NOERROR, otherwise the
- * function returns an SNMP error code and it will not be possible to activate the row until the
- * row's internal consistency is corrected.  This function might use a 'test' operation against the
- * driver to ensure that the commit phase will succeed.
- */
-int
-dsx1TotalTable_consistent(struct dsx1TotalTable_data *thedata)
-{
-	/* XXX: check row consistency return SNMP_ERR_NOERROR if consistent, or an SNMP error code if not. */
-	return (SNMP_ERR_NOERROR);
-}
-
-/**
- * @fn int dsx1FarEndCurrentTable_consistent(struct dsx1FarEndCurrentTable_data *thedata)
- * @param thedata the row data to check for consistency.
- * @brief check the internal consistency of a table row.
- *
- * This function checks the internal consistency of a table row for the dsx1FarEndCurrentTable table.  If the
- * table row is internally consistent, then this function returns SNMP_ERR_NOERROR, otherwise the
- * function returns an SNMP error code and it will not be possible to activate the row until the
- * row's internal consistency is corrected.  This function might use a 'test' operation against the
- * driver to ensure that the commit phase will succeed.
- */
-int
-dsx1FarEndCurrentTable_consistent(struct dsx1FarEndCurrentTable_data *thedata)
-{
-	/* XXX: check row consistency return SNMP_ERR_NOERROR if consistent, or an SNMP error code if not. */
-	return (SNMP_ERR_NOERROR);
-}
-
-/**
- * @fn int dsx1FarEndIntervalTable_consistent(struct dsx1FarEndIntervalTable_data *thedata)
- * @param thedata the row data to check for consistency.
- * @brief check the internal consistency of a table row.
- *
- * This function checks the internal consistency of a table row for the dsx1FarEndIntervalTable table.  If the
- * table row is internally consistent, then this function returns SNMP_ERR_NOERROR, otherwise the
- * function returns an SNMP error code and it will not be possible to activate the row until the
- * row's internal consistency is corrected.  This function might use a 'test' operation against the
- * driver to ensure that the commit phase will succeed.
- */
-int
-dsx1FarEndIntervalTable_consistent(struct dsx1FarEndIntervalTable_data *thedata)
-{
-	/* XXX: check row consistency return SNMP_ERR_NOERROR if consistent, or an SNMP error code if not. */
-	return (SNMP_ERR_NOERROR);
-}
-
-/**
- * @fn int dsx1FarEndTotalTable_consistent(struct dsx1FarEndTotalTable_data *thedata)
- * @param thedata the row data to check for consistency.
- * @brief check the internal consistency of a table row.
- *
- * This function checks the internal consistency of a table row for the dsx1FarEndTotalTable table.  If the
- * table row is internally consistent, then this function returns SNMP_ERR_NOERROR, otherwise the
- * function returns an SNMP error code and it will not be possible to activate the row until the
- * row's internal consistency is corrected.  This function might use a 'test' operation against the
- * driver to ensure that the commit phase will succeed.
- */
-int
-dsx1FarEndTotalTable_consistent(struct dsx1FarEndTotalTable_data *thedata)
-{
-	/* XXX: check row consistency return SNMP_ERR_NOERROR if consistent, or an SNMP error code if not. */
-	return (SNMP_ERR_NOERROR);
-}
-
-/**
- * @fn int dsx1FracTable_consistent(struct dsx1FracTable_data *thedata)
- * @param thedata the row data to check for consistency.
- * @brief check the internal consistency of a table row.
- *
- * This function checks the internal consistency of a table row for the dsx1FracTable table.  If the
- * table row is internally consistent, then this function returns SNMP_ERR_NOERROR, otherwise the
- * function returns an SNMP error code and it will not be possible to activate the row until the
- * row's internal consistency is corrected.  This function might use a 'test' operation against the
- * driver to ensure that the commit phase will succeed.
- */
-int
-dsx1FracTable_consistent(struct dsx1FracTable_data *thedata)
-{
-	/* XXX: check row consistency return SNMP_ERR_NOERROR if consistent, or an SNMP error code if not. */
-	return (SNMP_ERR_NOERROR);
-}
-
-/**
- * @fn int dsx1ChanMappingTable_consistent(struct dsx1ChanMappingTable_data *thedata)
- * @param thedata the row data to check for consistency.
- * @brief check the internal consistency of a table row.
- *
- * This function checks the internal consistency of a table row for the dsx1ChanMappingTable table.  If the
- * table row is internally consistent, then this function returns SNMP_ERR_NOERROR, otherwise the
- * function returns an SNMP error code and it will not be possible to activate the row until the
- * row's internal consistency is corrected.  This function might use a 'test' operation against the
- * driver to ensure that the commit phase will succeed.
- */
-int
-dsx1ChanMappingTable_consistent(struct dsx1ChanMappingTable_data *thedata)
-{
-	/* XXX: check row consistency return SNMP_ERR_NOERROR if consistent, or an SNMP error code if not. */
-	return (SNMP_ERR_NOERROR);
 }
 
 void
