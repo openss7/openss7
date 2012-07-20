@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2012  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -427,8 +427,38 @@ ss7MIB_create(void)
 		/* XXX: fill in default scalar values here into StorageNew */
 
 	}
+      done:
 	DEBUGMSGTL(("ss7MIB", "done.\n"));
 	return (StorageNew);
+	goto nomem;
+      nomem:
+	ss7MIB_destroy(&StorageNew);
+	goto done;
+}
+
+/**
+ * @fn struct ss7MIB_data *ss7MIB_duplicate(struct ss7MIB_data *thedata)
+ * @param thedata the mib structure to duplicate
+ * @brief duplicate a mib structure for the mib
+ *
+ * Duplicates the specified mib structure @param thedata and returns a pointer to the newly
+ * allocated mib structure on success, or NULL on failure.
+ */
+struct ss7MIB_data *
+ss7MIB_duplicate(struct ss7MIB_data *thedata)
+{
+	struct ss7MIB_data *StorageNew = SNMP_MALLOC_STRUCT(ss7MIB_data);
+
+	DEBUGMSGTL(("ss7MIB", "ss7MIB_duplicate: duplicating mib... "));
+	if (StorageNew != NULL) {
+	}
+      done:
+	DEBUGMSGTL(("ss7MIB", "done.\n"));
+	return (StorageNew);
+	goto destroy;
+      destroy:
+	ss7MIB_destroy(&StorageNew);
+	goto done;
 }
 
 /**
@@ -479,7 +509,7 @@ ss7MIB_add(struct ss7MIB_data *thedata)
  * @param line line from configuration file matching the token.
  * @brief parse configuration file for ss7MIB entries.
  *
- * This callback is called by UCD-SNMP when it prases a configuration file and finds a configuration
+ * This callback is called by UCD-SNMP when it parses a configuration file and finds a configuration
  * file line for the registsred token (in this case ss7MIB).  This routine is invoked by
  * UCD-SNMP to read the values of scalars in the MIB from the configuration file.  Note that this
  * procedure may exist regardless of the persistence of the MIB.  If there are no configured entries
@@ -531,6 +561,62 @@ store_ss7MIB(int majorID, int minorID, void *serverarg, void *clientarg)
 	}
 	DEBUGMSGTL(("ss7MIB", "done.\n"));
 	return SNMPERR_SUCCESS;
+}
+
+/**
+ * @fn int check_ss7MIB(struct ss7MIB_data *StorageTmp, struct ss7MIB_data *StorageOld)
+ * @param StorageTmp the data as updated
+ * @param StorageOld the data previous to update
+ *
+ * This function is used by mibs.  It is used to check, all scalars at a time, the varbinds
+ * belonging to the mib.  This function is called for the first varbind in a mib at the beginning of
+ * the ACTION phase.  The COMMIT phase does not ensue unless this check passes.  This function can
+ * return SNMP_ERR_NOERR or a specific SNMP error value.  Values in StorageOld are the values before
+ * the varbinds on the mib were applied; the values in StorageTmp are the new values.  The function
+ * is permitted to change the values in StorageTmp to correct them; however, preferences should be
+ * made for setting values that were not in the varbinds.
+ */
+int
+check_ss7MIB(struct ss7MIB_data *StorageTmp, struct ss7MIB_data *StorageOld)
+{
+	/* XXX: provide code to check the scalars for consistency */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int update_ss7MIB(struct ss7MIB_data *StorageTmp, struct ss7MIB_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the set operation (ACTION phase)
+ *
+ * This function is used by mibs.  It is used to update, all scalars at a time, the varbinds
+ * belonging to the mib.  This function is called for the first varbind in a mib at the beginning of
+ * the COMMIT phase.  The start of the ACTION phase performs a consistency check on the mib before
+ * allowing the request to proceed to the COMMIT phase.  The COMMIT phase then arrives here with
+ * consistency already checked (see check_ss7MIB()).  This function can
+ * return SNMP_ERR_NOERROR or SNMP_ERR_COMMITFAILED.  Values in StorageOld are the values before the
+ * varbinds on the mib were applied: the values in StorageTmp are the new values.
+ */
+int
+update_ss7MIB(struct ss7MIB_data *StorageTmp, struct ss7MIB_data *StorageOld)
+{
+	/* XXX: provide code to update the row with the underlying device */
+	ss7MIB_refresh = 1;
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn revert_ss7MIB(struct 
+ * @fn void revert_ss7MIB(struct ss7MIB_data *StorageTmp, struct ss7MIB_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the undo operation (UNDO phase)
+ */
+void
+revert_ss7MIB(struct ss7MIB_data *StorageTmp, struct ss7MIB_data *StorageOld)
+{
+	/* XXX: provide code to revert the row with the underlying device */
+	update_ss7MIB(StorageOld, NULL);
 }
 
 /**
@@ -628,23 +714,31 @@ ss7NetworkTable_create(void)
 		/* XXX: fill in default row values here into StorageNew */
 		{
 			static oid tmpoid[15] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 0, 1, 4, 1, 3, 2000 };
-			if ((StorageNew->ss7NetworkProtocolVariant = snmp_duplicate_objid(tmpoid, 15)))
-				StorageNew->ss7NetworkProtocolVariantLen = 15;
+			if ((StorageNew->ss7NetworkProtocolVariant = snmp_duplicate_objid(tmpoid, 15)) == NULL)
+				goto nomem;
+			StorageNew->ss7NetworkProtocolVariantLen = 15;
 		}
 		StorageNew->ss7NetworkProtocolVersion = 2000;
-		if ((StorageNew->ss7NetworkProtocolOptions = (uint8_t *) strdup("")) != NULL)
-			StorageNew->ss7NetworkProtocolOptionsLen = strlen("");
+		if ((StorageNew->ss7NetworkProtocolOptions = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->ss7NetworkProtocolOptionsLen = 0;
+		StorageNew->ss7NetworkProtocolOptions[StorageNew->ss7NetworkProtocolOptionsLen] = 0;
 		StorageNew->ss7NetworkRowStatus = 0;
 		StorageNew->ss7NetworkRowStatus = RS_NOTREADY;
 	}
+      done:
 	DEBUGMSGTL(("ss7MIB", "done.\n"));
 	return (StorageNew);
+	goto nomem;
+      nomem:
+	ss7NetworkTable_destroy(&StorageNew);
+	goto done;
 }
 
 /**
  * @fn struct ss7NetworkTable_data *ss7NetworkTable_duplicate(struct ss7NetworkTable_data *thedata)
  * @param thedata the row structure to duplicate.
- * @brief duplicat a row structure for a table.
+ * @brief duplicate a row structure for a table.
  *
  * Duplicates the specified row structure @param thedata and returns a pointer to the newly
  * allocated row structure on success, or NULL on failure.
@@ -656,6 +750,18 @@ ss7NetworkTable_duplicate(struct ss7NetworkTable_data *thedata)
 
 	DEBUGMSGTL(("ss7MIB", "ss7NetworkTable_duplicate: duplicating row...  "));
 	if (StorageNew != NULL) {
+		StorageNew->ss7NetworkTable_id = thedata->ss7NetworkTable_id;
+		StorageNew->ss7NetworkId = thedata->ss7NetworkId;
+		if (!(StorageNew->ss7NetworkProtocolVariant = snmp_duplicate_objid(thedata->ss7NetworkProtocolVariant, thedata->ss7NetworkProtocolVariantLen / sizeof(oid))))
+			goto destroy;
+		StorageNew->ss7NetworkProtocolVariantLen = thedata->ss7NetworkProtocolVariantLen;
+		StorageNew->ss7NetworkProtocolVersion = thedata->ss7NetworkProtocolVersion;
+		if (!(StorageNew->ss7NetworkProtocolOptions = malloc(thedata->ss7NetworkProtocolOptionsLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->ss7NetworkProtocolOptions, thedata->ss7NetworkProtocolOptions, thedata->ss7NetworkProtocolOptionsLen);
+		StorageNew->ss7NetworkProtocolOptionsLen = thedata->ss7NetworkProtocolOptionsLen;
+		StorageNew->ss7NetworkProtocolOptions[StorageNew->ss7NetworkProtocolOptionsLen] = 0;
+		StorageNew->ss7NetworkRowStatus = thedata->ss7NetworkRowStatus;
 	}
       done:
 	DEBUGMSGTL(("ss7MIB", "done.\n"));
@@ -753,7 +859,7 @@ ss7NetworkTable_del(struct ss7NetworkTable_data *thedata)
  * @param line line from configuration file matching the token.
  * @brief parse configuration file for ss7NetworkTable entries.
  *
- * This callback is called by UCD-SNMP when it prases a configuration file and finds a configuration
+ * This callback is called by UCD-SNMP when it parses a configuration file and finds a configuration
  * file line for the registsred token (in this case ss7NetworkTable).  This routine is invoked by UCD-SNMP
  * to read the values of each row in the table from the configuration file.  Note that this
  * procedure may exist regardless of the persistence of the table.  If there are no configured
@@ -826,6 +932,98 @@ store_ss7NetworkTable(int majorID, int minorID, void *serverarg, void *clientarg
 	}
 	DEBUGMSGTL(("ss7MIB", "done.\n"));
 	return SNMPERR_SUCCESS;
+}
+
+/**
+ * @fn int activate_ss7NetworkTable_row(struct ss7NetworkTable_data *StorageTmp)
+ * @param StorageTmp the data row to activate
+ * @brief commit activation of a row to the underlying device
+ *
+ * This function is used by tables that contain a RowStatus object.  It is used to move the row from
+ * the RS_NOTINSERVICE state to the RS_ACTIVE state.  It is also used when transitioning from the
+ * RS_CREATEANDGO state to the RS_ACTIVE state.  If activation fails, the function should return
+ * SNMP_ERR_COMMITFAILED; otherwise, SNMP_ERR_NOERROR.
+ */
+int
+activate_ss7NetworkTable_row(struct ss7NetworkTable_data *StorageTmp)
+{
+	/* XXX: provide code to activate the row with the underlying device */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int deactivate_ss7NetworkTable_row(struct ss7NetworkTable_data *StorageTmp)
+ * @param StorageTmp the data row to deactivate
+ * @brief commit deactivation of a row to the underlying device
+ *
+ * This function is used by tables that contain a RowStatus object.  It is used to move the row from
+ * the RS_ACTIVE state to the RS_NOTINSERVICE state.  It is also used when transitioning from the
+ * RS_ACTIVE state to the RS_DESTROY state.  If deactivation fails, the function should return
+ * SNMP_ERR_COMMITFAILED; otherwise, SNMP_ERR_NOERROR.
+ */
+int
+deactivate_ss7NetworkTable_row(struct ss7NetworkTable_data *StorageTmp)
+{
+	/* XXX: provide code to deactivate the row with the underlying device */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int check_ss7NetworkTable_row(struct ss7NetworkTable_data *StorageTmp, struct ss7NetworkTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to check, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the ACTION phase.  The start of the ACTION pahse performs this consitency check
+ * on the row before allowing the request to proceed to the COMMIT phase.  This function can return
+ * SNMP_ERR_NOERR or a specific SNMP error value.  Values in StorageOld are the values before the
+ * varbinds on the mib were applied; the values in StorageTmp are the new values.  The function is
+ * permitted to change the values in StorageTmp to correct them; however, preference should be made
+ * for setting values where were not in the varbinds.
+ */
+int
+check_ss7NetworkTable_row(struct ss7NetworkTable_data *StorageTmp, struct ss7NetworkTable_data *StorageOld)
+{
+	/* XXX: provide code to check the row for consistency */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int update_ss7NetworkTable_row(struct ss7NetworkTable_data *StorageTmp, struct ss7NetworkTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the set operation (ACTION phase) on a row
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to update, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the COMMIT phase.  The start of the ACTION phase performs a consistency check on
+ * the row before allowing the request to proceed to the COMMIT phase.  The COMMIT phase then
+ * arrives here with consistency already checked (see check_ss7NetworkTable_row()).  This function can
+ * return SNMP_ERR_NOERROR or SNMP_ERR_COMMITFAILED.  Values in StorageOld are the values before the
+ * varbinds on the row were applied: the values in StorageTmp are the new values.
+ */
+int
+update_ss7NetworkTable_row(struct ss7NetworkTable_data *StorageTmp, struct ss7NetworkTable_data *StorageOld)
+{
+	/* XXX: provide code to update the row with the underlying device */
+	ss7NetworkTable_refresh = 1;
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int revert_ss7NetworkTable_row(struct ss7NetworkTable_data *StorageTmp, struct ss7NetworkTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the undo operation (UNDO phase) on a row
+ */
+void
+revert_ss7NetworkTable_row(struct ss7NetworkTable_data *StorageTmp, struct ss7NetworkTable_data *StorageOld)
+{
+	/* XXX: provide code to revert the row with the underlying device */
+	update_ss7NetworkTable_row(StorageOld, NULL);
 }
 
 /**
@@ -941,17 +1139,17 @@ var_ss7NetworkTable(struct variable *vp, oid * name, size_t *length, int exact, 
 int
 write_ss7NetworkProtocolVariant(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static oid *old_value;
-	struct ss7NetworkTable_data *StorageTmp = NULL;
+	struct ss7NetworkTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 15;
-	static size_t old_length = 0;
-	static oid *objid = NULL;
+	oid *objid = NULL;
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("ss7MIB", "write_ss7NetworkProtocolVariant entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(ss7NetworkTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
-		objid = NULL;
 		if (StorageTmp != NULL && statP == NULL) {
 			/* have row but no column */
 			switch (StorageTmp->ss7NetworkRowStatus) {
@@ -974,31 +1172,71 @@ write_ss7NetworkProtocolVariant(int action, u_char *var_val, u_char var_val_type
 			return SNMP_ERR_WRONGLENGTH;
 		}
 		/* Note: default value ss7ProtocolAnsi2000 */
-		break;
-	case RESERVE2:		/* memory reseveration, final preparation... */
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->ss7NetworkTable_old) == NULL)
+			if (StorageTmp->ss7NetworkTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->ss7NetworkTable_old = ss7NetworkTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->ss7NetworkTable_rsvs++;
 		if ((objid = snmp_duplicate_objid((void *) var_val, var_val_len / sizeof(oid))) == NULL)
 			return SNMP_ERR_RESOURCEUNAVAILABLE;
+		SNMP_FREE(StorageTmp->ss7NetworkProtocolVariant);
+		StorageTmp->ss7NetworkProtocolVariant = objid;
+		StorageTmp->ss7NetworkProtocolVariantLen = var_val_len / sizeof(oid);
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
+		break;
+	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->ss7NetworkTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->ss7NetworkTable_tsts == 0)
+				if ((ret = check_ss7NetworkTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->ss7NetworkTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->ss7NetworkProtocolVariant for you to use, and you have just been asked to do something with it.  Note that anything done 
 				   here must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->ss7NetworkProtocolVariant;
-		old_length = StorageTmp->ss7NetworkProtocolVariantLen;
-		StorageTmp->ss7NetworkProtocolVariant = objid;
-		StorageTmp->ss7NetworkProtocolVariantLen = var_val_len / sizeof(oid);
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->ss7NetworkTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->ss7NetworkTable_sets == 0)
+				if ((ret = update_ss7NetworkTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->ss7NetworkTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
-		SNMP_FREE(old_value);
-		old_length = 0;
-		objid = NULL;
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->ss7NetworkTable_old) != NULL) {
+			ss7NetworkTable_destroy(&StorageTmp->ss7NetworkTable_old);
+			StorageTmp->ss7NetworkTable_rsvs = 0;
+			StorageTmp->ss7NetworkTable_tsts = 0;
+			StorageTmp->ss7NetworkTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->ss7NetworkProtocolVariant = old_value;
-		StorageTmp->ss7NetworkProtocolVariantLen = old_length;
+		if ((StorageOld = StorageTmp->ss7NetworkTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->ss7NetworkTable_sets == 0)
+			revert_ss7NetworkTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
-		SNMP_FREE(objid);
+		if ((StorageOld = StorageTmp->ss7NetworkTable_old) == NULL)
+			break;
+		if (StorageOld->ss7NetworkProtocolVariant != NULL) {
+			SNMP_FREE(StorageTmp->ss7NetworkProtocolVariant);
+			StorageTmp->ss7NetworkProtocolVariant = StorageOld->ss7NetworkProtocolVariant;
+			StorageTmp->ss7NetworkProtocolVariantLen = StorageOld->ss7NetworkProtocolVariantLen;
+			StorageOld->ss7NetworkProtocolVariant = NULL;
+			StorageOld->ss7NetworkProtocolVariantLen = 0;
+		}
+		if (--StorageTmp->ss7NetworkTable_rsvs == 0)
+			ss7NetworkTable_destroy(&StorageTmp->ss7NetworkTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -1018,12 +1256,14 @@ write_ss7NetworkProtocolVariant(int action, u_char *var_val, u_char var_val_type
 int
 write_ss7NetworkProtocolVersion(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static ulong old_value;
-	struct ss7NetworkTable_data *StorageTmp = NULL;
+	struct ss7NetworkTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 15;
 	ulong set_value = *((ulong *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("ss7MIB", "write_ss7NetworkProtocolVersion entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(ss7NetworkTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -1054,22 +1294,61 @@ write_ss7NetworkProtocolVersion(int action, u_char *var_val, u_char var_val_type
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to ss7NetworkProtocolVersion: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->ss7NetworkTable_old) == NULL)
+			if (StorageTmp->ss7NetworkTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->ss7NetworkTable_old = ss7NetworkTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->ss7NetworkTable_rsvs++;
+		StorageTmp->ss7NetworkProtocolVersion = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->ss7NetworkTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->ss7NetworkTable_tsts == 0)
+				if ((ret = check_ss7NetworkTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->ss7NetworkTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->ss7NetworkProtocolVersion for you to use, and you have just been asked to do something with it.  Note that anything done 
 				   here must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->ss7NetworkProtocolVersion;
-		StorageTmp->ss7NetworkProtocolVersion = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->ss7NetworkTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->ss7NetworkTable_sets == 0)
+				if ((ret = update_ss7NetworkTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->ss7NetworkTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->ss7NetworkTable_old) != NULL) {
+			ss7NetworkTable_destroy(&StorageTmp->ss7NetworkTable_old);
+			StorageTmp->ss7NetworkTable_rsvs = 0;
+			StorageTmp->ss7NetworkTable_tsts = 0;
+			StorageTmp->ss7NetworkTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->ss7NetworkProtocolVersion = old_value;
+		if ((StorageOld = StorageTmp->ss7NetworkTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->ss7NetworkTable_sets == 0)
+			revert_ss7NetworkTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->ss7NetworkTable_old) == NULL)
+			break;
+		StorageTmp->ss7NetworkProtocolVersion = StorageOld->ss7NetworkProtocolVersion;
+		if (--StorageTmp->ss7NetworkTable_rsvs == 0)
+			ss7NetworkTable_destroy(&StorageTmp->ss7NetworkTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -1089,17 +1368,17 @@ write_ss7NetworkProtocolVersion(int action, u_char *var_val, u_char var_val_type
 int
 write_ss7NetworkProtocolOptions(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static uint8_t *old_value;
-	struct ss7NetworkTable_data *StorageTmp = NULL;
+	struct ss7NetworkTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 15;
-	static size_t old_length = 0;
-	static uint8_t *string = NULL;
+	uint8_t *string = NULL;
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("ss7MIB", "write_ss7NetworkProtocolOptions entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(ss7NetworkTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
-		string = NULL;
 		if (StorageTmp != NULL && statP == NULL) {
 			/* have row but no column */
 			switch (StorageTmp->ss7NetworkRowStatus) {
@@ -1121,54 +1400,110 @@ write_ss7NetworkProtocolOptions(int action, u_char *var_val, u_char var_val_type
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to ss7NetworkProtocolOptions: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
-		break;
-	case RESERVE2:		/* memory reseveration, final preparation... */
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->ss7NetworkTable_old) == NULL)
+			if (StorageTmp->ss7NetworkTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->ss7NetworkTable_old = ss7NetworkTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->ss7NetworkTable_rsvs++;
 		if ((string = malloc(var_val_len + 1)) == NULL)
 			return SNMP_ERR_RESOURCEUNAVAILABLE;
 		memcpy((void *) string, (void *) var_val, var_val_len);
 		string[var_val_len] = 0;
+		SNMP_FREE(StorageTmp->ss7NetworkProtocolOptions);
+		StorageTmp->ss7NetworkProtocolOptions = string;
+		StorageTmp->ss7NetworkProtocolOptionsLen = var_val_len;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
+		break;
+	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->ss7NetworkTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->ss7NetworkTable_tsts == 0)
+				if ((ret = check_ss7NetworkTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->ss7NetworkTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->ss7NetworkProtocolOptions for you to use, and you have just been asked to do something with it.  Note that anything done 
 				   here must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->ss7NetworkProtocolOptions;
-		old_length = StorageTmp->ss7NetworkProtocolOptionsLen;
-		StorageTmp->ss7NetworkProtocolOptions = string;
-		StorageTmp->ss7NetworkProtocolOptionsLen = var_val_len;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->ss7NetworkTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->ss7NetworkTable_sets == 0)
+				if ((ret = update_ss7NetworkTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->ss7NetworkTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
-		SNMP_FREE(old_value);
-		old_length = 0;
-		string = NULL;
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->ss7NetworkTable_old) != NULL) {
+			ss7NetworkTable_destroy(&StorageTmp->ss7NetworkTable_old);
+			StorageTmp->ss7NetworkTable_rsvs = 0;
+			StorageTmp->ss7NetworkTable_tsts = 0;
+			StorageTmp->ss7NetworkTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->ss7NetworkProtocolOptions = old_value;
-		StorageTmp->ss7NetworkProtocolOptionsLen = old_length;
+		if ((StorageOld = StorageTmp->ss7NetworkTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->ss7NetworkTable_sets == 0)
+			revert_ss7NetworkTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
-		SNMP_FREE(string);
+		if ((StorageOld = StorageTmp->ss7NetworkTable_old) == NULL)
+			break;
+		if (StorageOld->ss7NetworkProtocolOptions != NULL) {
+			SNMP_FREE(StorageTmp->ss7NetworkProtocolOptions);
+			StorageTmp->ss7NetworkProtocolOptions = StorageOld->ss7NetworkProtocolOptions;
+			StorageTmp->ss7NetworkProtocolOptionsLen = StorageOld->ss7NetworkProtocolOptionsLen;
+			StorageOld->ss7NetworkProtocolOptions = NULL;
+			StorageOld->ss7NetworkProtocolOptionsLen = 0;
+		}
+		if (--StorageTmp->ss7NetworkTable_rsvs == 0)
+			ss7NetworkTable_destroy(&StorageTmp->ss7NetworkTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
 }
 
 /**
- * @fn int ss7NetworkTable_consistent(struct ss7NetworkTable_data *thedata)
- * @param thedata the row data to check for consistency.
- * @brief check the internal consistency of a table row.
+ * @fn int can_act_ss7NetworkTable_row(struct ss7NetworkTable_data *StorageTmp)
+ * @param StorageTmp the data (as updated)
+ * @brief check whether an inactive table row can be activated
  *
- * This function checks the internal consistency of a table row for the ss7NetworkTable table.  If the
- * table row is internally consistent, then this function returns SNMP_ERR_NOERROR, otherwise the
- * function returns an SNMP error code and it will not be possible to activate the row until the
- * row's internal consistency is corrected.  This function might use a 'test' operation against the
- * driver to ensure that the commit phase will succeed.
+ * This function is used by the ACTION phase of a RowStatus object to test whether an inactive table
+ * row can be activated.  Returns SNMP_ERR_NOERROR when activation is permitted; an SNMP error
+ * value, otherwise.  This function might use a 'test' operation against the driver to ensure that
+ * the commit phase will succeed.
  */
 int
-ss7NetworkTable_consistent(struct ss7NetworkTable_data *thedata)
+can_act_ss7NetworkTable_row(struct ss7NetworkTable_data *StorageTmp)
 {
-	/* XXX: check row consistency return SNMP_ERR_NOERROR if consistent, or an SNMP error code if not. */
-	return (SNMP_ERR_NOERROR);
+	/* XXX: provide code to check whether the new or inactive table row can be activated */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int can_deact_ss7NetworkTable_row(struct ss7NetworkTable_data *StorageTmp)
+ * @param StorageTmp the data (as updated)
+ * @brief check whether an active table row can be deactivated
+ *
+ * This function is used by the ACTION phase of a RowStatus object to test whether an active table
+ * row can be deactivated.  Returns SNMP_ERR_NOERROR when deactivation is permitted; an SNMP error
+ * value, otherwise.  This function might use a 'test' operation against the driver to ensure that
+ * the commit phase will succeed.
+ */
+int
+can_deact_ss7NetworkTable_row(struct ss7NetworkTable_data *StorageTmp)
+{
+	/* XXX: provide code to check whether the active table row can be deactivated */
+	return SNMP_ERR_NOERROR;
 }
 
 /**
@@ -1185,10 +1520,9 @@ ss7NetworkTable_consistent(struct ss7NetworkTable_data *thedata)
 int
 write_ss7NetworkRowStatus(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	struct ss7NetworkTable_data *StorageTmp = NULL;
+	struct ss7NetworkTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	static struct ss7NetworkTable_data *StorageNew, *StorageDel;
 	size_t newlen = name_len - 15;
-	static int old_value;
 	int set_value, ret;
 	static struct variable_list *vars, *vp;
 
@@ -1215,40 +1549,6 @@ write_ss7NetworkRowStatus(int action, u_char *var_val, u_char var_val_type, size
 			if (StorageTmp != NULL)
 				/* cannot create existing row */
 				return SNMP_ERR_INCONSISTENTVALUE;
-			break;
-		case RS_ACTIVE:
-		case RS_NOTINSERVICE:
-			if (StorageTmp == NULL)
-				/* cannot change state of non-existent row */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			if (StorageTmp->ss7NetworkRowStatus == RS_NOTREADY)
-				/* cannot change state of row that is not ready */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			/* XXX: interaction with row storage type needed */
-			if (set_value == RS_NOTINSERVICE && StorageTmp->ss7NetworkTable_refs > 0)
-				/* row is busy and cannot be moved to the RS_NOTINSERVICE state */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			break;
-		case RS_DESTROY:
-			/* destroying existent or non-existent row is ok */
-			if (StorageTmp == NULL)
-				break;
-			/* XXX: interaction with row storage type needed */
-			if (StorageTmp->ss7NetworkTable_refs > 0)
-				/* row is busy and cannot be deleted */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			break;
-		case RS_NOTREADY:
-			/* management station cannot set this, only agent can */
-		default:
-			return SNMP_ERR_INCONSISTENTVALUE;
-		}
-		break;
-	case RESERVE2:
-		/* memory reseveration, final preparation... */
-		switch (set_value) {
-		case RS_CREATEANDGO:
-		case RS_CREATEANDWAIT:
 			/* creation */
 			vars = NULL;
 			/* ss7NetworkId */
@@ -1278,12 +1578,43 @@ write_ss7NetworkRowStatus(int action, u_char *var_val, u_char var_val_type, size
 				snmp_free_varbind(vars);
 				return SNMP_ERR_RESOURCEUNAVAILABLE;
 			}
+			StorageNew->ss7NetworkTable_rsvs = 1;
 			vp = vars;
 			StorageNew->ss7NetworkId = (long) *vp->val.integer;
 			vp = vp->next_variable;
 			header_complex_add_data(&ss7NetworkTableStorage, vars, StorageNew);	/* frees vars */
 			break;
+		case RS_ACTIVE:
+		case RS_NOTINSERVICE:
+			if (StorageTmp == NULL)
+				/* cannot change state of non-existent row */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			if (StorageTmp->ss7NetworkRowStatus == RS_NOTREADY)
+				/* cannot change state of row that is not ready */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			/* XXX: interaction with row storage type needed */
+			if (set_value == RS_NOTINSERVICE && StorageTmp->ss7NetworkTable_refs > 0)
+				/* row is busy and cannot be moved to the RS_NOTINSERVICE state */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			/* activate or deactivate */
+			if (StorageTmp == NULL)
+				return SNMP_ERR_NOSUCHNAME;
+			/* one allocation for the whole row */
+			if ((StorageOld = StorageTmp->ss7NetworkTable_old) == NULL)
+				if (StorageTmp->ss7NetworkTable_rsvs == 0)
+					if ((StorageOld = StorageTmp->ss7NetworkTable_old = ss7NetworkTable_duplicate(StorageTmp)) == NULL)
+						return SNMP_ERR_RESOURCEUNAVAILABLE;
+			if (StorageOld != NULL)
+				StorageTmp->ss7NetworkTable_rsvs++;
+			break;
 		case RS_DESTROY:
+			if (StorageTmp == NULL)
+				/* cannot destroy non-existent row */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			/* XXX: interaction with row storage type needed */
+			if (StorageTmp->ss7NetworkTable_refs > 0)
+				/* row is busy and cannot be deleted */
+				return SNMP_ERR_INCONSISTENTVALUE;
 			/* destroy */
 			if (StorageTmp != NULL) {
 				/* exists, extract it for now */
@@ -1293,78 +1624,127 @@ write_ss7NetworkRowStatus(int action, u_char *var_val, u_char var_val_type, size
 				StorageDel = NULL;
 			}
 			break;
+		case RS_NOTREADY:
+			/* management station cannot set this, only agent can */
+		default:
+			return SNMP_ERR_INCONSISTENTVALUE;
 		}
 		break;
-	case ACTION:
-		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the UNDO case */
+	case RESERVE2:
+		/* memory reseveration, final preparation... */
 		switch (set_value) {
 		case RS_CREATEANDGO:
 			/* check that activation is possible */
-			if ((ret = ss7NetworkTable_consistent(StorageNew)) != SNMP_ERR_NOERROR)
+			if ((ret = can_act_ss7NetworkTable_row(StorageNew)) != SNMP_ERR_NOERROR)
 				return (ret);
 			break;
 		case RS_CREATEANDWAIT:
-			/* row does not have to be consistent */
 			break;
 		case RS_ACTIVE:
-			old_value = StorageTmp->ss7NetworkRowStatus;
-			StorageTmp->ss7NetworkRowStatus = set_value;
-			if (old_value != RS_ACTIVE) {
-				/* check that activation is possible */
-				if ((ret = ss7NetworkTable_consistent(StorageTmp)) != SNMP_ERR_NOERROR) {
-					StorageTmp->ss7NetworkRowStatus = old_value;
+			/* check that activation is possible */
+			if (StorageTmp->ss7NetworkRowStatus != RS_ACTIVE)
+				if ((ret = can_act_ss7NetworkTable_row(StorageTmp)) != SNMP_ERR_NOERROR)
 					return (ret);
-				}
+			break;
+		case RS_NOTINSERVICE:
+			/* check that deactivation is possible */
+			if (StorageTmp->ss7NetworkRowStatus != RS_NOTINSERVICE)
+				if ((ret = can_deact_ss7NetworkTable_row(StorageTmp)) != SNMP_ERR_NOERROR)
+					return (ret);
+			break;
+		case RS_DESTROY:
+			/* check that deactivation is possible */
+			if (StorageTmp->ss7NetworkRowStatus != RS_NOTINSERVICE)
+				if ((ret = can_deact_ss7NetworkTable_row(StorageTmp)) != SNMP_ERR_NOERROR)
+					return (ret);
+			break;
+		default:
+			return SNMP_ERR_WRONGVALUE;
+		}
+		break;
+	case ACTION:
+		/* The variable has been stored in StorageTmp->ss7NetworkRowStatus for you to use, and you have just been asked to do something with it.  Note that anything done here must be
+		   reversable in the UNDO case */
+		switch (set_value) {
+		case RS_CREATEANDGO:
+			/* activate with underlying device */
+			if (activate_ss7NetworkTable_row(StorageNew) != SNMP_ERR_NOERROR)
+				return SNMP_ERR_COMMITFAILED;
+			break;
+		case RS_CREATEANDWAIT:
+			break;
+		case RS_ACTIVE:
+			/* state change already performed */
+			if (StorageTmp->ss7NetworkRowStatus != RS_ACTIVE) {
+				/* activate with underlying device */
+				if (activate_ss7NetworkTable_row(StorageTmp) != SNMP_ERR_NOERROR)
+					return SNMP_ERR_COMMITFAILED;
 			}
 			break;
 		case RS_NOTINSERVICE:
-			/* set the flag? */
-			old_value = StorageTmp->ss7NetworkRowStatus;
-			StorageTmp->ss7NetworkRowStatus = set_value;
+			/* state change already performed */
+			if (StorageTmp->ss7NetworkRowStatus != RS_NOTINSERVICE) {
+				/* deactivate with underlying device */
+				if (deactivate_ss7NetworkTable_row(StorageTmp) != SNMP_ERR_NOERROR)
+					return SNMP_ERR_COMMITFAILED;
+			}
 			break;
+		case RS_DESTROY:
+			/* commit destrution to underlying device */
+			if (StorageDel == NULL)
+				break;
+			/* deactivate with underlying device */
+			if (deactivate_ss7NetworkTable_row(StorageDel) != SNMP_ERR_NOERROR)
+				return SNMP_ERR_COMMITFAILED;
+			break;
+		default:
+			return SNMP_ERR_WRONGVALUE;
 		}
 		break;
 	case COMMIT:
 		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		switch (set_value) {
 		case RS_CREATEANDGO:
-			/* row creation, set final state */
-			/* XXX: commit creation to underlying device */
-			/* XXX: activate with underlying device */
 			StorageNew->ss7NetworkRowStatus = RS_ACTIVE;
 			break;
 		case RS_CREATEANDWAIT:
-			/* row creation, set final state */
 			StorageNew->ss7NetworkRowStatus = RS_NOTINSERVICE;
 			break;
 		case RS_ACTIVE:
 		case RS_NOTINSERVICE:
-			/* state change already performed */
-			if (old_value != set_value) {
-				switch (set_value) {
-				case RS_ACTIVE:
-					/* XXX: activate with underlying device */
-					break;
-				case RS_NOTINSERVICE:
-					/* XXX: deactivate with underlying device */
-					break;
-				}
+			StorageNew->ss7NetworkRowStatus = set_value;
+			if ((StorageOld = StorageTmp->ss7NetworkTable_old) != NULL) {
+				ss7NetworkTable_destroy(&StorageTmp->ss7NetworkTable_old);
+				StorageTmp->ss7NetworkTable_rsvs = 0;
+				StorageTmp->ss7NetworkTable_tsts = 0;
+				StorageTmp->ss7NetworkTable_sets = 0;
 			}
 			break;
 		case RS_DESTROY:
-			/* row deletion, free it its dead */
 			ss7NetworkTable_destroy(&StorageDel);
-			/* ss7NetworkTable_destroy() can handle NULL pointers. */
 			break;
 		}
 		break;
 	case UNDO:
 		/* Back out any changes made in the ACTION case */
 		switch (set_value) {
+		case RS_CREATEANDGO:
+			/* deactivate with underlying device */
+			deactivate_ss7NetworkTable_row(StorageNew);
+			break;
+		case RS_CREATEANDWAIT:
+			break;
 		case RS_ACTIVE:
+			if (StorageTmp->ss7NetworkRowStatus == RS_NOTINSERVICE)
+				/* deactivate with underlying device */
+				deactivate_ss7NetworkTable_row(StorageTmp);
+			break;
 		case RS_NOTINSERVICE:
-			/* restore state */
-			StorageTmp->ss7NetworkRowStatus = old_value;
+			if (StorageTmp->ss7NetworkRowStatus == RS_ACTIVE)
+				/* activate with underlying device */
+				activate_ss7NetworkTable_row(StorageTmp);
+			break;
+		case RS_DESTROY:
 			break;
 		}
 		/* fall through */
@@ -1378,6 +1758,13 @@ write_ss7NetworkRowStatus(int action, u_char *var_val, u_char var_val_type, size
 				ss7NetworkTable_del(StorageNew);
 				ss7NetworkTable_destroy(&StorageNew);
 			}
+			break;
+		case RS_ACTIVE:
+		case RS_NOTINSERVICE:
+			if ((StorageOld = StorageTmp->ss7NetworkTable_old) == NULL)
+				break;
+			if (--StorageTmp->ss7NetworkTable_rsvs == 0)
+				ss7NetworkTable_destroy(&StorageTmp->ss7NetworkTable_old);
 			break;
 		case RS_DESTROY:
 			/* row deletion, so add it again */

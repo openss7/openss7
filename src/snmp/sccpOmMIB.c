@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2012  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -764,18 +764,24 @@ sccpOmMIB_create(void)
 	DEBUGMSGTL(("sccpOmMIB", "sccpOmMIB_create: creating scalars...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default scalar values here into StorageNew */
-		if ((StorageNew->sccpOm1stAndIntervalActivate = snmp_duplicate_objid(zeroDotZero_oid, 2)))
-			StorageNew->sccpOm1stAndIntervalActivateLen = 2;
-		if ((StorageNew->sccpOm1stAndIntervalDeactivate = snmp_duplicate_objid(zeroDotZero_oid, 2)))
-			StorageNew->sccpOm1stAndIntervalDeactivateLen = 2;
-		if ((StorageNew->sccpOm5MinActivate = snmp_duplicate_objid(zeroDotZero_oid, 2)))
-			StorageNew->sccpOm5MinActivateLen = 2;
-		if ((StorageNew->sccpOm5MinDeaActivate = snmp_duplicate_objid(zeroDotZero_oid, 2)))
-			StorageNew->sccpOm5MinDeaActivateLen = 2;
-		if ((StorageNew->sccpOm15MinActivate = snmp_duplicate_objid(zeroDotZero_oid, 2)))
-			StorageNew->sccpOm15MinActivateLen = 2;
-		if ((StorageNew->sccpOm15MinDeaActivate = snmp_duplicate_objid(zeroDotZero_oid, 2)))
-			StorageNew->sccpOm15MinDeaActivateLen = 2;
+		if ((StorageNew->sccpOm1stAndIntervalActivate = snmp_duplicate_objid(zeroDotZero_oid, 2)) == NULL)
+			goto nomem;
+		StorageNew->sccpOm1stAndIntervalActivateLen = 2;
+		if ((StorageNew->sccpOm1stAndIntervalDeactivate = snmp_duplicate_objid(zeroDotZero_oid, 2)) == NULL)
+			goto nomem;
+		StorageNew->sccpOm1stAndIntervalDeactivateLen = 2;
+		if ((StorageNew->sccpOm5MinActivate = snmp_duplicate_objid(zeroDotZero_oid, 2)) == NULL)
+			goto nomem;
+		StorageNew->sccpOm5MinActivateLen = 2;
+		if ((StorageNew->sccpOm5MinDeaActivate = snmp_duplicate_objid(zeroDotZero_oid, 2)) == NULL)
+			goto nomem;
+		StorageNew->sccpOm5MinDeaActivateLen = 2;
+		if ((StorageNew->sccpOm15MinActivate = snmp_duplicate_objid(zeroDotZero_oid, 2)) == NULL)
+			goto nomem;
+		StorageNew->sccpOm15MinActivateLen = 2;
+		if ((StorageNew->sccpOm15MinDeaActivate = snmp_duplicate_objid(zeroDotZero_oid, 2)) == NULL)
+			goto nomem;
+		StorageNew->sccpOm15MinDeaActivateLen = 2;
 		StorageNew->sccpOmDiscontinuityTime = 0;
 		StorageNew->sccpOmTimeStamp = 0;
 		StorageNew->sccpOm5MinMaxIntervals = 96;
@@ -785,8 +791,63 @@ sccpOmMIB_create(void)
 		StorageNew->sccpOmNrOfRestrictionLevelsDefault = 8;
 
 	}
+      done:
 	DEBUGMSGTL(("sccpOmMIB", "done.\n"));
 	return (StorageNew);
+	goto nomem;
+      nomem:
+	sccpOmMIB_destroy(&StorageNew);
+	goto done;
+}
+
+/**
+ * @fn struct sccpOmMIB_data *sccpOmMIB_duplicate(struct sccpOmMIB_data *thedata)
+ * @param thedata the mib structure to duplicate
+ * @brief duplicate a mib structure for the mib
+ *
+ * Duplicates the specified mib structure @param thedata and returns a pointer to the newly
+ * allocated mib structure on success, or NULL on failure.
+ */
+struct sccpOmMIB_data *
+sccpOmMIB_duplicate(struct sccpOmMIB_data *thedata)
+{
+	struct sccpOmMIB_data *StorageNew = SNMP_MALLOC_STRUCT(sccpOmMIB_data);
+
+	DEBUGMSGTL(("sccpOmMIB", "sccpOmMIB_duplicate: duplicating mib... "));
+	if (StorageNew != NULL) {
+		if (!(StorageNew->sccpOm1stAndIntervalActivate = snmp_duplicate_objid(thedata->sccpOm1stAndIntervalActivate, thedata->sccpOm1stAndIntervalActivateLen / sizeof(oid))))
+			goto destroy;
+		StorageNew->sccpOm1stAndIntervalActivateLen = thedata->sccpOm1stAndIntervalActivateLen;
+		if (!(StorageNew->sccpOm1stAndIntervalDeactivate = snmp_duplicate_objid(thedata->sccpOm1stAndIntervalDeactivate, thedata->sccpOm1stAndIntervalDeactivateLen / sizeof(oid))))
+			goto destroy;
+		StorageNew->sccpOm1stAndIntervalDeactivateLen = thedata->sccpOm1stAndIntervalDeactivateLen;
+		if (!(StorageNew->sccpOm5MinActivate = snmp_duplicate_objid(thedata->sccpOm5MinActivate, thedata->sccpOm5MinActivateLen / sizeof(oid))))
+			goto destroy;
+		StorageNew->sccpOm5MinActivateLen = thedata->sccpOm5MinActivateLen;
+		if (!(StorageNew->sccpOm5MinDeaActivate = snmp_duplicate_objid(thedata->sccpOm5MinDeaActivate, thedata->sccpOm5MinDeaActivateLen / sizeof(oid))))
+			goto destroy;
+		StorageNew->sccpOm5MinDeaActivateLen = thedata->sccpOm5MinDeaActivateLen;
+		if (!(StorageNew->sccpOm15MinActivate = snmp_duplicate_objid(thedata->sccpOm15MinActivate, thedata->sccpOm15MinActivateLen / sizeof(oid))))
+			goto destroy;
+		StorageNew->sccpOm15MinActivateLen = thedata->sccpOm15MinActivateLen;
+		if (!(StorageNew->sccpOm15MinDeaActivate = snmp_duplicate_objid(thedata->sccpOm15MinDeaActivate, thedata->sccpOm15MinDeaActivateLen / sizeof(oid))))
+			goto destroy;
+		StorageNew->sccpOm15MinDeaActivateLen = thedata->sccpOm15MinDeaActivateLen;
+		StorageNew->sccpOmDiscontinuityTime = thedata->sccpOmDiscontinuityTime;
+		StorageNew->sccpOmTimeStamp = thedata->sccpOmTimeStamp;
+		StorageNew->sccpOm5MinMaxIntervals = thedata->sccpOm5MinMaxIntervals;
+		StorageNew->sccpOm15MinMaxIntervals = thedata->sccpOm15MinMaxIntervals;
+		StorageNew->sccpOmpDefault = thedata->sccpOmpDefault;
+		StorageNew->sccpOmNrOfSubLevelsDefault = thedata->sccpOmNrOfSubLevelsDefault;
+		StorageNew->sccpOmNrOfRestrictionLevelsDefault = thedata->sccpOmNrOfRestrictionLevelsDefault;
+	}
+      done:
+	DEBUGMSGTL(("sccpOmMIB", "done.\n"));
+	return (StorageNew);
+	goto destroy;
+      destroy:
+	sccpOmMIB_destroy(&StorageNew);
+	goto done;
 }
 
 /**
@@ -849,7 +910,7 @@ sccpOmMIB_add(struct sccpOmMIB_data *thedata)
  * @param line line from configuration file matching the token.
  * @brief parse configuration file for sccpOmMIB entries.
  *
- * This callback is called by UCD-SNMP when it prases a configuration file and finds a configuration
+ * This callback is called by UCD-SNMP when it parses a configuration file and finds a configuration
  * file line for the registsred token (in this case sccpOmMIB).  This routine is invoked by
  * UCD-SNMP to read the values of scalars in the MIB from the configuration file.  Note that this
  * procedure may exist regardless of the persistence of the MIB.  If there are no configured entries
@@ -960,6 +1021,62 @@ store_sccpOmMIB(int majorID, int minorID, void *serverarg, void *clientarg)
 }
 
 /**
+ * @fn int check_sccpOmMIB(struct sccpOmMIB_data *StorageTmp, struct sccpOmMIB_data *StorageOld)
+ * @param StorageTmp the data as updated
+ * @param StorageOld the data previous to update
+ *
+ * This function is used by mibs.  It is used to check, all scalars at a time, the varbinds
+ * belonging to the mib.  This function is called for the first varbind in a mib at the beginning of
+ * the ACTION phase.  The COMMIT phase does not ensue unless this check passes.  This function can
+ * return SNMP_ERR_NOERR or a specific SNMP error value.  Values in StorageOld are the values before
+ * the varbinds on the mib were applied; the values in StorageTmp are the new values.  The function
+ * is permitted to change the values in StorageTmp to correct them; however, preferences should be
+ * made for setting values that were not in the varbinds.
+ */
+int
+check_sccpOmMIB(struct sccpOmMIB_data *StorageTmp, struct sccpOmMIB_data *StorageOld)
+{
+	/* XXX: provide code to check the scalars for consistency */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int update_sccpOmMIB(struct sccpOmMIB_data *StorageTmp, struct sccpOmMIB_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the set operation (ACTION phase)
+ *
+ * This function is used by mibs.  It is used to update, all scalars at a time, the varbinds
+ * belonging to the mib.  This function is called for the first varbind in a mib at the beginning of
+ * the COMMIT phase.  The start of the ACTION phase performs a consistency check on the mib before
+ * allowing the request to proceed to the COMMIT phase.  The COMMIT phase then arrives here with
+ * consistency already checked (see check_sccpOmMIB()).  This function can
+ * return SNMP_ERR_NOERROR or SNMP_ERR_COMMITFAILED.  Values in StorageOld are the values before the
+ * varbinds on the mib were applied: the values in StorageTmp are the new values.
+ */
+int
+update_sccpOmMIB(struct sccpOmMIB_data *StorageTmp, struct sccpOmMIB_data *StorageOld)
+{
+	/* XXX: provide code to update the row with the underlying device */
+	sccpOmMIB_refresh = 1;
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn revert_sccpOmMIB(struct 
+ * @fn void revert_sccpOmMIB(struct sccpOmMIB_data *StorageTmp, struct sccpOmMIB_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the undo operation (UNDO phase)
+ */
+void
+revert_sccpOmMIB(struct sccpOmMIB_data *StorageTmp, struct sccpOmMIB_data *StorageOld)
+{
+	/* XXX: provide code to revert the row with the underlying device */
+	update_sccpOmMIB(StorageOld, NULL);
+}
+
+/**
  * @fn void refresh_sccpOmMIB(int force)
  * @param force forced refresh when non-zero.
  * @brief refresh the scalar values of sccpOmMIB.
@@ -1057,7 +1174,7 @@ var_sccpOmMIB(struct variable *vp, oid * name, size_t *length, int exact, size_t
 	case (u_char) SCCPOM15MINACTIVATE:	/* ReadWrite */
 		*write_method = write_sccpOm15MinActivate;
 		if (!StorageTmp)
-		break;
+			break;
 		*var_len = StorageTmp->sccpOm15MinActivateLen * sizeof(oid);
 		rval = (u_char *) StorageTmp->sccpOm15MinActivate;
 		break;
@@ -1141,8 +1258,10 @@ sccpOmErrorsTable_create(void)
 	DEBUGMSGTL(("sccpOmMIB", "sccpOmErrorsTable_create: creating row...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
-		if ((StorageNew->sccpNetworkEntityId = (uint8_t *) strdup("")) != NULL)
-			StorageNew->sccpNetworkEntityIdLen = strlen("");
+		if ((StorageNew->sccpNetworkEntityId = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->sccpNetworkEntityIdLen = 0;
+		StorageNew->sccpNetworkEntityId[StorageNew->sccpNetworkEntityIdLen] = 0;
 		StorageNew->sccpOmNoTranslatorForAddress = 0;
 		StorageNew->sccpOmNoRuleForAddress = 0;
 		StorageNew->sccpOmPointCodeNotAvailable = 0;
@@ -1166,16 +1285,20 @@ sccpOmErrorsTable_create(void)
 		StorageNew->sccpOmReassemblyFailure = 0;
 		StorageNew->sccpOmErrors5MinValidIntervals = 0;
 		StorageNew->sccpOmErrors15MinValidIntervals = 0;
-
 	}
+      done:
 	DEBUGMSGTL(("sccpOmMIB", "done.\n"));
 	return (StorageNew);
+	goto nomem;
+      nomem:
+	sccpOmErrorsTable_destroy(&StorageNew);
+	goto done;
 }
 
 /**
  * @fn struct sccpOmErrorsTable_data *sccpOmErrorsTable_duplicate(struct sccpOmErrorsTable_data *thedata)
  * @param thedata the row structure to duplicate.
- * @brief duplicat a row structure for a table.
+ * @brief duplicate a row structure for a table.
  *
  * Duplicates the specified row structure @param thedata and returns a pointer to the newly
  * allocated row structure on success, or NULL on failure.
@@ -1187,6 +1310,35 @@ sccpOmErrorsTable_duplicate(struct sccpOmErrorsTable_data *thedata)
 
 	DEBUGMSGTL(("sccpOmMIB", "sccpOmErrorsTable_duplicate: duplicating row...  "));
 	if (StorageNew != NULL) {
+		StorageNew->sccpOmErrorsTable_id = thedata->sccpOmErrorsTable_id;
+		if (!(StorageNew->sccpNetworkEntityId = malloc(thedata->sccpNetworkEntityIdLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->sccpNetworkEntityId, thedata->sccpNetworkEntityId, thedata->sccpNetworkEntityIdLen);
+		StorageNew->sccpNetworkEntityIdLen = thedata->sccpNetworkEntityIdLen;
+		StorageNew->sccpNetworkEntityId[StorageNew->sccpNetworkEntityIdLen] = 0;
+		StorageNew->sccpOmNoTranslatorForAddress = thedata->sccpOmNoTranslatorForAddress;
+		StorageNew->sccpOmNoRuleForAddress = thedata->sccpOmNoRuleForAddress;
+		StorageNew->sccpOmPointCodeNotAvailable = thedata->sccpOmPointCodeNotAvailable;
+		StorageNew->sccpOmPointCodeCongested = thedata->sccpOmPointCodeCongested;
+		StorageNew->sccpOmSubsystemUnavailable = thedata->sccpOmSubsystemUnavailable;
+		StorageNew->sccpOmSubsystemCongested = thedata->sccpOmSubsystemCongested;
+		StorageNew->sccpOmUnequippedSubsystem = thedata->sccpOmUnequippedSubsystem;
+		StorageNew->sccpOmSyntaxErrorDetected = thedata->sccpOmSyntaxErrorDetected;
+		StorageNew->sccpOmRoutingFailure = thedata->sccpOmRoutingFailure;
+		StorageNew->sccpOmReassemblyTimeOut = thedata->sccpOmReassemblyTimeOut;
+		StorageNew->sccpOmSegmentOutOfOrder = thedata->sccpOmSegmentOutOfOrder;
+		StorageNew->sccpOmNoReassemblySpace = thedata->sccpOmNoReassemblySpace;
+		StorageNew->sccpOmHopCounterViolation = thedata->sccpOmHopCounterViolation;
+		StorageNew->sccpOmTooLargeForSegmentation = thedata->sccpOmTooLargeForSegmentation;
+		StorageNew->sccpOmReleaseFailure = thedata->sccpOmReleaseFailure;
+		StorageNew->sccpOmInactivityTimerExpiry = thedata->sccpOmInactivityTimerExpiry;
+		StorageNew->sccpOmProviderInitiatedReset = thedata->sccpOmProviderInitiatedReset;
+		StorageNew->sccpOmProviderInitiatedRelease = thedata->sccpOmProviderInitiatedRelease;
+		StorageNew->sccpOmNoSegmentationSupport = thedata->sccpOmNoSegmentationSupport;
+		StorageNew->sccpOmSegmentationFailure = thedata->sccpOmSegmentationFailure;
+		StorageNew->sccpOmReassemblyFailure = thedata->sccpOmReassemblyFailure;
+		StorageNew->sccpOmErrors5MinValidIntervals = thedata->sccpOmErrors5MinValidIntervals;
+		StorageNew->sccpOmErrors15MinValidIntervals = thedata->sccpOmErrors15MinValidIntervals;
 	}
       done:
 	DEBUGMSGTL(("sccpOmMIB", "done.\n"));
@@ -1282,7 +1434,7 @@ sccpOmErrorsTable_del(struct sccpOmErrorsTable_data *thedata)
  * @param line line from configuration file matching the token.
  * @brief parse configuration file for sccpOmErrorsTable entries.
  *
- * This callback is called by UCD-SNMP when it prases a configuration file and finds a configuration
+ * This callback is called by UCD-SNMP when it parses a configuration file and finds a configuration
  * file line for the registsred token (in this case sccpOmErrorsTable).  This routine is invoked by UCD-SNMP
  * to read the values of each row in the table from the configuration file.  Note that this
  * procedure may exist regardless of the persistence of the table.  If there are no configured
@@ -1406,8 +1558,10 @@ sccpOmMessageTable_create(void)
 	DEBUGMSGTL(("sccpOmMIB", "sccpOmMessageTable_create: creating row...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
-		if ((StorageNew->sccpNetworkEntityId = (uint8_t *) strdup("")) != NULL)
-			StorageNew->sccpNetworkEntityIdLen = strlen("");
+		if ((StorageNew->sccpNetworkEntityId = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->sccpNetworkEntityIdLen = 0;
+		StorageNew->sccpNetworkEntityId[StorageNew->sccpNetworkEntityIdLen] = 0;
 		StorageNew->sccpOmTotalMessagesHandled = 0;
 		StorageNew->sccpOmTotalMessagesLocal = 0;
 		StorageNew->sccpOmTotalMessagesGTT = 0;
@@ -1433,16 +1587,20 @@ sccpOmMessageTable_create(void)
 		StorageNew->sccpOmLUDTSMessagesReceived = 0;
 		StorageNew->sccpOmMessage5MinValidIntervals = 0;
 		StorageNew->sccpOmMessage15MinValidIntervals = 0;
-
 	}
+      done:
 	DEBUGMSGTL(("sccpOmMIB", "done.\n"));
 	return (StorageNew);
+	goto nomem;
+      nomem:
+	sccpOmMessageTable_destroy(&StorageNew);
+	goto done;
 }
 
 /**
  * @fn struct sccpOmMessageTable_data *sccpOmMessageTable_duplicate(struct sccpOmMessageTable_data *thedata)
  * @param thedata the row structure to duplicate.
- * @brief duplicat a row structure for a table.
+ * @brief duplicate a row structure for a table.
  *
  * Duplicates the specified row structure @param thedata and returns a pointer to the newly
  * allocated row structure on success, or NULL on failure.
@@ -1454,6 +1612,37 @@ sccpOmMessageTable_duplicate(struct sccpOmMessageTable_data *thedata)
 
 	DEBUGMSGTL(("sccpOmMIB", "sccpOmMessageTable_duplicate: duplicating row...  "));
 	if (StorageNew != NULL) {
+		StorageNew->sccpOmMessageTable_id = thedata->sccpOmMessageTable_id;
+		if (!(StorageNew->sccpNetworkEntityId = malloc(thedata->sccpNetworkEntityIdLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->sccpNetworkEntityId, thedata->sccpNetworkEntityId, thedata->sccpNetworkEntityIdLen);
+		StorageNew->sccpNetworkEntityIdLen = thedata->sccpNetworkEntityIdLen;
+		StorageNew->sccpNetworkEntityId[StorageNew->sccpNetworkEntityIdLen] = 0;
+		StorageNew->sccpOmTotalMessagesHandled = thedata->sccpOmTotalMessagesHandled;
+		StorageNew->sccpOmTotalMessagesLocal = thedata->sccpOmTotalMessagesLocal;
+		StorageNew->sccpOmTotalMessagesGTT = thedata->sccpOmTotalMessagesGTT;
+		StorageNew->sccpOmUDTMessagesSent = thedata->sccpOmUDTMessagesSent;
+		StorageNew->sccpOmUDTSMessagesSent = thedata->sccpOmUDTSMessagesSent;
+		StorageNew->sccpOmUDTMessagesReceived = thedata->sccpOmUDTMessagesReceived;
+		StorageNew->sccpOmUDTSMessagesReceived = thedata->sccpOmUDTSMessagesReceived;
+		StorageNew->sccpOmCRMessagesSent = thedata->sccpOmCRMessagesSent;
+		StorageNew->sccpOmCREFMessagesSent = thedata->sccpOmCREFMessagesSent;
+		StorageNew->sccpOmCRMessagesReceived = thedata->sccpOmCRMessagesReceived;
+		StorageNew->sccpOmCREFMessagesReceived = thedata->sccpOmCREFMessagesReceived;
+		StorageNew->sccpOmRSRMessagesSent = thedata->sccpOmRSRMessagesSent;
+		StorageNew->sccpOmRSRMessagesReceived = thedata->sccpOmRSRMessagesReceived;
+		StorageNew->sccpOmERRMessagesSent = thedata->sccpOmERRMessagesSent;
+		StorageNew->sccpOmERRMessagesReceived = thedata->sccpOmERRMessagesReceived;
+		StorageNew->sccpOmXUDTMessagesSent = thedata->sccpOmXUDTMessagesSent;
+		StorageNew->sccpOmXUDTSMessagesSent = thedata->sccpOmXUDTSMessagesSent;
+		StorageNew->sccpOmXUDTMessagesReceived = thedata->sccpOmXUDTMessagesReceived;
+		StorageNew->sccpOmXUDTSMessagesReceived = thedata->sccpOmXUDTSMessagesReceived;
+		StorageNew->sccpOmLUDTMessagesSent = thedata->sccpOmLUDTMessagesSent;
+		StorageNew->sccpOmLUDTSMessagesSent = thedata->sccpOmLUDTSMessagesSent;
+		StorageNew->sccpOmLUDTMessagesReceived = thedata->sccpOmLUDTMessagesReceived;
+		StorageNew->sccpOmLUDTSMessagesReceived = thedata->sccpOmLUDTSMessagesReceived;
+		StorageNew->sccpOmMessage5MinValidIntervals = thedata->sccpOmMessage5MinValidIntervals;
+		StorageNew->sccpOmMessage15MinValidIntervals = thedata->sccpOmMessage15MinValidIntervals;
 	}
       done:
 	DEBUGMSGTL(("sccpOmMIB", "done.\n"));
@@ -1549,7 +1738,7 @@ sccpOmMessageTable_del(struct sccpOmMessageTable_data *thedata)
  * @param line line from configuration file matching the token.
  * @brief parse configuration file for sccpOmMessageTable entries.
  *
- * This callback is called by UCD-SNMP when it prases a configuration file and finds a configuration
+ * This callback is called by UCD-SNMP when it parses a configuration file and finds a configuration
  * file line for the registsred token (in this case sccpOmMessageTable).  This routine is invoked by UCD-SNMP
  * to read the values of each row in the table from the configuration file.  Note that this
  * procedure may exist regardless of the persistence of the table.  If there are no configured
@@ -1677,23 +1866,29 @@ sccpOmAccessibilityTable_create(void)
 	DEBUGMSGTL(("sccpOmMIB", "sccpOmAccessibilityTable_create: creating row...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
-		if ((StorageNew->sccpNetworkEntityId = (uint8_t *) strdup("")) != NULL)
-			StorageNew->sccpNetworkEntityIdLen = strlen("");
+		if ((StorageNew->sccpNetworkEntityId = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->sccpNetworkEntityIdLen = 0;
+		StorageNew->sccpNetworkEntityId[StorageNew->sccpNetworkEntityIdLen] = 0;
 		StorageNew->sccpOmSSCMessageReceived = 0;
 		StorageNew->sccpOmSSPMessageReceived = 0;
 		StorageNew->sccpOmSccpUnavailableDuration = 0;
 		StorageNew->sccpOmAccessibility5MinValidIntervals = 0;
 		StorageNew->sccpOmAccessibility15MinValidIntervals = 0;
-
 	}
+      done:
 	DEBUGMSGTL(("sccpOmMIB", "done.\n"));
 	return (StorageNew);
+	goto nomem;
+      nomem:
+	sccpOmAccessibilityTable_destroy(&StorageNew);
+	goto done;
 }
 
 /**
  * @fn struct sccpOmAccessibilityTable_data *sccpOmAccessibilityTable_duplicate(struct sccpOmAccessibilityTable_data *thedata)
  * @param thedata the row structure to duplicate.
- * @brief duplicat a row structure for a table.
+ * @brief duplicate a row structure for a table.
  *
  * Duplicates the specified row structure @param thedata and returns a pointer to the newly
  * allocated row structure on success, or NULL on failure.
@@ -1705,6 +1900,17 @@ sccpOmAccessibilityTable_duplicate(struct sccpOmAccessibilityTable_data *thedata
 
 	DEBUGMSGTL(("sccpOmMIB", "sccpOmAccessibilityTable_duplicate: duplicating row...  "));
 	if (StorageNew != NULL) {
+		StorageNew->sccpOmAccessibilityTable_id = thedata->sccpOmAccessibilityTable_id;
+		if (!(StorageNew->sccpNetworkEntityId = malloc(thedata->sccpNetworkEntityIdLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->sccpNetworkEntityId, thedata->sccpNetworkEntityId, thedata->sccpNetworkEntityIdLen);
+		StorageNew->sccpNetworkEntityIdLen = thedata->sccpNetworkEntityIdLen;
+		StorageNew->sccpNetworkEntityId[StorageNew->sccpNetworkEntityIdLen] = 0;
+		StorageNew->sccpOmSSCMessageReceived = thedata->sccpOmSSCMessageReceived;
+		StorageNew->sccpOmSSPMessageReceived = thedata->sccpOmSSPMessageReceived;
+		StorageNew->sccpOmSccpUnavailableDuration = thedata->sccpOmSccpUnavailableDuration;
+		StorageNew->sccpOmAccessibility5MinValidIntervals = thedata->sccpOmAccessibility5MinValidIntervals;
+		StorageNew->sccpOmAccessibility15MinValidIntervals = thedata->sccpOmAccessibility15MinValidIntervals;
 	}
       done:
 	DEBUGMSGTL(("sccpOmMIB", "done.\n"));
@@ -1800,7 +2006,7 @@ sccpOmAccessibilityTable_del(struct sccpOmAccessibilityTable_data *thedata)
  * @param line line from configuration file matching the token.
  * @brief parse configuration file for sccpOmAccessibilityTable entries.
  *
- * This callback is called by UCD-SNMP when it prases a configuration file and finds a configuration
+ * This callback is called by UCD-SNMP when it parses a configuration file and finds a configuration
  * file line for the registsred token (in this case sccpOmAccessibilityTable).  This routine is invoked by UCD-SNMP
  * to read the values of each row in the table from the configuration file.  Note that this
  * procedure may exist regardless of the persistence of the table.  If there are no configured
@@ -1888,8 +2094,10 @@ sccpOmUtilizationTable_create(void)
 	DEBUGMSGTL(("sccpOmMIB", "sccpOmUtilizationTable_create: creating row...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
-		if ((StorageNew->sccpNetworkEntityId = (uint8_t *) strdup("")) != NULL)
-			StorageNew->sccpNetworkEntityIdLen = strlen("");
+		if ((StorageNew->sccpNetworkEntityId = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->sccpNetworkEntityIdLen = 0;
+		StorageNew->sccpNetworkEntityId[StorageNew->sccpNetworkEntityIdLen] = 0;
 		StorageNew->sccpOmLXUDTMessagesOrigClass0 = 0;
 		StorageNew->sccpOmLXUDTMessagesOrigClass1 = 0;
 		StorageNew->sccpOmLXUDTMessagesTermClass0 = 0;
@@ -1903,16 +2111,20 @@ sccpOmUtilizationTable_create(void)
 		StorageNew->sccpOmEDMessagesReceived = 0;
 		StorageNew->sccpOmUtilization5MinValidIntervals = 0;
 		StorageNew->sccpOmUtilization15MinValidIntervals = 0;
-
 	}
+      done:
 	DEBUGMSGTL(("sccpOmMIB", "done.\n"));
 	return (StorageNew);
+	goto nomem;
+      nomem:
+	sccpOmUtilizationTable_destroy(&StorageNew);
+	goto done;
 }
 
 /**
  * @fn struct sccpOmUtilizationTable_data *sccpOmUtilizationTable_duplicate(struct sccpOmUtilizationTable_data *thedata)
  * @param thedata the row structure to duplicate.
- * @brief duplicat a row structure for a table.
+ * @brief duplicate a row structure for a table.
  *
  * Duplicates the specified row structure @param thedata and returns a pointer to the newly
  * allocated row structure on success, or NULL on failure.
@@ -1924,6 +2136,26 @@ sccpOmUtilizationTable_duplicate(struct sccpOmUtilizationTable_data *thedata)
 
 	DEBUGMSGTL(("sccpOmMIB", "sccpOmUtilizationTable_duplicate: duplicating row...  "));
 	if (StorageNew != NULL) {
+		StorageNew->sccpOmUtilizationTable_id = thedata->sccpOmUtilizationTable_id;
+		if (!(StorageNew->sccpNetworkEntityId = malloc(thedata->sccpNetworkEntityIdLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->sccpNetworkEntityId, thedata->sccpNetworkEntityId, thedata->sccpNetworkEntityIdLen);
+		StorageNew->sccpNetworkEntityIdLen = thedata->sccpNetworkEntityIdLen;
+		StorageNew->sccpNetworkEntityId[StorageNew->sccpNetworkEntityIdLen] = 0;
+		StorageNew->sccpOmSsn = thedata->sccpOmSsn;
+		StorageNew->sccpOmLXUDTMessagesOrigClass0 = thedata->sccpOmLXUDTMessagesOrigClass0;
+		StorageNew->sccpOmLXUDTMessagesOrigClass1 = thedata->sccpOmLXUDTMessagesOrigClass1;
+		StorageNew->sccpOmLXUDTMessagesTermClass0 = thedata->sccpOmLXUDTMessagesTermClass0;
+		StorageNew->sccpOmLXUDTMessagesTermClass1 = thedata->sccpOmLXUDTMessagesTermClass1;
+		StorageNew->sccpOmMessagesSentToBackup = thedata->sccpOmMessagesSentToBackup;
+		StorageNew->sccpOmDT1MessagesReceived = thedata->sccpOmDT1MessagesReceived;
+		StorageNew->sccpOmDT1MessagesSent = thedata->sccpOmDT1MessagesSent;
+		StorageNew->sccpOmDT2MessagesReceived = thedata->sccpOmDT2MessagesReceived;
+		StorageNew->sccpOmDT2MessagesSent = thedata->sccpOmDT2MessagesSent;
+		StorageNew->sccpOmEDMessagesSent = thedata->sccpOmEDMessagesSent;
+		StorageNew->sccpOmEDMessagesReceived = thedata->sccpOmEDMessagesReceived;
+		StorageNew->sccpOmUtilization5MinValidIntervals = thedata->sccpOmUtilization5MinValidIntervals;
+		StorageNew->sccpOmUtilization15MinValidIntervals = thedata->sccpOmUtilization15MinValidIntervals;
 	}
       done:
 	DEBUGMSGTL(("sccpOmMIB", "done.\n"));
@@ -2021,7 +2253,7 @@ sccpOmUtilizationTable_del(struct sccpOmUtilizationTable_data *thedata)
  * @param line line from configuration file matching the token.
  * @brief parse configuration file for sccpOmUtilizationTable entries.
  *
- * This callback is called by UCD-SNMP when it prases a configuration file and finds a configuration
+ * This callback is called by UCD-SNMP when it parses a configuration file and finds a configuration
  * file line for the registsred token (in this case sccpOmUtilizationTable).  This routine is invoked by UCD-SNMP
  * to read the values of each row in the table from the configuration file.  Note that this
  * procedure may exist regardless of the persistence of the table.  If there are no configured
@@ -2127,8 +2359,10 @@ sccpOm5MinHistoryTable_create(void)
 	DEBUGMSGTL(("sccpOmMIB", "sccpOm5MinHistoryTable_create: creating row...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
-		if ((StorageNew->sccpNetworkEntityId = (uint8_t *) strdup("")) != NULL)
-			StorageNew->sccpNetworkEntityIdLen = strlen("");
+		if ((StorageNew->sccpNetworkEntityId = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->sccpNetworkEntityIdLen = 0;
+		StorageNew->sccpNetworkEntityId[StorageNew->sccpNetworkEntityIdLen] = 0;
 		StorageNew->sccpOm5MinNoTranslatorForAddress = 0;
 		StorageNew->sccpOm5MinNoRuleForAddress = 0;
 		StorageNew->sccpOm5MinPointCodeNotAvailable = 0;
@@ -2175,16 +2409,20 @@ sccpOm5MinHistoryTable_create(void)
 		StorageNew->sccpOm5MinLUDTSMessagesReceived = 0;
 		StorageNew->sccpOm5MinSSCMessageReceived = 0;
 		StorageNew->sccpOm5MinSSPMessageReceived = 0;
-
 	}
+      done:
 	DEBUGMSGTL(("sccpOmMIB", "done.\n"));
 	return (StorageNew);
+	goto nomem;
+      nomem:
+	sccpOm5MinHistoryTable_destroy(&StorageNew);
+	goto done;
 }
 
 /**
  * @fn struct sccpOm5MinHistoryTable_data *sccpOm5MinHistoryTable_duplicate(struct sccpOm5MinHistoryTable_data *thedata)
  * @param thedata the row structure to duplicate.
- * @brief duplicat a row structure for a table.
+ * @brief duplicate a row structure for a table.
  *
  * Duplicates the specified row structure @param thedata and returns a pointer to the newly
  * allocated row structure on success, or NULL on failure.
@@ -2196,6 +2434,59 @@ sccpOm5MinHistoryTable_duplicate(struct sccpOm5MinHistoryTable_data *thedata)
 
 	DEBUGMSGTL(("sccpOmMIB", "sccpOm5MinHistoryTable_duplicate: duplicating row...  "));
 	if (StorageNew != NULL) {
+		StorageNew->sccpOm5MinHistoryTable_id = thedata->sccpOm5MinHistoryTable_id;
+		if (!(StorageNew->sccpNetworkEntityId = malloc(thedata->sccpNetworkEntityIdLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->sccpNetworkEntityId, thedata->sccpNetworkEntityId, thedata->sccpNetworkEntityIdLen);
+		StorageNew->sccpNetworkEntityIdLen = thedata->sccpNetworkEntityIdLen;
+		StorageNew->sccpNetworkEntityId[StorageNew->sccpNetworkEntityIdLen] = 0;
+		StorageNew->sccpOmInterval = thedata->sccpOmInterval;
+		StorageNew->sccpOm5MinNoTranslatorForAddress = thedata->sccpOm5MinNoTranslatorForAddress;
+		StorageNew->sccpOm5MinNoRuleForAddress = thedata->sccpOm5MinNoRuleForAddress;
+		StorageNew->sccpOm5MinPointCodeNotAvailable = thedata->sccpOm5MinPointCodeNotAvailable;
+		StorageNew->sccpOm5MinPointCodeCongested = thedata->sccpOm5MinPointCodeCongested;
+		StorageNew->sccpOm5MinSubsystemUnavailable = thedata->sccpOm5MinSubsystemUnavailable;
+		StorageNew->sccpOm5MinSubsystemCongested = thedata->sccpOm5MinSubsystemCongested;
+		StorageNew->sccpOm5MinUnequippedSubsystem = thedata->sccpOm5MinUnequippedSubsystem;
+		StorageNew->sccpOm5MinSyntaxErrorDetected = thedata->sccpOm5MinSyntaxErrorDetected;
+		StorageNew->sccpOm5MinRoutingFailure = thedata->sccpOm5MinRoutingFailure;
+		StorageNew->sccpOm5MinReassemblyTimeOut = thedata->sccpOm5MinReassemblyTimeOut;
+		StorageNew->sccpOm5MinSegmentOutOfOrder = thedata->sccpOm5MinSegmentOutOfOrder;
+		StorageNew->sccpOm5MinNoReassemblySpace = thedata->sccpOm5MinNoReassemblySpace;
+		StorageNew->sccpOm5MinHopCounterViolation = thedata->sccpOm5MinHopCounterViolation;
+		StorageNew->sccpOm5MinTooLargeForSegmentation = thedata->sccpOm5MinTooLargeForSegmentation;
+		StorageNew->sccpOm5MinReleaseFailure = thedata->sccpOm5MinReleaseFailure;
+		StorageNew->sccpOm5MinInactivityTimerExpiry = thedata->sccpOm5MinInactivityTimerExpiry;
+		StorageNew->sccpOm5MinProviderInitiatedReset = thedata->sccpOm5MinProviderInitiatedReset;
+		StorageNew->sccpOm5MinProviderInitiatedRelease = thedata->sccpOm5MinProviderInitiatedRelease;
+		StorageNew->sccpOm5MinNoSegmentationSupport = thedata->sccpOm5MinNoSegmentationSupport;
+		StorageNew->sccpOm5MinSegmentationFailure = thedata->sccpOm5MinSegmentationFailure;
+		StorageNew->sccpOm5MinReassemblyFailure = thedata->sccpOm5MinReassemblyFailure;
+		StorageNew->sccpOm5MinTotalMessagesHandled = thedata->sccpOm5MinTotalMessagesHandled;
+		StorageNew->sccpOm5MinTotalMessagesLocal = thedata->sccpOm5MinTotalMessagesLocal;
+		StorageNew->sccpOm5MinTotalMessagesGTT = thedata->sccpOm5MinTotalMessagesGTT;
+		StorageNew->sccpOm5MinUDTMessagesSent = thedata->sccpOm5MinUDTMessagesSent;
+		StorageNew->sccpOm5MinUDTSMessagesSent = thedata->sccpOm5MinUDTSMessagesSent;
+		StorageNew->sccpOm5MinUDTMessagesReceived = thedata->sccpOm5MinUDTMessagesReceived;
+		StorageNew->sccpOm5MinUDTSMessagesReceived = thedata->sccpOm5MinUDTSMessagesReceived;
+		StorageNew->sccpOm5MinCRMessagesSent = thedata->sccpOm5MinCRMessagesSent;
+		StorageNew->sccpOm5MinCREFMessagesSent = thedata->sccpOm5MinCREFMessagesSent;
+		StorageNew->sccpOm5MinCRMessagesReceived = thedata->sccpOm5MinCRMessagesReceived;
+		StorageNew->sccpOm5MinCREFMessagesReceived = thedata->sccpOm5MinCREFMessagesReceived;
+		StorageNew->sccpOm5MinRSRMessagesSent = thedata->sccpOm5MinRSRMessagesSent;
+		StorageNew->sccpOm5MinRSRMessagesReceived = thedata->sccpOm5MinRSRMessagesReceived;
+		StorageNew->sccpOm5MinERRMessagesSent = thedata->sccpOm5MinERRMessagesSent;
+		StorageNew->sccpOm5MinERRMessagesReceived = thedata->sccpOm5MinERRMessagesReceived;
+		StorageNew->sccpOm5MinXUDTMessagesSent = thedata->sccpOm5MinXUDTMessagesSent;
+		StorageNew->sccpOm5MinXUDTSMessagesSent = thedata->sccpOm5MinXUDTSMessagesSent;
+		StorageNew->sccpOm5MinXUDTMessagesReceived = thedata->sccpOm5MinXUDTMessagesReceived;
+		StorageNew->sccpOm5MinXUDTSMessagesReceived = thedata->sccpOm5MinXUDTSMessagesReceived;
+		StorageNew->sccpOm5MinLUDTMessagesSent = thedata->sccpOm5MinLUDTMessagesSent;
+		StorageNew->sccpOm5MinLUDTSMessagesSent = thedata->sccpOm5MinLUDTSMessagesSent;
+		StorageNew->sccpOm5MinLUDTMessagesReceived = thedata->sccpOm5MinLUDTMessagesReceived;
+		StorageNew->sccpOm5MinLUDTSMessagesReceived = thedata->sccpOm5MinLUDTSMessagesReceived;
+		StorageNew->sccpOm5MinSSCMessageReceived = thedata->sccpOm5MinSSCMessageReceived;
+		StorageNew->sccpOm5MinSSPMessageReceived = thedata->sccpOm5MinSSPMessageReceived;
 	}
       done:
 	DEBUGMSGTL(("sccpOmMIB", "done.\n"));
@@ -2293,7 +2584,7 @@ sccpOm5MinHistoryTable_del(struct sccpOm5MinHistoryTable_data *thedata)
  * @param line line from configuration file matching the token.
  * @brief parse configuration file for sccpOm5MinHistoryTable entries.
  *
- * This callback is called by UCD-SNMP when it prases a configuration file and finds a configuration
+ * This callback is called by UCD-SNMP when it parses a configuration file and finds a configuration
  * file line for the registsred token (in this case sccpOm5MinHistoryTable).  This routine is invoked by UCD-SNMP
  * to read the values of each row in the table from the configuration file.  Note that this
  * procedure may exist regardless of the persistence of the table.  If there are no configured
@@ -2465,8 +2756,10 @@ sccpOm15MinHistoryTable_create(void)
 	DEBUGMSGTL(("sccpOmMIB", "sccpOm15MinHistoryTable_create: creating row...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
-		if ((StorageNew->sccpNetworkEntityId = (uint8_t *) strdup("")) != NULL)
-			StorageNew->sccpNetworkEntityIdLen = strlen("");
+		if ((StorageNew->sccpNetworkEntityId = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->sccpNetworkEntityIdLen = 0;
+		StorageNew->sccpNetworkEntityId[StorageNew->sccpNetworkEntityIdLen] = 0;
 		StorageNew->sccpOmInterval = 0;
 		StorageNew->sccpOm15MinNoTranslatorForAddress = 0;
 		StorageNew->sccpOm15MinNoRuleForAddress = 0;
@@ -2513,16 +2806,20 @@ sccpOm15MinHistoryTable_create(void)
 		StorageNew->sccpOm15MinLUDTMessagesReceived = 0;
 		StorageNew->sccpOm15MinLUDTSMessagesReceived = 0;
 		StorageNew->sccpOm15MinSccpUnavailableDuration = 0;
-
 	}
+      done:
 	DEBUGMSGTL(("sccpOmMIB", "done.\n"));
 	return (StorageNew);
+	goto nomem;
+      nomem:
+	sccpOm15MinHistoryTable_destroy(&StorageNew);
+	goto done;
 }
 
 /**
  * @fn struct sccpOm15MinHistoryTable_data *sccpOm15MinHistoryTable_duplicate(struct sccpOm15MinHistoryTable_data *thedata)
  * @param thedata the row structure to duplicate.
- * @brief duplicat a row structure for a table.
+ * @brief duplicate a row structure for a table.
  *
  * Duplicates the specified row structure @param thedata and returns a pointer to the newly
  * allocated row structure on success, or NULL on failure.
@@ -2534,6 +2831,58 @@ sccpOm15MinHistoryTable_duplicate(struct sccpOm15MinHistoryTable_data *thedata)
 
 	DEBUGMSGTL(("sccpOmMIB", "sccpOm15MinHistoryTable_duplicate: duplicating row...  "));
 	if (StorageNew != NULL) {
+		StorageNew->sccpOm15MinHistoryTable_id = thedata->sccpOm15MinHistoryTable_id;
+		if (!(StorageNew->sccpNetworkEntityId = malloc(thedata->sccpNetworkEntityIdLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->sccpNetworkEntityId, thedata->sccpNetworkEntityId, thedata->sccpNetworkEntityIdLen);
+		StorageNew->sccpNetworkEntityIdLen = thedata->sccpNetworkEntityIdLen;
+		StorageNew->sccpNetworkEntityId[StorageNew->sccpNetworkEntityIdLen] = 0;
+		StorageNew->sccpOmInterval = thedata->sccpOmInterval;
+		StorageNew->sccpOm15MinNoTranslatorForAddress = thedata->sccpOm15MinNoTranslatorForAddress;
+		StorageNew->sccpOm15MinNoRuleForAddress = thedata->sccpOm15MinNoRuleForAddress;
+		StorageNew->sccpOm15MinPointCodeNotAvailable = thedata->sccpOm15MinPointCodeNotAvailable;
+		StorageNew->sccpOm15MinPointCodeCongested = thedata->sccpOm15MinPointCodeCongested;
+		StorageNew->sccpOm15MinSubsystemUnavailable = thedata->sccpOm15MinSubsystemUnavailable;
+		StorageNew->sccpOm15MinSubsystemCongested = thedata->sccpOm15MinSubsystemCongested;
+		StorageNew->sccpOm15MinUnequippedSubsystem = thedata->sccpOm15MinUnequippedSubsystem;
+		StorageNew->sccpOm15MinSyntaxErrorDetected = thedata->sccpOm15MinSyntaxErrorDetected;
+		StorageNew->sccpOm15MinRoutingFailure = thedata->sccpOm15MinRoutingFailure;
+		StorageNew->sccpOm15MinReassemblyTimeOut = thedata->sccpOm15MinReassemblyTimeOut;
+		StorageNew->sccpOm15MinSegmentOutOfOrder = thedata->sccpOm15MinSegmentOutOfOrder;
+		StorageNew->sccpOm15MinNoReassemblySpace = thedata->sccpOm15MinNoReassemblySpace;
+		StorageNew->sccpOm15MinHopCounterViolation = thedata->sccpOm15MinHopCounterViolation;
+		StorageNew->sccpOm15MinTooLargeForSegmentation = thedata->sccpOm15MinTooLargeForSegmentation;
+		StorageNew->sccpOm15MinReleaseFailure = thedata->sccpOm15MinReleaseFailure;
+		StorageNew->sccpOm15MinInactivityTimerExpiry = thedata->sccpOm15MinInactivityTimerExpiry;
+		StorageNew->sccpOm15MinProviderInitiatedReset = thedata->sccpOm15MinProviderInitiatedReset;
+		StorageNew->sccpOm15MinProviderInitiatedRelease = thedata->sccpOm15MinProviderInitiatedRelease;
+		StorageNew->sccpOm15MinNoSegmentationSupport = thedata->sccpOm15MinNoSegmentationSupport;
+		StorageNew->sccpOm15MinSegmentationFailure = thedata->sccpOm15MinSegmentationFailure;
+		StorageNew->sccpOm15MinReassemblyFailure = thedata->sccpOm15MinReassemblyFailure;
+		StorageNew->sccpOm15MinTotalMessagesHandled = thedata->sccpOm15MinTotalMessagesHandled;
+		StorageNew->sccpOm15MinTotalMessagesLocal = thedata->sccpOm15MinTotalMessagesLocal;
+		StorageNew->sccpOm15MinTotalMessagesGTT = thedata->sccpOm15MinTotalMessagesGTT;
+		StorageNew->sccpOm15MinUDTMessagesSent = thedata->sccpOm15MinUDTMessagesSent;
+		StorageNew->sccpOm15MinUDTSMessagesSent = thedata->sccpOm15MinUDTSMessagesSent;
+		StorageNew->sccpOm15MinUDTMessagesReceived = thedata->sccpOm15MinUDTMessagesReceived;
+		StorageNew->sccpOm15MinUDTSMessagesReceived = thedata->sccpOm15MinUDTSMessagesReceived;
+		StorageNew->sccpOm15MinCRMessagesSent = thedata->sccpOm15MinCRMessagesSent;
+		StorageNew->sccpOm15MinCREFMessagesSent = thedata->sccpOm15MinCREFMessagesSent;
+		StorageNew->sccpOm15MinCRMessagesReceived = thedata->sccpOm15MinCRMessagesReceived;
+		StorageNew->sccpOm15MinCREFMessagesReceived = thedata->sccpOm15MinCREFMessagesReceived;
+		StorageNew->sccpOm15MinRSRMessagesSent = thedata->sccpOm15MinRSRMessagesSent;
+		StorageNew->sccpOm15MinRSRMessagesReceived = thedata->sccpOm15MinRSRMessagesReceived;
+		StorageNew->sccpOm15MinERRMessagesSent = thedata->sccpOm15MinERRMessagesSent;
+		StorageNew->sccpOm15MinERRMessagesReceived = thedata->sccpOm15MinERRMessagesReceived;
+		StorageNew->sccpOm15MinXUDTMessagesSent = thedata->sccpOm15MinXUDTMessagesSent;
+		StorageNew->sccpOm15MinXUDTSMessagesSent = thedata->sccpOm15MinXUDTSMessagesSent;
+		StorageNew->sccpOm15MinXUDTMessagesReceived = thedata->sccpOm15MinXUDTMessagesReceived;
+		StorageNew->sccpOm15MinXUDTSMessagesReceived = thedata->sccpOm15MinXUDTSMessagesReceived;
+		StorageNew->sccpOm15MinLUDTMessagesSent = thedata->sccpOm15MinLUDTMessagesSent;
+		StorageNew->sccpOm15MinLUDTSMessagesSent = thedata->sccpOm15MinLUDTSMessagesSent;
+		StorageNew->sccpOm15MinLUDTMessagesReceived = thedata->sccpOm15MinLUDTMessagesReceived;
+		StorageNew->sccpOm15MinLUDTSMessagesReceived = thedata->sccpOm15MinLUDTSMessagesReceived;
+		StorageNew->sccpOm15MinSccpUnavailableDuration = thedata->sccpOm15MinSccpUnavailableDuration;
 	}
       done:
 	DEBUGMSGTL(("sccpOmMIB", "done.\n"));
@@ -2631,7 +2980,7 @@ sccpOm15MinHistoryTable_del(struct sccpOm15MinHistoryTable_data *thedata)
  * @param line line from configuration file matching the token.
  * @brief parse configuration file for sccpOm15MinHistoryTable entries.
  *
- * This callback is called by UCD-SNMP when it prases a configuration file and finds a configuration
+ * This callback is called by UCD-SNMP when it parses a configuration file and finds a configuration
  * file line for the registsred token (in this case sccpOm15MinHistoryTable).  This routine is invoked by UCD-SNMP
  * to read the values of each row in the table from the configuration file.  Note that this
  * procedure may exist regardless of the persistence of the table.  If there are no configured
@@ -2801,8 +3150,10 @@ sccpOm5MinSsnHistoryTable_create(void)
 	DEBUGMSGTL(("sccpOmMIB", "sccpOm5MinSsnHistoryTable_create: creating row...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
-		if ((StorageNew->sccpNetworkEntityId = (uint8_t *) strdup("")) != NULL)
-			StorageNew->sccpNetworkEntityIdLen = strlen("");
+		if ((StorageNew->sccpNetworkEntityId = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->sccpNetworkEntityIdLen = 0;
+		StorageNew->sccpNetworkEntityId[StorageNew->sccpNetworkEntityIdLen] = 0;
 		StorageNew->sccpOmSsn = 0;
 		StorageNew->sccpOmInterval = 0;
 		StorageNew->sccpOm5MinLXUDTMessagesOrigClass0 = 0;
@@ -2816,16 +3167,20 @@ sccpOm5MinSsnHistoryTable_create(void)
 		StorageNew->sccpOm5MinDT2MessagesSent = 0;
 		StorageNew->sccpOm5MinEDMessagesSent = 0;
 		StorageNew->sccpOm5MinEDMessagesReceived = 0;
-
 	}
+      done:
 	DEBUGMSGTL(("sccpOmMIB", "done.\n"));
 	return (StorageNew);
+	goto nomem;
+      nomem:
+	sccpOm5MinSsnHistoryTable_destroy(&StorageNew);
+	goto done;
 }
 
 /**
  * @fn struct sccpOm5MinSsnHistoryTable_data *sccpOm5MinSsnHistoryTable_duplicate(struct sccpOm5MinSsnHistoryTable_data *thedata)
  * @param thedata the row structure to duplicate.
- * @brief duplicat a row structure for a table.
+ * @brief duplicate a row structure for a table.
  *
  * Duplicates the specified row structure @param thedata and returns a pointer to the newly
  * allocated row structure on success, or NULL on failure.
@@ -2837,6 +3192,25 @@ sccpOm5MinSsnHistoryTable_duplicate(struct sccpOm5MinSsnHistoryTable_data *theda
 
 	DEBUGMSGTL(("sccpOmMIB", "sccpOm5MinSsnHistoryTable_duplicate: duplicating row...  "));
 	if (StorageNew != NULL) {
+		StorageNew->sccpOm5MinSsnHistoryTable_id = thedata->sccpOm5MinSsnHistoryTable_id;
+		if (!(StorageNew->sccpNetworkEntityId = malloc(thedata->sccpNetworkEntityIdLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->sccpNetworkEntityId, thedata->sccpNetworkEntityId, thedata->sccpNetworkEntityIdLen);
+		StorageNew->sccpNetworkEntityIdLen = thedata->sccpNetworkEntityIdLen;
+		StorageNew->sccpNetworkEntityId[StorageNew->sccpNetworkEntityIdLen] = 0;
+		StorageNew->sccpOmSsn = thedata->sccpOmSsn;
+		StorageNew->sccpOmInterval = thedata->sccpOmInterval;
+		StorageNew->sccpOm5MinLXUDTMessagesOrigClass0 = thedata->sccpOm5MinLXUDTMessagesOrigClass0;
+		StorageNew->sccpOm5MinLXUDTMessagesOrigClass1 = thedata->sccpOm5MinLXUDTMessagesOrigClass1;
+		StorageNew->sccpOm5MinLXUDTMessagesTermClass0 = thedata->sccpOm5MinLXUDTMessagesTermClass0;
+		StorageNew->sccpOm5MinLXUDTMessagesTermClass1 = thedata->sccpOm5MinLXUDTMessagesTermClass1;
+		StorageNew->sccpOm5MinMessagesSentToBackup = thedata->sccpOm5MinMessagesSentToBackup;
+		StorageNew->sccpOm5MinDT1MessagesReceived = thedata->sccpOm5MinDT1MessagesReceived;
+		StorageNew->sccpOm5MinDT1MessagesSent = thedata->sccpOm5MinDT1MessagesSent;
+		StorageNew->sccpOm5MinDT2MessagesReceived = thedata->sccpOm5MinDT2MessagesReceived;
+		StorageNew->sccpOm5MinDT2MessagesSent = thedata->sccpOm5MinDT2MessagesSent;
+		StorageNew->sccpOm5MinEDMessagesSent = thedata->sccpOm5MinEDMessagesSent;
+		StorageNew->sccpOm5MinEDMessagesReceived = thedata->sccpOm5MinEDMessagesReceived;
 	}
       done:
 	DEBUGMSGTL(("sccpOmMIB", "done.\n"));
@@ -2936,7 +3310,7 @@ sccpOm5MinSsnHistoryTable_del(struct sccpOm5MinSsnHistoryTable_data *thedata)
  * @param line line from configuration file matching the token.
  * @brief parse configuration file for sccpOm5MinSsnHistoryTable entries.
  *
- * This callback is called by UCD-SNMP when it prases a configuration file and finds a configuration
+ * This callback is called by UCD-SNMP when it parses a configuration file and finds a configuration
  * file line for the registsred token (in this case sccpOm5MinSsnHistoryTable).  This routine is invoked by UCD-SNMP
  * to read the values of each row in the table from the configuration file.  Note that this
  * procedure may exist regardless of the persistence of the table.  If there are no configured
@@ -3040,8 +3414,10 @@ sccpOm15MinSsnHistoryTable_create(void)
 	DEBUGMSGTL(("sccpOmMIB", "sccpOm15MinSsnHistoryTable_create: creating row...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
-		if ((StorageNew->sccpNetworkEntityId = (uint8_t *) strdup("")) != NULL)
-			StorageNew->sccpNetworkEntityIdLen = strlen("");
+		if ((StorageNew->sccpNetworkEntityId = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->sccpNetworkEntityIdLen = 0;
+		StorageNew->sccpNetworkEntityId[StorageNew->sccpNetworkEntityIdLen] = 0;
 		StorageNew->sccpOmSsn = 0;
 		StorageNew->sccpOmInterval = 0;
 		StorageNew->sccpOm15MinLXUDTMessagesOrigClass0 = 0;
@@ -3055,16 +3431,20 @@ sccpOm15MinSsnHistoryTable_create(void)
 		StorageNew->sccpOm15MinDT2MessagesSent = 0;
 		StorageNew->sccpOm15MinEDMessagesSent = 0;
 		StorageNew->sccpOm15MinEDMessagesReceived = 0;
-
 	}
+      done:
 	DEBUGMSGTL(("sccpOmMIB", "done.\n"));
 	return (StorageNew);
+	goto nomem;
+      nomem:
+	sccpOm15MinSsnHistoryTable_destroy(&StorageNew);
+	goto done;
 }
 
 /**
  * @fn struct sccpOm15MinSsnHistoryTable_data *sccpOm15MinSsnHistoryTable_duplicate(struct sccpOm15MinSsnHistoryTable_data *thedata)
  * @param thedata the row structure to duplicate.
- * @brief duplicat a row structure for a table.
+ * @brief duplicate a row structure for a table.
  *
  * Duplicates the specified row structure @param thedata and returns a pointer to the newly
  * allocated row structure on success, or NULL on failure.
@@ -3076,6 +3456,25 @@ sccpOm15MinSsnHistoryTable_duplicate(struct sccpOm15MinSsnHistoryTable_data *the
 
 	DEBUGMSGTL(("sccpOmMIB", "sccpOm15MinSsnHistoryTable_duplicate: duplicating row...  "));
 	if (StorageNew != NULL) {
+		StorageNew->sccpOm15MinSsnHistoryTable_id = thedata->sccpOm15MinSsnHistoryTable_id;
+		if (!(StorageNew->sccpNetworkEntityId = malloc(thedata->sccpNetworkEntityIdLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->sccpNetworkEntityId, thedata->sccpNetworkEntityId, thedata->sccpNetworkEntityIdLen);
+		StorageNew->sccpNetworkEntityIdLen = thedata->sccpNetworkEntityIdLen;
+		StorageNew->sccpNetworkEntityId[StorageNew->sccpNetworkEntityIdLen] = 0;
+		StorageNew->sccpOmSsn = thedata->sccpOmSsn;
+		StorageNew->sccpOmInterval = thedata->sccpOmInterval;
+		StorageNew->sccpOm15MinLXUDTMessagesOrigClass0 = thedata->sccpOm15MinLXUDTMessagesOrigClass0;
+		StorageNew->sccpOm15MinLXUDTMessagesOrigClass1 = thedata->sccpOm15MinLXUDTMessagesOrigClass1;
+		StorageNew->sccpOm15MinLXUDTMessagesTermClass0 = thedata->sccpOm15MinLXUDTMessagesTermClass0;
+		StorageNew->sccpOm15MinLXUDTMessagesTermClass1 = thedata->sccpOm15MinLXUDTMessagesTermClass1;
+		StorageNew->sccpOm15MinMessagesSentToBackup = thedata->sccpOm15MinMessagesSentToBackup;
+		StorageNew->sccpOm15MinDT1MessagesReceived = thedata->sccpOm15MinDT1MessagesReceived;
+		StorageNew->sccpOm15MinDT1MessagesSent = thedata->sccpOm15MinDT1MessagesSent;
+		StorageNew->sccpOm15MinDT2MessagesReceived = thedata->sccpOm15MinDT2MessagesReceived;
+		StorageNew->sccpOm15MinDT2MessagesSent = thedata->sccpOm15MinDT2MessagesSent;
+		StorageNew->sccpOm15MinEDMessagesSent = thedata->sccpOm15MinEDMessagesSent;
+		StorageNew->sccpOm15MinEDMessagesReceived = thedata->sccpOm15MinEDMessagesReceived;
 	}
       done:
 	DEBUGMSGTL(("sccpOmMIB", "done.\n"));
@@ -3175,7 +3574,7 @@ sccpOm15MinSsnHistoryTable_del(struct sccpOm15MinSsnHistoryTable_data *thedata)
  * @param line line from configuration file matching the token.
  * @brief parse configuration file for sccpOm15MinSsnHistoryTable entries.
  *
- * This callback is called by UCD-SNMP when it prases a configuration file and finds a configuration
+ * This callback is called by UCD-SNMP when it parses a configuration file and finds a configuration
  * file line for the registsred token (in this case sccpOm15MinSsnHistoryTable).  This routine is invoked by UCD-SNMP
  * to read the values of each row in the table from the configuration file.  Note that this
  * procedure may exist regardless of the persistence of the table.  If there are no configured
@@ -3261,6 +3660,64 @@ store_sccpOm15MinSsnHistoryTable(int majorID, int minorID, void *serverarg, void
 	}
 	DEBUGMSGTL(("sccpOmMIB", "done.\n"));
 	return SNMPERR_SUCCESS;
+}
+
+/**
+ * @fn int check_sccpOmErrorsTable_row(struct sccpOmErrorsTable_data *StorageTmp, struct sccpOmErrorsTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to check, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the ACTION phase.  The start of the ACTION pahse performs this consitency check
+ * on the row before allowing the request to proceed to the COMMIT phase.  This function can return
+ * SNMP_ERR_NOERR or a specific SNMP error value.  Values in StorageOld are the values before the
+ * varbinds on the mib were applied; the values in StorageTmp are the new values.  The function is
+ * permitted to change the values in StorageTmp to correct them; however, preference should be made
+ * for setting values where were not in the varbinds.
+ */
+int
+check_sccpOmErrorsTable_row(struct sccpOmErrorsTable_data *StorageTmp, struct sccpOmErrorsTable_data *StorageOld)
+{
+	/* XXX: provide code to check the row for consistency */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int update_sccpOmErrorsTable_row(struct sccpOmErrorsTable_data *StorageTmp, struct sccpOmErrorsTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the set operation (ACTION phase) on a row
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to update, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the COMMIT phase.  The start of the ACTION phase performs a consistency check on
+ * the row before allowing the request to proceed to the COMMIT phase.  The COMMIT phase then
+ * arrives here with consistency already checked (see check_sccpOmErrorsTable_row()).  This function can
+ * return SNMP_ERR_NOERROR or SNMP_ERR_COMMITFAILED.  Values in StorageOld are the values before the
+ * varbinds on the row were applied: the values in StorageTmp are the new values.
+ */
+int
+update_sccpOmErrorsTable_row(struct sccpOmErrorsTable_data *StorageTmp, struct sccpOmErrorsTable_data *StorageOld)
+{
+	/* XXX: provide code to update the row with the underlying device */
+	sccpOmErrorsTable_refresh = 1;
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int revert_sccpOmErrorsTable_row(struct sccpOmErrorsTable_data *StorageTmp, struct sccpOmErrorsTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the undo operation (UNDO phase) on a row
+ */
+void
+revert_sccpOmErrorsTable_row(struct sccpOmErrorsTable_data *StorageTmp, struct sccpOmErrorsTable_data *StorageOld)
+{
+	/* XXX: provide code to revert the row with the underlying device */
+	update_sccpOmErrorsTable_row(StorageOld, NULL);
 }
 
 /**
@@ -3470,6 +3927,64 @@ var_sccpOmErrorsTable(struct variable *vp, oid * name, size_t *length, int exact
 		ERROR_MSG("");
 	}
 	return (rval);
+}
+
+/**
+ * @fn int check_sccpOmMessageTable_row(struct sccpOmMessageTable_data *StorageTmp, struct sccpOmMessageTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to check, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the ACTION phase.  The start of the ACTION pahse performs this consitency check
+ * on the row before allowing the request to proceed to the COMMIT phase.  This function can return
+ * SNMP_ERR_NOERR or a specific SNMP error value.  Values in StorageOld are the values before the
+ * varbinds on the mib were applied; the values in StorageTmp are the new values.  The function is
+ * permitted to change the values in StorageTmp to correct them; however, preference should be made
+ * for setting values where were not in the varbinds.
+ */
+int
+check_sccpOmMessageTable_row(struct sccpOmMessageTable_data *StorageTmp, struct sccpOmMessageTable_data *StorageOld)
+{
+	/* XXX: provide code to check the row for consistency */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int update_sccpOmMessageTable_row(struct sccpOmMessageTable_data *StorageTmp, struct sccpOmMessageTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the set operation (ACTION phase) on a row
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to update, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the COMMIT phase.  The start of the ACTION phase performs a consistency check on
+ * the row before allowing the request to proceed to the COMMIT phase.  The COMMIT phase then
+ * arrives here with consistency already checked (see check_sccpOmMessageTable_row()).  This function can
+ * return SNMP_ERR_NOERROR or SNMP_ERR_COMMITFAILED.  Values in StorageOld are the values before the
+ * varbinds on the row were applied: the values in StorageTmp are the new values.
+ */
+int
+update_sccpOmMessageTable_row(struct sccpOmMessageTable_data *StorageTmp, struct sccpOmMessageTable_data *StorageOld)
+{
+	/* XXX: provide code to update the row with the underlying device */
+	sccpOmMessageTable_refresh = 1;
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int revert_sccpOmMessageTable_row(struct sccpOmMessageTable_data *StorageTmp, struct sccpOmMessageTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the undo operation (UNDO phase) on a row
+ */
+void
+revert_sccpOmMessageTable_row(struct sccpOmMessageTable_data *StorageTmp, struct sccpOmMessageTable_data *StorageOld)
+{
+	/* XXX: provide code to revert the row with the underlying device */
+	update_sccpOmMessageTable_row(StorageOld, NULL);
 }
 
 /**
@@ -3694,6 +4209,64 @@ var_sccpOmMessageTable(struct variable *vp, oid * name, size_t *length, int exac
 }
 
 /**
+ * @fn int check_sccpOmAccessibilityTable_row(struct sccpOmAccessibilityTable_data *StorageTmp, struct sccpOmAccessibilityTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to check, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the ACTION phase.  The start of the ACTION pahse performs this consitency check
+ * on the row before allowing the request to proceed to the COMMIT phase.  This function can return
+ * SNMP_ERR_NOERR or a specific SNMP error value.  Values in StorageOld are the values before the
+ * varbinds on the mib were applied; the values in StorageTmp are the new values.  The function is
+ * permitted to change the values in StorageTmp to correct them; however, preference should be made
+ * for setting values where were not in the varbinds.
+ */
+int
+check_sccpOmAccessibilityTable_row(struct sccpOmAccessibilityTable_data *StorageTmp, struct sccpOmAccessibilityTable_data *StorageOld)
+{
+	/* XXX: provide code to check the row for consistency */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int update_sccpOmAccessibilityTable_row(struct sccpOmAccessibilityTable_data *StorageTmp, struct sccpOmAccessibilityTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the set operation (ACTION phase) on a row
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to update, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the COMMIT phase.  The start of the ACTION phase performs a consistency check on
+ * the row before allowing the request to proceed to the COMMIT phase.  The COMMIT phase then
+ * arrives here with consistency already checked (see check_sccpOmAccessibilityTable_row()).  This function can
+ * return SNMP_ERR_NOERROR or SNMP_ERR_COMMITFAILED.  Values in StorageOld are the values before the
+ * varbinds on the row were applied: the values in StorageTmp are the new values.
+ */
+int
+update_sccpOmAccessibilityTable_row(struct sccpOmAccessibilityTable_data *StorageTmp, struct sccpOmAccessibilityTable_data *StorageOld)
+{
+	/* XXX: provide code to update the row with the underlying device */
+	sccpOmAccessibilityTable_refresh = 1;
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int revert_sccpOmAccessibilityTable_row(struct sccpOmAccessibilityTable_data *StorageTmp, struct sccpOmAccessibilityTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the undo operation (UNDO phase) on a row
+ */
+void
+revert_sccpOmAccessibilityTable_row(struct sccpOmAccessibilityTable_data *StorageTmp, struct sccpOmAccessibilityTable_data *StorageOld)
+{
+	/* XXX: provide code to revert the row with the underlying device */
+	update_sccpOmAccessibilityTable_row(StorageOld, NULL);
+}
+
+/**
  * @fn void refresh_sccpOmAccessibilityTable_row(struct sccpOmAccessibilityTable_data *StorageTmp, int force)
  * @param StorageTmp the data row to refresh.
  * @param force force refresh if non-zero.
@@ -3792,6 +4365,64 @@ var_sccpOmAccessibilityTable(struct variable *vp, oid * name, size_t *length, in
 		ERROR_MSG("");
 	}
 	return (rval);
+}
+
+/**
+ * @fn int check_sccpOmUtilizationTable_row(struct sccpOmUtilizationTable_data *StorageTmp, struct sccpOmUtilizationTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to check, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the ACTION phase.  The start of the ACTION pahse performs this consitency check
+ * on the row before allowing the request to proceed to the COMMIT phase.  This function can return
+ * SNMP_ERR_NOERR or a specific SNMP error value.  Values in StorageOld are the values before the
+ * varbinds on the mib were applied; the values in StorageTmp are the new values.  The function is
+ * permitted to change the values in StorageTmp to correct them; however, preference should be made
+ * for setting values where were not in the varbinds.
+ */
+int
+check_sccpOmUtilizationTable_row(struct sccpOmUtilizationTable_data *StorageTmp, struct sccpOmUtilizationTable_data *StorageOld)
+{
+	/* XXX: provide code to check the row for consistency */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int update_sccpOmUtilizationTable_row(struct sccpOmUtilizationTable_data *StorageTmp, struct sccpOmUtilizationTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the set operation (ACTION phase) on a row
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to update, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the COMMIT phase.  The start of the ACTION phase performs a consistency check on
+ * the row before allowing the request to proceed to the COMMIT phase.  The COMMIT phase then
+ * arrives here with consistency already checked (see check_sccpOmUtilizationTable_row()).  This function can
+ * return SNMP_ERR_NOERROR or SNMP_ERR_COMMITFAILED.  Values in StorageOld are the values before the
+ * varbinds on the row were applied: the values in StorageTmp are the new values.
+ */
+int
+update_sccpOmUtilizationTable_row(struct sccpOmUtilizationTable_data *StorageTmp, struct sccpOmUtilizationTable_data *StorageOld)
+{
+	/* XXX: provide code to update the row with the underlying device */
+	sccpOmUtilizationTable_refresh = 1;
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int revert_sccpOmUtilizationTable_row(struct sccpOmUtilizationTable_data *StorageTmp, struct sccpOmUtilizationTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the undo operation (UNDO phase) on a row
+ */
+void
+revert_sccpOmUtilizationTable_row(struct sccpOmUtilizationTable_data *StorageTmp, struct sccpOmUtilizationTable_data *StorageOld)
+{
+	/* XXX: provide code to revert the row with the underlying device */
+	update_sccpOmUtilizationTable_row(StorageOld, NULL);
 }
 
 /**
@@ -3941,6 +4572,64 @@ var_sccpOmUtilizationTable(struct variable *vp, oid * name, size_t *length, int 
 		ERROR_MSG("");
 	}
 	return (rval);
+}
+
+/**
+ * @fn int check_sccpOm5MinHistoryTable_row(struct sccpOm5MinHistoryTable_data *StorageTmp, struct sccpOm5MinHistoryTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to check, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the ACTION phase.  The start of the ACTION pahse performs this consitency check
+ * on the row before allowing the request to proceed to the COMMIT phase.  This function can return
+ * SNMP_ERR_NOERR or a specific SNMP error value.  Values in StorageOld are the values before the
+ * varbinds on the mib were applied; the values in StorageTmp are the new values.  The function is
+ * permitted to change the values in StorageTmp to correct them; however, preference should be made
+ * for setting values where were not in the varbinds.
+ */
+int
+check_sccpOm5MinHistoryTable_row(struct sccpOm5MinHistoryTable_data *StorageTmp, struct sccpOm5MinHistoryTable_data *StorageOld)
+{
+	/* XXX: provide code to check the row for consistency */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int update_sccpOm5MinHistoryTable_row(struct sccpOm5MinHistoryTable_data *StorageTmp, struct sccpOm5MinHistoryTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the set operation (ACTION phase) on a row
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to update, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the COMMIT phase.  The start of the ACTION phase performs a consistency check on
+ * the row before allowing the request to proceed to the COMMIT phase.  The COMMIT phase then
+ * arrives here with consistency already checked (see check_sccpOm5MinHistoryTable_row()).  This function can
+ * return SNMP_ERR_NOERROR or SNMP_ERR_COMMITFAILED.  Values in StorageOld are the values before the
+ * varbinds on the row were applied: the values in StorageTmp are the new values.
+ */
+int
+update_sccpOm5MinHistoryTable_row(struct sccpOm5MinHistoryTable_data *StorageTmp, struct sccpOm5MinHistoryTable_data *StorageOld)
+{
+	/* XXX: provide code to update the row with the underlying device */
+	sccpOm5MinHistoryTable_refresh = 1;
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int revert_sccpOm5MinHistoryTable_row(struct sccpOm5MinHistoryTable_data *StorageTmp, struct sccpOm5MinHistoryTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the undo operation (UNDO phase) on a row
+ */
+void
+revert_sccpOm5MinHistoryTable_row(struct sccpOm5MinHistoryTable_data *StorageTmp, struct sccpOm5MinHistoryTable_data *StorageOld)
+{
+	/* XXX: provide code to revert the row with the underlying device */
+	update_sccpOm5MinHistoryTable_row(StorageOld, NULL);
 }
 
 /**
@@ -4291,6 +4980,64 @@ var_sccpOm5MinHistoryTable(struct variable *vp, oid * name, size_t *length, int 
 }
 
 /**
+ * @fn int check_sccpOm15MinHistoryTable_row(struct sccpOm15MinHistoryTable_data *StorageTmp, struct sccpOm15MinHistoryTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to check, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the ACTION phase.  The start of the ACTION pahse performs this consitency check
+ * on the row before allowing the request to proceed to the COMMIT phase.  This function can return
+ * SNMP_ERR_NOERR or a specific SNMP error value.  Values in StorageOld are the values before the
+ * varbinds on the mib were applied; the values in StorageTmp are the new values.  The function is
+ * permitted to change the values in StorageTmp to correct them; however, preference should be made
+ * for setting values where were not in the varbinds.
+ */
+int
+check_sccpOm15MinHistoryTable_row(struct sccpOm15MinHistoryTable_data *StorageTmp, struct sccpOm15MinHistoryTable_data *StorageOld)
+{
+	/* XXX: provide code to check the row for consistency */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int update_sccpOm15MinHistoryTable_row(struct sccpOm15MinHistoryTable_data *StorageTmp, struct sccpOm15MinHistoryTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the set operation (ACTION phase) on a row
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to update, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the COMMIT phase.  The start of the ACTION phase performs a consistency check on
+ * the row before allowing the request to proceed to the COMMIT phase.  The COMMIT phase then
+ * arrives here with consistency already checked (see check_sccpOm15MinHistoryTable_row()).  This function can
+ * return SNMP_ERR_NOERROR or SNMP_ERR_COMMITFAILED.  Values in StorageOld are the values before the
+ * varbinds on the row were applied: the values in StorageTmp are the new values.
+ */
+int
+update_sccpOm15MinHistoryTable_row(struct sccpOm15MinHistoryTable_data *StorageTmp, struct sccpOm15MinHistoryTable_data *StorageOld)
+{
+	/* XXX: provide code to update the row with the underlying device */
+	sccpOm15MinHistoryTable_refresh = 1;
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int revert_sccpOm15MinHistoryTable_row(struct sccpOm15MinHistoryTable_data *StorageTmp, struct sccpOm15MinHistoryTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the undo operation (UNDO phase) on a row
+ */
+void
+revert_sccpOm15MinHistoryTable_row(struct sccpOm15MinHistoryTable_data *StorageTmp, struct sccpOm15MinHistoryTable_data *StorageOld)
+{
+	/* XXX: provide code to revert the row with the underlying device */
+	update_sccpOm15MinHistoryTable_row(StorageOld, NULL);
+}
+
+/**
  * @fn void refresh_sccpOm15MinHistoryTable_row(struct sccpOm15MinHistoryTable_data *StorageTmp, int force)
  * @param StorageTmp the data row to refresh.
  * @param force force refresh if non-zero.
@@ -4632,6 +5379,64 @@ var_sccpOm15MinHistoryTable(struct variable *vp, oid * name, size_t *length, int
 }
 
 /**
+ * @fn int check_sccpOm5MinSsnHistoryTable_row(struct sccpOm5MinSsnHistoryTable_data *StorageTmp, struct sccpOm5MinSsnHistoryTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to check, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the ACTION phase.  The start of the ACTION pahse performs this consitency check
+ * on the row before allowing the request to proceed to the COMMIT phase.  This function can return
+ * SNMP_ERR_NOERR or a specific SNMP error value.  Values in StorageOld are the values before the
+ * varbinds on the mib were applied; the values in StorageTmp are the new values.  The function is
+ * permitted to change the values in StorageTmp to correct them; however, preference should be made
+ * for setting values where were not in the varbinds.
+ */
+int
+check_sccpOm5MinSsnHistoryTable_row(struct sccpOm5MinSsnHistoryTable_data *StorageTmp, struct sccpOm5MinSsnHistoryTable_data *StorageOld)
+{
+	/* XXX: provide code to check the row for consistency */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int update_sccpOm5MinSsnHistoryTable_row(struct sccpOm5MinSsnHistoryTable_data *StorageTmp, struct sccpOm5MinSsnHistoryTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the set operation (ACTION phase) on a row
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to update, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the COMMIT phase.  The start of the ACTION phase performs a consistency check on
+ * the row before allowing the request to proceed to the COMMIT phase.  The COMMIT phase then
+ * arrives here with consistency already checked (see check_sccpOm5MinSsnHistoryTable_row()).  This function can
+ * return SNMP_ERR_NOERROR or SNMP_ERR_COMMITFAILED.  Values in StorageOld are the values before the
+ * varbinds on the row were applied: the values in StorageTmp are the new values.
+ */
+int
+update_sccpOm5MinSsnHistoryTable_row(struct sccpOm5MinSsnHistoryTable_data *StorageTmp, struct sccpOm5MinSsnHistoryTable_data *StorageOld)
+{
+	/* XXX: provide code to update the row with the underlying device */
+	sccpOm5MinSsnHistoryTable_refresh = 1;
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int revert_sccpOm5MinSsnHistoryTable_row(struct sccpOm5MinSsnHistoryTable_data *StorageTmp, struct sccpOm5MinSsnHistoryTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the undo operation (UNDO phase) on a row
+ */
+void
+revert_sccpOm5MinSsnHistoryTable_row(struct sccpOm5MinSsnHistoryTable_data *StorageTmp, struct sccpOm5MinSsnHistoryTable_data *StorageOld)
+{
+	/* XXX: provide code to revert the row with the underlying device */
+	update_sccpOm5MinSsnHistoryTable_row(StorageOld, NULL);
+}
+
+/**
  * @fn void refresh_sccpOm5MinSsnHistoryTable_row(struct sccpOm5MinSsnHistoryTable_data *StorageTmp, int force)
  * @param StorageTmp the data row to refresh.
  * @param force force refresh if non-zero.
@@ -4766,6 +5571,64 @@ var_sccpOm5MinSsnHistoryTable(struct variable *vp, oid * name, size_t *length, i
 		ERROR_MSG("");
 	}
 	return (rval);
+}
+
+/**
+ * @fn int check_sccpOm15MinSsnHistoryTable_row(struct sccpOm15MinSsnHistoryTable_data *StorageTmp, struct sccpOm15MinSsnHistoryTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to check, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the ACTION phase.  The start of the ACTION pahse performs this consitency check
+ * on the row before allowing the request to proceed to the COMMIT phase.  This function can return
+ * SNMP_ERR_NOERR or a specific SNMP error value.  Values in StorageOld are the values before the
+ * varbinds on the mib were applied; the values in StorageTmp are the new values.  The function is
+ * permitted to change the values in StorageTmp to correct them; however, preference should be made
+ * for setting values where were not in the varbinds.
+ */
+int
+check_sccpOm15MinSsnHistoryTable_row(struct sccpOm15MinSsnHistoryTable_data *StorageTmp, struct sccpOm15MinSsnHistoryTable_data *StorageOld)
+{
+	/* XXX: provide code to check the row for consistency */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int update_sccpOm15MinSsnHistoryTable_row(struct sccpOm15MinSsnHistoryTable_data *StorageTmp, struct sccpOm15MinSsnHistoryTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the set operation (ACTION phase) on a row
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to update, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the COMMIT phase.  The start of the ACTION phase performs a consistency check on
+ * the row before allowing the request to proceed to the COMMIT phase.  The COMMIT phase then
+ * arrives here with consistency already checked (see check_sccpOm15MinSsnHistoryTable_row()).  This function can
+ * return SNMP_ERR_NOERROR or SNMP_ERR_COMMITFAILED.  Values in StorageOld are the values before the
+ * varbinds on the row were applied: the values in StorageTmp are the new values.
+ */
+int
+update_sccpOm15MinSsnHistoryTable_row(struct sccpOm15MinSsnHistoryTable_data *StorageTmp, struct sccpOm15MinSsnHistoryTable_data *StorageOld)
+{
+	/* XXX: provide code to update the row with the underlying device */
+	sccpOm15MinSsnHistoryTable_refresh = 1;
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int revert_sccpOm15MinSsnHistoryTable_row(struct sccpOm15MinSsnHistoryTable_data *StorageTmp, struct sccpOm15MinSsnHistoryTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the undo operation (UNDO phase) on a row
+ */
+void
+revert_sccpOm15MinSsnHistoryTable_row(struct sccpOm15MinSsnHistoryTable_data *StorageTmp, struct sccpOm15MinSsnHistoryTable_data *StorageOld)
+{
+	/* XXX: provide code to revert the row with the underlying device */
+	update_sccpOm15MinSsnHistoryTable_row(StorageOld, NULL);
 }
 
 /**
@@ -4919,17 +5782,15 @@ var_sccpOm15MinSsnHistoryTable(struct variable *vp, oid * name, size_t *length, 
 int
 write_sccpOm1stAndIntervalActivate(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static oid *old_value;
-	struct sccpOmMIB_data *StorageTmp = NULL;
-	static size_t old_length = 0;
-	static oid *objid = NULL;
+	struct sccpOmMIB_data *StorageTmp = NULL, *StorageOld = NULL;
+	oid *objid = NULL;
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("sccpOmMIB", "write_sccpOm1stAndIntervalActivate entering action=%d...  \n", action));
 	if ((StorageTmp = sccpOmMIBStorage) == NULL)
-		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
+		return SNMP_ERR_NOSUCHNAME;
 	switch (action) {
 	case RESERVE1:
-		objid = NULL;
 		if (var_val_type != ASN_OBJECT_ID) {
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpOm1stAndIntervalActivate not ASN_OBJECT_ID\n");
 			return SNMP_ERR_WRONGTYPE;
@@ -4938,29 +5799,69 @@ write_sccpOm1stAndIntervalActivate(int action, u_char *var_val, u_char var_val_t
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpOm1stAndIntervalActivate: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
-		break;
-	case RESERVE2:		/* memory reseveration, final preparation... */
+		/* one allocation for whole mib */
+		if ((StorageOld = StorageTmp->sccpOmMIB_old) == NULL)
+			if (StorageTmp->sccpOmMIB_rsvs == 0)
+				if ((StorageOld = StorageTmp->sccpOmMIB_old = sccpOmMIB_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->sccpOmMIB_rsvs++;
 		if ((objid = snmp_duplicate_objid((void *) var_val, var_val_len / sizeof(oid))) == NULL)
 			return SNMP_ERR_RESOURCEUNAVAILABLE;
-		break;
-	case ACTION:		/* The variable has been stored in objid for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the
-				   UNDO case */
-		old_value = StorageTmp->sccpOm1stAndIntervalActivate;
-		old_length = StorageTmp->sccpOm1stAndIntervalActivateLen;
+		SNMP_FREE(StorageTmp->sccpOm1stAndIntervalActivate);
 		StorageTmp->sccpOm1stAndIntervalActivate = objid;
 		StorageTmp->sccpOm1stAndIntervalActivateLen = var_val_len / sizeof(oid);
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
+		break;
+	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->sccpOmMIB_old) != NULL) {
+			/* one consistency check for the whole mib */
+			if (StorageTmp->sccpOmMIB_tsts == 0)
+				if ((ret = check_sccpOmMIB(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->sccpOmMIB_tsts++;
+		}
+		break;
+	case ACTION:		/* The variable has been stored in StorageTmp->sccpOm1stAndIntervalActivate for you to use, and you have just been asked to do something with it.  Note that anything
+				   done here must be reversable in the UNDO case */
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole mib */
+		if ((StorageOld = StorageTmp->sccpOmMIB_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->sccpOmMIB_sets == 0)
+				if ((ret = update_sccpOmMIB(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->sccpOmMIB_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
-		SNMP_FREE(old_value);
-		old_length = 0;
-		objid = NULL;
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->sccpOmMIB_old) != NULL) {
+			sccpOmMIB_destroy(&StorageTmp->sccpOmMIB_old);
+			StorageTmp->sccpOmMIB_rsvs = 0;
+			StorageTmp->sccpOmMIB_tsts = 0;
+			StorageTmp->sccpOmMIB_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->sccpOm1stAndIntervalActivate = old_value;
-		StorageTmp->sccpOm1stAndIntervalActivateLen = old_length;
+		if ((StorageOld = StorageTmp->sccpOmMIB_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->sccpOmMIB_tsts == 0)
+			revert_sccpOmMIB(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
-		SNMP_FREE(objid);
+		if ((StorageOld = StorageTmp->sccpOmMIB_old) == NULL)
+			break;
+		if (StorageOld->sccpOm1stAndIntervalActivate != NULL) {
+			SNMP_FREE(StorageTmp->sccpOm1stAndIntervalActivate);
+			StorageTmp->sccpOm1stAndIntervalActivate = StorageOld->sccpOm1stAndIntervalActivate;
+			StorageTmp->sccpOm1stAndIntervalActivateLen = StorageOld->sccpOm1stAndIntervalActivateLen;
+			StorageOld->sccpOm1stAndIntervalActivate = NULL;
+			StorageOld->sccpOm1stAndIntervalActivateLen = 0;
+		}
+		if (--StorageTmp->sccpOmMIB_rsvs == 0)
+			sccpOmMIB_destroy(&StorageTmp->sccpOmMIB_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -4980,17 +5881,15 @@ write_sccpOm1stAndIntervalActivate(int action, u_char *var_val, u_char var_val_t
 int
 write_sccpOm1stAndIntervalDeactivate(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static oid *old_value;
-	struct sccpOmMIB_data *StorageTmp = NULL;
-	static size_t old_length = 0;
-	static oid *objid = NULL;
+	struct sccpOmMIB_data *StorageTmp = NULL, *StorageOld = NULL;
+	oid *objid = NULL;
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("sccpOmMIB", "write_sccpOm1stAndIntervalDeactivate entering action=%d...  \n", action));
 	if ((StorageTmp = sccpOmMIBStorage) == NULL)
-		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
+		return SNMP_ERR_NOSUCHNAME;
 	switch (action) {
 	case RESERVE1:
-		objid = NULL;
 		if (var_val_type != ASN_OBJECT_ID) {
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpOm1stAndIntervalDeactivate not ASN_OBJECT_ID\n");
 			return SNMP_ERR_WRONGTYPE;
@@ -4999,29 +5898,69 @@ write_sccpOm1stAndIntervalDeactivate(int action, u_char *var_val, u_char var_val
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpOm1stAndIntervalDeactivate: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
-		break;
-	case RESERVE2:		/* memory reseveration, final preparation... */
+		/* one allocation for whole mib */
+		if ((StorageOld = StorageTmp->sccpOmMIB_old) == NULL)
+			if (StorageTmp->sccpOmMIB_rsvs == 0)
+				if ((StorageOld = StorageTmp->sccpOmMIB_old = sccpOmMIB_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->sccpOmMIB_rsvs++;
 		if ((objid = snmp_duplicate_objid((void *) var_val, var_val_len / sizeof(oid))) == NULL)
 			return SNMP_ERR_RESOURCEUNAVAILABLE;
-		break;
-	case ACTION:		/* The variable has been stored in objid for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the
-				   UNDO case */
-		old_value = StorageTmp->sccpOm1stAndIntervalDeactivate;
-		old_length = StorageTmp->sccpOm1stAndIntervalDeactivateLen;
+		SNMP_FREE(StorageTmp->sccpOm1stAndIntervalDeactivate);
 		StorageTmp->sccpOm1stAndIntervalDeactivate = objid;
 		StorageTmp->sccpOm1stAndIntervalDeactivateLen = var_val_len / sizeof(oid);
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
+		break;
+	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->sccpOmMIB_old) != NULL) {
+			/* one consistency check for the whole mib */
+			if (StorageTmp->sccpOmMIB_tsts == 0)
+				if ((ret = check_sccpOmMIB(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->sccpOmMIB_tsts++;
+		}
+		break;
+	case ACTION:		/* The variable has been stored in StorageTmp->sccpOm1stAndIntervalDeactivate for you to use, and you have just been asked to do something with it.  Note that anything 
+				   done here must be reversable in the UNDO case */
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole mib */
+		if ((StorageOld = StorageTmp->sccpOmMIB_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->sccpOmMIB_sets == 0)
+				if ((ret = update_sccpOmMIB(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->sccpOmMIB_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
-		SNMP_FREE(old_value);
-		old_length = 0;
-		objid = NULL;
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->sccpOmMIB_old) != NULL) {
+			sccpOmMIB_destroy(&StorageTmp->sccpOmMIB_old);
+			StorageTmp->sccpOmMIB_rsvs = 0;
+			StorageTmp->sccpOmMIB_tsts = 0;
+			StorageTmp->sccpOmMIB_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->sccpOm1stAndIntervalDeactivate = old_value;
-		StorageTmp->sccpOm1stAndIntervalDeactivateLen = old_length;
+		if ((StorageOld = StorageTmp->sccpOmMIB_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->sccpOmMIB_tsts == 0)
+			revert_sccpOmMIB(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
-		SNMP_FREE(objid);
+		if ((StorageOld = StorageTmp->sccpOmMIB_old) == NULL)
+			break;
+		if (StorageOld->sccpOm1stAndIntervalDeactivate != NULL) {
+			SNMP_FREE(StorageTmp->sccpOm1stAndIntervalDeactivate);
+			StorageTmp->sccpOm1stAndIntervalDeactivate = StorageOld->sccpOm1stAndIntervalDeactivate;
+			StorageTmp->sccpOm1stAndIntervalDeactivateLen = StorageOld->sccpOm1stAndIntervalDeactivateLen;
+			StorageOld->sccpOm1stAndIntervalDeactivate = NULL;
+			StorageOld->sccpOm1stAndIntervalDeactivateLen = 0;
+		}
+		if (--StorageTmp->sccpOmMIB_rsvs == 0)
+			sccpOmMIB_destroy(&StorageTmp->sccpOmMIB_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -5041,17 +5980,15 @@ write_sccpOm1stAndIntervalDeactivate(int action, u_char *var_val, u_char var_val
 int
 write_sccpOm5MinActivate(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static oid *old_value;
-	struct sccpOmMIB_data *StorageTmp = NULL;
-	static size_t old_length = 0;
-	static oid *objid = NULL;
+	struct sccpOmMIB_data *StorageTmp = NULL, *StorageOld = NULL;
+	oid *objid = NULL;
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("sccpOmMIB", "write_sccpOm5MinActivate entering action=%d...  \n", action));
 	if ((StorageTmp = sccpOmMIBStorage) == NULL)
-		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
+		return SNMP_ERR_NOSUCHNAME;
 	switch (action) {
 	case RESERVE1:
-		objid = NULL;
 		if (var_val_type != ASN_OBJECT_ID) {
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpOm5MinActivate not ASN_OBJECT_ID\n");
 			return SNMP_ERR_WRONGTYPE;
@@ -5060,29 +5997,69 @@ write_sccpOm5MinActivate(int action, u_char *var_val, u_char var_val_type, size_
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpOm5MinActivate: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
-		break;
-	case RESERVE2:		/* memory reseveration, final preparation... */
+		/* one allocation for whole mib */
+		if ((StorageOld = StorageTmp->sccpOmMIB_old) == NULL)
+			if (StorageTmp->sccpOmMIB_rsvs == 0)
+				if ((StorageOld = StorageTmp->sccpOmMIB_old = sccpOmMIB_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->sccpOmMIB_rsvs++;
 		if ((objid = snmp_duplicate_objid((void *) var_val, var_val_len / sizeof(oid))) == NULL)
 			return SNMP_ERR_RESOURCEUNAVAILABLE;
-		break;
-	case ACTION:		/* The variable has been stored in objid for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the
-				   UNDO case */
-		old_value = StorageTmp->sccpOm5MinActivate;
-		old_length = StorageTmp->sccpOm5MinActivateLen;
+		SNMP_FREE(StorageTmp->sccpOm5MinActivate);
 		StorageTmp->sccpOm5MinActivate = objid;
 		StorageTmp->sccpOm5MinActivateLen = var_val_len / sizeof(oid);
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
+		break;
+	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->sccpOmMIB_old) != NULL) {
+			/* one consistency check for the whole mib */
+			if (StorageTmp->sccpOmMIB_tsts == 0)
+				if ((ret = check_sccpOmMIB(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->sccpOmMIB_tsts++;
+		}
+		break;
+	case ACTION:		/* The variable has been stored in StorageTmp->sccpOm5MinActivate for you to use, and you have just been asked to do something with it.  Note that anything done here
+				   must be reversable in the UNDO case */
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole mib */
+		if ((StorageOld = StorageTmp->sccpOmMIB_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->sccpOmMIB_sets == 0)
+				if ((ret = update_sccpOmMIB(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->sccpOmMIB_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
-		SNMP_FREE(old_value);
-		old_length = 0;
-		objid = NULL;
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->sccpOmMIB_old) != NULL) {
+			sccpOmMIB_destroy(&StorageTmp->sccpOmMIB_old);
+			StorageTmp->sccpOmMIB_rsvs = 0;
+			StorageTmp->sccpOmMIB_tsts = 0;
+			StorageTmp->sccpOmMIB_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->sccpOm5MinActivate = old_value;
-		StorageTmp->sccpOm5MinActivateLen = old_length;
+		if ((StorageOld = StorageTmp->sccpOmMIB_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->sccpOmMIB_tsts == 0)
+			revert_sccpOmMIB(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
-		SNMP_FREE(objid);
+		if ((StorageOld = StorageTmp->sccpOmMIB_old) == NULL)
+			break;
+		if (StorageOld->sccpOm5MinActivate != NULL) {
+			SNMP_FREE(StorageTmp->sccpOm5MinActivate);
+			StorageTmp->sccpOm5MinActivate = StorageOld->sccpOm5MinActivate;
+			StorageTmp->sccpOm5MinActivateLen = StorageOld->sccpOm5MinActivateLen;
+			StorageOld->sccpOm5MinActivate = NULL;
+			StorageOld->sccpOm5MinActivateLen = 0;
+		}
+		if (--StorageTmp->sccpOmMIB_rsvs == 0)
+			sccpOmMIB_destroy(&StorageTmp->sccpOmMIB_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -5102,17 +6079,15 @@ write_sccpOm5MinActivate(int action, u_char *var_val, u_char var_val_type, size_
 int
 write_sccpOm5MinDeaActivate(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static oid *old_value;
-	struct sccpOmMIB_data *StorageTmp = NULL;
-	static size_t old_length = 0;
-	static oid *objid = NULL;
+	struct sccpOmMIB_data *StorageTmp = NULL, *StorageOld = NULL;
+	oid *objid = NULL;
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("sccpOmMIB", "write_sccpOm5MinDeaActivate entering action=%d...  \n", action));
 	if ((StorageTmp = sccpOmMIBStorage) == NULL)
-		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
+		return SNMP_ERR_NOSUCHNAME;
 	switch (action) {
 	case RESERVE1:
-		objid = NULL;
 		if (var_val_type != ASN_OBJECT_ID) {
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpOm5MinDeaActivate not ASN_OBJECT_ID\n");
 			return SNMP_ERR_WRONGTYPE;
@@ -5121,29 +6096,69 @@ write_sccpOm5MinDeaActivate(int action, u_char *var_val, u_char var_val_type, si
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpOm5MinDeaActivate: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
-		break;
-	case RESERVE2:		/* memory reseveration, final preparation... */
+		/* one allocation for whole mib */
+		if ((StorageOld = StorageTmp->sccpOmMIB_old) == NULL)
+			if (StorageTmp->sccpOmMIB_rsvs == 0)
+				if ((StorageOld = StorageTmp->sccpOmMIB_old = sccpOmMIB_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->sccpOmMIB_rsvs++;
 		if ((objid = snmp_duplicate_objid((void *) var_val, var_val_len / sizeof(oid))) == NULL)
 			return SNMP_ERR_RESOURCEUNAVAILABLE;
-		break;
-	case ACTION:		/* The variable has been stored in objid for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the
-				   UNDO case */
-		old_value = StorageTmp->sccpOm5MinDeaActivate;
-		old_length = StorageTmp->sccpOm5MinDeaActivateLen;
+		SNMP_FREE(StorageTmp->sccpOm5MinDeaActivate);
 		StorageTmp->sccpOm5MinDeaActivate = objid;
 		StorageTmp->sccpOm5MinDeaActivateLen = var_val_len / sizeof(oid);
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
+		break;
+	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->sccpOmMIB_old) != NULL) {
+			/* one consistency check for the whole mib */
+			if (StorageTmp->sccpOmMIB_tsts == 0)
+				if ((ret = check_sccpOmMIB(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->sccpOmMIB_tsts++;
+		}
+		break;
+	case ACTION:		/* The variable has been stored in StorageTmp->sccpOm5MinDeaActivate for you to use, and you have just been asked to do something with it.  Note that anything done
+				   here must be reversable in the UNDO case */
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole mib */
+		if ((StorageOld = StorageTmp->sccpOmMIB_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->sccpOmMIB_sets == 0)
+				if ((ret = update_sccpOmMIB(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->sccpOmMIB_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
-		SNMP_FREE(old_value);
-		old_length = 0;
-		objid = NULL;
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->sccpOmMIB_old) != NULL) {
+			sccpOmMIB_destroy(&StorageTmp->sccpOmMIB_old);
+			StorageTmp->sccpOmMIB_rsvs = 0;
+			StorageTmp->sccpOmMIB_tsts = 0;
+			StorageTmp->sccpOmMIB_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->sccpOm5MinDeaActivate = old_value;
-		StorageTmp->sccpOm5MinDeaActivateLen = old_length;
+		if ((StorageOld = StorageTmp->sccpOmMIB_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->sccpOmMIB_tsts == 0)
+			revert_sccpOmMIB(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
-		SNMP_FREE(objid);
+		if ((StorageOld = StorageTmp->sccpOmMIB_old) == NULL)
+			break;
+		if (StorageOld->sccpOm5MinDeaActivate != NULL) {
+			SNMP_FREE(StorageTmp->sccpOm5MinDeaActivate);
+			StorageTmp->sccpOm5MinDeaActivate = StorageOld->sccpOm5MinDeaActivate;
+			StorageTmp->sccpOm5MinDeaActivateLen = StorageOld->sccpOm5MinDeaActivateLen;
+			StorageOld->sccpOm5MinDeaActivate = NULL;
+			StorageOld->sccpOm5MinDeaActivateLen = 0;
+		}
+		if (--StorageTmp->sccpOmMIB_rsvs == 0)
+			sccpOmMIB_destroy(&StorageTmp->sccpOmMIB_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -5163,17 +6178,15 @@ write_sccpOm5MinDeaActivate(int action, u_char *var_val, u_char var_val_type, si
 int
 write_sccpOm15MinActivate(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static oid *old_value;
-	struct sccpOmMIB_data *StorageTmp = NULL;
-	static size_t old_length = 0;
-	static oid *objid = NULL;
+	struct sccpOmMIB_data *StorageTmp = NULL, *StorageOld = NULL;
+	oid *objid = NULL;
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("sccpOmMIB", "write_sccpOm15MinActivate entering action=%d...  \n", action));
 	if ((StorageTmp = sccpOmMIBStorage) == NULL)
-		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
+		return SNMP_ERR_NOSUCHNAME;
 	switch (action) {
 	case RESERVE1:
-		objid = NULL;
 		if (var_val_type != ASN_OBJECT_ID) {
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpOm15MinActivate not ASN_OBJECT_ID\n");
 			return SNMP_ERR_WRONGTYPE;
@@ -5182,29 +6195,69 @@ write_sccpOm15MinActivate(int action, u_char *var_val, u_char var_val_type, size
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpOm15MinActivate: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
-		break;
-	case RESERVE2:		/* memory reseveration, final preparation... */
+		/* one allocation for whole mib */
+		if ((StorageOld = StorageTmp->sccpOmMIB_old) == NULL)
+			if (StorageTmp->sccpOmMIB_rsvs == 0)
+				if ((StorageOld = StorageTmp->sccpOmMIB_old = sccpOmMIB_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->sccpOmMIB_rsvs++;
 		if ((objid = snmp_duplicate_objid((void *) var_val, var_val_len / sizeof(oid))) == NULL)
 			return SNMP_ERR_RESOURCEUNAVAILABLE;
-		break;
-	case ACTION:		/* The variable has been stored in objid for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the
-				   UNDO case */
-		old_value = StorageTmp->sccpOm15MinActivate;
-		old_length = StorageTmp->sccpOm15MinActivateLen;
+		SNMP_FREE(StorageTmp->sccpOm15MinActivate);
 		StorageTmp->sccpOm15MinActivate = objid;
 		StorageTmp->sccpOm15MinActivateLen = var_val_len / sizeof(oid);
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
+		break;
+	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->sccpOmMIB_old) != NULL) {
+			/* one consistency check for the whole mib */
+			if (StorageTmp->sccpOmMIB_tsts == 0)
+				if ((ret = check_sccpOmMIB(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->sccpOmMIB_tsts++;
+		}
+		break;
+	case ACTION:		/* The variable has been stored in StorageTmp->sccpOm15MinActivate for you to use, and you have just been asked to do something with it.  Note that anything done here
+				   must be reversable in the UNDO case */
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole mib */
+		if ((StorageOld = StorageTmp->sccpOmMIB_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->sccpOmMIB_sets == 0)
+				if ((ret = update_sccpOmMIB(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->sccpOmMIB_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
-		SNMP_FREE(old_value);
-		old_length = 0;
-		objid = NULL;
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->sccpOmMIB_old) != NULL) {
+			sccpOmMIB_destroy(&StorageTmp->sccpOmMIB_old);
+			StorageTmp->sccpOmMIB_rsvs = 0;
+			StorageTmp->sccpOmMIB_tsts = 0;
+			StorageTmp->sccpOmMIB_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->sccpOm15MinActivate = old_value;
-		StorageTmp->sccpOm15MinActivateLen = old_length;
+		if ((StorageOld = StorageTmp->sccpOmMIB_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->sccpOmMIB_tsts == 0)
+			revert_sccpOmMIB(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
-		SNMP_FREE(objid);
+		if ((StorageOld = StorageTmp->sccpOmMIB_old) == NULL)
+			break;
+		if (StorageOld->sccpOm15MinActivate != NULL) {
+			SNMP_FREE(StorageTmp->sccpOm15MinActivate);
+			StorageTmp->sccpOm15MinActivate = StorageOld->sccpOm15MinActivate;
+			StorageTmp->sccpOm15MinActivateLen = StorageOld->sccpOm15MinActivateLen;
+			StorageOld->sccpOm15MinActivate = NULL;
+			StorageOld->sccpOm15MinActivateLen = 0;
+		}
+		if (--StorageTmp->sccpOmMIB_rsvs == 0)
+			sccpOmMIB_destroy(&StorageTmp->sccpOmMIB_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -5224,17 +6277,15 @@ write_sccpOm15MinActivate(int action, u_char *var_val, u_char var_val_type, size
 int
 write_sccpOm15MinDeaActivate(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static oid *old_value;
-	struct sccpOmMIB_data *StorageTmp = NULL;
-	static size_t old_length = 0;
-	static oid *objid = NULL;
+	struct sccpOmMIB_data *StorageTmp = NULL, *StorageOld = NULL;
+	oid *objid = NULL;
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("sccpOmMIB", "write_sccpOm15MinDeaActivate entering action=%d...  \n", action));
 	if ((StorageTmp = sccpOmMIBStorage) == NULL)
-		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
+		return SNMP_ERR_NOSUCHNAME;
 	switch (action) {
 	case RESERVE1:
-		objid = NULL;
 		if (var_val_type != ASN_OBJECT_ID) {
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpOm15MinDeaActivate not ASN_OBJECT_ID\n");
 			return SNMP_ERR_WRONGTYPE;
@@ -5243,29 +6294,69 @@ write_sccpOm15MinDeaActivate(int action, u_char *var_val, u_char var_val_type, s
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpOm15MinDeaActivate: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
-		break;
-	case RESERVE2:		/* memory reseveration, final preparation... */
+		/* one allocation for whole mib */
+		if ((StorageOld = StorageTmp->sccpOmMIB_old) == NULL)
+			if (StorageTmp->sccpOmMIB_rsvs == 0)
+				if ((StorageOld = StorageTmp->sccpOmMIB_old = sccpOmMIB_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->sccpOmMIB_rsvs++;
 		if ((objid = snmp_duplicate_objid((void *) var_val, var_val_len / sizeof(oid))) == NULL)
 			return SNMP_ERR_RESOURCEUNAVAILABLE;
-		break;
-	case ACTION:		/* The variable has been stored in objid for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the
-				   UNDO case */
-		old_value = StorageTmp->sccpOm15MinDeaActivate;
-		old_length = StorageTmp->sccpOm15MinDeaActivateLen;
+		SNMP_FREE(StorageTmp->sccpOm15MinDeaActivate);
 		StorageTmp->sccpOm15MinDeaActivate = objid;
 		StorageTmp->sccpOm15MinDeaActivateLen = var_val_len / sizeof(oid);
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
+		break;
+	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->sccpOmMIB_old) != NULL) {
+			/* one consistency check for the whole mib */
+			if (StorageTmp->sccpOmMIB_tsts == 0)
+				if ((ret = check_sccpOmMIB(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->sccpOmMIB_tsts++;
+		}
+		break;
+	case ACTION:		/* The variable has been stored in StorageTmp->sccpOm15MinDeaActivate for you to use, and you have just been asked to do something with it.  Note that anything done
+				   here must be reversable in the UNDO case */
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole mib */
+		if ((StorageOld = StorageTmp->sccpOmMIB_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->sccpOmMIB_sets == 0)
+				if ((ret = update_sccpOmMIB(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->sccpOmMIB_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
-		SNMP_FREE(old_value);
-		old_length = 0;
-		objid = NULL;
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->sccpOmMIB_old) != NULL) {
+			sccpOmMIB_destroy(&StorageTmp->sccpOmMIB_old);
+			StorageTmp->sccpOmMIB_rsvs = 0;
+			StorageTmp->sccpOmMIB_tsts = 0;
+			StorageTmp->sccpOmMIB_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->sccpOm15MinDeaActivate = old_value;
-		StorageTmp->sccpOm15MinDeaActivateLen = old_length;
+		if ((StorageOld = StorageTmp->sccpOmMIB_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->sccpOmMIB_tsts == 0)
+			revert_sccpOmMIB(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
-		SNMP_FREE(objid);
+		if ((StorageOld = StorageTmp->sccpOmMIB_old) == NULL)
+			break;
+		if (StorageOld->sccpOm15MinDeaActivate != NULL) {
+			SNMP_FREE(StorageTmp->sccpOm15MinDeaActivate);
+			StorageTmp->sccpOm15MinDeaActivate = StorageOld->sccpOm15MinDeaActivate;
+			StorageTmp->sccpOm15MinDeaActivateLen = StorageOld->sccpOm15MinDeaActivateLen;
+			StorageOld->sccpOm15MinDeaActivate = NULL;
+			StorageOld->sccpOm15MinDeaActivateLen = 0;
+		}
+		if (--StorageTmp->sccpOmMIB_rsvs == 0)
+			sccpOmMIB_destroy(&StorageTmp->sccpOmMIB_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -5285,13 +6376,13 @@ write_sccpOm15MinDeaActivate(int action, u_char *var_val, u_char var_val_type, s
 int
 write_sccpOm5MinMaxIntervals(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static ulong old_value;
-	struct sccpOmMIB_data *StorageTmp = NULL;
+	struct sccpOmMIB_data *StorageTmp = NULL, *StorageOld = NULL;
 	ulong set_value = *((ulong *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("sccpOmMIB", "write_sccpOm5MinMaxIntervals entering action=%d...  \n", action));
 	if ((StorageTmp = sccpOmMIBStorage) == NULL)
-		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
+		return SNMP_ERR_NOSUCHNAME;
 	switch (action) {
 	case RESERVE1:
 		if (var_val_type != ASN_UNSIGNED) {
@@ -5308,20 +6399,59 @@ write_sccpOm5MinMaxIntervals(int action, u_char *var_val, u_char var_val_type, s
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpOm5MinMaxIntervals: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
+		/* one allocation for whole mib */
+		if ((StorageOld = StorageTmp->sccpOmMIB_old) == NULL)
+			if (StorageTmp->sccpOmMIB_rsvs == 0)
+				if ((StorageOld = StorageTmp->sccpOmMIB_old = sccpOmMIB_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->sccpOmMIB_rsvs++;
+		StorageTmp->sccpOm5MinMaxIntervals = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->sccpOmMIB_old) != NULL) {
+			/* one consistency check for the whole mib */
+			if (StorageTmp->sccpOmMIB_tsts == 0)
+				if ((ret = check_sccpOmMIB(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->sccpOmMIB_tsts++;
+		}
 		break;
-	case ACTION:		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in
-				   the UNDO case */
-		old_value = StorageTmp->sccpOm5MinMaxIntervals;
-		StorageTmp->sccpOm5MinMaxIntervals = set_value;
+	case ACTION:		/* The variable has been stored in StorageTmp->sccpOm5MinMaxIntervals for you to use, and you have just been asked to do something with it.  Note that anything done
+				   here must be reversable in the UNDO case */
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole mib */
+		if ((StorageOld = StorageTmp->sccpOmMIB_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->sccpOmMIB_sets == 0)
+				if ((ret = update_sccpOmMIB(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->sccpOmMIB_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->sccpOmMIB_old) != NULL) {
+			sccpOmMIB_destroy(&StorageTmp->sccpOmMIB_old);
+			StorageTmp->sccpOmMIB_rsvs = 0;
+			StorageTmp->sccpOmMIB_tsts = 0;
+			StorageTmp->sccpOmMIB_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->sccpOm5MinMaxIntervals = old_value;
+		if ((StorageOld = StorageTmp->sccpOmMIB_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->sccpOmMIB_tsts == 0)
+			revert_sccpOmMIB(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->sccpOmMIB_old) == NULL)
+			break;
+		StorageTmp->sccpOm5MinMaxIntervals = StorageOld->sccpOm5MinMaxIntervals;
+		if (--StorageTmp->sccpOmMIB_rsvs == 0)
+			sccpOmMIB_destroy(&StorageTmp->sccpOmMIB_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -5341,13 +6471,13 @@ write_sccpOm5MinMaxIntervals(int action, u_char *var_val, u_char var_val_type, s
 int
 write_sccpOm15MinMaxIntervals(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static ulong old_value;
-	struct sccpOmMIB_data *StorageTmp = NULL;
+	struct sccpOmMIB_data *StorageTmp = NULL, *StorageOld = NULL;
 	ulong set_value = *((ulong *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("sccpOmMIB", "write_sccpOm15MinMaxIntervals entering action=%d...  \n", action));
 	if ((StorageTmp = sccpOmMIBStorage) == NULL)
-		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
+		return SNMP_ERR_NOSUCHNAME;
 	switch (action) {
 	case RESERVE1:
 		if (var_val_type != ASN_UNSIGNED) {
@@ -5364,20 +6494,59 @@ write_sccpOm15MinMaxIntervals(int action, u_char *var_val, u_char var_val_type, 
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpOm15MinMaxIntervals: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
+		/* one allocation for whole mib */
+		if ((StorageOld = StorageTmp->sccpOmMIB_old) == NULL)
+			if (StorageTmp->sccpOmMIB_rsvs == 0)
+				if ((StorageOld = StorageTmp->sccpOmMIB_old = sccpOmMIB_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->sccpOmMIB_rsvs++;
+		StorageTmp->sccpOm15MinMaxIntervals = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->sccpOmMIB_old) != NULL) {
+			/* one consistency check for the whole mib */
+			if (StorageTmp->sccpOmMIB_tsts == 0)
+				if ((ret = check_sccpOmMIB(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->sccpOmMIB_tsts++;
+		}
 		break;
-	case ACTION:		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in
-				   the UNDO case */
-		old_value = StorageTmp->sccpOm15MinMaxIntervals;
-		StorageTmp->sccpOm15MinMaxIntervals = set_value;
+	case ACTION:		/* The variable has been stored in StorageTmp->sccpOm15MinMaxIntervals for you to use, and you have just been asked to do something with it.  Note that anything done
+				   here must be reversable in the UNDO case */
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole mib */
+		if ((StorageOld = StorageTmp->sccpOmMIB_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->sccpOmMIB_sets == 0)
+				if ((ret = update_sccpOmMIB(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->sccpOmMIB_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->sccpOmMIB_old) != NULL) {
+			sccpOmMIB_destroy(&StorageTmp->sccpOmMIB_old);
+			StorageTmp->sccpOmMIB_rsvs = 0;
+			StorageTmp->sccpOmMIB_tsts = 0;
+			StorageTmp->sccpOmMIB_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->sccpOm15MinMaxIntervals = old_value;
+		if ((StorageOld = StorageTmp->sccpOmMIB_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->sccpOmMIB_tsts == 0)
+			revert_sccpOmMIB(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->sccpOmMIB_old) == NULL)
+			break;
+		StorageTmp->sccpOm15MinMaxIntervals = StorageOld->sccpOm15MinMaxIntervals;
+		if (--StorageTmp->sccpOmMIB_rsvs == 0)
+			sccpOmMIB_destroy(&StorageTmp->sccpOmMIB_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -5397,13 +6566,13 @@ write_sccpOm15MinMaxIntervals(int action, u_char *var_val, u_char var_val_type, 
 int
 write_sccpOmpDefault(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static long old_value;
-	struct sccpOmMIB_data *StorageTmp = NULL;
+	struct sccpOmMIB_data *StorageTmp = NULL, *StorageOld = NULL;
 	long set_value = *((long *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("sccpOmMIB", "write_sccpOmpDefault entering action=%d...  \n", action));
 	if ((StorageTmp = sccpOmMIBStorage) == NULL)
-		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
+		return SNMP_ERR_NOSUCHNAME;
 	switch (action) {
 	case RESERVE1:
 		if (var_val_type != ASN_INTEGER) {
@@ -5415,20 +6584,59 @@ write_sccpOmpDefault(int action, u_char *var_val, u_char var_val_type, size_t va
 			return SNMP_ERR_WRONGLENGTH;
 		}
 		/* Note: default value 8 */
+		/* one allocation for whole mib */
+		if ((StorageOld = StorageTmp->sccpOmMIB_old) == NULL)
+			if (StorageTmp->sccpOmMIB_rsvs == 0)
+				if ((StorageOld = StorageTmp->sccpOmMIB_old = sccpOmMIB_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->sccpOmMIB_rsvs++;
+		StorageTmp->sccpOmpDefault = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->sccpOmMIB_old) != NULL) {
+			/* one consistency check for the whole mib */
+			if (StorageTmp->sccpOmMIB_tsts == 0)
+				if ((ret = check_sccpOmMIB(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->sccpOmMIB_tsts++;
+		}
 		break;
-	case ACTION:		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in
-				   the UNDO case */
-		old_value = StorageTmp->sccpOmpDefault;
-		StorageTmp->sccpOmpDefault = set_value;
+	case ACTION:		/* The variable has been stored in StorageTmp->sccpOmpDefault for you to use, and you have just been asked to do something with it.  Note that anything done here must
+				   be reversable in the UNDO case */
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole mib */
+		if ((StorageOld = StorageTmp->sccpOmMIB_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->sccpOmMIB_sets == 0)
+				if ((ret = update_sccpOmMIB(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->sccpOmMIB_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->sccpOmMIB_old) != NULL) {
+			sccpOmMIB_destroy(&StorageTmp->sccpOmMIB_old);
+			StorageTmp->sccpOmMIB_rsvs = 0;
+			StorageTmp->sccpOmMIB_tsts = 0;
+			StorageTmp->sccpOmMIB_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->sccpOmpDefault = old_value;
+		if ((StorageOld = StorageTmp->sccpOmMIB_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->sccpOmMIB_tsts == 0)
+			revert_sccpOmMIB(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->sccpOmMIB_old) == NULL)
+			break;
+		StorageTmp->sccpOmpDefault = StorageOld->sccpOmpDefault;
+		if (--StorageTmp->sccpOmMIB_rsvs == 0)
+			sccpOmMIB_destroy(&StorageTmp->sccpOmMIB_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -5448,13 +6656,13 @@ write_sccpOmpDefault(int action, u_char *var_val, u_char var_val_type, size_t va
 int
 write_sccpOmNrOfSubLevelsDefault(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static long old_value;
-	struct sccpOmMIB_data *StorageTmp = NULL;
+	struct sccpOmMIB_data *StorageTmp = NULL, *StorageOld = NULL;
 	long set_value = *((long *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("sccpOmMIB", "write_sccpOmNrOfSubLevelsDefault entering action=%d...  \n", action));
 	if ((StorageTmp = sccpOmMIBStorage) == NULL)
-		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
+		return SNMP_ERR_NOSUCHNAME;
 	switch (action) {
 	case RESERVE1:
 		if (var_val_type != ASN_INTEGER) {
@@ -5466,20 +6674,59 @@ write_sccpOmNrOfSubLevelsDefault(int action, u_char *var_val, u_char var_val_typ
 			return SNMP_ERR_WRONGLENGTH;
 		}
 		/* Note: default value 4 */
+		/* one allocation for whole mib */
+		if ((StorageOld = StorageTmp->sccpOmMIB_old) == NULL)
+			if (StorageTmp->sccpOmMIB_rsvs == 0)
+				if ((StorageOld = StorageTmp->sccpOmMIB_old = sccpOmMIB_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->sccpOmMIB_rsvs++;
+		StorageTmp->sccpOmNrOfSubLevelsDefault = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->sccpOmMIB_old) != NULL) {
+			/* one consistency check for the whole mib */
+			if (StorageTmp->sccpOmMIB_tsts == 0)
+				if ((ret = check_sccpOmMIB(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->sccpOmMIB_tsts++;
+		}
 		break;
-	case ACTION:		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in
-				   the UNDO case */
-		old_value = StorageTmp->sccpOmNrOfSubLevelsDefault;
-		StorageTmp->sccpOmNrOfSubLevelsDefault = set_value;
+	case ACTION:		/* The variable has been stored in StorageTmp->sccpOmNrOfSubLevelsDefault for you to use, and you have just been asked to do something with it.  Note that anything
+				   done here must be reversable in the UNDO case */
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole mib */
+		if ((StorageOld = StorageTmp->sccpOmMIB_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->sccpOmMIB_sets == 0)
+				if ((ret = update_sccpOmMIB(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->sccpOmMIB_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->sccpOmMIB_old) != NULL) {
+			sccpOmMIB_destroy(&StorageTmp->sccpOmMIB_old);
+			StorageTmp->sccpOmMIB_rsvs = 0;
+			StorageTmp->sccpOmMIB_tsts = 0;
+			StorageTmp->sccpOmMIB_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->sccpOmNrOfSubLevelsDefault = old_value;
+		if ((StorageOld = StorageTmp->sccpOmMIB_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->sccpOmMIB_tsts == 0)
+			revert_sccpOmMIB(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->sccpOmMIB_old) == NULL)
+			break;
+		StorageTmp->sccpOmNrOfSubLevelsDefault = StorageOld->sccpOmNrOfSubLevelsDefault;
+		if (--StorageTmp->sccpOmMIB_rsvs == 0)
+			sccpOmMIB_destroy(&StorageTmp->sccpOmMIB_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -5499,13 +6746,13 @@ write_sccpOmNrOfSubLevelsDefault(int action, u_char *var_val, u_char var_val_typ
 int
 write_sccpOmNrOfRestrictionLevelsDefault(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static long old_value;
-	struct sccpOmMIB_data *StorageTmp = NULL;
+	struct sccpOmMIB_data *StorageTmp = NULL, *StorageOld = NULL;
 	long set_value = *((long *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("sccpOmMIB", "write_sccpOmNrOfRestrictionLevelsDefault entering action=%d...  \n", action));
 	if ((StorageTmp = sccpOmMIBStorage) == NULL)
-		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
+		return SNMP_ERR_NOSUCHNAME;
 	switch (action) {
 	case RESERVE1:
 		if (var_val_type != ASN_INTEGER) {
@@ -5517,167 +6764,62 @@ write_sccpOmNrOfRestrictionLevelsDefault(int action, u_char *var_val, u_char var
 			return SNMP_ERR_WRONGLENGTH;
 		}
 		/* Note: default value 8 */
+		/* one allocation for whole mib */
+		if ((StorageOld = StorageTmp->sccpOmMIB_old) == NULL)
+			if (StorageTmp->sccpOmMIB_rsvs == 0)
+				if ((StorageOld = StorageTmp->sccpOmMIB_old = sccpOmMIB_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->sccpOmMIB_rsvs++;
+		StorageTmp->sccpOmNrOfRestrictionLevelsDefault = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->sccpOmMIB_old) != NULL) {
+			/* one consistency check for the whole mib */
+			if (StorageTmp->sccpOmMIB_tsts == 0)
+				if ((ret = check_sccpOmMIB(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->sccpOmMIB_tsts++;
+		}
 		break;
-	case ACTION:		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in
-				   the UNDO case */
-		old_value = StorageTmp->sccpOmNrOfRestrictionLevelsDefault;
-		StorageTmp->sccpOmNrOfRestrictionLevelsDefault = set_value;
+	case ACTION:		/* The variable has been stored in StorageTmp->sccpOmNrOfRestrictionLevelsDefault for you to use, and you have just been asked to do something with it.  Note that
+				   anything done here must be reversable in the UNDO case */
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole mib */
+		if ((StorageOld = StorageTmp->sccpOmMIB_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->sccpOmMIB_sets == 0)
+				if ((ret = update_sccpOmMIB(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->sccpOmMIB_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->sccpOmMIB_old) != NULL) {
+			sccpOmMIB_destroy(&StorageTmp->sccpOmMIB_old);
+			StorageTmp->sccpOmMIB_rsvs = 0;
+			StorageTmp->sccpOmMIB_tsts = 0;
+			StorageTmp->sccpOmMIB_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->sccpOmNrOfRestrictionLevelsDefault = old_value;
+		if ((StorageOld = StorageTmp->sccpOmMIB_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->sccpOmMIB_tsts == 0)
+			revert_sccpOmMIB(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->sccpOmMIB_old) == NULL)
+			break;
+		StorageTmp->sccpOmNrOfRestrictionLevelsDefault = StorageOld->sccpOmNrOfRestrictionLevelsDefault;
+		if (--StorageTmp->sccpOmMIB_rsvs == 0)
+			sccpOmMIB_destroy(&StorageTmp->sccpOmMIB_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
-}
-
-/**
- * @fn int sccpOmErrorsTable_consistent(struct sccpOmErrorsTable_data *thedata)
- * @param thedata the row data to check for consistency.
- * @brief check the internal consistency of a table row.
- *
- * This function checks the internal consistency of a table row for the sccpOmErrorsTable table.  If the
- * table row is internally consistent, then this function returns SNMP_ERR_NOERROR, otherwise the
- * function returns an SNMP error code and it will not be possible to activate the row until the
- * row's internal consistency is corrected.  This function might use a 'test' operation against the
- * driver to ensure that the commit phase will succeed.
- */
-int
-sccpOmErrorsTable_consistent(struct sccpOmErrorsTable_data *thedata)
-{
-	/* XXX: check row consistency return SNMP_ERR_NOERROR if consistent, or an SNMP error code if not. */
-	return (SNMP_ERR_NOERROR);
-}
-
-/**
- * @fn int sccpOmMessageTable_consistent(struct sccpOmMessageTable_data *thedata)
- * @param thedata the row data to check for consistency.
- * @brief check the internal consistency of a table row.
- *
- * This function checks the internal consistency of a table row for the sccpOmMessageTable table.  If the
- * table row is internally consistent, then this function returns SNMP_ERR_NOERROR, otherwise the
- * function returns an SNMP error code and it will not be possible to activate the row until the
- * row's internal consistency is corrected.  This function might use a 'test' operation against the
- * driver to ensure that the commit phase will succeed.
- */
-int
-sccpOmMessageTable_consistent(struct sccpOmMessageTable_data *thedata)
-{
-	/* XXX: check row consistency return SNMP_ERR_NOERROR if consistent, or an SNMP error code if not. */
-	return (SNMP_ERR_NOERROR);
-}
-
-/**
- * @fn int sccpOmAccessibilityTable_consistent(struct sccpOmAccessibilityTable_data *thedata)
- * @param thedata the row data to check for consistency.
- * @brief check the internal consistency of a table row.
- *
- * This function checks the internal consistency of a table row for the sccpOmAccessibilityTable table.  If the
- * table row is internally consistent, then this function returns SNMP_ERR_NOERROR, otherwise the
- * function returns an SNMP error code and it will not be possible to activate the row until the
- * row's internal consistency is corrected.  This function might use a 'test' operation against the
- * driver to ensure that the commit phase will succeed.
- */
-int
-sccpOmAccessibilityTable_consistent(struct sccpOmAccessibilityTable_data *thedata)
-{
-	/* XXX: check row consistency return SNMP_ERR_NOERROR if consistent, or an SNMP error code if not. */
-	return (SNMP_ERR_NOERROR);
-}
-
-/**
- * @fn int sccpOmUtilizationTable_consistent(struct sccpOmUtilizationTable_data *thedata)
- * @param thedata the row data to check for consistency.
- * @brief check the internal consistency of a table row.
- *
- * This function checks the internal consistency of a table row for the sccpOmUtilizationTable table.  If the
- * table row is internally consistent, then this function returns SNMP_ERR_NOERROR, otherwise the
- * function returns an SNMP error code and it will not be possible to activate the row until the
- * row's internal consistency is corrected.  This function might use a 'test' operation against the
- * driver to ensure that the commit phase will succeed.
- */
-int
-sccpOmUtilizationTable_consistent(struct sccpOmUtilizationTable_data *thedata)
-{
-	/* XXX: check row consistency return SNMP_ERR_NOERROR if consistent, or an SNMP error code if not. */
-	return (SNMP_ERR_NOERROR);
-}
-
-/**
- * @fn int sccpOm5MinHistoryTable_consistent(struct sccpOm5MinHistoryTable_data *thedata)
- * @param thedata the row data to check for consistency.
- * @brief check the internal consistency of a table row.
- *
- * This function checks the internal consistency of a table row for the sccpOm5MinHistoryTable table.  If the
- * table row is internally consistent, then this function returns SNMP_ERR_NOERROR, otherwise the
- * function returns an SNMP error code and it will not be possible to activate the row until the
- * row's internal consistency is corrected.  This function might use a 'test' operation against the
- * driver to ensure that the commit phase will succeed.
- */
-int
-sccpOm5MinHistoryTable_consistent(struct sccpOm5MinHistoryTable_data *thedata)
-{
-	/* XXX: check row consistency return SNMP_ERR_NOERROR if consistent, or an SNMP error code if not. */
-	return (SNMP_ERR_NOERROR);
-}
-
-/**
- * @fn int sccpOm15MinHistoryTable_consistent(struct sccpOm15MinHistoryTable_data *thedata)
- * @param thedata the row data to check for consistency.
- * @brief check the internal consistency of a table row.
- *
- * This function checks the internal consistency of a table row for the sccpOm15MinHistoryTable table.  If the
- * table row is internally consistent, then this function returns SNMP_ERR_NOERROR, otherwise the
- * function returns an SNMP error code and it will not be possible to activate the row until the
- * row's internal consistency is corrected.  This function might use a 'test' operation against the
- * driver to ensure that the commit phase will succeed.
- */
-int
-sccpOm15MinHistoryTable_consistent(struct sccpOm15MinHistoryTable_data *thedata)
-{
-	/* XXX: check row consistency return SNMP_ERR_NOERROR if consistent, or an SNMP error code if not. */
-	return (SNMP_ERR_NOERROR);
-}
-
-/**
- * @fn int sccpOm5MinSsnHistoryTable_consistent(struct sccpOm5MinSsnHistoryTable_data *thedata)
- * @param thedata the row data to check for consistency.
- * @brief check the internal consistency of a table row.
- *
- * This function checks the internal consistency of a table row for the sccpOm5MinSsnHistoryTable table.  If the
- * table row is internally consistent, then this function returns SNMP_ERR_NOERROR, otherwise the
- * function returns an SNMP error code and it will not be possible to activate the row until the
- * row's internal consistency is corrected.  This function might use a 'test' operation against the
- * driver to ensure that the commit phase will succeed.
- */
-int
-sccpOm5MinSsnHistoryTable_consistent(struct sccpOm5MinSsnHistoryTable_data *thedata)
-{
-	/* XXX: check row consistency return SNMP_ERR_NOERROR if consistent, or an SNMP error code if not. */
-	return (SNMP_ERR_NOERROR);
-}
-
-/**
- * @fn int sccpOm15MinSsnHistoryTable_consistent(struct sccpOm15MinSsnHistoryTable_data *thedata)
- * @param thedata the row data to check for consistency.
- * @brief check the internal consistency of a table row.
- *
- * This function checks the internal consistency of a table row for the sccpOm15MinSsnHistoryTable table.  If the
- * table row is internally consistent, then this function returns SNMP_ERR_NOERROR, otherwise the
- * function returns an SNMP error code and it will not be possible to activate the row until the
- * row's internal consistency is corrected.  This function might use a 'test' operation against the
- * driver to ensure that the commit phase will succeed.
- */
-int
-sccpOm15MinSsnHistoryTable_consistent(struct sccpOm15MinSsnHistoryTable_data *thedata)
-{
-	/* XXX: check row consistency return SNMP_ERR_NOERROR if consistent, or an SNMP error code if not. */
-	return (SNMP_ERR_NOERROR);
 }
 
 void

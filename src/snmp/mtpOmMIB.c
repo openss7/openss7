@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2012  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -955,26 +955,84 @@ mtpOmMIB_create(void)
 	DEBUGMSGTL(("mtpOmMIB", "mtpOmMIB_create: creating scalars...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default scalar values here into StorageNew */
-		if ((StorageNew->mtpOm1stAndIntervalActivate = snmp_duplicate_objid(zeroDotZero_oid, 2)))
-			StorageNew->mtpOm1stAndIntervalActivateLen = 2;
-		if ((StorageNew->mtpOm1stAndIntervalDeactivate = snmp_duplicate_objid(zeroDotZero_oid, 2)))
-			StorageNew->mtpOm1stAndIntervalDeactivateLen = 2;
-		if ((StorageNew->mtpOm5MinActivate = snmp_duplicate_objid(zeroDotZero_oid, 2)))
-			StorageNew->mtpOm5MinActivateLen = 2;
-		if ((StorageNew->mtpOm5MinDeaActivate = snmp_duplicate_objid(zeroDotZero_oid, 2)))
-			StorageNew->mtpOm5MinDeaActivateLen = 2;
-		if ((StorageNew->mtpOm15MinActivate = snmp_duplicate_objid(zeroDotZero_oid, 2)))
-			StorageNew->mtpOm15MinActivateLen = 2;
-		if ((StorageNew->mtpOm15MinDeaActivate = snmp_duplicate_objid(zeroDotZero_oid, 2)))
-			StorageNew->mtpOm15MinDeaActivateLen = 2;
+		if ((StorageNew->mtpOm1stAndIntervalActivate = snmp_duplicate_objid(zeroDotZero_oid, 2)) == NULL)
+			goto nomem;
+		StorageNew->mtpOm1stAndIntervalActivateLen = 2;
+		if ((StorageNew->mtpOm1stAndIntervalDeactivate = snmp_duplicate_objid(zeroDotZero_oid, 2)) == NULL)
+			goto nomem;
+		StorageNew->mtpOm1stAndIntervalDeactivateLen = 2;
+		if ((StorageNew->mtpOm5MinActivate = snmp_duplicate_objid(zeroDotZero_oid, 2)) == NULL)
+			goto nomem;
+		StorageNew->mtpOm5MinActivateLen = 2;
+		if ((StorageNew->mtpOm5MinDeaActivate = snmp_duplicate_objid(zeroDotZero_oid, 2)) == NULL)
+			goto nomem;
+		StorageNew->mtpOm5MinDeaActivateLen = 2;
+		if ((StorageNew->mtpOm15MinActivate = snmp_duplicate_objid(zeroDotZero_oid, 2)) == NULL)
+			goto nomem;
+		StorageNew->mtpOm15MinActivateLen = 2;
+		if ((StorageNew->mtpOm15MinDeaActivate = snmp_duplicate_objid(zeroDotZero_oid, 2)) == NULL)
+			goto nomem;
+		StorageNew->mtpOm15MinDeaActivateLen = 2;
 		StorageNew->mtpOmDiscontinuityTime = 0;
 		StorageNew->mtpOmTimeStamp = 0;
 		StorageNew->mtpOm5MinMaxIntervals = 96;
 		StorageNew->mtpOm15MinMaxIntervals = 96;
 
 	}
+      done:
 	DEBUGMSGTL(("mtpOmMIB", "done.\n"));
 	return (StorageNew);
+	goto nomem;
+      nomem:
+	mtpOmMIB_destroy(&StorageNew);
+	goto done;
+}
+
+/**
+ * @fn struct mtpOmMIB_data *mtpOmMIB_duplicate(struct mtpOmMIB_data *thedata)
+ * @param thedata the mib structure to duplicate
+ * @brief duplicate a mib structure for the mib
+ *
+ * Duplicates the specified mib structure @param thedata and returns a pointer to the newly
+ * allocated mib structure on success, or NULL on failure.
+ */
+struct mtpOmMIB_data *
+mtpOmMIB_duplicate(struct mtpOmMIB_data *thedata)
+{
+	struct mtpOmMIB_data *StorageNew = SNMP_MALLOC_STRUCT(mtpOmMIB_data);
+
+	DEBUGMSGTL(("mtpOmMIB", "mtpOmMIB_duplicate: duplicating mib... "));
+	if (StorageNew != NULL) {
+		if (!(StorageNew->mtpOm1stAndIntervalActivate = snmp_duplicate_objid(thedata->mtpOm1stAndIntervalActivate, thedata->mtpOm1stAndIntervalActivateLen / sizeof(oid))))
+			goto destroy;
+		StorageNew->mtpOm1stAndIntervalActivateLen = thedata->mtpOm1stAndIntervalActivateLen;
+		if (!(StorageNew->mtpOm1stAndIntervalDeactivate = snmp_duplicate_objid(thedata->mtpOm1stAndIntervalDeactivate, thedata->mtpOm1stAndIntervalDeactivateLen / sizeof(oid))))
+			goto destroy;
+		StorageNew->mtpOm1stAndIntervalDeactivateLen = thedata->mtpOm1stAndIntervalDeactivateLen;
+		if (!(StorageNew->mtpOm5MinActivate = snmp_duplicate_objid(thedata->mtpOm5MinActivate, thedata->mtpOm5MinActivateLen / sizeof(oid))))
+			goto destroy;
+		StorageNew->mtpOm5MinActivateLen = thedata->mtpOm5MinActivateLen;
+		if (!(StorageNew->mtpOm5MinDeaActivate = snmp_duplicate_objid(thedata->mtpOm5MinDeaActivate, thedata->mtpOm5MinDeaActivateLen / sizeof(oid))))
+			goto destroy;
+		StorageNew->mtpOm5MinDeaActivateLen = thedata->mtpOm5MinDeaActivateLen;
+		if (!(StorageNew->mtpOm15MinActivate = snmp_duplicate_objid(thedata->mtpOm15MinActivate, thedata->mtpOm15MinActivateLen / sizeof(oid))))
+			goto destroy;
+		StorageNew->mtpOm15MinActivateLen = thedata->mtpOm15MinActivateLen;
+		if (!(StorageNew->mtpOm15MinDeaActivate = snmp_duplicate_objid(thedata->mtpOm15MinDeaActivate, thedata->mtpOm15MinDeaActivateLen / sizeof(oid))))
+			goto destroy;
+		StorageNew->mtpOm15MinDeaActivateLen = thedata->mtpOm15MinDeaActivateLen;
+		StorageNew->mtpOmDiscontinuityTime = thedata->mtpOmDiscontinuityTime;
+		StorageNew->mtpOmTimeStamp = thedata->mtpOmTimeStamp;
+		StorageNew->mtpOm5MinMaxIntervals = thedata->mtpOm5MinMaxIntervals;
+		StorageNew->mtpOm15MinMaxIntervals = thedata->mtpOm15MinMaxIntervals;
+	}
+      done:
+	DEBUGMSGTL(("mtpOmMIB", "done.\n"));
+	return (StorageNew);
+	goto destroy;
+      destroy:
+	mtpOmMIB_destroy(&StorageNew);
+	goto done;
 }
 
 /**
@@ -1037,7 +1095,7 @@ mtpOmMIB_add(struct mtpOmMIB_data *thedata)
  * @param line line from configuration file matching the token.
  * @brief parse configuration file for mtpOmMIB entries.
  *
- * This callback is called by UCD-SNMP when it prases a configuration file and finds a configuration
+ * This callback is called by UCD-SNMP when it parses a configuration file and finds a configuration
  * file line for the registsred token (in this case mtpOmMIB).  This routine is invoked by
  * UCD-SNMP to read the values of scalars in the MIB from the configuration file.  Note that this
  * procedure may exist regardless of the persistence of the MIB.  If there are no configured entries
@@ -1142,6 +1200,62 @@ store_mtpOmMIB(int majorID, int minorID, void *serverarg, void *clientarg)
 }
 
 /**
+ * @fn int check_mtpOmMIB(struct mtpOmMIB_data *StorageTmp, struct mtpOmMIB_data *StorageOld)
+ * @param StorageTmp the data as updated
+ * @param StorageOld the data previous to update
+ *
+ * This function is used by mibs.  It is used to check, all scalars at a time, the varbinds
+ * belonging to the mib.  This function is called for the first varbind in a mib at the beginning of
+ * the ACTION phase.  The COMMIT phase does not ensue unless this check passes.  This function can
+ * return SNMP_ERR_NOERR or a specific SNMP error value.  Values in StorageOld are the values before
+ * the varbinds on the mib were applied; the values in StorageTmp are the new values.  The function
+ * is permitted to change the values in StorageTmp to correct them; however, preferences should be
+ * made for setting values that were not in the varbinds.
+ */
+int
+check_mtpOmMIB(struct mtpOmMIB_data *StorageTmp, struct mtpOmMIB_data *StorageOld)
+{
+	/* XXX: provide code to check the scalars for consistency */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int update_mtpOmMIB(struct mtpOmMIB_data *StorageTmp, struct mtpOmMIB_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the set operation (ACTION phase)
+ *
+ * This function is used by mibs.  It is used to update, all scalars at a time, the varbinds
+ * belonging to the mib.  This function is called for the first varbind in a mib at the beginning of
+ * the COMMIT phase.  The start of the ACTION phase performs a consistency check on the mib before
+ * allowing the request to proceed to the COMMIT phase.  The COMMIT phase then arrives here with
+ * consistency already checked (see check_mtpOmMIB()).  This function can
+ * return SNMP_ERR_NOERROR or SNMP_ERR_COMMITFAILED.  Values in StorageOld are the values before the
+ * varbinds on the mib were applied: the values in StorageTmp are the new values.
+ */
+int
+update_mtpOmMIB(struct mtpOmMIB_data *StorageTmp, struct mtpOmMIB_data *StorageOld)
+{
+	/* XXX: provide code to update the row with the underlying device */
+	mtpOmMIB_refresh = 1;
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn revert_mtpOmMIB(struct 
+ * @fn void revert_mtpOmMIB(struct mtpOmMIB_data *StorageTmp, struct mtpOmMIB_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the undo operation (UNDO phase)
+ */
+void
+revert_mtpOmMIB(struct mtpOmMIB_data *StorageTmp, struct mtpOmMIB_data *StorageOld)
+{
+	/* XXX: provide code to revert the row with the underlying device */
+	update_mtpOmMIB(StorageOld, NULL);
+}
+
+/**
  * @fn void refresh_mtpOmMIB(int force)
  * @param force forced refresh when non-zero.
  * @brief refresh the scalar values of mtpOmMIB.
@@ -1211,14 +1325,14 @@ var_mtpOmMIB(struct variable *vp, oid * name, size_t *length, int exact, size_t 
 	case (u_char) MTPOM1STANDINTERVALACTIVATE:	/* ReadWrite */
 		*write_method = write_mtpOm1stAndIntervalActivate;
 		if (!StorageTmp)
-		break;
+			break;
 		*var_len = StorageTmp->mtpOm1stAndIntervalActivateLen * sizeof(oid);
 		rval = (u_char *) StorageTmp->mtpOm1stAndIntervalActivate;
 		break;
 	case (u_char) MTPOM1STANDINTERVALDEACTIVATE:	/* ReadWrite */
 		*write_method = write_mtpOm1stAndIntervalDeactivate;
 		if (!StorageTmp)
-		break;
+			break;
 		*var_len = StorageTmp->mtpOm1stAndIntervalDeactivateLen * sizeof(oid);
 		rval = (u_char *) StorageTmp->mtpOm1stAndIntervalDeactivate;
 		break;
@@ -1310,16 +1424,20 @@ mtpOmSpTable_create(void)
 		StorageNew->mtpOmSpReceivedTFCstatus1 = 0;
 		StorageNew->mtpOmSpReceivedTFCstatus2 = 0;
 		StorageNew->mtpOmSpOctetsXferred = 0;
-
 	}
+      done:
 	DEBUGMSGTL(("mtpOmMIB", "done.\n"));
 	return (StorageNew);
+	goto nomem;
+      nomem:
+	mtpOmSpTable_destroy(&StorageNew);
+	goto done;
 }
 
 /**
  * @fn struct mtpOmSpTable_data *mtpOmSpTable_duplicate(struct mtpOmSpTable_data *thedata)
  * @param thedata the row structure to duplicate.
- * @brief duplicat a row structure for a table.
+ * @brief duplicate a row structure for a table.
  *
  * Duplicates the specified row structure @param thedata and returns a pointer to the newly
  * allocated row structure on success, or NULL on failure.
@@ -1331,6 +1449,15 @@ mtpOmSpTable_duplicate(struct mtpOmSpTable_data *thedata)
 
 	DEBUGMSGTL(("mtpOmMIB", "mtpOmSpTable_duplicate: duplicating row...  "));
 	if (StorageNew != NULL) {
+		StorageNew->mtpOmSpTable_id = thedata->mtpOmSpTable_id;
+		StorageNew->mtpSpId = thedata->mtpSpId;
+		StorageNew->mtpOmSpValidIntervals = thedata->mtpOmSpValidIntervals;
+		StorageNew->mtpOmSpTimeDiscontinuity = thedata->mtpOmSpTimeDiscontinuity;
+		StorageNew->mtpOmSpDiscardedMSUs = thedata->mtpOmSpDiscardedMSUs;
+		StorageNew->mtpOmSpReceivedTFCstatus0 = thedata->mtpOmSpReceivedTFCstatus0;
+		StorageNew->mtpOmSpReceivedTFCstatus1 = thedata->mtpOmSpReceivedTFCstatus1;
+		StorageNew->mtpOmSpReceivedTFCstatus2 = thedata->mtpOmSpReceivedTFCstatus2;
+		StorageNew->mtpOmSpOctetsXferred = thedata->mtpOmSpOctetsXferred;
 	}
       done:
 	DEBUGMSGTL(("mtpOmMIB", "done.\n"));
@@ -1424,7 +1551,7 @@ mtpOmSpTable_del(struct mtpOmSpTable_data *thedata)
  * @param line line from configuration file matching the token.
  * @brief parse configuration file for mtpOmSpTable entries.
  *
- * This callback is called by UCD-SNMP when it prases a configuration file and finds a configuration
+ * This callback is called by UCD-SNMP when it parses a configuration file and finds a configuration
  * file line for the registsred token (in this case mtpOmSpTable).  This routine is invoked by UCD-SNMP
  * to read the values of each row in the table from the configuration file.  Note that this
  * procedure may exist regardless of the persistence of the table.  If there are no configured
@@ -1518,16 +1645,20 @@ mtpOmSpInt5minTable_create(void)
 		StorageNew->mtpOmSpInt5minReceivedTFCstatus1 = 0;
 		StorageNew->mtpOmSpInt5minReceivedTFCstatus2 = 0;
 		StorageNew->mtpOmSpInt5minOctetsXferred = 0;
-
 	}
+      done:
 	DEBUGMSGTL(("mtpOmMIB", "done.\n"));
 	return (StorageNew);
+	goto nomem;
+      nomem:
+	mtpOmSpInt5minTable_destroy(&StorageNew);
+	goto done;
 }
 
 /**
  * @fn struct mtpOmSpInt5minTable_data *mtpOmSpInt5minTable_duplicate(struct mtpOmSpInt5minTable_data *thedata)
  * @param thedata the row structure to duplicate.
- * @brief duplicat a row structure for a table.
+ * @brief duplicate a row structure for a table.
  *
  * Duplicates the specified row structure @param thedata and returns a pointer to the newly
  * allocated row structure on success, or NULL on failure.
@@ -1539,6 +1670,15 @@ mtpOmSpInt5minTable_duplicate(struct mtpOmSpInt5minTable_data *thedata)
 
 	DEBUGMSGTL(("mtpOmMIB", "mtpOmSpInt5minTable_duplicate: duplicating row...  "));
 	if (StorageNew != NULL) {
+		StorageNew->mtpOmSpInt5minTable_id = thedata->mtpOmSpInt5minTable_id;
+		StorageNew->mtpSpId = thedata->mtpSpId;
+		StorageNew->mtpOmSpInt5minInterval = thedata->mtpOmSpInt5minInterval;
+		StorageNew->mtpOmSpInt5minTimeStamp = thedata->mtpOmSpInt5minTimeStamp;
+		StorageNew->mtpOmSpInt5minDiscardedMSUs = thedata->mtpOmSpInt5minDiscardedMSUs;
+		StorageNew->mtpOmSpInt5minReceivedTFCstatus0 = thedata->mtpOmSpInt5minReceivedTFCstatus0;
+		StorageNew->mtpOmSpInt5minReceivedTFCstatus1 = thedata->mtpOmSpInt5minReceivedTFCstatus1;
+		StorageNew->mtpOmSpInt5minReceivedTFCstatus2 = thedata->mtpOmSpInt5minReceivedTFCstatus2;
+		StorageNew->mtpOmSpInt5minOctetsXferred = thedata->mtpOmSpInt5minOctetsXferred;
 	}
       done:
 	DEBUGMSGTL(("mtpOmMIB", "done.\n"));
@@ -1634,7 +1774,7 @@ mtpOmSpInt5minTable_del(struct mtpOmSpInt5minTable_data *thedata)
  * @param line line from configuration file matching the token.
  * @brief parse configuration file for mtpOmSpInt5minTable entries.
  *
- * This callback is called by UCD-SNMP when it prases a configuration file and finds a configuration
+ * This callback is called by UCD-SNMP when it parses a configuration file and finds a configuration
  * file line for the registsred token (in this case mtpOmSpInt5minTable).  This routine is invoked by UCD-SNMP
  * to read the values of each row in the table from the configuration file.  Note that this
  * procedure may exist regardless of the persistence of the table.  If there are no configured
@@ -1728,16 +1868,20 @@ mtpOmSpInt15minTable_create(void)
 		StorageNew->mtpOmSpInt15minReceivedTFCstatus1 = 0;
 		StorageNew->mtpOmSpInt15minReceivedTFCstatus2 = 0;
 		StorageNew->mtpOmSpInt15minOctetsXferred = 0;
-
 	}
+      done:
 	DEBUGMSGTL(("mtpOmMIB", "done.\n"));
 	return (StorageNew);
+	goto nomem;
+      nomem:
+	mtpOmSpInt15minTable_destroy(&StorageNew);
+	goto done;
 }
 
 /**
  * @fn struct mtpOmSpInt15minTable_data *mtpOmSpInt15minTable_duplicate(struct mtpOmSpInt15minTable_data *thedata)
  * @param thedata the row structure to duplicate.
- * @brief duplicat a row structure for a table.
+ * @brief duplicate a row structure for a table.
  *
  * Duplicates the specified row structure @param thedata and returns a pointer to the newly
  * allocated row structure on success, or NULL on failure.
@@ -1749,6 +1893,15 @@ mtpOmSpInt15minTable_duplicate(struct mtpOmSpInt15minTable_data *thedata)
 
 	DEBUGMSGTL(("mtpOmMIB", "mtpOmSpInt15minTable_duplicate: duplicating row...  "));
 	if (StorageNew != NULL) {
+		StorageNew->mtpOmSpInt15minTable_id = thedata->mtpOmSpInt15minTable_id;
+		StorageNew->mtpSpId = thedata->mtpSpId;
+		StorageNew->mtpOmSpInt15minInterval = thedata->mtpOmSpInt15minInterval;
+		StorageNew->mtpOmSpInt15minTimeStamp = thedata->mtpOmSpInt15minTimeStamp;
+		StorageNew->mtpOmSpInt15minDiscardedMSUs = thedata->mtpOmSpInt15minDiscardedMSUs;
+		StorageNew->mtpOmSpInt15minReceivedTFCstatus0 = thedata->mtpOmSpInt15minReceivedTFCstatus0;
+		StorageNew->mtpOmSpInt15minReceivedTFCstatus1 = thedata->mtpOmSpInt15minReceivedTFCstatus1;
+		StorageNew->mtpOmSpInt15minReceivedTFCstatus2 = thedata->mtpOmSpInt15minReceivedTFCstatus2;
+		StorageNew->mtpOmSpInt15minOctetsXferred = thedata->mtpOmSpInt15minOctetsXferred;
 	}
       done:
 	DEBUGMSGTL(("mtpOmMIB", "done.\n"));
@@ -1844,7 +1997,7 @@ mtpOmSpInt15minTable_del(struct mtpOmSpInt15minTable_data *thedata)
  * @param line line from configuration file matching the token.
  * @brief parse configuration file for mtpOmSpInt15minTable entries.
  *
- * This callback is called by UCD-SNMP when it prases a configuration file and finds a configuration
+ * This callback is called by UCD-SNMP when it parses a configuration file and finds a configuration
  * file line for the registsred token (in this case mtpOmSpInt15minTable).  This routine is invoked by UCD-SNMP
  * to read the values of each row in the table from the configuration file.  Note that this
  * procedure may exist regardless of the persistence of the table.  If there are no configured
@@ -1940,14 +2093,19 @@ mtpOmSpSiTable_create(void)
 		StorageNew->mtpOmSpSiStatus = 0;
 		StorageNew->mtpOmSpSiStatus = RS_NOTREADY;
 	}
+      done:
 	DEBUGMSGTL(("mtpOmMIB", "done.\n"));
 	return (StorageNew);
+	goto nomem;
+      nomem:
+	mtpOmSpSiTable_destroy(&StorageNew);
+	goto done;
 }
 
 /**
  * @fn struct mtpOmSpSiTable_data *mtpOmSpSiTable_duplicate(struct mtpOmSpSiTable_data *thedata)
  * @param thedata the row structure to duplicate.
- * @brief duplicat a row structure for a table.
+ * @brief duplicate a row structure for a table.
  *
  * Duplicates the specified row structure @param thedata and returns a pointer to the newly
  * allocated row structure on success, or NULL on failure.
@@ -1959,6 +2117,15 @@ mtpOmSpSiTable_duplicate(struct mtpOmSpSiTable_data *thedata)
 
 	DEBUGMSGTL(("mtpOmMIB", "mtpOmSpSiTable_duplicate: duplicating row...  "));
 	if (StorageNew != NULL) {
+		StorageNew->mtpOmSpSiTable_id = thedata->mtpOmSpSiTable_id;
+		StorageNew->mtpSpId = thedata->mtpSpId;
+		StorageNew->mtpOmSpSiCode = thedata->mtpOmSpSiCode;
+		StorageNew->mtpOmSpSiValidIntervals = thedata->mtpOmSpSiValidIntervals;
+		StorageNew->mtpOmSpSiTimeDiscontinuity = thedata->mtpOmSpSiTimeDiscontinuity;
+		StorageNew->mtpOmSpSiTransmittedUPUnavailable = thedata->mtpOmSpSiTransmittedUPUnavailable;
+		StorageNew->mtpOmSpSiReceivedUPUnavailable = thedata->mtpOmSpSiReceivedUPUnavailable;
+		StorageNew->mtpOmSpSiHandledOctetsSIO = thedata->mtpOmSpSiHandledOctetsSIO;
+		StorageNew->mtpOmSpSiStatus = thedata->mtpOmSpSiStatus;
 	}
       done:
 	DEBUGMSGTL(("mtpOmMIB", "done.\n"));
@@ -2054,7 +2221,7 @@ mtpOmSpSiTable_del(struct mtpOmSpSiTable_data *thedata)
  * @param line line from configuration file matching the token.
  * @brief parse configuration file for mtpOmSpSiTable entries.
  *
- * This callback is called by UCD-SNMP when it prases a configuration file and finds a configuration
+ * This callback is called by UCD-SNMP when it parses a configuration file and finds a configuration
  * file line for the registsred token (in this case mtpOmSpSiTable).  This routine is invoked by UCD-SNMP
  * to read the values of each row in the table from the configuration file.  Note that this
  * procedure may exist regardless of the persistence of the table.  If there are no configured
@@ -2147,16 +2314,20 @@ mtpOmSpSiInt5minTable_create(void)
 		StorageNew->mtpOmSpSiInt5minTransmittedUPUnavailable = 0;
 		StorageNew->mtpOmSpSiInt5minReceivedUPUnavailable = 0;
 		StorageNew->mtpOmSpSiInt5minHandledOctetsSIO = 0;
-
 	}
+      done:
 	DEBUGMSGTL(("mtpOmMIB", "done.\n"));
 	return (StorageNew);
+	goto nomem;
+      nomem:
+	mtpOmSpSiInt5minTable_destroy(&StorageNew);
+	goto done;
 }
 
 /**
  * @fn struct mtpOmSpSiInt5minTable_data *mtpOmSpSiInt5minTable_duplicate(struct mtpOmSpSiInt5minTable_data *thedata)
  * @param thedata the row structure to duplicate.
- * @brief duplicat a row structure for a table.
+ * @brief duplicate a row structure for a table.
  *
  * Duplicates the specified row structure @param thedata and returns a pointer to the newly
  * allocated row structure on success, or NULL on failure.
@@ -2168,6 +2339,14 @@ mtpOmSpSiInt5minTable_duplicate(struct mtpOmSpSiInt5minTable_data *thedata)
 
 	DEBUGMSGTL(("mtpOmMIB", "mtpOmSpSiInt5minTable_duplicate: duplicating row...  "));
 	if (StorageNew != NULL) {
+		StorageNew->mtpOmSpSiInt5minTable_id = thedata->mtpOmSpSiInt5minTable_id;
+		StorageNew->mtpSpId = thedata->mtpSpId;
+		StorageNew->mtpOmSpSiCode = thedata->mtpOmSpSiCode;
+		StorageNew->mtpOmSpSiInt5minInterval = thedata->mtpOmSpSiInt5minInterval;
+		StorageNew->mtpOmSpSiInt5minTimeStamp = thedata->mtpOmSpSiInt5minTimeStamp;
+		StorageNew->mtpOmSpSiInt5minTransmittedUPUnavailable = thedata->mtpOmSpSiInt5minTransmittedUPUnavailable;
+		StorageNew->mtpOmSpSiInt5minReceivedUPUnavailable = thedata->mtpOmSpSiInt5minReceivedUPUnavailable;
+		StorageNew->mtpOmSpSiInt5minHandledOctetsSIO = thedata->mtpOmSpSiInt5minHandledOctetsSIO;
 	}
       done:
 	DEBUGMSGTL(("mtpOmMIB", "done.\n"));
@@ -2265,7 +2444,7 @@ mtpOmSpSiInt5minTable_del(struct mtpOmSpSiInt5minTable_data *thedata)
  * @param line line from configuration file matching the token.
  * @brief parse configuration file for mtpOmSpSiInt5minTable entries.
  *
- * This callback is called by UCD-SNMP when it prases a configuration file and finds a configuration
+ * This callback is called by UCD-SNMP when it parses a configuration file and finds a configuration
  * file line for the registsred token (in this case mtpOmSpSiInt5minTable).  This routine is invoked by UCD-SNMP
  * to read the values of each row in the table from the configuration file.  Note that this
  * procedure may exist regardless of the persistence of the table.  If there are no configured
@@ -2356,16 +2535,20 @@ mtpOmSpSiInt15minTable_create(void)
 		StorageNew->mtpOmSpSiInt15minTransmittedUPUnavailable = 0;
 		StorageNew->mtpOmSpSiInt15minReceivedUPUnavailable = 0;
 		StorageNew->mtpOmSpSiInt15minHandledOctetsSIO = 0;
-
 	}
+      done:
 	DEBUGMSGTL(("mtpOmMIB", "done.\n"));
 	return (StorageNew);
+	goto nomem;
+      nomem:
+	mtpOmSpSiInt15minTable_destroy(&StorageNew);
+	goto done;
 }
 
 /**
  * @fn struct mtpOmSpSiInt15minTable_data *mtpOmSpSiInt15minTable_duplicate(struct mtpOmSpSiInt15minTable_data *thedata)
  * @param thedata the row structure to duplicate.
- * @brief duplicat a row structure for a table.
+ * @brief duplicate a row structure for a table.
  *
  * Duplicates the specified row structure @param thedata and returns a pointer to the newly
  * allocated row structure on success, or NULL on failure.
@@ -2377,6 +2560,14 @@ mtpOmSpSiInt15minTable_duplicate(struct mtpOmSpSiInt15minTable_data *thedata)
 
 	DEBUGMSGTL(("mtpOmMIB", "mtpOmSpSiInt15minTable_duplicate: duplicating row...  "));
 	if (StorageNew != NULL) {
+		StorageNew->mtpOmSpSiInt15minTable_id = thedata->mtpOmSpSiInt15minTable_id;
+		StorageNew->mtpSpId = thedata->mtpSpId;
+		StorageNew->mtpOmSpSiCode = thedata->mtpOmSpSiCode;
+		StorageNew->mtpOmSpSiInt15minInterval = thedata->mtpOmSpSiInt15minInterval;
+		StorageNew->mtpOmSpSiInt15minTimeStamp = thedata->mtpOmSpSiInt15minTimeStamp;
+		StorageNew->mtpOmSpSiInt15minTransmittedUPUnavailable = thedata->mtpOmSpSiInt15minTransmittedUPUnavailable;
+		StorageNew->mtpOmSpSiInt15minReceivedUPUnavailable = thedata->mtpOmSpSiInt15minReceivedUPUnavailable;
+		StorageNew->mtpOmSpSiInt15minHandledOctetsSIO = thedata->mtpOmSpSiInt15minHandledOctetsSIO;
 	}
       done:
 	DEBUGMSGTL(("mtpOmMIB", "done.\n"));
@@ -2474,7 +2665,7 @@ mtpOmSpSiInt15minTable_del(struct mtpOmSpSiInt15minTable_data *thedata)
  * @param line line from configuration file matching the token.
  * @brief parse configuration file for mtpOmSpSiInt15minTable entries.
  *
- * This callback is called by UCD-SNMP when it prases a configuration file and finds a configuration
+ * This callback is called by UCD-SNMP when it parses a configuration file and finds a configuration
  * file line for the registsred token (in this case mtpOmSpSiInt15minTable).  This routine is invoked by UCD-SNMP
  * to read the values of each row in the table from the configuration file.  Note that this
  * procedure may exist regardless of the persistence of the table.  If there are no configured
@@ -2566,14 +2757,19 @@ mtpOmSpStudyTable_create(void)
 		StorageNew->mtpOmSpStudyStatus = 0;
 		StorageNew->mtpOmSpStudyStatus = RS_NOTREADY;
 	}
+      done:
 	DEBUGMSGTL(("mtpOmMIB", "done.\n"));
 	return (StorageNew);
+	goto nomem;
+      nomem:
+	mtpOmSpStudyTable_destroy(&StorageNew);
+	goto done;
 }
 
 /**
  * @fn struct mtpOmSpStudyTable_data *mtpOmSpStudyTable_duplicate(struct mtpOmSpStudyTable_data *thedata)
  * @param thedata the row structure to duplicate.
- * @brief duplicat a row structure for a table.
+ * @brief duplicate a row structure for a table.
  *
  * Duplicates the specified row structure @param thedata and returns a pointer to the newly
  * allocated row structure on success, or NULL on failure.
@@ -2585,6 +2781,13 @@ mtpOmSpStudyTable_duplicate(struct mtpOmSpStudyTable_data *thedata)
 
 	DEBUGMSGTL(("mtpOmMIB", "mtpOmSpStudyTable_duplicate: duplicating row...  "));
 	if (StorageNew != NULL) {
+		StorageNew->mtpOmSpStudyTable_id = thedata->mtpOmSpStudyTable_id;
+		StorageNew->mtpOmSpStudyId = thedata->mtpOmSpStudyId;
+		StorageNew->mtpOmSpStudyValidIntervals = thedata->mtpOmSpStudyValidIntervals;
+		StorageNew->mtpOmSpStudyTimeDiscontinuity = thedata->mtpOmSpStudyTimeDiscontinuity;
+		StorageNew->mtpOmSpStudyHandledOctetsOpcDpcSio = thedata->mtpOmSpStudyHandledOctetsOpcDpcSio;
+		StorageNew->mtpOmSpStudyHandledMSUsOpcDpcSio = thedata->mtpOmSpStudyHandledMSUsOpcDpcSio;
+		StorageNew->mtpOmSpStudyStatus = thedata->mtpOmSpStudyStatus;
 	}
       done:
 	DEBUGMSGTL(("mtpOmMIB", "done.\n"));
@@ -2678,7 +2881,7 @@ mtpOmSpStudyTable_del(struct mtpOmSpStudyTable_data *thedata)
  * @param line line from configuration file matching the token.
  * @brief parse configuration file for mtpOmSpStudyTable entries.
  *
- * This callback is called by UCD-SNMP when it prases a configuration file and finds a configuration
+ * This callback is called by UCD-SNMP when it parses a configuration file and finds a configuration
  * file line for the registsred token (in this case mtpOmSpStudyTable).  This routine is invoked by UCD-SNMP
  * to read the values of each row in the table from the configuration file.  Note that this
  * procedure may exist regardless of the persistence of the table.  If there are no configured
@@ -2765,16 +2968,20 @@ mtpOmSpStudyInt5minTable_create(void)
 		StorageNew->mtpOmSpStudyInt5minTimeStamp = 0;
 		StorageNew->mtpOmSpStudyInt5minHandledOctetsOpcDpcSio = 0;
 		StorageNew->mtpOmSpStudyInt5minHandledMSUsOpcDpcSio = 0;
-
 	}
+      done:
 	DEBUGMSGTL(("mtpOmMIB", "done.\n"));
 	return (StorageNew);
+	goto nomem;
+      nomem:
+	mtpOmSpStudyInt5minTable_destroy(&StorageNew);
+	goto done;
 }
 
 /**
  * @fn struct mtpOmSpStudyInt5minTable_data *mtpOmSpStudyInt5minTable_duplicate(struct mtpOmSpStudyInt5minTable_data *thedata)
  * @param thedata the row structure to duplicate.
- * @brief duplicat a row structure for a table.
+ * @brief duplicate a row structure for a table.
  *
  * Duplicates the specified row structure @param thedata and returns a pointer to the newly
  * allocated row structure on success, or NULL on failure.
@@ -2786,6 +2993,12 @@ mtpOmSpStudyInt5minTable_duplicate(struct mtpOmSpStudyInt5minTable_data *thedata
 
 	DEBUGMSGTL(("mtpOmMIB", "mtpOmSpStudyInt5minTable_duplicate: duplicating row...  "));
 	if (StorageNew != NULL) {
+		StorageNew->mtpOmSpStudyInt5minTable_id = thedata->mtpOmSpStudyInt5minTable_id;
+		StorageNew->mtpOmSpStudyId = thedata->mtpOmSpStudyId;
+		StorageNew->mtpOmSpStudyInt5minInterval = thedata->mtpOmSpStudyInt5minInterval;
+		StorageNew->mtpOmSpStudyInt5minTimeStamp = thedata->mtpOmSpStudyInt5minTimeStamp;
+		StorageNew->mtpOmSpStudyInt5minHandledOctetsOpcDpcSio = thedata->mtpOmSpStudyInt5minHandledOctetsOpcDpcSio;
+		StorageNew->mtpOmSpStudyInt5minHandledMSUsOpcDpcSio = thedata->mtpOmSpStudyInt5minHandledMSUsOpcDpcSio;
 	}
       done:
 	DEBUGMSGTL(("mtpOmMIB", "done.\n"));
@@ -2881,7 +3094,7 @@ mtpOmSpStudyInt5minTable_del(struct mtpOmSpStudyInt5minTable_data *thedata)
  * @param line line from configuration file matching the token.
  * @brief parse configuration file for mtpOmSpStudyInt5minTable entries.
  *
- * This callback is called by UCD-SNMP when it prases a configuration file and finds a configuration
+ * This callback is called by UCD-SNMP when it parses a configuration file and finds a configuration
  * file line for the registsred token (in this case mtpOmSpStudyInt5minTable).  This routine is invoked by UCD-SNMP
  * to read the values of each row in the table from the configuration file.  Note that this
  * procedure may exist regardless of the persistence of the table.  If there are no configured
@@ -2966,16 +3179,20 @@ mtpOmSpStudyInt15minTable_create(void)
 		StorageNew->mtpOmSpStudyInt15minTimeStamp = 0;
 		StorageNew->mtpOmSpStudyInt15minHandledOctetsOpcDpcSio = 0;
 		StorageNew->mtpOmSpStudyInt15minHandledMSUsOpcDpcSio = 0;
-
 	}
+      done:
 	DEBUGMSGTL(("mtpOmMIB", "done.\n"));
 	return (StorageNew);
+	goto nomem;
+      nomem:
+	mtpOmSpStudyInt15minTable_destroy(&StorageNew);
+	goto done;
 }
 
 /**
  * @fn struct mtpOmSpStudyInt15minTable_data *mtpOmSpStudyInt15minTable_duplicate(struct mtpOmSpStudyInt15minTable_data *thedata)
  * @param thedata the row structure to duplicate.
- * @brief duplicat a row structure for a table.
+ * @brief duplicate a row structure for a table.
  *
  * Duplicates the specified row structure @param thedata and returns a pointer to the newly
  * allocated row structure on success, or NULL on failure.
@@ -2987,6 +3204,12 @@ mtpOmSpStudyInt15minTable_duplicate(struct mtpOmSpStudyInt15minTable_data *theda
 
 	DEBUGMSGTL(("mtpOmMIB", "mtpOmSpStudyInt15minTable_duplicate: duplicating row...  "));
 	if (StorageNew != NULL) {
+		StorageNew->mtpOmSpStudyInt15minTable_id = thedata->mtpOmSpStudyInt15minTable_id;
+		StorageNew->mtpOmSpStudyId = thedata->mtpOmSpStudyId;
+		StorageNew->mtpOmSpStudyInt15minInterval = thedata->mtpOmSpStudyInt15minInterval;
+		StorageNew->mtpOmSpStudyInt15minTimeStamp = thedata->mtpOmSpStudyInt15minTimeStamp;
+		StorageNew->mtpOmSpStudyInt15minHandledOctetsOpcDpcSio = thedata->mtpOmSpStudyInt15minHandledOctetsOpcDpcSio;
+		StorageNew->mtpOmSpStudyInt15minHandledMSUsOpcDpcSio = thedata->mtpOmSpStudyInt15minHandledMSUsOpcDpcSio;
 	}
       done:
 	DEBUGMSGTL(("mtpOmMIB", "done.\n"));
@@ -3082,7 +3305,7 @@ mtpOmSpStudyInt15minTable_del(struct mtpOmSpStudyInt15minTable_data *thedata)
  * @param line line from configuration file matching the token.
  * @brief parse configuration file for mtpOmSpStudyInt15minTable entries.
  *
- * This callback is called by UCD-SNMP when it prases a configuration file and finds a configuration
+ * This callback is called by UCD-SNMP when it parses a configuration file and finds a configuration
  * file line for the registsred token (in this case mtpOmSpStudyInt15minTable).  This routine is invoked by UCD-SNMP
  * to read the values of each row in the table from the configuration file.  Note that this
  * procedure may exist regardless of the persistence of the table.  If there are no configured
@@ -3169,14 +3392,19 @@ mtpOmSpStudyMapTable_create(void)
 		StorageNew->mtpOmSpStudyMapStatus = 0;
 		StorageNew->mtpOmSpStudyMapStatus = RS_NOTREADY;
 	}
+      done:
 	DEBUGMSGTL(("mtpOmMIB", "done.\n"));
 	return (StorageNew);
+	goto nomem;
+      nomem:
+	mtpOmSpStudyMapTable_destroy(&StorageNew);
+	goto done;
 }
 
 /**
  * @fn struct mtpOmSpStudyMapTable_data *mtpOmSpStudyMapTable_duplicate(struct mtpOmSpStudyMapTable_data *thedata)
  * @param thedata the row structure to duplicate.
- * @brief duplicat a row structure for a table.
+ * @brief duplicate a row structure for a table.
  *
  * Duplicates the specified row structure @param thedata and returns a pointer to the newly
  * allocated row structure on success, or NULL on failure.
@@ -3188,6 +3416,13 @@ mtpOmSpStudyMapTable_duplicate(struct mtpOmSpStudyMapTable_data *thedata)
 
 	DEBUGMSGTL(("mtpOmMIB", "mtpOmSpStudyMapTable_duplicate: duplicating row...  "));
 	if (StorageNew != NULL) {
+		StorageNew->mtpOmSpStudyMapTable_id = thedata->mtpOmSpStudyMapTable_id;
+		StorageNew->mtpSpId = thedata->mtpSpId;
+		StorageNew->mtpOmSpSiCode = thedata->mtpOmSpSiCode;
+		StorageNew->mtpOmSpStudyId = thedata->mtpOmSpStudyId;
+		StorageNew->mtpOmOpcRsId = thedata->mtpOmOpcRsId;
+		StorageNew->mtpOmDpcRsId = thedata->mtpOmDpcRsId;
+		StorageNew->mtpOmSpStudyMapStatus = thedata->mtpOmSpStudyMapStatus;
 	}
       done:
 	DEBUGMSGTL(("mtpOmMIB", "done.\n"));
@@ -3289,7 +3524,7 @@ mtpOmSpStudyMapTable_del(struct mtpOmSpStudyMapTable_data *thedata)
  * @param line line from configuration file matching the token.
  * @brief parse configuration file for mtpOmSpStudyMapTable entries.
  *
- * This callback is called by UCD-SNMP when it prases a configuration file and finds a configuration
+ * This callback is called by UCD-SNMP when it parses a configuration file and finds a configuration
  * file line for the registsred token (in this case mtpOmSpStudyMapTable).  This routine is invoked by UCD-SNMP
  * to read the values of each row in the table from the configuration file.  Note that this
  * procedure may exist regardless of the persistence of the table.  If there are no configured
@@ -3382,16 +3617,20 @@ mtpOmRsTable_create(void)
 		StorageNew->mtpOmRsTransmittedMSUsDpc = 0;
 		StorageNew->mtpOmRsRouteSetUnavailable = 0;
 		StorageNew->mtpOmRsRouteSetUnavailableDuration = 0;
-
 	}
+      done:
 	DEBUGMSGTL(("mtpOmMIB", "done.\n"));
 	return (StorageNew);
+	goto nomem;
+      nomem:
+	mtpOmRsTable_destroy(&StorageNew);
+	goto done;
 }
 
 /**
  * @fn struct mtpOmRsTable_data *mtpOmRsTable_duplicate(struct mtpOmRsTable_data *thedata)
  * @param thedata the row structure to duplicate.
- * @brief duplicat a row structure for a table.
+ * @brief duplicate a row structure for a table.
  *
  * Duplicates the specified row structure @param thedata and returns a pointer to the newly
  * allocated row structure on success, or NULL on failure.
@@ -3403,6 +3642,17 @@ mtpOmRsTable_duplicate(struct mtpOmRsTable_data *thedata)
 
 	DEBUGMSGTL(("mtpOmMIB", "mtpOmRsTable_duplicate: duplicating row...  "));
 	if (StorageNew != NULL) {
+		StorageNew->mtpOmRsTable_id = thedata->mtpOmRsTable_id;
+		StorageNew->mtpSpId = thedata->mtpSpId;
+		StorageNew->mtpRsId = thedata->mtpRsId;
+		StorageNew->mtpOmRsValidIntervals = thedata->mtpOmRsValidIntervals;
+		StorageNew->mtpOmRsTimeDiscontinuity = thedata->mtpOmRsTimeDiscontinuity;
+		StorageNew->mtpOmRsReceivedOctetsOPC = thedata->mtpOmRsReceivedOctetsOPC;
+		StorageNew->mtpOmRsTransmittedOctetsDPC = thedata->mtpOmRsTransmittedOctetsDPC;
+		StorageNew->mtpOmRsReceivedMSUsOpc = thedata->mtpOmRsReceivedMSUsOpc;
+		StorageNew->mtpOmRsTransmittedMSUsDpc = thedata->mtpOmRsTransmittedMSUsDpc;
+		StorageNew->mtpOmRsRouteSetUnavailable = thedata->mtpOmRsRouteSetUnavailable;
+		StorageNew->mtpOmRsRouteSetUnavailableDuration = thedata->mtpOmRsRouteSetUnavailableDuration;
 	}
       done:
 	DEBUGMSGTL(("mtpOmMIB", "done.\n"));
@@ -3498,7 +3748,7 @@ mtpOmRsTable_del(struct mtpOmRsTable_data *thedata)
  * @param line line from configuration file matching the token.
  * @brief parse configuration file for mtpOmRsTable entries.
  *
- * This callback is called by UCD-SNMP when it prases a configuration file and finds a configuration
+ * This callback is called by UCD-SNMP when it parses a configuration file and finds a configuration
  * file line for the registsred token (in this case mtpOmRsTable).  This routine is invoked by UCD-SNMP
  * to read the values of each row in the table from the configuration file.  Note that this
  * procedure may exist regardless of the persistence of the table.  If there are no configured
@@ -3598,16 +3848,20 @@ mtpOmRsInt5minTable_create(void)
 		StorageNew->mtpOmRsInt5minTransmittedMSUsDpc = 0;
 		StorageNew->mtpOmRsInt5minRouteSetUnavailable = 0;
 		StorageNew->mtpOmRsInt5minRouteSetUnavailableDuration = 0;
-
 	}
+      done:
 	DEBUGMSGTL(("mtpOmMIB", "done.\n"));
 	return (StorageNew);
+	goto nomem;
+      nomem:
+	mtpOmRsInt5minTable_destroy(&StorageNew);
+	goto done;
 }
 
 /**
  * @fn struct mtpOmRsInt5minTable_data *mtpOmRsInt5minTable_duplicate(struct mtpOmRsInt5minTable_data *thedata)
  * @param thedata the row structure to duplicate.
- * @brief duplicat a row structure for a table.
+ * @brief duplicate a row structure for a table.
  *
  * Duplicates the specified row structure @param thedata and returns a pointer to the newly
  * allocated row structure on success, or NULL on failure.
@@ -3619,6 +3873,17 @@ mtpOmRsInt5minTable_duplicate(struct mtpOmRsInt5minTable_data *thedata)
 
 	DEBUGMSGTL(("mtpOmMIB", "mtpOmRsInt5minTable_duplicate: duplicating row...  "));
 	if (StorageNew != NULL) {
+		StorageNew->mtpOmRsInt5minTable_id = thedata->mtpOmRsInt5minTable_id;
+		StorageNew->mtpSpId = thedata->mtpSpId;
+		StorageNew->mtpRsId = thedata->mtpRsId;
+		StorageNew->mtpOmRsInt5minInterval = thedata->mtpOmRsInt5minInterval;
+		StorageNew->mtpOmRsInt5minTimeStamp = thedata->mtpOmRsInt5minTimeStamp;
+		StorageNew->mtpOmRsInt5minReceivedOctetsOPC = thedata->mtpOmRsInt5minReceivedOctetsOPC;
+		StorageNew->mtpOmRsInt5minTransmittedOctetsDPC = thedata->mtpOmRsInt5minTransmittedOctetsDPC;
+		StorageNew->mtpOmRsInt5minReceivedMSUsOpc = thedata->mtpOmRsInt5minReceivedMSUsOpc;
+		StorageNew->mtpOmRsInt5minTransmittedMSUsDpc = thedata->mtpOmRsInt5minTransmittedMSUsDpc;
+		StorageNew->mtpOmRsInt5minRouteSetUnavailable = thedata->mtpOmRsInt5minRouteSetUnavailable;
+		StorageNew->mtpOmRsInt5minRouteSetUnavailableDuration = thedata->mtpOmRsInt5minRouteSetUnavailableDuration;
 	}
       done:
 	DEBUGMSGTL(("mtpOmMIB", "done.\n"));
@@ -3716,7 +3981,7 @@ mtpOmRsInt5minTable_del(struct mtpOmRsInt5minTable_data *thedata)
  * @param line line from configuration file matching the token.
  * @brief parse configuration file for mtpOmRsInt5minTable entries.
  *
- * This callback is called by UCD-SNMP when it prases a configuration file and finds a configuration
+ * This callback is called by UCD-SNMP when it parses a configuration file and finds a configuration
  * file line for the registsred token (in this case mtpOmRsInt5minTable).  This routine is invoked by UCD-SNMP
  * to read the values of each row in the table from the configuration file.  Note that this
  * procedure may exist regardless of the persistence of the table.  If there are no configured
@@ -3816,16 +4081,20 @@ mtpOmRsInt15minTable_create(void)
 		StorageNew->mtpOmRsInt15minTransmittedMSUsDpc = 0;
 		StorageNew->mtpOmRsInt15minRouteSetUnavailable = 0;
 		StorageNew->mtpOmRsInt15minRouteSetUnavailableDuration = 0;
-
 	}
+      done:
 	DEBUGMSGTL(("mtpOmMIB", "done.\n"));
 	return (StorageNew);
+	goto nomem;
+      nomem:
+	mtpOmRsInt15minTable_destroy(&StorageNew);
+	goto done;
 }
 
 /**
  * @fn struct mtpOmRsInt15minTable_data *mtpOmRsInt15minTable_duplicate(struct mtpOmRsInt15minTable_data *thedata)
  * @param thedata the row structure to duplicate.
- * @brief duplicat a row structure for a table.
+ * @brief duplicate a row structure for a table.
  *
  * Duplicates the specified row structure @param thedata and returns a pointer to the newly
  * allocated row structure on success, or NULL on failure.
@@ -3837,6 +4106,17 @@ mtpOmRsInt15minTable_duplicate(struct mtpOmRsInt15minTable_data *thedata)
 
 	DEBUGMSGTL(("mtpOmMIB", "mtpOmRsInt15minTable_duplicate: duplicating row...  "));
 	if (StorageNew != NULL) {
+		StorageNew->mtpOmRsInt15minTable_id = thedata->mtpOmRsInt15minTable_id;
+		StorageNew->mtpSpId = thedata->mtpSpId;
+		StorageNew->mtpRsId = thedata->mtpRsId;
+		StorageNew->mtpOmRsInt15minInterval = thedata->mtpOmRsInt15minInterval;
+		StorageNew->mtpOmRsInt15minTimeStamp = thedata->mtpOmRsInt15minTimeStamp;
+		StorageNew->mtpOmRsInt15minReceivedOctetsOPC = thedata->mtpOmRsInt15minReceivedOctetsOPC;
+		StorageNew->mtpOmRsInt15minTransmittedOctetsDPC = thedata->mtpOmRsInt15minTransmittedOctetsDPC;
+		StorageNew->mtpOmRsInt15minReceivedMSUsOpc = thedata->mtpOmRsInt15minReceivedMSUsOpc;
+		StorageNew->mtpOmRsInt15minTransmittedMSUsDpc = thedata->mtpOmRsInt15minTransmittedMSUsDpc;
+		StorageNew->mtpOmRsInt15minRouteSetUnavailable = thedata->mtpOmRsInt15minRouteSetUnavailable;
+		StorageNew->mtpOmRsInt15minRouteSetUnavailableDuration = thedata->mtpOmRsInt15minRouteSetUnavailableDuration;
 	}
       done:
 	DEBUGMSGTL(("mtpOmMIB", "done.\n"));
@@ -3934,7 +4214,7 @@ mtpOmRsInt15minTable_del(struct mtpOmRsInt15minTable_data *thedata)
  * @param line line from configuration file matching the token.
  * @brief parse configuration file for mtpOmRsInt15minTable entries.
  *
- * This callback is called by UCD-SNMP when it prases a configuration file and finds a configuration
+ * This callback is called by UCD-SNMP when it parses a configuration file and finds a configuration
  * file line for the registsred token (in this case mtpOmRsInt15minTable).  This routine is invoked by UCD-SNMP
  * to read the values of each row in the table from the configuration file.  Note that this
  * procedure may exist regardless of the persistence of the table.  If there are no configured
@@ -4036,14 +4316,19 @@ mtpOmRsSiTable_create(void)
 		StorageNew->mtpOmRsSiStatus = 0;
 		StorageNew->mtpOmRsSiStatus = RS_NOTREADY;
 	}
+      done:
 	DEBUGMSGTL(("mtpOmMIB", "done.\n"));
 	return (StorageNew);
+	goto nomem;
+      nomem:
+	mtpOmRsSiTable_destroy(&StorageNew);
+	goto done;
 }
 
 /**
  * @fn struct mtpOmRsSiTable_data *mtpOmRsSiTable_duplicate(struct mtpOmRsSiTable_data *thedata)
  * @param thedata the row structure to duplicate.
- * @brief duplicat a row structure for a table.
+ * @brief duplicate a row structure for a table.
  *
  * Duplicates the specified row structure @param thedata and returns a pointer to the newly
  * allocated row structure on success, or NULL on failure.
@@ -4055,6 +4340,17 @@ mtpOmRsSiTable_duplicate(struct mtpOmRsSiTable_data *thedata)
 
 	DEBUGMSGTL(("mtpOmMIB", "mtpOmRsSiTable_duplicate: duplicating row...  "));
 	if (StorageNew != NULL) {
+		StorageNew->mtpOmRsSiTable_id = thedata->mtpOmRsSiTable_id;
+		StorageNew->mtpSpId = thedata->mtpSpId;
+		StorageNew->mtpRsId = thedata->mtpRsId;
+		StorageNew->mtpOmRsSiCode = thedata->mtpOmRsSiCode;
+		StorageNew->mtpOmRsSiValidIntervals = thedata->mtpOmRsSiValidIntervals;
+		StorageNew->mtpOmRsSiTimeDiscontinuity = thedata->mtpOmRsSiTimeDiscontinuity;
+		StorageNew->mtpOmRsSiReceivedOctetsOpcSio = thedata->mtpOmRsSiReceivedOctetsOpcSio;
+		StorageNew->mtpOmRsSiTransmittedOctetsDpcSio = thedata->mtpOmRsSiTransmittedOctetsDpcSio;
+		StorageNew->mtpOmRsSiReceivedMSUsOpcSio = thedata->mtpOmRsSiReceivedMSUsOpcSio;
+		StorageNew->mtpOmRsSiTransmittedMSUsDpcSio = thedata->mtpOmRsSiTransmittedMSUsDpcSio;
+		StorageNew->mtpOmRsSiStatus = thedata->mtpOmRsSiStatus;
 	}
       done:
 	DEBUGMSGTL(("mtpOmMIB", "done.\n"));
@@ -4152,7 +4448,7 @@ mtpOmRsSiTable_del(struct mtpOmRsSiTable_data *thedata)
  * @param line line from configuration file matching the token.
  * @brief parse configuration file for mtpOmRsSiTable entries.
  *
- * This callback is called by UCD-SNMP when it prases a configuration file and finds a configuration
+ * This callback is called by UCD-SNMP when it parses a configuration file and finds a configuration
  * file line for the registsred token (in this case mtpOmRsSiTable).  This routine is invoked by UCD-SNMP
  * to read the values of each row in the table from the configuration file.  Note that this
  * procedure may exist regardless of the persistence of the table.  If there are no configured
@@ -4251,16 +4547,20 @@ mtpOmRsSiInt5minTable_create(void)
 		StorageNew->mtpOmRsSiInt5minTransmittedOctetsDpcSio = 0;
 		StorageNew->mtpOmRsSiInt5minReceivedMSUsOpcSio = 0;
 		StorageNew->mtpOmRsSiInt5minTransmittedMSUsDpcSio = 0;
-
 	}
+      done:
 	DEBUGMSGTL(("mtpOmMIB", "done.\n"));
 	return (StorageNew);
+	goto nomem;
+      nomem:
+	mtpOmRsSiInt5minTable_destroy(&StorageNew);
+	goto done;
 }
 
 /**
  * @fn struct mtpOmRsSiInt5minTable_data *mtpOmRsSiInt5minTable_duplicate(struct mtpOmRsSiInt5minTable_data *thedata)
  * @param thedata the row structure to duplicate.
- * @brief duplicat a row structure for a table.
+ * @brief duplicate a row structure for a table.
  *
  * Duplicates the specified row structure @param thedata and returns a pointer to the newly
  * allocated row structure on success, or NULL on failure.
@@ -4272,6 +4572,16 @@ mtpOmRsSiInt5minTable_duplicate(struct mtpOmRsSiInt5minTable_data *thedata)
 
 	DEBUGMSGTL(("mtpOmMIB", "mtpOmRsSiInt5minTable_duplicate: duplicating row...  "));
 	if (StorageNew != NULL) {
+		StorageNew->mtpOmRsSiInt5minTable_id = thedata->mtpOmRsSiInt5minTable_id;
+		StorageNew->mtpSpId = thedata->mtpSpId;
+		StorageNew->mtpRsId = thedata->mtpRsId;
+		StorageNew->mtpOmRsSiCode = thedata->mtpOmRsSiCode;
+		StorageNew->mtpOmRsSiInt5minInterval = thedata->mtpOmRsSiInt5minInterval;
+		StorageNew->mtpOmRsSiInt5minTimeStamp = thedata->mtpOmRsSiInt5minTimeStamp;
+		StorageNew->mtpOmRsSiInt5minReceivedOctetsOpcSio = thedata->mtpOmRsSiInt5minReceivedOctetsOpcSio;
+		StorageNew->mtpOmRsSiInt5minTransmittedOctetsDpcSio = thedata->mtpOmRsSiInt5minTransmittedOctetsDpcSio;
+		StorageNew->mtpOmRsSiInt5minReceivedMSUsOpcSio = thedata->mtpOmRsSiInt5minReceivedMSUsOpcSio;
+		StorageNew->mtpOmRsSiInt5minTransmittedMSUsDpcSio = thedata->mtpOmRsSiInt5minTransmittedMSUsDpcSio;
 	}
       done:
 	DEBUGMSGTL(("mtpOmMIB", "done.\n"));
@@ -4371,7 +4681,7 @@ mtpOmRsSiInt5minTable_del(struct mtpOmRsSiInt5minTable_data *thedata)
  * @param line line from configuration file matching the token.
  * @brief parse configuration file for mtpOmRsSiInt5minTable entries.
  *
- * This callback is called by UCD-SNMP when it prases a configuration file and finds a configuration
+ * This callback is called by UCD-SNMP when it parses a configuration file and finds a configuration
  * file line for the registsred token (in this case mtpOmRsSiInt5minTable).  This routine is invoked by UCD-SNMP
  * to read the values of each row in the table from the configuration file.  Note that this
  * procedure may exist regardless of the persistence of the table.  If there are no configured
@@ -4468,16 +4778,20 @@ mtpOmRsSiInt15minTable_create(void)
 		StorageNew->mtpOmRsSiInt15minTransmittedOctetsDpcSio = 0;
 		StorageNew->mtpOmRsSiInt15minReceivedMSUsOpcSio = 0;
 		StorageNew->mtpOmRsSiInt15minTransmittedMSUsDpcSio = 0;
-
 	}
+      done:
 	DEBUGMSGTL(("mtpOmMIB", "done.\n"));
 	return (StorageNew);
+	goto nomem;
+      nomem:
+	mtpOmRsSiInt15minTable_destroy(&StorageNew);
+	goto done;
 }
 
 /**
  * @fn struct mtpOmRsSiInt15minTable_data *mtpOmRsSiInt15minTable_duplicate(struct mtpOmRsSiInt15minTable_data *thedata)
  * @param thedata the row structure to duplicate.
- * @brief duplicat a row structure for a table.
+ * @brief duplicate a row structure for a table.
  *
  * Duplicates the specified row structure @param thedata and returns a pointer to the newly
  * allocated row structure on success, or NULL on failure.
@@ -4489,6 +4803,16 @@ mtpOmRsSiInt15minTable_duplicate(struct mtpOmRsSiInt15minTable_data *thedata)
 
 	DEBUGMSGTL(("mtpOmMIB", "mtpOmRsSiInt15minTable_duplicate: duplicating row...  "));
 	if (StorageNew != NULL) {
+		StorageNew->mtpOmRsSiInt15minTable_id = thedata->mtpOmRsSiInt15minTable_id;
+		StorageNew->mtpSpId = thedata->mtpSpId;
+		StorageNew->mtpRsId = thedata->mtpRsId;
+		StorageNew->mtpOmRsSiCode = thedata->mtpOmRsSiCode;
+		StorageNew->mtpOmRsSiInt15minInterval = thedata->mtpOmRsSiInt15minInterval;
+		StorageNew->mtpOmRsSiInt15minTimeStamp = thedata->mtpOmRsSiInt15minTimeStamp;
+		StorageNew->mtpOmRsSiInt15minReceivedOctetsOpcSio = thedata->mtpOmRsSiInt15minReceivedOctetsOpcSio;
+		StorageNew->mtpOmRsSiInt15minTransmittedOctetsDpcSio = thedata->mtpOmRsSiInt15minTransmittedOctetsDpcSio;
+		StorageNew->mtpOmRsSiInt15minReceivedMSUsOpcSio = thedata->mtpOmRsSiInt15minReceivedMSUsOpcSio;
+		StorageNew->mtpOmRsSiInt15minTransmittedMSUsDpcSio = thedata->mtpOmRsSiInt15minTransmittedMSUsDpcSio;
 	}
       done:
 	DEBUGMSGTL(("mtpOmMIB", "done.\n"));
@@ -4588,7 +4912,7 @@ mtpOmRsSiInt15minTable_del(struct mtpOmRsSiInt15minTable_data *thedata)
  * @param line line from configuration file matching the token.
  * @brief parse configuration file for mtpOmRsSiInt15minTable entries.
  *
- * This callback is called by UCD-SNMP when it prases a configuration file and finds a configuration
+ * This callback is called by UCD-SNMP when it parses a configuration file and finds a configuration
  * file line for the registsred token (in this case mtpOmRsSiInt15minTable).  This routine is invoked by UCD-SNMP
  * to read the values of each row in the table from the configuration file.  Note that this
  * procedure may exist regardless of the persistence of the table.  If there are no configured
@@ -4684,16 +5008,20 @@ mtpOmLsTable_create(void)
 		StorageNew->mtpOmLsAdjacentInaccessibleEvents = 0;
 		StorageNew->mtpOmLsAdjacentInaccessibleDuration = 0;
 		StorageNew->mtpOmLsSlsUnavailable = 0;
-
 	}
+      done:
 	DEBUGMSGTL(("mtpOmMIB", "done.\n"));
 	return (StorageNew);
+	goto nomem;
+      nomem:
+	mtpOmLsTable_destroy(&StorageNew);
+	goto done;
 }
 
 /**
  * @fn struct mtpOmLsTable_data *mtpOmLsTable_duplicate(struct mtpOmLsTable_data *thedata)
  * @param thedata the row structure to duplicate.
- * @brief duplicat a row structure for a table.
+ * @brief duplicate a row structure for a table.
  *
  * Duplicates the specified row structure @param thedata and returns a pointer to the newly
  * allocated row structure on success, or NULL on failure.
@@ -4705,6 +5033,14 @@ mtpOmLsTable_duplicate(struct mtpOmLsTable_data *thedata)
 
 	DEBUGMSGTL(("mtpOmMIB", "mtpOmLsTable_duplicate: duplicating row...  "));
 	if (StorageNew != NULL) {
+		StorageNew->mtpOmLsTable_id = thedata->mtpOmLsTable_id;
+		StorageNew->mtpSpId = thedata->mtpSpId;
+		StorageNew->mtpLsId = thedata->mtpLsId;
+		StorageNew->mtpOmLsValidIntervals = thedata->mtpOmLsValidIntervals;
+		StorageNew->mtpOmLsTimeDiscontinuity = thedata->mtpOmLsTimeDiscontinuity;
+		StorageNew->mtpOmLsAdjacentInaccessibleEvents = thedata->mtpOmLsAdjacentInaccessibleEvents;
+		StorageNew->mtpOmLsAdjacentInaccessibleDuration = thedata->mtpOmLsAdjacentInaccessibleDuration;
+		StorageNew->mtpOmLsSlsUnavailable = thedata->mtpOmLsSlsUnavailable;
 	}
       done:
 	DEBUGMSGTL(("mtpOmMIB", "done.\n"));
@@ -4800,7 +5136,7 @@ mtpOmLsTable_del(struct mtpOmLsTable_data *thedata)
  * @param line line from configuration file matching the token.
  * @brief parse configuration file for mtpOmLsTable entries.
  *
- * This callback is called by UCD-SNMP when it prases a configuration file and finds a configuration
+ * This callback is called by UCD-SNMP when it parses a configuration file and finds a configuration
  * file line for the registsred token (in this case mtpOmLsTable).  This routine is invoked by UCD-SNMP
  * to read the values of each row in the table from the configuration file.  Note that this
  * procedure may exist regardless of the persistence of the table.  If there are no configured
@@ -4891,16 +5227,20 @@ mtpOmLsInt5minTable_create(void)
 		StorageNew->mtpOmLsInt5minAdjacentInaccessibleEvents = 0;
 		StorageNew->mtpOmLsInt5minAdjacentInaccessibleDuration = 0;
 		StorageNew->mtpOmLsInt5minSlsUnavailable = 0;
-
 	}
+      done:
 	DEBUGMSGTL(("mtpOmMIB", "done.\n"));
 	return (StorageNew);
+	goto nomem;
+      nomem:
+	mtpOmLsInt5minTable_destroy(&StorageNew);
+	goto done;
 }
 
 /**
  * @fn struct mtpOmLsInt5minTable_data *mtpOmLsInt5minTable_duplicate(struct mtpOmLsInt5minTable_data *thedata)
  * @param thedata the row structure to duplicate.
- * @brief duplicat a row structure for a table.
+ * @brief duplicate a row structure for a table.
  *
  * Duplicates the specified row structure @param thedata and returns a pointer to the newly
  * allocated row structure on success, or NULL on failure.
@@ -4912,6 +5252,14 @@ mtpOmLsInt5minTable_duplicate(struct mtpOmLsInt5minTable_data *thedata)
 
 	DEBUGMSGTL(("mtpOmMIB", "mtpOmLsInt5minTable_duplicate: duplicating row...  "));
 	if (StorageNew != NULL) {
+		StorageNew->mtpOmLsInt5minTable_id = thedata->mtpOmLsInt5minTable_id;
+		StorageNew->mtpSpId = thedata->mtpSpId;
+		StorageNew->mtpLsId = thedata->mtpLsId;
+		StorageNew->mtpOmLsInt5minInterval = thedata->mtpOmLsInt5minInterval;
+		StorageNew->mtpOmLsInt5minTimeStamp = thedata->mtpOmLsInt5minTimeStamp;
+		StorageNew->mtpOmLsInt5minAdjacentInaccessibleEvents = thedata->mtpOmLsInt5minAdjacentInaccessibleEvents;
+		StorageNew->mtpOmLsInt5minAdjacentInaccessibleDuration = thedata->mtpOmLsInt5minAdjacentInaccessibleDuration;
+		StorageNew->mtpOmLsInt5minSlsUnavailable = thedata->mtpOmLsInt5minSlsUnavailable;
 	}
       done:
 	DEBUGMSGTL(("mtpOmMIB", "done.\n"));
@@ -5009,7 +5357,7 @@ mtpOmLsInt5minTable_del(struct mtpOmLsInt5minTable_data *thedata)
  * @param line line from configuration file matching the token.
  * @brief parse configuration file for mtpOmLsInt5minTable entries.
  *
- * This callback is called by UCD-SNMP when it prases a configuration file and finds a configuration
+ * This callback is called by UCD-SNMP when it parses a configuration file and finds a configuration
  * file line for the registsred token (in this case mtpOmLsInt5minTable).  This routine is invoked by UCD-SNMP
  * to read the values of each row in the table from the configuration file.  Note that this
  * procedure may exist regardless of the persistence of the table.  If there are no configured
@@ -5100,16 +5448,20 @@ mtpOmLsInt15minTable_create(void)
 		StorageNew->mtpOmLsInt15minAdjacentInaccessibleEvents = 0;
 		StorageNew->mtpOmLsInt15minAdjacentInaccessibleDuration = 0;
 		StorageNew->mtpOmLsInt15minSlsUnavailable = 0;
-
 	}
+      done:
 	DEBUGMSGTL(("mtpOmMIB", "done.\n"));
 	return (StorageNew);
+	goto nomem;
+      nomem:
+	mtpOmLsInt15minTable_destroy(&StorageNew);
+	goto done;
 }
 
 /**
  * @fn struct mtpOmLsInt15minTable_data *mtpOmLsInt15minTable_duplicate(struct mtpOmLsInt15minTable_data *thedata)
  * @param thedata the row structure to duplicate.
- * @brief duplicat a row structure for a table.
+ * @brief duplicate a row structure for a table.
  *
  * Duplicates the specified row structure @param thedata and returns a pointer to the newly
  * allocated row structure on success, or NULL on failure.
@@ -5121,6 +5473,14 @@ mtpOmLsInt15minTable_duplicate(struct mtpOmLsInt15minTable_data *thedata)
 
 	DEBUGMSGTL(("mtpOmMIB", "mtpOmLsInt15minTable_duplicate: duplicating row...  "));
 	if (StorageNew != NULL) {
+		StorageNew->mtpOmLsInt15minTable_id = thedata->mtpOmLsInt15minTable_id;
+		StorageNew->mtpSpId = thedata->mtpSpId;
+		StorageNew->mtpLsId = thedata->mtpLsId;
+		StorageNew->mtpOmLsInt15minInterval = thedata->mtpOmLsInt15minInterval;
+		StorageNew->mtpOmLsInt15minTimeStamp = thedata->mtpOmLsInt15minTimeStamp;
+		StorageNew->mtpOmLsInt15minAdjacentInaccessibleEvents = thedata->mtpOmLsInt15minAdjacentInaccessibleEvents;
+		StorageNew->mtpOmLsInt15minAdjacentInaccessibleDuration = thedata->mtpOmLsInt15minAdjacentInaccessibleDuration;
+		StorageNew->mtpOmLsInt15minSlsUnavailable = thedata->mtpOmLsInt15minSlsUnavailable;
 	}
       done:
 	DEBUGMSGTL(("mtpOmMIB", "done.\n"));
@@ -5218,7 +5578,7 @@ mtpOmLsInt15minTable_del(struct mtpOmLsInt15minTable_data *thedata)
  * @param line line from configuration file matching the token.
  * @brief parse configuration file for mtpOmLsInt15minTable entries.
  *
- * This callback is called by UCD-SNMP when it prases a configuration file and finds a configuration
+ * This callback is called by UCD-SNMP when it parses a configuration file and finds a configuration
  * file line for the registsred token (in this case mtpOmLsInt15minTable).  This routine is invoked by UCD-SNMP
  * to read the values of each row in the table from the configuration file.  Note that this
  * procedure may exist regardless of the persistence of the table.  If there are no configured
@@ -5331,16 +5691,20 @@ mtpOmSlStatsTable_create(void)
 		StorageNew->mtpOmSlStatsCongDiscdInd1 = 0;
 		StorageNew->mtpOmSlStatsCongDiscdInd2 = 0;
 		StorageNew->mtpOmSlStatsCongDiscdInd3 = 0;
-
 	}
+      done:
 	DEBUGMSGTL(("mtpOmMIB", "done.\n"));
 	return (StorageNew);
+	goto nomem;
+      nomem:
+	mtpOmSlStatsTable_destroy(&StorageNew);
+	goto done;
 }
 
 /**
  * @fn struct mtpOmSlStatsTable_data *mtpOmSlStatsTable_duplicate(struct mtpOmSlStatsTable_data *thedata)
  * @param thedata the row structure to duplicate.
- * @brief duplicat a row structure for a table.
+ * @brief duplicate a row structure for a table.
  *
  * Duplicates the specified row structure @param thedata and returns a pointer to the newly
  * allocated row structure on success, or NULL on failure.
@@ -5352,6 +5716,35 @@ mtpOmSlStatsTable_duplicate(struct mtpOmSlStatsTable_data *thedata)
 
 	DEBUGMSGTL(("mtpOmMIB", "mtpOmSlStatsTable_duplicate: duplicating row...  "));
 	if (StorageNew != NULL) {
+		StorageNew->mtpOmSlStatsTable_id = thedata->mtpOmSlStatsTable_id;
+		StorageNew->mtpMsId = thedata->mtpMsId;
+		StorageNew->mtpSpId = thedata->mtpSpId;
+		StorageNew->mtpLsId = thedata->mtpLsId;
+		StorageNew->mtpSlId = thedata->mtpSlId;
+		StorageNew->mtpOmSlStatsDurInService = thedata->mtpOmSlStatsDurInService;
+		StorageNew->mtpOmSlStatsFailAlignOrProving = thedata->mtpOmSlStatsFailAlignOrProving;
+		StorageNew->mtpOmSlStatsNacksReceived = thedata->mtpOmSlStatsNacksReceived;
+		StorageNew->mtpOmSlStatsDurUnavail = thedata->mtpOmSlStatsDurUnavail;
+		StorageNew->mtpOmSlStatsDurUnavailFailed = thedata->mtpOmSlStatsDurUnavailFailed;
+		StorageNew->mtpOmSlStatsDurUnavailRpo = thedata->mtpOmSlStatsDurUnavailRpo;
+		StorageNew->mtpOmSlStatsSibsSent = thedata->mtpOmSlStatsSibsSent;
+		StorageNew->mtpOmSlStatsTranSioSifOctets = thedata->mtpOmSlStatsTranSioSifOctets;
+		StorageNew->mtpOmSlStatsRetransOctets = thedata->mtpOmSlStatsRetransOctets;
+		StorageNew->mtpOmSlStatsTranMsus = thedata->mtpOmSlStatsTranMsus;
+		StorageNew->mtpOmSlStatsRecvSioSifOctets = thedata->mtpOmSlStatsRecvSioSifOctets;
+		StorageNew->mtpOmSlStatsRecvMsus = thedata->mtpOmSlStatsRecvMsus;
+		StorageNew->mtpOmSlStatsCongOnsetInd0 = thedata->mtpOmSlStatsCongOnsetInd0;
+		StorageNew->mtpOmSlStatsCongOnsetInd1 = thedata->mtpOmSlStatsCongOnsetInd1;
+		StorageNew->mtpOmSlStatsCongOnsetInd2 = thedata->mtpOmSlStatsCongOnsetInd2;
+		StorageNew->mtpOmSlStatsCongOnsetInd3 = thedata->mtpOmSlStatsCongOnsetInd3;
+		StorageNew->mtpOmSlStatsDurCongStatus0 = thedata->mtpOmSlStatsDurCongStatus0;
+		StorageNew->mtpOmSlStatsDurCongStatus1 = thedata->mtpOmSlStatsDurCongStatus1;
+		StorageNew->mtpOmSlStatsDurCongStatus2 = thedata->mtpOmSlStatsDurCongStatus2;
+		StorageNew->mtpOmSlStatsDurCongStatus3 = thedata->mtpOmSlStatsDurCongStatus3;
+		StorageNew->mtpOmSlStatsCongDiscdInd0 = thedata->mtpOmSlStatsCongDiscdInd0;
+		StorageNew->mtpOmSlStatsCongDiscdInd1 = thedata->mtpOmSlStatsCongDiscdInd1;
+		StorageNew->mtpOmSlStatsCongDiscdInd2 = thedata->mtpOmSlStatsCongDiscdInd2;
+		StorageNew->mtpOmSlStatsCongDiscdInd3 = thedata->mtpOmSlStatsCongDiscdInd3;
 	}
       done:
 	DEBUGMSGTL(("mtpOmMIB", "done.\n"));
@@ -5451,7 +5844,7 @@ mtpOmSlStatsTable_del(struct mtpOmSlStatsTable_data *thedata)
  * @param line line from configuration file matching the token.
  * @brief parse configuration file for mtpOmSlStatsTable entries.
  *
- * This callback is called by UCD-SNMP when it prases a configuration file and finds a configuration
+ * This callback is called by UCD-SNMP when it parses a configuration file and finds a configuration
  * file line for the registsred token (in this case mtpOmSlStatsTable).  This routine is invoked by UCD-SNMP
  * to read the values of each row in the table from the configuration file.  Note that this
  * procedure may exist regardless of the persistence of the table.  If there are no configured
@@ -5599,16 +5992,20 @@ mtpOmSlL3Table_create(void)
 		StorageNew->mtpOmSlL3Changeovers = 0;
 		StorageNew->mtpOmSlL3Changebacks = 0;
 		StorageNew->mtpOmSlL3Restorations = 0;
-
 	}
+      done:
 	DEBUGMSGTL(("mtpOmMIB", "done.\n"));
 	return (StorageNew);
+	goto nomem;
+      nomem:
+	mtpOmSlL3Table_destroy(&StorageNew);
+	goto done;
 }
 
 /**
  * @fn struct mtpOmSlL3Table_data *mtpOmSlL3Table_duplicate(struct mtpOmSlL3Table_data *thedata)
  * @param thedata the row structure to duplicate.
- * @brief duplicat a row structure for a table.
+ * @brief duplicate a row structure for a table.
  *
  * Duplicates the specified row structure @param thedata and returns a pointer to the newly
  * allocated row structure on success, or NULL on failure.
@@ -5620,6 +6017,28 @@ mtpOmSlL3Table_duplicate(struct mtpOmSlL3Table_data *thedata)
 
 	DEBUGMSGTL(("mtpOmMIB", "mtpOmSlL3Table_duplicate: duplicating row...  "));
 	if (StorageNew != NULL) {
+		StorageNew->mtpOmSlL3Table_id = thedata->mtpOmSlL3Table_id;
+		StorageNew->mtpSpId = thedata->mtpSpId;
+		StorageNew->mtpLsId = thedata->mtpLsId;
+		StorageNew->mtpSlSlCode = thedata->mtpSlSlCode;
+		StorageNew->mtpOmSlL3ValidIntervals = thedata->mtpOmSlL3ValidIntervals;
+		StorageNew->mtpOmSlL3TimeDiscontinuity = thedata->mtpOmSlL3TimeDiscontinuity;
+		StorageNew->mtpOmSlL3SlUnavailabilityDuration = thedata->mtpOmSlL3SlUnavailabilityDuration;
+		StorageNew->mtpOmSlL3SlLocalInhibition = thedata->mtpOmSlL3SlLocalInhibition;
+		StorageNew->mtpOmSlL3SlRemoteInhibition = thedata->mtpOmSlL3SlRemoteInhibition;
+		StorageNew->mtpOmSlL3SlFailed = thedata->mtpOmSlL3SlFailed;
+		StorageNew->mtpOmSlL3SlRemoteProcOutage = thedata->mtpOmSlL3SlRemoteProcOutage;
+		StorageNew->mtpOmSlL3LocalMgmtInhibit = thedata->mtpOmSlL3LocalMgmtInhibit;
+		StorageNew->mtpOmSlL3LocalMgmtUninhibit = thedata->mtpOmSlL3LocalMgmtUninhibit;
+		StorageNew->mtpOmSlL3LocalBusy = thedata->mtpOmSlL3LocalBusy;
+		StorageNew->mtpOmSlL3SlCongestedStarts = thedata->mtpOmSlL3SlCongestedStarts;
+		StorageNew->mtpOmSlL3SlCongestedDuration = thedata->mtpOmSlL3SlCongestedDuration;
+		StorageNew->mtpOmSlL3SlCongestionStops = thedata->mtpOmSlL3SlCongestionStops;
+		StorageNew->mtpOmSlL3DiscardedMSUs = thedata->mtpOmSlL3DiscardedMSUs;
+		StorageNew->mtpOmSlL3CongestionEventsMSULoss = thedata->mtpOmSlL3CongestionEventsMSULoss;
+		StorageNew->mtpOmSlL3Changeovers = thedata->mtpOmSlL3Changeovers;
+		StorageNew->mtpOmSlL3Changebacks = thedata->mtpOmSlL3Changebacks;
+		StorageNew->mtpOmSlL3Restorations = thedata->mtpOmSlL3Restorations;
 	}
       done:
 	DEBUGMSGTL(("mtpOmMIB", "done.\n"));
@@ -5717,7 +6136,7 @@ mtpOmSlL3Table_del(struct mtpOmSlL3Table_data *thedata)
  * @param line line from configuration file matching the token.
  * @brief parse configuration file for mtpOmSlL3Table entries.
  *
- * This callback is called by UCD-SNMP when it prases a configuration file and finds a configuration
+ * This callback is called by UCD-SNMP when it parses a configuration file and finds a configuration
  * file line for the registsred token (in this case mtpOmSlL3Table).  This routine is invoked by UCD-SNMP
  * to read the values of each row in the table from the configuration file.  Note that this
  * procedure may exist regardless of the persistence of the table.  If there are no configured
@@ -5850,16 +6269,20 @@ mtpOmSlL3Int5minTable_create(void)
 		StorageNew->mtpOmSlL3Int5minChangeovers = 0;
 		StorageNew->mtpOmSlL3Int5minChangebacks = 0;
 		StorageNew->mtpOmSlL3Int5minRestorations = 0;
-
 	}
+      done:
 	DEBUGMSGTL(("mtpOmMIB", "done.\n"));
 	return (StorageNew);
+	goto nomem;
+      nomem:
+	mtpOmSlL3Int5minTable_destroy(&StorageNew);
+	goto done;
 }
 
 /**
  * @fn struct mtpOmSlL3Int5minTable_data *mtpOmSlL3Int5minTable_duplicate(struct mtpOmSlL3Int5minTable_data *thedata)
  * @param thedata the row structure to duplicate.
- * @brief duplicat a row structure for a table.
+ * @brief duplicate a row structure for a table.
  *
  * Duplicates the specified row structure @param thedata and returns a pointer to the newly
  * allocated row structure on success, or NULL on failure.
@@ -5871,6 +6294,28 @@ mtpOmSlL3Int5minTable_duplicate(struct mtpOmSlL3Int5minTable_data *thedata)
 
 	DEBUGMSGTL(("mtpOmMIB", "mtpOmSlL3Int5minTable_duplicate: duplicating row...  "));
 	if (StorageNew != NULL) {
+		StorageNew->mtpOmSlL3Int5minTable_id = thedata->mtpOmSlL3Int5minTable_id;
+		StorageNew->mtpSpId = thedata->mtpSpId;
+		StorageNew->mtpLsId = thedata->mtpLsId;
+		StorageNew->mtpSlSlCode = thedata->mtpSlSlCode;
+		StorageNew->mtpOmSlL3Int5minInterval = thedata->mtpOmSlL3Int5minInterval;
+		StorageNew->mtpOmSlL3Int5minTimeStamp = thedata->mtpOmSlL3Int5minTimeStamp;
+		StorageNew->mtpOmSlL3Int5minSlUnavailabilityDuration = thedata->mtpOmSlL3Int5minSlUnavailabilityDuration;
+		StorageNew->mtpOmSlL3Int5minSlLocalInhibition = thedata->mtpOmSlL3Int5minSlLocalInhibition;
+		StorageNew->mtpOmSlL3Int5minSlRemoteInhibition = thedata->mtpOmSlL3Int5minSlRemoteInhibition;
+		StorageNew->mtpOmSlL3Int5minSlFailed = thedata->mtpOmSlL3Int5minSlFailed;
+		StorageNew->mtpOmSlL3Int5minSlRemoteProcOutage = thedata->mtpOmSlL3Int5minSlRemoteProcOutage;
+		StorageNew->mtpOmSlL3Int5minLocalMgmtInhibit = thedata->mtpOmSlL3Int5minLocalMgmtInhibit;
+		StorageNew->mtpOmSlL3Int5minLocalMgmtUninhibit = thedata->mtpOmSlL3Int5minLocalMgmtUninhibit;
+		StorageNew->mtpOmSlL3Int5minLocalBusy = thedata->mtpOmSlL3Int5minLocalBusy;
+		StorageNew->mtpOmSlL3Int5minSlCongestedStarts = thedata->mtpOmSlL3Int5minSlCongestedStarts;
+		StorageNew->mtpOmSlL3Int5minSlCongestedDuration = thedata->mtpOmSlL3Int5minSlCongestedDuration;
+		StorageNew->mtpOmSlL3Int5minSlCongestionStops = thedata->mtpOmSlL3Int5minSlCongestionStops;
+		StorageNew->mtpOmSlL3Int5minDiscardedMSUs = thedata->mtpOmSlL3Int5minDiscardedMSUs;
+		StorageNew->mtpOmSlL3Int5minCongestionEventsMSULoss = thedata->mtpOmSlL3Int5minCongestionEventsMSULoss;
+		StorageNew->mtpOmSlL3Int5minChangeovers = thedata->mtpOmSlL3Int5minChangeovers;
+		StorageNew->mtpOmSlL3Int5minChangebacks = thedata->mtpOmSlL3Int5minChangebacks;
+		StorageNew->mtpOmSlL3Int5minRestorations = thedata->mtpOmSlL3Int5minRestorations;
 	}
       done:
 	DEBUGMSGTL(("mtpOmMIB", "done.\n"));
@@ -5970,7 +6415,7 @@ mtpOmSlL3Int5minTable_del(struct mtpOmSlL3Int5minTable_data *thedata)
  * @param line line from configuration file matching the token.
  * @brief parse configuration file for mtpOmSlL3Int5minTable entries.
  *
- * This callback is called by UCD-SNMP when it prases a configuration file and finds a configuration
+ * This callback is called by UCD-SNMP when it parses a configuration file and finds a configuration
  * file line for the registsred token (in this case mtpOmSlL3Int5minTable).  This routine is invoked by UCD-SNMP
  * to read the values of each row in the table from the configuration file.  Note that this
  * procedure may exist regardless of the persistence of the table.  If there are no configured
@@ -6103,16 +6548,20 @@ mtpOmSlL3Int15minTable_create(void)
 		StorageNew->mtpOmSlL3Int15minChangeovers = 0;
 		StorageNew->mtpOmSlL3Int15minChangebacks = 0;
 		StorageNew->mtpOmSlL3Int15minRestorations = 0;
-
 	}
+      done:
 	DEBUGMSGTL(("mtpOmMIB", "done.\n"));
 	return (StorageNew);
+	goto nomem;
+      nomem:
+	mtpOmSlL3Int15minTable_destroy(&StorageNew);
+	goto done;
 }
 
 /**
  * @fn struct mtpOmSlL3Int15minTable_data *mtpOmSlL3Int15minTable_duplicate(struct mtpOmSlL3Int15minTable_data *thedata)
  * @param thedata the row structure to duplicate.
- * @brief duplicat a row structure for a table.
+ * @brief duplicate a row structure for a table.
  *
  * Duplicates the specified row structure @param thedata and returns a pointer to the newly
  * allocated row structure on success, or NULL on failure.
@@ -6124,6 +6573,28 @@ mtpOmSlL3Int15minTable_duplicate(struct mtpOmSlL3Int15minTable_data *thedata)
 
 	DEBUGMSGTL(("mtpOmMIB", "mtpOmSlL3Int15minTable_duplicate: duplicating row...  "));
 	if (StorageNew != NULL) {
+		StorageNew->mtpOmSlL3Int15minTable_id = thedata->mtpOmSlL3Int15minTable_id;
+		StorageNew->mtpSpId = thedata->mtpSpId;
+		StorageNew->mtpLsId = thedata->mtpLsId;
+		StorageNew->mtpSlSlCode = thedata->mtpSlSlCode;
+		StorageNew->mtpOmSlL3Int15minInterval = thedata->mtpOmSlL3Int15minInterval;
+		StorageNew->mtpOmSlL3Int15minTimeStamp = thedata->mtpOmSlL3Int15minTimeStamp;
+		StorageNew->mtpOmSlL3Int15minSlUnavailabilityDuration = thedata->mtpOmSlL3Int15minSlUnavailabilityDuration;
+		StorageNew->mtpOmSlL3Int15minSlLocalInhibition = thedata->mtpOmSlL3Int15minSlLocalInhibition;
+		StorageNew->mtpOmSlL3Int15minSlRemoteInhibition = thedata->mtpOmSlL3Int15minSlRemoteInhibition;
+		StorageNew->mtpOmSlL3Int15minSlFailed = thedata->mtpOmSlL3Int15minSlFailed;
+		StorageNew->mtpOmSlL3Int15minSlRemoteProcOutage = thedata->mtpOmSlL3Int15minSlRemoteProcOutage;
+		StorageNew->mtpOmSlL3Int15minLocalMgmtInhibit = thedata->mtpOmSlL3Int15minLocalMgmtInhibit;
+		StorageNew->mtpOmSlL3Int15minLocalMgmtUninhibit = thedata->mtpOmSlL3Int15minLocalMgmtUninhibit;
+		StorageNew->mtpOmSlL3Int15minLocalBusy = thedata->mtpOmSlL3Int15minLocalBusy;
+		StorageNew->mtpOmSlL3Int15minSlCongestedStarts = thedata->mtpOmSlL3Int15minSlCongestedStarts;
+		StorageNew->mtpOmSlL3Int15minSlCongestedDuration = thedata->mtpOmSlL3Int15minSlCongestedDuration;
+		StorageNew->mtpOmSlL3Int15minSlCongestionStops = thedata->mtpOmSlL3Int15minSlCongestionStops;
+		StorageNew->mtpOmSlL3Int15minDiscardedMSUs = thedata->mtpOmSlL3Int15minDiscardedMSUs;
+		StorageNew->mtpOmSlL3Int15minCongestionEventsMSULoss = thedata->mtpOmSlL3Int15minCongestionEventsMSULoss;
+		StorageNew->mtpOmSlL3Int15minChangeovers = thedata->mtpOmSlL3Int15minChangeovers;
+		StorageNew->mtpOmSlL3Int15minChangebacks = thedata->mtpOmSlL3Int15minChangebacks;
+		StorageNew->mtpOmSlL3Int15minRestorations = thedata->mtpOmSlL3Int15minRestorations;
 	}
       done:
 	DEBUGMSGTL(("mtpOmMIB", "done.\n"));
@@ -6223,7 +6694,7 @@ mtpOmSlL3Int15minTable_del(struct mtpOmSlL3Int15minTable_data *thedata)
  * @param line line from configuration file matching the token.
  * @brief parse configuration file for mtpOmSlL3Int15minTable entries.
  *
- * This callback is called by UCD-SNMP when it prases a configuration file and finds a configuration
+ * This callback is called by UCD-SNMP when it parses a configuration file and finds a configuration
  * file line for the registsred token (in this case mtpOmSlL3Int15minTable).  This routine is invoked by UCD-SNMP
  * to read the values of each row in the table from the configuration file.  Note that this
  * procedure may exist regardless of the persistence of the table.  If there are no configured
@@ -6350,16 +6821,20 @@ mtpOmSlL2Table_create(void)
 		StorageNew->mtpOmSlL2TransmittedMSUs = 0;
 		StorageNew->mtpOmSlL2ReceivedOctetsSIFSIO = 0;
 		StorageNew->mtpOmSlL2ReceivedMSUs = 0;
-
 	}
+      done:
 	DEBUGMSGTL(("mtpOmMIB", "done.\n"));
 	return (StorageNew);
+	goto nomem;
+      nomem:
+	mtpOmSlL2Table_destroy(&StorageNew);
+	goto done;
 }
 
 /**
  * @fn struct mtpOmSlL2Table_data *mtpOmSlL2Table_duplicate(struct mtpOmSlL2Table_data *thedata)
  * @param thedata the row structure to duplicate.
- * @brief duplicat a row structure for a table.
+ * @brief duplicate a row structure for a table.
  *
  * Duplicates the specified row structure @param thedata and returns a pointer to the newly
  * allocated row structure on success, or NULL on failure.
@@ -6371,6 +6846,21 @@ mtpOmSlL2Table_duplicate(struct mtpOmSlL2Table_data *thedata)
 
 	DEBUGMSGTL(("mtpOmMIB", "mtpOmSlL2Table_duplicate: duplicating row...  "));
 	if (StorageNew != NULL) {
+		StorageNew->mtpOmSlL2Table_id = thedata->mtpOmSlL2Table_id;
+		StorageNew->mtpSpId = thedata->mtpSpId;
+		StorageNew->mtpLsId = thedata->mtpLsId;
+		StorageNew->mtpSlSlCode = thedata->mtpSlSlCode;
+		StorageNew->mtpOmSlL2ValidIntervals = thedata->mtpOmSlL2ValidIntervals;
+		StorageNew->mtpOmSlL2TimeDiscontinuity = thedata->mtpOmSlL2TimeDiscontinuity;
+		StorageNew->mtpOmSlL2SlInServiceDuration = thedata->mtpOmSlL2SlInServiceDuration;
+		StorageNew->mtpOmSlL2SlAlignment = thedata->mtpOmSlL2SlAlignment;
+		StorageNew->mtpOmSlL2SignUnitsReceived = thedata->mtpOmSlL2SignUnitsReceived;
+		StorageNew->mtpOmSlL2NegAckReceived = thedata->mtpOmSlL2NegAckReceived;
+		StorageNew->mtpOmSlL2TransmittedOctetsSIFSIO = thedata->mtpOmSlL2TransmittedOctetsSIFSIO;
+		StorageNew->mtpOmSlL2RetransmittedOctets = thedata->mtpOmSlL2RetransmittedOctets;
+		StorageNew->mtpOmSlL2TransmittedMSUs = thedata->mtpOmSlL2TransmittedMSUs;
+		StorageNew->mtpOmSlL2ReceivedOctetsSIFSIO = thedata->mtpOmSlL2ReceivedOctetsSIFSIO;
+		StorageNew->mtpOmSlL2ReceivedMSUs = thedata->mtpOmSlL2ReceivedMSUs;
 	}
       done:
 	DEBUGMSGTL(("mtpOmMIB", "done.\n"));
@@ -6468,7 +6958,7 @@ mtpOmSlL2Table_del(struct mtpOmSlL2Table_data *thedata)
  * @param line line from configuration file matching the token.
  * @brief parse configuration file for mtpOmSlL2Table entries.
  *
- * This callback is called by UCD-SNMP when it prases a configuration file and finds a configuration
+ * This callback is called by UCD-SNMP when it parses a configuration file and finds a configuration
  * file line for the registsred token (in this case mtpOmSlL2Table).  This routine is invoked by UCD-SNMP
  * to read the values of each row in the table from the configuration file.  Note that this
  * procedure may exist regardless of the persistence of the table.  If there are no configured
@@ -6580,16 +7070,20 @@ mtpOmSlL2Int5minTable_create(void)
 		StorageNew->mtpOmSlL2Int5minTransmittedMSUs = 0;
 		StorageNew->mtpOmSlL2Int5minReceivedOctetsSIFSIO = 0;
 		StorageNew->mtpOmSlL2Int5minReceivedMSUs = 0;
-
 	}
+      done:
 	DEBUGMSGTL(("mtpOmMIB", "done.\n"));
 	return (StorageNew);
+	goto nomem;
+      nomem:
+	mtpOmSlL2Int5minTable_destroy(&StorageNew);
+	goto done;
 }
 
 /**
  * @fn struct mtpOmSlL2Int5minTable_data *mtpOmSlL2Int5minTable_duplicate(struct mtpOmSlL2Int5minTable_data *thedata)
  * @param thedata the row structure to duplicate.
- * @brief duplicat a row structure for a table.
+ * @brief duplicate a row structure for a table.
  *
  * Duplicates the specified row structure @param thedata and returns a pointer to the newly
  * allocated row structure on success, or NULL on failure.
@@ -6601,6 +7095,21 @@ mtpOmSlL2Int5minTable_duplicate(struct mtpOmSlL2Int5minTable_data *thedata)
 
 	DEBUGMSGTL(("mtpOmMIB", "mtpOmSlL2Int5minTable_duplicate: duplicating row...  "));
 	if (StorageNew != NULL) {
+		StorageNew->mtpOmSlL2Int5minTable_id = thedata->mtpOmSlL2Int5minTable_id;
+		StorageNew->mtpSpId = thedata->mtpSpId;
+		StorageNew->mtpLsId = thedata->mtpLsId;
+		StorageNew->mtpSlSlCode = thedata->mtpSlSlCode;
+		StorageNew->mtpOmSlL2Int5minInterval = thedata->mtpOmSlL2Int5minInterval;
+		StorageNew->mtpOmSlL2Int5minTimestamp = thedata->mtpOmSlL2Int5minTimestamp;
+		StorageNew->mtpOmSlL2Int5minSlInServiceDuration = thedata->mtpOmSlL2Int5minSlInServiceDuration;
+		StorageNew->mtpOmSlL2Int5minSlAlignment = thedata->mtpOmSlL2Int5minSlAlignment;
+		StorageNew->mtpOmSlL2Int5minSignUnitsReceived = thedata->mtpOmSlL2Int5minSignUnitsReceived;
+		StorageNew->mtpOmSlL2Int5minNegAckReceived = thedata->mtpOmSlL2Int5minNegAckReceived;
+		StorageNew->mtpOmSlL2Int5minTransmittedOctetsSIFSIO = thedata->mtpOmSlL2Int5minTransmittedOctetsSIFSIO;
+		StorageNew->mtpOmSlL2Int5minRetransmittedOctets = thedata->mtpOmSlL2Int5minRetransmittedOctets;
+		StorageNew->mtpOmSlL2Int5minTransmittedMSUs = thedata->mtpOmSlL2Int5minTransmittedMSUs;
+		StorageNew->mtpOmSlL2Int5minReceivedOctetsSIFSIO = thedata->mtpOmSlL2Int5minReceivedOctetsSIFSIO;
+		StorageNew->mtpOmSlL2Int5minReceivedMSUs = thedata->mtpOmSlL2Int5minReceivedMSUs;
 	}
       done:
 	DEBUGMSGTL(("mtpOmMIB", "done.\n"));
@@ -6700,7 +7209,7 @@ mtpOmSlL2Int5minTable_del(struct mtpOmSlL2Int5minTable_data *thedata)
  * @param line line from configuration file matching the token.
  * @brief parse configuration file for mtpOmSlL2Int5minTable entries.
  *
- * This callback is called by UCD-SNMP when it prases a configuration file and finds a configuration
+ * This callback is called by UCD-SNMP when it parses a configuration file and finds a configuration
  * file line for the registsred token (in this case mtpOmSlL2Int5minTable).  This routine is invoked by UCD-SNMP
  * to read the values of each row in the table from the configuration file.  Note that this
  * procedure may exist regardless of the persistence of the table.  If there are no configured
@@ -6812,16 +7321,20 @@ mtpOmSlL2Int15minTable_create(void)
 		StorageNew->mtpOmSlL2Int15minTransmittedMSUs = 0;
 		StorageNew->mtpOmSlL2Int15minReceivedOctetsSIFSIO = 0;
 		StorageNew->mtpOmSlL2Int15minReceivedMSUs = 0;
-
 	}
+      done:
 	DEBUGMSGTL(("mtpOmMIB", "done.\n"));
 	return (StorageNew);
+	goto nomem;
+      nomem:
+	mtpOmSlL2Int15minTable_destroy(&StorageNew);
+	goto done;
 }
 
 /**
  * @fn struct mtpOmSlL2Int15minTable_data *mtpOmSlL2Int15minTable_duplicate(struct mtpOmSlL2Int15minTable_data *thedata)
  * @param thedata the row structure to duplicate.
- * @brief duplicat a row structure for a table.
+ * @brief duplicate a row structure for a table.
  *
  * Duplicates the specified row structure @param thedata and returns a pointer to the newly
  * allocated row structure on success, or NULL on failure.
@@ -6833,6 +7346,21 @@ mtpOmSlL2Int15minTable_duplicate(struct mtpOmSlL2Int15minTable_data *thedata)
 
 	DEBUGMSGTL(("mtpOmMIB", "mtpOmSlL2Int15minTable_duplicate: duplicating row...  "));
 	if (StorageNew != NULL) {
+		StorageNew->mtpOmSlL2Int15minTable_id = thedata->mtpOmSlL2Int15minTable_id;
+		StorageNew->mtpSpId = thedata->mtpSpId;
+		StorageNew->mtpLsId = thedata->mtpLsId;
+		StorageNew->mtpSlSlCode = thedata->mtpSlSlCode;
+		StorageNew->mtpOmSlL2Int15minInterval = thedata->mtpOmSlL2Int15minInterval;
+		StorageNew->mtpOmSlL2Int15minTimestamp = thedata->mtpOmSlL2Int15minTimestamp;
+		StorageNew->mtpOmSlL2Int15minSlInServiceDuration = thedata->mtpOmSlL2Int15minSlInServiceDuration;
+		StorageNew->mtpOmSlL2Int15minSlAlignment = thedata->mtpOmSlL2Int15minSlAlignment;
+		StorageNew->mtpOmSlL2Int15minSignUnitsReceived = thedata->mtpOmSlL2Int15minSignUnitsReceived;
+		StorageNew->mtpOmSlL2Int15minNegAckReceived = thedata->mtpOmSlL2Int15minNegAckReceived;
+		StorageNew->mtpOmSlL2Int15minTransmittedOctetsSIFSIO = thedata->mtpOmSlL2Int15minTransmittedOctetsSIFSIO;
+		StorageNew->mtpOmSlL2Int15minRetransmittedOctets = thedata->mtpOmSlL2Int15minRetransmittedOctets;
+		StorageNew->mtpOmSlL2Int15minTransmittedMSUs = thedata->mtpOmSlL2Int15minTransmittedMSUs;
+		StorageNew->mtpOmSlL2Int15minReceivedOctetsSIFSIO = thedata->mtpOmSlL2Int15minReceivedOctetsSIFSIO;
+		StorageNew->mtpOmSlL2Int15minReceivedMSUs = thedata->mtpOmSlL2Int15minReceivedMSUs;
 	}
       done:
 	DEBUGMSGTL(("mtpOmMIB", "done.\n"));
@@ -6932,7 +7460,7 @@ mtpOmSlL2Int15minTable_del(struct mtpOmSlL2Int15minTable_data *thedata)
  * @param line line from configuration file matching the token.
  * @brief parse configuration file for mtpOmSlL2Int15minTable entries.
  *
- * This callback is called by UCD-SNMP when it prases a configuration file and finds a configuration
+ * This callback is called by UCD-SNMP when it parses a configuration file and finds a configuration
  * file line for the registsred token (in this case mtpOmSlL2Int15minTable).  This routine is invoked by UCD-SNMP
  * to read the values of each row in the table from the configuration file.  Note that this
  * procedure may exist regardless of the persistence of the table.  If there are no configured
@@ -7057,16 +7585,20 @@ mtpOmSdtStatsTable_create(void)
 		StorageNew->mtpOmSdtStatsCarrierCtsLost = 0;
 		StorageNew->mtpOmSdtStatsCarrierDcdLost = 0;
 		StorageNew->mtpOmSdtStatsCarrierLost = 0;
-
 	}
+      done:
 	DEBUGMSGTL(("mtpOmMIB", "done.\n"));
 	return (StorageNew);
+	goto nomem;
+      nomem:
+	mtpOmSdtStatsTable_destroy(&StorageNew);
+	goto done;
 }
 
 /**
  * @fn struct mtpOmSdtStatsTable_data *mtpOmSdtStatsTable_duplicate(struct mtpOmSdtStatsTable_data *thedata)
  * @param thedata the row structure to duplicate.
- * @brief duplicat a row structure for a table.
+ * @brief duplicate a row structure for a table.
  *
  * Duplicates the specified row structure @param thedata and returns a pointer to the newly
  * allocated row structure on success, or NULL on failure.
@@ -7078,6 +7610,33 @@ mtpOmSdtStatsTable_duplicate(struct mtpOmSdtStatsTable_data *thedata)
 
 	DEBUGMSGTL(("mtpOmMIB", "mtpOmSdtStatsTable_duplicate: duplicating row...  "));
 	if (StorageNew != NULL) {
+		StorageNew->mtpOmSdtStatsTable_id = thedata->mtpOmSdtStatsTable_id;
+		StorageNew->mtpMsId = thedata->mtpMsId;
+		StorageNew->mtpSdtId = thedata->mtpSdtId;
+		StorageNew->mtpOmSdtStatsTxBytes = thedata->mtpOmSdtStatsTxBytes;
+		StorageNew->mtpOmSdtStatsTxSus = thedata->mtpOmSdtStatsTxSus;
+		StorageNew->mtpOmSdtStatsTxSusRepeated = thedata->mtpOmSdtStatsTxSusRepeated;
+		StorageNew->mtpOmSdtStatsTxUnderruns = thedata->mtpOmSdtStatsTxUnderruns;
+		StorageNew->mtpOmSdtStatsTxAborts = thedata->mtpOmSdtStatsTxAborts;
+		StorageNew->mtpOmSdtStatsTxBufferOverflows = thedata->mtpOmSdtStatsTxBufferOverflows;
+		StorageNew->mtpOmSdtStatsTxSusInError = thedata->mtpOmSdtStatsTxSusInError;
+		StorageNew->mtpOmSdtStatsRxBytes = thedata->mtpOmSdtStatsRxBytes;
+		StorageNew->mtpOmSdtStatsRxSusCompressed = thedata->mtpOmSdtStatsRxSusCompressed;
+		StorageNew->mtpOmSdtStatsRxOverruns = thedata->mtpOmSdtStatsRxOverruns;
+		StorageNew->mtpOmSdtStatsRxAborts = thedata->mtpOmSdtStatsRxAborts;
+		StorageNew->mtpOmSdtStatsRxBufferOverflows = thedata->mtpOmSdtStatsRxBufferOverflows;
+		StorageNew->mtpOmSdtStatsRxSusInError = thedata->mtpOmSdtStatsRxSusInError;
+		StorageNew->mtpOmSdtStatsRxSyncTransitions = thedata->mtpOmSdtStatsRxSyncTransitions;
+		StorageNew->mtpOmSdtStatsRxBitsOctetCounted = thedata->mtpOmSdtStatsRxBitsOctetCounted;
+		StorageNew->mtpOmSdtStatsRxCrcErrors = thedata->mtpOmSdtStatsRxCrcErrors;
+		StorageNew->mtpOmSdtStatsRxFrameErrors = thedata->mtpOmSdtStatsRxFrameErrors;
+		StorageNew->mtpOmSdtStatsRxFrameOverflows = thedata->mtpOmSdtStatsRxFrameOverflows;
+		StorageNew->mtpOmSdtStatsRxFrameTooLong = thedata->mtpOmSdtStatsRxFrameTooLong;
+		StorageNew->mtpOmSdtStatsRxFrameTooShort = thedata->mtpOmSdtStatsRxFrameTooShort;
+		StorageNew->mtpOmSdtStatsRxResidueErrors = thedata->mtpOmSdtStatsRxResidueErrors;
+		StorageNew->mtpOmSdtStatsCarrierCtsLost = thedata->mtpOmSdtStatsCarrierCtsLost;
+		StorageNew->mtpOmSdtStatsCarrierDcdLost = thedata->mtpOmSdtStatsCarrierDcdLost;
+		StorageNew->mtpOmSdtStatsCarrierLost = thedata->mtpOmSdtStatsCarrierLost;
 	}
       done:
 	DEBUGMSGTL(("mtpOmMIB", "done.\n"));
@@ -7173,7 +7732,7 @@ mtpOmSdtStatsTable_del(struct mtpOmSdtStatsTable_data *thedata)
  * @param line line from configuration file matching the token.
  * @brief parse configuration file for mtpOmSdtStatsTable entries.
  *
- * This callback is called by UCD-SNMP when it prases a configuration file and finds a configuration
+ * This callback is called by UCD-SNMP when it parses a configuration file and finds a configuration
  * file line for the registsred token (in this case mtpOmSdtStatsTable).  This routine is invoked by UCD-SNMP
  * to read the values of each row in the table from the configuration file.  Note that this
  * procedure may exist regardless of the persistence of the table.  If there are no configured
@@ -7298,8 +7857,10 @@ mtpOmSdlStatsTable_create(void)
 		/* XXX: fill in default row values here into StorageNew */
 		StorageNew->mtpMsId = 0;
 		StorageNew->mtpSpId = 0;
-		if ((StorageNew->mtpSdlId = (uint8_t *) strdup("")) != NULL)
-			StorageNew->mtpSdlIdLen = strlen("");
+		if ((StorageNew->mtpSdlId = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->mtpSdlIdLen = 0;
+		StorageNew->mtpSdlId[StorageNew->mtpSdlIdLen] = 0;
 		StorageNew->mtpOmSdlStatsRxOctets = 0;
 		StorageNew->mtpOmSdlStatsTxOctets = 0;
 		StorageNew->mtpOmSdlStatsRXOverruns = 0;
@@ -7310,16 +7871,20 @@ mtpOmSdlStatsTable_create(void)
 		StorageNew->mtpOmSdlStatsLeadDcdLost = 0;
 		StorageNew->mtpOmSdlStatsCarrierLost = 0;
 		StorageNew->mtpOmSdlStatsBipolarViolations = 0;
-
 	}
+      done:
 	DEBUGMSGTL(("mtpOmMIB", "done.\n"));
 	return (StorageNew);
+	goto nomem;
+      nomem:
+	mtpOmSdlStatsTable_destroy(&StorageNew);
+	goto done;
 }
 
 /**
  * @fn struct mtpOmSdlStatsTable_data *mtpOmSdlStatsTable_duplicate(struct mtpOmSdlStatsTable_data *thedata)
  * @param thedata the row structure to duplicate.
- * @brief duplicat a row structure for a table.
+ * @brief duplicate a row structure for a table.
  *
  * Duplicates the specified row structure @param thedata and returns a pointer to the newly
  * allocated row structure on success, or NULL on failure.
@@ -7331,6 +7896,24 @@ mtpOmSdlStatsTable_duplicate(struct mtpOmSdlStatsTable_data *thedata)
 
 	DEBUGMSGTL(("mtpOmMIB", "mtpOmSdlStatsTable_duplicate: duplicating row...  "));
 	if (StorageNew != NULL) {
+		StorageNew->mtpOmSdlStatsTable_id = thedata->mtpOmSdlStatsTable_id;
+		StorageNew->mtpMsId = thedata->mtpMsId;
+		StorageNew->mtpSpId = thedata->mtpSpId;
+		if (!(StorageNew->mtpSdlId = malloc(thedata->mtpSdlIdLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->mtpSdlId, thedata->mtpSdlId, thedata->mtpSdlIdLen);
+		StorageNew->mtpSdlIdLen = thedata->mtpSdlIdLen;
+		StorageNew->mtpSdlId[StorageNew->mtpSdlIdLen] = 0;
+		StorageNew->mtpOmSdlStatsRxOctets = thedata->mtpOmSdlStatsRxOctets;
+		StorageNew->mtpOmSdlStatsTxOctets = thedata->mtpOmSdlStatsTxOctets;
+		StorageNew->mtpOmSdlStatsRXOverruns = thedata->mtpOmSdlStatsRXOverruns;
+		StorageNew->mtpOmSdlStatsTxUnderruns = thedata->mtpOmSdlStatsTxUnderruns;
+		StorageNew->mtpOmSdlStatsRxBufferOverflows = thedata->mtpOmSdlStatsRxBufferOverflows;
+		StorageNew->mtpOmSdlStatsTxBufferOverflows = thedata->mtpOmSdlStatsTxBufferOverflows;
+		StorageNew->mtpOmSdlStatsLeadCtsLost = thedata->mtpOmSdlStatsLeadCtsLost;
+		StorageNew->mtpOmSdlStatsLeadDcdLost = thedata->mtpOmSdlStatsLeadDcdLost;
+		StorageNew->mtpOmSdlStatsCarrierLost = thedata->mtpOmSdlStatsCarrierLost;
+		StorageNew->mtpOmSdlStatsBipolarViolations = thedata->mtpOmSdlStatsBipolarViolations;
 	}
       done:
 	DEBUGMSGTL(("mtpOmMIB", "done.\n"));
@@ -7430,7 +8013,7 @@ mtpOmSdlStatsTable_del(struct mtpOmSdlStatsTable_data *thedata)
  * @param line line from configuration file matching the token.
  * @brief parse configuration file for mtpOmSdlStatsTable entries.
  *
- * This callback is called by UCD-SNMP when it prases a configuration file and finds a configuration
+ * This callback is called by UCD-SNMP when it parses a configuration file and finds a configuration
  * file line for the registsred token (in this case mtpOmSdlStatsTable).  This routine is invoked by UCD-SNMP
  * to read the values of each row in the table from the configuration file.  Note that this
  * procedure may exist regardless of the persistence of the table.  If there are no configured
@@ -7514,6 +8097,200 @@ store_mtpOmSdlStatsTable(int majorID, int minorID, void *serverarg, void *client
 	}
 	DEBUGMSGTL(("mtpOmMIB", "done.\n"));
 	return SNMPERR_SUCCESS;
+}
+
+/**
+ * @fn int activate_mtpOmSpSiTable_row(struct mtpOmSpSiTable_data *StorageTmp)
+ * @param StorageTmp the data row to activate
+ * @brief commit activation of a row to the underlying device
+ *
+ * This function is used by tables that contain a RowStatus object.  It is used to move the row from
+ * the RS_NOTINSERVICE state to the RS_ACTIVE state.  It is also used when transitioning from the
+ * RS_CREATEANDGO state to the RS_ACTIVE state.  If activation fails, the function should return
+ * SNMP_ERR_COMMITFAILED; otherwise, SNMP_ERR_NOERROR.
+ */
+int
+activate_mtpOmSpSiTable_row(struct mtpOmSpSiTable_data *StorageTmp)
+{
+	/* XXX: provide code to activate the row with the underlying device */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int deactivate_mtpOmSpSiTable_row(struct mtpOmSpSiTable_data *StorageTmp)
+ * @param StorageTmp the data row to deactivate
+ * @brief commit deactivation of a row to the underlying device
+ *
+ * This function is used by tables that contain a RowStatus object.  It is used to move the row from
+ * the RS_ACTIVE state to the RS_NOTINSERVICE state.  It is also used when transitioning from the
+ * RS_ACTIVE state to the RS_DESTROY state.  If deactivation fails, the function should return
+ * SNMP_ERR_COMMITFAILED; otherwise, SNMP_ERR_NOERROR.
+ */
+int
+deactivate_mtpOmSpSiTable_row(struct mtpOmSpSiTable_data *StorageTmp)
+{
+	/* XXX: provide code to deactivate the row with the underlying device */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int activate_mtpOmSpStudyTable_row(struct mtpOmSpStudyTable_data *StorageTmp)
+ * @param StorageTmp the data row to activate
+ * @brief commit activation of a row to the underlying device
+ *
+ * This function is used by tables that contain a RowStatus object.  It is used to move the row from
+ * the RS_NOTINSERVICE state to the RS_ACTIVE state.  It is also used when transitioning from the
+ * RS_CREATEANDGO state to the RS_ACTIVE state.  If activation fails, the function should return
+ * SNMP_ERR_COMMITFAILED; otherwise, SNMP_ERR_NOERROR.
+ */
+int
+activate_mtpOmSpStudyTable_row(struct mtpOmSpStudyTable_data *StorageTmp)
+{
+	/* XXX: provide code to activate the row with the underlying device */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int deactivate_mtpOmSpStudyTable_row(struct mtpOmSpStudyTable_data *StorageTmp)
+ * @param StorageTmp the data row to deactivate
+ * @brief commit deactivation of a row to the underlying device
+ *
+ * This function is used by tables that contain a RowStatus object.  It is used to move the row from
+ * the RS_ACTIVE state to the RS_NOTINSERVICE state.  It is also used when transitioning from the
+ * RS_ACTIVE state to the RS_DESTROY state.  If deactivation fails, the function should return
+ * SNMP_ERR_COMMITFAILED; otherwise, SNMP_ERR_NOERROR.
+ */
+int
+deactivate_mtpOmSpStudyTable_row(struct mtpOmSpStudyTable_data *StorageTmp)
+{
+	/* XXX: provide code to deactivate the row with the underlying device */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int activate_mtpOmSpStudyMapTable_row(struct mtpOmSpStudyMapTable_data *StorageTmp)
+ * @param StorageTmp the data row to activate
+ * @brief commit activation of a row to the underlying device
+ *
+ * This function is used by tables that contain a RowStatus object.  It is used to move the row from
+ * the RS_NOTINSERVICE state to the RS_ACTIVE state.  It is also used when transitioning from the
+ * RS_CREATEANDGO state to the RS_ACTIVE state.  If activation fails, the function should return
+ * SNMP_ERR_COMMITFAILED; otherwise, SNMP_ERR_NOERROR.
+ */
+int
+activate_mtpOmSpStudyMapTable_row(struct mtpOmSpStudyMapTable_data *StorageTmp)
+{
+	/* XXX: provide code to activate the row with the underlying device */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int deactivate_mtpOmSpStudyMapTable_row(struct mtpOmSpStudyMapTable_data *StorageTmp)
+ * @param StorageTmp the data row to deactivate
+ * @brief commit deactivation of a row to the underlying device
+ *
+ * This function is used by tables that contain a RowStatus object.  It is used to move the row from
+ * the RS_ACTIVE state to the RS_NOTINSERVICE state.  It is also used when transitioning from the
+ * RS_ACTIVE state to the RS_DESTROY state.  If deactivation fails, the function should return
+ * SNMP_ERR_COMMITFAILED; otherwise, SNMP_ERR_NOERROR.
+ */
+int
+deactivate_mtpOmSpStudyMapTable_row(struct mtpOmSpStudyMapTable_data *StorageTmp)
+{
+	/* XXX: provide code to deactivate the row with the underlying device */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int activate_mtpOmRsSiTable_row(struct mtpOmRsSiTable_data *StorageTmp)
+ * @param StorageTmp the data row to activate
+ * @brief commit activation of a row to the underlying device
+ *
+ * This function is used by tables that contain a RowStatus object.  It is used to move the row from
+ * the RS_NOTINSERVICE state to the RS_ACTIVE state.  It is also used when transitioning from the
+ * RS_CREATEANDGO state to the RS_ACTIVE state.  If activation fails, the function should return
+ * SNMP_ERR_COMMITFAILED; otherwise, SNMP_ERR_NOERROR.
+ */
+int
+activate_mtpOmRsSiTable_row(struct mtpOmRsSiTable_data *StorageTmp)
+{
+	/* XXX: provide code to activate the row with the underlying device */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int deactivate_mtpOmRsSiTable_row(struct mtpOmRsSiTable_data *StorageTmp)
+ * @param StorageTmp the data row to deactivate
+ * @brief commit deactivation of a row to the underlying device
+ *
+ * This function is used by tables that contain a RowStatus object.  It is used to move the row from
+ * the RS_ACTIVE state to the RS_NOTINSERVICE state.  It is also used when transitioning from the
+ * RS_ACTIVE state to the RS_DESTROY state.  If deactivation fails, the function should return
+ * SNMP_ERR_COMMITFAILED; otherwise, SNMP_ERR_NOERROR.
+ */
+int
+deactivate_mtpOmRsSiTable_row(struct mtpOmRsSiTable_data *StorageTmp)
+{
+	/* XXX: provide code to deactivate the row with the underlying device */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int check_mtpOmSpTable_row(struct mtpOmSpTable_data *StorageTmp, struct mtpOmSpTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to check, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the ACTION phase.  The start of the ACTION pahse performs this consitency check
+ * on the row before allowing the request to proceed to the COMMIT phase.  This function can return
+ * SNMP_ERR_NOERR or a specific SNMP error value.  Values in StorageOld are the values before the
+ * varbinds on the mib were applied; the values in StorageTmp are the new values.  The function is
+ * permitted to change the values in StorageTmp to correct them; however, preference should be made
+ * for setting values where were not in the varbinds.
+ */
+int
+check_mtpOmSpTable_row(struct mtpOmSpTable_data *StorageTmp, struct mtpOmSpTable_data *StorageOld)
+{
+	/* XXX: provide code to check the row for consistency */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int update_mtpOmSpTable_row(struct mtpOmSpTable_data *StorageTmp, struct mtpOmSpTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the set operation (ACTION phase) on a row
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to update, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the COMMIT phase.  The start of the ACTION phase performs a consistency check on
+ * the row before allowing the request to proceed to the COMMIT phase.  The COMMIT phase then
+ * arrives here with consistency already checked (see check_mtpOmSpTable_row()).  This function can
+ * return SNMP_ERR_NOERROR or SNMP_ERR_COMMITFAILED.  Values in StorageOld are the values before the
+ * varbinds on the row were applied: the values in StorageTmp are the new values.
+ */
+int
+update_mtpOmSpTable_row(struct mtpOmSpTable_data *StorageTmp, struct mtpOmSpTable_data *StorageOld)
+{
+	/* XXX: provide code to update the row with the underlying device */
+	mtpOmSpTable_refresh = 1;
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int revert_mtpOmSpTable_row(struct mtpOmSpTable_data *StorageTmp, struct mtpOmSpTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the undo operation (UNDO phase) on a row
+ */
+void
+revert_mtpOmSpTable_row(struct mtpOmSpTable_data *StorageTmp, struct mtpOmSpTable_data *StorageOld)
+{
+	/* XXX: provide code to revert the row with the underlying device */
+	update_mtpOmSpTable_row(StorageOld, NULL);
 }
 
 /**
@@ -7630,6 +8407,64 @@ var_mtpOmSpTable(struct variable *vp, oid * name, size_t *length, int exact, siz
 }
 
 /**
+ * @fn int check_mtpOmSpInt5minTable_row(struct mtpOmSpInt5minTable_data *StorageTmp, struct mtpOmSpInt5minTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to check, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the ACTION phase.  The start of the ACTION pahse performs this consitency check
+ * on the row before allowing the request to proceed to the COMMIT phase.  This function can return
+ * SNMP_ERR_NOERR or a specific SNMP error value.  Values in StorageOld are the values before the
+ * varbinds on the mib were applied; the values in StorageTmp are the new values.  The function is
+ * permitted to change the values in StorageTmp to correct them; however, preference should be made
+ * for setting values where were not in the varbinds.
+ */
+int
+check_mtpOmSpInt5minTable_row(struct mtpOmSpInt5minTable_data *StorageTmp, struct mtpOmSpInt5minTable_data *StorageOld)
+{
+	/* XXX: provide code to check the row for consistency */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int update_mtpOmSpInt5minTable_row(struct mtpOmSpInt5minTable_data *StorageTmp, struct mtpOmSpInt5minTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the set operation (ACTION phase) on a row
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to update, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the COMMIT phase.  The start of the ACTION phase performs a consistency check on
+ * the row before allowing the request to proceed to the COMMIT phase.  The COMMIT phase then
+ * arrives here with consistency already checked (see check_mtpOmSpInt5minTable_row()).  This function can
+ * return SNMP_ERR_NOERROR or SNMP_ERR_COMMITFAILED.  Values in StorageOld are the values before the
+ * varbinds on the row were applied: the values in StorageTmp are the new values.
+ */
+int
+update_mtpOmSpInt5minTable_row(struct mtpOmSpInt5minTable_data *StorageTmp, struct mtpOmSpInt5minTable_data *StorageOld)
+{
+	/* XXX: provide code to update the row with the underlying device */
+	mtpOmSpInt5minTable_refresh = 1;
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int revert_mtpOmSpInt5minTable_row(struct mtpOmSpInt5minTable_data *StorageTmp, struct mtpOmSpInt5minTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the undo operation (UNDO phase) on a row
+ */
+void
+revert_mtpOmSpInt5minTable_row(struct mtpOmSpInt5minTable_data *StorageTmp, struct mtpOmSpInt5minTable_data *StorageOld)
+{
+	/* XXX: provide code to revert the row with the underlying device */
+	update_mtpOmSpInt5minTable_row(StorageOld, NULL);
+}
+
+/**
  * @fn void refresh_mtpOmSpInt5minTable_row(struct mtpOmSpInt5minTable_data *StorageTmp, int force)
  * @param StorageTmp the data row to refresh.
  * @param force force refresh if non-zero.
@@ -7737,6 +8572,64 @@ var_mtpOmSpInt5minTable(struct variable *vp, oid * name, size_t *length, int exa
 }
 
 /**
+ * @fn int check_mtpOmSpInt15minTable_row(struct mtpOmSpInt15minTable_data *StorageTmp, struct mtpOmSpInt15minTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to check, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the ACTION phase.  The start of the ACTION pahse performs this consitency check
+ * on the row before allowing the request to proceed to the COMMIT phase.  This function can return
+ * SNMP_ERR_NOERR or a specific SNMP error value.  Values in StorageOld are the values before the
+ * varbinds on the mib were applied; the values in StorageTmp are the new values.  The function is
+ * permitted to change the values in StorageTmp to correct them; however, preference should be made
+ * for setting values where were not in the varbinds.
+ */
+int
+check_mtpOmSpInt15minTable_row(struct mtpOmSpInt15minTable_data *StorageTmp, struct mtpOmSpInt15minTable_data *StorageOld)
+{
+	/* XXX: provide code to check the row for consistency */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int update_mtpOmSpInt15minTable_row(struct mtpOmSpInt15minTable_data *StorageTmp, struct mtpOmSpInt15minTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the set operation (ACTION phase) on a row
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to update, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the COMMIT phase.  The start of the ACTION phase performs a consistency check on
+ * the row before allowing the request to proceed to the COMMIT phase.  The COMMIT phase then
+ * arrives here with consistency already checked (see check_mtpOmSpInt15minTable_row()).  This function can
+ * return SNMP_ERR_NOERROR or SNMP_ERR_COMMITFAILED.  Values in StorageOld are the values before the
+ * varbinds on the row were applied: the values in StorageTmp are the new values.
+ */
+int
+update_mtpOmSpInt15minTable_row(struct mtpOmSpInt15minTable_data *StorageTmp, struct mtpOmSpInt15minTable_data *StorageOld)
+{
+	/* XXX: provide code to update the row with the underlying device */
+	mtpOmSpInt15minTable_refresh = 1;
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int revert_mtpOmSpInt15minTable_row(struct mtpOmSpInt15minTable_data *StorageTmp, struct mtpOmSpInt15minTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the undo operation (UNDO phase) on a row
+ */
+void
+revert_mtpOmSpInt15minTable_row(struct mtpOmSpInt15minTable_data *StorageTmp, struct mtpOmSpInt15minTable_data *StorageOld)
+{
+	/* XXX: provide code to revert the row with the underlying device */
+	update_mtpOmSpInt15minTable_row(StorageOld, NULL);
+}
+
+/**
  * @fn void refresh_mtpOmSpInt15minTable_row(struct mtpOmSpInt15minTable_data *StorageTmp, int force)
  * @param StorageTmp the data row to refresh.
  * @param force force refresh if non-zero.
@@ -7841,6 +8734,64 @@ var_mtpOmSpInt15minTable(struct variable *vp, oid * name, size_t *length, int ex
 		ERROR_MSG("");
 	}
 	return (rval);
+}
+
+/**
+ * @fn int check_mtpOmSpSiTable_row(struct mtpOmSpSiTable_data *StorageTmp, struct mtpOmSpSiTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to check, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the ACTION phase.  The start of the ACTION pahse performs this consitency check
+ * on the row before allowing the request to proceed to the COMMIT phase.  This function can return
+ * SNMP_ERR_NOERR or a specific SNMP error value.  Values in StorageOld are the values before the
+ * varbinds on the mib were applied; the values in StorageTmp are the new values.  The function is
+ * permitted to change the values in StorageTmp to correct them; however, preference should be made
+ * for setting values where were not in the varbinds.
+ */
+int
+check_mtpOmSpSiTable_row(struct mtpOmSpSiTable_data *StorageTmp, struct mtpOmSpSiTable_data *StorageOld)
+{
+	/* XXX: provide code to check the row for consistency */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int update_mtpOmSpSiTable_row(struct mtpOmSpSiTable_data *StorageTmp, struct mtpOmSpSiTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the set operation (ACTION phase) on a row
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to update, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the COMMIT phase.  The start of the ACTION phase performs a consistency check on
+ * the row before allowing the request to proceed to the COMMIT phase.  The COMMIT phase then
+ * arrives here with consistency already checked (see check_mtpOmSpSiTable_row()).  This function can
+ * return SNMP_ERR_NOERROR or SNMP_ERR_COMMITFAILED.  Values in StorageOld are the values before the
+ * varbinds on the row were applied: the values in StorageTmp are the new values.
+ */
+int
+update_mtpOmSpSiTable_row(struct mtpOmSpSiTable_data *StorageTmp, struct mtpOmSpSiTable_data *StorageOld)
+{
+	/* XXX: provide code to update the row with the underlying device */
+	mtpOmSpSiTable_refresh = 1;
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int revert_mtpOmSpSiTable_row(struct mtpOmSpSiTable_data *StorageTmp, struct mtpOmSpSiTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the undo operation (UNDO phase) on a row
+ */
+void
+revert_mtpOmSpSiTable_row(struct mtpOmSpSiTable_data *StorageTmp, struct mtpOmSpSiTable_data *StorageOld)
+{
+	/* XXX: provide code to revert the row with the underlying device */
+	update_mtpOmSpSiTable_row(StorageOld, NULL);
 }
 
 /**
@@ -7952,6 +8903,64 @@ var_mtpOmSpSiTable(struct variable *vp, oid * name, size_t *length, int exact, s
 }
 
 /**
+ * @fn int check_mtpOmSpSiInt5minTable_row(struct mtpOmSpSiInt5minTable_data *StorageTmp, struct mtpOmSpSiInt5minTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to check, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the ACTION phase.  The start of the ACTION pahse performs this consitency check
+ * on the row before allowing the request to proceed to the COMMIT phase.  This function can return
+ * SNMP_ERR_NOERR or a specific SNMP error value.  Values in StorageOld are the values before the
+ * varbinds on the mib were applied; the values in StorageTmp are the new values.  The function is
+ * permitted to change the values in StorageTmp to correct them; however, preference should be made
+ * for setting values where were not in the varbinds.
+ */
+int
+check_mtpOmSpSiInt5minTable_row(struct mtpOmSpSiInt5minTable_data *StorageTmp, struct mtpOmSpSiInt5minTable_data *StorageOld)
+{
+	/* XXX: provide code to check the row for consistency */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int update_mtpOmSpSiInt5minTable_row(struct mtpOmSpSiInt5minTable_data *StorageTmp, struct mtpOmSpSiInt5minTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the set operation (ACTION phase) on a row
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to update, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the COMMIT phase.  The start of the ACTION phase performs a consistency check on
+ * the row before allowing the request to proceed to the COMMIT phase.  The COMMIT phase then
+ * arrives here with consistency already checked (see check_mtpOmSpSiInt5minTable_row()).  This function can
+ * return SNMP_ERR_NOERROR or SNMP_ERR_COMMITFAILED.  Values in StorageOld are the values before the
+ * varbinds on the row were applied: the values in StorageTmp are the new values.
+ */
+int
+update_mtpOmSpSiInt5minTable_row(struct mtpOmSpSiInt5minTable_data *StorageTmp, struct mtpOmSpSiInt5minTable_data *StorageOld)
+{
+	/* XXX: provide code to update the row with the underlying device */
+	mtpOmSpSiInt5minTable_refresh = 1;
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int revert_mtpOmSpSiInt5minTable_row(struct mtpOmSpSiInt5minTable_data *StorageTmp, struct mtpOmSpSiInt5minTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the undo operation (UNDO phase) on a row
+ */
+void
+revert_mtpOmSpSiInt5minTable_row(struct mtpOmSpSiInt5minTable_data *StorageTmp, struct mtpOmSpSiInt5minTable_data *StorageOld)
+{
+	/* XXX: provide code to revert the row with the underlying device */
+	update_mtpOmSpSiInt5minTable_row(StorageOld, NULL);
+}
+
+/**
  * @fn void refresh_mtpOmSpSiInt5minTable_row(struct mtpOmSpSiInt5minTable_data *StorageTmp, int force)
  * @param StorageTmp the data row to refresh.
  * @param force force refresh if non-zero.
@@ -8047,6 +9056,64 @@ var_mtpOmSpSiInt5minTable(struct variable *vp, oid * name, size_t *length, int e
 }
 
 /**
+ * @fn int check_mtpOmSpSiInt15minTable_row(struct mtpOmSpSiInt15minTable_data *StorageTmp, struct mtpOmSpSiInt15minTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to check, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the ACTION phase.  The start of the ACTION pahse performs this consitency check
+ * on the row before allowing the request to proceed to the COMMIT phase.  This function can return
+ * SNMP_ERR_NOERR or a specific SNMP error value.  Values in StorageOld are the values before the
+ * varbinds on the mib were applied; the values in StorageTmp are the new values.  The function is
+ * permitted to change the values in StorageTmp to correct them; however, preference should be made
+ * for setting values where were not in the varbinds.
+ */
+int
+check_mtpOmSpSiInt15minTable_row(struct mtpOmSpSiInt15minTable_data *StorageTmp, struct mtpOmSpSiInt15minTable_data *StorageOld)
+{
+	/* XXX: provide code to check the row for consistency */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int update_mtpOmSpSiInt15minTable_row(struct mtpOmSpSiInt15minTable_data *StorageTmp, struct mtpOmSpSiInt15minTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the set operation (ACTION phase) on a row
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to update, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the COMMIT phase.  The start of the ACTION phase performs a consistency check on
+ * the row before allowing the request to proceed to the COMMIT phase.  The COMMIT phase then
+ * arrives here with consistency already checked (see check_mtpOmSpSiInt15minTable_row()).  This function can
+ * return SNMP_ERR_NOERROR or SNMP_ERR_COMMITFAILED.  Values in StorageOld are the values before the
+ * varbinds on the row were applied: the values in StorageTmp are the new values.
+ */
+int
+update_mtpOmSpSiInt15minTable_row(struct mtpOmSpSiInt15minTable_data *StorageTmp, struct mtpOmSpSiInt15minTable_data *StorageOld)
+{
+	/* XXX: provide code to update the row with the underlying device */
+	mtpOmSpSiInt15minTable_refresh = 1;
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int revert_mtpOmSpSiInt15minTable_row(struct mtpOmSpSiInt15minTable_data *StorageTmp, struct mtpOmSpSiInt15minTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the undo operation (UNDO phase) on a row
+ */
+void
+revert_mtpOmSpSiInt15minTable_row(struct mtpOmSpSiInt15minTable_data *StorageTmp, struct mtpOmSpSiInt15minTable_data *StorageOld)
+{
+	/* XXX: provide code to revert the row with the underlying device */
+	update_mtpOmSpSiInt15minTable_row(StorageOld, NULL);
+}
+
+/**
  * @fn void refresh_mtpOmSpSiInt15minTable_row(struct mtpOmSpSiInt15minTable_data *StorageTmp, int force)
  * @param StorageTmp the data row to refresh.
  * @param force force refresh if non-zero.
@@ -8139,6 +9206,64 @@ var_mtpOmSpSiInt15minTable(struct variable *vp, oid * name, size_t *length, int 
 		ERROR_MSG("");
 	}
 	return (rval);
+}
+
+/**
+ * @fn int check_mtpOmSpStudyTable_row(struct mtpOmSpStudyTable_data *StorageTmp, struct mtpOmSpStudyTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to check, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the ACTION phase.  The start of the ACTION pahse performs this consitency check
+ * on the row before allowing the request to proceed to the COMMIT phase.  This function can return
+ * SNMP_ERR_NOERR or a specific SNMP error value.  Values in StorageOld are the values before the
+ * varbinds on the mib were applied; the values in StorageTmp are the new values.  The function is
+ * permitted to change the values in StorageTmp to correct them; however, preference should be made
+ * for setting values where were not in the varbinds.
+ */
+int
+check_mtpOmSpStudyTable_row(struct mtpOmSpStudyTable_data *StorageTmp, struct mtpOmSpStudyTable_data *StorageOld)
+{
+	/* XXX: provide code to check the row for consistency */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int update_mtpOmSpStudyTable_row(struct mtpOmSpStudyTable_data *StorageTmp, struct mtpOmSpStudyTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the set operation (ACTION phase) on a row
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to update, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the COMMIT phase.  The start of the ACTION phase performs a consistency check on
+ * the row before allowing the request to proceed to the COMMIT phase.  The COMMIT phase then
+ * arrives here with consistency already checked (see check_mtpOmSpStudyTable_row()).  This function can
+ * return SNMP_ERR_NOERROR or SNMP_ERR_COMMITFAILED.  Values in StorageOld are the values before the
+ * varbinds on the row were applied: the values in StorageTmp are the new values.
+ */
+int
+update_mtpOmSpStudyTable_row(struct mtpOmSpStudyTable_data *StorageTmp, struct mtpOmSpStudyTable_data *StorageOld)
+{
+	/* XXX: provide code to update the row with the underlying device */
+	mtpOmSpStudyTable_refresh = 1;
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int revert_mtpOmSpStudyTable_row(struct mtpOmSpStudyTable_data *StorageTmp, struct mtpOmSpStudyTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the undo operation (UNDO phase) on a row
+ */
+void
+revert_mtpOmSpStudyTable_row(struct mtpOmSpStudyTable_data *StorageTmp, struct mtpOmSpStudyTable_data *StorageOld)
+{
+	/* XXX: provide code to revert the row with the underlying device */
+	update_mtpOmSpStudyTable_row(StorageOld, NULL);
 }
 
 /**
@@ -8244,6 +9369,64 @@ var_mtpOmSpStudyTable(struct variable *vp, oid * name, size_t *length, int exact
 }
 
 /**
+ * @fn int check_mtpOmSpStudyInt5minTable_row(struct mtpOmSpStudyInt5minTable_data *StorageTmp, struct mtpOmSpStudyInt5minTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to check, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the ACTION phase.  The start of the ACTION pahse performs this consitency check
+ * on the row before allowing the request to proceed to the COMMIT phase.  This function can return
+ * SNMP_ERR_NOERR or a specific SNMP error value.  Values in StorageOld are the values before the
+ * varbinds on the mib were applied; the values in StorageTmp are the new values.  The function is
+ * permitted to change the values in StorageTmp to correct them; however, preference should be made
+ * for setting values where were not in the varbinds.
+ */
+int
+check_mtpOmSpStudyInt5minTable_row(struct mtpOmSpStudyInt5minTable_data *StorageTmp, struct mtpOmSpStudyInt5minTable_data *StorageOld)
+{
+	/* XXX: provide code to check the row for consistency */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int update_mtpOmSpStudyInt5minTable_row(struct mtpOmSpStudyInt5minTable_data *StorageTmp, struct mtpOmSpStudyInt5minTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the set operation (ACTION phase) on a row
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to update, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the COMMIT phase.  The start of the ACTION phase performs a consistency check on
+ * the row before allowing the request to proceed to the COMMIT phase.  The COMMIT phase then
+ * arrives here with consistency already checked (see check_mtpOmSpStudyInt5minTable_row()).  This function can
+ * return SNMP_ERR_NOERROR or SNMP_ERR_COMMITFAILED.  Values in StorageOld are the values before the
+ * varbinds on the row were applied: the values in StorageTmp are the new values.
+ */
+int
+update_mtpOmSpStudyInt5minTable_row(struct mtpOmSpStudyInt5minTable_data *StorageTmp, struct mtpOmSpStudyInt5minTable_data *StorageOld)
+{
+	/* XXX: provide code to update the row with the underlying device */
+	mtpOmSpStudyInt5minTable_refresh = 1;
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int revert_mtpOmSpStudyInt5minTable_row(struct mtpOmSpStudyInt5minTable_data *StorageTmp, struct mtpOmSpStudyInt5minTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the undo operation (UNDO phase) on a row
+ */
+void
+revert_mtpOmSpStudyInt5minTable_row(struct mtpOmSpStudyInt5minTable_data *StorageTmp, struct mtpOmSpStudyInt5minTable_data *StorageOld)
+{
+	/* XXX: provide code to revert the row with the underlying device */
+	update_mtpOmSpStudyInt5minTable_row(StorageOld, NULL);
+}
+
+/**
  * @fn void refresh_mtpOmSpStudyInt5minTable_row(struct mtpOmSpStudyInt5minTable_data *StorageTmp, int force)
  * @param StorageTmp the data row to refresh.
  * @param force force refresh if non-zero.
@@ -8330,6 +9513,64 @@ var_mtpOmSpStudyInt5minTable(struct variable *vp, oid * name, size_t *length, in
 		ERROR_MSG("");
 	}
 	return (rval);
+}
+
+/**
+ * @fn int check_mtpOmSpStudyInt15minTable_row(struct mtpOmSpStudyInt15minTable_data *StorageTmp, struct mtpOmSpStudyInt15minTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to check, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the ACTION phase.  The start of the ACTION pahse performs this consitency check
+ * on the row before allowing the request to proceed to the COMMIT phase.  This function can return
+ * SNMP_ERR_NOERR or a specific SNMP error value.  Values in StorageOld are the values before the
+ * varbinds on the mib were applied; the values in StorageTmp are the new values.  The function is
+ * permitted to change the values in StorageTmp to correct them; however, preference should be made
+ * for setting values where were not in the varbinds.
+ */
+int
+check_mtpOmSpStudyInt15minTable_row(struct mtpOmSpStudyInt15minTable_data *StorageTmp, struct mtpOmSpStudyInt15minTable_data *StorageOld)
+{
+	/* XXX: provide code to check the row for consistency */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int update_mtpOmSpStudyInt15minTable_row(struct mtpOmSpStudyInt15minTable_data *StorageTmp, struct mtpOmSpStudyInt15minTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the set operation (ACTION phase) on a row
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to update, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the COMMIT phase.  The start of the ACTION phase performs a consistency check on
+ * the row before allowing the request to proceed to the COMMIT phase.  The COMMIT phase then
+ * arrives here with consistency already checked (see check_mtpOmSpStudyInt15minTable_row()).  This function can
+ * return SNMP_ERR_NOERROR or SNMP_ERR_COMMITFAILED.  Values in StorageOld are the values before the
+ * varbinds on the row were applied: the values in StorageTmp are the new values.
+ */
+int
+update_mtpOmSpStudyInt15minTable_row(struct mtpOmSpStudyInt15minTable_data *StorageTmp, struct mtpOmSpStudyInt15minTable_data *StorageOld)
+{
+	/* XXX: provide code to update the row with the underlying device */
+	mtpOmSpStudyInt15minTable_refresh = 1;
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int revert_mtpOmSpStudyInt15minTable_row(struct mtpOmSpStudyInt15minTable_data *StorageTmp, struct mtpOmSpStudyInt15minTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the undo operation (UNDO phase) on a row
+ */
+void
+revert_mtpOmSpStudyInt15minTable_row(struct mtpOmSpStudyInt15minTable_data *StorageTmp, struct mtpOmSpStudyInt15minTable_data *StorageOld)
+{
+	/* XXX: provide code to revert the row with the underlying device */
+	update_mtpOmSpStudyInt15minTable_row(StorageOld, NULL);
 }
 
 /**
@@ -8422,6 +9663,64 @@ var_mtpOmSpStudyInt15minTable(struct variable *vp, oid * name, size_t *length, i
 }
 
 /**
+ * @fn int check_mtpOmSpStudyMapTable_row(struct mtpOmSpStudyMapTable_data *StorageTmp, struct mtpOmSpStudyMapTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to check, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the ACTION phase.  The start of the ACTION pahse performs this consitency check
+ * on the row before allowing the request to proceed to the COMMIT phase.  This function can return
+ * SNMP_ERR_NOERR or a specific SNMP error value.  Values in StorageOld are the values before the
+ * varbinds on the mib were applied; the values in StorageTmp are the new values.  The function is
+ * permitted to change the values in StorageTmp to correct them; however, preference should be made
+ * for setting values where were not in the varbinds.
+ */
+int
+check_mtpOmSpStudyMapTable_row(struct mtpOmSpStudyMapTable_data *StorageTmp, struct mtpOmSpStudyMapTable_data *StorageOld)
+{
+	/* XXX: provide code to check the row for consistency */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int update_mtpOmSpStudyMapTable_row(struct mtpOmSpStudyMapTable_data *StorageTmp, struct mtpOmSpStudyMapTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the set operation (ACTION phase) on a row
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to update, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the COMMIT phase.  The start of the ACTION phase performs a consistency check on
+ * the row before allowing the request to proceed to the COMMIT phase.  The COMMIT phase then
+ * arrives here with consistency already checked (see check_mtpOmSpStudyMapTable_row()).  This function can
+ * return SNMP_ERR_NOERROR or SNMP_ERR_COMMITFAILED.  Values in StorageOld are the values before the
+ * varbinds on the row were applied: the values in StorageTmp are the new values.
+ */
+int
+update_mtpOmSpStudyMapTable_row(struct mtpOmSpStudyMapTable_data *StorageTmp, struct mtpOmSpStudyMapTable_data *StorageOld)
+{
+	/* XXX: provide code to update the row with the underlying device */
+	mtpOmSpStudyMapTable_refresh = 1;
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int revert_mtpOmSpStudyMapTable_row(struct mtpOmSpStudyMapTable_data *StorageTmp, struct mtpOmSpStudyMapTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the undo operation (UNDO phase) on a row
+ */
+void
+revert_mtpOmSpStudyMapTable_row(struct mtpOmSpStudyMapTable_data *StorageTmp, struct mtpOmSpStudyMapTable_data *StorageOld)
+{
+	/* XXX: provide code to revert the row with the underlying device */
+	update_mtpOmSpStudyMapTable_row(StorageOld, NULL);
+}
+
+/**
  * @fn void refresh_mtpOmSpStudyMapTable_row(struct mtpOmSpStudyMapTable_data *StorageTmp, int force)
  * @param StorageTmp the data row to refresh.
  * @param force force refresh if non-zero.
@@ -8497,6 +9796,64 @@ var_mtpOmSpStudyMapTable(struct variable *vp, oid * name, size_t *length, int ex
 		ERROR_MSG("");
 	}
 	return (rval);
+}
+
+/**
+ * @fn int check_mtpOmRsTable_row(struct mtpOmRsTable_data *StorageTmp, struct mtpOmRsTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to check, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the ACTION phase.  The start of the ACTION pahse performs this consitency check
+ * on the row before allowing the request to proceed to the COMMIT phase.  This function can return
+ * SNMP_ERR_NOERR or a specific SNMP error value.  Values in StorageOld are the values before the
+ * varbinds on the mib were applied; the values in StorageTmp are the new values.  The function is
+ * permitted to change the values in StorageTmp to correct them; however, preference should be made
+ * for setting values where were not in the varbinds.
+ */
+int
+check_mtpOmRsTable_row(struct mtpOmRsTable_data *StorageTmp, struct mtpOmRsTable_data *StorageOld)
+{
+	/* XXX: provide code to check the row for consistency */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int update_mtpOmRsTable_row(struct mtpOmRsTable_data *StorageTmp, struct mtpOmRsTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the set operation (ACTION phase) on a row
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to update, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the COMMIT phase.  The start of the ACTION phase performs a consistency check on
+ * the row before allowing the request to proceed to the COMMIT phase.  The COMMIT phase then
+ * arrives here with consistency already checked (see check_mtpOmRsTable_row()).  This function can
+ * return SNMP_ERR_NOERROR or SNMP_ERR_COMMITFAILED.  Values in StorageOld are the values before the
+ * varbinds on the row were applied: the values in StorageTmp are the new values.
+ */
+int
+update_mtpOmRsTable_row(struct mtpOmRsTable_data *StorageTmp, struct mtpOmRsTable_data *StorageOld)
+{
+	/* XXX: provide code to update the row with the underlying device */
+	mtpOmRsTable_refresh = 1;
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int revert_mtpOmRsTable_row(struct mtpOmRsTable_data *StorageTmp, struct mtpOmRsTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the undo operation (UNDO phase) on a row
+ */
+void
+revert_mtpOmRsTable_row(struct mtpOmRsTable_data *StorageTmp, struct mtpOmRsTable_data *StorageOld)
+{
+	/* XXX: provide code to revert the row with the underlying device */
+	update_mtpOmRsTable_row(StorageOld, NULL);
 }
 
 /**
@@ -8619,6 +9976,64 @@ var_mtpOmRsTable(struct variable *vp, oid * name, size_t *length, int exact, siz
 }
 
 /**
+ * @fn int check_mtpOmRsInt5minTable_row(struct mtpOmRsInt5minTable_data *StorageTmp, struct mtpOmRsInt5minTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to check, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the ACTION phase.  The start of the ACTION pahse performs this consitency check
+ * on the row before allowing the request to proceed to the COMMIT phase.  This function can return
+ * SNMP_ERR_NOERR or a specific SNMP error value.  Values in StorageOld are the values before the
+ * varbinds on the mib were applied; the values in StorageTmp are the new values.  The function is
+ * permitted to change the values in StorageTmp to correct them; however, preference should be made
+ * for setting values where were not in the varbinds.
+ */
+int
+check_mtpOmRsInt5minTable_row(struct mtpOmRsInt5minTable_data *StorageTmp, struct mtpOmRsInt5minTable_data *StorageOld)
+{
+	/* XXX: provide code to check the row for consistency */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int update_mtpOmRsInt5minTable_row(struct mtpOmRsInt5minTable_data *StorageTmp, struct mtpOmRsInt5minTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the set operation (ACTION phase) on a row
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to update, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the COMMIT phase.  The start of the ACTION phase performs a consistency check on
+ * the row before allowing the request to proceed to the COMMIT phase.  The COMMIT phase then
+ * arrives here with consistency already checked (see check_mtpOmRsInt5minTable_row()).  This function can
+ * return SNMP_ERR_NOERROR or SNMP_ERR_COMMITFAILED.  Values in StorageOld are the values before the
+ * varbinds on the row were applied: the values in StorageTmp are the new values.
+ */
+int
+update_mtpOmRsInt5minTable_row(struct mtpOmRsInt5minTable_data *StorageTmp, struct mtpOmRsInt5minTable_data *StorageOld)
+{
+	/* XXX: provide code to update the row with the underlying device */
+	mtpOmRsInt5minTable_refresh = 1;
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int revert_mtpOmRsInt5minTable_row(struct mtpOmRsInt5minTable_data *StorageTmp, struct mtpOmRsInt5minTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the undo operation (UNDO phase) on a row
+ */
+void
+revert_mtpOmRsInt5minTable_row(struct mtpOmRsInt5minTable_data *StorageTmp, struct mtpOmRsInt5minTable_data *StorageOld)
+{
+	/* XXX: provide code to revert the row with the underlying device */
+	update_mtpOmRsInt5minTable_row(StorageOld, NULL);
+}
+
+/**
  * @fn void refresh_mtpOmRsInt5minTable_row(struct mtpOmRsInt5minTable_data *StorageTmp, int force)
  * @param StorageTmp the data row to refresh.
  * @param force force refresh if non-zero.
@@ -8732,6 +10147,64 @@ var_mtpOmRsInt5minTable(struct variable *vp, oid * name, size_t *length, int exa
 }
 
 /**
+ * @fn int check_mtpOmRsInt15minTable_row(struct mtpOmRsInt15minTable_data *StorageTmp, struct mtpOmRsInt15minTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to check, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the ACTION phase.  The start of the ACTION pahse performs this consitency check
+ * on the row before allowing the request to proceed to the COMMIT phase.  This function can return
+ * SNMP_ERR_NOERR or a specific SNMP error value.  Values in StorageOld are the values before the
+ * varbinds on the mib were applied; the values in StorageTmp are the new values.  The function is
+ * permitted to change the values in StorageTmp to correct them; however, preference should be made
+ * for setting values where were not in the varbinds.
+ */
+int
+check_mtpOmRsInt15minTable_row(struct mtpOmRsInt15minTable_data *StorageTmp, struct mtpOmRsInt15minTable_data *StorageOld)
+{
+	/* XXX: provide code to check the row for consistency */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int update_mtpOmRsInt15minTable_row(struct mtpOmRsInt15minTable_data *StorageTmp, struct mtpOmRsInt15minTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the set operation (ACTION phase) on a row
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to update, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the COMMIT phase.  The start of the ACTION phase performs a consistency check on
+ * the row before allowing the request to proceed to the COMMIT phase.  The COMMIT phase then
+ * arrives here with consistency already checked (see check_mtpOmRsInt15minTable_row()).  This function can
+ * return SNMP_ERR_NOERROR or SNMP_ERR_COMMITFAILED.  Values in StorageOld are the values before the
+ * varbinds on the row were applied: the values in StorageTmp are the new values.
+ */
+int
+update_mtpOmRsInt15minTable_row(struct mtpOmRsInt15minTable_data *StorageTmp, struct mtpOmRsInt15minTable_data *StorageOld)
+{
+	/* XXX: provide code to update the row with the underlying device */
+	mtpOmRsInt15minTable_refresh = 1;
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int revert_mtpOmRsInt15minTable_row(struct mtpOmRsInt15minTable_data *StorageTmp, struct mtpOmRsInt15minTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the undo operation (UNDO phase) on a row
+ */
+void
+revert_mtpOmRsInt15minTable_row(struct mtpOmRsInt15minTable_data *StorageTmp, struct mtpOmRsInt15minTable_data *StorageOld)
+{
+	/* XXX: provide code to revert the row with the underlying device */
+	update_mtpOmRsInt15minTable_row(StorageOld, NULL);
+}
+
+/**
  * @fn void refresh_mtpOmRsInt15minTable_row(struct mtpOmRsInt15minTable_data *StorageTmp, int force)
  * @param StorageTmp the data row to refresh.
  * @param force force refresh if non-zero.
@@ -8842,6 +10315,64 @@ var_mtpOmRsInt15minTable(struct variable *vp, oid * name, size_t *length, int ex
 		ERROR_MSG("");
 	}
 	return (rval);
+}
+
+/**
+ * @fn int check_mtpOmRsSiTable_row(struct mtpOmRsSiTable_data *StorageTmp, struct mtpOmRsSiTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to check, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the ACTION phase.  The start of the ACTION pahse performs this consitency check
+ * on the row before allowing the request to proceed to the COMMIT phase.  This function can return
+ * SNMP_ERR_NOERR or a specific SNMP error value.  Values in StorageOld are the values before the
+ * varbinds on the mib were applied; the values in StorageTmp are the new values.  The function is
+ * permitted to change the values in StorageTmp to correct them; however, preference should be made
+ * for setting values where were not in the varbinds.
+ */
+int
+check_mtpOmRsSiTable_row(struct mtpOmRsSiTable_data *StorageTmp, struct mtpOmRsSiTable_data *StorageOld)
+{
+	/* XXX: provide code to check the row for consistency */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int update_mtpOmRsSiTable_row(struct mtpOmRsSiTable_data *StorageTmp, struct mtpOmRsSiTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the set operation (ACTION phase) on a row
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to update, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the COMMIT phase.  The start of the ACTION phase performs a consistency check on
+ * the row before allowing the request to proceed to the COMMIT phase.  The COMMIT phase then
+ * arrives here with consistency already checked (see check_mtpOmRsSiTable_row()).  This function can
+ * return SNMP_ERR_NOERROR or SNMP_ERR_COMMITFAILED.  Values in StorageOld are the values before the
+ * varbinds on the row were applied: the values in StorageTmp are the new values.
+ */
+int
+update_mtpOmRsSiTable_row(struct mtpOmRsSiTable_data *StorageTmp, struct mtpOmRsSiTable_data *StorageOld)
+{
+	/* XXX: provide code to update the row with the underlying device */
+	mtpOmRsSiTable_refresh = 1;
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int revert_mtpOmRsSiTable_row(struct mtpOmRsSiTable_data *StorageTmp, struct mtpOmRsSiTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the undo operation (UNDO phase) on a row
+ */
+void
+revert_mtpOmRsSiTable_row(struct mtpOmRsSiTable_data *StorageTmp, struct mtpOmRsSiTable_data *StorageOld)
+{
+	/* XXX: provide code to revert the row with the underlying device */
+	update_mtpOmRsSiTable_row(StorageOld, NULL);
 }
 
 /**
@@ -8961,6 +10492,64 @@ var_mtpOmRsSiTable(struct variable *vp, oid * name, size_t *length, int exact, s
 }
 
 /**
+ * @fn int check_mtpOmRsSiInt5minTable_row(struct mtpOmRsSiInt5minTable_data *StorageTmp, struct mtpOmRsSiInt5minTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to check, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the ACTION phase.  The start of the ACTION pahse performs this consitency check
+ * on the row before allowing the request to proceed to the COMMIT phase.  This function can return
+ * SNMP_ERR_NOERR or a specific SNMP error value.  Values in StorageOld are the values before the
+ * varbinds on the mib were applied; the values in StorageTmp are the new values.  The function is
+ * permitted to change the values in StorageTmp to correct them; however, preference should be made
+ * for setting values where were not in the varbinds.
+ */
+int
+check_mtpOmRsSiInt5minTable_row(struct mtpOmRsSiInt5minTable_data *StorageTmp, struct mtpOmRsSiInt5minTable_data *StorageOld)
+{
+	/* XXX: provide code to check the row for consistency */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int update_mtpOmRsSiInt5minTable_row(struct mtpOmRsSiInt5minTable_data *StorageTmp, struct mtpOmRsSiInt5minTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the set operation (ACTION phase) on a row
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to update, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the COMMIT phase.  The start of the ACTION phase performs a consistency check on
+ * the row before allowing the request to proceed to the COMMIT phase.  The COMMIT phase then
+ * arrives here with consistency already checked (see check_mtpOmRsSiInt5minTable_row()).  This function can
+ * return SNMP_ERR_NOERROR or SNMP_ERR_COMMITFAILED.  Values in StorageOld are the values before the
+ * varbinds on the row were applied: the values in StorageTmp are the new values.
+ */
+int
+update_mtpOmRsSiInt5minTable_row(struct mtpOmRsSiInt5minTable_data *StorageTmp, struct mtpOmRsSiInt5minTable_data *StorageOld)
+{
+	/* XXX: provide code to update the row with the underlying device */
+	mtpOmRsSiInt5minTable_refresh = 1;
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int revert_mtpOmRsSiInt5minTable_row(struct mtpOmRsSiInt5minTable_data *StorageTmp, struct mtpOmRsSiInt5minTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the undo operation (UNDO phase) on a row
+ */
+void
+revert_mtpOmRsSiInt5minTable_row(struct mtpOmRsSiInt5minTable_data *StorageTmp, struct mtpOmRsSiInt5minTable_data *StorageOld)
+{
+	/* XXX: provide code to revert the row with the underlying device */
+	update_mtpOmRsSiInt5minTable_row(StorageOld, NULL);
+}
+
+/**
  * @fn void refresh_mtpOmRsSiInt5minTable_row(struct mtpOmRsSiInt5minTable_data *StorageTmp, int force)
  * @param StorageTmp the data row to refresh.
  * @param force force refresh if non-zero.
@@ -9059,6 +10648,64 @@ var_mtpOmRsSiInt5minTable(struct variable *vp, oid * name, size_t *length, int e
 		ERROR_MSG("");
 	}
 	return (rval);
+}
+
+/**
+ * @fn int check_mtpOmRsSiInt15minTable_row(struct mtpOmRsSiInt15minTable_data *StorageTmp, struct mtpOmRsSiInt15minTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to check, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the ACTION phase.  The start of the ACTION pahse performs this consitency check
+ * on the row before allowing the request to proceed to the COMMIT phase.  This function can return
+ * SNMP_ERR_NOERR or a specific SNMP error value.  Values in StorageOld are the values before the
+ * varbinds on the mib were applied; the values in StorageTmp are the new values.  The function is
+ * permitted to change the values in StorageTmp to correct them; however, preference should be made
+ * for setting values where were not in the varbinds.
+ */
+int
+check_mtpOmRsSiInt15minTable_row(struct mtpOmRsSiInt15minTable_data *StorageTmp, struct mtpOmRsSiInt15minTable_data *StorageOld)
+{
+	/* XXX: provide code to check the row for consistency */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int update_mtpOmRsSiInt15minTable_row(struct mtpOmRsSiInt15minTable_data *StorageTmp, struct mtpOmRsSiInt15minTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the set operation (ACTION phase) on a row
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to update, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the COMMIT phase.  The start of the ACTION phase performs a consistency check on
+ * the row before allowing the request to proceed to the COMMIT phase.  The COMMIT phase then
+ * arrives here with consistency already checked (see check_mtpOmRsSiInt15minTable_row()).  This function can
+ * return SNMP_ERR_NOERROR or SNMP_ERR_COMMITFAILED.  Values in StorageOld are the values before the
+ * varbinds on the row were applied: the values in StorageTmp are the new values.
+ */
+int
+update_mtpOmRsSiInt15minTable_row(struct mtpOmRsSiInt15minTable_data *StorageTmp, struct mtpOmRsSiInt15minTable_data *StorageOld)
+{
+	/* XXX: provide code to update the row with the underlying device */
+	mtpOmRsSiInt15minTable_refresh = 1;
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int revert_mtpOmRsSiInt15minTable_row(struct mtpOmRsSiInt15minTable_data *StorageTmp, struct mtpOmRsSiInt15minTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the undo operation (UNDO phase) on a row
+ */
+void
+revert_mtpOmRsSiInt15minTable_row(struct mtpOmRsSiInt15minTable_data *StorageTmp, struct mtpOmRsSiInt15minTable_data *StorageOld)
+{
+	/* XXX: provide code to revert the row with the underlying device */
+	update_mtpOmRsSiInt15minTable_row(StorageOld, NULL);
 }
 
 /**
@@ -9163,6 +10810,64 @@ var_mtpOmRsSiInt15minTable(struct variable *vp, oid * name, size_t *length, int 
 }
 
 /**
+ * @fn int check_mtpOmLsTable_row(struct mtpOmLsTable_data *StorageTmp, struct mtpOmLsTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to check, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the ACTION phase.  The start of the ACTION pahse performs this consitency check
+ * on the row before allowing the request to proceed to the COMMIT phase.  This function can return
+ * SNMP_ERR_NOERR or a specific SNMP error value.  Values in StorageOld are the values before the
+ * varbinds on the mib were applied; the values in StorageTmp are the new values.  The function is
+ * permitted to change the values in StorageTmp to correct them; however, preference should be made
+ * for setting values where were not in the varbinds.
+ */
+int
+check_mtpOmLsTable_row(struct mtpOmLsTable_data *StorageTmp, struct mtpOmLsTable_data *StorageOld)
+{
+	/* XXX: provide code to check the row for consistency */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int update_mtpOmLsTable_row(struct mtpOmLsTable_data *StorageTmp, struct mtpOmLsTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the set operation (ACTION phase) on a row
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to update, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the COMMIT phase.  The start of the ACTION phase performs a consistency check on
+ * the row before allowing the request to proceed to the COMMIT phase.  The COMMIT phase then
+ * arrives here with consistency already checked (see check_mtpOmLsTable_row()).  This function can
+ * return SNMP_ERR_NOERROR or SNMP_ERR_COMMITFAILED.  Values in StorageOld are the values before the
+ * varbinds on the row were applied: the values in StorageTmp are the new values.
+ */
+int
+update_mtpOmLsTable_row(struct mtpOmLsTable_data *StorageTmp, struct mtpOmLsTable_data *StorageOld)
+{
+	/* XXX: provide code to update the row with the underlying device */
+	mtpOmLsTable_refresh = 1;
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int revert_mtpOmLsTable_row(struct mtpOmLsTable_data *StorageTmp, struct mtpOmLsTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the undo operation (UNDO phase) on a row
+ */
+void
+revert_mtpOmLsTable_row(struct mtpOmLsTable_data *StorageTmp, struct mtpOmLsTable_data *StorageOld)
+{
+	/* XXX: provide code to revert the row with the underlying device */
+	update_mtpOmLsTable_row(StorageOld, NULL);
+}
+
+/**
  * @fn void refresh_mtpOmLsTable_row(struct mtpOmLsTable_data *StorageTmp, int force)
  * @param StorageTmp the data row to refresh.
  * @param force force refresh if non-zero.
@@ -9264,6 +10969,64 @@ var_mtpOmLsTable(struct variable *vp, oid * name, size_t *length, int exact, siz
 }
 
 /**
+ * @fn int check_mtpOmLsInt5minTable_row(struct mtpOmLsInt5minTable_data *StorageTmp, struct mtpOmLsInt5minTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to check, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the ACTION phase.  The start of the ACTION pahse performs this consitency check
+ * on the row before allowing the request to proceed to the COMMIT phase.  This function can return
+ * SNMP_ERR_NOERR or a specific SNMP error value.  Values in StorageOld are the values before the
+ * varbinds on the mib were applied; the values in StorageTmp are the new values.  The function is
+ * permitted to change the values in StorageTmp to correct them; however, preference should be made
+ * for setting values where were not in the varbinds.
+ */
+int
+check_mtpOmLsInt5minTable_row(struct mtpOmLsInt5minTable_data *StorageTmp, struct mtpOmLsInt5minTable_data *StorageOld)
+{
+	/* XXX: provide code to check the row for consistency */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int update_mtpOmLsInt5minTable_row(struct mtpOmLsInt5minTable_data *StorageTmp, struct mtpOmLsInt5minTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the set operation (ACTION phase) on a row
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to update, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the COMMIT phase.  The start of the ACTION phase performs a consistency check on
+ * the row before allowing the request to proceed to the COMMIT phase.  The COMMIT phase then
+ * arrives here with consistency already checked (see check_mtpOmLsInt5minTable_row()).  This function can
+ * return SNMP_ERR_NOERROR or SNMP_ERR_COMMITFAILED.  Values in StorageOld are the values before the
+ * varbinds on the row were applied: the values in StorageTmp are the new values.
+ */
+int
+update_mtpOmLsInt5minTable_row(struct mtpOmLsInt5minTable_data *StorageTmp, struct mtpOmLsInt5minTable_data *StorageOld)
+{
+	/* XXX: provide code to update the row with the underlying device */
+	mtpOmLsInt5minTable_refresh = 1;
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int revert_mtpOmLsInt5minTable_row(struct mtpOmLsInt5minTable_data *StorageTmp, struct mtpOmLsInt5minTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the undo operation (UNDO phase) on a row
+ */
+void
+revert_mtpOmLsInt5minTable_row(struct mtpOmLsInt5minTable_data *StorageTmp, struct mtpOmLsInt5minTable_data *StorageOld)
+{
+	/* XXX: provide code to revert the row with the underlying device */
+	update_mtpOmLsInt5minTable_row(StorageOld, NULL);
+}
+
+/**
  * @fn void refresh_mtpOmLsInt5minTable_row(struct mtpOmLsInt5minTable_data *StorageTmp, int force)
  * @param StorageTmp the data row to refresh.
  * @param force force refresh if non-zero.
@@ -9359,6 +11122,64 @@ var_mtpOmLsInt5minTable(struct variable *vp, oid * name, size_t *length, int exa
 }
 
 /**
+ * @fn int check_mtpOmLsInt15minTable_row(struct mtpOmLsInt15minTable_data *StorageTmp, struct mtpOmLsInt15minTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to check, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the ACTION phase.  The start of the ACTION pahse performs this consitency check
+ * on the row before allowing the request to proceed to the COMMIT phase.  This function can return
+ * SNMP_ERR_NOERR or a specific SNMP error value.  Values in StorageOld are the values before the
+ * varbinds on the mib were applied; the values in StorageTmp are the new values.  The function is
+ * permitted to change the values in StorageTmp to correct them; however, preference should be made
+ * for setting values where were not in the varbinds.
+ */
+int
+check_mtpOmLsInt15minTable_row(struct mtpOmLsInt15minTable_data *StorageTmp, struct mtpOmLsInt15minTable_data *StorageOld)
+{
+	/* XXX: provide code to check the row for consistency */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int update_mtpOmLsInt15minTable_row(struct mtpOmLsInt15minTable_data *StorageTmp, struct mtpOmLsInt15minTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the set operation (ACTION phase) on a row
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to update, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the COMMIT phase.  The start of the ACTION phase performs a consistency check on
+ * the row before allowing the request to proceed to the COMMIT phase.  The COMMIT phase then
+ * arrives here with consistency already checked (see check_mtpOmLsInt15minTable_row()).  This function can
+ * return SNMP_ERR_NOERROR or SNMP_ERR_COMMITFAILED.  Values in StorageOld are the values before the
+ * varbinds on the row were applied: the values in StorageTmp are the new values.
+ */
+int
+update_mtpOmLsInt15minTable_row(struct mtpOmLsInt15minTable_data *StorageTmp, struct mtpOmLsInt15minTable_data *StorageOld)
+{
+	/* XXX: provide code to update the row with the underlying device */
+	mtpOmLsInt15minTable_refresh = 1;
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int revert_mtpOmLsInt15minTable_row(struct mtpOmLsInt15minTable_data *StorageTmp, struct mtpOmLsInt15minTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the undo operation (UNDO phase) on a row
+ */
+void
+revert_mtpOmLsInt15minTable_row(struct mtpOmLsInt15minTable_data *StorageTmp, struct mtpOmLsInt15minTable_data *StorageOld)
+{
+	/* XXX: provide code to revert the row with the underlying device */
+	update_mtpOmLsInt15minTable_row(StorageOld, NULL);
+}
+
+/**
  * @fn void refresh_mtpOmLsInt15minTable_row(struct mtpOmLsInt15minTable_data *StorageTmp, int force)
  * @param StorageTmp the data row to refresh.
  * @param force force refresh if non-zero.
@@ -9451,6 +11272,64 @@ var_mtpOmLsInt15minTable(struct variable *vp, oid * name, size_t *length, int ex
 		ERROR_MSG("");
 	}
 	return (rval);
+}
+
+/**
+ * @fn int check_mtpOmSlStatsTable_row(struct mtpOmSlStatsTable_data *StorageTmp, struct mtpOmSlStatsTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to check, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the ACTION phase.  The start of the ACTION pahse performs this consitency check
+ * on the row before allowing the request to proceed to the COMMIT phase.  This function can return
+ * SNMP_ERR_NOERR or a specific SNMP error value.  Values in StorageOld are the values before the
+ * varbinds on the mib were applied; the values in StorageTmp are the new values.  The function is
+ * permitted to change the values in StorageTmp to correct them; however, preference should be made
+ * for setting values where were not in the varbinds.
+ */
+int
+check_mtpOmSlStatsTable_row(struct mtpOmSlStatsTable_data *StorageTmp, struct mtpOmSlStatsTable_data *StorageOld)
+{
+	/* XXX: provide code to check the row for consistency */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int update_mtpOmSlStatsTable_row(struct mtpOmSlStatsTable_data *StorageTmp, struct mtpOmSlStatsTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the set operation (ACTION phase) on a row
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to update, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the COMMIT phase.  The start of the ACTION phase performs a consistency check on
+ * the row before allowing the request to proceed to the COMMIT phase.  The COMMIT phase then
+ * arrives here with consistency already checked (see check_mtpOmSlStatsTable_row()).  This function can
+ * return SNMP_ERR_NOERROR or SNMP_ERR_COMMITFAILED.  Values in StorageOld are the values before the
+ * varbinds on the row were applied: the values in StorageTmp are the new values.
+ */
+int
+update_mtpOmSlStatsTable_row(struct mtpOmSlStatsTable_data *StorageTmp, struct mtpOmSlStatsTable_data *StorageOld)
+{
+	/* XXX: provide code to update the row with the underlying device */
+	mtpOmSlStatsTable_refresh = 1;
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int revert_mtpOmSlStatsTable_row(struct mtpOmSlStatsTable_data *StorageTmp, struct mtpOmSlStatsTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the undo operation (UNDO phase) on a row
+ */
+void
+revert_mtpOmSlStatsTable_row(struct mtpOmSlStatsTable_data *StorageTmp, struct mtpOmSlStatsTable_data *StorageOld)
+{
+	/* XXX: provide code to revert the row with the underlying device */
+	update_mtpOmSlStatsTable_row(StorageOld, NULL);
 }
 
 /**
@@ -9669,6 +11548,64 @@ var_mtpOmSlStatsTable(struct variable *vp, oid * name, size_t *length, int exact
 }
 
 /**
+ * @fn int check_mtpOmSlL3Table_row(struct mtpOmSlL3Table_data *StorageTmp, struct mtpOmSlL3Table_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to check, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the ACTION phase.  The start of the ACTION pahse performs this consitency check
+ * on the row before allowing the request to proceed to the COMMIT phase.  This function can return
+ * SNMP_ERR_NOERR or a specific SNMP error value.  Values in StorageOld are the values before the
+ * varbinds on the mib were applied; the values in StorageTmp are the new values.  The function is
+ * permitted to change the values in StorageTmp to correct them; however, preference should be made
+ * for setting values where were not in the varbinds.
+ */
+int
+check_mtpOmSlL3Table_row(struct mtpOmSlL3Table_data *StorageTmp, struct mtpOmSlL3Table_data *StorageOld)
+{
+	/* XXX: provide code to check the row for consistency */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int update_mtpOmSlL3Table_row(struct mtpOmSlL3Table_data *StorageTmp, struct mtpOmSlL3Table_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the set operation (ACTION phase) on a row
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to update, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the COMMIT phase.  The start of the ACTION phase performs a consistency check on
+ * the row before allowing the request to proceed to the COMMIT phase.  The COMMIT phase then
+ * arrives here with consistency already checked (see check_mtpOmSlL3Table_row()).  This function can
+ * return SNMP_ERR_NOERROR or SNMP_ERR_COMMITFAILED.  Values in StorageOld are the values before the
+ * varbinds on the row were applied: the values in StorageTmp are the new values.
+ */
+int
+update_mtpOmSlL3Table_row(struct mtpOmSlL3Table_data *StorageTmp, struct mtpOmSlL3Table_data *StorageOld)
+{
+	/* XXX: provide code to update the row with the underlying device */
+	mtpOmSlL3Table_refresh = 1;
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int revert_mtpOmSlL3Table_row(struct mtpOmSlL3Table_data *StorageTmp, struct mtpOmSlL3Table_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the undo operation (UNDO phase) on a row
+ */
+void
+revert_mtpOmSlL3Table_row(struct mtpOmSlL3Table_data *StorageTmp, struct mtpOmSlL3Table_data *StorageOld)
+{
+	/* XXX: provide code to revert the row with the underlying device */
+	update_mtpOmSlL3Table_row(StorageOld, NULL);
+}
+
+/**
  * @fn void refresh_mtpOmSlL3Table_row(struct mtpOmSlL3Table_data *StorageTmp, int force)
  * @param StorageTmp the data row to refresh.
  * @param force force refresh if non-zero.
@@ -9848,6 +11785,64 @@ var_mtpOmSlL3Table(struct variable *vp, oid * name, size_t *length, int exact, s
 }
 
 /**
+ * @fn int check_mtpOmSlL3Int5minTable_row(struct mtpOmSlL3Int5minTable_data *StorageTmp, struct mtpOmSlL3Int5minTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to check, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the ACTION phase.  The start of the ACTION pahse performs this consitency check
+ * on the row before allowing the request to proceed to the COMMIT phase.  This function can return
+ * SNMP_ERR_NOERR or a specific SNMP error value.  Values in StorageOld are the values before the
+ * varbinds on the mib were applied; the values in StorageTmp are the new values.  The function is
+ * permitted to change the values in StorageTmp to correct them; however, preference should be made
+ * for setting values where were not in the varbinds.
+ */
+int
+check_mtpOmSlL3Int5minTable_row(struct mtpOmSlL3Int5minTable_data *StorageTmp, struct mtpOmSlL3Int5minTable_data *StorageOld)
+{
+	/* XXX: provide code to check the row for consistency */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int update_mtpOmSlL3Int5minTable_row(struct mtpOmSlL3Int5minTable_data *StorageTmp, struct mtpOmSlL3Int5minTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the set operation (ACTION phase) on a row
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to update, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the COMMIT phase.  The start of the ACTION phase performs a consistency check on
+ * the row before allowing the request to proceed to the COMMIT phase.  The COMMIT phase then
+ * arrives here with consistency already checked (see check_mtpOmSlL3Int5minTable_row()).  This function can
+ * return SNMP_ERR_NOERROR or SNMP_ERR_COMMITFAILED.  Values in StorageOld are the values before the
+ * varbinds on the row were applied: the values in StorageTmp are the new values.
+ */
+int
+update_mtpOmSlL3Int5minTable_row(struct mtpOmSlL3Int5minTable_data *StorageTmp, struct mtpOmSlL3Int5minTable_data *StorageOld)
+{
+	/* XXX: provide code to update the row with the underlying device */
+	mtpOmSlL3Int5minTable_refresh = 1;
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int revert_mtpOmSlL3Int5minTable_row(struct mtpOmSlL3Int5minTable_data *StorageTmp, struct mtpOmSlL3Int5minTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the undo operation (UNDO phase) on a row
+ */
+void
+revert_mtpOmSlL3Int5minTable_row(struct mtpOmSlL3Int5minTable_data *StorageTmp, struct mtpOmSlL3Int5minTable_data *StorageOld)
+{
+	/* XXX: provide code to revert the row with the underlying device */
+	update_mtpOmSlL3Int5minTable_row(StorageOld, NULL);
+}
+
+/**
  * @fn void refresh_mtpOmSlL3Int5minTable_row(struct mtpOmSlL3Int5minTable_data *StorageTmp, int force)
  * @param StorageTmp the data row to refresh.
  * @param force force refresh if non-zero.
@@ -10018,6 +12013,64 @@ var_mtpOmSlL3Int5minTable(struct variable *vp, oid * name, size_t *length, int e
 		ERROR_MSG("");
 	}
 	return (rval);
+}
+
+/**
+ * @fn int check_mtpOmSlL3Int15minTable_row(struct mtpOmSlL3Int15minTable_data *StorageTmp, struct mtpOmSlL3Int15minTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to check, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the ACTION phase.  The start of the ACTION pahse performs this consitency check
+ * on the row before allowing the request to proceed to the COMMIT phase.  This function can return
+ * SNMP_ERR_NOERR or a specific SNMP error value.  Values in StorageOld are the values before the
+ * varbinds on the mib were applied; the values in StorageTmp are the new values.  The function is
+ * permitted to change the values in StorageTmp to correct them; however, preference should be made
+ * for setting values where were not in the varbinds.
+ */
+int
+check_mtpOmSlL3Int15minTable_row(struct mtpOmSlL3Int15minTable_data *StorageTmp, struct mtpOmSlL3Int15minTable_data *StorageOld)
+{
+	/* XXX: provide code to check the row for consistency */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int update_mtpOmSlL3Int15minTable_row(struct mtpOmSlL3Int15minTable_data *StorageTmp, struct mtpOmSlL3Int15minTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the set operation (ACTION phase) on a row
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to update, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the COMMIT phase.  The start of the ACTION phase performs a consistency check on
+ * the row before allowing the request to proceed to the COMMIT phase.  The COMMIT phase then
+ * arrives here with consistency already checked (see check_mtpOmSlL3Int15minTable_row()).  This function can
+ * return SNMP_ERR_NOERROR or SNMP_ERR_COMMITFAILED.  Values in StorageOld are the values before the
+ * varbinds on the row were applied: the values in StorageTmp are the new values.
+ */
+int
+update_mtpOmSlL3Int15minTable_row(struct mtpOmSlL3Int15minTable_data *StorageTmp, struct mtpOmSlL3Int15minTable_data *StorageOld)
+{
+	/* XXX: provide code to update the row with the underlying device */
+	mtpOmSlL3Int15minTable_refresh = 1;
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int revert_mtpOmSlL3Int15minTable_row(struct mtpOmSlL3Int15minTable_data *StorageTmp, struct mtpOmSlL3Int15minTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the undo operation (UNDO phase) on a row
+ */
+void
+revert_mtpOmSlL3Int15minTable_row(struct mtpOmSlL3Int15minTable_data *StorageTmp, struct mtpOmSlL3Int15minTable_data *StorageOld)
+{
+	/* XXX: provide code to revert the row with the underlying device */
+	update_mtpOmSlL3Int15minTable_row(StorageOld, NULL);
 }
 
 /**
@@ -10194,6 +12247,64 @@ var_mtpOmSlL3Int15minTable(struct variable *vp, oid * name, size_t *length, int 
 }
 
 /**
+ * @fn int check_mtpOmSlL2Table_row(struct mtpOmSlL2Table_data *StorageTmp, struct mtpOmSlL2Table_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to check, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the ACTION phase.  The start of the ACTION pahse performs this consitency check
+ * on the row before allowing the request to proceed to the COMMIT phase.  This function can return
+ * SNMP_ERR_NOERR or a specific SNMP error value.  Values in StorageOld are the values before the
+ * varbinds on the mib were applied; the values in StorageTmp are the new values.  The function is
+ * permitted to change the values in StorageTmp to correct them; however, preference should be made
+ * for setting values where were not in the varbinds.
+ */
+int
+check_mtpOmSlL2Table_row(struct mtpOmSlL2Table_data *StorageTmp, struct mtpOmSlL2Table_data *StorageOld)
+{
+	/* XXX: provide code to check the row for consistency */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int update_mtpOmSlL2Table_row(struct mtpOmSlL2Table_data *StorageTmp, struct mtpOmSlL2Table_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the set operation (ACTION phase) on a row
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to update, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the COMMIT phase.  The start of the ACTION phase performs a consistency check on
+ * the row before allowing the request to proceed to the COMMIT phase.  The COMMIT phase then
+ * arrives here with consistency already checked (see check_mtpOmSlL2Table_row()).  This function can
+ * return SNMP_ERR_NOERROR or SNMP_ERR_COMMITFAILED.  Values in StorageOld are the values before the
+ * varbinds on the row were applied: the values in StorageTmp are the new values.
+ */
+int
+update_mtpOmSlL2Table_row(struct mtpOmSlL2Table_data *StorageTmp, struct mtpOmSlL2Table_data *StorageOld)
+{
+	/* XXX: provide code to update the row with the underlying device */
+	mtpOmSlL2Table_refresh = 1;
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int revert_mtpOmSlL2Table_row(struct mtpOmSlL2Table_data *StorageTmp, struct mtpOmSlL2Table_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the undo operation (UNDO phase) on a row
+ */
+void
+revert_mtpOmSlL2Table_row(struct mtpOmSlL2Table_data *StorageTmp, struct mtpOmSlL2Table_data *StorageOld)
+{
+	/* XXX: provide code to revert the row with the underlying device */
+	update_mtpOmSlL2Table_row(StorageOld, NULL);
+}
+
+/**
  * @fn void refresh_mtpOmSlL2Table_row(struct mtpOmSlL2Table_data *StorageTmp, int force)
  * @param StorageTmp the data row to refresh.
  * @param force force refresh if non-zero.
@@ -10331,6 +12442,64 @@ var_mtpOmSlL2Table(struct variable *vp, oid * name, size_t *length, int exact, s
 }
 
 /**
+ * @fn int check_mtpOmSlL2Int5minTable_row(struct mtpOmSlL2Int5minTable_data *StorageTmp, struct mtpOmSlL2Int5minTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to check, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the ACTION phase.  The start of the ACTION pahse performs this consitency check
+ * on the row before allowing the request to proceed to the COMMIT phase.  This function can return
+ * SNMP_ERR_NOERR or a specific SNMP error value.  Values in StorageOld are the values before the
+ * varbinds on the mib were applied; the values in StorageTmp are the new values.  The function is
+ * permitted to change the values in StorageTmp to correct them; however, preference should be made
+ * for setting values where were not in the varbinds.
+ */
+int
+check_mtpOmSlL2Int5minTable_row(struct mtpOmSlL2Int5minTable_data *StorageTmp, struct mtpOmSlL2Int5minTable_data *StorageOld)
+{
+	/* XXX: provide code to check the row for consistency */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int update_mtpOmSlL2Int5minTable_row(struct mtpOmSlL2Int5minTable_data *StorageTmp, struct mtpOmSlL2Int5minTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the set operation (ACTION phase) on a row
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to update, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the COMMIT phase.  The start of the ACTION phase performs a consistency check on
+ * the row before allowing the request to proceed to the COMMIT phase.  The COMMIT phase then
+ * arrives here with consistency already checked (see check_mtpOmSlL2Int5minTable_row()).  This function can
+ * return SNMP_ERR_NOERROR or SNMP_ERR_COMMITFAILED.  Values in StorageOld are the values before the
+ * varbinds on the row were applied: the values in StorageTmp are the new values.
+ */
+int
+update_mtpOmSlL2Int5minTable_row(struct mtpOmSlL2Int5minTable_data *StorageTmp, struct mtpOmSlL2Int5minTable_data *StorageOld)
+{
+	/* XXX: provide code to update the row with the underlying device */
+	mtpOmSlL2Int5minTable_refresh = 1;
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int revert_mtpOmSlL2Int5minTable_row(struct mtpOmSlL2Int5minTable_data *StorageTmp, struct mtpOmSlL2Int5minTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the undo operation (UNDO phase) on a row
+ */
+void
+revert_mtpOmSlL2Int5minTable_row(struct mtpOmSlL2Int5minTable_data *StorageTmp, struct mtpOmSlL2Int5minTable_data *StorageOld)
+{
+	/* XXX: provide code to revert the row with the underlying device */
+	update_mtpOmSlL2Int5minTable_row(StorageOld, NULL);
+}
+
+/**
  * @fn void refresh_mtpOmSlL2Int5minTable_row(struct mtpOmSlL2Int5minTable_data *StorageTmp, int force)
  * @param StorageTmp the data row to refresh.
  * @param force force refresh if non-zero.
@@ -10462,6 +12631,64 @@ var_mtpOmSlL2Int5minTable(struct variable *vp, oid * name, size_t *length, int e
 }
 
 /**
+ * @fn int check_mtpOmSlL2Int15minTable_row(struct mtpOmSlL2Int15minTable_data *StorageTmp, struct mtpOmSlL2Int15minTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to check, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the ACTION phase.  The start of the ACTION pahse performs this consitency check
+ * on the row before allowing the request to proceed to the COMMIT phase.  This function can return
+ * SNMP_ERR_NOERR or a specific SNMP error value.  Values in StorageOld are the values before the
+ * varbinds on the mib were applied; the values in StorageTmp are the new values.  The function is
+ * permitted to change the values in StorageTmp to correct them; however, preference should be made
+ * for setting values where were not in the varbinds.
+ */
+int
+check_mtpOmSlL2Int15minTable_row(struct mtpOmSlL2Int15minTable_data *StorageTmp, struct mtpOmSlL2Int15minTable_data *StorageOld)
+{
+	/* XXX: provide code to check the row for consistency */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int update_mtpOmSlL2Int15minTable_row(struct mtpOmSlL2Int15minTable_data *StorageTmp, struct mtpOmSlL2Int15minTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the set operation (ACTION phase) on a row
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to update, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the COMMIT phase.  The start of the ACTION phase performs a consistency check on
+ * the row before allowing the request to proceed to the COMMIT phase.  The COMMIT phase then
+ * arrives here with consistency already checked (see check_mtpOmSlL2Int15minTable_row()).  This function can
+ * return SNMP_ERR_NOERROR or SNMP_ERR_COMMITFAILED.  Values in StorageOld are the values before the
+ * varbinds on the row were applied: the values in StorageTmp are the new values.
+ */
+int
+update_mtpOmSlL2Int15minTable_row(struct mtpOmSlL2Int15minTable_data *StorageTmp, struct mtpOmSlL2Int15minTable_data *StorageOld)
+{
+	/* XXX: provide code to update the row with the underlying device */
+	mtpOmSlL2Int15minTable_refresh = 1;
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int revert_mtpOmSlL2Int15minTable_row(struct mtpOmSlL2Int15minTable_data *StorageTmp, struct mtpOmSlL2Int15minTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the undo operation (UNDO phase) on a row
+ */
+void
+revert_mtpOmSlL2Int15minTable_row(struct mtpOmSlL2Int15minTable_data *StorageTmp, struct mtpOmSlL2Int15minTable_data *StorageOld)
+{
+	/* XXX: provide code to revert the row with the underlying device */
+	update_mtpOmSlL2Int15minTable_row(StorageOld, NULL);
+}
+
+/**
  * @fn void refresh_mtpOmSlL2Int15minTable_row(struct mtpOmSlL2Int15minTable_data *StorageTmp, int force)
  * @param StorageTmp the data row to refresh.
  * @param force force refresh if non-zero.
@@ -10590,6 +12817,64 @@ var_mtpOmSlL2Int15minTable(struct variable *vp, oid * name, size_t *length, int 
 		ERROR_MSG("");
 	}
 	return (rval);
+}
+
+/**
+ * @fn int check_mtpOmSdtStatsTable_row(struct mtpOmSdtStatsTable_data *StorageTmp, struct mtpOmSdtStatsTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to check, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the ACTION phase.  The start of the ACTION pahse performs this consitency check
+ * on the row before allowing the request to proceed to the COMMIT phase.  This function can return
+ * SNMP_ERR_NOERR or a specific SNMP error value.  Values in StorageOld are the values before the
+ * varbinds on the mib were applied; the values in StorageTmp are the new values.  The function is
+ * permitted to change the values in StorageTmp to correct them; however, preference should be made
+ * for setting values where were not in the varbinds.
+ */
+int
+check_mtpOmSdtStatsTable_row(struct mtpOmSdtStatsTable_data *StorageTmp, struct mtpOmSdtStatsTable_data *StorageOld)
+{
+	/* XXX: provide code to check the row for consistency */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int update_mtpOmSdtStatsTable_row(struct mtpOmSdtStatsTable_data *StorageTmp, struct mtpOmSdtStatsTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the set operation (ACTION phase) on a row
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to update, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the COMMIT phase.  The start of the ACTION phase performs a consistency check on
+ * the row before allowing the request to proceed to the COMMIT phase.  The COMMIT phase then
+ * arrives here with consistency already checked (see check_mtpOmSdtStatsTable_row()).  This function can
+ * return SNMP_ERR_NOERROR or SNMP_ERR_COMMITFAILED.  Values in StorageOld are the values before the
+ * varbinds on the row were applied: the values in StorageTmp are the new values.
+ */
+int
+update_mtpOmSdtStatsTable_row(struct mtpOmSdtStatsTable_data *StorageTmp, struct mtpOmSdtStatsTable_data *StorageOld)
+{
+	/* XXX: provide code to update the row with the underlying device */
+	mtpOmSdtStatsTable_refresh = 1;
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int revert_mtpOmSdtStatsTable_row(struct mtpOmSdtStatsTable_data *StorageTmp, struct mtpOmSdtStatsTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the undo operation (UNDO phase) on a row
+ */
+void
+revert_mtpOmSdtStatsTable_row(struct mtpOmSdtStatsTable_data *StorageTmp, struct mtpOmSdtStatsTable_data *StorageOld)
+{
+	/* XXX: provide code to revert the row with the underlying device */
+	update_mtpOmSdtStatsTable_row(StorageOld, NULL);
 }
 
 /**
@@ -10808,6 +13093,64 @@ var_mtpOmSdtStatsTable(struct variable *vp, oid * name, size_t *length, int exac
 }
 
 /**
+ * @fn int check_mtpOmSdlStatsTable_row(struct mtpOmSdlStatsTable_data *StorageTmp, struct mtpOmSdlStatsTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to check, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the ACTION phase.  The start of the ACTION pahse performs this consitency check
+ * on the row before allowing the request to proceed to the COMMIT phase.  This function can return
+ * SNMP_ERR_NOERR or a specific SNMP error value.  Values in StorageOld are the values before the
+ * varbinds on the mib were applied; the values in StorageTmp are the new values.  The function is
+ * permitted to change the values in StorageTmp to correct them; however, preference should be made
+ * for setting values where were not in the varbinds.
+ */
+int
+check_mtpOmSdlStatsTable_row(struct mtpOmSdlStatsTable_data *StorageTmp, struct mtpOmSdlStatsTable_data *StorageOld)
+{
+	/* XXX: provide code to check the row for consistency */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int update_mtpOmSdlStatsTable_row(struct mtpOmSdlStatsTable_data *StorageTmp, struct mtpOmSdlStatsTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the set operation (ACTION phase) on a row
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to update, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the COMMIT phase.  The start of the ACTION phase performs a consistency check on
+ * the row before allowing the request to proceed to the COMMIT phase.  The COMMIT phase then
+ * arrives here with consistency already checked (see check_mtpOmSdlStatsTable_row()).  This function can
+ * return SNMP_ERR_NOERROR or SNMP_ERR_COMMITFAILED.  Values in StorageOld are the values before the
+ * varbinds on the row were applied: the values in StorageTmp are the new values.
+ */
+int
+update_mtpOmSdlStatsTable_row(struct mtpOmSdlStatsTable_data *StorageTmp, struct mtpOmSdlStatsTable_data *StorageOld)
+{
+	/* XXX: provide code to update the row with the underlying device */
+	mtpOmSdlStatsTable_refresh = 1;
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int revert_mtpOmSdlStatsTable_row(struct mtpOmSdlStatsTable_data *StorageTmp, struct mtpOmSdlStatsTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the undo operation (UNDO phase) on a row
+ */
+void
+revert_mtpOmSdlStatsTable_row(struct mtpOmSdlStatsTable_data *StorageTmp, struct mtpOmSdlStatsTable_data *StorageOld)
+{
+	/* XXX: provide code to revert the row with the underlying device */
+	update_mtpOmSdlStatsTable_row(StorageOld, NULL);
+}
+
+/**
  * @fn void refresh_mtpOmSdlStatsTable_row(struct mtpOmSdlStatsTable_data *StorageTmp, int force)
  * @param StorageTmp the data row to refresh.
  * @param force force refresh if non-zero.
@@ -10952,12 +13295,14 @@ var_mtpOmSdlStatsTable(struct variable *vp, oid * name, size_t *length, int exac
 int
 write_mtpOmRsSiValidIntervals(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static long old_value;
-	struct mtpOmRsSiTable_data *StorageTmp = NULL;
+	struct mtpOmRsSiTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 16;
 	long set_value = *((long *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("mtpOmMIB", "write_mtpOmRsSiValidIntervals entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(mtpOmRsSiTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -10987,22 +13332,61 @@ write_mtpOmRsSiValidIntervals(int action, u_char *var_val, u_char var_val_type, 
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to mtpOmRsSiValidIntervals: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->mtpOmRsSiTable_old) == NULL)
+			if (StorageTmp->mtpOmRsSiTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->mtpOmRsSiTable_old = mtpOmRsSiTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->mtpOmRsSiTable_rsvs++;
+		StorageTmp->mtpOmRsSiValidIntervals = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->mtpOmRsSiTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->mtpOmRsSiTable_tsts == 0)
+				if ((ret = check_mtpOmRsSiTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->mtpOmRsSiTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->mtpOmRsSiValidIntervals for you to use, and you have just been asked to do something with it.  Note that anything done
 				   here must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->mtpOmRsSiValidIntervals;
-		StorageTmp->mtpOmRsSiValidIntervals = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->mtpOmRsSiTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->mtpOmRsSiTable_sets == 0)
+				if ((ret = update_mtpOmRsSiTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->mtpOmRsSiTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->mtpOmRsSiTable_old) != NULL) {
+			mtpOmRsSiTable_destroy(&StorageTmp->mtpOmRsSiTable_old);
+			StorageTmp->mtpOmRsSiTable_rsvs = 0;
+			StorageTmp->mtpOmRsSiTable_tsts = 0;
+			StorageTmp->mtpOmRsSiTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->mtpOmRsSiValidIntervals = old_value;
+		if ((StorageOld = StorageTmp->mtpOmRsSiTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->mtpOmRsSiTable_sets == 0)
+			revert_mtpOmRsSiTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->mtpOmRsSiTable_old) == NULL)
+			break;
+		StorageTmp->mtpOmRsSiValidIntervals = StorageOld->mtpOmRsSiValidIntervals;
+		if (--StorageTmp->mtpOmRsSiTable_rsvs == 0)
+			mtpOmRsSiTable_destroy(&StorageTmp->mtpOmRsSiTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -11022,12 +13406,14 @@ write_mtpOmRsSiValidIntervals(int action, u_char *var_val, u_char var_val_type, 
 int
 write_mtpOmRsSiTimeDiscontinuity(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static long old_value;
-	struct mtpOmRsSiTable_data *StorageTmp = NULL;
+	struct mtpOmRsSiTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 16;
 	long set_value = *((long *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("mtpOmMIB", "write_mtpOmRsSiTimeDiscontinuity entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(mtpOmRsSiTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -11052,22 +13438,61 @@ write_mtpOmRsSiTimeDiscontinuity(int action, u_char *var_val, u_char var_val_typ
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to mtpOmRsSiTimeDiscontinuity: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->mtpOmRsSiTable_old) == NULL)
+			if (StorageTmp->mtpOmRsSiTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->mtpOmRsSiTable_old = mtpOmRsSiTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->mtpOmRsSiTable_rsvs++;
+		StorageTmp->mtpOmRsSiTimeDiscontinuity = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->mtpOmRsSiTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->mtpOmRsSiTable_tsts == 0)
+				if ((ret = check_mtpOmRsSiTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->mtpOmRsSiTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->mtpOmRsSiTimeDiscontinuity for you to use, and you have just been asked to do something with it.  Note that anything
 				   done here must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->mtpOmRsSiTimeDiscontinuity;
-		StorageTmp->mtpOmRsSiTimeDiscontinuity = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->mtpOmRsSiTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->mtpOmRsSiTable_sets == 0)
+				if ((ret = update_mtpOmRsSiTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->mtpOmRsSiTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->mtpOmRsSiTable_old) != NULL) {
+			mtpOmRsSiTable_destroy(&StorageTmp->mtpOmRsSiTable_old);
+			StorageTmp->mtpOmRsSiTable_rsvs = 0;
+			StorageTmp->mtpOmRsSiTable_tsts = 0;
+			StorageTmp->mtpOmRsSiTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->mtpOmRsSiTimeDiscontinuity = old_value;
+		if ((StorageOld = StorageTmp->mtpOmRsSiTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->mtpOmRsSiTable_sets == 0)
+			revert_mtpOmRsSiTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->mtpOmRsSiTable_old) == NULL)
+			break;
+		StorageTmp->mtpOmRsSiTimeDiscontinuity = StorageOld->mtpOmRsSiTimeDiscontinuity;
+		if (--StorageTmp->mtpOmRsSiTable_rsvs == 0)
+			mtpOmRsSiTable_destroy(&StorageTmp->mtpOmRsSiTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -11087,17 +13512,15 @@ write_mtpOmRsSiTimeDiscontinuity(int action, u_char *var_val, u_char var_val_typ
 int
 write_mtpOm1stAndIntervalActivate(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static oid *old_value;
-	struct mtpOmMIB_data *StorageTmp = NULL;
-	static size_t old_length = 0;
-	static oid *objid = NULL;
+	struct mtpOmMIB_data *StorageTmp = NULL, *StorageOld = NULL;
+	oid *objid = NULL;
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("mtpOmMIB", "write_mtpOm1stAndIntervalActivate entering action=%d...  \n", action));
 	if ((StorageTmp = mtpOmMIBStorage) == NULL)
-		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
+		return SNMP_ERR_NOSUCHNAME;
 	switch (action) {
 	case RESERVE1:
-		objid = NULL;
 		if (var_val_type != ASN_OBJECT_ID) {
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to mtpOm1stAndIntervalActivate not ASN_OBJECT_ID\n");
 			return SNMP_ERR_WRONGTYPE;
@@ -11106,29 +13529,69 @@ write_mtpOm1stAndIntervalActivate(int action, u_char *var_val, u_char var_val_ty
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to mtpOm1stAndIntervalActivate: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
-		break;
-	case RESERVE2:		/* memory reseveration, final preparation... */
+		/* one allocation for whole mib */
+		if ((StorageOld = StorageTmp->mtpOmMIB_old) == NULL)
+			if (StorageTmp->mtpOmMIB_rsvs == 0)
+				if ((StorageOld = StorageTmp->mtpOmMIB_old = mtpOmMIB_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->mtpOmMIB_rsvs++;
 		if ((objid = snmp_duplicate_objid((void *) var_val, var_val_len / sizeof(oid))) == NULL)
 			return SNMP_ERR_RESOURCEUNAVAILABLE;
-		break;
-	case ACTION:		/* The variable has been stored in objid for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the
-				   UNDO case */
-		old_value = StorageTmp->mtpOm1stAndIntervalActivate;
-		old_length = StorageTmp->mtpOm1stAndIntervalActivateLen;
+		SNMP_FREE(StorageTmp->mtpOm1stAndIntervalActivate);
 		StorageTmp->mtpOm1stAndIntervalActivate = objid;
 		StorageTmp->mtpOm1stAndIntervalActivateLen = var_val_len / sizeof(oid);
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
+		break;
+	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->mtpOmMIB_old) != NULL) {
+			/* one consistency check for the whole mib */
+			if (StorageTmp->mtpOmMIB_tsts == 0)
+				if ((ret = check_mtpOmMIB(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->mtpOmMIB_tsts++;
+		}
+		break;
+	case ACTION:		/* The variable has been stored in StorageTmp->mtpOm1stAndIntervalActivate for you to use, and you have just been asked to do something with it.  Note that anything
+				   done here must be reversable in the UNDO case */
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole mib */
+		if ((StorageOld = StorageTmp->mtpOmMIB_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->mtpOmMIB_sets == 0)
+				if ((ret = update_mtpOmMIB(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->mtpOmMIB_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
-		SNMP_FREE(old_value);
-		old_length = 0;
-		objid = NULL;
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->mtpOmMIB_old) != NULL) {
+			mtpOmMIB_destroy(&StorageTmp->mtpOmMIB_old);
+			StorageTmp->mtpOmMIB_rsvs = 0;
+			StorageTmp->mtpOmMIB_tsts = 0;
+			StorageTmp->mtpOmMIB_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->mtpOm1stAndIntervalActivate = old_value;
-		StorageTmp->mtpOm1stAndIntervalActivateLen = old_length;
+		if ((StorageOld = StorageTmp->mtpOmMIB_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->mtpOmMIB_tsts == 0)
+			revert_mtpOmMIB(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
-		SNMP_FREE(objid);
+		if ((StorageOld = StorageTmp->mtpOmMIB_old) == NULL)
+			break;
+		if (StorageOld->mtpOm1stAndIntervalActivate != NULL) {
+			SNMP_FREE(StorageTmp->mtpOm1stAndIntervalActivate);
+			StorageTmp->mtpOm1stAndIntervalActivate = StorageOld->mtpOm1stAndIntervalActivate;
+			StorageTmp->mtpOm1stAndIntervalActivateLen = StorageOld->mtpOm1stAndIntervalActivateLen;
+			StorageOld->mtpOm1stAndIntervalActivate = NULL;
+			StorageOld->mtpOm1stAndIntervalActivateLen = 0;
+		}
+		if (--StorageTmp->mtpOmMIB_rsvs == 0)
+			mtpOmMIB_destroy(&StorageTmp->mtpOmMIB_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -11148,17 +13611,15 @@ write_mtpOm1stAndIntervalActivate(int action, u_char *var_val, u_char var_val_ty
 int
 write_mtpOm1stAndIntervalDeactivate(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static oid *old_value;
-	struct mtpOmMIB_data *StorageTmp = NULL;
-	static size_t old_length = 0;
-	static oid *objid = NULL;
+	struct mtpOmMIB_data *StorageTmp = NULL, *StorageOld = NULL;
+	oid *objid = NULL;
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("mtpOmMIB", "write_mtpOm1stAndIntervalDeactivate entering action=%d...  \n", action));
 	if ((StorageTmp = mtpOmMIBStorage) == NULL)
-		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
+		return SNMP_ERR_NOSUCHNAME;
 	switch (action) {
 	case RESERVE1:
-		objid = NULL;
 		if (var_val_type != ASN_OBJECT_ID) {
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to mtpOm1stAndIntervalDeactivate not ASN_OBJECT_ID\n");
 			return SNMP_ERR_WRONGTYPE;
@@ -11167,29 +13628,69 @@ write_mtpOm1stAndIntervalDeactivate(int action, u_char *var_val, u_char var_val_
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to mtpOm1stAndIntervalDeactivate: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
-		break;
-	case RESERVE2:		/* memory reseveration, final preparation... */
+		/* one allocation for whole mib */
+		if ((StorageOld = StorageTmp->mtpOmMIB_old) == NULL)
+			if (StorageTmp->mtpOmMIB_rsvs == 0)
+				if ((StorageOld = StorageTmp->mtpOmMIB_old = mtpOmMIB_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->mtpOmMIB_rsvs++;
 		if ((objid = snmp_duplicate_objid((void *) var_val, var_val_len / sizeof(oid))) == NULL)
 			return SNMP_ERR_RESOURCEUNAVAILABLE;
-		break;
-	case ACTION:		/* The variable has been stored in objid for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the
-				   UNDO case */
-		old_value = StorageTmp->mtpOm1stAndIntervalDeactivate;
-		old_length = StorageTmp->mtpOm1stAndIntervalDeactivateLen;
+		SNMP_FREE(StorageTmp->mtpOm1stAndIntervalDeactivate);
 		StorageTmp->mtpOm1stAndIntervalDeactivate = objid;
 		StorageTmp->mtpOm1stAndIntervalDeactivateLen = var_val_len / sizeof(oid);
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
+		break;
+	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->mtpOmMIB_old) != NULL) {
+			/* one consistency check for the whole mib */
+			if (StorageTmp->mtpOmMIB_tsts == 0)
+				if ((ret = check_mtpOmMIB(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->mtpOmMIB_tsts++;
+		}
+		break;
+	case ACTION:		/* The variable has been stored in StorageTmp->mtpOm1stAndIntervalDeactivate for you to use, and you have just been asked to do something with it.  Note that anything
+				   done here must be reversable in the UNDO case */
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole mib */
+		if ((StorageOld = StorageTmp->mtpOmMIB_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->mtpOmMIB_sets == 0)
+				if ((ret = update_mtpOmMIB(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->mtpOmMIB_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
-		SNMP_FREE(old_value);
-		old_length = 0;
-		objid = NULL;
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->mtpOmMIB_old) != NULL) {
+			mtpOmMIB_destroy(&StorageTmp->mtpOmMIB_old);
+			StorageTmp->mtpOmMIB_rsvs = 0;
+			StorageTmp->mtpOmMIB_tsts = 0;
+			StorageTmp->mtpOmMIB_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->mtpOm1stAndIntervalDeactivate = old_value;
-		StorageTmp->mtpOm1stAndIntervalDeactivateLen = old_length;
+		if ((StorageOld = StorageTmp->mtpOmMIB_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->mtpOmMIB_tsts == 0)
+			revert_mtpOmMIB(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
-		SNMP_FREE(objid);
+		if ((StorageOld = StorageTmp->mtpOmMIB_old) == NULL)
+			break;
+		if (StorageOld->mtpOm1stAndIntervalDeactivate != NULL) {
+			SNMP_FREE(StorageTmp->mtpOm1stAndIntervalDeactivate);
+			StorageTmp->mtpOm1stAndIntervalDeactivate = StorageOld->mtpOm1stAndIntervalDeactivate;
+			StorageTmp->mtpOm1stAndIntervalDeactivateLen = StorageOld->mtpOm1stAndIntervalDeactivateLen;
+			StorageOld->mtpOm1stAndIntervalDeactivate = NULL;
+			StorageOld->mtpOm1stAndIntervalDeactivateLen = 0;
+		}
+		if (--StorageTmp->mtpOmMIB_rsvs == 0)
+			mtpOmMIB_destroy(&StorageTmp->mtpOmMIB_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -11209,17 +13710,15 @@ write_mtpOm1stAndIntervalDeactivate(int action, u_char *var_val, u_char var_val_
 int
 write_mtpOm5MinActivate(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static oid *old_value;
-	struct mtpOmMIB_data *StorageTmp = NULL;
-	static size_t old_length = 0;
-	static oid *objid = NULL;
+	struct mtpOmMIB_data *StorageTmp = NULL, *StorageOld = NULL;
+	oid *objid = NULL;
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("mtpOmMIB", "write_mtpOm5MinActivate entering action=%d...  \n", action));
 	if ((StorageTmp = mtpOmMIBStorage) == NULL)
-		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
+		return SNMP_ERR_NOSUCHNAME;
 	switch (action) {
 	case RESERVE1:
-		objid = NULL;
 		if (var_val_type != ASN_OBJECT_ID) {
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to mtpOm5MinActivate not ASN_OBJECT_ID\n");
 			return SNMP_ERR_WRONGTYPE;
@@ -11228,29 +13727,69 @@ write_mtpOm5MinActivate(int action, u_char *var_val, u_char var_val_type, size_t
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to mtpOm5MinActivate: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
-		break;
-	case RESERVE2:		/* memory reseveration, final preparation... */
+		/* one allocation for whole mib */
+		if ((StorageOld = StorageTmp->mtpOmMIB_old) == NULL)
+			if (StorageTmp->mtpOmMIB_rsvs == 0)
+				if ((StorageOld = StorageTmp->mtpOmMIB_old = mtpOmMIB_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->mtpOmMIB_rsvs++;
 		if ((objid = snmp_duplicate_objid((void *) var_val, var_val_len / sizeof(oid))) == NULL)
 			return SNMP_ERR_RESOURCEUNAVAILABLE;
-		break;
-	case ACTION:		/* The variable has been stored in objid for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the
-				   UNDO case */
-		old_value = StorageTmp->mtpOm5MinActivate;
-		old_length = StorageTmp->mtpOm5MinActivateLen;
+		SNMP_FREE(StorageTmp->mtpOm5MinActivate);
 		StorageTmp->mtpOm5MinActivate = objid;
 		StorageTmp->mtpOm5MinActivateLen = var_val_len / sizeof(oid);
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
+		break;
+	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->mtpOmMIB_old) != NULL) {
+			/* one consistency check for the whole mib */
+			if (StorageTmp->mtpOmMIB_tsts == 0)
+				if ((ret = check_mtpOmMIB(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->mtpOmMIB_tsts++;
+		}
+		break;
+	case ACTION:		/* The variable has been stored in StorageTmp->mtpOm5MinActivate for you to use, and you have just been asked to do something with it.  Note that anything done here
+				   must be reversable in the UNDO case */
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole mib */
+		if ((StorageOld = StorageTmp->mtpOmMIB_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->mtpOmMIB_sets == 0)
+				if ((ret = update_mtpOmMIB(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->mtpOmMIB_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
-		SNMP_FREE(old_value);
-		old_length = 0;
-		objid = NULL;
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->mtpOmMIB_old) != NULL) {
+			mtpOmMIB_destroy(&StorageTmp->mtpOmMIB_old);
+			StorageTmp->mtpOmMIB_rsvs = 0;
+			StorageTmp->mtpOmMIB_tsts = 0;
+			StorageTmp->mtpOmMIB_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->mtpOm5MinActivate = old_value;
-		StorageTmp->mtpOm5MinActivateLen = old_length;
+		if ((StorageOld = StorageTmp->mtpOmMIB_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->mtpOmMIB_tsts == 0)
+			revert_mtpOmMIB(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
-		SNMP_FREE(objid);
+		if ((StorageOld = StorageTmp->mtpOmMIB_old) == NULL)
+			break;
+		if (StorageOld->mtpOm5MinActivate != NULL) {
+			SNMP_FREE(StorageTmp->mtpOm5MinActivate);
+			StorageTmp->mtpOm5MinActivate = StorageOld->mtpOm5MinActivate;
+			StorageTmp->mtpOm5MinActivateLen = StorageOld->mtpOm5MinActivateLen;
+			StorageOld->mtpOm5MinActivate = NULL;
+			StorageOld->mtpOm5MinActivateLen = 0;
+		}
+		if (--StorageTmp->mtpOmMIB_rsvs == 0)
+			mtpOmMIB_destroy(&StorageTmp->mtpOmMIB_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -11270,17 +13809,15 @@ write_mtpOm5MinActivate(int action, u_char *var_val, u_char var_val_type, size_t
 int
 write_mtpOm5MinDeaActivate(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static oid *old_value;
-	struct mtpOmMIB_data *StorageTmp = NULL;
-	static size_t old_length = 0;
-	static oid *objid = NULL;
+	struct mtpOmMIB_data *StorageTmp = NULL, *StorageOld = NULL;
+	oid *objid = NULL;
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("mtpOmMIB", "write_mtpOm5MinDeaActivate entering action=%d...  \n", action));
 	if ((StorageTmp = mtpOmMIBStorage) == NULL)
-		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
+		return SNMP_ERR_NOSUCHNAME;
 	switch (action) {
 	case RESERVE1:
-		objid = NULL;
 		if (var_val_type != ASN_OBJECT_ID) {
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to mtpOm5MinDeaActivate not ASN_OBJECT_ID\n");
 			return SNMP_ERR_WRONGTYPE;
@@ -11289,29 +13826,69 @@ write_mtpOm5MinDeaActivate(int action, u_char *var_val, u_char var_val_type, siz
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to mtpOm5MinDeaActivate: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
-		break;
-	case RESERVE2:		/* memory reseveration, final preparation... */
+		/* one allocation for whole mib */
+		if ((StorageOld = StorageTmp->mtpOmMIB_old) == NULL)
+			if (StorageTmp->mtpOmMIB_rsvs == 0)
+				if ((StorageOld = StorageTmp->mtpOmMIB_old = mtpOmMIB_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->mtpOmMIB_rsvs++;
 		if ((objid = snmp_duplicate_objid((void *) var_val, var_val_len / sizeof(oid))) == NULL)
 			return SNMP_ERR_RESOURCEUNAVAILABLE;
-		break;
-	case ACTION:		/* The variable has been stored in objid for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the
-				   UNDO case */
-		old_value = StorageTmp->mtpOm5MinDeaActivate;
-		old_length = StorageTmp->mtpOm5MinDeaActivateLen;
+		SNMP_FREE(StorageTmp->mtpOm5MinDeaActivate);
 		StorageTmp->mtpOm5MinDeaActivate = objid;
 		StorageTmp->mtpOm5MinDeaActivateLen = var_val_len / sizeof(oid);
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
+		break;
+	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->mtpOmMIB_old) != NULL) {
+			/* one consistency check for the whole mib */
+			if (StorageTmp->mtpOmMIB_tsts == 0)
+				if ((ret = check_mtpOmMIB(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->mtpOmMIB_tsts++;
+		}
+		break;
+	case ACTION:		/* The variable has been stored in StorageTmp->mtpOm5MinDeaActivate for you to use, and you have just been asked to do something with it.  Note that anything done here 
+				   must be reversable in the UNDO case */
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole mib */
+		if ((StorageOld = StorageTmp->mtpOmMIB_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->mtpOmMIB_sets == 0)
+				if ((ret = update_mtpOmMIB(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->mtpOmMIB_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
-		SNMP_FREE(old_value);
-		old_length = 0;
-		objid = NULL;
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->mtpOmMIB_old) != NULL) {
+			mtpOmMIB_destroy(&StorageTmp->mtpOmMIB_old);
+			StorageTmp->mtpOmMIB_rsvs = 0;
+			StorageTmp->mtpOmMIB_tsts = 0;
+			StorageTmp->mtpOmMIB_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->mtpOm5MinDeaActivate = old_value;
-		StorageTmp->mtpOm5MinDeaActivateLen = old_length;
+		if ((StorageOld = StorageTmp->mtpOmMIB_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->mtpOmMIB_tsts == 0)
+			revert_mtpOmMIB(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
-		SNMP_FREE(objid);
+		if ((StorageOld = StorageTmp->mtpOmMIB_old) == NULL)
+			break;
+		if (StorageOld->mtpOm5MinDeaActivate != NULL) {
+			SNMP_FREE(StorageTmp->mtpOm5MinDeaActivate);
+			StorageTmp->mtpOm5MinDeaActivate = StorageOld->mtpOm5MinDeaActivate;
+			StorageTmp->mtpOm5MinDeaActivateLen = StorageOld->mtpOm5MinDeaActivateLen;
+			StorageOld->mtpOm5MinDeaActivate = NULL;
+			StorageOld->mtpOm5MinDeaActivateLen = 0;
+		}
+		if (--StorageTmp->mtpOmMIB_rsvs == 0)
+			mtpOmMIB_destroy(&StorageTmp->mtpOmMIB_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -11331,17 +13908,15 @@ write_mtpOm5MinDeaActivate(int action, u_char *var_val, u_char var_val_type, siz
 int
 write_mtpOm15MinActivate(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static oid *old_value;
-	struct mtpOmMIB_data *StorageTmp = NULL;
-	static size_t old_length = 0;
-	static oid *objid = NULL;
+	struct mtpOmMIB_data *StorageTmp = NULL, *StorageOld = NULL;
+	oid *objid = NULL;
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("mtpOmMIB", "write_mtpOm15MinActivate entering action=%d...  \n", action));
 	if ((StorageTmp = mtpOmMIBStorage) == NULL)
-		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
+		return SNMP_ERR_NOSUCHNAME;
 	switch (action) {
 	case RESERVE1:
-		objid = NULL;
 		if (var_val_type != ASN_OBJECT_ID) {
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to mtpOm15MinActivate not ASN_OBJECT_ID\n");
 			return SNMP_ERR_WRONGTYPE;
@@ -11350,29 +13925,69 @@ write_mtpOm15MinActivate(int action, u_char *var_val, u_char var_val_type, size_
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to mtpOm15MinActivate: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
-		break;
-	case RESERVE2:		/* memory reseveration, final preparation... */
+		/* one allocation for whole mib */
+		if ((StorageOld = StorageTmp->mtpOmMIB_old) == NULL)
+			if (StorageTmp->mtpOmMIB_rsvs == 0)
+				if ((StorageOld = StorageTmp->mtpOmMIB_old = mtpOmMIB_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->mtpOmMIB_rsvs++;
 		if ((objid = snmp_duplicate_objid((void *) var_val, var_val_len / sizeof(oid))) == NULL)
 			return SNMP_ERR_RESOURCEUNAVAILABLE;
-		break;
-	case ACTION:		/* The variable has been stored in objid for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the
-				   UNDO case */
-		old_value = StorageTmp->mtpOm15MinActivate;
-		old_length = StorageTmp->mtpOm15MinActivateLen;
+		SNMP_FREE(StorageTmp->mtpOm15MinActivate);
 		StorageTmp->mtpOm15MinActivate = objid;
 		StorageTmp->mtpOm15MinActivateLen = var_val_len / sizeof(oid);
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
+		break;
+	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->mtpOmMIB_old) != NULL) {
+			/* one consistency check for the whole mib */
+			if (StorageTmp->mtpOmMIB_tsts == 0)
+				if ((ret = check_mtpOmMIB(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->mtpOmMIB_tsts++;
+		}
+		break;
+	case ACTION:		/* The variable has been stored in StorageTmp->mtpOm15MinActivate for you to use, and you have just been asked to do something with it.  Note that anything done here
+				   must be reversable in the UNDO case */
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole mib */
+		if ((StorageOld = StorageTmp->mtpOmMIB_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->mtpOmMIB_sets == 0)
+				if ((ret = update_mtpOmMIB(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->mtpOmMIB_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
-		SNMP_FREE(old_value);
-		old_length = 0;
-		objid = NULL;
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->mtpOmMIB_old) != NULL) {
+			mtpOmMIB_destroy(&StorageTmp->mtpOmMIB_old);
+			StorageTmp->mtpOmMIB_rsvs = 0;
+			StorageTmp->mtpOmMIB_tsts = 0;
+			StorageTmp->mtpOmMIB_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->mtpOm15MinActivate = old_value;
-		StorageTmp->mtpOm15MinActivateLen = old_length;
+		if ((StorageOld = StorageTmp->mtpOmMIB_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->mtpOmMIB_tsts == 0)
+			revert_mtpOmMIB(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
-		SNMP_FREE(objid);
+		if ((StorageOld = StorageTmp->mtpOmMIB_old) == NULL)
+			break;
+		if (StorageOld->mtpOm15MinActivate != NULL) {
+			SNMP_FREE(StorageTmp->mtpOm15MinActivate);
+			StorageTmp->mtpOm15MinActivate = StorageOld->mtpOm15MinActivate;
+			StorageTmp->mtpOm15MinActivateLen = StorageOld->mtpOm15MinActivateLen;
+			StorageOld->mtpOm15MinActivate = NULL;
+			StorageOld->mtpOm15MinActivateLen = 0;
+		}
+		if (--StorageTmp->mtpOmMIB_rsvs == 0)
+			mtpOmMIB_destroy(&StorageTmp->mtpOmMIB_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -11392,17 +14007,15 @@ write_mtpOm15MinActivate(int action, u_char *var_val, u_char var_val_type, size_
 int
 write_mtpOm15MinDeaActivate(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static oid *old_value;
-	struct mtpOmMIB_data *StorageTmp = NULL;
-	static size_t old_length = 0;
-	static oid *objid = NULL;
+	struct mtpOmMIB_data *StorageTmp = NULL, *StorageOld = NULL;
+	oid *objid = NULL;
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("mtpOmMIB", "write_mtpOm15MinDeaActivate entering action=%d...  \n", action));
 	if ((StorageTmp = mtpOmMIBStorage) == NULL)
-		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
+		return SNMP_ERR_NOSUCHNAME;
 	switch (action) {
 	case RESERVE1:
-		objid = NULL;
 		if (var_val_type != ASN_OBJECT_ID) {
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to mtpOm15MinDeaActivate not ASN_OBJECT_ID\n");
 			return SNMP_ERR_WRONGTYPE;
@@ -11411,29 +14024,69 @@ write_mtpOm15MinDeaActivate(int action, u_char *var_val, u_char var_val_type, si
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to mtpOm15MinDeaActivate: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
-		break;
-	case RESERVE2:		/* memory reseveration, final preparation... */
+		/* one allocation for whole mib */
+		if ((StorageOld = StorageTmp->mtpOmMIB_old) == NULL)
+			if (StorageTmp->mtpOmMIB_rsvs == 0)
+				if ((StorageOld = StorageTmp->mtpOmMIB_old = mtpOmMIB_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->mtpOmMIB_rsvs++;
 		if ((objid = snmp_duplicate_objid((void *) var_val, var_val_len / sizeof(oid))) == NULL)
 			return SNMP_ERR_RESOURCEUNAVAILABLE;
-		break;
-	case ACTION:		/* The variable has been stored in objid for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the
-				   UNDO case */
-		old_value = StorageTmp->mtpOm15MinDeaActivate;
-		old_length = StorageTmp->mtpOm15MinDeaActivateLen;
+		SNMP_FREE(StorageTmp->mtpOm15MinDeaActivate);
 		StorageTmp->mtpOm15MinDeaActivate = objid;
 		StorageTmp->mtpOm15MinDeaActivateLen = var_val_len / sizeof(oid);
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
+		break;
+	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->mtpOmMIB_old) != NULL) {
+			/* one consistency check for the whole mib */
+			if (StorageTmp->mtpOmMIB_tsts == 0)
+				if ((ret = check_mtpOmMIB(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->mtpOmMIB_tsts++;
+		}
+		break;
+	case ACTION:		/* The variable has been stored in StorageTmp->mtpOm15MinDeaActivate for you to use, and you have just been asked to do something with it.  Note that anything done
+				   here must be reversable in the UNDO case */
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole mib */
+		if ((StorageOld = StorageTmp->mtpOmMIB_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->mtpOmMIB_sets == 0)
+				if ((ret = update_mtpOmMIB(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->mtpOmMIB_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
-		SNMP_FREE(old_value);
-		old_length = 0;
-		objid = NULL;
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->mtpOmMIB_old) != NULL) {
+			mtpOmMIB_destroy(&StorageTmp->mtpOmMIB_old);
+			StorageTmp->mtpOmMIB_rsvs = 0;
+			StorageTmp->mtpOmMIB_tsts = 0;
+			StorageTmp->mtpOmMIB_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->mtpOm15MinDeaActivate = old_value;
-		StorageTmp->mtpOm15MinDeaActivateLen = old_length;
+		if ((StorageOld = StorageTmp->mtpOmMIB_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->mtpOmMIB_tsts == 0)
+			revert_mtpOmMIB(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
-		SNMP_FREE(objid);
+		if ((StorageOld = StorageTmp->mtpOmMIB_old) == NULL)
+			break;
+		if (StorageOld->mtpOm15MinDeaActivate != NULL) {
+			SNMP_FREE(StorageTmp->mtpOm15MinDeaActivate);
+			StorageTmp->mtpOm15MinDeaActivate = StorageOld->mtpOm15MinDeaActivate;
+			StorageTmp->mtpOm15MinDeaActivateLen = StorageOld->mtpOm15MinDeaActivateLen;
+			StorageOld->mtpOm15MinDeaActivate = NULL;
+			StorageOld->mtpOm15MinDeaActivateLen = 0;
+		}
+		if (--StorageTmp->mtpOmMIB_rsvs == 0)
+			mtpOmMIB_destroy(&StorageTmp->mtpOmMIB_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -11453,13 +14106,13 @@ write_mtpOm15MinDeaActivate(int action, u_char *var_val, u_char var_val_type, si
 int
 write_mtpOm5MinMaxIntervals(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static ulong old_value;
-	struct mtpOmMIB_data *StorageTmp = NULL;
+	struct mtpOmMIB_data *StorageTmp = NULL, *StorageOld = NULL;
 	ulong set_value = *((ulong *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("mtpOmMIB", "write_mtpOm5MinMaxIntervals entering action=%d...  \n", action));
 	if ((StorageTmp = mtpOmMIBStorage) == NULL)
-		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
+		return SNMP_ERR_NOSUCHNAME;
 	switch (action) {
 	case RESERVE1:
 		if (var_val_type != ASN_UNSIGNED) {
@@ -11476,20 +14129,59 @@ write_mtpOm5MinMaxIntervals(int action, u_char *var_val, u_char var_val_type, si
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to mtpOm5MinMaxIntervals: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
+		/* one allocation for whole mib */
+		if ((StorageOld = StorageTmp->mtpOmMIB_old) == NULL)
+			if (StorageTmp->mtpOmMIB_rsvs == 0)
+				if ((StorageOld = StorageTmp->mtpOmMIB_old = mtpOmMIB_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->mtpOmMIB_rsvs++;
+		StorageTmp->mtpOm5MinMaxIntervals = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->mtpOmMIB_old) != NULL) {
+			/* one consistency check for the whole mib */
+			if (StorageTmp->mtpOmMIB_tsts == 0)
+				if ((ret = check_mtpOmMIB(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->mtpOmMIB_tsts++;
+		}
 		break;
-	case ACTION:		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in
-				   the UNDO case */
-		old_value = StorageTmp->mtpOm5MinMaxIntervals;
-		StorageTmp->mtpOm5MinMaxIntervals = set_value;
+	case ACTION:		/* The variable has been stored in StorageTmp->mtpOm5MinMaxIntervals for you to use, and you have just been asked to do something with it.  Note that anything done
+				   here must be reversable in the UNDO case */
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole mib */
+		if ((StorageOld = StorageTmp->mtpOmMIB_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->mtpOmMIB_sets == 0)
+				if ((ret = update_mtpOmMIB(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->mtpOmMIB_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->mtpOmMIB_old) != NULL) {
+			mtpOmMIB_destroy(&StorageTmp->mtpOmMIB_old);
+			StorageTmp->mtpOmMIB_rsvs = 0;
+			StorageTmp->mtpOmMIB_tsts = 0;
+			StorageTmp->mtpOmMIB_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->mtpOm5MinMaxIntervals = old_value;
+		if ((StorageOld = StorageTmp->mtpOmMIB_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->mtpOmMIB_tsts == 0)
+			revert_mtpOmMIB(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->mtpOmMIB_old) == NULL)
+			break;
+		StorageTmp->mtpOm5MinMaxIntervals = StorageOld->mtpOm5MinMaxIntervals;
+		if (--StorageTmp->mtpOmMIB_rsvs == 0)
+			mtpOmMIB_destroy(&StorageTmp->mtpOmMIB_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -11509,13 +14201,13 @@ write_mtpOm5MinMaxIntervals(int action, u_char *var_val, u_char var_val_type, si
 int
 write_mtpOm15MinMaxIntervals(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static ulong old_value;
-	struct mtpOmMIB_data *StorageTmp = NULL;
+	struct mtpOmMIB_data *StorageTmp = NULL, *StorageOld = NULL;
 	ulong set_value = *((ulong *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("mtpOmMIB", "write_mtpOm15MinMaxIntervals entering action=%d...  \n", action));
 	if ((StorageTmp = mtpOmMIBStorage) == NULL)
-		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
+		return SNMP_ERR_NOSUCHNAME;
 	switch (action) {
 	case RESERVE1:
 		if (var_val_type != ASN_UNSIGNED) {
@@ -11532,527 +14224,198 @@ write_mtpOm15MinMaxIntervals(int action, u_char *var_val, u_char var_val_type, s
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to mtpOm15MinMaxIntervals: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
+		/* one allocation for whole mib */
+		if ((StorageOld = StorageTmp->mtpOmMIB_old) == NULL)
+			if (StorageTmp->mtpOmMIB_rsvs == 0)
+				if ((StorageOld = StorageTmp->mtpOmMIB_old = mtpOmMIB_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->mtpOmMIB_rsvs++;
+		StorageTmp->mtpOm15MinMaxIntervals = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->mtpOmMIB_old) != NULL) {
+			/* one consistency check for the whole mib */
+			if (StorageTmp->mtpOmMIB_tsts == 0)
+				if ((ret = check_mtpOmMIB(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->mtpOmMIB_tsts++;
+		}
 		break;
-	case ACTION:		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in
-				   the UNDO case */
-		old_value = StorageTmp->mtpOm15MinMaxIntervals;
-		StorageTmp->mtpOm15MinMaxIntervals = set_value;
+	case ACTION:		/* The variable has been stored in StorageTmp->mtpOm15MinMaxIntervals for you to use, and you have just been asked to do something with it.  Note that anything done
+				   here must be reversable in the UNDO case */
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole mib */
+		if ((StorageOld = StorageTmp->mtpOmMIB_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->mtpOmMIB_sets == 0)
+				if ((ret = update_mtpOmMIB(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->mtpOmMIB_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->mtpOmMIB_old) != NULL) {
+			mtpOmMIB_destroy(&StorageTmp->mtpOmMIB_old);
+			StorageTmp->mtpOmMIB_rsvs = 0;
+			StorageTmp->mtpOmMIB_tsts = 0;
+			StorageTmp->mtpOmMIB_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->mtpOm15MinMaxIntervals = old_value;
+		if ((StorageOld = StorageTmp->mtpOmMIB_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->mtpOmMIB_tsts == 0)
+			revert_mtpOmMIB(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->mtpOmMIB_old) == NULL)
+			break;
+		StorageTmp->mtpOm15MinMaxIntervals = StorageOld->mtpOm15MinMaxIntervals;
+		if (--StorageTmp->mtpOmMIB_rsvs == 0)
+			mtpOmMIB_destroy(&StorageTmp->mtpOmMIB_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
 }
 
 /**
- * @fn int mtpOmSpTable_consistent(struct mtpOmSpTable_data *thedata)
- * @param thedata the row data to check for consistency.
- * @brief check the internal consistency of a table row.
+ * @fn int can_act_mtpOmSpSiTable_row(struct mtpOmSpSiTable_data *StorageTmp)
+ * @param StorageTmp the data (as updated)
+ * @brief check whether an inactive table row can be activated
  *
- * This function checks the internal consistency of a table row for the mtpOmSpTable table.  If the
- * table row is internally consistent, then this function returns SNMP_ERR_NOERROR, otherwise the
- * function returns an SNMP error code and it will not be possible to activate the row until the
- * row's internal consistency is corrected.  This function might use a 'test' operation against the
- * driver to ensure that the commit phase will succeed.
+ * This function is used by the ACTION phase of a RowStatus object to test whether an inactive table
+ * row can be activated.  Returns SNMP_ERR_NOERROR when activation is permitted; an SNMP error
+ * value, otherwise.  This function might use a 'test' operation against the driver to ensure that
+ * the commit phase will succeed.
  */
 int
-mtpOmSpTable_consistent(struct mtpOmSpTable_data *thedata)
+can_act_mtpOmSpSiTable_row(struct mtpOmSpSiTable_data *StorageTmp)
 {
-	/* XXX: check row consistency return SNMP_ERR_NOERROR if consistent, or an SNMP error code if not. */
-	return (SNMP_ERR_NOERROR);
+	/* XXX: provide code to check whether the new or inactive table row can be activated */
+	return SNMP_ERR_NOERROR;
 }
 
 /**
- * @fn int mtpOmSpInt5minTable_consistent(struct mtpOmSpInt5minTable_data *thedata)
- * @param thedata the row data to check for consistency.
- * @brief check the internal consistency of a table row.
+ * @fn int can_deact_mtpOmSpSiTable_row(struct mtpOmSpSiTable_data *StorageTmp)
+ * @param StorageTmp the data (as updated)
+ * @brief check whether an active table row can be deactivated
  *
- * This function checks the internal consistency of a table row for the mtpOmSpInt5minTable table.  If the
- * table row is internally consistent, then this function returns SNMP_ERR_NOERROR, otherwise the
- * function returns an SNMP error code and it will not be possible to activate the row until the
- * row's internal consistency is corrected.  This function might use a 'test' operation against the
- * driver to ensure that the commit phase will succeed.
+ * This function is used by the ACTION phase of a RowStatus object to test whether an active table
+ * row can be deactivated.  Returns SNMP_ERR_NOERROR when deactivation is permitted; an SNMP error
+ * value, otherwise.  This function might use a 'test' operation against the driver to ensure that
+ * the commit phase will succeed.
  */
 int
-mtpOmSpInt5minTable_consistent(struct mtpOmSpInt5minTable_data *thedata)
+can_deact_mtpOmSpSiTable_row(struct mtpOmSpSiTable_data *StorageTmp)
 {
-	/* XXX: check row consistency return SNMP_ERR_NOERROR if consistent, or an SNMP error code if not. */
-	return (SNMP_ERR_NOERROR);
+	/* XXX: provide code to check whether the active table row can be deactivated */
+	return SNMP_ERR_NOERROR;
 }
 
 /**
- * @fn int mtpOmSpInt15minTable_consistent(struct mtpOmSpInt15minTable_data *thedata)
- * @param thedata the row data to check for consistency.
- * @brief check the internal consistency of a table row.
+ * @fn int can_act_mtpOmSpStudyTable_row(struct mtpOmSpStudyTable_data *StorageTmp)
+ * @param StorageTmp the data (as updated)
+ * @brief check whether an inactive table row can be activated
  *
- * This function checks the internal consistency of a table row for the mtpOmSpInt15minTable table.  If the
- * table row is internally consistent, then this function returns SNMP_ERR_NOERROR, otherwise the
- * function returns an SNMP error code and it will not be possible to activate the row until the
- * row's internal consistency is corrected.  This function might use a 'test' operation against the
- * driver to ensure that the commit phase will succeed.
+ * This function is used by the ACTION phase of a RowStatus object to test whether an inactive table
+ * row can be activated.  Returns SNMP_ERR_NOERROR when activation is permitted; an SNMP error
+ * value, otherwise.  This function might use a 'test' operation against the driver to ensure that
+ * the commit phase will succeed.
  */
 int
-mtpOmSpInt15minTable_consistent(struct mtpOmSpInt15minTable_data *thedata)
+can_act_mtpOmSpStudyTable_row(struct mtpOmSpStudyTable_data *StorageTmp)
 {
-	/* XXX: check row consistency return SNMP_ERR_NOERROR if consistent, or an SNMP error code if not. */
-	return (SNMP_ERR_NOERROR);
+	/* XXX: provide code to check whether the new or inactive table row can be activated */
+	return SNMP_ERR_NOERROR;
 }
 
 /**
- * @fn int mtpOmSpSiTable_consistent(struct mtpOmSpSiTable_data *thedata)
- * @param thedata the row data to check for consistency.
- * @brief check the internal consistency of a table row.
+ * @fn int can_deact_mtpOmSpStudyTable_row(struct mtpOmSpStudyTable_data *StorageTmp)
+ * @param StorageTmp the data (as updated)
+ * @brief check whether an active table row can be deactivated
  *
- * This function checks the internal consistency of a table row for the mtpOmSpSiTable table.  If the
- * table row is internally consistent, then this function returns SNMP_ERR_NOERROR, otherwise the
- * function returns an SNMP error code and it will not be possible to activate the row until the
- * row's internal consistency is corrected.  This function might use a 'test' operation against the
- * driver to ensure that the commit phase will succeed.
+ * This function is used by the ACTION phase of a RowStatus object to test whether an active table
+ * row can be deactivated.  Returns SNMP_ERR_NOERROR when deactivation is permitted; an SNMP error
+ * value, otherwise.  This function might use a 'test' operation against the driver to ensure that
+ * the commit phase will succeed.
  */
 int
-mtpOmSpSiTable_consistent(struct mtpOmSpSiTable_data *thedata)
+can_deact_mtpOmSpStudyTable_row(struct mtpOmSpStudyTable_data *StorageTmp)
 {
-	/* XXX: check row consistency return SNMP_ERR_NOERROR if consistent, or an SNMP error code if not. */
-	return (SNMP_ERR_NOERROR);
+	/* XXX: provide code to check whether the active table row can be deactivated */
+	return SNMP_ERR_NOERROR;
 }
 
 /**
- * @fn int mtpOmSpSiInt5minTable_consistent(struct mtpOmSpSiInt5minTable_data *thedata)
- * @param thedata the row data to check for consistency.
- * @brief check the internal consistency of a table row.
+ * @fn int can_act_mtpOmSpStudyMapTable_row(struct mtpOmSpStudyMapTable_data *StorageTmp)
+ * @param StorageTmp the data (as updated)
+ * @brief check whether an inactive table row can be activated
  *
- * This function checks the internal consistency of a table row for the mtpOmSpSiInt5minTable table.  If the
- * table row is internally consistent, then this function returns SNMP_ERR_NOERROR, otherwise the
- * function returns an SNMP error code and it will not be possible to activate the row until the
- * row's internal consistency is corrected.  This function might use a 'test' operation against the
- * driver to ensure that the commit phase will succeed.
+ * This function is used by the ACTION phase of a RowStatus object to test whether an inactive table
+ * row can be activated.  Returns SNMP_ERR_NOERROR when activation is permitted; an SNMP error
+ * value, otherwise.  This function might use a 'test' operation against the driver to ensure that
+ * the commit phase will succeed.
  */
 int
-mtpOmSpSiInt5minTable_consistent(struct mtpOmSpSiInt5minTable_data *thedata)
+can_act_mtpOmSpStudyMapTable_row(struct mtpOmSpStudyMapTable_data *StorageTmp)
 {
-	/* XXX: check row consistency return SNMP_ERR_NOERROR if consistent, or an SNMP error code if not. */
-	return (SNMP_ERR_NOERROR);
+	/* XXX: provide code to check whether the new or inactive table row can be activated */
+	return SNMP_ERR_NOERROR;
 }
 
 /**
- * @fn int mtpOmSpSiInt15minTable_consistent(struct mtpOmSpSiInt15minTable_data *thedata)
- * @param thedata the row data to check for consistency.
- * @brief check the internal consistency of a table row.
+ * @fn int can_deact_mtpOmSpStudyMapTable_row(struct mtpOmSpStudyMapTable_data *StorageTmp)
+ * @param StorageTmp the data (as updated)
+ * @brief check whether an active table row can be deactivated
  *
- * This function checks the internal consistency of a table row for the mtpOmSpSiInt15minTable table.  If the
- * table row is internally consistent, then this function returns SNMP_ERR_NOERROR, otherwise the
- * function returns an SNMP error code and it will not be possible to activate the row until the
- * row's internal consistency is corrected.  This function might use a 'test' operation against the
- * driver to ensure that the commit phase will succeed.
+ * This function is used by the ACTION phase of a RowStatus object to test whether an active table
+ * row can be deactivated.  Returns SNMP_ERR_NOERROR when deactivation is permitted; an SNMP error
+ * value, otherwise.  This function might use a 'test' operation against the driver to ensure that
+ * the commit phase will succeed.
  */
 int
-mtpOmSpSiInt15minTable_consistent(struct mtpOmSpSiInt15minTable_data *thedata)
+can_deact_mtpOmSpStudyMapTable_row(struct mtpOmSpStudyMapTable_data *StorageTmp)
 {
-	/* XXX: check row consistency return SNMP_ERR_NOERROR if consistent, or an SNMP error code if not. */
-	return (SNMP_ERR_NOERROR);
+	/* XXX: provide code to check whether the active table row can be deactivated */
+	return SNMP_ERR_NOERROR;
 }
 
 /**
- * @fn int mtpOmSpStudyTable_consistent(struct mtpOmSpStudyTable_data *thedata)
- * @param thedata the row data to check for consistency.
- * @brief check the internal consistency of a table row.
+ * @fn int can_act_mtpOmRsSiTable_row(struct mtpOmRsSiTable_data *StorageTmp)
+ * @param StorageTmp the data (as updated)
+ * @brief check whether an inactive table row can be activated
  *
- * This function checks the internal consistency of a table row for the mtpOmSpStudyTable table.  If the
- * table row is internally consistent, then this function returns SNMP_ERR_NOERROR, otherwise the
- * function returns an SNMP error code and it will not be possible to activate the row until the
- * row's internal consistency is corrected.  This function might use a 'test' operation against the
- * driver to ensure that the commit phase will succeed.
+ * This function is used by the ACTION phase of a RowStatus object to test whether an inactive table
+ * row can be activated.  Returns SNMP_ERR_NOERROR when activation is permitted; an SNMP error
+ * value, otherwise.  This function might use a 'test' operation against the driver to ensure that
+ * the commit phase will succeed.
  */
 int
-mtpOmSpStudyTable_consistent(struct mtpOmSpStudyTable_data *thedata)
+can_act_mtpOmRsSiTable_row(struct mtpOmRsSiTable_data *StorageTmp)
 {
-	/* XXX: check row consistency return SNMP_ERR_NOERROR if consistent, or an SNMP error code if not. */
-	return (SNMP_ERR_NOERROR);
+	/* XXX: provide code to check whether the new or inactive table row can be activated */
+	return SNMP_ERR_NOERROR;
 }
 
 /**
- * @fn int mtpOmSpStudyInt5minTable_consistent(struct mtpOmSpStudyInt5minTable_data *thedata)
- * @param thedata the row data to check for consistency.
- * @brief check the internal consistency of a table row.
+ * @fn int can_deact_mtpOmRsSiTable_row(struct mtpOmRsSiTable_data *StorageTmp)
+ * @param StorageTmp the data (as updated)
+ * @brief check whether an active table row can be deactivated
  *
- * This function checks the internal consistency of a table row for the mtpOmSpStudyInt5minTable table.  If the
- * table row is internally consistent, then this function returns SNMP_ERR_NOERROR, otherwise the
- * function returns an SNMP error code and it will not be possible to activate the row until the
- * row's internal consistency is corrected.  This function might use a 'test' operation against the
- * driver to ensure that the commit phase will succeed.
+ * This function is used by the ACTION phase of a RowStatus object to test whether an active table
+ * row can be deactivated.  Returns SNMP_ERR_NOERROR when deactivation is permitted; an SNMP error
+ * value, otherwise.  This function might use a 'test' operation against the driver to ensure that
+ * the commit phase will succeed.
  */
 int
-mtpOmSpStudyInt5minTable_consistent(struct mtpOmSpStudyInt5minTable_data *thedata)
+can_deact_mtpOmRsSiTable_row(struct mtpOmRsSiTable_data *StorageTmp)
 {
-	/* XXX: check row consistency return SNMP_ERR_NOERROR if consistent, or an SNMP error code if not. */
-	return (SNMP_ERR_NOERROR);
-}
-
-/**
- * @fn int mtpOmSpStudyInt15minTable_consistent(struct mtpOmSpStudyInt15minTable_data *thedata)
- * @param thedata the row data to check for consistency.
- * @brief check the internal consistency of a table row.
- *
- * This function checks the internal consistency of a table row for the mtpOmSpStudyInt15minTable table.  If the
- * table row is internally consistent, then this function returns SNMP_ERR_NOERROR, otherwise the
- * function returns an SNMP error code and it will not be possible to activate the row until the
- * row's internal consistency is corrected.  This function might use a 'test' operation against the
- * driver to ensure that the commit phase will succeed.
- */
-int
-mtpOmSpStudyInt15minTable_consistent(struct mtpOmSpStudyInt15minTable_data *thedata)
-{
-	/* XXX: check row consistency return SNMP_ERR_NOERROR if consistent, or an SNMP error code if not. */
-	return (SNMP_ERR_NOERROR);
-}
-
-/**
- * @fn int mtpOmSpStudyMapTable_consistent(struct mtpOmSpStudyMapTable_data *thedata)
- * @param thedata the row data to check for consistency.
- * @brief check the internal consistency of a table row.
- *
- * This function checks the internal consistency of a table row for the mtpOmSpStudyMapTable table.  If the
- * table row is internally consistent, then this function returns SNMP_ERR_NOERROR, otherwise the
- * function returns an SNMP error code and it will not be possible to activate the row until the
- * row's internal consistency is corrected.  This function might use a 'test' operation against the
- * driver to ensure that the commit phase will succeed.
- */
-int
-mtpOmSpStudyMapTable_consistent(struct mtpOmSpStudyMapTable_data *thedata)
-{
-	/* XXX: check row consistency return SNMP_ERR_NOERROR if consistent, or an SNMP error code if not. */
-	return (SNMP_ERR_NOERROR);
-}
-
-/**
- * @fn int mtpOmRsTable_consistent(struct mtpOmRsTable_data *thedata)
- * @param thedata the row data to check for consistency.
- * @brief check the internal consistency of a table row.
- *
- * This function checks the internal consistency of a table row for the mtpOmRsTable table.  If the
- * table row is internally consistent, then this function returns SNMP_ERR_NOERROR, otherwise the
- * function returns an SNMP error code and it will not be possible to activate the row until the
- * row's internal consistency is corrected.  This function might use a 'test' operation against the
- * driver to ensure that the commit phase will succeed.
- */
-int
-mtpOmRsTable_consistent(struct mtpOmRsTable_data *thedata)
-{
-	/* XXX: check row consistency return SNMP_ERR_NOERROR if consistent, or an SNMP error code if not. */
-	return (SNMP_ERR_NOERROR);
-}
-
-/**
- * @fn int mtpOmRsInt5minTable_consistent(struct mtpOmRsInt5minTable_data *thedata)
- * @param thedata the row data to check for consistency.
- * @brief check the internal consistency of a table row.
- *
- * This function checks the internal consistency of a table row for the mtpOmRsInt5minTable table.  If the
- * table row is internally consistent, then this function returns SNMP_ERR_NOERROR, otherwise the
- * function returns an SNMP error code and it will not be possible to activate the row until the
- * row's internal consistency is corrected.  This function might use a 'test' operation against the
- * driver to ensure that the commit phase will succeed.
- */
-int
-mtpOmRsInt5minTable_consistent(struct mtpOmRsInt5minTable_data *thedata)
-{
-	/* XXX: check row consistency return SNMP_ERR_NOERROR if consistent, or an SNMP error code if not. */
-	return (SNMP_ERR_NOERROR);
-}
-
-/**
- * @fn int mtpOmRsInt15minTable_consistent(struct mtpOmRsInt15minTable_data *thedata)
- * @param thedata the row data to check for consistency.
- * @brief check the internal consistency of a table row.
- *
- * This function checks the internal consistency of a table row for the mtpOmRsInt15minTable table.  If the
- * table row is internally consistent, then this function returns SNMP_ERR_NOERROR, otherwise the
- * function returns an SNMP error code and it will not be possible to activate the row until the
- * row's internal consistency is corrected.  This function might use a 'test' operation against the
- * driver to ensure that the commit phase will succeed.
- */
-int
-mtpOmRsInt15minTable_consistent(struct mtpOmRsInt15minTable_data *thedata)
-{
-	/* XXX: check row consistency return SNMP_ERR_NOERROR if consistent, or an SNMP error code if not. */
-	return (SNMP_ERR_NOERROR);
-}
-
-/**
- * @fn int mtpOmRsSiTable_consistent(struct mtpOmRsSiTable_data *thedata)
- * @param thedata the row data to check for consistency.
- * @brief check the internal consistency of a table row.
- *
- * This function checks the internal consistency of a table row for the mtpOmRsSiTable table.  If the
- * table row is internally consistent, then this function returns SNMP_ERR_NOERROR, otherwise the
- * function returns an SNMP error code and it will not be possible to activate the row until the
- * row's internal consistency is corrected.  This function might use a 'test' operation against the
- * driver to ensure that the commit phase will succeed.
- */
-int
-mtpOmRsSiTable_consistent(struct mtpOmRsSiTable_data *thedata)
-{
-	/* XXX: check row consistency return SNMP_ERR_NOERROR if consistent, or an SNMP error code if not. */
-	return (SNMP_ERR_NOERROR);
-}
-
-/**
- * @fn int mtpOmRsSiInt5minTable_consistent(struct mtpOmRsSiInt5minTable_data *thedata)
- * @param thedata the row data to check for consistency.
- * @brief check the internal consistency of a table row.
- *
- * This function checks the internal consistency of a table row for the mtpOmRsSiInt5minTable table.  If the
- * table row is internally consistent, then this function returns SNMP_ERR_NOERROR, otherwise the
- * function returns an SNMP error code and it will not be possible to activate the row until the
- * row's internal consistency is corrected.  This function might use a 'test' operation against the
- * driver to ensure that the commit phase will succeed.
- */
-int
-mtpOmRsSiInt5minTable_consistent(struct mtpOmRsSiInt5minTable_data *thedata)
-{
-	/* XXX: check row consistency return SNMP_ERR_NOERROR if consistent, or an SNMP error code if not. */
-	return (SNMP_ERR_NOERROR);
-}
-
-/**
- * @fn int mtpOmRsSiInt15minTable_consistent(struct mtpOmRsSiInt15minTable_data *thedata)
- * @param thedata the row data to check for consistency.
- * @brief check the internal consistency of a table row.
- *
- * This function checks the internal consistency of a table row for the mtpOmRsSiInt15minTable table.  If the
- * table row is internally consistent, then this function returns SNMP_ERR_NOERROR, otherwise the
- * function returns an SNMP error code and it will not be possible to activate the row until the
- * row's internal consistency is corrected.  This function might use a 'test' operation against the
- * driver to ensure that the commit phase will succeed.
- */
-int
-mtpOmRsSiInt15minTable_consistent(struct mtpOmRsSiInt15minTable_data *thedata)
-{
-	/* XXX: check row consistency return SNMP_ERR_NOERROR if consistent, or an SNMP error code if not. */
-	return (SNMP_ERR_NOERROR);
-}
-
-/**
- * @fn int mtpOmLsTable_consistent(struct mtpOmLsTable_data *thedata)
- * @param thedata the row data to check for consistency.
- * @brief check the internal consistency of a table row.
- *
- * This function checks the internal consistency of a table row for the mtpOmLsTable table.  If the
- * table row is internally consistent, then this function returns SNMP_ERR_NOERROR, otherwise the
- * function returns an SNMP error code and it will not be possible to activate the row until the
- * row's internal consistency is corrected.  This function might use a 'test' operation against the
- * driver to ensure that the commit phase will succeed.
- */
-int
-mtpOmLsTable_consistent(struct mtpOmLsTable_data *thedata)
-{
-	/* XXX: check row consistency return SNMP_ERR_NOERROR if consistent, or an SNMP error code if not. */
-	return (SNMP_ERR_NOERROR);
-}
-
-/**
- * @fn int mtpOmLsInt5minTable_consistent(struct mtpOmLsInt5minTable_data *thedata)
- * @param thedata the row data to check for consistency.
- * @brief check the internal consistency of a table row.
- *
- * This function checks the internal consistency of a table row for the mtpOmLsInt5minTable table.  If the
- * table row is internally consistent, then this function returns SNMP_ERR_NOERROR, otherwise the
- * function returns an SNMP error code and it will not be possible to activate the row until the
- * row's internal consistency is corrected.  This function might use a 'test' operation against the
- * driver to ensure that the commit phase will succeed.
- */
-int
-mtpOmLsInt5minTable_consistent(struct mtpOmLsInt5minTable_data *thedata)
-{
-	/* XXX: check row consistency return SNMP_ERR_NOERROR if consistent, or an SNMP error code if not. */
-	return (SNMP_ERR_NOERROR);
-}
-
-/**
- * @fn int mtpOmLsInt15minTable_consistent(struct mtpOmLsInt15minTable_data *thedata)
- * @param thedata the row data to check for consistency.
- * @brief check the internal consistency of a table row.
- *
- * This function checks the internal consistency of a table row for the mtpOmLsInt15minTable table.  If the
- * table row is internally consistent, then this function returns SNMP_ERR_NOERROR, otherwise the
- * function returns an SNMP error code and it will not be possible to activate the row until the
- * row's internal consistency is corrected.  This function might use a 'test' operation against the
- * driver to ensure that the commit phase will succeed.
- */
-int
-mtpOmLsInt15minTable_consistent(struct mtpOmLsInt15minTable_data *thedata)
-{
-	/* XXX: check row consistency return SNMP_ERR_NOERROR if consistent, or an SNMP error code if not. */
-	return (SNMP_ERR_NOERROR);
-}
-
-/**
- * @fn int mtpOmSlStatsTable_consistent(struct mtpOmSlStatsTable_data *thedata)
- * @param thedata the row data to check for consistency.
- * @brief check the internal consistency of a table row.
- *
- * This function checks the internal consistency of a table row for the mtpOmSlStatsTable table.  If the
- * table row is internally consistent, then this function returns SNMP_ERR_NOERROR, otherwise the
- * function returns an SNMP error code and it will not be possible to activate the row until the
- * row's internal consistency is corrected.  This function might use a 'test' operation against the
- * driver to ensure that the commit phase will succeed.
- */
-int
-mtpOmSlStatsTable_consistent(struct mtpOmSlStatsTable_data *thedata)
-{
-	/* XXX: check row consistency return SNMP_ERR_NOERROR if consistent, or an SNMP error code if not. */
-	return (SNMP_ERR_NOERROR);
-}
-
-/**
- * @fn int mtpOmSlL3Table_consistent(struct mtpOmSlL3Table_data *thedata)
- * @param thedata the row data to check for consistency.
- * @brief check the internal consistency of a table row.
- *
- * This function checks the internal consistency of a table row for the mtpOmSlL3Table table.  If the
- * table row is internally consistent, then this function returns SNMP_ERR_NOERROR, otherwise the
- * function returns an SNMP error code and it will not be possible to activate the row until the
- * row's internal consistency is corrected.  This function might use a 'test' operation against the
- * driver to ensure that the commit phase will succeed.
- */
-int
-mtpOmSlL3Table_consistent(struct mtpOmSlL3Table_data *thedata)
-{
-	/* XXX: check row consistency return SNMP_ERR_NOERROR if consistent, or an SNMP error code if not. */
-	return (SNMP_ERR_NOERROR);
-}
-
-/**
- * @fn int mtpOmSlL3Int5minTable_consistent(struct mtpOmSlL3Int5minTable_data *thedata)
- * @param thedata the row data to check for consistency.
- * @brief check the internal consistency of a table row.
- *
- * This function checks the internal consistency of a table row for the mtpOmSlL3Int5minTable table.  If the
- * table row is internally consistent, then this function returns SNMP_ERR_NOERROR, otherwise the
- * function returns an SNMP error code and it will not be possible to activate the row until the
- * row's internal consistency is corrected.  This function might use a 'test' operation against the
- * driver to ensure that the commit phase will succeed.
- */
-int
-mtpOmSlL3Int5minTable_consistent(struct mtpOmSlL3Int5minTable_data *thedata)
-{
-	/* XXX: check row consistency return SNMP_ERR_NOERROR if consistent, or an SNMP error code if not. */
-	return (SNMP_ERR_NOERROR);
-}
-
-/**
- * @fn int mtpOmSlL3Int15minTable_consistent(struct mtpOmSlL3Int15minTable_data *thedata)
- * @param thedata the row data to check for consistency.
- * @brief check the internal consistency of a table row.
- *
- * This function checks the internal consistency of a table row for the mtpOmSlL3Int15minTable table.  If the
- * table row is internally consistent, then this function returns SNMP_ERR_NOERROR, otherwise the
- * function returns an SNMP error code and it will not be possible to activate the row until the
- * row's internal consistency is corrected.  This function might use a 'test' operation against the
- * driver to ensure that the commit phase will succeed.
- */
-int
-mtpOmSlL3Int15minTable_consistent(struct mtpOmSlL3Int15minTable_data *thedata)
-{
-	/* XXX: check row consistency return SNMP_ERR_NOERROR if consistent, or an SNMP error code if not. */
-	return (SNMP_ERR_NOERROR);
-}
-
-/**
- * @fn int mtpOmSlL2Table_consistent(struct mtpOmSlL2Table_data *thedata)
- * @param thedata the row data to check for consistency.
- * @brief check the internal consistency of a table row.
- *
- * This function checks the internal consistency of a table row for the mtpOmSlL2Table table.  If the
- * table row is internally consistent, then this function returns SNMP_ERR_NOERROR, otherwise the
- * function returns an SNMP error code and it will not be possible to activate the row until the
- * row's internal consistency is corrected.  This function might use a 'test' operation against the
- * driver to ensure that the commit phase will succeed.
- */
-int
-mtpOmSlL2Table_consistent(struct mtpOmSlL2Table_data *thedata)
-{
-	/* XXX: check row consistency return SNMP_ERR_NOERROR if consistent, or an SNMP error code if not. */
-	return (SNMP_ERR_NOERROR);
-}
-
-/**
- * @fn int mtpOmSlL2Int5minTable_consistent(struct mtpOmSlL2Int5minTable_data *thedata)
- * @param thedata the row data to check for consistency.
- * @brief check the internal consistency of a table row.
- *
- * This function checks the internal consistency of a table row for the mtpOmSlL2Int5minTable table.  If the
- * table row is internally consistent, then this function returns SNMP_ERR_NOERROR, otherwise the
- * function returns an SNMP error code and it will not be possible to activate the row until the
- * row's internal consistency is corrected.  This function might use a 'test' operation against the
- * driver to ensure that the commit phase will succeed.
- */
-int
-mtpOmSlL2Int5minTable_consistent(struct mtpOmSlL2Int5minTable_data *thedata)
-{
-	/* XXX: check row consistency return SNMP_ERR_NOERROR if consistent, or an SNMP error code if not. */
-	return (SNMP_ERR_NOERROR);
-}
-
-/**
- * @fn int mtpOmSlL2Int15minTable_consistent(struct mtpOmSlL2Int15minTable_data *thedata)
- * @param thedata the row data to check for consistency.
- * @brief check the internal consistency of a table row.
- *
- * This function checks the internal consistency of a table row for the mtpOmSlL2Int15minTable table.  If the
- * table row is internally consistent, then this function returns SNMP_ERR_NOERROR, otherwise the
- * function returns an SNMP error code and it will not be possible to activate the row until the
- * row's internal consistency is corrected.  This function might use a 'test' operation against the
- * driver to ensure that the commit phase will succeed.
- */
-int
-mtpOmSlL2Int15minTable_consistent(struct mtpOmSlL2Int15minTable_data *thedata)
-{
-	/* XXX: check row consistency return SNMP_ERR_NOERROR if consistent, or an SNMP error code if not. */
-	return (SNMP_ERR_NOERROR);
-}
-
-/**
- * @fn int mtpOmSdtStatsTable_consistent(struct mtpOmSdtStatsTable_data *thedata)
- * @param thedata the row data to check for consistency.
- * @brief check the internal consistency of a table row.
- *
- * This function checks the internal consistency of a table row for the mtpOmSdtStatsTable table.  If the
- * table row is internally consistent, then this function returns SNMP_ERR_NOERROR, otherwise the
- * function returns an SNMP error code and it will not be possible to activate the row until the
- * row's internal consistency is corrected.  This function might use a 'test' operation against the
- * driver to ensure that the commit phase will succeed.
- */
-int
-mtpOmSdtStatsTable_consistent(struct mtpOmSdtStatsTable_data *thedata)
-{
-	/* XXX: check row consistency return SNMP_ERR_NOERROR if consistent, or an SNMP error code if not. */
-	return (SNMP_ERR_NOERROR);
-}
-
-/**
- * @fn int mtpOmSdlStatsTable_consistent(struct mtpOmSdlStatsTable_data *thedata)
- * @param thedata the row data to check for consistency.
- * @brief check the internal consistency of a table row.
- *
- * This function checks the internal consistency of a table row for the mtpOmSdlStatsTable table.  If the
- * table row is internally consistent, then this function returns SNMP_ERR_NOERROR, otherwise the
- * function returns an SNMP error code and it will not be possible to activate the row until the
- * row's internal consistency is corrected.  This function might use a 'test' operation against the
- * driver to ensure that the commit phase will succeed.
- */
-int
-mtpOmSdlStatsTable_consistent(struct mtpOmSdlStatsTable_data *thedata)
-{
-	/* XXX: check row consistency return SNMP_ERR_NOERROR if consistent, or an SNMP error code if not. */
-	return (SNMP_ERR_NOERROR);
+	/* XXX: provide code to check whether the active table row can be deactivated */
+	return SNMP_ERR_NOERROR;
 }
 
 /**
@@ -12069,10 +14432,9 @@ mtpOmSdlStatsTable_consistent(struct mtpOmSdlStatsTable_data *thedata)
 int
 write_mtpOmSpSiStatus(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	struct mtpOmSpSiTable_data *StorageTmp = NULL;
+	struct mtpOmSpSiTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	static struct mtpOmSpSiTable_data *StorageNew, *StorageDel;
 	size_t newlen = name_len - 16;
-	static int old_value;
 	int set_value, ret;
 	static struct variable_list *vars, *vp;
 
@@ -12099,40 +14461,6 @@ write_mtpOmSpSiStatus(int action, u_char *var_val, u_char var_val_type, size_t v
 			if (StorageTmp != NULL)
 				/* cannot create existing row */
 				return SNMP_ERR_INCONSISTENTVALUE;
-			break;
-		case RS_ACTIVE:
-		case RS_NOTINSERVICE:
-			if (StorageTmp == NULL)
-				/* cannot change state of non-existent row */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			if (StorageTmp->mtpOmSpSiStatus == RS_NOTREADY)
-				/* cannot change state of row that is not ready */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			/* XXX: interaction with row storage type needed */
-			if (set_value == RS_NOTINSERVICE && StorageTmp->mtpOmSpSiTable_refs > 0)
-				/* row is busy and cannot be moved to the RS_NOTINSERVICE state */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			break;
-		case RS_DESTROY:
-			/* destroying existent or non-existent row is ok */
-			if (StorageTmp == NULL)
-				break;
-			/* XXX: interaction with row storage type needed */
-			if (StorageTmp->mtpOmSpSiTable_refs > 0)
-				/* row is busy and cannot be deleted */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			break;
-		case RS_NOTREADY:
-			/* management station cannot set this, only agent can */
-		default:
-			return SNMP_ERR_INCONSISTENTVALUE;
-		}
-		break;
-	case RESERVE2:
-		/* memory reseveration, final preparation... */
-		switch (set_value) {
-		case RS_CREATEANDGO:
-		case RS_CREATEANDWAIT:
 			/* creation */
 			vars = NULL;
 			/* mtpSpId */
@@ -12191,6 +14519,7 @@ write_mtpOmSpSiStatus(int action, u_char *var_val, u_char var_val_type, size_t v
 				snmp_free_varbind(vars);
 				return SNMP_ERR_RESOURCEUNAVAILABLE;
 			}
+			StorageNew->mtpOmSpSiTable_rsvs = 1;
 			vp = vars;
 			StorageNew->mtpSpId = (ulong) *vp->val.integer;
 			vp = vp->next_variable;
@@ -12198,7 +14527,37 @@ write_mtpOmSpSiStatus(int action, u_char *var_val, u_char var_val_type, size_t v
 			vp = vp->next_variable;
 			header_complex_add_data(&mtpOmSpSiTableStorage, vars, StorageNew);	/* frees vars */
 			break;
+		case RS_ACTIVE:
+		case RS_NOTINSERVICE:
+			if (StorageTmp == NULL)
+				/* cannot change state of non-existent row */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			if (StorageTmp->mtpOmSpSiStatus == RS_NOTREADY)
+				/* cannot change state of row that is not ready */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			/* XXX: interaction with row storage type needed */
+			if (set_value == RS_NOTINSERVICE && StorageTmp->mtpOmSpSiTable_refs > 0)
+				/* row is busy and cannot be moved to the RS_NOTINSERVICE state */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			/* activate or deactivate */
+			if (StorageTmp == NULL)
+				return SNMP_ERR_NOSUCHNAME;
+			/* one allocation for the whole row */
+			if ((StorageOld = StorageTmp->mtpOmSpSiTable_old) == NULL)
+				if (StorageTmp->mtpOmSpSiTable_rsvs == 0)
+					if ((StorageOld = StorageTmp->mtpOmSpSiTable_old = mtpOmSpSiTable_duplicate(StorageTmp)) == NULL)
+						return SNMP_ERR_RESOURCEUNAVAILABLE;
+			if (StorageOld != NULL)
+				StorageTmp->mtpOmSpSiTable_rsvs++;
+			break;
 		case RS_DESTROY:
+			if (StorageTmp == NULL)
+				/* cannot destroy non-existent row */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			/* XXX: interaction with row storage type needed */
+			if (StorageTmp->mtpOmSpSiTable_refs > 0)
+				/* row is busy and cannot be deleted */
+				return SNMP_ERR_INCONSISTENTVALUE;
 			/* destroy */
 			if (StorageTmp != NULL) {
 				/* exists, extract it for now */
@@ -12208,78 +14567,127 @@ write_mtpOmSpSiStatus(int action, u_char *var_val, u_char var_val_type, size_t v
 				StorageDel = NULL;
 			}
 			break;
+		case RS_NOTREADY:
+			/* management station cannot set this, only agent can */
+		default:
+			return SNMP_ERR_INCONSISTENTVALUE;
 		}
 		break;
-	case ACTION:
-		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the UNDO case */
+	case RESERVE2:
+		/* memory reseveration, final preparation... */
 		switch (set_value) {
 		case RS_CREATEANDGO:
 			/* check that activation is possible */
-			if ((ret = mtpOmSpSiTable_consistent(StorageNew)) != SNMP_ERR_NOERROR)
+			if ((ret = can_act_mtpOmSpSiTable_row(StorageNew)) != SNMP_ERR_NOERROR)
 				return (ret);
 			break;
 		case RS_CREATEANDWAIT:
-			/* row does not have to be consistent */
 			break;
 		case RS_ACTIVE:
-			old_value = StorageTmp->mtpOmSpSiStatus;
-			StorageTmp->mtpOmSpSiStatus = set_value;
-			if (old_value != RS_ACTIVE) {
-				/* check that activation is possible */
-				if ((ret = mtpOmSpSiTable_consistent(StorageTmp)) != SNMP_ERR_NOERROR) {
-					StorageTmp->mtpOmSpSiStatus = old_value;
+			/* check that activation is possible */
+			if (StorageTmp->mtpOmSpSiStatus != RS_ACTIVE)
+				if ((ret = can_act_mtpOmSpSiTable_row(StorageTmp)) != SNMP_ERR_NOERROR)
 					return (ret);
-				}
+			break;
+		case RS_NOTINSERVICE:
+			/* check that deactivation is possible */
+			if (StorageTmp->mtpOmSpSiStatus != RS_NOTINSERVICE)
+				if ((ret = can_deact_mtpOmSpSiTable_row(StorageTmp)) != SNMP_ERR_NOERROR)
+					return (ret);
+			break;
+		case RS_DESTROY:
+			/* check that deactivation is possible */
+			if (StorageTmp->mtpOmSpSiStatus != RS_NOTINSERVICE)
+				if ((ret = can_deact_mtpOmSpSiTable_row(StorageTmp)) != SNMP_ERR_NOERROR)
+					return (ret);
+			break;
+		default:
+			return SNMP_ERR_WRONGVALUE;
+		}
+		break;
+	case ACTION:
+		/* The variable has been stored in StorageTmp->mtpOmSpSiStatus for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable
+		   in the UNDO case */
+		switch (set_value) {
+		case RS_CREATEANDGO:
+			/* activate with underlying device */
+			if (activate_mtpOmSpSiTable_row(StorageNew) != SNMP_ERR_NOERROR)
+				return SNMP_ERR_COMMITFAILED;
+			break;
+		case RS_CREATEANDWAIT:
+			break;
+		case RS_ACTIVE:
+			/* state change already performed */
+			if (StorageTmp->mtpOmSpSiStatus != RS_ACTIVE) {
+				/* activate with underlying device */
+				if (activate_mtpOmSpSiTable_row(StorageTmp) != SNMP_ERR_NOERROR)
+					return SNMP_ERR_COMMITFAILED;
 			}
 			break;
 		case RS_NOTINSERVICE:
-			/* set the flag? */
-			old_value = StorageTmp->mtpOmSpSiStatus;
-			StorageTmp->mtpOmSpSiStatus = set_value;
+			/* state change already performed */
+			if (StorageTmp->mtpOmSpSiStatus != RS_NOTINSERVICE) {
+				/* deactivate with underlying device */
+				if (deactivate_mtpOmSpSiTable_row(StorageTmp) != SNMP_ERR_NOERROR)
+					return SNMP_ERR_COMMITFAILED;
+			}
 			break;
+		case RS_DESTROY:
+			/* commit destrution to underlying device */
+			if (StorageDel == NULL)
+				break;
+			/* deactivate with underlying device */
+			if (deactivate_mtpOmSpSiTable_row(StorageDel) != SNMP_ERR_NOERROR)
+				return SNMP_ERR_COMMITFAILED;
+			break;
+		default:
+			return SNMP_ERR_WRONGVALUE;
 		}
 		break;
 	case COMMIT:
 		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		switch (set_value) {
 		case RS_CREATEANDGO:
-			/* row creation, set final state */
-			/* XXX: commit creation to underlying device */
-			/* XXX: activate with underlying device */
 			StorageNew->mtpOmSpSiStatus = RS_ACTIVE;
 			break;
 		case RS_CREATEANDWAIT:
-			/* row creation, set final state */
 			StorageNew->mtpOmSpSiStatus = RS_NOTINSERVICE;
 			break;
 		case RS_ACTIVE:
 		case RS_NOTINSERVICE:
-			/* state change already performed */
-			if (old_value != set_value) {
-				switch (set_value) {
-				case RS_ACTIVE:
-					/* XXX: activate with underlying device */
-					break;
-				case RS_NOTINSERVICE:
-					/* XXX: deactivate with underlying device */
-					break;
-				}
+			StorageNew->mtpOmSpSiStatus = set_value;
+			if ((StorageOld = StorageTmp->mtpOmSpSiTable_old) != NULL) {
+				mtpOmSpSiTable_destroy(&StorageTmp->mtpOmSpSiTable_old);
+				StorageTmp->mtpOmSpSiTable_rsvs = 0;
+				StorageTmp->mtpOmSpSiTable_tsts = 0;
+				StorageTmp->mtpOmSpSiTable_sets = 0;
 			}
 			break;
 		case RS_DESTROY:
-			/* row deletion, free it its dead */
 			mtpOmSpSiTable_destroy(&StorageDel);
-			/* mtpOmSpSiTable_destroy() can handle NULL pointers. */
 			break;
 		}
 		break;
 	case UNDO:
 		/* Back out any changes made in the ACTION case */
 		switch (set_value) {
+		case RS_CREATEANDGO:
+			/* deactivate with underlying device */
+			deactivate_mtpOmSpSiTable_row(StorageNew);
+			break;
+		case RS_CREATEANDWAIT:
+			break;
 		case RS_ACTIVE:
+			if (StorageTmp->mtpOmSpSiStatus == RS_NOTINSERVICE)
+				/* deactivate with underlying device */
+				deactivate_mtpOmSpSiTable_row(StorageTmp);
+			break;
 		case RS_NOTINSERVICE:
-			/* restore state */
-			StorageTmp->mtpOmSpSiStatus = old_value;
+			if (StorageTmp->mtpOmSpSiStatus == RS_ACTIVE)
+				/* activate with underlying device */
+				activate_mtpOmSpSiTable_row(StorageTmp);
+			break;
+		case RS_DESTROY:
 			break;
 		}
 		/* fall through */
@@ -12293,6 +14701,13 @@ write_mtpOmSpSiStatus(int action, u_char *var_val, u_char var_val_type, size_t v
 				mtpOmSpSiTable_del(StorageNew);
 				mtpOmSpSiTable_destroy(&StorageNew);
 			}
+			break;
+		case RS_ACTIVE:
+		case RS_NOTINSERVICE:
+			if ((StorageOld = StorageTmp->mtpOmSpSiTable_old) == NULL)
+				break;
+			if (--StorageTmp->mtpOmSpSiTable_rsvs == 0)
+				mtpOmSpSiTable_destroy(&StorageTmp->mtpOmSpSiTable_old);
 			break;
 		case RS_DESTROY:
 			/* row deletion, so add it again */
@@ -12319,10 +14734,9 @@ write_mtpOmSpSiStatus(int action, u_char *var_val, u_char var_val_type, size_t v
 int
 write_mtpOmSpStudyStatus(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	struct mtpOmSpStudyTable_data *StorageTmp = NULL;
+	struct mtpOmSpStudyTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	static struct mtpOmSpStudyTable_data *StorageNew, *StorageDel;
 	size_t newlen = name_len - 16;
-	static int old_value;
 	int set_value, ret;
 	static struct variable_list *vars, *vp;
 
@@ -12349,40 +14763,6 @@ write_mtpOmSpStudyStatus(int action, u_char *var_val, u_char var_val_type, size_
 			if (StorageTmp != NULL)
 				/* cannot create existing row */
 				return SNMP_ERR_INCONSISTENTVALUE;
-			break;
-		case RS_ACTIVE:
-		case RS_NOTINSERVICE:
-			if (StorageTmp == NULL)
-				/* cannot change state of non-existent row */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			if (StorageTmp->mtpOmSpStudyStatus == RS_NOTREADY)
-				/* cannot change state of row that is not ready */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			/* XXX: interaction with row storage type needed */
-			if (set_value == RS_NOTINSERVICE && StorageTmp->mtpOmSpStudyTable_refs > 0)
-				/* row is busy and cannot be moved to the RS_NOTINSERVICE state */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			break;
-		case RS_DESTROY:
-			/* destroying existent or non-existent row is ok */
-			if (StorageTmp == NULL)
-				break;
-			/* XXX: interaction with row storage type needed */
-			if (StorageTmp->mtpOmSpStudyTable_refs > 0)
-				/* row is busy and cannot be deleted */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			break;
-		case RS_NOTREADY:
-			/* management station cannot set this, only agent can */
-		default:
-			return SNMP_ERR_INCONSISTENTVALUE;
-		}
-		break;
-	case RESERVE2:
-		/* memory reseveration, final preparation... */
-		switch (set_value) {
-		case RS_CREATEANDGO:
-		case RS_CREATEANDWAIT:
 			/* creation */
 			vars = NULL;
 			/* mtpOmSpStudyId */
@@ -12406,12 +14786,43 @@ write_mtpOmSpStudyStatus(int action, u_char *var_val, u_char var_val_type, size_
 				snmp_free_varbind(vars);
 				return SNMP_ERR_RESOURCEUNAVAILABLE;
 			}
+			StorageNew->mtpOmSpStudyTable_rsvs = 1;
 			vp = vars;
 			StorageNew->mtpOmSpStudyId = (ulong) *vp->val.integer;
 			vp = vp->next_variable;
 			header_complex_add_data(&mtpOmSpStudyTableStorage, vars, StorageNew);	/* frees vars */
 			break;
+		case RS_ACTIVE:
+		case RS_NOTINSERVICE:
+			if (StorageTmp == NULL)
+				/* cannot change state of non-existent row */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			if (StorageTmp->mtpOmSpStudyStatus == RS_NOTREADY)
+				/* cannot change state of row that is not ready */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			/* XXX: interaction with row storage type needed */
+			if (set_value == RS_NOTINSERVICE && StorageTmp->mtpOmSpStudyTable_refs > 0)
+				/* row is busy and cannot be moved to the RS_NOTINSERVICE state */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			/* activate or deactivate */
+			if (StorageTmp == NULL)
+				return SNMP_ERR_NOSUCHNAME;
+			/* one allocation for the whole row */
+			if ((StorageOld = StorageTmp->mtpOmSpStudyTable_old) == NULL)
+				if (StorageTmp->mtpOmSpStudyTable_rsvs == 0)
+					if ((StorageOld = StorageTmp->mtpOmSpStudyTable_old = mtpOmSpStudyTable_duplicate(StorageTmp)) == NULL)
+						return SNMP_ERR_RESOURCEUNAVAILABLE;
+			if (StorageOld != NULL)
+				StorageTmp->mtpOmSpStudyTable_rsvs++;
+			break;
 		case RS_DESTROY:
+			if (StorageTmp == NULL)
+				/* cannot destroy non-existent row */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			/* XXX: interaction with row storage type needed */
+			if (StorageTmp->mtpOmSpStudyTable_refs > 0)
+				/* row is busy and cannot be deleted */
+				return SNMP_ERR_INCONSISTENTVALUE;
 			/* destroy */
 			if (StorageTmp != NULL) {
 				/* exists, extract it for now */
@@ -12421,78 +14832,127 @@ write_mtpOmSpStudyStatus(int action, u_char *var_val, u_char var_val_type, size_
 				StorageDel = NULL;
 			}
 			break;
+		case RS_NOTREADY:
+			/* management station cannot set this, only agent can */
+		default:
+			return SNMP_ERR_INCONSISTENTVALUE;
 		}
 		break;
-	case ACTION:
-		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the UNDO case */
+	case RESERVE2:
+		/* memory reseveration, final preparation... */
 		switch (set_value) {
 		case RS_CREATEANDGO:
 			/* check that activation is possible */
-			if ((ret = mtpOmSpStudyTable_consistent(StorageNew)) != SNMP_ERR_NOERROR)
+			if ((ret = can_act_mtpOmSpStudyTable_row(StorageNew)) != SNMP_ERR_NOERROR)
 				return (ret);
 			break;
 		case RS_CREATEANDWAIT:
-			/* row does not have to be consistent */
 			break;
 		case RS_ACTIVE:
-			old_value = StorageTmp->mtpOmSpStudyStatus;
-			StorageTmp->mtpOmSpStudyStatus = set_value;
-			if (old_value != RS_ACTIVE) {
-				/* check that activation is possible */
-				if ((ret = mtpOmSpStudyTable_consistent(StorageTmp)) != SNMP_ERR_NOERROR) {
-					StorageTmp->mtpOmSpStudyStatus = old_value;
+			/* check that activation is possible */
+			if (StorageTmp->mtpOmSpStudyStatus != RS_ACTIVE)
+				if ((ret = can_act_mtpOmSpStudyTable_row(StorageTmp)) != SNMP_ERR_NOERROR)
 					return (ret);
-				}
+			break;
+		case RS_NOTINSERVICE:
+			/* check that deactivation is possible */
+			if (StorageTmp->mtpOmSpStudyStatus != RS_NOTINSERVICE)
+				if ((ret = can_deact_mtpOmSpStudyTable_row(StorageTmp)) != SNMP_ERR_NOERROR)
+					return (ret);
+			break;
+		case RS_DESTROY:
+			/* check that deactivation is possible */
+			if (StorageTmp->mtpOmSpStudyStatus != RS_NOTINSERVICE)
+				if ((ret = can_deact_mtpOmSpStudyTable_row(StorageTmp)) != SNMP_ERR_NOERROR)
+					return (ret);
+			break;
+		default:
+			return SNMP_ERR_WRONGVALUE;
+		}
+		break;
+	case ACTION:
+		/* The variable has been stored in StorageTmp->mtpOmSpStudyStatus for you to use, and you have just been asked to do something with it.  Note that anything done here must be
+		   reversable in the UNDO case */
+		switch (set_value) {
+		case RS_CREATEANDGO:
+			/* activate with underlying device */
+			if (activate_mtpOmSpStudyTable_row(StorageNew) != SNMP_ERR_NOERROR)
+				return SNMP_ERR_COMMITFAILED;
+			break;
+		case RS_CREATEANDWAIT:
+			break;
+		case RS_ACTIVE:
+			/* state change already performed */
+			if (StorageTmp->mtpOmSpStudyStatus != RS_ACTIVE) {
+				/* activate with underlying device */
+				if (activate_mtpOmSpStudyTable_row(StorageTmp) != SNMP_ERR_NOERROR)
+					return SNMP_ERR_COMMITFAILED;
 			}
 			break;
 		case RS_NOTINSERVICE:
-			/* set the flag? */
-			old_value = StorageTmp->mtpOmSpStudyStatus;
-			StorageTmp->mtpOmSpStudyStatus = set_value;
+			/* state change already performed */
+			if (StorageTmp->mtpOmSpStudyStatus != RS_NOTINSERVICE) {
+				/* deactivate with underlying device */
+				if (deactivate_mtpOmSpStudyTable_row(StorageTmp) != SNMP_ERR_NOERROR)
+					return SNMP_ERR_COMMITFAILED;
+			}
 			break;
+		case RS_DESTROY:
+			/* commit destrution to underlying device */
+			if (StorageDel == NULL)
+				break;
+			/* deactivate with underlying device */
+			if (deactivate_mtpOmSpStudyTable_row(StorageDel) != SNMP_ERR_NOERROR)
+				return SNMP_ERR_COMMITFAILED;
+			break;
+		default:
+			return SNMP_ERR_WRONGVALUE;
 		}
 		break;
 	case COMMIT:
 		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		switch (set_value) {
 		case RS_CREATEANDGO:
-			/* row creation, set final state */
-			/* XXX: commit creation to underlying device */
-			/* XXX: activate with underlying device */
 			StorageNew->mtpOmSpStudyStatus = RS_ACTIVE;
 			break;
 		case RS_CREATEANDWAIT:
-			/* row creation, set final state */
 			StorageNew->mtpOmSpStudyStatus = RS_NOTINSERVICE;
 			break;
 		case RS_ACTIVE:
 		case RS_NOTINSERVICE:
-			/* state change already performed */
-			if (old_value != set_value) {
-				switch (set_value) {
-				case RS_ACTIVE:
-					/* XXX: activate with underlying device */
-					break;
-				case RS_NOTINSERVICE:
-					/* XXX: deactivate with underlying device */
-					break;
-				}
+			StorageNew->mtpOmSpStudyStatus = set_value;
+			if ((StorageOld = StorageTmp->mtpOmSpStudyTable_old) != NULL) {
+				mtpOmSpStudyTable_destroy(&StorageTmp->mtpOmSpStudyTable_old);
+				StorageTmp->mtpOmSpStudyTable_rsvs = 0;
+				StorageTmp->mtpOmSpStudyTable_tsts = 0;
+				StorageTmp->mtpOmSpStudyTable_sets = 0;
 			}
 			break;
 		case RS_DESTROY:
-			/* row deletion, free it its dead */
 			mtpOmSpStudyTable_destroy(&StorageDel);
-			/* mtpOmSpStudyTable_destroy() can handle NULL pointers. */
 			break;
 		}
 		break;
 	case UNDO:
 		/* Back out any changes made in the ACTION case */
 		switch (set_value) {
+		case RS_CREATEANDGO:
+			/* deactivate with underlying device */
+			deactivate_mtpOmSpStudyTable_row(StorageNew);
+			break;
+		case RS_CREATEANDWAIT:
+			break;
 		case RS_ACTIVE:
+			if (StorageTmp->mtpOmSpStudyStatus == RS_NOTINSERVICE)
+				/* deactivate with underlying device */
+				deactivate_mtpOmSpStudyTable_row(StorageTmp);
+			break;
 		case RS_NOTINSERVICE:
-			/* restore state */
-			StorageTmp->mtpOmSpStudyStatus = old_value;
+			if (StorageTmp->mtpOmSpStudyStatus == RS_ACTIVE)
+				/* activate with underlying device */
+				activate_mtpOmSpStudyTable_row(StorageTmp);
+			break;
+		case RS_DESTROY:
 			break;
 		}
 		/* fall through */
@@ -12506,6 +14966,13 @@ write_mtpOmSpStudyStatus(int action, u_char *var_val, u_char var_val_type, size_
 				mtpOmSpStudyTable_del(StorageNew);
 				mtpOmSpStudyTable_destroy(&StorageNew);
 			}
+			break;
+		case RS_ACTIVE:
+		case RS_NOTINSERVICE:
+			if ((StorageOld = StorageTmp->mtpOmSpStudyTable_old) == NULL)
+				break;
+			if (--StorageTmp->mtpOmSpStudyTable_rsvs == 0)
+				mtpOmSpStudyTable_destroy(&StorageTmp->mtpOmSpStudyTable_old);
 			break;
 		case RS_DESTROY:
 			/* row deletion, so add it again */
@@ -12532,10 +14999,9 @@ write_mtpOmSpStudyStatus(int action, u_char *var_val, u_char var_val_type, size_
 int
 write_mtpOmSpStudyMapStatus(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	struct mtpOmSpStudyMapTable_data *StorageTmp = NULL;
+	struct mtpOmSpStudyMapTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	static struct mtpOmSpStudyMapTable_data *StorageNew, *StorageDel;
 	size_t newlen = name_len - 16;
-	static int old_value;
 	int set_value, ret;
 	static struct variable_list *vars, *vp;
 
@@ -12562,40 +15028,6 @@ write_mtpOmSpStudyMapStatus(int action, u_char *var_val, u_char var_val_type, si
 			if (StorageTmp != NULL)
 				/* cannot create existing row */
 				return SNMP_ERR_INCONSISTENTVALUE;
-			break;
-		case RS_ACTIVE:
-		case RS_NOTINSERVICE:
-			if (StorageTmp == NULL)
-				/* cannot change state of non-existent row */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			if (StorageTmp->mtpOmSpStudyMapStatus == RS_NOTREADY)
-				/* cannot change state of row that is not ready */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			/* XXX: interaction with row storage type needed */
-			if (set_value == RS_NOTINSERVICE && StorageTmp->mtpOmSpStudyMapTable_refs > 0)
-				/* row is busy and cannot be moved to the RS_NOTINSERVICE state */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			break;
-		case RS_DESTROY:
-			/* destroying existent or non-existent row is ok */
-			if (StorageTmp == NULL)
-				break;
-			/* XXX: interaction with row storage type needed */
-			if (StorageTmp->mtpOmSpStudyMapTable_refs > 0)
-				/* row is busy and cannot be deleted */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			break;
-		case RS_NOTREADY:
-			/* management station cannot set this, only agent can */
-		default:
-			return SNMP_ERR_INCONSISTENTVALUE;
-		}
-		break;
-	case RESERVE2:
-		/* memory reseveration, final preparation... */
-		switch (set_value) {
-		case RS_CREATEANDGO:
-		case RS_CREATEANDWAIT:
 			/* creation */
 			vars = NULL;
 			/* mtpSpId */
@@ -12690,6 +15122,7 @@ write_mtpOmSpStudyMapStatus(int action, u_char *var_val, u_char var_val_type, si
 				snmp_free_varbind(vars);
 				return SNMP_ERR_RESOURCEUNAVAILABLE;
 			}
+			StorageNew->mtpOmSpStudyMapTable_rsvs = 1;
 			vp = vars;
 			StorageNew->mtpSpId = (ulong) *vp->val.integer;
 			vp = vp->next_variable;
@@ -12703,7 +15136,37 @@ write_mtpOmSpStudyMapStatus(int action, u_char *var_val, u_char var_val_type, si
 			vp = vp->next_variable;
 			header_complex_add_data(&mtpOmSpStudyMapTableStorage, vars, StorageNew);	/* frees vars */
 			break;
+		case RS_ACTIVE:
+		case RS_NOTINSERVICE:
+			if (StorageTmp == NULL)
+				/* cannot change state of non-existent row */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			if (StorageTmp->mtpOmSpStudyMapStatus == RS_NOTREADY)
+				/* cannot change state of row that is not ready */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			/* XXX: interaction with row storage type needed */
+			if (set_value == RS_NOTINSERVICE && StorageTmp->mtpOmSpStudyMapTable_refs > 0)
+				/* row is busy and cannot be moved to the RS_NOTINSERVICE state */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			/* activate or deactivate */
+			if (StorageTmp == NULL)
+				return SNMP_ERR_NOSUCHNAME;
+			/* one allocation for the whole row */
+			if ((StorageOld = StorageTmp->mtpOmSpStudyMapTable_old) == NULL)
+				if (StorageTmp->mtpOmSpStudyMapTable_rsvs == 0)
+					if ((StorageOld = StorageTmp->mtpOmSpStudyMapTable_old = mtpOmSpStudyMapTable_duplicate(StorageTmp)) == NULL)
+						return SNMP_ERR_RESOURCEUNAVAILABLE;
+			if (StorageOld != NULL)
+				StorageTmp->mtpOmSpStudyMapTable_rsvs++;
+			break;
 		case RS_DESTROY:
+			if (StorageTmp == NULL)
+				/* cannot destroy non-existent row */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			/* XXX: interaction with row storage type needed */
+			if (StorageTmp->mtpOmSpStudyMapTable_refs > 0)
+				/* row is busy and cannot be deleted */
+				return SNMP_ERR_INCONSISTENTVALUE;
 			/* destroy */
 			if (StorageTmp != NULL) {
 				/* exists, extract it for now */
@@ -12713,78 +15176,127 @@ write_mtpOmSpStudyMapStatus(int action, u_char *var_val, u_char var_val_type, si
 				StorageDel = NULL;
 			}
 			break;
+		case RS_NOTREADY:
+			/* management station cannot set this, only agent can */
+		default:
+			return SNMP_ERR_INCONSISTENTVALUE;
 		}
 		break;
-	case ACTION:
-		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the UNDO case */
+	case RESERVE2:
+		/* memory reseveration, final preparation... */
 		switch (set_value) {
 		case RS_CREATEANDGO:
 			/* check that activation is possible */
-			if ((ret = mtpOmSpStudyMapTable_consistent(StorageNew)) != SNMP_ERR_NOERROR)
+			if ((ret = can_act_mtpOmSpStudyMapTable_row(StorageNew)) != SNMP_ERR_NOERROR)
 				return (ret);
 			break;
 		case RS_CREATEANDWAIT:
-			/* row does not have to be consistent */
 			break;
 		case RS_ACTIVE:
-			old_value = StorageTmp->mtpOmSpStudyMapStatus;
-			StorageTmp->mtpOmSpStudyMapStatus = set_value;
-			if (old_value != RS_ACTIVE) {
-				/* check that activation is possible */
-				if ((ret = mtpOmSpStudyMapTable_consistent(StorageTmp)) != SNMP_ERR_NOERROR) {
-					StorageTmp->mtpOmSpStudyMapStatus = old_value;
+			/* check that activation is possible */
+			if (StorageTmp->mtpOmSpStudyMapStatus != RS_ACTIVE)
+				if ((ret = can_act_mtpOmSpStudyMapTable_row(StorageTmp)) != SNMP_ERR_NOERROR)
 					return (ret);
-				}
+			break;
+		case RS_NOTINSERVICE:
+			/* check that deactivation is possible */
+			if (StorageTmp->mtpOmSpStudyMapStatus != RS_NOTINSERVICE)
+				if ((ret = can_deact_mtpOmSpStudyMapTable_row(StorageTmp)) != SNMP_ERR_NOERROR)
+					return (ret);
+			break;
+		case RS_DESTROY:
+			/* check that deactivation is possible */
+			if (StorageTmp->mtpOmSpStudyMapStatus != RS_NOTINSERVICE)
+				if ((ret = can_deact_mtpOmSpStudyMapTable_row(StorageTmp)) != SNMP_ERR_NOERROR)
+					return (ret);
+			break;
+		default:
+			return SNMP_ERR_WRONGVALUE;
+		}
+		break;
+	case ACTION:
+		/* The variable has been stored in StorageTmp->mtpOmSpStudyMapStatus for you to use, and you have just been asked to do something with it.  Note that anything done here must be
+		   reversable in the UNDO case */
+		switch (set_value) {
+		case RS_CREATEANDGO:
+			/* activate with underlying device */
+			if (activate_mtpOmSpStudyMapTable_row(StorageNew) != SNMP_ERR_NOERROR)
+				return SNMP_ERR_COMMITFAILED;
+			break;
+		case RS_CREATEANDWAIT:
+			break;
+		case RS_ACTIVE:
+			/* state change already performed */
+			if (StorageTmp->mtpOmSpStudyMapStatus != RS_ACTIVE) {
+				/* activate with underlying device */
+				if (activate_mtpOmSpStudyMapTable_row(StorageTmp) != SNMP_ERR_NOERROR)
+					return SNMP_ERR_COMMITFAILED;
 			}
 			break;
 		case RS_NOTINSERVICE:
-			/* set the flag? */
-			old_value = StorageTmp->mtpOmSpStudyMapStatus;
-			StorageTmp->mtpOmSpStudyMapStatus = set_value;
+			/* state change already performed */
+			if (StorageTmp->mtpOmSpStudyMapStatus != RS_NOTINSERVICE) {
+				/* deactivate with underlying device */
+				if (deactivate_mtpOmSpStudyMapTable_row(StorageTmp) != SNMP_ERR_NOERROR)
+					return SNMP_ERR_COMMITFAILED;
+			}
 			break;
+		case RS_DESTROY:
+			/* commit destrution to underlying device */
+			if (StorageDel == NULL)
+				break;
+			/* deactivate with underlying device */
+			if (deactivate_mtpOmSpStudyMapTable_row(StorageDel) != SNMP_ERR_NOERROR)
+				return SNMP_ERR_COMMITFAILED;
+			break;
+		default:
+			return SNMP_ERR_WRONGVALUE;
 		}
 		break;
 	case COMMIT:
 		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		switch (set_value) {
 		case RS_CREATEANDGO:
-			/* row creation, set final state */
-			/* XXX: commit creation to underlying device */
-			/* XXX: activate with underlying device */
 			StorageNew->mtpOmSpStudyMapStatus = RS_ACTIVE;
 			break;
 		case RS_CREATEANDWAIT:
-			/* row creation, set final state */
 			StorageNew->mtpOmSpStudyMapStatus = RS_NOTINSERVICE;
 			break;
 		case RS_ACTIVE:
 		case RS_NOTINSERVICE:
-			/* state change already performed */
-			if (old_value != set_value) {
-				switch (set_value) {
-				case RS_ACTIVE:
-					/* XXX: activate with underlying device */
-					break;
-				case RS_NOTINSERVICE:
-					/* XXX: deactivate with underlying device */
-					break;
-				}
+			StorageNew->mtpOmSpStudyMapStatus = set_value;
+			if ((StorageOld = StorageTmp->mtpOmSpStudyMapTable_old) != NULL) {
+				mtpOmSpStudyMapTable_destroy(&StorageTmp->mtpOmSpStudyMapTable_old);
+				StorageTmp->mtpOmSpStudyMapTable_rsvs = 0;
+				StorageTmp->mtpOmSpStudyMapTable_tsts = 0;
+				StorageTmp->mtpOmSpStudyMapTable_sets = 0;
 			}
 			break;
 		case RS_DESTROY:
-			/* row deletion, free it its dead */
 			mtpOmSpStudyMapTable_destroy(&StorageDel);
-			/* mtpOmSpStudyMapTable_destroy() can handle NULL pointers. */
 			break;
 		}
 		break;
 	case UNDO:
 		/* Back out any changes made in the ACTION case */
 		switch (set_value) {
+		case RS_CREATEANDGO:
+			/* deactivate with underlying device */
+			deactivate_mtpOmSpStudyMapTable_row(StorageNew);
+			break;
+		case RS_CREATEANDWAIT:
+			break;
 		case RS_ACTIVE:
+			if (StorageTmp->mtpOmSpStudyMapStatus == RS_NOTINSERVICE)
+				/* deactivate with underlying device */
+				deactivate_mtpOmSpStudyMapTable_row(StorageTmp);
+			break;
 		case RS_NOTINSERVICE:
-			/* restore state */
-			StorageTmp->mtpOmSpStudyMapStatus = old_value;
+			if (StorageTmp->mtpOmSpStudyMapStatus == RS_ACTIVE)
+				/* activate with underlying device */
+				activate_mtpOmSpStudyMapTable_row(StorageTmp);
+			break;
+		case RS_DESTROY:
 			break;
 		}
 		/* fall through */
@@ -12798,6 +15310,13 @@ write_mtpOmSpStudyMapStatus(int action, u_char *var_val, u_char var_val_type, si
 				mtpOmSpStudyMapTable_del(StorageNew);
 				mtpOmSpStudyMapTable_destroy(&StorageNew);
 			}
+			break;
+		case RS_ACTIVE:
+		case RS_NOTINSERVICE:
+			if ((StorageOld = StorageTmp->mtpOmSpStudyMapTable_old) == NULL)
+				break;
+			if (--StorageTmp->mtpOmSpStudyMapTable_rsvs == 0)
+				mtpOmSpStudyMapTable_destroy(&StorageTmp->mtpOmSpStudyMapTable_old);
 			break;
 		case RS_DESTROY:
 			/* row deletion, so add it again */
@@ -12824,10 +15343,9 @@ write_mtpOmSpStudyMapStatus(int action, u_char *var_val, u_char var_val_type, si
 int
 write_mtpOmRsSiStatus(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	struct mtpOmRsSiTable_data *StorageTmp = NULL;
+	struct mtpOmRsSiTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	static struct mtpOmRsSiTable_data *StorageNew, *StorageDel;
 	size_t newlen = name_len - 16;
-	static int old_value;
 	int set_value, ret;
 	static struct variable_list *vars, *vp;
 
@@ -12854,40 +15372,6 @@ write_mtpOmRsSiStatus(int action, u_char *var_val, u_char var_val_type, size_t v
 			if (StorageTmp != NULL)
 				/* cannot create existing row */
 				return SNMP_ERR_INCONSISTENTVALUE;
-			break;
-		case RS_ACTIVE:
-		case RS_NOTINSERVICE:
-			if (StorageTmp == NULL)
-				/* cannot change state of non-existent row */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			if (StorageTmp->mtpOmRsSiStatus == RS_NOTREADY)
-				/* cannot change state of row that is not ready */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			/* XXX: interaction with row storage type needed */
-			if (set_value == RS_NOTINSERVICE && StorageTmp->mtpOmRsSiTable_refs > 0)
-				/* row is busy and cannot be moved to the RS_NOTINSERVICE state */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			break;
-		case RS_DESTROY:
-			/* destroying existent or non-existent row is ok */
-			if (StorageTmp == NULL)
-				break;
-			/* XXX: interaction with row storage type needed */
-			if (StorageTmp->mtpOmRsSiTable_refs > 0)
-				/* row is busy and cannot be deleted */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			break;
-		case RS_NOTREADY:
-			/* management station cannot set this, only agent can */
-		default:
-			return SNMP_ERR_INCONSISTENTVALUE;
-		}
-		break;
-	case RESERVE2:
-		/* memory reseveration, final preparation... */
-		switch (set_value) {
-		case RS_CREATEANDGO:
-		case RS_CREATEANDWAIT:
 			/* creation */
 			vars = NULL;
 			/* mtpSpId */
@@ -12958,6 +15442,7 @@ write_mtpOmRsSiStatus(int action, u_char *var_val, u_char var_val_type, size_t v
 				snmp_free_varbind(vars);
 				return SNMP_ERR_RESOURCEUNAVAILABLE;
 			}
+			StorageNew->mtpOmRsSiTable_rsvs = 1;
 			vp = vars;
 			StorageNew->mtpSpId = (ulong) *vp->val.integer;
 			vp = vp->next_variable;
@@ -12967,7 +15452,37 @@ write_mtpOmRsSiStatus(int action, u_char *var_val, u_char var_val_type, size_t v
 			vp = vp->next_variable;
 			header_complex_add_data(&mtpOmRsSiTableStorage, vars, StorageNew);	/* frees vars */
 			break;
+		case RS_ACTIVE:
+		case RS_NOTINSERVICE:
+			if (StorageTmp == NULL)
+				/* cannot change state of non-existent row */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			if (StorageTmp->mtpOmRsSiStatus == RS_NOTREADY)
+				/* cannot change state of row that is not ready */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			/* XXX: interaction with row storage type needed */
+			if (set_value == RS_NOTINSERVICE && StorageTmp->mtpOmRsSiTable_refs > 0)
+				/* row is busy and cannot be moved to the RS_NOTINSERVICE state */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			/* activate or deactivate */
+			if (StorageTmp == NULL)
+				return SNMP_ERR_NOSUCHNAME;
+			/* one allocation for the whole row */
+			if ((StorageOld = StorageTmp->mtpOmRsSiTable_old) == NULL)
+				if (StorageTmp->mtpOmRsSiTable_rsvs == 0)
+					if ((StorageOld = StorageTmp->mtpOmRsSiTable_old = mtpOmRsSiTable_duplicate(StorageTmp)) == NULL)
+						return SNMP_ERR_RESOURCEUNAVAILABLE;
+			if (StorageOld != NULL)
+				StorageTmp->mtpOmRsSiTable_rsvs++;
+			break;
 		case RS_DESTROY:
+			if (StorageTmp == NULL)
+				/* cannot destroy non-existent row */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			/* XXX: interaction with row storage type needed */
+			if (StorageTmp->mtpOmRsSiTable_refs > 0)
+				/* row is busy and cannot be deleted */
+				return SNMP_ERR_INCONSISTENTVALUE;
 			/* destroy */
 			if (StorageTmp != NULL) {
 				/* exists, extract it for now */
@@ -12977,78 +15492,127 @@ write_mtpOmRsSiStatus(int action, u_char *var_val, u_char var_val_type, size_t v
 				StorageDel = NULL;
 			}
 			break;
+		case RS_NOTREADY:
+			/* management station cannot set this, only agent can */
+		default:
+			return SNMP_ERR_INCONSISTENTVALUE;
 		}
 		break;
-	case ACTION:
-		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the UNDO case */
+	case RESERVE2:
+		/* memory reseveration, final preparation... */
 		switch (set_value) {
 		case RS_CREATEANDGO:
 			/* check that activation is possible */
-			if ((ret = mtpOmRsSiTable_consistent(StorageNew)) != SNMP_ERR_NOERROR)
+			if ((ret = can_act_mtpOmRsSiTable_row(StorageNew)) != SNMP_ERR_NOERROR)
 				return (ret);
 			break;
 		case RS_CREATEANDWAIT:
-			/* row does not have to be consistent */
 			break;
 		case RS_ACTIVE:
-			old_value = StorageTmp->mtpOmRsSiStatus;
-			StorageTmp->mtpOmRsSiStatus = set_value;
-			if (old_value != RS_ACTIVE) {
-				/* check that activation is possible */
-				if ((ret = mtpOmRsSiTable_consistent(StorageTmp)) != SNMP_ERR_NOERROR) {
-					StorageTmp->mtpOmRsSiStatus = old_value;
+			/* check that activation is possible */
+			if (StorageTmp->mtpOmRsSiStatus != RS_ACTIVE)
+				if ((ret = can_act_mtpOmRsSiTable_row(StorageTmp)) != SNMP_ERR_NOERROR)
 					return (ret);
-				}
+			break;
+		case RS_NOTINSERVICE:
+			/* check that deactivation is possible */
+			if (StorageTmp->mtpOmRsSiStatus != RS_NOTINSERVICE)
+				if ((ret = can_deact_mtpOmRsSiTable_row(StorageTmp)) != SNMP_ERR_NOERROR)
+					return (ret);
+			break;
+		case RS_DESTROY:
+			/* check that deactivation is possible */
+			if (StorageTmp->mtpOmRsSiStatus != RS_NOTINSERVICE)
+				if ((ret = can_deact_mtpOmRsSiTable_row(StorageTmp)) != SNMP_ERR_NOERROR)
+					return (ret);
+			break;
+		default:
+			return SNMP_ERR_WRONGVALUE;
+		}
+		break;
+	case ACTION:
+		/* The variable has been stored in StorageTmp->mtpOmRsSiStatus for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable
+		   in the UNDO case */
+		switch (set_value) {
+		case RS_CREATEANDGO:
+			/* activate with underlying device */
+			if (activate_mtpOmRsSiTable_row(StorageNew) != SNMP_ERR_NOERROR)
+				return SNMP_ERR_COMMITFAILED;
+			break;
+		case RS_CREATEANDWAIT:
+			break;
+		case RS_ACTIVE:
+			/* state change already performed */
+			if (StorageTmp->mtpOmRsSiStatus != RS_ACTIVE) {
+				/* activate with underlying device */
+				if (activate_mtpOmRsSiTable_row(StorageTmp) != SNMP_ERR_NOERROR)
+					return SNMP_ERR_COMMITFAILED;
 			}
 			break;
 		case RS_NOTINSERVICE:
-			/* set the flag? */
-			old_value = StorageTmp->mtpOmRsSiStatus;
-			StorageTmp->mtpOmRsSiStatus = set_value;
+			/* state change already performed */
+			if (StorageTmp->mtpOmRsSiStatus != RS_NOTINSERVICE) {
+				/* deactivate with underlying device */
+				if (deactivate_mtpOmRsSiTable_row(StorageTmp) != SNMP_ERR_NOERROR)
+					return SNMP_ERR_COMMITFAILED;
+			}
 			break;
+		case RS_DESTROY:
+			/* commit destrution to underlying device */
+			if (StorageDel == NULL)
+				break;
+			/* deactivate with underlying device */
+			if (deactivate_mtpOmRsSiTable_row(StorageDel) != SNMP_ERR_NOERROR)
+				return SNMP_ERR_COMMITFAILED;
+			break;
+		default:
+			return SNMP_ERR_WRONGVALUE;
 		}
 		break;
 	case COMMIT:
 		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		switch (set_value) {
 		case RS_CREATEANDGO:
-			/* row creation, set final state */
-			/* XXX: commit creation to underlying device */
-			/* XXX: activate with underlying device */
 			StorageNew->mtpOmRsSiStatus = RS_ACTIVE;
 			break;
 		case RS_CREATEANDWAIT:
-			/* row creation, set final state */
 			StorageNew->mtpOmRsSiStatus = RS_NOTINSERVICE;
 			break;
 		case RS_ACTIVE:
 		case RS_NOTINSERVICE:
-			/* state change already performed */
-			if (old_value != set_value) {
-				switch (set_value) {
-				case RS_ACTIVE:
-					/* XXX: activate with underlying device */
-					break;
-				case RS_NOTINSERVICE:
-					/* XXX: deactivate with underlying device */
-					break;
-				}
+			StorageNew->mtpOmRsSiStatus = set_value;
+			if ((StorageOld = StorageTmp->mtpOmRsSiTable_old) != NULL) {
+				mtpOmRsSiTable_destroy(&StorageTmp->mtpOmRsSiTable_old);
+				StorageTmp->mtpOmRsSiTable_rsvs = 0;
+				StorageTmp->mtpOmRsSiTable_tsts = 0;
+				StorageTmp->mtpOmRsSiTable_sets = 0;
 			}
 			break;
 		case RS_DESTROY:
-			/* row deletion, free it its dead */
 			mtpOmRsSiTable_destroy(&StorageDel);
-			/* mtpOmRsSiTable_destroy() can handle NULL pointers. */
 			break;
 		}
 		break;
 	case UNDO:
 		/* Back out any changes made in the ACTION case */
 		switch (set_value) {
+		case RS_CREATEANDGO:
+			/* deactivate with underlying device */
+			deactivate_mtpOmRsSiTable_row(StorageNew);
+			break;
+		case RS_CREATEANDWAIT:
+			break;
 		case RS_ACTIVE:
+			if (StorageTmp->mtpOmRsSiStatus == RS_NOTINSERVICE)
+				/* deactivate with underlying device */
+				deactivate_mtpOmRsSiTable_row(StorageTmp);
+			break;
 		case RS_NOTINSERVICE:
-			/* restore state */
-			StorageTmp->mtpOmRsSiStatus = old_value;
+			if (StorageTmp->mtpOmRsSiStatus == RS_ACTIVE)
+				/* activate with underlying device */
+				activate_mtpOmRsSiTable_row(StorageTmp);
+			break;
+		case RS_DESTROY:
 			break;
 		}
 		/* fall through */
@@ -13062,6 +15626,13 @@ write_mtpOmRsSiStatus(int action, u_char *var_val, u_char var_val_type, size_t v
 				mtpOmRsSiTable_del(StorageNew);
 				mtpOmRsSiTable_destroy(&StorageNew);
 			}
+			break;
+		case RS_ACTIVE:
+		case RS_NOTINSERVICE:
+			if ((StorageOld = StorageTmp->mtpOmRsSiTable_old) == NULL)
+				break;
+			if (--StorageTmp->mtpOmRsSiTable_rsvs == 0)
+				mtpOmRsSiTable_destroy(&StorageTmp->mtpOmRsSiTable_old);
 			break;
 		case RS_DESTROY:
 			/* row deletion, so add it again */

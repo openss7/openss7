@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2012  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -121,13 +121,22 @@ extern int sa_request;			/* request number for per-request actions */
 
 /* our storage structure(s) */
 struct mxMIB_data {
+	struct mxMIB_data *mxMIB_old;
+	uint mxMIB_rsvs;
+	uint mxMIB_tsts;
+	uint mxMIB_sets;
 	uint mxMIB_request;
 	ulong mxCardNextIndex;		/* ReadOnly */
 	long mxDiscontinuityTime;	/* ReadOnly */
 };
 struct mxSyncTable_data {
+	struct mxSyncTable_data *mxSyncTable_old;
+	uint mxSyncTable_rsvs;
+	uint mxSyncTable_tsts;
+	uint mxSyncTable_sets;
 	uint mxSyncTable_request;
 	uint mxSyncTable_refs;
+	uint mxSyncTable_id;
 	ulong mxSyncGroup;		/* NoAccess */
 	ulong mxSyncIndex;		/* NoAccess */
 	uint8_t *mxSyncSpanId;		/* Create */
@@ -135,9 +144,13 @@ struct mxSyncTable_data {
 	long mxSyncRowStatus;		/* Create */
 };
 struct mxDrivTable_data {
+	struct mxDrivTable_data *mxDrivTable_old;
+	uint mxDrivTable_rsvs;
+	uint mxDrivTable_tsts;
+	uint mxDrivTable_sets;
 	uint mxDrivTable_request;
 	uint mxDrivTable_refs;
-	char *mxDrivTable_devname;
+	uint mxDrivTable_id;
 	uint8_t *mxDrivName;		/* NoAccess */
 	size_t mxDrivNameLen;
 	ulong mxDrivIdnum;		/* ReadOnly */
@@ -158,8 +171,13 @@ struct mxDrivTable_data {
 	long mxDrivRowStatus;		/* Create */
 };
 struct mxCardTable_data {
+	struct mxCardTable_data *mxCardTable_old;
+	uint mxCardTable_rsvs;
+	uint mxCardTable_tsts;
+	uint mxCardTable_sets;
 	uint mxCardTable_request;
 	uint mxCardTable_refs;
+	uint mxCardTable_id;
 	uint8_t *mxDrivName;		/* NoAccess */
 	size_t mxDrivNameLen;
 	ulong mxCardIndex;		/* NoAccess */
@@ -202,8 +220,13 @@ struct mxCardTable_data {
 	long mxCardStatus;		/* Create */
 };
 struct mxSpanTable_data {
+	struct mxSpanTable_data *mxSpanTable_old;
+	uint mxSpanTable_rsvs;
+	uint mxSpanTable_tsts;
+	uint mxSpanTable_sets;
 	uint mxSpanTable_request;
 	uint mxSpanTable_refs;
+	uint mxSpanTable_id;
 	uint8_t *mxDrivName;		/* NoAccess */
 	size_t mxDrivNameLen;
 	ulong mxCardIndex;		/* NoAccess */
@@ -268,8 +291,13 @@ struct mxSpanTable_data {
 	long mxSpanRowStatus;		/* Create */
 };
 struct mxBertTable_data {
+	struct mxBertTable_data *mxBertTable_old;
+	uint mxBertTable_rsvs;
+	uint mxBertTable_tsts;
+	uint mxBertTable_sets;
 	uint mxBertTable_request;
 	uint mxBertTable_refs;
+	uint mxBertTable_id;
 	uint8_t *mxDrivName;		/* NoAccess */
 	size_t mxDrivNameLen;
 	ulong mxCardIndex;		/* NoAccess */
@@ -285,8 +313,13 @@ struct mxBertTable_data {
 	long mxBertErrorCount;		/* ReadOnly */
 };
 struct mxChanTable_data {
+	struct mxChanTable_data *mxChanTable_old;
+	uint mxChanTable_rsvs;
+	uint mxChanTable_tsts;
+	uint mxChanTable_sets;
 	uint mxChanTable_request;
 	uint mxChanTable_refs;
+	uint mxChanTable_id;
 	uint8_t *mxDrivName;		/* NoAccess */
 	size_t mxDrivNameLen;
 	ulong mxCardIndex;		/* NoAccess */
@@ -313,8 +346,13 @@ struct mxChanTable_data {
 	long mxChanStandbyStatus;	/* ReadOnly */
 };
 struct mxXconTable_data {
+	struct mxXconTable_data *mxXconTable_old;
+	uint mxXconTable_rsvs;
+	uint mxXconTable_tsts;
+	uint mxXconTable_sets;
 	uint mxXconTable_request;
 	uint mxXconTable_refs;
+	uint mxXconTable_id;
 	uint8_t *mxDrivName;		/* NoAccess */
 	size_t mxDrivNameLen;
 	ulong mxCardIndex;		/* NoAccess */
@@ -328,8 +366,13 @@ struct mxXconTable_data {
 	long mxXconRowStatus;		/* Create */
 };
 struct mxNearEndCurrentTable_data {
+	struct mxNearEndCurrentTable_data *mxNearEndCurrentTable_old;
+	uint mxNearEndCurrentTable_rsvs;
+	uint mxNearEndCurrentTable_tsts;
+	uint mxNearEndCurrentTable_sets;
 	uint mxNearEndCurrentTable_request;
 	uint mxNearEndCurrentTable_refs;
+	uint mxNearEndCurrentTable_id;
 	uint8_t *mxDrivName;		/* NoAccess */
 	size_t mxDrivNameLen;
 	ulong mxCardIndex;		/* NoAccess */
@@ -345,10 +388,18 @@ struct mxNearEndCurrentTable_data {
 	long mxNearEndCurrentBESs;	/* ReadOnly */
 	long mxNearEndCurrentDMs;	/* ReadOnly */
 	long mxNearEndCurrentLCVs;	/* ReadOnly */
+	long mxNearEndCurrentFASEs;	/* ReadOnly */
+	long mxNearEndCurrentFABEs;	/* ReadOnly */
+	long mxNearEndCurrentFEBEs;	/* ReadOnly */
 };
 struct mxNearEndIntervalTable_data {
+	struct mxNearEndIntervalTable_data *mxNearEndIntervalTable_old;
+	uint mxNearEndIntervalTable_rsvs;
+	uint mxNearEndIntervalTable_tsts;
+	uint mxNearEndIntervalTable_sets;
 	uint mxNearEndIntervalTable_request;
 	uint mxNearEndIntervalTable_refs;
+	uint mxNearEndIntervalTable_id;
 	uint8_t *mxDrivName;		/* NoAccess */
 	size_t mxDrivNameLen;
 	ulong mxCardIndex;		/* NoAccess */
@@ -364,11 +415,19 @@ struct mxNearEndIntervalTable_data {
 	long mxNearEndIntervalBESs;	/* ReadOnly */
 	long mxNearEndIntervalDMs;	/* ReadOnly */
 	long mxNearEndIntervalLCVs;	/* ReadOnly */
+	long mxNearEndIntervalFASEs;	/* ReadOnly */
+	long mxNearEndIntervalFABEs;	/* ReadOnly */
+	long mxNearEndIntervalFEBEs;	/* ReadOnly */
 	long mxNearEndIntervalValidData;	/* ReadOnly */
 };
 struct mxNearEndTotalTable_data {
+	struct mxNearEndTotalTable_data *mxNearEndTotalTable_old;
+	uint mxNearEndTotalTable_rsvs;
+	uint mxNearEndTotalTable_tsts;
+	uint mxNearEndTotalTable_sets;
 	uint mxNearEndTotalTable_request;
 	uint mxNearEndTotalTable_refs;
+	uint mxNearEndTotalTable_id;
 	uint8_t *mxDrivName;		/* NoAccess */
 	size_t mxDrivNameLen;
 	ulong mxCardIndex;		/* NoAccess */
@@ -385,10 +444,18 @@ struct mxNearEndTotalTable_data {
 	long mxNearEndTotalBESs;	/* ReadOnly */
 	long mxNearEndTotalDMs;		/* ReadOnly */
 	long mxNearEndTotalLCVs;	/* ReadOnly */
+	long mxNearEndTotalFASEs;	/* ReadOnly */
+	long mxNearEndTotalFABEs;	/* ReadOnly */
+	long mxNearEndTotalFEBEs;	/* ReadOnly */
 };
 struct mxFarEndCurrentTable_data {
+	struct mxFarEndCurrentTable_data *mxFarEndCurrentTable_old;
+	uint mxFarEndCurrentTable_rsvs;
+	uint mxFarEndCurrentTable_tsts;
+	uint mxFarEndCurrentTable_sets;
 	uint mxFarEndCurrentTable_request;
 	uint mxFarEndCurrentTable_refs;
+	uint mxFarEndCurrentTable_id;
 	uint8_t *mxDrivName;		/* NoAccess */
 	size_t mxDrivNameLen;
 	ulong mxCardIndex;		/* NoAccess */
@@ -405,8 +472,13 @@ struct mxFarEndCurrentTable_data {
 	long mxFarEndCurrentDMs;	/* ReadOnly */
 };
 struct mxFarEndIntervalTable_data {
+	struct mxFarEndIntervalTable_data *mxFarEndIntervalTable_old;
+	uint mxFarEndIntervalTable_rsvs;
+	uint mxFarEndIntervalTable_tsts;
+	uint mxFarEndIntervalTable_sets;
 	uint mxFarEndIntervalTable_request;
 	uint mxFarEndIntervalTable_refs;
+	uint mxFarEndIntervalTable_id;
 	uint8_t *mxDrivName;		/* NoAccess */
 	size_t mxDrivNameLen;
 	ulong mxCardIndex;		/* NoAccess */
@@ -424,8 +496,13 @@ struct mxFarEndIntervalTable_data {
 	long mxFarEndIntervalValidData;	/* ReadOnly */
 };
 struct mxFarEndTotalTable_data {
+	struct mxFarEndTotalTable_data *mxFarEndTotalTable_old;
+	uint mxFarEndTotalTable_rsvs;
+	uint mxFarEndTotalTable_tsts;
+	uint mxFarEndTotalTable_sets;
 	uint mxFarEndTotalTable_request;
 	uint mxFarEndTotalTable_refs;
+	uint mxFarEndTotalTable_id;
 	uint8_t *mxDrivName;		/* NoAccess */
 	size_t mxDrivNameLen;
 	ulong mxCardIndex;		/* NoAccess */
@@ -874,6 +951,10 @@ void init_mxMIB(void);
 void deinit_mxMIB(void);
 int term_mxMIB(int majorID, int minorID, void *serverarg, void *clientarg);
 FindVarMethod var_mxMIB;
+struct mxMIB_data *mxMIB_create(void);
+struct mxMIB_data *mxMIB_duplicate(struct mxMIB_data *);
+int mxMIB_destroy(struct mxMIB_data **);
+int mxMIB_add(struct mxMIB_data *);
 void parse_mxMIB(const char *, char *);
 SNMPCallback store_mxMIB;
 void refresh_mxMIB(int);

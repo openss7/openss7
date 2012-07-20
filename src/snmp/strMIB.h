@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2012  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -142,6 +142,10 @@ extern int sa_request;			/* request number for per-request actions */
 
 /* our storage structure(s) */
 struct strMIB_data {
+	struct strMIB_data *strMIB_old;
+	uint strMIB_rsvs;
+	uint strMIB_tsts;
+	uint strMIB_sets;
 	uint strMIB_request;
 	long strCltime;			/* ReadWrite */
 	ulong strMaxApush;		/* ReadWrite */
@@ -168,8 +172,13 @@ struct strMIB_data {
 	long strIoctime;		/* ReadWrite */
 };
 struct strModTable_data {
+	struct strModTable_data *strModTable_old;
+	uint strModTable_rsvs;
+	uint strModTable_tsts;
+	uint strModTable_sets;
 	uint strModTable_request;
 	uint strModTable_refs;
+	uint strModTable_id;
 	uint8_t *strModName;		/* NoAccess */
 	size_t strModNameLen;
 	ulong strModIdnum;		/* ReadOnly */
@@ -178,8 +187,13 @@ struct strModTable_data {
 	long strModRowStatus;		/* Create */
 };
 struct strModInfoTable_data {
+	struct strModInfoTable_data *strModInfoTable_old;
+	uint strModInfoTable_rsvs;
+	uint strModInfoTable_tsts;
+	uint strModInfoTable_sets;
 	uint strModInfoTable_request;
 	uint strModInfoTable_refs;
+	uint strModInfoTable_id;
 	uint8_t *strModName;		/* NoAccess */
 	size_t strModNameLen;
 	ulong strModInfoIndex;		/* NoAccess */
@@ -192,8 +206,13 @@ struct strModInfoTable_data {
 	ulong strModInfoTraceLevel;	/* ReadWrite */
 };
 struct strModStatTable_data {
+	struct strModStatTable_data *strModStatTable_old;
+	uint strModStatTable_rsvs;
+	uint strModStatTable_tsts;
+	uint strModStatTable_sets;
 	uint strModStatTable_request;
 	uint strModStatTable_refs;
+	uint strModStatTable_id;
 	uint8_t *strModName;		/* NoAccess */
 	size_t strModNameLen;
 	ulong strModStatIndex;		/* NoAccess */
@@ -209,8 +228,13 @@ struct strModStatTable_data {
 	ulong strModStatFlags;		/* ReadOnly */
 };
 struct strApshTable_data {
+	struct strApshTable_data *strApshTable_old;
+	uint strApshTable_rsvs;
+	uint strApshTable_tsts;
+	uint strApshTable_sets;
 	uint strApshTable_request;
 	uint strApshTable_refs;
+	uint strApshTable_id;
 	uint8_t *strModName;		/* NoAccess */
 	size_t strModNameLen;
 	ulong strApshMajor;		/* ReadOnly */
@@ -221,8 +245,13 @@ struct strApshTable_data {
 	long strApshRowStatus;		/* Create */
 };
 struct strStatsTable_data {
+	struct strStatsTable_data *strStatsTable_old;
+	uint strStatsTable_rsvs;
+	uint strStatsTable_tsts;
+	uint strStatsTable_sets;
 	uint strStatsTable_request;
 	uint strStatsTable_refs;
+	uint strStatsTable_id;
 	long strStatsStructure;		/* NoAccess */
 	long strStatsCurrentAllocs;	/* ReadOnly */
 	long strStatsHighWaterMark;	/* ReadOnly */
@@ -302,6 +331,10 @@ void init_strMIB(void);
 void deinit_strMIB(void);
 int term_strMIB(int majorID, int minorID, void *serverarg, void *clientarg);
 FindVarMethod var_strMIB;
+struct strMIB_data *strMIB_create(void);
+struct strMIB_data *strMIB_duplicate(struct strMIB_data *);
+int strMIB_destroy(struct strMIB_data **);
+int strMIB_add(struct strMIB_data *);
 void parse_strMIB(const char *, char *);
 SNMPCallback store_strMIB;
 void refresh_strMIB(int);

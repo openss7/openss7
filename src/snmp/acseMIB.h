@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2012  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -70,11 +70,20 @@ extern int sa_request;			/* request number for per-request actions */
 
 /* our storage structure(s) */
 struct acseMIB_data {
+	struct acseMIB_data *acseMIB_old;
+	uint acseMIB_rsvs;
+	uint acseMIB_tsts;
+	uint acseMIB_sets;
 	uint acseMIB_request;
 };
 struct acseTable_data {
+	struct acseTable_data *acseTable_old;
+	uint acseTable_rsvs;
+	uint acseTable_tsts;
+	uint acseTable_sets;
 	uint acseTable_request;
 	uint acseTable_refs;
+	uint acseTable_id;
 	uint8_t *subsystemId;		/* ReadOnly */
 	size_t subsystemIdLen;
 	uint8_t *applicationProcessId;	/* NoAccess */
@@ -91,8 +100,13 @@ struct acseTable_data {
 	size_t acseFUresponderLen;
 };
 struct acseAssociationTable_data {
+	struct acseAssociationTable_data *acseAssociationTable_old;
+	uint acseAssociationTable_rsvs;
+	uint acseAssociationTable_tsts;
+	uint acseAssociationTable_sets;
 	uint acseAssociationTable_request;
 	uint acseAssociationTable_refs;
+	uint acseAssociationTable_id;
 	ulong applicationSubsystemId;	/* NoAccess */
 	uint8_t *apInvocationId;	/* NoAccess */
 	size_t apInvocationIdLen;
@@ -111,8 +125,13 @@ struct acseAssociationTable_data {
 	long acseAssociationRowStatus;	/* Create */
 };
 struct apInvocationTable_data {
+	struct apInvocationTable_data *apInvocationTable_old;
+	uint apInvocationTable_rsvs;
+	uint apInvocationTable_tsts;
+	uint apInvocationTable_sets;
 	uint apInvocationTable_request;
 	uint apInvocationTable_refs;
+	uint apInvocationTable_id;
 	ulong applicationSubsystemId;	/* NoAccess */
 	uint8_t *apInvocationId;	/* NoAccess */
 	size_t apInvocationIdLen;
@@ -121,8 +140,13 @@ struct apInvocationTable_data {
 	long apInvocationRowStatus;	/* Create */
 };
 struct applicationEntityInvocationTable_data {
+	struct applicationEntityInvocationTable_data *applicationEntityInvocationTable_old;
+	uint applicationEntityInvocationTable_rsvs;
+	uint applicationEntityInvocationTable_tsts;
+	uint applicationEntityInvocationTable_sets;
 	uint applicationEntityInvocationTable_request;
 	uint applicationEntityInvocationTable_refs;
+	uint applicationEntityInvocationTable_id;
 	ulong applicationSubsystemId;	/* NoAccess */
 	uint8_t *apInvocationId;	/* NoAccess */
 	size_t apInvocationIdLen;
@@ -135,15 +159,25 @@ struct applicationEntityInvocationTable_data {
 	long applicationEntityInvocationRowStatus;	/* Create */
 };
 struct applicationSubsystemTable_data {
+	struct applicationSubsystemTable_data *applicationSubsystemTable_old;
+	uint applicationSubsystemTable_rsvs;
+	uint applicationSubsystemTable_tsts;
+	uint applicationSubsystemTable_sets;
 	uint applicationSubsystemTable_request;
 	uint applicationSubsystemTable_refs;
+	uint applicationSubsystemTable_id;
 	uint8_t *subsystemId;		/* ReadOnly */
 	size_t subsystemIdLen;
 	ulong applicationSubsystemId;	/* NoAccess */
 };
 struct asoTable_data {
+	struct asoTable_data *asoTable_old;
+	uint asoTable_rsvs;
+	uint asoTable_tsts;
+	uint asoTable_sets;
 	uint asoTable_request;
 	uint asoTable_refs;
+	uint asoTable_id;
 	uint8_t *subsystemId;		/* ReadOnly */
 	size_t subsystemIdLen;
 	uint8_t *applicationProcessId;	/* NoAccess */
@@ -160,8 +194,13 @@ struct asoTable_data {
 	long asoRowStatus;		/* Create */
 };
 struct asoEntityTable_data {
+	struct asoEntityTable_data *asoEntityTable_old;
+	uint asoEntityTable_rsvs;
+	uint asoEntityTable_tsts;
+	uint asoEntityTable_sets;
 	uint asoEntityTable_request;
 	uint asoEntityTable_refs;
+	uint asoEntityTable_id;
 	uint8_t *subsystemId;		/* ReadOnly */
 	size_t subsystemIdLen;
 	uint8_t *applicationProcessId;	/* NoAccess */
@@ -180,8 +219,13 @@ struct asoEntityTable_data {
 	long asoEntityRowStatus;	/* Create */
 };
 struct asoInvocationTable_data {
+	struct asoInvocationTable_data *asoInvocationTable_old;
+	uint asoInvocationTable_rsvs;
+	uint asoInvocationTable_tsts;
+	uint asoInvocationTable_sets;
 	uint asoInvocationTable_request;
 	uint asoInvocationTable_refs;
+	uint asoInvocationTable_id;
 	ulong applicationSubsystemId;	/* NoAccess */
 	uint8_t *apInvocationId;	/* NoAccess */
 	size_t apInvocationIdLen;
@@ -192,30 +236,50 @@ struct asoInvocationTable_data {
 	long asoInvocationRowStatus;	/* Create */
 };
 struct monoULConnectionTable_data {
+	struct monoULConnectionTable_data *monoULConnectionTable_old;
+	uint monoULConnectionTable_rsvs;
+	uint monoULConnectionTable_tsts;
+	uint monoULConnectionTable_sets;
 	uint monoULConnectionTable_request;
 	uint monoULConnectionTable_refs;
+	uint monoULConnectionTable_id;
 	ulong applicationSubsystemId;	/* NoAccess */
 	uint8_t *apInvocationId;	/* NoAccess */
 	size_t apInvocationIdLen;
 	long monoULConnectionRowStatus;	/* Create */
 };
 struct monoULEntityTable_data {
+	struct monoULEntityTable_data *monoULEntityTable_old;
+	uint monoULEntityTable_rsvs;
+	uint monoULEntityTable_tsts;
+	uint monoULEntityTable_sets;
 	uint monoULEntityTable_request;
 	uint monoULEntityTable_refs;
+	uint monoULEntityTable_id;
 	uint8_t *subsystemId;		/* ReadOnly */
 	size_t subsystemIdLen;
 	ulong monoUlEntityId;		/* NoAccess */
 };
 struct monolithicUpperLayerSubsystemTable_data {
+	struct monolithicUpperLayerSubsystemTable_data *monolithicUpperLayerSubsystemTable_old;
+	uint monolithicUpperLayerSubsystemTable_rsvs;
+	uint monolithicUpperLayerSubsystemTable_tsts;
+	uint monolithicUpperLayerSubsystemTable_sets;
 	uint monolithicUpperLayerSubsystemTable_request;
 	uint monolithicUpperLayerSubsystemTable_refs;
+	uint monolithicUpperLayerSubsystemTable_id;
 	uint8_t *monolithicUpperLayerSubsystemId;	/* NoAccess */
 	size_t monolithicUpperLayerSubsystemIdLen;
 	long monolithicUpperLayerSubssytemRowStatus;	/* Create */
 };
 struct pSapTable_data {
+	struct pSapTable_data *pSapTable_old;
+	uint pSapTable_rsvs;
+	uint pSapTable_tsts;
+	uint pSapTable_sets;
 	uint pSapTable_request;
 	uint pSapTable_refs;
+	uint pSapTable_id;
 	uint8_t *subsystemId;		/* ReadOnly */
 	size_t subsystemIdLen;
 	uint8_t *pSapId;		/* NoAccess */
@@ -227,8 +291,13 @@ struct pSapTable_data {
 	long pSapRowStatus;		/* Create */
 };
 struct presentationConnectionTable_data {
+	struct presentationConnectionTable_data *presentationConnectionTable_old;
+	uint presentationConnectionTable_rsvs;
+	uint presentationConnectionTable_tsts;
+	uint presentationConnectionTable_sets;
 	uint presentationConnectionTable_request;
 	uint presentationConnectionTable_refs;
+	uint presentationConnectionTable_id;
 	uint8_t *presentationSubsystemId;	/* NoAccess */
 	size_t presentationSubsystemIdLen;
 	uint8_t *presentationEntityId;	/* NoAccess */
@@ -248,8 +317,13 @@ struct presentationConnectionTable_data {
 	long presentationCOnnectionRowStatus;	/* Create */
 };
 struct presentationCopmTable_data {
+	struct presentationCopmTable_data *presentationCopmTable_old;
+	uint presentationCopmTable_rsvs;
+	uint presentationCopmTable_tsts;
+	uint presentationCopmTable_sets;
 	uint presentationCopmTable_request;
 	uint presentationCopmTable_refs;
+	uint presentationCopmTable_id;
 	uint8_t *presentationSubsystemId;	/* NoAccess */
 	size_t presentationSubsystemIdLen;
 	uint8_t *presentationEntityId;	/* NoAccess */
@@ -266,8 +340,13 @@ struct presentationCopmTable_data {
 	long presentationCopmRowStatus;	/* Create */
 };
 struct presentationEntityTable_data {
+	struct presentationEntityTable_data *presentationEntityTable_old;
+	uint presentationEntityTable_rsvs;
+	uint presentationEntityTable_tsts;
+	uint presentationEntityTable_sets;
 	uint presentationEntityTable_request;
 	uint presentationEntityTable_refs;
+	uint presentationEntityTable_id;
 	uint8_t *presentationSubsystemId;	/* NoAccess */
 	size_t presentationSubsystemIdLen;
 	uint8_t *presentationEntityId;	/* NoAccess */
@@ -278,15 +357,25 @@ struct presentationEntityTable_data {
 	long presentationEntityRowStatus;	/* Create */
 };
 struct presentationSubsystemTable_data {
+	struct presentationSubsystemTable_data *presentationSubsystemTable_old;
+	uint presentationSubsystemTable_rsvs;
+	uint presentationSubsystemTable_tsts;
+	uint presentationSubsystemTable_sets;
 	uint presentationSubsystemTable_request;
 	uint presentationSubsystemTable_refs;
+	uint presentationSubsystemTable_id;
 	uint8_t *presentationSubsystemId;	/* NoAccess */
 	size_t presentationSubsystemIdLen;
 	long presentationSubsystemRowStatus;	/* Create */
 };
 struct sSapTable_data {
+	struct sSapTable_data *sSapTable_old;
+	uint sSapTable_rsvs;
+	uint sSapTable_tsts;
+	uint sSapTable_sets;
 	uint sSapTable_request;
 	uint sSapTable_refs;
+	uint sSapTable_id;
 	uint8_t *subsystemId;		/* ReadOnly */
 	size_t subsystemIdLen;
 	uint8_t *sSapId;		/* NoAccess */
@@ -298,8 +387,13 @@ struct sSapTable_data {
 	long sSapRowStatus;		/* Create */
 };
 struct sessionConnectionTable_data {
+	struct sessionConnectionTable_data *sessionConnectionTable_old;
+	uint sessionConnectionTable_rsvs;
+	uint sessionConnectionTable_tsts;
+	uint sessionConnectionTable_sets;
 	uint sessionConnectionTable_request;
 	uint sessionConnectionTable_refs;
+	uint sessionConnectionTable_id;
 	uint8_t *sessionSubsystemId;	/* NoAccess */
 	size_t sessionSubsystemIdLen;
 	uint8_t *sessionEntityId;	/* NoAccess */
@@ -320,8 +414,13 @@ struct sessionConnectionTable_data {
 	long sessionCOnnectionRowStatus;	/* Create */
 };
 struct sessionCopmTable_data {
+	struct sessionCopmTable_data *sessionCopmTable_old;
+	uint sessionCopmTable_rsvs;
+	uint sessionCopmTable_tsts;
+	uint sessionCopmTable_sets;
 	uint sessionCopmTable_request;
 	uint sessionCopmTable_refs;
+	uint sessionCopmTable_id;
 	uint8_t *sessionSubsystemId;	/* NoAccess */
 	size_t sessionSubsystemIdLen;
 	uint8_t *sessionEntityId;	/* NoAccess */
@@ -338,8 +437,13 @@ struct sessionCopmTable_data {
 	long sessionCopmRowStatus;	/* Create */
 };
 struct sessionEntityTable_data {
+	struct sessionEntityTable_data *sessionEntityTable_old;
+	uint sessionEntityTable_rsvs;
+	uint sessionEntityTable_tsts;
+	uint sessionEntityTable_sets;
 	uint sessionEntityTable_request;
 	uint sessionEntityTable_refs;
+	uint sessionEntityTable_id;
 	uint8_t *sessionSubsystemId;	/* NoAccess */
 	size_t sessionSubsystemIdLen;
 	uint8_t *sessionEntityId;	/* NoAccess */
@@ -350,30 +454,50 @@ struct sessionEntityTable_data {
 	long sessionEntityRowStatus;	/* Create */
 };
 struct sessionSubsystemTable_data {
+	struct sessionSubsystemTable_data *sessionSubsystemTable_old;
+	uint sessionSubsystemTable_rsvs;
+	uint sessionSubsystemTable_tsts;
+	uint sessionSubsystemTable_sets;
 	uint sessionSubsystemTable_request;
 	uint sessionSubsystemTable_refs;
+	uint sessionSubsystemTable_id;
 	uint8_t *sessionSubsystemId;	/* NoAccess */
 	size_t sessionSubsystemIdLen;
 	long sessionSubsystemRowStatus;	/* Create */
 };
 struct acseEntityTable_data {
+	struct acseEntityTable_data *acseEntityTable_old;
+	uint acseEntityTable_rsvs;
+	uint acseEntityTable_tsts;
+	uint acseEntityTable_sets;
 	uint acseEntityTable_request;
 	uint acseEntityTable_refs;
+	uint acseEntityTable_id;
 	ulong mtpMsId;			/* NoAccess */
 	ulong acseEntityId;		/* NoAccess */
 	long acseEntityRowStatus;	/* Create */
 };
 struct acseAccessPointTable_data {
+	struct acseAccessPointTable_data *acseAccessPointTable_old;
+	uint acseAccessPointTable_rsvs;
+	uint acseAccessPointTable_tsts;
+	uint acseAccessPointTable_sets;
 	uint acseAccessPointTable_request;
 	uint acseAccessPointTable_refs;
+	uint acseAccessPointTable_id;
 	ulong mtpMsId;			/* NoAccess */
 	ulong acseEntityId;		/* NoAccess */
 	ulong acseAccessPointId;	/* NoAccess */
 	long acseAccessPointRowStatus;	/* Create */
 };
 struct acseLinkageTable_data {
+	struct acseLinkageTable_data *acseLinkageTable_old;
+	uint acseLinkageTable_rsvs;
+	uint acseLinkageTable_tsts;
+	uint acseLinkageTable_sets;
 	uint acseLinkageTable_request;
 	uint acseLinkageTable_refs;
+	uint acseLinkageTable_id;
 	ulong mtpMsId;			/* NoAccess */
 	uint8_t *sccpNetworkEntityId;	/* NoAccess */
 	size_t sccpNetworkEntityIdLen;
@@ -468,6 +592,10 @@ void init_acseMIB(void);
 void deinit_acseMIB(void);
 int term_acseMIB(int majorID, int minorID, void *serverarg, void *clientarg);
 FindVarMethod var_acseMIB;
+struct acseMIB_data *acseMIB_create(void);
+struct acseMIB_data *acseMIB_duplicate(struct acseMIB_data *);
+int acseMIB_destroy(struct acseMIB_data **);
+int acseMIB_add(struct acseMIB_data *);
 void parse_acseMIB(const char *, char *);
 SNMPCallback store_acseMIB;
 void refresh_acseMIB(int);

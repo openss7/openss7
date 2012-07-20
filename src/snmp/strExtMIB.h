@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2012  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -106,6 +106,10 @@ extern int sa_request;			/* request number for per-request actions */
 
 /* our storage structure(s) */
 struct strExtMIB_data {
+	struct strExtMIB_data *strExtMIB_old;
+	uint strExtMIB_rsvs;
+	uint strExtMIB_tsts;
+	uint strExtMIB_sets;
 	uint strExtMIB_request;
 	ulong strExtStrlogRecordNextIndex;	/* ReadOnly */
 	ulong strNlogargs;		/* ReadWrite */
@@ -115,8 +119,13 @@ struct strExtMIB_data {
 	long strExtTraceLog;		/* ReadWrite */
 };
 struct strExtStrlogRecordTable_data {
+	struct strExtStrlogRecordTable_data *strExtStrlogRecordTable_old;
+	uint strExtStrlogRecordTable_rsvs;
+	uint strExtStrlogRecordTable_tsts;
+	uint strExtStrlogRecordTable_sets;
 	uint strExtStrlogRecordTable_request;
 	uint strExtStrlogRecordTable_refs;
+	uint strExtStrlogRecordTable_id;
 	ulong strExtStrlogRecordIndex;	/* NoAccess */
 	long strExtStrlogRecordSeqNo;	/* ReadOnly */
 	uint8_t *strExtStrlogRecordDateAndTime;	/* ReadOnly */
@@ -132,8 +141,13 @@ struct strExtStrlogRecordTable_data {
 	long strExtStrlogRecordRowStatus;	/* Create */
 };
 struct strExtTraceTable_data {
+	struct strExtTraceTable_data *strExtTraceTable_old;
+	uint strExtTraceTable_rsvs;
+	uint strExtTraceTable_tsts;
+	uint strExtTraceTable_sets;
 	uint strExtTraceTable_request;
 	uint strExtTraceTable_refs;
+	uint strExtTraceTable_id;
 	ulong strExtTraceId;		/* NoAccess */
 	long strExtTraceMid;		/* Create */
 	long strExtTraceSid;		/* Create */
@@ -210,6 +224,10 @@ void init_strExtMIB(void);
 void deinit_strExtMIB(void);
 int term_strExtMIB(int majorID, int minorID, void *serverarg, void *clientarg);
 FindVarMethod var_strExtMIB;
+struct strExtMIB_data *strExtMIB_create(void);
+struct strExtMIB_data *strExtMIB_duplicate(struct strExtMIB_data *);
+int strExtMIB_destroy(struct strExtMIB_data **);
+int strExtMIB_add(struct strExtMIB_data *);
 void parse_strExtMIB(const char *, char *);
 SNMPCallback store_strExtMIB;
 void refresh_strExtMIB(int);

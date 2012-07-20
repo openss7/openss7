@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2012  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -109,11 +109,20 @@ extern int sa_request;			/* request number for per-request actions */
 
 /* our storage structure(s) */
 struct sccpMIB_data {
+	struct sccpMIB_data *sccpMIB_old;
+	uint sccpMIB_rsvs;
+	uint sccpMIB_tsts;
+	uint sccpMIB_sets;
 	uint sccpMIB_request;
 };
 struct sccpNetworkEntityTable_data {
+	struct sccpNetworkEntityTable_data *sccpNetworkEntityTable_old;
+	uint sccpNetworkEntityTable_rsvs;
+	uint sccpNetworkEntityTable_tsts;
+	uint sccpNetworkEntityTable_sets;
 	uint sccpNetworkEntityTable_request;
 	uint sccpNetworkEntityTable_refs;
+	uint sccpNetworkEntityTable_id;
 	ulong mtpMsId;			/* NoAccess */
 	uint8_t *sccpNetworkEntityId;	/* NoAccess */
 	size_t sccpNetworkEntityIdLen;
@@ -139,8 +148,13 @@ struct sccpNetworkEntityTable_data {
 	long sccpNetworkEntityRowStatus;	/* Create */
 };
 struct sccpLocalSapNamesTable_data {
+	struct sccpLocalSapNamesTable_data *sccpLocalSapNamesTable_old;
+	uint sccpLocalSapNamesTable_rsvs;
+	uint sccpLocalSapNamesTable_tsts;
+	uint sccpLocalSapNamesTable_sets;
 	uint sccpLocalSapNamesTable_request;
 	uint sccpLocalSapNamesTable_refs;
+	uint sccpLocalSapNamesTable_id;
 	ulong mtpMsId;			/* NoAccess */
 	uint8_t *sccpNetworkEntityId;	/* NoAccess */
 	size_t sccpNetworkEntityIdLen;
@@ -149,8 +163,13 @@ struct sccpLocalSapNamesTable_data {
 	long sccpLocalSapNamesRowStatus;	/* Create */
 };
 struct sccpAccessPointTable_data {
+	struct sccpAccessPointTable_data *sccpAccessPointTable_old;
+	uint sccpAccessPointTable_rsvs;
+	uint sccpAccessPointTable_tsts;
+	uint sccpAccessPointTable_sets;
 	uint sccpAccessPointTable_request;
 	uint sccpAccessPointTable_refs;
+	uint sccpAccessPointTable_id;
 	ulong mtpMsId;			/* NoAccess */
 	uint8_t *sccpNetworkEntityId;	/* NoAccess */
 	size_t sccpNetworkEntityIdLen;
@@ -175,8 +194,13 @@ struct sccpAccessPointTable_data {
 	long sccpAccessPointRowStatus;	/* Create */
 };
 struct sccpLinkageTable_data {
+	struct sccpLinkageTable_data *sccpLinkageTable_old;
+	uint sccpLinkageTable_rsvs;
+	uint sccpLinkageTable_tsts;
+	uint sccpLinkageTable_sets;
 	uint sccpLinkageTable_request;
 	uint sccpLinkageTable_refs;
+	uint sccpLinkageTable_id;
 	ulong mtpMsId;			/* NoAccess */
 	uint8_t *sccpNetworkEntityId;	/* NoAccess */
 	size_t sccpNetworkEntityIdLen;
@@ -242,8 +266,13 @@ struct sccpLinkageTable_data {
 	long sccpLinkageRowStatus;	/* Create */
 };
 struct sccpMtpTable_data {
+	struct sccpMtpTable_data *sccpMtpTable_old;
+	uint sccpMtpTable_rsvs;
+	uint sccpMtpTable_tsts;
+	uint sccpMtpTable_sets;
 	uint sccpMtpTable_request;
 	uint sccpMtpTable_refs;
+	uint sccpMtpTable_id;
 	ulong mtpMsId;			/* NoAccess */
 	uint8_t *sccpNetworkEntityId;	/* NoAccess */
 	size_t sccpNetworkEntityIdLen;
@@ -268,8 +297,13 @@ struct sccpMtpTable_data {
 	long sccpMtpRowStatus;		/* Create */
 };
 struct sccpSclcTable_data {
+	struct sccpSclcTable_data *sccpSclcTable_old;
+	uint sccpSclcTable_rsvs;
+	uint sccpSclcTable_tsts;
+	uint sccpSclcTable_sets;
 	uint sccpSclcTable_request;
 	uint sccpSclcTable_refs;
+	uint sccpSclcTable_id;
 	ulong mtpMsId;			/* NoAccess */
 	uint8_t *sccpNetworkEntityId;	/* NoAccess */
 	size_t sccpNetworkEntityIdLen;
@@ -291,8 +325,13 @@ struct sccpSclcTable_data {
 	long sccpSclcRowStatus;		/* Create */
 };
 struct sccpScocTable_data {
+	struct sccpScocTable_data *sccpScocTable_old;
+	uint sccpScocTable_rsvs;
+	uint sccpScocTable_tsts;
+	uint sccpScocTable_sets;
 	uint sccpScocTable_request;
 	uint sccpScocTable_refs;
+	uint sccpScocTable_id;
 	ulong mtpMsId;			/* NoAccess */
 	uint8_t *sccpNetworkEntityId;	/* NoAccess */
 	size_t sccpNetworkEntityIdLen;
@@ -308,8 +347,13 @@ struct sccpScocTable_data {
 	long sccpScocRowStatus;		/* Create */
 };
 struct sccpScrcTable_data {
+	struct sccpScrcTable_data *sccpScrcTable_old;
+	uint sccpScrcTable_rsvs;
+	uint sccpScrcTable_tsts;
+	uint sccpScrcTable_sets;
 	uint sccpScrcTable_request;
 	uint sccpScrcTable_refs;
+	uint sccpScrcTable_id;
 	ulong mtpMsId;			/* NoAccess */
 	uint8_t *sccpNetworkEntityId;	/* NoAccess */
 	size_t sccpNetworkEntityIdLen;
@@ -324,8 +368,13 @@ struct sccpScrcTable_data {
 	long sccpScrcRowStatus;		/* Create */
 };
 struct sccpEntitySetTable_data {
+	struct sccpEntitySetTable_data *sccpEntitySetTable_old;
+	uint sccpEntitySetTable_rsvs;
+	uint sccpEntitySetTable_tsts;
+	uint sccpEntitySetTable_sets;
 	uint sccpEntitySetTable_request;
 	uint sccpEntitySetTable_refs;
+	uint sccpEntitySetTable_id;
 	ulong mtpMsId;			/* NoAccess */
 	uint8_t *sccpNetworkEntityId;	/* NoAccess */
 	size_t sccpNetworkEntityIdLen;
@@ -342,8 +391,13 @@ struct sccpEntitySetTable_data {
 	long sccpEntitySetRowStatus;	/* Create */
 };
 struct sccpEntitySetSapTable_data {
+	struct sccpEntitySetSapTable_data *sccpEntitySetSapTable_old;
+	uint sccpEntitySetSapTable_rsvs;
+	uint sccpEntitySetSapTable_tsts;
+	uint sccpEntitySetSapTable_sets;
 	uint sccpEntitySetSapTable_request;
 	uint sccpEntitySetSapTable_refs;
+	uint sccpEntitySetSapTable_id;
 	ulong mtpMsId;			/* NoAccess */
 	uint8_t *sccpNetworkEntityId;	/* NoAccess */
 	size_t sccpNetworkEntityIdLen;
@@ -357,8 +411,13 @@ struct sccpEntitySetSapTable_data {
 	long sccpEntitySetSapRowStatus;	/* Create */
 };
 struct sccpConcernedAreaTable_data {
+	struct sccpConcernedAreaTable_data *sccpConcernedAreaTable_old;
+	uint sccpConcernedAreaTable_rsvs;
+	uint sccpConcernedAreaTable_tsts;
+	uint sccpConcernedAreaTable_sets;
 	uint sccpConcernedAreaTable_request;
 	uint sccpConcernedAreaTable_refs;
+	uint sccpConcernedAreaTable_id;
 	ulong mtpMsId;			/* NoAccess */
 	uint8_t *sccpNetworkEntityId;	/* NoAccess */
 	size_t sccpNetworkEntityIdLen;
@@ -368,8 +427,13 @@ struct sccpConcernedAreaTable_data {
 	long sccpConcernedAreaRowStatus;	/* Create */
 };
 struct sccpRemoteSCCPTable_data {
+	struct sccpRemoteSCCPTable_data *sccpRemoteSCCPTable_old;
+	uint sccpRemoteSCCPTable_rsvs;
+	uint sccpRemoteSCCPTable_tsts;
+	uint sccpRemoteSCCPTable_sets;
 	uint sccpRemoteSCCPTable_request;
 	uint sccpRemoteSCCPTable_refs;
+	uint sccpRemoteSCCPTable_id;
 	ulong mtpMsId;			/* NoAccess */
 	uint8_t *sccpNetworkEntityId;	/* NoAccess */
 	size_t sccpNetworkEntityIdLen;
@@ -384,8 +448,13 @@ struct sccpRemoteSCCPTable_data {
 	long sccpRemoteSCCPRowStatus;	/* Create */
 };
 struct sccpGtConversionRuleTable_data {
+	struct sccpGtConversionRuleTable_data *sccpGtConversionRuleTable_old;
+	uint sccpGtConversionRuleTable_rsvs;
+	uint sccpGtConversionRuleTable_tsts;
+	uint sccpGtConversionRuleTable_sets;
 	uint sccpGtConversionRuleTable_request;
 	uint sccpGtConversionRuleTable_refs;
+	uint sccpGtConversionRuleTable_id;
 	ulong mtpMsId;			/* NoAccess */
 	uint8_t *sccpNetworkEntityId;	/* NoAccess */
 	size_t sccpNetworkEntityIdLen;
@@ -400,8 +469,13 @@ struct sccpGtConversionRuleTable_data {
 	long sccpGtConversionRuleRowStatus;	/* Create */
 };
 struct sccpAddressInfoTable_data {
+	struct sccpAddressInfoTable_data *sccpAddressInfoTable_old;
+	uint sccpAddressInfoTable_rsvs;
+	uint sccpAddressInfoTable_tsts;
+	uint sccpAddressInfoTable_sets;
 	uint sccpAddressInfoTable_request;
 	uint sccpAddressInfoTable_refs;
+	uint sccpAddressInfoTable_id;
 	ulong mtpMsId;			/* NoAccess */
 	uint8_t *sccpNetworkEntityId;	/* NoAccess */
 	size_t sccpNetworkEntityIdLen;
@@ -415,8 +489,13 @@ struct sccpAddressInfoTable_data {
 	long sccpAddressInfoRowStatus;	/* Create */
 };
 struct sccpGtTranslatorTable_data {
+	struct sccpGtTranslatorTable_data *sccpGtTranslatorTable_old;
+	uint sccpGtTranslatorTable_rsvs;
+	uint sccpGtTranslatorTable_tsts;
+	uint sccpGtTranslatorTable_sets;
 	uint sccpGtTranslatorTable_request;
 	uint sccpGtTranslatorTable_refs;
+	uint sccpGtTranslatorTable_id;
 	ulong mtpMsId;			/* NoAccess */
 	uint8_t *sccpNetworkEntityId;	/* NoAccess */
 	size_t sccpNetworkEntityIdLen;
@@ -432,8 +511,13 @@ struct sccpGtTranslatorTable_data {
 	long sccpGtTranslatorRowStatus;	/* Create */
 };
 struct sccpGtRuleTable_data {
+	struct sccpGtRuleTable_data *sccpGtRuleTable_old;
+	uint sccpGtRuleTable_rsvs;
+	uint sccpGtRuleTable_tsts;
+	uint sccpGtRuleTable_sets;
 	uint sccpGtRuleTable_request;
 	uint sccpGtRuleTable_refs;
+	uint sccpGtRuleTable_id;
 	ulong mtpMsId;			/* NoAccess */
 	uint8_t *sccpNetworkEntityId;	/* NoAccess */
 	size_t sccpNetworkEntityIdLen;
@@ -454,8 +538,13 @@ struct sccpGtRuleTable_data {
 	long sccpGtRuleRowStatus;	/* Create */
 };
 struct sccpSrvtTable_data {
+	struct sccpSrvtTable_data *sccpSrvtTable_old;
+	uint sccpSrvtTable_rsvs;
+	uint sccpSrvtTable_tsts;
+	uint sccpSrvtTable_sets;
 	uint sccpSrvtTable_request;
 	uint sccpSrvtTable_refs;
+	uint sccpSrvtTable_id;
 	ulong mtpMsId;			/* NoAccess */
 	uint8_t *sccpNetworkEntityId;	/* NoAccess */
 	size_t sccpNetworkEntityIdLen;
@@ -833,6 +922,10 @@ void init_sccpMIB(void);
 void deinit_sccpMIB(void);
 int term_sccpMIB(int majorID, int minorID, void *serverarg, void *clientarg);
 FindVarMethod var_sccpMIB;
+struct sccpMIB_data *sccpMIB_create(void);
+struct sccpMIB_data *sccpMIB_duplicate(struct sccpMIB_data *);
+int sccpMIB_destroy(struct sccpMIB_data **);
+int sccpMIB_add(struct sccpMIB_data *);
 void parse_sccpMIB(const char *, char *);
 SNMPCallback store_sccpMIB;
 void refresh_sccpMIB(int);
