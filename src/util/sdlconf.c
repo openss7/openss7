@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2010  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2012  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -292,7 +292,7 @@ copying(int argc, char *argv[])
 --------------------------------------------------------------------------------\n\
 %1$s\n\
 --------------------------------------------------------------------------------\n\
-Copyright (c) 2008-2010  Monavacon Limited <http://www.monavacon.com/>\n\
+Copyright (c) 2008-2012  Monavacon Limited <http://www.monavacon.com/>\n\
 Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>\n\
 Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>\n\
 \n\
@@ -339,7 +339,7 @@ version(int argc, char *argv[])
 %1$s (OpenSS7 %2$s) %3$s (%4$s)\n\
 Written by Brian Bidulock.\n\
 \n\
-Copyright (c) 2008, 2009  Monavacon Limited.\n\
+Copyright (c) 2008, 2009, 2010, 2011, 2012  Monavacon Limited.\n\
 Copyright (c) 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008  OpenSS7 Corporation.\n\
 Copyright (c) 1997, 1998, 1999, 2000, 2001  Brian F. G. Bidulock.\n\
 This is free software; see the source for copying conditions.  There is NO\n\
@@ -503,7 +503,6 @@ show_config(sdl_config_t * cfg, int get)
 	}
 }
 
-#if 0
 void
 show_stats(sdl_stats_t * sta)
 {
@@ -519,20 +518,18 @@ show_stats(sdl_stats_t * sta)
 	printf("  lead_dcd_lost:       %12u\n", sta->lead_dcd_lost);
 	printf("  carrier_lost:        %12u\n", sta->carrier_lost);
 }
-#endif
 
-#define BUFSIZE 128
+#define BUFSIZE 512
 
 void
 sdlconf_get(void)
 {
-	sdl_config_t cfg;
-#if 0
-	sdl_stats_t sta;
-#endif
-	struct strioctl ctl;
-	char cbuf[BUFSIZE];
-	char dbuf[BUFSIZE];
+	sdl_config_t cfg = {};
+	sdl_stats_t sta = {};
+
+	struct strioctl ctl = {};
+	char cbuf[BUFSIZE] = {};
+	char dbuf[BUFSIZE] = {};
 	struct strbuf ctrl = { sizeof(*cbuf), 0, cbuf };
 	struct strbuf data = { sizeof(*dbuf), 0, dbuf };
 	union LMI_primitives *p = (union LMI_primitives *) cbuf;
@@ -584,7 +581,6 @@ sdlconf_get(void)
 		perror(__FUNCTION__);
 		exit(1);
 	}
-#if 0
 	ctl.ic_cmd = SDL_IOCGSTATS;
 	ctl.ic_timout = 0;
 	ctl.ic_len = sizeof(sta);
@@ -593,7 +589,6 @@ sdlconf_get(void)
 		perror(__FUNCTION__);
 		exit(1);
 	}
-#endif
 	ctrl.maxlen = BUFSIZE;
 	ctrl.len = sizeof(p->detach_req);
 	ctrl.buf = cbuf;
@@ -604,19 +599,17 @@ sdlconf_get(void)
 	}
 	if (output) {
 		show_config(&cfg, 1);
-#if 0
 		show_stats(&sta);
-#endif
 	}
 }
 
 void
 sdlconf_set(void)
 {
-	sdl_config_t cfg;
-	struct strioctl ctl;
-	char cbuf[BUFSIZE];
-	char dbuf[BUFSIZE];
+	sdl_config_t cfg = {};
+	struct strioctl ctl = {};
+	char cbuf[BUFSIZE] = {};
+	char dbuf[BUFSIZE] = {};
 	struct strbuf ctrl = { sizeof(*cbuf), 0, cbuf };
 	struct strbuf data = { sizeof(*dbuf), 0, dbuf };
 	union LMI_primitives *p = (union LMI_primitives *) cbuf;

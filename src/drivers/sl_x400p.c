@@ -529,7 +529,7 @@ typedef struct st {
 	uint32_t LCVs;			/* line coding [violations] */
 	uint32_t FASEs;			/* frame alignment [errors] */
 	uint32_t FABEs;			/* error bit [errors] */
-	uint32_t FEBEs;
+	uint32_t FEBEs;			/* far end block errors [errors] */
 	uint32_t ValidData;		/* valid data */
 } st_t;
 
@@ -7974,7 +7974,6 @@ sl_lsc_no_processor_outage(struct ch *ch)
 	if (ch->sl.statem.lsc_state == SL_STATE_PROCESSOR_OUTAGE) {
 		ch->sl.statem.processor_outage = 0;
 		if (!ch->sl.statem.l3_indication_received) {
-			trace();
 			return;
 		}
 		ch->sl.statem.l3_indication_received = 0;
@@ -8705,7 +8704,6 @@ sl_lsc_continue(struct ch *ch)
 	if (ch->sl.statem.lsc_state == SL_STATE_PROCESSOR_OUTAGE) {
 		ch->sl.statem.l3_indication_received = 1;
 		if (ch->sl.statem.processor_outage) {
-			trace();
 			return;
 		}
 		ch->sl.statem.l3_indication_received = 0;
@@ -11421,10 +11419,6 @@ lmi_attach_req(struct xp *xp, queue_t *q, mblk_t *mp)
 	lmi_attach_req_t *p = ((typeof(p)) mp->b_rptr);
 	uint16_t ppa;
 	int card, span, chan;
-	struct cd *cd;
-	struct sp *sp;
-	struct ch *ch;
-	psw_t flags;
 
 	if (!MBLKIN(mp, 0, sizeof(*p)))
 		goto badprim;
@@ -11436,32 +11430,36 @@ lmi_attach_req(struct xp *xp, queue_t *q, mblk_t *mp)
 		goto badppa;
 	xp_set_state(xp, LMI_ATTACH_PENDING);
 	ppa = *(typeof(ppa) *) (mp->b_rptr + p->lmi_ppa_offset);
-	write_lock_irqsave(&xp_core_lock, flags);
+	read_lock(&xp_core_lock);
 	{
+		struct cd *cd;
+		struct sp *sp;
+		struct ch *ch;
+
 		/* check card */
 		card = (ppa >> 12) & 0x0f;
 		if (card < 0 || card > X400_CARDS - 1) {
-			write_unlock_irqrestore(&xp_core_lock, flags);
+			read_unlock(&xp_core_lock);
 			goto badcard;
 		}
 		if (!(cd = x400p_cards[card])) {
-			write_unlock_irqrestore(&xp_core_lock, flags);
+			read_unlock(&xp_core_lock);
 			goto nocard;
 		}
 		/* check span */
 		span = (ppa >> 8) & 0x0f;
 		if (span < 0 || span > X400_SPANS - 1) {
-			write_unlock_irqrestore(&xp_core_lock, flags);
+			read_unlock(&xp_core_lock);
 			goto badspan;
 		}
 		if (!(sp = cd->spans[span])) {
-			write_unlock_irqrestore(&xp_core_lock, flags);
+			read_unlock(&xp_core_lock);
 			goto nospan;
 		}
 #ifdef DEBUG
 		if (sp->config.ifgtype != SDL_GTYPE_E1 && sp->config.ifgtype != SDL_GTYPE_T1
 		    && sp->config.ifgtype != SDL_GTYPE_J1) {
-			write_unlock_irqrestore(&xp_core_lock, flags);
+			read_unlock(&xp_core_lock);
 			swerr();
 			goto efault;
 		}
@@ -11471,27 +11469,28 @@ lmi_attach_req(struct xp *xp, queue_t *q, mblk_t *mp)
 		switch (sp->config.ifgtype) {
 		case SDL_GTYPE_E1:
 			if (chan < 0 || chan > 31) {
-				write_unlock_irqrestore(&xp_core_lock, flags);
+				read_unlock(&xp_core_lock);
 				goto badchan;
 			}
 			break;
 		case SDL_GTYPE_T1:
 		case SDL_GTYPE_J1:
 			if (chan < 0 || chan > 24) {
-				write_unlock_irqrestore(&xp_core_lock, flags);
+				read_unlock(&xp_core_lock);
 				goto badchan;
 			}
 			break;
 		default:
-			write_unlock_irqrestore(&xp_core_lock, flags);
+			read_unlock(&xp_core_lock);
 			goto badppa;
 		}
 		if (!(ch = sp->chans[chan])) {
-			write_unlock_irqrestore(&xp_core_lock, flags);
+			read_unlock(&xp_core_lock);
 			goto nochan;
 		}
+#if 0
 		if ((ch = sp->chans[0]) && ch->xp) {
-			write_unlock_irqrestore(&xp_core_lock, flags);
+			read_unlock(&xp_core_lock);
 			goto chanbusy;
 		}
 		if (chan == 0) {
@@ -11523,14 +11522,17 @@ lmi_attach_req(struct xp *xp, queue_t *q, mblk_t *mp)
 				if (ch->xp)
 					goto chanbusy;
 		}
+#endif
 		ch = sp->chans[chan];
 		xp->card = card;
 		xp->span = span;
 		xp->chan = chan;
 		xp->ch = ch_get(ch);
+#if 0
 		ch->xp = xp;
+#endif
 	}
-	write_unlock_irqrestore(&xp_core_lock, flags);
+	read_unlock(&xp_core_lock);
 	LOGNO(xp2sid(xp), "INFO: attached card %d, span %d, chan %d", card, span, chan);
 	lmi_ok_ack(xp, q, mp, LMI_DISABLED, LMI_ATTACH_REQ);
 	return (0);
@@ -11562,9 +11564,11 @@ lmi_attach_req(struct xp *xp, queue_t *q, mblk_t *mp)
       nochan:
 	LOGNO(xp2sid(xp), "%s: ERROR: unallocated chan %d", __FUNCTION__, chan);
 	goto badppa;
+#if 0
       chanbusy:
 	LOGNO(xp2sid(xp), "%s: ERROR: already in use, chan %d", __FUNCTION__, chan);
 	goto badppa;
+#endif
       badppa:
 	return (-EADDRNOTAVAIL);
 }
@@ -11597,9 +11601,6 @@ lmi_detach_req(struct xp *xp, queue_t *q, mblk_t *mp)
 			goto efault;
 		}
 #endif
-		/*  FIXME: This is not enough: when we detach from the channel we must hold a plumbing write lock
-		 *  that is held by the channel code as a plumbing read lock when dereferencing ch->xp. */
-		ch->xp = NULL;
 		ch_put(ch);
 		xp->card = -1;
 		xp->span = -1;
@@ -11644,94 +11645,76 @@ startup_span(struct sp *sp)
   *
   * LMI_ENABLE_REQ used to configure the timeslot for operation and start up the span if it was not
   * already started, 
+  *
+  * We use to bind the xp structure to the ch structure when performing an attach.  However, this
+  * meant that one could not open a signalling link, attach to a ppa, perform some ioctls, and then
+  * detach and close.  What we do now is a semi-attachment: we link the xp structure to the ch
+  * structure but no vise versa.  The ch structure is only linked back to a xp structure on enable.
   */
 noinline fastcall __unlikely int
 lmi_enable_req(struct xp *xp, queue_t *q, mblk_t *mp)
 {
-	struct ch *ch = xp->ch;
-	struct cd *cd;
+	struct ch *ch;
 	struct sp *sp;
+	psw_t flags;
+	int chan = xp->chan;
 
 	/* validate enable */
 	if (xp_get_state(xp) != LMI_DISABLED)
 		goto outstate;
+	if (!(ch = xp->ch)) {
+		ptrace(("%s: ERROR: out of state: no chan pointer\n", DRV_NAME));
+		goto outstate;
+	}
 	if (!(sp = ch->sp)) {
 		ptrace(("%s: ERROR: out of state: no span pointer\n", DRV_NAME));
 		goto outstate;
 	}
-	if (!(cd = sp->cd)) {
-		ptrace(("%s: ERROR: out of state: no card pointer\n", DRV_NAME));
-		goto outstate;
-	}
-#ifdef _DEBUG
-	if (cd->config.ifgtype != SDL_GTYPE_E1 && cd->config.ifgtype != SDL_GTYPE_T1
-	    && cd->config.ifgtype != SDL_GTYPE_J1) {
-		ptrace(("%s: ERROR: card group type = %u\n", DRV_NAME, cd->config.ifgtype));
-		return m_error(xp, q, mp, EFAULT);
-	}
-#endif
-	if (ch->sdl.config.ifflags & SDL_IF_UP) {
-		ptrace(("%s: ERROR: out of state: device already up\n", DRV_NAME));
-		goto outstate;
-	}
-	/* commit enable */
 	printd(("%s: %p: performing enable\n", DRV_NAME, xp));
 	xp_set_state(xp, LMI_ENABLE_PENDING);
-#if 0
-	/* Don't do this here.  Previously we configured the channels when they were enabled;
-	 * however, this was because the channel data was part of the xp structure.  Defaults
-	 * are now set when channel is allocated. */
-	ch->sdl.config.ifname = sp->config.ifname;
-#endif
-	ch->sdl.config.ifflags |= SDL_IF_UP;
-#if 0
-	/* Same as above. */
-	ch->sdl.config.iftype = ch->sdl.config.iftype;
-	switch (ch->sdl.config.iftype) {
-	case SDL_TYPE_DS0A:
-		ch->sdl.config.ifrate = 56000;
-		ch->sdl.config.ifblksize = 8;
-		break;
-	case SDL_TYPE_DS0:
-		ch->sdl.config.ifrate = 64000;
-		ch->sdl.config.ifblksize = 8;
-		break;
-	case SDL_TYPE_E1:
-		ch->sdl.config.ifrate = 2048000;
-		ch->sdl.config.ifblksize = 64;
-		break;
-	case SDL_TYPE_T1:
-		ch->sdl.config.ifrate = 1544000;
-		ch->sdl.config.ifblksize = 64;
-		break;
-	case SDL_TYPE_J1:
-		ch->sdl.config.ifrate = 1544000;
-		ch->sdl.config.ifblksize = 64;
-		break;
+	spin_lock_irqsave(&ch->lock, flags);
+	{
+		if (ch->sdl.config.ifflags & SDL_IF_UP) {
+			spin_unlock_irqrestore(&ch->lock, flags);
+			ptrace(("%s: ERROR: out of state: device already up\n", DRV_NAME));
+			goto outstate;
+		}
+		if (ch->xp != NULL) {
+			spin_unlock_irqrestore(&ch->lock, flags);
+			goto chanbusy;
+		}
+		if (chan == 0) {
+			int c;
+
+			for (c = 1; c < 32; c++) {
+				if (sp->chans[c] == NULL)
+					continue;
+				if (sp->chans[c]->xp != NULL) {
+					spin_unlock_irqrestore(&ch->lock, flags);
+					goto chanbusy;
+				}
+			}
+		} else {
+			if (sp->chans[0]->xp != NULL) {
+				spin_unlock_irqrestore(&ch->lock, flags);
+				goto chanbusy;
+			}
+		}
+		/* commit enable */
+		ch->xp = xp;
+		ch->sdl.config.ifflags |= SDL_IF_UP;
 	}
-	ch->sdl.config.ifgtype = sp->config.ifgtype;
-	ch->sdl.config.ifgrate = sp->config.ifgrate;
-	ch->sdl.config.ifmode = sp->config.ifmode;
-	ch->sdl.config.ifgmode = sp->config.ifgmode;
-	ch->sdl.config.ifgcrc = sp->config.ifgcrc;
-	ch->sdl.config.ifclock = sp->config.ifclock;
-	ch->sdl.config.ifcoding = sp->config.ifcoding;
-	ch->sdl.config.ifframing = sp->config.ifframing;
-	ch->sdl.config.ifblksize = sp->config.ifblksize;
-	ch->sdl.config.ifleads = sp->config.ifleads;
-	ch->sdl.config.ifbpv = sp->config.ifbpv;
-	ch->sdl.config.ifalarms = sp->config.ifalarms;
-	ch->sdl.config.ifrxlevel = sp->config.ifrxlevel;
-	ch->sdl.config.iftxlevel = sp->config.iftxlevel;
-	ch->sdl.config.ifsync = cd->config.ifsync;
-#endif
-	xp_set_state(xp, LMI_ENABLED);
+	spin_unlock_irqrestore(&ch->lock, flags);
 	startup_span(sp);
+	xp_set_state(xp, LMI_ENABLED);
 	lmi_enable_con(xp, q, mp);
 	return (0);
       outstate:
 	LOGNO(xp2sid(xp), "%s: ERROR: out of state: state = %u", __FUNCTION__, xp_get_state(xp));
 	return (-EPROTO);
+      chanbusy:
+	LOGNO(xp2sid(xp), "%s: ERROR: already in use, chan %d", __FUNCTION__, chan);
+	return (-EADDRNOTAVAIL);
 }
 
 /** lmi_disable_req: - process LMI_DISABLE_REQ primitive
@@ -11805,6 +11788,8 @@ lmi_disable_req(struct xp *xp, queue_t *q, mblk_t *mp)
 				freemsg(xchg(&ch->rx.cmp, NULL));
 			bzero(&ch->tx, sizeof(ch->tx));
 			bzero(&ch->rx, sizeof(ch->tx));
+			if (ch->xp == xp)
+				ch->xp = NULL;
 		}
 		spin_unlock_irqrestore(&cd->lock, flags);
 	} else
@@ -15966,16 +15951,22 @@ mx_iocsoption(queue_t *q, mblk_t *mp, mblk_t *dp)
 noinline __unlikely int
 mx_ioclconfig(queue_t *q, mblk_t *mp, mblk_t *dp)
 {
-	mx_config_t *arg = (typeof(arg)) dp->b_rptr;
-	uint num = 0, *val = (typeof(val)) (arg + 1);
+	mx_config_t *hdr, *arg = (typeof(arg)) dp->b_rptr;
+	uint num = 0, *val, can = arg->id;
 	struct cd *cd;
 	struct sp *sp;
 	uint card, span, chan;
+	mblk_t *db;
+
+	if (!(db = mi_copyout_alloc(q, mp, 0, sizeof(*hdr) + can * sizeof(*val), 0)))
+		return (-ENOSR);
+	*(hdr = (typeof(hdr)) db->b_rptr) = *arg;
+	val = (typeof(val)) (hdr + 1);
 
 	switch (arg->type) {
 	case MX_OBJ_TYPE_DFLT:	/* defaults */
 		/* list all default objects: there is always only one */
-		if ((unsigned char *) (val + 1) <= mp->b_cont->b_wptr)
+		if ((unsigned char *) (val + 1) <= db->b_wptr)
 			*val = 0;
 		val++;
 		num++;
@@ -15989,8 +15980,10 @@ mx_ioclconfig(queue_t *q, mblk_t *mp, mblk_t *dp)
 		for (card = 0; card < X400_CARDS; card++) {
 			if (!(cd = x400p_cards[card]))
 				continue;
-			if ((unsigned char *) (val + 1) <= mp->b_cont->b_wptr)
+			if ((unsigned char *) (val + 1) <= db->b_wptr)
 				*val = (cd->card << 12);
+			val++;
+			num++;
 		}
 		break;
 	case MX_OBJ_TYPE_SPAN:	/* span */
@@ -15999,7 +15992,7 @@ mx_ioclconfig(queue_t *q, mblk_t *mp, mblk_t *dp)
 			if (!(cd = x400p_cards[card]))
 				continue;
 			for (span = 0; span < X400_SPANS; span++, val++, num++)
-				if ((unsigned char *) (val + 1) <= mp->b_cont->b_wptr)
+				if ((unsigned char *) (val + 1) <= db->b_wptr)
 					*val = (cd->card << 12) | (span << 8);
 		}
 		break;
@@ -16014,17 +16007,17 @@ mx_ioclconfig(queue_t *q, mblk_t *mp, mblk_t *dp)
 				switch (sp->config.ifgtype) {
 				case SDL_GTYPE_E1:
 					for (chan = 1; chan <= 31; chan++, val++, num++)
-						if ((unsigned char *) (val + 1) <= mp->b_cont->b_wptr)
+						if ((unsigned char *) (val + 1) <= db->b_wptr)
 							*val = (cd->card << 12) | (span << 8) | (chan << 0);
 					break;
 				case SDL_GTYPE_T1:
 					for (chan = 1; chan <= 24; chan++, val++, num++)
-						if ((unsigned char *) (val + 1) <= mp->b_cont->b_wptr)
+						if ((unsigned char *) (val + 1) <= db->b_wptr)
 							*val = (cd->card << 12) | (span << 8) | (chan << 0);
 					break;
 				case SDL_GTYPE_J1:
 					for (chan = 1; chan <= 24; chan++, val++, num++)
-						if ((unsigned char *) (val + 1) <= mp->b_cont->b_wptr)
+						if ((unsigned char *) (val + 1) <= db->b_wptr)
 							*val = (cd->card << 12) | (span << 8) | (chan << 0);
 					break;
 				}
@@ -16046,8 +16039,11 @@ mx_ioclconfig(queue_t *q, mblk_t *mp, mblk_t *dp)
 	default:
 		goto einval;
 	}
-	mp->b_cont->b_wptr = (unsigned char *) val;
-	return (num);
+	if (db->b_wptr > (unsigned char *) val)
+		db->b_wptr = (unsigned char *) val;
+	hdr->id = num > can ? can : num;
+	mi_copy_set_rval(mp, num);
+	return (0);
       einval:
 	return (-EINVAL);
 }
@@ -17400,15 +17396,15 @@ mx_iocgstatus_card(struct cd *cd, mx_status_t * arg)
 			val->mxCardAvailabilityStatus = 0;
 		val->mxCardAlarmStatus = 0;
 		if (alarms & SDL_ALARM_YEL) {
-			val->mxCardAlarmStatus |= X721_ALARMSTATUS_MINOR;
+			val->mxCardAlarmStatus |= (1 << X721_ALARMSTATUS_MINOR);
 			val->mxCardAvailabilityStatus |= (1 << X721_AVAILABILITYSTATUS_DEGRADED);
 		}
 		if (alarms & SDL_ALARM_RED) {
-			val->mxCardAlarmStatus |= X721_ALARMSTATUS_MAJOR;
+			val->mxCardAlarmStatus |= (1 << X721_ALARMSTATUS_MAJOR);
 			val->mxCardAvailabilityStatus |= (1 << X721_AVAILABILITYSTATUS_FAILED);
 		}
 		if (alarms & SDL_ALARM_BLU) {
-			val->mxCardAlarmStatus |= X721_ALARMSTATUS_ALARMOUTSTANDING;
+			val->mxCardAlarmStatus |= (1 << X721_ALARMSTATUS_ALARMOUTSTANDING);
 			val->mxCardAvailabilityStatus |= (1 << X721_AVAILABILITYSTATUS_DEPENDENCY);
 		}
 	}
@@ -17487,17 +17483,17 @@ mx_iocgstatus_span(struct sp *sp, mx_status_t * arg)
 		val->mxSpanAlarms = 0;
 		if (sp->config.ifalarms & SDL_ALARM_YEL) {
 			val->mxSpanAlarms |= (1 << MXSPANALARMS_YELLOW);
-			val->mxSpanAlarmStatus |= X721_ALARMSTATUS_MINOR;
+			val->mxSpanAlarmStatus |= (1 << X721_ALARMSTATUS_MINOR);
 			val->mxSpanAvailabilityStatus |= (1 << X721_AVAILABILITYSTATUS_DEGRADED);
 		}
 		if (sp->config.ifalarms & SDL_ALARM_RED) {
 			val->mxSpanAlarms |= (1 << MXSPANALARMS_RED);
-			val->mxSpanAlarmStatus |= X721_ALARMSTATUS_MAJOR;
+			val->mxSpanAlarmStatus |= (1 << X721_ALARMSTATUS_MAJOR);
 			val->mxSpanAvailabilityStatus |= (1 << X721_AVAILABILITYSTATUS_FAILED);
 		}
 		if (sp->config.ifalarms & SDL_ALARM_BLU) {
 			val->mxSpanAlarms |= (1 << MXSPANALARMS_BLUE);
-			val->mxSpanAlarmStatus |= X721_ALARMSTATUS_ALARMOUTSTANDING;
+			val->mxSpanAlarmStatus |= (1 << X721_ALARMSTATUS_ALARMOUTSTANDING);
 			val->mxSpanAvailabilityStatus |= (1 << X721_AVAILABILITYSTATUS_DEPENDENCY);
 		}
 		if (sp->config.ifalarms & SDL_ALARM_REC)
@@ -17588,15 +17584,15 @@ mx_iocgstatus_chan(struct sp *sp, struct ch *ch, mx_status_t * arg)
 			val->mxChanAvailabilityStatus = 0;
 		if (ch) {
 			if (ch->sp->config.ifalarms & SDL_ALARM_YEL) {
-				val->mxChanAlarmStatus |= X721_ALARMSTATUS_MINOR;
+				val->mxChanAlarmStatus |= (1 << X721_ALARMSTATUS_MINOR);
 				val->mxChanAvailabilityStatus |= (1 << X721_AVAILABILITYSTATUS_DEGRADED);
 			}
 			if (ch->sp->config.ifalarms & SDL_ALARM_RED) {
-				val->mxChanAlarmStatus |= X721_ALARMSTATUS_MAJOR;
+				val->mxChanAlarmStatus |= (1 << X721_ALARMSTATUS_MAJOR);
 				val->mxChanAvailabilityStatus |= (1 << X721_AVAILABILITYSTATUS_FAILED);
 			}
 			if (ch->sp->config.ifalarms & SDL_ALARM_BLU) {
-				val->mxChanAlarmStatus |= X721_ALARMSTATUS_ALARMOUTSTANDING;
+				val->mxChanAlarmStatus |= (1 << X721_ALARMSTATUS_ALARMOUTSTANDING);
 				val->mxChanAvailabilityStatus |= (1 << X721_AVAILABILITYSTATUS_DEPENDENCY);
 			}
 		}
@@ -17892,17 +17888,54 @@ noinline __unlikely int
 mx_iocgstats_span(struct sp *sp, mx_stats_t * arg)
 {
 	struct mx_stats_span *val = (typeof(val)) (arg + 1);
-	struct st *st;
+	uint interval, valid, invalid;
+	struct st *st, total;
 
 	/* FIXME: get these */
 	bzero(val, sizeof(*val));
-	if (arg->interval > 96)
-		return (-EINVAL);
+	for (valid = 0, invalid = 0, interval = 0; interval < 96; interval++) {
+		st = &sp->hist[interval];
+
+		if (st->ValidData)
+			valid++;
+		else
+			invalid++;
+	}
+	val->mxValidIntervals = valid;
+	val->mxInvalidIntervals = invalid;
+	
 	if (arg->interval == 0)
 		st = &sp->stats[2];
+	else if (arg->interval > 96 && arg->interval != 0xffffffff)
+		return (-EINVAL);
 	else if (sp->hist == NULL)
 		return (-EINVAL);
-	else
+	else if (arg->interval == 0xffffffff) {
+		bzero(&total, sizeof(total));
+		for (interval = 0; interval < 96; interval++) {
+			st = &sp->hist[interval];
+
+			if (st->ValidData) {
+				total.ESs += st->ESs;
+				total.SESs += st->SESs;
+				total.UASs += st->UASs;
+				total.CSSs += st->CSSs;
+				total.PCVs += st->PCVs;
+				total.LESs += st->LESs;
+				total.BESs += st->BESs;
+				total.DMs += st->DMs;
+				total.LCVs += st->LCVs;
+				total.FASEs += st->FASEs;
+				total.FABEs += st->FABEs;
+				total.FEBEs += st->FEBEs;
+			}
+		}
+		if (valid)
+			total.ValidData = 2; /* true(2) */
+		else
+			total.ValidData = 1; /* false(1) */
+		st = &total;
+	} else
 		st = &sp->hist[(sp->curr + (arg->interval - 1)) % 96];
 	val->mxNearEndESs = st->ESs;
 	val->mxNearEndSESs = st->SESs;
@@ -17913,7 +17946,11 @@ mx_iocgstats_span(struct sp *sp, mx_stats_t * arg)
 	val->mxNearEndBESs = st->BESs;
 	val->mxNearEndDMs = st->DMs;
 	val->mxNearEndLCVs = st->LCVs;
+	val->mxNearEndFASEs = st->FASEs;
+	val->mxNearEndFABEs = st->FABEs;
+	val->mxNearEndFEBEs = st->FEBEs;
 	val->mxNearEndValidData = st->ValidData;
+	/* FIXME: don't support far-end collection yet... */
 	val->mxFarEndESs = 0;
 	val->mxFarEndSESs = 0;
 	val->mxFarEndUASs = 0;
@@ -17922,7 +17959,7 @@ mx_iocgstats_span(struct sp *sp, mx_stats_t * arg)
 	val->mxFarEndLESs = 0;
 	val->mxFarEndBESs = 0;
 	val->mxFarEndDMs = 0;
-	val->mxFarEndValidData = 0;
+	val->mxFarEndValidData = 1; /* false(1) */
 	return (0);
 }
 
@@ -18920,7 +18957,6 @@ noinline __unlikely int
 sdl_test_config(struct ch *ch, sdl_config_t * arg)
 {
 	if (arg->ifflags) {
-		trace();
 		return (-EINVAL);
 	}
 	switch (arg->iftype) {
@@ -18933,24 +18969,20 @@ sdl_test_config(struct ch *ch, sdl_config_t * arg)
 		break;
 	case SDL_TYPE_E1:	/* full E1 span */
 		if (ch->sp->config.ifgtype != SDL_GTYPE_E1) {
-			trace();
 			return (-EINVAL);
 		}
 		break;
 	case SDL_TYPE_T1:	/* full T1 span */
 		if (ch->sp->config.ifgtype != SDL_GTYPE_T1) {
-			trace();
 			return (-EINVAL);
 		}
 		break;
 	case SDL_TYPE_J1:	/* full J1 span */
 		if (ch->sp->config.ifgtype != SDL_GTYPE_T1 && ch->sp->config.ifgtype != SDL_GTYPE_J1) {
-			trace();
 			return (-EINVAL);
 		}
 		break;
 	default:
-		trace();
 		return (-EINVAL);
 	}
 	switch (arg->ifmode) {
@@ -18966,7 +18998,6 @@ sdl_test_config(struct ch *ch, sdl_config_t * arg)
 	case SDL_MODE_TEST:	/* */
 		break;
 	default:
-		trace();
 		return (-EINVAL);
 	}
 	switch (arg->ifgmode) {
@@ -18975,7 +19006,6 @@ sdl_test_config(struct ch *ch, sdl_config_t * arg)
 		break;
 	case SDL_GMODE_REM_LB:
 	default:
-		trace();
 		return (-EINVAL);
 	}
 	if (ch->sp) {
@@ -18987,12 +19017,10 @@ sdl_test_config(struct ch *ch, sdl_config_t * arg)
 		case SDL_GTYPE_T1:	/* */
 		case SDL_GTYPE_J1:	/* */
 			if (arg->ifgtype != ch->sp->config.ifgtype) {
-				trace();
 				return (-EINVAL);
 			}
 			break;
 		default:
-			trace();
 			return (-EINVAL);
 		}
 		switch (arg->ifgcrc) {
@@ -19008,36 +19036,30 @@ sdl_test_config(struct ch *ch, sdl_config_t * arg)
 				arg->ifgcrc = SDL_GCRC_CRC6J;
 				break;
 			default:
-				trace();
 				return (-EINVAL);
 			}
 			break;
 		case SDL_GCRC_CRC4:	/* */
 			if (arg->ifgtype != SDL_GTYPE_E1) {
-				trace();
 				return (-EINVAL);
 			}
 			break;
 		case SDL_GCRC_CRC5:	/* */
 			if (arg->ifgtype != SDL_GTYPE_E1) {
-				trace();
 				return (-EINVAL);
 			}
 			break;
 		case SDL_GCRC_CRC6:	/* */
 			if (arg->ifgtype != SDL_GTYPE_T1) {
-				trace();
 				return (-EINVAL);
 			}
 			break;
 		case SDL_GCRC_CRC6J:
 			if (arg->ifgtype != SDL_GTYPE_J1) {
-				trace();
 				return (-EINVAL);
 			}
 			break;
 		default:
-			trace();
 			return (-EINVAL);
 		}
 		switch (arg->ifclock) {
@@ -19051,7 +19073,6 @@ sdl_test_config(struct ch *ch, sdl_config_t * arg)
 		case SDL_CLOCK_LOOP:	/* */
 			break;
 		default:
-			trace();
 			return (-EINVAL);
 		}
 		switch (arg->ifcoding) {
@@ -19062,19 +19083,16 @@ sdl_test_config(struct ch *ch, sdl_config_t * arg)
 			break;
 		case SDL_CODING_B8ZS:	/* */
 			if (arg->ifgtype != SDL_GTYPE_T1 && arg->ifgtype != SDL_GTYPE_J1) {
-				trace();
 				return (-EINVAL);
 			}
 			break;
 		case SDL_CODING_HDB3:	/* */
 			if (arg->ifgtype != SDL_GTYPE_E1) {
-				trace();
 				return (-EINVAL);
 			}
 			break;
 		default:
 		case SDL_CODING_B6ZS:	/* */
-			trace();
 			return (-EINVAL);
 		}
 		switch (arg->ifframing) {
@@ -19084,19 +19102,16 @@ sdl_test_config(struct ch *ch, sdl_config_t * arg)
 		case SDL_FRAMING_CCS:	/* */
 		case SDL_FRAMING_CAS:	/* */
 			if (arg->ifgtype != SDL_GTYPE_E1) {
-				trace();
 				return (-EINVAL);
 			}
 			break;
 		case SDL_FRAMING_SF:	/* */
 		case SDL_FRAMING_ESF:	/* */
 			if (arg->ifgtype != SDL_GTYPE_T1 && arg->ifgtype != SDL_GTYPE_J1) {
-				trace();
 				return (-EINVAL);
 			}
 			break;
 		default:
-			trace();
 			return (-EINVAL);
 		}
 		if (arg->iftxlevel == 0)
@@ -19104,7 +19119,6 @@ sdl_test_config(struct ch *ch, sdl_config_t * arg)
 		else if (arg->iftxlevel <= 16)
 			arg->iftxlevel--;
 		else {
-			trace();
 			return (-EINVAL);
 		}
 		if (ch->sp->cd) {
@@ -19112,15 +19126,12 @@ sdl_test_config(struct ch *ch, sdl_config_t * arg)
 
 			for (src = 0; src < SDL_SYNCS; src++)
 				if (arg->ifsyncsrc[src] < 0 || arg->ifsyncsrc[src] > 4) {
-					trace();
 					return (-EINVAL);
 				}
 		} else {
-			trace();
 			return (-EINVAL);
 		}
 	} else {
-		trace();
 		return (-EINVAL);
 	}
 	return (0);
@@ -23316,6 +23327,7 @@ xp_t1_process_stats(struct sp *sp, register uint errors)
 	sp->stats[1].LCVs += sp->stats[0].LCVs;
 	sp->stats[1].FASEs += sp->stats[0].FASEs;
 	sp->stats[1].FABEs += sp->stats[0].FABEs;
+	sp->stats[1].FEBEs += sp->stats[0].FEBEs;
 	bzero(&sp->stats[0], sizeof(sp->stats[0]));
 
 	if ((++sp->stats[1].SECs) == 60) {
@@ -23338,6 +23350,7 @@ xp_t1_process_stats(struct sp *sp, register uint errors)
 		sp->stats[2].LCVs += sp->stats[1].LCVs;
 		sp->stats[2].FASEs += sp->stats[1].FASEs;
 		sp->stats[2].FABEs += sp->stats[1].FABEs;
+		sp->stats[2].FEBEs += sp->stats[1].FEBEs;
 		bzero(&sp->stats[1], sizeof(sp->stats[1]));
 
 		if ((sp->stats[2].SECs += 60) == 900) {
@@ -24908,6 +24921,7 @@ xp_e1_process_stats(struct sp *sp, register uint errors)
 	sp->stats[1].LCVs += sp->stats[0].LCVs;
 	sp->stats[1].FASEs += sp->stats[0].FASEs;
 	sp->stats[1].FABEs += sp->stats[0].FABEs;
+	sp->stats[1].FEBEs += sp->stats[0].FEBEs;
 	bzero(&sp->stats[0], sizeof(sp->stats[0]));
 
 	if ((++sp->stats[1].SECs) == 60) {
@@ -24931,6 +24945,7 @@ xp_e1_process_stats(struct sp *sp, register uint errors)
 		sp->stats[2].LCVs += sp->stats[1].LCVs;
 		sp->stats[2].FASEs += sp->stats[1].FASEs;
 		sp->stats[2].FABEs += sp->stats[1].FABEs;
+		sp->stats[2].FEBEs += sp->stats[1].FEBEs;
 		bzero(&sp->stats[1], sizeof(sp->stats[1]));
 
 		if ((sp->stats[2].SECs += 60) == 900) {
@@ -27591,6 +27606,7 @@ xp_x1_process_stats(struct sp *sp, register uint errors)
 	sp->stats[1].LCVs += sp->stats[0].LCVs;
 	sp->stats[1].FASEs += sp->stats[0].FASEs;
 	sp->stats[1].FABEs += sp->stats[0].FABEs;
+	sp->stats[1].FEBEs += sp->stats[0].FEBEs;
 	bzero(&sp->stats[0], sizeof(sp->stats[0]));
 
 	if ((++sp->stats[1].SECs) == 60) {
@@ -27613,6 +27629,7 @@ xp_x1_process_stats(struct sp *sp, register uint errors)
 		sp->stats[2].LCVs += sp->stats[1].LCVs;
 		sp->stats[2].FASEs += sp->stats[1].FASEs;
 		sp->stats[2].FABEs += sp->stats[1].FABEs;
+		sp->stats[2].FESEs += sp->stats[1].FESEs;
 		bzero(&sp->stats[1], sizeof(sp->stats[1]));
 
 		if ((sp->stats[2].SECs += 60) == 900) {
@@ -27854,6 +27871,7 @@ dsx_copyin2(queue_t *q, mblk_t *mp, struct xp *xp, struct copyresp *cp, mblk_t *
 	}
 	return (err);
       eproto:
+	__swerr();
 	return (-EPROTO);
       einval:
 	return (-EINVAL);
@@ -28058,6 +28076,7 @@ mx_copyin2(queue_t *q, mblk_t *mp, struct xp *xp, struct copyresp *cp, mblk_t *d
 	}
 	return (err);
       eproto:
+	__swerr();
 	return (-EPROTO);
       einval:
 	return (-EINVAL);
@@ -28193,6 +28212,7 @@ noinline fastcall __unlikely int
 sl_copyin2(queue_t *q, mblk_t *mp, struct xp *xp, struct copyresp *cp, mblk_t *dp)
 {
 	/* SL has no copyin2 stage. */
+	__swerr();
 	return (-EPROTO);
 }
 
@@ -28235,6 +28255,7 @@ sl_copyin(queue_t *q, mblk_t *mp, struct xp *xp, struct copyresp *cp, mblk_t *dp
 			err = sl_ioccnotify(ch, dp);
 			break;
 		default:
+			__swerr();
 			err = -EPROTO;
 			break;
 		}
@@ -28337,6 +28358,7 @@ noinline fastcall __unlikely int
 sdt_copyin2(queue_t *q, mblk_t *mp, struct xp *xp, struct copyresp *cp, mblk_t *dp)
 {
 	/* SDT has no copyin2 stage. */
+	__swerr();
 	return (-EPROTO);
 }
 
@@ -28379,6 +28401,7 @@ sdt_copyin(queue_t *q, mblk_t *mp, struct xp *xp, struct copyresp *cp, mblk_t *d
 			err = sdt_ioccnotify(ch, dp);
 			break;
 		default:
+			__swerr();
 			err = -EPROTO;
 			break;
 		}
@@ -28494,6 +28517,7 @@ noinline fastcall __unlikely int
 sdl_copyin2(queue_t *q, mblk_t *mp, struct xp *xp, struct copyresp *cp, mblk_t *dp)
 {
 	/* SDL has no copyin2 stage. */
+	__swerr();
 	return (-EPROTO);
 }
 
@@ -28538,6 +28562,7 @@ sdl_copyin(queue_t *q, mblk_t *mp, struct xp *xp, struct copyresp *cp, mblk_t *d
 			err = sdl_ioccnotify(ch, dp);
 			break;
 		default:
+			__swerr();
 			err = -EPROTO;
 			break;
 		}
@@ -28671,6 +28696,7 @@ nit_copyin(queue_t *q, mblk_t *mp, struct xp *xp, struct copyresp *cp, mblk_t *d
 			err = nit_niocssnap(xp, dp);
 		break;
 	case _IOC_NR(NIOCGSNAP):
+		__swerr();
 		err = -EPROTO;
 		break;
 	case _IOC_NR(NIOCSFLAGS):
@@ -28682,9 +28708,11 @@ nit_copyin(queue_t *q, mblk_t *mp, struct xp *xp, struct copyresp *cp, mblk_t *d
 			err = nit_niocsflags(xp, dp);
 		break;
 	case _IOC_NR(NIOCGFLAGS):
+		__swerr();
 		err = -EPROTO;
 		break;
 	default:
+		__swerr();
 		err = -EPROTO;
 		break;
 	}
@@ -29451,6 +29479,7 @@ dl_copyin(queue_t *q, mblk_t *mp, struct xp *xp, struct copyresp *cp, mblk_t *dp
 	}
 	return (err);
       eproto:
+	__swerr();
 	return (-EPROTO);
       eacces:
 	return (-EACCES);
@@ -29560,6 +29589,7 @@ xp_w_copyin2(queue_t *q, mblk_t *mp, struct xp *xp, struct copyresp *cp, mblk_t 
 		err = sdl_copyin2(q, mp, xp, cp, dp);
 		break;
 	default:
+		__swerr();
 		err = -EPROTO;
 		break;
 	}
@@ -29600,6 +29630,7 @@ xp_w_copyin(queue_t *q, mblk_t *mp, struct xp *xp, struct copyresp *cp, mblk_t *
 		err = sdl_copyin(q, mp, xp, cp, dp);
 		break;
 	default:
+		__swerr();
 		err = -EPROTO;
 		break;
 	}
@@ -29622,10 +29653,13 @@ xp_w_iocdata(queue_t *q, mblk_t *mp)
 		err = xp_w_copyin2(q, mp, xp, cp, dp);
 		break;
 	case MI_COPY_CASE(MI_COPY_OUT, 1):
+		__trace();
 		break;
 	case -1:
+		__trace();
 		goto efault;
 	default:
+		__swerr();
 		err = -EPROTO;
 		break;
 	}
@@ -29711,6 +29745,7 @@ nit_w_iocdata(queue_t *q, mblk_t *mp)
 	case -1:
 		goto efault;
 	default:
+		__swerr();
 		err = -EPROTO;
 		break;
 	}
@@ -29901,6 +29936,7 @@ bpf_w_iocdata(queue_t *q, mblk_t *mp)
 	case -1:
 		goto efault;
 	default:
+		__swerr();
 		err = -EPROTO;
 		break;
 	}
@@ -29977,6 +30013,7 @@ dl_w_iocdata(queue_t *q, mblk_t *mp)
 	case -1:
 		goto efault;
 	default:
+		__swerr();
 		err = -EPROTO;
 		break;
 	}
@@ -31323,6 +31360,7 @@ xp_qclose(queue_t *q, int flag, cred_t *crp)
 		{
 			if (ch->xp == xp) {
 				ch->xp = NULL;
+				ch->sdl.config.ifflags &= ~SDL_IF_UP;
 				/* FIXME FIXME FIXME: more to do here: worry about the state of the state
 				   machine, perform local processor outage if necessary, etc. */
 			}

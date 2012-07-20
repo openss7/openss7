@@ -1322,7 +1322,7 @@ mi_copyin(queue_t *q, mblk_t *mp, caddr_t uaddr, size_t len)
 		if (ioc->iocblk.ioc_count == TRANSPARENT) {
 			/* for transparent ioctl perform a copy in */
 			if (!(bp = XCHG(&mp->b_cont, NULL)))
-				return mi_copy_done(q, mp, EPROTO);
+				return __ctrace(mi_copy_done(q, mp, EPROTO));
 			mi = (typeof(mi)) bp->b_rptr;
 			mp->b_datap->db_type = M_COPYIN;
 			ioc->copyreq.cq_private = bp;
@@ -1338,7 +1338,7 @@ mi_copyin(queue_t *q, mblk_t *mp, caddr_t uaddr, size_t len)
 			return;
 		}
 		if (!(db = mp->b_cont))
-			return mi_copy_done(q, mp, EPROTO);
+			return __ctrace(mi_copy_done(q, mp, EPROTO));
 		/* for a non-transparent ioctl the first copyin is already performed for us, fake
 		   out an M_IOCDATA response.  However, only place the requested data from the
 		   implicit copyin into the data block.  Save the rest for a subsequent
@@ -1384,7 +1384,7 @@ mi_copyin(queue_t *q, mblk_t *mp, caddr_t uaddr, size_t len)
 		/* for a subsequent M_IOCDATA, we should already have our private message block
 		   stacked up against the private pointer */
 		if (!(bp = XCHG(&ioc->copyresp.cp_private, NULL)))
-			return mi_copy_done(q, mp, EPROTO);
+			return __ctrace(mi_copy_done(q, mp, EPROTO));
 		mi = (typeof(mi)) bp->b_rptr;
 		mp->b_datap->db_type = M_COPYIN;
 		ioc->copyreq.cq_private = bp;
@@ -1402,7 +1402,7 @@ mi_copyin(queue_t *q, mblk_t *mp, caddr_t uaddr, size_t len)
 		qreply(q, mp);
 		return;
 	default:
-		return mi_copy_done(q, mp, EPROTO);
+		return __ctrace(mi_copy_done(q, mp, EPROTO));
 	}
 }
 
@@ -1433,10 +1433,10 @@ mi_copyin_n(queue_t *q, mblk_t *mp, size_t offset, size_t len)
 	mblk_t *bp, *dp;
 
 	if (mp->b_datap->db_type != M_IOCDATA || !(bp = ioc->copyresp.cp_private))
-		return mi_copy_done(q, mp, EPROTO);
+		return __ctrace(mi_copy_done(q, mp, EPROTO));
 	mi = (typeof(mi)) bp->b_rptr;
 	if (mi->mi_dir != MI_COPY_IN)
-		return mi_copy_done(q, mp, EPROTO);
+		return __ctrace(mi_copy_done(q, mp, EPROTO));
 	if (mi->mi_uaddr != NULL) {
 		/* last operation was an explicit copyin */
 		mp->b_datap->db_type = M_COPYIN;
@@ -1451,7 +1451,7 @@ mi_copyin_n(queue_t *q, mblk_t *mp, size_t offset, size_t len)
 	} else {
 		/* last operation was an implicit copyin */
 		if ((dp = bp->b_cont) == NULL)
-			return mi_copy_done(q, mp, EPROTO);
+			return __ctrace(mi_copy_done(q, mp, EPROTO));
 		/* If the implicit copyin buffer was to small to satisfy the request, then it was
 		   the user's fault in supplying a buffer that was too small, so return EINVAL. */
 		if (msgdsize(dp) < offset + len)
@@ -1511,7 +1511,7 @@ mi_copyout_alloc(queue_t *q, mblk_t *mp, caddr_t uaddr, size_t len, int free_on_
 	case M_IOCDATA:
 		if (!(bp = ioc->copyresp.cp_private)) {
 			if (free_on_error)
-				mi_copy_done(q, mp, EPROTO);
+				__ctrace(mi_copy_done(q, mp, EPROTO));
 			return (NULL);
 		}
 		mi = (typeof(mi)) bp->b_rptr;
@@ -1523,7 +1523,7 @@ mi_copyout_alloc(queue_t *q, mblk_t *mp, caddr_t uaddr, size_t len, int free_on_
 		break;
 	default:
 		if (free_on_error)
-			mi_copy_done(q, mp, EPROTO);
+			__ctrace(mi_copy_done(q, mp, EPROTO));
 		return (NULL);
 	}
 	if (mp->b_cont)
@@ -1533,6 +1533,7 @@ mi_copyout_alloc(queue_t *q, mblk_t *mp, caddr_t uaddr, size_t len, int free_on_
 			mi_copy_done(q, mp, ENOSR);
 		return (db);
 	}
+	db->b_wptr = db->b_rptr + len;
 	linkb(bp, db);
 	db->b_next = (mblk_t *) (uaddr ? : mi->mi_caddr);
 	return (db);
@@ -1553,8 +1554,19 @@ mi_copyout(queue_t *q, mblk_t *mp)
 	mblk_t *bp, *db;
 	caddr_t uaddr;
 
+#if 1
+	if (mp->b_datap->db_type != M_IOCDATA)
+		return __ctrace(mi_copy_done(q, mp, EPROTO));
+#if 0
+	if (!mp->b_cont)
+		return __ctrace(mi_copy_done(q, mp, EPROTO));
+#endif
+	if (!(bp = ioc->copyresp.cp_private))
+		return __ctrace(mi_copy_done(q, mp, EPROTO));
+#else
 	if (mp->b_datap->db_type != M_IOCDATA || !mp->b_cont || !(bp = ioc->copyresp.cp_private))
-		return mi_copy_done(q, mp, EPROTO);
+		return __ctrace(mi_copy_done(q, mp, EPROTO));
+#endif
 #if 0
 	/* This is for LiS that puts an error code in the cp_rval and expects an M_IOCNAK. */
 	if (ioc->copyresp.cp_rval)
@@ -1616,8 +1628,10 @@ mi_copy_state(queue_t *q, mblk_t *mp, mblk_t **mpp)
 	int err = EPROTO;
 
 	if (mp->b_datap->db_type != M_IOCDATA || !(db = mp->b_cont)
-	    || !(bp = ioc->copyresp.cp_private))
+	    || !(bp = ioc->copyresp.cp_private)) {
+		__swerr();
 		goto error;
+	}
 #if 0
 	/* This is for LiS that puts an error code in the cp_rval and expects an M_IOCNAK. */
 	if ((err = (int) (long) ioc->copyresp.cp_rval))
@@ -1625,8 +1639,8 @@ mi_copy_state(queue_t *q, mblk_t *mp, mblk_t **mpp)
 #endif
 	switch (mp->b_datap->db_type) {
 	case M_IOCDATA:
-		err = ENOMEM;
 #if 0
+		err = ENOMEM;
 		if (!pullupmsg(db, -1))
 			goto error;
 #endif
@@ -1635,7 +1649,7 @@ mi_copy_state(queue_t *q, mblk_t *mp, mblk_t **mpp)
 			*mpp = db;
 		return MI_COPY_CASE(mi->mi_dir, mi->mi_cnt);
 	case M_IOCTL:
-		err = EPROTO;
+		__swerr();
 		goto error;
 	}
       error:
