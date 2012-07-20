@@ -2031,6 +2031,24 @@ sbin_PROGRAMS			+= sdlconfig
 
 ## =====================================================================
 
+soconf_SOURCES			= src/util/soconf.c
+soconf_CPPFLAGS			= $(UTIL_INCLUDES)
+soconf_LDFLAGS			= $(USER_CFLAGS) $(USER_DFLAGS)
+soconf_LDADD			= libstreams.la
+
+sbin_PROGRAMS			+= soconf
+
+## =====================================================================
+
+mxconfig_SOURCES		= src/util/mxconf.c
+mxconfig_CPPFLAGS		= $(UTIL_INCLUDES)
+mxconfig_LDFLAGS		= $(USER_CFLAGS) $(USER_DFLAGS)
+mxconfig_LDADD			= libstreams.la
+
+sbin_PROGRAMS			+= mxconfig
+
+## =====================================================================
+
 slconfd_SOURCES			= src/util/slconfd.c
 slconfd_CPPFLAGS		= $(UTIL_INCLUDES)
 slconfd_CFLAGS			= $(USER_CFLAGS) $(USER_DFLAGS)

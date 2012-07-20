@@ -195,7 +195,10 @@ typedef struct lif_ifinfo_req {
 #define LIFNAMSIZ _LIFNAMSIZ
 #define LIFGRNAMSIZ LIFNAMSIZ
 
+#ifndef __id_t_defined
 typedef int id_t;
+#define __id_t_defined
+#endif
 typedef id_t zoneid_t;
 
 struct lifreq {
@@ -248,7 +251,7 @@ struct lifreq {
 #define DAD_DONE		0x2
 
 #ifndef __KERNEL__
-typedef short sa_family_t;
+typedef unsigned short int sa_family_t;
 #endif
 
 /* used by SIOCGLIFNUM */
@@ -262,7 +265,7 @@ struct lifnum {
 struct lifconf {
 	sa_family_t lifc_family;
 	int lifc_flags;			/* request specific interfaces */
-	int lifn_len;			/* size of associated buffer */
+	int lifc_len;			/* size of associated buffer */
 	union {
 		caddr_t lifcu_buf;
 		struct lifreq *lifcu_req;

@@ -639,6 +639,9 @@ struct mx_stats_span {
 	uint mxNearEndBESs;
 	uint mxNearEndDMs;
 	uint mxNearEndLCVs;
+	uint mxNearEndFASEs;
+	uint mxNearEndFABEs;
+	uint mxNearEndFEBEs;
 	uint mxNearEndValidData;
 	uint mxFarEndESs;
 	uint mxFarEndSESs;
@@ -650,6 +653,8 @@ struct mx_stats_span {
 	uint mxFarEndBESs;
 	uint mxFarEndDMs;
 	uint mxFarEndValidData;
+	uint mxValidIntervals;
+	uint mxInvalidIntervals;
 };
 struct mx_stats_chan {
 };
