@@ -2606,7 +2606,7 @@ slM2paSctpNoDelay OBJECT-TYPE
          algorithm increases the size of the packets placed on the 
          network at the expense of delaying the transmission of some 
          data during congestion episodes.  When set to true(1), the 
-         Nagle algorithm is suppresed; otherwise, set to false(2), the 
+         Nagle algorithm is suppressed; otherwise, set to false(2), the 
          Nagle algorithm is in effect.
          
          The default value is determined by the setting of 
@@ -2622,11 +2622,11 @@ slM2paSctpMaxseg OBJECT-TYPE
         "This column defines the maximum SCTP payload size for outgoing 
          packets.  Values greater than the association MTU are ignored 
          and have no effect.  The value determines the maximum size (in 
-         octets) above which SCCP will fragment larger DATA chunis into 
+         octets) above which SCTP will fragment larger DATA chunks into 
          smaller DATA chunks, and beneath which SCTP will bundle DATA 
-         chunks into a single packate or combine smaller DATA chunks 
+         chunks into a single packets or combine smaller DATA chunks 
          into larger DATA chunks.  Normally this value is the 
-         association MTU value must the size of the current IP and SCTP 
+         association MTU value minus the size of the current IP and SCTP 
          headers, minus the size of one DATA chunk header.  When set to 
          a lower value, the lower value will be used.
          
@@ -2699,7 +2699,7 @@ slM2paSctpRtoMin OBJECT-TYPE
     STATUS      current
     DESCRIPTION 
         "This column defines the minimum timer interval (in 
-         milliseconds) that will be used as an RTO (retranmission 
+         milliseconds) that will be used as an RTO (retransmission 
          timeout) value when sending packets to a destination transport 
          address and expecting acknowledgements.  Valid values are zero 
          or greater and must be less than or equal to 
@@ -2709,7 +2709,7 @@ slM2paSctpRtoMin OBJECT-TYPE
          
          Note that, in general, the RTO minimum should not be less than 
          the peer's maximum SACK delay, otherwise, excessive 
-         retransmission migh occur while the peer is delaying 
+         retransmission might occur while the peer is delaying 
          acknowledgements.
          
          The default value is determined by the setting of 
@@ -2724,16 +2724,16 @@ slM2paSctpRtoMax OBJECT-TYPE
     DESCRIPTION 
         "This column defines the maximum time interval (in milliseconds) 
          that will be used as an RTO (retransmission timeout) value when 
-         sending packets t a destination transport address and expecting 
-         acknowledgements.  Valid values are zero or greater but must be 
-         greater than or equal to slM2paSctpRtoInitial and strictly 
-         greater than slM2paSctpRtoMin.  The default value is the value 
-         recommended by RFC 2960 and RFC 4960 (60000 milliseconds, or 60 
-         seconds).
+         sending packets to a destination transport address and 
+         expecting acknowledgements.  Valid values are zero or greater 
+         but must be greater than or equal to slM2paSctpRtoInitial and 
+         strictly greater than slM2paSctpRtoMin.  The default value is 
+         the value recommended by RFC 2960 and RFC 4960 (60000 
+         milliseconds, or 60 seconds).
          
          Note that, in general, the RTO maximum should not be less than 
          the peer's maximum SACK delay, otherwise, excessive 
-         retransmission migh occur while the peer is delaying 
+         retransmission might occur while the peer is delaying 
          acknowledgements.
          
          The default value is determined by the setting of 
@@ -2747,8 +2747,8 @@ slM2paSctpPathMaxRetrans OBJECT-TYPE
     STATUS      current
     DESCRIPTION 
         "This column defines the number of times that SCTP will attempt 
-         retransmitting a packet to a given detination transport address 
-         before it considers that destination transport address 
+         retransmitting a packet to a given destination transport 
+         address before it considers that destination transport address 
          inactive.  Valid values are zero or greater.  The default value 
          is the value recommended in RFC 2960 (5 retransmissions).
          
@@ -2757,7 +2757,7 @@ slM2paSctpPathMaxRetrans OBJECT-TYPE
          Lower values (including zero) will yield faster fail-over 
          response times.  Lower values, however, may cause thrashing 
          between destinations contributing to congestion in the network.  
-         Deafult values are applicable to Internet applicaions.
+         Default values are applicable to Internet applications.
          
          The default value is determined by the setting of 
          slM2paDefaultSctpPathMaxRetrans."
@@ -2790,7 +2790,7 @@ slM2paSctpCookieLife OBJECT-TYPE
          slM2paSctpCookieLife.
          
          Unfortunately, the slM2paSctpCookieLife and 
-         slM2paSctpCookieInc must be adjusted to accomodate the slowest 
+         slM2paSctpCookieInc must be adjusted to accommodate the slowest 
          peer on the slowest connection.  The default setting is 
          adequate for Internet applications.
          
@@ -2806,7 +2806,7 @@ slM2paSctpCookieInc OBJECT-TYPE
     DESCRIPTION 
         "This column defines the time increment (in milliseconds) that 
          will be added to the lifespan of the cookie in an INIT-ACK if 
-         the recieved INIT requests cookie preservative to lengthen the 
+         the received INIT requests cookie preservative to lengthen the 
          lifespan of the cookie.  Valid values are zero or greater.  The 
          default value is the value recommended in RFC 
          2960 5.2.6 (1000 milliseconds, or 1 second).
@@ -2863,7 +2863,7 @@ slM2paSctpAssocMaxRetrans OBJECT-TYPE
          Value values are zero or greater.  The default value is the 
          value recommended in RFC 2960 (10 retransmissions).
          
-         This value should be larger  than sum of the path maximum 
+         This value should be larger than sum of the path maximum 
          number of retransmission values of each of the destinations.
          
          Setting this value to less than the sum of the path maximum 
@@ -2885,7 +2885,7 @@ slM2paSctpSackDelay OBJECT-TYPE
         "This column defines the interval of time (in milliseconds) that 
          will be used as an RTO (retransmission timeout) value when 
          sending packets to a destination transport address.  Valid 
-         values are zero or to 500 milliseconds (RFC 2960 forbits 
+         values are zero or to 500 milliseconds (RFC 2960 forbids  
          setting this value larger than 500 milliseconds).  The default 
          value is the value recommended in RFC 2960 (200 milliseconds).
          

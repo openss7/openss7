@@ -5800,6 +5800,142 @@ refresh_mxDrivTable(int force)
 		return;
 	/* XXX: Here, update the table as required... */
 	mxDrivTable_refresh = 0;
+	{
+		int fd;
+		struct header_complex_index *h, *h_next, *hciptr;
+		struct strioctl ioc;
+		struct {
+			struct mx_info info;
+			struct mx_info_dflt dflt;
+		} buf = {};
+
+		if ((fd = open("/dev/streams/clone/x400p-sl", O_RDWR)) < 0) {
+			snmp_log(MY_FACILITY(LOG_ERR), "%s: %s: %s: %s", __FUNCTION__, "open()", "/dev/streams/clone/x400p-sl", strerror(errno));
+			return;
+		}
+		buf.info.type = MX_OBJ_TYPE_DFLT;
+		buf.info.id = 0;
+		buf.info.cmd = MX_GET;
+		ioc.ic_cmd = MX_IOCGINFO;
+		ioc.ic_timout = 0;
+		ioc.ic_len = sizeof(buf);
+		ioc.ic_dp = (char *) &buf;
+		if (ioctl(fd, I_STR, &ioc) < 0) {
+			snmp_log(MY_FACILITY(LOG_ERR), "%s: %s: %s: %s", __FUNCTION__, "ioctl()", "MX_IOCGINFO", strerror(errno));
+			close(fd);
+			return;
+		}
+		for (hciptr = mxDrivTableStorage; hciptr; hciptr = hciptr->next) {
+			struct mxDrivTable_data *data = hciptr->data;
+			if (strncmp((char *) data->mxDrivName, "x400p-sl", 8))
+				continue;
+			break;
+		}
+		if (hciptr) {
+			struct mxDrivTable_data *StorageTmp = hciptr->data;
+			char *tmp;
+
+			StorageNew->mxDrivTable_refs = 1;
+			if ((tmp = strdup("x400p-sl")) != NULL) {
+				StorageTmp->mxDrivName = (uint8_t *) tmp;
+				StorageTmp->mxDrivNameLen = 8;
+			}
+			StorageTmp->mxDrivIdnum = data->mxDrivIdnum;
+			StorageTmp->mxDrivMajor = data->mxDrivMajor;
+			if ((tmp = strndup(data->mxDrivDescription, sizeof(data->mxDrivDescription)))) {
+				StorageTmp->mxDrivDescription = (uint8_t *) tmp;
+				StorageTmp->mxDrivDescriptionLen = strnlen(data->mxDrivDescription, sizeof(data->mxDrivDescription));
+			}
+			if ((tmp = strndup(data->mxDrivRevision, sizeof(data->mxDrivRevision)))) {
+				StorageTmp->mxDrivRevision = (uint8_t *) tmp;
+				StorageTmp->mxDrivRevisionLen = strnlen(data->mxDrivRevision, sizeof(data->mxDrivRevision));
+			}
+			if ((tmp = strndup(data->mxDrivCopyright, sizeof(data->mxDrivCopyright)))) {
+				StorageTmp->mxDrivCopyright = (uint8_t *) tmp;
+				StorageTmp->mxDrivCopyrightLen = strnlen(data->mxDrivCopyright, sizeof(data->mxDrivCopyright));
+			}
+			if ((tmp = strndup(data->mxDrivSupportedDevice, sizeof(data->mxDrivSupportedDevice)))) {
+				StorageTmp->mxDrivSupportedDevice = (uint8_t *) tmp;
+				StorageTmp->mxDrivSupportedDeviceLen = strnlen(data->mxDrivSupportedDevice, sizeof(data->mxDrivSupportedDevice));
+			}
+			if ((tmp = strndup(data->mxDrivContact, sizeof(data->mxDrivContact)))) {
+				StorageTmp->mxDrivContact = (uint8_t *) tmp;
+				StorageTmp->mxDrivContactLen = strnlen(data->mxDrivContact, sizeof(data->mxDrivContact));
+			}
+			StorageTmp->mxDrivLicense = data->mxDrivLicense;
+			if ((tmp = calloc(sizeof(data->mxDrivDate)+1,1))) {
+				memcpy((void *) tmp, (void *) data->mxDrivDate, sizeof(data->mxDrivDate));
+				StorageTmp->mxDrivDate = (uint8_t *) tmp;
+				StorageTmp->mxDrivDateLen = sizeof(mxDrivDate);
+			}
+			StorageTmp->mxDrivRowStatus = RS_ACTIVE;
+		} else {
+			struct mxDrivTable_data *StorageNew = SNMP_MALLOC_STRUCT(mxDrivData_data);
+			char *tmp;
+
+			if (!StorageNew) return;
+			StorageNew->mxDrivTable_refs = 1;
+			if (!(tmp = strdup("x400p-sl"))) {
+				mxDrivTable_destroy(&StorageNew);
+				return;
+			}
+			StorageNew->mxDrivName = (uint8_t *) tmp;
+			StorageNew->mxDrivNameLen = 8;
+			if (!(tmp = strndup(data->mxDrivDescription, sizeof(data->mxDrivDescription)))) {
+				mxDrivTable_destroy(&StorageNew);
+				return;
+			}
+			StorageNew->mxDrivDescription = (uint8_t *) tmp;
+			StorageNew->mxDrivDescription = strnlen(data->mxDrivDescription, sizeof(data->mxDrivDescription));
+			if (!(tmp = strndup(data->mxDrivRevision, sizeof(data->mxDrivRevision)))) {
+				mxDrivTable_destroy(&StorageNew);
+				return;
+			}
+			StorageNew->mxDrivRevision = (uint8_t *) tmp;
+			StorageNew->mxDrivRevision = strnlen(data->mxDrivRevision, sizeof(data->mxDrivRevision));
+			if (!(tmp = strndup(data->mxDrivCopyright, sizeof(data->mxDrivCopyright)))) {
+				mxDrivTable_destroy(&StorageNew);
+				return;
+			}
+			StorageNew->mxDrivCopyright = (uint8_t *) tmp;
+			StorageNew->mxDrivCopyright = strnlen(data->mxDrivCopyright, sizeof(data->mxDrivCopyright));
+			if (!(tmp = strndup(data->mxDrivSupportedDevice, sizeof(data->mxDrivSupportedDevice)))) {
+				mxDrivTable_destroy(&StorageNew);
+				return;
+			}
+			StorageNew->mxDrivSupportedDevice = (uint8_t *) tmp;
+			StorageNew->mxDrivSupportedDevice = strnlen(data->mxDrivSupportedDevice, sizeof(data->mxDrivSupportedDevice));
+			if (!(tmp = strndup(data->mxDrivContact, sizeof(data->mxDrivContact)))) {
+				mxDrivTable_destroy(&StorageNew);
+				return;
+			}
+			StorageNew->mxDrivContact = (uint8_t *) tmp;
+			StorageNew->mxDrivContact = strnlen(data->mxDrivContact, sizeof(data->mxDrivContact));
+			StorageNew->mxDrivLicense = data->mxDrivLicense;
+			if (!(tmp = calloc(sizeof(data->mxDrivDate)+1, 1))) {
+				mxDrivTable_destroy(&StorageNew);
+				return;
+			}
+			memcpy((void *) tmp, (void *) data->mxDrivDate, sizeof(data->mxDrivDate));
+			StorageNew->mxDrivDate = (uint8_t *) tmp;
+			StorageNew->mxDrivDateLen = sizeof(data->mxDrivDate);
+			StorageNew->mxDrivRowStatus = RS_ACTIVE;
+			mxDrivTable_add(StorageNew);
+		}
+		/* delete unused entries */
+		h_next = mxSpanTableStorage;
+		while ((h = h_next)) {
+			struct mxSpanTable_data *data = h->data;
+
+			h_next = h->next;
+			if (data->mxSpanTable_refs)
+				data->mxSpanTable_refs = 0;
+			else {
+				header_complex_extract_entry(&mxSpanTableStorage, h);
+				mxSpanTable_destroy(&data);
+			}
+		}
+	}
 }
 
 /**
