@@ -5835,42 +5835,42 @@ refresh_mxDrivTable(int force)
 			struct mxDrivTable_data *StorageTmp = hciptr->data;
 			char *tmp;
 
-			StorageNew->mxDrivTable_refs = 1;
+			StorageTmp->mxDrivTable_refs = 1;
 			if ((tmp = strdup("x400p-sl")) != NULL) {
 				StorageTmp->mxDrivName = (uint8_t *) tmp;
 				StorageTmp->mxDrivNameLen = 8;
 			}
-			StorageTmp->mxDrivIdnum = data->mxDrivIdnum;
-			StorageTmp->mxDrivMajor = data->mxDrivMajor;
-			if ((tmp = strndup(data->mxDrivDescription, sizeof(data->mxDrivDescription)))) {
+			StorageTmp->mxDrivIdnum = buf.dflt.mxDrivIdnum;
+			StorageTmp->mxDrivMajor = buf.dflt.mxDrivMajor;
+			if ((tmp = strndup(buf.dflt.mxDrivDescription, sizeof(buf.dflt.mxDrivDescription)))) {
 				StorageTmp->mxDrivDescription = (uint8_t *) tmp;
-				StorageTmp->mxDrivDescriptionLen = strnlen(data->mxDrivDescription, sizeof(data->mxDrivDescription));
+				StorageTmp->mxDrivDescriptionLen = strnlen(buf.dflt.mxDrivDescription, sizeof(buf.dflt.mxDrivDescription));
 			}
-			if ((tmp = strndup(data->mxDrivRevision, sizeof(data->mxDrivRevision)))) {
+			if ((tmp = strndup(buf.dflt.mxDrivRevision, sizeof(buf.dflt.mxDrivRevision)))) {
 				StorageTmp->mxDrivRevision = (uint8_t *) tmp;
-				StorageTmp->mxDrivRevisionLen = strnlen(data->mxDrivRevision, sizeof(data->mxDrivRevision));
+				StorageTmp->mxDrivRevisionLen = strnlen(buf.dflt.mxDrivRevision, sizeof(buf.dflt.mxDrivRevision));
 			}
-			if ((tmp = strndup(data->mxDrivCopyright, sizeof(data->mxDrivCopyright)))) {
+			if ((tmp = strndup(buf.dflt.mxDrivCopyright, sizeof(buf.dflt.mxDrivCopyright)))) {
 				StorageTmp->mxDrivCopyright = (uint8_t *) tmp;
-				StorageTmp->mxDrivCopyrightLen = strnlen(data->mxDrivCopyright, sizeof(data->mxDrivCopyright));
+				StorageTmp->mxDrivCopyrightLen = strnlen(buf.dflt.mxDrivCopyright, sizeof(buf.dflt.mxDrivCopyright));
 			}
-			if ((tmp = strndup(data->mxDrivSupportedDevice, sizeof(data->mxDrivSupportedDevice)))) {
+			if ((tmp = strndup(buf.dflt.mxDrivSupportedDevice, sizeof(buf.dflt.mxDrivSupportedDevice)))) {
 				StorageTmp->mxDrivSupportedDevice = (uint8_t *) tmp;
-				StorageTmp->mxDrivSupportedDeviceLen = strnlen(data->mxDrivSupportedDevice, sizeof(data->mxDrivSupportedDevice));
+				StorageTmp->mxDrivSupportedDeviceLen = strnlen(buf.dflt.mxDrivSupportedDevice, sizeof(buf.dflt.mxDrivSupportedDevice));
 			}
-			if ((tmp = strndup(data->mxDrivContact, sizeof(data->mxDrivContact)))) {
+			if ((tmp = strndup(buf.dflt.mxDrivContact, sizeof(buf.dflt.mxDrivContact)))) {
 				StorageTmp->mxDrivContact = (uint8_t *) tmp;
-				StorageTmp->mxDrivContactLen = strnlen(data->mxDrivContact, sizeof(data->mxDrivContact));
+				StorageTmp->mxDrivContactLen = strnlen(buf.dflt.mxDrivContact, sizeof(buf.dflt.mxDrivContact));
 			}
-			StorageTmp->mxDrivLicense = data->mxDrivLicense;
-			if ((tmp = calloc(sizeof(data->mxDrivDate)+1,1))) {
-				memcpy((void *) tmp, (void *) data->mxDrivDate, sizeof(data->mxDrivDate));
+			StorageTmp->mxDrivLicense = buf.dflt.mxDrivLicense;
+			if ((tmp = calloc(sizeof(buf.dflt.mxDrivDate)+1,1))) {
+				memcpy((void *) tmp, (void *) buf.dflt.mxDrivDate, sizeof(buf.dflt.mxDrivDate));
 				StorageTmp->mxDrivDate = (uint8_t *) tmp;
-				StorageTmp->mxDrivDateLen = sizeof(mxDrivDate);
+				StorageTmp->mxDrivDateLen = sizeof(buf.dflt.mxDrivDate);
 			}
 			StorageTmp->mxDrivRowStatus = RS_ACTIVE;
 		} else {
-			struct mxDrivTable_data *StorageNew = SNMP_MALLOC_STRUCT(mxDrivData_data);
+			struct mxDrivTable_data *StorageNew = SNMP_MALLOC_STRUCT(mxDrivTable_data);
 			char *tmp;
 
 			if (!StorageNew) return;
@@ -5881,44 +5881,44 @@ refresh_mxDrivTable(int force)
 			}
 			StorageNew->mxDrivName = (uint8_t *) tmp;
 			StorageNew->mxDrivNameLen = 8;
-			if (!(tmp = strndup(data->mxDrivDescription, sizeof(data->mxDrivDescription)))) {
+			if (!(tmp = strndup(buf.dflt.mxDrivDescription, sizeof(buf.dflt.mxDrivDescription)))) {
 				mxDrivTable_destroy(&StorageNew);
 				return;
 			}
 			StorageNew->mxDrivDescription = (uint8_t *) tmp;
-			StorageNew->mxDrivDescription = strnlen(data->mxDrivDescription, sizeof(data->mxDrivDescription));
-			if (!(tmp = strndup(data->mxDrivRevision, sizeof(data->mxDrivRevision)))) {
+			StorageNew->mxDrivDescriptionLen = strnlen(buf.dflt.mxDrivDescription, sizeof(buf.dflt.mxDrivDescription));
+			if (!(tmp = strndup(buf.dflt.mxDrivRevision, sizeof(buf.dflt.mxDrivRevision)))) {
 				mxDrivTable_destroy(&StorageNew);
 				return;
 			}
 			StorageNew->mxDrivRevision = (uint8_t *) tmp;
-			StorageNew->mxDrivRevision = strnlen(data->mxDrivRevision, sizeof(data->mxDrivRevision));
-			if (!(tmp = strndup(data->mxDrivCopyright, sizeof(data->mxDrivCopyright)))) {
+			StorageNew->mxDrivRevisionLen = strnlen(buf.dflt.mxDrivRevision, sizeof(buf.dflt.mxDrivRevision));
+			if (!(tmp = strndup(buf.dflt.mxDrivCopyright, sizeof(buf.dflt.mxDrivCopyright)))) {
 				mxDrivTable_destroy(&StorageNew);
 				return;
 			}
 			StorageNew->mxDrivCopyright = (uint8_t *) tmp;
-			StorageNew->mxDrivCopyright = strnlen(data->mxDrivCopyright, sizeof(data->mxDrivCopyright));
-			if (!(tmp = strndup(data->mxDrivSupportedDevice, sizeof(data->mxDrivSupportedDevice)))) {
+			StorageNew->mxDrivCopyrightLen = strnlen(buf.dflt.mxDrivCopyright, sizeof(buf.dflt.mxDrivCopyright));
+			if (!(tmp = strndup(buf.dflt.mxDrivSupportedDevice, sizeof(buf.dflt.mxDrivSupportedDevice)))) {
 				mxDrivTable_destroy(&StorageNew);
 				return;
 			}
 			StorageNew->mxDrivSupportedDevice = (uint8_t *) tmp;
-			StorageNew->mxDrivSupportedDevice = strnlen(data->mxDrivSupportedDevice, sizeof(data->mxDrivSupportedDevice));
-			if (!(tmp = strndup(data->mxDrivContact, sizeof(data->mxDrivContact)))) {
+			StorageNew->mxDrivSupportedDeviceLen = strnlen(buf.dflt.mxDrivSupportedDevice, sizeof(buf.dflt.mxDrivSupportedDevice));
+			if (!(tmp = strndup(buf.dflt.mxDrivContact, sizeof(buf.dflt.mxDrivContact)))) {
 				mxDrivTable_destroy(&StorageNew);
 				return;
 			}
 			StorageNew->mxDrivContact = (uint8_t *) tmp;
-			StorageNew->mxDrivContact = strnlen(data->mxDrivContact, sizeof(data->mxDrivContact));
-			StorageNew->mxDrivLicense = data->mxDrivLicense;
-			if (!(tmp = calloc(sizeof(data->mxDrivDate)+1, 1))) {
+			StorageNew->mxDrivContactLen = strnlen(buf.dflt.mxDrivContact, sizeof(buf.dflt.mxDrivContact));
+			StorageNew->mxDrivLicense = buf.dflt.mxDrivLicense;
+			if (!(tmp = calloc(sizeof(buf.dflt.mxDrivDate)+1, 1))) {
 				mxDrivTable_destroy(&StorageNew);
 				return;
 			}
-			memcpy((void *) tmp, (void *) data->mxDrivDate, sizeof(data->mxDrivDate));
+			memcpy((void *) tmp, (void *) buf.dflt.mxDrivDate, sizeof(buf.dflt.mxDrivDate));
 			StorageNew->mxDrivDate = (uint8_t *) tmp;
-			StorageNew->mxDrivDateLen = sizeof(data->mxDrivDate);
+			StorageNew->mxDrivDateLen = sizeof(buf.dflt.mxDrivDate);
 			StorageNew->mxDrivRowStatus = RS_ACTIVE;
 			mxDrivTable_add(StorageNew);
 		}

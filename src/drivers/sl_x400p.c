@@ -27629,7 +27629,7 @@ xp_x1_process_stats(struct sp *sp, register uint errors)
 		sp->stats[2].LCVs += sp->stats[1].LCVs;
 		sp->stats[2].FASEs += sp->stats[1].FASEs;
 		sp->stats[2].FABEs += sp->stats[1].FABEs;
-		sp->stats[2].FESEs += sp->stats[1].FESEs;
+		sp->stats[2].FEBEs += sp->stats[1].FEBEs;
 		bzero(&sp->stats[1], sizeof(sp->stats[1]));
 
 		if ((sp->stats[2].SECs += 60) == 900) {
