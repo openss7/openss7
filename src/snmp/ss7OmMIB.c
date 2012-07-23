@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2012  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -319,8 +319,38 @@ ss7OmMIB_create(void)
 		/* XXX: fill in default scalar values here into StorageNew */
 
 	}
+      done:
 	DEBUGMSGTL(("ss7OmMIB", "done.\n"));
 	return (StorageNew);
+	goto nomem;
+      nomem:
+	ss7OmMIB_destroy(&StorageNew);
+	goto done;
+}
+
+/**
+ * @fn struct ss7OmMIB_data *ss7OmMIB_duplicate(struct ss7OmMIB_data *thedata)
+ * @param thedata the mib structure to duplicate
+ * @brief duplicate a mib structure for the mib
+ *
+ * Duplicates the specified mib structure @param thedata and returns a pointer to the newly
+ * allocated mib structure on success, or NULL on failure.
+ */
+struct ss7OmMIB_data *
+ss7OmMIB_duplicate(struct ss7OmMIB_data *thedata)
+{
+	struct ss7OmMIB_data *StorageNew = SNMP_MALLOC_STRUCT(ss7OmMIB_data);
+
+	DEBUGMSGTL(("ss7OmMIB", "ss7OmMIB_duplicate: duplicating mib... "));
+	if (StorageNew != NULL) {
+	}
+      done:
+	DEBUGMSGTL(("ss7OmMIB", "done.\n"));
+	return (StorageNew);
+	goto destroy;
+      destroy:
+	ss7OmMIB_destroy(&StorageNew);
+	goto done;
 }
 
 /**
@@ -371,7 +401,7 @@ ss7OmMIB_add(struct ss7OmMIB_data *thedata)
  * @param line line from configuration file matching the token.
  * @brief parse configuration file for ss7OmMIB entries.
  *
- * This callback is called by UCD-SNMP when it prases a configuration file and finds a configuration
+ * This callback is called by UCD-SNMP when it parses a configuration file and finds a configuration
  * file line for the registsred token (in this case ss7OmMIB).  This routine is invoked by
  * UCD-SNMP to read the values of scalars in the MIB from the configuration file.  Note that this
  * procedure may exist regardless of the persistence of the MIB.  If there are no configured entries
@@ -423,6 +453,62 @@ store_ss7OmMIB(int majorID, int minorID, void *serverarg, void *clientarg)
 	}
 	DEBUGMSGTL(("ss7OmMIB", "done.\n"));
 	return SNMPERR_SUCCESS;
+}
+
+/**
+ * @fn int check_ss7OmMIB(struct ss7OmMIB_data *StorageTmp, struct ss7OmMIB_data *StorageOld)
+ * @param StorageTmp the data as updated
+ * @param StorageOld the data previous to update
+ *
+ * This function is used by mibs.  It is used to check, all scalars at a time, the varbinds
+ * belonging to the mib.  This function is called for the first varbind in a mib at the beginning of
+ * the ACTION phase.  The COMMIT phase does not ensue unless this check passes.  This function can
+ * return SNMP_ERR_NOERR or a specific SNMP error value.  Values in StorageOld are the values before
+ * the varbinds on the mib were applied; the values in StorageTmp are the new values.  The function
+ * is permitted to change the values in StorageTmp to correct them; however, preferences should be
+ * made for setting values that were not in the varbinds.
+ */
+int
+check_ss7OmMIB(struct ss7OmMIB_data *StorageTmp, struct ss7OmMIB_data *StorageOld)
+{
+	/* XXX: provide code to check the scalars for consistency */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int update_ss7OmMIB(struct ss7OmMIB_data *StorageTmp, struct ss7OmMIB_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the set operation (ACTION phase)
+ *
+ * This function is used by mibs.  It is used to update, all scalars at a time, the varbinds
+ * belonging to the mib.  This function is called for the first varbind in a mib at the beginning of
+ * the COMMIT phase.  The start of the ACTION phase performs a consistency check on the mib before
+ * allowing the request to proceed to the COMMIT phase.  The COMMIT phase then arrives here with
+ * consistency already checked (see check_ss7OmMIB()).  This function can
+ * return SNMP_ERR_NOERROR or SNMP_ERR_COMMITFAILED.  Values in StorageOld are the values before the
+ * varbinds on the mib were applied: the values in StorageTmp are the new values.
+ */
+int
+update_ss7OmMIB(struct ss7OmMIB_data *StorageTmp, struct ss7OmMIB_data *StorageOld)
+{
+	/* XXX: provide code to update the row with the underlying device */
+	ss7OmMIB_refresh = 1;
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn revert_ss7OmMIB(struct 
+ * @fn void revert_ss7OmMIB(struct ss7OmMIB_data *StorageTmp, struct ss7OmMIB_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the undo operation (UNDO phase)
+ */
+void
+revert_ss7OmMIB(struct ss7OmMIB_data *StorageTmp, struct ss7OmMIB_data *StorageOld)
+{
+	/* XXX: provide code to revert the row with the underlying device */
+	update_ss7OmMIB(StorageOld, NULL);
 }
 
 /**

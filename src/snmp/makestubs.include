@@ -2254,3 +2254,27 @@ ds1_openss7.c ds1_openss7.h: mib2c mib2c.conf ../mibs/RFC4805-MIB.txt
 	./mib2c -c ./mib2c.openss7.conf -f ds1_openss7 DS1-MIB::ds1
 	indent -nhnl ds1_openss7.[ch]
 
+
+MIBPREFIXES += mxMonMIB
+
+mxMonMIB.mib: ../mibs/OPENSS7-MX-MON-MIB.mib
+	smidump -k ../mibs/OPENSS7-MX-MON-MIB.mib>$@ || :
+
+mxMonMIB.lint: ../mibs/OPENSS7-MX-MON-MIB.mib
+	smilint $(SMILINTIGNORES) -ms ../mibs/OPENSS7-MX-MON-MIB.mib>$@ 2>&1 || :
+
+mxMonMIB.tree: ../mibs/OPENSS7-MX-MON-MIB.mib
+	snmptranslate -Tp OPENSS7-MX-MON-MIB::mxMonMIB>$@ || :
+
+mxMonMIB_simple.c mxMonMIB_simple.h: mib2c mib2c.conf ../mibs/OPENSS7-MX-MON-MIB.mib
+	./mib2c -c ./mib2c.conf -f mxMonMIB_simple OPENSS7-MX-MON-MIB::mxMonMIB
+	indent -nhnl mxMonMIB_simple.[ch]
+
+mxMonMIB_storage.c mxMonMIB_storage.h: mib2c mib2c.conf ../mibs/OPENSS7-MX-MON-MIB.mib
+	./mib2c -c ./mib2c.storage.conf -f mxMonMIB_storage OPENSS7-MX-MON-MIB::mxMonMIB
+	indent -nhnl mxMonMIB_storage.[ch]
+
+mxMonMIB_openss7.c mxMonMIB_openss7.h: mib2c mib2c.conf ../mibs/OPENSS7-MX-MON-MIB.mib
+	./mib2c -c ./mib2c.openss7.conf -f mxMonMIB_openss7 OPENSS7-MX-MON-MIB::mxMonMIB
+	indent -nhnl mxMonMIB_openss7.[ch]
+

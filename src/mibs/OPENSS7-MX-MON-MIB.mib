@@ -1,0 +1,1887 @@
+-- vim: ft=mib comments=\f\:\",\b\:\-\-,\:\-\-,\f\b\:- fo+=tcqlornw tw=72 nocin nosi sts=4 sw=4 et
+-- =============================================================================
+-- 
+-- @(#) $RCSfile$ $Name$($Revision$) $Date$
+--
+-- -----------------------------------------------------------------------------
+--
+-- Copyright (c) 2008-2012  Monavacon Limited <http://www.monavacon.com/>
+-- Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+-- Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
+--
+-- All Rights Reserved.
+--
+-- This program is free software; you can redistribute it and/or modify it under 
+-- the terms of the GNU Affero General Public License as published by the Free 
+-- Software Foundation; version 3 of the License.
+--
+-- This program is distributed in the hope that it will be useful, but WITHOUT 
+-- ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or  
+-- FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public License 
+-- for more details.
+--
+-- You should have received a copy of the GNU Affero General Public License 
+-- along with this program.  If not, see <http://www.gnu.org/licenses/>, or 
+-- write to the Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 
+-- 02139, USA.
+--
+-- -----------------------------------------------------------------------------
+--
+-- Note well: nonwithstanding this AGPL license, you are not permitted to make 
+-- modifications under the OpenSS7 project's enterprise object identifier arc: 
+-- 1.3.6.1.4.1.29591.  Modifications must be made only within an object 
+-- identifier arc under your control.
+--
+-- -----------------------------------------------------------------------------
+--
+-- U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+-- behalf of the U.S. Government ("Government"), the following provisions apply
+-- to you.  If the Software is supplied by the Department of Defense ("DoD"), it
+-- is classified as "Commercial Computer Software" under paragraph 252.227-7014
+-- of the DoD Supplement to the Federal Acquisition Regulations ("DFARS") (or any
+-- successor regulations) and the Government is acquiring only the license rights
+-- granted herein (the license rights customarily provided to non-Government
+-- users).  If the Software is supplied to any unit or agency of the Government
+-- other than DoD, it is classified as "Restricted Computer Software" and the
+-- Government's rights in the Software are defined in paragraph 52.227-19 of the
+-- Federal Acquisition Regulations ("FAR") (or any successor regulations) or, in
+-- the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
+-- (or any successor regulations).
+--
+-- -----------------------------------------------------------------------------
+--
+-- Commercial licensing and support of this software is available from OpenSS7
+-- Corporation at a fee.  See http://www.openss7.com/
+--
+-- -----------------------------------------------------------------------------
+--
+-- Last Modified $Date$ by $Author$
+--
+-- -----------------------------------------------------------------------------
+--
+-- $Log$
+-- =============================================================================
+
+
+-- Log rotation.
+-- - size
+-- - interval
+-- - filename (date and hour) designator
+-- 
+-- - once per hour
+-- 
+-- - archive folder
+-- - move data to archive folder when collected
+-- 
+-- - maximum fill on data partition.
+-- 
+-- - where to transfer to
+
+OPENSS7-MX-MON-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    openss7Modules
+        FROM OPENSS7-SMI
+    AdministrativeState, AvailabilityStatus, OperationalState, 
+    ProceduralStatus, UsageState
+        FROM OPENSS7-SMI-MIB
+    MilliSeconds
+        FROM OPENSS7-TC
+    SnmpAdminString
+        FROM SNMP-FRAMEWORK-MIB
+    Counter32, Gauge32, MODULE-IDENTITY, OBJECT-TYPE, 
+    Unsigned32
+        FROM SNMPv2-SMI
+    DisplayString, RowStatus, StorageType, TEXTUAL-CONVENTION, 
+    TimeInterval, TimeStamp, TruthValue
+        FROM SNMPv2-TC
+    TransportAddress, TransportAddressType
+        FROM TRANSPORT-ADDRESS-MIB;
+
+mxMonMIB MODULE-IDENTITY
+    LAST-UPDATED "201207200619Z"
+    ORGANIZATION 
+        "The OpenSS7 Project"
+    CONTACT-INFO 
+        "Brian Bidulock
+         OpenSS7 Corporation
+         1469 Jefferys Crescent
+         Edmonton AB  T6L 6T1
+         CANADA
+         Tel: +1 780 490 1141
+         Fax: +1 780 490 1241
+         Mob: +1 780 953 0557
+         E-Mail: bidulock@openss7.org"
+    DESCRIPTION 
+        "MIB Module for monitoring the MX multiplexing driver.  In the 
+         OpenSS7 system the MX multiplexing driver is a TDM switching 
+         module.
+         
+         Copyright (c) 2008-2012  Monavacon Limited
+         Copyright (c) 2001-2008  OpenSS7 Corporation
+         Copyright (c) 1997-2001  Brian F. G. Bidulock
+         
+         All Rights Reserved.
+         
+         This program is free software; you can redistribute it and/or 
+         modify it under the terms of the GNU Affero General Public 
+         License as published by the Free Software Foundation; version 3 
+         of the License.
+         
+         This program is distributed in the hope that it will be useful, 
+         but WITHOUT ANY WARRANTY; without even the implied warranty of 
+         MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the 
+         GNU Affero General Public License for more details.
+         
+         You should have received a copy of the GNU Affero General 
+         Public License along with this program.  If not, see 
+         <http://www.gnu.org/licenses/>, or write to the Free Software 
+         Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+         
+         Note well: notwithstanding this AGPL license, you are not 
+         permitted to make modifications under the OpenSS7 project's 
+         enterprise object identifier arc: 1.3.6.1.4.1.29591.  
+         Modifications must be made only within an object identifier arc 
+         under your control."
+    REVISION    "201207200619Z"
+    DESCRIPTION 
+        "First release of this module."
+    ::= { openss7Modules 81 }
+
+
+-- ====================================================================
+-- TEXTUAL CONVENTIONS
+-- ====================================================================
+
+MonitoringSourceName ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "1a"
+    STATUS      current
+    DESCRIPTION 
+        "This textual convention describes an MX monitoring source.  An 
+         MX monitoring source is described with a codified ASCII string 
+         that has the following components:
+         
+         - The driver name (or a single '*' indicating all drivers).  
+           When different from '*', the driver name must conform to the 
+           specification of a StreamsModuleName textual convention from 
+           the OPENSS7-STREAMS-MIB.  When the driver name is a single 
+           asterisk ('*'), the monitoring source refers to all sources 
+           from all MX drivers.  When the source name ends in the driver 
+           name (the driver name ends in a alphabetical character), the 
+           monitoring source refers to all sources from the specified 
+           driver.
+         
+         - One or more ASCII digits specifying an ordinal card number 
+           (starting at zero 0) supported by the driver.  This component 
+           is optional; however, it must be specified if the component 
+           that follows is specified.  When the source name ends with 
+           this component, the monitoring source refers to all sources 
+           for the specified card.
+         
+         - A colon (':') followed by one or more ASCII digits specifying 
+           an ordinal span number on the card (starting at zero).  When 
+           the source name ends with this component, the monitoring 
+           source refers to all sources for the specified span.
+         
+         - A period ('.') followed by one or more ASCII digits 
+           specifying the ordinal channel number on the card.  The 
+           ordinal channel number starts at one and spans through 24 for 
+           T1/J1 spans and 31 for E1 spans.  The channel number zero (0) 
+           is special and refers to a high-speed signalling link that 
+           takes up the entire span.  When the source name ends with 
+           this component, the monitoring source refers to the specified 
+           channel(s)."
+    SYNTAX      OCTET STRING (SIZE(1..16))
+
+ProfileName ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "1a"
+    STATUS      current
+    DESCRIPTION 
+        "This textual convention describes the name of a protocol 
+         parameter profile.  The name is limited to 16 characters so 
+         that it can be used effectively as a table index."
+    SYNTAX      OCTET STRING (SIZE(1..16))
+
+mxMonNotifications OBJECT IDENTIFIER
+    ::= { mxMonMIB 1 }
+
+mxMonObjects OBJECT IDENTIFIER
+    ::= { mxMonMIB 2 }
+
+-- ====================================================================
+-- TABLES
+-- ====================================================================
+
+mxMonitor OBJECT IDENTIFIER
+    ::= { mxMonObjects 1 }
+
+mxMonitorTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF MxMonitorEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Provides a table of sources that are to be monitored (messages 
+         captured)."
+    ::= { mxMonitor 1 }
+
+mxMonitorEntry OBJECT-TYPE
+    SYNTAX      MxMonitorEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Each row tin the monitor table describes a message source that 
+         is to be monitored.  Message sources can be entire drivers, 
+         entire cards, specific spans or specific channels within a 
+         specific span."
+    INDEX       { mxMonitorSource }
+    ::= { mxMonitorTable 1 }
+
+MxMonitorEntry ::= SEQUENCE {
+    mxMonitorSource             MonitoringSourceName,
+    mxMonitorExport             TruthValue,
+    mxMonitorAdminState         AdministrativeState,
+    mxMonitorOperState          OperationalState,
+    mxMonitorAvailStatus        AvailabilityStatus,
+    mxMonitorProcStatus         ProceduralStatus,
+    mxMonitorUsageState         UsageState,
+    mxMonitorMessages           Counter32,
+    mxMonitorMsgOctets          Counter32,
+    mxMonitorSusCompressed      Counter32,
+    mxMonitorMsuDrops           Counter32,
+    mxMonitorActiveLinkDirs     Gauge32,
+    mxMonitorActiveHslDirs      Gauge32,
+    mxMonitorResetCounts        TruthValue,
+    mxMonitorLastReset          TimeStamp,
+    mxMonitorCurrent            TimeStamp
+}
+
+mxMonitorSource OBJECT-TYPE
+    SYNTAX      MonitoringSourceName
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Provides the identification of the source and scope of the 
+         messages to be monitored using the MonitoringSourceName textual 
+         convention."
+    ::= { mxMonitorEntry 1 }
+
+mxMonitorExport OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Specifies whether this monitor source will be exported as a 
+         monitor source to remote system.  When true(1), the monitor 
+         source will be exported; false(2), otherwise."
+    ::= { mxMonitorEntry 2 }
+
+mxMonitorAdminState OBJECT-TYPE
+    SYNTAX      AdministrativeState
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Provides the administrative state of the monitor source:
+         
+         - locked(0), capture of messages from this monitor source is 
+           administratively prohibited;
+         
+         - unlocked(1), capture of messages from this monitor source is 
+           administratively permitted;
+         
+         - shuttingDown(2), the monitor source is shutting down: once it 
+           ceases generating messages, it will move to the locked(0) 
+           state.
+         
+         The value shuttingDown(2) is only valid when read and not valid 
+         when written.  This object is used primarily to enable or 
+         disable capture from the monitor source."
+    REFERENCE   
+        "OPENSS7-SMI-MIB, ITU-T Rec. X.721 | ISO/IEC 10165-2, 
+         administrativeState."
+    DEFVAL      { locked }
+    ::= { mxMonitorEntry 3 }
+
+mxMonitorOperState OBJECT-TYPE
+    SYNTAX      OperationalState
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Provides the operational state of the monitor source:
+         
+         - enabled(0), message source is enabled;
+         - disabled(1), message source is disabled.
+         
+         When enabled(0), messages generated by the source can be 
+         captured; when disabled(1), they cannot."
+    REFERENCE   
+        "OPENSS7-SMI-MIB, ITU-T Rec. X.721 | ISO/IEC 10165-2, 
+         operationalState."
+    ::= { mxMonitorEntry 4 }
+
+mxMonitorAvailStatus OBJECT-TYPE
+    SYNTAX      AvailabilityStatus
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Provides the availability status of the monitor source; it 
+         may contain:
+         
+         - inTest(0), the monitor source is in test; administrative 
+           state is locked(0), operational state is disabled(1);
+         
+         - failed(1), the monitor source has an internal fault that 
+           prevents it from operating; operational state disabled(1);
+         
+         - powerOff(2), the monitor source is not powered one;
+         
+         - offLine(3), the monitor source requires a routing operation;
+         
+         - offDuty(4), the monitor source is off duty per schedule;
+         
+         - dependency(5), the monitor source cannot operate due to a 
+           dependency;
+         
+         - degraded(6), the monitor source is operating with degraded 
+           performance;
+         
+         - notInstalled(7), the monitor source is not installed."
+    ::= { mxMonitorEntry 5 }
+
+mxMonitorProcStatus OBJECT-TYPE
+    SYNTAX      ProceduralStatus
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Provides the procedural status of the monitor source:
+         - initializationRequired(0),
+         - notInitialized(1),
+         - initializing(2),
+         - reporting(3),
+         - terminating(4),"
+    REFERENCE   
+        "OPENSS7-SMI-MIB, ITU-T Rec. X.721 | ISO/IEC 10165-2, 
+         proceduralStatus."
+    ::= { mxMonitorEntry 6 }
+
+mxMonitorUsageState OBJECT-TYPE
+    SYNTAX      UsageState
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Provides the usage state of the monitor source:
+         
+         - idle(0), the monitor source is not currently in use;
+           
+         - active(1), the monitor source is in use and has sufficient 
+           operating capacity to provide for additional users 
+           simultaneously;
+           
+         - busy(2), the monitor is in use an has no spare capacity."
+    REFERENCE   
+        "OPENSS7-SMI-MIB, ITU-T Rec. X.721 | ISO/IEC 10165-2, 
+         usageState."
+    ::= { mxMonitorEntry 7 }
+
+mxMonitorMessages OBJECT-TYPE
+    SYNTAX      Counter32
+    UNITS       "messages"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Provides a count of the number of messages that were captured 
+         from the source at the time that this object was read.  For an 
+         active monitoring source and capture, this counter will 
+         increase monotonically (wrapping) and rapidly.  The counter can 
+         be reset to zero by writing to the mxMonitorResetCounts column.  
+         Note that this counter is also resest to zero by the agent 
+         whenever a capture file is rotated."
+    ::= { mxMonitorEntry 8 }
+
+mxMonitorMsgOctets OBJECT-TYPE
+    SYNTAX      Counter32
+    UNITS       "message octets"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Provides a count of the number of message octets that were 
+         captured from the source by the time that this object was read.  
+         For an active monitoring source and capture, this counter will 
+         increase monotonically (wrapping) and rapidly.  The counter can 
+         be reset to zero by writing to the mxMonitorResetCounts column.  
+         Note that this counter is also reset to zero by the agent 
+         whenever a capture file is rotated."
+    ::= { mxMonitorEntry 9 }
+
+mxMonitorSusCompressed OBJECT-TYPE
+    SYNTAX      Counter32
+    UNITS       "SUs"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Provides a count of the number of FISUs or LSSUs that were 
+         compressed due to repetition.  For an active monitoring source 
+         and capture, this counter will increase monotonically 
+         (wrapping) and rapidly.  The counter can be reset to zero by 
+         writing to the mxMonitorResetCounts column.  Note that this 
+         counter is also reset to zero by the agent whenever a capture 
+         file is rotated."
+    ::= { mxMonitorEntry 10 }
+
+mxMonitorMsuDrops OBJECT-TYPE
+    SYNTAX      Counter32
+    UNITS       "MSUs"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Provides a count of the number of MSUs that were dropped due to 
+         inadequate resources.  For an active monitoring source and 
+         capture, this counter should always remain at zero.  The 
+         counter can be reset to zero by writing to the 
+         mxMonitorResetCounts column.  Note that this counter is also 
+         reset to zero by the agent whenever a capture file is rotated."
+    ::= { mxMonitorEntry 11 }
+
+mxMonitorActiveLinkDirs OBJECT-TYPE
+    SYNTAX      Gauge32
+    UNITS       "channels"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Provides a high water mark of the number of low-speed (56 or 64 
+         kbps) signalling link directions that were actively monitored 
+         (i.e, messages were captured from the link for the direction) 
+         since the water mark was reset.  This water mark can be reset 
+         to zero by writing to the mxMoniorResetCounts column.  The 
+         water mark is also reset to zero by the agent whenever a 
+         capture file is rotated.  This column is useful for determining 
+         whether the appropriate number of signalling links are being 
+         monitored for a span, card, driver or default source."
+    ::= { mxMonitorEntry 12 }
+
+mxMonitorActiveHslDirs OBJECT-TYPE
+    SYNTAX      Gauge32
+    UNITS       "spans"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Provides a high water mark of the number of high-speed (1.536 
+         or 1.892 kbps) signalling link directions that were actively 
+         monitored (i.e, messages were captured from the link for the 
+         direction) since the water mark was reset.  This water mark can 
+         be reset to zero by writing to the mxMonitorResetCounts column.  
+         The water mark is also reset to zero by the agent whenever a 
+         capture file is rotated.  This is useful for determining 
+         whether an appropriate number of signalling links are being 
+         monitored for a card, driver or default source."
+    ::= { mxMonitorEntry 13 }
+
+mxMonitorResetCounts OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "When true(1) is written to this object, the counts provided in 
+         mxMonitorMessages, mxMonitorMsgOctets, mxMonitorActiveLinkDirs 
+         and mxMonitorActiveHslDirs are reset to zero."
+    DEFVAL      { false }
+    ::= { mxMonitorEntry 14 }
+
+mxMonitorLastReset OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Provides the time (using the TimeStamp textual convention) at 
+         which the counts provided in mxMonitorMessages, 
+         mxMonitorMsgOctets, mxMonitorActiveLinkDirs and 
+         mxMonitorActiveHslDirs were reset to zero.  The intent of this 
+         object is to allow some support for scripting at the management 
+         station."
+    ::= { mxMonitorEntry 15 }
+
+mxMonitorCurrent OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Provides the time (using the TimeStamp textual convention) at 
+         which this object was read.  This time stamp can be used in 
+         conjunction with the mxMonitorLastReset time stamp to determine 
+         for what time interval the counts also read apply.  The intent 
+         of this object is to allow some support for scripting at the 
+         management station."
+    ::= { mxMonitorEntry 16 }
+
+-- =====================================================================
+-- mxCapture group
+-- =====================================================================
+-- The mxCapture group is responsible for managing the naming, rotation, 
+-- spooling, upload and archiving of capture files.
+-- .....................................................................
+
+mxCapture OBJECT IDENTIFIER
+    ::= { mxMonObjects 2 }
+
+mxCaptureNameString OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(1..32))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Specifies the file name as a printf-style string that specifies 
+         the base name of the file (without file extensions)."
+    DEFVAL      { "mxmon-%Y-%M-%D-%H" }
+    ::= { mxCapture 1 }
+
+mxCaptureRotInterval OBJECT-TYPE
+    SYNTAX      TimeInterval
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Specifies the rotation of capture files based on the interval 
+         of time since the capture file was last rotated.  When the 
+         interval elaspes since the last rotation, the file will be 
+         rotated.  The time interval of zero is special: it specifies to 
+         not rotate files based on interval."
+    ::= { mxCapture 2 }
+
+mxCaptureRotSize OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "bytes"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Specifies the rotation of capture files based on the file size 
+         in bytes.  The capture file size includes the bytes in captured 
+         messages as well as any overhead included in the record format.  
+         When the file exceeds the specified size, the file will be 
+         rotated.  The value zero (0) is special: it specifies to not 
+         rotate files based on the size of the file."
+    ::= { mxCapture 3 }
+
+mxCaptureRotNumber OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "records"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Specifies the rotation of capture files based on the number of 
+         records (messages) contained within the capture file. When the 
+         number of messages matches the specified value, the file will 
+         be rotated.  The value zero (0) is special: it specifies to not 
+         rotate files based on the number of records."
+    DEFVAL      { 0 }
+    ::= { mxCapture 4 }
+
+mxCaptureCachePath OBJECT-TYPE
+    SYNTAX      SnmpAdminString
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Specifies the filesystem path to the directory where files are 
+         cached while they are being captured.  The default if not 
+         specified on row creation is '/var/local/os7live/cache'."
+    DEFVAL      { "/var/local/os7live/cache" }
+    ::= { mxCapture 5 }
+
+mxCaptureSpoolPath OBJECT-TYPE
+    SYNTAX      SnmpAdminString
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Specifies the filesystem path to the directory where files are 
+         spooled once they have been rotated.  The default if not 
+         specified on row creation is '/var/local/os7live/spool'."
+    DEFVAL      { "/var/local/os7live/spool" }
+    ::= { mxCapture 6 }
+
+mxCaptureArchivePath OBJECT-TYPE
+    SYNTAX      SnmpAdminString
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Specifies the filesystem path to the directory where files are 
+         archived once they have been uploaded.  The default if not 
+         specified on row creation is '/var/local/os7live/archive'"
+    DEFVAL      { "/var/local/os7live/archive" }
+    ::= { mxCapture 7 }
+
+mxCaptureArchiveSubdirs OBJECT-TYPE
+    SYNTAX      BITS { daily(0), weekly(1), monthly(2), yearly(3) }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Specifies the subdirectories that will be used within the 
+         archive filesystem directory to organize archived files by 
+         date.  This object is single-valued and can contain zero or 
+         more of the following values:
+         
+         - daily(0), collect files by day of generation within a daily 
+           subdirectory whose name is the date (YYYY-MM-DD);
+           
+         - weekly(1), collect files and daily subdirectories (if any) 
+           within a weekly subdirectory whose name is the date of the 
+           beginning of the week (YYYY-MM-DD);
+           
+         - monthly(2), collect files, daily and weekly subdirectories 
+           (if any) within a monthly subdirectory whose name is the year 
+           and month (YYYY-MM);
+           
+         - yearly(3), collect files, daily, weekly and monthly 
+           subdirectories (if any) within a yearly subdirectory whose 
+           name is the year (YYYY).
+           
+         The default value on row creation when no set is specified is 
+         daily(0) and monthly(2)."
+    DEFVAL      { {daily, monthly} }
+    ::= { mxCapture 8 }
+
+mxCaptureCompression OBJECT-TYPE
+    SYNTAX      INTEGER { none(0), gz(1), bz2(2), xz(3), zip(4) }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "When an active capture or correlation file is rotated and 
+         spooled it is compressed.  Compression is maintained on the 
+         file when it is archived.  This object specifies what 
+         compression to use.  This object is single-values and can have 
+         one of the following values:
+         
+         - none(0), no compression, no filename extension;
+         
+         - gz(1), gzip compression, .gz filename extension;
+         
+         - bz2(2), bzip2 compression, .bz2 filename extension;
+         
+         - xz(3), xz compression, .xz filename extension;
+         
+         - zip(4), zip archive, .zip filename extension.
+         
+         When a compression of other than none(0) is specified, the 
+         corresponding file extension will be added to the file name.  
+         Zip archive contain the single original file.  The default 
+         value if unspecified on row creation is xz(3) compression."
+    DEFVAL      { xz }
+    ::= { mxCapture 9 }
+
+mxCaptureFileSystemAlloc OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "percent"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Specifies the percentage of the filesystem in which the 
+         mxCaptureArchivePath exists that is allocated to archival 
+         capture files.  The total amount of space occupied by archival 
+         capture files will not exceed this limit.
+         
+         When a row is created and this amount is not specified, the 
+         default value is 90%."
+    DEFVAL      { 90 }
+    ::= { mxCapture 10 }
+
+mxCaptureMaxDiskUsage OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "percent"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Specifies the percentage of the allocation portion of the the 
+         filesystem in which the mxCaptureArchivePath exists that is 
+         usable for archival capture files.  The total amount of space 
+         occupied by archival capture files will not exceed this limit.
+         
+         When a row is created and this amount is not specified, the 
+         efault value is 80%."
+    DEFVAL      { 80 }
+    ::= { mxCapture 11 }
+
+mxCaptureDiscardPolicy OBJECT-TYPE
+    SYNTAX      INTEGER { ignore(0), oldest(1), largest(2) }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Specifies the discard policy for archival capture files when 
+         file system allocation and disk usage limits are exceeded.  
+         This object is single-valued and can assume one of the 
+         following values:
+         
+         - ignore(0), ignores file system and disk usage limits;
+           
+         - oldest(1), the oldest archival capture files are discarded;
+           
+         - largest(2), the largest archive capture files are discarded.
+           
+         When a row is created and this amount is not specified, the 
+         default value is oldest(1)."
+    DEFVAL      { oldest }
+    ::= { mxCapture 12 }
+
+mxCaptureUpload OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        ""
+    ::= { mxCapture 13 }
+
+mxCaptureTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF MxCaptureEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Provides a table of capture files."
+    ::= { mxCapture 14 }
+
+mxCaptureEntry OBJECT-TYPE
+    SYNTAX      MxCaptureEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Each row in the mxCaptureTable provides information concerning 
+         a single capture file and provides some actions that can be 
+         performed on the file."
+    INDEX       { mxCaptureIndex }
+    ::= { mxCaptureTable 1 }
+
+MxCaptureEntry ::= SEQUENCE {
+    mxCaptureIndex              Unsigned32,
+    mxCaptureName               SnmpAdminString,
+    mxCaptureCompressed         INTEGER,
+    mxCaptureState              INTEGER,
+    mxCaptureLinkType           INTEGER,
+    mxCaptureSize               Gauge32,
+    mxCaptureCompSize           Gauge32,
+    mxCaptureMessages           Gauge32,
+    mxCaptureMsgOctets          Gauge32,
+    mxCaptureActiveLinkDirs     Gauge32,
+    mxCaptureActiveHslDirs      Gauge32,
+    mxCaptureBegTime            TimeStamp,
+    mxCaptureEndTime            TimeStamp,
+    mxCaptureActionResult       INTEGER
+}
+
+mxCaptureIndex OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Provides a non-zero ordinal index into the capture file table 
+         that uniquely identifies the capture file.  Files do not obtain 
+         a new index as they are rotated.  Indices are not small integer 
+         numbers, and are reverse assigned (subsequent indices are 
+         smaller in value than previously assigned indices).  Indices 
+         are ordinal and monotonically decreasing.  The current capture 
+         file will, therefore, always be the smallest index and appear 
+         first when the table is walked."
+    ::= { mxCaptureEntry 1 }
+
+mxCaptureName OBJECT-TYPE
+    SYNTAX      SnmpAdminString
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Provides the base name (without filesystem path or extensions) 
+         of the capture file.  The file name may be changed by writing 
+         to this object."
+    ::= { mxCaptureEntry 2 }
+
+mxCaptureCompressed OBJECT-TYPE
+    SYNTAX      INTEGER { none(0), gz(1), bz2(2), xz(3), zip(4) }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Provides the compression applied to the file on the filesystem.  
+         Compression is single-values and can assume one of the 
+         following values:
+         
+         - none(0), the file is not compressed;
+         - gz(1), the file is gzip compressed;
+         - bz2(2), the file is bzip2 compressed;
+         - xz(3), the file is xz compressed;
+         - zip(4), the file is zip compressed.
+         
+         The file can be decompressed or recompressed by writing to this 
+         object."
+    ::= { mxCaptureEntry 3 }
+
+mxCaptureState OBJECT-TYPE
+    SYNTAX      INTEGER { current(0), spooled(1), archived(2), 
+                    deleted(3) }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Indicates the state of the file.  File state is single-valued 
+         and can be one of the following:
+         
+         - current(0), the file is a current capture file that is 
+           actively capturing messages;
+         
+         - spooled(1), the file has been rotated and is no longer 
+           capturing messages; however, it is awaiting upload or 
+           download;
+         
+         - archived(2), the file has been rotated and also uploaded or 
+           downloaded and is archived; archived files are subject to 
+           deletion;
+         
+         - deleted(3), the file has been removed from the archive.
+         
+         Management stations can change the state of the file using the 
+         mxCaptureActionResult object."
+    ::= { mxCaptureEntry 4 }
+
+mxCaptureLinkType OBJECT-TYPE
+    SYNTAX      INTEGER { mtp2ph(139), mtp2(140), mtp3(141), sccp(142) }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Indicates the PCAP file format link type associated with the 
+         capture file.  The link type is single-valued and can assume 
+         one of the following values:
+         
+         - mtp2ph(139), MTP level 2 with pseudo-header indicating link 
+           id and direction;
+         
+         - mtp2(140), MTP level 2 without pseudo-header;
+         
+         - mtp3(141), MTP level 3 without pseudo-header; MTP level 2 
+           (link layer) headers are stripped;
+         
+         - sccp(142), SCCP without pseudo-header; MTP level 2 and 3 
+           (link layer) headers are stripped.
+           
+         For SS7 monitoring, link types should typically by mtp2ph(139) 
+         because it retains the most information."
+    ::= { mxCaptureEntry 5 }
+
+mxCaptureSize OBJECT-TYPE
+    SYNTAX      Gauge32
+    UNITS       "bytes"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Indicates the size of the uncompressed file in bytes.  When no 
+         compression is applied to the file, this value will be the same 
+         as the mxCaptureCompSize."
+    ::= { mxCaptureEntry 6 }
+
+mxCaptureCompSize OBJECT-TYPE
+    SYNTAX      Gauge32
+    UNITS       "bytes"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Indicates the size of the compressed file in bytes.  When no 
+         compression is applied to the file, this value will be the same 
+         as the mxCaptureSize."
+    ::= { mxCaptureEntry 7 }
+
+mxCaptureMessages OBJECT-TYPE
+    SYNTAX      Gauge32
+    UNITS       "messages"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Indicates the number of messages contained in the file."
+    ::= { mxCaptureEntry 8 }
+
+mxCaptureMsgOctets OBJECT-TYPE
+    SYNTAX      Gauge32
+    UNITS       "message octets"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Indicates the total number of message octets contained in the 
+         file."
+    ::= { mxCaptureEntry 9 }
+
+mxCaptureActiveLinkDirs OBJECT-TYPE
+    SYNTAX      Gauge32
+    UNITS       "low-speed links"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Provides a count of the number of low-speed (56 or 64 kbps) 
+         signalling link directions that were actively captured (i.e, 
+         the file contains messages that were captured from the link for 
+         the direction.  This column is useful for determining whether 
+         the appropriate number of signalling links are being captured 
+         for a span, card, driver or default source.  This column is 
+         useful for determining whether the appropriate number of high- 
+         and low-speed links have been captured for a span, card, driver 
+         or default source."
+    ::= { mxCaptureEntry 10 }
+
+mxCaptureActiveHslDirs OBJECT-TYPE
+    SYNTAX      Gauge32
+    UNITS       "high-speed links"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Provides a count of the number of high-speed (1.536 or 1.892 
+         kbps) signalling link directions that were actively captured 
+         (i.e, the file contains messages that were captured from the 
+         link for the direction.  This column is useful for determining 
+         whether the appropriate number of high- and low-speed links are 
+         being captured for a card, driver or default source."
+    ::= { mxCaptureEntry 11 }
+
+mxCaptureBegTime OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Indicates the time (using the TimeStamp textual convention) 
+         that the capture file was opened (capturing of messages to the 
+         file began)."
+    ::= { mxCaptureEntry 12 }
+
+mxCaptureEndTime OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Indicates the time (using the TimeStamp textual convention) 
+         that the capture file was closed (capturing of messages to the 
+         file ended)."
+    ::= { mxCaptureEntry 13 }
+
+mxCaptureActionResult OBJECT-TYPE
+    SYNTAX      INTEGER { success(0), failure(1), spool(2), archive(3), 
+                    delete(4), upload(5) }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Provides actions and their results.  The action-result is 
+         single-valued and can assume one of the following values:
+         
+         - success(0), the last action was successful;
+         - failure(1), the last action failed;
+         - spool(2), change the state of a file in the current or 
+           archived states to spooled; when successfully applied to a 
+           current capture file, the capture file is rotated; when to an 
+           archived file, the file is respooled;
+         - archive(3), change the state of a spooled file to archived; 
+           this action unspools and archives a spooled file;
+         - delete(4), delete the capture file; this action can only be 
+           applied to archived files;
+         - upload(5), initiate an upload of the file; this action can 
+           only be applied to spooled files; once upload is complete, 
+           the file will be archived.
+         
+         When written, only values spool(2), archive(3), delete(4) and 
+         upload(5) are valid and represent the action to be performed.  
+         When read, only values success(0) or failure(1) will be 
+         returned and represent the result of the previous action."
+    ::= { mxCaptureEntry 14 }
+
+-- =====================================================================
+-- mxPush group
+-- =====================================================================
+-- The mxPush group is responsible for managing live feeds of captured 
+-- messages to remote entities.
+-- .....................................................................
+
+mxPush OBJECT IDENTIFIER
+    ::= { mxMonObjects 3 }
+
+mxPushTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF MxPushEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "The probe is capable of exporting its monitor source 
+         definitions from the mxMonitorTable to remote collectors.  In 
+         doing so, either the probe or the collector can establish the 
+         connection.  This mxPushTable contains the transport adddress 
+         of the collectors to which exported monitor sources are to be 
+         pushed: that is, this probe will initiate establishment of a 
+         connection to the remote collector.
+         
+         The mxPullTable defines connections that are initiated in the 
+         opposite direciton."
+    ::= { mxPush 1 }
+
+mxPushEntry OBJECT-TYPE
+    SYNTAX      MxPushEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        ""
+    INDEX       { mxPushIndex }
+    ::= { mxPushTable 1 }
+
+MxPushEntry ::= SEQUENCE {
+    mxPushIndex             Unsigned32,
+    mxPushHostname          DisplayString,
+    mxPushXportAddrType     TransportAddressType,
+    mxPushXportAddr         TransportAddress,
+    mxPushXportProfile      SnmpAdminString,
+    mxPushStorageType       StorageType,
+    mxPushRowStatus         RowStatus
+}
+
+mxPushIndex OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Provides a non-zero ordinal index into the mxPushTable."
+    ::= { mxPushEntry 1 }
+
+mxPushHostname OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Provides the specification of one transport endpoint to which 
+         to push monitor sources expressed as a hostname and port 
+         address specification."
+    ::= { mxPushEntry 2 }
+
+mxPushXportAddrType OBJECT-TYPE
+    SYNTAX      TransportAddressType
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Specifies the transport address type.  For sctpipv4(9), the 
+         transport address is an IPv4 address and port number; for 
+         sctpipv6(10), it is an IPv6 address and port number."
+    REFERENCE   
+        "TRANSPORT-ADDRESS-MIB, TransportAddressType"
+    DEFVAL      { sctpIpv4 }
+    ::= { mxPushEntry 3 }
+
+mxPushXportAddr OBJECT-TYPE
+    SYNTAX      TransportAddress
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Specifies the transport address of the remote host to which to 
+         push monitor sources.  The address is of type 
+         mxPushXportAddrType."
+    REFERENCE   
+        "TRANSPORT-ADDRESS-MIB, TransportAddressType"
+    ::= { mxPushEntry 4 }
+
+mxPushXportProfile OBJECT-TYPE
+    SYNTAX      SnmpAdminString
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Specifies the transport address protocol parameters profile 
+         that is to be used to supply protocol parameters, timers, and 
+         options for the connection.  The values of this object must be 
+         the same as the name of a row in the mxXportProfileTable."
+    ::= { mxPushEntry 5 }
+
+mxPushStorageType OBJECT-TYPE
+    SYNTAX      StorageType
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Specifies the storage type for this conceptual row.  On write, 
+         only storage types volatile() and nonVolatile() are 
+         applicable."
+    DEFVAL      { nonVolatile }
+    ::= { mxPushEntry 6 }
+
+mxPushRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Provides a mechanism whereby mangaement stations may create and 
+         destroy rows in this table."
+    ::= { mxPushEntry 7 }
+
+-- =====================================================================
+-- mxPull group
+-- =====================================================================
+-- The mxPull group is responsible for managing live feeds of captured 
+-- messages from remote entities.
+-- .....................................................................
+
+mxPull OBJECT IDENTIFIER
+    ::= { mxMonObjects 4 }
+
+mxPullTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF MxPullEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "The collector is capable of importing other monitor source 
+         definitions from the mxMonitorTable of remote probes.  In doing 
+         so, either the collector or the probe can establish the 
+         connection.  This mxPullTable contains the transport addresses 
+         of the probes from which imported monitor sources are to be 
+         pulled: that is, the collector will initiate establishement of 
+         a connection to the remote probe.
+         
+         The mxPushTable defines connections that are initiated in the 
+         opposite direction."
+    ::= { mxPull 1 }
+
+mxPullEntry OBJECT-TYPE
+    SYNTAX      MxPullEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        ""
+    INDEX       { mxPullIndex }
+    ::= { mxPullTable 1 }
+
+MxPullEntry ::= SEQUENCE {
+    mxPullIndex             Unsigned32,
+    mxPullHostname          DisplayString,
+    mxPullXportAddrType     TransportAddressType,
+    mxPullXportAddr         TransportAddress,
+    mxPullXportProfile      SnmpAdminString,
+    mxPullStorageType       StorageType,
+    mxPullRowStatus         RowStatus
+}
+
+mxPullIndex OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Provides a non-zero ordinal row index into the mxPullTable."
+    ::= { mxPullEntry 1 }
+
+mxPullHostname OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Providse the specification of one transport endpoint from which 
+         to pull monitor sources expressed as a hostname and port 
+         address specification."
+    ::= { mxPullEntry 2 }
+
+mxPullXportAddrType OBJECT-TYPE
+    SYNTAX      TransportAddressType
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Specifies the transport address type.  For sctpIpv4(9), the 
+         transport address is an IPv4 address and port number; for 
+         sctpIpv6(10), it is an IPv6 address and port number."
+    REFERENCE   
+        "TRANSPORT-ADDRESS-MIB, TransportAddressType"
+    ::= { mxPullEntry 3 }
+
+mxPullXportAddr OBJECT-TYPE
+    SYNTAX      TransportAddress
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Specifies the trasnport address of the remote host from which 
+         to pull monitor sources.  The address is of type 
+         mxPullXportAddrType."
+    REFERENCE   
+        "TRANSPORT-ADDRESS-MIB, TransportAddressType"
+    ::= { mxPullEntry 4 }
+
+mxPullXportProfile OBJECT-TYPE
+    SYNTAX      SnmpAdminString
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Specifies the transport address protocol parameters profile 
+         that is to be used to supply protocol parameters, timers, and 
+         options for the connection.  The values of this object must be 
+         the same as the name of a row in the mxXportProfileTable."
+    ::= { mxPullEntry 5 }
+
+mxPullStorageType OBJECT-TYPE
+    SYNTAX      StorageType
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Specifies the storage type for this conceptual row.  On write, 
+         only storage types volatile() and nonVolatile() are 
+         applicable."
+    ::= { mxPullEntry 6 }
+
+mxPullRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Provides a mechanism whereby management stations may create and 
+         destroy rows in this table."
+    ::= { mxPullEntry 7 }
+
+-- =====================================================================
+-- mxUpload group
+-- =====================================================================
+-- The mxUpload group is responsible for managing the uploading of 
+-- capture files to central repository servers.
+-- .....................................................................
+
+mxUpload OBJECT IDENTIFIER
+    ::= { mxMonObjects 5 }
+
+-- =====================================================================
+-- mxDownload group
+-- =====================================================================
+-- The mxDownload group is responsible for managing the downloading of 
+-- capture files to central repository servers.
+-- .....................................................................
+
+mxDownload OBJECT IDENTIFIER
+    ::= { mxMonObjects 6 }
+
+-- =====================================================================
+-- mxCollect group
+-- =====================================================================
+-- The mxCollect group is responsible for managing the collection of 
+-- messages from additional remote sources.
+-- .....................................................................
+
+mxCollect OBJECT IDENTIFIER
+    ::= { mxMonObjects 7 }
+
+mxCollectTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF MxCollectEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        ""
+    ::= { mxCollect 1 }
+
+mxCollectEntry OBJECT-TYPE
+    SYNTAX      MxCollectEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        ""
+    INDEX       { mxCollectIndex }
+    ::= { mxCollectTable 1 }
+
+MxCollectEntry ::= SEQUENCE {
+    mxCollectIndex          Unsigned32,
+    mxCollectXportAddrType  TransportAddressType,
+    mxCollectXportAddr      TransportAddress,
+    mxCollectAdminState     AdministrativeState,
+    mxCollectOpState        OperationalState,
+    mxCollectRowStatus      RowStatus
+}
+
+mxCollectIndex OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Provides a non-zero ordinal index into the mxCollectTable."
+    ::= { mxCollectEntry 1 }
+
+mxCollectXportAddrType OBJECT-TYPE
+    SYNTAX      TransportAddressType
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Provides the type of the remote monitor source transport 
+         address.  For IPv4 this is sctpIpv4(9); for IPv6, 
+         sctpIpv6(10)."
+    REFERENCE   
+        "TRANSPORT-ADDRESS-MIB, TransportAddressType."
+    ::= { mxCollectEntry 2 }
+
+mxCollectXportAddr OBJECT-TYPE
+    SYNTAX      TransportAddress
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Provides the remote monitoring point's transport address of 
+         type mxCollectXportAddrType.  This is an IP address and port 
+         number."
+    REFERENCE   
+        "TRASNPORT-ADDRESS-MIB, TransportAddress"
+    ::= { mxCollectEntry 3 }
+
+mxCollectAdminState OBJECT-TYPE
+    SYNTAX      AdministrativeState
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Provides the administrative state of collection from the remote 
+         monitoring point.  When locked(0), collection from the remote 
+         monitoring point is prohibited (regardless of the operational 
+         state of the connection); when unlocked, collection is 
+         permitted."
+    DEFVAL      { locked }
+    ::= { mxCollectEntry 4 }
+
+mxCollectOpState OBJECT-TYPE
+    SYNTAX      OperationalState
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Provides the operational state of collection from the remote 
+         monitoring point.  When enabled(0), collection is being 
+         performed; otherwise, disabled(1)."
+    ::= { mxCollectEntry 5 }
+
+mxCollectRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Provides a mechanism whereby management staions can add remote 
+         monintoring points to the mxCollectTable."
+    ::= { mxCollectEntry 6 }
+
+-- =====================================================================
+-- mxSctp group
+-- =====================================================================
+-- The mxSctp group is responsible for providing SCTP protocol 
+-- parameters and defaults for use with the creation and operation of 
+-- SCTP associations.
+-- .....................................................................
+
+mxSctp OBJECT IDENTIFIER
+    ::= { mxMonObjects 8 }
+
+mxSctpDefaultNoDelay OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Provides the default value to be used in the mxSctpNoDelay 
+         column when rows are created in the mxSctpTable and no value is 
+         specified."
+    DEFVAL      { false }
+    ::= { mxSctp 1 }
+
+mxSctpDefaultMaxseg OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Provides the default value to be used in the mxSctpMaxseg 
+         column when rows are created in the mxSctpTable and no value is 
+         specified."
+    DEFVAL      { 536 }
+    ::= { mxSctp 2 }
+
+mxSctpDefaultHeartbeatItvl OBJECT-TYPE
+    SYNTAX      MilliSeconds
+    UNITS       "seconds"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Provides the default value to be used in the 
+         mxSctpHeartbeatItvl column when rows are created in the 
+         mxSctpTable and no value is specified."
+    DEFVAL      { 60000 }
+    ::= { mxSctp 3 }
+
+mxSctpDefaultHeartbeat OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Provides the default value to be used in the mxSctpHeartbeat 
+         column when rows are created in the mxSctpTable and no value is 
+         specified."
+    DEFVAL      { true }
+    ::= { mxSctp 4 }
+
+mxSctpDefaultRtoInitial OBJECT-TYPE
+    SYNTAX      MilliSeconds
+    UNITS       "seconds"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Provides the default value to be used in the mxSctpRtoInitial 
+         column when rows are created in the mxSctpTable and no value is 
+         specified."
+    DEFVAL      { 3000 }
+    ::= { mxSctp 5 }
+
+mxSctpDefaultRtoMin OBJECT-TYPE
+    SYNTAX      MilliSeconds
+    UNITS       "seconds"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Provides the default value to be used in the mxSctpRtoMin 
+         column when rows are created in the mxSctpTable and no value is 
+         specified."
+    DEFVAL      { 1000 }
+    ::= { mxSctp 6 }
+
+mxSctpDefaultRtoMax OBJECT-TYPE
+    SYNTAX      MilliSeconds
+    UNITS       "seconds"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Provides the default value to be used in the mxSctpRtoMax 
+         column when rows are created in the mxSctpTable and no value is 
+         specified."
+    DEFVAL      { 60000 }
+    ::= { mxSctp 7 }
+
+mxSctpDefaultPathMaxRetrans OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Provides the default value to be used in the 
+         mxSctpPathMaxRetrans column when rows are created in the 
+         mxSctpTable and no value is specified."
+    DEFVAL      { 5 }
+    ::= { mxSctp 8 }
+
+mxSctpDefaultCookieLife OBJECT-TYPE
+    SYNTAX      MilliSeconds
+    UNITS       "seconds"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Provides the default value to be used in the mxSctpCookieLife 
+         column when rows are created in the mxSctpTable and no value is 
+         specified."
+    DEFVAL      { 0 }
+    ::= { mxSctp 9 }
+
+mxSctpDefaultCookieInc OBJECT-TYPE
+    SYNTAX      MilliSeconds
+    UNITS       "seconds"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Provides the default value to be used in the mxSctpCookieInc 
+         column when rows are created in the mxSctpTable and no value is 
+         specified."
+    DEFVAL      { 5000 }
+    ::= { mxSctp 10 }
+
+mxSctpDefaultMaxInitRetries OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Provides the default value to be used in the 
+         mxSctpMaxInitRetries column when rows are created in the 
+         mxSctpTable and no value is specified."
+    DEFVAL      { 8 }
+    ::= { mxSctp 11 }
+
+mxSctpDefaultMaxBurst OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Provides the default value to be used in the mxSctpMaxBurst 
+         column when rows are created in the mxSctpTable and no value is 
+         specified."
+    DEFVAL      { 3 }
+    ::= { mxSctp 12 }
+
+mxSctpDefaultAssocMaxRetrans OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Provides the default value to be used in the 
+         mxSctpAssocMaxRetrans column when rows are created in the 
+         mxSctpTable and no value is specified."
+    DEFVAL      { 10 }
+    ::= { mxSctp 13 }
+
+mxSctpDefaultSackDelay OBJECT-TYPE
+    SYNTAX      MilliSeconds
+    UNITS       "seconds"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Provides the default value to be used in the mxSctpSackDelay 
+         column when rows are created in the mxSctpTable and no value is 
+         specified."
+    DEFVAL      { 200 }
+    ::= { mxSctp 14 }
+
+mxSctpDefaultLifetime OBJECT-TYPE
+    SYNTAX      MilliSeconds
+    UNITS       "seconds"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Provides the default value to be used in the mxSctpLifetime 
+         column when rows are created in the mxSctpTable and no value is 
+         specified."
+    DEFVAL      { 0 }
+    ::= { mxSctp 15 }
+
+mxSctpTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF MxSctpEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        ""
+    ::= { mxSctp 16 }
+
+mxSctpEntry OBJECT-TYPE
+    SYNTAX      MxSctpEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        ""
+    INDEX       { mxSctpProfileName }
+    ::= { mxSctpTable 1 }
+
+MxSctpEntry ::= SEQUENCE {
+    mxSctpProfileName       ProfileName,
+    mxSctpNoDelay           TruthValue,
+    mxSctpMaxseg            Unsigned32,
+    mxSctpHeartbeatItvl     MilliSeconds,
+    mxSctpHeartbeat         TruthValue,
+    mxSctpRtoInitial        MilliSeconds,
+    mxSctpRtoMin            MilliSeconds,
+    mxSctpRtoMax            MilliSeconds,
+    mxSctpPathMaxRetrans    Unsigned32,
+    mxSctpCookieLife        MilliSeconds,
+    mxSctpCookieInc         MilliSeconds,
+    mxSctpMaxInitRetries    Unsigned32,
+    mxSctpMaxBurst          Unsigned32,
+    mxSctpAssocMaxRetrans   Unsigned32,
+    mxSctpSackDelay         MilliSeconds,
+    mxSctpLifetime          MilliSeconds,
+    mxSctpRowStatus         RowStatus
+}
+
+mxSctpProfileName OBJECT-TYPE
+    SYNTAX      ProfileName
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Provides the non-null name index of each row in the mxSctpTable."
+    ::= { mxSctpEntry 1 }
+
+mxSctpNoDelay OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "This column defined, under this SCTP profile, whether the Nagle 
+         algorithm should be applied to SCTP associations.  The Nagle 
+         algorithm increases the size of the packets placed on the 
+         network at the expense of delaying the transmission of some 
+         data during congestion episodes.  When set to true(1), the 
+         Nagle algorithm is suppressed; otherwise, set to false(2), the 
+         Nagle algorithm is in effect.
+         
+         The default value for newly created profiles is determined by 
+         the setting of mxSctpDefaultNoDelay."
+    ::= { mxSctpEntry 2 }
+
+mxSctpMaxseg OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "This column defines the maximum SCTP payload size for outgoing 
+         packets.  Values greater than the association MTU are ignored 
+         and have no effect.  The value determines the maximum size (in 
+         octets) above which SCTP will fragment larget DATA chunks into 
+         smaller DATA chunks, and beneath which SCTP will bundle DATA 
+         chunks into single packets or combine smaller DATA chunks into 
+         larger DATA chunks.  Normally this value is the association MTU 
+         value minus the size of the current IP and SCTP headers, minus 
+         the size of one DATA chunk header.  When set to a lower value, 
+         the lower value will be used.
+         
+         The default value for newly created profiles is determined by 
+         the setting of mxSctpDefaultMaxseg."
+    ::= { mxSctpEntry 3 }
+
+mxSctpHeartbeatItvl OBJECT-TYPE
+    SYNTAX      MilliSeconds
+    UNITS       "seconds"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "This column defines the time interval (in milliseconds) between 
+         successive HEARTBEAT messages used to probe destination 
+         transport addresses for RTT calculation and activity.  Valid 
+         values are zero (0) - do not heartbeat, or a value of 1 
+         millisecond or greater.
+         
+         The default value for newly create profiles is determined by 
+         the setting of mxSctpDefaultHeartbeatItvl."
+    ::= { mxSctpEntry 4 }
+
+mxSctpHeartbeat OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "This column determines whether HEARTBEAT messages used to probe 
+         destination transport addresses for RTT calculation and 
+         activity will be sent periodically.  The default value from RFC 
+         4960 is true(1).
+         
+         Disabling heartbeats reduces the protocol's responsiveness in 
+         detection of failures and redirection of traffic away from 
+         failed paths and interfaces.  This column should normally be 
+         left at its default value.
+         
+         The default value for newly created profiles is determined by 
+         the setting of slM2paDefaultSctpHeartbeat."
+    ::= { mxSctpEntry 5 }
+
+mxSctpRtoInitial OBJECT-TYPE
+    SYNTAX      MilliSeconds
+    UNITS       "seconds"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "This column defines the initial time interval (in milliseconds) 
+         that will be used as an initial RTO (retransmission timeout) 
+         value when sending packets to a destination for the first time.  
+         Valid values are zero or greater but must be within the range 
+         mxSctpRtoMin to mxSctpRtoMax.  The default value is the value 
+         recommended by RFC 2960 and RFC 4960 (1000 milliseconds, or 1 
+         second).
+         
+         Note that, in general, the RTO initial should not be less than 
+         the peer's maximum SACK delay, otherwise, excessive 
+         retransmission migh occur while the peer is delaying 
+         acknowledgements.
+         
+         The default value for newly created profiles is determined by 
+         the setting of mxSctpDefaultRtoInitial."
+    ::= { mxSctpEntry 6 }
+
+mxSctpRtoMin OBJECT-TYPE
+    SYNTAX      MilliSeconds
+    UNITS       "seconds"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "This column defines the minimum timer interval (in 
+         milliseconds) that will be used as an RTO (retransmission 
+         timeout) value when sending packets to a destination transport 
+         address and expecting acknowledgements.  Valid values are zero 
+         or greater and must be less than or equal to mxSctpRtoInitial 
+         and strictly less than and mxSctpRtoMax.  The default value is 
+         the value recommended by RFC 2960 and RFC 4960 (1000 
+         milliseconds, or 1 second).
+         
+         Note that, in general, the RTO minimum should not be less than 
+         the peer's maximum SACK delay, otherwise, excessive 
+         retransmission might occur while the peer is delaying 
+         acknowledgements.
+         
+         The default value for newly created profiles is determined by 
+         the setting of mxSctpDefaultRtoMin."
+    ::= { mxSctpEntry 7 }
+
+mxSctpRtoMax OBJECT-TYPE
+    SYNTAX      MilliSeconds
+    UNITS       "seconds"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "This column defines the maximum time interval (in milliseconds) 
+         that will be used as an RTO (retransmission timeout) value when 
+         sending packets to a destination transport address and 
+         expecting acknowledgements.  Valid values are zero or greater 
+         but must be greater than or equal to mxSctpRtoInitial and 
+         strictly greater than mxSctpRtoMin.  The default value is the 
+         value recommended by RFC 2960 and RFC 4960 (60000 milliseconds, 
+         or 60 seconds).
+         
+         Note that, in general, the RTO maximum should not be less than 
+         the peer's maximum SACK delay, otherwise, excessive 
+         retransmission might occur while the peer is delaying 
+         acknowledgements.
+         
+         The default value for newly created profiles is determined by 
+         the setting of mxSctpDefaultRtoMax."
+    ::= { mxSctpEntry 8 }
+
+mxSctpPathMaxRetrans OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "This column defines the number of times that SCTP will attempt 
+         retransmitting a packet to a given destination transport 
+         address before it considers that destination transport address 
+         inactive.  Valid values are zero or greater.  The default value 
+         is the value recommended in RFC 2960 (5 retransmissions).
+         
+         Adjusting this value has an effect on th period of time taken 
+         to fail-over between destinations for multi-homed connections.  
+         Lower values (including zero) will yield faster fail-over 
+         response times.  Lower values, however, may cause thrashing 
+         between destinations contributing to congestion in the network.  
+         Default values are applicable to Internet applications.
+         
+         The default value for newly created profiles is determined by 
+         the setting of mxSctpDefaultPathMaxRetrans."
+    ::= { mxSctpEntry 9 }
+
+mxSctpCookieLife OBJECT-TYPE
+    SYNTAX      MilliSeconds
+    UNITS       "seconds"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "This column defines the time interval (in milliseconds) in 
+         conjunction with mxSctpCookieInc beyond which a COOKIE-ECHO 
+         received with a cookie sent in an INIT-ACK will no longer be 
+         accepted.  For SCTP, this also limits the maximum time interval 
+         for which the HMAC secret key for the cookie will be valid.  
+         Valid values are zero or greater.  Values of zero will  be 
+         converted to a system clock tick.  The default value is the 
+         value recommended by RFC 2960 (60,000 milliseconds, or 60 
+         seconds).
+         
+         Reducing this value will increase the probability that passive 
+         connection attempts will fail due to expired cookies.  
+         Increasing the value will reduce the overall security of the 
+         system by permitting attackers an increased interval within 
+         which to crack HMACs and guess verification tags.  This value 
+         may be adjusted in conjunction with mxSctpCookieInc to meet 
+         most objectives for successful passive connection attempts with 
+         the best security afforded by smaller values of 
+         mxSctpCookieLife.
+         
+         Unfortunately, the mxSctpCookieLife and mxSctpCookieInc must be 
+         adjusted to accommodate the slowest peer on the slowest 
+         connection.  The default setting is adequate for Internet 
+         applications.
+         
+         The default value for newly created profiles is determined by 
+         the setting of mxSctpDefaultCookieLife."
+    ::= { mxSctpEntry 10 }
+
+mxSctpCookieInc OBJECT-TYPE
+    SYNTAX      MilliSeconds
+    UNITS       "seconds"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "This column defines the time increment (in milliseconds) that 
+         will be added to the lifespan of the cookie in an INIT-ACK if 
+         the received INIT requests cookie preservative to lengthen the 
+         lifespan of the cookie.  Valid values are zero or greater.  The 
+         default value is the value recommended in RFC 2960 5.2.6 (1000 
+         milliseconds, or 1 second).
+         
+         This value can be adjusted in conjunction with mxSctpCookieLife 
+         to meet objectives of successful passive connection attempts 
+         and security.  The default setting is adequate for Internet 
+         applications.
+         
+         The default value for newly created profiles is determined by 
+         the setting of mxSctpDefaultCookieInc."
+    ::= { mxSctpEntry 11 }
+
+mxSctpMaxInitRetries OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "This column defines the number of times that an INIT or 
+         COOKIE-ECHO will be resent to a given destination before 
+         abandoning an active open attempt.  Value values are zero or 
+         greater.  The default value is the value recommended by RFC 
+         2960 (8 retries).
+         
+         The default value for newly created profiles is determined by 
+         the setting of mxSctpDefaultMaxInitRetries."
+    ::= { mxSctpEntry 12 }
+
+mxSctpMaxBurst OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "This column defines the maximum number of MTUs of new data 
+         chunks that will be sent in a burst in accordance with SCTP 
+         Specification Errata and Issues, RFC 4460 and RFC 4960.  The 
+         default value is the value recommended in RFC 4960 (4 MTUs).
+         
+         The default value for newly create profiles is determined by 
+         the setting of mxSctpDefaultMaxBurst."
+    ::= { mxSctpEntry 13 }
+
+mxSctpAssocMaxRetrans OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "This column defines the number of times that the sending 
+         endpoint will attempt retransmitting a packet on any active 
+         destination transport address before it aborts the association.  
+         Value values are zero or greater.  The default value is the 
+         value recommended in RFC 2960 (10 retransmissions).
+         
+         This value should be larger than sum of the path maximum number 
+         of retransmission values of each of the destinations.
+         
+         Setting this value to less than the sum of the path maximum 
+         retransmission values for all of the destinations has the 
+         interesting effect of permitting a connection to persist even 
+         when all destinations have been deemed inactive.
+         
+         The default value for newly created profiles is determined by 
+         the setting of mxSctpDefaultAssocMaxRetrans."
+    DEFVAL      { 20 }
+    ::= { mxSctpEntry 14 }
+
+mxSctpSackDelay OBJECT-TYPE
+    SYNTAX      MilliSeconds
+    UNITS       "seconds"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "This column defines the interval of time (in milliseconds) that 
+         will be used as an RTO (retransmission timeout) value when 
+         sending packets to a destination transport address.  Valid 
+         values are zero or to 500 milliseconds (RFC 2960 forbids 
+         setting this value larger than 500 milliseconds).  The default 
+         value is the value recommended in RFC 2960 (200 milliseconds).
+         
+         The default value for newly created profiles is determined by 
+         the setting of mxSctpDefaultSackDelay."
+    DEFVAL      { 20 }
+    ::= { mxSctpEntry 15 }
+
+mxSctpLifetime OBJECT-TYPE
+    SYNTAX      MilliSeconds
+    UNITS       "seconds"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The default value for newly created rows is determined by the 
+         setting of mxSctpDefaultLifetime."
+    ::= { mxSctpEntry 16 }
+
+mxSctpRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Provides a mechanism whereby management stations, following the 
+         RowStatus textual convention from the SNMPv2-TC module, may 
+         create or destroy conceptual rows in this table.  Profiles that 
+         are referenced by another table cannot be deleted until the 
+         reference is removed."
+    REFERENCE   
+        "STD 58, SNMPv2-TC RowStatus."
+    ::= { mxSctpEntry 17 }
+
+mxMonGroups OBJECT IDENTIFIER
+    ::= { mxMonMIB 3 }
+
+END -- end of module OPENSS7-MX-MON-MIB.
+
+-- vim: ft=mib comments=\f\:\",\b\:\-\-,\:\-\-,\f\b\:- fo+=tcqlornw tw=72 nocin nosi sts=4 sw=4 et

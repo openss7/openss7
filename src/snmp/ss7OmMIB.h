@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2012  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -103,6 +103,10 @@ extern int sa_request;			/* request number for per-request actions */
 
 /* our storage structure(s) */
 struct ss7OmMIB_data {
+	struct ss7OmMIB_data *ss7OmMIB_old;
+	uint ss7OmMIB_rsvs;
+	uint ss7OmMIB_tsts;
+	uint ss7OmMIB_sets;
 	uint ss7OmMIB_request;
 };
 
@@ -133,6 +137,10 @@ void init_ss7OmMIB(void);
 void deinit_ss7OmMIB(void);
 int term_ss7OmMIB(int majorID, int minorID, void *serverarg, void *clientarg);
 FindVarMethod var_ss7OmMIB;
+struct ss7OmMIB_data *ss7OmMIB_create(void);
+struct ss7OmMIB_data *ss7OmMIB_duplicate(struct ss7OmMIB_data *);
+int ss7OmMIB_destroy(struct ss7OmMIB_data **);
+int ss7OmMIB_add(struct ss7OmMIB_data *);
 void parse_ss7OmMIB(const char *, char *);
 SNMPCallback store_ss7OmMIB;
 void refresh_ss7OmMIB(int);
