@@ -1141,50 +1141,62 @@ dnl
 	    ${kbuilddir}/System.map-generic-${kversion}.lzma
 	    ${kbuilddir}/System.map-generic-${kversion}.bz2
 	    ${kbuilddir}/System.map-generic-${kversion}.gz
+	    ${kbuilddir}/System.map-generic-${kversion}
 	    ${kbuilddir}/System.map-generic.xz
 	    ${kbuilddir}/System.map-generic.lzma
 	    ${kbuilddir}/System.map-generic.bz2
 	    ${kbuilddir}/System.map-generic.gz
+	    ${kbuilddir}/System.map-generic
 	    ${kbuilddir}/System.map-huge-${kversion}.xz
 	    ${kbuilddir}/System.map-huge-${kversion}.lzma
 	    ${kbuilddir}/System.map-huge-${kversion}.bz2
 	    ${kbuilddir}/System.map-huge-${kversion}.gz
+	    ${kbuilddir}/System.map-huge-${kversion}
 	    ${kbuilddir}/System.map-huge.xz
 	    ${kbuilddir}/System.map-huge.lzma
 	    ${kbuilddir}/System.map-huge.bz2
 	    ${kbuilddir}/System.map-huge.gz
+	    ${kbuilddir}/System.map-huge
 	    ${kbuilddir}/System.map-${kversion}.xz
 	    ${kbuilddir}/System.map-${kversion}.lzma
 	    ${kbuilddir}/System.map-${kversion}.bz2
 	    ${kbuilddir}/System.map-${kversion}.gz
+	    ${kbuilddir}/System.map-${kversion}
 	    ${kbuilddir}/System.map.xz
 	    ${kbuilddir}/System.map.lzma
 	    ${kbuilddir}/System.map.bz2
 	    ${kbuilddir}/System.map.gz
+	    ${kbuilddir}/System.map
 	    ${rootdir}/boot/System.map-generic-${kversion}.xz
 	    ${rootdir}/boot/System.map-generic-${kversion}.lzma
 	    ${rootdir}/boot/System.map-generic-${kversion}.bz2
 	    ${rootdir}/boot/System.map-generic-${kversion}.gz
+	    ${rootdir}/boot/System.map-generic-${kversion}
 	    ${rootdir}/boot/System.map-generic.xz
 	    ${rootdir}/boot/System.map-generic.lzma
 	    ${rootdir}/boot/System.map-generic.bz2
 	    ${rootdir}/boot/System.map-generic.gz
+	    ${rootdir}/boot/System.map-generic
 	    ${rootdir}/boot/System.map-huge-${kversion}.xz
 	    ${rootdir}/boot/System.map-huge-${kversion}.lzma
 	    ${rootdir}/boot/System.map-huge-${kversion}.bz2
 	    ${rootdir}/boot/System.map-huge-${kversion}.gz
+	    ${rootdir}/boot/System.map-huge-${kversion}
 	    ${rootdir}/boot/System.map-huge.xz
 	    ${rootdir}/boot/System.map-huge.lzma
 	    ${rootdir}/boot/System.map-huge.bz2
 	    ${rootdir}/boot/System.map-huge.gz
+	    ${rootdir}/boot/System.map-huge
 	    ${rootdir}/boot/System.map-${kversion}.xz
 	    ${rootdir}/boot/System.map-${kversion}.lzma
 	    ${rootdir}/boot/System.map-${kversion}.bz2
 	    ${rootdir}/boot/System.map-${kversion}.gz
+	    ${rootdir}/boot/System.map-${kversion}
 	    ${rootdir}/boot/System.map.xz
 	    ${rootdir}/boot/System.map.lzma
 	    ${rootdir}/boot/System.map.bz2
-	    ${rootdir}/boot/System.map.gz], [], [dnl
+	    ${rootdir}/boot/System.map.gz
+	    ${rootdir}/boot/System.map], [], [dnl
 	if test -z "$kvmlinux" ; then
 	    AC_MSG_ERROR([
 *** 
