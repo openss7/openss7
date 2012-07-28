@@ -19692,7 +19692,7 @@ nit_niocssnap32(struct xp *xp, mblk_t *dp)
 				return (-ERANGE);
 		}
 	}
-	xp->xray.nit.snap = *arg;
+	xp->xray.nit.snap = snap;
 	return (0);
 }
 #endif				/* __LP64__ */
@@ -20015,7 +20015,7 @@ bpf_biocgdltlist(queue_t *q, mblk_t *mp, struct xp *xp, struct copyresp *cp, mbl
 	if (cp->cp_flag == IOC_ILP32) {
 		struct bpf_dltlist32 *bfl = (typeof(bfl)) dp->b_rptr;
 
-		uaddr = (caddr_t) bfl->bfl_list;
+		uaddr = (caddr_t) (ulong) bfl->bfl_list;
 		n = bfl->bfl_len;
 	} else
 #endif				/* defined __LP64__ */
