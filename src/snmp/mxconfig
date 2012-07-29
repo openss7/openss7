@@ -1,0 +1,810 @@
+#!/usr/bin/perl -w
+# vim: ft=perl sw=8 noet fo+=tcqlorn tw=80
+
+#eval 'exec /usr/bin/perl -S $0 ${1+"$@"}'
+#	if $running_under_some_shell;
+
+use Carp;
+use Gtk2 '-init';
+use Glib qw(TRUE FALSE);
+use Goo::Canvas;
+use Gtk2::Helper;
+use FileHandle;
+use FindBin qw($Bin);
+use lib "$Bin";
+use SNMP;
+use strict;
+
+$SNMP::verbose = 0;
+$SNMP::use_long_names = 0;
+$SNMP::use_sprint_value = 0;
+$SNMP::use_enums = 1;
+$SNMP::use_numeric = 0;
+$SNMP::best_guess = 2;
+$SNMP::save_descriptions = 1;
+SNMP::initMib();
+SNMP::addMibDirs(qw(../mibs));
+SNMP::loadModules('OPENSS7-MX-MIB');
+
+my @windows;
+
+# ----------------------------------
+package ChanDialog;
+use strict;
+use Gtk2;
+use Glib qw(TRUE FALSE);
+use vars qw(@ISA);
+@ISA = qw(Gtk2::Dialog);
+# ----------------------------------
+#package ChanDialog;
+sub myaddentry {
+	my ($self,$entryno,$label) = @_;
+	if ((my $t = $self->{table})) {
+		my ($l,$b,$e,$m,$units);
+		$l = Gtk2::Label->new($label);
+		$t->attach_defaults($l,0,1,$entryno,$entryno+1);
+		$b = $self->{$label} = Gtk2::EntryBuffer->new('');
+		$e = Gtk2::Entry->new_with_buffer($b);
+		$e->set_editable(TRUE);
+		$t->attach_defaults($e,1,2,$entryno,$entryno+1);
+		$units = '';
+		if (($m = $SNMP::MIB{$label})) {
+			if ($m->{units}) {
+				$units = $m->{units};
+			} elsif ($m->{textualConvention}) {
+				$units = $m->{textualConvention};
+			}
+		}
+		$l = Gtk2::Label->new($units);
+		$t->attach_defaults($l,2,3,$entryno,$entryno+1);
+	}
+}
+#package ChanDialog;
+sub new {
+	my ($type,$parent) = @_;
+	my @labels = ( qw/mxDrivName mxCardIndex mxSpanIndex mxChanIndex mxChanType mxChanFormat mxChanRate mxChanMode mxChanSap mxChanAdministrativeState mxChanOperationalState mxChanUsageState mxChanAvailabilityStatus mxChanControlStatus mxChanProceduralStatus mxChanAlarmStatus mxChanStandbyStatus/ );
+	my $self = Gtk2::Dialog->new('Channel Dialog',$parent,'destroy-with-parent',
+		'gtk-close' => 'close',
+		'gtk-apply'  => 'apply',
+		'gtk-connect' => 'accept',
+		'gtk-refresh' => 'yes',
+		'gtk-cancel' => 'cancel',
+		'gtk-ok'     => 'ok');
+	bless $self,$type;
+	my $f = Gtk2::Frame->new('Channel');
+	$self->get_content_area()->add($f);
+	$self->set_default_response('ok');
+	my $v = Gtk2::VBox->new(FALSE,8);
+	$f->add($v);
+	my $h = Gtk2::HBox->new;
+	$v->pack_start($h,TRUE,TRUE,0);
+	my $t = $self->{table} = Gtk2::Table->new(scalar @labels,3,TRUE);
+	$h->pack_start($t,TRUE,TRUE,0);
+
+	for (my $i = 0; $i < scalar @labels; $i++) {
+		$self->myaddentry($i,$labels[$i]);
+	}
+	$self->show_all;
+	return $self;
+}
+
+# ----------------------------------
+package ChanMenu;
+use strict;
+use Gtk2;
+use Glib qw(TRUE FALSE);
+use vars qw(@ISA);
+@ISA = qw(Gtk2::Menu);
+# ----------------------------------
+#package ChanMenu;
+sub new {
+	my ($type,$host,$driv,$card,$span,$chan) = @_;
+	my $self = Gtk2::Menu->new;
+	bless $self,$type;
+	$self->{'.data'}{host} = $host;
+	$self->{'.data'}{driv} = $driv;
+	$self->{'.data'}{card} = $card;
+	$self->{'.data'}{span} = $span;
+	$self->{'.data'}{chan} = $chan;
+	$self->set_title("$host\@$driv$card:$span.$chan");
+	my $mi;
+	$mi = Gtk2::TearoffMenuItem->new;
+	$self->append($mi);
+	$mi->show;
+	$mi = Gtk2::MenuItem->new_with_label('Properties...');
+	$mi->signal_connect('activate',\&ChanMenu::properties,$self);
+	$self->append($mi);
+	$mi->show;
+	return $self;
+}
+#package ChanMenu;
+sub printnode {
+	my ($self,$mib) = @_;
+	if ($mib) {
+		print "objectID:.......... $mib->{objectID}\n";
+		print "label:............. $mib->{label}\n";
+		print "subID:............. $mib->{subID}\n";
+		print "moduleID:.......... $mib->{moduleID}\n";
+		print "parent:............ $mib->{parent}\n";
+		print "children:.......... ".join(',',@{$mib->{children}})."\n" if defined $mib->{children} and ref $mib->{children};
+		print "indexes:........... ".join(',',@{$mib->{indexes}})."\n" if defined $mib->{indexes} and ref $mib->{indexes};
+		print "nextNode:.......... $mib->{nextNode}\n" if defined $mib->{nextNode};
+		print "type:.............. $mib->{type}\n";
+		print "access:............ $mib->{access}\n";
+		print "status:............ $mib->{status}\n";
+		print "syntax:............ $mib->{syntax}\n";
+		print "textualConvention:. $mib->{textualConvention}\n" if defined $mib->{textualConvention};
+		print "TCDescription:..... $mib->{TCDescription}\n" if defined $mib->{TCDescription};
+		print "units:............. $mib->{units}\n" if defined $mib->{units};
+		print "hint:.............. $mib->{hint}\n" if defined $mib->{hint};
+		print "enums:............. $mib->{enums}\n" if defined $mib->{enums} and ref $mib->{enums};
+		print "ranges:............ $mib->{ranges}\n" if defined $mib->{ranges} and ref $mib->{ranges};
+		print "description:....... $mib->{description}\n" if defined $mib->{description};
+		print "reference:......... $mib->{reference}\n" if defined $mib->{reference};
+		if (defined $mib->{indexes} and ref $mib->{indexes} eq 'ARRAY') {
+			foreach ( @{$mib->{indexes}} ) {
+				my $m = $SNMP::MIB{$_};
+				$self->printnode($m);
+			}
+		}
+		if (defined $mib->{children} and ref $mib->{children} eq 'ARRAY') {
+			foreach ( sort { $a->{subID} <=> $b->{subID} } @{$mib->{children}} ) {
+				$self->printnode($_);
+			}
+		}
+	}
+}
+#package ChanMenu;
+sub properties {
+	my ($mi,$self) = @_;
+	my $dialog = ChanDialog->new;
+	my $response = $dialog->run;
+	$dialog->destroy;
+#	my $mib = $SNMP::MIB{'mxChan'};
+#	$self->printnode($mib);
+#	mxDrivName
+#	mxCardIndex
+#	mxSpanIndex
+#	mxChanIndex
+#	mxChanType
+#	mxChanFormat
+#	mxChanRate
+#	mxChanMode
+#	mxChanSap
+#	mxChanAdministrativeState
+#	mxChanOperationalState
+#	mxChanUsageState
+#	mxChanAvailabilityStatus
+#	mxChanControlStatus
+#	mxChanProceduralStatus
+#	mxChanAlarmStatus
+#	mxChanStandbyStatus
+}
+
+# ----------------------------------
+package SpanMenu;
+use strict;
+use Gtk2;
+use Glib qw(TRUE FALSE);
+use vars qw(@ISA);
+@ISA = qw(Gtk2::Menu);
+# ----------------------------------
+#package SpanMenu;
+sub new {
+	my ($type,$host,$driv,$card,$span) = @_;
+	my $self = Gtk2::Menu->new;
+	bless $self,$type;
+	$self->{'.data'}{host} = $host;
+	$self->{'.data'}{driv} = $driv;
+	$self->{'.data'}{card} = $card;
+	$self->{'.data'}{span} = $span;
+	$self->set_title("$host\@$driv$card:$span");
+	my $mi;
+	$mi = Gtk2::TearoffMenuItem->new;
+	$self->append($mi);
+	$mi->show;
+	$mi = Gtk2::MenuItem->new_with_label('Properties...');
+	$mi->signal_connect('activate',\&SpanMenu::properties,$self);
+	$self->append($mi);
+	$mi->show;
+	$mi = Gtk2::SeparatorMenuItem->new;
+	$self->append($mi);
+	$mi->show;
+	for (my $chan = 0; $chan < 32; $chan++) {
+		$mi = Gtk2::MenuItem->new_with_label("$host\@$driv$card:$span.$chan");
+		$mi->set_submenu(ChanMenu->new($host,$driv,$card,$span,$chan));
+		$mi->set_right_justified(TRUE);
+		$self->append($mi);
+		$mi->show;
+	}
+	return $self;
+}
+#package SpanMenu;
+sub properties {
+	my ($mi,$self) = @_;
+#	mxDrivName
+#	mxCardIndex
+#	mxSpanIndex
+#	mxSpanName
+#	mxSpanDevice
+#	mxSpanEquipmentId
+#	mxSpanType
+#	mxSpanNumber
+#	mxSpanRate
+#	mxSpanMode
+#	mxSpanCrc
+#	mxSpanClocking
+#	mxSpanPriority
+#	mxSpanCoding
+#	mxSpanFraming
+#	mxSpanLineImpedance
+#	mxSpanLineMode
+#	mxSpanLineLength
+#	mxSpanLineAttenuation
+#	mxSpanLineGain
+#	mxSpanLineDelay
+#	mxSpanTxLevel
+#	mxSpanRxLevel
+#	mxSpanAlarmSettleTime
+#	mxSpanLineCodeTime
+#	mxSpanPrimary
+#	mxSpanDataLink
+#	mxSpanLineCode
+#	mxSpanAlarmServerityMapProfile
+#	mxSpanAdministrativeState
+#	mxSpanOperationalState
+#	mxSpanUsageState
+#	mxSpanAlarmStatus
+#	mxSpanProceduralStatus
+#	mxSpanAvailabilityStatus
+#	mxSpanControlStatus
+#	mxSpanStandbyStatus
+#	mxSpanUnknownStatus
+#	mxSpanSap
+#	mxSpanLoopbackStatus
+#	mxSpanLineStatus
+#	mxSpanAlarms
+#	mxSpanEvents
+#	mxSpanLed
+#	mxSpanReceiveLevel
+#	mxSpanReceiveThreshold
+#	mxSpanLastChange
+#	mxSpanRowStatus
+}
+
+# ----------------------------------
+package CardMenu;
+use strict;
+use Gtk2;
+use Glib qw(TRUE FALSE);
+use vars qw(@ISA);
+@ISA = qw(Gtk2::Menu);
+# ----------------------------------
+#package CardMenu;
+sub new {
+	my ($type,$host,$driv,$card) = @_;
+	my $self = Gtk2::Menu->new;
+	bless $self,$type;
+	$self->{'.data'}{host} = $host;
+	$self->{'.data'}{driv} = $driv;
+	$self->{'.data'}{card} = $card;
+	$self->set_title("$host\@$driv$card");
+	my $mi;
+	$mi = Gtk2::TearoffMenuItem->new;
+	$self->append($mi);
+	$mi->show;
+	$mi = Gtk2::MenuItem->new_with_label('Properties...');
+	$mi->signal_connect('activate',\&CardMenu::properties,$self);
+	$self->append($mi);
+	$mi->show;
+	$mi = Gtk2::SeparatorMenuItem->new;
+	$self->append($mi);
+	$mi->show;
+	for (my $span = 0; $span < 4; $span++) {
+		$mi = Gtk2::MenuItem->new_with_label("$host\@$driv$card:$span");
+		$mi->set_submenu(SpanMenu->new($host,$driv,$card,$span));
+		$mi->set_right_justified(TRUE);
+		$self->append($mi);
+		$mi->show;
+	}
+	return $self;
+}
+#package CardMenu;
+sub properties {
+	my ($mi,$self) = @_;
+#	mxDrivName
+#	mxCardIndex(1)
+#	mxCardType(2)
+#	mxCardIdentifier(3)
+#	mxCardRevision(4)
+#	mxCardChipType(5)
+#	mxCardChipRevision(6)
+#	mxCardPciBus(7)
+#	mxCardPciSlot(8)
+#	mxCardPciIrq(9)
+#	mxCardSpanType(10)
+#	mxCardMode(11)
+#	mxCardSyncMaster(12)
+#	mxCardSyncSource(13)
+#	mxCardSyncGroup(14)
+#	mxCardAdministrativeState(15)
+#	mxCardOperationalState(16)
+#	mxCardUsageState(17)
+#	mxCardAlarmStatus(18)
+#	mxCardProceduralStatus(19)
+#	mxCardAvailabilityStatus(20)
+#	mxCardControlStatus(21)
+#	mxCardUnknownStatus(22)
+#	mxCardStandbyStatus(23)
+#	mxCardSyncSpanId(24)
+#	mxCardSyncTransitions(25)
+#	mxCardLeds(26)
+#	mxCardLastChange(27)
+#	mxCardName(28)
+#	mxCardStatus(29)
+}
+
+# ----------------------------------
+package DrivMenu;
+use strict;
+use Gtk2;
+use Glib qw(TRUE FALSE);
+use vars qw(@ISA);
+@ISA = qw(Gtk2::Menu);
+# ----------------------------------
+#package DrivMenu;
+sub new {
+	my ($type,$host,$driv) = @_;
+	my $self = Gtk2::Menu->new;
+	bless $self,$type;
+	$self->{'.data'}{host} = $host;
+	$self->{'.data'}{driv} = $driv;
+	$self->set_title("$host\@$driv");
+	my $mi;
+	$mi = Gtk2::TearoffMenuItem->new;
+	$self->append($mi);
+	$mi->show;
+	$mi = Gtk2::MenuItem->new_with_label('Properties...');
+	$mi->signal_connect('activate',\&DrivMenu::properties,$self);
+	$self->append($mi);
+	$mi->show;
+	$mi = Gtk2::SeparatorMenuItem->new;
+	$self->append($mi);
+	$mi->show;
+	for (my $card = 0; $card < 4; $card++) {
+		$mi = Gtk2::MenuItem->new_with_label("$host\@$driv$card");
+		$mi->set_submenu(CardMenu->new($host,$driv,$card));
+		$mi->set_right_justified(TRUE);
+		$self->append($mi);
+		$mi->show;
+	}
+	return $self;
+}
+#package DrivMenu;
+sub properties {
+	my ($mi,$self) = @_;
+#
+#	mxDrivName(1)
+#	mxDrivIdnum(2)
+#	mxDrivMajor(3)
+#	mxDrivDescription(4)
+#	mxDrivRevision(5)
+#	mxDrivCopyright(6)
+#	mxDrivSupportedDevice(7)
+#	mxDrivContact(8)
+#	mxDrivLicense(9)
+#	mxDrivDate(10)
+#	mxDrivRowStatus(11)
+}
+
+# ----------------------------------
+package HostMenu;
+use strict;
+use Gtk2;
+use Glib qw(TRUE FALSE);
+use vars qw(@ISA);
+@ISA = qw(Gtk2::Menu);
+# ----------------------------------
+#package HostMenu;
+sub new {
+	my ($type,$name) = @_;
+	my $self = Gtk2::Menu->new;
+	bless $self,$type;
+	$self->set_title("$name");
+	my $mi;
+	$mi = Gtk2::TearoffMenuItem->new;
+	$self->append($mi);
+	$mi->show;
+	$mi = Gtk2::MenuItem->new_with_label('Properties...');
+	$mi->signal_connect('activate',\&HostMenu::properties,$self);
+	$self->append($mi);
+	$mi->show;
+	$mi = Gtk2::SeparatorMenuItem->new;
+	$self->append($mi);
+	$mi->show;
+	my $driv = "x400p-sl";
+	$mi = Gtk2::MenuItem->new_with_label("$name\@$driv");
+	$mi->set_submenu(DrivMenu->new($name,$driv));
+	$mi->set_right_justified(TRUE);
+	$self->append($mi);
+	$mi->show;
+	return $self;
+}
+#package HostMenu;
+sub properties {
+	my ($mi,$self) = @_;
+#	DestHost
+#	Community
+#	Version
+#	RemotePort
+#	Timeout
+#	Retries
+#	RetryNoSuch
+#	SecName
+#	SecLevel
+#	SecEngineId
+#	ContextEngineId
+#	Context
+#	AuthProto
+#	AuthPass
+#	PrivProto
+#	PrivPass
+#	authMasterKey
+#	privMasterKey
+#	authLocalizedKey
+#	privLocalizedKey
+#	UseLongNames
+#	UseSprintValue
+#	UseEnums
+#	UseNumeric
+#	BestGuess
+#
+}
+
+# ----------------------------------
+package Card;
+use strict;
+use Carp;
+use Gtk2;
+use Glib qw(TRUE FALSE);
+use Goo::Canvas;
+use vars qw(@ISA);
+@ISA = qw(Goo::Canvas::Group);
+# ----------------------------------
+sub new {
+	my ($type,$host,$cnum) = @_;
+	my $self = Goo::Canvas::Group->new($host->child->get_root_item);
+	bless $self,$type;
+	my $card = 3 - $cnum;
+	$self->{'.data'}{card} = $card;
+	my ($x,$y) = ($cnum*20+15,$cnum*10+9);
+	my $item;
+	my $data;
+	$item = $self->{'.data'}{outline} = Goo::Canvas::Polyline->new($self, TRUE,
+		[
+			$x+  0,$y+ 0,
+			$x+130,$y+ 0,
+			$x+130,$y+87,
+			$x+122,$y+87,
+			$x+122,$y+95,
+			$x+107,$y+95,
+			$x+107,$y+86,
+			$x+105,$y+86,
+			$x+105,$y+95,
+			$x+ 58,$y+95,
+			$x+ 58,$y+86,
+			$x+ 56,$y+86,
+			$x+ 56,$y+95,
+			$x+ 41,$y+95,
+			$x+ 41,$y+87,
+			$x+ 16,$y+87,
+			$x+ 16,$y+95,
+			$x+  0,$y+95,
+		],
+		'antialias'=>'subpixel',
+		'line-width'=>0.4,
+		'line-cap'=>'round',
+		'stroke-color'=>'black',
+		'fill-color'=>'SeaGreen',
+	);
+	$data = { host=>$host->{'.data'}{nm}, driv=>"x400p-sl", card=>$card };
+	$item->signal_connect('button-press-event',sub {
+		my ($it,$wg,$ev,$data) = @_;
+		my $menu = CardMenu->new($data->{host},$data->{driv},$data->{card});
+		$menu->popup(undef,undef,undef,undef,$ev->button,$ev->time);
+		return Gtk2::EVENT_STOP;
+	},$data);
+	$self->{'.data'}{text} = Goo::Canvas::Text->new($self,
+		"x400p-sl$card", $x+65,$y+5,130,'center',
+		'alignment'=>'center',
+		'fill-color'=>'white',
+		'font'=>'Sans 3',
+	);
+	for (my $span = 0; $span < 4; $span++) {
+		my $sno = $span + 1;
+		$self->{'.data'}{spans}[$span]{led} = Goo::Canvas::Rect->new($self,
+			$x+0,$y+8+($span*20),7,5,
+			'line-width'=>0,
+			'fill-color'=>'red',
+		);
+		$item = $self->{'.data'}{spans}[$span]{jack} = Goo::Canvas::Rect->new($self,
+			$x+0,$y+13+($span*20),18,15,
+			'line-width'=>0,
+			'fill-color'=>'DarkSlateGray',
+		);
+		$data = { host=>$host->{'.data'}{nm}, driv=>"x400p-sl", card=>$card, span=>$span };
+		$item->signal_connect('button-press-event',sub {
+			my ($it,$wg,$ev,$data) = @_;
+			my $menu = SpanMenu->new($data->{host},$data->{driv},$data->{card},$data->{span});
+			$menu->popup(undef,undef,undef,undef,$ev->button,$ev->time);
+			return Gtk2::EVENT_STOP;
+		},$data);
+		$self->{'.data'}{spans}[$span]{text} = Goo::Canvas::Text->new($self,
+			"$card:$sno", $x+9,$y+20+($span*20),15,'center',
+			'alignment'=>'center',
+			'fill-color'=>'white',
+			'font'=>'Sans 3',
+		);
+	}
+	$self->{'.data'}{xilinx}{chip} = Goo::Canvas::Rect->new($self,
+		$x+39,$y+50,28,28,
+		'line-width'=>0,
+		'fill-color'=>'DarkSlateGray',
+	);
+	$self->{'.data'}{xilinx}{text} = Goo::Canvas::Text->new($self,
+		"XILINX", $x+53,$y+64,28,'center',
+		'alignment'=>'center',
+		'fill-color'=>'white',
+		'font'=>'Sans 3',
+	);
+	$self->{'.data'}{xformer}{chip} = Goo::Canvas::Rect->new($self,
+		$x+34,$y+16,12,28,
+		'line-width'=>0,
+		'fill-color'=>'DarkSlateGray',
+	);
+	$self->{'.data'}{xformer}{text} = Goo::Canvas::Text->new($self,
+		"XFORMER", $x+40,$y+30,28,'center',
+		'alignment'=>'center',
+		'fill-color'=>'white',
+		'font'=>'Sans 3',
+	);
+	$self->{'.data'}{dallas}{chip} = Goo::Canvas::Rect->new($self,
+		$x+78,$y+13,24,24,
+		'line-width'=>0,
+		'fill-color'=>'DarkSlateGray',
+	);
+	$self->{'.data'}{dallas}{text} = Goo::Canvas::Text->new($self,
+		"DALLAS", $x+90,$y+25,24,'center',
+		'alignment'=>'center',
+		'fill-color'=>'white',
+		'font'=>'Sans 3',
+	);
+	$self->{'.data'}{plx}{chip} = Goo::Canvas::Rect->new($self,
+		$x+79,$y+54,24,24,
+		'line-width'=>0,
+		'fill-color'=>'DarkSlateGray',
+	);
+	$self->{'.data'}{plx}{text} = Goo::Canvas::Text->new($self,
+		"PLX 9030", $x+91,$y+66,24,'center',
+		'alignment'=>'center',
+		'fill-color'=>'white',
+		'font'=>'Sans 3',
+	);
+	$self->{'.data'}{bezel} = Goo::Canvas::Polyline->new($self, FALSE,
+		[
+			$x-12,$y-6,
+			$x+ 0,$y-6,
+			$x+ 0,$y+115,
+		],
+		'antialias'=>'subpixel',
+		'line-width'=>1,
+		'line-cap'=>'round',
+		'stroke-color'=>'darkgray',
+	);
+	return $self;
+}
+
+# ----------------------------------
+package Host;
+use strict;
+use Carp;
+use Gtk2;
+use Glib qw(TRUE FALSE);
+use Goo::Canvas;
+use vars qw(@ISA);
+@ISA = qw(Gtk2::ScrolledWindow);
+# ----------------------------------
+sub new {
+	my ($type,$name) = @_;
+	my $self = Gtk2::ScrolledWindow->new();
+	bless $self,$type;
+	my $cv = Goo::Canvas->new();
+	$cv->set(
+		'background-color'=>'white',
+		'automatic-bounds'=>TRUE,
+		'units'=>'mm',
+	);
+	$cv->signal_connect('scroll-event'=>\&Host::canvasScroll,$self);
+	my $root = $cv->get_root_item;
+	my $data = { host=>$name };
+	$root->signal_connect('button-press-event',sub {
+		my ($it,$wv,$ev,$data) = @_;
+		my $menu = HostMenu->new($data->{host});
+		$menu->popup(undef,undef,undef,undef,$ev->button,$ev->time);
+		return Gtk2::EVENT_STOP;
+	},$data);
+	$self->set_policy('automatic','automatic');
+	$self->signal_connect('scroll-event'=>\&Host::scrollScroll,$self);
+	$self->add($cv);
+	$self->{'.data'}{cv} = $cv;
+	$self->{'.data'}{nm} = $name;
+	for (my $card = 0; $card < 4; $card++) {
+		my $cno = 3 - $card;
+		$self->{'.data'}{cards}[$cno] = Card->new($self,$card);
+	}
+	return $self;
+}
+#package Host;
+sub canvasScroll {
+	my ($cv,$ev,$self) = @_;
+	my $state = $ev->get_state;
+	my $dir = $ev->direction;
+	my $states = join(',',@{$state});
+	if ($dir eq 'up' or $dir eq 'down') {
+		if ($states=~/control-mask/) {
+			if ($dir eq 'up') {
+				$cv->set_scale($cv->get_scale * 1.2);
+			} else {
+				$cv->set_scale($cv->get_scale / 1.2);
+			}
+			$ev->set_state([]);
+			return TRUE;
+		} elsif ($states=~/shift-mask/) {
+			if ($dir eq 'up') {
+				$ev->direction('left');
+			} else {
+				$ev->direction('right');
+			}
+			$ev->set_state([]);
+			$self->signal_emit('scroll-event',$ev);
+			return TRUE;
+		}
+	}
+	$self->signal_emit('scroll-event',$ev);
+	return FALSE;
+}
+#package Host;
+sub scrollScroll {
+	my ($sw,$ev,$self) = @_;
+	my $cv = $self->{'.data'}{cv};
+	my $state = $ev->get_state;
+	my $dir = $ev->direction;
+	my $states = join(',',@{$state});
+	if ($dir eq 'up' or $dir eq 'down') {
+		if ($states=~/control-mask/) {
+			if ($dir eq 'up') {
+				$cv->set_scale($cv->get_scale * 1.2);
+			} else {
+				$cv->set_scale($cv->get_scale / 1.2);
+			}
+			$ev->set_state([]);
+			return TRUE;
+		} elsif ($states=~/shift-mask/) {
+			if ($dir eq 'up') {
+				$ev->direction('left');
+			} else {
+				$ev->direction('right');
+			}
+			$ev->set_state([]);
+			return TRUE;
+		}
+	}
+	return FALSE;
+}
+
+# ----------------------------------
+package Window;
+use strict;
+use Carp;
+use Gtk2;
+use Glib qw(TRUE FALSE);
+use Goo::Canvas;
+use vars qw(@ISA);
+@ISA = qw(Gtk2::Window);
+# ----------------------------------
+#package Window;
+sub new {
+	my ($type,@args) = @_;
+	my $self = Gtk2::Window->new('toplevel');
+	bless $self,$type;
+	my $mb = Gtk2::MenuBar->new;
+	my $me = Gtk2::Menu->new;
+	my $mi;
+	$mi = Gtk2::ImageMenuItem->new_from_stock('gtk-new',undef);
+	$mi->signal_connect('activate'=>\&Window::menuSnmpNew,$self);
+	$me->append($mi);
+	$mi = Gtk2::ImageMenuItem->new_from_stock('gtk-open',undef);
+	$mi->signal_connect('activate'=>\&Window::menuSnmpOpen,$self);
+	$me->append($mi);
+	my $mc = Gtk2::MenuItem->new('_SNMP');
+	$mc->set_submenu($me);
+	$mb->append($mc);
+	my $nb = Gtk2::Notebook->new();
+	$nb->popup_enable;
+	my $vb = Gtk2::VBox->new();
+	$vb->set_spacing(0);
+	$vb->pack_start($mb,FALSE,FALSE,0);
+	$vb->pack_start($nb,TRUE,TRUE,0);
+	$self->set_type_hint('normal');
+	$self->set_default_size(800,640);
+	$self->set_opacity(0.5);
+	$self->set_position('mouse');
+	$self->signal_connect('delete_event'=>sub{
+		my ($self,$ev) = @_;
+		my @windows = ( @::windows ); @::windows = ();
+		while (my $w = shift @windows) {
+			push @::windows, $w unless $w eq $self;
+		}
+		Gtk2->main_quit unless scalar @::windows > 0;
+		return Gtk2::EVENT_PROPAGATE;
+	});
+	$self->add($vb);
+	$self->show_all;
+	$self->{'.data'}{nb} = $nb;
+	push @::windows, $self;
+	return $self;
+}
+#package Window;
+sub menuSnmpNew {
+	my ($mi,$self) = @_;
+	carp join(', ',@_).": menu item invoked";
+}
+#package Window;
+sub menuSnmpOpen {
+	my ($mi,$tw) = @_;
+	carp join(', ',@_).": menu item invoked";
+}
+#package Window;
+sub add_page {
+	my ($self,$host) = @_;
+	my $nb = $self->{'.data'}{nb};
+	$nb->append_page($host,$host->{'.data'}{nm});
+	$nb->set_tab_detachable($host,TRUE);
+	$nb->set_tab_reorderable($host,TRUE);
+	$self->show_all;
+}
+#package Window;
+sub newmain {
+	my ($type) = @_;
+	my $self = $type->new();
+	$self->add_page(Host->new('localhost'));
+	$self->add_page(Host->new('otherhost'));
+	return $self;
+}
+#package Window;
+sub newWindow {
+	my ($nb,$host,$x,$y) = @_;
+	my $self = Window->new();
+	return $self->{'.data'}{nb};
+}
+
+# ----------------------------------
+package main;
+use strict;
+use Gtk2;
+# ----------------------------------
+
+Gtk2::Notebook->set_window_creation_hook(\&Window::newWindow);
+
+Window->newmain;
+
+Gtk2->main;
+
+exit;
+
+1;
+
+__END__
+
+
+
