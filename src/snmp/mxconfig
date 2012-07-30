@@ -28,6 +28,7 @@ SNMP::addMibDirs(qw(../mibs));
 SNMP::loadModules('OPENSS7-MX-MIB');
 
 my @windows;
+my $quitting = 0;
 
 package MyDBI;
 use DBI;
@@ -79,8 +80,6 @@ CREATE TABLE IF NOT EXISTS pages (
 },
 	},
 );
-
-$MyDBI::dbh;
 
 my %mapping = (
 	'COUNTER'	=> 'INT',
@@ -166,6 +165,16 @@ sub getselect {
 	return preparesql($dbh,$sql);
 }
 
+sub getdelete {
+	my ($schema,$tab,$dbh) = @_;
+	my @indx = (); foreach (@{$schema->{$tab}{keys}}) { push @indx, "$_=?" }
+	my $sql = qq{
+	DELETE FROM $tab WHERE
+		}.join(' AND ',@indx).q{;
+};
+	return preparesql($dbh,$sql);
+}
+
 sub maketables {
 	my ($schema,$dbh) = @_;
 	foreach my $tab (@{$schema->{tables}}) {
@@ -186,6 +195,7 @@ sub maketables {
 		$schema->{$tab}{insert} = getinsert($schema,$tab,$dbh);
 		$schema->{$tab}{update} = getupdate($schema,$tab,$dbh);
 		$schema->{$tab}{select} = getselect($schema,$tab,$dbh);
+		$schema->{$tab}{delete} = getdelete($schema,$tab,$dbh);
 	}
 }
 
@@ -195,6 +205,7 @@ sub destroysth {
 		delete $schema->{$tab}{insert};
 		delete $schema->{$tab}{update};
 		delete $schema->{$tab}{select};
+		delete $schema->{$tab}{delete};
 	}
 }
 
@@ -958,6 +969,9 @@ sub new {
 	my ($type,@args) = @_;
 	my $self = Gtk2::Window->new('toplevel');
 	bless $self,$type;
+	my $windid = scalar @::windows;
+	my $data = $self->{'.data'} = {};
+	$self->read($windid);
 	my $mb = Gtk2::MenuBar->new;
 	my $me = Gtk2::Menu->new;
 	my $mi;
@@ -966,6 +980,12 @@ sub new {
 	$me->append($mi);
 	$mi = Gtk2::ImageMenuItem->new_from_stock('gtk-open',undef);
 	$mi->signal_connect('activate'=>\&Window::menuSnmpOpen,$self);
+	$me->append($mi);
+	$mi = Gtk2::ImageMenuItem->new_from_stock('gtk-close',undef);
+	$mi->signal_connect('activate'=>\&Window::menuSnmpClose,$self);
+	$me->append($mi);
+	$mi = Gtk2::ImageMenuItem->new_from_stock('gtk-quit',undef);
+	$mi->signal_connect('activate'=>\&Window::menuSnmpQuit,$self);
 	$me->append($mi);
 	my $mc = Gtk2::MenuItem->new('_SNMP');
 	$mc->set_submenu($me);
@@ -978,21 +998,63 @@ sub new {
 	$vb->pack_start($nb,TRUE,TRUE,0);
 	$self->set_type_hint('normal');
 	$self->set_default_size(800,640);
+	$self->move($data->{xpos},$data->{ypos}) if defined $data->{xpos};
+	$self->resize($data->{width},$data->{height}) if defined $data->{width};
 	$self->set_opacity(0.5);
 	$self->set_position('mouse');
-	$self->signal_connect('delete_event'=>sub{
+	$self->signal_connect('delete-event'=>sub{
 		my ($self,$ev) = @_;
 		my @windows = ( @::windows ); @::windows = ();
 		while (my $w = shift @windows) {
 			push @::windows, $w unless $w eq $self;
 		}
-		Gtk2->main_quit unless scalar @::windows > 0;
+		if ($::quitting or scalar @::windows == 0) { $self->save; } else { $self->remove; }
+		if (scalar @::windows == 0) {
+			$::quitting = 1;
+			Gtk2->main_quit;
+		}
 		return Gtk2::EVENT_PROPAGATE;
 	});
 	$self->add($vb);
 	$self->show_all;
-	$self->{'.data'}{nb} = $nb;
+	$data->{nb} = $nb;
 	push @::windows, $self;
+	return $self->save;
+}
+#package Window;
+sub read {
+	my ($self,$windid) = @_;
+	my $data = $self->{'.data'};
+	my $sth = $MyDBI::schema{winds}{select};
+	$data->{windid} = $windid;
+	if ($sth->execute($windid)) {
+		if (my $row = $sth->fetchrow_hashref) {
+			foreach (@{$MyDBI::schema{winds}{cols}}) {
+				$data->{$_} = $row->{$_};
+			}
+		}
+	} else {
+		warn $sth->errstr;
+	}
+	return $self;
+}
+#package Window;
+sub save {
+	my $self = shift;
+	my $data = $self->{'.data'};
+	my $sth = $MyDBI::schema{winds}{insert};
+	($data->{xpos}, $data->{ypos}  ) = $self->get_position;
+	($data->{width},$data->{height}) = $self->get_size;
+	$sth->execute($data->{windid},$data->{xpos},$data->{ypos},$data->{width},$data->{height})
+		or warn $sth->errstr;
+	return $self;
+}
+#package Window;
+sub remove {
+	my $self = shift;
+	my $data = $self->{'.data'};
+	my $sth = $MyDBI::schema{winds}{delete};
+	$sth->execute($data->{windid}) or warn $sth->errstr;
 	return $self;
 }
 #package Window;
@@ -1003,6 +1065,16 @@ sub menuSnmpNew {
 #package Window;
 sub menuSnmpOpen {
 	my ($mi,$tw) = @_;
+	carp join(', ',@_).": menu item invoked";
+}
+#package Window;
+sub menuSnmpClose {
+	my ($mi,$self) = @_;
+	carp join(', ',@_).": menu item invoked";
+}
+#package Window;
+sub menuSnmpQuit {
+	my ($mi,$self) = @_;
 	carp join(', ',@_).": menu item invoked";
 }
 #package Window;
