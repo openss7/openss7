@@ -12,6 +12,7 @@ use Gtk2::Helper;
 use FileHandle;
 use FindBin qw($Bin);
 use lib "$Bin";
+use DBI;
 use SNMP;
 use strict;
 
@@ -27,6 +28,246 @@ SNMP::addMibDirs(qw(../mibs));
 SNMP::loadModules('OPENSS7-MX-MIB');
 
 my @windows;
+
+package MyDBI;
+use DBI;
+use SNMP;
+use strict;
+
+%MyDBI::schema = (
+	tables=>[ qw/winds pages hosts mxSyncTable mxDrivTable mxCardTable mxSpanTable mxBertTable mxXconTable mxNearEndCurrentTable mxNearEndIntervalTable mxNearEndTotalTable mxFarEndCurrentTable mxFarEndIntervalTable mxFarEndTotalTable/ ],
+	hosts=>{
+		keys=>[ qw/hostid/ ],
+		cols=>[ qw/hostid url/ ],
+		tsql=>q{
+CREATE TABLE IF NOT EXISTS hosts (
+	hostid INT,
+	url TEXT,
+	PRIMARY KEY(hostid)
+);
+},
+	},
+	winds=>{
+		keys=>[ qw/windid/ ],
+		cols=>[ qw/windid xpos ypos width height/ ],
+		tsql=>q{
+CREATE TABLE IF NOT EXISTS winds (
+	windid INT,
+	xpos INT,
+	ypos INT,
+	width INT,
+	height INT,
+	PRIMARY KEY(windid)
+);
+},
+	},
+	pages=>{
+		keys=>[ qw/windid pageid/ ],
+		cols=>[ qw/windid pageid hostid xoffset yoffset scale/ ],
+		tsql=>q{
+CREATE TABLE IF NOT EXISTS pages (
+	windid INT,
+	pageid INT,
+	hostid INT,
+	xoffset INT,
+	yoffset INT,
+	scale REAL,
+	PRIMARY KEY(windid,pageid),
+	FOREIGN KEY(hostid) REFERENCES hosts(hostid),
+	FOREIGN KEY(windid) REFERENCES winds(windid)
+);
+},
+	},
+);
+
+$MyDBI::dbh;
+
+my %mapping = (
+	'COUNTER'	=> 'INT',
+	'GAUGE'		=> 'INT',
+	'INTEGER32'	=> 'INT',
+	'INTEGER'	=> 'INT',
+	'TICKS'		=> 'INT',
+	'UNSIGNED32'	=> 'INT',
+	'BITS'		=> 'TEXT',
+	'OBJECTID'	=> 'TEXT',
+	'OCTETSTR'	=> 'TEXT',
+);
+
+sub dosql {
+	my ($dbh,$sql) = @_;
+#	print STDERR "S: $sql";
+	$dbh->do($sql) or die $dbh->errstr;
+}
+
+sub preparesql {
+	my ($dbh, $sql) = @_;
+#	print STDERR "S: $sql";
+	my $sth = $dbh->prepare($sql) or die $dbh->errstr;
+	return $sth;
+}
+
+sub mapit {
+	my ($mib) = @_;
+	if (exists $mapping{$mib->{type}}) {
+		my $type = $mapping{$mib->{type}};
+		if ($mib->{type} eq 'OCTETSTR') {
+			if (defined $mib->{ranges} and ref $mib->{ranges} eq 'ARRAY') {
+				my $max = 0;
+				foreach (@{$mib->{ranges}}) {
+					if ($_->{high} > $max) {
+						$max = $_->{high};
+					}
+				}
+				if ($max != 0) {
+					$type = "CHARACTER($max)";
+				}
+			}
+		}
+		return $type;
+	}
+	return $mib->{type};
+}
+
+sub getinsert {
+	my ($schema,$tab,$dbh) = @_;
+	my @bind = (); foreach (@{$schema->{$tab}{cols}}) { push @bind, '?' }
+	my $sql = qq{
+	INSERT OR REPLACE INTO $tab (
+		}.join(',',@{$schema->{$tab}{cols}}).q{
+	) VALUES (
+		}.join(',',@bind).q{
+	);
+};
+	return preparesql($dbh,$sql);
+}
+
+sub getupdate {
+	my ($schema,$tab,$dbh) = @_;
+	my @bind = (); foreach (@{$schema->{$tab}{cols}}) { push @bind, "$_=?" }
+	my @indx = (); foreach (@{$schema->{$tab}{keys}}) { push @indx, "$_=?" }
+	my $sql = qq{
+	UPDATE OR REPLACE $tab SET
+		}.join(',',@bind).q{
+	WHERE }.join(' AND ',@indx).q{;
+};
+	return preparesql($dbh,$sql);
+} 
+
+sub getselect {
+	my ($schema,$tab,$dbh) = @_;
+	my @indx = (); foreach (@{$schema->{$tab}{keys}}) { push @indx, "$_=?" }
+	my $sql = q{
+	SELECT
+		}.join(',',@{$schema->{$tab}{cols}}).qq{
+	FROM $tab WHERE
+		}.join(' AND ',@indx).q{;
+};
+	return preparesql($dbh,$sql);
+}
+
+sub maketables {
+	my ($schema,$dbh) = @_;
+	foreach my $tab (@{$schema->{tables}}) {
+		my $sql = $schema->{$tab}{tsql};
+		next unless defined $sql;
+		dosql($dbh,$sql);
+	}
+	foreach my $tab (@{$schema->{tables}}) {
+		next unless exists $schema->{$tab}{tsql};
+		if (exists $schema->{$tab}{gsql} and ref $schema->{$tab}{gsql} eq 'ARRAY') {
+			foreach my $sql (@{$schema->{$tab}{gsql}}) {
+				dosql($dbh,$sql);
+			}
+		}
+	}
+	foreach my $tab (@{$schema->{tables}}) {
+		next unless exists $schema->{$tab}{tsql};
+		$schema->{$tab}{insert} = getinsert($schema,$tab,$dbh);
+		$schema->{$tab}{update} = getupdate($schema,$tab,$dbh);
+		$schema->{$tab}{select} = getselect($schema,$tab,$dbh);
+	}
+}
+
+sub destroysth {
+	my ($schema,$dbh) = @_;
+	foreach my $tab (@{$schema->{tables}}) {
+		delete $schema->{$tab}{insert};
+		delete $schema->{$tab}{update};
+		delete $schema->{$tab}{select};
+	}
+}
+
+sub startdb {
+	my ($dn) = @_;
+	my $fn = "$dn.sqlite";
+#	print STDERR "I: connecting to database $fn\n";
+	$MyDBI::dbh = DBI->connect("dbi:SQLite:$fn") or die "can't open $fn";
+	my $sql = qq{PRAGMA foreign_keys = OFF;\n};
+	dosql($MyDBI::dbh,$sql);
+	maketables(\%MyDBI::schema,$MyDBI::dbh);
+}
+
+sub stopdb {
+	my $sql = qq{VACUUM;\n};
+	dosql($MyDBI::dbh,$sql);
+	destroysth(\%MyDBI::schema,$MyDBI::dbh);
+#	print STDERR "I: disconnecting database\n";
+	$MyDBI::dbh->disconnect;
+#	print STDERR "I: database disconnected\n";
+	undef $MyDBI::dbh;
+}
+
+sub initSchema {
+	foreach my $t ( @{$MyDBI::schema{tables}} ) {
+		next unless $t=~/^mx/;
+		my $table = $SNMP::MIB{$t};
+		next unless $table;
+		my $entry = $table->{children}[0];
+		my @inds = ();
+		my @cols = ();
+		{
+			my @indexes = @{$entry->{indexes}};
+			my @children = ( sort { $a->{subID} <=> $b->{subID} } @{$entry->{children}} );
+			my %labs = ();
+			foreach (@indexes) {
+				$labs{$_} = 1;
+				push @inds, $SNMP::MIB{$_};
+			}
+			foreach ( @children ) {
+				next if exists $labs{$_->{label}};
+				push @cols, $_;
+			}
+		}
+		$MyDBI::schema{$t} = {};
+		$MyDBI::schema{$t}{keys} = [];
+		$MyDBI::schema{$t}{cols} = [];
+		$MyDBI::schema{$t}{tsql} = "\nCREATE TABLE IF NOT EXISTS $t (";
+		push @{$MyDBI::schema{$t}{keys}}, 'hostid';
+		push @{$MyDBI::schema{$t}{cols}}, 'hostid';
+		$MyDBI::schema{$t}{tsql} .= "\n\thostid INT";
+		my $keys = ",\n\tPRIMARY KEY(hostid";
+		foreach (@inds) {
+			$keys .= ','.$_->{label};
+		}
+		$keys .= ')';
+		$keys .= ",\n\tFOREIGN KEY(hostid) REFERENCES hosts(hostid)";
+		foreach (@inds) {
+			push @{$MyDBI::schema{$t}{keys}}, $_->{label};
+			push @{$MyDBI::schema{$t}{cols}}, $_->{label};
+			$MyDBI::schema{$t}{tsql} .= ",\n\t$_->{label} ".mapit($_);
+			if ($_->{parent} ne $entry) {
+				$keys .= ",\n\tFOREIGN KEY($_->{label}) REFERENCES $_->{parent}->{parent}->{label}($_->{label})";
+			}
+		}
+		foreach (@cols) {
+			push @{$MyDBI::schema{$t}{cols}}, $_->{label};
+			$MyDBI::schema{$t}{tsql} .= ",\n\t$_->{label} ".mapit($_);
+		}
+		$MyDBI::schema{$t}{tsql} .= $keys;
+		$MyDBI::schema{$t}{tsql} .= "\n);\n";
+	}
+}
 
 # ----------------------------------
 package ChanDialog;
@@ -792,13 +1033,23 @@ sub newWindow {
 package main;
 use strict;
 use Gtk2;
+use Data::Dumper;
+use DBI;
 # ----------------------------------
+
+MyDBI::initSchema();
+MyDBI::startdb('./.mxconfig');
+
+#my $d = Data::Dumper->new([\%MyDBI::schema]);
+#print $d->Dump;
 
 Gtk2::Notebook->set_window_creation_hook(\&Window::newWindow);
 
 Window->newmain;
 
 Gtk2->main;
+
+MyDBI::stopdb();
 
 exit;
 
