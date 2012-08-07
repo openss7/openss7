@@ -82,13 +82,16 @@ OPENSS7-MX-MON-MIB DEFINITIONS ::= BEGIN
 IMPORTS
     openss7Modules
         FROM OPENSS7-SMI
-    AdministrativeState, AvailabilityStatus, OperationalState, 
-    ProceduralStatus, UsageState
+    AdministrativeState, AvailabilityStatus, FullAction, IntervalsOfDay, 
+    LogCapacityAlarmThreshold, OperationalState, ProceduralStatus, 
+    SimpleNameType, UsageState, WeekMask
         FROM OPENSS7-SMI-MIB
     MilliSeconds
         FROM OPENSS7-TC
     SnmpAdminString
         FROM SNMP-FRAMEWORK-MIB
+    MODULE-COMPLIANCE, OBJECT-GROUP
+        FROM SNMPv2-CONF
     Counter32, Gauge32, MODULE-IDENTITY, OBJECT-TYPE, 
     Unsigned32
         FROM SNMPv2-SMI
@@ -148,59 +151,59 @@ mxMonMIB MODULE-IDENTITY
         "First release of this module."
     ::= { openss7Modules 81 }
 
-
 -- ====================================================================
 -- TEXTUAL CONVENTIONS
 -- ====================================================================
 
-MonitoringSourceName ::= TEXTUAL-CONVENTION
-    DISPLAY-HINT "1a"
+TimesOfDay ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "1d:1d,"
     STATUS      current
     DESCRIPTION 
-        "This textual convention describes an MX monitoring source.  An 
-         MX monitoring source is described with a codified ASCII string 
-         that has the following components:
+        "This textual convention specifies times of day by hour and 
+         minute and replaces the following ASN.1 syntax:
          
-         - The driver name (or a single '*' indicating all drivers).  
-           When different from '*', the driver name must conform to the 
-           specification of a StreamsModuleName textual convention from 
-           the OPENSS7-STREAMS-MIB.  When the driver name is a single 
-           asterisk ('*'), the monitoring source refers to all sources 
-           from all MX drivers.  When the source name ends in the driver 
-           name (the driver name ends in a alphabetical character), the 
-           monitoring source refers to all sources from the specified 
-           driver.
+         TimesOfDay ::= SET OF Time24
          
-         - One or more ASCII digits specifying an ordinal card number 
-           (starting at zero 0) supported by the driver.  This component 
-           is optional; however, it must be specified if the component 
-           that follows is specified.  When the source name ends with 
-           this component, the monitoring source refers to all sources 
-           for the specified card.
-         
-         - A colon (':') followed by one or more ASCII digits specifying 
-           an ordinal span number on the card (starting at zero).  When 
-           the source name ends with this component, the monitoring 
-           source refers to all sources for the specified span.
-         
-         - A period ('.') followed by one or more ASCII digits 
-           specifying the ordinal channel number on the card.  The 
-           ordinal channel number starts at one and spans through 24 for 
-           T1/J1 spans and 31 for E1 spans.  The channel number zero (0) 
-           is special and refers to a high-speed signalling link that 
-           takes up the entire span.  When the source name ends with 
-           this component, the monitoring source refers to the specified 
-           channel(s)."
-    SYNTAX      OCTET STRING (SIZE(1..16))
+         It consists of an octet string that is an integral multiple of 
+         2 octets.  Each 2 octet grouping is coded as a Time24 textual 
+         convention representing one time of day.  Each two-octet 
+         grouping represents as separate time of day."
+    REFERENCE   
+        "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992, 
+               Attribute-ASN1Module.IntervalsOfDay"
+    SYNTAX      OCTET STRING
 
-ProfileName ::= TEXTUAL-CONVENTION
-    DISPLAY-HINT "1a"
+TimesOfWeek ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "1x"
     STATUS      current
     DESCRIPTION 
-        "This textual convention describes the name of a protocol 
-         parameter profile.  The name is limited to 16 characters so 
-         that it can be used effectively as a table index."
-    SYNTAX      OCTET STRING (SIZE(1..16))
+        "This textual convention specifies intervals in the day for days 
+         of the week and replaces the following ASN.1 syntax:
+         
+         WeekMask ::= SET OF SEQUENCE {
+            daysOfWeek BIT STRING {
+                sunday(0),
+                monday(1),
+                tuesday(2),
+                wednesday(3),
+                thursday(4),
+                friday(5),
+                saturday(6) }(SIZE(7)),
+            timesOfDay TimesOfDay }
+         
+         The first octet of the octet string is a day of seek indicator 
+         that can have bit values: sunday(0), monday(1), tuesday(2), 
+         wednesday(3), thursday(4), friday(5) and saturday(6), with bit 
+         position 7 unused and set to zero.  The second octet of the 
+         string is an interval count indicating the number, 'n', of 
+         times of day (multiples of 2 octets) to follow.  The next nx2 
+         octets represent the times of day following the TimesOfDay 
+         textual convention.  The pattern is repeated again beginning 
+         with the week octet."
+    REFERENCE   
+        "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992, 
+               Attribute-ASN1Module.WeekMask"
+    SYNTAX      OCTET STRING
 
 mxMonNotifications OBJECT IDENTIFIER
     ::= { mxMonMIB 1 }
@@ -237,7 +240,7 @@ mxMonitorEntry OBJECT-TYPE
     ::= { mxMonitorTable 1 }
 
 MxMonitorEntry ::= SEQUENCE {
-    mxMonitorSource             MonitoringSourceName,
+    mxMonitorSource             SimpleNameType,
     mxMonitorExport             TruthValue,
     mxMonitorAdminState         AdministrativeState,
     mxMonitorOperState          OperationalState,
@@ -256,13 +259,45 @@ MxMonitorEntry ::= SEQUENCE {
 }
 
 mxMonitorSource OBJECT-TYPE
-    SYNTAX      MonitoringSourceName
+    SYNTAX      SimpleNameType
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION 
         "Provides the identification of the source and scope of the 
-         messages to be monitored using the MonitoringSourceName textual 
-         convention."
+         messages to be monitored.  An MX monitoring source is described 
+         using a non-null codified ASCII string that has the following 
+         components:
+         
+         - The driver name (or a single '*' indicating all drivers).  
+           When different from '*', the driver name must conform to the 
+           specification of a StreamsModuleName textual convention from 
+           the OPENSS7-STREAMS-MIB.  When the driver name is a single 
+           asterisk ('*'), the monitoring source refers to all sources 
+           from all MX drivers.  When the source name ends in the driver 
+           name (the driver name ends in a alphabetical character), the 
+           monitoring source refers to all sources from the specified 
+           driver.
+         
+         - One or more ASCII digits specifying an ordinal card number 
+           (starting at zero 0) supported by the driver.  This component 
+           is optional; however, it must be specified if the component 
+           that follows is specified.  When the source name ends with 
+           this component, the monitoring source refers to all sources 
+           for the specified card.
+         
+         - A colon (':') followed by one or more ASCII digits specifying 
+           an ordinal span number on the card (starting at zero).  When 
+           the source name ends with this component, the monitoring 
+           source refers to all sources for the specified span.
+         
+         - A period ('.') followed by one or more ASCII digits 
+           specifying the ordinal channel number on the card.  The 
+           ordinal channel number starts at one and spans through 24 for 
+           T1/J1 spans and 31 for E1 spans.  The channel number zero (0) 
+           is special and refers to a high-speed signalling link that 
+           takes up the entire span.  When the source name ends with 
+           this component, the monitoring source refers to the specified 
+           channel(s)."
     ::= { mxMonitorEntry 1 }
 
 mxMonitorExport OBJECT-TYPE
@@ -273,6 +308,7 @@ mxMonitorExport OBJECT-TYPE
         "Specifies whether this monitor source will be exported as a 
          monitor source to remote system.  When true(1), the monitor 
          source will be exported; false(2), otherwise."
+    DEFVAL      { true }
     ::= { mxMonitorEntry 2 }
 
 mxMonitorAdminState OBJECT-TYPE
@@ -298,7 +334,7 @@ mxMonitorAdminState OBJECT-TYPE
     REFERENCE   
         "OPENSS7-SMI-MIB, ITU-T Rec. X.721 | ISO/IEC 10165-2, 
          administrativeState."
-    DEFVAL      { locked }
+    DEFVAL      { unlocked }
     ::= { mxMonitorEntry 3 }
 
 mxMonitorOperState OBJECT-TYPE
@@ -316,6 +352,7 @@ mxMonitorOperState OBJECT-TYPE
     REFERENCE   
         "OPENSS7-SMI-MIB, ITU-T Rec. X.721 | ISO/IEC 10165-2, 
          operationalState."
+    DEFVAL      { enabled }
     ::= { mxMonitorEntry 4 }
 
 mxMonitorAvailStatus OBJECT-TYPE
@@ -344,7 +381,9 @@ mxMonitorAvailStatus OBJECT-TYPE
          - degraded(6), the monitor source is operating with degraded 
            performance;
          
-         - notInstalled(7), the monitor source is not installed."
+         - notInstalled(7), the monitor source is not installed.
+           
+         - logFull(8), not used."
     ::= { mxMonitorEntry 5 }
 
 mxMonitorProcStatus OBJECT-TYPE
@@ -353,11 +392,25 @@ mxMonitorProcStatus OBJECT-TYPE
     STATUS      current
     DESCRIPTION 
         "Provides the procedural status of the monitor source:
-         - initializationRequired(0),
-         - notInitialized(1),
-         - initializing(2),
-         - reporting(3),
-         - terminating(4),"
+         
+         - initializationRequired(0), hardware or firmware associated 
+           with the monitor source requires initialization and that 
+           initialization has not yet been performed; a manual or 
+           automatic action is required to initialize the monitor 
+           source;
+         - notInitialized(1), hardware or firmware associated with the 
+           monitor source requires initialization and that 
+           initialization has not completed yet;
+         - initializing(2), hardware or firmware associated with the 
+           monitor source requires initialization and that 
+           initialization is proceeding but has not yet completed;
+         - reporting(3), the monitor source is reporting its 
+           results;
+         - terminating(4), the monitor source is terminating.
+         
+         The procedural status for monitor sources result from actions 
+         taken by the underlying device or device driver and not by 
+         actions taken within this MIB."
     REFERENCE   
         "OPENSS7-SMI-MIB, ITU-T Rec. X.721 | ISO/IEC 10165-2, 
          proceduralStatus."
@@ -376,10 +429,15 @@ mxMonitorUsageState OBJECT-TYPE
            operating capacity to provide for additional users 
            simultaneously;
            
-         - busy(2), the monitor is in use an has no spare capacity."
+         - busy(2), the monitor is in use an has no spare capacity.
+           
+         This usage state determines the use of the monitor source as a 
+         monitor and not any use of the source in active communication.  
+         For example, a channel monitor source could be idle(0) for 
+         monitoring, and busy(2) in active communication."
     REFERENCE   
         "OPENSS7-SMI-MIB, ITU-T Rec. X.721 | ISO/IEC 10165-2, 
-         usageState."
+             usageState."
     ::= { mxMonitorEntry 7 }
 
 mxMonitorMessages OBJECT-TYPE
@@ -393,8 +451,13 @@ mxMonitorMessages OBJECT-TYPE
          active monitoring source and capture, this counter will 
          increase monotonically (wrapping) and rapidly.  The counter can 
          be reset to zero by writing to the mxMonitorResetCounts column.  
-         Note that this counter is also resest to zero by the agent 
-         whenever a capture file is rotated."
+         
+         Note that this counter is also reset to zero by the agent 
+         whenever a capture file is rotated.
+         
+         Note that the mxMonitorCurrent column can be read in the same 
+         request to obtain the time stamp corresponding to the read of 
+         the message count."
     ::= { mxMonitorEntry 8 }
 
 mxMonitorMsgOctets OBJECT-TYPE
@@ -408,8 +471,13 @@ mxMonitorMsgOctets OBJECT-TYPE
          For an active monitoring source and capture, this counter will 
          increase monotonically (wrapping) and rapidly.  The counter can 
          be reset to zero by writing to the mxMonitorResetCounts column.  
+         
          Note that this counter is also reset to zero by the agent 
-         whenever a capture file is rotated."
+         whenever a capture file is rotated.
+         
+         Note that the mxMonitorCurrent column can be read in the same 
+         request to obtain the time stamp corresponding to the read of 
+         the message octets."
     ::= { mxMonitorEntry 9 }
 
 mxMonitorSusCompressed OBJECT-TYPE
@@ -422,9 +490,14 @@ mxMonitorSusCompressed OBJECT-TYPE
          compressed due to repetition.  For an active monitoring source 
          and capture, this counter will increase monotonically 
          (wrapping) and rapidly.  The counter can be reset to zero by 
-         writing to the mxMonitorResetCounts column.  Note that this 
-         counter is also reset to zero by the agent whenever a capture 
-         file is rotated."
+         writing to the mxMonitorResetCounts column.
+         
+         Note that this counter is also reset to zero by the agent 
+         whenever a capture file is rotated.
+         
+         Note that the mxMonitorCurrent column can be read in the same 
+         request to obtain the time stamp corresponding to the read of 
+         the compressed signal units."
     ::= { mxMonitorEntry 10 }
 
 mxMonitorMsuDrops OBJECT-TYPE
@@ -437,8 +510,14 @@ mxMonitorMsuDrops OBJECT-TYPE
          inadequate resources.  For an active monitoring source and 
          capture, this counter should always remain at zero.  The 
          counter can be reset to zero by writing to the 
-         mxMonitorResetCounts column.  Note that this counter is also 
-         reset to zero by the agent whenever a capture file is rotated."
+         mxMonitorResetCounts column.
+         
+         Note that this counter is also reset to zero by the agent 
+         whenever a capture file is rotated.
+         
+         Note that the mxMonitorCurrent column can be read in the same 
+         request to obtain the time stamp corresponding to the read of 
+         the compressed signal units."
     ::= { mxMonitorEntry 11 }
 
 mxMonitorActiveLinkDirs OBJECT-TYPE
@@ -447,15 +526,15 @@ mxMonitorActiveLinkDirs OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        "Provides a high water mark of the number of low-speed (56 or 64 
+        "Provides a high watermark of the number of low-speed (56 or 64 
          kbps) signalling link directions that were actively monitored 
          (i.e, messages were captured from the link for the direction) 
-         since the water mark was reset.  This water mark can be reset 
-         to zero by writing to the mxMoniorResetCounts column.  The 
-         water mark is also reset to zero by the agent whenever a 
-         capture file is rotated.  This column is useful for determining 
-         whether the appropriate number of signalling links are being 
-         monitored for a span, card, driver or default source."
+         since the watermark was reset.  This watermark can be reset to 
+         zero by writing to the mxMoniorResetCounts column.  The 
+         watermark is also reset to zero by the agent whenever a capture 
+         file is rotated.  This column is useful for determining whether 
+         the appropriate number of signalling links are being monitored 
+         for a span, card, driver or default source."
     ::= { mxMonitorEntry 12 }
 
 mxMonitorActiveHslDirs OBJECT-TYPE
@@ -464,12 +543,12 @@ mxMonitorActiveHslDirs OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        "Provides a high water mark of the number of high-speed (1.536 
-         or 1.892 kbps) signalling link directions that were actively 
+        "Provides a high watermark of the number of high-speed (1.536 or 
+         1.892 kbps) signalling link directions that were actively 
          monitored (i.e, messages were captured from the link for the 
-         direction) since the water mark was reset.  This water mark can 
+         direction) since the watermark was reset.  This watermark can 
          be reset to zero by writing to the mxMonitorResetCounts column.  
-         The water mark is also reset to zero by the agent whenever a 
+         The watermark is also reset to zero by the agent whenever a 
          capture file is rotated.  This is useful for determining 
          whether an appropriate number of signalling links are being 
          monitored for a card, driver or default source."
@@ -523,7 +602,7 @@ mxCapture OBJECT IDENTIFIER
     ::= { mxMonObjects 2 }
 
 mxCaptureNameString OBJECT-TYPE
-    SYNTAX      OCTET STRING (SIZE(1..32))
+    SYNTAX      SimpleNameType
     MAX-ACCESS  read-write
     STATUS      current
     DESCRIPTION 
@@ -532,6 +611,298 @@ mxCaptureNameString OBJECT-TYPE
     DEFVAL      { "mxmon-%Y-%M-%D-%H" }
     ::= { mxCapture 1 }
 
+mxCaptureAdminState OBJECT-TYPE
+    SYNTAX      AdministrativeState
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "This attribute represents the administrative capability of the 
+         capture archive to perform its function.  The following 
+         administrative states are defined:
+         
+         - locked(0), use of the capture archive has been prohibited by 
+           a managing system.  Information from subordinate files may be 
+           retrieved but new files shall not be created.  Files may be 
+           deleted.
+           
+         - unlocked(1), use of the capture archive has been permitted by 
+           a managing system.  Information from subordinate files may be 
+           retrieved and, conditional on the values of other state and 
+           status attributes, new files may be created.
+           
+         Whenever the administrative state of the capture archive is 
+         changed, a state change notification is generated."
+    REFERENCE   
+        "ITU-T Rec. X.735 (1992) | ISO/IEC 10164-6 : 1993, 
+               Section 8.1.1.1.3."
+    DEFVAL      { unlocked }
+    ::= { mxCapture 2 }
+
+mxCaptureOpState OBJECT-TYPE
+    SYNTAX      OperationalState
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "This attribute represents that operational capability of the 
+         capture archive to perform its function.  The following 
+         operational states are defined:
+         
+         - enabled(0), the log is operational and ready for use.  
+           Information from subordinate records may be retrieved and, 
+           conditional on the values of other state and status 
+           attributes, new records may be created.
+           
+         - disabled(1), the log is not available for use.  New records 
+           cannot be created.
+           
+         A change in operational state shall generate a state changed 
+         notification."
+    REFERENCE   
+        "ITU-T Rec. X.735 (1992) | ISO/IEC 10164-6 : 1993, 
+               Section 8.1.1.1.4."
+    DEFVAL      { enabled }
+    ::= { mxCapture 3 }
+
+mxCaptureAvailStatus OBJECT-TYPE
+    SYNTAX      AvailabilityStatus
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "This attribute reflects the availability status of the log.  
+         The attribute may indicate a 'log-full' condition; indicating 
+         that records can be retrieved but that no new records can be 
+         added.
+         
+         The availability status package shall be present if any of the 
+         scheduling packages are instantiated.  This attribute reflects 
+         the availability status of the log.  When the resource has been 
+         made unavailable in accordance with a predetermined time 
+         schedule its value will be 'Off-Duty'.  The attribute is 
+         read-only.  The value on creation is determined by the 
+         scheduling parameters specified and the status of the resource.  
+         The required value set for this attribute in this package is 
+         'Off-Duty'.
+         
+         No state change notification is generated when this attribute 
+         changes value.  Note: the log makes use of the availability 
+         status to indicate the 'log-full' condition; the presence of 
+         this conditional package makes available the 'Off-Duty' value 
+         to the object."
+    REFERENCE   
+        "ITU-T Rec. X.735 (1992) | ISO/IEC 10164-6 : 1993, 
+               Section 8.1.1.1.6.
+         ITU-T Rec. X.735 (1992) | ISO/IEC 10164-6 : 1993, 
+         Section 8.1.1.4.1."
+    DEFVAL      { {} }
+    ::= { mxCapture 4 }
+
+mxCaptureFullAction OBJECT-TYPE
+    SYNTAX      FullAction
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Provides a specification of the action to be taken when the 
+         maximum size of the log has been reached.  Options are:
+         
+         - wrap(0), the oldest records in the log, as determined by the 
+           record time stamp, will be deleted to free resources for the 
+           creation of new records;
+           
+         - halt(1), no more records will be logged; records already in 
+           the log will be retained.
+           
+         Both options are supported by every log."
+    DEFVAL      { wrap }
+    ::= { mxCapture 5 }
+
+mxCaptureMaxSize OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "This attribute specifies the size of the log measured in number 
+         of octets.  A log may have an indeterminate size.  A maximum 
+         log size of zero shall be used to specify that the log size has 
+         no predefined limit.
+         
+         Note: Since the log size is specified in octets, the actual 
+         amount of information that is contained in a log will be 
+         determined by the data representation in the log.  This data 
+         representation is not subject to standardization.  The maximum 
+         log size does not include the system overhead involved in 
+         establishing the log.  Thus, immediately after creation, the 
+         current log size should read zero."
+    REFERENCE   
+        "ITU-T Rec. X.735 (1992) | ISO/IEC 10164-6 : 1993,
+                Section 8.1.1.2.1"
+    DEFVAL      { 0 }
+    ::= { mxCapture 6 }
+
+mxCaptureCurrentSize OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "This attribute indicates the current size of the log measured 
+         in octets.
+         
+         Note: Since the log size is specified in octets, the actual 
+         amount of information that is contained in a log will be 
+         determined by the data representation in the log.  This data 
+         representation is not subject to standardization.  The maximum 
+         log size does not include the system overhead involved in 
+         establishing the log.  Thus, immediately after creation, the 
+         current log size should read zero."
+    REFERENCE   
+        "ITU-T Rec. X.735 (1992) | ISO/IEC 10164-6 : 1993, 
+               Section 8.1.1.2.2."
+    DEFVAL      { 0 }
+    ::= { mxCapture 7 }
+
+mxCaptureNumberOfRecords OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "This attribute indicates the current number of records 
+         contained in the log."
+    REFERENCE   
+        "ITU-T Rec. X.735 (1992) | ISO/IEC 10164-6 : 1993, 
+               Section 8.1.1.2.3."
+    DEFVAL      { 0 }
+    ::= { mxCapture 8 }
+
+mxCaptureAlarmThreshold OBJECT-TYPE
+    SYNTAX      LogCapacityAlarmThreshold
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "The log alarm package provides for transmission of alarms when 
+         a log full condition approaches.  This package shall be present 
+         whenever a log is of finite size and halts logging when the log 
+         full availability status occurs.
+         
+         This attribute specifies, as a percentage of maximum log size, 
+         the points at which an event will be generated to indicate that 
+         a log full or log wrap condition is approaching.  This 
+         attribute is set-valued.  Support of this attribute is 
+         mandatory for the halt behaviour.  When a log is created with 
+         the wrap option the capacity threshold events are triggered as 
+         if coupled to a gauge that counts from zero to the highest 
+         capacity threshold value defined and then resets to zero."
+    REFERENCE   
+        "ITU-T Rec. X.735 (1992) | ISO/IEC 10164-6 : 1993, 
+               Section 8.1.1.3."
+    DEFVAL      { "\x64" }
+    ::= { mxCapture 9 }
+
+mxCaptureStartTime OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "The duration package provides the ability to automatically 
+         control the time that a managed object starts and stops 
+         functioning through the use of the start and stop time 
+         attributes.
+         
+         This attribute defines the date and time at which an unlocked 
+         and enabled managed object starts functioning.  If the value of 
+         the start time attribute is not specified in the create 
+         request, its value defaults to the time of creation of the 
+         managed object and thus causing it to function immediately.
+         
+         A change in the start time attribute results in an attribute 
+         change notification."
+    REFERENCE   
+        "ITU-T Rec. X.735 (1992) | ISO/IEC 10164-6 : 1993, 
+               Section 8.1.1.4.2."
+    DEFVAL      { 0 }
+    ::= { mxCapture 10 }
+
+mxCaptureStopTime OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "The duration package provides the ability to automatically 
+         control the time that a managed object starts and stops 
+         functioning through the use of the start and stop time 
+         attributes.
+         
+         This attribute defines the date and time at which a managed 
+         object stops functioning.  If the value of the stop time 
+         attribute is not specified in the create request, its value 
+         defaults to 'continuous operation'.  Continuous operation is 
+         represented by a null value for the stop time.
+         
+         A change in the stop time attribute results in an attribute 
+         change notification."
+    REFERENCE   
+        "ITU-T Rec. X.735 (1992) | ISO/IEC 10164-6 : 1993, 
+               Section 8.1.1.4.2."
+    DEFVAL      { 6983120 }
+    ::= { mxCapture 11 }
+
+mxCaptureIntervalsOfDay OBJECT-TYPE
+    SYNTAX      IntervalsOfDay
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "The daily scheduling conditional package provides the 
+         capability of scheduling logging with a periodicity of 
+         24 hours.
+         
+         This attribute defines the list of time intervals 
+         (interval-start and interval-end times of day) for which the 
+         logs will exhibit the logging-on condition.  During excluded 
+         intervals the log exhibits the logging-off condition.  If not 
+         specified in the create request, the value of this component 
+         defaults to a single interval encompassing the entire 24 hour 
+         period of a day."
+    REFERENCE   
+        "ITU-T Rec. X.735 (1992) | ISO/IEC 10164-6 : 1993, 
+               Section 8.1.1.4.3."
+    DEFVAL      { "\x00\x00\x17\x3B" }
+    ::= { mxCapture 12 }
+
+mxCaptureWeekMask OBJECT-TYPE
+    SYNTAX      WeekMask
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "The weekly scheduling conditional package provides the 
+         capability of scheduling logging with a periodicity of 
+         one week.  This structured attribute defines a set of 
+         mask components, each specifying a set of time 
+         intervals on a 24-hour time-of-day clock, pertaining to 
+         selected days of the week.  The week mask attribute 
+         defaults to a scheduling criteria of 'always-on' at 
+         logs creation.
+         
+         The days of week component defines the days of the week 
+         on which the log's scheduling mechanism will allow the 
+         log to have intervals during which logging may occur.  
+         This component, if not present is a create, will 
+         default to all seven days of the week.
+         
+         The intervals of day component defines the list of time 
+         intervals (interval-start and interval-end times of 
+         day) for which the log will exhibit the logging-on 
+         condition, if the current days is one of the days that 
+         is selected within the corresponding days of week.  
+         
+         During excluded intervals the log exhibits the 
+         logging-off condition.  If not specified in the create 
+         report, the value of this component defaults to 
+         a single interval encompassing the entire 24 hour 
+         period of a day."
+    REFERENCE   
+        "ITU-T Rec. X.735 (1992) | ISO/IEC 10164-6 : 1993, 
+               Section 8.1.1.4.4."
+    DEFVAL      { "\x7F\x01\x00\x00\x17\x3B" }
+    ::= { mxCapture 13 }
+
 mxCaptureRotInterval OBJECT-TYPE
     SYNTAX      TimeInterval
     MAX-ACCESS  read-write
@@ -539,10 +910,10 @@ mxCaptureRotInterval OBJECT-TYPE
     DESCRIPTION 
         "Specifies the rotation of capture files based on the interval 
          of time since the capture file was last rotated.  When the 
-         interval elaspes since the last rotation, the file will be 
+         interval elapses since the last rotation, the file will be 
          rotated.  The time interval of zero is special: it specifies to 
          not rotate files based on interval."
-    ::= { mxCapture 2 }
+    ::= { mxCapture 14 }
 
 mxCaptureRotSize OBJECT-TYPE
     SYNTAX      Unsigned32
@@ -556,7 +927,7 @@ mxCaptureRotSize OBJECT-TYPE
          When the file exceeds the specified size, the file will be 
          rotated.  The value zero (0) is special: it specifies to not 
          rotate files based on the size of the file."
-    ::= { mxCapture 3 }
+    ::= { mxCapture 15 }
 
 mxCaptureRotNumber OBJECT-TYPE
     SYNTAX      Unsigned32
@@ -570,40 +941,40 @@ mxCaptureRotNumber OBJECT-TYPE
          be rotated.  The value zero (0) is special: it specifies to not 
          rotate files based on the number of records."
     DEFVAL      { 0 }
-    ::= { mxCapture 4 }
+    ::= { mxCapture 16 }
 
 mxCaptureCachePath OBJECT-TYPE
     SYNTAX      SnmpAdminString
     MAX-ACCESS  read-write
     STATUS      current
     DESCRIPTION 
-        "Specifies the filesystem path to the directory where files are 
+        "Specifies the file system path to the directory where files are 
          cached while they are being captured.  The default if not 
          specified on row creation is '/var/local/os7live/cache'."
     DEFVAL      { "/var/local/os7live/cache" }
-    ::= { mxCapture 5 }
+    ::= { mxCapture 17 }
 
 mxCaptureSpoolPath OBJECT-TYPE
     SYNTAX      SnmpAdminString
     MAX-ACCESS  read-write
     STATUS      current
     DESCRIPTION 
-        "Specifies the filesystem path to the directory where files are 
+        "Specifies the file system path to the directory where files are 
          spooled once they have been rotated.  The default if not 
          specified on row creation is '/var/local/os7live/spool'."
     DEFVAL      { "/var/local/os7live/spool" }
-    ::= { mxCapture 6 }
+    ::= { mxCapture 18 }
 
 mxCaptureArchivePath OBJECT-TYPE
     SYNTAX      SnmpAdminString
     MAX-ACCESS  read-write
     STATUS      current
     DESCRIPTION 
-        "Specifies the filesystem path to the directory where files are 
+        "Specifies the file system path to the directory where files are 
          archived once they have been uploaded.  The default if not 
          specified on row creation is '/var/local/os7live/archive'"
     DEFVAL      { "/var/local/os7live/archive" }
-    ::= { mxCapture 7 }
+    ::= { mxCapture 19 }
 
 mxCaptureArchiveSubdirs OBJECT-TYPE
     SYNTAX      BITS { daily(0), weekly(1), monthly(2), yearly(3) }
@@ -611,7 +982,7 @@ mxCaptureArchiveSubdirs OBJECT-TYPE
     STATUS      current
     DESCRIPTION 
         "Specifies the subdirectories that will be used within the 
-         archive filesystem directory to organize archived files by 
+         archive file system directory to organize archived files by 
          date.  This object is single-valued and can contain zero or 
          more of the following values:
          
@@ -633,7 +1004,7 @@ mxCaptureArchiveSubdirs OBJECT-TYPE
          The default value on row creation when no set is specified is 
          daily(0) and monthly(2)."
     DEFVAL      { {daily, monthly} }
-    ::= { mxCapture 8 }
+    ::= { mxCapture 20 }
 
 mxCaptureCompression OBJECT-TYPE
     SYNTAX      INTEGER { none(0), gz(1), bz2(2), xz(3), zip(4) }
@@ -661,7 +1032,7 @@ mxCaptureCompression OBJECT-TYPE
          Zip archive contain the single original file.  The default 
          value if unspecified on row creation is xz(3) compression."
     DEFVAL      { xz }
-    ::= { mxCapture 9 }
+    ::= { mxCapture 21 }
 
 mxCaptureFileSystemAlloc OBJECT-TYPE
     SYNTAX      Unsigned32
@@ -669,7 +1040,7 @@ mxCaptureFileSystemAlloc OBJECT-TYPE
     MAX-ACCESS  read-write
     STATUS      current
     DESCRIPTION 
-        "Specifies the percentage of the filesystem in which the 
+        "Specifies the percentage of the file system in which the 
          mxCaptureArchivePath exists that is allocated to archival 
          capture files.  The total amount of space occupied by archival 
          capture files will not exceed this limit.
@@ -677,7 +1048,7 @@ mxCaptureFileSystemAlloc OBJECT-TYPE
          When a row is created and this amount is not specified, the 
          default value is 90%."
     DEFVAL      { 90 }
-    ::= { mxCapture 10 }
+    ::= { mxCapture 22 }
 
 mxCaptureMaxDiskUsage OBJECT-TYPE
     SYNTAX      Unsigned32
@@ -685,15 +1056,15 @@ mxCaptureMaxDiskUsage OBJECT-TYPE
     MAX-ACCESS  read-write
     STATUS      current
     DESCRIPTION 
-        "Specifies the percentage of the allocation portion of the the 
-         filesystem in which the mxCaptureArchivePath exists that is 
-         usable for archival capture files.  The total amount of space 
-         occupied by archival capture files will not exceed this limit.
+        "Specifies the percentage of the allocation portion of the file 
+         system in which the mxCaptureArchivePath exists that is usable 
+         for archival capture files.  The total amount of space occupied 
+         by archival capture files will not exceed this limit.
          
          When a row is created and this amount is not specified, the 
          efault value is 80%."
     DEFVAL      { 80 }
-    ::= { mxCapture 11 }
+    ::= { mxCapture 23 }
 
 mxCaptureDiscardPolicy OBJECT-TYPE
     SYNTAX      INTEGER { ignore(0), oldest(1), largest(2) }
@@ -714,15 +1085,16 @@ mxCaptureDiscardPolicy OBJECT-TYPE
          When a row is created and this amount is not specified, the 
          default value is oldest(1)."
     DEFVAL      { oldest }
-    ::= { mxCapture 12 }
+    ::= { mxCapture 24 }
 
 mxCaptureUpload OBJECT-TYPE
     SYNTAX      Unsigned32
     MAX-ACCESS  read-write
     STATUS      current
     DESCRIPTION 
-        ""
-    ::= { mxCapture 13 }
+        "Provides an index into the mxUploadTable that defines the 
+         upload server to which to upload spooled files."
+    ::= { mxCapture 25 }
 
 mxCaptureTable OBJECT-TYPE
     SYNTAX      SEQUENCE OF MxCaptureEntry
@@ -730,7 +1102,7 @@ mxCaptureTable OBJECT-TYPE
     STATUS      current
     DESCRIPTION 
         "Provides a table of capture files."
-    ::= { mxCapture 14 }
+    ::= { mxCapture 26 }
 
 mxCaptureEntry OBJECT-TYPE
     SYNTAX      MxCaptureEntry
@@ -753,6 +1125,7 @@ MxCaptureEntry ::= SEQUENCE {
     mxCaptureCompSize           Gauge32,
     mxCaptureMessages           Gauge32,
     mxCaptureMsgOctets          Gauge32,
+    mxCaptureInterval           Gauge32,
     mxCaptureActiveLinkDirs     Gauge32,
     mxCaptureActiveHslDirs      Gauge32,
     mxCaptureBegTime            TimeStamp,
@@ -780,9 +1153,10 @@ mxCaptureName OBJECT-TYPE
     MAX-ACCESS  read-write
     STATUS      current
     DESCRIPTION 
-        "Provides the base name (without filesystem path or extensions) 
+        "Provides the base name (without file system path or extensions) 
          of the capture file.  The file name may be changed by writing 
-         to this object."
+         to this object.  Note that files in the current(0) state cannot 
+         be renamed."
     ::= { mxCaptureEntry 2 }
 
 mxCaptureCompressed OBJECT-TYPE
@@ -790,8 +1164,8 @@ mxCaptureCompressed OBJECT-TYPE
     MAX-ACCESS  read-write
     STATUS      current
     DESCRIPTION 
-        "Provides the compression applied to the file on the filesystem.  
-         Compression is single-values and can assume one of the 
+        "Provides the compression applied to the file on the file 
+         system.  Compression is single-values and can assume one of the 
          following values:
          
          - none(0), the file is not compressed;
@@ -801,7 +1175,8 @@ mxCaptureCompressed OBJECT-TYPE
          - zip(4), the file is zip compressed.
          
          The file can be decompressed or recompressed by writing to this 
-         object."
+         object.  Note that files in the current(0) state cannot be 
+         compressed."
     ::= { mxCaptureEntry 3 }
 
 mxCaptureState OBJECT-TYPE
@@ -814,7 +1189,8 @@ mxCaptureState OBJECT-TYPE
          and can be one of the following:
          
          - current(0), the file is a current capture file that is 
-           actively capturing messages;
+           actively capturing messages; current files cannot be 
+           compressed or renamed;
          
          - spooled(1), the file has been rotated and is no longer 
            capturing messages; however, it is awaiting upload or 
@@ -895,6 +1271,17 @@ mxCaptureMsgOctets OBJECT-TYPE
          file."
     ::= { mxCaptureEntry 9 }
 
+mxCaptureInterval OBJECT-TYPE
+    SYNTAX      Gauge32
+    UNITS       "milliseconds"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Indicates the time interval covered by the file.  This is the 
+         difference in time between the last message captured and the 
+         first message captured."
+    ::= { mxCaptureEntry 10 }
+
 mxCaptureActiveLinkDirs OBJECT-TYPE
     SYNTAX      Gauge32
     UNITS       "low-speed links"
@@ -910,7 +1297,7 @@ mxCaptureActiveLinkDirs OBJECT-TYPE
          useful for determining whether the appropriate number of high- 
          and low-speed links have been captured for a span, card, driver 
          or default source."
-    ::= { mxCaptureEntry 10 }
+    ::= { mxCaptureEntry 11 }
 
 mxCaptureActiveHslDirs OBJECT-TYPE
     SYNTAX      Gauge32
@@ -924,7 +1311,7 @@ mxCaptureActiveHslDirs OBJECT-TYPE
          link for the direction.  This column is useful for determining 
          whether the appropriate number of high- and low-speed links are 
          being captured for a card, driver or default source."
-    ::= { mxCaptureEntry 11 }
+    ::= { mxCaptureEntry 12 }
 
 mxCaptureBegTime OBJECT-TYPE
     SYNTAX      TimeStamp
@@ -934,7 +1321,7 @@ mxCaptureBegTime OBJECT-TYPE
         "Indicates the time (using the TimeStamp textual convention) 
          that the capture file was opened (capturing of messages to the 
          file began)."
-    ::= { mxCaptureEntry 12 }
+    ::= { mxCaptureEntry 13 }
 
 mxCaptureEndTime OBJECT-TYPE
     SYNTAX      TimeStamp
@@ -944,7 +1331,7 @@ mxCaptureEndTime OBJECT-TYPE
         "Indicates the time (using the TimeStamp textual convention) 
          that the capture file was closed (capturing of messages to the 
          file ended)."
-    ::= { mxCaptureEntry 13 }
+    ::= { mxCaptureEntry 14 }
 
 mxCaptureActionResult OBJECT-TYPE
     SYNTAX      INTEGER { success(0), failure(1), spool(2), archive(3), 
@@ -973,7 +1360,7 @@ mxCaptureActionResult OBJECT-TYPE
          upload(5) are valid and represent the action to be performed.  
          When read, only values success(0) or failure(1) will be 
          returned and represent the result of the previous action."
-    ::= { mxCaptureEntry 14 }
+    ::= { mxCaptureEntry 15 }
 
 -- =====================================================================
 -- mxPush group
@@ -1007,7 +1394,8 @@ mxPushEntry OBJECT-TYPE
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION 
-        ""
+        "Each row in this table describes one collector to which this 
+         probe will export its monitor sources."
     INDEX       { mxPushIndex }
     ::= { mxPushTable 1 }
 
@@ -1016,7 +1404,8 @@ MxPushEntry ::= SEQUENCE {
     mxPushHostname          DisplayString,
     mxPushXportAddrType     TransportAddressType,
     mxPushXportAddr         TransportAddress,
-    mxPushXportProfile      SnmpAdminString,
+    mxPushXportProfile      SimpleNameType,
+    mxPushAssocState        INTEGER,
     mxPushStorageType       StorageType,
     mxPushRowStatus         RowStatus
 }
@@ -1065,7 +1454,7 @@ mxPushXportAddr OBJECT-TYPE
     ::= { mxPushEntry 4 }
 
 mxPushXportProfile OBJECT-TYPE
-    SYNTAX      SnmpAdminString
+    SYNTAX      SimpleNameType
     MAX-ACCESS  read-create
     STATUS      current
     DESCRIPTION 
@@ -1074,6 +1463,28 @@ mxPushXportProfile OBJECT-TYPE
          options for the connection.  The values of this object must be 
          the same as the name of a row in the mxXportProfileTable."
     ::= { mxPushEntry 5 }
+
+mxPushAssocState OBJECT-TYPE
+    SYNTAX      INTEGER { idle(0), connog(1), connic(2), established(3), 
+                    shuttingdown(4) }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Provides the state of the SCTP association use to export 
+         monitor sources from the remote probe corresponding to this 
+         row.  The state can be:
+         
+         - idle(0), no SCTP association formed;
+         - connog(1), connecting outgoing, SCTP association being 
+           established by this host;
+         - connic(2), connecting incoming, SCTP association being 
+           established by remote host;
+         - established(3), SCTP association is established and active;
+         - shuttindown(4), the SCTP associat is shutting down.
+           
+         Only SCTP associations that are in the established(3) state can 
+         capture packets or have filters applied."
+    ::= { mxPushEntry 6 }
 
 mxPushStorageType OBJECT-TYPE
     SYNTAX      StorageType
@@ -1084,7 +1495,7 @@ mxPushStorageType OBJECT-TYPE
          only storage types volatile() and nonVolatile() are 
          applicable."
     DEFVAL      { nonVolatile }
-    ::= { mxPushEntry 6 }
+    ::= { mxPushEntry 7 }
 
 mxPushRowStatus OBJECT-TYPE
     SYNTAX      RowStatus
@@ -1093,7 +1504,7 @@ mxPushRowStatus OBJECT-TYPE
     DESCRIPTION 
         "Provides a mechanism whereby mangaement stations may create and 
          destroy rows in this table."
-    ::= { mxPushEntry 7 }
+    ::= { mxPushEntry 8 }
 
 -- =====================================================================
 -- mxPull group
@@ -1127,7 +1538,8 @@ mxPullEntry OBJECT-TYPE
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION 
-        ""
+        "Each row in this table describes one probe from which this 
+         collector will import monitor sources."
     INDEX       { mxPullIndex }
     ::= { mxPullTable 1 }
 
@@ -1136,7 +1548,8 @@ MxPullEntry ::= SEQUENCE {
     mxPullHostname          DisplayString,
     mxPullXportAddrType     TransportAddressType,
     mxPullXportAddr         TransportAddress,
-    mxPullXportProfile      SnmpAdminString,
+    mxPullXportProfile      SimpleNameType,
+    mxPullAssocState        INTEGER,
     mxPullStorageType       StorageType,
     mxPullRowStatus         RowStatus
 }
@@ -1184,7 +1597,7 @@ mxPullXportAddr OBJECT-TYPE
     ::= { mxPullEntry 4 }
 
 mxPullXportProfile OBJECT-TYPE
-    SYNTAX      SnmpAdminString
+    SYNTAX      SimpleNameType
     MAX-ACCESS  read-create
     STATUS      current
     DESCRIPTION 
@@ -1194,6 +1607,28 @@ mxPullXportProfile OBJECT-TYPE
          the same as the name of a row in the mxXportProfileTable."
     ::= { mxPullEntry 5 }
 
+mxPullAssocState OBJECT-TYPE
+    SYNTAX      INTEGER { idle(0), connog(1), connic(2), established(3), 
+                    shuttingdown(4) }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Provides the state of the SCTP association use to import 
+         monitor sources from the remote probe corresponding to this 
+         row.  The state can be:
+         
+         - idle(0), no SCTP association formed;
+         - connog(1), connecting outgoing, SCTP association being 
+           established by this host;
+         - connic(2), connecting incoming, SCTP association being 
+           established by remote host;
+         - established(3), SCTP association is established and active;
+         - shuttindown(4), the SCTP associat is shutting down.
+           
+         Only SCTP associations that are in the established(3) state can 
+         capture packets or have filters applied."
+    ::= { mxPullEntry 6 }
+
 mxPullStorageType OBJECT-TYPE
     SYNTAX      StorageType
     MAX-ACCESS  read-create
@@ -1202,7 +1637,7 @@ mxPullStorageType OBJECT-TYPE
         "Specifies the storage type for this conceptual row.  On write, 
          only storage types volatile() and nonVolatile() are 
          applicable."
-    ::= { mxPullEntry 6 }
+    ::= { mxPullEntry 7 }
 
 mxPullRowStatus OBJECT-TYPE
     SYNTAX      RowStatus
@@ -1211,7 +1646,7 @@ mxPullRowStatus OBJECT-TYPE
     DESCRIPTION 
         "Provides a mechanism whereby management stations may create and 
          destroy rows in this table."
-    ::= { mxPullEntry 7 }
+    ::= { mxPullEntry 8 }
 
 -- =====================================================================
 -- mxUpload group
@@ -1223,6 +1658,109 @@ mxPullRowStatus OBJECT-TYPE
 mxUpload OBJECT IDENTIFIER
     ::= { mxMonObjects 5 }
 
+mxUploadTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF MxUploadEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Provides a table of collectors to which the probe is to upload 
+         capture files on a regular schedule."
+    ::= { mxUpload 1 }
+
+mxUploadEntry OBJECT-TYPE
+    SYNTAX      MxUploadEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Each row in the table specifies a single collector to which to 
+         upload capture files on a regular schedule."
+    INDEX       { mxUploadIndex }
+    ::= { mxUploadTable 1 }
+
+MxUploadEntry ::= SEQUENCE {
+    mxUploadIndex       Unsigned32,
+    mxUploadSpec        SnmpAdminString,
+    mxUploadUsername    SnmpAdminString,
+    mxUploadPassword    SnmpAdminString,
+    mxUploadAdminState  AdministrativeState,
+    mxUploadStatus      RowStatus
+}
+
+mxUploadIndex OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Provides a non-zero ordinal index into the mxUploadTable.  
+         Aside from being an index, this object has no other 
+         significance."
+    ::= { mxUploadEntry 1 }
+
+mxUploadSpec OBJECT-TYPE
+    SYNTAX      SnmpAdminString
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Specifies the method and path to which to upload files on the 
+         remote server.  This string consists of several components:
+         
+         1. The method for upload.  This can be one of rsync, http, 
+            https, ftp, ftps."
+    ::= { mxUploadEntry 2 }
+
+mxUploadUsername OBJECT-TYPE
+    SYNTAX      SnmpAdminString
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Provides a username for use with the upload string when 
+         required.  A username will not be provided unless demanded by 
+         the remote server."
+    DEFVAL      { "os7live" }
+    ::= { mxUploadEntry 3 }
+
+mxUploadPassword OBJECT-TYPE
+    SYNTAX      SnmpAdminString
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Provides a password for use with the upload string when 
+         required.  A password will not be provided unless demanded by 
+         the remote server.  A read of this object will only return the 
+         number of '*' characters equal to the length of the password."
+    DEFVAL      { "os7live" }
+    ::= { mxUploadEntry 4 }
+
+mxUploadAdminState OBJECT-TYPE
+    SYNTAX      AdministrativeState
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Provides the administrative state of uploads to the remote 
+         collector:
+         
+         - locked(0), the probe is prohibited from uploading files to 
+           the remote server;
+         - unlocked(1), the probe is permitted to upload files to the 
+           remote server according to the upload schedule;
+         - shuttingDown(2), the probe is actively uploading files to the 
+           remote server and will move to the locked(0) state once the 
+           upload is complete.
+           
+         This is used to control the state of uploads.  Set to locked(0) 
+         to suppress uploading.  Set to unlocked(1) to enable uploading."
+    DEFVAL      { locked }
+    ::= { mxUploadEntry 5 }
+
+mxUploadStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Provides a mechanism whereby management stations can add and 
+         remove rows from this table."
+    ::= { mxUploadEntry 7 }
+
 -- =====================================================================
 -- mxDownload group
 -- =====================================================================
@@ -1232,6 +1770,111 @@ mxUpload OBJECT IDENTIFIER
 
 mxDownload OBJECT IDENTIFIER
     ::= { mxMonObjects 6 }
+
+mxDownloadTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF MxDownloadEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Provides a table of probes from which the collector is to 
+         download capture files on a regular schedule."
+    ::= { mxDownload 1 }
+
+mxDownloadEntry OBJECT-TYPE
+    SYNTAX      MxDownloadEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Each row in the table specifies a single probe from which to 
+         download capture files on a regular schedule."
+    INDEX       { mxDownloadIndex }
+    ::= { mxDownloadTable 1 }
+
+MxDownloadEntry ::= SEQUENCE {
+    mxDownloadIndex         Unsigned32,
+    mxDownloadSpec          SnmpAdminString,
+    mxDownloadUsername      SnmpAdminString,
+    mxDownloadPassword      SnmpAdminString,
+    mxDownloadAdminState    AdministrativeState,
+    mxDownloadStatus        RowStatus
+}
+
+mxDownloadIndex OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Provides a non-zero ordinal index into the mxDownloadTable.  
+         Aside from being an index, this object has no other 
+         significance."
+    ::= { mxDownloadEntry 1 }
+
+mxDownloadSpec OBJECT-TYPE
+    SYNTAX      SnmpAdminString
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Specifies the method and path form which to download files from 
+         the remote servier.  This string consists of several 
+         components:
+         
+         1. The method of download.  This can be one of rsync, http, 
+            https, ftp, ftps."
+    ::= { mxDownloadEntry 2 }
+
+mxDownloadUsername OBJECT-TYPE
+    SYNTAX      SnmpAdminString
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Provides a username for use with the download string when 
+         required.  A username will not be provided unless demanded by 
+         the remote server."
+    DEFVAL      { "os7live" }
+    ::= { mxDownloadEntry 3 }
+
+mxDownloadPassword OBJECT-TYPE
+    SYNTAX      SnmpAdminString
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Provides a password for use with the download string when 
+         required.  A password will not be provided unless demanded by 
+         the remote server.  A read of this object will only return the 
+         number of '*' characters equal to the length of the password."
+    DEFVAL      { "os7live" }
+    ::= { mxDownloadEntry 4 }
+
+mxDownloadAdminState OBJECT-TYPE
+    SYNTAX      AdministrativeState
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Provides the administrative state of dowloads form the remote 
+         probe:
+         
+         - locked(0), the collector is prohibited from downloading files 
+           from the remote server;
+         - unlocked(1), the collector is permitted to download files 
+           from the remote server according to the download schedule;
+         - shuttingDown(2), the collector is actively downloading files 
+           from the remote server and will move to the locked(0) state 
+           once the download is complete.
+           
+         This is used to control the state of downloads.  Set to 
+         locked(0) to suppress downloading.  Set to unlocked(1) to 
+         enable downloading."
+    DEFVAL      { locked }
+    ::= { mxDownloadEntry 5 }
+
+mxDownloadStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Provides a mechanism whereby management stations can add and 
+         remove rows from this table."
+    ::= { mxDownloadEntry 6 }
 
 -- =====================================================================
 -- mxCollect group
@@ -1248,7 +1891,7 @@ mxCollectTable OBJECT-TYPE
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides a table of collectors to which to provide live feeds."
     ::= { mxCollect 1 }
 
 mxCollectEntry OBJECT-TYPE
@@ -1256,7 +1899,8 @@ mxCollectEntry OBJECT-TYPE
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION 
-        ""
+        "Each row in the table specifies a single collector to which to 
+         send live feeds."
     INDEX       { mxCollectIndex }
     ::= { mxCollectTable 1 }
 
@@ -1522,7 +2166,9 @@ mxSctpTable OBJECT-TYPE
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION 
-        ""
+        "The mxSctpTable provides a table of SCTP protocol parameters 
+         where each row provides one SCTP protocol parameter profile for 
+         use in establishing and accepting SCTP associations."
     ::= { mxSctp 16 }
 
 mxSctpEntry OBJECT-TYPE
@@ -1530,12 +2176,13 @@ mxSctpEntry OBJECT-TYPE
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION 
-        ""
+        "Each row in this table consists of a single SCTP prptocol 
+         parameter profile indexed by its name."
     INDEX       { mxSctpProfileName }
     ::= { mxSctpTable 1 }
 
 MxSctpEntry ::= SEQUENCE {
-    mxSctpProfileName       ProfileName,
+    mxSctpProfileName       SimpleNameType,
     mxSctpNoDelay           TruthValue,
     mxSctpMaxseg            Unsigned32,
     mxSctpHeartbeatItvl     MilliSeconds,
@@ -1555,7 +2202,7 @@ MxSctpEntry ::= SEQUENCE {
 }
 
 mxSctpProfileName OBJECT-TYPE
-    SYNTAX      ProfileName
+    SYNTAX      SimpleNameType
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION 
@@ -1879,8 +2526,1110 @@ mxSctpRowStatus OBJECT-TYPE
         "STD 58, SNMPv2-TC RowStatus."
     ::= { mxSctpEntry 17 }
 
+-- =====================================================================
+-- mxFilter group
+-- =====================================================================
+-- The mxFilter group is responsible for managing the filtering of local 
+-- and remote monitor sources.
+-- .....................................................................
+
+mxFilter OBJECT IDENTIFIER
+    ::= { mxMonObjects 9 }
+
+mxFilterTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF MxFilterEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Provides a table of filter programs for use in filtering the 
+         packets collected for a given monitoring source, whether local 
+         or remote."
+    ::= { mxFilter 1 }
+
+mxFilterEntry OBJECT-TYPE
+    SYNTAX      MxFilterEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Each row in this table corresponds to a single filter program.  
+         The program lines themselves are conatined under the 
+         corresponding index (mxFilterIndex) in the mxFilterProgTable.  
+         Filter programs can be compiled and activated for use using 
+         this table."
+    INDEX       { mxFilterIndex }
+    ::= { mxFilterTable 1 }
+
+MxFilterEntry ::= SEQUENCE {
+    mxFilterIndex           Unsigned32,
+    mxFilterState           INTEGER,
+    mxFilterActionResult    INTEGER,
+    mxFilterRowStatus       RowStatus
+}
+
+mxFilterIndex OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Provides a non-zero ordinal index into the rows of the 
+         mxFilterTable."
+    ::= { mxFilterEntry 1 }
+
+mxFilterState OBJECT-TYPE
+    SYNTAX      INTEGER { vacant(0), uninit(1), compiled(2), failed(3) }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Provides the state of the filter program.  The program can be:
+         - vacant(0), no filter program, unsusable;
+         - uninit(1), uninitialized, unusable;
+         - compiled(2), compiled and ready to use;
+         - failed(3), compilation failed, unusabled.
+         Only filter programs in the compiled(2) state are usable for 
+         filtering collected packets."
+    ::= { mxFilterEntry 2 }
+
+mxFilterActionResult OBJECT-TYPE
+    SYNTAX      INTEGER { success(0), failure(1), compile(2) }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Provides a mechanism for compiling filter programs.  The result 
+         (on read) can be:
+         - success(0), the filter program was compiled successfully; 
+           the state is compiled(2);
+         - failure(1), the filter program compilation failure; the state 
+           is vacant(0) or failed(3);
+         
+         The action (on write) can be:
+         - compile(2), compile the filter program and report result.
+         
+         To compile a filter program, write compile(2) to this column 
+         and then read the success(0) or failure(1) result."
+    ::= { mxFilterEntry 3 }
+
+mxFilterRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Provides a mechanism whereby management stations may add or 
+         delete rows from this table.  Destroying a row in this table 
+         will also destroy all of the corresponding rows in the 
+         mxFilterProgTable at the same mxFilterIndex as the destroyed 
+         row.  All entries in this table persist across agent reboots."
+    ::= { mxFilterEntry 4 }
+
+-- =====================================================================
+
+mxFilterProgTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF MxFilterProgEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "This is a side table of the mxFilterTable the provides a way of 
+         specifying multiple filter program lines.  Each row in the 
+         table corresponds to one line of filter program (indexed by 
+         mxFilterProgIndex) that belongs to one filter (indexed by 
+         mxFilterIndex).  Filter programs must be successfully compiled 
+         before they are usable.  Filter programs are compiled using the 
+         corresponding mxFilterIndex row in the mxFilterTable."
+    ::= { mxFilter 2 }
+
+mxFilterProgEntry OBJECT-TYPE
+    SYNTAX      MxFilterProgEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Each row in this table provides on line of filter program 
+         formattted according to tcpdump BPF filter syntax."
+    INDEX       { mxFilterIndex, mxFilterProgIndex }
+    ::= { mxFilterProgTable 1 }
+
+MxFilterProgEntry ::= SEQUENCE {
+    mxFilterProgIndex       Unsigned32,
+    mxFilterProgLine        SnmpAdminString,
+    mxFilterProgRowStatus   RowStatus
+}
+
+mxFilterProgIndex OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Provides a non-zero oridinal index into the filter program 
+         lines corresponding to a given filter program (indexed by 
+         mxFilterIndex).  Line indexes that have a lesser numeric value 
+         appear before lines that have a greater numeric value.  The 
+         value zero (0) is forbidden.  If numbers are missing in oridnal 
+         sequence, they are considered blank or void lines during filter 
+         program compilation."
+    ::= { mxFilterProgEntry 1 }
+
+mxFilterProgLine OBJECT-TYPE
+    SYNTAX      SnmpAdminString
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Provides one line of the filter program using tcpdump BPF 
+         filter format."
+    ::= { mxFilterProgEntry 2 }
+
+mxFilterProgRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Provides a mechanism whereby management stations may add filter 
+         program lines to this table.  When the mxFilterIndex for the 
+         created row does not already exist, one will be created in the 
+         mxFilterTable.  When the last line for a given mxFilterIndex is 
+         destroyed, the entry in the mxFilterTable is not destroyed by 
+         must be destroyed explicitly by using the row status of the 
+         mxFilterTable.  All rows in this table are persistent across 
+         agent reboot."
+    ::= { mxFilterProgEntry 3 }
+
+-- =====================================================================
+-- mxBuffer group
+-- =====================================================================
+-- The mxBuffer group is responsible for managing the buffering of local 
+-- to remote monitor sources.
+-- .....................................................................
+
+mxBuffer OBJECT IDENTIFIER
+    ::= { mxMonObjects 10 }
+
+mxBufferAdminState OBJECT-TYPE
+    SYNTAX      AdministrativeState
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Represents the administrative capability of the capture buffer 
+         to perform its function.  The following states are defined:
+         
+         - locked(0), use of the capture buffer has been prohibited by a 
+           managing system.  Information from subordinate records may be 
+           retrieved but new records shall not be created.  Records may 
+           be deleted.
+         
+         - unlocked(1), use of the capture buffer has been permitted by 
+           a managing system.  Information from subordinate records may 
+           be retrieved and, conditional on the values of other state 
+           and status attributes, new records may be created.
+         
+         Whenever the administrative state of the capture buffer is 
+         changed, a state change notification is generated."
+    REFERENCE   
+        "ITU-T Rec. X.735 (1992) | ISO/IEC 10164-6 : 1993, 
+               Section 8.1.1.1.3."
+    DEFVAL      { unlocked }
+    ::= { mxBuffer 1 }
+
+mxBufferOpState OBJECT-TYPE
+    SYNTAX      OperationalState
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Represents the operational capability of the capture buffer to 
+         perform its function.  The following states are defined:
+         
+         - enabled(0), the buffer is operational and ready for use.  
+           Information from subordinate records may be retrieved and, 
+           conditional on the values of other state and status 
+           attributes, new records may be created.
+         
+         - disabled(1), the buffer is not available for use.  New 
+           records cannot be created.
+         
+         A change in operational state shall generate a state changed 
+         notification."
+    REFERENCE   
+        "ITU-T Rec. X.735 (1992) | ISO/IEC 10164-6 : 1993, 
+               Section 8.1.1.1.4."
+    DEFVAL      { enabled }
+    ::= { mxBuffer 2 }
+
+mxBufferAvailStatus OBJECT-TYPE
+    SYNTAX      AvailabilityStatus
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Reflects the availability status of the buffer.  May indicate a 
+         'log-full' condition; indicating that records can be retrieved 
+         but that no new records can be added.
+         
+         The availability status package shall be present if any of the 
+         scheduling packages are instantiated.  This attribute reflects 
+         the availability status of the buffer.  When the resource has 
+         been made unavailable in accordance with a predetermined time 
+         schedule its value will be 'Off-Duty'.  The attribute is 
+         read-only.  The value on creation is determined by the 
+         scheduling parameters specified and the status of the resource.  
+         The required value set for this attribute in this package is 
+         'Off-Duty'.
+         
+         No state change notification is generated when this attribute 
+         changes value.  Note: the buffer makes use of the availability 
+         status to indicate the 'log-full' condition; the presence of 
+         this conditional package makes available the 'Off-Duty' value 
+         to the object."
+    REFERENCE   
+        "ITU-T Rec. X.735 (1992) | ISO/IEC 10164-6 : 1993, 
+               Section 8.1.1.1.6.
+         ITU-T Rec. X.735 (1992) | ISO/IEC 10164-6 : 1993, 
+         Section 8.1.1.4.1."
+    DEFVAL      { {} }
+    ::= { mxBuffer 3 }
+
+mxBufferFullAction OBJECT-TYPE
+    SYNTAX      FullAction
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Provides a specification of the action to be taken when the 
+         maximum size of the buffer has been reached.  Options are:
+         
+         - wrap(0), the oldest record in the buffer, as determined by 
+           the record time stamp, will be deleted to free resources for 
+           the creation of new records.
+         
+         - halt(1), no more records will be buffered; records already in 
+           the buffer will be retained.
+         
+         Both options are supported by every buffer."
+    DEFVAL      { wrap }
+    ::= { mxBuffer 4 }
+
+mxBufferMaxSize OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "octets"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Specifies the size of the buffer measured in number of octets.  
+         A buffer may have an indeterminate size.  A maximum buffer size 
+         of zero shall be used to specify that the buffer size has no 
+         predefined limit.
+         
+         Note: Since the buffer size is specified in octets, the actual 
+         amount of information that is contained in the buffer will be 
+         determined by the data representation in the buffer.  This data 
+         representation is not subject to standardization.  The maximum 
+         buffer size does not include the system overhead involved in 
+         establishing the buffer.  Thus, immediately after creation, the 
+         current buffer size should read zero."
+    REFERENCE   
+        "ITU-T Rec. X.735 (1992) | ISO/IEC 10164-6 : 1993,
+                Section 8.1.1.2.1"
+    DEFVAL      { 0 }
+    ::= { mxBuffer 5 }
+
+mxBufferMaxMsgs OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "messages"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Specifies the maximum number of messages that will be stored in 
+         the buffer before wrapping or halting occurs.  The value zero 
+         (0) specifies that wrapping or halting is not based on the 
+         number of messages in the buffer."
+    DEFVAL      { 0 }
+    ::= { mxBuffer 6 }
+
+mxBufferMaxTime OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "seconds"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Specifies the maximum time interval for which messages will be 
+         stored in the buffer before wrapping or halting occurs.  The 
+         value zero (0) is special and specifies that wrapping or 
+         halting is not based on the time interval buffered."
+    DEFVAL      { 0 }
+    ::= { mxBuffer 7 }
+
+mxBufferCurrentSize OBJECT-TYPE
+    SYNTAX      Gauge32
+    UNITS       "octets"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Indicates the current size of the buffer measured in octets.
+         
+         Note: Since the buffer size is specified in octets, the actual 
+         amount of information that is contained in the buffer will be 
+         determined by the data representation in the buffer.  This data 
+         representation is not subject to standardization.  The maximum 
+         buffer size does not include the system overhead involved in 
+         establishing the buffer.  Thus, immediately after creation, the 
+         current buffer size should read zero."
+    REFERENCE   
+        "ITU-T Rec. X.735 (1992) | ISO/IEC 10164-6 : 1993, 
+               Section 8.1.1.2.2."
+    DEFVAL      { 0 }
+    ::= { mxBuffer 8 }
+
+mxBufferNumberOfRecords OBJECT-TYPE
+    SYNTAX      Gauge32
+    UNITS       "messages"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "This attribute indicates the current number of records 
+         contained in the buffer."
+    REFERENCE   
+        "ITU-T Rec. X.735 (1992) | ISO/IEC 10164-6 : 1993, 
+               Section 8.1.1.2.3."
+    DEFVAL      { 0 }
+    ::= { mxBuffer 9 }
+
+mxBufferCurrentInterval OBJECT-TYPE
+    SYNTAX      Gauge32
+    UNITS       "seconds"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Indicates the current time interval (in seconds) over which 
+         messages are contained in the buffer."
+    DEFVAL      { 0 }
+    ::= { mxBuffer 10 }
+
+mxBufferAlarmThreshold OBJECT-TYPE
+    SYNTAX      LogCapacityAlarmThreshold
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "The log alarm package provides for transmission of alarms when 
+         a buffer full condition approaches.  This package shall be 
+         present whenever a buffer is of finite size and halts buffering 
+         when the 'log-full' availability status occurs.
+         
+         This attribute specifies, as a percentage of maximum buffer 
+         size, the points at which an event will be generated to 
+         indicate that a 'log-full' or 'log-wrap' condition is 
+         approaching.  This attribute is set-valued.  Support of this 
+         attribute is mandatory for the halt behaviour.  When a buffer 
+         is created with the wrap option, the capacity threshold events 
+         are triggered as if couple to a gauge that counts from zero to 
+         the highest capacity threshold value defined and then resets to 
+         zero."
+    REFERENCE   
+        "ITU-T Rec. X.735 (1992) | ISO/IEC 10164-6 : 1993, 
+               Section 8.1.1.3."
+    DEFVAL      { "\x64" }
+    ::= { mxBuffer 11 }
+
+mxBufferByteHiWaterMark OBJECT-TYPE
+    SYNTAX      Gauge32
+    UNITS       "message bytes"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Provides the high watermark of the number of message bytes 
+         captured in the capture buffer.  This is the maximum number of 
+         message bytes that were in the buffer since the last reset.  
+         mxBufferReset can be used to reset this gauge to zero.
+         
+         This value can be used to properly size the capture buffer so 
+         that it is unlikely to wrap or halt."
+    DEFVAL      { 0 }
+    ::= { mxBuffer 12 }
+
+mxBufferByteLoWaterMark OBJECT-TYPE
+    SYNTAX      Gauge32
+    UNITS       "message bytes"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Provides the low watermark of the number of message bytes 
+         captured in the capture buffer.  This is the minimum number of 
+         message bytes that were in the buffer since the high watermark 
+         was last set.  mxBufferReset can be used to reset this gauge to 
+         zero.
+         
+         This value can be used to properly size the capture buffer so 
+         that it is unlikely to wrap or halt."
+    DEFVAL      { 0 }
+    ::= { mxBuffer 13 }
+
+mxBufferMsgsHiWaterMark OBJECT-TYPE
+    SYNTAX      Gauge32
+    UNITS       "messages"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Provides the high watermark of the number of messages captured 
+         in the capture buffer.  This is the maximum number of messages 
+         that were in the buffer since the last reset.  mxBufferReset 
+         can be used to reset this gauge to zero.
+         
+         This value can be used to properly size the capture buffer so 
+         that it is unlikely to wrap or halt."
+    DEFVAL      { 0 }
+    ::= { mxBuffer 14 }
+
+mxBufferMsgsLoWaterMark OBJECT-TYPE
+    SYNTAX      Gauge32
+    UNITS       "messages"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Provides the low watermark of the number of messages captured 
+         in the capture buffer.  This is the minimum number of messages 
+         that were in the buffer since the high watermark was last set.  
+         mxBufferReset can be used to reset this gauge to zero.
+         
+         This value can be used to properly size the capture buffer so 
+         that it is unlikely to wrap or halt."
+    DEFVAL      { 0 }
+    ::= { mxBuffer 15 }
+
+mxBufferTimeHiWaterMark OBJECT-TYPE
+    SYNTAX      Gauge32
+    UNITS       "seconds"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Provides the high watermark of the duration of time, in 
+         seconds, between the first and last messages captured in the 
+         capture buffer.  This is the maximum duration of time of 
+         messages in the buffer since the last reset.  mxBufferReset can 
+         be used to reset this gauge to zero.
+         
+         This value can be used to properly size the capture buffer so 
+         that it is unlikely to wrap or halt."
+    DEFVAL      { 0 }
+    ::= { mxBuffer 16 }
+
+mxBufferTimeLoWaterMark OBJECT-TYPE
+    SYNTAX      Gauge32
+    UNITS       "seconds"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Provides the low watermark of the duration of time, in seconds, 
+         between the first and last messages captured in the capture 
+         buffer.  This is the minimum duration of time that was 
+         contained in the buffer since the high watermark was last set.  
+         mxBufferReset can be used to reset this gauge to zero.
+         
+         This value can be used to properly size the capture buffer so 
+         that it is unlikely to wrap or halt."
+    DEFVAL      { 0 }
+    ::= { mxBuffer 17 }
+
+mxBufferDrops OBJECT-TYPE
+    SYNTAX      Counter32
+    UNITS       "messages dropped"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Provides the number of messages dropped as a result of buffer 
+         wrap or buffer halt.  When the buffer is set for wrap(0), this 
+         is the number of messages dropped from the front of the buffer.  
+         When the buffer is set for halt(1), this is the number of 
+         messages dropped from the end of the buffer.  This number is 
+         reset by reading the first or last message in the buffer 
+         (respectively).  It may also be reset using mxBufferReset."
+    DEFVAL      { 0 }
+    ::= { mxBuffer 18 }
+
+mxBufferReset OBJECT-TYPE
+    SYNTAX      INTEGER { reset(0) }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "When written, resets the buffer high and low watermarks to 
+         zero.  Also, reset the number of message buffer drops."
+    DEFVAL      { reset }
+    ::= { mxBuffer 19 }
+
+-- =====================================================================
+
 mxMonGroups OBJECT IDENTIFIER
     ::= { mxMonMIB 3 }
+
+mxMonCompliances OBJECT IDENTIFIER
+    ::= { mxMonMIB 4 }
+
+mxMonMonitorGroup OBJECT-GROUP
+    OBJECTS     { mxMonitorExport, mxMonitorAdminState, 
+                  mxMonitorOperState, mxMonitorAvailStatus, 
+                  mxMonitorProcStatus, mxMonitorUsageState, 
+                  mxMonitorMessages, mxMonitorMsgOctets, 
+                  mxMonitorSusCompressed, mxMonitorMsuDrops, 
+                  mxMonitorActiveLinkDirs, mxMonitorActiveHslDirs, 
+                  mxMonitorResetCounts, mxMonitorLastReset, 
+                  mxMonitorCurrent }
+    STATUS      current
+    DESCRIPTION 
+        "A collection of objects providing managements of monitor 
+         sources."
+    ::= { mxMonGroups 1 }
+
+mxMonCaptureScalarGroup OBJECT-GROUP
+    OBJECTS     { mxCaptureNameString, mxCaptureAdminState, 
+                  mxCaptureOpState, mxCaptureAvailStatus, 
+                  mxCaptureFullAction, mxCaptureMaxSize, 
+                  mxCaptureCurrentSize, mxCaptureNumberOfRecords, 
+                  mxCaptureAlarmThreshold, mxCaptureStartTime, 
+                  mxCaptureStopTime, mxCaptureIntervalsOfDay, 
+                  mxCaptureWeekMask, mxCaptureRotInterval, 
+                  mxCaptureRotSize, mxCaptureRotNumber, 
+                  mxCaptureCachePath, mxCaptureSpoolPath, 
+                  mxCaptureArchivePath, mxCaptureArchiveSubdirs, 
+                  mxCaptureCompression, mxCaptureFileSystemAlloc, 
+                  mxCaptureMaxDiskUsage, mxCaptureDiscardPolicy, 
+                  mxCaptureUpload }
+    STATUS      current
+    DESCRIPTION 
+        "A collection of scalar objects that control the overall 
+         capture, spooling and archival processes."
+    ::= { mxMonGroups 2 }
+
+mxMonCaptureTableGroup OBJECT-GROUP
+    OBJECTS     { mxCaptureName, mxCaptureCompressed, mxCaptureState, 
+                  mxCaptureLinkType, mxCaptureSize, mxCaptureCompSize, 
+                  mxCaptureMessages, mxCaptureMsgOctets, 
+                  mxCaptureInterval, mxCaptureActiveLinkDirs, 
+                  mxCaptureActiveHslDirs, mxCaptureBegTime, 
+                  mxCaptureEndTime, mxCaptureActionResult }
+    STATUS      current
+    DESCRIPTION 
+        "A collection of tabular objects that control individual files 
+         in the capture, spooling and archival processes."
+    ::= { mxMonGroups 3 }
+
+mxMonPushGroup OBJECT-GROUP
+    OBJECTS     { mxPushHostname, mxPushXportAddrType, mxPushXportAddr, 
+                  mxPushXportProfile, mxPushAssocState, 
+                  mxPushStorageType, mxPushRowStatus }
+    STATUS      current
+    DESCRIPTION 
+        "A collection of tabular objects that control the export of 
+         monitor sources to remote collectors."
+    ::= { mxMonGroups 4 }
+
+mxMonPullGroup OBJECT-GROUP
+    OBJECTS     { mxPullHostname, mxPullXportAddrType, mxPullXportAddr, 
+                  mxPullXportProfile, mxPullAssocState, 
+                  mxPullStorageType, mxPullRowStatus }
+    STATUS      current
+    DESCRIPTION 
+        "A collection of tabular objects that control the import of 
+         monitor sources from remote probes."
+    ::= { mxMonGroups 5 }
+
+mxMonUploadGroup OBJECT-GROUP
+    OBJECTS     { mxUploadSpec, mxUploadUsername, mxUploadPassword, 
+                  mxUploadAdminState, mxUploadStatus }
+    STATUS      current
+    DESCRIPTION 
+        "A collection of tabular objects that control the uploading of 
+         files to a remote collector."
+    ::= { mxMonGroups 6 }
+
+mxMonDownloadGroup OBJECT-GROUP
+    OBJECTS     { mxDownloadSpec, mxDownloadUsername, mxDownloadPassword, 
+                  mxDownloadAdminState, mxDownloadStatus }
+    STATUS      current
+    DESCRIPTION 
+        "A collection of tabular objects that control the donwloading of 
+         files from a remote probe."
+    ::= { mxMonGroups 7 }
+
+mxMonCollectGroup OBJECT-GROUP
+    OBJECTS     { mxCollectXportAddrType, mxCollectXportAddr, 
+                  mxCollectAdminState, mxCollectOpState, 
+                  mxCollectRowStatus }
+    STATUS      current
+    DESCRIPTION 
+        "A collection of tabular objects that control the collection of 
+         files."
+    ::= { mxMonGroups 8 }
+
+mxMonSctpScalarsGroup OBJECT-GROUP
+    OBJECTS     { mxSctpDefaultNoDelay, mxSctpDefaultMaxseg, 
+                  mxSctpDefaultHeartbeatItvl, mxSctpDefaultHeartbeat, 
+                  mxSctpDefaultRtoInitial, mxSctpDefaultRtoMin, 
+                  mxSctpDefaultRtoMax, mxSctpDefaultPathMaxRetrans, 
+                  mxSctpDefaultCookieLife, mxSctpDefaultCookieInc, 
+                  mxSctpDefaultMaxInitRetries, mxSctpDefaultMaxBurst, 
+                  mxSctpDefaultAssocMaxRetrans, mxSctpDefaultSackDelay, 
+                  mxSctpDefaultLifetime }
+    STATUS      current
+    DESCRIPTION 
+        "A collection of scalar objects that provide defaults for SCTP 
+         protocol parameter profiles."
+    ::= { mxMonGroups 9 }
+
+mxMonSctpTableGroup OBJECT-GROUP
+    OBJECTS     { mxSctpNoDelay, mxSctpMaxseg, mxSctpHeartbeatItvl, 
+                  mxSctpHeartbeat, mxSctpRtoInitial, mxSctpRtoMin, 
+                  mxSctpRtoMax, mxSctpPathMaxRetrans, mxSctpCookieLife, 
+                  mxSctpCookieInc, mxSctpMaxInitRetries, mxSctpMaxBurst, 
+                  mxSctpAssocMaxRetrans, mxSctpSackDelay, mxSctpLifetime, 
+                  mxSctpRowStatus }
+    STATUS      current
+    DESCRIPTION 
+        "A collection of tabular objects that provide SCTP protocol 
+         parameter profiles."
+    ::= { mxMonGroups 10 }
+
+mxMonFilterGroup OBJECT-GROUP
+    OBJECTS     { mxFilterState, mxFilterActionResult, mxFilterRowStatus, 
+                  mxFilterProgLine, mxFilterProgRowStatus }
+    STATUS      current
+    DESCRIPTION 
+        "A collection of tabular objects that implement BPF filters."
+    ::= { mxMonGroups 11 }
+
+mxMonBufferScalarGroup OBJECT-GROUP
+    OBJECTS     { mxBufferAdminState, mxBufferOpState, 
+                  mxBufferAvailStatus, mxBufferFullAction, 
+                  mxBufferMaxSize, mxBufferMaxMsgs, mxBufferMaxTime, 
+                  mxBufferCurrentSize, mxBufferNumberOfRecords, 
+                  mxBufferCurrentInterval, mxBufferAlarmThreshold, 
+                  mxBufferByteHiWaterMark, mxBufferByteLoWaterMark, 
+                  mxBufferMsgsHiWaterMark, mxBufferMsgsLoWaterMark, 
+                  mxBufferTimeHiWaterMark, mxBufferTimeLoWaterMark, 
+                  mxBufferDrops, mxBufferReset }
+    STATUS      current
+    DESCRIPTION 
+        "A collection of scalar objects that manage the capture buffer."
+    ::= { mxMonGroups 12 }
+
+mxMonBasicCompliance MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION 
+        "Provides the module compliance requirements for the MX monitor 
+         MIB."
+
+    MODULE      -- this module
+
+        MANDATORY-GROUPS        { mxMonMonitorGroup, 
+                  mxMonCaptureScalarGroup, mxMonCaptureTableGroup, 
+                  mxMonUploadGroup, mxMonDownloadGroup }
+
+        GROUP   mxMonPushGroup
+        DESCRIPTION   
+              "Conditional items when a probe is implemented."
+
+        GROUP   mxMonPullGroup
+        DESCRIPTION   
+              "Conditional items when a collector is implemented."
+
+        GROUP   mxMonSctpScalarsGroup
+        DESCRIPTION   
+              "Conditional items when a live feeds are implemented."
+
+        GROUP   mxMonSctpTableGroup
+        DESCRIPTION   
+              "Conditional items when a live feeds are implemented."
+
+        GROUP   mxMonFilterGroup
+        DESCRIPTION   
+              "Conditional items when a filters are implemented."
+
+        GROUP   mxMonBufferScalarGroup
+        DESCRIPTION   
+              "Conditional items when a live feeds are implemented."
+
+        GROUP   mxMonCollectGroup
+        DESCRIPTION   
+              "Don't know what this is for yet..."
+
+        OBJECT  mxMonitorAdminState
+        SYNTAX  AdministrativeState { locked(0), unlocked(1), 
+                    shuttingDown(2) }
+        WRITE-SYNTAX    AdministrativeState { locked(0), unlocked(1) }
+        DESCRIPTION   
+              "This object has a different read and write syntax."
+
+        OBJECT  mxCaptureAdminState
+        SYNTAX  AdministrativeState { locked(0), unlocked(1), 
+                    shuttingDown(2) }
+        WRITE-SYNTAX    AdministrativeState { locked(0), unlocked(1) }
+        DESCRIPTION   
+              "This object has a different read and write syntax."
+
+        OBJECT  mxCaptureActionResult
+        SYNTAX  INTEGER { success(0), failure(1) }
+        WRITE-SYNTAX    INTEGER { spool(2), archive(3), delete(4), 
+                    upload(5) }
+        DESCRIPTION   
+              "This object has a different read and write syntax."
+
+        OBJECT  mxUploadAdminState
+        SYNTAX  AdministrativeState { locked(0), unlocked(1), 
+                    shuttingDown(2) }
+        WRITE-SYNTAX    AdministrativeState { locked(0), unlocked(1) }
+        DESCRIPTION   
+              "This object has a different read and write syntax."
+
+        OBJECT  mxUploadStatus
+        SYNTAX  RowStatus { active(1), notInService(2), notReady(3), 
+                    createAndGo(4), createAndWait(5), destroy(6) }
+        WRITE-SYNTAX    RowStatus { active(1), notInService(2), 
+                    createAndGo(4), createAndWait(5), destroy(6) }
+        DESCRIPTION   
+              "This object has a different read and write syntax."
+
+        OBJECT  mxDownloadAdminState
+        SYNTAX  AdministrativeState { locked(0), unlocked(1), 
+                    shuttingDown(2) }
+        WRITE-SYNTAX    AdministrativeState { locked(0), unlocked(1) }
+        DESCRIPTION   
+              "This object has a different read and write syntax."
+
+        OBJECT  mxDownloadStatus
+        SYNTAX  RowStatus { active(1), notInService(2), notReady(3), 
+                    createAndGo(4), createAndWait(5), destroy(6) }
+        WRITE-SYNTAX    RowStatus { active(1), notInService(2), 
+                    createAndGo(4), createAndWait(5), destroy(6) }
+        DESCRIPTION   
+              "This object has a different read and write syntax."
+
+        OBJECT  mxPushRowStatus
+        SYNTAX  RowStatus { active(1), notInService(2), notReady(3), 
+                    createAndGo(4), createAndWait(5), destroy(6) }
+        WRITE-SYNTAX    RowStatus { active(1), notInService(2), 
+                    createAndGo(4), createAndWait(5), destroy(6) }
+        DESCRIPTION   
+              "This object has a different read and write syntax."
+
+        OBJECT  mxPullRowStatus
+        SYNTAX  RowStatus { active(1), notInService(2), notReady(3), 
+                    createAndGo(4), createAndWait(5), destroy(6) }
+        WRITE-SYNTAX    RowStatus { active(1), notInService(2), 
+                    createAndGo(4), createAndWait(5), destroy(6) }
+        DESCRIPTION   
+              "This object has a different read and write syntax."
+
+        OBJECT  mxSctpRowStatus
+        SYNTAX  RowStatus { active(1), notInService(2), notReady(3), 
+                    createAndGo(4), createAndWait(5), destroy(6) }
+        WRITE-SYNTAX    RowStatus { active(1), notInService(2), 
+                    createAndGo(4), createAndWait(5), destroy(6) }
+        DESCRIPTION   
+              "This object has a different read and write syntax."
+
+        OBJECT  mxFilterActionResult
+        SYNTAX  INTEGER { success(0), failure(1) }
+        WRITE-SYNTAX    INTEGER { compile(2) }
+        DESCRIPTION   
+              "This object has a different read and write syntax."
+
+        OBJECT  mxFilterRowStatus
+        SYNTAX  RowStatus { active(1), notInService(2), notReady(3), 
+                    createAndGo(4), createAndWait(5), destroy(6) }
+        WRITE-SYNTAX    RowStatus { active(1), notInService(2), 
+                    createAndGo(4), createAndWait(5), destroy(6) }
+        DESCRIPTION   
+              "This object has a different read and write syntax."
+
+        OBJECT  mxFilterProgRowStatus
+        SYNTAX  RowStatus { active(1), notInService(2), notReady(3), 
+                    createAndGo(4), createAndWait(5), destroy(6) }
+        WRITE-SYNTAX    RowStatus { active(1), notInService(2), 
+                    createAndGo(4), createAndWait(5), destroy(6) }
+        DESCRIPTION   
+              "This object has a different read and write syntax."
+
+        OBJECT  mxBufferAdminState
+        SYNTAX  AdministrativeState { locked(0), unlocked(1), 
+                    shuttingDown(2) }
+        WRITE-SYNTAX    AdministrativeState { locked(0), unlocked(1) }
+        DESCRIPTION   
+              "This object has a different read and write syntax."
+
+        OBJECT  mxCollectAdminState
+        SYNTAX  AdministrativeState { locked(0), unlocked(1), 
+                    shuttingDown(2) }
+        WRITE-SYNTAX    AdministrativeState { locked(0), unlocked(1) }
+        DESCRIPTION   
+              "This object has a different read and write syntax."
+
+        OBJECT  mxCollectRowStatus
+        SYNTAX  RowStatus { active(1), notInService(2), notReady(3), 
+                    createAndGo(4), createAndWait(5), destroy(6) }
+        WRITE-SYNTAX    RowStatus { active(1), notInService(2), 
+                    createAndGo(4), createAndWait(5), destroy(6) }
+        DESCRIPTION   
+              "This object has a different read and write syntax."
+
+    ::= { mxMonCompliances 1 }
+
+mxMonProbeCompliance MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION 
+        "Provides the module compliance requirements for the MX monitor 
+         MIB when the implementation is a probe only.  A probe is a 
+         network element that captures messages and archives them in 
+         files that are uploaded to a collector according to a schedule.  
+         
+         The probe may also provide its monitoring sources as live feeds 
+         to network management stations or to collectors that will 
+         capture their own files from the live feed."
+
+    MODULE      -- this module
+
+        MANDATORY-GROUPS        { mxMonMonitorGroup, 
+                  mxMonCaptureScalarGroup, mxMonCaptureTableGroup, 
+                  mxMonUploadGroup }
+
+        GROUP   mxMonPushGroup
+        DESCRIPTION   
+              "Conditional items to export monitor sources to 
+               collectors."
+
+        GROUP   mxMonSctpScalarsGroup
+        DESCRIPTION   
+              "Conditional items when a live feeds are implemented."
+
+        GROUP   mxMonSctpTableGroup
+        DESCRIPTION   
+              "Conditional items when a live feeds are implemented."
+
+        GROUP   mxMonFilterGroup
+        DESCRIPTION   
+              "Conditional items when a filters are implemented."
+
+        GROUP   mxMonBufferScalarGroup
+        DESCRIPTION   
+              "Conditional items when a live feeds are implemented."
+
+        OBJECT  mxMonitorAdminState
+        SYNTAX  AdministrativeState { locked(0), unlocked(1), 
+                    shuttingDown(2) }
+        WRITE-SYNTAX    AdministrativeState { locked(0), unlocked(1) }
+        DESCRIPTION   
+              "This object has a different read and write syntax."
+
+        OBJECT  mxCaptureAdminState
+        SYNTAX  AdministrativeState { locked(0), unlocked(1), 
+                    shuttingDown(2) }
+        WRITE-SYNTAX    AdministrativeState { locked(0), unlocked(1) }
+        DESCRIPTION   
+              "This object has a different read and write syntax."
+
+        OBJECT  mxCaptureActionResult
+        SYNTAX  INTEGER { success(0), failure(1) }
+        WRITE-SYNTAX    INTEGER { spool(2), archive(3), delete(4), 
+                    upload(5) }
+        DESCRIPTION   
+              "This object has a different read and write syntax."
+
+        OBJECT  mxUploadAdminState
+        SYNTAX  AdministrativeState { locked(0), unlocked(1), 
+                    shuttingDown(2) }
+        WRITE-SYNTAX    AdministrativeState { locked(0), unlocked(1) }
+        DESCRIPTION   
+              "This object has a different read and write syntax."
+
+        OBJECT  mxUploadStatus
+        SYNTAX  RowStatus { active(1), notInService(2), notReady(3), 
+                    createAndGo(4), createAndWait(5), destroy(6) }
+        WRITE-SYNTAX    RowStatus { active(1), notInService(2), 
+                    createAndGo(4), createAndWait(5), destroy(6) }
+        DESCRIPTION   
+              "This object has a different read and write syntax."
+
+        OBJECT  mxPushRowStatus
+        SYNTAX  RowStatus { active(1), notInService(2), notReady(3), 
+                    createAndGo(4), createAndWait(5), destroy(6) }
+        WRITE-SYNTAX    RowStatus { active(1), notInService(2), 
+                    createAndGo(4), createAndWait(5), destroy(6) }
+        DESCRIPTION   
+              "This object has a different read and write syntax."
+
+        OBJECT  mxSctpRowStatus
+        SYNTAX  RowStatus { active(1), notInService(2), notReady(3), 
+                    createAndGo(4), createAndWait(5), destroy(6) }
+        WRITE-SYNTAX    RowStatus { active(1), notInService(2), 
+                    createAndGo(4), createAndWait(5), destroy(6) }
+        DESCRIPTION   
+              "This object has a different read and write syntax."
+
+        OBJECT  mxFilterActionResult
+        SYNTAX  INTEGER { success(0), failure(1) }
+        WRITE-SYNTAX    INTEGER { compile(2) }
+        DESCRIPTION   
+              "This object has a different read and write syntax."
+
+        OBJECT  mxFilterRowStatus
+        SYNTAX  RowStatus { active(1), notInService(2), notReady(3), 
+                    createAndGo(4), createAndWait(5), destroy(6) }
+        WRITE-SYNTAX    RowStatus { active(1), notInService(2), 
+                    createAndGo(4), createAndWait(5), destroy(6) }
+        DESCRIPTION   
+              "This object has a different read and write syntax."
+
+        OBJECT  mxFilterProgRowStatus
+        SYNTAX  RowStatus { active(1), notInService(2), notReady(3), 
+                    createAndGo(4), createAndWait(5), destroy(6) }
+        WRITE-SYNTAX    RowStatus { active(1), notInService(2), 
+                    createAndGo(4), createAndWait(5), destroy(6) }
+        DESCRIPTION   
+              "This object has a different read and write syntax."
+
+        OBJECT  mxBufferAdminState
+        SYNTAX  AdministrativeState { locked(0), unlocked(1), 
+                    shuttingDown(2) }
+        WRITE-SYNTAX    AdministrativeState { locked(0), unlocked(1) }
+        DESCRIPTION   
+              "This object has a different read and write syntax."
+
+    ::= { mxMonCompliances 2 }
+
+mxMonCollectorCompliance MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION 
+        "Provides the module compliance requirements for the MX monitor 
+         MIB when the implementation is a collector only."
+
+    MODULE      -- this module
+
+        MANDATORY-GROUPS        { mxMonDownloadGroup }
+
+        GROUP   mxMonCaptureScalarGroup
+        DESCRIPTION   
+              "Conditional items when collector is to capture from live 
+               monitor feeds."
+
+        GROUP   mxMonCaptureTableGroup
+        DESCRIPTION   
+              "Conditional items when collector is to capture from live 
+               monitor feeds."
+
+        GROUP   mxMonPullGroup
+        DESCRIPTION   
+              "Conditional items when a collector is implemented."
+
+        GROUP   mxMonSctpScalarsGroup
+        DESCRIPTION   
+              "Conditional items when a live feeds are implemented."
+
+        GROUP   mxMonSctpTableGroup
+        DESCRIPTION   
+              "Conditional items when a live feeds are implemented."
+
+        GROUP   mxMonFilterGroup
+        DESCRIPTION   
+              "Conditional items when a filters are implemented."
+
+        OBJECT  mxCaptureAdminState
+        SYNTAX  AdministrativeState { locked(0), unlocked(1), 
+                    shuttingDown(2) }
+        WRITE-SYNTAX    AdministrativeState { locked(0), unlocked(1) }
+        DESCRIPTION   
+              "This object has a different read and write syntax."
+
+        OBJECT  mxCaptureActionResult
+        SYNTAX  INTEGER { success(0), failure(1) }
+        WRITE-SYNTAX    INTEGER { spool(2), archive(3), delete(4), 
+                    upload(5) }
+        DESCRIPTION   
+              "This object has a different read and write syntax."
+
+        OBJECT  mxDownloadAdminState
+        SYNTAX  AdministrativeState { locked(0), unlocked(1), 
+                    shuttingDown(2) }
+        WRITE-SYNTAX    AdministrativeState { locked(0), unlocked(1) }
+        DESCRIPTION   
+              "This object has a different read and write syntax."
+
+        OBJECT  mxDownloadStatus
+        SYNTAX  RowStatus { active(1), notInService(2), notReady(3), 
+                    createAndGo(4), createAndWait(5), destroy(6) }
+        WRITE-SYNTAX    RowStatus { active(1), notInService(2), 
+                    createAndGo(4), createAndWait(5), destroy(6) }
+        DESCRIPTION   
+              "This object has a different read and write syntax."
+
+        OBJECT  mxPullRowStatus
+        SYNTAX  RowStatus { active(1), notInService(2), notReady(3), 
+                    createAndGo(4), createAndWait(5), destroy(6) }
+        WRITE-SYNTAX    RowStatus { active(1), notInService(2), 
+                    createAndGo(4), createAndWait(5), destroy(6) }
+        DESCRIPTION   
+              "This object has a different read and write syntax."
+
+        OBJECT  mxSctpRowStatus
+        SYNTAX  RowStatus { active(1), notInService(2), notReady(3), 
+                    createAndGo(4), createAndWait(5), destroy(6) }
+        WRITE-SYNTAX    RowStatus { active(1), notInService(2), 
+                    createAndGo(4), createAndWait(5), destroy(6) }
+        DESCRIPTION   
+              "This object has a different read and write syntax."
+
+        OBJECT  mxFilterActionResult
+        SYNTAX  INTEGER { success(0), failure(1) }
+        WRITE-SYNTAX    INTEGER { compile(2) }
+        DESCRIPTION   
+              "This object has a different read and write syntax."
+
+        OBJECT  mxFilterProgRowStatus
+        SYNTAX  RowStatus { active(1), notInService(2), notReady(3), 
+                    createAndGo(4), createAndWait(5), destroy(6) }
+        WRITE-SYNTAX    RowStatus { active(1), notInService(2), 
+                    createAndGo(4), createAndWait(5), destroy(6) }
+        DESCRIPTION   
+              "This object has a different read and write syntax."
+
+    ::= { mxMonCompliances 3 }
+
+mxMonNmsCompliance MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION 
+        "Provides the module compliance requirements for the MX monitor 
+         MIB when the implementation is a Network Mangement Station 
+         (NMS).
+         
+         Network management stations require the ability to accept a 
+         monitor source feed from a probe and act upon the live data 
+         stream."
+
+    MODULE      -- this module
+
+        MANDATORY-GROUPS        { mxMonPullGroup, mxMonSctpScalarsGroup, 
+                  mxMonSctpTableGroup }
+
+        GROUP   mxMonPullGroup
+        DESCRIPTION   
+              "Conditional items when a network management station is 
+               implemented."
+
+        GROUP   mxMonFilterGroup
+        DESCRIPTION   
+              "Conditional items when a filters are implemented."
+
+        OBJECT  mxPullRowStatus
+        SYNTAX  RowStatus { active(1), notInService(2), notReady(3), 
+                    createAndGo(4), createAndWait(5), destroy(6) }
+        WRITE-SYNTAX    RowStatus { active(1), notInService(2), 
+                    createAndGo(4), createAndWait(5), destroy(6) }
+        DESCRIPTION   
+              "This object has a different read and write syntax."
+
+        OBJECT  mxFilterActionResult
+        SYNTAX  INTEGER { success(0), failure(1) }
+        WRITE-SYNTAX    INTEGER { compile(2) }
+        DESCRIPTION   
+              "This object has a different read and write syntax."
+
+        OBJECT  mxFilterProgRowStatus
+        SYNTAX  RowStatus { active(1), notInService(2), notReady(3), 
+                    createAndGo(4), createAndWait(5), destroy(6) }
+        WRITE-SYNTAX    RowStatus { active(1), notInService(2), 
+                    createAndGo(4), createAndWait(5), destroy(6) }
+        DESCRIPTION   
+              "This object has a different read and write syntax."
+
+    ::= { mxMonCompliances 4 }
 
 END -- end of module OPENSS7-MX-MON-MIB.
 
