@@ -316,9 +316,9 @@ CREATE TABLE IF NOT EXISTS pages (
 	xoffset INT,
 	yoffset INT,
 	scale REAL,
-	PRIMARY KEY(windid,pageid)
-	-- FOREIGN KEY(hostid) REFERENCES hosts(hostid)
-	-- FOREIGN KEY(windid) REFERENCES winds(windid)
+	PRIMARY KEY(windid,pageid),
+	FOREIGN KEY(hostid) REFERENCES hosts(hostid),
+	FOREIGN KEY(windid) REFERENCES winds(windid)
 );
 },
 	},
@@ -544,13 +544,13 @@ sub initSchema {
 			$keys .= ','.$_->{label};
 		}
 		$keys .= ')';
-#		$keys .= ",\n\tFOREIGN KEY(hostid) REFERENCES hosts(hostid)";
+		$keys .= ",\n\tFOREIGN KEY(hostid) REFERENCES hosts(hostid)";
 		foreach (@inds) {
 			push @{$MyDBI::schema{$t}{keys}}, $_->{label};
 			push @{$MyDBI::schema{$t}{cols}}, $_->{label};
 			$MyDBI::schema{$t}{tsql} .= ",\n\t$_->{label} ".mapit($_);
 			if ($_->{parent} ne $entry) {
-#				$keys .= ",\n\tFOREIGN KEY($_->{label}) REFERENCES $_->{parent}->{parent}->{label}($_->{label})";
+				$keys .= ",\n\tFOREIGN KEY($_->{label}) REFERENCES $_->{parent}->{parent}->{label}($_->{label})";
 			}
 		}
 		foreach (@cols) {
@@ -1390,6 +1390,37 @@ sub get {
 }
 
 # ----------------------------------
+package MonSrcData;
+use strict;
+use vars qw(@ISA);
+@ISA = qw(SnmpData);
+# ----------------------------------
+sub get {
+	my ($type,@args) = @_;
+	return SnmpData::get($type,'Monitor','mxMonitorTable',@args);
+}
+sub label {
+	return shift->_data->{mxMonitorSource};
+}
+sub stitle {
+	my $self = shift;
+	my $data = $self->_data;
+	$data->{stitle} = "Monitor Source $data->{mxMonitorSource}" unless exists $data->{stitle};
+	return $data->{stitle};
+}
+sub new {
+	my ($type,$name,@args) = @_;
+	my $self = SnmpData::new($type,'Monintor','mxMonitorTable',@args);
+	my $read = $self->read;
+	my $data = $self->_data;
+	$data->{DestHost} = $name;
+	my ($hostid,$mxMonitorSource) = @args;
+	my @keys = ($hostid,$mxMonitorSource);
+	$self->save unless $read;
+	return $self;
+}
+
+# ----------------------------------
 package XconData;
 use vars qw(@ISA);
 @ISA = qw(SnmpData);
@@ -1459,6 +1490,9 @@ sub new {
 	my @keys = ($hostid,$mxDrivName,$mxCardIndex,$mxSpanIndex,$mxChanIndex);
 	my $side;
 	$side = $data->{xcon} = XconData->new($data->{DestHost},@keys);
+	push @{$data->{sides}}, $side if $side;
+	$side = $data->{msrc} = MonSrcData->new($data->{DestHost},$hostid,
+			"$mxDrivName$mxCardIndex:$mxSpanIndex.$mxChanIndex");
 	push @{$data->{sides}}, $side if $side;
 	$self->save unless $read;
 	return $self;
@@ -1767,6 +1801,9 @@ sub new {
 	}
 	$side = $data->{fetot} = FETotData->new($data->{DestHost},@keys);
 	push @{$data->{sides}}, $side if $side;
+	$side = $data->{msrc} = MonSrcData->new($data->{DestHost},$hostid,
+			"$mxDrivName$mxCardIndex:$mxSpanIndex");
+	push @{$data->{sides}}, $side if $side;
 	$self->save unless $read;
 	return $self;
 }
@@ -1808,6 +1845,9 @@ sub new {
 		my $part = SpanData->new($data->{DestHost},@keys,$i);
 		push @{$data->{parts}}, $part if $part;
 	}
+	my $side = $data->{msrc} = MonSrcData->new($data->{DestHost},$hostid,
+			"$mxDrivName$mxCardIndex");
+	push @{$data->{sides}}, $side if $side;
 	$self->save unless $read;
 	return $self;
 }
@@ -1849,6 +1889,8 @@ sub new {
 		my $part = CardData->new($data->{DestHost},@keys,$i+1);
 		push @{$data->{parts}}, $part if $part;
 	}
+	my $side = $data->{msrc} = MonSrcData->new($data->{DestHost},$hostid,$mxDrivName);
+	push @{$data->{sides}}, $side if $side;
 	$self->save unless $read;
 	return $self;
 }
@@ -1895,6 +1937,8 @@ sub new {
 	my $data = $self->_data;
 	my $part = DrivData->new($data->{DestHost},$hostid,'x400p-sl');
 	push @{$data->{parts}}, $part if $part;
+	my $side = $data->{msrc} = MonSrcData->new($data->{DestHost},$hostid,'*');
+	push @{$data->{sides}}, $side if $side;
 	$self->save unless $read;
 	return $self;
 }
@@ -2144,6 +2188,31 @@ sub okButton {
 }
 
 # ----------------------------------
+package EntryMenuItem;
+use strict;
+use Gtk2;
+use Glib;
+use vars qw(@ISA);
+@ISA = qw(Gtk2::MenuItem);
+# ----------------------------------
+#package EntryMenuItem;
+sub new {
+	my ($type,$name,$obj) = @_;
+	my $self = Gtk2::MenuItem->new_with_label("$name...");
+	bless $self,$type;
+	my $objs = $obj->_data;
+	$self->signal_connect(activate=>sub{
+		my ($self,$args) = @_;
+		my ($name,$obj) = @$args;
+		my $objs = $obj->_data;
+		$objs->{entry} = Entry->new($name,$obj) unless $objs->{entry};
+		$objs->{entry}->show_all;
+		return Gtk2::EVENT_STOP;
+	},[$name,$obj]);
+	return $self;
+}
+
+# ----------------------------------
 package Menu;
 use strict;
 use Gtk2;
@@ -2160,9 +2229,9 @@ sub new {
 	$data->{obj} = $obj;
 	my $title = $name.' Menu '.$obj->label;
 	$self->set_title($title);
-	my $mi = Gtk2::TearoffMenuItem->new;
-	$mi->show;
-	$self->append($mi);
+#	my $mi = Gtk2::TearoffMenuItem->new;
+#	$mi->show;
+#	$self->append($mi);
 	return $self;
 }
 
@@ -2178,14 +2247,30 @@ use vars qw(@ISA);
 sub new {
 	my ($type,$name,$obj) = @_;
 	my $self = Menu::new(@_);
-	my $mi = Gtk2::MenuItem->new_with_label("$name Properties...");
-	$mi->signal_connect(activate=>sub{
-		my ($mi,$self) = @_;
-		$self->dodialog($self->_data->{obj});
-		return Gtk2::EVENT_STOP;
-	},$self);
+	my $data = $self->_data;
+	my $mi = EntryMenuItem->new("$name Properties",$obj);
 	$mi->show;
 	$self->append($mi);
+	return $self;
+}
+
+#-----------------------------------
+package MonSource;
+use strict;
+use Gtk2;
+use Glib;
+use vars qw(@ISA);
+@ISA = qw(Properties);
+#-----------------------------------
+sub new {
+	my ($type,$name,$obj) = @_;
+	my $self = Properties::new(@_);
+	my $objs = $obj->_data;
+	if ($objs->{msrc}) {
+		my $mi = EntryMenuItem->new("$name Monitor Source",$objs->{msrc});
+		$mi->show;
+		$self->append($mi);
+	}
 	return $self;
 }
 
@@ -2195,37 +2280,17 @@ use strict;
 use Gtk2;
 use Glib;
 use vars qw(@ISA);
-@ISA = qw(Properties);
+@ISA = qw(MonSource);
 # ----------------------------------
 #package ChanMenu;
 sub new {
 	my ($type,$obj) = @_;
-	my $self = Properties::new($type,'Channel',$obj);
+	my $self = MonSource::new($type,'Channel',$obj);
 	my $objs = $obj->_data;
-	my $mi = Gtk2::MenuItem->new_with_label("Channel Cross-connect...");
-	$mi->signal_connect(activate=>sub{
-		my ($mi,$args) = @_;
-		my ($self,$obj) = @$args;
-		$self->doxcon($obj);
-		return Gtk2::EVENT_STOP;
-	},[$self,$objs->{xcon}]);
+	my $mi = EntryMenuItem->new('Channel Cross-connect',$objs->{xcon});
 	$mi->show;
 	$self->append($mi);
 	return $self;
-}
-#package ChanMenu;
-sub dodialog {
-	my ($self,$obj) = @_;
-	my $data = $self->_data;
-	$data->{dialog} = Entry->new('Channel',$obj) unless $data->{dialog};
-	$data->{dialog}->show_all;
-}
-#package ChanMenu;
-sub doxcon {
-	my ($self,$obj) = @_;
-	my $data = $self->_data;
-	$data->{doxcon} = Entry->new('Cross-connect',$obj) unless $data->{doxcon};
-	$data->{doxcon}->show_all;
 }
 
 # ----------------------------------
@@ -2234,32 +2299,20 @@ use strict;
 use Gtk2;
 use Glib;
 use vars qw(@ISA);
-@ISA = qw(Properties);
+@ISA = qw(MonSource);
 # ----------------------------------
 #package SpanMenu;
 sub new {
 	my ($type,$obj) = @_;
-	my $self = Properties::new($type,'Span',$obj);
+	my $self = MonSource::new($type,'Span',$obj);
 	my $objs = $obj->_data;
-	my $mi = Gtk2::MenuItem->new_with_label("Span Bert...");
-	$mi->signal_connect(activate=>sub{
-		my ($mi,$args) = @_;
-		my ($self,$obj) = @$args;
-		$self->dobert($obj);
-		return Gtk2::EVENT_STOP;
-	},[$self,$objs->{bert}]);
+	my $mi = EntryMenuItem->new('Span Bert',$objs->{bert});
 	$mi->show;
 	$self->append($mi);
 	$mi = Gtk2::SeparatorMenuItem->new;
 	$mi->show;
 	$self->append($mi);
-	$mi = Gtk2::MenuItem->new_with_label("Span Stats Near-end Current...");
-	$mi->signal_connect(activate=>sub{
-		my ($mi,$args) = @_;
-		my ($self,$obj) = @$args;
-		$self->donecur($obj);
-		return Gtk2::EVENT_STOP;
-	},[$self,$objs->{necur}]);
+	$mi = EntryMenuItem->new('Span Stats Near-end Current',$objs->{necur});
 	$mi->show;
 	$self->append($mi);
 	my $me = Gtk2::Menu->new;
@@ -2268,40 +2321,22 @@ sub new {
 	$mi->set_right_justified(Glib::TRUE);
 	$mi->show;
 	$self->append($mi);
-	$mi = Gtk2::TearoffMenuItem->new;
-	$mi->show;
-	$me->append($mi);
+#	$mi = Gtk2::TearoffMenuItem->new;
+#	$mi->show;
+#	$me->append($mi);
 	foreach (@{$objs->{neint}}) {
-		$mi = Gtk2::MenuItem->new_with_label($_->stitle."...");
-		$mi->signal_connect(activate=>sub{
-			my ($mi,$args) = @_;
-			my ($self,$obj) = @$args;
-			$self->doneint($obj);
-			return Gtk2::EVENT_STOP;
-		},[$self,$_]);
+		$mi = EntryMenuItem->new($_->stitle,$_);
 		$mi->show;
 		$me->append($mi);
 	}
-	$mi = Gtk2::MenuItem->new_with_label("Span Stats Near-end Total...");
-	$mi->signal_connect(activate=>sub{
-		my ($mi,$args) = @_;
-		my ($self,$obj) = @$args;
-		$self->donetot($obj);
-		return Gtk2::EVENT_STOP;
-	},[$self,$objs->{netot}]);
+	$mi = EntryMenuItem->new('Span Stats Near-end Total',$objs->{netot});
 	$mi->show;
 	$self->append($mi);
 	$mi = Gtk2::SeparatorMenuItem->new;
 	$mi->show;
 	$self->append($mi);
 	$me = Gtk2::Menu->new;
-	$mi = Gtk2::MenuItem->new_with_label("Span Stats Far-end Current...");
-	$mi->signal_connect(activate=>sub{
-		my ($mi,$args) = @_;
-		my ($self,$obj) = @$args;
-		$self->dofecur($obj);
-		return Gtk2::EVENT_STOP;
-	},[$self,$objs->{fecur}]);
+	$mi = EntryMenuItem->new('Span Stats Far-end Current',$objs->{fecur});
 	$mi->show;
 	$self->append($mi);
 	$me = Gtk2::Menu->new;
@@ -2310,27 +2345,15 @@ sub new {
 	$mi->set_right_justified(Glib::TRUE);
 	$mi->show;
 	$self->append($mi);
-	$mi = Gtk2::TearoffMenuItem->new;
-	$mi->show;
-	$me->append($mi);
+#	$mi = Gtk2::TearoffMenuItem->new;
+#	$mi->show;
+#	$me->append($mi);
 	foreach (@{$objs->{feint}}) {
-		$mi = Gtk2::MenuItem->new_with_label($_->stitle."...");
-		$mi->signal_connect(activate=>sub{
-			my ($mi,$args) = @_;
-			my ($self,$obj) = @$args;
-			$self->nofeint($obj);
-			return Gtk2::EVENT_STOP;
-		},[$self,$_]);
+		$mi = EntryMenuItem->new($_->stitle,$_);
 		$mi->show;
 		$me->append($mi);
 	}
-	$mi = Gtk2::MenuItem->new_with_label("Span Stats Far-end Total...");
-	$mi->signal_connect(activate=>sub{
-		my ($mi,$args) = @_;
-		my ($self,$obj) = @$args;
-		$self->dofetot($obj);
-		return Gtk2::EVENT_STOP;
-	},[$self,$objs->{fetot}]);
+	$mi = EntryMenuItem->new('Span Stats Far-end Total',$objs->{fetot});
 	$mi->show;
 	$self->append($mi);
 	$mi = Gtk2::SeparatorMenuItem->new;
@@ -2345,66 +2368,6 @@ sub new {
 	}
 	return $self;
 }
-#package SpanMenu;
-sub dodialog {
-	my ($self,$obj) = @_;
-	my $data = $self->_data;
-	$data->{dialog} = Entry->new('Span',$obj) unless $data->{dialog};
-	$data->{dialog}->show_all;
-}
-#package SpanMenu;
-sub dobert {
-	my ($self,$obj) = @_;
-	my $data = $self->_data;
-	$data->{dobert} = Entry->new('Bert',$obj) unless $data->{dobert};
-	$data->{dobert}->show_all;
-}
-#package SpanMenu;
-sub donecur {
-	my ($self,$obj) = @_;
-	my $data = $self->_data;
-	$data->{donecur} = Entry->new('Near-end Current',$obj) unless $data->{donecur};
-	$data->{donecur}->show_all;
-}
-#package SpanMenu;
-sub doneint {
-	my ($self,$obj) = @_;
-	my $data = $self->_data;
-	my $objs = $obj->_data;
-	my $index = $objs->{mxNearEndIntervalIndex};
-	$data->{doneint}[$index] = Entry->new('Near-end Interval',$obj) unless $data->{doneint}[$index];
-	$data->{doneint}[$index]->show_all;
-}
-#package SpanMenu;
-sub donetot {
-	my ($self,$obj) = @_;
-	my $data = $self->_data;
-	$data->{donetot} = Entry->new('Near-end Total',$obj) unless $data->{donetot};
-	$data->{donetot}->show_all;
-}
-#package SpanMenu;
-sub dofecur {
-	my ($self,$obj) = @_;
-	my $data = $self->_data;
-	$data->{dofecur} = Entry->new('Far-end Current',$obj) unless $data->{dofecur};
-	$data->{dofecur}->show_all;
-}
-#package SpanMenu;
-sub dofeint {
-	my ($self,$obj) = @_;
-	my $data = $self->_data;
-	my $objs = $obj->_data;
-	my $index = $objs->{mxFarEndIntervalIndex};
-	$data->{dofeint}[$index] = Entry->new('Far-end Interval',$obj) unless $data->{dofeint}[$index];
-	$data->{dofeint}[$index]->show_all;
-}
-#package SpanMenu;
-sub dofetot {
-	my ($self,$obj) = @_;
-	my $data = $self->_data;
-	$data->{dofetot} = Entry->new('Far-end Total',$obj) unless $data->{dofetot};
-	$data->{dofetot}->show_all;
-}
 
 # ----------------------------------
 package CardMenu;
@@ -2412,12 +2375,12 @@ use strict;
 use Gtk2;
 use Glib;
 use vars qw(@ISA);
-@ISA = qw(Properties);
+@ISA = qw(MonSource);
 # ----------------------------------
 #package CardMenu;
 sub new {
 	my ($type,$obj) = @_;
-	my $self = Properties::new($type,'Card',$obj);
+	my $self = MonSource::new($type,'Card',$obj);
 	my $objs = $obj->_data;
 	my $mi = Gtk2::SeparatorMenuItem->new;
 	$mi->show;
@@ -2431,13 +2394,6 @@ sub new {
 	}
 	return $self;
 }
-#package CardMenu;
-sub dodialog {
-	my ($self,$obj) = @_;
-	my $data = $self->_data;
-	$data->{dialog} = Entry->new('Card',$obj) unless $data->{dialog};
-	$data->{dialog}->show_all;
-}
 
 # ----------------------------------
 package DrivMenu;
@@ -2445,12 +2401,12 @@ use strict;
 use Gtk2;
 use Glib;
 use vars qw(@ISA);
-@ISA = qw(Properties);
+@ISA = qw(MonSource);
 # ----------------------------------
 #package DrivMenu;
 sub new {
 	my ($type,$obj) = @_;
-	my $self = Properties::new($type,'Driver',$obj);
+	my $self = MonSource::new($type,'Driver',$obj);
 	my $objs = $obj->_data;
 	my $mi = Gtk2::SeparatorMenuItem->new;
 	$mi->show;
@@ -2464,13 +2420,6 @@ sub new {
 	}
 	return $self;
 }
-#package DrivMenu;
-sub dodialog {
-	my ($self,$obj) = @_;
-	my $data = $self->_data;
-	$data->{dialog} = Entry->new('Driver',$obj) unless $data->{dialog};
-	$data->{dialog}->show_all;
-}
 
 # ----------------------------------
 package HostMenu;
@@ -2478,12 +2427,12 @@ use strict;
 use Gtk2;
 use Glib;
 use vars qw(@ISA);
-@ISA = qw(Properties);
+@ISA = qw(MonSource);
 # ----------------------------------
 #package HostMenu;
 sub new {
 	my ($type,$obj) = @_;
-	my $self = Properties::new($type,'Host',$obj);
+	my $self = MonSource::new($type,'Host',$obj);
 	my $objs = $obj->_data;
 	my $mi = Gtk2::SeparatorMenuItem->new;
 	$mi->show;
@@ -2496,13 +2445,6 @@ sub new {
 		$self->append($mi);
 	}
 	return $self;
-}
-#package HostMenu;
-sub dodialog {
-	my ($self,$obj) = @_;
-	my $data = $self->_data;
-	$data->{dialog} = Entry->new('Host',$obj) unless $data->{dialog};
-	$data->{dialog}->show_all;
 }
 
 # ----------------------------------
@@ -2569,8 +2511,11 @@ sub new {
 	);
 	$data->{jack}->signal_connect('button-press-event',sub{
 		my ($it,$wg,$ev,$obj) = @_;
-		SpanMenu->new($obj)->popup(undef,undef,undef,undef,$ev->button,$ev->time);
-		return Gtk2::EVENT_STOP;
+		if ($ev->button == 3) {
+			SpanMenu->new($obj)->popup(undef,undef,undef,undef,$ev->button,$ev->time);
+			return Gtk2::EVENT_STOP;
+		}
+		return Gtk2::EVENT_PROPAGATE;
 	},$obj);
 	$data->{text} = Goo::Canvas::Text->new($self,
 		"$objs->{mxCardIndex}:$objs->{mxSpanIndex}", $x+9,$y+20,15,'center',
@@ -2681,8 +2626,11 @@ sub new {
 	);
 	$item->signal_connect('button-press-event',sub{
 		my ($it,$wg,$ev,$obj) = @_;
-		CardMenu->new($obj)->popup(undef,undef,undef,undef,$ev->button,$ev->time);
-		return Gtk2::EVENT_STOP;
+		if ($ev->button == 3) {
+			CardMenu->new($obj)->popup(undef,undef,undef,undef,$ev->button,$ev->time);
+			return Gtk2::EVENT_STOP;
+		}
+		return Gtk2::EVENT_PROPAGATE;
 	},$obj);
 	$data->{text} = Goo::Canvas::Text->new($self,
 		"x400p-sl$card",$x+65,$y+5,130,'center',
@@ -2881,8 +2829,11 @@ sub new {
 	my $root = $self->get_root_item;
 	$root->signal_connect('button-press-event',sub{
 		my ($it,$wv,$ev,$host) = @_;
-		HostMenu->new($host)->popup(undef,undef,undef,undef,$ev->button,$ev->time);
-		return Gtk2::EVENT_STOP;
+		if ($ev->button == 3) {
+			HostMenu->new($host)->popup(undef,undef,undef,undef,$ev->button,$ev->time);
+			return Gtk2::EVENT_STOP;
+		}
+		return Gtk2::EVENT_PROPAGATE;
 	},$host);
 	foreach (reverse @{$objs->{parts}}) {
 		push @{$data->{subvs}}, CardView->new($self,$_);
@@ -3115,7 +3066,8 @@ sub new {
 	$mc->set_submenu($me);
 	$mb->append($mc);
 	my $nb = Gtk2::Notebook->new();
-	$nb->popup_enable;
+#	$nb->popup_enable;
+	$nb->popup_disable;
 	my $vb = Gtk2::VBox->new();
 	$vb->set_spacing(0);
 	$vb->pack_start($mb,Glib::FALSE,Glib::FALSE,0);
