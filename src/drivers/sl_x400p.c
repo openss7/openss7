@@ -20763,7 +20763,7 @@ sio_siocgifnum(queue_t *q, mblk_t *mp, struct xp *xp)
   * ifreq structures in ifc_req and its length in bytes in ifc_len.  The driver fills the ifreq
   * structures with all current L3 interface addresses that are running: ifr_name contains the
   * interface addresses that are running: ifr_name contains the interface name (eth0:1, etc.),
-  * ifr_addr the address.  The driver returns the actual length in ifc_len.  If ifc_len is equa to
+  * ifr_addr the address.  The driver returns the actual length in ifc_len.  If ifc_len is equal to
   * the original length the buffer probably has overflowed and the caller should retry with a larger
   * buffer to get all addresses.  When no error occurs, the command returns zero (0); otherwise
   * minus one (1) and errno(3) is set to an appropriate error code.  Overflow is not considered an
