@@ -6,7 +6,8 @@
 
 use Carp;
 use Gtk2 '-init';
-use Glib qw(TRUE FALSE);
+use Gtk2::SimpleList;
+use Glib;
 use Goo::Canvas;
 use Gtk2::Helper;
 use FileHandle;
@@ -14,6 +15,7 @@ use FindBin qw($Bin);
 use lib "$Bin";
 use DBI;
 use SNMP;
+use Time::HiRes qw(gettimeofday tv_interval);
 use strict;
 
 $SNMP::verbose = 0;
@@ -25,28 +27,269 @@ $SNMP::best_guess = 2;
 $SNMP::save_descriptions = 1;
 SNMP::initMib();
 SNMP::addMibDirs(qw(../mibs));
-SNMP::loadModules('OPENSS7-MX-MIB');
+SNMP::loadModules('OPENSS7-MX-MIB', 'OPENSS7-MX-MON-MIB');
 
-my @windows;
-my $quitting = 0;
+@::windows = ();
+$::windidn = 0;
+$::quitting = 0;
+
+$::hostidn = 0;
+
+%::HostMIB = (
+	hostid=>{
+		label=>'hostid',
+		type=>'INTEGER',
+		access=>'NoAccess',
+		syntax=>'INTEGER',
+	},
+	DestHost=>{
+		label=>'DestHost',
+		type=>'OCTETSTR',
+		access=>'ReadOnly',
+		syntax=>'SnmpAdminString',
+		defaultValue=>'localhost',
+	},
+	Community=>{
+		label=>'Community',
+		type=>'OCTETSTR',
+		access=>'Create',
+		syntax=>'SnmpAdminString',
+		defaultValues=>'os7live',
+	},
+	Version=>{
+		label=>'Version',
+		type=>'OCTETSTR',
+		access=>'Create',
+		syntax=>'OCTETSTR',
+		enums=>{
+			'1'=>0,
+			'2'=>1,
+			'2c'=>2,
+			'3'=>3,
+		},
+		defaultValue=>'2c',
+	},
+	RemotePort=>{
+		label=>'RemotePort',
+		type=>'INTEGER',
+		access=>'Create',
+		syntax=>'INTEGER',
+		defaultValue=>161,
+	},
+	Timeout=>{
+		label=>'Timeout',
+		type=>'INTEGER',
+		access=>'Create',
+		syntax=>'INTEGER',
+		units=>'microseconds',
+		defaultValue=>1000000,
+	},
+	Retries=>{
+		label=>'Retries',
+		type=>'INTEGER',
+		access=>'Create',
+		syntax=>'INTEGER',
+		units=>'retries',
+		defaultValue=>5,
+	},
+	RetryNoSuch=>{
+		label=>'RetryNoSuch',
+		type=>'BOOLEAN',
+		access=>'Create',
+		syntax=>'BOOLEAN',
+		defaultValue=>0,
+	},
+	SecName=>{
+		label=>'SecName',
+		type=>'OCTETSTR',
+		access=>'Create',
+		syntax=>'SnmpAdminString',
+		defaultValue=>'initial',
+	},
+	SecLevel=>{
+		label=>'SecLevel',
+		type=>'OCTETSTR',
+		access=>'Create',
+		syntax=>'OCTETSTR',
+		enums=>{
+			'noAuthNoPriv'=>0,
+			'authNoPriv'=>1,
+			'authPriv'=>2,
+		},
+		defaultValue=>'noAuthNoPriv',
+	},
+	SecEngineId=>{
+		label=>'SecEngineId',
+		type=>'OCTETSTR',
+		access=>'Create',
+		syntax=>'SnmpEngineID',
+		ranges=>[ { low=>5, high=>32 } ],
+		defaultValue=>undef,
+	},
+	ContextEngineId=>{
+		label=>'ContextEngineId',
+		type=>'OCTETSTR',
+		access=>'Create',
+		syntax=>'SnmpEngineID',
+		ranges=>[ { low=>5, high=>32 } ],
+		defaultValue=>undef,
+	},
+	Context=>{
+		label=>'Context',
+		type=>'OCTETSTR',
+		access=>'Create',
+		syntax=>'SnmpAdminString',
+		defaultValue=>undef,
+	},
+	AuthProto=>{
+		label=>'AuthProto',
+		type=>'OCTETSTR',
+		access=>'Create',
+		syntax=>'OCTETSTR',
+		enums=>{
+			'MD5'=>0,
+			'SHA'=>1,
+		},
+		defaultValue=>'MD5',
+	},
+	AuthPass=>{
+		label=>'AuthPass',
+		type=>'PASSWORD',
+		access=>'Create',
+		syntax=>'PASSWORD',
+		defaultValue=>'os7live',
+	},
+	PrivProto=>{
+		label=>'PrivProto',
+		type=>'OCTETSTR',
+		access=>'Create',
+		syntax=>'OCTETSTR',
+		enums=>{
+			'DES'=>0,
+			'AES'=>1,
+		},
+		defaultValue=>'DES',
+	},
+	PrivPass=>{
+		label=>'PrivPass',
+		type=>'PASSWORD',
+		access=>'Create',
+		syntax=>'PASSWORD',
+		defaultValue=>'os7live',
+	},
+	authMasterKey=>{
+		label=>'authMasterKey',
+		type=>'OCTETSTR',
+		access=>'Create',
+		syntax=>'SnmpAdminString',
+		defaultValue=>undef,
+	},
+	privMasterKey=>{
+		label=>'privMasterKey',
+		type=>'OCTETSTR',
+		access=>'Create',
+		syntax=>'SnmpAdminString',
+		defaultValue=>undef,
+	},
+	authLocalizedKey=>{
+		label=>'authLocalizedKey',
+		type=>'OCTETSTR',
+		access=>'Create',
+		syntax=>'SnmpAdminString',
+		defaultValue=>undef,
+	},
+	privLocalizedKey=>{
+		label=>'privLocalizedKey',
+		type=>'OCTETSTR',
+		access=>'Create',
+		syntax=>'SnmpAdminString',
+		defaultValue=>undef,
+	},
+	UseLongNames=>{
+		label=>'UseLongNames',
+		type=>'BOOLEAN',
+		access=>'ReadOnly',
+		syntax=>'BOOLEAN',
+		defaultValue=>0,
+	},
+	UseSprintValue=>{
+		label=>'UseSprintValue',
+		type=>'BOOLEAN',
+		access=>'ReadOnly',
+		syntax=>'BOOLEAN',
+		defaultValue=>0,
+	},
+	UseEnums=>{
+		label=>'UseEnums',
+		type=>'BOOLEAN',
+		access=>'ReadOnly',
+		syntax=>'BOOLEAN',
+		defaultValue=>0,
+	},
+	UseNumeric=>{
+		label=>'UseNumeric',
+		type=>'BOOLEAN',
+		access=>'ReadOnly',
+		syntax=>'BOOLEAN',
+		defaultValue=>0,
+	},
+	BestGuess=>{
+		label=>'BestGuess',
+		type=>'INTEGER',
+		access=>'ReadOnly',
+		syntax=>'INTEGER',
+		enums=>{
+			'Regular Lookup'=>0,
+			'Regular Expression Match'=>1,
+			'Random Access Lookup'=>2,
+		},
+		defaultValue=>2,
+	},
+);
 
 package MyDBI;
 use DBI;
 use SNMP;
 use strict;
 
+$MyDBI::dbh = undef;
+
 %MyDBI::schema = (
-	tables=>[ qw/winds pages hosts mxSyncTable mxDrivTable mxCardTable mxSpanTable mxBertTable mxXconTable mxNearEndCurrentTable mxNearEndIntervalTable mxNearEndTotalTable mxFarEndCurrentTable mxFarEndIntervalTable mxFarEndTotalTable/ ],
+	tables=>[ qw/winds pages panes hosts mxSyncTable mxDrivTable mxCardTable mxSpanTable mxChanTable mxBertTable mxXconTable mxNearEndCurrentTable mxNearEndIntervalTable mxNearEndTotalTable mxFarEndCurrentTable mxFarEndIntervalTable mxFarEndTotalTable mxMonitorTable mxCaptureScalars mxCaptureTable mxPushTable mxPullTable mxUploadTable mxDownloadTable mxCollectTable mxSctpScalars mxSctpTable mxFilterTable mxFilterProgTable mxBufferScalars/ ],
 	hosts=>{
 		keys=>[ qw/hostid/ ],
-		cols=>[ qw/hostid url/ ],
+		cols=>[ qw/hostid DestHost Community Version RemotePort Timeout Retries RetryNoSuch SecName SecLevel SecEngineId ContextEngineId Context AuthProto AuthPass PrivProto PrivPass authMasterKey privMasterKey authLocalizedKey privLocalizedKey UseLongNames UseSprintValue UseEnums UseNumeric BestGuess/ ],
 		tsql=>q{
 CREATE TABLE IF NOT EXISTS hosts (
 	hostid INT,
-	url TEXT,
+	DestHost TEXT UNIQUE,
+	Community TEXT,
+	Version CHARACTER(2),
+	RemotePort INT,
+	Timeout INT,
+	Retries INT,
+	RetryNoSuch BOOLEAN,
+	SecName TEXT,
+	SecLevel CHARACTER(12),
+	SecEngineId CHARACTER(32),
+	ContextEngineId CHARACTER(32),
+	Context TEXT,
+	AuthProto CHARACTER(3),
+	AuthPass TEXT,
+	PrivProto CHARACTER(3),
+	PrivPass TEXT,
+	authMasterKey TEXT,
+	privMasterKey TEXT,
+	authLocalizedKey TEXT,
+	privLocalizedKey TEXT,
+	UseLongNames BOOLEAN,
+	UseSprintValue BOOLEAN,
+	UseEnums BOOLEAN,
+	UseNumeric BOOLEAN,
+	BestGuess INT,
 	PRIMARY KEY(hostid)
 );
-},
+		},
 	},
 	winds=>{
 		keys=>[ qw/windid/ ],
@@ -60,7 +303,7 @@ CREATE TABLE IF NOT EXISTS winds (
 	height INT,
 	PRIMARY KEY(windid)
 );
-},
+		},
 	},
 	pages=>{
 		keys=>[ qw/windid pageid/ ],
@@ -73,11 +316,26 @@ CREATE TABLE IF NOT EXISTS pages (
 	xoffset INT,
 	yoffset INT,
 	scale REAL,
-	PRIMARY KEY(windid,pageid),
-	FOREIGN KEY(hostid) REFERENCES hosts(hostid),
-	FOREIGN KEY(windid) REFERENCES winds(windid)
+	PRIMARY KEY(windid,pageid)
+	-- FOREIGN KEY(hostid) REFERENCES hosts(hostid)
+	-- FOREIGN KEY(windid) REFERENCES winds(windid)
 );
 },
+	},
+	panes=>{
+		keys=>[ qw/paneid/ ],
+		cols=>[ qw/paneid xpos ypos width height sticky/ ],
+		tsql=>q{
+CREATE TABLE IF NOT EXISTS panes (
+	paneid TEXT,
+	xpos INT,
+	ypos INT,
+	width INT,
+	height INT,
+	sticky BOOLEAN,
+	PRIMARY KEY(paneid)
+);
+		},
 	},
 );
 
@@ -104,6 +362,18 @@ sub preparesql {
 #	print STDERR "S: $sql";
 	my $sth = $dbh->prepare($sql) or die $dbh->errstr;
 	return $sth;
+}
+
+$MyDBI::working = 0;
+
+sub begin_work {
+	$MyDBI::dbh->begin_work unless $MyDBI::working;
+	$MyDBI::working++;
+}
+
+sub commit {
+	$MyDBI::working--;
+	$MyDBI::dbh->commit unless $MyDBI::working;
 }
 
 sub mapit {
@@ -213,41 +483,53 @@ sub startdb {
 	my ($dn) = @_;
 	my $fn = "$dn.sqlite";
 #	print STDERR "I: connecting to database $fn\n";
-	$MyDBI::dbh = DBI->connect("dbi:SQLite:$fn") or die "can't open $fn";
+	my $dbh = DBI->connect("dbi:SQLite:$fn",undef,undef,{AutoCommit=>1}) or die "can't open $fn";
 	my $sql = qq{PRAGMA foreign_keys = OFF;\n};
-	dosql($MyDBI::dbh,$sql);
-	maketables(\%MyDBI::schema,$MyDBI::dbh);
+	dosql($dbh,$sql);
+	maketables(\%MyDBI::schema,$dbh);
+	return $dbh;
 }
 
 sub stopdb {
+	my $dbh = shift;
 	my $sql = qq{VACUUM;\n};
-	dosql($MyDBI::dbh,$sql);
-	destroysth(\%MyDBI::schema,$MyDBI::dbh);
+	dosql($dbh,$sql);
+	destroysth(\%MyDBI::schema,$dbh);
 #	print STDERR "I: disconnecting database\n";
-	$MyDBI::dbh->disconnect;
+	$dbh->disconnect;
 #	print STDERR "I: database disconnected\n";
-	undef $MyDBI::dbh;
+	undef $dbh;
 }
 
 sub initSchema {
 	foreach my $t ( @{$MyDBI::schema{tables}} ) {
-		next unless $t=~/^mx/;
-		my $table = $SNMP::MIB{$t};
-		next unless $table;
-		my $entry = $table->{children}[0];
+		next unless $t =~ /(Table|Scalars)$/;
 		my @inds = ();
 		my @cols = ();
-		{
-			my @indexes = @{$entry->{indexes}};
-			my @children = ( sort { $a->{subID} <=> $b->{subID} } @{$entry->{children}} );
-			my %labs = ();
-			foreach (@indexes) {
-				$labs{$_} = 1;
-				push @inds, $SNMP::MIB{$_};
+		my $entry;
+		if ($t=~/Table$/) {
+			my $table = $SNMP::MIB{$t};
+			next unless $table;
+			$entry = $table->{children}[0];
+			{
+				my @indexes = @{$entry->{indexes}};
+				my @children = ( sort { $a->{subID} <=> $b->{subID} } @{$entry->{children}} );
+				my %labs = ();
+				foreach (@indexes) {
+					$labs{$_} = 1;
+					push @inds, $SNMP::MIB{$_};
+				}
+				foreach ( @children ) {
+					next if exists $labs{$_->{label}};
+					push @cols, $_;
+				}
 			}
-			foreach ( @children ) {
-				next if exists $labs{$_->{label}};
-				push @cols, $_;
+		} elsif ($t=~/Scalars$/) {
+			my $r = $t; $r=~s/Scalars$//;
+			my $entry = $SNMP::MIB{$r};
+			next unless $entry;
+			foreach ( sort {$a->{subID}<=>$b->{subID}} @{$entry->{children}} ) {
+				push @cols, $_ unless $_->{access} eq 'NoAccess';
 			}
 		}
 		$MyDBI::schema{$t} = {};
@@ -262,13 +544,13 @@ sub initSchema {
 			$keys .= ','.$_->{label};
 		}
 		$keys .= ')';
-		$keys .= ",\n\tFOREIGN KEY(hostid) REFERENCES hosts(hostid)";
+#		$keys .= ",\n\tFOREIGN KEY(hostid) REFERENCES hosts(hostid)";
 		foreach (@inds) {
 			push @{$MyDBI::schema{$t}{keys}}, $_->{label};
 			push @{$MyDBI::schema{$t}{cols}}, $_->{label};
 			$MyDBI::schema{$t}{tsql} .= ",\n\t$_->{label} ".mapit($_);
 			if ($_->{parent} ne $entry) {
-				$keys .= ",\n\tFOREIGN KEY($_->{label}) REFERENCES $_->{parent}->{parent}->{label}($_->{label})";
+#				$keys .= ",\n\tFOREIGN KEY($_->{label}) REFERENCES $_->{parent}->{parent}->{label}($_->{label})";
 			}
 		}
 		foreach (@cols) {
@@ -281,62 +563,1629 @@ sub initSchema {
 }
 
 # ----------------------------------
-package ChanDialog;
+package MibNode;
 use strict;
+use Glib;
 use Gtk2;
-use Glib qw(TRUE FALSE);
-use vars qw(@ISA);
-@ISA = qw(Gtk2::Dialog);
+use Gtk2::SimpleList;
 # ----------------------------------
-#package ChanDialog;
-sub myaddentry {
-	my ($self,$entryno,$label) = @_;
-	if ((my $t = $self->{table})) {
-		my ($l,$b,$e,$m,$units);
-		$l = Gtk2::Label->new($label);
-		$t->attach_defaults($l,0,1,$entryno,$entryno+1);
-		$b = $self->{$label} = Gtk2::EntryBuffer->new('');
-		$e = Gtk2::Entry->new_with_buffer($b);
-		$e->set_editable(TRUE);
-		$t->attach_defaults($e,1,2,$entryno,$entryno+1);
-		$units = '';
-		if (($m = $SNMP::MIB{$label})) {
-			if ($m->{units}) {
-				$units = $m->{units};
-			} elsif ($m->{textualConvention}) {
-				$units = $m->{textualConvention};
-			}
+# this is a grouping of three widgets providing a row in a Gtk2::Table to be
+# used for inputing and displaying data.
+# ----------------------------------
+sub new {
+	my ($type,$obj,$label) = @_;
+	my $self = {};
+	bless $self,$type;
+	my $data = $obj->_data;
+	my $prefix = $data->{table};
+	$prefix =~ s/Table$//;
+	my $short = $label;
+	$short =~ s/^$prefix//;
+	my $m = $self->{m} = $data->{mib}{$label};
+	my $val = $self->{val} = \$data->{$label};
+	my $lf = $self->{lf} = Gtk2::Frame->new();
+	my $l = $self->{l} = Gtk2::Label->new($short);
+	$l->set_alignment(1.0,0.5);
+	$lf->set_shadow_type('etched-out');
+	$lf->add($l);
+	if ((defined $m->{syntax} and $m->{syntax} eq 'TruthValue') or (defined $m->{type} and $m->{type} eq 'BOOLEAN')) {
+		$$val = 0 unless defined $$val;
+		my $e = $self->{e} = Gtk2::ToggleButton->new;
+		$e->set_active($$val == 1 or $$val eq 'true' ?  Glib::TRUE : Glib::FALSE);
+		if ($m->{syntax} eq 'TruthValue') {
+			bless $self,'MibNodeTruth';
+		} else {
+			bless $self,'MibNodeBoolean';
 		}
-		$l = Gtk2::Label->new($units);
-		$t->attach_defaults($l,2,3,$entryno,$entryno+1);
+		$self->{ef} = $self->{e};
+	} elsif (defined $m->{type} and $m->{type} eq 'BITS') {
+		$$val = '' unless defined $$val;
+		my @rows = ();
+		foreach (sort {$m->{enums}{$a}<=>$m->{enums}{$b}} keys %{$m->{enums}}) {
+			push @rows, [ $_, $m->{enums}{$_} ];
+		}
+		my $ef = $self->{ef} = Gtk2::Frame->new();
+		my $e = $self->{e} = Gtk2::SimpleList->new(tag=>'text',value=>'int');
+		$e->set_headers_visible(Glib::FALSE);
+		$e->set_grid_lines('horizontal');
+		@{$e->{data}} = @rows;
+		$e->get_selection->set_mode('multiple');
+		my @sels = ();
+		my @bits = (); foreach (values %{$m->{enums}}) { $bits[$_] = '0'; }
+		@bits = map {'0'} @bits;
+		my $bits = join('',@bits);
+
+		my $use = MibNodeList->snmpval($m,$$val);
+		$bits = unpack('B*',$use).$bits;
+
+		my $i = 0;
+		foreach (sort {$m->{enums}{$a}<=>$m->{enums}{$b}} keys %{$m->{enums}}) {
+			if (substr($bits,$m->{enums}{$_},1) eq '1') {
+				push @sels,$i;
+			}
+			$i++;
+		}
+		$e->select(@sels);
+		$ef->set_shadow_type('in');
+		$ef->add($e);
+		bless $self,'MibNodeList';
+	} elsif (defined $m->{enums} and $m->{enums} and scalar keys %{$m->{enums}} > 0) {
+		$$val = 0 unless defined $$val;
+		my $e = $self->{e} = Gtk2::ComboBox->new_text;
+		$e->set_title($label);
+		my $i = 0;
+		foreach (sort {$m->{enums}{$a}<=>$m->{enums}{$b}} keys %{$m->{enums}}) {
+			$e->append_text($_);
+			$e->set_active($i) if $$val eq $_ or ($$val =~ /^d+$/ and $$val == $m->{enums}{$_});
+			$i++;
+		}
+#		$e->set_active_text($$val) if $m->{type} eq 'OCTETSTR';
+		if (defined $m->{access} and $m->{access} =~ /Write|Create/) {
+			$e->set('button-sensitivity','on');
+		} else {
+			$e->set('button-sensitivity','off');
+		}
+		bless $self,'MibNodeCombo';
+		$self->{ef} = $self->{e};
+	} else {
+		$$val = '' unless defined $$val;
+		my $b = $self->{b} = Gtk2::EntryBuffer->new($$val);
+		my $e = $self->{e} = Gtk2::Entry->new_with_buffer($b);
+		$e->set_editable((defined $m->{access} and $m->{access} =~ /Write|Create/) ? Glib::TRUE : Glib::FALSE);
+		$e->set(visibility=>Glib::FALSE) if defined $m->{type} and $m->{type} eq 'PASSWORD';
+		bless $self,'MibNodeEntry';
+		$self->{ef} = $self->{e};
+	}
+	my $units = '';
+	$units = $m->{type} if $m->{type};
+	$units = $m->{syntax} if $m->{syntax};
+	$units = $m->{textualConvention} if $m->{textualConvention};
+	$units = $m->{units} if $m->{units};
+	my $uf = $self->{uf} = Gtk2::Frame->new();
+	my $u = $self->{u} = Gtk2::Label->new($units);
+	$u->set_alignment(0.0,0.5);
+	$uf->set_shadow_type('etched-out');
+	$uf->add($u);
+	return $self;
+}
+sub add_to_table {
+	my ($self,$table,$entryno) = @_;
+	$table->attach($self->{lf},0,1,$entryno,$entryno+1,'fill','fill',0,0);
+	$table->attach($self->{ef},1,2,$entryno,$entryno+1,'fill','fill',0,0);
+	$table->attach($self->{uf},2,3,$entryno,$entryno+1,'fill','fill',0,0);
+	return $self;
+}
+sub revert {
+	my $self = shift;
+	my $val = $self->{val};
+	$self->setval($$val);
+}
+sub store {
+	my $self = shift;
+	my $val = $self->{val};
+	$$val = $self->getval;
+}
+sub classof {
+	my ($m) = @_;
+	if ((defined $m->{syntax} and $m->{syntax} eq 'TruthValue') or (defined $m->{type} and $m->{type} eq 'BOOLEAN')) {
+		if ($m->{syntax} eq 'TruthValue') {
+			return 'MibNodeTruth';
+		} else {
+			return 'MibNodeBoolean';
+		}
+	} elsif (defined $m->{type} and $m->{type} eq 'BITS') {
+		return 'MibNodeList';
+	} elsif (defined $m->{enums} and $m->{enums} and scalar keys %{$m->{enums}} > 0) {
+		return 'MibNodeCombo';
+	} else {
+		return 'MibNodeEntry';
 	}
 }
-#package ChanDialog;
+sub convert {
+	my ($m,$val) = @_;
+	my $class = MibNode::classof($m);
+	$val = "$class"->snmpval($m,$val);
+	return $val;
+}
+
+# ----------------------------------
+package MibNodeTruth;
+use strict;
+use Glib;
+use Gtk2;
+use vars qw(@ISA);
+@ISA = qw(MibNode);
+# ----------------------------------
+sub snmpval {
+	my ($type,$m,$val) = @_;
+	if (not defined $val) {
+		return MibNodeTruth->snmpval($m,$m->{defaultValue}) if exists
+			$m->{defaultValue} and defined $m->{defaultValue};
+		$val = 2;
+	} elsif ($val=~/^\d+$/) {
+		$val = 2 unless $val == 1;
+	} else {
+		$val = 1 if $val=~/true|yes|on/i;
+		$val = 2 if $val=~/false|no|off/i;
+	}
+	return ($val);
+}
+sub getval {
+	return shift->{e}->get_active ? 1 : 2;
+}
+sub setval {
+	shift->{e}->set_active(shift == 1 ? Glib::TRUE : Glib::FALSE);
+}
+
+# ----------------------------------
+package MibNodeBoolean;
+use strict;
+use Glib;
+use Gtk2;
+use vars qw(@ISA);
+@ISA = qw(MibNode);
+# ----------------------------------
+sub snmpval {
+	my ($type,$m,$val) = @_;
+	if ($val=~/^\d+$/) {
+		$val = 0 unless $val == 1;
+	} else {
+		$val = 1 if $val=~/true|yes|on/i;
+		$val = 0 if $val=~/false|no|off/i;
+	}
+	return ($val);
+}
+sub getval {
+	return shift->{e}->get_active ? 1 : 0;
+}
+sub setval {
+	shift->{e}->set_active(shift == 1 ? Glib::TRUE : Glib::FALSE);
+}
+
+# ----------------------------------
+package MibNodeList;
+use strict;
+use Glib;
+use Gtk2;
+use vars qw(@ISA);
+@ISA = qw(MibNode);
+# ----------------------------------
+sub snmpval {
+	my ($type,$m,$val) = @_;
+	if (not defined $val) {
+		# try default
+		return MibNodeList->snmpval($m,$m->{defaultValue}) if exists $m->{defaultValue} and defined $m->{defaultValue};
+		# do all zeros
+		my @bits = (); foreach (values %{$m->{enums}}) { $bits[$_] = 0; }
+		@bits = map {'0'} @bits;
+		my $bits = join('',@bits).'0000000';
+		$bits = substr($bits,0,8*int(length($bits)/8));
+		$val = pack('B*',$bits);
+	} elsif ($val=~/^((\w+\b)(\n?\w+\b)*)?$/) {
+		# found line feed array
+		my @bits = (); foreach (values %{$m->{enums}}) { $bits[$_] = 0; }
+		@bits = map {'0'} @bits;
+		my $bits = join('',@bits).'0000000';
+		$bits = substr($bits,0,8*int(length($bits)/8));
+		foreach (split(/\n/,$val)) {
+			if (defined $m->{enums}{$_}) {
+				substr($bits,$m->{enums}{$_},1) = '1';
+			} elsif (/^\d+$/) {
+				substr($bits,$_,1) = '1';
+			}
+		}
+		$val = pack('B*',$bits);
+	} elsif ($val=~/^\s*{\s*((\w+\b)(\s*[,]?\s*\w+\b)*)?\s*}\s*$/) {
+		# found parethentical list
+		my @bits = (); foreach (values %{$m->{enums}}) { $bits[$_] = 0; }
+		@bits = map {'0'} @bits;
+		my $bits = join('',@bits).'0000000';
+		$bits = substr($bits,0,8*int(length($bits)/8));
+		$val=~s/^\s*{\s*//; $val=~s/\s*}\s*$//;
+		foreach (split(/\b\s*[,]?\s*/,$val)) {
+			if (defined $m->{enums}{$_}) {
+				substr($bits,$m->{enums}{$_},1) = '1';
+			} elsif (/^\d+$/) {
+				substr($bits,$_,1) = '1';
+			}
+		}
+		$val = pack('B*',$bits);
+	} elsif ($val=~/^"([0-9a-fA-F][0-9a-fA-f])*\s*"$/) {
+		# found hexadecimal string
+		$val=~s/^"//; $val=~s/\s*"$//;
+		$val = pack('H*',$val);
+	} elsif ($val=~/^[0-9]+$/) {
+		# found number
+		$val = pack('N',$val);
+	}
+	return ($val);
+}
+sub getval {
+	my $self = shift;
+	my $e = $self->{e};
+	my $m = $self->{m};
+	my @bits = ();
+	foreach (values %{$m->{enums}}) { $bits[$_] = 0; }
+	foreach ($e->get_selected_indices) {
+		$bits[$e->{data}[$_][1]] = 1;
+	}
+	my $bits = '';
+	for (my $i = 0; $i < @bits; $i++) {
+		$bits .= $bits[$i] == 1 ? '1' : '0';
+	}
+	return pack('B*',$bits);
+}
+sub setval {
+	my ($self,$val) = @_;
+	my $e = $self->{e};
+	my $m = $self->{m};
+	my @sels = ();
+	my @bits = (); foreach (values %{$m->{enums}}) { $bits[$_] = '0'; }
+	@bits = map {'0'} @bits;
+	my $bits = join('',@bits);
+	$bits = unpack('B*',$val).$bits;
+	my $i = 0;
+	foreach (sort {$m->{enums}{$a}<=>$m->{enums}{$b}} keys %{$m->{enums}}) {
+		if (substr($bits,$m->{enums}{$_},1) eq '1') {
+			push @sels,$i;
+		}
+		$i++;
+	}
+	$e->select(@sels);
+}
+
+# ----------------------------------
+package MibNodeCombo;
+use strict;
+use Glib;
+use Gtk2;
+use vars qw(@ISA);
+@ISA = qw(MibNode);
+# ----------------------------------
+sub snmpval {
+	my ($type,$m,$val) = @_;
+	if ($m->{type} eq 'OCTETSTR') {
+		if (not defined $val) {
+			return MibNodeCombo->snmpval($m,$m->{defaultValue}) if
+				exists $m->{defaultValue} and
+				defined $m->{defaultValue};
+			$val = '';
+		} elsif ($val =~ /^\d+$/) {
+			my %vals = map {$m->{enums}{$_}=>$_} keys %{$m->{enums}};
+			$val = $vals{$val} if exists $vals{$val};
+		}
+	} elsif ($m->{type} eq 'INTEGER') {
+		if (not defined $val) {
+			return MibNodeCombo->snmpval($m,$m->{defaultValue}) if
+				exists $m->{defaultValue} and
+				defined $m->{defaultValue};
+			$val = 0;
+		} elsif ($val !~ /^\d+$/) {
+			$val = $m->{enums}{$val} if exists $m->{enums}{$val};
+		}
+	}
+	return $val;
+}
+sub getval {
+	return shift->{e}->get_active_text;
+}
+sub setval {
+	my ($self,$val) = @_;
+	my $e = $self->{e};
+	my $m = $self->{m};
+	my $i = 0;
+	my %rows = map {$m->{enums}{$_}=>$i++} keys %{$m->{enums}};
+	$e->set_active($rows{$val});
+}
+
+# ----------------------------------
+package MibNodeEntry;
+use strict;
+use Glib;
+use Gtk2;
+use vars qw(@ISA);
+@ISA = qw(MibNode);
+# ----------------------------------
+sub snmpval {
+	my ($type,$m,$val) = @_;
+	if ($m->{type} eq 'OCTETSTR') {
+		if (not defined $val) {
+			return MibNodeEntry->snmpval($m,$m->{defaultValue}) if
+				exists $m->{defaultValue} and
+				defined $m->{defaultValue};
+			$val = '';
+		} elsif ($val =~ /^"([^"]*)"$/) {
+			$val = $1;
+		} elsif ($val =~ /^\\"([^"]*)\\"$/) {
+			$val = $1;
+		}
+	} elsif ($m->{type} =~ /INTEGER|UNSIGNED|COUNTER|GAUGE/) {
+		if (not defined $val) {
+			return MibNodeEntry->snmpval($m,$m->{defaultValue}) if
+				exists $m->{defaultValue} and
+				defined $m->{defaultValue};
+			$val = 0;
+		} elsif ($val =~ /^0x/) {
+			$val = int($val);
+		} elsif ($val =~ /^'(([0-9a-fA-F][0-9a-fA-F])+)'H$/) {
+			$val = int("0x$1");
+		}
+	}
+	return $val;
+}
+sub getval {
+	return shift->{e}->get_text;
+}
+sub setval {
+	shift->{e}->set_text(shift);
+}
+
+# ----------------------------------
+package HiddenData;
+use strict;
+# ----------------------------------
+#package HiddenData;
 sub new {
-	my ($type,$parent) = @_;
-	my @labels = ( qw/mxDrivName mxCardIndex mxSpanIndex mxChanIndex mxChanType mxChanFormat mxChanRate mxChanMode mxChanSap mxChanAdministrativeState mxChanOperationalState mxChanUsageState mxChanAvailabilityStatus mxChanControlStatus mxChanProceduralStatus mxChanAlarmStatus mxChanStandbyStatus/ );
-	my $self = Gtk2::Dialog->new('Channel Dialog',$parent,'destroy-with-parent',
+	my ($type,@args) = @_;
+	my $self = {};
+	bless $self,$type;
+	$self->{'.data'} = {}  unless exists $self->{'.data'};
+	return $self;
+}
+#package HiddenData;
+sub _data {
+	my $self = shift;
+	unless (exists $self->{'.data'}) {
+		$self->{'.data'} = {};
+	}
+	return $self->{'.data'};
+}
+
+# ----------------------------------
+package Destroyable;
+use strict;
+use Glib;
+use Gtk2;
+use vars qw(@ISA);
+@ISA = qw(HiddenData);
+# ----------------------------------
+#package Destroyable;
+sub _init {
+	my ($self,@args) = @_;
+	my $data = $self->_data;
+	$self->signal_connect('destroy-event'=>sub{
+		my ($self,$ev) = @_;
+		return $self->_destroy($ev);
+	}) or Carp::cluck "Bad signal handler";
+	return $self;
+}
+#package Destroyable;
+sub _destroy {
+	my ($self,$ev) = @_;
+	# default is not to do anything, override this method to do something
+	return Gtk2::EVENT_PROPAGATE;
+}
+
+# ----------------------------------
+package Store;
+use strict;
+use Carp;
+use DBI;
+use Time::HiRes qw(gettimeofday tv_interval);
+use vars qw(@ISA);
+@ISA = qw(HiddenData);
+# ----------------------------------
+#package Store;
+%Store::hash = ();
+#package Store;
+sub hash {
+	my $data = shift->_data;
+	my $hash = $data->{hash};
+	unless ($hash) {
+		my $table = $data->{table};
+		my @keys = map {$data->{$_}} @{$data->{schema}{keys}};
+		$hash = $data->{hash} = join('::',$table,@keys);
+	}
+	return $hash;
+}
+#package Store;
+sub _init {
+	my ($self,$table,@args) = @_;
+	my $data = $self->_data;
+	$data->{parts} = [] unless exists $data->{parts};
+	$data->{sides} = [] unless exists $data->{sides};
+	$data->{table} = $table;
+	my $schema = $data->{schema} = $MyDBI::schema{$table};
+	my $knum = @{$MyDBI::schema{$table}{keys}};
+	my @keys = (); for (my $i = 0; $i < $knum; $i++) { push @keys, $args[$i] }
+	my $hash = $data->{hash} = join('::',$table,@keys);
+	$Store::hash{$hash} = $self;
+	foreach (@{$schema->{cols}}) {
+		$data->{$_} = shift @args if @args > 0;
+	}
+	return $self;
+}
+#package Store;
+sub add_part {
+	my ($self,$part) = @_;
+	my $data = $self->_data;
+	push @{$data->{parts}}, $part if $part;
+	return $self;
+}
+#package Store;
+sub del_part {
+	my ($self,$part) = @_;
+	my $data = $self->_data;
+	my %parts = map {$_=>1} @{$data->{parts}};
+	delete $parts{$part};
+	$data->{parts} = [keys %parts];
+	return $self;
+}
+#package Store;
+sub new {
+	my ($type,$table,@args) = @_;
+	my $self = {};
+	bless $self,$type;
+	$self->Store::_init($table,@args);
+	return $self;
+}
+#package Store;
+sub get {
+	my ($type,$table,@args) = @_;
+	my $self = Store::find($table,@args);
+	$self = Store::new(@_) unless $self;
+	return $self;
+}
+#package Store;
+sub find {
+	my ($table,@args) = @_;
+	my $knum = @{$MyDBI::schema{$table}{keys}};
+	my @keys = (); for (my $i = 0; $i < $knum; $i++) { push @keys, $args[$i] }
+	my $hash = join('::',$table,@keys);
+	return $Store::hash{$hash};
+}
+#package Store;
+sub read {
+	my $self = shift;
+	my $data = $self->_data;
+	my $result = Glib::FALSE;
+	my $sth = $data->{schema}{select};
+	if ($sth->execute(map {$data->{$_}} @{$data->{schema}{keys}})) {
+		if (my $row = $sth->fetchrow_hashref) {
+			foreach (@{$data->{schema}{cols}}) {
+				$data->{$_} = $row->{$_};
+			}
+			$result = Glib::TRUE;
+		}
+		$sth->finish;
+	} else {
+		warn $sth->errstr;
+	}
+	my $mib = $data->{mib};
+	foreach (@{$data->{schema}{cols}}) {
+		my $m = $mib->{$_};
+		$data->{$_} = MibNode::convert($m,$m->{defaultValue})
+			unless exists $data->{$_}
+			or not exists $m->{defaultValue}
+			or not defined $m->{defaultValue};
+	}
+	return $result;
+}
+#package Store;
+sub read_all {
+	my $self = shift;
+	my $data = $self->_data;
+	$self->read;
+	foreach (@{$data->{sides}}) {
+		$_->read_all;
+	}
+	foreach (@{$data->{parts}}) {
+		$_->read_all;
+	}
+	return $self;
+}
+#package Store;
+sub save {
+	my $self = shift;
+	my $data = $self->_data;
+	my $sth = $data->{schema}{insert};
+	MyDBI::begin_work;
+	$sth->execute(map {$data->{$_}} @{$data->{schema}{cols}}) or warn $sth->errstr;
+	MyDBI::commit;
+	return $self;
+}
+#package Store;
+sub save_all {
+	my $self = shift;
+	my $data = $self->_data;
+	MyDBI::begin_work;
+	$self->save;
+	foreach (@{$data->{sides}}) { $_->save_all }
+	foreach (@{$data->{parts}}) { $_->save_all }
+	MyDBI::commit;
+	return $self;
+}
+#package Store;
+sub remove {
+	my $self = shift;
+	my $data = $self->_data;
+	my $sth = $data->{schema}{delete};
+	MyDBI::begin_work;
+	foreach (@{$data->{sides}}) { $_->remove }
+	foreach (@{$data->{parts}}) { $_->remove }
+	$sth->execute(map {$data->{$_}} @{$data->{schema}{keys}}) or warn $sth->errstr;
+	MyDBI::commit;
+	return $self;
+}
+#package Store;
+sub delete {
+	my ($table,@args) = @_;
+	my $knum = @{$MyDBI::schema{$table}{keys}};
+	my @keys = (); for (my $i = 0; $i < $knum; $i++) { push @keys, $args[$i] }
+	my $hash = join('::',$table,@keys);
+	my $item = delete $Store::hash{$hash};
+	$item->remove if $item;
+	return $item;
+}
+
+# ----------------------------------
+package ViewList;
+use strict;
+# ----------------------------------
+sub new {
+	my $type = shift;
+	my $self = {};
+	bless $self,$type;
+	$self->{views} = ();
+	return $self;
+}
+sub add_view {
+	my ($self,$view) = @_;
+	foreach (@{$self->{views}}) { return $self if $_ eq $view; }
+	push @{$self->{views}}, $view;
+	return $self;
+}
+sub del_view {
+	my ($self,$view) = @_;
+	my @views = ();
+	foreach (@{$self->{views}}) { push @views, $_ if $_ ne $view; }
+	$self->{views} = \@views;
+	return $self;
+}
+sub get_views {
+	return @{shift->{views}};
+}
+
+# ----------------------------------
+package Viewable;
+use strict;
+use vars qw(@ISA);
+@ISA = qw(HiddenData);
+# ----------------------------------
+#package Viewable;
+sub _init {
+	my $self = shift;
+	my $data = $self->_data;
+	$data->{viewlist} = ViewList->new;
+	return $self;
+}
+#package Viewable;
+sub new {
+	my $type = shift;
+	my $self = {};
+	bless $self,$type;
+	return $self->Viewable::_init;
+}
+#package Viewable;
+#sub DESTROY {
+#	my $self = shift;
+#	my $data = $self->_data;
+#	foreach ($self->get_views) { $_->destroy; }
+#}
+#package Viewable;
+sub add_view {
+	my ($self,$view) = @_;
+	my $data = $self->_data;
+	$data->{viewlist}->add_view($view);
+	return $self;
+}
+#package Viewable;
+sub del_view {
+	my ($self,$view) = @_;
+	my $data = $self->_data;
+	$data->{viewlist}->del_view($view);
+	return $self;
+}
+#package Viewable;
+sub get_views {
+	my $self = shift;
+	return $self->_data->{viewlist}->get_views;
+}
+#package Viewable;
+sub view_list {
+	return shift->_data->{viewlist};
+}
+#package Viewable;
+sub refresh_viewable {
+	my $self = shift;
+	my $data = $self->_data;
+	if ($data->{active}) {
+		foreach ($self->get_views) { $_->refresh_view($self); }
+	}
+	return $self;
+}
+#package Viewable;
+sub disable_viewable {
+	my $self = shift;
+	my $data = $self->_data;
+	foreach ($self->get_views) { $_->disable_view($self); }
+	$data->{active} = Glib::FALSE;
+	return $self;
+}
+#package Viewable;
+sub enable_viewable {
+	my $self = shift;
+	my $data = $self->_data;
+	foreach ($self->get_views) { $_->enable_view($self); }
+	my $was_active = $data->{active};
+	$data->{active} = Glib::TRUE;
+	$self->refresh_viewable unless $was_active;
+	return $self;
+}
+
+# ----------------------------------
+package View;
+use strict;
+use Carp;
+use Glib;
+use Gtk2;
+use vars qw(@ISA);
+@ISA = qw(Destroyable);
+# ----------------------------------
+#package View;
+sub _init {
+	my ($self,$obj) = @_;
+	my $data = $self->_data;
+	$data->{subvs} = () unless exists $data->{subvs};
+	$data->{active} = Glib::FALSE;
+	my $vlst = $data->{vlst} = $obj->view_list;
+	$vlst->add_view($self);
+}
+#package View;
+sub _destroy {
+	my ($self,$ev) = @_;
+	my $data = $self->data;
+	if (my $vlst = delete $data->{vlst}) {
+		$vlst->del_view($self);
+	}
+	return $self->SUPER::_destroy($ev);
+}
+#package View;
+sub refresh_view {
+	my ($self,$obj) = @_;
+	my $data = $self->_data;
+	$self->enable_view($obj) unless $data->{active};
+	# default is to do nothing
+	return $self;
+}
+#package View;
+sub enable_view {
+	my ($self,$obj) = @_;
+	my $data = $self->_data;
+	# default is to do nothing
+	$data->{active} = Glib::TRUE;
+	return $self;
+}
+#package View;
+sub disable_view {
+	my ($self,$obj) = @_;
+	my $data = $self->_data;
+	# default is to do nothing
+	$data->{active} = Glib::FALSE;
+	return $self;
+}
+
+
+# ----------------------------------
+package MibData;
+use strict;
+use DBI;
+use SNMP;
+use vars qw(@ISA);
+@ISA = qw(Store Viewable);
+# ----------------------------------
+#package MibData;
+sub _init {
+	my ($self,$name,$table,$mib,@args) = @_;
+	my $data = $self->Viewable::_init()->_data;
+	$data->{name} = $name;
+	$data->{mib} = $mib;
+	return $self;
+}
+#package MibData;
+sub new {
+	my ($type,$name,$table,$mib,@args) = @_;
+	my $self = Store::new($type,$table,@args);
+	$self->MibData::_init($name,$table,$mib,@args);
+	my $data = $self->_data;
+	foreach (@{$data->{schema}{cols}}) {
+		my $m = $mib->{$_};
+		$data->{$_} = MibNode::convert($m,$m->{defaultValue})
+			unless exists $data->{$_}
+			or not exists $m->{defaultValue}
+			or not defined $m->{defaultValue};
+	}
+	return $self;
+}
+#package MibData;
+sub get {
+	my ($type,$name,$table,$mib,@args) = @_;
+	my $self = Store::find($table,@args);
+	my $read = Glib::FALSE;
+	unless ($self) {
+		$self = MibData::new(@_);
+		$read = $self->read;
+	}
+	$self->save unless $read;
+	return $self;
+}
+#package MibData;
+sub dialog {
+	my ($self,$parent) = @_;
+	my $data = $self->_data;
+	if ($data->{dialog}) {
+		$data->{dialog}->raise;
+	} else {
+		$data->{dialog} = Dialog->new($data->{name},$self,$parent);
+		$data->{dialog}->run;
+	}
+	return $self;
+}
+
+
+# ----------------------------------
+package SnmpData;
+use strict;
+use DBI;
+use SNMP;
+use vars qw(@ISA);
+@ISA = qw(MibData);
+# ----------------------------------
+#package SnmpData;
+sub new {
+	my ($type,$name,$table,@args) = @_;
+	return MibData::new($type,$name,$table,\%SNMP::MIB,@args);
+}
+#package SnmpData;
+sub get {
+	my ($type,$name,$table,@args) = @_;
+	my $self = Store::find($table,@args);
+	my $read = Glib::FALSE;
+	unless ($self) {
+		$self = SnmpData::new(@_);
+		$read = $self->read;
+	}
+	$self->save unless $read;
+	return $self;
+}
+
+# ----------------------------------
+package XconData;
+use vars qw(@ISA);
+@ISA = qw(SnmpData);
+# ----------------------------------
+#package XconData;
+sub get {
+	my ($type,@args) = @_;
+	return SnmpData::get($type,'Cross-connect','mxXconTable',@args);
+}
+#package XconData;
+sub label {
+	my $self = shift;
+	my $data = $self->_data;
+	$data->{label} = "$data->{DestHost}\@$data->{mxDrivName}$data->{mxCardIndex}:$data->{mxSpanIndex}.$data->{mxChanIndex}" unless exists $data->{label};
+	return $data->{label};
+}
+#package XconData;
+sub stitle {
+	my $self = shift;
+	my $data = $self->_data;
+	$data->{stitle} = "Channel $data->{mxChanIndex} Cross-connect" unless exists $data->{stitle};
+	return $data->{stitle};
+}
+#package XconData;
+sub new {
+	my ($type,$name,@args) = @_;
+	my $self = SnmpData::new($type,'Cross-connect','mxXconTable',@args);
+	my $read = $self->read;
+	my $data = $self->_data;
+	$data->{DestHost} = $name;
+	$self->save unless $read;
+	return $self;
+}
+
+# ----------------------------------
+package ChanData;
+use vars qw(@ISA);
+@ISA = qw(SnmpData);
+# ----------------------------------
+#package ChanData;
+sub get {
+	my ($type,@args) = @_;
+	return SnmpData::get($type,'Channel','mxChanTable',@args);
+}
+#package ChanData;
+sub label {
+	my $self = shift;
+	my $data = $self->_data;
+	$data->{label} = "$data->{DestHost}\@$data->{mxDrivName}$data->{mxCardIndex}:$data->{mxSpanIndex}.$data->{mxChanIndex}" unless exists $data->{label};
+	return $data->{label};
+}
+#package ChanData;
+sub stitle {
+	my $self = shift;
+	my $data = $self->_data;
+	$data->{stitle} = "Channel $data->{mxChanIndex}" unless exists $data->{stitle};
+	return $data->{stitle};
+}
+#package ChanData;
+sub new {
+	my ($type,$name,@args) = @_;
+	my $self = SnmpData::new($type,'Channel','mxChanTable',@args);
+	my $read = $self->read;
+	my $data = $self->_data;
+	$data->{DestHost} = $name;
+	my ($hostid,$mxDrivName,$mxCardIndex,$mxSpanIndex,$mxChanIndex) = @args;
+	my @keys = ($hostid,$mxDrivName,$mxCardIndex,$mxSpanIndex,$mxChanIndex);
+	my $side;
+	$side = $data->{xcon} = XconData->new($data->{DestHost},@keys);
+	push @{$data->{sides}}, $side if $side;
+	$self->save unless $read;
+	return $self;
+}
+
+# ----------------------------------
+package BertData;
+use vars qw(@ISA);
+@ISA = qw(SnmpData);
+# ----------------------------------
+#package BertData;
+sub get {
+	my ($type,@args) = @_;
+	return SnmpData::get($type,'Bert','mxBertTable',@args);
+}
+#package BertData;
+sub label {
+	my $self = shift;
+	my $data = $self->_data;
+	$data->{label} = "$data->{DestHost}\@$data->{mxDrivName}$data->{mxCardIndex}:$data->{mxSpanIndex}" unless exists $data->{label};
+	return $data->{label};
+}
+#package BertData;
+sub stitle {
+	my $self = shift;
+	my $data = $self->_data;
+	$data->{stitle} = "Bert Span $data->{mxSpanIndex}" unless exists $data->{stitle};
+	return $data->{stitle};
+}
+#package BertData;
+sub new {
+	my ($type,$name,@args) = @_;
+	my $self = SnmpData::new($type,'Bert','mxBertTable',@args);
+	my $read = $self->read;
+	my $data = $self->_data;
+	$data->{DestHost} = $name;
+	$self->save unless $read;
+	return $self;
+}
+
+# ----------------------------------
+package NECurData;
+use vars qw(@ISA);
+@ISA = qw(SnmpData);
+# ----------------------------------
+#package NECurData;
+sub get {
+	my ($type,@args) = @_;
+	return SnmpData::get($type,'Near-end Current','mxNearEndCurrentTable',@args);
+}
+#package NECurData;
+sub label {
+	my $self = shift;
+	my $data = $self->_data;
+	$data->{label} = "$data->{DestHost}\@$data->{mxDrivName}$data->{mxCardIndex}:$data->{mxSpanIndex}" unless exists $data->{label};
+	return $data->{label};
+}
+#package NECurData;
+sub stitle {
+	my $self = shift;
+	my $data = $self->_data;
+	$data->{stitle} = "Span $data->{mxSpanIndex} Near-end Current" unless exists $data->{stitle};
+	return $data->{stitle};
+}
+#package NECurData;
+sub new {
+	my ($type,$name,@args) = @_;
+	my $self = SnmpData::new($type,'Near-end Current','mxNearEndCurrentTable',@args);
+	my $read = $self->read;
+	my $data = $self->_data;
+	$data->{DestHost} = $name;
+	$self->save unless $read;
+	return $self;
+}
+
+# ----------------------------------
+package NEIntData;
+use vars qw(@ISA);
+@ISA = qw(SnmpData);
+# ----------------------------------
+#package NEIntData;
+sub get {
+	my ($type,@args) = @_;
+	return SnmpData::get($type,'Near-end Interval','mxNearEndIntervalTable',@args);
+}
+#package NEIntData;
+sub label {
+	my $self = shift;
+	my $data = $self->_data;
+	$data->{label} = "$data->{DestHost}\@$data->{mxDrivName}$data->{mxCardIndex}:$data->{mxSpanIndex}\[$data->{mxNearEndIntervalIndex}\]" unless exists $data->{label};
+	return $data->{label};
+}
+#package NEIntData;
+sub stitle {
+	my $self = shift;
+	my $data = $self->_data;
+	$data->{stitle} = "Near-end Interval $data->{mxNearEndIntervalIndex}" unless exists $data->{stitle};
+	return $data->{stitle};
+}
+#package NEIntData;
+sub new {
+	my ($type,$name,@args) = @_;
+	my $self = SnmpData::new($type,'Near-end Interval','mxNearEndIntervalTable',@args);
+	my $read = $self->read;
+	my $data = $self->_data;
+	$data->{DestHost} = $name;
+	$self->save unless $read;
+	return $self;
+}
+
+# ----------------------------------
+package NETotData;
+use vars qw(@ISA);
+@ISA = qw(SnmpData);
+# ----------------------------------
+#package NETotData;
+sub get {
+	my ($type,@args) = @_;
+	return SnmpData::get($type,'Near-end Total','mxNearEndTotalTable',@args);
+}
+#package NETotData;
+sub label {
+	my $self = shift;
+	my $data = $self->_data;
+	$data->{label} = "$data->{DestHost}\@$data->{mxDrivName}$data->{mxCardIndex}:$data->{mxSpanIndex}" unless exists $data->{label};
+	return $data->{label};
+}
+#package NETotData;
+sub stitle {
+	my $self = shift;
+	my $data = $self->_data;
+	$data->{stitle} = "Span $data->{mxSpanIndex} Near-end Total" unless exists $data->{stitle};
+	return $data->{stitle};
+}
+#package NETotData;
+sub new {
+	my ($type,$name,@args) = @_;
+	my $self = SnmpData::new($type,'Near-end Total','mxNearEndTotalTable',@args);
+	my $read = $self->read;
+	my $data = $self->_data;
+	$data->{DestHost} = $name;
+	$self->save unless $read;
+	return $self;
+}
+
+# ----------------------------------
+package FECurData;
+use vars qw(@ISA);
+@ISA = qw(SnmpData);
+# ----------------------------------
+#package FECurData;
+sub get {
+	my ($type,@args) = @_;
+	return SnmpData::get($type,'Far-end Current','mxFarEndCurrentTable',@args);
+}
+#package FECurData;
+sub label {
+	my $self = shift;
+	my $data = $self->_data;
+	$data->{label} = "$data->{DestHost}\@$data->{mxDrivName}$data->{mxCardIndex}:$data->{mxSpanIndex}" unless exists $data->{label};
+	return $data->{label};
+}
+#package FECurData;
+sub stitle {
+	my $self = shift;
+	my $data = $self->_data;
+	$data->{stitle} = "Span $data->{mxSpanIndex} Far-end Current" unless exists $data->{stitle};
+	return $data->{stitle};
+}
+#package FECurData;
+sub new {
+	my ($type,$name,@args) = @_;
+	my $self = SnmpData::new($type,'Far-end Current','mxFarEndCurrentTable',@args);
+	my $read = $self->read;
+	my $data = $self->_data;
+	$data->{DestHost} = $name;
+	$self->save unless $read;
+	return $self;
+}
+
+# ----------------------------------
+package FEIntData;
+use vars qw(@ISA);
+@ISA = qw(SnmpData);
+# ----------------------------------
+#package FEIntData;
+sub get {
+	my ($type,@args) = @_;
+	return SnmpData::get($type,'Far-end Interval','mxFarEndIntervalTable',@args);
+}
+#package FEIntData;
+sub label {
+	my $self = shift;
+	my $data = $self->_data;
+	$data->{label} = "$data->{DestHost}\@$data->{mxDrivName}$data->{mxCardIndex}:$data->{mxSpanIndex}\[$data->{mxFarEndIntervalIndex}\]" unless exists $data->{label};
+	return $data->{label};
+}
+#package FEIntData;
+sub stitle {
+	my $self = shift;
+	my $data = $self->_data;
+	$data->{stitle} = "Far-end Interval $data->{mxFarEndIntervalIndex}" unless exists $data->{stitle};
+	return $data->{stitle};
+}
+#package FEIntData;
+sub new {
+	my ($type,$name,@args) = @_;
+	my $self = SnmpData::new($type,'Far-end Interval','mxFarEndIntervalTable',@args);
+	my $read = $self->read;
+	my $data = $self->_data;
+	$data->{DestHost} = $name;
+	$self->save unless $read;
+	return $self;
+}
+
+# ----------------------------------
+package FETotData;
+use vars qw(@ISA);
+@ISA = qw(SnmpData);
+# ----------------------------------
+#package FETotData;
+sub get {
+	my ($type,@args) = @_;
+	return SnmpData::get($type,'Far-end Total','mxFarEndTotalTable',@args);
+}
+#package FETotData;
+sub label {
+	my $self = shift;
+	my $data = $self->_data;
+	$data->{label} = "$data->{DestHost}\@$data->{mxDrivName}$data->{mxCardIndex}:$data->{mxSpanIndex}" unless exists $data->{label};
+	return $data->{label};
+}
+#package FETotData;
+sub stitle {
+	my $self = shift;
+	my $data = $self->_data;
+	$data->{stitle} = "Span $data->{mxSpanIndex} Far-end Total" unless exists $data->{stitle};
+	return $data->{stitle};
+}
+#package FETotData;
+sub new {
+	my ($type,$name,@args) = @_;
+	my $self = SnmpData::new($type,'Far-end Total','mxFarEndTotalTable',@args);
+	my $read = $self->read;
+	my $data = $self->_data;
+	$data->{DestHost} = $name;
+	$self->save unless $read;
+	return $self;
+}
+
+# ----------------------------------
+package SpanData;
+use vars qw(@ISA);
+@ISA = qw(SnmpData);
+# ----------------------------------
+#package SpanData;
+sub get {
+	my ($type,@args) = @_;
+	return SnmpData::get($type,'Span','mxSpanTable',@args);
+}
+#package SpanData;
+sub label {
+	my $self = shift;
+	my $data = $self->_data;
+	$data->{label} = "$data->{DestHost}\@$data->{mxDrivName}$data->{mxCardIndex}:$data->{mxSpanIndex}" unless exists $data->{label};
+	return $data->{label};
+}
+#package SpanData;
+sub stitle {
+	my $self = shift;
+	my $data = $self->_data;
+	$data->{stitle} = "Span $data->{mxSpanIndex}" unless exists $data->{stitle};
+	return $data->{stitle};
+}
+#package SpanData;
+sub new {
+	my ($type,$name,@args) = @_;
+	my $self = SnmpData::new($type,'Span','mxSpanTable',@args);
+	my $read = $self->read;
+	my $data = $self->_data;
+	$data->{DestHost} = $name;
+	my ($hostid,$mxDrivName,$mxCardIndex,$mxSpanIndex) = @args;
+	my @keys = ($hostid,$mxDrivName,$mxCardIndex,$mxSpanIndex);
+	for (my $i = 0; $i < 32; $i++) {
+		my $part = ChanData->new($data->{DestHost},@keys,$i);
+		push @{$data->{parts}}, $part if $part;
+	}
+	my $side;
+	$side = $data->{bert} = BertData->new($data->{DestHost},@keys);
+	push @{$data->{sides}}, $side if $side;
+	$side = $data->{necur} = NECurData->new($data->{DestHost},@keys);
+	push @{$data->{sides}}, $side if $side;
+	for (my $i = 0; $i < 96; $i++) {
+		$side = NEIntData->new($data->{DestHost},@keys,$i+1);
+		push @{$data->{neint}}, $side if $side;
+		push @{$data->{sides}}, $side if $side;
+	}
+	$side = $data->{netot} = NETotData->new($data->{DestHost},@keys);
+	push @{$data->{sides}}, $side if $side;
+	$side = $data->{fecur} = FECurData->new($data->{DestHost},@keys);
+	push @{$data->{sides}}, $side if $side;
+	for (my $i = 0; $i < 96; $i++) {
+		$side = FEIntData->new($data->{DestHost},@keys,$i+1);
+		push @{$data->{feint}}, $side if $side;
+		push @{$data->{sides}}, $side if $side;
+	}
+	$side = $data->{fetot} = FETotData->new($data->{DestHost},@keys);
+	push @{$data->{sides}}, $side if $side;
+	$self->save unless $read;
+	return $self;
+}
+
+# ----------------------------------
+package CardData;
+use vars qw(@ISA);
+@ISA = qw(SnmpData);
+# ----------------------------------
+#package CardData;
+sub get {
+	my ($type,@args) = @_;
+	return SnmpData::get($type,'Card','mxCardTable',@args);
+}
+#package CardData;
+sub label {
+	my $self = shift;
+	my $data = $self->_data;
+	$data->{label} = "$data->{DestHost}\@$data->{mxDrivName}$data->{mxCardIndex}" unless exists $data->{label};
+	return $data->{label};
+}
+#package CardData;
+sub stitle {
+	my $self = shift;
+	my $data = $self->_data;
+	$data->{stitle} = "Card $data->{mxCardIndex}" unless exists $data->{stitle};
+	return $data->{stitle};
+}
+#package CardData;
+sub new {
+	my ($type,$name,@args) = @_;
+	my $self = SnmpData::new($type,'Card','mxCardTable',@args);
+	my $read = $self->read;
+	my $data = $self->_data;
+	$data->{DestHost} = $name;
+	my ($hostid,$mxDrivName,$mxCardIndex) = @args;
+	my @keys = ($hostid,$mxDrivName,$mxCardIndex);
+	for (my $i = 0; $i < 4; $i++) {
+		my $part = SpanData->new($data->{DestHost},@keys,$i);
+		push @{$data->{parts}}, $part if $part;
+	}
+	$self->save unless $read;
+	return $self;
+}
+
+# ----------------------------------
+package DrivData;
+use vars qw(@ISA);
+@ISA = qw(SnmpData);
+# ----------------------------------
+#package DrivData;
+sub get {
+	my ($type,@args) = @_;
+	return SnmpData::get($type,'Driver','mxDrivTable',@args);
+}
+#package DrivData;
+sub label {
+	my $self = shift;
+	my $data = $self->_data;
+	$data->{label} = "$data->{DestHost}\@$data->{mxDrivName}" unless exists $data->{label};
+	return $data->{label};
+}
+#package DrivData;
+sub stitle {
+	my $self = shift;
+	my $data = $self->_data;
+	$data->{stitle} = "Driver $data->{mxDrivName}" unless exists $data->{stitle};
+	return $data->{stitle};
+}
+#package DrivData;
+sub new {
+	my ($type,$name,@args) = @_;
+	my $self = SnmpData::new($type,'Driver','mxDrivTable',@args);
+	my $read = $self->read;
+	my $data = $self->_data;
+	$data->{DestHost} = $name;
+	my ($hostid,$mxDrivName) = @args;
+	my @keys = ($hostid,$mxDrivName);
+	for (my $i = 0; $i < 4; $i++) {
+		my $part = CardData->new($data->{DestHost},@keys,$i+1);
+		push @{$data->{parts}}, $part if $part;
+	}
+	$self->save unless $read;
+	return $self;
+}
+
+# ----------------------------------
+package HostData;
+use strict;
+use Carp;
+use vars qw(@ISA);
+@ISA = qw(MibData);
+# ----------------------------------
+#package HostData;
+sub get {
+	my ($type,@args) = @_;
+	return MibData::get($type,'Host','hosts',\%::HostMIB,@args);
+}
+#package HostData;
+sub label {
+	my $self = shift;
+	my $data = $self->_data;
+	$data->{label} = "$data->{DestHost}" unless exists $data->{label};
+	return $data->{label};
+}
+#package HostData;
+sub stitle {
+	my $self = shift;
+	my $data = $self->_data;
+	$data->{stitle} = "Host $data->{DestHost}" unless exists $data->{stitle};
+	return $data->{stitle};
+}
+#package HostData;
+sub new {
+	my ($type,$hostid,@args) = @_;
+	if (defined $hostid) {
+		if ($::hostidn <= $hostid) {
+			$::hostidn = $hostid+1;
+		}
+	} else {
+		$hostid = $::hostidn;
+		$::hostidn++;
+	}
+	my $self = MibData::new($type,'Host','hosts',\%::HostMIB,$hostid,@args);
+	my $read = $self->read;
+	my $data = $self->_data;
+	my $part = DrivData->new($data->{DestHost},$hostid,'x400p-sl');
+	push @{$data->{parts}}, $part if $part;
+	$self->save unless $read;
+	return $self;
+}
+#package HostData;
+sub readdb {
+	my ($type,$dbh) = @_;
+	my @cols = @{$MyDBI::schema{hosts}{cols}};
+	my $sql = "SELECT hostid FROM hosts;\n";
+	my $sth = MyDBI::preparesql($dbh,$sql);
+	$sth->execute() or warn $sth->errstr;
+	my %ids = ();
+	while (my $row = $sth->fetchrow_hashref) {
+		$ids{$row->{hostid}} = 1;
+	}
+	$sth->finish;
+	foreach (sort {$a<=>$b} keys %ids) {
+		next unless length($_);
+		HostData->new($_);
+	}
+	return undef;
+}
+
+# ----------------------------------
+package Dialog;
+use strict;
+use Gtk2;
+use Glib;
+use vars qw(@ISA);
+@ISA = qw(HiddenData Gtk2::Dialog);
+# ----------------------------------
+#package Dialog;
+sub new {
+	my ($type,$name,$obj,$parent) = @_;
+	my $self = Gtk2::Dialog->new("$name Dialog",$parent,'destroy-with-parent',
 		'gtk-close' => 'close',
 		'gtk-apply'  => 'apply',
 		'gtk-connect' => 'accept',
 		'gtk-refresh' => 'yes',
+		'gtk-revert-to-saved' => 'no',
 		'gtk-cancel' => 'cancel',
 		'gtk-ok'     => 'ok');
 	bless $self,$type;
-	my $f = Gtk2::Frame->new('Channel');
+	my $ctls = $self->_data;
+	my $data =  $obj->_data;
+	foreach (qw{table schema mib}) { $ctls->{$_} = $data->{$_}; }
+	my $f = Gtk2::Frame->new($name);
 	$self->get_content_area()->add($f);
 	$self->set_default_response('ok');
-	my $v = Gtk2::VBox->new(FALSE,8);
+	my $v = Gtk2::VBox->new(Glib::FALSE,0);
 	$f->add($v);
 	my $h = Gtk2::HBox->new;
-	$v->pack_start($h,TRUE,TRUE,0);
-	my $t = $self->{table} = Gtk2::Table->new(scalar @labels,3,TRUE);
-	$h->pack_start($t,TRUE,TRUE,0);
-
-	for (my $i = 0; $i < scalar @labels; $i++) {
-		$self->myaddentry($i,$labels[$i]);
+	$v->pack_start($h,Glib::TRUE,Glib::TRUE,0);
+	my @cols = @{$ctls->{schema}{cols}};
+	my $t = Gtk2::Table->new(scalar @cols,3,Glib::FALSE);
+	$t->set_col_spacings(0);
+	$t->set_row_spacings(0);
+	$h->pack_start($t,Glib::TRUE,Glib::TRUE,0);
+	for (my $i = 0; $i < scalar @cols; $i++) {
+		my $label = $cols[$i];
+		my $ent = $ctls->{$label} = MibNode->new($obj,$label);
+		$ent->add_to_table($t,$i);
 	}
 	$self->show_all;
+	return $self;
+}
+#package Dialog;
+sub store {
+	my $ctls = shift->_data;
+	my %inds = map { $_=>1 } @{$ctls->{schema}{keys}};
+	foreach (@{$ctls->{schema}{cols}}) { $ctls->{$_}->store unless exists $inds{$_}; }
+}
+#package Dialog;
+sub revert {
+	my $ctls = shift->_data;
+	foreach (@{$ctls->{schema}{cols}}) { $ctls->{$_}->revert; }
+}
+#package Dialog;
+# raise an existing dialog
+sub raise {
+	my $self = shift;
+# FIXME write this function
+	return $self;
+}
+#package Dialog;
+# run a new dialog
+sub run {
+	my $self = shift;
+# FIXME write this function
+	return $self;
+}
+
+# ----------------------------------
+package Entry;
+use strict;
+use Glib;
+use Gtk2;
+use vars qw(@ISA);
+@ISA = qw(View Gtk2::Window);
+# ----------------------------------
+#package Entry;
+sub new {
+	my ($type,$name,$obj) = @_;
+	my $self = Gtk2::Window->new('toplevel');
+	bless $self,$type;
+	my $data = $self->_data;
+	$data->{schema} = $obj->_data->{schema};
+	my $fr = Gtk2::Frame->new($name." ".$obj->label);
+	my $v = Gtk2::VBox->new(Glib::FALSE,0);
+	my $sw = Gtk2::ScrolledWindow->new();
+	$sw->set_policy('never','automatic');
+	$sw->add_with_viewport($v);
+	$fr->add($sw);
+	my $h = Gtk2::HBox->new;
+	$v->pack_start($h,Glib::TRUE,Glib::TRUE,0);
+	my $t = Gtk2::Table->new(scalar @{$data->{schema}{cols}} - scalar @{$data->{schema}{keys}},3,Glib::FALSE);
+	$t->set_col_spacings(0);
+	$t->set_row_spacings(0);
+	$h->pack_start($t,Glib::TRUE,Glib::TRUE,0);
+	my $i = 0;
+	my %keys = map {$_=>1} @{$data->{schema}{keys}};
+	foreach (@{$data->{schema}{cols}}) {
+		next if exists $keys{$_};
+		my $ent = $data->{$_} = MibNode->new($obj,$_);
+		$ent->add_to_table($t,$i);
+		$i++;
+	}
+	my $bb = Gtk2::HButtonBox->new();
+	$bb->set_layout('end');
+	$bb->set_spacing(10);
+	my $b;
+	$b = Gtk2::Button->new_from_stock('gtk-refresh');
+	$b->signal_connect('clicked'=>sub{ Carp::carp join(',',@_); my ($b,$self) = @_; return $self->refresh_view; },$self);
+	$bb->add($b);
+	$b = Gtk2::Button->new_from_stock('gtk-revert-to-saved');
+	$b->signal_connect('clicked'=>sub{ Carp::carp join(',',@_); my ($b,$self) = @_; return $self->revert; },$self);
+	$bb->add($b);
+	$b = Gtk2::Button->new_from_stock('gtk-apply');
+	$b->signal_connect('clicked'=>sub{ Carp::carp join(',',@_); my ($b,$self) = @_; return $self->store; },$self);
+	$bb->add($b);
+	$b = Gtk2::Button->new_from_stock('gtk-close');
+	$b->signal_connect('clicked'=>sub{ Carp::carp join(',',@_); my ($b,$self) = @_; return $self->hide; },$self);
+	$bb->add($b);
+#	$b = Gtk2::Button->new_from_stock('gtk-connect');
+#	$b->signal_connect('clicked'=>sub{ Carp::carp join(',',@_); my ($b,$self) = @_; return $self->connectButton; },$self);
+#	$bb->add($b);
+#	$b = Gtk2::Button->new_from_stock('gtk-cancel');
+#	$b->signal_connect('clicked'=>sub{ Carp::carp join(',',@_); my ($b,$self) = @_; return $self->cancelButton; },$self);
+#	$bb->add($b);
+#	$b = Gtk2::Button->new_from_stock('gtk-ok');
+#	$b->signal_connect('clicked'=>sub{ Carp::carp join(',',@_); my ($b,$self) = @_; return $self->okButton; },$self);
+#	$bb->add($b);
+	my $vb = Gtk2::VBox->new();
+	$vb->set_spacing(0);
+	$fr->set_border_width(5);
+	$vb->pack_start($fr,Glib::TRUE,Glib::TRUE,0);
+	$bb->set_border_width(5);
+	$vb->pack_start($bb,Glib::FALSE,Glib::FALSE,0);
+	$self->set_type_hint('normal');
+	$self->set_default_size(-1,600);
+	$self->set_opacity(0.5);
+	$self->set_position('mouse');
+	$data->{deleted} = Glib::FALSE;
+	$self->signal_connect('delete-event'=>sub{
+		my ($self,$ev) = @_;
+		$self->hide_all;
+		return Gtk2::EVENT_STOP;
+	});
+	$self->add($vb);
+	$self->View::_init($obj);
+	return $self;
+}
+#package Entry;
+sub refresh_view {
+	my ($self,$obj) = @_;
+	my $data = $self->_data;
+	$self->enable_view($obj) unless $data->{active};
+	$self->revert;
+	return $self;
+}
+#package Entry;
+sub enable_view {
+	my ($self,$obj) = @_;
+	my $data = $self->_data;
+	$data->{active} = Glib::TRUE;
+	return $self;
+}
+#package Entry;
+sub disable_view {
+	my ($self,$obj) = @_;
+	my $data = $self->_data;
+	$data->{active} = Glib::FALSE;
+	return $self;
+}
+#package Entry;
+sub store {
+	my $data = shift->_data;
+	my %keys = map {$_=>1} @{$data->{schema}{keys}};
+	foreach (@{$data->{schema}{cols}}) { $data->{$_}->store unless exists $keys{$_}; }
+}
+#package Entry;
+sub revert {
+	my $data = shift->_data;
+	my %keys = map {$_=>1} @{$data->{schema}{keys}};
+	foreach (@{$data->{schema}{cols}}) { $data->{$_}->revert unless exists $keys{$_}; }
+}
+#package Entry;
+sub closeButton {
+	my ($self,$ev) = @_;
+	$self->hide_all;
+	return Gtk2::EVENT_STOP;
+}
+#package Entry;
+sub applyButton {
+	my ($self,$ev) = @_;
+	$self->store;
+	return Gtk2::EVENT_STOP;
+}
+#package Entry;
+sub connectButton {
+	my ($self,$ev) = @_;
+	return Gtk2::EVENT_STOP;
+}
+#package Entry;
+sub refreshButton {
+	my ($self,$ev) = @_;
+	$self->revert;
+	return Gtk2::EVENT_STOP;
+}
+#package Entry;
+sub revertButton {
+	my ($self,$ev) = @_;
+	$self->revert;
+	return Gtk2::EVENT_STOP;
+}
+#package Entry;
+sub cancelButton {
+	my ($self,$ev) = @_;
+	$self->hide_all;
+	return Gtk2::EVENT_STOP;
+}
+#package Entry;
+sub okButton {
+	my ($self,$ev) = @_;
+	$self->store;
+	$self->hide_all;
+	return Gtk2::EVENT_STOP;
+}
+
+# ----------------------------------
+package Menu;
+use strict;
+use Gtk2;
+use Glib;
+use vars qw(@ISA);
+@ISA = qw(HiddenData Gtk2::Menu);
+# ----------------------------------
+#package Menu;
+sub new {
+	my ($type,$name,$obj) = @_;
+	my $self = Gtk2::Menu->new;
+	bless $self,$type;
+	my $data = $self->_data;
+	$data->{obj} = $obj;
+	my $title = $name.' Menu '.$obj->label;
+	$self->set_title($title);
+	my $mi = Gtk2::TearoffMenuItem->new;
+	$mi->show;
+	$self->append($mi);
+	return $self;
+}
+
+# ----------------------------------
+package Properties;
+use strict;
+use Gtk2;
+use Glib;
+use vars qw(@ISA);
+@ISA = qw(Menu);
+# ----------------------------------
+#package Properties
+sub new {
+	my ($type,$name,$obj) = @_;
+	my $self = Menu::new(@_);
+	my $mi = Gtk2::MenuItem->new_with_label("$name Properties...");
+	$mi->signal_connect(activate=>sub{
+		my ($mi,$self) = @_;
+		$self->dodialog($self->_data->{obj});
+		return Gtk2::EVENT_STOP;
+	},$self);
+	$mi->show;
+	$self->append($mi);
 	return $self;
 }
 
@@ -344,395 +2193,466 @@ sub new {
 package ChanMenu;
 use strict;
 use Gtk2;
-use Glib qw(TRUE FALSE);
+use Glib;
 use vars qw(@ISA);
-@ISA = qw(Gtk2::Menu);
+@ISA = qw(Properties);
 # ----------------------------------
 #package ChanMenu;
 sub new {
-	my ($type,$host,$driv,$card,$span,$chan) = @_;
-	my $self = Gtk2::Menu->new;
-	bless $self,$type;
-	$self->{'.data'}{host} = $host;
-	$self->{'.data'}{driv} = $driv;
-	$self->{'.data'}{card} = $card;
-	$self->{'.data'}{span} = $span;
-	$self->{'.data'}{chan} = $chan;
-	$self->set_title("$host\@$driv$card:$span.$chan");
-	my $mi;
-	$mi = Gtk2::TearoffMenuItem->new;
-	$self->append($mi);
+	my ($type,$obj) = @_;
+	my $self = Properties::new($type,'Channel',$obj);
+	my $objs = $obj->_data;
+	my $mi = Gtk2::MenuItem->new_with_label("Channel Cross-connect...");
+	$mi->signal_connect(activate=>sub{
+		my ($mi,$args) = @_;
+		my ($self,$obj) = @$args;
+		$self->doxcon($obj);
+		return Gtk2::EVENT_STOP;
+	},[$self,$objs->{xcon}]);
 	$mi->show;
-	$mi = Gtk2::MenuItem->new_with_label('Properties...');
-	$mi->signal_connect('activate',\&ChanMenu::properties,$self);
 	$self->append($mi);
-	$mi->show;
 	return $self;
 }
 #package ChanMenu;
-sub printnode {
-	my ($self,$mib) = @_;
-	if ($mib) {
-		print "objectID:.......... $mib->{objectID}\n";
-		print "label:............. $mib->{label}\n";
-		print "subID:............. $mib->{subID}\n";
-		print "moduleID:.......... $mib->{moduleID}\n";
-		print "parent:............ $mib->{parent}\n";
-		print "children:.......... ".join(',',@{$mib->{children}})."\n" if defined $mib->{children} and ref $mib->{children};
-		print "indexes:........... ".join(',',@{$mib->{indexes}})."\n" if defined $mib->{indexes} and ref $mib->{indexes};
-		print "nextNode:.......... $mib->{nextNode}\n" if defined $mib->{nextNode};
-		print "type:.............. $mib->{type}\n";
-		print "access:............ $mib->{access}\n";
-		print "status:............ $mib->{status}\n";
-		print "syntax:............ $mib->{syntax}\n";
-		print "textualConvention:. $mib->{textualConvention}\n" if defined $mib->{textualConvention};
-		print "TCDescription:..... $mib->{TCDescription}\n" if defined $mib->{TCDescription};
-		print "units:............. $mib->{units}\n" if defined $mib->{units};
-		print "hint:.............. $mib->{hint}\n" if defined $mib->{hint};
-		print "enums:............. $mib->{enums}\n" if defined $mib->{enums} and ref $mib->{enums};
-		print "ranges:............ $mib->{ranges}\n" if defined $mib->{ranges} and ref $mib->{ranges};
-		print "description:....... $mib->{description}\n" if defined $mib->{description};
-		print "reference:......... $mib->{reference}\n" if defined $mib->{reference};
-		if (defined $mib->{indexes} and ref $mib->{indexes} eq 'ARRAY') {
-			foreach ( @{$mib->{indexes}} ) {
-				my $m = $SNMP::MIB{$_};
-				$self->printnode($m);
-			}
-		}
-		if (defined $mib->{children} and ref $mib->{children} eq 'ARRAY') {
-			foreach ( sort { $a->{subID} <=> $b->{subID} } @{$mib->{children}} ) {
-				$self->printnode($_);
-			}
-		}
-	}
+sub dodialog {
+	my ($self,$obj) = @_;
+	my $data = $self->_data;
+	$data->{dialog} = Entry->new('Channel',$obj) unless $data->{dialog};
+	$data->{dialog}->show_all;
 }
 #package ChanMenu;
-sub properties {
-	my ($mi,$self) = @_;
-	my $dialog = ChanDialog->new;
-	my $response = $dialog->run;
-	$dialog->destroy;
-#	my $mib = $SNMP::MIB{'mxChan'};
-#	$self->printnode($mib);
-#	mxDrivName
-#	mxCardIndex
-#	mxSpanIndex
-#	mxChanIndex
-#	mxChanType
-#	mxChanFormat
-#	mxChanRate
-#	mxChanMode
-#	mxChanSap
-#	mxChanAdministrativeState
-#	mxChanOperationalState
-#	mxChanUsageState
-#	mxChanAvailabilityStatus
-#	mxChanControlStatus
-#	mxChanProceduralStatus
-#	mxChanAlarmStatus
-#	mxChanStandbyStatus
+sub doxcon {
+	my ($self,$obj) = @_;
+	my $data = $self->_data;
+	$data->{doxcon} = Entry->new('Cross-connect',$obj) unless $data->{doxcon};
+	$data->{doxcon}->show_all;
 }
 
 # ----------------------------------
 package SpanMenu;
 use strict;
 use Gtk2;
-use Glib qw(TRUE FALSE);
+use Glib;
 use vars qw(@ISA);
-@ISA = qw(Gtk2::Menu);
+@ISA = qw(Properties);
 # ----------------------------------
 #package SpanMenu;
 sub new {
-	my ($type,$host,$driv,$card,$span) = @_;
-	my $self = Gtk2::Menu->new;
-	bless $self,$type;
-	$self->{'.data'}{host} = $host;
-	$self->{'.data'}{driv} = $driv;
-	$self->{'.data'}{card} = $card;
-	$self->{'.data'}{span} = $span;
-	$self->set_title("$host\@$driv$card:$span");
-	my $mi;
-	$mi = Gtk2::TearoffMenuItem->new;
-	$self->append($mi);
+	my ($type,$obj) = @_;
+	my $self = Properties::new($type,'Span',$obj);
+	my $objs = $obj->_data;
+	my $mi = Gtk2::MenuItem->new_with_label("Span Bert...");
+	$mi->signal_connect(activate=>sub{
+		my ($mi,$args) = @_;
+		my ($self,$obj) = @$args;
+		$self->dobert($obj);
+		return Gtk2::EVENT_STOP;
+	},[$self,$objs->{bert}]);
 	$mi->show;
-	$mi = Gtk2::MenuItem->new_with_label('Properties...');
-	$mi->signal_connect('activate',\&SpanMenu::properties,$self);
 	$self->append($mi);
-	$mi->show;
 	$mi = Gtk2::SeparatorMenuItem->new;
-	$self->append($mi);
 	$mi->show;
-	for (my $chan = 0; $chan < 32; $chan++) {
-		$mi = Gtk2::MenuItem->new_with_label("$host\@$driv$card:$span.$chan");
-		$mi->set_submenu(ChanMenu->new($host,$driv,$card,$span,$chan));
-		$mi->set_right_justified(TRUE);
-		$self->append($mi);
+	$self->append($mi);
+	$mi = Gtk2::MenuItem->new_with_label("Span Stats Near-end Current...");
+	$mi->signal_connect(activate=>sub{
+		my ($mi,$args) = @_;
+		my ($self,$obj) = @$args;
+		$self->donecur($obj);
+		return Gtk2::EVENT_STOP;
+	},[$self,$objs->{necur}]);
+	$mi->show;
+	$self->append($mi);
+	my $me = Gtk2::Menu->new;
+	$mi = Gtk2::MenuItem->new_with_label("Span Stats Near-end Intervals");
+	$mi->set_submenu($me);
+	$mi->set_right_justified(Glib::TRUE);
+	$mi->show;
+	$self->append($mi);
+	$mi = Gtk2::TearoffMenuItem->new;
+	$mi->show;
+	$me->append($mi);
+	foreach (@{$objs->{neint}}) {
+		$mi = Gtk2::MenuItem->new_with_label($_->stitle."...");
+		$mi->signal_connect(activate=>sub{
+			my ($mi,$args) = @_;
+			my ($self,$obj) = @$args;
+			$self->doneint($obj);
+			return Gtk2::EVENT_STOP;
+		},[$self,$_]);
 		$mi->show;
+		$me->append($mi);
+	}
+	$mi = Gtk2::MenuItem->new_with_label("Span Stats Near-end Total...");
+	$mi->signal_connect(activate=>sub{
+		my ($mi,$args) = @_;
+		my ($self,$obj) = @$args;
+		$self->donetot($obj);
+		return Gtk2::EVENT_STOP;
+	},[$self,$objs->{netot}]);
+	$mi->show;
+	$self->append($mi);
+	$mi = Gtk2::SeparatorMenuItem->new;
+	$mi->show;
+	$self->append($mi);
+	$me = Gtk2::Menu->new;
+	$mi = Gtk2::MenuItem->new_with_label("Span Stats Far-end Current...");
+	$mi->signal_connect(activate=>sub{
+		my ($mi,$args) = @_;
+		my ($self,$obj) = @$args;
+		$self->dofecur($obj);
+		return Gtk2::EVENT_STOP;
+	},[$self,$objs->{fecur}]);
+	$mi->show;
+	$self->append($mi);
+	$me = Gtk2::Menu->new;
+	$mi = Gtk2::MenuItem->new_with_label("Span Stats Far-end Intervals");
+	$mi->set_submenu($me);
+	$mi->set_right_justified(Glib::TRUE);
+	$mi->show;
+	$self->append($mi);
+	$mi = Gtk2::TearoffMenuItem->new;
+	$mi->show;
+	$me->append($mi);
+	foreach (@{$objs->{feint}}) {
+		$mi = Gtk2::MenuItem->new_with_label($_->stitle."...");
+		$mi->signal_connect(activate=>sub{
+			my ($mi,$args) = @_;
+			my ($self,$obj) = @$args;
+			$self->nofeint($obj);
+			return Gtk2::EVENT_STOP;
+		},[$self,$_]);
+		$mi->show;
+		$me->append($mi);
+	}
+	$mi = Gtk2::MenuItem->new_with_label("Span Stats Far-end Total...");
+	$mi->signal_connect(activate=>sub{
+		my ($mi,$args) = @_;
+		my ($self,$obj) = @$args;
+		$self->dofetot($obj);
+		return Gtk2::EVENT_STOP;
+	},[$self,$objs->{fetot}]);
+	$mi->show;
+	$self->append($mi);
+	$mi = Gtk2::SeparatorMenuItem->new;
+	$mi->show;
+	$self->append($mi);
+	foreach (@{$objs->{parts}}) {
+		$mi = Gtk2::MenuItem->new_with_label($_->stitle);
+		$mi->set_submenu(ChanMenu->new($_));
+		$mi->set_right_justified(Glib::TRUE);
+		$mi->show;
+		$self->append($mi);
 	}
 	return $self;
 }
 #package SpanMenu;
-sub properties {
-	my ($mi,$self) = @_;
-#	mxDrivName
-#	mxCardIndex
-#	mxSpanIndex
-#	mxSpanName
-#	mxSpanDevice
-#	mxSpanEquipmentId
-#	mxSpanType
-#	mxSpanNumber
-#	mxSpanRate
-#	mxSpanMode
-#	mxSpanCrc
-#	mxSpanClocking
-#	mxSpanPriority
-#	mxSpanCoding
-#	mxSpanFraming
-#	mxSpanLineImpedance
-#	mxSpanLineMode
-#	mxSpanLineLength
-#	mxSpanLineAttenuation
-#	mxSpanLineGain
-#	mxSpanLineDelay
-#	mxSpanTxLevel
-#	mxSpanRxLevel
-#	mxSpanAlarmSettleTime
-#	mxSpanLineCodeTime
-#	mxSpanPrimary
-#	mxSpanDataLink
-#	mxSpanLineCode
-#	mxSpanAlarmServerityMapProfile
-#	mxSpanAdministrativeState
-#	mxSpanOperationalState
-#	mxSpanUsageState
-#	mxSpanAlarmStatus
-#	mxSpanProceduralStatus
-#	mxSpanAvailabilityStatus
-#	mxSpanControlStatus
-#	mxSpanStandbyStatus
-#	mxSpanUnknownStatus
-#	mxSpanSap
-#	mxSpanLoopbackStatus
-#	mxSpanLineStatus
-#	mxSpanAlarms
-#	mxSpanEvents
-#	mxSpanLed
-#	mxSpanReceiveLevel
-#	mxSpanReceiveThreshold
-#	mxSpanLastChange
-#	mxSpanRowStatus
+sub dodialog {
+	my ($self,$obj) = @_;
+	my $data = $self->_data;
+	$data->{dialog} = Entry->new('Span',$obj) unless $data->{dialog};
+	$data->{dialog}->show_all;
+}
+#package SpanMenu;
+sub dobert {
+	my ($self,$obj) = @_;
+	my $data = $self->_data;
+	$data->{dobert} = Entry->new('Bert',$obj) unless $data->{dobert};
+	$data->{dobert}->show_all;
+}
+#package SpanMenu;
+sub donecur {
+	my ($self,$obj) = @_;
+	my $data = $self->_data;
+	$data->{donecur} = Entry->new('Near-end Current',$obj) unless $data->{donecur};
+	$data->{donecur}->show_all;
+}
+#package SpanMenu;
+sub doneint {
+	my ($self,$obj) = @_;
+	my $data = $self->_data;
+	my $objs = $obj->_data;
+	my $index = $objs->{mxNearEndIntervalIndex};
+	$data->{doneint}[$index] = Entry->new('Near-end Interval',$obj) unless $data->{doneint}[$index];
+	$data->{doneint}[$index]->show_all;
+}
+#package SpanMenu;
+sub donetot {
+	my ($self,$obj) = @_;
+	my $data = $self->_data;
+	$data->{donetot} = Entry->new('Near-end Total',$obj) unless $data->{donetot};
+	$data->{donetot}->show_all;
+}
+#package SpanMenu;
+sub dofecur {
+	my ($self,$obj) = @_;
+	my $data = $self->_data;
+	$data->{dofecur} = Entry->new('Far-end Current',$obj) unless $data->{dofecur};
+	$data->{dofecur}->show_all;
+}
+#package SpanMenu;
+sub dofeint {
+	my ($self,$obj) = @_;
+	my $data = $self->_data;
+	my $objs = $obj->_data;
+	my $index = $objs->{mxFarEndIntervalIndex};
+	$data->{dofeint}[$index] = Entry->new('Far-end Interval',$obj) unless $data->{dofeint}[$index];
+	$data->{dofeint}[$index]->show_all;
+}
+#package SpanMenu;
+sub dofetot {
+	my ($self,$obj) = @_;
+	my $data = $self->_data;
+	$data->{dofetot} = Entry->new('Far-end Total',$obj) unless $data->{dofetot};
+	$data->{dofetot}->show_all;
 }
 
 # ----------------------------------
 package CardMenu;
 use strict;
 use Gtk2;
-use Glib qw(TRUE FALSE);
+use Glib;
 use vars qw(@ISA);
-@ISA = qw(Gtk2::Menu);
+@ISA = qw(Properties);
 # ----------------------------------
 #package CardMenu;
 sub new {
-	my ($type,$host,$driv,$card) = @_;
-	my $self = Gtk2::Menu->new;
-	bless $self,$type;
-	$self->{'.data'}{host} = $host;
-	$self->{'.data'}{driv} = $driv;
-	$self->{'.data'}{card} = $card;
-	$self->set_title("$host\@$driv$card");
-	my $mi;
-	$mi = Gtk2::TearoffMenuItem->new;
-	$self->append($mi);
+	my ($type,$obj) = @_;
+	my $self = Properties::new($type,'Card',$obj);
+	my $objs = $obj->_data;
+	my $mi = Gtk2::SeparatorMenuItem->new;
 	$mi->show;
-	$mi = Gtk2::MenuItem->new_with_label('Properties...');
-	$mi->signal_connect('activate',\&CardMenu::properties,$self);
 	$self->append($mi);
-	$mi->show;
-	$mi = Gtk2::SeparatorMenuItem->new;
-	$self->append($mi);
-	$mi->show;
-	for (my $span = 0; $span < 4; $span++) {
-		$mi = Gtk2::MenuItem->new_with_label("$host\@$driv$card:$span");
-		$mi->set_submenu(SpanMenu->new($host,$driv,$card,$span));
-		$mi->set_right_justified(TRUE);
-		$self->append($mi);
+	foreach (@{$objs->{parts}}) {
+		$mi = Gtk2::MenuItem->new_with_label($_->stitle);
+		$mi->set_submenu(SpanMenu->new($_));
+		$mi->set_right_justified(Glib::TRUE);
 		$mi->show;
+		$self->append($mi);
 	}
 	return $self;
 }
 #package CardMenu;
-sub properties {
-	my ($mi,$self) = @_;
-#	mxDrivName
-#	mxCardIndex(1)
-#	mxCardType(2)
-#	mxCardIdentifier(3)
-#	mxCardRevision(4)
-#	mxCardChipType(5)
-#	mxCardChipRevision(6)
-#	mxCardPciBus(7)
-#	mxCardPciSlot(8)
-#	mxCardPciIrq(9)
-#	mxCardSpanType(10)
-#	mxCardMode(11)
-#	mxCardSyncMaster(12)
-#	mxCardSyncSource(13)
-#	mxCardSyncGroup(14)
-#	mxCardAdministrativeState(15)
-#	mxCardOperationalState(16)
-#	mxCardUsageState(17)
-#	mxCardAlarmStatus(18)
-#	mxCardProceduralStatus(19)
-#	mxCardAvailabilityStatus(20)
-#	mxCardControlStatus(21)
-#	mxCardUnknownStatus(22)
-#	mxCardStandbyStatus(23)
-#	mxCardSyncSpanId(24)
-#	mxCardSyncTransitions(25)
-#	mxCardLeds(26)
-#	mxCardLastChange(27)
-#	mxCardName(28)
-#	mxCardStatus(29)
+sub dodialog {
+	my ($self,$obj) = @_;
+	my $data = $self->_data;
+	$data->{dialog} = Entry->new('Card',$obj) unless $data->{dialog};
+	$data->{dialog}->show_all;
 }
 
 # ----------------------------------
 package DrivMenu;
 use strict;
 use Gtk2;
-use Glib qw(TRUE FALSE);
+use Glib;
 use vars qw(@ISA);
-@ISA = qw(Gtk2::Menu);
+@ISA = qw(Properties);
 # ----------------------------------
 #package DrivMenu;
 sub new {
-	my ($type,$host,$driv) = @_;
-	my $self = Gtk2::Menu->new;
-	bless $self,$type;
-	$self->{'.data'}{host} = $host;
-	$self->{'.data'}{driv} = $driv;
-	$self->set_title("$host\@$driv");
-	my $mi;
-	$mi = Gtk2::TearoffMenuItem->new;
-	$self->append($mi);
+	my ($type,$obj) = @_;
+	my $self = Properties::new($type,'Driver',$obj);
+	my $objs = $obj->_data;
+	my $mi = Gtk2::SeparatorMenuItem->new;
 	$mi->show;
-	$mi = Gtk2::MenuItem->new_with_label('Properties...');
-	$mi->signal_connect('activate',\&DrivMenu::properties,$self);
 	$self->append($mi);
-	$mi->show;
-	$mi = Gtk2::SeparatorMenuItem->new;
-	$self->append($mi);
-	$mi->show;
-	for (my $card = 0; $card < 4; $card++) {
-		$mi = Gtk2::MenuItem->new_with_label("$host\@$driv$card");
-		$mi->set_submenu(CardMenu->new($host,$driv,$card));
-		$mi->set_right_justified(TRUE);
+	foreach (@{$objs->{parts}}) {
+		$mi = Gtk2::MenuItem->new_with_label($_->stitle);
+		$mi->set_submenu(CardMenu->new($_));
+		$mi->set_right_justified(Glib::TRUE);
 		$self->append($mi);
 		$mi->show;
 	}
 	return $self;
 }
 #package DrivMenu;
-sub properties {
-	my ($mi,$self) = @_;
-#
-#	mxDrivName(1)
-#	mxDrivIdnum(2)
-#	mxDrivMajor(3)
-#	mxDrivDescription(4)
-#	mxDrivRevision(5)
-#	mxDrivCopyright(6)
-#	mxDrivSupportedDevice(7)
-#	mxDrivContact(8)
-#	mxDrivLicense(9)
-#	mxDrivDate(10)
-#	mxDrivRowStatus(11)
+sub dodialog {
+	my ($self,$obj) = @_;
+	my $data = $self->_data;
+	$data->{dialog} = Entry->new('Driver',$obj) unless $data->{dialog};
+	$data->{dialog}->show_all;
 }
 
 # ----------------------------------
 package HostMenu;
 use strict;
 use Gtk2;
-use Glib qw(TRUE FALSE);
+use Glib;
 use vars qw(@ISA);
-@ISA = qw(Gtk2::Menu);
+@ISA = qw(Properties);
 # ----------------------------------
 #package HostMenu;
 sub new {
-	my ($type,$name) = @_;
-	my $self = Gtk2::Menu->new;
-	bless $self,$type;
-	$self->set_title("$name");
-	my $mi;
-	$mi = Gtk2::TearoffMenuItem->new;
-	$self->append($mi);
+	my ($type,$obj) = @_;
+	my $self = Properties::new($type,'Host',$obj);
+	my $objs = $obj->_data;
+	my $mi = Gtk2::SeparatorMenuItem->new;
 	$mi->show;
-	$mi = Gtk2::MenuItem->new_with_label('Properties...');
-	$mi->signal_connect('activate',\&HostMenu::properties,$self);
 	$self->append($mi);
-	$mi->show;
-	$mi = Gtk2::SeparatorMenuItem->new;
-	$self->append($mi);
-	$mi->show;
-	my $driv = "x400p-sl";
-	$mi = Gtk2::MenuItem->new_with_label("$name\@$driv");
-	$mi->set_submenu(DrivMenu->new($name,$driv));
-	$mi->set_right_justified(TRUE);
-	$self->append($mi);
-	$mi->show;
+	foreach (@{$objs->{parts}}) {
+		$mi = Gtk2::MenuItem->new_with_label($_->stitle);
+		$mi->set_submenu(DrivMenu->new($_));
+		$mi->set_right_justified(Glib::TRUE);
+		$mi->show;
+		$self->append($mi);
+	}
 	return $self;
 }
 #package HostMenu;
-sub properties {
-	my ($mi,$self) = @_;
-#	DestHost
-#	Community
-#	Version
-#	RemotePort
-#	Timeout
-#	Retries
-#	RetryNoSuch
-#	SecName
-#	SecLevel
-#	SecEngineId
-#	ContextEngineId
-#	Context
-#	AuthProto
-#	AuthPass
-#	PrivProto
-#	PrivPass
-#	authMasterKey
-#	privMasterKey
-#	authLocalizedKey
-#	privLocalizedKey
-#	UseLongNames
-#	UseSprintValue
-#	UseEnums
-#	UseNumeric
-#	BestGuess
-#
+sub dodialog {
+	my ($self,$obj) = @_;
+	my $data = $self->_data;
+	$data->{dialog} = Entry->new('Host',$obj) unless $data->{dialog};
+	$data->{dialog}->show_all;
 }
 
 # ----------------------------------
-package Card;
+package ChanView;
 use strict;
 use Carp;
 use Gtk2;
-use Glib qw(TRUE FALSE);
+use Glib;
 use Goo::Canvas;
 use vars qw(@ISA);
-@ISA = qw(Goo::Canvas::Group);
+@ISA = qw(View Goo::Canvas::Group);
+# ----------------------------------
+# A ChanView is a view of a channels for a host, driver, card and span,
+# and the span's subordinate data.  It consists of a Goo::Canvas::Group
+# containing all of the displayed objects for a channel.  The
+# Goo::Canvas::Group is placed within a card.
+# ----------------------------------
+#package ChanView;
+sub new {
+	my ($type,$span,$obj) = @_;
+	my $self = Goo::Canvas::Group->new($span);
+	bless $self,$type;
+	my $data = $self->_data;
+	my $objs = $obj->_data;
+	$data->{mxChanIndex} = $objs->{mxChanIndex};
+	$self->View::_init($obj);
+	return $self;
+}
+
+# ----------------------------------
+package SpanView;
+use strict;
+use Carp;
+use Gtk2;
+use Glib;
+use Goo::Canvas;
+use vars qw(@ISA);
+@ISA = qw(View Goo::Canvas::Group);
+# ----------------------------------
+# A SpanView is a view of a span for a host, driver and card, and the
+# span's subordinate data.  It consists of a Goo::Canvas::Group
+# containing all of the displayed objects for a span.  The
+# Goo::Canvas::Group is placed within a card.
+# ----------------------------------
+# Note, this needs to be translated by the parent to x=0,y=sno*20.
+# ----------------------------------
+#package SpanView;
+sub new {
+	my ($type,$card,$obj) = @_;
+	my $self = Goo::Canvas::Group->new($card);
+	bless $self,$type;
+	my $data = $self->_data;
+	my $objs = $obj->_data;
+	my ($x,$y) = (15,8);
+	$data->{led} = Goo::Canvas::Rect->new($self,
+		$x+0,$y+8,7,5,
+		'line-width'=>0,
+		'fill-color'=>'red',
+	);
+	$data->{jack} = Goo::Canvas::Rect->new($self,
+		$x+0,$y+13,18,15,
+		'line-width'=>0,
+		'fill-color'=>'DarkSlateGray',
+	);
+	$data->{jack}->signal_connect('button-press-event',sub{
+		my ($it,$wg,$ev,$obj) = @_;
+		SpanMenu->new($obj)->popup(undef,undef,undef,undef,$ev->button,$ev->time);
+		return Gtk2::EVENT_STOP;
+	},$obj);
+	$data->{text} = Goo::Canvas::Text->new($self,
+		"$objs->{mxCardIndex}:$objs->{mxSpanIndex}", $x+9,$y+20,15,'center',
+		'alignment'=>'center',
+		'fill-color'=>'white',
+		'font'=>'Sans 3',
+	);
+	foreach (@{$objs->{parts}}) {
+		push @{$data->{subvs}}, ChanView->new($self,$_);
+	}
+	$self->translate(0,$objs->{mxSpanIndex}*20);
+	$self->View::_init($obj);
+	return $self;
+}
+#package SpanView;
+sub refresh_view {
+	my ($self,$obj) = @_;
+	my $data = $self->_data;
+	$self->enable_view($obj) unless $data->{active};
+	my $val = $obj->_data->{mxSpanLed};
+	my %ledcolors = ( 0=>'black', 1=>'green', 2=>'red', 3=>'yellow' );
+	my $color = exists $ledcolors{$val} ?  $ledcolors{$val} : 'gray';
+	$data->{led}->set('fill-color'=>$color);
+	return $self;
+}
+#package SpanView;
+sub disable_view {
+	my ($self,$obj) = @_;
+	my $data = $self->_data;
+	$data->{led}->set(
+		'fill-color'=>'gray',
+	);
+	$data->{jack}->set(
+		'fill-color'=>'gray',
+	);
+	$data->{text}->set(
+		'fill-color'=>'lightgray',
+	);
+	$data->{active} = Glib::FALSE;
+	return $self;
+}
+#package SpanView;
+sub enable_view {
+	my ($self,$obj) = @_;
+	my $data = $self->_data;
+	$data->{led}->set(
+		'fill-color'=>'black',
+	);
+	$data->{jack}->set(
+		'fill-color'=>'DarkSlateGray',
+	);
+	$data->{text}->set(
+		'fill-color'=>'white',
+	);
+	$data->{active} = Glib::TRUE;
+	return $self;
+}
+
+# ----------------------------------
+package CardView;
+use strict;
+use Carp;
+use Gtk2;
+use Glib;
+use Goo::Canvas;
+use vars qw(@ISA);
+@ISA = qw(View Goo::Canvas::Group);
+# ----------------------------------
+# A CardView is a view of a card for host and driver, and the card's
+# subordinate data.  It consists of a Goo::Canvas::Group containing all
+# of the displayed objects for a card.  The group is placed at an x and
+# y offset within the Goo::Canvas for the driver.
 # ----------------------------------
 sub new {
-	my ($type,$host,$cnum) = @_;
-	my $self = Goo::Canvas::Group->new($host->child->get_root_item);
+	my ($type,$driv,$obj) = @_;
+	my $self = Goo::Canvas::Group->new($driv->get_root_item);
 	bless $self,$type;
-	my $card = 3 - $cnum;
-	$self->{'.data'}{card} = $card;
-	my ($x,$y) = ($cnum*20+15,$cnum*10+9);
-	my $item;
-	my $data;
-	$item = $self->{'.data'}{outline} = Goo::Canvas::Polyline->new($self, TRUE,
+	my $data = $self->_data;
+	my $objs = $obj->_data;
+	my $card = $objs->{mxCardIndex} - 1;
+	my ($x,$y) = (15,9);
+	my $item = $data->{outline} = Goo::Canvas::Polyline->new($self, Glib::TRUE,
 		[
 			$x+  0,$y+ 0,
 			$x+130,$y+ 0,
@@ -759,90 +2679,62 @@ sub new {
 		'stroke-color'=>'black',
 		'fill-color'=>'SeaGreen',
 	);
-	$data = { host=>$host->{'.data'}{nm}, driv=>"x400p-sl", card=>$card };
-	$item->signal_connect('button-press-event',sub {
-		my ($it,$wg,$ev,$data) = @_;
-		my $menu = CardMenu->new($data->{host},$data->{driv},$data->{card});
-		$menu->popup(undef,undef,undef,undef,$ev->button,$ev->time);
+	$item->signal_connect('button-press-event',sub{
+		my ($it,$wg,$ev,$obj) = @_;
+		CardMenu->new($obj)->popup(undef,undef,undef,undef,$ev->button,$ev->time);
 		return Gtk2::EVENT_STOP;
-	},$data);
-	$self->{'.data'}{text} = Goo::Canvas::Text->new($self,
-		"x400p-sl$card", $x+65,$y+5,130,'center',
+	},$obj);
+	$data->{text} = Goo::Canvas::Text->new($self,
+		"x400p-sl$card",$x+65,$y+5,130,'center',
 		'alignment'=>'center',
 		'fill-color'=>'white',
 		'font'=>'Sans 3',
 	);
-	for (my $span = 0; $span < 4; $span++) {
-		my $sno = $span + 1;
-		$self->{'.data'}{spans}[$span]{led} = Goo::Canvas::Rect->new($self,
-			$x+0,$y+8+($span*20),7,5,
-			'line-width'=>0,
-			'fill-color'=>'red',
-		);
-		$item = $self->{'.data'}{spans}[$span]{jack} = Goo::Canvas::Rect->new($self,
-			$x+0,$y+13+($span*20),18,15,
-			'line-width'=>0,
-			'fill-color'=>'DarkSlateGray',
-		);
-		$data = { host=>$host->{'.data'}{nm}, driv=>"x400p-sl", card=>$card, span=>$span };
-		$item->signal_connect('button-press-event',sub {
-			my ($it,$wg,$ev,$data) = @_;
-			my $menu = SpanMenu->new($data->{host},$data->{driv},$data->{card},$data->{span});
-			$menu->popup(undef,undef,undef,undef,$ev->button,$ev->time);
-			return Gtk2::EVENT_STOP;
-		},$data);
-		$self->{'.data'}{spans}[$span]{text} = Goo::Canvas::Text->new($self,
-			"$card:$sno", $x+9,$y+20+($span*20),15,'center',
-			'alignment'=>'center',
-			'fill-color'=>'white',
-			'font'=>'Sans 3',
-		);
-	}
-	$self->{'.data'}{xilinx}{chip} = Goo::Canvas::Rect->new($self,
+	$data->{xilinx}{chip} = Goo::Canvas::Rect->new($self,
 		$x+39,$y+50,28,28,
 		'line-width'=>0,
 		'fill-color'=>'DarkSlateGray',
 	);
-	$self->{'.data'}{xilinx}{text} = Goo::Canvas::Text->new($self,
+	$data->{xilinx}{text} = Goo::Canvas::Text->new($self,
 		"XILINX", $x+53,$y+64,28,'center',
 		'alignment'=>'center',
 		'fill-color'=>'white',
 		'font'=>'Sans 3',
 	);
-	$self->{'.data'}{xformer}{chip} = Goo::Canvas::Rect->new($self,
+	$data->{xformer}{chip} = Goo::Canvas::Rect->new($self,
 		$x+34,$y+16,12,28,
 		'line-width'=>0,
 		'fill-color'=>'DarkSlateGray',
 	);
-	$self->{'.data'}{xformer}{text} = Goo::Canvas::Text->new($self,
+	$data->{xformer}{text} = Goo::Canvas::Text->new($self,
 		"XFORMER", $x+40,$y+30,28,'center',
 		'alignment'=>'center',
 		'fill-color'=>'white',
 		'font'=>'Sans 3',
 	);
-	$self->{'.data'}{dallas}{chip} = Goo::Canvas::Rect->new($self,
+	$data->{dallas}{chip} = Goo::Canvas::Rect->new($self,
 		$x+78,$y+13,24,24,
 		'line-width'=>0,
 		'fill-color'=>'DarkSlateGray',
 	);
-	$self->{'.data'}{dallas}{text} = Goo::Canvas::Text->new($self,
+	$data->{dallas}{text} = Goo::Canvas::Text->new($self,
 		"DALLAS", $x+90,$y+25,24,'center',
 		'alignment'=>'center',
 		'fill-color'=>'white',
 		'font'=>'Sans 3',
 	);
-	$self->{'.data'}{plx}{chip} = Goo::Canvas::Rect->new($self,
+	$data->{plx}{chip} = Goo::Canvas::Rect->new($self,
 		$x+79,$y+54,24,24,
 		'line-width'=>0,
 		'fill-color'=>'DarkSlateGray',
 	);
-	$self->{'.data'}{plx}{text} = Goo::Canvas::Text->new($self,
+	$data->{plx}{text} = Goo::Canvas::Text->new($self,
 		"PLX 9030", $x+91,$y+66,24,'center',
 		'alignment'=>'center',
 		'fill-color'=>'white',
 		'font'=>'Sans 3',
 	);
-	$self->{'.data'}{bezel} = Goo::Canvas::Polyline->new($self, FALSE,
+	$data->{bezel} = Goo::Canvas::Polyline->new($self, Glib::FALSE,
 		[
 			$x-12,$y-6,
 			$x+ 0,$y-6,
@@ -853,94 +2745,190 @@ sub new {
 		'line-cap'=>'round',
 		'stroke-color'=>'darkgray',
 	);
+	foreach (@{$objs->{parts}}) {
+		push @{$data->{subvs}}, SpanView->new($self,$_);
+	}
+	$self->translate((3-$card)*20,(3-$card)*10);
+package ChanView;
+	$self->View::_init($obj);
+	return $self;
+}
+#package CardView;
+sub refresh_view {
+	my ($self,$obj) = @_;
+	my $data = $self->_data;
+	$self->enable_view($obj) unless $data->{active};
+	my ($val,$text,$more);
+	my %cardtypes = (
+		'zeroDotZero'=>'Unknown',
+		'mxCardTypePLX9030'=>'PLX 9030',
+		'mxCardTypePLXDevelopmentBoard'=>'PLX 9030 Dev.',
+		'mxCardTypeX400P'=>'X400P',
+		'mxCardTypeE400P'=>'E400P',
+		'mxCardTypeT400P'=>'T400P',
+		'mxCardTypeX400P-SS7'=>'X400P-SS7',
+		'mxCardTypeE400P-SS7'=>'E400P-SS7',
+		'mxCardTypeT400P-SS7'=>'T400P-SS7',
+		'mxCardTypeV400P'=>'V400P',
+		'mxCardTypeV400PE'=>'V400PE',
+		'mxCardTypeV400PT'=>'V400PT',
+		'mxCardTypeA400P'=>'A400P',
+		'mxCardTypeV401PE'=>'V401PE',
+		'mxCardTypeV401PT'=>'V401PT',
+		'mxCardTypeAT400P'=>'AT400P',
+		'mxCardTypeAE400P'=>'AE400P',
+		'mxCardTypeA400PT'=>'A400PT',
+		'mxCardTypeA400PE'=>'A400PE',
+	);
+	$val = $obj->_data->{mxCardType};
+	$text = exists $cardtypes{$val} ? $cardtypes{$val} : 'Unknown';
+	$val = $obj->_data->{mxCardRevision};
+	$text .= ' Rev. $val';
+	$text = "(PCI $obj->_data->{mxCardPciBus}:$obj->_data->{mxCardPciSlot}:$obj->_data->{mxCardPciIrq}) ".$text;
+	$val = $obj->_data->{mxCardSpanType};
+	my %spantypes = (
+		1=>'E1/T1/J1',
+		2=>'T1',
+		3=>'E1',
+		4=>'J1',
+	);
+	$more = exists $spantypes{$val} ? $spantypes{$val} : '??';
+	$text .= " $more";
+	$data->{text}->set(text=>$text);
+
+	my %chiptypes = (
+		'zeroDotZero'=>'DALLAS',
+		'mxChipTypeDS2152'=>'DS2152',
+		'mxChipTypeDS21352'=>'DS21352',
+		'mxChipTypeDS21552'=>'DS21552',
+		'mxChipTypeDS2154'=>'DS2154',
+		'mxChipTypeDS21354'=>'DS21354',
+		'mxChipTypeDS21554'=>'DS21554',
+		'mxChipTypeDS2155'=>'DS2155',
+		'mxChipTypeDS2156'=>'DS2156',
+		'mxChipTypeDS21455'=>'DS21455',
+		'mxChipTypeDS21458'=>'DS21458',
+	);
+	$val = $obj->_data->{mxCardChipType};
+	$text = exists $chiptypes{$val} ? $chiptypes{$val} : 'DALLAS';
+	$val = $obj->_data->{mxCardChipRevision};
+	$text .= " Rev. $val";
+	$data->{dallas}{text}->set(text=>$text);
+	return $self;
+}
+#package CardView;
+sub disable_view {
+	my ($self,$obj) = @_;
+	my $data = $self->_data;
+	$data->{outine}->set(
+		'stroke-color'=>'darkgray',
+		'fill-color'=>'lightgray',
+	);
+	$data->{text}->set('fill-color'=>'gray');
+	foreach (qw/xilinx xformer dallas plx/) {
+		$data->{$_}{chip}->set('fill-color'=>'lightgray');
+		$data->{$_}{text}->set('fill-color'=>'gray');
+	}
+	$data->{active} = Glib::FALSE;
+	return $self;
+}
+#package CardView;
+sub enable_view {
+	my ($self,$obj) = @_;
+	my $data = $self->_data;
+	$data->{outine}->set(
+		'stroke-color'=>'black',
+		'fill-color'=>'SeaGreen',
+	);
+	$data->{text}->set('fill-color'=>'white');
+	foreach (qw/xilinx xformer dallas plx/) {
+		$data->{$_}{chip}->set('fill-color'=>'DarkSlateGray');
+		$data->{$_}{text}->set('fill-color'=>'white');
+	}
+	$data->{active} = Glib::TRUE;
 	return $self;
 }
 
 # ----------------------------------
-package Host;
+package DrivView;
 use strict;
 use Carp;
 use Gtk2;
-use Glib qw(TRUE FALSE);
+use Glib;
 use Goo::Canvas;
 use vars qw(@ISA);
-@ISA = qw(Gtk2::ScrolledWindow);
+@ISA = qw(View Goo::Canvas);
 # ----------------------------------
+# A DrivView is a view of a driver for a host and the driver's
+# subordinate data.  It consists of a Goo::Canvas that contains the view
+# of the cards, spans and channels.  The Goo::Canvas is placed inside of
+# the host Gtk2::ScolledWindow on a given notebook page.
+# ----------------------------------
+#package DrivView;
 sub new {
-	my ($type,$name) = @_;
-	my $self = Gtk2::ScrolledWindow->new();
+	my ($type,$host,$obj) = @_;
+	my $self = Goo::Canvas->new();
 	bless $self,$type;
-	my $cv = Goo::Canvas->new();
-	$cv->set(
+	my $data = $self->_data;
+	$data->{views} = ();
+	my $objs = $obj->_data;
+	$self->set(
 		'background-color'=>'white',
-		'automatic-bounds'=>TRUE,
+		'automatic-bounds'=>Glib::TRUE,
 		'units'=>'mm',
 	);
-	$cv->signal_connect('scroll-event'=>\&Host::canvasScroll,$self);
-	my $root = $cv->get_root_item;
-	my $data = { host=>$name };
-	$root->signal_connect('button-press-event',sub {
-		my ($it,$wv,$ev,$data) = @_;
-		my $menu = HostMenu->new($data->{host});
-		$menu->popup(undef,undef,undef,undef,$ev->button,$ev->time);
+	$self->signal_connect('scroll-event'=>\&DrivView::scroll);
+	my $root = $self->get_root_item;
+	$root->signal_connect('button-press-event',sub{
+		my ($it,$wv,$ev,$host) = @_;
+		HostMenu->new($host)->popup(undef,undef,undef,undef,$ev->button,$ev->time);
 		return Gtk2::EVENT_STOP;
-	},$data);
-	$self->set_policy('automatic','automatic');
-	$self->signal_connect('scroll-event'=>\&Host::scrollScroll,$self);
-	$self->add($cv);
-	$self->{'.data'}{cv} = $cv;
-	$self->{'.data'}{nm} = $name;
-	for (my $card = 0; $card < 4; $card++) {
-		my $cno = 3 - $card;
-		$self->{'.data'}{cards}[$cno] = Card->new($self,$card);
+	},$host);
+	foreach (reverse @{$objs->{parts}}) {
+		push @{$data->{subvs}}, CardView->new($self,$_);
 	}
+	$self->View::_init($obj);
 	return $self;
 }
-#package Host;
-sub canvasScroll {
-	my ($cv,$ev,$self) = @_;
-	my $state = $ev->get_state;
-	my $dir = $ev->direction;
-	my $states = join(',',@{$state});
-	if ($dir eq 'up' or $dir eq 'down') {
-		if ($states=~/control-mask/) {
-			if ($dir eq 'up') {
-				$cv->set_scale($cv->get_scale * 1.2);
-			} else {
-				$cv->set_scale($cv->get_scale / 1.2);
-			}
-			$ev->set_state([]);
-			return TRUE;
-		} elsif ($states=~/shift-mask/) {
-			if ($dir eq 'up') {
-				$ev->direction('left');
-			} else {
-				$ev->direction('right');
-			}
-			$ev->set_state([]);
-			$self->signal_emit('scroll-event',$ev);
-			return TRUE;
-		}
-	}
-	$self->signal_emit('scroll-event',$ev);
-	return FALSE;
+#package DrivView;
+sub refresh_view {
+	my ($self,$obj) = @_;
+	my $data = $self->_data;
+	$self->enable_view($obj) unless $data->{active};
+	# XXX we should place driver information on the background
+	return $self;
 }
-#package Host;
-sub scrollScroll {
-	my ($sw,$ev,$self) = @_;
-	my $cv = $self->{'.data'}{cv};
+#package DrivView;
+sub disable_view {
+	my ($self,$obj) = @_;
+	my $data = $self->_data;
+	$self->set('background-color'=>'lightgray');
+	$data->{active} = Glib::FALSE;
+	return $self;
+}
+#package DrivView;
+sub enable_view {
+	my ($self,$obj) = @_;
+	my $data = $self->_data;
+	$self->set('background-color'=>'white');
+	$data->{active} = Glib::TRUE;
+	return $self;
+}
+#package DrivView;
+sub scroll {
+	my ($self,$ev) = @_;
 	my $state = $ev->get_state;
 	my $dir = $ev->direction;
 	my $states = join(',',@{$state});
 	if ($dir eq 'up' or $dir eq 'down') {
 		if ($states=~/control-mask/) {
 			if ($dir eq 'up') {
-				$cv->set_scale($cv->get_scale * 1.2);
+				$self->set_scale($self->get_scale * 1.2);
 			} else {
-				$cv->set_scale($cv->get_scale / 1.2);
+				$self->set_scale($self->get_scale / 1.2);
 			}
 			$ev->set_state([]);
-			return TRUE;
+			return Gtk2::EVENT_STOP;
 		} elsif ($states=~/shift-mask/) {
 			if ($dir eq 'up') {
 				$ev->direction('left');
@@ -948,10 +2936,139 @@ sub scrollScroll {
 				$ev->direction('right');
 			}
 			$ev->set_state([]);
-			return TRUE;
+			$self->parent->signal_emit('scroll-event',$ev);
+			return Gtk2::EVENT_STOP;
 		}
 	}
-	return FALSE;
+	$self->parent->signal_emit('scroll-event',$ev);
+	return Gtk2::EVENT_PROPAGATE;
+
+
+}
+
+# ----------------------------------
+package HostView;
+use strict;
+use Carp;
+use Gtk2;
+use Glib;
+use Goo::Canvas;
+use vars qw(@ISA);
+@ISA = qw(View Store Gtk2::ScrolledWindow);
+# ----------------------------------
+# A HostView is a view of host and subordinate data.  It consists of a
+# Gtk2::ScrolledWindow that contains the view of the host and
+# subordinate objects.  The Gtk2::ScrolledWindow is used as a notebook
+# page within a Window.
+# ----------------------------------
+#package HostView;
+sub new {
+	my ($type,$windid,$pageid,$hostid) = @_;
+	my $self = Gtk2::ScrolledWindow->new();
+	bless $self,$type;
+	$self->Store::_init('pages',$windid,$pageid,$hostid);
+	my $data = $self->_data;
+	my $obj = HostData->get($hostid);
+	my $objs = $obj->_data;
+	$self->set_policy('automatic','automatic');
+	$self->signal_connect('scroll-event'=>\&HostView::scroll);
+	MyDBI::begin_work;
+	foreach (@{$objs->{parts}}) {
+		if (my $driv = DrivView->new($obj,$_)) {
+			push @{$data->{subvs}}, $driv;
+			$self->add($driv);
+		}
+	}
+	$self->View::_init($obj);
+	$self->save unless $self->read;
+	MyDBI::commit;
+	return $self;
+}
+#package HostView;
+sub refesh_view {
+	my ($self,$obj) = @_;
+	my $data = $self->_data;
+	$self->enable_view($obj) unless $data->{active};
+	# XXX we should color the tab in the notebook on the basis
+	# of the connectivity of the host.
+	return $self;
+}
+#package HostView;
+sub enable_view {
+	my ($self,$obj) = @_;
+	my $data = $self->_data;
+	# XXX we should color the tab in the notebook on the basis
+	# of the connectivity of the host.
+	$data->{active} = Glib::TRUE;
+	return $self;
+}
+#package HostView;
+sub disable_view {
+	my ($self,$obj) = @_;
+	my $data = $self->_data;
+	# XXX we should color the tab in the notebook on the basis
+	# of the connectivity of the host.
+	$data->{active} = Glib::FALSE;
+	return $self;
+}
+#package HostView;
+sub read {
+	my $self = shift;
+	my $data = $self->_data;
+	if ($self->Store::read) {
+		$data->{subvs}[0]->set_scale($data->{scale});
+		my $adj;
+		$adj = $self->get_hadjustment;
+		$adj->value($data->{xoffset});
+		$adj->value_changed;
+		$adj = $self->get_vadjustment;
+		$adj->value($data->{yoffset});
+		$adj->value_changed;
+		return Glib::TRUE;
+	}
+	return Glib::FALSE;
+}
+#package HostView;
+sub save {
+	my $self = shift;
+	my $data = $self->_data;
+	$data->{scale} = $data->{subvs}[0]->get_scale;
+	my $adj;
+	$adj = $self->get_hadjustment;
+	$data->{xoffset} = $adj->value;
+	$adj = $self->get_vadjustment;
+	$data->{yoffset} = $adj->value;
+	$self->Store::save;
+	return $self;
+}
+#package HostView;
+sub scroll {
+	my ($self,$ev) = @_;
+	my $data = $self->_data;
+	my $canvas = $data->{subvs}[0];
+	my $state = $ev->get_state;
+	my $dir = $ev->direction;
+	my $states = join(',',@{$state});
+	if ($dir eq 'up' or $dir eq 'down') {
+		if ($states=~/control-mask/) {
+			if ($dir eq 'up') {
+				$canvas->set_scale($canvas->get_scale * 1.2);
+			} else {
+				$canvas->set_scale($canvas->get_scale / 1.2);
+			}
+			$ev->set_state([]);
+			return Gtk2::EVENT_STOP;
+		} elsif ($states=~/shift-mask/) {
+			if ($dir eq 'up') {
+				$ev->direction('left');
+			} else {
+				$ev->direction('right');
+			}
+			$ev->set_state([]);
+			return Gtk2::EVENT_STOP;
+		}
+	}
+	return Gtk2::EVENT_PROPAGATE;
 }
 
 # ----------------------------------
@@ -959,19 +3076,26 @@ package Window;
 use strict;
 use Carp;
 use Gtk2;
-use Glib qw(TRUE FALSE);
+use Glib;
 use Goo::Canvas;
 use vars qw(@ISA);
-@ISA = qw(Gtk2::Window);
+@ISA = qw(Store Gtk2::Window);
 # ----------------------------------
 #package Window;
 sub new {
-	my ($type,@args) = @_;
+	my ($type,$windid) = @_;
 	my $self = Gtk2::Window->new('toplevel');
 	bless $self,$type;
-	my $windid = scalar @::windows;
-	my $data = $self->{'.data'} = {};
-	$self->read($windid);
+	if (defined $windid) {
+		if ($::windidn <= $windid) {
+			$::windidn = $windid+1;
+		}
+	} else {
+		$windid = $::windidn;
+		$::windidn++;
+	}
+	$self->Store::_init('winds',$windid);
+	my $data = $self->_data;
 	my $mb = Gtk2::MenuBar->new;
 	my $me = Gtk2::Menu->new;
 	my $mi;
@@ -994,21 +3118,29 @@ sub new {
 	$nb->popup_enable;
 	my $vb = Gtk2::VBox->new();
 	$vb->set_spacing(0);
-	$vb->pack_start($mb,FALSE,FALSE,0);
-	$vb->pack_start($nb,TRUE,TRUE,0);
+	$vb->pack_start($mb,Glib::FALSE,Glib::FALSE,0);
+	$vb->pack_start($nb,Glib::TRUE,Glib::TRUE,0);
 	$self->set_type_hint('normal');
 	$self->set_default_size(800,640);
-	$self->move($data->{xpos},$data->{ypos}) if defined $data->{xpos};
-	$self->resize($data->{width},$data->{height}) if defined $data->{width};
+	my $read = $self->read;
+	if ($read) {
+		$self->move($data->{xpos},$data->{ypos}) if defined $data->{xpos};
+		$self->resize($data->{width},$data->{height}) if defined $data->{width};
+		# If the window is in the database, then we need to read
+		# whatever  notebook pages there are.
+	}
 	$self->set_opacity(0.5);
 	$self->set_position('mouse');
 	$self->signal_connect('delete-event'=>sub{
 		my ($self,$ev) = @_;
-		my @windows = ( @::windows ); @::windows = ();
-		while (my $w = shift @windows) {
-			push @::windows, $w unless $w eq $self;
+		my %windows = map {$_=>1} @::windows;
+		delete $windows{$self};
+		@::windows = (keys %windows);
+		if ($::quitting or scalar @::windows == 0) {
+			$self->save_all;
+		} else {
+			$self->remove;
 		}
-		if ($::quitting or scalar @::windows == 0) { $self->save; } else { $self->remove; }
 		if (scalar @::windows == 0) {
 			$::quitting = 1;
 			Gtk2->main_quit;
@@ -1019,86 +3151,130 @@ sub new {
 	$self->show_all;
 	$data->{nb} = $nb;
 	push @::windows, $self;
-	return $self->save;
+	$self->save unless $read;
+	return $self;
 }
 #package Window;
 sub read {
-	my ($self,$windid) = @_;
-	my $data = $self->{'.data'};
-	my $sth = $MyDBI::schema{winds}{select};
-	$data->{windid} = $windid;
-	if ($sth->execute($windid)) {
-		if (my $row = $sth->fetchrow_hashref) {
-			foreach (@{$MyDBI::schema{winds}{cols}}) {
-				$data->{$_} = $row->{$_};
-			}
-		}
-	} else {
-		warn $sth->errstr;
+	my $self = shift;
+	my $data = $self->_data;
+	if ($self->Store::read) {
+		$self->move($data->{xpos},$data->{ypos})
+			if defined $data->{xpos} and defined $data->{ypos};
+		$self->resize($data->{width},$data->{height})
+			if defined $data->{width} and defined $data->{height};
+		return Glib::TRUE;
 	}
-	return $self;
+	return Glib::FALSE;
 }
 #package Window;
 sub save {
 	my $self = shift;
-	my $data = $self->{'.data'};
-	my $sth = $MyDBI::schema{winds}{insert};
+	my $data = $self->_data;
 	($data->{xpos}, $data->{ypos}  ) = $self->get_position;
 	($data->{width},$data->{height}) = $self->get_size;
-	$sth->execute($data->{windid},$data->{xpos},$data->{ypos},$data->{width},$data->{height})
-		or warn $sth->errstr;
-	return $self;
-}
-#package Window;
-sub remove {
-	my $self = shift;
-	my $data = $self->{'.data'};
-	my $sth = $MyDBI::schema{winds}{delete};
-	$sth->execute($data->{windid}) or warn $sth->errstr;
+	$self->Store::save;
 	return $self;
 }
 #package Window;
 sub menuSnmpNew {
 	my ($mi,$self) = @_;
-	carp join(', ',@_).": menu item invoked";
+	Carp::cluck join(', ',@_).": menu item invoked";
 }
 #package Window;
 sub menuSnmpOpen {
 	my ($mi,$tw) = @_;
-	carp join(', ',@_).": menu item invoked";
+	Carp::cluck join(', ',@_).": menu item invoked";
 }
 #package Window;
 sub menuSnmpClose {
 	my ($mi,$self) = @_;
-	carp join(', ',@_).": menu item invoked";
+	Carp::cluck join(', ',@_).": menu item invoked";
+	my $data = $self->_data;
+	my %windows = map {$_=>1} @::windows;
+	delete $windows{$self};
+	@::windows = (keys %windows);
+	$self->remove;
+	$self->destroy;
 }
 #package Window;
 sub menuSnmpQuit {
 	my ($mi,$self) = @_;
-	carp join(', ',@_).": menu item invoked";
+	Carp::cluck join(', ',@_).": menu item invoked";
+	$::quitting = 1;
+	foreach (@::windows) { $_->save_all }
+	Gtk2->main_quit;
 }
 #package Window;
 sub add_page {
 	my ($self,$host) = @_;
-	my $nb = $self->{'.data'}{nb};
-	$nb->append_page($host,$host->{'.data'}{nm});
-	$nb->set_tab_detachable($host,TRUE);
-	$nb->set_tab_reorderable($host,TRUE);
+	my $data = $self->_data;
+	my $nb = $data->{nb};
+	$nb->append_page($host,$host->_data->{DestHost});
+	$nb->set_tab_detachable($host,Glib::TRUE);
+	$nb->set_tab_reorderable($host,Glib::TRUE);
+	push @{$data->{parts}}, $host;
 	$self->show_all;
 }
 #package Window;
 sub newmain {
 	my ($type) = @_;
-	my $self = $type->new();
-	$self->add_page(Host->new('localhost'));
-	$self->add_page(Host->new('otherhost'));
+	my $self = Window::new(@_);
+	my $data = $self->_data;
+	my $nb = $data->{nb};
+	my ($host,$view);
+	MyDBI::begin_work;
+	$host = HostData->new(undef,'localhost');
+	$view = HostView->new($data->{windid},$nb->get_n_pages,$host->_data->{hostid});
+	$self->add_page($view);
+	$host = HostData->new(undef,'otherhost');
+	$view = HostView->new($data->{windid},$nb->get_n_pages,$host->_data->{hostid});
+	$self->add_page($view);
+	MyDBI::commit;
 	return $self;
+}
+#package Window;
+sub readdb {
+	my ($type,$dbh) = @_;
+	my @cols = @{$MyDBI::schema{winds}{cols}};
+	my $sql = "SELECT windid FROM winds;\n";
+	my $sth = MyDBI::preparesql($dbh,$sql);
+	$sth->execute() or warn $sth->errstr;
+	my %ids = ();
+	while (my $row = $sth->fetchrow_hashref) {
+		$ids{$row->{windid}} = 1;
+	}
+	$sth->finish;
+	unless (scalar keys %ids > 0) {
+		return Window->newmain;
+	}
+	MyDBI::begin_work;
+	foreach (sort {$a <=> $b} keys %ids) {
+		next unless length($_);
+		my $wind = Window->new($_);
+		$sql = "SELECT pageid,hostid FROM pages WHERE windid == $_ ORDER BY pageid;\n";
+		$sth = MyDBI::preparesql($dbh,$sql);
+		$sth->execute() or warn $sth->errstr;
+		my @pids = ();
+		my %hids = ();
+		while (my $row = $sth->fetchrow_hashref) {
+			push @pids, $row->{pageid};
+			$hids{$row->{pageid}} = $row->{hostid};
+		}
+		$sth->finish;
+		foreach my $pid (@pids) {
+			my $view = HostView->new($_,$pid,$hids{$pid});
+			$wind->add_page($view);
+		}
+	}
+	MyDBI::commit;
+	return undef;
 }
 #package Window;
 sub newWindow {
 	my ($nb,$host,$x,$y) = @_;
 	my $self = Window->new();
-	return $self->{'.data'}{nb};
+	return $self->_data->{nb};
 }
 
 # ----------------------------------
@@ -1110,18 +3286,19 @@ use DBI;
 # ----------------------------------
 
 MyDBI::initSchema();
-MyDBI::startdb('./.mxconfig');
+$MyDBI::dbh = MyDBI::startdb('./.mxconfig');
 
 #my $d = Data::Dumper->new([\%MyDBI::schema]);
 #print $d->Dump;
 
 Gtk2::Notebook->set_window_creation_hook(\&Window::newWindow);
 
-Window->newmain;
+HostData->readdb($MyDBI::dbh);
+Window->readdb($MyDBI::dbh);
 
-Gtk2->main;
+Gtk2->main();
 
-MyDBI::stopdb();
+MyDBI::stopdb($MyDBI::dbh);
 
 exit;
 
