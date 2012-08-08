@@ -1267,7 +1267,8 @@ sub _init {
 	my ($self,$obj) = @_;
 	my $data = $self->_data;
 	$data->{subvs} = () unless exists $data->{subvs};
-	$data->{active} = Glib::FALSE;
+	$data->{active} = Glib::TRUE;
+	$data->{highlight} = Glib::FALSE;
 	my $vlst = $data->{vlst} = $obj->view_list;
 	$vlst->add_view($self);
 }
@@ -2043,6 +2044,7 @@ sub new {
 	my ($type,$name,$obj) = @_;
 	my $self = Gtk2::Window->new('toplevel');
 	bless $self,$type;
+	$self->View::_init($obj);
 	my $data = $self->_data;
 	$data->{schema} = $obj->_data->{schema};
 	my $fr = Gtk2::Frame->new($name." ".$obj->label);
@@ -2107,7 +2109,6 @@ sub new {
 		return Gtk2::EVENT_STOP;
 	});
 	$self->add($vb);
-	$self->View::_init($obj);
 	return $self;
 }
 #package Entry;
@@ -2222,7 +2223,7 @@ use vars qw(@ISA);
 # ----------------------------------
 #package Menu;
 sub new {
-	my ($type,$name,$obj) = @_;
+	my ($type,$name,$obj,$view) = @_;
 	my $self = Gtk2::Menu->new;
 	bless $self,$type;
 	my $data = $self->_data;
@@ -2245,9 +2246,8 @@ use vars qw(@ISA);
 # ----------------------------------
 #package Properties
 sub new {
-	my ($type,$name,$obj) = @_;
+	my ($type,$name,$obj,$view) = @_;
 	my $self = Menu::new(@_);
-	my $data = $self->_data;
 	my $mi = EntryMenuItem->new("$name Properties",$obj);
 	$mi->show;
 	$self->append($mi);
@@ -2263,7 +2263,7 @@ use vars qw(@ISA);
 @ISA = qw(Properties);
 #-----------------------------------
 sub new {
-	my ($type,$name,$obj) = @_;
+	my ($type,$name,$obj,$view) = @_;
 	my $self = Properties::new(@_);
 	my $objs = $obj->_data;
 	if ($objs->{msrc}) {
@@ -2284,8 +2284,8 @@ use vars qw(@ISA);
 # ----------------------------------
 #package ChanMenu;
 sub new {
-	my ($type,$obj) = @_;
-	my $self = MonSource::new($type,'Channel',$obj);
+	my ($type,$obj,$view) = @_;
+	my $self = MonSource::new($type,'Channel',$obj,$view);
 	my $objs = $obj->_data;
 	my $mi = EntryMenuItem->new('Channel Cross-connect',$objs->{xcon});
 	$mi->show;
@@ -2303,8 +2303,8 @@ use vars qw(@ISA);
 # ----------------------------------
 #package SpanMenu;
 sub new {
-	my ($type,$obj) = @_;
-	my $self = MonSource::new($type,'Span',$obj);
+	my ($type,$obj,$view) = @_;
+	my $self = MonSource::new($type,'Span',$obj,$view);
 	my $objs = $obj->_data;
 	my $mi = EntryMenuItem->new('Span Bert',$objs->{bert});
 	$mi->show;
@@ -2379,18 +2379,20 @@ use vars qw(@ISA);
 # ----------------------------------
 #package CardMenu;
 sub new {
-	my ($type,$obj) = @_;
-	my $self = MonSource::new($type,'Card',$obj);
-	my $objs = $obj->_data;
-	my $mi = Gtk2::SeparatorMenuItem->new;
-	$mi->show;
-	$self->append($mi);
-	foreach (@{$objs->{parts}}) {
-		$mi = Gtk2::MenuItem->new_with_label($_->stitle);
-		$mi->set_submenu(SpanMenu->new($_));
-		$mi->set_right_justified(Glib::TRUE);
+	my ($type,$obj,$view) = @_;
+	my $self = MonSource::new($type,'Card',$obj,$view);
+	if (0) {
+		my $objs = $obj->_data;
+		my $mi = Gtk2::SeparatorMenuItem->new;
 		$mi->show;
 		$self->append($mi);
+		foreach (@{$objs->{parts}}) {
+			$mi = Gtk2::MenuItem->new_with_label($_->stitle);
+			$mi->set_submenu(SpanMenu->new($_));
+			$mi->set_right_justified(Glib::TRUE);
+			$mi->show;
+			$self->append($mi);
+		}
 	}
 	return $self;
 }
@@ -2405,18 +2407,20 @@ use vars qw(@ISA);
 # ----------------------------------
 #package DrivMenu;
 sub new {
-	my ($type,$obj) = @_;
-	my $self = MonSource::new($type,'Driver',$obj);
-	my $objs = $obj->_data;
-	my $mi = Gtk2::SeparatorMenuItem->new;
-	$mi->show;
-	$self->append($mi);
-	foreach (@{$objs->{parts}}) {
-		$mi = Gtk2::MenuItem->new_with_label($_->stitle);
-		$mi->set_submenu(CardMenu->new($_));
-		$mi->set_right_justified(Glib::TRUE);
-		$self->append($mi);
+	my ($type,$obj,$view) = @_;
+	my $self = MonSource::new($type,'Driver',$obj,$view);
+	if (0) {
+		my $objs = $obj->_data;
+		my $mi = Gtk2::SeparatorMenuItem->new;
 		$mi->show;
+		$self->append($mi);
+		foreach (@{$objs->{parts}}) {
+			$mi = Gtk2::MenuItem->new_with_label($_->stitle);
+			$mi->set_submenu(CardMenu->new($_));
+			$mi->set_right_justified(Glib::TRUE);
+			$mi->show;
+			$self->append($mi);
+		}
 	}
 	return $self;
 }
@@ -2431,18 +2435,20 @@ use vars qw(@ISA);
 # ----------------------------------
 #package HostMenu;
 sub new {
-	my ($type,$obj) = @_;
-	my $self = MonSource::new($type,'Host',$obj);
-	my $objs = $obj->_data;
-	my $mi = Gtk2::SeparatorMenuItem->new;
-	$mi->show;
-	$self->append($mi);
-	foreach (@{$objs->{parts}}) {
-		$mi = Gtk2::MenuItem->new_with_label($_->stitle);
-		$mi->set_submenu(DrivMenu->new($_));
-		$mi->set_right_justified(Glib::TRUE);
+	my ($type,$obj,$view) = @_;
+	my $self = MonSource::new($type,'Host',$obj,$view);
+	if (0) {
+		my $objs = $obj->_data;
+		my $mi = Gtk2::SeparatorMenuItem->new;
 		$mi->show;
 		$self->append($mi);
+		foreach (@{$objs->{parts}}) {
+			$mi = Gtk2::MenuItem->new_with_label($_->stitle);
+			$mi->set_submenu(DrivMenu->new($_));
+			$mi->set_right_justified(Glib::TRUE);
+			$mi->show;
+			$self->append($mi);
+		}
 	}
 	return $self;
 }
@@ -2455,7 +2461,7 @@ use Gtk2;
 use Glib;
 use Goo::Canvas;
 use vars qw(@ISA);
-@ISA = qw(View Goo::Canvas::Group);
+@ISA = qw(View Goo::Canvas::GroupModel);
 # ----------------------------------
 # A ChanView is a view of a channels for a host, driver, card and span,
 # and the span's subordinate data.  It consists of a Goo::Canvas::Group
@@ -2464,13 +2470,14 @@ use vars qw(@ISA);
 # ----------------------------------
 #package ChanView;
 sub new {
-	my ($type,$span,$obj) = @_;
-	my $self = Goo::Canvas::Group->new($span);
+	my ($type,$canv,$span,$obj) = @_;
+	my $self = Goo::Canvas::GroupModel->new($span);
 	bless $self,$type;
+	$self->View::_init($obj);
 	my $data = $self->_data;
+	$data->{obj} = $obj;
 	my $objs = $obj->_data;
 	$data->{mxChanIndex} = $objs->{mxChanIndex};
-	$self->View::_init($obj);
 	return $self;
 }
 
@@ -2482,7 +2489,7 @@ use Gtk2;
 use Glib;
 use Goo::Canvas;
 use vars qw(@ISA);
-@ISA = qw(View Goo::Canvas::Group);
+@ISA = qw(View Goo::Canvas::GroupModel);
 # ----------------------------------
 # A SpanView is a view of a span for a host, driver and card, and the
 # span's subordinate data.  It consists of a Goo::Canvas::Group
@@ -2493,42 +2500,98 @@ use vars qw(@ISA);
 # ----------------------------------
 #package SpanView;
 sub new {
-	my ($type,$card,$obj) = @_;
-	my $self = Goo::Canvas::Group->new($card);
+	my ($type,$canv,$card,$obj) = @_;
+	my $self = Goo::Canvas::GroupModel->new($card);
 	bless $self,$type;
+	$self->View::_init($obj);
 	my $data = $self->_data;
+	$data->{obj} = $obj;
 	my $objs = $obj->_data;
-	my ($x,$y) = (15,8);
-	$data->{led} = Goo::Canvas::Rect->new($self,
-		$x+0,$y+8,7,5,
-		'line-width'=>0,
-		'fill-color'=>'red',
-	);
-	$data->{jack} = Goo::Canvas::Rect->new($self,
-		$x+0,$y+13,18,15,
-		'line-width'=>0,
-		'fill-color'=>'DarkSlateGray',
-	);
-	$data->{jack}->signal_connect('button-press-event',sub{
-		my ($it,$wg,$ev,$obj) = @_;
-		if ($ev->button == 3) {
-			SpanMenu->new($obj)->popup(undef,undef,undef,undef,$ev->button,$ev->time);
-			return Gtk2::EVENT_STOP;
+	$self->set('pointer-events'=>'all');
+	my $item = $canv->get_item($self);
+	$item->signal_connect('enter-notify-event'=>sub{
+		my ($item,$targ,$ev) = @_;
+		$item->get_model->highlight_view;
+		return Gtk2::EVENT_PROPAGATE;
+	});
+	$item->signal_connect('leave-notify-event'=>sub{
+		my ($item,$targ,$ev) = @_;
+		$item->get_model->unhighlight_view;
+		return Gtk2::EVENT_PROPAGATE;
+	});
+	$item->signal_connect('button-press-event'=>sub{
+		my ($item,$targ,$ev,$obj) = @_;
+		if ($ev->button == 1) {
+			$item->get_model->enable_view($obj);
+		} elsif ($ev->button == 2) {
+			$item->get_model->disable_view($obj);
+		} elsif ($ev->button == 8) {
+			$item->get_model->set(visibility=>'invisible');
+		} elsif ($ev->button == 9) {
+			$item->get_model->set(visibility=>'visible');
 		}
 		return Gtk2::EVENT_PROPAGATE;
 	},$obj);
-	$data->{text} = Goo::Canvas::Text->new($self,
+	my ($x,$y) = (15,8);
+	my $chld;
+	$chld = $data->{led} = Goo::Canvas::RectModel->new($self,
+		$x+0,$y+8,7,5,
+		'line-width'=>0,
+		'fill-color'=>'red',
+		'pointer-events'=>'all',
+	);
+	$chld->{view} = $self;
+	$chld = $data->{jack} = Goo::Canvas::RectModel->new($self,
+		$x+0,$y+13,18,15,
+		'line-width'=>0,
+		'fill-color'=>'DarkSlateGray',
+		'pointer-events'=>'all',
+	);
+	$chld->{view} = $self;
+	$chld = $data->{text} = Goo::Canvas::TextModel->new($self,
 		"$objs->{mxCardIndex}:$objs->{mxSpanIndex}", $x+9,$y+20,15,'center',
 		'alignment'=>'center',
 		'fill-color'=>'white',
 		'font'=>'Sans 3',
+		'pointer-events'=>'all',
 	);
+	$chld->{view} = $self;
 	foreach (@{$objs->{parts}}) {
-		push @{$data->{subvs}}, ChanView->new($self,$_);
+		push @{$data->{subvs}}, ChanView->new($canv,$self,$_);
 	}
 	$self->translate(0,$objs->{mxSpanIndex}*20);
-	$self->View::_init($obj);
 	return $self;
+}
+#package SpanView;
+sub highlight_view {
+	my $self = shift;
+	my $data = $self->_data;
+	$data->{led}->set(
+		'line-width'=>0.2,
+		'stroke-color'=>'cyan',
+	);
+	$data->{jack}->set(
+		'line-width'=>0.3,
+		'stroke-color'=>'cyan',
+	);
+	$data->{text}->set('fill-color'=>'cyan');
+	$data->{highlight} = Glib::TRUE;
+}
+#package SpanView;
+sub unhighlight_view {
+	my $self = shift;
+	my $data = $self->_data;
+	$data->{led}->set(
+		'line-width'=>0,
+		'stroke-color'=>'black',
+	);
+	$data->{jack}->set(
+		'line-width'=>0,
+		'stroke-color'=>'black',
+	);
+	my $color = $data->{active} ? 'white' : 'lightgray';
+	$data->{text}->set('fill-color'=>$color);
+	$data->{highlight} = Glib::FALSE;
 }
 #package SpanView;
 sub refresh_view {
@@ -2545,15 +2608,10 @@ sub refresh_view {
 sub disable_view {
 	my ($self,$obj) = @_;
 	my $data = $self->_data;
-	$data->{led}->set(
-		'fill-color'=>'gray',
-	);
-	$data->{jack}->set(
-		'fill-color'=>'gray',
-	);
-	$data->{text}->set(
-		'fill-color'=>'lightgray',
-	);
+	$data->{led}->set('fill-color'=>'gray');
+	$data->{jack}->set('fill-color'=>'gray');
+	my $color = $data->{highlight} ? 'cyan' : 'lightgray';
+	$data->{text}->set('fill-color'=>$color);
 	$data->{active} = Glib::FALSE;
 	return $self;
 }
@@ -2561,15 +2619,10 @@ sub disable_view {
 sub enable_view {
 	my ($self,$obj) = @_;
 	my $data = $self->_data;
-	$data->{led}->set(
-		'fill-color'=>'black',
-	);
-	$data->{jack}->set(
-		'fill-color'=>'DarkSlateGray',
-	);
-	$data->{text}->set(
-		'fill-color'=>'white',
-	);
+	$data->{led}->set('fill-color'=>'black');
+	$data->{jack}->set('fill-color'=>'DarkSlateGray');
+	my $color = $data->{highlight} ? 'cyan' : 'white';
+	$data->{text}->set('fill-color'=>$color);
 	$data->{active} = Glib::TRUE;
 	return $self;
 }
@@ -2582,7 +2635,7 @@ use Gtk2;
 use Glib;
 use Goo::Canvas;
 use vars qw(@ISA);
-@ISA = qw(View Goo::Canvas::Group);
+@ISA = qw(View Goo::Canvas::GroupModel);
 # ----------------------------------
 # A CardView is a view of a card for host and driver, and the card's
 # subordinate data.  It consists of a Goo::Canvas::Group containing all
@@ -2590,14 +2643,42 @@ use vars qw(@ISA);
 # y offset within the Goo::Canvas for the driver.
 # ----------------------------------
 sub new {
-	my ($type,$driv,$obj) = @_;
-	my $self = Goo::Canvas::Group->new($driv->get_root_item);
+	my ($type,$canv,$root,$obj) = @_;
+	my $self = Goo::Canvas::GroupModel->new($root);
 	bless $self,$type;
+	$self->View::_init($obj);
 	my $data = $self->_data;
+	$data->{obj} = $obj;
 	my $objs = $obj->_data;
 	my $card = $objs->{mxCardIndex} - 1;
+	$self->set('pointer-events'=>'all');
+	my $item = $canv->get_item($self);
+	$item->signal_connect('enter-notify-event'=>sub{
+		my ($item,$target,$ev) = @_;
+		$item->get_model->highlight_view;
+		return Gtk2::EVENT_PROPAGATE;
+	});
+	$item->signal_connect('leave-notify-event'=>sub{
+		my ($item,$targ,$ev) = @_;
+		$item->get_model->unhighlight_view;
+		return Gtk2::EVENT_PROPAGATE;
+	});
+	$item->signal_connect('button-press-event'=>sub{
+		my ($item,$targ,$ev,$obj) = @_;
+		if ($ev->button == 1) {
+			$item->get_model->enable_view($obj);
+		} elsif ($ev->button == 2) {
+			$item->get_model->disable_view($obj);
+		} elsif ($ev->button == 8) {
+			$item->get_model->set(visibility=>'invisible');
+		} elsif ($ev->button == 9) {
+			$item->get_model->set(visibility=>'visible');
+		}
+		return Gtk2::EVENT_PROPAGATE;
+	},$obj);
 	my ($x,$y) = (15,9);
-	my $item = $data->{outline} = Goo::Canvas::Polyline->new($self, Glib::TRUE,
+	my $chld;
+	$chld = $data->{outline} = Goo::Canvas::PolylineModel->new($self, Glib::TRUE,
 		[
 			$x+  0,$y+ 0,
 			$x+130,$y+ 0,
@@ -2623,66 +2704,78 @@ sub new {
 		'line-cap'=>'round',
 		'stroke-color'=>'black',
 		'fill-color'=>'SeaGreen',
+		'pointer-events'=>'all',
 	);
-	$item->signal_connect('button-press-event',sub{
-		my ($it,$wg,$ev,$obj) = @_;
-		if ($ev->button == 3) {
-			CardMenu->new($obj)->popup(undef,undef,undef,undef,$ev->button,$ev->time);
-			return Gtk2::EVENT_STOP;
-		}
-		return Gtk2::EVENT_PROPAGATE;
-	},$obj);
-	$data->{text} = Goo::Canvas::Text->new($self,
+	$chld->{view} = $self;
+	$chld = $data->{text} = Goo::Canvas::TextModel->new($self,
 		"x400p-sl$card",$x+65,$y+5,130,'center',
 		'alignment'=>'center',
 		'fill-color'=>'white',
 		'font'=>'Sans 3',
+		'pointer-events'=>'all',
 	);
-	$data->{xilinx}{chip} = Goo::Canvas::Rect->new($self,
+	$chld->{view} = $self;
+	$chld = $data->{xilinx}{chip} = Goo::Canvas::RectModel->new($self,
 		$x+39,$y+50,28,28,
 		'line-width'=>0,
 		'fill-color'=>'DarkSlateGray',
+		'pointer-events'=>'all',
 	);
-	$data->{xilinx}{text} = Goo::Canvas::Text->new($self,
+	$chld->{view} = $self;
+	$chld = $data->{xilinx}{text} = Goo::Canvas::TextModel->new($self,
 		"XILINX", $x+53,$y+64,28,'center',
 		'alignment'=>'center',
 		'fill-color'=>'white',
 		'font'=>'Sans 3',
+		'pointer-events'=>'all',
 	);
-	$data->{xformer}{chip} = Goo::Canvas::Rect->new($self,
+	$chld->{view} = $self;
+	$chld = $data->{xformer}{chip} = Goo::Canvas::RectModel->new($self,
 		$x+34,$y+16,12,28,
 		'line-width'=>0,
 		'fill-color'=>'DarkSlateGray',
+		'pointer-events'=>'all',
 	);
-	$data->{xformer}{text} = Goo::Canvas::Text->new($self,
+	$chld->{view} = $self;
+	$chld = $data->{xformer}{text} = Goo::Canvas::TextModel->new($self,
 		"XFORMER", $x+40,$y+30,28,'center',
 		'alignment'=>'center',
 		'fill-color'=>'white',
 		'font'=>'Sans 3',
+		'pointer-events'=>'all',
 	);
-	$data->{dallas}{chip} = Goo::Canvas::Rect->new($self,
+	$chld->{view} = $self;
+	$chld = $data->{dallas}{chip} = Goo::Canvas::RectModel->new($self,
 		$x+78,$y+13,24,24,
 		'line-width'=>0,
 		'fill-color'=>'DarkSlateGray',
+		'pointer-events'=>'all',
 	);
-	$data->{dallas}{text} = Goo::Canvas::Text->new($self,
+	$chld->{view} = $self;
+	$chld = $data->{dallas}{text} = Goo::Canvas::TextModel->new($self,
 		"DALLAS", $x+90,$y+25,24,'center',
 		'alignment'=>'center',
 		'fill-color'=>'white',
 		'font'=>'Sans 3',
+		'pointer-events'=>'all',
 	);
-	$data->{plx}{chip} = Goo::Canvas::Rect->new($self,
+	$chld->{view} = $self;
+	$chld = $data->{plx}{chip} = Goo::Canvas::RectModel->new($self,
 		$x+79,$y+54,24,24,
 		'line-width'=>0,
 		'fill-color'=>'DarkSlateGray',
+		'pointer-events'=>'all',
 	);
-	$data->{plx}{text} = Goo::Canvas::Text->new($self,
+	$chld->{view} = $self;
+	$chld = $data->{plx}{text} = Goo::Canvas::TextModel->new($self,
 		"PLX 9030", $x+91,$y+66,24,'center',
 		'alignment'=>'center',
 		'fill-color'=>'white',
 		'font'=>'Sans 3',
+		'pointer-events'=>'all',
 	);
-	$data->{bezel} = Goo::Canvas::Polyline->new($self, Glib::FALSE,
+	$chld->{view} = $self;
+	$chld = $data->{bezel} = Goo::Canvas::PolylineModel->new($self, Glib::FALSE,
 		[
 			$x-12,$y-6,
 			$x+ 0,$y-6,
@@ -2692,13 +2785,13 @@ sub new {
 		'line-width'=>1,
 		'line-cap'=>'round',
 		'stroke-color'=>'darkgray',
+		'pointer-events'=>'all',
 	);
+	$chld->{view} = $self;
 	foreach (@{$objs->{parts}}) {
-		push @{$data->{subvs}}, SpanView->new($self,$_);
+		push @{$data->{subvs}}, SpanView->new($canv,$self,$_);
 	}
 	$self->translate((3-$card)*20,(3-$card)*10);
-package ChanView;
-	$self->View::_init($obj);
 	return $self;
 }
 #package CardView;
@@ -2743,7 +2836,6 @@ sub refresh_view {
 	$more = exists $spantypes{$val} ? $spantypes{$val} : '??';
 	$text .= " $more";
 	$data->{text}->set(text=>$text);
-
 	my %chiptypes = (
 		'zeroDotZero'=>'DALLAS',
 		'mxChipTypeDS2152'=>'DS2152',
@@ -2765,14 +2857,34 @@ sub refresh_view {
 	return $self;
 }
 #package CardView;
+sub highlight_view {
+	my $self = shift;
+	my $data = $self->_data;
+	$data->{outline}->set('stroke-color'=>'cyan');
+	$data->{text}->set('fill-color'=>'cyan');
+	$data->{highlight} = Glib::TRUE;
+}
+#package CardView;
+sub unhighlight_view {
+	my $self = shift;
+	my $data = $self->_data;
+	my $color = $data->{active} ? 'black' : 'darkgray';
+	$data->{outline}->set('stroke-color'=>$color);
+	$color = $data->{active} ? 'white' : 'gray';
+	$data->{text}->set('fill-color'=>$color);
+	$data->{highlight} = Glib::FALSE;
+}
+#package CardView;
 sub disable_view {
 	my ($self,$obj) = @_;
 	my $data = $self->_data;
-	$data->{outine}->set(
-		'stroke-color'=>'darkgray',
+	my $color = $data->{highlight} ? 'cyan' : 'darkgray';
+	$data->{outline}->set(
+		'stroke-color'=>$color,
 		'fill-color'=>'lightgray',
 	);
-	$data->{text}->set('fill-color'=>'gray');
+	$color = $data->{highlight} ? 'cyan' : 'gray';
+	$data->{text}->set('fill-color'=>$color);
 	foreach (qw/xilinx xformer dallas plx/) {
 		$data->{$_}{chip}->set('fill-color'=>'lightgray');
 		$data->{$_}{text}->set('fill-color'=>'gray');
@@ -2784,11 +2896,13 @@ sub disable_view {
 sub enable_view {
 	my ($self,$obj) = @_;
 	my $data = $self->_data;
-	$data->{outine}->set(
-		'stroke-color'=>'black',
+	my $color = $data->{highlight} ? 'cyan' : 'black';
+	$data->{outline}->set(
+		'stroke-color'=>$color,
 		'fill-color'=>'SeaGreen',
 	);
-	$data->{text}->set('fill-color'=>'white');
+	$color = $data->{highlight} ? 'cyan' : 'white';
+	$data->{text}->set('fill-color'=>$color);
 	foreach (qw/xilinx xformer dallas plx/) {
 		$data->{$_}{chip}->set('fill-color'=>'DarkSlateGray');
 		$data->{$_}{text}->set('fill-color'=>'white');
@@ -2805,7 +2919,7 @@ use Gtk2;
 use Glib;
 use Goo::Canvas;
 use vars qw(@ISA);
-@ISA = qw(View Goo::Canvas);
+@ISA = qw(View Goo::Canvas::GroupModel);
 # ----------------------------------
 # A DrivView is a view of a driver for a host and the driver's
 # subordinate data.  It consists of a Goo::Canvas that contains the view
@@ -2814,31 +2928,59 @@ use vars qw(@ISA);
 # ----------------------------------
 #package DrivView;
 sub new {
-	my ($type,$host,$obj) = @_;
-	my $self = Goo::Canvas->new();
+	my ($type,$canv,$root,$obj) = @_;
+	my $self = Goo::Canvas::GroupModel->new($root);
 	bless $self,$type;
+	$self->View::_init($obj);
 	my $data = $self->_data;
-	$data->{views} = ();
+	$data->{obj} = $obj;
 	my $objs = $obj->_data;
-	$self->set(
-		'background-color'=>'white',
-		'automatic-bounds'=>Glib::TRUE,
-		'units'=>'mm',
-	);
-	$self->signal_connect('scroll-event'=>\&DrivView::scroll);
-	my $root = $self->get_root_item;
-	$root->signal_connect('button-press-event',sub{
-		my ($it,$wv,$ev,$host) = @_;
-		if ($ev->button == 3) {
-			HostMenu->new($host)->popup(undef,undef,undef,undef,$ev->button,$ev->time);
-			return Gtk2::EVENT_STOP;
+	my $driv = 'x400p-sl';
+	$self->set('pointer-events'=>'all');
+	my $item = $canv->get_item($self);
+	$item->signal_connect('enter-notify-event'=>sub{
+		my ($item,$targ,$ev) = @_;
+		$item->get_model->highlight_view;
+		return Gtk2::EVENT_PROPAGATE;
+	});
+	$item->signal_connect('leave-notify-event'=>sub{
+		my ($item,$targ,$ev) = @_;
+		$item->get_model->unhighlight_view;
+		return Gtk2::EVENT_PROPAGATE;
+	});
+	$item->signal_connect('button-press-event'=>sub{
+		my ($item,$targ,$ev,$obj) = @_;
+		if ($ev->button == 1) {
+			$item->get_model->enable_view($obj);
+		} elsif ($ev->button == 2) {
+			$item->get_model->disable_view($obj);
+		} elsif ($ev->button == 8) {
+			$item->get_model->set(visibility=>'invisible');
+		} elsif ($ev->button == 9) {
+			$item->get_model->set(visibility=>'visible');
 		}
 		return Gtk2::EVENT_PROPAGATE;
-	},$host);
+	},$obj);
+	my $chld;
+	$chld = $data->{rect} = Goo::Canvas::RectModel->new($self,
+		0,0,220,160,
+		'line-width'=>0.3,
+		'stroke-color'=>'black',
+		'fill-color'=>'white',
+		'pointer-events'=>'all',
+	);
+	$chld->{view} = $self;
+	$chld = $data->{text} = Goo::Canvas::TextModel->new($self,
+		"$driv",100,4,20,'center',
+		'alignment'=>'center',
+		'fill-color'=>'black',
+		'font'=>'Sans 3',
+		'pointer-events'=>'all',
+	);
+	$chld->{view} = $self;
 	foreach (reverse @{$objs->{parts}}) {
-		push @{$data->{subvs}}, CardView->new($self,$_);
+		push @{$data->{subvs}}, CardView->new($canv,$self,$_);
 	}
-	$self->View::_init($obj);
 	return $self;
 }
 #package DrivView;
@@ -2850,10 +2992,29 @@ sub refresh_view {
 	return $self;
 }
 #package DrivView;
+sub highlight_view {
+	my $self = shift;
+	my $data = $self->_data;
+	$data->{rect}->set('stroke-color'=>'cyan');
+	$data->{text}->set('fill-color'=>'cyan');
+	$data->{highlight} = Glib::TRUE;
+}
+#package DrivView;
+sub unhighlight_view {
+	my $self = shift;
+	my $data = $self->_data;
+	my $color = $data->{active} ? 'black' : 'gray';
+	$data->{rect}->set('stroke-color'=>$color);
+	$data->{text}->set('fill-color'=>$color);
+	$data->{highlight} = Glib::FALSE;
+}
+#package DrivView;
 sub disable_view {
 	my ($self,$obj) = @_;
 	my $data = $self->_data;
-	$self->set('background-color'=>'lightgray');
+	my $color = $data->{highlight} ? 'cyan' : 'gray';
+	$data->{rect}->set('stroke-color'=>$color);
+	$data->{text}->set('fill-color'=>$color);
 	$data->{active} = Glib::FALSE;
 	return $self;
 }
@@ -2861,40 +3022,11 @@ sub disable_view {
 sub enable_view {
 	my ($self,$obj) = @_;
 	my $data = $self->_data;
-	$self->set('background-color'=>'white');
+	my $color = $data->{highlight} ? 'cyan' : 'black';
+	$data->{rect}->set('stroke-color'=>$color);
+	$data->{text}->set('fill-color'=>$color);
 	$data->{active} = Glib::TRUE;
 	return $self;
-}
-#package DrivView;
-sub scroll {
-	my ($self,$ev) = @_;
-	my $state = $ev->get_state;
-	my $dir = $ev->direction;
-	my $states = join(',',@{$state});
-	if ($dir eq 'up' or $dir eq 'down') {
-		if ($states=~/control-mask/) {
-			if ($dir eq 'up') {
-				$self->set_scale($self->get_scale * 1.2);
-			} else {
-				$self->set_scale($self->get_scale / 1.2);
-			}
-			$ev->set_state([]);
-			return Gtk2::EVENT_STOP;
-		} elsif ($states=~/shift-mask/) {
-			if ($dir eq 'up') {
-				$ev->direction('left');
-			} else {
-				$ev->direction('right');
-			}
-			$ev->set_state([]);
-			$self->parent->signal_emit('scroll-event',$ev);
-			return Gtk2::EVENT_STOP;
-		}
-	}
-	$self->parent->signal_emit('scroll-event',$ev);
-	return Gtk2::EVENT_PROPAGATE;
-
-
 }
 
 # ----------------------------------
@@ -2920,17 +3052,79 @@ sub new {
 	$self->Store::_init('pages',$windid,$pageid,$hostid);
 	my $data = $self->_data;
 	my $obj = HostData->get($hostid);
+	$data->{obj} = $obj;
+	$self->View::_init($obj);
 	my $objs = $obj->_data;
 	$self->set_policy('automatic','automatic');
-	$self->signal_connect('scroll-event'=>\&HostView::scroll);
+	my $canv = $data->{canv} = Goo::Canvas->new();
+	$canv->set(
+		'background-color'=>'white',
+		'automatic-bounds'=>Glib::TRUE,
+		'units'=>'mm',
+	);
+	$self->add($canv);
+	$self->signal_connect('scroll-event'=>\&HostView::scrollWindow,$canv);
+	$canv->signal_connect('scroll-event'=>\&HostView::scrollCanvas,$self);
+	$canv->signal_connect('button-press-event'=>sub{
+		my ($canv,$ev) = @_;
+		my $mult = $canv->get_screen->get_width_mm/$canv->get_screen->get_width/$canv->get_scale;
+		my $what = $canv->get_item_at(map{$_*$mult} $ev->coords,1);
+		$what = $canv->get_root_item unless $what;
+		my $self = $what->get_model;
+		my $view = $self->{view};
+		if ($view) {
+			my $data = $view->_data;
+			my $obj = $data->{obj};
+			if ($ev->button == 3) {
+				if ($view->isa('HostView')) {
+					HostMenu->new($obj,$view)->popup(undef,undef,undef,undef,$ev->button,$ev->time);
+					return Gtk2::EVENT_STOP;
+				} elsif ($view->isa('DrivView')) {
+					DrivMenu->new($obj,$view)->popup(undef,undef,undef,undef,$ev->button,$ev->time);
+					return Gtk2::EVENT_STOP;
+				} elsif ($view->isa('CardView')) {
+					CardMenu->new($obj,$view)->popup(undef,undef,undef,undef,$ev->button,$ev->time);
+					return Gtk2::EVENT_STOP;
+				} elsif ($view->isa('SpanView')) {
+					SpanMenu->new($obj,$view)->popup(undef,undef,undef,undef,$ev->button,$ev->time);
+					return Gtk2::EVENT_STOP;
+				}
+			}
+		}
+		return Gtk2::EVENT_PROPAGATE;
+	});
+	my $root = Goo::Canvas::GroupModel->new();
+	$root->{view} = $self;
+	$canv->set_root_item_model($root);
+	$root->set('pointer-events'=>'all');
+	my $item = $canv->get_root_item;
+#	$item->signal_connect('enter-notify-event'=>sub{
+#		my ($item,$targ,$ev) = @_;
+#		$item->get_model->highlight_view;
+#		return Gtk2::EVENT_PROPAGATE;
+#	});
+#	$item->signal_connect('leave-notify-event'=>sub{
+#		my ($item,$targ,$ev) = @_;
+#		$item->get_model->unhighlight_view;
+#		return Gtk2::EVENT_PROPAGATE;
+#	});
+#	$item->signal_connect('button-press-event'=>sub{
+#		my ($item,$targ,$ev,$obj) = @_;
+#		if ($ev->button == 1) {
+#			$item->get_model->enable_view($obj);
+#		} elsif ($ev->button == 2) {
+#			$item->get_model->disable_view($obj);
+#		} elsif ($ev->button == 8) {
+#			$item->get_model->set(visibility=>'invisible');
+#		} elsif ($ev->button == 9) {
+#			$item->get_model->set(visibility=>'visible');
+#		}
+#		return Gtk2::EVENT_PROPAGATE;
+#	},$obj);
 	MyDBI::begin_work;
 	foreach (@{$objs->{parts}}) {
-		if (my $driv = DrivView->new($obj,$_)) {
-			push @{$data->{subvs}}, $driv;
-			$self->add($driv);
-		}
+		push @{$data->{subvs}}, DrivView->new($canv,$root,$_);
 	}
-	$self->View::_init($obj);
 	$self->save unless $self->read;
 	MyDBI::commit;
 	return $self;
@@ -2967,7 +3161,7 @@ sub read {
 	my $self = shift;
 	my $data = $self->_data;
 	if ($self->Store::read) {
-		$data->{subvs}[0]->set_scale($data->{scale});
+		$data->{canv}->set_scale($data->{scale});
 		my $adj;
 		$adj = $self->get_hadjustment;
 		$adj->value($data->{xoffset});
@@ -2983,7 +3177,7 @@ sub read {
 sub save {
 	my $self = shift;
 	my $data = $self->_data;
-	$data->{scale} = $data->{subvs}[0]->get_scale;
+	$data->{scale} = $data->{canv}->get_scale;
 	my $adj;
 	$adj = $self->get_hadjustment;
 	$data->{xoffset} = $adj->value;
@@ -2993,19 +3187,18 @@ sub save {
 	return $self;
 }
 #package HostView;
-sub scroll {
-	my ($self,$ev) = @_;
+sub scrollWindow {
+	my ($self,$ev,$canv) = @_;
 	my $data = $self->_data;
-	my $canvas = $data->{subvs}[0];
 	my $state = $ev->get_state;
 	my $dir = $ev->direction;
 	my $states = join(',',@{$state});
 	if ($dir eq 'up' or $dir eq 'down') {
 		if ($states=~/control-mask/) {
 			if ($dir eq 'up') {
-				$canvas->set_scale($canvas->get_scale * 1.2);
+				$canv->set_scale($canv->get_scale * 1.2);
 			} else {
-				$canvas->set_scale($canvas->get_scale / 1.2);
+				$canv->set_scale($canv->get_scale / 1.2);
 			}
 			$ev->set_state([]);
 			return Gtk2::EVENT_STOP;
@@ -3020,6 +3213,37 @@ sub scroll {
 		}
 	}
 	return Gtk2::EVENT_PROPAGATE;
+}
+#package HostView;
+sub scrollCanvas {
+	my ($canv,$ev,$self) = @_;
+	my $state = $ev->get_state;
+	my $dir = $ev->direction;
+	my $states = join(',',@{$state});
+	if ($dir eq 'up' or $dir eq 'down') {
+		if ($states=~/control-mask/) {
+			if ($dir eq 'up') {
+				$canv->set_scale($canv->get_scale * 1.2);
+			} else {
+				$canv->set_scale($canv->get_scale / 1.2);
+			}
+			$ev->set_state([]);
+			return Gtk2::EVENT_STOP;
+		} elsif ($states=~/shift-mask/) {
+			if ($dir eq 'up') {
+				$ev->direction('left');
+			} else {
+				$ev->direction('right');
+			}
+			$ev->set_state([]);
+			$self->signal_emit('scroll-event',$ev);
+			return Gtk2::EVENT_STOP;
+		}
+	}
+	$self->signal_emit('scroll-event',$ev);
+	return Gtk2::EVENT_PROPAGATE;
+
+
 }
 
 # ----------------------------------
