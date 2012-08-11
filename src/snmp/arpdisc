@@ -1,0 +1,312 @@
+#!/usr/bin/perl
+
+use Net::Libdnet::Arp;
+use Net::Libdnet::Intf;
+use Net::hostent;
+use Socket;
+use Carp;
+use SNMP::Info;
+
+package Host;
+use strict;
+
+%Host::hosts = ();
+
+sub find {
+	my $hn = shift;
+	$hn = "\L$hn\E";
+	return $Host::hosts{$hn} if exists $Host::hosts{$hn};
+	return undef;
+}
+sub new {
+	my ($type,$hname) = @_;
+	my $self = {};
+	bless $self,$type;
+	my $hn = "\L$hname\E";
+	$self->{hn} = $hn;
+	$self->{addrs} = {};
+	if (my $h = Net::hostent::gethost($hn)) {
+		$self->{name} = $h->name;
+		$self->{aliases} = [ @{$h->aliases} ];
+		$self->{addrtype} = $h->addrtype;
+		$self->{length} = $h->length;
+		$self->{addr_list} = [ @{$h->addr_list} ];
+	} else {
+		warn "$0 no such host $hn";
+		$self->{name} = '';
+		$self->{aliases} = [];
+		$self->{addrtype} = 2;
+		$self->{length} = 4;
+		$self->{addr_list} = [];
+	}
+	$Host::hosts{$hn} = $self;
+	return $self;
+}
+sub get {
+	my ($type,$hname) = @_;
+	my $hn = "\L$hname\E";
+	my $self = Host::find($hn);
+	$self = Host::new(@_) unless $self;
+	return $self;
+}
+sub add_addr {
+	my ($self,$ipaddr) = @_;
+	my $ip = Ipaddr::to_binary($ipaddr);
+	return if exists $self->{addrs}{$ip};
+	$self->{addrs}{$ip} = '';
+	my $obj = $self->{addrs}{$ip} = Ipaddr->get($ipaddr);
+	$obj->add_host($self->{hn});
+}
+sub del_addr {
+	my ($self,$ipaddr) = @_;
+	my $ip = Ipaddr::to_binary($ipaddr);
+	if (my $obj = delete $self->{addrs}{$ip}) {
+		$obj->del_host($self->{hn});
+	}
+}
+
+package Ipaddr;
+use strict;
+
+%Ipaddr::addrs = ();
+
+sub find {
+	my $ip = shift;
+	return $Ipaddr::addrs{$ip} if exists $Interface::addrs{$ip};
+	return undef;
+}
+sub new {
+	my ($type,$ipaddr) = @_;
+	my $self = {};
+	bless $self,$type;
+	my $ip = Ipaddr::to_binary($ipaddr);
+	$self->{ip} = $ip;
+	$self->{macs} = {};
+	$self->{hosts} = {};
+	$self->{others} = {};
+	if (my $h = Net::hostent::gethost($ipaddr)) {
+		$self->{name} = $h->name;
+		$self->{aliases} = [ @{$h->aliases} ];
+		$self->{addrtype} = $h->addrtype;
+		$self->{length} = $h->length;
+		$self->{addr_list} = [ @{$h->addr_list} ];
+	} else {
+		warn "$0 no such address $ipaddr";
+		$self->{name} = '';
+		$self->{aliases} = [];
+		$self->{addrtype} = 2;
+		$self->{length} = 4;
+		$self->{addr_list} = [];
+	}
+	$Ipaddr::addrs{$ip} = $self;
+	foreach ($self->{name},@{$self->{aliases}}) {
+		next unless $_;
+		$self->add_host($_);
+	}
+	return $self;
+}
+sub get {
+	my ($type,$ipaddr) = @_;
+	my $ip = Ipaddr::to_binary($ipaddr);
+	my $self = Ipaddr::find($ip);
+	$self = Ipaddr::new(@_) unless $self;
+	return $self;
+}
+sub to_binary {
+	my $ip = shift;
+	return pack('C*',split(/\./,$ip));
+}
+sub from_binary {
+	my $ip = shift;
+	return join('.',unpack('C*',$ip));
+}
+sub add_mac {
+	my ($self,$hwaddr) = @_;
+	my $hw = Interface::to_binary($hwaddr);
+	return if exists $self->{macs}{$hw};
+	$self->{macs}{$hw} = '';
+	my $obj = $self->{macs}{$hw} = Interface->get($hwaddr);
+	$obj->add_addr(Ipaddr::from_binary($self->{ip}));
+}
+sub del_mac {
+	my ($self,$hwaddr) = @_;
+	my $hw = Interface::to_binary($hwaddr);
+	if (my $obj = delete $self->{macs}{$hw}) {
+		$obj->del_addr(Ipaddr::from_binary($self->{ip}));
+	}
+}
+sub add_host {
+	my ($self,$hname) = @_;
+	my $hn = "\L$hname\E";
+	return if exists $self->{hosts}{$hn};
+	$self->{hosts}{$hn} = '';
+	my $obj = $self->{hosts}{$hn} = Host->get($hname);
+	$obj->add_addr(Ipaddr::from_binary($self->{ip}));
+}
+sub del_host {
+	my ($self,$hname) = @_;
+	my $hn = "\L$hname\E";
+	if (my $obj = delete $self->{hosts}{$hn}) {
+		$obj->del_addr(Ipaddr::from_binary($self->{ip}));
+	}
+}
+
+package Interface;
+use strict;
+
+%Interface::ports = ();
+
+sub find {
+	my $hw = shift;
+	return $Interface::ports{$hw} if exists $Interface::ports{$hw};
+	return undef;
+}
+sub new {
+	my ($type,$hwaddr) = @_;
+	my $self = {};
+	bless $self,$type;
+	my $hw = Interface::to_binary($hwaddr);
+	$self->{hw} = $hw;
+	$self->{addrs} = {};
+	$Interface::ports{$hw} = $self;
+	return $self;
+}
+sub get {
+	my ($type,$hwaddr) = @_;
+	my $hw = Interface::to_binary($hwaddr);
+	my $self = Interface::find($hw);
+	$self = Interface::new(@_) unless $self;
+	return $self;
+}
+sub to_binary {
+	my $hw = shift;
+	$hw =~ s/://g;
+	return pack('H*',$hw);
+}
+sub from_binary {
+	my $hw = shift;
+	return join(':',map { sprintf('%02x',$_) } unpack('C*',$hw));
+}
+sub add_addr {
+	my ($self,$ipaddr) = @_;
+	my $ip = Ipaddr::to_binary($ipaddr);
+	return if exists $self->{addrs}{$ip};
+	$self->{addrs}{$ip} = '';
+	my $obj = $self->{addrs}{$ip} = Ipaddr->get($ipaddr);
+	$obj->add_mac(Interface::from_binary($self->{hw}));
+}
+sub del_addr {
+	my ($self,$ipaddr) = @_;
+	my $ip = Ipaddr::to_binary($ipaddr);
+	if (my $obj = delete $self->{addrs}{$ip}) {
+		$obj->del_mac(Interface::from_binary($self->{hw}));
+	}
+}
+
+package main;
+use strict;
+use Net::Libdnet::Arp;
+
+Net::Libdnet::Arp->new->loop(\&read_arp);
+
+sub read_arp {
+	my $e = shift;
+	my $if = Interface->get($e->{arp_ha});
+	$if->add_addr($e->{arp_pa});
+}
+
+Net::Libdnet::Intf->new->loop(\&read_intf);
+
+sub read_intf {
+	my $e = shift;
+	my $hw = $e->{intf_link_addr};
+	$hw = '00:00:00:00:00:00' unless $hw;
+	my $if = Interface->get($hw);
+	$if->{mtu} = $e->{intf_mtu};
+	$if->{len} = $e->{intf_len};
+	$if->{type} = $e->{intf_type};
+	$if->{name} = $e->{intf_name};
+	$if->{dst_addr} = $e->{intf_dst_addr};
+	$if->{flags} = $e->{intf_flags};
+	my @addrs = ();
+	push @addrs, $e->{intf_addr} if $e->{intf_addr};
+	push @addrs, @{$e->{intf_alias_addrs}} if $e->{intf_alias_addrs} and @{$e->{intf_alias_addrs}};
+	foreach my $ip (@addrs) {
+		$ip=~s{/.*}{};
+		$if->add_addr($ip) if $ip=~m/^\d+\.\d+\.\d+\.\d+$/;
+	}
+}
+
+#my $lo = Interface->get('00:00:00:00:00:00');
+#$lo->add_addr('127.0.0.1');
+
+foreach (sort keys %Interface::ports) {
+	my $if = $Interface::ports{$_};
+	print $if->{name}, ": ", Interface::from_binary($_);
+	foreach my $ip (sort keys %{$if->{addrs}}) {
+		my $obj = $if->{addrs}{$ip};
+		print ",\n\t", Ipaddr::from_binary($ip);
+		print ", ", $obj->{name};
+		print ", ", $obj->{addrtype};
+		print ", ", $obj->{length};
+		print ", [", join(",",@{$obj->{aliases}}), "]";
+		print ", [", join(",",map {Ipaddr::from_binary($_)} @{$obj->{addr_list}}), "]";
+		print ", [", join(",",map {Interface::from_binary($_)} keys %{$obj->{macs}}), "]";
+		foreach my $hn (sort keys %{$obj->{hosts}}) {
+			print ",\n\t\t", $hn;
+		}
+	}
+	print "\n";
+}
+
+foreach (sort keys %Host::hosts) {
+	Carp::carp "Processing host $_...";
+	my $info = new SNMP::Info(
+		AutoSpecify=>1,
+		Debug=>0,
+		DestHost=>$_,
+		Community=>'public',
+		Version=>2
+	);
+	unless ($info) { Carp::carp "Can't connect to host $_"; next }
+	my $err = $info->error;
+	if (defined $err) { Carp::carp "Error connecting to host $_. $err\n"; next }
+	my $class = $info->class;
+	Carp::carp "SNMP::Info is using device class $class for $_.";
+	print "DestHost: ", $_, "\n";
+	print "sysName: ", $info->name, "\n";
+	print "sysLocation: ", $info->location, "\n";
+	print "sysContact: ", $info->contact, "\n";
+	print "sysUptime: ", $info->uptime, "\n";
+	print "sysServices: ", $info->layers, "\n";
+	print "ifNumber: ", $info->ports, "\n";
+	print "ipForwarding: ", $info->ipforwarding, "\n";
+	my $interfaces = $info->interfaces;
+	my $if_ignore = $info->if_ignore;
+	my $i_index = $info->i_index;
+	my $i_description = $info->i_description;
+	my $i_type = $info->i_type;
+	my $i_mtu = $info->i_mtu;
+	my $i_speed = $info->i_speed;
+	my $i_speed_raw = $info->i_speed_raw;
+	my $i_speed_high = $info->i_speed_high;
+	my $i_mac = $info->i_mac;
+	my $i_up = $info->i_up;
+	my $i_up_admin = $info->i_up_admin;
+	my $i_lastchange = $info->i_lastchange;
+	my $i_name = $info->i_name;
+	my $i_alias = $info->i_alias;
+	foreach my $iid (keys %$interfaces) {
+		my $port = $interfaces->{$iid};
+		print "\tInterface $port, ";
+		print $i_name->{$iid}, ": ";
+		print $i_mac->{$iid}, ", ";
+		print $i_index->{$iid}, ", ";
+		print $i_type->{$iid}, ", ";
+		print $i_description->{$iid}, ", ";
+		print $i_mtu->{$iid}, ", ";
+		print $i_speed->{$iid}, ", ";
+		print $i_up->{$iid}, ", ";
+		print $i_up_admin->{$iid}, "\n";
+	}
+}
