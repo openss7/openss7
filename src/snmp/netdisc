@@ -1,0 +1,561 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+use Carp;
+use SNMP;
+use Net::SNMP;
+use Data::Dumper;
+use Net::Libdnet::Arp;
+use Net::Libdnet::Intf;
+use Net::Libdnet::Route;
+use Net::hostent;
+use Socket;
+use SNMP::Info;
+use SNMP::Info::LLDP;
+require "./Network.pm";
+
+$ENV{MIBDIRS} = '+'.join(':',qw{
+	/usr/share/netdisco/mibs
+	/usr/share/netdisco/mibs/allied
+	/usr/share/netdisco/mibs/arista
+	/usr/share/netdisco/mibs/aruba
+	/usr/share/netdisco/mibs/asante
+	/usr/share/netdisco/mibs/cabletron
+	/usr/share/netdisco/mibs/cisco
+	/usr/share/netdisco/mibs/cyclades
+	/usr/share/netdisco/mibs/dell
+	/usr/share/netdisco/mibs/enterasys
+	/usr/share/netdisco/mibs/extreme
+	/usr/share/netdisco/mibs/foundry
+	/usr/share/netdisco/mibs/hp
+	/usr/share/netdisco/mibs/juniper
+	/usr/share/netdisco/mibs/netscreen
+	/usr/share/netdisco/mibs/net-snmp
+	/usr/share/netdisco/mibs/nortel
+	/usr/share/netdisco/mibs/rfc
+});
+$SNMP::verbose = 0;
+$SNMP::use_long_names = 0;
+$SNMP::use_sprint_value = 0;
+$SNMP::use_enums = 1;
+$SNMP::use_numeric = 0;
+$SNMP::best_guess = 2;
+$SNMP::save_descriptions = 1;
+SNMP::initMib();
+SNMP::addMibDirs(qw{
+	/usr/share/netdisco/mibs
+	/usr/share/netdisco/mibs/allied
+	/usr/share/netdisco/mibs/arista
+	/usr/share/netdisco/mibs/aruba
+	/usr/share/netdisco/mibs/asante
+	/usr/share/netdisco/mibs/cabletron
+	/usr/share/netdisco/mibs/cisco
+	/usr/share/netdisco/mibs/cyclades
+	/usr/share/netdisco/mibs/dell
+	/usr/share/netdisco/mibs/enterasys
+	/usr/share/netdisco/mibs/extreme
+	/usr/share/netdisco/mibs/foundry
+	/usr/share/netdisco/mibs/hp
+	/usr/share/netdisco/mibs/juniper
+	/usr/share/netdisco/mibs/netscreen
+	/usr/share/netdisco/mibs/net-snmp
+	/usr/share/netdisco/mibs/nortel
+	/usr/share/netdisco/mibs/rfc
+});
+SNMP::loadModules(qw{
+	SNMPv2-SMI
+	SNMPv2-TC
+	SNMPv2-MIB
+	RFC1213-MIB
+	IF-MIB
+	Q-BRIDGE-MIB
+	INET-ADDRESS-MIB
+	IP-MIB
+	LLDP-MIB
+	LLDP-EXT-DOT1-MIB
+	LLDP-EXT-DOT3-MIB
+	LLDP-EXT-MED-MIB
+});
+
+package Fetch; our @ISA = qw(Base);
+use strict;
+use warnings;
+
+sub strip_dot {
+	my $oid = shift;
+	$oid =~ s/^\.//g;
+	return $oid;
+}
+sub add_dot {
+	my $oid = shift;
+	$oid = strip_dot($oid);
+	return ".$oid";
+}
+
+package Table; our @ISA = qw(Fetch);
+use strict;
+use warnings;
+use Data::Dumper;
+
+sub init {
+	my ($self,$table) = @_;
+	$self->{table} = $table;
+	my $oid = SNMP::translateObj($table);
+	$self->{oid} = Fetch::strip_dot($oid);
+	print STDERR "New table:\n";
+	print STDERR "\ttable = $self->{table}\n";
+	print STDERR "\toid   = $self->{oid}\n";
+}
+sub fini {
+	my $self = shift;
+	delete $self->{table};
+	delete $self->{oid};
+}
+sub xlate_result {
+	my ($self,$result) = @_;
+	my $table = $self->{table};
+	my $r = {};
+	foreach (keys %$result) {
+		my $val = $result->{$_};
+		my $tag = SNMP::translateObj(Fetch::add_dot($_));
+		my ($label,$index) = split(/\./,$tag,2);
+		my $mib = $SNMP::MIB{$label};
+		if ($val =~ /^0x([0-9a-fA-F][0-9a-fA-F])+$/) {
+			$val =~ s/^0x//;
+			my $bin = pack('H*',$val);
+			$val = join(':',(map {sprintf('%02x',$_)} unpack('C*',$bin)));
+		}
+		if ($mib->{enums}) {
+			foreach my $k (keys %{$mib->{enums}}) {
+				$val = "$k($val)" if $mib->{enums}{$k} eq $val;
+			}
+		}
+		if ($mib->{syntax} eq 'InetAddress' and $val=~m/:/) {
+			if ($val=~m/^[0-9a-fA-F]{2}(:[0-9a-fA-F]{2}){3}$/) {
+				my $v = $val; $v =~ s/://g;
+				$val = join('.',unpack('C*',pack('H*',$v)));
+			} else {
+				while ($val=~s/00:/:/) { }
+				while ($val=~s/:::/::/) { }
+				$val=~s/^:[^:]/::/;
+				$val=~s/^0//;
+				while ($val=~s/:0/:/) { }
+			}
+		}
+		if ($mib->{type} =~ /OBJECTID|OPAQUE/) {
+		#if ($val =~ /^1\.3\.6(\.\d+)*$/) {
+			$val = SNMP::translateObj(Fetch::add_dot($val));
+		#}
+		}
+		#$val =~ s/ .*$// if $val =~ /^\d/;
+		$r->{$index}{$label} = $val;
+	}
+	my $entry = $SNMP::MIB{$table}{children}[0];
+	my @indexes = @{$entry->{indexes}};
+	print STDERR "$table indexes are: ", join(',',@indexes), "\n";
+	foreach my $index (keys %$r) {
+		my @inds = (split(/\./,$index));
+		foreach my $i (@indexes) {
+			my $mib = $SNMP::MIB{$i};
+			next if exists $r->{$index}{$i};
+			#next if $mib->{parent} eq $entry;
+			if ($mib->{type} =~ /INTEGER|UNSIGNED|COUNTER|GAUGE|TICKS/) {
+				my $val = shift @inds;
+				if ($SNMP::MIB{$i}{enums}) {
+					foreach my $k (keys %{$SNMP::MIB{$i}{enums}}) {
+						$val = "$k($val)" if $SNMP::MIB{$i}{enums}{$k} eq $val;
+					}
+				}
+				$r->{$index}{$i} = $val;
+			} elsif ($mib->{type} =~ /OCTETSTR/) {
+				my @vals = ();
+				my $len = shift @inds;
+				while ($len > 0) { push @vals, shift @inds; $len-- }
+				my $val = join(':',map {sprintf('%02x',$_)} @vals);
+				if ($val =~ /^0x([0-9a-fA-F][0-9a-fA-F])+$/) {
+					$val =~ s/^0x//;
+					my $bin = pack('H*',$val);
+					$val = join(':',(map {sprintf('%02x',$_)} unpack('C*',$bin)));
+				}
+				if ($mib->{syntax} eq 'InetAddress' and $val=~m/:/) {
+					if ($val=~m/^[0-9a-fA-F]{2}(:[0-9a-fA-F]{2}){3}$/) {
+						my $v = $val; $v =~ s/://g;
+						$val = join('.',unpack('C*',pack('H*',$v)));
+					} else {
+						while ($val=~s/00:/:/) { }
+						while ($val=~s/:::/::/) { }
+						$val=~s/^:[^:]/::/;
+						$val=~s/^0//;
+						while ($val=~s/:0/:/) { }
+					}
+				}
+				$r->{$index}{$i} = $val;
+			} elsif ($mib->{type} =~ /OBJECTID|OPAQUE/) {
+				my @vals = ();
+				my $len = shift @inds;
+				while ($len > 0) { push @vals, shift @inds; $len-- }
+				my $val = join('.',@vals);
+				#if ($val =~ /^1\.3\.6(\.\d+)*$/) {
+				$val = SNMP::translateObj(Fetch::add_dot($val));
+				#}
+				$r->{$index}{$i} = $val;
+			} elsif ($mib->{type} =~ /IPADDR/) {
+				my @vals = ();
+				my $len = 4;
+				while ($len > 0) { push @vals, shift @inds; $len-- }
+				$r->{$index}{$i} = join('.',@vals);
+			} elsif ($mib->{type} =~ /NETADDR/) {
+				my @vals = ();
+				my $len = 4; shift @inds;
+				while ($len > 0) { push @vals, shift @inds; $len-- }
+				$r->{$index}{$i} = join('.',@vals);
+			} else {
+				warn "Index type for $i is $mib->{type}\n";
+			}
+		}
+	}
+	print STDERR Dumper($r) if $r;
+	return $r;
+}
+sub fetch {
+	my ($self,$session) = @_;
+	my $table = $self->{table};
+	my $oid = $self->{oid};
+	print STDERR "oid $table = $oid\n";
+	my $result = $session->get_table(-baseoid=>$oid);
+	my $error = $session->error() unless defined $result;
+	Carp::carp "SNMP error $error" if defined $error;
+	#print STDERR Dumper($result) if $result;
+	return $result, $error;
+}
+
+package Scalars; our @ISA = qw(Fetch);
+use strict;
+use warnings;
+use Data::Dumper;
+
+sub init {
+	my ($self,$scalars) = @_;
+	$self->{scalars} = $scalars;
+	$scalars =~ s/Scalars$//;
+	my $oid = SNMP::translateObj($scalars);
+	$self->{oid} = Fetch::strip_dot($oid);
+	print STDERR "New scalars:\n";
+	print STDERR "\tscalars = $self->{scalars}\n";
+	print STDERR "\toid     = $self->{oid}\n";
+}
+sub fini {
+	my $self = shift;
+	delete $self->{scalars};
+	delete $self->{oid};
+}
+sub xlate_result {
+	my ($self,$result) = @_;
+	my $r = {};
+	foreach (keys %$result) {
+		my $val = $result->{$_};
+		my $tag = SNMP::translateObj(Fetch::add_dot($_));
+		my ($label,$index) = split(/\./,$tag,2);
+		($label,$index) = ('sysUpTime',0) if $label eq 'sysUpTimeInstance';
+		my $mib = $SNMP::MIB{$label};
+		if ($val =~ /^0x([0-9a-fA-F][0-9a-fA-F])+$/) {
+			$val =~ s/^0x//;
+			my $bin = pack('H*',$val);
+			$val = join(':',(map {sprintf('%02x',$_)} unpack('C*',$bin)));
+		}
+		if ($mib->{enums}) {
+			foreach my $k (keys %{$mib->{enums}}) {
+				$val = "$k($val)" if $mib->{enums}{$k} eq $val;
+			}
+		}
+		if ($mib->{syntax} eq 'InetAddress' and $val=~m/:/) {
+			if ($val=~m/^[0-9a-fA-F]{2}(:[0-9a-fA-F]{2}){3}$/) {
+				my $v = $val; $v =~ s/://g;
+				$val = join('.',unpack('C*',pack('H*',$v)));
+			} else {
+				while ($val=~s/00:/:/) { }
+				while ($val=~s/:::/::/) { }
+				$val=~s/^:[^:]/::/;
+				$val=~s/^0//;
+				while ($val=~s/:0/:/) { }
+			}
+		}
+		if ($mib->{type} =~ /OBJECTID|OPAQUE/) {
+		#if ($val =~ /^1\.3\.6(\.\d+)*$/) {
+			$val = SNMP::translateObj(Fetch::add_dot($val));
+		#}
+		}
+		#$val =~ s/ .*$// if $val =~ /^\d/;
+		$r->{$index}{$label} = $val;
+	}
+	print STDERR Dumper($r) if $r;
+	return $r;
+}
+sub fetch {
+	my ($self,$session) = @_;
+	my $scalars = $self->{scalars};
+	my $oid = $self->{oid};
+	print STDERR "oid $scalars = $oid\n";
+	my $result = $session->get_bulk_request(-nonrepeaters=>0,-maxrepetitions=>8,-varbindlist=>[$oid]);
+	my $error = $session->error() unless defined $result;
+	Carp::carp "SNMP error $error" if defined $error;
+	print STDERR Dumper($result) if $result;
+	return $result, $error;
+}
+
+package main;
+use strict;
+use warnings;
+
+my $network = new Network();
+if (1) {
+my $hkey = Item::makekey('127.0.0.1');
+Point::Host->get($network,$hkey);
+} else {
+my %hosts = ( '127.0.0.1'=>0 );
+while (1) {
+	my $host = undef;
+	foreach my $h (keys %hosts) {
+		unless ($hosts{$h}) {
+			$hosts{$h} = 1;
+			$host = $h;
+			last;
+		}
+	}
+	last unless $host;
+	print STDERR "Forming SNMP session for host $host\n";
+	my ($session,$error) = Net::SNMP->session(
+		-hostname=>$host,
+		-version=>'snmpv2c',
+		-community=>'public',
+	);
+	Carp::carp "SNMP session error $error" unless defined $session;
+	next unless $session;
+	my %indexes = ();
+	Point::Host->get($network,$host);
+	foreach (qw/
+	systemScalars
+	sysORTable
+	ifTable
+	ipAddrTable
+	ipAddressTable
+	atTable
+	ipNetToPhysicalTable
+	ipRouteTable
+	lldpPortConfigTable
+	lldpConfigManAddrTable
+	lldpStatsTxPortTable
+	lldpStatsRxPortTable
+	lldpLocPortTable
+	lldpLocManAddrTable
+	lldpRemTable
+	lldpRemManAddrTable
+	lldpRemUnknownTLVTable
+	lldpRemOrgDefInfoTable
+	lldpXdot1ConfigPortVlanTable
+	lldpXdot1ConfigVlanNameTable
+	lldpXdot1ConfigProtoVlanTable
+	lldpXdot1ConfigProtocolTable
+	lldpXdot1LocTable
+	lldpXdot1LocProtoVlanTable
+	lldpXdot1LocVlanNameTable
+	lldpXdot1LocProtocolTable
+	lldpXdot1RemTable
+	lldpXdot1RemProtoVlanTable
+	lldpXdot1RemVlanNameTable
+	lldpXdot1RemProtocolTable
+	lldpXdot3PortConfigTable
+	lldpXdot3LocPortTable
+	lldpXdot3LocPowerTable
+	lldpXdot3LocLinkAggTable
+	lldpXdot3LocMaxFrameSizeTable
+	lldpXdot3RemPortTable
+	lldpXdot3RemPowerTable
+	lldpXdot3RemLinkAggTable
+	lldpXdot3RemMaxFrameSizeTable
+	lldpXMedPortConfigTable
+	lldpXMedLocMediaPolicyTable
+	lldpXMedLocLocationTable
+	lldpXMedLocXPoEPSEPortTable
+	lldpXMedRemCapabilitiesTable
+	lldpXMedRemMediaPolicyTable
+	lldpXMedRemInventoryTable
+	lldpXMedRemLocationTable
+	lldpXMedRemXPoETable
+	lldpXMedRemXPoEPSETable
+	lldpXMedRemXPoEPDTable
+	/) {
+		my $fetch;
+		if (/Table$/  ) { $fetch = new Table($_) };
+		if (/Scalars$/) { $fetch = new Scalars($_) };
+		next unless defined $fetch;
+		my ($result,$error) = $fetch->fetch($session);
+		unless (defined $result) {
+			if ($error =~ /No response/) { last }
+			elsif ($error =~ /Permission denied/) { next }
+			elsif ($error =~ /Requested table is empty/) { next }
+			else { next }
+		}
+		#print STDERR Dumper($result);
+		my $xlated = $fetch->xlate_result($result);
+		#print STDERR Dumper($xlated);
+		if ($_ eq 'systemScalars') {
+			my $row = $xlated->{0};
+			my $self = Point::Host->get($network,$host);
+			foreach my $label (qw{
+				sysLocation
+				sysObjectID
+				sysDescr
+				sysORLastChange
+				sysUpTime
+				sysServices
+				sysName
+				sysContact}) {
+				$self->{$label} = $row->{$label} if exists $row->{$label};
+			}
+		} elsif ($_ eq 'ifTable') {
+			foreach my $row (values %$xlated) {
+				my $idx = $row->{ifIndex};
+				my $hwa = $row->{ifPhysAddress};
+				next unless $hwa; # skip loop back for now
+				my $dsc = $row->{ifDescr};
+				my $vid = 0;
+				if ($dsc =~ /\d+\.(\d+)(:\d+)?$/) { $vid = $1 }
+				if ($hwa =~ /^[0-9a-fA-F]{2}(:[0-9a-fA-F]{2})*$/) {
+					$hwa =~ s/://g; $hwa = pack('H*',$hwa);
+				}
+				Point::Host->get($network,$host)->add_hwa($hwa);
+				my $vprt = Vprt->get($network,$hwa,$vid);
+				$vprt->{ifIndex} = $vprt->{parent}{ifIndex} = $idx;
+				my $vlan = Vlan->get($network,$hwa,$vid);
+				$indexes{$idx} = [ $hwa, $vid ];
+			}
+		} elsif ($_ eq 'ipAddrTable') {
+			foreach my $row (values %$xlated) {
+				my $idx = $row->{ipAdEntIfIndex};
+				my $ipa = $row->{ipAdEntAddr};
+				$hosts{$ipa} = 0 unless exists $hosts{$ipa};
+				$ipa = pack('C*',split(/\./,$ipa));
+				Point::Host->get($network,$host)->add_ipa($ipa);
+				next unless exists $indexes{$idx};
+				my ($hwa,$vid) = @{$indexes{$idx}};
+				Vprt->get($network,$hwa,$vid)->add_ipa($ipa);
+				Vlan->get($network,$hwa,$vid)->add_ipa($ipa);
+				my $msk = $row->{ipAdEntNetMask};
+				$msk = pack('C*',split(/\./,$msk));
+				my $ipn = unpack('N',$ipa);
+				my $mkn = unpack('N',$msk);
+				my $pfx = pack('N',$ipn & $mkn);
+				my $cnt = 32;
+				while (($mkn & 0x1) == 0) {
+					$cnt--;
+					$mkn>>=1;
+				}
+				$pfx .= pack('C',$cnt);
+				my $sub = Subnet->get($network,$pfx);
+				$sub->add_ipa($ipa);
+				my $vlan = Vlan->get($network,$hwa,$vid);
+				my $sup = Support->get($network,$sub,$vlan);
+			}
+		} elsif ($_ eq 'ipAddressTable') {
+			foreach my $row (values %$xlated) {
+				next unless $row->{ipAddressRowStatus} eq 'active(1)';
+				next unless $row->{ipAddressAddrType} eq 'ipv4(1)';
+				next unless $row->{ipAddressType} eq 'unicast(1)';
+				my $idx = $row->{ipAddressIfIndex};
+				my $ipa = $row->{ipAddressAddr};
+				$hosts{$ipa} = 0 unless exists $hosts{$ipa};
+				$ipa = pack('C*',split(/\./,$ipa));
+				Point::Host->get($network,$host)->add_ipa($ipa);
+				next unless exists $indexes{$idx};
+				my ($hwa,$vid) = @{$indexes{$idx}};
+				Vprt->get($network,$hwa,$vid)->add_ipa($ipa);
+				Vlan->get($network,$hwa,$vid)->add_ipa($ipa);
+			}
+		} elsif ($_ eq 'atTable') {
+			foreach my $row (values %$xlated) {
+				my $idx = $row->{atIfIndex};
+				next unless exists $indexes{$idx};
+				my $hwa = $row->{atPhysAddress};
+				if ($hwa =~ /^[0-9a-fA-F]{2}(:[0-9a-fA-F]{2})*$/) {
+					$hwa =~ s/://g; $hwa = pack('H*',$hwa);
+				}
+				my $ipa = $row->{atNetAddress};
+				$hosts{$ipa} = 0 unless exists $hosts{$ipa};
+				$ipa = pack('C*',split(/\./,$ipa));
+				my ($dummy,$vid) = @{$indexes{$idx}};
+				Vlan->get($network,$hwa,$vid)->add_ipa($ipa);
+				Vprt->get($network,$hwa,$vid)->add_ipa($ipa);
+				Point::Station->get($network,$hwa)->add_ipa($ipa);
+			}
+		} elsif ($_ eq 'ipNetToPhysicalTable') {
+			foreach my $row (values %$xlated) {
+				next unless $row->{ipNetToPhysicalRowStatus} eq 'active(1)';
+				next unless $row->{ipNetToPhysicalNetAddressType} eq 'ipv4(1)';
+				my $idx = $row->{ipNetToPhysicalIfIndex};
+				next unless exists $indexes{$idx};
+				my $hwa = $row->{ipNetToPhysicalPhysAddress};
+				if ($hwa =~ /^[0-9a-fA-F]{2}(:[0-9a-fA-F]{2})*$/) {
+					$hwa =~ s/://g; $hwa = pack('H*',$hwa);
+				}
+				my $ipa = $row->{ipNetToPhysicalNetAddress};
+				$hosts{$ipa} = 0 unless exists $hosts{$ipa};
+				$ipa = pack('C*',split(/\./,$ipa));
+				my ($dummy,$vid) = @{$indexes{$idx}};
+				next if $hwa eq "\0\0\0\0\0\0";
+				Vlan->get($network,$hwa,$vid)->add_ipa($ipa);
+				Vprt->get($network,$hwa,$vid)->add_ipa($ipa);
+				Point::Station->get($network,$hwa)->add_ipa($ipa);
+			}
+		} elsif ($_ eq 'ipRouteTable') {
+			foreach my $row (values %$xlated) {
+				my $idx = $row->{ipRouteIfIndex};
+				next unless exists $indexes{$idx};
+				my $addr = $row->{ipRouteDest};
+				my $mask = $row->{ipRouteMask};
+				my $gw = $row->{ipRouteNextHop} if $row->{ipRouteType} eq 'indirect(4)';
+				my $sub = Subnet->get($network,"$addr/$mask");
+				next unless exists $indexes{$idx};
+				my ($hwa,$vid) = @{$indexes{$idx}};
+				my $vprt = Vprt->get($network,$hwa,$vid);
+				my $vlan = Vlan->get($network,$hwa,$vid);
+				my $sup = Support->get($network,$sub,$vlan) if $row->{ipRouteType} eq 'direct(3)';
+				my $rte = Route->get($network,$vprt,$sub,$gw);
+			}
+		}
+	}
+	$session->close;
+}
+}
+$network->snmp_results;
+foreach my $kind (sort keys %{$network->{items}}) {
+	foreach my $key (sort keys %{$network->{items}{$kind}}) {
+		my $item = $network->{items}{$kind}{$key};
+		next unless $item;
+		next if $item->{crumb};
+		if ($item->{bad}) {
+			print STDERR "Bad item $item still at key ",Item::showkey($key),"\n";
+			next;
+		}
+		print STDERR "Showing item $item\n";
+		$item->show;
+		$item->{crumb} = 1;
+	}
+}
+
+#	atTable
+#	ifTable
+#	ipAddrTable
+#	ipRouteTable
+#	ipAddressTable
+#	ipNetToPhysicalTable
+#	ipDefaultRouterTable
+#	lldpLocPortTable
+#	lldpLocManAddrTable
+#	lldpRemTable
+#	lldpRemManAddrTable
+#	lldpRemOrgDefInfoTable
+
+
+
