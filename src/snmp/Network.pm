@@ -1,25 +1,60 @@
 # ------------------------------------------
 package UNIVERSAL;
-use warnings;
+use warnings; use Carp;
 # ------------------------------------------
+#package UNIVERSAL;
+sub _forw {
+	my $self = shift;
+	my $type = shift;
+	my $only = shift;
+	my $each = shift;
+	if ($only and exists *{"$type\::"}->{$only}) {
+		my $sub = "$type\::$only";
+		$self->$sub(@_);
+	} elsif ($each) {
+		if (exists *{"$type\::"}->{ISA}) {
+			foreach my $clas (@{*{"$type\::"}->{ISA}}) {
+				$self->_forw($clas,$only,$each,@_);
+			}
+		}
+		if (exists *{"$type\::"}->{$each}) {
+			my $sub = "$type\::$each";
+			$self->$sub(@_);
+		}
+	}
+}
+#package UNIVERSAL;
+sub _fwcd {
+	my $self = shift;
+	my $type = shift;
+	my $only = shift;
+	my $each = shift;
+	my $want = shift;
+	my $have = $want;
+	if ($only and exists *{"$type\::"}->{$only}) {
+		my $sub = "$type\::$only";
+		$have = $self->$sub(@_);
+	} elsif ($each) {
+		if (exists *{"$type\::"}->{ISA}) {
+			foreach my $clas (@{*{"$type\::"}->{ISA}}) {
+				$have = $self->_fwcd($clas,$only,$each,$want,@_);
+				last unless $have eq $want;
+			}
+		}
+		if ($have eq $want) {
+			if (exists *{"$type\::"}->{$each}) {
+				my $sub = "$type\::$each";
+				$have = $self->$sub(@_);
+			}
+		}
+	}
+	return $have;
+}
 #package UNIVERSAL;
 sub _init {
 	my $self = shift;
 	my $type = shift;
-	if (exists *{"$type\::"}->{only}) {
-		my $sub = "$type\::only";
-		$self->$sub(@_);
-	} else {
-		if (exists *{"$type\::"}->{ISA}) {
-			foreach my $clas (@{*{"$type\::"}->{ISA}}) {
-				$self->_init($clas,@_);
-			}
-		}
-		if (exists *{"$type\::"}->{init}) {
-			my $sub = "$type\::init";
-			$self->$sub(@_);
-		}
-	}
+	$self->_forw($type,'only','init',@_);
 }
 #package UNIVERSAL;
 sub _new {
@@ -51,46 +86,82 @@ sub _make {
 #package UNIVERSAL;
 sub new {
 	my $type = shift;
-	Carp::carp "Creating instance of $type";
 	my $self = $type->_make($type,@_);
 	$self->_init($type,@_);
 	return $self;
 }
 #package UNIVERSAL;
-sub _fini {
+sub _revs {
 	my $self = shift;
 	my $type = shift;
-	if (exists *{"$type\::"}->{cull}) {
-		my $sub = "$type\::cull";
+	my $only = shift;
+	my $each = shift;
+	if ($only and exists *{"$type\::"}->{$only}) {
+		my $sub = "$type\::$only";
 		$self->$sub(@_);
-	} else {
-		if (exists *{"$type\::"}->{fini}) {
-			my $sub = "$type\::fini";
+	} elsif ($each) {
+		if (exists *{"$type\::"}->{$each}) {
+			my $sub = "$type\::$each";
 			$self->$sub(@_);
 		}
 		if (exists *{"$type\::"}->{ISA}) {
 			foreach my $clas (reverse @{*{"$type\::"}->{ISA}}) {
-				$self->_fini($clas,@_);
+				$self->_revs($clas,$only,$each,@_);
 			}
 		}
 	}
 }
 #package UNIVERSAL;
+sub _rvcd {
+	my $self = shift;
+	my $type = shift;
+	my $only = shift;
+	my $each = shift;
+	my $want = shift;
+	my $have = $want;
+	if ($only and exists *{"$type\::"}->{$only}) {
+		my $sub = "$type\::$only";
+		$have = $self->$sub(@_);
+	} elsif ($each) {
+		if (exists *{"$type\::"}->{$each}) {
+			my $sub = "$type\::$each";
+			$have = $self->$sub(@_);
+		}
+		if ($have eq $want) {
+			if (exists *{"$type\::"}->{ISA}) {
+				foreach my $clas (reverse @{*{"$type\::"}->{ISA}}) {
+					$have = $self->_rvcd($clas,$only,$each,$want,@_);
+					last unless $have eq $want;
+				}
+			}
+		}
+	}
+	return $have;
+}
+#package UNIVERSAL;
+sub _fini {
+	my $self = shift;
+	my $type = shift;
+	$self->_revs($type,'cull','fini',@_);
+}
+#package UNIVERSAL;
 sub put {
 	my $self = shift;
 	my $type = ref $self;
-	Carp::carp "Removing instance of $type, $self";
 	$self->_fini($type,@_);
 }
 #package UNIVERSAL;
 sub get {
 	my $type = shift;
-	Carp::carp "Getting object of $type";
 	my $self;
 	if ($type->can('find')) {
-		$self = $type->find(@_);
+		if ($self = $type->find(@_)) {
+			if ($self->can('link')) {
+				$self->link(@_);
+			}
+			return $self;
+		}
 	}
-	return $self if $self;
 	$self = $type->new(@_);
 	return $self;
 }
@@ -98,394 +169,1132 @@ sub get {
 sub _dump {
 	my $self = shift;
 	my $type = shift;
-	if (exists *{"$type\::"}->{info}) {
-		my $sub = "$type\::info";
-		$self->$sub(@_);
-	} else {
-		if (exists *{"$type\::"}->{dump}) {
-			my $sub = "$type\::dump";
-			$self->$sub(@_);
-		}
-		if (exists *{"$type\::"}->{ISA}) {
-			foreach my $clas (@{*{"$type\::"}->{ISA}}) {
-				$self->_dump($clas,@_);
-			}
-		}
-	}
+	$self->_forw($type,'info','dump',@_);
 }
 #package UNIVERSAL;
 sub show {
 	my $self = shift;
 	my $type = ref $self;
-	warn "Bad object of type $type, $self\n" if $self->{bad};
+	##warn "Bad object of type $type, $self\n" if $self->{bad};
+	print STDERR "\nShowing item $self\n-------------------------\n";
 	$self->_dump($type,@_);
+}
+#package UNIVERSAL;
+sub _tree {
+	my $self = shift;
+	my $type = shift;
+	$self->_forw($type,undef,'tree',@_);
+}
+#package UNIVERSAL;
+sub walk {
+	my $self = shift;
+	my ($crumb,$indent,$suffix) = @_;
+	my $type = ref $self;
+	$suffix .= ' ...' if exists $self->{crumb} and $self->{crumb} == $crumb;
+	print STDERR "$indent$self$suffix\n";
+	$self->_tree($type,@_);
+	$self->{crumb} = $crumb;
 }
 
 # ------------------------------------------
 package Base;
-use strict; use warnings;
+use strict; use warnings; use Carp;
 # ------------------------------------------
+##package Base;
+#our %use = ();
+#our %put = ();
+#our %dst = ();
+#our $init_count = 0;
+#our $fini_count = 0;
+#our $dest_count = 0;
+##package Base;
+#sub showstats {
+#	print STDERR "Base object stats:\n------------------\n";
+#	printf STDERR "%6d object init calls\n", $Base::init_count;
+#	printf STDERR "%6d object fini calls\n", $Base::fini_count;
+#	printf STDERR "%6d object dest calls\n", $Base::dest_count;
+#	print STDERR "------------------\n";
+#	printf STDERR "%6d objects use\n",scalar(values %Base::use);
+#	printf STDERR "%6d objects put\n",scalar(values %Base::put);
+#	printf STDERR "%6d objects dst\n",scalar(values %Base::dst);
+#	print STDERR "------------------\n";
+#}
+##package Base;
+#sub init {
+#	my $self = shift;
+#	$use{$self} = 1;
+#	$init_count++;
+#	Base::showstats() unless ($init_count % 10);
+#}
+##package Base;
+#sub fini {
+#	my $self = shift;
+#	delete $Base::use{$self};
+#	$put{$self} = 1;
+#	$fini_count++;
+#	Base::showstats() unless ($fini_count % 10);
+#}
+##package Base;
+#sub DESTROY {
+#	my $self = shift;
+#	delete $Base::put{$self};
+#	$dst{$self} = 1;
+#	$dest_count++;
+#	Base::showstats() unless ($dest_count % 10);
+#}
 
 # ------------------------------------------
 package Root; our @ISA = qw(Base);
-use strict; use warnings;
+use strict; use warnings; use Carp;
+use Data::Dumper;
 # ------------------------------------------
 #package Root;
 sub init {
 	my $self = shift;
+	$self->{child} = {} unless exists $self->{child};
+	$self->{members} = {} unless exists $self->{members};
 	$self->{children} = {} unless exists $self->{children};
+}
+#package Root;
+sub dump {
+	my $self = shift;
+	foreach my $form (keys %{$self->{child}}) {
+		my @keys = keys %{$self->{child}{$form}};
+		if (@keys) {
+			print STDERR "$self has children of type $form:\n";
+			foreach my $key (@keys) {
+				my $child = $self->{child}{$form}{$key};
+				print STDERR "\t$form child $child has key ",Item::showkey($key),"\n";
+			}
+		}
+	}
+	foreach my $form (keys %{$self->{members}}) {
+		my @members = values %{$self->{members}{$form}};
+		if (@members) {
+			print STDERR "$self has members of type $form:\n";
+			foreach my $memb (@members) {
+				print STDERR "\t$form member $memb\n";
+			}
+		}
+	}
 }
 #package Root;
 sub fini {
 	my $self = shift;
-	return unless exists $self->{children};
-	foreach my $form (values %{$self->{children}}) {
-		foreach my $child (values %{$form}) {
-			$child->put(@_);
-		}
-	}
+#	return unless exists $self->{members};
+#	foreach my $form (values %{$self->{members}}) {
+#		foreach (values %$form) { $_->put(@_) }
+#	}
+	delete $self->{child};
+	delete $self->{members};
 	delete $self->{children};
 }
 #package Root;
 sub child {
 	my ($self,$form,$key) = @_;
-	return undef unless exists $self->{children}{$form}{$key};
-	return $self->{children}{$form}{$key};
+	Carp::confess "XXXXXX child of $self requested without key" unless defined $key;
+	return undef unless exists $self->{child}{$form}{$key};
+	return $self->{child}{$form}{$key};
+}
+#package Root;
+sub members {
+	my ($self,$form) = @_;
+	my @members = ();
+	if (defined $form) {
+		push @members, values %{$self->{members}{$form}} if $self->{members}{$form};
+	} else {
+		foreach $form (keys %{$self->{members}}) {
+			push @members, values %{$self->{members}{$form}};
+		}
+	}
+	return @members;
+}
+#package Root;
+sub members_sorted {
+	my ($self,$forms) = @_;
+	$forms = [ keys %{$self->{members}} ] unless defined $forms;
+	$forms = [ $forms ] unless ref($forms) eq 'ARRAY';
+	my @results = ();
+	foreach my $form (@$forms) {
+		if (my $membs = $self->{members}{$form}) {
+			push @results,sort {-$a->{no} <=> -$b->{no}} values %$membs;
+		}
+	}
+	return @results;
 }
 #package Root;
 sub children {
 	my ($self,$form) = @_;
-	return values %{$self->{children}{$form}};
+	my @children = ();
+	if (defined $form) {
+		push @children, values %{$self->{children}{$form}} if $self->{children}{$form};
+	} else {
+		foreach $form (keys %{$self->{children}}) {
+			push @children, values %{$self->{children}{$form}};
+		}
+	}
+	return @children;
 }
 #package Root;
-sub count {
-	my ($self,$form) = @_;
-	return 0 unless exists $self->{children}{$form};
-	return scalar values %{$self->{children}{$form}};
+sub children_sorted {
+	my ($self,$forms,$min,$max) = @_;
+	$max = $min unless defined $max;
+	$min = $max unless defined $min;
+	$forms = [ keys %{$self->{child}} ] unless defined $forms;
+	$forms = [ $forms ] unless ref($forms) eq 'ARRAY';
+	my @results = ();
+	{
+		my @pairs = ();
+		foreach my $form (@$forms) {
+			if (my $kids = $self->{child}{$form}) {
+				foreach my $key (keys %$kids) {
+					push @pairs, [ $key, $kids->{$key} ];
+				}
+			}
+		}
+		my %child = ();
+		foreach my $result (sort {$a->[0] cmp $b->[0]} @pairs) {
+			next if defined $min and defined $max and
+				($min > length($result->[0]) or length($result->[0]) > $max);
+			unless (exists $child{$result->[1]}) {
+				push @results, $result;
+				$child{$result->[1]} = 1;
+			}
+		}
+		foreach my $result (sort {$a->[0] cmp $b->[0]} @pairs) {
+			unless (exists $child{$result->[1]}) {
+				push @results, $result;
+				$child{$result->[1]} = 1;
+			}
+		}
+	}
+	@results = map {$_->[1]} @results;
+	return @results;
+}
+#package Root;
+sub offspring {
+	my $self = shift;
+	return ($self->children(@_),$self->members(@_));
+}
+#package Root;
+sub offspring_sorted {
+	my $self = shift;
+	return ($self->children_sorted(@_),$self->members_sorted(@_));
+}
+#package Root;
+sub tree {
+	my ($self,$crumb,$indent,$suffix) = @_;
+	return if exists $self->{crumb} and $self->{crumb} == $crumb;
+	foreach my $form (sort keys %{$self->{children}}) {
+		if (exists $self->{child}{$form}) {
+			my %children = ();
+			foreach my $key (keys %{$self->{child}{$form}}) {
+				my $child = $self->{child}{$form}{$key};
+				$children{$child}{child} = $child;
+				push @{$children{$child}{keys}}, $key;
+			}
+			foreach my $ckey (keys %children) {
+				my $child = $children{$ckey}{child};
+				my $keys = join(',',map {Item::showkey($_)} sort @{$children{$ckey}{keys}});
+				$keys = " with keys $keys";
+				$child->walk($crumb,$indent."\t->>",$keys);
+			}
+		}
+		if (exists $self->{members}{$form}) {
+			foreach my $member (values %{$self->{members}{$form}}) {
+				$member->walk($crumb,$indent."\t-->",' without key');
+			}
+		}
+	}
+
+}
+#package Root;
+sub getchild {
+	my $self = shift;
+	my ($type,$key,$ckey,$link) = @_;
+	my $form = $type->kind;
+	my $child = $self->child($form,$key);
+	if ($child) {
+		$child->link($self->{model},$ckey,$link)
+			if $link and ref $link eq 'ARRAY';
+	} else {
+		$link = [] unless $link;
+		unshift @$link, [ref $self,$self,$key];
+		$child = $type->get($self->{model},$ckey,$link);
+	}
+	return $child;
 }
 #package Root;
 sub addchild {
-	my ($self,$child,$dir,$key,$form) = @_;
-	$self->{children}{$form}{$key} = $child;
-	$self->addfrom($child,$dir) if $self->can('addrom');
-}
-#package Root;
-sub mergefrom {
-	my ($self,$othr) = @_;
-	Carp::carp "Merging Root $othr into $self";
-	return unless $othr->isa('Root');
-	foreach my $form (keys %{$othr->{children}}) {
-		while (my ($k,$v) = each %{$othr->{children}{$form}}) {
-			$self->{children}{$form}{$k} = $v;
+	my $self = shift;
+	my ($child,$key) = @_;
+	my $form = $child->kind;
+	my $kind = $self->kind;
+	my $result = 0;
+	$child->{parent}{$kind} = $self;
+	if ($key) {
+		my @keys = ref $key eq 'ARRAY' ? @$key : ($key);
+		foreach $key (@keys) {
+			next unless defined $key;
+			my $othr = $self->{child}{$form}{$key};
+			if ($othr and $othr ne $child) {
+				Carp::confess sprintf('%s(%s) and %s(%s) object mismatch',$othr,$othr->kind,$child,$child->kind)
+				unless $othr->isa(ref $child) or $child->isa(ref $othr);
+				# Whoops.  Another child exists at that key so must
+				# be the same, merge them.
+				#warn "Adding child: child merge required: $othr instead of $child at key ".Item::showkey($key);
+				my $reason = sprintf "Child index '%s' added to %s belongs to %s",Item::showkey($key),$child,$othr;
+				$child->mergefrom($othr,$reason);
+				my $became = $self->{child}{$form}{$key};
+				Carp::confess "Adding child: child merge failed: $became should have become $child for key ".Item::showkey($key)
+				if $became and $became ne $child;
+			} elsif (not $othr) {
+				$self->{child}{$form}{$key} = $child;
+				$child->{key}{p}{$kind}{$key} = $key;
+				$result = 1;
+				#if (($self->isa('Network') or $self->isa('Private')) and $child->isa('Point::Station')) {
+				#	Carp::cluck "Adding $child to $self with key ",Item::showkey($key); 
+				#}
+			}
+			delete $self->{members}{$form}{$child->no}; # insurance
+		}
+	} else {
+		unless (exists $child->{key}{p}{$kind} and scalar values %{$child->{key}{p}{$kind}}) {
+			unless (exists $self->{members}{$form}{$child->no}) {
+				$self->{members}{$form}{$child->no} = $child;
+				$result = 1;
+			}
 		}
 	}
-	$othr->{children} = {};
+	if (exists $self->{children}{$form}{$child->no}) {
+		Viewer->changed($self,$child) if $result;
+	} else {
+		$self->{children}{$form}{$child->no} = $child;
+		Viewer->added_child($self,$child);
+	}
+	return $result;
+}
+#package Root;
+sub delchild {
+	my $self = shift;
+	my ($child,$key) = @_;
+	my $kind = $self->kind;
+	my $form = $child->kind;
+	my $result = undef;
+	$key = exists $child->{key}{p}{$kind} ? [ values %{$child->{key}{p}{$kind}} ] : [] unless $key;
+	my @keys = ref $key eq 'ARRAY' ? @$key : ($key);
+	if (@keys) {
+		foreach my $k (@keys) {
+			delete $child->{key}{p}{$kind}{$k};
+			if (my $othr = delete $self->{child}{$form}{$k}) {
+				Carp::confess "Deleted child $othr unexpected, should be $child"
+				if $othr ne $child;
+				#warn "Deleted child $othr for key ".Item::showkey($k);
+				$result = $child;
+			} else {
+				Carp::cluck "No entry for child with key ".Item::showkey($k);
+			}
+		}
+		delete $self->{members}{$form}{$child->no}; # insurance
+		unless (scalar values %{$child->{key}{p}{$kind}}) {
+			delete $child->{key}{p}{$kind};
+			delete $child->{parent}{$kind};
+		}
+	} else {
+		if (my $othr = delete $self->{members}{$form}{$child->no}) {
+			#warn "Deleted member $othr";
+			$result = $child;
+		} else {
+			Carp::cluck "No entry for child $child";
+		}
+		delete $child->{key}{p}{$kind};
+		delete $child->{parent}{$kind};
+	}
+	delete $self->{children}{$form}{$child->no};
+	return $result;
+}
+#package Root;
+sub chek {
+	my $self = shift;
+	foreach my $form (keys %{$self->{children}}) {
+		foreach my $child (values %{$self->{children}{$form}}) {
+			#$self->show();
+			Carp::confess "Merge failed, Root $self still has children $child";
+		}
+	}
+	foreach my $form (keys %{$self->{child}}) {
+		foreach my $child (values %{$self->{child}{$form}}) {
+			#$self->show();
+			Carp::confess "Merge failed, Root $self still has child $child";
+		}
+		delete $self->{child}{$form};
+	}
+	foreach my $form (keys %{$self->{members}}) {
+		foreach my $member (values %{$self->{members}{$form}}) {
+			#$self->show();
+			Carp::confess "Merge failed, Root $self still has member $member";
+		}
+		delete $self->{members}{$form};
+	}
+}
+#package Root;
+sub mark {
+	my ($self,$othr,$merge) = @_;
+	foreach my $form (keys %{$othr->{child}}) {
+		my %children = ();
+		foreach my $key (keys %{$othr->{child}{$form}}) {
+			my $child = $othr->{child}{$form}{$key};
+			$children{$child}{child} = $child;
+			push @{$children{$child}{keys}}, $key;
+		}
+		foreach my $ckey (keys %children) {
+			foreach my $key (@{$children{$ckey}{keys}}) {
+				if (my $schild = $self->{child}{$form}{$key}) {
+					my $ochild = $children{$ckey}{child};
+					my $reason = sprintf "Merging %s from %s child %s and %s have same key %s",$self,$othr,$schild,$ochild,Item::showkey($ckey);
+					$schild->mergemark($ochild,$merge,$reason);
+				}
+			}
+		}
+	}
+	return 1;
+}
+#package Root;
+sub them {
+	my ($self,@others) = @_;
+	my $kind = $self->kind;
+	foreach my $othr (@others) {
+		foreach my $form (keys %{$othr->{children}}) {
+			foreach my $ckey (keys %{$othr->{children}{$form}}) {
+				my $child = delete $othr->{children}{$form}{$ckey};
+				my $targ = $child->target;
+				if (exists $child->{key}{p}{$kind}) {
+					foreach my $key (keys %{$child->{key}{p}{$kind}}) {
+						delete $othr->{child}{$form}{$key};
+						$self->{child}{$form}{$key} = $targ;
+						delete $child->{key}{p}{$kind}{$key};
+						$targ->{key}{p}{$kind}{$key} = $key;
+						delete $self->{members}{$form}{$targ->no};
+					}
+					delete $child->{key}{p}{$kind} unless $child eq $targ;
+				}
+				if (my $member = delete $othr->{members}{$form}{$child->no}) {
+					unless (exists $targ->{key}{p}{$kind} and scalar values %{$targ->{key}{p}{$kind}}) {
+						$self->{members}{$form}{$targ->no} = $targ;
+					}
+				}
+				$self->{children}{$form}{$targ->no} = $targ;
+				delete $child->{parent}{$kind};
+				$targ->{parent}{$kind} = $self;
+			}
+			delete $othr->{members}{$form};
+			delete $othr->{child}{$form};
+			delete $othr->{children}{$form};
+		}
+	}
+}
+#package Root;
+sub mfix {
+	my ($self,$abort) = @_;
+	my $kind = $self->kind;
+	my $fixed = 0;
+	foreach my $form (keys %{$self->{children}}) {
+		foreach my $key (keys %{$self->{children}{$form}}) {
+			my $member = $self->{children}{$form}{$key};
+			if (my $became = $member->{target}) {
+				#warn "Root $self: Fixing reference to bad member $member which became $became";
+				$self->{children}{$form}{$key} = $became;
+				$became->{parent}{$kind} = $self;
+				$fixed = 1;
+			}
+		}
+	}
+	foreach my $form (keys %{$self->{members}}) {
+		foreach my $key (keys %{$self->{members}{$form}}) {
+			my $member = $self->{members}{$form}{$key};
+			if (my $became = $member->{target}) {
+				#warn "Root $self: Fixing reference to bad member $member which became $became";
+				$self->{members}{$form}{$key} = $became;
+				$became->{parent}{$kind} = $self;
+				$fixed = 1;
+			}
+		}
+	}
+	foreach my $form (keys %{$self->{child}}) {
+		foreach my $key (keys %{$self->{child}{$form}}) {
+			my $child = $self->{child}{$form}{$key};
+			if (my $became = $child->{target}) {
+				#warn "Root $self: Fixing reference to bad child $child which became $became";
+				$self->{child}{$form}{$key} = $became;
+				$became->{key}{p}{$kind}{$key} = $key;
+				$fixed = 1;
+			}
+		}
+	}
+	my %children = ();
+	foreach my $form (keys %{$self->{members}}) {
+		foreach my $key (keys %{$self->{members}{$form}}) {
+			my $child = $self->{members}{$form}{$key};
+			$children{$form}{$child}{child} = $child;
+			$children{$form}{$child}{ents} = {};
+			if (exists $child->{key}{p}{$kind}) {
+				$children{$form}{$child}{keys} = $child->{key}{p}{$kind};
+			} else {
+				$children{$form}{$child}{keys} = {};
+			}
+		}
+	}
+	foreach my $form (keys %{$self->{child}}) {
+		foreach my $key (keys %{$self->{child}{$form}}) {
+			my $child = $self->{child}{$form}{$key};
+			$children{$form}{$child}{child} = $child;
+			$children{$form}{$child}{ents}{$key} = $key;
+			if (exists $child->{key}{p}{$kind}) {
+				$children{$form}{$child}{keys} = $child->{key}{p}{$kind};
+			} else {
+				$children{$form}{$child}{keys} = {};
+			}
+		}
+	}
+	foreach my $form (keys %children) {
+		foreach my $ckey (keys %{$children{$form}}) {
+			my $entry = $children{$form}{$ckey};
+			my $child = $entry->{child};
+			my %ents = %{$entry->{ents}};
+			my %keys = %{$entry->{keys}};
+			if (scalar values %ents or scalar values %keys and exists $self->{members}{$form}{$child->no}) {
+				if ($fixed) {
+					#warn "Root $self: Fixing reference to member $child that has keys entries";
+				}
+			}
+			foreach my $ent (keys %ents) {
+				next if exists $keys{$ent};
+				#warn "Root $self: Fixing child $child missing key ".Item::showkey($ent);
+				$child->{key}{p}{$kind}{$ent} = $ent;
+				$keys{$ent} = $ent;
+				$fixed = 1;
+			}
+			foreach my $key (keys %keys) {
+				next if exists $ents{$key};
+				#warn "Root $self: Fixing child $child extra key ".Item::showkey($key);
+				if (my $exists = $self->{child}{$form}{$key}) {
+					#warn "Root $self: Fixing child $child extra key ".Item::showkey($key)." belongs to $exists";
+					delete $child->{key}{p}{$kind}{$key};
+				} else {
+					#warn "Root $self: Fixing child $child extra key ".Item::showkey($key)." adding parent entry";
+					$self->{child}{$form}{$key} = $child;
+				}
+				$fixed = 1;
+			}
+			unless (exists $self->{children}{$form}{$child->no}) {
+				#warn "Root $self: Fixing missing $child";
+				$self->{children}{$form}{$child->no} = $child;
+			}
+		}
+	}
+	foreach my $form (keys %{$self->{child}}) {
+		foreach my $child (values %{$self->{child}{$form}}) {
+			if (exists $self->{children}{$form}{$child->no}) {
+				unless ($self->{children}{$form}{$child->no} eq $child) {
+					#warn "Root $self: Fixing wrong children setting for $child";
+					$self->{children}{$form}{$child->no} = $child;
+					$fixed = 1;
+				}
+			} else {
+				#warn "Root $self: Fixing missing children setting for $child";
+				$self->{children}{$form}{$child->no} = $child;
+				#$fixed = 1;
+			}
+		}
+	}
+	foreach my $form (keys %{$self->{members}}) {
+		my @children = values %{$self->{members}{$form}};
+		foreach my $child (@children) {
+			if (exists $child->{key}{p}{$kind} and scalar values %{$child->{key}{p}{$kind}}) {
+				#warn "Root $self: Fixing extra member $child that has keys";
+				delete $self->{members}{$form}{$child->no};
+				#$fixed = 1;
+			}
+		}
+	}
+	foreach my $form (keys %{$self->{children}}) {
+		foreach my $child (values %{$self->{children}{$form}}) {
+			unless (exists $child->{key}{p}{$kind} and scalar values %{$child->{key}{p}{$kind}}) {
+				if (exists $self->{members}{$form}{$child->no}) {
+					unless ($self->{members}{$form}{$child->no} eq $child) {
+						#warn "Root $self: Fixing wrong member setting for $child";
+						$self->{members}{$form}{$child->no} = $child;
+						$fixed = 1;
+					}
+				} else {
+					#warn "Root $self: Fixing missing member $child";
+					$self->{members}{$form}{$child->no} = $child;
+					#$fixed = 1;
+				}
+			}
+		}
+	}
+#	$self->show if $fixed;
+	Carp::croak if $fixed and $abort;
 }
 
 # ------------------------------------------
 package Leaf; our @ISA = qw(Base);
-use strict; use warnings;
+use strict; use warnings; use Carp;
+use Data::Dumper;
 # ------------------------------------------
-#package Leaf;
-sub form {
-	my $self = shift;
-	my $type = ref $self;
-	$type =~ s/::.*//;
-	return "\L$type\Es";
-}
-#package Leaf;
-sub pkey {
-	my $self = shift;
-	my $type = ref $self;
-	my ($ptyp,$key,@args) = ($type->skey(@_));
-	my $parent = $ptyp->get(@args);
-	my $dir = 0;
-	if ($self->isa('Path') and $parent->isa('Path')) {
-		$dir = ($self->obja eq $parent->objb) ? 1 : 0;
-	}
-	$key = $dir + 1 unless $key;
-	return $parent,$dir,$key;
-}
 #package Leaf;
 sub addtoparent {
 	my $self = shift;
-	my ($parent,$dir,$key,$form) = @_;
-	Carp::carp "Adding child $self to parent $parent";
-	$self->{parent} = $parent;
-	$self->{dir} = $dir;
-	$self->{key}{p} = $key;
-	$self->{form} = $form;
-	Carp::confess "Parent is $parent" unless $parent->can('addchild');
-	$parent->addchild($self,$dir,$key,$form) if $parent;
+	my ($parent,$key) = @_;
+	return unless defined $parent;
+#	if ($key) {
+#		warn "Adding child $self to parent $parent with key ".Item::showkey($key);
+#	} else {
+#		warn "Adding member $self to group $parent";
+#	}
+	Carp::confess "Parent $parent is not a Root" unless $parent->isa('Root');
+	my $kind = $parent->kind;
+	my $othr = $self->{parent}{$kind};
+	$othr = $othr->target if $othr;
+	if ($othr and $othr ne $parent) {
+		Carp::confess sprintf('%s($s) and %s(%s) object mismatch',$othr,$othr->kind,$parent,$parent->kind)
+		unless $othr->isa(ref $parent) or $parent->isa(ref $othr);
+		# Whoops.  We have already been added to another parent,
+		# that parent and this must be the same so merge them.
+		#warn "Adding child: parent merge required: parent $othr instead of $parent at key ".Item::showkey($key);
+		my $reason = sprintf "Child %s cannot be %s child for two parents %s and %s",$self,$kind,$parent,$othr;
+		$parent->mergefrom($othr,$reason);
+		my $became = $self->{parent}{$kind};
+		Carp::confess "Adding child: parent merge failed: $became should have become $parent for key ".Item::showkey($key)
+		if $became and $became ne $parent;
+		# we don't have to add the child to the parent, the merge should have done this
+	} else {
+		$parent->addchild($self,$key);
+	}
+}
+#package Leaf;
+sub parent {
+	my ($self,$type) = @_;
+	return $self->{parent}{$type->kind()};
+}
+#package Leaf;
+sub parents {
+	my $self = shift;
+	return values %{$self->{parent}};
+}
+#package Leaf;
+sub delfromparent {
+	my $self = shift;
+	my ($parent) = @_;
+	my $kind = $parent->kind;
+	#warn "Deleting $kind children from $parent";
+	Carp::confess "parent changed" if ref $parent and $parent ne $self->{parent}{$kind};
+	my $key = [ values %{$self->{key}{p}{$kind}} ];
+	$parent->delchild($self,$key);
+	return $key;
+}
+#package Leaf;
+sub link {
+	my $self = shift;
+	my ($model,$key,$links) = @_;
+	return unless defined $links and ref $links eq 'ARRAY';
+	foreach my $link (@$links) {
+		next unless defined $link and ref $link eq 'ARRAY';
+		my ($type,$pkey,$index,@args) = @$link;
+		if (defined $pkey) {
+			while (ref($pkey) eq 'REF') { $pkey = $$pkey }
+		}
+		next unless $type or ref $pkey;
+		$type = ref $pkey unless defined $type;
+		next unless $type;
+		my $kind = $type->kind;
+		Carp::confess ref($pkey)." should be $type"
+		if ref $pkey and $pkey->kind ne $kind;
+		Carp::confess "$type is not a Root"
+		unless $type->isa('Root');
+		$pkey = $pkey->target if ref $pkey;
+		my $oldparent = $self->{parent}{$kind};
+		my $newparent = ref $pkey ? $pkey
+			: ($oldparent ? $oldparent : $type->get($model,$pkey,@args));
+		$newparent->add_key($pkey) if not ref $pkey;
+		$self = $self->target;
+		$newparent = $newparent->target;
+		$self->addtoparent($newparent,$index);
+		$newparent = $newparent->target;
+		if ($newparent->can('link') and scalar @args) {
+			$newparent->link($model,$pkey,@args);
+		}
+	}
 }
 #package Leaf;
 sub init {
 	my $self = shift;
-	$self->addtoparent($self->pkey(@_),$self->form());
+	$self->link(@_);
 }
 #package Leaf;
-sub parent { return shift->{parent} }
+sub myckey {
+	my $self = shift;
+	my $kind = shift;
+	my @keys = sort @{$self->{key}{p}{$kind}} if exists $self->{key}{p}{$kind};
+	my $key = $keys[0];
+	$key = makekey($self->{no}) unless $key or not exists $self->{no};
+	return $key;
+}
 #package Leaf;
-sub childid { return shift->{key}{p} }
+sub myckeys {
+	my $self = shift;
+	my $kind = shift;
+	$kind = [ keys %{$self->{key}{p}} ] unless defined $kind;
+	$kind = [ $kind ] unless ref $kind eq 'ARRAY';
+	my %keys = ();
+	foreach my $k (@$kind) { map {$keys{$_}=$_} keys %{$self->{key}{p}{$k}} }
+	my @keys = (sort keys %keys);
+	return \@keys;
+}
 #package Leaf;
-sub mergefrom {
-	my ($self,$othr) = @_;
-	Carp::carp "Merging Leaf $othr into $self";
-	return unless $othr->isa('Leaf');
-	return if $self->{parent};
-	return unless my $parent = $othr->{parent};
-	my $dir = 0;
-	if ($self->isa('Path') and $parent->isa('Path')) {
-		$dir = ($self->obja == $parent->objb) ? 1 : 0;
+sub dump {
+	my $self = shift;
+	my $form = $self->kind;
+	foreach my $kind (keys %{$self->{parent}}) {
+		my $parent = $self->{parent}{$kind};
+		print STDERR "$self has $kind parent $parent with indexes:\n";
+		if ($self->{key}{p}{$kind}) {
+			foreach my $key (values %{$self->{key}{p}{$kind}}) {
+				print STDERR "\t$form ",Item::showkey($key),"\n";
+			}
+		}
 	}
-	my $key = $othr->{key}{p};
-	my $form = $self->form;
-	$self->addtoparent($parent,$dir,$key,$form);
+}
+#package Leaf;
+sub chek {
+	my $self = shift;
+	foreach my $kind (keys %{$self->{parent}}) {
+		if (my $parent = $self->{parent}{$kind}) {
+			#$self->show();
+			Carp::confess "Merge failed, Leaf $self still has $kind parent $parent";
+		}
+		delete $self->{parent}{$kind};
+	}
+	foreach my $kind (keys %{$self->{key}{p}}) {
+		foreach my $key (values %{$self->{key}{p}{$kind}}) {
+			#$self->show();
+			Carp::confess "Merge failed, Leaf $self still has $kind key ".Item::showkey($key);
+		}
+		delete $self->{key}{p}{$kind};
+	}
+}
+#package Leaf;
+sub mark {
+	my ($self,$othr,$merge) = @_;
+	foreach my $kind (%{$othr->{parent}}) {
+		my $sparent = $self->{parent}{$kind};
+		my $oparent = $othr->{parent}{$kind};
+		if ($oparent and $sparent and $oparent ne $sparent) {
+			my $reason = sprintf "Merging %s from %s have different parents %s and %s",$self,$othr,$sparent,$oparent;
+			$sparent->mergemark($oparent,$merge,$reason);
+		}
+	}
+	return 1;
+}
+#package Leaf;
+sub them {
+	my ($self,@others) = @_;
+	my $form = $self->kind;
+	foreach my $kind (keys %{$self->{parent}}) {
+		my $sparent = $self->{parent}{$kind};
+		my $tparent = $sparent->target();
+		if ($sparent ne $tparent) {
+			$self->{parent}{$kind} = $tparent;
+			if (exists $self->{key}{p}{$kind}) {
+				foreach my $key (values %{$self->{key}{p}{$kind}}) {
+					#warn "Moving $form child $self from $kind parent $sparent to parent $tparent for key ".Item::showkey($key);
+					delete $sparent->{child}{$form}{$key};
+					$tparent->{child}{$form}{$key} = $self;
+				}
+			}
+			if (delete $sparent->{members}{$form}{$self->no}) {
+				#warn "Moving $form member $self from $kind parent $sparent to parent $tparent";
+				$tparent->{members}{$form}{$self->no} = $self;
+			}
+			delete $sparent->{children}{$form}{$self->no};
+			$tparent->{children}{$form}{$self->no} = $self;
+			$tparent->Root::mfix();
+		}
+	}
+	foreach my $othr (@others) {
+		foreach my $kind (keys %{$othr->{parent}}) {
+			my $oparent = delete $othr->{parent}{$kind};
+			next unless $oparent;
+			my $tparent = $oparent->target();
+			#warn "Adding $kind parent $tparent to $self" unless exists $self->{parent}{$kind};
+			$self->{parent}{$kind} = $tparent;
+			if (exists $othr->{key}{p}{$kind}) {
+				foreach my $key (values %{$othr->{key}{p}{$kind}}) {
+					#warn "Merging $form child $othr of $kind parent $oparent to child $self of parent $tparent for key ".Item::showkey($key);
+					delete $oparent->{child}{$form}{$key};
+					#warn "Deleting $form child $othr $kind key ".Item::showkey($key);
+					delete $othr->{key}{p}{$kind}{$key};
+					$self->{key}{p}{$kind}{$key} = $key;
+					$tparent->{child}{$form}{$key} = $self;
+					delete $tparent->{members}{$form}{$self->no};
+				}
+				delete $othr->{key}{p}{$kind};
+			}
+			if (delete $oparent->{members}{$form}{$othr->no}) {
+				unless (exists $self->{key}{p}{$kind} and scalar values %{$self->{key}{p}{kind}}) {
+					#warn "Merging $form member $othr of $kind parent $oparent to member $self of parent $tparent";
+					$tparent->{members}{$form}{$self->no} = $self;
+				}
+			}
+			delete $oparent->{children}{$form}{$othr->no};
+			$tparent->{children}{$form}{$self->no} = $self;
+			$tparent->Root::mfix();
+		}
+	}
 }
 
 # ------------------------------------------
 package Tree; our @ISA = qw(Root Leaf);
-use strict; use warnings;
+use strict; use warnings; use Carp;
 # ------------------------------------------
 
 # ------------------------------------------
-package Type; our @ISA = qw(Base);
-use strict; use warnings;
+package Model; our @ISA = qw(Base);
+use strict; use warnings; use Carp;
 # ------------------------------------------
-#package Type;
-sub init { shift->{subs} = {} }
-#package Type;
-sub fini { delete shift->{subs} }
-#package Type;
-sub hasa { return exists shift->{subs}{shift} }
-#package Type;
-sub sub {
-	my $self = shift;
-	my ($subtype) = @_;
-	return $self->{subs}{$subtype} if $self->hasa($subtype);
-}
-
-# ------------------------------------------
-package Subtype; our @ISA = qw(Base);
-use strict; use warnings;
-# ------------------------------------------
-#package Subtype;
-sub subtype {
-	my $self = shift;
-	my $type = ref $self;
-	$type =~ s/::.*//;
-	return "\L$type\E";
-}
-#package Subtype;
-sub init {
-	my $self = shift;
-	my $subtype = $self->{subtype} = $self->subtype(@_);
-	my $class = $self->type(@_);
-	my $type = $self->{type} = $class->get(@_);
-	$type->{subs}{$subtype} = $self;
-}
-#package Subtype;
-sub fini {
-	my $self = shift;
-	my $type = delete $self->{type};
-	my $subtype = delete $self->{subtype};
-	delete $type->{subs}{$subtype} if $type and $subtype;
-}
-
-# ------------------------------------------
-package Network; our @ISA = qw(Base);
-use strict; use warnings;
-use threads;
-use threads::shared;
-use Thread::Queue;
-use SNMP;
-use Data::Dumper;
-# ------------------------------------------
-# There is only really one network object.  It is the collection of the single
-# global network plus all the private and local subnetworks.  This is the root
-# of all other objects in the network.
-# ------------------------------------------
-#package Network;
-sub launch_thread {
-	my $self = shift;
-	my $rq :shared = Thread::Queue->new;
-	my $wq :shared = Thread::Queue->new;
-	my $thread = threads->create(sub{
-			while (my $item = $rq->dequeue()) {
-				threads->create(sub{
-						my ($session,$error) = Net::SNMP->session(%$item);
-						if (defined $session and $session) {
-							foreach my $table (qw/
-							systemScalars
-							sysORTable
-							ifTable
-							ipAddrTable
-							ipAddressTable
-							atTable
-							ipNetToPhysicalTable
-							ipRouteTable
-							lldpPortConfigTable
-							lldpConfigManAddrTable
-							lldpStatsTxPortTable
-							lldpStatsRxPortTable
-							lldpLocPortTable
-							lldpLocManAddrTable
-							lldpRemTable
-							lldpRemManAddrTable
-							lldpRemUnknownTLVTable
-							lldpRemOrgDefInfoTable
-							lldpXdot1ConfigPortVlanTable
-							lldpXdot1ConfigVlanNameTable
-							lldpXdot1ConfigProtoVlanTable
-							lldpXdot1ConfigProtocolTable
-							lldpXdot1LocTable
-							lldpXdot1LocProtoVlanTable
-							lldpXdot1LocVlanNameTable
-							lldpXdot1LocProtocolTable
-							lldpXdot1RemTable
-							lldpXdot1RemProtoVlanTable
-							lldpXdot1RemVlanNameTable
-							lldpXdot1RemProtocolTable
-							lldpXdot3PortConfigTable
-							lldpXdot3LocPortTable
-							lldpXdot3LocPowerTable
-							lldpXdot3LocLinkAggTable
-							lldpXdot3LocMaxFrameSizeTable
-							lldpXdot3RemPortTable
-							lldpXdot3RemPowerTable
-							lldpXdot3RemLinkAggTable
-							lldpXdot3RemMaxFrameSizeTable
-							lldpXMedPortConfigTable
-							lldpXMedLocMediaPolicyTable
-							lldpXMedLocLocationTable
-							lldpXMedLocXPoEPSEPortTable
-							lldpXMedRemCapabilitiesTable
-							lldpXMedRemMediaPolicyTable
-							lldpXMedRemInventoryTable
-							lldpXMedRemLocationTable
-							lldpXMedRemXPoETable
-							lldpXMedRemXPoEPSETable
-							lldpXMedRemXPoEPDTable
-							/) {
-								my ($oid,$result,$error);
-								my $key = $table;
-								if ($key =~ /Table$/) {
-									$oid = sub_dot(SNMP::translateObj($key));
-									$result = $session->get_table(-baseoid=>$oid);
-									$error = $session->error() unless defined $result;
-									$wq->enqueue([$item,$table,$result,$error]);
-									unless (defined $result) {
-										if ($error =~ /No response/) { last }
-										if ($error =~ /Requested table is empty/) { next }
-										Carp::carp "SNMP error $error\n";
-										next;
-									}
-								} elsif ($key =~ /Scalars$/) {
-									$key =~ s/Scalars$//;
-									$oid = sub_dot(SNMP::translateObj($key));
-									$result = $session->get_bulk_request(-nonrepeaters=>0,-maxrepetitions=>8,-varbindlist=>[$oid]);
-									$error = $session->error() unless defined $result;
-									$wq->enqueue([$item,$table,$result,$error]);
-								}
-							}
-						} else {
-							$wq->enqueue([$item,undef,$error]);
-						}
-				})->detach();
-			}
-	})->detach();
-	$self->{queue}{host}{request} = $rq;
-	$self->{queue}{host}{results} = $wq;
-	$self->{thread}{host} = $thread;
-}
-#package Network;
-sub snmp_results {
-	my $self = shift;
-	my $count = 10;
-	for (my $i=0;$i<100;$i++) {
-		while (my $item = $self->{queue}{host}{results}->dequeue_nb()) {
-			my ($snmpargs,$table,$result,$error) = @$item;
-			my $sub = $self->can($table);
-			&{$sub}($self,@$item) if $sub;
-		}
-		sleep 1;
-		last unless --$count;
-	}
-}
-#package Network;
+#package Model;
 sub init {
 	my $self = shift;
 	$self->{numbs} = {};
 	$self->{items} = {};
-	$self->launch_thread;
+	$self->{lists} = {};
+	my $glob = $self->{net}{PUBLIC} = Network->new($self,undef);
+	my $priv = $self->{net}{PRIVATE} = Private::Here->new($self,undef,[['Network',$glob,undef]]);
+	my $locl = $self->{net}{LOOPBACK} = Local::Here->new($self,undef,[['Private::Here',$priv,undef]]);
 }
-#package Network;
+#package Model;
 sub fini {
 	my $self = shift;
 	delete $self->{numbs};
 	delete $self->{items};
-	delete ($self->{thread}{host})->kill('TERM');
-	delete $self->{queue}{host}{request};
-	delete $self->{queue}{host}{results};
+	delete $self->{lists};
+	delete($self->{net}{LOOPBACK})->put();
+	delete($self->{net}{PRIVATE})->put();
+	delete($self->{net}{PUBLIC})->put();
 }
-#package Network;
+#package Model;
+sub getno {
+	my ($self,$kind) = @_;
+	return --$self->{numbs}{$kind};
+}
+#package Model;
 sub item {
-	my ($self,$kind,$ref) = @_;
-	my $keys = $ref;
-	if (ref $ref ne 'ARRAY') {
-		$keys = [ $ref ];
-	}
+	my $self = shift;
+	my ($kind,$ref) = @_;
+	return undef unless defined $ref;
 	my $result = undef;
-	foreach my $key (@$keys) {
-		Carp::carp "Searching $kind key ".Item::showkey($key);
+	my @keys = ref $ref eq 'ARRAY' ? @$ref : ( $ref );
+	foreach my $key (@keys) {
+		#warn "Searching $kind key ".Item::showkey($key);
 		if (exists $self->{items}{$kind}{$key}) {
 			$result = $self->{items}{$kind}{$key};
 			last if $result;
 		}
 	}
-	Carp::carp "Found $result" if $result;
+	#warn "Found $result" if $result;
 	return $result;
 }
-#package Network;
-sub getno {
+#package Model;
+sub items {
 	my ($self,$kind) = @_;
-	return --$self->{numbs}{$kind};
+	$kind = [keys %{$self->{items}}] unless defined $kind;
+	$kind = [$kind] unless ref $kind eq 'ARRAY';
+	my @items = ();
+	foreach (@$kind) {
+		push @items, values %{$self->{lists}{$_}} if $self->{lists}{$_};
+	}
+	return @items;
 }
-#package Network;
-sub added {
-	my ($self,$obj) = @_;
-	Carp::carp "Added object $obj number $obj->{no} of kind $obj->{kind}";
+#package Model;
+sub showstats {
+	my $self = shift;
+	print STDERR "Model stats:\n------------\n";
+	Carp::confess "$self->{lists} not a HASH" unless ref $self->{lists} eq 'HASH';
+	foreach my $kind (sort keys %{$self->{lists}}) {
+		next unless $self->{lists}{$kind};
+		Carp::confess "$self->{lists}{$kind} not a HASH" unless ref $self->{lists}{$kind} eq 'HASH';
+		my $count = scalar(values %{$self->{lists}{$kind}});
+		printf STDERR "%6d lists of kind %s\n", $count, $kind;
+	}
+	print STDERR "------------\n";
+	foreach my $kind (sort keys %{$self->{items}}) {
+		my $count = scalar(values %{$self->{items}{$kind}});
+		printf STDERR "%6d items of kind %s\n", $count, $kind;
+	}
+	print STDERR "------------\n";
 }
-#package Network;
-sub removed {
-	my ($self,$obj) = @_;
-	Carp::carp "Removed object $obj number $obj->{no} of kind $obj->{kind}";
-}
-#package Network;
-sub xformed {
-	my ($self,$obj,$oldtype,$newtype) = @_;
-	Carp::carp "Transformed $obj number $obj->{no} of kind $obj->{kind} from $oldtype to $newtype";
+#package Model;
+our $bread = 0;
+#package Model;
+sub walktree {
+	my $self = shift;
+	print STDERR "\nNetwork tree:\n-------------\n";
+	my $crumb = $bread++;
+	$self->walk($crumb,'','');
+	print STDERR "-------------\n\n";
 }
 
+# ------------------------------------------
+package Model::SNMP; our @ISA = qw(Model);
+use strict; use warnings; use Carp; use Data::Dumper;
+#use threads; use threads::shared; use Thread::Queue;
+use Thread; use Thread::Queue;
+use SNMP; use Net::IP;
+# ------------------------------------------
+#package Model::SNMP;
+our $tables = [ qw/
+	systemScalars
+	sysORTable
+	ifTable
+	ipAddrTable
+	ipAddressTable
+	ipRouteTable
+	atTable
+	ipNetToPhysicalTable
+	lldpPortConfigTable
+	lldpConfigManAddrTable
+	lldpStatsTxPortTable
+	lldpStatsRxPortTable
+	lldpLocPortTable
+	lldpLocManAddrTable
+	lldpRemTable
+	lldpRemManAddrTable
+	lldpRemUnknownTLVTable
+	lldpRemOrgDefInfoTable
+	lldpXdot1ConfigPortVlanTable
+	lldpXdot1ConfigVlanNameTable
+	lldpXdot1ConfigProtoVlanTable
+	lldpXdot1ConfigProtocolTable
+	lldpXdot1LocTable
+	lldpXdot1LocProtoVlanTable
+	lldpXdot1LocVlanNameTable
+	lldpXdot1LocProtocolTable
+	lldpXdot1RemTable
+	lldpXdot1RemProtoVlanTable
+	lldpXdot1RemVlanNameTable
+	lldpXdot1RemProtocolTable
+	lldpXdot3PortConfigTable
+	lldpXdot3LocPortTable
+	lldpXdot3LocPowerTable
+	lldpXdot3LocLinkAggTable
+	lldpXdot3LocMaxFrameSizeTable
+	lldpXdot3RemPortTable
+	lldpXdot3RemPowerTable
+	lldpXdot3RemLinkAggTable
+	lldpXdot3RemMaxFrameSizeTable
+	lldpXMedPortConfigTable
+	lldpXMedLocMediaPolicyTable
+	lldpXMedLocLocationTable
+	lldpXMedLocXPoEPSEPortTable
+	lldpXMedRemCapabilitiesTable
+	lldpXMedRemMediaPolicyTable
+	lldpXMedRemInventoryTable
+	lldpXMedRemLocationTable
+	lldpXMedRemXPoETable
+	lldpXMedRemXPoEPSETable
+	lldpXMedRemXPoEPDTable
+/];
+#package Model::SNMP;
+sub init {
+	my $self = shift;
+	$self->launch_thread();
+}
+#package Model::SNMP;
+sub fini {
+	my $self = shift;
+	delete ($self->{thread}{host})->kill('TERM');
+	delete $self->{queue}{host}{request};
+	delete $self->{queue}{host}{results};
+}
+#package Model::SNMP;
+sub launch_thread {
+	my $self = shift;
+#	my $rq :shared = Thread::Queue->new;
+#	my $wq :shared = Thread::Queue->new;
+	my $rq = Thread::Queue->new;
+	my $wq = Thread::Queue->new;
+#	my $thread = threads->create(sub{
+#			while (my $item = $rq->dequeue()) {
+#				threads->create(sub{
+#						my ($session,$error) = Net::SNMP->session(%$item);
+#						if (defined $session and $session) {
+#							foreach my $table (@$tables) {
+#								my ($oid,$result,$error);
+#								my $key = $table;
+#								if ($key =~ /Table$/) {
+#									$oid = sub_dot(SNMP::translateObj($key));
+#									$result = $session->get_table(-baseoid=>$oid);
+#									$error = $session->error() unless defined $result;
+#									$wq->enqueue([$item,$table,$result,$error]);
+#									unless (defined $result) {
+#										if ($error =~ /No response/) { last }
+#										if ($error =~ /Requested table is empty/) { next }
+#										#warn "SNMP error $error\n";
+#										next;
+#									}
+#								} elsif ($key =~ /Scalars$/) {
+#									$key =~ s/Scalars$//;
+#									$oid = sub_dot(SNMP::translateObj($key));
+#									$result = $session->get_bulk_request(-nonrepeaters=>0,-maxrepetitions=>8,-varbindlist=>[$oid]);
+#									$error = $session->error() unless defined $result;
+#									$wq->enqueue([$item,$table,$result,$error]);
+#								}
+#							}
+#						} else {
+#							$wq->enqueue([$item,undef,$error]);
+#						}
+#				})->detach();
+#			}
+#	})->detach();
+	$self->{queue}{host}{request} = $rq;
+	$self->{queue}{host}{results} = $wq;
+	#warn "Launching thread...";
+	my $thread = Thread->new(\&Model::SNMP::main_thread,$rq,$wq);
+	#warn "Detaching thread...";
+	$thread->detach();
+	$self->{thread}{host} = $thread;
+}
+#package Model::SNMP;
+sub main_thread {
+	my ($rq,$wq) = @_;
+	while (my $item = $rq->dequeue()) {
+		my $worker = Thread->new(\&Model::SNMP::worker_thread,$rq,$wq,$item);
+		$worker->detach();
+	}
+}
+#package Model::SNMP;
+sub worker_thread {
+	my ($rq,$wq,$item) = @_;
+	my ($session,$error) = Net::SNMP->session(%$item);
+	if (defined $session and $session) {
+		foreach my $table (@$tables) {
+			my ($oid,$result,$error);
+			my $key = $table;
+			if ($key =~ /Table$/) {
+				$oid = sub_dot(SNMP::translateObj($key));
+				$result = $session->get_table(-baseoid=>$oid);
+				$error = $session->error() unless defined $result;
+				unless (defined $result) {
+					if ($error =~ /No response/) { last }
+					if ($error =~ /Requested table is empty/) { next }
+				}
+				$wq->enqueue([$item,$table,$result,$error]);
+			}
+			elsif ($key =~ /Scalars$/) {
+				$key =~ s/Scalars$//;
+				$oid = sub_dot(SNMP::translateObj($key));
+				$result = $session->get_bulk_request(-nonrepeaters=>0,-maxrepetitions=>8,-varbindlist=>[$oid]);
+				$error = $session->error() unless defined $result;
+				unless (defined $result) {
+					if ($error =~ /No response/) { last }
+				}
+				$wq->enqueue([$item,$table,$result,$error]);
+			}
+		}
+	} else {
+		$wq->enqueue([$item,undef,$error]);
+	}
+}
+#package Model::SNMP;
+sub snmp_process {
+	my $self = shift;
+	my $item = shift;
+	my ($snmpargs,$table,$result,$error) = @$item;
+	if ($error) {
+		warn "Errored result:\nRaw SNMP result:\n",Dumper($item),"\n";
+		return;
+	}
+	my $xlated;
+	if ($table =~ /Scalars$/) {
+		$xlated = xlate_scalars(@$item);
+	} else {
+		$xlated = xlate_table(@$item);
+	}
+	my ($hkey,$type,$net) = $self->keytype($snmpargs->{'-hostname'});
+	my $name = netname($type);
+	if ($net = $self->{net}{$type}) {
+		#warn "Found net $name/$type for ".Item::showkey($hkey);
+	} else {
+		warn "No net $name/$type for ".Item::showkey($hkey);
+		return;
+	}
+	my $host = $net->getchild('Point::Host',$hkey,undef);
+	if ($host->can($table)) {
+		#warn "Host ".Item::showkey($hkey)." processing $table";
+		#printf STDERR "Processing %s %s...\n",Item::showkey($hkey),$table;
+		$host->$table($self,$snmpargs,$table,$xlated,$error,$hkey,$type,$net,$name);
+		#printf STDERR "Processing %s %s... ...done\n",Item::showkey($hkey),$table;
+		Viewer->refresh();
+	} else {
+		#warn "Host ".Item::showkey($hkey)." cannot process $table";
+	}
+	#Model::walktree($host);
+}
+#package Model::SNMP;
+sub snmp_doone {
+	my $self = shift;
+	my $q = $self->{queue}{host}{results};
+	my $result = 0;
+	if (my $item = $q->dequeue_nb()) {
+		#warn "There are still ",$q->pending()," pending results\n" if $q->pending();
+		$self->snmp_process($item);
+		$result++;
+	}
+	return $result;
+}
+#package Model::SNMP;
+sub snmp_result {
+	my $self = shift;
+	my $q = $self->{queue}{host}{results};
+	my $result = 0;
+	while (my $item = $q->dequeue_nb()) {
+		#warn "There are still ",$q->pending()," pending results\n" if $q->pending();
+		$self->snmp_process($item);
+		$result++;
+	}
+	return $result;
+}
+#package Model::SNMP;
+sub snmp_results {
+	my $self = shift;
+	my $count = 5;
+	while (1) {
+		$count = 5 if $self->snmp_result();
+		sleep 1;
+		last unless --$count;
+	}
+}
+#package Model::SNMP;
 sub sub_dot {
 	my $oid = shift;
 	$oid =~ s/^\.+//;
 	return $oid;
 }
+#package Model::SNMP;
 sub add_dot {
 	my $oid = shift;
 	$oid = sub_dot($oid);
 	return ".$oid";
 }
-
-#package Network;
+#package Model::SNMP;
 sub xlate_table {
 	my ($snmpargs,$table,$result,$error) = @_;
 	return undef unless defined $result;
 	my $xlate = {};
-	foreach (keys %$result) {
-		my $val = $result->{$_};
-		my $tag = SNMP::translateObj(add_dot($_));
+	foreach my $key (keys %$result) {
+		my $val = $result->{$key};
+		my $tag = SNMP::translateObj(add_dot($key));
 		my ($label,$index) = split(/\./,$tag,2);
 		my $mib = $SNMP::MIB{$label};
 		if ($val =~ /^0x([0-9a-fA-F]{2})+$/) {
@@ -524,64 +1333,86 @@ sub xlate_table {
 			next if exists $xlate->{$index}{$i};
 			if ($mib->{type} =~ /INTEGER|UNSIGNED|COUNTER|GAUGE|TICKS/) {
 				my $val = shift @inds;
-				if (my $enums = $SNMP::MIB{$i}{enums}) {
-					foreach my $k (keys %$enums) {
-						$val = "$k($val)" if $enums->{$k} eq $val;
+				if (defined $val) {
+					if (my $enums = $SNMP::MIB{$i}{enums}) {
+						foreach my $k (keys %$enums) {
+							$val = "$k($val)" if $enums->{$k} eq $val;
+						}
 					}
+					$xlate->{$index}{$i} = $val;
+				} else {
+					Carp::cluck "Ran out of indexes in [",join('.',@inds),"] looking for ",$mib->{type};
+					@inds = ();
+					$xlate->{$index}{$i} = undef;
 				}
-				$xlate->{$index}{$i} = $val;
 			} elsif ($mib->{type} =~ /OCTETSTR/) {
 				my @vals = ();
 				my $len = shift @inds;
-				while ($len>0) { push @vals, shift @inds; $len-- } 
-				my $val = join(':',map {sprintf('%02x',$_)} @vals);
-				if ($val =~ /^0x([0-9a-fA-F]{2})+$/) {
-					$val =~ s/^0x//;
-					$val = pack('H*',$val);
-					$val = join(':',map {sprintf('%02x',$_)} unpack('C*',$val));
-				}
-				if ($mib->{syntax} eq 'InetAddress' and $val =~ /:/) {
-					if ($val =~ /^[0-9a-fA-F]{2}(:[0-9a-fA-F]{2}){3}$/) {
-						$val =~ s/://g;
-						$val = join('.',unpack('C*',pack('H*',$val)));
-					} else {
-						while ($val =~ s/00:/:/) { }
-						while ($val =~ s/:::+/::/) { }
-						$val =~ s/^:([^:])/::$1/;
-						$val =~ s/^0+//;
-						while ($val =~ s/:0/:/) { }
+				if (defined $len and $len <= scalar(@inds)) {
+					while ($len>0) { push @vals, shift @inds; $len-- } 
+					my $val = join(':',map {sprintf('%02x',$_)} @vals);
+					if ($val =~ /^0x([0-9a-fA-F]{2})+$/) {
+						$val =~ s/^0x//;
+						$val = pack('H*',$val);
+						$val = join(':',map {sprintf('%02x',$_)} unpack('C*',$val));
 					}
+					if ($mib->{syntax} eq 'InetAddress' and $val =~ /:/) {
+						if ($val =~ /^[0-9a-fA-F]{2}(:[0-9a-fA-F]{2}){3}$/) {
+							$val =~ s/://g;
+							$val = join('.',unpack('C*',pack('H*',$val)));
+						} else {
+							while ($val =~ s/00:/:/) { }
+							while ($val =~ s/:::+/::/) { }
+							$val =~ s/^:([^:])/::$1/;
+							$val =~ s/^0+//;
+							while ($val =~ s/:0/:/) { }
+						}
+					}
+					$xlate->{$index}{$i} = $val;
+				} else {
+					Carp::cluck "Ran out of indexes in [",join('.',@inds),"] looking for ",$mib->{type};
+					@inds = ();
+					$xlate->{$index}{$i} = undef;
 				}
-				$xlate->{$index}{$i} = $val;
 			} elsif ($mib->{type} =~ /OBJECTID|OPAQUE/) {
 				my @vals = ();
 				my $len = shift @inds;
-				while ($len>0) { push @vals, shift @inds; $len-- }
-				my $val = join('.',@vals);
-				$val = SNMP::translateObj(add_dot($val));
-				$xlate->{$index}{$i} = join('.',@vals);
+				if (defined $len and $len <= scalar(@inds)) {
+					while ($len>0) { push @vals, shift @inds; $len-- }
+					my $val = join('.',@vals);
+					$val = SNMP::translateObj(add_dot($val));
+					$xlate->{$index}{$i} = join('.',@vals);
+				} else {
+					Carp::cluck "Ran out of indexes in [",join('.',@inds),"] looking for ",$mib->{type};
+					@inds = ();
+					$xlate->{$index}{$i} = undef;
+				}
 			} elsif ($mib->{type} =~ /IPADDR|NETADDR/) {
 				my @vals = ();
 				my $len = 4;
-				while ($len>0) { push @vals, shift @inds; $len-- }
-				$xlate->{$index}{$i} = join('.',@vals);
+				if ($len <= scalar(@inds)) {
+					while ($len>0) { push @vals, shift @inds; $len-- }
+					$xlate->{$index}{$i} = join('.',@vals);
+				} else {
+					Carp::cluck "Ran out of indexes in [",join('.',@inds),"] looking for ",$mib->{type};
+					@inds = ();
+					$xlate->{$index}{$i} = undef;
+				}
 			} else {
-				Carp::carp "Unhandled index type for $i is $mib->{type}\n";
+				Carp::cluck "Unhandled index type for $i is $mib->{type}\n";
 			}
 		}
 	}
-	print STDERR "Table $table:\n";
-	print STDERR Dumper($xlate);
 	return $xlate;
 }
-#package Network;
+#package Model::SNMP;
 sub xlate_scalars {
 	my ($snmpargs,$scalars,$result,$error) = @_;
 	return undef unless defined $result;
 	my $xlate = {};
-	foreach (keys %$result) {
-		my $val = $result->{$_};
-		my $tag = SNMP::translateObj(add_dot($_));
+	foreach my $key (keys %$result) {
+		my $val = $result->{$key};
+		my $tag = SNMP::translateObj(add_dot($key));
 		my ($label,$index) = split(/\./,$tag,2);
 		($label,$index) = ('sysUpTime',0) if $label eq 'sysUpTimeInstance';
 		my $mib = $SNMP::MIB{$label};
@@ -612,458 +1443,225 @@ sub xlate_scalars {
 		}
 		$xlate->{$index}{$label} = $val;
 	}
-	print STDERR "Scalar $scalars:\n";
-	print STDERR Dumper($xlate);
 	return $xlate;
 }
+#package Model::SNMP;
+sub netname {
+	my $type = shift;
+	my %hash = (
+		PUBLIC=>'Network',
+		PRIVATE=>'Private',
+		LOOPBACK=>'Local',
+		RESERVED=>'Network',
+	);
+	return $hash{$type};
+}
+#package Model::SNMP;
+sub typeok {
+	my ($type,$ipt) = @_;
+	my %hash = (
+		PUBLIC=>{PUBLIC=>1,PRIVATE=>0,LOOPBACK=>0,RESERVED=>0},
+		PRIVATE=>{PUBLIC=>1,PRIVATE=>1,LOOPBACK=>0,RESERVERD=>0},
+		LOOPBACK=>{PUBLIC=>1,PRIVATE=>1,LOOPBACK=>1,RESERVED=>0},
+		RESERVED=>{PUBLIC=>0,PRIVATE=>0,LOOPBACK=>0,RESERVED=>0},
+	);
+	return $hash{$type}{$ipt};
+}
+#package Model::SNMP;
+sub iptype {
+	my $key = shift;
+	my $hnip = Item::showkey($key);
+	return 'PUBLIC' if $hnip =~ /\/0$/;
+	my $ip = new Net::IP($hnip) or Carp::confess "can't decode key '$hnip'";
+	#print STDERR "SNMP host IP  :",$ip->ip,"\n";
+	#print STDERR "SNMP host Ver :",$ip->version,"\n";
+	#print STDERR "SNMP host Sho :",$ip->short,"\n";
+	#print STDERR "SNMP host Bin :",$ip->binip,"\n";
+	#print STDERR "SNMP host Int :",$ip->intip,"\n";
+	#print STDERR "SNMP host Hex :",$ip->hexip,"\n";
+	#print STDERR "SNMP host Mask:",$ip->mask,"\n";
+	#print STDERR "SNMP host Last:",$ip->last_ip,"\n";
+	#print STDERR "SNMP host Pfx :",$ip->prefix,"\n";
+	#print STDERR "SNMP host Len :",$ip->prefixlen,"\n";
+	#print STDERR "SNMP host Size:",$ip->size,"\n";
+	#print STDERR "SNMP host Type:",$ip->iptype,"\n";
+	#print STDERR "SNMP host Rev :",$ip->reverse_ip,"\n";
+	my $type = $ip->iptype; $type = 'LOOPBACK' if $type eq 'PRIVATE' and $hnip =~ /^127\./;
+	# LOOPBACK, PRIVATE, RESERVED, PUBLIC for IPv4
+	return $type;
+}
+#package Model::SNMP;
+sub keytype {
+	my ($self,$host) = @_;
+	my $key = Item::makekey($host);
+	return $key,iptype($key);
+}
+#package Model::SNMP;
+our %already_queried = ();
+#package Model::SNMP;
+sub query {
+	my $self = shift;
+	my ($ipa) = @_;
+	if (exists $already_queried{$ipa}) {
+		Carp::confess "Already queried ",Item::showkey($ipa);
+	}
+	$already_queried{$ipa} = Item::showkey($ipa);
+	my $snmpargs = {
+		-hostname=>Item::showkey($ipa),
+		-version=>'snmpv2c',
+		-community=>'public',
+	};
+	my $q = $self->{queue}{host}{request};
+	$q->enqueue($snmpargs);
+	#warn "There are now ",$q->pending()," pending requests";
+}
+#package Model::SNMP;
 
-#package Network;
-sub systemScalars {
-	my $self = shift;
-	#Carp::cluck "check";
-	my ($snmpargs,$scalars,$result,$error) = @_;
-	my $xlated = Network::xlate_scalars(@_);
-	my $row = $xlated->{0};
-	my $hkey = Item::makekey($snmpargs->{'-hostname'});
-	my $host = Point::Host->get($self,$hkey);
-	foreach (qw{sysLocation sysObjectID sysDescr sysORLastChange sysUpTime sysServices sysName sysContact}) {
-		$host->{$_} = $row->{$_} if exists $row->{$_};
+# ------------------------------------------
+package Subnetwork; our @ISA = qw(Point Root);
+use strict; use warnings; use Carp;
+# ------------------------------------------
+#package Subnetwork;
+sub subnetbyip {
+	my ($self,$ipa) = @_;
+	if ($ipa) {
+		my $kind = $self->kind;
+		#print STDERR "Lookup up subnet of $self for IP ",Item::showkey($ipa),"\n";
+		foreach my $subnet ($self->children('Subnet')) {
+			#print STDERR "Checking subnet $subnet\n";
+			foreach my $key (sort keys %{$subnet->{key}{p}{$kind}}) {
+				next unless length($key) == 5;
+				#print STDERR "Checking prefix ",Item::showkey($key),"\n";
+				my ($addr,$len) = unpack('NC',$key);
+				next if $len == 0 or $addr == 0;
+				my $mask = 0xffffffff << (32-$len);
+				my $kasm = ~$mask;
+				my $beg = pack('N',$addr & $mask);
+				my $end = pack('N',$addr | $kasm);
+				#print STDERR "Beg address is ",Item::showkey($beg),"\n";
+				#print STDERR "End address is ",Item::showkey($end),"\n";
+				return ($subnet,$key) if $beg le $ipa and $ipa le $end;
+				#print STDERR "IP ",Item::showkey($ipa)," not in range from ",Item::showkey($beg)," to ",Item::showkey($end),"\n";
+			}
+		}
 	}
+	return (undef,undef);
 }
+
+# ------------------------------------------
+package Network; our @ISA = qw(Subnetwork);
+use strict; use warnings; use Carp;
+# ------------------------------------------
+# There is only really one network object.  It is the collection of the single
+# global network plus all the private and local subnetworks.  This is the root
+# of all other objects in the network.
+# ------------------------------------------
 #package Network;
-sub sysORTable {
+sub addchild {
 	my $self = shift;
-	my $xlated = Network::xlate_table(@_);
-	my ($snmpargs,$table,$result,$error) = @_;
-	my $hkey = Item::makekey($snmpargs->{'-hostname'});
+	my ($child,$key,$result) = @_;
+	$result = $self->SUPER::addchild(@_);
+	$self->{model}->query($key) if $result and $key and length($key) == 4 and Model::SNMP::iptype($key) ne 'RESERVED' and $child->kind eq 'Point';
+	return $result;
 }
-#package Network;
-sub ifTable {
+
+# -------------------------------------
+package Private; our @ISA = qw(Subnetwork Leaf);
+use strict; use warnings; use Carp;
+# -------------------------------------
+#package Private;
+sub them {
+	my ($self,@others) = @_;
+	$self->{model}{net}{PRIVATE} = $self->{model}{net}{PRIVATE}->target();
+}
+# -------------------------------------
+package Private::Here; our @ISA = qw(Private);
+use strict; use warnings; use Carp;
+# -------------------------------------
+#package Private::Here;
+sub addchild {
 	my $self = shift;
-	my $xlated = Network::xlate_table(@_);
-	my ($snmpargs,$table,$result,$error) = @_;
-	my $hkey = Item::makekey($snmpargs->{'-hostname'});
-	foreach my $row (values %$xlated) {
-		my $idx = $row->{ifIndex};
-		my $hwa = $row->{ifPhysAddress};
-		$hwa = "\0\0\0\0\0\0" unless $hwa;
-		my $dsc = $row->{ifDescr};
-		my $vid = 0;
-		if ($dsc =~ /\d+\.(\d+)(:\d+)?$/) { $vid = $1 }
-		$vid = pack('n',$vid);
-		$hwa = Item::makekey($hwa);
-		Point::Host->get($self,$hkey)->add_hwa($hwa);
-		Vprt->get($self,$hwa,$vid)->{ifIndex} = $idx;
-		Port->get($self,$hwa)->{ifIndex} = $idx;
-		Vlan->get($self,$hwa,$vid);
-		Point::Host->get($self,$hkey)->{indexes}{$idx} = [ $hwa, $vid ];
+	my ($child,$key,$result) = @_;
+	$result = $self->SUPER::addchild(@_);
+	$self->{model}->query($key) if $result and $key and length($key) == 4 and Model::SNMP::iptype($key) ne 'RESERVED' and $child->kind eq 'Point';
+	return $result;
+}
+
+# -------------------------------------
+package Local; our @ISA = qw(Subnetwork Leaf);
+use strict; use warnings; use Carp;
+# -------------------------------------
+#package Local;
+sub them {
+	my ($self,@others) = @_;
+	$self->{model}{net}{LOOPBACK} = $self->{model}{net}{LOOPBACK}->target();
+}
+# -------------------------------------
+package Local::Here; our @ISA = qw(Local);
+use strict; use warnings; use Carp;
+# -------------------------------------
+#package Local::Here;
+sub addchild {
+	my $self = shift;
+	my ($child,$key,$result) = @_;
+	$result = $self->SUPER::addchild(@_);
+	$self->{model}->query($key) if $result and $key and length($key) == 4 and Model::SNMP::iptype($key) ne 'RESERVED' and $child->kind eq 'Point';
+	return $result;
+}
+
+# -------------------------------------
+package Subnet; our @ISA = qw(Point Tree Datum);
+use strict; use warnings; use Carp;
+# -------------------------------------
+
+# -------------------------------------
+package Datum; our @ISA = qw(Base);
+use strict; use warnings; use Carp;
+use Data::Dumper;
+# -------------------------------------
+#package Datum;
+sub init {
+	my $self = shift;
+	$self->{data} = {} unless exists $self->{data};
+}
+#package Datum;
+sub fini {
+	my $self = shift;
+	delete $self->{data};
+}
+#package Datum;
+sub dump {
+	my $self = shift;
+	print STDERR Dumper($self->{data});
+}
+#package Datum;
+sub them {
+	my ($self,@others) = @_;
+	foreach my $othr (@others) {
+		foreach my $table (keys %{$othr->{data}}) {
+			foreach my $col (keys %{$othr->{data}{$table}}) {
+				$self->{data}{$table}{$col} = $othr->{data}{$table}{$col};
+			}
+		}
 	}
-}
-#package Network;
-sub ipAddrTable {
-	my $self = shift;
-	my $xlated = Network::xlate_table(@_);
-	my ($snmpargs,$table,$result,$error) = @_;
-	my $hkey = Item::makekey($snmpargs->{'-hostname'});
-	foreach my $row (values %$xlated) {
-		my $idx = $row->{ipAdEntIfIndex};
-		my $ipa = Item::makekey($row->{ipAdEntAddr});
-		my $host = Point::Host->get($self,$hkey); $host->add_ipa($ipa);
-		next unless exists $host->{indexes}{$idx};
-		my ($hwa,$vid) = @{$host->{indexes}{$idx}};
-		Vprt->get($self,$hwa,$vid)->add_ipa($ipa);
-		Vlan->get($self,$hwa,$vid)->add_ipa($ipa);
-		my $pfx = Item::makekey($row->{ipAdEntNetMask});
-		my $sub = Subnet->get($self,$pfx); $sub->add_ipa($ipa);
-		Support->get($self,$sub,Vlan->get($self,$hwa,$vid));
-	}
-}
-#package Network;
-sub ipAddressTable {
-	my $self = shift;
-	my $xlated = Network::xlate_table(@_);
-	my ($snmpargs,$table,$result,$error) = @_;
-	my $hkey = Item::makekey($snmpargs->{'-hostname'});
-	foreach my $row (values %$xlated) {
-		next unless $row->{ipAddressRowStatus} eq 'active(1)';
-		next unless $row->{ipAddressAddrType} eq 'ipv4(1)';
-		next unless $row->{ipAddressType} eq 'unicast(1)';
-		my $idx = $row->{ipAddressIfIndex};
-		my $ipa = Item::makekey($row->{ipAddressAddr});
-		my $host = Point::Host->get($self,$hkey); $host->add_ipa($ipa);
-		next unless exists $host->{indexes}{$idx};
-		my ($hwa,$vid) = @{$host->{indexes}{$idx}};
-		Vprt->get($self,$hwa,$vid)->add_ipa($ipa);
-		Vlan->get($self,$hwa,$vid)->add_ipa($ipa);
-	}
-}
-#package Network;
-sub atTable {
-	my $self = shift;
-	my $xlated = Network::xlate_table(@_);
-	my ($snmpargs,$table,$result,$error) = @_;
-	my $hkey = Item::makekey($snmpargs->{'-hostname'});
-	foreach my $row (values %$xlated) {
-		my $idx = $row->{atIfIndex};
-		my $hwa = Item::makekey($row->{atPhysAddress});
-		my $ipa = Item::makekey($row->{atNetAddress});
-		my $host = Point::Host->get($self,$hkey);
-		next unless exists $host->{indexes}{$idx};
-		my ($dummy,$vid) = @{$host->{indexes}{$idx}};
-		Point::Host->get($self,$ipa)->add_hwa($hwa);
-		Vprt->get($self,$hwa,$vid)->add_ipa($ipa);
-		Vlan->get($self,$hwa,$vid)->add_ipa($ipa);
-	}
-}
-#package Network;
-sub ipNetToPhysicalTable {
-	my $self = shift;
-	my $xlated = Network::xlate_table(@_);
-	my ($snmpargs,$table,$result,$error) = @_;
-	my $hkey = Item::makekey($snmpargs->{'-hostname'});
-	foreach my $row (values %$xlated) {
-		next unless $row->{ipNetToPhysicalRowStatus} eq 'active(1)';
-		next unless $row->{ipNetToPhysicalNetAddressType} eq 'ipv4(1)';
-		my $idx = $row->{ipNetToPhysicalIfIndex};
-		my $hwa = Item::makekey($row->{ipNetToPhysicalPhysAddress});
-		my $ipa = Item::makekey($row->{ipNetToPhysicalNetAddress});
-		my $host = Point::Host->get($self,$hkey);
-		next unless exists $host->{indexes}{$idx};
-		my ($dummy,$vid) = @{$host->{indexes}{$idx}};
-		Point::Host->get($self,$ipa)->add_hwa($hwa);
-		Vprt->get($self,$hwa,$vid)->add_ipa($ipa);
-		Vlan->get($self,$hwa,$vid)->add_ipa($ipa);
-	}
-}
-#package Network;
-sub ipRouteTable {
-	my $self = shift;
-	my $xlated = Network::xlate_table(@_);
-	my ($snmpargs,$table,$result,$error) = @_;
-	my $hkey = Item::makekey($snmpargs->{'-hostname'});
-	foreach my $row (values %$xlated) {
-		my $idx = $row->{ipRouteIfIndex};
-		my $pfx = Item::makekey($row->{ipRouteDest}.'/'.$row->{ipRouteMask});
-		my $ipa = Item::makekey($row->{ipRouteNextHop}) if $row->{ipRouteType} eq 'indirect(4)';
-		my $sub = Subnet->get($self,$pfx);
-		my $host = Point::Host->get($self,$hkey);
-		next unless exists $host->{indexes}{$idx};
-		my ($hwa,$vid) = @{$host->{indexes}{$idx}};
-		my $vprt = Vprt->get($self,$hwa,$vid);
-		my $vlan = Vlan->get($self,$hwa,$vid); $vlan->add_ipa($ipa) if $ipa;
-		Support->get($self,$sub,$vlan) if $row->{ipRouteType} eq 'direct(3)';
-		Route->get($self,$vprt,$sub,$ipa);
-	}
-}
-#package Network;
-sub lldpPortConfigTable {
-	my $self = shift;
-	my $xlated = Network::xlate_table(@_);
-	my ($snmpargs,$table,$result,$error) = @_;
-	my $hkey = Item::makekey($snmpargs->{'-hostname'});
-}
-#package Network;
-sub lldpConfigManAddrTable {
-	my $self = shift;
-	my $xlated = Network::xlate_table(@_);
-	my ($snmpargs,$table,$result,$error) = @_;
-	my $hkey = Item::makekey($snmpargs->{'-hostname'});
-}
-#package Network;
-sub lldpStatsTxPortTable {
-	my $self = shift;
-	my $xlated = Network::xlate_table(@_);
-	my ($snmpargs,$table,$result,$error) = @_;
-	my $hkey = Item::makekey($snmpargs->{'-hostname'});
-}
-#package Network;
-sub lldpStatsRxPortTable {
-	my $self = shift;
-	my $xlated = Network::xlate_table(@_);
-	my ($snmpargs,$table,$result,$error) = @_;
-	my $hkey = Item::makekey($snmpargs->{'-hostname'});
-}
-#package Network;
-sub lldpLocPortTable {
-	my $self = shift;
-	my $xlated = Network::xlate_table(@_);
-	my ($snmpargs,$table,$result,$error) = @_;
-	my $hkey = Item::makekey($snmpargs->{'-hostname'});
-}
-#package Network;
-sub lldpLocManAddrTable {
-	my $self = shift;
-	my $xlated = Network::xlate_table(@_);
-	my ($snmpargs,$table,$result,$error) = @_;
-	my $hkey = Item::makekey($snmpargs->{'-hostname'});
-}
-#package Network;
-sub lldpRemTable {
-	my $self = shift;
-	my $xlated = Network::xlate_table(@_);
-	my ($snmpargs,$table,$result,$error) = @_;
-	my $hkey = Item::makekey($snmpargs->{'-hostname'});
-}
-#package Network;
-sub lldpRemManAddrTable {
-	my $self = shift;
-	my $xlated = Network::xlate_table(@_);
-	my ($snmpargs,$table,$result,$error) = @_;
-	my $hkey = Item::makekey($snmpargs->{'-hostname'});
-}
-#package Network;
-sub lldpRemUnknownTLVTable {
-	my $self = shift;
-	my $xlated = Network::xlate_table(@_);
-	my ($snmpargs,$table,$result,$error) = @_;
-	my $hkey = Item::makekey($snmpargs->{'-hostname'});
-}
-#package Network;
-sub lldpRemOrgDefInfoTable {
-	my $self = shift;
-	my $xlated = Network::xlate_table(@_);
-	my ($snmpargs,$table,$result,$error) = @_;
-	my $hkey = Item::makekey($snmpargs->{'-hostname'});
-}
-#package Network;
-sub lldpXdot1ConfigPortVlanTable {
-	my $self = shift;
-	my $xlated = Network::xlate_table(@_);
-	my ($snmpargs,$table,$result,$error) = @_;
-	my $hkey = Item::makekey($snmpargs->{'-hostname'});
-}
-#package Network;
-sub lldpXdot1ConfigVlanNameTable {
-	my $self = shift;
-	my $xlated = Network::xlate_table(@_);
-	my ($snmpargs,$table,$result,$error) = @_;
-	my $hkey = Item::makekey($snmpargs->{'-hostname'});
-}
-#package Network;
-sub lldpXdot1ConfigProtoVlanTable {
-	my $self = shift;
-	my $xlated = Network::xlate_table(@_);
-	my ($snmpargs,$table,$result,$error) = @_;
-	my $hkey = Item::makekey($snmpargs->{'-hostname'});
-}
-#package Network;
-sub lldpXdot1ConfigProtocolTable {
-	my $self = shift;
-	my $xlated = Network::xlate_table(@_);
-	my ($snmpargs,$table,$result,$error) = @_;
-	my $hkey = Item::makekey($snmpargs->{'-hostname'});
-}
-#package Network;
-sub lldpXdot1LocTable {
-	my $self = shift;
-	my $xlated = Network::xlate_table(@_);
-	my ($snmpargs,$table,$result,$error) = @_;
-	my $hkey = Item::makekey($snmpargs->{'-hostname'});
-}
-#package Network;
-sub lldpXdot1LocProtoVlanTable {
-	my $self = shift;
-	my $xlated = Network::xlate_table(@_);
-	my ($snmpargs,$table,$result,$error) = @_;
-	my $hkey = Item::makekey($snmpargs->{'-hostname'});
-}
-#package Network;
-sub lldpXdot1LocVlanNameTable {
-	my $self = shift;
-	my $xlated = Network::xlate_table(@_);
-	my ($snmpargs,$table,$result,$error) = @_;
-	my $hkey = Item::makekey($snmpargs->{'-hostname'});
-}
-#package Network;
-sub lldpXdot1LocProtocolTable {
-	my $self = shift;
-	my $xlated = Network::xlate_table(@_);
-	my ($snmpargs,$table,$result,$error) = @_;
-	my $hkey = Item::makekey($snmpargs->{'-hostname'});
-}
-#package Network;
-sub lldpXdot1RemTable {
-	my $self = shift;
-	my $xlated = Network::xlate_table(@_);
-	my ($snmpargs,$table,$result,$error) = @_;
-	my $hkey = Item::makekey($snmpargs->{'-hostname'});
-}
-#package Network;
-sub lldpXdot1RemProtoVlanTable {
-	my $self = shift;
-	my $xlated = Network::xlate_table(@_);
-	my ($snmpargs,$table,$result,$error) = @_;
-	my $hkey = Item::makekey($snmpargs->{'-hostname'});
-}
-#package Network;
-sub lldpXdot1RemVlanNameTable {
-	my $self = shift;
-	my $xlated = Network::xlate_table(@_);
-	my ($snmpargs,$table,$result,$error) = @_;
-	my $hkey = Item::makekey($snmpargs->{'-hostname'});
-}
-#package Network;
-sub lldpXdot1RemProtocolTable {
-	my $self = shift;
-	my $xlated = Network::xlate_table(@_);
-	my ($snmpargs,$table,$result,$error) = @_;
-	my $hkey = Item::makekey($snmpargs->{'-hostname'});
-}
-#package Network;
-sub lldpXdot3PortConfigTable {
-	my $self = shift;
-	my $xlated = Network::xlate_table(@_);
-	my ($snmpargs,$table,$result,$error) = @_;
-	my $hkey = Item::makekey($snmpargs->{'-hostname'});
-}
-#package Network;
-sub lldpXdot3LocPortTable {
-	my $self = shift;
-	my $xlated = Network::xlate_table(@_);
-	my ($snmpargs,$table,$result,$error) = @_;
-	my $hkey = Item::makekey($snmpargs->{'-hostname'});
-}
-#package Network;
-sub lldpXdot3LocPowerTable {
-	my $self = shift;
-	my $xlated = Network::xlate_table(@_);
-	my ($snmpargs,$table,$result,$error) = @_;
-	my $hkey = Item::makekey($snmpargs->{'-hostname'});
-}
-#package Network;
-sub lldpXdot3LocLinkAggTable {
-	my $self = shift;
-	my $xlated = Network::xlate_table(@_);
-	my ($snmpargs,$table,$result,$error) = @_;
-	my $hkey = Item::makekey($snmpargs->{'-hostname'});
-}
-#package Network;
-sub lldpXdot3LocMaxFrameSizeTable {
-	my $self = shift;
-	my $xlated = Network::xlate_table(@_);
-	my ($snmpargs,$table,$result,$error) = @_;
-	my $hkey = Item::makekey($snmpargs->{'-hostname'});
-}
-#package Network;
-sub lldpXdot3RemPortTable {
-	my $self = shift;
-	my $xlated = Network::xlate_table(@_);
-	my ($snmpargs,$table,$result,$error) = @_;
-	my $hkey = Item::makekey($snmpargs->{'-hostname'});
-}
-#package Network;
-sub lldpXdot3RemPowerTable {
-	my $self = shift;
-	my $xlated = Network::xlate_table(@_);
-	my ($snmpargs,$table,$result,$error) = @_;
-	my $hkey = Item::makekey($snmpargs->{'-hostname'});
-}
-#package Network;
-sub lldpXdot3RemLinkAggTable {
-	my $self = shift;
-	my $xlated = Network::xlate_table(@_);
-	my ($snmpargs,$table,$result,$error) = @_;
-	my $hkey = Item::makekey($snmpargs->{'-hostname'});
-}
-#package Network;
-sub lldpXdot3RemMaxFrameSizeTable {
-	my $self = shift;
-	my $xlated = Network::xlate_table(@_);
-	my ($snmpargs,$table,$result,$error) = @_;
-	my $hkey = Item::makekey($snmpargs->{'-hostname'});
-}
-#package Network;
-sub lldpXMedPortConfigTable {
-	my $self = shift;
-	my $xlated = Network::xlate_table(@_);
-	my ($snmpargs,$table,$result,$error) = @_;
-	my $hkey = Item::makekey($snmpargs->{'-hostname'});
-}
-#package Network;
-sub lldpXMedLocMediaPolicyTable {
-	my $self = shift;
-	my $xlated = Network::xlate_table(@_);
-	my ($snmpargs,$table,$result,$error) = @_;
-	my $hkey = Item::makekey($snmpargs->{'-hostname'});
-}
-#package Network;
-sub lldpXMedLocLocationTable {
-	my $self = shift;
-	my $xlated = Network::xlate_table(@_);
-	my ($snmpargs,$table,$result,$error) = @_;
-	my $hkey = Item::makekey($snmpargs->{'-hostname'});
-}
-#package Network;
-sub lldpXMedLocXPoEPSEPortTable {
-	my $self = shift;
-	my $xlated = Network::xlate_table(@_);
-	my ($snmpargs,$table,$result,$error) = @_;
-	my $hkey = Item::makekey($snmpargs->{'-hostname'});
-}
-#package Network;
-sub lldpXMedRemCapabilitiesTable {
-	my $self = shift;
-	my $xlated = Network::xlate_table(@_);
-	my ($snmpargs,$table,$result,$error) = @_;
-	my $hkey = Item::makekey($snmpargs->{'-hostname'});
-}
-#package Network;
-sub lldpXMedRemMediaPolicyTable {
-	my $self = shift;
-	my $xlated = Network::xlate_table(@_);
-	my ($snmpargs,$table,$result,$error) = @_;
-	my $hkey = Item::makekey($snmpargs->{'-hostname'});
-}
-#package Network;
-sub lldpXMedRemInventoryTable {
-	my $self = shift;
-	my $xlated = Network::xlate_table(@_);
-	my ($snmpargs,$table,$result,$error) = @_;
-	my $hkey = Item::makekey($snmpargs->{'-hostname'});
-}
-#package Network;
-sub lldpXMedRemLocationTable {
-	my $self = shift;
-	my $xlated = Network::xlate_table(@_);
-	my ($snmpargs,$table,$result,$error) = @_;
-	my $hkey = Item::makekey($snmpargs->{'-hostname'});
-}
-#package Network;
-sub lldpXMedRemXPoETable {
-	my $self = shift;
-	my $xlated = Network::xlate_table(@_);
-	my ($snmpargs,$table,$result,$error) = @_;
-	my $hkey = Item::makekey($snmpargs->{'-hostname'});
-}
-#package Network;
-sub lldpXMedRemXPoEPSETable {
-	my $self = shift;
-	my $xlated = Network::xlate_table(@_);
-	my ($snmpargs,$table,$result,$error) = @_;
-	my $hkey = Item::makekey($snmpargs->{'-hostname'});
-}
-#package Network;
-sub lldpXMedRemXPoEPDTable {
-	my $self = shift;
-	my $xlated = Network::xlate_table(@_);
-	my ($snmpargs,$table,$result,$error) = @_;
-	my $hkey = Item::makekey($snmpargs->{'-hostname'});
 }
 
 # ------------------------------------------
 package Item; our @ISA = qw(Base);
-use strict; use warnings;
-use Carp qw(cluck);
+use strict; use warnings; use Carp;
 # ------------------------------------------
 #package Item;
 sub makekey {
 	my $key = shift;
 	unless (defined $key) {
-		cluck "passed null key";
-		return '';
+		Carp::cluck "passed null key";
+		#return '';
+		return undef;
 	}
 	my ($made,@parts) = ($key);
-	if ($key =~ /^-?\d+$/) {
+	if ($key =~ /^\.{3}\/?$/) {
+		$made = undef;
+	} elsif ($key =~ /^-?\d+$/) {
 		$made = pack('s',$key);
 	} elsif ($key =~ /^0x([0-9a-fA-F]{2})+$/) {
 		$key =~ s/^0x//;
@@ -1083,7 +1681,7 @@ sub makekey {
 		@parts = split(/\./,$pfx);
 		for (my $i=0;$i<4;$i++) { $parts[$i] = 0 unless $parts[$i] }
 		$made = pack('C*',@parts,$len);
-	} elsif ($key =~ /^\d+(\.\d+){0,3}\/\d+(\.\d+){0,3}$/) {
+	} elsif ($key =~ /^\d+(\.\d+){0,3}\/\d+(\.\d+){1,3}$/) {
 		my ($add,$msk) = split(/\//,$key);
 		@parts = split(/\./,$add);
 		for (my $i=0;$i<4;$i++) { $parts[$i] = 0 unless $parts[$i] }
@@ -1095,12 +1693,14 @@ sub makekey {
 		$msk = unpack('N',$msk);
 		my $pfx = $add & $msk;
 		my $len = 32;
-		while (($msk & 1) == 0 and $len > 0) { $len--; $msk <<= 1 }
+		while (($msk & 1) == 0 and $len > 0) { $len--; $msk >>= 1 }
 		$made = pack('NC',$pfx,$len);
 	} elsif ($key =~ /^[0-9a-fA-F]{2}(:[0-9a-fA-F]{2})*[(]\d+[)]$/) {
 		my ($hwa,$vlan) = split(/[()]/,$key);
 		$hwa =~ s/://g;
 		$made = pack('H*',$hwa).pack('n',$vlan);
+	} elsif ($key eq "\0\0\0\0\0\0") {
+		$made = undef;
 	}
 	return $made;
 }
@@ -1108,11 +1708,13 @@ sub makekey {
 sub showkey {
 	my $key = shift;
 	unless (defined $key) {
-		cluck "passed null key";
+		#cluck "passed null key";
 		return '(null)';
 	}
 	my ($show,@parts);
-	if (length($key) == 2) { # item number
+	if ($key =~ /^-?\d+$/) {
+		$show = $key;
+	} elsif (length($key) == 2) { # item number
 		$show = unpack('s',$key);
 	} elsif (length($key) == 4) { # IP address
 		@parts = unpack('C*',$key);
@@ -1137,116 +1739,326 @@ sub kind {
 	my $type = shift;
 	$type = ref $type if ref $type;
 	$type =~ s/::.*//;
-	return "\L$type\Es";
+	return $type;
 }
 #package Item;
-sub key  { return join('',shift->gkey(@_)) }
+sub mykey {
+	my $self = shift;
+	my $key = $self->{key}{n}[0];
+	$key = makekey($self->{no}) unless $key or not exists $self->{no};
+	return $key;
+}
 #package Item;
-sub keys { return shift->key(@_) }
+sub mykeys {
+	my $self = shift;
+	return [] unless exists $self->{key}{n};
+	return $self->{key}{n};
+}
+#package Item;
+sub allkeys {
+	my $self = shift;
+	my @keys = ();
+	my $key = $self->key(@_);
+	push @keys, $key if defined $key;
+	return \@keys;
+}
 #package Item;
 sub init {
 	my $self = shift;
 	my $type = ref $self;
-	my ($network) = @_;
-	$self->{network} = $network;
-	my $keys = $self->{key}{n} = [ $type->keys(@_) ];
-	Carp::carp "Creating item $self with key ".Item::showkey($keys->[0]);
-	my $kind = $self->{kind} = $self->kind;
-	$self->{no} = $network->getno($kind);
-	push @{$keys}, Item::makekey($self->{no});
-	foreach my $key (@$keys) {
-		$network->{items}{$kind}{$key} = $self;
+	my ($model) = @_;
+	$self->{views} = [];
+	$self->{model} = $model;
+	$self->{key}{n} = $type->allkeys(@_);
+	my @keys = @{$self->{key}{n}};
+	if (@keys) {
+		#warn "Creating item $self with key ".Item::showkey($keys[0]);
+	} else {
+		#warn "Creating item $self with no external key.";
 	}
-	$network->added($self);
+	my $kind = $self->kind;
+	$self->{no} = $model->getno($kind);
+	push @keys, Item::makekey($self->{no});
+	foreach my $key (@keys) {
+		$model->{items}{$kind}{$key} = $self;
+	}
+	$model->{lists}{$kind}{0-$self->{no}} = $self;
 	$self->{new} = 1;
+}
+#package Item;
+sub identify {
+	my $self = shift;
+	my @keys = ();
+	push @keys,map {Item::showkey($_)} sort @{$self->{key}{n}} if $self->{key}{n};
+	if ($self->{no}) {
+		unshift @keys,$self->{no};
+	} elsif ($self->{bad}) {
+		unshift @keys,'[bad]';
+	} else {
+		unshift @keys,'[null]';
+	}
+	return $self->kind.'('.join(',',@keys).')';
 }
 #package Item;
 sub dump {
 	my $self = shift;
-	print STDERR "Item $self has number $self->{no}\n";
+	print STDERR "$self has identity ",$self->Item::identify(),"\n";
+	print STDERR "$self has number ",$self->no,"\n";
+	my @keys = (); @keys = @{$self->{key}{n}} if $self->{key}{n};
+	my $keys = ''; $keys = "\n\tkey ".join("\n\tkey ",map {Item::showkey($_)} sort @keys) if @keys;
+	print STDERR "$self has keys:",$keys,"\n";
 }
 #package Item;
 sub find {
 	my $type = shift;
-	my ($network) = @_;
-	Carp::carp "Finding object of $type";
-	my $self = $network->item(Item::kind($type),$type->key(@_));
+	my ($model) = @_;
+	my $self = $model->item($type->kind,$type->allkeys(@_));
 	delete $self->{new} if $self and exists $self->{new};
 	return $self;
 }
 #package Item;
 sub fini {
 	my $self = shift;
-	my $network = $self->{network};
+	my $model = $self->{model};
+	my $kind = $self->kind;
 	my $keys = $self->{key}{n};
-	my $kind = $self->{kind};
+	push @$keys, Item::makekey($self->{no});
 	foreach my $key (@$keys) {
-		delete $network->{items}{$kind}{$key};
+		delete $model->{items}{$kind}{$key};
 	}
-	$network->removed($self);
+	delete $model->{lists}{$kind}{0-$self->{no}};
+	Viewer->removed($self);
 	delete $self->{key}{n};
 	delete $self->{no};
+	delete $self->{views};
 	$self->{bad} = 1;
 }
 #package Item;
 sub add_key {
 	my $self = shift;
 	my ($key) = @_;
-	my $kind = $self->{kind};
-	foreach (@{$self->{key}{n}}) {
-		return if $_ eq $key;
+	return unless $key;
+	my @keys = ref $key eq 'ARRAY' ? @$key : ($key);
+	my %toadd = ();
+	foreach $key (@keys) {
+		next if ref $key;
+		next unless $key;
+		$toadd{$key} = 1;
 	}
-	my $othr = $self->{network}->item($kind,$key);
-	if (defined $othr) {
-		return if $othr eq $self;
-		$self->mergefrom($othr);
-		$othr->put;
-	} else {
-		push @{$self->{key}{n}}, $key;
-		$self->{network}{items}{$kind}{$key} = $self;
+	foreach (@{$self->{key}{n}}) {
+		delete $toadd{$_} if exists $toadd{$_};
+	}
+	@keys = keys %toadd;
+	my $kind = $self->kind;
+	foreach $key (@keys) {
+		my $othr = $self->{model}->item($kind,$key);
+		if (defined $othr) {
+			next if $othr eq $self;
+			my $reason = sprintf "Key '%s' added to %s belongs to %s",Item::showkey($key),$self,$othr;
+			$self->mergefrom($othr,$reason);
+		} else {
+			push @{$self->{key}{n}}, $key;
+			$self->{model}{items}{$kind}{$key} = $self;
+		}
 	}
 }
 #package Item;
+sub mergechek {
+	my $self = shift;
+	my $type = ref $self;
+	$self->_revs($type,undef,'chek',@_);
+}
+#package Item;
+sub mergemark {
+	my $self = shift;
+	my $type = ref $self;
+	my $want = 1;
+	$self->_fwcd($type,undef,'mark',$want,@_);
+}
+#package Item;
+sub mergethem {
+	my $self = shift;
+	my $type = ref $self;
+	$self->_forw($type,undef,'them',@_);
+}
+#package Item;
+sub mergefix {
+	my $self = shift;
+	my $type = ref $self;
+	$self->_forw($type,undef,'mfix',@_);
+}
+#package Item;
+sub showlist {
+	my ($self,$merge) = @_;
+	my %processed = ();
+	print STDERR "\nTargets to process:\n-------------------\n";
+	foreach (@{$merge->{targets}}) {
+		my $kind = $_->kind;
+		my $no = $_->no;
+		my $list = $merge->{$kind}{$no};
+		next if exists $processed{$list};
+		$processed{$list} = $list;
+		print STDERR '[',join(',',@$list),']',"\n";
+	}
+	print STDERR "-------------------\n";
+}
+#package Item;
 sub mergefrom {
-	my ($self,$othr) = @_;
-	Carp::carp "Merging Item $othr into $self";
-	return unless $othr->isa('Item');
-	my ($s_network,$s_kind) = ($self->{network},$self->{kind});
-	my ($o_network,$o_kind) = ($othr->{network},$othr->{kind});
-	foreach (@{$othr->{key}{n}}) {
-		Carp::carp "Merging Item key ".Item::showkey($_);
-		push @{$self->{key}{n}}, $_;
-		delete $o_network->{items}{$o_kind}{$_};
-		$s_network->{items}{$s_kind}{$_} = $self;
+	my ($self,$othr,$reason) = @_;
+	my @list = ();
+	# Pass #1: mark for merge
+	{
+		my %merge = ( targets=>[] );
+		$self->mergemark($othr,\%merge,$reason);
+		#$self->showlist(\%merge);
+		#print STDERR "\n";
+		my %processed = ();
+		foreach my $target (@{$merge{targets}}) {
+			my $kind = $target->kind;
+			my $no = $target->no;
+			my $list = $merge{$kind}{$no};
+			next if exists $processed{$list};
+			push @list, $list;
+			$processed{$list} = $list;
+		}
 	}
-	print STDERR "Item $self keys are now:\n";
-	foreach (sort @{$self->{key}{n}}) {
-		print STDERR "\t",Item::showkey($_),"\n";
+	# Pass #2: test the merge
+	foreach my $list (@list) {
+		my ($targ,@others) = @$list;
+		foreach (@others) { $_->mergefix(1) }
 	}
-	$self->Root::mergefrom($othr) if $self->isa('Root');
-	$self->Leaf::mergefrom($othr) if $self->isa('Leaf');
-	$self->HasIpas::mergefrom($othr) if $self->isa('HasIpas');
-	$self->HasHwas::mergefrom($othr) if $self->isa('HasHwas');
+	# Pass #3: perform the merge
+	foreach my $list (@list) {
+		my ($targ,@others) = @$list;
+		foreach (@others) { $_->{target} = $targ }
+	}
+	foreach my $list (@list) {
+		my ($targ,@others) = @$list;
+		Carp::confess "Target $targ is bad" if exists $targ->{target};
+		$targ->mergethem(@others);
+	}
+	# Pass #4: fix internal state
+	foreach my $list (@list) {
+		my ($targ,@others) = @$list;
+		$targ->mergefix();
+	}
+	# Pass #5: check the merge
+	foreach my $list (@list) {
+		my ($targ,@others) = @$list;
+		foreach (@others) { $_->mergechek() }
+	}
+	# Pass #6: release merged objects
+	foreach my $list (@list) {
+		my ($targ,@others) = @$list;
+		foreach (@others) { $_->put() }
+	}
+	# Pass #7: notify of merge
+	foreach my $list (@list) {
+		my ($targ,@others) = @$list;
+		Viewer->merged($targ);
+	}
+}
+#package Item;
+sub target {
+	my $self = shift;
+	while (exists $self->{target}) { $self = $self->{target} }
+	return $self;
+}
+#package Item;
+sub chek {
+	my $self = shift;
+	if (exists $self->{key}{n}) {
+		foreach (@{$self->{key}{n}}) {
+			#$self->show;
+			Carp::confess "Item $self still has model key ".Item::showkey($_);
+		}
+	}
+}
+#package Item;
+sub no {
+	my $self = shift;
+	Carp::confess "Requesting number for deleted object $self" if $self->{bad} or not exists $self->{no};
+	return $self->{no};
+}
+#package Item;
+sub mark {
+	my ($self,$othr,$merge) = @_;
+	Carp::confess "This object $othr is not a reference" unless ref $othr;
+	Carp::confess "That object $self is not a reference" unless ref $self;
+	Carp::confess "This object $othr is bad" if $othr->{bad};
+	Carp::confess "That object $self is bad" if $self->{bad};
+	Carp::confess "Objects $othr and $self are not of same kind" if $othr->kind ne $self->kind;
+	my $kind = $self->kind;
+	my $sno = $self->no;
+	my $ono = $othr->no;
+	return 0 if $self eq $othr;
+	return 0 if exists $merge->{$kind}{$sno} and exists $merge->{$kind}{$ono} and $merge->{$kind}{$sno} eq $merge->{$kind}{$ono};
+	#warn "Marking merge of $othr into $self";
+	my @smerge = exists $merge->{$kind}{$sno} ? @{$merge->{$kind}{$sno}} : ($self);
+	my @omerge = exists $merge->{$kind}{$ono} ? @{$merge->{$kind}{$ono}} : ($othr);
+	my $tmerge = ();
+	push @$tmerge, @smerge;
+	push @$tmerge, @omerge;
+	foreach (@$tmerge) { $merge->{$_->kind}{$_->no} = $tmerge }
+	push @{$merge->{targets}}, $self;
+	return 1;
+}
+#package Item;
+sub them {
+	my ($self,@others) = @_;
+	#warn "Merging ".join(',',@others)." into $self";
+	my $model = $self->{model};
+	my $s_kind = $self->kind;
+	foreach my $othr (@others) {
+		if ($othr->isa(ref $self) and not $self->isa(ref $othr)) {
+			my $type = ref($othr);
+			$type->xform($self);
+		}
+		my $o_kind = $othr->kind;
+		while (my $key = shift @{$othr->{key}{n}}) {
+			next if $key eq Item::makekey($othr->no);
+			#warn "Merging $othr key ".Item::showkey($key)." to $self";
+			push @{$self->{key}{n}}, $key;
+			delete $model->{items}{$o_kind}{$key};
+			$model->{items}{$s_kind}{$key} = $self;
+		}
+	}
 }
 #package Item;
 sub xform {
 	my ($type,$self) = @_;
 	my $oldtype = ref $self;
 	bless $self,$type;
-	$self->{network}->xformed($self,$oldtype,$type);
+	Viewer->xformed($self);
 }
 
 # ------------------------------------------
 package Point; our @ISA = qw(Item);
-use strict; use warnings;
-use Carp qw(cluck);
+use strict; use warnings; use Carp;
 # ------------------------------------------
 #package Point;
-sub gkey {
-	my $typeorself = shift;
-	my ($network,$id,@args) = @_;
-	$id = Item::makekey($id);
-	return $id;
+sub key {
+	my $type = shift; $type = ref $type if ref $type;
+	my ($model,$item) = @_;
+	$item = $item->[0] if ref $item eq 'ARRAY';
+	$item = $item->mykey() if ref $item;
+	$item = Item::makekey($item) if $item;
+	return $item;
+}
+#package Point;
+sub allkeys {
+	my $type = shift; $type = ref $type if ref $type;
+	my ($model,$item) = @_;
+	my @keys = ref $item eq 'ARRAY' ? @$item : ($item);
+	my @rslt = ();
+	foreach $item (@keys) {
+		Carp::confess "XXXXXX wrong item $item"
+		if ref $item eq 'ARRAY' or ref $item eq 'HASH' or ref $item eq 'SCALAR';
+		$item = $item->mykey() if ref $item;
+		$item = Item::makekey($item) if $item;
+		push @rslt, $item if $item;
+	}
+	return \@rslt;
 }
 #package Point;
 sub init {
@@ -1256,101 +2068,214 @@ sub init {
 #package Point;
 sub fini {
 	my $self = shift;
-	foreach my $side (values %{$self->{end}}) {
-		foreach my $kind (values %$side) {
-			foreach my $edge (values %$kind) {
-				$edge->put(@_);
-			}
-		}
-	}
+#	foreach my $side (values %{$self->{end}}) {
+#		foreach my $kind (values %$side) {
+#			foreach my $edge (values %$kind) {
+#				$edge->put(@_);
+#			}
+#		}
+#	}
 	delete $self->{end};
 }
 #package Point;
-sub mergefrom {
-	my ($self,$othr) = @_;
-	Carp::carp "Merging Point $othr into $self";
-	$self->SUPER::mergefrom($othr);
-	# move all the edges from $othr to attach instead to $self
-	unless ($othr->isa('Point')) {
-		cluck "Cannot merge $self and $othr";
-		return undef;
+sub mypkey {
+	my $self = shift;
+	my $kind = shift;
+}
+#package Point;
+sub mypkeys {
+	my $self = shift;
+}
+#package Point;
+sub dump {
+	my $self = shift;
+	print STDERR "$self attaches to the following paths:\n";
+	foreach my $side (qw/a b/) {
+		foreach my $kind (keys %{$self->{end}{$side}}) {
+			foreach my $key (keys %{$self->{end}{$side}{$kind}}) {
+				my $path = $self->{end}{$side}{$kind}{$key};
+				print STDERR "\t$path side $side kind $kind with key ",Item::showkey($key),"\n";
+			}
+		}
 	}
-	my @tomerge = ();
-	my @puts = ();
-	foreach my $side (keys %{$othr->{end}}) {
-		foreach my $kind (keys %{$othr->{end}{$side}}) {
-			foreach my $key (keys %{$othr->{end}{$side}{$kind}}) {
-				my $edgeo = $othr->{end}{$side}{$kind}{$key};
-				my $edges = $self->{end}{$side}{$kind}{$key}
-				if exists $self->{end}{$side}{$kind}{$key};
-				if ($edges) {
-					warn "cannot merge $edgeo and $edges";
-					#does not work for overlapping edges
-					push @tomerge,$edges,$edgeo;
-				} else {
-					$edgeo->{obj}{$side} = $self;
-					$self->{end}{$side}{$kind}{$key} = $edgeo;
-					delete $othr->{end}{$side}{$kind}{$key};
+}
+#package Point;
+sub chek {
+	my $self = shift;
+	foreach my $side (qw{a b}) {
+		foreach my $kind (keys %{$self->{end}{$side}}) {
+			foreach my $obj (values %{$self->{end}{$side}{$kind}}) {
+				#$self->show();
+				Carp::confess "Point $self still attached to Path $obj";
+			}
+		}
+	}
+}
+#package Point;
+sub mark {
+	my ($self,$othr,$merge) = @_;
+	# basically if other ends of paths from merged objects are to the same object or objects
+	# that are to be merged together, then the path must be merged as well.
+	foreach my $oside (qw/a b/) {
+		my $oopos = ($oside eq 'a' ? 'b' : 'a');
+		#warn "Checking $othr side $oside";
+		foreach my $kind (keys %{$othr->{end}{$oside}}) {
+			#warn "Checking $othr side $oside kind $kind";
+			foreach my $okey (keys %{$othr->{end}{$oside}{$kind}}) {
+				my $opath = $othr->{end}{$oside}{$kind}{$okey};
+				#warn "Checking $othr side $oside kind $kind path $opath";
+				foreach my $sside (qw/a b/) {
+					my $sopos = (($sside eq 'a') ? 'b' : 'a');
+					#warn "Checking $othr side $oside kind $kind path $opath side $sside";
+					foreach my $skey (keys %{$self->{end}{$sside}{$kind}}) {
+						my $spath = $self->{end}{$sside}{$kind}{$skey};
+						#warn "Checking $othr side $oside kind $kind path $opath side $sside path $spath";
+						my $otrg = $opath->obj($oopos)->target();
+						my $strg = $spath->obj($sopos)->target();
+						unless ($otrg eq $strg) {
+							my $reason = sprintf "Merging %s from %s have different ends %s and %s with same key %s",$self,$othr,$strg,$otrg,Item::showkey($skey);
+							$spath->mergemark($opath,$merge,$reason);
+						}
+					}
 				}
 			}
 		}
 	}
-	while (my $edges = shift @tomerge) {
-		my $edgeo = shift @tomerge;
-		$edges->mergefrom($edgeo);
-		push @puts,$edgeo;
+	return 1;
+}
+#package Point;
+sub them {
+	my ($self,@others) = @_;
+	my %sides = ( a=>'b', b=>'a' );
+	foreach my $othr (@others) {
+		foreach my $oside (qw/a b/) {
+			my $oopos = ($oside eq 'a' ? 'b' : 'a');
+			foreach my $kind (keys %{$othr->{end}{$oside}}) {
+				foreach my $opath (values %{$othr->{end}{$oside}{$kind}}) {
+					my $otarg = $opath->target();
+					my $objl = $opath->{obj}{$oside};
+					Carp::confess "Object $objl should be $othr or $self" unless $objl eq $othr or $objl eq $self;
+					my $objr = $opath->{obj}{$oopos};
+					#warn "Deleting $objl reference to Path $opath side $oside kind $kind with key ".Item::showkey($objr->no);
+					delete $objl->{end}{$oside}{$kind}{$objr->no};
+					#warn "Deleting $objr reference to Path $opath side $oopos kind $kind with key ".Item::showkey($objl->no);
+					delete $objr->{end}{$oopos}{$kind}{$objl->no};
+					my $trgl = $objl->target();
+					Carp::confess "Object $trgl should be $self" unless $trgl eq $self;
+					my $trgr = $objr->target();
+					#warn "Adding $trgl reference to Path $otarg side $oside kind $kind with key ".Item::showkey($trgr->no);
+					$trgl->{end}{$oside}{$kind}{$trgr->no} = $otarg;
+					#warn "Adding $trgr reference to Path $otarg side $oopos kind $kind with key ".Item::showkey($trgl->no);
+					$trgr->{end}{$oopos}{$kind}{$trgl->no} = $otarg;
+					$otarg->{obj}{$oside} = $trgl;
+					$otarg->{obj}{$oopos} = $trgr;
+				}
+			}
+		}
 	}
-	foreach (@puts) { $_->put }
-	# note: any edges that went from $othr to $self will wind up going
-	# from $self to $self.
-	$self->addrom($othr,$self->{dir}^$othr->{dir})
-	if $self->isa('Counts') or $self->isa('Collector');
-	# FIXME: add notification of the merge
-	return $self;
+
 }
 #package Point;
-sub count {
+sub mfix {
+	my ($self,$abort) = @_;
+	my $fixed = 0;
+	foreach my $side (qw/a b/) {
+		foreach my $kind (keys %{$self->{end}{$side}}) {
+			foreach my $key (keys %{$self->{end}{$side}{$kind}}) {
+				my $edge = $self->{end}{$side}{$kind}{$key};
+				if (my $became = $edge->{target}) {
+					#warn "Point $self: Fixing reference to bad edge $edge which became $became";
+					delete $self->{end}{$side}{$kind}{$key};
+					$self->{end}{$side}{$kind}{$became->objo($side)->no} = $became;
+					$fixed = 1;
+					$edge = $became;
+				}
+				unless ($edge->obj($side) eq $self) {
+					#warn "Path $edge: Fixing reference to $side object";
+					$edge->{obj}{$side} = $self;
+					$fixed = 1;
+				}
+			}
+		}
+	}
+#	$self->show if $fixed;
+	Carp::croak if $fixed and $abort;
+}
+#package Point
+sub tree {
+	my ($self,$crumb,$indent,$suffix) = @_;
+	return if exists $self->{crumb} and $self->{crumb} == $crumb;
+	foreach my $side (qw/a b/) {
+		foreach my $kind (keys %{$self->{end}{$side}}) {
+			foreach my $key (keys %{$self->{end}{$side}{$kind}}) {
+				my $edge = $self->{end}{$side}{$kind}{$key};
+				my $suffix;
+				if ($side eq 'a') {
+					$suffix = " to object $edge->{obj}{b}";
+				} else {
+					$suffix = " from object $edge->{obj}{a}";
+				}
+				$edge->walk($crumb,$indent."\t==>",$suffix);
+			}
+		}
+	}
+}
+#package Point
+sub pathsx {
 	my ($self,$side,$kind) = @_;
-	return undef unless exists $self->{end}{$side}{$kind};
-	return scalar values %{$self->{end}{$side}{$kind}};
+	my @paths = ();
+	if (defined $kind) {
+		push @paths, values %{$self->{end}{$side}{$kind}} if $self->{end}{$side}{$kind};
+	} else {
+		foreach $kind (keys %{$self->{end}{$side}}) {
+			push @paths, values %{$self->{end}{$side}{$kind}};
+		}
+	}
+	return @paths;
 }
-#package Point;
-sub counts {
+#package Point
+sub pathsa {
 	my ($self,$kind) = @_;
-	return undef unless exists $self->{end}{a}{$kind} or
-			    exists $self->{end}{b}{$kind};
-	return (scalar values %{$self->{end}{a}{$kind}}) +
-	       (scalar values %{$self->{end}{b}{$kind}});
+	return $self->pathsx('a',$kind);
+}
+#package Point
+sub pathsb {
+	my ($self,$kind) = @_;
+	return $self->pathsx('b',$kind);
+}
+#package Point
+sub paths {
+	my ($self,$kind) = @_;
+	return ($self->pathsx('a',$kind),$self->pathsx('b',$kind));
 }
 
 # ------------------------------------------
 package Path; our @ISA = qw(Item);
-use strict; use warnings;
-use Carp qw(cluck);
+use strict; use warnings; use Carp;
 # ------------------------------------------
 #package Path;
 sub typpair { return 'Point','Point'; }
 #package Path;
-sub gkey {
+sub key {
 	my $type = shift;
-	my ($network,$keya,$keyb,@args) = @_;
-	my ($okeya,$okeyb) = ($keya,$keyb);
-	my ($typea,$typeb) = $type->typpair();
-	$keya = $typea->key($network,$keya);
-	cluck "Key A is null for type $typea, originally $okeya" unless $keya;
-	$keyb = $typeb->key($network,$keyb);
-	cluck "Key B is null for type $typeb, originally $okeyb" unless $keyb;
-	return $keya, $keyb;
+	my ($model,$enda,$endb) = @_;
+	my ($typa,$typb) = $type->typpair();
+	$enda = $typa->key($model,$enda);
+	$endb = $typb->key($model,$endb);
+	return $enda.$endb if $enda and $endb;
+	return undef;
 }
 #package Path;
 sub gobj {
 	my $type = shift;
-	my ($network,$obja,$objb,@args) = @_;
+	my ($model,$obja,$objb,$linka,$linkb,@args) = @_;
 	my ($typea,$typeb) = ($type->typpair(@_));
-	Carp::confess "Object $obja must be of type $typea" if ref $obja and not $obja->isa($typea);
-	Carp::confess "Object $objb must be of type $typeb" if ref $objb and not $objb->isa($typeb);
-	$obja = $typea->get($network,$obja,@args) unless ref $obja;
-	$objb = $typeb->get($network,$objb,@args) unless ref $objb;
+	unless (ref $obja and ref $obja ne 'ARRAY') {
+		$obja = $typea->get($model,$obja,$linka,@args);
+	} else { Carp::confess "Object $obja must be of type $typea" unless $obja->isa($typea); }
+	unless (ref $objb and ref $objb ne 'ARRAY') {
+		$objb = $typeb->get($model,$objb,$linkb,@args);
+	} else { Carp::confess "Object $objb must be of type $typeb" unless $objb->isa($typeb); }
 	return $obja,$objb;
 }
 #package Path;
@@ -1360,28 +2285,27 @@ sub init {
 	my ($obja,$objb) = ($type->gobj(@_));
 	$self->{obj}{a} = $obja;
 	$self->{obj}{b} = $objb;
-	my ($keya,$keyb) = ($type->gkey(@_));
-	$self->{key}{a} = $keya;
-	$self->{key}{b} = $keyb;
-	print STDERR "Key A for $obja is ",Item::showkey($keya),"\n";
-	print STDERR "Key B for $objb is ",Item::showkey($keyb),"\n";
-	$obja->{end}{a}{$self->{kind}}{$keyb} = $self;
-	$objb->{end}{b}{$self->{kind}}{$keya} = $self;
+	$obja->{end}{a}{$self->kind}{$objb->no} = $self;
+	$objb->{end}{b}{$self->kind}{$obja->no} = $self;
 	$self->{duplex} = 0;
+	#warn "Created Path $self from $obja to $objb";
+	Viewer->added_path($obja,$self);
+	Viewer->added_path($objb,$self);
 }
 #package Path;
 sub dump {
 	my $self = shift;
-	print STDERR "Path $self object A is $self->{obj}{a}\n";
-	print STDERR "Path $self object B is $self->{obj}{b}\n";
+	print STDERR "$self object A is $self->{obj}{a} with identity ",$self->{obj}{a}->identify(),"\n";
+	print STDERR "$self object B is $self->{obj}{b} with identity ",$self->{obj}{b}->identify(),"\n";
 }
 #package Path;
 sub fini {
 	my $self = shift;
-	my ($keya,$keyb) = ($self->{key}{a},$self->{key}{b});
 	my ($obja,$objb) = ($self->{obj}{a},$self->{obj}{b});
-	delete $obja->{end}{a}{$self->{kind}}{$keyb} if $obja;
-	delete $objb->{end}{b}{$self->{kind}}{$keya} if $objb;
+	if ($obja and $objb) {
+		delete $obja->{end}{a}{$self->kind}{$objb->no};
+		delete $objb->{end}{b}{$self->kind}{$obja->no};
+	}
 	foreach (qw(key obj)) { delete $self->{$_} }
 }
 #package Path;
@@ -1389,9 +2313,9 @@ sub identify {
 	my $self = shift;
 	my $type = ref $self;
 	my $id = "$type ";
-	$id .= $self->{obj}{a}->shortid;
+	$id .= $self->obja->shortid;
 	$id .= $self->{duplex} ? ', ' : ' -> ';
-	$id .= $self->{obj}{b}->shortid;
+	$id .= $self->objb->shortid;
 	my $cid = $self->can('childid');
 	$cid = ' : '.$cid if $cid and $cid = &{$cid}($self);
 	$id .= $cid;
@@ -1403,34 +2327,108 @@ sub shortid {
 	my $conn = $self->{duplex} ? '::' : '->';
 	my $cid = $self->can('childid');
 	$cid = ' : '.$cid if $cid and $cid = &{$cid}($self);
-	return $self->{obj}{a}->shortid.$conn.$self->{obj}{b}->shortid.$cid;
+	return $self->obja->shortid.$conn.$self->objb->shortid.$cid;
 }
 #package Path;
-sub mergefrom {
-	my ($self,$othr) = @_;
-	Carp::carp "Merging Path $othr into $self";
-	$self->SUPER::mergefrom($othr);
-	# merge path $othr into $self.  It does not matter between which
-	# nodes $othr exists.
-	unless (ref $self eq ref $othr) {
-		cluck "Cannot merge $self and $othr";
-		return undef;
+sub chek {
+	my $self = shift;
+	if (my $obj = $self->{obj}{a}) {
+		#$self->show();
+		Carp::confess "Path $self still attached from $obj";
 	}
-	$self->addfrom($othr,$self->{dir}^$othr->{dir})
-	if $self->isa('Counts') or $self->isa('Collector');
-	# FIXME: add notification of merge
-	return $self;
+	if (my $obj = $self->{obj}{b}) {
+		#$self->show();
+		Carp::confess "Path $self still attached to $obj";
+	}
 }
 #package Path;
-sub obja { my $self = shift; return $self->{obj}{a} }
+sub mark {
+	my ($self,$othr,$merge) = @_;
+	return 1;
+}
 #package Path;
-sub objb { my $self = shift; return $self->{obj}{b} }
+sub them {
+	my ($self,@others) = @_;
+	my $kind = $self->kind;
+	foreach my $othr (@others) {
+		my $obja = delete $othr->{obj}{a};
+		my $objb = delete $othr->{obj}{b};
+		#warn "Deleting $obja reference to Path $othr side a kind $kind with key ".Item::showkey($objb->no);
+		delete $obja->{end}{a}{$kind}{$objb->no};
+		#warn "Deleting $objb reference to Path $othr side b kind $kind with key ".Item::showkey($obja->no);
+		delete $objb->{end}{b}{$kind}{$obja->no};
+		my $trga = $self->{obj}{a} = $obja->target();
+		my $trgb = $self->{obj}{b} = $objb->target();
+		#warn "Adding $trga reference to Path $self side a kind $kind with key ".Item::showkey($trgb->no);
+		$trga->{end}{a}{$kind}{$trgb->no} = $self if $trga ne $obja;
+		#warn "Adding $trgb reference to Path $self side b kind $kind with key ".Item::showkey($trga->no);
+		$trgb->{end}{b}{$kind}{$trga->no} = $self if $trgb ne $objb;
+	}
+}
 #package Path;
-sub objs { my $self = shift; return $self->{obj}{a},$self->{obj}{b} }
+sub mfix {
+	my ($self,$abort) = @_;
+	my $fixed = 0;
+	my ($obja,$objb) = ($self->{obj}{a},$self->{obj}{b});
+	my ($beca,$becb) = ($obja->{target},$objb->{target});
+	my ($fina,$finb) = ($obja,$objb);
+	if ($beca) {
+		#warn "Path $self: Fixing reference to bad node $obja which became $beca";
+		$fina = $beca;
+		$fixed = 1;
+	}
+	if ($becb) {
+		#warn "Path $self: Fixing reference to bad node $objb which became $becb";
+		$finb = $becb;
+		$fixed = 1;
+	}
+	if ($fixed) {
+		$self->{obj}{a} = $fina;
+		$self->{obj}{b} = $finb;
+		my $kind = $self->kind;
+		foreach (keys %{$fina->{end}{a}{$kind}}) {
+			delete $fina->{end}{a}{$kind}{$_} if $fina->{end}{a}{$kind}{$_} eq $self;
+		}
+		$fina->{end}{a}{$kind}{$finb->no} = $self;
+		foreach (keys %{$finb->{end}{b}{$kind}}) {
+			delete $finb->{end}{b}{$kind}{$_} if $finb->{end}{b}{$kind}{$_} eq $self;
+		}
+		$finb->{end}{b}{$kind}{$fina->no} = $self;
+	}
+	Carp::confess "Path $self, object A $self->{obj}{a} is bad" if $self->{obj}{a}{bad};
+	Carp::confess "Path $self, object B $self->{obj}{b} is bad" if $self->{obj}{b}{bad};
+#	$self->show if $fixed;
+	Carp::croak if $fixed and $abort;
+}
+#package Path;
+sub obj {
+	my $self = shift;
+	my $side = shift;
+	Carp::confess "Requested object of deleted path $self" if $self->{bad};
+	my $obj = $self->{obj}{$side};
+	Carp::confess "Returning reference to delete object $obj of path $self" if $self->{bad};
+	return $obj;
+}
+#package Path;
+sub objo {
+	my $self = shift;
+	my $side = shift;
+	$side = (($side eq 'a') ? 'b' : 'a');
+	return $self->obj($side);
+}
+#package Path;
+sub obja { return shift->obj('a') }
+#package Path;
+sub objb { return shift->obj('b') }
+#package Path;
+sub objs {
+	my $self = shift;
+	return $self->obja,$self->objb;
+}
 
 # -------------------------------------
 package Path::Duplex; our @ISA = qw(Path);
-use strict; use warnings;
+use strict; use warnings; use Carp;
 # -------------------------------------
 # A Path::Duplex is a bidirectional concept.  There are two directional keys
 # used to index the Path.
@@ -1441,16 +2439,18 @@ sub init {
 	$self->{duplex} = 1;
 }
 #package Path::Duplex;
-sub keys {
+sub allkeys {
 	my $type = shift;
-	my ($network,$keya,$keyb,@args) = @_;
-	return	$type->key($network,$keya,$keyb,@args),
-		$type->key($network,$keyb,$keya,@args);
+	my ($model,$enda,$endb) = @_;
+	my @keys = ();
+	my $keya = $type->key($model,$enda,$endb); push @keys, $keya if $keya;
+	my $keyb = $type->key($model,$endb,$enda); push @keys, $keyb if $keyb;
+	return \@keys;
 }
 
 # -------------------------------------
 package Traceable; our @ISA = qw(Base);
-use strict; use warnings;
+use strict; use warnings; use Carp;
 # -------------------------------------
 #package Traceable;
 sub init {
@@ -1504,7 +2504,7 @@ sub dotrace {
 
 # -------------------------------------
 package Showable; our @ISA = qw(Traceable);
-use strict; use warnings;
+use strict; use warnings; use Carp;
 # -------------------------------------
 #package Showable;
 sub init {
@@ -1516,9 +2516,8 @@ sub init {
 sub fini {
 	my $self = shift;
 	my ($which,$what) = $self->what;
-	$self->{show}{$which}->put(@_) if $self->{show}{$which};
+#	$self->{show}{$which}->put(@_) if $self->{show}{$which};
 	delete $self->{show}{$which};
-
 }
 #package Showable;
 sub update {
@@ -1529,144 +2528,8 @@ sub update {
 }
 
 # -------------------------------------
-package HasIpas; our @ISA = qw(Base);
-use strict; use warnings;
-# -------------------------------------
-#package HasIpas;
-sub init {
-	my $self = shift;
-	$self->{ipas} = {};
-}
-#package HasIpas;
-sub dump {
-	my $self = shift;
-	foreach (sort keys %{$self->{ipas}}) {
-		print STDERR "HasIpas $self has IP address ",Item::showkey($_),"\n";
-	}
-}
-#package HasIpas;
-sub fini {
-	my $self = shift;
-	delete $self->{ipas};
-	delete $self->{ipa};
-}
-#package HasIpas;
-sub add_ipa {
-	my ($self,$ipa) = @_;
-	return if defined $ipa and exists $self->{ipas}{$ipa};
-	Carp::carp "Adding IP address ".Item::showkey($ipa)." to $self";
-	$self->add_key($ipa) unless unpack('C',$ipa) == 127;
-	if ($self->{parent} and $self->{parent}->can('add_ipa')) {
-		$self->{parent}->add_ipa($ipa);
-	}
-	$self->{ipas}{$ipa} = $ipa if defined $ipa;
-	$self->{ipa} = $ipa if defined $ipa and $ipa and not exists $self->{ipa};
-}
-#package HasIpas;
-sub mergefrom {
-	my ($self,$othr) = @_;
-	Carp::carp "Merging HasIpas $othr into $self";
-	return unless $othr->isa('HasIpas');
-	$self->{ipa} = $othr->{ipa} unless $self->{ipa};
-	delete $othr->{ipa};
-	foreach (keys %{$othr->{ipas}}) { $self->{ipas}{$_} = $_ }
-	$othr->{ipas} = {};
-}
-
-# -------------------------------------
-package HasHwas; our @ISA = qw(Base);
-use strict; use warnings;
-# -------------------------------------
-#package HasHwas;
-sub init {
-	my $self = shift;
-	$self->{hwas} = {};
-}
-#package HasHwas;
-sub dump {
-	my $self = shift;
-	foreach (sort keys %{$self->{hwas}}) {
-		print STDERR "HasHwas $self has HW address ",Item::showkey($_),"\n";
-	}
-}
-#package HasHwas;
-sub fini {
-	my $self = shift;
-	delete $self->{hwas};
-	delete $self->{hwa};
-}
-#package HasHwas;
-sub add_hwa {
-	my ($self,$hwa,$vlan) = @_;
-	return if defined $hwa and exists $self->{hwas}{$hwa};
-	$vlan = $self->{vlan} if exists $self->{vlan};
-	$vlan = '' unless defined $vlan;
-	Carp::carp "Adding HW address ".Item::showkey($hwa.$vlan)." to $self";
-	$self->add_key($hwa.$vlan) unless $hwa eq "\0\0\0\0\0\0";
-	if ($self->{parent} and $self->{parent}->can('add_hwa')) {
-		$self->{parent}->add_hwa($hwa);
-	}
-	$self->{hwas}{$hwa} = $hwa if defined $hwa;
-	$self->{hwa} = $hwa if defined $hwa and $hwa and not exists $self->{hwa};
-}
-#package HasHwas;
-sub mergefrom {
-	my ($self,$othr) = @_;
-	Carp::carp "Merging HasHwas $othr into $self";
-	return unless $othr->isa('HasHwas');
-	$self->{hwa} = $othr->{hwa} unless $self->{hwa};
-	delete $othr->{hwa};
-	foreach (keys %{$othr->{hwas}}) { $self->{hwas}{$_} = $_ }
-	$othr->{hwas} = {};
-}
-
-
-# -------------------------------------
-package SubNetwork; our @ISA = qw(Point HasHwas HasIpas Root);
-use strict; use warnings;
-# -------------------------------------
-# A subnetwork is a scoping of IP addresses.  There are either local, link,
-# private or global subnetworks.  There is only a single global subnetwork.
-# -------------------------------------
-#package SubNetwork;
-
-# -------------------------------------
-package SubNetwork::Local; our @ISA = qw(SubNetwork);
-use strict; use warnings;
-# -------------------------------------
-# Every host has a local subnetwork.  This is the 127.0.0.0/8 subnet.
-# -------------------------------------
-#package SubNetwork::Local;
-
-# -------------------------------------
-package SubNetwork::Link; our @ISA = qw(SubNetwork);
-use strict; use warnings;
-# -------------------------------------
-# Every port has a link local subnetwork.  This is only an IPv6 concept.
-# -------------------------------------
-#package SubNetwork::Link;
-
-# -------------------------------------
-package SubNetwork::Private; our @ISA = qw(SubNetwork);
-use strict; use warnings;
-# -------------------------------------
-# Some hosts may belong to a private subnetwork.  Private subnetworks are
-# distiguished from other private subnetworks by the global scoped IP addresses
-# that belong to them.
-# -------------------------------------
-#package SubNetwork::Private;
-
-# -------------------------------------
-package SubNetwork::Global; our @ISA = qw(SubNetwork);
-use strict; use warnings;
-# -------------------------------------
-# There is a single global subnetwork to which all global IP addresses belong.
-# -------------------------------------
-#package SubNetwork::Global;
-
-# -------------------------------------
-package Point::Station; our @ISA = qw(Point HasHwas HasIpas Root);
-use strict; use warnings;
+package Point::Station; our @ISA = qw(Point Tree Datum);
+use strict; use warnings; use Carp;
 # -------------------------------------
 # Stations are an unidentified IP host or gateway.  We know that there are two
 # stations on the edge of a single ethernet, we just do no know which stations
@@ -1683,103 +2546,1135 @@ use strict; use warnings;
 # query ARP, LLDP or SNMP for further information.  In particualr LLDP can help
 # us find the management IP address associated with the station so that we can
 # query it directly with SNMP.
-#
-# The addchild() method of the Root package is overridden so that the key
-# associated with the child Port can be added to the station and stations can
-# be properly merged once their hardware and IP addresses are discovered.
 # -------------------------------------
 #package Point::Station;
-sub gkey {
-	my $typeorself = shift;
-	return Port->gkey(@_);
-}
-#package Point::Station;
-sub addchild {
-	my $self = shift;
-	my ($child,$dir,$hwa,$form) = @_;
-	$self->SUPER::addchild(@_);
-	$self->add_hwa($hwa);
-}
-#package Point::Station;
-sub add_ipa {
-	my ($self,$ipa) = @_;
-	my $type = ref $self;
-	Point::Host->xform($self);
-	$self->add_ipa($ipa);
-	$self->query($self->{network},$ipa);
-}
-#package Point::Station;
-sub init {
-	my $self = shift;
-	my $hwa = $self->gkey(@_);
-	$self->add_hwa($hwa);
-	$self->{indexes} = {};
-}
-#package Point::Station;
-sub mergefrom {
-	my ($self,$othr) = @_;
-	Carp::carp "Merging Point::Station $othr into $self";
-	$self->SUPER::mergefrom($othr);
-	foreach (keys %{$othr->{indexes}}) {
-		$self->{indexes}{$_} = $othr->{indexes}{$_};
+sub add_key {
+	my ($self,$key) = @_;
+	if ($key and length($key) == 4) {
+		Point::Host->xform($self);
+		$self->add_key($key);
+	} else {
+		$self->SUPER::add_key($key);
 	}
-	delete $othr->{indexes};
 }
+#package Point::Station;
+#sub mark {
+#	my ($self,$othr,$merge,$reason) = @_;
+#	#Carp::cluck $reason;
+#	return 1;
+#}
 
 # -------------------------------------
-package Point::Host; our @ISA = qw(Point HasHwas HasIpas Root);
-use strict; use warnings;
+package Point::Host; our @ISA = qw(Point::Station);
+use strict; use warnings; use Carp;
+use Data::Dumper;
 # -------------------------------------
 #package Point::Host;
-sub gkey {
-	my $typeorself = shift;
-	my ($network,$ipa) = @_;
-	$ipa = $ipa->{ipa} if ref $ipa;
-	$ipa = Item::makekey($ipa);
-	return $ipa;
-}
+use constant {
+	dump_tables => 0,
+};
 #package Point::Host;
-sub query {
+sub systemScalars {
 	my $self = shift;
-	my ($network,$ipa) = @_;
-	my $snmpargs = {
-		-hostname=>Item::showkey($ipa),
-		-version=>'snmpv2c',
-		-community=>'public',
-	};
-	$network->{queue}{host}{request}->enqueue($snmpargs);
+	my ($model,$snmpargs,$table,$xlated,$error,$hkey,$type,$snet,$name) = @_;
+	my $row = $xlated->{0};
+	#print STDERR "\nScalars $table: for ",Item::showkey($hkey),"\n";
+	#print STDERR Dumper($row),"\n";
+	foreach (qw{sysLocation sysObjectID sysDescr sysORLastChange sysUpTime sysServices sysName sysContact}) {
+		$self->{$_} = $row->{$_} if exists $row->{$_};
+	}
 }
 #package Point::Host;
-sub init {
+#sub sysORTable {
+#	my $self = shift;
+#	my ($model,$snmpargs,$table,$xlated,$error,$hkey,$type,$snet,$name) = @_;
+#}
+#package Point::Host;
+sub ifTable {
 	my $self = shift;
-	my $ipa = $self->gkey(@_);
-	$self->add_ipa($ipa);
-	$self->query(@_);
+	my ($model,$snmpargs,$table,$xlated,$error,$hkey,$type,$snet,$name) = @_;
+	foreach my $row (values %$xlated) {
+		if (dump_tables) {
+			print STDERR "\nTable $table row: for ",Item::showkey($hkey),"\n";
+			print STDERR Dumper($row),"\n";
+		}
+		my $idx = $row->{ifIndex};
+		my $hwa = $row->{ifPhysAddress};
+		next unless $hwa;
+		my $dsc = $row->{ifDescr};
+		my $vid = ''; if ($dsc =~ /\d+\.(\d+)(:\d+)?$/) { $vid = $1 }
+		my $vla = undef;
+		if (defined $hwa) {
+			$vla = $hwa = Item::makekey($hwa);
+			$vla .= pack('n',$vid) if defined $vla and length($vid);
+		}
+		my $vprt = $self->getchild('Vprt',$idx,$vla,[
+			['Port',$hwa,$vid,[
+				['Point::Host',$self,$hwa],
+				['Lan',$hwa,$hwa]]],
+			['Bprt',$vla,$vla,[
+				['Point::Host',$self,$vla],
+				['Blan',$vla,$vla]]],
+			['Vlan',$vla,$vla,[
+				['Lan',$hwa,$vid],
+				['Blan',$vla,$vla]]],
+			]);
+		$vprt = $vprt->target;
+		foreach (qw/
+			ifIndex
+			ifDescr
+			ifType
+			ifMtu
+			ifSpeed
+			ifPhysAddress
+			ifAdminStatus
+			ifOperStatus
+			ifLastChange
+			ifInOctets
+			ifInUcastPkts
+			ifInNUcastPkts
+			ifInDiscards
+			ifInErrors
+			ifInUnknownProtos
+			ifOutOctets
+			ifOutUcastPkts
+			ifOutNUcastPkts
+			ifOutDiscards
+			ifOutErrors
+			ifOutQLen
+			ifSpecific/) {
+			$vprt->{data}{$table}{$_} = $row->{$_};
+		}
+		$vprt->{data}{extra}{hwa} = $hwa;
+		$vprt->{data}{extra}{vla} = $vla;
+		$vprt->{data}{extra}{vid} = $vid;
+	}
 }
 #package Point::Host;
-sub add_ipa {
-	my ($self,$ipa) = @_;
-	$self->HasIpas::add_ipa($ipa);
+sub ipAddrTable {
+	my $self = shift;
+	my ($model,$snmpargs,$table,$xlated,$error,$hkey,$type,$snet,$name) = @_;
+	foreach my $row (values %$xlated) {
+		if (dump_tables) {
+			print STDERR "\nTable $table row: for ",Item::showkey($hkey),"\n";
+			print STDERR Dumper($row),"\n";
+		}
+		my $idx = $row->{ipAdEntIfIndex};
+		next unless defined $idx;
+		next if not $row->{ipAdEntAddr} or $row->{ipAdEntAddr} eq '...';
+		my $pfx = Item::makekey($row->{ipAdEntAddr}.'/'.$row->{ipAdEntNetMask});
+		my $ipa = Item::makekey($row->{ipAdEntAddr});
+		my $ipt = Model::SNMP::iptype($ipa); next if $ipt eq 'RESERVED';
+		my $net = $model->{net}{$ipt} if Model::SNMP::typeok($type,$ipt);
+		my $nam = Model::SNMP::netname($ipt);
+		$self->link($model,undef,[[$nam,$net,$ipa]]);
+		$net = $self->parent($nam) unless $net;
+		my $vprt = $self->getchild('Vprt',$idx,undef);
+		my $hwa = $vprt->{data}{extra}{hwa} if exists $vprt->{data}{extra}{hwa};
+		my $vla = $vprt->{data}{extra}{vla} if exists $vprt->{data}{extra}{vla};
+		my $vid = $vprt->{data}{extra}{vid} if exists $vprt->{data}{extra}{vid};
+		$vprt = $self->getchild('Vprt',$idx,undef,[
+			['Port',$hwa,$vid,[
+				[$nam,$net,$ipa],
+				['Point::Host',$self,$hwa],
+				['Lan',$hwa,$hwa,[
+					[$nam,$net,$ipa]]]]],
+			['Bprt',$vla,$vla,[
+				[$nam,$net,$ipa],
+				['Point::Host',$self,$vla],
+				['Blan',$vla,$vla,[
+					[$nam,$net,$ipa]]]]],
+			['Vlan',$hwa,undef,[
+				[$nam,$net,$ipa]]],
+			]);
+		$vprt->parent('Vlan')->link($model,undef,[
+			['Lan',$vprt->parent('Port')->parent('Lan'),$vid],
+			['Blan',$vprt->parent('Bprt')->parent('Blan'),$vla],
+			]);
+		$vprt = $vprt->target;
+		my $blan = $vprt->parent('Bprt')->parent('Blan');
+		$net = $net->target;
+		my $add = $net->getchild('Address',$ipa,undef,[
+			['Point::Host',$self,$ipa],
+			['Subnet',undef,$ipa,[
+				[$nam,$net,$pfx],[$nam,$net,$ipa],
+				['Blan',$blan,$pfx]]],
+			]);
+		foreach (qw/
+			ipAdEntAddr
+			ipAdEntIfIndex
+			ipAdEntNetMask
+			ipAdEntBcastAddr
+			ipAdEntReasmMaxSize/) {
+			$add->{data}{$table}{$_} = $row->{$_};
+		}
+		my $sub = $add->parent('Subnet');
+		foreach (qw/
+			ipAdEntAddr
+			ipAdEntNetMask
+			ipAdEntBcastAddr
+			ipAdEntReasmMaxSize/) {
+			$sub->{data}{$table}{$_} = $row->{$_};
+		}
+	}
+}
+#package Point::Host;
+sub ipAddressTable {
+	my $self = shift;
+	my ($model,$snmpargs,$table,$xlated,$error,$hkey,$type,$snet,$name) = @_;
+	foreach my $row (values %$xlated) {
+		if (dump_tables) {
+			print STDERR "\nTable $table row: for ",Item::showkey($hkey),"\n";
+			print STDERR Dumper($row),"\n";
+		}
+		next unless $row->{ipAddressRowStatus} eq 'active(1)';
+		next unless $row->{ipAddressAddrType} eq 'ipv4(1)';
+		next unless $row->{ipAddressType} eq 'unicast(1)';
+		my $idx = $row->{ipAddressIfIndex};
+		my $ipa = Item::makekey($row->{ipAddressAddr});
+		my $ipt = Model::SNMP::iptype($ipa);
+		next if $ipt eq 'RESERVED';
+		my $net = $model->{net}{$ipt} if Model::SNMP::typeok($type,$ipt);
+		my $nam = Model::SNMP::netname($ipt);
+		$self->link($model,undef,[[$nam,$net,$ipa]]);
+		$net = $self->parent($nam) unless $net;
+		my $vprt = $self->getchild('Vprt',$idx,undef,[
+			['Port',undef,undef,[
+				[$nam,$net,$ipa],
+				['Point::Host',$self,undef],
+				['Lan',undef,undef,[
+					[$nam,$net,$ipa]]]]],
+			['Bprt',undef,undef,[
+				[$nam,$net,$ipa],
+				['Point::Host',$self,undef],
+				['Blan',undef,undef,[
+					[$nam,$net,$ipa]]]]],
+			['Vlan',undef,undef,[
+				[$nam,$net,$ipa]]],
+			]);
+		$vprt->parent('Vlan')->link($model,undef,[
+			['Lan',$vprt->parent('Port')->parent('Lan'),undef],
+			['Blan',$vprt->parent('Bprt')->parent('Blan'),undef],
+			]);
+		$vprt = $vprt->target;
+		my $blan = $vprt->parent('Bprt')->parent('Blan');
+		$net = $net->target;
+		# FIXME: there is a way to get the prefix as well
+		my $addr = $net->getchild('Address',$ipa,undef,[
+			['Point::Host',$self,$ipa],
+			['Subnet',undef,$ipa,[
+				[$nam,$net,$ipa],
+				['Blan',$blan,undef]]],
+			]);
+		foreach (qw/
+			ipAddressAddrType
+			ipAddressAddr
+			ipAddressIfIndex
+			ipAddressType
+			ipAddressPrefix
+			ipAddressOrigin
+			ipAddressStatus
+			ipAddressCreated
+			ipAddressLastChanged
+			ipAddressRowStatus
+			ipAddressStorageType/) {
+			$addr->{data}{$table}{$_} = $row->{$_};
+		}
+		my $sub = $addr->parent('Subnet');
+		foreach (qw/
+			ipAddressPrefix
+			ipAddressOrigin
+			ipAddressStatus
+			ipAddressCreated
+			ipAddressLastChanged
+			ipAddressRowStatus
+			ipAddressStorageType/) {
+			$sub->{data}{$table}{$_} = $row->{$_};
+		}
+	}
+}
+#package Point::Host;
+sub atTable {
+	my $self = shift;
+	my ($model,$snmpargs,$table,$xlated,$error,$hkey,$type,$snet,$name) = @_;
+	foreach my $row (values %$xlated) {
+		if (dump_tables) {
+			print STDERR "\nTable $table row: for ",Item::showkey($hkey),"\n";
+			print STDERR Dumper($row),"\n";
+		}
+		my $idx = $row->{atIfIndex};
+		my $mac = Item::makekey($row->{atPhysAddress}) if $row->{atPhysAddress};
+		next unless $mac;
+		my $ipa = Item::makekey($row->{atNetAddress}) if $row->{atNetAddress};
+		next unless $ipa;
+		my $ipt = Model::SNMP::iptype($ipa);
+		next if $ipt eq 'RESERVED';
+		my $net = $model->{net}{$ipt} if Model::SNMP::typeok($type,$ipt);
+		my $nam = Model::SNMP::netname($ipt);
+		$self->link($model,undef,[[$nam,$net,undef]]);
+		$net = $self->parent($nam) unless $net;
+		my $vprt = $self->getchild('Vprt',$idx,undef);
+		my $hwa = $vprt->{data}{extra}{hwa} if exists $vprt->{data}{extra}{hwa};
+		my $vla = $vprt->{data}{extra}{vla} if exists $vprt->{data}{extra}{vla};
+		my $vid = $vprt->{data}{extra}{vid} if exists $vprt->{data}{extra}{vid};
+		$vprt = $self->getchild('Vprt',$idx,undef,[
+			['Port',$hwa,$vid,[
+				[$nam,$net,undef],
+				['Point::Host',$self,$hwa],
+				['Lan',$mac,$hwa,[
+					[$nam,$net,undef]]]]],
+			['Bprt',$vla,$vla,[
+				[$nam,$net,undef],
+				['Point::Host',$self,$vla],
+				['Blan',$vla,$vla,[
+					[$nam,$net,undef]]]]],
+			['Vlan',$mac,undef,[
+				[$nam,$net,undef]]],
+			]);
+		$vprt->parent('Vlan')->link($model,undef,[
+			['Lan',$vprt->parent('Port')->parent('Lan'),$vid],
+			['Blan',$vprt->parent('Bprt')->parent('Blan'),$vla],
+			]);
+		$vprt = $vprt->target;
+		my $host = Point::Host->get($model,$mac,[[$nam,$net,$ipa]]);
+		$net = $host->parent($nam) unless $net;
+		$vprt = $vprt->target;
+		my $blan = $vprt->parent('Bprt')->parent('Blan');
+		$vid = '' unless defined $vid;
+		my $vlh = $mac;
+		$vlh .= pack('n',$vid) if defined $vlh and length($vid);
+		my $vlan = $vprt->parent('Vlan');
+		my $oprt = $vlan->getchild('Vprt',$mac,$mac,[
+			[$nam,$net,$ipa],
+			['Point::Host',$host,undef],
+			['Port',$mac,$vid,[
+				[$nam,$net,$ipa],
+				['Point::Host',$host,$mac],
+				['Lan',$mac,$mac,[
+					[$nam,$net,$ipa]]]]],
+			['Bprt',$vlh,$vlh,[
+				[$nam,$net,$ipa],
+				['Point::Host',$host,$vlh],
+				['Blan',$blan,$vlh,[
+					[$nam,$net,$ipa]]]]],
+			['Vlan',$vlan,$vlh,[
+				[$nam,$net,$ipa],
+				['Lan',$mac,$vid],
+				['Blan',$blan,$vlh]]],
+			]);
+		$net = $net->target;
+		my ($sub,$pfx) = $net->subnetbyip($ipa);
+		if ($sub) {
+			my $addr = $net->getchild('Address',$ipa,undef,[
+				['Point::Host',$host,$ipa],
+				['Subnet',$sub,$ipa,[
+					[$nam,$net,$ipa],
+					['Blan',$blan,$pfx]]],
+				]);
+			foreach (qw/
+				atPhysAddress
+				atNetAddress/) {
+				$addr->{data}{$table}{$_} = $row->{$_};
+			}
+		} else {
+			warn "Can't find subnet of $net for address ",Item::showkey($ipa);
+		}
+	}
+}
+#package Point::Host;
+sub ipNetToPhysicalTable {
+	my $self = shift;
+	my ($model,$snmpargs,$table,$xlated,$error,$hkey,$type,$snet,$name) = @_;
+	foreach my $row (values %$xlated) {
+		if (dump_tables) {
+			print STDERR "\nTable $table row: for ",Item::showkey($hkey),"\n";
+			print STDERR Dumper($row),"\n";
+		}
+		next unless $row->{ipNetToPhysicalRowStatus} eq 'active(1)';
+		next unless $row->{ipNetToPhysicalNetAddressType} eq 'ipv4(1)';
+		next unless $row->{ipNetToPhysicalState} eq 'reachable(1)';
+		next unless $row->{ipNetToPhysicalType} ne 'invalid(2)';
+		# TODO: should also check ipNetToPhysicalType
+		my $idx = $row->{ipNetToPhysicalIfIndex};
+		my $mac = Item::makekey($row->{ipNetToPhysicalPhysAddress});
+		next unless $mac;
+		my $ipa = Item::makekey($row->{ipNetToPhysicalNetAddress});
+		my $ipt = Model::SNMP::iptype($ipa);
+		next if $ipt eq 'RESERVED';
+		my $net = $model->{net}{$ipt} if Model::SNMP::typeok($type,$ipt);
+		my $nam = Model::SNMP::netname($ipt);
+		$self->link($model,undef,[[$nam,$net,undef]]);
+		$net = $self->parent($nam) unless $net;
+		my $vprt = $self->getchild('Vprt',$idx,undef);
+		my $hwa = $vprt->{data}{extra}{hwa} if exists $vprt->{data}{extra}{hwa};
+		my $vla = $vprt->{data}{extra}{vla} if exists $vprt->{data}{extra}{vla};
+		my $vid = $vprt->{data}{extra}{vid} if exists $vprt->{data}{extra}{vid};
+		$vprt = $self->getchild('Vprt',$idx,undef,[
+			['Port',$hwa,$vid,[
+				[$nam,$net,undef],
+				['Point::Host',$self,$hwa],
+				['Lan',$mac,$hwa,[
+					[$nam,$net,undef]]]]],
+			['Bprt',$vla,$vla,[
+				[$nam,$net,undef],
+				['Point::Host',$self,$vla],
+				['Blan',$vla,$vla,[
+					[$nam,$net,undef]]]]],
+			['Vlan',$mac,undef,[
+				[$nam,$net,undef]]],
+			]);
+		$vprt->parent('Vlan')->link($model,undef,[
+			['Lan',$vprt->parent('Port')->parent('Lan'),$vid],
+			['Blan',$vprt->parent('Bprt')->parent('Blan'),$vla],
+			]);
+		$vprt = $vprt->target;
+		my $host = Point::Host->get($model,$mac,[[$nam,$net,$ipa]]);
+		$net = $host->parent($nam) unless $net;
+		$vprt = $vprt->target;
+		my $blan = $vprt->parent('Bprt')->parent('Blan');
+		$vid = '' unless defined $vid;
+		my $vlh = $mac;
+		$vlh .= pack('n',$vid) if defined $vlh and length($vid);
+		my $vlan = $vprt->parent('Vlan');
+		my $oprt = $vlan->getchild('Vprt',$mac,$vlh,[
+			[$nam,$net,$ipa],
+			['Point::Host',$host,undef],
+			['Port',$mac,$vid,[
+				[$nam,$net,$ipa],
+				['Point::Host',$host,$mac],
+				['Lan',$mac,$mac,[
+					[$nam,$net,$ipa]]]]],
+			['Bprt',$vlh,$vlh,[
+				[$nam,$net,$ipa],
+				['Point::Host',$host,$vlh],
+				['Blan',$blan,$vlh,[
+					[$nam,$net,$ipa]]]]],
+			['Vlan',$vlan,$vlh,[
+				[$nam,$net,$ipa],
+				['Lan',$mac,$vid],
+				['Blan',$blan,$vlh]]],
+			]);
+		$net = $net->target;
+		my ($sub,$pfx) = $net->subnetbyip($ipa);
+		if ($sub) {
+			my $addr = $net->getchild('Address',$ipa,undef,[
+				['Point::Host',$host,$ipa],
+				['Subnet',$sub,$ipa,[
+					[$nam,$net,$ipa],
+					['Blan',$blan,$pfx]]],
+				]);
+			foreach (qw/
+				ipNetToPhysicalNetAddressType
+				ipNetToPhysicalNetAddress
+				ipNetToPhysicalPhysAddress
+				ipNetToPhysicalLastUpdated
+				ipNetToPhysicalType
+				ipNetToPhysicalState
+				ipNetToPhysicalRowStatus/) {
+				$addr->{data}{$table}{$_} = $row->{$_};
+			}
+		} else {
+			warn "Can't find subnet of $net for address ",Item::showkey($ipa);
+		}
+	}
+}
+#package Point::Host;
+sub ipRouteTable {
+	my $self = shift;
+	my ($model,$snmpargs,$table,$xlated,$error,$hkey,$type,$snet,$name) = @_;
+	foreach my $row (values %$xlated) {
+		next unless $row->{ipRouteType} eq 'direct(3)';
+		if (dump_tables) {
+			print STDERR "\nTable $table row: for ",Item::showkey($hkey),"\n";
+			print STDERR Dumper($row),"\n";
+		}
+		my $idx = $row->{ipRouteIfIndex};
+		next unless $row->{ipRouteDest} and $row->{ipRouteMask};
+		my $pfx = Item::makekey($row->{ipRouteDest}.'/'.$row->{ipRouteMask});
+		my $ipt = Model::SNMP::iptype($pfx); next if $ipt eq 'RESERVED';
+		my $net = $model->{net}{$ipt} if Model::SNMP::typeok($type,$ipt);
+		my $nam = Model::SNMP::netname($ipt);
+		$self->link($model,undef,[[$nam,$net,undef]]);
+		$net = $self->parent($nam) unless $net;
+		next unless $idx;
+		my $vprt = $self->getchild('Vprt',$idx,undef,[
+			['Port',undef,undef,[
+				[$nam,$net,undef],
+				['Point::Host',$self,undef],
+				['Lan',undef,undef,[
+					[$nam,$net,undef]]]]],
+			['Bprt',undef,undef,[
+				[$nam,$net,undef],
+				['Point::Host',$self,undef],
+				['Blan',undef,undef,[
+					[$nam,$net,undef]]]]],
+			['Vlan',undef,undef,[
+				[$nam,$net,undef]]],
+			]);
+		$vprt->parent('Vlan')->link($model,undef,[
+			['Lan',$vprt->parent('Port')->parent('Lan'),undef],
+			['Blan',$vprt->parent('Bprt')->parent('Blan'),undef],
+			]);
+		$vprt = $vprt->target;
+		my $blan = $vprt->parent('Bprt')->parent('Blan');
+		$net = $net->target;
+		my $sub = $net->getchild('Subnet',$pfx,undef,[
+			['Blan',$blan,$pfx],
+			]);
+	}
+	foreach my $row (values %$xlated) {
+		next unless $row->{ipRouteType} eq 'indirect(4)';
+		if (dump_tables) {
+			print STDERR "\nTable $table row: for ",Item::showkey($hkey),"\n";
+			print STDERR Dumper($row),"\n";
+		}
+		my $idx = $row->{ipRouteIfIndex};
+		my $ipa = Item::makekey($row->{ipRouteNextHop});
+		unless ($row->{ipRouteDest} and $row->{ipRouteMask}) {
+			Carp::confess "XXXXXX Missing fields:\n",Data::Dumper->new([$row])->Dump;
+		}
+		my $pfx = Item::makekey($row->{ipRouteDest}.'/'.$row->{ipRouteMask});
+		my $ipt = Model::SNMP::iptype($pfx); next if $ipt eq 'RESERVED';
+		my $net = $model->{net}{$ipt} if Model::SNMP::typeok($type,$ipt);
+		my $nam = Model::SNMP::netname($ipt);
+		$net = $self->parent($nam) unless $net;
+		next unless $net;
+		next unless $idx;
+		my $vprt = $self->getchild('Vprt',$idx,undef);
+		my $sub = $net->getchild('Subnet',$pfx,undef);
+		my $rte = Route->get($model,$vprt->target,$sub->target,$ipa);
+		foreach (qw/
+			ipRouteDest
+			ipRouteIfIndex
+			ipRouteMetric1
+			ipRouteMetric2
+			ipRouteMetric3
+			ipRouteMetric4
+			ipRouteNextHop
+			ipRouteType
+			ipRouteProto
+			ipRouteAge
+			ipRouteMask
+			ipRouteMetric5
+			ipRouteInfo/) {
+			$rte->{data}{$table}{$_} = $row->{$_};
+		}
+	}
+	foreach my $row (values %$xlated) {
+		next unless $row->{ipRouteType} eq 'indirect(4)';
+		next unless $row->{ipRouteNextHop};
+		if (dump_tables) {
+			print STDERR "\nTable $table row: for ",Item::showkey($hkey),"\n";
+			print STDERR Dumper($row),"\n";
+		}
+		my $idx = $row->{ipRouteIfIndex};
+		my $ipa = Item::makekey($row->{ipRouteNextHop});
+		my $ipt = Model::SNMP::iptype($ipa); next if $ipt eq 'RESERVED';
+		my $net = $model->{net}{$ipt} if Model::SNMP::typeok($type,$ipt);
+		my $nam = Model::SNMP::netname($ipt);
+		$self->link($model,undef,[[$nam,$net,undef]]);
+		$net = $self->parent($nam) unless $net;
+		my $host = $net->getchild('Point::Host',$ipa);
+		my ($sub,$pfx) = $net->subnetbyip($ipa);
+		if ($sub) {
+			my $addr = $net->getchild('Address',$ipa,undef,[
+				['Point::Host',$host,$ipa],
+				['Subnet',$sub,$ipa,[
+					[$nam,$net,$ipa]]],
+				]);
+		} else {
+			warn "Can't find subnet of $net for address ",Item::showkey($ipa);
+		}
+	}
+}
+#package Point::Host;
+sub lldpPortConfigTable {
+	my $self = shift;
+	my ($model,$snmpargs,$table,$xlated,$error,$hkey,$type,$snet,$name) = @_;
+	foreach my $row (values %$xlated) {
+		if (dump_tables) {
+			print STDERR "\nTable $table row: for ",Item::showkey($hkey),"\n";
+			print STDERR Dumper($row),"\n";
+		}
+		my $idx = $row->{lldpPortConfigPortNum};
+		next unless $idx;
+		my $vprt = $self->getchild('Vprt',$idx,undef);
+		next unless $vprt;
+		my $vdat = $vprt->{data}{$table};
+		$vdat = $vprt->{data}{$table} = {} unless $vdat;
+		foreach (keys %$row) {
+			$vdat->{$_} = $row->{$_};
+		}
+	}
+}
+#package Point::Host;
+sub lldpConfigManAddrTable {
+	my $self = shift;
+	my ($model,$snmpargs,$table,$xlated,$error,$hkey,$type,$snet,$name) = @_;
+	foreach my $row (values %$xlated) {
+		if (dump_tables) {
+			print STDERR "\nTable $table row: for ",Item::showkey($hkey),"\n";
+			print STDERR Dumper($row),"\n";
+		}
+	}
+}
+#package Point::Host;
+sub lldpStatsTxPortTable {
+	my $self = shift;
+	my ($model,$snmpargs,$table,$xlated,$error,$hkey,$type,$snet,$name) = @_;
+	foreach my $row (values %$xlated) {
+		if (dump_tables) {
+			print STDERR "\nTable $table row: for ",Item::showkey($hkey),"\n";
+			print STDERR Dumper($row),"\n";
+		}
+		my $idx = $row->{lldpStatsTxPortNum};
+		next unless $idx;
+		my $vprt = $self->getchild('Vprt',$idx,undef);
+		next unless $vprt;
+		my $vdat = $vprt->{data}{$table};
+		$vdat = $vprt->{data}{$table} = {} unless $vdat;
+		foreach (keys %$row) {
+			$vdat->{$_} = $row->{$_};
+		}
+	}
+}
+#package Point::Host;
+sub lldpStatsRxPortTable {
+	my $self = shift;
+	my ($model,$snmpargs,$table,$xlated,$error,$hkey,$type,$snet,$name) = @_;
+	foreach my $row (values %$xlated) {
+		if (dump_tables) {
+			print STDERR "\nTable $table row: for ",Item::showkey($hkey),"\n";
+			print STDERR Dumper($row),"\n";
+		}
+		my $idx = $row->{lldpStatsRxPortNum};
+		next unless $idx;
+		my $vprt = $self->getchild('Vprt',$idx,undef);
+		next unless $vprt;
+		{
+			my $vdat = $vprt->{data}{$table};
+			$vdat = $vprt->{data}{$table} = {} unless $vdat;
+			foreach (qw/
+				lldpStatsRxPortNum
+				lldpStatsRxPortFramesDiscardedTotal
+				lldpStatsRxPortFramesErrors
+				lldpStatsRxPortFramesTotal
+				lldpStatsRxPortTLVsDiscardedTotal
+				lldpStatsRxPortTLVsUnrecognizedTotal
+				lldpStatsRxPortAgeoutsTotal/) {
+				$vdat->{$_} = $row->{$_};
+			}
+		}
+	}
+}
+#package Point::Host;
+sub lldpLocPortTable {
+	my $self = shift;
+	my ($model,$snmpargs,$table,$xlated,$error,$hkey,$type,$snet,$name) = @_;
+	foreach my $row (values %$xlated) {
+		if (dump_tables) {
+			print STDERR "\nTable $table row: for ",Item::showkey($hkey),"\n";
+			print STDERR Dumper($row),"\n";
+		}
+		my $idx = $row->{lldpLocPortNum};
+		next unless $idx;
+		my $vprt = $self->getchild('Vprt',$idx,undef);
+		next unless $vprt;
+		{
+			my $vdat = $vprt->{data}{$table};
+			$vdat = $vprt->{data}{$table} = {} unless $vdat;
+			foreach (qw/
+				lldpLocPortNum
+				lldpLocPortIdSubtype
+				lldpLocPortId
+				lldpLocPortDesc/) {
+				$vdat->{$_} = $row->{$_};
+			}
+		}
+		next;
+		next unless $row->{lldpLocPortIdSubtype} eq 'macAddress(3)';
+		my $hwa = Item::makekey($row->{lldpLocPortIdSubtype});
+		next unless $hwa;
+		my $vprt = $self->getchild('Vprt',$idx,undef,[
+			['Port',$hwa,undef,[
+				['Point::Host',$self,undef]]],
+			['Vlan',undef,undef,[
+				['Lan',$hwa,undef]]],
+			]);
+	}
+}
+#package Point::Host;
+sub lldpLocManAddrTable {
+	my $self = shift;
+	my ($model,$snmpargs,$table,$xlated,$error,$hkey,$type,$snet,$name) = @_;
+	foreach my $row (values %$xlated) {
+		if (dump_tables) {
+			print STDERR "\nTable $table row: for ",Item::showkey($hkey),"\n";
+			print STDERR Dumper($row),"\n";
+		}
+		next;
+		my ($idx,$ipa);
+		if ($row->{lldpLocManAddrIfSubtype} eq 'ifIndex(2)') {
+			$idx = $row->{lldpLocManAddrIfId};
+		}
+		next unless $idx;
+		if ($row->{lldpLocManAddrSubtype} eq 'ipV4(1)') {
+			$ipa = Item::makekey($row->{lldpLocManAddr});
+			next unless $ipa;
+			$row->{lldpLocManAddr} = Item::showkey($ipa);
+		}
+		next unless $ipa;
+		my $ipt = Model::SNMP::iptype($ipa);
+		next if $ipt eq 'RESERVED';
+		my $net = $model->{net}{$ipt} if Model::SNMP::typeok($type,$ipt);
+		my $nam = Model::SNMP::netname($ipt);
+		$self->link($model,undef,[[$nam,$net,$ipa]]);
+		$net = $self->parent($nam) unless $net;
+		my $vprt = $self->getchild('Vprt',$idx,undef,[
+			['Port',undef,undef,[
+				[$nam,$net,$ipa],
+				['Point::Host',$self,undef],
+				['Lan',undef,undef,[
+					[$nam,$net,$ipa]]]]],
+			['Bprt',undef,undef,[
+				[$nam,$net,$ipa],
+				['Point::Host',$self,undef],
+				['Blan',undef,undef,[
+					[$nam,$net,$ipa]]]]],
+			['Vlan',undef,undef,[
+				[$nam,$net,$ipa]]],
+			]);
+		$vprt->parent('Vlan')->link($model,undef,[
+			['Lan',$vprt->parent('Port')->parent('Lan'),undef],
+			['Blan',$vprt->parent('Bprt')->parent('Blan'),undef],
+			]);
+		$vprt = $vprt->target;
+		my $blan = $vprt->parent('Bprt')->parent('Blan');
+		$net = $net->target;
+		my $addr = $net->getchild('Address',$ipa,undef,[
+			['Point::Host',$self,$ipa],
+			['Subnet',undef,$ipa,[
+				[$nam,$net,$ipa],
+				['Blan',$blan,undef]]],
+			]);
+		foreach (qw/
+			lldpLocManAddrIfId
+			lldpLocManAddrIfSubtype
+			lldpLocManAddrOID
+			lldpLocManAddr
+			lldpLocManAddrLen
+			lldpLocManAddrSubtype/) {
+			$vprt->{data}{$table}{$_} = $row->{$_};
+			$self->{data}{$table}{$_} = $row->{$_};
+			$addr->{data}{$table}{$_} = $row->{$_};
+		}
+	}
+}
+#package Point::Host;
+sub lldpRemTable {
+	my $self = shift;
+	my ($model,$snmpargs,$table,$xlated,$error,$hkey,$type,$snet,$name) = @_;
+	foreach my $row (values %$xlated) {
+		if (dump_tables) {
+			print STDERR "\nTable $table row: for ",Item::showkey($hkey),"\n";
+			print STDERR Dumper($row),"\n";
+		}
+	}
+}
+#package Point::Host;
+sub lldpRemManAddrTable {
+	my $self = shift;
+	my ($model,$snmpargs,$table,$xlated,$error,$hkey,$type,$snet,$name) = @_;
+	foreach my $row (values %$xlated) {
+		if (dump_tables) {
+			print STDERR "\nTable $table row: for ",Item::showkey($hkey),"\n";
+			print STDERR Dumper($row),"\n";
+		}
+	}
+}
+#package Point::Host;
+sub lldpRemUnknownTLVTable {
+	my $self = shift;
+	my ($model,$snmpargs,$table,$xlated,$error,$hkey,$type,$snet,$name) = @_;
+	foreach my $row (values %$xlated) {
+		if (dump_tables) {
+			print STDERR "\nTable $table row: for ",Item::showkey($hkey),"\n";
+			print STDERR Dumper($row),"\n";
+		}
+	}
+}
+#package Point::Host;
+sub lldpRemOrgDefInfoTable {
+	my $self = shift;
+	my ($model,$snmpargs,$table,$xlated,$error,$hkey,$type,$snet,$name) = @_;
+	foreach my $row (values %$xlated) {
+		if (dump_tables) {
+			print STDERR "\nTable $table row: for ",Item::showkey($hkey),"\n";
+			print STDERR Dumper($row),"\n";
+		}
+	}
+}
+#package Point::Host;
+sub lldpXdot1ConfigPortVlanTable {
+	my $self = shift;
+	my ($model,$snmpargs,$table,$xlated,$error,$hkey,$type,$snet,$name) = @_;
+	foreach my $row (values %$xlated) {
+		if (dump_tables) {
+			print STDERR "\nTable $table row: for ",Item::showkey($hkey),"\n";
+			print STDERR Dumper($row),"\n";
+		}
+	}
+}
+#package Point::Host;
+sub lldpXdot1ConfigVlanNameTable {
+	my $self = shift;
+	my ($model,$snmpargs,$table,$xlated,$error,$hkey,$type,$snet,$name) = @_;
+	foreach my $row (values %$xlated) {
+		if (dump_tables) {
+			print STDERR "\nTable $table row: for ",Item::showkey($hkey),"\n";
+			print STDERR Dumper($row),"\n";
+		}
+	}
+}
+#package Point::Host;
+sub lldpXdot1ConfigProtoVlanTable {
+	my $self = shift;
+	my ($model,$snmpargs,$table,$xlated,$error,$hkey,$type,$snet,$name) = @_;
+	foreach my $row (values %$xlated) {
+		if (dump_tables) {
+			print STDERR "\nTable $table row: for ",Item::showkey($hkey),"\n";
+			print STDERR Dumper($row),"\n";
+		}
+	}
+}
+#package Point::Host;
+sub lldpXdot1ConfigProtocolTable {
+	my $self = shift;
+	my ($model,$snmpargs,$table,$xlated,$error,$hkey,$type,$snet,$name) = @_;
+	foreach my $row (values %$xlated) {
+		if (dump_tables) {
+			print STDERR "\nTable $table row: for ",Item::showkey($hkey),"\n";
+			print STDERR Dumper($row),"\n";
+		}
+	}
+}
+#package Point::Host;
+sub lldpXdot1LocTable {
+	my $self = shift;
+	my ($model,$snmpargs,$table,$xlated,$error,$hkey,$type,$snet,$name) = @_;
+	foreach my $row (values %$xlated) {
+		if (dump_tables) {
+			print STDERR "\nTable $table row: for ",Item::showkey($hkey),"\n";
+			print STDERR Dumper($row),"\n";
+		}
+	}
+}
+#package Point::Host;
+sub lldpXdot1LocProtoVlanTable {
+	my $self = shift;
+	my ($model,$snmpargs,$table,$xlated,$error,$hkey,$type,$snet,$name) = @_;
+	foreach my $row (values %$xlated) {
+		if (dump_tables) {
+			print STDERR "\nTable $table row: for ",Item::showkey($hkey),"\n";
+			print STDERR Dumper($row),"\n";
+		}
+	}
+}
+#package Point::Host;
+sub lldpXdot1LocVlanNameTable {
+	my $self = shift;
+	my ($model,$snmpargs,$table,$xlated,$error,$hkey,$type,$snet,$name) = @_;
+	foreach my $row (values %$xlated) {
+		if (dump_tables) {
+			print STDERR "\nTable $table row: for ",Item::showkey($hkey),"\n";
+			print STDERR Dumper($row),"\n";
+		}
+	}
+}
+#package Point::Host;
+sub lldpXdot1LocProtocolTable {
+	my $self = shift;
+	my ($model,$snmpargs,$table,$xlated,$error,$hkey,$type,$snet,$name) = @_;
+	foreach my $row (values %$xlated) {
+		if (dump_tables) {
+			print STDERR "\nTable $table row: for ",Item::showkey($hkey),"\n";
+			print STDERR Dumper($row),"\n";
+		}
+	}
+}
+#package Point::Host;
+sub lldpXdot1RemTable {
+	my $self = shift;
+	my ($model,$snmpargs,$table,$xlated,$error,$hkey,$type,$snet,$name) = @_;
+	foreach my $row (values %$xlated) {
+		if (dump_tables) {
+			print STDERR "\nTable $table row: for ",Item::showkey($hkey),"\n";
+			print STDERR Dumper($row),"\n";
+		}
+	}
+}
+#package Point::Host;
+sub lldpXdot1RemProtoVlanTable {
+	my $self = shift;
+	my ($model,$snmpargs,$table,$xlated,$error,$hkey,$type,$snet,$name) = @_;
+	foreach my $row (values %$xlated) {
+		if (dump_tables) {
+			print STDERR "\nTable $table row: for ",Item::showkey($hkey),"\n";
+			print STDERR Dumper($row),"\n";
+		}
+	}
+}
+#package Point::Host;
+sub lldpXdot1RemVlanNameTable {
+	my $self = shift;
+	my ($model,$snmpargs,$table,$xlated,$error,$hkey,$type,$snet,$name) = @_;
+	foreach my $row (values %$xlated) {
+		if (dump_tables) {
+			print STDERR "\nTable $table row: for ",Item::showkey($hkey),"\n";
+			print STDERR Dumper($row),"\n";
+		}
+	}
+}
+#package Point::Host;
+sub lldpXdot1RemProtocolTable {
+	my $self = shift;
+	my ($model,$snmpargs,$table,$xlated,$error,$hkey,$type,$snet,$name) = @_;
+	foreach my $row (values %$xlated) {
+		if (dump_tables) {
+			print STDERR "\nTable $table row: for ",Item::showkey($hkey),"\n";
+			print STDERR Dumper($row),"\n";
+		}
+	}
+}
+#package Point::Host;
+sub lldpXdot3PortConfigTable {
+	my $self = shift;
+	my ($model,$snmpargs,$table,$xlated,$error,$hkey,$type,$snet,$name) = @_;
+	foreach my $row (values %$xlated) {
+		if (dump_tables) {
+			print STDERR "\nTable $table row: for ",Item::showkey($hkey),"\n";
+			print STDERR Dumper($row),"\n";
+		}
+	}
+}
+#package Point::Host;
+sub lldpXdot3LocPortTable {
+	my $self = shift;
+	my ($model,$snmpargs,$table,$xlated,$error,$hkey,$type,$snet,$name) = @_;
+	foreach my $row (values %$xlated) {
+		if (dump_tables) {
+			print STDERR "\nTable $table row: for ",Item::showkey($hkey),"\n";
+			print STDERR Dumper($row),"\n";
+		}
+	}
+}
+#package Point::Host;
+sub lldpXdot3LocPowerTable {
+	my $self = shift;
+	my ($model,$snmpargs,$table,$xlated,$error,$hkey,$type,$snet,$name) = @_;
+	foreach my $row (values %$xlated) {
+		if (dump_tables) {
+			print STDERR "\nTable $table row: for ",Item::showkey($hkey),"\n";
+			print STDERR Dumper($row),"\n";
+		}
+	}
+}
+#package Point::Host;
+sub lldpXdot3LocLinkAggTable {
+	my $self = shift;
+	my ($model,$snmpargs,$table,$xlated,$error,$hkey,$type,$snet,$name) = @_;
+	foreach my $row (values %$xlated) {
+		if (dump_tables) {
+			print STDERR "\nTable $table row: for ",Item::showkey($hkey),"\n";
+			print STDERR Dumper($row),"\n";
+		}
+	}
+}
+#package Point::Host;
+sub lldpXdot3LocMaxFrameSizeTable {
+	my $self = shift;
+	my ($model,$snmpargs,$table,$xlated,$error,$hkey,$type,$snet,$name) = @_;
+	foreach my $row (values %$xlated) {
+		if (dump_tables) {
+			print STDERR "\nTable $table row: for ",Item::showkey($hkey),"\n";
+			print STDERR Dumper($row),"\n";
+		}
+	}
+}
+#package Point::Host;
+sub lldpXdot3RemPortTable {
+	my $self = shift;
+	my ($model,$snmpargs,$table,$xlated,$error,$hkey,$type,$snet,$name) = @_;
+	foreach my $row (values %$xlated) {
+		if (dump_tables) {
+			print STDERR "\nTable $table row: for ",Item::showkey($hkey),"\n";
+			print STDERR Dumper($row),"\n";
+		}
+	}
+}
+#package Point::Host;
+sub lldpXdot3RemPowerTable {
+	my $self = shift;
+	my ($model,$snmpargs,$table,$xlated,$error,$hkey,$type,$snet,$name) = @_;
+	foreach my $row (values %$xlated) {
+		if (dump_tables) {
+			print STDERR "\nTable $table row: for ",Item::showkey($hkey),"\n";
+			print STDERR Dumper($row),"\n";
+		}
+	}
+}
+#package Point::Host;
+sub lldpXdot3RemLinkAggTable {
+	my $self = shift;
+	my ($model,$snmpargs,$table,$xlated,$error,$hkey,$type,$snet,$name) = @_;
+	foreach my $row (values %$xlated) {
+		if (dump_tables) {
+			print STDERR "\nTable $table row: for ",Item::showkey($hkey),"\n";
+			print STDERR Dumper($row),"\n";
+		}
+	}
+}
+#package Point::Host;
+sub lldpXdot3RemMaxFrameSizeTable {
+	my $self = shift;
+	my ($model,$snmpargs,$table,$xlated,$error,$hkey,$type,$snet,$name) = @_;
+	foreach my $row (values %$xlated) {
+		if (dump_tables) {
+			print STDERR "\nTable $table row: for ",Item::showkey($hkey),"\n";
+			print STDERR Dumper($row),"\n";
+		}
+	}
+}
+#package Point::Host;
+sub lldpXMedPortConfigTable {
+	my $self = shift;
+	my ($model,$snmpargs,$table,$xlated,$error,$hkey,$type,$snet,$name) = @_;
+	foreach my $row (values %$xlated) {
+		if (dump_tables) {
+			print STDERR "\nTable $table row: for ",Item::showkey($hkey),"\n";
+			print STDERR Dumper($row),"\n";
+		}
+	}
+}
+#package Point::Host;
+sub lldpXMedLocMediaPolicyTable {
+	my $self = shift;
+	my ($model,$snmpargs,$table,$xlated,$error,$hkey,$type,$snet,$name) = @_;
+	foreach my $row (values %$xlated) {
+		if (dump_tables) {
+			print STDERR "\nTable $table row: for ",Item::showkey($hkey),"\n";
+			print STDERR Dumper($row),"\n";
+		}
+	}
+}
+#package Point::Host;
+sub lldpXMedLocLocationTable {
+	my $self = shift;
+	my ($model,$snmpargs,$table,$xlated,$error,$hkey,$type,$snet,$name) = @_;
+	foreach my $row (values %$xlated) {
+		if (dump_tables) {
+			print STDERR "\nTable $table row: for ",Item::showkey($hkey),"\n";
+			print STDERR Dumper($row),"\n";
+		}
+	}
+}
+#package Point::Host;
+sub lldpXMedLocXPoEPSEPortTable {
+	my $self = shift;
+	my ($model,$snmpargs,$table,$xlated,$error,$hkey,$type,$snet,$name) = @_;
+	foreach my $row (values %$xlated) {
+		if (dump_tables) {
+			print STDERR "\nTable $table row: for ",Item::showkey($hkey),"\n";
+			print STDERR Dumper($row),"\n";
+		}
+	}
+}
+#package Point::Host;
+sub lldpXMedRemCapabilitiesTable {
+	my $self = shift;
+	my ($model,$snmpargs,$table,$xlated,$error,$hkey,$type,$snet,$name) = @_;
+	foreach my $row (values %$xlated) {
+		if (dump_tables) {
+			print STDERR "\nTable $table row: for ",Item::showkey($hkey),"\n";
+			print STDERR Dumper($row),"\n";
+		}
+	}
+}
+#package Point::Host;
+sub lldpXMedRemMediaPolicyTable {
+	my $self = shift;
+	my ($model,$snmpargs,$table,$xlated,$error,$hkey,$type,$snet,$name) = @_;
+	foreach my $row (values %$xlated) {
+		if (dump_tables) {
+			print STDERR "\nTable $table row: for ",Item::showkey($hkey),"\n";
+			print STDERR Dumper($row),"\n";
+		}
+	}
+}
+#package Point::Host;
+sub lldpXMedRemInventoryTable {
+	my $self = shift;
+	my ($model,$snmpargs,$table,$xlated,$error,$hkey,$type,$snet,$name) = @_;
+	foreach my $row (values %$xlated) {
+		if (dump_tables) {
+			print STDERR "\nTable $table row: for ",Item::showkey($hkey),"\n";
+			print STDERR Dumper($row),"\n";
+		}
+	}
+}
+#package Point::Host;
+sub lldpXMedRemLocationTable {
+	my $self = shift;
+	my ($model,$snmpargs,$table,$xlated,$error,$hkey,$type,$snet,$name) = @_;
+	foreach my $row (values %$xlated) {
+		if (dump_tables) {
+			print STDERR "\nTable $table row: for ",Item::showkey($hkey),"\n";
+			print STDERR Dumper($row),"\n";
+		}
+	}
+}
+#package Point::Host;
+sub lldpXMedRemXPoETable {
+	my $self = shift;
+	my ($model,$snmpargs,$table,$xlated,$error,$hkey,$type,$snet,$name) = @_;
+	foreach my $row (values %$xlated) {
+		if (dump_tables) {
+			print STDERR "\nTable $table row: for ",Item::showkey($hkey),"\n";
+			print STDERR Dumper($row),"\n";
+		}
+	}
+}
+#package Point::Host;
+sub lldpXMedRemXPoEPSETable {
+	my $self = shift;
+	my ($model,$snmpargs,$table,$xlated,$error,$hkey,$type,$snet,$name) = @_;
+	foreach my $row (values %$xlated) {
+		if (dump_tables) {
+			print STDERR "\nTable $table row: for ",Item::showkey($hkey),"\n";
+			print STDERR Dumper($row),"\n";
+		}
+	}
+}
+#package Point::Host;
+sub lldpXMedRemXPoEPDTable {
+	my $self = shift;
+	my ($model,$snmpargs,$table,$xlated,$error,$hkey,$type,$snet,$name) = @_;
+	foreach my $row (values %$xlated) {
+		if (dump_tables) {
+			print STDERR "\nTable $table row: for ",Item::showkey($hkey),"\n";
+			print STDERR Dumper($row),"\n";
+		}
+	}
 }
 
 # -------------------------------------
-package Point::Host::LLDP; our @ISA = qw(Point::Host);
-use strict; use warnings;
+package Point::Host::Here; our @ISA = qw(Point::Host);
+use strict; use warnings; use Carp;
 # -------------------------------------
 
 # -------------------------------------
-package Point::Router; our @ISA = qw(Point::Station);
-use strict; use warnings;
-# -------------------------------------
-
-# -------------------------------------
-package Point::Router::LLDP; our @ISA = qw(Point::Router);
-use strict; use warnings;
-# -------------------------------------
-
-# -------------------------------------
-package Lan; our @ISA = qw(Point HasHwas HasIpas Root);
-use strict; use warnings;
+package Lan; our @ISA = qw(Point Tree);
+use strict; use warnings; use Carp;
 # -------------------------------------
 # An Lan is a relationship between any number of Port packages.  All ports that
 # share a hardware address with a Lan are on that LAN.
@@ -1793,21 +3688,10 @@ use strict; use warnings;
 # In this way membership of hardware addresses (Port and Point::Station
 # packages) to Lan packages is discovered.
 # -------------------------------------
-#package Lan;
-sub gkey {
-	my $typeorself = shift;
-	return Port->gkey(@_);
-}
-#package Lan;
-sub init {
-	my $self = shift;
-	my $hwa = $self->gkey(@_);
-	$self->add_hwa($hwa);
-}
 
 # -------------------------------------
-package Vlan; our @ISA = qw(Point HasHwas HasIpas Leaf);
-use strict; use warnings;
+package Vlan; our @ISA = qw(Point Tree);
+use strict; use warnings; use Carp;
 # -------------------------------------
 # A Vlan is an IEEE 802.1P/Q virtual LAN.  It is a relationship between any
 # number of Vprt packages.  All virtual ports that share a hardware address and
@@ -1825,83 +3709,31 @@ use strict; use warnings;
 # To avoid unnecessary complexity, we deal with Vlan packages only.  The parent
 # Lan package is just for automatically tracking membership of Vlan to Lan
 # relationships.
+# -------------------------------------
+
+# -------------------------------------
+package Blan; our @ISA = qw(Point Tree);
+use strict; use warnings; use Carp;
+# -------------------------------------
+# A Blan is an set of bridged IEEE 802.1P/Q virtual LAN.  It is a relationship
+# between any number of Vlans and any number of Subnets supported on each of
+# those Vlans.
 #
-# The addchild() method of the Root package is overridden so that the key
-# associated with the child Subnet can be added to the Vlan
+# Blans are keyed by the Vprt keys of the Vlans that make up the Blan.  Blans
+# should typically have one or more Vlan packages as children, one or more
+# Subnet packages, and one Network, Private and/or Local subnetwork as a parent.
+# These parents are the same as the corresponding subnetworks of the constituent
+# Subnets.
 # -------------------------------------
-#package Vlan;
-sub gkey {
-	my $typeorself = shift;
-	return Vprt->gkey(@_);
-}
-#package Vlan;
-sub skey {
-	my $type = shift;
-	my ($hwa,$vlan) = $type->gkey(@_);
-	return 'Lan',$vlan,@_;
-}
-#package Vlan;
-sub init {
-	my $self = shift;
-	my ($hwa,$vlan) = $self->gkey(@_);
-	$self->{vlan} = $vlan;
-	$self->add_hwa($hwa,$vlan);
-}
-#package Vlan;
-sub dump {
-	my $self = shift;
-	print STDERR "Vlan $self has VLAN ID ",Item::showkey($self->{vlan}),"\n";
-}
-#package Vlan;
-sub fini {
-	my $self = shift;
-	delete $self->{vlan};
-}
 
 # -------------------------------------
-package Subnet; our @ISA = qw(Point HasIpas);
-use strict; use warnings;
+package Address; our @ISA = qw(Point Leaf Datum);
+use strict; use warnings; use Carp;
 # -------------------------------------
-# A Subnet is an IP subnet (address prefix) that is associated with a Vlan.
-# Note that 0.0.0.0/0 is the default subnet.
-# -------------------------------------
-#package Subnet;
-sub gkey {
-	my $typeorself = shift;
-	my ($network,$pfx) = @_;
-	$pfx = $pfx->{pfx} if ref $pfx;
-	$pfx = Item::makekey($pfx);
-	return $pfx;
-}
-#package Subnet;
-sub init {
-	my $self = shift;
-	my $pfx = $self->gkey(@_);
-	$self->{pfx} = $pfx;
-}
-#package Subnet;
-sub fini {
-	my $self = shift;
-	delete $self->{pfx};
-}
 
 # -------------------------------------
-package Support; our @ISA = qw(Path);
-use strict; use warnings;
-# -------------------------------------
-# A Support represents the support for a subnet on a Vlan;
-# -------------------------------------
-#package Support;
-sub typpair { return 'Subnet','Vlan' }
-#package Support;
-sub dump {
-	my $self = shift;
-	print STDERR "Support $self supports subnet ",Item::showkey($self->{key}{a})," on vlan ",Item::showkey($self->{key}{b}),"\n";
-}
-
-# -------------------------------------
-package Route; our @ISA = qw(Path);
-use strict; use warnings;
+package Route; our @ISA = qw(Path Datum);
+use strict; use warnings; use Carp;
 # -------------------------------------
 # A route is an IP routing path from a Port to a Subnet via a gateway
 # (Point::Router).
@@ -1909,30 +3741,22 @@ use strict; use warnings;
 #package Route;
 sub typpair { return 'Vprt','Subnet'; }
 #package Route;
-sub gkey {
-	my ($type,$network,$vprt,$dest,$gw) = @_;
-	$gw = Point::Host->key($network,$gw) if defined $gw;
-	$gw = '' unless defined $gw;
-	($vprt,$dest) = Path::gkey(@_);
-	return $vprt, $dest.$gw;
-}
-#package Route;
 sub dump {
 	my $self = shift;
-	print STDERR "Route $self is from vprt ",Item::showkey($self->{key}{a})," to subnet ",Item::showkey($self->{key}{b}),"\n";
+	print STDERR "$self is from vprt ",$self->obja," to subnet ",$self->objb,"\n";
 }
 
 # -------------------------------------
 package Loopback; our @ISA = qw(Point Leaf);
-use strict; use warnings;
+use strict; use warnings; use Carp;
 # -------------------------------------
 # A Loopback object represents the loopback port.
 # -------------------------------------
 #package Loopback;
 
 # -------------------------------------
-package Port; our @ISA = qw(Point HasIpas Tree);
-use strict; use warnings;
+package Port; our @ISA = qw(Point Tree);
+use strict; use warnings; use Carp;
 # -------------------------------------
 # A Port is a LAN link layer interface.  Fundamentally, a Port belongs to the
 # Lan to which it is attached  (with which it shares its hardware address key).
@@ -1941,40 +3765,10 @@ use strict; use warnings;
 # can be found by simply lookup up the Lan with the Port hardware address.  The
 # same is true of the Point::Station.
 # -------------------------------------
-#package Port;
-sub gkey {
-	my $typeorself = shift;
-	my ($network,$hwa) = @_;
-	$hwa = $hwa->{hwa} if ref $hwa;
-	$hwa = Item::makekey($hwa);
-	return $hwa;
-}
-#package Port;
-sub skey {
-	my $type = shift;
-	return 'Point::Station', $type->key(@_),@_;
-}
-#package Port;
-sub init {
-	my $self = shift;
-	my $hwa = $self->gkey(@_);
-	$self->{hwa} = $hwa;
-}
-#package Port;
-sub dump {
-	my $self = shift;
-	print STDERR "Port $self has HW address ",Item::showkey($self->{hwa}),"\n";
-}
-#package Port;
-sub fini {
-	my $self = shift;
-	delete $self->{hwa};
-	delete $self->{ipas};
-}
 
 # -------------------------------------
-package Vprt; our @ISA = qw(Point HasIpas Leaf);
-use strict; use warnings;
+package Vprt; our @ISA = qw(Point Tree Datum);
+use strict; use warnings; use Carp;
 # -------------------------------------
 # A Vprt is a VLAN link layer interface.  Fundamentally, a Vprt belongs to the
 # Vlan to which it is attached (with which it shares its hardware address and
@@ -1986,37 +3780,19 @@ use strict; use warnings;
 # Port package is just for automatically tracking membership of Vprt to Port
 # relationships.
 # -------------------------------------
-#package Vprt;
-sub gkey {
-	my $typeorself = shift;
-	my ($network,$hwa,$vlan) = @_;
-	$hwa = Port->key($network,$hwa);
-	$vlan = '' unless defined $vlan;
-	$vlan = Item::makekey($vlan);
-	return $hwa,$vlan;
-}
-#package Vprt;
-sub skey {
-	my $type = shift;
-	my ($hwa,$vlan) = $type->gkey(@_);
-	return 'Port',$vlan,@_;
-}
-#package Vprt;
-sub init {
-	my $self = shift;
-	my ($hwa,$vlan) = $self->gkey(@_);
-	$self->{hwa} = $hwa;
-	$self->{vlan} = $vlan;
-}
-#package Vprt;
-sub fini {
-	my $self = shift;
-	delete $self->{hwa};
-	delete $self->{vlan};
-}
-#package Vprt;
-sub dump {
-	my $self = shift;
-	print STDERR "Vprt $self has HW address ",Item::showkey($self->{hwa}),"\n";
-	print STDERR "Vprt $self has VLAN ID ",Item::showkey($self->{vlan}),"\n";
-}
+
+# -------------------------------------
+package Bprt; our @ISA = qw(Point Tree Datum);
+use strict; use warnings; use Carp;
+# -------------------------------------
+# A Bprt is a Bridged VLAN link layer interface.  Fundamentally, a Bprt belongs
+# to the Blan to which it is attached (with which it shares its hardware address
+# and VLAN id key).  Also, a Bprt normally exists for every Vprt.  The Blan to
+# which a Bprt belongs can be found by simply lookking up the Vlan with the Bprt
+# hardware address.  The Vprt that corresponds to the Blan can be looked up using
+# the same primary key.
+# -------------------------------------
+
+1;
+
+__END__
