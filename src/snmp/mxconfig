@@ -3472,6 +3472,16 @@ Gtk2::Notebook->set_window_creation_hook(\&Window::newWindow);
 HostData->readdb($MyDBI::dbh);
 Window->readdb($MyDBI::dbh);
 
+#Glib::Idle->add(sub{
+#	print STDERR "Idle callback called with arguments ",join(',',@_),"\n";
+#},$MyDBI::dbh);
+
+# Note: interval is in milliseconds.  Timeout is periodic and must be removed
+# with Glib::Source->remove($tag), where tag was returned from the add
+#Glib::Timeout->add(1500,sub{
+#	print STDERR "Timeout callback called with arguments ",join(',',@_),"\n";
+#},$MyDBI::dbh);
+
 Gtk2->main();
 
 MyDBI::stopdb($MyDBI::dbh);
