@@ -320,7 +320,7 @@ CREATE TABLE IF NOT EXISTS pages (
 	FOREIGN KEY(hostid) REFERENCES hosts(hostid),
 	FOREIGN KEY(windid) REFERENCES winds(windid)
 );
-},
+		},
 	},
 	panes=>{
 		keys=>[ qw/paneid/ ],
@@ -349,12 +349,13 @@ CREATE TABLE IF NOT EXISTS nodes (
 	name TEXT,
 	col INT,
 	row INT,
-	PRIMARY KEY(windid pageid nodeid),
-	FOREIGN KEY(hostis) REFERENCES hosts(hostid),
+	PRIMARY KEY(windid,pageid,nodeid),
+	FOREIGN KEY(hostid) REFERENCES hosts(hostid),
 	FOREIGN KEY(pageid) REFERENCES pages(pageid),
 	FOREIGN KEY(windid) REFERENCES winds(windid)
 );
 		},
+	},
 );
 
 my %mapping = (
@@ -371,7 +372,7 @@ my %mapping = (
 
 sub dosql {
 	my ($dbh,$sql) = @_;
-#	print STDERR "S: $sql";
+	print STDERR "S: $sql";
 	$dbh->do($sql) or die $dbh->errstr;
 }
 
@@ -2343,6 +2344,7 @@ sub new {
 	return $NetData::net if $NetData::net;
 	my $self = {};
 	bless $self,$type;
+	my $data = $self->_data;
 	$self->{dbh} = $dbh;
 	my @cols = @{$MyDBI::schema{systemScalars}{cols}};
 	my $sql = "SELECT hostid FROM systemScalars;\n";

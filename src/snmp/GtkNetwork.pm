@@ -495,8 +495,11 @@ sub init {
 	my $self = shift;
 	my ($windid,$pageid,$base,$viewid) = @_;
 	$self->{visibility} = {};
-	foreach (qw/Point Blan Vlan Lan Subnet Bprt Vprt Port Address Network Private/) {
+	foreach (qw/Point Subnet Address Network Private/) {
 		$self->{visibility}{$_} = Glib::TRUE;
+	}
+	foreach (qw/Blan Vlan Lan Bprt Vprt Port/) {
+		$self->{visibility}{$_} = Glib::FALSE;
 	}
 }
 #package Viewer::Network;
@@ -840,7 +843,6 @@ sub init {
 			$self->setcolor($self->mycolor);
 		},$self);
 	$group->signal_connect('button-press-event'=>sub{
-			Carp::carp "***** button-press-event (",join(',',@_),")";
 			my ($item,$targ,$ev,$self) = @_;
 			if ($ev->button == 3) {
 				if (my $sub = $self->can('fillmenu')) {
@@ -849,12 +851,8 @@ sub init {
 						$menu->show_all;
 						$menu->popup(undef,undef,undef,undef,$ev->button,$ev->time);
 						return Gtk2::EVENT_STOP;
-					} else {
-						Carp::carp "******** $self did not fillmenu";
 					}
 					$menu->destroy;
-				} else {
-					Carp::carp "******** $self cannot fillmenu";
 				}
 			}
 			elsif ($ev->button == 2) {
@@ -1532,17 +1530,19 @@ use Gtk2::SimpleList; use SNMP;
 # ------------------------------------------
 #package MibNode;
 sub new {
-	my ($type,$dialog,$table,$label) = @_;
+	my ($type,$dialog,$view,$table,$label) = @_;
 	my $self = {};
 	bless $self,$type;
-	my $data = $dialog->{data}{data}{$table};
+	my $data = $view->{data}{data}{$table};
 	$self->{dialog} = $dialog;
 	$self->{data} = $data;
+	$self->{view} = $view;
 	my $prefix = $table;
 	$prefix =~ s/Table$//;
+	$prefix = 'ipAdEnt' if $prefix eq 'ipAddr';
 	my $short = $label;
 	$short =~ s/^$prefix//;
-	my $m = $SNMP::MIB{$label};
+	my $m = $self->{m} = $SNMP::MIB{$label};
 	$data->{label} = undef unless exists $data->{label};
 	my $val = $self->{val} = \$data->{$label};
 	my ($lf,$l,$ef,$e,$uf,$u);
@@ -1579,7 +1579,7 @@ sub new {
 		@bits = map {'0'} @bits;
 		my $bits = join('',@bits);
 
-		my $use = MibNode::List->snmpval($m,$val);
+		my $use = MibNode::List->snmpval($m,$$val);
 		$bits = unpack('B*',$use).$bits;
 
 		my $i = 0;
@@ -1595,16 +1595,15 @@ sub new {
 		bless $self,'MibNode::List';
 	}
 	elsif (defined $m->{enums} and $m->{enums} and scalar keys %{$m->{enums}} > 0) {
-		$$val = 0 unless defined $$val;
+		my $use = MibNode::Combo->snmpval($m,$$val);
 		$e = $self->{e} = Gtk2::ComboBox->new_text;
 		$e->set_title($label);
 		my $i = 0;
 		foreach my $tag (sort {$m->{enums}{$a}<=>$m->{enums}{$b}} keys %{$m->{enums}}) {
-			$e->append_text($tag);
-			$e->set_active($i) if $$val eq $tag or ($$val =~ /^d+$/ and $$val == $m->{enums}{$tag});
+			$e->append_text("$tag($m->{enums}{$tag})");
+			$e->set_active($i) if $use eq $tag or ($use =~ /^\d+$/ and $use == $m->{enums}{$tag});
 			$i++;
 		}
-#		$e->set_active_text($$val) if $m->{type} eq 'OCTETSTR';
 		if (defined $m->{access} and $m->{access} =~ /Write|Create/) {
 			$e->set('button-sensitivity'=>'on');
 		} else {
@@ -1615,7 +1614,7 @@ sub new {
 	}
 	else {
 		$$val = '' unless defined $$val;
-		my $b = Gtk2::EntryBuffer->new($$val);
+		my $b = $self->{b} = Gtk2::EntryBuffer->new($$val);
 		$e = $self->{e} = Gtk2::Entry->new_with_buffer($b);
 		$e->set_editable((defined $m->{access} and $m->{access} =~ /Write|Create/) ? TRUE : FALSE);
 		$e->set(visibility=>FALSE) if defined $m->{type} and $m->{type} eq 'PASSWORD';
@@ -1627,8 +1626,8 @@ sub new {
 	$units = $m->{syntax} if $m->{syntax};
 	$units = $m->{textualConvention} if $m->{textualConvention};
 	$units = $m->{units} if $m->{units};
-	my $uf = new Gtk2::Frame;
-	my $u = new Gtk2::Label($units);
+	$uf = $self->{uf} = new Gtk2::Frame;
+	$u = $self->{u} = new Gtk2::Label($units);
 	$u->set_alignment(0.0,0.5);
 	$uf->set_shadow_type('etched-out');
 	$uf->add($u);
@@ -1641,6 +1640,15 @@ sub add_to_table {
 	$table->attach($self->{ef},1,2,$entryno,$entryno+1,'fill','fill',0,0);
 	$table->attach($self->{uf},2,3,$entryno,$entryno+1,'fill','fill',0,0);
 	return $self;
+}
+#package MibNode;
+sub add_tooltips {
+	my ($self,$tips) = @_;
+	my $tip;
+	$tip = $self->description(450);
+	$tips->set_tip($self->{l},$tip) if $tip;
+	$tip = $self->TCDescription(450);
+	$tips->set_tip($self->{u},$tip) if $tip;
 }
 #package MibNode;
 sub revert {
@@ -1677,6 +1685,148 @@ sub convert {
 	my $class = MibNode::classof($m);
 	$val = "$class"->snmpval($m,$val);
 	return $val;
+}
+#package MibNode;
+sub widthof {
+	my $text = shift;
+	return length($text)*8;
+}
+#package MibNode;
+sub strip {
+	my ($msg) = @_;
+	if (defined $msg) {
+		$msg =~ s/^(\s|\n)*//s;
+		$msg =~ s/(\s|\n)*$//s;
+		$msg =~ s/\t/        /g;
+		$msg =~ s/\n[ ]+\n/\n\n/g;
+		while ($msg =~ /\n\n\n/) {
+			$msg =~ s/\n\n\n/\n/g;
+		}
+		my $lead = undef;
+		my $match;
+		while ($msg =~ /(\n[ ]+)[^\n]/g) {
+			$match = $1;
+			if (defined $lead) {
+				if (length($lead) > length($match)) {
+					$lead = $match;
+				}
+			} else {
+				$lead = $match;
+			}
+		}
+		if (defined $lead) {
+			$msg =~ s/$lead/\n/g;
+		}
+		$msg =~ s/^(\n|\s)*$//sg;
+		chomp $msg;
+	} else {
+		$msg = '';
+	}
+	return $msg;
+}
+#package MibNode;
+sub reflow {
+	my ($msg,$width) = @_;
+	$width = 400 unless defined $width;
+	my @lines;
+	my @result = ();
+	$msg =~ s/\n[ ]+\n/\n\n/sg;
+	if ($msg =~ /[ ]\n[ ]*/s) {
+		$msg =~ s/[ ]\n[ ]*/ /sg;
+		@lines = split(/\n/,$msg);
+	} elsif ($msg =~ /\n\n/s) {
+		$msg =~ s/\.\n(?!\n)/. \n/sg;
+		$msg =~ s/\n(?!\n)/ \n/sg;
+		$msg =~ s/\n[ ]+\n/\n\n/sg;
+		$msg =~ s/[ ]\n[ ]*/ /sg;
+		@lines = split(/\n/,$msg);
+	} else {
+		$msg =~ s/\.\n/. \n/sg;
+		$msg =~ s/\n[ ]*/ /sg;
+		# FIXME - check for lead change
+		@lines = split(/\n/,$msg);
+	}
+	foreach (@lines) {
+		my ($indent,$lead,$measure) = ('','');
+		$indent = $1 if s/^( *)//;
+		$lead = $1 if s/^(([0-9]+\.|-|·)[ ]+)//;
+		my $rest = $width - MibNode::widthof($indent) - MibNode::widthof($lead);
+		while (($measure = MibNode::widthof($_)) > $rest) {
+			my ($pos,$where,$break) = (-1,-1,-1);
+			while (($break = index($_,' ',$pos+1)) >= 0) {
+				my $portion = MibNode::widthof(substr($_,0,$break));
+				last if $portion >= $rest;
+				$where = $break unless $break == $pos+1;
+				$pos = $break;
+			}
+			$where = $break if $where == 0;
+			$where = length($_) if $where <= 0;
+			push @result,$indent.$lead.substr($_,0,$where,'');
+			s/^[ ]*//;
+			$lead =~ s/./ /g;
+			$rest = $width - MibNode::widthof($indent) - MibNode::widthof($lead);
+		}
+		push @result,$indent.$lead.$_;
+	}
+	@result = grep(!/^\s*$/,@result) if @result > 60; # turf blank lines
+	$msg = join("\n",@result);
+	return $msg;
+}
+#package MibNode;
+sub rehang {
+	my ($msg,$width,$hang) = @_;
+	$width = 400 unless defined $width;
+	$hang = '        ' unless defined $hang;
+	$msg =~ s/\n[ ]+\n/\n\n/sg;
+	$msg =~ s/[ ]\n[ ]*/ /sg;
+	my @result = ();
+	my @lines = split(/\n/,$msg);
+	foreach (@lines) {
+		my ($indent,$lead) = ('','');
+		$indent = $1 if s/^( *)//;
+		my $rest = $width - MibNode::widthof($indent) - MibNode::widthof($lead);
+		while ((my $measure = MibNode::widthof($_)) > $rest) {
+			my ($pos,$where,$break) = (-1,-1,-1);
+			while (($break = index($_,' ',$pos + 1)) >= 0) {
+				my $portion = MibNode::widthof(substr($_,0,$break));
+				last if $portion >= $rest;
+				$where = $break unless $break == $pos + 1;
+				$pos = $break;
+			}
+			$where = $break if $where == 0;
+			$where = length($_) if $where <= 0;
+			push @result,$indent.$lead.substr($_,0,$where,'');
+			s/^[ ]*//;
+			$lead = $hang;
+			$rest = $width - MibNode::widthof($indent) - MibNode::widthof($lead);
+		}
+		push @result,$indent.$lead.$_;
+	}
+	$msg = join("\n",@result);
+	return $msg;
+}
+#package MibNode;
+sub description {
+	my ($self,$width) = @_;
+	my $m = $self->{m};
+	my $msg = MibNode::strip($m->{description});
+	$msg = MibNode::reflow($msg,$width) if defined $width;
+	$msg = "$m->{moduleID}::$m->{label}($m->{subID}): $m->{objectID}\n\n".$msg;
+	return $msg;
+}
+#package MibNode;
+sub TCDescription {
+	my ($self,$width) = @_;
+	my $msg = MibNode::strip($self->{m}{TCDescription});
+	$msg = MibNode::reflow($msg,$width) if defined $width;
+	return $msg;
+}
+#package MibNode;
+sub reference {
+	my ($self,$width) = @_;
+	my $msg = MibNode::strip($self->{m}{reference});
+	$msg = MibNode::rehang($msg,$width) if defined $width;
+	return $msg;
 }
 
 # ----------------------------------
@@ -1843,6 +1993,11 @@ sub snmpval {
 		} elsif ($val =~ /^\d+$/) {
 			my %vals = map {$m->{enums}{$_}=>$_} keys %{$m->{enums}};
 			$val = $vals{$val} if exists $vals{$val};
+		} elsif ($val =~ /^(\w+)\((\d+)\)$/) {
+			my ($tag,$num) = ($1,$2);
+			my %vals = map {$m->{enums}{$_}=>$_} keys %{$m->{enums}};
+			$val = $vals{$num} if exists $vals{$num};
+			$val = $tag if exists $m->{enums}{$tag};
 		}
 	} elsif ($m->{type} eq 'INTEGER') {
 		if (not defined $val) {
@@ -1850,6 +2005,9 @@ sub snmpval {
 				exists $m->{defaultValue} and
 				defined $m->{defaultValue};
 			$val = 0;
+		} elsif ($val =~ /^(\w+)\((\d+)\)$/) {
+			my ($tag,$num) = ($1,$2);
+			$val = $num;
 		} elsif ($val !~ /^\d+$/) {
 			$val = $m->{enums}{$val} if exists $m->{enums}{$val};
 		}
@@ -1932,23 +2090,22 @@ sub new {
 	$self->{rows} = \@rows;
 	return undef unless scalar(@rows);
 	my $fr = new Gtk2::Frame($table);
-	my $v = new Gtk2::VBox(FALSE,0);
-	my $sw = new Gtk2::ScrolledWindow;
-	$sw->set_policy('never','automatic');
-	$sw->add_with_viewport($v);
-	$fr->add($sw);
-	my $h = new Gtk2::HBox;
-	$v->pack_start($h,TRUE,TRUE,0);
 	my $t = new Gtk2::Table(scalar(@rows),3,FALSE);
 	$t->set_col_spacings(0);
 	$t->set_row_spacings(0);
-	$h->pack_start($t,TRUE,TRUE,0);
+	my $sw = new Gtk2::ScrolledWindow;
+	$sw->set_policy('never','automatic');
+	$sw->add_with_viewport($t);
+	$fr->add($sw);
+	my $tt = $data->{tooltips} = new Gtk2::Tooltips;
 	my $i = 0;
 	foreach my $row (@rows) {
-		my $ent = $self->{entries}{$row} = MibNode->new($self,$table,$row);
+		my $ent = $self->{entries}{$row} = MibNode->new($self,$view,$table,$row);
 		$ent->add_to_table($t,$i);
+		$ent->add_tooltips($tt);
 		$i++;
 	}
+	$tt->enable;
 	my $bb = new Gtk2::HButtonBox;
 	$bb->set_layout('end');
 	$bb->set_spacing(10);
@@ -1978,7 +2135,7 @@ sub new {
 	$vb->set_spacing(0);
 	$fr->set_border_width(5);
 	$vb->pack_start($fr,TRUE,TRUE,0);
-	$bb->set_bort_width(5);
+	$bb->set_border_width(5);
 	$vb->pack_start($bb,FALSE,FALSE,0);
 	$self->set_type_hint('normal');
 	$self->set_default_size(-1,600);
@@ -2002,15 +2159,15 @@ sub getrows {
 	my $mib = $SNMP::MIB{$label};
 	my @ents = @{$mib->{indexes}};
 	my %inds = map {$_=>1} @ents;
-	foreach my $row (@{$mib->{children}}) {
+	foreach my $row (sort {$a->{subID}<=>$b->{subID}} @{$mib->{children}}) {
 		my $name = $row->{label};
 		push @ents, $name unless $inds{$name};
 	}
-	my @rows = ();
-	foreach my $row (@ents) {
-		push @rows, $row if exists $data->{$row};
-	}
-	return @rows;
+#	my @rows = ();
+#	foreach my $row (@ents) {
+#		push @rows, $row if exists $data->{$row};
+#	}
+	return @ents;
 }
 #package MibEntry;
 sub refresh_view {
@@ -2697,6 +2854,9 @@ sub mycolor { return 'black' }
 #package Point::Host::View;
 sub gettxt {
 	my $self = shift;
+	my @lines = ();
+	my $name = $self->{data}{data}{systemScalars}{sysName};
+	push @lines, $name if $name;
 	my @keys = ();
 	foreach my $kind (qw/Network Private Local/) {
 		if ($self->{data}{key}{p}{$kind}) {
@@ -2704,8 +2864,9 @@ sub gettxt {
 		}
 	}
 	my $key = $keys[0];
-	return $self->SUPER::gettxt() unless $key;
-	return Item::showkey($key);
+	push @lines, Item::showkey($key) if $key;
+	return $self->SUPER::gettxt() unless $key or $name;
+	return join("\n",@lines);
 }
 #package Point::Host::View;
 sub xformed {
