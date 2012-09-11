@@ -1048,8 +1048,7 @@ sub walktree {
 # ------------------------------------------
 package Model::SNMP; our @ISA = qw(Model);
 use strict; use warnings; use Carp; use Data::Dumper;
-#use threads; use threads::shared; use Thread::Queue;
-use Thread; use Thread::Queue;
+use threads; use threads::shared; use Thread; use Thread::Queue;
 use SNMP; use Net::IP;
 # ------------------------------------------
 #package Model::SNMP;
@@ -1120,47 +1119,11 @@ sub fini {
 #package Model::SNMP;
 sub launch_thread {
 	my $self = shift;
-#	my $rq :shared = Thread::Queue->new;
-#	my $wq :shared = Thread::Queue->new;
-	my $rq = Thread::Queue->new;
-	my $wq = Thread::Queue->new;
-#	my $thread = threads->create(sub{
-#			while (my $item = $rq->dequeue()) {
-#				threads->create(sub{
-#						my ($session,$error) = Net::SNMP->session(%$item);
-#						if (defined $session and $session) {
-#							foreach my $table (@$tables) {
-#								my ($oid,$result,$error);
-#								my $key = $table;
-#								if ($key =~ /Table$/) {
-#									$oid = sub_dot(SNMP::translateObj($key));
-#									$result = $session->get_table(-baseoid=>$oid);
-#									$error = $session->error() unless defined $result;
-#									$wq->enqueue([$item,$table,$result,$error]);
-#									unless (defined $result) {
-#										if ($error =~ /No response/) { last }
-#										if ($error =~ /Requested table is empty/) { next }
-#										#warn "SNMP error $error\n";
-#										next;
-#									}
-#								} elsif ($key =~ /Scalars$/) {
-#									$key =~ s/Scalars$//;
-#									$oid = sub_dot(SNMP::translateObj($key));
-#									$result = $session->get_bulk_request(-nonrepeaters=>0,-maxrepetitions=>8,-varbindlist=>[$oid]);
-#									$error = $session->error() unless defined $result;
-#									$wq->enqueue([$item,$table,$result,$error]);
-#								}
-#							}
-#						} else {
-#							$wq->enqueue([$item,undef,$error]);
-#						}
-#				})->detach();
-#			}
-#	})->detach();
-	$self->{queue}{host}{request} = $rq;
-	$self->{queue}{host}{results} = $wq;
+	my $rq :shared = Thread::Queue->new; $self->{queue}{host}{request} = $rq;
+	my $wq :shared = Thread::Queue->new; $self->{queue}{host}{results} = $wq;
 	#warn "Launching thread...";
-	my $thread = Thread->new(\&Model::SNMP::main_thread,$rq,$wq);
+	#my $thread = Thread->new(\&Model::SNMP::main_thread,$rq,$wq);
+	my $thread = threads->create('Model::SNMP::main_thread',$rq,$wq);
 	#warn "Detaching thread...";
 	$thread->detach();
 	$self->{thread}{host} = $thread;
@@ -1169,7 +1132,8 @@ sub launch_thread {
 sub main_thread {
 	my ($rq,$wq) = @_;
 	while (my $item = $rq->dequeue()) {
-		my $worker = Thread->new(\&Model::SNMP::worker_thread,$rq,$wq,$item);
+		#my $worker = Thread->new(\&Model::SNMP::worker_thread,$rq,$wq,$item);
+		my $worker = threads->create('Model::SNMP::worker_thread',$rq,$wq,$item);
 		$worker->detach();
 	}
 }
@@ -1186,8 +1150,8 @@ sub worker_thread {
 				$result = $session->get_table(-baseoid=>$oid);
 				$error = $session->error() unless defined $result;
 				unless (defined $result) {
-					if ($error =~ /No response/) { last }
-					if ($error =~ /Requested table is empty/) { next }
+					if ($error =~ /No response/i) { last }
+					if ($error =~ /Requested table is empty/i) { next }
 				}
 				$wq->enqueue([$item,$table,$result,$error]);
 			}
@@ -2580,8 +2544,16 @@ sub systemScalars {
 	my $row = $xlated->{0};
 	#print STDERR "\nScalars $table: for ",Item::showkey($hkey),"\n";
 	#print STDERR Dumper($row),"\n";
-	foreach (qw{sysLocation sysObjectID sysDescr sysORLastChange sysUpTime sysServices sysName sysContact}) {
-		$self->{$_} = $row->{$_} if exists $row->{$_};
+	foreach (qw/
+		sysLocation
+		sysObjectID
+		sysDescr
+		sysORLastChange
+		sysUpTime
+		sysServices
+		sysName
+		sysContact/) {
+		$self->{data}{$table}{$_} = $row->{$_};
 	}
 }
 #package Point::Host;
@@ -3133,7 +3105,9 @@ sub lldpStatsTxPortTable {
 		next unless $vprt;
 		my $vdat = $vprt->{data}{$table};
 		$vdat = $vprt->{data}{$table} = {} unless $vdat;
-		foreach (keys %$row) {
+		foreach (qw/
+				lldpStatsTxPortNum
+				lldpStatsTxPortFramesTotal/) {
 			$vdat->{$_} = $row->{$_};
 		}
 	}
@@ -3155,13 +3129,13 @@ sub lldpStatsRxPortTable {
 			my $vdat = $vprt->{data}{$table};
 			$vdat = $vprt->{data}{$table} = {} unless $vdat;
 			foreach (qw/
-				lldpStatsRxPortNum
-				lldpStatsRxPortFramesDiscardedTotal
-				lldpStatsRxPortFramesErrors
-				lldpStatsRxPortFramesTotal
-				lldpStatsRxPortTLVsDiscardedTotal
-				lldpStatsRxPortTLVsUnrecognizedTotal
-				lldpStatsRxPortAgeoutsTotal/) {
+					lldpStatsRxPortNum
+					lldpStatsRxPortFramesDiscardedTotal
+					lldpStatsRxPortFramesErrors
+					lldpStatsRxPortFramesTotal
+					lldpStatsRxPortTLVsDiscardedTotal
+					lldpStatsRxPortTLVsUnrecognizedTotal
+					lldpStatsRxPortAgeoutsTotal/) {
 				$vdat->{$_} = $row->{$_};
 			}
 		}
@@ -3184,10 +3158,10 @@ sub lldpLocPortTable {
 			my $vdat = $vprt->{data}{$table};
 			$vdat = $vprt->{data}{$table} = {} unless $vdat;
 			foreach (qw/
-				lldpLocPortNum
-				lldpLocPortIdSubtype
-				lldpLocPortId
-				lldpLocPortDesc/) {
+					lldpLocPortNum
+					lldpLocPortIdSubtype
+					lldpLocPortId
+					lldpLocPortDesc/) {
 				$vdat->{$_} = $row->{$_};
 			}
 		}
@@ -3195,7 +3169,7 @@ sub lldpLocPortTable {
 		next unless $row->{lldpLocPortIdSubtype} eq 'macAddress(3)';
 		my $hwa = Item::makekey($row->{lldpLocPortIdSubtype});
 		next unless $hwa;
-		my $vprt = $self->getchild('Vprt',$idx,undef,[
+		$vprt = $self->getchild('Vprt',$idx,undef,[
 			['Port',$hwa,undef,[
 				['Point::Host',$self,undef]]],
 			['Vlan',undef,undef,[
@@ -3258,12 +3232,12 @@ sub lldpLocManAddrTable {
 				['Blan',$blan,undef]]],
 			]);
 		foreach (qw/
-			lldpLocManAddrIfId
-			lldpLocManAddrIfSubtype
-			lldpLocManAddrOID
-			lldpLocManAddr
-			lldpLocManAddrLen
-			lldpLocManAddrSubtype/) {
+				lldpLocManAddrIfId
+				lldpLocManAddrIfSubtype
+				lldpLocManAddrOID
+				lldpLocManAddr
+				lldpLocManAddrLen
+				lldpLocManAddrSubtype/) {
 			$vprt->{data}{$table}{$_} = $row->{$_};
 			$self->{data}{$table}{$_} = $row->{$_};
 			$addr->{data}{$table}{$_} = $row->{$_};

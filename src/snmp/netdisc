@@ -1,11 +1,11 @@
 #!/usr/bin/perl
 
-#use threads;
-#use threads::shared;
-use Thread qw/:DEFAULT async yield/;
-use Thread::Queue;
 use strict;
 use warnings;
+use threads;
+use threads::shared;
+use Thread qw/:DEFAULT async yield/;
+use Thread::Queue;
 use Carp;
 use Gtk2 qw/-init -threads-init/;
 use Gtk2::SimpleList;
@@ -111,12 +111,12 @@ $loc->getchild('Point::Host::Here',$hkey,undef,[['Local::Here',$loc,$hkey]]);
 
 Gtk2->main();
 
-foreach my $kind (sort keys %{$model->{lists}}) {
-	foreach my $item (@{$model->{lists}{$kind}}) {
-		next unless $item;
-		$item->show;
-	}
-}
+#foreach my $kind (sort keys %{$model->{lists}}) {
+#	foreach my $item (values %{$model->{lists}{$kind}}) {
+#		next unless $item;
+#		$item->show;
+#	}
+#}
 
 exit;
 
