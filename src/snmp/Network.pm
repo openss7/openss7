@@ -1210,7 +1210,6 @@ sub lexical_sort {
 	my (@tables) = @_;
 	my %tuples = ();
 	foreach my $table (@tables) {
-		next if $table eq 'extra';
 		my $label = $table;
 		if ($label =~ s/Data$//) { }
 		elsif ($label =~ s/Scalars$//) { }
@@ -2914,23 +2913,15 @@ sub ifEntry {
 		$vla .= pack('n',$vid) if defined $vla and length($vid);
 	}
 	my $vprt = $self->getchild('Vprt',$idx,$vla,[
-		['Port',$hwa,$vid,[
-			['Point::Host',$self,$hwa],
-			['Lan',$hwa,$hwa]]],
-		['Vlan',undef,$hwa,[
-			['Lan',$hwa,undef]]],
+		['Port',$hwa,undef,[
+			['Point::Host',$self,undef],
+			['Lan',undef,undef]]],
+		['Vlan',undef,undef],
 		]);
+	my $vlan = $vprt->parent('Vlan');
+	my $plan = $vprt->parent('Port')->parent('Lan');
+	$vlan->link($model,undef,[['Lan',$plan,undef]]);
 	$vprt->addrow($table,$row);
-	$vprt->{data}{extra}{hwa} = $hwa;
-	$vprt->{data}{extra}{vla} = $vla;
-	$vprt->{data}{extra}{vid} = $vid;
-	my $port = $vprt->parent('Port') if defined $vid and $vid eq '';
-	if ($port) {
-		$port->addrow($table,$row);
-		$port->{data}{extra}{hwa} = $hwa;
-		$port->{data}{extra}{vla} = $vla;
-		$port->{data}{extra}{vid} = $vid;
-	}
 }
 #package Point::Host;
 sub ifXEntry {
@@ -2943,17 +2934,7 @@ sub ifXEntry {
 	my $idx = $row->{ifIndex};
 	return unless $idx;
 	my $vprt = $self->getchild('Vprt',$idx,undef);
-	unless (exists $vprt->{data}{extra}) {
-		Carp::cluck "No extra data for index $idx";
-		$self->show;
-		$vprt->show;
-	}
-	my $hwa = $vprt->{data}{extra}{hwa} if exists $vprt->{data}{extra}{hwa};
-	my $vla = $vprt->{data}{extra}{vla} if exists $vprt->{data}{extra}{vla};
-	my $vid = $vprt->{data}{extra}{vid} if exists $vprt->{data}{extra}{vid};
 	$vprt->addrow($table,$row);
-	my $port = $vprt->parent('Port') if defined $vid and $vid eq '';
-	$port->addrow($table,$row) if $port;
 }
 #package Point::Host;
 sub ipAddrEntry {
@@ -2974,36 +2955,30 @@ sub ipAddrEntry {
 	$self->link($model,undef,[[$nam,$net,$ipa]]);
 	$net = $self->parent($nam) unless $net;
 	my $vprt = $self->getchild('Vprt',$idx,undef);
-	unless (exists $vprt->{data}{extra}) {
-		Carp::cluck "No extra data for index $idx";
-		$self->show;
-		$vprt->show;
-	}
-	my $hwa = $vprt->{data}{extra}{hwa} if exists $vprt->{data}{extra}{hwa};
-	my $vla = $vprt->{data}{extra}{vla} if exists $vprt->{data}{extra}{vla};
-	my $vid = $vprt->{data}{extra}{vid} if exists $vprt->{data}{extra}{vid};
 	$vprt = $self->getchild('Vprt',$idx,undef,[
 		[$nam,$net,$ipa],
 		['Point::Host',$self,$ipa],
-		['Port',$hwa,$vid,[
+		['Port',undef,undef,[
 			[$nam,$net,$ipa],
-			['Point::Host',$self,$hwa],
-			['Lan',$hwa,$hwa,[
+			['Point::Host',$self,undef],
+			['Lan',undef,undef,[
 				[$nam,$net,$ipa]]]]],
-		['Vlan',undef,$hwa,[
+		['Vlan',undef,undef,[
 			[$nam,$net,$ipa]]],
 		]);
 	my $vlan = $vprt->parent('Vlan');
-	$vlan->link($model,undef,[['Lan',$vprt->parent('Port')->parent('Lan'),undef]]);
+	my $plan = $vprt->parent('Port')->parent('Lan');
+	$vlan->link($model,undef,[['Lan',$plan,undef]]);
 	$net = $net->target;
+	my $sub = $net->getchild('Subnet',$pfx,undef,[
+		['Vlan',$vlan,undef],
+		]);
 	my $addr = $net->getchild('Address',$ipa,undef,[
 		['Point::Host',$self,$ipa],
-		['Subnet',undef,$ipa,[
-			[$nam,$net,$pfx],[$nam,$net,$ipa],
-			['Vlan',$vlan,$pfx]]],
+		['Subnet',$sub,undef],
 		]);
 	$addr->addrow($table,$row);
-	my $sub = $addr->parent('Subnet');
+	$sub = $sub->target;
 	$sub->addrow($table,$row);
 }
 #package Point::Host;
@@ -3026,38 +3001,31 @@ sub ipAddressEntry {
 	$self->link($model,undef,[[$nam,$net,$ipa]]);
 	$net = $self->parent($nam) unless $net;
 	my $vprt = $self->getchild('Vprt',$idx,undef);
-	unless (exists $vprt->{data}{extra}) {
-		Carp::cluck "No extra data for index $idx";
-		$self->show;
-		$vprt->show;
-	}
-	my $hwa = $vprt->{data}{extra}{hwa} if exists $vprt->{data}{extra}{hwa};
-	my $vla = $vprt->{data}{extra}{vla} if exists $vprt->{data}{extra}{vla};
-	my $vid = $vprt->{data}{extra}{vid} if exists $vprt->{data}{extra}{vid};
 	$vprt = $self->getchild('Vprt',$idx,undef,[
 		[$nam,$net,$ipa],
 		['Point::Host',$self,$ipa],
-		['Port',$hwa,$vid,[
+		['Port',undef,undef,[
 			[$nam,$net,$ipa],
-			['Point::Host',$self,$hwa],
-			['Lan',$hwa,$hwa,[
+			['Point::Host',$self,undef],
+			['Lan',undef,undef,[
 				[$nam,$net,$ipa]]]]],
-		['Vlan',undef,$hwa,[
+		['Vlan',undef,undef,[
 			[$nam,$net,$ipa]]],
 		]);
 	my $vlan = $vprt->parent('Vlan');
-	$vlan->link($model,undef,[['Lan',$vprt->parent('Port')->parent('Lan'),undef]]);
+	my $plan = $vprt->parent('Port')->parent('Lan');
+	$vlan->link($model,undef,[['Lan',$plan,undef]]);
 	$net = $net->target;
 	# FIXME: there is a way to get the prefix as well
+	my ($sub,$pfx) = $net->subnetbyip($ipa);
+	warn "Can't find subnet of $net for address ",Item::showkey($ipa) unless $sub;
 	my $addr = $net->getchild('Address',$ipa,undef,[
 		['Point::Host',$self,$ipa],
-		['Subnet',undef,$ipa,[
-			[$nam,$net,$ipa],
+		['Subnet',$sub,undef,[
+			[$nam,$net,$pfx],
 			['Vlan',$vlan,undef]]],
 		]);
 	$addr->addrow($table,$row);
-	my $sub = $addr->parent('Subnet');
-	$sub->addrow($table,$row);
 }
 #package Point::Host;
 sub atEntry {
@@ -3079,22 +3047,13 @@ sub atEntry {
 	$self->link($model,undef,[[$nam,$net,undef]]);
 	$net = $self->parent($nam) unless $net;
 	my $vprt = $self->getchild('Vprt',$idx,undef);
-	unless (exists $vprt->{data}{extra}) {
-		Carp::cluck "No extra data for index $idx";
-		$self->show;
-		$vprt->show;
-	}
-	my $hwa = $vprt->{data}{extra}{hwa} if exists $vprt->{data}{extra}{hwa};
-	my $vla = $vprt->{data}{extra}{vla} if exists $vprt->{data}{extra}{vla};
-	my $vid = $vprt->{data}{extra}{vid} if exists $vprt->{data}{extra}{vid};
-	#printf STDERR "Using extra data for %s: %s,%s,%s\n", $vprt,Item::showkey($hwa),Item::showkey($vla),$vid;
 	$vprt = $self->getchild('Vprt',$idx,undef,[
-		['Port',$hwa,$vid,[
+		['Port',undef,undef,[
 			[$nam,$net,undef],
-			['Point::Host',$self,$hwa],
-			['Lan',$hwa,$hwa,[
+			['Point::Host',$self,undef],
+			['Lan',undef,undef,[
 				[$nam,$net,undef]]]]],
-		['Vlan',undef,$hwa,[
+		['Vlan',undef,undef,[
 			[$nam,$net,undef]]],
 		]);
 	my $vlan = $vprt->parent('Vlan');
@@ -3108,25 +3067,22 @@ sub atEntry {
 		['Point::Host',$host,$ipa],
 		['Port',$mac,undef,[
 			[$nam,$net,$ipa],
-			['Point::Host',$host,$mac],
-			['Lan',$plan,$mac,[
+			['Point::Host',$host,undef],
+			['Lan',$plan,undef,[
 				[$nam,$net,$ipa]]]]],
-		['Vlan',$vlan,$mac,[
+		['Vlan',$vlan,undef,[
 			[$nam,$net,$ipa]]],
 		]);
 	$net = $net->target;
 	my ($sub,$pfx) = $net->subnetbyip($ipa);
-	if ($sub) {
-		my $addr = $net->getchild('Address',$ipa,undef,[
-			['Point::Host',$host,$ipa],
-			['Subnet',$sub,$ipa,[
-				[$nam,$net,$pfx],[$nam,$net,$ipa],
-				['Vlan',$vlan,$pfx]]],
-			]);
-		$addr->addrow($table,$row);
-	} else {
-		warn "Can't find subnet of $net for address ",Item::showkey($ipa);
-	}
+	warn "Can't find subnet of $net for address ",Item::showkey($ipa) unless $sub;
+	my $addr = $net->getchild('Address',$ipa,undef,[
+		['Point::Host',$host,$ipa],
+		['Subnet',$sub,undef,[
+			[$nam,$net,$pfx],
+			['Vlan',$vlan,undef]]],
+		]);
+	$addr->addrow($table,$row);
 }
 #package Point::Host;
 sub ipNetToMediaEntry {
@@ -3149,21 +3105,13 @@ sub ipNetToMediaEntry {
 		$self->link($model,undef,[[$nam,$net,undef]]);
 		$net = $self->parent($nam) unless $net;
 		my $vprt = $self->getchild('Vprt',$idx,undef);
-		unless (exists $vprt->{data}{extra}) {
-			Carp::cluck "No extra data for index $idx";
-			$self->show;
-			$vprt->show;
-		}
-		my $hwa = $vprt->{data}{extra}{hwa} if exists $vprt->{data}{extra}{hwa};
-		my $vla = $vprt->{data}{extra}{vla} if exists $vprt->{data}{extra}{vla};
-		my $vid = $vprt->{data}{extra}{vid} if exists $vprt->{data}{extra}{vid};
 		$vprt = $self->getchild('Vprt',$idx,undef,[
-			['Port',$hwa,$vid,[
+			['Port',undef,undef,[
 				[$nam,$net,undef],
-				['Point::Host',$self,$hwa],
-				['Lan',$hwa,$hwa,[
+				['Point::Host',$self,undef],
+				['Lan',undef,undef,[
 					[$nam,$net,undef]]]]],
-			['Vlan',undef,$hwa,[
+			['Vlan',undef,undef,[
 				[$nam,$net,undef]]],
 			]);
 		my $vlan = $vprt->parent('Vlan');
@@ -3177,25 +3125,22 @@ sub ipNetToMediaEntry {
 			['Point::Host',$host,$ipa],
 			['Port',$mac,undef,[
 				[$nam,$net,$ipa],
-				['Point::Host',$host,$mac],
-				['Lan',$plan,$mac,[
+				['Point::Host',$host,undef],
+				['Lan',$plan,undef,[
 					[$nam,$net,$ipa]]]]],
-			['Vlan',$vlan,$mac,[
+			['Vlan',$vlan,undef,[
 				[$nam,$net,$ipa]]],
 			]);
 		$net = $net->target;
 		my ($sub,$pfx) = $net->subnetbyip($ipa);
-		if ($sub) {
-			my $addr = $net->getchild('Address',$ipa,undef,[
-				['Point::Host',$host,$ipa],
-				['Subnet',$sub,$ipa,[
-					[$nam,$net,$pfx],[$nam,$net,$ipa],
-					['Vlan',$vlan,$pfx]]],
-				]);
-			$addr->addrow($table,$row);
-		} else {
-			warn "Can't find subnet of $net for address ",Item::showkey($ipa);
-		}
+		warn "Can't find subnet of $net for address ",Item::showkey($ipa) unless $sub;
+		my $addr = $net->getchild('Address',$ipa,undef,[
+			['Point::Host',$host,$ipa],
+			['Subnet',$sub,undef,[
+				[$nam,$net,$pfx],
+				['Vlan',$vlan,undef]]],
+			]);
+		$addr->addrow($table,$row);
 }
 #package Point::Host;
 sub ipNetToPhysicalEntry {
@@ -3221,21 +3166,13 @@ sub ipNetToPhysicalEntry {
 	$self->link($model,undef,[[$nam,$net,undef]]);
 	$net = $self->parent($nam) unless $net;
 	my $vprt = $self->getchild('Vprt',$idx,undef);
-	unless (exists $vprt->{data}{extra}) {
-		Carp::cluck "No extra data for index $idx";
-		$self->show;
-		$vprt->show;
-	}
-	my $hwa = $vprt->{data}{extra}{hwa} if exists $vprt->{data}{extra}{hwa};
-	my $vla = $vprt->{data}{extra}{vla} if exists $vprt->{data}{extra}{vla};
-	my $vid = $vprt->{data}{extra}{vid} if exists $vprt->{data}{extra}{vid};
 	$vprt = $self->getchild('Vprt',$idx,undef,[
-		['Port',$hwa,$vid,[
+		['Port',undef,undef,[
 			[$nam,$net,undef],
-			['Point::Host',$self,$hwa],
-			['Lan',$hwa,$hwa,[
+			['Point::Host',$self,undef],
+			['Lan',undef,undef,[
 				[$nam,$net,undef]]]]],
-		['Vlan',undef,$hwa,[
+		['Vlan',undef,undef,[
 			[$nam,$net,undef]]],
 		]);
 	my $vlan = $vprt->parent('Vlan');
@@ -3249,25 +3186,22 @@ sub ipNetToPhysicalEntry {
 		['Point::Host',$host,$ipa],
 		['Port',$mac,undef,[
 			[$nam,$net,$ipa],
-			['Point::Host',$host,$mac],
-			['Lan',$plan,$mac,[
+			['Point::Host',$host,undef],
+			['Lan',$plan,undef,[
 				[$nam,$net,$ipa]]]]],
-		['Vlan',$vlan,$mac,[
+		['Vlan',$vlan,undef,[
 			[$nam,$net,$ipa]]],
 		]);
 	$net = $net->target;
 	my ($sub,$pfx) = $net->subnetbyip($ipa);
-	if ($sub) {
-		my $addr = $net->getchild('Address',$ipa,undef,[
-			['Point::Host',$host,$ipa],
-			['Subnet',$sub,$ipa,[
-				[$nam,$net,$pfx],[$nam,$net,$ipa],
-				['Vlan',$vlan,$pfx]]],
-			]);
-		$addr->addrow($table,$row);
-	} else {
-		warn "Can't find subnet of $net for address ",Item::showkey($ipa);
-	}
+	warn "Can't find subnet of $net for address ",Item::showkey($ipa) unless $sub;
+	my $addr = $net->getchild('Address',$ipa,undef,[
+		['Point::Host',$host,$ipa],
+		['Subnet',$sub,undef,[
+			[$nam,$net,$pfx],
+			['Vlan',$vlan,undef]]],
+		]);
+	$addr->addrow($table,$row);
 }
 #package Point::Host;
 sub ipRouteEntry {
@@ -3289,22 +3223,13 @@ sub ipRouteEntry {
 		$net = $self->parent($nam) unless $net;
 		last unless $idx;
 		my $vprt = $self->getchild('Vprt',$idx,undef);
-		unless (exists $vprt->{data}{extra}) {
-			Carp::cluck "No extra data for index $idx";
-			$self->show;
-			$vprt->show;
-		}
-		my $hwa = $vprt->{data}{extra}{hwa} if exists $vprt->{data}{extra}{hwa};
-		my $vla = $vprt->{data}{extra}{vla} if exists $vprt->{data}{extra}{vla};
-		my $vid = $vprt->{data}{extra}{vid} if exists $vprt->{data}{extra}{vid};
-		#printf STDERR "Using extra data for %s: %s,%s,%s\n", $vprt,Item::showkey($hwa),Item::showkey($vla),$vid;
 		$vprt = $self->getchild('Vprt',$idx,undef,[
-			['Port',$hwa,$vid,[
+			['Port',undef,undef,[
 				[$nam,$net,undef],
-				['Point::Host',$self,$hwa],
-				['Lan',$hwa,$hwa,[
+				['Point::Host',$self,undef],
+				['Lan',undef,undef,[
 					[$nam,$net,undef]]]]],
-			['Vlan',undef,$hwa,[
+			['Vlan',undef,undef,[
 				[$nam,$net,undef]]],
 			]);
 		my $vlan = $vprt->parent('Vlan');
@@ -3313,7 +3238,7 @@ sub ipRouteEntry {
 		$net = $net->target;
 		last if unpack('C',substr($pfx,4,1)) == 32;
 		my $sub = $net->getchild('Subnet',$pfx,undef,[
-			['Vlan',$vlan,$pfx],
+			['Vlan',$vlan,undef],
 			]);
 		last;
 	}
@@ -3358,15 +3283,13 @@ sub ipRouteEntry {
 		$net = $self->parent($nam) unless $net;
 		my $host = $net->getchild('Point::Host',$ipa);
 		my ($sub,$pfx) = $net->subnetbyip($ipa);
-		if ($sub) {
-			my $addr = $net->getchild('Address',$ipa,undef,[
-				['Point::Host',$host,$ipa],
-				['Subnet',$sub,$ipa,[
-					[$nam,$net,$ipa]]],
-				]);
-		} else {
-			warn "Can't find subnet of $net for address ",Item::showkey($ipa);
-		}
+		warn "Can't find subnet of $net for address ",Item::showkey($ipa) unless $sub;
+		my $addr = $net->getchild('Address',$ipa,undef,[
+			['Point::Host',$host,$ipa],
+			['Subnet',$sub,undef,[
+				[$nam,$net,$pfx],
+				['Vlan',undef,undef]]],
+			]);
 		last;
 	}
 }
@@ -3390,22 +3313,13 @@ sub ipCidrRouteEntry {
 		$net = $self->parent($nam) unless $net;
 		last unless $idx;
 		my $vprt = $self->getchild('Vprt',$idx,undef);
-		unless (exists $vprt->{data}{extra}) {
-			Carp::cluck "No extra data for index $idx";
-			$self->show;
-			$vprt->show;
-		}
-		my $hwa = $vprt->{data}{extra}{hwa} if exists $vprt->{data}{extra}{hwa};
-		my $vla = $vprt->{data}{extra}{vla} if exists $vprt->{data}{extra}{vla};
-		my $vid = $vprt->{data}{extra}{vid} if exists $vprt->{data}{extra}{vid};
-		#printf STDERR "Using extra data for %s: %s,%s,%s\n", $vprt,Item::showkey($hwa),Item::showkey($vla),$vid;
 		$vprt = $self->getchild('Vprt',$idx,undef,[
-			['Port',$hwa,$vid,[
+			['Port',undef,undef,[
 				[$nam,$net,undef],
-				['Point::Host',$self,$hwa],
-				['Lan',$hwa,$hwa,[
+				['Point::Host',$self,undef],
+				['Lan',undef,undef,[
 					[$nam,$net,undef]]]]],
-			['Vlan',undef,$hwa,[
+			['Vlan',undef,undef,[
 				[$nam,$net,undef]]],
 			]);
 		my $vlan = $vprt->parent('Vlan');
@@ -3414,7 +3328,7 @@ sub ipCidrRouteEntry {
 		last if unpack('C',substr($pfx,4,1)) == 32;
 		$net = $net->target;
 		my $sub = $net->getchild('Subnet',$pfx,undef,[
-			['Vlan',$vlan,$pfx],
+			['Vlan',$vlan,undef],
 			]);
 		last;
 	}
@@ -3459,15 +3373,13 @@ sub ipCidrRouteEntry {
 		$net = $self->parent($nam) unless $net;
 		my $host = $net->getchild('Point::Host',$ipa);
 		my ($sub,$pfx) = $net->subnetbyip($ipa);
-		if ($sub) {
-			my $addr = $net->getchild('Address',$ipa,undef,[
-				['Point::Host',$host,$ipa],
-				['Subnet',$sub,$ipa,[
-					[$nam,$net,$ipa]]],
-				]);
-		} else {
-			warn "Can't find subnet of $net for address ",Item::showkey($ipa);
-		}
+		warn "Can't find subnet of $net for address ",Item::showkey($ipa) unless $sub;
+		my $addr = $net->getchild('Address',$ipa,undef,[
+			['Point::Host',$host,$ipa],
+			['Subnet',$sub,undef,[
+				[$nam,$net,$pfx],
+				['Vlan',undef,undef]]],
+			]);
 		last;
 	}
 }
@@ -3492,22 +3404,13 @@ sub inetCidrRouteEntry {
 		$net = $self->parent($nam) unless $net;
 		last unless $idx;
 		my $vprt = $self->getchild('Vprt',$idx,undef);
-		unless (exists $vprt->{data}{extra}) {
-			Carp::cluck "No extra data for index $idx";
-			$self->show;
-			$vprt->show;
-		}
-		my $hwa = $vprt->{data}{extra}{hwa} if exists $vprt->{data}{extra}{hwa};
-		my $vla = $vprt->{data}{extra}{vla} if exists $vprt->{data}{extra}{vla};
-		my $vid = $vprt->{data}{extra}{vid} if exists $vprt->{data}{extra}{vid};
-		#printf STDERR "Using extra data for %s: %s,%s,%s\n", $vprt,Item::showkey($hwa),Item::showkey($vla),$vid;
 		$vprt = $self->getchild('Vprt',$idx,undef,[
-			['Port',$hwa,$vid,[
+			['Port',undef,undef,[
 				[$nam,$net,undef],
-				['Point::Host',$self,$hwa],
-				['Lan',$hwa,$hwa,[
+				['Point::Host',$self,undef],
+				['Lan',undef,undef,[
 					[$nam,$net,undef]]]]],
-			['Vlan',undef,$hwa,[
+			['Vlan',undef,undef,[
 				[$nam,$net,undef]]],
 			]);
 		my $vlan = $vprt->parent('Vlan');
@@ -3516,7 +3419,7 @@ sub inetCidrRouteEntry {
 		last if unpack('C',substr($pfx,4,1)) == 32;
 		$net = $net->target;
 		my $sub = $net->getchild('Subnet',$pfx,undef,[
-			['Vlan',$vlan,$pfx],
+			['Vlan',$vlan,undef],
 			]);
 		last;
 	}
@@ -3564,15 +3467,13 @@ sub inetCidrRouteEntry {
 		$net = $self->parent($nam) unless $net;
 		my $host = $net->getchild('Point::Host',$ipa);
 		my ($sub,$pfx) = $net->subnetbyip($ipa);
-		if ($sub) {
-			my $addr = $net->getchild('Address',$ipa,undef,[
-				['Point::Host',$host,$ipa],
-				['Subnet',$sub,$ipa,[
-					[$nam,$net,$ipa]]],
-				]);
-		} else {
-			warn "Can't find subnet of $net for address ",Item::showkey($ipa);
-		}
+		warn "Can't find subnet of $net for address ",Item::showkey($ipa) unless $sub;
+		my $addr = $net->getchild('Address',$ipa,undef,[
+			['Point::Host',$host,$ipa],
+			['Subnet',$sub,undef,[
+				[$nam,$net,$pfx],
+				['Vlan',undef,undef]]],
+			]);
 		last;
 	}
 }
@@ -3610,12 +3511,7 @@ sub lldpPortConfigEntry {
 	return unless $idx;
 	my $vprt = $self->getchild('Vprt',$idx,undef);
 	return unless $vprt;
-	my $hwa = $vprt->{data}{extra}{hwa} if exists $vprt->{data}{extra}{hwa};
-	my $vla = $vprt->{data}{extra}{vla} if exists $vprt->{data}{extra}{vla};
-	my $vid = $vprt->{data}{extra}{vid} if exists $vprt->{data}{extra}{vid};
 	$vprt->addrow($table,$row);
-	my $port = $vprt->parent('Port') if defined $vid and $vid eq '';
-	$port->addrow($table,$row) if $port;
 }
 #package Point::Host;
 sub lldpStatsTxPortEntry {
@@ -3629,12 +3525,7 @@ sub lldpStatsTxPortEntry {
 	return unless $idx;
 	my $vprt = $self->getchild('Vprt',$idx,undef);
 	return unless $vprt;
-	my $hwa = $vprt->{data}{extra}{hwa} if exists $vprt->{data}{extra}{hwa};
-	my $vla = $vprt->{data}{extra}{vla} if exists $vprt->{data}{extra}{vla};
-	my $vid = $vprt->{data}{extra}{vid} if exists $vprt->{data}{extra}{vid};
 	$vprt->addrow($table,$row);
-	my $port = $vprt->parent('Port') if defined $vid and $vid eq '';
-	$port->addrow($table,$row) if $port;
 }
 #package Point::Host;
 sub lldpStatsRxPortEntry {
@@ -3648,12 +3539,7 @@ sub lldpStatsRxPortEntry {
 	return unless $idx;
 	my $vprt = $self->getchild('Vprt',$idx,undef);
 	return unless $vprt;
-	my $hwa = $vprt->{data}{extra}{hwa} if exists $vprt->{data}{extra}{hwa};
-	my $vla = $vprt->{data}{extra}{vla} if exists $vprt->{data}{extra}{vla};
-	my $vid = $vprt->{data}{extra}{vid} if exists $vprt->{data}{extra}{vid};
 	$vprt->addrow($table,$row);
-	my $port = $vprt->parent('Port') if defined $vid and $vid eq '';
-	$port->addrow($table,$row) if $port;
 }
 #package Point::Host;
 sub lldpLocPortEntry {
@@ -3668,12 +3554,7 @@ sub lldpLocPortEntry {
 	my $hwa = Item::makekey($row->{lldpLocPortIdSubtype})
 		if $row->{lldpLocPortIdSubtype} eq 'macAddress(3)';
 	my $vprt = $self->getchild('Vprt',$idx,undef);
-	#my $hwa = $vprt->{data}{extra}{hwa} if exists $vprt->{data}{extra}{hwa};
-	my $vla = $vprt->{data}{extra}{vla} if exists $vprt->{data}{extra}{vla};
-	my $vid = $vprt->{data}{extra}{vid} if exists $vprt->{data}{extra}{vid};
 	$vprt->addrow($table,$row);
-	my $port = $vprt->parent('Port') if defined $vid and $vid eq '';
-	$port->addrow($table,$row) if $port;
 }
 #package Point::Host;
 sub lldpLocManAddrEntry {
@@ -3702,41 +3583,31 @@ sub lldpLocManAddrEntry {
 	$self->link($model,undef,[[$nam,$net,$ipa]]);
 	$net = $self->parent($nam) unless $net;
 	my $vprt = $self->getchild('Vprt',$idx,undef);
-	unless (exists $vprt->{data}{extra}) {
-		Carp::cluck "No extra data for index $idx";
-		$self->show;
-		$vprt->show;
-	}
-	my $hwa = $vprt->{data}{extra}{hwa} if exists $vprt->{data}{extra}{hwa};
-	my $vla = $vprt->{data}{extra}{vla} if exists $vprt->{data}{extra}{vla};
-	my $vid = $vprt->{data}{extra}{vid} if exists $vprt->{data}{extra}{vid};
-	#printf STDERR "Using extra data for %s: %s,%s,%s\n", $vprt,Item::showkey($hwa),Item::showkey($vla),$vid;
 	my $addr;
 	$vprt = $self->getchild('Vprt',$idx,undef,[
-		['Port',$hwa,$vid,[
+		['Port',undef,undef,[
 			[$nam,$net,$ipa],
-			['Point::Host',$self,$hwa],
-			['Lan',$hwa,$hwa,[
+			['Point::Host',$self,undef],
+			['Lan',undef,undef,[
 				[$nam,$net,$ipa]]]]],
-		['Vlan',undef,$hwa,[
+		['Vlan',undef,undef,[
 			[$nam,$net,$ipa]]],
 		]);
 	my $vlan = $vprt->parent('Vlan');
 	my $plan = $vprt->parent('Port')->parent('Lan');
 	$vlan->link($model,undef,[['Lan',$plan,undef]]);
 	$net = $net->target;
+	my ($sub,$pfx) = $net->subnetbyip($ipa);
+	warn "Can't find subnet of $net for address ",Item::showkey($ipa) unless $sub;
 	$addr = $net->getchild('Address',$ipa,undef,[
 		['Point::Host',$self,$ipa],
-		['Subnet',undef,$ipa,[
-			[$nam,$net,$ipa],
+		['Subnet',$sub,undef,[
+			[$nam,$net,$pfx],
 			['Vlan',$vlan,undef]]],
 		]);
-	$vprt = $vprt->target;
-	my $port = $vprt->parent('Port') if defined $vid and $vid eq '';
-	$vprt->addrow($table,$row);
-	$self->addrow($table,$row);
 	$addr->addrow($table,$row);
-	$port->addrow($table,$row) if $port;
+	$vprt->target->addrow($table,$row);
+	$self->target->addrow($table,$row);
 }
 
 # -------------------------------------
@@ -3922,6 +3793,18 @@ sub mergefrom {
 		Carp::confess;
 	}
 	$self->SUPER::mergefrom(@_);
+}
+#package Vprt;
+sub addrow {
+	my $self = shift;
+	my ($table,$row) = @_;
+	$self->SUPER::addrow(@_);
+	my $vla = $self->{key}{n}[0];
+	if (defined $vla and length($vla) == 6) {
+		if (my $port = $self->parent('Port')) {
+			$port->addrow($table,$row);
+		}
+	}
 }
 
 # -------------------------------------
