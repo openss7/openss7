@@ -1052,58 +1052,73 @@ use threads; use threads::shared; use Thread; use Thread::Queue;
 use SNMP; use Net::IP;
 # ------------------------------------------
 #package Model::SNMP;
-our $tables = [ qw/
-	systemScalars
-	sysORTable
-	ifTable
-	ipAddrTable
-	ipAddressTable
-	ipRouteTable
-	atTable
-	ipNetToPhysicalTable
-	lldpPortConfigTable
-	lldpConfigManAddrTable
-	lldpStatsTxPortTable
-	lldpStatsRxPortTable
-	lldpLocPortTable
-	lldpLocManAddrTable
-	lldpRemTable
-	lldpRemManAddrTable
-	lldpRemUnknownTLVTable
-	lldpRemOrgDefInfoTable
-	lldpXdot1ConfigPortVlanTable
-	lldpXdot1ConfigVlanNameTable
-	lldpXdot1ConfigProtoVlanTable
-	lldpXdot1ConfigProtocolTable
-	lldpXdot1LocTable
-	lldpXdot1LocProtoVlanTable
-	lldpXdot1LocVlanNameTable
-	lldpXdot1LocProtocolTable
-	lldpXdot1RemTable
-	lldpXdot1RemProtoVlanTable
-	lldpXdot1RemVlanNameTable
-	lldpXdot1RemProtocolTable
-	lldpXdot3PortConfigTable
-	lldpXdot3LocPortTable
-	lldpXdot3LocPowerTable
-	lldpXdot3LocLinkAggTable
-	lldpXdot3LocMaxFrameSizeTable
-	lldpXdot3RemPortTable
-	lldpXdot3RemPowerTable
-	lldpXdot3RemLinkAggTable
-	lldpXdot3RemMaxFrameSizeTable
-	lldpXMedPortConfigTable
-	lldpXMedLocMediaPolicyTable
-	lldpXMedLocLocationTable
-	lldpXMedLocXPoEPSEPortTable
-	lldpXMedRemCapabilitiesTable
-	lldpXMedRemMediaPolicyTable
-	lldpXMedRemInventoryTable
-	lldpXMedRemLocationTable
-	lldpXMedRemXPoETable
-	lldpXMedRemXPoEPSETable
-	lldpXMedRemXPoEPDTable
-/];
+our $tables = [
+	'systemBulk',
+#	'systemScalars',
+#	'sysORTable',
+	'interfacesBulk',
+	'ifMIBObjectsBulk',
+#	'ifTable',
+	'ipBulk',
+#	'ipAddrTable',
+#	'ipAddressTable',
+#	'ipRouteTable',
+	'atBulk',
+#	'atTable',
+#	'ipNetToPhysicalTable',
+	'lldpObjectsBulk',
+#	'lldpLocalSystemDataScalars',
+#	'lldpConfigurationScalars',
+#	'lldpPortConfigTable',
+#	'lldpConfigManAddrTable',
+#	'lldpStatsTxPortTable',
+#	'lldpStatsRxPortTable',
+#	'lldpLocPortTable',
+#	'lldpLocManAddrTable',
+#	'lldpRemTable',
+#	'lldpRemManAddrTable',
+#	'lldpRemUnknownTLVTable',
+#	'lldpRemOrgDefInfoTable',
+
+#	'lldpXdot1ObjectsBulk',
+#	'lldpXdot1ConfigPortVlanTable',
+#	'lldpXdot1ConfigVlanNameTable',
+#	'lldpXdot1ConfigProtoVlanTable',
+#	'lldpXdot1ConfigProtocolTable',
+#	'lldpXdot1LocTable',
+#	'lldpXdot1LocProtoVlanTable',
+#	'lldpXdot1LocVlanNameTable',
+#	'lldpXdot1LocProtocolTable',
+#	'lldpXdot1RemTable',
+#	'lldpXdot1RemProtoVlanTable',
+#	'lldpXdot1RemVlanNameTable',
+#	'lldpXdot1RemProtocolTable',
+
+#	'lldpXdot3ObjectsBulk',
+#	'lldpXdot3PortConfigTable',
+#	'lldpXdot3LocPortTable',
+#	'lldpXdot3LocPowerTable',
+#	'lldpXdot3LocLinkAggTable',
+#	'lldpXdot3LocMaxFrameSizeTable',
+#	'lldpXdot3RemPortTable',
+#	'lldpXdot3RemPowerTable',
+#	'lldpXdot3RemLinkAggTable',
+#	'lldpXdot3RemMaxFrameSizeTable',
+
+#	'lldpXMedObjectsBulk',
+#	'lldpXMedLocalDataScalars',
+#	'lldpXMedPortConfigTable',
+#	'lldpXMedLocMediaPolicyTable',
+#	'lldpXMedLocLocationTable',
+#	'lldpXMedLocXPoEPSEPortTable',
+#	'lldpXMedRemCapabilitiesTable',
+#	'lldpXMedRemMediaPolicyTable',
+#	'lldpXMedRemInventoryTable',
+#	'lldpXMedRemLocationTable',
+#	'lldpXMedRemXPoETable',
+#	'lldpXMedRemXPoEPSETable',
+#	'lldpXMedRemXPoEPDTable',
+];
 #package Model::SNMP;
 sub init {
 	my $self = shift;
@@ -1147,7 +1162,7 @@ sub worker_thread {
 			my $key = $table;
 			if ($key =~ /Table$/) {
 				$oid = sub_dot(SNMP::translateObj($key));
-				$result = $session->get_table(-baseoid=>$oid);
+				$result = $session->get_table(-baseoid=>$oid,-maxrepetitions=>4);
 				$error = $session->error() unless defined $result;
 				unless (defined $result) {
 					if ($error =~ /No response/i) { last }
@@ -1165,10 +1180,54 @@ sub worker_thread {
 				}
 				$wq->enqueue([$item,$table,$result,$error]);
 			}
+			elsif ($key =~ /Bulk$/) {
+				$key =~ s/Bulk$//;
+				$oid = sub_dot(SNMP::translateObj($key));
+				$result = $session->get_table(-baseoid=>$oid,-maxrepetitions=>4);
+				$error = $session->error() unless defined $result;
+				unless (defined $result) {
+					if ($error =~ /No response/) { last }
+				}
+				$wq->enqueue([$item,$table,$result,$error]);
+			}
 		}
 	} else {
 		$wq->enqueue([$item,undef,$error]);
 	}
+}
+#package Model::SNMP;
+sub lexical_oids {
+	my (@indexes) = @_;
+	my %tuples = ();
+	foreach my $index (@indexes) {
+		$tuples{$index} = pack('S*',split(/\./,$index));
+	}
+	my @sort = sort {$tuples{$a} cmp $tuples{$b}} keys %tuples;
+	return @sort;
+}
+#package Model::SNMP;
+sub lexical_sort {
+	my (@tables) = @_;
+	my %tuples = ();
+	foreach my $table (@tables) {
+		next if $table eq 'extra';
+		my $label = $table;
+		if ($label =~ s/Data$//) { }
+		elsif ($label =~ s/Scalars$//) { }
+		elsif ($label =~ s/Bulk$//) { }
+		my $mib = $SNMP::MIB{$label};
+		next unless $mib;
+		my $oid = $mib->{objectID};
+		unless (defined $oid) {
+			Carp::cluck "Undefined objectID for label '$label' of table '$table'";
+			next;
+		}
+		$oid =~ s/^\.//;
+		my $key = pack('S*',split(/\./,$oid));
+		$tuples{$table} = $key;
+	}
+	my @sort = sort {$tuples{$a} cmp $tuples{$b}} keys %tuples;
+	return @sort;
 }
 #package Model::SNMP;
 sub snmp_process {
@@ -1182,9 +1241,14 @@ sub snmp_process {
 	my $xlated;
 	if ($table =~ /Scalars$/) {
 		$xlated = xlate_scalars(@$item);
-	} else {
+	}
+	elsif ($table =~ /Table$/) {
 		$xlated = xlate_table(@$item);
 	}
+	elsif ($table =~ /Bulk$/) {
+		$xlated = xlate_bulk(@$item);
+	}
+	return unless $xlated;
 	my ($hkey,$type,$net) = $self->keytype($snmpargs->{'-hostname'});
 	my $name = netname($type);
 	if ($net = $self->{net}{$type}) {
@@ -1194,15 +1258,37 @@ sub snmp_process {
 		return;
 	}
 	my $host = $net->getchild('Point::Host',$hkey,undef);
-	if ($host->can($table)) {
-		#warn "Host ".Item::showkey($hkey)." processing $table";
-		#printf STDERR "Processing %s %s...\n",Item::showkey($hkey),$table;
-		$host->$table($self,$snmpargs,$table,$xlated,$error,$hkey,$type,$net,$name);
-		#printf STDERR "Processing %s %s... ...done\n",Item::showkey($hkey),$table;
-		Viewer->refresh();
-	} else {
-		#warn "Host ".Item::showkey($hkey)." cannot process $table";
+	foreach my $group (lexical_sort(keys %$xlated)) {
+		my $entries = $group;
+		if ($entries =~ s/Scalars$/Data/) {}
+		elsif ($entries =~ s/Table$/Entry/) {}
+
+		if ($host->can($group)) {
+			warn "Host ".Item::showkey($hkey)." processing $table ($group)";
+			$host->$group($self,$snmpargs,$group,$xlated->{$group},$error,$hkey,$type,$net,$name);
+		} elsif ($host->can($entries)) {
+			warn "Host ".Item::showkey($hkey)." processing $table ($entries)";
+			if ($group =~ /Scalars$/) {
+				$host->addrow($group,$xlated->{$group}{0});
+			} elsif ($group =~ /Table$/) {
+				$host->addtab($group,$xlated->{$group});
+			}
+			foreach my $index (lexical_oids(keys %{$xlated->{$group}})) {
+				$host->$entries($index,$xlated->{$group}{$index},$self,$snmpargs,$group,$xlated->{$group},$error,$hkey,$type,$net,$name);
+			}
+		} else {
+			if ($group =~ /Scalars$/) {
+				warn "Host ".Item::showkey($hkey)." including $table ($group)";
+				$host->addrow($group,$xlated->{$group}{0});
+			} elsif ($group =~ /Table$/) {
+				warn "Host ".Item::showkey($hkey)." including $table ($group)";
+				$host->addtab($group,$xlated->{$group});
+			} else {
+				warn "Host ".Item::showkey($hkey)." cannot process $table ($group)";
+			}
+		}
 	}
+	Viewer->refresh();
 	#Model::walktree($host);
 }
 #package Model::SNMP;
@@ -1252,8 +1338,192 @@ sub add_dot {
 	return ".$oid";
 }
 #package Model::SNMP;
+sub xlate_bulk {
+	my ($snmpargs,$bulk,$result,$error) = @_;
+	if (0) {
+		print STDERR "\nBulk $bulk raw result:\n";
+		print STDERR Dumper($result),"\n";
+		foreach my $key (keys %$result) {
+			my $tag = SNMP::translateObj(add_dot($key));
+			my ($label,$index) = split(/\./,$tag,2);
+			my $entry = '(unknown)';
+			if (my $mib = $SNMP::MIB{$label}) {
+				if (my $parent = $mib->{parent}) {
+					$entry = $parent->{label};
+				}
+			}
+			print STDERR "$key --> $entry\::$label $index\n";
+		}
+		print STDERR "\n";
+	}
+	return undef unless defined $result;
+	my $indexes = {};
+	my $xlate = {};
+	foreach my $key (keys %$result) {
+		my $val = $result->{$key};
+		my $tag = SNMP::translateObj(add_dot($key));
+		my ($label,$index) = split(/\./,$tag,2);
+		($label,$index) = ('sysUpTime',0) if $label eq 'sysUpTimeInstance';
+		Carp::cluck "Couldn't find index in $key, label is $label" unless length($index);
+		next unless length($index);
+		my $mib = $SNMP::MIB{$label};
+		my $entry = $mib->{parent};
+		my $table;
+		if ($entry->{indexes} and scalar(@{$entry->{indexes}}) > 0) {
+			$table = $entry->{parent}{label};
+			$indexes->{$table} = [ @{$entry->{indexes}} ] unless exists $indexes->{$table};
+		} else {
+			$table = $entry->{label}.'Scalars';
+			$indexes->{$table} = [] unless exists $indexes->{$table};
+		}
+		if ($val =~ /^0x([0-9a-fA-F]{2})+$/) {
+			$val =~ s/^0x//;
+			$val = pack('H*',$val);
+			$val = join(':',map {sprintf('%02x',$_)} unpack('C*',$val));
+		}
+		if ($mib->{enums}) {
+			foreach my $k (keys %{$mib->{enums}}) {
+				$val = "$k($val)" if $mib->{enums}{$k} eq $val;
+			}
+		}
+		if ($mib->{syntax} eq 'InetAddress' and $val =~ /:/) {
+			if ($val =~ /^[0-9a-fA-F]{2}(:[0-9a-fA-F]{2}){3}$/) {
+				$val =~ s/://g;
+				$val = join('.',unpack('C*',pack('H*',$val)));
+			} else {
+				while ($val =~ s/00:/:/) { }
+				while ($val =~ s/:::+/::/) { }
+				$val =~ s/^:([^:])/::$1/;
+				$val =~ s/^0+//;
+				while ($val =~ s/:0/:/) { }
+			}
+		}
+		if ($mib->{type} =~ /OBJECTID|OPAQUE/) {
+			$val = SNMP::translateObj(add_dot($val));
+		}
+		$xlate->{$table}{$index}{$label} = $val;
+	}
+	foreach my $table (keys %$xlate) {
+		my @indexes = @{$indexes->{$table}};
+		foreach my $index (keys %{$xlate->{$table}}) {
+			my @inds = split(/\./,$index);
+			foreach my $i (@indexes) {
+				my $mib = $SNMP::MIB{$i};
+				next if exists $xlate->{$table}{$index}{$i};
+				if ($mib->{type} =~ /INTEGER|UNSIGNED|COUNTER|GAUGE|TICKS/) {
+					my $val = shift @inds;
+					if (defined $val) {
+						if (my $enums = $SNMP::MIB{$i}{enums}) {
+							foreach my $k (keys %$enums) {
+								$val = "$k($val)" if $enums->{$k} eq $val;
+							}
+						}
+						$xlate->{$table}{$index}{$i} = $val;
+					} else {
+						Carp::carp "Ran out of indexes in [",join('.',@inds),"] looking for ",$mib->{type};
+						Carp::cluck "processing index '$index' of table '$table' for instance $i";
+						print STDERR "$table raw result was:\n";
+						print STDERR Dumper($result),"\n";
+						print STDERR "$table translated result is currently:\n";
+						print STDERR Dumper($xlate),"\n";
+						@inds = ();
+						#$xlate->{$table}{$index}{$i} = undef;
+					}
+				} elsif ($mib->{type} =~ /OCTETSTR/) {
+					my @vals = ();
+					my $len = shift @inds;
+					if (defined $len and $len <= scalar(@inds)) {
+						while ($len>0) { push @vals, shift @inds; $len-- } 
+						my $val = join(':',map {sprintf('%02x',$_)} @vals);
+						if ($val =~ /^0x([0-9a-fA-F]{2})+$/) {
+							$val =~ s/^0x//;
+							$val = pack('H*',$val);
+							$val = join(':',map {sprintf('%02x',$_)} unpack('C*',$val));
+						}
+						if ($mib->{syntax} eq 'InetAddress' and $val =~ /:/) {
+							if ($val =~ /^[0-9a-fA-F]{2}(:[0-9a-fA-F]{2}){3}$/) {
+								$val =~ s/://g;
+								$val = join('.',unpack('C*',pack('H*',$val)));
+							} else {
+								while ($val =~ s/00:/:/) { }
+								while ($val =~ s/:::+/::/) { }
+								$val =~ s/^:([^:])/::$1/;
+								$val =~ s/^0+//;
+								while ($val =~ s/:0/:/) { }
+							}
+						}
+						$xlate->{$table}{$index}{$i} = $val;
+					} else {
+						Carp::carp "Ran out of indexes in [",join('.',@inds),"] looking for ",$mib->{type};
+						Carp::cluck "processing index '$index' of table '$table' for instance $i";
+						print STDERR "$table raw result was:\n";
+						print STDERR Dumper($result),"\n";
+						print STDERR "$table translated result is currently:\n";
+						print STDERR Dumper($xlate),"\n";
+						@inds = ();
+						#$xlate->{$table}{$index}{$i} = undef;
+					}
+				} elsif ($mib->{type} =~ /OBJECTID|OPAQUE/) {
+					my @vals = ();
+					my $len = shift @inds;
+					if (defined $len and $len <= scalar(@inds)) {
+						while ($len>0) { push @vals, shift @inds; $len-- }
+						my $val = join('.',@vals);
+						$val = SNMP::translateObj(add_dot($val));
+						$xlate->{$table}{$index}{$i} = join('.',@vals);
+					} else {
+						Carp::carp "Ran out of indexes in [",join('.',@inds),"] looking for ",$mib->{type};
+						Carp::cluck "processing index '$index' of table '$table' for instance $i";
+						print STDERR "$table raw result was:\n";
+						print STDERR Dumper($result),"\n";
+						print STDERR "$table translated result is currently:\n";
+						print STDERR Dumper($xlate),"\n";
+						@inds = ();
+						#$xlate->{$table}{$index}{$i} = undef;
+					}
+				} elsif ($mib->{type} =~ /IPADDR|NETADDR/) {
+					my @vals = ();
+					my $len = 4;
+					if ($len <= scalar(@inds)) {
+						while ($len>0) { push @vals, shift @inds; $len-- }
+						$xlate->{$table}{$index}{$i} = join('.',@vals);
+					} else {
+						Carp::carp "Ran out of indexes in [",join('.',@inds),"] looking for ",$mib->{type};
+						Carp::cluck "processing index '$index' of table '$table' for instance $i";
+						print STDERR "$table raw result was:\n";
+						print STDERR Dumper($result),"\n";
+						print STDERR "$table translated result is currently:\n";
+						print STDERR Dumper($xlate),"\n";
+						@inds = ();
+						#$xlate->{$table}{$index}{$i} = undef;
+					}
+				} else {
+					Carp::cluck "Unhandled index type for $i is $mib->{type}\n";
+				}
+			}
+		}
+	}
+	return $xlate;
+}
+#package Model::SNMP;
 sub xlate_table {
 	my ($snmpargs,$table,$result,$error) = @_;
+	if (0) {
+		print STDERR "\nTable $table raw result:\n";
+		print STDERR Dumper($result),"\n";
+		foreach my $key (keys %$result) {
+			my $tag = SNMP::translateObj(add_dot($key));
+			my ($label,$index) = split(/\./,$tag,2);
+			my $entry = '(unknown)';
+			if (my $mib = $SNMP::MIB{$label}) {
+				if (my $parent = $mib->{parent}) {
+					$entry = $parent->{label};
+				}
+			}
+			print STDERR "$key --> $entry\::$label $index\n";
+		}
+		print STDERR "\n";
+	}
 	return undef unless defined $result;
 	my $xlate = {};
 	foreach my $key (keys %$result) {
@@ -1286,15 +1556,15 @@ sub xlate_table {
 		if ($mib->{type} =~ /OBJECTID|OPAQUE/) {
 			$val = SNMP::translateObj(add_dot($val));
 		}
-		$xlate->{$index}{$label} = $val;
+		$xlate->{$table}{$index}{$label} = $val;
 	}
 	my $entry = $SNMP::MIB{$table}{children}[0];
 	my @indexes = @{$entry->{indexes}};
-	foreach my $index (keys %$xlate) {
+	foreach my $index (keys %{$xlate->{$table}}) {
 		my @inds = split(/\./,$index);
 		foreach my $i (@indexes) {
 			my $mib = $SNMP::MIB{$i};
-			next if exists $xlate->{$index}{$i};
+			next if exists $xlate->{$table}{$index}{$i};
 			if ($mib->{type} =~ /INTEGER|UNSIGNED|COUNTER|GAUGE|TICKS/) {
 				my $val = shift @inds;
 				if (defined $val) {
@@ -1303,11 +1573,16 @@ sub xlate_table {
 							$val = "$k($val)" if $enums->{$k} eq $val;
 						}
 					}
-					$xlate->{$index}{$i} = $val;
+					$xlate->{$table}{$index}{$i} = $val;
 				} else {
-					Carp::cluck "Ran out of indexes in [",join('.',@inds),"] looking for ",$mib->{type};
+					Carp::carp "Ran out of indexes in [",join('.',@inds),"] looking for ",$mib->{type};
+					Carp::cluck "processing index '$index' of table '$table' for instance $i";
+					print STDERR "$table raw result was:\n";
+					print STDERR Dumper($result),"\n";
+					print STDERR "$table translated result is currently:\n";
+					print STDERR Dumper($xlate),"\n";
 					@inds = ();
-					$xlate->{$index}{$i} = undef;
+					$xlate->{$table}{$index}{$i} = undef;
 				}
 			} elsif ($mib->{type} =~ /OCTETSTR/) {
 				my @vals = ();
@@ -1332,11 +1607,16 @@ sub xlate_table {
 							while ($val =~ s/:0/:/) { }
 						}
 					}
-					$xlate->{$index}{$i} = $val;
+					$xlate->{$table}{$index}{$i} = $val;
 				} else {
-					Carp::cluck "Ran out of indexes in [",join('.',@inds),"] looking for ",$mib->{type};
+					Carp::carp "Ran out of indexes in [",join('.',@inds),"] looking for ",$mib->{type};
+					Carp::cluck "processing index '$index' of table '$table' for instance $i";
+					print STDERR "$table raw result was:\n";
+					print STDERR Dumper($result),"\n";
+					print STDERR "$table translated result is currently:\n";
+					print STDERR Dumper($xlate),"\n";
 					@inds = ();
-					$xlate->{$index}{$i} = undef;
+					$xlate->{$table}{$index}{$i} = undef;
 				}
 			} elsif ($mib->{type} =~ /OBJECTID|OPAQUE/) {
 				my @vals = ();
@@ -1345,22 +1625,32 @@ sub xlate_table {
 					while ($len>0) { push @vals, shift @inds; $len-- }
 					my $val = join('.',@vals);
 					$val = SNMP::translateObj(add_dot($val));
-					$xlate->{$index}{$i} = join('.',@vals);
+					$xlate->{$table}{$index}{$i} = join('.',@vals);
 				} else {
-					Carp::cluck "Ran out of indexes in [",join('.',@inds),"] looking for ",$mib->{type};
+					Carp::carp "Ran out of indexes in [",join('.',@inds),"] looking for ",$mib->{type};
+					Carp::cluck "processing index '$index' of table '$table' for instance $i";
+					print STDERR "$table raw result was:\n";
+					print STDERR Dumper($result),"\n";
+					print STDERR "$table translated result is currently:\n";
+					print STDERR Dumper($xlate),"\n";
 					@inds = ();
-					$xlate->{$index}{$i} = undef;
+					$xlate->{$table}{$index}{$i} = undef;
 				}
 			} elsif ($mib->{type} =~ /IPADDR|NETADDR/) {
 				my @vals = ();
 				my $len = 4;
 				if ($len <= scalar(@inds)) {
 					while ($len>0) { push @vals, shift @inds; $len-- }
-					$xlate->{$index}{$i} = join('.',@vals);
+					$xlate->{$table}{$index}{$i} = join('.',@vals);
 				} else {
-					Carp::cluck "Ran out of indexes in [",join('.',@inds),"] looking for ",$mib->{type};
+					Carp::carp "Ran out of indexes in [",join('.',@inds),"] looking for ",$mib->{type};
+					Carp::cluck "processing index '$index' of table '$table' for instance $i";
+					print STDERR "$table raw result was:\n";
+					print STDERR Dumper($result),"\n";
+					print STDERR "$table translated result is currently:\n";
+					print STDERR Dumper($xlate),"\n";
 					@inds = ();
-					$xlate->{$index}{$i} = undef;
+					$xlate->{$table}{$index}{$i} = undef;
 				}
 			} else {
 				Carp::cluck "Unhandled index type for $i is $mib->{type}\n";
@@ -1372,6 +1662,22 @@ sub xlate_table {
 #package Model::SNMP;
 sub xlate_scalars {
 	my ($snmpargs,$scalars,$result,$error) = @_;
+	if (0) {
+		print STDERR "\nScalars $scalars raw result:\n";
+		print STDERR Dumper($result),"\n";
+		foreach my $key (keys %$result) {
+			my $tag = SNMP::translateObj(add_dot($key));
+			my ($label,$index) = split(/\./,$tag,2);
+			my $entry = '(unknown)';
+			if (my $mib = $SNMP::MIB{$label}) {
+				if (my $parent = $mib->{parent}) {
+					$entry = $parent->{label};
+				}
+			}
+			print STDERR "$key --> $entry\::$label $index\n";
+		}
+		print STDERR "\n";
+	}
 	return undef unless defined $result;
 	my $xlate = {};
 	foreach my $key (keys %$result) {
@@ -1405,7 +1711,7 @@ sub xlate_scalars {
 		if ($mib->{type} =~ /OBJECTID|OPAQUE/) {
 			$val = SNMP::translateObj(add_dot($val));
 		}
-		$xlate->{$index}{$label} = $val;
+		$xlate->{$scalars}{$index}{$label} = $val;
 	}
 	return $xlate;
 }
@@ -1525,7 +1831,12 @@ sub addchild {
 	my $self = shift;
 	my ($child,$key,$result) = @_;
 	$result = $self->SUPER::addchild(@_);
-	$self->{model}->query($key) if $result and $key and length($key) == 4 and Model::SNMP::iptype($key) ne 'RESERVED' and $child->kind eq 'Point';
+	if ($result and $key and length($key) == 4 and Model::SNMP::iptype($key) ne 'RESERVED' and $child->kind eq 'Point') {
+		my $host = $self->child('Point',$key);
+		unless ($host and $host->{queried}) {
+			$self->{model}->query($key);
+		}
+	}
 	return $result;
 }
 
@@ -1547,7 +1858,12 @@ sub addchild {
 	my $self = shift;
 	my ($child,$key,$result) = @_;
 	$result = $self->SUPER::addchild(@_);
-	$self->{model}->query($key) if $result and $key and length($key) == 4 and Model::SNMP::iptype($key) ne 'RESERVED' and $child->kind eq 'Point';
+	if ($result and $key and length($key) == 4 and Model::SNMP::iptype($key) ne 'RESERVED' and $child->kind eq 'Point') {
+		my $host = $self->child('Point',$key);
+		unless ($host and $host->{queried}) {
+			$self->{model}->query($key);
+		}
+	}
 	return $result;
 }
 
@@ -1569,7 +1885,12 @@ sub addchild {
 	my $self = shift;
 	my ($child,$key,$result) = @_;
 	$result = $self->SUPER::addchild(@_);
-	$self->{model}->query($key) if $result and $key and length($key) == 4 and Model::SNMP::iptype($key) ne 'RESERVED' and $child->kind eq 'Point';
+	if ($result and $key and length($key) == 4 and Model::SNMP::iptype($key) ne 'RESERVED' and $child->kind eq 'Point') {
+		my $host = $self->child('Point',$key);
+		unless ($host and $host->{queried}) {
+			$self->{model}->query($key);
+		}
+	}
 	return $result;
 }
 
@@ -1608,6 +1929,30 @@ sub them {
 			}
 		}
 	}
+}
+#package Datum;
+sub addrow {
+	my $self = shift;
+	my ($table,$row) = @_;
+	if ($table =~ /Table$/) {
+		$table =~ s/Table$/Entry/;
+	}
+	elsif ($table =~ /Scalars$/) {
+		$table =~ s/Scalars$/Data/;
+	}
+	$self->{data}{$table} = $row;
+}
+#package Datum;
+sub addrow_to_table {
+	my $self = shift;
+	my ($table,$index,$row) = @_;
+	$self->{data}{$table}{$index} = $row;
+}
+#package Datum;
+sub addtab {
+	my $self = shift;
+	my ($table,$tab) = @_;
+	$self->{data}{$table} = $tab;
 }
 
 # ------------------------------------------
@@ -1692,6 +2037,8 @@ sub showkey {
 	} elsif (length($key) == 8) { # HW address + VLAN
 		@parts = unpack('C6n',$key);
 		$show = join(':',map {sprintf('%02x',$_)} @parts[0..5])."($parts[6])";
+	} elsif (length($key) == 0) {
+		$show = '';
 	} else {
 		@parts = unpack('C*',$key);
 		$show = "0x".join('',map {sprintf('%02x',$_)} @parts);
@@ -2538,464 +2885,440 @@ use constant {
 	dump_tables => 0,
 };
 #package Point::Host;
-sub systemScalars {
+sub systemData {
 	my $self = shift;
-	my ($model,$snmpargs,$table,$xlated,$error,$hkey,$type,$snet,$name) = @_;
-	my $row = $xlated->{0};
-	#print STDERR "\nScalars $table: for ",Item::showkey($hkey),"\n";
-	#print STDERR Dumper($row),"\n";
-	foreach (qw/
-		sysLocation
-		sysObjectID
-		sysDescr
-		sysORLastChange
-		sysUpTime
-		sysServices
-		sysName
-		sysContact/) {
-		$self->{data}{$table}{$_} = $row->{$_};
+	my ($index,$row,$model,$snmpargs,$scalars,$xlated,$error,$hkey,$type,$snet,$name) = @_;
+	if (dump_tables) {
+		print STDERR "\nScalars $scalars: for ",Item::showkey($hkey),"\n";
+		print STDERR Dumper($row),"\n";
+	}
+	$self->{queried} = 1;
+	$self->addrow($scalars,$row);
+}
+#package Point::Host;
+sub ifEntry {
+	my $self = shift;
+	my ($index,$row,$model,$snmpargs,$table,$xlated,$error,$hkey,$type,$snet,$name) = @_;
+	if (dump_tables) {
+		print STDERR "\nTable $table row: for ",Item::showkey($hkey),"\n";
+		print STDERR Dumper($row),"\n";
+	}
+	my $idx = $row->{ifIndex};
+	my $hwa = $row->{ifPhysAddress};
+	return unless $hwa or $row->{ifType} eq 'softwareLoopback(24)';
+	my $dsc = $row->{ifDescr};
+	my $vid = ''; if ($dsc =~ /\d+\.(\d+)(:\d+)?$/) { $vid = $1 }
+	my $vla = undef;
+	if (defined $hwa) {
+		$vla = $hwa = Item::makekey($hwa);
+		$vla .= pack('n',$vid) if defined $vla and length($vid);
+	}
+	my $vprt = $self->getchild('Vprt',$idx,$vla,[
+		['Port',$hwa,$vid,[
+			['Point::Host',$self,$hwa],
+			['Lan',$hwa,$hwa]]],
+		['Vlan',undef,$hwa,[
+			['Lan',$hwa,undef]]],
+		]);
+	$vprt->addrow($table,$row);
+	$vprt->{data}{extra}{hwa} = $hwa;
+	$vprt->{data}{extra}{vla} = $vla;
+	$vprt->{data}{extra}{vid} = $vid;
+	my $port = $vprt->parent('Port') if defined $vid and $vid eq '';
+	if ($port) {
+		$port->addrow($table,$row);
+		$port->{data}{extra}{hwa} = $hwa;
+		$port->{data}{extra}{vla} = $vla;
+		$port->{data}{extra}{vid} = $vid;
 	}
 }
 #package Point::Host;
-#sub sysORTable {
-#	my $self = shift;
-#	my ($model,$snmpargs,$table,$xlated,$error,$hkey,$type,$snet,$name) = @_;
-#}
-#package Point::Host;
-sub ifTable {
+sub ifXEntry {
 	my $self = shift;
-	my ($model,$snmpargs,$table,$xlated,$error,$hkey,$type,$snet,$name) = @_;
-	foreach my $row (values %$xlated) {
-		if (dump_tables) {
-			print STDERR "\nTable $table row: for ",Item::showkey($hkey),"\n";
-			print STDERR Dumper($row),"\n";
-		}
-		my $idx = $row->{ifIndex};
-		my $hwa = $row->{ifPhysAddress};
-		next unless $hwa;
-		my $dsc = $row->{ifDescr};
-		my $vid = ''; if ($dsc =~ /\d+\.(\d+)(:\d+)?$/) { $vid = $1 }
-		my $vla = undef;
-		if (defined $hwa) {
-			$vla = $hwa = Item::makekey($hwa);
-			$vla .= pack('n',$vid) if defined $vla and length($vid);
-		}
-		my $vprt = $self->getchild('Vprt',$idx,$vla,[
-			['Port',$hwa,$vid,[
-				['Point::Host',$self,$hwa],
-				['Lan',$hwa,$hwa]]],
-			['Bprt',$vla,$vla,[
-				['Point::Host',$self,$vla],
-				['Blan',$vla,$vla]]],
-			['Vlan',$vla,$vla,[
-				['Lan',$hwa,$vid],
-				['Blan',$vla,$vla]]],
+	my ($index,$row,$model,$snmpargs,$table,$xlated,$error,$hkey,$type,$snet,$name) = @_;
+	if (dump_tables) {
+		print STDERR "\nTable $table row: for ",Item::showkey($hkey),"\n";
+		print STDERR Dumper($row),"\n";
+	}
+	my $idx = $row->{ifIndex};
+	return unless $idx;
+	my $vprt = $self->getchild('Vprt',$idx,undef);
+	unless (exists $vprt->{data}{extra}) {
+		Carp::cluck "No extra data for index $idx";
+		$self->show;
+		$vprt->show;
+	}
+	my $hwa = $vprt->{data}{extra}{hwa} if exists $vprt->{data}{extra}{hwa};
+	my $vla = $vprt->{data}{extra}{vla} if exists $vprt->{data}{extra}{vla};
+	my $vid = $vprt->{data}{extra}{vid} if exists $vprt->{data}{extra}{vid};
+	$vprt->addrow($table,$row);
+	my $port = $vprt->parent('Port') if defined $vid and $vid eq '';
+	$port->addrow($table,$row) if $port;
+}
+#package Point::Host;
+sub ipAddrEntry {
+	my $self = shift;
+	my ($index,$row,$model,$snmpargs,$table,$xlated,$error,$hkey,$type,$snet,$name) = @_;
+	if (dump_tables) {
+		print STDERR "\nTable $table row: for ",Item::showkey($hkey),"\n";
+		print STDERR Dumper($row),"\n";
+	}
+	my $idx = $row->{ipAdEntIfIndex};
+	return unless defined $idx;
+	return if not $row->{ipAdEntAddr} or $row->{ipAdEntAddr} eq '...';
+	my $pfx = Item::makekey($row->{ipAdEntAddr}.'/'.$row->{ipAdEntNetMask});
+	my $ipa = Item::makekey($row->{ipAdEntAddr});
+	my $ipt = Model::SNMP::iptype($ipa); return if $ipt eq 'RESERVED';
+	my $net = $model->{net}{$ipt} if Model::SNMP::typeok($type,$ipt);
+	my $nam = Model::SNMP::netname($ipt);
+	$self->link($model,undef,[[$nam,$net,$ipa]]);
+	$net = $self->parent($nam) unless $net;
+	my $vprt = $self->getchild('Vprt',$idx,undef);
+	unless (exists $vprt->{data}{extra}) {
+		Carp::cluck "No extra data for index $idx";
+		$self->show;
+		$vprt->show;
+	}
+	my $hwa = $vprt->{data}{extra}{hwa} if exists $vprt->{data}{extra}{hwa};
+	my $vla = $vprt->{data}{extra}{vla} if exists $vprt->{data}{extra}{vla};
+	my $vid = $vprt->{data}{extra}{vid} if exists $vprt->{data}{extra}{vid};
+	$vprt = $self->getchild('Vprt',$idx,undef,[
+		[$nam,$net,$ipa],
+		['Point::Host',$self,$ipa],
+		['Port',$hwa,$vid,[
+			[$nam,$net,$ipa],
+			['Point::Host',$self,$hwa],
+			['Lan',$hwa,$hwa,[
+				[$nam,$net,$ipa]]]]],
+		['Vlan',undef,$hwa,[
+			[$nam,$net,$ipa]]],
+		]);
+	my $vlan = $vprt->parent('Vlan');
+	$vlan->link($model,undef,[['Lan',$vprt->parent('Port')->parent('Lan'),undef]]);
+	$net = $net->target;
+	my $addr = $net->getchild('Address',$ipa,undef,[
+		['Point::Host',$self,$ipa],
+		['Subnet',undef,$ipa,[
+			[$nam,$net,$pfx],[$nam,$net,$ipa],
+			['Vlan',$vlan,$pfx]]],
+		]);
+	$addr->addrow($table,$row);
+	my $sub = $addr->parent('Subnet');
+	$sub->addrow($table,$row);
+}
+#package Point::Host;
+sub ipAddressEntry {
+	my $self = shift;
+	my ($index,$row,$model,$snmpargs,$table,$xlated,$error,$hkey,$type,$snet,$name) = @_;
+	if (dump_tables) {
+		print STDERR "\nTable $table row: for ",Item::showkey($hkey),"\n";
+		print STDERR Dumper($row),"\n";
+	}
+	return unless $row->{ipAddressRowStatus} eq 'active(1)';
+	return unless $row->{ipAddressAddrType} eq 'ipv4(1)';
+	return unless $row->{ipAddressType} eq 'unicast(1)';
+	my $idx = $row->{ipAddressIfIndex};
+	my $ipa = Item::makekey($row->{ipAddressAddr});
+	my $ipt = Model::SNMP::iptype($ipa);
+	return if $ipt eq 'RESERVED';
+	my $net = $model->{net}{$ipt} if Model::SNMP::typeok($type,$ipt);
+	my $nam = Model::SNMP::netname($ipt);
+	$self->link($model,undef,[[$nam,$net,$ipa]]);
+	$net = $self->parent($nam) unless $net;
+	my $vprt = $self->getchild('Vprt',$idx,undef);
+	unless (exists $vprt->{data}{extra}) {
+		Carp::cluck "No extra data for index $idx";
+		$self->show;
+		$vprt->show;
+	}
+	my $hwa = $vprt->{data}{extra}{hwa} if exists $vprt->{data}{extra}{hwa};
+	my $vla = $vprt->{data}{extra}{vla} if exists $vprt->{data}{extra}{vla};
+	my $vid = $vprt->{data}{extra}{vid} if exists $vprt->{data}{extra}{vid};
+	$vprt = $self->getchild('Vprt',$idx,undef,[
+		[$nam,$net,$ipa],
+		['Point::Host',$self,$ipa],
+		['Port',$hwa,$vid,[
+			[$nam,$net,$ipa],
+			['Point::Host',$self,$hwa],
+			['Lan',$hwa,$hwa,[
+				[$nam,$net,$ipa]]]]],
+		['Vlan',undef,$hwa,[
+			[$nam,$net,$ipa]]],
+		]);
+	my $vlan = $vprt->parent('Vlan');
+	$vlan->link($model,undef,[['Lan',$vprt->parent('Port')->parent('Lan'),undef]]);
+	$net = $net->target;
+	# FIXME: there is a way to get the prefix as well
+	my $addr = $net->getchild('Address',$ipa,undef,[
+		['Point::Host',$self,$ipa],
+		['Subnet',undef,$ipa,[
+			[$nam,$net,$ipa],
+			['Vlan',$vlan,undef]]],
+		]);
+	$addr->addrow($table,$row);
+	my $sub = $addr->parent('Subnet');
+	$sub->addrow($table,$row);
+}
+#package Point::Host;
+sub atEntry {
+	my $self = shift;
+	my ($index,$row,$model,$snmpargs,$table,$xlated,$error,$hkey,$type,$snet,$name) = @_;
+	if (dump_tables) {
+		print STDERR "\nTable $table row: for ",Item::showkey($hkey),"\n";
+		print STDERR Dumper($row),"\n";
+	}
+	my $idx = $row->{atIfIndex};
+	my $mac = Item::makekey($row->{atPhysAddress}) if $row->{atPhysAddress};
+	return unless $mac;
+	my $ipa = Item::makekey($row->{atNetAddress}) if $row->{atNetAddress};
+	return unless $ipa;
+	my $ipt = Model::SNMP::iptype($ipa);
+	return if $ipt eq 'RESERVED';
+	my $net = $model->{net}{$ipt} if Model::SNMP::typeok($type,$ipt);
+	my $nam = Model::SNMP::netname($ipt);
+	$self->link($model,undef,[[$nam,$net,undef]]);
+	$net = $self->parent($nam) unless $net;
+	my $vprt = $self->getchild('Vprt',$idx,undef);
+	unless (exists $vprt->{data}{extra}) {
+		Carp::cluck "No extra data for index $idx";
+		$self->show;
+		$vprt->show;
+	}
+	my $hwa = $vprt->{data}{extra}{hwa} if exists $vprt->{data}{extra}{hwa};
+	my $vla = $vprt->{data}{extra}{vla} if exists $vprt->{data}{extra}{vla};
+	my $vid = $vprt->{data}{extra}{vid} if exists $vprt->{data}{extra}{vid};
+	#printf STDERR "Using extra data for %s: %s,%s,%s\n", $vprt,Item::showkey($hwa),Item::showkey($vla),$vid;
+	$vprt = $self->getchild('Vprt',$idx,undef,[
+		['Port',$hwa,$vid,[
+			[$nam,$net,undef],
+			['Point::Host',$self,$hwa],
+			['Lan',$hwa,$hwa,[
+				[$nam,$net,undef]]]]],
+		['Vlan',undef,$hwa,[
+			[$nam,$net,undef]]],
+		]);
+	my $vlan = $vprt->parent('Vlan');
+	my $plan = $vprt->parent('Port')->parent('Lan');
+	$vlan->link($model,undef,[['Lan',$plan,undef]]);
+	$vprt = $vprt->target;
+	my $host = Point::Host->get($model,$mac,[[$nam,$net,$ipa]]);
+	$net = $host->parent($nam) unless $net;
+	my $oprt = $vlan->getchild('Vprt',$mac,undef,[
+		[$nam,$net,$ipa],
+		['Point::Host',$host,$ipa],
+		['Port',$mac,undef,[
+			[$nam,$net,$ipa],
+			['Point::Host',$host,$mac],
+			['Lan',$plan,$mac,[
+				[$nam,$net,$ipa]]]]],
+		['Vlan',$vlan,$mac,[
+			[$nam,$net,$ipa]]],
+		]);
+	$net = $net->target;
+	my ($sub,$pfx) = $net->subnetbyip($ipa);
+	if ($sub) {
+		my $addr = $net->getchild('Address',$ipa,undef,[
+			['Point::Host',$host,$ipa],
+			['Subnet',$sub,$ipa,[
+				[$nam,$net,$pfx],[$nam,$net,$ipa],
+				['Vlan',$vlan,$pfx]]],
 			]);
-		$vprt = $vprt->target;
-		foreach (qw/
-			ifIndex
-			ifDescr
-			ifType
-			ifMtu
-			ifSpeed
-			ifPhysAddress
-			ifAdminStatus
-			ifOperStatus
-			ifLastChange
-			ifInOctets
-			ifInUcastPkts
-			ifInNUcastPkts
-			ifInDiscards
-			ifInErrors
-			ifInUnknownProtos
-			ifOutOctets
-			ifOutUcastPkts
-			ifOutNUcastPkts
-			ifOutDiscards
-			ifOutErrors
-			ifOutQLen
-			ifSpecific/) {
-			$vprt->{data}{$table}{$_} = $row->{$_};
-		}
-		$vprt->{data}{extra}{hwa} = $hwa;
-		$vprt->{data}{extra}{vla} = $vla;
-		$vprt->{data}{extra}{vid} = $vid;
+		$addr->addrow($table,$row);
+	} else {
+		warn "Can't find subnet of $net for address ",Item::showkey($ipa);
 	}
 }
 #package Point::Host;
-sub ipAddrTable {
+sub ipNetToMediaEntry {
 	my $self = shift;
-	my ($model,$snmpargs,$table,$xlated,$error,$hkey,$type,$snet,$name) = @_;
-	foreach my $row (values %$xlated) {
+	my ($index,$row,$model,$snmpargs,$table,$xlated,$error,$hkey,$type,$snet,$name) = @_;
 		if (dump_tables) {
 			print STDERR "\nTable $table row: for ",Item::showkey($hkey),"\n";
 			print STDERR Dumper($row),"\n";
 		}
-		my $idx = $row->{ipAdEntIfIndex};
-		next unless defined $idx;
-		next if not $row->{ipAdEntAddr} or $row->{ipAdEntAddr} eq '...';
-		my $pfx = Item::makekey($row->{ipAdEntAddr}.'/'.$row->{ipAdEntNetMask});
-		my $ipa = Item::makekey($row->{ipAdEntAddr});
-		my $ipt = Model::SNMP::iptype($ipa); next if $ipt eq 'RESERVED';
+		return unless $row->{ipNetToMediaType} ne 'invalid(2)';
+		# TODO: should also check ipNetToPhysicalType
+		my $idx = $row->{ipNetToMediaIfIndex};
+		my $mac = Item::makekey($row->{ipNetToMediaPhysAddress});
+		return unless $mac;
+		my $ipa = Item::makekey($row->{ipNetToMediaNetAddress});
+		my $ipt = Model::SNMP::iptype($ipa);
+		return if $ipt eq 'RESERVED';
 		my $net = $model->{net}{$ipt} if Model::SNMP::typeok($type,$ipt);
 		my $nam = Model::SNMP::netname($ipt);
-		$self->link($model,undef,[[$nam,$net,$ipa]]);
+		$self->link($model,undef,[[$nam,$net,undef]]);
 		$net = $self->parent($nam) unless $net;
 		my $vprt = $self->getchild('Vprt',$idx,undef);
+		unless (exists $vprt->{data}{extra}) {
+			Carp::cluck "No extra data for index $idx";
+			$self->show;
+			$vprt->show;
+		}
 		my $hwa = $vprt->{data}{extra}{hwa} if exists $vprt->{data}{extra}{hwa};
 		my $vla = $vprt->{data}{extra}{vla} if exists $vprt->{data}{extra}{vla};
 		my $vid = $vprt->{data}{extra}{vid} if exists $vprt->{data}{extra}{vid};
 		$vprt = $self->getchild('Vprt',$idx,undef,[
 			['Port',$hwa,$vid,[
-				[$nam,$net,$ipa],
+				[$nam,$net,undef],
 				['Point::Host',$self,$hwa],
 				['Lan',$hwa,$hwa,[
-					[$nam,$net,$ipa]]]]],
-			['Bprt',$vla,$vla,[
+					[$nam,$net,undef]]]]],
+			['Vlan',undef,$hwa,[
+				[$nam,$net,undef]]],
+			]);
+		my $vlan = $vprt->parent('Vlan');
+		my $plan = $vprt->parent('Port')->parent('Lan');
+		$vlan->link($model,undef,[['Lan',$plan,undef]]);
+		my $host = Point::Host->get($model,$mac,[[$nam,$net,$ipa]]);
+		$net = $host->parent($nam) unless $net;
+		$vprt = $vprt->target;
+		my $oprt = $vlan->getchild('Vprt',$mac,undef,[
+			[$nam,$net,$ipa],
+			['Point::Host',$host,$ipa],
+			['Port',$mac,undef,[
 				[$nam,$net,$ipa],
-				['Point::Host',$self,$vla],
-				['Blan',$vla,$vla,[
+				['Point::Host',$host,$mac],
+				['Lan',$plan,$mac,[
 					[$nam,$net,$ipa]]]]],
-			['Vlan',$hwa,undef,[
+			['Vlan',$vlan,$mac,[
 				[$nam,$net,$ipa]]],
 			]);
-		$vprt->parent('Vlan')->link($model,undef,[
-			['Lan',$vprt->parent('Port')->parent('Lan'),$vid],
-			['Blan',$vprt->parent('Bprt')->parent('Blan'),$vla],
-			]);
-		$vprt = $vprt->target;
-		my $blan = $vprt->parent('Bprt')->parent('Blan');
 		$net = $net->target;
-		my $add = $net->getchild('Address',$ipa,undef,[
-			['Point::Host',$self,$ipa],
-			['Subnet',undef,$ipa,[
-				[$nam,$net,$pfx],[$nam,$net,$ipa],
-				['Blan',$blan,$pfx]]],
-			]);
-		foreach (qw/
-			ipAdEntAddr
-			ipAdEntIfIndex
-			ipAdEntNetMask
-			ipAdEntBcastAddr
-			ipAdEntReasmMaxSize/) {
-			$add->{data}{$table}{$_} = $row->{$_};
+		my ($sub,$pfx) = $net->subnetbyip($ipa);
+		if ($sub) {
+			my $addr = $net->getchild('Address',$ipa,undef,[
+				['Point::Host',$host,$ipa],
+				['Subnet',$sub,$ipa,[
+					[$nam,$net,$pfx],[$nam,$net,$ipa],
+					['Vlan',$vlan,$pfx]]],
+				]);
+			$addr->addrow($table,$row);
+		} else {
+			warn "Can't find subnet of $net for address ",Item::showkey($ipa);
 		}
-		my $sub = $add->parent('Subnet');
-		foreach (qw/
-			ipAdEntAddr
-			ipAdEntNetMask
-			ipAdEntBcastAddr
-			ipAdEntReasmMaxSize/) {
-			$sub->{data}{$table}{$_} = $row->{$_};
-		}
-	}
 }
 #package Point::Host;
-sub ipAddressTable {
+sub ipNetToPhysicalEntry {
 	my $self = shift;
-	my ($model,$snmpargs,$table,$xlated,$error,$hkey,$type,$snet,$name) = @_;
-	foreach my $row (values %$xlated) {
-		if (dump_tables) {
-			print STDERR "\nTable $table row: for ",Item::showkey($hkey),"\n";
-			print STDERR Dumper($row),"\n";
-		}
-		next unless $row->{ipAddressRowStatus} eq 'active(1)';
-		next unless $row->{ipAddressAddrType} eq 'ipv4(1)';
-		next unless $row->{ipAddressType} eq 'unicast(1)';
-		my $idx = $row->{ipAddressIfIndex};
-		my $ipa = Item::makekey($row->{ipAddressAddr});
-		my $ipt = Model::SNMP::iptype($ipa);
-		next if $ipt eq 'RESERVED';
-		my $net = $model->{net}{$ipt} if Model::SNMP::typeok($type,$ipt);
-		my $nam = Model::SNMP::netname($ipt);
-		$self->link($model,undef,[[$nam,$net,$ipa]]);
-		$net = $self->parent($nam) unless $net;
-		my $vprt = $self->getchild('Vprt',$idx,undef,[
-			['Port',undef,undef,[
-				[$nam,$net,$ipa],
-				['Point::Host',$self,undef],
-				['Lan',undef,undef,[
-					[$nam,$net,$ipa]]]]],
-			['Bprt',undef,undef,[
-				[$nam,$net,$ipa],
-				['Point::Host',$self,undef],
-				['Blan',undef,undef,[
-					[$nam,$net,$ipa]]]]],
-			['Vlan',undef,undef,[
-				[$nam,$net,$ipa]]],
-			]);
-		$vprt->parent('Vlan')->link($model,undef,[
-			['Lan',$vprt->parent('Port')->parent('Lan'),undef],
-			['Blan',$vprt->parent('Bprt')->parent('Blan'),undef],
-			]);
-		$vprt = $vprt->target;
-		my $blan = $vprt->parent('Bprt')->parent('Blan');
-		$net = $net->target;
-		# FIXME: there is a way to get the prefix as well
+	my ($index,$row,$model,$snmpargs,$table,$xlated,$error,$hkey,$type,$snet,$name) = @_;
+	if (dump_tables) {
+		print STDERR "\nTable $table row: for ",Item::showkey($hkey),"\n";
+		print STDERR Dumper($row),"\n";
+	}
+	return unless $row->{ipNetToPhysicalRowStatus} eq 'active(1)';
+	return unless $row->{ipNetToPhysicalNetAddressType} eq 'ipv4(1)';
+	return unless $row->{ipNetToPhysicalState} eq 'reachable(1)';
+	return unless $row->{ipNetToPhysicalType} ne 'invalid(2)';
+	# TODO: should also check ipNetToPhysicalType
+	my $idx = $row->{ipNetToPhysicalIfIndex};
+	my $mac = Item::makekey($row->{ipNetToPhysicalPhysAddress});
+	return unless $mac;
+	my $ipa = Item::makekey($row->{ipNetToPhysicalNetAddress});
+	my $ipt = Model::SNMP::iptype($ipa);
+	return if $ipt eq 'RESERVED';
+	my $net = $model->{net}{$ipt} if Model::SNMP::typeok($type,$ipt);
+	my $nam = Model::SNMP::netname($ipt);
+	$self->link($model,undef,[[$nam,$net,undef]]);
+	$net = $self->parent($nam) unless $net;
+	my $vprt = $self->getchild('Vprt',$idx,undef);
+	unless (exists $vprt->{data}{extra}) {
+		Carp::cluck "No extra data for index $idx";
+		$self->show;
+		$vprt->show;
+	}
+	my $hwa = $vprt->{data}{extra}{hwa} if exists $vprt->{data}{extra}{hwa};
+	my $vla = $vprt->{data}{extra}{vla} if exists $vprt->{data}{extra}{vla};
+	my $vid = $vprt->{data}{extra}{vid} if exists $vprt->{data}{extra}{vid};
+	$vprt = $self->getchild('Vprt',$idx,undef,[
+		['Port',$hwa,$vid,[
+			[$nam,$net,undef],
+			['Point::Host',$self,$hwa],
+			['Lan',$hwa,$hwa,[
+				[$nam,$net,undef]]]]],
+		['Vlan',undef,$hwa,[
+			[$nam,$net,undef]]],
+		]);
+	my $vlan = $vprt->parent('Vlan');
+	my $plan = $vprt->parent('Port')->parent('Lan');
+	$vlan->link($model,undef,[['Lan',$plan,undef]]);
+	my $host = Point::Host->get($model,$mac,[[$nam,$net,$ipa]]);
+	$net = $host->parent($nam) unless $net;
+	$vprt = $vprt->target;
+	my $oprt = $vlan->getchild('Vprt',$mac,undef,[
+		[$nam,$net,$ipa],
+		['Point::Host',$host,$ipa],
+		['Port',$mac,undef,[
+			[$nam,$net,$ipa],
+			['Point::Host',$host,$mac],
+			['Lan',$plan,$mac,[
+				[$nam,$net,$ipa]]]]],
+		['Vlan',$vlan,$mac,[
+			[$nam,$net,$ipa]]],
+		]);
+	$net = $net->target;
+	my ($sub,$pfx) = $net->subnetbyip($ipa);
+	if ($sub) {
 		my $addr = $net->getchild('Address',$ipa,undef,[
-			['Point::Host',$self,$ipa],
-			['Subnet',undef,$ipa,[
-				[$nam,$net,$ipa],
-				['Blan',$blan,undef]]],
+			['Point::Host',$host,$ipa],
+			['Subnet',$sub,$ipa,[
+				[$nam,$net,$pfx],[$nam,$net,$ipa],
+				['Vlan',$vlan,$pfx]]],
 			]);
-		foreach (qw/
-			ipAddressAddrType
-			ipAddressAddr
-			ipAddressIfIndex
-			ipAddressType
-			ipAddressPrefix
-			ipAddressOrigin
-			ipAddressStatus
-			ipAddressCreated
-			ipAddressLastChanged
-			ipAddressRowStatus
-			ipAddressStorageType/) {
-			$addr->{data}{$table}{$_} = $row->{$_};
-		}
-		my $sub = $addr->parent('Subnet');
-		foreach (qw/
-			ipAddressPrefix
-			ipAddressOrigin
-			ipAddressStatus
-			ipAddressCreated
-			ipAddressLastChanged
-			ipAddressRowStatus
-			ipAddressStorageType/) {
-			$sub->{data}{$table}{$_} = $row->{$_};
-		}
+		$addr->addrow($table,$row);
+	} else {
+		warn "Can't find subnet of $net for address ",Item::showkey($ipa);
 	}
 }
 #package Point::Host;
-sub atTable {
+sub ipRouteEntry {
 	my $self = shift;
-	my ($model,$snmpargs,$table,$xlated,$error,$hkey,$type,$snet,$name) = @_;
-	foreach my $row (values %$xlated) {
-		if (dump_tables) {
-			print STDERR "\nTable $table row: for ",Item::showkey($hkey),"\n";
-			print STDERR Dumper($row),"\n";
-		}
-		my $idx = $row->{atIfIndex};
-		my $mac = Item::makekey($row->{atPhysAddress}) if $row->{atPhysAddress};
-		next unless $mac;
-		my $ipa = Item::makekey($row->{atNetAddress}) if $row->{atNetAddress};
-		next unless $ipa;
-		my $ipt = Model::SNMP::iptype($ipa);
-		next if $ipt eq 'RESERVED';
-		my $net = $model->{net}{$ipt} if Model::SNMP::typeok($type,$ipt);
-		my $nam = Model::SNMP::netname($ipt);
-		$self->link($model,undef,[[$nam,$net,undef]]);
-		$net = $self->parent($nam) unless $net;
-		my $vprt = $self->getchild('Vprt',$idx,undef);
-		my $hwa = $vprt->{data}{extra}{hwa} if exists $vprt->{data}{extra}{hwa};
-		my $vla = $vprt->{data}{extra}{vla} if exists $vprt->{data}{extra}{vla};
-		my $vid = $vprt->{data}{extra}{vid} if exists $vprt->{data}{extra}{vid};
-		$vprt = $self->getchild('Vprt',$idx,undef,[
-			['Port',$hwa,$vid,[
-				[$nam,$net,undef],
-				['Point::Host',$self,$hwa],
-				['Lan',$mac,$hwa,[
-					[$nam,$net,undef]]]]],
-			['Bprt',$vla,$vla,[
-				[$nam,$net,undef],
-				['Point::Host',$self,$vla],
-				['Blan',$vla,$vla,[
-					[$nam,$net,undef]]]]],
-			['Vlan',$mac,undef,[
-				[$nam,$net,undef]]],
-			]);
-		$vprt->parent('Vlan')->link($model,undef,[
-			['Lan',$vprt->parent('Port')->parent('Lan'),$vid],
-			['Blan',$vprt->parent('Bprt')->parent('Blan'),$vla],
-			]);
-		$vprt = $vprt->target;
-		my $host = Point::Host->get($model,$mac,[[$nam,$net,$ipa]]);
-		$net = $host->parent($nam) unless $net;
-		$vprt = $vprt->target;
-		my $blan = $vprt->parent('Bprt')->parent('Blan');
-		$vid = '' unless defined $vid;
-		my $vlh = $mac;
-		$vlh .= pack('n',$vid) if defined $vlh and length($vid);
-		my $vlan = $vprt->parent('Vlan');
-		my $oprt = $vlan->getchild('Vprt',$mac,$mac,[
-			[$nam,$net,$ipa],
-			['Point::Host',$host,undef],
-			['Port',$mac,$vid,[
-				[$nam,$net,$ipa],
-				['Point::Host',$host,$mac],
-				['Lan',$mac,$mac,[
-					[$nam,$net,$ipa]]]]],
-			['Bprt',$vlh,$vlh,[
-				[$nam,$net,$ipa],
-				['Point::Host',$host,$vlh],
-				['Blan',$blan,$vlh,[
-					[$nam,$net,$ipa]]]]],
-			['Vlan',$vlan,$vlh,[
-				[$nam,$net,$ipa],
-				['Lan',$mac,$vid],
-				['Blan',$blan,$vlh]]],
-			]);
-		$net = $net->target;
-		my ($sub,$pfx) = $net->subnetbyip($ipa);
-		if ($sub) {
-			my $addr = $net->getchild('Address',$ipa,undef,[
-				['Point::Host',$host,$ipa],
-				['Subnet',$sub,$ipa,[
-					[$nam,$net,$ipa],
-					['Blan',$blan,$pfx]]],
-				]);
-			foreach (qw/
-				atPhysAddress
-				atNetAddress/) {
-				$addr->{data}{$table}{$_} = $row->{$_};
-			}
-		} else {
-			warn "Can't find subnet of $net for address ",Item::showkey($ipa);
-		}
-	}
-}
-#package Point::Host;
-sub ipNetToPhysicalTable {
-	my $self = shift;
-	my ($model,$snmpargs,$table,$xlated,$error,$hkey,$type,$snet,$name) = @_;
-	foreach my $row (values %$xlated) {
-		if (dump_tables) {
-			print STDERR "\nTable $table row: for ",Item::showkey($hkey),"\n";
-			print STDERR Dumper($row),"\n";
-		}
-		next unless $row->{ipNetToPhysicalRowStatus} eq 'active(1)';
-		next unless $row->{ipNetToPhysicalNetAddressType} eq 'ipv4(1)';
-		next unless $row->{ipNetToPhysicalState} eq 'reachable(1)';
-		next unless $row->{ipNetToPhysicalType} ne 'invalid(2)';
-		# TODO: should also check ipNetToPhysicalType
-		my $idx = $row->{ipNetToPhysicalIfIndex};
-		my $mac = Item::makekey($row->{ipNetToPhysicalPhysAddress});
-		next unless $mac;
-		my $ipa = Item::makekey($row->{ipNetToPhysicalNetAddress});
-		my $ipt = Model::SNMP::iptype($ipa);
-		next if $ipt eq 'RESERVED';
-		my $net = $model->{net}{$ipt} if Model::SNMP::typeok($type,$ipt);
-		my $nam = Model::SNMP::netname($ipt);
-		$self->link($model,undef,[[$nam,$net,undef]]);
-		$net = $self->parent($nam) unless $net;
-		my $vprt = $self->getchild('Vprt',$idx,undef);
-		my $hwa = $vprt->{data}{extra}{hwa} if exists $vprt->{data}{extra}{hwa};
-		my $vla = $vprt->{data}{extra}{vla} if exists $vprt->{data}{extra}{vla};
-		my $vid = $vprt->{data}{extra}{vid} if exists $vprt->{data}{extra}{vid};
-		$vprt = $self->getchild('Vprt',$idx,undef,[
-			['Port',$hwa,$vid,[
-				[$nam,$net,undef],
-				['Point::Host',$self,$hwa],
-				['Lan',$mac,$hwa,[
-					[$nam,$net,undef]]]]],
-			['Bprt',$vla,$vla,[
-				[$nam,$net,undef],
-				['Point::Host',$self,$vla],
-				['Blan',$vla,$vla,[
-					[$nam,$net,undef]]]]],
-			['Vlan',$mac,undef,[
-				[$nam,$net,undef]]],
-			]);
-		$vprt->parent('Vlan')->link($model,undef,[
-			['Lan',$vprt->parent('Port')->parent('Lan'),$vid],
-			['Blan',$vprt->parent('Bprt')->parent('Blan'),$vla],
-			]);
-		$vprt = $vprt->target;
-		my $host = Point::Host->get($model,$mac,[[$nam,$net,$ipa]]);
-		$net = $host->parent($nam) unless $net;
-		$vprt = $vprt->target;
-		my $blan = $vprt->parent('Bprt')->parent('Blan');
-		$vid = '' unless defined $vid;
-		my $vlh = $mac;
-		$vlh .= pack('n',$vid) if defined $vlh and length($vid);
-		my $vlan = $vprt->parent('Vlan');
-		my $oprt = $vlan->getchild('Vprt',$mac,$vlh,[
-			[$nam,$net,$ipa],
-			['Point::Host',$host,undef],
-			['Port',$mac,$vid,[
-				[$nam,$net,$ipa],
-				['Point::Host',$host,$mac],
-				['Lan',$mac,$mac,[
-					[$nam,$net,$ipa]]]]],
-			['Bprt',$vlh,$vlh,[
-				[$nam,$net,$ipa],
-				['Point::Host',$host,$vlh],
-				['Blan',$blan,$vlh,[
-					[$nam,$net,$ipa]]]]],
-			['Vlan',$vlan,$vlh,[
-				[$nam,$net,$ipa],
-				['Lan',$mac,$vid],
-				['Blan',$blan,$vlh]]],
-			]);
-		$net = $net->target;
-		my ($sub,$pfx) = $net->subnetbyip($ipa);
-		if ($sub) {
-			my $addr = $net->getchild('Address',$ipa,undef,[
-				['Point::Host',$host,$ipa],
-				['Subnet',$sub,$ipa,[
-					[$nam,$net,$ipa],
-					['Blan',$blan,$pfx]]],
-				]);
-			foreach (qw/
-				ipNetToPhysicalNetAddressType
-				ipNetToPhysicalNetAddress
-				ipNetToPhysicalPhysAddress
-				ipNetToPhysicalLastUpdated
-				ipNetToPhysicalType
-				ipNetToPhysicalState
-				ipNetToPhysicalRowStatus/) {
-				$addr->{data}{$table}{$_} = $row->{$_};
-			}
-		} else {
-			warn "Can't find subnet of $net for address ",Item::showkey($ipa);
-		}
-	}
-}
-#package Point::Host;
-sub ipRouteTable {
-	my $self = shift;
-	my ($model,$snmpargs,$table,$xlated,$error,$hkey,$type,$snet,$name) = @_;
-	foreach my $row (values %$xlated) {
-		next unless $row->{ipRouteType} eq 'direct(3)';
+	my ($index,$row,$model,$snmpargs,$table,$xlated,$error,$hkey,$type,$snet,$name) = @_;
+	while (1) {
+		last unless $row->{ipRouteType} eq 'direct(3)';
 		if (dump_tables) {
 			print STDERR "\nTable $table row: for ",Item::showkey($hkey),"\n";
 			print STDERR Dumper($row),"\n";
 		}
 		my $idx = $row->{ipRouteIfIndex};
-		next unless $row->{ipRouteDest} and $row->{ipRouteMask};
+		last unless $row->{ipRouteDest} and $row->{ipRouteMask};
 		my $pfx = Item::makekey($row->{ipRouteDest}.'/'.$row->{ipRouteMask});
-		my $ipt = Model::SNMP::iptype($pfx); next if $ipt eq 'RESERVED';
+		my $ipt = Model::SNMP::iptype($pfx); last if $ipt eq 'RESERVED';
 		my $net = $model->{net}{$ipt} if Model::SNMP::typeok($type,$ipt);
 		my $nam = Model::SNMP::netname($ipt);
 		$self->link($model,undef,[[$nam,$net,undef]]);
 		$net = $self->parent($nam) unless $net;
-		next unless $idx;
-		my $vprt = $self->getchild('Vprt',$idx,undef,[
-			['Port',undef,undef,[
+		last unless $idx;
+		my $vprt = $self->getchild('Vprt',$idx,undef);
+		unless (exists $vprt->{data}{extra}) {
+			Carp::cluck "No extra data for index $idx";
+			$self->show;
+			$vprt->show;
+		}
+		my $hwa = $vprt->{data}{extra}{hwa} if exists $vprt->{data}{extra}{hwa};
+		my $vla = $vprt->{data}{extra}{vla} if exists $vprt->{data}{extra}{vla};
+		my $vid = $vprt->{data}{extra}{vid} if exists $vprt->{data}{extra}{vid};
+		#printf STDERR "Using extra data for %s: %s,%s,%s\n", $vprt,Item::showkey($hwa),Item::showkey($vla),$vid;
+		$vprt = $self->getchild('Vprt',$idx,undef,[
+			['Port',$hwa,$vid,[
 				[$nam,$net,undef],
-				['Point::Host',$self,undef],
-				['Lan',undef,undef,[
+				['Point::Host',$self,$hwa],
+				['Lan',$hwa,$hwa,[
 					[$nam,$net,undef]]]]],
-			['Bprt',undef,undef,[
-				[$nam,$net,undef],
-				['Point::Host',$self,undef],
-				['Blan',undef,undef,[
-					[$nam,$net,undef]]]]],
-			['Vlan',undef,undef,[
+			['Vlan',undef,$hwa,[
 				[$nam,$net,undef]]],
 			]);
-		$vprt->parent('Vlan')->link($model,undef,[
-			['Lan',$vprt->parent('Port')->parent('Lan'),undef],
-			['Blan',$vprt->parent('Bprt')->parent('Blan'),undef],
-			]);
-		$vprt = $vprt->target;
-		my $blan = $vprt->parent('Bprt')->parent('Blan');
+		my $vlan = $vprt->parent('Vlan');
+		my $plan = $vprt->parent('Port')->parent('Lan');
+		$vlan->link($model,undef,[['Lan',$plan,undef]]);
 		$net = $net->target;
+		last if unpack('C',substr($pfx,4,1)) == 32;
 		my $sub = $net->getchild('Subnet',$pfx,undef,[
-			['Blan',$blan,$pfx],
+			['Vlan',$vlan,$pfx],
 			]);
+		last;
 	}
-	foreach my $row (values %$xlated) {
-		next unless $row->{ipRouteType} eq 'indirect(4)';
+	while (1) {
+		last unless $row->{ipRouteType} eq 'indirect(4)';
 		if (dump_tables) {
 			print STDERR "\nTable $table row: for ",Item::showkey($hkey),"\n";
 			print STDERR Dumper($row),"\n";
@@ -3006,42 +3329,29 @@ sub ipRouteTable {
 			Carp::confess "XXXXXX Missing fields:\n",Data::Dumper->new([$row])->Dump;
 		}
 		my $pfx = Item::makekey($row->{ipRouteDest}.'/'.$row->{ipRouteMask});
-		my $ipt = Model::SNMP::iptype($pfx); next if $ipt eq 'RESERVED';
+		last if unpack('C',substr($pfx,4,1)) == 32;
+		my $ipt = Model::SNMP::iptype($pfx); last if $ipt eq 'RESERVED';
 		my $net = $model->{net}{$ipt} if Model::SNMP::typeok($type,$ipt);
 		my $nam = Model::SNMP::netname($ipt);
 		$net = $self->parent($nam) unless $net;
-		next unless $net;
-		next unless $idx;
+		last unless $net;
+		last unless $idx;
 		my $vprt = $self->getchild('Vprt',$idx,undef);
 		my $sub = $net->getchild('Subnet',$pfx,undef);
 		my $rte = Route->get($model,$vprt->target,$sub->target,$ipa);
-		foreach (qw/
-			ipRouteDest
-			ipRouteIfIndex
-			ipRouteMetric1
-			ipRouteMetric2
-			ipRouteMetric3
-			ipRouteMetric4
-			ipRouteNextHop
-			ipRouteType
-			ipRouteProto
-			ipRouteAge
-			ipRouteMask
-			ipRouteMetric5
-			ipRouteInfo/) {
-			$rte->{data}{$table}{$_} = $row->{$_};
-		}
+		$rte->addrow($table,$row);
+		last;
 	}
-	foreach my $row (values %$xlated) {
-		next unless $row->{ipRouteType} eq 'indirect(4)';
-		next unless $row->{ipRouteNextHop};
+	while (1) {
+		last unless $row->{ipRouteType} eq 'indirect(4)';
+		last unless $row->{ipRouteNextHop};
 		if (dump_tables) {
 			print STDERR "\nTable $table row: for ",Item::showkey($hkey),"\n";
 			print STDERR Dumper($row),"\n";
 		}
 		my $idx = $row->{ipRouteIfIndex};
 		my $ipa = Item::makekey($row->{ipRouteNextHop});
-		my $ipt = Model::SNMP::iptype($ipa); next if $ipt eq 'RESERVED';
+		my $ipt = Model::SNMP::iptype($ipa); last if $ipt eq 'RESERVED';
 		my $net = $model->{net}{$ipt} if Model::SNMP::typeok($type,$ipt);
 		my $nam = Model::SNMP::netname($ipt);
 		$self->link($model,undef,[[$nam,$net,undef]]);
@@ -3057,588 +3367,376 @@ sub ipRouteTable {
 		} else {
 			warn "Can't find subnet of $net for address ",Item::showkey($ipa);
 		}
+		last;
 	}
 }
 #package Point::Host;
-sub lldpPortConfigTable {
+sub ipCidrRouteEntry {
 	my $self = shift;
-	my ($model,$snmpargs,$table,$xlated,$error,$hkey,$type,$snet,$name) = @_;
-	foreach my $row (values %$xlated) {
+	my ($index,$row,$model,$snmpargs,$table,$xlated,$error,$hkey,$type,$snet,$name) = @_;
+	while (1) {
+		last unless $row->{ipCidrRouteType} eq 'local(3)';
 		if (dump_tables) {
 			print STDERR "\nTable $table row: for ",Item::showkey($hkey),"\n";
 			print STDERR Dumper($row),"\n";
 		}
-		my $idx = $row->{lldpPortConfigPortNum};
-		next unless $idx;
-		my $vprt = $self->getchild('Vprt',$idx,undef);
-		next unless $vprt;
-		my $vdat = $vprt->{data}{$table};
-		$vdat = $vprt->{data}{$table} = {} unless $vdat;
-		foreach (keys %$row) {
-			$vdat->{$_} = $row->{$_};
-		}
-	}
-}
-#package Point::Host;
-sub lldpConfigManAddrTable {
-	my $self = shift;
-	my ($model,$snmpargs,$table,$xlated,$error,$hkey,$type,$snet,$name) = @_;
-	foreach my $row (values %$xlated) {
-		if (dump_tables) {
-			print STDERR "\nTable $table row: for ",Item::showkey($hkey),"\n";
-			print STDERR Dumper($row),"\n";
-		}
-	}
-}
-#package Point::Host;
-sub lldpStatsTxPortTable {
-	my $self = shift;
-	my ($model,$snmpargs,$table,$xlated,$error,$hkey,$type,$snet,$name) = @_;
-	foreach my $row (values %$xlated) {
-		if (dump_tables) {
-			print STDERR "\nTable $table row: for ",Item::showkey($hkey),"\n";
-			print STDERR Dumper($row),"\n";
-		}
-		my $idx = $row->{lldpStatsTxPortNum};
-		next unless $idx;
-		my $vprt = $self->getchild('Vprt',$idx,undef);
-		next unless $vprt;
-		my $vdat = $vprt->{data}{$table};
-		$vdat = $vprt->{data}{$table} = {} unless $vdat;
-		foreach (qw/
-				lldpStatsTxPortNum
-				lldpStatsTxPortFramesTotal/) {
-			$vdat->{$_} = $row->{$_};
-		}
-	}
-}
-#package Point::Host;
-sub lldpStatsRxPortTable {
-	my $self = shift;
-	my ($model,$snmpargs,$table,$xlated,$error,$hkey,$type,$snet,$name) = @_;
-	foreach my $row (values %$xlated) {
-		if (dump_tables) {
-			print STDERR "\nTable $table row: for ",Item::showkey($hkey),"\n";
-			print STDERR Dumper($row),"\n";
-		}
-		my $idx = $row->{lldpStatsRxPortNum};
-		next unless $idx;
-		my $vprt = $self->getchild('Vprt',$idx,undef);
-		next unless $vprt;
-		{
-			my $vdat = $vprt->{data}{$table};
-			$vdat = $vprt->{data}{$table} = {} unless $vdat;
-			foreach (qw/
-					lldpStatsRxPortNum
-					lldpStatsRxPortFramesDiscardedTotal
-					lldpStatsRxPortFramesErrors
-					lldpStatsRxPortFramesTotal
-					lldpStatsRxPortTLVsDiscardedTotal
-					lldpStatsRxPortTLVsUnrecognizedTotal
-					lldpStatsRxPortAgeoutsTotal/) {
-				$vdat->{$_} = $row->{$_};
-			}
-		}
-	}
-}
-#package Point::Host;
-sub lldpLocPortTable {
-	my $self = shift;
-	my ($model,$snmpargs,$table,$xlated,$error,$hkey,$type,$snet,$name) = @_;
-	foreach my $row (values %$xlated) {
-		if (dump_tables) {
-			print STDERR "\nTable $table row: for ",Item::showkey($hkey),"\n";
-			print STDERR Dumper($row),"\n";
-		}
-		my $idx = $row->{lldpLocPortNum};
-		next unless $idx;
-		my $vprt = $self->getchild('Vprt',$idx,undef);
-		next unless $vprt;
-		{
-			my $vdat = $vprt->{data}{$table};
-			$vdat = $vprt->{data}{$table} = {} unless $vdat;
-			foreach (qw/
-					lldpLocPortNum
-					lldpLocPortIdSubtype
-					lldpLocPortId
-					lldpLocPortDesc/) {
-				$vdat->{$_} = $row->{$_};
-			}
-		}
-		next;
-		next unless $row->{lldpLocPortIdSubtype} eq 'macAddress(3)';
-		my $hwa = Item::makekey($row->{lldpLocPortIdSubtype});
-		next unless $hwa;
-		$vprt = $self->getchild('Vprt',$idx,undef,[
-			['Port',$hwa,undef,[
-				['Point::Host',$self,undef]]],
-			['Vlan',undef,undef,[
-				['Lan',$hwa,undef]]],
-			]);
-	}
-}
-#package Point::Host;
-sub lldpLocManAddrTable {
-	my $self = shift;
-	my ($model,$snmpargs,$table,$xlated,$error,$hkey,$type,$snet,$name) = @_;
-	foreach my $row (values %$xlated) {
-		if (dump_tables) {
-			print STDERR "\nTable $table row: for ",Item::showkey($hkey),"\n";
-			print STDERR Dumper($row),"\n";
-		}
-		next;
-		my ($idx,$ipa);
-		if ($row->{lldpLocManAddrIfSubtype} eq 'ifIndex(2)') {
-			$idx = $row->{lldpLocManAddrIfId};
-		}
-		next unless $idx;
-		if ($row->{lldpLocManAddrSubtype} eq 'ipV4(1)') {
-			$ipa = Item::makekey($row->{lldpLocManAddr});
-			next unless $ipa;
-			$row->{lldpLocManAddr} = Item::showkey($ipa);
-		}
-		next unless $ipa;
-		my $ipt = Model::SNMP::iptype($ipa);
-		next if $ipt eq 'RESERVED';
+		my $idx = $row->{ipCidrRouteIfIndex};
+		last unless $row->{ipCidrRouteDest} and $row->{ipCidrRouteMask};
+		my $pfx = Item::makekey($row->{ipCidrRouteDest}.'/'.$row->{ipCidrRouteMask});
+		my $ipt = Model::SNMP::iptype($pfx); last if $ipt eq 'RESERVED';
 		my $net = $model->{net}{$ipt} if Model::SNMP::typeok($type,$ipt);
 		my $nam = Model::SNMP::netname($ipt);
-		$self->link($model,undef,[[$nam,$net,$ipa]]);
+		$self->link($model,undef,[[$nam,$net,undef]]);
 		$net = $self->parent($nam) unless $net;
-		my $vprt = $self->getchild('Vprt',$idx,undef,[
-			['Port',undef,undef,[
-				[$nam,$net,$ipa],
-				['Point::Host',$self,undef],
-				['Lan',undef,undef,[
-					[$nam,$net,$ipa]]]]],
-			['Bprt',undef,undef,[
-				[$nam,$net,$ipa],
-				['Point::Host',$self,undef],
-				['Blan',undef,undef,[
-					[$nam,$net,$ipa]]]]],
-			['Vlan',undef,undef,[
-				[$nam,$net,$ipa]]],
+		last unless $idx;
+		my $vprt = $self->getchild('Vprt',$idx,undef);
+		unless (exists $vprt->{data}{extra}) {
+			Carp::cluck "No extra data for index $idx";
+			$self->show;
+			$vprt->show;
+		}
+		my $hwa = $vprt->{data}{extra}{hwa} if exists $vprt->{data}{extra}{hwa};
+		my $vla = $vprt->{data}{extra}{vla} if exists $vprt->{data}{extra}{vla};
+		my $vid = $vprt->{data}{extra}{vid} if exists $vprt->{data}{extra}{vid};
+		#printf STDERR "Using extra data for %s: %s,%s,%s\n", $vprt,Item::showkey($hwa),Item::showkey($vla),$vid;
+		$vprt = $self->getchild('Vprt',$idx,undef,[
+			['Port',$hwa,$vid,[
+				[$nam,$net,undef],
+				['Point::Host',$self,$hwa],
+				['Lan',$hwa,$hwa,[
+					[$nam,$net,undef]]]]],
+			['Vlan',undef,$hwa,[
+				[$nam,$net,undef]]],
 			]);
-		$vprt->parent('Vlan')->link($model,undef,[
-			['Lan',$vprt->parent('Port')->parent('Lan'),undef],
-			['Blan',$vprt->parent('Bprt')->parent('Blan'),undef],
-			]);
-		$vprt = $vprt->target;
-		my $blan = $vprt->parent('Bprt')->parent('Blan');
+		my $vlan = $vprt->parent('Vlan');
+		my $plan = $vprt->parent('Port')->parent('Lan');
+		$vlan->link($model,undef,[['Lan',$plan,undef]]);
+		last if unpack('C',substr($pfx,4,1)) == 32;
 		$net = $net->target;
-		my $addr = $net->getchild('Address',$ipa,undef,[
-			['Point::Host',$self,$ipa],
-			['Subnet',undef,$ipa,[
-				[$nam,$net,$ipa],
-				['Blan',$blan,undef]]],
+		my $sub = $net->getchild('Subnet',$pfx,undef,[
+			['Vlan',$vlan,$pfx],
 			]);
-		foreach (qw/
-				lldpLocManAddrIfId
-				lldpLocManAddrIfSubtype
-				lldpLocManAddrOID
-				lldpLocManAddr
-				lldpLocManAddrLen
-				lldpLocManAddrSubtype/) {
-			$vprt->{data}{$table}{$_} = $row->{$_};
-			$self->{data}{$table}{$_} = $row->{$_};
-			$addr->{data}{$table}{$_} = $row->{$_};
-		}
+		last;
 	}
-}
-#package Point::Host;
-sub lldpRemTable {
-	my $self = shift;
-	my ($model,$snmpargs,$table,$xlated,$error,$hkey,$type,$snet,$name) = @_;
-	foreach my $row (values %$xlated) {
+	while (1) {
+		last unless $row->{ipCidrRouteType} eq 'remote(4)';
 		if (dump_tables) {
 			print STDERR "\nTable $table row: for ",Item::showkey($hkey),"\n";
 			print STDERR Dumper($row),"\n";
 		}
+		my $idx = $row->{ipCidrRouteIfIndex};
+		my $ipa = Item::makekey($row->{ipCidrRouteNextHop});
+		unless ($row->{ipCidrRouteDest} and $row->{ipCidrRouteMask}) {
+			Carp::confess "XXXXXX Missing fields:\n",Data::Dumper->new([$row])->Dump;
+		}
+		my $pfx = Item::makekey($row->{ipCidrRouteDest}.'/'.$row->{ipCidrRouteMask});
+		last if unpack('C',substr($pfx,4,1)) == 32;
+		my $ipt = Model::SNMP::iptype($pfx); last if $ipt eq 'RESERVED';
+		my $net = $model->{net}{$ipt} if Model::SNMP::typeok($type,$ipt);
+		my $nam = Model::SNMP::netname($ipt);
+		$net = $self->parent($nam) unless $net;
+		last unless $net;
+		last unless $idx;
+		my $vprt = $self->getchild('Vprt',$idx,undef);
+		my $sub = $net->getchild('Subnet',$pfx,undef);
+		my $rte = Route->get($model,$vprt->target,$sub->target,$ipa);
+		$rte->addrow($table,$row);
+		last;
 	}
-}
-#package Point::Host;
-sub lldpRemManAddrTable {
-	my $self = shift;
-	my ($model,$snmpargs,$table,$xlated,$error,$hkey,$type,$snet,$name) = @_;
-	foreach my $row (values %$xlated) {
+	while (1) {
+		last unless $row->{ipCidrRouteType} eq 'remote(4)';
+		last unless $row->{ipCidrRouteNextHop};
 		if (dump_tables) {
 			print STDERR "\nTable $table row: for ",Item::showkey($hkey),"\n";
 			print STDERR Dumper($row),"\n";
 		}
+		my $idx = $row->{ipCidrRouteIfIndex};
+		my $ipa = Item::makekey($row->{ipCidrRouteNextHop});
+		my $ipt = Model::SNMP::iptype($ipa); last if $ipt eq 'RESERVED';
+		my $net = $model->{net}{$ipt} if Model::SNMP::typeok($type,$ipt);
+		my $nam = Model::SNMP::netname($ipt);
+		$self->link($model,undef,[[$nam,$net,undef]]);
+		$net = $self->parent($nam) unless $net;
+		my $host = $net->getchild('Point::Host',$ipa);
+		my ($sub,$pfx) = $net->subnetbyip($ipa);
+		if ($sub) {
+			my $addr = $net->getchild('Address',$ipa,undef,[
+				['Point::Host',$host,$ipa],
+				['Subnet',$sub,$ipa,[
+					[$nam,$net,$ipa]]],
+				]);
+		} else {
+			warn "Can't find subnet of $net for address ",Item::showkey($ipa);
+		}
+		last;
 	}
 }
 #package Point::Host;
-sub lldpRemUnknownTLVTable {
+sub inetCidrRouteEntry {
 	my $self = shift;
-	my ($model,$snmpargs,$table,$xlated,$error,$hkey,$type,$snet,$name) = @_;
-	foreach my $row (values %$xlated) {
+	my ($index,$row,$model,$snmpargs,$table,$xlated,$error,$hkey,$type,$snet,$name) = @_;
+	while (1) {
+		last unless $row->{inetCidrRouteType} eq 'local(3)';
 		if (dump_tables) {
 			print STDERR "\nTable $table row: for ",Item::showkey($hkey),"\n";
 			print STDERR Dumper($row),"\n";
 		}
+		last unless $row->{inetCidrRouteDestType} eq 'ipv4(1)';
+		my $idx = $row->{inetCidrRouteIfIndex};
+		last unless defined $row->{inetCidrRouteDest} and defined $row->{inetCidrRoutePfxLen};
+		my $pfx = Item::makekey($row->{inetCidrRouteDest}.'/'.$row->{inetCidrRoutePfxLen});
+		my $ipt = Model::SNMP::iptype($pfx); last if $ipt eq 'RESERVED';
+		my $net = $model->{net}{$ipt} if Model::SNMP::typeok($type,$ipt);
+		my $nam = Model::SNMP::netname($ipt);
+		$self->link($model,undef,[[$nam,$net,undef]]);
+		$net = $self->parent($nam) unless $net;
+		last unless $idx;
+		my $vprt = $self->getchild('Vprt',$idx,undef);
+		unless (exists $vprt->{data}{extra}) {
+			Carp::cluck "No extra data for index $idx";
+			$self->show;
+			$vprt->show;
+		}
+		my $hwa = $vprt->{data}{extra}{hwa} if exists $vprt->{data}{extra}{hwa};
+		my $vla = $vprt->{data}{extra}{vla} if exists $vprt->{data}{extra}{vla};
+		my $vid = $vprt->{data}{extra}{vid} if exists $vprt->{data}{extra}{vid};
+		#printf STDERR "Using extra data for %s: %s,%s,%s\n", $vprt,Item::showkey($hwa),Item::showkey($vla),$vid;
+		$vprt = $self->getchild('Vprt',$idx,undef,[
+			['Port',$hwa,$vid,[
+				[$nam,$net,undef],
+				['Point::Host',$self,$hwa],
+				['Lan',$hwa,$hwa,[
+					[$nam,$net,undef]]]]],
+			['Vlan',undef,$hwa,[
+				[$nam,$net,undef]]],
+			]);
+		my $vlan = $vprt->parent('Vlan');
+		my $plan = $vprt->parent('Port')->parent('Lan');
+		$vlan->link($model,undef,[['Lan',$plan,undef]]);
+		last if unpack('C',substr($pfx,4,1)) == 32;
+		$net = $net->target;
+		my $sub = $net->getchild('Subnet',$pfx,undef,[
+			['Vlan',$vlan,$pfx],
+			]);
+		last;
 	}
-}
-#package Point::Host;
-sub lldpRemOrgDefInfoTable {
-	my $self = shift;
-	my ($model,$snmpargs,$table,$xlated,$error,$hkey,$type,$snet,$name) = @_;
-	foreach my $row (values %$xlated) {
+	while (1) {
+		last unless $row->{inetCidrRouteType} eq 'remote(4)';
 		if (dump_tables) {
 			print STDERR "\nTable $table row: for ",Item::showkey($hkey),"\n";
 			print STDERR Dumper($row),"\n";
 		}
+		last unless $row->{inetCidrRouteDestType} eq 'ipv4(1)';
+		last unless $row->{inetCidrRouteNextHopType} eq 'ipv4(1)';
+		my $idx = $row->{inetCidrRouteIfIndex};
+		my $ipa = Item::makekey($row->{inetCidrRouteNextHop});
+		unless ($row->{inetCidrRouteDest} and defined $row->{inetCidrRoutePfxLen}) {
+			Carp::confess "XXXXXX Missing fields:\n",Data::Dumper->new([$row])->Dump;
+		}
+		my $pfx = Item::makekey($row->{inetCidrRouteDest}.'/'.$row->{inetCidrRoutePfxLen});
+		last if unpack('C',substr($pfx,4,1)) == 32;
+		my $ipt = Model::SNMP::iptype($pfx); last if $ipt eq 'RESERVED';
+		my $net = $model->{net}{$ipt} if Model::SNMP::typeok($type,$ipt);
+		my $nam = Model::SNMP::netname($ipt);
+		$net = $self->parent($nam) unless $net;
+		last unless $net;
+		last unless $idx;
+		my $vprt = $self->getchild('Vprt',$idx,undef);
+		my $sub = $net->getchild('Subnet',$pfx,undef);
+		my $rte = Route->get($model,$vprt->target,$sub->target,$ipa);
+		$rte->addrow($table,$row);
+		last;
 	}
-}
-#package Point::Host;
-sub lldpXdot1ConfigPortVlanTable {
-	my $self = shift;
-	my ($model,$snmpargs,$table,$xlated,$error,$hkey,$type,$snet,$name) = @_;
-	foreach my $row (values %$xlated) {
+	while (1) {
+		last unless $row->{inetCidrRouteType} eq 'remote(4)';
 		if (dump_tables) {
 			print STDERR "\nTable $table row: for ",Item::showkey($hkey),"\n";
 			print STDERR Dumper($row),"\n";
 		}
+		last unless $row->{inetCidrRouteDestType} eq 'ipv4(1)';
+		last unless $row->{inetCidrRouteNextHopType} eq 'ipv4(1)';
+		my $idx = $row->{inetCidrRouteIfIndex};
+		my $ipa = Item::makekey($row->{inetCidrRouteNextHop});
+		my $ipt = Model::SNMP::iptype($ipa); last if $ipt eq 'RESERVED';
+		my $net = $model->{net}{$ipt} if Model::SNMP::typeok($type,$ipt);
+		my $nam = Model::SNMP::netname($ipt);
+		$self->link($model,undef,[[$nam,$net,undef]]);
+		$net = $self->parent($nam) unless $net;
+		my $host = $net->getchild('Point::Host',$ipa);
+		my ($sub,$pfx) = $net->subnetbyip($ipa);
+		if ($sub) {
+			my $addr = $net->getchild('Address',$ipa,undef,[
+				['Point::Host',$host,$ipa],
+				['Subnet',$sub,$ipa,[
+					[$nam,$net,$ipa]]],
+				]);
+		} else {
+			warn "Can't find subnet of $net for address ",Item::showkey($ipa);
+		}
+		last;
 	}
 }
 #package Point::Host;
-sub lldpXdot1ConfigVlanNameTable {
+sub ipSystemStatsEntry {
 	my $self = shift;
-	my ($model,$snmpargs,$table,$xlated,$error,$hkey,$type,$snet,$name) = @_;
-	foreach my $row (values %$xlated) {
-		if (dump_tables) {
-			print STDERR "\nTable $table row: for ",Item::showkey($hkey),"\n";
-			print STDERR Dumper($row),"\n";
-		}
+	my ($index,$row,$model,$snmpargs,$table,$xlated,$error,$hkey,$type,$snet,$name) = @_;
+	return unless $row->{ipSystemStatsIPVersion} eq 'ipv4(1)';
+	if (dump_tables) {
+		print STDERR "\nTable $table row: for ",Item::showkey($hkey),"\n";
+		print STDERR Dumper($row),"\n";
 	}
+	$self->addrow($table,$row);
 }
 #package Point::Host;
-sub lldpXdot1ConfigProtoVlanTable {
+sub ipIfStatsEntry {
 	my $self = shift;
-	my ($model,$snmpargs,$table,$xlated,$error,$hkey,$type,$snet,$name) = @_;
-	foreach my $row (values %$xlated) {
-		if (dump_tables) {
-			print STDERR "\nTable $table row: for ",Item::showkey($hkey),"\n";
-			print STDERR Dumper($row),"\n";
-		}
+	my ($index,$row,$model,$snmpargs,$table,$xlated,$error,$hkey,$type,$snet,$name) = @_;
+	return unless $row->{ipIfStatsIPVersion} eq 'ipv4(1)';
+	if (dump_tables) {
+		print STDERR "\nTable $table row: for ",Item::showkey($hkey),"\n";
+		print STDERR Dumper($row),"\n";
 	}
+	$self->addrow($table,$row);
 }
 #package Point::Host;
-sub lldpXdot1ConfigProtocolTable {
+sub lldpPortConfigEntry {
 	my $self = shift;
-	my ($model,$snmpargs,$table,$xlated,$error,$hkey,$type,$snet,$name) = @_;
-	foreach my $row (values %$xlated) {
-		if (dump_tables) {
-			print STDERR "\nTable $table row: for ",Item::showkey($hkey),"\n";
-			print STDERR Dumper($row),"\n";
-		}
+	my ($index,$row,$model,$snmpargs,$table,$xlated,$error,$hkey,$type,$snet,$name) = @_;
+	if (dump_tables) {
+		print STDERR "\nTable $table row: for ",Item::showkey($hkey),"\n";
+		print STDERR Dumper($row),"\n";
 	}
+	my $idx = $row->{lldpPortConfigPortNum};
+	return unless $idx;
+	my $vprt = $self->getchild('Vprt',$idx,undef);
+	return unless $vprt;
+	my $hwa = $vprt->{data}{extra}{hwa} if exists $vprt->{data}{extra}{hwa};
+	my $vla = $vprt->{data}{extra}{vla} if exists $vprt->{data}{extra}{vla};
+	my $vid = $vprt->{data}{extra}{vid} if exists $vprt->{data}{extra}{vid};
+	$vprt->addrow($table,$row);
+	my $port = $vprt->parent('Port') if defined $vid and $vid eq '';
+	$port->addrow($table,$row) if $port;
 }
 #package Point::Host;
-sub lldpXdot1LocTable {
+sub lldpStatsTxPortEntry {
 	my $self = shift;
-	my ($model,$snmpargs,$table,$xlated,$error,$hkey,$type,$snet,$name) = @_;
-	foreach my $row (values %$xlated) {
-		if (dump_tables) {
-			print STDERR "\nTable $table row: for ",Item::showkey($hkey),"\n";
-			print STDERR Dumper($row),"\n";
-		}
+	my ($index,$row,$model,$snmpargs,$table,$xlated,$error,$hkey,$type,$snet,$name) = @_;
+	if (dump_tables) {
+		print STDERR "\nTable $table row: for ",Item::showkey($hkey),"\n";
+		print STDERR Dumper($row),"\n";
 	}
+	my $idx = $row->{lldpStatsTxPortNum};
+	return unless $idx;
+	my $vprt = $self->getchild('Vprt',$idx,undef);
+	return unless $vprt;
+	my $hwa = $vprt->{data}{extra}{hwa} if exists $vprt->{data}{extra}{hwa};
+	my $vla = $vprt->{data}{extra}{vla} if exists $vprt->{data}{extra}{vla};
+	my $vid = $vprt->{data}{extra}{vid} if exists $vprt->{data}{extra}{vid};
+	$vprt->addrow($table,$row);
+	my $port = $vprt->parent('Port') if defined $vid and $vid eq '';
+	$port->addrow($table,$row) if $port;
 }
 #package Point::Host;
-sub lldpXdot1LocProtoVlanTable {
+sub lldpStatsRxPortEntry {
 	my $self = shift;
-	my ($model,$snmpargs,$table,$xlated,$error,$hkey,$type,$snet,$name) = @_;
-	foreach my $row (values %$xlated) {
-		if (dump_tables) {
-			print STDERR "\nTable $table row: for ",Item::showkey($hkey),"\n";
-			print STDERR Dumper($row),"\n";
-		}
+	my ($index,$row,$model,$snmpargs,$table,$xlated,$error,$hkey,$type,$snet,$name) = @_;
+	if (dump_tables) {
+		print STDERR "\nTable $table row: for ",Item::showkey($hkey),"\n";
+		print STDERR Dumper($row),"\n";
 	}
+	my $idx = $row->{lldpStatsRxPortNum};
+	return unless $idx;
+	my $vprt = $self->getchild('Vprt',$idx,undef);
+	return unless $vprt;
+	my $hwa = $vprt->{data}{extra}{hwa} if exists $vprt->{data}{extra}{hwa};
+	my $vla = $vprt->{data}{extra}{vla} if exists $vprt->{data}{extra}{vla};
+	my $vid = $vprt->{data}{extra}{vid} if exists $vprt->{data}{extra}{vid};
+	$vprt->addrow($table,$row);
+	my $port = $vprt->parent('Port') if defined $vid and $vid eq '';
+	$port->addrow($table,$row) if $port;
 }
 #package Point::Host;
-sub lldpXdot1LocVlanNameTable {
+sub lldpLocPortEntry {
 	my $self = shift;
-	my ($model,$snmpargs,$table,$xlated,$error,$hkey,$type,$snet,$name) = @_;
-	foreach my $row (values %$xlated) {
-		if (dump_tables) {
-			print STDERR "\nTable $table row: for ",Item::showkey($hkey),"\n";
-			print STDERR Dumper($row),"\n";
-		}
+	my ($index,$row,$model,$snmpargs,$table,$xlated,$error,$hkey,$type,$snet,$name) = @_;
+	if (dump_tables) {
+		print STDERR "\nTable $table row: for ",Item::showkey($hkey),"\n";
+		print STDERR Dumper($row),"\n";
 	}
+	my $idx = $row->{lldpLocPortNum};
+	return unless $idx;
+	my $hwa = Item::makekey($row->{lldpLocPortIdSubtype})
+		if $row->{lldpLocPortIdSubtype} eq 'macAddress(3)';
+	my $vprt = $self->getchild('Vprt',$idx,undef);
+	#my $hwa = $vprt->{data}{extra}{hwa} if exists $vprt->{data}{extra}{hwa};
+	my $vla = $vprt->{data}{extra}{vla} if exists $vprt->{data}{extra}{vla};
+	my $vid = $vprt->{data}{extra}{vid} if exists $vprt->{data}{extra}{vid};
+	$vprt->addrow($table,$row);
+	my $port = $vprt->parent('Port') if defined $vid and $vid eq '';
+	$port->addrow($table,$row) if $port;
 }
 #package Point::Host;
-sub lldpXdot1LocProtocolTable {
+sub lldpLocManAddrEntry {
 	my $self = shift;
-	my ($model,$snmpargs,$table,$xlated,$error,$hkey,$type,$snet,$name) = @_;
-	foreach my $row (values %$xlated) {
-		if (dump_tables) {
-			print STDERR "\nTable $table row: for ",Item::showkey($hkey),"\n";
-			print STDERR Dumper($row),"\n";
-		}
+	my ($index,$row,$model,$snmpargs,$table,$xlated,$error,$hkey,$type,$snet,$name) = @_;
+	if (dump_tables) {
+		print STDERR "\nTable $table row: for ",Item::showkey($hkey),"\n";
+		print STDERR Dumper($row),"\n";
 	}
-}
-#package Point::Host;
-sub lldpXdot1RemTable {
-	my $self = shift;
-	my ($model,$snmpargs,$table,$xlated,$error,$hkey,$type,$snet,$name) = @_;
-	foreach my $row (values %$xlated) {
-		if (dump_tables) {
-			print STDERR "\nTable $table row: for ",Item::showkey($hkey),"\n";
-			print STDERR Dumper($row),"\n";
-		}
+	return; # XXX FIXME
+	my ($idx,$ipa);
+	if ($row->{lldpLocManAddrIfSubtype} eq 'ifIndex(2)') {
+		$idx = $row->{lldpLocManAddrIfId};
 	}
-}
-#package Point::Host;
-sub lldpXdot1RemProtoVlanTable {
-	my $self = shift;
-	my ($model,$snmpargs,$table,$xlated,$error,$hkey,$type,$snet,$name) = @_;
-	foreach my $row (values %$xlated) {
-		if (dump_tables) {
-			print STDERR "\nTable $table row: for ",Item::showkey($hkey),"\n";
-			print STDERR Dumper($row),"\n";
-		}
+	return unless $idx;
+	if ($row->{lldpLocManAddrSubtype} eq 'ipV4(1)') {
+		$ipa = Item::makekey($row->{lldpLocManAddr});
+		return unless $ipa;
+		$row->{lldpLocManAddr} = Item::showkey($ipa);
 	}
-}
-#package Point::Host;
-sub lldpXdot1RemVlanNameTable {
-	my $self = shift;
-	my ($model,$snmpargs,$table,$xlated,$error,$hkey,$type,$snet,$name) = @_;
-	foreach my $row (values %$xlated) {
-		if (dump_tables) {
-			print STDERR "\nTable $table row: for ",Item::showkey($hkey),"\n";
-			print STDERR Dumper($row),"\n";
-		}
+	return unless $ipa;
+	my $ipt = Model::SNMP::iptype($ipa);
+	return if $ipt eq 'RESERVED';
+	my $net = $model->{net}{$ipt} if Model::SNMP::typeok($type,$ipt);
+	my $nam = Model::SNMP::netname($ipt);
+	$self->link($model,undef,[[$nam,$net,$ipa]]);
+	$net = $self->parent($nam) unless $net;
+	my $vprt = $self->getchild('Vprt',$idx,undef);
+	unless (exists $vprt->{data}{extra}) {
+		Carp::cluck "No extra data for index $idx";
+		$self->show;
+		$vprt->show;
 	}
-}
-#package Point::Host;
-sub lldpXdot1RemProtocolTable {
-	my $self = shift;
-	my ($model,$snmpargs,$table,$xlated,$error,$hkey,$type,$snet,$name) = @_;
-	foreach my $row (values %$xlated) {
-		if (dump_tables) {
-			print STDERR "\nTable $table row: for ",Item::showkey($hkey),"\n";
-			print STDERR Dumper($row),"\n";
-		}
-	}
-}
-#package Point::Host;
-sub lldpXdot3PortConfigTable {
-	my $self = shift;
-	my ($model,$snmpargs,$table,$xlated,$error,$hkey,$type,$snet,$name) = @_;
-	foreach my $row (values %$xlated) {
-		if (dump_tables) {
-			print STDERR "\nTable $table row: for ",Item::showkey($hkey),"\n";
-			print STDERR Dumper($row),"\n";
-		}
-	}
-}
-#package Point::Host;
-sub lldpXdot3LocPortTable {
-	my $self = shift;
-	my ($model,$snmpargs,$table,$xlated,$error,$hkey,$type,$snet,$name) = @_;
-	foreach my $row (values %$xlated) {
-		if (dump_tables) {
-			print STDERR "\nTable $table row: for ",Item::showkey($hkey),"\n";
-			print STDERR Dumper($row),"\n";
-		}
-	}
-}
-#package Point::Host;
-sub lldpXdot3LocPowerTable {
-	my $self = shift;
-	my ($model,$snmpargs,$table,$xlated,$error,$hkey,$type,$snet,$name) = @_;
-	foreach my $row (values %$xlated) {
-		if (dump_tables) {
-			print STDERR "\nTable $table row: for ",Item::showkey($hkey),"\n";
-			print STDERR Dumper($row),"\n";
-		}
-	}
-}
-#package Point::Host;
-sub lldpXdot3LocLinkAggTable {
-	my $self = shift;
-	my ($model,$snmpargs,$table,$xlated,$error,$hkey,$type,$snet,$name) = @_;
-	foreach my $row (values %$xlated) {
-		if (dump_tables) {
-			print STDERR "\nTable $table row: for ",Item::showkey($hkey),"\n";
-			print STDERR Dumper($row),"\n";
-		}
-	}
-}
-#package Point::Host;
-sub lldpXdot3LocMaxFrameSizeTable {
-	my $self = shift;
-	my ($model,$snmpargs,$table,$xlated,$error,$hkey,$type,$snet,$name) = @_;
-	foreach my $row (values %$xlated) {
-		if (dump_tables) {
-			print STDERR "\nTable $table row: for ",Item::showkey($hkey),"\n";
-			print STDERR Dumper($row),"\n";
-		}
-	}
-}
-#package Point::Host;
-sub lldpXdot3RemPortTable {
-	my $self = shift;
-	my ($model,$snmpargs,$table,$xlated,$error,$hkey,$type,$snet,$name) = @_;
-	foreach my $row (values %$xlated) {
-		if (dump_tables) {
-			print STDERR "\nTable $table row: for ",Item::showkey($hkey),"\n";
-			print STDERR Dumper($row),"\n";
-		}
-	}
-}
-#package Point::Host;
-sub lldpXdot3RemPowerTable {
-	my $self = shift;
-	my ($model,$snmpargs,$table,$xlated,$error,$hkey,$type,$snet,$name) = @_;
-	foreach my $row (values %$xlated) {
-		if (dump_tables) {
-			print STDERR "\nTable $table row: for ",Item::showkey($hkey),"\n";
-			print STDERR Dumper($row),"\n";
-		}
-	}
-}
-#package Point::Host;
-sub lldpXdot3RemLinkAggTable {
-	my $self = shift;
-	my ($model,$snmpargs,$table,$xlated,$error,$hkey,$type,$snet,$name) = @_;
-	foreach my $row (values %$xlated) {
-		if (dump_tables) {
-			print STDERR "\nTable $table row: for ",Item::showkey($hkey),"\n";
-			print STDERR Dumper($row),"\n";
-		}
-	}
-}
-#package Point::Host;
-sub lldpXdot3RemMaxFrameSizeTable {
-	my $self = shift;
-	my ($model,$snmpargs,$table,$xlated,$error,$hkey,$type,$snet,$name) = @_;
-	foreach my $row (values %$xlated) {
-		if (dump_tables) {
-			print STDERR "\nTable $table row: for ",Item::showkey($hkey),"\n";
-			print STDERR Dumper($row),"\n";
-		}
-	}
-}
-#package Point::Host;
-sub lldpXMedPortConfigTable {
-	my $self = shift;
-	my ($model,$snmpargs,$table,$xlated,$error,$hkey,$type,$snet,$name) = @_;
-	foreach my $row (values %$xlated) {
-		if (dump_tables) {
-			print STDERR "\nTable $table row: for ",Item::showkey($hkey),"\n";
-			print STDERR Dumper($row),"\n";
-		}
-	}
-}
-#package Point::Host;
-sub lldpXMedLocMediaPolicyTable {
-	my $self = shift;
-	my ($model,$snmpargs,$table,$xlated,$error,$hkey,$type,$snet,$name) = @_;
-	foreach my $row (values %$xlated) {
-		if (dump_tables) {
-			print STDERR "\nTable $table row: for ",Item::showkey($hkey),"\n";
-			print STDERR Dumper($row),"\n";
-		}
-	}
-}
-#package Point::Host;
-sub lldpXMedLocLocationTable {
-	my $self = shift;
-	my ($model,$snmpargs,$table,$xlated,$error,$hkey,$type,$snet,$name) = @_;
-	foreach my $row (values %$xlated) {
-		if (dump_tables) {
-			print STDERR "\nTable $table row: for ",Item::showkey($hkey),"\n";
-			print STDERR Dumper($row),"\n";
-		}
-	}
-}
-#package Point::Host;
-sub lldpXMedLocXPoEPSEPortTable {
-	my $self = shift;
-	my ($model,$snmpargs,$table,$xlated,$error,$hkey,$type,$snet,$name) = @_;
-	foreach my $row (values %$xlated) {
-		if (dump_tables) {
-			print STDERR "\nTable $table row: for ",Item::showkey($hkey),"\n";
-			print STDERR Dumper($row),"\n";
-		}
-	}
-}
-#package Point::Host;
-sub lldpXMedRemCapabilitiesTable {
-	my $self = shift;
-	my ($model,$snmpargs,$table,$xlated,$error,$hkey,$type,$snet,$name) = @_;
-	foreach my $row (values %$xlated) {
-		if (dump_tables) {
-			print STDERR "\nTable $table row: for ",Item::showkey($hkey),"\n";
-			print STDERR Dumper($row),"\n";
-		}
-	}
-}
-#package Point::Host;
-sub lldpXMedRemMediaPolicyTable {
-	my $self = shift;
-	my ($model,$snmpargs,$table,$xlated,$error,$hkey,$type,$snet,$name) = @_;
-	foreach my $row (values %$xlated) {
-		if (dump_tables) {
-			print STDERR "\nTable $table row: for ",Item::showkey($hkey),"\n";
-			print STDERR Dumper($row),"\n";
-		}
-	}
-}
-#package Point::Host;
-sub lldpXMedRemInventoryTable {
-	my $self = shift;
-	my ($model,$snmpargs,$table,$xlated,$error,$hkey,$type,$snet,$name) = @_;
-	foreach my $row (values %$xlated) {
-		if (dump_tables) {
-			print STDERR "\nTable $table row: for ",Item::showkey($hkey),"\n";
-			print STDERR Dumper($row),"\n";
-		}
-	}
-}
-#package Point::Host;
-sub lldpXMedRemLocationTable {
-	my $self = shift;
-	my ($model,$snmpargs,$table,$xlated,$error,$hkey,$type,$snet,$name) = @_;
-	foreach my $row (values %$xlated) {
-		if (dump_tables) {
-			print STDERR "\nTable $table row: for ",Item::showkey($hkey),"\n";
-			print STDERR Dumper($row),"\n";
-		}
-	}
-}
-#package Point::Host;
-sub lldpXMedRemXPoETable {
-	my $self = shift;
-	my ($model,$snmpargs,$table,$xlated,$error,$hkey,$type,$snet,$name) = @_;
-	foreach my $row (values %$xlated) {
-		if (dump_tables) {
-			print STDERR "\nTable $table row: for ",Item::showkey($hkey),"\n";
-			print STDERR Dumper($row),"\n";
-		}
-	}
-}
-#package Point::Host;
-sub lldpXMedRemXPoEPSETable {
-	my $self = shift;
-	my ($model,$snmpargs,$table,$xlated,$error,$hkey,$type,$snet,$name) = @_;
-	foreach my $row (values %$xlated) {
-		if (dump_tables) {
-			print STDERR "\nTable $table row: for ",Item::showkey($hkey),"\n";
-			print STDERR Dumper($row),"\n";
-		}
-	}
-}
-#package Point::Host;
-sub lldpXMedRemXPoEPDTable {
-	my $self = shift;
-	my ($model,$snmpargs,$table,$xlated,$error,$hkey,$type,$snet,$name) = @_;
-	foreach my $row (values %$xlated) {
-		if (dump_tables) {
-			print STDERR "\nTable $table row: for ",Item::showkey($hkey),"\n";
-			print STDERR Dumper($row),"\n";
-		}
-	}
+	my $hwa = $vprt->{data}{extra}{hwa} if exists $vprt->{data}{extra}{hwa};
+	my $vla = $vprt->{data}{extra}{vla} if exists $vprt->{data}{extra}{vla};
+	my $vid = $vprt->{data}{extra}{vid} if exists $vprt->{data}{extra}{vid};
+	#printf STDERR "Using extra data for %s: %s,%s,%s\n", $vprt,Item::showkey($hwa),Item::showkey($vla),$vid;
+	my $addr;
+	$vprt = $self->getchild('Vprt',$idx,undef,[
+		['Port',$hwa,$vid,[
+			[$nam,$net,$ipa],
+			['Point::Host',$self,$hwa],
+			['Lan',$hwa,$hwa,[
+				[$nam,$net,$ipa]]]]],
+		['Vlan',undef,$hwa,[
+			[$nam,$net,$ipa]]],
+		]);
+	my $vlan = $vprt->parent('Vlan');
+	my $plan = $vprt->parent('Port')->parent('Lan');
+	$vlan->link($model,undef,[['Lan',$plan,undef]]);
+	$net = $net->target;
+	$addr = $net->getchild('Address',$ipa,undef,[
+		['Point::Host',$self,$ipa],
+		['Subnet',undef,$ipa,[
+			[$nam,$net,$ipa],
+			['Vlan',$vlan,undef]]],
+		]);
+	$vprt = $vprt->target;
+	my $port = $vprt->parent('Port') if defined $vid and $vid eq '';
+	$vprt->addrow($table,$row);
+	$self->addrow($table,$row);
+	$addr->addrow($table,$row);
+	$port->addrow($table,$row) if $port;
 }
 
 # -------------------------------------
@@ -3686,21 +3784,6 @@ use strict; use warnings; use Carp;
 # -------------------------------------
 
 # -------------------------------------
-package Blan; our @ISA = qw(Point Tree);
-use strict; use warnings; use Carp;
-# -------------------------------------
-# A Blan is an set of bridged IEEE 802.1P/Q virtual LAN.  It is a relationship
-# between any number of Vlans and any number of Subnets supported on each of
-# those Vlans.
-#
-# Blans are keyed by the Vprt keys of the Vlans that make up the Blan.  Blans
-# should typically have one or more Vlan packages as children, one or more
-# Subnet packages, and one Network, Private and/or Local subnetwork as a parent.
-# These parents are the same as the corresponding subnetworks of the constituent
-# Subnets.
-# -------------------------------------
-
-# -------------------------------------
 package Address; our @ISA = qw(Point Leaf Datum);
 use strict; use warnings; use Carp;
 # -------------------------------------
@@ -3729,7 +3812,7 @@ use strict; use warnings; use Carp;
 #package Loopback;
 
 # -------------------------------------
-package Port; our @ISA = qw(Point Tree);
+package Port; our @ISA = qw(Point Tree Datum);
 use strict; use warnings; use Carp;
 # -------------------------------------
 # A Port is a LAN link layer interface.  Fundamentally, a Port belongs to the
@@ -3739,6 +3822,49 @@ use strict; use warnings; use Carp;
 # can be found by simply lookup up the Lan with the Port hardware address.  The
 # same is true of the Point::Station.
 # -------------------------------------
+#package Port;
+sub add_key {
+	my $self = shift;
+	my ($key) = @_;
+	return unless $key;
+	my @keys = ref $key eq 'ARRAY' ? @$key : ($key);
+	my %keys = ();
+	foreach $key (@keys) {
+		next if ref $key;
+		next unless $key;
+		my $len = length($key);
+		$keys{$key} = 1 if $len >= 6 and $len <= 6;
+	}
+	foreach $key (@{$self->{key}{n}}) {
+		my $len = length($key);
+		$keys{$key} = 1 if $len >= 6 and $len <= 6;
+	}
+	if (scalar(values(%keys)) > 1) {
+		Carp::carp "Attempt to add non-unique key to $self:";
+		Carp::carp "Keys added are ",join(',',map {Item::showkey($_)} @keys);
+		$self->show;
+		Carp::confess;
+	}
+	$self->SUPER::add_key(@_);
+}
+#package Port;
+sub mergefrom {
+	my $self = shift;
+	my ($othr,$reason) = @_;
+	my %keys = ();
+	foreach my $key (@{$self->{key}{n}},@{$othr->{key}{n}}) {
+		my $len = length($key);
+		$keys{$key} = 1 if $len >= 6 and $len <= 6;
+	}
+	if (scalar(values(%keys)) > 1) {
+		Carp::carp "Attempt to merge $self and $othr with non-unique keys:";
+		Carp::carp "Reason was $reason";
+		$self->show;
+		$othr->show;
+		Carp::confess;
+	}
+	$self->SUPER::mergefrom(@_);
+}
 
 # -------------------------------------
 package Vprt; our @ISA = qw(Point Tree Datum);
@@ -3754,17 +3880,90 @@ use strict; use warnings; use Carp;
 # Port package is just for automatically tracking membership of Vprt to Port
 # relationships.
 # -------------------------------------
+#package Vprt;
+sub add_key {
+	my $self = shift;
+	my ($key) = @_;
+	return unless $key;
+	my @keys = ref $key eq 'ARRAY' ? @$key : ($key);
+	my %keys = ();
+	foreach $key (@keys) {
+		next if ref $key;
+		next unless $key;
+		my $len = length($key);
+		$keys{$key} = 1 if $len >= 6 and $len <= 8;
+	}
+	foreach $key (@{$self->{key}{n}}) {
+		my $len = length($key);
+		$keys{$key} = 1 if $len >= 6 and $len <= 8;
+	}
+	if (scalar(values(%keys)) > 1) {
+		Carp::carp "Attempt to add non-unique key to $self:";
+		Carp::carp "Keys added are ",join(',',map {Item::showkey($_)} @keys);
+		$self->show;
+		Carp::confess;
+	}
+	$self->SUPER::add_key(@_);
+}
+#package Vprt;
+sub mergefrom {
+	my $self = shift;
+	my ($othr,$reason) = @_;
+	my %keys = ();
+	foreach my $key (@{$self->{key}{n}},@{$othr->{key}{n}}) {
+		my $len = length($key);
+		$keys{$key} = 1 if $len >= 6 and $len <= 8;
+	}
+	if (scalar(values(%keys)) > 1) {
+		Carp::carp "Attempt to merge $self and $othr with non-unique keys:";
+		Carp::carp "Reason was $reason";
+		$self->show;
+		$othr->show;
+		Carp::confess;
+	}
+	$self->SUPER::mergefrom(@_);
+}
 
 # -------------------------------------
-package Bprt; our @ISA = qw(Point Tree Datum);
+package Driv; our @ISA = qw(Point Tree Datum);
 use strict; use warnings; use Carp;
 # -------------------------------------
-# A Bprt is a Bridged VLAN link layer interface.  Fundamentally, a Bprt belongs
-# to the Blan to which it is attached (with which it shares its hardware address
-# and VLAN id key).  Also, a Bprt normally exists for every Vprt.  The Blan to
-# which a Bprt belongs can be found by simply lookking up the Vlan with the Bprt
-# hardware address.  The Vprt that corresponds to the Blan can be looked up using
-# the same primary key.
+# An MX driver belongs to a specific host.  The index used is the MX driver
+# name.  There is really only one driver for now.  There is really nothing more
+# required to model these objects.
+# -------------------------------------
+
+# -------------------------------------
+package Card; our @ISA = qw(Point Tree Datum);
+use strict; use warnings; use Carp;
+# -------------------------------------
+# An MX card belongs to a driver on a specific host.  The index used in the
+# card number.  There is really nothing more required to model these objects.
+# -------------------------------------
+
+# -------------------------------------
+package Span; our @ISA = qw(Point Tree Datum);
+use strict; use warnings; use Carp;
+# -------------------------------------
+# An MX span belongs to a card.  The index used in ths span number.  There is
+# really nothing more required to model these objects.
+# -------------------------------------
+
+# -------------------------------------
+package Chan; our @ISA = qw(Point Tree Datum);
+use strict; use warnings; use Carp;
+# -------------------------------------
+# An MX channel belongs to a span.  The index used is the channel number.  There
+# is really nothing more required to model these objects.
+# -------------------------------------
+
+# -------------------------------------
+package Xcon; our @ISA = qw(Point Leaf Datum);
+use strict; use warnings; use Carp;
+# -------------------------------------
+# An MX cross-connect belongs to a driver.  The index used is a ppa pair: mx
+# card, span and channel triple pair.  There is really nothing more required to
+# model these objects.
 # -------------------------------------
 
 1;
