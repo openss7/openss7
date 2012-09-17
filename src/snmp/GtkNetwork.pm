@@ -3171,8 +3171,8 @@ sub types { return qw{Subnet Point} }
 #package Address::View;
 sub gettxt {
 	my $self = shift;
-	if ($self->{data}{key}{p}{Subnet}) {
-		foreach my $key (sort keys %{$self->{data}{key}{p}{Subnet}}) {
+	if ($self->{data}{key}{p}{Point}) {
+		foreach my $key (sort keys %{$self->{data}{key}{p}{Point}}) {
 			return Item::showkey($key) if length($key) == 4;
 		}
 	}
