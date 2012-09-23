@@ -53,6 +53,7 @@ $ENV{MIBDIRS} = '+'.join(':',qw{
 	/usr/share/netdisco/mibs/nortel
 	/usr/share/netdisco/mibs/rfc
 });
+$SNMP::debugging = 0;
 $SNMP::verbose = 0;
 $SNMP::use_long_names = 0;
 $SNMP::use_sprint_value = 0;
@@ -100,7 +101,7 @@ package main;
 use strict;
 use warnings;
 
-my $model = new Model::SNMP();
+my $model = new Model::Network('./.netdisc');
 my $net = $model->{net}{PUBLIC};
 my $window = new Window();
 my $viewer = $window->new_network($net);
