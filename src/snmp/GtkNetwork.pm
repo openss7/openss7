@@ -1,6 +1,6 @@
 # ------------------------------------------
 package Viewer; our @ISA = qw(Base Gtk2::ScrolledWindow);
-use strict; use warnings; use Carp;
+#use strict; use warnings; use Carp;
 use Gtk2; use Glib; use Goo::Canvas;
 # ------------------------------------------
 #package Viewer;
@@ -63,8 +63,11 @@ sub init {
 		$root->signal_connect('button-press-event'=>$sub,$self);
 	}
 	my $view = $self->{view} = $self->getbase($base);
+	warn "******** POPULATING VIEWER";
 	$view->populate();
+	warn "******** LAYING OUT VIEWER";
 	$self->layout();
+	warn "******** DONE START VIEWER";
 }
 #package Viewer;
 sub fini {
@@ -390,6 +393,7 @@ sub xformed {
 package Viewer::Network; our @ISA = qw(Viewer);
 use strict; use warnings; use Carp;
 use Gtk2; use Glib; use Goo::Canvas;
+use Time::HiRes qw(gettimeofday tv_interval);
 # ------------------------------------------
 # Columns in the display are laid out as follows:
 #   - HERENOD_COLUMN: local host
@@ -545,11 +549,9 @@ sub click {
 			$menu->append($mi);
 			my $mv = Gtk2::Menu->new;
 			$mi->set_submenu($mv);
-
 			$mi = Gtk2::TearoffMenuItem->new();
 			$mi->show_all;
 			$mv->append($mi);
-
 			foreach my $view (qw{Subnet/Address Vlan/Vprt Lan/Port}) {
 				my $mr = Gtk2::CheckMenuItem->new($view);
 				$mr->set_draw_as_radio(Glib::TRUE);
@@ -572,11 +574,9 @@ sub click {
 				}
 				$mv->append($mr);
 			}
-
 			$mi = Gtk2::SeparatorMenuItem->new();
 			$mi->show_all;
 			$mv->append($mi);
-
 			foreach my $kind (qw/Point Vlan Lan Subnet Vprt Port Address Network Private/) {
 				my $mb = Gtk2::CheckMenuItem->new($kind);
 				$mb->set_active($self->isvisible($kind));
@@ -586,9 +586,7 @@ sub click {
 				}
 				$mv->append($mb);
 			}
-
 			$mv->show_all;
-
 			$menu->show_all;
 			$menu->popup(undef,undef,undef,undef,$ev->button,$ev->time);
 			return Gtk2::EVENT_STOP;
@@ -607,6 +605,7 @@ $Viewer::Network::callcount = 0;
 #package Viewer::Network;
 sub layout {
 	my $self = shift;
+	warn "Laying out network...";
 	#printf STDERR "Laying out %s...\n",$self;
 	my $view = $self->{view};
 	my $canv = $self->{canv};
@@ -618,11 +617,30 @@ sub layout {
 		$view->{siz}{l}{total}[1] + 2.0*$view->{siz}{l}{total}[3]+
 		$view->{siz}{c}{total}[1]/2.0 + $view->{siz}{c}{total}[3];
 	$h = $h/2.0 + $mh;
+	my $now = [gettimeofday];
+	my $then = $now;
+	print STDERR "Moving base view...";
+	$self->{movements} = {};
 	$view->move_view($w,$h,0,0);
+	$now = [gettimeofday]; print STDERR "...done. ",tv_interval($then,$now)," seconds\n"; $then = $now;
+	foreach (sort keys %{$self->{movements}}) { print STDERR "movements $_ ",$self->{movements}{$_},"\n" }
+	print STDERR "Laying out base view...";
 	$view->layout($hbox,$wbox);
+	$now = [gettimeofday]; print STDERR "...done. ",tv_interval($then,$now)," seconds\n"; $then = $now;
+	print STDERR "Placing base view...";
+	$self->{placements} = {};
 	$view->place_view($w,$h,0,0);
+	$now = [gettimeofday]; print STDERR "...done. ",tv_interval($then,$now)," seconds\n"; $then = $now;
+	foreach (sort keys %{$self->{placements}}) { print STDERR "placments $_ ",$self->{placements}{$_},"\n" }
+	print STDERR "Showing base view...";
+	$self->{exposures} = {};
 	$view->show_view($w,$h,0,0);
-	$Viewer::Network::callcount += 1;
+	$now = [gettimeofday]; print STDERR "...done. ",tv_interval($then,$now)," seconds\n"; $then = $now;
+	foreach (sort keys %{$self->{exposures}}) { print STDERR "exposures $_ ",$self->{exposures}{$_},"\n" }
+	print STDERR "Updating canvas...";
+	$canv->update;
+	$now = [gettimeofday]; print STDERR "...done. ",tv_interval($then,$now)," seconds\n"; $then = $now;
+#	$Viewer::Network::callcount += 1;
 #	unless ($Viewer::Network::callcount % 10) {
 #		warn "Layout called $Viewer::Network::callcount times...";
 #	}
@@ -630,6 +648,7 @@ sub layout {
 #		$self->showstats;
 #	}
 	#printf STDERR "Laying out %s... ...done\n",$self;
+	warn "...done.";
 }
 #package Viewer::Network;
 sub start_idle {
@@ -644,7 +663,7 @@ sub start_quick {
 	my $self = shift;
 	my $tag = delete $self->{tag};
 	Glib::Source->remove($tag) if defined $tag;
-	$tag = Glib::Timeout->add(100,$self->can('do_idle'),$self);
+	$tag = Glib::Timeout->add(100,$self->can('do_quick'),$self);
 	$self->{tag} = $tag;
 }
 #package Viewer::Network;
@@ -656,6 +675,16 @@ sub start_timeout {
 	$self->{tag} = $tag;
 }
 #package Viewer::Network;
+sub do_quick {
+	my $self = shift;
+	my $model = $self->{model};
+	if ($model->snmp_doone()) {
+		$self->start_quick();
+	} else {
+		$self->start_timeout();
+	}
+}
+#package Viewer::Network;
 sub do_idle {
 	my $self = shift;
 	my $model = $self->{model};
@@ -665,7 +694,11 @@ sub do_idle {
 sub do_timeout {
 	my $self = shift;
 	my $model = $self->{model};
-	$self->start_idle() if $model->snmp_doone();
+	if ($model->snmp_doone()) {
+		$self->start_quick();
+	} else {
+		$self->start_timeout();
+	}
 }
 
 # ------------------------------------------
@@ -742,6 +775,9 @@ sub siz {
 #package View;
 sub place_view {
 	my $self = shift;
+	$self->{viewer}{placements}{total}++;
+	$self->{viewer}{placements}{$self->kind}++;
+	$self->{viewer}{placements}{$self}++;
 	return unless $self->{set};
 	$self->{placing} = 1;
 	my $type = ref $self;
@@ -751,6 +787,9 @@ sub place_view {
 #package View;
 sub move_view {
 	my $self = shift;
+	$self->{viewer}{movements}{total}++;
+	$self->{viewer}{movements}{$self->kind}++;
+	$self->{viewer}{movements}{$self}++;
 	my ($x,$y,$xo,$yo) = @_;
 	my ($X,$Y,$XO,$YO) = $self->pos;
 	$x = $X unless defined $x;
@@ -769,6 +808,9 @@ sub move_view {
 #package View;
 sub show_view {
 	my $self = shift;
+	$self->{viewer}{exposures}{total}++;
+	$self->{viewer}{exposures}{$self->kind}++;
+	$self->{viewer}{exposures}{$self}++;
 	$self->{showing} = 1;
 	my $type = ref $self;
 	$self->_forw($type,undef,'showing',@_);
@@ -777,8 +819,8 @@ sub show_view {
 #package View;
 sub populate {
 	my $self = shift;
+	my $type = ref $self;
 	if (delete $self->{fresh}) {
-		my $type = ref $self;
 		$self->_forw($type,undef,'popu',@_);
 	}
 }
@@ -933,7 +975,10 @@ sub setcolor {
 	$self->{txt}{item}->set('fill-color'=>$color);
 }
 #package Node::View;
-sub gettxt { return ref(shift) }
+sub gettxt {
+	my $self = shift;
+	return sprintf '(%s%d)',ref($self->{data}),$self->{data}{no};
+}
 #package Node::View;
 sub placing {
 	my $self = shift;
@@ -988,11 +1033,32 @@ sub parent_propagate {
 	}
 }
 #package Node::View;
-sub parent_moving { shift->Node::View::parent_propagate('move',@_) }
+sub parent_walk {
+	my ($self,$tag,$parent) = @_;
+	my $kind = $parent->kind;
+	if ($kind eq 'Private' or ($kind eq 'Network' and not $self->parent('Private'))) {
+		my $sub = $tag.'_view';
+		$self->$sub();
+	}
+}
 #package Node::View;
-sub parent_placing { shift->Node::View::parent_propagate('place',@_) }
+sub parent_moving {
+	my $self = shift;
+	$self->{viewer}{movements}{parent}++;
+	$self->Node::View::parent_propagate('move',@_);
+}
 #package Node::View;
-sub parent_showing { shift->Node::View::parent_propagate('show',@_) }
+sub parent_placing {
+	my $self = shift;
+	$self->{viewer}{placements}{parent}++;
+	$self->Node::View::parent_walk('place',@_);
+}
+#package Node::View;
+sub parent_showing {
+	my $self = shift;
+	$self->{viewer}{exposures}{parent}++;
+	$self->Node::View::parent_walk('show',@_);
+}
 
 # ------------------------------------------
 package Bus::View; our @ISA = qw(Clickable::View);
@@ -1063,7 +1129,10 @@ sub fini {
 	}
 }
 #package Bus::View;
-sub gettxt { return ref(shift) }
+sub gettxt {
+	my $self = shift;
+	return sprintf '(%s%d)',ref($self->{data}),$self->{data}{no};
+}
 #package Bus::View;
 sub resize {
 	my $self = shift;
@@ -1146,11 +1215,32 @@ sub parent_propagate {
 	}
 }
 #package Bus::View;
-sub parent_moving { shift->Bus::View::parent_propagate('move',@_) }
+sub parent_walk {
+	my ($self,$tag,$parent) = @_;
+	my $kind = $parent->kind;
+	if ($kind eq 'Private' or ($kind eq 'Network' and not $self->parent('Private'))) {
+		my $sub = $tag.'_view';
+		$self->$sub();
+	}
+}
 #package Bus::View;
-sub parent_placing { shift->Bus::View::parent_propagate('place',@_) }
+sub parent_moving {
+	my $self = shift;
+	$self->{viewer}{movements}{parent}++;
+	$self->Bus::View::parent_propagate('move',@_);
+}
 #package Bus::View;
-sub parent_showing { shift->Bus::View::parent_propagate('show',@_) }
+sub parent_placing {
+	my $self = shift;
+	$self->{viewer}{placements}{parent}++;
+	$self->Bus::View::parent_walk('place',@_);
+}
+#package Bus::View;
+sub parent_showing {
+	my $self = shift;
+	$self->{viewer}{exposures}{parent}++;
+	$self->Bus::View::parent_walk('show',@_);
+}
 
 # ------------------------------------------
 package BoxAndLink::View; our @ISA = qw(Clickable::View);
@@ -1287,7 +1377,10 @@ sub layout {
 	}
 }
 #package BoxAndLink::View;
-sub gettxt { return ref(shift) }
+sub gettxt {
+	my $self = shift;
+	return sprintf '(%s%d)',ref($self->{data}),$self->{data}{no};
+}
 #package BoxAndLink::View;
 sub types { return () }
 #package BoxAndLink::View;
@@ -1371,11 +1464,42 @@ sub parent_propagate {
 	}
 }
 #package BoxAndLink::View;
-sub parent_moving { shift->BoxAndLink::View::parent_propagate('move',@_) }
+sub parent_walk {
+	my ($self,$tag,$parent,@args) = @_;
+	my ($btype,$ntype) = $self->types;
+	my $kind = $parent->kind;
+	my ($nview,$bview);
+	if ($kind eq $btype) {
+		$bview = $parent;
+		$nview = $self->parent($ntype);
+	}
+	elsif ($kind eq $ntype) {
+		$nview = $parent;
+		$bview = $self->parent($btype);
+	}
+	if ($nview and $bview and $nview->{set} and $bview->{set}) {
+		my $sub = $tag.'_view';
+		$self->$sub();
+	}
+}
 #package BoxAndLink::View;
-sub parent_placing { shift->BoxAndLink::View::parent_propagate('place',@_) }
+sub parent_moving {
+	my $self = shift;
+	$self->{viewer}{movements}{parent}++;
+	$self->BoxAndLink::View::parent_propagate('move',@_);
+}
 #package BoxAndLink::View;
-sub parent_showing { shift->BoxAndLink::View::parent_propagate('show',@_) }
+sub parent_placing {
+	my $self = shift;
+	$self->{viewer}{placements}{parent}++;
+	$self->BoxAndLink::View::parent_walk('place',@_);
+}
+#package BoxAndLink::View;
+sub parent_showing {
+	my $self = shift;
+	$self->{viewer}{exposures}{parent}++;
+	$self->BoxAndLink::View::parent_walk('show',@_);
+}
 
 # ------------------------------------------
 package Root::View; our @ISA = qw(Base);
@@ -1431,9 +1555,12 @@ sub popu {
 sub propagate {
 	my $self = shift;
 	my $tag = shift;
-	foreach my $off ($self->offspring()) {
-		next if $off->{$tag};
-		if (my $sub = $off->can("parent_$tag")) { &$sub($off,$self,@_) };
+	my $name = "parent_$tag";
+	if ($self->can('ctypes')) {
+		foreach my $off ($self->offspring_sorted([$self->ctypes])) {
+			next if $off->{$tag};
+			$off->$name($self,@_);
+		}
 	}
 }
 #package Root::View;
@@ -1470,11 +1597,11 @@ sub propagate {
 	}
 }
 #package Leaf::View;
-sub moving { shift->Leaf::View::propagate('moving',@_) }
+sub moving_old { shift->Leaf::View::propagate('moving',@_) }
 #package Leaf::View;
-sub placing { shift->Leaf::View::propagate('placing',@_) }
+sub placing_old { shift->Leaf::View::propagate('placing',@_) }
 #package Leaf::View;
-sub showing { shift->Leaf::View::propagate('showing',@_) }
+sub showing_old { shift->Leaf::View::propagate('showing',@_) }
 
 # ------------------------------------------
 package Tree::View; our @ISA = qw(Root::View Leaf::View);
@@ -1531,11 +1658,11 @@ sub propagate {
 	}
 }
 #package Point::View;
-sub moving { shift->Point::View::propagate('moving',@_) }
+sub moving_old { shift->Point::View::propagate('moving',@_) }
 #package Point::View;
-sub placing { shift->Point::View::propagate('placing',@_) }
+sub placing_old { shift->Point::View::propagate('placing',@_) }
 #package Point::View;
-sub showing { shift->Point::View::propagate('showing',@_) }
+sub showing_old { shift->Point::View::propagate('showing',@_) }
 
 # ------------------------------------------
 package Path::View; our @ISA = qw(Base);
@@ -1570,6 +1697,7 @@ package MibInfo; our @ISA = qw(Base);
 use strict; use warnings; use Carp;
 use Gtk2; use Glib qw/TRUE FALSE/; use Goo::Canvas;
 use Gtk2::SimpleList; use SNMP;
+use threads::shared;
 # ------------------------------------------
 #package MibInfo;
 sub init {
@@ -1578,6 +1706,7 @@ sub init {
 	$self->{view} = $view;
 	$self->{table} = $table;
 	$self->{label} = $label;
+	lock $Model::SNMP::lockvar;
 	$self->{m} = $SNMP::MIB{$label};
 }
 #package MibInfo;
@@ -1702,6 +1831,7 @@ sub rehang {
 #package MibInfo;
 sub description {
 	my ($self,$width) = @_;
+	lock $Model::SNMP::lockvar;
 	my $m = $self->{m};
 	my $msg = MibInfo::strip($m->{description});
 	$msg = MibInfo::reflow($msg,$width) if defined $width;
@@ -1711,6 +1841,7 @@ sub description {
 #package MibInfo;
 sub TCDescription {
 	my ($self,$width) = @_;
+	lock $Model::SNMP::lockvar;
 	my $msg = MibInfo::strip($self->{m}{TCDescription});
 	$msg = MibInfo::reflow($msg,$width) if defined $width;
 	return $msg;
@@ -1718,6 +1849,7 @@ sub TCDescription {
 #package MibInfo;
 sub reference {
 	my ($self,$width) = @_;
+	lock $Model::SNMP::lockvar;
 	my $msg = MibInfo::strip($self->{m}{reference});
 	$msg = MibInfo::rehang($msg,$width) if defined $width;
 	return $msg;
@@ -1773,10 +1905,12 @@ package MibUnits; our @ISA = qw(MibInfo);
 use strict; use warnings; use Carp;
 use Gtk2; use Glib qw/TRUE FALSE/; use Goo::Canvas;
 use Gtk2::SimpleList; use SNMP;
+use threads::shared;
 # ------------------------------------------
 #package MibUnits;
 sub init {
 	my ($self,$dialog,$view,$table,$label) = @_;
+	lock $Model::SNMP::lockvar;
 	my $m = $self->{m};
 	my $units = '';
 	$units = $m->{type} if $m->{type};
@@ -1806,10 +1940,12 @@ package MibNode; our @ISA = qw(MibInfo);
 use strict; use warnings; use Carp;
 use Gtk2; use Glib qw/TRUE FALSE/; use Goo::Canvas;
 use Gtk2::SimpleList; use SNMP;
+use threads::shared;
 # ------------------------------------------
 #package MibNode;
 sub init {
 	my ($self,$dialog,$view,$table,$label,$val) = @_;
+	lock $Model::SNMP::lockvar;
 	my $m = $self->{m};
 	$self->{val} = $val;
 	my ($f,$e);
@@ -1989,6 +2125,7 @@ package MibNode::List; our @ISA = qw(MibNode);
 use strict; use warnings; use Carp;
 use Glib qw/TRUE FALSE/; use Gtk2; use Goo::Canvas;
 use Gtk2::SimpleList; use SNMP;
+use threads::shared;
 # ----------------------------------
 sub snmpval {
 	my ($type,$m,$val) = @_;
@@ -2043,6 +2180,7 @@ sub snmpval {
 sub getval {
 	my $self = shift;
 	my $e = $self->{e};
+	lock $Model::SNMP::lockvar;
 	my $m = $self->{m};
 	my @bits = ();
 	foreach (values %{$m->{enums}}) { $bits[$_] = 0; }
@@ -2058,6 +2196,7 @@ sub getval {
 sub setval {
 	my ($self,$val) = @_;
 	my $e = $self->{e};
+	lock $Model::SNMP::lockvar;
 	my $m = $self->{m};
 	my @sels = ();
 	my @bits = (); foreach (values %{$m->{enums}}) { $bits[$_] = '0'; }
@@ -2079,6 +2218,7 @@ package MibNode::Combo; our @ISA = qw(MibNode);
 use strict; use warnings; use Carp;
 use Glib qw/TRUE FALSE/; use Gtk2; use Goo::Canvas;
 use Gtk2::SimpleList; use SNMP;
+use threads::shared;
 # ----------------------------------
 #package MibNode::Combo;
 sub snmpval {
@@ -2121,6 +2261,7 @@ sub getval {
 sub setval {
 	my ($self,$val) = @_;
 	my $e = $self->{e};
+	lock $Model::SNMP::lockvar;
 	my $m = $self->{m};
 	my $i = 0;
 	my %rows = map {$m->{enums}{$_}=>$i++} keys %{$m->{enums}};
@@ -2175,6 +2316,7 @@ package MibEntry; our @ISA = qw(Base Gtk2::Window);
 use strict; use warnings; use Carp;
 use Gtk2; use Glib qw/TRUE FALSE/; use Goo::Canvas;
 use Gtk2::SimpleList; use SNMP;
+use threads::shared;
 # ------------------------------------------
 #package MibEntry;
 sub new {
@@ -2287,6 +2429,7 @@ sub getrows {
 	if ($label =~ s/Data$//) { }
 	elsif ($label =~ s/Scalars$//) { }
 	elsif ($label =~ s/Table$/Entry/) { }
+	lock $Model::SNMP::lockvar;
 	my $mib = $SNMP::MIB{$label};
 	my @rows = @{$mib->{indexes}};
 	my %inds = map {$_=>1} @rows;
@@ -2741,6 +2884,8 @@ use Data::Dumper;
 #package Network::View;
 sub mycolor { return 'grey' }
 #package Network::View;
+sub ctypes { return qw/Private Point Vlan Lan Subnet/ }
+#package Network::View;
 sub isanchor { return Glib::TRUE }
 #package Network::View;
 sub getgeom {
@@ -2755,7 +2900,7 @@ sub getgeom {
 			$net->{col} = +2;
 		}
 	}
-	foreach my $host ($self->offspring_sorted('Point',4)) {
+	foreach my $host ($self->offspring_sorted('Point',1+4)) {
 		next if ($host->parent('Private'));
 		if ($host->isa('Point::Host::Here::View')) {
 			push @{$geom{l}{Point}},$host;
@@ -2766,7 +2911,7 @@ sub getgeom {
 		}
 	}
 	foreach my $form (qw/Lan Vlan Subnet/) {
-		foreach my $bus ($self->offspring_sorted($form,5,8)) {
+		foreach my $bus ($self->offspring_sorted($form,1+5,1+8)) {
 			push @{$geom{c}{$form}},$bus;
 			$bus->{col} = 0;
 		}
@@ -2807,13 +2952,15 @@ use Data::Dumper;
 #package Private::View;
 sub mycolor { return 'orange' }
 #package Private::View;
+sub ctypes { return qw/Point Vlan Lan Subnet/ }
+#package Private::View;
 sub getgeom {
 	my $self = shift;
 	my %geom = ();
 	my $col = $self->{col};
 	my $l = $col > 0 ? 'l' : 'r';
 	my $r = $col > 0 ? 'r' : 'l';
-	foreach my $point ($self->offspring_sorted('Point',4,6)) {
+	foreach my $point ($self->offspring_sorted('Point',1+4,1+6)) {
 		if ($point->parent('Network')) {
 			push @{$geom{$l}{Point}},$point;
 			$point->{col} = ($col > 0) ? $col-1 : $col+1;
@@ -2824,7 +2971,7 @@ sub getgeom {
 		}
 	}
 	foreach my $form (qw/Lan Vlan Subnet/) {
-		foreach my $bus ($self->offspring_sorted($form,5,8)) {
+		foreach my $bus ($self->offspring_sorted($form,1+5,1+8)) {
 			unless ($bus->parent('Network')) {
 				push @{$geom{c}{$form}},$bus;
 				$bus->{col} = $col;
@@ -2874,11 +3021,32 @@ sub parent_propagate {
 	}
 }
 #package Private::View;
-sub parent_moving { shift->Private::View::parent_propagate('move',@_) }
+sub parent_walk {
+	my ($self,$tag,$parent) = @_;
+	my $kind = $parent->kind;
+	if ($kind eq 'Network') {
+		my $sub = $tag.'_view';
+		$self->$sub();
+	}
+}
 #package Private::View;
-sub parent_placing { shift->Private::View::parent_propagate('place',@_) }
+sub parent_moving {
+	my $self = shift;
+	$self->{viewer}{movements}{parent}++;
+	$self->Private::View::parent_propagate('move',@_);
+}
 #package Private::View;
-sub parent_showing { shift->Private::View::parent_propagate('show',@_) }
+sub parent_placing {
+	my $self = shift;
+	$self->{viewer}{placements}{parent}++;
+	$self->Private::View::parent_walk('place',@_);
+}
+#package Private::View;
+sub parent_showing {
+	my $self = shift;
+	$self->{viewer}{exposures}{parent}++;
+	$self->Private::View::parent_walk('show',@_);
+}
 
 # ------------------------------------------
 package Private::Here::View; our @ISA = qw(Private::View);
@@ -2917,12 +3085,14 @@ use Data::Dumper;
 #package Point::Station::View;
 sub mycolor { return 'red' }
 #package Point::Station::View;
+sub ctypes { return qw/Vprt Port Address/ }
+#package Point::Station::View;
 sub getgeom {
 	my $self = shift;
 	my ($x,$y) = $self->pos;
 	my %geom = ();
 	my $col = $self->{col};
-	foreach my $vprt ($self->offspring_sorted('Vprt',6,8)) {
+	foreach my $vprt ($self->offspring_sorted('Vprt',1+6,1+8)) {
 		my $vlan = $vprt->parent('Vlan');
 		if ($vlan and exists $vlan->{col} and ($vlan->parent('Network') or $vlan->parent('Private'))) {
 			if ($vlan->{col} < $col)
@@ -2930,7 +3100,7 @@ sub getgeom {
 			{ push @{$geom{r}{Vprt}},$vprt }
 		}
 	}
-	foreach my $port ($self->offspring_sorted('Port',6)) {
+	foreach my $port ($self->offspring_sorted('Port',1+6)) {
 		my $plan = $port->parent('Lan');
 		if ($plan and exists $plan->{col} and ($plan->parent('Network') or $plan->parent('Private'))) {
 			if ($plan->{col} < $col)
@@ -2938,7 +3108,7 @@ sub getgeom {
 			{ push @{$geom{r}{Port}},$port }
 		}
 	}
-	foreach my $addr ($self->offspring_sorted('Address',4)) {
+	foreach my $addr ($self->offspring_sorted('Address',1+4)) {
 		my $subn = $addr->parent('Subnet');
 		if ($subn and exists $subn->{col} and ($subn->parent('Network') or $subn->parent('Private'))) {
 			if ($subn->{col} < $col)
@@ -3067,14 +3237,18 @@ use Gtk2; use Glib; use Goo::Canvas;
 #package Point::Host::View;
 sub mycolor {
 	my $self = shift;
-	my $color = exists $self->{data}{data}{systemData}{sysName} ? 'black' : 'darkgrey';
+	my $data = $self->{data}{data};
+	my $sysd = $data->{systemData};
+	my $color = ($sysd and exists $sysd->{sysName}) ? 'black' : 'darkgrey';
 	return $color;
 }
 #package Point::Host::View;
 sub gettxt {
 	my $self = shift;
 	my @lines = ();
-	my $name = $self->{data}{data}{systemData}{sysName};
+	my $data = $self->{data}{data};
+	my $sysd = $data->{systemData};
+	my $name = $sysd->{sysName} if $sysd;
 	push @lines, $name if $name;
 	my @keys = ();
 	foreach my $kind (qw/Network Private Local/) {
@@ -3102,7 +3276,9 @@ use Gtk2; use Glib; use Goo::Canvas;
 #package Point::Host::Here::View;
 sub mycolor {
 	my $self = shift;
-	my $color = exists $self->{data}{data}{systemData}{sysName} ? 'magenta' : 'darkgrey';
+	my $data = $self->{data}{data};
+	my $sysd = $data->{systemData};
+	my $color = ($sysd and exists $sysd->{sysName}) ? 'magenta' : 'darkgrey';
 	return $color;
 }
 #package Point::Host::Here::View;
@@ -3120,13 +3296,15 @@ use Gtk2; use Glib; use Goo::Canvas;
 #package Subnet::View;
 sub mycolor { return 'brown' }
 #package Subnet::View;
+sub ctypes { return qw/Address/ }
+#package Subnet::View;
 sub gettxt {
 	my $self = shift;
 	my @keys = ();
 	foreach my $kind (qw/Network Private Local/) {
 		if ($self->{data}{key}{p}{$kind}) {
 			foreach (keys %{$self->{data}{key}{p}{$kind}}) {
-				push @keys, $_ if length($_) == 5;
+				push @keys, $_ if Item::keytype($_) == Item::IPV4MASKKEY();
 			}
 		}
 	}
@@ -3143,6 +3321,8 @@ use Gtk2; use Glib; use Goo::Canvas;
 # ------------------------------------------
 #package Lan::View;
 sub mycolor { return 'black' }
+#package Lan::View;
+sub ctypes { return qw/Port/ }
 
 # ------------------------------------------
 package Vlan::View; our @ISA = qw(Bus::View Point::View Tree::View);
@@ -3151,6 +3331,8 @@ use Gtk2; use Glib; use Goo::Canvas;
 # ------------------------------------------
 #package Vlan::View;
 sub mycolor { return 'blue' }
+#package Vlan::View;
+sub ctypes { return qw/Vprt/ }
 
 # ------------------------------------------
 package Address::View; our @ISA = qw(BoxAndLink::View Point::View Leaf::View Datum::View);
@@ -3162,8 +3344,9 @@ sub init { shift->{txt}{pnts}[2] = 11 }
 #package Address::View;
 sub mycolor {
 	my $self = shift;
-	return 'brown' if exists $self->{data}{data}{ipAddrEntry};
-	return 'brown' if exists $self->{data}{data}{ipAddressEntry};
+	my $data = $self->{data}{data};
+	return 'brown' if exists $data->{ipAddrEntry};
+	return 'brown' if exists $data->{ipAddressEntry};
 	return 'darkgrey';
 }
 #package Address::View;
@@ -3173,10 +3356,10 @@ sub gettxt {
 	my $self = shift;
 	if ($self->{data}{key}{p}{Point}) {
 		foreach my $key (sort keys %{$self->{data}{key}{p}{Point}}) {
-			return Item::showkey($key) if length($key) == 4;
+			return Item::showkey($key) if Item::keytype($key) == Item::IPV4ADDRKEY();
 		}
 	}
-	return '(unknown)';
+	return $self->SUPER::gettxt();
 }
 
 # ------------------------------------------
@@ -3194,16 +3377,19 @@ sub types { return qw{Lan Point} }
 sub gettxt {
 	my $self = shift;
 	my $txt;
-	$txt = $self->{data}{data}{lldpLocPortEntry}{lldpLocPortDesc};
+	my $data = $self->{data}{data};
+	my $lldp = $data->{lldpLocPortEntry};
+	$txt = $lldp->{lldpLocPortDesc} if $lldp;
 	return $txt if $txt and $txt =~ /^eth/;
-	$txt = $self->{data}{data}{ifEntry}{ifDescr};
+	my $ifen = $data->{ifEntry};
+	$txt = $ifen->{ifDescr} if $ifen;
 	return $txt if $txt and $txt =~ /^eth/;
 	if ($self->{data}{key}{n}) {
 		foreach my $key (sort @{$self->{data}{key}{n}}) {
-			return Item::showkey($key) if length($key) == 6;
+			return Item::showkey($key) if Item::keytype($key) == Item::MACKEY();
 		}
 	}
-	return '(unknown)';
+	return $self->SUPER::gettxt();
 }
 
 # ------------------------------------------
@@ -3216,10 +3402,11 @@ sub init { shift->{txt}{pnts}[2] = 17 }
 #package Vprt::View;
 sub mycolor {
 	my $self = shift;
-	return 'blue' if exists $self->{data}{data}{ifEntry};
-	return 'blue' if exists $self->{data}{data}{lldpStatsTxPortEntry};
-	return 'blue' if exists $self->{data}{data}{lldpStatsRxPortEntry};
-	return 'blue' if exists $self->{data}{data}{lldpLocPortEntry};
+	my $data = $self->{data}{data};
+	return 'blue' if exists $data->{ifEntry};
+	return 'blue' if exists $data->{lldpStatsTxPortEntry};
+	return 'blue' if exists $data->{lldpStatsRxPortEntry};
+	return 'blue' if exists $data->{lldpLocPortEntry};
 	return 'darkgrey';
 }
 #package Vprt::View;
@@ -3228,16 +3415,19 @@ sub types { return qw{Vlan Point} }
 sub gettxt {
 	my $self = shift;
 	my $txt;
-	$txt = $self->{data}{data}{lldpLocPortEntry}{lldpLocPortDesc};
+	my $data = $self->{data}{data};
+	my $lldp = $data->{lldpLocPortEntry};
+	$txt = $lldp->{lldpLocPortDesc} if $lldp;
 	return $txt if $txt and $txt =~ /^eth/;
-	$txt = $self->{data}{data}{ifEntry}{ifDescr};
+	my $ifen = $data->{ifEntry};
+	$txt = $ifen->{ifDescr} if $ifen;
 	return $txt if $txt and $txt =~ /^eth/;
 	if ($self->{data}{key}{n}) {
 		foreach my $key (sort @{$self->{data}{key}{n}}) {
-			return Item::showkey($key) if length($key) >= 6;
+			return Item::showkey($key) if Item::keytype($key) == Item::MACKEY();
 		}
 	}
-	return '(unknown)';
+	return $self->SUPER::gettxt();
 }
 
 # ------------------------------------------
@@ -3373,7 +3563,7 @@ sub new {
 	$vb->pack_start($mb,Glib::FALSE,Glib::FALSE,0);
 	$vb->pack_start($nb,Glib::TRUE,Glib::TRUE,0);
 	$self->set_type_hint('normal');
-	$self->set_default_size(800,640);
+	$self->set_default_size(1000,800);
 #	if (0) {
 #		my $read = $self->read;
 #		if ($read) {
