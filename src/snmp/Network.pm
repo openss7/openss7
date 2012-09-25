@@ -175,7 +175,6 @@ sub _dump {
 sub show {
 	my $self = shift;
 	my $type = ref $self;
-	##warn "Bad object of type $type, $self\n" if $self->{bad};
 	print STDERR "\nShowing item $self\n-------------------------\n";
 	$self->_dump($type,@_);
 }
@@ -281,10 +280,6 @@ sub dump {
 #package Root;
 sub fini {
 	my $self = shift;
-#	return unless exists $self->{members};
-#	foreach my $form (values %{$self->{members}}) {
-#		foreach (values %$form) { $_->put(@_) }
-#	}
 	delete $self->{child};
 	delete $self->{members};
 	delete $self->{children};
@@ -311,6 +306,19 @@ sub members {
 }
 #package Root;
 sub members_sorted {
+	my ($self,$forms) = @_;
+	$forms = [ keys %{$self->{members}} ] unless defined $forms;
+	$forms = [ $forms ] unless ref($forms) eq 'ARRAY';
+	my @results = ();
+	foreach my $form (@$forms) {
+		if (my $membs = $self->{members}{$form}) {
+			push @results,sort {-$a->{no} <=> -$b->{no}} values %$membs;
+		}
+	}
+	return @results;
+}
+#package Root;
+sub members_sortbytype {
 	my ($self,$forms) = @_;
 	$forms = [ keys %{$self->{members}} ] unless defined $forms;
 	$forms = [ $forms ] unless ref($forms) eq 'ARRAY';
@@ -372,6 +380,41 @@ sub children_sorted {
 	return @results;
 }
 #package Root;
+sub children_sortbytype {
+	my ($self,$forms,$ktyp) = @_;
+	$forms = [ keys %{$self->{child}} ] unless defined $forms;
+	$forms = [ $forms ] unless ref($forms) eq 'ARRAY';
+	$ktyp = [ $ktyp ] unless not defined $ktyp or ref $ktyp eq 'ARRAY';
+	$ktyp = { map {$_=>1} @$ktyp } if defined $ktyp;
+	my @results = ();
+	{
+		my @pairs = ();
+		foreach my $form (@$forms) {
+			if (my $kids = $self->{child}{$form}) {
+				foreach my $key (keys %$kids) {
+					push @pairs, [ $key, $kids->{$key} ];
+				}
+			}
+		}
+		my %child = ();
+		foreach my $result (sort {$a->[0] cmp $b->[0]} @pairs) {
+			next if defined $ktyp and not exists $ktyp->{Item::keytype($result->[0])};
+			unless (exists $child{$result->[1]}) {
+				push @results, $result;
+				$child{$result->[1]} = 1;
+			}
+		}
+		foreach my $result (sort {$a->[0] cmp $b->[0]} @pairs) {
+			unless (exists $child{$result->[1]}) {
+				push @results, $result;
+				$child{$result->[1]} = 1;
+			}
+		}
+	}
+	@results = map {$_->[1]} @results;
+	return @results;
+}
+#package Root;
 sub offspring {
 	my $self = shift;
 	return ($self->children(@_),$self->members(@_));
@@ -380,6 +423,11 @@ sub offspring {
 sub offspring_sorted {
 	my $self = shift;
 	return ($self->children_sorted(@_),$self->members_sorted(@_));
+}
+#package Root;
+sub offspring_sortbytype {
+	my $self = shift;
+	return ($self->children_sortbytype(@_),$self->members_sortbytype(@_));
 }
 #package Root;
 sub tree {
@@ -442,7 +490,6 @@ sub addchild {
 				unless $othr->isa(ref $child) or $child->isa(ref $othr);
 				# Whoops.  Another child exists at that key so must
 				# be the same, merge them.
-				#warn "Adding child: child merge required: $othr instead of $child at key ".Item::showkey($key);
 				my $reason = sprintf "Child index '%s' added to %s belongs to %s",Item::showkey($key),$child,$othr;
 				$child->mergefrom($othr,$reason);
 				my $became = $self->{child}{$form}{$key};
@@ -452,9 +499,6 @@ sub addchild {
 				$self->{child}{$form}{$key} = $child;
 				$child->{key}{p}{$kind}{$key} = $key;
 				$result = 1;
-				#if (($self->isa('Network') or $self->isa('Private')) and $child->isa('Point::Station')) {
-				#	Carp::cluck "Adding $child to $self with key ",Item::showkey($key); 
-				#}
 			}
 			delete $self->{members}{$form}{$child->no}; # insurance
 		}
@@ -493,7 +537,6 @@ sub delchild {
 			if (my $othr = delete $self->{child}{$form}{$k}) {
 				Carp::confess "Deleted child $othr unexpected, should be $child"
 				if $othr ne $child;
-				#warn "Deleted child $othr for key ".Item::showkey($k);
 				$result = $child;
 			} else {
 				Carp::cluck "No entry for child with key ".Item::showkey($k);
@@ -506,7 +549,6 @@ sub delchild {
 		}
 	} else {
 		if (my $othr = delete $self->{members}{$form}{$child->no}) {
-			#warn "Deleted member $othr";
 			$result = $child;
 		} else {
 			Carp::cluck "No entry for child $child";
@@ -522,20 +564,17 @@ sub chek {
 	my $self = shift;
 	foreach my $form (keys %{$self->{children}}) {
 		foreach my $child (values %{$self->{children}{$form}}) {
-			#$self->show();
 			Carp::confess "Merge failed, Root $self still has children $child";
 		}
 	}
 	foreach my $form (keys %{$self->{child}}) {
 		foreach my $child (values %{$self->{child}{$form}}) {
-			#$self->show();
 			Carp::confess "Merge failed, Root $self still has child $child";
 		}
 		delete $self->{child}{$form};
 	}
 	foreach my $form (keys %{$self->{members}}) {
 		foreach my $member (values %{$self->{members}{$form}}) {
-			#$self->show();
 			Carp::confess "Merge failed, Root $self still has member $member";
 		}
 		delete $self->{members}{$form};
@@ -606,7 +645,6 @@ sub mfix {
 		foreach my $key (keys %{$self->{children}{$form}}) {
 			my $member = $self->{children}{$form}{$key};
 			if (my $became = $member->{target}) {
-				#warn "Root $self: Fixing reference to bad member $member which became $became";
 				$self->{children}{$form}{$key} = $became;
 				$became->{parent}{$kind} = $self;
 				$fixed = 1;
@@ -617,7 +655,6 @@ sub mfix {
 		foreach my $key (keys %{$self->{members}{$form}}) {
 			my $member = $self->{members}{$form}{$key};
 			if (my $became = $member->{target}) {
-				#warn "Root $self: Fixing reference to bad member $member which became $became";
 				$self->{members}{$form}{$key} = $became;
 				$became->{parent}{$kind} = $self;
 				$fixed = 1;
@@ -628,7 +665,6 @@ sub mfix {
 		foreach my $key (keys %{$self->{child}{$form}}) {
 			my $child = $self->{child}{$form}{$key};
 			if (my $became = $child->{target}) {
-				#warn "Root $self: Fixing reference to bad child $child which became $became";
 				$self->{child}{$form}{$key} = $became;
 				$became->{key}{p}{$kind}{$key} = $key;
 				$fixed = 1;
@@ -668,30 +704,24 @@ sub mfix {
 			my %keys = %{$entry->{keys}};
 			if (scalar values %ents or scalar values %keys and exists $self->{members}{$form}{$child->no}) {
 				if ($fixed) {
-					#warn "Root $self: Fixing reference to member $child that has keys entries";
 				}
 			}
 			foreach my $ent (keys %ents) {
 				next if exists $keys{$ent};
-				#warn "Root $self: Fixing child $child missing key ".Item::showkey($ent);
 				$child->{key}{p}{$kind}{$ent} = $ent;
 				$keys{$ent} = $ent;
 				$fixed = 1;
 			}
 			foreach my $key (keys %keys) {
 				next if exists $ents{$key};
-				#warn "Root $self: Fixing child $child extra key ".Item::showkey($key);
 				if (my $exists = $self->{child}{$form}{$key}) {
-					#warn "Root $self: Fixing child $child extra key ".Item::showkey($key)." belongs to $exists";
 					delete $child->{key}{p}{$kind}{$key};
 				} else {
-					#warn "Root $self: Fixing child $child extra key ".Item::showkey($key)." adding parent entry";
 					$self->{child}{$form}{$key} = $child;
 				}
 				$fixed = 1;
 			}
 			unless (exists $self->{children}{$form}{$child->no}) {
-				#warn "Root $self: Fixing missing $child";
 				$self->{children}{$form}{$child->no} = $child;
 			}
 		}
@@ -700,14 +730,11 @@ sub mfix {
 		foreach my $child (values %{$self->{child}{$form}}) {
 			if (exists $self->{children}{$form}{$child->no}) {
 				unless ($self->{children}{$form}{$child->no} eq $child) {
-					#warn "Root $self: Fixing wrong children setting for $child";
 					$self->{children}{$form}{$child->no} = $child;
 					$fixed = 1;
 				}
 			} else {
-				#warn "Root $self: Fixing missing children setting for $child";
 				$self->{children}{$form}{$child->no} = $child;
-				#$fixed = 1;
 			}
 		}
 	}
@@ -715,9 +742,7 @@ sub mfix {
 		my @children = values %{$self->{members}{$form}};
 		foreach my $child (@children) {
 			if (exists $child->{key}{p}{$kind} and scalar values %{$child->{key}{p}{$kind}}) {
-				#warn "Root $self: Fixing extra member $child that has keys";
 				delete $self->{members}{$form}{$child->no};
-				#$fixed = 1;
 			}
 		}
 	}
@@ -726,19 +751,15 @@ sub mfix {
 			unless (exists $child->{key}{p}{$kind} and scalar values %{$child->{key}{p}{$kind}}) {
 				if (exists $self->{members}{$form}{$child->no}) {
 					unless ($self->{members}{$form}{$child->no} eq $child) {
-						#warn "Root $self: Fixing wrong member setting for $child";
 						$self->{members}{$form}{$child->no} = $child;
 						$fixed = 1;
 					}
 				} else {
-					#warn "Root $self: Fixing missing member $child";
 					$self->{members}{$form}{$child->no} = $child;
-					#$fixed = 1;
 				}
 			}
 		}
 	}
-#	$self->show if $fixed;
 	Carp::croak if $fixed and $abort;
 }
 
@@ -752,11 +773,6 @@ sub addtoparent {
 	my $self = shift;
 	my ($parent,$key) = @_;
 	return unless defined $parent;
-#	if ($key) {
-#		warn "Adding child $self to parent $parent with key ".Item::showkey($key);
-#	} else {
-#		warn "Adding member $self to group $parent";
-#	}
 	Carp::confess "Parent $parent is not a Root" unless $parent->isa('Root');
 	my $kind = $parent->kind;
 	my $othr = $self->{parent}{$kind};
@@ -766,7 +782,6 @@ sub addtoparent {
 		unless $othr->isa(ref $parent) or $parent->isa(ref $othr);
 		# Whoops.  We have already been added to another parent,
 		# that parent and this must be the same so merge them.
-		#warn "Adding child: parent merge required: parent $othr instead of $parent at key ".Item::showkey($key);
 		my $reason = sprintf "Child %s cannot be %s child for two parents %s and %s",$self,$kind,$parent,$othr;
 		$parent->mergefrom($othr,$reason);
 		my $became = $self->{parent}{$kind};
@@ -792,7 +807,6 @@ sub delfromparent {
 	my $self = shift;
 	my ($parent) = @_;
 	my $kind = $parent->kind;
-	#warn "Deleting $kind children from $parent";
 	Carp::confess "parent changed" if ref $parent and $parent ne $self->{parent}{$kind};
 	my $key = [ values %{$self->{key}{p}{$kind}} ];
 	$parent->delchild($self,$key);
@@ -875,14 +889,12 @@ sub chek {
 	my $self = shift;
 	foreach my $kind (keys %{$self->{parent}}) {
 		if (my $parent = $self->{parent}{$kind}) {
-			#$self->show();
 			Carp::confess "Merge failed, Leaf $self still has $kind parent $parent";
 		}
 		delete $self->{parent}{$kind};
 	}
 	foreach my $kind (keys %{$self->{key}{p}}) {
 		foreach my $key (values %{$self->{key}{p}{$kind}}) {
-			#$self->show();
 			Carp::confess "Merge failed, Leaf $self still has $kind key ".Item::showkey($key);
 		}
 		delete $self->{key}{p}{$kind};
@@ -912,13 +924,11 @@ sub them {
 			$self->{parent}{$kind} = $tparent;
 			if (exists $self->{key}{p}{$kind}) {
 				foreach my $key (values %{$self->{key}{p}{$kind}}) {
-					#warn "Moving $form child $self from $kind parent $sparent to parent $tparent for key ".Item::showkey($key);
 					delete $sparent->{child}{$form}{$key};
 					$tparent->{child}{$form}{$key} = $self;
 				}
 			}
 			if (delete $sparent->{members}{$form}{$self->no}) {
-				#warn "Moving $form member $self from $kind parent $sparent to parent $tparent";
 				$tparent->{members}{$form}{$self->no} = $self;
 			}
 			delete $sparent->{children}{$form}{$self->no};
@@ -931,13 +941,10 @@ sub them {
 			my $oparent = delete $othr->{parent}{$kind};
 			next unless $oparent;
 			my $tparent = $oparent->target();
-			#warn "Adding $kind parent $tparent to $self" unless exists $self->{parent}{$kind};
 			$self->{parent}{$kind} = $tparent;
 			if (exists $othr->{key}{p}{$kind}) {
 				foreach my $key (values %{$othr->{key}{p}{$kind}}) {
-					#warn "Merging $form child $othr of $kind parent $oparent to child $self of parent $tparent for key ".Item::showkey($key);
 					delete $oparent->{child}{$form}{$key};
-					#warn "Deleting $form child $othr $kind key ".Item::showkey($key);
 					delete $othr->{key}{p}{$kind}{$key};
 					$self->{key}{p}{$kind}{$key} = $key;
 					$tparent->{child}{$form}{$key} = $self;
@@ -947,7 +954,6 @@ sub them {
 			}
 			if (delete $oparent->{members}{$form}{$othr->no}) {
 				unless (exists $self->{key}{p}{$kind} and scalar values %{$self->{key}{p}{kind}}) {
-					#warn "Merging $form member $othr of $kind parent $oparent to member $self of parent $tparent";
 					$tparent->{members}{$form}{$self->no} = $self;
 				}
 			}
@@ -962,6 +968,90 @@ sub them {
 package Tree; our @ISA = qw(Root Leaf);
 use strict; use warnings; use Carp;
 # ------------------------------------------
+
+# ------------------------------------------
+package Database; our @ISA = qw(Base);
+use strict; use warnings; use Carp;
+use DBI;
+# ------------------------------------------
+#package Database;
+sub init {
+	my $self = shift;
+	my ($dn) = @_;
+	my $fn = $self->{fn} = "$dn.db";
+	warn "Connecting to database dbi:SQLite:$fn";
+	my $dbh = $self->{dbh} = DBI->connect("dbi:SQLite:$fn",undef,undef,{AutoCommit=>1});
+	Carp::confess unless $dbh;
+	$self->{working} = 0;
+	$self->{table} = {};
+	$self->dosql(qq{PRAGMA foreign_keys = OFF;});
+	return $self;
+}
+#package Database;
+sub fini {
+	my $self = shift;
+	foreach my $tab (keys %{$self->{table}}) {
+		my $table = delete $self->{table}{$tab};
+		$table->put();
+	}
+	$self->dosql(qq{VACUUM;});
+	my $dbh = delete $self->{dbh};
+	$dbh->disconnect;
+	undef $dbh;
+}
+#package Database;
+sub dosql {
+	my $self = shift;
+	my ($sql) = @_;
+	my $dbh = $self->{dbh};
+	Carp::confess $? unless $dbh;
+	$dbh->do($sql) or Carp::confess $dbh->errstr;
+}
+#package Database;
+sub prepare {
+	my $self = shift;
+	my ($sql) = @_;
+	my $dbh = $self->{dbh};
+	Carp::confess unless $dbh;
+	my $sth = $dbh->prepare($sql) or Carp::confess $dbh->errstr;
+	return $sth;
+}
+#package Database;
+sub begin_work {
+	my $self = shift;
+	my $dbh = $self->{dbh};
+	Carp::confess unless $dbh;
+	$dbh->begin_work unless $self->{working};
+	$self->{working}++;
+}
+#package Database;
+sub commit {
+	my $self = shift;
+	my $dbh = $self->{dbh};
+	Carp::confess "Too many commits" unless $self->{working} > 0;
+	Carp::confess unless $dbh;
+	$self->{working}--;
+	$dbh->commit unless $self->{working};
+}
+#package Database;
+sub findtable {
+	my $self = shift;
+	my ($name) = @_;
+	return $self->{table}{$name};
+}
+#package Database;
+sub newtable {
+	my $self = shift;
+	my ($name,$table) = @_;
+	$self->{table}{$name} = $table;
+	return $table;
+}
+#package Database;
+sub puttable {
+	my $self = shift;
+	my ($name,$table) = @_;
+	return delete $self->{table}{$name};
+}
 
 # ------------------------------------------
 package Model; our @ISA = qw(Base);
@@ -1002,13 +1092,11 @@ sub item {
 	my $result = undef;
 	my @keys = ref $ref eq 'ARRAY' ? @$ref : ( $ref );
 	foreach my $key (@keys) {
-		#warn "Searching $kind key ".Item::showkey($key);
 		if (exists $self->{items}{$kind}{$key}) {
 			$result = $self->{items}{$kind}{$key};
 			last if $result;
 		}
 	}
-	#warn "Found $result" if $result;
 	return $result;
 }
 #package Model;
@@ -1054,108 +1142,33 @@ sub walktree {
 # ------------------------------------------
 package Model::DBI; our @ISA = qw(Model);
 use strict; use warnings; use Carp;
-use DBI;
 # ------------------------------------------
 #package Model::DBI;
 sub kinds {
-	return qw/Network Private Local Point Lan Vlan Subnet Port Vprt Address/;
+	return qw/Network Private Local Host Lan Vlan Subnet Port Vprt Address/;
 }
 #package Model::DBI;
 sub init {
 	my $self = shift;
-	my ($dn) = @_;
-	my $fn = $self->{fn} = "$dn.db";
-	warn "Connecting to database dbi:SQLite:$fn";
-	my $dbh = $self->{dbh} = DBI->connect("dbi:SQLite:$fn",undef,undef,{AutoCommit=>1});
-	Carp::confess unless $dbh;
-	$self->{working} = 0;
-	$self->{table} = {};
-	$self->dosql(qq{PRAGMA foreign_keys = OFF;});
-	$self->readmodel;
-	return $self;
+	my ($db) = @_;
+	$self->{database} = $db;
+	$db->begin_work;
+	foreach my $kind ($self->kinds) {
+		my $name = "Table\::$kind";
+		my $table = $name->get($db,$kind);
+		if (my $dat = $table->getall) {
+			foreach my $id (keys %$dat) {
+				$id = Item::makekey($id);
+				$kind->get($self,$id);
+			}
+		}
+	}
+	$db->commit;
 }
 #package Model::DBI;
 sub fini {
 	my $self = shift;
-	foreach my $tab (keys %{$self->{table}}) {
-		my $table = delete $self->{table}{$tab};
-		$table->put();
-	}
-	$self->dosql(qq{VACUUM;});
-	my $dbh = delete $self->{dbh};
-	$dbh->disconnect;
-	undef $dbh;
-}
-#package Model::DBI;
-sub dosql {
-	my $self = shift;
-	my ($sql) = @_;
-	my $dbh = $self->{dbh};
-	Carp::confess $? unless $dbh;
-	#print STDERR "S: $sql\n";
-	$dbh->do($sql) or Carp::confess $dbh->errstr;
-}
-#package Model::DBI;
-sub prepare {
-	my $self = shift;
-	my ($sql) = @_;
-	my $dbh = $self->{dbh};
-	Carp::confess unless $dbh;
-	my $sth = $dbh->prepare($sql) or Carp::confess $dbh->errstr;
-	return $sth;
-}
-#package Model::DBI;
-sub begin_work {
-	my $self = shift;
-	my $dbh = $self->{dbh};
-	Carp::confess unless $dbh;
-	$dbh->begin_work unless $self->{working};
-	$self->{working}++;
-}
-#package Model::DBI;
-sub commit {
-	my $self = shift;
-	my $dbh = $self->{dbh};
-	Carp::confess "Too many commits" unless $self->{working} > 0;
-	Carp::confess unless $dbh;
-	$self->{working}--;
-	$dbh->commit unless $self->{working};
-}
-#package Model::DBI;
-sub findtable {
-	my $self = shift;
-	my ($name) = @_;
-	return $self->{table}{$name};
-}
-#package Model::DBI;
-sub newtable {
-	my $self = shift;
-	my ($name,$table) = @_;
-	$self->{table}{$name} = $table;
-	return $table;
-}
-#package Model::DBI;
-sub puttable {
-	my $self = shift;
-	my ($name,$table) = @_;
-	return delete $self->{table}{$name};
-}
-#package Model::DBI;
-sub readmodel {
-	my $self = shift;
-	$self->begin_work;
-	foreach my $kind ($self->kinds) {
-		my $name = "Table\::$kind";
-		my $table = $name->get($self,$kind);
-		if (my $dat = $table->getall) {
-			my $type = $kind;
-			$type = 'Point::Station' if $type eq 'Point';
-			foreach my $id (keys %$dat) {
-				$type->get($self,$id);
-			}
-		}
-	}
-	$self->commit;
+	delete $self->{database};
 }
 
 # ------------------------------------------
@@ -1168,67 +1181,11 @@ use Time::HiRes qw(gettimeofday tv_interval);
 #package Model::SNMP;
 our $tables = [
 	'systemBulk',
-#	'systemScalars',
-#	'sysORTable',
 	'interfacesBulk',
 	'ifMIBObjectsBulk',
-#	'ifTable',
 	'ipBulk',
-#	'ipAddrTable',
-#	'ipAddressTable',
-#	'ipRouteTable',
 	'atBulk',
-#	'atTable',
-#	'ipNetToPhysicalTable',
 	'lldpObjectsBulk',
-#	'lldpLocalSystemDataScalars',
-#	'lldpConfigurationScalars',
-#	'lldpPortConfigTable',
-#	'lldpConfigManAddrTable',
-#	'lldpStatsTxPortTable',
-#	'lldpStatsRxPortTable',
-#	'lldpLocPortTable',
-#	'lldpLocManAddrTable',
-#	'lldpRemTable',
-#	'lldpRemManAddrTable',
-#	'lldpRemUnknownTLVTable',
-#	'lldpRemOrgDefInfoTable',
-#	'lldpXdot1ObjectsBulk',
-#	'lldpXdot1ConfigPortVlanTable',
-#	'lldpXdot1ConfigVlanNameTable',
-#	'lldpXdot1ConfigProtoVlanTable',
-#	'lldpXdot1ConfigProtocolTable',
-#	'lldpXdot1LocTable',
-#	'lldpXdot1LocProtoVlanTable',
-#	'lldpXdot1LocVlanNameTable',
-#	'lldpXdot1LocProtocolTable',
-#	'lldpXdot1RemTable',
-#	'lldpXdot1RemProtoVlanTable',
-#	'lldpXdot1RemVlanNameTable',
-#	'lldpXdot1RemProtocolTable',
-#	'lldpXdot3ObjectsBulk',
-#	'lldpXdot3PortConfigTable',
-#	'lldpXdot3LocPortTable',
-#	'lldpXdot3LocPowerTable',
-#	'lldpXdot3LocLinkAggTable',
-#	'lldpXdot3LocMaxFrameSizeTable',
-#	'lldpXdot3RemPortTable',
-#	'lldpXdot3RemPowerTable',
-#	'lldpXdot3RemLinkAggTable',
-#	'lldpXdot3RemMaxFrameSizeTable',
-#	'lldpXMedObjectsBulk',
-#	'lldpXMedLocalDataScalars',
-#	'lldpXMedPortConfigTable',
-#	'lldpXMedLocMediaPolicyTable',
-#	'lldpXMedLocLocationTable',
-#	'lldpXMedLocXPoEPSEPortTable',
-#	'lldpXMedRemCapabilitiesTable',
-#	'lldpXMedRemMediaPolicyTable',
-#	'lldpXMedRemInventoryTable',
-#	'lldpXMedRemLocationTable',
-#	'lldpXMedRemXPoETable',
-#	'lldpXMedRemXPoEPSETable',
-#	'lldpXMedRemXPoEPDTable',
 #	'mib-2Bulk',
 ];
 #package Model::SNMP;
@@ -1256,11 +1213,8 @@ sub launch_threads {
 	my $wq :shared = Thread::Queue->new; $self->{queue}{host}{results} = $wq;
 	my $bq :shared = Thread::Queue->new; $self->{queue}{entry}{request} = $bq;
 	my $eq :shared = Thread::Queue->new; $self->{queue}{entry}{results} = $eq;
-	#warn "Launching thread...";
 	my @queues :shared = ( $rq, $wq, $bq, $eq );
-	#my $thread = Thread->new(\&Model::SNMP::host_dispatcher_thread,\@queues);
 	my $thread = threads->create('Model::SNMP::host_dispatcher_thread',\@queues);
-	#warn "Detaching thread...";
 	$thread->detach();
 	$self->{thread}{host}{request} = $thread;
 	$thread = threads->create('Model::SNMP::result_dispatcher_thread',\@queues);
@@ -1275,7 +1229,6 @@ sub host_dispatcher_thread {
 	my ($queues) = @_;
 	my ($rq,$wq,$bq,$eq) = @$queues;
 	while (my $item = $rq->dequeue()) {
-		#my $worker = Thread->new(\&Model::SNMP::host_request_thread,$queues,$item);
 		my $worker = threads->create('Model::SNMP::host_request_thread',$queues,$item);
 		if (0) {
 			$worker->detach();
@@ -1359,7 +1312,6 @@ sub result_dispatcher_thread {
 	my ($queues) = @_;
 	my ($rq,$wq,$bq,$eq) = @$queues;
 	while (my $item = $wq->dequeue()) {
-		#my $worker = Thread->new(\&Model::SNMP::result_xlate_thread,$queues,$item);
 		my $worker = threads->create('Model::SNMP::result_xlate_thread',$queues,$item);
 		if (0) {
 			$worker->detach();
@@ -1389,7 +1341,6 @@ sub result_xlate_thread {
 	}
 	Carp::confess "No translation for $table" unless $xlated;
 	foreach my $group (lexical_sort(keys %$xlated)) {
-#warn "Queueing result for $table ($group)";
 		$eq->enqueue([$snmpargs,$table,$group,$xlated->{$group},$error]);
 	}
 }
@@ -1498,62 +1449,44 @@ sub snmp_process {
 	my $self = shift;
 	my $item = shift;
 	my ($snmpargs,$request,$table,$result,$error) = @$item;
-#warn "Processing result for $request ($table)...";
 	if ($error) {
 		warn "Errored result:\nRaw SNMP result:\n",Dumper($item),"\n";
 		return;
 	}
 	my ($hkey,$type,$net) = $self->keytype($snmpargs->{'-hostname'});
 	my $name = netname($type);
-	if ($net = $self->{net}{$type}) {
-		#warn "Found net $name/$type for ".Item::showkey($hkey);
-	} else {
+	unless ($net = $self->{net}{$type}) {
 		warn "No net $name/$type for ".Item::showkey($hkey);
 		return;
 	}
-	my $host = $net->getchild('Point::Host',$hkey,undef);
+	my $host = $net->getchild('Host::Ip',$hkey,undef);
 	my $entries = $table;
 	if ($entries =~ s/Scalars$/Data/) {}
 	elsif ($entries =~ s/Table$/Entry/) {}
-	$self->begin_work;
-	my $now = [gettimeofday];
-	my $then = $now;
-	print STDERR "Processing $request($table)...";
+	my $db = $self->{database};
+	$db->begin_work;
 	if ($host->can($table)) {
-#warn "Host ".Item::showkey($hkey)." processing $request ($table)";
 		$host->$table($self,$snmpargs,$table,$result,$error,$hkey,$type,$net,$name);
 	} elsif ($host->can($entries)) {
-#warn "Host ".Item::showkey($hkey)." processing $request ($entries)";
 		if ($table =~ /Scalars$/) {
 			$host->addrow($table,$result->{0});
 		} elsif ($table =~ /Table$/) {
 			$host->addtab($table,$result);
 		}
 		foreach my $index (lexical_oids(keys %{$result})) {
-			print STDERR "Processing $request($table)[$index]...";
 			$host->$entries($index,$result->{$index},$self,$snmpargs,$table,$result,$error,$hkey,$type,$net,$name);
-			$now = [gettimeofday]; print STDERR "...done. ",tv_interval($then,$now)," seconds\n"; $then = $now;
 		}
 	} else {
 		if ($table =~ /Scalars$/) {
-#warn "Host ".Item::showkey($hkey)." including $request ($table)";
 			$host->addrow($table,$result->{0});
 		} elsif ($table =~ /Table$/) {
-#warn "Host ".Item::showkey($hkey)." including $request ($table)";
 			$host->addtab($table,$result);
 		} else {
 			warn "Host ".Item::showkey($hkey)." cannot process $request ($table)";
 		}
 	}
-	$now = [gettimeofday]; print STDERR "...done. ",tv_interval($then,$now)," seconds\n"; $then = $now;
-	print STDERR "Committing database changes...";
-	$self->commit;
-	$now = [gettimeofday]; print STDERR "...done. ",tv_interval($then,$now)," seconds\n"; $then = $now;
-	print STDERR "Refreshing view...";
+	$db->commit;
 	Viewer->refresh();
-	$now = [gettimeofday]; print STDERR "...done. ",tv_interval($then,$now)," seconds\n"; $then = $now;
-	#Model::walktree($host);
-#warn "...done processing result for $request ($table)";
 }
 #package Model::SNMP;
 sub snmp_doone {
@@ -1561,7 +1494,6 @@ sub snmp_doone {
 	my $q = $self->{queue}{entry}{results};
 	my $result = 0;
 	if (my $item = $q->dequeue_nb()) {
-		#warn "There are still ",$q->pending()," pending results\n" if $q->pending();
 		$self->snmp_process($item);
 		$result++;
 	}
@@ -1582,7 +1514,6 @@ sub add_dot {
 #package Model::SNMP;
 sub xlate_bulk {
 	my ($snmpargs,$bulk,$result,$error) = @_;
-#warn "Translating bulk $bulk...";
 	if (0) {
 		print STDERR "\nBulk $bulk raw result:\n";
 		print STDERR Dumper($result),"\n";
@@ -1676,7 +1607,6 @@ sub xlate_bulk {
 						print STDERR "$table translated result is currently:\n";
 						print STDERR Dumper($xlate),"\n";
 						@inds = ();
-						#$xlate->{$table}{$index}{$i} = undef;
 					}
 				} elsif ($mib->{type} =~ /OCTETSTR/) {
 					my @vals = ();
@@ -1710,7 +1640,6 @@ sub xlate_bulk {
 						print STDERR "$table translated result is currently:\n";
 						print STDERR Dumper($xlate),"\n";
 						@inds = ();
-						#$xlate->{$table}{$index}{$i} = undef;
 					}
 				} elsif ($mib->{type} =~ /OBJECTID|OPAQUE/) {
 					my @vals = ();
@@ -1728,7 +1657,6 @@ sub xlate_bulk {
 						print STDERR "$table translated result is currently:\n";
 						print STDERR Dumper($xlate),"\n";
 						@inds = ();
-						#$xlate->{$table}{$index}{$i} = undef;
 					}
 				} elsif ($mib->{type} =~ /IPADDR|NETADDR/) {
 					my @vals = ();
@@ -1744,7 +1672,6 @@ sub xlate_bulk {
 						print STDERR "$table translated result is currently:\n";
 						print STDERR Dumper($xlate),"\n";
 						@inds = ();
-						#$xlate->{$table}{$index}{$i} = undef;
 					}
 				} else {
 					Carp::cluck "Unhandled index type for $i is $mib->{type}\n";
@@ -1752,13 +1679,11 @@ sub xlate_bulk {
 			}
 		}
 	}
-#warn "...done translating bulk $bulk";
 	return $xlate;
 }
 #package Model::SNMP;
 sub xlate_table {
 	my ($snmpargs,$table,$result,$error) = @_;
-#warn "Translating table $table...";
 	if (0) {
 		print STDERR "\nTable $table raw result:\n";
 		print STDERR Dumper($result),"\n";
@@ -1911,13 +1836,11 @@ sub xlate_table {
 			}
 		}
 	}
-#warn "...done translating table $table";
 	return $xlate;
 }
 #package Model::SNMP;
 sub xlate_scalars {
 	my ($snmpargs,$scalars,$result,$error) = @_;
-#warn "Translating scalars $scalars...";
 	if (0) {
 		print STDERR "\nScalars $scalars raw result:\n";
 		print STDERR Dumper($result),"\n";
@@ -1971,7 +1894,6 @@ sub xlate_scalars {
 		}
 		$xlate->{$scalars}{$index}{$label} = $val;
 	}
-#warn "...done translating scalars $scalars";
 	return $xlate;
 }
 #package Model::SNMP;
@@ -2002,19 +1924,6 @@ sub iptype {
 	my $hnip = Item::showkey($key);
 	return 'PUBLIC' if $hnip =~ /\/0$/;
 	my $ip = new Net::IP($hnip) or Carp::confess "can't decode key '$hnip'";
-	#print STDERR "SNMP host IP  :",$ip->ip,"\n";
-	#print STDERR "SNMP host Ver :",$ip->version,"\n";
-	#print STDERR "SNMP host Sho :",$ip->short,"\n";
-	#print STDERR "SNMP host Bin :",$ip->binip,"\n";
-	#print STDERR "SNMP host Int :",$ip->intip,"\n";
-	#print STDERR "SNMP host Hex :",$ip->hexip,"\n";
-	#print STDERR "SNMP host Mask:",$ip->mask,"\n";
-	#print STDERR "SNMP host Last:",$ip->last_ip,"\n";
-	#print STDERR "SNMP host Pfx :",$ip->prefix,"\n";
-	#print STDERR "SNMP host Len :",$ip->prefixlen,"\n";
-	#print STDERR "SNMP host Size:",$ip->size,"\n";
-	#print STDERR "SNMP host Type:",$ip->iptype,"\n";
-	#print STDERR "SNMP host Rev :",$ip->reverse_ip,"\n";
 	my $type = $ip->iptype; $type = 'LOOPBACK' if $type eq 'PRIVATE' and $hnip =~ /^127\./;
 	# LOOPBACK, PRIVATE, RESERVED, PUBLIC for IPv4
 	return $type;
@@ -2042,7 +1951,6 @@ sub query {
 	};
 	my $q = $self->{queue}{host}{request};
 	$q->enqueue($snmpargs);
-	#warn "There are now ",$q->pending()," pending requests";
 }
 #package Model::SNMP;
 
@@ -2053,7 +1961,7 @@ use strict; use warnings; use Carp;
 #package Model::Network;
 sub init {
 	my $self = shift;
-	my $glob = $self->{net}{PUBLIC} = Network->get($self,-1);
+	my $glob = $self->{net}{PUBLIC} = Network->get($self,Item::makekey(-1));
 	$glob->store(); # force storage because we looked up by object number
 	my $priv = $self->{net}{PRIVATE} = Private::Here->new($self,undef,[['Network',$glob,undef]]);
 	my $locl = $self->{net}{LOOPBACK} = Local::Here->new($self,undef,[['Private::Here',$priv,undef]]);
@@ -2076,22 +1984,16 @@ sub subnetbyip {
 	$ipa = substr($ipa,1);
 	if ($ipa) {
 		my $kind = $self->kind;
-		#print STDERR "Lookup up subnet of $self for IP ",Item::showkey($ipa),"\n";
 		foreach my $subnet ($self->children('Subnet')) {
-			#print STDERR "Checking subnet $subnet\n";
 			foreach my $key (sort keys %{$subnet->{key}{p}{$kind}}) {
 				next unless Item::keytype($key) == Item::IPV4MASKKEY();
-				#print STDERR "Checking prefix ",Item::showkey($key),"\n";
 				my ($type,$addr,$len) = unpack('CNC',$key);
 				next if $len == 0 or $addr == 0;
 				my $mask = 0xffffffff << (32-$len);
 				my $kasm = ~$mask;
 				my $beg = pack('N',$addr & $mask);
 				my $end = pack('N',$addr | $kasm);
-				#print STDERR "Beg address is ",Item::showkey($beg),"\n";
-				#print STDERR "End address is ",Item::showkey($end),"\n";
 				return ($subnet,$key) if $beg le $ipa and $ipa le $end;
-				#print STDERR "IP ",Item::showkey($ipa)," not in range from ",Item::showkey($beg)," to ",Item::showkey($end),"\n";
 			}
 		}
 	}
@@ -2112,8 +2014,8 @@ sub addchild {
 	my $self = shift;
 	my ($child,$key,$result) = @_;
 	$result = $self->SUPER::addchild(@_);
-	if ($result and $key and Item::keytype($key) == Item::IPV4ADDRKEY() and Model::SNMP::iptype($key) ne 'RESERVED' and $child->kind eq 'Point') {
-		my $host = $self->child('Point',$key);
+	if ($result and $key and Item::keytype($key) == Item::IPV4ADDRKEY() and Model::SNMP::iptype($key) ne 'RESERVED' and $child->kind eq 'Host') {
+		my $host = $self->child('Host',$key);
 		unless ($host and $host->{queried}) {
 			$self->{model}->query($key);
 		}
@@ -2140,8 +2042,8 @@ sub addchild {
 	my $self = shift;
 	my ($child,$key,$result) = @_;
 	$result = $self->SUPER::addchild(@_);
-	if ($result and $key and Item::keytype($key) == Item::IPV4ADDRKEY() and Model::SNMP::iptype($key) ne 'RESERVED' and $child->kind eq 'Point') {
-		my $host = $self->child('Point',$key);
+	if ($result and $key and Item::keytype($key) == Item::IPV4ADDRKEY() and Model::SNMP::iptype($key) ne 'RESERVED' and $child->kind eq 'Host') {
+		my $host = $self->child('Host',$key);
 		unless ($host and $host->{queried}) {
 			$self->{model}->query($key);
 		}
@@ -2168,8 +2070,8 @@ sub addchild {
 	my $self = shift;
 	my ($child,$key,$result) = @_;
 	$result = $self->SUPER::addchild(@_);
-	if ($result and $key and Item::keytype($key) == Item::IPV4ADDRKEY() and Model::SNMP::iptype($key) ne 'RESERVED' and $child->kind eq 'Point') {
-		my $host = $self->child('Point',$key);
+	if ($result and $key and Item::keytype($key) == Item::IPV4ADDRKEY() and Model::SNMP::iptype($key) ne 'RESERVED' and $child->kind eq 'Host') {
+		my $host = $self->child('Host',$key);
 		unless ($host and $host->{queried}) {
 			$self->{model}->query($key);
 		}
@@ -2178,7 +2080,7 @@ sub addchild {
 }
 
 # -------------------------------------
-package Subnet; our @ISA = qw(Storable Point Tree Datum Restorable);
+package Subnet; our @ISA = qw(Storable Host Tree Datum Restorable);
 use strict; use warnings; use Carp;
 # -------------------------------------
 #package Subnet;
@@ -2186,23 +2088,24 @@ sub link_parents {
 	my $self = shift;
 	my ($dat) = @_;
 	$self->SUPER::link_parents(@_);
-	# For convenience we need to link Vlan, Lan and Point to the networks
+	# For convenience we need to link Vlan, Lan and Host to the networks
 	# to which their addresses belong.
-	my ($net,$nam);
+	my ($net,$nam,$key);
 	foreach (qw/Network Private Local/) {
 		($nam,$net) = ($_,$dat->{$_});
+		$key = Item::makekey($net) if $net;
 		last if $net;
 	}
 	return unless $net;
 	my $model = $self->{model};
 	if (my $vlan = $self->parent('Vlan')) {
 		warn "Linking $vlan to [[$nam,$net,undef]]";
-		$vlan->link($model,undef,[[$nam,$net,undef]]);
+		$vlan->link($model,undef,[[$nam,$key,undef]]);
 	}
 	if (my $vlan = $self->parent('Vlan')) {
 		if (my $plan = $vlan->parent('Lan')) {
 			warn "Linking $plan to [[$nam,$net,undef]]";
-			$plan->link($model,undef,[[$nam,$net,undef]]);
+			$plan->link($model,undef,[[$nam,$key,undef]]);
 		}
 	}
 }
@@ -2215,10 +2118,11 @@ use Data::Dumper; use DBI;
 #package Table;
 sub find {
 	my $type = shift;
-	my ($model) = @_;
+	my ($db) = @_;
+	Carp::confess "Passed wrong argument" unless $db->isa('Database');
 	my $table = $type;
 	$table =~ s/^Table.*:://;
-	return $model->findtable($table);
+	return $db->findtable($table);
 }
 #package Table;
 sub schema {
@@ -2229,8 +2133,8 @@ sub schema {
 #package Table;
 sub init {
 	my $self = shift;
-	my ($model) = @_;
-	$self->{model} = $model;
+	my ($db) = @_;
+	$self->{database} = $db;
 	my $schema = $self->schema(@_);
 	my $table = $schema->{table};
 	my %schema = (
@@ -2241,16 +2145,16 @@ sub init {
 	);
 	$schema{kmap} = { map {$_=>1} @{$schema{keys}} };
 	$schema{cmap} = { map {$_=>1} @{$schema{cols}} };
-	$model->dosql($schema{tsql});
-	$schema{update} = $model->prepare(qq{UPDATE OR REPLACE $table SET }.join(',',map {"$_=?"} @{$schema{cols}}).qq{ WHERE }.join(' AND ',map {"$_=?"} @{$schema{keys}}).qq{;});
-	$schema{insert} = $model->prepare(qq{INSERT OR REPLACE INTO $table (}.join(',',@{$schema{cols}}).qq{) VALUES (}.join(',',map {'?'} @{$schema{cols}}).qq{);});
-	$schema{select} = $model->prepare(qq{SELECT }.join(',',@{$schema{cols}}).qq{ FROM $table WHERE }.join(' AND ',map {"$_=?"} @{$schema{keys}}).qq{;});
-	$schema{stable} = $model->prepare(qq{SELECT }.join(',',@{$schema{cols}}).qq{ FROM $table WHERE id=?;});
-	$schema{getall} = $model->prepare(qq{SELECT }.join(',',@{$schema{cols}}).qq{ FROM $table;});
-	$schema{delete} = $model->prepare(qq{DELETE FROM $table WHERE }.join(' AND ',map {"$_=?"} @{$schema{keys}}).qq{;});
-	$schema{tclear} = $model->prepare(qq{DELETE FROM $table WHERE id=?;});
+	$db->dosql($schema{tsql});
+	$schema{update} = $db->prepare(qq{UPDATE OR REPLACE $table SET }.join(',',map {"$_=?"} @{$schema{cols}}).qq{ WHERE }.join(' AND ',map {"$_=?"} @{$schema{keys}}).qq{;});
+	$schema{insert} = $db->prepare(qq{INSERT OR REPLACE INTO $table (}.join(',',@{$schema{cols}}).qq{) VALUES (}.join(',',map {'?'} @{$schema{cols}}).qq{);});
+	$schema{select} = $db->prepare(qq{SELECT }.join(',',@{$schema{cols}}).qq{ FROM $table WHERE }.join(' AND ',map {"$_=?"} @{$schema{keys}}).qq{;});
+	$schema{stable} = $db->prepare(qq{SELECT }.join(',',@{$schema{cols}}).qq{ FROM $table WHERE }.$schema{keys}[0].qq{=?;});
+	$schema{getall} = $db->prepare(qq{SELECT }.join(',',@{$schema{cols}}).qq{ FROM $table;});
+	$schema{delete} = $db->prepare(qq{DELETE FROM $table WHERE }.join(' AND ',map {"$_=?"} @{$schema{keys}}).qq{;});
+	$schema{tclear} = $db->prepare(qq{DELETE FROM $table WHERE }.$schema{keys}[0].qq{=?;});
 	$self->{schema} = \%schema;
-	$model->newtable($table,$self);
+	$db->newtable($table,$self);
 }
 #package Table;
 sub fini {
@@ -2263,8 +2167,8 @@ sub fini {
 	delete $self->{schema}{getall};
 	delete $self->{schema}{delete};
 	delete $self->{schema}{tclear};
-	my $model = delete $self->{model};
-	$model->puttable($table,$self);
+	my $db = delete $self->{database};
+	$db->puttable($table,$self);
 }
 #package Table;
 sub update {
@@ -2320,7 +2224,8 @@ sub tclear {
 	Carp::confess "No schema!" unless $schema;
 	my $sth = $schema->{tclear};
 	Carp::confess "No statement handle!" unless $sth;
-	if ($sth->execute($vals->{id})) {
+	my $key = $schema->{keys}[0];
+	if ($sth->execute($vals->{$key})) {
 		$sth->finish;
 	} else {
 		Carp::cluck $sth->errstr;
@@ -2359,7 +2264,8 @@ sub stable {
 	Carp::confess "No statement handle!" unless $sth;
 	my $name = $schema->{table};
 	my $dat;
-	if ($sth->execute($vals->{id})) {
+	my $key = $schema->{keys}[0];
+	if ($sth->execute($vals->{$key})) {
 		if ($name =~ /Table$/) {
 			if (my $rows = $sth->fetchall_hashref('oid')) {
 				foreach my $index (keys %$rows) {
@@ -2386,7 +2292,8 @@ sub getall {
 	Carp::confess "No statement handle!" unless $sth;
 	my $dat;
 	if ($sth->execute()) {
-		if (my $rows = $sth->fetchall_hashref('id')) {
+		my $key = $schema->{keys}[0];
+		if (my $rows = $sth->fetchall_hashref($key)) {
 			foreach my $id (keys %$rows) {
 				$dat->{$id} = {map {$_=>$rows->{$id}{$_}} keys %{$rows->{$id}}};
 			}
@@ -2459,17 +2366,17 @@ q{CREATE TABLE IF NOT EXISTS Local (
 sub schema { return \%schema; }
 
 # -------------------------------------
-package Table::Point; our @ISA = qw(Table);
+package Table::Host; our @ISA = qw(Table);
 use strict; use warnings; use Carp;
 use Data::Dumper; use DBI;
 # -------------------------------------
-#package Table::Point;
+#package Table::Host;
 our %schema = (
-	table=>'Point',
+	table=>'Host',
 	keys=>[qw/id/],
 	cols=>[qw/id name/],
 	tsql=>
-q{CREATE TABLE IF NOT EXISTS Point (
+q{CREATE TABLE IF NOT EXISTS Host (
 	id INT,
 	name TEXT,
 	PRIMARY KEY(id)
@@ -2556,17 +2463,17 @@ use Data::Dumper; use DBI;
 our %schema = (
 	table=>'Port',
 	keys=>[qw/id/],
-	cols=>[qw/id name key Point idxPoint Lan/],
+	cols=>[qw/id name key Host idxPoint Lan/],
 	tsql=>
 q{CREATE TABLE IF NOT EXISTS Port (
 	id INT,
 	name TEXT,
 	key TEXT,
-	Point INT,
+	Host INT,
 	idxPoint INT,
 	Lan INT,
 	PRIMARY KEY(id),
-	FOREIGN KEY(Point) REFERENCES Point(id),
+	FOREIGN KEY(Host) REFERENCES Host(id),
 	FOREIGN KEY(Lan) REFERENCES Lan(id)
 );},
 );
@@ -2581,19 +2488,19 @@ use Data::Dumper; use DBI;
 our %schema = (
 	table=>'Vprt',
 	keys=>[qw/id/],
-	cols=>[qw/id name key Port Point idxPoint Vlan/],
+	cols=>[qw/id name key Port Host idxPoint Vlan/],
 	tsql=>
 q{CREATE TABLE IF NOT EXISTS Vprt (
 	id INT,
 	name TEXT,
 	key TEXT,
 	Port INT,
-	Point INT,
+	Host INT,
 	idxPoint INT,
 	Vlan INT,
 	PRIMARY KEY(id),
 	FOREIGN KEY(Port) REFERENCES Port(id),
-	FOREIGN KEY(Point) REFERENCES Point(id)
+	FOREIGN KEY(Host) REFERENCES Host(id)
 );},
 );
 sub schema { return \%schema; }
@@ -2607,14 +2514,14 @@ use Data::Dumper; use DBI;
 our %schema = (
 	table=>'Address',
 	keys=>[qw/id/],
-	cols=>[qw/id name Vprt idxVprt Point idxPoint Subnet idxSubnet Network idxNetwork Private idxPrivate Local idxLocal/],
+	cols=>[qw/id name Vprt idxVprt Host idxPoint Subnet idxSubnet Network idxNetwork Private idxPrivate Local idxLocal/],
 	tsql=>
 q{CREATE TABLE IF NOT EXISTS Address (
 	id INT,
 	name TEXT,
 	Vprt INT,
 	idxVprt TEXT,
-	Point INT,
+	Host INT,
 	idxPoint TEXT,
 	Subnet INT,
 	idxSubnet TEXT,
@@ -2646,8 +2553,8 @@ our %schema = (
 #package Table::SNMP;
 sub find {
 	my $type = shift;
-	my ($model,$name) = @_;
-	return $model->findtable($name);
+	my ($db,$name) = @_;
+	return $db->findtable($name);
 }
 #package Table::SNMP;
 sub getmib {
@@ -2710,7 +2617,7 @@ sub mapit {
 #package Table::SNMP;
 sub schema {
 	my $self = shift;
-	my ($model,$name) = @_;
+	my ($db,$name) = @_;
 	my $schema = $schema{$name};
 	return $schema if $schema;
 	# Have to create the schema for this table.
@@ -2745,13 +2652,13 @@ our %schema = (
 #package Table::Tables;
 sub find {
 	my $type = shift;
-	my ($model,$name) = @_;
-	return $model->findtable($name);
+	my ($db,$name) = @_;
+	return $db->findtable($name);
 }
 #package Table::Tables;
 sub schema {
 	my $self = shift;
-	my ($model,$name) = @_;
+	my ($db,$name) = @_;
 	my $schema = $schema{$name};
 	return $schema if $schema;
 	# Have to create schema for this table.
@@ -2764,7 +2671,7 @@ sub schema {
 #package Table::Tables;
 sub init {
 	my $self = shift;
-	my ($model,$name) = @_;
+	my ($db,$name) = @_;
 	$self->{tables} = {};
 	if (my $dat = $self->getall()) {
 		$self->{tables} = $dat;
@@ -2794,9 +2701,10 @@ use Data::Dumper;  use DBI;
 #package Storable;
 sub init {
 	my $self = shift;
-	my ($model) = @_;
+	my $model = shift;
+	my $db = $model->{database};
 	my $ttyp = "Table::".$self->kind;
-	my $table = $self->{table} = $ttyp->get(@_);
+	my $table = $self->{table} = $ttyp->get($db,@_);
 	Carp::confess "No table" unless $table;
 }
 #package Storable;
@@ -2881,14 +2789,13 @@ sub link_parents {
 	my $model = $self->{model};
 	foreach my $kind ($model->kinds) {
 		if ($dat->{$kind}) {
-			# TODO: shouldn't have Point::Station derived from Point
-			my $type = $kind;
-			$type = 'Point::Station' if $type eq 'Point';
 			my $idx = $dat->{"idx$kind"};
 			my $key = $idx ? Item::makekey($idx) : $idx;
 			$idx = 'undef' unless defined $idx;
-			warn "Linking $self to [[$type,$dat->{$kind},$idx]]";
-			$self->link($model,undef,[[$type,$dat->{$kind},$key]]);
+			my $pky = $dat->{$kind};
+			my $pid = $pky ? Item::makekey($pky) : $pky;
+			warn "Linking $self to [[$kind,$pky,$idx]]";
+			$self->link($model,undef,[[$kind,$pid,$key]]);
 		}
 	}
 }
@@ -2922,10 +2829,12 @@ use Data::Dumper;
 #package Datum;
 sub init {
 	my $self = shift;
+	my ($model) = @_;
 	$self->{data} = {} unless exists $self->{data};
 	my $kind = $self->kind;
 	my $name = "tables$kind";
-	$self->{tabs} = Table::Tables->get($self->{model},$name);
+	my $db = $model->{database};
+	$self->{tabs} = Table::Tables->get($db,$name);
 	$self->restoretables() if $self->{readme};
 }
 #package Datum;
@@ -3005,7 +2914,8 @@ sub save {
 	$names = [ keys %{$self->{data}} ] unless defined $names;
 	$names = [ $names ] unless ref($names) eq 'ARRAY';
 	foreach my $name (@$names) {
-		if (my $table = Table::SNMP->get($self->{model},$name)) {
+		my $db = $self->{model}{database};
+		if (my $table = Table::SNMP->get($db,$name)) {
 			my $data = $self->{data}{$name};
 			my @indexes = $name =~ /Table$/ ? ( keys %$data ) : ( undef );
 			foreach my $index (@indexes) {
@@ -3024,7 +2934,8 @@ sub restore {
 	$names = [ keys %{$self->{data}} ] unless defined $names;
 	$names = [ $names ] unless ref($names) eq 'ARRAY';
 	foreach my $name (@$names) {
-		if (my $table = Table::SNMP->get($self->{model},$name)) {
+		my $db = $self->{model}{database};
+		if (my $table = Table::SNMP->get($db,$name)) {
 			my $cols = {id=>$self->{no}};
 			if (my $read = $table->stable($cols)) {
 				$self->{data}{$name} = $read;
@@ -3043,7 +2954,8 @@ sub remove {
 	$names = [ keys %{$self->{data}} ] unless defined $names;
 	$names = [ $names ] unless ref($names) eq 'ARRAY';
 	foreach my $name (@$names) {
-		if (my $table = Table::SNMP->get($self->{model},$name)) {
+		my $db = $self->{model}{database};
+		if (my $table = Table::SNMP->get($db,$name)) {
 			my $cols = {id=>$self->{no}};
 			$table->tclear($cols);
 			delete $self->{data}{$name};
@@ -3070,23 +2982,16 @@ package Item; our @ISA = qw(Base);
 use strict; use warnings; use Carp;
 # ------------------------------------------
 #package Item;
-#sub OBJKEY	{ return 0 }
-#sub IPV4ADDRKEY { return 1 }
-#sub IPV4MASKKEY { return 2 }
-#sub MACKEY	{ return 3 }
-#sub VLANKEY	{ return 4 }
-#sub IPV6ADDRKEY { return 5 }
-#sub IPV6MASKKEY { return 6 }
-#sub HEXKEY	{ return 7 }
 use constant {
 	OBJKEY=>0,
-	IPV4ADDRKEY=>1,
-	IPV4MASKKEY=>2,
-	MACKEY=>3,
-	VLANKEY=>4,
-	IPV6ADDRKEY=>5,
-	IPV6MASKKEY=>6,
-	HEXKEY=>7,
+	INTKEY=>1,
+	IPV4ADDRKEY=>2,
+	IPV4MASKKEY=>3,
+	MACKEY=>4,
+	VLANKEY=>5,
+	IPV6ADDRKEY=>6,
+	IPV6MASKKEY=>7,
+	HEXKEY=>8,
 };
 #package Item;
 sub makekey {
@@ -3099,8 +3004,11 @@ sub makekey {
 	if ($key =~ /^\.{3}\/?$/) {
 		$made = undef;
 	}
-	elsif ($key =~ /^-?\d{1,5}$/) {
+	elsif ($key =~ /^-\d{1,5}$/) {
 		$made = pack('Cs',OBJKEY,$key);
+	}
+	elsif ($key =~ /^\d+$/) {
+		$made = pack('CL',INTKEY,$key);
 	}
 	elsif ($key =~ /^0x([0-9a-fA-F]{2})+$/) {
 		$key =~ s/^0x//;
@@ -3189,29 +3097,34 @@ sub makekey {
 		my $type = unpack('C',substr($key,0,1));
 		if (HEXKEY >= $type and $type >= 0) {
 			if ($type == OBJKEY) {
-				Carp::carp "Key already coded" if length($key) == 3;
+				Carp::cluck "Key '",Item::showkey($key),"' already coded" if length($key) == 3;
+			}
+			if ($type == INTKEY) {
+				Carp::cluck "Key '",Item::showkey($key),"' already coded" if length($key) == 3;
 			}
 			elsif ($type == IPV4ADDRKEY) {
-				Carp::carp "Key already coded" if length($key) == 5;
+				Carp::cluck "Key '",Item::showkey($key),"' already coded" if length($key) == 5;
 			}
 			elsif ($type == IPV4MASKKEY) {
-				Carp::carp "Key already coded" if length($key) == 6;
+				Carp::cluck "Key '",Item::showkey($key),"' already coded" if length($key) == 6;
 			}
 			elsif ($type == MACKEY) {
-				Carp::carp "Key already coded" if length($key) == 7;
+				Carp::cluck "Key '",Item::showkey($key),"' already coded" if length($key) == 7;
 			}
 			elsif ($type == VLANKEY) {
-				Carp::carp "Key already coded" if length($key) == 9;
+				Carp::cluck "Key '",Item::showkey($key),"' already coded" if length($key) == 9;
 			}
 			elsif ($type == IPV6ADDRKEY) {
-				Carp::carp "Key already coded" if length($key) == 17;
+				Carp::cluck "Key '",Item::showkey($key),"' already coded" if length($key) == 17;
 			}
 			elsif ($type == IPV6MASKKEY) {
-				Carp::carp "Key already coded" if length($key) == 18;
+				Carp::cluck "Key '",Item::showkey($key),"' already coded" if length($key) == 18;
 			}
 			elsif ($type == HEXKEY) {
-				Carp::carp "Key already coded";
+				Carp::cluck "Key '",Item::showkey($key),"' already coded";
 			}
+		} else {
+			Carp::cluck "Unknown key type '$key'";
 		}
 	}
 	return $made;
@@ -3236,7 +3149,8 @@ sub showkey {
 	}
 	return $key unless length($key) > 0;
 	return $key if $key =~ /^\.{3}\/?$/;
-	return $key if $key =~ /^-?\d{1,5}$/;
+	return $key if $key =~ /^-\d{1,5}$/;
+	return $key if $key =~ /^\d+$/;
 	return $key if $key =~ /^0x([0-9a-fA-F]{2})+$/;
 	return $key if $key =~ /^[0-9a-fA-F]{2}(:[0-9a-fA-F]{2})*$/;
 	return $key if $key =~ /^\d+(\.\d+){3}$/;
@@ -3248,6 +3162,9 @@ sub showkey {
 	$key = substr($key,1);
 	if ($type == OBJKEY) {
 		$show = unpack('s',$key);
+	}
+	elsif ($type == INTKEY) {
+		$show = unpack('L',$key);
 	}
 	elsif ($type == IPV4ADDRKEY) {
 		@parts = unpack('C*',$key);
@@ -3290,7 +3207,6 @@ sub makekey_old {
 	my $key = shift;
 	unless (defined $key) {
 		Carp::cluck "passed null key";
-		#return '';
 		return undef;
 	}
 	my ($made,@parts) = ($key);
@@ -3343,7 +3259,6 @@ sub makekey_old {
 sub showkey_old {
 	my $key = shift;
 	unless (defined $key) {
-		#cluck "passed null key";
 		return '(null)';
 	}
 	my ($show,@parts);
@@ -3408,11 +3323,6 @@ sub init {
 	$self->{model} = $model;
 	$self->{key}{n} = $type->allkeys(@_);
 	my @keys = @{$self->{key}{n}};
-	if (@keys) {
-		#warn "Creating item $self with key ".Item::showkey($keys[0]);
-	} else {
-		#warn "Creating item $self with no external key.";
-	}
 	my $kind = $self->kind;
         # any packed short key (2 bytes) is an item number
 	my $no; foreach my $key (@keys) { $no = $key if keytype($key) == OBJKEY }
@@ -3556,8 +3466,6 @@ sub mergefrom {
 	{
 		my %merge = ( targets=>[] );
 		$self->mergemark($othr,\%merge,$reason);
-		#$self->showlist(\%merge);
-		#print STDERR "\n";
 		my %processed = ();
 		foreach my $target (@{$merge{targets}}) {
 			my $kind = $target->kind;
@@ -3626,7 +3534,6 @@ sub chek {
 	my $self = shift;
 	if (exists $self->{key}{n}) {
 		foreach (@{$self->{key}{n}}) {
-			#$self->show;
 			Carp::confess "Item $self still has model key ".Item::showkey($_);
 		}
 	}
@@ -3650,7 +3557,6 @@ sub mark {
 	my $ono = $othr->no;
 	return 0 if $self eq $othr;
 	return 0 if exists $merge->{$kind}{$sno} and exists $merge->{$kind}{$ono} and $merge->{$kind}{$sno} eq $merge->{$kind}{$ono};
-	#warn "Marking merge of $othr into $self";
 	my @smerge = exists $merge->{$kind}{$sno} ? @{$merge->{$kind}{$sno}} : ($self);
 	my @omerge = exists $merge->{$kind}{$ono} ? @{$merge->{$kind}{$ono}} : ($othr);
 	my $tmerge = ();
@@ -3663,7 +3569,6 @@ sub mark {
 #package Item;
 sub them {
 	my ($self,@others) = @_;
-	#warn "Merging ".join(',',@others)." into $self";
 	my $model = $self->{model};
 	my $s_kind = $self->kind;
 	foreach my $othr (@others) {
@@ -3672,9 +3577,11 @@ sub them {
 			$type->xform($self);
 		}
 		my $o_kind = $othr->kind;
+		my %already = map {$_=>$_} @{$self->{key}{n}};
 		while (my $key = shift @{$othr->{key}{n}}) {
+			next if exists $already{$key};
 			next if $key eq Item::makekey($othr->no);
-			#warn "Merging $othr key ".Item::showkey($key)." to $self";
+			$already{$key} = $key;
 			push @{$self->{key}{n}}, $key;
 			delete $model->{items}{$o_kind}{$key};
 			$model->{items}{$s_kind}{$key} = $self;
@@ -3699,7 +3606,6 @@ sub key {
 	my ($model,$item) = @_;
 	$item = $item->[0] if ref $item eq 'ARRAY';
 	$item = $item->mykey() if ref $item;
-	$item = Item::makekey($item) if $item;
 	return $item;
 }
 #package Point;
@@ -3712,7 +3618,6 @@ sub allkeys {
 		Carp::confess "XXXXXX wrong item $item"
 		if ref $item eq 'ARRAY' or ref $item eq 'HASH' or ref $item eq 'SCALAR';
 		$item = $item->mykey() if ref $item;
-		$item = Item::makekey($item) if $item;
 		push @rslt, $item if $item;
 	}
 	return \@rslt;
@@ -3725,13 +3630,6 @@ sub init {
 #package Point;
 sub fini {
 	my $self = shift;
-#	foreach my $side (values %{$self->{end}}) {
-#		foreach my $kind (values %$side) {
-#			foreach my $edge (values %$kind) {
-#				$edge->put(@_);
-#			}
-#		}
-#	}
 	delete $self->{end};
 }
 #package Point;
@@ -3762,7 +3660,6 @@ sub chek {
 	foreach my $side (qw{a b}) {
 		foreach my $kind (keys %{$self->{end}{$side}}) {
 			foreach my $obj (values %{$self->{end}{$side}{$kind}}) {
-				#$self->show();
 				Carp::confess "Point $self still attached to Path $obj";
 			}
 		}
@@ -3775,18 +3672,13 @@ sub mark {
 	# that are to be merged together, then the path must be merged as well.
 	foreach my $oside (qw/a b/) {
 		my $oopos = ($oside eq 'a' ? 'b' : 'a');
-		#warn "Checking $othr side $oside";
 		foreach my $kind (keys %{$othr->{end}{$oside}}) {
-			#warn "Checking $othr side $oside kind $kind";
 			foreach my $okey (keys %{$othr->{end}{$oside}{$kind}}) {
 				my $opath = $othr->{end}{$oside}{$kind}{$okey};
-				#warn "Checking $othr side $oside kind $kind path $opath";
 				foreach my $sside (qw/a b/) {
 					my $sopos = (($sside eq 'a') ? 'b' : 'a');
-					#warn "Checking $othr side $oside kind $kind path $opath side $sside";
 					foreach my $skey (keys %{$self->{end}{$sside}{$kind}}) {
 						my $spath = $self->{end}{$sside}{$kind}{$skey};
-						#warn "Checking $othr side $oside kind $kind path $opath side $sside path $spath";
 						my $otrg = $opath->obj($oopos)->target();
 						my $strg = $spath->obj($sopos)->target();
 						unless ($otrg eq $strg) {
@@ -3813,16 +3705,12 @@ sub them {
 					my $objl = $opath->{obj}{$oside};
 					Carp::confess "Object $objl should be $othr or $self" unless $objl eq $othr or $objl eq $self;
 					my $objr = $opath->{obj}{$oopos};
-					#warn "Deleting $objl reference to Path $opath side $oside kind $kind with key ".Item::showkey($objr->no);
 					delete $objl->{end}{$oside}{$kind}{$objr->no};
-					#warn "Deleting $objr reference to Path $opath side $oopos kind $kind with key ".Item::showkey($objl->no);
 					delete $objr->{end}{$oopos}{$kind}{$objl->no};
 					my $trgl = $objl->target();
 					Carp::confess "Object $trgl should be $self" unless $trgl eq $self;
 					my $trgr = $objr->target();
-					#warn "Adding $trgl reference to Path $otarg side $oside kind $kind with key ".Item::showkey($trgr->no);
 					$trgl->{end}{$oside}{$kind}{$trgr->no} = $otarg;
-					#warn "Adding $trgr reference to Path $otarg side $oopos kind $kind with key ".Item::showkey($trgl->no);
 					$trgr->{end}{$oopos}{$kind}{$trgl->no} = $otarg;
 					$otarg->{obj}{$oside} = $trgl;
 					$otarg->{obj}{$oopos} = $trgr;
@@ -3840,21 +3728,18 @@ sub mfix {
 			foreach my $key (keys %{$self->{end}{$side}{$kind}}) {
 				my $edge = $self->{end}{$side}{$kind}{$key};
 				if (my $became = $edge->{target}) {
-					#warn "Point $self: Fixing reference to bad edge $edge which became $became";
 					delete $self->{end}{$side}{$kind}{$key};
 					$self->{end}{$side}{$kind}{$became->objo($side)->no} = $became;
 					$fixed = 1;
 					$edge = $became;
 				}
 				unless ($edge->obj($side) eq $self) {
-					#warn "Path $edge: Fixing reference to $side object";
 					$edge->{obj}{$side} = $self;
 					$fixed = 1;
 				}
 			}
 		}
 	}
-#	$self->show if $fixed;
 	Carp::croak if $fixed and $abort;
 }
 #package Point
@@ -3944,7 +3829,6 @@ sub init {
 	$obja->{end}{a}{$self->kind}{$objb->no} = $self;
 	$objb->{end}{b}{$self->kind}{$obja->no} = $self;
 	$self->{duplex} = 0;
-	#warn "Created Path $self from $obja to $objb";
 	Viewer->added_path($obja,$self);
 	Viewer->added_path($objb,$self);
 }
@@ -3989,11 +3873,9 @@ sub shortid {
 sub chek {
 	my $self = shift;
 	if (my $obj = $self->{obj}{a}) {
-		#$self->show();
 		Carp::confess "Path $self still attached from $obj";
 	}
 	if (my $obj = $self->{obj}{b}) {
-		#$self->show();
 		Carp::confess "Path $self still attached to $obj";
 	}
 }
@@ -4009,15 +3891,11 @@ sub them {
 	foreach my $othr (@others) {
 		my $obja = delete $othr->{obj}{a};
 		my $objb = delete $othr->{obj}{b};
-		#warn "Deleting $obja reference to Path $othr side a kind $kind with key ".Item::showkey($objb->no);
 		delete $obja->{end}{a}{$kind}{$objb->no};
-		#warn "Deleting $objb reference to Path $othr side b kind $kind with key ".Item::showkey($obja->no);
 		delete $objb->{end}{b}{$kind}{$obja->no};
 		my $trga = $self->{obj}{a} = $obja->target();
 		my $trgb = $self->{obj}{b} = $objb->target();
-		#warn "Adding $trga reference to Path $self side a kind $kind with key ".Item::showkey($trgb->no);
 		$trga->{end}{a}{$kind}{$trgb->no} = $self if $trga ne $obja;
-		#warn "Adding $trgb reference to Path $self side b kind $kind with key ".Item::showkey($trga->no);
 		$trgb->{end}{b}{$kind}{$trga->no} = $self if $trgb ne $objb;
 	}
 }
@@ -4029,12 +3907,10 @@ sub mfix {
 	my ($beca,$becb) = ($obja->{target},$objb->{target});
 	my ($fina,$finb) = ($obja,$objb);
 	if ($beca) {
-		#warn "Path $self: Fixing reference to bad node $obja which became $beca";
 		$fina = $beca;
 		$fixed = 1;
 	}
 	if ($becb) {
-		#warn "Path $self: Fixing reference to bad node $objb which became $becb";
 		$finb = $becb;
 		$fixed = 1;
 	}
@@ -4053,7 +3929,6 @@ sub mfix {
 	}
 	Carp::confess "Path $self, object A $self->{obj}{a} is bad" if $self->{obj}{a}{bad};
 	Carp::confess "Path $self, object B $self->{obj}{b} is bad" if $self->{obj}{b}{bad};
-#	$self->show if $fixed;
 	Carp::croak if $fixed and $abort;
 }
 #package Path;
@@ -4105,18 +3980,18 @@ sub allkeys {
 }
 
 # -------------------------------------
-package Point::Station; our @ISA = qw(Storable Point Tree Datum Restorable);
+package Host; our @ISA = qw(Storable Point Tree Datum Restorable);
 use strict; use warnings; use Carp;
 # -------------------------------------
 # Stations are an unidentified IP host or gateway.  We know that there are two
 # stations on the edge of a single ethernet, we just do no know which stations
-# yet.  A bare Point::Station object is an unknown IP host or gateway.  It just
+# yet.  A bare Host object is an unknown IP host or gateway.  It just
 # acts as a place holder for when the station is bound to an actual IP host or
 # gateway.  Stations need a put method so that the ethernet can put these
 # stations once they are no longer necessary.  Stations are created in reference
 # to an ethernet, the edge of the ethernet on which they exist.
 #
-# When a Point::Station is created, we know possibly one of its Ethernet
+# When a Host is created, we know possibly one of its Ethernet
 # hardware addresses (Port), but we have no idea which IP addreses belong to it
 # unti an ARP or LLDP packet is processed.  When we are live (we are viewing
 # captured files or performing capture on the monitoring point itself), we can
@@ -4124,42 +3999,36 @@ use strict; use warnings; use Carp;
 # us find the management IP address associated with the station so that we can
 # query it directly with SNMP.
 # -------------------------------------
-# A Point is an IP host.  A Point has no globally unique key of its own;
-# however, its Ports and public Addresses do.  A Point belongs to the 'Local',
+# A Host is an IP host.  A Host has no globally unique key of its own;
+# however, its Ports and public Addresses do.  A Host belongs to the 'Local',
 # 'Private' and 'Network' subnetworks in which it has assigned IP addresses.  It
 # belongs to zero or one of each kind.  However, this is a convenience as it can
 # be determined from its assigned Addresses and need not be stored.  Because
-# only the Point id need be saved, no separate database table is needed for
-# Point objects (although SNMP data tables are still required indexed on Point
-# id).  SEE package Point for the data definitions.
+# only the Host id need be saved, no separate database table is needed for
+# Host objects (although SNMP data tables are still required indexed on Host
+# id).  SEE package Host for the data definitions.
 # -------------------------------------
-#package Point::Station;
+#package Host;
 sub add_key {
 	my ($self,$key) = @_;
 	if ($key and Item::keytype($key) == Item::IPV4ADDRKEY()) {
-		Point::Host->xform($self);
+		Host::Ip->xform($self);
 		$self->add_key($key);
 	} else {
 		$self->SUPER::add_key($key);
 	}
 }
-#package Point::Station;
-#sub mark {
-#	my ($self,$othr,$merge,$reason) = @_;
-#	#Carp::cluck $reason;
-#	return 1;
-#}
 
 # -------------------------------------
-package Point::Host; our @ISA = qw(Point::Station);
+package Host::Ip; our @ISA = qw(Host);
 use strict; use warnings; use Carp;
 use Data::Dumper;
 # -------------------------------------
-#package Point::Host;
+#package Host::Ip;
 use constant {
 	dump_tables => 0,
 };
-#package Point::Host;
+#package Host::Ip;
 sub systemData {
 	my $self = shift;
 	my ($index,$row,$model,$snmpargs,$scalars,$xlated,$error,$hkey,$type,$snet,$name) = @_;
@@ -4170,7 +4039,7 @@ sub systemData {
 	$self->{queried} = 1;
 	$self->addrow($scalars,$row);
 }
-#package Point::Host;
+#package Host::Ip;
 sub ifEntry {
 	my $self = shift;
 	my ($index,$row,$model,$snmpargs,$table,$xlated,$error,$hkey,$type,$snet,$name) = @_;
@@ -4190,9 +4059,11 @@ sub ifEntry {
 		$hwa = Item::makekey($hwa);
 		$pid = $idx unless length($vid);
 	}
+	$idx = Item::makekey($idx) if $idx;
+	$pid = Item::makekey($pid) if $pid;
 	my $vprt = $self->getchild('Vprt',$idx,$vla,[
 		['Port',$hwa,undef,[
-			['Point::Host',$self,$pid],
+			['Host::Ip',$self,$pid],
 			['Lan',undef,undef]]],
 		['Vlan',undef,undef],
 		]);
@@ -4202,7 +4073,7 @@ sub ifEntry {
 	$vlan->link($model,undef,[['Lan',$plan,undef]]);
 	$vprt->addrow($table,$row);
 }
-#package Point::Host;
+#package Host::Ip;
 sub ifXEntry {
 	my $self = shift;
 	my ($index,$row,$model,$snmpargs,$table,$xlated,$error,$hkey,$type,$snet,$name) = @_;
@@ -4212,10 +4083,11 @@ sub ifXEntry {
 	}
 	my $idx = $row->{ifIndex};
 	return unless $idx;
+	$idx = Item::makekey($idx);
 	my $vprt = $self->getchild('Vprt',$idx,undef);
 	$vprt->addrow($table,$row);
 }
-#package Point::Host;
+#package Host::Ip;
 sub ipAddrEntry {
 	my $self = shift;
 	my ($index,$row,$model,$snmpargs,$table,$xlated,$error,$hkey,$type,$snet,$name) = @_;
@@ -4233,9 +4105,10 @@ sub ipAddrEntry {
 	my $nam = Model::SNMP::netname($ipt);
 	$self->link($model,undef,[[$nam,$net,$ipa]]);
 	$net = $self->parent($nam) unless $net;
+	$idx = Item::makekey($idx);
 	my $vprt = $self->getchild('Vprt',$idx,undef,[
 		['Port',undef,undef,[
-			['Point::Host',$self,undef],
+			['Host::Ip',$self,undef],
 			['Lan',undef,undef,[
 				[$nam,$net,undef]]]]],
 		['Vlan',undef,undef,[
@@ -4250,14 +4123,14 @@ sub ipAddrEntry {
 		]);
 	my $addr = $net->getchild('Address',$ipa,undef,[
 		['Vprt',$vprt,$ipa],
-		['Point::Host',$self,$ipa],
+		['Host::Ip',$self,$ipa],
 		['Subnet',$sub,$ipa],
 		]);
 	$addr->addrow($table,$row);
 	$sub = $sub->target;
 	$sub->addrow($table,$row);
 }
-#package Point::Host;
+#package Host::Ip;
 sub ipAddressEntry {
 	my $self = shift;
 	my ($index,$row,$model,$snmpargs,$table,$xlated,$error,$hkey,$type,$snet,$name) = @_;
@@ -4276,9 +4149,10 @@ sub ipAddressEntry {
 	my $nam = Model::SNMP::netname($ipt);
 	$self->link($model,undef,[[$nam,$net,$ipa]]);
 	$net = $self->parent($nam) unless $net;
+	$idx = Item::makekey($idx) if $idx;
 	my $vprt = $self->getchild('Vprt',$idx,undef,[
 		['Port',undef,undef,[
-			['Point::Host',$self,undef],
+			['Host::Ip',$self,undef],
 			['Lan',undef,undef,[
 				[$nam,$net,undef]]]]],
 		['Vlan',undef,undef,[
@@ -4290,17 +4164,16 @@ sub ipAddressEntry {
 	$net = $net->target;
 	# FIXME: there is a way to get the prefix as well
 	my ($sub,$pfx) = $net->subnetbyip($ipa);
-#warn "Can't find subnet of $net for address ",Item::showkey($ipa) unless $sub;
 	my $addr = $net->getchild('Address',$ipa,undef,[
 		['Vprt',$vprt,$ipa],
-		['Point::Host',$self,$ipa],
+		['Host::Ip',$self,$ipa],
 		['Subnet',$sub,$ipa,[
 			[$nam,$net,$pfx],
 			['Vlan',$vlan,undef]]],
 		]);
 	$addr->addrow($table,$row);
 }
-#package Point::Host;
+#package Host::Ip;
 sub atEntry {
 	my $self = shift;
 	my ($index,$row,$model,$snmpargs,$table,$xlated,$error,$hkey,$type,$snet,$name) = @_;
@@ -4319,9 +4192,10 @@ sub atEntry {
 	my $nam = Model::SNMP::netname($ipt);
 	$self->link($model,undef,[[$nam,$net,undef]]);
 	$net = $self->parent($nam) unless $net;
+	$idx = Item::makekey($idx) if $idx;
 	my $vprt = $self->getchild('Vprt',$idx,undef,[
 		['Port',undef,undef,[
-			['Point::Host',$self,undef],
+			['Host::Ip',$self,undef],
 			['Lan',undef,undef,[
 				[$nam,$net,undef]]]]],
 		['Vlan',undef,undef,[
@@ -4331,12 +4205,12 @@ sub atEntry {
 	my $plan = $vprt->parent('Port')->parent('Lan');
 	$vlan->link($model,undef,[['Lan',$plan,undef]]);
 	$vprt = $vprt->target;
-	my $host = Point::Host->get($model,$mac,[[$nam,$net,$ipa]]);
+	my $host = Host::Ip->get($model,$mac,[[$nam,$net,$ipa]]);
 	$net = $host->parent($nam) unless $net;
 	my $oprt = $vlan->getchild('Vprt',$mac,undef,[
-		['Point::Host',$host,undef],
+		['Host::Ip',$host,undef],
 		['Port',$mac,undef,[
-			['Point::Host',$host,undef],
+			['Host::Ip',$host,undef],
 			['Lan',$plan,undef,[
 				[$nam,$net,undef]]]]],
 		['Vlan',$vlan,undef,[
@@ -4344,17 +4218,16 @@ sub atEntry {
 		]);
 	$net = $net->target;
 	my ($sub,$pfx) = $net->subnetbyip($ipa);
-#warn "Can't find subnet of $net for address ",Item::showkey($ipa) unless $sub;
 	my $addr = $net->getchild('Address',$ipa,undef,[
 		['Vprt',$oprt,$ipa],
-		['Point::Host',$host,$ipa],
+		['Host::Ip',$host,$ipa],
 		['Subnet',$sub,$ipa,[
 			[$nam,$net,$pfx],
 			['Vlan',$vlan,undef]]],
 		]);
 	$addr->addrow($table,$row);
 }
-#package Point::Host;
+#package Host::Ip;
 sub ipNetToMediaEntry {
 	my $self = shift;
 	my ($index,$row,$model,$snmpargs,$table,$xlated,$error,$hkey,$type,$snet,$name) = @_;
@@ -4374,9 +4247,10 @@ sub ipNetToMediaEntry {
 		my $nam = Model::SNMP::netname($ipt);
 		$self->link($model,undef,[[$nam,$net,undef]]);
 		$net = $self->parent($nam) unless $net;
+		$idx = Item::makekey($idx) if $idx;
 		my $vprt = $self->getchild('Vprt',$idx,undef,[
 			['Port',undef,undef,[
-				['Point::Host',$self,undef],
+				['Host::Ip',$self,undef],
 				['Lan',undef,undef,[
 					[$nam,$net,undef]]]]],
 			['Vlan',undef,undef,[
@@ -4385,13 +4259,13 @@ sub ipNetToMediaEntry {
 		my $vlan = $vprt->parent('Vlan');
 		my $plan = $vprt->parent('Port')->parent('Lan');
 		$vlan->link($model,undef,[['Lan',$plan,undef]]);
-		my $host = Point::Host->get($model,$mac,[[$nam,$net,$ipa]]);
+		my $host = Host::Ip->get($model,$mac,[[$nam,$net,$ipa]]);
 		$net = $host->parent($nam) unless $net;
 		$vprt = $vprt->target;
 		my $oprt = $vlan->getchild('Vprt',$mac,undef,[
-			['Point::Host',$host,undef],
+			['Host::Ip',$host,undef],
 			['Port',$mac,undef,[
-				['Point::Host',$host,undef],
+				['Host::Ip',$host,undef],
 				['Lan',$plan,undef,[
 					[$nam,$net,undef]]]]],
 			['Vlan',$vlan,undef,[
@@ -4399,17 +4273,16 @@ sub ipNetToMediaEntry {
 			]);
 		$net = $net->target;
 		my ($sub,$pfx) = $net->subnetbyip($ipa);
-#warn "Can't find subnet of $net for address ",Item::showkey($ipa) unless $sub;
 		my $addr = $net->getchild('Address',$ipa,undef,[
 			['Vprt',$oprt,$ipa],
-			['Point::Host',$host,$ipa],
+			['Host::Ip',$host,$ipa],
 			['Subnet',$sub,$ipa,[
 				[$nam,$net,$pfx],
 				['Vlan',$vlan,undef]]],
 			]);
 		$addr->addrow($table,$row);
 }
-#package Point::Host;
+#package Host::Ip;
 sub ipNetToPhysicalEntry {
 	my $self = shift;
 	my ($index,$row,$model,$snmpargs,$table,$xlated,$error,$hkey,$type,$snet,$name) = @_;
@@ -4432,9 +4305,10 @@ sub ipNetToPhysicalEntry {
 	my $nam = Model::SNMP::netname($ipt);
 	$self->link($model,undef,[[$nam,$net,undef]]);
 	$net = $self->parent($nam) unless $net;
+	$idx = Item::makekey($idx) if $idx;
 	my $vprt = $self->getchild('Vprt',$idx,undef,[
 		['Port',undef,undef,[
-			['Point::Host',$self,undef],
+			['Host::Ip',$self,undef],
 			['Lan',undef,undef,[
 				[$nam,$net,undef]]]]],
 		['Vlan',undef,undef,[
@@ -4443,13 +4317,13 @@ sub ipNetToPhysicalEntry {
 	my $vlan = $vprt->parent('Vlan');
 	my $plan = $vprt->parent('Port')->parent('Lan');
 	$vlan->link($model,undef,[['Lan',$plan,undef]]);
-	my $host = Point::Host->get($model,$mac,[[$nam,$net,$ipa]]);
+	my $host = Host::Ip->get($model,$mac,[[$nam,$net,$ipa]]);
 	$net = $host->parent($nam) unless $net;
 	$vprt = $vprt->target;
 	my $oprt = $vlan->getchild('Vprt',$mac,undef,[
-		['Point::Host',$host,undef],
+		['Host::Ip',$host,undef],
 		['Port',$mac,undef,[
-			['Point::Host',$host,undef],
+			['Host::Ip',$host,undef],
 			['Lan',$plan,undef,[
 				[$nam,$net,undef]]]]],
 		['Vlan',$vlan,undef,[
@@ -4457,17 +4331,16 @@ sub ipNetToPhysicalEntry {
 		]);
 	$net = $net->target;
 	my ($sub,$pfx) = $net->subnetbyip($ipa);
-#warn "Can't find subnet of $net for address ",Item::showkey($ipa) unless $sub;
 	my $addr = $net->getchild('Address',$ipa,undef,[
 		['Vprt',$oprt,$ipa],
-		['Point::Host',$host,$ipa],
+		['Host::Ip',$host,$ipa],
 		['Subnet',$sub,$ipa,[
 			[$nam,$net,$pfx],
 			['Vlan',$vlan,undef]]],
 		]);
 	$addr->addrow($table,$row);
 }
-#package Point::Host;
+#package Host::Ip;
 sub ipRouteEntry {
 	my $self = shift;
 	my ($index,$row,$model,$snmpargs,$table,$xlated,$error,$hkey,$type,$snet,$name) = @_;
@@ -4486,9 +4359,10 @@ sub ipRouteEntry {
 		$self->link($model,undef,[[$nam,$net,undef]]);
 		$net = $self->parent($nam) unless $net;
 		last unless $idx;
+		$idx = Item::makekey($idx) if $idx;
 		my $vprt = $self->getchild('Vprt',$idx,undef,[
 			['Port',undef,undef,[
-				['Point::Host',$self,undef],
+				['Host::Ip',$self,undef],
 				['Lan',undef,undef,[
 					[$nam,$net,undef]]]]],
 			['Vlan',undef,undef,[
@@ -4523,6 +4397,7 @@ sub ipRouteEntry {
 		$net = $self->parent($nam) unless $net;
 		last unless $net;
 		last unless $idx;
+		$idx = Item::makekey($idx) if $idx;
 		my $vprt = $self->getchild('Vprt',$idx,undef);
 		my $sub = $net->getchild('Subnet',$pfx,undef);
 		my $rte = Route->get($model,$vprt->target,$sub->target,$ipa);
@@ -4543,12 +4418,11 @@ sub ipRouteEntry {
 		my $nam = Model::SNMP::netname($ipt);
 		$self->link($model,undef,[[$nam,$net,undef]]);
 		$net = $self->parent($nam) unless $net;
-		my $host = $net->getchild('Point::Host',$ipa);
+		my $host = $net->getchild('Host::Ip',$ipa);
 		my ($sub,$pfx) = $net->subnetbyip($ipa);
-#warn "Can't find subnet of $net for address ",Item::showkey($ipa) unless $sub;
 		my $addr = $net->getchild('Address',$ipa,undef,[
 			['Vprt',undef,$ipa],
-			['Point::Host',$host,$ipa],
+			['Host::Ip',$host,$ipa],
 			['Subnet',$sub,$ipa,[
 				[$nam,$net,$pfx],
 				['Vlan',undef,undef]]],
@@ -4556,7 +4430,7 @@ sub ipRouteEntry {
 		last;
 	}
 }
-#package Point::Host;
+#package Host::Ip;
 sub ipCidrRouteEntry {
 	my $self = shift;
 	my ($index,$row,$model,$snmpargs,$table,$xlated,$error,$hkey,$type,$snet,$name) = @_;
@@ -4575,9 +4449,10 @@ sub ipCidrRouteEntry {
 		$self->link($model,undef,[[$nam,$net,undef]]);
 		$net = $self->parent($nam) unless $net;
 		last unless $idx;
+		$idx = Item::makekey($idx) if $idx;
 		my $vprt = $self->getchild('Vprt',$idx,undef,[
 			['Port',undef,undef,[
-				['Point::Host',$self,undef],
+				['Host::Ip',$self,undef],
 				['Lan',undef,undef,[
 					[$nam,$net,undef]]]]],
 			['Vlan',undef,undef,[
@@ -4612,6 +4487,7 @@ sub ipCidrRouteEntry {
 		$net = $self->parent($nam) unless $net;
 		last unless $net;
 		last unless $idx;
+		$idx = Item::makekey($idx) if $idx;
 		my $vprt = $self->getchild('Vprt',$idx,undef);
 		my $sub = $net->getchild('Subnet',$pfx,undef);
 		my $rte = Route->get($model,$vprt->target,$sub->target,$ipa);
@@ -4632,12 +4508,11 @@ sub ipCidrRouteEntry {
 		my $nam = Model::SNMP::netname($ipt);
 		$self->link($model,undef,[[$nam,$net,undef]]);
 		$net = $self->parent($nam) unless $net;
-		my $host = $net->getchild('Point::Host',$ipa);
+		my $host = $net->getchild('Host::Ip',$ipa);
 		my ($sub,$pfx) = $net->subnetbyip($ipa);
-#warn "Can't find subnet of $net for address ",Item::showkey($ipa) unless $sub;
 		my $addr = $net->getchild('Address',$ipa,undef,[
 			['Vprt',undef,$ipa],
-			['Point::Host',$host,$ipa],
+			['Host::Ip',$host,$ipa],
 			['Subnet',$sub,$ipa,[
 				[$nam,$net,$pfx],
 				['Vlan',undef,undef]]],
@@ -4645,7 +4520,7 @@ sub ipCidrRouteEntry {
 		last;
 	}
 }
-#package Point::Host;
+#package Host::Ip;
 sub inetCidrRouteEntry {
 	my $self = shift;
 	my ($index,$row,$model,$snmpargs,$table,$xlated,$error,$hkey,$type,$snet,$name) = @_;
@@ -4665,9 +4540,10 @@ sub inetCidrRouteEntry {
 		$self->link($model,undef,[[$nam,$net,undef]]);
 		$net = $self->parent($nam) unless $net;
 		last unless $idx;
+		$idx = Item::makekey($idx) if $idx;
 		my $vprt = $self->getchild('Vprt',$idx,undef,[
 			['Port',undef,undef,[
-				['Point::Host',$self,undef],
+				['Host::Ip',$self,undef],
 				['Lan',undef,undef,[
 					[$nam,$net,undef]]]]],
 			['Vlan',undef,undef,[
@@ -4704,6 +4580,7 @@ sub inetCidrRouteEntry {
 		$net = $self->parent($nam) unless $net;
 		last unless $net;
 		last unless $idx;
+		$idx = Item::makekey($idx) if $idx;
 		my $vprt = $self->getchild('Vprt',$idx,undef);
 		my $sub = $net->getchild('Subnet',$pfx,undef);
 		my $rte = Route->get($model,$vprt->target,$sub->target,$ipa);
@@ -4725,12 +4602,11 @@ sub inetCidrRouteEntry {
 		my $nam = Model::SNMP::netname($ipt);
 		$self->link($model,undef,[[$nam,$net,undef]]);
 		$net = $self->parent($nam) unless $net;
-		my $host = $net->getchild('Point::Host',$ipa);
+		my $host = $net->getchild('Host::Ip',$ipa);
 		my ($sub,$pfx) = $net->subnetbyip($ipa);
-#warn "Can't find subnet of $net for address ",Item::showkey($ipa) unless $sub;
 		my $addr = $net->getchild('Address',$ipa,undef,[
 			['Vprt',undef,$ipa],
-			['Point::Host',$host,$ipa],
+			['Host::Ip',$host,$ipa],
 			['Subnet',$sub,$ipa,[
 				[$nam,$net,$pfx],
 				['Vlan',undef,undef]]],
@@ -4738,7 +4614,7 @@ sub inetCidrRouteEntry {
 		last;
 	}
 }
-#package Point::Host;
+#package Host::Ip;
 sub ipSystemStatsEntry {
 	my $self = shift;
 	my ($index,$row,$model,$snmpargs,$table,$xlated,$error,$hkey,$type,$snet,$name) = @_;
@@ -4749,7 +4625,7 @@ sub ipSystemStatsEntry {
 	}
 	$self->addrow($table,$row);
 }
-#package Point::Host;
+#package Host::Ip;
 sub ipIfStatsEntry {
 	my $self = shift;
 	my ($index,$row,$model,$snmpargs,$table,$xlated,$error,$hkey,$type,$snet,$name) = @_;
@@ -4760,7 +4636,7 @@ sub ipIfStatsEntry {
 	}
 	$self->addrow($table,$row);
 }
-#package Point::Host;
+#package Host::Ip;
 sub lldpPortConfigEntry {
 	my $self = shift;
 	my ($index,$row,$model,$snmpargs,$table,$xlated,$error,$hkey,$type,$snet,$name) = @_;
@@ -4770,11 +4646,12 @@ sub lldpPortConfigEntry {
 	}
 	my $idx = $row->{lldpPortConfigPortNum};
 	return unless $idx;
+	$idx = Item::makekey($idx) if $idx;
 	my $vprt = $self->getchild('Vprt',$idx,undef);
 	return unless $vprt;
 	$vprt->addrow($table,$row);
 }
-#package Point::Host;
+#package Host::Ip;
 sub lldpStatsTxPortEntry {
 	my $self = shift;
 	my ($index,$row,$model,$snmpargs,$table,$xlated,$error,$hkey,$type,$snet,$name) = @_;
@@ -4784,11 +4661,12 @@ sub lldpStatsTxPortEntry {
 	}
 	my $idx = $row->{lldpStatsTxPortNum};
 	return unless $idx;
+	$idx = Item::makekey($idx) if $idx;
 	my $vprt = $self->getchild('Vprt',$idx,undef);
 	return unless $vprt;
 	$vprt->addrow($table,$row);
 }
-#package Point::Host;
+#package Host::Ip;
 sub lldpStatsRxPortEntry {
 	my $self = shift;
 	my ($index,$row,$model,$snmpargs,$table,$xlated,$error,$hkey,$type,$snet,$name) = @_;
@@ -4798,11 +4676,12 @@ sub lldpStatsRxPortEntry {
 	}
 	my $idx = $row->{lldpStatsRxPortNum};
 	return unless $idx;
+	$idx = Item::makekey($idx) if $idx;
 	my $vprt = $self->getchild('Vprt',$idx,undef);
 	return unless $vprt;
 	$vprt->addrow($table,$row);
 }
-#package Point::Host;
+#package Host::Ip;
 sub lldpLocPortEntry {
 	my $self = shift;
 	my ($index,$row,$model,$snmpargs,$table,$xlated,$error,$hkey,$type,$snet,$name) = @_;
@@ -4812,12 +4691,13 @@ sub lldpLocPortEntry {
 	}
 	my $idx = $row->{lldpLocPortNum};
 	return unless $idx;
-	my $hwa = Item::makekey($row->{lldpLocPortIdSubtype})
+	$idx = Item::makekey($idx) if $idx;
+	my $hwa = Item::makekey($row->{lldpLocPortId})
 		if $row->{lldpLocPortIdSubtype} eq 'macAddress(3)';
 	my $vprt = $self->getchild('Vprt',$idx,undef);
 	$vprt->addrow($table,$row);
 }
-#package Point::Host;
+#package Host::Ip;
 sub lldpLocManAddrEntry {
 	my $self = shift;
 	my ($index,$row,$model,$snmpargs,$table,$xlated,$error,$hkey,$type,$snet,$name) = @_;
@@ -4843,9 +4723,10 @@ sub lldpLocManAddrEntry {
 	my $nam = Model::SNMP::netname($ipt);
 	$self->link($model,undef,[[$nam,$net,$ipa]]);
 	$net = $self->parent($nam) unless $net;
+	$idx = Item::makekey($idx) if $idx;
 	my $vprt = $self->getchild('Vprt',$idx,undef,[
 		['Port',undef,undef,[
-			['Point::Host',$self,undef],
+			['Host::Ip',$self,undef],
 			['Lan',undef,undef,[
 				[$nam,$net,undef]]]]],
 		['Vlan',undef,undef,[
@@ -4856,10 +4737,9 @@ sub lldpLocManAddrEntry {
 	$vlan->link($model,undef,[['Lan',$plan,undef]]);
 	$net = $net->target;
 	my ($sub,$pfx) = $net->subnetbyip($ipa);
-#warn "Can't find subnet of $net for address ",Item::showkey($ipa) unless $sub;
 	my $addr = $net->getchild('Address',$ipa,undef,[
 		['Vprt',undef,$ipa],
-		['Point::Host',$self,$ipa],
+		['Host::Ip',$self,$ipa],
 		['Subnet',$sub,$ipa,[
 			[$nam,$net,$pfx],
 			['Vlan',$vlan,undef]]],
@@ -4870,7 +4750,7 @@ sub lldpLocManAddrEntry {
 }
 
 # -------------------------------------
-package Point::Host::Here; our @ISA = qw(Point::Host);
+package Host::Ip::Here; our @ISA = qw(Host::Ip);
 use strict; use warnings; use Carp;
 # -------------------------------------
 
@@ -4887,8 +4767,8 @@ use strict; use warnings; use Carp;
 # hardware addresses is not available when the packet comes from a Linux cooked
 # header capture.  When another Lan exists that already has the destination
 # hardware address as one of its addresses, the two Lan packages will be merged.
-# In this way membership of hardware addresses (Port and Point::Station
-# packages) to Lan packages is discovered.
+# In this way membership of hardware addresses (Port and Host packages) to Lan
+# packages is discovered.
 # -------------------------------------
 # A Lan is a IEEE 802.1 LAN.  Lans have no globally unique key, but the Ports
 # that atttach to them do.  Each Lan belongs to the 'Local', 'Private' or
@@ -4914,7 +4794,7 @@ use strict; use warnings; use Carp;
 # Linux cooked header capture.  When another Vlan exists that already has this
 # destination hardware address as on of its addresses, the two Vlan packages
 # will be merged.  In this way membership of hardware addresses (Port and
-# Point::Station packages) to Vlan packages is discovered.
+# Host packages) to Vlan packages is discovered.
 #
 # To avoid unnecessary complexity, we deal with Vlan packages only.  The parent
 # Lan package is just for automatically tracking membership of Vlan to Lan
@@ -4934,7 +4814,7 @@ use strict; use warnings; use Carp;
 # An Address is an IP address.  IP addresses are only gobally unique when
 # assigned in a public network so no key is used.  An Address belongs to the
 # Vprt to which it is assigned using the IP address as an index. An Address
-# belongs to a Point::Host using the IP address as an index; however, this is a
+# belongs to a Host using the IP address as an index; however, this is a
 # convenience for layout and can be determined by the hosts of the Vprt to which
 # the address is assigned..  An Address belongs to a Subnet using its IP address
 # as an index.  Each address belongs to a 'Local', 'Private' or 'Network'
@@ -4947,31 +4827,32 @@ sub link_parents {
 	my $self = shift;
 	my ($dat) = @_;
 	$self->SUPER::link_parents(@_);
-	# For convenience we need to link Vlan, Lan and Point to the networks
+	# For convenience we need to link Vlan, Lan and Host to the networks
 	# to which their addresses belong.
-	my ($net,$nam);
+	my ($net,$nam,$key);
 	foreach (qw/Network Private Local/) {
 		($nam,$net) = ($_,$dat->{$_});
+		$key = Item::makekey($net) if $net;
 		last if $net;
 	}
 	return unless $net;
 	my $model = $self->{model};
-	if (my $point = $self->parent('Point')) {
+	if (my $point = $self->parent('Host')) {
 		warn "Linking $point to [[$nam,$net,undef]]";
-		$point->link($model,undef,[[$nam,$net,undef]]);
+		$point->link($model,undef,[[$nam,$key,undef]]);
 	}
 	if (my $vprt = $self->parent('Vprt')) {
 		if (my $port = $vprt->parent('Port')) {
 			if (my $plan = $port->parent('Lan')) {
 				warn "Linking $plan to [[$nam,$net,undef]]";
-				$plan->link($model,undef,[[$nam,$net,undef]]);
+				$plan->link($model,undef,[[$nam,$key,undef]]);
 			}
 		}
 	}
 	if (my $vprt = $self->parent('Vprt')) {
 		if (my $vlan = $vprt->parent('Vlan')) {
 			warn "Linking $vlan to [[$nam,$net,undef]]";
-			$vlan->link($model,undef,[[$nam,$net,undef]]);
+			$vlan->link($model,undef,[[$nam,$key,undef]]);
 		}
 	}
 }
@@ -4981,7 +4862,7 @@ package Route; our @ISA = qw(Path Datum);
 use strict; use warnings; use Carp;
 # -------------------------------------
 # A route is an IP routing path from a Port to a Subnet via a gateway
-# (Point::Router).
+# (Host::Router).
 # -------------------------------------
 #package Route;
 sub typpair { return 'Vprt','Subnet'; }
@@ -4997,15 +4878,15 @@ use strict; use warnings; use Carp;
 # -------------------------------------
 # A Port is a LAN link layer interface.  Fundamentally, a Port belongs to the
 # Lan to which it is attached  (with which it shares its hardware address key).
-# Also, it fundamentally belongs to the Point::Station to which it is attached
+# Also, it fundamentally belongs to the Host to which it is attached
 # (and also shares its hardware address key).  The Lan to which a Port belongs
 # can be found by simply lookup up the Lan with the Port hardware address.  The
-# same is true of the Point::Station.
+# same is true of the Host.
 # -------------------------------------
 # A Port is a physical LAN link layer interface.  It is globally uniquely
 # identified by its hardware address (when known).  The Port belongs to a
-# Point::Station indexed by interface index.  Each Port belongs to a Lan.  The
-# Port database table tuple is Port id, Hardware Address, Point::Host id,
+# Host indexed by interface index.  Each Port belongs to a Lan.  The
+# Port database table tuple is Port id, Hardware Address, Host::Ip id,
 # Interface Index, Lan id.  The hardware address and interface index may be
 # NULL.
 # -------------------------------------
@@ -5066,10 +4947,10 @@ use strict; use warnings; use Carp;
 # -------------------------------------
 # A Vprt is a VLAN link layer interface.  It is globally uniquely identified by
 # its hardware address (shared with its Port) and VLAN id (possibly NULL).  The
-# Vprt belongs to a Point::Station indexed by interface index.  Each Vprt
+# Vprt belongs to a Host indexed by interface index.  Each Vprt
 # belongs to the Port with the same hardware address.  Each Vprt belongs to a
 # Vlan.  The Vlan database table consists of an n-tuple of Vlan id, Hardware
-# Address, VLAN number, Point id, interface index.  All fields with the exception
+# Address, VLAN number, Host id, interface index.  All fields with the exception
 # of the Vlan id may be null.
 # -------------------------------------
 #package Vprt;
@@ -5111,18 +4992,6 @@ sub mergefrom {
 		Carp::confess;
 	}
 	$self->SUPER::mergefrom(@_);
-}
-#package Vprt;
-sub addrow {
-	my $self = shift;
-	my ($table,$row) = @_;
-	$self->SUPER::addrow(@_);
-	my $vla = $self->{key}{n}[0];
-	if (defined $vla and Item::keytype($vla) == Item::VLANKEY() and length($vla) == 7) {
-		if (my $port = $self->parent('Port')) {
-			$port->addrow($table,$row);
-		}
-	}
 }
 
 # -------------------------------------
