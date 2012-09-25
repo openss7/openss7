@@ -52,7 +52,7 @@ sub init {
 	$root->set('pointer-events'=>'all');
 	$root->{viewer} = $self;
 	$canv->set_root_item($root);
-	foreach my $layer (qw/Network Private Lan Port Vlan Vprt Subnet Address Point/) {
+	foreach my $layer (qw/Network Private Lan Port Vlan Vprt Subnet Address Host/) {
 		$self->getlayer($layer);
 	}
 	$self->{base} = $base;
@@ -253,10 +253,6 @@ $Viewer::added_child_count = 0;
 #package Viewer;
 sub added_child {
 	my ($type,$pdata,$cdata) = @_;
-#	$Viewer::added_child_count += 1;
-#	unless ($Viewer::added_child_count % 10) {
-#		warn "added_child called $Viewer::added_child_count times...";
-#	}
 	foreach my $viewer (values %viewers) {
 		if (my $pview = $viewer->findview($pdata)) {
 			if (my $cview = $viewer->getview($cdata)) {
@@ -267,7 +263,6 @@ sub added_child {
 			}
 		}
 		$viewer->{changed} = 1;
-		#$viewer->layout();
 	}
 }
 #package Viewer;
@@ -275,10 +270,6 @@ $Viewer::added_path_count = 0;
 #package Viewer;
 sub added_path {
 	my ($type,$ndata,$pdata) = @_;
-#	$Viewer::added_path_count += 1;
-#	unless ($Viewer::added_path_count % 10) {
-#		warn "added_path called $Viewer::added_path_count times...";
-#	}
 	foreach my $viewer (values %viewers) {
 		if (my $nview = $viewer->findview($ndata)) {
 			if (my $pview = $viewer->getview($pdata)) {
@@ -289,7 +280,6 @@ sub added_path {
 			}
 		}
 		$viewer->{changed} = 1;
-		#$viewer->layout();
 	}
 }
 #package Viewer;
@@ -297,16 +287,11 @@ $Viewer::removed_count = 0;
 #package Viewer;
 sub removed {
 	my ($type,$data) = @_;
-#	$Viewer::removed_count += 1;
-#	unless ($Viewer::removed_count % 10) {
-#		warn "removed called $Viewer::removed_count times...";
-#	}
 	foreach my $viewer (values %viewers) {
 		if (my $view = $viewer->findview($data)) {
 			$view->put();
 		}
 		$viewer->{changed} = 1;
-		#$viewer->layout();
 	}
 }
 #package Viewer;
@@ -314,10 +299,6 @@ $Viewer::updated_count = 0;
 #package Viewer;
 sub updated {
 	my ($type,$data) = @_;
-#	$Viewer::updated_count += 1;
-#	unless ($Viewer::updated_count % 10) {
-#		warn "updated called $Viewer::updated_count times...";
-#	}
 	foreach my $viewer (values %viewers) {
 		if (my $view = $viewer->findview($data)) {
 			if (my $sub = $view->can('update')) {
@@ -325,7 +306,6 @@ sub updated {
 			}
 		}
 		$viewer->{changed} = 1;
-		#$viewer->layout();
 	}
 }
 #package Viewer;
@@ -333,10 +313,6 @@ $Viewer::merged_count = 0;
 #package Viewer;
 sub merged {
 	my ($type,$data) = @_;
-#	$Viewer::merged_count += 1;
-#	unless ($Viewer::merged_count % 10) {
-#		warn "merged called $Viewer::merged_count times...";
-#	}
 	foreach my $viewer (values %viewers) {
 		if (my $view = $viewer->getview($data)) {
 			$view->populate();
@@ -345,7 +321,6 @@ sub merged {
 			}
 		}
 		$viewer->{changed} = 1;
-		#$viewer->layout();
 	}
 }
 #package Viewer;
@@ -353,10 +328,6 @@ $Viewer::changed_count = 0;
 #package Viewer;
 sub changed {
 	my ($type,@data) = @_;
-#	$Viewer::changed_count += 1;
-#	unless ($Viewer::changed_count % 10) {
-#		warn "changed called $Viewer::changed_count times...";
-#	}
 	foreach my $viewer (values %viewers) {
 		my @views = ($viewer->findviews(@data));
 		foreach my $view (@views) {
@@ -365,7 +336,6 @@ sub changed {
 			}
 		}
 		$viewer->{changed} = 1;
-		#$viewer->layout();
 	}
 }
 #package Viewer;
@@ -373,10 +343,6 @@ $Viewer::xformed_count = 0;
 #package Viewer;
 sub xformed {
 	my ($type,$data) = @_;
-#	$Viewer::xformed_count += 1;
-#	unless ($Viewer::xformed_count % 10) {
-#		warn "xformed called $Viewer::xformed_count times...";
-#	}
 	foreach my $viewer (values %viewers) {
 		if (my $view = $viewer->findview($data)) {
 			my $type = ref($data).'::View';
@@ -385,7 +351,6 @@ sub xformed {
 			}
 		}
 		$viewer->{changed} = 1;
-		#$viewer->layout();
 	}
 }
 
@@ -409,7 +374,7 @@ use Time::HiRes qw(gettimeofday tv_interval);
 #   - HERENOD_COLUMN: unknown subnets
 #   - HERENOD_COLUMN: unknown hosts
 #
-# Note that local nets are displayed beneath the Point::Station.
+# Note that local nets are displayed beneath the Host.
 # ------------------------------------------
 # This is the basic layout:
 #                                                                                                 
@@ -499,7 +464,7 @@ sub init {
 	my $self = shift;
 	my ($windid,$pageid,$base,$viewid) = @_;
 	$self->{visibility} = {};
-	foreach (qw/Point Subnet Address Network Private/) {
+	foreach (qw/Host Subnet Address Network Private/) {
 		$self->{visibility}{$_} = Glib::TRUE;
 	}
 	foreach (qw/Vlan Lan Vprt Port/) {
@@ -577,7 +542,7 @@ sub click {
 			$mi = Gtk2::SeparatorMenuItem->new();
 			$mi->show_all;
 			$mv->append($mi);
-			foreach my $kind (qw/Point Vlan Lan Subnet Vprt Port Address Network Private/) {
+			foreach my $kind (qw/Host Vlan Lan Subnet Vprt Port Address Network Private/) {
 				my $mb = Gtk2::CheckMenuItem->new($kind);
 				$mb->set_active($self->isvisible($kind));
 				$mb->show_all;
@@ -605,8 +570,6 @@ $Viewer::Network::callcount = 0;
 #package Viewer::Network;
 sub layout {
 	my $self = shift;
-	warn "Laying out network...";
-	#printf STDERR "Laying out %s...\n",$self;
 	my $view = $self->{view};
 	my $canv = $self->{canv};
 	my $hbox = $canv->get_screen->get_height_mm;
@@ -617,38 +580,11 @@ sub layout {
 		$view->{siz}{l}{total}[1] + 2.0*$view->{siz}{l}{total}[3]+
 		$view->{siz}{c}{total}[1]/2.0 + $view->{siz}{c}{total}[3];
 	$h = $h/2.0 + $mh;
-	my $now = [gettimeofday];
-	my $then = $now;
-	print STDERR "Moving base view...";
-	$self->{movements} = {};
 	$view->move_view($w,$h,0,0);
-	$now = [gettimeofday]; print STDERR "...done. ",tv_interval($then,$now)," seconds\n"; $then = $now;
-	foreach (sort keys %{$self->{movements}}) { print STDERR "movements $_ ",$self->{movements}{$_},"\n" }
-	print STDERR "Laying out base view...";
 	$view->layout($hbox,$wbox);
-	$now = [gettimeofday]; print STDERR "...done. ",tv_interval($then,$now)," seconds\n"; $then = $now;
-	print STDERR "Placing base view...";
-	$self->{placements} = {};
 	$view->place_view($w,$h,0,0);
-	$now = [gettimeofday]; print STDERR "...done. ",tv_interval($then,$now)," seconds\n"; $then = $now;
-	foreach (sort keys %{$self->{placements}}) { print STDERR "placments $_ ",$self->{placements}{$_},"\n" }
-	print STDERR "Showing base view...";
-	$self->{exposures} = {};
 	$view->show_view($w,$h,0,0);
-	$now = [gettimeofday]; print STDERR "...done. ",tv_interval($then,$now)," seconds\n"; $then = $now;
-	foreach (sort keys %{$self->{exposures}}) { print STDERR "exposures $_ ",$self->{exposures}{$_},"\n" }
-	print STDERR "Updating canvas...";
 	$canv->update;
-	$now = [gettimeofday]; print STDERR "...done. ",tv_interval($then,$now)," seconds\n"; $then = $now;
-#	$Viewer::Network::callcount += 1;
-#	unless ($Viewer::Network::callcount % 10) {
-#		warn "Layout called $Viewer::Network::callcount times...";
-#	}
-#	unless ($Viewer::Network::callcount % 100) {
-#		$self->showstats;
-#	}
-	#printf STDERR "Laying out %s... ...done\n",$self;
-	warn "...done.";
 }
 #package Viewer::Network;
 sub start_idle {
@@ -706,6 +642,51 @@ package Viewer::Driver; our @ISA = qw(Viewer);
 use strict; use warnings; use Carp;
 use Gtk2; use Glib; use Goo::Canvas;
 # ------------------------------------------
+
+# ------------------------------------------
+package Table::Window; our @ISA = qw(Table);
+use strict; use warnings; use Carp;
+use Data::Dumper; use DBI;
+# ------------------------------------------
+#package Table::Window;
+our %schema = (
+	table=>'winds',
+	keys=>[ qw/windid/ ],
+	cols=>[ qw/windid xpos ypos width height/ ],
+	tsql=>
+q{CREATE TABLE IF NOT EXISTS winds (
+	windid INT,
+	xpos INT,
+	ypos INT,
+	width INT,
+	height INT,
+	PRIMARY KEY(windid)
+);},
+);
+
+# ------------------------------------------
+package Table::Page; our @ISA = qw(Table);
+use strict; use warnings; use Carp;
+use Data::Dumper; use DBI;
+# ------------------------------------------
+#package Table::Page;
+our %schema = (
+	table=>'pages',
+	keys=>[ qw/windid pageid/ ],
+	cols=>[ qw/windid pageid type id xoffset yoffset scale/ ],
+	tsql=>
+q{CREATE TABLE IF NOT EXISTS winds (
+	windid INT,
+	pageid INT,
+	type TEXT,	-- type of base object (e.g. Network)
+	id INT,		-- id of base object within model
+	xoffset INT,	-- xoffset of scrolled window
+	yoffset INT,	-- yoffset of scrolled window
+	scale REAL,	-- scale of canvas
+	PRIMARY KEY(windid,pageid),
+	FOREIGN KEY(windid) REFERENCES winds(windid)
+);},
+);
 
 # ------------------------------------------
 package View; our @ISA = qw(Base);
@@ -775,9 +756,6 @@ sub siz {
 #package View;
 sub place_view {
 	my $self = shift;
-	$self->{viewer}{placements}{total}++;
-	$self->{viewer}{placements}{$self->kind}++;
-	$self->{viewer}{placements}{$self}++;
 	return unless $self->{set};
 	$self->{placing} = 1;
 	my $type = ref $self;
@@ -787,9 +765,6 @@ sub place_view {
 #package View;
 sub move_view {
 	my $self = shift;
-	$self->{viewer}{movements}{total}++;
-	$self->{viewer}{movements}{$self->kind}++;
-	$self->{viewer}{movements}{$self}++;
 	my ($x,$y,$xo,$yo) = @_;
 	my ($X,$Y,$XO,$YO) = $self->pos;
 	$x = $X unless defined $x;
@@ -808,9 +783,6 @@ sub move_view {
 #package View;
 sub show_view {
 	my $self = shift;
-	$self->{viewer}{exposures}{total}++;
-	$self->{viewer}{exposures}{$self->kind}++;
-	$self->{viewer}{exposures}{$self}++;
 	$self->{showing} = 1;
 	my $type = ref $self;
 	$self->_forw($type,undef,'showing',@_);
@@ -880,12 +852,10 @@ sub init {
 	my $group = $self->{grp}{item};
 	$group->set('pointer-events','visible');
 	$group->signal_connect('enter-notify-event'=>sub{
-			#Carp::carp "***** enter-notify-event (",join(',',@_),")";
 			my ($item,$targ,$ev,$self) = @_;
 			$self->setcolor('cyan');
 		},$self);
 	$group->signal_connect('leave-notify-event'=>sub{
-			#Carp::carp "***** leave-notify-event (",join(',',@_),")";
 			my ($item,$targ,$ev,$self) = @_;
 			$self->setcolor($self->mycolor);
 		},$self);
@@ -930,9 +900,9 @@ sub init {
 	my $nod = $self->{nod} = {pnts=>[-8.0,-4.5,16,9]};
 	$nod->{item} = new Goo::Canvas::Rect(
 		$group,@{$nod->{pnts}},
-		'antialias'=>'subpixel',
-		'line-join'=>'round',
-		'line-cap'=>'round',
+#'antialias'=>'subpixel',
+#'line-join'=>'round',
+#'line-cap'=>'round',
 		'line-width'=>0.4,
 		'stroke-color'=>$color,
 		'fill-color'=>'white',
@@ -941,11 +911,9 @@ sub init {
 	my $txt = $self->{txt} = {pnts=>[0,0,20]};
 	$txt->{item} = new Goo::Canvas::Text(
 		$group,$self->gettxt(),@{$txt->{pnts}},'center',
-		'antialias'=>'subpixel',
+#'antialias'=>'subpixel',
 		alignment=>'center',
 		font=>'Sans 1',
-		#height=>6.0,
-		#wrap=>'word-char',
 		'fill-color'=>$color,
 		'pointer-events'=>'visible',
 	);
@@ -985,29 +953,16 @@ sub placing {
 	return unless $self->{set};
 	my $color = $self->mycolor;
 	my ($x,$y) = $self->pos;
-	#Carp::carp "****** Placing $self ($x,$y) component is negative or zero" if $x <= 0 or $y <= 0;
-	if (0) {
-		my $grp = $self->{grp};
-		my ($dx,$dy) = ($x-$grp->{pnts}[0],$y-$grp->{pnts}[1]);
-		$grp->{item}->translate($dx,$dy);
-		$grp->{pnts}[0] = $x;
-		$grp->{pnts}[1] = $y;
-#		$grp->{item}->set(x=>$x,y=>$y);
-	} else {
-		my $txt = $self->{txt};
-		$txt->{pnts}[0] = $x;
-		$txt->{pnts}[1] = $y;
-		$txt->{item}->set(x=>$x,y=>$y,text=>$self->gettxt(),'fill-color'=>$color);
-		my $nod = $self->{nod};
-		$x-=$nod->{pnts}[2]/2.0;
-		$y-=$nod->{pnts}[3]/2.0;
-		$nod->{pnts}[0] = $x;
-		$nod->{pnts}[1] = $y;
-		#Carp::cluck;
-		#warn "****** Setting $self ($x,$y)";
-		$nod->{item}->set(x=>$x,y=>$y,'stroke-color'=>$color);
-		#warn "****** Getting $self (",join(',',$nod->{item}->get('x','y')),")";
-	}
+	my $txt = $self->{txt};
+	$txt->{pnts}[0] = $x;
+	$txt->{pnts}[1] = $y;
+	$txt->{item}->set(x=>$x,y=>$y,text=>$self->gettxt(),'fill-color'=>$color);
+	my $nod = $self->{nod};
+	$x-=$nod->{pnts}[2]/2.0;
+	$y-=$nod->{pnts}[3]/2.0;
+	$nod->{pnts}[0] = $x;
+	$nod->{pnts}[1] = $y;
+	$nod->{item}->set(x=>$x,y=>$y,'stroke-color'=>$color);
 }
 #package Node::View;
 sub makevisible {
@@ -1028,7 +983,6 @@ sub parent_propagate {
 		my ($X,$Y) = $parent->pos;
 		my $sub = $tag.'_view';
 		my @pos = ($X+$xofs,$Y+$yofs,$xofs,$yofs);
-		#warn "****** $tag (",join(',',@pos),") child $self for parent $parent";
 		$self->$sub(@pos);
 	}
 }
@@ -1044,19 +998,16 @@ sub parent_walk {
 #package Node::View;
 sub parent_moving {
 	my $self = shift;
-	$self->{viewer}{movements}{parent}++;
 	$self->Node::View::parent_propagate('move',@_);
 }
 #package Node::View;
 sub parent_placing {
 	my $self = shift;
-	$self->{viewer}{placements}{parent}++;
 	$self->Node::View::parent_walk('place',@_);
 }
 #package Node::View;
 sub parent_showing {
 	my $self = shift;
-	$self->{viewer}{exposures}{parent}++;
 	$self->Node::View::parent_walk('show',@_);
 }
 
@@ -1077,9 +1028,9 @@ sub init {
 	my $bus = $self->{bus} = {pnts=>[0,-10,0,10]};
 	$bus->{item} = new Goo::Canvas::Polyline(
 		$group,Glib::FALSE,$bus->{pnts},
-		'antialias'=>'subpixel',
-		'line-join'=>'round',
-		'line-cap'=>'round',
+#'antialias'=>'subpixel',
+#'line-join'=>'round',
+#'line-cap'=>'round',
 		'line-width'=>0.6,
 		'stroke-color'=>$color,
 		'pointer-events'=>'visible',
@@ -1087,7 +1038,7 @@ sub init {
 	my $txt = $self->{txt} = {pnts=>[0,0,12]};
 	$txt->{item} = new Goo::Canvas::Text(
 		$group,$self->gettxt(),@{$txt->{pnts}},'west',
-		'antialias'=>'subpixel',
+#'antialias'=>'subpixel',
 		alignment=>'left',
 		font=>'Sans 1',
 		'fill-color'=>$color,
@@ -1097,7 +1048,7 @@ sub init {
 	my $txb = $self->{txb} = {pnts=>[0,0,12]};
 	$txb->{item} = new Goo::Canvas::Text(
 		$group,$self->gettxt(),@{$txb->{pnts}},'west',
-		'antialias'=>'subpixel',
+#'antialias'=>'subpixel',
 		alignment=>'left',
 		font=>'Sans 1',
 		'fill-color'=>$color,
@@ -1160,35 +1111,25 @@ sub placing {
 	return unless $self->{set};
 	my $color = $self->mycolor;
 	my ($x,$y) = $self->pos;
-	#Carp::carp "****** Placing $self ($x,$y) component is negative or zero" if $x <= 0 or $y <= 0;
-	if (0) {
-		my $grp = $self->{grp};
-		my ($dx,$dy) = ($x-$grp->{pnts}[0],$y-$grp->{pnts}[1]);
-		$grp->{item}->translate($dx,$dy);
-		$grp->{pnts}[0] = $x;
-		$grp->{pnts}[1] = $y;
-#		$grp->{item}->set(x=>$x,y=>$y);
-	} else {
-		my ($h,$w) = @{$self->{siz}{t}};
-		my $bus = $self->{bus};
-		$bus->{pnts}[0] = $x;
-		$bus->{pnts}[1] = $y-$h/2.0;
-		$bus->{pnts}[2] = $x;
-		$bus->{pnts}[3] = $y+$h/2.0;
-		$bus->{item}->set(points=>Goo::Canvas::Points->new($bus->{pnts}),'stroke-color'=>$color);
-		my ($X,$Y) = ($x,$y+$h/2.0+$self->{pad}[0]);
-		my $txt = $self->{txt};
-		$txt->{pnts}[0] = $X;
-		$txt->{pnts}[1] = $Y;
-		$txt->{item}->set(text=>$self->gettxt(),'fill-color'=>$color);
-		$txt->{item}->set_simple_transform($X,$Y,1.0,90.0);
-		($X,$Y) = ($x,$y-$h/2.0-$self->{pad}[0]);
-		my $txb = $self->{txb};
-		$txb->{pnts}[0] = $X;
-		$txb->{pnts}[1] = $Y;
-		$txb->{item}->set(text=>$self->gettxt(),'fill-color'=>$color);
-		$txb->{item}->set_simple_transform($X,$Y,1.0,-90.0);
-	}
+	my ($h,$w) = @{$self->{siz}{t}};
+	my $bus = $self->{bus};
+	$bus->{pnts}[0] = $x;
+	$bus->{pnts}[1] = $y-$h/2.0;
+	$bus->{pnts}[2] = $x;
+	$bus->{pnts}[3] = $y+$h/2.0;
+	$bus->{item}->set(points=>Goo::Canvas::Points->new($bus->{pnts}),'stroke-color'=>$color);
+	my ($X,$Y) = ($x,$y+$h/2.0+$self->{pad}[0]);
+	my $txt = $self->{txt};
+	$txt->{pnts}[0] = $X;
+	$txt->{pnts}[1] = $Y;
+	$txt->{item}->set(text=>$self->gettxt(),'fill-color'=>$color);
+	$txt->{item}->set_simple_transform($X,$Y,1.0,90.0);
+	($X,$Y) = ($x,$y-$h/2.0-$self->{pad}[0]);
+	my $txb = $self->{txb};
+	$txb->{pnts}[0] = $X;
+	$txb->{pnts}[1] = $Y;
+	$txb->{item}->set(text=>$self->gettxt(),'fill-color'=>$color);
+	$txb->{item}->set_simple_transform($X,$Y,1.0,-90.0);
 }
 #package Bus::View;
 sub makevisible {
@@ -1210,7 +1151,6 @@ sub parent_propagate {
 		my ($X,$Y) = $parent->pos;
 		my $sub = $tag.'_view';
 		my @pos = ($X+$xofs,$Y+$yofs,$xofs,$yofs);
-		#warn "****** $tag (",join(',',@pos),") child $self for parent $parent";
 		$self->$sub(@pos);
 	}
 }
@@ -1226,19 +1166,16 @@ sub parent_walk {
 #package Bus::View;
 sub parent_moving {
 	my $self = shift;
-	$self->{viewer}{movements}{parent}++;
 	$self->Bus::View::parent_propagate('move',@_);
 }
 #package Bus::View;
 sub parent_placing {
 	my $self = shift;
-	$self->{viewer}{placements}{parent}++;
 	$self->Bus::View::parent_walk('place',@_);
 }
 #package Bus::View;
 sub parent_showing {
 	my $self = shift;
-	$self->{viewer}{exposures}{parent}++;
 	$self->Bus::View::parent_walk('show',@_);
 }
 
@@ -1259,9 +1196,9 @@ sub init {
 	my $box = $self->{box} = {pnts=>[-1,-1,2,2]};
 	$box->{item} = new Goo::Canvas::Rect(
 		$group,@{$box->{pnts}},
-		'antialias'=>'subpixel',
-		'line-join'=>'round',
-		'line-cap'=>'round',
+#'antialias'=>'subpixel',
+#'line-join'=>'round',
+#'line-cap'=>'round',
 		'line-width'=>0.4,
 		'stroke-color'=>$color,
 		'fill-color'=>'white',
@@ -1270,9 +1207,9 @@ sub init {
 	my $lnk = $self->{lnk} = {pnts=>[0,0,5,0,10,0]};
 	$lnk->{item} = new Goo::Canvas::Polyline(
 		$group,Glib::FALSE,$lnk->{pnts},
-		'antialias'=>'subpixel',
-		'line-join'=>'round',
-		'line-cap'=>'round',
+#'antialias'=>'subpixel',
+#'line-join'=>'round',
+#'line-cap'=>'round',
 		'line-width'=>0.2,
 		'stroke-color'=>$color,
 		'pointer-events'=>'visible',
@@ -1281,10 +1218,8 @@ sub init {
 	my $txt = $self->{txt} = {pnts=>[5,0,20,'sw',alignment=>'left']};
 	$txt->{item} = new Goo::Canvas::Text(
 		$group,$self->gettxt(),@{$txt->{pnts}},
-		'antialias'=>'subpixel',
+#'antialias'=>'subpixel',
 		font=>'Monospace 1',
-		#height=>6.0,
-		#wrap=>'word-char',
 		'fill-color'=>$color,
 		'pointer-events'=>'visible',
 	);
@@ -1389,7 +1324,6 @@ sub placing {
 	return unless $self->{set};
 	my $color = $self->mycolor;
 	my ($x,$y) = $self->pos;
-	#Carp::carp "****** Placing $self ($x,$y) component is negative or zero" if $x <= 0 or $y <= 0;
 	my $lnk = $self->{lnk};
 	my $txt = $self->{txt};
 	$lnk->{pnts}[0] = $x;
@@ -1485,19 +1419,16 @@ sub parent_walk {
 #package BoxAndLink::View;
 sub parent_moving {
 	my $self = shift;
-	$self->{viewer}{movements}{parent}++;
 	$self->BoxAndLink::View::parent_propagate('move',@_);
 }
 #package BoxAndLink::View;
 sub parent_placing {
 	my $self = shift;
-	$self->{viewer}{placements}{parent}++;
 	$self->BoxAndLink::View::parent_walk('place',@_);
 }
 #package BoxAndLink::View;
 sub parent_showing {
 	my $self = shift;
-	$self->{viewer}{exposures}{parent}++;
 	$self->BoxAndLink::View::parent_walk('show',@_);
 }
 
@@ -1522,6 +1453,11 @@ sub members_sorted {
 	return $self->{viewer}->findviews($self->{data}->members_sorted(@_));
 }
 #package Root::View;
+sub members_sortbytype {
+	my $self = shift;
+	return $self->{viewer}->findviews($self->{data}->members_sortbytype(@_));
+}
+#package Root::View;
 sub children {
 	my $self = shift;
 	return $self->{viewer}->findviews($self->{data}->children(@_));
@@ -1532,6 +1468,11 @@ sub children_sorted {
 	return $self->{viewer}->findviews($self->{data}->children_sorted(@_));
 }
 #package Root::View;
+sub children_sortbytype {
+	my $self = shift;
+	return $self->{viewer}->findviews($self->{data}->children_sortbytype(@_));
+}
+#package Root::View;
 sub offspring {
 	my $self = shift;
 	return $self->{viewer}->findviews($self->{data}->offspring(@_));
@@ -1540,6 +1481,11 @@ sub offspring {
 sub offspring_sorted {
 	my $self = shift;
 	return $self->{viewer}->findviews($self->{data}->offspring_sorted(@_));
+}
+#package Root::View;
+sub offspring_sortbytype {
+	my $self = shift;
+	return $self->{viewer}->findviews($self->{data}->offspring_sortbytype(@_));
 }
 #package Root::View;
 sub getoffspring {
@@ -2569,9 +2515,9 @@ sub init {
 	my $tbox = $self->{tbox} = {pnts=>[0,0,0,0,0,0,0,0]};
 	$tbox->{item} = new Goo::Canvas::Polyline(
 		$group,Glib::TRUE,$tbox->{pnts},
-		'antialias'=>'subpixel',
-		'line-join'=>'round',
-		'line-cap'=>'round',
+#'antialias'=>'subpixel',
+#'line-join'=>'round',
+#'line-cap'=>'round',
 		'line-width'=>0.1,
 		'stroke-color'=>$color,
 		'pointer-events'=>'visible',
@@ -2580,9 +2526,9 @@ sub init {
 	my $lbox = $self->{lbox} = {pnts=>[0,0,0,0,0,0,0,0]};
 	$lbox->{item} = new Goo::Canvas::Polyline(
 		$group,Glib::TRUE,$lbox->{pnts},
-		'antialias'=>'subpixel',
-		'line-join'=>'round',
-		'line-cap'=>'round',
+#'antialias'=>'subpixel',
+#'line-join'=>'round',
+#'line-cap'=>'round',
 		'line-width'=>0.1,
 		'stroke-color'=>$color,
 		'pointer-events'=>'visible',
@@ -2591,9 +2537,9 @@ sub init {
 	my $cbox = $self->{cbox} = {pnts=>[0,0,0,0,0,0,0,0]};
 	$cbox->{item} = new Goo::Canvas::Polyline(
 		$group,Glib::TRUE,$cbox->{pnts},
-		'antialias'=>'subpixel',
-		'line-join'=>'round',
-		'line-cap'=>'round',
+#'antialias'=>'subpixel',
+#'line-join'=>'round',
+#'line-cap'=>'round',
 		'line-width'=>0.1,
 		'stroke-color'=>$color,
 		'pointer-events'=>'visible',
@@ -2602,9 +2548,9 @@ sub init {
 	my $rbox = $self->{rbox} = {pnts=>[0,0,0,0,0,0,0,0]};
 	$rbox->{item} = new Goo::Canvas::Polyline(
 		$group,Glib::TRUE,$rbox->{pnts},
-		'antialias'=>'subpixel',
-		'line-join'=>'round',
-		'line-cap'=>'round',
+#'antialias'=>'subpixel',
+#'line-join'=>'round',
+#'line-cap'=>'round',
 		'line-width'=>0.1,
 		'stroke-color'=>$color,
 		'pointer-events'=>'visible',
@@ -2848,7 +2794,6 @@ sub layout {
 					my ($h,$w,$mh,$mw) = $view->siz;
 					my $xofs = $x + $w/2.0 + $mw;
 					my @pos = ($X+$xofs,$Y+$yofs,$xofs,$yofs);
-					#warn "****** Placing $view at (",join(',',@pos),")";
 					$view->move_view(@pos);
 					$view->layout();
 					$x += $w + 2.0*$mw;
@@ -2865,7 +2810,6 @@ sub layout {
 					$xofs = -$xofs if $side eq 'l';
 					my $yofs = $y + $h/2.0 + $mw;
 					my @pos = ($X+$xofs,$Y+$yofs,$xofs,$yofs);
-					#warn "****** Placing $view at (",join(',',@pos),")";
 					$view->move_view(@pos);
 					$view->layout();
 					$y += $h + 2.0*$mh;
@@ -2884,7 +2828,7 @@ use Data::Dumper;
 #package Network::View;
 sub mycolor { return 'grey' }
 #package Network::View;
-sub ctypes { return qw/Private Point Vlan Lan Subnet/ }
+sub ctypes { return qw/Private Host Vlan Lan Subnet/ }
 #package Network::View;
 sub isanchor { return Glib::TRUE }
 #package Network::View;
@@ -2900,18 +2844,24 @@ sub getgeom {
 			$net->{col} = +2;
 		}
 	}
-	foreach my $host ($self->offspring_sorted('Point',1+4)) {
+	foreach my $host ($self->offspring_sortbytype('Host',[
+				Item::IPV4ADDRKEY,
+				Item::IPV6ADDRKEY])) {
 		next if ($host->parent('Private'));
-		if ($host->isa('Point::Host::Here::View')) {
-			push @{$geom{l}{Point}},$host;
+		if ($host->isa('Host::Ip::Here::View')) {
+			push @{$geom{l}{Host}},$host;
 			$host->{col} = -1;
 		} else {
-			push @{$geom{r}{Point}},$host;
+			push @{$geom{r}{Host}},$host;
 			$host->{col} = +1;
 		}
 	}
 	foreach my $form (qw/Lan Vlan Subnet/) {
-		foreach my $bus ($self->offspring_sorted($form,1+5,1+8)) {
+		foreach my $bus ($self->offspring_sortbytype($form,[
+					Item::MACKEY,
+					Item::VLANKEY,
+					Item::IPV4MASKKEY,
+					Item::IPV6MASKKEY])) {
 			push @{$geom{c}{$form}},$bus;
 			$bus->{col} = 0;
 		}
@@ -2924,7 +2874,7 @@ sub rebalance {
 	my ($hbox,$wbox,$geom,$size) = @_;
 	my %views = (l=>[],r=>[]);
 	foreach my $side (qw/l r/) {
-		foreach my $kind (qw/Private Point/) {
+		foreach my $kind (qw/Private Host/) {
 			if ($geom->{$side}{$kind}) {
 				push @{$views{$side}}, @{$geom->{$side}{$kind}};
 			}
@@ -2952,7 +2902,7 @@ use Data::Dumper;
 #package Private::View;
 sub mycolor { return 'orange' }
 #package Private::View;
-sub ctypes { return qw/Point Vlan Lan Subnet/ }
+sub ctypes { return qw/Host Vlan Lan Subnet/ }
 #package Private::View;
 sub getgeom {
 	my $self = shift;
@@ -2960,18 +2910,24 @@ sub getgeom {
 	my $col = $self->{col};
 	my $l = $col > 0 ? 'l' : 'r';
 	my $r = $col > 0 ? 'r' : 'l';
-	foreach my $point ($self->offspring_sorted('Point',1+4,1+6)) {
+	foreach my $point ($self->offspring_sortbytype('Host',[
+				Item::IPV4ADDRKEY,
+				Item::IPV6ADDRKEY])) {
 		if ($point->parent('Network')) {
-			push @{$geom{$l}{Point}},$point;
+			push @{$geom{$l}{Host}},$point;
 			$point->{col} = ($col > 0) ? $col-1 : $col+1;
 		}
 		elsif ($point->parent('Private')) {
-			push @{$geom{$r}{Point}},$point;
+			push @{$geom{$r}{Host}},$point;
 			$point->{col} = ($col > 0) ? $col+1 : $col-1;
 		}
 	}
 	foreach my $form (qw/Lan Vlan Subnet/) {
-		foreach my $bus ($self->offspring_sorted($form,1+5,1+8)) {
+		foreach my $bus ($self->offspring_sortbytype($form,[
+					Item::MACKEY,
+					Item::VLANKEY,
+					Item::IPV4MASKKEY,
+					Item::IPV6MASKKEY])) {
 			unless ($bus->parent('Network')) {
 				push @{$geom{c}{$form}},$bus;
 				$bus->{col} = $col;
@@ -2989,7 +2945,7 @@ sub rebalance {
 	my $r = $col > 0 ? 'r' : 'l';
 	my %views = ($l=>[],$r=>[]);
 	foreach my $side (qw/l r/) {
-		foreach my $kind (qw/Point/) {
+		foreach my $kind (qw/Host/) {
 			if ($geom->{$side}{$kind}) {
 				push @{$views{$side}}, @{$geom->{$side}{$kind}};
 			}
@@ -3016,7 +2972,6 @@ sub parent_propagate {
 		my ($X,$Y) = $parent->pos;
 		my $sub = $tag.'_view';
 		my @pos = ($X+$xofs,$Y+$yofs,$xofs,$yofs);
-		#warn "****** $tag (",join(',',@pos),") child $self for parent $parent";
 		$self->$sub(@pos);
 	}
 }
@@ -3032,19 +2987,16 @@ sub parent_walk {
 #package Private::View;
 sub parent_moving {
 	my $self = shift;
-	$self->{viewer}{movements}{parent}++;
 	$self->Private::View::parent_propagate('move',@_);
 }
 #package Private::View;
 sub parent_placing {
 	my $self = shift;
-	$self->{viewer}{placements}{parent}++;
 	$self->Private::View::parent_walk('place',@_);
 }
 #package Private::View;
 sub parent_showing {
 	my $self = shift;
-	$self->{viewer}{exposures}{parent}++;
 	$self->Private::View::parent_walk('show',@_);
 }
 
@@ -3077,22 +3029,24 @@ use Gtk2; use Glib; use Goo::Canvas;
 # ------------------------------------------
 
 # ------------------------------------------
-package Point::Station::View; our @ISA = qw(Node::View Point::View Tree::View Datum::View);
+package Host::View; our @ISA = qw(Node::View Point::View Tree::View Datum::View);
 use strict; use warnings; use Carp;
 use Gtk2; use Glib; use Goo::Canvas;
 use Data::Dumper;
 # ------------------------------------------
-#package Point::Station::View;
+#package Host::View;
 sub mycolor { return 'red' }
-#package Point::Station::View;
+#package Host::View;
 sub ctypes { return qw/Vprt Port Address/ }
-#package Point::Station::View;
+#package Host::View;
 sub getgeom {
 	my $self = shift;
 	my ($x,$y) = $self->pos;
 	my %geom = ();
 	my $col = $self->{col};
-	foreach my $vprt ($self->offspring_sorted('Vprt',1+6,1+8)) {
+	foreach my $vprt ($self->offspring_sortbytype('Vprt',[
+				Item::INTKEY,
+				Item::VLANKEY])) {
 		my $vlan = $vprt->parent('Vlan');
 		if ($vlan and exists $vlan->{col} and ($vlan->parent('Network') or $vlan->parent('Private'))) {
 			if ($vlan->{col} < $col)
@@ -3100,7 +3054,9 @@ sub getgeom {
 			{ push @{$geom{r}{Vprt}},$vprt }
 		}
 	}
-	foreach my $port ($self->offspring_sorted('Port',1+6)) {
+	foreach my $port ($self->offspring_sortbytype('Port',[
+				Item::INTKEY,
+				Item::MACKEY])) {
 		my $plan = $port->parent('Lan');
 		if ($plan and exists $plan->{col} and ($plan->parent('Network') or $plan->parent('Private'))) {
 			if ($plan->{col} < $col)
@@ -3108,7 +3064,9 @@ sub getgeom {
 			{ push @{$geom{r}{Port}},$port }
 		}
 	}
-	foreach my $addr ($self->offspring_sorted('Address',1+4)) {
+	foreach my $addr ($self->offspring_sortbytype('Address',[
+				Item::IPV4ADDRKEY,
+				Item::IPV6ADDRKEY])) {
 		my $subn = $addr->parent('Subnet');
 		if ($subn and exists $subn->{col} and ($subn->parent('Network') or $subn->parent('Private'))) {
 			if ($subn->{col} < $col)
@@ -3118,7 +3076,7 @@ sub getgeom {
 	}
 	return \%geom;
 }
-#package Point::Station::View;
+#package Host::View;
 sub getsize {
 	my $self = shift;
 	my ($hbox,$wbox,$geom) = @_;
@@ -3131,14 +3089,14 @@ sub getsize {
 		}
 	}
 }
-#package Point::Station::View;
+#package Host::View;
 sub sizecalc {
 	my $self = shift;
 	my ($geom,$size) = @_;
 	my $pnts = $self->{nod}{pnts};
-	$size->{c}{Point} = [$pnts->[3],$pnts->[2],0,0];
-	$size->{c}{total} = [@{$size->{c}{Point}},0,0];
-	my $tsiz = $size->{t} = [@{$size->{c}{Point}},0,0];
+	$size->{c}{Host} = [$pnts->[3],$pnts->[2],0,0];
+	$size->{c}{total} = [@{$size->{c}{Host}},0,0];
+	my $tsiz = $size->{t} = [@{$size->{c}{Host}},0,0];
 	$size->{l}{total} = [0,0,0,0];
 	$size->{r}{total} = [0,0,0,0];
 	my $smax = 0;
@@ -3162,7 +3120,7 @@ sub sizecalc {
 	$size->{r}{total}[1] = $smax;
 	$tsiz->[1] += $smax + $smax;
 }
-#package Point::Station::View;
+#package Host::View;
 sub shrink {
 	my $self = shift;
 	my ($hbox,$wbox,$geom,$size) = @_;
@@ -3179,7 +3137,7 @@ sub shrink {
 		}
 	}
 }
-#package Point::Station::View;
+#package Host::View;
 sub resize {
 	my $self = shift;
 	my ($hbox,$wbox) = @_;
@@ -3195,12 +3153,11 @@ sub resize {
 	}
 	return $self->siz;
 }
-#package Point::Station::View;
+#package Host::View;
 sub layout {
 	my $self = shift;
 	my $geom = delete $self->{geo};
 	my $size = $self->{siz};
-	#warn "****** Laying out $self:\n", Data::Dumper->new([$geom])->Maxdepth(3)->Dump, Data::Dumper->new([$size])->Dump;
 	my ($X,$Y) = $self->pos;
 	foreach my $side (keys %$geom) {
 		my $x0 = $size->{c}{total}[1]/2.0 + $size->{$side}{total}[1]/2.0;
@@ -3209,7 +3166,6 @@ sub layout {
 			my @views = @{$geom->{$side}{$kind}};
 			if (@views) {
 				my ($H,$W) = @{$size->{$side}{$kind}};
-				#warn "****** Size ($H,$W) for side $side kind $kind of $self has zero component" unless $H and $W;
 				my $y0 = -$H/2.0;
 				my $y = $y0;
 				foreach my $view (@views) {
@@ -3219,7 +3175,6 @@ sub layout {
 					my ($h,$w) = $view->siz;
 					my $yofs = $y + $h/2.0;
 					my @pos = ($x,$Y+$yofs,$xofs,$yofs);
-					#warn "****** Placing $view at (",join(',',@pos),")";
 					$view->move_view(@pos);
 					$view->layout();
 					$y += $h;
@@ -3230,11 +3185,11 @@ sub layout {
 }
 
 # ------------------------------------------
-package Point::Host::View; our @ISA = qw(Point::Station::View);
+package Host::Ip::View; our @ISA = qw(Host::View);
 use strict; use warnings; use Carp;
 use Gtk2; use Glib; use Goo::Canvas;
 # ------------------------------------------
-#package Point::Host::View;
+#package Host::Ip::View;
 sub mycolor {
 	my $self = shift;
 	my $data = $self->{data}{data};
@@ -3242,7 +3197,7 @@ sub mycolor {
 	my $color = ($sysd and exists $sysd->{sysName}) ? 'black' : 'darkgrey';
 	return $color;
 }
-#package Point::Host::View;
+#package Host::Ip::View;
 sub gettxt {
 	my $self = shift;
 	my @lines = ();
@@ -3261,7 +3216,7 @@ sub gettxt {
 	return $self->SUPER::gettxt() unless $key or $name;
 	return join("\n",@lines);
 }
-#package Point::Host::View;
+#package Host::Ip::View;
 sub xformed {
 	my ($type,$self) = @_;
 	bless $self,$type;
@@ -3269,11 +3224,11 @@ sub xformed {
 }
 
 # ------------------------------------------
-package Point::Host::Here::View; our @ISA = qw(Point::Host::View);
+package Host::Ip::Here::View; our @ISA = qw(Host::Ip::View);
 use strict; use warnings; use Carp;
 use Gtk2; use Glib; use Goo::Canvas;
 # ------------------------------------------
-#package Point::Host::Here::View;
+#package Host::Ip::Here::View;
 sub mycolor {
 	my $self = shift;
 	my $data = $self->{data}{data};
@@ -3281,7 +3236,7 @@ sub mycolor {
 	my $color = ($sysd and exists $sysd->{sysName}) ? 'magenta' : 'darkgrey';
 	return $color;
 }
-#package Point::Host::Here::View;
+#package Host::Ip::Here::View;
 sub xformed {
 	my ($type,$self) = @_;
 	bless $self,$type;
@@ -3350,12 +3305,12 @@ sub mycolor {
 	return 'darkgrey';
 }
 #package Address::View;
-sub types { return qw{Subnet Point} }
+sub types { return qw{Subnet Host} }
 #package Address::View;
 sub gettxt {
 	my $self = shift;
-	if ($self->{data}{key}{p}{Point}) {
-		foreach my $key (sort keys %{$self->{data}{key}{p}{Point}}) {
+	if ($self->{data}{key}{p}{Host}) {
+		foreach my $key (sort keys %{$self->{data}{key}{p}{Host}}) {
 			return Item::showkey($key) if Item::keytype($key) == Item::IPV4ADDRKEY();
 		}
 	}
@@ -3372,7 +3327,7 @@ sub init { shift->{txt}{pnts}[2] = 13 }
 #package Port::View;
 sub mycolor { return 'black' }
 #package Port::View;
-sub types { return qw{Lan Point} }
+sub types { return qw{Lan Host} }
 #package Port::View;
 sub gettxt {
 	my $self = shift;
@@ -3410,7 +3365,7 @@ sub mycolor {
 	return 'darkgrey';
 }
 #package Vprt::View;
-sub types { return qw{Vlan Point} }
+sub types { return qw{Vlan Host} }
 #package Vprt::View;
 sub gettxt {
 	my $self = shift;
@@ -3480,18 +3435,16 @@ sub init {
 		]};
 	$otl->{item} = new Goo::Canvas::Polyline(
 			$group,Glib::FALSE,$otl->{pnts},
-			'antialias'=>'subpixel',
-			'line-join'=>'round',
-			'line-cap'=>'round',
+#'antialias'=>'subpixel',
+#'line-join'=>'round',
+#'line-cap'=>'round',
 			'line-width'=>0.4,
-			'line-cap'=>'round',
+#'line-cap'=>'round',
 			'stroke-color'=>$color,
 			'fill-color'=>'SeaGreen',
 			'pointer-events'=>'visible',
 	);
 }
-#package Card::View;
-#package Card::View;
 
 # ------------------------------------------
 package Span::View; our @ISA = qw(Group::View Point::View Tree::View Datum::View);
@@ -3525,7 +3478,7 @@ our @windows = ();
 our $quitting = 0;
 #package Window;
 sub new {
-	my ($type,$windid) = @_;
+	my ($type,$db,$windid) = @_;
 	my $self = new Gtk2::Window('toplevel');
 	bless $self,$type;
 	if (defined $windid) {

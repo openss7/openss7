@@ -101,23 +101,17 @@ package main;
 use strict;
 use warnings;
 
-my $model = new Model::Network('./.netdisc');
+my $db = new Database('./.netdisc');
+my $model = new Model::Network($db);
 my $net = $model->{net}{PUBLIC};
-my $window = new Window();
+my $window = new Window($db);
 my $viewer = $window->new_network($net);
 $viewer->start_timeout();
 my $hkey = Item::makekey('127.0.0.1');
 my $loc = $model->{net}{LOOPBACK};
-$loc->getchild('Point::Host::Here',$hkey,undef,[['Local::Here',$loc,$hkey]]);
+$loc->getchild('Host::Ip::Here',$hkey,undef,[['Local::Here',$loc,$hkey]]);
 
 Gtk2->main();
-
-#foreach my $kind (sort keys %{$model->{lists}}) {
-#	foreach my $item (values %{$model->{lists}{$kind}}) {
-#		next unless $item;
-#		$item->show;
-#	}
-#}
 
 exit;
 
