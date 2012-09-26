@@ -594,7 +594,7 @@ sub mark {
 			foreach my $key (@{$children{$ckey}{keys}}) {
 				if (my $schild = $self->{child}{$form}{$key}) {
 					my $ochild = $children{$ckey}{child};
-					my $reason = sprintf "Merging %s from %s child %s and %s have same key %s",$self,$othr,$schild,$ochild,Item::showkey($ckey);
+					my $reason = sprintf "Merging %s from %s child %s and %s have same key %s",$self,$othr,$schild,$ochild,Item::showkey($key);
 					$schild->mergemark($ochild,$merge,$reason);
 				}
 			}
@@ -983,15 +983,15 @@ sub init {
 	my $dbh = $self->{dbh} = DBI->connect("dbi:SQLite:$fn",undef,undef,{AutoCommit=>1});
 	Carp::confess unless $dbh;
 	$self->{working} = 0;
-	$self->{table} = {};
+	$self->{tables} = {};
 	$self->dosql(qq{PRAGMA foreign_keys = OFF;});
 	return $self;
 }
 #package Database;
 sub fini {
 	my $self = shift;
-	foreach my $tab (keys %{$self->{table}}) {
-		my $table = delete $self->{table}{$tab};
+	foreach my $tab (keys %{$self->{tables}}) {
+		my $table = delete $self->{tables}{$tab};
 		$table->put();
 	}
 	$self->dosql(qq{VACUUM;});
@@ -1037,20 +1037,20 @@ sub commit {
 sub findtable {
 	my $self = shift;
 	my ($name) = @_;
-	return $self->{table}{$name};
+	return $self->{tables}{$name};
 }
 #package Database;
 sub newtable {
 	my $self = shift;
 	my ($name,$table) = @_;
-	$self->{table}{$name} = $table;
+	$self->{tables}{$name} = $table;
 	return $table;
 }
 #package Database;
 sub puttable {
 	my $self = shift;
 	my ($name,$table) = @_;
-	return delete $self->{table}{$name};
+	return delete $self->{tables}{$name};
 }
 
 # ------------------------------------------
@@ -1158,8 +1158,11 @@ sub init {
 		my $table = $name->get($db,$kind);
 		if (my $dat = $table->getall) {
 			foreach my $id (keys %$dat) {
+				my $sub = $dat->{$id}{sub};
+				my $type = $kind;
+				$type .= "\::$sub" if $sub;
 				$id = Item::makekey($id);
-				$kind->get($self,$id);
+				$type->get($self,$id);
 			}
 		}
 	}
@@ -2374,11 +2377,12 @@ use Data::Dumper; use DBI;
 our %schema = (
 	table=>'Host',
 	keys=>[qw/id/],
-	cols=>[qw/id name/],
+	cols=>[qw/id name sub/],
 	tsql=>
 q{CREATE TABLE IF NOT EXISTS Host (
 	id INT,
 	name TEXT,
+	sub TEXT,
 	PRIMARY KEY(id)
 );},
 );
@@ -2463,14 +2467,14 @@ use Data::Dumper; use DBI;
 our %schema = (
 	table=>'Port',
 	keys=>[qw/id/],
-	cols=>[qw/id name key Host idxPoint Lan/],
+	cols=>[qw/id name key Host idxHost Lan/],
 	tsql=>
 q{CREATE TABLE IF NOT EXISTS Port (
 	id INT,
 	name TEXT,
 	key TEXT,
 	Host INT,
-	idxPoint INT,
+	idxHost INT,
 	Lan INT,
 	PRIMARY KEY(id),
 	FOREIGN KEY(Host) REFERENCES Host(id),
@@ -2488,7 +2492,7 @@ use Data::Dumper; use DBI;
 our %schema = (
 	table=>'Vprt',
 	keys=>[qw/id/],
-	cols=>[qw/id name key Port Host idxPoint Vlan/],
+	cols=>[qw/id name key Port Host idxHost Vlan/],
 	tsql=>
 q{CREATE TABLE IF NOT EXISTS Vprt (
 	id INT,
@@ -2496,7 +2500,7 @@ q{CREATE TABLE IF NOT EXISTS Vprt (
 	key TEXT,
 	Port INT,
 	Host INT,
-	idxPoint INT,
+	idxHost INT,
 	Vlan INT,
 	PRIMARY KEY(id),
 	FOREIGN KEY(Port) REFERENCES Port(id),
@@ -2514,7 +2518,7 @@ use Data::Dumper; use DBI;
 our %schema = (
 	table=>'Address',
 	keys=>[qw/id/],
-	cols=>[qw/id name Vprt idxVprt Host idxPoint Subnet idxSubnet Network idxNetwork Private idxPrivate Local idxLocal/],
+	cols=>[qw/id name Vprt idxVprt Host idxHost Subnet idxSubnet Network idxNetwork Private idxPrivate Local idxLocal/],
 	tsql=>
 q{CREATE TABLE IF NOT EXISTS Address (
 	id INT,
@@ -2522,7 +2526,7 @@ q{CREATE TABLE IF NOT EXISTS Address (
 	Vprt INT,
 	idxVprt TEXT,
 	Host INT,
-	idxPoint TEXT,
+	idxHost TEXT,
 	Subnet INT,
 	idxSubnet TEXT,
 	Network INT,
@@ -2699,18 +2703,16 @@ use strict; use warnings; use Carp;
 use Data::Dumper;  use DBI;
 # -------------------------------------
 #package Storable;
-sub init {
+sub table {
 	my $self = shift;
-	my $model = shift;
-	my $db = $model->{database};
 	my $ttyp = "Table::".$self->kind;
-	my $table = $self->{table} = $ttyp->get($db,@_);
+	my $model = $self->{model};
+	Carp::confess "No model" unless $model;
+	my $db = $model->{database};
+	Carp::confess "No database" unless $db;
+	my $table = $ttyp->get($db,@_);
 	Carp::confess "No table" unless $table;
-}
-#package Storable;
-sub fini {
-	my $self = shift;
-	delete $self->{table};
+	return $table;
 }
 #package Storable;
 sub getvals {
@@ -2719,6 +2721,10 @@ sub getvals {
 	$vals = {} unless $vals;
 	$vals->{id} = $self->{no};
 	$vals->{name} = $self->{name};
+	if (my $sub = $self->subtype) {
+		$sub =~ s/::Here//; # Remove here distinction.
+		$vals->{sub} = $sub;
+	}
 	my $key = $self->{key}{n}[0];
 	$key = Item::showkey($key) if $key;
 	$vals->{key} = $key;
@@ -2737,9 +2743,7 @@ sub store {
 	my $vals = shift;
 	return if $self->{reading};
 	$vals = $self->getvals($vals);
-	my $table = $self->{table};
-	Carp::confess "No table" unless $table;
-	$table->insert($vals);
+	$self->table->insert($vals);
 }
 #package Storable;
 sub update {
@@ -2747,9 +2751,7 @@ sub update {
 	my $vals = shift;
 	return if $self->{reading};
 	$vals = $self->getvals($vals);
-	my $table = $self->{table};
-	Carp::confess "No table" unless $table;
-	$table->update($vals);
+	$self->table->update($vals);
 }
 #package Storable;
 sub delete {
@@ -2757,9 +2759,7 @@ sub delete {
 	my $vals = shift;
 	return if $self->{reading};
 	$vals = $self->getvals($vals);
-	my $table = $self->{table};
-	Carp::confess "No table" unless $table;
-	$table->delete($vals);
+	$self->table->delete($vals);
 }
 #package Storable;
 sub read {
@@ -2767,8 +2767,7 @@ sub read {
 	my $vals = shift;
 	return if $self->{reading};
 	$vals = $self->getvals($vals);
-	my $table = $self->{table};
-	Carp::confess "No table" unless $table;
+	my $table = $self->table;
 	warn "Reading table $table for ",ref($self)," $self->{no}";
 	if (my $dat = $table->select($vals)) {
 		$self->{reading} = 1;
@@ -3290,8 +3289,15 @@ sub showkey_old {
 sub kind {
 	my $type = shift;
 	$type = ref $type if ref $type;
-	$type =~ s/::.*//;
-	return $type;
+	my ($kind,$subtype) = split(/::/,$type,2);
+	return $kind;
+}
+#package Item;
+sub subtype {
+	my $type = shift;
+	$type = ref $type if ref $type;
+	my ($kind,$subtype) = split(/::/,$type,2);
+	return $subtype;
 }
 #package Item;
 sub mykey {
@@ -3591,8 +3597,13 @@ sub them {
 #package Item;
 sub xform {
 	my ($type,$self) = @_;
-	my $oldtype = ref $self;
-	bless $self,$type;
+	if ($self->isa('Storable') and $type->kind ne $self->kind) {
+		$self->delete();
+		bless $self,$type;
+		$self->store();
+	} else {
+		bless $self,$type;
+	}
 	Viewer->xformed($self);
 }
 
@@ -4013,6 +4024,7 @@ sub add_key {
 	my ($self,$key) = @_;
 	if ($key and Item::keytype($key) == Item::IPV4ADDRKEY()) {
 		Host::Ip->xform($self);
+		Carp::cluck "Adding IPV4 address key to host $self";
 		$self->add_key($key);
 	} else {
 		$self->SUPER::add_key($key);
@@ -4829,11 +4841,14 @@ sub link_parents {
 	$self->SUPER::link_parents(@_);
 	# For convenience we need to link Vlan, Lan and Host to the networks
 	# to which their addresses belong.
-	my ($net,$nam,$key);
+	my ($net,$nam,$key,$idx,$pky);
 	foreach (qw/Network Private Local/) {
-		($nam,$net) = ($_,$dat->{$_});
-		$key = Item::makekey($net) if $net;
-		last if $net;
+		($nam,$net,$idx) = ($_,$dat->{$_},$dat->{"idx$_"});
+		if ($net) {
+			$key = Item::makekey($net);
+			$pky = Item::makekey($idx);
+			last;
+		}
 	}
 	return unless $net;
 	my $model = $self->{model};

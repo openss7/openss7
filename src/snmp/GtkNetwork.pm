@@ -44,6 +44,8 @@ sub init {
 	$canv->set(
 		'background-color'=>'white',
 		'automatic-bounds'=>Glib::TRUE,
+		'bounds-from-origin'=>Glib::FALSE,
+		'bounds-padding'=>3,
 		'units'=>'mm',
 	);
 	$self->add($canv);
@@ -343,11 +345,11 @@ $Viewer::xformed_count = 0;
 #package Viewer;
 sub xformed {
 	my ($type,$data) = @_;
+	my $vtyp = ref($data).'::View';
 	foreach my $viewer (values %viewers) {
 		if (my $view = $viewer->findview($data)) {
-			my $type = ref($data).'::View';
-			if (my $sub = $type->can('xformed')) {
-				&$sub($type,$view);
+			if (my $sub = $vtyp->can('xformed')) {
+				&$sub($vtyp,$view);
 			}
 		}
 		$viewer->{changed} = 1;
@@ -575,11 +577,16 @@ sub layout {
 	my $hbox = $canv->get_screen->get_height_mm;
 	my $wbox = $canv->get_screen->get_width_mm;
 	my ($h,$w,$mh,$mw) = $view->resize($hbox,$wbox);
-	$w =
-		$view->{pad}[1]+
-		$view->{siz}{l}{total}[1] + 2.0*$view->{siz}{l}{total}[3]+
-		$view->{siz}{c}{total}[1]/2.0 + $view->{siz}{c}{total}[3];
-	$h = $h/2.0 + $mh;
+	if (0) {
+		$w =
+			$view->{pad}[1]+
+			$view->{siz}{l}{total}[1] + 2.0*$view->{siz}{l}{total}[3]+
+			$view->{siz}{c}{total}[1]/2.0 + $view->{siz}{c}{total}[3];
+		$h = $h/2.0 + $mh;
+	} else {
+		$w = 0;
+		$h = 0;
+	}
 	$view->move_view($w,$h,0,0);
 	$view->layout($hbox,$wbox);
 	$view->place_view($w,$h,0,0);
@@ -752,6 +759,32 @@ sub siz {
 	$h += 2.0*$self->{pad}[0]; # if $h;
 	$w += 2.0*$self->{pad}[1]; # if $w;
 	return ($h,$w,$mh,$mw);
+}
+#package View;
+sub gethandw {
+	my $self = shift;
+	unless (exists $self->{handw}) {
+		if ($self->isvisible) {
+			if (my $sub = $self->can('recalc')) {
+				$self->{handw} = [ &$sub($self,@_) ];
+			} else {
+				$self->{handw} = [ 0, 0, 0, 0 ];
+			}
+		} else {
+			$self->{handw} = [ 0, 0, 0, 0 ];
+		}
+	}
+	return @{$self->{handw}};
+}
+#package View;
+sub resize {
+	my $self = shift;
+	if ($self->isvisible) {
+		$self->{siz}{t} = [ $self->recalc(@_) ];
+	} else {
+		$self->{siz}{t} = [ 0, 0, 0, 0 ];
+	}
+	return $self->siz;
 }
 #package View;
 sub place_view {
@@ -1085,23 +1118,17 @@ sub gettxt {
 	return sprintf '(%s%d)',ref($self->{data}),$self->{data}{no};
 }
 #package Bus::View;
-sub resize {
+sub recalc {
 	my $self = shift;
 	my ($hbox,$wbox) = @_;
-	my ($hmrg,$wmrg) = (0,0);
-	if ($self->isvisible) {
-		$hbox = $hbox < 2.0*$self->{pad}[0] ? 0 : $hbox - 2.0*$self->{pad}[0];
-		$wbox = $wbox < 2.0*$self->{pad}[1] ? 0 : $wbox - 2.0*$self->{pad}[1];
-		my $min = 15.0;
-		$hbox = $min if $hbox < $min;
-		$wbox = 0.8;
-		$hmrg = ($self->{txt}{pnts}[2]+$self->{txb}{pnts}[2])/2.0;
-		$wmrg = 0;
-	} else {
-		($hbox,$wbox,$hmrg,$wmrg) = (0,0,0,0);
-	}
-	$self->{siz}{t} = [$hbox,$wbox,$hmrg,$wmrg];
-	return $self->siz;
+	my ($hmrg,$wmrg);
+	$hbox = $hbox < 2.0*$self->{pad}[0] ? 0 : $hbox - 2.0*$self->{pad}[0];
+	$wbox = $wbox < 2.0*$self->{pad}[1] ? 0 : $wbox - 2.0*$self->{pad}[1];
+	$hbox = 15.0 if $hbox < 15.0;
+	$wbox = 0.8;
+	$hmrg = ($self->{txt}{pnts}[2]+$self->{txb}{pnts}[2])/2.0;
+	$wmrg = 0;
+	return ($hbox,$wbox,$hmrg,$wmrg);
 }
 #package Bus::View;
 sub layout { }
@@ -1249,20 +1276,19 @@ sub setcolor {
 	$self->{txt}{item}->set('fill-color'=>$color);
 }
 #package BoxAndLink::View;
-sub resize {
+sub recalc {
 	my $self = shift;
 	my ($hbox,$wbox) = @_;
-	if ($self->isvisible) {
-		$hbox = $hbox < 2.0*$self->{pad}[0] ? 0 : $hbox - 2.0*$self->{pad}[0];
-		$wbox = $wbox < 2.0*$self->{pad}[1] ? 0 : $wbox - 2.0*$self->{pad}[1];
-		my ($h,$w) = ($self->{box}{pnts}[2],$self->{box}{pnts}[3]+$self->{txt}{pnts}[2]);
-		$hbox = $h; # if $hbox < $h; $hbox = 2.0*$h if $hbox > 2.0*$h;
-		$wbox = $w; # if $wbox < $w; $wbox = 2.0*$w if $wbox > 2.0*$w;
-	} else {
-		($hbox,$wbox) = (0,0);
-	}
-	$self->{siz}{t} = [$hbox,$wbox,0,0];
-	return $self->siz;
+	my ($hmrg,$wmrg);
+	$hbox = $hbox < 2.0*$self->{pad}[0] ? 0 : $hbox - 2.0*$self->{pad}[0];
+	$wbox = $wbox < 2.0*$self->{pad}[1] ? 0 : $wbox - 2.0*$self->{pad}[1];
+	my $h = $self->{box}{pnts}[2];
+	my $w = $self->{box}{pnts}[3]+$self->{txt}{pnts}[2];
+	$hbox = $h; # if $hbox < $h; $hbox = 2.0*$h if $hbox > 2.0*$h;
+	$wbox = $w; # if $wbox < $w; $wbox = 2.0*$w if $wbox > 2.0*$w;
+	$hmrg = 0;
+	$wmrg = 0;
+	return ($hbox,$wbox,$hmrg,$wmrg);
 }
 #package BoxAndLink::View;
 sub layout {
@@ -2832,6 +2858,38 @@ sub ctypes { return qw/Private Host Vlan Lan Subnet/ }
 #package Network::View;
 sub isanchor { return Glib::TRUE }
 #package Network::View;
+sub geom {
+	my $self = shift;
+	my %geom = ();
+	foreach my $net ($self->children('Private')) {
+		if ($net->isa('Private::Here::View')) {
+			push @{$geom{l}{Private}}, $net;
+		} else {
+			push @{$geom{r}{Private}}, $net;
+		}
+	}
+	foreach my $host ($self->offspring_sortbytype('Host',[
+				Item::IPV4ADDRKEY,
+				Item::IPV6ADDRKEY])) {
+		next if ($host->parent('Private'));
+		if ($host->isa('Host::Ip::Here::View')) {
+			push @{$geom{l}{Host}}, $host;
+		} else {
+			push @{$geom{r}{Host}}, $host;
+		}
+	}
+	foreach my $form (qw/Vlan Lan Subnet/) {
+		foreach my $bus ($self->offsprint_sortbytype($form,[
+					Item::MACKEY,
+					Item::VLANKEY,
+					Item::IPV4MASKKEY,
+					Item::IPV6MASKKEY])) {
+			push @{$geom{c}{$form}},$bus;
+		}
+	}
+	return \%geom;
+}
+#package Network::View;
 sub getgeom {
 	my $self = shift;
 	my %geom = ();
@@ -2904,22 +2962,49 @@ sub mycolor { return 'orange' }
 #package Private::View;
 sub ctypes { return qw/Host Vlan Lan Subnet/ }
 #package Private::View;
+sub geom {
+	my $self = shift;
+	my %geom = ();
+	foreach my $host ($self->offspring_sortbytype('Host',[
+				Item::IPV4ADDRKEY,
+				Item::IPV6ADDRKEY])) {
+		if ($host->parent('Network')) {
+			push @{$geom{l}{Host}}, $host;
+		}
+		elsif ($host->parent('Private')) {
+			push @{$geom{r}{Host}}, $host;
+		}
+	}
+	foreach my $form (qw/Vlan Lan Subnet/) {
+		foreach my $bus ($self->offspring_sortbytype($form,[
+					Item::MACKEY,
+					Item::VLANKEY,
+					Item::IPV4MASKKEY,
+					Item::IPV6MASKKEY])) {
+			unless ($bus->parent('Network')) {
+				push @{$geom{c}{$form}},$bus;
+			}
+		}
+	}
+	return \%geom;
+}
+#package Private::View;
 sub getgeom {
 	my $self = shift;
 	my %geom = ();
 	my $col = $self->{col};
 	my $l = $col > 0 ? 'l' : 'r';
 	my $r = $col > 0 ? 'r' : 'l';
-	foreach my $point ($self->offspring_sortbytype('Host',[
+	foreach my $host ($self->offspring_sortbytype('Host',[
 				Item::IPV4ADDRKEY,
 				Item::IPV6ADDRKEY])) {
-		if ($point->parent('Network')) {
-			push @{$geom{$l}{Host}},$point;
-			$point->{col} = ($col > 0) ? $col-1 : $col+1;
+		if ($host->parent('Network')) {
+			push @{$geom{$l}{Host}},$host;
+			$host->{col} = ($col > 0) ? $col-1 : $col+1;
 		}
-		elsif ($point->parent('Private')) {
-			push @{$geom{$r}{Host}},$point;
-			$point->{col} = ($col > 0) ? $col+1 : $col-1;
+		elsif ($host->parent('Private')) {
+			push @{$geom{$r}{Host}},$host;
+			$host->{col} = ($col > 0) ? $col+1 : $col-1;
 		}
 	}
 	foreach my $form (qw/Lan Vlan Subnet/) {
@@ -3136,6 +3221,61 @@ sub shrink {
 			}
 		}
 	}
+}
+#package Host::View;
+sub geom {
+	my $self = shift;
+	my %geom = ();
+	my @buses = qw/Vlan Lan Subnet/;
+	foreach my $kind (qw/Vprt Port Address/) {
+		my $ptype = shift @buses;
+		foreach my $box ($self->offspring($kind)) {
+			if (my $bus = $box->parent($ptype)) {
+				if ($bus->parent('Network')) {
+					push @{$geom{l}{$kind}}, $box;
+				}
+				elsif ($bus->parent('Private')) {
+					push @{$geom{r}{$kind}}, $box;
+				}
+			} else {
+				push @{$geom{r}{$kind}}, $box;
+			}
+		}
+	}
+	return \%geom;
+}
+#package Host::View;
+sub recalc {
+	my $self = shift;
+	my ($hbox,$wbox) = @_;
+	my ($hmrg,$wmrg);
+	$hbox = $hbox < 2.0*$self->{pad}[0] ? 0 : $hbox - 2.0*$self->{pad}[0];
+	$wbox = $wbox < 2.0*$self->{pad}[1] ? 0 : $wbox - 2.0*$self->{pad}[1];
+	# The height is simply the maximum of the sum of the heights of all
+	# boxes on either size and the height of the node itself.
+	# The width is simply the maximum width of the boxes on the left plus
+	# the width of the node plus the maximum width of the boxes on the
+	# right.
+	my $geom = $self->geom();
+	$hbox = $self->{nod}{pnts}[3]; # height of node alone
+	$wbox = $self->{nod}{pnts}[2]; # width of node alone
+	my %wmax = (l=>0,r=>0);
+	foreach my $side (qw/l r/) {
+		foreach my $kind (keys %{$geom->{$side}}) {
+			my $wmax = \$wmax{$side};
+			my $hsum = 0;
+			foreach my $box (@{$geom->{$side}{$kind}}) {
+				my ($h,$w) = $box->gethandw($hbox,$wbox);
+				$hsum += $h;
+				$$wmax = $w if $$wmax < $w;
+			}
+			$hbox = $hsum if $hbox < $hsum;
+		}
+	}
+	$wbox += $wmax{l} + $wmax{r};
+	$hmrg = 0;
+	$wmrg = 0;
+	return ($hbox,$wbox,$hmrg,$wmrg);
 }
 #package Host::View;
 sub resize {
