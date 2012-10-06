@@ -7,11 +7,33 @@ use threads::shared;
 use Thread qw/:DEFAULT async yield/;
 use Thread::Queue;
 use Carp;
-use Gtk2 qw/-init -threads-init/;
-use Gtk2::SimpleList;
-use Glib;
-use Goo::Canvas;
-use Gtk2::Helper;
+if (0) {
+	use Gtk2 qw/-init -threads-init/;
+	use Gtk2::SimpleList;
+	use Glib;
+	use Goo::Canvas;
+	use Gtk2::Helper;
+} else {
+	use Tk;
+	use Tk::Xrm;
+	use Tk::Event;
+	use Tk::Trace;
+	require Tk::Toplevel;
+	require Tk::Adjuster;
+	require Tk::Dialog;
+	require Tk::HList;
+	require Tk::ItemStyle;
+	require Tk::ROText;
+	require Tk::NoteBook;
+	require Tk::Pane;
+	require Tk::Balloon;
+	require Tk::DragDrop;
+	require Tk::DropSite;
+	require Tk::TableMatrix;
+	require Tk::TableMatrix::Spreadsheet;
+	require Tk::Frame;
+	require Tk::TFrame;
+}
 use SNMP;
 use Net::IP;
 use Net::SNMP;
@@ -29,8 +51,19 @@ use DBI;
 use Time::HiRes qw(gettimeofday tv_interval);
 use FindBin qw($Bin);
 use lib "$Bin";
+print STDERR "Loading Universal.pm...\n";
+require "Universal.pm";
+print STDERR "Loading Network.pm...\n";
 require "Network.pm";
-require "GtkNetwork.pm";
+print STDERR "Loading Viewer.pm...\n";
+require "Viewer.pm";
+if (0) {
+	print STDERR "Loading GtkViewer.pm...\n";
+	require "GtkViewer.pm";
+} else {
+	print STDERR "Loading TkViewer.pm...\n";
+	require "TkViewer.pm";
+}
 use strict;
 
 $ENV{MIBDIRS} = '+'.join(':',qw{
@@ -103,15 +136,32 @@ use warnings;
 
 my $db = new Database('./.netdisc');
 my $model = new Model::Network($db);
-my $net = $model->{net}{PUBLIC};
-my $window = new Window($db);
-my $viewer = $window->new_network($net);
-$viewer->start_timeout();
+my $gui;
+if (0) {
+	$gui = new Gui::Gtk($db,$model);
+} else {
+	$gui = new Gui::Tk($db,$model);
+}
+#my @windows = values %{$gui->{items}{Window}};
+#unless (@windows) {
+	print STDERR "Creating window...\n";
+	my $window;
+	if (0) {
+		$window = new Window::Gtk($gui);
+	} else {
+		$window = new Window::Tk($gui);
+	}
+	print STDERR "Window is $window\n";
+	my $net = $model->{net}{PUBLIC};
+	print STDERR "Creating viewer...\n";
+	my $viewer = $window->new_viewer($net);
+#}
 my $hkey = Item::makekey('127.0.0.1');
 my $loc = $model->{net}{LOOPBACK};
 $loc->getchild('Host::Ip::Here',$hkey,undef,[['Local::Here',$loc,$hkey]]);
 
-Gtk2->main();
+print STDERR "Entering main loop...\n";
+$gui->mainloop;
 
 exit;
 
