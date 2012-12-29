@@ -1,10 +1,6 @@
-use strict;
-no warnings;
-
 # ------------------------------------------
 package UNIVERSAL;
-no strict;
-no warnings;
+use warnings; use Carp;
 # ------------------------------------------
 #package UNIVERSAL;
 sub _forw {
@@ -61,12 +57,6 @@ sub _init {
 	$self->_forw($type,'only','init',@_);
 }
 #package UNIVERSAL;
-sub _post {
-	my $self = shift;
-	my $type = shift;
-	$self->_revs($type,undef,'post',@_);
-}
-#package UNIVERSAL;
 sub _new {
 	my $clas = shift;
 	my $type = shift;
@@ -98,7 +88,6 @@ sub new {
 	my $type = shift;
 	my $self = $type->_make($type,@_);
 	$self->_init($type,@_);
-	$self->_post($type,@_);
 	return $self;
 }
 #package UNIVERSAL;
@@ -193,6 +182,7 @@ sub _dump {
 sub show {
 	my $self = shift;
 	my $type = ref $self;
+	warn "Bad object of type $type, $self\n" if $self->{bad};
 	print STDERR "\nShowing item $self\n-------------------------\n";
 	$self->_dump($type,@_);
 }
@@ -213,53 +203,3 @@ sub walk {
 	$self->{crumb} = $crumb;
 }
 
-# ------------------------------------------
-package Base;
-no warnings;
-# ------------------------------------------
-##package Base;
-#our %use = ();
-#our %put = ();
-#our %dst = ();
-#our $init_count = 0;
-#our $fini_count = 0;
-#our $dest_count = 0;
-##package Base;
-#sub showstats {
-#	print STDERR "Base object stats:\n------------------\n";
-#	printf STDERR "%6d object init calls\n", $Base::init_count;
-#	printf STDERR "%6d object fini calls\n", $Base::fini_count;
-#	printf STDERR "%6d object dest calls\n", $Base::dest_count;
-#	print STDERR "------------------\n";
-#	printf STDERR "%6d objects use\n",scalar(values %Base::use);
-#	printf STDERR "%6d objects put\n",scalar(values %Base::put);
-#	printf STDERR "%6d objects dst\n",scalar(values %Base::dst);
-#	print STDERR "------------------\n";
-#}
-##package Base;
-#sub init {
-#	my $self = shift;
-#	$use{$self} = 1;
-#	$init_count++;
-#	Base::showstats() unless ($init_count % 10);
-#}
-##package Base;
-#sub fini {
-#	my $self = shift;
-#	delete $Base::use{$self};
-#	$put{$self} = 1;
-#	$fini_count++;
-#	Base::showstats() unless ($fini_count % 10);
-#}
-##package Base;
-#sub DESTROY {
-#	my $self = shift;
-#	delete $Base::put{$self};
-#	$dst{$self} = 1;
-#	$dest_count++;
-#	Base::showstats() unless ($dest_count % 10);
-#}
-
-1;
-
-__END__
