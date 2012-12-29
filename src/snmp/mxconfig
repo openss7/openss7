@@ -27,7 +27,7 @@ $SNMP::best_guess = 2;
 $SNMP::save_descriptions = 1;
 SNMP::initMib();
 SNMP::addMibDirs(qw(../mibs));
-SNMP::loadModules('OPENSS7-MX-MIB', 'OPENSS7-MX-MON-MIB');
+SNMP::loadModules('SNMPv2-MIB', 'OPENSS7-MX-MIB', 'OPENSS7-MX-MON-MIB');
 
 @::windows = ();
 $::windidn = 0;
@@ -255,7 +255,7 @@ use strict;
 $MyDBI::dbh = undef;
 
 %MyDBI::schema = (
-	tables=>[ qw/winds pages panes hosts mxSyncTable mxDrivTable mxCardTable mxSpanTable mxChanTable mxBertTable mxXconTable mxNearEndCurrentTable mxNearEndIntervalTable mxNearEndTotalTable mxFarEndCurrentTable mxFarEndIntervalTable mxFarEndTotalTable mxMonitorTable mxCaptureScalars mxCaptureTable mxPushTable mxPullTable mxUploadTable mxDownloadTable mxCollectTable mxSctpScalars mxSctpTable mxFilterTable mxFilterProgTable mxBufferScalars/ ],
+	tables=>[ qw/winds pages panes hosts nodes mxSyncTable mxDrivTable mxCardTable mxSpanTable mxChanTable mxBertTable mxXconTable mxNearEndCurrentTable mxNearEndIntervalTable mxNearEndTotalTable mxFarEndCurrentTable mxFarEndIntervalTable mxFarEndTotalTable mxMonitorTable mxCaptureScalars mxCaptureTable mxPushTable mxPullTable mxUploadTable mxDownloadTable mxCollectTable mxSctpScalars mxSctpTable mxFilterTable mxFilterProgTable mxBufferScalars systemScalars/ ],
 	hosts=>{
 		keys=>[ qw/hostid/ ],
 		cols=>[ qw/hostid DestHost Community Version RemotePort Timeout Retries RetryNoSuch SecName SecLevel SecEngineId ContextEngineId Context AuthProto AuthPass PrivProto PrivPass authMasterKey privMasterKey authLocalizedKey privLocalizedKey UseLongNames UseSprintValue UseEnums UseNumeric BestGuess/ ],
@@ -320,7 +320,7 @@ CREATE TABLE IF NOT EXISTS pages (
 	FOREIGN KEY(hostid) REFERENCES hosts(hostid),
 	FOREIGN KEY(windid) REFERENCES winds(windid)
 );
-},
+		},
 	},
 	panes=>{
 		keys=>[ qw/paneid/ ],
@@ -334,6 +334,25 @@ CREATE TABLE IF NOT EXISTS panes (
 	height INT,
 	sticky BOOLEAN,
 	PRIMARY KEY(paneid)
+);
+		},
+	},
+	nodes=>{
+		keys=>[ qw/windid pageid nodeid/ ],
+		cols=>[ qw/windid pageid nodeid hostid name col row/ ],
+		tsql=>q{
+CREATE TABLE IF NOT EXISTS nodes (
+	windid INT,
+	pageid INT,
+	nodeid INT,
+	hostid INT,
+	name TEXT,
+	col INT,
+	row INT,
+	PRIMARY KEY(windid,pageid,nodeid),
+	FOREIGN KEY(hostid) REFERENCES hosts(hostid),
+	FOREIGN KEY(pageid) REFERENCES pages(pageid),
+	FOREIGN KEY(windid) REFERENCES winds(windid)
 );
 		},
 	},
@@ -353,7 +372,7 @@ my %mapping = (
 
 sub dosql {
 	my ($dbh,$sql) = @_;
-#	print STDERR "S: $sql";
+	print STDERR "S: $sql";
 	$dbh->do($sql) or die $dbh->errstr;
 }
 
@@ -579,6 +598,7 @@ sub new {
 	my $data = $obj->_data;
 	my $prefix = $data->{table};
 	$prefix =~ s/Table$//;
+	$prefix =~ s/Scalars$//;
 	my $short = $label;
 	$short =~ s/^$prefix//;
 	my $m = $self->{m} = $data->{mib}{$label};
@@ -675,6 +695,14 @@ sub add_to_table {
 	$table->attach($self->{uf},2,3,$entryno,$entryno+1,'fill','fill',0,0);
 	return $self;
 }
+sub add_tooltips {
+	my ($self,$tips) = @_;
+	my $tip;
+	$tip = $self->description(450);
+	$tips->set_tip($self->{l},$tip) if $tip;
+	$tip = $self->TCDescription(450);
+	$tips->set_tip($self->{u},$tip) if $tip;
+}
 sub revert {
 	my $self = shift;
 	my $val = $self->{val};
@@ -706,6 +734,139 @@ sub convert {
 	my $class = MibNode::classof($m);
 	$val = "$class"->snmpval($m,$val);
 	return $val;
+}
+sub widthof {
+	my $text = shift;
+	return length($text)*8;
+}
+sub strip {
+	my ($msg) = @_;
+	if (defined $msg) {
+		$msg =~ s/^(\s|\n)*//s;
+		$msg =~ s/(\s|\n)*$//s;
+		$msg =~ s/\t/        /g;
+		$msg =~ s/\n[ ]+\n/\n\n/g;
+		while ($msg =~ /\n\n\n/) {
+			$msg =~ s/\n\n\n/\n/g;
+		}
+		my $lead = undef;
+		my $match;
+		while ($msg =~ /(\n[ ]+)[^\n]/g) {
+			$match = $1;
+			if (defined $lead) {
+				if (length($lead) > length($match)) {
+					$lead = $match;
+				}
+			} else {
+				$lead = $match;
+			}
+		}
+		if (defined $lead) {
+			$msg =~ s/$lead/\n/g;
+		}
+		$msg =~ s/^(\n|\s)*$//sg;
+		chomp $msg;
+	} else {
+		$msg = '';
+	}
+	return $msg;
+}
+sub reflow {
+	my ($msg,$width) = @_;
+	$width = 400 unless defined $width;
+	my @lines;
+	my @result = ();
+	$msg =~ s/\n[ ]+\n/\n\n/sg;
+	if ($msg =~ /[ ]\n[ ]*/s) {
+		$msg =~ s/[ ]\n[ ]*/ /sg;
+		@lines = split(/\n/,$msg);
+	} elsif ($msg =~ /\n\n/s) {
+		$msg =~ s/\.\n(?!\n)/. \n/sg;
+		$msg =~ s/\n(?!\n)/ \n/sg;
+		$msg =~ s/\n[ ]+\n/\n\n/sg;
+		$msg =~ s/[ ]\n[ ]*/ /sg;
+		@lines = split(/\n/,$msg);
+	} else {
+		$msg =~ s/\.\n/. \n/sg;
+		$msg =~ s/\n[ ]*/ /sg;
+		# FIXME - check for lead change
+		@lines = split(/\n/,$msg);
+	}
+	foreach (@lines) {
+		my ($indent,$lead,$measure) = ('','');
+		$indent = $1 if s/^( *)//;
+		$lead = $1 if s/^(([0-9]+\.|-|·)[ ]+)//;
+		my $rest = $width - MibNode::widthof($indent) - MibNode::widthof($lead);
+		while (($measure = MibNode::widthof($_)) > $rest) {
+			my ($pos,$where,$break) = (-1,-1,-1);
+			while (($break = index($_,' ',$pos+1)) >= 0) {
+				my $portion = MibNode::widthof(substr($_,0,$break));
+				last if $portion >= $rest;
+				$where = $break unless $break == $pos+1;
+				$pos = $break;
+			}
+			$where = $break if $where == 0;
+			$where = length($_) if $where <= 0;
+			push @result,$indent.$lead.substr($_,0,$where,'');
+			s/^[ ]*//;
+			$lead =~ s/./ /g;
+			$rest = $width - MibNode::widthof($indent) - MibNode::widthof($lead);
+		}
+		push @result,$indent.$lead.$_;
+	}
+	@result = grep(!/^\s*$/,@result) if @result > 60; # turf blank lines
+	$msg = join("\n",@result);
+	return $msg;
+}
+sub rehang {
+	my ($msg,$width,$hang) = @_;
+	$width = 400 unless defined $width;
+	$hang = '        ' unless defined $hang;
+	$msg =~ s/\n[ ]+\n/\n\n/sg;
+	$msg =~ s/[ ]\n[ ]*/ /sg;
+	my @result = ();
+	my @lines = split(/\n/,$msg);
+	foreach (@lines) {
+		my ($indent,$lead) = ('','');
+		$indent = $1 if s/^( *)//;
+		my $rest = $width - MibNode::widthof($indent) - MibNode::widthof($lead);
+		while ((my $measure = MibNode::widthof($_)) > $rest) {
+			my ($pos,$where,$break) = (-1,-1,-1);
+			while (($break = index($_,' ',$pos + 1)) >= 0) {
+				my $portion = MibNode::widthof(substr($_,0,$break));
+				last if $portion >= $rest;
+				$where = $break unless $break == $pos + 1;
+				$pos = $break;
+			}
+			$where = $break if $where == 0;
+			$where = length($_) if $where <= 0;
+			push @result,$indent.$lead.substr($_,0,$where,'');
+			s/^[ ]*//;
+			$lead = $hang;
+			$rest = $width - MibNode::widthof($indent) - MibNode::widthof($lead);
+		}
+		push @result,$indent.$lead.$_;
+	}
+	$msg = join("\n",@result);
+	return $msg;
+}
+sub description {
+	my ($self,$width) = @_;
+	my $msg = MibNode::strip($self->{m}{description});
+	$msg = MibNode::reflow($msg,$width) if defined $width;
+	return $msg;
+}
+sub TCDescription {
+	my ($self,$width) = @_;
+	my $msg = MibNode::strip($self->{m}{TCDescription});
+	$msg = MibNode::reflow($msg,$width) if defined $width;
+	return $msg;
+}
+sub reference {
+	my ($self,$width) = @_;
+	my $msg = MibNode::strip($self->{m}{reference});
+	$msg = MibNode::rehang($msg,$width) if defined $width;
+	return $msg;
 }
 
 # ----------------------------------
@@ -1096,12 +1257,8 @@ sub read_all {
 	my $self = shift;
 	my $data = $self->_data;
 	$self->read;
-	foreach (@{$data->{sides}}) {
-		$_->read_all;
-	}
-	foreach (@{$data->{parts}}) {
-		$_->read_all;
-	}
+	foreach (@{$data->{sides}}) { $_->read_all }
+	foreach (@{$data->{parts}}) { $_->read_all }
 	return $self;
 }
 #package Store;
@@ -1897,6 +2054,102 @@ sub new {
 }
 
 # ----------------------------------
+package CaptData;
+use strict;
+use vars qw(@ISA);
+@ISA = qw(SnmpData);
+# ----------------------------------
+sub get {
+	my ($type,@args) = @_;
+	return SnmpData::get($type,'Capture','mxCaptureScalars',@args);
+}
+sub label {
+	my $self = shift;
+	my $data = $self->_data;
+	$data->{label} = "$data->{DestHost}";
+	return $data->{label};
+}
+sub stitle {
+	my $self = shift;
+	my $data = $self->_data;
+	$data->{stitle} = "Host $data->{DestHost} Capture" unless exists $data->{stitle};
+	return $data->{stitle};
+}
+sub new {
+	my ($type,$name,@args) = @_;
+	my $self = SnmpData::new($type,'Capture','mxCaptureScalars',@args);
+	my $read = $self->read;
+	my $data = $self->_data;
+	$data->{DestHost} = $name;
+	$self->save unless $read;
+	return $self;
+}
+
+# ----------------------------------
+package BuffData;
+use strict;
+use vars qw(@ISA);
+@ISA = qw(SnmpData);
+# ----------------------------------
+sub get {
+	my ($type,@args) = @_;
+	return SnmpData::get($type,'Buffer','mxBufferScalars',@args);
+}
+sub label {
+	my $self = shift;
+	my $data = $self->_data;
+	$data->{label} = "$data->{DestHost}";
+	return $data->{label};
+}
+sub stitle {
+	my $self = shift;
+	my $data = $self->_data;
+	$data->{stitle} = "Host $data->{DestHost} Buffer" unless exists $data->{stitle};
+	return $data->{stitle};
+}
+sub new {
+	my ($type,$name,@args) = @_;
+	my $self = SnmpData::new($type,'Buffer','mxBufferScalars',@args);
+	my $read = $self->read;
+	my $data = $self->_data;
+	$data->{DestHost} = $name;
+	$self->save unless $read;
+	return $self;
+}
+
+# ----------------------------------
+package SctpData;
+use strict;
+use vars qw(@ISA);
+@ISA = qw(SnmpData);
+# ----------------------------------
+sub get {
+	my ($type,@args) = @_;
+	return SnmpData::get($type,'SCTP','mxSctpScalars',@args);
+}
+sub label {
+	my $self = shift;
+	my $data = $self->_data;
+	$data->{label} = "$data->{DestHost}";
+	return $data->{label};
+}
+sub stitle {
+	my $self = shift;
+	my $data = $self->_data;
+	$data->{stitle} = "Host $data->{DestHost} SCTP" unless exists $data->{stitle};
+	return $data->{stitle};
+}
+sub new {
+	my ($type,$name,@args) = @_;
+	my $self = SnmpData::new($type,'SCTP','mxSctpScalars',@args);
+	my $read = $self->read;
+	my $data = $self->_data;
+	$data->{DestHost} = $name;
+	$self->save unless $read;
+	return $self;
+}
+
+# ----------------------------------
 package HostData;
 use strict;
 use Carp;
@@ -1940,14 +2193,20 @@ sub new {
 	push @{$data->{parts}}, $part if $part;
 	my $side = $data->{msrc} = MonSrcData->new($data->{DestHost},$hostid,'*');
 	push @{$data->{sides}}, $side if $side;
+	$side = $data->{capt} = CaptData->new($data->{DestHost},$hostid);
+	push @{$data->{sides}}, $side if $side;
+	$side = $data->{buff} = BuffData->new($data->{DestHost},$hostid);
+	push @{$data->{sides}}, $side if $side;
+	$side = $data->{sctp} = SctpData->new($data->{DestHost},$hostid);
+	push @{$data->{sides}}, $side if $side;
 	$self->save unless $read;
 	return $self;
 }
 #package HostData;
 sub readdb {
 	my ($type,$dbh) = @_;
-	my @cols = @{$MyDBI::schema{hosts}{cols}};
-	my $sql = "SELECT hostid FROM hosts;\n";
+	my @cols = @{$MyDBI::schema{systemScalars}{cols}};
+	my $sql = "SELECT hostid FROM systemScalars;\n";
 	my $sth = MyDBI::preparesql($dbh,$sql);
 	$sth->execute() or warn $sth->errstr;
 	my %ids = ();
@@ -1957,10 +2216,165 @@ sub readdb {
 	$sth->finish;
 	foreach (sort {$a<=>$b} keys %ids) {
 		next unless length($_);
-		HostData->new($_);
+		NodeData->new($_);
 	}
 	return undef;
 }
+
+# ----------------------------------
+package SysData;
+use vars qw(@ISA);
+@ISA = qw(SnmpData);
+# ----------------------------------
+#package SysData;
+sub get {
+	my ($type,@args) = @_;
+	return SnmpData::get($type,'System','systemScalars',@args);
+}
+#package SysData;
+sub label {
+	my $self = shift;
+	my $data = $self->_data;
+	$data->{label} = "$data->{sysName}" unless exists $data->{label};
+	return $data->{label};
+}
+#package SysData;
+sub stitle {
+	my $self = shift;
+	my $data = $self->_data;
+	$data->{stitle} = "System $data->{sysName}" unless exists $data->{stitle};
+	return $data->{stitle};
+}
+#package SysData;
+sub new {
+	my ($type,$hostid,@args) = @_;
+	if (defined $hostid) {
+		if ($::hostidn <= $hostid) {
+			$::hostidn = $hostid+1;
+		}
+	} else {
+		$hostid = $::hostidn;
+		$::hostidn++;
+	}
+	my $self = SnmpData::new($type,'System','systemScalars',$hostid,@args);
+	my $read = $self->read;
+	my $data = $self->_data;
+	my ($name) = @args;
+	$data->{DestHost} = $name;
+	my @keys = ($hostid);
+	my $side = $data->{snmp} = HostData->new($hostid,$name);
+	push @{$data->{sides}}, $side if $side;
+	$side = $data->{msrc} = MonSrcData->new($name,$hostid,'*');
+	push @{$data->{sides}}, $side if $side;
+	$self->save unless $read;
+	return $self;
+}
+
+# ----------------------------------
+package NodeData;
+use vars qw(@ISA);
+@ISA = qw(Store Viewable);
+# ----------------------------------
+#package NodeData;
+sub get {
+	my ($type,@args) = @_;
+	my $self = Store::find('nodes',@args);
+	my $read = Glib::FALSE;
+	unless ($self) {
+		$self = NodeData::new(@_);
+		$read = $self->read;
+	}
+	$self->save unless $read;
+	return $self;
+}
+#package NodeData;
+sub label {
+	my $self = shift;
+	my $data = $self->_data;
+	$data->{label} = "$data->{name}" unless exists $data->{label};
+	return $data->{label};
+}
+#package NodeData;
+sub stitle {
+	my $self = shift;
+	my $data = $self->_data;
+	$data->{stitle} = "Node $data->{name}" unless exists $data->{stitle};
+	return $data->{stitle};
+}
+#package NodeData;
+sub new {
+	my ($type,@args) = @_;
+	my $self = Store::new($type,'nodes',@args);
+	$self->Viewable::_init();
+	my $data = $self->_data;
+}
+#package NodeData;
+sub new {
+	my ($type,$hostid,@args) = @_;
+	if (defined $hostid) {
+		if ($::hostidn <= $hostid) {
+			$::hostidn = $hostid+1;
+		}
+	} else {
+		$hostid = $::hostidn;
+		$::hostidn++;
+	}
+	my $self = SnmpData::new($type,'System','systemScalars',$hostid,@args);
+	my $read = $self->read;
+	my $data = $self->_data;
+	my ($name) = @args;
+	$data->{DestHost} = $name;
+	my @keys = ($hostid);
+	my $side = $data->{snmp} = HostData->new($hostid,$name);
+	push @{$data->{sides}}, $side if $side;
+	$side = $data->{msrc} = MonSrcData->new($name,$hostid,'*');
+	push @{$data->{sides}}, $side if $side;
+	$self->save unless $read;
+	return $self;
+}
+
+# ----------------------------------
+package NetData;
+use strict;
+# ----------------------------------
+$NetData::net = undef;
+#package NetData;
+sub new {
+	my ($type,$dbh,@args) = @_;
+	return $NetData::net if $NetData::net;
+	my $self = {};
+	bless $self,$type;
+	my $data = $self->_data;
+	$self->{dbh} = $dbh;
+	my @cols = @{$MyDBI::schema{systemScalars}{cols}};
+	my $sql = "SELECT hostid FROM systemScalars;\n";
+	my $sth = MyDBI::preparesql($dbh,$sql);
+	$sth->execute() or warn $sth->errstr;
+	my %ids = ();
+	while (my $row = $sth->fetchrow_hashref) {
+		$ids{$row->{hostid}} = 1;
+	}
+	$sth->finish;
+	$data->{nodes} = [];
+	foreach (sort {$a<=>$b} keys %ids) {
+		next unless length($_);
+		my $node = NodeData->new($_);
+		push @{$data->{nodes}}, $node if $node;
+	}
+	unless (@{$data->{nodes}}) {
+		my $node;
+		MyDBI::begin_work;
+		$node = NodeData->new(undef,'localhost');
+		push @{$data->{nodes}}, $node if $node;
+		$node = NodeData->new(undef,'otherhost');
+		push @{$data->{nodes}}, $node if $node;
+		MyDBI::commit;
+	}
+	$NetData::net = $self;
+	return $self;
+}
+#package NetData;
+
 
 # ----------------------------------
 package Dialog;
@@ -2048,25 +2462,24 @@ sub new {
 	my $data = $self->_data;
 	$data->{schema} = $obj->_data->{schema};
 	my $fr = Gtk2::Frame->new($name." ".$obj->label);
-	my $v = Gtk2::VBox->new(Glib::FALSE,0);
-	my $sw = Gtk2::ScrolledWindow->new();
-	$sw->set_policy('never','automatic');
-	$sw->add_with_viewport($v);
-	$fr->add($sw);
-	my $h = Gtk2::HBox->new;
-	$v->pack_start($h,Glib::TRUE,Glib::TRUE,0);
 	my $t = Gtk2::Table->new(scalar @{$data->{schema}{cols}} - scalar @{$data->{schema}{keys}},3,Glib::FALSE);
 	$t->set_col_spacings(0);
 	$t->set_row_spacings(0);
-	$h->pack_start($t,Glib::TRUE,Glib::TRUE,0);
+	my $sw = Gtk2::ScrolledWindow->new();
+	$sw->set_policy('never','automatic');
+	$sw->add_with_viewport($t);
+	$fr->add($sw);
+	my $tt = $data->{tooltips} = Gtk2::Tooltips->new;
 	my $i = 0;
 	my %keys = map {$_=>1} @{$data->{schema}{keys}};
 	foreach (@{$data->{schema}{cols}}) {
 		next if exists $keys{$_};
 		my $ent = $data->{$_} = MibNode->new($obj,$_);
 		$ent->add_to_table($t,$i);
+		$ent->add_tooltips($tt);
 		$i++;
 	}
+	$tt->enable;
 	my $bb = Gtk2::HButtonBox->new();
 	$bb->set_layout('end');
 	$bb->set_spacing(10);
@@ -2230,9 +2643,9 @@ sub new {
 	$data->{obj} = $obj;
 	my $title = $name.' Menu '.$obj->label;
 	$self->set_title($title);
-#	my $mi = Gtk2::TearoffMenuItem->new;
-#	$mi->show;
-#	$self->append($mi);
+	my $mi = Gtk2::TearoffMenuItem->new;
+	$mi->show;
+	$self->append($mi);
 	return $self;
 }
 
@@ -2321,9 +2734,9 @@ sub new {
 	$mi->set_right_justified(Glib::TRUE);
 	$mi->show;
 	$self->append($mi);
-#	$mi = Gtk2::TearoffMenuItem->new;
-#	$mi->show;
-#	$me->append($mi);
+	$mi = Gtk2::TearoffMenuItem->new;
+	$mi->show;
+	$me->append($mi);
 	foreach (@{$objs->{neint}}) {
 		$mi = EntryMenuItem->new($_->stitle,$_);
 		$mi->show;
@@ -2345,9 +2758,9 @@ sub new {
 	$mi->set_right_justified(Glib::TRUE);
 	$mi->show;
 	$self->append($mi);
-#	$mi = Gtk2::TearoffMenuItem->new;
-#	$mi->show;
-#	$me->append($mi);
+	$mi = Gtk2::TearoffMenuItem->new;
+	$mi->show;
+	$me->append($mi);
 	foreach (@{$objs->{feint}}) {
 		$mi = EntryMenuItem->new($_->stitle,$_);
 		$mi->show;
@@ -2437,9 +2850,18 @@ use vars qw(@ISA);
 sub new {
 	my ($type,$obj,$view) = @_;
 	my $self = MonSource::new($type,'Host',$obj,$view);
+	my $objs = $obj->_data;
+	my $mi = EntryMenuItem->new('Host Capture',$objs->{capt});
+	$mi->show;
+	$self->append($mi);
+	$mi = EntryMenuItem->new('Host Buffer',$objs->{buff});
+	$mi->show;
+	$self->append($mi);
+	$mi = EntryMenuItem->new('Host SCTP Defaults',$objs->{sctp});
+	$mi->show;
+	$self->append($mi);
 	if (0) {
-		my $objs = $obj->_data;
-		my $mi = Gtk2::SeparatorMenuItem->new;
+		$mi = Gtk2::SeparatorMenuItem->new;
 		$mi->show;
 		$self->append($mi);
 		foreach (@{$objs->{parts}}) {
@@ -2450,6 +2872,24 @@ sub new {
 			$self->append($mi);
 		}
 	}
+	return $self;
+}
+
+# ----------------------------------
+package NodeMenu;
+use strict;
+use Gtk2;
+use Glib;
+use vars qw(@ISA);
+@ISA = qw(MonSource);
+# ----------------------------------
+sub new {
+	my ($type,$obj,$view) = @_;
+	my $self = MonSource::new($type,'System',$obj,$view);
+	my $objs = $obj->_data;
+	my $mi = EntryMenuItem->new('System SNMP', $objs->{snmp});
+	$mi->show;
+	$self->append($mi);
 	return $self;
 }
 
@@ -2966,7 +3406,7 @@ sub new {
 		0,0,220,160,
 		'line-width'=>0.3,
 		'stroke-color'=>'black',
-		'fill-color'=>'white',
+		'fill-color'=>'lightgray',
 		'pointer-events'=>'all',
 	);
 	$chld->{view} = $self;
@@ -3077,16 +3517,18 @@ sub new {
 			my $obj = $data->{obj};
 			if ($ev->button == 3) {
 				if ($view->isa('HostView')) {
-					HostMenu->new($obj,$view)->popup(undef,undef,undef,undef,$ev->button,$ev->time);
-					return Gtk2::EVENT_STOP;
+					$objs->{menu} = HostMenu->new($obj,$view);
 				} elsif ($view->isa('DrivView')) {
-					DrivMenu->new($obj,$view)->popup(undef,undef,undef,undef,$ev->button,$ev->time);
-					return Gtk2::EVENT_STOP;
+					$objs->{menu} = DrivMenu->new($obj,$view);
 				} elsif ($view->isa('CardView')) {
-					CardMenu->new($obj,$view)->popup(undef,undef,undef,undef,$ev->button,$ev->time);
-					return Gtk2::EVENT_STOP;
+					$objs->{menu} = CardMenu->new($obj,$view);
 				} elsif ($view->isa('SpanView')) {
-					SpanMenu->new($obj,$view)->popup(undef,undef,undef,undef,$ev->button,$ev->time);
+					$objs->{menu} = SpanMenu->new($obj,$view);
+				} elsif ($view->is('NodeView')) {
+					$objs->{menu} = NodeMenu->new($obj,$view);
+				}
+				if ($objs->{menu}) {
+					$objs->{menu}->popup(undef,undef,undef,undef,$ev->button,$ev->time);
 					return Gtk2::EVENT_STOP;
 				}
 			}
@@ -3242,6 +3684,186 @@ sub scrollCanvas {
 	}
 	$self->signal_emit('scroll-event',$ev);
 	return Gtk2::EVENT_PROPAGATE;
+}
+
+
+# ----------------------------------
+package BusView;
+use strict;
+use Glib;
+use Gtk2;
+use Goo::Canvas;
+use vars qw(@ISA);
+@ISA = qw(View Goo::Canvas::GroupModel);
+# ----------------------------------
+
+# ----------------------------------
+package NodeView;
+use strict;
+use Glib;
+use Gtk2;
+use Goo::Canvas;
+use vars qw(@ISA);
+@ISA = qw(View Goo::Canvas::GroupModel);
+# ----------------------------------
+sub new {
+	my ($type,$canv,$netw,$obj) = @_;
+	my $self = Goo::Canvas::GroupModel->new($netw);
+	bless $self,$type;
+	$self->View::_init($obj);
+	my $data = $self->_data;
+	$data->{obj} = $obj;
+	my $objs = $obj->_data;
+	$self->set('pointer-events'=>'all');
+	my $item = $canv->get_item($self);
+	$item->signal_connect('enter-notify-event'=>sub{
+		my ($item,$targ,$ev) = @_;
+		$item->get_model->highlight_view;
+		return Gtk2::EVENT_PROPAGATE;
+	});
+	$item->signal_connect('leave-notify-event'=>sub{
+		my ($item,$targ,$ev) = @_;
+		$item->get_model->unhighlight_view;
+		return Gtk2::EVENT_PROPAGATE;
+	});
+	$item->signal_connect('button-press-event'=>sub{
+		my ($item,$targ,$ev,$obj) = @_;
+		if ($ev->button == 1) {
+			$item->get_model->enable_view($obj);
+		} elsif ($ev->button == 2) {
+			$item->get_model->disable_view($obj);
+		} elsif ($ev->button == 8) {
+			$item->get_model->set(visibility=>'invisible');
+		} elsif ($ev->button == 9) {
+			$item->get_model->set(visibility=>'visible');
+		}
+		return Gtk2::EVENT_PROPAGATE;
+	},$obj);
+	my $chld;
+	$chld = $data->{rect} = Goo::Canvas::RectModel->($self,
+		0,0,15,15,
+		'line-width'=>0.5,
+		'fill-color'=>'black',
+		'pointer-events'=>'all',
+	);
+	$chld->{view} = $self;
+	$chld = $data->{text} = Goo::Canvas::TextModel->new($self,
+		"$objs->{DestHost}",7.5,7.5,15,'center',
+		'alignment'=>'center',
+		'fill-color'=>'DarkSlateGray',
+		'font'=>'Sans 3',
+		'pointer-events'=>'all',
+	);
+	$chld->{view} = $self;
+	if ($objs->{DestHost} eq 'localhost' or $objs->{DestHost} eq '127.0.0.0') {
+		$self->translate(50,50);
+	} else {
+		$self->translate(75,$objs->{hostid}*20);
+	}
+	return $self;
+}
+#package NodeView;
+sub highlight_view {
+	my $self = shift;
+	my $data = $self->_data;
+	$data->{rect}->set('stroke-color'=>'cyan');
+	$data->{text}->set('fill-color'=>'cyan');
+	$data->{highlight} = Glib::TRUE;
+}
+#package NodeView;
+sub unhighlight_view {
+	my $self = shift;
+	my $data = $self->_data;
+	my $color = $data->{active} ? 'black' : 'lightgray';
+	$data->{rect}->set('stroke-color'=>$color);
+	$color = $data->{active} ? 'DarkSlateGray' : 'lightgray';
+	$data->{text}->set('fill-color'=>$color);
+	$data->{highlight} = Glib::FALSE;
+}
+#package NodeView;
+sub refresh_view {
+	my ($self,$obj) = @_;
+	my $data = $self->data;
+	$self->enable_view($obj) unless $data->{active};
+	my $val = $obj->_data->{DestHost};
+	$data->{text}->set(text=>$val);
+	return $self;
+}
+#package NodeView;
+sub disable_view {
+	my ($self,$obj) = @_;
+	my $data = $self->_data;
+	$data->{rect}->set('stroke-color'=>'gray');
+	$data->{text}->set('fill-color'=>'gray');
+	$data->{active} = Glib::FALSE;
+	return $self;
+}
+#package NodeView;
+sub enable_view {
+	my ($self,$obj) = @_;
+	my $data = $self->_data;
+	$data->{rect}->set('stroke-color'=>'black');
+	$data->{text}->set('fill-color'=>'DarkSlateGray');
+	$data->{active} = Glib::TRUE;
+	return $self;
+}
+
+# ----------------------------------
+package NetView;
+use strict;
+use Glib;
+use Gtk2;
+use Goo::Canvas;
+use vars qw(@ISA);
+@ISA = qw(Store Gtk2::ScrolledWindow);
+# ----------------------------------
+sub new {
+	my ($type,$windid,$pageid) = @_;
+	my $self = Gtk2::ScrolledWindow->new();
+	bless $self,$type;
+	$self->Store::_init('pages',$windid,$pageid,-1);
+	my $data = $self->_data;
+	$self->set_policy('automatic','automatic');
+	my $canv = $data->{canv} = Goo::Canvas::new();
+	$canv->set(
+		'background-color'=>'white',
+		'automatic-bounds'=>Glib::TRUE,
+		'units'=>'mm',
+	);
+	$self->add($canv);
+	$self->signal_connect('scroll-event'=>\&NetView::scrollWindow,$canv);
+	$canv->signal_connect('scroll-event'=>\&NetView::scrollCanvas,$self);
+	$canv->signal_connect('button-press-event'=>sub{
+		my ($canv,$ev) = @_;
+		my $mult = $canv->get_screen->get_width_mm/$canv->get_screen->get_width/$canv->get_scale;
+		my $what = $canv->get_item_at(map{$_*$mult} $ev->coords,1);
+		$what = $canv->get_root_item unless $what;
+		my $self = $what->get_model;
+		my $view = $self->{view};
+		if ($view) {
+			my $data = $view->_data;
+			my $obj = $data->{obj};
+			my $objs = $obj->_data;
+			if ($ev->button == 3) {
+				if ($view->isa('HostView')) {
+					$objs->{menu} = HostMenu->new($obj,$view);
+				} elsif ($view->isa('DrivView')) {
+					$objs->{menu} = DrivMenu->new($obj,$view);
+				} elsif ($view->isa('CardView')) {
+					$objs->{menu} = CardMenu->new($obj,$view);
+				} elsif ($view->isa('SpanView')) {
+					$objs->{menu} = SpanMenu->new($obj,$view);
+				} elsif ($view->is('NodeView')) {
+					$objs->{menu} = NodeMenu->new($obj,$view);
+				}
+				if ($objs->{menu}) {
+					$objs->{menu}->popup(undef,undef,undef,undef,$ev->button,$ev->time);
+					return Gtk2::EVENT_STOP;
+				}
+			}
+		}
+		return Gtk2::EVENT_PROPAGATE;
+	});
 
 
 }
@@ -3391,6 +4013,15 @@ sub add_page {
 	$nb->set_tab_reorderable($host,Glib::TRUE);
 	push @{$data->{parts}}, $host;
 	$self->show_all;
+}
+#package Window;
+sub main {
+	my ($type,$dbh,@args) = @_;
+	my $self = Window::new($type,@args);
+	my $data = $self->_data;
+	my $nb = $data->{nb};
+	my $net = NetData->new($dbh);
+	my $view = NetView->new($data->{windid},$nb->get_n_pages,-1);
 }
 #package Window;
 sub newmain {

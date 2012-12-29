@@ -52,7 +52,7 @@ sub init {
 	$root->set('pointer-events'=>'all');
 	$root->{viewer} = $self;
 	$canv->set_root_item($root);
-	foreach my $layer (qw/Network Private Lan Port Vlan Vprt Blan Bprt Subnet Address Point/) {
+	foreach my $layer (qw/Network Private Lan Port Vlan Vprt Subnet Address Point/) {
 		$self->getlayer($layer);
 	}
 	$self->{base} = $base;
@@ -495,8 +495,11 @@ sub init {
 	my $self = shift;
 	my ($windid,$pageid,$base,$viewid) = @_;
 	$self->{visibility} = {};
-	foreach (qw/Point Blan Vlan Lan Subnet Bprt Vprt Port Address Network Private/) {
+	foreach (qw/Point Subnet Address Network Private/) {
 		$self->{visibility}{$_} = Glib::TRUE;
+	}
+	foreach (qw/Vlan Lan Vprt Port/) {
+		$self->{visibility}{$_} = Glib::FALSE;
 	}
 }
 #package Viewer::Network;
@@ -508,7 +511,7 @@ sub fini {
 sub selected {
 	my ($radio,$args) = @_;
 	my ($self,$kind,$from) = @$args;
-	foreach my $view (qw{Blan/Bprt Vlan/Vprt Lan/Port Subnet/Address}) {
+	foreach my $view (qw{Subnet/Address Vlan/Vprt Lan/Port}) {
 		my @pair = split(/\//,$view);
 		my $vis = ($view eq $kind) ? Glib::TRUE : Glib::FALSE;
 		$self->{visibility}{$pair[0]} = $vis;
@@ -547,7 +550,7 @@ sub click {
 			$mi->show_all;
 			$mv->append($mi);
 
-			foreach my $view (qw{Blan/Bprt Vlan/Vprt Lan/Port Subnet/Address}) {
+			foreach my $view (qw{Subnet/Address Vlan/Vprt Lan/Port}) {
 				my $mr = Gtk2::CheckMenuItem->new($view);
 				$mr->set_draw_as_radio(Glib::TRUE);
 				my @pair = map {$self->isvisible($_)} split(/\//,$view);
@@ -574,7 +577,7 @@ sub click {
 			$mi->show_all;
 			$mv->append($mi);
 
-			foreach my $kind (qw/Point Blan Vlan Lan Subnet Bprt Vprt Port Address Network Private/) {
+			foreach my $kind (qw/Point Vlan Lan Subnet Vprt Port Address Network Private/) {
 				my $mb = Gtk2::CheckMenuItem->new($kind);
 				$mb->set_active($self->isvisible($kind));
 				$mb->show_all;
@@ -609,9 +612,12 @@ sub layout {
 	my $canv = $self->{canv};
 	my $hbox = $canv->get_screen->get_height_mm;
 	my $wbox = $canv->get_screen->get_width_mm;
-	my ($h,$w) = $view->resize($hbox,$wbox);
-	$w = $view->{siz}{l}{total}[1]+$view->{siz}{c}{total}[1]/2.0+$view->{pad}[1];
-	$h = $h/2.0;
+	my ($h,$w,$mh,$mw) = $view->resize($hbox,$wbox);
+	$w =
+		$view->{pad}[1]+
+		$view->{siz}{l}{total}[1] + 2.0*$view->{siz}{l}{total}[3]+
+		$view->{siz}{c}{total}[1]/2.0 + $view->{siz}{c}{total}[3];
+	$h = $h/2.0 + $mh;
 	$view->move_view($w,$h,0,0);
 	$view->layout($hbox,$wbox);
 	$view->place_view($w,$h,0,0);
@@ -659,7 +665,7 @@ sub do_idle {
 sub do_timeout {
 	my $self = shift;
 	my $model = $self->{model};
-	$self->start_quick() if $model->snmp_doone();
+	$self->start_idle() if $model->snmp_doone();
 }
 
 # ------------------------------------------
@@ -708,7 +714,7 @@ sub init {
 	$viewer->setview($data,$self);
 	$self->{new} = 1;
 	$self->{fresh} = 1;
-	$self->{siz}{t} = [0,0];
+	$self->{siz}{t} = [0,0,0,0];
 	$self->{pad} = [3.0,3.0];
 	return $self;
 }
@@ -728,10 +734,10 @@ sub pos { return @{shift->{pos}} }
 #package View;
 sub siz {
 	my $self = shift;
-	my ($h,$w) = @{$self->{siz}{t}};
-	$h += $self->{pad}[0]; # if $h;
-	$w += $self->{pad}[1]; # if $w;
-	return ($h,$w);
+	my ($h,$w,$mh,$mw) = @{$self->{siz}{t}};
+	$h += 2.0*$self->{pad}[0]; # if $h;
+	$w += 2.0*$self->{pad}[1]; # if $w;
+	return ($h,$w,$mh,$mw);
 }
 #package View;
 sub place_view {
@@ -793,7 +799,9 @@ sub init {
 	my ($viewer,$data) = @_;
 	my $layer = $self->{layer} = $viewer->getlayer($self->kind);
 	my $grp = $self->{grp} = {pnts=>[0,0]};
-	$grp->{item} = new Goo::Canvas::Group($layer,visibility=>'invisible');
+	$grp->{item} = new Goo::Canvas::Group($layer,
+			visibility=>'invisible',
+			);
 }
 #package Group::View;
 sub fini {
@@ -840,7 +848,6 @@ sub init {
 			$self->setcolor($self->mycolor);
 		},$self);
 	$group->signal_connect('button-press-event'=>sub{
-			Carp::carp "***** button-press-event (",join(',',@_),")";
 			my ($item,$targ,$ev,$self) = @_;
 			if ($ev->button == 3) {
 				if (my $sub = $self->can('fillmenu')) {
@@ -849,12 +856,8 @@ sub init {
 						$menu->show_all;
 						$menu->popup(undef,undef,undef,undef,$ev->button,$ev->time);
 						return Gtk2::EVENT_STOP;
-					} else {
-						Carp::carp "******** $self did not fillmenu";
 					}
 					$menu->destroy;
-				} else {
-					Carp::carp "******** $self cannot fillmenu";
 				}
 			}
 			elsif ($ev->button == 2) {
@@ -882,9 +885,12 @@ sub init {
 	my ($viewer,$data) = @_;
 	my $color = $self->mycolor;
 	my $group = $self->{grp}{item};
-	my $nod = $self->{nod} = {pnts=>[-6.0,-6.0,12,12]};
+	my $nod = $self->{nod} = {pnts=>[-8.0,-4.5,16,9]};
 	$nod->{item} = new Goo::Canvas::Rect(
 		$group,@{$nod->{pnts}},
+		'antialias'=>'subpixel',
+		'line-join'=>'round',
+		'line-cap'=>'round',
 		'line-width'=>0.4,
 		'stroke-color'=>$color,
 		'fill-color'=>'white',
@@ -893,6 +899,7 @@ sub init {
 	my $txt = $self->{txt} = {pnts=>[0,0,20]};
 	$txt->{item} = new Goo::Canvas::Text(
 		$group,$self->gettxt(),@{$txt->{pnts}},'center',
+		'antialias'=>'subpixel',
 		alignment=>'center',
 		font=>'Sans 1',
 		#height=>6.0,
@@ -931,6 +938,7 @@ sub gettxt { return ref(shift) }
 sub placing {
 	my $self = shift;
 	return unless $self->{set};
+	my $color = $self->mycolor;
 	my ($x,$y) = $self->pos;
 	#Carp::carp "****** Placing $self ($x,$y) component is negative or zero" if $x <= 0 or $y <= 0;
 	if (0) {
@@ -944,15 +952,15 @@ sub placing {
 		my $txt = $self->{txt};
 		$txt->{pnts}[0] = $x;
 		$txt->{pnts}[1] = $y;
-		$txt->{item}->set(x=>$x,y=>$y,text=>$self->gettxt());
+		$txt->{item}->set(x=>$x,y=>$y,text=>$self->gettxt(),'fill-color'=>$color);
 		my $nod = $self->{nod};
-		$x-=$nod->{pnts}[3]/2.0;
-		$y-=$nod->{pnts}[2]/2.0;
+		$x-=$nod->{pnts}[2]/2.0;
+		$y-=$nod->{pnts}[3]/2.0;
 		$nod->{pnts}[0] = $x;
 		$nod->{pnts}[1] = $y;
 		#Carp::cluck;
 		#warn "****** Setting $self ($x,$y)";
-		$nod->{item}->set(x=>$x,y=>$y);
+		$nod->{item}->set(x=>$x,y=>$y,'stroke-color'=>$color);
 		#warn "****** Getting $self (",join(',',$nod->{item}->get('x','y')),")";
 	}
 }
@@ -1003,21 +1011,33 @@ sub init {
 	my $bus = $self->{bus} = {pnts=>[0,-10,0,10]};
 	$bus->{item} = new Goo::Canvas::Polyline(
 		$group,Glib::FALSE,$bus->{pnts},
+		'antialias'=>'subpixel',
+		'line-join'=>'round',
+		'line-cap'=>'round',
 		'line-width'=>0.6,
 		'stroke-color'=>$color,
 		'pointer-events'=>'visible',
 	);
-	my $txt = $self->{txt} = {pnts=>[0,0,20]};
+	my $txt = $self->{txt} = {pnts=>[0,0,12]};
 	$txt->{item} = new Goo::Canvas::Text(
 		$group,$self->gettxt(),@{$txt->{pnts}},'west',
+		'antialias'=>'subpixel',
 		alignment=>'left',
 		font=>'Sans 1',
-		#height=>6.0,
-		#wrap=>'word-char',
 		'fill-color'=>$color,
 		'pointer-events'=>'visible',
 	);
 	$txt->{item}->raise($bus->{item});
+	my $txb = $self->{txb} = {pnts=>[0,0,12]};
+	$txb->{item} = new Goo::Canvas::Text(
+		$group,$self->gettxt(),@{$txb->{pnts}},'west',
+		'antialias'=>'subpixel',
+		alignment=>'left',
+		font=>'Sans 1',
+		'fill-color'=>$color,
+		'pointer-events'=>'visible',
+	);
+	$txb->{item}->raise($bus->{item});
 	$self->{pad} = [1.0,1.0];
 }
 #package Bus::View;
@@ -1025,12 +1045,13 @@ sub setcolor {
 	my ($self,$color) = @_;
 	$self->{bus}{item}->set('stroke-color'=>$color);
 	$self->{txt}{item}->set('fill-color'=>$color);
+	$self->{txb}{item}->set('fill-color'=>$color);
 }
 #package Bus::View;
 sub fini {
 	my $self = shift;
 	my $group = $self->{grp}{item};
-	foreach (qw/bus txt/) {
+	foreach (qw/bus txt txb/) {
 		if (my $itm = delete $self->{$_}) {
 			my $numb = $group->find_child($itm->{item});
 			if (defined $numb) {
@@ -1047,15 +1068,19 @@ sub gettxt { return ref(shift) }
 sub resize {
 	my $self = shift;
 	my ($hbox,$wbox) = @_;
+	my ($hmrg,$wmrg) = (0,0);
 	if ($self->isvisible) {
-		$hbox = $hbox < $self->{pad}[0] ? 0 : $hbox - $self->{pad}[0];
-		$wbox = $wbox < $self->{pad}[1] ? 0 : $wbox - $self->{pad}[1];
-		$hbox = 15.0 if $hbox < 15.0;
+		$hbox = $hbox < 2.0*$self->{pad}[0] ? 0 : $hbox - 2.0*$self->{pad}[0];
+		$wbox = $wbox < 2.0*$self->{pad}[1] ? 0 : $wbox - 2.0*$self->{pad}[1];
+		my $min = 15.0;
+		$hbox = $min if $hbox < $min;
 		$wbox = 0.8;
+		$hmrg = ($self->{txt}{pnts}[2]+$self->{txb}{pnts}[2])/2.0;
+		$wmrg = 0;
 	} else {
-		($hbox,$wbox) = (0,0);
+		($hbox,$wbox,$hmrg,$wmrg) = (0,0,0,0);
 	}
-	$self->{siz}{t} = [$hbox,$wbox];
+	$self->{siz}{t} = [$hbox,$wbox,$hmrg,$wmrg];
 	return $self->siz;
 }
 #package Bus::View;
@@ -1064,6 +1089,7 @@ sub layout { }
 sub placing {
 	my $self = shift;
 	return unless $self->{set};
+	my $color = $self->mycolor;
 	my ($x,$y) = $self->pos;
 	#Carp::carp "****** Placing $self ($x,$y) component is negative or zero" if $x <= 0 or $y <= 0;
 	if (0) {
@@ -1080,13 +1106,19 @@ sub placing {
 		$bus->{pnts}[1] = $y-$h/2.0;
 		$bus->{pnts}[2] = $x;
 		$bus->{pnts}[3] = $y+$h/2.0;
-		$bus->{item}->set(points=>Goo::Canvas::Points->new($bus->{pnts}));
+		$bus->{item}->set(points=>Goo::Canvas::Points->new($bus->{pnts}),'stroke-color'=>$color);
 		my ($X,$Y) = ($x,$y+$h/2.0+$self->{pad}[0]);
 		my $txt = $self->{txt};
 		$txt->{pnts}[0] = $X;
 		$txt->{pnts}[1] = $Y;
-		$txt->{item}->set(text=>$self->gettxt());
+		$txt->{item}->set(text=>$self->gettxt(),'fill-color'=>$color);
 		$txt->{item}->set_simple_transform($X,$Y,1.0,90.0);
+		($X,$Y) = ($x,$y-$h/2.0-$self->{pad}[0]);
+		my $txb = $self->{txb};
+		$txb->{pnts}[0] = $X;
+		$txb->{pnts}[1] = $Y;
+		$txb->{item}->set(text=>$self->gettxt(),'fill-color'=>$color);
+		$txb->{item}->set_simple_transform($X,$Y,1.0,-90.0);
 	}
 }
 #package Bus::View;
@@ -1095,6 +1127,7 @@ sub makevisible {
 	my $vis = $self->SUPER::makevisible(@_);
 	$self->{bus}{item}->set(visibility=>$vis);
 	$self->{txt}{item}->set(visibility=>$vis);
+	$self->{txb}{item}->set(visibility=>$vis);
 	return $vis;
 }
 #package Bus::View;
@@ -1136,6 +1169,9 @@ sub init {
 	my $box = $self->{box} = {pnts=>[-1,-1,2,2]};
 	$box->{item} = new Goo::Canvas::Rect(
 		$group,@{$box->{pnts}},
+		'antialias'=>'subpixel',
+		'line-join'=>'round',
+		'line-cap'=>'round',
 		'line-width'=>0.4,
 		'stroke-color'=>$color,
 		'fill-color'=>'white',
@@ -1144,6 +1180,9 @@ sub init {
 	my $lnk = $self->{lnk} = {pnts=>[0,0,5,0,10,0]};
 	$lnk->{item} = new Goo::Canvas::Polyline(
 		$group,Glib::FALSE,$lnk->{pnts},
+		'antialias'=>'subpixel',
+		'line-join'=>'round',
+		'line-cap'=>'round',
 		'line-width'=>0.2,
 		'stroke-color'=>$color,
 		'pointer-events'=>'visible',
@@ -1152,6 +1191,7 @@ sub init {
 	my $txt = $self->{txt} = {pnts=>[5,0,20,'sw',alignment=>'left']};
 	$txt->{item} = new Goo::Canvas::Text(
 		$group,$self->gettxt(),@{$txt->{pnts}},
+		'antialias'=>'subpixel',
 		font=>'Monospace 1',
 		#height=>6.0,
 		#wrap=>'word-char',
@@ -1188,15 +1228,15 @@ sub resize {
 	my $self = shift;
 	my ($hbox,$wbox) = @_;
 	if ($self->isvisible) {
-		$hbox = $hbox < $self->{pad}[0] ? 0 : $hbox - $self->{pad}[0];
-		$wbox = $wbox < $self->{pad}[1] ? 0 : $wbox - $self->{pad}[1];
+		$hbox = $hbox < 2.0*$self->{pad}[0] ? 0 : $hbox - 2.0*$self->{pad}[0];
+		$wbox = $wbox < 2.0*$self->{pad}[1] ? 0 : $wbox - 2.0*$self->{pad}[1];
 		my ($h,$w) = ($self->{box}{pnts}[2],$self->{box}{pnts}[3]+$self->{txt}{pnts}[2]);
 		$hbox = $h; # if $hbox < $h; $hbox = 2.0*$h if $hbox > 2.0*$h;
 		$wbox = $w; # if $wbox < $w; $wbox = 2.0*$w if $wbox > 2.0*$w;
 	} else {
 		($hbox,$wbox) = (0,0);
 	}
-	$self->{siz}{t} = [$hbox,$wbox];
+	$self->{siz}{t} = [$hbox,$wbox,0,0];
 	return $self->siz;
 }
 #package BoxAndLink::View;
@@ -1228,16 +1268,17 @@ sub layout {
 			$self->move_view(@pos);
 		}
 		my ($x,$y) = $nview->pos;
+		my $w = $nview->{nod}{pnts}[2]/2.0;
 		my $lnk = $self->{lnk};
 		my $txt = $self->{txt};
 		if ($x < $X) {
-			$lnk->{pnts}[2] = $x + 6.0 + 0.5;
-			$txt->{pnts}[0] = $x + 6.0 + 1.0;
+			$lnk->{pnts}[2] = $x + $w + 0.5;
+			$txt->{pnts}[0] = $x + $w + 1.0;
 			$txt->{pnts}[3] = 'sw';
 			$txt->{pnts}[5] = 'left';
 		} else {
-			$lnk->{pnts}[2] = $x - 6.0 - 0.5;
-			$txt->{pnts}[0] = $x - 6.0 - 1.0;
+			$lnk->{pnts}[2] = $x - $w - 0.5;
+			$txt->{pnts}[0] = $x - $w - 1.0;
 			$txt->{pnts}[3] = 'se';
 			$txt->{pnts}[5] = 'right';
 		}
@@ -1253,6 +1294,7 @@ sub types { return () }
 sub placing {
 	my $self = shift;
 	return unless $self->{set};
+	my $color = $self->mycolor;
 	my ($x,$y) = $self->pos;
 	#Carp::carp "****** Placing $self ($x,$y) component is negative or zero" if $x <= 0 or $y <= 0;
 	my $lnk = $self->{lnk};
@@ -1264,33 +1306,35 @@ sub placing {
 	my ($btype,$ntype) = $self->types;
 	if (my $nview = $self->parent($ntype)) {
 		my ($X,$Y) = $nview->pos;
+		my $w = $nview->{nod}{pnts}[2]/2.0;
 		if ($x > $X) {
-			$lnk->{pnts}[2] = $X + 6.0 + 0.5;
-			$txt->{pnts}[0] = $X + 6.0 + 1.0;
+			$lnk->{pnts}[2] = $X + $w + 0.5;
+			$txt->{pnts}[0] = $X + $w + 1.0;
 			$txt->{pnts}[3] = 'sw';
 			$txt->{pnts}[5] = 'left';
 		} else {
-			$lnk->{pnts}[2] = $X - 6.0 - 0.5;
-			$txt->{pnts}[0] = $X - 6.0 - 1.0;
+			$lnk->{pnts}[2] = $X - $w - 0.5;
+			$txt->{pnts}[0] = $X - $w - 1.0;
 			$txt->{pnts}[3] = 'se';
 			$txt->{pnts}[5] = 'right';
 		}
 		$lnk->{pnts}[4] = $X;
 		$lnk->{pnts}[5] = $Y;
 	}
-	$lnk->{item}->set(points=>Goo::Canvas::Points->new($lnk->{pnts}));
+	$lnk->{item}->set(points=>Goo::Canvas::Points->new($lnk->{pnts}),'stroke-color'=>$color);
 	$txt->{item}->set(
 		x=>$txt->{pnts}[0],
 		y=>$txt->{pnts}[1],
 		anchor=>$txt->{pnts}[3],
 		alignment=>$txt->{pnts}[5],
-		text=>$self->gettxt());
+		text=>$self->gettxt(),
+		'fill-color'=>$color);
 	my $box = $self->{box};
 	$x-=$box->{pnts}[3]/2.0;
 	$y-=$box->{pnts}[2]/2.0;
 	$box->{pnts}[0] = $x;
 	$box->{pnts}[1] = $y;
-	$box->{item}->set(x=>$x,y=>$y);
+	$box->{item}->set(x=>$x,y=>$y,'stroke-color'=>$color);
 }
 #package BoxAndLink::View;
 sub makevisible {
@@ -1522,40 +1566,258 @@ sub objs {
 }
 
 # ------------------------------------------
-package MibNode; our @ISA = qw(Base);
+package MibInfo; our @ISA = qw(Base);
 use strict; use warnings; use Carp;
 use Gtk2; use Glib qw/TRUE FALSE/; use Goo::Canvas;
 use Gtk2::SimpleList; use SNMP;
 # ------------------------------------------
-# This is a grouping of three widgets providing a row in a Gtk2::Table to be used for inputting and
-# displaying data.
+#package MibInfo;
+sub init {
+	my ($self,$dialog,$view,$table,$label) = @_;
+	$self->{dialog} = $dialog;
+	$self->{view} = $view;
+	$self->{table} = $table;
+	$self->{label} = $label;
+	$self->{m} = $SNMP::MIB{$label};
+}
+#package MibInfo;
+sub widthof {
+	my $text = shift;
+	return length($text)*8;
+}
+#package MibInfo;
+sub strip {
+	my ($msg) = @_;
+	if (defined $msg) {
+		$msg =~ s/^(\s|\n)*//s;
+		$msg =~ s/(\s|\n)*$//s;
+		$msg =~ s/\t/        /g;
+		$msg =~ s/\n[ ]+\n/\n\n/g;
+		while ($msg =~ /\n\n\n/) {
+			$msg =~ s/\n\n\n/\n/g;
+		}
+		my $lead = undef;
+		my $match;
+		while ($msg =~ /(\n[ ]+)[^\n]/g) {
+			$match = $1;
+			if (defined $lead) {
+				if (length($lead) > length($match)) {
+					$lead = $match;
+				}
+			} else {
+				$lead = $match;
+			}
+		}
+		if (defined $lead) {
+			$msg =~ s/$lead/\n/g;
+		}
+		$msg =~ s/^(\n|\s)*$//sg;
+		chomp $msg;
+	} else {
+		$msg = '';
+	}
+	return $msg;
+}
+#package MibInfo;
+sub reflow {
+	my ($msg,$width) = @_;
+	$width = 400 unless defined $width;
+	my @lines;
+	my @result = ();
+	$msg =~ s/\n[ ]+\n/\n\n/sg;
+	if ($msg =~ /[ ]\n[ ]*/s) {
+		$msg =~ s/[ ]\n[ ]*/ /sg;
+		@lines = split(/\n/,$msg);
+	} elsif ($msg =~ /\n\n/s) {
+		$msg =~ s/\.\n(?!\n)/. \n/sg;
+		$msg =~ s/\n(?!\n)/ \n/sg;
+		$msg =~ s/\n[ ]+\n/\n\n/sg;
+		$msg =~ s/[ ]\n[ ]*/ /sg;
+		@lines = split(/\n/,$msg);
+	} else {
+		$msg =~ s/\.\n/. \n/sg;
+		$msg =~ s/\n[ ]*/ /sg;
+		# FIXME - check for lead change
+		@lines = split(/\n/,$msg);
+	}
+	foreach (@lines) {
+		my ($indent,$lead,$measure) = ('','');
+		$indent = $1 if s/^( *)//;
+		$lead = $1 if s/^(([0-9]+\.|-|·)[ ]+)//;
+		my $rest = $width - MibInfo::widthof($indent) - MibInfo::widthof($lead);
+		while (($measure = MibInfo::widthof($_)) > $rest) {
+			my ($pos,$where,$break) = (-1,-1,-1);
+			while (($break = index($_,' ',$pos+1)) >= 0) {
+				my $portion = MibInfo::widthof(substr($_,0,$break));
+				last if $portion >= $rest;
+				$where = $break unless $break == $pos+1;
+				$pos = $break;
+			}
+			$where = $break if $where == 0;
+			$where = length($_) if $where <= 0;
+			push @result,$indent.$lead.substr($_,0,$where,'');
+			s/^[ ]*//;
+			$lead =~ s/./ /g;
+			$rest = $width - MibInfo::widthof($indent) - MibInfo::widthof($lead);
+		}
+		push @result,$indent.$lead.$_;
+	}
+	@result = grep(!/^\s*$/,@result) if @result > 60; # turf blank lines
+	$msg = join("\n",@result);
+	return $msg;
+}
+#package MibInfo;
+sub rehang {
+	my ($msg,$width,$hang) = @_;
+	$width = 400 unless defined $width;
+	$hang = '        ' unless defined $hang;
+	$msg =~ s/\n[ ]+\n/\n\n/sg;
+	$msg =~ s/[ ]\n[ ]*/ /sg;
+	my @result = ();
+	my @lines = split(/\n/,$msg);
+	foreach (@lines) {
+		my ($indent,$lead) = ('','');
+		$indent = $1 if s/^( *)//;
+		my $rest = $width - MibInfo::widthof($indent) - MibInfo::widthof($lead);
+		while ((my $measure = MibInfo::widthof($_)) > $rest) {
+			my ($pos,$where,$break) = (-1,-1,-1);
+			while (($break = index($_,' ',$pos + 1)) >= 0) {
+				my $portion = MibInfo::widthof(substr($_,0,$break));
+				last if $portion >= $rest;
+				$where = $break unless $break == $pos + 1;
+				$pos = $break;
+			}
+			$where = $break if $where == 0;
+			$where = length($_) if $where <= 0;
+			push @result,$indent.$lead.substr($_,0,$where,'');
+			s/^[ ]*//;
+			$lead = $hang;
+			$rest = $width - MibInfo::widthof($indent) - MibInfo::widthof($lead);
+		}
+		push @result,$indent.$lead.$_;
+	}
+	$msg = join("\n",@result);
+	return $msg;
+}
+#package MibInfo;
+sub description {
+	my ($self,$width) = @_;
+	my $m = $self->{m};
+	my $msg = MibInfo::strip($m->{description});
+	$msg = MibInfo::reflow($msg,$width) if defined $width;
+	$msg = "$m->{moduleID}::$m->{label}($m->{subID}): $m->{objectID}\n\n".$msg;
+	return $msg;
+}
+#package MibInfo;
+sub TCDescription {
+	my ($self,$width) = @_;
+	my $msg = MibInfo::strip($self->{m}{TCDescription});
+	$msg = MibInfo::reflow($msg,$width) if defined $width;
+	return $msg;
+}
+#package MibInfo;
+sub reference {
+	my ($self,$width) = @_;
+	my $msg = MibInfo::strip($self->{m}{reference});
+	$msg = MibInfo::rehang($msg,$width) if defined $width;
+	return $msg;
+}
+
+# ------------------------------------------
+package MibLabel; our @ISA = qw(MibInfo);
+use strict; use warnings; use Carp;
+use Gtk2; use Glib qw/TRUE FALSE/; use Goo::Canvas;
+use Gtk2::SimpleList; use SNMP;
+# ------------------------------------------
+#package MibLabel;
+our %prefixes = (
+	system=>'sys',
+	ipAddr=>'ipAdEnt',
+	ifX=>'if',
+	lldpLocalSystemData=>'lldpLoc',
+	lldpConfiguration=>'lldp',
+	lldpXMedLocalData=>'lldpXMedLoc',
+	lldpStatistics=>'lldpStats',
+);
+#package MibLabel;
+sub init {
+	my ($self,$dialog,$view,$table,$label) = @_;
+	my $prefix = $table;
+	$prefix =~ s/Data$//;
+	$prefix =~ s/Scalars$//;
+	$prefix =~ s/Table$//;
+	$prefix =~ s/Entry$//;
+	$prefix = $prefixes{$prefix} if exists $prefixes{$prefix};
+	my $short = $label; $short =~ s/^$prefix//;
+	my $f = $self->{f} = new Gtk2::Frame;
+	my $l = $self->{l} = new Gtk2::Label($short);
+	$l->set_alignment(1.0,0.5);
+	$f->set_shadow_type('etched-out');
+	$f->add($l);
+	return $self;
+}
+#package MibLabel;
+sub add_tooltip {
+	my ($self,$tips) = @_;
+	my $tip = $self->description(450);
+	$tips->set_tip($self->{l},$tip) if $tip;
+}
+#package MibLabel;
+sub add_to_table {
+	my ($self,$table,$row,$col) = @_;
+	$table->attach($self->{f},$col,$col+1,$row,$row+1,'fill','fill',0,0);
+}
+
+# ------------------------------------------
+package MibUnits; our @ISA = qw(MibInfo);
+use strict; use warnings; use Carp;
+use Gtk2; use Glib qw/TRUE FALSE/; use Goo::Canvas;
+use Gtk2::SimpleList; use SNMP;
+# ------------------------------------------
+#package MibUnits;
+sub init {
+	my ($self,$dialog,$view,$table,$label) = @_;
+	my $m = $self->{m};
+	my $units = '';
+	$units = $m->{type} if $m->{type};
+	$units = $m->{textualConvention} if $m->{textualConvention};
+	$units = $m->{units} if $m->{units};
+	my $f = $self->{f} = new Gtk2::Frame;
+	my $u = $self->{u} = new Gtk2::Label($units);
+	$u->set_alignment(0.0,0.5);
+	$f->set_shadow_type('etched-out');
+	$f->add($u);
+	return $self;
+}
+#package MibUnits;
+sub add_tooltip {
+	my ($self,$tips) = @_;
+	my $tip = $self->TCDescription(450);
+	$tips->set_tip($self->{u},$tip) if $tip;
+}
+#package MibUnits;
+sub add_to_table {
+	my ($self,$table,$row,$col) = @_;
+	$table->attach($self->{f},$col,$col+1,$row,$row+1,'fill','fill',0,0);
+}
+
+# ------------------------------------------
+package MibNode; our @ISA = qw(MibInfo);
+use strict; use warnings; use Carp;
+use Gtk2; use Glib qw/TRUE FALSE/; use Goo::Canvas;
+use Gtk2::SimpleList; use SNMP;
 # ------------------------------------------
 #package MibNode;
-sub new {
-	my ($type,$dialog,$table,$label) = @_;
-	my $self = {};
-	bless $self,$type;
-	my $data = $dialog->{data}{data}{$table};
-	$self->{dialog} = $dialog;
-	$self->{data} = $data;
-	my $prefix = $table;
-	$prefix =~ s/Table$//;
-	my $short = $label;
-	$short =~ s/^$prefix//;
-	my $m = $SNMP::MIB{$label};
-	$data->{label} = undef unless exists $data->{label};
-	my $val = $self->{val} = \$data->{$label};
-	my ($lf,$l,$ef,$e,$uf,$u);
-	$lf = $self->{lf} = new Gtk2::Frame;
-	$l = $self->{l} = new Gtk2::Label($short);
-	$l->set_alignment(1.0,0.5);
-	$lf->set_shadow_type('etched-out');
-	$lf->add($l);
+sub init {
+	my ($self,$dialog,$view,$table,$label,$val) = @_;
+	my $m = $self->{m};
+	$self->{val} = $val;
+	my ($f,$e);
 	if ((defined $m->{syntax} and $m->{syntax} eq 'TruthValue') or (defined $m->{type} and $m->{type} eq 'BOOLEAN')) {
 		$$val = 0 unless defined $$val;
 		$e = $self->{e} = new Gtk2::ToggleButton();
-		$e->set_active($$val == 1 or $$val eq 'true' ? TRUE : FALSE);
-		$ef = $self->{ef} = $e;
+		$e->set_active(($$val eq 'true(1)' or $$val eq '1') ? TRUE : FALSE);
+		$f = $self->{f} = $e;
 		if ($m->{syntax} eq 'TruthValue') {
 			bless $self,'MibNode::Truth';
 		} else {
@@ -1568,18 +1830,19 @@ sub new {
 		foreach my $tag (sort {$m->{enums}{$a}<=>$m->{enums}{$b}} keys %{$m->{enums}}) {
 			push @rows, [ $tag, $m->{enums}{$tag} ];
 		}
-		$ef = $self->{ef} = new Gtk2::Frame;
+		$f = $self->{f} = new Gtk2::Frame;
 		$e = $self->{e} = new Gtk2::SimpleList(tag=>'text',value=>'int');
 		$e->set_headers_visible(FALSE);
-		$e->set_grid_lines(FALSE);
-		$e->get_selection->set_model('multiple');
+		$e->set_grid_lines('horizontal');
+		@{$e->{data}} = @rows;
+		$e->get_selection->set_mode('multiple');
 		my @sels = ();
 		my @bits = ();
 		foreach (values %{$m->{enums}}) { $bits[$_] = '0'; }
 		@bits = map {'0'} @bits;
 		my $bits = join('',@bits);
 
-		my $use = MibNode::List->snmpval($m,$val);
+		my $use = MibNode::List->snmpval($m,$$val);
 		$bits = unpack('B*',$use).$bits;
 
 		my $i = 0;
@@ -1590,57 +1853,43 @@ sub new {
 			$i++;
 		}
 		$e->select(@sels);
-		$ef->set_shadow_type('in');
-		$ef->add($e);
+		$f->set_shadow_type('in');
+		$f->add($e);
 		bless $self,'MibNode::List';
 	}
 	elsif (defined $m->{enums} and $m->{enums} and scalar keys %{$m->{enums}} > 0) {
-		$$val = 0 unless defined $$val;
+		my $use = MibNode::Combo->snmpval($m,$$val);
 		$e = $self->{e} = Gtk2::ComboBox->new_text;
 		$e->set_title($label);
 		my $i = 0;
 		foreach my $tag (sort {$m->{enums}{$a}<=>$m->{enums}{$b}} keys %{$m->{enums}}) {
-			$e->append_text($tag);
-			$e->set_active($i) if $$val eq $tag or ($$val =~ /^d+$/ and $$val == $m->{enums}{$tag});
+			$e->append_text("$tag($m->{enums}{$tag})");
+			$e->set_active($i) if $use eq $tag or ($use =~ /^\d+$/ and $use == $m->{enums}{$tag});
 			$i++;
 		}
-#		$e->set_active_text($$val) if $m->{type} eq 'OCTETSTR';
 		if (defined $m->{access} and $m->{access} =~ /Write|Create/) {
 			$e->set('button-sensitivity'=>'on');
 		} else {
 			$e->set('button-sensitivity'=>'off');
 		}
-		$ef = $self->{ef} = $e;
+		$f = $self->{f} = $e;
 		bless $self,'MibNode::Combo';
 	}
 	else {
 		$$val = '' unless defined $$val;
-		my $b = Gtk2::EntryBuffer->new($$val);
+		my $b = $self->{b} = Gtk2::EntryBuffer->new($$val);
 		$e = $self->{e} = Gtk2::Entry->new_with_buffer($b);
 		$e->set_editable((defined $m->{access} and $m->{access} =~ /Write|Create/) ? TRUE : FALSE);
 		$e->set(visibility=>FALSE) if defined $m->{type} and $m->{type} eq 'PASSWORD';
-		$ef = $self->{ef} = $e;
+		$f = $self->{f} = $e;
 		bless $self,'MibNode::Entry';
 	}
-	my $units = '';
-	$units = $m->{type} if $m->{type};
-	$units = $m->{syntax} if $m->{syntax};
-	$units = $m->{textualConvention} if $m->{textualConvention};
-	$units = $m->{units} if $m->{units};
-	my $uf = new Gtk2::Frame;
-	my $u = new Gtk2::Label($units);
-	$u->set_alignment(0.0,0.5);
-	$uf->set_shadow_type('etched-out');
-	$uf->add($u);
 	return $self;
 }
 #package MibNode;
 sub add_to_table {
-	my ($self,$table,$entryno) = @_;
-	$table->attach($self->{lf},0,1,$entryno,$entryno+1,'fill','fill',0,0);
-	$table->attach($self->{ef},1,2,$entryno,$entryno+1,'fill','fill',0,0);
-	$table->attach($self->{uf},2,3,$entryno,$entryno+1,'fill','fill',0,0);
-	return $self;
+	my ($self,$table,$row,$col) = @_;
+	$table->attach($self->{f},$col,$col+1,$row,$row+1,'fill','fill',0,0);
 }
 #package MibNode;
 sub revert {
@@ -1843,6 +2092,11 @@ sub snmpval {
 		} elsif ($val =~ /^\d+$/) {
 			my %vals = map {$m->{enums}{$_}=>$_} keys %{$m->{enums}};
 			$val = $vals{$val} if exists $vals{$val};
+		} elsif ($val =~ /^(\w+)\((\d+)\)$/) {
+			my ($tag,$num) = ($1,$2);
+			my %vals = map {$m->{enums}{$_}=>$_} keys %{$m->{enums}};
+			$val = $vals{$num} if exists $vals{$num};
+			$val = $tag if exists $m->{enums}{$tag};
 		}
 	} elsif ($m->{type} eq 'INTEGER') {
 		if (not defined $val) {
@@ -1850,6 +2104,9 @@ sub snmpval {
 				exists $m->{defaultValue} and
 				defined $m->{defaultValue};
 			$val = 0;
+		} elsif ($val =~ /^(\w+)\((\d+)\)$/) {
+			my ($tag,$num) = ($1,$2);
+			$val = $num;
 		} elsif ($val !~ /^\d+$/) {
 			$val = $m->{enums}{$val} if exists $m->{enums}{$val};
 		}
@@ -1925,60 +2182,69 @@ sub new {
 	my $self = new Gtk2::Window('toplevel');
 	bless $self,$type;
 	my $data = $view->{data}{data}{$table};
-	my @rows = $self->getrows($table,$data);
+	my @rows = $self->getrows($table);
+	my @cols = $self->getcols($table,$data);
 	$self->{view} = $view;
 	$self->{table} = $table;
 	$self->{data} = $data;
 	$self->{rows} = \@rows;
-	return undef unless scalar(@rows);
 	my $fr = new Gtk2::Frame($table);
-	my $v = new Gtk2::VBox(FALSE,0);
-	my $sw = new Gtk2::ScrolledWindow;
-	$sw->set_policy('never','automatic');
-	$sw->add_with_viewport($v);
-	$fr->add($sw);
-	my $h = new Gtk2::HBox;
-	$v->pack_start($h,TRUE,TRUE,0);
-	my $t = new Gtk2::Table(scalar(@rows),3,FALSE);
+	my $t = new Gtk2::Table(scalar(@rows),scalar(@cols)+2,FALSE);
 	$t->set_col_spacings(0);
 	$t->set_row_spacings(0);
-	$h->pack_start($t,TRUE,TRUE,0);
+	my $sw = new Gtk2::ScrolledWindow;
+	$sw->set_policy((scalar(@cols)>2 ? 'automatic' : 'never'),'automatic');
+	$sw->add_with_viewport($t);
+	$fr->add($sw);
+	my $tt = $self->{tooltips} = new Gtk2::Tooltips;
 	my $i = 0;
 	foreach my $row (@rows) {
-		my $ent = $self->{entries}{$row} = MibNode->new($self,$table,$row);
-		$ent->add_to_table($t,$i);
+		my $j = 0;
+		my $lab = $self->{labels}{$row} = MibLabel->new($self,$view,$table,$row);
+		$lab->add_to_table($t,$i,$j); $j++;
+		$lab->add_tooltip($tt);
+		foreach my $col (@cols) {
+			$col->{$row} = undef unless exists $col->{$row};
+			my $val = \$col->{$row};
+			my $ent = $self->{entries}{$row}{$j} = MibNode->new($self,$view,$table,$row,$val);
+			$ent->add_to_table($t,$i,$j); $j++;
+		}
+		my $uni = $self->{units}{$row} = MibUnits->new($self,$view,$table,$row);
+		$uni->add_to_table($t,$i,$j); $j++;
+		$uni->add_tooltip($tt);
 		$i++;
 	}
+	$tt->enable;
 	my $bb = new Gtk2::HButtonBox;
 	$bb->set_layout('end');
 	$bb->set_spacing(10);
 	my $b;
 	$b = Gtk2::Button->new_from_stock('gtk-refresh');
-	$b->signal_connect('clicked'=>sub{ Carp::carp join(',',@_); my ($b,$self) = @_; return $self->refresh_view; },$self);
+	$b->signal_connect('clicked'=>sub{ my ($b,$self) = @_; return $self->refresh_view; },$self);
 	$bb->add($b);
 	$b = Gtk2::Button->new_from_stock('gtk-revert-to-saved');
-	$b->signal_connect('clicked'=>sub{ Carp::carp join(',',@_); my ($b,$self) = @_; return $self->revert; },$self);
+	$b->signal_connect('clicked'=>sub{ my ($b,$self) = @_; return $self->revert; },$self);
 	$bb->add($b);
 	$b = Gtk2::Button->new_from_stock('gtk-apply');
-	$b->signal_connect('clicked'=>sub{ Carp::carp join(',',@_); my ($b,$self) = @_; return $self->store; },$self);
+	$b->signal_connect('clicked'=>sub{ my ($b,$self) = @_; return $self->store; },$self);
 	$bb->add($b);
 	$b = Gtk2::Button->new_from_stock('gtk-close');
-	$b->signal_connect('clicked'=>sub{ Carp::carp join(',',@_); my ($b,$self) = @_; return $self->hide; },$self);
+	$b->signal_connect('clicked'=>sub{ my ($b,$self) = @_; return $self->hide; },$self);
 	$bb->add($b);
 #	$b = Gtk2::Button->new_from_stock('gtk-connect');
-#	$b->signal_connect('clicked'=>sub{ Carp::carp join(',',@_); my ($b,$self) = @_; return $self->connectButton; },$self);
+#	$b->signal_connect('clicked'=>sub{ my ($b,$self) = @_; return $self->connectButton; },$self);
 #	$bb->add($b);
 #	$b = Gtk2::Button->new_from_stock('gtk-cancel');
-#	$b->signal_connect('clicked'=>sub{ Carp::carp join(',',@_); my ($b,$self) = @_; return $self->cancelButton; },$self);
+#	$b->signal_connect('clicked'=>sub{ my ($b,$self) = @_; return $self->cancelButton; },$self);
 #	$bb->add($b);
 #	$b = Gtk2::Button->new_from_stock('gtk-ok');
-#	$b->signal_connect('clicked'=>sub{ Carp::carp join(',',@_); my ($b,$self) = @_; return $self->okButton; },$self);
+#	$b->signal_connect('clicked'=>sub{ my ($b,$self) = @_; return $self->okButton; },$self);
 #	$bb->add($b);
 	my $vb = new Gtk2::VBox;
 	$vb->set_spacing(0);
 	$fr->set_border_width(5);
 	$vb->pack_start($fr,TRUE,TRUE,0);
-	$bb->set_bort_width(5);
+	$bb->set_border_width(5);
 	$vb->pack_start($bb,FALSE,FALSE,0);
 	$self->set_type_hint('normal');
 	$self->set_default_size(-1,600);
@@ -1994,21 +2260,41 @@ sub new {
 	return $self;
 }
 #package MibEntry;
-sub getrows {
-	my ($self,$table,$data) = @_;
-	my $label = $table;
-	$label =~ s/Scalars$//;
-	$label =~ s/Table$/Entry/;
-	my $mib = $SNMP::MIB{$label};
-	my @ents = @{$mib->{indexes}};
-	my %inds = map {$_=>1} @ents;
-	foreach my $row (@{$mib->{children}}) {
-		my $name = $row->{label};
-		push @ents, $name unless $inds{$name};
+sub lexical_oids {
+	my (@indexes) = @_;
+	my %tuples = ();
+	foreach my $index (@indexes) {
+		$tuples{$index} = pack('S*',split(/\./,$index));
 	}
-	my @rows = ();
-	foreach my $row (@ents) {
-		push @rows, $row if exists $data->{$row};
+	my @sort = sort {$tuples{$a} cmp $tuples{$b}} keys %tuples;
+	return @sort;
+}
+#package MibEntry;
+sub getcols {
+	my ($self,$table,$data) = @_;
+	my @cols = ();
+	if ($table =~ /Table$/) {
+		@cols = map {$data->{$_}} lexical_oids(keys %$data);
+	} else {
+		@cols = ( $data );
+	}
+	return @cols;
+}
+#package MibEntry;
+sub getrows {
+	my ($self,$table) = @_;
+	my $label = $table;
+	if ($label =~ s/Data$//) { }
+	elsif ($label =~ s/Scalars$//) { }
+	elsif ($label =~ s/Table$/Entry/) { }
+	my $mib = $SNMP::MIB{$label};
+	my @rows = @{$mib->{indexes}};
+	my %inds = map {$_=>1} @rows;
+	foreach my $row (sort {$a->{subID}<=>$b->{subID}} @{$mib->{children}}) {
+		my $name = $row->{label};
+		next if $inds{$name};
+		next unless $row->{access} and $row->{access} =~ /Read|Write|Create/;
+		push @rows, $name;
 	}
 	return @rows;
 }
@@ -2101,7 +2387,8 @@ sub fillmenu {
 	my ($self,$menu) = @_;
 	my $gotone = 0;
 	if (my $data = $self->{data}{data}) {
-		foreach my $table (@{$Model::SNMP::tables}) {
+		foreach my $table (Model::SNMP::lexical_sort(keys %$data)) {
+			next if $table eq 'extra';
 			if ($data->{$table} and scalar values %{$data->{$table}}) {
 				my $mi = Gtk2::MenuItem->new_with_label("$table...");
 				$mi->signal_connect('activate'=>sub{
@@ -2139,6 +2426,9 @@ sub init {
 	my $tbox = $self->{tbox} = {pnts=>[0,0,0,0,0,0,0,0]};
 	$tbox->{item} = new Goo::Canvas::Polyline(
 		$group,Glib::TRUE,$tbox->{pnts},
+		'antialias'=>'subpixel',
+		'line-join'=>'round',
+		'line-cap'=>'round',
 		'line-width'=>0.1,
 		'stroke-color'=>$color,
 		'pointer-events'=>'visible',
@@ -2147,6 +2437,9 @@ sub init {
 	my $lbox = $self->{lbox} = {pnts=>[0,0,0,0,0,0,0,0]};
 	$lbox->{item} = new Goo::Canvas::Polyline(
 		$group,Glib::TRUE,$lbox->{pnts},
+		'antialias'=>'subpixel',
+		'line-join'=>'round',
+		'line-cap'=>'round',
 		'line-width'=>0.1,
 		'stroke-color'=>$color,
 		'pointer-events'=>'visible',
@@ -2155,6 +2448,9 @@ sub init {
 	my $cbox = $self->{cbox} = {pnts=>[0,0,0,0,0,0,0,0]};
 	$cbox->{item} = new Goo::Canvas::Polyline(
 		$group,Glib::TRUE,$cbox->{pnts},
+		'antialias'=>'subpixel',
+		'line-join'=>'round',
+		'line-cap'=>'round',
 		'line-width'=>0.1,
 		'stroke-color'=>$color,
 		'pointer-events'=>'visible',
@@ -2163,6 +2459,9 @@ sub init {
 	my $rbox = $self->{rbox} = {pnts=>[0,0,0,0,0,0,0,0]};
 	$rbox->{item} = new Goo::Canvas::Polyline(
 		$group,Glib::TRUE,$rbox->{pnts},
+		'antialias'=>'subpixel',
+		'line-join'=>'round',
+		'line-cap'=>'round',
 		'line-width'=>0.1,
 		'stroke-color'=>$color,
 		'pointer-events'=>'visible',
@@ -2210,34 +2509,35 @@ sub showing { shift->makevisible() }
 sub placing {
 	my $self = shift;
 	#return unless $self->{set};
+	my $color = $self->mycolor;
 	my ($x,$y) = $self->pos;
 	my $siz = $self->{siz};
 	my ($th,$tw) = map {$_/2.0} @{$siz->{t}};
 	my ($tx,$ty) = ($x,$y);
 	my $tbox = $self->{tbox};
 	$tbox->{pnts} = [$tx-$tw,$ty-$th,$tx+$tw,$ty-$th,$tx+$tw,$ty+$th,$tx-$tw,$ty+$th];
-	$tbox->{item}->set(points=>Goo::Canvas::Points->new($tbox->{pnts}));
+	$tbox->{item}->set(points=>Goo::Canvas::Points->new($tbox->{pnts}),'stroke-color'=>$color);
 	my ($ch,$cw) = (0,0);
 	if ($siz->{c}{total}) {
 		($ch,$cw) = map {$_/2.0} @{$siz->{c}{total}};
 		my ($cx,$cy) = ($x,$y);
 		my $cbox = $self->{cbox};
 		$cbox->{pnts} = [$cx-$cw,$cy-$ch,$cx+$cw,$cy-$ch,$cx+$cw,$cy+$ch,$cx-$cw,$cy+$ch];
-		$cbox->{item}->set(points=>Goo::Canvas::Points->new($cbox->{pnts}));
+		$cbox->{item}->set(points=>Goo::Canvas::Points->new($cbox->{pnts}),'stroke-color'=>$color);
 	}
 	if ($siz->{l}{total}) {
 		my ($lh,$lw) = map {$_/2.0} @{$siz->{l}{total}};
 		my ($lx,$ly) = ($x-$cw-$lw,$y);
 		my $lbox = $self->{lbox};
 		$lbox->{pnts} = [$lx-$lw,$ly-$lh,$lx+$lw,$ly-$lh,$lx+$lw,$ly+$lh,$lx-$lw,$ly+$lh];
-		$lbox->{item}->set(points=>Goo::Canvas::Points->new($lbox->{pnts}));
+		$lbox->{item}->set(points=>Goo::Canvas::Points->new($lbox->{pnts}),'stroke-color'=>$color);
 	}
 	if ($siz->{r}{total}) {
 		my ($rh,$rw) = map {$_/2.0} @{$siz->{r}{total}};
 		my ($rx,$ry) = ($x+$cw+$rw,$y);
 		my $rbox = $self->{rbox};
 		$rbox->{pnts} = [$rx-$rw,$ry-$rh,$rx+$rw,$ry-$rh,$rx+$rw,$ry+$rh,$rx-$rw,$ry+$rh];
-		$rbox->{item}->set(points=>Goo::Canvas::Points->new($rbox->{pnts}));
+		$rbox->{item}->set(points=>Goo::Canvas::Points->new($rbox->{pnts}),'stroke-color'=>$color);
 	}
 }
 #package ThreeColumn::View;
@@ -2252,6 +2552,7 @@ use Data::Dumper;
 sub fini {
 	my $self = shift;
 	my $group = $self->{grp}{item};
+	$self->{pad} = [1.0,1.0];
 	foreach (qw/tbox lbox cbox rbox/) {
 		if (my $itm = delete $self->{$_}) {
 			my $numb = $group->find_child($itm->{item});
@@ -2264,104 +2565,125 @@ sub fini {
 	}
 }
 #package Subnetwork::View;
-sub resize {
+sub getsize {
 	my $self = shift;
-	my ($hbox,$wbox) = @_;
-	$hbox = $hbox < $self->{pad}[0] ? 0 : $hbox - $self->{pad}[0];
-	$wbox = $wbox < $self->{pad}[1] ? 0 : $wbox - $self->{pad}[1];
-	my $geom = $self->getgeom;
-	my %size = ();
-	my $tsiz = $size{t} = [0,0];
-	$size{l}{total} = [0,0];
-	$size{c}{total} = [0,0];
-	$size{r}{total} = [0,0];
-	my $smax = 0;
+	my ($hbox,$wbox,$geom) = @_;
 	foreach my $side (keys %$geom) {
-		my $ssiz = $size{$side}{total} = [0,0];
+		foreach my $kind (keys %{$geom->{$side}}) {
+			foreach my $view (@{$geom->{$side}{$kind}}) {
+				my $hsiz = $side eq 'c' ? 0 : $hbox;
+				$view->{want} = [$hsiz,$wbox];
+			}
+		}
+	}
+}
+#package Subnetwork::View;
+sub sizecalc {
+	my $self = shift;
+	my ($geom,$size) = @_;
+	my $tsiz = $size->{t} = [0,0,0,0];
+	$size->{l}{total} = [0,0,0,0];
+	$size->{c}{total} = [0,0,0,0];
+	$size->{r}{total} = [0,0,0,0];
+	my ($smax,$mmax) = (0,0);
+	foreach my $side (keys %$geom) {
+		my $ssiz = $size->{$side}{total} = [0,0,0,0];
 		if ($side eq 'c') {
 			foreach my $kind (keys %{$geom->{$side}}) {
-				my $ksiz = $size{$side}{$kind} = [0,0];
+				my $ksiz = $size->{$side}{$kind} = [0,0,0,0];
 				foreach my $view (@{$geom->{$side}{$kind}}) {
-					my ($h,$w) = $view->resize(0,$wbox);
-					$ksiz->[1] += $w;
+					my ($hbox,$wbox) = @{$view->{want}};
+					my ($h,$w,$mh,$mw) = $view->resize($hbox,$wbox);
 					$ksiz->[0] = $h if $h > $ksiz->[0];
+					$ksiz->[1] += $w;
+					$ksiz->[2] = $mh if $mh > $ksiz->[2] and $h;
+					$ksiz->[3] += $mw if $w;
 				}
-				$ssiz->[1] = $ksiz->[1] if $ksiz->[1] > $ssiz->[1];
 				$ssiz->[0] = $ksiz->[0] if $ksiz->[0] > $ssiz->[0];
+				$ssiz->[1] = $ksiz->[1] if $ksiz->[1] > $ssiz->[1];
+				$ssiz->[2] = $ksiz->[2] if $ksiz->[2] > $ssiz->[2] and $ksiz->[0];
+				$ssiz->[3] = $ksiz->[3] if $ksiz->[3] > $ssiz->[3] and $ksiz->[1];
 			}
 			$tsiz->[1] += $ssiz->[1];
+			$tsiz->[3] += $ssiz->[3] if $ssiz->[1];
 		} else {
 			foreach my $kind (keys %{$geom->{$side}}) {
-				my $ksiz = $size{$side}{$kind} = [0,0];
+				my $ksiz = $size->{$side}{$kind} = [0,0,0,0];
 				foreach my $view (@{$geom->{$side}{$kind}}) {
-					my ($h,$w) = $view->resize($hbox,$wbox);
+					my ($hbox,$wbox) = @{$view->{want}};
+					my ($h,$w,$mh,$mw) = $view->resize($hbox,$wbox);
 					$ksiz->[0] += $h;
 					$ksiz->[1] = $w if $w > $ksiz->[1];
+					$ksiz->[2] += $mh if $h;
+					$ksiz->[3] = $mw if $mw > $ksiz->[3] and $w;
 				}
 				$ssiz->[0] += $ksiz->[0];
 				$ssiz->[1] = $ksiz->[1] if $ksiz->[1] > $ssiz->[1];
+				$ssiz->[2] += $ksiz->[2] if $ksiz->[0];
+				$ssiz->[3] = $ksiz->[3] if $ksiz->[3] > $ssiz->[3] and $ksiz->[1];
 			}
 			$smax = $ssiz->[1] if $ssiz->[1] > $smax;
+			$mmax = $ssiz->[3] if $ssiz->[3] > $mmax and $ssiz->[1];
 		}
 		$tsiz->[0] = $ssiz->[0] if $ssiz->[0] > $tsiz->[0];
+		$tsiz->[2] = $ssiz->[2] if $ssiz->[2] > $tsiz->[2] and $ssiz->[0];
 	}
-	$size{l}{total}[1] = $smax;
-	$size{r}{total}[1] = $smax;
+	$size->{l}{total}[1] = $size->{r}{total}[1] = $smax;
+	$size->{l}{total}[3] = $size->{r}{total}[3] = $mmax if $smax;
 	$tsiz->[1] += $smax + $smax;
-	if ($tsiz->[0] > $hbox or $tsiz->[1] > $wbox) {
-		my ($hall,$wall) = @$tsiz;
-		my $hfac = $hbox/$hall;
-		$tsiz = $size{t} = [0,0];
-		$size{l}{total} = [0,0];
-		$size{c}{total} = [0,0];
-		$size{r}{total} = [0,0];
-		$smax = 0;
-		foreach my $side (keys %$geom) {
-			my $wfac = $size{$side}{total}[1]/$wall;
-			my $ssiz = $size{$side}{total} = [0,0];
-			if ($side eq 'c') {
-				foreach my $kind (keys %{$geom->{$side}}) {
-					if (my $count = scalar(@{$geom->{$side}{$kind}})) {
-						my $ksiz = $size{$side}{$kind} = [0,0];
-						my $wsiz = $wbox*$wfac/$count;
-						foreach my $view (@{$geom->{$side}{$kind}}) {
-							my ($h,$w) = $view->resize(0,$wsiz);
-							$ksiz->[1] += $w;
-							$ksiz->[0] = $h if $h > $ksiz->[0];
-						}
-						$ssiz->[1] = $ksiz->[1] if $ksiz->[1] > $ssiz->[1];
-						$ssiz->[0] = $ksiz->[0] if $ksiz->[0] > $ssiz->[0];
-					}
+	$tsiz->[3] += $mmax + $mmax if $smax;
+}
+#package Subnetwork::View;
+sub shrink {
+	my $self = shift;
+	my ($hbox,$wbox,$geom,$size) = @_;
+	my ($hall,$wall) = @{$size->{t}};
+	my ($hfac,$wfac) = ($hbox/$hall,$wbox/$wall);
+	foreach my $side (keys %$geom) {
+		if ($side eq 'c') {
+			my $hsiz = $hbox;
+			foreach my $kind (keys %{$geom->{$side}}) {
+				foreach my $view (@{$geom->{$side}{$kind}}) {
+					my ($h,$w) = $view->siz;
+					my $wsiz = $w*$wfac;
+					$view->{want} = [$hsiz,$wsiz];
 				}
-				$tsiz->[1] += $ssiz->[1];
-			} else {
-				foreach my $kind (keys %{$geom->{$side}}) {
-					my $ksiz = $size{$side}{$kind} = [0,0];
-					foreach my $view (@{$geom->{$side}{$kind}}) {
-						my ($h,$w) = $view->siz;
-						($h,$w) = $view->resize($h*$hfac,$wbox*$wfac);
-						$ksiz->[0] += $h;
-						$ksiz->[1] = $w if $w > $ksiz->[1];
-					}
-					$ssiz->[0] += $ksiz->[0];
-					$ssiz->[1] = $ksiz->[1] if $ksiz->[1] > $ssiz->[1];
-				}
-				$smax = $ssiz->[1] if $ssiz->[1] > $smax;
 			}
-			$tsiz->[0] = $ssiz->[0] if $ssiz->[0] > $tsiz->[0];
+		} else {
+			my $wsiz = ($size->{$side}{total}[1]+2.0*$size->{$side}{total}[3])*$wfac;
+			foreach my $kind (keys %{$geom->{$side}}) {
+				foreach my $view (@{$geom->{$side}{$kind}}) {
+					my ($h,$w) = $view->siz;
+					my $hsiz = $h*$hfac;
+					$view->{want} = [$hsiz,$wsiz];
+				}
+			}
 		}
-		$size{l}{total}[1] = $smax;
-		$size{r}{total}[1] = $smax;
-		$tsiz->[1] += $smax + $smax;
 	}
+}
+#package Subnetwork::View;
+sub resize {
+	my $self = shift;
+	my ($hbox,$wbox) = @_;
+	$hbox = $hbox < 2.0*$self->{pad}[0] ? 0 : $hbox - 2.0*$self->{pad}[0];
+	$wbox = $wbox < 2.0*$self->{pad}[1] ? 0 : $wbox - 2.0*$self->{pad}[1];
+	my $geom = $self->{geo} = $self->getgeom;
+	my $size = $self->{siz} = {};
+	$self->getsize($hbox,$wbox,$geom);
+	$self->sizecalc($geom,$size);
+	$self->rebalance($hbox,$wbox,$geom,$size);
+	$self->sizecalc($geom,$size);
+	if ($size->{t}[0]+$size->{t}[2]*2.0 > $hbox or $size->{t}[1]+$size->{t}[3]*2.0 > $wbox) {
+		$self->shrink($hbox,$wbox,$geom,$size);
+		$self->sizecalc($geom,$size);
+	}
+	my $hsiz = $size->{t}[0];
 	foreach my $kind (keys %{$geom->{c}}) {
 		foreach my $view (@{$geom->{c}{$kind}}) {
-			my ($h,$w) = $view->siz;
-			$view->resize($tsiz->[0],$w);
+			my ($h,$wsiz) = $view->siz;
+			$view->resize($hsiz,$wsiz);
 		}
 	}
-	$self->{siz} = \%size;
-	$self->{geo} = $geom;
 	return $self->siz;
 }
 #package Subnetwork::View;
@@ -2376,34 +2698,34 @@ sub layout {
 		if ($side eq 'c') {
 			my $yofs = 0;
 			foreach my $type (keys %{$geom->{$side}}) {
-				my ($H,$W) = @{$size->{$side}{$type}};
+				my ($H,$W,$MH,$MW) = @{$size->{$side}{$type}};
 				my $x0 = -$W/2.0;
 				my $x = $x0;
 				foreach my $view (@{$geom->{$side}{$type}}) {
-					my ($h,$w) = $view->siz;
-					my $xofs = $x + $w/2.0;
+					my ($h,$w,$mh,$mw) = $view->siz;
+					my $xofs = $x + $w/2.0 + $mw;
 					my @pos = ($X+$xofs,$Y+$yofs,$xofs,$yofs);
 					#warn "****** Placing $view at (",join(',',@pos),")";
 					$view->move_view(@pos);
 					$view->layout();
-					$x += $w;
+					$x += $w + 2.0*$mw;
 				}
 			}
 		} else {
-			my ($H,$W) = @{$size->{$side}{total}};
+			my ($H,$W,$MH,$MW) = @{$size->{$side}{total}};
 			my $y = -$H/2.0;
-			my $x = $size->{c}{total}[1]/2.0;
+			my $x = $size->{c}{total}[1]/2.0+$size->{c}{total}[3];
 			foreach my $type (keys %{$geom->{$side}}) {
 				foreach my $view (@{$geom->{$side}{$type}}) {
-					my ($h,$w) = $view->siz;
-					my $xofs = $x + $w/2.0;
+					my ($h,$w,$mh,$mw) = $view->siz;
+					my $xofs = $x + $w/2.0 + $mw;
 					$xofs = -$xofs if $side eq 'l';
-					my $yofs = $y + $h/2.0;
+					my $yofs = $y + $h/2.0 + $mw;
 					my @pos = ($X+$xofs,$Y+$yofs,$xofs,$yofs);
 					#warn "****** Placing $view at (",join(',',@pos),")";
 					$view->move_view(@pos);
 					$view->layout();
-					$y += $h;
+					$y += $h + 2.0*$mh;
 				}
 			}
 		}
@@ -2435,7 +2757,7 @@ sub getgeom {
 	}
 	foreach my $host ($self->offspring_sorted('Point',4)) {
 		next if ($host->parent('Private'));
-		if ($host->isa('Point::Host::Here')) {
+		if ($host->isa('Point::Host::Here::View')) {
 			push @{$geom{l}{Point}},$host;
 			$host->{col} = -1;
 		} else {
@@ -2443,13 +2765,37 @@ sub getgeom {
 			$host->{col} = +1;
 		}
 	}
-	foreach my $form (qw/Lan Vlan Blan Subnet/) {
+	foreach my $form (qw/Lan Vlan Subnet/) {
 		foreach my $bus ($self->offspring_sorted($form,5,8)) {
 			push @{$geom{c}{$form}},$bus;
 			$bus->{col} = 0;
 		}
 	}
 	return \%geom;
+}
+#package Network::View;
+sub rebalance {
+	my $self = shift;
+	my ($hbox,$wbox,$geom,$size) = @_;
+	my %views = (l=>[],r=>[]);
+	foreach my $side (qw/l r/) {
+		foreach my $kind (qw/Private Point/) {
+			if ($geom->{$side}{$kind}) {
+				push @{$views{$side}}, @{$geom->{$side}{$kind}};
+			}
+		}
+	}
+	while (@{$views{r}} > 1) {
+		my $view = $views{r}[-1];
+		my ($h,$w) = $view->siz;
+		last if ($size->{l}{total}[0] + $h > $size->{r}{total}[0] - $h);
+		$size->{l}{total}[0] += $h;
+		$size->{r}{total}[0] -= $h;
+		push @{$views{l}},pop @{$views{r}};
+		my $kind = $view->kind;
+		push @{$geom->{l}{$kind}}, pop @{$geom->{r}{$kind}};
+		$view->{col} = -$view->{col};
+	}
 }
 
 # ------------------------------------------
@@ -2477,7 +2823,7 @@ sub getgeom {
 			$point->{col} = ($col > 0) ? $col+1 : $col-1;
 		}
 	}
-	foreach my $form (qw/Lan Vlan Blan Subnet/) {
+	foreach my $form (qw/Lan Vlan Subnet/) {
 		foreach my $bus ($self->offspring_sorted($form,5,8)) {
 			unless ($bus->parent('Network')) {
 				push @{$geom{c}{$form}},$bus;
@@ -2486,6 +2832,33 @@ sub getgeom {
 		}
 	}
 	return \%geom;
+}
+#package Private::View;
+sub rebalance {
+	my $self = shift;
+	my ($hbox,$wbox,$geom,$size) = @_;
+	my $col = $self->{col};
+	my $l = $col > 0 ? 'l' : 'r';
+	my $r = $col > 0 ? 'r' : 'l';
+	my %views = ($l=>[],$r=>[]);
+	foreach my $side (qw/l r/) {
+		foreach my $kind (qw/Point/) {
+			if ($geom->{$side}{$kind}) {
+				push @{$views{$side}}, @{$geom->{$side}{$kind}};
+			}
+		}
+	}
+	while (@{$views{$r}} > 1) {
+		my $view = $views{$r}[-1];
+		my ($h,$w) = $view->siz;
+		last if ($size->{$l}{total}[0] + $h > $size->{$r}{total}[0] - $h);
+		$size->{$l}{total}[0] += $h;
+		$size->{$r}{total}[0] -= $h;
+		push @{$views{$l}}, pop @{$views{$r}};
+		my $kind = $view->kind;
+		push @{$geom->{$l}{$kind}}, pop @{$geom->{$r}{$kind}};
+		$view->{col} = ($col > 0) ? $col-1 : $col+1;
+	}
 }
 #package Private::View;
 sub parent_propagate {
@@ -2557,14 +2930,6 @@ sub getgeom {
 			{ push @{$geom{r}{Vprt}},$vprt }
 		}
 	}
-	foreach my $bprt ($self->offspring_sorted('Bprt',6,8)) {
-		my $blan = $bprt->parent('Blan');
-		if ($blan and exists $blan->{col} and ($blan->parent('Network') or $blan->parent('Private'))) {
-			if ($blan->{col} < $col)
-			{ push @{$geom{l}{Bprt}},$bprt } else
-			{ push @{$geom{r}{Bprt}},$bprt }
-		}
-	}
 	foreach my $port ($self->offspring_sorted('Port',6)) {
 		my $plan = $port->parent('Lan');
 		if ($plan and exists $plan->{col} and ($plan->parent('Network') or $plan->parent('Private'))) {
@@ -2584,25 +2949,35 @@ sub getgeom {
 	return \%geom;
 }
 #package Point::Station::View;
-sub resize {
+sub getsize {
 	my $self = shift;
-	my ($hbox,$wbox) = @_;
-	$hbox = $hbox < $self->{pad}[0] ? 0 : $hbox - $self->{pad}[0];
-	$wbox = $wbox < $self->{pad}[1] ? 0 : $wbox - $self->{pad}[1];
-	my $geom = $self->getgeom;
-	my %size = ();
+	my ($hbox,$wbox,$geom) = @_;
+	$self->{want} = [$hbox,$wbox];
+	foreach my $side (keys %$geom) {
+		foreach my $kind (keys %{$geom->{$side}}) {
+			foreach my $view (@{$geom->{$side}{$kind}}) {
+				$view->{want} = [$hbox,$wbox];
+			}
+		}
+	}
+}
+#package Point::Station::View;
+sub sizecalc {
+	my $self = shift;
+	my ($geom,$size) = @_;
 	my $pnts = $self->{nod}{pnts};
-	$size{c}{Point} = [$pnts->[2],$pnts->[3]];
-	$size{c}{total} = [@{$size{c}{Point}}];
-	my $tsiz = $size{t} = [@{$size{c}{Point}}];
-	$size{l}{total} = [0,0];
-	$size{r}{total} = [0,0];
+	$size->{c}{Point} = [$pnts->[3],$pnts->[2],0,0];
+	$size->{c}{total} = [@{$size->{c}{Point}},0,0];
+	my $tsiz = $size->{t} = [@{$size->{c}{Point}},0,0];
+	$size->{l}{total} = [0,0,0,0];
+	$size->{r}{total} = [0,0,0,0];
 	my $smax = 0;
 	foreach my $side (keys %$geom) {
-		my $ssiz = $size{$side}{total} = [0,0];
+		my $ssiz = $size->{$side}{total} = [0,0,0,0];
 		foreach my $kind (keys %{$geom->{$side}}) {
-			my $ksiz = $size{$side}{$kind} = [0,0];
+			my $ksiz = $size->{$side}{$kind} = [0,0,0,0];
 			foreach my $view (@{$geom->{$side}{$kind}}) {
+				my ($hbox,$wbox) = @{$view->{want}};
 				my ($h,$w) = $view->resize($hbox,$wbox);
 				$ksiz->[0] += $h;
 				$ksiz->[1] = $w if $w > $ksiz->[1];
@@ -2613,44 +2988,41 @@ sub resize {
 		$tsiz->[0] = $ssiz->[0] if $ssiz->[0] > $tsiz->[0];
 		$smax = $ssiz->[1] if $ssiz->[1] > $smax;
 	}
-	$size{l}{total}[1] = $smax;
-	$size{r}{total}[1] = $smax;
+	$size->{l}{total}[1] = $smax;
+	$size->{r}{total}[1] = $smax;
 	$tsiz->[1] += $smax + $smax;
-	if ($tsiz->[0] > $hbox or $tsiz->[1] > $wbox) {
-		my ($hall,$wall) = @$tsiz;
-		$size{c}{Point} = [$pnts->[2],$pnts->[3]];
-		$size{c}{total} = [@{$size{c}{Point}}];
-		$tsiz = $size{t} = [@{$size{c}{Point}}];
-		$size{l}{total} = [0,0];
-		$size{r}{total} = [0,0];
-		$smax = 0;
-		foreach my $side (keys %$geom) {
-			my $wfac = $size{$side}{total}[1]/$wall;
-			my $ssiz = $size{$side}{total} = [0,0];
-			foreach my $kind (keys %{$geom->{$side}}) {
-				my @views = @{$geom->{$side}{$kind}};
-				if (my $count = scalar(@views)) {
-					my $hfac = $size{$side}{$kind}[0]/$hall;
-					my $ksiz = $size{$side}{$kind} = [0,0];
-					my $hsiz = $hbox*$hfac/$count;
-					foreach my $view (@views) {
-						my ($h,$w) = $view->resize($hbox*$hfac,$wbox*$wfac);
-						$ksiz->[0] += $h;
-						$ksiz->[1] = $w if $w > $ksiz->[1];
-					}
-					$ssiz->[0] = $ksiz->[0] if $ksiz->[0] > $ssiz->[0];
-					$ssiz->[1] = $ksiz->[1] if $ksiz->[1] > $ssiz->[1];
-				}
+}
+#package Point::Station::View;
+sub shrink {
+	my $self = shift;
+	my ($hbox,$wbox,$geom,$size) = @_;
+	my ($hall,$wall) = @{$size->{t}};
+	my ($hfac,$wfac) = ($hbox/$hall,$wbox/$wall);
+	foreach my $side (keys %$geom) {
+		my $wsiz = $size->{$side}{total}[1]*$wfac;
+		foreach my $kind (keys %{$geom->{$side}}) {
+			foreach my $view (@{$geom->{$side}{$kind}}) {
+				my ($h,$v) = $view->siz;
+				my $hsiz = $h*$hfac;
+				$view->{want} = [$hsiz,$wsiz];
 			}
-			$tsiz->[0] = $ssiz->[0] if $ssiz->[0] > $tsiz->[0];
-			$smax = $ssiz->[1] if $ssiz->[1] > $smax;
 		}
-		$size{l}{total}[1] = $smax;
-		$size{r}{total}[1] = $smax;
-		$tsiz->[1] += $smax + $smax;
 	}
-	$self->{siz} = \%size;
-	$self->{geo} = $geom;
+}
+#package Point::Station::View;
+sub resize {
+	my $self = shift;
+	my ($hbox,$wbox) = @_;
+	$hbox = $hbox < 2.0*$self->{pad}[0] ? 0 : $hbox - 2.0*$self->{pad}[0];
+	$wbox = $wbox < 2.0*$self->{pad}[1] ? 0 : $wbox - 2.0*$self->{pad}[1];
+	my $geom = $self->{geo} = $self->getgeom;
+	my $size = $self->{siz} = {};
+	$self->getsize($hbox,$wbox,$geom);
+	$self->sizecalc($geom,$size);
+	if ($size->{t}[0] > $hbox or $size->{t}[1] > $wbox) {
+		$self->shrink($hbox,$wbox,$geom,$size);
+		$self->sizecalc($geom,$size);
+	}
 	return $self->siz;
 }
 #package Point::Station::View;
@@ -2693,10 +3065,17 @@ use strict; use warnings; use Carp;
 use Gtk2; use Glib; use Goo::Canvas;
 # ------------------------------------------
 #package Point::Host::View;
-sub mycolor { return 'black' }
+sub mycolor {
+	my $self = shift;
+	my $color = exists $self->{data}{data}{systemData}{sysName} ? 'black' : 'darkgrey';
+	return $color;
+}
 #package Point::Host::View;
 sub gettxt {
 	my $self = shift;
+	my @lines = ();
+	my $name = $self->{data}{data}{systemData}{sysName};
+	push @lines, $name if $name;
 	my @keys = ();
 	foreach my $kind (qw/Network Private Local/) {
 		if ($self->{data}{key}{p}{$kind}) {
@@ -2704,8 +3083,9 @@ sub gettxt {
 		}
 	}
 	my $key = $keys[0];
-	return $self->SUPER::gettxt() unless $key;
-	return Item::showkey($key);
+	push @lines, Item::showkey($key) if $key;
+	return $self->SUPER::gettxt() unless $key or $name;
+	return join("\n",@lines);
 }
 #package Point::Host::View;
 sub xformed {
@@ -2720,7 +3100,11 @@ use strict; use warnings; use Carp;
 use Gtk2; use Glib; use Goo::Canvas;
 # ------------------------------------------
 #package Point::Host::Here::View;
-sub mycolor { return 'magenta' }
+sub mycolor {
+	my $self = shift;
+	my $color = exists $self->{data}{data}{systemData}{sysName} ? 'magenta' : 'darkgrey';
+	return $color;
+}
 #package Point::Host::Here::View;
 sub xformed {
 	my ($type,$self) = @_;
@@ -2769,14 +3153,6 @@ use Gtk2; use Glib; use Goo::Canvas;
 sub mycolor { return 'blue' }
 
 # ------------------------------------------
-package Blan::View; our @ISA = qw(Bus::View Point::View Leaf::View);
-use strict; use warnings; use Carp;
-use Gtk2; use Glib; use Goo::Canvas;
-# ------------------------------------------
-#package Blan::View;
-sub mycolor { return 'green' }
-
-# ------------------------------------------
 package Address::View; our @ISA = qw(BoxAndLink::View Point::View Leaf::View Datum::View);
 use strict; use warnings; use Carp;
 use Gtk2; use Glib; use Goo::Canvas;
@@ -2784,14 +3160,19 @@ use Gtk2; use Glib; use Goo::Canvas;
 #package Address::View;
 sub init { shift->{txt}{pnts}[2] = 11 }
 #package Address::View;
-sub mycolor { return 'brown' }
+sub mycolor {
+	my $self = shift;
+	return 'brown' if exists $self->{data}{data}{ipAddrEntry};
+	return 'brown' if exists $self->{data}{data}{ipAddressEntry};
+	return 'darkgrey';
+}
 #package Address::View;
 sub types { return qw{Subnet Point} }
 #package Address::View;
 sub gettxt {
 	my $self = shift;
-	if ($self->{data}{key}{p}{Subnet}) {
-		foreach my $key (sort keys %{$self->{data}{key}{p}{Subnet}}) {
+	if ($self->{data}{key}{p}{Point}) {
+		foreach my $key (sort keys %{$self->{data}{key}{p}{Point}}) {
 			return Item::showkey($key) if length($key) == 4;
 		}
 	}
@@ -2799,7 +3180,7 @@ sub gettxt {
 }
 
 # ------------------------------------------
-package Port::View; our @ISA = qw(BoxAndLink::View Point::View Tree::View);
+package Port::View; our @ISA = qw(BoxAndLink::View Point::View Tree::View Datum::View);
 use strict; use warnings; use Carp;
 use Gtk2; use Glib; use Goo::Canvas;
 # ------------------------------------------
@@ -2812,6 +3193,11 @@ sub types { return qw{Lan Point} }
 #package Port::View;
 sub gettxt {
 	my $self = shift;
+	my $txt;
+	$txt = $self->{data}{data}{lldpLocPortEntry}{lldpLocPortDesc};
+	return $txt if $txt and $txt =~ /^eth/;
+	$txt = $self->{data}{data}{ifEntry}{ifDescr};
+	return $txt if $txt and $txt =~ /^eth/;
 	if ($self->{data}{key}{n}) {
 		foreach my $key (sort @{$self->{data}{key}{n}}) {
 			return Item::showkey($key) if length($key) == 6;
@@ -2828,34 +3214,24 @@ use Gtk2; use Glib; use Goo::Canvas;
 #package Vprt::View;
 sub init { shift->{txt}{pnts}[2] = 17 }
 #package Vprt::View;
-sub mycolor { return 'blue' }
+sub mycolor {
+	my $self = shift;
+	return 'blue' if exists $self->{data}{data}{ifEntry};
+	return 'blue' if exists $self->{data}{data}{lldpStatsTxPortEntry};
+	return 'blue' if exists $self->{data}{data}{lldpStatsRxPortEntry};
+	return 'blue' if exists $self->{data}{data}{lldpLocPortEntry};
+	return 'darkgrey';
+}
 #package Vprt::View;
 sub types { return qw{Vlan Point} }
 #package Vprt::View;
 sub gettxt {
 	my $self = shift;
-	if ($self->{data}{key}{n}) {
-		foreach my $key (sort @{$self->{data}{key}{n}}) {
-			return Item::showkey($key) if length($key) >= 6;
-		}
-	}
-	return '(unknown)';
-}
-
-# ------------------------------------------
-package Bprt::View; our @ISA = qw(BoxAndLink::View Point::View Tree::View Datum::View);
-use strict; use warnings; use Carp;
-use Gtk2; use Glib; use Goo::Canvas;
-# ------------------------------------------
-#package Bprt::View;
-sub init { shift->{txt}{pnts}[2] = 17 }
-#package Bprt::View;
-sub mycolor { return 'green' }
-#package Bprt::View;
-sub types { return qw{Blan Point} }
-#package Bprt::View;
-sub gettxt {
-	my $self = shift;
+	my $txt;
+	$txt = $self->{data}{data}{lldpLocPortEntry}{lldpLocPortDesc};
+	return $txt if $txt and $txt =~ /^eth/;
+	$txt = $self->{data}{data}{ifEntry}{ifDescr};
+	return $txt if $txt and $txt =~ /^eth/;
 	if ($self->{data}{key}{n}) {
 		foreach my $key (sort @{$self->{data}{key}{n}}) {
 			return Item::showkey($key) if length($key) >= 6;
@@ -2871,16 +3247,82 @@ use Gtk2; use Glib; use Goo::Canvas;
 # ------------------------------------------
 
 # ------------------------------------------
-package Menu; our @ISA = qw(Base);
+package Driv::View; our @ISA = qw(View Point::View Tree::View Datum::View);
 use strict; use warnings; use Carp;
 use Gtk2; use Glib; use Goo::Canvas;
 # ------------------------------------------
-sub new {
-	my ($type,$view) = @_;
-	my $self = {};
-	bless $self,$type;
-	return $self;
+#package Driv::View;
+sub isanchor { return Glib::TRUE }
+
+# ------------------------------------------
+package Card::View; our @ISA = qw(Group::View Point::View Tree::View Datum::View);
+use strict; use warnings; use Carp;
+use Gtk2; use Glib; use Goo::Canvas;
+# ------------------------------------------
+#package Card::View;
+sub mycolor { return 'black' }
+#package Card::View;
+sub init {
+	my $self = shift;
+	my ($viewer,$data) = @_;
+	my $color = $self->mycolor;
+	my $group = $self->{grp}{item};
+	my ($x,$y) = (-107.0/2.0,-95.0/2.0);
+	my $otl = $self->{otl} = {pnts=>[
+			$x+  0,$y+ 0,
+			$x+130,$y+ 0,
+			$x+130,$y+87,
+			$x+122,$y+87,
+			$x+122,$y+95,
+			$x+107,$y+95,
+			$x+107,$y+86,
+			$x+105,$y+86,
+			$x+105,$y+95,
+			$x+ 58,$y+95,
+			$x+ 58,$y+86,
+			$x+ 56,$y+86,
+			$x+ 56,$y+95,
+			$x+ 41,$y+95,
+			$x+ 41,$y+87,
+			$x+ 16,$y+87,
+			$x+ 16,$y+95,
+			$x+  0,$y+95,
+		]};
+	$otl->{item} = new Goo::Canvas::Polyline(
+			$group,Glib::FALSE,$otl->{pnts},
+			'antialias'=>'subpixel',
+			'line-join'=>'round',
+			'line-cap'=>'round',
+			'line-width'=>0.4,
+			'line-cap'=>'round',
+			'stroke-color'=>$color,
+			'fill-color'=>'SeaGreen',
+			'pointer-events'=>'visible',
+	);
 }
+#package Card::View;
+#package Card::View;
+
+# ------------------------------------------
+package Span::View; our @ISA = qw(Group::View Point::View Tree::View Datum::View);
+use strict; use warnings; use Carp;
+use Gtk2; use Glib; use Goo::Canvas;
+# ------------------------------------------
+#package Span::View;
+
+# ------------------------------------------
+package Chan::View; our @ISA = qw(Group::View Point::View Tree::View Datum::View);
+use strict; use warnings; use Carp;
+use Gtk2; use Glib; use Goo::Canvas;
+# ------------------------------------------
+#package Chan::View;
+
+# ------------------------------------------
+package Xcon::View; our @ISA = qw(Group::View Point::View Tree::View Datum::View);
+use strict; use warnings; use Carp;
+use Gtk2; use Glib; use Goo::Canvas;
+# ------------------------------------------
+#package Xcon::View;
 
 # ------------------------------------------
 package Window; our @ISA = qw(Gtk2::Window);
