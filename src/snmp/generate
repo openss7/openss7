@@ -8,8 +8,9 @@ BEGIN {
 	name = $1;
 }
 /MODULE-IDENTITY/ {
-	if ($NF == "MODULE-IDENTITY") {
+	if ($NF ~ /MODULE-IDENTITY/) {
 		root = $1;
+		print "# root = " root;
 	}
 }
 /^END/ {

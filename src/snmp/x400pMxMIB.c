@@ -193,6 +193,15 @@ oid x400pCardTypeAT400P_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 1, 10, 1, 4, 1, 8 }
 oid x400pCardTypeAE400P_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 1, 10, 1, 4, 1, 9 };
 oid x400pCardTypeA400PT_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 1, 10, 1, 4, 1, 10 };
 oid x400pCardTypeA400PE_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 1, 10, 1, 4, 1, 11 };
+oid x400pCardTypeCP100_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 1, 10, 1, 4, 1, 12 };
+oid x400pCardTypeCP100P_oid[14] = { 1, 3, 6, 1, 4, 1, 29591, 1, 10, 1, 4, 1, 12, 1 };
+oid x400pCardTypeCP100E_oid[14] = { 1, 3, 6, 1, 4, 1, 29591, 1, 10, 1, 4, 1, 12, 2 };
+oid x400pCardTypeCP200_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 1, 10, 1, 4, 1, 13 };
+oid x400pCardTypeCP200P_oid[14] = { 1, 3, 6, 1, 4, 1, 29591, 1, 10, 1, 4, 1, 13, 1 };
+oid x400pCardTypeCP200E_oid[14] = { 1, 3, 6, 1, 4, 1, 29591, 1, 10, 1, 4, 1, 13, 2 };
+oid x400pCardTypeCP400_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 1, 10, 1, 4, 1, 14 };
+oid x400pCardTypeCP400P_oid[14] = { 1, 3, 6, 1, 4, 1, 29591, 1, 10, 1, 4, 1, 14, 1 };
+oid x400pCardTypeCP400E_oid[14] = { 1, 3, 6, 1, 4, 1, 29591, 1, 10, 1, 4, 1, 14, 2 };
 oid x400pChipTypeDS2152_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 1, 10, 1, 4, 2, 1 };
 oid x400pChipTypeDS21352_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 1, 10, 1, 4, 2, 2 };
 oid x400pChipTypeDS21552_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 1, 10, 1, 4, 2, 3 };
@@ -757,8 +766,40 @@ x400pMxMIB_create(void)
 		StorageNew->x400pDiscontinuityTime = 0;
 
 	}
+      done:
 	DEBUGMSGTL(("x400pMxMIB", "done.\n"));
 	return (StorageNew);
+	goto nomem;
+      nomem:
+	x400pMxMIB_destroy(&StorageNew);
+	goto done;
+}
+
+/**
+ * @fn struct x400pMxMIB_data *x400pMxMIB_duplicate(struct x400pMxMIB_data *thedata)
+ * @param thedata the mib structure to duplicate
+ * @brief duplicate a mib structure for the mib
+ *
+ * Duplicates the specified mib structure @param thedata and returns a pointer to the newly
+ * allocated mib structure on success, or NULL on failure.
+ */
+struct x400pMxMIB_data *
+x400pMxMIB_duplicate(struct x400pMxMIB_data *thedata)
+{
+	struct x400pMxMIB_data *StorageNew = SNMP_MALLOC_STRUCT(x400pMxMIB_data);
+
+	DEBUGMSGTL(("x400pMxMIB", "x400pMxMIB_duplicate: duplicating mib... "));
+	if (StorageNew != NULL) {
+		StorageNew->x400pCardNextIndex = thedata->x400pCardNextIndex;
+		StorageNew->x400pDiscontinuityTime = thedata->x400pDiscontinuityTime;
+	}
+      done:
+	DEBUGMSGTL(("x400pMxMIB", "done.\n"));
+	return (StorageNew);
+	goto destroy;
+      destroy:
+	x400pMxMIB_destroy(&StorageNew);
+	goto done;
 }
 
 /**
@@ -809,7 +850,7 @@ x400pMxMIB_add(struct x400pMxMIB_data *thedata)
  * @param line line from configuration file matching the token.
  * @brief parse configuration file for x400pMxMIB entries.
  *
- * This callback is called by UCD-SNMP when it prases a configuration file and finds a configuration
+ * This callback is called by UCD-SNMP when it parses a configuration file and finds a configuration
  * file line for the registsred token (in this case x400pMxMIB).  This routine is invoked by
  * UCD-SNMP to read the values of scalars in the MIB from the configuration file.  Note that this
  * procedure may exist regardless of the persistence of the MIB.  If there are no configured entries
@@ -865,6 +906,62 @@ store_x400pMxMIB(int majorID, int minorID, void *serverarg, void *clientarg)
 	}
 	DEBUGMSGTL(("x400pMxMIB", "done.\n"));
 	return SNMPERR_SUCCESS;
+}
+
+/**
+ * @fn int check_x400pMxMIB(struct x400pMxMIB_data *StorageTmp, struct x400pMxMIB_data *StorageOld)
+ * @param StorageTmp the data as updated
+ * @param StorageOld the data previous to update
+ *
+ * This function is used by mibs.  It is used to check, all scalars at a time, the varbinds
+ * belonging to the mib.  This function is called for the first varbind in a mib at the beginning of
+ * the ACTION phase.  The COMMIT phase does not ensue unless this check passes.  This function can
+ * return SNMP_ERR_NOERR or a specific SNMP error value.  Values in StorageOld are the values before
+ * the varbinds on the mib were applied; the values in StorageTmp are the new values.  The function
+ * is permitted to change the values in StorageTmp to correct them; however, preferences should be
+ * made for setting values that were not in the varbinds.
+ */
+int
+check_x400pMxMIB(struct x400pMxMIB_data *StorageTmp, struct x400pMxMIB_data *StorageOld)
+{
+	/* XXX: provide code to check the scalars for consistency */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int update_x400pMxMIB(struct x400pMxMIB_data *StorageTmp, struct x400pMxMIB_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the set operation (ACTION phase)
+ *
+ * This function is used by mibs.  It is used to update, all scalars at a time, the varbinds
+ * belonging to the mib.  This function is called for the first varbind in a mib at the beginning of
+ * the COMMIT phase.  The start of the ACTION phase performs a consistency check on the mib before
+ * allowing the request to proceed to the COMMIT phase.  The COMMIT phase then arrives here with
+ * consistency already checked (see check_x400pMxMIB()).  This function can
+ * return SNMP_ERR_NOERROR or SNMP_ERR_COMMITFAILED.  Values in StorageOld are the values before the
+ * varbinds on the mib were applied: the values in StorageTmp are the new values.
+ */
+int
+update_x400pMxMIB(struct x400pMxMIB_data *StorageTmp, struct x400pMxMIB_data *StorageOld)
+{
+	/* XXX: provide code to update the row with the underlying device */
+	x400pMxMIB_refresh = 1;
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn revert_x400pMxMIB(struct 
+ * @fn void revert_x400pMxMIB(struct x400pMxMIB_data *StorageTmp, struct x400pMxMIB_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the undo operation (UNDO phase)
+ */
+void
+revert_x400pMxMIB(struct x400pMxMIB_data *StorageTmp, struct x400pMxMIB_data *StorageOld)
+{
+	/* XXX: provide code to revert the row with the underlying device */
+	update_x400pMxMIB(StorageOld, NULL);
 }
 
 /**
@@ -972,19 +1069,26 @@ x400pSyncTable_create(void)
 	DEBUGMSGTL(("x400pMxMIB", "x400pSyncTable_create: creating row...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
-		if ((StorageNew->x400pSyncSpanId = (uint8_t *) strdup("")) != NULL)
-			StorageNew->x400pSyncSpanIdLen = strlen("");
+		if ((StorageNew->x400pSyncSpanId = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->x400pSyncSpanIdLen = 0;
+		StorageNew->x400pSyncSpanId[StorageNew->x400pSyncSpanIdLen] = 0;
 		StorageNew->x400pSyncRowStatus = 0;
 		StorageNew->x400pSyncRowStatus = RS_NOTREADY;
 	}
+      done:
 	DEBUGMSGTL(("x400pMxMIB", "done.\n"));
 	return (StorageNew);
+	goto nomem;
+      nomem:
+	x400pSyncTable_destroy(&StorageNew);
+	goto done;
 }
 
 /**
  * @fn struct x400pSyncTable_data *x400pSyncTable_duplicate(struct x400pSyncTable_data *thedata)
  * @param thedata the row structure to duplicate.
- * @brief duplicat a row structure for a table.
+ * @brief duplicate a row structure for a table.
  *
  * Duplicates the specified row structure @param thedata and returns a pointer to the newly
  * allocated row structure on success, or NULL on failure.
@@ -996,6 +1100,15 @@ x400pSyncTable_duplicate(struct x400pSyncTable_data *thedata)
 
 	DEBUGMSGTL(("x400pMxMIB", "x400pSyncTable_duplicate: duplicating row...  "));
 	if (StorageNew != NULL) {
+		StorageNew->x400pSyncTable_id = thedata->x400pSyncTable_id;
+		StorageNew->x400pSyncGroup = thedata->x400pSyncGroup;
+		StorageNew->x400pSyncIndex = thedata->x400pSyncIndex;
+		if (!(StorageNew->x400pSyncSpanId = malloc(thedata->x400pSyncSpanIdLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->x400pSyncSpanId, thedata->x400pSyncSpanId, thedata->x400pSyncSpanIdLen);
+		StorageNew->x400pSyncSpanIdLen = thedata->x400pSyncSpanIdLen;
+		StorageNew->x400pSyncSpanId[StorageNew->x400pSyncSpanIdLen] = 0;
+		StorageNew->x400pSyncRowStatus = thedata->x400pSyncRowStatus;
 	}
       done:
 	DEBUGMSGTL(("x400pMxMIB", "done.\n"));
@@ -1093,7 +1206,7 @@ x400pSyncTable_del(struct x400pSyncTable_data *thedata)
  * @param line line from configuration file matching the token.
  * @brief parse configuration file for x400pSyncTable entries.
  *
- * This callback is called by UCD-SNMP when it prases a configuration file and finds a configuration
+ * This callback is called by UCD-SNMP when it parses a configuration file and finds a configuration
  * file line for the registsred token (in this case x400pSyncTable).  This routine is invoked by UCD-SNMP
  * to read the values of each row in the table from the configuration file.  Note that this
  * procedure may exist regardless of the persistence of the table.  If there are no configured
@@ -1176,44 +1289,50 @@ x400pDrivTable_create(void)
 
 	DEBUGMSGTL(("x400pMxMIB", "x400pDrivTable_create: creating row...  "));
 	if (StorageNew != NULL) {
-		if (!(StorageNew->x400pDrivTable_devname = calloc(129, 1)))
-			goto nomem;
 		/* XXX: fill in default row values here into StorageNew */
 		StorageNew->x400pDrivIdnum = 0;
 		StorageNew->x400pDrivMajor = 0;
-		if (!(StorageNew->x400pDrivDescription = calloc(257, 1)))
+		if ((StorageNew->x400pDrivDescription = malloc(1)) == NULL)
 			goto nomem;
 		StorageNew->x400pDrivDescriptionLen = 0;
-		if (!(StorageNew->x400pDrivRevision = calloc(257, 1)))
+		StorageNew->x400pDrivDescription[StorageNew->x400pDrivDescriptionLen] = 0;
+		if ((StorageNew->x400pDrivRevision = malloc(1)) == NULL)
 			goto nomem;
 		StorageNew->x400pDrivRevisionLen = 0;
-		if (!(StorageNew->x400pDrivCopyright = calloc(257, 1)))
+		StorageNew->x400pDrivRevision[StorageNew->x400pDrivRevisionLen] = 0;
+		if ((StorageNew->x400pDrivCopyright = malloc(1)) == NULL)
 			goto nomem;
 		StorageNew->x400pDrivCopyrightLen = 0;
-		if (!(StorageNew->x400pDrivSupportedDevice = calloc(257, 1)))
+		StorageNew->x400pDrivCopyright[StorageNew->x400pDrivCopyrightLen] = 0;
+		if ((StorageNew->x400pDrivSupportedDevice = malloc(1)) == NULL)
 			goto nomem;
 		StorageNew->x400pDrivSupportedDeviceLen = 0;
-		if (!(StorageNew->x400pDrivContact = calloc(257, 1)))
+		StorageNew->x400pDrivSupportedDevice[StorageNew->x400pDrivSupportedDeviceLen] = 0;
+		if ((StorageNew->x400pDrivContact = malloc(1)) == NULL)
 			goto nomem;
 		StorageNew->x400pDrivContactLen = 0;
+		StorageNew->x400pDrivContact[StorageNew->x400pDrivContactLen] = 0;
 		StorageNew->x400pDrivLicense = 0;
-		if (!(StorageNew->x400pDrivDate = calloc(12, 1)))
+		if ((StorageNew->x400pDrivDate = malloc(1)) == NULL)
 			goto nomem;
 		StorageNew->x400pDrivDateLen = 0;
+		StorageNew->x400pDrivDate[StorageNew->x400pDrivDateLen] = 0;
 		StorageNew->x400pDrivRowStatus = 0;
 		StorageNew->x400pDrivRowStatus = RS_NOTREADY;
-	} else {
-	      nomem:
-		x400pDrivTable_destroy(&StorageNew);
 	}
+      done:
 	DEBUGMSGTL(("x400pMxMIB", "done.\n"));
 	return (StorageNew);
+	goto nomem;
+      nomem:
+	x400pDrivTable_destroy(&StorageNew);
+	goto done;
 }
 
 /**
  * @fn struct x400pDrivTable_data *x400pDrivTable_duplicate(struct x400pDrivTable_data *thedata)
  * @param thedata the row structure to duplicate.
- * @brief duplicat a row structure for a table.
+ * @brief duplicate a row structure for a table.
  *
  * Duplicates the specified row structure @param thedata and returns a pointer to the newly
  * allocated row structure on success, or NULL on failure.
@@ -1225,6 +1344,46 @@ x400pDrivTable_duplicate(struct x400pDrivTable_data *thedata)
 
 	DEBUGMSGTL(("x400pMxMIB", "x400pDrivTable_duplicate: duplicating row...  "));
 	if (StorageNew != NULL) {
+		StorageNew->x400pDrivTable_id = thedata->x400pDrivTable_id;
+		if (!(StorageNew->x400pDrivName = malloc(thedata->x400pDrivNameLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->x400pDrivName, thedata->x400pDrivName, thedata->x400pDrivNameLen);
+		StorageNew->x400pDrivNameLen = thedata->x400pDrivNameLen;
+		StorageNew->x400pDrivName[StorageNew->x400pDrivNameLen] = 0;
+		StorageNew->x400pDrivIdnum = thedata->x400pDrivIdnum;
+		StorageNew->x400pDrivMajor = thedata->x400pDrivMajor;
+		if (!(StorageNew->x400pDrivDescription = malloc(thedata->x400pDrivDescriptionLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->x400pDrivDescription, thedata->x400pDrivDescription, thedata->x400pDrivDescriptionLen);
+		StorageNew->x400pDrivDescriptionLen = thedata->x400pDrivDescriptionLen;
+		StorageNew->x400pDrivDescription[StorageNew->x400pDrivDescriptionLen] = 0;
+		if (!(StorageNew->x400pDrivRevision = malloc(thedata->x400pDrivRevisionLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->x400pDrivRevision, thedata->x400pDrivRevision, thedata->x400pDrivRevisionLen);
+		StorageNew->x400pDrivRevisionLen = thedata->x400pDrivRevisionLen;
+		StorageNew->x400pDrivRevision[StorageNew->x400pDrivRevisionLen] = 0;
+		if (!(StorageNew->x400pDrivCopyright = malloc(thedata->x400pDrivCopyrightLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->x400pDrivCopyright, thedata->x400pDrivCopyright, thedata->x400pDrivCopyrightLen);
+		StorageNew->x400pDrivCopyrightLen = thedata->x400pDrivCopyrightLen;
+		StorageNew->x400pDrivCopyright[StorageNew->x400pDrivCopyrightLen] = 0;
+		if (!(StorageNew->x400pDrivSupportedDevice = malloc(thedata->x400pDrivSupportedDeviceLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->x400pDrivSupportedDevice, thedata->x400pDrivSupportedDevice, thedata->x400pDrivSupportedDeviceLen);
+		StorageNew->x400pDrivSupportedDeviceLen = thedata->x400pDrivSupportedDeviceLen;
+		StorageNew->x400pDrivSupportedDevice[StorageNew->x400pDrivSupportedDeviceLen] = 0;
+		if (!(StorageNew->x400pDrivContact = malloc(thedata->x400pDrivContactLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->x400pDrivContact, thedata->x400pDrivContact, thedata->x400pDrivContactLen);
+		StorageNew->x400pDrivContactLen = thedata->x400pDrivContactLen;
+		StorageNew->x400pDrivContact[StorageNew->x400pDrivContactLen] = 0;
+		StorageNew->x400pDrivLicense = thedata->x400pDrivLicense;
+		if (!(StorageNew->x400pDrivDate = malloc(thedata->x400pDrivDateLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->x400pDrivDate, thedata->x400pDrivDate, thedata->x400pDrivDateLen);
+		StorageNew->x400pDrivDateLen = thedata->x400pDrivDateLen;
+		StorageNew->x400pDrivDate[StorageNew->x400pDrivDateLen] = 0;
+		StorageNew->x400pDrivRowStatus = thedata->x400pDrivRowStatus;
 	}
       done:
 	DEBUGMSGTL(("x400pMxMIB", "done.\n"));
@@ -1252,7 +1411,6 @@ x400pDrivTable_destroy(struct x400pDrivTable_data **thedata)
 
 	DEBUGMSGTL(("x400pMxMIB", "x400pDrivTable_destroy: deleting row...  "));
 	if ((StorageDel = *thedata) != NULL) {
-		SNMP_FREE(StorageDel->x400pDrivTable_devname);
 		SNMP_FREE(StorageDel->x400pDrivName);
 		StorageDel->x400pDrivNameLen = 0;
 		SNMP_FREE(StorageDel->x400pDrivDescription);
@@ -1333,7 +1491,7 @@ x400pDrivTable_del(struct x400pDrivTable_data *thedata)
  * @param line line from configuration file matching the token.
  * @brief parse configuration file for x400pDrivTable entries.
  *
- * This callback is called by UCD-SNMP when it prases a configuration file and finds a configuration
+ * This callback is called by UCD-SNMP when it parses a configuration file and finds a configuration
  * file line for the registsred token (in this case x400pDrivTable).  This routine is invoked by UCD-SNMP
  * to read the values of each row in the table from the configuration file.  Note that this
  * procedure may exist regardless of the persistence of the table.  If there are no configured
@@ -1461,22 +1619,31 @@ x400pCardTable_create(void)
 	DEBUGMSGTL(("x400pMxMIB", "x400pCardTable_create: creating row...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
-		if ((StorageNew->x400pDrivName = (uint8_t *) strdup("")) != NULL)
-			StorageNew->x400pDrivNameLen = strlen("");
-		if ((StorageNew->x400pCardType = snmp_duplicate_objid(zeroDotZero_oid, 2)))
+		if ((StorageNew->x400pDrivName = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->x400pDrivNameLen = 0;
+		StorageNew->x400pDrivName[StorageNew->x400pDrivNameLen] = 0;
+		if ((StorageNew->x400pCardType = snmp_duplicate_objid(zeroDotZero_oid, 2)) == NULL)
+			goto nomem;
 			StorageNew->x400pCardTypeLen = 2;
 		StorageNew->x400pCardIdentifier = 0;
-		if ((StorageNew->x400pCardRevision = (uint8_t *) strdup("")) != NULL)
-			StorageNew->x400pCardRevisionLen = strlen("");
-		if ((StorageNew->x400pCardChipType = snmp_duplicate_objid(zeroDotZero_oid, 2)))
+		if ((StorageNew->x400pCardRevision = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->x400pCardRevisionLen = 0;
+		StorageNew->x400pCardRevision[StorageNew->x400pCardRevisionLen] = 0;
+		if ((StorageNew->x400pCardChipType = snmp_duplicate_objid(zeroDotZero_oid, 2)) == NULL)
+			goto nomem;
 			StorageNew->x400pCardChipTypeLen = 2;
-		if ((StorageNew->x400pCardChipRevision = (uint8_t *) strdup("")) != NULL)
-			StorageNew->x400pCardChipRevisionLen = strlen("");
+		if ((StorageNew->x400pCardChipRevision = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->x400pCardChipRevisionLen = 0;
+		StorageNew->x400pCardChipRevision[StorageNew->x400pCardChipRevisionLen] = 0;
 		StorageNew->x400pCardPciBus = 0;
 		StorageNew->x400pCardPciSlot = 0;
 		StorageNew->x400pCardPciIrq = 0;
 		StorageNew->x400pCardSpanType = 0;
-		if (memdup((u_char **) &StorageNew->x400pCardMode, (u_char *) "\x00", 1) == SNMPERR_SUCCESS)
+		if (memdup((u_char **) &StorageNew->x400pCardMode, (u_char *) "\x00", 1) != SNMPERR_SUCCESS)
+			goto nomem;
 			StorageNew->x400pCardModeLen = 1;
 		StorageNew->x400pCardSyncMaster = 0;
 		StorageNew->x400pCardSyncSource = 0;
@@ -1484,32 +1651,45 @@ x400pCardTable_create(void)
 		StorageNew->x400pCardAdministrativeState = X400PCARDADMINISTRATIVESTATE_LOCKED;
 		StorageNew->x400pCardOperationalState = X400PCARDOPERATIONALSTATE_DISABLED;
 		StorageNew->x400pCardUsageState = X400PCARDUSAGESTATE_IDLE;
-		if (memdup((u_char **) &StorageNew->x400pCardAlarmStatus, (u_char *) "\x00", 1) == SNMPERR_SUCCESS)
+		if (memdup((u_char **) &StorageNew->x400pCardAlarmStatus, (u_char *) "\x00", 1) != SNMPERR_SUCCESS)
+			goto nomem;
 			StorageNew->x400pCardAlarmStatusLen = 1;
-		if (memdup((u_char **) &StorageNew->x400pCardProceduralStatus, (u_char *) "\x00", 1) == SNMPERR_SUCCESS)
+		if (memdup((u_char **) &StorageNew->x400pCardProceduralStatus, (u_char *) "\x00", 1) != SNMPERR_SUCCESS)
+			goto nomem;
 			StorageNew->x400pCardProceduralStatusLen = 1;
-		if (memdup((u_char **) &StorageNew->x400pCardAvailabilityStatus, (u_char *) "\x00\x00", 2) == SNMPERR_SUCCESS)
+		if (memdup((u_char **) &StorageNew->x400pCardAvailabilityStatus, (u_char *) "\x00\x00", 2) != SNMPERR_SUCCESS)
+			goto nomem;
 			StorageNew->x400pCardAvailabilityStatusLen = 2;
-		if (memdup((u_char **) &StorageNew->x400pCardControlStatus, (u_char *) "\x00", 1) == SNMPERR_SUCCESS)
+		if (memdup((u_char **) &StorageNew->x400pCardControlStatus, (u_char *) "\x00", 1) != SNMPERR_SUCCESS)
+			goto nomem;
 			StorageNew->x400pCardControlStatusLen = 1;
 		StorageNew->x400pCardUnknownStatus = X400PCARDUNKNOWNSTATUS_FALSE;
 		StorageNew->x400pCardStandbyStatus = X400PCARDSTANDBYSTATUS_PROVIDINGSERVICE;
-		if ((StorageNew->x400pCardSyncSpanId = (uint8_t *) strdup("")) != NULL)
-			StorageNew->x400pCardSyncSpanIdLen = strlen("");
+		if ((StorageNew->x400pCardSyncSpanId = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->x400pCardSyncSpanIdLen = 0;
+		StorageNew->x400pCardSyncSpanId[StorageNew->x400pCardSyncSpanIdLen] = 0;
 		StorageNew->x400pCardSyncTransitions = 0;
-		if ((StorageNew->x400pCardName = (uint8_t *) strdup("")) != NULL)
-			StorageNew->x400pCardNameLen = strlen("");
+		if ((StorageNew->x400pCardName = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->x400pCardNameLen = 0;
+		StorageNew->x400pCardName[StorageNew->x400pCardNameLen] = 0;
 		StorageNew->x400pCardStatus = 0;
 		StorageNew->x400pCardStatus = RS_NOTREADY;
 	}
+      done:
 	DEBUGMSGTL(("x400pMxMIB", "done.\n"));
 	return (StorageNew);
+	goto nomem;
+      nomem:
+	x400pCardTable_destroy(&StorageNew);
+	goto done;
 }
 
 /**
  * @fn struct x400pCardTable_data *x400pCardTable_duplicate(struct x400pCardTable_data *thedata)
  * @param thedata the row structure to duplicate.
- * @brief duplicat a row structure for a table.
+ * @brief duplicate a row structure for a table.
  *
  * Duplicates the specified row structure @param thedata and returns a pointer to the newly
  * allocated row structure on success, or NULL on failure.
@@ -1521,6 +1701,79 @@ x400pCardTable_duplicate(struct x400pCardTable_data *thedata)
 
 	DEBUGMSGTL(("x400pMxMIB", "x400pCardTable_duplicate: duplicating row...  "));
 	if (StorageNew != NULL) {
+		StorageNew->x400pCardTable_id = thedata->x400pCardTable_id;
+		if (!(StorageNew->x400pDrivName = malloc(thedata->x400pDrivNameLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->x400pDrivName, thedata->x400pDrivName, thedata->x400pDrivNameLen);
+		StorageNew->x400pDrivNameLen = thedata->x400pDrivNameLen;
+		StorageNew->x400pDrivName[StorageNew->x400pDrivNameLen] = 0;
+		StorageNew->x400pCardIndex = thedata->x400pCardIndex;
+		if (!(StorageNew->x400pCardType = snmp_duplicate_objid(thedata->x400pCardType, thedata->x400pCardTypeLen / sizeof(oid))))
+			goto destroy;
+		StorageNew->x400pCardTypeLen = thedata->x400pCardTypeLen;
+		StorageNew->x400pCardIdentifier = thedata->x400pCardIdentifier;
+		if (!(StorageNew->x400pCardRevision = malloc(thedata->x400pCardRevisionLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->x400pCardRevision, thedata->x400pCardRevision, thedata->x400pCardRevisionLen);
+		StorageNew->x400pCardRevisionLen = thedata->x400pCardRevisionLen;
+		StorageNew->x400pCardRevision[StorageNew->x400pCardRevisionLen] = 0;
+		if (!(StorageNew->x400pCardChipType = snmp_duplicate_objid(thedata->x400pCardChipType, thedata->x400pCardChipTypeLen / sizeof(oid))))
+			goto destroy;
+		StorageNew->x400pCardChipTypeLen = thedata->x400pCardChipTypeLen;
+		if (!(StorageNew->x400pCardChipRevision = malloc(thedata->x400pCardChipRevisionLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->x400pCardChipRevision, thedata->x400pCardChipRevision, thedata->x400pCardChipRevisionLen);
+		StorageNew->x400pCardChipRevisionLen = thedata->x400pCardChipRevisionLen;
+		StorageNew->x400pCardChipRevision[StorageNew->x400pCardChipRevisionLen] = 0;
+		StorageNew->x400pCardPciBus = thedata->x400pCardPciBus;
+		StorageNew->x400pCardPciSlot = thedata->x400pCardPciSlot;
+		StorageNew->x400pCardPciIrq = thedata->x400pCardPciIrq;
+		StorageNew->x400pCardSpanType = thedata->x400pCardSpanType;
+		if (!(StorageNew->x400pCardMode = malloc(thedata->x400pCardModeLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->x400pCardMode, thedata->x400pCardMode, thedata->x400pCardModeLen);
+		StorageNew->x400pCardModeLen = thedata->x400pCardModeLen;
+		StorageNew->x400pCardMode[StorageNew->x400pCardModeLen] = 0;
+		StorageNew->x400pCardSyncMaster = thedata->x400pCardSyncMaster;
+		StorageNew->x400pCardSyncSource = thedata->x400pCardSyncSource;
+		StorageNew->x400pCardSyncGroup = thedata->x400pCardSyncGroup;
+		StorageNew->x400pCardAdministrativeState = thedata->x400pCardAdministrativeState;
+		StorageNew->x400pCardOperationalState = thedata->x400pCardOperationalState;
+		StorageNew->x400pCardUsageState = thedata->x400pCardUsageState;
+		if (!(StorageNew->x400pCardAlarmStatus = malloc(thedata->x400pCardAlarmStatusLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->x400pCardAlarmStatus, thedata->x400pCardAlarmStatus, thedata->x400pCardAlarmStatusLen);
+		StorageNew->x400pCardAlarmStatusLen = thedata->x400pCardAlarmStatusLen;
+		StorageNew->x400pCardAlarmStatus[StorageNew->x400pCardAlarmStatusLen] = 0;
+		if (!(StorageNew->x400pCardProceduralStatus = malloc(thedata->x400pCardProceduralStatusLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->x400pCardProceduralStatus, thedata->x400pCardProceduralStatus, thedata->x400pCardProceduralStatusLen);
+		StorageNew->x400pCardProceduralStatusLen = thedata->x400pCardProceduralStatusLen;
+		StorageNew->x400pCardProceduralStatus[StorageNew->x400pCardProceduralStatusLen] = 0;
+		if (!(StorageNew->x400pCardAvailabilityStatus = malloc(thedata->x400pCardAvailabilityStatusLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->x400pCardAvailabilityStatus, thedata->x400pCardAvailabilityStatus, thedata->x400pCardAvailabilityStatusLen);
+		StorageNew->x400pCardAvailabilityStatusLen = thedata->x400pCardAvailabilityStatusLen;
+		StorageNew->x400pCardAvailabilityStatus[StorageNew->x400pCardAvailabilityStatusLen] = 0;
+		if (!(StorageNew->x400pCardControlStatus = malloc(thedata->x400pCardControlStatusLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->x400pCardControlStatus, thedata->x400pCardControlStatus, thedata->x400pCardControlStatusLen);
+		StorageNew->x400pCardControlStatusLen = thedata->x400pCardControlStatusLen;
+		StorageNew->x400pCardControlStatus[StorageNew->x400pCardControlStatusLen] = 0;
+		StorageNew->x400pCardUnknownStatus = thedata->x400pCardUnknownStatus;
+		StorageNew->x400pCardStandbyStatus = thedata->x400pCardStandbyStatus;
+		if (!(StorageNew->x400pCardSyncSpanId = malloc(thedata->x400pCardSyncSpanIdLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->x400pCardSyncSpanId, thedata->x400pCardSyncSpanId, thedata->x400pCardSyncSpanIdLen);
+		StorageNew->x400pCardSyncSpanIdLen = thedata->x400pCardSyncSpanIdLen;
+		StorageNew->x400pCardSyncSpanId[StorageNew->x400pCardSyncSpanIdLen] = 0;
+		StorageNew->x400pCardSyncTransitions = thedata->x400pCardSyncTransitions;
+		if (!(StorageNew->x400pCardName = malloc(thedata->x400pCardNameLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->x400pCardName, thedata->x400pCardName, thedata->x400pCardNameLen);
+		StorageNew->x400pCardNameLen = thedata->x400pCardNameLen;
+		StorageNew->x400pCardName[StorageNew->x400pCardNameLen] = 0;
+		StorageNew->x400pCardStatus = thedata->x400pCardStatus;
 	}
       done:
 	DEBUGMSGTL(("x400pMxMIB", "done.\n"));
@@ -1640,7 +1893,7 @@ x400pCardTable_del(struct x400pCardTable_data *thedata)
  * @param line line from configuration file matching the token.
  * @brief parse configuration file for x400pCardTable entries.
  *
- * This callback is called by UCD-SNMP when it prases a configuration file and finds a configuration
+ * This callback is called by UCD-SNMP when it parses a configuration file and finds a configuration
  * file line for the registsred token (in this case x400pCardTable).  This routine is invoked by UCD-SNMP
  * to read the values of each row in the table from the configuration file.  Note that this
  * procedure may exist regardless of the persistence of the table.  If there are no configured
@@ -1827,19 +2080,26 @@ x400pSpanTable_create(void)
 	DEBUGMSGTL(("x400pMxMIB", "x400pSpanTable_create: creating row...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
-		if ((StorageNew->x400pDrivName = (uint8_t *) strdup("")) != NULL)
-			StorageNew->x400pDrivNameLen = strlen("");
+		if ((StorageNew->x400pDrivName = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->x400pDrivNameLen = 0;
+		StorageNew->x400pDrivName[StorageNew->x400pDrivNameLen] = 0;
 		StorageNew->x400pCardIndex = 0;
-		if ((StorageNew->x400pSpanName = (uint8_t *) strdup("")) != NULL)
+		if ((StorageNew->x400pSpanName = (uint8_t *) strdup("")) == NULL)
+			goto nomem;
 			StorageNew->x400pSpanNameLen = strlen("");
-		if ((StorageNew->x400pSpanDevice = snmp_duplicate_objid(zeroDotZero_oid, 2)))
+		if ((StorageNew->x400pSpanDevice = snmp_duplicate_objid(zeroDotZero_oid, 2)) == NULL)
+			goto nomem;
 			StorageNew->x400pSpanDeviceLen = 2;
-		if ((StorageNew->x400pSpanEquipmentId = (uint8_t *) strdup("")) != NULL)
-			StorageNew->x400pSpanEquipmentIdLen = strlen("");
+		if ((StorageNew->x400pSpanEquipmentId = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->x400pSpanEquipmentIdLen = 0;
+		StorageNew->x400pSpanEquipmentId[StorageNew->x400pSpanEquipmentIdLen] = 0;
 		StorageNew->x400pSpanType = X400PSPANTYPE_NONE;
 		StorageNew->x400pSpanNumber = 0;
 		StorageNew->x400pSpanRate = 0;
-		if (memdup((u_char **) &StorageNew->x400pSpanMode, (u_char *) "\x00", 1) == SNMPERR_SUCCESS)
+		if (memdup((u_char **) &StorageNew->x400pSpanMode, (u_char *) "\x00", 1) != SNMPERR_SUCCESS)
+			goto nomem;
 			StorageNew->x400pSpanModeLen = 1;
 		StorageNew->x400pSpanCrc = X400PSPANCRC_NONE;
 		StorageNew->x400pSpanClocking = 0;
@@ -1857,47 +2117,63 @@ x400pSpanTable_create(void)
 		StorageNew->x400pSpanAlarmSettleTime = 500;
 		StorageNew->x400pSpanLineCodeTime = 500;
 		StorageNew->x400pSpanPrimary = 0;
-		if (memdup((u_char **) &StorageNew->x400pSpanDataLink, (u_char *) "\x00", 1) == SNMPERR_SUCCESS)
+		if (memdup((u_char **) &StorageNew->x400pSpanDataLink, (u_char *) "\x00", 1) != SNMPERR_SUCCESS)
+			goto nomem;
 			StorageNew->x400pSpanDataLinkLen = 1;
 		StorageNew->x400pSpanLineCode = X400PSPANLINECODE_NOCODE;
-		if ((StorageNew->x400pSpanAlarmSeverityMapProfile = snmp_duplicate_objid(zeroDotZero_oid, 2)))
+		if ((StorageNew->x400pSpanAlarmSeverityMapProfile = snmp_duplicate_objid(zeroDotZero_oid, 2)) == NULL)
+			goto nomem;
 			StorageNew->x400pSpanAlarmSeverityMapProfileLen = 2;
 		StorageNew->x400pSpanAdministrativeState = X400PSPANADMINISTRATIVESTATE_LOCKED;
 		StorageNew->x400pSpanOperationalState = 0;
 		StorageNew->x400pSpanUsageState = 0;
-		if (memdup((u_char **) &StorageNew->x400pSpanAlarmStatus, (u_char *) "\x00", 1) == SNMPERR_SUCCESS)
+		if (memdup((u_char **) &StorageNew->x400pSpanAlarmStatus, (u_char *) "\x00", 1) != SNMPERR_SUCCESS)
+			goto nomem;
 			StorageNew->x400pSpanAlarmStatusLen = 1;
-		if (memdup((u_char **) &StorageNew->x400pSpanProceduralStatus, (u_char *) "\x00", 1) == SNMPERR_SUCCESS)
+		if (memdup((u_char **) &StorageNew->x400pSpanProceduralStatus, (u_char *) "\x00", 1) != SNMPERR_SUCCESS)
+			goto nomem;
 			StorageNew->x400pSpanProceduralStatusLen = 1;
-		if (memdup((u_char **) &StorageNew->x400pSpanAvailabilityStatus, (u_char *) "\x00\x00", 2) == SNMPERR_SUCCESS)
+		if (memdup((u_char **) &StorageNew->x400pSpanAvailabilityStatus, (u_char *) "\x00\x00", 2) != SNMPERR_SUCCESS)
+			goto nomem;
 			StorageNew->x400pSpanAvailabilityStatusLen = 2;
-		if (memdup((u_char **) &StorageNew->x400pSpanControlStatus, (u_char *) "\x00", 1) == SNMPERR_SUCCESS)
+		if (memdup((u_char **) &StorageNew->x400pSpanControlStatus, (u_char *) "\x00", 1) != SNMPERR_SUCCESS)
+			goto nomem;
 			StorageNew->x400pSpanControlStatusLen = 1;
 		StorageNew->x400pSpanStandbyStatus = X400PSPANSTANDBYSTATUS_PROVIDINGSERVICE;
 		StorageNew->x400pSpanUnknownStatus = 0;
-		if ((StorageNew->x400pSpanSap = snmp_duplicate_objid(zeroDotZero_oid, 2)))
+		if ((StorageNew->x400pSpanSap = snmp_duplicate_objid(zeroDotZero_oid, 2)) == NULL)
+			goto nomem;
 			StorageNew->x400pSpanSapLen = 2;
-		if (memdup((u_char **) &StorageNew->x400pSpanLoopbackStatus, (u_char *) "\x00", 1) == SNMPERR_SUCCESS)
+		if (memdup((u_char **) &StorageNew->x400pSpanLoopbackStatus, (u_char *) "\x00", 1) != SNMPERR_SUCCESS)
+			goto nomem;
 			StorageNew->x400pSpanLoopbackStatusLen = 1;
-		if (memdup((u_char **) &StorageNew->x400pSpanLineStatus, (u_char *) "\x00\x00\x00", 3) == SNMPERR_SUCCESS)
+		if (memdup((u_char **) &StorageNew->x400pSpanLineStatus, (u_char *) "\x00\x00\x00", 3) != SNMPERR_SUCCESS)
+			goto nomem;
 			StorageNew->x400pSpanLineStatusLen = 3;
-		if (memdup((u_char **) &StorageNew->x400pSpanAlarms, (u_char *) "\x00", 1) == SNMPERR_SUCCESS)
+		if (memdup((u_char **) &StorageNew->x400pSpanAlarms, (u_char *) "\x00", 1) != SNMPERR_SUCCESS)
+			goto nomem;
 			StorageNew->x400pSpanAlarmsLen = 1;
-		if (memdup((u_char **) &StorageNew->x400pSpanEvents, (u_char *) "\x00\x00", 2) == SNMPERR_SUCCESS)
+		if (memdup((u_char **) &StorageNew->x400pSpanEvents, (u_char *) "\x00\x00", 2) != SNMPERR_SUCCESS)
+			goto nomem;
 			StorageNew->x400pSpanEventsLen = 2;
 		StorageNew->x400pSpanReceiveLevel = 0;
 		StorageNew->x400pSpanReceiveThreshold = 0;
 		StorageNew->x400pSpanRowStatus = 0;
 		StorageNew->x400pSpanRowStatus = RS_NOTREADY;
 	}
+      done:
 	DEBUGMSGTL(("x400pMxMIB", "done.\n"));
 	return (StorageNew);
+	goto nomem;
+      nomem:
+	x400pSpanTable_destroy(&StorageNew);
+	goto done;
 }
 
 /**
  * @fn struct x400pSpanTable_data *x400pSpanTable_duplicate(struct x400pSpanTable_data *thedata)
  * @param thedata the row structure to duplicate.
- * @brief duplicat a row structure for a table.
+ * @brief duplicate a row structure for a table.
  *
  * Duplicates the specified row structure @param thedata and returns a pointer to the newly
  * allocated row structure on success, or NULL on failure.
@@ -1909,6 +2185,111 @@ x400pSpanTable_duplicate(struct x400pSpanTable_data *thedata)
 
 	DEBUGMSGTL(("x400pMxMIB", "x400pSpanTable_duplicate: duplicating row...  "));
 	if (StorageNew != NULL) {
+		StorageNew->x400pSpanTable_id = thedata->x400pSpanTable_id;
+		if (!(StorageNew->x400pDrivName = malloc(thedata->x400pDrivNameLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->x400pDrivName, thedata->x400pDrivName, thedata->x400pDrivNameLen);
+		StorageNew->x400pDrivNameLen = thedata->x400pDrivNameLen;
+		StorageNew->x400pDrivName[StorageNew->x400pDrivNameLen] = 0;
+		StorageNew->x400pCardIndex = thedata->x400pCardIndex;
+		StorageNew->x400pSpanIndex = thedata->x400pSpanIndex;
+		if (!(StorageNew->x400pSpanName = malloc(thedata->x400pSpanNameLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->x400pSpanName, thedata->x400pSpanName, thedata->x400pSpanNameLen);
+		StorageNew->x400pSpanNameLen = thedata->x400pSpanNameLen;
+		StorageNew->x400pSpanName[StorageNew->x400pSpanNameLen] = 0;
+		if (!(StorageNew->x400pSpanDevice = snmp_duplicate_objid(thedata->x400pSpanDevice, thedata->x400pSpanDeviceLen / sizeof(oid))))
+			goto destroy;
+		StorageNew->x400pSpanDeviceLen = thedata->x400pSpanDeviceLen;
+		if (!(StorageNew->x400pSpanEquipmentId = malloc(thedata->x400pSpanEquipmentIdLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->x400pSpanEquipmentId, thedata->x400pSpanEquipmentId, thedata->x400pSpanEquipmentIdLen);
+		StorageNew->x400pSpanEquipmentIdLen = thedata->x400pSpanEquipmentIdLen;
+		StorageNew->x400pSpanEquipmentId[StorageNew->x400pSpanEquipmentIdLen] = 0;
+		StorageNew->x400pSpanType = thedata->x400pSpanType;
+		StorageNew->x400pSpanNumber = thedata->x400pSpanNumber;
+		StorageNew->x400pSpanRate = thedata->x400pSpanRate;
+		if (!(StorageNew->x400pSpanMode = malloc(thedata->x400pSpanModeLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->x400pSpanMode, thedata->x400pSpanMode, thedata->x400pSpanModeLen);
+		StorageNew->x400pSpanModeLen = thedata->x400pSpanModeLen;
+		StorageNew->x400pSpanMode[StorageNew->x400pSpanModeLen] = 0;
+		StorageNew->x400pSpanCrc = thedata->x400pSpanCrc;
+		StorageNew->x400pSpanClocking = thedata->x400pSpanClocking;
+		StorageNew->x400pSpanPriority = thedata->x400pSpanPriority;
+		StorageNew->x400pSpanCoding = thedata->x400pSpanCoding;
+		StorageNew->x400pSpanFraming = thedata->x400pSpanFraming;
+		StorageNew->x400pSpanLineImpedance = thedata->x400pSpanLineImpedance;
+		StorageNew->x400pSpanLineMode = thedata->x400pSpanLineMode;
+		StorageNew->x400pSpanLineLength = thedata->x400pSpanLineLength;
+		StorageNew->x400pSpanLineAttenuation = thedata->x400pSpanLineAttenuation;
+		StorageNew->x400pSpanLineGain = thedata->x400pSpanLineGain;
+		StorageNew->x400pSpanLineDelay = thedata->x400pSpanLineDelay;
+		StorageNew->x400pSpanTxLevel = thedata->x400pSpanTxLevel;
+		StorageNew->x400pSpanRxLevel = thedata->x400pSpanRxLevel;
+		StorageNew->x400pSpanAlarmSettleTime = thedata->x400pSpanAlarmSettleTime;
+		StorageNew->x400pSpanLineCodeTime = thedata->x400pSpanLineCodeTime;
+		StorageNew->x400pSpanPrimary = thedata->x400pSpanPrimary;
+		if (!(StorageNew->x400pSpanDataLink = malloc(thedata->x400pSpanDataLinkLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->x400pSpanDataLink, thedata->x400pSpanDataLink, thedata->x400pSpanDataLinkLen);
+		StorageNew->x400pSpanDataLinkLen = thedata->x400pSpanDataLinkLen;
+		StorageNew->x400pSpanDataLink[StorageNew->x400pSpanDataLinkLen] = 0;
+		StorageNew->x400pSpanLineCode = thedata->x400pSpanLineCode;
+		if (!(StorageNew->x400pSpanAlarmSeverityMapProfile = snmp_duplicate_objid(thedata->x400pSpanAlarmSeverityMapProfile, thedata->x400pSpanAlarmSeverityMapProfileLen / sizeof(oid))))
+			goto destroy;
+		StorageNew->x400pSpanAlarmSeverityMapProfileLen = thedata->x400pSpanAlarmSeverityMapProfileLen;
+		StorageNew->x400pSpanAdministrativeState = thedata->x400pSpanAdministrativeState;
+		StorageNew->x400pSpanOperationalState = thedata->x400pSpanOperationalState;
+		StorageNew->x400pSpanUsageState = thedata->x400pSpanUsageState;
+		if (!(StorageNew->x400pSpanAlarmStatus = malloc(thedata->x400pSpanAlarmStatusLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->x400pSpanAlarmStatus, thedata->x400pSpanAlarmStatus, thedata->x400pSpanAlarmStatusLen);
+		StorageNew->x400pSpanAlarmStatusLen = thedata->x400pSpanAlarmStatusLen;
+		StorageNew->x400pSpanAlarmStatus[StorageNew->x400pSpanAlarmStatusLen] = 0;
+		if (!(StorageNew->x400pSpanProceduralStatus = malloc(thedata->x400pSpanProceduralStatusLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->x400pSpanProceduralStatus, thedata->x400pSpanProceduralStatus, thedata->x400pSpanProceduralStatusLen);
+		StorageNew->x400pSpanProceduralStatusLen = thedata->x400pSpanProceduralStatusLen;
+		StorageNew->x400pSpanProceduralStatus[StorageNew->x400pSpanProceduralStatusLen] = 0;
+		if (!(StorageNew->x400pSpanAvailabilityStatus = malloc(thedata->x400pSpanAvailabilityStatusLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->x400pSpanAvailabilityStatus, thedata->x400pSpanAvailabilityStatus, thedata->x400pSpanAvailabilityStatusLen);
+		StorageNew->x400pSpanAvailabilityStatusLen = thedata->x400pSpanAvailabilityStatusLen;
+		StorageNew->x400pSpanAvailabilityStatus[StorageNew->x400pSpanAvailabilityStatusLen] = 0;
+		if (!(StorageNew->x400pSpanControlStatus = malloc(thedata->x400pSpanControlStatusLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->x400pSpanControlStatus, thedata->x400pSpanControlStatus, thedata->x400pSpanControlStatusLen);
+		StorageNew->x400pSpanControlStatusLen = thedata->x400pSpanControlStatusLen;
+		StorageNew->x400pSpanControlStatus[StorageNew->x400pSpanControlStatusLen] = 0;
+		StorageNew->x400pSpanStandbyStatus = thedata->x400pSpanStandbyStatus;
+		StorageNew->x400pSpanUnknownStatus = thedata->x400pSpanUnknownStatus;
+		if (!(StorageNew->x400pSpanSap = snmp_duplicate_objid(thedata->x400pSpanSap, thedata->x400pSpanSapLen / sizeof(oid))))
+			goto destroy;
+		StorageNew->x400pSpanSapLen = thedata->x400pSpanSapLen;
+		if (!(StorageNew->x400pSpanLoopbackStatus = malloc(thedata->x400pSpanLoopbackStatusLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->x400pSpanLoopbackStatus, thedata->x400pSpanLoopbackStatus, thedata->x400pSpanLoopbackStatusLen);
+		StorageNew->x400pSpanLoopbackStatusLen = thedata->x400pSpanLoopbackStatusLen;
+		StorageNew->x400pSpanLoopbackStatus[StorageNew->x400pSpanLoopbackStatusLen] = 0;
+		if (!(StorageNew->x400pSpanLineStatus = malloc(thedata->x400pSpanLineStatusLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->x400pSpanLineStatus, thedata->x400pSpanLineStatus, thedata->x400pSpanLineStatusLen);
+		StorageNew->x400pSpanLineStatusLen = thedata->x400pSpanLineStatusLen;
+		StorageNew->x400pSpanLineStatus[StorageNew->x400pSpanLineStatusLen] = 0;
+		if (!(StorageNew->x400pSpanAlarms = malloc(thedata->x400pSpanAlarmsLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->x400pSpanAlarms, thedata->x400pSpanAlarms, thedata->x400pSpanAlarmsLen);
+		StorageNew->x400pSpanAlarmsLen = thedata->x400pSpanAlarmsLen;
+		StorageNew->x400pSpanAlarms[StorageNew->x400pSpanAlarmsLen] = 0;
+		if (!(StorageNew->x400pSpanEvents = malloc(thedata->x400pSpanEventsLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->x400pSpanEvents, thedata->x400pSpanEvents, thedata->x400pSpanEventsLen);
+		StorageNew->x400pSpanEventsLen = thedata->x400pSpanEventsLen;
+		StorageNew->x400pSpanEvents[StorageNew->x400pSpanEventsLen] = 0;
+		StorageNew->x400pSpanReceiveLevel = thedata->x400pSpanReceiveLevel;
+		StorageNew->x400pSpanReceiveThreshold = thedata->x400pSpanReceiveThreshold;
+		StorageNew->x400pSpanRowStatus = thedata->x400pSpanRowStatus;
 	}
       done:
 	DEBUGMSGTL(("x400pMxMIB", "done.\n"));
@@ -2038,7 +2419,7 @@ x400pSpanTable_del(struct x400pSpanTable_data *thedata)
  * @param line line from configuration file matching the token.
  * @brief parse configuration file for x400pSpanTable entries.
  *
- * This callback is called by UCD-SNMP when it prases a configuration file and finds a configuration
+ * This callback is called by UCD-SNMP when it parses a configuration file and finds a configuration
  * file line for the registsred token (in this case x400pSpanTable).  This routine is invoked by UCD-SNMP
  * to read the values of each row in the table from the configuration file.  Note that this
  * procedure may exist regardless of the persistence of the table.  If there are no configured
@@ -2281,29 +2662,37 @@ x400pBertTable_create(void)
 	DEBUGMSGTL(("x400pMxMIB", "x400pBertTable_create: creating row...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
-		if ((StorageNew->x400pDrivName = (uint8_t *) strdup("")) != NULL)
-			StorageNew->x400pDrivNameLen = strlen("");
+		if ((StorageNew->x400pDrivName = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->x400pDrivNameLen = 0;
+		StorageNew->x400pDrivName[StorageNew->x400pDrivNameLen] = 0;
 		StorageNew->x400pCardIndex = 0;
 		StorageNew->x400pSpanIndex = 0;
 		StorageNew->x400pBertMode = X400PBERTMODE_NONE;
 		StorageNew->x400pBertSelect = X400PBERTSELECT_NONE;
-		if (memdup((u_char **) &StorageNew->x400pBertPattern, (u_char *) "\x10\xFF\xFF\xFF\xFF", 5) == SNMPERR_SUCCESS)
+		if (memdup((u_char **) &StorageNew->x400pBertPattern, (u_char *) "\x10\xFF\xFF\xFF\xFF", 5) != SNMPERR_SUCCESS)
+			goto nomem;
 			StorageNew->x400pBertPatternLen = 5;
 		StorageNew->x400pBertOperationalState = 0;
-		if (memdup((u_char **) &StorageNew->x400pBertProceduralStatus, (u_char *) "\x00", 1) == SNMPERR_SUCCESS)
+		if (memdup((u_char **) &StorageNew->x400pBertProceduralStatus, (u_char *) "\x00", 1) != SNMPERR_SUCCESS)
+			goto nomem;
 			StorageNew->x400pBertProceduralStatusLen = 1;
 		StorageNew->x400pBertBitCount = 0;
 		StorageNew->x400pBertErrorCount = 0;
-
 	}
+      done:
 	DEBUGMSGTL(("x400pMxMIB", "done.\n"));
 	return (StorageNew);
+	goto nomem;
+      nomem:
+	x400pBertTable_destroy(&StorageNew);
+	goto done;
 }
 
 /**
  * @fn struct x400pBertTable_data *x400pBertTable_duplicate(struct x400pBertTable_data *thedata)
  * @param thedata the row structure to duplicate.
- * @brief duplicat a row structure for a table.
+ * @brief duplicate a row structure for a table.
  *
  * Duplicates the specified row structure @param thedata and returns a pointer to the newly
  * allocated row structure on success, or NULL on failure.
@@ -2315,6 +2704,29 @@ x400pBertTable_duplicate(struct x400pBertTable_data *thedata)
 
 	DEBUGMSGTL(("x400pMxMIB", "x400pBertTable_duplicate: duplicating row...  "));
 	if (StorageNew != NULL) {
+		StorageNew->x400pBertTable_id = thedata->x400pBertTable_id;
+		if (!(StorageNew->x400pDrivName = malloc(thedata->x400pDrivNameLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->x400pDrivName, thedata->x400pDrivName, thedata->x400pDrivNameLen);
+		StorageNew->x400pDrivNameLen = thedata->x400pDrivNameLen;
+		StorageNew->x400pDrivName[StorageNew->x400pDrivNameLen] = 0;
+		StorageNew->x400pCardIndex = thedata->x400pCardIndex;
+		StorageNew->x400pSpanIndex = thedata->x400pSpanIndex;
+		StorageNew->x400pBertMode = thedata->x400pBertMode;
+		StorageNew->x400pBertSelect = thedata->x400pBertSelect;
+		if (!(StorageNew->x400pBertPattern = malloc(thedata->x400pBertPatternLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->x400pBertPattern, thedata->x400pBertPattern, thedata->x400pBertPatternLen);
+		StorageNew->x400pBertPatternLen = thedata->x400pBertPatternLen;
+		StorageNew->x400pBertPattern[StorageNew->x400pBertPatternLen] = 0;
+		StorageNew->x400pBertOperationalState = thedata->x400pBertOperationalState;
+		if (!(StorageNew->x400pBertProceduralStatus = malloc(thedata->x400pBertProceduralStatusLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->x400pBertProceduralStatus, thedata->x400pBertProceduralStatus, thedata->x400pBertProceduralStatusLen);
+		StorageNew->x400pBertProceduralStatusLen = thedata->x400pBertProceduralStatusLen;
+		StorageNew->x400pBertProceduralStatus[StorageNew->x400pBertProceduralStatusLen] = 0;
+		StorageNew->x400pBertBitCount = thedata->x400pBertBitCount;
+		StorageNew->x400pBertErrorCount = thedata->x400pBertErrorCount;
 	}
       done:
 	DEBUGMSGTL(("x400pMxMIB", "done.\n"));
@@ -2418,7 +2830,7 @@ x400pBertTable_del(struct x400pBertTable_data *thedata)
  * @param line line from configuration file matching the token.
  * @brief parse configuration file for x400pBertTable entries.
  *
- * This callback is called by UCD-SNMP when it prases a configuration file and finds a configuration
+ * This callback is called by UCD-SNMP when it parses a configuration file and finds a configuration
  * file line for the registsred token (in this case x400pBertTable).  This routine is invoked by UCD-SNMP
  * to read the values of each row in the table from the configuration file.  Note that this
  * procedure may exist regardless of the persistence of the table.  If there are no configured
@@ -2524,39 +2936,51 @@ x400pChanTable_create(void)
 	DEBUGMSGTL(("x400pMxMIB", "x400pChanTable_create: creating row...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
-		if ((StorageNew->x400pDrivName = (uint8_t *) strdup("")) != NULL)
-			StorageNew->x400pDrivNameLen = strlen("");
+		if ((StorageNew->x400pDrivName = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->x400pDrivNameLen = 0;
+		StorageNew->x400pDrivName[StorageNew->x400pDrivNameLen] = 0;
 		StorageNew->x400pCardIndex = 0;
 		StorageNew->x400pSpanIndex = 0;
 		StorageNew->x400pChanType = X400PCHANTYPE_CCS;
 		StorageNew->x400pChanFormat = 0;
 		StorageNew->x400pChanRate = 0;
-		if (memdup((u_char **) &StorageNew->x400pChanMode, (u_char *) "\x00", 1) == SNMPERR_SUCCESS)
+		if (memdup((u_char **) &StorageNew->x400pChanMode, (u_char *) "\x00", 1) != SNMPERR_SUCCESS)
+			goto nomem;
 			StorageNew->x400pChanModeLen = 1;
-		if ((StorageNew->x400pChanSap = snmp_duplicate_objid(zeroDotZero_oid, 2)))
+		if ((StorageNew->x400pChanSap = snmp_duplicate_objid(zeroDotZero_oid, 2)) == NULL)
+			goto nomem;
 			StorageNew->x400pChanSapLen = 2;
 		StorageNew->x400pChanAdministrativeState = X400PCHANADMINISTRATIVESTATE_LOCKED;
 		StorageNew->x400pChanOperationalState = X400PCHANOPERATIONALSTATE_DISABLED;
 		StorageNew->x400pChanUsageState = 0;
-		if (memdup((u_char **) &StorageNew->x400pChanAvailabilityStatus, (u_char *) "\x00\x00", 2) == SNMPERR_SUCCESS)
+		if (memdup((u_char **) &StorageNew->x400pChanAvailabilityStatus, (u_char *) "\x00\x00", 2) != SNMPERR_SUCCESS)
+			goto nomem;
 			StorageNew->x400pChanAvailabilityStatusLen = 2;
-		if (memdup((u_char **) &StorageNew->x400pChanControlStatus, (u_char *) "\x00", 1) == SNMPERR_SUCCESS)
+		if (memdup((u_char **) &StorageNew->x400pChanControlStatus, (u_char *) "\x00", 1) != SNMPERR_SUCCESS)
+			goto nomem;
 			StorageNew->x400pChanControlStatusLen = 1;
-		if (memdup((u_char **) &StorageNew->x400pChanProceduralStatus, (u_char *) "\x00", 1) == SNMPERR_SUCCESS)
+		if (memdup((u_char **) &StorageNew->x400pChanProceduralStatus, (u_char *) "\x00", 1) != SNMPERR_SUCCESS)
+			goto nomem;
 			StorageNew->x400pChanProceduralStatusLen = 1;
-		if (memdup((u_char **) &StorageNew->x400pChanAlarmStatus, (u_char *) "\x00", 1) == SNMPERR_SUCCESS)
+		if (memdup((u_char **) &StorageNew->x400pChanAlarmStatus, (u_char *) "\x00", 1) != SNMPERR_SUCCESS)
+			goto nomem;
 			StorageNew->x400pChanAlarmStatusLen = 1;
 		StorageNew->x400pChanStandbyStatus = X400PCHANSTANDBYSTATUS_PROVIDINGSERVICE;
-
 	}
+      done:
 	DEBUGMSGTL(("x400pMxMIB", "done.\n"));
 	return (StorageNew);
+	goto nomem;
+      nomem:
+	x400pChanTable_destroy(&StorageNew);
+	goto done;
 }
 
 /**
  * @fn struct x400pChanTable_data *x400pChanTable_duplicate(struct x400pChanTable_data *thedata)
  * @param thedata the row structure to duplicate.
- * @brief duplicat a row structure for a table.
+ * @brief duplicate a row structure for a table.
  *
  * Duplicates the specified row structure @param thedata and returns a pointer to the newly
  * allocated row structure on success, or NULL on failure.
@@ -2568,6 +2992,50 @@ x400pChanTable_duplicate(struct x400pChanTable_data *thedata)
 
 	DEBUGMSGTL(("x400pMxMIB", "x400pChanTable_duplicate: duplicating row...  "));
 	if (StorageNew != NULL) {
+		StorageNew->x400pChanTable_id = thedata->x400pChanTable_id;
+		if (!(StorageNew->x400pDrivName = malloc(thedata->x400pDrivNameLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->x400pDrivName, thedata->x400pDrivName, thedata->x400pDrivNameLen);
+		StorageNew->x400pDrivNameLen = thedata->x400pDrivNameLen;
+		StorageNew->x400pDrivName[StorageNew->x400pDrivNameLen] = 0;
+		StorageNew->x400pCardIndex = thedata->x400pCardIndex;
+		StorageNew->x400pSpanIndex = thedata->x400pSpanIndex;
+		StorageNew->x400pChanIndex = thedata->x400pChanIndex;
+		StorageNew->x400pChanType = thedata->x400pChanType;
+		StorageNew->x400pChanFormat = thedata->x400pChanFormat;
+		StorageNew->x400pChanRate = thedata->x400pChanRate;
+		if (!(StorageNew->x400pChanMode = malloc(thedata->x400pChanModeLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->x400pChanMode, thedata->x400pChanMode, thedata->x400pChanModeLen);
+		StorageNew->x400pChanModeLen = thedata->x400pChanModeLen;
+		StorageNew->x400pChanMode[StorageNew->x400pChanModeLen] = 0;
+		if (!(StorageNew->x400pChanSap = snmp_duplicate_objid(thedata->x400pChanSap, thedata->x400pChanSapLen / sizeof(oid))))
+			goto destroy;
+		StorageNew->x400pChanSapLen = thedata->x400pChanSapLen;
+		StorageNew->x400pChanAdministrativeState = thedata->x400pChanAdministrativeState;
+		StorageNew->x400pChanOperationalState = thedata->x400pChanOperationalState;
+		StorageNew->x400pChanUsageState = thedata->x400pChanUsageState;
+		if (!(StorageNew->x400pChanAvailabilityStatus = malloc(thedata->x400pChanAvailabilityStatusLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->x400pChanAvailabilityStatus, thedata->x400pChanAvailabilityStatus, thedata->x400pChanAvailabilityStatusLen);
+		StorageNew->x400pChanAvailabilityStatusLen = thedata->x400pChanAvailabilityStatusLen;
+		StorageNew->x400pChanAvailabilityStatus[StorageNew->x400pChanAvailabilityStatusLen] = 0;
+		if (!(StorageNew->x400pChanControlStatus = malloc(thedata->x400pChanControlStatusLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->x400pChanControlStatus, thedata->x400pChanControlStatus, thedata->x400pChanControlStatusLen);
+		StorageNew->x400pChanControlStatusLen = thedata->x400pChanControlStatusLen;
+		StorageNew->x400pChanControlStatus[StorageNew->x400pChanControlStatusLen] = 0;
+		if (!(StorageNew->x400pChanProceduralStatus = malloc(thedata->x400pChanProceduralStatusLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->x400pChanProceduralStatus, thedata->x400pChanProceduralStatus, thedata->x400pChanProceduralStatusLen);
+		StorageNew->x400pChanProceduralStatusLen = thedata->x400pChanProceduralStatusLen;
+		StorageNew->x400pChanProceduralStatus[StorageNew->x400pChanProceduralStatusLen] = 0;
+		if (!(StorageNew->x400pChanAlarmStatus = malloc(thedata->x400pChanAlarmStatusLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->x400pChanAlarmStatus, thedata->x400pChanAlarmStatus, thedata->x400pChanAlarmStatusLen);
+		StorageNew->x400pChanAlarmStatusLen = thedata->x400pChanAlarmStatusLen;
+		StorageNew->x400pChanAlarmStatus[StorageNew->x400pChanAlarmStatusLen] = 0;
+		StorageNew->x400pChanStandbyStatus = thedata->x400pChanStandbyStatus;
 	}
       done:
 	DEBUGMSGTL(("x400pMxMIB", "done.\n"));
@@ -2681,7 +3149,7 @@ x400pChanTable_del(struct x400pChanTable_data *thedata)
  * @param line line from configuration file matching the token.
  * @brief parse configuration file for x400pChanTable entries.
  *
- * This callback is called by UCD-SNMP when it prases a configuration file and finds a configuration
+ * This callback is called by UCD-SNMP when it parses a configuration file and finds a configuration
  * file line for the registsred token (in this case x400pChanTable).  This routine is invoked by UCD-SNMP
  * to read the values of each row in the table from the configuration file.  Note that this
  * procedure may exist regardless of the persistence of the table.  If there are no configured
@@ -2821,8 +3289,10 @@ x400pXconTable_create(void)
 	DEBUGMSGTL(("x400pMxMIB", "x400pXconTable_create: creating row...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
-		if ((StorageNew->x400pDrivName = (uint8_t *) strdup("")) != NULL)
-			StorageNew->x400pDrivNameLen = strlen("");
+		if ((StorageNew->x400pDrivName = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->x400pDrivNameLen = 0;
+		StorageNew->x400pDrivName[StorageNew->x400pDrivNameLen] = 0;
 		StorageNew->x400pCardIndex = 0;
 		StorageNew->x400pSpanIndex = 0;
 		StorageNew->x400pChanIndex = 0;
@@ -2834,14 +3304,19 @@ x400pXconTable_create(void)
 		StorageNew->x400pXconRowStatus = 0;
 		StorageNew->x400pXconRowStatus = RS_NOTREADY;
 	}
+      done:
 	DEBUGMSGTL(("x400pMxMIB", "done.\n"));
 	return (StorageNew);
+	goto nomem;
+      nomem:
+	x400pXconTable_destroy(&StorageNew);
+	goto done;
 }
 
 /**
  * @fn struct x400pXconTable_data *x400pXconTable_duplicate(struct x400pXconTable_data *thedata)
  * @param thedata the row structure to duplicate.
- * @brief duplicat a row structure for a table.
+ * @brief duplicate a row structure for a table.
  *
  * Duplicates the specified row structure @param thedata and returns a pointer to the newly
  * allocated row structure on success, or NULL on failure.
@@ -2853,6 +3328,21 @@ x400pXconTable_duplicate(struct x400pXconTable_data *thedata)
 
 	DEBUGMSGTL(("x400pMxMIB", "x400pXconTable_duplicate: duplicating row...  "));
 	if (StorageNew != NULL) {
+		StorageNew->x400pXconTable_id = thedata->x400pXconTable_id;
+		if (!(StorageNew->x400pDrivName = malloc(thedata->x400pDrivNameLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->x400pDrivName, thedata->x400pDrivName, thedata->x400pDrivNameLen);
+		StorageNew->x400pDrivNameLen = thedata->x400pDrivNameLen;
+		StorageNew->x400pDrivName[StorageNew->x400pDrivNameLen] = 0;
+		StorageNew->x400pCardIndex = thedata->x400pCardIndex;
+		StorageNew->x400pSpanIndex = thedata->x400pSpanIndex;
+		StorageNew->x400pChanIndex = thedata->x400pChanIndex;
+		StorageNew->x400pXconCardIndex = thedata->x400pXconCardIndex;
+		StorageNew->x400pXconSpanIndex = thedata->x400pXconSpanIndex;
+		StorageNew->x400pXconChanIndex = thedata->x400pXconChanIndex;
+		StorageNew->x400pXconType = thedata->x400pXconType;
+		StorageNew->x400pXconStorageType = thedata->x400pXconStorageType;
+		StorageNew->x400pXconRowStatus = thedata->x400pXconRowStatus;
 	}
       done:
 	DEBUGMSGTL(("x400pMxMIB", "done.\n"));
@@ -2954,7 +3444,7 @@ x400pXconTable_del(struct x400pXconTable_data *thedata)
  * @param line line from configuration file matching the token.
  * @brief parse configuration file for x400pXconTable entries.
  *
- * This callback is called by UCD-SNMP when it prases a configuration file and finds a configuration
+ * This callback is called by UCD-SNMP when it parses a configuration file and finds a configuration
  * file line for the registsred token (in this case x400pXconTable).  This routine is invoked by UCD-SNMP
  * to read the values of each row in the table from the configuration file.  Note that this
  * procedure may exist regardless of the persistence of the table.  If there are no configured
@@ -3050,8 +3540,10 @@ x400pNearEndCurrentTable_create(void)
 	DEBUGMSGTL(("x400pMxMIB", "x400pNearEndCurrentTable_create: creating row...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
-		if ((StorageNew->x400pDrivName = (uint8_t *) strdup("")) != NULL)
-			StorageNew->x400pDrivNameLen = strlen("");
+		if ((StorageNew->x400pDrivName = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->x400pDrivNameLen = 0;
+		StorageNew->x400pDrivName[StorageNew->x400pDrivNameLen] = 0;
 		StorageNew->x400pCardIndex = 0;
 		StorageNew->x400pSpanIndex = 0;
 		StorageNew->x400pNearEndCurrentTimeElapsed = 0;
@@ -3065,16 +3557,20 @@ x400pNearEndCurrentTable_create(void)
 		StorageNew->x400pNearEndCurrentBESs = 0;
 		StorageNew->x400pNearEndCurrentDMs = 0;
 		StorageNew->x400pNearEndCurrentLCVs = 0;
-
 	}
+      done:
 	DEBUGMSGTL(("x400pMxMIB", "done.\n"));
 	return (StorageNew);
+	goto nomem;
+      nomem:
+	x400pNearEndCurrentTable_destroy(&StorageNew);
+	goto done;
 }
 
 /**
  * @fn struct x400pNearEndCurrentTable_data *x400pNearEndCurrentTable_duplicate(struct x400pNearEndCurrentTable_data *thedata)
  * @param thedata the row structure to duplicate.
- * @brief duplicat a row structure for a table.
+ * @brief duplicate a row structure for a table.
  *
  * Duplicates the specified row structure @param thedata and returns a pointer to the newly
  * allocated row structure on success, or NULL on failure.
@@ -3086,6 +3582,25 @@ x400pNearEndCurrentTable_duplicate(struct x400pNearEndCurrentTable_data *thedata
 
 	DEBUGMSGTL(("x400pMxMIB", "x400pNearEndCurrentTable_duplicate: duplicating row...  "));
 	if (StorageNew != NULL) {
+		StorageNew->x400pNearEndCurrentTable_id = thedata->x400pNearEndCurrentTable_id;
+		if (!(StorageNew->x400pDrivName = malloc(thedata->x400pDrivNameLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->x400pDrivName, thedata->x400pDrivName, thedata->x400pDrivNameLen);
+		StorageNew->x400pDrivNameLen = thedata->x400pDrivNameLen;
+		StorageNew->x400pDrivName[StorageNew->x400pDrivNameLen] = 0;
+		StorageNew->x400pCardIndex = thedata->x400pCardIndex;
+		StorageNew->x400pSpanIndex = thedata->x400pSpanIndex;
+		StorageNew->x400pNearEndCurrentTimeElapsed = thedata->x400pNearEndCurrentTimeElapsed;
+		StorageNew->x400pNearEndCurrentESs = thedata->x400pNearEndCurrentESs;
+		StorageNew->x400pNearEndCurrentSESs = thedata->x400pNearEndCurrentSESs;
+		StorageNew->x400pNearEndCurrentSEFSs = thedata->x400pNearEndCurrentSEFSs;
+		StorageNew->x400pNearEndCurrentUASs = thedata->x400pNearEndCurrentUASs;
+		StorageNew->x400pNearEndCurrentCSSs = thedata->x400pNearEndCurrentCSSs;
+		StorageNew->x400pNearEndCurrentPCVs = thedata->x400pNearEndCurrentPCVs;
+		StorageNew->x400pNearEndCurrentLESs = thedata->x400pNearEndCurrentLESs;
+		StorageNew->x400pNearEndCurrentBESs = thedata->x400pNearEndCurrentBESs;
+		StorageNew->x400pNearEndCurrentDMs = thedata->x400pNearEndCurrentDMs;
+		StorageNew->x400pNearEndCurrentLCVs = thedata->x400pNearEndCurrentLCVs;
 	}
       done:
 	DEBUGMSGTL(("x400pMxMIB", "done.\n"));
@@ -3185,7 +3700,7 @@ x400pNearEndCurrentTable_del(struct x400pNearEndCurrentTable_data *thedata)
  * @param line line from configuration file matching the token.
  * @brief parse configuration file for x400pNearEndCurrentTable entries.
  *
- * This callback is called by UCD-SNMP when it prases a configuration file and finds a configuration
+ * This callback is called by UCD-SNMP when it parses a configuration file and finds a configuration
  * file line for the registsred token (in this case x400pNearEndCurrentTable).  This routine is invoked by UCD-SNMP
  * to read the values of each row in the table from the configuration file.  Note that this
  * procedure may exist regardless of the persistence of the table.  If there are no configured
@@ -3289,8 +3804,10 @@ x400pNearEndIntervalTable_create(void)
 	DEBUGMSGTL(("x400pMxMIB", "x400pNearEndIntervalTable_create: creating row...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
-		if ((StorageNew->x400pDrivName = (uint8_t *) strdup("")) != NULL)
-			StorageNew->x400pDrivNameLen = strlen("");
+		if ((StorageNew->x400pDrivName = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->x400pDrivNameLen = 0;
+		StorageNew->x400pDrivName[StorageNew->x400pDrivNameLen] = 0;
 		StorageNew->x400pCardIndex = 0;
 		StorageNew->x400pSpanIndex = 0;
 		StorageNew->x400pNearEndIntervalESs = 0;
@@ -3304,16 +3821,20 @@ x400pNearEndIntervalTable_create(void)
 		StorageNew->x400pNearEndIntervalDMs = 0;
 		StorageNew->x400pNearEndIntervalLCVs = 0;
 		StorageNew->x400pNearEndIntervalValidData = 0;
-
 	}
+      done:
 	DEBUGMSGTL(("x400pMxMIB", "done.\n"));
 	return (StorageNew);
+	goto nomem;
+      nomem:
+	x400pNearEndIntervalTable_destroy(&StorageNew);
+	goto done;
 }
 
 /**
  * @fn struct x400pNearEndIntervalTable_data *x400pNearEndIntervalTable_duplicate(struct x400pNearEndIntervalTable_data *thedata)
  * @param thedata the row structure to duplicate.
- * @brief duplicat a row structure for a table.
+ * @brief duplicate a row structure for a table.
  *
  * Duplicates the specified row structure @param thedata and returns a pointer to the newly
  * allocated row structure on success, or NULL on failure.
@@ -3325,6 +3846,26 @@ x400pNearEndIntervalTable_duplicate(struct x400pNearEndIntervalTable_data *theda
 
 	DEBUGMSGTL(("x400pMxMIB", "x400pNearEndIntervalTable_duplicate: duplicating row...  "));
 	if (StorageNew != NULL) {
+		StorageNew->x400pNearEndIntervalTable_id = thedata->x400pNearEndIntervalTable_id;
+		if (!(StorageNew->x400pDrivName = malloc(thedata->x400pDrivNameLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->x400pDrivName, thedata->x400pDrivName, thedata->x400pDrivNameLen);
+		StorageNew->x400pDrivNameLen = thedata->x400pDrivNameLen;
+		StorageNew->x400pDrivName[StorageNew->x400pDrivNameLen] = 0;
+		StorageNew->x400pCardIndex = thedata->x400pCardIndex;
+		StorageNew->x400pSpanIndex = thedata->x400pSpanIndex;
+		StorageNew->x400pNearEndIntervalIndex = thedata->x400pNearEndIntervalIndex;
+		StorageNew->x400pNearEndIntervalESs = thedata->x400pNearEndIntervalESs;
+		StorageNew->x400pNearEndIntervalSESs = thedata->x400pNearEndIntervalSESs;
+		StorageNew->x400pNearEndIntervalSEFSs = thedata->x400pNearEndIntervalSEFSs;
+		StorageNew->x400pNearEndIntervalUASs = thedata->x400pNearEndIntervalUASs;
+		StorageNew->x400pNearEndIntervalCSSs = thedata->x400pNearEndIntervalCSSs;
+		StorageNew->x400pNearEndIntervalPCVs = thedata->x400pNearEndIntervalPCVs;
+		StorageNew->x400pNearEndIntervalLESs = thedata->x400pNearEndIntervalLESs;
+		StorageNew->x400pNearEndIntervalBESs = thedata->x400pNearEndIntervalBESs;
+		StorageNew->x400pNearEndIntervalDMs = thedata->x400pNearEndIntervalDMs;
+		StorageNew->x400pNearEndIntervalLCVs = thedata->x400pNearEndIntervalLCVs;
+		StorageNew->x400pNearEndIntervalValidData = thedata->x400pNearEndIntervalValidData;
 	}
       done:
 	DEBUGMSGTL(("x400pMxMIB", "done.\n"));
@@ -3426,7 +3967,7 @@ x400pNearEndIntervalTable_del(struct x400pNearEndIntervalTable_data *thedata)
  * @param line line from configuration file matching the token.
  * @brief parse configuration file for x400pNearEndIntervalTable entries.
  *
- * This callback is called by UCD-SNMP when it prases a configuration file and finds a configuration
+ * This callback is called by UCD-SNMP when it parses a configuration file and finds a configuration
  * file line for the registsred token (in this case x400pNearEndIntervalTable).  This routine is invoked by UCD-SNMP
  * to read the values of each row in the table from the configuration file.  Note that this
  * procedure may exist regardless of the persistence of the table.  If there are no configured
@@ -3532,8 +4073,10 @@ x400pNearEndTotalTable_create(void)
 	DEBUGMSGTL(("x400pMxMIB", "x400pNearEndTotalTable_create: creating row...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
-		if ((StorageNew->x400pDrivName = (uint8_t *) strdup("")) != NULL)
-			StorageNew->x400pDrivNameLen = strlen("");
+		if ((StorageNew->x400pDrivName = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->x400pDrivNameLen = 0;
+		StorageNew->x400pDrivName[StorageNew->x400pDrivNameLen] = 0;
 		StorageNew->x400pCardIndex = 0;
 		StorageNew->x400pSpanIndex = 0;
 		StorageNew->x400pNearEndTotalValidIntervals = 0;
@@ -3548,16 +4091,20 @@ x400pNearEndTotalTable_create(void)
 		StorageNew->x400pNearEndTotalBESs = 0;
 		StorageNew->x400pNearEndTotalDMs = 0;
 		StorageNew->x400pNearEndTotalLCVs = 0;
-
 	}
+      done:
 	DEBUGMSGTL(("x400pMxMIB", "done.\n"));
 	return (StorageNew);
+	goto nomem;
+      nomem:
+	x400pNearEndTotalTable_destroy(&StorageNew);
+	goto done;
 }
 
 /**
  * @fn struct x400pNearEndTotalTable_data *x400pNearEndTotalTable_duplicate(struct x400pNearEndTotalTable_data *thedata)
  * @param thedata the row structure to duplicate.
- * @brief duplicat a row structure for a table.
+ * @brief duplicate a row structure for a table.
  *
  * Duplicates the specified row structure @param thedata and returns a pointer to the newly
  * allocated row structure on success, or NULL on failure.
@@ -3569,6 +4116,26 @@ x400pNearEndTotalTable_duplicate(struct x400pNearEndTotalTable_data *thedata)
 
 	DEBUGMSGTL(("x400pMxMIB", "x400pNearEndTotalTable_duplicate: duplicating row...  "));
 	if (StorageNew != NULL) {
+		StorageNew->x400pNearEndTotalTable_id = thedata->x400pNearEndTotalTable_id;
+		if (!(StorageNew->x400pDrivName = malloc(thedata->x400pDrivNameLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->x400pDrivName, thedata->x400pDrivName, thedata->x400pDrivNameLen);
+		StorageNew->x400pDrivNameLen = thedata->x400pDrivNameLen;
+		StorageNew->x400pDrivName[StorageNew->x400pDrivNameLen] = 0;
+		StorageNew->x400pCardIndex = thedata->x400pCardIndex;
+		StorageNew->x400pSpanIndex = thedata->x400pSpanIndex;
+		StorageNew->x400pNearEndTotalValidIntervals = thedata->x400pNearEndTotalValidIntervals;
+		StorageNew->x400pNearEndTotalInvalidIntervals = thedata->x400pNearEndTotalInvalidIntervals;
+		StorageNew->x400pNearEndTotalESs = thedata->x400pNearEndTotalESs;
+		StorageNew->x400pNearEndTotalSESs = thedata->x400pNearEndTotalSESs;
+		StorageNew->x400pNearEndTotalSEFSs = thedata->x400pNearEndTotalSEFSs;
+		StorageNew->x400pNearEndTotalUASs = thedata->x400pNearEndTotalUASs;
+		StorageNew->x400pNearEndTotalCSSs = thedata->x400pNearEndTotalCSSs;
+		StorageNew->x400pNearEndTotalPCVs = thedata->x400pNearEndTotalPCVs;
+		StorageNew->x400pNearEndTotalLESs = thedata->x400pNearEndTotalLESs;
+		StorageNew->x400pNearEndTotalBESs = thedata->x400pNearEndTotalBESs;
+		StorageNew->x400pNearEndTotalDMs = thedata->x400pNearEndTotalDMs;
+		StorageNew->x400pNearEndTotalLCVs = thedata->x400pNearEndTotalLCVs;
 	}
       done:
 	DEBUGMSGTL(("x400pMxMIB", "done.\n"));
@@ -3668,7 +4235,7 @@ x400pNearEndTotalTable_del(struct x400pNearEndTotalTable_data *thedata)
  * @param line line from configuration file matching the token.
  * @brief parse configuration file for x400pNearEndTotalTable entries.
  *
- * This callback is called by UCD-SNMP when it prases a configuration file and finds a configuration
+ * This callback is called by UCD-SNMP when it parses a configuration file and finds a configuration
  * file line for the registsred token (in this case x400pNearEndTotalTable).  This routine is invoked by UCD-SNMP
  * to read the values of each row in the table from the configuration file.  Note that this
  * procedure may exist regardless of the persistence of the table.  If there are no configured
@@ -3774,8 +4341,10 @@ x400pFarEndCurrentTable_create(void)
 	DEBUGMSGTL(("x400pMxMIB", "x400pFarEndCurrentTable_create: creating row...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
-		if ((StorageNew->x400pDrivName = (uint8_t *) strdup("")) != NULL)
-			StorageNew->x400pDrivNameLen = strlen("");
+		if ((StorageNew->x400pDrivName = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->x400pDrivNameLen = 0;
+		StorageNew->x400pDrivName[StorageNew->x400pDrivNameLen] = 0;
 		StorageNew->x400pCardIndex = 0;
 		StorageNew->x400pSpanIndex = 0;
 		StorageNew->x400pFarEndCurrentTimeElapsed = 0;
@@ -3788,16 +4357,20 @@ x400pFarEndCurrentTable_create(void)
 		StorageNew->x400pFarEndCurrentLESs = 0;
 		StorageNew->x400pFarEndCurrentBESs = 0;
 		StorageNew->x400pFarEndCurrentDMs = 0;
-
 	}
+      done:
 	DEBUGMSGTL(("x400pMxMIB", "done.\n"));
 	return (StorageNew);
+	goto nomem;
+      nomem:
+	x400pFarEndCurrentTable_destroy(&StorageNew);
+	goto done;
 }
 
 /**
  * @fn struct x400pFarEndCurrentTable_data *x400pFarEndCurrentTable_duplicate(struct x400pFarEndCurrentTable_data *thedata)
  * @param thedata the row structure to duplicate.
- * @brief duplicat a row structure for a table.
+ * @brief duplicate a row structure for a table.
  *
  * Duplicates the specified row structure @param thedata and returns a pointer to the newly
  * allocated row structure on success, or NULL on failure.
@@ -3809,6 +4382,24 @@ x400pFarEndCurrentTable_duplicate(struct x400pFarEndCurrentTable_data *thedata)
 
 	DEBUGMSGTL(("x400pMxMIB", "x400pFarEndCurrentTable_duplicate: duplicating row...  "));
 	if (StorageNew != NULL) {
+		StorageNew->x400pFarEndCurrentTable_id = thedata->x400pFarEndCurrentTable_id;
+		if (!(StorageNew->x400pDrivName = malloc(thedata->x400pDrivNameLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->x400pDrivName, thedata->x400pDrivName, thedata->x400pDrivNameLen);
+		StorageNew->x400pDrivNameLen = thedata->x400pDrivNameLen;
+		StorageNew->x400pDrivName[StorageNew->x400pDrivNameLen] = 0;
+		StorageNew->x400pCardIndex = thedata->x400pCardIndex;
+		StorageNew->x400pSpanIndex = thedata->x400pSpanIndex;
+		StorageNew->x400pFarEndCurrentTimeElapsed = thedata->x400pFarEndCurrentTimeElapsed;
+		StorageNew->x400pFarEndCurrentESs = thedata->x400pFarEndCurrentESs;
+		StorageNew->x400pFarEndCurrentSESs = thedata->x400pFarEndCurrentSESs;
+		StorageNew->x400pFarEndCurrentSEFSs = thedata->x400pFarEndCurrentSEFSs;
+		StorageNew->x400pFarEndCurrentUASs = thedata->x400pFarEndCurrentUASs;
+		StorageNew->x400pFarEndCurrentCSSs = thedata->x400pFarEndCurrentCSSs;
+		StorageNew->x400pFarEndCurrentPCVs = thedata->x400pFarEndCurrentPCVs;
+		StorageNew->x400pFarEndCurrentLESs = thedata->x400pFarEndCurrentLESs;
+		StorageNew->x400pFarEndCurrentBESs = thedata->x400pFarEndCurrentBESs;
+		StorageNew->x400pFarEndCurrentDMs = thedata->x400pFarEndCurrentDMs;
 	}
       done:
 	DEBUGMSGTL(("x400pMxMIB", "done.\n"));
@@ -3908,7 +4499,7 @@ x400pFarEndCurrentTable_del(struct x400pFarEndCurrentTable_data *thedata)
  * @param line line from configuration file matching the token.
  * @brief parse configuration file for x400pFarEndCurrentTable entries.
  *
- * This callback is called by UCD-SNMP when it prases a configuration file and finds a configuration
+ * This callback is called by UCD-SNMP when it parses a configuration file and finds a configuration
  * file line for the registsred token (in this case x400pFarEndCurrentTable).  This routine is invoked by UCD-SNMP
  * to read the values of each row in the table from the configuration file.  Note that this
  * procedure may exist regardless of the persistence of the table.  If there are no configured
@@ -4010,8 +4601,10 @@ x400pFarEndIntervalTable_create(void)
 	DEBUGMSGTL(("x400pMxMIB", "x400pFarEndIntervalTable_create: creating row...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
-		if ((StorageNew->x400pDrivName = (uint8_t *) strdup("")) != NULL)
-			StorageNew->x400pDrivNameLen = strlen("");
+		if ((StorageNew->x400pDrivName = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->x400pDrivNameLen = 0;
+		StorageNew->x400pDrivName[StorageNew->x400pDrivNameLen] = 0;
 		StorageNew->x400pCardIndex = 0;
 		StorageNew->x400pSpanIndex = 0;
 		StorageNew->x400pFarEndIntervalESs = 0;
@@ -4024,16 +4617,20 @@ x400pFarEndIntervalTable_create(void)
 		StorageNew->x400pFarEndIntervalBESs = 0;
 		StorageNew->x400pFarEndIntervalDMs = 0;
 		StorageNew->x400pFarEndIntervalValidData = 0;
-
 	}
+      done:
 	DEBUGMSGTL(("x400pMxMIB", "done.\n"));
 	return (StorageNew);
+	goto nomem;
+      nomem:
+	x400pFarEndIntervalTable_destroy(&StorageNew);
+	goto done;
 }
 
 /**
  * @fn struct x400pFarEndIntervalTable_data *x400pFarEndIntervalTable_duplicate(struct x400pFarEndIntervalTable_data *thedata)
  * @param thedata the row structure to duplicate.
- * @brief duplicat a row structure for a table.
+ * @brief duplicate a row structure for a table.
  *
  * Duplicates the specified row structure @param thedata and returns a pointer to the newly
  * allocated row structure on success, or NULL on failure.
@@ -4045,6 +4642,25 @@ x400pFarEndIntervalTable_duplicate(struct x400pFarEndIntervalTable_data *thedata
 
 	DEBUGMSGTL(("x400pMxMIB", "x400pFarEndIntervalTable_duplicate: duplicating row...  "));
 	if (StorageNew != NULL) {
+		StorageNew->x400pFarEndIntervalTable_id = thedata->x400pFarEndIntervalTable_id;
+		if (!(StorageNew->x400pDrivName = malloc(thedata->x400pDrivNameLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->x400pDrivName, thedata->x400pDrivName, thedata->x400pDrivNameLen);
+		StorageNew->x400pDrivNameLen = thedata->x400pDrivNameLen;
+		StorageNew->x400pDrivName[StorageNew->x400pDrivNameLen] = 0;
+		StorageNew->x400pCardIndex = thedata->x400pCardIndex;
+		StorageNew->x400pSpanIndex = thedata->x400pSpanIndex;
+		StorageNew->x400pFarEndIntervalIndex = thedata->x400pFarEndIntervalIndex;
+		StorageNew->x400pFarEndIntervalESs = thedata->x400pFarEndIntervalESs;
+		StorageNew->x400pFarEndIntervalSESs = thedata->x400pFarEndIntervalSESs;
+		StorageNew->x400pFarEndIntervalSEFSs = thedata->x400pFarEndIntervalSEFSs;
+		StorageNew->x400pFarEndIntervalUASs = thedata->x400pFarEndIntervalUASs;
+		StorageNew->x400pFarEndIntervalCSSs = thedata->x400pFarEndIntervalCSSs;
+		StorageNew->x400pFarEndIntervalPCVs = thedata->x400pFarEndIntervalPCVs;
+		StorageNew->x400pFarEndIntervalLESs = thedata->x400pFarEndIntervalLESs;
+		StorageNew->x400pFarEndIntervalBESs = thedata->x400pFarEndIntervalBESs;
+		StorageNew->x400pFarEndIntervalDMs = thedata->x400pFarEndIntervalDMs;
+		StorageNew->x400pFarEndIntervalValidData = thedata->x400pFarEndIntervalValidData;
 	}
       done:
 	DEBUGMSGTL(("x400pMxMIB", "done.\n"));
@@ -4146,7 +4762,7 @@ x400pFarEndIntervalTable_del(struct x400pFarEndIntervalTable_data *thedata)
  * @param line line from configuration file matching the token.
  * @brief parse configuration file for x400pFarEndIntervalTable entries.
  *
- * This callback is called by UCD-SNMP when it prases a configuration file and finds a configuration
+ * This callback is called by UCD-SNMP when it parses a configuration file and finds a configuration
  * file line for the registsred token (in this case x400pFarEndIntervalTable).  This routine is invoked by UCD-SNMP
  * to read the values of each row in the table from the configuration file.  Note that this
  * procedure may exist regardless of the persistence of the table.  If there are no configured
@@ -4250,8 +4866,10 @@ x400pFarEndTotalTable_create(void)
 	DEBUGMSGTL(("x400pMxMIB", "x400pFarEndTotalTable_create: creating row...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
-		if ((StorageNew->x400pDrivName = (uint8_t *) strdup("")) != NULL)
-			StorageNew->x400pDrivNameLen = strlen("");
+		if ((StorageNew->x400pDrivName = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->x400pDrivNameLen = 0;
+		StorageNew->x400pDrivName[StorageNew->x400pDrivNameLen] = 0;
 		StorageNew->x400pCardIndex = 0;
 		StorageNew->x400pSpanIndex = 0;
 		StorageNew->x400pFarEndTotalValidIntervals = 0;
@@ -4265,16 +4883,20 @@ x400pFarEndTotalTable_create(void)
 		StorageNew->x400pFarEndTotalLESs = 0;
 		StorageNew->x400pFarEndTotalBESs = 0;
 		StorageNew->x400pFarEndTotalDMs = 0;
-
 	}
+      done:
 	DEBUGMSGTL(("x400pMxMIB", "done.\n"));
 	return (StorageNew);
+	goto nomem;
+      nomem:
+	x400pFarEndTotalTable_destroy(&StorageNew);
+	goto done;
 }
 
 /**
  * @fn struct x400pFarEndTotalTable_data *x400pFarEndTotalTable_duplicate(struct x400pFarEndTotalTable_data *thedata)
  * @param thedata the row structure to duplicate.
- * @brief duplicat a row structure for a table.
+ * @brief duplicate a row structure for a table.
  *
  * Duplicates the specified row structure @param thedata and returns a pointer to the newly
  * allocated row structure on success, or NULL on failure.
@@ -4286,6 +4908,25 @@ x400pFarEndTotalTable_duplicate(struct x400pFarEndTotalTable_data *thedata)
 
 	DEBUGMSGTL(("x400pMxMIB", "x400pFarEndTotalTable_duplicate: duplicating row...  "));
 	if (StorageNew != NULL) {
+		StorageNew->x400pFarEndTotalTable_id = thedata->x400pFarEndTotalTable_id;
+		if (!(StorageNew->x400pDrivName = malloc(thedata->x400pDrivNameLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->x400pDrivName, thedata->x400pDrivName, thedata->x400pDrivNameLen);
+		StorageNew->x400pDrivNameLen = thedata->x400pDrivNameLen;
+		StorageNew->x400pDrivName[StorageNew->x400pDrivNameLen] = 0;
+		StorageNew->x400pCardIndex = thedata->x400pCardIndex;
+		StorageNew->x400pSpanIndex = thedata->x400pSpanIndex;
+		StorageNew->x400pFarEndTotalValidIntervals = thedata->x400pFarEndTotalValidIntervals;
+		StorageNew->x400pFarEndTotalInvalidIntervals = thedata->x400pFarEndTotalInvalidIntervals;
+		StorageNew->x400pFarEndTotalESs = thedata->x400pFarEndTotalESs;
+		StorageNew->x400pFarEndTotalSESs = thedata->x400pFarEndTotalSESs;
+		StorageNew->x400pFarEndTotalSEFSs = thedata->x400pFarEndTotalSEFSs;
+		StorageNew->x400pFarEndTotalUASs = thedata->x400pFarEndTotalUASs;
+		StorageNew->x400pFarEndTotalCSSs = thedata->x400pFarEndTotalCSSs;
+		StorageNew->x400pFarEndTotalPCVs = thedata->x400pFarEndTotalPCVs;
+		StorageNew->x400pFarEndTotalLESs = thedata->x400pFarEndTotalLESs;
+		StorageNew->x400pFarEndTotalBESs = thedata->x400pFarEndTotalBESs;
+		StorageNew->x400pFarEndTotalDMs = thedata->x400pFarEndTotalDMs;
 	}
       done:
 	DEBUGMSGTL(("x400pMxMIB", "done.\n"));
@@ -4385,7 +5026,7 @@ x400pFarEndTotalTable_del(struct x400pFarEndTotalTable_data *thedata)
  * @param line line from configuration file matching the token.
  * @brief parse configuration file for x400pFarEndTotalTable entries.
  *
- * This callback is called by UCD-SNMP when it prases a configuration file and finds a configuration
+ * This callback is called by UCD-SNMP when it parses a configuration file and finds a configuration
  * file line for the registsred token (in this case x400pFarEndTotalTable).  This routine is invoked by UCD-SNMP
  * to read the values of each row in the table from the configuration file.  Note that this
  * procedure may exist regardless of the persistence of the table.  If there are no configured
@@ -4474,6 +5115,234 @@ store_x400pFarEndTotalTable(int majorID, int minorID, void *serverarg, void *cli
 }
 
 /**
+ * @fn int activate_x400pSyncTable_row(struct x400pSyncTable_data *StorageTmp)
+ * @param StorageTmp the data row to activate
+ * @brief commit activation of a row to the underlying device
+ *
+ * This function is used by tables that contain a RowStatus object.  It is used to move the row from
+ * the RS_NOTINSERVICE state to the RS_ACTIVE state.  It is also used when transitioning from the
+ * RS_CREATEANDGO state to the RS_ACTIVE state.  If activation fails, the function should return
+ * SNMP_ERR_COMMITFAILED; otherwise, SNMP_ERR_NOERROR.
+ */
+int
+activate_x400pSyncTable_row(struct x400pSyncTable_data *StorageTmp)
+{
+	/* XXX: provide code to activate the row with the underlying device */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int deactivate_x400pSyncTable_row(struct x400pSyncTable_data *StorageTmp)
+ * @param StorageTmp the data row to deactivate
+ * @brief commit deactivation of a row to the underlying device
+ *
+ * This function is used by tables that contain a RowStatus object.  It is used to move the row from
+ * the RS_ACTIVE state to the RS_NOTINSERVICE state.  It is also used when transitioning from the
+ * RS_ACTIVE state to the RS_DESTROY state.  If deactivation fails, the function should return
+ * SNMP_ERR_COMMITFAILED; otherwise, SNMP_ERR_NOERROR.
+ */
+int
+deactivate_x400pSyncTable_row(struct x400pSyncTable_data *StorageTmp)
+{
+	/* XXX: provide code to deactivate the row with the underlying device */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int activate_x400pDrivTable_row(struct x400pDrivTable_data *StorageTmp)
+ * @param StorageTmp the data row to activate
+ * @brief commit activation of a row to the underlying device
+ *
+ * This function is used by tables that contain a RowStatus object.  It is used to move the row from
+ * the RS_NOTINSERVICE state to the RS_ACTIVE state.  It is also used when transitioning from the
+ * RS_CREATEANDGO state to the RS_ACTIVE state.  If activation fails, the function should return
+ * SNMP_ERR_COMMITFAILED; otherwise, SNMP_ERR_NOERROR.
+ */
+int
+activate_x400pDrivTable_row(struct x400pDrivTable_data *StorageTmp)
+{
+	/* XXX: provide code to activate the row with the underlying device */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int deactivate_x400pDrivTable_row(struct x400pDrivTable_data *StorageTmp)
+ * @param StorageTmp the data row to deactivate
+ * @brief commit deactivation of a row to the underlying device
+ *
+ * This function is used by tables that contain a RowStatus object.  It is used to move the row from
+ * the RS_ACTIVE state to the RS_NOTINSERVICE state.  It is also used when transitioning from the
+ * RS_ACTIVE state to the RS_DESTROY state.  If deactivation fails, the function should return
+ * SNMP_ERR_COMMITFAILED; otherwise, SNMP_ERR_NOERROR.
+ */
+int
+deactivate_x400pDrivTable_row(struct x400pDrivTable_data *StorageTmp)
+{
+	/* XXX: provide code to deactivate the row with the underlying device */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int activate_x400pCardTable_row(struct x400pCardTable_data *StorageTmp)
+ * @param StorageTmp the data row to activate
+ * @brief commit activation of a row to the underlying device
+ *
+ * This function is used by tables that contain a RowStatus object.  It is used to move the row from
+ * the RS_NOTINSERVICE state to the RS_ACTIVE state.  It is also used when transitioning from the
+ * RS_CREATEANDGO state to the RS_ACTIVE state.  If activation fails, the function should return
+ * SNMP_ERR_COMMITFAILED; otherwise, SNMP_ERR_NOERROR.
+ */
+int
+activate_x400pCardTable_row(struct x400pCardTable_data *StorageTmp)
+{
+	/* XXX: provide code to activate the row with the underlying device */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int deactivate_x400pCardTable_row(struct x400pCardTable_data *StorageTmp)
+ * @param StorageTmp the data row to deactivate
+ * @brief commit deactivation of a row to the underlying device
+ *
+ * This function is used by tables that contain a RowStatus object.  It is used to move the row from
+ * the RS_ACTIVE state to the RS_NOTINSERVICE state.  It is also used when transitioning from the
+ * RS_ACTIVE state to the RS_DESTROY state.  If deactivation fails, the function should return
+ * SNMP_ERR_COMMITFAILED; otherwise, SNMP_ERR_NOERROR.
+ */
+int
+deactivate_x400pCardTable_row(struct x400pCardTable_data *StorageTmp)
+{
+	/* XXX: provide code to deactivate the row with the underlying device */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int activate_x400pSpanTable_row(struct x400pSpanTable_data *StorageTmp)
+ * @param StorageTmp the data row to activate
+ * @brief commit activation of a row to the underlying device
+ *
+ * This function is used by tables that contain a RowStatus object.  It is used to move the row from
+ * the RS_NOTINSERVICE state to the RS_ACTIVE state.  It is also used when transitioning from the
+ * RS_CREATEANDGO state to the RS_ACTIVE state.  If activation fails, the function should return
+ * SNMP_ERR_COMMITFAILED; otherwise, SNMP_ERR_NOERROR.
+ */
+int
+activate_x400pSpanTable_row(struct x400pSpanTable_data *StorageTmp)
+{
+	/* XXX: provide code to activate the row with the underlying device */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int deactivate_x400pSpanTable_row(struct x400pSpanTable_data *StorageTmp)
+ * @param StorageTmp the data row to deactivate
+ * @brief commit deactivation of a row to the underlying device
+ *
+ * This function is used by tables that contain a RowStatus object.  It is used to move the row from
+ * the RS_ACTIVE state to the RS_NOTINSERVICE state.  It is also used when transitioning from the
+ * RS_ACTIVE state to the RS_DESTROY state.  If deactivation fails, the function should return
+ * SNMP_ERR_COMMITFAILED; otherwise, SNMP_ERR_NOERROR.
+ */
+int
+deactivate_x400pSpanTable_row(struct x400pSpanTable_data *StorageTmp)
+{
+	/* XXX: provide code to deactivate the row with the underlying device */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int activate_x400pXconTable_row(struct x400pXconTable_data *StorageTmp)
+ * @param StorageTmp the data row to activate
+ * @brief commit activation of a row to the underlying device
+ *
+ * This function is used by tables that contain a RowStatus object.  It is used to move the row from
+ * the RS_NOTINSERVICE state to the RS_ACTIVE state.  It is also used when transitioning from the
+ * RS_CREATEANDGO state to the RS_ACTIVE state.  If activation fails, the function should return
+ * SNMP_ERR_COMMITFAILED; otherwise, SNMP_ERR_NOERROR.
+ */
+int
+activate_x400pXconTable_row(struct x400pXconTable_data *StorageTmp)
+{
+	/* XXX: provide code to activate the row with the underlying device */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int deactivate_x400pXconTable_row(struct x400pXconTable_data *StorageTmp)
+ * @param StorageTmp the data row to deactivate
+ * @brief commit deactivation of a row to the underlying device
+ *
+ * This function is used by tables that contain a RowStatus object.  It is used to move the row from
+ * the RS_ACTIVE state to the RS_NOTINSERVICE state.  It is also used when transitioning from the
+ * RS_ACTIVE state to the RS_DESTROY state.  If deactivation fails, the function should return
+ * SNMP_ERR_COMMITFAILED; otherwise, SNMP_ERR_NOERROR.
+ */
+int
+deactivate_x400pXconTable_row(struct x400pXconTable_data *StorageTmp)
+{
+	/* XXX: provide code to deactivate the row with the underlying device */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int check_x400pSyncTable_row(struct x400pSyncTable_data *StorageTmp, struct x400pSyncTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to check, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the ACTION phase.  The start of the ACTION pahse performs this consitency check
+ * on the row before allowing the request to proceed to the COMMIT phase.  This function can return
+ * SNMP_ERR_NOERR or a specific SNMP error value.  Values in StorageOld are the values before the
+ * varbinds on the mib were applied; the values in StorageTmp are the new values.  The function is
+ * permitted to change the values in StorageTmp to correct them; however, preference should be made
+ * for setting values where were not in the varbinds.
+ */
+int
+check_x400pSyncTable_row(struct x400pSyncTable_data *StorageTmp, struct x400pSyncTable_data *StorageOld)
+{
+	/* XXX: provide code to check the row for consistency */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int update_x400pSyncTable_row(struct x400pSyncTable_data *StorageTmp, struct x400pSyncTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the set operation (ACTION phase) on a row
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to update, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the COMMIT phase.  The start of the ACTION phase performs a consistency check on
+ * the row before allowing the request to proceed to the COMMIT phase.  The COMMIT phase then
+ * arrives here with consistency already checked (see check_x400pSyncTable_row()).  This function can
+ * return SNMP_ERR_NOERROR or SNMP_ERR_COMMITFAILED.  Values in StorageOld are the values before the
+ * varbinds on the row were applied: the values in StorageTmp are the new values.
+ */
+int
+update_x400pSyncTable_row(struct x400pSyncTable_data *StorageTmp, struct x400pSyncTable_data *StorageOld)
+{
+	/* XXX: provide code to update the row with the underlying device */
+	x400pSyncTable_refresh = 1;
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int revert_x400pSyncTable_row(struct x400pSyncTable_data *StorageTmp, struct x400pSyncTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the undo operation (UNDO phase) on a row
+ */
+void
+revert_x400pSyncTable_row(struct x400pSyncTable_data *StorageTmp, struct x400pSyncTable_data *StorageOld)
+{
+	/* XXX: provide code to revert the row with the underlying device */
+	update_x400pSyncTable_row(StorageOld, NULL);
+}
+
+/**
  * @fn void refresh_x400pSyncTable_row(struct x400pSyncTable_data *StorageTmp, int force)
  * @param StorageTmp the data row to refresh.
  * @param force force refresh if non-zero.
@@ -4556,6 +5425,64 @@ var_x400pSyncTable(struct variable *vp, oid * name, size_t *length, int exact, s
 		ERROR_MSG("");
 	}
 	return (rval);
+}
+
+/**
+ * @fn int check_x400pDrivTable_row(struct x400pDrivTable_data *StorageTmp, struct x400pDrivTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to check, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the ACTION phase.  The start of the ACTION pahse performs this consitency check
+ * on the row before allowing the request to proceed to the COMMIT phase.  This function can return
+ * SNMP_ERR_NOERR or a specific SNMP error value.  Values in StorageOld are the values before the
+ * varbinds on the mib were applied; the values in StorageTmp are the new values.  The function is
+ * permitted to change the values in StorageTmp to correct them; however, preference should be made
+ * for setting values where were not in the varbinds.
+ */
+int
+check_x400pDrivTable_row(struct x400pDrivTable_data *StorageTmp, struct x400pDrivTable_data *StorageOld)
+{
+	/* XXX: provide code to check the row for consistency */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int update_x400pDrivTable_row(struct x400pDrivTable_data *StorageTmp, struct x400pDrivTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the set operation (ACTION phase) on a row
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to update, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the COMMIT phase.  The start of the ACTION phase performs a consistency check on
+ * the row before allowing the request to proceed to the COMMIT phase.  The COMMIT phase then
+ * arrives here with consistency already checked (see check_x400pDrivTable_row()).  This function can
+ * return SNMP_ERR_NOERROR or SNMP_ERR_COMMITFAILED.  Values in StorageOld are the values before the
+ * varbinds on the row were applied: the values in StorageTmp are the new values.
+ */
+int
+update_x400pDrivTable_row(struct x400pDrivTable_data *StorageTmp, struct x400pDrivTable_data *StorageOld)
+{
+	/* XXX: provide code to update the row with the underlying device */
+	x400pDrivTable_refresh = 1;
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int revert_x400pDrivTable_row(struct x400pDrivTable_data *StorageTmp, struct x400pDrivTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the undo operation (UNDO phase) on a row
+ */
+void
+revert_x400pDrivTable_row(struct x400pDrivTable_data *StorageTmp, struct x400pDrivTable_data *StorageOld)
+{
+	/* XXX: provide code to revert the row with the underlying device */
+	update_x400pDrivTable_row(StorageOld, NULL);
 }
 
 /**
@@ -4688,6 +5615,64 @@ var_x400pDrivTable(struct variable *vp, oid * name, size_t *length, int exact, s
 		ERROR_MSG("");
 	}
 	return (rval);
+}
+
+/**
+ * @fn int check_x400pCardTable_row(struct x400pCardTable_data *StorageTmp, struct x400pCardTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to check, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the ACTION phase.  The start of the ACTION pahse performs this consitency check
+ * on the row before allowing the request to proceed to the COMMIT phase.  This function can return
+ * SNMP_ERR_NOERR or a specific SNMP error value.  Values in StorageOld are the values before the
+ * varbinds on the mib were applied; the values in StorageTmp are the new values.  The function is
+ * permitted to change the values in StorageTmp to correct them; however, preference should be made
+ * for setting values where were not in the varbinds.
+ */
+int
+check_x400pCardTable_row(struct x400pCardTable_data *StorageTmp, struct x400pCardTable_data *StorageOld)
+{
+	/* XXX: provide code to check the row for consistency */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int update_x400pCardTable_row(struct x400pCardTable_data *StorageTmp, struct x400pCardTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the set operation (ACTION phase) on a row
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to update, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the COMMIT phase.  The start of the ACTION phase performs a consistency check on
+ * the row before allowing the request to proceed to the COMMIT phase.  The COMMIT phase then
+ * arrives here with consistency already checked (see check_x400pCardTable_row()).  This function can
+ * return SNMP_ERR_NOERROR or SNMP_ERR_COMMITFAILED.  Values in StorageOld are the values before the
+ * varbinds on the row were applied: the values in StorageTmp are the new values.
+ */
+int
+update_x400pCardTable_row(struct x400pCardTable_data *StorageTmp, struct x400pCardTable_data *StorageOld)
+{
+	/* XXX: provide code to update the row with the underlying device */
+	x400pCardTable_refresh = 1;
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int revert_x400pCardTable_row(struct x400pCardTable_data *StorageTmp, struct x400pCardTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the undo operation (UNDO phase) on a row
+ */
+void
+revert_x400pCardTable_row(struct x400pCardTable_data *StorageTmp, struct x400pCardTable_data *StorageOld)
+{
+	/* XXX: provide code to revert the row with the underlying device */
+	update_x400pCardTable_row(StorageOld, NULL);
 }
 
 /**
@@ -5404,6 +6389,64 @@ var_x400pCardTable(struct variable *vp, oid * name, size_t *length, int exact, s
 }
 
 /**
+ * @fn int check_x400pSpanTable_row(struct x400pSpanTable_data *StorageTmp, struct x400pSpanTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to check, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the ACTION phase.  The start of the ACTION pahse performs this consitency check
+ * on the row before allowing the request to proceed to the COMMIT phase.  This function can return
+ * SNMP_ERR_NOERR or a specific SNMP error value.  Values in StorageOld are the values before the
+ * varbinds on the mib were applied; the values in StorageTmp are the new values.  The function is
+ * permitted to change the values in StorageTmp to correct them; however, preference should be made
+ * for setting values where were not in the varbinds.
+ */
+int
+check_x400pSpanTable_row(struct x400pSpanTable_data *StorageTmp, struct x400pSpanTable_data *StorageOld)
+{
+	/* XXX: provide code to check the row for consistency */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int update_x400pSpanTable_row(struct x400pSpanTable_data *StorageTmp, struct x400pSpanTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the set operation (ACTION phase) on a row
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to update, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the COMMIT phase.  The start of the ACTION phase performs a consistency check on
+ * the row before allowing the request to proceed to the COMMIT phase.  The COMMIT phase then
+ * arrives here with consistency already checked (see check_x400pSpanTable_row()).  This function can
+ * return SNMP_ERR_NOERROR or SNMP_ERR_COMMITFAILED.  Values in StorageOld are the values before the
+ * varbinds on the row were applied: the values in StorageTmp are the new values.
+ */
+int
+update_x400pSpanTable_row(struct x400pSpanTable_data *StorageTmp, struct x400pSpanTable_data *StorageOld)
+{
+	/* XXX: provide code to update the row with the underlying device */
+	x400pSpanTable_refresh = 1;
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int revert_x400pSpanTable_row(struct x400pSpanTable_data *StorageTmp, struct x400pSpanTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the undo operation (UNDO phase) on a row
+ */
+void
+revert_x400pSpanTable_row(struct x400pSpanTable_data *StorageTmp, struct x400pSpanTable_data *StorageOld)
+{
+	/* XXX: provide code to revert the row with the underlying device */
+	update_x400pSpanTable_row(StorageOld, NULL);
+}
+
+/**
  * @fn void refresh_x400pSpanTable_row(struct x400pSpanTable_data *StorageTmp, int force)
  * @param StorageTmp the data row to refresh.
  * @param force force refresh if non-zero.
@@ -6048,6 +7091,64 @@ var_x400pSpanTable(struct variable *vp, oid * name, size_t *length, int exact, s
 }
 
 /**
+ * @fn int check_x400pBertTable_row(struct x400pBertTable_data *StorageTmp, struct x400pBertTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to check, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the ACTION phase.  The start of the ACTION pahse performs this consitency check
+ * on the row before allowing the request to proceed to the COMMIT phase.  This function can return
+ * SNMP_ERR_NOERR or a specific SNMP error value.  Values in StorageOld are the values before the
+ * varbinds on the mib were applied; the values in StorageTmp are the new values.  The function is
+ * permitted to change the values in StorageTmp to correct them; however, preference should be made
+ * for setting values where were not in the varbinds.
+ */
+int
+check_x400pBertTable_row(struct x400pBertTable_data *StorageTmp, struct x400pBertTable_data *StorageOld)
+{
+	/* XXX: provide code to check the row for consistency */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int update_x400pBertTable_row(struct x400pBertTable_data *StorageTmp, struct x400pBertTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the set operation (ACTION phase) on a row
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to update, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the COMMIT phase.  The start of the ACTION phase performs a consistency check on
+ * the row before allowing the request to proceed to the COMMIT phase.  The COMMIT phase then
+ * arrives here with consistency already checked (see check_x400pBertTable_row()).  This function can
+ * return SNMP_ERR_NOERROR or SNMP_ERR_COMMITFAILED.  Values in StorageOld are the values before the
+ * varbinds on the row were applied: the values in StorageTmp are the new values.
+ */
+int
+update_x400pBertTable_row(struct x400pBertTable_data *StorageTmp, struct x400pBertTable_data *StorageOld)
+{
+	/* XXX: provide code to update the row with the underlying device */
+	x400pBertTable_refresh = 1;
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int revert_x400pBertTable_row(struct x400pBertTable_data *StorageTmp, struct x400pBertTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the undo operation (UNDO phase) on a row
+ */
+void
+revert_x400pBertTable_row(struct x400pBertTable_data *StorageTmp, struct x400pBertTable_data *StorageOld)
+{
+	/* XXX: provide code to revert the row with the underlying device */
+	update_x400pBertTable_row(StorageOld, NULL);
+}
+
+/**
  * @fn void refresh_x400pBertTable_row(struct x400pBertTable_data *StorageTmp, int force)
  * @param StorageTmp the data row to refresh.
  * @param force force refresh if non-zero.
@@ -6162,6 +7263,64 @@ var_x400pBertTable(struct variable *vp, oid * name, size_t *length, int exact, s
 		ERROR_MSG("");
 	}
 	return (rval);
+}
+
+/**
+ * @fn int check_x400pChanTable_row(struct x400pChanTable_data *StorageTmp, struct x400pChanTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to check, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the ACTION phase.  The start of the ACTION pahse performs this consitency check
+ * on the row before allowing the request to proceed to the COMMIT phase.  This function can return
+ * SNMP_ERR_NOERR or a specific SNMP error value.  Values in StorageOld are the values before the
+ * varbinds on the mib were applied; the values in StorageTmp are the new values.  The function is
+ * permitted to change the values in StorageTmp to correct them; however, preference should be made
+ * for setting values where were not in the varbinds.
+ */
+int
+check_x400pChanTable_row(struct x400pChanTable_data *StorageTmp, struct x400pChanTable_data *StorageOld)
+{
+	/* XXX: provide code to check the row for consistency */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int update_x400pChanTable_row(struct x400pChanTable_data *StorageTmp, struct x400pChanTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the set operation (ACTION phase) on a row
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to update, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the COMMIT phase.  The start of the ACTION phase performs a consistency check on
+ * the row before allowing the request to proceed to the COMMIT phase.  The COMMIT phase then
+ * arrives here with consistency already checked (see check_x400pChanTable_row()).  This function can
+ * return SNMP_ERR_NOERROR or SNMP_ERR_COMMITFAILED.  Values in StorageOld are the values before the
+ * varbinds on the row were applied: the values in StorageTmp are the new values.
+ */
+int
+update_x400pChanTable_row(struct x400pChanTable_data *StorageTmp, struct x400pChanTable_data *StorageOld)
+{
+	/* XXX: provide code to update the row with the underlying device */
+	x400pChanTable_refresh = 1;
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int revert_x400pChanTable_row(struct x400pChanTable_data *StorageTmp, struct x400pChanTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the undo operation (UNDO phase) on a row
+ */
+void
+revert_x400pChanTable_row(struct x400pChanTable_data *StorageTmp, struct x400pChanTable_data *StorageOld)
+{
+	/* XXX: provide code to revert the row with the underlying device */
+	update_x400pChanTable_row(StorageOld, NULL);
 }
 
 /**
@@ -6322,6 +7481,64 @@ var_x400pChanTable(struct variable *vp, oid * name, size_t *length, int exact, s
 }
 
 /**
+ * @fn int check_x400pXconTable_row(struct x400pXconTable_data *StorageTmp, struct x400pXconTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to check, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the ACTION phase.  The start of the ACTION pahse performs this consitency check
+ * on the row before allowing the request to proceed to the COMMIT phase.  This function can return
+ * SNMP_ERR_NOERR or a specific SNMP error value.  Values in StorageOld are the values before the
+ * varbinds on the mib were applied; the values in StorageTmp are the new values.  The function is
+ * permitted to change the values in StorageTmp to correct them; however, preference should be made
+ * for setting values where were not in the varbinds.
+ */
+int
+check_x400pXconTable_row(struct x400pXconTable_data *StorageTmp, struct x400pXconTable_data *StorageOld)
+{
+	/* XXX: provide code to check the row for consistency */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int update_x400pXconTable_row(struct x400pXconTable_data *StorageTmp, struct x400pXconTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the set operation (ACTION phase) on a row
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to update, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the COMMIT phase.  The start of the ACTION phase performs a consistency check on
+ * the row before allowing the request to proceed to the COMMIT phase.  The COMMIT phase then
+ * arrives here with consistency already checked (see check_x400pXconTable_row()).  This function can
+ * return SNMP_ERR_NOERROR or SNMP_ERR_COMMITFAILED.  Values in StorageOld are the values before the
+ * varbinds on the row were applied: the values in StorageTmp are the new values.
+ */
+int
+update_x400pXconTable_row(struct x400pXconTable_data *StorageTmp, struct x400pXconTable_data *StorageOld)
+{
+	/* XXX: provide code to update the row with the underlying device */
+	x400pXconTable_refresh = 1;
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int revert_x400pXconTable_row(struct x400pXconTable_data *StorageTmp, struct x400pXconTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the undo operation (UNDO phase) on a row
+ */
+void
+revert_x400pXconTable_row(struct x400pXconTable_data *StorageTmp, struct x400pXconTable_data *StorageOld)
+{
+	/* XXX: provide code to revert the row with the underlying device */
+	update_x400pXconTable_row(StorageOld, NULL);
+}
+
+/**
  * @fn void refresh_x400pXconTable_row(struct x400pXconTable_data *StorageTmp, int force)
  * @param StorageTmp the data row to refresh.
  * @param force force refresh if non-zero.
@@ -6433,6 +7650,64 @@ var_x400pXconTable(struct variable *vp, oid * name, size_t *length, int exact, s
 		ERROR_MSG("");
 	}
 	return (rval);
+}
+
+/**
+ * @fn int check_x400pNearEndCurrentTable_row(struct x400pNearEndCurrentTable_data *StorageTmp, struct x400pNearEndCurrentTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to check, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the ACTION phase.  The start of the ACTION pahse performs this consitency check
+ * on the row before allowing the request to proceed to the COMMIT phase.  This function can return
+ * SNMP_ERR_NOERR or a specific SNMP error value.  Values in StorageOld are the values before the
+ * varbinds on the mib were applied; the values in StorageTmp are the new values.  The function is
+ * permitted to change the values in StorageTmp to correct them; however, preference should be made
+ * for setting values where were not in the varbinds.
+ */
+int
+check_x400pNearEndCurrentTable_row(struct x400pNearEndCurrentTable_data *StorageTmp, struct x400pNearEndCurrentTable_data *StorageOld)
+{
+	/* XXX: provide code to check the row for consistency */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int update_x400pNearEndCurrentTable_row(struct x400pNearEndCurrentTable_data *StorageTmp, struct x400pNearEndCurrentTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the set operation (ACTION phase) on a row
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to update, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the COMMIT phase.  The start of the ACTION phase performs a consistency check on
+ * the row before allowing the request to proceed to the COMMIT phase.  The COMMIT phase then
+ * arrives here with consistency already checked (see check_x400pNearEndCurrentTable_row()).  This function can
+ * return SNMP_ERR_NOERROR or SNMP_ERR_COMMITFAILED.  Values in StorageOld are the values before the
+ * varbinds on the row were applied: the values in StorageTmp are the new values.
+ */
+int
+update_x400pNearEndCurrentTable_row(struct x400pNearEndCurrentTable_data *StorageTmp, struct x400pNearEndCurrentTable_data *StorageOld)
+{
+	/* XXX: provide code to update the row with the underlying device */
+	x400pNearEndCurrentTable_refresh = 1;
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int revert_x400pNearEndCurrentTable_row(struct x400pNearEndCurrentTable_data *StorageTmp, struct x400pNearEndCurrentTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the undo operation (UNDO phase) on a row
+ */
+void
+revert_x400pNearEndCurrentTable_row(struct x400pNearEndCurrentTable_data *StorageTmp, struct x400pNearEndCurrentTable_data *StorageOld)
+{
+	/* XXX: provide code to revert the row with the underlying device */
+	update_x400pNearEndCurrentTable_row(StorageOld, NULL);
 }
 
 /**
@@ -6574,6 +7849,64 @@ var_x400pNearEndCurrentTable(struct variable *vp, oid * name, size_t *length, in
 }
 
 /**
+ * @fn int check_x400pNearEndIntervalTable_row(struct x400pNearEndIntervalTable_data *StorageTmp, struct x400pNearEndIntervalTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to check, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the ACTION phase.  The start of the ACTION pahse performs this consitency check
+ * on the row before allowing the request to proceed to the COMMIT phase.  This function can return
+ * SNMP_ERR_NOERR or a specific SNMP error value.  Values in StorageOld are the values before the
+ * varbinds on the mib were applied; the values in StorageTmp are the new values.  The function is
+ * permitted to change the values in StorageTmp to correct them; however, preference should be made
+ * for setting values where were not in the varbinds.
+ */
+int
+check_x400pNearEndIntervalTable_row(struct x400pNearEndIntervalTable_data *StorageTmp, struct x400pNearEndIntervalTable_data *StorageOld)
+{
+	/* XXX: provide code to check the row for consistency */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int update_x400pNearEndIntervalTable_row(struct x400pNearEndIntervalTable_data *StorageTmp, struct x400pNearEndIntervalTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the set operation (ACTION phase) on a row
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to update, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the COMMIT phase.  The start of the ACTION phase performs a consistency check on
+ * the row before allowing the request to proceed to the COMMIT phase.  The COMMIT phase then
+ * arrives here with consistency already checked (see check_x400pNearEndIntervalTable_row()).  This function can
+ * return SNMP_ERR_NOERROR or SNMP_ERR_COMMITFAILED.  Values in StorageOld are the values before the
+ * varbinds on the row were applied: the values in StorageTmp are the new values.
+ */
+int
+update_x400pNearEndIntervalTable_row(struct x400pNearEndIntervalTable_data *StorageTmp, struct x400pNearEndIntervalTable_data *StorageOld)
+{
+	/* XXX: provide code to update the row with the underlying device */
+	x400pNearEndIntervalTable_refresh = 1;
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int revert_x400pNearEndIntervalTable_row(struct x400pNearEndIntervalTable_data *StorageTmp, struct x400pNearEndIntervalTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the undo operation (UNDO phase) on a row
+ */
+void
+revert_x400pNearEndIntervalTable_row(struct x400pNearEndIntervalTable_data *StorageTmp, struct x400pNearEndIntervalTable_data *StorageOld)
+{
+	/* XXX: provide code to revert the row with the underlying device */
+	update_x400pNearEndIntervalTable_row(StorageOld, NULL);
+}
+
+/**
  * @fn void refresh_x400pNearEndIntervalTable_row(struct x400pNearEndIntervalTable_data *StorageTmp, int force)
  * @param StorageTmp the data row to refresh.
  * @param force force refresh if non-zero.
@@ -6709,6 +8042,64 @@ var_x400pNearEndIntervalTable(struct variable *vp, oid * name, size_t *length, i
 		ERROR_MSG("");
 	}
 	return (rval);
+}
+
+/**
+ * @fn int check_x400pNearEndTotalTable_row(struct x400pNearEndTotalTable_data *StorageTmp, struct x400pNearEndTotalTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to check, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the ACTION phase.  The start of the ACTION pahse performs this consitency check
+ * on the row before allowing the request to proceed to the COMMIT phase.  This function can return
+ * SNMP_ERR_NOERR or a specific SNMP error value.  Values in StorageOld are the values before the
+ * varbinds on the mib were applied; the values in StorageTmp are the new values.  The function is
+ * permitted to change the values in StorageTmp to correct them; however, preference should be made
+ * for setting values where were not in the varbinds.
+ */
+int
+check_x400pNearEndTotalTable_row(struct x400pNearEndTotalTable_data *StorageTmp, struct x400pNearEndTotalTable_data *StorageOld)
+{
+	/* XXX: provide code to check the row for consistency */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int update_x400pNearEndTotalTable_row(struct x400pNearEndTotalTable_data *StorageTmp, struct x400pNearEndTotalTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the set operation (ACTION phase) on a row
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to update, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the COMMIT phase.  The start of the ACTION phase performs a consistency check on
+ * the row before allowing the request to proceed to the COMMIT phase.  The COMMIT phase then
+ * arrives here with consistency already checked (see check_x400pNearEndTotalTable_row()).  This function can
+ * return SNMP_ERR_NOERROR or SNMP_ERR_COMMITFAILED.  Values in StorageOld are the values before the
+ * varbinds on the row were applied: the values in StorageTmp are the new values.
+ */
+int
+update_x400pNearEndTotalTable_row(struct x400pNearEndTotalTable_data *StorageTmp, struct x400pNearEndTotalTable_data *StorageOld)
+{
+	/* XXX: provide code to update the row with the underlying device */
+	x400pNearEndTotalTable_refresh = 1;
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int revert_x400pNearEndTotalTable_row(struct x400pNearEndTotalTable_data *StorageTmp, struct x400pNearEndTotalTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the undo operation (UNDO phase) on a row
+ */
+void
+revert_x400pNearEndTotalTable_row(struct x400pNearEndTotalTable_data *StorageTmp, struct x400pNearEndTotalTable_data *StorageOld)
+{
+	/* XXX: provide code to revert the row with the underlying device */
+	update_x400pNearEndTotalTable_row(StorageOld, NULL);
 }
 
 /**
@@ -6856,6 +8247,64 @@ var_x400pNearEndTotalTable(struct variable *vp, oid * name, size_t *length, int 
 }
 
 /**
+ * @fn int check_x400pFarEndCurrentTable_row(struct x400pFarEndCurrentTable_data *StorageTmp, struct x400pFarEndCurrentTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to check, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the ACTION phase.  The start of the ACTION pahse performs this consitency check
+ * on the row before allowing the request to proceed to the COMMIT phase.  This function can return
+ * SNMP_ERR_NOERR or a specific SNMP error value.  Values in StorageOld are the values before the
+ * varbinds on the mib were applied; the values in StorageTmp are the new values.  The function is
+ * permitted to change the values in StorageTmp to correct them; however, preference should be made
+ * for setting values where were not in the varbinds.
+ */
+int
+check_x400pFarEndCurrentTable_row(struct x400pFarEndCurrentTable_data *StorageTmp, struct x400pFarEndCurrentTable_data *StorageOld)
+{
+	/* XXX: provide code to check the row for consistency */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int update_x400pFarEndCurrentTable_row(struct x400pFarEndCurrentTable_data *StorageTmp, struct x400pFarEndCurrentTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the set operation (ACTION phase) on a row
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to update, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the COMMIT phase.  The start of the ACTION phase performs a consistency check on
+ * the row before allowing the request to proceed to the COMMIT phase.  The COMMIT phase then
+ * arrives here with consistency already checked (see check_x400pFarEndCurrentTable_row()).  This function can
+ * return SNMP_ERR_NOERROR or SNMP_ERR_COMMITFAILED.  Values in StorageOld are the values before the
+ * varbinds on the row were applied: the values in StorageTmp are the new values.
+ */
+int
+update_x400pFarEndCurrentTable_row(struct x400pFarEndCurrentTable_data *StorageTmp, struct x400pFarEndCurrentTable_data *StorageOld)
+{
+	/* XXX: provide code to update the row with the underlying device */
+	x400pFarEndCurrentTable_refresh = 1;
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int revert_x400pFarEndCurrentTable_row(struct x400pFarEndCurrentTable_data *StorageTmp, struct x400pFarEndCurrentTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the undo operation (UNDO phase) on a row
+ */
+void
+revert_x400pFarEndCurrentTable_row(struct x400pFarEndCurrentTable_data *StorageTmp, struct x400pFarEndCurrentTable_data *StorageOld)
+{
+	/* XXX: provide code to revert the row with the underlying device */
+	update_x400pFarEndCurrentTable_row(StorageOld, NULL);
+}
+
+/**
  * @fn void refresh_x400pFarEndCurrentTable_row(struct x400pFarEndCurrentTable_data *StorageTmp, int force)
  * @param StorageTmp the data row to refresh.
  * @param force force refresh if non-zero.
@@ -6988,6 +8437,64 @@ var_x400pFarEndCurrentTable(struct variable *vp, oid * name, size_t *length, int
 }
 
 /**
+ * @fn int check_x400pFarEndIntervalTable_row(struct x400pFarEndIntervalTable_data *StorageTmp, struct x400pFarEndIntervalTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to check, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the ACTION phase.  The start of the ACTION pahse performs this consitency check
+ * on the row before allowing the request to proceed to the COMMIT phase.  This function can return
+ * SNMP_ERR_NOERR or a specific SNMP error value.  Values in StorageOld are the values before the
+ * varbinds on the mib were applied; the values in StorageTmp are the new values.  The function is
+ * permitted to change the values in StorageTmp to correct them; however, preference should be made
+ * for setting values where were not in the varbinds.
+ */
+int
+check_x400pFarEndIntervalTable_row(struct x400pFarEndIntervalTable_data *StorageTmp, struct x400pFarEndIntervalTable_data *StorageOld)
+{
+	/* XXX: provide code to check the row for consistency */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int update_x400pFarEndIntervalTable_row(struct x400pFarEndIntervalTable_data *StorageTmp, struct x400pFarEndIntervalTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the set operation (ACTION phase) on a row
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to update, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the COMMIT phase.  The start of the ACTION phase performs a consistency check on
+ * the row before allowing the request to proceed to the COMMIT phase.  The COMMIT phase then
+ * arrives here with consistency already checked (see check_x400pFarEndIntervalTable_row()).  This function can
+ * return SNMP_ERR_NOERROR or SNMP_ERR_COMMITFAILED.  Values in StorageOld are the values before the
+ * varbinds on the row were applied: the values in StorageTmp are the new values.
+ */
+int
+update_x400pFarEndIntervalTable_row(struct x400pFarEndIntervalTable_data *StorageTmp, struct x400pFarEndIntervalTable_data *StorageOld)
+{
+	/* XXX: provide code to update the row with the underlying device */
+	x400pFarEndIntervalTable_refresh = 1;
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int revert_x400pFarEndIntervalTable_row(struct x400pFarEndIntervalTable_data *StorageTmp, struct x400pFarEndIntervalTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the undo operation (UNDO phase) on a row
+ */
+void
+revert_x400pFarEndIntervalTable_row(struct x400pFarEndIntervalTable_data *StorageTmp, struct x400pFarEndIntervalTable_data *StorageOld)
+{
+	/* XXX: provide code to revert the row with the underlying device */
+	update_x400pFarEndIntervalTable_row(StorageOld, NULL);
+}
+
+/**
  * @fn void refresh_x400pFarEndIntervalTable_row(struct x400pFarEndIntervalTable_data *StorageTmp, int force)
  * @param StorageTmp the data row to refresh.
  * @param force force refresh if non-zero.
@@ -7117,6 +8624,64 @@ var_x400pFarEndIntervalTable(struct variable *vp, oid * name, size_t *length, in
 		ERROR_MSG("");
 	}
 	return (rval);
+}
+
+/**
+ * @fn int check_x400pFarEndTotalTable_row(struct x400pFarEndTotalTable_data *StorageTmp, struct x400pFarEndTotalTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to check, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the ACTION phase.  The start of the ACTION pahse performs this consitency check
+ * on the row before allowing the request to proceed to the COMMIT phase.  This function can return
+ * SNMP_ERR_NOERR or a specific SNMP error value.  Values in StorageOld are the values before the
+ * varbinds on the mib were applied; the values in StorageTmp are the new values.  The function is
+ * permitted to change the values in StorageTmp to correct them; however, preference should be made
+ * for setting values where were not in the varbinds.
+ */
+int
+check_x400pFarEndTotalTable_row(struct x400pFarEndTotalTable_data *StorageTmp, struct x400pFarEndTotalTable_data *StorageOld)
+{
+	/* XXX: provide code to check the row for consistency */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int update_x400pFarEndTotalTable_row(struct x400pFarEndTotalTable_data *StorageTmp, struct x400pFarEndTotalTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the set operation (ACTION phase) on a row
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to update, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the COMMIT phase.  The start of the ACTION phase performs a consistency check on
+ * the row before allowing the request to proceed to the COMMIT phase.  The COMMIT phase then
+ * arrives here with consistency already checked (see check_x400pFarEndTotalTable_row()).  This function can
+ * return SNMP_ERR_NOERROR or SNMP_ERR_COMMITFAILED.  Values in StorageOld are the values before the
+ * varbinds on the row were applied: the values in StorageTmp are the new values.
+ */
+int
+update_x400pFarEndTotalTable_row(struct x400pFarEndTotalTable_data *StorageTmp, struct x400pFarEndTotalTable_data *StorageOld)
+{
+	/* XXX: provide code to update the row with the underlying device */
+	x400pFarEndTotalTable_refresh = 1;
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int revert_x400pFarEndTotalTable_row(struct x400pFarEndTotalTable_data *StorageTmp, struct x400pFarEndTotalTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the undo operation (UNDO phase) on a row
+ */
+void
+revert_x400pFarEndTotalTable_row(struct x400pFarEndTotalTable_data *StorageTmp, struct x400pFarEndTotalTable_data *StorageOld)
+{
+	/* XXX: provide code to revert the row with the underlying device */
+	update_x400pFarEndTotalTable_row(StorageOld, NULL);
 }
 
 /**
@@ -7271,17 +8836,17 @@ var_x400pFarEndTotalTable(struct variable *vp, oid * name, size_t *length, int e
 int
 write_x400pSyncSpanId(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static uint8_t *old_value;
-	struct x400pSyncTable_data *StorageTmp = NULL;
+	struct x400pSyncTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 15;
-	static size_t old_length = 0;
-	static uint8_t *string = NULL;
+	uint8_t *string = NULL;
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("x400pMxMIB", "write_x400pSyncSpanId entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(x400pSyncTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
-		string = NULL;
 		if (StorageTmp != NULL && statP == NULL) {
 			/* have row but no column */
 			switch (StorageTmp->x400pSyncRowStatus) {
@@ -7304,33 +8869,73 @@ write_x400pSyncSpanId(int action, u_char *var_val, u_char var_val_type, size_t v
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to x400pSyncSpanId: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
-		break;
-	case RESERVE2:		/* memory reseveration, final preparation... */
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->x400pSyncTable_old) == NULL)
+			if (StorageTmp->x400pSyncTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->x400pSyncTable_old = x400pSyncTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->x400pSyncTable_rsvs++;
 		if ((string = malloc(var_val_len + 1)) == NULL)
 			return SNMP_ERR_RESOURCEUNAVAILABLE;
 		memcpy((void *) string, (void *) var_val, var_val_len);
 		string[var_val_len] = 0;
+		SNMP_FREE(StorageTmp->x400pSyncSpanId);
+		StorageTmp->x400pSyncSpanId = string;
+		StorageTmp->x400pSyncSpanIdLen = var_val_len;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
+		break;
+	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->x400pSyncTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->x400pSyncTable_tsts == 0)
+				if ((ret = check_x400pSyncTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->x400pSyncTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->x400pSyncSpanId for you to use, and you have just been asked to do something with it.  Note that anything done here must
 				   be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->x400pSyncSpanId;
-		old_length = StorageTmp->x400pSyncSpanIdLen;
-		StorageTmp->x400pSyncSpanId = string;
-		StorageTmp->x400pSyncSpanIdLen = var_val_len;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->x400pSyncTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->x400pSyncTable_sets == 0)
+				if ((ret = update_x400pSyncTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->x400pSyncTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
-		SNMP_FREE(old_value);
-		old_length = 0;
-		string = NULL;
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->x400pSyncTable_old) != NULL) {
+			x400pSyncTable_destroy(&StorageTmp->x400pSyncTable_old);
+			StorageTmp->x400pSyncTable_rsvs = 0;
+			StorageTmp->x400pSyncTable_tsts = 0;
+			StorageTmp->x400pSyncTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->x400pSyncSpanId = old_value;
-		StorageTmp->x400pSyncSpanIdLen = old_length;
+		if ((StorageOld = StorageTmp->x400pSyncTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->x400pSyncTable_sets == 0)
+			revert_x400pSyncTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
-		SNMP_FREE(string);
+		if ((StorageOld = StorageTmp->x400pSyncTable_old) == NULL)
+			break;
+		if (StorageOld->x400pSyncSpanId != NULL) {
+			SNMP_FREE(StorageTmp->x400pSyncSpanId);
+			StorageTmp->x400pSyncSpanId = StorageOld->x400pSyncSpanId;
+			StorageTmp->x400pSyncSpanIdLen = StorageOld->x400pSyncSpanIdLen;
+			StorageOld->x400pSyncSpanId = NULL;
+			StorageOld->x400pSyncSpanIdLen = 0;
+		}
+		if (--StorageTmp->x400pSyncTable_rsvs == 0)
+			x400pSyncTable_destroy(&StorageTmp->x400pSyncTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -7350,12 +8955,14 @@ write_x400pSyncSpanId(int action, u_char *var_val, u_char var_val_type, size_t v
 int
 write_x400pCardSpanType(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static long old_value;
-	struct x400pCardTable_data *StorageTmp = NULL;
+	struct x400pCardTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 15;
 	long set_value = *((long *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("x400pMxMIB", "write_x400pCardSpanType entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(x400pCardTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -7390,22 +8997,61 @@ write_x400pCardSpanType(int action, u_char *var_val, u_char var_val_type, size_t
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to x400pCardSpanType: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->x400pCardTable_old) == NULL)
+			if (StorageTmp->x400pCardTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->x400pCardTable_old = x400pCardTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->x400pCardTable_rsvs++;
+		StorageTmp->x400pCardSpanType = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->x400pCardTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->x400pCardTable_tsts == 0)
+				if ((ret = check_x400pCardTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->x400pCardTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->x400pCardSpanType for you to use, and you have just been asked to do something with it.  Note that anything done here
 				   must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->x400pCardSpanType;
-		StorageTmp->x400pCardSpanType = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->x400pCardTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->x400pCardTable_sets == 0)
+				if ((ret = update_x400pCardTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->x400pCardTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->x400pCardTable_old) != NULL) {
+			x400pCardTable_destroy(&StorageTmp->x400pCardTable_old);
+			StorageTmp->x400pCardTable_rsvs = 0;
+			StorageTmp->x400pCardTable_tsts = 0;
+			StorageTmp->x400pCardTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->x400pCardSpanType = old_value;
+		if ((StorageOld = StorageTmp->x400pCardTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->x400pCardTable_sets == 0)
+			revert_x400pCardTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->x400pCardTable_old) == NULL)
+			break;
+		StorageTmp->x400pCardSpanType = StorageOld->x400pCardSpanType;
+		if (--StorageTmp->x400pCardTable_rsvs == 0)
+			x400pCardTable_destroy(&StorageTmp->x400pCardTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -7425,17 +9071,17 @@ write_x400pCardSpanType(int action, u_char *var_val, u_char var_val_type, size_t
 int
 write_x400pCardMode(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static uint8_t *old_value;
-	struct x400pCardTable_data *StorageTmp = NULL;
+	struct x400pCardTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 15;
-	static size_t old_length = 0;
-	static uint8_t *string = NULL;
+	uint8_t *string = NULL;
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("x400pMxMIB", "write_x400pCardMode entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(x400pCardTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
-		string = NULL;
 		if (StorageTmp != NULL && statP == NULL) {
 			/* have row but no column */
 			switch (StorageTmp->x400pCardStatus) {
@@ -7465,33 +9111,73 @@ write_x400pCardMode(int action, u_char *var_val, u_char var_val_type, size_t var
 				return SNMP_ERR_WRONGLENGTH;
 			}
 		}
-		break;
-	case RESERVE2:		/* memory reseveration, final preparation... */
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->x400pCardTable_old) == NULL)
+			if (StorageTmp->x400pCardTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->x400pCardTable_old = x400pCardTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->x400pCardTable_rsvs++;
 		if ((string = malloc(var_val_len + 1)) == NULL)
 			return SNMP_ERR_RESOURCEUNAVAILABLE;
 		memcpy((void *) string, (void *) var_val, var_val_len);
 		string[var_val_len] = 0;
+		SNMP_FREE(StorageTmp->x400pCardMode);
+		StorageTmp->x400pCardMode = string;
+		StorageTmp->x400pCardModeLen = var_val_len;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
+		break;
+	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->x400pCardTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->x400pCardTable_tsts == 0)
+				if ((ret = check_x400pCardTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->x400pCardTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->x400pCardMode for you to use, and you have just been asked to do something with it.  Note that anything done here must
 				   be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->x400pCardMode;
-		old_length = StorageTmp->x400pCardModeLen;
-		StorageTmp->x400pCardMode = string;
-		StorageTmp->x400pCardModeLen = var_val_len;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->x400pCardTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->x400pCardTable_sets == 0)
+				if ((ret = update_x400pCardTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->x400pCardTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
-		SNMP_FREE(old_value);
-		old_length = 0;
-		string = NULL;
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->x400pCardTable_old) != NULL) {
+			x400pCardTable_destroy(&StorageTmp->x400pCardTable_old);
+			StorageTmp->x400pCardTable_rsvs = 0;
+			StorageTmp->x400pCardTable_tsts = 0;
+			StorageTmp->x400pCardTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->x400pCardMode = old_value;
-		StorageTmp->x400pCardModeLen = old_length;
+		if ((StorageOld = StorageTmp->x400pCardTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->x400pCardTable_sets == 0)
+			revert_x400pCardTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
-		SNMP_FREE(string);
+		if ((StorageOld = StorageTmp->x400pCardTable_old) == NULL)
+			break;
+		if (StorageOld->x400pCardMode != NULL) {
+			SNMP_FREE(StorageTmp->x400pCardMode);
+			StorageTmp->x400pCardMode = StorageOld->x400pCardMode;
+			StorageTmp->x400pCardModeLen = StorageOld->x400pCardModeLen;
+			StorageOld->x400pCardMode = NULL;
+			StorageOld->x400pCardModeLen = 0;
+		}
+		if (--StorageTmp->x400pCardTable_rsvs == 0)
+			x400pCardTable_destroy(&StorageTmp->x400pCardTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -7511,12 +9197,14 @@ write_x400pCardMode(int action, u_char *var_val, u_char var_val_type, size_t var
 int
 write_x400pCardSyncMaster(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static long old_value;
-	struct x400pCardTable_data *StorageTmp = NULL;
+	struct x400pCardTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 15;
 	long set_value = *((long *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("x400pMxMIB", "write_x400pCardSyncMaster entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(x400pCardTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -7549,22 +9237,61 @@ write_x400pCardSyncMaster(int action, u_char *var_val, u_char var_val_type, size
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to x400pCardSyncMaster: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->x400pCardTable_old) == NULL)
+			if (StorageTmp->x400pCardTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->x400pCardTable_old = x400pCardTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->x400pCardTable_rsvs++;
+		StorageTmp->x400pCardSyncMaster = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->x400pCardTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->x400pCardTable_tsts == 0)
+				if ((ret = check_x400pCardTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->x400pCardTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->x400pCardSyncMaster for you to use, and you have just been asked to do something with it.  Note that anything done here
 				   must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->x400pCardSyncMaster;
-		StorageTmp->x400pCardSyncMaster = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->x400pCardTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->x400pCardTable_sets == 0)
+				if ((ret = update_x400pCardTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->x400pCardTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->x400pCardTable_old) != NULL) {
+			x400pCardTable_destroy(&StorageTmp->x400pCardTable_old);
+			StorageTmp->x400pCardTable_rsvs = 0;
+			StorageTmp->x400pCardTable_tsts = 0;
+			StorageTmp->x400pCardTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->x400pCardSyncMaster = old_value;
+		if ((StorageOld = StorageTmp->x400pCardTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->x400pCardTable_sets == 0)
+			revert_x400pCardTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->x400pCardTable_old) == NULL)
+			break;
+		StorageTmp->x400pCardSyncMaster = StorageOld->x400pCardSyncMaster;
+		if (--StorageTmp->x400pCardTable_rsvs == 0)
+			x400pCardTable_destroy(&StorageTmp->x400pCardTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -7584,12 +9311,14 @@ write_x400pCardSyncMaster(int action, u_char *var_val, u_char var_val_type, size
 int
 write_x400pCardSyncSource(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static long old_value;
-	struct x400pCardTable_data *StorageTmp = NULL;
+	struct x400pCardTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 15;
 	long set_value = *((long *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("x400pMxMIB", "write_x400pCardSyncSource entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(x400pCardTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -7627,22 +9356,61 @@ write_x400pCardSyncSource(int action, u_char *var_val, u_char var_val_type, size
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to x400pCardSyncSource: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->x400pCardTable_old) == NULL)
+			if (StorageTmp->x400pCardTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->x400pCardTable_old = x400pCardTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->x400pCardTable_rsvs++;
+		StorageTmp->x400pCardSyncSource = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->x400pCardTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->x400pCardTable_tsts == 0)
+				if ((ret = check_x400pCardTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->x400pCardTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->x400pCardSyncSource for you to use, and you have just been asked to do something with it.  Note that anything done here
 				   must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->x400pCardSyncSource;
-		StorageTmp->x400pCardSyncSource = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->x400pCardTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->x400pCardTable_sets == 0)
+				if ((ret = update_x400pCardTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->x400pCardTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->x400pCardTable_old) != NULL) {
+			x400pCardTable_destroy(&StorageTmp->x400pCardTable_old);
+			StorageTmp->x400pCardTable_rsvs = 0;
+			StorageTmp->x400pCardTable_tsts = 0;
+			StorageTmp->x400pCardTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->x400pCardSyncSource = old_value;
+		if ((StorageOld = StorageTmp->x400pCardTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->x400pCardTable_sets == 0)
+			revert_x400pCardTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->x400pCardTable_old) == NULL)
+			break;
+		StorageTmp->x400pCardSyncSource = StorageOld->x400pCardSyncSource;
+		if (--StorageTmp->x400pCardTable_rsvs == 0)
+			x400pCardTable_destroy(&StorageTmp->x400pCardTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -7662,12 +9430,14 @@ write_x400pCardSyncSource(int action, u_char *var_val, u_char var_val_type, size
 int
 write_x400pCardSyncGroup(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static ulong old_value;
-	struct x400pCardTable_data *StorageTmp = NULL;
+	struct x400pCardTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 15;
 	ulong set_value = *((ulong *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("x400pMxMIB", "write_x400pCardSyncGroup entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(x400pCardTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -7697,22 +9467,61 @@ write_x400pCardSyncGroup(int action, u_char *var_val, u_char var_val_type, size_
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to x400pCardSyncGroup: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->x400pCardTable_old) == NULL)
+			if (StorageTmp->x400pCardTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->x400pCardTable_old = x400pCardTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->x400pCardTable_rsvs++;
+		StorageTmp->x400pCardSyncGroup = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->x400pCardTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->x400pCardTable_tsts == 0)
+				if ((ret = check_x400pCardTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->x400pCardTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->x400pCardSyncGroup for you to use, and you have just been asked to do something with it.  Note that anything done here
 				   must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->x400pCardSyncGroup;
-		StorageTmp->x400pCardSyncGroup = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->x400pCardTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->x400pCardTable_sets == 0)
+				if ((ret = update_x400pCardTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->x400pCardTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->x400pCardTable_old) != NULL) {
+			x400pCardTable_destroy(&StorageTmp->x400pCardTable_old);
+			StorageTmp->x400pCardTable_rsvs = 0;
+			StorageTmp->x400pCardTable_tsts = 0;
+			StorageTmp->x400pCardTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->x400pCardSyncGroup = old_value;
+		if ((StorageOld = StorageTmp->x400pCardTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->x400pCardTable_sets == 0)
+			revert_x400pCardTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->x400pCardTable_old) == NULL)
+			break;
+		StorageTmp->x400pCardSyncGroup = StorageOld->x400pCardSyncGroup;
+		if (--StorageTmp->x400pCardTable_rsvs == 0)
+			x400pCardTable_destroy(&StorageTmp->x400pCardTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -7732,12 +9541,14 @@ write_x400pCardSyncGroup(int action, u_char *var_val, u_char var_val_type, size_
 int
 write_x400pCardAdministrativeState(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static long old_value;
-	struct x400pCardTable_data *StorageTmp = NULL;
+	struct x400pCardTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 15;
 	long set_value = *((long *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("x400pMxMIB", "write_x400pCardAdministrativeState entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(x400pCardTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -7772,22 +9583,61 @@ write_x400pCardAdministrativeState(int action, u_char *var_val, u_char var_val_t
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to x400pCardAdministrativeState: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->x400pCardTable_old) == NULL)
+			if (StorageTmp->x400pCardTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->x400pCardTable_old = x400pCardTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->x400pCardTable_rsvs++;
+		StorageTmp->x400pCardAdministrativeState = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->x400pCardTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->x400pCardTable_tsts == 0)
+				if ((ret = check_x400pCardTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->x400pCardTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->x400pCardAdministrativeState for you to use, and you have just been asked to do something with it.  Note that anything
 				   done here must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->x400pCardAdministrativeState;
-		StorageTmp->x400pCardAdministrativeState = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->x400pCardTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->x400pCardTable_sets == 0)
+				if ((ret = update_x400pCardTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->x400pCardTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->x400pCardTable_old) != NULL) {
+			x400pCardTable_destroy(&StorageTmp->x400pCardTable_old);
+			StorageTmp->x400pCardTable_rsvs = 0;
+			StorageTmp->x400pCardTable_tsts = 0;
+			StorageTmp->x400pCardTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->x400pCardAdministrativeState = old_value;
+		if ((StorageOld = StorageTmp->x400pCardTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->x400pCardTable_sets == 0)
+			revert_x400pCardTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->x400pCardTable_old) == NULL)
+			break;
+		StorageTmp->x400pCardAdministrativeState = StorageOld->x400pCardAdministrativeState;
+		if (--StorageTmp->x400pCardTable_rsvs == 0)
+			x400pCardTable_destroy(&StorageTmp->x400pCardTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -7807,17 +9657,17 @@ write_x400pCardAdministrativeState(int action, u_char *var_val, u_char var_val_t
 int
 write_x400pCardAlarmStatus(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static uint8_t *old_value;
-	struct x400pCardTable_data *StorageTmp = NULL;
+	struct x400pCardTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 15;
-	static size_t old_length = 0;
-	static uint8_t *string = NULL;
+	uint8_t *string = NULL;
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("x400pMxMIB", "write_x400pCardAlarmStatus entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(x400pCardTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
-		string = NULL;
 		if (StorageTmp != NULL && statP == NULL) {
 			/* have row but no column */
 			switch (StorageTmp->x400pCardStatus) {
@@ -7848,33 +9698,73 @@ write_x400pCardAlarmStatus(int action, u_char *var_val, u_char var_val_type, siz
 			}
 		}
 		/* Note: default value { } */
-		break;
-	case RESERVE2:		/* memory reseveration, final preparation... */
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->x400pCardTable_old) == NULL)
+			if (StorageTmp->x400pCardTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->x400pCardTable_old = x400pCardTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->x400pCardTable_rsvs++;
 		if ((string = malloc(var_val_len + 1)) == NULL)
 			return SNMP_ERR_RESOURCEUNAVAILABLE;
 		memcpy((void *) string, (void *) var_val, var_val_len);
 		string[var_val_len] = 0;
+		SNMP_FREE(StorageTmp->x400pCardAlarmStatus);
+		StorageTmp->x400pCardAlarmStatus = string;
+		StorageTmp->x400pCardAlarmStatusLen = var_val_len;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
+		break;
+	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->x400pCardTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->x400pCardTable_tsts == 0)
+				if ((ret = check_x400pCardTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->x400pCardTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->x400pCardAlarmStatus for you to use, and you have just been asked to do something with it.  Note that anything done here
 				   must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->x400pCardAlarmStatus;
-		old_length = StorageTmp->x400pCardAlarmStatusLen;
-		StorageTmp->x400pCardAlarmStatus = string;
-		StorageTmp->x400pCardAlarmStatusLen = var_val_len;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->x400pCardTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->x400pCardTable_sets == 0)
+				if ((ret = update_x400pCardTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->x400pCardTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
-		SNMP_FREE(old_value);
-		old_length = 0;
-		string = NULL;
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->x400pCardTable_old) != NULL) {
+			x400pCardTable_destroy(&StorageTmp->x400pCardTable_old);
+			StorageTmp->x400pCardTable_rsvs = 0;
+			StorageTmp->x400pCardTable_tsts = 0;
+			StorageTmp->x400pCardTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->x400pCardAlarmStatus = old_value;
-		StorageTmp->x400pCardAlarmStatusLen = old_length;
+		if ((StorageOld = StorageTmp->x400pCardTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->x400pCardTable_sets == 0)
+			revert_x400pCardTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
-		SNMP_FREE(string);
+		if ((StorageOld = StorageTmp->x400pCardTable_old) == NULL)
+			break;
+		if (StorageOld->x400pCardAlarmStatus != NULL) {
+			SNMP_FREE(StorageTmp->x400pCardAlarmStatus);
+			StorageTmp->x400pCardAlarmStatus = StorageOld->x400pCardAlarmStatus;
+			StorageTmp->x400pCardAlarmStatusLen = StorageOld->x400pCardAlarmStatusLen;
+			StorageOld->x400pCardAlarmStatus = NULL;
+			StorageOld->x400pCardAlarmStatusLen = 0;
+		}
+		if (--StorageTmp->x400pCardTable_rsvs == 0)
+			x400pCardTable_destroy(&StorageTmp->x400pCardTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -7894,17 +9784,17 @@ write_x400pCardAlarmStatus(int action, u_char *var_val, u_char var_val_type, siz
 int
 write_x400pCardControlStatus(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static uint8_t *old_value;
-	struct x400pCardTable_data *StorageTmp = NULL;
+	struct x400pCardTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 15;
-	static size_t old_length = 0;
-	static uint8_t *string = NULL;
+	uint8_t *string = NULL;
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("x400pMxMIB", "write_x400pCardControlStatus entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(x400pCardTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
-		string = NULL;
 		if (StorageTmp != NULL && statP == NULL) {
 			/* have row but no column */
 			switch (StorageTmp->x400pCardStatus) {
@@ -7935,33 +9825,73 @@ write_x400pCardControlStatus(int action, u_char *var_val, u_char var_val_type, s
 			}
 		}
 		/* Note: default value { } */
-		break;
-	case RESERVE2:		/* memory reseveration, final preparation... */
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->x400pCardTable_old) == NULL)
+			if (StorageTmp->x400pCardTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->x400pCardTable_old = x400pCardTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->x400pCardTable_rsvs++;
 		if ((string = malloc(var_val_len + 1)) == NULL)
 			return SNMP_ERR_RESOURCEUNAVAILABLE;
 		memcpy((void *) string, (void *) var_val, var_val_len);
 		string[var_val_len] = 0;
+		SNMP_FREE(StorageTmp->x400pCardControlStatus);
+		StorageTmp->x400pCardControlStatus = string;
+		StorageTmp->x400pCardControlStatusLen = var_val_len;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
+		break;
+	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->x400pCardTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->x400pCardTable_tsts == 0)
+				if ((ret = check_x400pCardTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->x400pCardTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->x400pCardControlStatus for you to use, and you have just been asked to do something with it.  Note that anything done
 				   here must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->x400pCardControlStatus;
-		old_length = StorageTmp->x400pCardControlStatusLen;
-		StorageTmp->x400pCardControlStatus = string;
-		StorageTmp->x400pCardControlStatusLen = var_val_len;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->x400pCardTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->x400pCardTable_sets == 0)
+				if ((ret = update_x400pCardTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->x400pCardTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
-		SNMP_FREE(old_value);
-		old_length = 0;
-		string = NULL;
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->x400pCardTable_old) != NULL) {
+			x400pCardTable_destroy(&StorageTmp->x400pCardTable_old);
+			StorageTmp->x400pCardTable_rsvs = 0;
+			StorageTmp->x400pCardTable_tsts = 0;
+			StorageTmp->x400pCardTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->x400pCardControlStatus = old_value;
-		StorageTmp->x400pCardControlStatusLen = old_length;
+		if ((StorageOld = StorageTmp->x400pCardTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->x400pCardTable_sets == 0)
+			revert_x400pCardTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
-		SNMP_FREE(string);
+		if ((StorageOld = StorageTmp->x400pCardTable_old) == NULL)
+			break;
+		if (StorageOld->x400pCardControlStatus != NULL) {
+			SNMP_FREE(StorageTmp->x400pCardControlStatus);
+			StorageTmp->x400pCardControlStatus = StorageOld->x400pCardControlStatus;
+			StorageTmp->x400pCardControlStatusLen = StorageOld->x400pCardControlStatusLen;
+			StorageOld->x400pCardControlStatus = NULL;
+			StorageOld->x400pCardControlStatusLen = 0;
+		}
+		if (--StorageTmp->x400pCardTable_rsvs == 0)
+			x400pCardTable_destroy(&StorageTmp->x400pCardTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -7981,17 +9911,17 @@ write_x400pCardControlStatus(int action, u_char *var_val, u_char var_val_type, s
 int
 write_x400pSpanName(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static uint8_t *old_value;
-	struct x400pSpanTable_data *StorageTmp = NULL;
+	struct x400pSpanTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 15;
-	static size_t old_length = 0;
-	static uint8_t *string = NULL;
+	uint8_t *string = NULL;
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("x400pMxMIB", "write_x400pSpanName entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(x400pSpanTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
-		string = NULL;
 		if (StorageTmp != NULL && statP == NULL) {
 			/* have row but no column */
 			switch (StorageTmp->x400pSpanRowStatus) {
@@ -8015,33 +9945,73 @@ write_x400pSpanName(int action, u_char *var_val, u_char var_val_type, size_t var
 			return SNMP_ERR_WRONGLENGTH;
 		}
 		/* Note: default value \"\" */
-		break;
-	case RESERVE2:		/* memory reseveration, final preparation... */
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->x400pSpanTable_old) == NULL)
+			if (StorageTmp->x400pSpanTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->x400pSpanTable_old = x400pSpanTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->x400pSpanTable_rsvs++;
 		if ((string = malloc(var_val_len + 1)) == NULL)
 			return SNMP_ERR_RESOURCEUNAVAILABLE;
 		memcpy((void *) string, (void *) var_val, var_val_len);
 		string[var_val_len] = 0;
+		SNMP_FREE(StorageTmp->x400pSpanName);
+		StorageTmp->x400pSpanName = string;
+		StorageTmp->x400pSpanNameLen = var_val_len;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
+		break;
+	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->x400pSpanTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->x400pSpanTable_tsts == 0)
+				if ((ret = check_x400pSpanTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->x400pSpanTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->x400pSpanName for you to use, and you have just been asked to do something with it.  Note that anything done here must
 				   be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->x400pSpanName;
-		old_length = StorageTmp->x400pSpanNameLen;
-		StorageTmp->x400pSpanName = string;
-		StorageTmp->x400pSpanNameLen = var_val_len;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->x400pSpanTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->x400pSpanTable_sets == 0)
+				if ((ret = update_x400pSpanTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->x400pSpanTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
-		SNMP_FREE(old_value);
-		old_length = 0;
-		string = NULL;
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->x400pSpanTable_old) != NULL) {
+			x400pSpanTable_destroy(&StorageTmp->x400pSpanTable_old);
+			StorageTmp->x400pSpanTable_rsvs = 0;
+			StorageTmp->x400pSpanTable_tsts = 0;
+			StorageTmp->x400pSpanTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->x400pSpanName = old_value;
-		StorageTmp->x400pSpanNameLen = old_length;
+		if ((StorageOld = StorageTmp->x400pSpanTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->x400pSpanTable_sets == 0)
+			revert_x400pSpanTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
-		SNMP_FREE(string);
+		if ((StorageOld = StorageTmp->x400pSpanTable_old) == NULL)
+			break;
+		if (StorageOld->x400pSpanName != NULL) {
+			SNMP_FREE(StorageTmp->x400pSpanName);
+			StorageTmp->x400pSpanName = StorageOld->x400pSpanName;
+			StorageTmp->x400pSpanNameLen = StorageOld->x400pSpanNameLen;
+			StorageOld->x400pSpanName = NULL;
+			StorageOld->x400pSpanNameLen = 0;
+		}
+		if (--StorageTmp->x400pSpanTable_rsvs == 0)
+			x400pSpanTable_destroy(&StorageTmp->x400pSpanTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -8061,17 +10031,17 @@ write_x400pSpanName(int action, u_char *var_val, u_char var_val_type, size_t var
 int
 write_x400pSpanDevice(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static oid *old_value;
-	struct x400pSpanTable_data *StorageTmp = NULL;
+	struct x400pSpanTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 15;
-	static size_t old_length = 0;
-	static oid *objid = NULL;
+	oid *objid = NULL;
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("x400pMxMIB", "write_x400pSpanDevice entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(x400pSpanTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
-		objid = NULL;
 		if (StorageTmp != NULL && statP == NULL) {
 			/* have row but no column */
 			switch (StorageTmp->x400pSpanRowStatus) {
@@ -8094,31 +10064,71 @@ write_x400pSpanDevice(int action, u_char *var_val, u_char var_val_type, size_t v
 			return SNMP_ERR_WRONGLENGTH;
 		}
 		/* Note: default value zeroDotZero */
-		break;
-	case RESERVE2:		/* memory reseveration, final preparation... */
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->x400pSpanTable_old) == NULL)
+			if (StorageTmp->x400pSpanTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->x400pSpanTable_old = x400pSpanTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->x400pSpanTable_rsvs++;
 		if ((objid = snmp_duplicate_objid((void *) var_val, var_val_len / sizeof(oid))) == NULL)
 			return SNMP_ERR_RESOURCEUNAVAILABLE;
+		SNMP_FREE(StorageTmp->x400pSpanDevice);
+		StorageTmp->x400pSpanDevice = objid;
+		StorageTmp->x400pSpanDeviceLen = var_val_len / sizeof(oid);
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
+		break;
+	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->x400pSpanTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->x400pSpanTable_tsts == 0)
+				if ((ret = check_x400pSpanTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->x400pSpanTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->x400pSpanDevice for you to use, and you have just been asked to do something with it.  Note that anything done here must 
 				   be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->x400pSpanDevice;
-		old_length = StorageTmp->x400pSpanDeviceLen;
-		StorageTmp->x400pSpanDevice = objid;
-		StorageTmp->x400pSpanDeviceLen = var_val_len / sizeof(oid);
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->x400pSpanTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->x400pSpanTable_sets == 0)
+				if ((ret = update_x400pSpanTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->x400pSpanTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
-		SNMP_FREE(old_value);
-		old_length = 0;
-		objid = NULL;
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->x400pSpanTable_old) != NULL) {
+			x400pSpanTable_destroy(&StorageTmp->x400pSpanTable_old);
+			StorageTmp->x400pSpanTable_rsvs = 0;
+			StorageTmp->x400pSpanTable_tsts = 0;
+			StorageTmp->x400pSpanTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->x400pSpanDevice = old_value;
-		StorageTmp->x400pSpanDeviceLen = old_length;
+		if ((StorageOld = StorageTmp->x400pSpanTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->x400pSpanTable_sets == 0)
+			revert_x400pSpanTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
-		SNMP_FREE(objid);
+		if ((StorageOld = StorageTmp->x400pSpanTable_old) == NULL)
+			break;
+		if (StorageOld->x400pSpanDevice != NULL) {
+			SNMP_FREE(StorageTmp->x400pSpanDevice);
+			StorageTmp->x400pSpanDevice = StorageOld->x400pSpanDevice;
+			StorageTmp->x400pSpanDeviceLen = StorageOld->x400pSpanDeviceLen;
+			StorageOld->x400pSpanDevice = NULL;
+			StorageOld->x400pSpanDeviceLen = 0;
+		}
+		if (--StorageTmp->x400pSpanTable_rsvs == 0)
+			x400pSpanTable_destroy(&StorageTmp->x400pSpanTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -8138,17 +10148,17 @@ write_x400pSpanDevice(int action, u_char *var_val, u_char var_val_type, size_t v
 int
 write_x400pSpanEquipmentId(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static uint8_t *old_value;
-	struct x400pSpanTable_data *StorageTmp = NULL;
+	struct x400pSpanTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 15;
-	static size_t old_length = 0;
-	static uint8_t *string = NULL;
+	uint8_t *string = NULL;
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("x400pMxMIB", "write_x400pSpanEquipmentId entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(x400pSpanTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
-		string = NULL;
 		if (StorageTmp != NULL && statP == NULL) {
 			/* have row but no column */
 			switch (StorageTmp->x400pSpanRowStatus) {
@@ -8171,33 +10181,73 @@ write_x400pSpanEquipmentId(int action, u_char *var_val, u_char var_val_type, siz
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to x400pSpanEquipmentId: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
-		break;
-	case RESERVE2:		/* memory reseveration, final preparation... */
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->x400pSpanTable_old) == NULL)
+			if (StorageTmp->x400pSpanTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->x400pSpanTable_old = x400pSpanTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->x400pSpanTable_rsvs++;
 		if ((string = malloc(var_val_len + 1)) == NULL)
 			return SNMP_ERR_RESOURCEUNAVAILABLE;
 		memcpy((void *) string, (void *) var_val, var_val_len);
 		string[var_val_len] = 0;
+		SNMP_FREE(StorageTmp->x400pSpanEquipmentId);
+		StorageTmp->x400pSpanEquipmentId = string;
+		StorageTmp->x400pSpanEquipmentIdLen = var_val_len;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
+		break;
+	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->x400pSpanTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->x400pSpanTable_tsts == 0)
+				if ((ret = check_x400pSpanTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->x400pSpanTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->x400pSpanEquipmentId for you to use, and you have just been asked to do something with it.  Note that anything done here
 				   must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->x400pSpanEquipmentId;
-		old_length = StorageTmp->x400pSpanEquipmentIdLen;
-		StorageTmp->x400pSpanEquipmentId = string;
-		StorageTmp->x400pSpanEquipmentIdLen = var_val_len;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->x400pSpanTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->x400pSpanTable_sets == 0)
+				if ((ret = update_x400pSpanTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->x400pSpanTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
-		SNMP_FREE(old_value);
-		old_length = 0;
-		string = NULL;
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->x400pSpanTable_old) != NULL) {
+			x400pSpanTable_destroy(&StorageTmp->x400pSpanTable_old);
+			StorageTmp->x400pSpanTable_rsvs = 0;
+			StorageTmp->x400pSpanTable_tsts = 0;
+			StorageTmp->x400pSpanTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->x400pSpanEquipmentId = old_value;
-		StorageTmp->x400pSpanEquipmentIdLen = old_length;
+		if ((StorageOld = StorageTmp->x400pSpanTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->x400pSpanTable_sets == 0)
+			revert_x400pSpanTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
-		SNMP_FREE(string);
+		if ((StorageOld = StorageTmp->x400pSpanTable_old) == NULL)
+			break;
+		if (StorageOld->x400pSpanEquipmentId != NULL) {
+			SNMP_FREE(StorageTmp->x400pSpanEquipmentId);
+			StorageTmp->x400pSpanEquipmentId = StorageOld->x400pSpanEquipmentId;
+			StorageTmp->x400pSpanEquipmentIdLen = StorageOld->x400pSpanEquipmentIdLen;
+			StorageOld->x400pSpanEquipmentId = NULL;
+			StorageOld->x400pSpanEquipmentIdLen = 0;
+		}
+		if (--StorageTmp->x400pSpanTable_rsvs == 0)
+			x400pSpanTable_destroy(&StorageTmp->x400pSpanTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -8217,12 +10267,14 @@ write_x400pSpanEquipmentId(int action, u_char *var_val, u_char var_val_type, siz
 int
 write_x400pSpanType(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static long old_value;
-	struct x400pSpanTable_data *StorageTmp = NULL;
+	struct x400pSpanTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 15;
 	long set_value = *((long *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("x400pMxMIB", "write_x400pSpanType entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(x400pSpanTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -8261,22 +10313,61 @@ write_x400pSpanType(int action, u_char *var_val, u_char var_val_type, size_t var
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to x400pSpanType: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->x400pSpanTable_old) == NULL)
+			if (StorageTmp->x400pSpanTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->x400pSpanTable_old = x400pSpanTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->x400pSpanTable_rsvs++;
+		StorageTmp->x400pSpanType = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->x400pSpanTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->x400pSpanTable_tsts == 0)
+				if ((ret = check_x400pSpanTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->x400pSpanTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->x400pSpanType for you to use, and you have just been asked to do something with it.  Note that anything done here must
 				   be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->x400pSpanType;
-		StorageTmp->x400pSpanType = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->x400pSpanTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->x400pSpanTable_sets == 0)
+				if ((ret = update_x400pSpanTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->x400pSpanTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->x400pSpanTable_old) != NULL) {
+			x400pSpanTable_destroy(&StorageTmp->x400pSpanTable_old);
+			StorageTmp->x400pSpanTable_rsvs = 0;
+			StorageTmp->x400pSpanTable_tsts = 0;
+			StorageTmp->x400pSpanTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->x400pSpanType = old_value;
+		if ((StorageOld = StorageTmp->x400pSpanTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->x400pSpanTable_sets == 0)
+			revert_x400pSpanTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->x400pSpanTable_old) == NULL)
+			break;
+		StorageTmp->x400pSpanType = StorageOld->x400pSpanType;
+		if (--StorageTmp->x400pSpanTable_rsvs == 0)
+			x400pSpanTable_destroy(&StorageTmp->x400pSpanTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -8296,12 +10387,14 @@ write_x400pSpanType(int action, u_char *var_val, u_char var_val_type, size_t var
 int
 write_x400pSpanNumber(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static ulong old_value;
-	struct x400pSpanTable_data *StorageTmp = NULL;
+	struct x400pSpanTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 15;
 	ulong set_value = *((ulong *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("x400pMxMIB", "write_x400pSpanNumber entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(x400pSpanTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -8331,22 +10424,61 @@ write_x400pSpanNumber(int action, u_char *var_val, u_char var_val_type, size_t v
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to x400pSpanNumber: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->x400pSpanTable_old) == NULL)
+			if (StorageTmp->x400pSpanTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->x400pSpanTable_old = x400pSpanTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->x400pSpanTable_rsvs++;
+		StorageTmp->x400pSpanNumber = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->x400pSpanTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->x400pSpanTable_tsts == 0)
+				if ((ret = check_x400pSpanTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->x400pSpanTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->x400pSpanNumber for you to use, and you have just been asked to do something with it.  Note that anything done here must 
 				   be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->x400pSpanNumber;
-		StorageTmp->x400pSpanNumber = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->x400pSpanTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->x400pSpanTable_sets == 0)
+				if ((ret = update_x400pSpanTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->x400pSpanTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->x400pSpanTable_old) != NULL) {
+			x400pSpanTable_destroy(&StorageTmp->x400pSpanTable_old);
+			StorageTmp->x400pSpanTable_rsvs = 0;
+			StorageTmp->x400pSpanTable_tsts = 0;
+			StorageTmp->x400pSpanTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->x400pSpanNumber = old_value;
+		if ((StorageOld = StorageTmp->x400pSpanTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->x400pSpanTable_sets == 0)
+			revert_x400pSpanTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->x400pSpanTable_old) == NULL)
+			break;
+		StorageTmp->x400pSpanNumber = StorageOld->x400pSpanNumber;
+		if (--StorageTmp->x400pSpanTable_rsvs == 0)
+			x400pSpanTable_destroy(&StorageTmp->x400pSpanTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -8366,17 +10498,17 @@ write_x400pSpanNumber(int action, u_char *var_val, u_char var_val_type, size_t v
 int
 write_x400pSpanMode(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static uint8_t *old_value;
-	struct x400pSpanTable_data *StorageTmp = NULL;
+	struct x400pSpanTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 15;
-	static size_t old_length = 0;
-	static uint8_t *string = NULL;
+	uint8_t *string = NULL;
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("x400pMxMIB", "write_x400pSpanMode entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(x400pSpanTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
-		string = NULL;
 		if (StorageTmp != NULL && statP == NULL) {
 			/* have row but no column */
 			switch (StorageTmp->x400pSpanRowStatus) {
@@ -8407,33 +10539,73 @@ write_x400pSpanMode(int action, u_char *var_val, u_char var_val_type, size_t var
 			}
 		}
 		/* Note: default value { } */
-		break;
-	case RESERVE2:		/* memory reseveration, final preparation... */
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->x400pSpanTable_old) == NULL)
+			if (StorageTmp->x400pSpanTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->x400pSpanTable_old = x400pSpanTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->x400pSpanTable_rsvs++;
 		if ((string = malloc(var_val_len + 1)) == NULL)
 			return SNMP_ERR_RESOURCEUNAVAILABLE;
 		memcpy((void *) string, (void *) var_val, var_val_len);
 		string[var_val_len] = 0;
+		SNMP_FREE(StorageTmp->x400pSpanMode);
+		StorageTmp->x400pSpanMode = string;
+		StorageTmp->x400pSpanModeLen = var_val_len;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
+		break;
+	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->x400pSpanTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->x400pSpanTable_tsts == 0)
+				if ((ret = check_x400pSpanTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->x400pSpanTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->x400pSpanMode for you to use, and you have just been asked to do something with it.  Note that anything done here must
 				   be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->x400pSpanMode;
-		old_length = StorageTmp->x400pSpanModeLen;
-		StorageTmp->x400pSpanMode = string;
-		StorageTmp->x400pSpanModeLen = var_val_len;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->x400pSpanTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->x400pSpanTable_sets == 0)
+				if ((ret = update_x400pSpanTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->x400pSpanTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
-		SNMP_FREE(old_value);
-		old_length = 0;
-		string = NULL;
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->x400pSpanTable_old) != NULL) {
+			x400pSpanTable_destroy(&StorageTmp->x400pSpanTable_old);
+			StorageTmp->x400pSpanTable_rsvs = 0;
+			StorageTmp->x400pSpanTable_tsts = 0;
+			StorageTmp->x400pSpanTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->x400pSpanMode = old_value;
-		StorageTmp->x400pSpanModeLen = old_length;
+		if ((StorageOld = StorageTmp->x400pSpanTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->x400pSpanTable_sets == 0)
+			revert_x400pSpanTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
-		SNMP_FREE(string);
+		if ((StorageOld = StorageTmp->x400pSpanTable_old) == NULL)
+			break;
+		if (StorageOld->x400pSpanMode != NULL) {
+			SNMP_FREE(StorageTmp->x400pSpanMode);
+			StorageTmp->x400pSpanMode = StorageOld->x400pSpanMode;
+			StorageTmp->x400pSpanModeLen = StorageOld->x400pSpanModeLen;
+			StorageOld->x400pSpanMode = NULL;
+			StorageOld->x400pSpanModeLen = 0;
+		}
+		if (--StorageTmp->x400pSpanTable_rsvs == 0)
+			x400pSpanTable_destroy(&StorageTmp->x400pSpanTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -8453,12 +10625,14 @@ write_x400pSpanMode(int action, u_char *var_val, u_char var_val_type, size_t var
 int
 write_x400pSpanCrc(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static long old_value;
-	struct x400pSpanTable_data *StorageTmp = NULL;
+	struct x400pSpanTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 15;
 	long set_value = *((long *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("x400pMxMIB", "write_x400pSpanCrc entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(x400pSpanTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -8495,22 +10669,61 @@ write_x400pSpanCrc(int action, u_char *var_val, u_char var_val_type, size_t var_
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to x400pSpanCrc: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->x400pSpanTable_old) == NULL)
+			if (StorageTmp->x400pSpanTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->x400pSpanTable_old = x400pSpanTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->x400pSpanTable_rsvs++;
+		StorageTmp->x400pSpanCrc = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->x400pSpanTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->x400pSpanTable_tsts == 0)
+				if ((ret = check_x400pSpanTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->x400pSpanTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->x400pSpanCrc for you to use, and you have just been asked to do something with it.  Note that anything done here must be
 				   reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->x400pSpanCrc;
-		StorageTmp->x400pSpanCrc = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->x400pSpanTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->x400pSpanTable_sets == 0)
+				if ((ret = update_x400pSpanTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->x400pSpanTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->x400pSpanTable_old) != NULL) {
+			x400pSpanTable_destroy(&StorageTmp->x400pSpanTable_old);
+			StorageTmp->x400pSpanTable_rsvs = 0;
+			StorageTmp->x400pSpanTable_tsts = 0;
+			StorageTmp->x400pSpanTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->x400pSpanCrc = old_value;
+		if ((StorageOld = StorageTmp->x400pSpanTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->x400pSpanTable_sets == 0)
+			revert_x400pSpanTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->x400pSpanTable_old) == NULL)
+			break;
+		StorageTmp->x400pSpanCrc = StorageOld->x400pSpanCrc;
+		if (--StorageTmp->x400pSpanTable_rsvs == 0)
+			x400pSpanTable_destroy(&StorageTmp->x400pSpanTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -8530,12 +10743,14 @@ write_x400pSpanCrc(int action, u_char *var_val, u_char var_val_type, size_t var_
 int
 write_x400pSpanClocking(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static long old_value;
-	struct x400pSpanTable_data *StorageTmp = NULL;
+	struct x400pSpanTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 15;
 	long set_value = *((long *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("x400pMxMIB", "write_x400pSpanClocking entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(x400pSpanTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -8572,22 +10787,61 @@ write_x400pSpanClocking(int action, u_char *var_val, u_char var_val_type, size_t
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to x400pSpanClocking: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->x400pSpanTable_old) == NULL)
+			if (StorageTmp->x400pSpanTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->x400pSpanTable_old = x400pSpanTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->x400pSpanTable_rsvs++;
+		StorageTmp->x400pSpanClocking = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->x400pSpanTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->x400pSpanTable_tsts == 0)
+				if ((ret = check_x400pSpanTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->x400pSpanTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->x400pSpanClocking for you to use, and you have just been asked to do something with it.  Note that anything done here
 				   must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->x400pSpanClocking;
-		StorageTmp->x400pSpanClocking = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->x400pSpanTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->x400pSpanTable_sets == 0)
+				if ((ret = update_x400pSpanTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->x400pSpanTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->x400pSpanTable_old) != NULL) {
+			x400pSpanTable_destroy(&StorageTmp->x400pSpanTable_old);
+			StorageTmp->x400pSpanTable_rsvs = 0;
+			StorageTmp->x400pSpanTable_tsts = 0;
+			StorageTmp->x400pSpanTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->x400pSpanClocking = old_value;
+		if ((StorageOld = StorageTmp->x400pSpanTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->x400pSpanTable_sets == 0)
+			revert_x400pSpanTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->x400pSpanTable_old) == NULL)
+			break;
+		StorageTmp->x400pSpanClocking = StorageOld->x400pSpanClocking;
+		if (--StorageTmp->x400pSpanTable_rsvs == 0)
+			x400pSpanTable_destroy(&StorageTmp->x400pSpanTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -8607,12 +10861,14 @@ write_x400pSpanClocking(int action, u_char *var_val, u_char var_val_type, size_t
 int
 write_x400pSpanPriority(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static ulong old_value;
-	struct x400pSpanTable_data *StorageTmp = NULL;
+	struct x400pSpanTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 15;
 	ulong set_value = *((ulong *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("x400pMxMIB", "write_x400pSpanPriority entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(x400pSpanTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -8637,22 +10893,61 @@ write_x400pSpanPriority(int action, u_char *var_val, u_char var_val_type, size_t
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to x400pSpanPriority: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->x400pSpanTable_old) == NULL)
+			if (StorageTmp->x400pSpanTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->x400pSpanTable_old = x400pSpanTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->x400pSpanTable_rsvs++;
+		StorageTmp->x400pSpanPriority = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->x400pSpanTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->x400pSpanTable_tsts == 0)
+				if ((ret = check_x400pSpanTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->x400pSpanTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->x400pSpanPriority for you to use, and you have just been asked to do something with it.  Note that anything done here
 				   must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->x400pSpanPriority;
-		StorageTmp->x400pSpanPriority = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->x400pSpanTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->x400pSpanTable_sets == 0)
+				if ((ret = update_x400pSpanTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->x400pSpanTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->x400pSpanTable_old) != NULL) {
+			x400pSpanTable_destroy(&StorageTmp->x400pSpanTable_old);
+			StorageTmp->x400pSpanTable_rsvs = 0;
+			StorageTmp->x400pSpanTable_tsts = 0;
+			StorageTmp->x400pSpanTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->x400pSpanPriority = old_value;
+		if ((StorageOld = StorageTmp->x400pSpanTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->x400pSpanTable_sets == 0)
+			revert_x400pSpanTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->x400pSpanTable_old) == NULL)
+			break;
+		StorageTmp->x400pSpanPriority = StorageOld->x400pSpanPriority;
+		if (--StorageTmp->x400pSpanTable_rsvs == 0)
+			x400pSpanTable_destroy(&StorageTmp->x400pSpanTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -8672,12 +10967,14 @@ write_x400pSpanPriority(int action, u_char *var_val, u_char var_val_type, size_t
 int
 write_x400pSpanCoding(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static long old_value;
-	struct x400pSpanTable_data *StorageTmp = NULL;
+	struct x400pSpanTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 15;
 	long set_value = *((long *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("x400pMxMIB", "write_x400pSpanCoding entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(x400pSpanTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -8715,22 +11012,61 @@ write_x400pSpanCoding(int action, u_char *var_val, u_char var_val_type, size_t v
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to x400pSpanCoding: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->x400pSpanTable_old) == NULL)
+			if (StorageTmp->x400pSpanTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->x400pSpanTable_old = x400pSpanTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->x400pSpanTable_rsvs++;
+		StorageTmp->x400pSpanCoding = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->x400pSpanTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->x400pSpanTable_tsts == 0)
+				if ((ret = check_x400pSpanTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->x400pSpanTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->x400pSpanCoding for you to use, and you have just been asked to do something with it.  Note that anything done here must 
 				   be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->x400pSpanCoding;
-		StorageTmp->x400pSpanCoding = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->x400pSpanTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->x400pSpanTable_sets == 0)
+				if ((ret = update_x400pSpanTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->x400pSpanTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->x400pSpanTable_old) != NULL) {
+			x400pSpanTable_destroy(&StorageTmp->x400pSpanTable_old);
+			StorageTmp->x400pSpanTable_rsvs = 0;
+			StorageTmp->x400pSpanTable_tsts = 0;
+			StorageTmp->x400pSpanTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->x400pSpanCoding = old_value;
+		if ((StorageOld = StorageTmp->x400pSpanTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->x400pSpanTable_sets == 0)
+			revert_x400pSpanTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->x400pSpanTable_old) == NULL)
+			break;
+		StorageTmp->x400pSpanCoding = StorageOld->x400pSpanCoding;
+		if (--StorageTmp->x400pSpanTable_rsvs == 0)
+			x400pSpanTable_destroy(&StorageTmp->x400pSpanTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -8750,12 +11086,14 @@ write_x400pSpanCoding(int action, u_char *var_val, u_char var_val_type, size_t v
 int
 write_x400pSpanFraming(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static long old_value;
-	struct x400pSpanTable_data *StorageTmp = NULL;
+	struct x400pSpanTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 15;
 	long set_value = *((long *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("x400pMxMIB", "write_x400pSpanFraming entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(x400pSpanTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -8792,22 +11130,61 @@ write_x400pSpanFraming(int action, u_char *var_val, u_char var_val_type, size_t 
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to x400pSpanFraming: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->x400pSpanTable_old) == NULL)
+			if (StorageTmp->x400pSpanTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->x400pSpanTable_old = x400pSpanTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->x400pSpanTable_rsvs++;
+		StorageTmp->x400pSpanFraming = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->x400pSpanTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->x400pSpanTable_tsts == 0)
+				if ((ret = check_x400pSpanTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->x400pSpanTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->x400pSpanFraming for you to use, and you have just been asked to do something with it.  Note that anything done here
 				   must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->x400pSpanFraming;
-		StorageTmp->x400pSpanFraming = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->x400pSpanTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->x400pSpanTable_sets == 0)
+				if ((ret = update_x400pSpanTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->x400pSpanTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->x400pSpanTable_old) != NULL) {
+			x400pSpanTable_destroy(&StorageTmp->x400pSpanTable_old);
+			StorageTmp->x400pSpanTable_rsvs = 0;
+			StorageTmp->x400pSpanTable_tsts = 0;
+			StorageTmp->x400pSpanTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->x400pSpanFraming = old_value;
+		if ((StorageOld = StorageTmp->x400pSpanTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->x400pSpanTable_sets == 0)
+			revert_x400pSpanTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->x400pSpanTable_old) == NULL)
+			break;
+		StorageTmp->x400pSpanFraming = StorageOld->x400pSpanFraming;
+		if (--StorageTmp->x400pSpanTable_rsvs == 0)
+			x400pSpanTable_destroy(&StorageTmp->x400pSpanTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -8827,12 +11204,14 @@ write_x400pSpanFraming(int action, u_char *var_val, u_char var_val_type, size_t 
 int
 write_x400pSpanLineImpedance(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static long old_value;
-	struct x400pSpanTable_data *StorageTmp = NULL;
+	struct x400pSpanTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 15;
 	long set_value = *((long *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("x400pMxMIB", "write_x400pSpanLineImpedance entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(x400pSpanTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -8867,22 +11246,61 @@ write_x400pSpanLineImpedance(int action, u_char *var_val, u_char var_val_type, s
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to x400pSpanLineImpedance: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->x400pSpanTable_old) == NULL)
+			if (StorageTmp->x400pSpanTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->x400pSpanTable_old = x400pSpanTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->x400pSpanTable_rsvs++;
+		StorageTmp->x400pSpanLineImpedance = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->x400pSpanTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->x400pSpanTable_tsts == 0)
+				if ((ret = check_x400pSpanTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->x400pSpanTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->x400pSpanLineImpedance for you to use, and you have just been asked to do something with it.  Note that anything done
 				   here must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->x400pSpanLineImpedance;
-		StorageTmp->x400pSpanLineImpedance = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->x400pSpanTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->x400pSpanTable_sets == 0)
+				if ((ret = update_x400pSpanTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->x400pSpanTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->x400pSpanTable_old) != NULL) {
+			x400pSpanTable_destroy(&StorageTmp->x400pSpanTable_old);
+			StorageTmp->x400pSpanTable_rsvs = 0;
+			StorageTmp->x400pSpanTable_tsts = 0;
+			StorageTmp->x400pSpanTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->x400pSpanLineImpedance = old_value;
+		if ((StorageOld = StorageTmp->x400pSpanTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->x400pSpanTable_sets == 0)
+			revert_x400pSpanTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->x400pSpanTable_old) == NULL)
+			break;
+		StorageTmp->x400pSpanLineImpedance = StorageOld->x400pSpanLineImpedance;
+		if (--StorageTmp->x400pSpanTable_rsvs == 0)
+			x400pSpanTable_destroy(&StorageTmp->x400pSpanTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -8902,12 +11320,14 @@ write_x400pSpanLineImpedance(int action, u_char *var_val, u_char var_val_type, s
 int
 write_x400pSpanLineMode(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static long old_value;
-	struct x400pSpanTable_data *StorageTmp = NULL;
+	struct x400pSpanTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 15;
 	long set_value = *((long *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("x400pMxMIB", "write_x400pSpanLineMode entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(x400pSpanTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -8943,22 +11363,61 @@ write_x400pSpanLineMode(int action, u_char *var_val, u_char var_val_type, size_t
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to x400pSpanLineMode: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->x400pSpanTable_old) == NULL)
+			if (StorageTmp->x400pSpanTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->x400pSpanTable_old = x400pSpanTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->x400pSpanTable_rsvs++;
+		StorageTmp->x400pSpanLineMode = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->x400pSpanTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->x400pSpanTable_tsts == 0)
+				if ((ret = check_x400pSpanTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->x400pSpanTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->x400pSpanLineMode for you to use, and you have just been asked to do something with it.  Note that anything done here
 				   must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->x400pSpanLineMode;
-		StorageTmp->x400pSpanLineMode = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->x400pSpanTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->x400pSpanTable_sets == 0)
+				if ((ret = update_x400pSpanTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->x400pSpanTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->x400pSpanTable_old) != NULL) {
+			x400pSpanTable_destroy(&StorageTmp->x400pSpanTable_old);
+			StorageTmp->x400pSpanTable_rsvs = 0;
+			StorageTmp->x400pSpanTable_tsts = 0;
+			StorageTmp->x400pSpanTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->x400pSpanLineMode = old_value;
+		if ((StorageOld = StorageTmp->x400pSpanTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->x400pSpanTable_sets == 0)
+			revert_x400pSpanTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->x400pSpanTable_old) == NULL)
+			break;
+		StorageTmp->x400pSpanLineMode = StorageOld->x400pSpanLineMode;
+		if (--StorageTmp->x400pSpanTable_rsvs == 0)
+			x400pSpanTable_destroy(&StorageTmp->x400pSpanTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -8978,12 +11437,14 @@ write_x400pSpanLineMode(int action, u_char *var_val, u_char var_val_type, size_t
 int
 write_x400pSpanLineLength(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static long old_value;
-	struct x400pSpanTable_data *StorageTmp = NULL;
+	struct x400pSpanTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 15;
 	long set_value = *((long *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("x400pMxMIB", "write_x400pSpanLineLength entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(x400pSpanTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -9021,22 +11482,61 @@ write_x400pSpanLineLength(int action, u_char *var_val, u_char var_val_type, size
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to x400pSpanLineLength: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->x400pSpanTable_old) == NULL)
+			if (StorageTmp->x400pSpanTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->x400pSpanTable_old = x400pSpanTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->x400pSpanTable_rsvs++;
+		StorageTmp->x400pSpanLineLength = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->x400pSpanTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->x400pSpanTable_tsts == 0)
+				if ((ret = check_x400pSpanTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->x400pSpanTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->x400pSpanLineLength for you to use, and you have just been asked to do something with it.  Note that anything done here
 				   must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->x400pSpanLineLength;
-		StorageTmp->x400pSpanLineLength = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->x400pSpanTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->x400pSpanTable_sets == 0)
+				if ((ret = update_x400pSpanTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->x400pSpanTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->x400pSpanTable_old) != NULL) {
+			x400pSpanTable_destroy(&StorageTmp->x400pSpanTable_old);
+			StorageTmp->x400pSpanTable_rsvs = 0;
+			StorageTmp->x400pSpanTable_tsts = 0;
+			StorageTmp->x400pSpanTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->x400pSpanLineLength = old_value;
+		if ((StorageOld = StorageTmp->x400pSpanTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->x400pSpanTable_sets == 0)
+			revert_x400pSpanTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->x400pSpanTable_old) == NULL)
+			break;
+		StorageTmp->x400pSpanLineLength = StorageOld->x400pSpanLineLength;
+		if (--StorageTmp->x400pSpanTable_rsvs == 0)
+			x400pSpanTable_destroy(&StorageTmp->x400pSpanTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -9056,12 +11556,14 @@ write_x400pSpanLineLength(int action, u_char *var_val, u_char var_val_type, size
 int
 write_x400pSpanLineAttenuation(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static long old_value;
-	struct x400pSpanTable_data *StorageTmp = NULL;
+	struct x400pSpanTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 15;
 	long set_value = *((long *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("x400pMxMIB", "write_x400pSpanLineAttenuation entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(x400pSpanTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -9098,22 +11600,61 @@ write_x400pSpanLineAttenuation(int action, u_char *var_val, u_char var_val_type,
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to x400pSpanLineAttenuation: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->x400pSpanTable_old) == NULL)
+			if (StorageTmp->x400pSpanTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->x400pSpanTable_old = x400pSpanTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->x400pSpanTable_rsvs++;
+		StorageTmp->x400pSpanLineAttenuation = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->x400pSpanTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->x400pSpanTable_tsts == 0)
+				if ((ret = check_x400pSpanTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->x400pSpanTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->x400pSpanLineAttenuation for you to use, and you have just been asked to do something with it.  Note that anything done
 				   here must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->x400pSpanLineAttenuation;
-		StorageTmp->x400pSpanLineAttenuation = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->x400pSpanTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->x400pSpanTable_sets == 0)
+				if ((ret = update_x400pSpanTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->x400pSpanTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->x400pSpanTable_old) != NULL) {
+			x400pSpanTable_destroy(&StorageTmp->x400pSpanTable_old);
+			StorageTmp->x400pSpanTable_rsvs = 0;
+			StorageTmp->x400pSpanTable_tsts = 0;
+			StorageTmp->x400pSpanTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->x400pSpanLineAttenuation = old_value;
+		if ((StorageOld = StorageTmp->x400pSpanTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->x400pSpanTable_sets == 0)
+			revert_x400pSpanTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->x400pSpanTable_old) == NULL)
+			break;
+		StorageTmp->x400pSpanLineAttenuation = StorageOld->x400pSpanLineAttenuation;
+		if (--StorageTmp->x400pSpanTable_rsvs == 0)
+			x400pSpanTable_destroy(&StorageTmp->x400pSpanTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -9133,12 +11674,14 @@ write_x400pSpanLineAttenuation(int action, u_char *var_val, u_char var_val_type,
 int
 write_x400pSpanLineGain(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static long old_value;
-	struct x400pSpanTable_data *StorageTmp = NULL;
+	struct x400pSpanTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 15;
 	long set_value = *((long *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("x400pMxMIB", "write_x400pSpanLineGain entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(x400pSpanTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -9177,22 +11720,61 @@ write_x400pSpanLineGain(int action, u_char *var_val, u_char var_val_type, size_t
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to x400pSpanLineGain: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->x400pSpanTable_old) == NULL)
+			if (StorageTmp->x400pSpanTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->x400pSpanTable_old = x400pSpanTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->x400pSpanTable_rsvs++;
+		StorageTmp->x400pSpanLineGain = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->x400pSpanTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->x400pSpanTable_tsts == 0)
+				if ((ret = check_x400pSpanTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->x400pSpanTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->x400pSpanLineGain for you to use, and you have just been asked to do something with it.  Note that anything done here
 				   must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->x400pSpanLineGain;
-		StorageTmp->x400pSpanLineGain = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->x400pSpanTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->x400pSpanTable_sets == 0)
+				if ((ret = update_x400pSpanTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->x400pSpanTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->x400pSpanTable_old) != NULL) {
+			x400pSpanTable_destroy(&StorageTmp->x400pSpanTable_old);
+			StorageTmp->x400pSpanTable_rsvs = 0;
+			StorageTmp->x400pSpanTable_tsts = 0;
+			StorageTmp->x400pSpanTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->x400pSpanLineGain = old_value;
+		if ((StorageOld = StorageTmp->x400pSpanTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->x400pSpanTable_sets == 0)
+			revert_x400pSpanTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->x400pSpanTable_old) == NULL)
+			break;
+		StorageTmp->x400pSpanLineGain = StorageOld->x400pSpanLineGain;
+		if (--StorageTmp->x400pSpanTable_rsvs == 0)
+			x400pSpanTable_destroy(&StorageTmp->x400pSpanTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -9212,12 +11794,14 @@ write_x400pSpanLineGain(int action, u_char *var_val, u_char var_val_type, size_t
 int
 write_x400pSpanLineDelay(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static ulong old_value;
-	struct x400pSpanTable_data *StorageTmp = NULL;
+	struct x400pSpanTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 15;
 	ulong set_value = *((ulong *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("x400pMxMIB", "write_x400pSpanLineDelay entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(x400pSpanTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -9243,22 +11827,61 @@ write_x400pSpanLineDelay(int action, u_char *var_val, u_char var_val_type, size_
 			return SNMP_ERR_WRONGLENGTH;
 		}
 		/* Note: default value 0 */
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->x400pSpanTable_old) == NULL)
+			if (StorageTmp->x400pSpanTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->x400pSpanTable_old = x400pSpanTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->x400pSpanTable_rsvs++;
+		StorageTmp->x400pSpanLineDelay = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->x400pSpanTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->x400pSpanTable_tsts == 0)
+				if ((ret = check_x400pSpanTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->x400pSpanTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->x400pSpanLineDelay for you to use, and you have just been asked to do something with it.  Note that anything done here
 				   must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->x400pSpanLineDelay;
-		StorageTmp->x400pSpanLineDelay = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->x400pSpanTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->x400pSpanTable_sets == 0)
+				if ((ret = update_x400pSpanTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->x400pSpanTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->x400pSpanTable_old) != NULL) {
+			x400pSpanTable_destroy(&StorageTmp->x400pSpanTable_old);
+			StorageTmp->x400pSpanTable_rsvs = 0;
+			StorageTmp->x400pSpanTable_tsts = 0;
+			StorageTmp->x400pSpanTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->x400pSpanLineDelay = old_value;
+		if ((StorageOld = StorageTmp->x400pSpanTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->x400pSpanTable_sets == 0)
+			revert_x400pSpanTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->x400pSpanTable_old) == NULL)
+			break;
+		StorageTmp->x400pSpanLineDelay = StorageOld->x400pSpanLineDelay;
+		if (--StorageTmp->x400pSpanTable_rsvs == 0)
+			x400pSpanTable_destroy(&StorageTmp->x400pSpanTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -9278,12 +11901,14 @@ write_x400pSpanLineDelay(int action, u_char *var_val, u_char var_val_type, size_
 int
 write_x400pSpanTxLevel(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static long old_value;
-	struct x400pSpanTable_data *StorageTmp = NULL;
+	struct x400pSpanTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 15;
 	long set_value = *((long *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("x400pMxMIB", "write_x400pSpanTxLevel entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(x400pSpanTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -9318,22 +11943,61 @@ write_x400pSpanTxLevel(int action, u_char *var_val, u_char var_val_type, size_t 
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to x400pSpanTxLevel: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->x400pSpanTable_old) == NULL)
+			if (StorageTmp->x400pSpanTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->x400pSpanTable_old = x400pSpanTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->x400pSpanTable_rsvs++;
+		StorageTmp->x400pSpanTxLevel = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->x400pSpanTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->x400pSpanTable_tsts == 0)
+				if ((ret = check_x400pSpanTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->x400pSpanTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->x400pSpanTxLevel for you to use, and you have just been asked to do something with it.  Note that anything done here
 				   must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->x400pSpanTxLevel;
-		StorageTmp->x400pSpanTxLevel = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->x400pSpanTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->x400pSpanTable_sets == 0)
+				if ((ret = update_x400pSpanTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->x400pSpanTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->x400pSpanTable_old) != NULL) {
+			x400pSpanTable_destroy(&StorageTmp->x400pSpanTable_old);
+			StorageTmp->x400pSpanTable_rsvs = 0;
+			StorageTmp->x400pSpanTable_tsts = 0;
+			StorageTmp->x400pSpanTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->x400pSpanTxLevel = old_value;
+		if ((StorageOld = StorageTmp->x400pSpanTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->x400pSpanTable_sets == 0)
+			revert_x400pSpanTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->x400pSpanTable_old) == NULL)
+			break;
+		StorageTmp->x400pSpanTxLevel = StorageOld->x400pSpanTxLevel;
+		if (--StorageTmp->x400pSpanTable_rsvs == 0)
+			x400pSpanTable_destroy(&StorageTmp->x400pSpanTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -9353,12 +12017,14 @@ write_x400pSpanTxLevel(int action, u_char *var_val, u_char var_val_type, size_t 
 int
 write_x400pSpanRxLevel(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static long old_value;
-	struct x400pSpanTable_data *StorageTmp = NULL;
+	struct x400pSpanTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 15;
 	long set_value = *((long *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("x400pMxMIB", "write_x400pSpanRxLevel entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(x400pSpanTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -9393,22 +12059,61 @@ write_x400pSpanRxLevel(int action, u_char *var_val, u_char var_val_type, size_t 
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to x400pSpanRxLevel: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->x400pSpanTable_old) == NULL)
+			if (StorageTmp->x400pSpanTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->x400pSpanTable_old = x400pSpanTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->x400pSpanTable_rsvs++;
+		StorageTmp->x400pSpanRxLevel = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->x400pSpanTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->x400pSpanTable_tsts == 0)
+				if ((ret = check_x400pSpanTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->x400pSpanTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->x400pSpanRxLevel for you to use, and you have just been asked to do something with it.  Note that anything done here
 				   must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->x400pSpanRxLevel;
-		StorageTmp->x400pSpanRxLevel = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->x400pSpanTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->x400pSpanTable_sets == 0)
+				if ((ret = update_x400pSpanTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->x400pSpanTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->x400pSpanTable_old) != NULL) {
+			x400pSpanTable_destroy(&StorageTmp->x400pSpanTable_old);
+			StorageTmp->x400pSpanTable_rsvs = 0;
+			StorageTmp->x400pSpanTable_tsts = 0;
+			StorageTmp->x400pSpanTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->x400pSpanRxLevel = old_value;
+		if ((StorageOld = StorageTmp->x400pSpanTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->x400pSpanTable_sets == 0)
+			revert_x400pSpanTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->x400pSpanTable_old) == NULL)
+			break;
+		StorageTmp->x400pSpanRxLevel = StorageOld->x400pSpanRxLevel;
+		if (--StorageTmp->x400pSpanTable_rsvs == 0)
+			x400pSpanTable_destroy(&StorageTmp->x400pSpanTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -9428,12 +12133,14 @@ write_x400pSpanRxLevel(int action, u_char *var_val, u_char var_val_type, size_t 
 int
 write_x400pSpanAlarmSettleTime(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static long old_value;
-	struct x400pSpanTable_data *StorageTmp = NULL;
+	struct x400pSpanTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 15;
 	long set_value = *((long *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("x400pMxMIB", "write_x400pSpanAlarmSettleTime entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(x400pSpanTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -9464,22 +12171,61 @@ write_x400pSpanAlarmSettleTime(int action, u_char *var_val, u_char var_val_type,
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to x400pSpanAlarmSettleTime: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->x400pSpanTable_old) == NULL)
+			if (StorageTmp->x400pSpanTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->x400pSpanTable_old = x400pSpanTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->x400pSpanTable_rsvs++;
+		StorageTmp->x400pSpanAlarmSettleTime = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->x400pSpanTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->x400pSpanTable_tsts == 0)
+				if ((ret = check_x400pSpanTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->x400pSpanTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->x400pSpanAlarmSettleTime for you to use, and you have just been asked to do something with it.  Note that anything done
 				   here must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->x400pSpanAlarmSettleTime;
-		StorageTmp->x400pSpanAlarmSettleTime = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->x400pSpanTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->x400pSpanTable_sets == 0)
+				if ((ret = update_x400pSpanTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->x400pSpanTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->x400pSpanTable_old) != NULL) {
+			x400pSpanTable_destroy(&StorageTmp->x400pSpanTable_old);
+			StorageTmp->x400pSpanTable_rsvs = 0;
+			StorageTmp->x400pSpanTable_tsts = 0;
+			StorageTmp->x400pSpanTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->x400pSpanAlarmSettleTime = old_value;
+		if ((StorageOld = StorageTmp->x400pSpanTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->x400pSpanTable_sets == 0)
+			revert_x400pSpanTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->x400pSpanTable_old) == NULL)
+			break;
+		StorageTmp->x400pSpanAlarmSettleTime = StorageOld->x400pSpanAlarmSettleTime;
+		if (--StorageTmp->x400pSpanTable_rsvs == 0)
+			x400pSpanTable_destroy(&StorageTmp->x400pSpanTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -9499,12 +12245,14 @@ write_x400pSpanAlarmSettleTime(int action, u_char *var_val, u_char var_val_type,
 int
 write_x400pSpanLineCodeTime(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static long old_value;
-	struct x400pSpanTable_data *StorageTmp = NULL;
+	struct x400pSpanTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 15;
 	long set_value = *((long *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("x400pMxMIB", "write_x400pSpanLineCodeTime entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(x400pSpanTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -9535,22 +12283,61 @@ write_x400pSpanLineCodeTime(int action, u_char *var_val, u_char var_val_type, si
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to x400pSpanLineCodeTime: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->x400pSpanTable_old) == NULL)
+			if (StorageTmp->x400pSpanTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->x400pSpanTable_old = x400pSpanTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->x400pSpanTable_rsvs++;
+		StorageTmp->x400pSpanLineCodeTime = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->x400pSpanTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->x400pSpanTable_tsts == 0)
+				if ((ret = check_x400pSpanTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->x400pSpanTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->x400pSpanLineCodeTime for you to use, and you have just been asked to do something with it.  Note that anything done
 				   here must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->x400pSpanLineCodeTime;
-		StorageTmp->x400pSpanLineCodeTime = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->x400pSpanTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->x400pSpanTable_sets == 0)
+				if ((ret = update_x400pSpanTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->x400pSpanTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->x400pSpanTable_old) != NULL) {
+			x400pSpanTable_destroy(&StorageTmp->x400pSpanTable_old);
+			StorageTmp->x400pSpanTable_rsvs = 0;
+			StorageTmp->x400pSpanTable_tsts = 0;
+			StorageTmp->x400pSpanTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->x400pSpanLineCodeTime = old_value;
+		if ((StorageOld = StorageTmp->x400pSpanTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->x400pSpanTable_sets == 0)
+			revert_x400pSpanTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->x400pSpanTable_old) == NULL)
+			break;
+		StorageTmp->x400pSpanLineCodeTime = StorageOld->x400pSpanLineCodeTime;
+		if (--StorageTmp->x400pSpanTable_rsvs == 0)
+			x400pSpanTable_destroy(&StorageTmp->x400pSpanTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -9570,12 +12357,14 @@ write_x400pSpanLineCodeTime(int action, u_char *var_val, u_char var_val_type, si
 int
 write_x400pSpanPrimary(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static ulong old_value;
-	struct x400pSpanTable_data *StorageTmp = NULL;
+	struct x400pSpanTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 15;
 	ulong set_value = *((ulong *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("x400pMxMIB", "write_x400pSpanPrimary entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(x400pSpanTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -9600,22 +12389,61 @@ write_x400pSpanPrimary(int action, u_char *var_val, u_char var_val_type, size_t 
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to x400pSpanPrimary: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->x400pSpanTable_old) == NULL)
+			if (StorageTmp->x400pSpanTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->x400pSpanTable_old = x400pSpanTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->x400pSpanTable_rsvs++;
+		StorageTmp->x400pSpanPrimary = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->x400pSpanTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->x400pSpanTable_tsts == 0)
+				if ((ret = check_x400pSpanTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->x400pSpanTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->x400pSpanPrimary for you to use, and you have just been asked to do something with it.  Note that anything done here
 				   must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->x400pSpanPrimary;
-		StorageTmp->x400pSpanPrimary = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->x400pSpanTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->x400pSpanTable_sets == 0)
+				if ((ret = update_x400pSpanTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->x400pSpanTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->x400pSpanTable_old) != NULL) {
+			x400pSpanTable_destroy(&StorageTmp->x400pSpanTable_old);
+			StorageTmp->x400pSpanTable_rsvs = 0;
+			StorageTmp->x400pSpanTable_tsts = 0;
+			StorageTmp->x400pSpanTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->x400pSpanPrimary = old_value;
+		if ((StorageOld = StorageTmp->x400pSpanTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->x400pSpanTable_sets == 0)
+			revert_x400pSpanTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->x400pSpanTable_old) == NULL)
+			break;
+		StorageTmp->x400pSpanPrimary = StorageOld->x400pSpanPrimary;
+		if (--StorageTmp->x400pSpanTable_rsvs == 0)
+			x400pSpanTable_destroy(&StorageTmp->x400pSpanTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -9635,17 +12463,17 @@ write_x400pSpanPrimary(int action, u_char *var_val, u_char var_val_type, size_t 
 int
 write_x400pSpanDataLink(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static uint8_t *old_value;
-	struct x400pSpanTable_data *StorageTmp = NULL;
+	struct x400pSpanTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 15;
-	static size_t old_length = 0;
-	static uint8_t *string = NULL;
+	uint8_t *string = NULL;
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("x400pMxMIB", "write_x400pSpanDataLink entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(x400pSpanTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
-		string = NULL;
 		if (StorageTmp != NULL && statP == NULL) {
 			/* have row but no column */
 			switch (StorageTmp->x400pSpanRowStatus) {
@@ -9675,33 +12503,73 @@ write_x400pSpanDataLink(int action, u_char *var_val, u_char var_val_type, size_t
 				return SNMP_ERR_WRONGLENGTH;
 			}
 		}
-		break;
-	case RESERVE2:		/* memory reseveration, final preparation... */
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->x400pSpanTable_old) == NULL)
+			if (StorageTmp->x400pSpanTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->x400pSpanTable_old = x400pSpanTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->x400pSpanTable_rsvs++;
 		if ((string = malloc(var_val_len + 1)) == NULL)
 			return SNMP_ERR_RESOURCEUNAVAILABLE;
 		memcpy((void *) string, (void *) var_val, var_val_len);
 		string[var_val_len] = 0;
+		SNMP_FREE(StorageTmp->x400pSpanDataLink);
+		StorageTmp->x400pSpanDataLink = string;
+		StorageTmp->x400pSpanDataLinkLen = var_val_len;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
+		break;
+	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->x400pSpanTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->x400pSpanTable_tsts == 0)
+				if ((ret = check_x400pSpanTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->x400pSpanTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->x400pSpanDataLink for you to use, and you have just been asked to do something with it.  Note that anything done here
 				   must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->x400pSpanDataLink;
-		old_length = StorageTmp->x400pSpanDataLinkLen;
-		StorageTmp->x400pSpanDataLink = string;
-		StorageTmp->x400pSpanDataLinkLen = var_val_len;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->x400pSpanTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->x400pSpanTable_sets == 0)
+				if ((ret = update_x400pSpanTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->x400pSpanTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
-		SNMP_FREE(old_value);
-		old_length = 0;
-		string = NULL;
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->x400pSpanTable_old) != NULL) {
+			x400pSpanTable_destroy(&StorageTmp->x400pSpanTable_old);
+			StorageTmp->x400pSpanTable_rsvs = 0;
+			StorageTmp->x400pSpanTable_tsts = 0;
+			StorageTmp->x400pSpanTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->x400pSpanDataLink = old_value;
-		StorageTmp->x400pSpanDataLinkLen = old_length;
+		if ((StorageOld = StorageTmp->x400pSpanTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->x400pSpanTable_sets == 0)
+			revert_x400pSpanTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
-		SNMP_FREE(string);
+		if ((StorageOld = StorageTmp->x400pSpanTable_old) == NULL)
+			break;
+		if (StorageOld->x400pSpanDataLink != NULL) {
+			SNMP_FREE(StorageTmp->x400pSpanDataLink);
+			StorageTmp->x400pSpanDataLink = StorageOld->x400pSpanDataLink;
+			StorageTmp->x400pSpanDataLinkLen = StorageOld->x400pSpanDataLinkLen;
+			StorageOld->x400pSpanDataLink = NULL;
+			StorageOld->x400pSpanDataLinkLen = 0;
+		}
+		if (--StorageTmp->x400pSpanTable_rsvs == 0)
+			x400pSpanTable_destroy(&StorageTmp->x400pSpanTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -9721,12 +12589,14 @@ write_x400pSpanDataLink(int action, u_char *var_val, u_char var_val_type, size_t
 int
 write_x400pSpanLineCode(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static long old_value;
-	struct x400pSpanTable_data *StorageTmp = NULL;
+	struct x400pSpanTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 15;
 	long set_value = *((long *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("x400pMxMIB", "write_x400pSpanLineCode entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(x400pSpanTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -9765,22 +12635,61 @@ write_x400pSpanLineCode(int action, u_char *var_val, u_char var_val_type, size_t
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to x400pSpanLineCode: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->x400pSpanTable_old) == NULL)
+			if (StorageTmp->x400pSpanTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->x400pSpanTable_old = x400pSpanTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->x400pSpanTable_rsvs++;
+		StorageTmp->x400pSpanLineCode = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->x400pSpanTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->x400pSpanTable_tsts == 0)
+				if ((ret = check_x400pSpanTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->x400pSpanTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->x400pSpanLineCode for you to use, and you have just been asked to do something with it.  Note that anything done here
 				   must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->x400pSpanLineCode;
-		StorageTmp->x400pSpanLineCode = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->x400pSpanTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->x400pSpanTable_sets == 0)
+				if ((ret = update_x400pSpanTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->x400pSpanTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->x400pSpanTable_old) != NULL) {
+			x400pSpanTable_destroy(&StorageTmp->x400pSpanTable_old);
+			StorageTmp->x400pSpanTable_rsvs = 0;
+			StorageTmp->x400pSpanTable_tsts = 0;
+			StorageTmp->x400pSpanTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->x400pSpanLineCode = old_value;
+		if ((StorageOld = StorageTmp->x400pSpanTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->x400pSpanTable_sets == 0)
+			revert_x400pSpanTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->x400pSpanTable_old) == NULL)
+			break;
+		StorageTmp->x400pSpanLineCode = StorageOld->x400pSpanLineCode;
+		if (--StorageTmp->x400pSpanTable_rsvs == 0)
+			x400pSpanTable_destroy(&StorageTmp->x400pSpanTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -9800,17 +12709,17 @@ write_x400pSpanLineCode(int action, u_char *var_val, u_char var_val_type, size_t
 int
 write_x400pSpanAlarmSeverityMapProfile(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static oid *old_value;
-	struct x400pSpanTable_data *StorageTmp = NULL;
+	struct x400pSpanTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 15;
-	static size_t old_length = 0;
-	static oid *objid = NULL;
+	oid *objid = NULL;
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("x400pMxMIB", "write_x400pSpanAlarmSeverityMapProfile entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(x400pSpanTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
-		objid = NULL;
 		if (StorageTmp != NULL && statP == NULL) {
 			/* have row but no column */
 			switch (StorageTmp->x400pSpanRowStatus) {
@@ -9833,31 +12742,71 @@ write_x400pSpanAlarmSeverityMapProfile(int action, u_char *var_val, u_char var_v
 			return SNMP_ERR_WRONGLENGTH;
 		}
 		/* Note: default value zeroDotZero */
-		break;
-	case RESERVE2:		/* memory reseveration, final preparation... */
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->x400pSpanTable_old) == NULL)
+			if (StorageTmp->x400pSpanTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->x400pSpanTable_old = x400pSpanTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->x400pSpanTable_rsvs++;
 		if ((objid = snmp_duplicate_objid((void *) var_val, var_val_len / sizeof(oid))) == NULL)
 			return SNMP_ERR_RESOURCEUNAVAILABLE;
+		SNMP_FREE(StorageTmp->x400pSpanAlarmSeverityMapProfile);
+		StorageTmp->x400pSpanAlarmSeverityMapProfile = objid;
+		StorageTmp->x400pSpanAlarmSeverityMapProfileLen = var_val_len / sizeof(oid);
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
+		break;
+	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->x400pSpanTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->x400pSpanTable_tsts == 0)
+				if ((ret = check_x400pSpanTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->x400pSpanTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->x400pSpanAlarmSeverityMapProfile for you to use, and you have just been asked to do something with it.  Note that
 				   anything done here must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->x400pSpanAlarmSeverityMapProfile;
-		old_length = StorageTmp->x400pSpanAlarmSeverityMapProfileLen;
-		StorageTmp->x400pSpanAlarmSeverityMapProfile = objid;
-		StorageTmp->x400pSpanAlarmSeverityMapProfileLen = var_val_len / sizeof(oid);
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->x400pSpanTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->x400pSpanTable_sets == 0)
+				if ((ret = update_x400pSpanTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->x400pSpanTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
-		SNMP_FREE(old_value);
-		old_length = 0;
-		objid = NULL;
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->x400pSpanTable_old) != NULL) {
+			x400pSpanTable_destroy(&StorageTmp->x400pSpanTable_old);
+			StorageTmp->x400pSpanTable_rsvs = 0;
+			StorageTmp->x400pSpanTable_tsts = 0;
+			StorageTmp->x400pSpanTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->x400pSpanAlarmSeverityMapProfile = old_value;
-		StorageTmp->x400pSpanAlarmSeverityMapProfileLen = old_length;
+		if ((StorageOld = StorageTmp->x400pSpanTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->x400pSpanTable_sets == 0)
+			revert_x400pSpanTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
-		SNMP_FREE(objid);
+		if ((StorageOld = StorageTmp->x400pSpanTable_old) == NULL)
+			break;
+		if (StorageOld->x400pSpanAlarmSeverityMapProfile != NULL) {
+			SNMP_FREE(StorageTmp->x400pSpanAlarmSeverityMapProfile);
+			StorageTmp->x400pSpanAlarmSeverityMapProfile = StorageOld->x400pSpanAlarmSeverityMapProfile;
+			StorageTmp->x400pSpanAlarmSeverityMapProfileLen = StorageOld->x400pSpanAlarmSeverityMapProfileLen;
+			StorageOld->x400pSpanAlarmSeverityMapProfile = NULL;
+			StorageOld->x400pSpanAlarmSeverityMapProfileLen = 0;
+		}
+		if (--StorageTmp->x400pSpanTable_rsvs == 0)
+			x400pSpanTable_destroy(&StorageTmp->x400pSpanTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -9877,12 +12826,14 @@ write_x400pSpanAlarmSeverityMapProfile(int action, u_char *var_val, u_char var_v
 int
 write_x400pSpanAdministrativeState(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static long old_value;
-	struct x400pSpanTable_data *StorageTmp = NULL;
+	struct x400pSpanTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 15;
 	long set_value = *((long *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("x400pMxMIB", "write_x400pSpanAdministrativeState entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(x400pSpanTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -9917,22 +12868,61 @@ write_x400pSpanAdministrativeState(int action, u_char *var_val, u_char var_val_t
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to x400pSpanAdministrativeState: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->x400pSpanTable_old) == NULL)
+			if (StorageTmp->x400pSpanTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->x400pSpanTable_old = x400pSpanTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->x400pSpanTable_rsvs++;
+		StorageTmp->x400pSpanAdministrativeState = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->x400pSpanTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->x400pSpanTable_tsts == 0)
+				if ((ret = check_x400pSpanTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->x400pSpanTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->x400pSpanAdministrativeState for you to use, and you have just been asked to do something with it.  Note that anything
 				   done here must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->x400pSpanAdministrativeState;
-		StorageTmp->x400pSpanAdministrativeState = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->x400pSpanTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->x400pSpanTable_sets == 0)
+				if ((ret = update_x400pSpanTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->x400pSpanTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->x400pSpanTable_old) != NULL) {
+			x400pSpanTable_destroy(&StorageTmp->x400pSpanTable_old);
+			StorageTmp->x400pSpanTable_rsvs = 0;
+			StorageTmp->x400pSpanTable_tsts = 0;
+			StorageTmp->x400pSpanTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->x400pSpanAdministrativeState = old_value;
+		if ((StorageOld = StorageTmp->x400pSpanTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->x400pSpanTable_sets == 0)
+			revert_x400pSpanTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->x400pSpanTable_old) == NULL)
+			break;
+		StorageTmp->x400pSpanAdministrativeState = StorageOld->x400pSpanAdministrativeState;
+		if (--StorageTmp->x400pSpanTable_rsvs == 0)
+			x400pSpanTable_destroy(&StorageTmp->x400pSpanTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -9952,17 +12942,17 @@ write_x400pSpanAdministrativeState(int action, u_char *var_val, u_char var_val_t
 int
 write_x400pSpanAlarmStatus(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static uint8_t *old_value;
-	struct x400pSpanTable_data *StorageTmp = NULL;
+	struct x400pSpanTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 15;
-	static size_t old_length = 0;
-	static uint8_t *string = NULL;
+	uint8_t *string = NULL;
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("x400pMxMIB", "write_x400pSpanAlarmStatus entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(x400pSpanTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
-		string = NULL;
 		if (StorageTmp != NULL && statP == NULL) {
 			/* have row but no column */
 			switch (StorageTmp->x400pSpanRowStatus) {
@@ -9993,33 +12983,73 @@ write_x400pSpanAlarmStatus(int action, u_char *var_val, u_char var_val_type, siz
 			}
 		}
 		/* Note: default value { } */
-		break;
-	case RESERVE2:		/* memory reseveration, final preparation... */
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->x400pSpanTable_old) == NULL)
+			if (StorageTmp->x400pSpanTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->x400pSpanTable_old = x400pSpanTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->x400pSpanTable_rsvs++;
 		if ((string = malloc(var_val_len + 1)) == NULL)
 			return SNMP_ERR_RESOURCEUNAVAILABLE;
 		memcpy((void *) string, (void *) var_val, var_val_len);
 		string[var_val_len] = 0;
+		SNMP_FREE(StorageTmp->x400pSpanAlarmStatus);
+		StorageTmp->x400pSpanAlarmStatus = string;
+		StorageTmp->x400pSpanAlarmStatusLen = var_val_len;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
+		break;
+	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->x400pSpanTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->x400pSpanTable_tsts == 0)
+				if ((ret = check_x400pSpanTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->x400pSpanTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->x400pSpanAlarmStatus for you to use, and you have just been asked to do something with it.  Note that anything done here
 				   must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->x400pSpanAlarmStatus;
-		old_length = StorageTmp->x400pSpanAlarmStatusLen;
-		StorageTmp->x400pSpanAlarmStatus = string;
-		StorageTmp->x400pSpanAlarmStatusLen = var_val_len;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->x400pSpanTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->x400pSpanTable_sets == 0)
+				if ((ret = update_x400pSpanTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->x400pSpanTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
-		SNMP_FREE(old_value);
-		old_length = 0;
-		string = NULL;
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->x400pSpanTable_old) != NULL) {
+			x400pSpanTable_destroy(&StorageTmp->x400pSpanTable_old);
+			StorageTmp->x400pSpanTable_rsvs = 0;
+			StorageTmp->x400pSpanTable_tsts = 0;
+			StorageTmp->x400pSpanTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->x400pSpanAlarmStatus = old_value;
-		StorageTmp->x400pSpanAlarmStatusLen = old_length;
+		if ((StorageOld = StorageTmp->x400pSpanTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->x400pSpanTable_sets == 0)
+			revert_x400pSpanTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
-		SNMP_FREE(string);
+		if ((StorageOld = StorageTmp->x400pSpanTable_old) == NULL)
+			break;
+		if (StorageOld->x400pSpanAlarmStatus != NULL) {
+			SNMP_FREE(StorageTmp->x400pSpanAlarmStatus);
+			StorageTmp->x400pSpanAlarmStatus = StorageOld->x400pSpanAlarmStatus;
+			StorageTmp->x400pSpanAlarmStatusLen = StorageOld->x400pSpanAlarmStatusLen;
+			StorageOld->x400pSpanAlarmStatus = NULL;
+			StorageOld->x400pSpanAlarmStatusLen = 0;
+		}
+		if (--StorageTmp->x400pSpanTable_rsvs == 0)
+			x400pSpanTable_destroy(&StorageTmp->x400pSpanTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -10039,17 +13069,17 @@ write_x400pSpanAlarmStatus(int action, u_char *var_val, u_char var_val_type, siz
 int
 write_x400pSpanControlStatus(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static uint8_t *old_value;
-	struct x400pSpanTable_data *StorageTmp = NULL;
+	struct x400pSpanTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 15;
-	static size_t old_length = 0;
-	static uint8_t *string = NULL;
+	uint8_t *string = NULL;
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("x400pMxMIB", "write_x400pSpanControlStatus entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(x400pSpanTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
-		string = NULL;
 		if (StorageTmp != NULL && statP == NULL) {
 			/* have row but no column */
 			switch (StorageTmp->x400pSpanRowStatus) {
@@ -10079,33 +13109,73 @@ write_x400pSpanControlStatus(int action, u_char *var_val, u_char var_val_type, s
 				return SNMP_ERR_WRONGLENGTH;
 			}
 		}
-		break;
-	case RESERVE2:		/* memory reseveration, final preparation... */
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->x400pSpanTable_old) == NULL)
+			if (StorageTmp->x400pSpanTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->x400pSpanTable_old = x400pSpanTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->x400pSpanTable_rsvs++;
 		if ((string = malloc(var_val_len + 1)) == NULL)
 			return SNMP_ERR_RESOURCEUNAVAILABLE;
 		memcpy((void *) string, (void *) var_val, var_val_len);
 		string[var_val_len] = 0;
+		SNMP_FREE(StorageTmp->x400pSpanControlStatus);
+		StorageTmp->x400pSpanControlStatus = string;
+		StorageTmp->x400pSpanControlStatusLen = var_val_len;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
+		break;
+	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->x400pSpanTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->x400pSpanTable_tsts == 0)
+				if ((ret = check_x400pSpanTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->x400pSpanTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->x400pSpanControlStatus for you to use, and you have just been asked to do something with it.  Note that anything done
 				   here must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->x400pSpanControlStatus;
-		old_length = StorageTmp->x400pSpanControlStatusLen;
-		StorageTmp->x400pSpanControlStatus = string;
-		StorageTmp->x400pSpanControlStatusLen = var_val_len;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->x400pSpanTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->x400pSpanTable_sets == 0)
+				if ((ret = update_x400pSpanTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->x400pSpanTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
-		SNMP_FREE(old_value);
-		old_length = 0;
-		string = NULL;
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->x400pSpanTable_old) != NULL) {
+			x400pSpanTable_destroy(&StorageTmp->x400pSpanTable_old);
+			StorageTmp->x400pSpanTable_rsvs = 0;
+			StorageTmp->x400pSpanTable_tsts = 0;
+			StorageTmp->x400pSpanTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->x400pSpanControlStatus = old_value;
-		StorageTmp->x400pSpanControlStatusLen = old_length;
+		if ((StorageOld = StorageTmp->x400pSpanTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->x400pSpanTable_sets == 0)
+			revert_x400pSpanTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
-		SNMP_FREE(string);
+		if ((StorageOld = StorageTmp->x400pSpanTable_old) == NULL)
+			break;
+		if (StorageOld->x400pSpanControlStatus != NULL) {
+			SNMP_FREE(StorageTmp->x400pSpanControlStatus);
+			StorageTmp->x400pSpanControlStatus = StorageOld->x400pSpanControlStatus;
+			StorageTmp->x400pSpanControlStatusLen = StorageOld->x400pSpanControlStatusLen;
+			StorageOld->x400pSpanControlStatus = NULL;
+			StorageOld->x400pSpanControlStatusLen = 0;
+		}
+		if (--StorageTmp->x400pSpanTable_rsvs == 0)
+			x400pSpanTable_destroy(&StorageTmp->x400pSpanTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -10125,12 +13195,14 @@ write_x400pSpanControlStatus(int action, u_char *var_val, u_char var_val_type, s
 int
 write_x400pSpanReceiveThreshold(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static ulong old_value;
-	struct x400pSpanTable_data *StorageTmp = NULL;
+	struct x400pSpanTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 15;
 	ulong set_value = *((ulong *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("x400pMxMIB", "write_x400pSpanReceiveThreshold entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(x400pSpanTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -10160,22 +13232,61 @@ write_x400pSpanReceiveThreshold(int action, u_char *var_val, u_char var_val_type
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to x400pSpanReceiveThreshold: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->x400pSpanTable_old) == NULL)
+			if (StorageTmp->x400pSpanTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->x400pSpanTable_old = x400pSpanTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->x400pSpanTable_rsvs++;
+		StorageTmp->x400pSpanReceiveThreshold = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->x400pSpanTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->x400pSpanTable_tsts == 0)
+				if ((ret = check_x400pSpanTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->x400pSpanTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->x400pSpanReceiveThreshold for you to use, and you have just been asked to do something with it.  Note that anything done
 				   here must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->x400pSpanReceiveThreshold;
-		StorageTmp->x400pSpanReceiveThreshold = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->x400pSpanTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->x400pSpanTable_sets == 0)
+				if ((ret = update_x400pSpanTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->x400pSpanTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->x400pSpanTable_old) != NULL) {
+			x400pSpanTable_destroy(&StorageTmp->x400pSpanTable_old);
+			StorageTmp->x400pSpanTable_rsvs = 0;
+			StorageTmp->x400pSpanTable_tsts = 0;
+			StorageTmp->x400pSpanTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->x400pSpanReceiveThreshold = old_value;
+		if ((StorageOld = StorageTmp->x400pSpanTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->x400pSpanTable_sets == 0)
+			revert_x400pSpanTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->x400pSpanTable_old) == NULL)
+			break;
+		StorageTmp->x400pSpanReceiveThreshold = StorageOld->x400pSpanReceiveThreshold;
+		if (--StorageTmp->x400pSpanTable_rsvs == 0)
+			x400pSpanTable_destroy(&StorageTmp->x400pSpanTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -10195,12 +13306,14 @@ write_x400pSpanReceiveThreshold(int action, u_char *var_val, u_char var_val_type
 int
 write_x400pBertMode(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static long old_value;
-	struct x400pBertTable_data *StorageTmp = NULL;
+	struct x400pBertTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 15;
 	long set_value = *((long *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("x400pMxMIB", "write_x400pBertMode entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(x400pBertTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
@@ -10225,20 +13338,59 @@ write_x400pBertMode(int action, u_char *var_val, u_char var_val_type, size_t var
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to x400pBertMode: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->x400pBertTable_old) == NULL)
+			if (StorageTmp->x400pBertTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->x400pBertTable_old = x400pBertTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->x400pBertTable_rsvs++;
+		StorageTmp->x400pBertMode = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->x400pBertTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->x400pBertTable_tsts == 0)
+				if ((ret = check_x400pBertTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->x400pBertTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->x400pBertMode for you to use, and you have just been asked to do something with it.  Note that anything done here must
 				   be reversable in the UNDO case */
-		old_value = StorageTmp->x400pBertMode;
-		StorageTmp->x400pBertMode = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->x400pBertTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->x400pBertTable_sets == 0)
+				if ((ret = update_x400pBertTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->x400pBertTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->x400pBertTable_old) != NULL) {
+			x400pBertTable_destroy(&StorageTmp->x400pBertTable_old);
+			StorageTmp->x400pBertTable_rsvs = 0;
+			StorageTmp->x400pBertTable_tsts = 0;
+			StorageTmp->x400pBertTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->x400pBertMode = old_value;
+		if ((StorageOld = StorageTmp->x400pBertTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->x400pBertTable_sets == 0)
+			revert_x400pBertTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->x400pBertTable_old) == NULL)
+			break;
+		StorageTmp->x400pBertMode = StorageOld->x400pBertMode;
+		if (--StorageTmp->x400pBertTable_rsvs == 0)
+			x400pBertTable_destroy(&StorageTmp->x400pBertTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -10258,12 +13410,14 @@ write_x400pBertMode(int action, u_char *var_val, u_char var_val_type, size_t var
 int
 write_x400pBertSelect(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static long old_value;
-	struct x400pBertTable_data *StorageTmp = NULL;
+	struct x400pBertTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 15;
 	long set_value = *((long *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("x400pMxMIB", "write_x400pBertSelect entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(x400pBertTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
@@ -10293,20 +13447,59 @@ write_x400pBertSelect(int action, u_char *var_val, u_char var_val_type, size_t v
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to x400pBertSelect: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->x400pBertTable_old) == NULL)
+			if (StorageTmp->x400pBertTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->x400pBertTable_old = x400pBertTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->x400pBertTable_rsvs++;
+		StorageTmp->x400pBertSelect = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->x400pBertTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->x400pBertTable_tsts == 0)
+				if ((ret = check_x400pBertTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->x400pBertTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->x400pBertSelect for you to use, and you have just been asked to do something with it.  Note that anything done here must
 				   be reversable in the UNDO case */
-		old_value = StorageTmp->x400pBertSelect;
-		StorageTmp->x400pBertSelect = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->x400pBertTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->x400pBertTable_sets == 0)
+				if ((ret = update_x400pBertTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->x400pBertTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->x400pBertTable_old) != NULL) {
+			x400pBertTable_destroy(&StorageTmp->x400pBertTable_old);
+			StorageTmp->x400pBertTable_rsvs = 0;
+			StorageTmp->x400pBertTable_tsts = 0;
+			StorageTmp->x400pBertTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->x400pBertSelect = old_value;
+		if ((StorageOld = StorageTmp->x400pBertTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->x400pBertTable_sets == 0)
+			revert_x400pBertTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->x400pBertTable_old) == NULL)
+			break;
+		StorageTmp->x400pBertSelect = StorageOld->x400pBertSelect;
+		if (--StorageTmp->x400pBertTable_rsvs == 0)
+			x400pBertTable_destroy(&StorageTmp->x400pBertTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -10326,19 +13519,19 @@ write_x400pBertSelect(int action, u_char *var_val, u_char var_val_type, size_t v
 int
 write_x400pBertPattern(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static uint8_t *old_value;
-	struct x400pBertTable_data *StorageTmp = NULL;
+	struct x400pBertTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 15;
-	static size_t old_length = 0;
-	static uint8_t *string = NULL;
+	uint8_t *string = NULL;
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("x400pMxMIB", "write_x400pBertPattern entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(x400pBertTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	switch (action) {
 	case RESERVE1:
-		string = NULL;
 		if (var_val_type != ASN_OCTET_STR) {
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to x400pBertPattern not ASN_OCTET_STR\n");
 			return SNMP_ERR_WRONGTYPE;
@@ -10349,31 +13542,71 @@ write_x400pBertPattern(int action, u_char *var_val, u_char var_val_type, size_t 
 			return SNMP_ERR_WRONGLENGTH;
 		}
 		/* Note: default value \"\x10\xFF\xFF\xFF\xFF\" */
-		break;
-	case RESERVE2:		/* memory reseveration, final preparation... */
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->x400pBertTable_old) == NULL)
+			if (StorageTmp->x400pBertTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->x400pBertTable_old = x400pBertTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->x400pBertTable_rsvs++;
 		if ((string = malloc(var_val_len + 1)) == NULL)
 			return SNMP_ERR_RESOURCEUNAVAILABLE;
 		memcpy((void *) string, (void *) var_val, var_val_len);
 		string[var_val_len] = 0;
+		SNMP_FREE(StorageTmp->x400pBertPattern);
+		StorageTmp->x400pBertPattern = string;
+		StorageTmp->x400pBertPatternLen = var_val_len;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
+		break;
+	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->x400pBertTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->x400pBertTable_tsts == 0)
+				if ((ret = check_x400pBertTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->x400pBertTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->x400pBertPattern for you to use, and you have just been asked to do something with it.  Note that anything done here
 				   must be reversable in the UNDO case */
-		old_value = StorageTmp->x400pBertPattern;
-		old_length = StorageTmp->x400pBertPatternLen;
-		StorageTmp->x400pBertPattern = string;
-		StorageTmp->x400pBertPatternLen = var_val_len;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->x400pBertTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->x400pBertTable_sets == 0)
+				if ((ret = update_x400pBertTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->x400pBertTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
-		SNMP_FREE(old_value);
-		old_length = 0;
-		string = NULL;
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->x400pBertTable_old) != NULL) {
+			x400pBertTable_destroy(&StorageTmp->x400pBertTable_old);
+			StorageTmp->x400pBertTable_rsvs = 0;
+			StorageTmp->x400pBertTable_tsts = 0;
+			StorageTmp->x400pBertTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->x400pBertPattern = old_value;
-		StorageTmp->x400pBertPatternLen = old_length;
+		if ((StorageOld = StorageTmp->x400pBertTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->x400pBertTable_sets == 0)
+			revert_x400pBertTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
-		SNMP_FREE(string);
+		if ((StorageOld = StorageTmp->x400pBertTable_old) == NULL)
+			break;
+		if (StorageOld->x400pBertPattern != NULL) {
+			SNMP_FREE(StorageTmp->x400pBertPattern);
+			StorageTmp->x400pBertPattern = StorageOld->x400pBertPattern;
+			StorageTmp->x400pBertPatternLen = StorageOld->x400pBertPatternLen;
+			StorageOld->x400pBertPattern = NULL;
+			StorageOld->x400pBertPatternLen = 0;
+		}
+		if (--StorageTmp->x400pBertTable_rsvs == 0)
+			x400pBertTable_destroy(&StorageTmp->x400pBertTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -10393,12 +13626,14 @@ write_x400pBertPattern(int action, u_char *var_val, u_char var_val_type, size_t 
 int
 write_x400pChanType(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static long old_value;
-	struct x400pChanTable_data *StorageTmp = NULL;
+	struct x400pChanTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 15;
 	long set_value = *((long *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("x400pMxMIB", "write_x400pChanType entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(x400pChanTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
@@ -10422,20 +13657,59 @@ write_x400pChanType(int action, u_char *var_val, u_char var_val_type, size_t var
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to x400pChanType: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->x400pChanTable_old) == NULL)
+			if (StorageTmp->x400pChanTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->x400pChanTable_old = x400pChanTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->x400pChanTable_rsvs++;
+		StorageTmp->x400pChanType = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->x400pChanTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->x400pChanTable_tsts == 0)
+				if ((ret = check_x400pChanTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->x400pChanTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->x400pChanType for you to use, and you have just been asked to do something with it.  Note that anything done here must
 				   be reversable in the UNDO case */
-		old_value = StorageTmp->x400pChanType;
-		StorageTmp->x400pChanType = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->x400pChanTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->x400pChanTable_sets == 0)
+				if ((ret = update_x400pChanTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->x400pChanTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->x400pChanTable_old) != NULL) {
+			x400pChanTable_destroy(&StorageTmp->x400pChanTable_old);
+			StorageTmp->x400pChanTable_rsvs = 0;
+			StorageTmp->x400pChanTable_tsts = 0;
+			StorageTmp->x400pChanTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->x400pChanType = old_value;
+		if ((StorageOld = StorageTmp->x400pChanTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->x400pChanTable_sets == 0)
+			revert_x400pChanTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->x400pChanTable_old) == NULL)
+			break;
+		StorageTmp->x400pChanType = StorageOld->x400pChanType;
+		if (--StorageTmp->x400pChanTable_rsvs == 0)
+			x400pChanTable_destroy(&StorageTmp->x400pChanTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -10455,12 +13729,14 @@ write_x400pChanType(int action, u_char *var_val, u_char var_val_type, size_t var
 int
 write_x400pChanFormat(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static long old_value;
-	struct x400pChanTable_data *StorageTmp = NULL;
+	struct x400pChanTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 15;
 	long set_value = *((long *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("x400pMxMIB", "write_x400pChanFormat entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(x400pChanTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
@@ -10486,20 +13762,59 @@ write_x400pChanFormat(int action, u_char *var_val, u_char var_val_type, size_t v
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to x400pChanFormat: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->x400pChanTable_old) == NULL)
+			if (StorageTmp->x400pChanTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->x400pChanTable_old = x400pChanTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->x400pChanTable_rsvs++;
+		StorageTmp->x400pChanFormat = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->x400pChanTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->x400pChanTable_tsts == 0)
+				if ((ret = check_x400pChanTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->x400pChanTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->x400pChanFormat for you to use, and you have just been asked to do something with it.  Note that anything done here must
 				   be reversable in the UNDO case */
-		old_value = StorageTmp->x400pChanFormat;
-		StorageTmp->x400pChanFormat = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->x400pChanTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->x400pChanTable_sets == 0)
+				if ((ret = update_x400pChanTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->x400pChanTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->x400pChanTable_old) != NULL) {
+			x400pChanTable_destroy(&StorageTmp->x400pChanTable_old);
+			StorageTmp->x400pChanTable_rsvs = 0;
+			StorageTmp->x400pChanTable_tsts = 0;
+			StorageTmp->x400pChanTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->x400pChanFormat = old_value;
+		if ((StorageOld = StorageTmp->x400pChanTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->x400pChanTable_sets == 0)
+			revert_x400pChanTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->x400pChanTable_old) == NULL)
+			break;
+		StorageTmp->x400pChanFormat = StorageOld->x400pChanFormat;
+		if (--StorageTmp->x400pChanTable_rsvs == 0)
+			x400pChanTable_destroy(&StorageTmp->x400pChanTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -10519,12 +13834,14 @@ write_x400pChanFormat(int action, u_char *var_val, u_char var_val_type, size_t v
 int
 write_x400pChanRate(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static long old_value;
-	struct x400pChanTable_data *StorageTmp = NULL;
+	struct x400pChanTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 15;
 	long set_value = *((long *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("x400pMxMIB", "write_x400pChanRate entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(x400pChanTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
@@ -10549,20 +13866,59 @@ write_x400pChanRate(int action, u_char *var_val, u_char var_val_type, size_t var
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to x400pChanRate: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->x400pChanTable_old) == NULL)
+			if (StorageTmp->x400pChanTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->x400pChanTable_old = x400pChanTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->x400pChanTable_rsvs++;
+		StorageTmp->x400pChanRate = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->x400pChanTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->x400pChanTable_tsts == 0)
+				if ((ret = check_x400pChanTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->x400pChanTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->x400pChanRate for you to use, and you have just been asked to do something with it.  Note that anything done here must
 				   be reversable in the UNDO case */
-		old_value = StorageTmp->x400pChanRate;
-		StorageTmp->x400pChanRate = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->x400pChanTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->x400pChanTable_sets == 0)
+				if ((ret = update_x400pChanTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->x400pChanTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->x400pChanTable_old) != NULL) {
+			x400pChanTable_destroy(&StorageTmp->x400pChanTable_old);
+			StorageTmp->x400pChanTable_rsvs = 0;
+			StorageTmp->x400pChanTable_tsts = 0;
+			StorageTmp->x400pChanTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->x400pChanRate = old_value;
+		if ((StorageOld = StorageTmp->x400pChanTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->x400pChanTable_sets == 0)
+			revert_x400pChanTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->x400pChanTable_old) == NULL)
+			break;
+		StorageTmp->x400pChanRate = StorageOld->x400pChanRate;
+		if (--StorageTmp->x400pChanTable_rsvs == 0)
+			x400pChanTable_destroy(&StorageTmp->x400pChanTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -10582,19 +13938,19 @@ write_x400pChanRate(int action, u_char *var_val, u_char var_val_type, size_t var
 int
 write_x400pChanMode(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static uint8_t *old_value;
-	struct x400pChanTable_data *StorageTmp = NULL;
+	struct x400pChanTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 15;
-	static size_t old_length = 0;
-	static uint8_t *string = NULL;
+	uint8_t *string = NULL;
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("x400pMxMIB", "write_x400pChanMode entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(x400pChanTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	switch (action) {
 	case RESERVE1:
-		string = NULL;
 		if ((var_val_type != ASN_BIT_STR && var_val_type != ASN_OCTET_STR)) {
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to x400pChanMode not ASN_OCTET_STR\n");
 			return SNMP_ERR_WRONGTYPE;
@@ -10611,31 +13967,71 @@ write_x400pChanMode(int action, u_char *var_val, u_char var_val_type, size_t var
 				return SNMP_ERR_WRONGLENGTH;
 			}
 		}
-		break;
-	case RESERVE2:		/* memory reseveration, final preparation... */
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->x400pChanTable_old) == NULL)
+			if (StorageTmp->x400pChanTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->x400pChanTable_old = x400pChanTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->x400pChanTable_rsvs++;
 		if ((string = malloc(var_val_len + 1)) == NULL)
 			return SNMP_ERR_RESOURCEUNAVAILABLE;
 		memcpy((void *) string, (void *) var_val, var_val_len);
 		string[var_val_len] = 0;
+		SNMP_FREE(StorageTmp->x400pChanMode);
+		StorageTmp->x400pChanMode = string;
+		StorageTmp->x400pChanModeLen = var_val_len;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
+		break;
+	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->x400pChanTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->x400pChanTable_tsts == 0)
+				if ((ret = check_x400pChanTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->x400pChanTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->x400pChanMode for you to use, and you have just been asked to do something with it.  Note that anything done here must
 				   be reversable in the UNDO case */
-		old_value = StorageTmp->x400pChanMode;
-		old_length = StorageTmp->x400pChanModeLen;
-		StorageTmp->x400pChanMode = string;
-		StorageTmp->x400pChanModeLen = var_val_len;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->x400pChanTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->x400pChanTable_sets == 0)
+				if ((ret = update_x400pChanTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->x400pChanTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
-		SNMP_FREE(old_value);
-		old_length = 0;
-		string = NULL;
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->x400pChanTable_old) != NULL) {
+			x400pChanTable_destroy(&StorageTmp->x400pChanTable_old);
+			StorageTmp->x400pChanTable_rsvs = 0;
+			StorageTmp->x400pChanTable_tsts = 0;
+			StorageTmp->x400pChanTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->x400pChanMode = old_value;
-		StorageTmp->x400pChanModeLen = old_length;
+		if ((StorageOld = StorageTmp->x400pChanTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->x400pChanTable_sets == 0)
+			revert_x400pChanTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
-		SNMP_FREE(string);
+		if ((StorageOld = StorageTmp->x400pChanTable_old) == NULL)
+			break;
+		if (StorageOld->x400pChanMode != NULL) {
+			SNMP_FREE(StorageTmp->x400pChanMode);
+			StorageTmp->x400pChanMode = StorageOld->x400pChanMode;
+			StorageTmp->x400pChanModeLen = StorageOld->x400pChanModeLen;
+			StorageOld->x400pChanMode = NULL;
+			StorageOld->x400pChanModeLen = 0;
+		}
+		if (--StorageTmp->x400pChanTable_rsvs == 0)
+			x400pChanTable_destroy(&StorageTmp->x400pChanTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -10655,12 +14051,14 @@ write_x400pChanMode(int action, u_char *var_val, u_char var_val_type, size_t var
 int
 write_x400pChanAdministrativeState(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static long old_value;
-	struct x400pChanTable_data *StorageTmp = NULL;
+	struct x400pChanTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 15;
 	long set_value = *((long *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("x400pMxMIB", "write_x400pChanAdministrativeState entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(x400pChanTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
@@ -10684,20 +14082,59 @@ write_x400pChanAdministrativeState(int action, u_char *var_val, u_char var_val_t
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to x400pChanAdministrativeState: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->x400pChanTable_old) == NULL)
+			if (StorageTmp->x400pChanTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->x400pChanTable_old = x400pChanTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->x400pChanTable_rsvs++;
+		StorageTmp->x400pChanAdministrativeState = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->x400pChanTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->x400pChanTable_tsts == 0)
+				if ((ret = check_x400pChanTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->x400pChanTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->x400pChanAdministrativeState for you to use, and you have just been asked to do something with it.  Note that anything
 				   done here must be reversable in the UNDO case */
-		old_value = StorageTmp->x400pChanAdministrativeState;
-		StorageTmp->x400pChanAdministrativeState = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->x400pChanTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->x400pChanTable_sets == 0)
+				if ((ret = update_x400pChanTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->x400pChanTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->x400pChanTable_old) != NULL) {
+			x400pChanTable_destroy(&StorageTmp->x400pChanTable_old);
+			StorageTmp->x400pChanTable_rsvs = 0;
+			StorageTmp->x400pChanTable_tsts = 0;
+			StorageTmp->x400pChanTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->x400pChanAdministrativeState = old_value;
+		if ((StorageOld = StorageTmp->x400pChanTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->x400pChanTable_sets == 0)
+			revert_x400pChanTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->x400pChanTable_old) == NULL)
+			break;
+		StorageTmp->x400pChanAdministrativeState = StorageOld->x400pChanAdministrativeState;
+		if (--StorageTmp->x400pChanTable_rsvs == 0)
+			x400pChanTable_destroy(&StorageTmp->x400pChanTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -10717,19 +14154,19 @@ write_x400pChanAdministrativeState(int action, u_char *var_val, u_char var_val_t
 int
 write_x400pChanControlStatus(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static uint8_t *old_value;
-	struct x400pChanTable_data *StorageTmp = NULL;
+	struct x400pChanTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 15;
-	static size_t old_length = 0;
-	static uint8_t *string = NULL;
+	uint8_t *string = NULL;
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("x400pMxMIB", "write_x400pChanControlStatus entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(x400pChanTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	switch (action) {
 	case RESERVE1:
-		string = NULL;
 		if ((var_val_type != ASN_BIT_STR && var_val_type != ASN_OCTET_STR)) {
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to x400pChanControlStatus not ASN_OCTET_STR\n");
 			return SNMP_ERR_WRONGTYPE;
@@ -10746,31 +14183,71 @@ write_x400pChanControlStatus(int action, u_char *var_val, u_char var_val_type, s
 				return SNMP_ERR_WRONGLENGTH;
 			}
 		}
-		break;
-	case RESERVE2:		/* memory reseveration, final preparation... */
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->x400pChanTable_old) == NULL)
+			if (StorageTmp->x400pChanTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->x400pChanTable_old = x400pChanTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->x400pChanTable_rsvs++;
 		if ((string = malloc(var_val_len + 1)) == NULL)
 			return SNMP_ERR_RESOURCEUNAVAILABLE;
 		memcpy((void *) string, (void *) var_val, var_val_len);
 		string[var_val_len] = 0;
+		SNMP_FREE(StorageTmp->x400pChanControlStatus);
+		StorageTmp->x400pChanControlStatus = string;
+		StorageTmp->x400pChanControlStatusLen = var_val_len;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
+		break;
+	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->x400pChanTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->x400pChanTable_tsts == 0)
+				if ((ret = check_x400pChanTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->x400pChanTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->x400pChanControlStatus for you to use, and you have just been asked to do something with it.  Note that anything done
 				   here must be reversable in the UNDO case */
-		old_value = StorageTmp->x400pChanControlStatus;
-		old_length = StorageTmp->x400pChanControlStatusLen;
-		StorageTmp->x400pChanControlStatus = string;
-		StorageTmp->x400pChanControlStatusLen = var_val_len;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->x400pChanTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->x400pChanTable_sets == 0)
+				if ((ret = update_x400pChanTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->x400pChanTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
-		SNMP_FREE(old_value);
-		old_length = 0;
-		string = NULL;
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->x400pChanTable_old) != NULL) {
+			x400pChanTable_destroy(&StorageTmp->x400pChanTable_old);
+			StorageTmp->x400pChanTable_rsvs = 0;
+			StorageTmp->x400pChanTable_tsts = 0;
+			StorageTmp->x400pChanTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->x400pChanControlStatus = old_value;
-		StorageTmp->x400pChanControlStatusLen = old_length;
+		if ((StorageOld = StorageTmp->x400pChanTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->x400pChanTable_sets == 0)
+			revert_x400pChanTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
-		SNMP_FREE(string);
+		if ((StorageOld = StorageTmp->x400pChanTable_old) == NULL)
+			break;
+		if (StorageOld->x400pChanControlStatus != NULL) {
+			SNMP_FREE(StorageTmp->x400pChanControlStatus);
+			StorageTmp->x400pChanControlStatus = StorageOld->x400pChanControlStatus;
+			StorageTmp->x400pChanControlStatusLen = StorageOld->x400pChanControlStatusLen;
+			StorageOld->x400pChanControlStatus = NULL;
+			StorageOld->x400pChanControlStatusLen = 0;
+		}
+		if (--StorageTmp->x400pChanTable_rsvs == 0)
+			x400pChanTable_destroy(&StorageTmp->x400pChanTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -10790,19 +14267,19 @@ write_x400pChanControlStatus(int action, u_char *var_val, u_char var_val_type, s
 int
 write_x400pChanAlarmStatus(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static uint8_t *old_value;
-	struct x400pChanTable_data *StorageTmp = NULL;
+	struct x400pChanTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 15;
-	static size_t old_length = 0;
-	static uint8_t *string = NULL;
+	uint8_t *string = NULL;
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("x400pMxMIB", "write_x400pChanAlarmStatus entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(x400pChanTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	switch (action) {
 	case RESERVE1:
-		string = NULL;
 		if ((var_val_type != ASN_BIT_STR && var_val_type != ASN_OCTET_STR)) {
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to x400pChanAlarmStatus not ASN_OCTET_STR\n");
 			return SNMP_ERR_WRONGTYPE;
@@ -10819,31 +14296,71 @@ write_x400pChanAlarmStatus(int action, u_char *var_val, u_char var_val_type, siz
 				return SNMP_ERR_WRONGLENGTH;
 			}
 		}
-		break;
-	case RESERVE2:		/* memory reseveration, final preparation... */
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->x400pChanTable_old) == NULL)
+			if (StorageTmp->x400pChanTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->x400pChanTable_old = x400pChanTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->x400pChanTable_rsvs++;
 		if ((string = malloc(var_val_len + 1)) == NULL)
 			return SNMP_ERR_RESOURCEUNAVAILABLE;
 		memcpy((void *) string, (void *) var_val, var_val_len);
 		string[var_val_len] = 0;
+		SNMP_FREE(StorageTmp->x400pChanAlarmStatus);
+		StorageTmp->x400pChanAlarmStatus = string;
+		StorageTmp->x400pChanAlarmStatusLen = var_val_len;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
+		break;
+	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->x400pChanTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->x400pChanTable_tsts == 0)
+				if ((ret = check_x400pChanTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->x400pChanTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->x400pChanAlarmStatus for you to use, and you have just been asked to do something with it.  Note that anything done here
 				   must be reversable in the UNDO case */
-		old_value = StorageTmp->x400pChanAlarmStatus;
-		old_length = StorageTmp->x400pChanAlarmStatusLen;
-		StorageTmp->x400pChanAlarmStatus = string;
-		StorageTmp->x400pChanAlarmStatusLen = var_val_len;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->x400pChanTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->x400pChanTable_sets == 0)
+				if ((ret = update_x400pChanTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->x400pChanTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
-		SNMP_FREE(old_value);
-		old_length = 0;
-		string = NULL;
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->x400pChanTable_old) != NULL) {
+			x400pChanTable_destroy(&StorageTmp->x400pChanTable_old);
+			StorageTmp->x400pChanTable_rsvs = 0;
+			StorageTmp->x400pChanTable_tsts = 0;
+			StorageTmp->x400pChanTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->x400pChanAlarmStatus = old_value;
-		StorageTmp->x400pChanAlarmStatusLen = old_length;
+		if ((StorageOld = StorageTmp->x400pChanTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->x400pChanTable_sets == 0)
+			revert_x400pChanTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
-		SNMP_FREE(string);
+		if ((StorageOld = StorageTmp->x400pChanTable_old) == NULL)
+			break;
+		if (StorageOld->x400pChanAlarmStatus != NULL) {
+			SNMP_FREE(StorageTmp->x400pChanAlarmStatus);
+			StorageTmp->x400pChanAlarmStatus = StorageOld->x400pChanAlarmStatus;
+			StorageTmp->x400pChanAlarmStatusLen = StorageOld->x400pChanAlarmStatusLen;
+			StorageOld->x400pChanAlarmStatus = NULL;
+			StorageOld->x400pChanAlarmStatusLen = 0;
+		}
+		if (--StorageTmp->x400pChanTable_rsvs == 0)
+			x400pChanTable_destroy(&StorageTmp->x400pChanTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -10863,12 +14380,14 @@ write_x400pChanAlarmStatus(int action, u_char *var_val, u_char var_val_type, siz
 int
 write_x400pXconCardIndex(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static ulong old_value;
-	struct x400pXconTable_data *StorageTmp = NULL;
+	struct x400pXconTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 15;
 	ulong set_value = *((ulong *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("x400pMxMIB", "write_x400pXconCardIndex entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(x400pXconTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -10893,22 +14412,66 @@ write_x400pXconCardIndex(int action, u_char *var_val, u_char var_val_type, size_
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to x400pXconCardIndex: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
+		/* Note: ranges 1..16 */
+		if ((1 > set_value || set_value > 16)) {
+			snmp_log(MY_FACILITY(LOG_NOTICE), "write to x400pXconCardIndex: bad value\n");
+			return SNMP_ERR_WRONGVALUE;
+		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->x400pXconTable_old) == NULL)
+			if (StorageTmp->x400pXconTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->x400pXconTable_old = x400pXconTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->x400pXconTable_rsvs++;
+		StorageTmp->x400pXconCardIndex = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->x400pXconTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->x400pXconTable_tsts == 0)
+				if ((ret = check_x400pXconTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->x400pXconTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->x400pXconCardIndex for you to use, and you have just been asked to do something with it.  Note that anything done here
 				   must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->x400pXconCardIndex;
-		StorageTmp->x400pXconCardIndex = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->x400pXconTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->x400pXconTable_sets == 0)
+				if ((ret = update_x400pXconTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->x400pXconTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->x400pXconTable_old) != NULL) {
+			x400pXconTable_destroy(&StorageTmp->x400pXconTable_old);
+			StorageTmp->x400pXconTable_rsvs = 0;
+			StorageTmp->x400pXconTable_tsts = 0;
+			StorageTmp->x400pXconTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->x400pXconCardIndex = old_value;
+		if ((StorageOld = StorageTmp->x400pXconTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->x400pXconTable_sets == 0)
+			revert_x400pXconTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->x400pXconTable_old) == NULL)
+			break;
+		StorageTmp->x400pXconCardIndex = StorageOld->x400pXconCardIndex;
+		if (--StorageTmp->x400pXconTable_rsvs == 0)
+			x400pXconTable_destroy(&StorageTmp->x400pXconTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -10928,12 +14491,14 @@ write_x400pXconCardIndex(int action, u_char *var_val, u_char var_val_type, size_
 int
 write_x400pXconSpanIndex(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static ulong old_value;
-	struct x400pXconTable_data *StorageTmp = NULL;
+	struct x400pXconTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 15;
 	ulong set_value = *((ulong *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("x400pMxMIB", "write_x400pXconSpanIndex entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(x400pXconTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -10958,22 +14523,66 @@ write_x400pXconSpanIndex(int action, u_char *var_val, u_char var_val_type, size_
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to x400pXconSpanIndex: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
+		/* Note: ranges 1..4 */
+		if ((1 > set_value || set_value > 4)) {
+			snmp_log(MY_FACILITY(LOG_NOTICE), "write to x400pXconSpanIndex: bad value\n");
+			return SNMP_ERR_WRONGVALUE;
+		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->x400pXconTable_old) == NULL)
+			if (StorageTmp->x400pXconTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->x400pXconTable_old = x400pXconTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->x400pXconTable_rsvs++;
+		StorageTmp->x400pXconSpanIndex = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->x400pXconTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->x400pXconTable_tsts == 0)
+				if ((ret = check_x400pXconTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->x400pXconTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->x400pXconSpanIndex for you to use, and you have just been asked to do something with it.  Note that anything done here
 				   must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->x400pXconSpanIndex;
-		StorageTmp->x400pXconSpanIndex = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->x400pXconTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->x400pXconTable_sets == 0)
+				if ((ret = update_x400pXconTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->x400pXconTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->x400pXconTable_old) != NULL) {
+			x400pXconTable_destroy(&StorageTmp->x400pXconTable_old);
+			StorageTmp->x400pXconTable_rsvs = 0;
+			StorageTmp->x400pXconTable_tsts = 0;
+			StorageTmp->x400pXconTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->x400pXconSpanIndex = old_value;
+		if ((StorageOld = StorageTmp->x400pXconTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->x400pXconTable_sets == 0)
+			revert_x400pXconTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->x400pXconTable_old) == NULL)
+			break;
+		StorageTmp->x400pXconSpanIndex = StorageOld->x400pXconSpanIndex;
+		if (--StorageTmp->x400pXconTable_rsvs == 0)
+			x400pXconTable_destroy(&StorageTmp->x400pXconTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -10993,12 +14602,14 @@ write_x400pXconSpanIndex(int action, u_char *var_val, u_char var_val_type, size_
 int
 write_x400pXconChanIndex(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static ulong old_value;
-	struct x400pXconTable_data *StorageTmp = NULL;
+	struct x400pXconTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 15;
 	ulong set_value = *((ulong *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("x400pMxMIB", "write_x400pXconChanIndex entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(x400pXconTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -11028,22 +14639,61 @@ write_x400pXconChanIndex(int action, u_char *var_val, u_char var_val_type, size_
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to x400pXconChanIndex: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->x400pXconTable_old) == NULL)
+			if (StorageTmp->x400pXconTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->x400pXconTable_old = x400pXconTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->x400pXconTable_rsvs++;
+		StorageTmp->x400pXconChanIndex = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->x400pXconTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->x400pXconTable_tsts == 0)
+				if ((ret = check_x400pXconTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->x400pXconTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->x400pXconChanIndex for you to use, and you have just been asked to do something with it.  Note that anything done here
 				   must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->x400pXconChanIndex;
-		StorageTmp->x400pXconChanIndex = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->x400pXconTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->x400pXconTable_sets == 0)
+				if ((ret = update_x400pXconTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->x400pXconTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->x400pXconTable_old) != NULL) {
+			x400pXconTable_destroy(&StorageTmp->x400pXconTable_old);
+			StorageTmp->x400pXconTable_rsvs = 0;
+			StorageTmp->x400pXconTable_tsts = 0;
+			StorageTmp->x400pXconTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->x400pXconChanIndex = old_value;
+		if ((StorageOld = StorageTmp->x400pXconTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->x400pXconTable_sets == 0)
+			revert_x400pXconTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->x400pXconTable_old) == NULL)
+			break;
+		StorageTmp->x400pXconChanIndex = StorageOld->x400pXconChanIndex;
+		if (--StorageTmp->x400pXconTable_rsvs == 0)
+			x400pXconTable_destroy(&StorageTmp->x400pXconTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -11063,12 +14713,14 @@ write_x400pXconChanIndex(int action, u_char *var_val, u_char var_val_type, size_
 int
 write_x400pXconType(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static long old_value;
-	struct x400pXconTable_data *StorageTmp = NULL;
+	struct x400pXconTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 15;
 	long set_value = *((long *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("x400pMxMIB", "write_x400pXconType entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(x400pXconTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -11103,22 +14755,61 @@ write_x400pXconType(int action, u_char *var_val, u_char var_val_type, size_t var
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to x400pXconType: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->x400pXconTable_old) == NULL)
+			if (StorageTmp->x400pXconTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->x400pXconTable_old = x400pXconTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->x400pXconTable_rsvs++;
+		StorageTmp->x400pXconType = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->x400pXconTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->x400pXconTable_tsts == 0)
+				if ((ret = check_x400pXconTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->x400pXconTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->x400pXconType for you to use, and you have just been asked to do something with it.  Note that anything done here must
 				   be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->x400pXconType;
-		StorageTmp->x400pXconType = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->x400pXconTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->x400pXconTable_sets == 0)
+				if ((ret = update_x400pXconTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->x400pXconTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->x400pXconTable_old) != NULL) {
+			x400pXconTable_destroy(&StorageTmp->x400pXconTable_old);
+			StorageTmp->x400pXconTable_rsvs = 0;
+			StorageTmp->x400pXconTable_tsts = 0;
+			StorageTmp->x400pXconTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->x400pXconType = old_value;
+		if ((StorageOld = StorageTmp->x400pXconTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->x400pXconTable_sets == 0)
+			revert_x400pXconTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->x400pXconTable_old) == NULL)
+			break;
+		StorageTmp->x400pXconType = StorageOld->x400pXconType;
+		if (--StorageTmp->x400pXconTable_rsvs == 0)
+			x400pXconTable_destroy(&StorageTmp->x400pXconTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -11138,12 +14829,14 @@ write_x400pXconType(int action, u_char *var_val, u_char var_val_type, size_t var
 int
 write_x400pXconStorageType(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static long old_value;
-	struct x400pXconTable_data *StorageTmp = NULL;
+	struct x400pXconTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 15;
 	long set_value = *((long *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("x400pMxMIB", "write_x400pXconStorageType entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(x400pXconTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -11180,308 +14873,234 @@ write_x400pXconStorageType(int action, u_char *var_val, u_char var_val_type, siz
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to x400pXconStorageType: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->x400pXconTable_old) == NULL)
+			if (StorageTmp->x400pXconTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->x400pXconTable_old = x400pXconTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->x400pXconTable_rsvs++;
+		StorageTmp->x400pXconStorageType = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->x400pXconTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->x400pXconTable_tsts == 0)
+				if ((ret = check_x400pXconTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->x400pXconTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->x400pXconStorageType for you to use, and you have just been asked to do something with it.  Note that anything done here
 				   must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->x400pXconStorageType;
-		StorageTmp->x400pXconStorageType = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->x400pXconTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->x400pXconTable_sets == 0)
+				if ((ret = update_x400pXconTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->x400pXconTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->x400pXconTable_old) != NULL) {
+			x400pXconTable_destroy(&StorageTmp->x400pXconTable_old);
+			StorageTmp->x400pXconTable_rsvs = 0;
+			StorageTmp->x400pXconTable_tsts = 0;
+			StorageTmp->x400pXconTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->x400pXconStorageType = old_value;
+		if ((StorageOld = StorageTmp->x400pXconTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->x400pXconTable_sets == 0)
+			revert_x400pXconTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->x400pXconTable_old) == NULL)
+			break;
+		StorageTmp->x400pXconStorageType = StorageOld->x400pXconStorageType;
+		if (--StorageTmp->x400pXconTable_rsvs == 0)
+			x400pXconTable_destroy(&StorageTmp->x400pXconTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
 }
 
 /**
- * @fn int x400pSyncTable_consistent(struct x400pSyncTable_data *thedata)
- * @param thedata the row data to check for consistency.
- * @brief check the internal consistency of a table row.
+ * @fn int can_act_x400pSyncTable_row(struct x400pSyncTable_data *StorageTmp)
+ * @param StorageTmp the data (as updated)
+ * @brief check whether an inactive table row can be activated
  *
- * This function checks the internal consistency of a table row for the x400pSyncTable table.  If the
- * table row is internally consistent, then this function returns SNMP_ERR_NOERROR, otherwise the
- * function returns an SNMP error code and it will not be possible to activate the row until the
- * row's internal consistency is corrected.  This function might use a 'test' operation against the
- * driver to ensure that the commit phase will succeed.
+ * This function is used by the ACTION phase of a RowStatus object to test whether an inactive table
+ * row can be activated.  Returns SNMP_ERR_NOERROR when activation is permitted; an SNMP error
+ * value, otherwise.  This function might use a 'test' operation against the driver to ensure that
+ * the commit phase will succeed.
  */
 int
-x400pSyncTable_consistent(struct x400pSyncTable_data *thedata)
+can_act_x400pSyncTable_row(struct x400pSyncTable_data *StorageTmp)
 {
-	/* XXX: check row consistency return SNMP_ERR_NOERROR if consistent, or an SNMP error code if not. */
-	return (SNMP_ERR_NOERROR);
+	/* XXX: provide code to check whether the new or inactive table row can be activated */
+	return SNMP_ERR_NOERROR;
 }
 
 /**
- * @fn int x400pDrivTable_consistent(struct x400pDrivTable_data *thedata)
- * @param thedata the row data to check for consistency.
- * @brief check the internal consistency of a table row.
+ * @fn int can_deact_x400pSyncTable_row(struct x400pSyncTable_data *StorageTmp)
+ * @param StorageTmp the data (as updated)
+ * @brief check whether an active table row can be deactivated
  *
- * This function checks the internal consistency of a table row for the x400pDrivTable table.  If the
- * table row is internally consistent, then this function returns SNMP_ERR_NOERROR, otherwise the
- * function returns an SNMP error code and it will not be possible to activate the row until the
- * row's internal consistency is corrected.  This function might use a 'test' operation against the
- * driver to ensure that the commit phase will succeed.
+ * This function is used by the ACTION phase of a RowStatus object to test whether an active table
+ * row can be deactivated.  Returns SNMP_ERR_NOERROR when deactivation is permitted; an SNMP error
+ * value, otherwise.  This function might use a 'test' operation against the driver to ensure that
+ * the commit phase will succeed.
  */
 int
-x400pDrivTable_consistent(struct x400pDrivTable_data *thedata)
+can_deact_x400pSyncTable_row(struct x400pSyncTable_data *StorageTmp)
 {
-	/* XXX: check row consistency return SNMP_ERR_NOERROR if consistent, or an SNMP error code if not. */
-	int fd;
-	struct x400p_info *info;
-	struct x400p_info_dflt *driv;
-	char buf[sizeof(*info) + sizeof(*driv)];
-	struct strioctl ioc;
-
-	/* Check that the corresponding device can be opened and that the general information about the driver can be read. */
-	if (thedata->x400pDrivNameLen > 128 - 1 - 19)
-		return SNMP_ERR_INCONSISTENTNAME;
-	memcpy(thedata->x400pDrivTable_devname, "/dev/streams/clone/", 19);
-	memcpy(thedata->x400pDrivTable_devname + 19, thedata->x400pDrivName, thedata->x400pDrivNameLen);
-	thedata->x400pDrivTable_devname[19 + thedata->x400pDrivNameLen] = '\0';
-	if ((fd = open(thedata->x400pDrivTable_devname, O_RDWR)) < 0) {
-		snmp_log_perror("x400pDrivTable_consistent: open()");
-		snmp_log(LOG_ERR, "%s: device name was %s\n", __FUNCTION__, thedata->x400pDrivTable_devname);
-		snmp_log(LOG_ERR, "%s: device name length is %zu\n", __FUNCTION__, thedata->x400pDrivNameLen);
-		return SNMP_ERR_INCONSISTENTNAME;
-	}
-	info = memset(buf, 0, sizeof(*info));
-	info->type = MX_OBJ_TYPE_DFLT;
-	info->id = 0;
-	info->cmd = MX_GET;
-	driv = memset((info + 1), 0, sizeof(*driv));
-	ioc.ic_cmd = MX_IOCGINFO;
-	ioc.ic_timout = 0;
-	ioc.ic_len = sizeof(*info) + sizeof(*driv);
-	ioc.ic_dp = buf;
-	if (ioctl(fd, I_STR, &ioc) < 0) {
-		snmp_log_perror("x400pDrivTable_consistent: ioctl()");
-		close(fd);
-		return SNMP_ERR_INCONSISTENTNAME;
-	}
-	close(fd);
-	/* Copy the information returned, strings were preallocated by create. */
-	thedata->x400pDrivIdnum = driv->x400pDrivIdnum;
-	thedata->x400pDrivMajor = driv->x400pDrivMajor;
-	strncpy((char *) thedata->x400pDrivDescription, driv->x400pDrivDescription, 256);
-	thedata->x400pDrivDescriptionLen = strnlen(driv->x400pDrivDescription, 256);
-	strncpy((char *) thedata->x400pDrivRevision, driv->x400pDrivRevision, 256);
-	thedata->x400pDrivRevisionLen = strnlen(driv->x400pDrivRevision, 256);
-	strncpy((char *) thedata->x400pDrivCopyright, driv->x400pDrivCopyright, 256);
-	thedata->x400pDrivCopyrightLen = strnlen(driv->x400pDrivCopyright, 256);
-	strncpy((char *) thedata->x400pDrivSupportedDevice, driv->x400pDrivSupportedDevice, 256);
-	thedata->x400pDrivSupportedDeviceLen = strnlen(driv->x400pDrivSupportedDevice, 256);
-	strncpy((char *) thedata->x400pDrivContact, driv->x400pDrivContact, 256);
-	thedata->x400pDrivContactLen = strnlen(driv->x400pDrivContact, 256);
-	thedata->x400pDrivLicense = driv->x400pDrivLicense;
-	memcpy(thedata->x400pDrivDate, driv->x400pDrivDate, 11);
-	thedata->x400pDrivDateLen = 11;
-	return (SNMP_ERR_NOERROR);
+	/* XXX: provide code to check whether the active table row can be deactivated */
+	return SNMP_ERR_NOERROR;
 }
 
 /**
- * @fn int x400pCardTable_consistent(struct x400pCardTable_data *thedata)
- * @param thedata the row data to check for consistency.
- * @brief check the internal consistency of a table row.
+ * @fn int can_act_x400pDrivTable_row(struct x400pDrivTable_data *StorageTmp)
+ * @param StorageTmp the data (as updated)
+ * @brief check whether an inactive table row can be activated
  *
- * This function checks the internal consistency of a table row for the x400pCardTable table.  If the
- * table row is internally consistent, then this function returns SNMP_ERR_NOERROR, otherwise the
- * function returns an SNMP error code and it will not be possible to activate the row until the
- * row's internal consistency is corrected.  This function might use a 'test' operation against the
- * driver to ensure that the commit phase will succeed.
+ * This function is used by the ACTION phase of a RowStatus object to test whether an inactive table
+ * row can be activated.  Returns SNMP_ERR_NOERROR when activation is permitted; an SNMP error
+ * value, otherwise.  This function might use a 'test' operation against the driver to ensure that
+ * the commit phase will succeed.
  */
 int
-x400pCardTable_consistent(struct x400pCardTable_data *thedata)
+can_act_x400pDrivTable_row(struct x400pDrivTable_data *StorageTmp)
 {
-	/* XXX: check row consistency return SNMP_ERR_NOERROR if consistent, or an SNMP error code if not. */
-	return (SNMP_ERR_NOERROR);
+	/* XXX: provide code to check whether the new or inactive table row can be activated */
+	return SNMP_ERR_NOERROR;
 }
 
 /**
- * @fn int x400pSpanTable_consistent(struct x400pSpanTable_data *thedata)
- * @param thedata the row data to check for consistency.
- * @brief check the internal consistency of a table row.
+ * @fn int can_deact_x400pDrivTable_row(struct x400pDrivTable_data *StorageTmp)
+ * @param StorageTmp the data (as updated)
+ * @brief check whether an active table row can be deactivated
  *
- * This function checks the internal consistency of a table row for the x400pSpanTable table.  If the
- * table row is internally consistent, then this function returns SNMP_ERR_NOERROR, otherwise the
- * function returns an SNMP error code and it will not be possible to activate the row until the
- * row's internal consistency is corrected.  This function might use a 'test' operation against the
- * driver to ensure that the commit phase will succeed.
+ * This function is used by the ACTION phase of a RowStatus object to test whether an active table
+ * row can be deactivated.  Returns SNMP_ERR_NOERROR when deactivation is permitted; an SNMP error
+ * value, otherwise.  This function might use a 'test' operation against the driver to ensure that
+ * the commit phase will succeed.
  */
 int
-x400pSpanTable_consistent(struct x400pSpanTable_data *thedata)
+can_deact_x400pDrivTable_row(struct x400pDrivTable_data *StorageTmp)
 {
-	/* XXX: check row consistency return SNMP_ERR_NOERROR if consistent, or an SNMP error code if not. */
-	return (SNMP_ERR_NOERROR);
+	/* XXX: provide code to check whether the active table row can be deactivated */
+	return SNMP_ERR_NOERROR;
 }
 
 /**
- * @fn int x400pBertTable_consistent(struct x400pBertTable_data *thedata)
- * @param thedata the row data to check for consistency.
- * @brief check the internal consistency of a table row.
+ * @fn int can_act_x400pCardTable_row(struct x400pCardTable_data *StorageTmp)
+ * @param StorageTmp the data (as updated)
+ * @brief check whether an inactive table row can be activated
  *
- * This function checks the internal consistency of a table row for the x400pBertTable table.  If the
- * table row is internally consistent, then this function returns SNMP_ERR_NOERROR, otherwise the
- * function returns an SNMP error code and it will not be possible to activate the row until the
- * row's internal consistency is corrected.  This function might use a 'test' operation against the
- * driver to ensure that the commit phase will succeed.
+ * This function is used by the ACTION phase of a RowStatus object to test whether an inactive table
+ * row can be activated.  Returns SNMP_ERR_NOERROR when activation is permitted; an SNMP error
+ * value, otherwise.  This function might use a 'test' operation against the driver to ensure that
+ * the commit phase will succeed.
  */
 int
-x400pBertTable_consistent(struct x400pBertTable_data *thedata)
+can_act_x400pCardTable_row(struct x400pCardTable_data *StorageTmp)
 {
-	/* XXX: check row consistency return SNMP_ERR_NOERROR if consistent, or an SNMP error code if not. */
-	return (SNMP_ERR_NOERROR);
+	/* XXX: provide code to check whether the new or inactive table row can be activated */
+	return SNMP_ERR_NOERROR;
 }
 
 /**
- * @fn int x400pChanTable_consistent(struct x400pChanTable_data *thedata)
- * @param thedata the row data to check for consistency.
- * @brief check the internal consistency of a table row.
+ * @fn int can_deact_x400pCardTable_row(struct x400pCardTable_data *StorageTmp)
+ * @param StorageTmp the data (as updated)
+ * @brief check whether an active table row can be deactivated
  *
- * This function checks the internal consistency of a table row for the x400pChanTable table.  If the
- * table row is internally consistent, then this function returns SNMP_ERR_NOERROR, otherwise the
- * function returns an SNMP error code and it will not be possible to activate the row until the
- * row's internal consistency is corrected.  This function might use a 'test' operation against the
- * driver to ensure that the commit phase will succeed.
+ * This function is used by the ACTION phase of a RowStatus object to test whether an active table
+ * row can be deactivated.  Returns SNMP_ERR_NOERROR when deactivation is permitted; an SNMP error
+ * value, otherwise.  This function might use a 'test' operation against the driver to ensure that
+ * the commit phase will succeed.
  */
 int
-x400pChanTable_consistent(struct x400pChanTable_data *thedata)
+can_deact_x400pCardTable_row(struct x400pCardTable_data *StorageTmp)
 {
-	/* XXX: check row consistency return SNMP_ERR_NOERROR if consistent, or an SNMP error code if not. */
-	return (SNMP_ERR_NOERROR);
+	/* XXX: provide code to check whether the active table row can be deactivated */
+	return SNMP_ERR_NOERROR;
 }
 
 /**
- * @fn int x400pXconTable_consistent(struct x400pXconTable_data *thedata)
- * @param thedata the row data to check for consistency.
- * @brief check the internal consistency of a table row.
+ * @fn int can_act_x400pSpanTable_row(struct x400pSpanTable_data *StorageTmp)
+ * @param StorageTmp the data (as updated)
+ * @brief check whether an inactive table row can be activated
  *
- * This function checks the internal consistency of a table row for the x400pXconTable table.  If the
- * table row is internally consistent, then this function returns SNMP_ERR_NOERROR, otherwise the
- * function returns an SNMP error code and it will not be possible to activate the row until the
- * row's internal consistency is corrected.  This function might use a 'test' operation against the
- * driver to ensure that the commit phase will succeed.
+ * This function is used by the ACTION phase of a RowStatus object to test whether an inactive table
+ * row can be activated.  Returns SNMP_ERR_NOERROR when activation is permitted; an SNMP error
+ * value, otherwise.  This function might use a 'test' operation against the driver to ensure that
+ * the commit phase will succeed.
  */
 int
-x400pXconTable_consistent(struct x400pXconTable_data *thedata)
+can_act_x400pSpanTable_row(struct x400pSpanTable_data *StorageTmp)
 {
-	/* XXX: check row consistency return SNMP_ERR_NOERROR if consistent, or an SNMP error code if not. */
-	return (SNMP_ERR_NOERROR);
+	/* XXX: provide code to check whether the new or inactive table row can be activated */
+	return SNMP_ERR_NOERROR;
 }
 
 /**
- * @fn int x400pNearEndCurrentTable_consistent(struct x400pNearEndCurrentTable_data *thedata)
- * @param thedata the row data to check for consistency.
- * @brief check the internal consistency of a table row.
+ * @fn int can_deact_x400pSpanTable_row(struct x400pSpanTable_data *StorageTmp)
+ * @param StorageTmp the data (as updated)
+ * @brief check whether an active table row can be deactivated
  *
- * This function checks the internal consistency of a table row for the x400pNearEndCurrentTable table.  If the
- * table row is internally consistent, then this function returns SNMP_ERR_NOERROR, otherwise the
- * function returns an SNMP error code and it will not be possible to activate the row until the
- * row's internal consistency is corrected.  This function might use a 'test' operation against the
- * driver to ensure that the commit phase will succeed.
+ * This function is used by the ACTION phase of a RowStatus object to test whether an active table
+ * row can be deactivated.  Returns SNMP_ERR_NOERROR when deactivation is permitted; an SNMP error
+ * value, otherwise.  This function might use a 'test' operation against the driver to ensure that
+ * the commit phase will succeed.
  */
 int
-x400pNearEndCurrentTable_consistent(struct x400pNearEndCurrentTable_data *thedata)
+can_deact_x400pSpanTable_row(struct x400pSpanTable_data *StorageTmp)
 {
-	/* XXX: check row consistency return SNMP_ERR_NOERROR if consistent, or an SNMP error code if not. */
-	return (SNMP_ERR_NOERROR);
+	/* XXX: provide code to check whether the active table row can be deactivated */
+	return SNMP_ERR_NOERROR;
 }
 
 /**
- * @fn int x400pNearEndIntervalTable_consistent(struct x400pNearEndIntervalTable_data *thedata)
- * @param thedata the row data to check for consistency.
- * @brief check the internal consistency of a table row.
+ * @fn int can_act_x400pXconTable_row(struct x400pXconTable_data *StorageTmp)
+ * @param StorageTmp the data (as updated)
+ * @brief check whether an inactive table row can be activated
  *
- * This function checks the internal consistency of a table row for the x400pNearEndIntervalTable table.  If the
- * table row is internally consistent, then this function returns SNMP_ERR_NOERROR, otherwise the
- * function returns an SNMP error code and it will not be possible to activate the row until the
- * row's internal consistency is corrected.  This function might use a 'test' operation against the
- * driver to ensure that the commit phase will succeed.
+ * This function is used by the ACTION phase of a RowStatus object to test whether an inactive table
+ * row can be activated.  Returns SNMP_ERR_NOERROR when activation is permitted; an SNMP error
+ * value, otherwise.  This function might use a 'test' operation against the driver to ensure that
+ * the commit phase will succeed.
  */
 int
-x400pNearEndIntervalTable_consistent(struct x400pNearEndIntervalTable_data *thedata)
+can_act_x400pXconTable_row(struct x400pXconTable_data *StorageTmp)
 {
-	/* XXX: check row consistency return SNMP_ERR_NOERROR if consistent, or an SNMP error code if not. */
-	return (SNMP_ERR_NOERROR);
+	/* XXX: provide code to check whether the new or inactive table row can be activated */
+	return SNMP_ERR_NOERROR;
 }
 
 /**
- * @fn int x400pNearEndTotalTable_consistent(struct x400pNearEndTotalTable_data *thedata)
- * @param thedata the row data to check for consistency.
- * @brief check the internal consistency of a table row.
+ * @fn int can_deact_x400pXconTable_row(struct x400pXconTable_data *StorageTmp)
+ * @param StorageTmp the data (as updated)
+ * @brief check whether an active table row can be deactivated
  *
- * This function checks the internal consistency of a table row for the x400pNearEndTotalTable table.  If the
- * table row is internally consistent, then this function returns SNMP_ERR_NOERROR, otherwise the
- * function returns an SNMP error code and it will not be possible to activate the row until the
- * row's internal consistency is corrected.  This function might use a 'test' operation against the
- * driver to ensure that the commit phase will succeed.
+ * This function is used by the ACTION phase of a RowStatus object to test whether an active table
+ * row can be deactivated.  Returns SNMP_ERR_NOERROR when deactivation is permitted; an SNMP error
+ * value, otherwise.  This function might use a 'test' operation against the driver to ensure that
+ * the commit phase will succeed.
  */
 int
-x400pNearEndTotalTable_consistent(struct x400pNearEndTotalTable_data *thedata)
+can_deact_x400pXconTable_row(struct x400pXconTable_data *StorageTmp)
 {
-	/* XXX: check row consistency return SNMP_ERR_NOERROR if consistent, or an SNMP error code if not. */
-	return (SNMP_ERR_NOERROR);
-}
-
-/**
- * @fn int x400pFarEndCurrentTable_consistent(struct x400pFarEndCurrentTable_data *thedata)
- * @param thedata the row data to check for consistency.
- * @brief check the internal consistency of a table row.
- *
- * This function checks the internal consistency of a table row for the x400pFarEndCurrentTable table.  If the
- * table row is internally consistent, then this function returns SNMP_ERR_NOERROR, otherwise the
- * function returns an SNMP error code and it will not be possible to activate the row until the
- * row's internal consistency is corrected.  This function might use a 'test' operation against the
- * driver to ensure that the commit phase will succeed.
- */
-int
-x400pFarEndCurrentTable_consistent(struct x400pFarEndCurrentTable_data *thedata)
-{
-	/* XXX: check row consistency return SNMP_ERR_NOERROR if consistent, or an SNMP error code if not. */
-	return (SNMP_ERR_NOERROR);
-}
-
-/**
- * @fn int x400pFarEndIntervalTable_consistent(struct x400pFarEndIntervalTable_data *thedata)
- * @param thedata the row data to check for consistency.
- * @brief check the internal consistency of a table row.
- *
- * This function checks the internal consistency of a table row for the x400pFarEndIntervalTable table.  If the
- * table row is internally consistent, then this function returns SNMP_ERR_NOERROR, otherwise the
- * function returns an SNMP error code and it will not be possible to activate the row until the
- * row's internal consistency is corrected.  This function might use a 'test' operation against the
- * driver to ensure that the commit phase will succeed.
- */
-int
-x400pFarEndIntervalTable_consistent(struct x400pFarEndIntervalTable_data *thedata)
-{
-	/* XXX: check row consistency return SNMP_ERR_NOERROR if consistent, or an SNMP error code if not. */
-	return (SNMP_ERR_NOERROR);
-}
-
-/**
- * @fn int x400pFarEndTotalTable_consistent(struct x400pFarEndTotalTable_data *thedata)
- * @param thedata the row data to check for consistency.
- * @brief check the internal consistency of a table row.
- *
- * This function checks the internal consistency of a table row for the x400pFarEndTotalTable table.  If the
- * table row is internally consistent, then this function returns SNMP_ERR_NOERROR, otherwise the
- * function returns an SNMP error code and it will not be possible to activate the row until the
- * row's internal consistency is corrected.  This function might use a 'test' operation against the
- * driver to ensure that the commit phase will succeed.
- */
-int
-x400pFarEndTotalTable_consistent(struct x400pFarEndTotalTable_data *thedata)
-{
-	/* XXX: check row consistency return SNMP_ERR_NOERROR if consistent, or an SNMP error code if not. */
-	return (SNMP_ERR_NOERROR);
+	/* XXX: provide code to check whether the active table row can be deactivated */
+	return SNMP_ERR_NOERROR;
 }
 
 /**
@@ -11498,10 +15117,9 @@ x400pFarEndTotalTable_consistent(struct x400pFarEndTotalTable_data *thedata)
 int
 write_x400pSyncRowStatus(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	struct x400pSyncTable_data *StorageTmp = NULL;
+	struct x400pSyncTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	static struct x400pSyncTable_data *StorageNew, *StorageDel;
 	size_t newlen = name_len - 15;
-	static int old_value;
 	int set_value, ret;
 	static struct variable_list *vars, *vp;
 
@@ -11528,40 +15146,6 @@ write_x400pSyncRowStatus(int action, u_char *var_val, u_char var_val_type, size_
 			if (StorageTmp != NULL)
 				/* cannot create existing row */
 				return SNMP_ERR_INCONSISTENTVALUE;
-			break;
-		case RS_ACTIVE:
-		case RS_NOTINSERVICE:
-			if (StorageTmp == NULL)
-				/* cannot change state of non-existent row */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			if (StorageTmp->x400pSyncRowStatus == RS_NOTREADY)
-				/* cannot change state of row that is not ready */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			/* XXX: interaction with row storage type needed */
-			if (set_value == RS_NOTINSERVICE && StorageTmp->x400pSyncTable_refs > 0)
-				/* row is busy and cannot be moved to the RS_NOTINSERVICE state */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			break;
-		case RS_DESTROY:
-			/* destroying existent or non-existent row is ok */
-			if (StorageTmp == NULL)
-				break;
-			/* XXX: interaction with row storage type needed */
-			if (StorageTmp->x400pSyncTable_refs > 0)
-				/* row is busy and cannot be deleted */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			break;
-		case RS_NOTREADY:
-			/* management station cannot set this, only agent can */
-		default:
-			return SNMP_ERR_INCONSISTENTVALUE;
-		}
-		break;
-	case RESERVE2:
-		/* memory reseveration, final preparation... */
-		switch (set_value) {
-		case RS_CREATEANDGO:
-		case RS_CREATEANDWAIT:
 			/* creation */
 			vars = NULL;
 			/* x400pSyncGroup */
@@ -11609,6 +15193,7 @@ write_x400pSyncRowStatus(int action, u_char *var_val, u_char var_val_type, size_
 				snmp_free_varbind(vars);
 				return SNMP_ERR_RESOURCEUNAVAILABLE;
 			}
+			StorageNew->x400pSyncTable_rsvs = 1;
 			vp = vars;
 			StorageNew->x400pSyncGroup = (ulong) *vp->val.integer;
 			vp = vp->next_variable;
@@ -11616,7 +15201,37 @@ write_x400pSyncRowStatus(int action, u_char *var_val, u_char var_val_type, size_
 			vp = vp->next_variable;
 			header_complex_add_data(&x400pSyncTableStorage, vars, StorageNew);	/* frees vars */
 			break;
+		case RS_ACTIVE:
+		case RS_NOTINSERVICE:
+			if (StorageTmp == NULL)
+				/* cannot change state of non-existent row */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			if (StorageTmp->x400pSyncRowStatus == RS_NOTREADY)
+				/* cannot change state of row that is not ready */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			/* XXX: interaction with row storage type needed */
+			if (set_value == RS_NOTINSERVICE && StorageTmp->x400pSyncTable_refs > 0)
+				/* row is busy and cannot be moved to the RS_NOTINSERVICE state */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			/* activate or deactivate */
+			if (StorageTmp == NULL)
+				return SNMP_ERR_NOSUCHNAME;
+			/* one allocation for the whole row */
+			if ((StorageOld = StorageTmp->x400pSyncTable_old) == NULL)
+				if (StorageTmp->x400pSyncTable_rsvs == 0)
+					if ((StorageOld = StorageTmp->x400pSyncTable_old = x400pSyncTable_duplicate(StorageTmp)) == NULL)
+						return SNMP_ERR_RESOURCEUNAVAILABLE;
+			if (StorageOld != NULL)
+				StorageTmp->x400pSyncTable_rsvs++;
+			break;
 		case RS_DESTROY:
+			if (StorageTmp == NULL)
+				/* cannot destroy non-existent row */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			/* XXX: interaction with row storage type needed */
+			if (StorageTmp->x400pSyncTable_refs > 0)
+				/* row is busy and cannot be deleted */
+				return SNMP_ERR_INCONSISTENTVALUE;
 			/* destroy */
 			if (StorageTmp != NULL) {
 				/* exists, extract it for now */
@@ -11626,78 +15241,127 @@ write_x400pSyncRowStatus(int action, u_char *var_val, u_char var_val_type, size_
 				StorageDel = NULL;
 			}
 			break;
+		case RS_NOTREADY:
+			/* management station cannot set this, only agent can */
+		default:
+			return SNMP_ERR_INCONSISTENTVALUE;
 		}
 		break;
-	case ACTION:
-		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the UNDO case */
+	case RESERVE2:
+		/* memory reseveration, final preparation... */
 		switch (set_value) {
 		case RS_CREATEANDGO:
 			/* check that activation is possible */
-			if ((ret = x400pSyncTable_consistent(StorageNew)) != SNMP_ERR_NOERROR)
+			if ((ret = can_act_x400pSyncTable_row(StorageNew)) != SNMP_ERR_NOERROR)
 				return (ret);
 			break;
 		case RS_CREATEANDWAIT:
-			/* row does not have to be consistent */
 			break;
 		case RS_ACTIVE:
-			old_value = StorageTmp->x400pSyncRowStatus;
-			StorageTmp->x400pSyncRowStatus = set_value;
-			if (old_value != RS_ACTIVE) {
 				/* check that activation is possible */
-				if ((ret = x400pSyncTable_consistent(StorageTmp)) != SNMP_ERR_NOERROR) {
-					StorageTmp->x400pSyncRowStatus = old_value;
+			if (StorageTmp->x400pSyncRowStatus != RS_ACTIVE)
+				if ((ret = can_act_x400pSyncTable_row(StorageTmp)) != SNMP_ERR_NOERROR)
 					return (ret);
+			break;
+		case RS_NOTINSERVICE:
+			/* check that deactivation is possible */
+			if (StorageTmp->x400pSyncRowStatus != RS_NOTINSERVICE)
+				if ((ret = can_deact_x400pSyncTable_row(StorageTmp)) != SNMP_ERR_NOERROR)
+					return (ret);
+			break;
+		case RS_DESTROY:
+			/* check that deactivation is possible */
+			if (StorageTmp->x400pSyncRowStatus != RS_NOTINSERVICE)
+				if ((ret = can_deact_x400pSyncTable_row(StorageTmp)) != SNMP_ERR_NOERROR)
+					return (ret);
+			break;
+		default:
+			return SNMP_ERR_WRONGVALUE;
 				}
+		break;
+	case ACTION:
+		/* The variable has been stored in StorageTmp->x400pSyncRowStatus for you to use, and you have just been asked to do something with it.  Note that anything done here must be
+		   reversable in the UNDO case */
+		switch (set_value) {
+		case RS_CREATEANDGO:
+			/* activate with underlying device */
+			if (activate_x400pSyncTable_row(StorageNew) != SNMP_ERR_NOERROR)
+				return SNMP_ERR_COMMITFAILED;
+			break;
+		case RS_CREATEANDWAIT:
+			break;
+		case RS_ACTIVE:
+			/* state change already performed */
+			if (StorageTmp->x400pSyncRowStatus != RS_ACTIVE) {
+				/* activate with underlying device */
+				if (activate_x400pSyncTable_row(StorageTmp) != SNMP_ERR_NOERROR)
+					return SNMP_ERR_COMMITFAILED;
 			}
 			break;
 		case RS_NOTINSERVICE:
-			/* set the flag? */
-			old_value = StorageTmp->x400pSyncRowStatus;
-			StorageTmp->x400pSyncRowStatus = set_value;
+			/* state change already performed */
+			if (StorageTmp->x400pSyncRowStatus != RS_NOTINSERVICE) {
+				/* deactivate with underlying device */
+				if (deactivate_x400pSyncTable_row(StorageTmp) != SNMP_ERR_NOERROR)
+					return SNMP_ERR_COMMITFAILED;
+			}
 			break;
+		case RS_DESTROY:
+			/* commit destrution to underlying device */
+			if (StorageDel == NULL)
+			break;
+			/* deactivate with underlying device */
+			if (deactivate_x400pSyncTable_row(StorageDel) != SNMP_ERR_NOERROR)
+				return SNMP_ERR_COMMITFAILED;
+			break;
+		default:
+			return SNMP_ERR_WRONGVALUE;
 		}
 		break;
 	case COMMIT:
 		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		switch (set_value) {
 		case RS_CREATEANDGO:
-			/* row creation, set final state */
-			/* XXX: commit creation to underlying device */
-			/* XXX: activate with underlying device */
 			StorageNew->x400pSyncRowStatus = RS_ACTIVE;
 			break;
 		case RS_CREATEANDWAIT:
-			/* row creation, set final state */
 			StorageNew->x400pSyncRowStatus = RS_NOTINSERVICE;
 			break;
 		case RS_ACTIVE:
 		case RS_NOTINSERVICE:
-			/* state change already performed */
-			if (old_value != set_value) {
-				switch (set_value) {
-				case RS_ACTIVE:
-					/* XXX: activate with underlying device */
-					break;
-				case RS_NOTINSERVICE:
-					/* XXX: deactivate with underlying device */
-					break;
-				}
+			StorageNew->x400pSyncRowStatus = set_value;
+			if ((StorageOld = StorageTmp->x400pSyncTable_old) != NULL) {
+				x400pSyncTable_destroy(&StorageTmp->x400pSyncTable_old);
+				StorageTmp->x400pSyncTable_rsvs = 0;
+				StorageTmp->x400pSyncTable_tsts = 0;
+				StorageTmp->x400pSyncTable_sets = 0;
 			}
 			break;
 		case RS_DESTROY:
-			/* row deletion, free it its dead */
 			x400pSyncTable_destroy(&StorageDel);
-			/* x400pSyncTable_destroy() can handle NULL pointers. */
 			break;
 		}
 		break;
 	case UNDO:
 		/* Back out any changes made in the ACTION case */
 		switch (set_value) {
+		case RS_CREATEANDGO:
+			/* deactivate with underlying device */
+			deactivate_x400pSyncTable_row(StorageNew);
+			break;
+		case RS_CREATEANDWAIT:
+			break;
 		case RS_ACTIVE:
+			if (StorageTmp->x400pSyncRowStatus == RS_NOTINSERVICE)
+				/* deactivate with underlying device */
+				deactivate_x400pSyncTable_row(StorageTmp);
+			break;
 		case RS_NOTINSERVICE:
-			/* restore state */
-			StorageTmp->x400pSyncRowStatus = old_value;
+			if (StorageTmp->x400pSyncRowStatus == RS_ACTIVE)
+				/* activate with underlying device */
+				activate_x400pSyncTable_row(StorageTmp);
+			break;
+		case RS_DESTROY:
 			break;
 		}
 		/* fall through */
@@ -11711,6 +15375,13 @@ write_x400pSyncRowStatus(int action, u_char *var_val, u_char var_val_type, size_
 				x400pSyncTable_del(StorageNew);
 				x400pSyncTable_destroy(&StorageNew);
 			}
+			break;
+		case RS_ACTIVE:
+		case RS_NOTINSERVICE:
+			if ((StorageOld = StorageTmp->x400pSyncTable_old) == NULL)
+				break;
+			if (--StorageTmp->x400pSyncTable_rsvs == 0)
+				x400pSyncTable_destroy(&StorageTmp->x400pSyncTable_old);
 			break;
 		case RS_DESTROY:
 			/* row deletion, so add it again */
@@ -11737,10 +15408,9 @@ write_x400pSyncRowStatus(int action, u_char *var_val, u_char var_val_type, size_
 int
 write_x400pDrivRowStatus(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	struct x400pDrivTable_data *StorageTmp = NULL;
+	struct x400pDrivTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	static struct x400pDrivTable_data *StorageNew, *StorageDel;
 	size_t newlen = name_len - 15;
-	static int old_value;
 	int set_value, ret;
 	static struct variable_list *vars, *vp;
 
@@ -11767,40 +15437,6 @@ write_x400pDrivRowStatus(int action, u_char *var_val, u_char var_val_type, size_
 			if (StorageTmp != NULL)
 				/* cannot create existing row */
 				return SNMP_ERR_INCONSISTENTVALUE;
-			break;
-		case RS_ACTIVE:
-		case RS_NOTINSERVICE:
-			if (StorageTmp == NULL)
-				/* cannot change state of non-existent row */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			if (StorageTmp->x400pDrivRowStatus == RS_NOTREADY)
-				/* cannot change state of row that is not ready */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			/* XXX: interaction with row storage type needed */
-			if (set_value == RS_NOTINSERVICE && StorageTmp->x400pDrivTable_refs > 0)
-				/* row is busy and cannot be moved to the RS_NOTINSERVICE state */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			break;
-		case RS_DESTROY:
-			/* destroying existent or non-existent row is ok */
-			if (StorageTmp == NULL)
-				break;
-			/* XXX: interaction with row storage type needed */
-			if (StorageTmp->x400pDrivTable_refs > 0)
-				/* row is busy and cannot be deleted */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			break;
-		case RS_NOTREADY:
-			/* management station cannot set this, only agent can */
-		default:
-			return SNMP_ERR_INCONSISTENTVALUE;
-		}
-		break;
-	case RESERVE2:
-		/* memory reseveration, final preparation... */
-		switch (set_value) {
-		case RS_CREATEANDGO:
-		case RS_CREATEANDWAIT:
 			/* creation */
 			vars = NULL;
 			/* x400pDrivName */
@@ -11825,13 +15461,44 @@ write_x400pDrivRowStatus(int action, u_char *var_val, u_char var_val_type, size_
 				snmp_free_varbind(vars);
 				return SNMP_ERR_RESOURCEUNAVAILABLE;
 			}
+			StorageNew->x400pDrivTable_rsvs = 1;
 			vp = vars;
 			memdup((void *) &StorageNew->x400pDrivName, vp->val.string, vp->val_len);
 			StorageNew->x400pDrivNameLen = vp->val_len;
 			vp = vp->next_variable;
 			header_complex_add_data(&x400pDrivTableStorage, vars, StorageNew);	/* frees vars */
 			break;
+		case RS_ACTIVE:
+		case RS_NOTINSERVICE:
+			if (StorageTmp == NULL)
+				/* cannot change state of non-existent row */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			if (StorageTmp->x400pDrivRowStatus == RS_NOTREADY)
+				/* cannot change state of row that is not ready */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			/* XXX: interaction with row storage type needed */
+			if (set_value == RS_NOTINSERVICE && StorageTmp->x400pDrivTable_refs > 0)
+				/* row is busy and cannot be moved to the RS_NOTINSERVICE state */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			/* activate or deactivate */
+			if (StorageTmp == NULL)
+				return SNMP_ERR_NOSUCHNAME;
+			/* one allocation for the whole row */
+			if ((StorageOld = StorageTmp->x400pDrivTable_old) == NULL)
+				if (StorageTmp->x400pDrivTable_rsvs == 0)
+					if ((StorageOld = StorageTmp->x400pDrivTable_old = x400pDrivTable_duplicate(StorageTmp)) == NULL)
+						return SNMP_ERR_RESOURCEUNAVAILABLE;
+			if (StorageOld != NULL)
+				StorageTmp->x400pDrivTable_rsvs++;
+			break;
 		case RS_DESTROY:
+			if (StorageTmp == NULL)
+				/* cannot destroy non-existent row */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			/* XXX: interaction with row storage type needed */
+			if (StorageTmp->x400pDrivTable_refs > 0)
+				/* row is busy and cannot be deleted */
+				return SNMP_ERR_INCONSISTENTVALUE;
 			/* destroy */
 			if (StorageTmp != NULL) {
 				/* exists, extract it for now */
@@ -11841,84 +15508,127 @@ write_x400pDrivRowStatus(int action, u_char *var_val, u_char var_val_type, size_
 				StorageDel = NULL;
 			}
 			break;
+		case RS_NOTREADY:
+			/* management station cannot set this, only agent can */
+		default:
+			return SNMP_ERR_INCONSISTENTVALUE;
 		}
 		break;
-	case ACTION:
-		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the UNDO case */
+	case RESERVE2:
+		/* memory reseveration, final preparation... */
 		switch (set_value) {
 		case RS_CREATEANDGO:
 			/* check that activation is possible */
-			if ((ret = x400pDrivTable_consistent(StorageNew)) != SNMP_ERR_NOERROR)
+			if ((ret = can_act_x400pDrivTable_row(StorageNew)) != SNMP_ERR_NOERROR)
 				return (ret);
 			break;
 		case RS_CREATEANDWAIT:
-			/* row does not have to be consistent */
 			break;
 		case RS_ACTIVE:
-			old_value = StorageTmp->x400pDrivRowStatus;
-			StorageTmp->x400pDrivRowStatus = set_value;
-			if (old_value != RS_ACTIVE) {
 				/* check that activation is possible */
-				if ((ret = x400pDrivTable_consistent(StorageTmp)) != SNMP_ERR_NOERROR) {
-					StorageTmp->x400pDrivRowStatus = old_value;
+			if (StorageTmp->x400pDrivRowStatus != RS_ACTIVE)
+				if ((ret = can_act_x400pDrivTable_row(StorageTmp)) != SNMP_ERR_NOERROR)
 					return (ret);
+			break;
+		case RS_NOTINSERVICE:
+			/* check that deactivation is possible */
+			if (StorageTmp->x400pDrivRowStatus != RS_NOTINSERVICE)
+				if ((ret = can_deact_x400pDrivTable_row(StorageTmp)) != SNMP_ERR_NOERROR)
+					return (ret);
+			break;
+		case RS_DESTROY:
+			/* check that deactivation is possible */
+			if (StorageTmp->x400pDrivRowStatus != RS_NOTINSERVICE)
+				if ((ret = can_deact_x400pDrivTable_row(StorageTmp)) != SNMP_ERR_NOERROR)
+					return (ret);
+			break;
+		default:
+			return SNMP_ERR_WRONGVALUE;
 				}
+		break;
+	case ACTION:
+		/* The variable has been stored in StorageTmp->x400pDrivRowStatus for you to use, and you have just been asked to do something with it.  Note that anything done here must be
+		   reversable in the UNDO case */
+		switch (set_value) {
+		case RS_CREATEANDGO:
+			/* activate with underlying device */
+			if (activate_x400pDrivTable_row(StorageNew) != SNMP_ERR_NOERROR)
+				return SNMP_ERR_COMMITFAILED;
+			break;
+		case RS_CREATEANDWAIT:
+			break;
+		case RS_ACTIVE:
+			/* state change already performed */
+			if (StorageTmp->x400pDrivRowStatus != RS_ACTIVE) {
+				/* activate with underlying device */
+				if (activate_x400pDrivTable_row(StorageTmp) != SNMP_ERR_NOERROR)
+					return SNMP_ERR_COMMITFAILED;
 			}
 			break;
 		case RS_NOTINSERVICE:
-			/* set the flag? */
-			old_value = StorageTmp->x400pDrivRowStatus;
-			StorageTmp->x400pDrivRowStatus = set_value;
+			/* state change already performed */
+			if (StorageTmp->x400pDrivRowStatus != RS_NOTINSERVICE) {
+				/* deactivate with underlying device */
+				if (deactivate_x400pDrivTable_row(StorageTmp) != SNMP_ERR_NOERROR)
+					return SNMP_ERR_COMMITFAILED;
+			}
 			break;
+		case RS_DESTROY:
+			/* commit destrution to underlying device */
+			if (StorageDel == NULL)
+			break;
+			/* deactivate with underlying device */
+			if (deactivate_x400pDrivTable_row(StorageDel) != SNMP_ERR_NOERROR)
+				return SNMP_ERR_COMMITFAILED;
+			break;
+		default:
+			return SNMP_ERR_WRONGVALUE;
 		}
 		break;
 	case COMMIT:
 		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		switch (set_value) {
 		case RS_CREATEANDGO:
-			/* row creation, set final state */
-			/* XXX: commit creation to underlying device */
-			/* XXX: activate with underlying device */
 			StorageNew->x400pDrivRowStatus = RS_ACTIVE;
-			/* tables need to be refreshed now */
-			x400pSyncTable_refresh = 1;
-			x400pCardTable_refresh = 1;
 			break;
 		case RS_CREATEANDWAIT:
-			/* row creation, set final state */
 			StorageNew->x400pDrivRowStatus = RS_NOTINSERVICE;
 			break;
 		case RS_ACTIVE:
 		case RS_NOTINSERVICE:
-			/* state change already performed */
-			if (old_value != set_value) {
-				switch (set_value) {
-				case RS_ACTIVE:
-					/* XXX: activate with underlying device */
-					/* tables need to be refreshed now */
-					x400pSyncTable_refresh = 1;
-					x400pCardTable_refresh = 1;
-					break;
-				case RS_NOTINSERVICE:
-					/* XXX: deactivate with underlying device */
-					break;
-				}
+			StorageNew->x400pDrivRowStatus = set_value;
+			if ((StorageOld = StorageTmp->x400pDrivTable_old) != NULL) {
+				x400pDrivTable_destroy(&StorageTmp->x400pDrivTable_old);
+				StorageTmp->x400pDrivTable_rsvs = 0;
+				StorageTmp->x400pDrivTable_tsts = 0;
+				StorageTmp->x400pDrivTable_sets = 0;
 			}
 			break;
 		case RS_DESTROY:
-			/* row deletion, free it its dead */
 			x400pDrivTable_destroy(&StorageDel);
-			/* x400pDrivTable_destroy() can handle NULL pointers. */
 			break;
 		}
 		break;
 	case UNDO:
 		/* Back out any changes made in the ACTION case */
 		switch (set_value) {
+		case RS_CREATEANDGO:
+			/* deactivate with underlying device */
+			deactivate_x400pDrivTable_row(StorageNew);
+			break;
+		case RS_CREATEANDWAIT:
+			break;
 		case RS_ACTIVE:
+			if (StorageTmp->x400pDrivRowStatus == RS_NOTINSERVICE)
+				/* deactivate with underlying device */
+				deactivate_x400pDrivTable_row(StorageTmp);
+			break;
 		case RS_NOTINSERVICE:
-			/* restore state */
-			StorageTmp->x400pDrivRowStatus = old_value;
+			if (StorageTmp->x400pDrivRowStatus == RS_ACTIVE)
+				/* activate with underlying device */
+				activate_x400pDrivTable_row(StorageTmp);
+			break;
+		case RS_DESTROY:
 			break;
 		}
 		/* fall through */
@@ -11932,6 +15642,13 @@ write_x400pDrivRowStatus(int action, u_char *var_val, u_char var_val_type, size_
 				x400pDrivTable_del(StorageNew);
 				x400pDrivTable_destroy(&StorageNew);
 			}
+			break;
+		case RS_ACTIVE:
+		case RS_NOTINSERVICE:
+			if ((StorageOld = StorageTmp->x400pDrivTable_old) == NULL)
+				break;
+			if (--StorageTmp->x400pDrivTable_rsvs == 0)
+				x400pDrivTable_destroy(&StorageTmp->x400pDrivTable_old);
 			break;
 		case RS_DESTROY:
 			/* row deletion, so add it again */
@@ -11958,10 +15675,9 @@ write_x400pDrivRowStatus(int action, u_char *var_val, u_char var_val_type, size_
 int
 write_x400pCardStatus(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	struct x400pCardTable_data *StorageTmp = NULL;
+	struct x400pCardTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	static struct x400pCardTable_data *StorageNew, *StorageDel;
 	size_t newlen = name_len - 15;
-	static int old_value;
 	int set_value, ret;
 	static struct variable_list *vars, *vp;
 
@@ -11988,40 +15704,6 @@ write_x400pCardStatus(int action, u_char *var_val, u_char var_val_type, size_t v
 			if (StorageTmp != NULL)
 				/* cannot create existing row */
 				return SNMP_ERR_INCONSISTENTVALUE;
-			break;
-		case RS_ACTIVE:
-		case RS_NOTINSERVICE:
-			if (StorageTmp == NULL)
-				/* cannot change state of non-existent row */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			if (StorageTmp->x400pCardStatus == RS_NOTREADY)
-				/* cannot change state of row that is not ready */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			/* XXX: interaction with row storage type needed */
-			if (set_value == RS_NOTINSERVICE && StorageTmp->x400pCardTable_refs > 0)
-				/* row is busy and cannot be moved to the RS_NOTINSERVICE state */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			break;
-		case RS_DESTROY:
-			/* destroying existent or non-existent row is ok */
-			if (StorageTmp == NULL)
-				break;
-			/* XXX: interaction with row storage type needed */
-			if (StorageTmp->x400pCardTable_refs > 0)
-				/* row is busy and cannot be deleted */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			break;
-		case RS_NOTREADY:
-			/* management station cannot set this, only agent can */
-		default:
-			return SNMP_ERR_INCONSISTENTVALUE;
-		}
-		break;
-	case RESERVE2:
-		/* memory reseveration, final preparation... */
-		switch (set_value) {
-		case RS_CREATEANDGO:
-		case RS_CREATEANDWAIT:
 			/* creation */
 			vars = NULL;
 			/* x400pDrivName */
@@ -12064,6 +15746,7 @@ write_x400pCardStatus(int action, u_char *var_val, u_char var_val_type, size_t v
 				snmp_free_varbind(vars);
 				return SNMP_ERR_RESOURCEUNAVAILABLE;
 			}
+			StorageNew->x400pCardTable_rsvs = 1;
 			vp = vars;
 			memdup((void *) &StorageNew->x400pDrivName, vp->val.string, vp->val_len);
 			StorageNew->x400pDrivNameLen = vp->val_len;
@@ -12072,7 +15755,37 @@ write_x400pCardStatus(int action, u_char *var_val, u_char var_val_type, size_t v
 			vp = vp->next_variable;
 			header_complex_add_data(&x400pCardTableStorage, vars, StorageNew);	/* frees vars */
 			break;
+		case RS_ACTIVE:
+		case RS_NOTINSERVICE:
+			if (StorageTmp == NULL)
+				/* cannot change state of non-existent row */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			if (StorageTmp->x400pCardStatus == RS_NOTREADY)
+				/* cannot change state of row that is not ready */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			/* XXX: interaction with row storage type needed */
+			if (set_value == RS_NOTINSERVICE && StorageTmp->x400pCardTable_refs > 0)
+				/* row is busy and cannot be moved to the RS_NOTINSERVICE state */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			/* activate or deactivate */
+			if (StorageTmp == NULL)
+				return SNMP_ERR_NOSUCHNAME;
+			/* one allocation for the whole row */
+			if ((StorageOld = StorageTmp->x400pCardTable_old) == NULL)
+				if (StorageTmp->x400pCardTable_rsvs == 0)
+					if ((StorageOld = StorageTmp->x400pCardTable_old = x400pCardTable_duplicate(StorageTmp)) == NULL)
+						return SNMP_ERR_RESOURCEUNAVAILABLE;
+			if (StorageOld != NULL)
+				StorageTmp->x400pCardTable_rsvs++;
+			break;
 		case RS_DESTROY:
+			if (StorageTmp == NULL)
+				/* cannot destroy non-existent row */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			/* XXX: interaction with row storage type needed */
+			if (StorageTmp->x400pCardTable_refs > 0)
+				/* row is busy and cannot be deleted */
+				return SNMP_ERR_INCONSISTENTVALUE;
 			/* destroy */
 			if (StorageTmp != NULL) {
 				/* exists, extract it for now */
@@ -12082,78 +15795,127 @@ write_x400pCardStatus(int action, u_char *var_val, u_char var_val_type, size_t v
 				StorageDel = NULL;
 			}
 			break;
+		case RS_NOTREADY:
+			/* management station cannot set this, only agent can */
+		default:
+			return SNMP_ERR_INCONSISTENTVALUE;
 		}
 		break;
-	case ACTION:
-		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the UNDO case */
+	case RESERVE2:
+		/* memory reseveration, final preparation... */
 		switch (set_value) {
 		case RS_CREATEANDGO:
 			/* check that activation is possible */
-			if ((ret = x400pCardTable_consistent(StorageNew)) != SNMP_ERR_NOERROR)
+			if ((ret = can_act_x400pCardTable_row(StorageNew)) != SNMP_ERR_NOERROR)
 				return (ret);
 			break;
 		case RS_CREATEANDWAIT:
-			/* row does not have to be consistent */
 			break;
 		case RS_ACTIVE:
-			old_value = StorageTmp->x400pCardStatus;
-			StorageTmp->x400pCardStatus = set_value;
-			if (old_value != RS_ACTIVE) {
-				/* check that activation is possible */
-				if ((ret = x400pCardTable_consistent(StorageTmp)) != SNMP_ERR_NOERROR) {
-					StorageTmp->x400pCardStatus = old_value;
+			/* check that activation is possible */
+			if (StorageTmp->x400pCardStatus != RS_ACTIVE)
+				if ((ret = can_act_x400pCardTable_row(StorageTmp)) != SNMP_ERR_NOERROR)
 					return (ret);
-				}
-			}
 			break;
 		case RS_NOTINSERVICE:
-			/* set the flag? */
-			old_value = StorageTmp->x400pCardStatus;
-			StorageTmp->x400pCardStatus = set_value;
+			/* check that deactivation is possible */
+			if (StorageTmp->x400pCardStatus != RS_NOTINSERVICE)
+				if ((ret = can_deact_x400pCardTable_row(StorageTmp)) != SNMP_ERR_NOERROR)
+					return (ret);
 			break;
+		case RS_DESTROY:
+			/* check that deactivation is possible */
+			if (StorageTmp->x400pCardStatus != RS_NOTINSERVICE)
+				if ((ret = can_deact_x400pCardTable_row(StorageTmp)) != SNMP_ERR_NOERROR)
+					return (ret);
+			break;
+		default:
+			return SNMP_ERR_WRONGVALUE;
+		}
+		break;
+	case ACTION:
+		/* The variable has been stored in StorageTmp->x400pCardStatus for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable
+		   in the UNDO case */
+		switch (set_value) {
+		case RS_CREATEANDGO:
+			/* activate with underlying device */
+			if (activate_x400pCardTable_row(StorageNew) != SNMP_ERR_NOERROR)
+				return SNMP_ERR_COMMITFAILED;
+			break;
+		case RS_CREATEANDWAIT:
+			break;
+		case RS_ACTIVE:
+			/* state change already performed */
+			if (StorageTmp->x400pCardStatus != RS_ACTIVE) {
+				/* activate with underlying device */
+				if (activate_x400pCardTable_row(StorageTmp) != SNMP_ERR_NOERROR)
+					return SNMP_ERR_COMMITFAILED;
+				}
+			break;
+		case RS_NOTINSERVICE:
+			/* state change already performed */
+			if (StorageTmp->x400pCardStatus != RS_NOTINSERVICE) {
+				/* deactivate with underlying device */
+				if (deactivate_x400pCardTable_row(StorageTmp) != SNMP_ERR_NOERROR)
+					return SNMP_ERR_COMMITFAILED;
+			}
+			break;
+		case RS_DESTROY:
+			/* commit destrution to underlying device */
+			if (StorageDel == NULL)
+				break;
+			/* deactivate with underlying device */
+			if (deactivate_x400pCardTable_row(StorageDel) != SNMP_ERR_NOERROR)
+				return SNMP_ERR_COMMITFAILED;
+			break;
+		default:
+			return SNMP_ERR_WRONGVALUE;
 		}
 		break;
 	case COMMIT:
 		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		switch (set_value) {
 		case RS_CREATEANDGO:
-			/* row creation, set final state */
-			/* XXX: commit creation to underlying device */
-			/* XXX: activate with underlying device */
 			StorageNew->x400pCardStatus = RS_ACTIVE;
 			break;
 		case RS_CREATEANDWAIT:
-			/* row creation, set final state */
 			StorageNew->x400pCardStatus = RS_NOTINSERVICE;
 			break;
 		case RS_ACTIVE:
 		case RS_NOTINSERVICE:
-			/* state change already performed */
-			if (old_value != set_value) {
-				switch (set_value) {
-				case RS_ACTIVE:
-					/* XXX: activate with underlying device */
-					break;
-				case RS_NOTINSERVICE:
-					/* XXX: deactivate with underlying device */
-					break;
-				}
+			StorageNew->x400pCardStatus = set_value;
+			if ((StorageOld = StorageTmp->x400pCardTable_old) != NULL) {
+				x400pCardTable_destroy(&StorageTmp->x400pCardTable_old);
+				StorageTmp->x400pCardTable_rsvs = 0;
+				StorageTmp->x400pCardTable_tsts = 0;
+				StorageTmp->x400pCardTable_sets = 0;
 			}
 			break;
 		case RS_DESTROY:
-			/* row deletion, free it its dead */
 			x400pCardTable_destroy(&StorageDel);
-			/* x400pCardTable_destroy() can handle NULL pointers. */
 			break;
 		}
 		break;
 	case UNDO:
 		/* Back out any changes made in the ACTION case */
 		switch (set_value) {
+		case RS_CREATEANDGO:
+			/* deactivate with underlying device */
+			deactivate_x400pCardTable_row(StorageNew);
+			break;
+		case RS_CREATEANDWAIT:
+			break;
 		case RS_ACTIVE:
+			if (StorageTmp->x400pCardStatus == RS_NOTINSERVICE)
+				/* deactivate with underlying device */
+				deactivate_x400pCardTable_row(StorageTmp);
+			break;
 		case RS_NOTINSERVICE:
-			/* restore state */
-			StorageTmp->x400pCardStatus = old_value;
+			if (StorageTmp->x400pCardStatus == RS_ACTIVE)
+				/* activate with underlying device */
+				activate_x400pCardTable_row(StorageTmp);
+			break;
+		case RS_DESTROY:
 			break;
 		}
 		/* fall through */
@@ -12167,6 +15929,13 @@ write_x400pCardStatus(int action, u_char *var_val, u_char var_val_type, size_t v
 				x400pCardTable_del(StorageNew);
 				x400pCardTable_destroy(&StorageNew);
 			}
+			break;
+		case RS_ACTIVE:
+		case RS_NOTINSERVICE:
+			if ((StorageOld = StorageTmp->x400pCardTable_old) == NULL)
+				break;
+			if (--StorageTmp->x400pCardTable_rsvs == 0)
+				x400pCardTable_destroy(&StorageTmp->x400pCardTable_old);
 			break;
 		case RS_DESTROY:
 			/* row deletion, so add it again */
@@ -12193,10 +15962,9 @@ write_x400pCardStatus(int action, u_char *var_val, u_char var_val_type, size_t v
 int
 write_x400pSpanRowStatus(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	struct x400pSpanTable_data *StorageTmp = NULL;
+	struct x400pSpanTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	static struct x400pSpanTable_data *StorageNew, *StorageDel;
 	size_t newlen = name_len - 15;
-	static int old_value;
 	int set_value, ret;
 	static struct variable_list *vars, *vp;
 
@@ -12223,40 +15991,6 @@ write_x400pSpanRowStatus(int action, u_char *var_val, u_char var_val_type, size_
 			if (StorageTmp != NULL)
 				/* cannot create existing row */
 				return SNMP_ERR_INCONSISTENTVALUE;
-			break;
-		case RS_ACTIVE:
-		case RS_NOTINSERVICE:
-			if (StorageTmp == NULL)
-				/* cannot change state of non-existent row */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			if (StorageTmp->x400pSpanRowStatus == RS_NOTREADY)
-				/* cannot change state of row that is not ready */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			/* XXX: interaction with row storage type needed */
-			if (set_value == RS_NOTINSERVICE && StorageTmp->x400pSpanTable_refs > 0)
-				/* row is busy and cannot be moved to the RS_NOTINSERVICE state */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			break;
-		case RS_DESTROY:
-			/* destroying existent or non-existent row is ok */
-			if (StorageTmp == NULL)
-				break;
-			/* XXX: interaction with row storage type needed */
-			if (StorageTmp->x400pSpanTable_refs > 0)
-				/* row is busy and cannot be deleted */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			break;
-		case RS_NOTREADY:
-			/* management station cannot set this, only agent can */
-		default:
-			return SNMP_ERR_INCONSISTENTVALUE;
-		}
-		break;
-	case RESERVE2:
-		/* memory reseveration, final preparation... */
-		switch (set_value) {
-		case RS_CREATEANDGO:
-		case RS_CREATEANDWAIT:
 			/* creation */
 			vars = NULL;
 			/* x400pDrivName */
@@ -12317,6 +16051,7 @@ write_x400pSpanRowStatus(int action, u_char *var_val, u_char var_val_type, size_
 				snmp_free_varbind(vars);
 				return SNMP_ERR_RESOURCEUNAVAILABLE;
 			}
+			StorageNew->x400pSpanTable_rsvs = 1;
 			vp = vars;
 			memdup((void *) &StorageNew->x400pDrivName, vp->val.string, vp->val_len);
 			StorageNew->x400pDrivNameLen = vp->val_len;
@@ -12327,7 +16062,37 @@ write_x400pSpanRowStatus(int action, u_char *var_val, u_char var_val_type, size_
 			vp = vp->next_variable;
 			header_complex_add_data(&x400pSpanTableStorage, vars, StorageNew);	/* frees vars */
 			break;
+		case RS_ACTIVE:
+		case RS_NOTINSERVICE:
+			if (StorageTmp == NULL)
+				/* cannot change state of non-existent row */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			if (StorageTmp->x400pSpanRowStatus == RS_NOTREADY)
+				/* cannot change state of row that is not ready */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			/* XXX: interaction with row storage type needed */
+			if (set_value == RS_NOTINSERVICE && StorageTmp->x400pSpanTable_refs > 0)
+				/* row is busy and cannot be moved to the RS_NOTINSERVICE state */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			/* activate or deactivate */
+			if (StorageTmp == NULL)
+				return SNMP_ERR_NOSUCHNAME;
+			/* one allocation for the whole row */
+			if ((StorageOld = StorageTmp->x400pSpanTable_old) == NULL)
+				if (StorageTmp->x400pSpanTable_rsvs == 0)
+					if ((StorageOld = StorageTmp->x400pSpanTable_old = x400pSpanTable_duplicate(StorageTmp)) == NULL)
+						return SNMP_ERR_RESOURCEUNAVAILABLE;
+			if (StorageOld != NULL)
+				StorageTmp->x400pSpanTable_rsvs++;
+			break;
 		case RS_DESTROY:
+			if (StorageTmp == NULL)
+				/* cannot destroy non-existent row */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			/* XXX: interaction with row storage type needed */
+			if (StorageTmp->x400pSpanTable_refs > 0)
+				/* row is busy and cannot be deleted */
+				return SNMP_ERR_INCONSISTENTVALUE;
 			/* destroy */
 			if (StorageTmp != NULL) {
 				/* exists, extract it for now */
@@ -12337,78 +16102,127 @@ write_x400pSpanRowStatus(int action, u_char *var_val, u_char var_val_type, size_
 				StorageDel = NULL;
 			}
 			break;
+		case RS_NOTREADY:
+			/* management station cannot set this, only agent can */
+		default:
+			return SNMP_ERR_INCONSISTENTVALUE;
 		}
 		break;
-	case ACTION:
-		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the UNDO case */
+	case RESERVE2:
+		/* memory reseveration, final preparation... */
 		switch (set_value) {
 		case RS_CREATEANDGO:
 			/* check that activation is possible */
-			if ((ret = x400pSpanTable_consistent(StorageNew)) != SNMP_ERR_NOERROR)
+			if ((ret = can_act_x400pSpanTable_row(StorageNew)) != SNMP_ERR_NOERROR)
 				return (ret);
 			break;
 		case RS_CREATEANDWAIT:
-			/* row does not have to be consistent */
 			break;
 		case RS_ACTIVE:
-			old_value = StorageTmp->x400pSpanRowStatus;
-			StorageTmp->x400pSpanRowStatus = set_value;
-			if (old_value != RS_ACTIVE) {
 				/* check that activation is possible */
-				if ((ret = x400pSpanTable_consistent(StorageTmp)) != SNMP_ERR_NOERROR) {
-					StorageTmp->x400pSpanRowStatus = old_value;
+			if (StorageTmp->x400pSpanRowStatus != RS_ACTIVE)
+				if ((ret = can_act_x400pSpanTable_row(StorageTmp)) != SNMP_ERR_NOERROR)
 					return (ret);
+			break;
+		case RS_NOTINSERVICE:
+			/* check that deactivation is possible */
+			if (StorageTmp->x400pSpanRowStatus != RS_NOTINSERVICE)
+				if ((ret = can_deact_x400pSpanTable_row(StorageTmp)) != SNMP_ERR_NOERROR)
+					return (ret);
+			break;
+		case RS_DESTROY:
+			/* check that deactivation is possible */
+			if (StorageTmp->x400pSpanRowStatus != RS_NOTINSERVICE)
+				if ((ret = can_deact_x400pSpanTable_row(StorageTmp)) != SNMP_ERR_NOERROR)
+					return (ret);
+			break;
+		default:
+			return SNMP_ERR_WRONGVALUE;
 				}
+		break;
+	case ACTION:
+		/* The variable has been stored in StorageTmp->x400pSpanRowStatus for you to use, and you have just been asked to do something with it.  Note that anything done here must be
+		   reversable in the UNDO case */
+		switch (set_value) {
+		case RS_CREATEANDGO:
+			/* activate with underlying device */
+			if (activate_x400pSpanTable_row(StorageNew) != SNMP_ERR_NOERROR)
+				return SNMP_ERR_COMMITFAILED;
+			break;
+		case RS_CREATEANDWAIT:
+			break;
+		case RS_ACTIVE:
+			/* state change already performed */
+			if (StorageTmp->x400pSpanRowStatus != RS_ACTIVE) {
+				/* activate with underlying device */
+				if (activate_x400pSpanTable_row(StorageTmp) != SNMP_ERR_NOERROR)
+					return SNMP_ERR_COMMITFAILED;
 			}
 			break;
 		case RS_NOTINSERVICE:
-			/* set the flag? */
-			old_value = StorageTmp->x400pSpanRowStatus;
-			StorageTmp->x400pSpanRowStatus = set_value;
+			/* state change already performed */
+			if (StorageTmp->x400pSpanRowStatus != RS_NOTINSERVICE) {
+				/* deactivate with underlying device */
+				if (deactivate_x400pSpanTable_row(StorageTmp) != SNMP_ERR_NOERROR)
+					return SNMP_ERR_COMMITFAILED;
+			}
 			break;
+		case RS_DESTROY:
+			/* commit destrution to underlying device */
+			if (StorageDel == NULL)
+				break;
+			/* deactivate with underlying device */
+			if (deactivate_x400pSpanTable_row(StorageDel) != SNMP_ERR_NOERROR)
+				return SNMP_ERR_COMMITFAILED;
+			break;
+		default:
+			return SNMP_ERR_WRONGVALUE;
 		}
 		break;
 	case COMMIT:
 		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		switch (set_value) {
 		case RS_CREATEANDGO:
-			/* row creation, set final state */
-			/* XXX: commit creation to underlying device */
-			/* XXX: activate with underlying device */
 			StorageNew->x400pSpanRowStatus = RS_ACTIVE;
 			break;
 		case RS_CREATEANDWAIT:
-			/* row creation, set final state */
 			StorageNew->x400pSpanRowStatus = RS_NOTINSERVICE;
 			break;
 		case RS_ACTIVE:
 		case RS_NOTINSERVICE:
-			/* state change already performed */
-			if (old_value != set_value) {
-				switch (set_value) {
-				case RS_ACTIVE:
-					/* XXX: activate with underlying device */
-					break;
-				case RS_NOTINSERVICE:
-					/* XXX: deactivate with underlying device */
-					break;
-				}
+			StorageNew->x400pSpanRowStatus = set_value;
+			if ((StorageOld = StorageTmp->x400pSpanTable_old) != NULL) {
+				x400pSpanTable_destroy(&StorageTmp->x400pSpanTable_old);
+				StorageTmp->x400pSpanTable_rsvs = 0;
+				StorageTmp->x400pSpanTable_tsts = 0;
+				StorageTmp->x400pSpanTable_sets = 0;
 			}
 			break;
 		case RS_DESTROY:
-			/* row deletion, free it its dead */
 			x400pSpanTable_destroy(&StorageDel);
-			/* x400pSpanTable_destroy() can handle NULL pointers. */
 			break;
 		}
 		break;
 	case UNDO:
 		/* Back out any changes made in the ACTION case */
 		switch (set_value) {
+		case RS_CREATEANDGO:
+			/* deactivate with underlying device */
+			deactivate_x400pSpanTable_row(StorageNew);
+			break;
+		case RS_CREATEANDWAIT:
+			break;
 		case RS_ACTIVE:
+			if (StorageTmp->x400pSpanRowStatus == RS_NOTINSERVICE)
+				/* deactivate with underlying device */
+				deactivate_x400pSpanTable_row(StorageTmp);
+			break;
 		case RS_NOTINSERVICE:
-			/* restore state */
-			StorageTmp->x400pSpanRowStatus = old_value;
+			if (StorageTmp->x400pSpanRowStatus == RS_ACTIVE)
+				/* activate with underlying device */
+				activate_x400pSpanTable_row(StorageTmp);
+			break;
+		case RS_DESTROY:
 			break;
 		}
 		/* fall through */
@@ -12422,6 +16236,13 @@ write_x400pSpanRowStatus(int action, u_char *var_val, u_char var_val_type, size_
 				x400pSpanTable_del(StorageNew);
 				x400pSpanTable_destroy(&StorageNew);
 			}
+			break;
+		case RS_ACTIVE:
+		case RS_NOTINSERVICE:
+			if ((StorageOld = StorageTmp->x400pSpanTable_old) == NULL)
+				break;
+			if (--StorageTmp->x400pSpanTable_rsvs == 0)
+				x400pSpanTable_destroy(&StorageTmp->x400pSpanTable_old);
 			break;
 		case RS_DESTROY:
 			/* row deletion, so add it again */
@@ -12448,10 +16269,9 @@ write_x400pSpanRowStatus(int action, u_char *var_val, u_char var_val_type, size_
 int
 write_x400pXconRowStatus(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	struct x400pXconTable_data *StorageTmp = NULL;
+	struct x400pXconTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	static struct x400pXconTable_data *StorageNew, *StorageDel;
 	size_t newlen = name_len - 15;
-	static int old_value;
 	int set_value, ret;
 	static struct variable_list *vars, *vp;
 
@@ -12478,40 +16298,6 @@ write_x400pXconRowStatus(int action, u_char *var_val, u_char var_val_type, size_
 			if (StorageTmp != NULL)
 				/* cannot create existing row */
 				return SNMP_ERR_INCONSISTENTVALUE;
-			break;
-		case RS_ACTIVE:
-		case RS_NOTINSERVICE:
-			if (StorageTmp == NULL)
-				/* cannot change state of non-existent row */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			if (StorageTmp->x400pXconRowStatus == RS_NOTREADY)
-				/* cannot change state of row that is not ready */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			/* XXX: interaction with row storage type needed */
-			if (set_value == RS_NOTINSERVICE && StorageTmp->x400pXconTable_refs > 0)
-				/* row is busy and cannot be moved to the RS_NOTINSERVICE state */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			break;
-		case RS_DESTROY:
-			/* destroying existent or non-existent row is ok */
-			if (StorageTmp == NULL)
-				break;
-			/* XXX: interaction with row storage type needed */
-			if (StorageTmp->x400pXconTable_refs > 0)
-				/* row is busy and cannot be deleted */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			break;
-		case RS_NOTREADY:
-			/* management station cannot set this, only agent can */
-		default:
-			return SNMP_ERR_INCONSISTENTVALUE;
-		}
-		break;
-	case RESERVE2:
-		/* memory reseveration, final preparation... */
-		switch (set_value) {
-		case RS_CREATEANDGO:
-		case RS_CREATEANDWAIT:
 			/* creation */
 			vars = NULL;
 			/* x400pDrivName */
@@ -12590,6 +16376,7 @@ write_x400pXconRowStatus(int action, u_char *var_val, u_char var_val_type, size_
 				snmp_free_varbind(vars);
 				return SNMP_ERR_RESOURCEUNAVAILABLE;
 			}
+			StorageNew->x400pXconTable_rsvs = 1;
 			vp = vars;
 			memdup((void *) &StorageNew->x400pDrivName, vp->val.string, vp->val_len);
 			StorageNew->x400pDrivNameLen = vp->val_len;
@@ -12602,7 +16389,37 @@ write_x400pXconRowStatus(int action, u_char *var_val, u_char var_val_type, size_
 			vp = vp->next_variable;
 			header_complex_add_data(&x400pXconTableStorage, vars, StorageNew);	/* frees vars */
 			break;
+		case RS_ACTIVE:
+		case RS_NOTINSERVICE:
+			if (StorageTmp == NULL)
+				/* cannot change state of non-existent row */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			if (StorageTmp->x400pXconRowStatus == RS_NOTREADY)
+				/* cannot change state of row that is not ready */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			/* XXX: interaction with row storage type needed */
+			if (set_value == RS_NOTINSERVICE && StorageTmp->x400pXconTable_refs > 0)
+				/* row is busy and cannot be moved to the RS_NOTINSERVICE state */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			/* activate or deactivate */
+			if (StorageTmp == NULL)
+				return SNMP_ERR_NOSUCHNAME;
+			/* one allocation for the whole row */
+			if ((StorageOld = StorageTmp->x400pXconTable_old) == NULL)
+				if (StorageTmp->x400pXconTable_rsvs == 0)
+					if ((StorageOld = StorageTmp->x400pXconTable_old = x400pXconTable_duplicate(StorageTmp)) == NULL)
+						return SNMP_ERR_RESOURCEUNAVAILABLE;
+			if (StorageOld != NULL)
+				StorageTmp->x400pXconTable_rsvs++;
+			break;
 		case RS_DESTROY:
+			if (StorageTmp == NULL)
+				/* cannot destroy non-existent row */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			/* XXX: interaction with row storage type needed */
+			if (StorageTmp->x400pXconTable_refs > 0)
+				/* row is busy and cannot be deleted */
+				return SNMP_ERR_INCONSISTENTVALUE;
 			/* destroy */
 			if (StorageTmp != NULL) {
 				/* exists, extract it for now */
@@ -12612,78 +16429,127 @@ write_x400pXconRowStatus(int action, u_char *var_val, u_char var_val_type, size_
 				StorageDel = NULL;
 			}
 			break;
+		case RS_NOTREADY:
+			/* management station cannot set this, only agent can */
+		default:
+			return SNMP_ERR_INCONSISTENTVALUE;
 		}
 		break;
-	case ACTION:
-		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the UNDO case */
+	case RESERVE2:
+		/* memory reseveration, final preparation... */
 		switch (set_value) {
 		case RS_CREATEANDGO:
 			/* check that activation is possible */
-			if ((ret = x400pXconTable_consistent(StorageNew)) != SNMP_ERR_NOERROR)
+			if ((ret = can_act_x400pXconTable_row(StorageNew)) != SNMP_ERR_NOERROR)
 				return (ret);
 			break;
 		case RS_CREATEANDWAIT:
-			/* row does not have to be consistent */
 			break;
 		case RS_ACTIVE:
-			old_value = StorageTmp->x400pXconRowStatus;
-			StorageTmp->x400pXconRowStatus = set_value;
-			if (old_value != RS_ACTIVE) {
 				/* check that activation is possible */
-				if ((ret = x400pXconTable_consistent(StorageTmp)) != SNMP_ERR_NOERROR) {
-					StorageTmp->x400pXconRowStatus = old_value;
+			if (StorageTmp->x400pXconRowStatus != RS_ACTIVE)
+				if ((ret = can_act_x400pXconTable_row(StorageTmp)) != SNMP_ERR_NOERROR)
 					return (ret);
+			break;
+		case RS_NOTINSERVICE:
+			/* check that deactivation is possible */
+			if (StorageTmp->x400pXconRowStatus != RS_NOTINSERVICE)
+				if ((ret = can_deact_x400pXconTable_row(StorageTmp)) != SNMP_ERR_NOERROR)
+					return (ret);
+			break;
+		case RS_DESTROY:
+			/* check that deactivation is possible */
+			if (StorageTmp->x400pXconRowStatus != RS_NOTINSERVICE)
+				if ((ret = can_deact_x400pXconTable_row(StorageTmp)) != SNMP_ERR_NOERROR)
+					return (ret);
+			break;
+		default:
+			return SNMP_ERR_WRONGVALUE;
 				}
+		break;
+	case ACTION:
+		/* The variable has been stored in StorageTmp->x400pXconRowStatus for you to use, and you have just been asked to do something with it.  Note that anything done here must be
+		   reversable in the UNDO case */
+		switch (set_value) {
+		case RS_CREATEANDGO:
+			/* activate with underlying device */
+			if (activate_x400pXconTable_row(StorageNew) != SNMP_ERR_NOERROR)
+				return SNMP_ERR_COMMITFAILED;
+			break;
+		case RS_CREATEANDWAIT:
+			break;
+		case RS_ACTIVE:
+			/* state change already performed */
+			if (StorageTmp->x400pXconRowStatus != RS_ACTIVE) {
+				/* activate with underlying device */
+				if (activate_x400pXconTable_row(StorageTmp) != SNMP_ERR_NOERROR)
+					return SNMP_ERR_COMMITFAILED;
 			}
 			break;
 		case RS_NOTINSERVICE:
-			/* set the flag? */
-			old_value = StorageTmp->x400pXconRowStatus;
-			StorageTmp->x400pXconRowStatus = set_value;
+			/* state change already performed */
+			if (StorageTmp->x400pXconRowStatus != RS_NOTINSERVICE) {
+				/* deactivate with underlying device */
+				if (deactivate_x400pXconTable_row(StorageTmp) != SNMP_ERR_NOERROR)
+					return SNMP_ERR_COMMITFAILED;
+			}
 			break;
+		case RS_DESTROY:
+			/* commit destrution to underlying device */
+			if (StorageDel == NULL)
+				break;
+			/* deactivate with underlying device */
+			if (deactivate_x400pXconTable_row(StorageDel) != SNMP_ERR_NOERROR)
+				return SNMP_ERR_COMMITFAILED;
+			break;
+		default:
+			return SNMP_ERR_WRONGVALUE;
 		}
 		break;
 	case COMMIT:
 		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		switch (set_value) {
 		case RS_CREATEANDGO:
-			/* row creation, set final state */
-			/* XXX: commit creation to underlying device */
-			/* XXX: activate with underlying device */
 			StorageNew->x400pXconRowStatus = RS_ACTIVE;
 			break;
 		case RS_CREATEANDWAIT:
-			/* row creation, set final state */
 			StorageNew->x400pXconRowStatus = RS_NOTINSERVICE;
 			break;
 		case RS_ACTIVE:
 		case RS_NOTINSERVICE:
-			/* state change already performed */
-			if (old_value != set_value) {
-				switch (set_value) {
-				case RS_ACTIVE:
-					/* XXX: activate with underlying device */
-					break;
-				case RS_NOTINSERVICE:
-					/* XXX: deactivate with underlying device */
-					break;
-				}
+			StorageNew->x400pXconRowStatus = set_value;
+			if ((StorageOld = StorageTmp->x400pXconTable_old) != NULL) {
+				x400pXconTable_destroy(&StorageTmp->x400pXconTable_old);
+				StorageTmp->x400pXconTable_rsvs = 0;
+				StorageTmp->x400pXconTable_tsts = 0;
+				StorageTmp->x400pXconTable_sets = 0;
 			}
 			break;
 		case RS_DESTROY:
-			/* row deletion, free it its dead */
 			x400pXconTable_destroy(&StorageDel);
-			/* x400pXconTable_destroy() can handle NULL pointers. */
 			break;
 		}
 		break;
 	case UNDO:
 		/* Back out any changes made in the ACTION case */
 		switch (set_value) {
+		case RS_CREATEANDGO:
+			/* deactivate with underlying device */
+			deactivate_x400pXconTable_row(StorageNew);
+			break;
+		case RS_CREATEANDWAIT:
+			break;
 		case RS_ACTIVE:
+			if (StorageTmp->x400pXconRowStatus == RS_NOTINSERVICE)
+				/* deactivate with underlying device */
+				deactivate_x400pXconTable_row(StorageTmp);
+			break;
 		case RS_NOTINSERVICE:
-			/* restore state */
-			StorageTmp->x400pXconRowStatus = old_value;
+			if (StorageTmp->x400pXconRowStatus == RS_ACTIVE)
+				/* activate with underlying device */
+				activate_x400pXconTable_row(StorageTmp);
+			break;
+		case RS_DESTROY:
 			break;
 		}
 		/* fall through */
@@ -12697,6 +16563,13 @@ write_x400pXconRowStatus(int action, u_char *var_val, u_char var_val_type, size_
 				x400pXconTable_del(StorageNew);
 				x400pXconTable_destroy(&StorageNew);
 			}
+			break;
+		case RS_ACTIVE:
+		case RS_NOTINSERVICE:
+			if ((StorageOld = StorageTmp->x400pXconTable_old) == NULL)
+				break;
+			if (--StorageTmp->x400pXconTable_rsvs == 0)
+				x400pXconTable_destroy(&StorageTmp->x400pXconTable_old);
 			break;
 		case RS_DESTROY:
 			/* row deletion, so add it again */
