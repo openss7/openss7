@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2012  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -85,20 +85,34 @@ extern int sa_request;			/* request number for per-request actions */
 
 /* our storage structure(s) */
 struct ds0Bundle_data {
+	struct ds0Bundle_data *ds0Bundle_old;
+	uint ds0Bundle_rsvs;
+	uint ds0Bundle_tsts;
+	uint ds0Bundle_sets;
 	uint ds0Bundle_request;
 	long dsx0BundleNextIndex;	/* ReadWrite */
 };
 struct dsx0BondingTable_data {
+	struct dsx0BondingTable_data *dsx0BondingTable_old;
+	uint dsx0BondingTable_rsvs;
+	uint dsx0BondingTable_tsts;
+	uint dsx0BondingTable_sets;
 	uint dsx0BondingTable_request;
 	uint dsx0BondingTable_refs;
+	uint dsx0BondingTable_id;
 	long ifIndex;			/* ReadOnly */
 	long dsx0BondMode;		/* Create */
 	long dsx0BondStatus;		/* ReadOnly */
 	long dsx0BondRowStatus;		/* Create */
 };
 struct dsx0BundleTable_data {
+	struct dsx0BundleTable_data *dsx0BundleTable_old;
+	uint dsx0BundleTable_rsvs;
+	uint dsx0BundleTable_tsts;
+	uint dsx0BundleTable_sets;
 	uint dsx0BundleTable_request;
 	uint dsx0BundleTable_refs;
+	uint dsx0BundleTable_id;
 	long dsx0BundleIndex;		/* NoAccess */
 	long dsx0BundleIfIndex;		/* ReadOnly */
 	uint8_t *dsx0BundleCircuitIdentifier;	/* Create */
@@ -141,6 +155,10 @@ void init_ds0Bundle(void);
 void deinit_ds0Bundle(void);
 int term_ds0Bundle(int majorID, int minorID, void *serverarg, void *clientarg);
 FindVarMethod var_ds0Bundle;
+struct ds0Bundle_data *ds0Bundle_create(void);
+struct ds0Bundle_data *ds0Bundle_duplicate(struct ds0Bundle_data *);
+int ds0Bundle_destroy(struct ds0Bundle_data **);
+int ds0Bundle_add(struct ds0Bundle_data *);
 void parse_ds0Bundle(const char *, char *);
 SNMPCallback store_ds0Bundle;
 void refresh_ds0Bundle(int);

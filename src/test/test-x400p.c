@@ -80,6 +80,7 @@ static char const ident[] = "$RCSfile: test-x400p.c,v $ $Name:  $($Revision: 1.1
 
 #define TEST_M2PA   0
 #define TEST_X400   1
+#define TEST_M2UA   0
 
 #include <sys/types.h>
 #include <stropts.h>
@@ -114,12 +115,12 @@ static char const ident[] = "$RCSfile: test-x400p.c,v $ $Name:  $($Revision: 1.1
 #include <getopt.h>
 #endif
 
-#if TEST_M2PA
+#if TEST_M2PA || TEST_M2UA
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
 #include <netdb.h>
-#endif				/* TEST_M2PA */
+#endif				/* TEST_M2PA || TEST_M2UA */
 
 #include <ss7/lmi.h>
 #include <ss7/lmi_ioctl.h>
@@ -133,10 +134,17 @@ static char const ident[] = "$RCSfile: test-x400p.c,v $ $Name:  $($Revision: 1.1
 #include <ss7/sdti_ioctl.h>
 #include <ss7/sli.h>
 #include <ss7/sli_ioctl.h>
-#if TEST_M2PA
+#if TEST_M2PA || TEST_M2UA
 #include <sys/npi.h>
 #include <sys/npi_sctp.h>
-#endif				/* TEST_M2PA */
+#endif				/* TEST_M2PA || TEST_M2UA */
+#if TEST_M2UA
+#include <xti.h>
+#include <tihdr.h>
+#include <timod.h>
+#include <xti_inet.h>
+#include <sys/xti_sctp.h>
+#endif				/* TEST_M2UA */
 
 #if __BYTE_ORDER == __BIG_ENDIAN
 #   define __constant_ntohl(x)	(x)
@@ -215,6 +223,7 @@ static const char *lpkgname = "SS7 MTP Level 2";
 static const char *lstdname = "Q.703/ANSI T1.111.3/JQ.703";
 static const char *sstdname = "Q.781";
 static const char *shortname = "MTP2";
+
 static char devname[256] = "/dev/streams/clone/x400p-sl";
 
 static int repeat_verbose = 0;
@@ -222,7 +231,7 @@ static int repeat_on_success = 0;
 static int repeat_on_failure = 0;
 static int exit_on_failure = 0;
 
-#if TEST_M2PA
+#if TEST_M2PA || TEST_M2UA
 static int client_port_specified = 0;
 static int server_port_specified = 0;
 static int client_host_specified = 0;
@@ -234,10 +243,23 @@ static int verbose = 1;
 static int client_exec = 0;		/* execute client side */
 static int server_exec = 0;		/* execute server side */
 
+#if TEST_M2UA
+static uint32_t aspid = 0;
+
+struct {
+	uint32_t num;
+	char text[32];
+} iids[2] = { {
+0,},};
+#endif				/* TEST_M2UA */
+
 static int show_msg = 0;
 static int show_acks = 0;
 static int show_timeout = 0;
+#if TEST_M2PA || TEST_X400
 static int show_fisus = 1;
+#endif				/* TEST_M2PA || TEST_X400 */
+
 #if TEST_X400
 static int show_msus = 1;
 #endif
@@ -268,7 +290,24 @@ static int DISCON_reason = 0;
 static int CONN_flags = 0;
 static int ERROR_type = 0;
 static int RESERVED_field[2] = { 0, 0 };
-#endif
+#endif				/* TEST_M2PA */
+
+#if 0
+static int PRIM_type = 0;
+static int CONIND_number = 2;
+static int TOKEN_value = 0;
+static int SEQ_number = 1;
+static int SERV_type = T_COTS_ORD;
+static int CURRENT_state = TS_UNBND;
+struct T_info_ack last_info = { 0, };
+
+static int DATA_xfer_flags = 0;
+static int BIND_flags = 0;
+static int DISCONN_reason = 0;
+static int CONN_flags = 0;
+static int ERROR_type = 0;
+static int RESERVED_field[2] = { 0, 0 };
+#endif				/* TEST_M2UA */
 
 #define TEST_PROTOCOL 132
 
@@ -331,12 +370,14 @@ static int test_gflags = 0;		/* MSG_BAND | MSG_HIPRI */
 static int test_gband = 0;
 static int test_timout = 200;
 
+#if TEST_M2PA || TEST_M2UA
+static struct sockaddr_in *ADDR_buffer = NULL;
+static socklen_t ADDR_length = sizeof(*ADDR_buffer);
+#endif				/* TEST_M2PA || TEST_M2UA */
 #if TEST_M2PA
 static int test_bufsize = 256;
 static int test_nidu = 256;
 static int OPTMGMT_flags = 0;
-static struct sockaddr_in *ADDR_buffer = NULL;
-static socklen_t ADDR_length = sizeof(*ADDR_buffer);
 static struct sockaddr_in *DEST_buffer = NULL;
 static socklen_t DEST_length = 0;
 static struct sockaddr_in *SRC_buffer = NULL;
@@ -348,7 +389,7 @@ static size_t DATA_length = 0;
 static int test_resfd = -1;
 static void *QOS_buffer = NULL;
 static int QOS_length = 0;
-#else
+#elif TEST_X400
 static unsigned short ptu_test_slot = PTU_TEST_SLOT;
 static unsigned short ptu_test_span = PTU_TEST_SPAN;
 static unsigned short ptu_test_chan = PTU_TEST_CHAN;
@@ -376,7 +417,7 @@ int flags = 0;
 
 int dummy = 0;
 
-#if TEST_M2PA
+#if TEST_M2PA || TEST_M2UA
 #ifndef SCTP_VERSION_2
 #define SCTP_VERSION_2
 #endif
@@ -492,15 +533,22 @@ enum {
  *  -------------------------------------------------------------------------
  */
 
-#if TEST_X400
+#if TEST_M2PA || TEST_X400
 static int ss7_pvar = SS7_PVAR_ITUT_00;
-#endif				/* TEST_X400 */
+#endif				/* TEST_M2PA || TEST_X400 */
 
 struct test_stats {
 	sdl_stats_t sdl;
 	sdt_stats_t sdt;
 	sl_stats_t sl;
 } iutstat = {};
+
+#if TEST_M2UA
+#define M2UA_VERSION_RFC3331	0xc5
+#define M2UA_VERSION_DEFAULT	M2UA_VERSION_RFC3331
+
+static int m2ua_version = M2UA_VERSION_DEFAULT;
+#endif				/* TEST_M2UA */
 
 #if TEST_M2PA
 #define M2PA_VERSION_DRAFT3	0x30
@@ -585,6 +633,7 @@ struct {
 },};
 #endif				/* TEST_M2PA */
 
+#if TEST_X400
 lmi_option_t lmi_default_e1_chan = {
 	.pvar = SS7_PVAR_ITUT_00,
 	.popt = 0,
@@ -771,6 +820,8 @@ sl_config_t sl_default_j1_span = {
 	.N2 = 8192,
 	.M = 5,
 };
+#endif					/* TEST_X400 */
+#if TEST_M2PA
 sl_config_t sl_default_m2pa = {
 	.t1 = 45 * 1000,
 	.t2 = 5 * 1000,
@@ -798,6 +849,8 @@ sl_config_t sl_default_m2pa = {
 	.N2 = 8192,
 	.M = 5,
 };
+#endif					/* TEST_M2PA */
+#if TEST_X400
 sdt_config_t sdt_default_e1_span = {
 	.Tin = 4,
 	.Tie = 1,
@@ -882,6 +935,8 @@ sdt_config_t sdt_default_j1_chan = {
 	.b = 8,
 	.f = SDT_FLAGS_ONE,
 };
+#endif					/* TEST_X400 */
+#if TEST_M2PA
 sdt_config_t sdt_default_m2pa = {
 	.Tin = 4,
 	.Tie = 1,
@@ -896,6 +951,8 @@ sdt_config_t sdt_default_m2pa = {
 	.b = 8,
 	.f = SDT_FLAGS_ONE,
 };
+#endif					/* TEST_M2PA */
+#if TEST_X400
 sdl_config_t sdl_default_e1_chan = {
 	.ifname = NULL,
 	.ifflags = 0,
@@ -1034,6 +1091,8 @@ sdl_config_t sdl_default_j1_span = {
 	.ifsyncsrc = {0, 0, 0, 0}
 	,
 };
+#endif					/* TEST_X400 */
+#if TEST_M2PA
 sdl_config_t sdl_default_m2pa = {
 	.ifname = NULL,
 	.ifflags = 0,
@@ -1057,6 +1116,7 @@ sdl_config_t sdl_default_m2pa = {
 	.ifsyncsrc = {0, 0, 0, 0}
 	,
 };
+#endif					/* TEST_M2PA */
 
 struct test_config {
 	lmi_option_t opt;
@@ -1071,7 +1131,7 @@ struct test_config {
 	{
 		.ifname = NULL,	/* */
 		    .ifflags = 0,	/* */
-#if TEST_X400
+#if TEST_X400 || TEST_M2UA
 		    .iftype = SDL_TYPE_DS0,	/* */
 		    .ifrate = 64000,	/* */
 		    .ifgtype = SDL_GTYPE_NONE,	/* */
@@ -1109,7 +1169,7 @@ struct test_config {
 		    .Ue = 144292000,	/* Ue - EIM error increment */
 		    .N = 16,	/* N */
 		    .m = 272,	/* m */
-		    .b = 8,	/* b */
+		    .b = 64,	/* b */
 		    .f = SDT_FLAGS_ONE,	/* f */
 	},			/* sdt */
 	{
@@ -1168,6 +1228,7 @@ typedef struct timer_range {
 
 enum { t1 = 0, t2, t3, t4n, t4e, t5, t6, t7, tmax };
 
+#if TEST_M2PA || TEST_X400
 static timer_range_t timer[tmax] = {
 	{40000, 50000, "T1"},	/* Timer T1 30000 */
 	{5000, 150000, "T2"},	/* Timer T2 5000 */
@@ -1178,6 +1239,7 @@ static timer_range_t timer[tmax] = {
 	{3000, 6000, "T6"},	/* Timer T6 300 */
 	{500, 2000, "T7"}	/* Timer T7 50 */
 };
+#endif				/* TEST_M2PA || TEST_X400 */
 
 long test_start = 0;
 
@@ -1194,6 +1256,7 @@ static const char *failure_string = NULL;
 #define lockf(x,y,z) 0
 #endif
 
+#if TEST_M2PA || TEST_X400
 /*
  *  Return the current time in milliseconds.
  */
@@ -1321,6 +1384,7 @@ check_time(int child, const char *t, long beg, long lo, long hi)
 	else
 		return __RESULT_FAILURE;
 }
+#endif				/* TEST_M2PA || TEST_X400 */
 
 static int
 time_event(int child, int event)
@@ -1474,7 +1538,9 @@ stop_tt(void)
 	return (result);
 }
 
+#if TEST_M2PA || TEST_X400
 static long beg_time = 0;
+#endif				/* TEST_M2PA || TEST_X400 */
 
 #if TEST_X400
 static int event = 0;
@@ -1486,8 +1552,6 @@ static int oldisb = 0;
 static int oldret = 0;
 static int cntret = 0;
 #endif				/* TEST_X400 */
-
-#define TEST_PORT_NUMBER 18000
 
 #if TEST_M2PA
 /*
@@ -1528,7 +1592,9 @@ static int cntret = 0;
 #define M2PA_STATUS_OUT_OF_SERVICE		(__constant_htonl(9))
 #define M2PA_STATUS_NONE			(__constant_htonl(10))
 #define M2PA_STATUS_INVALID			(__constant_htonl(11))
+#endif				/* TEST_M2PA */
 
+#if TEST_M2PA || TEST_M2UA
 /*
  *  Addresses
  */
@@ -1542,9 +1608,13 @@ struct sockaddr_in addrs[4][3];
 struct sockaddr_in addrs[4];
 #endif
 int anums[4] = { 3, 3, 3, 3 };
-unsigned short ports[4] = { TEST_PORT_NUMBER+0, TEST_PORT_NUMBER+1, TEST_PORT_NUMBER+2, TEST_PORT_NUMBER+3 };
-const char *addr_strings[4] = { "127.0.0.1", "127.0.0.2", "127.0.0.3", "127.0.0.4" };
 
+#define TEST_PORT_NUMBER 18000
+unsigned short ports[4] = { TEST_PORT_NUMBER + 0, TEST_PORT_NUMBER + 1, TEST_PORT_NUMBER + 2, TEST_PORT_NUMBER + 3 };
+const char *addr_strings[4] = { "127.0.0.1", "127.0.0.2", "127.0.0.3", "127.0.0.4" };
+#endif				/* TEST_M2PA || TEST_M2UA */
+
+#if TEST_M2PA
 /*
  *  Options
  */
@@ -1853,6 +1923,80 @@ errno_string(long err)
 	}
 	}
 }
+
+#if TEST_M2UA
+char *
+terrno_string(t_uscalar_t terr, t_scalar_t uerr)
+{
+	switch (terr) {
+	case TBADADDR:
+		return ("[TBADADDR]");
+	case TBADOPT:
+		return ("[TBADOPT]");
+	case TACCES:
+		return ("[TACCES]");
+	case TBADF:
+		return ("[TBADF]");
+	case TNOADDR:
+		return ("[TNOADDR]");
+	case TOUTSTATE:
+		return ("[TOUTSTATE]");
+	case TBADSEQ:
+		return ("[TBADSEQ]");
+	case TSYSERR:
+		return errno_string(uerr);
+	case TLOOK:
+		return ("[TLOOK]");
+	case TBADDATA:
+		return ("[TBADDATA]");
+	case TBUFOVFLW:
+		return ("[TBUFOVFLW]");
+	case TFLOW:
+		return ("[TFLOW]");
+	case TNODATA:
+		return ("[TNODATA]");
+	case TNODIS:
+		return ("[TNODIS]");
+	case TNOUDERR:
+		return ("[TNOUDERR]");
+	case TBADFLAG:
+		return ("[TBADFLAG]");
+	case TNOREL:
+		return ("[TNOREL]");
+	case TNOTSUPPORT:
+		return ("[TNOTSUPPORT]");
+	case TSTATECHNG:
+		return ("[TSTATECHNG]");
+	case TNOSTRUCTYPE:
+		return ("[TNOSTRUCTYPE]");
+	case TBADNAME:
+		return ("[TBADNAME]");
+	case TBADQLEN:
+		return ("[TBADQLEN]");
+	case TADDRBUSY:
+		return ("[TADDRBUSY]");
+	case TINDOUT:
+		return ("[TINDOUT]");
+	case TPROVMISMATCH:
+		return ("[TPROVMISMATCH]");
+	case TRESQLEN:
+		return ("[TRESQLEN]");
+	case TRESADDR:
+		return ("[TRESADDR]");
+	case TQFULL:
+		return ("[TQFULL]");
+	case TPROTO:
+		return ("[TPROTO]");
+	default:
+	{
+		static char buf[32];
+
+		snprintf(buf, sizeof(buf), "[%lu]", (ulong) terr);
+		return buf;
+	}
+	}
+}
+#endif				/* TEST_M2UA */
 
 #if TEST_M2PA
 char *
@@ -2229,6 +2373,70 @@ event_string(int child, int event)
 	case __TEST_ERROR_IND:
 		return ("!error ind");
 #endif				/* TEST_X400 */
+#if TEST_M2UA
+	case __TEST_CONN_REQ:
+		return ("T_CONN_REQ");
+	case __TEST_CONN_RES:
+		return ("T_CONN_RES");
+	case __TEST_DISCON_REQ:
+		return ("T_DISCON_REQ");
+	case __TEST_DATA_REQ:
+		return ("T_DATA_REQ");
+	case __TEST_EXDATA_REQ:
+		return ("T_EXDATA_REQ");
+	case __TEST_OPTDATA_REQ:
+		return ("T_OPTDATA_REQ");
+	case __TEST_INFO_REQ:
+		return ("T_INFO_REQ");
+	case __TEST_BIND_REQ:
+		return ("T_BIND_REQ");
+	case __TEST_UNBIND_REQ:
+		return ("T_UNBIND_REQ");
+	case __TEST_UNITDATA_REQ:
+		return ("T_UNITDATA_REQ");
+	case __TEST_OPTMGMT_REQ:
+		return ("T_OPTMGMT_REQ");
+	case __TEST_ORDREL_REQ:
+		return ("T_ORDREL_REQ");
+	case __TEST_CONN_IND:
+		return ("T_CONN_IND");
+	case __TEST_CONN_CON:
+		return ("T_CONN_CON");
+	case __TEST_DISCON_IND:
+		return ("T_DISCON_IND");
+	case __TEST_DATA_IND:
+		return ("T_DATA_IND");
+	case __TEST_EXDATA_IND:
+		return ("T_EXDATA_IND");
+	case __TEST_NRM_OPTDATA_IND:
+		return ("T_OPTDATA_IND");
+	case __TEST_EXP_OPTDATA_IND:
+		return ("T_OPTDATA_IND");
+	case __TEST_INFO_ACK:
+		return ("T_INFO_ACK");
+	case __TEST_BIND_ACK:
+		return ("T_BIND_ACK");
+	case __TEST_ERROR_ACK:
+		return ("T_ERROR_ACK");
+	case __TEST_OK_ACK:
+		return ("T_OK_ACK");
+	case __TEST_UNITDATA_IND:
+		return ("T_UNITDATA_IND");
+	case __TEST_UDERROR_IND:
+		return ("T_UDERROR_IND");
+	case __TEST_OPTMGMT_ACK:
+		return ("T_OPTMGMT_ACK");
+	case __TEST_ORDREL_IND:
+		return ("T_ORDREL_IND");
+	case __TEST_ADDR_REQ:
+		return ("T_ADDR_REQ");
+	case __TEST_ADDR_ACK:
+		return ("T_ADDR_ACK");
+	case __TEST_CAPABILITY_REQ:
+		return ("T_CAPABILITY_REQ");
+	case __TEST_CAPABILITY_ACK:
+		return ("T_CAPABILITY_ACK");
+#endif
 #if TEST_M2PA
 	case __TEST_CONN_REQ:
 		return ("N_CONN_REQ");
@@ -2653,6 +2861,66 @@ poll_events_string(short events)
 	return (string);
 }
 
+#if TEST_M2UA
+const char *
+service_type(t_uscalar_t type)
+{
+	switch (type) {
+	case T_CLTS:
+		return ("T_CLTS");
+	case T_COTS:
+		return ("T_COTS");
+	case T_COTS_ORD:
+		return ("T_COTS_ORD");
+	default:
+		return ("(unknown)");
+	}
+}
+
+const char *
+state_string(t_uscalar_t state)
+{
+	switch (state) {
+	case TS_UNBND:
+		return ("TS_UNBND");
+	case TS_WACK_BREQ:
+		return ("TS_WACK_BREQ");
+	case TS_WACK_UREQ:
+		return ("TS_WACK_UREQ");
+	case TS_IDLE:
+		return ("TS_IDLE");
+	case TS_WACK_OPTREQ:
+		return ("TS_WACK_OPTREQ");
+	case TS_WACK_CREQ:
+		return ("TS_WACK_CREQ");
+	case TS_WCON_CREQ:
+		return ("TS_WCON_CREQ");
+	case TS_WRES_CIND:
+		return ("TS_WRES_CIND");
+	case TS_WACK_CRES:
+		return ("TS_WACK_CRES");
+	case TS_DATA_XFER:
+		return ("TS_DATA_XFER");
+	case TS_WIND_ORDREL:
+		return ("TS_WIND_ORDREL");
+	case TS_WREQ_ORDREL:
+		return ("TS_WRES_ORDREL");
+	case TS_WACK_DREQ6:
+		return ("TS_WACK_DREQ6");
+	case TS_WACK_DREQ7:
+		return ("TS_WACK_DREQ7");
+	case TS_WACK_DREQ9:
+		return ("TS_WACK_DREQ9");
+	case TS_WACK_DREQ10:
+		return ("TS_WACK_DREQ10");
+	case TS_WACK_DREQ11:
+		return ("TS_WACK_DREQ11");
+	default:
+		return ("(unknown)");
+	}
+}
+#endif				/* TEST_M2UA */
+
 #if TEST_X400
 void print_string(int child, const char *string);
 void
@@ -2665,6 +2933,7 @@ print_ppa(int child, ppa_t * ppa)
 }
 #endif				/* TEST_X400 */
 void print_string_val(int child, const char *string, ulong val);
+#if TEST_X400
 void print_string(int child, const char *string);
 void
 print_lmi_options(int child, lmi_option_t *o)
@@ -2730,6 +2999,7 @@ print_lmi_options(int child, lmi_option_t *o)
 	if (o->popt & SS7_POPT_NOPR)
 		print_string(child, "SS7_POPT_NOPR");
 }
+#endif				/* TEST_X400 */
 void
 print_sdl_stats(int child, sdl_stats_t * s)
 {
@@ -2752,6 +3022,7 @@ print_sdl_stats(int child, sdl_stats_t * s)
 	if (s->carrier_lost)
 		print_string_val(child, "carrier_lost", s->carrier_lost);
 }
+#if TEST_X400
 void
 print_sdl_config(int child, sdl_config_t * c)
 {
@@ -3118,6 +3389,7 @@ print_sdl_config(int child, sdl_config_t * c)
 	print_string_val(child, "ifsyncsrc[2]", c->ifsyncsrc[2]);
 	print_string_val(child, "ifsyncsrc[3]", c->ifsyncsrc[3]);
 }
+#endif					/* TEST_X400 */
 
 void
 print_sdt_stats(int child, sdt_stats_t * s)
@@ -3175,6 +3447,7 @@ print_sdt_stats(int child, sdt_stats_t * s)
 	if (s->carrier_lost)
 		print_string_val(child, "carrier_lost", s->carrier_lost);
 }
+#if TEST_X400
 void
 print_sdt_config(int child, sdt_config_t * c)
 {
@@ -3207,6 +3480,7 @@ print_sdt_config(int child, sdt_config_t * c)
 		break;
 	}
 }
+#endif					/* TEST_X400 */
 
 void
 print_sl_stats(int child, sl_stats_t *s)
@@ -3256,6 +3530,7 @@ print_sl_stats(int child, sl_stats_t *s)
 	if (s->sl_cong_discd_ind[3])
 		print_string_val(child, "sl_cong_discd_ind[3]", s->sl_cong_discd_ind[3]);
 }
+#if TEST_X400
 void
 print_sl_config(int child, sl_config_t * c)
 {
@@ -3285,6 +3560,7 @@ print_sl_config(int child, sl_config_t * c)
 	print_string_val(child, "N2", c->N2);
 	print_string_val(child, "M", c->M);
 }
+#endif					/* TEST_X400 */
 
 #if TEST_M2PA
 const char *
@@ -3359,7 +3635,9 @@ state_string(np_ulong state)
 		return ("(unknown)");
 	}
 }
+#endif				/* TEST_M2PA */
 
+#if TEST_M2PA || TEST_M2UA
 #ifndef SCTP_VERSION_2
 void
 print_addr(char *add_ptr, size_t add_len)
@@ -3511,7 +3789,7 @@ print_prots(int child, char *pro_ptr, size_t pro_len)
 	}
 }
 
-#if 0
+#if TEST_M2UA
 char *
 status_string(struct t_opthdr *oh)
 {
@@ -3914,7 +4192,7 @@ value_string(int child, struct t_opthdr *oh)
 }
 #endif
 
-#if 0
+#if TEST_M2UA
 void
 parse_options(int fd, char *opt_ptr, size_t opt_len)
 {
@@ -3944,6 +4222,34 @@ parse_options(int fd, char *opt_ptr, size_t opt_len)
 }
 #endif
 
+#if TEST_M2UA
+char *
+mgmtflag_string(t_uscalar_t flag)
+{
+	switch (flag) {
+	case T_NEGOTIATE:
+		return ("T_NEGOTIATE");
+	case T_CHECK:
+		return ("T_CHECK");
+	case T_DEFAULT:
+		return ("T_DEFAULT");
+	case T_SUCCESS:
+		return ("T_SUCCESS");
+	case T_FAILURE:
+		return ("T_FAILURE");
+	case T_CURRENT:
+		return ("T_CURRENT");
+	case T_PARTSUCCESS:
+		return ("T_PARTSUCCESS");
+	case T_READONLY:
+		return ("T_READONLY");
+	case T_NOTSUPPORT:
+		return ("T_NOTSUPPORT");
+	}
+	return "(unknown flag)";
+}
+#endif				/* TEST_M2UA */
+#if TEST_M2PA || TEST_X400
 const char *
 mgmtflag_string(np_ulong flag)
 {
@@ -3956,8 +4262,9 @@ mgmtflag_string(np_ulong flag)
 		return ("(unknown flags)");
 	}
 }
+#endif				/* TEST_M2PA || TEST_X400 */
 
-#if 0
+#if TEST_M2UA
 char *
 size_string(t_uscalar_t size)
 {
@@ -3975,7 +4282,192 @@ size_string(t_uscalar_t size)
 	return buf;
 }
 #endif
+#endif				/* TEST_M2PA || TEST_M2UA */
 
+#if TEST_M2UA
+#if 0
+const char *
+prim_string(t_uscalar_t prim)
+{
+	switch (prim) {
+	case T_CONN_REQ:
+		return ("T_CONN_REQ------");
+	case T_CONN_RES:
+		return ("T_CONN_RES------");
+	case T_DISCON_REQ:
+		return ("T_DISCON_REQ----");
+	case T_DATA_REQ:
+		return ("T_DATA_REQ------");
+	case T_EXDATA_REQ:
+		return ("T_EXDATA_REQ----");
+	case T_INFO_REQ:
+		return ("T_INFO_REQ------");
+	case T_BIND_REQ:
+		return ("T_BIND_REQ------");
+	case T_UNBIND_REQ:
+		return ("T_UNBIND_REQ----");
+	case T_UNITDATA_REQ:
+		return ("T_UNITDATA_REQ--");
+	case T_OPTMGMT_REQ:
+		return ("T_OPTMGMT_REQ---");
+	case T_ORDREL_REQ:
+		return ("T_ORDREL_REQ----");
+	case T_OPTDATA_REQ:
+		return ("T_OPTDATA_REQ---");
+	case T_ADDR_REQ:
+		return ("T_ADDR_REQ------");
+	case T_CAPABILITY_REQ:
+		return ("T_CAPABILITY_REQ");
+	case T_CONN_IND:
+		return ("T_CONN_IND------");
+	case T_CONN_CON:
+		return ("T_CONN_CON------");
+	case T_DISCON_IND:
+		return ("T_DISCON_IND----");
+	case T_DATA_IND:
+		return ("T_DATA_IND------");
+	case T_EXDATA_IND:
+		return ("T_EXDATA_IND----");
+	case T_INFO_ACK:
+		return ("T_INFO_ACK------");
+	case T_BIND_ACK:
+		return ("T_BIND_ACK------");
+	case T_ERROR_ACK:
+		return ("T_ERROR_ACK-----");
+	case T_OK_ACK:
+		return ("T_OK_ACK--------");
+	case T_UNITDATA_IND:
+		return ("T_UNITDATA_IND--");
+	case T_UDERROR_IND:
+		return ("T_UDERROR_IND---");
+	case T_OPTMGMT_ACK:
+		return ("T_OPTMGMT_ACK---");
+	case T_ORDREL_IND:
+		return ("T_ORDREL_IND----");
+	case T_OPTDATA_IND:
+		return ("T_OPTDATA_IND---");
+	case T_ADDR_ACK:
+		return ("T_ADDR_ACK------");
+	case T_CAPABILITY_ACK:
+		return ("T_CAPABILITY_ACK");
+	default:
+		return ("T_????_??? -----");
+	}
+}
+#endif
+#endif				/* TEST_M2UA */
+
+#if TEST_M2UA
+char *
+t_errno_string(t_scalar_t err, t_scalar_t syserr)
+{
+	switch (err) {
+	case 0:
+		return ("ok");
+	case TBADADDR:
+		return ("[TBADADDR]");
+	case TBADOPT:
+		return ("[TBADOPT]");
+	case TACCES:
+		return ("[TACCES]");
+	case TBADF:
+		return ("[TBADF]");
+	case TNOADDR:
+		return ("[TNOADDR]");
+	case TOUTSTATE:
+		return ("[TOUTSTATE]");
+	case TBADSEQ:
+		return ("[TBADSEQ]");
+	case TSYSERR:
+		return errno_string(syserr);
+	case TLOOK:
+		return ("[TLOOK]");
+	case TBADDATA:
+		return ("[TBADDATA]");
+	case TBUFOVFLW:
+		return ("[TBUFOVFLW]");
+	case TFLOW:
+		return ("[TFLOW]");
+	case TNODATA:
+		return ("[TNODATA]");
+	case TNODIS:
+		return ("[TNODIS]");
+	case TNOUDERR:
+		return ("[TNOUDERR]");
+	case TBADFLAG:
+		return ("[TBADFLAG]");
+	case TNOREL:
+		return ("[TNOREL]");
+	case TNOTSUPPORT:
+		return ("[TNOTSUPPORT]");
+	case TSTATECHNG:
+		return ("[TSTATECHNG]");
+	case TNOSTRUCTYPE:
+		return ("[TNOSTRUCTYPE]");
+	case TBADNAME:
+		return ("[TBADNAME]");
+	case TBADQLEN:
+		return ("[TBADQLEN]");
+	case TADDRBUSY:
+		return ("[TADDRBUSY]");
+	case TINDOUT:
+		return ("[TINDOUT]");
+	case TPROVMISMATCH:
+		return ("[TPROVMISMATCH]");
+	case TRESQLEN:
+		return ("[TRESQLEN]");
+	case TRESADDR:
+		return ("[TRESADDR]");
+	case TQFULL:
+		return ("[TQFULL]");
+	case TPROTO:
+		return ("[TPROTO]");
+	default:
+	{
+		static char buf[32];
+
+		snprintf(buf, sizeof(buf), "[%ld]", (long) err);
+		return buf;
+	}
+	}
+}
+
+char *
+t_look_string(int look)
+{
+	switch (look) {
+	case 0:
+		return ("(NO EVENT)");
+	case T_LISTEN:
+		return ("(T_LISTEN)");
+	case T_CONNECT:
+		return ("(T_CONNECT)");
+	case T_DATA:
+		return ("(T_DATA)");
+	case T_EXDATA:
+		return ("(T_EXDATA)");
+	case T_DISCONNECT:
+		return ("(T_DISCONNECT)");
+	case T_UDERR:
+		return ("(T_UDERR)");
+	case T_ORDREL:
+		return ("(T_ORDREL)");
+	case T_GODATA:
+		return ("(T_GODATA)");
+	case T_GOEXDATA:
+		return ("(T_GOEXDATA)");
+	default:
+	{
+		static char buf[32];
+
+		snprintf(buf, sizeof(buf), "(%d)", look);
+		return buf;
+	}
+	}
+}
+#endif				/* TEST_M2UA */
+
+#if TEST_M2PA
 const char *
 reset_reason_string(np_ulong RESET_reason)
 {
@@ -4261,6 +4753,68 @@ prim_string(int prim)
 	case N_DATACK_IND:
 		return ("N_DATACK_IND----");
 #endif				/* TEST_M2PA */
+#if TEST_M2UA
+	case T_CONN_REQ:
+		return ("T_CONN_REQ------");
+	case T_CONN_RES:
+		return ("T_CONN_RES------");
+	case T_DISCON_REQ:
+		return ("T_DISCON_REQ----");
+	case T_DATA_REQ:
+		return ("T_DATA_REQ------");
+	case T_EXDATA_REQ:
+		return ("T_EXDATA_REQ----");
+	case T_INFO_REQ:
+		return ("T_INFO_REQ------");
+	case T_BIND_REQ:
+		return ("T_BIND_REQ------");
+	case T_UNBIND_REQ:
+		return ("T_UNBIND_REQ----");
+	case T_UNITDATA_REQ:
+		return ("T_UNITDATA_REQ--");
+	case T_OPTMGMT_REQ:
+		return ("T_OPTMGMT_REQ---");
+	case T_ORDREL_REQ:
+		return ("T_ORDREL_REQ----");
+	case T_OPTDATA_REQ:
+		return ("T_OPTDATA_REQ---");
+	case T_ADDR_REQ:
+		return ("T_ADDR_REQ------");
+	case T_CAPABILITY_REQ:
+		return ("T_CAPABILITY_REQ");
+	case T_CONN_IND:
+		return ("T_CONN_IND------");
+	case T_CONN_CON:
+		return ("T_CONN_CON------");
+	case T_DISCON_IND:
+		return ("T_DISCON_IND----");
+	case T_DATA_IND:
+		return ("T_DATA_IND------");
+	case T_EXDATA_IND:
+		return ("T_EXDATA_IND----");
+	case T_INFO_ACK:
+		return ("T_INFO_ACK------");
+	case T_BIND_ACK:
+		return ("T_BIND_ACK------");
+	case T_ERROR_ACK:
+		return ("T_ERROR_ACK-----");
+	case T_OK_ACK:
+		return ("T_OK_ACK--------");
+	case T_UNITDATA_IND:
+		return ("T_UNITDATA_IND--");
+	case T_UDERROR_IND:
+		return ("T_UDERROR_IND---");
+	case T_OPTMGMT_ACK:
+		return ("T_OPTMGMT_ACK---");
+	case T_ORDREL_IND:
+		return ("T_ORDREL_IND----");
+	case T_OPTDATA_IND:
+		return ("T_OPTDATA_IND---");
+	case T_ADDR_ACK:
+		return ("T_ADDR_ACK------");
+	case T_CAPABILITY_ACK:
+		return ("T_CAPABILITY_ACK");
+#endif				/* TEST_M2UA */
 	case SL_REMOTE_PROCESSOR_OUTAGE_IND:
 		return ("!rpo");
 	case SL_REMOTE_PROCESSOR_RECOVERED_IND:
@@ -4835,6 +5389,7 @@ print_rx_msg_sn(int child, const char *string, uint32_t bsn, uint32_t fsn)
 		print_string_state_sn(child, msgs, string, bsn, fsn);
 }
 
+#if TEST_X400 || TEST_M2PA
 void
 print_tx_msg(int child, const char *string)
 {
@@ -4912,6 +5467,7 @@ print_rx_msg(int child, const char *string)
 #endif				/* TEST_M2PA */
 	}
 }
+#endif				/* TEST_X400 || TEST_M2PA */
 
 void
 print_ack_prim(int child, const char *command)
@@ -5287,15 +5843,15 @@ print_mwaiting(int child, struct timespec *time)
 	}
 }
 
-#if TEST_M2PA
+#if TEST_M2PA || TEST_M2UA
 void
-print_mgmtflag(int child, np_ulong flag)
+print_mgmtflag(int child, uint flag)
 {
 	print_string(child, mgmtflag_string(flag));
 }
-#endif				/* TEST_M2PA */
+#endif				/* TEST_M2PA || TEST_M2UA */
 
-#if 0
+#if TEST_M2UA
 void
 print_opt_level(int child, struct t_opthdr *oh)
 {
@@ -5343,7 +5899,44 @@ print_opt_value(int child, struct t_opthdr *oh)
 	if (value)
 		print_string(child, value);
 }
-#endif
+#endif				/* TEST_M2UA */
+
+#if TEST_M2UA
+void
+print_options(int child, const char *cmd_buf, size_t opt_ofs, size_t opt_len)
+{
+	struct t_opthdr *oh;
+	const char *opt_ptr = cmd_buf + opt_ofs;
+	char buf[64];
+
+	if (verbose < 4)
+		return;
+	snprintf(buf, sizeof(buf), "opt len = %lu", (ulong) opt_len);
+	print_string(child, buf);
+	snprintf(buf, sizeof(buf), "opt ofs = %lu", (ulong) opt_ofs);
+	print_string(child, buf);
+	oh = _T_OPT_FIRSTHDR_OFS(opt_ptr, opt_len, 0);
+	if (oh) {
+		for (; oh; oh = _T_OPT_NEXTHDR_OFS(opt_ptr, opt_len, oh, 0)) {
+			int len = oh->len - sizeof(*oh);
+
+			print_opt_level(child, oh);
+			print_opt_name(child, oh);
+			print_opt_status(child, oh);
+			print_opt_length(child, oh);
+			if (len < 0)
+				break;
+			print_opt_value(child, oh);
+		}
+	} else {
+		oh = (typeof(oh)) opt_ptr;
+		print_opt_level(child, oh);
+		print_opt_name(child, oh);
+		print_opt_status(child, oh);
+		print_opt_length(child, oh);
+	}
+}
+#endif				/* TEST_M2UA */
 
 #if 0
 void
@@ -5435,19 +6028,19 @@ print_info(int child, N_info_ack_t *info)
 
 	if (verbose < 4 || !show)
 		return;
-	snprintf(buf, sizeof(buf), "NSDU_size = %d", (int) info->NSDU_size);
+	snprintf(buf, sizeof(buf), "NSDU_size = %ld", (long) info->NSDU_size);
 	print_string(child, buf);
-	snprintf(buf, sizeof(buf), "ENSDU_size = %d", (int) info->ENSDU_size);
+	snprintf(buf, sizeof(buf), "ENSDU_size = %ld", (long) info->ENSDU_size);
 	print_string(child, buf);
-	snprintf(buf, sizeof(buf), "CDATA_size = %d", (int) info->CDATA_size);
+	snprintf(buf, sizeof(buf), "CDATA_size = %ld", (long) info->CDATA_size);
 	print_string(child, buf);
-	snprintf(buf, sizeof(buf), "DDATA_size = %d", (int) info->DDATA_size);
+	snprintf(buf, sizeof(buf), "DDATA_size = %ld", (long) info->DDATA_size);
 	print_string(child, buf);
-	snprintf(buf, sizeof(buf), "ADDR_size = %d", (int) info->ADDR_size);
+	snprintf(buf, sizeof(buf), "ADDR_size = %ld", (long) info->ADDR_size);
 	print_string(child, buf);
-	snprintf(buf, sizeof(buf), "OPTIONS_flags = %x", (int) info->OPTIONS_flags);
+	snprintf(buf, sizeof(buf), "OPTIONS_flags = %lx", (long) info->OPTIONS_flags);
 	print_string(child, buf);
-	snprintf(buf, sizeof(buf), "NIDU_size = %d", (int) info->NIDU_size);
+	snprintf(buf, sizeof(buf), "NIDU_size = %ld", (long) info->NIDU_size);
 	print_string(child, buf);
 	snprintf(buf, sizeof(buf), "<%s>", service_type(info->SERV_type));
 	print_string(child, buf);
@@ -5455,9 +6048,9 @@ print_info(int child, N_info_ack_t *info)
 	print_string(child, buf);
 	snprintf(buf, sizeof(buf), "<%s>", provider_type(info->PROVIDER_type));
 	print_string(child, buf);
-	snprintf(buf, sizeof(buf), "NODU_size = %d", (int) info->NODU_size);
+	snprintf(buf, sizeof(buf), "NODU_size = %ld", (long) info->NODU_size);
 	print_string(child, buf);
-	snprintf(buf, sizeof(buf), "NPI_version = %d", (int) info->NPI_version);
+	snprintf(buf, sizeof(buf), "NPI_version = %ld", (long) info->NPI_version);
 	print_string(child, buf);
 }
 
@@ -5526,6 +6119,36 @@ ip_datack_req(int fd)
 	return (ret);
 }
 #endif
+#if TEST_M2UA
+void
+print_info(int child, struct T_info_ack *info)
+{
+	char buf[64];
+
+	if (verbose < 4)
+		return;
+	snprintf(buf, sizeof(buf), "TSDU  = %ld", (long) info->TSDU_size);
+	print_string(child, buf);
+	snprintf(buf, sizeof(buf), "ETSDU = %ld", (long) info->ETSDU_size);
+	print_string(child, buf);
+	snprintf(buf, sizeof(buf), "CDATA = %ld", (long) info->CDATA_size);
+	print_string(child, buf);
+	snprintf(buf, sizeof(buf), "DDATA = %ld", (long) info->DDATA_size);
+	print_string(child, buf);
+	snprintf(buf, sizeof(buf), "ADDR  = %ld", (long) info->ADDR_size);
+	print_string(child, buf);
+	snprintf(buf, sizeof(buf), "OPT   = %ld", (long) info->OPT_size);
+	print_string(child, buf);
+	snprintf(buf, sizeof(buf), "TIDU  = %ld", (long) info->TIDU_size);
+	print_string(child, buf);
+	snprintf(buf, sizeof(buf), "<%s>", service_type(info->SERV_type));
+	print_string(child, buf);
+	snprintf(buf, sizeof(buf), "<%s>", state_string(info->CURRENT_state));
+	print_string(child, buf);
+	snprintf(buf, sizeof(buf), "PROV  = %ld", (long) info->PROVIDER_flag);
+	print_string(child, buf);
+}
+#endif				/* TEST_M2UA */
 
 /*
  *  -------------------------------------------------------------------------
@@ -5691,30 +6314,30 @@ test_m2pa_status(int child, uint32_t status)
 	struct strbuf *ctrl = &ctrl_buf;
 	struct strbuf *data = &data_buf;
 	union N_primitives *p = (typeof(p)) cbuf;
+        uint32_t *d = (typeof(d)) dbuf;
 
 	switch (m2pa_version) {
 	case M2PA_VERSION_DRAFT3:
 	case M2PA_VERSION_DRAFT3_1:
 		data->len = 3 * sizeof(uint32_t);
-		((uint32_t *) dbuf)[0] = M2PA_STATUS_MESSAGE;
-		((uint32_t *) dbuf)[1] = htonl(data->len);
-		((uint32_t *) dbuf)[2] = status;
+		d[0] = M2PA_STATUS_MESSAGE;
+		d[1] = htonl(data->len);
+		d[2] = status;
 		break;
 	case M2PA_VERSION_DRAFT4:
 	case M2PA_VERSION_DRAFT4_1:
 		data->len = 4 * sizeof(uint32_t);
-		((uint32_t *) dbuf)[0] = M2PA_STATUS_MESSAGE;
-		((uint32_t *) dbuf)[1] = htonl(data->len);
-		((uint16_t *) dbuf)[4] = htons(bsn[child]);
-		((uint16_t *) dbuf)[5] = htons(fsn[child]);
-		((uint32_t *) dbuf)[3] = status;
+		d[0] = M2PA_STATUS_MESSAGE;
+		d[1] = htonl(data->len);
+		d[2] = htonl(((bsn[child] & 0x0000ffff) << 16) | (fsn[child] & 0x0000ffff));
+		d[3] = status;
 		break;
 	case M2PA_VERSION_DRAFT6_9:
 	case M2PA_VERSION_DRAFT7:
 		data->len = 3 * sizeof(uint32_t);
-		((uint32_t *) dbuf)[0] = M2PA_STATUS_MESSAGE;
-		((uint32_t *) dbuf)[1] = htonl(data->len);
-		((uint32_t *) dbuf)[2] = status;
+		d[0] = M2PA_STATUS_MESSAGE;
+		d[1] = htonl(data->len);
+		d[2] = status;
 		break;
 	case M2PA_VERSION_DRAFT4_9:
 	case M2PA_VERSION_DRAFT5:
@@ -5725,11 +6348,11 @@ test_m2pa_status(int child, uint32_t status)
 	case M2PA_VERSION_DRAFT11:
 	case M2PA_VERSION_RFC4165:
 		data->len = 5 * sizeof(uint32_t);
-		((uint32_t *) dbuf)[0] = M2PA_STATUS_MESSAGE;
-		((uint32_t *) dbuf)[1] = htonl(data->len);
-		((uint32_t *) dbuf)[2] = htonl(bsn[child] & 0x00ffffff);
-		((uint32_t *) dbuf)[3] = htonl(fsn[child] & 0x00ffffff);
-		((uint32_t *) dbuf)[4] = status;
+		d[0] = M2PA_STATUS_MESSAGE;
+		d[1] = htonl(data->len);
+		d[2] = htonl(bsn[child] & 0x00ffffff);
+		d[3] = htonl(fsn[child] & 0x00ffffff);
+		d[4] = status;
 		break;
 	default:
 		return __RESULT_SCRIPT_ERROR;
@@ -6254,9 +6877,15 @@ test_pop(int child)
 /*
  *  -------------------------------------------------------------------------
  *
- *  Stream Initialization
+ *  STREAM Initialization
  *
  *  -------------------------------------------------------------------------
+ */
+
+/*
+ *  For M2UA, for diagramtic purposes, stream 0 is the SG stream (PTU); stream 1 and 2 are AS
+ *  streams (IUT).  Stream 0 starts as a listening SCTP stream (unless server connects is
+ *  specified).
  */
 
 static int
@@ -6353,9 +6982,23 @@ test_msleep(int child, unsigned long m)
  *  -------------------------------------------------------------------------
  */
 
+/*
+ * First step is to perform an I_PUNLINK operation with MUXID_ALL on the m2ua-as to remove any
+ * previous linked streams from a previous failed test case run.  To begin tests requires the
+ * opening of an sctp_t stream for the ASP and an sctp_t stream for the SG.  The ASP stream connects
+ * and the SG stream listens (unless reversed with options).  Once the ASP stream is connecting to
+ * the SG stream, the ASP stream is I_PLINKed under the the m2ua-as driver and configured at SG
+ * position 1.  Then the two AS streams are opened on m2ua-as.  Then, children test case processes
+ * are spawned and the test proceeds.  Once the test case completes, the AS and SCTP streams are
+ * closed.  An m2ua-as stream is opened and an I_PUNLINK operation with the muxid of the linked
+ * stream used to unlink the previously linked SCTP stream.  Another possibility is to allow the
+ * linked SCTP to attempt to reconnect until it is successful.
+ */
+
 static int
 begin_tests(int index)
 {
+#if TEST_X400
 	switch (ss7_pvar) {
 	case SS7_PVAR_ITUT_88:
 	case SS7_PVAR_ITUT_93:
@@ -6411,6 +7054,7 @@ begin_tests(int index)
 		break;
 	}
 	config->opt.pvar = ss7_pvar;
+#endif				/* TEST_X400 */
 #if TEST_M2PA
 	config->sl = sl_default_m2pa;
 	config->sdt = sdt_default_m2pa;
@@ -7274,6 +7918,8 @@ do_signal(int child, int action)
 
 	case __TEST_POWER_ON:
 		if (child == CHILD_PTU) {
+#if TEST_M2PA
+#else
 			ctrl->len = sizeof(p->sdt.daedt_start_req);
 			p->sdt.daedt_start_req.sdt_primitive = SDT_DAEDT_START_REQ;
 			data = NULL;
@@ -7281,6 +7927,7 @@ do_signal(int child, int action)
 			ctrl->len = sizeof(p->sdt.daedr_start_req);
 			p->sdt.daedr_start_req.sdt_primitive = SDT_DAEDR_START_REQ;
 			data = NULL;
+#endif
 		} else {
 			ctrl->len = sizeof(p->sl.power_on_req);
 			p->sl.power_on_req.sl_primitive = SL_POWER_ON_REQ;
@@ -7289,7 +7936,13 @@ do_signal(int child, int action)
 			test_pband = 0;
 		}
 		print_command_state(child, ":power on");
+#if TEST_M2PA
+		if (child != CHILD_PTU)
+			return test_putpmsg(child, ctrl, data, test_pband, test_pflags);
+		return __RESULT_SUCCESS;
+#else
 		return test_putpmsg(child, ctrl, data, test_pband, test_pflags);
+#endif
 	case __TEST_START:
 		ctrl->len = sizeof(p->sl.start_req);
 		p->sl.start_req.sl_primitive = SL_START_REQ;
@@ -7559,6 +8212,7 @@ do_signal(int child, int action)
 			if (show && verbose > 1)
 				print_sdl_stats(child, &stats->sdl);
 		return (err);
+#if TEST_X400
 	case __TEST_SDL_GOPTIONS:
 		if (show && verbose > 1)
 			print_command_state(child, "!options sdl");
@@ -7581,6 +8235,7 @@ do_signal(int child, int action)
 			if (show && verbose > 1)
 				print_sdl_config(child, &config->sdl);
 		return (err);
+#endif				/* TEST_X400 */
 	case __TEST_SDT_OPTIONS:
 		if (show && verbose > 1)
 			print_command_state(child, ":options sdt");
@@ -7608,6 +8263,7 @@ do_signal(int child, int action)
 			if (show && verbose > 1)
 				print_sdt_stats(child, &stats->sdt);
 		return (err);
+#if TEST_X400
 	case __TEST_SDT_GOPTIONS:
 		if (show && verbose > 1)
 			print_command_state(child, "!options sdt");
@@ -7630,6 +8286,7 @@ do_signal(int child, int action)
 			if (show && verbose > 1)
 				print_sdt_config(child, &config->sdt);
 		return (err);
+#endif				/* TEST_X400 */
 	case __TEST_SL_OPTIONS:
 		if (show && verbose > 1)
 			print_command_state(child, ":options sl");
@@ -7657,6 +8314,7 @@ do_signal(int child, int action)
 			if (show && verbose > 1)
 				print_sl_stats(child, &stats->sl);
 		return (err);
+#if TEST_X400
 	case __TEST_SL_GOPTIONS:
 		if (show && verbose > 1)
 			print_command_state(child, "!options sl");
@@ -7679,7 +8337,7 @@ do_signal(int child, int action)
 			if (show && verbose > 1)
 				print_sl_config(child, &config->sl);
 		return (err);
-
+#endif				/* TEST_X400 */
 	case __TEST_ATTACH_REQ:
 		ctrl->len = sizeof(p->lmi.attach_req) + (ADDR_buffer ? ADDR_length : 0);
 		p->lmi.attach_req.lmi_primitive = LMI_ATTACH_REQ;
@@ -7699,7 +8357,9 @@ do_signal(int child, int action)
 			print_addrs(child, cbuf + sizeof(p->lmi.attach_req), ADDR_length);
 #endif
 #else				/* TEST_M2PA */
+#if TEST_X400
 			print_ppa(child, (ppa_t *) p->lmi.attach_req.lmi_ppa);
+#endif				/* TEST_X400 */
 #endif				/* TEST_M2PA */
 		}
 		return test_putpmsg(child, ctrl, data, test_pband, test_pflags);
@@ -7731,7 +8391,9 @@ do_signal(int child, int action)
 			print_addrs(child, cbuf + sizeof(p->lmi.enable_req), ADDR_length);
 #endif
 #else				/* TEST_M2PA */
+#if TEST_X400
 			print_ppa(child, (ppa_t *) p->lmi.enable_req.lmi_rem);
+#endif				/* TEST_X400 */
 #endif				/* TEST_M2PA */
 		}
 		return test_putpmsg(child, ctrl, data, test_pband, test_pflags);
@@ -7837,7 +8499,10 @@ static int
 do_decode_data(int child, struct strbuf *ctrl, struct strbuf *data)
 {
 	int event = __RESULT_DECODE_ERROR;
+
+#if TEST_X400 || TEST_M2PA
 	int other = (child + 1) % 2;
+#endif				/* TEST_X400 || TEST_M2PA */
 
 	if (data->len >= 0) {
 		switch (child) {
@@ -9139,6 +9804,7 @@ preamble_config(int child)
 	return __RESULT_FAILURE;
 }
 
+#if TEST_X400
 static int
 postamble_config(int child)
 {
@@ -9174,6 +9840,7 @@ postamble_config(int child)
       failure:
 	return __RESULT_FAILURE;
 }
+#endif				/* TEST_X400 */
 
 static int
 postamble_detach(int child)
@@ -9273,8 +9940,10 @@ postamble_disable(int child)
 {
 	int failed = 0;
 
+#if TEST_X400
 	if (postamble_config(child))
 		failed = failed ? : state;
+#endif				/* TEST_X400 */
 	state++;
 #if TEST_M2PA
 	if (child == CHILD_IUT)
@@ -9679,16 +10348,18 @@ struct test_stream {
 	int (*postamble) (int);		/* test postamble */
 };
 
-#if TEST_X400
 static int
 check_snibs(int child, unsigned char bsnib, unsigned char fsnib)
 {
+#if TEST_X400
 	print_rx_msg_sn(child, "check b/f sn/ib", bsnib, fsnib);
 	if ((bib[1] | bsn[1]) == bsnib && (fib[1] | fsn[1]) == fsnib)
 		return __RESULT_SUCCESS;
 	return __RESULT_FAILURE;
-}
+#else
+	return __RESULT_SUCCESS;
 #endif
+}
 
 /*
  *  Check test case guard timer.
@@ -15575,8 +16246,10 @@ test_4_1a_ptu(int child)
 					goto failure;
 				break;
 			case __TEST_FISU:
+#if TEST_X400
 				if (bsn[1] != fsn[0] - 1 && bsn[1] != fsn[0])
 					continue;
+#endif				/* TEST_X400 */
 				if (ack == 0) {
 					ack++;
 					if (dat != 2)
@@ -15618,9 +16291,8 @@ test_4_1a_ptu(int child)
 				}
 				goto failure;
 			}
-			/* (11) Send another data message to SP A and send a status "Ready" 
-			   message from SP B to SP A with the appropriate sequence numbers. 
-			 */
+			/* (11) Send another data message to SP A and send a status "Ready" message 
+			   from SP B to SP A with the appropriate sequence numbers. */
 			if (do_signal(child, __TEST_MSU))
 				goto failure;
 			fsn[0] = bsn[1];
@@ -15680,8 +16352,10 @@ test_4_1a_iut(int child)
 	if (expect(child, INFINITE_WAIT, __EVENT_IUT_DATA))
 		goto failure;
 	state++;
+#if TEST_X400
 	test_msleep(child, NORMAL_WAIT);
 	state++;
+#endif				/* TEST_X400 */
 	if (do_signal(child, __TEST_LPO))
 		goto failure;
 	state++;
@@ -17778,10 +18452,12 @@ test_8_1_ptu(int child)
 			state++;
 		case 1:
 			if (expect(child, INFINITE_WAIT, __TEST_FISU)) {
+#if TEST_X400
 				if (last_event == __TEST_MSU) {
 					state++;
 					goto got_msu;
 				}
+#endif				/* TEST_X400 */
 				goto failure;
 			}
 #if TEST_X400
@@ -17809,11 +18485,28 @@ test_8_1_ptu(int child)
 				}
 				goto failure;
 			}
+#if TEST_X400
 		      got_msu:
 			if (check_snibs(child, 0x80, 0x80))
 				goto failure;
 			if (do_signal(child, __TEST_FISU))
 				goto failure;
+#endif				/* TEST_X400 */
+#if TEST_M2PA
+			switch (m2pa_version) {
+			case M2PA_VERSION_DRAFT6:
+			case M2PA_VERSION_DRAFT6_1:
+			case M2PA_VERSION_DRAFT6_9:
+			case M2PA_VERSION_DRAFT7:
+			case M2PA_VERSION_DRAFT10:
+			case M2PA_VERSION_DRAFT11:
+			case M2PA_VERSION_RFC4165:
+				bsn[0] = fsn[1];
+				break;
+			}
+			if (do_signal(child, __TEST_ACK))
+				goto failure;
+#endif				/* TEST_M2PA */
 			state++;
 		case 3:
 #if TEST_X400
@@ -17821,6 +18514,11 @@ test_8_1_ptu(int child)
 				goto failure;
 			if (check_snibs(child, 0x80, 0x80))
 				goto failure;
+#endif
+#if TEST_M2PA
+			if (expect(child, config->sl.t7 >> 1, __EVENT_NO_MSG))
+				if (last_event != __TEST_ACK)
+					goto failure;
 #endif
 			state++;
 		case 4:
@@ -18307,6 +19005,13 @@ test_8_5_ptu(int child)
 {
 	int origin = state;
 
+#if TEST_M2PA
+	switch (m2pa_version) {
+	case M2PA_VERSION_DRAFT3:
+	case M2PA_VERSION_DRAFT3_1:
+		return __RESULT_NOTAPPL;	/* can't do this */
+	}
+#endif				/* TEST_M2PA */
 	for (;;) {
 		switch (state - origin) {
 		case 0:
@@ -18924,6 +19629,13 @@ test_8_10_ptu(int child)
 {
 	int origin = state;
 
+#if TEST_M2PA
+	switch (m2pa_version) {
+	case M2PA_VERSION_DRAFT3:
+	case M2PA_VERSION_DRAFT3_1:
+		return __RESULT_NOTAPPL;	/* can't do this */
+	}
+#endif				/* TEST_M2PA */
 	for (;;) {
 		switch (state - origin) {
 		case 0:
@@ -19352,6 +20064,13 @@ test_8_14_ptu(int child)
 static int
 test_8_14_iut(int child)
 {
+#if TEST_M2PA
+	switch (m2pa_version) {
+	case M2PA_VERSION_DRAFT3:
+	case M2PA_VERSION_DRAFT3_1:
+		return __RESULT_NOTAPPL;	/* can't do this */
+	}
+#endif				/* TEST_M2PA */
 	if (expect(child, INFINITE_WAIT, __EVENT_IUT_DATA))
 		goto failure;
 	state++;
@@ -19679,8 +20398,7 @@ test_9_3_ptu(int child)
 		goto inconclusive;
 	if (msu_len > 12)
 		msu_len = 12;
-	printf("(N1=%ld, N2=%ld, n=%d, l=%d)\n", (long) config->sl.N1, (long) config->sl.N2, n,
-	       msu_len);
+	printf("(N1=%ld, N2=%ld, n=%d, l=%d)\n", (long) config->sl.N1, (long) config->sl.N2, n, msu_len);
 	fflush(stdout);
 
 	for (;;) {
@@ -22086,8 +22804,8 @@ provide any feature listed herein.\n\
 \n\
 As an exception to the above,  this software may be  distributed  under the  GNU\n\
 Affero  General  Public  License  (AGPL)  Version  3, so long as the software is\n\
-distributed with,  and only used for the testing of,  OpenSS7 modules,  drivers,\n\
-and libraries.\n\
+distributed with, and only used for the testing of, OpenSS7 modules, drivers and\n\
+libraries.\n\
 \n\
 U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on behalf\n\
 of the  U.S. Government  (\"Government\"),  the following provisions apply to you.\n\
@@ -22157,10 +22875,10 @@ Arguments:\n\
 Options:\n\
     -u, --iut\n\
         IUT connects instead of PT.\n\
-    -D, --decl-std [STANDARD]\n\
+    -F, --decl-std [STANDARD]\n\
         specify the SS7 standard version to test.\n\
     -D, --draft [DRAFT]\n\
-        specify the M2PA draft version to test.\n\
+        specify the M2PA draft or RFC version to test.\n\
     -c, --client\n\
         execute client side (PTU) of test case only.\n\
     -S, --server\n\
@@ -22173,17 +22891,6 @@ Options:\n\
         repeat test cases on success or failure.\n\
     -R, --repeat-fail\n\
         repeat test cases on failure.\n\
-    -p, --client-port [PORT]\n\
-        port number from which to connect [default: %3$d+index*3]\n\
-    -P, --server-port [PORT]\n\
-        port number to which to connect or upon which to listen\n\
-        [default: %3$d+index*3+2]\n\
-    -i, --client-host [HOSTNAME[,HOSTNAME]*]\n\
-        client host names(s) or IP numbers\n\
-        [default: 127.0.0.1,127.0.0.2,127.0.0.3]\n\
-    -I, --server-host [HOSTNAME[,HOSTNAME]*]\n\
-        server host names(s) or IP numbers\n\
-        [default: 127.0.0.1,127.0.0.2,127.0.0.3]\n\
     -k, --iut-card CARD\n\
         card to use (1..16) [default: 1]\n\
     -K, --ptu-card CARD\n\
@@ -22229,15 +22936,8 @@ Symbols:\n\
         SS7_PVAR_ITUT_93  SS7_PVAR_ETSI_93  SS7_PVAR_JTTC_94  SS7_PVAR_SPAN_88\n\
         SS7_PVAR_ITUT_96  SS7_PVAR_ETSI_96  SS7_PVAR_ANSI_96\n\
         SS7_PVAR_ITUT_00  SS7_PVAR_ETSI_00  SS7_PVAR_ANSI_00  SS7_PVAR_CHIN_00\n\
-    [DRAFT]\n\
-        M2PA_VERSION_DRAFT3   M2PA_VERSION_DRAFT3_1\n\
-        M2PA_VERSION_DRAFT4   M2PA_VERSION_DRAFT4_1   M2PA_VERSION_DRAFT4_9\n\
-        M2PA_VERSION_DRAFT5   M2PA_VERSION_DRAFT5_1\n\
-        M2PA_VERSION_DRAFT6   M2PA_VERSION_DRAFT6_1   M2PA_VERSION_DRAFT6_9\n\
-        M2PA_VERSION_DRAFT7   M2PA_VERSION_DRAFT9     M2PA_VERSION_DRAFT10\n\
-        M2PA_VERSION_DRAFT11  M2PA_VERSION_RFC4165\n\
 \n\
-", argv[0], devname, TEST_PORT_NUMBER);
+", argv[0], devname);
 }
 
 #define HOST_BUF_LEN 128
@@ -22250,13 +22950,13 @@ main(int argc, char *argv[])
 	struct test_case *t;
 	int tests_to_run = 0;
 
-#if TEST_M2PA
+#if TEST_M2PA || TEST_M2UA
 	char *hostc = "127.0.0.1,127.0.0.2,127.0.0.3";
 	char *hosts = "127.0.0.1,127.0.0.2,127.0.0.3";
 	char hostbufc[HOST_BUF_LEN];
 	char hostbufs[HOST_BUF_LEN];
 	struct hostent *haddr;
-#endif				/* TEST_M2PA */
+#endif				/* TEST_M2PA || TEST_M2UA */
 
 	for (t = tests; t->numb; t++) {
 		if (!t->result) {
@@ -22271,9 +22971,14 @@ main(int argc, char *argv[])
 		int option_index = 0;
 		/* *INDENT-OFF* */
 		static struct option long_options[] = {
+#if TEST_M2UA
+			{"iids",	required_argument,	NULL, 'T'},
+			{"text",	required_argument,	NULL, 'T'},
+			{"aspid",	required_argument,	NULL, 'A'},
+#endif				/* TEST_M2UA */
 			{"iut",		no_argument,		NULL, 'u'},
 			{"draft",	required_argument,	NULL, 'D'},
-			{"decl-std",	required_argument,	NULL, 'D'},
+			{"decl-std",	required_argument,	NULL, 'F'},
 			{"client",	no_argument,		NULL, 'c'},
 			{"server",	no_argument,		NULL, 'S'},
 			{"again",	no_argument,		NULL, 'a'},
@@ -22285,7 +22990,7 @@ main(int argc, char *argv[])
 			{"ptu-span",	required_argument,	NULL, 'P'},
 			{"iut-chan",	required_argument,	NULL, 'i'},
 			{"ptu-chan",	required_argument,	NULL, 'I'},
-#elif TEST_M2PA
+#elif TEST_M2PA || TEST_M2UA
 			{"client-port",	required_argument,	NULL, 'p'},
 			{"server-port",	required_argument,	NULL, 'P'},
 			{"client-host",	required_argument,	NULL, 'i'},
@@ -22294,6 +22999,9 @@ main(int argc, char *argv[])
 			{"repeat",	no_argument,		NULL, 'r'},
 			{"repeat-fail",	no_argument,		NULL, 'R'},
 			{"device",	required_argument,	NULL, 'd'},
+#if TEST_M2PA || TEST_M2UA
+			{"transport",	required_argument,	NULL, 'x'},
+#endif				/* TEST_M2PA || TEST_M2UA */
 			{"exit",	no_argument,		NULL, 'e'},
 			{"list",	optional_argument,	NULL, 'l'},
 			{"fast",	optional_argument,	NULL, 'f'},
@@ -22311,18 +23019,53 @@ main(int argc, char *argv[])
 		};
 		/* *INDENT-ON* */
 
-		c = getopt_long(argc, argv, "uD:cSawk:K:p:P:i:I:rRd:el::f::so:t:mqvhVC?", long_options, &option_index);
+#if TEST_M2PA || TEST_M2UA
+		c = getopt_long(argc, argv, "T:A:uD:F:cSawp:P:i:I:rRd:x:el::f::so:t:mqvhVC?", long_options, &option_index);
+#elif TEST_X400
+		c = getopt_long(argc, argv, "uF:cSawk:K:p:P:i:I:rRd:el::f::so:t:mqvhVC?", long_options, &option_index);
+#endif
 #else				/* defined _GNU_SOURCE */
-		c = getopt(argc, argv, "uD:cSawk:K:p:P:i:I:rRd:el::f::so:t:mqvhVC?");
+#if TEST_M2PA || TEST_M2UA
+		c = getopt(argc, argv, "T:A:uD:F:cSawp:P:i:I:rRd:x:el::f::so:t:mqvhVC?");
+#elif TEST_X400
+		c = getopt(argc, argv, "uF:cSawk:K:p:P:i:I:rRd:el::f::so:t:mqvhVC?");
+#endif
 #endif				/* defined _GNU_SOURCE */
 		if (c == -1)
 			break;
 		switch (c) {
-		case 'u':	/* --iut */
+#if TEST_M2UA
+		case 'T':	/* -T, --iids, --text IID[,IID] */
+		{
+			char *token = NULL;
+
+			if ((token = index(optarg, ','))) {
+				token[0] = '\0';
+				token++;
+			}
+			if (strtoul(optarg, NULL, 0) != 0)
+				iids[0].num = strtoul(optarg, NULL, 0);
+			else
+				strncpy(iids[0].text, optarg, sizeof(iids[0].text));
+			if (token) {
+				if (strtoul(token, NULL, 0) != 0)
+					iids[1].num = strtoul(token, NULL, 0);
+				else
+					strncpy(iids[1].text, token, sizeof(iids[1].text));
+				token--;
+				token[0] = ',';
+			}
+			break;
+		}
+		case 'A':	/* -A, --aspid ASPID */
+			aspid = strtoul(optarg, NULL, 0);
+			break;
+#endif				/* TEST_M2UA */
+		case 'u':	/* -u, --iut */
 			iut_connects = 1;
 			break;
-#if TEST_X400
-		case 'D':	/* --decl-std */
+#if TEST_X400 || TEST_M2PA
+		case 'F':	/* -F, --decl-std */
 			ss7_pvar = strtoul(optarg, NULL, 0);
 			switch (ss7_pvar) {
 			case SS7_PVAR_ITUT_88:
@@ -22376,9 +23119,10 @@ main(int argc, char *argv[])
 					goto bad_option;
 			}
 			break;
-#endif				/* TEST_X400 */
+#endif				/* TEST_X400 || TEST_M2PA */
+#if TEST_M2PA || TEST_M2UA
+		case 'D':	/* -D, --draft */
 #if TEST_M2PA
-		case 'D':	/* --draft */
 			m2pa_version = strtoul(optarg, NULL, 0);
 			switch (m2pa_version) {
 			case M2PA_VERSION_DRAFT3:
@@ -22431,18 +23175,31 @@ main(int argc, char *argv[])
 				else
 					goto bad_option;
 			}
-			break;
 #endif				/* TEST_M2PA */
-		case 'c':	/* --client */
+#if TEST_M2UA
+			m2ua_version = strtoul(optarg, NULL, 0);
+			switch (m2ua_version) {
+			case M2UA_VERSION_RFC3331:
+				break;
+			default:
+				if (!strcmp(optarg, "M2UA_VERSION_RFC3331"))
+					m2ua_version = M2UA_VERSION_RFC3331;
+				else
+					goto bad_option;
+			}
+#endif				/* TEST_M2UA */
+			break;
+#endif				/* TEST_M2PA || TEST_M2UA */
+		case 'c':	/* -c, --client */
 			client_exec = 1;
 			break;
-		case 'S':	/* --server */
+		case 'S':	/* -S, --server */
 			server_exec = 1;
 			break;
-		case 'a':	/* --again */
+		case 'a':	/* -a, --again */
 			repeat_verbose = 1;
 			break;
-		case 'w':	/* --wait */
+		case 'w':	/* -w, --wait */
 			test_duration = INFINITE_WAIT;
 			break;
 #if TEST_X400
@@ -22497,46 +23254,54 @@ main(int argc, char *argv[])
 				break;
 			}
 			goto bad_option;
-#elif TEST_M2PA
-		case 'p':	/* --client-port */
+#elif TEST_M2PA || TEST_M2UA
+		case 'p':	/* -p, --client-port [PORT] */
 			client_port_specified = 1;
 			ports[3] = atoi(optarg);
 			ports[0] = ports[3];
 			break;
-		case 'P':	/* --server-port */
+		case 'P':	/* -P, --server-port [PORT] */
 			server_port_specified = 1;
 			ports[3] = atoi(optarg);
 			ports[1] = ports[3];
 			ports[2] = ports[3] + 1;
 			break;
-		case 'i':	/* --client-host *//* client host */
+		case 'i':	/* -i, --client-host [HOSTNAME[,HOSTNAME]*] */
 			client_host_specified = 1;
 			strncpy(hostbufc, optarg, HOST_BUF_LEN);
 			hostc = hostbufc;
 			break;
-		case 'I':	/* --server-host *//* server host */
+		case 'I':	/* -I, --server-host [HOSTNAME[,HOSTNAME]*] */
 			server_host_specified = 1;
 			strncpy(hostbufs, optarg, HOST_BUF_LEN);
 			hosts = hostbufs;
 			break;
-#endif				/* TEST_M2PA */
-		case 'r':	/* --repeat */
+#endif				/* TEST_M2PA || TEST_M2UA */
+		case 'r':	/* -r, --repeat */
 			repeat_on_success = 1;
 			repeat_on_failure = 1;
 			break;
-		case 'R':	/* --repeat-fail */
+		case 'R':	/* -R, --repeat-fail */
 			repeat_on_failure = 1;
 			break;
-		case 'd':
+		case 'd':	/* -d, --device [DEVICE] */
 			if (optarg) {
 				snprintf(devname, sizeof(devname), "%s", optarg);
 				break;
 			}
 			goto bad_option;
-		case 'e':
+#if TEST_M2UA
+		case 'x':	/* -x, --transport [DEVICE] */
+			if (optarg) {
+				snprintf(xptname, sizeof(xptname), "%s", optarg);
+				break;
+			}
+			goto bad_option;
+#endif
+		case 'e':	/* -e, --exit */
 			exit_on_failure = 1;
 			break;
-		case 'l':
+		case 'l':	/* -l, --list [RANGE] */
 			if (optarg) {
 				l = strnlen(optarg, 16);
 				fprintf(stdout, "\n");
@@ -22589,17 +23354,17 @@ main(int argc, char *argv[])
 				exit(0);
 			}
 			break;
-		case 'f':
+		case 'f':	/* -f, --fast [SCALE] */
 			if (optarg)
 				timer_scale = atoi(optarg);
 			else
 				timer_scale = 50;
 			fprintf(stderr, "WARNING: timers are scaled by a factor of %ld\n", (long) timer_scale);
 			break;
-		case 's':
+		case 's':	/* -s, --summary */
 			summary = 1;
 			break;
-		case 'o':
+		case 'o':	/* -o, --onetest [TESTCASE] */
 			if (optarg) {
 				if (!range) {
 					for (t = tests; t->numb; t++)
@@ -22623,7 +23388,19 @@ main(int argc, char *argv[])
 				break;
 			}
 			goto bad_option;
-		case 't':
+		case 'q':	/* -q, --quiet */
+			verbose = 0;
+			break;
+		case 'v':	/* -v, --verbose [LEVEL] */
+			if (optarg == NULL) {
+				verbose++;
+				break;
+			}
+			if ((val = strtol(optarg, NULL, 0)) < 0)
+				goto bad_option;
+			verbose = val;
+			break;
+		case 't':	/* -t, --tests [RANGE] */
 			l = strnlen(optarg, 16);
 			if (!range) {
 				for (t = tests; t->numb; t++)
@@ -22645,29 +23422,17 @@ main(int argc, char *argv[])
 				goto bad_option;
 			}
 			break;
-		case 'm':
+		case 'm':	/* -m, --messages */
 			show_msg = 1;
 			break;
-		case 'q':	/* -q, --quiet */
-			verbose = 0;
-			break;
-		case 'v':	/* -v, --verbose */
-			if (optarg == NULL) {
-				verbose++;
-				break;
-			}
-			if ((val = strtol(optarg, NULL, 0)) < 0)
-				goto bad_option;
-			verbose = val;
-			break;
 		case 'H':	/* -H */
-		case 'h':	/* -h, --help */
+		case 'h':	/* -h, --help, -?, --? */
 			help(argc, argv);
 			exit(0);
 		case 'V':	/* -V, --version */
 			version(argc, argv);
 			exit(0);
-		case 'C':
+		case 'C':	/* -C, --copying */
 			copying(argc, argv);
 			exit(0);
 		case '?':
@@ -22715,7 +23480,7 @@ main(int argc, char *argv[])
 	if (server_ppa_specified) {
 	}
 #endif
-#if TEST_M2PA
+#if TEST_M2PA || TEST_M2UA
 	if (client_host_specified) {
 		char *token = hostc, *next_token, *delim = NULL;
 
@@ -22777,6 +23542,6 @@ main(int argc, char *argv[])
 		anums[3] = count;
 		fprintf(stdout, "%d server addresses assigned\n", count);
 	}
-#endif				/* TEST_M2PA */
+#endif				/* TEST_M2PA || TEST_M2UA */
 	exit(do_tests(tests_to_run));
 }

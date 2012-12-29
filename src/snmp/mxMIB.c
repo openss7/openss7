@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2012  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -185,6 +185,26 @@ int header_generic(struct variable *, oid *, size_t *, int, size_t *, WriteMetho
 #include "ds1EXT.h"
 #include "phyMIB.h"
 #include "mxMIB.h"
+
+static inline void
+uinttobits(uint8_t *ostr, uint val, int max)
+{
+	int i;
+
+	for (i = 0; i <= max; i++)
+		ostr[i >> 3] = 0;
+	for (i = 0; i <= max; i++)
+		if (val & (1 << i))
+			ostr[i >> 3] |= (1 << (7 - (i % 8)));
+}
+
+static inline void
+uinttobitsalloc(uint8_t **optr, uint val, int max)
+{
+	if ((*optr = calloc((max >> 3) + 1, 1)))
+		uinttobits(*optr, val, max);
+}
+
 #define MASTER 1
 #define MY_FACILITY(__pri)	(LOG_DAEMON|(__pri))
 #if defined MODULE
@@ -230,6 +250,8 @@ oid mxXconTable_variables_oid[14] = { 1, 3, 6, 1, 4, 1, 29591, 1, 11, 1, 1, 7, 1
 /*
  * Oids for use in notifications defined in this MIB.
  */
+oid mxCardStateChange_oid[11] = { 1, 3, 6, 1, 4, 1, 29591, 1, 11, 0, 1 };
+oid mxSpanStateChange_oid[11] = { 1, 3, 6, 1, 4, 1, 29591, 1, 11, 0, 2 };
 
 /*
  * Oids accessible only for notify defined in this MIB.
@@ -256,6 +278,15 @@ oid mxCardTypeAT400P_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 1, 11, 1, 4, 1, 8 };
 oid mxCardTypeAE400P_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 1, 11, 1, 4, 1, 9 };
 oid mxCardTypeA400PT_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 1, 11, 1, 4, 1, 10 };
 oid mxCardTypeA400PE_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 1, 11, 1, 4, 1, 11 };
+oid mxCardTypeCP100_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 1, 11, 1, 4, 1, 12 };
+oid mxCardTypeCP100P_oid[14] = { 1, 3, 6, 1, 4, 1, 29591, 1, 11, 1, 4, 1, 12, 1 };
+oid mxCardTypeCP100E_oid[14] = { 1, 3, 6, 1, 4, 1, 29591, 1, 11, 1, 4, 1, 12, 2 };
+oid mxCardTypeCP200_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 1, 11, 1, 4, 1, 13 };
+oid mxCardTypeCP200P_oid[14] = { 1, 3, 6, 1, 4, 1, 29591, 1, 11, 1, 4, 1, 13, 1 };
+oid mxCardTypeCP200E_oid[14] = { 1, 3, 6, 1, 4, 1, 29591, 1, 11, 1, 4, 1, 13, 2 };
+oid mxCardTypeCP400_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 1, 11, 1, 4, 1, 14 };
+oid mxCardTypeCP400P_oid[14] = { 1, 3, 6, 1, 4, 1, 29591, 1, 11, 1, 4, 1, 14, 1 };
+oid mxCardTypeCP400E_oid[14] = { 1, 3, 6, 1, 4, 1, 29591, 1, 11, 1, 4, 1, 14, 2 };
 oid mxChipTypeDS2152_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 1, 11, 1, 4, 2, 1 };
 oid mxChipTypeDS21352_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 1, 11, 1, 4, 2, 2 };
 oid mxChipTypeDS21552_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 1, 11, 1, 4, 2, 3 };
@@ -283,6 +314,7 @@ oid mxFarEndCurrentGroup_oid[12] = { 1, 3, 6, 1, 4, 1, 29591, 1, 11, 2, 1, 14 };
 oid mxFarEndIntervalGroup_oid[12] = { 1, 3, 6, 1, 4, 1, 29591, 1, 11, 2, 1, 15 };
 oid mxFarEndTotalGroup_oid[12] = { 1, 3, 6, 1, 4, 1, 29591, 1, 11, 2, 1, 16 };
 oid mxDrivGroup_oid[12] = { 1, 3, 6, 1, 4, 1, 29591, 1, 11, 2, 1, 17 };
+oid mxTrapGroup_oid[12] = { 1, 3, 6, 1, 4, 1, 29591, 1, 11, 2, 1, 18 };
 oid mxBasicCompliance_oid[12] = { 1, 3, 6, 1, 4, 1, 29591, 1, 11, 2, 2, 1 };
 oid mxEnhancedCompliance_oid[12] = { 1, 3, 6, 1, 4, 1, 29591, 1, 11, 2, 2, 2 };
 static oid zeroDotZero_oid[2] = { 0, 0 };
@@ -368,279 +400,305 @@ struct variable7 mxMIB_variables[] = {
 	{(u_char) MXCARDSYNCSPANID, ASN_OCTET_STR, RONLY, var_mxCardTable, 6, {1, 1, 3, 2, 1, 24}},
 #define   MXCARDSYNCTRANSITIONS  37
 	{(u_char) MXCARDSYNCTRANSITIONS, ASN_COUNTER, RONLY, var_mxCardTable, 6, {1, 1, 3, 2, 1, 25}},
-#define   MXCARDNAME            38
-	{(u_char) MXCARDNAME, ASN_OCTET_STR, RONLY, var_mxCardTable, 6, {1, 1, 3, 2, 1, 26}},
-#define   MXCARDSTATUS          39
-	{(u_char) MXCARDSTATUS, ASN_INTEGER, RWRITE, var_mxCardTable, 6, {1, 1, 3, 2, 1, 27}},
-#define   MXSPANNAME            40
+#define   MXCARDLEDS            38
+	{(u_char) MXCARDLEDS, ASN_OCTET_STR, RONLY, var_mxCardTable, 6, {1, 1, 3, 2, 1, 26}},
+#define   MXCARDLASTCHANGE      39
+	{(u_char) MXCARDLASTCHANGE, ASN_TIMETICKS, RONLY, var_mxCardTable, 6, {1, 1, 3, 2, 1, 27}},
+#define   MXCARDNAME            40
+	{(u_char) MXCARDNAME, ASN_OCTET_STR, RONLY, var_mxCardTable, 6, {1, 1, 3, 2, 1, 28}},
+#define   MXCARDSTATUS          41
+	{(u_char) MXCARDSTATUS, ASN_INTEGER, RWRITE, var_mxCardTable, 6, {1, 1, 3, 2, 1, 29}},
+#define   MXSPANNAME            42
 	{(u_char) MXSPANNAME, ASN_OCTET_STR, RWRITE, var_mxSpanTable, 6, {1, 1, 4, 1, 1, 2}},
-#define   MXSPANDEVICE          41
+#define   MXSPANDEVICE          43
 	{(u_char) MXSPANDEVICE, ASN_OBJECT_ID, RWRITE, var_mxSpanTable, 6, {1, 1, 4, 1, 1, 3}},
-#define   MXSPANEQUIPMENTID     42
+#define   MXSPANEQUIPMENTID     44
 	{(u_char) MXSPANEQUIPMENTID, ASN_OCTET_STR, RWRITE, var_mxSpanTable, 6, {1, 1, 4, 1, 1, 4}},
-#define   MXSPANTYPE            43
+#define   MXSPANTYPE            45
 	{(u_char) MXSPANTYPE, ASN_INTEGER, RWRITE, var_mxSpanTable, 6, {1, 1, 4, 1, 1, 5}},
-#define   MXSPANNUMBER          44
+#define   MXSPANNUMBER          46
 	{(u_char) MXSPANNUMBER, ASN_UNSIGNED, RWRITE, var_mxSpanTable, 6, {1, 1, 4, 1, 1, 6}},
-#define   MXSPANRATE            45
+#define   MXSPANRATE            47
 	{(u_char) MXSPANRATE, ASN_INTEGER, RONLY, var_mxSpanTable, 6, {1, 1, 4, 1, 1, 7}},
-#define   MXSPANMODE            46
+#define   MXSPANMODE            48
 	{(u_char) MXSPANMODE, ASN_OCTET_STR, RWRITE, var_mxSpanTable, 6, {1, 1, 4, 1, 1, 8}},
-#define   MXSPANCRC             47
+#define   MXSPANCRC             49
 	{(u_char) MXSPANCRC, ASN_INTEGER, RWRITE, var_mxSpanTable, 6, {1, 1, 4, 1, 1, 9}},
-#define   MXSPANCLOCKING        48
+#define   MXSPANCLOCKING        50
 	{(u_char) MXSPANCLOCKING, ASN_INTEGER, RWRITE, var_mxSpanTable, 6, {1, 1, 4, 1, 1, 10}},
-#define   MXSPANPRIORITY        49
+#define   MXSPANPRIORITY        51
 	{(u_char) MXSPANPRIORITY, ASN_UNSIGNED, RWRITE, var_mxSpanTable, 6, {1, 1, 4, 1, 1, 11}},
-#define   MXSPANCODING          50
+#define   MXSPANCODING          52
 	{(u_char) MXSPANCODING, ASN_INTEGER, RWRITE, var_mxSpanTable, 6, {1, 1, 4, 1, 1, 12}},
-#define   MXSPANFRAMING         51
+#define   MXSPANFRAMING         53
 	{(u_char) MXSPANFRAMING, ASN_INTEGER, RWRITE, var_mxSpanTable, 6, {1, 1, 4, 1, 1, 13}},
-#define   MXSPANLINEIMPEDANCE   52
+#define   MXSPANLINEIMPEDANCE   54
 	{(u_char) MXSPANLINEIMPEDANCE, ASN_INTEGER, RWRITE, var_mxSpanTable, 6, {1, 1, 4, 1, 1, 14}},
-#define   MXSPANLINEMODE        53
+#define   MXSPANLINEMODE        55
 	{(u_char) MXSPANLINEMODE, ASN_INTEGER, RWRITE, var_mxSpanTable, 6, {1, 1, 4, 1, 1, 15}},
-#define   MXSPANLINELENGTH      54
+#define   MXSPANLINELENGTH      56
 	{(u_char) MXSPANLINELENGTH, ASN_INTEGER, RWRITE, var_mxSpanTable, 6, {1, 1, 4, 1, 1, 16}},
-#define   MXSPANLINEATTENUATION  55
+#define   MXSPANLINEATTENUATION  57
 	{(u_char) MXSPANLINEATTENUATION, ASN_INTEGER, RWRITE, var_mxSpanTable, 6, {1, 1, 4, 1, 1, 17}},
-#define   MXSPANLINEGAIN        56
+#define   MXSPANLINEGAIN        58
 	{(u_char) MXSPANLINEGAIN, ASN_INTEGER, RWRITE, var_mxSpanTable, 6, {1, 1, 4, 1, 1, 18}},
-#define   MXSPANLINEDELAY       57
+#define   MXSPANLINEDELAY       59
 	{(u_char) MXSPANLINEDELAY, ASN_UNSIGNED, RWRITE, var_mxSpanTable, 6, {1, 1, 4, 1, 1, 19}},
-#define   MXSPANTXLEVEL         58
+#define   MXSPANTXLEVEL         60
 	{(u_char) MXSPANTXLEVEL, ASN_INTEGER, RWRITE, var_mxSpanTable, 6, {1, 1, 4, 1, 1, 20}},
-#define   MXSPANRXLEVEL         59
+#define   MXSPANRXLEVEL         61
 	{(u_char) MXSPANRXLEVEL, ASN_INTEGER, RWRITE, var_mxSpanTable, 6, {1, 1, 4, 1, 1, 21}},
-#define   MXSPANALARMSETTLETIME  60
+#define   MXSPANALARMSETTLETIME  62
 	{(u_char) MXSPANALARMSETTLETIME, ASN_INTEGER, RWRITE, var_mxSpanTable, 6, {1, 1, 4, 1, 1, 22}},
-#define   MXSPANLINECODETIME    61
+#define   MXSPANLINECODETIME    63
 	{(u_char) MXSPANLINECODETIME, ASN_INTEGER, RWRITE, var_mxSpanTable, 6, {1, 1, 4, 1, 1, 23}},
-#define   MXSPANPRIMARY         62
+#define   MXSPANPRIMARY         64
 	{(u_char) MXSPANPRIMARY, ASN_UNSIGNED, RWRITE, var_mxSpanTable, 6, {1, 1, 4, 1, 1, 24}},
-#define   MXSPANDATALINK        63
+#define   MXSPANDATALINK        65
 	{(u_char) MXSPANDATALINK, ASN_OCTET_STR, RWRITE, var_mxSpanTable, 6, {1, 1, 4, 1, 1, 25}},
-#define   MXSPANLINECODE        64
+#define   MXSPANLINECODE        66
 	{(u_char) MXSPANLINECODE, ASN_INTEGER, RWRITE, var_mxSpanTable, 6, {1, 1, 4, 1, 1, 26}},
-#define   MXSPANALARMSEVERITYMAPPROFILE  65
+#define   MXSPANALARMSEVERITYMAPPROFILE  67
 	{(u_char) MXSPANALARMSEVERITYMAPPROFILE, ASN_OBJECT_ID, RWRITE, var_mxSpanTable, 6, {1, 1, 4, 1, 1, 27}},
-#define   MXSPANADMINISTRATIVESTATE  66
+#define   MXSPANADMINISTRATIVESTATE  68
 	{(u_char) MXSPANADMINISTRATIVESTATE, ASN_INTEGER, RWRITE, var_mxSpanTable, 6, {1, 1, 4, 1, 1, 28}},
-#define   MXSPANOPERATIONALSTATE  67
+#define   MXSPANOPERATIONALSTATE  69
 	{(u_char) MXSPANOPERATIONALSTATE, ASN_INTEGER, RONLY, var_mxSpanTable, 6, {1, 1, 4, 1, 1, 29}},
-#define   MXSPANUSAGESTATE      68
+#define   MXSPANUSAGESTATE      70
 	{(u_char) MXSPANUSAGESTATE, ASN_INTEGER, RONLY, var_mxSpanTable, 6, {1, 1, 4, 1, 1, 30}},
-#define   MXSPANALARMSTATUS     69
+#define   MXSPANALARMSTATUS     71
 	{(u_char) MXSPANALARMSTATUS, ASN_OCTET_STR, RWRITE, var_mxSpanTable, 6, {1, 1, 4, 1, 1, 31}},
-#define   MXSPANPROCEDURALSTATUS  70
+#define   MXSPANPROCEDURALSTATUS  72
 	{(u_char) MXSPANPROCEDURALSTATUS, ASN_OCTET_STR, RONLY, var_mxSpanTable, 6, {1, 1, 4, 1, 1, 32}},
-#define   MXSPANAVAILABILITYSTATUS  71
+#define   MXSPANAVAILABILITYSTATUS  73
 	{(u_char) MXSPANAVAILABILITYSTATUS, ASN_OCTET_STR, RONLY, var_mxSpanTable, 6, {1, 1, 4, 1, 1, 33}},
-#define   MXSPANCONTROLSTATUS   72
+#define   MXSPANCONTROLSTATUS   74
 	{(u_char) MXSPANCONTROLSTATUS, ASN_OCTET_STR, RWRITE, var_mxSpanTable, 6, {1, 1, 4, 1, 1, 34}},
-#define   MXSPANSTANDBYSTATUS   73
+#define   MXSPANSTANDBYSTATUS   75
 	{(u_char) MXSPANSTANDBYSTATUS, ASN_INTEGER, RONLY, var_mxSpanTable, 6, {1, 1, 4, 1, 1, 35}},
-#define   MXSPANUNKNOWNSTATUS   74
+#define   MXSPANUNKNOWNSTATUS   76
 	{(u_char) MXSPANUNKNOWNSTATUS, ASN_INTEGER, RONLY, var_mxSpanTable, 6, {1, 1, 4, 1, 1, 36}},
-#define   MXSPANSAP             75
+#define   MXSPANSAP             77
 	{(u_char) MXSPANSAP, ASN_OBJECT_ID, RONLY, var_mxSpanTable, 6, {1, 1, 4, 1, 1, 37}},
-#define   MXSPANLOOPBACKSTATUS  76
+#define   MXSPANLOOPBACKSTATUS  78
 	{(u_char) MXSPANLOOPBACKSTATUS, ASN_OCTET_STR, RONLY, var_mxSpanTable, 6, {1, 1, 4, 1, 1, 38}},
-#define   MXSPANLINESTATUS      77
+#define   MXSPANLINESTATUS      79
 	{(u_char) MXSPANLINESTATUS, ASN_OCTET_STR, RONLY, var_mxSpanTable, 6, {1, 1, 4, 1, 1, 39}},
-#define   MXSPANALARMS          78
+#define   MXSPANALARMS          80
 	{(u_char) MXSPANALARMS, ASN_OCTET_STR, RONLY, var_mxSpanTable, 6, {1, 1, 4, 1, 1, 40}},
-#define   MXSPANEVENTS          79
+#define   MXSPANEVENTS          81
 	{(u_char) MXSPANEVENTS, ASN_OCTET_STR, RONLY, var_mxSpanTable, 6, {1, 1, 4, 1, 1, 41}},
-#define   MXSPANRECEIVELEVEL    80
-	{(u_char) MXSPANRECEIVELEVEL, ASN_UNSIGNED, RONLY, var_mxSpanTable, 6, {1, 1, 4, 1, 1, 42}},
-#define   MXSPANRECEIVETHRESHOLD  81
-	{(u_char) MXSPANRECEIVETHRESHOLD, ASN_UNSIGNED, RWRITE, var_mxSpanTable, 6, {1, 1, 4, 1, 1, 43}},
-#define   MXSPANROWSTATUS       82
-	{(u_char) MXSPANROWSTATUS, ASN_INTEGER, RWRITE, var_mxSpanTable, 6, {1, 1, 4, 1, 1, 44}},
-#define   MXBERTMODE            83
+#define   MXSPANLED             82
+	{(u_char) MXSPANLED, ASN_INTEGER, RONLY, var_mxSpanTable, 6, {1, 1, 4, 1, 1, 42}},
+#define   MXSPANRECEIVELEVEL    83
+	{(u_char) MXSPANRECEIVELEVEL, ASN_UNSIGNED, RONLY, var_mxSpanTable, 6, {1, 1, 4, 1, 1, 43}},
+#define   MXSPANRECEIVETHRESHOLD  84
+	{(u_char) MXSPANRECEIVETHRESHOLD, ASN_UNSIGNED, RWRITE, var_mxSpanTable, 6, {1, 1, 4, 1, 1, 44}},
+#define   MXSPANLASTCHANGE      85
+	{(u_char) MXSPANLASTCHANGE, ASN_TIMETICKS, RONLY, var_mxSpanTable, 6, {1, 1, 4, 1, 1, 45}},
+#define   MXSPANROWSTATUS       86
+	{(u_char) MXSPANROWSTATUS, ASN_INTEGER, RWRITE, var_mxSpanTable, 6, {1, 1, 4, 1, 1, 46}},
+#define   MXBERTMODE            87
 	{(u_char) MXBERTMODE, ASN_INTEGER, RWRITE, var_mxBertTable, 6, {1, 1, 5, 1, 1, 1}},
-#define   MXBERTSELECT          84
+#define   MXBERTSELECT          88
 	{(u_char) MXBERTSELECT, ASN_INTEGER, RWRITE, var_mxBertTable, 6, {1, 1, 5, 1, 1, 2}},
-#define   MXBERTPATTERN         85
+#define   MXBERTPATTERN         89
 	{(u_char) MXBERTPATTERN, ASN_OCTET_STR, RWRITE, var_mxBertTable, 6, {1, 1, 5, 1, 1, 3}},
-#define   MXBERTOPERATIONALSTATE  86
+#define   MXBERTOPERATIONALSTATE  90
 	{(u_char) MXBERTOPERATIONALSTATE, ASN_INTEGER, RONLY, var_mxBertTable, 6, {1, 1, 5, 1, 1, 4}},
-#define   MXBERTPROCEDURALSTATUS  87
+#define   MXBERTPROCEDURALSTATUS  91
 	{(u_char) MXBERTPROCEDURALSTATUS, ASN_OCTET_STR, RONLY, var_mxBertTable, 6, {1, 1, 5, 1, 1, 5}},
-#define   MXBERTBITCOUNT        88
+#define   MXBERTBITCOUNT        92
 	{(u_char) MXBERTBITCOUNT, ASN_COUNTER, RONLY, var_mxBertTable, 6, {1, 1, 5, 1, 1, 6}},
-#define   MXBERTERRORCOUNT      89
+#define   MXBERTERRORCOUNT      93
 	{(u_char) MXBERTERRORCOUNT, ASN_COUNTER, RONLY, var_mxBertTable, 6, {1, 1, 5, 1, 1, 7}},
-#define   MXCHANTYPE            90
+#define   MXCHANTYPE            94
 	{(u_char) MXCHANTYPE, ASN_INTEGER, RWRITE, var_mxChanTable, 6, {1, 1, 6, 1, 1, 2}},
-#define   MXCHANFORMAT          91
+#define   MXCHANFORMAT          95
 	{(u_char) MXCHANFORMAT, ASN_INTEGER, RWRITE, var_mxChanTable, 6, {1, 1, 6, 1, 1, 3}},
-#define   MXCHANRATE            92
+#define   MXCHANRATE            96
 	{(u_char) MXCHANRATE, ASN_INTEGER, RWRITE, var_mxChanTable, 6, {1, 1, 6, 1, 1, 4}},
-#define   MXCHANMODE            93
+#define   MXCHANMODE            97
 	{(u_char) MXCHANMODE, ASN_OCTET_STR, RWRITE, var_mxChanTable, 6, {1, 1, 6, 1, 1, 5}},
-#define   MXCHANSAP             94
+#define   MXCHANSAP             98
 	{(u_char) MXCHANSAP, ASN_OBJECT_ID, RONLY, var_mxChanTable, 6, {1, 1, 6, 1, 1, 6}},
-#define   MXCHANADMINISTRATIVESTATE  95
+#define   MXCHANADMINISTRATIVESTATE  99
 	{(u_char) MXCHANADMINISTRATIVESTATE, ASN_INTEGER, RWRITE, var_mxChanTable, 6, {1, 1, 6, 1, 1, 7}},
-#define   MXCHANOPERATIONALSTATE  96
+#define   MXCHANOPERATIONALSTATE  100
 	{(u_char) MXCHANOPERATIONALSTATE, ASN_INTEGER, RONLY, var_mxChanTable, 6, {1, 1, 6, 1, 1, 8}},
-#define   MXCHANUSAGESTATE      97
+#define   MXCHANUSAGESTATE      101
 	{(u_char) MXCHANUSAGESTATE, ASN_INTEGER, RONLY, var_mxChanTable, 6, {1, 1, 6, 1, 1, 9}},
-#define   MXCHANAVAILABILITYSTATUS  98
+#define   MXCHANAVAILABILITYSTATUS  102
 	{(u_char) MXCHANAVAILABILITYSTATUS, ASN_OCTET_STR, RONLY, var_mxChanTable, 6, {1, 1, 6, 1, 1, 10}},
-#define   MXCHANCONTROLSTATUS   99
+#define   MXCHANCONTROLSTATUS   103
 	{(u_char) MXCHANCONTROLSTATUS, ASN_OCTET_STR, RWRITE, var_mxChanTable, 6, {1, 1, 6, 1, 1, 11}},
-#define   MXCHANPROCEDURALSTATUS  100
+#define   MXCHANPROCEDURALSTATUS  104
 	{(u_char) MXCHANPROCEDURALSTATUS, ASN_OCTET_STR, RONLY, var_mxChanTable, 6, {1, 1, 6, 1, 1, 12}},
-#define   MXCHANALARMSTATUS     101
+#define   MXCHANALARMSTATUS     105
 	{(u_char) MXCHANALARMSTATUS, ASN_OCTET_STR, RWRITE, var_mxChanTable, 6, {1, 1, 6, 1, 1, 13}},
-#define   MXCHANSTANDBYSTATUS   102
+#define   MXCHANSTANDBYSTATUS   106
 	{(u_char) MXCHANSTANDBYSTATUS, ASN_INTEGER, RONLY, var_mxChanTable, 6, {1, 1, 6, 1, 1, 14}},
-#define   MXXCONCARDINDEX       103
+#define   MXXCONCARDINDEX       107
 	{(u_char) MXXCONCARDINDEX, ASN_UNSIGNED, RWRITE, var_mxXconTable, 6, {1, 1, 7, 1, 1, 1}},
-#define   MXXCONSPANINDEX       104
+#define   MXXCONSPANINDEX       108
 	{(u_char) MXXCONSPANINDEX, ASN_UNSIGNED, RWRITE, var_mxXconTable, 6, {1, 1, 7, 1, 1, 2}},
-#define   MXXCONCHANINDEX       105
+#define   MXXCONCHANINDEX       109
 	{(u_char) MXXCONCHANINDEX, ASN_UNSIGNED, RWRITE, var_mxXconTable, 6, {1, 1, 7, 1, 1, 3}},
-#define   MXXCONTYPE            106
+#define   MXXCONTYPE            110
 	{(u_char) MXXCONTYPE, ASN_INTEGER, RWRITE, var_mxXconTable, 6, {1, 1, 7, 1, 1, 4}},
-#define   MXXCONSTORAGETYPE     107
+#define   MXXCONSTORAGETYPE     111
 	{(u_char) MXXCONSTORAGETYPE, ASN_INTEGER, RWRITE, var_mxXconTable, 6, {1, 1, 7, 1, 1, 5}},
-#define   MXXCONROWSTATUS       108
+#define   MXXCONROWSTATUS       112
 	{(u_char) MXXCONROWSTATUS, ASN_INTEGER, RWRITE, var_mxXconTable, 6, {1, 1, 7, 1, 1, 6}},
-#define   MXDISCONTINUITYTIME   109
+#define   MXDISCONTINUITYTIME   113
 	{(u_char) MXDISCONTINUITYTIME, ASN_TIMETICKS, RONLY, var_mxMIB, 3, {1, 2, 1}},
-#define   MXNEARENDCURRENTTIMEELAPSED  110
+#define   MXNEARENDCURRENTTIMEELAPSED  114
 	{(u_char) MXNEARENDCURRENTTIMEELAPSED, ASN_INTEGER, RONLY, var_mxNearEndCurrentTable, 7, {1, 5, 1, 1, 1, 1, 1}},
-#define   MXNEARENDCURRENTESS   111
+#define   MXNEARENDCURRENTESS   115
 	{(u_char) MXNEARENDCURRENTESS, ASN_GAUGE, RONLY, var_mxNearEndCurrentTable, 7, {1, 5, 1, 1, 1, 1, 2}},
-#define   MXNEARENDCURRENTSESS  112
+#define   MXNEARENDCURRENTSESS  116
 	{(u_char) MXNEARENDCURRENTSESS, ASN_GAUGE, RONLY, var_mxNearEndCurrentTable, 7, {1, 5, 1, 1, 1, 1, 3}},
-#define   MXNEARENDCURRENTSEFSS  113
+#define   MXNEARENDCURRENTSEFSS  117
 	{(u_char) MXNEARENDCURRENTSEFSS, ASN_GAUGE, RONLY, var_mxNearEndCurrentTable, 7, {1, 5, 1, 1, 1, 1, 4}},
-#define   MXNEARENDCURRENTUASS  114
+#define   MXNEARENDCURRENTUASS  118
 	{(u_char) MXNEARENDCURRENTUASS, ASN_GAUGE, RONLY, var_mxNearEndCurrentTable, 7, {1, 5, 1, 1, 1, 1, 5}},
-#define   MXNEARENDCURRENTCSSS  115
+#define   MXNEARENDCURRENTCSSS  119
 	{(u_char) MXNEARENDCURRENTCSSS, ASN_GAUGE, RONLY, var_mxNearEndCurrentTable, 7, {1, 5, 1, 1, 1, 1, 6}},
-#define   MXNEARENDCURRENTPCVS  116
+#define   MXNEARENDCURRENTPCVS  120
 	{(u_char) MXNEARENDCURRENTPCVS, ASN_GAUGE, RONLY, var_mxNearEndCurrentTable, 7, {1, 5, 1, 1, 1, 1, 7}},
-#define   MXNEARENDCURRENTLESS  117
+#define   MXNEARENDCURRENTLESS  121
 	{(u_char) MXNEARENDCURRENTLESS, ASN_GAUGE, RONLY, var_mxNearEndCurrentTable, 7, {1, 5, 1, 1, 1, 1, 8}},
-#define   MXNEARENDCURRENTBESS  118
+#define   MXNEARENDCURRENTBESS  122
 	{(u_char) MXNEARENDCURRENTBESS, ASN_GAUGE, RONLY, var_mxNearEndCurrentTable, 7, {1, 5, 1, 1, 1, 1, 9}},
-#define   MXNEARENDCURRENTDMS   119
+#define   MXNEARENDCURRENTDMS   123
 	{(u_char) MXNEARENDCURRENTDMS, ASN_GAUGE, RONLY, var_mxNearEndCurrentTable, 7, {1, 5, 1, 1, 1, 1, 10}},
-#define   MXNEARENDCURRENTLCVS  120
+#define   MXNEARENDCURRENTLCVS  124
 	{(u_char) MXNEARENDCURRENTLCVS, ASN_GAUGE, RONLY, var_mxNearEndCurrentTable, 7, {1, 5, 1, 1, 1, 1, 11}},
-#define   MXNEARENDINTERVALESS  121
+#define   MXNEARENDCURRENTFASES  125
+	{(u_char) MXNEARENDCURRENTFASES, ASN_GAUGE, RONLY, var_mxNearEndCurrentTable, 7, {1, 5, 1, 1, 1, 1, 12}},
+#define   MXNEARENDCURRENTFABES  126
+	{(u_char) MXNEARENDCURRENTFABES, ASN_GAUGE, RONLY, var_mxNearEndCurrentTable, 7, {1, 5, 1, 1, 1, 1, 13}},
+#define   MXNEARENDCURRENTFEBES  127
+	{(u_char) MXNEARENDCURRENTFEBES, ASN_GAUGE, RONLY, var_mxNearEndCurrentTable, 7, {1, 5, 1, 1, 1, 1, 14}},
+#define   MXNEARENDINTERVALESS  128
 	{(u_char) MXNEARENDINTERVALESS, ASN_GAUGE, RONLY, var_mxNearEndIntervalTable, 7, {1, 5, 1, 2, 1, 1, 2}},
-#define   MXNEARENDINTERVALSESS  122
+#define   MXNEARENDINTERVALSESS  129
 	{(u_char) MXNEARENDINTERVALSESS, ASN_GAUGE, RONLY, var_mxNearEndIntervalTable, 7, {1, 5, 1, 2, 1, 1, 3}},
-#define   MXNEARENDINTERVALSEFSS  123
+#define   MXNEARENDINTERVALSEFSS  130
 	{(u_char) MXNEARENDINTERVALSEFSS, ASN_GAUGE, RONLY, var_mxNearEndIntervalTable, 7, {1, 5, 1, 2, 1, 1, 4}},
-#define   MXNEARENDINTERVALUASS  124
+#define   MXNEARENDINTERVALUASS  131
 	{(u_char) MXNEARENDINTERVALUASS, ASN_GAUGE, RONLY, var_mxNearEndIntervalTable, 7, {1, 5, 1, 2, 1, 1, 5}},
-#define   MXNEARENDINTERVALCSSS  125
+#define   MXNEARENDINTERVALCSSS  132
 	{(u_char) MXNEARENDINTERVALCSSS, ASN_GAUGE, RONLY, var_mxNearEndIntervalTable, 7, {1, 5, 1, 2, 1, 1, 6}},
-#define   MXNEARENDINTERVALPCVS  126
+#define   MXNEARENDINTERVALPCVS  133
 	{(u_char) MXNEARENDINTERVALPCVS, ASN_GAUGE, RONLY, var_mxNearEndIntervalTable, 7, {1, 5, 1, 2, 1, 1, 7}},
-#define   MXNEARENDINTERVALLESS  127
+#define   MXNEARENDINTERVALLESS  134
 	{(u_char) MXNEARENDINTERVALLESS, ASN_GAUGE, RONLY, var_mxNearEndIntervalTable, 7, {1, 5, 1, 2, 1, 1, 8}},
-#define   MXNEARENDINTERVALBESS  128
+#define   MXNEARENDINTERVALBESS  135
 	{(u_char) MXNEARENDINTERVALBESS, ASN_GAUGE, RONLY, var_mxNearEndIntervalTable, 7, {1, 5, 1, 2, 1, 1, 9}},
-#define   MXNEARENDINTERVALDMS  129
+#define   MXNEARENDINTERVALDMS  136
 	{(u_char) MXNEARENDINTERVALDMS, ASN_GAUGE, RONLY, var_mxNearEndIntervalTable, 7, {1, 5, 1, 2, 1, 1, 10}},
-#define   MXNEARENDINTERVALLCVS  130
+#define   MXNEARENDINTERVALLCVS  137
 	{(u_char) MXNEARENDINTERVALLCVS, ASN_GAUGE, RONLY, var_mxNearEndIntervalTable, 7, {1, 5, 1, 2, 1, 1, 11}},
-#define   MXNEARENDINTERVALVALIDDATA  131
-	{(u_char) MXNEARENDINTERVALVALIDDATA, ASN_INTEGER, RONLY, var_mxNearEndIntervalTable, 7, {1, 5, 1, 2, 1, 1, 12}},
-#define   MXNEARENDTOTALVALIDINTERVALS  132
+#define   MXNEARENDINTERVALFASES  138
+	{(u_char) MXNEARENDINTERVALFASES, ASN_GAUGE, RONLY, var_mxNearEndIntervalTable, 7, {1, 5, 1, 2, 1, 1, 12}},
+#define   MXNEARENDINTERVALFABES  139
+	{(u_char) MXNEARENDINTERVALFABES, ASN_GAUGE, RONLY, var_mxNearEndIntervalTable, 7, {1, 5, 1, 2, 1, 1, 13}},
+#define   MXNEARENDINTERVALFEBES  140
+	{(u_char) MXNEARENDINTERVALFEBES, ASN_GAUGE, RONLY, var_mxNearEndIntervalTable, 7, {1, 5, 1, 2, 1, 1, 14}},
+#define   MXNEARENDINTERVALVALIDDATA  141
+	{(u_char) MXNEARENDINTERVALVALIDDATA, ASN_INTEGER, RONLY, var_mxNearEndIntervalTable, 7, {1, 5, 1, 2, 1, 1, 15}},
+#define   MXNEARENDTOTALVALIDINTERVALS  142
 	{(u_char) MXNEARENDTOTALVALIDINTERVALS, ASN_INTEGER, RONLY, var_mxNearEndTotalTable, 7, {1, 5, 1, 3, 1, 1, 1}},
-#define   MXNEARENDTOTALINVALIDINTERVALS  133
+#define   MXNEARENDTOTALINVALIDINTERVALS  143
 	{(u_char) MXNEARENDTOTALINVALIDINTERVALS, ASN_INTEGER, RONLY, var_mxNearEndTotalTable, 7, {1, 5, 1, 3, 1, 1, 2}},
-#define   MXNEARENDTOTALESS     134
+#define   MXNEARENDTOTALESS     144
 	{(u_char) MXNEARENDTOTALESS, ASN_GAUGE, RONLY, var_mxNearEndTotalTable, 7, {1, 5, 1, 3, 1, 1, 3}},
-#define   MXNEARENDTOTALSESS    135
+#define   MXNEARENDTOTALSESS    145
 	{(u_char) MXNEARENDTOTALSESS, ASN_GAUGE, RONLY, var_mxNearEndTotalTable, 7, {1, 5, 1, 3, 1, 1, 4}},
-#define   MXNEARENDTOTALSEFSS   136
+#define   MXNEARENDTOTALSEFSS   146
 	{(u_char) MXNEARENDTOTALSEFSS, ASN_GAUGE, RONLY, var_mxNearEndTotalTable, 7, {1, 5, 1, 3, 1, 1, 5}},
-#define   MXNEARENDTOTALUASS    137
+#define   MXNEARENDTOTALUASS    147
 	{(u_char) MXNEARENDTOTALUASS, ASN_GAUGE, RONLY, var_mxNearEndTotalTable, 7, {1, 5, 1, 3, 1, 1, 6}},
-#define   MXNEARENDTOTALCSSS    138
+#define   MXNEARENDTOTALCSSS    148
 	{(u_char) MXNEARENDTOTALCSSS, ASN_GAUGE, RONLY, var_mxNearEndTotalTable, 7, {1, 5, 1, 3, 1, 1, 7}},
-#define   MXNEARENDTOTALPCVS    139
+#define   MXNEARENDTOTALPCVS    149
 	{(u_char) MXNEARENDTOTALPCVS, ASN_GAUGE, RONLY, var_mxNearEndTotalTable, 7, {1, 5, 1, 3, 1, 1, 8}},
-#define   MXNEARENDTOTALLESS    140
+#define   MXNEARENDTOTALLESS    150
 	{(u_char) MXNEARENDTOTALLESS, ASN_GAUGE, RONLY, var_mxNearEndTotalTable, 7, {1, 5, 1, 3, 1, 1, 9}},
-#define   MXNEARENDTOTALBESS    141
+#define   MXNEARENDTOTALBESS    151
 	{(u_char) MXNEARENDTOTALBESS, ASN_GAUGE, RONLY, var_mxNearEndTotalTable, 7, {1, 5, 1, 3, 1, 1, 10}},
-#define   MXNEARENDTOTALDMS     142
+#define   MXNEARENDTOTALDMS     152
 	{(u_char) MXNEARENDTOTALDMS, ASN_GAUGE, RONLY, var_mxNearEndTotalTable, 7, {1, 5, 1, 3, 1, 1, 11}},
-#define   MXNEARENDTOTALLCVS    143
+#define   MXNEARENDTOTALLCVS    153
 	{(u_char) MXNEARENDTOTALLCVS, ASN_GAUGE, RONLY, var_mxNearEndTotalTable, 7, {1, 5, 1, 3, 1, 1, 12}},
-#define   MXFARENDCURRENTTIMEELAPSED  144
+#define   MXNEARENDTOTALFASES   154
+	{(u_char) MXNEARENDTOTALFASES, ASN_GAUGE, RONLY, var_mxNearEndTotalTable, 7, {1, 5, 1, 3, 1, 1, 13}},
+#define   MXNEARENDTOTALFABES   155
+	{(u_char) MXNEARENDTOTALFABES, ASN_GAUGE, RONLY, var_mxNearEndTotalTable, 7, {1, 5, 1, 3, 1, 1, 14}},
+#define   MXNEARENDTOTALFEBES   156
+	{(u_char) MXNEARENDTOTALFEBES, ASN_GAUGE, RONLY, var_mxNearEndTotalTable, 7, {1, 5, 1, 3, 1, 1, 15}},
+#define   MXFARENDCURRENTTIMEELAPSED  157
 	{(u_char) MXFARENDCURRENTTIMEELAPSED, ASN_INTEGER, RONLY, var_mxFarEndCurrentTable, 7, {1, 5, 2, 1, 1, 1, 1}},
-#define   MXFARENDCURRENTESS    145
+#define   MXFARENDCURRENTESS    158
 	{(u_char) MXFARENDCURRENTESS, ASN_GAUGE, RONLY, var_mxFarEndCurrentTable, 7, {1, 5, 2, 1, 1, 1, 2}},
-#define   MXFARENDCURRENTSESS   146
+#define   MXFARENDCURRENTSESS   159
 	{(u_char) MXFARENDCURRENTSESS, ASN_GAUGE, RONLY, var_mxFarEndCurrentTable, 7, {1, 5, 2, 1, 1, 1, 3}},
-#define   MXFARENDCURRENTSEFSS  147
+#define   MXFARENDCURRENTSEFSS  160
 	{(u_char) MXFARENDCURRENTSEFSS, ASN_GAUGE, RONLY, var_mxFarEndCurrentTable, 7, {1, 5, 2, 1, 1, 1, 4}},
-#define   MXFARENDCURRENTUASS   148
+#define   MXFARENDCURRENTUASS   161
 	{(u_char) MXFARENDCURRENTUASS, ASN_GAUGE, RONLY, var_mxFarEndCurrentTable, 7, {1, 5, 2, 1, 1, 1, 5}},
-#define   MXFARENDCURRENTCSSS   149
+#define   MXFARENDCURRENTCSSS   162
 	{(u_char) MXFARENDCURRENTCSSS, ASN_GAUGE, RONLY, var_mxFarEndCurrentTable, 7, {1, 5, 2, 1, 1, 1, 6}},
-#define   MXFARENDCURRENTPCVS   150
+#define   MXFARENDCURRENTPCVS   163
 	{(u_char) MXFARENDCURRENTPCVS, ASN_GAUGE, RONLY, var_mxFarEndCurrentTable, 7, {1, 5, 2, 1, 1, 1, 7}},
-#define   MXFARENDCURRENTLESS   151
+#define   MXFARENDCURRENTLESS   164
 	{(u_char) MXFARENDCURRENTLESS, ASN_GAUGE, RONLY, var_mxFarEndCurrentTable, 7, {1, 5, 2, 1, 1, 1, 8}},
-#define   MXFARENDCURRENTBESS   152
+#define   MXFARENDCURRENTBESS   165
 	{(u_char) MXFARENDCURRENTBESS, ASN_GAUGE, RONLY, var_mxFarEndCurrentTable, 7, {1, 5, 2, 1, 1, 1, 9}},
-#define   MXFARENDCURRENTDMS    153
+#define   MXFARENDCURRENTDMS    166
 	{(u_char) MXFARENDCURRENTDMS, ASN_GAUGE, RONLY, var_mxFarEndCurrentTable, 7, {1, 5, 2, 1, 1, 1, 10}},
-#define   MXFARENDINTERVALESS   154
+#define   MXFARENDINTERVALESS   167
 	{(u_char) MXFARENDINTERVALESS, ASN_GAUGE, RONLY, var_mxFarEndIntervalTable, 7, {1, 5, 2, 2, 1, 1, 2}},
-#define   MXFARENDINTERVALSESS  155
+#define   MXFARENDINTERVALSESS  168
 	{(u_char) MXFARENDINTERVALSESS, ASN_GAUGE, RONLY, var_mxFarEndIntervalTable, 7, {1, 5, 2, 2, 1, 1, 3}},
-#define   MXFARENDINTERVALSEFSS  156
+#define   MXFARENDINTERVALSEFSS  169
 	{(u_char) MXFARENDINTERVALSEFSS, ASN_GAUGE, RONLY, var_mxFarEndIntervalTable, 7, {1, 5, 2, 2, 1, 1, 4}},
-#define   MXFARENDINTERVALUASS  157
+#define   MXFARENDINTERVALUASS  170
 	{(u_char) MXFARENDINTERVALUASS, ASN_GAUGE, RONLY, var_mxFarEndIntervalTable, 7, {1, 5, 2, 2, 1, 1, 5}},
-#define   MXFARENDINTERVALCSSS  158
+#define   MXFARENDINTERVALCSSS  171
 	{(u_char) MXFARENDINTERVALCSSS, ASN_GAUGE, RONLY, var_mxFarEndIntervalTable, 7, {1, 5, 2, 2, 1, 1, 6}},
-#define   MXFARENDINTERVALPCVS  159
+#define   MXFARENDINTERVALPCVS  172
 	{(u_char) MXFARENDINTERVALPCVS, ASN_GAUGE, RONLY, var_mxFarEndIntervalTable, 7, {1, 5, 2, 2, 1, 1, 7}},
-#define   MXFARENDINTERVALLESS  160
+#define   MXFARENDINTERVALLESS  173
 	{(u_char) MXFARENDINTERVALLESS, ASN_GAUGE, RONLY, var_mxFarEndIntervalTable, 7, {1, 5, 2, 2, 1, 1, 8}},
-#define   MXFARENDINTERVALBESS  161
+#define   MXFARENDINTERVALBESS  174
 	{(u_char) MXFARENDINTERVALBESS, ASN_GAUGE, RONLY, var_mxFarEndIntervalTable, 7, {1, 5, 2, 2, 1, 1, 9}},
-#define   MXFARENDINTERVALDMS   162
+#define   MXFARENDINTERVALDMS   175
 	{(u_char) MXFARENDINTERVALDMS, ASN_GAUGE, RONLY, var_mxFarEndIntervalTable, 7, {1, 5, 2, 2, 1, 1, 10}},
-#define   MXFARENDINTERVALVALIDDATA  163
+#define   MXFARENDINTERVALVALIDDATA  176
 	{(u_char) MXFARENDINTERVALVALIDDATA, ASN_INTEGER, RONLY, var_mxFarEndIntervalTable, 7, {1, 5, 2, 2, 1, 1, 11}},
-#define   MXFARENDTOTALVALIDINTERVALS  164
+#define   MXFARENDTOTALVALIDINTERVALS  177
 	{(u_char) MXFARENDTOTALVALIDINTERVALS, ASN_INTEGER, RONLY, var_mxFarEndTotalTable, 7, {1, 5, 2, 3, 1, 1, 1}},
-#define   MXFARENDTOTALINVALIDINTERVALS  165
+#define   MXFARENDTOTALINVALIDINTERVALS  178
 	{(u_char) MXFARENDTOTALINVALIDINTERVALS, ASN_INTEGER, RONLY, var_mxFarEndTotalTable, 7, {1, 5, 2, 3, 1, 1, 2}},
-#define   MXFARENDTOTALESS      166
+#define   MXFARENDTOTALESS      179
 	{(u_char) MXFARENDTOTALESS, ASN_GAUGE, RONLY, var_mxFarEndTotalTable, 7, {1, 5, 2, 3, 1, 1, 3}},
-#define   MXFARENDTOTALSESS     167
+#define   MXFARENDTOTALSESS     180
 	{(u_char) MXFARENDTOTALSESS, ASN_GAUGE, RONLY, var_mxFarEndTotalTable, 7, {1, 5, 2, 3, 1, 1, 4}},
-#define   MXFARENDTOTALSEFSS    168
+#define   MXFARENDTOTALSEFSS    181
 	{(u_char) MXFARENDTOTALSEFSS, ASN_GAUGE, RONLY, var_mxFarEndTotalTable, 7, {1, 5, 2, 3, 1, 1, 5}},
-#define   MXFARENDTOTALUASS     169
+#define   MXFARENDTOTALUASS     182
 	{(u_char) MXFARENDTOTALUASS, ASN_GAUGE, RONLY, var_mxFarEndTotalTable, 7, {1, 5, 2, 3, 1, 1, 6}},
-#define   MXFARENDTOTALCSSS     170
+#define   MXFARENDTOTALCSSS     183
 	{(u_char) MXFARENDTOTALCSSS, ASN_GAUGE, RONLY, var_mxFarEndTotalTable, 7, {1, 5, 2, 3, 1, 1, 7}},
-#define   MXFARENDTOTALPCVS     171
+#define   MXFARENDTOTALPCVS     184
 	{(u_char) MXFARENDTOTALPCVS, ASN_GAUGE, RONLY, var_mxFarEndTotalTable, 7, {1, 5, 2, 3, 1, 1, 8}},
-#define   MXFARENDTOTALLESS     172
+#define   MXFARENDTOTALLESS     185
 	{(u_char) MXFARENDTOTALLESS, ASN_GAUGE, RONLY, var_mxFarEndTotalTable, 7, {1, 5, 2, 3, 1, 1, 9}},
-#define   MXFARENDTOTALBESS     173
+#define   MXFARENDTOTALBESS     186
 	{(u_char) MXFARENDTOTALBESS, ASN_GAUGE, RONLY, var_mxFarEndTotalTable, 7, {1, 5, 2, 3, 1, 1, 10}},
-#define   MXFARENDTOTALDMS      174
+#define   MXFARENDTOTALDMS      187
 	{(u_char) MXFARENDTOTALDMS, ASN_GAUGE, RONLY, var_mxFarEndTotalTable, 7, {1, 5, 2, 3, 1, 1, 11}},
 };
 
@@ -820,8 +878,40 @@ mxMIB_create(void)
 		StorageNew->mxDiscontinuityTime = 0;
 
 	}
+      done:
 	DEBUGMSGTL(("mxMIB", "done.\n"));
 	return (StorageNew);
+	goto nomem;
+      nomem:
+	mxMIB_destroy(&StorageNew);
+	goto done;
+}
+
+/**
+ * @fn struct mxMIB_data *mxMIB_duplicate(struct mxMIB_data *thedata)
+ * @param thedata the mib structure to duplicate
+ * @brief duplicate a mib structure for the mib
+ *
+ * Duplicates the specified mib structure @param thedata and returns a pointer to the newly
+ * allocated mib structure on success, or NULL on failure.
+ */
+struct mxMIB_data *
+mxMIB_duplicate(struct mxMIB_data *thedata)
+{
+	struct mxMIB_data *StorageNew = SNMP_MALLOC_STRUCT(mxMIB_data);
+
+	DEBUGMSGTL(("mxMIB", "mxMIB_duplicate: duplicating mib... "));
+	if (StorageNew != NULL) {
+		StorageNew->mxCardNextIndex = thedata->mxCardNextIndex;
+		StorageNew->mxDiscontinuityTime = thedata->mxDiscontinuityTime;
+	}
+      done:
+	DEBUGMSGTL(("mxMIB", "done.\n"));
+	return (StorageNew);
+	goto destroy;
+      destroy:
+	mxMIB_destroy(&StorageNew);
+	goto done;
 }
 
 /**
@@ -872,7 +962,7 @@ mxMIB_add(struct mxMIB_data *thedata)
  * @param line line from configuration file matching the token.
  * @brief parse configuration file for mxMIB entries.
  *
- * This callback is called by UCD-SNMP when it prases a configuration file and finds a configuration
+ * This callback is called by UCD-SNMP when it parses a configuration file and finds a configuration
  * file line for the registsred token (in this case mxMIB).  This routine is invoked by
  * UCD-SNMP to read the values of scalars in the MIB from the configuration file.  Note that this
  * procedure may exist regardless of the persistence of the MIB.  If there are no configured entries
@@ -928,6 +1018,62 @@ store_mxMIB(int majorID, int minorID, void *serverarg, void *clientarg)
 	}
 	DEBUGMSGTL(("mxMIB", "done.\n"));
 	return SNMPERR_SUCCESS;
+}
+
+/**
+ * @fn int check_mxMIB(struct mxMIB_data *StorageTmp, struct mxMIB_data *StorageOld)
+ * @param StorageTmp the data as updated
+ * @param StorageOld the data previous to update
+ *
+ * This function is used by mibs.  It is used to check, all scalars at a time, the varbinds
+ * belonging to the mib.  This function is called for the first varbind in a mib at the beginning of
+ * the ACTION phase.  The COMMIT phase does not ensue unless this check passes.  This function can
+ * return SNMP_ERR_NOERR or a specific SNMP error value.  Values in StorageOld are the values before
+ * the varbinds on the mib were applied; the values in StorageTmp are the new values.  The function
+ * is permitted to change the values in StorageTmp to correct them; however, preferences should be
+ * made for setting values that were not in the varbinds.
+ */
+int
+check_mxMIB(struct mxMIB_data *StorageTmp, struct mxMIB_data *StorageOld)
+{
+	/* XXX: provide code to check the scalars for consistency */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int update_mxMIB(struct mxMIB_data *StorageTmp, struct mxMIB_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the set operation (ACTION phase)
+ *
+ * This function is used by mibs.  It is used to update, all scalars at a time, the varbinds
+ * belonging to the mib.  This function is called for the first varbind in a mib at the beginning of
+ * the COMMIT phase.  The start of the ACTION phase performs a consistency check on the mib before
+ * allowing the request to proceed to the COMMIT phase.  The COMMIT phase then arrives here with
+ * consistency already checked (see check_mxMIB()).  This function can
+ * return SNMP_ERR_NOERROR or SNMP_ERR_COMMITFAILED.  Values in StorageOld are the values before the
+ * varbinds on the mib were applied: the values in StorageTmp are the new values.
+ */
+int
+update_mxMIB(struct mxMIB_data *StorageTmp, struct mxMIB_data *StorageOld)
+{
+	/* XXX: provide code to update the row with the underlying device */
+	mxMIB_refresh = 1;
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn revert_mxMIB(struct 
+ * @fn void revert_mxMIB(struct mxMIB_data *StorageTmp, struct mxMIB_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the undo operation (UNDO phase)
+ */
+void
+revert_mxMIB(struct mxMIB_data *StorageTmp, struct mxMIB_data *StorageOld)
+{
+	/* XXX: provide code to revert the row with the underlying device */
+	update_mxMIB(StorageOld, NULL);
 }
 
 /**
@@ -1035,19 +1181,26 @@ mxSyncTable_create(void)
 	DEBUGMSGTL(("mxMIB", "mxSyncTable_create: creating row...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
-		if ((StorageNew->mxSyncSpanId = (uint8_t *) strdup("")) != NULL)
-			StorageNew->mxSyncSpanIdLen = strlen("");
+		if ((StorageNew->mxSyncSpanId = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->mxSyncSpanIdLen = 0;
+		StorageNew->mxSyncSpanId[StorageNew->mxSyncSpanIdLen] = 0;
 		StorageNew->mxSyncRowStatus = 0;
 		StorageNew->mxSyncRowStatus = RS_NOTREADY;
 	}
+      done:
 	DEBUGMSGTL(("mxMIB", "done.\n"));
 	return (StorageNew);
+	goto nomem;
+      nomem:
+	mxSyncTable_destroy(&StorageNew);
+	goto done;
 }
 
 /**
  * @fn struct mxSyncTable_data *mxSyncTable_duplicate(struct mxSyncTable_data *thedata)
  * @param thedata the row structure to duplicate.
- * @brief duplicat a row structure for a table.
+ * @brief duplicate a row structure for a table.
  *
  * Duplicates the specified row structure @param thedata and returns a pointer to the newly
  * allocated row structure on success, or NULL on failure.
@@ -1059,6 +1212,15 @@ mxSyncTable_duplicate(struct mxSyncTable_data *thedata)
 
 	DEBUGMSGTL(("mxMIB", "mxSyncTable_duplicate: duplicating row...  "));
 	if (StorageNew != NULL) {
+		StorageNew->mxSyncTable_id = thedata->mxSyncTable_id;
+		StorageNew->mxSyncGroup = thedata->mxSyncGroup;
+		StorageNew->mxSyncIndex = thedata->mxSyncIndex;
+		if (!(StorageNew->mxSyncSpanId = malloc(thedata->mxSyncSpanIdLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->mxSyncSpanId, thedata->mxSyncSpanId, thedata->mxSyncSpanIdLen);
+		StorageNew->mxSyncSpanIdLen = thedata->mxSyncSpanIdLen;
+		StorageNew->mxSyncSpanId[StorageNew->mxSyncSpanIdLen] = 0;
+		StorageNew->mxSyncRowStatus = thedata->mxSyncRowStatus;
 	}
       done:
 	DEBUGMSGTL(("mxMIB", "done.\n"));
@@ -1156,7 +1318,7 @@ mxSyncTable_del(struct mxSyncTable_data *thedata)
  * @param line line from configuration file matching the token.
  * @brief parse configuration file for mxSyncTable entries.
  *
- * This callback is called by UCD-SNMP when it prases a configuration file and finds a configuration
+ * This callback is called by UCD-SNMP when it parses a configuration file and finds a configuration
  * file line for the registsred token (in this case mxSyncTable).  This routine is invoked by UCD-SNMP
  * to read the values of each row in the table from the configuration file.  Note that this
  * procedure may exist regardless of the persistence of the table.  If there are no configured
@@ -1239,44 +1401,50 @@ mxDrivTable_create(void)
 
 	DEBUGMSGTL(("mxMIB", "mxDrivTable_create: creating row...  "));
 	if (StorageNew != NULL) {
-		if (!(StorageNew->mxDrivTable_devname = calloc(129, 1)))
-			goto nomem;
 		/* XXX: fill in default row values here into StorageNew */
 		StorageNew->mxDrivIdnum = 0;
 		StorageNew->mxDrivMajor = 0;
-		if (!(StorageNew->mxDrivDescription = calloc(257, 1)))
+		if ((StorageNew->mxDrivDescription = malloc(1)) == NULL)
 			goto nomem;
 		StorageNew->mxDrivDescriptionLen = 0;
-		if (!(StorageNew->mxDrivRevision = calloc(257, 1)))
+		StorageNew->mxDrivDescription[StorageNew->mxDrivDescriptionLen] = 0;
+		if ((StorageNew->mxDrivRevision = malloc(1)) == NULL)
 			goto nomem;
 		StorageNew->mxDrivRevisionLen = 0;
-		if (!(StorageNew->mxDrivCopyright = calloc(257, 1)))
+		StorageNew->mxDrivRevision[StorageNew->mxDrivRevisionLen] = 0;
+		if ((StorageNew->mxDrivCopyright = malloc(1)) == NULL)
 			goto nomem;
 		StorageNew->mxDrivCopyrightLen = 0;
-		if (!(StorageNew->mxDrivSupportedDevice = calloc(257, 1)))
+		StorageNew->mxDrivCopyright[StorageNew->mxDrivCopyrightLen] = 0;
+		if ((StorageNew->mxDrivSupportedDevice = malloc(1)) == NULL)
 			goto nomem;
 		StorageNew->mxDrivSupportedDeviceLen = 0;
-		if (!(StorageNew->mxDrivContact = calloc(257, 1)))
+		StorageNew->mxDrivSupportedDevice[StorageNew->mxDrivSupportedDeviceLen] = 0;
+		if ((StorageNew->mxDrivContact = malloc(1)) == NULL)
 			goto nomem;
 		StorageNew->mxDrivContactLen = 0;
+		StorageNew->mxDrivContact[StorageNew->mxDrivContactLen] = 0;
 		StorageNew->mxDrivLicense = 0;
-		if (!(StorageNew->mxDrivDate = calloc(12, 1)))
+		if ((StorageNew->mxDrivDate = malloc(1)) == NULL)
 			goto nomem;
 		StorageNew->mxDrivDateLen = 0;
+		StorageNew->mxDrivDate[StorageNew->mxDrivDateLen] = 0;
 		StorageNew->mxDrivRowStatus = 0;
 		StorageNew->mxDrivRowStatus = RS_NOTREADY;
-	} else {
-	      nomem:
-		mxDrivTable_destroy(&StorageNew);
 	}
+      done:
 	DEBUGMSGTL(("mxMIB", "done.\n"));
 	return (StorageNew);
+	goto nomem;
+      nomem:
+	mxDrivTable_destroy(&StorageNew);
+	goto done;
 }
 
 /**
  * @fn struct mxDrivTable_data *mxDrivTable_duplicate(struct mxDrivTable_data *thedata)
  * @param thedata the row structure to duplicate.
- * @brief duplicat a row structure for a table.
+ * @brief duplicate a row structure for a table.
  *
  * Duplicates the specified row structure @param thedata and returns a pointer to the newly
  * allocated row structure on success, or NULL on failure.
@@ -1288,6 +1456,46 @@ mxDrivTable_duplicate(struct mxDrivTable_data *thedata)
 
 	DEBUGMSGTL(("mxMIB", "mxDrivTable_duplicate: duplicating row...  "));
 	if (StorageNew != NULL) {
+		StorageNew->mxDrivTable_id = thedata->mxDrivTable_id;
+		if (!(StorageNew->mxDrivName = malloc(thedata->mxDrivNameLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->mxDrivName, thedata->mxDrivName, thedata->mxDrivNameLen);
+		StorageNew->mxDrivNameLen = thedata->mxDrivNameLen;
+		StorageNew->mxDrivName[StorageNew->mxDrivNameLen] = 0;
+		StorageNew->mxDrivIdnum = thedata->mxDrivIdnum;
+		StorageNew->mxDrivMajor = thedata->mxDrivMajor;
+		if (!(StorageNew->mxDrivDescription = malloc(thedata->mxDrivDescriptionLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->mxDrivDescription, thedata->mxDrivDescription, thedata->mxDrivDescriptionLen);
+		StorageNew->mxDrivDescriptionLen = thedata->mxDrivDescriptionLen;
+		StorageNew->mxDrivDescription[StorageNew->mxDrivDescriptionLen] = 0;
+		if (!(StorageNew->mxDrivRevision = malloc(thedata->mxDrivRevisionLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->mxDrivRevision, thedata->mxDrivRevision, thedata->mxDrivRevisionLen);
+		StorageNew->mxDrivRevisionLen = thedata->mxDrivRevisionLen;
+		StorageNew->mxDrivRevision[StorageNew->mxDrivRevisionLen] = 0;
+		if (!(StorageNew->mxDrivCopyright = malloc(thedata->mxDrivCopyrightLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->mxDrivCopyright, thedata->mxDrivCopyright, thedata->mxDrivCopyrightLen);
+		StorageNew->mxDrivCopyrightLen = thedata->mxDrivCopyrightLen;
+		StorageNew->mxDrivCopyright[StorageNew->mxDrivCopyrightLen] = 0;
+		if (!(StorageNew->mxDrivSupportedDevice = malloc(thedata->mxDrivSupportedDeviceLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->mxDrivSupportedDevice, thedata->mxDrivSupportedDevice, thedata->mxDrivSupportedDeviceLen);
+		StorageNew->mxDrivSupportedDeviceLen = thedata->mxDrivSupportedDeviceLen;
+		StorageNew->mxDrivSupportedDevice[StorageNew->mxDrivSupportedDeviceLen] = 0;
+		if (!(StorageNew->mxDrivContact = malloc(thedata->mxDrivContactLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->mxDrivContact, thedata->mxDrivContact, thedata->mxDrivContactLen);
+		StorageNew->mxDrivContactLen = thedata->mxDrivContactLen;
+		StorageNew->mxDrivContact[StorageNew->mxDrivContactLen] = 0;
+		StorageNew->mxDrivLicense = thedata->mxDrivLicense;
+		if (!(StorageNew->mxDrivDate = malloc(thedata->mxDrivDateLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->mxDrivDate, thedata->mxDrivDate, thedata->mxDrivDateLen);
+		StorageNew->mxDrivDateLen = thedata->mxDrivDateLen;
+		StorageNew->mxDrivDate[StorageNew->mxDrivDateLen] = 0;
+		StorageNew->mxDrivRowStatus = thedata->mxDrivRowStatus;
 	}
       done:
 	DEBUGMSGTL(("mxMIB", "done.\n"));
@@ -1315,7 +1523,6 @@ mxDrivTable_destroy(struct mxDrivTable_data **thedata)
 
 	DEBUGMSGTL(("mxMIB", "mxDrivTable_destroy: deleting row...  "));
 	if ((StorageDel = *thedata) != NULL) {
-		SNMP_FREE(StorageDel->mxDrivTable_devname);
 		SNMP_FREE(StorageDel->mxDrivName);
 		StorageDel->mxDrivNameLen = 0;
 		SNMP_FREE(StorageDel->mxDrivDescription);
@@ -1396,7 +1603,7 @@ mxDrivTable_del(struct mxDrivTable_data *thedata)
  * @param line line from configuration file matching the token.
  * @brief parse configuration file for mxDrivTable entries.
  *
- * This callback is called by UCD-SNMP when it prases a configuration file and finds a configuration
+ * This callback is called by UCD-SNMP when it parses a configuration file and finds a configuration
  * file line for the registsred token (in this case mxDrivTable).  This routine is invoked by UCD-SNMP
  * to read the values of each row in the table from the configuration file.  Note that this
  * procedure may exist regardless of the persistence of the table.  If there are no configured
@@ -1524,55 +1731,81 @@ mxCardTable_create(void)
 	DEBUGMSGTL(("mxMIB", "mxCardTable_create: creating row...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
-		if ((StorageNew->mxDrivName = (uint8_t *) strdup("")) != NULL)
-			StorageNew->mxDrivNameLen = strlen("");
-		if ((StorageNew->mxCardType = snmp_duplicate_objid(zeroDotZero_oid, 2)))
-			StorageNew->mxCardTypeLen = 2;
+		if ((StorageNew->mxDrivName = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->mxDrivNameLen = 0;
+		StorageNew->mxDrivName[StorageNew->mxDrivNameLen] = 0;
+		if ((StorageNew->mxCardType = snmp_duplicate_objid(zeroDotZero_oid, 2)) == NULL)
+			goto nomem;
+		StorageNew->mxCardTypeLen = 2;
 		StorageNew->mxCardIdentifier = 0;
-		if ((StorageNew->mxCardRevision = (uint8_t *) strdup("")) != NULL)
-			StorageNew->mxCardRevisionLen = strlen("");
-		if ((StorageNew->mxCardChipType = snmp_duplicate_objid(zeroDotZero_oid, 2)))
-			StorageNew->mxCardChipTypeLen = 2;
-		if ((StorageNew->mxCardChipRevision = (uint8_t *) strdup("")) != NULL)
-			StorageNew->mxCardChipRevisionLen = strlen("");
+		if ((StorageNew->mxCardRevision = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->mxCardRevisionLen = 0;
+		StorageNew->mxCardRevision[StorageNew->mxCardRevisionLen] = 0;
+		if ((StorageNew->mxCardChipType = snmp_duplicate_objid(zeroDotZero_oid, 2)) == NULL)
+			goto nomem;
+		StorageNew->mxCardChipTypeLen = 2;
+		if ((StorageNew->mxCardChipRevision = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->mxCardChipRevisionLen = 0;
+		StorageNew->mxCardChipRevision[StorageNew->mxCardChipRevisionLen] = 0;
 		StorageNew->mxCardPciBus = 0;
 		StorageNew->mxCardPciSlot = 0;
 		StorageNew->mxCardPciIrq = 0;
 		StorageNew->mxCardSpanType = 0;
-		if (memdup((u_char **) &StorageNew->mxCardMode, (u_char *) "\x00", 1) == SNMPERR_SUCCESS)
-			StorageNew->mxCardModeLen = 1;
+		if (memdup((u_char **) &StorageNew->mxCardMode, (u_char *) "\x00", 1) != SNMPERR_SUCCESS)
+			goto nomem;
+		StorageNew->mxCardModeLen = 1;
 		StorageNew->mxCardSyncMaster = 0;
 		StorageNew->mxCardSyncSource = 0;
 		StorageNew->mxCardSyncGroup = 0;
 		StorageNew->mxCardAdministrativeState = MXCARDADMINISTRATIVESTATE_LOCKED;
 		StorageNew->mxCardOperationalState = MXCARDOPERATIONALSTATE_DISABLED;
 		StorageNew->mxCardUsageState = MXCARDUSAGESTATE_IDLE;
-		if (memdup((u_char **) &StorageNew->mxCardAlarmStatus, (u_char *) "\x00", 1) == SNMPERR_SUCCESS)
-			StorageNew->mxCardAlarmStatusLen = 1;
-		if (memdup((u_char **) &StorageNew->mxCardProceduralStatus, (u_char *) "\x00", 1) == SNMPERR_SUCCESS)
-			StorageNew->mxCardProceduralStatusLen = 1;
-		if (memdup((u_char **) &StorageNew->mxCardAvailabilityStatus, (u_char *) "\x00\x00", 2) == SNMPERR_SUCCESS)
-			StorageNew->mxCardAvailabilityStatusLen = 2;
-		if (memdup((u_char **) &StorageNew->mxCardControlStatus, (u_char *) "\x00", 1) == SNMPERR_SUCCESS)
-			StorageNew->mxCardControlStatusLen = 1;
+		if (memdup((u_char **) &StorageNew->mxCardAlarmStatus, (u_char *) "\x00", 1) != SNMPERR_SUCCESS)
+			goto nomem;
+		StorageNew->mxCardAlarmStatusLen = 1;
+		if (memdup((u_char **) &StorageNew->mxCardProceduralStatus, (u_char *) "\x00", 1) != SNMPERR_SUCCESS)
+			goto nomem;
+		StorageNew->mxCardProceduralStatusLen = 1;
+		if (memdup((u_char **) &StorageNew->mxCardAvailabilityStatus, (u_char *) "\x00\x00", 2) != SNMPERR_SUCCESS)
+			goto nomem;
+		StorageNew->mxCardAvailabilityStatusLen = 2;
+		if (memdup((u_char **) &StorageNew->mxCardControlStatus, (u_char *) "\x00", 1) != SNMPERR_SUCCESS)
+			goto nomem;
+		StorageNew->mxCardControlStatusLen = 1;
 		StorageNew->mxCardUnknownStatus = MXCARDUNKNOWNSTATUS_FALSE;
 		StorageNew->mxCardStandbyStatus = MXCARDSTANDBYSTATUS_PROVIDINGSERVICE;
-		if ((StorageNew->mxCardSyncSpanId = (uint8_t *) strdup("")) != NULL)
-			StorageNew->mxCardSyncSpanIdLen = strlen("");
+		if ((StorageNew->mxCardSyncSpanId = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->mxCardSyncSpanIdLen = 0;
+		StorageNew->mxCardSyncSpanId[StorageNew->mxCardSyncSpanIdLen] = 0;
 		StorageNew->mxCardSyncTransitions = 0;
-		if ((StorageNew->mxCardName = (uint8_t *) strdup("")) != NULL)
-			StorageNew->mxCardNameLen = strlen("");
+		if (memdup((u_char **) &StorageNew->mxCardLeds, (u_char *) "\x00\x00", 2) != SNMPERR_SUCCESS)
+			goto nomem;
+		StorageNew->mxCardLedsLen = 2;
+		StorageNew->mxCardLastChange = 0;
+		if ((StorageNew->mxCardName = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->mxCardNameLen = 0;
+		StorageNew->mxCardName[StorageNew->mxCardNameLen] = 0;
 		StorageNew->mxCardStatus = 0;
 		StorageNew->mxCardStatus = RS_NOTREADY;
 	}
+      done:
 	DEBUGMSGTL(("mxMIB", "done.\n"));
 	return (StorageNew);
+	goto nomem;
+      nomem:
+	mxCardTable_destroy(&StorageNew);
+	goto done;
 }
 
 /**
  * @fn struct mxCardTable_data *mxCardTable_duplicate(struct mxCardTable_data *thedata)
  * @param thedata the row structure to duplicate.
- * @brief duplicat a row structure for a table.
+ * @brief duplicate a row structure for a table.
  *
  * Duplicates the specified row structure @param thedata and returns a pointer to the newly
  * allocated row structure on success, or NULL on failure.
@@ -1584,6 +1817,85 @@ mxCardTable_duplicate(struct mxCardTable_data *thedata)
 
 	DEBUGMSGTL(("mxMIB", "mxCardTable_duplicate: duplicating row...  "));
 	if (StorageNew != NULL) {
+		StorageNew->mxCardTable_id = thedata->mxCardTable_id;
+		if (!(StorageNew->mxDrivName = malloc(thedata->mxDrivNameLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->mxDrivName, thedata->mxDrivName, thedata->mxDrivNameLen);
+		StorageNew->mxDrivNameLen = thedata->mxDrivNameLen;
+		StorageNew->mxDrivName[StorageNew->mxDrivNameLen] = 0;
+		StorageNew->mxCardIndex = thedata->mxCardIndex;
+		if (!(StorageNew->mxCardType = snmp_duplicate_objid(thedata->mxCardType, thedata->mxCardTypeLen / sizeof(oid))))
+			goto destroy;
+		StorageNew->mxCardTypeLen = thedata->mxCardTypeLen;
+		StorageNew->mxCardIdentifier = thedata->mxCardIdentifier;
+		if (!(StorageNew->mxCardRevision = malloc(thedata->mxCardRevisionLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->mxCardRevision, thedata->mxCardRevision, thedata->mxCardRevisionLen);
+		StorageNew->mxCardRevisionLen = thedata->mxCardRevisionLen;
+		StorageNew->mxCardRevision[StorageNew->mxCardRevisionLen] = 0;
+		if (!(StorageNew->mxCardChipType = snmp_duplicate_objid(thedata->mxCardChipType, thedata->mxCardChipTypeLen / sizeof(oid))))
+			goto destroy;
+		StorageNew->mxCardChipTypeLen = thedata->mxCardChipTypeLen;
+		if (!(StorageNew->mxCardChipRevision = malloc(thedata->mxCardChipRevisionLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->mxCardChipRevision, thedata->mxCardChipRevision, thedata->mxCardChipRevisionLen);
+		StorageNew->mxCardChipRevisionLen = thedata->mxCardChipRevisionLen;
+		StorageNew->mxCardChipRevision[StorageNew->mxCardChipRevisionLen] = 0;
+		StorageNew->mxCardPciBus = thedata->mxCardPciBus;
+		StorageNew->mxCardPciSlot = thedata->mxCardPciSlot;
+		StorageNew->mxCardPciIrq = thedata->mxCardPciIrq;
+		StorageNew->mxCardSpanType = thedata->mxCardSpanType;
+		if (!(StorageNew->mxCardMode = malloc(thedata->mxCardModeLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->mxCardMode, thedata->mxCardMode, thedata->mxCardModeLen);
+		StorageNew->mxCardModeLen = thedata->mxCardModeLen;
+		StorageNew->mxCardMode[StorageNew->mxCardModeLen] = 0;
+		StorageNew->mxCardSyncMaster = thedata->mxCardSyncMaster;
+		StorageNew->mxCardSyncSource = thedata->mxCardSyncSource;
+		StorageNew->mxCardSyncGroup = thedata->mxCardSyncGroup;
+		StorageNew->mxCardAdministrativeState = thedata->mxCardAdministrativeState;
+		StorageNew->mxCardOperationalState = thedata->mxCardOperationalState;
+		StorageNew->mxCardUsageState = thedata->mxCardUsageState;
+		if (!(StorageNew->mxCardAlarmStatus = malloc(thedata->mxCardAlarmStatusLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->mxCardAlarmStatus, thedata->mxCardAlarmStatus, thedata->mxCardAlarmStatusLen);
+		StorageNew->mxCardAlarmStatusLen = thedata->mxCardAlarmStatusLen;
+		StorageNew->mxCardAlarmStatus[StorageNew->mxCardAlarmStatusLen] = 0;
+		if (!(StorageNew->mxCardProceduralStatus = malloc(thedata->mxCardProceduralStatusLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->mxCardProceduralStatus, thedata->mxCardProceduralStatus, thedata->mxCardProceduralStatusLen);
+		StorageNew->mxCardProceduralStatusLen = thedata->mxCardProceduralStatusLen;
+		StorageNew->mxCardProceduralStatus[StorageNew->mxCardProceduralStatusLen] = 0;
+		if (!(StorageNew->mxCardAvailabilityStatus = malloc(thedata->mxCardAvailabilityStatusLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->mxCardAvailabilityStatus, thedata->mxCardAvailabilityStatus, thedata->mxCardAvailabilityStatusLen);
+		StorageNew->mxCardAvailabilityStatusLen = thedata->mxCardAvailabilityStatusLen;
+		StorageNew->mxCardAvailabilityStatus[StorageNew->mxCardAvailabilityStatusLen] = 0;
+		if (!(StorageNew->mxCardControlStatus = malloc(thedata->mxCardControlStatusLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->mxCardControlStatus, thedata->mxCardControlStatus, thedata->mxCardControlStatusLen);
+		StorageNew->mxCardControlStatusLen = thedata->mxCardControlStatusLen;
+		StorageNew->mxCardControlStatus[StorageNew->mxCardControlStatusLen] = 0;
+		StorageNew->mxCardUnknownStatus = thedata->mxCardUnknownStatus;
+		StorageNew->mxCardStandbyStatus = thedata->mxCardStandbyStatus;
+		if (!(StorageNew->mxCardSyncSpanId = malloc(thedata->mxCardSyncSpanIdLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->mxCardSyncSpanId, thedata->mxCardSyncSpanId, thedata->mxCardSyncSpanIdLen);
+		StorageNew->mxCardSyncSpanIdLen = thedata->mxCardSyncSpanIdLen;
+		StorageNew->mxCardSyncSpanId[StorageNew->mxCardSyncSpanIdLen] = 0;
+		StorageNew->mxCardSyncTransitions = thedata->mxCardSyncTransitions;
+		if (!(StorageNew->mxCardLeds = malloc(thedata->mxCardLedsLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->mxCardLeds, thedata->mxCardLeds, thedata->mxCardLedsLen);
+		StorageNew->mxCardLedsLen = thedata->mxCardLedsLen;
+		StorageNew->mxCardLeds[StorageNew->mxCardLedsLen] = 0;
+		StorageNew->mxCardLastChange = thedata->mxCardLastChange;
+		if (!(StorageNew->mxCardName = malloc(thedata->mxCardNameLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->mxCardName, thedata->mxCardName, thedata->mxCardNameLen);
+		StorageNew->mxCardNameLen = thedata->mxCardNameLen;
+		StorageNew->mxCardName[StorageNew->mxCardNameLen] = 0;
+		StorageNew->mxCardStatus = thedata->mxCardStatus;
 	}
       done:
 	DEBUGMSGTL(("mxMIB", "done.\n"));
@@ -1633,6 +1945,8 @@ mxCardTable_destroy(struct mxCardTable_data **thedata)
 		StorageDel->mxCardControlStatusLen = 0;
 		SNMP_FREE(StorageDel->mxCardSyncSpanId);
 		StorageDel->mxCardSyncSpanIdLen = 0;
+		SNMP_FREE(StorageDel->mxCardLeds);
+		StorageDel->mxCardLedsLen = 0;
 		SNMP_FREE(StorageDel->mxCardName);
 		StorageDel->mxCardNameLen = 0;
 		SNMP_FREE(StorageDel);
@@ -1703,7 +2017,7 @@ mxCardTable_del(struct mxCardTable_data *thedata)
  * @param line line from configuration file matching the token.
  * @brief parse configuration file for mxCardTable entries.
  *
- * This callback is called by UCD-SNMP when it prases a configuration file and finds a configuration
+ * This callback is called by UCD-SNMP when it parses a configuration file and finds a configuration
  * file line for the registsred token (in this case mxCardTable).  This routine is invoked by UCD-SNMP
  * to read the values of each row in the table from the configuration file.  Note that this
  * procedure may exist regardless of the persistence of the table.  If there are no configured
@@ -1802,6 +2116,13 @@ parse_mxCardTable(const char *token, char *line)
 		return;
 	}
 	line = read_config_read_data(ASN_COUNTER, line, &StorageTmp->mxCardSyncTransitions, &tmpsize);
+	SNMP_FREE(StorageTmp->mxCardLeds);
+	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->mxCardLeds, &StorageTmp->mxCardLedsLen);
+	if (StorageTmp->mxCardLeds == NULL) {
+		config_perror("invalid specification for mxCardLeds");
+		return;
+	}
+	line = read_config_read_data(ASN_TIMETICKS, line, &StorageTmp->mxCardLastChange, &tmpsize);
 	SNMP_FREE(StorageTmp->mxCardName);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->mxCardName, &StorageTmp->mxCardNameLen);
 	if (StorageTmp->mxCardName == NULL) {
@@ -1865,6 +2186,8 @@ store_mxCardTable(int majorID, int minorID, void *serverarg, void *clientarg)
 			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->mxCardStandbyStatus, &tmpsize);
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->mxCardSyncSpanId, &StorageTmp->mxCardSyncSpanIdLen);
 			cptr = read_config_store_data(ASN_COUNTER, cptr, &StorageTmp->mxCardSyncTransitions, &tmpsize);
+			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->mxCardLeds, &StorageTmp->mxCardLedsLen);
+			cptr = read_config_store_data(ASN_TIMETICKS, cptr, &StorageTmp->mxCardLastChange, &tmpsize);
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->mxCardName, &StorageTmp->mxCardNameLen);
 			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->mxCardStatus, &tmpsize);
 			snmpd_store_config(line);
@@ -1890,20 +2213,27 @@ mxSpanTable_create(void)
 	DEBUGMSGTL(("mxMIB", "mxSpanTable_create: creating row...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
-		if ((StorageNew->mxDrivName = (uint8_t *) strdup("")) != NULL)
-			StorageNew->mxDrivNameLen = strlen("");
+		if ((StorageNew->mxDrivName = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->mxDrivNameLen = 0;
+		StorageNew->mxDrivName[StorageNew->mxDrivNameLen] = 0;
 		StorageNew->mxCardIndex = 0;
-		if ((StorageNew->mxSpanName = (uint8_t *) strdup("")) != NULL)
-			StorageNew->mxSpanNameLen = strlen("");
-		if ((StorageNew->mxSpanDevice = snmp_duplicate_objid(zeroDotZero_oid, 2)))
-			StorageNew->mxSpanDeviceLen = 2;
-		if ((StorageNew->mxSpanEquipmentId = (uint8_t *) strdup("")) != NULL)
-			StorageNew->mxSpanEquipmentIdLen = strlen("");
+		if ((StorageNew->mxSpanName = (uint8_t *) strdup("")) == NULL)
+			goto nomem;
+		StorageNew->mxSpanNameLen = strlen("");
+		if ((StorageNew->mxSpanDevice = snmp_duplicate_objid(zeroDotZero_oid, 2)) == NULL)
+			goto nomem;
+		StorageNew->mxSpanDeviceLen = 2;
+		if ((StorageNew->mxSpanEquipmentId = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->mxSpanEquipmentIdLen = 0;
+		StorageNew->mxSpanEquipmentId[StorageNew->mxSpanEquipmentIdLen] = 0;
 		StorageNew->mxSpanType = MXSPANTYPE_NONE;
 		StorageNew->mxSpanNumber = 0;
 		StorageNew->mxSpanRate = 0;
-		if (memdup((u_char **) &StorageNew->mxSpanMode, (u_char *) "\x00", 1) == SNMPERR_SUCCESS)
-			StorageNew->mxSpanModeLen = 1;
+		if (memdup((u_char **) &StorageNew->mxSpanMode, (u_char *) "\x00", 1) != SNMPERR_SUCCESS)
+			goto nomem;
+		StorageNew->mxSpanModeLen = 1;
 		StorageNew->mxSpanCrc = MXSPANCRC_NONE;
 		StorageNew->mxSpanClocking = 0;
 		StorageNew->mxSpanPriority = 0;
@@ -1920,47 +2250,65 @@ mxSpanTable_create(void)
 		StorageNew->mxSpanAlarmSettleTime = 500;
 		StorageNew->mxSpanLineCodeTime = 500;
 		StorageNew->mxSpanPrimary = 0;
-		if (memdup((u_char **) &StorageNew->mxSpanDataLink, (u_char *) "\x00", 1) == SNMPERR_SUCCESS)
-			StorageNew->mxSpanDataLinkLen = 1;
+		if (memdup((u_char **) &StorageNew->mxSpanDataLink, (u_char *) "\x00", 1) != SNMPERR_SUCCESS)
+			goto nomem;
+		StorageNew->mxSpanDataLinkLen = 1;
 		StorageNew->mxSpanLineCode = MXSPANLINECODE_NOCODE;
-		if ((StorageNew->mxSpanAlarmSeverityMapProfile = snmp_duplicate_objid(zeroDotZero_oid, 2)))
-			StorageNew->mxSpanAlarmSeverityMapProfileLen = 2;
+		if ((StorageNew->mxSpanAlarmSeverityMapProfile = snmp_duplicate_objid(zeroDotZero_oid, 2)) == NULL)
+			goto nomem;
+		StorageNew->mxSpanAlarmSeverityMapProfileLen = 2;
 		StorageNew->mxSpanAdministrativeState = MXSPANADMINISTRATIVESTATE_LOCKED;
 		StorageNew->mxSpanOperationalState = 0;
 		StorageNew->mxSpanUsageState = 0;
-		if (memdup((u_char **) &StorageNew->mxSpanAlarmStatus, (u_char *) "\x00", 1) == SNMPERR_SUCCESS)
-			StorageNew->mxSpanAlarmStatusLen = 1;
-		if (memdup((u_char **) &StorageNew->mxSpanProceduralStatus, (u_char *) "\x00", 1) == SNMPERR_SUCCESS)
-			StorageNew->mxSpanProceduralStatusLen = 1;
-		if (memdup((u_char **) &StorageNew->mxSpanAvailabilityStatus, (u_char *) "\x00\x00", 2) == SNMPERR_SUCCESS)
-			StorageNew->mxSpanAvailabilityStatusLen = 2;
-		if (memdup((u_char **) &StorageNew->mxSpanControlStatus, (u_char *) "\x00", 1) == SNMPERR_SUCCESS)
-			StorageNew->mxSpanControlStatusLen = 1;
+		if (memdup((u_char **) &StorageNew->mxSpanAlarmStatus, (u_char *) "\x00", 1) != SNMPERR_SUCCESS)
+			goto nomem;
+		StorageNew->mxSpanAlarmStatusLen = 1;
+		if (memdup((u_char **) &StorageNew->mxSpanProceduralStatus, (u_char *) "\x00", 1) != SNMPERR_SUCCESS)
+			goto nomem;
+		StorageNew->mxSpanProceduralStatusLen = 1;
+		if (memdup((u_char **) &StorageNew->mxSpanAvailabilityStatus, (u_char *) "\x00\x00", 2) != SNMPERR_SUCCESS)
+			goto nomem;
+		StorageNew->mxSpanAvailabilityStatusLen = 2;
+		if (memdup((u_char **) &StorageNew->mxSpanControlStatus, (u_char *) "\x00", 1) != SNMPERR_SUCCESS)
+			goto nomem;
+		StorageNew->mxSpanControlStatusLen = 1;
 		StorageNew->mxSpanStandbyStatus = MXSPANSTANDBYSTATUS_PROVIDINGSERVICE;
 		StorageNew->mxSpanUnknownStatus = 0;
-		if ((StorageNew->mxSpanSap = snmp_duplicate_objid(zeroDotZero_oid, 2)))
-			StorageNew->mxSpanSapLen = 2;
-		if (memdup((u_char **) &StorageNew->mxSpanLoopbackStatus, (u_char *) "\x00", 1) == SNMPERR_SUCCESS)
-			StorageNew->mxSpanLoopbackStatusLen = 1;
-		if (memdup((u_char **) &StorageNew->mxSpanLineStatus, (u_char *) "\x00\x00\x00", 3) == SNMPERR_SUCCESS)
-			StorageNew->mxSpanLineStatusLen = 3;
-		if (memdup((u_char **) &StorageNew->mxSpanAlarms, (u_char *) "\x00", 1) == SNMPERR_SUCCESS)
-			StorageNew->mxSpanAlarmsLen = 1;
-		if (memdup((u_char **) &StorageNew->mxSpanEvents, (u_char *) "\x00\x00", 2) == SNMPERR_SUCCESS)
-			StorageNew->mxSpanEventsLen = 2;
+		if ((StorageNew->mxSpanSap = snmp_duplicate_objid(zeroDotZero_oid, 2)) == NULL)
+			goto nomem;
+		StorageNew->mxSpanSapLen = 2;
+		if (memdup((u_char **) &StorageNew->mxSpanLoopbackStatus, (u_char *) "\x00", 1) != SNMPERR_SUCCESS)
+			goto nomem;
+		StorageNew->mxSpanLoopbackStatusLen = 1;
+		if (memdup((u_char **) &StorageNew->mxSpanLineStatus, (u_char *) "\x00\x00\x00", 3) != SNMPERR_SUCCESS)
+			goto nomem;
+		StorageNew->mxSpanLineStatusLen = 3;
+		if (memdup((u_char **) &StorageNew->mxSpanAlarms, (u_char *) "\x00", 1) != SNMPERR_SUCCESS)
+			goto nomem;
+		StorageNew->mxSpanAlarmsLen = 1;
+		if (memdup((u_char **) &StorageNew->mxSpanEvents, (u_char *) "\x00\x00", 2) != SNMPERR_SUCCESS)
+			goto nomem;
+		StorageNew->mxSpanEventsLen = 2;
+		StorageNew->mxSpanLed = MXSPANLED_BLACK;
 		StorageNew->mxSpanReceiveLevel = 0;
 		StorageNew->mxSpanReceiveThreshold = 0;
+		StorageNew->mxSpanLastChange = 0;
 		StorageNew->mxSpanRowStatus = 0;
 		StorageNew->mxSpanRowStatus = RS_NOTREADY;
 	}
+      done:
 	DEBUGMSGTL(("mxMIB", "done.\n"));
 	return (StorageNew);
+	goto nomem;
+      nomem:
+	mxSpanTable_destroy(&StorageNew);
+	goto done;
 }
 
 /**
  * @fn struct mxSpanTable_data *mxSpanTable_duplicate(struct mxSpanTable_data *thedata)
  * @param thedata the row structure to duplicate.
- * @brief duplicat a row structure for a table.
+ * @brief duplicate a row structure for a table.
  *
  * Duplicates the specified row structure @param thedata and returns a pointer to the newly
  * allocated row structure on success, or NULL on failure.
@@ -1972,6 +2320,113 @@ mxSpanTable_duplicate(struct mxSpanTable_data *thedata)
 
 	DEBUGMSGTL(("mxMIB", "mxSpanTable_duplicate: duplicating row...  "));
 	if (StorageNew != NULL) {
+		StorageNew->mxSpanTable_id = thedata->mxSpanTable_id;
+		if (!(StorageNew->mxDrivName = malloc(thedata->mxDrivNameLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->mxDrivName, thedata->mxDrivName, thedata->mxDrivNameLen);
+		StorageNew->mxDrivNameLen = thedata->mxDrivNameLen;
+		StorageNew->mxDrivName[StorageNew->mxDrivNameLen] = 0;
+		StorageNew->mxCardIndex = thedata->mxCardIndex;
+		StorageNew->mxSpanIndex = thedata->mxSpanIndex;
+		if (!(StorageNew->mxSpanName = malloc(thedata->mxSpanNameLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->mxSpanName, thedata->mxSpanName, thedata->mxSpanNameLen);
+		StorageNew->mxSpanNameLen = thedata->mxSpanNameLen;
+		StorageNew->mxSpanName[StorageNew->mxSpanNameLen] = 0;
+		if (!(StorageNew->mxSpanDevice = snmp_duplicate_objid(thedata->mxSpanDevice, thedata->mxSpanDeviceLen / sizeof(oid))))
+			goto destroy;
+		StorageNew->mxSpanDeviceLen = thedata->mxSpanDeviceLen;
+		if (!(StorageNew->mxSpanEquipmentId = malloc(thedata->mxSpanEquipmentIdLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->mxSpanEquipmentId, thedata->mxSpanEquipmentId, thedata->mxSpanEquipmentIdLen);
+		StorageNew->mxSpanEquipmentIdLen = thedata->mxSpanEquipmentIdLen;
+		StorageNew->mxSpanEquipmentId[StorageNew->mxSpanEquipmentIdLen] = 0;
+		StorageNew->mxSpanType = thedata->mxSpanType;
+		StorageNew->mxSpanNumber = thedata->mxSpanNumber;
+		StorageNew->mxSpanRate = thedata->mxSpanRate;
+		if (!(StorageNew->mxSpanMode = malloc(thedata->mxSpanModeLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->mxSpanMode, thedata->mxSpanMode, thedata->mxSpanModeLen);
+		StorageNew->mxSpanModeLen = thedata->mxSpanModeLen;
+		StorageNew->mxSpanMode[StorageNew->mxSpanModeLen] = 0;
+		StorageNew->mxSpanCrc = thedata->mxSpanCrc;
+		StorageNew->mxSpanClocking = thedata->mxSpanClocking;
+		StorageNew->mxSpanPriority = thedata->mxSpanPriority;
+		StorageNew->mxSpanCoding = thedata->mxSpanCoding;
+		StorageNew->mxSpanFraming = thedata->mxSpanFraming;
+		StorageNew->mxSpanLineImpedance = thedata->mxSpanLineImpedance;
+		StorageNew->mxSpanLineMode = thedata->mxSpanLineMode;
+		StorageNew->mxSpanLineLength = thedata->mxSpanLineLength;
+		StorageNew->mxSpanLineAttenuation = thedata->mxSpanLineAttenuation;
+		StorageNew->mxSpanLineGain = thedata->mxSpanLineGain;
+		StorageNew->mxSpanLineDelay = thedata->mxSpanLineDelay;
+		StorageNew->mxSpanTxLevel = thedata->mxSpanTxLevel;
+		StorageNew->mxSpanRxLevel = thedata->mxSpanRxLevel;
+		StorageNew->mxSpanAlarmSettleTime = thedata->mxSpanAlarmSettleTime;
+		StorageNew->mxSpanLineCodeTime = thedata->mxSpanLineCodeTime;
+		StorageNew->mxSpanPrimary = thedata->mxSpanPrimary;
+		if (!(StorageNew->mxSpanDataLink = malloc(thedata->mxSpanDataLinkLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->mxSpanDataLink, thedata->mxSpanDataLink, thedata->mxSpanDataLinkLen);
+		StorageNew->mxSpanDataLinkLen = thedata->mxSpanDataLinkLen;
+		StorageNew->mxSpanDataLink[StorageNew->mxSpanDataLinkLen] = 0;
+		StorageNew->mxSpanLineCode = thedata->mxSpanLineCode;
+		if (!(StorageNew->mxSpanAlarmSeverityMapProfile = snmp_duplicate_objid(thedata->mxSpanAlarmSeverityMapProfile, thedata->mxSpanAlarmSeverityMapProfileLen / sizeof(oid))))
+			goto destroy;
+		StorageNew->mxSpanAlarmSeverityMapProfileLen = thedata->mxSpanAlarmSeverityMapProfileLen;
+		StorageNew->mxSpanAdministrativeState = thedata->mxSpanAdministrativeState;
+		StorageNew->mxSpanOperationalState = thedata->mxSpanOperationalState;
+		StorageNew->mxSpanUsageState = thedata->mxSpanUsageState;
+		if (!(StorageNew->mxSpanAlarmStatus = malloc(thedata->mxSpanAlarmStatusLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->mxSpanAlarmStatus, thedata->mxSpanAlarmStatus, thedata->mxSpanAlarmStatusLen);
+		StorageNew->mxSpanAlarmStatusLen = thedata->mxSpanAlarmStatusLen;
+		StorageNew->mxSpanAlarmStatus[StorageNew->mxSpanAlarmStatusLen] = 0;
+		if (!(StorageNew->mxSpanProceduralStatus = malloc(thedata->mxSpanProceduralStatusLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->mxSpanProceduralStatus, thedata->mxSpanProceduralStatus, thedata->mxSpanProceduralStatusLen);
+		StorageNew->mxSpanProceduralStatusLen = thedata->mxSpanProceduralStatusLen;
+		StorageNew->mxSpanProceduralStatus[StorageNew->mxSpanProceduralStatusLen] = 0;
+		if (!(StorageNew->mxSpanAvailabilityStatus = malloc(thedata->mxSpanAvailabilityStatusLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->mxSpanAvailabilityStatus, thedata->mxSpanAvailabilityStatus, thedata->mxSpanAvailabilityStatusLen);
+		StorageNew->mxSpanAvailabilityStatusLen = thedata->mxSpanAvailabilityStatusLen;
+		StorageNew->mxSpanAvailabilityStatus[StorageNew->mxSpanAvailabilityStatusLen] = 0;
+		if (!(StorageNew->mxSpanControlStatus = malloc(thedata->mxSpanControlStatusLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->mxSpanControlStatus, thedata->mxSpanControlStatus, thedata->mxSpanControlStatusLen);
+		StorageNew->mxSpanControlStatusLen = thedata->mxSpanControlStatusLen;
+		StorageNew->mxSpanControlStatus[StorageNew->mxSpanControlStatusLen] = 0;
+		StorageNew->mxSpanStandbyStatus = thedata->mxSpanStandbyStatus;
+		StorageNew->mxSpanUnknownStatus = thedata->mxSpanUnknownStatus;
+		if (!(StorageNew->mxSpanSap = snmp_duplicate_objid(thedata->mxSpanSap, thedata->mxSpanSapLen / sizeof(oid))))
+			goto destroy;
+		StorageNew->mxSpanSapLen = thedata->mxSpanSapLen;
+		if (!(StorageNew->mxSpanLoopbackStatus = malloc(thedata->mxSpanLoopbackStatusLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->mxSpanLoopbackStatus, thedata->mxSpanLoopbackStatus, thedata->mxSpanLoopbackStatusLen);
+		StorageNew->mxSpanLoopbackStatusLen = thedata->mxSpanLoopbackStatusLen;
+		StorageNew->mxSpanLoopbackStatus[StorageNew->mxSpanLoopbackStatusLen] = 0;
+		if (!(StorageNew->mxSpanLineStatus = malloc(thedata->mxSpanLineStatusLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->mxSpanLineStatus, thedata->mxSpanLineStatus, thedata->mxSpanLineStatusLen);
+		StorageNew->mxSpanLineStatusLen = thedata->mxSpanLineStatusLen;
+		StorageNew->mxSpanLineStatus[StorageNew->mxSpanLineStatusLen] = 0;
+		if (!(StorageNew->mxSpanAlarms = malloc(thedata->mxSpanAlarmsLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->mxSpanAlarms, thedata->mxSpanAlarms, thedata->mxSpanAlarmsLen);
+		StorageNew->mxSpanAlarmsLen = thedata->mxSpanAlarmsLen;
+		StorageNew->mxSpanAlarms[StorageNew->mxSpanAlarmsLen] = 0;
+		if (!(StorageNew->mxSpanEvents = malloc(thedata->mxSpanEventsLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->mxSpanEvents, thedata->mxSpanEvents, thedata->mxSpanEventsLen);
+		StorageNew->mxSpanEventsLen = thedata->mxSpanEventsLen;
+		StorageNew->mxSpanEvents[StorageNew->mxSpanEventsLen] = 0;
+		StorageNew->mxSpanLed = thedata->mxSpanLed;
+		StorageNew->mxSpanReceiveLevel = thedata->mxSpanReceiveLevel;
+		StorageNew->mxSpanReceiveThreshold = thedata->mxSpanReceiveThreshold;
+		StorageNew->mxSpanLastChange = thedata->mxSpanLastChange;
+		StorageNew->mxSpanRowStatus = thedata->mxSpanRowStatus;
 	}
       done:
 	DEBUGMSGTL(("mxMIB", "done.\n"));
@@ -2101,7 +2556,7 @@ mxSpanTable_del(struct mxSpanTable_data *thedata)
  * @param line line from configuration file matching the token.
  * @brief parse configuration file for mxSpanTable entries.
  *
- * This callback is called by UCD-SNMP when it prases a configuration file and finds a configuration
+ * This callback is called by UCD-SNMP when it parses a configuration file and finds a configuration
  * file line for the registsred token (in this case mxSpanTable).  This routine is invoked by UCD-SNMP
  * to read the values of each row in the table from the configuration file.  Note that this
  * procedure may exist regardless of the persistence of the table.  If there are no configured
@@ -2242,8 +2697,10 @@ parse_mxSpanTable(const char *token, char *line)
 		config_perror("invalid specification for mxSpanEvents");
 		return;
 	}
+	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->mxSpanLed, &tmpsize);
 	line = read_config_read_data(ASN_UNSIGNED, line, &StorageTmp->mxSpanReceiveLevel, &tmpsize);
 	line = read_config_read_data(ASN_UNSIGNED, line, &StorageTmp->mxSpanReceiveThreshold, &tmpsize);
+	line = read_config_read_data(ASN_TIMETICKS, line, &StorageTmp->mxSpanLastChange, &tmpsize);
 	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->mxSpanRowStatus, &tmpsize);
 	mxSpanTable_add(StorageTmp);
 	(void) tmpsize;
@@ -2318,8 +2775,10 @@ store_mxSpanTable(int majorID, int minorID, void *serverarg, void *clientarg)
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->mxSpanLineStatus, &StorageTmp->mxSpanLineStatusLen);
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->mxSpanAlarms, &StorageTmp->mxSpanAlarmsLen);
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->mxSpanEvents, &StorageTmp->mxSpanEventsLen);
+			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->mxSpanLed, &tmpsize);
 			cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->mxSpanReceiveLevel, &tmpsize);
 			cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->mxSpanReceiveThreshold, &tmpsize);
+			cptr = read_config_store_data(ASN_TIMETICKS, cptr, &StorageTmp->mxSpanLastChange, &tmpsize);
 			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->mxSpanRowStatus, &tmpsize);
 			snmpd_store_config(line);
 		}
@@ -2344,29 +2803,37 @@ mxBertTable_create(void)
 	DEBUGMSGTL(("mxMIB", "mxBertTable_create: creating row...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
-		if ((StorageNew->mxDrivName = (uint8_t *) strdup("")) != NULL)
-			StorageNew->mxDrivNameLen = strlen("");
+		if ((StorageNew->mxDrivName = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->mxDrivNameLen = 0;
+		StorageNew->mxDrivName[StorageNew->mxDrivNameLen] = 0;
 		StorageNew->mxCardIndex = 0;
 		StorageNew->mxSpanIndex = 0;
 		StorageNew->mxBertMode = MXBERTMODE_NONE;
 		StorageNew->mxBertSelect = MXBERTSELECT_NONE;
-		if (memdup((u_char **) &StorageNew->mxBertPattern, (u_char *) "\x10\xFF\xFF\xFF\xFF", 5) == SNMPERR_SUCCESS)
-			StorageNew->mxBertPatternLen = 5;
+		if (memdup((u_char **) &StorageNew->mxBertPattern, (u_char *) "\x10\xFF\xFF\xFF\xFF", 5) != SNMPERR_SUCCESS)
+			goto nomem;
+		StorageNew->mxBertPatternLen = 5;
 		StorageNew->mxBertOperationalState = 0;
-		if (memdup((u_char **) &StorageNew->mxBertProceduralStatus, (u_char *) "\x00", 1) == SNMPERR_SUCCESS)
-			StorageNew->mxBertProceduralStatusLen = 1;
+		if (memdup((u_char **) &StorageNew->mxBertProceduralStatus, (u_char *) "\x00", 1) != SNMPERR_SUCCESS)
+			goto nomem;
+		StorageNew->mxBertProceduralStatusLen = 1;
 		StorageNew->mxBertBitCount = 0;
 		StorageNew->mxBertErrorCount = 0;
-
 	}
+      done:
 	DEBUGMSGTL(("mxMIB", "done.\n"));
 	return (StorageNew);
+	goto nomem;
+      nomem:
+	mxBertTable_destroy(&StorageNew);
+	goto done;
 }
 
 /**
  * @fn struct mxBertTable_data *mxBertTable_duplicate(struct mxBertTable_data *thedata)
  * @param thedata the row structure to duplicate.
- * @brief duplicat a row structure for a table.
+ * @brief duplicate a row structure for a table.
  *
  * Duplicates the specified row structure @param thedata and returns a pointer to the newly
  * allocated row structure on success, or NULL on failure.
@@ -2378,6 +2845,29 @@ mxBertTable_duplicate(struct mxBertTable_data *thedata)
 
 	DEBUGMSGTL(("mxMIB", "mxBertTable_duplicate: duplicating row...  "));
 	if (StorageNew != NULL) {
+		StorageNew->mxBertTable_id = thedata->mxBertTable_id;
+		if (!(StorageNew->mxDrivName = malloc(thedata->mxDrivNameLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->mxDrivName, thedata->mxDrivName, thedata->mxDrivNameLen);
+		StorageNew->mxDrivNameLen = thedata->mxDrivNameLen;
+		StorageNew->mxDrivName[StorageNew->mxDrivNameLen] = 0;
+		StorageNew->mxCardIndex = thedata->mxCardIndex;
+		StorageNew->mxSpanIndex = thedata->mxSpanIndex;
+		StorageNew->mxBertMode = thedata->mxBertMode;
+		StorageNew->mxBertSelect = thedata->mxBertSelect;
+		if (!(StorageNew->mxBertPattern = malloc(thedata->mxBertPatternLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->mxBertPattern, thedata->mxBertPattern, thedata->mxBertPatternLen);
+		StorageNew->mxBertPatternLen = thedata->mxBertPatternLen;
+		StorageNew->mxBertPattern[StorageNew->mxBertPatternLen] = 0;
+		StorageNew->mxBertOperationalState = thedata->mxBertOperationalState;
+		if (!(StorageNew->mxBertProceduralStatus = malloc(thedata->mxBertProceduralStatusLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->mxBertProceduralStatus, thedata->mxBertProceduralStatus, thedata->mxBertProceduralStatusLen);
+		StorageNew->mxBertProceduralStatusLen = thedata->mxBertProceduralStatusLen;
+		StorageNew->mxBertProceduralStatus[StorageNew->mxBertProceduralStatusLen] = 0;
+		StorageNew->mxBertBitCount = thedata->mxBertBitCount;
+		StorageNew->mxBertErrorCount = thedata->mxBertErrorCount;
 	}
       done:
 	DEBUGMSGTL(("mxMIB", "done.\n"));
@@ -2481,7 +2971,7 @@ mxBertTable_del(struct mxBertTable_data *thedata)
  * @param line line from configuration file matching the token.
  * @brief parse configuration file for mxBertTable entries.
  *
- * This callback is called by UCD-SNMP when it prases a configuration file and finds a configuration
+ * This callback is called by UCD-SNMP when it parses a configuration file and finds a configuration
  * file line for the registsred token (in this case mxBertTable).  This routine is invoked by UCD-SNMP
  * to read the values of each row in the table from the configuration file.  Note that this
  * procedure may exist regardless of the persistence of the table.  If there are no configured
@@ -2587,39 +3077,51 @@ mxChanTable_create(void)
 	DEBUGMSGTL(("mxMIB", "mxChanTable_create: creating row...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
-		if ((StorageNew->mxDrivName = (uint8_t *) strdup("")) != NULL)
-			StorageNew->mxDrivNameLen = strlen("");
+		if ((StorageNew->mxDrivName = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->mxDrivNameLen = 0;
+		StorageNew->mxDrivName[StorageNew->mxDrivNameLen] = 0;
 		StorageNew->mxCardIndex = 0;
 		StorageNew->mxSpanIndex = 0;
 		StorageNew->mxChanType = MXCHANTYPE_CCS;
 		StorageNew->mxChanFormat = 0;
 		StorageNew->mxChanRate = 0;
-		if (memdup((u_char **) &StorageNew->mxChanMode, (u_char *) "\x00", 1) == SNMPERR_SUCCESS)
-			StorageNew->mxChanModeLen = 1;
-		if ((StorageNew->mxChanSap = snmp_duplicate_objid(zeroDotZero_oid, 2)))
-			StorageNew->mxChanSapLen = 2;
+		if (memdup((u_char **) &StorageNew->mxChanMode, (u_char *) "\x00", 1) != SNMPERR_SUCCESS)
+			goto nomem;
+		StorageNew->mxChanModeLen = 1;
+		if ((StorageNew->mxChanSap = snmp_duplicate_objid(zeroDotZero_oid, 2)) == NULL)
+			goto nomem;
+		StorageNew->mxChanSapLen = 2;
 		StorageNew->mxChanAdministrativeState = MXCHANADMINISTRATIVESTATE_LOCKED;
 		StorageNew->mxChanOperationalState = MXCHANOPERATIONALSTATE_DISABLED;
 		StorageNew->mxChanUsageState = 0;
-		if (memdup((u_char **) &StorageNew->mxChanAvailabilityStatus, (u_char *) "\x00\x00", 2) == SNMPERR_SUCCESS)
-			StorageNew->mxChanAvailabilityStatusLen = 2;
-		if (memdup((u_char **) &StorageNew->mxChanControlStatus, (u_char *) "\x00", 1) == SNMPERR_SUCCESS)
-			StorageNew->mxChanControlStatusLen = 1;
-		if (memdup((u_char **) &StorageNew->mxChanProceduralStatus, (u_char *) "\x00", 1) == SNMPERR_SUCCESS)
-			StorageNew->mxChanProceduralStatusLen = 1;
-		if (memdup((u_char **) &StorageNew->mxChanAlarmStatus, (u_char *) "\x00", 1) == SNMPERR_SUCCESS)
-			StorageNew->mxChanAlarmStatusLen = 1;
+		if (memdup((u_char **) &StorageNew->mxChanAvailabilityStatus, (u_char *) "\x00\x00", 2) != SNMPERR_SUCCESS)
+			goto nomem;
+		StorageNew->mxChanAvailabilityStatusLen = 2;
+		if (memdup((u_char **) &StorageNew->mxChanControlStatus, (u_char *) "\x00", 1) != SNMPERR_SUCCESS)
+			goto nomem;
+		StorageNew->mxChanControlStatusLen = 1;
+		if (memdup((u_char **) &StorageNew->mxChanProceduralStatus, (u_char *) "\x00", 1) != SNMPERR_SUCCESS)
+			goto nomem;
+		StorageNew->mxChanProceduralStatusLen = 1;
+		if (memdup((u_char **) &StorageNew->mxChanAlarmStatus, (u_char *) "\x00", 1) != SNMPERR_SUCCESS)
+			goto nomem;
+		StorageNew->mxChanAlarmStatusLen = 1;
 		StorageNew->mxChanStandbyStatus = MXCHANSTANDBYSTATUS_PROVIDINGSERVICE;
-
 	}
+      done:
 	DEBUGMSGTL(("mxMIB", "done.\n"));
 	return (StorageNew);
+	goto nomem;
+      nomem:
+	mxChanTable_destroy(&StorageNew);
+	goto done;
 }
 
 /**
  * @fn struct mxChanTable_data *mxChanTable_duplicate(struct mxChanTable_data *thedata)
  * @param thedata the row structure to duplicate.
- * @brief duplicat a row structure for a table.
+ * @brief duplicate a row structure for a table.
  *
  * Duplicates the specified row structure @param thedata and returns a pointer to the newly
  * allocated row structure on success, or NULL on failure.
@@ -2631,6 +3133,50 @@ mxChanTable_duplicate(struct mxChanTable_data *thedata)
 
 	DEBUGMSGTL(("mxMIB", "mxChanTable_duplicate: duplicating row...  "));
 	if (StorageNew != NULL) {
+		StorageNew->mxChanTable_id = thedata->mxChanTable_id;
+		if (!(StorageNew->mxDrivName = malloc(thedata->mxDrivNameLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->mxDrivName, thedata->mxDrivName, thedata->mxDrivNameLen);
+		StorageNew->mxDrivNameLen = thedata->mxDrivNameLen;
+		StorageNew->mxDrivName[StorageNew->mxDrivNameLen] = 0;
+		StorageNew->mxCardIndex = thedata->mxCardIndex;
+		StorageNew->mxSpanIndex = thedata->mxSpanIndex;
+		StorageNew->mxChanIndex = thedata->mxChanIndex;
+		StorageNew->mxChanType = thedata->mxChanType;
+		StorageNew->mxChanFormat = thedata->mxChanFormat;
+		StorageNew->mxChanRate = thedata->mxChanRate;
+		if (!(StorageNew->mxChanMode = malloc(thedata->mxChanModeLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->mxChanMode, thedata->mxChanMode, thedata->mxChanModeLen);
+		StorageNew->mxChanModeLen = thedata->mxChanModeLen;
+		StorageNew->mxChanMode[StorageNew->mxChanModeLen] = 0;
+		if (!(StorageNew->mxChanSap = snmp_duplicate_objid(thedata->mxChanSap, thedata->mxChanSapLen / sizeof(oid))))
+			goto destroy;
+		StorageNew->mxChanSapLen = thedata->mxChanSapLen;
+		StorageNew->mxChanAdministrativeState = thedata->mxChanAdministrativeState;
+		StorageNew->mxChanOperationalState = thedata->mxChanOperationalState;
+		StorageNew->mxChanUsageState = thedata->mxChanUsageState;
+		if (!(StorageNew->mxChanAvailabilityStatus = malloc(thedata->mxChanAvailabilityStatusLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->mxChanAvailabilityStatus, thedata->mxChanAvailabilityStatus, thedata->mxChanAvailabilityStatusLen);
+		StorageNew->mxChanAvailabilityStatusLen = thedata->mxChanAvailabilityStatusLen;
+		StorageNew->mxChanAvailabilityStatus[StorageNew->mxChanAvailabilityStatusLen] = 0;
+		if (!(StorageNew->mxChanControlStatus = malloc(thedata->mxChanControlStatusLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->mxChanControlStatus, thedata->mxChanControlStatus, thedata->mxChanControlStatusLen);
+		StorageNew->mxChanControlStatusLen = thedata->mxChanControlStatusLen;
+		StorageNew->mxChanControlStatus[StorageNew->mxChanControlStatusLen] = 0;
+		if (!(StorageNew->mxChanProceduralStatus = malloc(thedata->mxChanProceduralStatusLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->mxChanProceduralStatus, thedata->mxChanProceduralStatus, thedata->mxChanProceduralStatusLen);
+		StorageNew->mxChanProceduralStatusLen = thedata->mxChanProceduralStatusLen;
+		StorageNew->mxChanProceduralStatus[StorageNew->mxChanProceduralStatusLen] = 0;
+		if (!(StorageNew->mxChanAlarmStatus = malloc(thedata->mxChanAlarmStatusLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->mxChanAlarmStatus, thedata->mxChanAlarmStatus, thedata->mxChanAlarmStatusLen);
+		StorageNew->mxChanAlarmStatusLen = thedata->mxChanAlarmStatusLen;
+		StorageNew->mxChanAlarmStatus[StorageNew->mxChanAlarmStatusLen] = 0;
+		StorageNew->mxChanStandbyStatus = thedata->mxChanStandbyStatus;
 	}
       done:
 	DEBUGMSGTL(("mxMIB", "done.\n"));
@@ -2744,7 +3290,7 @@ mxChanTable_del(struct mxChanTable_data *thedata)
  * @param line line from configuration file matching the token.
  * @brief parse configuration file for mxChanTable entries.
  *
- * This callback is called by UCD-SNMP when it prases a configuration file and finds a configuration
+ * This callback is called by UCD-SNMP when it parses a configuration file and finds a configuration
  * file line for the registsred token (in this case mxChanTable).  This routine is invoked by UCD-SNMP
  * to read the values of each row in the table from the configuration file.  Note that this
  * procedure may exist regardless of the persistence of the table.  If there are no configured
@@ -2884,8 +3430,10 @@ mxXconTable_create(void)
 	DEBUGMSGTL(("mxMIB", "mxXconTable_create: creating row...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
-		if ((StorageNew->mxDrivName = (uint8_t *) strdup("")) != NULL)
-			StorageNew->mxDrivNameLen = strlen("");
+		if ((StorageNew->mxDrivName = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->mxDrivNameLen = 0;
+		StorageNew->mxDrivName[StorageNew->mxDrivNameLen] = 0;
 		StorageNew->mxCardIndex = 0;
 		StorageNew->mxSpanIndex = 0;
 		StorageNew->mxChanIndex = 0;
@@ -2897,14 +3445,19 @@ mxXconTable_create(void)
 		StorageNew->mxXconRowStatus = 0;
 		StorageNew->mxXconRowStatus = RS_NOTREADY;
 	}
+      done:
 	DEBUGMSGTL(("mxMIB", "done.\n"));
 	return (StorageNew);
+	goto nomem;
+      nomem:
+	mxXconTable_destroy(&StorageNew);
+	goto done;
 }
 
 /**
  * @fn struct mxXconTable_data *mxXconTable_duplicate(struct mxXconTable_data *thedata)
  * @param thedata the row structure to duplicate.
- * @brief duplicat a row structure for a table.
+ * @brief duplicate a row structure for a table.
  *
  * Duplicates the specified row structure @param thedata and returns a pointer to the newly
  * allocated row structure on success, or NULL on failure.
@@ -2916,6 +3469,21 @@ mxXconTable_duplicate(struct mxXconTable_data *thedata)
 
 	DEBUGMSGTL(("mxMIB", "mxXconTable_duplicate: duplicating row...  "));
 	if (StorageNew != NULL) {
+		StorageNew->mxXconTable_id = thedata->mxXconTable_id;
+		if (!(StorageNew->mxDrivName = malloc(thedata->mxDrivNameLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->mxDrivName, thedata->mxDrivName, thedata->mxDrivNameLen);
+		StorageNew->mxDrivNameLen = thedata->mxDrivNameLen;
+		StorageNew->mxDrivName[StorageNew->mxDrivNameLen] = 0;
+		StorageNew->mxCardIndex = thedata->mxCardIndex;
+		StorageNew->mxSpanIndex = thedata->mxSpanIndex;
+		StorageNew->mxChanIndex = thedata->mxChanIndex;
+		StorageNew->mxXconCardIndex = thedata->mxXconCardIndex;
+		StorageNew->mxXconSpanIndex = thedata->mxXconSpanIndex;
+		StorageNew->mxXconChanIndex = thedata->mxXconChanIndex;
+		StorageNew->mxXconType = thedata->mxXconType;
+		StorageNew->mxXconStorageType = thedata->mxXconStorageType;
+		StorageNew->mxXconRowStatus = thedata->mxXconRowStatus;
 	}
       done:
 	DEBUGMSGTL(("mxMIB", "done.\n"));
@@ -3017,7 +3585,7 @@ mxXconTable_del(struct mxXconTable_data *thedata)
  * @param line line from configuration file matching the token.
  * @brief parse configuration file for mxXconTable entries.
  *
- * This callback is called by UCD-SNMP when it prases a configuration file and finds a configuration
+ * This callback is called by UCD-SNMP when it parses a configuration file and finds a configuration
  * file line for the registsred token (in this case mxXconTable).  This routine is invoked by UCD-SNMP
  * to read the values of each row in the table from the configuration file.  Note that this
  * procedure may exist regardless of the persistence of the table.  If there are no configured
@@ -3113,8 +3681,10 @@ mxNearEndCurrentTable_create(void)
 	DEBUGMSGTL(("mxMIB", "mxNearEndCurrentTable_create: creating row...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
-		if ((StorageNew->mxDrivName = (uint8_t *) strdup("")) != NULL)
-			StorageNew->mxDrivNameLen = strlen("");
+		if ((StorageNew->mxDrivName = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->mxDrivNameLen = 0;
+		StorageNew->mxDrivName[StorageNew->mxDrivNameLen] = 0;
 		StorageNew->mxCardIndex = 0;
 		StorageNew->mxSpanIndex = 0;
 		StorageNew->mxNearEndCurrentTimeElapsed = 0;
@@ -3128,16 +3698,23 @@ mxNearEndCurrentTable_create(void)
 		StorageNew->mxNearEndCurrentBESs = 0;
 		StorageNew->mxNearEndCurrentDMs = 0;
 		StorageNew->mxNearEndCurrentLCVs = 0;
-
+		StorageNew->mxNearEndCurrentFASEs = 0;
+		StorageNew->mxNearEndCurrentFABEs = 0;
+		StorageNew->mxNearEndCurrentFEBEs = 0;
 	}
+      done:
 	DEBUGMSGTL(("mxMIB", "done.\n"));
 	return (StorageNew);
+	goto nomem;
+      nomem:
+	mxNearEndCurrentTable_destroy(&StorageNew);
+	goto done;
 }
 
 /**
  * @fn struct mxNearEndCurrentTable_data *mxNearEndCurrentTable_duplicate(struct mxNearEndCurrentTable_data *thedata)
  * @param thedata the row structure to duplicate.
- * @brief duplicat a row structure for a table.
+ * @brief duplicate a row structure for a table.
  *
  * Duplicates the specified row structure @param thedata and returns a pointer to the newly
  * allocated row structure on success, or NULL on failure.
@@ -3149,6 +3726,28 @@ mxNearEndCurrentTable_duplicate(struct mxNearEndCurrentTable_data *thedata)
 
 	DEBUGMSGTL(("mxMIB", "mxNearEndCurrentTable_duplicate: duplicating row...  "));
 	if (StorageNew != NULL) {
+		StorageNew->mxNearEndCurrentTable_id = thedata->mxNearEndCurrentTable_id;
+		if (!(StorageNew->mxDrivName = malloc(thedata->mxDrivNameLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->mxDrivName, thedata->mxDrivName, thedata->mxDrivNameLen);
+		StorageNew->mxDrivNameLen = thedata->mxDrivNameLen;
+		StorageNew->mxDrivName[StorageNew->mxDrivNameLen] = 0;
+		StorageNew->mxCardIndex = thedata->mxCardIndex;
+		StorageNew->mxSpanIndex = thedata->mxSpanIndex;
+		StorageNew->mxNearEndCurrentTimeElapsed = thedata->mxNearEndCurrentTimeElapsed;
+		StorageNew->mxNearEndCurrentESs = thedata->mxNearEndCurrentESs;
+		StorageNew->mxNearEndCurrentSESs = thedata->mxNearEndCurrentSESs;
+		StorageNew->mxNearEndCurrentSEFSs = thedata->mxNearEndCurrentSEFSs;
+		StorageNew->mxNearEndCurrentUASs = thedata->mxNearEndCurrentUASs;
+		StorageNew->mxNearEndCurrentCSSs = thedata->mxNearEndCurrentCSSs;
+		StorageNew->mxNearEndCurrentPCVs = thedata->mxNearEndCurrentPCVs;
+		StorageNew->mxNearEndCurrentLESs = thedata->mxNearEndCurrentLESs;
+		StorageNew->mxNearEndCurrentBESs = thedata->mxNearEndCurrentBESs;
+		StorageNew->mxNearEndCurrentDMs = thedata->mxNearEndCurrentDMs;
+		StorageNew->mxNearEndCurrentLCVs = thedata->mxNearEndCurrentLCVs;
+		StorageNew->mxNearEndCurrentFASEs = thedata->mxNearEndCurrentFASEs;
+		StorageNew->mxNearEndCurrentFABEs = thedata->mxNearEndCurrentFABEs;
+		StorageNew->mxNearEndCurrentFEBEs = thedata->mxNearEndCurrentFEBEs;
 	}
       done:
 	DEBUGMSGTL(("mxMIB", "done.\n"));
@@ -3248,7 +3847,7 @@ mxNearEndCurrentTable_del(struct mxNearEndCurrentTable_data *thedata)
  * @param line line from configuration file matching the token.
  * @brief parse configuration file for mxNearEndCurrentTable entries.
  *
- * This callback is called by UCD-SNMP when it prases a configuration file and finds a configuration
+ * This callback is called by UCD-SNMP when it parses a configuration file and finds a configuration
  * file line for the registsred token (in this case mxNearEndCurrentTable).  This routine is invoked by UCD-SNMP
  * to read the values of each row in the table from the configuration file.  Note that this
  * procedure may exist regardless of the persistence of the table.  If there are no configured
@@ -3285,6 +3884,9 @@ parse_mxNearEndCurrentTable(const char *token, char *line)
 	line = read_config_read_data(ASN_GAUGE, line, &StorageTmp->mxNearEndCurrentBESs, &tmpsize);
 	line = read_config_read_data(ASN_GAUGE, line, &StorageTmp->mxNearEndCurrentDMs, &tmpsize);
 	line = read_config_read_data(ASN_GAUGE, line, &StorageTmp->mxNearEndCurrentLCVs, &tmpsize);
+	line = read_config_read_data(ASN_GAUGE, line, &StorageTmp->mxNearEndCurrentFASEs, &tmpsize);
+	line = read_config_read_data(ASN_GAUGE, line, &StorageTmp->mxNearEndCurrentFABEs, &tmpsize);
+	line = read_config_read_data(ASN_GAUGE, line, &StorageTmp->mxNearEndCurrentFEBEs, &tmpsize);
 	mxNearEndCurrentTable_add(StorageTmp);
 	(void) tmpsize;
 	DEBUGMSGTL(("mxMIB", "done.\n"));
@@ -3329,6 +3931,9 @@ store_mxNearEndCurrentTable(int majorID, int minorID, void *serverarg, void *cli
 			cptr = read_config_store_data(ASN_GAUGE, cptr, &StorageTmp->mxNearEndCurrentBESs, &tmpsize);
 			cptr = read_config_store_data(ASN_GAUGE, cptr, &StorageTmp->mxNearEndCurrentDMs, &tmpsize);
 			cptr = read_config_store_data(ASN_GAUGE, cptr, &StorageTmp->mxNearEndCurrentLCVs, &tmpsize);
+			cptr = read_config_store_data(ASN_GAUGE, cptr, &StorageTmp->mxNearEndCurrentFASEs, &tmpsize);
+			cptr = read_config_store_data(ASN_GAUGE, cptr, &StorageTmp->mxNearEndCurrentFABEs, &tmpsize);
+			cptr = read_config_store_data(ASN_GAUGE, cptr, &StorageTmp->mxNearEndCurrentFEBEs, &tmpsize);
 			snmpd_store_config(line);
 		}
 	}
@@ -3352,8 +3957,10 @@ mxNearEndIntervalTable_create(void)
 	DEBUGMSGTL(("mxMIB", "mxNearEndIntervalTable_create: creating row...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
-		if ((StorageNew->mxDrivName = (uint8_t *) strdup("")) != NULL)
-			StorageNew->mxDrivNameLen = strlen("");
+		if ((StorageNew->mxDrivName = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->mxDrivNameLen = 0;
+		StorageNew->mxDrivName[StorageNew->mxDrivNameLen] = 0;
 		StorageNew->mxCardIndex = 0;
 		StorageNew->mxSpanIndex = 0;
 		StorageNew->mxNearEndIntervalESs = 0;
@@ -3366,17 +3973,24 @@ mxNearEndIntervalTable_create(void)
 		StorageNew->mxNearEndIntervalBESs = 0;
 		StorageNew->mxNearEndIntervalDMs = 0;
 		StorageNew->mxNearEndIntervalLCVs = 0;
+		StorageNew->mxNearEndIntervalFASEs = 0;
+		StorageNew->mxNearEndIntervalFABEs = 0;
+		StorageNew->mxNearEndIntervalFEBEs = 0;
 		StorageNew->mxNearEndIntervalValidData = 0;
-
 	}
+      done:
 	DEBUGMSGTL(("mxMIB", "done.\n"));
 	return (StorageNew);
+	goto nomem;
+      nomem:
+	mxNearEndIntervalTable_destroy(&StorageNew);
+	goto done;
 }
 
 /**
  * @fn struct mxNearEndIntervalTable_data *mxNearEndIntervalTable_duplicate(struct mxNearEndIntervalTable_data *thedata)
  * @param thedata the row structure to duplicate.
- * @brief duplicat a row structure for a table.
+ * @brief duplicate a row structure for a table.
  *
  * Duplicates the specified row structure @param thedata and returns a pointer to the newly
  * allocated row structure on success, or NULL on failure.
@@ -3388,6 +4002,29 @@ mxNearEndIntervalTable_duplicate(struct mxNearEndIntervalTable_data *thedata)
 
 	DEBUGMSGTL(("mxMIB", "mxNearEndIntervalTable_duplicate: duplicating row...  "));
 	if (StorageNew != NULL) {
+		StorageNew->mxNearEndIntervalTable_id = thedata->mxNearEndIntervalTable_id;
+		if (!(StorageNew->mxDrivName = malloc(thedata->mxDrivNameLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->mxDrivName, thedata->mxDrivName, thedata->mxDrivNameLen);
+		StorageNew->mxDrivNameLen = thedata->mxDrivNameLen;
+		StorageNew->mxDrivName[StorageNew->mxDrivNameLen] = 0;
+		StorageNew->mxCardIndex = thedata->mxCardIndex;
+		StorageNew->mxSpanIndex = thedata->mxSpanIndex;
+		StorageNew->mxNearEndIntervalIndex = thedata->mxNearEndIntervalIndex;
+		StorageNew->mxNearEndIntervalESs = thedata->mxNearEndIntervalESs;
+		StorageNew->mxNearEndIntervalSESs = thedata->mxNearEndIntervalSESs;
+		StorageNew->mxNearEndIntervalSEFSs = thedata->mxNearEndIntervalSEFSs;
+		StorageNew->mxNearEndIntervalUASs = thedata->mxNearEndIntervalUASs;
+		StorageNew->mxNearEndIntervalCSSs = thedata->mxNearEndIntervalCSSs;
+		StorageNew->mxNearEndIntervalPCVs = thedata->mxNearEndIntervalPCVs;
+		StorageNew->mxNearEndIntervalLESs = thedata->mxNearEndIntervalLESs;
+		StorageNew->mxNearEndIntervalBESs = thedata->mxNearEndIntervalBESs;
+		StorageNew->mxNearEndIntervalDMs = thedata->mxNearEndIntervalDMs;
+		StorageNew->mxNearEndIntervalLCVs = thedata->mxNearEndIntervalLCVs;
+		StorageNew->mxNearEndIntervalFASEs = thedata->mxNearEndIntervalFASEs;
+		StorageNew->mxNearEndIntervalFABEs = thedata->mxNearEndIntervalFABEs;
+		StorageNew->mxNearEndIntervalFEBEs = thedata->mxNearEndIntervalFEBEs;
+		StorageNew->mxNearEndIntervalValidData = thedata->mxNearEndIntervalValidData;
 	}
       done:
 	DEBUGMSGTL(("mxMIB", "done.\n"));
@@ -3489,7 +4126,7 @@ mxNearEndIntervalTable_del(struct mxNearEndIntervalTable_data *thedata)
  * @param line line from configuration file matching the token.
  * @brief parse configuration file for mxNearEndIntervalTable entries.
  *
- * This callback is called by UCD-SNMP when it prases a configuration file and finds a configuration
+ * This callback is called by UCD-SNMP when it parses a configuration file and finds a configuration
  * file line for the registsred token (in this case mxNearEndIntervalTable).  This routine is invoked by UCD-SNMP
  * to read the values of each row in the table from the configuration file.  Note that this
  * procedure may exist regardless of the persistence of the table.  If there are no configured
@@ -3526,6 +4163,9 @@ parse_mxNearEndIntervalTable(const char *token, char *line)
 	line = read_config_read_data(ASN_GAUGE, line, &StorageTmp->mxNearEndIntervalBESs, &tmpsize);
 	line = read_config_read_data(ASN_GAUGE, line, &StorageTmp->mxNearEndIntervalDMs, &tmpsize);
 	line = read_config_read_data(ASN_GAUGE, line, &StorageTmp->mxNearEndIntervalLCVs, &tmpsize);
+	line = read_config_read_data(ASN_GAUGE, line, &StorageTmp->mxNearEndIntervalFASEs, &tmpsize);
+	line = read_config_read_data(ASN_GAUGE, line, &StorageTmp->mxNearEndIntervalFABEs, &tmpsize);
+	line = read_config_read_data(ASN_GAUGE, line, &StorageTmp->mxNearEndIntervalFEBEs, &tmpsize);
 	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->mxNearEndIntervalValidData, &tmpsize);
 	mxNearEndIntervalTable_add(StorageTmp);
 	(void) tmpsize;
@@ -3571,6 +4211,9 @@ store_mxNearEndIntervalTable(int majorID, int minorID, void *serverarg, void *cl
 			cptr = read_config_store_data(ASN_GAUGE, cptr, &StorageTmp->mxNearEndIntervalBESs, &tmpsize);
 			cptr = read_config_store_data(ASN_GAUGE, cptr, &StorageTmp->mxNearEndIntervalDMs, &tmpsize);
 			cptr = read_config_store_data(ASN_GAUGE, cptr, &StorageTmp->mxNearEndIntervalLCVs, &tmpsize);
+			cptr = read_config_store_data(ASN_GAUGE, cptr, &StorageTmp->mxNearEndIntervalFASEs, &tmpsize);
+			cptr = read_config_store_data(ASN_GAUGE, cptr, &StorageTmp->mxNearEndIntervalFABEs, &tmpsize);
+			cptr = read_config_store_data(ASN_GAUGE, cptr, &StorageTmp->mxNearEndIntervalFEBEs, &tmpsize);
 			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->mxNearEndIntervalValidData, &tmpsize);
 			snmpd_store_config(line);
 		}
@@ -3595,8 +4238,10 @@ mxNearEndTotalTable_create(void)
 	DEBUGMSGTL(("mxMIB", "mxNearEndTotalTable_create: creating row...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
-		if ((StorageNew->mxDrivName = (uint8_t *) strdup("")) != NULL)
-			StorageNew->mxDrivNameLen = strlen("");
+		if ((StorageNew->mxDrivName = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->mxDrivNameLen = 0;
+		StorageNew->mxDrivName[StorageNew->mxDrivNameLen] = 0;
 		StorageNew->mxCardIndex = 0;
 		StorageNew->mxSpanIndex = 0;
 		StorageNew->mxNearEndTotalValidIntervals = 0;
@@ -3611,16 +4256,23 @@ mxNearEndTotalTable_create(void)
 		StorageNew->mxNearEndTotalBESs = 0;
 		StorageNew->mxNearEndTotalDMs = 0;
 		StorageNew->mxNearEndTotalLCVs = 0;
-
+		StorageNew->mxNearEndTotalFASEs = 0;
+		StorageNew->mxNearEndTotalFABEs = 0;
+		StorageNew->mxNearEndTotalFEBEs = 0;
 	}
+      done:
 	DEBUGMSGTL(("mxMIB", "done.\n"));
 	return (StorageNew);
+	goto nomem;
+      nomem:
+	mxNearEndTotalTable_destroy(&StorageNew);
+	goto done;
 }
 
 /**
  * @fn struct mxNearEndTotalTable_data *mxNearEndTotalTable_duplicate(struct mxNearEndTotalTable_data *thedata)
  * @param thedata the row structure to duplicate.
- * @brief duplicat a row structure for a table.
+ * @brief duplicate a row structure for a table.
  *
  * Duplicates the specified row structure @param thedata and returns a pointer to the newly
  * allocated row structure on success, or NULL on failure.
@@ -3632,6 +4284,29 @@ mxNearEndTotalTable_duplicate(struct mxNearEndTotalTable_data *thedata)
 
 	DEBUGMSGTL(("mxMIB", "mxNearEndTotalTable_duplicate: duplicating row...  "));
 	if (StorageNew != NULL) {
+		StorageNew->mxNearEndTotalTable_id = thedata->mxNearEndTotalTable_id;
+		if (!(StorageNew->mxDrivName = malloc(thedata->mxDrivNameLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->mxDrivName, thedata->mxDrivName, thedata->mxDrivNameLen);
+		StorageNew->mxDrivNameLen = thedata->mxDrivNameLen;
+		StorageNew->mxDrivName[StorageNew->mxDrivNameLen] = 0;
+		StorageNew->mxCardIndex = thedata->mxCardIndex;
+		StorageNew->mxSpanIndex = thedata->mxSpanIndex;
+		StorageNew->mxNearEndTotalValidIntervals = thedata->mxNearEndTotalValidIntervals;
+		StorageNew->mxNearEndTotalInvalidIntervals = thedata->mxNearEndTotalInvalidIntervals;
+		StorageNew->mxNearEndTotalESs = thedata->mxNearEndTotalESs;
+		StorageNew->mxNearEndTotalSESs = thedata->mxNearEndTotalSESs;
+		StorageNew->mxNearEndTotalSEFSs = thedata->mxNearEndTotalSEFSs;
+		StorageNew->mxNearEndTotalUASs = thedata->mxNearEndTotalUASs;
+		StorageNew->mxNearEndTotalCSSs = thedata->mxNearEndTotalCSSs;
+		StorageNew->mxNearEndTotalPCVs = thedata->mxNearEndTotalPCVs;
+		StorageNew->mxNearEndTotalLESs = thedata->mxNearEndTotalLESs;
+		StorageNew->mxNearEndTotalBESs = thedata->mxNearEndTotalBESs;
+		StorageNew->mxNearEndTotalDMs = thedata->mxNearEndTotalDMs;
+		StorageNew->mxNearEndTotalLCVs = thedata->mxNearEndTotalLCVs;
+		StorageNew->mxNearEndTotalFASEs = thedata->mxNearEndTotalFASEs;
+		StorageNew->mxNearEndTotalFABEs = thedata->mxNearEndTotalFABEs;
+		StorageNew->mxNearEndTotalFEBEs = thedata->mxNearEndTotalFEBEs;
 	}
       done:
 	DEBUGMSGTL(("mxMIB", "done.\n"));
@@ -3731,7 +4406,7 @@ mxNearEndTotalTable_del(struct mxNearEndTotalTable_data *thedata)
  * @param line line from configuration file matching the token.
  * @brief parse configuration file for mxNearEndTotalTable entries.
  *
- * This callback is called by UCD-SNMP when it prases a configuration file and finds a configuration
+ * This callback is called by UCD-SNMP when it parses a configuration file and finds a configuration
  * file line for the registsred token (in this case mxNearEndTotalTable).  This routine is invoked by UCD-SNMP
  * to read the values of each row in the table from the configuration file.  Note that this
  * procedure may exist regardless of the persistence of the table.  If there are no configured
@@ -3769,6 +4444,9 @@ parse_mxNearEndTotalTable(const char *token, char *line)
 	line = read_config_read_data(ASN_GAUGE, line, &StorageTmp->mxNearEndTotalBESs, &tmpsize);
 	line = read_config_read_data(ASN_GAUGE, line, &StorageTmp->mxNearEndTotalDMs, &tmpsize);
 	line = read_config_read_data(ASN_GAUGE, line, &StorageTmp->mxNearEndTotalLCVs, &tmpsize);
+	line = read_config_read_data(ASN_GAUGE, line, &StorageTmp->mxNearEndTotalFASEs, &tmpsize);
+	line = read_config_read_data(ASN_GAUGE, line, &StorageTmp->mxNearEndTotalFABEs, &tmpsize);
+	line = read_config_read_data(ASN_GAUGE, line, &StorageTmp->mxNearEndTotalFEBEs, &tmpsize);
 	mxNearEndTotalTable_add(StorageTmp);
 	(void) tmpsize;
 	DEBUGMSGTL(("mxMIB", "done.\n"));
@@ -3814,6 +4492,9 @@ store_mxNearEndTotalTable(int majorID, int minorID, void *serverarg, void *clien
 			cptr = read_config_store_data(ASN_GAUGE, cptr, &StorageTmp->mxNearEndTotalBESs, &tmpsize);
 			cptr = read_config_store_data(ASN_GAUGE, cptr, &StorageTmp->mxNearEndTotalDMs, &tmpsize);
 			cptr = read_config_store_data(ASN_GAUGE, cptr, &StorageTmp->mxNearEndTotalLCVs, &tmpsize);
+			cptr = read_config_store_data(ASN_GAUGE, cptr, &StorageTmp->mxNearEndTotalFASEs, &tmpsize);
+			cptr = read_config_store_data(ASN_GAUGE, cptr, &StorageTmp->mxNearEndTotalFABEs, &tmpsize);
+			cptr = read_config_store_data(ASN_GAUGE, cptr, &StorageTmp->mxNearEndTotalFEBEs, &tmpsize);
 			snmpd_store_config(line);
 		}
 	}
@@ -3837,8 +4518,10 @@ mxFarEndCurrentTable_create(void)
 	DEBUGMSGTL(("mxMIB", "mxFarEndCurrentTable_create: creating row...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
-		if ((StorageNew->mxDrivName = (uint8_t *) strdup("")) != NULL)
-			StorageNew->mxDrivNameLen = strlen("");
+		if ((StorageNew->mxDrivName = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->mxDrivNameLen = 0;
+		StorageNew->mxDrivName[StorageNew->mxDrivNameLen] = 0;
 		StorageNew->mxCardIndex = 0;
 		StorageNew->mxSpanIndex = 0;
 		StorageNew->mxFarEndCurrentTimeElapsed = 0;
@@ -3851,16 +4534,20 @@ mxFarEndCurrentTable_create(void)
 		StorageNew->mxFarEndCurrentLESs = 0;
 		StorageNew->mxFarEndCurrentBESs = 0;
 		StorageNew->mxFarEndCurrentDMs = 0;
-
 	}
+      done:
 	DEBUGMSGTL(("mxMIB", "done.\n"));
 	return (StorageNew);
+	goto nomem;
+      nomem:
+	mxFarEndCurrentTable_destroy(&StorageNew);
+	goto done;
 }
 
 /**
  * @fn struct mxFarEndCurrentTable_data *mxFarEndCurrentTable_duplicate(struct mxFarEndCurrentTable_data *thedata)
  * @param thedata the row structure to duplicate.
- * @brief duplicat a row structure for a table.
+ * @brief duplicate a row structure for a table.
  *
  * Duplicates the specified row structure @param thedata and returns a pointer to the newly
  * allocated row structure on success, or NULL on failure.
@@ -3872,6 +4559,24 @@ mxFarEndCurrentTable_duplicate(struct mxFarEndCurrentTable_data *thedata)
 
 	DEBUGMSGTL(("mxMIB", "mxFarEndCurrentTable_duplicate: duplicating row...  "));
 	if (StorageNew != NULL) {
+		StorageNew->mxFarEndCurrentTable_id = thedata->mxFarEndCurrentTable_id;
+		if (!(StorageNew->mxDrivName = malloc(thedata->mxDrivNameLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->mxDrivName, thedata->mxDrivName, thedata->mxDrivNameLen);
+		StorageNew->mxDrivNameLen = thedata->mxDrivNameLen;
+		StorageNew->mxDrivName[StorageNew->mxDrivNameLen] = 0;
+		StorageNew->mxCardIndex = thedata->mxCardIndex;
+		StorageNew->mxSpanIndex = thedata->mxSpanIndex;
+		StorageNew->mxFarEndCurrentTimeElapsed = thedata->mxFarEndCurrentTimeElapsed;
+		StorageNew->mxFarEndCurrentESs = thedata->mxFarEndCurrentESs;
+		StorageNew->mxFarEndCurrentSESs = thedata->mxFarEndCurrentSESs;
+		StorageNew->mxFarEndCurrentSEFSs = thedata->mxFarEndCurrentSEFSs;
+		StorageNew->mxFarEndCurrentUASs = thedata->mxFarEndCurrentUASs;
+		StorageNew->mxFarEndCurrentCSSs = thedata->mxFarEndCurrentCSSs;
+		StorageNew->mxFarEndCurrentPCVs = thedata->mxFarEndCurrentPCVs;
+		StorageNew->mxFarEndCurrentLESs = thedata->mxFarEndCurrentLESs;
+		StorageNew->mxFarEndCurrentBESs = thedata->mxFarEndCurrentBESs;
+		StorageNew->mxFarEndCurrentDMs = thedata->mxFarEndCurrentDMs;
 	}
       done:
 	DEBUGMSGTL(("mxMIB", "done.\n"));
@@ -3971,7 +4676,7 @@ mxFarEndCurrentTable_del(struct mxFarEndCurrentTable_data *thedata)
  * @param line line from configuration file matching the token.
  * @brief parse configuration file for mxFarEndCurrentTable entries.
  *
- * This callback is called by UCD-SNMP when it prases a configuration file and finds a configuration
+ * This callback is called by UCD-SNMP when it parses a configuration file and finds a configuration
  * file line for the registsred token (in this case mxFarEndCurrentTable).  This routine is invoked by UCD-SNMP
  * to read the values of each row in the table from the configuration file.  Note that this
  * procedure may exist regardless of the persistence of the table.  If there are no configured
@@ -4073,8 +4778,10 @@ mxFarEndIntervalTable_create(void)
 	DEBUGMSGTL(("mxMIB", "mxFarEndIntervalTable_create: creating row...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
-		if ((StorageNew->mxDrivName = (uint8_t *) strdup("")) != NULL)
-			StorageNew->mxDrivNameLen = strlen("");
+		if ((StorageNew->mxDrivName = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->mxDrivNameLen = 0;
+		StorageNew->mxDrivName[StorageNew->mxDrivNameLen] = 0;
 		StorageNew->mxCardIndex = 0;
 		StorageNew->mxSpanIndex = 0;
 		StorageNew->mxFarEndIntervalESs = 0;
@@ -4087,16 +4794,20 @@ mxFarEndIntervalTable_create(void)
 		StorageNew->mxFarEndIntervalBESs = 0;
 		StorageNew->mxFarEndIntervalDMs = 0;
 		StorageNew->mxFarEndIntervalValidData = 0;
-
 	}
+      done:
 	DEBUGMSGTL(("mxMIB", "done.\n"));
 	return (StorageNew);
+	goto nomem;
+      nomem:
+	mxFarEndIntervalTable_destroy(&StorageNew);
+	goto done;
 }
 
 /**
  * @fn struct mxFarEndIntervalTable_data *mxFarEndIntervalTable_duplicate(struct mxFarEndIntervalTable_data *thedata)
  * @param thedata the row structure to duplicate.
- * @brief duplicat a row structure for a table.
+ * @brief duplicate a row structure for a table.
  *
  * Duplicates the specified row structure @param thedata and returns a pointer to the newly
  * allocated row structure on success, or NULL on failure.
@@ -4108,6 +4819,25 @@ mxFarEndIntervalTable_duplicate(struct mxFarEndIntervalTable_data *thedata)
 
 	DEBUGMSGTL(("mxMIB", "mxFarEndIntervalTable_duplicate: duplicating row...  "));
 	if (StorageNew != NULL) {
+		StorageNew->mxFarEndIntervalTable_id = thedata->mxFarEndIntervalTable_id;
+		if (!(StorageNew->mxDrivName = malloc(thedata->mxDrivNameLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->mxDrivName, thedata->mxDrivName, thedata->mxDrivNameLen);
+		StorageNew->mxDrivNameLen = thedata->mxDrivNameLen;
+		StorageNew->mxDrivName[StorageNew->mxDrivNameLen] = 0;
+		StorageNew->mxCardIndex = thedata->mxCardIndex;
+		StorageNew->mxSpanIndex = thedata->mxSpanIndex;
+		StorageNew->mxFarEndIntervalIndex = thedata->mxFarEndIntervalIndex;
+		StorageNew->mxFarEndIntervalESs = thedata->mxFarEndIntervalESs;
+		StorageNew->mxFarEndIntervalSESs = thedata->mxFarEndIntervalSESs;
+		StorageNew->mxFarEndIntervalSEFSs = thedata->mxFarEndIntervalSEFSs;
+		StorageNew->mxFarEndIntervalUASs = thedata->mxFarEndIntervalUASs;
+		StorageNew->mxFarEndIntervalCSSs = thedata->mxFarEndIntervalCSSs;
+		StorageNew->mxFarEndIntervalPCVs = thedata->mxFarEndIntervalPCVs;
+		StorageNew->mxFarEndIntervalLESs = thedata->mxFarEndIntervalLESs;
+		StorageNew->mxFarEndIntervalBESs = thedata->mxFarEndIntervalBESs;
+		StorageNew->mxFarEndIntervalDMs = thedata->mxFarEndIntervalDMs;
+		StorageNew->mxFarEndIntervalValidData = thedata->mxFarEndIntervalValidData;
 	}
       done:
 	DEBUGMSGTL(("mxMIB", "done.\n"));
@@ -4209,7 +4939,7 @@ mxFarEndIntervalTable_del(struct mxFarEndIntervalTable_data *thedata)
  * @param line line from configuration file matching the token.
  * @brief parse configuration file for mxFarEndIntervalTable entries.
  *
- * This callback is called by UCD-SNMP when it prases a configuration file and finds a configuration
+ * This callback is called by UCD-SNMP when it parses a configuration file and finds a configuration
  * file line for the registsred token (in this case mxFarEndIntervalTable).  This routine is invoked by UCD-SNMP
  * to read the values of each row in the table from the configuration file.  Note that this
  * procedure may exist regardless of the persistence of the table.  If there are no configured
@@ -4313,8 +5043,10 @@ mxFarEndTotalTable_create(void)
 	DEBUGMSGTL(("mxMIB", "mxFarEndTotalTable_create: creating row...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
-		if ((StorageNew->mxDrivName = (uint8_t *) strdup("")) != NULL)
-			StorageNew->mxDrivNameLen = strlen("");
+		if ((StorageNew->mxDrivName = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->mxDrivNameLen = 0;
+		StorageNew->mxDrivName[StorageNew->mxDrivNameLen] = 0;
 		StorageNew->mxCardIndex = 0;
 		StorageNew->mxSpanIndex = 0;
 		StorageNew->mxFarEndTotalValidIntervals = 0;
@@ -4328,16 +5060,20 @@ mxFarEndTotalTable_create(void)
 		StorageNew->mxFarEndTotalLESs = 0;
 		StorageNew->mxFarEndTotalBESs = 0;
 		StorageNew->mxFarEndTotalDMs = 0;
-
 	}
+      done:
 	DEBUGMSGTL(("mxMIB", "done.\n"));
 	return (StorageNew);
+	goto nomem;
+      nomem:
+	mxFarEndTotalTable_destroy(&StorageNew);
+	goto done;
 }
 
 /**
  * @fn struct mxFarEndTotalTable_data *mxFarEndTotalTable_duplicate(struct mxFarEndTotalTable_data *thedata)
  * @param thedata the row structure to duplicate.
- * @brief duplicat a row structure for a table.
+ * @brief duplicate a row structure for a table.
  *
  * Duplicates the specified row structure @param thedata and returns a pointer to the newly
  * allocated row structure on success, or NULL on failure.
@@ -4349,6 +5085,25 @@ mxFarEndTotalTable_duplicate(struct mxFarEndTotalTable_data *thedata)
 
 	DEBUGMSGTL(("mxMIB", "mxFarEndTotalTable_duplicate: duplicating row...  "));
 	if (StorageNew != NULL) {
+		StorageNew->mxFarEndTotalTable_id = thedata->mxFarEndTotalTable_id;
+		if (!(StorageNew->mxDrivName = malloc(thedata->mxDrivNameLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->mxDrivName, thedata->mxDrivName, thedata->mxDrivNameLen);
+		StorageNew->mxDrivNameLen = thedata->mxDrivNameLen;
+		StorageNew->mxDrivName[StorageNew->mxDrivNameLen] = 0;
+		StorageNew->mxCardIndex = thedata->mxCardIndex;
+		StorageNew->mxSpanIndex = thedata->mxSpanIndex;
+		StorageNew->mxFarEndTotalValidIntervals = thedata->mxFarEndTotalValidIntervals;
+		StorageNew->mxFarEndTotalInvalidIntervals = thedata->mxFarEndTotalInvalidIntervals;
+		StorageNew->mxFarEndTotalESs = thedata->mxFarEndTotalESs;
+		StorageNew->mxFarEndTotalSESs = thedata->mxFarEndTotalSESs;
+		StorageNew->mxFarEndTotalSEFSs = thedata->mxFarEndTotalSEFSs;
+		StorageNew->mxFarEndTotalUASs = thedata->mxFarEndTotalUASs;
+		StorageNew->mxFarEndTotalCSSs = thedata->mxFarEndTotalCSSs;
+		StorageNew->mxFarEndTotalPCVs = thedata->mxFarEndTotalPCVs;
+		StorageNew->mxFarEndTotalLESs = thedata->mxFarEndTotalLESs;
+		StorageNew->mxFarEndTotalBESs = thedata->mxFarEndTotalBESs;
+		StorageNew->mxFarEndTotalDMs = thedata->mxFarEndTotalDMs;
 	}
       done:
 	DEBUGMSGTL(("mxMIB", "done.\n"));
@@ -4448,7 +5203,7 @@ mxFarEndTotalTable_del(struct mxFarEndTotalTable_data *thedata)
  * @param line line from configuration file matching the token.
  * @brief parse configuration file for mxFarEndTotalTable entries.
  *
- * This callback is called by UCD-SNMP when it prases a configuration file and finds a configuration
+ * This callback is called by UCD-SNMP when it parses a configuration file and finds a configuration
  * file line for the registsred token (in this case mxFarEndTotalTable).  This routine is invoked by UCD-SNMP
  * to read the values of each row in the table from the configuration file.  Note that this
  * procedure may exist regardless of the persistence of the table.  If there are no configured
@@ -4537,6 +5292,234 @@ store_mxFarEndTotalTable(int majorID, int minorID, void *serverarg, void *client
 }
 
 /**
+ * @fn int activate_mxSyncTable_row(struct mxSyncTable_data *StorageTmp)
+ * @param StorageTmp the data row to activate
+ * @brief commit activation of a row to the underlying device
+ *
+ * This function is used by tables that contain a RowStatus object.  It is used to move the row from
+ * the RS_NOTINSERVICE state to the RS_ACTIVE state.  It is also used when transitioning from the
+ * RS_CREATEANDGO state to the RS_ACTIVE state.  If activation fails, the function should return
+ * SNMP_ERR_COMMITFAILED; otherwise, SNMP_ERR_NOERROR.
+ */
+int
+activate_mxSyncTable_row(struct mxSyncTable_data *StorageTmp)
+{
+	/* XXX: provide code to activate the row with the underlying device */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int deactivate_mxSyncTable_row(struct mxSyncTable_data *StorageTmp)
+ * @param StorageTmp the data row to deactivate
+ * @brief commit deactivation of a row to the underlying device
+ *
+ * This function is used by tables that contain a RowStatus object.  It is used to move the row from
+ * the RS_ACTIVE state to the RS_NOTINSERVICE state.  It is also used when transitioning from the
+ * RS_ACTIVE state to the RS_DESTROY state.  If deactivation fails, the function should return
+ * SNMP_ERR_COMMITFAILED; otherwise, SNMP_ERR_NOERROR.
+ */
+int
+deactivate_mxSyncTable_row(struct mxSyncTable_data *StorageTmp)
+{
+	/* XXX: provide code to deactivate the row with the underlying device */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int activate_mxDrivTable_row(struct mxDrivTable_data *StorageTmp)
+ * @param StorageTmp the data row to activate
+ * @brief commit activation of a row to the underlying device
+ *
+ * This function is used by tables that contain a RowStatus object.  It is used to move the row from
+ * the RS_NOTINSERVICE state to the RS_ACTIVE state.  It is also used when transitioning from the
+ * RS_CREATEANDGO state to the RS_ACTIVE state.  If activation fails, the function should return
+ * SNMP_ERR_COMMITFAILED; otherwise, SNMP_ERR_NOERROR.
+ */
+int
+activate_mxDrivTable_row(struct mxDrivTable_data *StorageTmp)
+{
+	/* XXX: provide code to activate the row with the underlying device */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int deactivate_mxDrivTable_row(struct mxDrivTable_data *StorageTmp)
+ * @param StorageTmp the data row to deactivate
+ * @brief commit deactivation of a row to the underlying device
+ *
+ * This function is used by tables that contain a RowStatus object.  It is used to move the row from
+ * the RS_ACTIVE state to the RS_NOTINSERVICE state.  It is also used when transitioning from the
+ * RS_ACTIVE state to the RS_DESTROY state.  If deactivation fails, the function should return
+ * SNMP_ERR_COMMITFAILED; otherwise, SNMP_ERR_NOERROR.
+ */
+int
+deactivate_mxDrivTable_row(struct mxDrivTable_data *StorageTmp)
+{
+	/* XXX: provide code to deactivate the row with the underlying device */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int activate_mxCardTable_row(struct mxCardTable_data *StorageTmp)
+ * @param StorageTmp the data row to activate
+ * @brief commit activation of a row to the underlying device
+ *
+ * This function is used by tables that contain a RowStatus object.  It is used to move the row from
+ * the RS_NOTINSERVICE state to the RS_ACTIVE state.  It is also used when transitioning from the
+ * RS_CREATEANDGO state to the RS_ACTIVE state.  If activation fails, the function should return
+ * SNMP_ERR_COMMITFAILED; otherwise, SNMP_ERR_NOERROR.
+ */
+int
+activate_mxCardTable_row(struct mxCardTable_data *StorageTmp)
+{
+	/* XXX: provide code to activate the row with the underlying device */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int deactivate_mxCardTable_row(struct mxCardTable_data *StorageTmp)
+ * @param StorageTmp the data row to deactivate
+ * @brief commit deactivation of a row to the underlying device
+ *
+ * This function is used by tables that contain a RowStatus object.  It is used to move the row from
+ * the RS_ACTIVE state to the RS_NOTINSERVICE state.  It is also used when transitioning from the
+ * RS_ACTIVE state to the RS_DESTROY state.  If deactivation fails, the function should return
+ * SNMP_ERR_COMMITFAILED; otherwise, SNMP_ERR_NOERROR.
+ */
+int
+deactivate_mxCardTable_row(struct mxCardTable_data *StorageTmp)
+{
+	/* XXX: provide code to deactivate the row with the underlying device */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int activate_mxSpanTable_row(struct mxSpanTable_data *StorageTmp)
+ * @param StorageTmp the data row to activate
+ * @brief commit activation of a row to the underlying device
+ *
+ * This function is used by tables that contain a RowStatus object.  It is used to move the row from
+ * the RS_NOTINSERVICE state to the RS_ACTIVE state.  It is also used when transitioning from the
+ * RS_CREATEANDGO state to the RS_ACTIVE state.  If activation fails, the function should return
+ * SNMP_ERR_COMMITFAILED; otherwise, SNMP_ERR_NOERROR.
+ */
+int
+activate_mxSpanTable_row(struct mxSpanTable_data *StorageTmp)
+{
+	/* XXX: provide code to activate the row with the underlying device */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int deactivate_mxSpanTable_row(struct mxSpanTable_data *StorageTmp)
+ * @param StorageTmp the data row to deactivate
+ * @brief commit deactivation of a row to the underlying device
+ *
+ * This function is used by tables that contain a RowStatus object.  It is used to move the row from
+ * the RS_ACTIVE state to the RS_NOTINSERVICE state.  It is also used when transitioning from the
+ * RS_ACTIVE state to the RS_DESTROY state.  If deactivation fails, the function should return
+ * SNMP_ERR_COMMITFAILED; otherwise, SNMP_ERR_NOERROR.
+ */
+int
+deactivate_mxSpanTable_row(struct mxSpanTable_data *StorageTmp)
+{
+	/* XXX: provide code to deactivate the row with the underlying device */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int activate_mxXconTable_row(struct mxXconTable_data *StorageTmp)
+ * @param StorageTmp the data row to activate
+ * @brief commit activation of a row to the underlying device
+ *
+ * This function is used by tables that contain a RowStatus object.  It is used to move the row from
+ * the RS_NOTINSERVICE state to the RS_ACTIVE state.  It is also used when transitioning from the
+ * RS_CREATEANDGO state to the RS_ACTIVE state.  If activation fails, the function should return
+ * SNMP_ERR_COMMITFAILED; otherwise, SNMP_ERR_NOERROR.
+ */
+int
+activate_mxXconTable_row(struct mxXconTable_data *StorageTmp)
+{
+	/* XXX: provide code to activate the row with the underlying device */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int deactivate_mxXconTable_row(struct mxXconTable_data *StorageTmp)
+ * @param StorageTmp the data row to deactivate
+ * @brief commit deactivation of a row to the underlying device
+ *
+ * This function is used by tables that contain a RowStatus object.  It is used to move the row from
+ * the RS_ACTIVE state to the RS_NOTINSERVICE state.  It is also used when transitioning from the
+ * RS_ACTIVE state to the RS_DESTROY state.  If deactivation fails, the function should return
+ * SNMP_ERR_COMMITFAILED; otherwise, SNMP_ERR_NOERROR.
+ */
+int
+deactivate_mxXconTable_row(struct mxXconTable_data *StorageTmp)
+{
+	/* XXX: provide code to deactivate the row with the underlying device */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int check_mxSyncTable_row(struct mxSyncTable_data *StorageTmp, struct mxSyncTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to check, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the ACTION phase.  The start of the ACTION pahse performs this consitency check
+ * on the row before allowing the request to proceed to the COMMIT phase.  This function can return
+ * SNMP_ERR_NOERR or a specific SNMP error value.  Values in StorageOld are the values before the
+ * varbinds on the mib were applied; the values in StorageTmp are the new values.  The function is
+ * permitted to change the values in StorageTmp to correct them; however, preference should be made
+ * for setting values where were not in the varbinds.
+ */
+int
+check_mxSyncTable_row(struct mxSyncTable_data *StorageTmp, struct mxSyncTable_data *StorageOld)
+{
+	/* XXX: provide code to check the row for consistency */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int update_mxSyncTable_row(struct mxSyncTable_data *StorageTmp, struct mxSyncTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the set operation (ACTION phase) on a row
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to update, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the COMMIT phase.  The start of the ACTION phase performs a consistency check on
+ * the row before allowing the request to proceed to the COMMIT phase.  The COMMIT phase then
+ * arrives here with consistency already checked (see check_mxSyncTable_row()).  This function can
+ * return SNMP_ERR_NOERROR or SNMP_ERR_COMMITFAILED.  Values in StorageOld are the values before the
+ * varbinds on the row were applied: the values in StorageTmp are the new values.
+ */
+int
+update_mxSyncTable_row(struct mxSyncTable_data *StorageTmp, struct mxSyncTable_data *StorageOld)
+{
+	/* XXX: provide code to update the row with the underlying device */
+	mxSyncTable_refresh = 1;
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int revert_mxSyncTable_row(struct mxSyncTable_data *StorageTmp, struct mxSyncTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the undo operation (UNDO phase) on a row
+ */
+void
+revert_mxSyncTable_row(struct mxSyncTable_data *StorageTmp, struct mxSyncTable_data *StorageOld)
+{
+	/* XXX: provide code to revert the row with the underlying device */
+	update_mxSyncTable_row(StorageOld, NULL);
+}
+
+/**
  * @fn void refresh_mxSyncTable_row(struct mxSyncTable_data *StorageTmp, int force)
  * @param StorageTmp the data row to refresh.
  * @param force force refresh if non-zero.
@@ -4570,10 +5553,159 @@ refresh_mxSyncTable_row(struct mxSyncTable_data *StorageTmp, int force)
 void
 refresh_mxSyncTable(int force)
 {
+	struct header_complex_index *h, *h_next;
+
+	refresh_mxSpanTable(force);
 	if (!force && mxSyncTable_refresh == 0)
 		return;
 	/* XXX: Here, update the table as required... */
 	mxSyncTable_refresh = 0;
+	for (h = mxDrivTableStorage; h; h = h->next) {
+		/* for each entry in the driver table */
+		int fd, count, count2, i;
+		uint *val;
+		struct mxDrivTable_data *driv = h->data;
+		struct strioctl ioc;
+		struct mx_config config, *cptr = &config;
+		char devname[19+FMNAMESZ+1] = {};
+
+		if (driv->mxDrivRowStatus != RS_ACTIVE)
+			continue;
+		snprintf(devname, 19+FMNAMESZ+1, "/dev/streams/clone/%s", driv->mxDrivName);
+		if ((fd = open(devname, O_RDWR)) < 0) {
+			snmp_log(MY_FACILITY(LOG_ERR), "%s: %s: %s: %s", __FUNCTION__, "open()", devname, strerror(errno));
+			continue;
+		}
+		cptr = &config;
+		cptr->type = MX_OBJ_TYPE_SYNC;
+		cptr->id = 0;
+		cptr->cmd = MX_GET;
+		ioc.ic_cmd = MX_IOCLCONFIG;
+		ioc.ic_len = sizeof(*cptr);
+		ioc.ic_dp = (char *) cptr;
+	      retry:
+		if ((count = ioctl(fd, I_STR, &ioc)) < 0) {
+			snmp_log(MY_FACILITY(LOG_ERR), "%s: %s: %s: %s", __FUNCTION__, "ioctl()", "MX_IOCLCONFIG", strerror(errno));
+			close(fd);
+			continue;
+		}
+		if (!(cptr = malloc(sizeof(*cptr) + count * sizeof(uint)))) {
+			snmp_log(MY_FACILITY(LOG_ERR), "%s: %s: %s", __FUNCTION__, "malloc()", strerror(errno));
+			close(fd);
+			continue;
+		}
+		cptr->type = MX_OBJ_TYPE_SPAN;
+		cptr->id = count;
+		cptr->cmd = MX_GET;
+		ioc.ic_cmd = MX_IOCLCONFIG;
+		ioc.ic_timout = 0;
+		ioc.ic_len = sizeof(*cptr) + count * sizeof(uint);
+		ioc.ic_dp = (char *) cptr;
+		if ((count2 = ioctl(fd, I_STR, &ioc)) < 0) {
+			snmp_log(MY_FACILITY(LOG_ERR), "%s: %s: %s: %s", __FUNCTION__, "ioctl()", "MX_IOCLCONFIG", strerror(errno));
+			free(cptr);
+			close(fd);
+			continue;
+		}
+		if (count2 > count) {
+			count = count2;
+			free(cptr);
+			goto retry;
+		}
+		for (i = 0, val = (typeof(val)) (cptr + 1); i < count2; i++, val++) {
+			int j;
+			struct {
+				struct mx_attr attr;
+				struct mx_attr_sync sync;
+			} buf;
+
+			buf.attr.type = MX_OBJ_TYPE_SYNC;
+			buf.attr.id = *val;
+			buf.attr.cmd = MX_GET;
+			ioc.ic_cmd = MX_IOCGATTR;
+			ioc.ic_timout = 0;
+			ioc.ic_len = sizeof(buf);
+			ioc.ic_dp = (char *) &buf;
+			if (ioctl(fd, I_STR, &buf) < 0) {
+				snmp_log(MY_FACILITY(LOG_ERR), "%s: %s: %s: %s", __FUNCTION__, "ioctl()", "MX_IOCGATTR", strerror(errno));
+				continue;
+			}
+			for (j = 0; j < 8; j++) {
+				struct header_complex_index *hciptr;
+
+				if (buf.sync.config.mxSpanId[j] == 0)
+					continue;
+				for (hciptr = mxSyncTableStorage; hciptr; hciptr = hciptr->next) {
+					struct mxSyncTable_data *data = hciptr->data;
+
+					if (data->mxSyncTable_id != 0 && data->mxSyncTable_id != *val)
+						continue;
+					if (data->mxSyncGroup != buf.sync.config.mxSyncGroup)
+						continue;
+					if (data->mxSyncIndex != j + 1)
+						continue;
+					break;
+				}
+				if (hciptr) {
+					/* already have an entry for this sync index, simply update it */
+					struct mxSyncTable_data *StorageTmp = hciptr->data;
+					uint8_t *tmp;
+
+					StorageTmp->mxSyncTable_request = sa_request;	/* mark as updated */
+					StorageTmp->mxSyncTable_refs = 1;	/* mark as used */
+					StorageTmp->mxSyncTable_id = *val;	/* remember driver id */
+					StorageTmp->mxSyncGroup = buf.sync.config.mxSyncGroup;
+					StorageTmp->mxSyncIndex = j + 1;
+					if (StorageTmp->mxSyncSpanIdLen < 4) {
+						if ((tmp = calloc(5,1)) != NULL) {
+							SNMP_FREE(StorageTmp->mxSyncSpanId);
+							StorageTmp->mxSyncSpanId = tmp;
+							StorageTmp->mxSyncSpanIdLen = 4;
+						}
+					}
+					if (StorageTmp->mxSyncSpanIdLen >= 4)
+						StorageTmp->mxSyncSpanId[3] = buf.sync.config.mxSpanId[j];
+					/* FIXME:  need to fille out driver id and card number */
+				} else {
+					/* no entryfor this span index, create it */
+					struct mxSyncTable_data *StorageNew = SNMP_MALLOC_STRUCT(mxSyncTable_data);
+
+					if (!StorageNew) continue;
+					StorageNew->mxSyncTable_request = sa_request;	/* mark as updated */
+					StorageNew->mxSyncTable_refs = 1;	/* mark as used */
+					StorageNew->mxSyncTable_id = *val;	/* remember driver id */
+					StorageNew->mxSyncGroup = buf.sync.config.mxSyncGroup;
+					StorageNew->mxSyncIndex = j + 1;
+					if ((StorageNew->mxSyncSpanId = calloc(5, 1)) == NULL) {
+						mxSyncTable_destroy(&StorageNew);
+						continue;
+					}
+					StorageNew->mxSyncSpanIdLen = 4;
+					StorageNew->mxSyncSpanId[3] = buf.sync.config.mxSpanId[j];
+					/* FIXME:  need to fille out driver id and card number */
+
+					mxSyncTable_add(StorageNew);
+				}
+			}
+		}
+		free(cptr);
+		close(fd);
+	}
+	/* delete unused entries */
+	h_next = mxSyncTableStorage;
+	while ((h = h_next)) {
+		struct mxSyncTable_data *data = h->data;
+
+		h_next = h->next;
+		if (data->mxSyncTable_refs)
+			data->mxSyncTable_refs = 0;
+		else {
+			header_complex_extract_entry(&mxSyncTableStorage, h);
+			mxSyncTable_destroy(&data);
+		}
+	}
+	/* done */
+	return;
 }
 
 /**
@@ -4622,6 +5754,64 @@ var_mxSyncTable(struct variable *vp, oid * name, size_t *length, int exact, size
 }
 
 /**
+ * @fn int check_mxDrivTable_row(struct mxDrivTable_data *StorageTmp, struct mxDrivTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to check, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the ACTION phase.  The start of the ACTION pahse performs this consitency check
+ * on the row before allowing the request to proceed to the COMMIT phase.  This function can return
+ * SNMP_ERR_NOERR or a specific SNMP error value.  Values in StorageOld are the values before the
+ * varbinds on the mib were applied; the values in StorageTmp are the new values.  The function is
+ * permitted to change the values in StorageTmp to correct them; however, preference should be made
+ * for setting values where were not in the varbinds.
+ */
+int
+check_mxDrivTable_row(struct mxDrivTable_data *StorageTmp, struct mxDrivTable_data *StorageOld)
+{
+	/* XXX: provide code to check the row for consistency */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int update_mxDrivTable_row(struct mxDrivTable_data *StorageTmp, struct mxDrivTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the set operation (ACTION phase) on a row
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to update, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the COMMIT phase.  The start of the ACTION phase performs a consistency check on
+ * the row before allowing the request to proceed to the COMMIT phase.  The COMMIT phase then
+ * arrives here with consistency already checked (see check_mxDrivTable_row()).  This function can
+ * return SNMP_ERR_NOERROR or SNMP_ERR_COMMITFAILED.  Values in StorageOld are the values before the
+ * varbinds on the row were applied: the values in StorageTmp are the new values.
+ */
+int
+update_mxDrivTable_row(struct mxDrivTable_data *StorageTmp, struct mxDrivTable_data *StorageOld)
+{
+	/* XXX: provide code to update the row with the underlying device */
+	mxDrivTable_refresh = 1;
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int revert_mxDrivTable_row(struct mxDrivTable_data *StorageTmp, struct mxDrivTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the undo operation (UNDO phase) on a row
+ */
+void
+revert_mxDrivTable_row(struct mxDrivTable_data *StorageTmp, struct mxDrivTable_data *StorageOld)
+{
+	/* XXX: provide code to revert the row with the underlying device */
+	update_mxDrivTable_row(StorageOld, NULL);
+}
+
+/**
  * @fn void refresh_mxDrivTable_row(struct mxDrivTable_data *StorageTmp, int force)
  * @param StorageTmp the data row to refresh.
  * @param force force refresh if non-zero.
@@ -4659,6 +5849,142 @@ refresh_mxDrivTable(int force)
 		return;
 	/* XXX: Here, update the table as required... */
 	mxDrivTable_refresh = 0;
+	{
+		int fd;
+		struct header_complex_index *h, *h_next, *hciptr;
+		struct strioctl ioc;
+		struct {
+			struct mx_info info;
+			struct mx_info_dflt dflt;
+		} buf = {};
+
+		if ((fd = open("/dev/streams/clone/x400p-sl", O_RDWR)) < 0) {
+			snmp_log(MY_FACILITY(LOG_ERR), "%s: %s: %s: %s", __FUNCTION__, "open()", "/dev/streams/clone/x400p-sl", strerror(errno));
+			return;
+		}
+		buf.info.type = MX_OBJ_TYPE_DFLT;
+		buf.info.id = 0;
+		buf.info.cmd = MX_GET;
+		ioc.ic_cmd = MX_IOCGINFO;
+		ioc.ic_timout = 0;
+		ioc.ic_len = sizeof(buf);
+		ioc.ic_dp = (char *) &buf;
+		if (ioctl(fd, I_STR, &ioc) < 0) {
+			snmp_log(MY_FACILITY(LOG_ERR), "%s: %s: %s: %s", __FUNCTION__, "ioctl()", "MX_IOCGINFO", strerror(errno));
+			close(fd);
+			return;
+		}
+		for (hciptr = mxDrivTableStorage; hciptr; hciptr = hciptr->next) {
+			struct mxDrivTable_data *data = hciptr->data;
+			if (strncmp((char *) data->mxDrivName, "x400p-sl", 8))
+				continue;
+			break;
+		}
+		if (hciptr) {
+			struct mxDrivTable_data *StorageTmp = hciptr->data;
+			char *tmp;
+
+			StorageTmp->mxDrivTable_refs = 1;
+			if ((tmp = strdup("x400p-sl")) != NULL) {
+				StorageTmp->mxDrivName = (uint8_t *) tmp;
+				StorageTmp->mxDrivNameLen = 8;
+			}
+			StorageTmp->mxDrivIdnum = buf.dflt.mxDrivIdnum;
+			StorageTmp->mxDrivMajor = buf.dflt.mxDrivMajor;
+			if ((tmp = strndup(buf.dflt.mxDrivDescription, sizeof(buf.dflt.mxDrivDescription)))) {
+				StorageTmp->mxDrivDescription = (uint8_t *) tmp;
+				StorageTmp->mxDrivDescriptionLen = strnlen(buf.dflt.mxDrivDescription, sizeof(buf.dflt.mxDrivDescription));
+			}
+			if ((tmp = strndup(buf.dflt.mxDrivRevision, sizeof(buf.dflt.mxDrivRevision)))) {
+				StorageTmp->mxDrivRevision = (uint8_t *) tmp;
+				StorageTmp->mxDrivRevisionLen = strnlen(buf.dflt.mxDrivRevision, sizeof(buf.dflt.mxDrivRevision));
+			}
+			if ((tmp = strndup(buf.dflt.mxDrivCopyright, sizeof(buf.dflt.mxDrivCopyright)))) {
+				StorageTmp->mxDrivCopyright = (uint8_t *) tmp;
+				StorageTmp->mxDrivCopyrightLen = strnlen(buf.dflt.mxDrivCopyright, sizeof(buf.dflt.mxDrivCopyright));
+			}
+			if ((tmp = strndup(buf.dflt.mxDrivSupportedDevice, sizeof(buf.dflt.mxDrivSupportedDevice)))) {
+				StorageTmp->mxDrivSupportedDevice = (uint8_t *) tmp;
+				StorageTmp->mxDrivSupportedDeviceLen = strnlen(buf.dflt.mxDrivSupportedDevice, sizeof(buf.dflt.mxDrivSupportedDevice));
+			}
+			if ((tmp = strndup(buf.dflt.mxDrivContact, sizeof(buf.dflt.mxDrivContact)))) {
+				StorageTmp->mxDrivContact = (uint8_t *) tmp;
+				StorageTmp->mxDrivContactLen = strnlen(buf.dflt.mxDrivContact, sizeof(buf.dflt.mxDrivContact));
+			}
+			StorageTmp->mxDrivLicense = buf.dflt.mxDrivLicense;
+			if ((tmp = calloc(sizeof(buf.dflt.mxDrivDate)+1,1))) {
+				memcpy((void *) tmp, (void *) buf.dflt.mxDrivDate, sizeof(buf.dflt.mxDrivDate));
+				StorageTmp->mxDrivDate = (uint8_t *) tmp;
+				StorageTmp->mxDrivDateLen = sizeof(buf.dflt.mxDrivDate);
+			}
+			StorageTmp->mxDrivRowStatus = RS_ACTIVE;
+		} else {
+			struct mxDrivTable_data *StorageNew = SNMP_MALLOC_STRUCT(mxDrivTable_data);
+			char *tmp;
+
+			if (!StorageNew) return;
+			StorageNew->mxDrivTable_refs = 1;
+			if (!(tmp = strdup("x400p-sl"))) {
+				mxDrivTable_destroy(&StorageNew);
+				return;
+			}
+			StorageNew->mxDrivName = (uint8_t *) tmp;
+			StorageNew->mxDrivNameLen = 8;
+			if (!(tmp = strndup(buf.dflt.mxDrivDescription, sizeof(buf.dflt.mxDrivDescription)))) {
+				mxDrivTable_destroy(&StorageNew);
+				return;
+			}
+			StorageNew->mxDrivDescription = (uint8_t *) tmp;
+			StorageNew->mxDrivDescriptionLen = strnlen(buf.dflt.mxDrivDescription, sizeof(buf.dflt.mxDrivDescription));
+			if (!(tmp = strndup(buf.dflt.mxDrivRevision, sizeof(buf.dflt.mxDrivRevision)))) {
+				mxDrivTable_destroy(&StorageNew);
+				return;
+			}
+			StorageNew->mxDrivRevision = (uint8_t *) tmp;
+			StorageNew->mxDrivRevisionLen = strnlen(buf.dflt.mxDrivRevision, sizeof(buf.dflt.mxDrivRevision));
+			if (!(tmp = strndup(buf.dflt.mxDrivCopyright, sizeof(buf.dflt.mxDrivCopyright)))) {
+				mxDrivTable_destroy(&StorageNew);
+				return;
+			}
+			StorageNew->mxDrivCopyright = (uint8_t *) tmp;
+			StorageNew->mxDrivCopyrightLen = strnlen(buf.dflt.mxDrivCopyright, sizeof(buf.dflt.mxDrivCopyright));
+			if (!(tmp = strndup(buf.dflt.mxDrivSupportedDevice, sizeof(buf.dflt.mxDrivSupportedDevice)))) {
+				mxDrivTable_destroy(&StorageNew);
+				return;
+			}
+			StorageNew->mxDrivSupportedDevice = (uint8_t *) tmp;
+			StorageNew->mxDrivSupportedDeviceLen = strnlen(buf.dflt.mxDrivSupportedDevice, sizeof(buf.dflt.mxDrivSupportedDevice));
+			if (!(tmp = strndup(buf.dflt.mxDrivContact, sizeof(buf.dflt.mxDrivContact)))) {
+				mxDrivTable_destroy(&StorageNew);
+				return;
+			}
+			StorageNew->mxDrivContact = (uint8_t *) tmp;
+			StorageNew->mxDrivContactLen = strnlen(buf.dflt.mxDrivContact, sizeof(buf.dflt.mxDrivContact));
+			StorageNew->mxDrivLicense = buf.dflt.mxDrivLicense;
+			if (!(tmp = calloc(sizeof(buf.dflt.mxDrivDate)+1, 1))) {
+				mxDrivTable_destroy(&StorageNew);
+				return;
+			}
+			memcpy((void *) tmp, (void *) buf.dflt.mxDrivDate, sizeof(buf.dflt.mxDrivDate));
+			StorageNew->mxDrivDate = (uint8_t *) tmp;
+			StorageNew->mxDrivDateLen = sizeof(buf.dflt.mxDrivDate);
+			StorageNew->mxDrivRowStatus = RS_ACTIVE;
+			mxDrivTable_add(StorageNew);
+		}
+		/* delete unused entries */
+		h_next = mxSpanTableStorage;
+		while ((h = h_next)) {
+			struct mxSpanTable_data *data = h->data;
+
+			h_next = h->next;
+			if (data->mxSpanTable_refs)
+				data->mxSpanTable_refs = 0;
+			else {
+				header_complex_extract_entry(&mxSpanTableStorage, h);
+				mxSpanTable_destroy(&data);
+			}
+		}
+	}
 }
 
 /**
@@ -4754,6 +6080,64 @@ var_mxDrivTable(struct variable *vp, oid * name, size_t *length, int exact, size
 }
 
 /**
+ * @fn int check_mxCardTable_row(struct mxCardTable_data *StorageTmp, struct mxCardTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to check, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the ACTION phase.  The start of the ACTION pahse performs this consitency check
+ * on the row before allowing the request to proceed to the COMMIT phase.  This function can return
+ * SNMP_ERR_NOERR or a specific SNMP error value.  Values in StorageOld are the values before the
+ * varbinds on the mib were applied; the values in StorageTmp are the new values.  The function is
+ * permitted to change the values in StorageTmp to correct them; however, preference should be made
+ * for setting values where were not in the varbinds.
+ */
+int
+check_mxCardTable_row(struct mxCardTable_data *StorageTmp, struct mxCardTable_data *StorageOld)
+{
+	/* XXX: provide code to check the row for consistency */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int update_mxCardTable_row(struct mxCardTable_data *StorageTmp, struct mxCardTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the set operation (ACTION phase) on a row
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to update, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the COMMIT phase.  The start of the ACTION phase performs a consistency check on
+ * the row before allowing the request to proceed to the COMMIT phase.  The COMMIT phase then
+ * arrives here with consistency already checked (see check_mxCardTable_row()).  This function can
+ * return SNMP_ERR_NOERROR or SNMP_ERR_COMMITFAILED.  Values in StorageOld are the values before the
+ * varbinds on the row were applied: the values in StorageTmp are the new values.
+ */
+int
+update_mxCardTable_row(struct mxCardTable_data *StorageTmp, struct mxCardTable_data *StorageOld)
+{
+	/* XXX: provide code to update the row with the underlying device */
+	mxCardTable_refresh = 1;
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int revert_mxCardTable_row(struct mxCardTable_data *StorageTmp, struct mxCardTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the undo operation (UNDO phase) on a row
+ */
+void
+revert_mxCardTable_row(struct mxCardTable_data *StorageTmp, struct mxCardTable_data *StorageOld)
+{
+	/* XXX: provide code to revert the row with the underlying device */
+	update_mxCardTable_row(StorageOld, NULL);
+}
+
+/**
  * @fn void refresh_mxCardTable_row(struct mxCardTable_data *StorageTmp, int force)
  * @param StorageTmp the data row to refresh.
  * @param force force refresh if non-zero.
@@ -4789,20 +6173,7 @@ refresh_mxCardTable(int force)
 {
 	struct header_complex_index *h, *h_next;
 
-	void uinttobits(uint8_t *ostr, uint val, int max) {
-		int i;
-
-		for (i = 0; i <= max; i++)
-			ostr[i >> 3] = 0;
-		for (i = 0; i <= max; i++)
-			if (val & (1 << i))
-				ostr[i >> 3] = (7 - (i % 8));
-	}
-	void uinttobitsalloc(uint8_t **optr, uint val, int max) {
-		if ((*optr = calloc((max >> 3) + 1, 1)))
-			uinttobits(*optr, val, max);
-	}
-
+	refresh_mxDrivTable(force);
 	if (!force && mxCardTable_refresh == 0)
 		return;
 	/* XXX: Here, update the table as required... */
@@ -4814,11 +6185,15 @@ refresh_mxCardTable(int force)
 		struct mxDrivTable_data *driv = h->data;
 		struct strioctl ioc;
 		struct mx_config config, *cptr = &config;
+		char devname[19+FMNAMESZ+1] = {};
 
 		if (driv->mxDrivRowStatus != RS_ACTIVE)
 			continue;
-		if ((fd = open(driv->mxDrivTable_devname, O_RDWR)) < 0)
+		snprintf(devname, 19+FMNAMESZ+1, "/dev/streams/clone/%s", driv->mxDrivName);
+		if ((fd = open(devname, O_RDWR)) < 0) {
+			snmp_log(MY_FACILITY(LOG_ERR), "%s: %s: %s: %s", __FUNCTION__, "open()", devname, strerror(errno));
 			continue;
+		}
 		cptr = &config;
 		cptr->type = MX_OBJ_TYPE_CARD;
 		cptr->id = 0;
@@ -4837,7 +6212,7 @@ refresh_mxCardTable(int force)
 			continue;
 		}
 		cptr->type = MX_OBJ_TYPE_CARD;
-		cptr->id = 0;
+		cptr->id = count;
 		cptr->cmd = MX_GET;
 		ioc.ic_cmd = MX_IOCLCONFIG;
 		ioc.ic_timout = 0;
@@ -4850,6 +6225,7 @@ refresh_mxCardTable(int force)
 		}
 		if (count2 > count) {
 			count = count2;
+			free(cptr);
 			goto retry;
 		}
 		for (i = 0, val = (typeof(val)) (cptr + 1); i < count2; i++, val++) {
@@ -4871,9 +6247,11 @@ refresh_mxCardTable(int force)
 			for (hciptr = mxCardTableStorage; hciptr; hciptr = hciptr->next) {
 				struct mxCardTable_data *data = hciptr->data;
 
+				if (data->mxCardTable_id != 0 && data->mxCardTable_id != *val)
+					continue;
 				if (data->mxDrivNameLen != driv->mxDrivNameLen || strncmp((char *) data->mxDrivName, (char *) driv->mxDrivName, driv->mxDrivNameLen))
 					continue;
-				if (data->mxCardIndex != *val)
+				if (data->mxCardIndex != buf.card.config.mxCardIndex)
 					continue;
 				break;
 			}
@@ -5256,9 +6634,11 @@ refresh_mxCardTable(int force)
 	}
 	/* delete unused entries */
 	h_next = mxCardTableStorage;
+	h_next = h->next;
 	while ((h = h_next)) {
 		struct mxCardTable_data *data = h->data;
 
+		h_next = h->next;
 		if (data->mxCardTable_refs)
 			data->mxCardTable_refs = 0;
 		else {
@@ -5447,6 +6827,18 @@ var_mxCardTable(struct variable *vp, oid * name, size_t *length, int exact, size
 		*var_len = sizeof(StorageTmp->mxCardSyncTransitions);
 		rval = (u_char *) &StorageTmp->mxCardSyncTransitions;
 		break;
+	case (u_char) MXCARDLEDS:	/* ReadOnly */
+		if (!StorageTmp)
+			break;
+		*var_len = StorageTmp->mxCardLedsLen;
+		rval = (u_char *) StorageTmp->mxCardLeds;
+		break;
+	case (u_char) MXCARDLASTCHANGE:	/* ReadOnly */
+		if (!StorageTmp)
+			break;
+		*var_len = sizeof(StorageTmp->mxCardLastChange);
+		rval = (u_char *) &StorageTmp->mxCardLastChange;
+		break;
 	case (u_char) MXCARDNAME:	/* ReadOnly */
 		if (!StorageTmp)
 			break;
@@ -5464,6 +6856,64 @@ var_mxCardTable(struct variable *vp, oid * name, size_t *length, int exact, size
 		ERROR_MSG("");
 	}
 	return (rval);
+}
+
+/**
+ * @fn int check_mxSpanTable_row(struct mxSpanTable_data *StorageTmp, struct mxSpanTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to check, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the ACTION phase.  The start of the ACTION pahse performs this consitency check
+ * on the row before allowing the request to proceed to the COMMIT phase.  This function can return
+ * SNMP_ERR_NOERR or a specific SNMP error value.  Values in StorageOld are the values before the
+ * varbinds on the mib were applied; the values in StorageTmp are the new values.  The function is
+ * permitted to change the values in StorageTmp to correct them; however, preference should be made
+ * for setting values where were not in the varbinds.
+ */
+int
+check_mxSpanTable_row(struct mxSpanTable_data *StorageTmp, struct mxSpanTable_data *StorageOld)
+{
+	/* XXX: provide code to check the row for consistency */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int update_mxSpanTable_row(struct mxSpanTable_data *StorageTmp, struct mxSpanTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the set operation (ACTION phase) on a row
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to update, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the COMMIT phase.  The start of the ACTION phase performs a consistency check on
+ * the row before allowing the request to proceed to the COMMIT phase.  The COMMIT phase then
+ * arrives here with consistency already checked (see check_mxSpanTable_row()).  This function can
+ * return SNMP_ERR_NOERROR or SNMP_ERR_COMMITFAILED.  Values in StorageOld are the values before the
+ * varbinds on the row were applied: the values in StorageTmp are the new values.
+ */
+int
+update_mxSpanTable_row(struct mxSpanTable_data *StorageTmp, struct mxSpanTable_data *StorageOld)
+{
+	/* XXX: provide code to update the row with the underlying device */
+	mxSpanTable_refresh = 1;
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int revert_mxSpanTable_row(struct mxSpanTable_data *StorageTmp, struct mxSpanTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the undo operation (UNDO phase) on a row
+ */
+void
+revert_mxSpanTable_row(struct mxSpanTable_data *StorageTmp, struct mxSpanTable_data *StorageOld)
+{
+	/* XXX: provide code to revert the row with the underlying device */
+	update_mxSpanTable_row(StorageOld, NULL);
 }
 
 /**
@@ -5502,20 +6952,6 @@ refresh_mxSpanTable(int force)
 {
 	struct header_complex_index *h, *h_next;
 
-	void uinttobits(uint8_t *ostr, uint val, int max) {
-		int i;
-
-		for (i = 0; i <= max; i++)
-			ostr[i >> 3] = 0;
-		for (i = 0; i <= max; i++)
-			if (val & (1 << i))
-				ostr[i >> 3] = (7 - (i % 8));
-	}
-	void uinttobitsalloc(uint8_t **optr, uint val, int max) {
-		if ((*optr = calloc((max >> 3) + 1, 1)))
-			uinttobits(*optr, val, max);
-	}
-
 	refresh_mxCardTable(force);
 	if (!force && mxSpanTable_refresh == 0)
 		return;
@@ -5528,11 +6964,15 @@ refresh_mxSpanTable(int force)
 		struct mxDrivTable_data *driv = h->data;
 		struct strioctl ioc;
 		struct mx_config config, *cptr = &config;
+		char devname[19+FMNAMESZ+1] = {};
 
 		if (driv->mxDrivRowStatus != RS_ACTIVE)
 			continue;
-		if ((fd = open(driv->mxDrivTable_devname, O_RDWR)) < 0)
+		snprintf(devname, 19+FMNAMESZ+1, "/dev/streams/clone/%s", driv->mxDrivName);
+		if ((fd = open(devname, O_RDWR)) < 0) {
+			snmp_log(MY_FACILITY(LOG_ERR), "%s: %s: %s: %s", __FUNCTION__, "open()", devname, strerror(errno));
 			continue;
+		}
 		cptr = &config;
 		cptr->type = MX_OBJ_TYPE_SPAN;
 		cptr->id = 0;
@@ -5543,27 +6983,31 @@ refresh_mxSpanTable(int force)
 		ioc.ic_dp = (char *) cptr;
 	      retry:
 		if ((count = ioctl(fd, I_STR, &ioc)) < 0) {
+			snmp_log(MY_FACILITY(LOG_ERR), "%s: %s: %s: %s", __FUNCTION__, "ioctl()", "MX_IOCLCONFIG", strerror(errno));
 			close(fd);
 			continue;
 		}
 		if (!(cptr = malloc(sizeof(*cptr) + count * sizeof(uint)))) {
+			snmp_log(MY_FACILITY(LOG_ERR), "%s: %s: %s", __FUNCTION__, "malloc()", strerror(errno));
 			close(fd);
 			continue;
 		}
 		cptr->type = MX_OBJ_TYPE_SPAN;
-		cptr->id = 0;
+		cptr->id = count;
 		cptr->cmd = MX_GET;
 		ioc.ic_cmd = MX_IOCLCONFIG;
 		ioc.ic_timout = 0;
 		ioc.ic_len = sizeof(*cptr) + count * sizeof(uint);
 		ioc.ic_dp = (char *) cptr;
 		if ((count2 = ioctl(fd, I_STR, &ioc)) < 0) {
+			snmp_log(MY_FACILITY(LOG_ERR), "%s: %s: %s: %s", __FUNCTION__, "ioctl()", "MX_IOCLCONFIG", strerror(errno));
 			free(cptr);
 			close(fd);
 			continue;
 		}
 		if (count2 > count) {
 			count = count2;
+			free(cptr);
 			goto retry;
 		}
 		for (i = 0, val = (typeof(val)) (cptr + 1); i < count2; i++, val++) {
@@ -5580,14 +7024,20 @@ refresh_mxSpanTable(int force)
 			ioc.ic_timout = 0;
 			ioc.ic_len = sizeof(buf);
 			ioc.ic_dp = (char *) &buf;
-			if (ioctl(fd, I_STR, &buf) < 0)
+			if (ioctl(fd, I_STR, &buf) < 0) {
+				snmp_log(MY_FACILITY(LOG_ERR), "%s: %s: %s: %s", __FUNCTION__, "ioctl()", "MX_IOCGATTR", strerror(errno));
 				continue;
+			}
 			for (hciptr = mxSpanTableStorage; hciptr; hciptr = hciptr->next) {
 				struct mxSpanTable_data *data = hciptr->data;
 
+				if (data->mxSpanTable_id != 0 && data->mxSpanTable_id != *val)
+					continue;
 				if (data->mxDrivNameLen != driv->mxDrivNameLen || strncmp((char *) data->mxDrivName, (char *) driv->mxDrivName, driv->mxDrivNameLen))
 					continue;
-				if (data->mxSpanIndex != *val)
+				if (data->mxCardIndex != buf.span.config.mxCardIndex)
+					continue;
+				if (data->mxSpanIndex != buf.span.config.mxSpanIndex)
 					continue;
 				break;
 			}
@@ -5598,8 +7048,8 @@ refresh_mxSpanTable(int force)
 				oid *tmpoid;
 
 				StorageTmp->mxSpanTable_request = sa_request;	/* mark as updated */
-
 				StorageTmp->mxSpanTable_refs = 1;	/* mark as used */
+				StorageTmp->mxSpanTable_id = *val;
 				/* copy driver name from driver entry */
 				if ((tmp = strndup((char *) driv->mxDrivName, driv->mxDrivNameLen))) {
 					SNMP_FREE(StorageTmp->mxDrivName);
@@ -5695,6 +7145,7 @@ refresh_mxSpanTable(int force)
 
 				StorageNew->mxSpanTable_request = sa_request;	/* mark as updated */
 				StorageNew->mxSpanTable_refs = 1;	/* mark as used */
+				StorageNew->mxSpanTable_id = *val;
 				/* copy driver name from driver entry */
 				StorageNew->mxDrivName = (uint8_t *) strndup((char *) driv->mxDrivName, driv->mxDrivNameLen);
 				StorageNew->mxDrivNameLen = driv->mxDrivNameLen;
@@ -5780,6 +7231,7 @@ refresh_mxSpanTable(int force)
 	while ((h = h_next)) {
 		struct mxSpanTable_data *data = h->data;
 
+		h_next = h->next;
 		if (data->mxSpanTable_refs)
 			data->mxSpanTable_refs = 0;
 		else {
@@ -6084,6 +7536,12 @@ var_mxSpanTable(struct variable *vp, oid * name, size_t *length, int exact, size
 		*var_len = StorageTmp->mxSpanEventsLen;
 		rval = (u_char *) StorageTmp->mxSpanEvents;
 		break;
+	case (u_char) MXSPANLED:	/* ReadOnly */
+		if (!StorageTmp)
+			break;
+		*var_len = sizeof(StorageTmp->mxSpanLed);
+		rval = (u_char *) &StorageTmp->mxSpanLed;
+		break;
 	case (u_char) MXSPANRECEIVELEVEL:	/* ReadOnly */
 		if (!StorageTmp)
 			break;
@@ -6097,6 +7555,12 @@ var_mxSpanTable(struct variable *vp, oid * name, size_t *length, int exact, size
 		*var_len = sizeof(StorageTmp->mxSpanReceiveThreshold);
 		rval = (u_char *) &StorageTmp->mxSpanReceiveThreshold;
 		break;
+	case (u_char) MXSPANLASTCHANGE:	/* ReadOnly */
+		if (!StorageTmp)
+			break;
+		*var_len = sizeof(StorageTmp->mxSpanLastChange);
+		rval = (u_char *) &StorageTmp->mxSpanLastChange;
+		break;
 	case (u_char) MXSPANROWSTATUS:	/* Create */
 		*write_method = write_mxSpanRowStatus;
 		if (!StorageTmp)
@@ -6108,6 +7572,64 @@ var_mxSpanTable(struct variable *vp, oid * name, size_t *length, int exact, size
 		ERROR_MSG("");
 	}
 	return (rval);
+}
+
+/**
+ * @fn int check_mxBertTable_row(struct mxBertTable_data *StorageTmp, struct mxBertTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to check, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the ACTION phase.  The start of the ACTION pahse performs this consitency check
+ * on the row before allowing the request to proceed to the COMMIT phase.  This function can return
+ * SNMP_ERR_NOERR or a specific SNMP error value.  Values in StorageOld are the values before the
+ * varbinds on the mib were applied; the values in StorageTmp are the new values.  The function is
+ * permitted to change the values in StorageTmp to correct them; however, preference should be made
+ * for setting values where were not in the varbinds.
+ */
+int
+check_mxBertTable_row(struct mxBertTable_data *StorageTmp, struct mxBertTable_data *StorageOld)
+{
+	/* XXX: provide code to check the row for consistency */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int update_mxBertTable_row(struct mxBertTable_data *StorageTmp, struct mxBertTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the set operation (ACTION phase) on a row
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to update, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the COMMIT phase.  The start of the ACTION phase performs a consistency check on
+ * the row before allowing the request to proceed to the COMMIT phase.  The COMMIT phase then
+ * arrives here with consistency already checked (see check_mxBertTable_row()).  This function can
+ * return SNMP_ERR_NOERROR or SNMP_ERR_COMMITFAILED.  Values in StorageOld are the values before the
+ * varbinds on the row were applied: the values in StorageTmp are the new values.
+ */
+int
+update_mxBertTable_row(struct mxBertTable_data *StorageTmp, struct mxBertTable_data *StorageOld)
+{
+	/* XXX: provide code to update the row with the underlying device */
+	mxBertTable_refresh = 1;
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int revert_mxBertTable_row(struct mxBertTable_data *StorageTmp, struct mxBertTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the undo operation (UNDO phase) on a row
+ */
+void
+revert_mxBertTable_row(struct mxBertTable_data *StorageTmp, struct mxBertTable_data *StorageOld)
+{
+	/* XXX: provide code to revert the row with the underlying device */
+	update_mxBertTable_row(StorageOld, NULL);
 }
 
 /**
@@ -6127,7 +7649,50 @@ refresh_mxBertTable_row(struct mxBertTable_data *StorageTmp, int force)
 		return (StorageTmp);
 	/* XXX: update row; delete it and return NULL if the row has disappeared */
 	StorageTmp->mxBertTable_request = sa_request;
+	{
+		int fd;
+		struct strioctl ioc = {};
+		char devname[19+FMNAMESZ+1] = {};
+		struct {
+			struct mx_attr attr;
+			struct mx_attr_bert bert;
+		} buf = {};
+
+		snprintf(devname, 19+FMNAMESZ+1, "/dev/streams/clone/%s", StorageTmp->mxDrivName);
+		if ((fd = open(devname, O_RDWR)) < 0) {
+			snmp_log(MY_FACILITY(LOG_ERR), "%s: %s: %s", __FUNCTION__, "open()", strerror(errno));
+			goto error;
+		}
+		buf.attr.type = MX_OBJ_TYPE_BERT;
+		buf.attr.id = StorageTmp->mxBertTable_id;
+		buf.attr.cmd = MX_GET;
+		ioc.ic_cmd = MX_IOCGATTR;
+		ioc.ic_timout = 0;
+		ioc.ic_len = sizeof(buf);
+		ioc.ic_dp = (char *) &buf;
+		if (ioctl(fd, I_STR, &ioc) < 0) {
+			snmp_log(MY_FACILITY(LOG_ERR), "%s: %s: %s", __FUNCTION__, "ioctl(): MX_IOCGATTR", strerror(errno));
+			goto error;
+		}
+		/* these two must match. */
+		if (StorageTmp->mxCardIndex != buf.bert.config.mxCardIndex)
+			goto error;
+		if (StorageTmp->mxSpanIndex != buf.bert.config.mxSpanIndex)
+			goto error;
+		StorageTmp->mxBertMode = buf.bert.option.mxBertMode;
+		StorageTmp->mxBertSelect = buf.bert.option.mxBertSelect;
+		memcpy(StorageTmp->mxBertPattern, buf.bert.option.mxBertPattern, 32);
+		StorageTmp->mxBertPatternLen = buf.bert.option.mxBertPatternLen;
+		StorageTmp->mxBertOperationalState = buf.bert.status.mxBertOperationalState;
+		uinttobits(StorageTmp->mxBertProceduralStatus, buf.bert.status.mxBertProceduralStatus, 4);
+		StorageTmp->mxBertBitCount = buf.bert.stats.mxBertBitCount;
+		StorageTmp->mxBertErrorCount = buf.bert.stats.mxBertErrorCount;
+	}
 	return (StorageTmp);
+      error:
+	mxBertTable_del(StorageTmp);
+	mxBertTable_destroy(&StorageTmp);
+	return (NULL);
 }
 
 /**
@@ -6144,11 +7709,136 @@ refresh_mxBertTable_row(struct mxBertTable_data *StorageTmp, int force)
 void
 refresh_mxBertTable(int force)
 {
+	struct header_complex_index *h, *h_next, *hciptr;
+
 	refresh_mxSpanTable(force);
 	if (!force && mxBertTable_refresh == 0)
 		return;
 	/* XXX: Here, update the table as required... */
 	mxBertTable_refresh = 0;
+	for (h = mxSpanTableStorage; h; h = h->next) {
+		/* for each entry in the span table */
+		int fd;
+		struct mxSpanTable_data *span = h->data;
+		struct strioctl ioc = {};
+		char devname[19+FMNAMESZ+1] = {};
+		struct {
+			struct mx_attr attr;
+			struct mx_attr_bert bert;
+		} buf = {};
+
+		snprintf(devname, 19+FMNAMESZ+1, "/dev/streams/clone/%s", span->mxDrivName);
+		if ((fd = open(devname, O_RDWR)) < 0) {
+			snmp_log(MY_FACILITY(LOG_ERR), "%s: %s: %s", __FUNCTION__, "open()", strerror(errno));
+			continue;
+		}
+		buf.attr.type = MX_OBJ_TYPE_BERT;
+		buf.attr.id = span->mxSpanTable_id;
+		buf.attr.cmd = MX_GET;
+		ioc.ic_cmd = MX_IOCGATTR;
+		ioc.ic_timout = 0;
+		ioc.ic_len = sizeof(buf);
+		ioc.ic_dp = (char *) &buf;
+		if (ioctl(fd, I_STR, &ioc) < 0) {
+			snmp_log(MY_FACILITY(LOG_ERR), "%s: %s: %s", __FUNCTION__, "ioctl(): MX_IOCGATTR", strerror(errno));
+			continue;
+		}
+		for (hciptr = mxBertTableStorage; hciptr; hciptr = hciptr->next) {
+			struct mxBertTable_data *data = hciptr->data;
+
+			if (data->mxBertTable_id != 0 && data->mxBertTable_id != span->mxSpanTable_id)
+				continue;
+			if (data->mxDrivNameLen != span->mxDrivNameLen || strncmp((char *) data->mxDrivName, (char *) span->mxDrivName, span->mxDrivNameLen))
+				continue;
+			if (data->mxCardIndex != span->mxCardIndex)
+				continue;
+			if (data->mxSpanIndex != span->mxSpanIndex)
+				continue;
+		}
+		if (hciptr) {
+			/* already have an entry for this span index, simply update it */
+			struct mxBertTable_data *StorageTmp = hciptr->data;
+			char *tmp;
+
+			StorageTmp->mxBertTable_request = sa_request;
+			StorageTmp->mxBertTable_refs = 1;
+			StorageTmp->mxBertTable_id = span->mxSpanTable_id;
+			if ((tmp = strndup((char *) span->mxDrivName, span->mxDrivNameLen))) {
+				SNMP_FREE(StorageTmp->mxDrivName);
+				StorageTmp->mxDrivName = (uint8_t *) tmp;
+				StorageTmp->mxDrivNameLen = span->mxDrivNameLen;
+				StorageTmp->mxDrivName[StorageTmp->mxDrivNameLen] = '\0';
+			}
+			StorageTmp->mxCardIndex = buf.bert.config.mxCardIndex;
+			StorageTmp->mxSpanIndex = buf.bert.config.mxSpanIndex;
+			StorageTmp->mxBertMode = buf.bert.option.mxBertMode;
+			StorageTmp->mxBertSelect = buf.bert.option.mxBertSelect;
+			if ((tmp = calloc(32, 1))) {
+				SNMP_FREE(StorageTmp->mxBertPattern);
+				memcpy(tmp, buf.bert.option.mxBertPattern, 32);
+				StorageTmp->mxBertPattern =  (uint8_t *) tmp;
+				StorageTmp->mxBertPatternLen = buf.bert.option.mxBertPatternLen;
+			}
+			StorageTmp->mxBertOperationalState = buf.bert.status.mxBertOperationalState;
+			uinttobits(StorageTmp->mxBertProceduralStatus, buf.bert.status.mxBertProceduralStatus, 4);
+			StorageTmp->mxBertBitCount = buf.bert.stats.mxBertBitCount;
+			StorageTmp->mxBertErrorCount = buf.bert.stats.mxBertErrorCount;
+		} else {
+			/* no entry for this span index, create it */
+			struct mxBertTable_data *StorageNew = SNMP_MALLOC_STRUCT(mxBertTable_data);
+			char *tmp;
+
+			if (!StorageNew) continue;
+			StorageNew->mxBertTable_request = sa_request;
+			StorageNew->mxBertTable_refs = 1;
+			StorageNew->mxBertTable_id = span->mxSpanTable_id;
+			if (!(tmp = strndup((char *) span->mxDrivName, span->mxDrivNameLen))) {
+				snmp_log(MY_FACILITY(LOG_ERR), "%s: %s: %s", __FUNCTION__, "strndup()", strerror(errno));
+				mxBertTable_destroy(&StorageNew);
+				continue;
+			}
+			StorageNew->mxDrivName = (uint8_t *) tmp;
+			StorageNew->mxDrivNameLen = span->mxDrivNameLen;
+			StorageNew->mxDrivName[StorageNew->mxDrivNameLen] = '\0';
+			StorageNew->mxCardIndex = buf.bert.config.mxCardIndex;
+			StorageNew->mxSpanIndex = buf.bert.config.mxSpanIndex;
+			StorageNew->mxBertMode = buf.bert.option.mxBertMode;
+			StorageNew->mxBertSelect = buf.bert.option.mxBertSelect;
+			if (!(tmp = calloc(32, 1))) {
+				snmp_log(MY_FACILITY(LOG_ERR), "%s: %s: %s", __FUNCTION__, "calloc()", strerror(errno));
+				mxBertTable_destroy(&StorageNew);
+				continue;
+			}
+			memcpy(tmp, buf.bert.option.mxBertPattern, 32);
+			StorageNew->mxBertPattern = (uint8_t *) tmp;
+			StorageNew->mxBertPatternLen = buf.bert.option.mxBertPatternLen;
+			StorageNew->mxBertOperationalState = buf.bert.status.mxBertOperationalState;
+			uinttobitsalloc(&StorageNew->mxBertProceduralStatus, buf.bert.status.mxBertProceduralStatus, 4);
+			if (!StorageNew->mxBertProceduralStatus) {
+				snmp_log(MY_FACILITY(LOG_ERR), "%s: %s: %s", __FUNCTION__, "uinttobitsalloc()", strerror(errno));
+				mxBertTable_destroy(&StorageNew);
+				continue;
+			}
+			StorageNew->mxBertBitCount = buf.bert.stats.mxBertBitCount;
+			StorageNew->mxBertErrorCount = buf.bert.stats.mxBertErrorCount;
+			mxBertTable_add(StorageNew);
+		}
+	}
+	/* delete unused entries */
+	h_next = mxBertTableStorage;
+	while ((h = h_next)) {
+		struct mxBertTable_data *data = h->data;
+
+		h_next = h->next;
+		if (data->mxBertTable_refs)
+			data->mxBertTable_refs = 0;
+		else {
+			header_complex_extract_entry(&mxBertTableStorage, h);
+			mxBertTable_destroy(&data);
+		}
+	}
+	/* done */
+	return;
 }
 
 /**
@@ -6228,6 +7918,64 @@ var_mxBertTable(struct variable *vp, oid * name, size_t *length, int exact, size
 }
 
 /**
+ * @fn int check_mxChanTable_row(struct mxChanTable_data *StorageTmp, struct mxChanTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to check, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the ACTION phase.  The start of the ACTION pahse performs this consitency check
+ * on the row before allowing the request to proceed to the COMMIT phase.  This function can return
+ * SNMP_ERR_NOERR or a specific SNMP error value.  Values in StorageOld are the values before the
+ * varbinds on the mib were applied; the values in StorageTmp are the new values.  The function is
+ * permitted to change the values in StorageTmp to correct them; however, preference should be made
+ * for setting values where were not in the varbinds.
+ */
+int
+check_mxChanTable_row(struct mxChanTable_data *StorageTmp, struct mxChanTable_data *StorageOld)
+{
+	/* XXX: provide code to check the row for consistency */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int update_mxChanTable_row(struct mxChanTable_data *StorageTmp, struct mxChanTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the set operation (ACTION phase) on a row
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to update, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the COMMIT phase.  The start of the ACTION phase performs a consistency check on
+ * the row before allowing the request to proceed to the COMMIT phase.  The COMMIT phase then
+ * arrives here with consistency already checked (see check_mxChanTable_row()).  This function can
+ * return SNMP_ERR_NOERROR or SNMP_ERR_COMMITFAILED.  Values in StorageOld are the values before the
+ * varbinds on the row were applied: the values in StorageTmp are the new values.
+ */
+int
+update_mxChanTable_row(struct mxChanTable_data *StorageTmp, struct mxChanTable_data *StorageOld)
+{
+	/* XXX: provide code to update the row with the underlying device */
+	mxChanTable_refresh = 1;
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int revert_mxChanTable_row(struct mxChanTable_data *StorageTmp, struct mxChanTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the undo operation (UNDO phase) on a row
+ */
+void
+revert_mxChanTable_row(struct mxChanTable_data *StorageTmp, struct mxChanTable_data *StorageOld)
+{
+	/* XXX: provide code to revert the row with the underlying device */
+	update_mxChanTable_row(StorageOld, NULL);
+}
+
+/**
  * @fn void refresh_mxChanTable_row(struct mxChanTable_data *StorageTmp, int force)
  * @param StorageTmp the data row to refresh.
  * @param force force refresh if non-zero.
@@ -6261,11 +8009,183 @@ refresh_mxChanTable_row(struct mxChanTable_data *StorageTmp, int force)
 void
 refresh_mxChanTable(int force)
 {
+	struct header_complex_index *h, *h_next;
+
 	refresh_mxSpanTable(force);
 	if (!force && mxChanTable_refresh == 0)
 		return;
 	/* XXX: Here, update the table as required... */
 	mxChanTable_refresh = 0;
+	for (h = mxDrivTableStorage; h; h = h->next) {
+		/* for each entry in the driver table */
+		int fd, count, count2, i;
+		uint *val;
+		struct mxDrivTable_data *driv = h->data;
+		struct strioctl ioc;
+		struct mx_config config, *cptr = &config;
+		char devname[19+FMNAMESZ+1] = {};
+
+		if (driv->mxDrivRowStatus != RS_ACTIVE)
+			continue;
+		snprintf(devname, 19+FMNAMESZ+1, "/dev/streams/clone/%s", driv->mxDrivName);
+		if ((fd = open(devname, O_RDWR)) < 0) {
+			snmp_log(MY_FACILITY(LOG_ERR), "%s: %s: %s: %s", __FUNCTION__, "open()", devname, strerror(errno));
+			continue;
+		}
+		cptr = &config;
+		cptr->type = MX_OBJ_TYPE_CHAN;
+		cptr->id = 0;
+		cptr->cmd = MX_GET;
+		ioc.ic_cmd = MX_IOCLCONFIG;
+		ioc.ic_len = sizeof(*cptr);
+		ioc.ic_dp = (char *) cptr;
+	      retry:
+		if ((count = ioctl(fd, I_STR, &ioc)) < 0) {
+			snmp_log(MY_FACILITY(LOG_ERR), "%s: %s: %s: %s", __FUNCTION__, "open()", "MX_IOCLCONFIG(1)", strerror(errno));
+			close(fd);
+			continue;
+		}
+		if (!(cptr = malloc(sizeof(*cptr) + count * sizeof(uint)))) {
+			snmp_log(MY_FACILITY(LOG_ERR), "%s: %s: %s", __FUNCTION__, "malloc()", strerror(errno));
+			close(fd);
+			continue;
+		}
+		cptr->type = MX_OBJ_TYPE_CHAN;
+		cptr->id = count;
+		cptr->cmd = MX_GET;
+		ioc.ic_cmd = MX_IOCLCONFIG;
+		ioc.ic_timout = 0;
+		ioc.ic_len = sizeof(*cptr) + count * sizeof(uint);
+		ioc.ic_dp = (char *) cptr;
+		if ((count2 = ioctl(fd, I_STR, &ioc)) < 0) {
+			snmp_log(MY_FACILITY(LOG_ERR), "%s: %s: %s: %s", __FUNCTION__, "open()", "MX_IOCLCONFIG(2)", strerror(errno));
+			free(cptr);
+			close(fd);
+			continue;
+		}
+		if (count2 > count) {
+			count = count2;
+			free(cptr);
+			goto retry;
+		}
+		for (i = 0, val = (typeof(val)) (cptr + 1); i < count2; i++, val++) {
+			struct header_complex_index *hciptr;
+			struct {
+				struct mx_attr attr;
+				struct mx_attr_chan chan;
+			} buf;
+
+			buf.attr.type = MX_OBJ_TYPE_CHAN;
+			buf.attr.id = *val;
+			buf.attr.cmd = MX_GET;
+			ioc.ic_cmd = MX_IOCGATTR;
+			ioc.ic_timout = 0;
+			ioc.ic_len = sizeof(buf);
+			ioc.ic_dp = (char *) &buf;
+			if (ioctl(fd, I_STR, &buf) < 0) {
+				snmp_log(MY_FACILITY(LOG_ERR), "%s: %s: %s: %s", __FUNCTION__, "ioctl()", "MX_IOCGATTR", strerror(errno));
+				continue;
+			}
+			for (hciptr = mxChanTableStorage; hciptr; hciptr = hciptr->next) {
+				struct mxChanTable_data *data = hciptr->data;
+
+				if (data->mxChanTable_id != 0 && data->mxChanTable_id != *val)
+					continue;
+				if (data->mxDrivNameLen != driv->mxDrivNameLen || strncmp((char *) data->mxDrivName, (char *) driv->mxDrivName, driv->mxDrivNameLen))
+					continue;
+				if (data->mxCardIndex != buf.chan.config.mxCardIndex)
+					continue;
+				if (data->mxSpanIndex != buf.chan.config.mxSpanIndex)
+					continue;
+				if (data->mxChanIndex != buf.chan.config.mxChanIndex)
+					continue;
+				break;
+			}
+			if (hciptr) {
+				/* already have an entry for this card index, simply update it */
+				struct mxChanTable_data *StorageTmp = hciptr->data;
+				char *tmp;
+				oid *tmpoid;
+
+				StorageTmp->mxChanTable_request = sa_request;	/* mark as updated */
+				StorageTmp->mxChanTable_refs = 1;   /* mark as used */
+				StorageTmp->mxChanTable_id = *val;
+				/* copy driver name from driver entry */
+				if ((tmp = strndup((char *) driv->mxDrivName, driv->mxDrivNameLen))) {
+					SNMP_FREE(StorageTmp->mxDrivName);
+					StorageTmp->mxDrivName = (uint8_t *) tmp;
+					StorageTmp->mxDrivNameLen = driv->mxDrivNameLen;
+					StorageTmp->mxDrivName[StorageTmp->mxDrivNameLen] = '\0';
+				}
+				StorageTmp->mxCardIndex = buf.chan.config.mxCardIndex;
+				StorageTmp->mxSpanIndex = buf.chan.config.mxSpanIndex;
+				StorageTmp->mxChanIndex = buf.chan.config.mxChanIndex;
+				StorageTmp->mxChanType = buf.chan.option.mxChanType;
+				StorageTmp->mxChanFormat = buf.chan.option.mxChanFormat;
+				StorageTmp->mxChanRate = buf.chan.option.mxChanRate;
+				uinttobits(StorageTmp->mxChanMode, buf.chan.option.mxChanMode, 4);
+				if ((tmpoid = snmp_duplicate_objid(zeroDotZero_oid, 2))) {
+					SNMP_FREE(StorageTmp->mxChanSap);
+					StorageTmp->mxChanSap = tmpoid;
+					StorageTmp->mxChanSapLen = 2;
+				}
+				StorageTmp->mxChanAdministrativeState = buf.chan.status.mxChanAdministrativeState;
+				StorageTmp->mxChanOperationalState = buf.chan.status.mxChanOperationalState;
+				StorageTmp->mxChanUsageState = buf.chan.status.mxChanUsageState;
+				uinttobits(StorageTmp->mxChanAvailabilityStatus, buf.chan.status.mxChanAvailabilityStatus, 8);
+				uinttobits(StorageTmp->mxChanControlStatus, buf.chan.status.mxChanControlStatus, 3);
+				uinttobits(StorageTmp->mxChanProceduralStatus, buf.chan.status.mxChanProceduralStatus, 4);
+				uinttobits(StorageTmp->mxChanAlarmStatus, buf.chan.status.mxChanAlarmStatus, 4);
+				StorageTmp->mxChanStandbyStatus = buf.chan.status.mxChanStandbyStatus;
+			} else {
+				/* no entry for this chan index, create it */
+				struct mxChanTable_data *StorageNew = SNMP_MALLOC_STRUCT(mxChanTable_data);
+
+				if (!StorageNew) continue;
+				StorageNew->mxChanTable_request = sa_request;	/* mark as updated */
+				StorageNew->mxChanTable_refs = 1;	/* mark as used */
+				StorageNew->mxChanTable_id = *val;
+				/* copy driver name from driver entry */
+				StorageNew->mxDrivName = (uint8_t *) strndup((char *) driv->mxDrivName, driv->mxDrivNameLen);
+				StorageNew->mxDrivNameLen = driv->mxDrivNameLen;
+				StorageNew->mxDrivName[StorageNew->mxDrivNameLen] = '\0';
+				StorageNew->mxCardIndex = buf.chan.config.mxCardIndex;
+				StorageNew->mxSpanIndex = buf.chan.config.mxSpanIndex;
+				StorageNew->mxChanIndex = buf.chan.config.mxChanIndex;
+				StorageNew->mxChanType = buf.chan.option.mxChanType;
+				StorageNew->mxChanFormat = buf.chan.option.mxChanFormat;
+				StorageNew->mxChanRate = buf.chan.option.mxChanRate;
+				StorageNew->mxChanSap = snmp_duplicate_objid(zeroDotZero_oid, 2);
+				StorageNew->mxChanSapLen = 2;
+				StorageNew->mxChanAdministrativeState = buf.chan.status.mxChanAdministrativeState;
+				StorageNew->mxChanOperationalState = buf.chan.status.mxChanOperationalState;
+				StorageNew->mxChanUsageState = buf.chan.status.mxChanUsageState;
+				uinttobitsalloc(&StorageNew->mxChanAvailabilityStatus, buf.chan.status.mxChanAvailabilityStatus, 8);
+				uinttobitsalloc(&StorageNew->mxChanControlStatus, buf.chan.status.mxChanControlStatus, 3);
+				uinttobitsalloc(&StorageNew->mxChanProceduralStatus, buf.chan.status.mxChanProceduralStatus, 4);
+				uinttobitsalloc(&StorageNew->mxChanAlarmStatus, buf.chan.status.mxChanAlarmStatus, 4);
+				StorageNew->mxChanStandbyStatus = buf.chan.status.mxChanStandbyStatus;
+				mxChanTable_add(StorageNew);
+			}
+		}
+		free(cptr);
+		close(fd);
+	}
+	/* delete unused entries */
+	h_next = mxChanTableStorage;
+	while ((h = h_next)) {
+		struct mxChanTable_data *data = h->data;
+
+		h_next = h->next;
+		if (data->mxChanTable_refs)
+			data->mxChanTable_refs = 0;
+		else {
+			header_complex_extract_entry(&mxChanTableStorage, h);
+			mxChanTable_destroy(&data);
+		}
+	}
+	/* done */
+	return;
 }
 
 /**
@@ -6385,6 +8305,64 @@ var_mxChanTable(struct variable *vp, oid * name, size_t *length, int exact, size
 }
 
 /**
+ * @fn int check_mxXconTable_row(struct mxXconTable_data *StorageTmp, struct mxXconTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to check, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the ACTION phase.  The start of the ACTION pahse performs this consitency check
+ * on the row before allowing the request to proceed to the COMMIT phase.  This function can return
+ * SNMP_ERR_NOERR or a specific SNMP error value.  Values in StorageOld are the values before the
+ * varbinds on the mib were applied; the values in StorageTmp are the new values.  The function is
+ * permitted to change the values in StorageTmp to correct them; however, preference should be made
+ * for setting values where were not in the varbinds.
+ */
+int
+check_mxXconTable_row(struct mxXconTable_data *StorageTmp, struct mxXconTable_data *StorageOld)
+{
+	/* XXX: provide code to check the row for consistency */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int update_mxXconTable_row(struct mxXconTable_data *StorageTmp, struct mxXconTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the set operation (ACTION phase) on a row
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to update, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the COMMIT phase.  The start of the ACTION phase performs a consistency check on
+ * the row before allowing the request to proceed to the COMMIT phase.  The COMMIT phase then
+ * arrives here with consistency already checked (see check_mxXconTable_row()).  This function can
+ * return SNMP_ERR_NOERROR or SNMP_ERR_COMMITFAILED.  Values in StorageOld are the values before the
+ * varbinds on the row were applied: the values in StorageTmp are the new values.
+ */
+int
+update_mxXconTable_row(struct mxXconTable_data *StorageTmp, struct mxXconTable_data *StorageOld)
+{
+	/* XXX: provide code to update the row with the underlying device */
+	mxXconTable_refresh = 1;
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int revert_mxXconTable_row(struct mxXconTable_data *StorageTmp, struct mxXconTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the undo operation (UNDO phase) on a row
+ */
+void
+revert_mxXconTable_row(struct mxXconTable_data *StorageTmp, struct mxXconTable_data *StorageOld)
+{
+	/* XXX: provide code to revert the row with the underlying device */
+	update_mxXconTable_row(StorageOld, NULL);
+}
+
+/**
  * @fn void refresh_mxXconTable_row(struct mxXconTable_data *StorageTmp, int force)
  * @param StorageTmp the data row to refresh.
  * @param force force refresh if non-zero.
@@ -6418,11 +8396,192 @@ refresh_mxXconTable_row(struct mxXconTable_data *StorageTmp, int force)
 void
 refresh_mxXconTable(int force)
 {
+	struct header_complex_index *h, *h_next;
+
 	refresh_mxChanTable(force);
 	if (!force && mxXconTable_refresh == 0)
 		return;
 	/* XXX: Here, update the table as required... */
 	mxXconTable_refresh = 0;
+	for (h = mxDrivTableStorage; h; h = h->next) {
+		/* for each entry in the driver table */
+		int fd, count, count2, i;
+		uint *val;
+		struct mxDrivTable_data *driv = h->data;
+		struct strioctl ioc;
+		struct mx_config config, *cptr = &config;
+		char devname[19+FMNAMESZ+1] = {};
+
+		if (driv->mxDrivRowStatus != RS_ACTIVE)
+			continue;
+		snprintf(devname, 19+FMNAMESZ+1, "/dev/streams/clone/%s", driv->mxDrivName);
+		if ((fd = open(devname, O_RDWR)) < 0) {
+			snmp_log(MY_FACILITY(LOG_ERR), "%s: %s: %s: %s", __FUNCTION__, "open()", devname, strerror(errno));
+			continue;
+		}
+		cptr = &config;
+		cptr->type = MX_OBJ_TYPE_XCON;
+		cptr->id = 0;
+		cptr->cmd = MX_GET;
+		ioc.ic_cmd = MX_IOCLCONFIG;
+		ioc.ic_len = sizeof(*cptr);
+		ioc.ic_dp = (char *) cptr;
+	      retry:
+		if ((count = ioctl(fd, I_STR, &ioc)) < 0) {
+			snmp_log(MY_FACILITY(LOG_ERR), "%s: %s: %s: %s", __FUNCTION__, "ioctl()", "MX_IOCLCONFIG(1)", strerror(errno));
+			close(fd);
+			continue;
+		}
+		if (!(cptr = malloc(sizeof(*cptr) + count * sizeof(uint)))) {
+			snmp_log(MY_FACILITY(LOG_ERR), "%s: %s: %s", __FUNCTION__, "malloc()", strerror(errno));
+			close(fd);
+			continue;
+		}
+		cptr->type = MX_OBJ_TYPE_XCON;
+		cptr->id = count;
+		cptr->cmd = MX_GET;
+		ioc.ic_cmd = MX_IOCLCONFIG;
+		ioc.ic_timout = 0;
+		ioc.ic_len = sizeof(*cptr) + count * sizeof(uint);
+		ioc.ic_dp = (char *) cptr;
+		if ((count2 = ioctl(fd, I_STR, &ioc)) < 0) {
+			snmp_log(MY_FACILITY(LOG_ERR), "%s: %s: %s: %s", __FUNCTION__, "ioctl()", "MX_IOCLCONFIG(2)", strerror(errno));
+			free(cptr);
+			close(fd);
+			continue;
+		}
+		if (count2 > count) {
+			count = count2;
+			free(cptr);
+			goto retry;
+		}
+		for (i = 0, val = (typeof(val)) (cptr + 1); i < count2; i++, val++) {
+			struct header_complex_index *hciptr;
+			struct {
+				struct mx_attr attr;
+				struct mx_attr_xcon xcon;
+			} buf;
+
+			buf.attr.type = MX_OBJ_TYPE_XCON;
+			buf.attr.id = *val;
+			buf.attr.cmd = MX_GET;
+			ioc.ic_cmd = MX_IOCGATTR;
+			ioc.ic_timout = 0;
+			ioc.ic_len = sizeof(buf);
+			ioc.ic_dp = (char *) &buf;
+			if (ioctl(fd, I_STR, &buf) < 0) {
+				snmp_log(MY_FACILITY(LOG_ERR), "%s: %s: %s: %s", __FUNCTION__, "ioctl()", "MX_IOCGATTR", strerror(errno));
+				continue;
+			}
+			for (hciptr = mxXconTableStorage; hciptr; hciptr = hciptr->next) {
+				struct mxXconTable_data *data = hciptr->data;
+
+				if (data->mxXconTable_id != 0 && data->mxXconTable_id != *val)
+					continue;
+				if (data->mxDrivNameLen != driv->mxDrivNameLen || strncmp((char *) data->mxDrivName, (char *) driv->mxDrivName, driv->mxDrivNameLen))
+					continue;
+				if (data->mxCardIndex != buf.xcon.config.mxCardIndex)
+					continue;
+				if (data->mxSpanIndex != buf.xcon.config.mxSpanIndex)
+					continue;
+				if (data->mxChanIndex != buf.xcon.config.mxChanIndex)
+					continue;
+				break;
+			}
+			if (hciptr) {
+				/* already have an entry for this card index, simply update it */
+				struct mxXconTable_data *StorageTmp = hciptr->data;
+				char *tmp;
+
+				StorageTmp->mxXconTable_request = sa_request;	/* mark as updated */
+				StorageTmp->mxXconTable_refs = 1;	/* mark as used */
+				StorageTmp->mxXconTable_id = *val;
+				/* copy driver name from driver entry */
+				if ((tmp = strndup((char *) driv->mxDrivName, driv->mxDrivNameLen))) {
+					SNMP_FREE(StorageTmp->mxDrivName);
+					StorageTmp->mxDrivName = (uint8_t *) tmp;
+					StorageTmp->mxDrivNameLen = driv->mxDrivNameLen;
+					StorageTmp->mxDrivName[StorageTmp->mxDrivNameLen] = '\0';
+				}
+				StorageTmp->mxCardIndex = buf.xcon.config.mxCardIndex;
+				StorageTmp->mxSpanIndex = buf.xcon.config.mxSpanIndex;
+				StorageTmp->mxChanIndex = buf.xcon.config.mxChanIndex;
+				StorageTmp->mxXconCardIndex = buf.xcon.config.mxXconCardIndex;
+				StorageTmp->mxXconSpanIndex = buf.xcon.config.mxXconSpanIndex;
+				StorageTmp->mxXconChanIndex = buf.xcon.config.mxXconChanIndex;
+				StorageTmp->mxXconType = buf.xcon.option.mxXconType;
+				switch (StorageTmp->mxXconType) {
+				default:
+				case MXXCONTYPE_SWITCHED:
+					StorageTmp->mxXconStorageType = ST_READONLY;
+					break;
+				case MXXCONTYPE_SEMIPERMANENT:
+					StorageTmp->mxXconStorageType = ST_NONVOLATILE;
+					break;
+				case MXXCONTYPE_PERMANENT:
+					StorageTmp->mxXconStorageType = ST_PERMANENT;
+					break;
+				}
+				StorageTmp->mxXconRowStatus = RS_ACTIVE;
+			} else {
+				/* no entry for this xcon index, create it */
+				struct mxXconTable_data *StorageNew = SNMP_MALLOC_STRUCT(mxXconTable_data);
+				char *tmp;
+
+				if (!StorageNew) continue;
+				StorageNew->mxXconTable_request = sa_request;	/* mark as updated */
+				StorageNew->mxXconTable_refs = 1;	/* mark as used */
+				StorageNew->mxXconTable_id = *val;
+				/* copy driver name from driver entry */
+				if (!(tmp = strndup((char *) driv->mxDrivName, driv->mxDrivNameLen))) {
+					snmp_log(MY_FACILITY(LOG_ERR), "%s: %s: %s", __FUNCTION__, "strndup()", strerror(errno));
+					SNMP_FREE(StorageNew);
+					continue;
+				}
+				StorageNew->mxDrivName = (uint8_t *) tmp;
+				StorageNew->mxDrivNameLen = driv->mxDrivNameLen;
+				StorageNew->mxDrivName[StorageNew->mxDrivNameLen] = '\0';
+				StorageNew->mxCardIndex = buf.xcon.config.mxCardIndex;
+				StorageNew->mxSpanIndex = buf.xcon.config.mxSpanIndex;
+				StorageNew->mxChanIndex = buf.xcon.config.mxChanIndex;
+				StorageNew->mxXconCardIndex = buf.xcon.config.mxXconCardIndex;
+				StorageNew->mxXconSpanIndex = buf.xcon.config.mxXconSpanIndex;
+				StorageNew->mxXconChanIndex = buf.xcon.config.mxXconChanIndex;
+				StorageNew->mxXconType = buf.xcon.option.mxXconType;
+				switch (StorageNew->mxXconType) {
+				default:
+				case MXXCONTYPE_SWITCHED:
+					StorageNew->mxXconStorageType = ST_READONLY;
+					break;
+				case MXXCONTYPE_SEMIPERMANENT:
+					StorageNew->mxXconStorageType = ST_NONVOLATILE;
+					break;
+				case MXXCONTYPE_PERMANENT:
+					StorageNew->mxXconStorageType = ST_PERMANENT;
+					break;
+				}
+				StorageNew->mxXconRowStatus = RS_ACTIVE;
+				mxXconTable_add(StorageNew);
+			}
+		}
+		free(cptr);
+		close(fd);
+	}
+	/* delete unused entries */
+	h_next = mxXconTableStorage;
+	while ((h = h_next)) {
+		struct mxXconTable_data *data = h->data;
+
+		h_next = h->next;
+		if (data->mxXconTable_refs)
+			data->mxXconTable_refs = 0;
+		else {
+			header_complex_extract_entry(&mxChanTableStorage, h);
+			mxXconTable_destroy(&data);
+		}
+	}
+	/* done */
+	return;
 }
 
 /**
@@ -6499,6 +8658,64 @@ var_mxXconTable(struct variable *vp, oid * name, size_t *length, int exact, size
 }
 
 /**
+ * @fn int check_mxNearEndCurrentTable_row(struct mxNearEndCurrentTable_data *StorageTmp, struct mxNearEndCurrentTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to check, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the ACTION phase.  The start of the ACTION pahse performs this consitency check
+ * on the row before allowing the request to proceed to the COMMIT phase.  This function can return
+ * SNMP_ERR_NOERR or a specific SNMP error value.  Values in StorageOld are the values before the
+ * varbinds on the mib were applied; the values in StorageTmp are the new values.  The function is
+ * permitted to change the values in StorageTmp to correct them; however, preference should be made
+ * for setting values where were not in the varbinds.
+ */
+int
+check_mxNearEndCurrentTable_row(struct mxNearEndCurrentTable_data *StorageTmp, struct mxNearEndCurrentTable_data *StorageOld)
+{
+	/* XXX: provide code to check the row for consistency */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int update_mxNearEndCurrentTable_row(struct mxNearEndCurrentTable_data *StorageTmp, struct mxNearEndCurrentTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the set operation (ACTION phase) on a row
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to update, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the COMMIT phase.  The start of the ACTION phase performs a consistency check on
+ * the row before allowing the request to proceed to the COMMIT phase.  The COMMIT phase then
+ * arrives here with consistency already checked (see check_mxNearEndCurrentTable_row()).  This function can
+ * return SNMP_ERR_NOERROR or SNMP_ERR_COMMITFAILED.  Values in StorageOld are the values before the
+ * varbinds on the row were applied: the values in StorageTmp are the new values.
+ */
+int
+update_mxNearEndCurrentTable_row(struct mxNearEndCurrentTable_data *StorageTmp, struct mxNearEndCurrentTable_data *StorageOld)
+{
+	/* XXX: provide code to update the row with the underlying device */
+	mxNearEndCurrentTable_refresh = 1;
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int revert_mxNearEndCurrentTable_row(struct mxNearEndCurrentTable_data *StorageTmp, struct mxNearEndCurrentTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the undo operation (UNDO phase) on a row
+ */
+void
+revert_mxNearEndCurrentTable_row(struct mxNearEndCurrentTable_data *StorageTmp, struct mxNearEndCurrentTable_data *StorageOld)
+{
+	/* XXX: provide code to revert the row with the underlying device */
+	update_mxNearEndCurrentTable_row(StorageOld, NULL);
+}
+
+/**
  * @fn void refresh_mxNearEndCurrentTable_row(struct mxNearEndCurrentTable_data *StorageTmp, int force)
  * @param StorageTmp the data row to refresh.
  * @param force force refresh if non-zero.
@@ -6515,7 +8732,53 @@ refresh_mxNearEndCurrentTable_row(struct mxNearEndCurrentTable_data *StorageTmp,
 		return (StorageTmp);
 	/* XXX: update row; delete it and return NULL if the row has disappeared */
 	StorageTmp->mxNearEndCurrentTable_request = sa_request;
+	{
+		int fd;
+		struct strioctl ioc = {};
+		char devname[19+FMNAMESZ+1] = {};
+		struct {
+			struct mx_stats stats;
+			struct mx_stats_span span;
+		} buf = {};
+
+		snprintf(devname, 19+FMNAMESZ+1, "/dev/streams/clone/%s", StorageTmp->mxDrivName);
+		if ((fd = open(devname, O_RDWR)) < 0) {
+			snmp_log(MY_FACILITY(LOG_ERR), "%s: %s: %s: %s", __FUNCTION__, "open()", devname, strerror(errno));
+			goto error;
+		}
+		buf.stats.type = MX_OBJ_TYPE_SPAN;
+		buf.stats.id = StorageTmp->mxNearEndCurrentTable_id;
+		buf.stats.interval = 0; /* current */
+		buf.stats.time = 0; /* returned */
+		buf.stats.stamp = 0; /* returned */
+		ioc.ic_cmd = MX_IOCGSTATS;
+		ioc.ic_timout = 0;
+		ioc.ic_len = sizeof(buf);
+		ioc.ic_dp = (char *) &buf;
+		if (ioctl(fd, I_STR, &ioc) < 0) {
+			snmp_log(MY_FACILITY(LOG_ERR), "%s: %s: %s: %s", __FUNCTION__, "ioctl()", "MX_IOCGSTATS", strerror(errno));
+			goto error;
+		}
+		StorageTmp->mxNearEndCurrentTimeElapsed = buf.stats.time;
+		StorageTmp->mxNearEndCurrentESs = buf.span.mxNearEndESs;
+		StorageTmp->mxNearEndCurrentSESs = buf.span.mxNearEndSESs;
+		StorageTmp->mxNearEndCurrentSEFSs = buf.span.mxNearEndSEFSs;
+		StorageTmp->mxNearEndCurrentUASs = buf.span.mxNearEndUASs;
+		StorageTmp->mxNearEndCurrentCSSs = buf.span.mxNearEndCSSs;
+		StorageTmp->mxNearEndCurrentPCVs = buf.span.mxNearEndPCVs;
+		StorageTmp->mxNearEndCurrentLESs = buf.span.mxNearEndLESs;
+		StorageTmp->mxNearEndCurrentBESs = buf.span.mxNearEndBESs;
+		StorageTmp->mxNearEndCurrentDMs = buf.span.mxNearEndDMs;
+		StorageTmp->mxNearEndCurrentLCVs = buf.span.mxNearEndLCVs;
+		StorageTmp->mxNearEndCurrentFASEs = buf.span.mxNearEndFASEs;
+		StorageTmp->mxNearEndCurrentFABEs = buf.span.mxNearEndFABEs;
+		StorageTmp->mxNearEndCurrentFEBEs = buf.span.mxNearEndFEBEs;
+	}
 	return (StorageTmp);
+      error:
+	mxNearEndCurrentTable_del(StorageTmp);
+	mxNearEndCurrentTable_destroy(&StorageTmp);
+	return (NULL);
 }
 
 /**
@@ -6532,11 +8795,119 @@ refresh_mxNearEndCurrentTable_row(struct mxNearEndCurrentTable_data *StorageTmp,
 void
 refresh_mxNearEndCurrentTable(int force)
 {
+	struct header_complex_index *h, *h_next, *hciptr;
+
 	refresh_mxSpanTable(force);
 	if (!force && mxNearEndCurrentTable_refresh == 0)
 		return;
 	/* XXX: Here, update the table as required... */
 	mxNearEndCurrentTable_refresh = 0;
+	for (h = mxSpanTableStorage; h; h = h->next) {
+		/* for each entry in the span table */
+		int fd;
+		struct mxSpanTable_data *span = h->data;
+		struct strioctl ioc = {};
+		char devname[19+FMNAMESZ+1] = {};
+		struct {
+			struct mx_stats stats;
+			struct mx_stats_span span;
+		} buf = {};
+
+		snprintf(devname, 19+FMNAMESZ+1, "/dev/streams/clone/%s", span->mxDrivName);
+		if ((fd = open(devname, O_RDWR)) < 0) {
+			snmp_log(MY_FACILITY(LOG_ERR), "%s: %s: %s: %s", __FUNCTION__, "open()", devname, strerror(errno));
+			continue;
+		}
+		buf.stats.type = MX_OBJ_TYPE_SPAN;
+		buf.stats.id = span->mxSpanTable_id;
+		buf.stats.interval = 0; /* current */
+		buf.stats.time = 0; /* returned */
+		buf.stats.stamp = 0; /* returned */
+		ioc.ic_cmd = MX_IOCGSTATS;
+		ioc.ic_timout = 0;
+		ioc.ic_len = sizeof(buf);
+		ioc.ic_dp = (char *) &buf;
+		if (ioctl(fd, I_STR, &ioc) < 0) {
+			snmp_log(MY_FACILITY(LOG_ERR), "%s: %s: %s: %s", __FUNCTION__, "ioctl()", "MX_IOCGSTATS", strerror(errno));
+			continue;
+		}
+		for (hciptr = mxNearEndCurrentTableStorage; hciptr; hciptr = hciptr->next) {
+			struct mxNearEndCurrentTable_data *data = hciptr->data;
+
+			if (data->mxNearEndCurrentTable_id != 0 && data->mxNearEndCurrentTable_id != span->mxSpanTable_id)
+				continue;
+			if (data->mxDrivNameLen != span->mxDrivNameLen || strncmp((char *) data->mxDrivName, (char *) span->mxDrivName, span->mxDrivNameLen))
+				continue;
+			if (data->mxCardIndex != span->mxCardIndex)
+				continue;
+			if (data->mxSpanIndex != span->mxSpanIndex)
+				continue;
+			break;
+		}
+		if (hciptr) {
+			/* already have an entry for this span index, simply update it */
+			struct mxNearEndCurrentTable_data *StorageTmp = hciptr->data;
+
+			StorageTmp->mxNearEndCurrentTable_request = sa_request;
+			StorageTmp->mxNearEndCurrentTable_refs = 1;
+			StorageTmp->mxNearEndCurrentTimeElapsed = buf.stats.time;
+			StorageTmp->mxNearEndCurrentESs = buf.span.mxNearEndESs;
+			StorageTmp->mxNearEndCurrentSESs = buf.span.mxNearEndSESs;
+			StorageTmp->mxNearEndCurrentSEFSs = buf.span.mxNearEndSEFSs;
+			StorageTmp->mxNearEndCurrentUASs = buf.span.mxNearEndUASs;
+			StorageTmp->mxNearEndCurrentCSSs = buf.span.mxNearEndCSSs;
+			StorageTmp->mxNearEndCurrentPCVs = buf.span.mxNearEndPCVs;
+			StorageTmp->mxNearEndCurrentLESs = buf.span.mxNearEndLESs;
+			StorageTmp->mxNearEndCurrentBESs = buf.span.mxNearEndBESs;
+			StorageTmp->mxNearEndCurrentDMs = buf.span.mxNearEndDMs;
+			StorageTmp->mxNearEndCurrentLCVs = buf.span.mxNearEndLCVs;
+		} else {
+			struct mxNearEndCurrentTable_data *StorageNew = SNMP_MALLOC_STRUCT(mxNearEndCurrentTable_data);
+			char *tmp;
+
+			if (!StorageNew) continue;
+			StorageNew->mxNearEndCurrentTable_request = sa_request;
+			StorageNew->mxNearEndCurrentTable_refs = 1;
+			StorageNew->mxNearEndCurrentTable_id = span->mxSpanTable_id;
+			/* copy driver name from span entry */
+			if (!(tmp = strndup((char *) span->mxDrivName, span->mxDrivNameLen))) {
+				snmp_log(MY_FACILITY(LOG_ERR), "%s: %s: %s", __FUNCTION__, "strndup()", strerror(errno));
+				mxNearEndCurrentTable_destroy(&StorageNew);
+				continue;
+			}
+			StorageNew->mxDrivName = (uint8_t *) tmp;
+			StorageNew->mxCardIndex = span->mxCardIndex;
+			StorageNew->mxSpanIndex = span->mxSpanIndex;
+			StorageNew->mxNearEndCurrentTimeElapsed = buf.stats.time;
+			StorageNew->mxNearEndCurrentESs = buf.span.mxNearEndESs;
+			StorageNew->mxNearEndCurrentSESs = buf.span.mxNearEndSESs;
+			StorageNew->mxNearEndCurrentSEFSs = buf.span.mxNearEndSEFSs;
+			StorageNew->mxNearEndCurrentUASs = buf.span.mxNearEndUASs;
+			StorageNew->mxNearEndCurrentCSSs = buf.span.mxNearEndCSSs;
+			StorageNew->mxNearEndCurrentPCVs = buf.span.mxNearEndPCVs;
+			StorageNew->mxNearEndCurrentLESs = buf.span.mxNearEndLESs;
+			StorageNew->mxNearEndCurrentBESs = buf.span.mxNearEndBESs;
+			StorageNew->mxNearEndCurrentDMs = buf.span.mxNearEndDMs;
+			StorageNew->mxNearEndCurrentLCVs = buf.span.mxNearEndLCVs;
+			mxNearEndCurrentTable_add(StorageNew);
+		}
+		close(fd);
+	}
+	/* delete unused entries */
+	h_next = mxNearEndCurrentTableStorage;
+	while ((h = h_next)) {
+		struct mxNearEndCurrentTable_data *data = h->data;
+
+		h_next = h->next;
+		if (data->mxNearEndCurrentTable_refs)
+			data->mxNearEndCurrentTable_refs = 0;
+		else {
+			header_complex_extract_entry(&mxNearEndCurrentTableStorage, h);
+			mxNearEndCurrentTable_destroy(&data);
+		}
+	}
+	/* done */
+	return;
 }
 
 /**
@@ -6630,10 +9001,86 @@ var_mxNearEndCurrentTable(struct variable *vp, oid * name, size_t *length, int e
 		*var_len = sizeof(StorageTmp->mxNearEndCurrentLCVs);
 		rval = (u_char *) &StorageTmp->mxNearEndCurrentLCVs;
 		break;
+	case (u_char) MXNEARENDCURRENTFASES:	/* ReadOnly */
+		if (!StorageTmp)
+			break;
+		*var_len = sizeof(StorageTmp->mxNearEndCurrentFASEs);
+		rval = (u_char *) &StorageTmp->mxNearEndCurrentFASEs;
+		break;
+	case (u_char) MXNEARENDCURRENTFABES:	/* ReadOnly */
+		if (!StorageTmp)
+			break;
+		*var_len = sizeof(StorageTmp->mxNearEndCurrentFABEs);
+		rval = (u_char *) &StorageTmp->mxNearEndCurrentFABEs;
+		break;
+	case (u_char) MXNEARENDCURRENTFEBES:	/* ReadOnly */
+		if (!StorageTmp)
+			break;
+		*var_len = sizeof(StorageTmp->mxNearEndCurrentFEBEs);
+		rval = (u_char *) &StorageTmp->mxNearEndCurrentFEBEs;
+		break;
 	default:
 		ERROR_MSG("");
 	}
 	return (rval);
+}
+
+/**
+ * @fn int check_mxNearEndIntervalTable_row(struct mxNearEndIntervalTable_data *StorageTmp, struct mxNearEndIntervalTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to check, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the ACTION phase.  The start of the ACTION pahse performs this consitency check
+ * on the row before allowing the request to proceed to the COMMIT phase.  This function can return
+ * SNMP_ERR_NOERR or a specific SNMP error value.  Values in StorageOld are the values before the
+ * varbinds on the mib were applied; the values in StorageTmp are the new values.  The function is
+ * permitted to change the values in StorageTmp to correct them; however, preference should be made
+ * for setting values where were not in the varbinds.
+ */
+int
+check_mxNearEndIntervalTable_row(struct mxNearEndIntervalTable_data *StorageTmp, struct mxNearEndIntervalTable_data *StorageOld)
+{
+	/* XXX: provide code to check the row for consistency */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int update_mxNearEndIntervalTable_row(struct mxNearEndIntervalTable_data *StorageTmp, struct mxNearEndIntervalTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the set operation (ACTION phase) on a row
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to update, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the COMMIT phase.  The start of the ACTION phase performs a consistency check on
+ * the row before allowing the request to proceed to the COMMIT phase.  The COMMIT phase then
+ * arrives here with consistency already checked (see check_mxNearEndIntervalTable_row()).  This function can
+ * return SNMP_ERR_NOERROR or SNMP_ERR_COMMITFAILED.  Values in StorageOld are the values before the
+ * varbinds on the row were applied: the values in StorageTmp are the new values.
+ */
+int
+update_mxNearEndIntervalTable_row(struct mxNearEndIntervalTable_data *StorageTmp, struct mxNearEndIntervalTable_data *StorageOld)
+{
+	/* XXX: provide code to update the row with the underlying device */
+	mxNearEndIntervalTable_refresh = 1;
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int revert_mxNearEndIntervalTable_row(struct mxNearEndIntervalTable_data *StorageTmp, struct mxNearEndIntervalTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the undo operation (UNDO phase) on a row
+ */
+void
+revert_mxNearEndIntervalTable_row(struct mxNearEndIntervalTable_data *StorageTmp, struct mxNearEndIntervalTable_data *StorageOld)
+{
+	/* XXX: provide code to revert the row with the underlying device */
+	update_mxNearEndIntervalTable_row(StorageOld, NULL);
 }
 
 /**
@@ -6653,7 +9100,53 @@ refresh_mxNearEndIntervalTable_row(struct mxNearEndIntervalTable_data *StorageTm
 		return (StorageTmp);
 	/* XXX: update row; delete it and return NULL if the row has disappeared */
 	StorageTmp->mxNearEndIntervalTable_request = sa_request;
+	{
+		int fd;
+		struct strioctl ioc = {};
+		char devname[19+FMNAMESZ+1] = {};
+		struct {
+			struct mx_stats stats;
+			struct mx_stats_span span;
+		} buf = {};
+
+		snprintf(devname, 19+FMNAMESZ+1, "/dev/streams/clone/%s", StorageTmp->mxDrivName);
+		if ((fd = open(devname, O_RDWR)) < 0) {
+			snmp_log(MY_FACILITY(LOG_ERR), "%s: %s: %s: %s", __FUNCTION__, "open()", devname, strerror(errno));
+			goto error;
+		}
+		buf.stats.type = MX_OBJ_TYPE_SPAN;
+		buf.stats.id = StorageTmp->mxNearEndIntervalTable_id;
+		buf.stats.interval = StorageTmp->mxNearEndIntervalIndex; /* specific index */
+		buf.stats.time = 0; /* returned */
+		buf.stats.stamp = 0; /* returned */
+		ioc.ic_cmd = MX_IOCGSTATS;
+		ioc.ic_timout = 0;
+		ioc.ic_len = sizeof(buf);
+		ioc.ic_dp = (char *) &buf;
+		if (ioctl(fd, I_STR, &ioc) < 0) {
+			snmp_log(MY_FACILITY(LOG_ERR), "%s: %s: %s: %s", __FUNCTION__, "ioctl()", "MX_IOCGSTATS", strerror(errno));
+			goto error;
+		}
+		StorageTmp->mxNearEndIntervalESs = buf.span.mxNearEndESs;
+		StorageTmp->mxNearEndIntervalSESs = buf.span.mxNearEndSESs;
+		StorageTmp->mxNearEndIntervalSEFSs = buf.span.mxNearEndSEFSs;
+		StorageTmp->mxNearEndIntervalUASs = buf.span.mxNearEndUASs;
+		StorageTmp->mxNearEndIntervalCSSs = buf.span.mxNearEndCSSs;
+		StorageTmp->mxNearEndIntervalPCVs = buf.span.mxNearEndPCVs;
+		StorageTmp->mxNearEndIntervalLESs = buf.span.mxNearEndLESs;
+		StorageTmp->mxNearEndIntervalBESs = buf.span.mxNearEndBESs;
+		StorageTmp->mxNearEndIntervalDMs = buf.span.mxNearEndDMs;
+		StorageTmp->mxNearEndIntervalLCVs = buf.span.mxNearEndLCVs;
+		StorageTmp->mxNearEndIntervalFASEs = buf.span.mxNearEndFASEs;
+		StorageTmp->mxNearEndIntervalFABEs = buf.span.mxNearEndFABEs;
+		StorageTmp->mxNearEndIntervalFEBEs = buf.span.mxNearEndFEBEs;
+		StorageTmp->mxNearEndIntervalValidData = buf.span.mxNearEndValidData;
+	}
 	return (StorageTmp);
+      error:
+	mxNearEndIntervalTable_del(StorageTmp);
+	mxNearEndIntervalTable_destroy(&StorageTmp);
+	return (NULL);
 }
 
 /**
@@ -6670,11 +9163,131 @@ refresh_mxNearEndIntervalTable_row(struct mxNearEndIntervalTable_data *StorageTm
 void
 refresh_mxNearEndIntervalTable(int force)
 {
+	struct header_complex_index *h, *h_next, *hciptr;
+
 	refresh_mxSpanTable(force);
 	if (!force && mxNearEndIntervalTable_refresh == 0)
 		return;
 	/* XXX: Here, update the table as required... */
 	mxNearEndIntervalTable_refresh = 0;
+	for (h = mxSpanTableStorage; h; h = h->next) {
+		/* for each entry in the span table */
+		int fd;
+		struct mxSpanTable_data *span = h->data;
+		struct strioctl ioc = {};
+		char devname[19+FMNAMESZ+1] = {};
+		struct {
+			struct mx_stats stats;
+			struct mx_stats_span span;
+		} buf = {};
+		uint index;
+
+		snprintf(devname, 19+FMNAMESZ+1, "/dev/streams/clone/%s", span->mxDrivName);
+		if ((fd = open(devname, O_RDWR)) < 0) {
+			snmp_log(MY_FACILITY(LOG_ERR), "%s: %s: %s: %s", __FUNCTION__, "open()", devname, strerror(errno));
+			continue;
+		}
+		ioc.ic_cmd = MX_IOCGSTATS;
+		ioc.ic_timout = 0;
+		ioc.ic_len = sizeof(buf);
+		ioc.ic_dp = (char *) &buf;
+
+		for (index = 1; index <= 96; index++) {
+			buf.stats.type = MX_OBJ_TYPE_SPAN;
+			buf.stats.id = span->mxSpanTable_id;
+			buf.stats.interval = index;
+			buf.stats.time = 0; /* returned */
+			buf.stats.stamp = 0; /* returned */
+
+			if (ioctl(fd, I_STR, &ioc) < 0) {
+				snmp_log(MY_FACILITY(LOG_ERR), "%s: %s: %s: %s", __FUNCTION__, "ioctl()", "MX_IOCGSTATS", strerror(errno));
+				continue;
+			}
+			for (hciptr = mxNearEndIntervalTableStorage; hciptr; hciptr = hciptr->next) {
+				struct mxNearEndIntervalTable_data *data = hciptr->data;
+
+				if (data->mxNearEndIntervalTable_id != 0 && data->mxNearEndIntervalTable_id != span->mxSpanTable_id)
+					continue;
+				if (data->mxDrivNameLen != span->mxDrivNameLen || strncmp((char *) data->mxDrivName, (char *) span->mxDrivName, span->mxDrivNameLen))
+					continue;
+				if (data->mxCardIndex != span->mxCardIndex)
+					continue;
+				if (data->mxSpanIndex != span->mxSpanIndex)
+					continue;
+				if (data->mxNearEndIntervalIndex != index)
+					continue;
+				break;
+			}
+			if (hciptr) {
+				/* already have an entry for this span index, simply update it */
+				struct mxNearEndIntervalTable_data *StorageTmp = hciptr->data;
+
+				StorageTmp->mxNearEndIntervalTable_request = sa_request;
+				StorageTmp->mxNearEndIntervalTable_refs = 1;
+				StorageTmp->mxNearEndIntervalESs = buf.span.mxNearEndESs;
+				StorageTmp->mxNearEndIntervalSESs = buf.span.mxNearEndSESs;
+				StorageTmp->mxNearEndIntervalSEFSs = buf.span.mxNearEndSEFSs;
+				StorageTmp->mxNearEndIntervalUASs = buf.span.mxNearEndUASs;
+				StorageTmp->mxNearEndIntervalCSSs = buf.span.mxNearEndCSSs;
+				StorageTmp->mxNearEndIntervalPCVs = buf.span.mxNearEndPCVs;
+				StorageTmp->mxNearEndIntervalLESs = buf.span.mxNearEndLESs;
+				StorageTmp->mxNearEndIntervalBESs = buf.span.mxNearEndBESs;
+				StorageTmp->mxNearEndIntervalDMs = buf.span.mxNearEndDMs;
+				StorageTmp->mxNearEndIntervalLCVs = buf.span.mxNearEndLCVs;
+				StorageTmp->mxNearEndIntervalFASEs = buf.span.mxNearEndFASEs;
+				StorageTmp->mxNearEndIntervalFABEs = buf.span.mxNearEndFABEs;
+				StorageTmp->mxNearEndIntervalFEBEs = buf.span.mxNearEndFEBEs;
+				StorageTmp->mxNearEndIntervalValidData = buf.span.mxNearEndValidData;
+			} else {
+				struct mxNearEndIntervalTable_data *StorageNew = SNMP_MALLOC_STRUCT(mxNearEndIntervalTable_data);
+				char *tmp;
+
+				if (!StorageNew) continue;
+				StorageNew->mxNearEndIntervalTable_request = sa_request;
+				StorageNew->mxNearEndIntervalTable_refs = 1;
+				StorageNew->mxNearEndIntervalTable_id = span->mxSpanTable_id;
+				if (!(tmp = strndup((char *) span->mxDrivName, span->mxDrivNameLen))) {
+					snmp_log(MY_FACILITY(LOG_ERR), "%s: %s: %s", __FUNCTION__, "strndup()", strerror(errno));
+					mxNearEndIntervalTable_destroy(&StorageNew);
+					continue;
+				}
+				StorageNew->mxDrivName = (uint8_t *) tmp;
+				StorageNew->mxCardIndex = span->mxCardIndex;
+				StorageNew->mxSpanIndex = span->mxSpanIndex;
+				StorageNew->mxNearEndIntervalIndex = index;
+				StorageNew->mxNearEndIntervalESs = buf.span.mxNearEndESs;
+				StorageNew->mxNearEndIntervalSESs = buf.span.mxNearEndSESs;
+				StorageNew->mxNearEndIntervalSEFSs = buf.span.mxNearEndSEFSs;
+				StorageNew->mxNearEndIntervalUASs = buf.span.mxNearEndUASs;
+				StorageNew->mxNearEndIntervalCSSs = buf.span.mxNearEndCSSs;
+				StorageNew->mxNearEndIntervalPCVs = buf.span.mxNearEndPCVs;
+				StorageNew->mxNearEndIntervalLESs = buf.span.mxNearEndLESs;
+				StorageNew->mxNearEndIntervalBESs = buf.span.mxNearEndBESs;
+				StorageNew->mxNearEndIntervalDMs = buf.span.mxNearEndDMs;
+				StorageNew->mxNearEndIntervalLCVs = buf.span.mxNearEndLCVs;
+				StorageNew->mxNearEndIntervalFASEs = buf.span.mxNearEndFASEs;
+				StorageNew->mxNearEndIntervalFABEs = buf.span.mxNearEndFABEs;
+				StorageNew->mxNearEndIntervalFEBEs = buf.span.mxNearEndFEBEs;
+				StorageNew->mxNearEndIntervalValidData = buf.span.mxNearEndValidData;
+			}
+		}
+		close(fd);
+	}
+	/* delete unused entries */
+	h_next = mxNearEndIntervalTableStorage;
+	while ((h = h_next)) {
+		struct mxNearEndIntervalTable_data *data = h->data;
+
+		h_next = h->next;
+		if (data->mxNearEndIntervalTable_refs)
+			data->mxNearEndIntervalTable_refs = 0;
+		else {
+			header_complex_extract_entry(&mxNearEndIntervalTableStorage, h);
+			mxNearEndIntervalTable_destroy(&data);
+		}
+	}
+	/* done */
+	return;
 }
 
 /**
@@ -6762,6 +9375,24 @@ var_mxNearEndIntervalTable(struct variable *vp, oid * name, size_t *length, int 
 		*var_len = sizeof(StorageTmp->mxNearEndIntervalLCVs);
 		rval = (u_char *) &StorageTmp->mxNearEndIntervalLCVs;
 		break;
+	case (u_char) MXNEARENDINTERVALFASES:	/* ReadOnly */
+		if (!StorageTmp)
+			break;
+		*var_len = sizeof(StorageTmp->mxNearEndIntervalFASEs);
+		rval = (u_char *) &StorageTmp->mxNearEndIntervalFASEs;
+		break;
+	case (u_char) MXNEARENDINTERVALFABES:	/* ReadOnly */
+		if (!StorageTmp)
+			break;
+		*var_len = sizeof(StorageTmp->mxNearEndIntervalFABEs);
+		rval = (u_char *) &StorageTmp->mxNearEndIntervalFABEs;
+		break;
+	case (u_char) MXNEARENDINTERVALFEBES:	/* ReadOnly */
+		if (!StorageTmp)
+			break;
+		*var_len = sizeof(StorageTmp->mxNearEndIntervalFEBEs);
+		rval = (u_char *) &StorageTmp->mxNearEndIntervalFEBEs;
+		break;
 	case (u_char) MXNEARENDINTERVALVALIDDATA:	/* ReadOnly */
 		if (!StorageTmp)
 			break;
@@ -6772,6 +9403,64 @@ var_mxNearEndIntervalTable(struct variable *vp, oid * name, size_t *length, int 
 		ERROR_MSG("");
 	}
 	return (rval);
+}
+
+/**
+ * @fn int check_mxNearEndTotalTable_row(struct mxNearEndTotalTable_data *StorageTmp, struct mxNearEndTotalTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to check, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the ACTION phase.  The start of the ACTION pahse performs this consitency check
+ * on the row before allowing the request to proceed to the COMMIT phase.  This function can return
+ * SNMP_ERR_NOERR or a specific SNMP error value.  Values in StorageOld are the values before the
+ * varbinds on the mib were applied; the values in StorageTmp are the new values.  The function is
+ * permitted to change the values in StorageTmp to correct them; however, preference should be made
+ * for setting values where were not in the varbinds.
+ */
+int
+check_mxNearEndTotalTable_row(struct mxNearEndTotalTable_data *StorageTmp, struct mxNearEndTotalTable_data *StorageOld)
+{
+	/* XXX: provide code to check the row for consistency */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int update_mxNearEndTotalTable_row(struct mxNearEndTotalTable_data *StorageTmp, struct mxNearEndTotalTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the set operation (ACTION phase) on a row
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to update, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the COMMIT phase.  The start of the ACTION phase performs a consistency check on
+ * the row before allowing the request to proceed to the COMMIT phase.  The COMMIT phase then
+ * arrives here with consistency already checked (see check_mxNearEndTotalTable_row()).  This function can
+ * return SNMP_ERR_NOERROR or SNMP_ERR_COMMITFAILED.  Values in StorageOld are the values before the
+ * varbinds on the row were applied: the values in StorageTmp are the new values.
+ */
+int
+update_mxNearEndTotalTable_row(struct mxNearEndTotalTable_data *StorageTmp, struct mxNearEndTotalTable_data *StorageOld)
+{
+	/* XXX: provide code to update the row with the underlying device */
+	mxNearEndTotalTable_refresh = 1;
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int revert_mxNearEndTotalTable_row(struct mxNearEndTotalTable_data *StorageTmp, struct mxNearEndTotalTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the undo operation (UNDO phase) on a row
+ */
+void
+revert_mxNearEndTotalTable_row(struct mxNearEndTotalTable_data *StorageTmp, struct mxNearEndTotalTable_data *StorageOld)
+{
+	/* XXX: provide code to revert the row with the underlying device */
+	update_mxNearEndTotalTable_row(StorageOld, NULL);
 }
 
 /**
@@ -6791,7 +9480,54 @@ refresh_mxNearEndTotalTable_row(struct mxNearEndTotalTable_data *StorageTmp, int
 		return (StorageTmp);
 	/* XXX: update row; delete it and return NULL if the row has disappeared */
 	StorageTmp->mxNearEndTotalTable_request = sa_request;
+	{
+		int fd;
+		struct strioctl ioc = {};
+		char devname[19+FMNAMESZ+1] = {};
+		struct {
+			struct mx_stats stats;
+			struct mx_stats_span span;
+		} buf = {};
+
+		snprintf(devname, 19+FMNAMESZ+1, "/dev/streams/clone/%s", StorageTmp->mxDrivName);
+		if ((fd = open(devname, O_RDWR)) < 0) {
+			snmp_log(MY_FACILITY(LOG_ERR), "%s: %s: %s: %s", __FUNCTION__, "open()", devname, strerror(errno));
+			goto error;
+		}
+		buf.stats.type = MX_OBJ_TYPE_SPAN;
+		buf.stats.id = StorageTmp->mxNearEndTotalTable_id;
+		buf.stats.interval = -1UL; /* totals */
+		buf.stats.time = 0; /* returned */
+		buf.stats.stamp = 0; /* returned */
+		ioc.ic_cmd = MX_IOCGSTATS;
+		ioc.ic_timout = 0;
+		ioc.ic_len = sizeof(buf);
+		ioc.ic_dp = (char *) &buf;
+		if (ioctl(fd, I_STR, &ioc) < 0) {
+			snmp_log(MY_FACILITY(LOG_ERR), "%s: %s: %s: %s", __FUNCTION__, "ioctl()", "MX_IOCGSTATS", strerror(errno));
+			goto error;
+		}
+		StorageTmp->mxNearEndTotalValidIntervals = buf.span.mxValidIntervals;
+		StorageTmp->mxNearEndTotalInvalidIntervals = buf.span.mxInvalidIntervals;
+		StorageTmp->mxNearEndTotalESs = buf.span.mxNearEndESs;
+		StorageTmp->mxNearEndTotalSESs = buf.span.mxNearEndSESs;
+		StorageTmp->mxNearEndTotalSEFSs = buf.span.mxNearEndSEFSs;
+		StorageTmp->mxNearEndTotalUASs = buf.span.mxNearEndUASs;
+		StorageTmp->mxNearEndTotalCSSs = buf.span.mxNearEndCSSs;
+		StorageTmp->mxNearEndTotalPCVs = buf.span.mxNearEndPCVs;
+		StorageTmp->mxNearEndTotalLESs = buf.span.mxNearEndLESs;
+		StorageTmp->mxNearEndTotalBESs = buf.span.mxNearEndBESs;
+		StorageTmp->mxNearEndTotalDMs = buf.span.mxNearEndDMs;
+		StorageTmp->mxNearEndTotalLCVs = buf.span.mxNearEndLCVs;
+		StorageTmp->mxNearEndTotalFASEs = buf.span.mxNearEndFASEs;
+		StorageTmp->mxNearEndTotalFABEs = buf.span.mxNearEndFABEs;
+		StorageTmp->mxNearEndTotalFEBEs = buf.span.mxNearEndFEBEs;
+	}
 	return (StorageTmp);
+      error:
+	mxNearEndTotalTable_del(StorageTmp);
+	mxNearEndTotalTable_destroy(&StorageTmp);
+	return (NULL);
 }
 
 /**
@@ -6808,11 +9544,126 @@ refresh_mxNearEndTotalTable_row(struct mxNearEndTotalTable_data *StorageTmp, int
 void
 refresh_mxNearEndTotalTable(int force)
 {
+	struct header_complex_index *h, *h_next, *hciptr;
+
 	refresh_mxSpanTable(force);
 	if (!force && mxNearEndTotalTable_refresh == 0)
 		return;
 	/* XXX: Here, update the table as required... */
 	mxNearEndTotalTable_refresh = 0;
+	for (h = mxSpanTableStorage; h; h = h->next) {
+		/* for each entry in the span table */
+		int fd;
+		struct mxSpanTable_data *span = h->data;
+		struct strioctl ioc = {};
+		char devname[19+FMNAMESZ+1] = {};
+		struct {
+			struct mx_stats stats;
+			struct mx_stats_span span;
+		} buf = {};
+
+		snprintf(devname, 19+FMNAMESZ+1, "/dev/streams/clone/%s", span->mxDrivName);
+		if ((fd = open(devname, O_RDWR)) < 0) {
+			snmp_log(MY_FACILITY(LOG_ERR), "%s: %s: %s: %s", __FUNCTION__, "open()", devname, strerror(errno));
+			continue;
+		}
+		buf.stats.type = MX_OBJ_TYPE_SPAN;
+		buf.stats.id = span->mxSpanTable_id;
+		buf.stats.interval = 0xffffffff; /* total */
+		buf.stats.time = 0; /* returned */
+		buf.stats.stamp = 0; /* returned */
+		ioc.ic_cmd = MX_IOCGSTATS;
+		ioc.ic_timout = 0;
+		ioc.ic_len = sizeof(buf);
+		ioc.ic_dp = (char *) &buf;
+		if (ioctl(fd, I_STR, &ioc) < 0) {
+			snmp_log(MY_FACILITY(LOG_ERR), "%s: %s: %s: %s", __FUNCTION__, "ioctl()", "MX_IOCGSTATS", strerror(errno));
+			continue;
+		}
+		for (hciptr = mxNearEndTotalTableStorage; hciptr; hciptr = hciptr->next) {
+			struct mxNearEndTotalTable_data *data = hciptr->data;
+
+			if (data->mxNearEndTotalTable_id != 0 && data->mxNearEndTotalTable_id != span->mxSpanTable_id)
+				continue;
+			if (data->mxDrivNameLen != span->mxDrivNameLen || strncmp((char *) data->mxDrivName, (char *) span->mxDrivName, span->mxDrivNameLen))
+				continue;
+			if (data->mxCardIndex != span->mxCardIndex)
+				continue;
+			if (data->mxSpanIndex != span->mxSpanIndex)
+				continue;
+			break;
+		}
+		if (hciptr) {
+			struct mxNearEndTotalTable_data *StorageTmp = hciptr->data;
+
+			StorageTmp->mxNearEndTotalTable_request = sa_request;
+			StorageTmp->mxNearEndTotalTable_refs = 1;
+			StorageTmp->mxNearEndTotalValidIntervals = buf.span.mxValidIntervals;
+			StorageTmp->mxNearEndTotalInvalidIntervals = buf.span.mxInvalidIntervals;
+			StorageTmp->mxNearEndTotalESs = buf.span.mxNearEndESs;
+			StorageTmp->mxNearEndTotalSESs = buf.span.mxNearEndSESs;
+			StorageTmp->mxNearEndTotalSEFSs = buf.span.mxNearEndSEFSs;
+			StorageTmp->mxNearEndTotalUASs = buf.span.mxNearEndUASs;
+			StorageTmp->mxNearEndTotalCSSs = buf.span.mxNearEndCSSs;
+			StorageTmp->mxNearEndTotalPCVs = buf.span.mxNearEndPCVs;
+			StorageTmp->mxNearEndTotalLESs = buf.span.mxNearEndLESs;
+			StorageTmp->mxNearEndTotalBESs = buf.span.mxNearEndBESs;
+			StorageTmp->mxNearEndTotalDMs = buf.span.mxNearEndDMs;
+			StorageTmp->mxNearEndTotalLCVs = buf.span.mxNearEndLCVs;
+			StorageTmp->mxNearEndTotalFASEs = buf.span.mxNearEndFASEs;
+			StorageTmp->mxNearEndTotalFABEs = buf.span.mxNearEndFABEs;
+			StorageTmp->mxNearEndTotalFASEs = buf.span.mxNearEndFASEs;
+		} else {
+			struct mxNearEndTotalTable_data *StorageNew = SNMP_MALLOC_STRUCT(mxNearEndTotalTable_data);
+			char *tmp;
+
+			if (!StorageNew) continue;
+			StorageNew->mxNearEndTotalTable_request = sa_request;
+			StorageNew->mxNearEndTotalTable_refs = 1;
+			StorageNew->mxNearEndTotalTable_id = span->mxSpanTable_id;
+			/* copy driver name from span entry */
+			if (!(tmp = strndup((char *) span->mxDrivName, span->mxDrivNameLen))) {
+				snmp_log(MY_FACILITY(LOG_ERR), "%s: %s: %s", __FUNCTION__, "strndup()", strerror(errno));
+				mxNearEndTotalTable_destroy(&StorageNew);
+				continue;
+			}
+			StorageNew->mxDrivName = (uint8_t *) tmp;
+			StorageNew->mxCardIndex = span->mxCardIndex;
+			StorageNew->mxSpanIndex = span->mxSpanIndex;
+			StorageNew->mxNearEndTotalValidIntervals = buf.span.mxValidIntervals;
+			StorageNew->mxNearEndTotalInvalidIntervals = buf.span.mxInvalidIntervals;
+			StorageNew->mxNearEndTotalESs = buf.span.mxNearEndESs;
+			StorageNew->mxNearEndTotalSESs = buf.span.mxNearEndSESs;
+			StorageNew->mxNearEndTotalSEFSs = buf.span.mxNearEndSEFSs;
+			StorageNew->mxNearEndTotalUASs = buf.span.mxNearEndUASs;
+			StorageNew->mxNearEndTotalCSSs = buf.span.mxNearEndCSSs;
+			StorageNew->mxNearEndTotalPCVs = buf.span.mxNearEndPCVs;
+			StorageNew->mxNearEndTotalLESs = buf.span.mxNearEndLESs;
+			StorageNew->mxNearEndTotalBESs = buf.span.mxNearEndBESs;
+			StorageNew->mxNearEndTotalDMs = buf.span.mxNearEndDMs;
+			StorageNew->mxNearEndTotalLCVs = buf.span.mxNearEndLCVs;
+			StorageNew->mxNearEndTotalFASEs = buf.span.mxNearEndFASEs;
+			StorageNew->mxNearEndTotalFABEs = buf.span.mxNearEndFABEs;
+			StorageNew->mxNearEndTotalFASEs = buf.span.mxNearEndFASEs;
+			mxNearEndTotalTable_add(StorageNew);
+		}
+		close(fd);
+	}
+	/* delete unused entries */
+	h_next = mxNearEndTotalTableStorage;
+	while ((h = h_next)) {
+		struct mxNearEndTotalTable_data *data = h->data;
+
+		h_next = h->next;
+		if (data->mxNearEndTotalTable_refs)
+			data->mxNearEndTotalTable_refs = 0;
+		else {
+			header_complex_extract_entry(&mxNearEndTotalTableStorage, h);
+			mxNearEndTotalTable_destroy(&data);
+		}
+	}
+	/* done */
+	return;
 }
 
 /**
@@ -6912,10 +9763,86 @@ var_mxNearEndTotalTable(struct variable *vp, oid * name, size_t *length, int exa
 		*var_len = sizeof(StorageTmp->mxNearEndTotalLCVs);
 		rval = (u_char *) &StorageTmp->mxNearEndTotalLCVs;
 		break;
+	case (u_char) MXNEARENDTOTALFASES:	/* ReadOnly */
+		if (!StorageTmp)
+			break;
+		*var_len = sizeof(StorageTmp->mxNearEndTotalFASEs);
+		rval = (u_char *) &StorageTmp->mxNearEndTotalFASEs;
+		break;
+	case (u_char) MXNEARENDTOTALFABES:	/* ReadOnly */
+		if (!StorageTmp)
+			break;
+		*var_len = sizeof(StorageTmp->mxNearEndTotalFABEs);
+		rval = (u_char *) &StorageTmp->mxNearEndTotalFABEs;
+		break;
+	case (u_char) MXNEARENDTOTALFEBES:	/* ReadOnly */
+		if (!StorageTmp)
+			break;
+		*var_len = sizeof(StorageTmp->mxNearEndTotalFEBEs);
+		rval = (u_char *) &StorageTmp->mxNearEndTotalFEBEs;
+		break;
 	default:
 		ERROR_MSG("");
 	}
 	return (rval);
+}
+
+/**
+ * @fn int check_mxFarEndCurrentTable_row(struct mxFarEndCurrentTable_data *StorageTmp, struct mxFarEndCurrentTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to check, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the ACTION phase.  The start of the ACTION pahse performs this consitency check
+ * on the row before allowing the request to proceed to the COMMIT phase.  This function can return
+ * SNMP_ERR_NOERR or a specific SNMP error value.  Values in StorageOld are the values before the
+ * varbinds on the mib were applied; the values in StorageTmp are the new values.  The function is
+ * permitted to change the values in StorageTmp to correct them; however, preference should be made
+ * for setting values where were not in the varbinds.
+ */
+int
+check_mxFarEndCurrentTable_row(struct mxFarEndCurrentTable_data *StorageTmp, struct mxFarEndCurrentTable_data *StorageOld)
+{
+	/* XXX: provide code to check the row for consistency */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int update_mxFarEndCurrentTable_row(struct mxFarEndCurrentTable_data *StorageTmp, struct mxFarEndCurrentTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the set operation (ACTION phase) on a row
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to update, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the COMMIT phase.  The start of the ACTION phase performs a consistency check on
+ * the row before allowing the request to proceed to the COMMIT phase.  The COMMIT phase then
+ * arrives here with consistency already checked (see check_mxFarEndCurrentTable_row()).  This function can
+ * return SNMP_ERR_NOERROR or SNMP_ERR_COMMITFAILED.  Values in StorageOld are the values before the
+ * varbinds on the row were applied: the values in StorageTmp are the new values.
+ */
+int
+update_mxFarEndCurrentTable_row(struct mxFarEndCurrentTable_data *StorageTmp, struct mxFarEndCurrentTable_data *StorageOld)
+{
+	/* XXX: provide code to update the row with the underlying device */
+	mxFarEndCurrentTable_refresh = 1;
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int revert_mxFarEndCurrentTable_row(struct mxFarEndCurrentTable_data *StorageTmp, struct mxFarEndCurrentTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the undo operation (UNDO phase) on a row
+ */
+void
+revert_mxFarEndCurrentTable_row(struct mxFarEndCurrentTable_data *StorageTmp, struct mxFarEndCurrentTable_data *StorageOld)
+{
+	/* XXX: provide code to revert the row with the underlying device */
+	update_mxFarEndCurrentTable_row(StorageOld, NULL);
 }
 
 /**
@@ -6935,7 +9862,50 @@ refresh_mxFarEndCurrentTable_row(struct mxFarEndCurrentTable_data *StorageTmp, i
 		return (StorageTmp);
 	/* XXX: update row; delete it and return NULL if the row has disappeared */
 	StorageTmp->mxFarEndCurrentTable_request = sa_request;
+	{
+		int fd;
+		struct strioctl ioc = {};
+		char devname[19+FMNAMESZ+1] = {};
+		struct {
+			struct mx_stats stats;
+			struct mx_stats_span span;
+		} buf = {};
+
+		snprintf(devname, 19+FMNAMESZ+1, "/dev/streams/clone/%s", StorageTmp->mxDrivName);
+		if ((fd = open(devname, O_RDWR)) < 0) {
+			snmp_log(MY_FACILITY(LOG_ERR), "%s: %s: %s: %s", __FUNCTION__, "open()", devname, strerror(errno));
+			goto error;
+		}
+		buf.stats.type = MX_OBJ_TYPE_SPAN;
+		buf.stats.id = StorageTmp->mxFarEndCurrentTable_id;
+		buf.stats.interval = 0; /* current */
+		buf.stats.time = 0; /* returned */
+		buf.stats.stamp = 0; /* returned */
+		ioc.ic_cmd = MX_IOCGSTATS;
+		ioc.ic_timout = 0;
+		ioc.ic_len = sizeof(buf);
+		ioc.ic_dp = (char *) &buf;
+		if (ioctl(fd, I_STR, &ioc) < 0) {
+			snmp_log(MY_FACILITY(LOG_ERR), "%s: %s: %s: %s", __FUNCTION__, "ioctl()", "MX_IOCGSTATS", strerror(errno));
+			goto error;
+		}
+		StorageTmp->mxFarEndCurrentTimeElapsed = buf.stats.time;
+		StorageTmp->mxFarEndCurrentESs = buf.span.mxFarEndESs;
+		StorageTmp->mxFarEndCurrentSESs = buf.span.mxFarEndSESs;
+		StorageTmp->mxFarEndCurrentSEFSs = buf.span.mxFarEndSEFSs;
+		StorageTmp->mxFarEndCurrentUASs = buf.span.mxFarEndUASs;
+		StorageTmp->mxFarEndCurrentCSSs = buf.span.mxFarEndCSSs;
+		StorageTmp->mxFarEndCurrentPCVs = buf.span.mxFarEndPCVs;
+		StorageTmp->mxFarEndCurrentLESs = buf.span.mxFarEndLESs;
+		StorageTmp->mxFarEndCurrentBESs = buf.span.mxFarEndBESs;
+		StorageTmp->mxFarEndCurrentDMs = buf.span.mxFarEndDMs;
+	}
 	return (StorageTmp);
+      error:
+	mxFarEndCurrentTable_del(StorageTmp);
+	mxFarEndCurrentTable_destroy(&StorageTmp);
+	return (NULL);
+
 }
 
 /**
@@ -6952,11 +9922,129 @@ refresh_mxFarEndCurrentTable_row(struct mxFarEndCurrentTable_data *StorageTmp, i
 void
 refresh_mxFarEndCurrentTable(int force)
 {
+	struct header_complex_index *h, *h_next;
+
 	refresh_mxSpanTable(force);
 	if (!force && mxFarEndCurrentTable_refresh == 0)
 		return;
 	/* XXX: Here, update the table as required... */
 	mxFarEndCurrentTable_refresh = 0;
+	for (h = mxSpanTableStorage; h; h = h->next) {
+		/* for each entry in the span table */
+		int fd;
+		struct header_complex_index *hciptr;
+		struct mxSpanTable_data *span = h->data;
+		struct strioctl ioc = {};
+		char devname[19+FMNAMESZ+1] = {};
+		struct {
+			struct mx_stats stats;
+			struct mx_stats_span span;
+		} buf = {};
+
+		snprintf(devname, 19+FMNAMESZ+1, "/dev/streams/clone/%s", span->mxDrivName);
+		if ((fd = open(devname, O_RDWR)) < 0) {
+			snmp_log(MY_FACILITY(LOG_ERR), "%s: %s: %s: %s", __FUNCTION__, "open()", devname, strerror(errno));
+			continue;
+		}
+		buf.stats.type = MX_OBJ_TYPE_SPAN;
+		buf.stats.id = span->mxSpanTable_id;
+		buf.stats.interval = 0; /* current */
+		buf.stats.time = 0; /* returned */
+		buf.stats.stamp = 0; /* returned */
+		ioc.ic_cmd = MX_IOCGSTATS;
+		ioc.ic_timout = 0;
+		ioc.ic_len = sizeof(buf);
+		ioc.ic_dp = (char *) &buf;
+		if (ioctl(fd, I_STR, &ioc) < 0) {
+			snmp_log(MY_FACILITY(LOG_ERR), "%s: %s: %s: %s", __FUNCTION__, "ioctl()", "MX_IOCGSTATS", strerror(errno));
+			continue;
+		}
+		for (hciptr = mxFarEndCurrentTableStorage; hciptr; hciptr = hciptr->next) {
+			struct mxFarEndCurrentTable_data *data = hciptr->data;
+
+			if (data->mxFarEndCurrentTable_id != 0 && data->mxFarEndCurrentTable_id != span->mxSpanTable_id)
+				continue;
+			if (data->mxDrivNameLen != span->mxDrivNameLen || strncmp((char *) data->mxDrivName, (char *)span->mxDrivName, span->mxDrivNameLen))
+				continue;
+			if (data->mxCardIndex != span->mxCardIndex)
+				continue;
+			if (data->mxSpanIndex != span->mxSpanIndex)
+				continue;
+			break;
+		}
+		if (hciptr) {
+			/* already have an entry for this span index, simply update it */
+			struct mxFarEndCurrentTable_data *StorageTmp = hciptr->data;
+			char *tmp;
+
+			StorageTmp->mxFarEndCurrentTable_request = sa_request;
+			StorageTmp->mxFarEndCurrentTable_refs = 1;
+			StorageTmp->mxFarEndCurrentTable_id = span->mxSpanTable_id;
+			/* copy driver name from span entry */
+			if ((tmp = strndup((char *) span->mxDrivName, span->mxDrivNameLen))) {
+				SNMP_FREE(StorageTmp->mxDrivName);
+				StorageTmp->mxDrivName = (uint8_t *) tmp;
+				StorageTmp->mxDrivNameLen = span->mxDrivNameLen;
+				StorageTmp->mxDrivName[StorageTmp->mxDrivNameLen] = '\0';
+			}
+			StorageTmp->mxCardIndex = span->mxCardIndex;
+			StorageTmp->mxSpanIndex = span->mxSpanIndex;
+			StorageTmp->mxFarEndCurrentTimeElapsed = buf.stats.time;
+			StorageTmp->mxFarEndCurrentESs = buf.span.mxFarEndESs;
+			StorageTmp->mxFarEndCurrentSESs = buf.span.mxFarEndSESs;
+			StorageTmp->mxFarEndCurrentSEFSs = buf.span.mxFarEndSEFSs;
+			StorageTmp->mxFarEndCurrentUASs = buf.span.mxFarEndUASs;
+			StorageTmp->mxFarEndCurrentCSSs = buf.span.mxFarEndCSSs;
+			StorageTmp->mxFarEndCurrentPCVs = buf.span.mxFarEndPCVs;
+			StorageTmp->mxFarEndCurrentLESs = buf.span.mxFarEndLESs;
+			StorageTmp->mxFarEndCurrentBESs = buf.span.mxFarEndBESs;
+			StorageTmp->mxFarEndCurrentDMs = buf.span.mxFarEndDMs;
+		} else {
+			struct mxFarEndCurrentTable_data *StorageNew = SNMP_MALLOC_STRUCT(mxFarEndCurrentTable_data);
+			char *tmp;
+
+			if (!StorageNew) continue;
+			StorageNew->mxFarEndCurrentTable_request = sa_request;
+			StorageNew->mxFarEndCurrentTable_refs = 1;
+			StorageNew->mxFarEndCurrentTable_id = span->mxSpanTable_id;
+			/* copy driver name from span entry */
+			if (!(tmp = strndup((char *) span->mxDrivName, span->mxDrivNameLen))) {
+				snmp_log(MY_FACILITY(LOG_ERR), "%s: %s: %s", __FUNCTION__, "strndup()", strerror(errno));
+				mxFarEndCurrentTable_destroy(&StorageNew);
+				continue;
+			}
+			StorageNew->mxDrivName = (uint8_t *) tmp;
+			StorageNew->mxCardIndex = span->mxCardIndex;
+			StorageNew->mxSpanIndex = span->mxSpanIndex;
+			StorageNew->mxFarEndCurrentTimeElapsed = buf.stats.time;
+			StorageNew->mxFarEndCurrentESs = buf.span.mxFarEndESs;
+			StorageNew->mxFarEndCurrentSESs = buf.span.mxFarEndSESs;
+			StorageNew->mxFarEndCurrentSEFSs = buf.span.mxFarEndSEFSs;
+			StorageNew->mxFarEndCurrentUASs = buf.span.mxFarEndUASs;
+			StorageNew->mxFarEndCurrentCSSs = buf.span.mxFarEndCSSs;
+			StorageNew->mxFarEndCurrentPCVs = buf.span.mxFarEndPCVs;
+			StorageNew->mxFarEndCurrentLESs = buf.span.mxFarEndLESs;
+			StorageNew->mxFarEndCurrentBESs = buf.span.mxFarEndBESs;
+			StorageNew->mxFarEndCurrentDMs = buf.span.mxFarEndDMs;
+			mxFarEndCurrentTable_add(StorageNew);
+		}
+		close(fd);
+	}
+	/* delete unused entries */
+	h_next = mxFarEndCurrentTableStorage;
+	while ((h = h_next)) {
+		struct mxFarEndCurrentTable_data *data = h->data;
+
+		h_next = h->next;
+		if (data->mxFarEndCurrentTable_refs)
+			data->mxFarEndCurrentTable_refs = 0;
+		else {
+			header_complex_extract_entry(&mxFarEndCurrentTableStorage, h);
+			mxFarEndCurrentTable_destroy(&data);
+		}
+	}
+	/* done */
+	return;
 }
 
 /**
@@ -7051,6 +10139,64 @@ var_mxFarEndCurrentTable(struct variable *vp, oid * name, size_t *length, int ex
 }
 
 /**
+ * @fn int check_mxFarEndIntervalTable_row(struct mxFarEndIntervalTable_data *StorageTmp, struct mxFarEndIntervalTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to check, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the ACTION phase.  The start of the ACTION pahse performs this consitency check
+ * on the row before allowing the request to proceed to the COMMIT phase.  This function can return
+ * SNMP_ERR_NOERR or a specific SNMP error value.  Values in StorageOld are the values before the
+ * varbinds on the mib were applied; the values in StorageTmp are the new values.  The function is
+ * permitted to change the values in StorageTmp to correct them; however, preference should be made
+ * for setting values where were not in the varbinds.
+ */
+int
+check_mxFarEndIntervalTable_row(struct mxFarEndIntervalTable_data *StorageTmp, struct mxFarEndIntervalTable_data *StorageOld)
+{
+	/* XXX: provide code to check the row for consistency */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int update_mxFarEndIntervalTable_row(struct mxFarEndIntervalTable_data *StorageTmp, struct mxFarEndIntervalTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the set operation (ACTION phase) on a row
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to update, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the COMMIT phase.  The start of the ACTION phase performs a consistency check on
+ * the row before allowing the request to proceed to the COMMIT phase.  The COMMIT phase then
+ * arrives here with consistency already checked (see check_mxFarEndIntervalTable_row()).  This function can
+ * return SNMP_ERR_NOERROR or SNMP_ERR_COMMITFAILED.  Values in StorageOld are the values before the
+ * varbinds on the row were applied: the values in StorageTmp are the new values.
+ */
+int
+update_mxFarEndIntervalTable_row(struct mxFarEndIntervalTable_data *StorageTmp, struct mxFarEndIntervalTable_data *StorageOld)
+{
+	/* XXX: provide code to update the row with the underlying device */
+	mxFarEndIntervalTable_refresh = 1;
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int revert_mxFarEndIntervalTable_row(struct mxFarEndIntervalTable_data *StorageTmp, struct mxFarEndIntervalTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the undo operation (UNDO phase) on a row
+ */
+void
+revert_mxFarEndIntervalTable_row(struct mxFarEndIntervalTable_data *StorageTmp, struct mxFarEndIntervalTable_data *StorageOld)
+{
+	/* XXX: provide code to revert the row with the underlying device */
+	update_mxFarEndIntervalTable_row(StorageOld, NULL);
+}
+
+/**
  * @fn void refresh_mxFarEndIntervalTable_row(struct mxFarEndIntervalTable_data *StorageTmp, int force)
  * @param StorageTmp the data row to refresh.
  * @param force force refresh if non-zero.
@@ -7067,7 +10213,49 @@ refresh_mxFarEndIntervalTable_row(struct mxFarEndIntervalTable_data *StorageTmp,
 		return (StorageTmp);
 	/* XXX: update row; delete it and return NULL if the row has disappeared */
 	StorageTmp->mxFarEndIntervalTable_request = sa_request;
+	{
+		int fd;
+		struct strioctl ioc = {};
+		char devname[19+FMNAMESZ+1] = {};
+		struct {
+			struct mx_stats stats;
+			struct mx_stats_span span;
+		} buf = {};
+
+		snprintf(devname, 19+FMNAMESZ+1, "/dev/streams/clone/%s", StorageTmp->mxDrivName);
+		if ((fd = open(devname, O_RDWR)) < 0) {
+			snmp_log(MY_FACILITY(LOG_ERR), "%s: %s: %s: %s", __FUNCTION__, "open()", devname, strerror(errno));
+			goto error;
+		}
+		buf.stats.type = MX_OBJ_TYPE_SPAN;
+		buf.stats.id = StorageTmp->mxFarEndIntervalTable_id;
+		buf.stats.interval = StorageTmp->mxFarEndIntervalIndex; /* specific index */
+		buf.stats.time = 0; /* returned */
+		buf.stats.stamp = 0; /* returned */
+		ioc.ic_cmd = MX_IOCGSTATS;
+		ioc.ic_timout = 0;
+		ioc.ic_len = sizeof(buf);
+		ioc.ic_dp = (char *) &buf;
+		if (ioctl(fd, I_STR, &ioc) < 0) {
+			snmp_log(MY_FACILITY(LOG_ERR), "%s: %s: %s: %s", __FUNCTION__, "ioctl()", "MX_IOCGSTATS", strerror(errno));
+			goto error;
+		}
+		StorageTmp->mxFarEndIntervalESs = buf.span.mxFarEndESs;
+		StorageTmp->mxFarEndIntervalSESs = buf.span.mxFarEndSESs;
+		StorageTmp->mxFarEndIntervalSEFSs = buf.span.mxFarEndSEFSs;
+		StorageTmp->mxFarEndIntervalUASs = buf.span.mxFarEndUASs;
+		StorageTmp->mxFarEndIntervalCSSs = buf.span.mxFarEndCSSs;
+		StorageTmp->mxFarEndIntervalPCVs = buf.span.mxFarEndPCVs;
+		StorageTmp->mxFarEndIntervalLESs = buf.span.mxFarEndLESs;
+		StorageTmp->mxFarEndIntervalBESs = buf.span.mxFarEndBESs;
+		StorageTmp->mxFarEndIntervalDMs = buf.span.mxFarEndDMs;
+		StorageTmp->mxFarEndIntervalValidData = buf.span.mxFarEndValidData;
+	}
 	return (StorageTmp);
+      error:
+	mxFarEndIntervalTable_del(StorageTmp);
+	mxFarEndIntervalTable_destroy(&StorageTmp);
+	return (NULL);
 }
 
 /**
@@ -7183,6 +10371,64 @@ var_mxFarEndIntervalTable(struct variable *vp, oid * name, size_t *length, int e
 }
 
 /**
+ * @fn int check_mxFarEndTotalTable_row(struct mxFarEndTotalTable_data *StorageTmp, struct mxFarEndTotalTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to check, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the ACTION phase.  The start of the ACTION pahse performs this consitency check
+ * on the row before allowing the request to proceed to the COMMIT phase.  This function can return
+ * SNMP_ERR_NOERR or a specific SNMP error value.  Values in StorageOld are the values before the
+ * varbinds on the mib were applied; the values in StorageTmp are the new values.  The function is
+ * permitted to change the values in StorageTmp to correct them; however, preference should be made
+ * for setting values where were not in the varbinds.
+ */
+int
+check_mxFarEndTotalTable_row(struct mxFarEndTotalTable_data *StorageTmp, struct mxFarEndTotalTable_data *StorageOld)
+{
+	/* XXX: provide code to check the row for consistency */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int update_mxFarEndTotalTable_row(struct mxFarEndTotalTable_data *StorageTmp, struct mxFarEndTotalTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the set operation (ACTION phase) on a row
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to update, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the COMMIT phase.  The start of the ACTION phase performs a consistency check on
+ * the row before allowing the request to proceed to the COMMIT phase.  The COMMIT phase then
+ * arrives here with consistency already checked (see check_mxFarEndTotalTable_row()).  This function can
+ * return SNMP_ERR_NOERROR or SNMP_ERR_COMMITFAILED.  Values in StorageOld are the values before the
+ * varbinds on the row were applied: the values in StorageTmp are the new values.
+ */
+int
+update_mxFarEndTotalTable_row(struct mxFarEndTotalTable_data *StorageTmp, struct mxFarEndTotalTable_data *StorageOld)
+{
+	/* XXX: provide code to update the row with the underlying device */
+	mxFarEndTotalTable_refresh = 1;
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int revert_mxFarEndTotalTable_row(struct mxFarEndTotalTable_data *StorageTmp, struct mxFarEndTotalTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the undo operation (UNDO phase) on a row
+ */
+void
+revert_mxFarEndTotalTable_row(struct mxFarEndTotalTable_data *StorageTmp, struct mxFarEndTotalTable_data *StorageOld)
+{
+	/* XXX: provide code to revert the row with the underlying device */
+	update_mxFarEndTotalTable_row(StorageOld, NULL);
+}
+
+/**
  * @fn void refresh_mxFarEndTotalTable_row(struct mxFarEndTotalTable_data *StorageTmp, int force)
  * @param StorageTmp the data row to refresh.
  * @param force force refresh if non-zero.
@@ -7199,7 +10445,50 @@ refresh_mxFarEndTotalTable_row(struct mxFarEndTotalTable_data *StorageTmp, int f
 		return (StorageTmp);
 	/* XXX: update row; delete it and return NULL if the row has disappeared */
 	StorageTmp->mxFarEndTotalTable_request = sa_request;
+	{
+		int fd;
+		struct strioctl ioc = {};
+		char devname[19+FMNAMESZ+1] = {};
+		struct {
+			struct mx_stats stats;
+			struct mx_stats_span span;
+		} buf = {};
+
+		snprintf(devname, 19+FMNAMESZ+1, "/dev/stream/clone/%s", StorageTmp->mxDrivName);
+		if ((fd = open(devname, O_RDWR)) < 0) {
+			snmp_log(MY_FACILITY(LOG_ERR), "%s: %s: %s: %s", __FUNCTION__, "open()", devname, strerror(errno));
+			goto error;
+		}
+		buf.stats.type = MX_OBJ_TYPE_SPAN;
+		buf.stats.id = StorageTmp->mxFarEndTotalTable_id;
+		buf.stats.interval = -1UL; /* totals */
+		buf.stats.time = 0; /* returned */
+		buf.stats.stamp = 0; /* returned */
+		ioc.ic_cmd = MX_IOCGSTATS;
+		ioc.ic_timout = 0;
+		ioc.ic_len = sizeof(buf);
+		ioc.ic_dp = (char *) &buf;
+		if (ioctl(fd, I_STR, &ioc) < 0) {
+			snmp_log(MY_FACILITY(LOG_ERR), "%s: %s: %s: %s", __FUNCTION__, "ioctl()", "MX_IOCGSTATS", strerror(errno));
+			goto error;
+		}
+		StorageTmp->mxFarEndTotalValidIntervals = buf.span.mxValidIntervals;
+		StorageTmp->mxFarEndTotalInvalidIntervals = buf.span.mxInvalidIntervals;
+		StorageTmp->mxFarEndTotalESs = buf.span.mxFarEndESs;
+		StorageTmp->mxFarEndTotalSESs = buf.span.mxFarEndSESs;
+		StorageTmp->mxFarEndTotalSEFSs = buf.span.mxFarEndSEFSs;
+		StorageTmp->mxFarEndTotalUASs = buf.span.mxFarEndUASs;
+		StorageTmp->mxFarEndTotalCSSs = buf.span.mxFarEndCSSs;
+		StorageTmp->mxFarEndTotalPCVs = buf.span.mxFarEndPCVs;
+		StorageTmp->mxFarEndTotalLESs = buf.span.mxFarEndLESs;
+		StorageTmp->mxFarEndTotalBESs = buf.span.mxFarEndBESs;
+		StorageTmp->mxFarEndTotalDMs = buf.span.mxFarEndDMs;
+	}
 	return (StorageTmp);
+      error:
+	mxFarEndTotalTable_del(StorageTmp);
+	mxFarEndTotalTable_destroy(&StorageTmp);
+	return (NULL);
 }
 
 /**
@@ -7216,7 +10505,6 @@ refresh_mxFarEndTotalTable_row(struct mxFarEndTotalTable_data *StorageTmp, int f
 void
 refresh_mxFarEndTotalTable(int force)
 {
-	refresh_mxSpanTable(force);
 	if (!force && mxFarEndTotalTable_refresh == 0)
 		return;
 	/* XXX: Here, update the table as required... */
@@ -7334,17 +10622,17 @@ var_mxFarEndTotalTable(struct variable *vp, oid * name, size_t *length, int exac
 int
 write_mxSyncSpanId(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static uint8_t *old_value;
-	struct mxSyncTable_data *StorageTmp = NULL;
+	struct mxSyncTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 15;
-	static size_t old_length = 0;
-	static uint8_t *string = NULL;
+	uint8_t *string = NULL;
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("mxMIB", "write_mxSyncSpanId entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(mxSyncTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
-		string = NULL;
 		if (StorageTmp != NULL && statP == NULL) {
 			/* have row but no column */
 			switch (StorageTmp->mxSyncRowStatus) {
@@ -7367,33 +10655,73 @@ write_mxSyncSpanId(int action, u_char *var_val, u_char var_val_type, size_t var_
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to mxSyncSpanId: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
-		break;
-	case RESERVE2:		/* memory reseveration, final preparation... */
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->mxSyncTable_old) == NULL)
+			if (StorageTmp->mxSyncTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->mxSyncTable_old = mxSyncTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->mxSyncTable_rsvs++;
 		if ((string = malloc(var_val_len + 1)) == NULL)
 			return SNMP_ERR_RESOURCEUNAVAILABLE;
 		memcpy((void *) string, (void *) var_val, var_val_len);
 		string[var_val_len] = 0;
+		SNMP_FREE(StorageTmp->mxSyncSpanId);
+		StorageTmp->mxSyncSpanId = string;
+		StorageTmp->mxSyncSpanIdLen = var_val_len;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
+		break;
+	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->mxSyncTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->mxSyncTable_tsts == 0)
+				if ((ret = check_mxSyncTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->mxSyncTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->mxSyncSpanId for you to use, and you have just been asked to do something with it.  Note that anything done here must be 
 				   reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->mxSyncSpanId;
-		old_length = StorageTmp->mxSyncSpanIdLen;
-		StorageTmp->mxSyncSpanId = string;
-		StorageTmp->mxSyncSpanIdLen = var_val_len;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->mxSyncTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->mxSyncTable_sets == 0)
+				if ((ret = update_mxSyncTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->mxSyncTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
-		SNMP_FREE(old_value);
-		old_length = 0;
-		string = NULL;
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->mxSyncTable_old) != NULL) {
+			mxSyncTable_destroy(&StorageTmp->mxSyncTable_old);
+			StorageTmp->mxSyncTable_rsvs = 0;
+			StorageTmp->mxSyncTable_tsts = 0;
+			StorageTmp->mxSyncTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->mxSyncSpanId = old_value;
-		StorageTmp->mxSyncSpanIdLen = old_length;
+		if ((StorageOld = StorageTmp->mxSyncTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->mxSyncTable_sets == 0)
+			revert_mxSyncTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
-		SNMP_FREE(string);
+		if ((StorageOld = StorageTmp->mxSyncTable_old) == NULL)
+			break;
+		if (StorageOld->mxSyncSpanId != NULL) {
+			SNMP_FREE(StorageTmp->mxSyncSpanId);
+			StorageTmp->mxSyncSpanId = StorageOld->mxSyncSpanId;
+			StorageTmp->mxSyncSpanIdLen = StorageOld->mxSyncSpanIdLen;
+			StorageOld->mxSyncSpanId = NULL;
+			StorageOld->mxSyncSpanIdLen = 0;
+		}
+		if (--StorageTmp->mxSyncTable_rsvs == 0)
+			mxSyncTable_destroy(&StorageTmp->mxSyncTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -7413,12 +10741,14 @@ write_mxSyncSpanId(int action, u_char *var_val, u_char var_val_type, size_t var_
 int
 write_mxCardSpanType(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static long old_value;
-	struct mxCardTable_data *StorageTmp = NULL;
+	struct mxCardTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 15;
 	long set_value = *((long *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("mxMIB", "write_mxCardSpanType entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(mxCardTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -7453,22 +10783,61 @@ write_mxCardSpanType(int action, u_char *var_val, u_char var_val_type, size_t va
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to mxCardSpanType: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->mxCardTable_old) == NULL)
+			if (StorageTmp->mxCardTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->mxCardTable_old = mxCardTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->mxCardTable_rsvs++;
+		StorageTmp->mxCardSpanType = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->mxCardTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->mxCardTable_tsts == 0)
+				if ((ret = check_mxCardTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->mxCardTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->mxCardSpanType for you to use, and you have just been asked to do something with it.  Note that anything done here must
 				   be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->mxCardSpanType;
-		StorageTmp->mxCardSpanType = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->mxCardTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->mxCardTable_sets == 0)
+				if ((ret = update_mxCardTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->mxCardTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->mxCardTable_old) != NULL) {
+			mxCardTable_destroy(&StorageTmp->mxCardTable_old);
+			StorageTmp->mxCardTable_rsvs = 0;
+			StorageTmp->mxCardTable_tsts = 0;
+			StorageTmp->mxCardTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->mxCardSpanType = old_value;
+		if ((StorageOld = StorageTmp->mxCardTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->mxCardTable_sets == 0)
+			revert_mxCardTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->mxCardTable_old) == NULL)
+			break;
+		StorageTmp->mxCardSpanType = StorageOld->mxCardSpanType;
+		if (--StorageTmp->mxCardTable_rsvs == 0)
+			mxCardTable_destroy(&StorageTmp->mxCardTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -7488,17 +10857,17 @@ write_mxCardSpanType(int action, u_char *var_val, u_char var_val_type, size_t va
 int
 write_mxCardMode(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static uint8_t *old_value;
-	struct mxCardTable_data *StorageTmp = NULL;
+	struct mxCardTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 15;
-	static size_t old_length = 0;
-	static uint8_t *string = NULL;
+	uint8_t *string = NULL;
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("mxMIB", "write_mxCardMode entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(mxCardTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
-		string = NULL;
 		if (StorageTmp != NULL && statP == NULL) {
 			/* have row but no column */
 			switch (StorageTmp->mxCardStatus) {
@@ -7528,33 +10897,73 @@ write_mxCardMode(int action, u_char *var_val, u_char var_val_type, size_t var_va
 				return SNMP_ERR_WRONGLENGTH;
 			}
 		}
-		break;
-	case RESERVE2:		/* memory reseveration, final preparation... */
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->mxCardTable_old) == NULL)
+			if (StorageTmp->mxCardTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->mxCardTable_old = mxCardTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->mxCardTable_rsvs++;
 		if ((string = malloc(var_val_len + 1)) == NULL)
 			return SNMP_ERR_RESOURCEUNAVAILABLE;
 		memcpy((void *) string, (void *) var_val, var_val_len);
 		string[var_val_len] = 0;
+		SNMP_FREE(StorageTmp->mxCardMode);
+		StorageTmp->mxCardMode = string;
+		StorageTmp->mxCardModeLen = var_val_len;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
+		break;
+	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->mxCardTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->mxCardTable_tsts == 0)
+				if ((ret = check_mxCardTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->mxCardTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->mxCardMode for you to use, and you have just been asked to do something with it.  Note that anything done here must be
 				   reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->mxCardMode;
-		old_length = StorageTmp->mxCardModeLen;
-		StorageTmp->mxCardMode = string;
-		StorageTmp->mxCardModeLen = var_val_len;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->mxCardTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->mxCardTable_sets == 0)
+				if ((ret = update_mxCardTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->mxCardTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
-		SNMP_FREE(old_value);
-		old_length = 0;
-		string = NULL;
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->mxCardTable_old) != NULL) {
+			mxCardTable_destroy(&StorageTmp->mxCardTable_old);
+			StorageTmp->mxCardTable_rsvs = 0;
+			StorageTmp->mxCardTable_tsts = 0;
+			StorageTmp->mxCardTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->mxCardMode = old_value;
-		StorageTmp->mxCardModeLen = old_length;
+		if ((StorageOld = StorageTmp->mxCardTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->mxCardTable_sets == 0)
+			revert_mxCardTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
-		SNMP_FREE(string);
+		if ((StorageOld = StorageTmp->mxCardTable_old) == NULL)
+			break;
+		if (StorageOld->mxCardMode != NULL) {
+			SNMP_FREE(StorageTmp->mxCardMode);
+			StorageTmp->mxCardMode = StorageOld->mxCardMode;
+			StorageTmp->mxCardModeLen = StorageOld->mxCardModeLen;
+			StorageOld->mxCardMode = NULL;
+			StorageOld->mxCardModeLen = 0;
+		}
+		if (--StorageTmp->mxCardTable_rsvs == 0)
+			mxCardTable_destroy(&StorageTmp->mxCardTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -7574,12 +10983,14 @@ write_mxCardMode(int action, u_char *var_val, u_char var_val_type, size_t var_va
 int
 write_mxCardSyncMaster(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static long old_value;
-	struct mxCardTable_data *StorageTmp = NULL;
+	struct mxCardTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 15;
 	long set_value = *((long *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("mxMIB", "write_mxCardSyncMaster entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(mxCardTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -7612,22 +11023,61 @@ write_mxCardSyncMaster(int action, u_char *var_val, u_char var_val_type, size_t 
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to mxCardSyncMaster: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->mxCardTable_old) == NULL)
+			if (StorageTmp->mxCardTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->mxCardTable_old = mxCardTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->mxCardTable_rsvs++;
+		StorageTmp->mxCardSyncMaster = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->mxCardTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->mxCardTable_tsts == 0)
+				if ((ret = check_mxCardTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->mxCardTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->mxCardSyncMaster for you to use, and you have just been asked to do something with it.  Note that anything done here
 				   must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->mxCardSyncMaster;
-		StorageTmp->mxCardSyncMaster = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->mxCardTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->mxCardTable_sets == 0)
+				if ((ret = update_mxCardTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->mxCardTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->mxCardTable_old) != NULL) {
+			mxCardTable_destroy(&StorageTmp->mxCardTable_old);
+			StorageTmp->mxCardTable_rsvs = 0;
+			StorageTmp->mxCardTable_tsts = 0;
+			StorageTmp->mxCardTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->mxCardSyncMaster = old_value;
+		if ((StorageOld = StorageTmp->mxCardTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->mxCardTable_sets == 0)
+			revert_mxCardTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->mxCardTable_old) == NULL)
+			break;
+		StorageTmp->mxCardSyncMaster = StorageOld->mxCardSyncMaster;
+		if (--StorageTmp->mxCardTable_rsvs == 0)
+			mxCardTable_destroy(&StorageTmp->mxCardTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -7647,12 +11097,14 @@ write_mxCardSyncMaster(int action, u_char *var_val, u_char var_val_type, size_t 
 int
 write_mxCardSyncSource(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static long old_value;
-	struct mxCardTable_data *StorageTmp = NULL;
+	struct mxCardTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 15;
 	long set_value = *((long *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("mxMIB", "write_mxCardSyncSource entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(mxCardTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -7690,22 +11142,61 @@ write_mxCardSyncSource(int action, u_char *var_val, u_char var_val_type, size_t 
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to mxCardSyncSource: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->mxCardTable_old) == NULL)
+			if (StorageTmp->mxCardTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->mxCardTable_old = mxCardTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->mxCardTable_rsvs++;
+		StorageTmp->mxCardSyncSource = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->mxCardTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->mxCardTable_tsts == 0)
+				if ((ret = check_mxCardTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->mxCardTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->mxCardSyncSource for you to use, and you have just been asked to do something with it.  Note that anything done here
 				   must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->mxCardSyncSource;
-		StorageTmp->mxCardSyncSource = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->mxCardTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->mxCardTable_sets == 0)
+				if ((ret = update_mxCardTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->mxCardTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->mxCardTable_old) != NULL) {
+			mxCardTable_destroy(&StorageTmp->mxCardTable_old);
+			StorageTmp->mxCardTable_rsvs = 0;
+			StorageTmp->mxCardTable_tsts = 0;
+			StorageTmp->mxCardTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->mxCardSyncSource = old_value;
+		if ((StorageOld = StorageTmp->mxCardTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->mxCardTable_sets == 0)
+			revert_mxCardTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->mxCardTable_old) == NULL)
+			break;
+		StorageTmp->mxCardSyncSource = StorageOld->mxCardSyncSource;
+		if (--StorageTmp->mxCardTable_rsvs == 0)
+			mxCardTable_destroy(&StorageTmp->mxCardTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -7725,12 +11216,14 @@ write_mxCardSyncSource(int action, u_char *var_val, u_char var_val_type, size_t 
 int
 write_mxCardSyncGroup(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static ulong old_value;
-	struct mxCardTable_data *StorageTmp = NULL;
+	struct mxCardTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 15;
 	ulong set_value = *((ulong *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("mxMIB", "write_mxCardSyncGroup entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(mxCardTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -7760,22 +11253,61 @@ write_mxCardSyncGroup(int action, u_char *var_val, u_char var_val_type, size_t v
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to mxCardSyncGroup: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->mxCardTable_old) == NULL)
+			if (StorageTmp->mxCardTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->mxCardTable_old = mxCardTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->mxCardTable_rsvs++;
+		StorageTmp->mxCardSyncGroup = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->mxCardTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->mxCardTable_tsts == 0)
+				if ((ret = check_mxCardTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->mxCardTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->mxCardSyncGroup for you to use, and you have just been asked to do something with it.  Note that anything done here must 
 				   be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->mxCardSyncGroup;
-		StorageTmp->mxCardSyncGroup = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->mxCardTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->mxCardTable_sets == 0)
+				if ((ret = update_mxCardTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->mxCardTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->mxCardTable_old) != NULL) {
+			mxCardTable_destroy(&StorageTmp->mxCardTable_old);
+			StorageTmp->mxCardTable_rsvs = 0;
+			StorageTmp->mxCardTable_tsts = 0;
+			StorageTmp->mxCardTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->mxCardSyncGroup = old_value;
+		if ((StorageOld = StorageTmp->mxCardTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->mxCardTable_sets == 0)
+			revert_mxCardTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->mxCardTable_old) == NULL)
+			break;
+		StorageTmp->mxCardSyncGroup = StorageOld->mxCardSyncGroup;
+		if (--StorageTmp->mxCardTable_rsvs == 0)
+			mxCardTable_destroy(&StorageTmp->mxCardTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -7795,12 +11327,14 @@ write_mxCardSyncGroup(int action, u_char *var_val, u_char var_val_type, size_t v
 int
 write_mxCardAdministrativeState(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static long old_value;
-	struct mxCardTable_data *StorageTmp = NULL;
+	struct mxCardTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 15;
 	long set_value = *((long *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("mxMIB", "write_mxCardAdministrativeState entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(mxCardTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -7835,22 +11369,61 @@ write_mxCardAdministrativeState(int action, u_char *var_val, u_char var_val_type
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to mxCardAdministrativeState: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->mxCardTable_old) == NULL)
+			if (StorageTmp->mxCardTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->mxCardTable_old = mxCardTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->mxCardTable_rsvs++;
+		StorageTmp->mxCardAdministrativeState = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->mxCardTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->mxCardTable_tsts == 0)
+				if ((ret = check_mxCardTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->mxCardTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->mxCardAdministrativeState for you to use, and you have just been asked to do something with it.  Note that anything done 
 				   here must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->mxCardAdministrativeState;
-		StorageTmp->mxCardAdministrativeState = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->mxCardTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->mxCardTable_sets == 0)
+				if ((ret = update_mxCardTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->mxCardTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->mxCardTable_old) != NULL) {
+			mxCardTable_destroy(&StorageTmp->mxCardTable_old);
+			StorageTmp->mxCardTable_rsvs = 0;
+			StorageTmp->mxCardTable_tsts = 0;
+			StorageTmp->mxCardTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->mxCardAdministrativeState = old_value;
+		if ((StorageOld = StorageTmp->mxCardTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->mxCardTable_sets == 0)
+			revert_mxCardTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->mxCardTable_old) == NULL)
+			break;
+		StorageTmp->mxCardAdministrativeState = StorageOld->mxCardAdministrativeState;
+		if (--StorageTmp->mxCardTable_rsvs == 0)
+			mxCardTable_destroy(&StorageTmp->mxCardTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -7870,17 +11443,17 @@ write_mxCardAdministrativeState(int action, u_char *var_val, u_char var_val_type
 int
 write_mxCardAlarmStatus(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static uint8_t *old_value;
-	struct mxCardTable_data *StorageTmp = NULL;
+	struct mxCardTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 15;
-	static size_t old_length = 0;
-	static uint8_t *string = NULL;
+	uint8_t *string = NULL;
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("mxMIB", "write_mxCardAlarmStatus entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(mxCardTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
-		string = NULL;
 		if (StorageTmp != NULL && statP == NULL) {
 			/* have row but no column */
 			switch (StorageTmp->mxCardStatus) {
@@ -7911,33 +11484,73 @@ write_mxCardAlarmStatus(int action, u_char *var_val, u_char var_val_type, size_t
 			}
 		}
 		/* Note: default value { } */
-		break;
-	case RESERVE2:		/* memory reseveration, final preparation... */
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->mxCardTable_old) == NULL)
+			if (StorageTmp->mxCardTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->mxCardTable_old = mxCardTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->mxCardTable_rsvs++;
 		if ((string = malloc(var_val_len + 1)) == NULL)
 			return SNMP_ERR_RESOURCEUNAVAILABLE;
 		memcpy((void *) string, (void *) var_val, var_val_len);
 		string[var_val_len] = 0;
+		SNMP_FREE(StorageTmp->mxCardAlarmStatus);
+		StorageTmp->mxCardAlarmStatus = string;
+		StorageTmp->mxCardAlarmStatusLen = var_val_len;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
+		break;
+	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->mxCardTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->mxCardTable_tsts == 0)
+				if ((ret = check_mxCardTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->mxCardTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->mxCardAlarmStatus for you to use, and you have just been asked to do something with it.  Note that anything done here
 				   must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->mxCardAlarmStatus;
-		old_length = StorageTmp->mxCardAlarmStatusLen;
-		StorageTmp->mxCardAlarmStatus = string;
-		StorageTmp->mxCardAlarmStatusLen = var_val_len;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->mxCardTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->mxCardTable_sets == 0)
+				if ((ret = update_mxCardTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->mxCardTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
-		SNMP_FREE(old_value);
-		old_length = 0;
-		string = NULL;
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->mxCardTable_old) != NULL) {
+			mxCardTable_destroy(&StorageTmp->mxCardTable_old);
+			StorageTmp->mxCardTable_rsvs = 0;
+			StorageTmp->mxCardTable_tsts = 0;
+			StorageTmp->mxCardTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->mxCardAlarmStatus = old_value;
-		StorageTmp->mxCardAlarmStatusLen = old_length;
+		if ((StorageOld = StorageTmp->mxCardTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->mxCardTable_sets == 0)
+			revert_mxCardTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
-		SNMP_FREE(string);
+		if ((StorageOld = StorageTmp->mxCardTable_old) == NULL)
+			break;
+		if (StorageOld->mxCardAlarmStatus != NULL) {
+			SNMP_FREE(StorageTmp->mxCardAlarmStatus);
+			StorageTmp->mxCardAlarmStatus = StorageOld->mxCardAlarmStatus;
+			StorageTmp->mxCardAlarmStatusLen = StorageOld->mxCardAlarmStatusLen;
+			StorageOld->mxCardAlarmStatus = NULL;
+			StorageOld->mxCardAlarmStatusLen = 0;
+		}
+		if (--StorageTmp->mxCardTable_rsvs == 0)
+			mxCardTable_destroy(&StorageTmp->mxCardTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -7957,17 +11570,17 @@ write_mxCardAlarmStatus(int action, u_char *var_val, u_char var_val_type, size_t
 int
 write_mxCardControlStatus(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static uint8_t *old_value;
-	struct mxCardTable_data *StorageTmp = NULL;
+	struct mxCardTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 15;
-	static size_t old_length = 0;
-	static uint8_t *string = NULL;
+	uint8_t *string = NULL;
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("mxMIB", "write_mxCardControlStatus entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(mxCardTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
-		string = NULL;
 		if (StorageTmp != NULL && statP == NULL) {
 			/* have row but no column */
 			switch (StorageTmp->mxCardStatus) {
@@ -7998,33 +11611,73 @@ write_mxCardControlStatus(int action, u_char *var_val, u_char var_val_type, size
 			}
 		}
 		/* Note: default value { } */
-		break;
-	case RESERVE2:		/* memory reseveration, final preparation... */
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->mxCardTable_old) == NULL)
+			if (StorageTmp->mxCardTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->mxCardTable_old = mxCardTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->mxCardTable_rsvs++;
 		if ((string = malloc(var_val_len + 1)) == NULL)
 			return SNMP_ERR_RESOURCEUNAVAILABLE;
 		memcpy((void *) string, (void *) var_val, var_val_len);
 		string[var_val_len] = 0;
+		SNMP_FREE(StorageTmp->mxCardControlStatus);
+		StorageTmp->mxCardControlStatus = string;
+		StorageTmp->mxCardControlStatusLen = var_val_len;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
+		break;
+	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->mxCardTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->mxCardTable_tsts == 0)
+				if ((ret = check_mxCardTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->mxCardTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->mxCardControlStatus for you to use, and you have just been asked to do something with it.  Note that anything done here
 				   must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->mxCardControlStatus;
-		old_length = StorageTmp->mxCardControlStatusLen;
-		StorageTmp->mxCardControlStatus = string;
-		StorageTmp->mxCardControlStatusLen = var_val_len;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->mxCardTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->mxCardTable_sets == 0)
+				if ((ret = update_mxCardTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->mxCardTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
-		SNMP_FREE(old_value);
-		old_length = 0;
-		string = NULL;
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->mxCardTable_old) != NULL) {
+			mxCardTable_destroy(&StorageTmp->mxCardTable_old);
+			StorageTmp->mxCardTable_rsvs = 0;
+			StorageTmp->mxCardTable_tsts = 0;
+			StorageTmp->mxCardTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->mxCardControlStatus = old_value;
-		StorageTmp->mxCardControlStatusLen = old_length;
+		if ((StorageOld = StorageTmp->mxCardTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->mxCardTable_sets == 0)
+			revert_mxCardTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
-		SNMP_FREE(string);
+		if ((StorageOld = StorageTmp->mxCardTable_old) == NULL)
+			break;
+		if (StorageOld->mxCardControlStatus != NULL) {
+			SNMP_FREE(StorageTmp->mxCardControlStatus);
+			StorageTmp->mxCardControlStatus = StorageOld->mxCardControlStatus;
+			StorageTmp->mxCardControlStatusLen = StorageOld->mxCardControlStatusLen;
+			StorageOld->mxCardControlStatus = NULL;
+			StorageOld->mxCardControlStatusLen = 0;
+		}
+		if (--StorageTmp->mxCardTable_rsvs == 0)
+			mxCardTable_destroy(&StorageTmp->mxCardTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -8044,17 +11697,17 @@ write_mxCardControlStatus(int action, u_char *var_val, u_char var_val_type, size
 int
 write_mxSpanName(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static uint8_t *old_value;
-	struct mxSpanTable_data *StorageTmp = NULL;
+	struct mxSpanTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 15;
-	static size_t old_length = 0;
-	static uint8_t *string = NULL;
+	uint8_t *string = NULL;
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("mxMIB", "write_mxSpanName entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(mxSpanTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
-		string = NULL;
 		if (StorageTmp != NULL && statP == NULL) {
 			/* have row but no column */
 			switch (StorageTmp->mxSpanRowStatus) {
@@ -8078,33 +11731,73 @@ write_mxSpanName(int action, u_char *var_val, u_char var_val_type, size_t var_va
 			return SNMP_ERR_WRONGLENGTH;
 		}
 		/* Note: default value \"\" */
-		break;
-	case RESERVE2:		/* memory reseveration, final preparation... */
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->mxSpanTable_old) == NULL)
+			if (StorageTmp->mxSpanTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->mxSpanTable_old = mxSpanTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->mxSpanTable_rsvs++;
 		if ((string = malloc(var_val_len + 1)) == NULL)
 			return SNMP_ERR_RESOURCEUNAVAILABLE;
 		memcpy((void *) string, (void *) var_val, var_val_len);
 		string[var_val_len] = 0;
+		SNMP_FREE(StorageTmp->mxSpanName);
+		StorageTmp->mxSpanName = string;
+		StorageTmp->mxSpanNameLen = var_val_len;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
+		break;
+	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->mxSpanTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->mxSpanTable_tsts == 0)
+				if ((ret = check_mxSpanTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->mxSpanTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->mxSpanName for you to use, and you have just been asked to do something with it.  Note that anything done here must be
 				   reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->mxSpanName;
-		old_length = StorageTmp->mxSpanNameLen;
-		StorageTmp->mxSpanName = string;
-		StorageTmp->mxSpanNameLen = var_val_len;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->mxSpanTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->mxSpanTable_sets == 0)
+				if ((ret = update_mxSpanTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->mxSpanTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
-		SNMP_FREE(old_value);
-		old_length = 0;
-		string = NULL;
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->mxSpanTable_old) != NULL) {
+			mxSpanTable_destroy(&StorageTmp->mxSpanTable_old);
+			StorageTmp->mxSpanTable_rsvs = 0;
+			StorageTmp->mxSpanTable_tsts = 0;
+			StorageTmp->mxSpanTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->mxSpanName = old_value;
-		StorageTmp->mxSpanNameLen = old_length;
+		if ((StorageOld = StorageTmp->mxSpanTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->mxSpanTable_sets == 0)
+			revert_mxSpanTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
-		SNMP_FREE(string);
+		if ((StorageOld = StorageTmp->mxSpanTable_old) == NULL)
+			break;
+		if (StorageOld->mxSpanName != NULL) {
+			SNMP_FREE(StorageTmp->mxSpanName);
+			StorageTmp->mxSpanName = StorageOld->mxSpanName;
+			StorageTmp->mxSpanNameLen = StorageOld->mxSpanNameLen;
+			StorageOld->mxSpanName = NULL;
+			StorageOld->mxSpanNameLen = 0;
+		}
+		if (--StorageTmp->mxSpanTable_rsvs == 0)
+			mxSpanTable_destroy(&StorageTmp->mxSpanTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -8124,17 +11817,17 @@ write_mxSpanName(int action, u_char *var_val, u_char var_val_type, size_t var_va
 int
 write_mxSpanDevice(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static oid *old_value;
-	struct mxSpanTable_data *StorageTmp = NULL;
+	struct mxSpanTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 15;
-	static size_t old_length = 0;
-	static oid *objid = NULL;
+	oid *objid = NULL;
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("mxMIB", "write_mxSpanDevice entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(mxSpanTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
-		objid = NULL;
 		if (StorageTmp != NULL && statP == NULL) {
 			/* have row but no column */
 			switch (StorageTmp->mxSpanRowStatus) {
@@ -8157,31 +11850,71 @@ write_mxSpanDevice(int action, u_char *var_val, u_char var_val_type, size_t var_
 			return SNMP_ERR_WRONGLENGTH;
 		}
 		/* Note: default value zeroDotZero */
-		break;
-	case RESERVE2:		/* memory reseveration, final preparation... */
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->mxSpanTable_old) == NULL)
+			if (StorageTmp->mxSpanTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->mxSpanTable_old = mxSpanTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->mxSpanTable_rsvs++;
 		if ((objid = snmp_duplicate_objid((void *) var_val, var_val_len / sizeof(oid))) == NULL)
 			return SNMP_ERR_RESOURCEUNAVAILABLE;
+		SNMP_FREE(StorageTmp->mxSpanDevice);
+		StorageTmp->mxSpanDevice = objid;
+		StorageTmp->mxSpanDeviceLen = var_val_len / sizeof(oid);
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
+		break;
+	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->mxSpanTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->mxSpanTable_tsts == 0)
+				if ((ret = check_mxSpanTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->mxSpanTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->mxSpanDevice for you to use, and you have just been asked to do something with it.  Note that anything done here must be 
 				   reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->mxSpanDevice;
-		old_length = StorageTmp->mxSpanDeviceLen;
-		StorageTmp->mxSpanDevice = objid;
-		StorageTmp->mxSpanDeviceLen = var_val_len / sizeof(oid);
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->mxSpanTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->mxSpanTable_sets == 0)
+				if ((ret = update_mxSpanTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->mxSpanTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
-		SNMP_FREE(old_value);
-		old_length = 0;
-		objid = NULL;
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->mxSpanTable_old) != NULL) {
+			mxSpanTable_destroy(&StorageTmp->mxSpanTable_old);
+			StorageTmp->mxSpanTable_rsvs = 0;
+			StorageTmp->mxSpanTable_tsts = 0;
+			StorageTmp->mxSpanTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->mxSpanDevice = old_value;
-		StorageTmp->mxSpanDeviceLen = old_length;
+		if ((StorageOld = StorageTmp->mxSpanTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->mxSpanTable_sets == 0)
+			revert_mxSpanTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
-		SNMP_FREE(objid);
+		if ((StorageOld = StorageTmp->mxSpanTable_old) == NULL)
+			break;
+		if (StorageOld->mxSpanDevice != NULL) {
+			SNMP_FREE(StorageTmp->mxSpanDevice);
+			StorageTmp->mxSpanDevice = StorageOld->mxSpanDevice;
+			StorageTmp->mxSpanDeviceLen = StorageOld->mxSpanDeviceLen;
+			StorageOld->mxSpanDevice = NULL;
+			StorageOld->mxSpanDeviceLen = 0;
+		}
+		if (--StorageTmp->mxSpanTable_rsvs == 0)
+			mxSpanTable_destroy(&StorageTmp->mxSpanTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -8201,17 +11934,17 @@ write_mxSpanDevice(int action, u_char *var_val, u_char var_val_type, size_t var_
 int
 write_mxSpanEquipmentId(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static uint8_t *old_value;
-	struct mxSpanTable_data *StorageTmp = NULL;
+	struct mxSpanTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 15;
-	static size_t old_length = 0;
-	static uint8_t *string = NULL;
+	uint8_t *string = NULL;
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("mxMIB", "write_mxSpanEquipmentId entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(mxSpanTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
-		string = NULL;
 		if (StorageTmp != NULL && statP == NULL) {
 			/* have row but no column */
 			switch (StorageTmp->mxSpanRowStatus) {
@@ -8234,33 +11967,73 @@ write_mxSpanEquipmentId(int action, u_char *var_val, u_char var_val_type, size_t
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to mxSpanEquipmentId: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
-		break;
-	case RESERVE2:		/* memory reseveration, final preparation... */
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->mxSpanTable_old) == NULL)
+			if (StorageTmp->mxSpanTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->mxSpanTable_old = mxSpanTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->mxSpanTable_rsvs++;
 		if ((string = malloc(var_val_len + 1)) == NULL)
 			return SNMP_ERR_RESOURCEUNAVAILABLE;
 		memcpy((void *) string, (void *) var_val, var_val_len);
 		string[var_val_len] = 0;
+		SNMP_FREE(StorageTmp->mxSpanEquipmentId);
+		StorageTmp->mxSpanEquipmentId = string;
+		StorageTmp->mxSpanEquipmentIdLen = var_val_len;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
+		break;
+	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->mxSpanTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->mxSpanTable_tsts == 0)
+				if ((ret = check_mxSpanTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->mxSpanTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->mxSpanEquipmentId for you to use, and you have just been asked to do something with it.  Note that anything done here
 				   must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->mxSpanEquipmentId;
-		old_length = StorageTmp->mxSpanEquipmentIdLen;
-		StorageTmp->mxSpanEquipmentId = string;
-		StorageTmp->mxSpanEquipmentIdLen = var_val_len;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->mxSpanTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->mxSpanTable_sets == 0)
+				if ((ret = update_mxSpanTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->mxSpanTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
-		SNMP_FREE(old_value);
-		old_length = 0;
-		string = NULL;
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->mxSpanTable_old) != NULL) {
+			mxSpanTable_destroy(&StorageTmp->mxSpanTable_old);
+			StorageTmp->mxSpanTable_rsvs = 0;
+			StorageTmp->mxSpanTable_tsts = 0;
+			StorageTmp->mxSpanTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->mxSpanEquipmentId = old_value;
-		StorageTmp->mxSpanEquipmentIdLen = old_length;
+		if ((StorageOld = StorageTmp->mxSpanTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->mxSpanTable_sets == 0)
+			revert_mxSpanTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
-		SNMP_FREE(string);
+		if ((StorageOld = StorageTmp->mxSpanTable_old) == NULL)
+			break;
+		if (StorageOld->mxSpanEquipmentId != NULL) {
+			SNMP_FREE(StorageTmp->mxSpanEquipmentId);
+			StorageTmp->mxSpanEquipmentId = StorageOld->mxSpanEquipmentId;
+			StorageTmp->mxSpanEquipmentIdLen = StorageOld->mxSpanEquipmentIdLen;
+			StorageOld->mxSpanEquipmentId = NULL;
+			StorageOld->mxSpanEquipmentIdLen = 0;
+		}
+		if (--StorageTmp->mxSpanTable_rsvs == 0)
+			mxSpanTable_destroy(&StorageTmp->mxSpanTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -8280,12 +12053,14 @@ write_mxSpanEquipmentId(int action, u_char *var_val, u_char var_val_type, size_t
 int
 write_mxSpanType(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static long old_value;
-	struct mxSpanTable_data *StorageTmp = NULL;
+	struct mxSpanTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 15;
 	long set_value = *((long *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("mxMIB", "write_mxSpanType entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(mxSpanTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -8324,22 +12099,61 @@ write_mxSpanType(int action, u_char *var_val, u_char var_val_type, size_t var_va
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to mxSpanType: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->mxSpanTable_old) == NULL)
+			if (StorageTmp->mxSpanTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->mxSpanTable_old = mxSpanTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->mxSpanTable_rsvs++;
+		StorageTmp->mxSpanType = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->mxSpanTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->mxSpanTable_tsts == 0)
+				if ((ret = check_mxSpanTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->mxSpanTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->mxSpanType for you to use, and you have just been asked to do something with it.  Note that anything done here must be
 				   reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->mxSpanType;
-		StorageTmp->mxSpanType = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->mxSpanTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->mxSpanTable_sets == 0)
+				if ((ret = update_mxSpanTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->mxSpanTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->mxSpanTable_old) != NULL) {
+			mxSpanTable_destroy(&StorageTmp->mxSpanTable_old);
+			StorageTmp->mxSpanTable_rsvs = 0;
+			StorageTmp->mxSpanTable_tsts = 0;
+			StorageTmp->mxSpanTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->mxSpanType = old_value;
+		if ((StorageOld = StorageTmp->mxSpanTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->mxSpanTable_sets == 0)
+			revert_mxSpanTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->mxSpanTable_old) == NULL)
+			break;
+		StorageTmp->mxSpanType = StorageOld->mxSpanType;
+		if (--StorageTmp->mxSpanTable_rsvs == 0)
+			mxSpanTable_destroy(&StorageTmp->mxSpanTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -8359,12 +12173,14 @@ write_mxSpanType(int action, u_char *var_val, u_char var_val_type, size_t var_va
 int
 write_mxSpanNumber(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static ulong old_value;
-	struct mxSpanTable_data *StorageTmp = NULL;
+	struct mxSpanTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 15;
 	ulong set_value = *((ulong *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("mxMIB", "write_mxSpanNumber entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(mxSpanTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -8394,22 +12210,61 @@ write_mxSpanNumber(int action, u_char *var_val, u_char var_val_type, size_t var_
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to mxSpanNumber: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->mxSpanTable_old) == NULL)
+			if (StorageTmp->mxSpanTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->mxSpanTable_old = mxSpanTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->mxSpanTable_rsvs++;
+		StorageTmp->mxSpanNumber = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->mxSpanTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->mxSpanTable_tsts == 0)
+				if ((ret = check_mxSpanTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->mxSpanTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->mxSpanNumber for you to use, and you have just been asked to do something with it.  Note that anything done here must be 
 				   reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->mxSpanNumber;
-		StorageTmp->mxSpanNumber = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->mxSpanTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->mxSpanTable_sets == 0)
+				if ((ret = update_mxSpanTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->mxSpanTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->mxSpanTable_old) != NULL) {
+			mxSpanTable_destroy(&StorageTmp->mxSpanTable_old);
+			StorageTmp->mxSpanTable_rsvs = 0;
+			StorageTmp->mxSpanTable_tsts = 0;
+			StorageTmp->mxSpanTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->mxSpanNumber = old_value;
+		if ((StorageOld = StorageTmp->mxSpanTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->mxSpanTable_sets == 0)
+			revert_mxSpanTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->mxSpanTable_old) == NULL)
+			break;
+		StorageTmp->mxSpanNumber = StorageOld->mxSpanNumber;
+		if (--StorageTmp->mxSpanTable_rsvs == 0)
+			mxSpanTable_destroy(&StorageTmp->mxSpanTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -8429,17 +12284,17 @@ write_mxSpanNumber(int action, u_char *var_val, u_char var_val_type, size_t var_
 int
 write_mxSpanMode(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static uint8_t *old_value;
-	struct mxSpanTable_data *StorageTmp = NULL;
+	struct mxSpanTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 15;
-	static size_t old_length = 0;
-	static uint8_t *string = NULL;
+	uint8_t *string = NULL;
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("mxMIB", "write_mxSpanMode entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(mxSpanTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
-		string = NULL;
 		if (StorageTmp != NULL && statP == NULL) {
 			/* have row but no column */
 			switch (StorageTmp->mxSpanRowStatus) {
@@ -8470,33 +12325,73 @@ write_mxSpanMode(int action, u_char *var_val, u_char var_val_type, size_t var_va
 			}
 		}
 		/* Note: default value { } */
-		break;
-	case RESERVE2:		/* memory reseveration, final preparation... */
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->mxSpanTable_old) == NULL)
+			if (StorageTmp->mxSpanTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->mxSpanTable_old = mxSpanTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->mxSpanTable_rsvs++;
 		if ((string = malloc(var_val_len + 1)) == NULL)
 			return SNMP_ERR_RESOURCEUNAVAILABLE;
 		memcpy((void *) string, (void *) var_val, var_val_len);
 		string[var_val_len] = 0;
+		SNMP_FREE(StorageTmp->mxSpanMode);
+		StorageTmp->mxSpanMode = string;
+		StorageTmp->mxSpanModeLen = var_val_len;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
+		break;
+	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->mxSpanTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->mxSpanTable_tsts == 0)
+				if ((ret = check_mxSpanTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->mxSpanTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->mxSpanMode for you to use, and you have just been asked to do something with it.  Note that anything done here must be
 				   reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->mxSpanMode;
-		old_length = StorageTmp->mxSpanModeLen;
-		StorageTmp->mxSpanMode = string;
-		StorageTmp->mxSpanModeLen = var_val_len;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->mxSpanTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->mxSpanTable_sets == 0)
+				if ((ret = update_mxSpanTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->mxSpanTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
-		SNMP_FREE(old_value);
-		old_length = 0;
-		string = NULL;
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->mxSpanTable_old) != NULL) {
+			mxSpanTable_destroy(&StorageTmp->mxSpanTable_old);
+			StorageTmp->mxSpanTable_rsvs = 0;
+			StorageTmp->mxSpanTable_tsts = 0;
+			StorageTmp->mxSpanTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->mxSpanMode = old_value;
-		StorageTmp->mxSpanModeLen = old_length;
+		if ((StorageOld = StorageTmp->mxSpanTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->mxSpanTable_sets == 0)
+			revert_mxSpanTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
-		SNMP_FREE(string);
+		if ((StorageOld = StorageTmp->mxSpanTable_old) == NULL)
+			break;
+		if (StorageOld->mxSpanMode != NULL) {
+			SNMP_FREE(StorageTmp->mxSpanMode);
+			StorageTmp->mxSpanMode = StorageOld->mxSpanMode;
+			StorageTmp->mxSpanModeLen = StorageOld->mxSpanModeLen;
+			StorageOld->mxSpanMode = NULL;
+			StorageOld->mxSpanModeLen = 0;
+		}
+		if (--StorageTmp->mxSpanTable_rsvs == 0)
+			mxSpanTable_destroy(&StorageTmp->mxSpanTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -8516,12 +12411,14 @@ write_mxSpanMode(int action, u_char *var_val, u_char var_val_type, size_t var_va
 int
 write_mxSpanCrc(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static long old_value;
-	struct mxSpanTable_data *StorageTmp = NULL;
+	struct mxSpanTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 15;
 	long set_value = *((long *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("mxMIB", "write_mxSpanCrc entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(mxSpanTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -8558,22 +12455,61 @@ write_mxSpanCrc(int action, u_char *var_val, u_char var_val_type, size_t var_val
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to mxSpanCrc: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->mxSpanTable_old) == NULL)
+			if (StorageTmp->mxSpanTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->mxSpanTable_old = mxSpanTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->mxSpanTable_rsvs++;
+		StorageTmp->mxSpanCrc = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->mxSpanTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->mxSpanTable_tsts == 0)
+				if ((ret = check_mxSpanTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->mxSpanTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->mxSpanCrc for you to use, and you have just been asked to do something with it.  Note that anything done here must be
 				   reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->mxSpanCrc;
-		StorageTmp->mxSpanCrc = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->mxSpanTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->mxSpanTable_sets == 0)
+				if ((ret = update_mxSpanTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->mxSpanTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->mxSpanTable_old) != NULL) {
+			mxSpanTable_destroy(&StorageTmp->mxSpanTable_old);
+			StorageTmp->mxSpanTable_rsvs = 0;
+			StorageTmp->mxSpanTable_tsts = 0;
+			StorageTmp->mxSpanTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->mxSpanCrc = old_value;
+		if ((StorageOld = StorageTmp->mxSpanTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->mxSpanTable_sets == 0)
+			revert_mxSpanTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->mxSpanTable_old) == NULL)
+			break;
+		StorageTmp->mxSpanCrc = StorageOld->mxSpanCrc;
+		if (--StorageTmp->mxSpanTable_rsvs == 0)
+			mxSpanTable_destroy(&StorageTmp->mxSpanTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -8593,12 +12529,14 @@ write_mxSpanCrc(int action, u_char *var_val, u_char var_val_type, size_t var_val
 int
 write_mxSpanClocking(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static long old_value;
-	struct mxSpanTable_data *StorageTmp = NULL;
+	struct mxSpanTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 15;
 	long set_value = *((long *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("mxMIB", "write_mxSpanClocking entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(mxSpanTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -8635,22 +12573,61 @@ write_mxSpanClocking(int action, u_char *var_val, u_char var_val_type, size_t va
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to mxSpanClocking: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->mxSpanTable_old) == NULL)
+			if (StorageTmp->mxSpanTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->mxSpanTable_old = mxSpanTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->mxSpanTable_rsvs++;
+		StorageTmp->mxSpanClocking = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->mxSpanTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->mxSpanTable_tsts == 0)
+				if ((ret = check_mxSpanTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->mxSpanTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->mxSpanClocking for you to use, and you have just been asked to do something with it.  Note that anything done here must
 				   be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->mxSpanClocking;
-		StorageTmp->mxSpanClocking = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->mxSpanTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->mxSpanTable_sets == 0)
+				if ((ret = update_mxSpanTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->mxSpanTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->mxSpanTable_old) != NULL) {
+			mxSpanTable_destroy(&StorageTmp->mxSpanTable_old);
+			StorageTmp->mxSpanTable_rsvs = 0;
+			StorageTmp->mxSpanTable_tsts = 0;
+			StorageTmp->mxSpanTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->mxSpanClocking = old_value;
+		if ((StorageOld = StorageTmp->mxSpanTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->mxSpanTable_sets == 0)
+			revert_mxSpanTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->mxSpanTable_old) == NULL)
+			break;
+		StorageTmp->mxSpanClocking = StorageOld->mxSpanClocking;
+		if (--StorageTmp->mxSpanTable_rsvs == 0)
+			mxSpanTable_destroy(&StorageTmp->mxSpanTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -8670,12 +12647,14 @@ write_mxSpanClocking(int action, u_char *var_val, u_char var_val_type, size_t va
 int
 write_mxSpanPriority(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static ulong old_value;
-	struct mxSpanTable_data *StorageTmp = NULL;
+	struct mxSpanTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 15;
 	ulong set_value = *((ulong *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("mxMIB", "write_mxSpanPriority entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(mxSpanTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -8700,22 +12679,61 @@ write_mxSpanPriority(int action, u_char *var_val, u_char var_val_type, size_t va
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to mxSpanPriority: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->mxSpanTable_old) == NULL)
+			if (StorageTmp->mxSpanTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->mxSpanTable_old = mxSpanTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->mxSpanTable_rsvs++;
+		StorageTmp->mxSpanPriority = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->mxSpanTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->mxSpanTable_tsts == 0)
+				if ((ret = check_mxSpanTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->mxSpanTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->mxSpanPriority for you to use, and you have just been asked to do something with it.  Note that anything done here must
 				   be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->mxSpanPriority;
-		StorageTmp->mxSpanPriority = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->mxSpanTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->mxSpanTable_sets == 0)
+				if ((ret = update_mxSpanTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->mxSpanTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->mxSpanTable_old) != NULL) {
+			mxSpanTable_destroy(&StorageTmp->mxSpanTable_old);
+			StorageTmp->mxSpanTable_rsvs = 0;
+			StorageTmp->mxSpanTable_tsts = 0;
+			StorageTmp->mxSpanTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->mxSpanPriority = old_value;
+		if ((StorageOld = StorageTmp->mxSpanTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->mxSpanTable_sets == 0)
+			revert_mxSpanTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->mxSpanTable_old) == NULL)
+			break;
+		StorageTmp->mxSpanPriority = StorageOld->mxSpanPriority;
+		if (--StorageTmp->mxSpanTable_rsvs == 0)
+			mxSpanTable_destroy(&StorageTmp->mxSpanTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -8735,12 +12753,14 @@ write_mxSpanPriority(int action, u_char *var_val, u_char var_val_type, size_t va
 int
 write_mxSpanCoding(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static long old_value;
-	struct mxSpanTable_data *StorageTmp = NULL;
+	struct mxSpanTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 15;
 	long set_value = *((long *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("mxMIB", "write_mxSpanCoding entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(mxSpanTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -8778,22 +12798,61 @@ write_mxSpanCoding(int action, u_char *var_val, u_char var_val_type, size_t var_
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to mxSpanCoding: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->mxSpanTable_old) == NULL)
+			if (StorageTmp->mxSpanTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->mxSpanTable_old = mxSpanTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->mxSpanTable_rsvs++;
+		StorageTmp->mxSpanCoding = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->mxSpanTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->mxSpanTable_tsts == 0)
+				if ((ret = check_mxSpanTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->mxSpanTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->mxSpanCoding for you to use, and you have just been asked to do something with it.  Note that anything done here must be 
 				   reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->mxSpanCoding;
-		StorageTmp->mxSpanCoding = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->mxSpanTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->mxSpanTable_sets == 0)
+				if ((ret = update_mxSpanTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->mxSpanTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->mxSpanTable_old) != NULL) {
+			mxSpanTable_destroy(&StorageTmp->mxSpanTable_old);
+			StorageTmp->mxSpanTable_rsvs = 0;
+			StorageTmp->mxSpanTable_tsts = 0;
+			StorageTmp->mxSpanTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->mxSpanCoding = old_value;
+		if ((StorageOld = StorageTmp->mxSpanTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->mxSpanTable_sets == 0)
+			revert_mxSpanTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->mxSpanTable_old) == NULL)
+			break;
+		StorageTmp->mxSpanCoding = StorageOld->mxSpanCoding;
+		if (--StorageTmp->mxSpanTable_rsvs == 0)
+			mxSpanTable_destroy(&StorageTmp->mxSpanTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -8813,12 +12872,14 @@ write_mxSpanCoding(int action, u_char *var_val, u_char var_val_type, size_t var_
 int
 write_mxSpanFraming(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static long old_value;
-	struct mxSpanTable_data *StorageTmp = NULL;
+	struct mxSpanTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 15;
 	long set_value = *((long *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("mxMIB", "write_mxSpanFraming entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(mxSpanTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -8855,22 +12916,61 @@ write_mxSpanFraming(int action, u_char *var_val, u_char var_val_type, size_t var
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to mxSpanFraming: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->mxSpanTable_old) == NULL)
+			if (StorageTmp->mxSpanTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->mxSpanTable_old = mxSpanTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->mxSpanTable_rsvs++;
+		StorageTmp->mxSpanFraming = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->mxSpanTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->mxSpanTable_tsts == 0)
+				if ((ret = check_mxSpanTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->mxSpanTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->mxSpanFraming for you to use, and you have just been asked to do something with it.  Note that anything done here must
 				   be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->mxSpanFraming;
-		StorageTmp->mxSpanFraming = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->mxSpanTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->mxSpanTable_sets == 0)
+				if ((ret = update_mxSpanTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->mxSpanTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->mxSpanTable_old) != NULL) {
+			mxSpanTable_destroy(&StorageTmp->mxSpanTable_old);
+			StorageTmp->mxSpanTable_rsvs = 0;
+			StorageTmp->mxSpanTable_tsts = 0;
+			StorageTmp->mxSpanTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->mxSpanFraming = old_value;
+		if ((StorageOld = StorageTmp->mxSpanTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->mxSpanTable_sets == 0)
+			revert_mxSpanTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->mxSpanTable_old) == NULL)
+			break;
+		StorageTmp->mxSpanFraming = StorageOld->mxSpanFraming;
+		if (--StorageTmp->mxSpanTable_rsvs == 0)
+			mxSpanTable_destroy(&StorageTmp->mxSpanTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -8890,12 +12990,14 @@ write_mxSpanFraming(int action, u_char *var_val, u_char var_val_type, size_t var
 int
 write_mxSpanLineImpedance(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static long old_value;
-	struct mxSpanTable_data *StorageTmp = NULL;
+	struct mxSpanTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 15;
 	long set_value = *((long *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("mxMIB", "write_mxSpanLineImpedance entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(mxSpanTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -8930,22 +13032,61 @@ write_mxSpanLineImpedance(int action, u_char *var_val, u_char var_val_type, size
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to mxSpanLineImpedance: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->mxSpanTable_old) == NULL)
+			if (StorageTmp->mxSpanTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->mxSpanTable_old = mxSpanTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->mxSpanTable_rsvs++;
+		StorageTmp->mxSpanLineImpedance = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->mxSpanTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->mxSpanTable_tsts == 0)
+				if ((ret = check_mxSpanTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->mxSpanTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->mxSpanLineImpedance for you to use, and you have just been asked to do something with it.  Note that anything done here
 				   must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->mxSpanLineImpedance;
-		StorageTmp->mxSpanLineImpedance = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->mxSpanTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->mxSpanTable_sets == 0)
+				if ((ret = update_mxSpanTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->mxSpanTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->mxSpanTable_old) != NULL) {
+			mxSpanTable_destroy(&StorageTmp->mxSpanTable_old);
+			StorageTmp->mxSpanTable_rsvs = 0;
+			StorageTmp->mxSpanTable_tsts = 0;
+			StorageTmp->mxSpanTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->mxSpanLineImpedance = old_value;
+		if ((StorageOld = StorageTmp->mxSpanTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->mxSpanTable_sets == 0)
+			revert_mxSpanTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->mxSpanTable_old) == NULL)
+			break;
+		StorageTmp->mxSpanLineImpedance = StorageOld->mxSpanLineImpedance;
+		if (--StorageTmp->mxSpanTable_rsvs == 0)
+			mxSpanTable_destroy(&StorageTmp->mxSpanTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -8965,12 +13106,14 @@ write_mxSpanLineImpedance(int action, u_char *var_val, u_char var_val_type, size
 int
 write_mxSpanLineMode(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static long old_value;
-	struct mxSpanTable_data *StorageTmp = NULL;
+	struct mxSpanTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 15;
 	long set_value = *((long *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("mxMIB", "write_mxSpanLineMode entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(mxSpanTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -9006,22 +13149,61 @@ write_mxSpanLineMode(int action, u_char *var_val, u_char var_val_type, size_t va
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to mxSpanLineMode: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->mxSpanTable_old) == NULL)
+			if (StorageTmp->mxSpanTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->mxSpanTable_old = mxSpanTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->mxSpanTable_rsvs++;
+		StorageTmp->mxSpanLineMode = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->mxSpanTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->mxSpanTable_tsts == 0)
+				if ((ret = check_mxSpanTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->mxSpanTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->mxSpanLineMode for you to use, and you have just been asked to do something with it.  Note that anything done here must
 				   be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->mxSpanLineMode;
-		StorageTmp->mxSpanLineMode = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->mxSpanTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->mxSpanTable_sets == 0)
+				if ((ret = update_mxSpanTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->mxSpanTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->mxSpanTable_old) != NULL) {
+			mxSpanTable_destroy(&StorageTmp->mxSpanTable_old);
+			StorageTmp->mxSpanTable_rsvs = 0;
+			StorageTmp->mxSpanTable_tsts = 0;
+			StorageTmp->mxSpanTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->mxSpanLineMode = old_value;
+		if ((StorageOld = StorageTmp->mxSpanTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->mxSpanTable_sets == 0)
+			revert_mxSpanTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->mxSpanTable_old) == NULL)
+			break;
+		StorageTmp->mxSpanLineMode = StorageOld->mxSpanLineMode;
+		if (--StorageTmp->mxSpanTable_rsvs == 0)
+			mxSpanTable_destroy(&StorageTmp->mxSpanTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -9041,12 +13223,14 @@ write_mxSpanLineMode(int action, u_char *var_val, u_char var_val_type, size_t va
 int
 write_mxSpanLineLength(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static long old_value;
-	struct mxSpanTable_data *StorageTmp = NULL;
+	struct mxSpanTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 15;
 	long set_value = *((long *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("mxMIB", "write_mxSpanLineLength entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(mxSpanTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -9084,22 +13268,61 @@ write_mxSpanLineLength(int action, u_char *var_val, u_char var_val_type, size_t 
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to mxSpanLineLength: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->mxSpanTable_old) == NULL)
+			if (StorageTmp->mxSpanTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->mxSpanTable_old = mxSpanTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->mxSpanTable_rsvs++;
+		StorageTmp->mxSpanLineLength = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->mxSpanTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->mxSpanTable_tsts == 0)
+				if ((ret = check_mxSpanTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->mxSpanTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->mxSpanLineLength for you to use, and you have just been asked to do something with it.  Note that anything done here
 				   must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->mxSpanLineLength;
-		StorageTmp->mxSpanLineLength = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->mxSpanTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->mxSpanTable_sets == 0)
+				if ((ret = update_mxSpanTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->mxSpanTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->mxSpanTable_old) != NULL) {
+			mxSpanTable_destroy(&StorageTmp->mxSpanTable_old);
+			StorageTmp->mxSpanTable_rsvs = 0;
+			StorageTmp->mxSpanTable_tsts = 0;
+			StorageTmp->mxSpanTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->mxSpanLineLength = old_value;
+		if ((StorageOld = StorageTmp->mxSpanTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->mxSpanTable_sets == 0)
+			revert_mxSpanTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->mxSpanTable_old) == NULL)
+			break;
+		StorageTmp->mxSpanLineLength = StorageOld->mxSpanLineLength;
+		if (--StorageTmp->mxSpanTable_rsvs == 0)
+			mxSpanTable_destroy(&StorageTmp->mxSpanTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -9119,12 +13342,14 @@ write_mxSpanLineLength(int action, u_char *var_val, u_char var_val_type, size_t 
 int
 write_mxSpanLineAttenuation(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static long old_value;
-	struct mxSpanTable_data *StorageTmp = NULL;
+	struct mxSpanTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 15;
 	long set_value = *((long *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("mxMIB", "write_mxSpanLineAttenuation entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(mxSpanTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -9161,22 +13386,61 @@ write_mxSpanLineAttenuation(int action, u_char *var_val, u_char var_val_type, si
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to mxSpanLineAttenuation: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->mxSpanTable_old) == NULL)
+			if (StorageTmp->mxSpanTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->mxSpanTable_old = mxSpanTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->mxSpanTable_rsvs++;
+		StorageTmp->mxSpanLineAttenuation = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->mxSpanTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->mxSpanTable_tsts == 0)
+				if ((ret = check_mxSpanTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->mxSpanTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->mxSpanLineAttenuation for you to use, and you have just been asked to do something with it.  Note that anything done
 				   here must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->mxSpanLineAttenuation;
-		StorageTmp->mxSpanLineAttenuation = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->mxSpanTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->mxSpanTable_sets == 0)
+				if ((ret = update_mxSpanTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->mxSpanTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->mxSpanTable_old) != NULL) {
+			mxSpanTable_destroy(&StorageTmp->mxSpanTable_old);
+			StorageTmp->mxSpanTable_rsvs = 0;
+			StorageTmp->mxSpanTable_tsts = 0;
+			StorageTmp->mxSpanTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->mxSpanLineAttenuation = old_value;
+		if ((StorageOld = StorageTmp->mxSpanTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->mxSpanTable_sets == 0)
+			revert_mxSpanTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->mxSpanTable_old) == NULL)
+			break;
+		StorageTmp->mxSpanLineAttenuation = StorageOld->mxSpanLineAttenuation;
+		if (--StorageTmp->mxSpanTable_rsvs == 0)
+			mxSpanTable_destroy(&StorageTmp->mxSpanTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -9196,12 +13460,14 @@ write_mxSpanLineAttenuation(int action, u_char *var_val, u_char var_val_type, si
 int
 write_mxSpanLineGain(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static long old_value;
-	struct mxSpanTable_data *StorageTmp = NULL;
+	struct mxSpanTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 15;
 	long set_value = *((long *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("mxMIB", "write_mxSpanLineGain entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(mxSpanTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -9240,22 +13506,61 @@ write_mxSpanLineGain(int action, u_char *var_val, u_char var_val_type, size_t va
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to mxSpanLineGain: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->mxSpanTable_old) == NULL)
+			if (StorageTmp->mxSpanTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->mxSpanTable_old = mxSpanTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->mxSpanTable_rsvs++;
+		StorageTmp->mxSpanLineGain = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->mxSpanTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->mxSpanTable_tsts == 0)
+				if ((ret = check_mxSpanTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->mxSpanTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->mxSpanLineGain for you to use, and you have just been asked to do something with it.  Note that anything done here must
 				   be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->mxSpanLineGain;
-		StorageTmp->mxSpanLineGain = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->mxSpanTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->mxSpanTable_sets == 0)
+				if ((ret = update_mxSpanTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->mxSpanTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->mxSpanTable_old) != NULL) {
+			mxSpanTable_destroy(&StorageTmp->mxSpanTable_old);
+			StorageTmp->mxSpanTable_rsvs = 0;
+			StorageTmp->mxSpanTable_tsts = 0;
+			StorageTmp->mxSpanTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->mxSpanLineGain = old_value;
+		if ((StorageOld = StorageTmp->mxSpanTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->mxSpanTable_sets == 0)
+			revert_mxSpanTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->mxSpanTable_old) == NULL)
+			break;
+		StorageTmp->mxSpanLineGain = StorageOld->mxSpanLineGain;
+		if (--StorageTmp->mxSpanTable_rsvs == 0)
+			mxSpanTable_destroy(&StorageTmp->mxSpanTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -9275,12 +13580,14 @@ write_mxSpanLineGain(int action, u_char *var_val, u_char var_val_type, size_t va
 int
 write_mxSpanLineDelay(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static ulong old_value;
-	struct mxSpanTable_data *StorageTmp = NULL;
+	struct mxSpanTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 15;
 	ulong set_value = *((ulong *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("mxMIB", "write_mxSpanLineDelay entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(mxSpanTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -9306,22 +13613,61 @@ write_mxSpanLineDelay(int action, u_char *var_val, u_char var_val_type, size_t v
 			return SNMP_ERR_WRONGLENGTH;
 		}
 		/* Note: default value 0 */
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->mxSpanTable_old) == NULL)
+			if (StorageTmp->mxSpanTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->mxSpanTable_old = mxSpanTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->mxSpanTable_rsvs++;
+		StorageTmp->mxSpanLineDelay = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->mxSpanTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->mxSpanTable_tsts == 0)
+				if ((ret = check_mxSpanTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->mxSpanTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->mxSpanLineDelay for you to use, and you have just been asked to do something with it.  Note that anything done here must 
 				   be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->mxSpanLineDelay;
-		StorageTmp->mxSpanLineDelay = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->mxSpanTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->mxSpanTable_sets == 0)
+				if ((ret = update_mxSpanTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->mxSpanTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->mxSpanTable_old) != NULL) {
+			mxSpanTable_destroy(&StorageTmp->mxSpanTable_old);
+			StorageTmp->mxSpanTable_rsvs = 0;
+			StorageTmp->mxSpanTable_tsts = 0;
+			StorageTmp->mxSpanTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->mxSpanLineDelay = old_value;
+		if ((StorageOld = StorageTmp->mxSpanTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->mxSpanTable_sets == 0)
+			revert_mxSpanTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->mxSpanTable_old) == NULL)
+			break;
+		StorageTmp->mxSpanLineDelay = StorageOld->mxSpanLineDelay;
+		if (--StorageTmp->mxSpanTable_rsvs == 0)
+			mxSpanTable_destroy(&StorageTmp->mxSpanTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -9341,12 +13687,14 @@ write_mxSpanLineDelay(int action, u_char *var_val, u_char var_val_type, size_t v
 int
 write_mxSpanTxLevel(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static long old_value;
-	struct mxSpanTable_data *StorageTmp = NULL;
+	struct mxSpanTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 15;
 	long set_value = *((long *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("mxMIB", "write_mxSpanTxLevel entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(mxSpanTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -9381,22 +13729,61 @@ write_mxSpanTxLevel(int action, u_char *var_val, u_char var_val_type, size_t var
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to mxSpanTxLevel: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->mxSpanTable_old) == NULL)
+			if (StorageTmp->mxSpanTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->mxSpanTable_old = mxSpanTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->mxSpanTable_rsvs++;
+		StorageTmp->mxSpanTxLevel = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->mxSpanTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->mxSpanTable_tsts == 0)
+				if ((ret = check_mxSpanTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->mxSpanTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->mxSpanTxLevel for you to use, and you have just been asked to do something with it.  Note that anything done here must
 				   be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->mxSpanTxLevel;
-		StorageTmp->mxSpanTxLevel = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->mxSpanTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->mxSpanTable_sets == 0)
+				if ((ret = update_mxSpanTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->mxSpanTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->mxSpanTable_old) != NULL) {
+			mxSpanTable_destroy(&StorageTmp->mxSpanTable_old);
+			StorageTmp->mxSpanTable_rsvs = 0;
+			StorageTmp->mxSpanTable_tsts = 0;
+			StorageTmp->mxSpanTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->mxSpanTxLevel = old_value;
+		if ((StorageOld = StorageTmp->mxSpanTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->mxSpanTable_sets == 0)
+			revert_mxSpanTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->mxSpanTable_old) == NULL)
+			break;
+		StorageTmp->mxSpanTxLevel = StorageOld->mxSpanTxLevel;
+		if (--StorageTmp->mxSpanTable_rsvs == 0)
+			mxSpanTable_destroy(&StorageTmp->mxSpanTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -9416,12 +13803,14 @@ write_mxSpanTxLevel(int action, u_char *var_val, u_char var_val_type, size_t var
 int
 write_mxSpanRxLevel(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static long old_value;
-	struct mxSpanTable_data *StorageTmp = NULL;
+	struct mxSpanTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 15;
 	long set_value = *((long *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("mxMIB", "write_mxSpanRxLevel entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(mxSpanTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -9456,22 +13845,61 @@ write_mxSpanRxLevel(int action, u_char *var_val, u_char var_val_type, size_t var
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to mxSpanRxLevel: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->mxSpanTable_old) == NULL)
+			if (StorageTmp->mxSpanTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->mxSpanTable_old = mxSpanTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->mxSpanTable_rsvs++;
+		StorageTmp->mxSpanRxLevel = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->mxSpanTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->mxSpanTable_tsts == 0)
+				if ((ret = check_mxSpanTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->mxSpanTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->mxSpanRxLevel for you to use, and you have just been asked to do something with it.  Note that anything done here must
 				   be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->mxSpanRxLevel;
-		StorageTmp->mxSpanRxLevel = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->mxSpanTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->mxSpanTable_sets == 0)
+				if ((ret = update_mxSpanTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->mxSpanTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->mxSpanTable_old) != NULL) {
+			mxSpanTable_destroy(&StorageTmp->mxSpanTable_old);
+			StorageTmp->mxSpanTable_rsvs = 0;
+			StorageTmp->mxSpanTable_tsts = 0;
+			StorageTmp->mxSpanTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->mxSpanRxLevel = old_value;
+		if ((StorageOld = StorageTmp->mxSpanTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->mxSpanTable_sets == 0)
+			revert_mxSpanTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->mxSpanTable_old) == NULL)
+			break;
+		StorageTmp->mxSpanRxLevel = StorageOld->mxSpanRxLevel;
+		if (--StorageTmp->mxSpanTable_rsvs == 0)
+			mxSpanTable_destroy(&StorageTmp->mxSpanTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -9491,12 +13919,14 @@ write_mxSpanRxLevel(int action, u_char *var_val, u_char var_val_type, size_t var
 int
 write_mxSpanAlarmSettleTime(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static long old_value;
-	struct mxSpanTable_data *StorageTmp = NULL;
+	struct mxSpanTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 15;
 	long set_value = *((long *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("mxMIB", "write_mxSpanAlarmSettleTime entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(mxSpanTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -9527,22 +13957,61 @@ write_mxSpanAlarmSettleTime(int action, u_char *var_val, u_char var_val_type, si
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to mxSpanAlarmSettleTime: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->mxSpanTable_old) == NULL)
+			if (StorageTmp->mxSpanTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->mxSpanTable_old = mxSpanTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->mxSpanTable_rsvs++;
+		StorageTmp->mxSpanAlarmSettleTime = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->mxSpanTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->mxSpanTable_tsts == 0)
+				if ((ret = check_mxSpanTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->mxSpanTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->mxSpanAlarmSettleTime for you to use, and you have just been asked to do something with it.  Note that anything done
 				   here must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->mxSpanAlarmSettleTime;
-		StorageTmp->mxSpanAlarmSettleTime = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->mxSpanTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->mxSpanTable_sets == 0)
+				if ((ret = update_mxSpanTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->mxSpanTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->mxSpanTable_old) != NULL) {
+			mxSpanTable_destroy(&StorageTmp->mxSpanTable_old);
+			StorageTmp->mxSpanTable_rsvs = 0;
+			StorageTmp->mxSpanTable_tsts = 0;
+			StorageTmp->mxSpanTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->mxSpanAlarmSettleTime = old_value;
+		if ((StorageOld = StorageTmp->mxSpanTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->mxSpanTable_sets == 0)
+			revert_mxSpanTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->mxSpanTable_old) == NULL)
+			break;
+		StorageTmp->mxSpanAlarmSettleTime = StorageOld->mxSpanAlarmSettleTime;
+		if (--StorageTmp->mxSpanTable_rsvs == 0)
+			mxSpanTable_destroy(&StorageTmp->mxSpanTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -9562,12 +14031,14 @@ write_mxSpanAlarmSettleTime(int action, u_char *var_val, u_char var_val_type, si
 int
 write_mxSpanLineCodeTime(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static long old_value;
-	struct mxSpanTable_data *StorageTmp = NULL;
+	struct mxSpanTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 15;
 	long set_value = *((long *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("mxMIB", "write_mxSpanLineCodeTime entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(mxSpanTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -9598,22 +14069,61 @@ write_mxSpanLineCodeTime(int action, u_char *var_val, u_char var_val_type, size_
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to mxSpanLineCodeTime: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->mxSpanTable_old) == NULL)
+			if (StorageTmp->mxSpanTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->mxSpanTable_old = mxSpanTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->mxSpanTable_rsvs++;
+		StorageTmp->mxSpanLineCodeTime = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->mxSpanTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->mxSpanTable_tsts == 0)
+				if ((ret = check_mxSpanTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->mxSpanTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->mxSpanLineCodeTime for you to use, and you have just been asked to do something with it.  Note that anything done here
 				   must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->mxSpanLineCodeTime;
-		StorageTmp->mxSpanLineCodeTime = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->mxSpanTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->mxSpanTable_sets == 0)
+				if ((ret = update_mxSpanTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->mxSpanTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->mxSpanTable_old) != NULL) {
+			mxSpanTable_destroy(&StorageTmp->mxSpanTable_old);
+			StorageTmp->mxSpanTable_rsvs = 0;
+			StorageTmp->mxSpanTable_tsts = 0;
+			StorageTmp->mxSpanTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->mxSpanLineCodeTime = old_value;
+		if ((StorageOld = StorageTmp->mxSpanTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->mxSpanTable_sets == 0)
+			revert_mxSpanTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->mxSpanTable_old) == NULL)
+			break;
+		StorageTmp->mxSpanLineCodeTime = StorageOld->mxSpanLineCodeTime;
+		if (--StorageTmp->mxSpanTable_rsvs == 0)
+			mxSpanTable_destroy(&StorageTmp->mxSpanTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -9633,12 +14143,14 @@ write_mxSpanLineCodeTime(int action, u_char *var_val, u_char var_val_type, size_
 int
 write_mxSpanPrimary(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static ulong old_value;
-	struct mxSpanTable_data *StorageTmp = NULL;
+	struct mxSpanTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 15;
 	ulong set_value = *((ulong *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("mxMIB", "write_mxSpanPrimary entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(mxSpanTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -9663,22 +14175,61 @@ write_mxSpanPrimary(int action, u_char *var_val, u_char var_val_type, size_t var
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to mxSpanPrimary: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->mxSpanTable_old) == NULL)
+			if (StorageTmp->mxSpanTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->mxSpanTable_old = mxSpanTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->mxSpanTable_rsvs++;
+		StorageTmp->mxSpanPrimary = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->mxSpanTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->mxSpanTable_tsts == 0)
+				if ((ret = check_mxSpanTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->mxSpanTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->mxSpanPrimary for you to use, and you have just been asked to do something with it.  Note that anything done here must
 				   be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->mxSpanPrimary;
-		StorageTmp->mxSpanPrimary = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->mxSpanTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->mxSpanTable_sets == 0)
+				if ((ret = update_mxSpanTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->mxSpanTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->mxSpanTable_old) != NULL) {
+			mxSpanTable_destroy(&StorageTmp->mxSpanTable_old);
+			StorageTmp->mxSpanTable_rsvs = 0;
+			StorageTmp->mxSpanTable_tsts = 0;
+			StorageTmp->mxSpanTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->mxSpanPrimary = old_value;
+		if ((StorageOld = StorageTmp->mxSpanTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->mxSpanTable_sets == 0)
+			revert_mxSpanTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->mxSpanTable_old) == NULL)
+			break;
+		StorageTmp->mxSpanPrimary = StorageOld->mxSpanPrimary;
+		if (--StorageTmp->mxSpanTable_rsvs == 0)
+			mxSpanTable_destroy(&StorageTmp->mxSpanTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -9698,17 +14249,17 @@ write_mxSpanPrimary(int action, u_char *var_val, u_char var_val_type, size_t var
 int
 write_mxSpanDataLink(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static uint8_t *old_value;
-	struct mxSpanTable_data *StorageTmp = NULL;
+	struct mxSpanTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 15;
-	static size_t old_length = 0;
-	static uint8_t *string = NULL;
+	uint8_t *string = NULL;
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("mxMIB", "write_mxSpanDataLink entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(mxSpanTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
-		string = NULL;
 		if (StorageTmp != NULL && statP == NULL) {
 			/* have row but no column */
 			switch (StorageTmp->mxSpanRowStatus) {
@@ -9738,33 +14289,73 @@ write_mxSpanDataLink(int action, u_char *var_val, u_char var_val_type, size_t va
 				return SNMP_ERR_WRONGLENGTH;
 			}
 		}
-		break;
-	case RESERVE2:		/* memory reseveration, final preparation... */
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->mxSpanTable_old) == NULL)
+			if (StorageTmp->mxSpanTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->mxSpanTable_old = mxSpanTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->mxSpanTable_rsvs++;
 		if ((string = malloc(var_val_len + 1)) == NULL)
 			return SNMP_ERR_RESOURCEUNAVAILABLE;
 		memcpy((void *) string, (void *) var_val, var_val_len);
 		string[var_val_len] = 0;
+		SNMP_FREE(StorageTmp->mxSpanDataLink);
+		StorageTmp->mxSpanDataLink = string;
+		StorageTmp->mxSpanDataLinkLen = var_val_len;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
+		break;
+	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->mxSpanTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->mxSpanTable_tsts == 0)
+				if ((ret = check_mxSpanTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->mxSpanTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->mxSpanDataLink for you to use, and you have just been asked to do something with it.  Note that anything done here must
 				   be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->mxSpanDataLink;
-		old_length = StorageTmp->mxSpanDataLinkLen;
-		StorageTmp->mxSpanDataLink = string;
-		StorageTmp->mxSpanDataLinkLen = var_val_len;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->mxSpanTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->mxSpanTable_sets == 0)
+				if ((ret = update_mxSpanTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->mxSpanTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
-		SNMP_FREE(old_value);
-		old_length = 0;
-		string = NULL;
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->mxSpanTable_old) != NULL) {
+			mxSpanTable_destroy(&StorageTmp->mxSpanTable_old);
+			StorageTmp->mxSpanTable_rsvs = 0;
+			StorageTmp->mxSpanTable_tsts = 0;
+			StorageTmp->mxSpanTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->mxSpanDataLink = old_value;
-		StorageTmp->mxSpanDataLinkLen = old_length;
+		if ((StorageOld = StorageTmp->mxSpanTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->mxSpanTable_sets == 0)
+			revert_mxSpanTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
-		SNMP_FREE(string);
+		if ((StorageOld = StorageTmp->mxSpanTable_old) == NULL)
+			break;
+		if (StorageOld->mxSpanDataLink != NULL) {
+			SNMP_FREE(StorageTmp->mxSpanDataLink);
+			StorageTmp->mxSpanDataLink = StorageOld->mxSpanDataLink;
+			StorageTmp->mxSpanDataLinkLen = StorageOld->mxSpanDataLinkLen;
+			StorageOld->mxSpanDataLink = NULL;
+			StorageOld->mxSpanDataLinkLen = 0;
+		}
+		if (--StorageTmp->mxSpanTable_rsvs == 0)
+			mxSpanTable_destroy(&StorageTmp->mxSpanTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -9784,12 +14375,14 @@ write_mxSpanDataLink(int action, u_char *var_val, u_char var_val_type, size_t va
 int
 write_mxSpanLineCode(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static long old_value;
-	struct mxSpanTable_data *StorageTmp = NULL;
+	struct mxSpanTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 15;
 	long set_value = *((long *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("mxMIB", "write_mxSpanLineCode entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(mxSpanTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -9828,22 +14421,61 @@ write_mxSpanLineCode(int action, u_char *var_val, u_char var_val_type, size_t va
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to mxSpanLineCode: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->mxSpanTable_old) == NULL)
+			if (StorageTmp->mxSpanTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->mxSpanTable_old = mxSpanTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->mxSpanTable_rsvs++;
+		StorageTmp->mxSpanLineCode = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->mxSpanTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->mxSpanTable_tsts == 0)
+				if ((ret = check_mxSpanTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->mxSpanTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->mxSpanLineCode for you to use, and you have just been asked to do something with it.  Note that anything done here must
 				   be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->mxSpanLineCode;
-		StorageTmp->mxSpanLineCode = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->mxSpanTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->mxSpanTable_sets == 0)
+				if ((ret = update_mxSpanTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->mxSpanTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->mxSpanTable_old) != NULL) {
+			mxSpanTable_destroy(&StorageTmp->mxSpanTable_old);
+			StorageTmp->mxSpanTable_rsvs = 0;
+			StorageTmp->mxSpanTable_tsts = 0;
+			StorageTmp->mxSpanTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->mxSpanLineCode = old_value;
+		if ((StorageOld = StorageTmp->mxSpanTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->mxSpanTable_sets == 0)
+			revert_mxSpanTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->mxSpanTable_old) == NULL)
+			break;
+		StorageTmp->mxSpanLineCode = StorageOld->mxSpanLineCode;
+		if (--StorageTmp->mxSpanTable_rsvs == 0)
+			mxSpanTable_destroy(&StorageTmp->mxSpanTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -9863,17 +14495,17 @@ write_mxSpanLineCode(int action, u_char *var_val, u_char var_val_type, size_t va
 int
 write_mxSpanAlarmSeverityMapProfile(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static oid *old_value;
-	struct mxSpanTable_data *StorageTmp = NULL;
+	struct mxSpanTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 15;
-	static size_t old_length = 0;
-	static oid *objid = NULL;
+	oid *objid = NULL;
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("mxMIB", "write_mxSpanAlarmSeverityMapProfile entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(mxSpanTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
-		objid = NULL;
 		if (StorageTmp != NULL && statP == NULL) {
 			/* have row but no column */
 			switch (StorageTmp->mxSpanRowStatus) {
@@ -9896,31 +14528,71 @@ write_mxSpanAlarmSeverityMapProfile(int action, u_char *var_val, u_char var_val_
 			return SNMP_ERR_WRONGLENGTH;
 		}
 		/* Note: default value zeroDotZero */
-		break;
-	case RESERVE2:		/* memory reseveration, final preparation... */
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->mxSpanTable_old) == NULL)
+			if (StorageTmp->mxSpanTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->mxSpanTable_old = mxSpanTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->mxSpanTable_rsvs++;
 		if ((objid = snmp_duplicate_objid((void *) var_val, var_val_len / sizeof(oid))) == NULL)
 			return SNMP_ERR_RESOURCEUNAVAILABLE;
+		SNMP_FREE(StorageTmp->mxSpanAlarmSeverityMapProfile);
+		StorageTmp->mxSpanAlarmSeverityMapProfile = objid;
+		StorageTmp->mxSpanAlarmSeverityMapProfileLen = var_val_len / sizeof(oid);
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
+		break;
+	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->mxSpanTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->mxSpanTable_tsts == 0)
+				if ((ret = check_mxSpanTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->mxSpanTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->mxSpanAlarmSeverityMapProfile for you to use, and you have just been asked to do something with it.  Note that anything
 				   done here must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->mxSpanAlarmSeverityMapProfile;
-		old_length = StorageTmp->mxSpanAlarmSeverityMapProfileLen;
-		StorageTmp->mxSpanAlarmSeverityMapProfile = objid;
-		StorageTmp->mxSpanAlarmSeverityMapProfileLen = var_val_len / sizeof(oid);
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->mxSpanTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->mxSpanTable_sets == 0)
+				if ((ret = update_mxSpanTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->mxSpanTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
-		SNMP_FREE(old_value);
-		old_length = 0;
-		objid = NULL;
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->mxSpanTable_old) != NULL) {
+			mxSpanTable_destroy(&StorageTmp->mxSpanTable_old);
+			StorageTmp->mxSpanTable_rsvs = 0;
+			StorageTmp->mxSpanTable_tsts = 0;
+			StorageTmp->mxSpanTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->mxSpanAlarmSeverityMapProfile = old_value;
-		StorageTmp->mxSpanAlarmSeverityMapProfileLen = old_length;
+		if ((StorageOld = StorageTmp->mxSpanTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->mxSpanTable_sets == 0)
+			revert_mxSpanTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
-		SNMP_FREE(objid);
+		if ((StorageOld = StorageTmp->mxSpanTable_old) == NULL)
+			break;
+		if (StorageOld->mxSpanAlarmSeverityMapProfile != NULL) {
+			SNMP_FREE(StorageTmp->mxSpanAlarmSeverityMapProfile);
+			StorageTmp->mxSpanAlarmSeverityMapProfile = StorageOld->mxSpanAlarmSeverityMapProfile;
+			StorageTmp->mxSpanAlarmSeverityMapProfileLen = StorageOld->mxSpanAlarmSeverityMapProfileLen;
+			StorageOld->mxSpanAlarmSeverityMapProfile = NULL;
+			StorageOld->mxSpanAlarmSeverityMapProfileLen = 0;
+		}
+		if (--StorageTmp->mxSpanTable_rsvs == 0)
+			mxSpanTable_destroy(&StorageTmp->mxSpanTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -9940,12 +14612,14 @@ write_mxSpanAlarmSeverityMapProfile(int action, u_char *var_val, u_char var_val_
 int
 write_mxSpanAdministrativeState(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static long old_value;
-	struct mxSpanTable_data *StorageTmp = NULL;
+	struct mxSpanTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 15;
 	long set_value = *((long *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("mxMIB", "write_mxSpanAdministrativeState entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(mxSpanTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -9980,22 +14654,61 @@ write_mxSpanAdministrativeState(int action, u_char *var_val, u_char var_val_type
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to mxSpanAdministrativeState: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->mxSpanTable_old) == NULL)
+			if (StorageTmp->mxSpanTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->mxSpanTable_old = mxSpanTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->mxSpanTable_rsvs++;
+		StorageTmp->mxSpanAdministrativeState = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->mxSpanTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->mxSpanTable_tsts == 0)
+				if ((ret = check_mxSpanTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->mxSpanTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->mxSpanAdministrativeState for you to use, and you have just been asked to do something with it.  Note that anything done 
 				   here must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->mxSpanAdministrativeState;
-		StorageTmp->mxSpanAdministrativeState = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->mxSpanTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->mxSpanTable_sets == 0)
+				if ((ret = update_mxSpanTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->mxSpanTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->mxSpanTable_old) != NULL) {
+			mxSpanTable_destroy(&StorageTmp->mxSpanTable_old);
+			StorageTmp->mxSpanTable_rsvs = 0;
+			StorageTmp->mxSpanTable_tsts = 0;
+			StorageTmp->mxSpanTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->mxSpanAdministrativeState = old_value;
+		if ((StorageOld = StorageTmp->mxSpanTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->mxSpanTable_sets == 0)
+			revert_mxSpanTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->mxSpanTable_old) == NULL)
+			break;
+		StorageTmp->mxSpanAdministrativeState = StorageOld->mxSpanAdministrativeState;
+		if (--StorageTmp->mxSpanTable_rsvs == 0)
+			mxSpanTable_destroy(&StorageTmp->mxSpanTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -10015,17 +14728,17 @@ write_mxSpanAdministrativeState(int action, u_char *var_val, u_char var_val_type
 int
 write_mxSpanAlarmStatus(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static uint8_t *old_value;
-	struct mxSpanTable_data *StorageTmp = NULL;
+	struct mxSpanTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 15;
-	static size_t old_length = 0;
-	static uint8_t *string = NULL;
+	uint8_t *string = NULL;
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("mxMIB", "write_mxSpanAlarmStatus entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(mxSpanTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
-		string = NULL;
 		if (StorageTmp != NULL && statP == NULL) {
 			/* have row but no column */
 			switch (StorageTmp->mxSpanRowStatus) {
@@ -10056,33 +14769,73 @@ write_mxSpanAlarmStatus(int action, u_char *var_val, u_char var_val_type, size_t
 			}
 		}
 		/* Note: default value { } */
-		break;
-	case RESERVE2:		/* memory reseveration, final preparation... */
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->mxSpanTable_old) == NULL)
+			if (StorageTmp->mxSpanTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->mxSpanTable_old = mxSpanTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->mxSpanTable_rsvs++;
 		if ((string = malloc(var_val_len + 1)) == NULL)
 			return SNMP_ERR_RESOURCEUNAVAILABLE;
 		memcpy((void *) string, (void *) var_val, var_val_len);
 		string[var_val_len] = 0;
+		SNMP_FREE(StorageTmp->mxSpanAlarmStatus);
+		StorageTmp->mxSpanAlarmStatus = string;
+		StorageTmp->mxSpanAlarmStatusLen = var_val_len;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
+		break;
+	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->mxSpanTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->mxSpanTable_tsts == 0)
+				if ((ret = check_mxSpanTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->mxSpanTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->mxSpanAlarmStatus for you to use, and you have just been asked to do something with it.  Note that anything done here
 				   must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->mxSpanAlarmStatus;
-		old_length = StorageTmp->mxSpanAlarmStatusLen;
-		StorageTmp->mxSpanAlarmStatus = string;
-		StorageTmp->mxSpanAlarmStatusLen = var_val_len;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->mxSpanTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->mxSpanTable_sets == 0)
+				if ((ret = update_mxSpanTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->mxSpanTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
-		SNMP_FREE(old_value);
-		old_length = 0;
-		string = NULL;
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->mxSpanTable_old) != NULL) {
+			mxSpanTable_destroy(&StorageTmp->mxSpanTable_old);
+			StorageTmp->mxSpanTable_rsvs = 0;
+			StorageTmp->mxSpanTable_tsts = 0;
+			StorageTmp->mxSpanTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->mxSpanAlarmStatus = old_value;
-		StorageTmp->mxSpanAlarmStatusLen = old_length;
+		if ((StorageOld = StorageTmp->mxSpanTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->mxSpanTable_sets == 0)
+			revert_mxSpanTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
-		SNMP_FREE(string);
+		if ((StorageOld = StorageTmp->mxSpanTable_old) == NULL)
+			break;
+		if (StorageOld->mxSpanAlarmStatus != NULL) {
+			SNMP_FREE(StorageTmp->mxSpanAlarmStatus);
+			StorageTmp->mxSpanAlarmStatus = StorageOld->mxSpanAlarmStatus;
+			StorageTmp->mxSpanAlarmStatusLen = StorageOld->mxSpanAlarmStatusLen;
+			StorageOld->mxSpanAlarmStatus = NULL;
+			StorageOld->mxSpanAlarmStatusLen = 0;
+		}
+		if (--StorageTmp->mxSpanTable_rsvs == 0)
+			mxSpanTable_destroy(&StorageTmp->mxSpanTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -10102,17 +14855,17 @@ write_mxSpanAlarmStatus(int action, u_char *var_val, u_char var_val_type, size_t
 int
 write_mxSpanControlStatus(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static uint8_t *old_value;
-	struct mxSpanTable_data *StorageTmp = NULL;
+	struct mxSpanTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 15;
-	static size_t old_length = 0;
-	static uint8_t *string = NULL;
+	uint8_t *string = NULL;
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("mxMIB", "write_mxSpanControlStatus entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(mxSpanTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
-		string = NULL;
 		if (StorageTmp != NULL && statP == NULL) {
 			/* have row but no column */
 			switch (StorageTmp->mxSpanRowStatus) {
@@ -10142,33 +14895,73 @@ write_mxSpanControlStatus(int action, u_char *var_val, u_char var_val_type, size
 				return SNMP_ERR_WRONGLENGTH;
 			}
 		}
-		break;
-	case RESERVE2:		/* memory reseveration, final preparation... */
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->mxSpanTable_old) == NULL)
+			if (StorageTmp->mxSpanTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->mxSpanTable_old = mxSpanTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->mxSpanTable_rsvs++;
 		if ((string = malloc(var_val_len + 1)) == NULL)
 			return SNMP_ERR_RESOURCEUNAVAILABLE;
 		memcpy((void *) string, (void *) var_val, var_val_len);
 		string[var_val_len] = 0;
+		SNMP_FREE(StorageTmp->mxSpanControlStatus);
+		StorageTmp->mxSpanControlStatus = string;
+		StorageTmp->mxSpanControlStatusLen = var_val_len;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
+		break;
+	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->mxSpanTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->mxSpanTable_tsts == 0)
+				if ((ret = check_mxSpanTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->mxSpanTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->mxSpanControlStatus for you to use, and you have just been asked to do something with it.  Note that anything done here
 				   must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->mxSpanControlStatus;
-		old_length = StorageTmp->mxSpanControlStatusLen;
-		StorageTmp->mxSpanControlStatus = string;
-		StorageTmp->mxSpanControlStatusLen = var_val_len;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->mxSpanTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->mxSpanTable_sets == 0)
+				if ((ret = update_mxSpanTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->mxSpanTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
-		SNMP_FREE(old_value);
-		old_length = 0;
-		string = NULL;
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->mxSpanTable_old) != NULL) {
+			mxSpanTable_destroy(&StorageTmp->mxSpanTable_old);
+			StorageTmp->mxSpanTable_rsvs = 0;
+			StorageTmp->mxSpanTable_tsts = 0;
+			StorageTmp->mxSpanTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->mxSpanControlStatus = old_value;
-		StorageTmp->mxSpanControlStatusLen = old_length;
+		if ((StorageOld = StorageTmp->mxSpanTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->mxSpanTable_sets == 0)
+			revert_mxSpanTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
-		SNMP_FREE(string);
+		if ((StorageOld = StorageTmp->mxSpanTable_old) == NULL)
+			break;
+		if (StorageOld->mxSpanControlStatus != NULL) {
+			SNMP_FREE(StorageTmp->mxSpanControlStatus);
+			StorageTmp->mxSpanControlStatus = StorageOld->mxSpanControlStatus;
+			StorageTmp->mxSpanControlStatusLen = StorageOld->mxSpanControlStatusLen;
+			StorageOld->mxSpanControlStatus = NULL;
+			StorageOld->mxSpanControlStatusLen = 0;
+		}
+		if (--StorageTmp->mxSpanTable_rsvs == 0)
+			mxSpanTable_destroy(&StorageTmp->mxSpanTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -10188,12 +14981,14 @@ write_mxSpanControlStatus(int action, u_char *var_val, u_char var_val_type, size
 int
 write_mxSpanReceiveThreshold(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static ulong old_value;
-	struct mxSpanTable_data *StorageTmp = NULL;
+	struct mxSpanTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 15;
 	ulong set_value = *((ulong *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("mxMIB", "write_mxSpanReceiveThreshold entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(mxSpanTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -10223,22 +15018,61 @@ write_mxSpanReceiveThreshold(int action, u_char *var_val, u_char var_val_type, s
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to mxSpanReceiveThreshold: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->mxSpanTable_old) == NULL)
+			if (StorageTmp->mxSpanTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->mxSpanTable_old = mxSpanTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->mxSpanTable_rsvs++;
+		StorageTmp->mxSpanReceiveThreshold = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->mxSpanTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->mxSpanTable_tsts == 0)
+				if ((ret = check_mxSpanTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->mxSpanTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->mxSpanReceiveThreshold for you to use, and you have just been asked to do something with it.  Note that anything done
 				   here must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->mxSpanReceiveThreshold;
-		StorageTmp->mxSpanReceiveThreshold = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->mxSpanTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->mxSpanTable_sets == 0)
+				if ((ret = update_mxSpanTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->mxSpanTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->mxSpanTable_old) != NULL) {
+			mxSpanTable_destroy(&StorageTmp->mxSpanTable_old);
+			StorageTmp->mxSpanTable_rsvs = 0;
+			StorageTmp->mxSpanTable_tsts = 0;
+			StorageTmp->mxSpanTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->mxSpanReceiveThreshold = old_value;
+		if ((StorageOld = StorageTmp->mxSpanTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->mxSpanTable_sets == 0)
+			revert_mxSpanTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->mxSpanTable_old) == NULL)
+			break;
+		StorageTmp->mxSpanReceiveThreshold = StorageOld->mxSpanReceiveThreshold;
+		if (--StorageTmp->mxSpanTable_rsvs == 0)
+			mxSpanTable_destroy(&StorageTmp->mxSpanTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -10258,12 +15092,14 @@ write_mxSpanReceiveThreshold(int action, u_char *var_val, u_char var_val_type, s
 int
 write_mxBertMode(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static long old_value;
-	struct mxBertTable_data *StorageTmp = NULL;
+	struct mxBertTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 15;
 	long set_value = *((long *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("mxMIB", "write_mxBertMode entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(mxBertTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
@@ -10288,20 +15124,59 @@ write_mxBertMode(int action, u_char *var_val, u_char var_val_type, size_t var_va
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to mxBertMode: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->mxBertTable_old) == NULL)
+			if (StorageTmp->mxBertTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->mxBertTable_old = mxBertTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->mxBertTable_rsvs++;
+		StorageTmp->mxBertMode = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->mxBertTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->mxBertTable_tsts == 0)
+				if ((ret = check_mxBertTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->mxBertTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->mxBertMode for you to use, and you have just been asked to do something with it.  Note that anything done here must be
 				   reversable in the UNDO case */
-		old_value = StorageTmp->mxBertMode;
-		StorageTmp->mxBertMode = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->mxBertTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->mxBertTable_sets == 0)
+				if ((ret = update_mxBertTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->mxBertTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->mxBertTable_old) != NULL) {
+			mxBertTable_destroy(&StorageTmp->mxBertTable_old);
+			StorageTmp->mxBertTable_rsvs = 0;
+			StorageTmp->mxBertTable_tsts = 0;
+			StorageTmp->mxBertTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->mxBertMode = old_value;
+		if ((StorageOld = StorageTmp->mxBertTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->mxBertTable_sets == 0)
+			revert_mxBertTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->mxBertTable_old) == NULL)
+			break;
+		StorageTmp->mxBertMode = StorageOld->mxBertMode;
+		if (--StorageTmp->mxBertTable_rsvs == 0)
+			mxBertTable_destroy(&StorageTmp->mxBertTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -10321,12 +15196,14 @@ write_mxBertMode(int action, u_char *var_val, u_char var_val_type, size_t var_va
 int
 write_mxBertSelect(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static long old_value;
-	struct mxBertTable_data *StorageTmp = NULL;
+	struct mxBertTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 15;
 	long set_value = *((long *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("mxMIB", "write_mxBertSelect entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(mxBertTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
@@ -10356,20 +15233,59 @@ write_mxBertSelect(int action, u_char *var_val, u_char var_val_type, size_t var_
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to mxBertSelect: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->mxBertTable_old) == NULL)
+			if (StorageTmp->mxBertTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->mxBertTable_old = mxBertTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->mxBertTable_rsvs++;
+		StorageTmp->mxBertSelect = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->mxBertTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->mxBertTable_tsts == 0)
+				if ((ret = check_mxBertTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->mxBertTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->mxBertSelect for you to use, and you have just been asked to do something with it.  Note that anything done here must be 
 				   reversable in the UNDO case */
-		old_value = StorageTmp->mxBertSelect;
-		StorageTmp->mxBertSelect = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->mxBertTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->mxBertTable_sets == 0)
+				if ((ret = update_mxBertTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->mxBertTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->mxBertTable_old) != NULL) {
+			mxBertTable_destroy(&StorageTmp->mxBertTable_old);
+			StorageTmp->mxBertTable_rsvs = 0;
+			StorageTmp->mxBertTable_tsts = 0;
+			StorageTmp->mxBertTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->mxBertSelect = old_value;
+		if ((StorageOld = StorageTmp->mxBertTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->mxBertTable_sets == 0)
+			revert_mxBertTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->mxBertTable_old) == NULL)
+			break;
+		StorageTmp->mxBertSelect = StorageOld->mxBertSelect;
+		if (--StorageTmp->mxBertTable_rsvs == 0)
+			mxBertTable_destroy(&StorageTmp->mxBertTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -10389,19 +15305,19 @@ write_mxBertSelect(int action, u_char *var_val, u_char var_val_type, size_t var_
 int
 write_mxBertPattern(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static uint8_t *old_value;
-	struct mxBertTable_data *StorageTmp = NULL;
+	struct mxBertTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 15;
-	static size_t old_length = 0;
-	static uint8_t *string = NULL;
+	uint8_t *string = NULL;
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("mxMIB", "write_mxBertPattern entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(mxBertTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	switch (action) {
 	case RESERVE1:
-		string = NULL;
 		if (var_val_type != ASN_OCTET_STR) {
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to mxBertPattern not ASN_OCTET_STR\n");
 			return SNMP_ERR_WRONGTYPE;
@@ -10412,31 +15328,71 @@ write_mxBertPattern(int action, u_char *var_val, u_char var_val_type, size_t var
 			return SNMP_ERR_WRONGLENGTH;
 		}
 		/* Note: default value \"\x10\xFF\xFF\xFF\xFF\" */
-		break;
-	case RESERVE2:		/* memory reseveration, final preparation... */
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->mxBertTable_old) == NULL)
+			if (StorageTmp->mxBertTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->mxBertTable_old = mxBertTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->mxBertTable_rsvs++;
 		if ((string = malloc(var_val_len + 1)) == NULL)
 			return SNMP_ERR_RESOURCEUNAVAILABLE;
 		memcpy((void *) string, (void *) var_val, var_val_len);
 		string[var_val_len] = 0;
+		SNMP_FREE(StorageTmp->mxBertPattern);
+		StorageTmp->mxBertPattern = string;
+		StorageTmp->mxBertPatternLen = var_val_len;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
+		break;
+	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->mxBertTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->mxBertTable_tsts == 0)
+				if ((ret = check_mxBertTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->mxBertTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->mxBertPattern for you to use, and you have just been asked to do something with it.  Note that anything done here must
 				   be reversable in the UNDO case */
-		old_value = StorageTmp->mxBertPattern;
-		old_length = StorageTmp->mxBertPatternLen;
-		StorageTmp->mxBertPattern = string;
-		StorageTmp->mxBertPatternLen = var_val_len;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->mxBertTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->mxBertTable_sets == 0)
+				if ((ret = update_mxBertTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->mxBertTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
-		SNMP_FREE(old_value);
-		old_length = 0;
-		string = NULL;
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->mxBertTable_old) != NULL) {
+			mxBertTable_destroy(&StorageTmp->mxBertTable_old);
+			StorageTmp->mxBertTable_rsvs = 0;
+			StorageTmp->mxBertTable_tsts = 0;
+			StorageTmp->mxBertTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->mxBertPattern = old_value;
-		StorageTmp->mxBertPatternLen = old_length;
+		if ((StorageOld = StorageTmp->mxBertTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->mxBertTable_sets == 0)
+			revert_mxBertTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
-		SNMP_FREE(string);
+		if ((StorageOld = StorageTmp->mxBertTable_old) == NULL)
+			break;
+		if (StorageOld->mxBertPattern != NULL) {
+			SNMP_FREE(StorageTmp->mxBertPattern);
+			StorageTmp->mxBertPattern = StorageOld->mxBertPattern;
+			StorageTmp->mxBertPatternLen = StorageOld->mxBertPatternLen;
+			StorageOld->mxBertPattern = NULL;
+			StorageOld->mxBertPatternLen = 0;
+		}
+		if (--StorageTmp->mxBertTable_rsvs == 0)
+			mxBertTable_destroy(&StorageTmp->mxBertTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -10456,12 +15412,14 @@ write_mxBertPattern(int action, u_char *var_val, u_char var_val_type, size_t var
 int
 write_mxChanType(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static long old_value;
-	struct mxChanTable_data *StorageTmp = NULL;
+	struct mxChanTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 15;
 	long set_value = *((long *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("mxMIB", "write_mxChanType entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(mxChanTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
@@ -10485,20 +15443,59 @@ write_mxChanType(int action, u_char *var_val, u_char var_val_type, size_t var_va
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to mxChanType: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->mxChanTable_old) == NULL)
+			if (StorageTmp->mxChanTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->mxChanTable_old = mxChanTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->mxChanTable_rsvs++;
+		StorageTmp->mxChanType = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->mxChanTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->mxChanTable_tsts == 0)
+				if ((ret = check_mxChanTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->mxChanTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->mxChanType for you to use, and you have just been asked to do something with it.  Note that anything done here must be
 				   reversable in the UNDO case */
-		old_value = StorageTmp->mxChanType;
-		StorageTmp->mxChanType = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->mxChanTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->mxChanTable_sets == 0)
+				if ((ret = update_mxChanTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->mxChanTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->mxChanTable_old) != NULL) {
+			mxChanTable_destroy(&StorageTmp->mxChanTable_old);
+			StorageTmp->mxChanTable_rsvs = 0;
+			StorageTmp->mxChanTable_tsts = 0;
+			StorageTmp->mxChanTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->mxChanType = old_value;
+		if ((StorageOld = StorageTmp->mxChanTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->mxChanTable_sets == 0)
+			revert_mxChanTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->mxChanTable_old) == NULL)
+			break;
+		StorageTmp->mxChanType = StorageOld->mxChanType;
+		if (--StorageTmp->mxChanTable_rsvs == 0)
+			mxChanTable_destroy(&StorageTmp->mxChanTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -10518,12 +15515,14 @@ write_mxChanType(int action, u_char *var_val, u_char var_val_type, size_t var_va
 int
 write_mxChanFormat(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static long old_value;
-	struct mxChanTable_data *StorageTmp = NULL;
+	struct mxChanTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 15;
 	long set_value = *((long *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("mxMIB", "write_mxChanFormat entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(mxChanTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
@@ -10549,20 +15548,59 @@ write_mxChanFormat(int action, u_char *var_val, u_char var_val_type, size_t var_
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to mxChanFormat: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->mxChanTable_old) == NULL)
+			if (StorageTmp->mxChanTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->mxChanTable_old = mxChanTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->mxChanTable_rsvs++;
+		StorageTmp->mxChanFormat = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->mxChanTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->mxChanTable_tsts == 0)
+				if ((ret = check_mxChanTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->mxChanTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->mxChanFormat for you to use, and you have just been asked to do something with it.  Note that anything done here must be 
 				   reversable in the UNDO case */
-		old_value = StorageTmp->mxChanFormat;
-		StorageTmp->mxChanFormat = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->mxChanTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->mxChanTable_sets == 0)
+				if ((ret = update_mxChanTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->mxChanTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->mxChanTable_old) != NULL) {
+			mxChanTable_destroy(&StorageTmp->mxChanTable_old);
+			StorageTmp->mxChanTable_rsvs = 0;
+			StorageTmp->mxChanTable_tsts = 0;
+			StorageTmp->mxChanTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->mxChanFormat = old_value;
+		if ((StorageOld = StorageTmp->mxChanTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->mxChanTable_sets == 0)
+			revert_mxChanTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->mxChanTable_old) == NULL)
+			break;
+		StorageTmp->mxChanFormat = StorageOld->mxChanFormat;
+		if (--StorageTmp->mxChanTable_rsvs == 0)
+			mxChanTable_destroy(&StorageTmp->mxChanTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -10582,12 +15620,14 @@ write_mxChanFormat(int action, u_char *var_val, u_char var_val_type, size_t var_
 int
 write_mxChanRate(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static long old_value;
-	struct mxChanTable_data *StorageTmp = NULL;
+	struct mxChanTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 15;
 	long set_value = *((long *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("mxMIB", "write_mxChanRate entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(mxChanTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
@@ -10612,20 +15652,59 @@ write_mxChanRate(int action, u_char *var_val, u_char var_val_type, size_t var_va
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to mxChanRate: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->mxChanTable_old) == NULL)
+			if (StorageTmp->mxChanTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->mxChanTable_old = mxChanTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->mxChanTable_rsvs++;
+		StorageTmp->mxChanRate = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->mxChanTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->mxChanTable_tsts == 0)
+				if ((ret = check_mxChanTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->mxChanTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->mxChanRate for you to use, and you have just been asked to do something with it.  Note that anything done here must be
 				   reversable in the UNDO case */
-		old_value = StorageTmp->mxChanRate;
-		StorageTmp->mxChanRate = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->mxChanTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->mxChanTable_sets == 0)
+				if ((ret = update_mxChanTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->mxChanTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->mxChanTable_old) != NULL) {
+			mxChanTable_destroy(&StorageTmp->mxChanTable_old);
+			StorageTmp->mxChanTable_rsvs = 0;
+			StorageTmp->mxChanTable_tsts = 0;
+			StorageTmp->mxChanTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->mxChanRate = old_value;
+		if ((StorageOld = StorageTmp->mxChanTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->mxChanTable_sets == 0)
+			revert_mxChanTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->mxChanTable_old) == NULL)
+			break;
+		StorageTmp->mxChanRate = StorageOld->mxChanRate;
+		if (--StorageTmp->mxChanTable_rsvs == 0)
+			mxChanTable_destroy(&StorageTmp->mxChanTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -10645,19 +15724,19 @@ write_mxChanRate(int action, u_char *var_val, u_char var_val_type, size_t var_va
 int
 write_mxChanMode(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static uint8_t *old_value;
-	struct mxChanTable_data *StorageTmp = NULL;
+	struct mxChanTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 15;
-	static size_t old_length = 0;
-	static uint8_t *string = NULL;
+	uint8_t *string = NULL;
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("mxMIB", "write_mxChanMode entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(mxChanTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	switch (action) {
 	case RESERVE1:
-		string = NULL;
 		if ((var_val_type != ASN_BIT_STR && var_val_type != ASN_OCTET_STR)) {
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to mxChanMode not ASN_OCTET_STR\n");
 			return SNMP_ERR_WRONGTYPE;
@@ -10674,31 +15753,71 @@ write_mxChanMode(int action, u_char *var_val, u_char var_val_type, size_t var_va
 				return SNMP_ERR_WRONGLENGTH;
 			}
 		}
-		break;
-	case RESERVE2:		/* memory reseveration, final preparation... */
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->mxChanTable_old) == NULL)
+			if (StorageTmp->mxChanTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->mxChanTable_old = mxChanTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->mxChanTable_rsvs++;
 		if ((string = malloc(var_val_len + 1)) == NULL)
 			return SNMP_ERR_RESOURCEUNAVAILABLE;
 		memcpy((void *) string, (void *) var_val, var_val_len);
 		string[var_val_len] = 0;
+		SNMP_FREE(StorageTmp->mxChanMode);
+		StorageTmp->mxChanMode = string;
+		StorageTmp->mxChanModeLen = var_val_len;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
+		break;
+	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->mxChanTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->mxChanTable_tsts == 0)
+				if ((ret = check_mxChanTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->mxChanTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->mxChanMode for you to use, and you have just been asked to do something with it.  Note that anything done here must be
 				   reversable in the UNDO case */
-		old_value = StorageTmp->mxChanMode;
-		old_length = StorageTmp->mxChanModeLen;
-		StorageTmp->mxChanMode = string;
-		StorageTmp->mxChanModeLen = var_val_len;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->mxChanTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->mxChanTable_sets == 0)
+				if ((ret = update_mxChanTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->mxChanTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
-		SNMP_FREE(old_value);
-		old_length = 0;
-		string = NULL;
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->mxChanTable_old) != NULL) {
+			mxChanTable_destroy(&StorageTmp->mxChanTable_old);
+			StorageTmp->mxChanTable_rsvs = 0;
+			StorageTmp->mxChanTable_tsts = 0;
+			StorageTmp->mxChanTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->mxChanMode = old_value;
-		StorageTmp->mxChanModeLen = old_length;
+		if ((StorageOld = StorageTmp->mxChanTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->mxChanTable_sets == 0)
+			revert_mxChanTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
-		SNMP_FREE(string);
+		if ((StorageOld = StorageTmp->mxChanTable_old) == NULL)
+			break;
+		if (StorageOld->mxChanMode != NULL) {
+			SNMP_FREE(StorageTmp->mxChanMode);
+			StorageTmp->mxChanMode = StorageOld->mxChanMode;
+			StorageTmp->mxChanModeLen = StorageOld->mxChanModeLen;
+			StorageOld->mxChanMode = NULL;
+			StorageOld->mxChanModeLen = 0;
+		}
+		if (--StorageTmp->mxChanTable_rsvs == 0)
+			mxChanTable_destroy(&StorageTmp->mxChanTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -10718,12 +15837,14 @@ write_mxChanMode(int action, u_char *var_val, u_char var_val_type, size_t var_va
 int
 write_mxChanAdministrativeState(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static long old_value;
-	struct mxChanTable_data *StorageTmp = NULL;
+	struct mxChanTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 15;
 	long set_value = *((long *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("mxMIB", "write_mxChanAdministrativeState entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(mxChanTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
@@ -10747,20 +15868,59 @@ write_mxChanAdministrativeState(int action, u_char *var_val, u_char var_val_type
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to mxChanAdministrativeState: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->mxChanTable_old) == NULL)
+			if (StorageTmp->mxChanTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->mxChanTable_old = mxChanTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->mxChanTable_rsvs++;
+		StorageTmp->mxChanAdministrativeState = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->mxChanTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->mxChanTable_tsts == 0)
+				if ((ret = check_mxChanTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->mxChanTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->mxChanAdministrativeState for you to use, and you have just been asked to do something with it.  Note that anything done 
 				   here must be reversable in the UNDO case */
-		old_value = StorageTmp->mxChanAdministrativeState;
-		StorageTmp->mxChanAdministrativeState = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->mxChanTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->mxChanTable_sets == 0)
+				if ((ret = update_mxChanTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->mxChanTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->mxChanTable_old) != NULL) {
+			mxChanTable_destroy(&StorageTmp->mxChanTable_old);
+			StorageTmp->mxChanTable_rsvs = 0;
+			StorageTmp->mxChanTable_tsts = 0;
+			StorageTmp->mxChanTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->mxChanAdministrativeState = old_value;
+		if ((StorageOld = StorageTmp->mxChanTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->mxChanTable_sets == 0)
+			revert_mxChanTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->mxChanTable_old) == NULL)
+			break;
+		StorageTmp->mxChanAdministrativeState = StorageOld->mxChanAdministrativeState;
+		if (--StorageTmp->mxChanTable_rsvs == 0)
+			mxChanTable_destroy(&StorageTmp->mxChanTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -10780,19 +15940,19 @@ write_mxChanAdministrativeState(int action, u_char *var_val, u_char var_val_type
 int
 write_mxChanControlStatus(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static uint8_t *old_value;
-	struct mxChanTable_data *StorageTmp = NULL;
+	struct mxChanTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 15;
-	static size_t old_length = 0;
-	static uint8_t *string = NULL;
+	uint8_t *string = NULL;
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("mxMIB", "write_mxChanControlStatus entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(mxChanTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	switch (action) {
 	case RESERVE1:
-		string = NULL;
 		if ((var_val_type != ASN_BIT_STR && var_val_type != ASN_OCTET_STR)) {
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to mxChanControlStatus not ASN_OCTET_STR\n");
 			return SNMP_ERR_WRONGTYPE;
@@ -10809,31 +15969,71 @@ write_mxChanControlStatus(int action, u_char *var_val, u_char var_val_type, size
 				return SNMP_ERR_WRONGLENGTH;
 			}
 		}
-		break;
-	case RESERVE2:		/* memory reseveration, final preparation... */
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->mxChanTable_old) == NULL)
+			if (StorageTmp->mxChanTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->mxChanTable_old = mxChanTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->mxChanTable_rsvs++;
 		if ((string = malloc(var_val_len + 1)) == NULL)
 			return SNMP_ERR_RESOURCEUNAVAILABLE;
 		memcpy((void *) string, (void *) var_val, var_val_len);
 		string[var_val_len] = 0;
+		SNMP_FREE(StorageTmp->mxChanControlStatus);
+		StorageTmp->mxChanControlStatus = string;
+		StorageTmp->mxChanControlStatusLen = var_val_len;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
+		break;
+	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->mxChanTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->mxChanTable_tsts == 0)
+				if ((ret = check_mxChanTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->mxChanTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->mxChanControlStatus for you to use, and you have just been asked to do something with it.  Note that anything done here
 				   must be reversable in the UNDO case */
-		old_value = StorageTmp->mxChanControlStatus;
-		old_length = StorageTmp->mxChanControlStatusLen;
-		StorageTmp->mxChanControlStatus = string;
-		StorageTmp->mxChanControlStatusLen = var_val_len;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->mxChanTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->mxChanTable_sets == 0)
+				if ((ret = update_mxChanTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->mxChanTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
-		SNMP_FREE(old_value);
-		old_length = 0;
-		string = NULL;
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->mxChanTable_old) != NULL) {
+			mxChanTable_destroy(&StorageTmp->mxChanTable_old);
+			StorageTmp->mxChanTable_rsvs = 0;
+			StorageTmp->mxChanTable_tsts = 0;
+			StorageTmp->mxChanTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->mxChanControlStatus = old_value;
-		StorageTmp->mxChanControlStatusLen = old_length;
+		if ((StorageOld = StorageTmp->mxChanTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->mxChanTable_sets == 0)
+			revert_mxChanTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
-		SNMP_FREE(string);
+		if ((StorageOld = StorageTmp->mxChanTable_old) == NULL)
+			break;
+		if (StorageOld->mxChanControlStatus != NULL) {
+			SNMP_FREE(StorageTmp->mxChanControlStatus);
+			StorageTmp->mxChanControlStatus = StorageOld->mxChanControlStatus;
+			StorageTmp->mxChanControlStatusLen = StorageOld->mxChanControlStatusLen;
+			StorageOld->mxChanControlStatus = NULL;
+			StorageOld->mxChanControlStatusLen = 0;
+		}
+		if (--StorageTmp->mxChanTable_rsvs == 0)
+			mxChanTable_destroy(&StorageTmp->mxChanTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -10853,19 +16053,19 @@ write_mxChanControlStatus(int action, u_char *var_val, u_char var_val_type, size
 int
 write_mxChanAlarmStatus(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static uint8_t *old_value;
-	struct mxChanTable_data *StorageTmp = NULL;
+	struct mxChanTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 15;
-	static size_t old_length = 0;
-	static uint8_t *string = NULL;
+	uint8_t *string = NULL;
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("mxMIB", "write_mxChanAlarmStatus entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(mxChanTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	switch (action) {
 	case RESERVE1:
-		string = NULL;
 		if ((var_val_type != ASN_BIT_STR && var_val_type != ASN_OCTET_STR)) {
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to mxChanAlarmStatus not ASN_OCTET_STR\n");
 			return SNMP_ERR_WRONGTYPE;
@@ -10882,31 +16082,71 @@ write_mxChanAlarmStatus(int action, u_char *var_val, u_char var_val_type, size_t
 				return SNMP_ERR_WRONGLENGTH;
 			}
 		}
-		break;
-	case RESERVE2:		/* memory reseveration, final preparation... */
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->mxChanTable_old) == NULL)
+			if (StorageTmp->mxChanTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->mxChanTable_old = mxChanTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->mxChanTable_rsvs++;
 		if ((string = malloc(var_val_len + 1)) == NULL)
 			return SNMP_ERR_RESOURCEUNAVAILABLE;
 		memcpy((void *) string, (void *) var_val, var_val_len);
 		string[var_val_len] = 0;
+		SNMP_FREE(StorageTmp->mxChanAlarmStatus);
+		StorageTmp->mxChanAlarmStatus = string;
+		StorageTmp->mxChanAlarmStatusLen = var_val_len;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
+		break;
+	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->mxChanTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->mxChanTable_tsts == 0)
+				if ((ret = check_mxChanTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->mxChanTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->mxChanAlarmStatus for you to use, and you have just been asked to do something with it.  Note that anything done here
 				   must be reversable in the UNDO case */
-		old_value = StorageTmp->mxChanAlarmStatus;
-		old_length = StorageTmp->mxChanAlarmStatusLen;
-		StorageTmp->mxChanAlarmStatus = string;
-		StorageTmp->mxChanAlarmStatusLen = var_val_len;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->mxChanTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->mxChanTable_sets == 0)
+				if ((ret = update_mxChanTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->mxChanTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
-		SNMP_FREE(old_value);
-		old_length = 0;
-		string = NULL;
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->mxChanTable_old) != NULL) {
+			mxChanTable_destroy(&StorageTmp->mxChanTable_old);
+			StorageTmp->mxChanTable_rsvs = 0;
+			StorageTmp->mxChanTable_tsts = 0;
+			StorageTmp->mxChanTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->mxChanAlarmStatus = old_value;
-		StorageTmp->mxChanAlarmStatusLen = old_length;
+		if ((StorageOld = StorageTmp->mxChanTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->mxChanTable_sets == 0)
+			revert_mxChanTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
-		SNMP_FREE(string);
+		if ((StorageOld = StorageTmp->mxChanTable_old) == NULL)
+			break;
+		if (StorageOld->mxChanAlarmStatus != NULL) {
+			SNMP_FREE(StorageTmp->mxChanAlarmStatus);
+			StorageTmp->mxChanAlarmStatus = StorageOld->mxChanAlarmStatus;
+			StorageTmp->mxChanAlarmStatusLen = StorageOld->mxChanAlarmStatusLen;
+			StorageOld->mxChanAlarmStatus = NULL;
+			StorageOld->mxChanAlarmStatusLen = 0;
+		}
+		if (--StorageTmp->mxChanTable_rsvs == 0)
+			mxChanTable_destroy(&StorageTmp->mxChanTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -10926,12 +16166,14 @@ write_mxChanAlarmStatus(int action, u_char *var_val, u_char var_val_type, size_t
 int
 write_mxXconCardIndex(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static ulong old_value;
-	struct mxXconTable_data *StorageTmp = NULL;
+	struct mxXconTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 15;
 	ulong set_value = *((ulong *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("mxMIB", "write_mxXconCardIndex entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(mxXconTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -10956,22 +16198,61 @@ write_mxXconCardIndex(int action, u_char *var_val, u_char var_val_type, size_t v
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to mxXconCardIndex: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->mxXconTable_old) == NULL)
+			if (StorageTmp->mxXconTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->mxXconTable_old = mxXconTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->mxXconTable_rsvs++;
+		StorageTmp->mxXconCardIndex = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->mxXconTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->mxXconTable_tsts == 0)
+				if ((ret = check_mxXconTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->mxXconTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->mxXconCardIndex for you to use, and you have just been asked to do something with it.  Note that anything done here must 
 				   be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->mxXconCardIndex;
-		StorageTmp->mxXconCardIndex = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->mxXconTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->mxXconTable_sets == 0)
+				if ((ret = update_mxXconTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->mxXconTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->mxXconTable_old) != NULL) {
+			mxXconTable_destroy(&StorageTmp->mxXconTable_old);
+			StorageTmp->mxXconTable_rsvs = 0;
+			StorageTmp->mxXconTable_tsts = 0;
+			StorageTmp->mxXconTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->mxXconCardIndex = old_value;
+		if ((StorageOld = StorageTmp->mxXconTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->mxXconTable_sets == 0)
+			revert_mxXconTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->mxXconTable_old) == NULL)
+			break;
+		StorageTmp->mxXconCardIndex = StorageOld->mxXconCardIndex;
+		if (--StorageTmp->mxXconTable_rsvs == 0)
+			mxXconTable_destroy(&StorageTmp->mxXconTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -10991,12 +16272,14 @@ write_mxXconCardIndex(int action, u_char *var_val, u_char var_val_type, size_t v
 int
 write_mxXconSpanIndex(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static ulong old_value;
-	struct mxXconTable_data *StorageTmp = NULL;
+	struct mxXconTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 15;
 	ulong set_value = *((ulong *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("mxMIB", "write_mxXconSpanIndex entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(mxXconTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -11021,22 +16304,61 @@ write_mxXconSpanIndex(int action, u_char *var_val, u_char var_val_type, size_t v
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to mxXconSpanIndex: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->mxXconTable_old) == NULL)
+			if (StorageTmp->mxXconTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->mxXconTable_old = mxXconTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->mxXconTable_rsvs++;
+		StorageTmp->mxXconSpanIndex = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->mxXconTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->mxXconTable_tsts == 0)
+				if ((ret = check_mxXconTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->mxXconTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->mxXconSpanIndex for you to use, and you have just been asked to do something with it.  Note that anything done here must 
 				   be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->mxXconSpanIndex;
-		StorageTmp->mxXconSpanIndex = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->mxXconTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->mxXconTable_sets == 0)
+				if ((ret = update_mxXconTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->mxXconTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->mxXconTable_old) != NULL) {
+			mxXconTable_destroy(&StorageTmp->mxXconTable_old);
+			StorageTmp->mxXconTable_rsvs = 0;
+			StorageTmp->mxXconTable_tsts = 0;
+			StorageTmp->mxXconTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->mxXconSpanIndex = old_value;
+		if ((StorageOld = StorageTmp->mxXconTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->mxXconTable_sets == 0)
+			revert_mxXconTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->mxXconTable_old) == NULL)
+			break;
+		StorageTmp->mxXconSpanIndex = StorageOld->mxXconSpanIndex;
+		if (--StorageTmp->mxXconTable_rsvs == 0)
+			mxXconTable_destroy(&StorageTmp->mxXconTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -11056,12 +16378,14 @@ write_mxXconSpanIndex(int action, u_char *var_val, u_char var_val_type, size_t v
 int
 write_mxXconChanIndex(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static ulong old_value;
-	struct mxXconTable_data *StorageTmp = NULL;
+	struct mxXconTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 15;
 	ulong set_value = *((ulong *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("mxMIB", "write_mxXconChanIndex entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(mxXconTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -11091,22 +16415,61 @@ write_mxXconChanIndex(int action, u_char *var_val, u_char var_val_type, size_t v
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to mxXconChanIndex: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->mxXconTable_old) == NULL)
+			if (StorageTmp->mxXconTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->mxXconTable_old = mxXconTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->mxXconTable_rsvs++;
+		StorageTmp->mxXconChanIndex = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->mxXconTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->mxXconTable_tsts == 0)
+				if ((ret = check_mxXconTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->mxXconTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->mxXconChanIndex for you to use, and you have just been asked to do something with it.  Note that anything done here must 
 				   be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->mxXconChanIndex;
-		StorageTmp->mxXconChanIndex = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->mxXconTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->mxXconTable_sets == 0)
+				if ((ret = update_mxXconTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->mxXconTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->mxXconTable_old) != NULL) {
+			mxXconTable_destroy(&StorageTmp->mxXconTable_old);
+			StorageTmp->mxXconTable_rsvs = 0;
+			StorageTmp->mxXconTable_tsts = 0;
+			StorageTmp->mxXconTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->mxXconChanIndex = old_value;
+		if ((StorageOld = StorageTmp->mxXconTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->mxXconTable_sets == 0)
+			revert_mxXconTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->mxXconTable_old) == NULL)
+			break;
+		StorageTmp->mxXconChanIndex = StorageOld->mxXconChanIndex;
+		if (--StorageTmp->mxXconTable_rsvs == 0)
+			mxXconTable_destroy(&StorageTmp->mxXconTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -11126,12 +16489,14 @@ write_mxXconChanIndex(int action, u_char *var_val, u_char var_val_type, size_t v
 int
 write_mxXconType(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static long old_value;
-	struct mxXconTable_data *StorageTmp = NULL;
+	struct mxXconTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 15;
 	long set_value = *((long *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("mxMIB", "write_mxXconType entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(mxXconTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -11166,22 +16531,61 @@ write_mxXconType(int action, u_char *var_val, u_char var_val_type, size_t var_va
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to mxXconType: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->mxXconTable_old) == NULL)
+			if (StorageTmp->mxXconTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->mxXconTable_old = mxXconTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->mxXconTable_rsvs++;
+		StorageTmp->mxXconType = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->mxXconTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->mxXconTable_tsts == 0)
+				if ((ret = check_mxXconTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->mxXconTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->mxXconType for you to use, and you have just been asked to do something with it.  Note that anything done here must be
 				   reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->mxXconType;
-		StorageTmp->mxXconType = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->mxXconTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->mxXconTable_sets == 0)
+				if ((ret = update_mxXconTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->mxXconTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->mxXconTable_old) != NULL) {
+			mxXconTable_destroy(&StorageTmp->mxXconTable_old);
+			StorageTmp->mxXconTable_rsvs = 0;
+			StorageTmp->mxXconTable_tsts = 0;
+			StorageTmp->mxXconTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->mxXconType = old_value;
+		if ((StorageOld = StorageTmp->mxXconTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->mxXconTable_sets == 0)
+			revert_mxXconTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->mxXconTable_old) == NULL)
+			break;
+		StorageTmp->mxXconType = StorageOld->mxXconType;
+		if (--StorageTmp->mxXconTable_rsvs == 0)
+			mxXconTable_destroy(&StorageTmp->mxXconTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -11201,12 +16605,14 @@ write_mxXconType(int action, u_char *var_val, u_char var_val_type, size_t var_va
 int
 write_mxXconStorageType(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static long old_value;
-	struct mxXconTable_data *StorageTmp = NULL;
+	struct mxXconTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 15;
 	long set_value = *((long *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("mxMIB", "write_mxXconStorageType entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(mxXconTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -11243,76 +16649,129 @@ write_mxXconStorageType(int action, u_char *var_val, u_char var_val_type, size_t
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to mxXconStorageType: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->mxXconTable_old) == NULL)
+			if (StorageTmp->mxXconTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->mxXconTable_old = mxXconTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->mxXconTable_rsvs++;
+		StorageTmp->mxXconStorageType = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->mxXconTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->mxXconTable_tsts == 0)
+				if ((ret = check_mxXconTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->mxXconTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->mxXconStorageType for you to use, and you have just been asked to do something with it.  Note that anything done here
 				   must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->mxXconStorageType;
-		StorageTmp->mxXconStorageType = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->mxXconTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->mxXconTable_sets == 0)
+				if ((ret = update_mxXconTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->mxXconTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->mxXconTable_old) != NULL) {
+			mxXconTable_destroy(&StorageTmp->mxXconTable_old);
+			StorageTmp->mxXconTable_rsvs = 0;
+			StorageTmp->mxXconTable_tsts = 0;
+			StorageTmp->mxXconTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->mxXconStorageType = old_value;
+		if ((StorageOld = StorageTmp->mxXconTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->mxXconTable_sets == 0)
+			revert_mxXconTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->mxXconTable_old) == NULL)
+			break;
+		StorageTmp->mxXconStorageType = StorageOld->mxXconStorageType;
+		if (--StorageTmp->mxXconTable_rsvs == 0)
+			mxXconTable_destroy(&StorageTmp->mxXconTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
 }
 
 /**
- * @fn int mxSyncTable_consistent(struct mxSyncTable_data *thedata)
- * @param thedata the row data to check for consistency.
- * @brief check the internal consistency of a table row.
+ * @fn int can_act_mxSyncTable_row(struct mxSyncTable_data *StorageTmp)
+ * @param StorageTmp the data (as updated)
+ * @brief check whether an inactive table row can be activated
  *
- * This function checks the internal consistency of a table row for the mxSyncTable table.  If the
- * table row is internally consistent, then this function returns SNMP_ERR_NOERROR, otherwise the
- * function returns an SNMP error code and it will not be possible to activate the row until the
- * row's internal consistency is corrected.  This function might use a 'test' operation against the
- * driver to ensure that the commit phase will succeed.
+ * This function is used by the ACTION phase of a RowStatus object to test whether an inactive table
+ * row can be activated.  Returns SNMP_ERR_NOERROR when activation is permitted; an SNMP error
+ * value, otherwise.  This function might use a 'test' operation against the driver to ensure that
+ * the commit phase will succeed.
  */
 int
-mxSyncTable_consistent(struct mxSyncTable_data *thedata)
+can_act_mxSyncTable_row(struct mxSyncTable_data *StorageTmp)
 {
-	/* XXX: check row consistency return SNMP_ERR_NOERROR if consistent, or an SNMP error code if not. */
-	return (SNMP_ERR_NOERROR);
+	/* XXX: provide code to check whether the new or inactive table row can be activated */
+	return SNMP_ERR_NOERROR;
 }
 
 /**
- * @fn int mxDrivTable_consistent(struct mxDrivTable_data *thedata)
- * @param thedata the row data to check for consistency.
- * @brief check the internal consistency of a table row.
+ * @fn int can_deact_mxSyncTable_row(struct mxSyncTable_data *StorageTmp)
+ * @param StorageTmp the data (as updated)
+ * @brief check whether an active table row can be deactivated
  *
- * This function checks the internal consistency of a table row for the mxDrivTable table.  If the
- * table row is internally consistent, then this function returns SNMP_ERR_NOERROR, otherwise the
- * function returns an SNMP error code and it will not be possible to activate the row until the
- * row's internal consistency is corrected.  This function might use a 'test' operation against the
- * driver to ensure that the commit phase will succeed.
+ * This function is used by the ACTION phase of a RowStatus object to test whether an active table
+ * row can be deactivated.  Returns SNMP_ERR_NOERROR when deactivation is permitted; an SNMP error
+ * value, otherwise.  This function might use a 'test' operation against the driver to ensure that
+ * the commit phase will succeed.
  */
 int
-mxDrivTable_consistent(struct mxDrivTable_data *thedata)
+can_deact_mxSyncTable_row(struct mxSyncTable_data *StorageTmp)
 {
-	/* XXX: check row consistency return SNMP_ERR_NOERROR if consistent, or an SNMP error code if not. */
+	/* XXX: provide code to check whether the active table row can be deactivated */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int can_act_mxDrivTable_row(struct mxDrivTable_data *StorageTmp)
+ * @param StorageTmp the data (as updated)
+ * @brief check whether an inactive table row can be activated
+ *
+ * This function is used by the ACTION phase of a RowStatus object to test whether an inactive table
+ * row can be activated.  Returns SNMP_ERR_NOERROR when activation is permitted; an SNMP error
+ * value, otherwise.  This function might use a 'test' operation against the driver to ensure that
+ * the commit phase will succeed.
+ */
+int
+can_act_mxDrivTable_row(struct mxDrivTable_data *StorageTmp)
+{
+	/* XXX: provide code to check whether the new or inactive table row can be activated */
 	int fd;
 	struct mx_info *info;
 	struct mx_info_dflt *driv;
 	char buf[sizeof(*info) + sizeof(*driv)];
 	struct strioctl ioc;
+	char devname[19+FMNAMESZ+1] = {};
 
 	/* Check that the corresponding device can be opened and that the general information about the driver can be read. */
-	if (thedata->mxDrivNameLen > 128 - 1 - 19)
+	if (StorageTmp->mxDrivNameLen > FMNAMESZ)
 		return SNMP_ERR_INCONSISTENTNAME;
-	memcpy(thedata->mxDrivTable_devname, "/dev/streams/clone/", 19);
-	memcpy(thedata->mxDrivTable_devname + 19, thedata->mxDrivName, thedata->mxDrivNameLen);
-	thedata->mxDrivTable_devname[19 + thedata->mxDrivNameLen] = '\0';
-	if ((fd = open(thedata->mxDrivTable_devname, O_RDWR)) < 0) {
-		snmp_log_perror("mxDrivTable_consistent: open()");
-		snmp_log(LOG_ERR, "%s: device name was %s\n", __FUNCTION__, thedata->mxDrivTable_devname);
-		snmp_log(LOG_ERR, "%s: device name length is %zu\n", __FUNCTION__, thedata->mxDrivNameLen);
+	snprintf(devname, 19+FMNAMESZ+1, "/dev/streams/clone/%s", StorageTmp->mxDrivName);
+	if ((fd = open(devname, O_RDWR)) < 0) {
+		snmp_log(MY_FACILITY(LOG_ERR), "%s: %s: %s: %s", __FUNCTION__, "open()", devname, strerror(errno));
+		snmp_log(LOG_ERR, "%s: device name was %s\n", __FUNCTION__, devname);
+		snmp_log(LOG_ERR, "%s: device name length is %zu\n", __FUNCTION__, StorageTmp->mxDrivNameLen);
 		return SNMP_ERR_INCONSISTENTNAME;
 	}
 	info = memset(buf, 0, sizeof(*info));
@@ -11325,226 +16784,147 @@ mxDrivTable_consistent(struct mxDrivTable_data *thedata)
 	ioc.ic_len = sizeof(*info) + sizeof(*driv);
 	ioc.ic_dp = buf;
 	if (ioctl(fd, I_STR, &ioc) < 0) {
-		snmp_log_perror("mxDrivTable_consistent: ioctl()");
+		snmp_log(MY_FACILITY(LOG_ERR), "%s: %s: %s: %s", __FUNCTION__, "ioctl()", "MX_IOCGINFO", strerror(errno));
 		close(fd);
 		return SNMP_ERR_INCONSISTENTNAME;
 	}
 	close(fd);
 	/* Copy the information returned, strings were preallocated by create. */
-	thedata->mxDrivIdnum = driv->mxDrivIdnum;
-	thedata->mxDrivMajor = driv->mxDrivMajor;
-	strncpy((char *) thedata->mxDrivDescription, driv->mxDrivDescription, 256);
-	thedata->mxDrivDescriptionLen = strnlen(driv->mxDrivDescription, 256);
-	strncpy((char *) thedata->mxDrivRevision, driv->mxDrivRevision, 256);
-	thedata->mxDrivRevisionLen = strnlen(driv->mxDrivRevision, 256);
-	strncpy((char *) thedata->mxDrivCopyright, driv->mxDrivCopyright, 256);
-	thedata->mxDrivCopyrightLen = strnlen(driv->mxDrivCopyright, 256);
-	strncpy((char *) thedata->mxDrivSupportedDevice, driv->mxDrivSupportedDevice, 256);
-	thedata->mxDrivSupportedDeviceLen = strnlen(driv->mxDrivSupportedDevice, 256);
-	strncpy((char *) thedata->mxDrivContact, driv->mxDrivContact, 256);
-	thedata->mxDrivContactLen = strnlen(driv->mxDrivContact, 256);
-	thedata->mxDrivLicense = driv->mxDrivLicense;
-	memcpy(thedata->mxDrivDate, driv->mxDrivDate, 11);
-	thedata->mxDrivDateLen = 11;
-	return (SNMP_ERR_NOERROR);
+	StorageTmp->mxDrivIdnum = driv->mxDrivIdnum;
+	StorageTmp->mxDrivMajor = driv->mxDrivMajor;
+	strncpy((char *) StorageTmp->mxDrivDescription, driv->mxDrivDescription, 256);
+	StorageTmp->mxDrivDescriptionLen = strnlen(driv->mxDrivDescription, 256);
+	strncpy((char *) StorageTmp->mxDrivRevision, driv->mxDrivRevision, 256);
+	StorageTmp->mxDrivRevisionLen = strnlen(driv->mxDrivRevision, 256);
+	strncpy((char *) StorageTmp->mxDrivCopyright, driv->mxDrivCopyright, 256);
+	StorageTmp->mxDrivCopyrightLen = strnlen(driv->mxDrivCopyright, 256);
+	strncpy((char *) StorageTmp->mxDrivSupportedDevice, driv->mxDrivSupportedDevice, 256);
+	StorageTmp->mxDrivSupportedDeviceLen = strnlen(driv->mxDrivSupportedDevice, 256);
+	strncpy((char *) StorageTmp->mxDrivContact, driv->mxDrivContact, 256);
+	StorageTmp->mxDrivContactLen = strnlen(driv->mxDrivContact, 256);
+	StorageTmp->mxDrivLicense = driv->mxDrivLicense;
+	memcpy(StorageTmp->mxDrivDate, driv->mxDrivDate, 11);
+	StorageTmp->mxDrivDateLen = 11;
+	return SNMP_ERR_NOERROR;
 }
 
 /**
- * @fn int mxCardTable_consistent(struct mxCardTable_data *thedata)
- * @param thedata the row data to check for consistency.
- * @brief check the internal consistency of a table row.
+ * @fn int can_deact_mxDrivTable_row(struct mxDrivTable_data *StorageTmp)
+ * @param StorageTmp the data (as updated)
+ * @brief check whether an active table row can be deactivated
  *
- * This function checks the internal consistency of a table row for the mxCardTable table.  If the
- * table row is internally consistent, then this function returns SNMP_ERR_NOERROR, otherwise the
- * function returns an SNMP error code and it will not be possible to activate the row until the
- * row's internal consistency is corrected.  This function might use a 'test' operation against the
- * driver to ensure that the commit phase will succeed.
+ * This function is used by the ACTION phase of a RowStatus object to test whether an active table
+ * row can be deactivated.  Returns SNMP_ERR_NOERROR when deactivation is permitted; an SNMP error
+ * value, otherwise.  This function might use a 'test' operation against the driver to ensure that
+ * the commit phase will succeed.
  */
 int
-mxCardTable_consistent(struct mxCardTable_data *thedata)
+can_deact_mxDrivTable_row(struct mxDrivTable_data *StorageTmp)
 {
-	/* XXX: check row consistency return SNMP_ERR_NOERROR if consistent, or an SNMP error code if not. */
-	return (SNMP_ERR_NOERROR);
+	/* XXX: provide code to check whether the active table row can be deactivated */
+	return SNMP_ERR_NOERROR;
 }
 
 /**
- * @fn int mxSpanTable_consistent(struct mxSpanTable_data *thedata)
- * @param thedata the row data to check for consistency.
- * @brief check the internal consistency of a table row.
+ * @fn int can_act_mxCardTable_row(struct mxCardTable_data *StorageTmp)
+ * @param StorageTmp the data (as updated)
+ * @brief check whether an inactive table row can be activated
  *
- * This function checks the internal consistency of a table row for the mxSpanTable table.  If the
- * table row is internally consistent, then this function returns SNMP_ERR_NOERROR, otherwise the
- * function returns an SNMP error code and it will not be possible to activate the row until the
- * row's internal consistency is corrected.  This function might use a 'test' operation against the
- * driver to ensure that the commit phase will succeed.
+ * This function is used by the ACTION phase of a RowStatus object to test whether an inactive table
+ * row can be activated.  Returns SNMP_ERR_NOERROR when activation is permitted; an SNMP error
+ * value, otherwise.  This function might use a 'test' operation against the driver to ensure that
+ * the commit phase will succeed.
  */
 int
-mxSpanTable_consistent(struct mxSpanTable_data *thedata)
+can_act_mxCardTable_row(struct mxCardTable_data *StorageTmp)
 {
-	/* XXX: check row consistency return SNMP_ERR_NOERROR if consistent, or an SNMP error code if not. */
-	return (SNMP_ERR_NOERROR);
+	/* XXX: provide code to check whether the new or inactive table row can be activated */
+	return SNMP_ERR_NOERROR;
 }
 
 /**
- * @fn int mxBertTable_consistent(struct mxBertTable_data *thedata)
- * @param thedata the row data to check for consistency.
- * @brief check the internal consistency of a table row.
+ * @fn int can_deact_mxCardTable_row(struct mxCardTable_data *StorageTmp)
+ * @param StorageTmp the data (as updated)
+ * @brief check whether an active table row can be deactivated
  *
- * This function checks the internal consistency of a table row for the mxBertTable table.  If the
- * table row is internally consistent, then this function returns SNMP_ERR_NOERROR, otherwise the
- * function returns an SNMP error code and it will not be possible to activate the row until the
- * row's internal consistency is corrected.  This function might use a 'test' operation against the
- * driver to ensure that the commit phase will succeed.
+ * This function is used by the ACTION phase of a RowStatus object to test whether an active table
+ * row can be deactivated.  Returns SNMP_ERR_NOERROR when deactivation is permitted; an SNMP error
+ * value, otherwise.  This function might use a 'test' operation against the driver to ensure that
+ * the commit phase will succeed.
  */
 int
-mxBertTable_consistent(struct mxBertTable_data *thedata)
+can_deact_mxCardTable_row(struct mxCardTable_data *StorageTmp)
 {
-	/* XXX: check row consistency return SNMP_ERR_NOERROR if consistent, or an SNMP error code if not. */
-	return (SNMP_ERR_NOERROR);
+	/* XXX: provide code to check whether the active table row can be deactivated */
+	return SNMP_ERR_NOERROR;
 }
 
 /**
- * @fn int mxChanTable_consistent(struct mxChanTable_data *thedata)
- * @param thedata the row data to check for consistency.
- * @brief check the internal consistency of a table row.
+ * @fn int can_act_mxSpanTable_row(struct mxSpanTable_data *StorageTmp)
+ * @param StorageTmp the data (as updated)
+ * @brief check whether an inactive table row can be activated
  *
- * This function checks the internal consistency of a table row for the mxChanTable table.  If the
- * table row is internally consistent, then this function returns SNMP_ERR_NOERROR, otherwise the
- * function returns an SNMP error code and it will not be possible to activate the row until the
- * row's internal consistency is corrected.  This function might use a 'test' operation against the
- * driver to ensure that the commit phase will succeed.
+ * This function is used by the ACTION phase of a RowStatus object to test whether an inactive table
+ * row can be activated.  Returns SNMP_ERR_NOERROR when activation is permitted; an SNMP error
+ * value, otherwise.  This function might use a 'test' operation against the driver to ensure that
+ * the commit phase will succeed.
  */
 int
-mxChanTable_consistent(struct mxChanTable_data *thedata)
+can_act_mxSpanTable_row(struct mxSpanTable_data *StorageTmp)
 {
-	/* XXX: check row consistency return SNMP_ERR_NOERROR if consistent, or an SNMP error code if not. */
-	return (SNMP_ERR_NOERROR);
+	/* XXX: provide code to check whether the new or inactive table row can be activated */
+	return SNMP_ERR_NOERROR;
 }
 
 /**
- * @fn int mxXconTable_consistent(struct mxXconTable_data *thedata)
- * @param thedata the row data to check for consistency.
- * @brief check the internal consistency of a table row.
+ * @fn int can_deact_mxSpanTable_row(struct mxSpanTable_data *StorageTmp)
+ * @param StorageTmp the data (as updated)
+ * @brief check whether an active table row can be deactivated
  *
- * This function checks the internal consistency of a table row for the mxXconTable table.  If the
- * table row is internally consistent, then this function returns SNMP_ERR_NOERROR, otherwise the
- * function returns an SNMP error code and it will not be possible to activate the row until the
- * row's internal consistency is corrected.  This function might use a 'test' operation against the
- * driver to ensure that the commit phase will succeed.
+ * This function is used by the ACTION phase of a RowStatus object to test whether an active table
+ * row can be deactivated.  Returns SNMP_ERR_NOERROR when deactivation is permitted; an SNMP error
+ * value, otherwise.  This function might use a 'test' operation against the driver to ensure that
+ * the commit phase will succeed.
  */
 int
-mxXconTable_consistent(struct mxXconTable_data *thedata)
+can_deact_mxSpanTable_row(struct mxSpanTable_data *StorageTmp)
 {
-	/* XXX: check row consistency return SNMP_ERR_NOERROR if consistent, or an SNMP error code if not. */
-	return (SNMP_ERR_NOERROR);
+	/* XXX: provide code to check whether the active table row can be deactivated */
+	return SNMP_ERR_NOERROR;
 }
 
 /**
- * @fn int mxNearEndCurrentTable_consistent(struct mxNearEndCurrentTable_data *thedata)
- * @param thedata the row data to check for consistency.
- * @brief check the internal consistency of a table row.
+ * @fn int can_act_mxXconTable_row(struct mxXconTable_data *StorageTmp)
+ * @param StorageTmp the data (as updated)
+ * @brief check whether an inactive table row can be activated
  *
- * This function checks the internal consistency of a table row for the mxNearEndCurrentTable table.  If the
- * table row is internally consistent, then this function returns SNMP_ERR_NOERROR, otherwise the
- * function returns an SNMP error code and it will not be possible to activate the row until the
- * row's internal consistency is corrected.  This function might use a 'test' operation against the
- * driver to ensure that the commit phase will succeed.
+ * This function is used by the ACTION phase of a RowStatus object to test whether an inactive table
+ * row can be activated.  Returns SNMP_ERR_NOERROR when activation is permitted; an SNMP error
+ * value, otherwise.  This function might use a 'test' operation against the driver to ensure that
+ * the commit phase will succeed.
  */
 int
-mxNearEndCurrentTable_consistent(struct mxNearEndCurrentTable_data *thedata)
+can_act_mxXconTable_row(struct mxXconTable_data *StorageTmp)
 {
-	/* XXX: check row consistency return SNMP_ERR_NOERROR if consistent, or an SNMP error code if not. */
-	return (SNMP_ERR_NOERROR);
+	/* XXX: provide code to check whether the new or inactive table row can be activated */
+	return SNMP_ERR_NOERROR;
 }
 
 /**
- * @fn int mxNearEndIntervalTable_consistent(struct mxNearEndIntervalTable_data *thedata)
- * @param thedata the row data to check for consistency.
- * @brief check the internal consistency of a table row.
+ * @fn int can_deact_mxXconTable_row(struct mxXconTable_data *StorageTmp)
+ * @param StorageTmp the data (as updated)
+ * @brief check whether an active table row can be deactivated
  *
- * This function checks the internal consistency of a table row for the mxNearEndIntervalTable table.  If the
- * table row is internally consistent, then this function returns SNMP_ERR_NOERROR, otherwise the
- * function returns an SNMP error code and it will not be possible to activate the row until the
- * row's internal consistency is corrected.  This function might use a 'test' operation against the
- * driver to ensure that the commit phase will succeed.
+ * This function is used by the ACTION phase of a RowStatus object to test whether an active table
+ * row can be deactivated.  Returns SNMP_ERR_NOERROR when deactivation is permitted; an SNMP error
+ * value, otherwise.  This function might use a 'test' operation against the driver to ensure that
+ * the commit phase will succeed.
  */
 int
-mxNearEndIntervalTable_consistent(struct mxNearEndIntervalTable_data *thedata)
+can_deact_mxXconTable_row(struct mxXconTable_data *StorageTmp)
 {
-	/* XXX: check row consistency return SNMP_ERR_NOERROR if consistent, or an SNMP error code if not. */
-	return (SNMP_ERR_NOERROR);
-}
-
-/**
- * @fn int mxNearEndTotalTable_consistent(struct mxNearEndTotalTable_data *thedata)
- * @param thedata the row data to check for consistency.
- * @brief check the internal consistency of a table row.
- *
- * This function checks the internal consistency of a table row for the mxNearEndTotalTable table.  If the
- * table row is internally consistent, then this function returns SNMP_ERR_NOERROR, otherwise the
- * function returns an SNMP error code and it will not be possible to activate the row until the
- * row's internal consistency is corrected.  This function might use a 'test' operation against the
- * driver to ensure that the commit phase will succeed.
- */
-int
-mxNearEndTotalTable_consistent(struct mxNearEndTotalTable_data *thedata)
-{
-	/* XXX: check row consistency return SNMP_ERR_NOERROR if consistent, or an SNMP error code if not. */
-	return (SNMP_ERR_NOERROR);
-}
-
-/**
- * @fn int mxFarEndCurrentTable_consistent(struct mxFarEndCurrentTable_data *thedata)
- * @param thedata the row data to check for consistency.
- * @brief check the internal consistency of a table row.
- *
- * This function checks the internal consistency of a table row for the mxFarEndCurrentTable table.  If the
- * table row is internally consistent, then this function returns SNMP_ERR_NOERROR, otherwise the
- * function returns an SNMP error code and it will not be possible to activate the row until the
- * row's internal consistency is corrected.  This function might use a 'test' operation against the
- * driver to ensure that the commit phase will succeed.
- */
-int
-mxFarEndCurrentTable_consistent(struct mxFarEndCurrentTable_data *thedata)
-{
-	/* XXX: check row consistency return SNMP_ERR_NOERROR if consistent, or an SNMP error code if not. */
-	return (SNMP_ERR_NOERROR);
-}
-
-/**
- * @fn int mxFarEndIntervalTable_consistent(struct mxFarEndIntervalTable_data *thedata)
- * @param thedata the row data to check for consistency.
- * @brief check the internal consistency of a table row.
- *
- * This function checks the internal consistency of a table row for the mxFarEndIntervalTable table.  If the
- * table row is internally consistent, then this function returns SNMP_ERR_NOERROR, otherwise the
- * function returns an SNMP error code and it will not be possible to activate the row until the
- * row's internal consistency is corrected.  This function might use a 'test' operation against the
- * driver to ensure that the commit phase will succeed.
- */
-int
-mxFarEndIntervalTable_consistent(struct mxFarEndIntervalTable_data *thedata)
-{
-	/* XXX: check row consistency return SNMP_ERR_NOERROR if consistent, or an SNMP error code if not. */
-	return (SNMP_ERR_NOERROR);
-}
-
-/**
- * @fn int mxFarEndTotalTable_consistent(struct mxFarEndTotalTable_data *thedata)
- * @param thedata the row data to check for consistency.
- * @brief check the internal consistency of a table row.
- *
- * This function checks the internal consistency of a table row for the mxFarEndTotalTable table.  If the
- * table row is internally consistent, then this function returns SNMP_ERR_NOERROR, otherwise the
- * function returns an SNMP error code and it will not be possible to activate the row until the
- * row's internal consistency is corrected.  This function might use a 'test' operation against the
- * driver to ensure that the commit phase will succeed.
- */
-int
-mxFarEndTotalTable_consistent(struct mxFarEndTotalTable_data *thedata)
-{
-	/* XXX: check row consistency return SNMP_ERR_NOERROR if consistent, or an SNMP error code if not. */
-	return (SNMP_ERR_NOERROR);
+	/* XXX: provide code to check whether the active table row can be deactivated */
+	return SNMP_ERR_NOERROR;
 }
 
 /**
@@ -11561,10 +16941,9 @@ mxFarEndTotalTable_consistent(struct mxFarEndTotalTable_data *thedata)
 int
 write_mxSyncRowStatus(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	struct mxSyncTable_data *StorageTmp = NULL;
+	struct mxSyncTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	static struct mxSyncTable_data *StorageNew, *StorageDel;
 	size_t newlen = name_len - 15;
-	static int old_value;
 	int set_value, ret;
 	static struct variable_list *vars, *vp;
 
@@ -11591,40 +16970,6 @@ write_mxSyncRowStatus(int action, u_char *var_val, u_char var_val_type, size_t v
 			if (StorageTmp != NULL)
 				/* cannot create existing row */
 				return SNMP_ERR_INCONSISTENTVALUE;
-			break;
-		case RS_ACTIVE:
-		case RS_NOTINSERVICE:
-			if (StorageTmp == NULL)
-				/* cannot change state of non-existent row */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			if (StorageTmp->mxSyncRowStatus == RS_NOTREADY)
-				/* cannot change state of row that is not ready */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			/* XXX: interaction with row storage type needed */
-			if (set_value == RS_NOTINSERVICE && StorageTmp->mxSyncTable_refs > 0)
-				/* row is busy and cannot be moved to the RS_NOTINSERVICE state */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			break;
-		case RS_DESTROY:
-			/* destroying existent or non-existent row is ok */
-			if (StorageTmp == NULL)
-				break;
-			/* XXX: interaction with row storage type needed */
-			if (StorageTmp->mxSyncTable_refs > 0)
-				/* row is busy and cannot be deleted */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			break;
-		case RS_NOTREADY:
-			/* management station cannot set this, only agent can */
-		default:
-			return SNMP_ERR_INCONSISTENTVALUE;
-		}
-		break;
-	case RESERVE2:
-		/* memory reseveration, final preparation... */
-		switch (set_value) {
-		case RS_CREATEANDGO:
-		case RS_CREATEANDWAIT:
 			/* creation */
 			vars = NULL;
 			/* mxSyncGroup */
@@ -11672,6 +17017,7 @@ write_mxSyncRowStatus(int action, u_char *var_val, u_char var_val_type, size_t v
 				snmp_free_varbind(vars);
 				return SNMP_ERR_RESOURCEUNAVAILABLE;
 			}
+			StorageNew->mxSyncTable_rsvs = 1;
 			vp = vars;
 			StorageNew->mxSyncGroup = (ulong) *vp->val.integer;
 			vp = vp->next_variable;
@@ -11679,7 +17025,37 @@ write_mxSyncRowStatus(int action, u_char *var_val, u_char var_val_type, size_t v
 			vp = vp->next_variable;
 			header_complex_add_data(&mxSyncTableStorage, vars, StorageNew);	/* frees vars */
 			break;
+		case RS_ACTIVE:
+		case RS_NOTINSERVICE:
+			if (StorageTmp == NULL)
+				/* cannot change state of non-existent row */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			if (StorageTmp->mxSyncRowStatus == RS_NOTREADY)
+				/* cannot change state of row that is not ready */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			/* XXX: interaction with row storage type needed */
+			if (set_value == RS_NOTINSERVICE && StorageTmp->mxSyncTable_refs > 0)
+				/* row is busy and cannot be moved to the RS_NOTINSERVICE state */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			/* activate or deactivate */
+			if (StorageTmp == NULL)
+				return SNMP_ERR_NOSUCHNAME;
+			/* one allocation for the whole row */
+			if ((StorageOld = StorageTmp->mxSyncTable_old) == NULL)
+				if (StorageTmp->mxSyncTable_rsvs == 0)
+					if ((StorageOld = StorageTmp->mxSyncTable_old = mxSyncTable_duplicate(StorageTmp)) == NULL)
+						return SNMP_ERR_RESOURCEUNAVAILABLE;
+			if (StorageOld != NULL)
+				StorageTmp->mxSyncTable_rsvs++;
+			break;
 		case RS_DESTROY:
+			if (StorageTmp == NULL)
+				/* cannot destroy non-existent row */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			/* XXX: interaction with row storage type needed */
+			if (StorageTmp->mxSyncTable_refs > 0)
+				/* row is busy and cannot be deleted */
+				return SNMP_ERR_INCONSISTENTVALUE;
 			/* destroy */
 			if (StorageTmp != NULL) {
 				/* exists, extract it for now */
@@ -11689,78 +17065,127 @@ write_mxSyncRowStatus(int action, u_char *var_val, u_char var_val_type, size_t v
 				StorageDel = NULL;
 			}
 			break;
+		case RS_NOTREADY:
+			/* management station cannot set this, only agent can */
+		default:
+			return SNMP_ERR_INCONSISTENTVALUE;
 		}
 		break;
-	case ACTION:
-		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the UNDO case */
+	case RESERVE2:
+		/* memory reseveration, final preparation... */
 		switch (set_value) {
 		case RS_CREATEANDGO:
 			/* check that activation is possible */
-			if ((ret = mxSyncTable_consistent(StorageNew)) != SNMP_ERR_NOERROR)
+			if ((ret = can_act_mxSyncTable_row(StorageNew)) != SNMP_ERR_NOERROR)
 				return (ret);
 			break;
 		case RS_CREATEANDWAIT:
-			/* row does not have to be consistent */
 			break;
 		case RS_ACTIVE:
-			old_value = StorageTmp->mxSyncRowStatus;
-			StorageTmp->mxSyncRowStatus = set_value;
-			if (old_value != RS_ACTIVE) {
-				/* check that activation is possible */
-				if ((ret = mxSyncTable_consistent(StorageTmp)) != SNMP_ERR_NOERROR) {
-					StorageTmp->mxSyncRowStatus = old_value;
+			/* check that activation is possible */
+			if (StorageTmp->mxSyncRowStatus != RS_ACTIVE)
+				if ((ret = can_act_mxSyncTable_row(StorageTmp)) != SNMP_ERR_NOERROR)
 					return (ret);
-				}
+			break;
+		case RS_NOTINSERVICE:
+			/* check that deactivation is possible */
+			if (StorageTmp->mxSyncRowStatus != RS_NOTINSERVICE)
+				if ((ret = can_deact_mxSyncTable_row(StorageTmp)) != SNMP_ERR_NOERROR)
+					return (ret);
+			break;
+		case RS_DESTROY:
+			/* check that deactivation is possible */
+			if (StorageTmp->mxSyncRowStatus != RS_NOTINSERVICE)
+				if ((ret = can_deact_mxSyncTable_row(StorageTmp)) != SNMP_ERR_NOERROR)
+					return (ret);
+			break;
+		default:
+			return SNMP_ERR_WRONGVALUE;
+		}
+		break;
+	case ACTION:
+		/* The variable has been stored in StorageTmp->mxSyncRowStatus for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable
+		   in the UNDO case */
+		switch (set_value) {
+		case RS_CREATEANDGO:
+			/* activate with underlying device */
+			if (activate_mxSyncTable_row(StorageNew) != SNMP_ERR_NOERROR)
+				return SNMP_ERR_COMMITFAILED;
+			break;
+		case RS_CREATEANDWAIT:
+			break;
+		case RS_ACTIVE:
+			/* state change already performed */
+			if (StorageTmp->mxSyncRowStatus != RS_ACTIVE) {
+				/* activate with underlying device */
+				if (activate_mxSyncTable_row(StorageTmp) != SNMP_ERR_NOERROR)
+					return SNMP_ERR_COMMITFAILED;
 			}
 			break;
 		case RS_NOTINSERVICE:
-			/* set the flag? */
-			old_value = StorageTmp->mxSyncRowStatus;
-			StorageTmp->mxSyncRowStatus = set_value;
+			/* state change already performed */
+			if (StorageTmp->mxSyncRowStatus != RS_NOTINSERVICE) {
+				/* deactivate with underlying device */
+				if (deactivate_mxSyncTable_row(StorageTmp) != SNMP_ERR_NOERROR)
+					return SNMP_ERR_COMMITFAILED;
+			}
 			break;
+		case RS_DESTROY:
+			/* commit destrution to underlying device */
+			if (StorageDel == NULL)
+				break;
+			/* deactivate with underlying device */
+			if (deactivate_mxSyncTable_row(StorageDel) != SNMP_ERR_NOERROR)
+				return SNMP_ERR_COMMITFAILED;
+			break;
+		default:
+			return SNMP_ERR_WRONGVALUE;
 		}
 		break;
 	case COMMIT:
 		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		switch (set_value) {
 		case RS_CREATEANDGO:
-			/* row creation, set final state */
-			/* XXX: commit creation to underlying device */
-			/* XXX: activate with underlying device */
 			StorageNew->mxSyncRowStatus = RS_ACTIVE;
 			break;
 		case RS_CREATEANDWAIT:
-			/* row creation, set final state */
 			StorageNew->mxSyncRowStatus = RS_NOTINSERVICE;
 			break;
 		case RS_ACTIVE:
 		case RS_NOTINSERVICE:
-			/* state change already performed */
-			if (old_value != set_value) {
-				switch (set_value) {
-				case RS_ACTIVE:
-					/* XXX: activate with underlying device */
-					break;
-				case RS_NOTINSERVICE:
-					/* XXX: deactivate with underlying device */
-					break;
-				}
+			StorageNew->mxSyncRowStatus = set_value;
+			if ((StorageOld = StorageTmp->mxSyncTable_old) != NULL) {
+				mxSyncTable_destroy(&StorageTmp->mxSyncTable_old);
+				StorageTmp->mxSyncTable_rsvs = 0;
+				StorageTmp->mxSyncTable_tsts = 0;
+				StorageTmp->mxSyncTable_sets = 0;
 			}
 			break;
 		case RS_DESTROY:
-			/* row deletion, free it its dead */
 			mxSyncTable_destroy(&StorageDel);
-			/* mxSyncTable_destroy() can handle NULL pointers. */
 			break;
 		}
 		break;
 	case UNDO:
 		/* Back out any changes made in the ACTION case */
 		switch (set_value) {
+		case RS_CREATEANDGO:
+			/* deactivate with underlying device */
+			deactivate_mxSyncTable_row(StorageNew);
+			break;
+		case RS_CREATEANDWAIT:
+			break;
 		case RS_ACTIVE:
+			if (StorageTmp->mxSyncRowStatus == RS_NOTINSERVICE)
+				/* deactivate with underlying device */
+				deactivate_mxSyncTable_row(StorageTmp);
+			break;
 		case RS_NOTINSERVICE:
-			/* restore state */
-			StorageTmp->mxSyncRowStatus = old_value;
+			if (StorageTmp->mxSyncRowStatus == RS_ACTIVE)
+				/* activate with underlying device */
+				activate_mxSyncTable_row(StorageTmp);
+			break;
+		case RS_DESTROY:
 			break;
 		}
 		/* fall through */
@@ -11774,6 +17199,13 @@ write_mxSyncRowStatus(int action, u_char *var_val, u_char var_val_type, size_t v
 				mxSyncTable_del(StorageNew);
 				mxSyncTable_destroy(&StorageNew);
 			}
+			break;
+		case RS_ACTIVE:
+		case RS_NOTINSERVICE:
+			if ((StorageOld = StorageTmp->mxSyncTable_old) == NULL)
+				break;
+			if (--StorageTmp->mxSyncTable_rsvs == 0)
+				mxSyncTable_destroy(&StorageTmp->mxSyncTable_old);
 			break;
 		case RS_DESTROY:
 			/* row deletion, so add it again */
@@ -11800,10 +17232,9 @@ write_mxSyncRowStatus(int action, u_char *var_val, u_char var_val_type, size_t v
 int
 write_mxDrivRowStatus(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	struct mxDrivTable_data *StorageTmp = NULL;
+	struct mxDrivTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	static struct mxDrivTable_data *StorageNew, *StorageDel;
 	size_t newlen = name_len - 15;
-	static int old_value;
 	int set_value, ret;
 	static struct variable_list *vars, *vp;
 
@@ -11830,40 +17261,6 @@ write_mxDrivRowStatus(int action, u_char *var_val, u_char var_val_type, size_t v
 			if (StorageTmp != NULL)
 				/* cannot create existing row */
 				return SNMP_ERR_INCONSISTENTVALUE;
-			break;
-		case RS_ACTIVE:
-		case RS_NOTINSERVICE:
-			if (StorageTmp == NULL)
-				/* cannot change state of non-existent row */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			if (StorageTmp->mxDrivRowStatus == RS_NOTREADY)
-				/* cannot change state of row that is not ready */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			/* XXX: interaction with row storage type needed */
-			if (set_value == RS_NOTINSERVICE && StorageTmp->mxDrivTable_refs > 0)
-				/* row is busy and cannot be moved to the RS_NOTINSERVICE state */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			break;
-		case RS_DESTROY:
-			/* destroying existent or non-existent row is ok */
-			if (StorageTmp == NULL)
-				break;
-			/* XXX: interaction with row storage type needed */
-			if (StorageTmp->mxDrivTable_refs > 0)
-				/* row is busy and cannot be deleted */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			break;
-		case RS_NOTREADY:
-			/* management station cannot set this, only agent can */
-		default:
-			return SNMP_ERR_INCONSISTENTVALUE;
-		}
-		break;
-	case RESERVE2:
-		/* memory reseveration, final preparation... */
-		switch (set_value) {
-		case RS_CREATEANDGO:
-		case RS_CREATEANDWAIT:
 			/* creation */
 			vars = NULL;
 			/* mxDrivName */
@@ -11888,13 +17285,44 @@ write_mxDrivRowStatus(int action, u_char *var_val, u_char var_val_type, size_t v
 				snmp_free_varbind(vars);
 				return SNMP_ERR_RESOURCEUNAVAILABLE;
 			}
+			StorageNew->mxDrivTable_rsvs = 1;
 			vp = vars;
 			memdup((void *) &StorageNew->mxDrivName, vp->val.string, vp->val_len);
 			StorageNew->mxDrivNameLen = vp->val_len;
 			vp = vp->next_variable;
 			header_complex_add_data(&mxDrivTableStorage, vars, StorageNew);	/* frees vars */
 			break;
+		case RS_ACTIVE:
+		case RS_NOTINSERVICE:
+			if (StorageTmp == NULL)
+				/* cannot change state of non-existent row */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			if (StorageTmp->mxDrivRowStatus == RS_NOTREADY)
+				/* cannot change state of row that is not ready */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			/* XXX: interaction with row storage type needed */
+			if (set_value == RS_NOTINSERVICE && StorageTmp->mxDrivTable_refs > 0)
+				/* row is busy and cannot be moved to the RS_NOTINSERVICE state */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			/* activate or deactivate */
+			if (StorageTmp == NULL)
+				return SNMP_ERR_NOSUCHNAME;
+			/* one allocation for the whole row */
+			if ((StorageOld = StorageTmp->mxDrivTable_old) == NULL)
+				if (StorageTmp->mxDrivTable_rsvs == 0)
+					if ((StorageOld = StorageTmp->mxDrivTable_old = mxDrivTable_duplicate(StorageTmp)) == NULL)
+						return SNMP_ERR_RESOURCEUNAVAILABLE;
+			if (StorageOld != NULL)
+				StorageTmp->mxDrivTable_rsvs++;
+			break;
 		case RS_DESTROY:
+			if (StorageTmp == NULL)
+				/* cannot destroy non-existent row */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			/* XXX: interaction with row storage type needed */
+			if (StorageTmp->mxDrivTable_refs > 0)
+				/* row is busy and cannot be deleted */
+				return SNMP_ERR_INCONSISTENTVALUE;
 			/* destroy */
 			if (StorageTmp != NULL) {
 				/* exists, extract it for now */
@@ -11904,84 +17332,127 @@ write_mxDrivRowStatus(int action, u_char *var_val, u_char var_val_type, size_t v
 				StorageDel = NULL;
 			}
 			break;
+		case RS_NOTREADY:
+			/* management station cannot set this, only agent can */
+		default:
+			return SNMP_ERR_INCONSISTENTVALUE;
 		}
 		break;
-	case ACTION:
-		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the UNDO case */
+	case RESERVE2:
+		/* memory reseveration, final preparation... */
 		switch (set_value) {
 		case RS_CREATEANDGO:
 			/* check that activation is possible */
-			if ((ret = mxDrivTable_consistent(StorageNew)) != SNMP_ERR_NOERROR)
+			if ((ret = can_act_mxDrivTable_row(StorageNew)) != SNMP_ERR_NOERROR)
 				return (ret);
 			break;
 		case RS_CREATEANDWAIT:
-			/* row does not have to be consistent */
 			break;
 		case RS_ACTIVE:
-			old_value = StorageTmp->mxDrivRowStatus;
-			StorageTmp->mxDrivRowStatus = set_value;
-			if (old_value != RS_ACTIVE) {
-				/* check that activation is possible */
-				if ((ret = mxDrivTable_consistent(StorageTmp)) != SNMP_ERR_NOERROR) {
-					StorageTmp->mxDrivRowStatus = old_value;
+			/* check that activation is possible */
+			if (StorageTmp->mxDrivRowStatus != RS_ACTIVE)
+				if ((ret = can_act_mxDrivTable_row(StorageTmp)) != SNMP_ERR_NOERROR)
 					return (ret);
-				}
+			break;
+		case RS_NOTINSERVICE:
+			/* check that deactivation is possible */
+			if (StorageTmp->mxDrivRowStatus != RS_NOTINSERVICE)
+				if ((ret = can_deact_mxDrivTable_row(StorageTmp)) != SNMP_ERR_NOERROR)
+					return (ret);
+			break;
+		case RS_DESTROY:
+			/* check that deactivation is possible */
+			if (StorageTmp->mxDrivRowStatus != RS_NOTINSERVICE)
+				if ((ret = can_deact_mxDrivTable_row(StorageTmp)) != SNMP_ERR_NOERROR)
+					return (ret);
+			break;
+		default:
+			return SNMP_ERR_WRONGVALUE;
+		}
+		break;
+	case ACTION:
+		/* The variable has been stored in StorageTmp->mxDrivRowStatus for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable
+		   in the UNDO case */
+		switch (set_value) {
+		case RS_CREATEANDGO:
+			/* activate with underlying device */
+			if (activate_mxDrivTable_row(StorageNew) != SNMP_ERR_NOERROR)
+				return SNMP_ERR_COMMITFAILED;
+			break;
+		case RS_CREATEANDWAIT:
+			break;
+		case RS_ACTIVE:
+			/* state change already performed */
+			if (StorageTmp->mxDrivRowStatus != RS_ACTIVE) {
+				/* activate with underlying device */
+				if (activate_mxDrivTable_row(StorageTmp) != SNMP_ERR_NOERROR)
+					return SNMP_ERR_COMMITFAILED;
 			}
 			break;
 		case RS_NOTINSERVICE:
-			/* set the flag? */
-			old_value = StorageTmp->mxDrivRowStatus;
-			StorageTmp->mxDrivRowStatus = set_value;
+			/* state change already performed */
+			if (StorageTmp->mxDrivRowStatus != RS_NOTINSERVICE) {
+				/* deactivate with underlying device */
+				if (deactivate_mxDrivTable_row(StorageTmp) != SNMP_ERR_NOERROR)
+					return SNMP_ERR_COMMITFAILED;
+			}
 			break;
+		case RS_DESTROY:
+			/* commit destrution to underlying device */
+			if (StorageDel == NULL)
+				break;
+			/* deactivate with underlying device */
+			if (deactivate_mxDrivTable_row(StorageDel) != SNMP_ERR_NOERROR)
+				return SNMP_ERR_COMMITFAILED;
+			break;
+		default:
+			return SNMP_ERR_WRONGVALUE;
 		}
 		break;
 	case COMMIT:
 		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		switch (set_value) {
 		case RS_CREATEANDGO:
-			/* row creation, set final state */
-			/* XXX: commit creation to underlying device */
-			/* XXX: activate with underlying device */
 			StorageNew->mxDrivRowStatus = RS_ACTIVE;
-			/* tables need to be refreshed now */
-			mxSyncTable_refresh = 1;
-			mxCardTable_refresh = 1;
 			break;
 		case RS_CREATEANDWAIT:
-			/* row creation, set final state */
 			StorageNew->mxDrivRowStatus = RS_NOTINSERVICE;
 			break;
 		case RS_ACTIVE:
 		case RS_NOTINSERVICE:
-			/* state change already performed */
-			if (old_value != set_value) {
-				switch (set_value) {
-				case RS_ACTIVE:
-					/* XXX: activate with underlying device */
-					/* tables need to be refreshed now */
-					mxSyncTable_refresh = 1;
-					mxCardTable_refresh = 1;
-					break;
-				case RS_NOTINSERVICE:
-					/* XXX: deactivate with underlying device */
-					break;
-				}
+			StorageNew->mxDrivRowStatus = set_value;
+			if ((StorageOld = StorageTmp->mxDrivTable_old) != NULL) {
+				mxDrivTable_destroy(&StorageTmp->mxDrivTable_old);
+				StorageTmp->mxDrivTable_rsvs = 0;
+				StorageTmp->mxDrivTable_tsts = 0;
+				StorageTmp->mxDrivTable_sets = 0;
 			}
 			break;
 		case RS_DESTROY:
-			/* row deletion, free it its dead */
 			mxDrivTable_destroy(&StorageDel);
-			/* mxDrivTable_destroy() can handle NULL pointers. */
 			break;
 		}
 		break;
 	case UNDO:
 		/* Back out any changes made in the ACTION case */
 		switch (set_value) {
+		case RS_CREATEANDGO:
+			/* deactivate with underlying device */
+			deactivate_mxDrivTable_row(StorageNew);
+			break;
+		case RS_CREATEANDWAIT:
+			break;
 		case RS_ACTIVE:
+			if (StorageTmp->mxDrivRowStatus == RS_NOTINSERVICE)
+				/* deactivate with underlying device */
+				deactivate_mxDrivTable_row(StorageTmp);
+			break;
 		case RS_NOTINSERVICE:
-			/* restore state */
-			StorageTmp->mxDrivRowStatus = old_value;
+			if (StorageTmp->mxDrivRowStatus == RS_ACTIVE)
+				/* activate with underlying device */
+				activate_mxDrivTable_row(StorageTmp);
+			break;
+		case RS_DESTROY:
 			break;
 		}
 		/* fall through */
@@ -11995,6 +17466,13 @@ write_mxDrivRowStatus(int action, u_char *var_val, u_char var_val_type, size_t v
 				mxDrivTable_del(StorageNew);
 				mxDrivTable_destroy(&StorageNew);
 			}
+			break;
+		case RS_ACTIVE:
+		case RS_NOTINSERVICE:
+			if ((StorageOld = StorageTmp->mxDrivTable_old) == NULL)
+				break;
+			if (--StorageTmp->mxDrivTable_rsvs == 0)
+				mxDrivTable_destroy(&StorageTmp->mxDrivTable_old);
 			break;
 		case RS_DESTROY:
 			/* row deletion, so add it again */
@@ -12021,10 +17499,9 @@ write_mxDrivRowStatus(int action, u_char *var_val, u_char var_val_type, size_t v
 int
 write_mxCardStatus(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	struct mxCardTable_data *StorageTmp = NULL;
+	struct mxCardTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	static struct mxCardTable_data *StorageNew, *StorageDel;
 	size_t newlen = name_len - 15;
-	static int old_value;
 	int set_value, ret;
 	static struct variable_list *vars, *vp;
 
@@ -12051,40 +17528,6 @@ write_mxCardStatus(int action, u_char *var_val, u_char var_val_type, size_t var_
 			if (StorageTmp != NULL)
 				/* cannot create existing row */
 				return SNMP_ERR_INCONSISTENTVALUE;
-			break;
-		case RS_ACTIVE:
-		case RS_NOTINSERVICE:
-			if (StorageTmp == NULL)
-				/* cannot change state of non-existent row */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			if (StorageTmp->mxCardStatus == RS_NOTREADY)
-				/* cannot change state of row that is not ready */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			/* XXX: interaction with row storage type needed */
-			if (set_value == RS_NOTINSERVICE && StorageTmp->mxCardTable_refs > 0)
-				/* row is busy and cannot be moved to the RS_NOTINSERVICE state */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			break;
-		case RS_DESTROY:
-			/* destroying existent or non-existent row is ok */
-			if (StorageTmp == NULL)
-				break;
-			/* XXX: interaction with row storage type needed */
-			if (StorageTmp->mxCardTable_refs > 0)
-				/* row is busy and cannot be deleted */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			break;
-		case RS_NOTREADY:
-			/* management station cannot set this, only agent can */
-		default:
-			return SNMP_ERR_INCONSISTENTVALUE;
-		}
-		break;
-	case RESERVE2:
-		/* memory reseveration, final preparation... */
-		switch (set_value) {
-		case RS_CREATEANDGO:
-		case RS_CREATEANDWAIT:
 			/* creation */
 			vars = NULL;
 			/* mxDrivName */
@@ -12127,6 +17570,7 @@ write_mxCardStatus(int action, u_char *var_val, u_char var_val_type, size_t var_
 				snmp_free_varbind(vars);
 				return SNMP_ERR_RESOURCEUNAVAILABLE;
 			}
+			StorageNew->mxCardTable_rsvs = 1;
 			vp = vars;
 			memdup((void *) &StorageNew->mxDrivName, vp->val.string, vp->val_len);
 			StorageNew->mxDrivNameLen = vp->val_len;
@@ -12135,7 +17579,37 @@ write_mxCardStatus(int action, u_char *var_val, u_char var_val_type, size_t var_
 			vp = vp->next_variable;
 			header_complex_add_data(&mxCardTableStorage, vars, StorageNew);	/* frees vars */
 			break;
+		case RS_ACTIVE:
+		case RS_NOTINSERVICE:
+			if (StorageTmp == NULL)
+				/* cannot change state of non-existent row */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			if (StorageTmp->mxCardStatus == RS_NOTREADY)
+				/* cannot change state of row that is not ready */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			/* XXX: interaction with row storage type needed */
+			if (set_value == RS_NOTINSERVICE && StorageTmp->mxCardTable_refs > 0)
+				/* row is busy and cannot be moved to the RS_NOTINSERVICE state */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			/* activate or deactivate */
+			if (StorageTmp == NULL)
+				return SNMP_ERR_NOSUCHNAME;
+			/* one allocation for the whole row */
+			if ((StorageOld = StorageTmp->mxCardTable_old) == NULL)
+				if (StorageTmp->mxCardTable_rsvs == 0)
+					if ((StorageOld = StorageTmp->mxCardTable_old = mxCardTable_duplicate(StorageTmp)) == NULL)
+						return SNMP_ERR_RESOURCEUNAVAILABLE;
+			if (StorageOld != NULL)
+				StorageTmp->mxCardTable_rsvs++;
+			break;
 		case RS_DESTROY:
+			if (StorageTmp == NULL)
+				/* cannot destroy non-existent row */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			/* XXX: interaction with row storage type needed */
+			if (StorageTmp->mxCardTable_refs > 0)
+				/* row is busy and cannot be deleted */
+				return SNMP_ERR_INCONSISTENTVALUE;
 			/* destroy */
 			if (StorageTmp != NULL) {
 				/* exists, extract it for now */
@@ -12145,78 +17619,127 @@ write_mxCardStatus(int action, u_char *var_val, u_char var_val_type, size_t var_
 				StorageDel = NULL;
 			}
 			break;
+		case RS_NOTREADY:
+			/* management station cannot set this, only agent can */
+		default:
+			return SNMP_ERR_INCONSISTENTVALUE;
 		}
 		break;
-	case ACTION:
-		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the UNDO case */
+	case RESERVE2:
+		/* memory reseveration, final preparation... */
 		switch (set_value) {
 		case RS_CREATEANDGO:
 			/* check that activation is possible */
-			if ((ret = mxCardTable_consistent(StorageNew)) != SNMP_ERR_NOERROR)
+			if ((ret = can_act_mxCardTable_row(StorageNew)) != SNMP_ERR_NOERROR)
 				return (ret);
 			break;
 		case RS_CREATEANDWAIT:
-			/* row does not have to be consistent */
 			break;
 		case RS_ACTIVE:
-			old_value = StorageTmp->mxCardStatus;
-			StorageTmp->mxCardStatus = set_value;
-			if (old_value != RS_ACTIVE) {
-				/* check that activation is possible */
-				if ((ret = mxCardTable_consistent(StorageTmp)) != SNMP_ERR_NOERROR) {
-					StorageTmp->mxCardStatus = old_value;
+			/* check that activation is possible */
+			if (StorageTmp->mxCardStatus != RS_ACTIVE)
+				if ((ret = can_act_mxCardTable_row(StorageTmp)) != SNMP_ERR_NOERROR)
 					return (ret);
-				}
+			break;
+		case RS_NOTINSERVICE:
+			/* check that deactivation is possible */
+			if (StorageTmp->mxCardStatus != RS_NOTINSERVICE)
+				if ((ret = can_deact_mxCardTable_row(StorageTmp)) != SNMP_ERR_NOERROR)
+					return (ret);
+			break;
+		case RS_DESTROY:
+			/* check that deactivation is possible */
+			if (StorageTmp->mxCardStatus != RS_NOTINSERVICE)
+				if ((ret = can_deact_mxCardTable_row(StorageTmp)) != SNMP_ERR_NOERROR)
+					return (ret);
+			break;
+		default:
+			return SNMP_ERR_WRONGVALUE;
+		}
+		break;
+	case ACTION:
+		/* The variable has been stored in StorageTmp->mxCardStatus for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in
+		   the UNDO case */
+		switch (set_value) {
+		case RS_CREATEANDGO:
+			/* activate with underlying device */
+			if (activate_mxCardTable_row(StorageNew) != SNMP_ERR_NOERROR)
+				return SNMP_ERR_COMMITFAILED;
+			break;
+		case RS_CREATEANDWAIT:
+			break;
+		case RS_ACTIVE:
+			/* state change already performed */
+			if (StorageTmp->mxCardStatus != RS_ACTIVE) {
+				/* activate with underlying device */
+				if (activate_mxCardTable_row(StorageTmp) != SNMP_ERR_NOERROR)
+					return SNMP_ERR_COMMITFAILED;
 			}
 			break;
 		case RS_NOTINSERVICE:
-			/* set the flag? */
-			old_value = StorageTmp->mxCardStatus;
-			StorageTmp->mxCardStatus = set_value;
+			/* state change already performed */
+			if (StorageTmp->mxCardStatus != RS_NOTINSERVICE) {
+				/* deactivate with underlying device */
+				if (deactivate_mxCardTable_row(StorageTmp) != SNMP_ERR_NOERROR)
+					return SNMP_ERR_COMMITFAILED;
+			}
 			break;
+		case RS_DESTROY:
+			/* commit destrution to underlying device */
+			if (StorageDel == NULL)
+				break;
+			/* deactivate with underlying device */
+			if (deactivate_mxCardTable_row(StorageDel) != SNMP_ERR_NOERROR)
+				return SNMP_ERR_COMMITFAILED;
+			break;
+		default:
+			return SNMP_ERR_WRONGVALUE;
 		}
 		break;
 	case COMMIT:
 		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		switch (set_value) {
 		case RS_CREATEANDGO:
-			/* row creation, set final state */
-			/* XXX: commit creation to underlying device */
-			/* XXX: activate with underlying device */
 			StorageNew->mxCardStatus = RS_ACTIVE;
 			break;
 		case RS_CREATEANDWAIT:
-			/* row creation, set final state */
 			StorageNew->mxCardStatus = RS_NOTINSERVICE;
 			break;
 		case RS_ACTIVE:
 		case RS_NOTINSERVICE:
-			/* state change already performed */
-			if (old_value != set_value) {
-				switch (set_value) {
-				case RS_ACTIVE:
-					/* XXX: activate with underlying device */
-					break;
-				case RS_NOTINSERVICE:
-					/* XXX: deactivate with underlying device */
-					break;
-				}
+			StorageNew->mxCardStatus = set_value;
+			if ((StorageOld = StorageTmp->mxCardTable_old) != NULL) {
+				mxCardTable_destroy(&StorageTmp->mxCardTable_old);
+				StorageTmp->mxCardTable_rsvs = 0;
+				StorageTmp->mxCardTable_tsts = 0;
+				StorageTmp->mxCardTable_sets = 0;
 			}
 			break;
 		case RS_DESTROY:
-			/* row deletion, free it its dead */
 			mxCardTable_destroy(&StorageDel);
-			/* mxCardTable_destroy() can handle NULL pointers. */
 			break;
 		}
 		break;
 	case UNDO:
 		/* Back out any changes made in the ACTION case */
 		switch (set_value) {
+		case RS_CREATEANDGO:
+			/* deactivate with underlying device */
+			deactivate_mxCardTable_row(StorageNew);
+			break;
+		case RS_CREATEANDWAIT:
+			break;
 		case RS_ACTIVE:
+			if (StorageTmp->mxCardStatus == RS_NOTINSERVICE)
+				/* deactivate with underlying device */
+				deactivate_mxCardTable_row(StorageTmp);
+			break;
 		case RS_NOTINSERVICE:
-			/* restore state */
-			StorageTmp->mxCardStatus = old_value;
+			if (StorageTmp->mxCardStatus == RS_ACTIVE)
+				/* activate with underlying device */
+				activate_mxCardTable_row(StorageTmp);
+			break;
+		case RS_DESTROY:
 			break;
 		}
 		/* fall through */
@@ -12230,6 +17753,13 @@ write_mxCardStatus(int action, u_char *var_val, u_char var_val_type, size_t var_
 				mxCardTable_del(StorageNew);
 				mxCardTable_destroy(&StorageNew);
 			}
+			break;
+		case RS_ACTIVE:
+		case RS_NOTINSERVICE:
+			if ((StorageOld = StorageTmp->mxCardTable_old) == NULL)
+				break;
+			if (--StorageTmp->mxCardTable_rsvs == 0)
+				mxCardTable_destroy(&StorageTmp->mxCardTable_old);
 			break;
 		case RS_DESTROY:
 			/* row deletion, so add it again */
@@ -12256,10 +17786,9 @@ write_mxCardStatus(int action, u_char *var_val, u_char var_val_type, size_t var_
 int
 write_mxSpanRowStatus(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	struct mxSpanTable_data *StorageTmp = NULL;
+	struct mxSpanTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	static struct mxSpanTable_data *StorageNew, *StorageDel;
 	size_t newlen = name_len - 15;
-	static int old_value;
 	int set_value, ret;
 	static struct variable_list *vars, *vp;
 
@@ -12286,40 +17815,6 @@ write_mxSpanRowStatus(int action, u_char *var_val, u_char var_val_type, size_t v
 			if (StorageTmp != NULL)
 				/* cannot create existing row */
 				return SNMP_ERR_INCONSISTENTVALUE;
-			break;
-		case RS_ACTIVE:
-		case RS_NOTINSERVICE:
-			if (StorageTmp == NULL)
-				/* cannot change state of non-existent row */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			if (StorageTmp->mxSpanRowStatus == RS_NOTREADY)
-				/* cannot change state of row that is not ready */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			/* XXX: interaction with row storage type needed */
-			if (set_value == RS_NOTINSERVICE && StorageTmp->mxSpanTable_refs > 0)
-				/* row is busy and cannot be moved to the RS_NOTINSERVICE state */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			break;
-		case RS_DESTROY:
-			/* destroying existent or non-existent row is ok */
-			if (StorageTmp == NULL)
-				break;
-			/* XXX: interaction with row storage type needed */
-			if (StorageTmp->mxSpanTable_refs > 0)
-				/* row is busy and cannot be deleted */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			break;
-		case RS_NOTREADY:
-			/* management station cannot set this, only agent can */
-		default:
-			return SNMP_ERR_INCONSISTENTVALUE;
-		}
-		break;
-	case RESERVE2:
-		/* memory reseveration, final preparation... */
-		switch (set_value) {
-		case RS_CREATEANDGO:
-		case RS_CREATEANDWAIT:
 			/* creation */
 			vars = NULL;
 			/* mxDrivName */
@@ -12380,6 +17875,7 @@ write_mxSpanRowStatus(int action, u_char *var_val, u_char var_val_type, size_t v
 				snmp_free_varbind(vars);
 				return SNMP_ERR_RESOURCEUNAVAILABLE;
 			}
+			StorageNew->mxSpanTable_rsvs = 1;
 			vp = vars;
 			memdup((void *) &StorageNew->mxDrivName, vp->val.string, vp->val_len);
 			StorageNew->mxDrivNameLen = vp->val_len;
@@ -12390,7 +17886,37 @@ write_mxSpanRowStatus(int action, u_char *var_val, u_char var_val_type, size_t v
 			vp = vp->next_variable;
 			header_complex_add_data(&mxSpanTableStorage, vars, StorageNew);	/* frees vars */
 			break;
+		case RS_ACTIVE:
+		case RS_NOTINSERVICE:
+			if (StorageTmp == NULL)
+				/* cannot change state of non-existent row */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			if (StorageTmp->mxSpanRowStatus == RS_NOTREADY)
+				/* cannot change state of row that is not ready */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			/* XXX: interaction with row storage type needed */
+			if (set_value == RS_NOTINSERVICE && StorageTmp->mxSpanTable_refs > 0)
+				/* row is busy and cannot be moved to the RS_NOTINSERVICE state */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			/* activate or deactivate */
+			if (StorageTmp == NULL)
+				return SNMP_ERR_NOSUCHNAME;
+			/* one allocation for the whole row */
+			if ((StorageOld = StorageTmp->mxSpanTable_old) == NULL)
+				if (StorageTmp->mxSpanTable_rsvs == 0)
+					if ((StorageOld = StorageTmp->mxSpanTable_old = mxSpanTable_duplicate(StorageTmp)) == NULL)
+						return SNMP_ERR_RESOURCEUNAVAILABLE;
+			if (StorageOld != NULL)
+				StorageTmp->mxSpanTable_rsvs++;
+			break;
 		case RS_DESTROY:
+			if (StorageTmp == NULL)
+				/* cannot destroy non-existent row */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			/* XXX: interaction with row storage type needed */
+			if (StorageTmp->mxSpanTable_refs > 0)
+				/* row is busy and cannot be deleted */
+				return SNMP_ERR_INCONSISTENTVALUE;
 			/* destroy */
 			if (StorageTmp != NULL) {
 				/* exists, extract it for now */
@@ -12400,78 +17926,127 @@ write_mxSpanRowStatus(int action, u_char *var_val, u_char var_val_type, size_t v
 				StorageDel = NULL;
 			}
 			break;
+		case RS_NOTREADY:
+			/* management station cannot set this, only agent can */
+		default:
+			return SNMP_ERR_INCONSISTENTVALUE;
 		}
 		break;
-	case ACTION:
-		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the UNDO case */
+	case RESERVE2:
+		/* memory reseveration, final preparation... */
 		switch (set_value) {
 		case RS_CREATEANDGO:
 			/* check that activation is possible */
-			if ((ret = mxSpanTable_consistent(StorageNew)) != SNMP_ERR_NOERROR)
+			if ((ret = can_act_mxSpanTable_row(StorageNew)) != SNMP_ERR_NOERROR)
 				return (ret);
 			break;
 		case RS_CREATEANDWAIT:
-			/* row does not have to be consistent */
 			break;
 		case RS_ACTIVE:
-			old_value = StorageTmp->mxSpanRowStatus;
-			StorageTmp->mxSpanRowStatus = set_value;
-			if (old_value != RS_ACTIVE) {
-				/* check that activation is possible */
-				if ((ret = mxSpanTable_consistent(StorageTmp)) != SNMP_ERR_NOERROR) {
-					StorageTmp->mxSpanRowStatus = old_value;
+			/* check that activation is possible */
+			if (StorageTmp->mxSpanRowStatus != RS_ACTIVE)
+				if ((ret = can_act_mxSpanTable_row(StorageTmp)) != SNMP_ERR_NOERROR)
 					return (ret);
-				}
+			break;
+		case RS_NOTINSERVICE:
+			/* check that deactivation is possible */
+			if (StorageTmp->mxSpanRowStatus != RS_NOTINSERVICE)
+				if ((ret = can_deact_mxSpanTable_row(StorageTmp)) != SNMP_ERR_NOERROR)
+					return (ret);
+			break;
+		case RS_DESTROY:
+			/* check that deactivation is possible */
+			if (StorageTmp->mxSpanRowStatus != RS_NOTINSERVICE)
+				if ((ret = can_deact_mxSpanTable_row(StorageTmp)) != SNMP_ERR_NOERROR)
+					return (ret);
+			break;
+		default:
+			return SNMP_ERR_WRONGVALUE;
+		}
+		break;
+	case ACTION:
+		/* The variable has been stored in StorageTmp->mxSpanRowStatus for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable
+		   in the UNDO case */
+		switch (set_value) {
+		case RS_CREATEANDGO:
+			/* activate with underlying device */
+			if (activate_mxSpanTable_row(StorageNew) != SNMP_ERR_NOERROR)
+				return SNMP_ERR_COMMITFAILED;
+			break;
+		case RS_CREATEANDWAIT:
+			break;
+		case RS_ACTIVE:
+			/* state change already performed */
+			if (StorageTmp->mxSpanRowStatus != RS_ACTIVE) {
+				/* activate with underlying device */
+				if (activate_mxSpanTable_row(StorageTmp) != SNMP_ERR_NOERROR)
+					return SNMP_ERR_COMMITFAILED;
 			}
 			break;
 		case RS_NOTINSERVICE:
-			/* set the flag? */
-			old_value = StorageTmp->mxSpanRowStatus;
-			StorageTmp->mxSpanRowStatus = set_value;
+			/* state change already performed */
+			if (StorageTmp->mxSpanRowStatus != RS_NOTINSERVICE) {
+				/* deactivate with underlying device */
+				if (deactivate_mxSpanTable_row(StorageTmp) != SNMP_ERR_NOERROR)
+					return SNMP_ERR_COMMITFAILED;
+			}
 			break;
+		case RS_DESTROY:
+			/* commit destrution to underlying device */
+			if (StorageDel == NULL)
+				break;
+			/* deactivate with underlying device */
+			if (deactivate_mxSpanTable_row(StorageDel) != SNMP_ERR_NOERROR)
+				return SNMP_ERR_COMMITFAILED;
+			break;
+		default:
+			return SNMP_ERR_WRONGVALUE;
 		}
 		break;
 	case COMMIT:
 		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		switch (set_value) {
 		case RS_CREATEANDGO:
-			/* row creation, set final state */
-			/* XXX: commit creation to underlying device */
-			/* XXX: activate with underlying device */
 			StorageNew->mxSpanRowStatus = RS_ACTIVE;
 			break;
 		case RS_CREATEANDWAIT:
-			/* row creation, set final state */
 			StorageNew->mxSpanRowStatus = RS_NOTINSERVICE;
 			break;
 		case RS_ACTIVE:
 		case RS_NOTINSERVICE:
-			/* state change already performed */
-			if (old_value != set_value) {
-				switch (set_value) {
-				case RS_ACTIVE:
-					/* XXX: activate with underlying device */
-					break;
-				case RS_NOTINSERVICE:
-					/* XXX: deactivate with underlying device */
-					break;
-				}
+			StorageNew->mxSpanRowStatus = set_value;
+			if ((StorageOld = StorageTmp->mxSpanTable_old) != NULL) {
+				mxSpanTable_destroy(&StorageTmp->mxSpanTable_old);
+				StorageTmp->mxSpanTable_rsvs = 0;
+				StorageTmp->mxSpanTable_tsts = 0;
+				StorageTmp->mxSpanTable_sets = 0;
 			}
 			break;
 		case RS_DESTROY:
-			/* row deletion, free it its dead */
 			mxSpanTable_destroy(&StorageDel);
-			/* mxSpanTable_destroy() can handle NULL pointers. */
 			break;
 		}
 		break;
 	case UNDO:
 		/* Back out any changes made in the ACTION case */
 		switch (set_value) {
+		case RS_CREATEANDGO:
+			/* deactivate with underlying device */
+			deactivate_mxSpanTable_row(StorageNew);
+			break;
+		case RS_CREATEANDWAIT:
+			break;
 		case RS_ACTIVE:
+			if (StorageTmp->mxSpanRowStatus == RS_NOTINSERVICE)
+				/* deactivate with underlying device */
+				deactivate_mxSpanTable_row(StorageTmp);
+			break;
 		case RS_NOTINSERVICE:
-			/* restore state */
-			StorageTmp->mxSpanRowStatus = old_value;
+			if (StorageTmp->mxSpanRowStatus == RS_ACTIVE)
+				/* activate with underlying device */
+				activate_mxSpanTable_row(StorageTmp);
+			break;
+		case RS_DESTROY:
 			break;
 		}
 		/* fall through */
@@ -12485,6 +18060,13 @@ write_mxSpanRowStatus(int action, u_char *var_val, u_char var_val_type, size_t v
 				mxSpanTable_del(StorageNew);
 				mxSpanTable_destroy(&StorageNew);
 			}
+			break;
+		case RS_ACTIVE:
+		case RS_NOTINSERVICE:
+			if ((StorageOld = StorageTmp->mxSpanTable_old) == NULL)
+				break;
+			if (--StorageTmp->mxSpanTable_rsvs == 0)
+				mxSpanTable_destroy(&StorageTmp->mxSpanTable_old);
 			break;
 		case RS_DESTROY:
 			/* row deletion, so add it again */
@@ -12511,10 +18093,9 @@ write_mxSpanRowStatus(int action, u_char *var_val, u_char var_val_type, size_t v
 int
 write_mxXconRowStatus(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	struct mxXconTable_data *StorageTmp = NULL;
+	struct mxXconTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	static struct mxXconTable_data *StorageNew, *StorageDel;
 	size_t newlen = name_len - 15;
-	static int old_value;
 	int set_value, ret;
 	static struct variable_list *vars, *vp;
 
@@ -12541,40 +18122,6 @@ write_mxXconRowStatus(int action, u_char *var_val, u_char var_val_type, size_t v
 			if (StorageTmp != NULL)
 				/* cannot create existing row */
 				return SNMP_ERR_INCONSISTENTVALUE;
-			break;
-		case RS_ACTIVE:
-		case RS_NOTINSERVICE:
-			if (StorageTmp == NULL)
-				/* cannot change state of non-existent row */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			if (StorageTmp->mxXconRowStatus == RS_NOTREADY)
-				/* cannot change state of row that is not ready */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			/* XXX: interaction with row storage type needed */
-			if (set_value == RS_NOTINSERVICE && StorageTmp->mxXconTable_refs > 0)
-				/* row is busy and cannot be moved to the RS_NOTINSERVICE state */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			break;
-		case RS_DESTROY:
-			/* destroying existent or non-existent row is ok */
-			if (StorageTmp == NULL)
-				break;
-			/* XXX: interaction with row storage type needed */
-			if (StorageTmp->mxXconTable_refs > 0)
-				/* row is busy and cannot be deleted */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			break;
-		case RS_NOTREADY:
-			/* management station cannot set this, only agent can */
-		default:
-			return SNMP_ERR_INCONSISTENTVALUE;
-		}
-		break;
-	case RESERVE2:
-		/* memory reseveration, final preparation... */
-		switch (set_value) {
-		case RS_CREATEANDGO:
-		case RS_CREATEANDWAIT:
 			/* creation */
 			vars = NULL;
 			/* mxDrivName */
@@ -12653,6 +18200,7 @@ write_mxXconRowStatus(int action, u_char *var_val, u_char var_val_type, size_t v
 				snmp_free_varbind(vars);
 				return SNMP_ERR_RESOURCEUNAVAILABLE;
 			}
+			StorageNew->mxXconTable_rsvs = 1;
 			vp = vars;
 			memdup((void *) &StorageNew->mxDrivName, vp->val.string, vp->val_len);
 			StorageNew->mxDrivNameLen = vp->val_len;
@@ -12665,7 +18213,37 @@ write_mxXconRowStatus(int action, u_char *var_val, u_char var_val_type, size_t v
 			vp = vp->next_variable;
 			header_complex_add_data(&mxXconTableStorage, vars, StorageNew);	/* frees vars */
 			break;
+		case RS_ACTIVE:
+		case RS_NOTINSERVICE:
+			if (StorageTmp == NULL)
+				/* cannot change state of non-existent row */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			if (StorageTmp->mxXconRowStatus == RS_NOTREADY)
+				/* cannot change state of row that is not ready */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			/* XXX: interaction with row storage type needed */
+			if (set_value == RS_NOTINSERVICE && StorageTmp->mxXconTable_refs > 0)
+				/* row is busy and cannot be moved to the RS_NOTINSERVICE state */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			/* activate or deactivate */
+			if (StorageTmp == NULL)
+				return SNMP_ERR_NOSUCHNAME;
+			/* one allocation for the whole row */
+			if ((StorageOld = StorageTmp->mxXconTable_old) == NULL)
+				if (StorageTmp->mxXconTable_rsvs == 0)
+					if ((StorageOld = StorageTmp->mxXconTable_old = mxXconTable_duplicate(StorageTmp)) == NULL)
+						return SNMP_ERR_RESOURCEUNAVAILABLE;
+			if (StorageOld != NULL)
+				StorageTmp->mxXconTable_rsvs++;
+			break;
 		case RS_DESTROY:
+			if (StorageTmp == NULL)
+				/* cannot destroy non-existent row */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			/* XXX: interaction with row storage type needed */
+			if (StorageTmp->mxXconTable_refs > 0)
+				/* row is busy and cannot be deleted */
+				return SNMP_ERR_INCONSISTENTVALUE;
 			/* destroy */
 			if (StorageTmp != NULL) {
 				/* exists, extract it for now */
@@ -12675,78 +18253,127 @@ write_mxXconRowStatus(int action, u_char *var_val, u_char var_val_type, size_t v
 				StorageDel = NULL;
 			}
 			break;
+		case RS_NOTREADY:
+			/* management station cannot set this, only agent can */
+		default:
+			return SNMP_ERR_INCONSISTENTVALUE;
 		}
 		break;
-	case ACTION:
-		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the UNDO case */
+	case RESERVE2:
+		/* memory reseveration, final preparation... */
 		switch (set_value) {
 		case RS_CREATEANDGO:
 			/* check that activation is possible */
-			if ((ret = mxXconTable_consistent(StorageNew)) != SNMP_ERR_NOERROR)
+			if ((ret = can_act_mxXconTable_row(StorageNew)) != SNMP_ERR_NOERROR)
 				return (ret);
 			break;
 		case RS_CREATEANDWAIT:
-			/* row does not have to be consistent */
 			break;
 		case RS_ACTIVE:
-			old_value = StorageTmp->mxXconRowStatus;
-			StorageTmp->mxXconRowStatus = set_value;
-			if (old_value != RS_ACTIVE) {
-				/* check that activation is possible */
-				if ((ret = mxXconTable_consistent(StorageTmp)) != SNMP_ERR_NOERROR) {
-					StorageTmp->mxXconRowStatus = old_value;
+			/* check that activation is possible */
+			if (StorageTmp->mxXconRowStatus != RS_ACTIVE)
+				if ((ret = can_act_mxXconTable_row(StorageTmp)) != SNMP_ERR_NOERROR)
 					return (ret);
-				}
+			break;
+		case RS_NOTINSERVICE:
+			/* check that deactivation is possible */
+			if (StorageTmp->mxXconRowStatus != RS_NOTINSERVICE)
+				if ((ret = can_deact_mxXconTable_row(StorageTmp)) != SNMP_ERR_NOERROR)
+					return (ret);
+			break;
+		case RS_DESTROY:
+			/* check that deactivation is possible */
+			if (StorageTmp->mxXconRowStatus != RS_NOTINSERVICE)
+				if ((ret = can_deact_mxXconTable_row(StorageTmp)) != SNMP_ERR_NOERROR)
+					return (ret);
+			break;
+		default:
+			return SNMP_ERR_WRONGVALUE;
+		}
+		break;
+	case ACTION:
+		/* The variable has been stored in StorageTmp->mxXconRowStatus for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable
+		   in the UNDO case */
+		switch (set_value) {
+		case RS_CREATEANDGO:
+			/* activate with underlying device */
+			if (activate_mxXconTable_row(StorageNew) != SNMP_ERR_NOERROR)
+				return SNMP_ERR_COMMITFAILED;
+			break;
+		case RS_CREATEANDWAIT:
+			break;
+		case RS_ACTIVE:
+			/* state change already performed */
+			if (StorageTmp->mxXconRowStatus != RS_ACTIVE) {
+				/* activate with underlying device */
+				if (activate_mxXconTable_row(StorageTmp) != SNMP_ERR_NOERROR)
+					return SNMP_ERR_COMMITFAILED;
 			}
 			break;
 		case RS_NOTINSERVICE:
-			/* set the flag? */
-			old_value = StorageTmp->mxXconRowStatus;
-			StorageTmp->mxXconRowStatus = set_value;
+			/* state change already performed */
+			if (StorageTmp->mxXconRowStatus != RS_NOTINSERVICE) {
+				/* deactivate with underlying device */
+				if (deactivate_mxXconTable_row(StorageTmp) != SNMP_ERR_NOERROR)
+					return SNMP_ERR_COMMITFAILED;
+			}
 			break;
+		case RS_DESTROY:
+			/* commit destrution to underlying device */
+			if (StorageDel == NULL)
+				break;
+			/* deactivate with underlying device */
+			if (deactivate_mxXconTable_row(StorageDel) != SNMP_ERR_NOERROR)
+				return SNMP_ERR_COMMITFAILED;
+			break;
+		default:
+			return SNMP_ERR_WRONGVALUE;
 		}
 		break;
 	case COMMIT:
 		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		switch (set_value) {
 		case RS_CREATEANDGO:
-			/* row creation, set final state */
-			/* XXX: commit creation to underlying device */
-			/* XXX: activate with underlying device */
 			StorageNew->mxXconRowStatus = RS_ACTIVE;
 			break;
 		case RS_CREATEANDWAIT:
-			/* row creation, set final state */
 			StorageNew->mxXconRowStatus = RS_NOTINSERVICE;
 			break;
 		case RS_ACTIVE:
 		case RS_NOTINSERVICE:
-			/* state change already performed */
-			if (old_value != set_value) {
-				switch (set_value) {
-				case RS_ACTIVE:
-					/* XXX: activate with underlying device */
-					break;
-				case RS_NOTINSERVICE:
-					/* XXX: deactivate with underlying device */
-					break;
-				}
+			StorageNew->mxXconRowStatus = set_value;
+			if ((StorageOld = StorageTmp->mxXconTable_old) != NULL) {
+				mxXconTable_destroy(&StorageTmp->mxXconTable_old);
+				StorageTmp->mxXconTable_rsvs = 0;
+				StorageTmp->mxXconTable_tsts = 0;
+				StorageTmp->mxXconTable_sets = 0;
 			}
 			break;
 		case RS_DESTROY:
-			/* row deletion, free it its dead */
 			mxXconTable_destroy(&StorageDel);
-			/* mxXconTable_destroy() can handle NULL pointers. */
 			break;
 		}
 		break;
 	case UNDO:
 		/* Back out any changes made in the ACTION case */
 		switch (set_value) {
+		case RS_CREATEANDGO:
+			/* deactivate with underlying device */
+			deactivate_mxXconTable_row(StorageNew);
+			break;
+		case RS_CREATEANDWAIT:
+			break;
 		case RS_ACTIVE:
+			if (StorageTmp->mxXconRowStatus == RS_NOTINSERVICE)
+				/* deactivate with underlying device */
+				deactivate_mxXconTable_row(StorageTmp);
+			break;
 		case RS_NOTINSERVICE:
-			/* restore state */
-			StorageTmp->mxXconRowStatus = old_value;
+			if (StorageTmp->mxXconRowStatus == RS_ACTIVE)
+				/* activate with underlying device */
+				activate_mxXconTable_row(StorageTmp);
+			break;
+		case RS_DESTROY:
 			break;
 		}
 		/* fall through */
@@ -12761,6 +18388,13 @@ write_mxXconRowStatus(int action, u_char *var_val, u_char var_val_type, size_t v
 				mxXconTable_destroy(&StorageNew);
 			}
 			break;
+		case RS_ACTIVE:
+		case RS_NOTINSERVICE:
+			if ((StorageOld = StorageTmp->mxXconTable_old) == NULL)
+				break;
+			if (--StorageTmp->mxXconTable_rsvs == 0)
+				mxXconTable_destroy(&StorageTmp->mxXconTable_old);
+			break;
 		case RS_DESTROY:
 			/* row deletion, so add it again */
 			if (StorageDel)
@@ -12770,6 +18404,40 @@ write_mxXconRowStatus(int action, u_char *var_val, u_char var_val_type, size_t v
 		break;
 	}
 	return SNMP_ERR_NOERROR;
+}
+
+void
+send_mxCardStateChange_v2trap(struct variable_list *vars)
+{
+	struct variable_list trap;
+
+	DEBUGMSGTL(("mxMIB", "send_mxCardStateChange_v2trap: sending trap...  "));
+	trap.next_variable = vars;
+	trap.name = snmpTrapOID_oid;
+	trap.name_length = sizeof(snmpTrapOID_oid) / sizeof(oid);
+	trap.type = ASN_OBJECT_ID;
+	trap.val.objid = mxCardStateChange_oid;
+	trap.val_len = sizeof(mxCardStateChange_oid);
+	trap.index = 0;
+	send_v2trap(&trap);
+	DEBUGMSGTL(("mxMIB", "done.\n"));
+}
+
+void
+send_mxSpanStateChange_v2trap(struct variable_list *vars)
+{
+	struct variable_list trap;
+
+	DEBUGMSGTL(("mxMIB", "send_mxSpanStateChange_v2trap: sending trap...  "));
+	trap.next_variable = vars;
+	trap.name = snmpTrapOID_oid;
+	trap.name_length = sizeof(snmpTrapOID_oid) / sizeof(oid);
+	trap.type = ASN_OBJECT_ID;
+	trap.val.objid = mxSpanStateChange_oid;
+	trap.val_len = sizeof(mxSpanStateChange_oid);
+	trap.index = 0;
+	send_v2trap(&trap);
+	DEBUGMSGTL(("mxMIB", "done.\n"));
 }
 
 /**

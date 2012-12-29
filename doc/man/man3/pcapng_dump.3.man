@@ -1,0 +1,382 @@
+'\" rtp
+.\" vim: ft=nroff sw=4 noet nocin nosi com=b\:.\\\" fo+=tcqlorn tw=77
+.\" =========================================================================
+.\"
+.\" @(#) $Id$
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2008-2012  Monavacon Limited <http://www.monavacon.com/>
+.\" Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+.\" Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to copy, distribute and/or modify this manual
+.\" under the terms of the GNU Free Documentation License, Version 1.3 or
+.\" any later version published by the Free Software Foundation; with no
+.\" Invariant Sections, no Front-Cover Texts, and no Back-Cover Texts.  A
+.\" copy of the license is included in the section entitled "GNU Free
+.\" Documentation License".
+.\"
+.\" Permission to use, copy and distribute this manual without modification,
+.\" for any purpose and without fee or royalty is hereby granted, provided
+.\" that both the above copyright notice and this permission notice appears
+.\" in all copies and that the name of OpenSS7 Corporation not be used in
+.\" advertising or publicity pertaining to distribution of this documentation
+.\" or its contents without specific, written prior permission.  OpenSS7
+.\" Corporation makes no representation about the suitability of this manual
+.\" for any purpose.  It is provided "as is" without express or implied
+.\" warranty.
+.\"
+.\" Permission is granted to process this file through groff and print the
+.\" results, provided the printed document carries a copying permission
+.\" notice identical to this one except for the removal of this paragraph
+.\" (this paragraph not being relevant to the printed manual).
+.\"
+.\" OPENSS7 CORPORATION DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS MANUAL
+.\" INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A
+.\" PARTICULAR PURPOSE, NON-INFRINGEMENT, OR TITLE; THAT THE CONTENTS OF THE
+.\" DOCUMENT ARE SUITABLE FOR ANY PURPOSE, OR THAT THE IMPLEMENTATION OF
+.\" SUCH CONTENTS WILL NOT INFRINGE ON ANY THIRD PARTY PATENTS, COPYRIGHTS,
+.\" TRADEMARKS OR OTHER RIGHTS.  IN NO EVENT SHALL OPENSS7 CORPORATION BE
+.\" LIABLE FOR ANY DIRECT, INDIRECT, SPECIAL OR CONSEQUENTIAL DAMAGES OR ANY
+.\" DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER
+.\" IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING
+.\" OUT OF OR IN CONNECTION WITH ANY USE OF THIS DOCUMENT OR THE PERFORMANCE
+.\" OR IMPLEMENTATION OF THE CONTENTS THEREOF.
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not have
+.\" taken the same level of care in the production of this manual, which is
+.\" licensed free of charge, as they might when working professionally.  The
+.\" author(s) will take no responsibility in it.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by the
+.\" source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any successor
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date$ by $Author$
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Log$
+.\" =========================================================================
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database openss7.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+search-truncate 40
+search-ignore CGIQOSTU
+.R2
+.so openss7.macros
+.\"
+.\"
+.TH PCAPNG_DUMP 3 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "PCAP-NG Library Calls"
+.\"
+.\"
+.SH NAME
+.B pcapng_dump
+\- write a packet to a capture file.
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+.B #include <pcapng.h>
+.HP 8
+.BI "typedef int (*pcapng_handler)(void *" user ", const struct pcapng_pkthdr *" h ", const u_char *" bytes );
+.HP 8
+.BI "int pcapng_dump(void *" user ", const struct pcapng_pkthdr *" h ", u_char *" sp );
+.\"
+.\"
+.SH ARGUMENTS
+.PP
+.TP
+.I user
+a handle to the PCAP-NG dump file.
+.PD 0
+.TP
+.I h
+a pointer to a PCAP-NG packet header structure.
+.TP
+.I sp
+a pointer to the packet payload.
+.PD
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+.B pcapng_dump
+outputs a packet to the \(lqsavefile\(rq opened with
+.BR pcapng_dump_open (3)
+or
+.BR pcapng_dump_fopen (3).
+Note that the calling arguments for
+.B pcapng_dump
+are suitable for use as a direct
+.B pcapng_callback
+function for use by
+.BR pcapng_dispatch (3)
+or
+.BR pcapng_loop (3).
+When called directly, the
+.I user
+argument should be a
+.B pcapng_dumper_t
+as returned by
+.BR pcapng_dump_open (3)
+or
+.BR pcapng_dump_fopen (3).
+.PP
+The
+.B pcapng_pkthdr
+structure has the following format:
+.sp
+.nf
+\fC\s+1
+struct pcapng_pkthdr {
+      uint32_t pph_interfaceid;
+      uint32_t pph_ts[2];
+      uint32_t pph_captlen;
+      uint32_t pph_packlen;
+      uint32_t pph_datalen;
+      uint32_t pph_flags;
+      uint64_t pph_dropcount;
+      uint64_t pph_compcount;
+};
+\s-1\fR
+.fi
+where the members are defined as follows:
+.TP 4
+.I pph_interfaceid
+The interface identifier (index) for the interface to which the
+packet belongs.
+.TP
+.I pph_ts
+The low-order 32-bits followed by the high-order 32-bits of a
+64-bit time stamp representing the time that the packet was received.  The
+64-bit value is in the time units of the indexed interface.
+.TP
+.I pph_captlen
+The capture length of the packet.  The capture length will not be
+greater than the snapshot length associated with the indexed interface.
+.TP
+.I pph_packlen
+The original length of the packet.  The packet length will not be
+less than the capture length provided in
+.IR pph_caplen .
+.TP
+.I pph_datalen
+The length of the packet contained in an associated data buffer.
+This field is often the same value as the
+.IR pph_captlen .
+.TP
+.I pph_flags
+The flags associated with the packet.  The flags are a logical OR of one flag
+from each of the following groups (or any flag from the errors group):
+.RS 4
+.TP
+.B PCAPNG_FLAG_DIR_UNKNOWN
+The direction of the packet is unknown.
+.PD 0
+.TP
+.B PCAPNG_FLAG_DIR_INBOUND
+The direction of the packet was inbound to the interface.
+.TP
+.B PCAPNG_FLAG_DIR_OUTBOUND
+The direction of the packet was outbound from the interface.
+.PD
+.TP
+.B PCAPNG_FLAG_TYP_UNSPEC
+The packet is of unspecified type.
+.PD 0
+.TP
+.B PCAPNG_FLAG_TYP_UNICAST
+The packet was received as a unicast packet.
+.TP
+.B PCAPNG_FLAG_TYP_MULTICAST
+The packet was received as a multicast packet.
+.TP
+.B PCAPNG_FLAG_TYP_BROADCAST
+The packet was received as a broadcast packet.
+.TP
+.B PCAPNG_FLAG_TYP_PROMISCUOUS
+The packet was received promiscuously.
+.PD
+.TP
+.B PCAPNG_FLAG_FCS_UNAVAIL
+The FCS length for the packet is unavailable.
+.PD 0
+.TP
+.B PCAPNG_FLAG_FCS_VAL(\fIval\fP)
+The FCS length of the packet is the value,
+.IR val .
+This value is between 0 and 15 inclusive.
+.PD
+.TP
+.B PCAPNG_FLAG_ERR_SYMBOL
+There was a link-layer symbol error.
+.PD 0
+.TP
+.B PCAPNG_FLAG_ERR_PREAMBLE
+There was a link-layer preamble error.
+.TP
+.B PCAPNG_FLAG_ERR_START
+There was a link-layer start frame delimiter error.
+.TP
+.B PCAPNG_FLAG_ERR_UNALIGNED
+There was a link-layer unaligned frame error.
+.TP
+.B PCAPNG_FLAG_ERR_GAP
+There was a link-layer inter-frame gap error.
+.TP
+.B PCAPNG_FLAG_ERR_SHORT
+There was a link-layer frame too short error.
+.TP
+.B PCAPNG_FLAG_ERR_LONG
+There was a link-layer frame too long error.
+.TP
+.B PCAPNG_FLAG_ERR_CRC
+There was a link-layer CRC error.
+.PD
+.RE
+.TP
+.I pph_dropcount
+The number of packets that were dropped since the last packet received and
+this packet.
+.TP
+.I pph_compcount
+The number of packets that were compressed since the last packet received and
+this packet.  This is the number of identical copies of this packet that were
+compressed.
+.\"
+.\"
+.SH USAGE
+.PP
+When used for saving packets from live capture to a \(lqsavefile,\(rq
+.B pcapng_dump
+is typically specified as the
+.I callback
+argument to
+.BR pcapng_dispatch (3)
+or
+.BR pcapng_loop (3),
+so that packets capture by these functions are directly written to the
+\(lqsavefile\(rq.
+.\"
+.\"
+.SH MT CONTEXT
+.PP
+.BR pcapng_dump
+is fully thread-safe.
+.\"
+.\"
+.SH RETURN
+.PP
+Upon success,
+.B pcapng_dump
+saves the packet to the \(lqsavefile\(rq specified by
+.IR user ,
+and returns zero
+.RB ( 0 ).
+.PP
+Upon failure,
+.B pcapng_dump
+returns minus one
+.RB ( -1 ),
+sets
+.IR p_errno
+to an appropriate error number, and sets
+.IR p_errbuf
+to an appropriate error string when available.
+.\"
+.\"
+.SH ERRORS
+.PP
+.B pcapng_dump
+returns
+.BR void .
+When
+.B pcpang_dump
+fails, it fails silently.
+.\"
+.\"
+.SH SEE ALSO
+.PP
+.BR pcapng (3),
+.BR pcapng_dump_open (3),
+.BR pcapng_dump_fopen (3),
+.BR pcapng_dispatch (3),
+.BR pcapng_loop (3),
+.BR pcap_dump (3pcap),
+.BR pcap (3pcap).
+.\"
+.\"
+.SH BUGS
+.PP
+.B pcapng_dump
+has no known bugs.
+.\"
+.\"
+.SH NOTICES
+.PP
+Because
+.B pcapng_dump
+returns
+.BR void ,
+it fails silently.
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+.\"
+.\"
+.SH HISTORY
+.PP
+.\"
+.\"
+.SH VERSIONS
+.PP
+This manual page was written for the OpenSS7 PCAP-NG Library.
+.\"
+.\"
+.[
+$LIST$
+.]
+.T4

@@ -1,0 +1,14 @@
+#!/bin/bash
+set -x
+where=`dirname $0`
+srcdir=`(cd $where/..; pwd)`
+$srcdir/configure \
+	KCC=gcc-4.6 \
+	DH_COMPAT=8 \
+	GCJ=gcj-4.6 \
+	GCJH=gcjh-4.6 \
+	--with-pkg-distdir=/u6/repo \
+	--with-pkg-repodir=/u5/repo \
+	--enable-maintainer-mode \
+	$* \
+	2>&1 | tee configure.log

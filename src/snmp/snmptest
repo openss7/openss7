@@ -1,0 +1,15 @@
+#!/usr/bin/perl
+
+use SNMP;
+use Data::Dumper;
+
+SNMP::loadModules('SNMPv2-SMI', 'SNMPv2-TC', 'SNMPv2-MIB', 'RFC1213-MIB', 'IF-MIB', 'INET-ADDRESS-MIB', 'IP-MIB');
+
+
+my $s = new SNMP::Session(
+	DestHost=>'localhost',
+	Community=>'public',
+	Version=>2,
+);
+print Dumper($s->gettable('atTable'));
+

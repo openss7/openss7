@@ -169,13 +169,6 @@ This is the default behaviour.
 .PP
 However, when the input-output controls recognized by the module are used to
 alter the behaviour of the module, it performs as follows:
-.IP \(bu \w'\(bu\(em'u
-The write side behaviour is as described above.
-.IP \(bu
-When the chunk size has been set to a non-zero value with
-.IP \(bu
-.IP \(bu
-.IP \(bu
 .\"
 .SS Read-Side Behaviour
 .PP
@@ -476,7 +469,7 @@ structure.
 See
 .BR M_IOCTL (9)
 for a description of how
-.I Linux Fast-STREAMS
+.I @PACKAGE_TITLE@
 handles 32-bit user space input-output controls to a 64-bit kernel.
 .\"
 .SS SBIOCGTIME (('B' << 8) + 2)
@@ -874,14 +867,9 @@ equivalent to
 .PD
 .PP
 The implementation in
-.I Linux Fast-STREAMS
+.I @PACKAGE_TITLE@
 defines these older input-output controls for backwards compatibility.
 .RE
-.IP \(em
-.IP \(em
-.IP \(em
-.IP \(em
-.IP \(em
 .PP
 Compatibility is tested using the
 .BR test-bufmod (8)

@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2012  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -121,12 +121,21 @@ extern int sa_request;			/* request number for per-request actions */
 
 /* our storage structure(s) */
 struct ds1EXT_data {
+	struct ds1EXT_data *ds1EXT_old;
+	uint ds1EXT_rsvs;
+	uint ds1EXT_tsts;
+	uint ds1EXT_sets;
 	uint ds1EXT_request;
 };
 struct dsx1ConfigTable_data {
+	struct dsx1ConfigTable_data *dsx1ConfigTable_old;
+	uint dsx1ConfigTable_rsvs;
+	uint dsx1ConfigTable_tsts;
+	uint dsx1ConfigTable_sets;
 	uint dsx1ConfigTable_request;
 	uint dsx1ConfigTable_refs;
-	long dsx1LineIndex;		/* ReadOnly */
+	uint dsx1ConfigTable_id;
+	long dsx1LineIndex;		/* NoAccess */
 	long dsx1IfIndex;		/* ReadOnly */
 	long dsx1TimeElapsed;		/* ReadOnly */
 	long dsx1ValidIntervals;	/* ReadOnly */
@@ -155,9 +164,14 @@ struct dsx1ConfigTable_data {
 	long dsx1LineImpedance;		/* ReadWrite */
 };
 struct dsx1CurrentTable_data {
+	struct dsx1CurrentTable_data *dsx1CurrentTable_old;
+	uint dsx1CurrentTable_rsvs;
+	uint dsx1CurrentTable_tsts;
+	uint dsx1CurrentTable_sets;
 	uint dsx1CurrentTable_request;
 	uint dsx1CurrentTable_refs;
-	long dsx1CurrentIndex;		/* ReadOnly */
+	uint dsx1CurrentTable_id;
+	long dsx1CurrentIndex;		/* NoAccess */
 	long dsx1CurrentESs;		/* ReadOnly */
 	long dsx1CurrentSESs;		/* ReadOnly */
 	long dsx1CurrentSEFSs;		/* ReadOnly */
@@ -170,10 +184,15 @@ struct dsx1CurrentTable_data {
 	long dsx1CurrentLCVs;		/* ReadOnly */
 };
 struct dsx1IntervalTable_data {
+	struct dsx1IntervalTable_data *dsx1IntervalTable_old;
+	uint dsx1IntervalTable_rsvs;
+	uint dsx1IntervalTable_tsts;
+	uint dsx1IntervalTable_sets;
 	uint dsx1IntervalTable_request;
 	uint dsx1IntervalTable_refs;
-	long dsx1IntervalIndex;		/* ReadOnly */
-	long dsx1IntervalNumber;	/* ReadOnly */
+	uint dsx1IntervalTable_id;
+	long dsx1IntervalIndex;		/* NoAccess */
+	long dsx1IntervalNumber;	/* NoAccess */
 	long dsx1IntervalESs;		/* ReadOnly */
 	long dsx1IntervalSESs;		/* ReadOnly */
 	long dsx1IntervalSEFSs;		/* ReadOnly */
@@ -187,9 +206,14 @@ struct dsx1IntervalTable_data {
 	long dsx1IntervalValidData;	/* ReadOnly */
 };
 struct dsx1TotalTable_data {
+	struct dsx1TotalTable_data *dsx1TotalTable_old;
+	uint dsx1TotalTable_rsvs;
+	uint dsx1TotalTable_tsts;
+	uint dsx1TotalTable_sets;
 	uint dsx1TotalTable_request;
 	uint dsx1TotalTable_refs;
-	long dsx1TotalIndex;		/* ReadOnly */
+	uint dsx1TotalTable_id;
+	long dsx1TotalIndex;		/* NoAccess */
 	long dsx1TotalESs;		/* ReadOnly */
 	long dsx1TotalSESs;		/* ReadOnly */
 	long dsx1TotalSEFSs;		/* ReadOnly */
@@ -202,9 +226,14 @@ struct dsx1TotalTable_data {
 	long dsx1TotalLCVs;		/* ReadOnly */
 };
 struct dsx1FarEndCurrentTable_data {
+	struct dsx1FarEndCurrentTable_data *dsx1FarEndCurrentTable_old;
+	uint dsx1FarEndCurrentTable_rsvs;
+	uint dsx1FarEndCurrentTable_tsts;
+	uint dsx1FarEndCurrentTable_sets;
 	uint dsx1FarEndCurrentTable_request;
 	uint dsx1FarEndCurrentTable_refs;
-	long dsx1FarEndCurrentIndex;	/* ReadOnly */
+	uint dsx1FarEndCurrentTable_id;
+	long dsx1FarEndCurrentIndex;	/* NoAccess */
 	long dsx1FarEndTimeElapsed;	/* ReadOnly */
 	long dsx1FarEndValidIntervals;	/* ReadOnly */
 	long dsx1FarEndCurrentESs;	/* ReadOnly */
@@ -219,10 +248,15 @@ struct dsx1FarEndCurrentTable_data {
 	long dsx1FarEndInvalidIntervals;	/* ReadOnly */
 };
 struct dsx1FarEndIntervalTable_data {
+	struct dsx1FarEndIntervalTable_data *dsx1FarEndIntervalTable_old;
+	uint dsx1FarEndIntervalTable_rsvs;
+	uint dsx1FarEndIntervalTable_tsts;
+	uint dsx1FarEndIntervalTable_sets;
 	uint dsx1FarEndIntervalTable_request;
 	uint dsx1FarEndIntervalTable_refs;
-	long dsx1FarEndIntervalIndex;	/* ReadOnly */
-	long dsx1FarEndIntervalNumber;	/* ReadOnly */
+	uint dsx1FarEndIntervalTable_id;
+	long dsx1FarEndIntervalIndex;	/* NoAccess */
+	long dsx1FarEndIntervalNumber;	/* NoAccess */
 	long dsx1FarEndIntervalESs;	/* ReadOnly */
 	long dsx1FarEndIntervalSESs;	/* ReadOnly */
 	long dsx1FarEndIntervalSEFSs;	/* ReadOnly */
@@ -235,9 +269,14 @@ struct dsx1FarEndIntervalTable_data {
 	long dsx1FarEndIntervalValidData;	/* ReadOnly */
 };
 struct dsx1FarEndTotalTable_data {
+	struct dsx1FarEndTotalTable_data *dsx1FarEndTotalTable_old;
+	uint dsx1FarEndTotalTable_rsvs;
+	uint dsx1FarEndTotalTable_tsts;
+	uint dsx1FarEndTotalTable_sets;
 	uint dsx1FarEndTotalTable_request;
 	uint dsx1FarEndTotalTable_refs;
-	long dsx1FarEndTotalIndex;	/* ReadOnly */
+	uint dsx1FarEndTotalTable_id;
+	long dsx1FarEndTotalIndex;	/* NoAccess */
 	long dsx1FarEndTotalESs;	/* ReadOnly */
 	long dsx1FarEndTotalSESs;	/* ReadOnly */
 	long dsx1FarEndTotalSEFSs;	/* ReadOnly */
@@ -249,15 +288,25 @@ struct dsx1FarEndTotalTable_data {
 	long dsx1FarEndTotalDMs;	/* ReadOnly */
 };
 struct dsx1FracTable_data {
+	struct dsx1FracTable_data *dsx1FracTable_old;
+	uint dsx1FracTable_rsvs;
+	uint dsx1FracTable_tsts;
+	uint dsx1FracTable_sets;
 	uint dsx1FracTable_request;
 	uint dsx1FracTable_refs;
-	long dsx1FracIndex;		/* ReadOnly */
-	long dsx1FracNumber;		/* ReadOnly */
+	uint dsx1FracTable_id;
+	long dsx1FracIndex;		/* NoAccess */
+	long dsx1FracNumber;		/* NoAccess */
 	long dsx1FracIfIndex;		/* ReadWrite */
 };
 struct dsx1ChanMappingTable_data {
+	struct dsx1ChanMappingTable_data *dsx1ChanMappingTable_old;
+	uint dsx1ChanMappingTable_rsvs;
+	uint dsx1ChanMappingTable_tsts;
+	uint dsx1ChanMappingTable_sets;
 	uint dsx1ChanMappingTable_request;
 	uint dsx1ChanMappingTable_refs;
+	uint dsx1ChanMappingTable_id;
 	long ifIndex;			/* ReadOnly */
 	long dsx1Ds1ChannelNumber;	/* ReadOnly */
 	long dsx1ChanMappedIfIndex;	/* ReadOnly */
@@ -425,6 +474,10 @@ void init_ds1EXT(void);
 void deinit_ds1EXT(void);
 int term_ds1EXT(int majorID, int minorID, void *serverarg, void *clientarg);
 FindVarMethod var_ds1EXT;
+struct ds1EXT_data *ds1EXT_create(void);
+struct ds1EXT_data *ds1EXT_duplicate(struct ds1EXT_data *);
+int ds1EXT_destroy(struct ds1EXT_data **);
+int ds1EXT_add(struct ds1EXT_data *);
 void parse_ds1EXT(const char *, char *);
 SNMPCallback store_ds1EXT;
 void refresh_ds1EXT(int);

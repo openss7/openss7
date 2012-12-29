@@ -1032,7 +1032,7 @@ pullupmsg(mblk_t *mp, register ssize_t len)
 	dp->db_size = size;
 	// _ensure(dp->db_flag == 0, dp->db_flag = 0);
 	/* copy from old initial datab */
-	if ((blen = bp->b_wptr > bp->b_rptr ? bp->b_wptr - bp->b_rptr : 0)) {
+	if ((blen = mp->b_wptr > mp->b_rptr ? mp->b_wptr - mp->b_rptr : 0)) {
 		bcopy(mp->b_rptr, base, blen);
 		size -= blen;
 	}

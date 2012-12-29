@@ -636,7 +636,16 @@ x400pCardType OBJECT-TYPE
          - x400pCardTypeAE400P,
          - x400pCardTypeA400P,
          - x400pCardTypeA400PT,
-         - x400pCardTypeA400PE,"
+         - x400pCardTypeA400PE,
+         - x400pCardTypeCP100,
+         - x400pCardTypeCP100P,
+         - x400pCardTypeCP100E,
+         - x400pCardTypeCP200,
+         - x400pCardTypeCP200P,
+         - x400pCardTypeCP200E,
+         - x400pCardTypeCP400,
+         - x400pCardTypeCP400P,
+         - x400pCardTypeCP400E,"
     ::= { x400pCardEntry 2 }
 
 x400pCardIdentifier OBJECT-TYPE
@@ -2509,7 +2518,7 @@ x400pSpanAlarms OBJECT-TYPE
     ::= { x400pSpanEntry 40 }
 
 x400pSpanEvents OBJECT-TYPE
-    SYNTAX      BITS { rlos(0), frcl(1), rual(2), ryel(3), rra(4), 
+    SYNTAX      BITS { rlos(0), frcl(1), rua1(2), ryel(3), rra(4), 
                     rdma(5), v52lnk(6), lorc(7), lotc(8), lup(9), 
                     ldn(10), lspare(11), tocd(12), tcle(13) }
     MAX-ACCESS  read-only
@@ -3444,22 +3453,22 @@ x400pCardTypePLX9030 OBJECT-IDENTITY
     STATUS      current
     DESCRIPTION 
         "This the the PLX 90303 board resulting from finding 
-         '9030'X in the PCI id.  This is a card that has not has 
-         the correct PCI Id burnt into it."
+         '9030'X in the PCI device.  This is a card that has not 
+         had the correct PCI device burnt into it."
     ::= { x400pCardTypes 1 }
 
 x400pCardTypePLXDevelopmentBoard OBJECT-IDENTITY
     STATUS      current
     DESCRIPTION 
         "This is a PLX development board as identified by the 
-         PCI Id '3001'X."
+         PCI device '3001'X."
     ::= { x400pCardTypes 2 }
 
 x400pCardTypeX400P OBJECT-IDENTITY
     STATUS      current
     DESCRIPTION 
         "This is an old Digium X400P card as identified by its 
-         PCI Id 'D00D'X.  The next position below this arc 
+         PCI device 'D00D'X.  The next position below this arc 
          identifies whether it is a T1 card or an E1 card.  If 
          there is nothing below this arc, the card supports both 
          E1 and T1 modes.  These cards were discontinued when 
@@ -3471,122 +3480,124 @@ x400pCardTypeE400P OBJECT-IDENTITY
     STATUS      current
     DESCRIPTION 
         "This is an old Digium E400P card as identifier by its 
-         PCI Id 'D00D'X.  The card reports a DS2154, DS21354, 
-         DS21554 Dallas chip indicating that this is an E1 card.  
-         This card does not support a T1 mode. It also does not 
-         support some of the snazzier features.  These cards 
-         were discontinued when Digium decided to force upgrade 
-         everyone to a TE410 card."
+         PCI device 'D00D'X.  The card reports a DS2154, 
+         DS21354, DS21554 Dallas chip indicating that this is an 
+         E1 card.  This card does not support a T1 mode. It also 
+         does not support some of the snazzier features.  These 
+         cards were discontinued when Digium decided to force 
+         upgrade everyone to a TE410 card."
     ::= { x400pCardTypeX400P 1 }
 
 x400pCardTypeT400P OBJECT-IDENTITY
     STATUS      current
     DESCRIPTION 
         "This is the old Digium T400P card as identified by its 
-         PCI Id 'D00D'X.  The card reporets a DS2152, DS21352, 
-         DS21552 Dallas chip indicating that this ia a T1 card.  
-         This card does not support an E1 mode. It also does not 
-         support some of the snazzier features.  These cards 
-         were discontinued when Digium decided to force upgrade 
-         everyone to a TE410 card."
+         PCI device 'D00D'X.  The card reporets a DS2152, 
+         DS21352, DS21552 Dallas chip indicating that this ia a 
+         T1 card.  This card does not support an E1 mode. It 
+         also does not support some of the snazzier features.  
+         These cards were discontinued when Digium decided to 
+         force upgrade everyone to a TE410 card."
     ::= { x400pCardTypeX400P 2 }
 
 x400pCardTypeX400P-SS7 OBJECT-IDENTITY
     STATUS      current
     DESCRIPTION 
         "This is an old OpenSS7 X400P-SS7 card as identified by 
-         its PCI Id '0557'X. The next position below this arc 
-         identifies whether this is a T1 card or an E1 card.  If 
-         there is nothing below this arc, the card supports both 
-         E1 and T1.  These cards were discontinued when Digium 
-         decided to force upgrade everyone to a TE410 card."
+         its PCI device '0557'X. The next position below this 
+         arc identifies whether this is a T1 card or an E1 card.  
+         If there is nothing below this arc, the card supports 
+         both E1 and T1.  These cards were discontinued when 
+         Digium decided to force upgrade everyone to a TE410 
+         card."
     ::= { x400pCardTypes 4 }
 
 x400pCardTypeE400P-SS7 OBJECT-IDENTITY
     STATUS      current
     DESCRIPTION 
         "This is an old OpenSS7 E400P-SS7 card as identified by 
-         its PCI Id '0557'X.  These are electically equivalent 
-         to the E400P card.  The card reports a DS2154, DS21354 
-         or DS21554 Dallas chip indicating that this is an E1 
-         card.  This card does not support a T1 mode.  It also 
-         does not support some othe snazzier features.  These 
-         cards were discontinued when Digium decided to force 
-         upgrade everyone to a TE410 card."
+         its PCI device '0557'X.  These are electically 
+         equivalent to the E400P card.  The card reports a 
+         DS2154, DS21354 or DS21554 Dallas chip indicating that 
+         this is an E1 card.  This card does not support a T1 
+         mode.  It also does not support some othe snazzier 
+         features.  These cards were discontinued when Digium 
+         decided to force upgrade everyone to a TE410 card."
     ::= { x400pCardTypeX400P-SS7 1 }
 
 x400pCardTypeT400P-SS7 OBJECT-IDENTITY
     STATUS      current
     DESCRIPTION 
         "This is an old OpenSS7 T400P-SS7 card as identified by 
-         its PCI Id '0557'X.  These are electically equivalent 
-         to the T400P card.  The card reports a DS2152, DS21352 
-         or DS21552 Dallas chip indicating that this is a T1 
-         card.  This card does not support an E1 mode.  It also 
-         does not support some othe snazzier features.  These 
-         cards were discontinued when Digium decided to force 
-         upgrade everyone to a TE410 card."
+         its PCI device '0557'X.  These are electically 
+         equivalent to the T400P card.  The card reports a 
+         DS2152, DS21352 or DS21552 Dallas chip indicating that 
+         this is a T1 card.  This card does not support an E1 
+         mode.  It also does not support some othe snazzier 
+         features.  These cards were discontinued when Digium 
+         decided to force upgrade everyone to a TE410 card."
     ::= { x400pCardTypeX400P-SS7 2 }
 
 x400pCardTypeV400P OBJECT-IDENTITY
     STATUS      current
     DESCRIPTION 
         "This is a old Varion V400P card or a newer ATCOM TE400P 
-         as identified by its PCI id '4000'X.  The next position 
-         below this arc identifies whether this is a Varion T1 
-         card, a Varion E1 card, or an ATCOM E1/T1/J1 card.  If 
-         there is nothing below this arc, the card is a Varion 
-         V400P card that supports both E1 and T1.  The Varion 
-         cards were discontinued by Varion due to excessive lead 
-         content compared to newer European standards."
+         as identified by its PCI device '4000'X.  The next 
+         position below this arc identifies whether this is a 
+         Varion T1 card, a Varion E1 card, or an ATCOM E1/T1/J1 
+         card.  If there is nothing below this arc, the card is 
+         a Varion V400P card that supports both E1 and T1.  The 
+         Varion cards were discontinued by Varion due to 
+         excessive lead content compared to newer European 
+         standards."
     ::= { x400pCardTypes 5 }
 
 x400pCardTypeV400PE OBJECT-IDENTITY
     STATUS      current
     DESCRIPTION 
         "This is an old Varion V400PE card as identified by its 
-         PCI id '4000'X.  These cards sometimes have a E1 only 
-         chip and sometimes have a chip that does both E1 and 
-         T1.  Some of the E1/T1 chips can be configured for J1.  
-         These cards are treated as E1 only.  These cards were 
-         discontinued by Varion due to excessive lead content 
-         compared to newer European standards."
+         PCI device '4000'X.  These cards sometimes have a E1 
+         only chip and sometimes have a chip that does both E1 
+         and T1.  Some of the E1/T1 chips can be configured for 
+         J1.  These cards are treated as E1 only.  These cards 
+         were discontinued by Varion due to excessive lead 
+         content compared to newer European standards."
     ::= { x400pCardTypeV400P 1 }
 
 x400pCardTypeV400PT OBJECT-IDENTITY
     STATUS      current
     DESCRIPTION 
         "This is an old Varion V400PT card as identified by its 
-         PCI id '4000'X.  These cards sometimes have a T1 only 
-         chip and sometimes have a chip that does both E1 and 
-         T1.  Some of the E1/T1 chips can be configured for J1.  
-         These cards are treated as T1 only.  These cards were 
-         discontinued by Varion due to excessive lead content 
-         compared to newer European standards."
+         PCI device '4000'X.  These cards sometimes have a T1 
+         only chip and sometimes have a chip that does both E1 
+         and T1.  Some of the E1/T1 chips can be configured for 
+         J1.  These cards are treated as T1 only.  These cards 
+         were discontinued by Varion due to excessive lead 
+         content compared to newer European standards."
     ::= { x400pCardTypeV400P 2 }
 
 x400pCardTypeA400P OBJECT-IDENTITY
     STATUS      current
     DESCRIPTION 
-        "This is an ATCOM TE400P card as identified by its PCI id 
-         '4000'X.  These cards have a chip that supports E1, T1 
-         and J1.  These cards are treated as supporting both E1 
-         and T1/J1.  It is unclear whether these cards are still 
-         available.  They are treated identical to the old Varion 
-         V400P card (x400pCardTypeV400P) with the newer 
-         chipsets."
+        "This is an ATCOM TE400P card as identified by its PCI 
+         device '4000'X.  These cards have a chip that supports 
+         E1, T1 and J1.  These cards are treated as supporting 
+         both E1 and T1/J1.  It is unclear whether these cards 
+         are still available.  They are treated identical to the 
+         old Varion V400P card (x400pCardTypeV400P) with the 
+         newer chipsets."
     ::= { x400pCardTypeV400P 3 }
 
 x400pCardTypeV401PE OBJECT-IDENTITY
     STATUS      current
     DESCRIPTION 
         "This is a current Varion V401PE card as identified by 
-         its PCI id 'D33D'X.  Unfortunately, even though it 
+         its PCI device 'D33D'X.  Unfortunately, even though it 
          reports itself as an E1 card, most of these cards are 
          electrically identical to the T1 card, just reporting a 
-         different PCI Id.  The chips support E1/T1/J1 and can 
-         be configured for any mode of operation, typically on a 
-         card by card basis and sometimes on a span by span 
+         different PCI device.  The chips support E1/T1/J1 and 
+         can be configured for any mode of operation, typically 
+         on a card by card basis and sometimes on a span by span 
          basis."
     ::= { x400pCardTypes 6 }
 
@@ -3594,23 +3605,23 @@ x400pCardTypeV401PT OBJECT-IDENTITY
     STATUS      current
     DESCRIPTION 
         "This is a current Varion V401PT card as identified by 
-         its PCI id 'D44D'X.  Unfortunately, even though it 
+         its PCI device 'D44D'X.  Unfortunately, even though it 
          reports itself as a T1 card, most of these cards are 
          electrically identical to the E1 card, just reporting a 
-         different PCI Id.  The chips support E1/T1/J1 and can 
-         be configured for any mode of operation, typically on a 
-         card by card basis and sometimes on a span by span 
+         different PCI device.  The chips support E1/T1/J1 and 
+         can be configured for any mode of operation, typically 
+         on a card by card basis and sometimes on a span by span 
          basis."
     ::= { x400pCardTypes 7 }
 
 x400pCardTypeAT400P OBJECT-IDENTITY
     STATUS      current
     DESCRIPTION 
-        "This is an ATCOM T400P card as identified by its PCI id 
-         '1000'X.  These cards are configured for T1 only 
-         regardless of whether the chip supports E1.  Some of the 
-         E1/T1 chips can be configured for J1.  These cards are 
-         treated as T1 only.  This is a Tormenta 3 card and 
+        "This is an ATCOM T400P card as identified by its PCI 
+         device '1000'X.  These cards are configured for T1 only 
+         regardless of whether the chip supports E1.  Some of 
+         the E1/T1 chips can be configured for J1.  These cards 
+         are treated as T1 only.  This is a Tormenta 3 card and 
          supports more advanced features.  It is unclear whether 
          these cards are still available."
     ::= { x400pCardTypes 8 }
@@ -3618,11 +3629,11 @@ x400pCardTypeAT400P OBJECT-IDENTITY
 x400pCardTypeAE400P OBJECT-IDENTITY
     STATUS      current
     DESCRIPTION 
-        "This is an ATCOM E400P card as identified by its PCI id 
-         '2000'X.  These cards are configured for E1 only 
-         regardless of whether the chip supports T1.  Some of the
-         E1/T1 chips can be configured for J1.  These cards are 
-         treated as E1 only.  This is a Tormenta 3 card and 
+        "This is an ATCOM E400P card as identified by its PCI 
+         device '2000'X.  These cards are configured for E1 only 
+         regardless of whether the chip supports T1.  Some of 
+         the E1/T1 chips can be configured for J1.  These cards 
+         are treated as E1 only.  This is a Tormenta 3 card and 
          supports more advanced features.  It is unclear whether 
          these cards are still available."
     ::= { x400pCardTypes 9 }
@@ -3631,12 +3642,12 @@ x400pCardTypeA400PT OBJECT-IDENTITY
     STATUS      current
     DESCRIPTION 
         "This is a current ATCOM T400P card as identified by its 
-         PCI id '4001'X.  Unfortunately, even though it reports 
-         itself as a T1 card, most of these cards are 
+         PCI device '4001'X.  Unfortunately, even though it 
+         reports itself as a T1 card, most of these cards are 
          electrically identifical to the E1 card, just reporting 
-         a different PCI Id.  The chips support E1/T1/J1 and can 
-         be configured for any mode of operation, typically on a 
-         card by card basis and sometimes on a span by span 
+         a different PCI device.  The chips support E1/T1/J1 and 
+         can be configured for any mode of operation, typically 
+         on a card by card basis and sometimes on a span by span 
          basis.  These cards are treated identical to the old 
          Varion V401PE cards (x400pCardTypeV401PE)."
     ::= { x400pCardTypes 10 }
@@ -3645,15 +3656,166 @@ x400pCardTypeA400PE OBJECT-IDENTITY
     STATUS      current
     DESCRIPTION 
         "This is a current ATCOM E400P card as identified by its 
-         PCI id '4002'X.  Unfortunatley, even though it reports 
-         itself as an E1 card, most of these cards are 
-         electrically identifcal to the T1 card, just reporting a 
-         different PCI Id.  The chips support E1/T1/J1 and can be 
-         configured for any mode of operation, typically on a 
-         card by card basis and sometimes on a span by span 
+         PCI device '4002'X.  Unfortunatley, even though it 
+         reports itself as an E1 card, most of these cards are 
+         electrically identifcal to the T1 card, just reporting 
+         a different PCI device.  The chips support E1/T1/J1 and 
+         can be configured for any mode of operation, typically 
+         on a card by card basis and sometimes on a span by span 
          basis.  These cards a treated identical to the old 
          Varion V401PT cards (x400pCardTypeV401PT)."
     ::= { x400pCardTypes 11 }
+
+x400pCardTypeCP100 OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "This is a current Allo CP100P/CP100E card providing a 
+         PCI/PCIe bus interface as identified by its PCI device 
+         'D44D'X and a subsystem device of '17F6'X.  These cards 
+         are marked as a '4E1T1 CARD'.  The PCI device of 
+         'D44D'X reports the card like an old Varion V401PT 
+         card. They currently have a DS21455 chip.  The chip 
+         supports E1/T1/J1 and can be configured for any mode of 
+         operation, typically on a card by card basis and 
+         sometimes on a span by span basis.  These cards are 
+         almost identitical to the CP400P/C400E cards, but only 
+         have one port populated instead of four."
+    ::= { x400pCardTypes 12 }
+
+x400pCardTypeCP100P OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION 
+        "This is a current Allo CP100P card providing a PCI bus 
+         interface as identified by its PCI device 'D44D'X and a 
+         subsystem device of '17F6'X.  These cards are marked as 
+         a '4E1T1 CARD'.  The PCI device of 'D44D'X reports the 
+         card like an old Varion V401PT (Torementa 3) card. They 
+         currently have a DS21455 chip.  The chip supports 
+         E1/T1/J1 and can be configured for any mode of 
+         operation, typically on a card by card basis and 
+         sometimes on a span by span basis.  These cards are 
+         almost identitical to the CP400P cards, but only have 
+         one port populated instead of four.  These cards can 
+         only be distinguished from the CP100E card by the PCI 
+         bus that they support."
+    ::= { x400pCardTypeCP100 1 }
+
+x400pCardTypeCP100E OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION 
+        "This is a current Allo CP100E card providing a PCIe bus 
+         interface as identified by its PCI device 'D44D'X and a 
+         subsystem device of '17F6'X.  These cards are marked as 
+         a '4E1T1 CARD'.  The PCI device of 'D44D'X reports the 
+         card like an old Varion V401PT (Torementa 3) card. They 
+         currently have a DS21455 chip.  The chip supports 
+         E1/T1/J1 and can be configured for any mode of 
+         operation, typically on a card by card basis and 
+         sometimes on a span by span basis.  These cards are 
+         almost identitical to the CP400P cards, but only have 
+         one port populated instead of four.  These cards can 
+         only be distinguished from the CP100P card by the PCI 
+         bus that they support."
+    ::= { x400pCardTypeCP100 2 }
+
+x400pCardTypeCP200 OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "This is a current Allo CP200P/CP200E card providing a 
+         PCI/PCIe bus interface as identified by its PCI device 
+         'D44D'X and a subsystem device of '17F8'X.  These cards 
+         are marked as a '4E1T1 CARD'.  The PCI device of 
+         'D44D'X reports the card like an old Varion V401PT 
+         card. They currently have a DS21455 chip.  The chip 
+         supports E1/T1/J1 and can be configured for any mode of 
+         operation, typically on a card by card basis and 
+         sometimes on a span by span basis.  These cards are 
+         almost identitical to the CP400P/C400E cards, but only 
+         have two ports populated instead of four."
+    ::= { x400pCardTypes 13 }
+
+x400pCardTypeCP200P OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION 
+        "This is a current Allo CP200P card providing a PCI bus 
+         interface as identified by its PCI device 'D44D'X and a 
+         subsystem device of '17F8'X.  Thses cards are marked as 
+         a '4E1T1 CARD'.  The PCI device of 'D44D'X reports the 
+         card like an old Varion V401PT (Torementa 3) card. They 
+         currently have a DS21455 chip.  The chip supports 
+         E1/T1/J1 and can be configured for any mode of 
+         operation, typically on a card by card basis and 
+         sometimes on a span by span basis.  These cards are 
+         almost identitical to the CP400P cards, but only have 
+         two ports populated instead of four.  These cards can 
+         only be distinguished from the CP200E card by the PCI 
+         bus that they support."
+    ::= { x400pCardTypeCP200 1 }
+
+x400pCardTypeCP200E OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION 
+        "This is a current Allo CP200E card providing a PCIe bus 
+         interface as identified by its PCI device 'D44D'X and a 
+         subsystem device of '17F8'X.  These cards are marked as 
+         a '4E1T1 CARD'.  The PCI device of 'D44D'X reports the 
+         card like an old Varion V401PT (Torementa 3) card. They 
+         currently have a DS21455 chip.  The chip supports 
+         E1/T1/J1 and can be configured for any mode of 
+         operation, typically on a card by card basis and 
+         sometimes on a span by span basis.  These cards are 
+         almost identitical to the CP400P cards, but only have 
+         one port populated instead of four.  These cards can 
+         only be distinguished from the CP200P card by the PCI 
+         bus that they support."
+    ::= { x400pCardTypeCP200 2 }
+
+x400pCardTypeCP400 OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "This is a current Allo CP400P/CP400E card providing a 
+         PCI/PCIe bus interface as identified by its PCI device 
+         'D44D'X and a subsystem device of '17F7'X.  These cards 
+         are marked as 'CP400P Rev 12' or 'CP400P Rev 1.1'.  The 
+         PCI device of 'D44D'X reports the card like an old 
+         Varion V401PT card.  They currently have a DS21455 
+         chip.  The chip supports E1/T1/J1 operation and can be 
+         configured for any mode of operation, typically on a 
+         card by card basis and sometimes on a span by span 
+         basis."
+    ::= { x400pCardTypes 14 }
+
+x400pCardTypeCP400P OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION 
+        "This is a current Allo CP400P card providing a PCI bus 
+         interface as identified by its PCI device 'D44D'X and a 
+         subsystem device of '17F7'X.  These cards are marked as 
+         'CP400P Rev 12'.  The PCI device of 'D44D'X reports the 
+         card like an old Varion V401PT card.  They currently 
+         have a DS21455 chip.  The chip supports E1/T1/J1 
+         operation and can be configured for any mode of 
+         operation, typically on a card by card basis and 
+         sometimes on a span by span basis.  These cards can 
+         only be distinguished from the CP400E card by the PCI 
+         bus that they support."
+    ::= { x400pCardTypeCP400 1 }
+
+x400pCardTypeCP400E OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION 
+        "This is a current Allo CP400E card providing a PCIe bus 
+         interface as identified by its PCI device 'D44D'X and a 
+         subsystem device of '17F7'X.  These cards are marked as 
+         'CP400P Rev 12'.  The PCI device of 'D44D'X reports the 
+         card like an old Varion V401PT card.  They currently 
+         have a DS21455 chip.  The chip supports E1/T1/J1 
+         operation and can be configured for any mode of 
+         operation, typically on a card by card basis and 
+         sometimes on a span by span basis.  These cards can 
+         only be distinguished from the CP400P card by the PCI 
+         bus that they support."
+    ::= { x400pCardTypeCP400 2 }
 
 -- ====================================================================
 -- CHIP TYPES

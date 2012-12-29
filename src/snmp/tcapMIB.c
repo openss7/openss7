@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2012  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -485,8 +485,38 @@ tcapMIB_create(void)
 		/* XXX: fill in default scalar values here into StorageNew */
 
 	}
+      done:
 	DEBUGMSGTL(("tcapMIB", "done.\n"));
 	return (StorageNew);
+	goto nomem;
+      nomem:
+	tcapMIB_destroy(&StorageNew);
+	goto done;
+}
+
+/**
+ * @fn struct tcapMIB_data *tcapMIB_duplicate(struct tcapMIB_data *thedata)
+ * @param thedata the mib structure to duplicate
+ * @brief duplicate a mib structure for the mib
+ *
+ * Duplicates the specified mib structure @param thedata and returns a pointer to the newly
+ * allocated mib structure on success, or NULL on failure.
+ */
+struct tcapMIB_data *
+tcapMIB_duplicate(struct tcapMIB_data *thedata)
+{
+	struct tcapMIB_data *StorageNew = SNMP_MALLOC_STRUCT(tcapMIB_data);
+
+	DEBUGMSGTL(("tcapMIB", "tcapMIB_duplicate: duplicating mib... "));
+	if (StorageNew != NULL) {
+	}
+      done:
+	DEBUGMSGTL(("tcapMIB", "done.\n"));
+	return (StorageNew);
+	goto destroy;
+      destroy:
+	tcapMIB_destroy(&StorageNew);
+	goto done;
 }
 
 /**
@@ -537,7 +567,7 @@ tcapMIB_add(struct tcapMIB_data *thedata)
  * @param line line from configuration file matching the token.
  * @brief parse configuration file for tcapMIB entries.
  *
- * This callback is called by UCD-SNMP when it prases a configuration file and finds a configuration
+ * This callback is called by UCD-SNMP when it parses a configuration file and finds a configuration
  * file line for the registsred token (in this case tcapMIB).  This routine is invoked by
  * UCD-SNMP to read the values of scalars in the MIB from the configuration file.  Note that this
  * procedure may exist regardless of the persistence of the MIB.  If there are no configured entries
@@ -589,6 +619,62 @@ store_tcapMIB(int majorID, int minorID, void *serverarg, void *clientarg)
 	}
 	DEBUGMSGTL(("tcapMIB", "done.\n"));
 	return SNMPERR_SUCCESS;
+}
+
+/**
+ * @fn int check_tcapMIB(struct tcapMIB_data *StorageTmp, struct tcapMIB_data *StorageOld)
+ * @param StorageTmp the data as updated
+ * @param StorageOld the data previous to update
+ *
+ * This function is used by mibs.  It is used to check, all scalars at a time, the varbinds
+ * belonging to the mib.  This function is called for the first varbind in a mib at the beginning of
+ * the ACTION phase.  The COMMIT phase does not ensue unless this check passes.  This function can
+ * return SNMP_ERR_NOERR or a specific SNMP error value.  Values in StorageOld are the values before
+ * the varbinds on the mib were applied; the values in StorageTmp are the new values.  The function
+ * is permitted to change the values in StorageTmp to correct them; however, preferences should be
+ * made for setting values that were not in the varbinds.
+ */
+int
+check_tcapMIB(struct tcapMIB_data *StorageTmp, struct tcapMIB_data *StorageOld)
+{
+	/* XXX: provide code to check the scalars for consistency */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int update_tcapMIB(struct tcapMIB_data *StorageTmp, struct tcapMIB_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the set operation (ACTION phase)
+ *
+ * This function is used by mibs.  It is used to update, all scalars at a time, the varbinds
+ * belonging to the mib.  This function is called for the first varbind in a mib at the beginning of
+ * the COMMIT phase.  The start of the ACTION phase performs a consistency check on the mib before
+ * allowing the request to proceed to the COMMIT phase.  The COMMIT phase then arrives here with
+ * consistency already checked (see check_tcapMIB()).  This function can
+ * return SNMP_ERR_NOERROR or SNMP_ERR_COMMITFAILED.  Values in StorageOld are the values before the
+ * varbinds on the mib were applied: the values in StorageTmp are the new values.
+ */
+int
+update_tcapMIB(struct tcapMIB_data *StorageTmp, struct tcapMIB_data *StorageOld)
+{
+	/* XXX: provide code to update the row with the underlying device */
+	tcapMIB_refresh = 1;
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn revert_tcapMIB(struct 
+ * @fn void revert_tcapMIB(struct tcapMIB_data *StorageTmp, struct tcapMIB_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the undo operation (UNDO phase)
+ */
+void
+revert_tcapMIB(struct tcapMIB_data *StorageTmp, struct tcapMIB_data *StorageOld)
+{
+	/* XXX: provide code to revert the row with the underlying device */
+	update_tcapMIB(StorageOld, NULL);
 }
 
 /**
@@ -687,14 +773,19 @@ tcapApplicationSubsystemTable_create(void)
 		StorageNew->tcapApplicationSubsystemRowStatus = 0;
 		StorageNew->tcapApplicationSubsystemRowStatus = RS_NOTREADY;
 	}
+      done:
 	DEBUGMSGTL(("tcapMIB", "done.\n"));
 	return (StorageNew);
+	goto nomem;
+      nomem:
+	tcapApplicationSubsystemTable_destroy(&StorageNew);
+	goto done;
 }
 
 /**
  * @fn struct tcapApplicationSubsystemTable_data *tcapApplicationSubsystemTable_duplicate(struct tcapApplicationSubsystemTable_data *thedata)
  * @param thedata the row structure to duplicate.
- * @brief duplicat a row structure for a table.
+ * @brief duplicate a row structure for a table.
  *
  * Duplicates the specified row structure @param thedata and returns a pointer to the newly
  * allocated row structure on success, or NULL on failure.
@@ -706,6 +797,14 @@ tcapApplicationSubsystemTable_duplicate(struct tcapApplicationSubsystemTable_dat
 
 	DEBUGMSGTL(("tcapMIB", "tcapApplicationSubsystemTable_duplicate: duplicating row...  "));
 	if (StorageNew != NULL) {
+		StorageNew->tcapApplicationSubsystemTable_id = thedata->tcapApplicationSubsystemTable_id;
+		StorageNew->tcapSystemId = thedata->tcapSystemId;
+		if (!(StorageNew->tcapApplicationSubsystemId = malloc(thedata->tcapApplicationSubsystemIdLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->tcapApplicationSubsystemId, thedata->tcapApplicationSubsystemId, thedata->tcapApplicationSubsystemIdLen);
+		StorageNew->tcapApplicationSubsystemIdLen = thedata->tcapApplicationSubsystemIdLen;
+		StorageNew->tcapApplicationSubsystemId[StorageNew->tcapApplicationSubsystemIdLen] = 0;
+		StorageNew->tcapApplicationSubsystemRowStatus = thedata->tcapApplicationSubsystemRowStatus;
 	}
       done:
 	DEBUGMSGTL(("tcapMIB", "done.\n"));
@@ -803,7 +902,7 @@ tcapApplicationSubsystemTable_del(struct tcapApplicationSubsystemTable_data *the
  * @param line line from configuration file matching the token.
  * @brief parse configuration file for tcapApplicationSubsystemTable entries.
  *
- * This callback is called by UCD-SNMP when it prases a configuration file and finds a configuration
+ * This callback is called by UCD-SNMP when it parses a configuration file and finds a configuration
  * file line for the registsred token (in this case tcapApplicationSubsystemTable).  This routine is invoked by UCD-SNMP
  * to read the values of each row in the table from the configuration file.  Note that this
  * procedure may exist regardless of the persistence of the table.  If there are no configured
@@ -889,14 +988,19 @@ tcapTransactionCopmTable_create(void)
 		StorageNew->tcapTransactionCopmRowStatus = 0;
 		StorageNew->tcapTransactionCopmRowStatus = RS_NOTREADY;
 	}
+      done:
 	DEBUGMSGTL(("tcapMIB", "done.\n"));
 	return (StorageNew);
+	goto nomem;
+      nomem:
+	tcapTransactionCopmTable_destroy(&StorageNew);
+	goto done;
 }
 
 /**
  * @fn struct tcapTransactionCopmTable_data *tcapTransactionCopmTable_duplicate(struct tcapTransactionCopmTable_data *thedata)
  * @param thedata the row structure to duplicate.
- * @brief duplicat a row structure for a table.
+ * @brief duplicate a row structure for a table.
  *
  * Duplicates the specified row structure @param thedata and returns a pointer to the newly
  * allocated row structure on success, or NULL on failure.
@@ -908,6 +1012,10 @@ tcapTransactionCopmTable_duplicate(struct tcapTransactionCopmTable_data *thedata
 
 	DEBUGMSGTL(("tcapMIB", "tcapTransactionCopmTable_duplicate: duplicating row...  "));
 	if (StorageNew != NULL) {
+		StorageNew->tcapTransactionCopmTable_id = thedata->tcapTransactionCopmTable_id;
+		StorageNew->tcapTransactionCopmId = thedata->tcapTransactionCopmId;
+		StorageNew->tcapTransactionCopmOperationalState = thedata->tcapTransactionCopmOperationalState;
+		StorageNew->tcapTransactionCopmRowStatus = thedata->tcapTransactionCopmRowStatus;
 	}
       done:
 	DEBUGMSGTL(("tcapMIB", "done.\n"));
@@ -1001,7 +1109,7 @@ tcapTransactionCopmTable_del(struct tcapTransactionCopmTable_data *thedata)
  * @param line line from configuration file matching the token.
  * @brief parse configuration file for tcapTransactionCopmTable entries.
  *
- * This callback is called by UCD-SNMP when it prases a configuration file and finds a configuration
+ * This callback is called by UCD-SNMP when it parses a configuration file and finds a configuration
  * file line for the registsred token (in this case tcapTransactionCopmTable).  This routine is invoked by UCD-SNMP
  * to read the values of each row in the table from the configuration file.  Note that this
  * procedure may exist regardless of the persistence of the table.  If there are no configured
@@ -1078,29 +1186,39 @@ tcapTransactionTable_create(void)
 	DEBUGMSGTL(("tcapMIB", "tcapTransactionTable_create: creating row...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
-		if ((StorageNew->tcapTransactionUnderlyingConnectionNames = snmp_duplicate_objid(zeroDotZero_oid, 2)))
+		if ((StorageNew->tcapTransactionUnderlyingConnectionNames = snmp_duplicate_objid(zeroDotZero_oid, 2)) == NULL)
+			goto nomem;
 			StorageNew->tcapTransactionUnderlyingConnectionNamesLen = 2;
-		if ((StorageNew->tcapTransactionInvocationOfPointer = snmp_duplicate_objid(zeroDotZero_oid, 2)))
+		if ((StorageNew->tcapTransactionInvocationOfPointer = snmp_duplicate_objid(zeroDotZero_oid, 2)) == NULL)
+			goto nomem;
 			StorageNew->tcapTransactionInvocationOfPointerLen = 2;
-		if (memdup((u_char **) &StorageNew->tcapTransactionPresFUinUse, (u_char *) "\x00", 1) == SNMPERR_SUCCESS)
+		if (memdup((u_char **) &StorageNew->tcapTransactionPresFUinUse, (u_char *) "\x00", 1) != SNMPERR_SUCCESS)
+			goto nomem;
 			StorageNew->tcapTransactionPresFUinUseLen = 1;
-		if ((StorageNew->tcapTransactionPresContextInUse = snmp_duplicate_objid(zeroDotZero_oid, 2)))
+		if ((StorageNew->tcapTransactionPresContextInUse = snmp_duplicate_objid(zeroDotZero_oid, 2)) == NULL)
+			goto nomem;
 			StorageNew->tcapTransactionPresContextInUseLen = 2;
-		if (memdup((u_char **) &StorageNew->tcapTransactionSessProtInUse, (u_char *) "\x00", 1) == SNMPERR_SUCCESS)
+		if (memdup((u_char **) &StorageNew->tcapTransactionSessProtInUse, (u_char *) "\x00", 1) != SNMPERR_SUCCESS)
+			goto nomem;
 			StorageNew->tcapTransactionSessProtInUseLen = 1;
-		if (memdup((u_char **) &StorageNew->tcapTransactionSessFUInUse, (u_char *) "\x00\x00", 2) == SNMPERR_SUCCESS)
+		if (memdup((u_char **) &StorageNew->tcapTransactionSessFUInUse, (u_char *) "\x00\x00", 2) != SNMPERR_SUCCESS)
+			goto nomem;
 			StorageNew->tcapTransactionSessFUInUseLen = 2;
 		StorageNew->tcapTransactionMaxTSDUsize = 0;
-
 	}
+      done:
 	DEBUGMSGTL(("tcapMIB", "done.\n"));
 	return (StorageNew);
+	goto nomem;
+      nomem:
+	tcapTransactionTable_destroy(&StorageNew);
+	goto done;
 }
 
 /**
  * @fn struct tcapTransactionTable_data *tcapTransactionTable_duplicate(struct tcapTransactionTable_data *thedata)
  * @param thedata the row structure to duplicate.
- * @brief duplicat a row structure for a table.
+ * @brief duplicate a row structure for a table.
  *
  * Duplicates the specified row structure @param thedata and returns a pointer to the newly
  * allocated row structure on success, or NULL on failure.
@@ -1112,6 +1230,36 @@ tcapTransactionTable_duplicate(struct tcapTransactionTable_data *thedata)
 
 	DEBUGMSGTL(("tcapMIB", "tcapTransactionTable_duplicate: duplicating row...  "));
 	if (StorageNew != NULL) {
+		StorageNew->tcapTransactionTable_id = thedata->tcapTransactionTable_id;
+		StorageNew->tcapApInvocationId = thedata->tcapApInvocationId;
+		StorageNew->tcapTransactionId = thedata->tcapTransactionId;
+		if (!
+		    (StorageNew->tcapTransactionUnderlyingConnectionNames =
+		     snmp_duplicate_objid(thedata->tcapTransactionUnderlyingConnectionNames, thedata->tcapTransactionUnderlyingConnectionNamesLen / sizeof(oid))))
+			goto destroy;
+		StorageNew->tcapTransactionUnderlyingConnectionNamesLen = thedata->tcapTransactionUnderlyingConnectionNamesLen;
+		if (!(StorageNew->tcapTransactionInvocationOfPointer = snmp_duplicate_objid(thedata->tcapTransactionInvocationOfPointer, thedata->tcapTransactionInvocationOfPointerLen / sizeof(oid))))
+			goto destroy;
+		StorageNew->tcapTransactionInvocationOfPointerLen = thedata->tcapTransactionInvocationOfPointerLen;
+		if (!(StorageNew->tcapTransactionPresFUinUse = malloc(thedata->tcapTransactionPresFUinUseLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->tcapTransactionPresFUinUse, thedata->tcapTransactionPresFUinUse, thedata->tcapTransactionPresFUinUseLen);
+		StorageNew->tcapTransactionPresFUinUseLen = thedata->tcapTransactionPresFUinUseLen;
+		StorageNew->tcapTransactionPresFUinUse[StorageNew->tcapTransactionPresFUinUseLen] = 0;
+		if (!(StorageNew->tcapTransactionPresContextInUse = snmp_duplicate_objid(thedata->tcapTransactionPresContextInUse, thedata->tcapTransactionPresContextInUseLen / sizeof(oid))))
+			goto destroy;
+		StorageNew->tcapTransactionPresContextInUseLen = thedata->tcapTransactionPresContextInUseLen;
+		if (!(StorageNew->tcapTransactionSessProtInUse = malloc(thedata->tcapTransactionSessProtInUseLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->tcapTransactionSessProtInUse, thedata->tcapTransactionSessProtInUse, thedata->tcapTransactionSessProtInUseLen);
+		StorageNew->tcapTransactionSessProtInUseLen = thedata->tcapTransactionSessProtInUseLen;
+		StorageNew->tcapTransactionSessProtInUse[StorageNew->tcapTransactionSessProtInUseLen] = 0;
+		if (!(StorageNew->tcapTransactionSessFUInUse = malloc(thedata->tcapTransactionSessFUInUseLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->tcapTransactionSessFUInUse, thedata->tcapTransactionSessFUInUse, thedata->tcapTransactionSessFUInUseLen);
+		StorageNew->tcapTransactionSessFUInUseLen = thedata->tcapTransactionSessFUInUseLen;
+		StorageNew->tcapTransactionSessFUInUse[StorageNew->tcapTransactionSessFUInUseLen] = 0;
+		StorageNew->tcapTransactionMaxTSDUsize = thedata->tcapTransactionMaxTSDUsize;
 	}
       done:
 	DEBUGMSGTL(("tcapMIB", "done.\n"));
@@ -1219,7 +1367,7 @@ tcapTransactionTable_del(struct tcapTransactionTable_data *thedata)
  * @param line line from configuration file matching the token.
  * @brief parse configuration file for tcapTransactionTable entries.
  *
- * This callback is called by UCD-SNMP when it prases a configuration file and finds a configuration
+ * This callback is called by UCD-SNMP when it parses a configuration file and finds a configuration
  * file line for the registsred token (in this case tcapTransactionTable).  This routine is invoked by UCD-SNMP
  * to read the values of each row in the table from the configuration file.  Note that this
  * procedure may exist regardless of the persistence of the table.  If there are no configured
@@ -1340,28 +1488,40 @@ tcapDialogueTable_create(void)
 		/* XXX: fill in default row values here into StorageNew */
 		StorageNew->tcapApInvocationId = 0;
 		StorageNew->tcapTransactionId = 0;
-		if ((StorageNew->tcapDialogueInvocationOfPointer = snmp_duplicate_objid(zeroDotZero_oid, 2)))
+		if ((StorageNew->tcapDialogueInvocationOfPointer = snmp_duplicate_objid(zeroDotZero_oid, 2)) == NULL)
+			goto nomem;
 			StorageNew->tcapDialogueInvocationOfPointerLen = 2;
-		if ((StorageNew->tcapDialogueCallingAEtitle = (uint8_t *) strdup("")) != NULL)
-			StorageNew->tcapDialogueCallingAEtitleLen = strlen("");
-		if (memdup((u_char **) &StorageNew->tcapDialogueAcseFUinUse, (u_char *) "\x00", 1) == SNMPERR_SUCCESS)
+		if ((StorageNew->tcapDialogueCallingAEtitle = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->tcapDialogueCallingAEtitleLen = 0;
+		StorageNew->tcapDialogueCallingAEtitle[StorageNew->tcapDialogueCallingAEtitleLen] = 0;
+		if (memdup((u_char **) &StorageNew->tcapDialogueAcseFUinUse, (u_char *) "\x00", 1) != SNMPERR_SUCCESS)
+			goto nomem;
 			StorageNew->tcapDialogueAcseFUinUseLen = 1;
-		if ((StorageNew->tcapDialogueApplContextInUse = snmp_duplicate_objid(zeroDotZero_oid, 2)))
+		if ((StorageNew->tcapDialogueApplContextInUse = snmp_duplicate_objid(zeroDotZero_oid, 2)) == NULL)
+			goto nomem;
 			StorageNew->tcapDialogueApplContextInUseLen = 2;
-		if ((StorageNew->tcapDialogueParentASOinvoc = snmp_duplicate_objid(zeroDotZero_oid, 2)))
+		if ((StorageNew->tcapDialogueParentASOinvoc = snmp_duplicate_objid(zeroDotZero_oid, 2)) == NULL)
+			goto nomem;
 			StorageNew->tcapDialogueParentASOinvocLen = 2;
-		if ((StorageNew->tcapDialogueCalledAEtitle = (uint8_t *) strdup("")) != NULL)
-			StorageNew->tcapDialogueCalledAEtitleLen = strlen("");
-
+		if ((StorageNew->tcapDialogueCalledAEtitle = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->tcapDialogueCalledAEtitleLen = 0;
+		StorageNew->tcapDialogueCalledAEtitle[StorageNew->tcapDialogueCalledAEtitleLen] = 0;
 	}
+      done:
 	DEBUGMSGTL(("tcapMIB", "done.\n"));
 	return (StorageNew);
+	goto nomem;
+      nomem:
+	tcapDialogueTable_destroy(&StorageNew);
+	goto done;
 }
 
 /**
  * @fn struct tcapDialogueTable_data *tcapDialogueTable_duplicate(struct tcapDialogueTable_data *thedata)
  * @param thedata the row structure to duplicate.
- * @brief duplicat a row structure for a table.
+ * @brief duplicate a row structure for a table.
  *
  * Duplicates the specified row structure @param thedata and returns a pointer to the newly
  * allocated row structure on success, or NULL on failure.
@@ -1373,6 +1533,34 @@ tcapDialogueTable_duplicate(struct tcapDialogueTable_data *thedata)
 
 	DEBUGMSGTL(("tcapMIB", "tcapDialogueTable_duplicate: duplicating row...  "));
 	if (StorageNew != NULL) {
+		StorageNew->tcapDialogueTable_id = thedata->tcapDialogueTable_id;
+		StorageNew->tcapApInvocationId = thedata->tcapApInvocationId;
+		StorageNew->tcapTransactionId = thedata->tcapTransactionId;
+		StorageNew->tcapDialogueId = thedata->tcapDialogueId;
+		if (!(StorageNew->tcapDialogueInvocationOfPointer = snmp_duplicate_objid(thedata->tcapDialogueInvocationOfPointer, thedata->tcapDialogueInvocationOfPointerLen / sizeof(oid))))
+			goto destroy;
+		StorageNew->tcapDialogueInvocationOfPointerLen = thedata->tcapDialogueInvocationOfPointerLen;
+		if (!(StorageNew->tcapDialogueCallingAEtitle = malloc(thedata->tcapDialogueCallingAEtitleLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->tcapDialogueCallingAEtitle, thedata->tcapDialogueCallingAEtitle, thedata->tcapDialogueCallingAEtitleLen);
+		StorageNew->tcapDialogueCallingAEtitleLen = thedata->tcapDialogueCallingAEtitleLen;
+		StorageNew->tcapDialogueCallingAEtitle[StorageNew->tcapDialogueCallingAEtitleLen] = 0;
+		if (!(StorageNew->tcapDialogueAcseFUinUse = malloc(thedata->tcapDialogueAcseFUinUseLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->tcapDialogueAcseFUinUse, thedata->tcapDialogueAcseFUinUse, thedata->tcapDialogueAcseFUinUseLen);
+		StorageNew->tcapDialogueAcseFUinUseLen = thedata->tcapDialogueAcseFUinUseLen;
+		StorageNew->tcapDialogueAcseFUinUse[StorageNew->tcapDialogueAcseFUinUseLen] = 0;
+		if (!(StorageNew->tcapDialogueApplContextInUse = snmp_duplicate_objid(thedata->tcapDialogueApplContextInUse, thedata->tcapDialogueApplContextInUseLen / sizeof(oid))))
+			goto destroy;
+		StorageNew->tcapDialogueApplContextInUseLen = thedata->tcapDialogueApplContextInUseLen;
+		if (!(StorageNew->tcapDialogueParentASOinvoc = snmp_duplicate_objid(thedata->tcapDialogueParentASOinvoc, thedata->tcapDialogueParentASOinvocLen / sizeof(oid))))
+			goto destroy;
+		StorageNew->tcapDialogueParentASOinvocLen = thedata->tcapDialogueParentASOinvocLen;
+		if (!(StorageNew->tcapDialogueCalledAEtitle = malloc(thedata->tcapDialogueCalledAEtitleLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->tcapDialogueCalledAEtitle, thedata->tcapDialogueCalledAEtitle, thedata->tcapDialogueCalledAEtitleLen);
+		StorageNew->tcapDialogueCalledAEtitleLen = thedata->tcapDialogueCalledAEtitleLen;
+		StorageNew->tcapDialogueCalledAEtitle[StorageNew->tcapDialogueCalledAEtitleLen] = 0;
 	}
       done:
 	DEBUGMSGTL(("tcapMIB", "done.\n"));
@@ -1482,7 +1670,7 @@ tcapDialogueTable_del(struct tcapDialogueTable_data *thedata)
  * @param line line from configuration file matching the token.
  * @brief parse configuration file for tcapDialogueTable entries.
  *
- * This callback is called by UCD-SNMP when it prases a configuration file and finds a configuration
+ * This callback is called by UCD-SNMP when it parses a configuration file and finds a configuration
  * file line for the registsred token (in this case tcapDialogueTable).  This routine is invoked by UCD-SNMP
  * to read the values of each row in the table from the configuration file.  Note that this
  * procedure may exist regardless of the persistence of the table.  If there are no configured
@@ -1602,20 +1790,27 @@ tcapTcUserTable_create(void)
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
 		StorageNew->tcapSystemId = 0;
-		if ((StorageNew->tcapApplicationSubsystemId = (uint8_t *) strdup("")) != NULL)
-			StorageNew->tcapApplicationSubsystemIdLen = strlen("");
-		if ((StorageNew->tcapTcUserInvocationOfPointer = snmp_duplicate_objid(zeroDotZero_oid, 2)))
+		if ((StorageNew->tcapApplicationSubsystemId = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->tcapApplicationSubsystemIdLen = 0;
+		StorageNew->tcapApplicationSubsystemId[StorageNew->tcapApplicationSubsystemIdLen] = 0;
+		if ((StorageNew->tcapTcUserInvocationOfPointer = snmp_duplicate_objid(zeroDotZero_oid, 2)) == NULL)
+			goto nomem;
 			StorageNew->tcapTcUserInvocationOfPointerLen = 2;
-
 	}
+      done:
 	DEBUGMSGTL(("tcapMIB", "done.\n"));
 	return (StorageNew);
+	goto nomem;
+      nomem:
+	tcapTcUserTable_destroy(&StorageNew);
+	goto done;
 }
 
 /**
  * @fn struct tcapTcUserTable_data *tcapTcUserTable_duplicate(struct tcapTcUserTable_data *thedata)
  * @param thedata the row structure to duplicate.
- * @brief duplicat a row structure for a table.
+ * @brief duplicate a row structure for a table.
  *
  * Duplicates the specified row structure @param thedata and returns a pointer to the newly
  * allocated row structure on success, or NULL on failure.
@@ -1627,6 +1822,17 @@ tcapTcUserTable_duplicate(struct tcapTcUserTable_data *thedata)
 
 	DEBUGMSGTL(("tcapMIB", "tcapTcUserTable_duplicate: duplicating row...  "));
 	if (StorageNew != NULL) {
+		StorageNew->tcapTcUserTable_id = thedata->tcapTcUserTable_id;
+		StorageNew->tcapSystemId = thedata->tcapSystemId;
+		if (!(StorageNew->tcapApplicationSubsystemId = malloc(thedata->tcapApplicationSubsystemIdLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->tcapApplicationSubsystemId, thedata->tcapApplicationSubsystemId, thedata->tcapApplicationSubsystemIdLen);
+		StorageNew->tcapApplicationSubsystemIdLen = thedata->tcapApplicationSubsystemIdLen;
+		StorageNew->tcapApplicationSubsystemId[StorageNew->tcapApplicationSubsystemIdLen] = 0;
+		StorageNew->tcapTcUserId = thedata->tcapTcUserId;
+		if (!(StorageNew->tcapTcUserInvocationOfPointer = snmp_duplicate_objid(thedata->tcapTcUserInvocationOfPointer, thedata->tcapTcUserInvocationOfPointerLen / sizeof(oid))))
+			goto destroy;
+		StorageNew->tcapTcUserInvocationOfPointerLen = thedata->tcapTcUserInvocationOfPointerLen;
 	}
       done:
 	DEBUGMSGTL(("tcapMIB", "done.\n"));
@@ -1728,7 +1934,7 @@ tcapTcUserTable_del(struct tcapTcUserTable_data *thedata)
  * @param line line from configuration file matching the token.
  * @brief parse configuration file for tcapTcUserTable entries.
  *
- * This callback is called by UCD-SNMP when it prases a configuration file and finds a configuration
+ * This callback is called by UCD-SNMP when it parses a configuration file and finds a configuration
  * file line for the registsred token (in this case tcapTcUserTable).  This routine is invoked by UCD-SNMP
  * to read the values of each row in the table from the configuration file.  Note that this
  * procedure may exist regardless of the persistence of the table.  If there are no configured
@@ -1818,23 +2024,31 @@ tcapApplicationProcessTable_create(void)
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
 		StorageNew->tcapSystemId = 0;
-		if ((StorageNew->tcapApplicationSubsystemId = (uint8_t *) strdup("")) != NULL)
-			StorageNew->tcapApplicationSubsystemIdLen = strlen("");
-		if ((StorageNew->tcapApplicationProcessTitle = snmp_duplicate_objid(zeroDotZero_oid, 2)))
+		if ((StorageNew->tcapApplicationSubsystemId = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->tcapApplicationSubsystemIdLen = 0;
+		StorageNew->tcapApplicationSubsystemId[StorageNew->tcapApplicationSubsystemIdLen] = 0;
+		if ((StorageNew->tcapApplicationProcessTitle = snmp_duplicate_objid(zeroDotZero_oid, 2)) == NULL)
+			goto nomem;
 			StorageNew->tcapApplicationProcessTitleLen = 2;
 		StorageNew->tcapApplicationProcessSupportEntityNames = 0;
 		StorageNew->tcapApplicationProcessOperationalState = 0;
 		StorageNew->tcapApplicationProcessRowStatus = 0;
 		StorageNew->tcapApplicationProcessRowStatus = RS_NOTREADY;
 	}
+      done:
 	DEBUGMSGTL(("tcapMIB", "done.\n"));
 	return (StorageNew);
+	goto nomem;
+      nomem:
+	tcapApplicationProcessTable_destroy(&StorageNew);
+	goto done;
 }
 
 /**
  * @fn struct tcapApplicationProcessTable_data *tcapApplicationProcessTable_duplicate(struct tcapApplicationProcessTable_data *thedata)
  * @param thedata the row structure to duplicate.
- * @brief duplicat a row structure for a table.
+ * @brief duplicate a row structure for a table.
  *
  * Duplicates the specified row structure @param thedata and returns a pointer to the newly
  * allocated row structure on success, or NULL on failure.
@@ -1846,6 +2060,24 @@ tcapApplicationProcessTable_duplicate(struct tcapApplicationProcessTable_data *t
 
 	DEBUGMSGTL(("tcapMIB", "tcapApplicationProcessTable_duplicate: duplicating row...  "));
 	if (StorageNew != NULL) {
+		StorageNew->tcapApplicationProcessTable_id = thedata->tcapApplicationProcessTable_id;
+		StorageNew->tcapSystemId = thedata->tcapSystemId;
+		if (!(StorageNew->tcapApplicationSubsystemId = malloc(thedata->tcapApplicationSubsystemIdLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->tcapApplicationSubsystemId, thedata->tcapApplicationSubsystemId, thedata->tcapApplicationSubsystemIdLen);
+		StorageNew->tcapApplicationSubsystemIdLen = thedata->tcapApplicationSubsystemIdLen;
+		StorageNew->tcapApplicationSubsystemId[StorageNew->tcapApplicationSubsystemIdLen] = 0;
+		if (!(StorageNew->tcapApplicationProcessId = malloc(thedata->tcapApplicationProcessIdLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->tcapApplicationProcessId, thedata->tcapApplicationProcessId, thedata->tcapApplicationProcessIdLen);
+		StorageNew->tcapApplicationProcessIdLen = thedata->tcapApplicationProcessIdLen;
+		StorageNew->tcapApplicationProcessId[StorageNew->tcapApplicationProcessIdLen] = 0;
+		if (!(StorageNew->tcapApplicationProcessTitle = snmp_duplicate_objid(thedata->tcapApplicationProcessTitle, thedata->tcapApplicationProcessTitleLen / sizeof(oid))))
+			goto destroy;
+		StorageNew->tcapApplicationProcessTitleLen = thedata->tcapApplicationProcessTitleLen;
+		StorageNew->tcapApplicationProcessSupportEntityNames = thedata->tcapApplicationProcessSupportEntityNames;
+		StorageNew->tcapApplicationProcessOperationalState = thedata->tcapApplicationProcessOperationalState;
+		StorageNew->tcapApplicationProcessRowStatus = thedata->tcapApplicationProcessRowStatus;
 	}
       done:
 	DEBUGMSGTL(("tcapMIB", "done.\n"));
@@ -1949,7 +2181,7 @@ tcapApplicationProcessTable_del(struct tcapApplicationProcessTable_data *thedata
  * @param line line from configuration file matching the token.
  * @brief parse configuration file for tcapApplicationProcessTable entries.
  *
- * This callback is called by UCD-SNMP when it prases a configuration file and finds a configuration
+ * This callback is called by UCD-SNMP when it parses a configuration file and finds a configuration
  * file line for the registsred token (in this case tcapApplicationProcessTable).  This routine is invoked by UCD-SNMP
  * to read the values of each row in the table from the configuration file.  Note that this
  * procedure may exist regardless of the persistence of the table.  If there are no configured
@@ -2050,23 +2282,33 @@ tcapSupportEntityNameTable_create(void)
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
 		StorageNew->tcapSystemId = 0;
-		if ((StorageNew->tcapApplicationSubsystemId = (uint8_t *) strdup("")) != NULL)
-			StorageNew->tcapApplicationSubsystemIdLen = strlen("");
-		if ((StorageNew->tcapApplicationProcessId = (uint8_t *) strdup("")) != NULL)
-			StorageNew->tcapApplicationProcessIdLen = strlen("");
-		if ((StorageNew->tcapSupportEntityNamePointer = snmp_duplicate_objid(zeroDotZero_oid, 2)))
+		if ((StorageNew->tcapApplicationSubsystemId = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->tcapApplicationSubsystemIdLen = 0;
+		StorageNew->tcapApplicationSubsystemId[StorageNew->tcapApplicationSubsystemIdLen] = 0;
+		if ((StorageNew->tcapApplicationProcessId = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->tcapApplicationProcessIdLen = 0;
+		StorageNew->tcapApplicationProcessId[StorageNew->tcapApplicationProcessIdLen] = 0;
+		if ((StorageNew->tcapSupportEntityNamePointer = snmp_duplicate_objid(zeroDotZero_oid, 2)) == NULL)
+			goto nomem;
 			StorageNew->tcapSupportEntityNamePointerLen = 2;
 		StorageNew->tcapSupportEntityRowStatus = 0;
 		StorageNew->tcapSupportEntityRowStatus = RS_NOTREADY;
 	}
+      done:
 	DEBUGMSGTL(("tcapMIB", "done.\n"));
 	return (StorageNew);
+	goto nomem;
+      nomem:
+	tcapSupportEntityNameTable_destroy(&StorageNew);
+	goto done;
 }
 
 /**
  * @fn struct tcapSupportEntityNameTable_data *tcapSupportEntityNameTable_duplicate(struct tcapSupportEntityNameTable_data *thedata)
  * @param thedata the row structure to duplicate.
- * @brief duplicat a row structure for a table.
+ * @brief duplicate a row structure for a table.
  *
  * Duplicates the specified row structure @param thedata and returns a pointer to the newly
  * allocated row structure on success, or NULL on failure.
@@ -2078,6 +2320,23 @@ tcapSupportEntityNameTable_duplicate(struct tcapSupportEntityNameTable_data *the
 
 	DEBUGMSGTL(("tcapMIB", "tcapSupportEntityNameTable_duplicate: duplicating row...  "));
 	if (StorageNew != NULL) {
+		StorageNew->tcapSupportEntityNameTable_id = thedata->tcapSupportEntityNameTable_id;
+		StorageNew->tcapSystemId = thedata->tcapSystemId;
+		if (!(StorageNew->tcapApplicationSubsystemId = malloc(thedata->tcapApplicationSubsystemIdLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->tcapApplicationSubsystemId, thedata->tcapApplicationSubsystemId, thedata->tcapApplicationSubsystemIdLen);
+		StorageNew->tcapApplicationSubsystemIdLen = thedata->tcapApplicationSubsystemIdLen;
+		StorageNew->tcapApplicationSubsystemId[StorageNew->tcapApplicationSubsystemIdLen] = 0;
+		if (!(StorageNew->tcapApplicationProcessId = malloc(thedata->tcapApplicationProcessIdLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->tcapApplicationProcessId, thedata->tcapApplicationProcessId, thedata->tcapApplicationProcessIdLen);
+		StorageNew->tcapApplicationProcessIdLen = thedata->tcapApplicationProcessIdLen;
+		StorageNew->tcapApplicationProcessId[StorageNew->tcapApplicationProcessIdLen] = 0;
+		StorageNew->tcapSupportEntityNameId = thedata->tcapSupportEntityNameId;
+		if (!(StorageNew->tcapSupportEntityNamePointer = snmp_duplicate_objid(thedata->tcapSupportEntityNamePointer, thedata->tcapSupportEntityNamePointerLen / sizeof(oid))))
+			goto destroy;
+		StorageNew->tcapSupportEntityNamePointerLen = thedata->tcapSupportEntityNamePointerLen;
+		StorageNew->tcapSupportEntityRowStatus = thedata->tcapSupportEntityRowStatus;
 	}
       done:
 	DEBUGMSGTL(("tcapMIB", "done.\n"));
@@ -2183,7 +2442,7 @@ tcapSupportEntityNameTable_del(struct tcapSupportEntityNameTable_data *thedata)
  * @param line line from configuration file matching the token.
  * @brief parse configuration file for tcapSupportEntityNameTable entries.
  *
- * This callback is called by UCD-SNMP when it prases a configuration file and finds a configuration
+ * This callback is called by UCD-SNMP when it parses a configuration file and finds a configuration
  * file line for the registsred token (in this case tcapSupportEntityNameTable).  This routine is invoked by UCD-SNMP
  * to read the values of each row in the table from the configuration file.  Note that this
  * procedure may exist regardless of the persistence of the table.  If there are no configured
@@ -2281,42 +2540,61 @@ tcapApplicationEntityTable_create(void)
 	DEBUGMSGTL(("tcapMIB", "tcapApplicationEntityTable_create: creating row...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
-		if ((StorageNew->tcapApplicationSubsystemId = (uint8_t *) strdup("")) != NULL)
-			StorageNew->tcapApplicationSubsystemIdLen = strlen("");
+		if ((StorageNew->tcapApplicationSubsystemId = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->tcapApplicationSubsystemIdLen = 0;
+		StorageNew->tcapApplicationSubsystemId[StorageNew->tcapApplicationSubsystemIdLen] = 0;
 		StorageNew->tcapApplicationEntityLocalSapNames = 0;
 		StorageNew->tcapApplicationEntityOperationalState = 0;
-		if ((StorageNew->tcapApplicationEntityAsoTitle = snmp_duplicate_objid(zeroDotZero_oid, 2)))
+		if ((StorageNew->tcapApplicationEntityAsoTitle = snmp_duplicate_objid(zeroDotZero_oid, 2)) == NULL)
+			goto nomem;
 			StorageNew->tcapApplicationEntityAsoTitleLen = 2;
-		if ((StorageNew->tcapApplicationEntityAsoQualifier = snmp_duplicate_objid(zeroDotZero_oid, 2)))
+		if ((StorageNew->tcapApplicationEntityAsoQualifier = snmp_duplicate_objid(zeroDotZero_oid, 2)) == NULL)
+			goto nomem;
 			StorageNew->tcapApplicationEntityAsoQualifierLen = 2;
 		StorageNew->tcapApplicationEntityApplicationContextNameSupport = 0;
-		if (memdup((u_char **) &StorageNew->tcapApplicationEntityPresFUsupport, (u_char *) "\x00", 1) == SNMPERR_SUCCESS)
+		if (memdup((u_char **) &StorageNew->tcapApplicationEntityPresFUsupport, (u_char *) "\x00", 1) != SNMPERR_SUCCESS)
+			goto nomem;
 			StorageNew->tcapApplicationEntityPresFUsupportLen = 1;
-		if ((StorageNew->tcapApplicationEntityAbstrSyntaxSupport = snmp_duplicate_objid(zeroDotZero_oid, 2)))
+		if ((StorageNew->tcapApplicationEntityAbstrSyntaxSupport = snmp_duplicate_objid(zeroDotZero_oid, 2)) == NULL)
+			goto nomem;
 			StorageNew->tcapApplicationEntityAbstrSyntaxSupportLen = 2;
-		if ((StorageNew->tcapApplicationEntityTransfSynstaxSupport = snmp_duplicate_objid(zeroDotZero_oid, 2)))
+		if ((StorageNew->tcapApplicationEntityTransfSynstaxSupport = snmp_duplicate_objid(zeroDotZero_oid, 2)) == NULL)
+			goto nomem;
 			StorageNew->tcapApplicationEntityTransfSynstaxSupportLen = 2;
-		if ((StorageNew->tcapApplicationEntityPresSelectorValue = (uint8_t *) strdup("")) != NULL)
-			StorageNew->tcapApplicationEntityPresSelectorValueLen = strlen("");
-		if (memdup((u_char **) &StorageNew->tcapApplicationEntitySessProtVerSupport, (u_char *) "\x00", 1) == SNMPERR_SUCCESS)
+		if ((StorageNew->tcapApplicationEntityPresSelectorValue = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->tcapApplicationEntityPresSelectorValueLen = 0;
+		StorageNew->tcapApplicationEntityPresSelectorValue[StorageNew->tcapApplicationEntityPresSelectorValueLen] = 0;
+		if (memdup((u_char **) &StorageNew->tcapApplicationEntitySessProtVerSupport, (u_char *) "\x00", 1) != SNMPERR_SUCCESS)
+			goto nomem;
 			StorageNew->tcapApplicationEntitySessProtVerSupportLen = 1;
-		if (memdup((u_char **) &StorageNew->tcapApplicationEntitySessFUsupport, (u_char *) "\x00\x00", 2) == SNMPERR_SUCCESS)
+		if (memdup((u_char **) &StorageNew->tcapApplicationEntitySessFUsupport, (u_char *) "\x00\x00", 2) != SNMPERR_SUCCESS)
+			goto nomem;
 			StorageNew->tcapApplicationEntitySessFUsupportLen = 2;
-		if (memdup((u_char **) &StorageNew->tcapApplicationEntitySessOptSupport, (u_char *) "\x00", 1) == SNMPERR_SUCCESS)
+		if (memdup((u_char **) &StorageNew->tcapApplicationEntitySessOptSupport, (u_char *) "\x00", 1) != SNMPERR_SUCCESS)
+			goto nomem;
 			StorageNew->tcapApplicationEntitySessOptSupportLen = 1;
-		if ((StorageNew->tcapApplicationEntitySessionSelectorValue = (uint8_t *) strdup("")) != NULL)
-			StorageNew->tcapApplicationEntitySessionSelectorValueLen = strlen("");
+		if ((StorageNew->tcapApplicationEntitySessionSelectorValue = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->tcapApplicationEntitySessionSelectorValueLen = 0;
+		StorageNew->tcapApplicationEntitySessionSelectorValue[StorageNew->tcapApplicationEntitySessionSelectorValueLen] = 0;
 		StorageNew->tcapApplicationEntityRowStatus = 0;
 		StorageNew->tcapApplicationEntityRowStatus = RS_NOTREADY;
 	}
+      done:
 	DEBUGMSGTL(("tcapMIB", "done.\n"));
 	return (StorageNew);
+	goto nomem;
+      nomem:
+	tcapApplicationEntityTable_destroy(&StorageNew);
+	goto done;
 }
 
 /**
  * @fn struct tcapApplicationEntityTable_data *tcapApplicationEntityTable_duplicate(struct tcapApplicationEntityTable_data *thedata)
  * @param thedata the row structure to duplicate.
- * @brief duplicat a row structure for a table.
+ * @brief duplicate a row structure for a table.
  *
  * Duplicates the specified row structure @param thedata and returns a pointer to the newly
  * allocated row structure on success, or NULL on failure.
@@ -2328,6 +2606,67 @@ tcapApplicationEntityTable_duplicate(struct tcapApplicationEntityTable_data *the
 
 	DEBUGMSGTL(("tcapMIB", "tcapApplicationEntityTable_duplicate: duplicating row...  "));
 	if (StorageNew != NULL) {
+		StorageNew->tcapApplicationEntityTable_id = thedata->tcapApplicationEntityTable_id;
+		if (!(StorageNew->tcapApplicationSubsystemId = malloc(thedata->tcapApplicationSubsystemIdLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->tcapApplicationSubsystemId, thedata->tcapApplicationSubsystemId, thedata->tcapApplicationSubsystemIdLen);
+		StorageNew->tcapApplicationSubsystemIdLen = thedata->tcapApplicationSubsystemIdLen;
+		StorageNew->tcapApplicationSubsystemId[StorageNew->tcapApplicationSubsystemIdLen] = 0;
+		if (!(StorageNew->tcapApplicationEntityId = malloc(thedata->tcapApplicationEntityIdLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->tcapApplicationEntityId, thedata->tcapApplicationEntityId, thedata->tcapApplicationEntityIdLen);
+		StorageNew->tcapApplicationEntityIdLen = thedata->tcapApplicationEntityIdLen;
+		StorageNew->tcapApplicationEntityId[StorageNew->tcapApplicationEntityIdLen] = 0;
+		StorageNew->tcapApplicationEntityLocalSapNames = thedata->tcapApplicationEntityLocalSapNames;
+		StorageNew->tcapApplicationEntityOperationalState = thedata->tcapApplicationEntityOperationalState;
+		if (!(StorageNew->tcapApplicationEntityAsoTitle = snmp_duplicate_objid(thedata->tcapApplicationEntityAsoTitle, thedata->tcapApplicationEntityAsoTitleLen / sizeof(oid))))
+			goto destroy;
+		StorageNew->tcapApplicationEntityAsoTitleLen = thedata->tcapApplicationEntityAsoTitleLen;
+		if (!(StorageNew->tcapApplicationEntityAsoQualifier = snmp_duplicate_objid(thedata->tcapApplicationEntityAsoQualifier, thedata->tcapApplicationEntityAsoQualifierLen / sizeof(oid))))
+			goto destroy;
+		StorageNew->tcapApplicationEntityAsoQualifierLen = thedata->tcapApplicationEntityAsoQualifierLen;
+		StorageNew->tcapApplicationEntityApplicationContextNameSupport = thedata->tcapApplicationEntityApplicationContextNameSupport;
+		if (!(StorageNew->tcapApplicationEntityPresFUsupport = malloc(thedata->tcapApplicationEntityPresFUsupportLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->tcapApplicationEntityPresFUsupport, thedata->tcapApplicationEntityPresFUsupport, thedata->tcapApplicationEntityPresFUsupportLen);
+		StorageNew->tcapApplicationEntityPresFUsupportLen = thedata->tcapApplicationEntityPresFUsupportLen;
+		StorageNew->tcapApplicationEntityPresFUsupport[StorageNew->tcapApplicationEntityPresFUsupportLen] = 0;
+		if (!
+		    (StorageNew->tcapApplicationEntityAbstrSyntaxSupport =
+		     snmp_duplicate_objid(thedata->tcapApplicationEntityAbstrSyntaxSupport, thedata->tcapApplicationEntityAbstrSyntaxSupportLen / sizeof(oid))))
+			goto destroy;
+		StorageNew->tcapApplicationEntityAbstrSyntaxSupportLen = thedata->tcapApplicationEntityAbstrSyntaxSupportLen;
+		if (!
+		    (StorageNew->tcapApplicationEntityTransfSynstaxSupport =
+		     snmp_duplicate_objid(thedata->tcapApplicationEntityTransfSynstaxSupport, thedata->tcapApplicationEntityTransfSynstaxSupportLen / sizeof(oid))))
+			goto destroy;
+		StorageNew->tcapApplicationEntityTransfSynstaxSupportLen = thedata->tcapApplicationEntityTransfSynstaxSupportLen;
+		if (!(StorageNew->tcapApplicationEntityPresSelectorValue = malloc(thedata->tcapApplicationEntityPresSelectorValueLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->tcapApplicationEntityPresSelectorValue, thedata->tcapApplicationEntityPresSelectorValue, thedata->tcapApplicationEntityPresSelectorValueLen);
+		StorageNew->tcapApplicationEntityPresSelectorValueLen = thedata->tcapApplicationEntityPresSelectorValueLen;
+		StorageNew->tcapApplicationEntityPresSelectorValue[StorageNew->tcapApplicationEntityPresSelectorValueLen] = 0;
+		if (!(StorageNew->tcapApplicationEntitySessProtVerSupport = malloc(thedata->tcapApplicationEntitySessProtVerSupportLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->tcapApplicationEntitySessProtVerSupport, thedata->tcapApplicationEntitySessProtVerSupport, thedata->tcapApplicationEntitySessProtVerSupportLen);
+		StorageNew->tcapApplicationEntitySessProtVerSupportLen = thedata->tcapApplicationEntitySessProtVerSupportLen;
+		StorageNew->tcapApplicationEntitySessProtVerSupport[StorageNew->tcapApplicationEntitySessProtVerSupportLen] = 0;
+		if (!(StorageNew->tcapApplicationEntitySessFUsupport = malloc(thedata->tcapApplicationEntitySessFUsupportLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->tcapApplicationEntitySessFUsupport, thedata->tcapApplicationEntitySessFUsupport, thedata->tcapApplicationEntitySessFUsupportLen);
+		StorageNew->tcapApplicationEntitySessFUsupportLen = thedata->tcapApplicationEntitySessFUsupportLen;
+		StorageNew->tcapApplicationEntitySessFUsupport[StorageNew->tcapApplicationEntitySessFUsupportLen] = 0;
+		if (!(StorageNew->tcapApplicationEntitySessOptSupport = malloc(thedata->tcapApplicationEntitySessOptSupportLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->tcapApplicationEntitySessOptSupport, thedata->tcapApplicationEntitySessOptSupport, thedata->tcapApplicationEntitySessOptSupportLen);
+		StorageNew->tcapApplicationEntitySessOptSupportLen = thedata->tcapApplicationEntitySessOptSupportLen;
+		StorageNew->tcapApplicationEntitySessOptSupport[StorageNew->tcapApplicationEntitySessOptSupportLen] = 0;
+		if (!(StorageNew->tcapApplicationEntitySessionSelectorValue = malloc(thedata->tcapApplicationEntitySessionSelectorValueLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->tcapApplicationEntitySessionSelectorValue, thedata->tcapApplicationEntitySessionSelectorValue, thedata->tcapApplicationEntitySessionSelectorValueLen);
+		StorageNew->tcapApplicationEntitySessionSelectorValueLen = thedata->tcapApplicationEntitySessionSelectorValueLen;
+		StorageNew->tcapApplicationEntitySessionSelectorValue[StorageNew->tcapApplicationEntitySessionSelectorValueLen] = 0;
+		StorageNew->tcapApplicationEntityRowStatus = thedata->tcapApplicationEntityRowStatus;
 	}
       done:
 	DEBUGMSGTL(("tcapMIB", "done.\n"));
@@ -2447,7 +2786,7 @@ tcapApplicationEntityTable_del(struct tcapApplicationEntityTable_data *thedata)
  * @param line line from configuration file matching the token.
  * @brief parse configuration file for tcapApplicationEntityTable entries.
  *
- * This callback is called by UCD-SNMP when it prases a configuration file and finds a configuration
+ * This callback is called by UCD-SNMP when it parses a configuration file and finds a configuration
  * file line for the registsred token (in this case tcapApplicationEntityTable).  This routine is invoked by UCD-SNMP
  * to read the values of each row in the table from the configuration file.  Note that this
  * procedure may exist regardless of the persistence of the table.  If there are no configured
@@ -2610,23 +2949,33 @@ tcapLocalSapNameTable_create(void)
 	DEBUGMSGTL(("tcapMIB", "tcapLocalSapNameTable_create: creating row...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
-		if ((StorageNew->tcapApplicationSubsystemId = (uint8_t *) strdup("")) != NULL)
-			StorageNew->tcapApplicationSubsystemIdLen = strlen("");
-		if ((StorageNew->tcapApplicationEntityId = (uint8_t *) strdup("")) != NULL)
-			StorageNew->tcapApplicationEntityIdLen = strlen("");
-		if ((StorageNew->tcapLocalSapNamePointer = snmp_duplicate_objid(zeroDotZero_oid, 2)))
+		if ((StorageNew->tcapApplicationSubsystemId = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->tcapApplicationSubsystemIdLen = 0;
+		StorageNew->tcapApplicationSubsystemId[StorageNew->tcapApplicationSubsystemIdLen] = 0;
+		if ((StorageNew->tcapApplicationEntityId = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->tcapApplicationEntityIdLen = 0;
+		StorageNew->tcapApplicationEntityId[StorageNew->tcapApplicationEntityIdLen] = 0;
+		if ((StorageNew->tcapLocalSapNamePointer = snmp_duplicate_objid(zeroDotZero_oid, 2)) == NULL)
+			goto nomem;
 			StorageNew->tcapLocalSapNamePointerLen = 2;
 		StorageNew->tcapLocalSapNameRowStatus = 0;
 		StorageNew->tcapLocalSapNameRowStatus = RS_NOTREADY;
 	}
+      done:
 	DEBUGMSGTL(("tcapMIB", "done.\n"));
 	return (StorageNew);
+	goto nomem;
+      nomem:
+	tcapLocalSapNameTable_destroy(&StorageNew);
+	goto done;
 }
 
 /**
  * @fn struct tcapLocalSapNameTable_data *tcapLocalSapNameTable_duplicate(struct tcapLocalSapNameTable_data *thedata)
  * @param thedata the row structure to duplicate.
- * @brief duplicat a row structure for a table.
+ * @brief duplicate a row structure for a table.
  *
  * Duplicates the specified row structure @param thedata and returns a pointer to the newly
  * allocated row structure on success, or NULL on failure.
@@ -2638,6 +2987,22 @@ tcapLocalSapNameTable_duplicate(struct tcapLocalSapNameTable_data *thedata)
 
 	DEBUGMSGTL(("tcapMIB", "tcapLocalSapNameTable_duplicate: duplicating row...  "));
 	if (StorageNew != NULL) {
+		StorageNew->tcapLocalSapNameTable_id = thedata->tcapLocalSapNameTable_id;
+		if (!(StorageNew->tcapApplicationSubsystemId = malloc(thedata->tcapApplicationSubsystemIdLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->tcapApplicationSubsystemId, thedata->tcapApplicationSubsystemId, thedata->tcapApplicationSubsystemIdLen);
+		StorageNew->tcapApplicationSubsystemIdLen = thedata->tcapApplicationSubsystemIdLen;
+		StorageNew->tcapApplicationSubsystemId[StorageNew->tcapApplicationSubsystemIdLen] = 0;
+		if (!(StorageNew->tcapApplicationEntityId = malloc(thedata->tcapApplicationEntityIdLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->tcapApplicationEntityId, thedata->tcapApplicationEntityId, thedata->tcapApplicationEntityIdLen);
+		StorageNew->tcapApplicationEntityIdLen = thedata->tcapApplicationEntityIdLen;
+		StorageNew->tcapApplicationEntityId[StorageNew->tcapApplicationEntityIdLen] = 0;
+		StorageNew->tcapLocalSapNameId = thedata->tcapLocalSapNameId;
+		if (!(StorageNew->tcapLocalSapNamePointer = snmp_duplicate_objid(thedata->tcapLocalSapNamePointer, thedata->tcapLocalSapNamePointerLen / sizeof(oid))))
+			goto destroy;
+		StorageNew->tcapLocalSapNamePointerLen = thedata->tcapLocalSapNamePointerLen;
+		StorageNew->tcapLocalSapNameRowStatus = thedata->tcapLocalSapNameRowStatus;
 	}
       done:
 	DEBUGMSGTL(("tcapMIB", "done.\n"));
@@ -2741,7 +3106,7 @@ tcapLocalSapNameTable_del(struct tcapLocalSapNameTable_data *thedata)
  * @param line line from configuration file matching the token.
  * @brief parse configuration file for tcapLocalSapNameTable entries.
  *
- * This callback is called by UCD-SNMP when it prases a configuration file and finds a configuration
+ * This callback is called by UCD-SNMP when it parses a configuration file and finds a configuration
  * file line for the registsred token (in this case tcapLocalSapNameTable).  This routine is invoked by UCD-SNMP
  * to read the values of each row in the table from the configuration file.  Note that this
  * procedure may exist regardless of the persistence of the table.  If there are no configured
@@ -2837,24 +3202,34 @@ tcapApplicationContextNameTable_create(void)
 	DEBUGMSGTL(("tcapMIB", "tcapApplicationContextNameTable_create: creating row...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
-		if ((StorageNew->tcapApplicationSubsystemId = (uint8_t *) strdup("")) != NULL)
-			StorageNew->tcapApplicationSubsystemIdLen = strlen("");
-		if ((StorageNew->tcapApplicationEntityId = (uint8_t *) strdup("")) != NULL)
-			StorageNew->tcapApplicationEntityIdLen = strlen("");
-		if ((StorageNew->tcapApplicationContextName = snmp_duplicate_objid(zeroDotZero_oid, 2)))
+		if ((StorageNew->tcapApplicationSubsystemId = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->tcapApplicationSubsystemIdLen = 0;
+		StorageNew->tcapApplicationSubsystemId[StorageNew->tcapApplicationSubsystemIdLen] = 0;
+		if ((StorageNew->tcapApplicationEntityId = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->tcapApplicationEntityIdLen = 0;
+		StorageNew->tcapApplicationEntityId[StorageNew->tcapApplicationEntityIdLen] = 0;
+		if ((StorageNew->tcapApplicationContextName = snmp_duplicate_objid(zeroDotZero_oid, 2)) == NULL)
+			goto nomem;
 			StorageNew->tcapApplicationContextNameLen = 2;
 		StorageNew->tcapApplicationContextNumber = 0;
 		StorageNew->tcapApplicationContextRowStatus = 0;
 		StorageNew->tcapApplicationContextRowStatus = RS_NOTREADY;
 	}
+      done:
 	DEBUGMSGTL(("tcapMIB", "done.\n"));
 	return (StorageNew);
+	goto nomem;
+      nomem:
+	tcapApplicationContextNameTable_destroy(&StorageNew);
+	goto done;
 }
 
 /**
  * @fn struct tcapApplicationContextNameTable_data *tcapApplicationContextNameTable_duplicate(struct tcapApplicationContextNameTable_data *thedata)
  * @param thedata the row structure to duplicate.
- * @brief duplicat a row structure for a table.
+ * @brief duplicate a row structure for a table.
  *
  * Duplicates the specified row structure @param thedata and returns a pointer to the newly
  * allocated row structure on success, or NULL on failure.
@@ -2866,6 +3241,23 @@ tcapApplicationContextNameTable_duplicate(struct tcapApplicationContextNameTable
 
 	DEBUGMSGTL(("tcapMIB", "tcapApplicationContextNameTable_duplicate: duplicating row...  "));
 	if (StorageNew != NULL) {
+		StorageNew->tcapApplicationContextNameTable_id = thedata->tcapApplicationContextNameTable_id;
+		if (!(StorageNew->tcapApplicationSubsystemId = malloc(thedata->tcapApplicationSubsystemIdLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->tcapApplicationSubsystemId, thedata->tcapApplicationSubsystemId, thedata->tcapApplicationSubsystemIdLen);
+		StorageNew->tcapApplicationSubsystemIdLen = thedata->tcapApplicationSubsystemIdLen;
+		StorageNew->tcapApplicationSubsystemId[StorageNew->tcapApplicationSubsystemIdLen] = 0;
+		if (!(StorageNew->tcapApplicationEntityId = malloc(thedata->tcapApplicationEntityIdLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->tcapApplicationEntityId, thedata->tcapApplicationEntityId, thedata->tcapApplicationEntityIdLen);
+		StorageNew->tcapApplicationEntityIdLen = thedata->tcapApplicationEntityIdLen;
+		StorageNew->tcapApplicationEntityId[StorageNew->tcapApplicationEntityIdLen] = 0;
+		StorageNew->tcapApplicationContextId = thedata->tcapApplicationContextId;
+		if (!(StorageNew->tcapApplicationContextName = snmp_duplicate_objid(thedata->tcapApplicationContextName, thedata->tcapApplicationContextNameLen / sizeof(oid))))
+			goto destroy;
+		StorageNew->tcapApplicationContextNameLen = thedata->tcapApplicationContextNameLen;
+		StorageNew->tcapApplicationContextNumber = thedata->tcapApplicationContextNumber;
+		StorageNew->tcapApplicationContextRowStatus = thedata->tcapApplicationContextRowStatus;
 	}
       done:
 	DEBUGMSGTL(("tcapMIB", "done.\n"));
@@ -2969,7 +3361,7 @@ tcapApplicationContextNameTable_del(struct tcapApplicationContextNameTable_data 
  * @param line line from configuration file matching the token.
  * @brief parse configuration file for tcapApplicationContextNameTable entries.
  *
- * This callback is called by UCD-SNMP when it prases a configuration file and finds a configuration
+ * This callback is called by UCD-SNMP when it parses a configuration file and finds a configuration
  * file line for the registsred token (in this case tcapApplicationContextNameTable).  This routine is invoked by UCD-SNMP
  * to read the values of each row in the table from the configuration file.  Note that this
  * procedure may exist regardless of the persistence of the table.  If there are no configured
@@ -3067,24 +3459,32 @@ tcapAbstractSyntaxTable_create(void)
 	DEBUGMSGTL(("tcapMIB", "tcapAbstractSyntaxTable_create: creating row...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
-		if ((StorageNew->tcapApplicationEntityId = (uint8_t *) strdup("")) != NULL)
-			StorageNew->tcapApplicationEntityIdLen = strlen("");
+		if ((StorageNew->tcapApplicationEntityId = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->tcapApplicationEntityIdLen = 0;
+		StorageNew->tcapApplicationEntityId[StorageNew->tcapApplicationEntityIdLen] = 0;
 		{
 			static oid tmpoid[7] = { 0, 0, 17, 773, 1, 1, 1 };
-			if ((StorageNew->tcapAbstractSyntaxName = snmp_duplicate_objid(tmpoid, 7)))
+			if ((StorageNew->tcapAbstractSyntaxName = snmp_duplicate_objid(tmpoid, 7)) == NULL)
+				goto nomem;
 				StorageNew->tcapAbstractSyntaxNameLen = 7;
 		}
 		StorageNew->tcapAbstractSyntaxRowStatus = 0;
 		StorageNew->tcapAbstractSyntaxRowStatus = RS_NOTREADY;
 	}
+      done:
 	DEBUGMSGTL(("tcapMIB", "done.\n"));
 	return (StorageNew);
+	goto nomem;
+      nomem:
+	tcapAbstractSyntaxTable_destroy(&StorageNew);
+	goto done;
 }
 
 /**
  * @fn struct tcapAbstractSyntaxTable_data *tcapAbstractSyntaxTable_duplicate(struct tcapAbstractSyntaxTable_data *thedata)
  * @param thedata the row structure to duplicate.
- * @brief duplicat a row structure for a table.
+ * @brief duplicate a row structure for a table.
  *
  * Duplicates the specified row structure @param thedata and returns a pointer to the newly
  * allocated row structure on success, or NULL on failure.
@@ -3096,6 +3496,17 @@ tcapAbstractSyntaxTable_duplicate(struct tcapAbstractSyntaxTable_data *thedata)
 
 	DEBUGMSGTL(("tcapMIB", "tcapAbstractSyntaxTable_duplicate: duplicating row...  "));
 	if (StorageNew != NULL) {
+		StorageNew->tcapAbstractSyntaxTable_id = thedata->tcapAbstractSyntaxTable_id;
+		if (!(StorageNew->tcapApplicationEntityId = malloc(thedata->tcapApplicationEntityIdLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->tcapApplicationEntityId, thedata->tcapApplicationEntityId, thedata->tcapApplicationEntityIdLen);
+		StorageNew->tcapApplicationEntityIdLen = thedata->tcapApplicationEntityIdLen;
+		StorageNew->tcapApplicationEntityId[StorageNew->tcapApplicationEntityIdLen] = 0;
+		StorageNew->tcapAbstractSyntaxId = thedata->tcapAbstractSyntaxId;
+		if (!(StorageNew->tcapAbstractSyntaxName = snmp_duplicate_objid(thedata->tcapAbstractSyntaxName, thedata->tcapAbstractSyntaxNameLen / sizeof(oid))))
+			goto destroy;
+		StorageNew->tcapAbstractSyntaxNameLen = thedata->tcapAbstractSyntaxNameLen;
+		StorageNew->tcapAbstractSyntaxRowStatus = thedata->tcapAbstractSyntaxRowStatus;
 	}
       done:
 	DEBUGMSGTL(("tcapMIB", "done.\n"));
@@ -3195,7 +3606,7 @@ tcapAbstractSyntaxTable_del(struct tcapAbstractSyntaxTable_data *thedata)
  * @param line line from configuration file matching the token.
  * @brief parse configuration file for tcapAbstractSyntaxTable entries.
  *
- * This callback is called by UCD-SNMP when it prases a configuration file and finds a configuration
+ * This callback is called by UCD-SNMP when it parses a configuration file and finds a configuration
  * file line for the registsred token (in this case tcapAbstractSyntaxTable).  This routine is invoked by UCD-SNMP
  * to read the values of each row in the table from the configuration file.  Note that this
  * procedure may exist regardless of the persistence of the table.  If there are no configured
@@ -3284,24 +3695,32 @@ tcapTransferSyntaxTable_create(void)
 	DEBUGMSGTL(("tcapMIB", "tcapTransferSyntaxTable_create: creating row...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
-		if ((StorageNew->tcapApplicationEntityId = (uint8_t *) strdup("")) != NULL)
-			StorageNew->tcapApplicationEntityIdLen = strlen("");
+		if ((StorageNew->tcapApplicationEntityId = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->tcapApplicationEntityIdLen = 0;
+		StorageNew->tcapApplicationEntityId[StorageNew->tcapApplicationEntityIdLen] = 0;
 		{
 			static oid tmpoid[3] = { 2, 1, 1 };
-			if ((StorageNew->tcapTransferSyntaxName = snmp_duplicate_objid(tmpoid, 3)))
+			if ((StorageNew->tcapTransferSyntaxName = snmp_duplicate_objid(tmpoid, 3)) == NULL)
+				goto nomem;
 				StorageNew->tcapTransferSyntaxNameLen = 3;
 		}
 		StorageNew->tcapTransferSyntaxRowStatus = 0;
 		StorageNew->tcapTransferSyntaxRowStatus = RS_NOTREADY;
 	}
+      done:
 	DEBUGMSGTL(("tcapMIB", "done.\n"));
 	return (StorageNew);
+	goto nomem;
+      nomem:
+	tcapTransferSyntaxTable_destroy(&StorageNew);
+	goto done;
 }
 
 /**
  * @fn struct tcapTransferSyntaxTable_data *tcapTransferSyntaxTable_duplicate(struct tcapTransferSyntaxTable_data *thedata)
  * @param thedata the row structure to duplicate.
- * @brief duplicat a row structure for a table.
+ * @brief duplicate a row structure for a table.
  *
  * Duplicates the specified row structure @param thedata and returns a pointer to the newly
  * allocated row structure on success, or NULL on failure.
@@ -3313,6 +3732,19 @@ tcapTransferSyntaxTable_duplicate(struct tcapTransferSyntaxTable_data *thedata)
 
 	DEBUGMSGTL(("tcapMIB", "tcapTransferSyntaxTable_duplicate: duplicating row...  "));
 	if (StorageNew != NULL) {
+		StorageNew->tcapTransferSyntaxTable_id = thedata->tcapTransferSyntaxTable_id;
+		if (!(StorageNew->tcapApplicationEntityId = malloc(thedata->tcapApplicationEntityIdLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->tcapApplicationEntityId, thedata->tcapApplicationEntityId, thedata->tcapApplicationEntityIdLen);
+		StorageNew->tcapApplicationEntityIdLen = thedata->tcapApplicationEntityIdLen;
+		StorageNew->tcapApplicationEntityId[StorageNew->tcapApplicationEntityIdLen] = 0;
+		if (!(StorageNew->tcapTransferSyntaxId = snmp_duplicate_objid(thedata->tcapTransferSyntaxId, thedata->tcapTransferSyntaxIdLen / sizeof(oid))))
+			goto destroy;
+		StorageNew->tcapTransferSyntaxIdLen = thedata->tcapTransferSyntaxIdLen;
+		if (!(StorageNew->tcapTransferSyntaxName = snmp_duplicate_objid(thedata->tcapTransferSyntaxName, thedata->tcapTransferSyntaxNameLen / sizeof(oid))))
+			goto destroy;
+		StorageNew->tcapTransferSyntaxNameLen = thedata->tcapTransferSyntaxNameLen;
+		StorageNew->tcapTransferSyntaxRowStatus = thedata->tcapTransferSyntaxRowStatus;
 	}
       done:
 	DEBUGMSGTL(("tcapMIB", "done.\n"));
@@ -3414,7 +3846,7 @@ tcapTransferSyntaxTable_del(struct tcapTransferSyntaxTable_data *thedata)
  * @param line line from configuration file matching the token.
  * @brief parse configuration file for tcapTransferSyntaxTable entries.
  *
- * This callback is called by UCD-SNMP when it prases a configuration file and finds a configuration
+ * This callback is called by UCD-SNMP when it parses a configuration file and finds a configuration
  * file line for the registsred token (in this case tcapTransferSyntaxTable).  This routine is invoked by UCD-SNMP
  * to read the values of each row in the table from the configuration file.  Note that this
  * procedure may exist regardless of the persistence of the table.  If there are no configured
@@ -3490,6 +3922,370 @@ store_tcapTransferSyntaxTable(int majorID, int minorID, void *serverarg, void *c
 	}
 	DEBUGMSGTL(("tcapMIB", "done.\n"));
 	return SNMPERR_SUCCESS;
+}
+
+/**
+ * @fn int activate_tcapApplicationSubsystemTable_row(struct tcapApplicationSubsystemTable_data *StorageTmp)
+ * @param StorageTmp the data row to activate
+ * @brief commit activation of a row to the underlying device
+ *
+ * This function is used by tables that contain a RowStatus object.  It is used to move the row from
+ * the RS_NOTINSERVICE state to the RS_ACTIVE state.  It is also used when transitioning from the
+ * RS_CREATEANDGO state to the RS_ACTIVE state.  If activation fails, the function should return
+ * SNMP_ERR_COMMITFAILED; otherwise, SNMP_ERR_NOERROR.
+ */
+int
+activate_tcapApplicationSubsystemTable_row(struct tcapApplicationSubsystemTable_data *StorageTmp)
+{
+	/* XXX: provide code to activate the row with the underlying device */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int deactivate_tcapApplicationSubsystemTable_row(struct tcapApplicationSubsystemTable_data *StorageTmp)
+ * @param StorageTmp the data row to deactivate
+ * @brief commit deactivation of a row to the underlying device
+ *
+ * This function is used by tables that contain a RowStatus object.  It is used to move the row from
+ * the RS_ACTIVE state to the RS_NOTINSERVICE state.  It is also used when transitioning from the
+ * RS_ACTIVE state to the RS_DESTROY state.  If deactivation fails, the function should return
+ * SNMP_ERR_COMMITFAILED; otherwise, SNMP_ERR_NOERROR.
+ */
+int
+deactivate_tcapApplicationSubsystemTable_row(struct tcapApplicationSubsystemTable_data *StorageTmp)
+{
+	/* XXX: provide code to deactivate the row with the underlying device */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int activate_tcapTransactionCopmTable_row(struct tcapTransactionCopmTable_data *StorageTmp)
+ * @param StorageTmp the data row to activate
+ * @brief commit activation of a row to the underlying device
+ *
+ * This function is used by tables that contain a RowStatus object.  It is used to move the row from
+ * the RS_NOTINSERVICE state to the RS_ACTIVE state.  It is also used when transitioning from the
+ * RS_CREATEANDGO state to the RS_ACTIVE state.  If activation fails, the function should return
+ * SNMP_ERR_COMMITFAILED; otherwise, SNMP_ERR_NOERROR.
+ */
+int
+activate_tcapTransactionCopmTable_row(struct tcapTransactionCopmTable_data *StorageTmp)
+{
+	/* XXX: provide code to activate the row with the underlying device */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int deactivate_tcapTransactionCopmTable_row(struct tcapTransactionCopmTable_data *StorageTmp)
+ * @param StorageTmp the data row to deactivate
+ * @brief commit deactivation of a row to the underlying device
+ *
+ * This function is used by tables that contain a RowStatus object.  It is used to move the row from
+ * the RS_ACTIVE state to the RS_NOTINSERVICE state.  It is also used when transitioning from the
+ * RS_ACTIVE state to the RS_DESTROY state.  If deactivation fails, the function should return
+ * SNMP_ERR_COMMITFAILED; otherwise, SNMP_ERR_NOERROR.
+ */
+int
+deactivate_tcapTransactionCopmTable_row(struct tcapTransactionCopmTable_data *StorageTmp)
+{
+	/* XXX: provide code to deactivate the row with the underlying device */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int activate_tcapApplicationProcessTable_row(struct tcapApplicationProcessTable_data *StorageTmp)
+ * @param StorageTmp the data row to activate
+ * @brief commit activation of a row to the underlying device
+ *
+ * This function is used by tables that contain a RowStatus object.  It is used to move the row from
+ * the RS_NOTINSERVICE state to the RS_ACTIVE state.  It is also used when transitioning from the
+ * RS_CREATEANDGO state to the RS_ACTIVE state.  If activation fails, the function should return
+ * SNMP_ERR_COMMITFAILED; otherwise, SNMP_ERR_NOERROR.
+ */
+int
+activate_tcapApplicationProcessTable_row(struct tcapApplicationProcessTable_data *StorageTmp)
+{
+	/* XXX: provide code to activate the row with the underlying device */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int deactivate_tcapApplicationProcessTable_row(struct tcapApplicationProcessTable_data *StorageTmp)
+ * @param StorageTmp the data row to deactivate
+ * @brief commit deactivation of a row to the underlying device
+ *
+ * This function is used by tables that contain a RowStatus object.  It is used to move the row from
+ * the RS_ACTIVE state to the RS_NOTINSERVICE state.  It is also used when transitioning from the
+ * RS_ACTIVE state to the RS_DESTROY state.  If deactivation fails, the function should return
+ * SNMP_ERR_COMMITFAILED; otherwise, SNMP_ERR_NOERROR.
+ */
+int
+deactivate_tcapApplicationProcessTable_row(struct tcapApplicationProcessTable_data *StorageTmp)
+{
+	/* XXX: provide code to deactivate the row with the underlying device */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int activate_tcapSupportEntityNameTable_row(struct tcapSupportEntityNameTable_data *StorageTmp)
+ * @param StorageTmp the data row to activate
+ * @brief commit activation of a row to the underlying device
+ *
+ * This function is used by tables that contain a RowStatus object.  It is used to move the row from
+ * the RS_NOTINSERVICE state to the RS_ACTIVE state.  It is also used when transitioning from the
+ * RS_CREATEANDGO state to the RS_ACTIVE state.  If activation fails, the function should return
+ * SNMP_ERR_COMMITFAILED; otherwise, SNMP_ERR_NOERROR.
+ */
+int
+activate_tcapSupportEntityNameTable_row(struct tcapSupportEntityNameTable_data *StorageTmp)
+{
+	/* XXX: provide code to activate the row with the underlying device */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int deactivate_tcapSupportEntityNameTable_row(struct tcapSupportEntityNameTable_data *StorageTmp)
+ * @param StorageTmp the data row to deactivate
+ * @brief commit deactivation of a row to the underlying device
+ *
+ * This function is used by tables that contain a RowStatus object.  It is used to move the row from
+ * the RS_ACTIVE state to the RS_NOTINSERVICE state.  It is also used when transitioning from the
+ * RS_ACTIVE state to the RS_DESTROY state.  If deactivation fails, the function should return
+ * SNMP_ERR_COMMITFAILED; otherwise, SNMP_ERR_NOERROR.
+ */
+int
+deactivate_tcapSupportEntityNameTable_row(struct tcapSupportEntityNameTable_data *StorageTmp)
+{
+	/* XXX: provide code to deactivate the row with the underlying device */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int activate_tcapApplicationEntityTable_row(struct tcapApplicationEntityTable_data *StorageTmp)
+ * @param StorageTmp the data row to activate
+ * @brief commit activation of a row to the underlying device
+ *
+ * This function is used by tables that contain a RowStatus object.  It is used to move the row from
+ * the RS_NOTINSERVICE state to the RS_ACTIVE state.  It is also used when transitioning from the
+ * RS_CREATEANDGO state to the RS_ACTIVE state.  If activation fails, the function should return
+ * SNMP_ERR_COMMITFAILED; otherwise, SNMP_ERR_NOERROR.
+ */
+int
+activate_tcapApplicationEntityTable_row(struct tcapApplicationEntityTable_data *StorageTmp)
+{
+	/* XXX: provide code to activate the row with the underlying device */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int deactivate_tcapApplicationEntityTable_row(struct tcapApplicationEntityTable_data *StorageTmp)
+ * @param StorageTmp the data row to deactivate
+ * @brief commit deactivation of a row to the underlying device
+ *
+ * This function is used by tables that contain a RowStatus object.  It is used to move the row from
+ * the RS_ACTIVE state to the RS_NOTINSERVICE state.  It is also used when transitioning from the
+ * RS_ACTIVE state to the RS_DESTROY state.  If deactivation fails, the function should return
+ * SNMP_ERR_COMMITFAILED; otherwise, SNMP_ERR_NOERROR.
+ */
+int
+deactivate_tcapApplicationEntityTable_row(struct tcapApplicationEntityTable_data *StorageTmp)
+{
+	/* XXX: provide code to deactivate the row with the underlying device */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int activate_tcapLocalSapNameTable_row(struct tcapLocalSapNameTable_data *StorageTmp)
+ * @param StorageTmp the data row to activate
+ * @brief commit activation of a row to the underlying device
+ *
+ * This function is used by tables that contain a RowStatus object.  It is used to move the row from
+ * the RS_NOTINSERVICE state to the RS_ACTIVE state.  It is also used when transitioning from the
+ * RS_CREATEANDGO state to the RS_ACTIVE state.  If activation fails, the function should return
+ * SNMP_ERR_COMMITFAILED; otherwise, SNMP_ERR_NOERROR.
+ */
+int
+activate_tcapLocalSapNameTable_row(struct tcapLocalSapNameTable_data *StorageTmp)
+{
+	/* XXX: provide code to activate the row with the underlying device */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int deactivate_tcapLocalSapNameTable_row(struct tcapLocalSapNameTable_data *StorageTmp)
+ * @param StorageTmp the data row to deactivate
+ * @brief commit deactivation of a row to the underlying device
+ *
+ * This function is used by tables that contain a RowStatus object.  It is used to move the row from
+ * the RS_ACTIVE state to the RS_NOTINSERVICE state.  It is also used when transitioning from the
+ * RS_ACTIVE state to the RS_DESTROY state.  If deactivation fails, the function should return
+ * SNMP_ERR_COMMITFAILED; otherwise, SNMP_ERR_NOERROR.
+ */
+int
+deactivate_tcapLocalSapNameTable_row(struct tcapLocalSapNameTable_data *StorageTmp)
+{
+	/* XXX: provide code to deactivate the row with the underlying device */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int activate_tcapApplicationContextNameTable_row(struct tcapApplicationContextNameTable_data *StorageTmp)
+ * @param StorageTmp the data row to activate
+ * @brief commit activation of a row to the underlying device
+ *
+ * This function is used by tables that contain a RowStatus object.  It is used to move the row from
+ * the RS_NOTINSERVICE state to the RS_ACTIVE state.  It is also used when transitioning from the
+ * RS_CREATEANDGO state to the RS_ACTIVE state.  If activation fails, the function should return
+ * SNMP_ERR_COMMITFAILED; otherwise, SNMP_ERR_NOERROR.
+ */
+int
+activate_tcapApplicationContextNameTable_row(struct tcapApplicationContextNameTable_data *StorageTmp)
+{
+	/* XXX: provide code to activate the row with the underlying device */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int deactivate_tcapApplicationContextNameTable_row(struct tcapApplicationContextNameTable_data *StorageTmp)
+ * @param StorageTmp the data row to deactivate
+ * @brief commit deactivation of a row to the underlying device
+ *
+ * This function is used by tables that contain a RowStatus object.  It is used to move the row from
+ * the RS_ACTIVE state to the RS_NOTINSERVICE state.  It is also used when transitioning from the
+ * RS_ACTIVE state to the RS_DESTROY state.  If deactivation fails, the function should return
+ * SNMP_ERR_COMMITFAILED; otherwise, SNMP_ERR_NOERROR.
+ */
+int
+deactivate_tcapApplicationContextNameTable_row(struct tcapApplicationContextNameTable_data *StorageTmp)
+{
+	/* XXX: provide code to deactivate the row with the underlying device */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int activate_tcapAbstractSyntaxTable_row(struct tcapAbstractSyntaxTable_data *StorageTmp)
+ * @param StorageTmp the data row to activate
+ * @brief commit activation of a row to the underlying device
+ *
+ * This function is used by tables that contain a RowStatus object.  It is used to move the row from
+ * the RS_NOTINSERVICE state to the RS_ACTIVE state.  It is also used when transitioning from the
+ * RS_CREATEANDGO state to the RS_ACTIVE state.  If activation fails, the function should return
+ * SNMP_ERR_COMMITFAILED; otherwise, SNMP_ERR_NOERROR.
+ */
+int
+activate_tcapAbstractSyntaxTable_row(struct tcapAbstractSyntaxTable_data *StorageTmp)
+{
+	/* XXX: provide code to activate the row with the underlying device */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int deactivate_tcapAbstractSyntaxTable_row(struct tcapAbstractSyntaxTable_data *StorageTmp)
+ * @param StorageTmp the data row to deactivate
+ * @brief commit deactivation of a row to the underlying device
+ *
+ * This function is used by tables that contain a RowStatus object.  It is used to move the row from
+ * the RS_ACTIVE state to the RS_NOTINSERVICE state.  It is also used when transitioning from the
+ * RS_ACTIVE state to the RS_DESTROY state.  If deactivation fails, the function should return
+ * SNMP_ERR_COMMITFAILED; otherwise, SNMP_ERR_NOERROR.
+ */
+int
+deactivate_tcapAbstractSyntaxTable_row(struct tcapAbstractSyntaxTable_data *StorageTmp)
+{
+	/* XXX: provide code to deactivate the row with the underlying device */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int activate_tcapTransferSyntaxTable_row(struct tcapTransferSyntaxTable_data *StorageTmp)
+ * @param StorageTmp the data row to activate
+ * @brief commit activation of a row to the underlying device
+ *
+ * This function is used by tables that contain a RowStatus object.  It is used to move the row from
+ * the RS_NOTINSERVICE state to the RS_ACTIVE state.  It is also used when transitioning from the
+ * RS_CREATEANDGO state to the RS_ACTIVE state.  If activation fails, the function should return
+ * SNMP_ERR_COMMITFAILED; otherwise, SNMP_ERR_NOERROR.
+ */
+int
+activate_tcapTransferSyntaxTable_row(struct tcapTransferSyntaxTable_data *StorageTmp)
+{
+	/* XXX: provide code to activate the row with the underlying device */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int deactivate_tcapTransferSyntaxTable_row(struct tcapTransferSyntaxTable_data *StorageTmp)
+ * @param StorageTmp the data row to deactivate
+ * @brief commit deactivation of a row to the underlying device
+ *
+ * This function is used by tables that contain a RowStatus object.  It is used to move the row from
+ * the RS_ACTIVE state to the RS_NOTINSERVICE state.  It is also used when transitioning from the
+ * RS_ACTIVE state to the RS_DESTROY state.  If deactivation fails, the function should return
+ * SNMP_ERR_COMMITFAILED; otherwise, SNMP_ERR_NOERROR.
+ */
+int
+deactivate_tcapTransferSyntaxTable_row(struct tcapTransferSyntaxTable_data *StorageTmp)
+{
+	/* XXX: provide code to deactivate the row with the underlying device */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int check_tcapApplicationSubsystemTable_row(struct tcapApplicationSubsystemTable_data *StorageTmp, struct tcapApplicationSubsystemTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to check, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the ACTION phase.  The start of the ACTION pahse performs this consitency check
+ * on the row before allowing the request to proceed to the COMMIT phase.  This function can return
+ * SNMP_ERR_NOERR or a specific SNMP error value.  Values in StorageOld are the values before the
+ * varbinds on the mib were applied; the values in StorageTmp are the new values.  The function is
+ * permitted to change the values in StorageTmp to correct them; however, preference should be made
+ * for setting values where were not in the varbinds.
+ */
+int
+check_tcapApplicationSubsystemTable_row(struct tcapApplicationSubsystemTable_data *StorageTmp, struct tcapApplicationSubsystemTable_data *StorageOld)
+{
+	/* XXX: provide code to check the row for consistency */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int update_tcapApplicationSubsystemTable_row(struct tcapApplicationSubsystemTable_data *StorageTmp, struct tcapApplicationSubsystemTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the set operation (ACTION phase) on a row
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to update, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the COMMIT phase.  The start of the ACTION phase performs a consistency check on
+ * the row before allowing the request to proceed to the COMMIT phase.  The COMMIT phase then
+ * arrives here with consistency already checked (see check_tcapApplicationSubsystemTable_row()).  This function can
+ * return SNMP_ERR_NOERROR or SNMP_ERR_COMMITFAILED.  Values in StorageOld are the values before the
+ * varbinds on the row were applied: the values in StorageTmp are the new values.
+ */
+int
+update_tcapApplicationSubsystemTable_row(struct tcapApplicationSubsystemTable_data *StorageTmp, struct tcapApplicationSubsystemTable_data *StorageOld)
+{
+	/* XXX: provide code to update the row with the underlying device */
+	tcapApplicationSubsystemTable_refresh = 1;
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int revert_tcapApplicationSubsystemTable_row(struct tcapApplicationSubsystemTable_data *StorageTmp, struct tcapApplicationSubsystemTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the undo operation (UNDO phase) on a row
+ */
+void
+revert_tcapApplicationSubsystemTable_row(struct tcapApplicationSubsystemTable_data *StorageTmp, struct tcapApplicationSubsystemTable_data *StorageOld)
+{
+	/* XXX: provide code to revert the row with the underlying device */
+	update_tcapApplicationSubsystemTable_row(StorageOld, NULL);
 }
 
 /**
@@ -3571,6 +4367,64 @@ var_tcapApplicationSubsystemTable(struct variable *vp, oid * name, size_t *lengt
 }
 
 /**
+ * @fn int check_tcapTransactionCopmTable_row(struct tcapTransactionCopmTable_data *StorageTmp, struct tcapTransactionCopmTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to check, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the ACTION phase.  The start of the ACTION pahse performs this consitency check
+ * on the row before allowing the request to proceed to the COMMIT phase.  This function can return
+ * SNMP_ERR_NOERR or a specific SNMP error value.  Values in StorageOld are the values before the
+ * varbinds on the mib were applied; the values in StorageTmp are the new values.  The function is
+ * permitted to change the values in StorageTmp to correct them; however, preference should be made
+ * for setting values where were not in the varbinds.
+ */
+int
+check_tcapTransactionCopmTable_row(struct tcapTransactionCopmTable_data *StorageTmp, struct tcapTransactionCopmTable_data *StorageOld)
+{
+	/* XXX: provide code to check the row for consistency */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int update_tcapTransactionCopmTable_row(struct tcapTransactionCopmTable_data *StorageTmp, struct tcapTransactionCopmTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the set operation (ACTION phase) on a row
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to update, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the COMMIT phase.  The start of the ACTION phase performs a consistency check on
+ * the row before allowing the request to proceed to the COMMIT phase.  The COMMIT phase then
+ * arrives here with consistency already checked (see check_tcapTransactionCopmTable_row()).  This function can
+ * return SNMP_ERR_NOERROR or SNMP_ERR_COMMITFAILED.  Values in StorageOld are the values before the
+ * varbinds on the row were applied: the values in StorageTmp are the new values.
+ */
+int
+update_tcapTransactionCopmTable_row(struct tcapTransactionCopmTable_data *StorageTmp, struct tcapTransactionCopmTable_data *StorageOld)
+{
+	/* XXX: provide code to update the row with the underlying device */
+	tcapTransactionCopmTable_refresh = 1;
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int revert_tcapTransactionCopmTable_row(struct tcapTransactionCopmTable_data *StorageTmp, struct tcapTransactionCopmTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the undo operation (UNDO phase) on a row
+ */
+void
+revert_tcapTransactionCopmTable_row(struct tcapTransactionCopmTable_data *StorageTmp, struct tcapTransactionCopmTable_data *StorageOld)
+{
+	/* XXX: provide code to revert the row with the underlying device */
+	update_tcapTransactionCopmTable_row(StorageOld, NULL);
+}
+
+/**
  * @fn void refresh_tcapTransactionCopmTable_row(struct tcapTransactionCopmTable_data *StorageTmp, int force)
  * @param StorageTmp the data row to refresh.
  * @param force force refresh if non-zero.
@@ -3646,6 +4500,64 @@ var_tcapTransactionCopmTable(struct variable *vp, oid * name, size_t *length, in
 		ERROR_MSG("");
 	}
 	return (rval);
+}
+
+/**
+ * @fn int check_tcapTransactionTable_row(struct tcapTransactionTable_data *StorageTmp, struct tcapTransactionTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to check, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the ACTION phase.  The start of the ACTION pahse performs this consitency check
+ * on the row before allowing the request to proceed to the COMMIT phase.  This function can return
+ * SNMP_ERR_NOERR or a specific SNMP error value.  Values in StorageOld are the values before the
+ * varbinds on the mib were applied; the values in StorageTmp are the new values.  The function is
+ * permitted to change the values in StorageTmp to correct them; however, preference should be made
+ * for setting values where were not in the varbinds.
+ */
+int
+check_tcapTransactionTable_row(struct tcapTransactionTable_data *StorageTmp, struct tcapTransactionTable_data *StorageOld)
+{
+	/* XXX: provide code to check the row for consistency */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int update_tcapTransactionTable_row(struct tcapTransactionTable_data *StorageTmp, struct tcapTransactionTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the set operation (ACTION phase) on a row
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to update, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the COMMIT phase.  The start of the ACTION phase performs a consistency check on
+ * the row before allowing the request to proceed to the COMMIT phase.  The COMMIT phase then
+ * arrives here with consistency already checked (see check_tcapTransactionTable_row()).  This function can
+ * return SNMP_ERR_NOERROR or SNMP_ERR_COMMITFAILED.  Values in StorageOld are the values before the
+ * varbinds on the row were applied: the values in StorageTmp are the new values.
+ */
+int
+update_tcapTransactionTable_row(struct tcapTransactionTable_data *StorageTmp, struct tcapTransactionTable_data *StorageOld)
+{
+	/* XXX: provide code to update the row with the underlying device */
+	tcapTransactionTable_refresh = 1;
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int revert_tcapTransactionTable_row(struct tcapTransactionTable_data *StorageTmp, struct tcapTransactionTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the undo operation (UNDO phase) on a row
+ */
+void
+revert_tcapTransactionTable_row(struct tcapTransactionTable_data *StorageTmp, struct tcapTransactionTable_data *StorageOld)
+{
+	/* XXX: provide code to revert the row with the underlying device */
+	update_tcapTransactionTable_row(StorageOld, NULL);
 }
 
 /**
@@ -3762,6 +4674,64 @@ var_tcapTransactionTable(struct variable *vp, oid * name, size_t *length, int ex
 }
 
 /**
+ * @fn int check_tcapDialogueTable_row(struct tcapDialogueTable_data *StorageTmp, struct tcapDialogueTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to check, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the ACTION phase.  The start of the ACTION pahse performs this consitency check
+ * on the row before allowing the request to proceed to the COMMIT phase.  This function can return
+ * SNMP_ERR_NOERR or a specific SNMP error value.  Values in StorageOld are the values before the
+ * varbinds on the mib were applied; the values in StorageTmp are the new values.  The function is
+ * permitted to change the values in StorageTmp to correct them; however, preference should be made
+ * for setting values where were not in the varbinds.
+ */
+int
+check_tcapDialogueTable_row(struct tcapDialogueTable_data *StorageTmp, struct tcapDialogueTable_data *StorageOld)
+{
+	/* XXX: provide code to check the row for consistency */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int update_tcapDialogueTable_row(struct tcapDialogueTable_data *StorageTmp, struct tcapDialogueTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the set operation (ACTION phase) on a row
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to update, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the COMMIT phase.  The start of the ACTION phase performs a consistency check on
+ * the row before allowing the request to proceed to the COMMIT phase.  The COMMIT phase then
+ * arrives here with consistency already checked (see check_tcapDialogueTable_row()).  This function can
+ * return SNMP_ERR_NOERROR or SNMP_ERR_COMMITFAILED.  Values in StorageOld are the values before the
+ * varbinds on the row were applied: the values in StorageTmp are the new values.
+ */
+int
+update_tcapDialogueTable_row(struct tcapDialogueTable_data *StorageTmp, struct tcapDialogueTable_data *StorageOld)
+{
+	/* XXX: provide code to update the row with the underlying device */
+	tcapDialogueTable_refresh = 1;
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int revert_tcapDialogueTable_row(struct tcapDialogueTable_data *StorageTmp, struct tcapDialogueTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the undo operation (UNDO phase) on a row
+ */
+void
+revert_tcapDialogueTable_row(struct tcapDialogueTable_data *StorageTmp, struct tcapDialogueTable_data *StorageOld)
+{
+	/* XXX: provide code to revert the row with the underlying device */
+	update_tcapDialogueTable_row(StorageOld, NULL);
+}
+
+/**
  * @fn void refresh_tcapDialogueTable_row(struct tcapDialogueTable_data *StorageTmp, int force)
  * @param StorageTmp the data row to refresh.
  * @param force force refresh if non-zero.
@@ -3869,6 +4839,64 @@ var_tcapDialogueTable(struct variable *vp, oid * name, size_t *length, int exact
 }
 
 /**
+ * @fn int check_tcapTcUserTable_row(struct tcapTcUserTable_data *StorageTmp, struct tcapTcUserTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to check, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the ACTION phase.  The start of the ACTION pahse performs this consitency check
+ * on the row before allowing the request to proceed to the COMMIT phase.  This function can return
+ * SNMP_ERR_NOERR or a specific SNMP error value.  Values in StorageOld are the values before the
+ * varbinds on the mib were applied; the values in StorageTmp are the new values.  The function is
+ * permitted to change the values in StorageTmp to correct them; however, preference should be made
+ * for setting values where were not in the varbinds.
+ */
+int
+check_tcapTcUserTable_row(struct tcapTcUserTable_data *StorageTmp, struct tcapTcUserTable_data *StorageOld)
+{
+	/* XXX: provide code to check the row for consistency */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int update_tcapTcUserTable_row(struct tcapTcUserTable_data *StorageTmp, struct tcapTcUserTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the set operation (ACTION phase) on a row
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to update, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the COMMIT phase.  The start of the ACTION phase performs a consistency check on
+ * the row before allowing the request to proceed to the COMMIT phase.  The COMMIT phase then
+ * arrives here with consistency already checked (see check_tcapTcUserTable_row()).  This function can
+ * return SNMP_ERR_NOERROR or SNMP_ERR_COMMITFAILED.  Values in StorageOld are the values before the
+ * varbinds on the row were applied: the values in StorageTmp are the new values.
+ */
+int
+update_tcapTcUserTable_row(struct tcapTcUserTable_data *StorageTmp, struct tcapTcUserTable_data *StorageOld)
+{
+	/* XXX: provide code to update the row with the underlying device */
+	tcapTcUserTable_refresh = 1;
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int revert_tcapTcUserTable_row(struct tcapTcUserTable_data *StorageTmp, struct tcapTcUserTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the undo operation (UNDO phase) on a row
+ */
+void
+revert_tcapTcUserTable_row(struct tcapTcUserTable_data *StorageTmp, struct tcapTcUserTable_data *StorageOld)
+{
+	/* XXX: provide code to revert the row with the underlying device */
+	update_tcapTcUserTable_row(StorageOld, NULL);
+}
+
+/**
  * @fn void refresh_tcapTcUserTable_row(struct tcapTcUserTable_data *StorageTmp, int force)
  * @param StorageTmp the data row to refresh.
  * @param force force refresh if non-zero.
@@ -3944,6 +4972,64 @@ var_tcapTcUserTable(struct variable *vp, oid * name, size_t *length, int exact, 
 		ERROR_MSG("");
 	}
 	return (rval);
+}
+
+/**
+ * @fn int check_tcapApplicationProcessTable_row(struct tcapApplicationProcessTable_data *StorageTmp, struct tcapApplicationProcessTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to check, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the ACTION phase.  The start of the ACTION pahse performs this consitency check
+ * on the row before allowing the request to proceed to the COMMIT phase.  This function can return
+ * SNMP_ERR_NOERR or a specific SNMP error value.  Values in StorageOld are the values before the
+ * varbinds on the mib were applied; the values in StorageTmp are the new values.  The function is
+ * permitted to change the values in StorageTmp to correct them; however, preference should be made
+ * for setting values where were not in the varbinds.
+ */
+int
+check_tcapApplicationProcessTable_row(struct tcapApplicationProcessTable_data *StorageTmp, struct tcapApplicationProcessTable_data *StorageOld)
+{
+	/* XXX: provide code to check the row for consistency */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int update_tcapApplicationProcessTable_row(struct tcapApplicationProcessTable_data *StorageTmp, struct tcapApplicationProcessTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the set operation (ACTION phase) on a row
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to update, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the COMMIT phase.  The start of the ACTION phase performs a consistency check on
+ * the row before allowing the request to proceed to the COMMIT phase.  The COMMIT phase then
+ * arrives here with consistency already checked (see check_tcapApplicationProcessTable_row()).  This function can
+ * return SNMP_ERR_NOERROR or SNMP_ERR_COMMITFAILED.  Values in StorageOld are the values before the
+ * varbinds on the row were applied: the values in StorageTmp are the new values.
+ */
+int
+update_tcapApplicationProcessTable_row(struct tcapApplicationProcessTable_data *StorageTmp, struct tcapApplicationProcessTable_data *StorageOld)
+{
+	/* XXX: provide code to update the row with the underlying device */
+	tcapApplicationProcessTable_refresh = 1;
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int revert_tcapApplicationProcessTable_row(struct tcapApplicationProcessTable_data *StorageTmp, struct tcapApplicationProcessTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the undo operation (UNDO phase) on a row
+ */
+void
+revert_tcapApplicationProcessTable_row(struct tcapApplicationProcessTable_data *StorageTmp, struct tcapApplicationProcessTable_data *StorageOld)
+{
+	/* XXX: provide code to revert the row with the underlying device */
+	update_tcapApplicationProcessTable_row(StorageOld, NULL);
 }
 
 /**
@@ -4044,6 +5130,64 @@ var_tcapApplicationProcessTable(struct variable *vp, oid * name, size_t *length,
 }
 
 /**
+ * @fn int check_tcapSupportEntityNameTable_row(struct tcapSupportEntityNameTable_data *StorageTmp, struct tcapSupportEntityNameTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to check, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the ACTION phase.  The start of the ACTION pahse performs this consitency check
+ * on the row before allowing the request to proceed to the COMMIT phase.  This function can return
+ * SNMP_ERR_NOERR or a specific SNMP error value.  Values in StorageOld are the values before the
+ * varbinds on the mib were applied; the values in StorageTmp are the new values.  The function is
+ * permitted to change the values in StorageTmp to correct them; however, preference should be made
+ * for setting values where were not in the varbinds.
+ */
+int
+check_tcapSupportEntityNameTable_row(struct tcapSupportEntityNameTable_data *StorageTmp, struct tcapSupportEntityNameTable_data *StorageOld)
+{
+	/* XXX: provide code to check the row for consistency */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int update_tcapSupportEntityNameTable_row(struct tcapSupportEntityNameTable_data *StorageTmp, struct tcapSupportEntityNameTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the set operation (ACTION phase) on a row
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to update, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the COMMIT phase.  The start of the ACTION phase performs a consistency check on
+ * the row before allowing the request to proceed to the COMMIT phase.  The COMMIT phase then
+ * arrives here with consistency already checked (see check_tcapSupportEntityNameTable_row()).  This function can
+ * return SNMP_ERR_NOERROR or SNMP_ERR_COMMITFAILED.  Values in StorageOld are the values before the
+ * varbinds on the row were applied: the values in StorageTmp are the new values.
+ */
+int
+update_tcapSupportEntityNameTable_row(struct tcapSupportEntityNameTable_data *StorageTmp, struct tcapSupportEntityNameTable_data *StorageOld)
+{
+	/* XXX: provide code to update the row with the underlying device */
+	tcapSupportEntityNameTable_refresh = 1;
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int revert_tcapSupportEntityNameTable_row(struct tcapSupportEntityNameTable_data *StorageTmp, struct tcapSupportEntityNameTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the undo operation (UNDO phase) on a row
+ */
+void
+revert_tcapSupportEntityNameTable_row(struct tcapSupportEntityNameTable_data *StorageTmp, struct tcapSupportEntityNameTable_data *StorageOld)
+{
+	/* XXX: provide code to revert the row with the underlying device */
+	update_tcapSupportEntityNameTable_row(StorageOld, NULL);
+}
+
+/**
  * @fn void refresh_tcapSupportEntityNameTable_row(struct tcapSupportEntityNameTable_data *StorageTmp, int force)
  * @param StorageTmp the data row to refresh.
  * @param force force refresh if non-zero.
@@ -4126,6 +5270,64 @@ var_tcapSupportEntityNameTable(struct variable *vp, oid * name, size_t *length, 
 		ERROR_MSG("");
 	}
 	return (rval);
+}
+
+/**
+ * @fn int check_tcapApplicationEntityTable_row(struct tcapApplicationEntityTable_data *StorageTmp, struct tcapApplicationEntityTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to check, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the ACTION phase.  The start of the ACTION pahse performs this consitency check
+ * on the row before allowing the request to proceed to the COMMIT phase.  This function can return
+ * SNMP_ERR_NOERR or a specific SNMP error value.  Values in StorageOld are the values before the
+ * varbinds on the mib were applied; the values in StorageTmp are the new values.  The function is
+ * permitted to change the values in StorageTmp to correct them; however, preference should be made
+ * for setting values where were not in the varbinds.
+ */
+int
+check_tcapApplicationEntityTable_row(struct tcapApplicationEntityTable_data *StorageTmp, struct tcapApplicationEntityTable_data *StorageOld)
+{
+	/* XXX: provide code to check the row for consistency */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int update_tcapApplicationEntityTable_row(struct tcapApplicationEntityTable_data *StorageTmp, struct tcapApplicationEntityTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the set operation (ACTION phase) on a row
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to update, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the COMMIT phase.  The start of the ACTION phase performs a consistency check on
+ * the row before allowing the request to proceed to the COMMIT phase.  The COMMIT phase then
+ * arrives here with consistency already checked (see check_tcapApplicationEntityTable_row()).  This function can
+ * return SNMP_ERR_NOERROR or SNMP_ERR_COMMITFAILED.  Values in StorageOld are the values before the
+ * varbinds on the row were applied: the values in StorageTmp are the new values.
+ */
+int
+update_tcapApplicationEntityTable_row(struct tcapApplicationEntityTable_data *StorageTmp, struct tcapApplicationEntityTable_data *StorageOld)
+{
+	/* XXX: provide code to update the row with the underlying device */
+	tcapApplicationEntityTable_refresh = 1;
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int revert_tcapApplicationEntityTable_row(struct tcapApplicationEntityTable_data *StorageTmp, struct tcapApplicationEntityTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the undo operation (UNDO phase) on a row
+ */
+void
+revert_tcapApplicationEntityTable_row(struct tcapApplicationEntityTable_data *StorageTmp, struct tcapApplicationEntityTable_data *StorageOld)
+{
+	/* XXX: provide code to revert the row with the underlying device */
+	update_tcapApplicationEntityTable_row(StorageOld, NULL);
 }
 
 /**
@@ -4295,6 +5497,64 @@ var_tcapApplicationEntityTable(struct variable *vp, oid * name, size_t *length, 
 }
 
 /**
+ * @fn int check_tcapLocalSapNameTable_row(struct tcapLocalSapNameTable_data *StorageTmp, struct tcapLocalSapNameTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to check, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the ACTION phase.  The start of the ACTION pahse performs this consitency check
+ * on the row before allowing the request to proceed to the COMMIT phase.  This function can return
+ * SNMP_ERR_NOERR or a specific SNMP error value.  Values in StorageOld are the values before the
+ * varbinds on the mib were applied; the values in StorageTmp are the new values.  The function is
+ * permitted to change the values in StorageTmp to correct them; however, preference should be made
+ * for setting values where were not in the varbinds.
+ */
+int
+check_tcapLocalSapNameTable_row(struct tcapLocalSapNameTable_data *StorageTmp, struct tcapLocalSapNameTable_data *StorageOld)
+{
+	/* XXX: provide code to check the row for consistency */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int update_tcapLocalSapNameTable_row(struct tcapLocalSapNameTable_data *StorageTmp, struct tcapLocalSapNameTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the set operation (ACTION phase) on a row
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to update, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the COMMIT phase.  The start of the ACTION phase performs a consistency check on
+ * the row before allowing the request to proceed to the COMMIT phase.  The COMMIT phase then
+ * arrives here with consistency already checked (see check_tcapLocalSapNameTable_row()).  This function can
+ * return SNMP_ERR_NOERROR or SNMP_ERR_COMMITFAILED.  Values in StorageOld are the values before the
+ * varbinds on the row were applied: the values in StorageTmp are the new values.
+ */
+int
+update_tcapLocalSapNameTable_row(struct tcapLocalSapNameTable_data *StorageTmp, struct tcapLocalSapNameTable_data *StorageOld)
+{
+	/* XXX: provide code to update the row with the underlying device */
+	tcapLocalSapNameTable_refresh = 1;
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int revert_tcapLocalSapNameTable_row(struct tcapLocalSapNameTable_data *StorageTmp, struct tcapLocalSapNameTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the undo operation (UNDO phase) on a row
+ */
+void
+revert_tcapLocalSapNameTable_row(struct tcapLocalSapNameTable_data *StorageTmp, struct tcapLocalSapNameTable_data *StorageOld)
+{
+	/* XXX: provide code to revert the row with the underlying device */
+	update_tcapLocalSapNameTable_row(StorageOld, NULL);
+}
+
+/**
  * @fn void refresh_tcapLocalSapNameTable_row(struct tcapLocalSapNameTable_data *StorageTmp, int force)
  * @param StorageTmp the data row to refresh.
  * @param force force refresh if non-zero.
@@ -4377,6 +5637,64 @@ var_tcapLocalSapNameTable(struct variable *vp, oid * name, size_t *length, int e
 		ERROR_MSG("");
 	}
 	return (rval);
+}
+
+/**
+ * @fn int check_tcapApplicationContextNameTable_row(struct tcapApplicationContextNameTable_data *StorageTmp, struct tcapApplicationContextNameTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to check, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the ACTION phase.  The start of the ACTION pahse performs this consitency check
+ * on the row before allowing the request to proceed to the COMMIT phase.  This function can return
+ * SNMP_ERR_NOERR or a specific SNMP error value.  Values in StorageOld are the values before the
+ * varbinds on the mib were applied; the values in StorageTmp are the new values.  The function is
+ * permitted to change the values in StorageTmp to correct them; however, preference should be made
+ * for setting values where were not in the varbinds.
+ */
+int
+check_tcapApplicationContextNameTable_row(struct tcapApplicationContextNameTable_data *StorageTmp, struct tcapApplicationContextNameTable_data *StorageOld)
+{
+	/* XXX: provide code to check the row for consistency */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int update_tcapApplicationContextNameTable_row(struct tcapApplicationContextNameTable_data *StorageTmp, struct tcapApplicationContextNameTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the set operation (ACTION phase) on a row
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to update, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the COMMIT phase.  The start of the ACTION phase performs a consistency check on
+ * the row before allowing the request to proceed to the COMMIT phase.  The COMMIT phase then
+ * arrives here with consistency already checked (see check_tcapApplicationContextNameTable_row()).  This function can
+ * return SNMP_ERR_NOERROR or SNMP_ERR_COMMITFAILED.  Values in StorageOld are the values before the
+ * varbinds on the row were applied: the values in StorageTmp are the new values.
+ */
+int
+update_tcapApplicationContextNameTable_row(struct tcapApplicationContextNameTable_data *StorageTmp, struct tcapApplicationContextNameTable_data *StorageOld)
+{
+	/* XXX: provide code to update the row with the underlying device */
+	tcapApplicationContextNameTable_refresh = 1;
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int revert_tcapApplicationContextNameTable_row(struct tcapApplicationContextNameTable_data *StorageTmp, struct tcapApplicationContextNameTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the undo operation (UNDO phase) on a row
+ */
+void
+revert_tcapApplicationContextNameTable_row(struct tcapApplicationContextNameTable_data *StorageTmp, struct tcapApplicationContextNameTable_data *StorageOld)
+{
+	/* XXX: provide code to revert the row with the underlying device */
+	update_tcapApplicationContextNameTable_row(StorageOld, NULL);
 }
 
 /**
@@ -4472,6 +5790,64 @@ var_tcapApplicationContextNameTable(struct variable *vp, oid * name, size_t *len
 }
 
 /**
+ * @fn int check_tcapAbstractSyntaxTable_row(struct tcapAbstractSyntaxTable_data *StorageTmp, struct tcapAbstractSyntaxTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to check, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the ACTION phase.  The start of the ACTION pahse performs this consitency check
+ * on the row before allowing the request to proceed to the COMMIT phase.  This function can return
+ * SNMP_ERR_NOERR or a specific SNMP error value.  Values in StorageOld are the values before the
+ * varbinds on the mib were applied; the values in StorageTmp are the new values.  The function is
+ * permitted to change the values in StorageTmp to correct them; however, preference should be made
+ * for setting values where were not in the varbinds.
+ */
+int
+check_tcapAbstractSyntaxTable_row(struct tcapAbstractSyntaxTable_data *StorageTmp, struct tcapAbstractSyntaxTable_data *StorageOld)
+{
+	/* XXX: provide code to check the row for consistency */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int update_tcapAbstractSyntaxTable_row(struct tcapAbstractSyntaxTable_data *StorageTmp, struct tcapAbstractSyntaxTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the set operation (ACTION phase) on a row
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to update, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the COMMIT phase.  The start of the ACTION phase performs a consistency check on
+ * the row before allowing the request to proceed to the COMMIT phase.  The COMMIT phase then
+ * arrives here with consistency already checked (see check_tcapAbstractSyntaxTable_row()).  This function can
+ * return SNMP_ERR_NOERROR or SNMP_ERR_COMMITFAILED.  Values in StorageOld are the values before the
+ * varbinds on the row were applied: the values in StorageTmp are the new values.
+ */
+int
+update_tcapAbstractSyntaxTable_row(struct tcapAbstractSyntaxTable_data *StorageTmp, struct tcapAbstractSyntaxTable_data *StorageOld)
+{
+	/* XXX: provide code to update the row with the underlying device */
+	tcapAbstractSyntaxTable_refresh = 1;
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int revert_tcapAbstractSyntaxTable_row(struct tcapAbstractSyntaxTable_data *StorageTmp, struct tcapAbstractSyntaxTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the undo operation (UNDO phase) on a row
+ */
+void
+revert_tcapAbstractSyntaxTable_row(struct tcapAbstractSyntaxTable_data *StorageTmp, struct tcapAbstractSyntaxTable_data *StorageOld)
+{
+	/* XXX: provide code to revert the row with the underlying device */
+	update_tcapAbstractSyntaxTable_row(StorageOld, NULL);
+}
+
+/**
  * @fn void refresh_tcapAbstractSyntaxTable_row(struct tcapAbstractSyntaxTable_data *StorageTmp, int force)
  * @param StorageTmp the data row to refresh.
  * @param force force refresh if non-zero.
@@ -4554,6 +5930,64 @@ var_tcapAbstractSyntaxTable(struct variable *vp, oid * name, size_t *length, int
 		ERROR_MSG("");
 	}
 	return (rval);
+}
+
+/**
+ * @fn int check_tcapTransferSyntaxTable_row(struct tcapTransferSyntaxTable_data *StorageTmp, struct tcapTransferSyntaxTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to check, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the ACTION phase.  The start of the ACTION pahse performs this consitency check
+ * on the row before allowing the request to proceed to the COMMIT phase.  This function can return
+ * SNMP_ERR_NOERR or a specific SNMP error value.  Values in StorageOld are the values before the
+ * varbinds on the mib were applied; the values in StorageTmp are the new values.  The function is
+ * permitted to change the values in StorageTmp to correct them; however, preference should be made
+ * for setting values where were not in the varbinds.
+ */
+int
+check_tcapTransferSyntaxTable_row(struct tcapTransferSyntaxTable_data *StorageTmp, struct tcapTransferSyntaxTable_data *StorageOld)
+{
+	/* XXX: provide code to check the row for consistency */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int update_tcapTransferSyntaxTable_row(struct tcapTransferSyntaxTable_data *StorageTmp, struct tcapTransferSyntaxTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the set operation (ACTION phase) on a row
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to update, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the COMMIT phase.  The start of the ACTION phase performs a consistency check on
+ * the row before allowing the request to proceed to the COMMIT phase.  The COMMIT phase then
+ * arrives here with consistency already checked (see check_tcapTransferSyntaxTable_row()).  This function can
+ * return SNMP_ERR_NOERROR or SNMP_ERR_COMMITFAILED.  Values in StorageOld are the values before the
+ * varbinds on the row were applied: the values in StorageTmp are the new values.
+ */
+int
+update_tcapTransferSyntaxTable_row(struct tcapTransferSyntaxTable_data *StorageTmp, struct tcapTransferSyntaxTable_data *StorageOld)
+{
+	/* XXX: provide code to update the row with the underlying device */
+	tcapTransferSyntaxTable_refresh = 1;
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int revert_tcapTransferSyntaxTable_row(struct tcapTransferSyntaxTable_data *StorageTmp, struct tcapTransferSyntaxTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the undo operation (UNDO phase) on a row
+ */
+void
+revert_tcapTransferSyntaxTable_row(struct tcapTransferSyntaxTable_data *StorageTmp, struct tcapTransferSyntaxTable_data *StorageOld)
+{
+	/* XXX: provide code to revert the row with the underlying device */
+	update_tcapTransferSyntaxTable_row(StorageOld, NULL);
 }
 
 /**
@@ -4655,19 +6089,19 @@ var_tcapTransferSyntaxTable(struct variable *vp, oid * name, size_t *length, int
 int
 write_tcapTcUserInvocationOfPointer(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static oid *old_value;
-	struct tcapTcUserTable_data *StorageTmp = NULL;
+	struct tcapTcUserTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 15;
-	static size_t old_length = 0;
-	static oid *objid = NULL;
+	oid *objid = NULL;
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("tcapMIB", "write_tcapTcUserInvocationOfPointer entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(tcapTcUserTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	switch (action) {
 	case RESERVE1:
-		objid = NULL;
 		if (var_val_type != ASN_OBJECT_ID) {
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to tcapTcUserInvocationOfPointer not ASN_OBJECT_ID\n");
 			return SNMP_ERR_WRONGTYPE;
@@ -4676,29 +6110,69 @@ write_tcapTcUserInvocationOfPointer(int action, u_char *var_val, u_char var_val_
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to tcapTcUserInvocationOfPointer: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
-		break;
-	case RESERVE2:		/* memory reseveration, final preparation... */
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->tcapTcUserTable_old) == NULL)
+			if (StorageTmp->tcapTcUserTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->tcapTcUserTable_old = tcapTcUserTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->tcapTcUserTable_rsvs++;
 		if ((objid = snmp_duplicate_objid((void *) var_val, var_val_len / sizeof(oid))) == NULL)
 			return SNMP_ERR_RESOURCEUNAVAILABLE;
+		SNMP_FREE(StorageTmp->tcapTcUserInvocationOfPointer);
+		StorageTmp->tcapTcUserInvocationOfPointer = objid;
+		StorageTmp->tcapTcUserInvocationOfPointerLen = var_val_len / sizeof(oid);
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
+		break;
+	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->tcapTcUserTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->tcapTcUserTable_tsts == 0)
+				if ((ret = check_tcapTcUserTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->tcapTcUserTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->tcapTcUserInvocationOfPointer for you to use, and you have just been asked to do something with it.  Note that anything
 				   done here must be reversable in the UNDO case */
-		old_value = StorageTmp->tcapTcUserInvocationOfPointer;
-		old_length = StorageTmp->tcapTcUserInvocationOfPointerLen;
-		StorageTmp->tcapTcUserInvocationOfPointer = objid;
-		StorageTmp->tcapTcUserInvocationOfPointerLen = var_val_len / sizeof(oid);
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->tcapTcUserTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->tcapTcUserTable_sets == 0)
+				if ((ret = update_tcapTcUserTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->tcapTcUserTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
-		SNMP_FREE(old_value);
-		old_length = 0;
-		objid = NULL;
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->tcapTcUserTable_old) != NULL) {
+			tcapTcUserTable_destroy(&StorageTmp->tcapTcUserTable_old);
+			StorageTmp->tcapTcUserTable_rsvs = 0;
+			StorageTmp->tcapTcUserTable_tsts = 0;
+			StorageTmp->tcapTcUserTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->tcapTcUserInvocationOfPointer = old_value;
-		StorageTmp->tcapTcUserInvocationOfPointerLen = old_length;
+		if ((StorageOld = StorageTmp->tcapTcUserTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->tcapTcUserTable_sets == 0)
+			revert_tcapTcUserTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
-		SNMP_FREE(objid);
+		if ((StorageOld = StorageTmp->tcapTcUserTable_old) == NULL)
+			break;
+		if (StorageOld->tcapTcUserInvocationOfPointer != NULL) {
+			SNMP_FREE(StorageTmp->tcapTcUserInvocationOfPointer);
+			StorageTmp->tcapTcUserInvocationOfPointer = StorageOld->tcapTcUserInvocationOfPointer;
+			StorageTmp->tcapTcUserInvocationOfPointerLen = StorageOld->tcapTcUserInvocationOfPointerLen;
+			StorageOld->tcapTcUserInvocationOfPointer = NULL;
+			StorageOld->tcapTcUserInvocationOfPointerLen = 0;
+		}
+		if (--StorageTmp->tcapTcUserTable_rsvs == 0)
+			tcapTcUserTable_destroy(&StorageTmp->tcapTcUserTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -4718,17 +6192,17 @@ write_tcapTcUserInvocationOfPointer(int action, u_char *var_val, u_char var_val_
 int
 write_tcapApplicationProcessTitle(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static oid *old_value;
-	struct tcapApplicationProcessTable_data *StorageTmp = NULL;
+	struct tcapApplicationProcessTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 15;
-	static size_t old_length = 0;
-	static oid *objid = NULL;
+	oid *objid = NULL;
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("tcapMIB", "write_tcapApplicationProcessTitle entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(tcapApplicationProcessTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
-		objid = NULL;
 		if (StorageTmp != NULL && statP == NULL) {
 			/* have row but no column */
 			switch (StorageTmp->tcapApplicationProcessRowStatus) {
@@ -4750,31 +6224,71 @@ write_tcapApplicationProcessTitle(int action, u_char *var_val, u_char var_val_ty
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to tcapApplicationProcessTitle: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
-		break;
-	case RESERVE2:		/* memory reseveration, final preparation... */
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->tcapApplicationProcessTable_old) == NULL)
+			if (StorageTmp->tcapApplicationProcessTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->tcapApplicationProcessTable_old = tcapApplicationProcessTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->tcapApplicationProcessTable_rsvs++;
 		if ((objid = snmp_duplicate_objid((void *) var_val, var_val_len / sizeof(oid))) == NULL)
 			return SNMP_ERR_RESOURCEUNAVAILABLE;
+		SNMP_FREE(StorageTmp->tcapApplicationProcessTitle);
+		StorageTmp->tcapApplicationProcessTitle = objid;
+		StorageTmp->tcapApplicationProcessTitleLen = var_val_len / sizeof(oid);
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
+		break;
+	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->tcapApplicationProcessTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->tcapApplicationProcessTable_tsts == 0)
+				if ((ret = check_tcapApplicationProcessTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->tcapApplicationProcessTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->tcapApplicationProcessTitle for you to use, and you have just been asked to do something with it.  Note that anything
 				   done here must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->tcapApplicationProcessTitle;
-		old_length = StorageTmp->tcapApplicationProcessTitleLen;
-		StorageTmp->tcapApplicationProcessTitle = objid;
-		StorageTmp->tcapApplicationProcessTitleLen = var_val_len / sizeof(oid);
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->tcapApplicationProcessTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->tcapApplicationProcessTable_sets == 0)
+				if ((ret = update_tcapApplicationProcessTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->tcapApplicationProcessTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
-		SNMP_FREE(old_value);
-		old_length = 0;
-		objid = NULL;
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->tcapApplicationProcessTable_old) != NULL) {
+			tcapApplicationProcessTable_destroy(&StorageTmp->tcapApplicationProcessTable_old);
+			StorageTmp->tcapApplicationProcessTable_rsvs = 0;
+			StorageTmp->tcapApplicationProcessTable_tsts = 0;
+			StorageTmp->tcapApplicationProcessTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->tcapApplicationProcessTitle = old_value;
-		StorageTmp->tcapApplicationProcessTitleLen = old_length;
+		if ((StorageOld = StorageTmp->tcapApplicationProcessTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->tcapApplicationProcessTable_sets == 0)
+			revert_tcapApplicationProcessTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
-		SNMP_FREE(objid);
+		if ((StorageOld = StorageTmp->tcapApplicationProcessTable_old) == NULL)
+			break;
+		if (StorageOld->tcapApplicationProcessTitle != NULL) {
+			SNMP_FREE(StorageTmp->tcapApplicationProcessTitle);
+			StorageTmp->tcapApplicationProcessTitle = StorageOld->tcapApplicationProcessTitle;
+			StorageTmp->tcapApplicationProcessTitleLen = StorageOld->tcapApplicationProcessTitleLen;
+			StorageOld->tcapApplicationProcessTitle = NULL;
+			StorageOld->tcapApplicationProcessTitleLen = 0;
+		}
+		if (--StorageTmp->tcapApplicationProcessTable_rsvs == 0)
+			tcapApplicationProcessTable_destroy(&StorageTmp->tcapApplicationProcessTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -4794,17 +6308,17 @@ write_tcapApplicationProcessTitle(int action, u_char *var_val, u_char var_val_ty
 int
 write_tcapSupportEntityNamePointer(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static oid *old_value;
-	struct tcapSupportEntityNameTable_data *StorageTmp = NULL;
+	struct tcapSupportEntityNameTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 15;
-	static size_t old_length = 0;
-	static oid *objid = NULL;
+	oid *objid = NULL;
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("tcapMIB", "write_tcapSupportEntityNamePointer entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(tcapSupportEntityNameTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
-		objid = NULL;
 		if (StorageTmp != NULL && statP == NULL) {
 			/* have row but no column */
 			switch (StorageTmp->tcapSupportEntityRowStatus) {
@@ -4826,31 +6340,71 @@ write_tcapSupportEntityNamePointer(int action, u_char *var_val, u_char var_val_t
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to tcapSupportEntityNamePointer: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
-		break;
-	case RESERVE2:		/* memory reseveration, final preparation... */
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->tcapSupportEntityNameTable_old) == NULL)
+			if (StorageTmp->tcapSupportEntityNameTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->tcapSupportEntityNameTable_old = tcapSupportEntityNameTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->tcapSupportEntityNameTable_rsvs++;
 		if ((objid = snmp_duplicate_objid((void *) var_val, var_val_len / sizeof(oid))) == NULL)
 			return SNMP_ERR_RESOURCEUNAVAILABLE;
+		SNMP_FREE(StorageTmp->tcapSupportEntityNamePointer);
+		StorageTmp->tcapSupportEntityNamePointer = objid;
+		StorageTmp->tcapSupportEntityNamePointerLen = var_val_len / sizeof(oid);
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
+		break;
+	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->tcapSupportEntityNameTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->tcapSupportEntityNameTable_tsts == 0)
+				if ((ret = check_tcapSupportEntityNameTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->tcapSupportEntityNameTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->tcapSupportEntityNamePointer for you to use, and you have just been asked to do something with it.  Note that anything
 				   done here must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->tcapSupportEntityNamePointer;
-		old_length = StorageTmp->tcapSupportEntityNamePointerLen;
-		StorageTmp->tcapSupportEntityNamePointer = objid;
-		StorageTmp->tcapSupportEntityNamePointerLen = var_val_len / sizeof(oid);
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->tcapSupportEntityNameTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->tcapSupportEntityNameTable_sets == 0)
+				if ((ret = update_tcapSupportEntityNameTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->tcapSupportEntityNameTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
-		SNMP_FREE(old_value);
-		old_length = 0;
-		objid = NULL;
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->tcapSupportEntityNameTable_old) != NULL) {
+			tcapSupportEntityNameTable_destroy(&StorageTmp->tcapSupportEntityNameTable_old);
+			StorageTmp->tcapSupportEntityNameTable_rsvs = 0;
+			StorageTmp->tcapSupportEntityNameTable_tsts = 0;
+			StorageTmp->tcapSupportEntityNameTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->tcapSupportEntityNamePointer = old_value;
-		StorageTmp->tcapSupportEntityNamePointerLen = old_length;
+		if ((StorageOld = StorageTmp->tcapSupportEntityNameTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->tcapSupportEntityNameTable_sets == 0)
+			revert_tcapSupportEntityNameTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
-		SNMP_FREE(objid);
+		if ((StorageOld = StorageTmp->tcapSupportEntityNameTable_old) == NULL)
+			break;
+		if (StorageOld->tcapSupportEntityNamePointer != NULL) {
+			SNMP_FREE(StorageTmp->tcapSupportEntityNamePointer);
+			StorageTmp->tcapSupportEntityNamePointer = StorageOld->tcapSupportEntityNamePointer;
+			StorageTmp->tcapSupportEntityNamePointerLen = StorageOld->tcapSupportEntityNamePointerLen;
+			StorageOld->tcapSupportEntityNamePointer = NULL;
+			StorageOld->tcapSupportEntityNamePointerLen = 0;
+		}
+		if (--StorageTmp->tcapSupportEntityNameTable_rsvs == 0)
+			tcapSupportEntityNameTable_destroy(&StorageTmp->tcapSupportEntityNameTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -4870,17 +6424,17 @@ write_tcapSupportEntityNamePointer(int action, u_char *var_val, u_char var_val_t
 int
 write_tcapApplicationEntityAsoTitle(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static oid *old_value;
-	struct tcapApplicationEntityTable_data *StorageTmp = NULL;
+	struct tcapApplicationEntityTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 15;
-	static size_t old_length = 0;
-	static oid *objid = NULL;
+	oid *objid = NULL;
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("tcapMIB", "write_tcapApplicationEntityAsoTitle entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(tcapApplicationEntityTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
-		objid = NULL;
 		if (StorageTmp != NULL && statP == NULL) {
 			/* have row but no column */
 			switch (StorageTmp->tcapApplicationEntityRowStatus) {
@@ -4903,31 +6457,71 @@ write_tcapApplicationEntityAsoTitle(int action, u_char *var_val, u_char var_val_
 			return SNMP_ERR_WRONGLENGTH;
 		}
 		/* Note: default value zeroDotZero */
-		break;
-	case RESERVE2:		/* memory reseveration, final preparation... */
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->tcapApplicationEntityTable_old) == NULL)
+			if (StorageTmp->tcapApplicationEntityTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->tcapApplicationEntityTable_old = tcapApplicationEntityTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->tcapApplicationEntityTable_rsvs++;
 		if ((objid = snmp_duplicate_objid((void *) var_val, var_val_len / sizeof(oid))) == NULL)
 			return SNMP_ERR_RESOURCEUNAVAILABLE;
+		SNMP_FREE(StorageTmp->tcapApplicationEntityAsoTitle);
+		StorageTmp->tcapApplicationEntityAsoTitle = objid;
+		StorageTmp->tcapApplicationEntityAsoTitleLen = var_val_len / sizeof(oid);
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
+		break;
+	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->tcapApplicationEntityTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->tcapApplicationEntityTable_tsts == 0)
+				if ((ret = check_tcapApplicationEntityTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->tcapApplicationEntityTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->tcapApplicationEntityAsoTitle for you to use, and you have just been asked to do something with it.  Note that anything
 				   done here must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->tcapApplicationEntityAsoTitle;
-		old_length = StorageTmp->tcapApplicationEntityAsoTitleLen;
-		StorageTmp->tcapApplicationEntityAsoTitle = objid;
-		StorageTmp->tcapApplicationEntityAsoTitleLen = var_val_len / sizeof(oid);
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->tcapApplicationEntityTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->tcapApplicationEntityTable_sets == 0)
+				if ((ret = update_tcapApplicationEntityTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->tcapApplicationEntityTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
-		SNMP_FREE(old_value);
-		old_length = 0;
-		objid = NULL;
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->tcapApplicationEntityTable_old) != NULL) {
+			tcapApplicationEntityTable_destroy(&StorageTmp->tcapApplicationEntityTable_old);
+			StorageTmp->tcapApplicationEntityTable_rsvs = 0;
+			StorageTmp->tcapApplicationEntityTable_tsts = 0;
+			StorageTmp->tcapApplicationEntityTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->tcapApplicationEntityAsoTitle = old_value;
-		StorageTmp->tcapApplicationEntityAsoTitleLen = old_length;
+		if ((StorageOld = StorageTmp->tcapApplicationEntityTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->tcapApplicationEntityTable_sets == 0)
+			revert_tcapApplicationEntityTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
-		SNMP_FREE(objid);
+		if ((StorageOld = StorageTmp->tcapApplicationEntityTable_old) == NULL)
+			break;
+		if (StorageOld->tcapApplicationEntityAsoTitle != NULL) {
+			SNMP_FREE(StorageTmp->tcapApplicationEntityAsoTitle);
+			StorageTmp->tcapApplicationEntityAsoTitle = StorageOld->tcapApplicationEntityAsoTitle;
+			StorageTmp->tcapApplicationEntityAsoTitleLen = StorageOld->tcapApplicationEntityAsoTitleLen;
+			StorageOld->tcapApplicationEntityAsoTitle = NULL;
+			StorageOld->tcapApplicationEntityAsoTitleLen = 0;
+		}
+		if (--StorageTmp->tcapApplicationEntityTable_rsvs == 0)
+			tcapApplicationEntityTable_destroy(&StorageTmp->tcapApplicationEntityTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -4947,17 +6541,17 @@ write_tcapApplicationEntityAsoTitle(int action, u_char *var_val, u_char var_val_
 int
 write_tcapApplicationEntityAsoQualifier(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static oid *old_value;
-	struct tcapApplicationEntityTable_data *StorageTmp = NULL;
+	struct tcapApplicationEntityTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 15;
-	static size_t old_length = 0;
-	static oid *objid = NULL;
+	oid *objid = NULL;
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("tcapMIB", "write_tcapApplicationEntityAsoQualifier entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(tcapApplicationEntityTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
-		objid = NULL;
 		if (StorageTmp != NULL && statP == NULL) {
 			/* have row but no column */
 			switch (StorageTmp->tcapApplicationEntityRowStatus) {
@@ -4980,31 +6574,71 @@ write_tcapApplicationEntityAsoQualifier(int action, u_char *var_val, u_char var_
 			return SNMP_ERR_WRONGLENGTH;
 		}
 		/* Note: default value zeroDotZero */
-		break;
-	case RESERVE2:		/* memory reseveration, final preparation... */
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->tcapApplicationEntityTable_old) == NULL)
+			if (StorageTmp->tcapApplicationEntityTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->tcapApplicationEntityTable_old = tcapApplicationEntityTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->tcapApplicationEntityTable_rsvs++;
 		if ((objid = snmp_duplicate_objid((void *) var_val, var_val_len / sizeof(oid))) == NULL)
 			return SNMP_ERR_RESOURCEUNAVAILABLE;
+		SNMP_FREE(StorageTmp->tcapApplicationEntityAsoQualifier);
+		StorageTmp->tcapApplicationEntityAsoQualifier = objid;
+		StorageTmp->tcapApplicationEntityAsoQualifierLen = var_val_len / sizeof(oid);
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
+		break;
+	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->tcapApplicationEntityTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->tcapApplicationEntityTable_tsts == 0)
+				if ((ret = check_tcapApplicationEntityTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->tcapApplicationEntityTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->tcapApplicationEntityAsoQualifier for you to use, and you have just been asked to do something with it.  Note that
 				   anything done here must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->tcapApplicationEntityAsoQualifier;
-		old_length = StorageTmp->tcapApplicationEntityAsoQualifierLen;
-		StorageTmp->tcapApplicationEntityAsoQualifier = objid;
-		StorageTmp->tcapApplicationEntityAsoQualifierLen = var_val_len / sizeof(oid);
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->tcapApplicationEntityTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->tcapApplicationEntityTable_sets == 0)
+				if ((ret = update_tcapApplicationEntityTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->tcapApplicationEntityTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
-		SNMP_FREE(old_value);
-		old_length = 0;
-		objid = NULL;
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->tcapApplicationEntityTable_old) != NULL) {
+			tcapApplicationEntityTable_destroy(&StorageTmp->tcapApplicationEntityTable_old);
+			StorageTmp->tcapApplicationEntityTable_rsvs = 0;
+			StorageTmp->tcapApplicationEntityTable_tsts = 0;
+			StorageTmp->tcapApplicationEntityTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->tcapApplicationEntityAsoQualifier = old_value;
-		StorageTmp->tcapApplicationEntityAsoQualifierLen = old_length;
+		if ((StorageOld = StorageTmp->tcapApplicationEntityTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->tcapApplicationEntityTable_sets == 0)
+			revert_tcapApplicationEntityTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
-		SNMP_FREE(objid);
+		if ((StorageOld = StorageTmp->tcapApplicationEntityTable_old) == NULL)
+			break;
+		if (StorageOld->tcapApplicationEntityAsoQualifier != NULL) {
+			SNMP_FREE(StorageTmp->tcapApplicationEntityAsoQualifier);
+			StorageTmp->tcapApplicationEntityAsoQualifier = StorageOld->tcapApplicationEntityAsoQualifier;
+			StorageTmp->tcapApplicationEntityAsoQualifierLen = StorageOld->tcapApplicationEntityAsoQualifierLen;
+			StorageOld->tcapApplicationEntityAsoQualifier = NULL;
+			StorageOld->tcapApplicationEntityAsoQualifierLen = 0;
+		}
+		if (--StorageTmp->tcapApplicationEntityTable_rsvs == 0)
+			tcapApplicationEntityTable_destroy(&StorageTmp->tcapApplicationEntityTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -5024,17 +6658,17 @@ write_tcapApplicationEntityAsoQualifier(int action, u_char *var_val, u_char var_
 int
 write_tcapApplicationEntityPresFUsupport(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static uint8_t *old_value;
-	struct tcapApplicationEntityTable_data *StorageTmp = NULL;
+	struct tcapApplicationEntityTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 15;
-	static size_t old_length = 0;
-	static uint8_t *string = NULL;
+	uint8_t *string = NULL;
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("tcapMIB", "write_tcapApplicationEntityPresFUsupport entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(tcapApplicationEntityTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
-		string = NULL;
 		if (StorageTmp != NULL && statP == NULL) {
 			/* have row but no column */
 			switch (StorageTmp->tcapApplicationEntityRowStatus) {
@@ -5064,33 +6698,73 @@ write_tcapApplicationEntityPresFUsupport(int action, u_char *var_val, u_char var
 				return SNMP_ERR_WRONGLENGTH;
 			}
 		}
-		break;
-	case RESERVE2:		/* memory reseveration, final preparation... */
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->tcapApplicationEntityTable_old) == NULL)
+			if (StorageTmp->tcapApplicationEntityTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->tcapApplicationEntityTable_old = tcapApplicationEntityTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->tcapApplicationEntityTable_rsvs++;
 		if ((string = malloc(var_val_len + 1)) == NULL)
 			return SNMP_ERR_RESOURCEUNAVAILABLE;
 		memcpy((void *) string, (void *) var_val, var_val_len);
 		string[var_val_len] = 0;
+		SNMP_FREE(StorageTmp->tcapApplicationEntityPresFUsupport);
+		StorageTmp->tcapApplicationEntityPresFUsupport = string;
+		StorageTmp->tcapApplicationEntityPresFUsupportLen = var_val_len;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
+		break;
+	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->tcapApplicationEntityTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->tcapApplicationEntityTable_tsts == 0)
+				if ((ret = check_tcapApplicationEntityTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->tcapApplicationEntityTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->tcapApplicationEntityPresFUsupport for you to use, and you have just been asked to do something with it.  Note that
 				   anything done here must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->tcapApplicationEntityPresFUsupport;
-		old_length = StorageTmp->tcapApplicationEntityPresFUsupportLen;
-		StorageTmp->tcapApplicationEntityPresFUsupport = string;
-		StorageTmp->tcapApplicationEntityPresFUsupportLen = var_val_len;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->tcapApplicationEntityTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->tcapApplicationEntityTable_sets == 0)
+				if ((ret = update_tcapApplicationEntityTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->tcapApplicationEntityTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
-		SNMP_FREE(old_value);
-		old_length = 0;
-		string = NULL;
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->tcapApplicationEntityTable_old) != NULL) {
+			tcapApplicationEntityTable_destroy(&StorageTmp->tcapApplicationEntityTable_old);
+			StorageTmp->tcapApplicationEntityTable_rsvs = 0;
+			StorageTmp->tcapApplicationEntityTable_tsts = 0;
+			StorageTmp->tcapApplicationEntityTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->tcapApplicationEntityPresFUsupport = old_value;
-		StorageTmp->tcapApplicationEntityPresFUsupportLen = old_length;
+		if ((StorageOld = StorageTmp->tcapApplicationEntityTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->tcapApplicationEntityTable_sets == 0)
+			revert_tcapApplicationEntityTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
-		SNMP_FREE(string);
+		if ((StorageOld = StorageTmp->tcapApplicationEntityTable_old) == NULL)
+			break;
+		if (StorageOld->tcapApplicationEntityPresFUsupport != NULL) {
+			SNMP_FREE(StorageTmp->tcapApplicationEntityPresFUsupport);
+			StorageTmp->tcapApplicationEntityPresFUsupport = StorageOld->tcapApplicationEntityPresFUsupport;
+			StorageTmp->tcapApplicationEntityPresFUsupportLen = StorageOld->tcapApplicationEntityPresFUsupportLen;
+			StorageOld->tcapApplicationEntityPresFUsupport = NULL;
+			StorageOld->tcapApplicationEntityPresFUsupportLen = 0;
+		}
+		if (--StorageTmp->tcapApplicationEntityTable_rsvs == 0)
+			tcapApplicationEntityTable_destroy(&StorageTmp->tcapApplicationEntityTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -5110,17 +6784,17 @@ write_tcapApplicationEntityPresFUsupport(int action, u_char *var_val, u_char var
 int
 write_tcapApplicationEntityAbstrSyntaxSupport(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static oid *old_value;
-	struct tcapApplicationEntityTable_data *StorageTmp = NULL;
+	struct tcapApplicationEntityTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 15;
-	static size_t old_length = 0;
-	static oid *objid = NULL;
+	oid *objid = NULL;
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("tcapMIB", "write_tcapApplicationEntityAbstrSyntaxSupport entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(tcapApplicationEntityTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
-		objid = NULL;
 		if (StorageTmp != NULL && statP == NULL) {
 			/* have row but no column */
 			switch (StorageTmp->tcapApplicationEntityRowStatus) {
@@ -5142,31 +6816,71 @@ write_tcapApplicationEntityAbstrSyntaxSupport(int action, u_char *var_val, u_cha
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to tcapApplicationEntityAbstrSyntaxSupport: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
-		break;
-	case RESERVE2:		/* memory reseveration, final preparation... */
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->tcapApplicationEntityTable_old) == NULL)
+			if (StorageTmp->tcapApplicationEntityTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->tcapApplicationEntityTable_old = tcapApplicationEntityTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->tcapApplicationEntityTable_rsvs++;
 		if ((objid = snmp_duplicate_objid((void *) var_val, var_val_len / sizeof(oid))) == NULL)
 			return SNMP_ERR_RESOURCEUNAVAILABLE;
+		SNMP_FREE(StorageTmp->tcapApplicationEntityAbstrSyntaxSupport);
+		StorageTmp->tcapApplicationEntityAbstrSyntaxSupport = objid;
+		StorageTmp->tcapApplicationEntityAbstrSyntaxSupportLen = var_val_len / sizeof(oid);
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
+		break;
+	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->tcapApplicationEntityTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->tcapApplicationEntityTable_tsts == 0)
+				if ((ret = check_tcapApplicationEntityTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->tcapApplicationEntityTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->tcapApplicationEntityAbstrSyntaxSupport for you to use, and you have just been asked to do something with it.  Note that 
 				   anything done here must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->tcapApplicationEntityAbstrSyntaxSupport;
-		old_length = StorageTmp->tcapApplicationEntityAbstrSyntaxSupportLen;
-		StorageTmp->tcapApplicationEntityAbstrSyntaxSupport = objid;
-		StorageTmp->tcapApplicationEntityAbstrSyntaxSupportLen = var_val_len / sizeof(oid);
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->tcapApplicationEntityTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->tcapApplicationEntityTable_sets == 0)
+				if ((ret = update_tcapApplicationEntityTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->tcapApplicationEntityTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
-		SNMP_FREE(old_value);
-		old_length = 0;
-		objid = NULL;
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->tcapApplicationEntityTable_old) != NULL) {
+			tcapApplicationEntityTable_destroy(&StorageTmp->tcapApplicationEntityTable_old);
+			StorageTmp->tcapApplicationEntityTable_rsvs = 0;
+			StorageTmp->tcapApplicationEntityTable_tsts = 0;
+			StorageTmp->tcapApplicationEntityTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->tcapApplicationEntityAbstrSyntaxSupport = old_value;
-		StorageTmp->tcapApplicationEntityAbstrSyntaxSupportLen = old_length;
+		if ((StorageOld = StorageTmp->tcapApplicationEntityTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->tcapApplicationEntityTable_sets == 0)
+			revert_tcapApplicationEntityTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
-		SNMP_FREE(objid);
+		if ((StorageOld = StorageTmp->tcapApplicationEntityTable_old) == NULL)
+			break;
+		if (StorageOld->tcapApplicationEntityAbstrSyntaxSupport != NULL) {
+			SNMP_FREE(StorageTmp->tcapApplicationEntityAbstrSyntaxSupport);
+			StorageTmp->tcapApplicationEntityAbstrSyntaxSupport = StorageOld->tcapApplicationEntityAbstrSyntaxSupport;
+			StorageTmp->tcapApplicationEntityAbstrSyntaxSupportLen = StorageOld->tcapApplicationEntityAbstrSyntaxSupportLen;
+			StorageOld->tcapApplicationEntityAbstrSyntaxSupport = NULL;
+			StorageOld->tcapApplicationEntityAbstrSyntaxSupportLen = 0;
+		}
+		if (--StorageTmp->tcapApplicationEntityTable_rsvs == 0)
+			tcapApplicationEntityTable_destroy(&StorageTmp->tcapApplicationEntityTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -5186,17 +6900,17 @@ write_tcapApplicationEntityAbstrSyntaxSupport(int action, u_char *var_val, u_cha
 int
 write_tcapApplicationEntityTransfSynstaxSupport(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static oid *old_value;
-	struct tcapApplicationEntityTable_data *StorageTmp = NULL;
+	struct tcapApplicationEntityTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 15;
-	static size_t old_length = 0;
-	static oid *objid = NULL;
+	oid *objid = NULL;
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("tcapMIB", "write_tcapApplicationEntityTransfSynstaxSupport entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(tcapApplicationEntityTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
-		objid = NULL;
 		if (StorageTmp != NULL && statP == NULL) {
 			/* have row but no column */
 			switch (StorageTmp->tcapApplicationEntityRowStatus) {
@@ -5218,31 +6932,71 @@ write_tcapApplicationEntityTransfSynstaxSupport(int action, u_char *var_val, u_c
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to tcapApplicationEntityTransfSynstaxSupport: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
-		break;
-	case RESERVE2:		/* memory reseveration, final preparation... */
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->tcapApplicationEntityTable_old) == NULL)
+			if (StorageTmp->tcapApplicationEntityTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->tcapApplicationEntityTable_old = tcapApplicationEntityTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->tcapApplicationEntityTable_rsvs++;
 		if ((objid = snmp_duplicate_objid((void *) var_val, var_val_len / sizeof(oid))) == NULL)
 			return SNMP_ERR_RESOURCEUNAVAILABLE;
+		SNMP_FREE(StorageTmp->tcapApplicationEntityTransfSynstaxSupport);
+		StorageTmp->tcapApplicationEntityTransfSynstaxSupport = objid;
+		StorageTmp->tcapApplicationEntityTransfSynstaxSupportLen = var_val_len / sizeof(oid);
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
+		break;
+	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->tcapApplicationEntityTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->tcapApplicationEntityTable_tsts == 0)
+				if ((ret = check_tcapApplicationEntityTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->tcapApplicationEntityTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->tcapApplicationEntityTransfSynstaxSupport for you to use, and you have just been asked to do something with it.  Note
 				   that anything done here must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->tcapApplicationEntityTransfSynstaxSupport;
-		old_length = StorageTmp->tcapApplicationEntityTransfSynstaxSupportLen;
-		StorageTmp->tcapApplicationEntityTransfSynstaxSupport = objid;
-		StorageTmp->tcapApplicationEntityTransfSynstaxSupportLen = var_val_len / sizeof(oid);
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->tcapApplicationEntityTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->tcapApplicationEntityTable_sets == 0)
+				if ((ret = update_tcapApplicationEntityTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->tcapApplicationEntityTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
-		SNMP_FREE(old_value);
-		old_length = 0;
-		objid = NULL;
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->tcapApplicationEntityTable_old) != NULL) {
+			tcapApplicationEntityTable_destroy(&StorageTmp->tcapApplicationEntityTable_old);
+			StorageTmp->tcapApplicationEntityTable_rsvs = 0;
+			StorageTmp->tcapApplicationEntityTable_tsts = 0;
+			StorageTmp->tcapApplicationEntityTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->tcapApplicationEntityTransfSynstaxSupport = old_value;
-		StorageTmp->tcapApplicationEntityTransfSynstaxSupportLen = old_length;
+		if ((StorageOld = StorageTmp->tcapApplicationEntityTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->tcapApplicationEntityTable_sets == 0)
+			revert_tcapApplicationEntityTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
-		SNMP_FREE(objid);
+		if ((StorageOld = StorageTmp->tcapApplicationEntityTable_old) == NULL)
+			break;
+		if (StorageOld->tcapApplicationEntityTransfSynstaxSupport != NULL) {
+			SNMP_FREE(StorageTmp->tcapApplicationEntityTransfSynstaxSupport);
+			StorageTmp->tcapApplicationEntityTransfSynstaxSupport = StorageOld->tcapApplicationEntityTransfSynstaxSupport;
+			StorageTmp->tcapApplicationEntityTransfSynstaxSupportLen = StorageOld->tcapApplicationEntityTransfSynstaxSupportLen;
+			StorageOld->tcapApplicationEntityTransfSynstaxSupport = NULL;
+			StorageOld->tcapApplicationEntityTransfSynstaxSupportLen = 0;
+		}
+		if (--StorageTmp->tcapApplicationEntityTable_rsvs == 0)
+			tcapApplicationEntityTable_destroy(&StorageTmp->tcapApplicationEntityTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -5262,17 +7016,17 @@ write_tcapApplicationEntityTransfSynstaxSupport(int action, u_char *var_val, u_c
 int
 write_tcapApplicationEntityPresSelectorValue(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static uint8_t *old_value;
-	struct tcapApplicationEntityTable_data *StorageTmp = NULL;
+	struct tcapApplicationEntityTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 15;
-	static size_t old_length = 0;
-	static uint8_t *string = NULL;
+	uint8_t *string = NULL;
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("tcapMIB", "write_tcapApplicationEntityPresSelectorValue entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(tcapApplicationEntityTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
-		string = NULL;
 		if (StorageTmp != NULL && statP == NULL) {
 			/* have row but no column */
 			switch (StorageTmp->tcapApplicationEntityRowStatus) {
@@ -5294,33 +7048,73 @@ write_tcapApplicationEntityPresSelectorValue(int action, u_char *var_val, u_char
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to tcapApplicationEntityPresSelectorValue: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
-		break;
-	case RESERVE2:		/* memory reseveration, final preparation... */
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->tcapApplicationEntityTable_old) == NULL)
+			if (StorageTmp->tcapApplicationEntityTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->tcapApplicationEntityTable_old = tcapApplicationEntityTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->tcapApplicationEntityTable_rsvs++;
 		if ((string = malloc(var_val_len + 1)) == NULL)
 			return SNMP_ERR_RESOURCEUNAVAILABLE;
 		memcpy((void *) string, (void *) var_val, var_val_len);
 		string[var_val_len] = 0;
+		SNMP_FREE(StorageTmp->tcapApplicationEntityPresSelectorValue);
+		StorageTmp->tcapApplicationEntityPresSelectorValue = string;
+		StorageTmp->tcapApplicationEntityPresSelectorValueLen = var_val_len;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
+		break;
+	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->tcapApplicationEntityTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->tcapApplicationEntityTable_tsts == 0)
+				if ((ret = check_tcapApplicationEntityTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->tcapApplicationEntityTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->tcapApplicationEntityPresSelectorValue for you to use, and you have just been asked to do something with it.  Note that
 				   anything done here must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->tcapApplicationEntityPresSelectorValue;
-		old_length = StorageTmp->tcapApplicationEntityPresSelectorValueLen;
-		StorageTmp->tcapApplicationEntityPresSelectorValue = string;
-		StorageTmp->tcapApplicationEntityPresSelectorValueLen = var_val_len;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->tcapApplicationEntityTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->tcapApplicationEntityTable_sets == 0)
+				if ((ret = update_tcapApplicationEntityTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->tcapApplicationEntityTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
-		SNMP_FREE(old_value);
-		old_length = 0;
-		string = NULL;
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->tcapApplicationEntityTable_old) != NULL) {
+			tcapApplicationEntityTable_destroy(&StorageTmp->tcapApplicationEntityTable_old);
+			StorageTmp->tcapApplicationEntityTable_rsvs = 0;
+			StorageTmp->tcapApplicationEntityTable_tsts = 0;
+			StorageTmp->tcapApplicationEntityTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->tcapApplicationEntityPresSelectorValue = old_value;
-		StorageTmp->tcapApplicationEntityPresSelectorValueLen = old_length;
+		if ((StorageOld = StorageTmp->tcapApplicationEntityTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->tcapApplicationEntityTable_sets == 0)
+			revert_tcapApplicationEntityTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
-		SNMP_FREE(string);
+		if ((StorageOld = StorageTmp->tcapApplicationEntityTable_old) == NULL)
+			break;
+		if (StorageOld->tcapApplicationEntityPresSelectorValue != NULL) {
+			SNMP_FREE(StorageTmp->tcapApplicationEntityPresSelectorValue);
+			StorageTmp->tcapApplicationEntityPresSelectorValue = StorageOld->tcapApplicationEntityPresSelectorValue;
+			StorageTmp->tcapApplicationEntityPresSelectorValueLen = StorageOld->tcapApplicationEntityPresSelectorValueLen;
+			StorageOld->tcapApplicationEntityPresSelectorValue = NULL;
+			StorageOld->tcapApplicationEntityPresSelectorValueLen = 0;
+		}
+		if (--StorageTmp->tcapApplicationEntityTable_rsvs == 0)
+			tcapApplicationEntityTable_destroy(&StorageTmp->tcapApplicationEntityTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -5340,17 +7134,17 @@ write_tcapApplicationEntityPresSelectorValue(int action, u_char *var_val, u_char
 int
 write_tcapApplicationEntitySessProtVerSupport(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static uint8_t *old_value;
-	struct tcapApplicationEntityTable_data *StorageTmp = NULL;
+	struct tcapApplicationEntityTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 15;
-	static size_t old_length = 0;
-	static uint8_t *string = NULL;
+	uint8_t *string = NULL;
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("tcapMIB", "write_tcapApplicationEntitySessProtVerSupport entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(tcapApplicationEntityTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
-		string = NULL;
 		if (StorageTmp != NULL && statP == NULL) {
 			/* have row but no column */
 			switch (StorageTmp->tcapApplicationEntityRowStatus) {
@@ -5380,33 +7174,73 @@ write_tcapApplicationEntitySessProtVerSupport(int action, u_char *var_val, u_cha
 				return SNMP_ERR_WRONGLENGTH;
 			}
 		}
-		break;
-	case RESERVE2:		/* memory reseveration, final preparation... */
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->tcapApplicationEntityTable_old) == NULL)
+			if (StorageTmp->tcapApplicationEntityTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->tcapApplicationEntityTable_old = tcapApplicationEntityTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->tcapApplicationEntityTable_rsvs++;
 		if ((string = malloc(var_val_len + 1)) == NULL)
 			return SNMP_ERR_RESOURCEUNAVAILABLE;
 		memcpy((void *) string, (void *) var_val, var_val_len);
 		string[var_val_len] = 0;
+		SNMP_FREE(StorageTmp->tcapApplicationEntitySessProtVerSupport);
+		StorageTmp->tcapApplicationEntitySessProtVerSupport = string;
+		StorageTmp->tcapApplicationEntitySessProtVerSupportLen = var_val_len;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
+		break;
+	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->tcapApplicationEntityTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->tcapApplicationEntityTable_tsts == 0)
+				if ((ret = check_tcapApplicationEntityTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->tcapApplicationEntityTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->tcapApplicationEntitySessProtVerSupport for you to use, and you have just been asked to do something with it.  Note that 
 				   anything done here must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->tcapApplicationEntitySessProtVerSupport;
-		old_length = StorageTmp->tcapApplicationEntitySessProtVerSupportLen;
-		StorageTmp->tcapApplicationEntitySessProtVerSupport = string;
-		StorageTmp->tcapApplicationEntitySessProtVerSupportLen = var_val_len;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->tcapApplicationEntityTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->tcapApplicationEntityTable_sets == 0)
+				if ((ret = update_tcapApplicationEntityTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->tcapApplicationEntityTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
-		SNMP_FREE(old_value);
-		old_length = 0;
-		string = NULL;
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->tcapApplicationEntityTable_old) != NULL) {
+			tcapApplicationEntityTable_destroy(&StorageTmp->tcapApplicationEntityTable_old);
+			StorageTmp->tcapApplicationEntityTable_rsvs = 0;
+			StorageTmp->tcapApplicationEntityTable_tsts = 0;
+			StorageTmp->tcapApplicationEntityTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->tcapApplicationEntitySessProtVerSupport = old_value;
-		StorageTmp->tcapApplicationEntitySessProtVerSupportLen = old_length;
+		if ((StorageOld = StorageTmp->tcapApplicationEntityTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->tcapApplicationEntityTable_sets == 0)
+			revert_tcapApplicationEntityTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
-		SNMP_FREE(string);
+		if ((StorageOld = StorageTmp->tcapApplicationEntityTable_old) == NULL)
+			break;
+		if (StorageOld->tcapApplicationEntitySessProtVerSupport != NULL) {
+			SNMP_FREE(StorageTmp->tcapApplicationEntitySessProtVerSupport);
+			StorageTmp->tcapApplicationEntitySessProtVerSupport = StorageOld->tcapApplicationEntitySessProtVerSupport;
+			StorageTmp->tcapApplicationEntitySessProtVerSupportLen = StorageOld->tcapApplicationEntitySessProtVerSupportLen;
+			StorageOld->tcapApplicationEntitySessProtVerSupport = NULL;
+			StorageOld->tcapApplicationEntitySessProtVerSupportLen = 0;
+		}
+		if (--StorageTmp->tcapApplicationEntityTable_rsvs == 0)
+			tcapApplicationEntityTable_destroy(&StorageTmp->tcapApplicationEntityTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -5426,17 +7260,17 @@ write_tcapApplicationEntitySessProtVerSupport(int action, u_char *var_val, u_cha
 int
 write_tcapApplicationEntitySessFUsupport(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static uint8_t *old_value;
-	struct tcapApplicationEntityTable_data *StorageTmp = NULL;
+	struct tcapApplicationEntityTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 15;
-	static size_t old_length = 0;
-	static uint8_t *string = NULL;
+	uint8_t *string = NULL;
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("tcapMIB", "write_tcapApplicationEntitySessFUsupport entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(tcapApplicationEntityTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
-		string = NULL;
 		if (StorageTmp != NULL && statP == NULL) {
 			/* have row but no column */
 			switch (StorageTmp->tcapApplicationEntityRowStatus) {
@@ -5466,33 +7300,73 @@ write_tcapApplicationEntitySessFUsupport(int action, u_char *var_val, u_char var
 				return SNMP_ERR_WRONGLENGTH;
 			}
 		}
-		break;
-	case RESERVE2:		/* memory reseveration, final preparation... */
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->tcapApplicationEntityTable_old) == NULL)
+			if (StorageTmp->tcapApplicationEntityTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->tcapApplicationEntityTable_old = tcapApplicationEntityTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->tcapApplicationEntityTable_rsvs++;
 		if ((string = malloc(var_val_len + 1)) == NULL)
 			return SNMP_ERR_RESOURCEUNAVAILABLE;
 		memcpy((void *) string, (void *) var_val, var_val_len);
 		string[var_val_len] = 0;
+		SNMP_FREE(StorageTmp->tcapApplicationEntitySessFUsupport);
+		StorageTmp->tcapApplicationEntitySessFUsupport = string;
+		StorageTmp->tcapApplicationEntitySessFUsupportLen = var_val_len;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
+		break;
+	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->tcapApplicationEntityTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->tcapApplicationEntityTable_tsts == 0)
+				if ((ret = check_tcapApplicationEntityTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->tcapApplicationEntityTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->tcapApplicationEntitySessFUsupport for you to use, and you have just been asked to do something with it.  Note that
 				   anything done here must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->tcapApplicationEntitySessFUsupport;
-		old_length = StorageTmp->tcapApplicationEntitySessFUsupportLen;
-		StorageTmp->tcapApplicationEntitySessFUsupport = string;
-		StorageTmp->tcapApplicationEntitySessFUsupportLen = var_val_len;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->tcapApplicationEntityTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->tcapApplicationEntityTable_sets == 0)
+				if ((ret = update_tcapApplicationEntityTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->tcapApplicationEntityTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
-		SNMP_FREE(old_value);
-		old_length = 0;
-		string = NULL;
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->tcapApplicationEntityTable_old) != NULL) {
+			tcapApplicationEntityTable_destroy(&StorageTmp->tcapApplicationEntityTable_old);
+			StorageTmp->tcapApplicationEntityTable_rsvs = 0;
+			StorageTmp->tcapApplicationEntityTable_tsts = 0;
+			StorageTmp->tcapApplicationEntityTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->tcapApplicationEntitySessFUsupport = old_value;
-		StorageTmp->tcapApplicationEntitySessFUsupportLen = old_length;
+		if ((StorageOld = StorageTmp->tcapApplicationEntityTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->tcapApplicationEntityTable_sets == 0)
+			revert_tcapApplicationEntityTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
-		SNMP_FREE(string);
+		if ((StorageOld = StorageTmp->tcapApplicationEntityTable_old) == NULL)
+			break;
+		if (StorageOld->tcapApplicationEntitySessFUsupport != NULL) {
+			SNMP_FREE(StorageTmp->tcapApplicationEntitySessFUsupport);
+			StorageTmp->tcapApplicationEntitySessFUsupport = StorageOld->tcapApplicationEntitySessFUsupport;
+			StorageTmp->tcapApplicationEntitySessFUsupportLen = StorageOld->tcapApplicationEntitySessFUsupportLen;
+			StorageOld->tcapApplicationEntitySessFUsupport = NULL;
+			StorageOld->tcapApplicationEntitySessFUsupportLen = 0;
+		}
+		if (--StorageTmp->tcapApplicationEntityTable_rsvs == 0)
+			tcapApplicationEntityTable_destroy(&StorageTmp->tcapApplicationEntityTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -5512,17 +7386,17 @@ write_tcapApplicationEntitySessFUsupport(int action, u_char *var_val, u_char var
 int
 write_tcapApplicationEntitySessOptSupport(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static uint8_t *old_value;
-	struct tcapApplicationEntityTable_data *StorageTmp = NULL;
+	struct tcapApplicationEntityTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 15;
-	static size_t old_length = 0;
-	static uint8_t *string = NULL;
+	uint8_t *string = NULL;
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("tcapMIB", "write_tcapApplicationEntitySessOptSupport entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(tcapApplicationEntityTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
-		string = NULL;
 		if (StorageTmp != NULL && statP == NULL) {
 			/* have row but no column */
 			switch (StorageTmp->tcapApplicationEntityRowStatus) {
@@ -5552,33 +7426,73 @@ write_tcapApplicationEntitySessOptSupport(int action, u_char *var_val, u_char va
 				return SNMP_ERR_WRONGLENGTH;
 			}
 		}
-		break;
-	case RESERVE2:		/* memory reseveration, final preparation... */
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->tcapApplicationEntityTable_old) == NULL)
+			if (StorageTmp->tcapApplicationEntityTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->tcapApplicationEntityTable_old = tcapApplicationEntityTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->tcapApplicationEntityTable_rsvs++;
 		if ((string = malloc(var_val_len + 1)) == NULL)
 			return SNMP_ERR_RESOURCEUNAVAILABLE;
 		memcpy((void *) string, (void *) var_val, var_val_len);
 		string[var_val_len] = 0;
+		SNMP_FREE(StorageTmp->tcapApplicationEntitySessOptSupport);
+		StorageTmp->tcapApplicationEntitySessOptSupport = string;
+		StorageTmp->tcapApplicationEntitySessOptSupportLen = var_val_len;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
+		break;
+	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->tcapApplicationEntityTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->tcapApplicationEntityTable_tsts == 0)
+				if ((ret = check_tcapApplicationEntityTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->tcapApplicationEntityTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->tcapApplicationEntitySessOptSupport for you to use, and you have just been asked to do something with it.  Note that
 				   anything done here must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->tcapApplicationEntitySessOptSupport;
-		old_length = StorageTmp->tcapApplicationEntitySessOptSupportLen;
-		StorageTmp->tcapApplicationEntitySessOptSupport = string;
-		StorageTmp->tcapApplicationEntitySessOptSupportLen = var_val_len;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->tcapApplicationEntityTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->tcapApplicationEntityTable_sets == 0)
+				if ((ret = update_tcapApplicationEntityTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->tcapApplicationEntityTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
-		SNMP_FREE(old_value);
-		old_length = 0;
-		string = NULL;
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->tcapApplicationEntityTable_old) != NULL) {
+			tcapApplicationEntityTable_destroy(&StorageTmp->tcapApplicationEntityTable_old);
+			StorageTmp->tcapApplicationEntityTable_rsvs = 0;
+			StorageTmp->tcapApplicationEntityTable_tsts = 0;
+			StorageTmp->tcapApplicationEntityTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->tcapApplicationEntitySessOptSupport = old_value;
-		StorageTmp->tcapApplicationEntitySessOptSupportLen = old_length;
+		if ((StorageOld = StorageTmp->tcapApplicationEntityTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->tcapApplicationEntityTable_sets == 0)
+			revert_tcapApplicationEntityTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
-		SNMP_FREE(string);
+		if ((StorageOld = StorageTmp->tcapApplicationEntityTable_old) == NULL)
+			break;
+		if (StorageOld->tcapApplicationEntitySessOptSupport != NULL) {
+			SNMP_FREE(StorageTmp->tcapApplicationEntitySessOptSupport);
+			StorageTmp->tcapApplicationEntitySessOptSupport = StorageOld->tcapApplicationEntitySessOptSupport;
+			StorageTmp->tcapApplicationEntitySessOptSupportLen = StorageOld->tcapApplicationEntitySessOptSupportLen;
+			StorageOld->tcapApplicationEntitySessOptSupport = NULL;
+			StorageOld->tcapApplicationEntitySessOptSupportLen = 0;
+		}
+		if (--StorageTmp->tcapApplicationEntityTable_rsvs == 0)
+			tcapApplicationEntityTable_destroy(&StorageTmp->tcapApplicationEntityTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -5598,17 +7512,17 @@ write_tcapApplicationEntitySessOptSupport(int action, u_char *var_val, u_char va
 int
 write_tcapApplicationEntitySessionSelectorValue(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static uint8_t *old_value;
-	struct tcapApplicationEntityTable_data *StorageTmp = NULL;
+	struct tcapApplicationEntityTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 15;
-	static size_t old_length = 0;
-	static uint8_t *string = NULL;
+	uint8_t *string = NULL;
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("tcapMIB", "write_tcapApplicationEntitySessionSelectorValue entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(tcapApplicationEntityTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
-		string = NULL;
 		if (StorageTmp != NULL && statP == NULL) {
 			/* have row but no column */
 			switch (StorageTmp->tcapApplicationEntityRowStatus) {
@@ -5631,33 +7545,73 @@ write_tcapApplicationEntitySessionSelectorValue(int action, u_char *var_val, u_c
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to tcapApplicationEntitySessionSelectorValue: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
-		break;
-	case RESERVE2:		/* memory reseveration, final preparation... */
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->tcapApplicationEntityTable_old) == NULL)
+			if (StorageTmp->tcapApplicationEntityTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->tcapApplicationEntityTable_old = tcapApplicationEntityTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->tcapApplicationEntityTable_rsvs++;
 		if ((string = malloc(var_val_len + 1)) == NULL)
 			return SNMP_ERR_RESOURCEUNAVAILABLE;
 		memcpy((void *) string, (void *) var_val, var_val_len);
 		string[var_val_len] = 0;
+		SNMP_FREE(StorageTmp->tcapApplicationEntitySessionSelectorValue);
+		StorageTmp->tcapApplicationEntitySessionSelectorValue = string;
+		StorageTmp->tcapApplicationEntitySessionSelectorValueLen = var_val_len;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
+		break;
+	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->tcapApplicationEntityTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->tcapApplicationEntityTable_tsts == 0)
+				if ((ret = check_tcapApplicationEntityTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->tcapApplicationEntityTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->tcapApplicationEntitySessionSelectorValue for you to use, and you have just been asked to do something with it.  Note
 				   that anything done here must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->tcapApplicationEntitySessionSelectorValue;
-		old_length = StorageTmp->tcapApplicationEntitySessionSelectorValueLen;
-		StorageTmp->tcapApplicationEntitySessionSelectorValue = string;
-		StorageTmp->tcapApplicationEntitySessionSelectorValueLen = var_val_len;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->tcapApplicationEntityTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->tcapApplicationEntityTable_sets == 0)
+				if ((ret = update_tcapApplicationEntityTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->tcapApplicationEntityTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
-		SNMP_FREE(old_value);
-		old_length = 0;
-		string = NULL;
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->tcapApplicationEntityTable_old) != NULL) {
+			tcapApplicationEntityTable_destroy(&StorageTmp->tcapApplicationEntityTable_old);
+			StorageTmp->tcapApplicationEntityTable_rsvs = 0;
+			StorageTmp->tcapApplicationEntityTable_tsts = 0;
+			StorageTmp->tcapApplicationEntityTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->tcapApplicationEntitySessionSelectorValue = old_value;
-		StorageTmp->tcapApplicationEntitySessionSelectorValueLen = old_length;
+		if ((StorageOld = StorageTmp->tcapApplicationEntityTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->tcapApplicationEntityTable_sets == 0)
+			revert_tcapApplicationEntityTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
-		SNMP_FREE(string);
+		if ((StorageOld = StorageTmp->tcapApplicationEntityTable_old) == NULL)
+			break;
+		if (StorageOld->tcapApplicationEntitySessionSelectorValue != NULL) {
+			SNMP_FREE(StorageTmp->tcapApplicationEntitySessionSelectorValue);
+			StorageTmp->tcapApplicationEntitySessionSelectorValue = StorageOld->tcapApplicationEntitySessionSelectorValue;
+			StorageTmp->tcapApplicationEntitySessionSelectorValueLen = StorageOld->tcapApplicationEntitySessionSelectorValueLen;
+			StorageOld->tcapApplicationEntitySessionSelectorValue = NULL;
+			StorageOld->tcapApplicationEntitySessionSelectorValueLen = 0;
+		}
+		if (--StorageTmp->tcapApplicationEntityTable_rsvs == 0)
+			tcapApplicationEntityTable_destroy(&StorageTmp->tcapApplicationEntityTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -5677,17 +7631,17 @@ write_tcapApplicationEntitySessionSelectorValue(int action, u_char *var_val, u_c
 int
 write_tcapLocalSapNamePointer(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static oid *old_value;
-	struct tcapLocalSapNameTable_data *StorageTmp = NULL;
+	struct tcapLocalSapNameTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 15;
-	static size_t old_length = 0;
-	static oid *objid = NULL;
+	oid *objid = NULL;
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("tcapMIB", "write_tcapLocalSapNamePointer entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(tcapLocalSapNameTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
-		objid = NULL;
 		if (StorageTmp != NULL && statP == NULL) {
 			/* have row but no column */
 			switch (StorageTmp->tcapLocalSapNameRowStatus) {
@@ -5709,31 +7663,71 @@ write_tcapLocalSapNamePointer(int action, u_char *var_val, u_char var_val_type, 
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to tcapLocalSapNamePointer: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
-		break;
-	case RESERVE2:		/* memory reseveration, final preparation... */
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->tcapLocalSapNameTable_old) == NULL)
+			if (StorageTmp->tcapLocalSapNameTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->tcapLocalSapNameTable_old = tcapLocalSapNameTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->tcapLocalSapNameTable_rsvs++;
 		if ((objid = snmp_duplicate_objid((void *) var_val, var_val_len / sizeof(oid))) == NULL)
 			return SNMP_ERR_RESOURCEUNAVAILABLE;
+		SNMP_FREE(StorageTmp->tcapLocalSapNamePointer);
+		StorageTmp->tcapLocalSapNamePointer = objid;
+		StorageTmp->tcapLocalSapNamePointerLen = var_val_len / sizeof(oid);
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
+		break;
+	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->tcapLocalSapNameTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->tcapLocalSapNameTable_tsts == 0)
+				if ((ret = check_tcapLocalSapNameTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->tcapLocalSapNameTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->tcapLocalSapNamePointer for you to use, and you have just been asked to do something with it.  Note that anything done
 				   here must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->tcapLocalSapNamePointer;
-		old_length = StorageTmp->tcapLocalSapNamePointerLen;
-		StorageTmp->tcapLocalSapNamePointer = objid;
-		StorageTmp->tcapLocalSapNamePointerLen = var_val_len / sizeof(oid);
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->tcapLocalSapNameTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->tcapLocalSapNameTable_sets == 0)
+				if ((ret = update_tcapLocalSapNameTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->tcapLocalSapNameTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
-		SNMP_FREE(old_value);
-		old_length = 0;
-		objid = NULL;
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->tcapLocalSapNameTable_old) != NULL) {
+			tcapLocalSapNameTable_destroy(&StorageTmp->tcapLocalSapNameTable_old);
+			StorageTmp->tcapLocalSapNameTable_rsvs = 0;
+			StorageTmp->tcapLocalSapNameTable_tsts = 0;
+			StorageTmp->tcapLocalSapNameTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->tcapLocalSapNamePointer = old_value;
-		StorageTmp->tcapLocalSapNamePointerLen = old_length;
+		if ((StorageOld = StorageTmp->tcapLocalSapNameTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->tcapLocalSapNameTable_sets == 0)
+			revert_tcapLocalSapNameTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
-		SNMP_FREE(objid);
+		if ((StorageOld = StorageTmp->tcapLocalSapNameTable_old) == NULL)
+			break;
+		if (StorageOld->tcapLocalSapNamePointer != NULL) {
+			SNMP_FREE(StorageTmp->tcapLocalSapNamePointer);
+			StorageTmp->tcapLocalSapNamePointer = StorageOld->tcapLocalSapNamePointer;
+			StorageTmp->tcapLocalSapNamePointerLen = StorageOld->tcapLocalSapNamePointerLen;
+			StorageOld->tcapLocalSapNamePointer = NULL;
+			StorageOld->tcapLocalSapNamePointerLen = 0;
+		}
+		if (--StorageTmp->tcapLocalSapNameTable_rsvs == 0)
+			tcapLocalSapNameTable_destroy(&StorageTmp->tcapLocalSapNameTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -5753,17 +7747,17 @@ write_tcapLocalSapNamePointer(int action, u_char *var_val, u_char var_val_type, 
 int
 write_tcapApplicationContextName(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static oid *old_value;
-	struct tcapApplicationContextNameTable_data *StorageTmp = NULL;
+	struct tcapApplicationContextNameTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 15;
-	static size_t old_length = 0;
-	static oid *objid = NULL;
+	oid *objid = NULL;
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("tcapMIB", "write_tcapApplicationContextName entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(tcapApplicationContextNameTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
-		objid = NULL;
 		if (StorageTmp != NULL && statP == NULL) {
 			/* have row but no column */
 			switch (StorageTmp->tcapApplicationContextRowStatus) {
@@ -5786,31 +7780,71 @@ write_tcapApplicationContextName(int action, u_char *var_val, u_char var_val_typ
 			return SNMP_ERR_WRONGLENGTH;
 		}
 		/* Note: default value zeroDotZero */
-		break;
-	case RESERVE2:		/* memory reseveration, final preparation... */
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->tcapApplicationContextNameTable_old) == NULL)
+			if (StorageTmp->tcapApplicationContextNameTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->tcapApplicationContextNameTable_old = tcapApplicationContextNameTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->tcapApplicationContextNameTable_rsvs++;
 		if ((objid = snmp_duplicate_objid((void *) var_val, var_val_len / sizeof(oid))) == NULL)
 			return SNMP_ERR_RESOURCEUNAVAILABLE;
+		SNMP_FREE(StorageTmp->tcapApplicationContextName);
+		StorageTmp->tcapApplicationContextName = objid;
+		StorageTmp->tcapApplicationContextNameLen = var_val_len / sizeof(oid);
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
+		break;
+	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->tcapApplicationContextNameTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->tcapApplicationContextNameTable_tsts == 0)
+				if ((ret = check_tcapApplicationContextNameTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->tcapApplicationContextNameTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->tcapApplicationContextName for you to use, and you have just been asked to do something with it.  Note that anything
 				   done here must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->tcapApplicationContextName;
-		old_length = StorageTmp->tcapApplicationContextNameLen;
-		StorageTmp->tcapApplicationContextName = objid;
-		StorageTmp->tcapApplicationContextNameLen = var_val_len / sizeof(oid);
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->tcapApplicationContextNameTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->tcapApplicationContextNameTable_sets == 0)
+				if ((ret = update_tcapApplicationContextNameTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->tcapApplicationContextNameTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
-		SNMP_FREE(old_value);
-		old_length = 0;
-		objid = NULL;
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->tcapApplicationContextNameTable_old) != NULL) {
+			tcapApplicationContextNameTable_destroy(&StorageTmp->tcapApplicationContextNameTable_old);
+			StorageTmp->tcapApplicationContextNameTable_rsvs = 0;
+			StorageTmp->tcapApplicationContextNameTable_tsts = 0;
+			StorageTmp->tcapApplicationContextNameTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->tcapApplicationContextName = old_value;
-		StorageTmp->tcapApplicationContextNameLen = old_length;
+		if ((StorageOld = StorageTmp->tcapApplicationContextNameTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->tcapApplicationContextNameTable_sets == 0)
+			revert_tcapApplicationContextNameTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
-		SNMP_FREE(objid);
+		if ((StorageOld = StorageTmp->tcapApplicationContextNameTable_old) == NULL)
+			break;
+		if (StorageOld->tcapApplicationContextName != NULL) {
+			SNMP_FREE(StorageTmp->tcapApplicationContextName);
+			StorageTmp->tcapApplicationContextName = StorageOld->tcapApplicationContextName;
+			StorageTmp->tcapApplicationContextNameLen = StorageOld->tcapApplicationContextNameLen;
+			StorageOld->tcapApplicationContextName = NULL;
+			StorageOld->tcapApplicationContextNameLen = 0;
+		}
+		if (--StorageTmp->tcapApplicationContextNameTable_rsvs == 0)
+			tcapApplicationContextNameTable_destroy(&StorageTmp->tcapApplicationContextNameTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -5830,12 +7864,14 @@ write_tcapApplicationContextName(int action, u_char *var_val, u_char var_val_typ
 int
 write_tcapApplicationContextNumber(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static long old_value;
-	struct tcapApplicationContextNameTable_data *StorageTmp = NULL;
+	struct tcapApplicationContextNameTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 15;
 	long set_value = *((long *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("tcapMIB", "write_tcapApplicationContextNumber entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(tcapApplicationContextNameTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -5860,22 +7896,61 @@ write_tcapApplicationContextNumber(int action, u_char *var_val, u_char var_val_t
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to tcapApplicationContextNumber: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->tcapApplicationContextNameTable_old) == NULL)
+			if (StorageTmp->tcapApplicationContextNameTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->tcapApplicationContextNameTable_old = tcapApplicationContextNameTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->tcapApplicationContextNameTable_rsvs++;
+		StorageTmp->tcapApplicationContextNumber = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->tcapApplicationContextNameTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->tcapApplicationContextNameTable_tsts == 0)
+				if ((ret = check_tcapApplicationContextNameTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->tcapApplicationContextNameTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->tcapApplicationContextNumber for you to use, and you have just been asked to do something with it.  Note that anything
 				   done here must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->tcapApplicationContextNumber;
-		StorageTmp->tcapApplicationContextNumber = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->tcapApplicationContextNameTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->tcapApplicationContextNameTable_sets == 0)
+				if ((ret = update_tcapApplicationContextNameTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->tcapApplicationContextNameTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->tcapApplicationContextNameTable_old) != NULL) {
+			tcapApplicationContextNameTable_destroy(&StorageTmp->tcapApplicationContextNameTable_old);
+			StorageTmp->tcapApplicationContextNameTable_rsvs = 0;
+			StorageTmp->tcapApplicationContextNameTable_tsts = 0;
+			StorageTmp->tcapApplicationContextNameTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->tcapApplicationContextNumber = old_value;
+		if ((StorageOld = StorageTmp->tcapApplicationContextNameTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->tcapApplicationContextNameTable_sets == 0)
+			revert_tcapApplicationContextNameTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->tcapApplicationContextNameTable_old) == NULL)
+			break;
+		StorageTmp->tcapApplicationContextNumber = StorageOld->tcapApplicationContextNumber;
+		if (--StorageTmp->tcapApplicationContextNameTable_rsvs == 0)
+			tcapApplicationContextNameTable_destroy(&StorageTmp->tcapApplicationContextNameTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -5895,17 +7970,17 @@ write_tcapApplicationContextNumber(int action, u_char *var_val, u_char var_val_t
 int
 write_tcapAbstractSyntaxName(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static oid *old_value;
-	struct tcapAbstractSyntaxTable_data *StorageTmp = NULL;
+	struct tcapAbstractSyntaxTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 15;
-	static size_t old_length = 0;
-	static oid *objid = NULL;
+	oid *objid = NULL;
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("tcapMIB", "write_tcapAbstractSyntaxName entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(tcapAbstractSyntaxTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
-		objid = NULL;
 		if (StorageTmp != NULL && statP == NULL) {
 			/* have row but no column */
 			switch (StorageTmp->tcapAbstractSyntaxRowStatus) {
@@ -5928,31 +8003,71 @@ write_tcapAbstractSyntaxName(int action, u_char *var_val, u_char var_val_type, s
 			return SNMP_ERR_WRONGLENGTH;
 		}
 		/* Note: default value tcapQ773DialogueAsId */
-		break;
-	case RESERVE2:		/* memory reseveration, final preparation... */
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->tcapAbstractSyntaxTable_old) == NULL)
+			if (StorageTmp->tcapAbstractSyntaxTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->tcapAbstractSyntaxTable_old = tcapAbstractSyntaxTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->tcapAbstractSyntaxTable_rsvs++;
 		if ((objid = snmp_duplicate_objid((void *) var_val, var_val_len / sizeof(oid))) == NULL)
 			return SNMP_ERR_RESOURCEUNAVAILABLE;
+		SNMP_FREE(StorageTmp->tcapAbstractSyntaxName);
+		StorageTmp->tcapAbstractSyntaxName = objid;
+		StorageTmp->tcapAbstractSyntaxNameLen = var_val_len / sizeof(oid);
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
+		break;
+	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->tcapAbstractSyntaxTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->tcapAbstractSyntaxTable_tsts == 0)
+				if ((ret = check_tcapAbstractSyntaxTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->tcapAbstractSyntaxTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->tcapAbstractSyntaxName for you to use, and you have just been asked to do something with it.  Note that anything done
 				   here must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->tcapAbstractSyntaxName;
-		old_length = StorageTmp->tcapAbstractSyntaxNameLen;
-		StorageTmp->tcapAbstractSyntaxName = objid;
-		StorageTmp->tcapAbstractSyntaxNameLen = var_val_len / sizeof(oid);
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->tcapAbstractSyntaxTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->tcapAbstractSyntaxTable_sets == 0)
+				if ((ret = update_tcapAbstractSyntaxTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->tcapAbstractSyntaxTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
-		SNMP_FREE(old_value);
-		old_length = 0;
-		objid = NULL;
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->tcapAbstractSyntaxTable_old) != NULL) {
+			tcapAbstractSyntaxTable_destroy(&StorageTmp->tcapAbstractSyntaxTable_old);
+			StorageTmp->tcapAbstractSyntaxTable_rsvs = 0;
+			StorageTmp->tcapAbstractSyntaxTable_tsts = 0;
+			StorageTmp->tcapAbstractSyntaxTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->tcapAbstractSyntaxName = old_value;
-		StorageTmp->tcapAbstractSyntaxNameLen = old_length;
+		if ((StorageOld = StorageTmp->tcapAbstractSyntaxTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->tcapAbstractSyntaxTable_sets == 0)
+			revert_tcapAbstractSyntaxTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
-		SNMP_FREE(objid);
+		if ((StorageOld = StorageTmp->tcapAbstractSyntaxTable_old) == NULL)
+			break;
+		if (StorageOld->tcapAbstractSyntaxName != NULL) {
+			SNMP_FREE(StorageTmp->tcapAbstractSyntaxName);
+			StorageTmp->tcapAbstractSyntaxName = StorageOld->tcapAbstractSyntaxName;
+			StorageTmp->tcapAbstractSyntaxNameLen = StorageOld->tcapAbstractSyntaxNameLen;
+			StorageOld->tcapAbstractSyntaxName = NULL;
+			StorageOld->tcapAbstractSyntaxNameLen = 0;
+		}
+		if (--StorageTmp->tcapAbstractSyntaxTable_rsvs == 0)
+			tcapAbstractSyntaxTable_destroy(&StorageTmp->tcapAbstractSyntaxTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -5972,17 +8087,17 @@ write_tcapAbstractSyntaxName(int action, u_char *var_val, u_char var_val_type, s
 int
 write_tcapTransferSyntaxName(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static oid *old_value;
-	struct tcapTransferSyntaxTable_data *StorageTmp = NULL;
+	struct tcapTransferSyntaxTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 15;
-	static size_t old_length = 0;
-	static oid *objid = NULL;
+	oid *objid = NULL;
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("tcapMIB", "write_tcapTransferSyntaxName entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(tcapTransferSyntaxTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
-		objid = NULL;
 		if (StorageTmp != NULL && statP == NULL) {
 			/* have row but no column */
 			switch (StorageTmp->tcapTransferSyntaxRowStatus) {
@@ -6005,250 +8120,380 @@ write_tcapTransferSyntaxName(int action, u_char *var_val, u_char var_val_type, s
 			return SNMP_ERR_WRONGLENGTH;
 		}
 		/* Note: default value tcapAsn1BerTsId */
-		break;
-	case RESERVE2:		/* memory reseveration, final preparation... */
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->tcapTransferSyntaxTable_old) == NULL)
+			if (StorageTmp->tcapTransferSyntaxTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->tcapTransferSyntaxTable_old = tcapTransferSyntaxTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->tcapTransferSyntaxTable_rsvs++;
 		if ((objid = snmp_duplicate_objid((void *) var_val, var_val_len / sizeof(oid))) == NULL)
 			return SNMP_ERR_RESOURCEUNAVAILABLE;
+		SNMP_FREE(StorageTmp->tcapTransferSyntaxName);
+		StorageTmp->tcapTransferSyntaxName = objid;
+		StorageTmp->tcapTransferSyntaxNameLen = var_val_len / sizeof(oid);
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
+		break;
+	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->tcapTransferSyntaxTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->tcapTransferSyntaxTable_tsts == 0)
+				if ((ret = check_tcapTransferSyntaxTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->tcapTransferSyntaxTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->tcapTransferSyntaxName for you to use, and you have just been asked to do something with it.  Note that anything done
 				   here must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->tcapTransferSyntaxName;
-		old_length = StorageTmp->tcapTransferSyntaxNameLen;
-		StorageTmp->tcapTransferSyntaxName = objid;
-		StorageTmp->tcapTransferSyntaxNameLen = var_val_len / sizeof(oid);
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->tcapTransferSyntaxTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->tcapTransferSyntaxTable_sets == 0)
+				if ((ret = update_tcapTransferSyntaxTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->tcapTransferSyntaxTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
-		SNMP_FREE(old_value);
-		old_length = 0;
-		objid = NULL;
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->tcapTransferSyntaxTable_old) != NULL) {
+			tcapTransferSyntaxTable_destroy(&StorageTmp->tcapTransferSyntaxTable_old);
+			StorageTmp->tcapTransferSyntaxTable_rsvs = 0;
+			StorageTmp->tcapTransferSyntaxTable_tsts = 0;
+			StorageTmp->tcapTransferSyntaxTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->tcapTransferSyntaxName = old_value;
-		StorageTmp->tcapTransferSyntaxNameLen = old_length;
+		if ((StorageOld = StorageTmp->tcapTransferSyntaxTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->tcapTransferSyntaxTable_sets == 0)
+			revert_tcapTransferSyntaxTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
-		SNMP_FREE(objid);
+		if ((StorageOld = StorageTmp->tcapTransferSyntaxTable_old) == NULL)
+			break;
+		if (StorageOld->tcapTransferSyntaxName != NULL) {
+			SNMP_FREE(StorageTmp->tcapTransferSyntaxName);
+			StorageTmp->tcapTransferSyntaxName = StorageOld->tcapTransferSyntaxName;
+			StorageTmp->tcapTransferSyntaxNameLen = StorageOld->tcapTransferSyntaxNameLen;
+			StorageOld->tcapTransferSyntaxName = NULL;
+			StorageOld->tcapTransferSyntaxNameLen = 0;
+		}
+		if (--StorageTmp->tcapTransferSyntaxTable_rsvs == 0)
+			tcapTransferSyntaxTable_destroy(&StorageTmp->tcapTransferSyntaxTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
 }
 
 /**
- * @fn int tcapApplicationSubsystemTable_consistent(struct tcapApplicationSubsystemTable_data *thedata)
- * @param thedata the row data to check for consistency.
- * @brief check the internal consistency of a table row.
+ * @fn int can_act_tcapApplicationSubsystemTable_row(struct tcapApplicationSubsystemTable_data *StorageTmp)
+ * @param StorageTmp the data (as updated)
+ * @brief check whether an inactive table row can be activated
  *
- * This function checks the internal consistency of a table row for the tcapApplicationSubsystemTable table.  If the
- * table row is internally consistent, then this function returns SNMP_ERR_NOERROR, otherwise the
- * function returns an SNMP error code and it will not be possible to activate the row until the
- * row's internal consistency is corrected.  This function might use a 'test' operation against the
- * driver to ensure that the commit phase will succeed.
+ * This function is used by the ACTION phase of a RowStatus object to test whether an inactive table
+ * row can be activated.  Returns SNMP_ERR_NOERROR when activation is permitted; an SNMP error
+ * value, otherwise.  This function might use a 'test' operation against the driver to ensure that
+ * the commit phase will succeed.
  */
 int
-tcapApplicationSubsystemTable_consistent(struct tcapApplicationSubsystemTable_data *thedata)
+can_act_tcapApplicationSubsystemTable_row(struct tcapApplicationSubsystemTable_data *StorageTmp)
 {
-	/* XXX: check row consistency return SNMP_ERR_NOERROR if consistent, or an SNMP error code if not. */
-	return (SNMP_ERR_NOERROR);
+	/* XXX: provide code to check whether the new or inactive table row can be activated */
+	return SNMP_ERR_NOERROR;
 }
 
 /**
- * @fn int tcapTransactionCopmTable_consistent(struct tcapTransactionCopmTable_data *thedata)
- * @param thedata the row data to check for consistency.
- * @brief check the internal consistency of a table row.
+ * @fn int can_deact_tcapApplicationSubsystemTable_row(struct tcapApplicationSubsystemTable_data *StorageTmp)
+ * @param StorageTmp the data (as updated)
+ * @brief check whether an active table row can be deactivated
  *
- * This function checks the internal consistency of a table row for the tcapTransactionCopmTable table.  If the
- * table row is internally consistent, then this function returns SNMP_ERR_NOERROR, otherwise the
- * function returns an SNMP error code and it will not be possible to activate the row until the
- * row's internal consistency is corrected.  This function might use a 'test' operation against the
- * driver to ensure that the commit phase will succeed.
+ * This function is used by the ACTION phase of a RowStatus object to test whether an active table
+ * row can be deactivated.  Returns SNMP_ERR_NOERROR when deactivation is permitted; an SNMP error
+ * value, otherwise.  This function might use a 'test' operation against the driver to ensure that
+ * the commit phase will succeed.
  */
 int
-tcapTransactionCopmTable_consistent(struct tcapTransactionCopmTable_data *thedata)
+can_deact_tcapApplicationSubsystemTable_row(struct tcapApplicationSubsystemTable_data *StorageTmp)
 {
-	/* XXX: check row consistency return SNMP_ERR_NOERROR if consistent, or an SNMP error code if not. */
-	return (SNMP_ERR_NOERROR);
+	/* XXX: provide code to check whether the active table row can be deactivated */
+	return SNMP_ERR_NOERROR;
 }
 
 /**
- * @fn int tcapTransactionTable_consistent(struct tcapTransactionTable_data *thedata)
- * @param thedata the row data to check for consistency.
- * @brief check the internal consistency of a table row.
+ * @fn int can_act_tcapTransactionCopmTable_row(struct tcapTransactionCopmTable_data *StorageTmp)
+ * @param StorageTmp the data (as updated)
+ * @brief check whether an inactive table row can be activated
  *
- * This function checks the internal consistency of a table row for the tcapTransactionTable table.  If the
- * table row is internally consistent, then this function returns SNMP_ERR_NOERROR, otherwise the
- * function returns an SNMP error code and it will not be possible to activate the row until the
- * row's internal consistency is corrected.  This function might use a 'test' operation against the
- * driver to ensure that the commit phase will succeed.
+ * This function is used by the ACTION phase of a RowStatus object to test whether an inactive table
+ * row can be activated.  Returns SNMP_ERR_NOERROR when activation is permitted; an SNMP error
+ * value, otherwise.  This function might use a 'test' operation against the driver to ensure that
+ * the commit phase will succeed.
  */
 int
-tcapTransactionTable_consistent(struct tcapTransactionTable_data *thedata)
+can_act_tcapTransactionCopmTable_row(struct tcapTransactionCopmTable_data *StorageTmp)
 {
-	/* XXX: check row consistency return SNMP_ERR_NOERROR if consistent, or an SNMP error code if not. */
-	return (SNMP_ERR_NOERROR);
+	/* XXX: provide code to check whether the new or inactive table row can be activated */
+	return SNMP_ERR_NOERROR;
 }
 
 /**
- * @fn int tcapDialogueTable_consistent(struct tcapDialogueTable_data *thedata)
- * @param thedata the row data to check for consistency.
- * @brief check the internal consistency of a table row.
+ * @fn int can_deact_tcapTransactionCopmTable_row(struct tcapTransactionCopmTable_data *StorageTmp)
+ * @param StorageTmp the data (as updated)
+ * @brief check whether an active table row can be deactivated
  *
- * This function checks the internal consistency of a table row for the tcapDialogueTable table.  If the
- * table row is internally consistent, then this function returns SNMP_ERR_NOERROR, otherwise the
- * function returns an SNMP error code and it will not be possible to activate the row until the
- * row's internal consistency is corrected.  This function might use a 'test' operation against the
- * driver to ensure that the commit phase will succeed.
+ * This function is used by the ACTION phase of a RowStatus object to test whether an active table
+ * row can be deactivated.  Returns SNMP_ERR_NOERROR when deactivation is permitted; an SNMP error
+ * value, otherwise.  This function might use a 'test' operation against the driver to ensure that
+ * the commit phase will succeed.
  */
 int
-tcapDialogueTable_consistent(struct tcapDialogueTable_data *thedata)
+can_deact_tcapTransactionCopmTable_row(struct tcapTransactionCopmTable_data *StorageTmp)
 {
-	/* XXX: check row consistency return SNMP_ERR_NOERROR if consistent, or an SNMP error code if not. */
-	return (SNMP_ERR_NOERROR);
+	/* XXX: provide code to check whether the active table row can be deactivated */
+	return SNMP_ERR_NOERROR;
 }
 
 /**
- * @fn int tcapTcUserTable_consistent(struct tcapTcUserTable_data *thedata)
- * @param thedata the row data to check for consistency.
- * @brief check the internal consistency of a table row.
+ * @fn int can_act_tcapApplicationProcessTable_row(struct tcapApplicationProcessTable_data *StorageTmp)
+ * @param StorageTmp the data (as updated)
+ * @brief check whether an inactive table row can be activated
  *
- * This function checks the internal consistency of a table row for the tcapTcUserTable table.  If the
- * table row is internally consistent, then this function returns SNMP_ERR_NOERROR, otherwise the
- * function returns an SNMP error code and it will not be possible to activate the row until the
- * row's internal consistency is corrected.  This function might use a 'test' operation against the
- * driver to ensure that the commit phase will succeed.
+ * This function is used by the ACTION phase of a RowStatus object to test whether an inactive table
+ * row can be activated.  Returns SNMP_ERR_NOERROR when activation is permitted; an SNMP error
+ * value, otherwise.  This function might use a 'test' operation against the driver to ensure that
+ * the commit phase will succeed.
  */
 int
-tcapTcUserTable_consistent(struct tcapTcUserTable_data *thedata)
+can_act_tcapApplicationProcessTable_row(struct tcapApplicationProcessTable_data *StorageTmp)
 {
-	/* XXX: check row consistency return SNMP_ERR_NOERROR if consistent, or an SNMP error code if not. */
-	return (SNMP_ERR_NOERROR);
+	/* XXX: provide code to check whether the new or inactive table row can be activated */
+	return SNMP_ERR_NOERROR;
 }
 
 /**
- * @fn int tcapApplicationProcessTable_consistent(struct tcapApplicationProcessTable_data *thedata)
- * @param thedata the row data to check for consistency.
- * @brief check the internal consistency of a table row.
+ * @fn int can_deact_tcapApplicationProcessTable_row(struct tcapApplicationProcessTable_data *StorageTmp)
+ * @param StorageTmp the data (as updated)
+ * @brief check whether an active table row can be deactivated
  *
- * This function checks the internal consistency of a table row for the tcapApplicationProcessTable table.  If the
- * table row is internally consistent, then this function returns SNMP_ERR_NOERROR, otherwise the
- * function returns an SNMP error code and it will not be possible to activate the row until the
- * row's internal consistency is corrected.  This function might use a 'test' operation against the
- * driver to ensure that the commit phase will succeed.
+ * This function is used by the ACTION phase of a RowStatus object to test whether an active table
+ * row can be deactivated.  Returns SNMP_ERR_NOERROR when deactivation is permitted; an SNMP error
+ * value, otherwise.  This function might use a 'test' operation against the driver to ensure that
+ * the commit phase will succeed.
  */
 int
-tcapApplicationProcessTable_consistent(struct tcapApplicationProcessTable_data *thedata)
+can_deact_tcapApplicationProcessTable_row(struct tcapApplicationProcessTable_data *StorageTmp)
 {
-	/* XXX: check row consistency return SNMP_ERR_NOERROR if consistent, or an SNMP error code if not. */
-	return (SNMP_ERR_NOERROR);
+	/* XXX: provide code to check whether the active table row can be deactivated */
+	return SNMP_ERR_NOERROR;
 }
 
 /**
- * @fn int tcapSupportEntityNameTable_consistent(struct tcapSupportEntityNameTable_data *thedata)
- * @param thedata the row data to check for consistency.
- * @brief check the internal consistency of a table row.
+ * @fn int can_act_tcapSupportEntityNameTable_row(struct tcapSupportEntityNameTable_data *StorageTmp)
+ * @param StorageTmp the data (as updated)
+ * @brief check whether an inactive table row can be activated
  *
- * This function checks the internal consistency of a table row for the tcapSupportEntityNameTable table.  If the
- * table row is internally consistent, then this function returns SNMP_ERR_NOERROR, otherwise the
- * function returns an SNMP error code and it will not be possible to activate the row until the
- * row's internal consistency is corrected.  This function might use a 'test' operation against the
- * driver to ensure that the commit phase will succeed.
+ * This function is used by the ACTION phase of a RowStatus object to test whether an inactive table
+ * row can be activated.  Returns SNMP_ERR_NOERROR when activation is permitted; an SNMP error
+ * value, otherwise.  This function might use a 'test' operation against the driver to ensure that
+ * the commit phase will succeed.
  */
 int
-tcapSupportEntityNameTable_consistent(struct tcapSupportEntityNameTable_data *thedata)
+can_act_tcapSupportEntityNameTable_row(struct tcapSupportEntityNameTable_data *StorageTmp)
 {
-	/* XXX: check row consistency return SNMP_ERR_NOERROR if consistent, or an SNMP error code if not. */
-	return (SNMP_ERR_NOERROR);
+	/* XXX: provide code to check whether the new or inactive table row can be activated */
+	return SNMP_ERR_NOERROR;
 }
 
 /**
- * @fn int tcapApplicationEntityTable_consistent(struct tcapApplicationEntityTable_data *thedata)
- * @param thedata the row data to check for consistency.
- * @brief check the internal consistency of a table row.
+ * @fn int can_deact_tcapSupportEntityNameTable_row(struct tcapSupportEntityNameTable_data *StorageTmp)
+ * @param StorageTmp the data (as updated)
+ * @brief check whether an active table row can be deactivated
  *
- * This function checks the internal consistency of a table row for the tcapApplicationEntityTable table.  If the
- * table row is internally consistent, then this function returns SNMP_ERR_NOERROR, otherwise the
- * function returns an SNMP error code and it will not be possible to activate the row until the
- * row's internal consistency is corrected.  This function might use a 'test' operation against the
- * driver to ensure that the commit phase will succeed.
+ * This function is used by the ACTION phase of a RowStatus object to test whether an active table
+ * row can be deactivated.  Returns SNMP_ERR_NOERROR when deactivation is permitted; an SNMP error
+ * value, otherwise.  This function might use a 'test' operation against the driver to ensure that
+ * the commit phase will succeed.
  */
 int
-tcapApplicationEntityTable_consistent(struct tcapApplicationEntityTable_data *thedata)
+can_deact_tcapSupportEntityNameTable_row(struct tcapSupportEntityNameTable_data *StorageTmp)
 {
-	/* XXX: check row consistency return SNMP_ERR_NOERROR if consistent, or an SNMP error code if not. */
-	return (SNMP_ERR_NOERROR);
+	/* XXX: provide code to check whether the active table row can be deactivated */
+	return SNMP_ERR_NOERROR;
 }
 
 /**
- * @fn int tcapLocalSapNameTable_consistent(struct tcapLocalSapNameTable_data *thedata)
- * @param thedata the row data to check for consistency.
- * @brief check the internal consistency of a table row.
+ * @fn int can_act_tcapApplicationEntityTable_row(struct tcapApplicationEntityTable_data *StorageTmp)
+ * @param StorageTmp the data (as updated)
+ * @brief check whether an inactive table row can be activated
  *
- * This function checks the internal consistency of a table row for the tcapLocalSapNameTable table.  If the
- * table row is internally consistent, then this function returns SNMP_ERR_NOERROR, otherwise the
- * function returns an SNMP error code and it will not be possible to activate the row until the
- * row's internal consistency is corrected.  This function might use a 'test' operation against the
- * driver to ensure that the commit phase will succeed.
+ * This function is used by the ACTION phase of a RowStatus object to test whether an inactive table
+ * row can be activated.  Returns SNMP_ERR_NOERROR when activation is permitted; an SNMP error
+ * value, otherwise.  This function might use a 'test' operation against the driver to ensure that
+ * the commit phase will succeed.
  */
 int
-tcapLocalSapNameTable_consistent(struct tcapLocalSapNameTable_data *thedata)
+can_act_tcapApplicationEntityTable_row(struct tcapApplicationEntityTable_data *StorageTmp)
 {
-	/* XXX: check row consistency return SNMP_ERR_NOERROR if consistent, or an SNMP error code if not. */
-	return (SNMP_ERR_NOERROR);
+	/* XXX: provide code to check whether the new or inactive table row can be activated */
+	return SNMP_ERR_NOERROR;
 }
 
 /**
- * @fn int tcapApplicationContextNameTable_consistent(struct tcapApplicationContextNameTable_data *thedata)
- * @param thedata the row data to check for consistency.
- * @brief check the internal consistency of a table row.
+ * @fn int can_deact_tcapApplicationEntityTable_row(struct tcapApplicationEntityTable_data *StorageTmp)
+ * @param StorageTmp the data (as updated)
+ * @brief check whether an active table row can be deactivated
  *
- * This function checks the internal consistency of a table row for the tcapApplicationContextNameTable table.  If the
- * table row is internally consistent, then this function returns SNMP_ERR_NOERROR, otherwise the
- * function returns an SNMP error code and it will not be possible to activate the row until the
- * row's internal consistency is corrected.  This function might use a 'test' operation against the
- * driver to ensure that the commit phase will succeed.
+ * This function is used by the ACTION phase of a RowStatus object to test whether an active table
+ * row can be deactivated.  Returns SNMP_ERR_NOERROR when deactivation is permitted; an SNMP error
+ * value, otherwise.  This function might use a 'test' operation against the driver to ensure that
+ * the commit phase will succeed.
  */
 int
-tcapApplicationContextNameTable_consistent(struct tcapApplicationContextNameTable_data *thedata)
+can_deact_tcapApplicationEntityTable_row(struct tcapApplicationEntityTable_data *StorageTmp)
 {
-	/* XXX: check row consistency return SNMP_ERR_NOERROR if consistent, or an SNMP error code if not. */
-	return (SNMP_ERR_NOERROR);
+	/* XXX: provide code to check whether the active table row can be deactivated */
+	return SNMP_ERR_NOERROR;
 }
 
 /**
- * @fn int tcapAbstractSyntaxTable_consistent(struct tcapAbstractSyntaxTable_data *thedata)
- * @param thedata the row data to check for consistency.
- * @brief check the internal consistency of a table row.
+ * @fn int can_act_tcapLocalSapNameTable_row(struct tcapLocalSapNameTable_data *StorageTmp)
+ * @param StorageTmp the data (as updated)
+ * @brief check whether an inactive table row can be activated
  *
- * This function checks the internal consistency of a table row for the tcapAbstractSyntaxTable table.  If the
- * table row is internally consistent, then this function returns SNMP_ERR_NOERROR, otherwise the
- * function returns an SNMP error code and it will not be possible to activate the row until the
- * row's internal consistency is corrected.  This function might use a 'test' operation against the
- * driver to ensure that the commit phase will succeed.
+ * This function is used by the ACTION phase of a RowStatus object to test whether an inactive table
+ * row can be activated.  Returns SNMP_ERR_NOERROR when activation is permitted; an SNMP error
+ * value, otherwise.  This function might use a 'test' operation against the driver to ensure that
+ * the commit phase will succeed.
  */
 int
-tcapAbstractSyntaxTable_consistent(struct tcapAbstractSyntaxTable_data *thedata)
+can_act_tcapLocalSapNameTable_row(struct tcapLocalSapNameTable_data *StorageTmp)
 {
-	/* XXX: check row consistency return SNMP_ERR_NOERROR if consistent, or an SNMP error code if not. */
-	return (SNMP_ERR_NOERROR);
+	/* XXX: provide code to check whether the new or inactive table row can be activated */
+	return SNMP_ERR_NOERROR;
 }
 
 /**
- * @fn int tcapTransferSyntaxTable_consistent(struct tcapTransferSyntaxTable_data *thedata)
- * @param thedata the row data to check for consistency.
- * @brief check the internal consistency of a table row.
+ * @fn int can_deact_tcapLocalSapNameTable_row(struct tcapLocalSapNameTable_data *StorageTmp)
+ * @param StorageTmp the data (as updated)
+ * @brief check whether an active table row can be deactivated
  *
- * This function checks the internal consistency of a table row for the tcapTransferSyntaxTable table.  If the
- * table row is internally consistent, then this function returns SNMP_ERR_NOERROR, otherwise the
- * function returns an SNMP error code and it will not be possible to activate the row until the
- * row's internal consistency is corrected.  This function might use a 'test' operation against the
- * driver to ensure that the commit phase will succeed.
+ * This function is used by the ACTION phase of a RowStatus object to test whether an active table
+ * row can be deactivated.  Returns SNMP_ERR_NOERROR when deactivation is permitted; an SNMP error
+ * value, otherwise.  This function might use a 'test' operation against the driver to ensure that
+ * the commit phase will succeed.
  */
 int
-tcapTransferSyntaxTable_consistent(struct tcapTransferSyntaxTable_data *thedata)
+can_deact_tcapLocalSapNameTable_row(struct tcapLocalSapNameTable_data *StorageTmp)
 {
-	/* XXX: check row consistency return SNMP_ERR_NOERROR if consistent, or an SNMP error code if not. */
-	return (SNMP_ERR_NOERROR);
+	/* XXX: provide code to check whether the active table row can be deactivated */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int can_act_tcapApplicationContextNameTable_row(struct tcapApplicationContextNameTable_data *StorageTmp)
+ * @param StorageTmp the data (as updated)
+ * @brief check whether an inactive table row can be activated
+ *
+ * This function is used by the ACTION phase of a RowStatus object to test whether an inactive table
+ * row can be activated.  Returns SNMP_ERR_NOERROR when activation is permitted; an SNMP error
+ * value, otherwise.  This function might use a 'test' operation against the driver to ensure that
+ * the commit phase will succeed.
+ */
+int
+can_act_tcapApplicationContextNameTable_row(struct tcapApplicationContextNameTable_data *StorageTmp)
+{
+	/* XXX: provide code to check whether the new or inactive table row can be activated */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int can_deact_tcapApplicationContextNameTable_row(struct tcapApplicationContextNameTable_data *StorageTmp)
+ * @param StorageTmp the data (as updated)
+ * @brief check whether an active table row can be deactivated
+ *
+ * This function is used by the ACTION phase of a RowStatus object to test whether an active table
+ * row can be deactivated.  Returns SNMP_ERR_NOERROR when deactivation is permitted; an SNMP error
+ * value, otherwise.  This function might use a 'test' operation against the driver to ensure that
+ * the commit phase will succeed.
+ */
+int
+can_deact_tcapApplicationContextNameTable_row(struct tcapApplicationContextNameTable_data *StorageTmp)
+{
+	/* XXX: provide code to check whether the active table row can be deactivated */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int can_act_tcapAbstractSyntaxTable_row(struct tcapAbstractSyntaxTable_data *StorageTmp)
+ * @param StorageTmp the data (as updated)
+ * @brief check whether an inactive table row can be activated
+ *
+ * This function is used by the ACTION phase of a RowStatus object to test whether an inactive table
+ * row can be activated.  Returns SNMP_ERR_NOERROR when activation is permitted; an SNMP error
+ * value, otherwise.  This function might use a 'test' operation against the driver to ensure that
+ * the commit phase will succeed.
+ */
+int
+can_act_tcapAbstractSyntaxTable_row(struct tcapAbstractSyntaxTable_data *StorageTmp)
+{
+	/* XXX: provide code to check whether the new or inactive table row can be activated */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int can_deact_tcapAbstractSyntaxTable_row(struct tcapAbstractSyntaxTable_data *StorageTmp)
+ * @param StorageTmp the data (as updated)
+ * @brief check whether an active table row can be deactivated
+ *
+ * This function is used by the ACTION phase of a RowStatus object to test whether an active table
+ * row can be deactivated.  Returns SNMP_ERR_NOERROR when deactivation is permitted; an SNMP error
+ * value, otherwise.  This function might use a 'test' operation against the driver to ensure that
+ * the commit phase will succeed.
+ */
+int
+can_deact_tcapAbstractSyntaxTable_row(struct tcapAbstractSyntaxTable_data *StorageTmp)
+{
+	/* XXX: provide code to check whether the active table row can be deactivated */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int can_act_tcapTransferSyntaxTable_row(struct tcapTransferSyntaxTable_data *StorageTmp)
+ * @param StorageTmp the data (as updated)
+ * @brief check whether an inactive table row can be activated
+ *
+ * This function is used by the ACTION phase of a RowStatus object to test whether an inactive table
+ * row can be activated.  Returns SNMP_ERR_NOERROR when activation is permitted; an SNMP error
+ * value, otherwise.  This function might use a 'test' operation against the driver to ensure that
+ * the commit phase will succeed.
+ */
+int
+can_act_tcapTransferSyntaxTable_row(struct tcapTransferSyntaxTable_data *StorageTmp)
+{
+	/* XXX: provide code to check whether the new or inactive table row can be activated */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int can_deact_tcapTransferSyntaxTable_row(struct tcapTransferSyntaxTable_data *StorageTmp)
+ * @param StorageTmp the data (as updated)
+ * @brief check whether an active table row can be deactivated
+ *
+ * This function is used by the ACTION phase of a RowStatus object to test whether an active table
+ * row can be deactivated.  Returns SNMP_ERR_NOERROR when deactivation is permitted; an SNMP error
+ * value, otherwise.  This function might use a 'test' operation against the driver to ensure that
+ * the commit phase will succeed.
+ */
+int
+can_deact_tcapTransferSyntaxTable_row(struct tcapTransferSyntaxTable_data *StorageTmp)
+{
+	/* XXX: provide code to check whether the active table row can be deactivated */
+	return SNMP_ERR_NOERROR;
 }
 
 /**
@@ -6265,10 +8510,9 @@ tcapTransferSyntaxTable_consistent(struct tcapTransferSyntaxTable_data *thedata)
 int
 write_tcapApplicationSubsystemRowStatus(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	struct tcapApplicationSubsystemTable_data *StorageTmp = NULL;
+	struct tcapApplicationSubsystemTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	static struct tcapApplicationSubsystemTable_data *StorageNew, *StorageDel;
 	size_t newlen = name_len - 15;
-	static int old_value;
 	int set_value, ret;
 	static struct variable_list *vars, *vp;
 
@@ -6295,40 +8539,6 @@ write_tcapApplicationSubsystemRowStatus(int action, u_char *var_val, u_char var_
 			if (StorageTmp != NULL)
 				/* cannot create existing row */
 				return SNMP_ERR_INCONSISTENTVALUE;
-			break;
-		case RS_ACTIVE:
-		case RS_NOTINSERVICE:
-			if (StorageTmp == NULL)
-				/* cannot change state of non-existent row */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			if (StorageTmp->tcapApplicationSubsystemRowStatus == RS_NOTREADY)
-				/* cannot change state of row that is not ready */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			/* XXX: interaction with row storage type needed */
-			if (set_value == RS_NOTINSERVICE && StorageTmp->tcapApplicationSubsystemTable_refs > 0)
-				/* row is busy and cannot be moved to the RS_NOTINSERVICE state */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			break;
-		case RS_DESTROY:
-			/* destroying existent or non-existent row is ok */
-			if (StorageTmp == NULL)
-				break;
-			/* XXX: interaction with row storage type needed */
-			if (StorageTmp->tcapApplicationSubsystemTable_refs > 0)
-				/* row is busy and cannot be deleted */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			break;
-		case RS_NOTREADY:
-			/* management station cannot set this, only agent can */
-		default:
-			return SNMP_ERR_INCONSISTENTVALUE;
-		}
-		break;
-	case RESERVE2:
-		/* memory reseveration, final preparation... */
-		switch (set_value) {
-		case RS_CREATEANDGO:
-		case RS_CREATEANDWAIT:
 			/* creation */
 			vars = NULL;
 			/* tcapSystemId */
@@ -6371,6 +8581,7 @@ write_tcapApplicationSubsystemRowStatus(int action, u_char *var_val, u_char var_
 				snmp_free_varbind(vars);
 				return SNMP_ERR_RESOURCEUNAVAILABLE;
 			}
+			StorageNew->tcapApplicationSubsystemTable_rsvs = 1;
 			vp = vars;
 			StorageNew->tcapSystemId = (long) *vp->val.integer;
 			vp = vp->next_variable;
@@ -6379,7 +8590,37 @@ write_tcapApplicationSubsystemRowStatus(int action, u_char *var_val, u_char var_
 			vp = vp->next_variable;
 			header_complex_add_data(&tcapApplicationSubsystemTableStorage, vars, StorageNew);	/* frees vars */
 			break;
+		case RS_ACTIVE:
+		case RS_NOTINSERVICE:
+			if (StorageTmp == NULL)
+				/* cannot change state of non-existent row */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			if (StorageTmp->tcapApplicationSubsystemRowStatus == RS_NOTREADY)
+				/* cannot change state of row that is not ready */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			/* XXX: interaction with row storage type needed */
+			if (set_value == RS_NOTINSERVICE && StorageTmp->tcapApplicationSubsystemTable_refs > 0)
+				/* row is busy and cannot be moved to the RS_NOTINSERVICE state */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			/* activate or deactivate */
+			if (StorageTmp == NULL)
+				return SNMP_ERR_NOSUCHNAME;
+			/* one allocation for the whole row */
+			if ((StorageOld = StorageTmp->tcapApplicationSubsystemTable_old) == NULL)
+				if (StorageTmp->tcapApplicationSubsystemTable_rsvs == 0)
+					if ((StorageOld = StorageTmp->tcapApplicationSubsystemTable_old = tcapApplicationSubsystemTable_duplicate(StorageTmp)) == NULL)
+						return SNMP_ERR_RESOURCEUNAVAILABLE;
+			if (StorageOld != NULL)
+				StorageTmp->tcapApplicationSubsystemTable_rsvs++;
+			break;
 		case RS_DESTROY:
+			if (StorageTmp == NULL)
+				/* cannot destroy non-existent row */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			/* XXX: interaction with row storage type needed */
+			if (StorageTmp->tcapApplicationSubsystemTable_refs > 0)
+				/* row is busy and cannot be deleted */
+				return SNMP_ERR_INCONSISTENTVALUE;
 			/* destroy */
 			if (StorageTmp != NULL) {
 				/* exists, extract it for now */
@@ -6389,78 +8630,127 @@ write_tcapApplicationSubsystemRowStatus(int action, u_char *var_val, u_char var_
 				StorageDel = NULL;
 			}
 			break;
+		case RS_NOTREADY:
+			/* management station cannot set this, only agent can */
+		default:
+			return SNMP_ERR_INCONSISTENTVALUE;
 		}
 		break;
-	case ACTION:
-		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the UNDO case */
+	case RESERVE2:
+		/* memory reseveration, final preparation... */
 		switch (set_value) {
 		case RS_CREATEANDGO:
 			/* check that activation is possible */
-			if ((ret = tcapApplicationSubsystemTable_consistent(StorageNew)) != SNMP_ERR_NOERROR)
+			if ((ret = can_act_tcapApplicationSubsystemTable_row(StorageNew)) != SNMP_ERR_NOERROR)
 				return (ret);
 			break;
 		case RS_CREATEANDWAIT:
-			/* row does not have to be consistent */
 			break;
 		case RS_ACTIVE:
-			old_value = StorageTmp->tcapApplicationSubsystemRowStatus;
-			StorageTmp->tcapApplicationSubsystemRowStatus = set_value;
-			if (old_value != RS_ACTIVE) {
-				/* check that activation is possible */
-				if ((ret = tcapApplicationSubsystemTable_consistent(StorageTmp)) != SNMP_ERR_NOERROR) {
-					StorageTmp->tcapApplicationSubsystemRowStatus = old_value;
+			/* check that activation is possible */
+			if (StorageTmp->tcapApplicationSubsystemRowStatus != RS_ACTIVE)
+				if ((ret = can_act_tcapApplicationSubsystemTable_row(StorageTmp)) != SNMP_ERR_NOERROR)
 					return (ret);
-				}
+			break;
+		case RS_NOTINSERVICE:
+			/* check that deactivation is possible */
+			if (StorageTmp->tcapApplicationSubsystemRowStatus != RS_NOTINSERVICE)
+				if ((ret = can_deact_tcapApplicationSubsystemTable_row(StorageTmp)) != SNMP_ERR_NOERROR)
+					return (ret);
+			break;
+		case RS_DESTROY:
+			/* check that deactivation is possible */
+			if (StorageTmp->tcapApplicationSubsystemRowStatus != RS_NOTINSERVICE)
+				if ((ret = can_deact_tcapApplicationSubsystemTable_row(StorageTmp)) != SNMP_ERR_NOERROR)
+					return (ret);
+			break;
+		default:
+			return SNMP_ERR_WRONGVALUE;
+		}
+		break;
+	case ACTION:
+		/* The variable has been stored in StorageTmp->tcapApplicationSubsystemRowStatus for you to use, and you have just been asked to do something with it.  Note that anything done here
+		   must be reversable in the UNDO case */
+		switch (set_value) {
+		case RS_CREATEANDGO:
+			/* activate with underlying device */
+			if (activate_tcapApplicationSubsystemTable_row(StorageNew) != SNMP_ERR_NOERROR)
+				return SNMP_ERR_COMMITFAILED;
+			break;
+		case RS_CREATEANDWAIT:
+			break;
+		case RS_ACTIVE:
+			/* state change already performed */
+			if (StorageTmp->tcapApplicationSubsystemRowStatus != RS_ACTIVE) {
+				/* activate with underlying device */
+				if (activate_tcapApplicationSubsystemTable_row(StorageTmp) != SNMP_ERR_NOERROR)
+					return SNMP_ERR_COMMITFAILED;
 			}
 			break;
 		case RS_NOTINSERVICE:
-			/* set the flag? */
-			old_value = StorageTmp->tcapApplicationSubsystemRowStatus;
-			StorageTmp->tcapApplicationSubsystemRowStatus = set_value;
+			/* state change already performed */
+			if (StorageTmp->tcapApplicationSubsystemRowStatus != RS_NOTINSERVICE) {
+				/* deactivate with underlying device */
+				if (deactivate_tcapApplicationSubsystemTable_row(StorageTmp) != SNMP_ERR_NOERROR)
+					return SNMP_ERR_COMMITFAILED;
+			}
 			break;
+		case RS_DESTROY:
+			/* commit destrution to underlying device */
+			if (StorageDel == NULL)
+				break;
+			/* deactivate with underlying device */
+			if (deactivate_tcapApplicationSubsystemTable_row(StorageDel) != SNMP_ERR_NOERROR)
+				return SNMP_ERR_COMMITFAILED;
+			break;
+		default:
+			return SNMP_ERR_WRONGVALUE;
 		}
 		break;
 	case COMMIT:
 		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		switch (set_value) {
 		case RS_CREATEANDGO:
-			/* row creation, set final state */
-			/* XXX: commit creation to underlying device */
-			/* XXX: activate with underlying device */
 			StorageNew->tcapApplicationSubsystemRowStatus = RS_ACTIVE;
 			break;
 		case RS_CREATEANDWAIT:
-			/* row creation, set final state */
 			StorageNew->tcapApplicationSubsystemRowStatus = RS_NOTINSERVICE;
 			break;
 		case RS_ACTIVE:
 		case RS_NOTINSERVICE:
-			/* state change already performed */
-			if (old_value != set_value) {
-				switch (set_value) {
-				case RS_ACTIVE:
-					/* XXX: activate with underlying device */
-					break;
-				case RS_NOTINSERVICE:
-					/* XXX: deactivate with underlying device */
-					break;
-				}
+			StorageNew->tcapApplicationSubsystemRowStatus = set_value;
+			if ((StorageOld = StorageTmp->tcapApplicationSubsystemTable_old) != NULL) {
+				tcapApplicationSubsystemTable_destroy(&StorageTmp->tcapApplicationSubsystemTable_old);
+				StorageTmp->tcapApplicationSubsystemTable_rsvs = 0;
+				StorageTmp->tcapApplicationSubsystemTable_tsts = 0;
+				StorageTmp->tcapApplicationSubsystemTable_sets = 0;
 			}
 			break;
 		case RS_DESTROY:
-			/* row deletion, free it its dead */
 			tcapApplicationSubsystemTable_destroy(&StorageDel);
-			/* tcapApplicationSubsystemTable_destroy() can handle NULL pointers. */
 			break;
 		}
 		break;
 	case UNDO:
 		/* Back out any changes made in the ACTION case */
 		switch (set_value) {
+		case RS_CREATEANDGO:
+			/* deactivate with underlying device */
+			deactivate_tcapApplicationSubsystemTable_row(StorageNew);
+			break;
+		case RS_CREATEANDWAIT:
+			break;
 		case RS_ACTIVE:
+			if (StorageTmp->tcapApplicationSubsystemRowStatus == RS_NOTINSERVICE)
+				/* deactivate with underlying device */
+				deactivate_tcapApplicationSubsystemTable_row(StorageTmp);
+			break;
 		case RS_NOTINSERVICE:
-			/* restore state */
-			StorageTmp->tcapApplicationSubsystemRowStatus = old_value;
+			if (StorageTmp->tcapApplicationSubsystemRowStatus == RS_ACTIVE)
+				/* activate with underlying device */
+				activate_tcapApplicationSubsystemTable_row(StorageTmp);
+			break;
+		case RS_DESTROY:
 			break;
 		}
 		/* fall through */
@@ -6474,6 +8764,13 @@ write_tcapApplicationSubsystemRowStatus(int action, u_char *var_val, u_char var_
 				tcapApplicationSubsystemTable_del(StorageNew);
 				tcapApplicationSubsystemTable_destroy(&StorageNew);
 			}
+			break;
+		case RS_ACTIVE:
+		case RS_NOTINSERVICE:
+			if ((StorageOld = StorageTmp->tcapApplicationSubsystemTable_old) == NULL)
+				break;
+			if (--StorageTmp->tcapApplicationSubsystemTable_rsvs == 0)
+				tcapApplicationSubsystemTable_destroy(&StorageTmp->tcapApplicationSubsystemTable_old);
 			break;
 		case RS_DESTROY:
 			/* row deletion, so add it again */
@@ -6500,10 +8797,9 @@ write_tcapApplicationSubsystemRowStatus(int action, u_char *var_val, u_char var_
 int
 write_tcapTransactionCopmRowStatus(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	struct tcapTransactionCopmTable_data *StorageTmp = NULL;
+	struct tcapTransactionCopmTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	static struct tcapTransactionCopmTable_data *StorageNew, *StorageDel;
 	size_t newlen = name_len - 15;
-	static int old_value;
 	int set_value, ret;
 	static struct variable_list *vars, *vp;
 
@@ -6530,40 +8826,6 @@ write_tcapTransactionCopmRowStatus(int action, u_char *var_val, u_char var_val_t
 			if (StorageTmp != NULL)
 				/* cannot create existing row */
 				return SNMP_ERR_INCONSISTENTVALUE;
-			break;
-		case RS_ACTIVE:
-		case RS_NOTINSERVICE:
-			if (StorageTmp == NULL)
-				/* cannot change state of non-existent row */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			if (StorageTmp->tcapTransactionCopmRowStatus == RS_NOTREADY)
-				/* cannot change state of row that is not ready */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			/* XXX: interaction with row storage type needed */
-			if (set_value == RS_NOTINSERVICE && StorageTmp->tcapTransactionCopmTable_refs > 0)
-				/* row is busy and cannot be moved to the RS_NOTINSERVICE state */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			break;
-		case RS_DESTROY:
-			/* destroying existent or non-existent row is ok */
-			if (StorageTmp == NULL)
-				break;
-			/* XXX: interaction with row storage type needed */
-			if (StorageTmp->tcapTransactionCopmTable_refs > 0)
-				/* row is busy and cannot be deleted */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			break;
-		case RS_NOTREADY:
-			/* management station cannot set this, only agent can */
-		default:
-			return SNMP_ERR_INCONSISTENTVALUE;
-		}
-		break;
-	case RESERVE2:
-		/* memory reseveration, final preparation... */
-		switch (set_value) {
-		case RS_CREATEANDGO:
-		case RS_CREATEANDWAIT:
 			/* creation */
 			vars = NULL;
 			/* tcapTransactionCopmId */
@@ -6587,12 +8849,43 @@ write_tcapTransactionCopmRowStatus(int action, u_char *var_val, u_char var_val_t
 				snmp_free_varbind(vars);
 				return SNMP_ERR_RESOURCEUNAVAILABLE;
 			}
+			StorageNew->tcapTransactionCopmTable_rsvs = 1;
 			vp = vars;
 			StorageNew->tcapTransactionCopmId = (ulong) *vp->val.integer;
 			vp = vp->next_variable;
 			header_complex_add_data(&tcapTransactionCopmTableStorage, vars, StorageNew);	/* frees vars */
 			break;
+		case RS_ACTIVE:
+		case RS_NOTINSERVICE:
+			if (StorageTmp == NULL)
+				/* cannot change state of non-existent row */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			if (StorageTmp->tcapTransactionCopmRowStatus == RS_NOTREADY)
+				/* cannot change state of row that is not ready */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			/* XXX: interaction with row storage type needed */
+			if (set_value == RS_NOTINSERVICE && StorageTmp->tcapTransactionCopmTable_refs > 0)
+				/* row is busy and cannot be moved to the RS_NOTINSERVICE state */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			/* activate or deactivate */
+			if (StorageTmp == NULL)
+				return SNMP_ERR_NOSUCHNAME;
+			/* one allocation for the whole row */
+			if ((StorageOld = StorageTmp->tcapTransactionCopmTable_old) == NULL)
+				if (StorageTmp->tcapTransactionCopmTable_rsvs == 0)
+					if ((StorageOld = StorageTmp->tcapTransactionCopmTable_old = tcapTransactionCopmTable_duplicate(StorageTmp)) == NULL)
+						return SNMP_ERR_RESOURCEUNAVAILABLE;
+			if (StorageOld != NULL)
+				StorageTmp->tcapTransactionCopmTable_rsvs++;
+			break;
 		case RS_DESTROY:
+			if (StorageTmp == NULL)
+				/* cannot destroy non-existent row */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			/* XXX: interaction with row storage type needed */
+			if (StorageTmp->tcapTransactionCopmTable_refs > 0)
+				/* row is busy and cannot be deleted */
+				return SNMP_ERR_INCONSISTENTVALUE;
 			/* destroy */
 			if (StorageTmp != NULL) {
 				/* exists, extract it for now */
@@ -6602,78 +8895,127 @@ write_tcapTransactionCopmRowStatus(int action, u_char *var_val, u_char var_val_t
 				StorageDel = NULL;
 			}
 			break;
+		case RS_NOTREADY:
+			/* management station cannot set this, only agent can */
+		default:
+			return SNMP_ERR_INCONSISTENTVALUE;
 		}
 		break;
-	case ACTION:
-		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the UNDO case */
+	case RESERVE2:
+		/* memory reseveration, final preparation... */
 		switch (set_value) {
 		case RS_CREATEANDGO:
 			/* check that activation is possible */
-			if ((ret = tcapTransactionCopmTable_consistent(StorageNew)) != SNMP_ERR_NOERROR)
+			if ((ret = can_act_tcapTransactionCopmTable_row(StorageNew)) != SNMP_ERR_NOERROR)
 				return (ret);
 			break;
 		case RS_CREATEANDWAIT:
-			/* row does not have to be consistent */
 			break;
 		case RS_ACTIVE:
-			old_value = StorageTmp->tcapTransactionCopmRowStatus;
-			StorageTmp->tcapTransactionCopmRowStatus = set_value;
-			if (old_value != RS_ACTIVE) {
-				/* check that activation is possible */
-				if ((ret = tcapTransactionCopmTable_consistent(StorageTmp)) != SNMP_ERR_NOERROR) {
-					StorageTmp->tcapTransactionCopmRowStatus = old_value;
+			/* check that activation is possible */
+			if (StorageTmp->tcapTransactionCopmRowStatus != RS_ACTIVE)
+				if ((ret = can_act_tcapTransactionCopmTable_row(StorageTmp)) != SNMP_ERR_NOERROR)
 					return (ret);
-				}
+			break;
+		case RS_NOTINSERVICE:
+			/* check that deactivation is possible */
+			if (StorageTmp->tcapTransactionCopmRowStatus != RS_NOTINSERVICE)
+				if ((ret = can_deact_tcapTransactionCopmTable_row(StorageTmp)) != SNMP_ERR_NOERROR)
+					return (ret);
+			break;
+		case RS_DESTROY:
+			/* check that deactivation is possible */
+			if (StorageTmp->tcapTransactionCopmRowStatus != RS_NOTINSERVICE)
+				if ((ret = can_deact_tcapTransactionCopmTable_row(StorageTmp)) != SNMP_ERR_NOERROR)
+					return (ret);
+			break;
+		default:
+			return SNMP_ERR_WRONGVALUE;
+		}
+		break;
+	case ACTION:
+		/* The variable has been stored in StorageTmp->tcapTransactionCopmRowStatus for you to use, and you have just been asked to do something with it.  Note that anything done here must be 
+		   reversable in the UNDO case */
+		switch (set_value) {
+		case RS_CREATEANDGO:
+			/* activate with underlying device */
+			if (activate_tcapTransactionCopmTable_row(StorageNew) != SNMP_ERR_NOERROR)
+				return SNMP_ERR_COMMITFAILED;
+			break;
+		case RS_CREATEANDWAIT:
+			break;
+		case RS_ACTIVE:
+			/* state change already performed */
+			if (StorageTmp->tcapTransactionCopmRowStatus != RS_ACTIVE) {
+				/* activate with underlying device */
+				if (activate_tcapTransactionCopmTable_row(StorageTmp) != SNMP_ERR_NOERROR)
+					return SNMP_ERR_COMMITFAILED;
 			}
 			break;
 		case RS_NOTINSERVICE:
-			/* set the flag? */
-			old_value = StorageTmp->tcapTransactionCopmRowStatus;
-			StorageTmp->tcapTransactionCopmRowStatus = set_value;
+			/* state change already performed */
+			if (StorageTmp->tcapTransactionCopmRowStatus != RS_NOTINSERVICE) {
+				/* deactivate with underlying device */
+				if (deactivate_tcapTransactionCopmTable_row(StorageTmp) != SNMP_ERR_NOERROR)
+					return SNMP_ERR_COMMITFAILED;
+			}
 			break;
+		case RS_DESTROY:
+			/* commit destrution to underlying device */
+			if (StorageDel == NULL)
+				break;
+			/* deactivate with underlying device */
+			if (deactivate_tcapTransactionCopmTable_row(StorageDel) != SNMP_ERR_NOERROR)
+				return SNMP_ERR_COMMITFAILED;
+			break;
+		default:
+			return SNMP_ERR_WRONGVALUE;
 		}
 		break;
 	case COMMIT:
 		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		switch (set_value) {
 		case RS_CREATEANDGO:
-			/* row creation, set final state */
-			/* XXX: commit creation to underlying device */
-			/* XXX: activate with underlying device */
 			StorageNew->tcapTransactionCopmRowStatus = RS_ACTIVE;
 			break;
 		case RS_CREATEANDWAIT:
-			/* row creation, set final state */
 			StorageNew->tcapTransactionCopmRowStatus = RS_NOTINSERVICE;
 			break;
 		case RS_ACTIVE:
 		case RS_NOTINSERVICE:
-			/* state change already performed */
-			if (old_value != set_value) {
-				switch (set_value) {
-				case RS_ACTIVE:
-					/* XXX: activate with underlying device */
-					break;
-				case RS_NOTINSERVICE:
-					/* XXX: deactivate with underlying device */
-					break;
-				}
+			StorageNew->tcapTransactionCopmRowStatus = set_value;
+			if ((StorageOld = StorageTmp->tcapTransactionCopmTable_old) != NULL) {
+				tcapTransactionCopmTable_destroy(&StorageTmp->tcapTransactionCopmTable_old);
+				StorageTmp->tcapTransactionCopmTable_rsvs = 0;
+				StorageTmp->tcapTransactionCopmTable_tsts = 0;
+				StorageTmp->tcapTransactionCopmTable_sets = 0;
 			}
 			break;
 		case RS_DESTROY:
-			/* row deletion, free it its dead */
 			tcapTransactionCopmTable_destroy(&StorageDel);
-			/* tcapTransactionCopmTable_destroy() can handle NULL pointers. */
 			break;
 		}
 		break;
 	case UNDO:
 		/* Back out any changes made in the ACTION case */
 		switch (set_value) {
+		case RS_CREATEANDGO:
+			/* deactivate with underlying device */
+			deactivate_tcapTransactionCopmTable_row(StorageNew);
+			break;
+		case RS_CREATEANDWAIT:
+			break;
 		case RS_ACTIVE:
+			if (StorageTmp->tcapTransactionCopmRowStatus == RS_NOTINSERVICE)
+				/* deactivate with underlying device */
+				deactivate_tcapTransactionCopmTable_row(StorageTmp);
+			break;
 		case RS_NOTINSERVICE:
-			/* restore state */
-			StorageTmp->tcapTransactionCopmRowStatus = old_value;
+			if (StorageTmp->tcapTransactionCopmRowStatus == RS_ACTIVE)
+				/* activate with underlying device */
+				activate_tcapTransactionCopmTable_row(StorageTmp);
+			break;
+		case RS_DESTROY:
 			break;
 		}
 		/* fall through */
@@ -6687,6 +9029,13 @@ write_tcapTransactionCopmRowStatus(int action, u_char *var_val, u_char var_val_t
 				tcapTransactionCopmTable_del(StorageNew);
 				tcapTransactionCopmTable_destroy(&StorageNew);
 			}
+			break;
+		case RS_ACTIVE:
+		case RS_NOTINSERVICE:
+			if ((StorageOld = StorageTmp->tcapTransactionCopmTable_old) == NULL)
+				break;
+			if (--StorageTmp->tcapTransactionCopmTable_rsvs == 0)
+				tcapTransactionCopmTable_destroy(&StorageTmp->tcapTransactionCopmTable_old);
 			break;
 		case RS_DESTROY:
 			/* row deletion, so add it again */
@@ -6713,10 +9062,9 @@ write_tcapTransactionCopmRowStatus(int action, u_char *var_val, u_char var_val_t
 int
 write_tcapApplicationProcessRowStatus(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	struct tcapApplicationProcessTable_data *StorageTmp = NULL;
+	struct tcapApplicationProcessTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	static struct tcapApplicationProcessTable_data *StorageNew, *StorageDel;
 	size_t newlen = name_len - 15;
-	static int old_value;
 	int set_value, ret;
 	static struct variable_list *vars, *vp;
 
@@ -6743,40 +9091,6 @@ write_tcapApplicationProcessRowStatus(int action, u_char *var_val, u_char var_va
 			if (StorageTmp != NULL)
 				/* cannot create existing row */
 				return SNMP_ERR_INCONSISTENTVALUE;
-			break;
-		case RS_ACTIVE:
-		case RS_NOTINSERVICE:
-			if (StorageTmp == NULL)
-				/* cannot change state of non-existent row */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			if (StorageTmp->tcapApplicationProcessRowStatus == RS_NOTREADY)
-				/* cannot change state of row that is not ready */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			/* XXX: interaction with row storage type needed */
-			if (set_value == RS_NOTINSERVICE && StorageTmp->tcapApplicationProcessTable_refs > 0)
-				/* row is busy and cannot be moved to the RS_NOTINSERVICE state */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			break;
-		case RS_DESTROY:
-			/* destroying existent or non-existent row is ok */
-			if (StorageTmp == NULL)
-				break;
-			/* XXX: interaction with row storage type needed */
-			if (StorageTmp->tcapApplicationProcessTable_refs > 0)
-				/* row is busy and cannot be deleted */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			break;
-		case RS_NOTREADY:
-			/* management station cannot set this, only agent can */
-		default:
-			return SNMP_ERR_INCONSISTENTVALUE;
-		}
-		break;
-	case RESERVE2:
-		/* memory reseveration, final preparation... */
-		switch (set_value) {
-		case RS_CREATEANDGO:
-		case RS_CREATEANDWAIT:
 			/* creation */
 			vars = NULL;
 			/* tcapSystemId */
@@ -6832,6 +9146,7 @@ write_tcapApplicationProcessRowStatus(int action, u_char *var_val, u_char var_va
 				snmp_free_varbind(vars);
 				return SNMP_ERR_RESOURCEUNAVAILABLE;
 			}
+			StorageNew->tcapApplicationProcessTable_rsvs = 1;
 			vp = vars;
 			StorageNew->tcapSystemId = (long) *vp->val.integer;
 			vp = vp->next_variable;
@@ -6843,7 +9158,37 @@ write_tcapApplicationProcessRowStatus(int action, u_char *var_val, u_char var_va
 			vp = vp->next_variable;
 			header_complex_add_data(&tcapApplicationProcessTableStorage, vars, StorageNew);	/* frees vars */
 			break;
+		case RS_ACTIVE:
+		case RS_NOTINSERVICE:
+			if (StorageTmp == NULL)
+				/* cannot change state of non-existent row */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			if (StorageTmp->tcapApplicationProcessRowStatus == RS_NOTREADY)
+				/* cannot change state of row that is not ready */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			/* XXX: interaction with row storage type needed */
+			if (set_value == RS_NOTINSERVICE && StorageTmp->tcapApplicationProcessTable_refs > 0)
+				/* row is busy and cannot be moved to the RS_NOTINSERVICE state */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			/* activate or deactivate */
+			if (StorageTmp == NULL)
+				return SNMP_ERR_NOSUCHNAME;
+			/* one allocation for the whole row */
+			if ((StorageOld = StorageTmp->tcapApplicationProcessTable_old) == NULL)
+				if (StorageTmp->tcapApplicationProcessTable_rsvs == 0)
+					if ((StorageOld = StorageTmp->tcapApplicationProcessTable_old = tcapApplicationProcessTable_duplicate(StorageTmp)) == NULL)
+						return SNMP_ERR_RESOURCEUNAVAILABLE;
+			if (StorageOld != NULL)
+				StorageTmp->tcapApplicationProcessTable_rsvs++;
+			break;
 		case RS_DESTROY:
+			if (StorageTmp == NULL)
+				/* cannot destroy non-existent row */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			/* XXX: interaction with row storage type needed */
+			if (StorageTmp->tcapApplicationProcessTable_refs > 0)
+				/* row is busy and cannot be deleted */
+				return SNMP_ERR_INCONSISTENTVALUE;
 			/* destroy */
 			if (StorageTmp != NULL) {
 				/* exists, extract it for now */
@@ -6853,78 +9198,127 @@ write_tcapApplicationProcessRowStatus(int action, u_char *var_val, u_char var_va
 				StorageDel = NULL;
 			}
 			break;
+		case RS_NOTREADY:
+			/* management station cannot set this, only agent can */
+		default:
+			return SNMP_ERR_INCONSISTENTVALUE;
 		}
 		break;
-	case ACTION:
-		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the UNDO case */
+	case RESERVE2:
+		/* memory reseveration, final preparation... */
 		switch (set_value) {
 		case RS_CREATEANDGO:
 			/* check that activation is possible */
-			if ((ret = tcapApplicationProcessTable_consistent(StorageNew)) != SNMP_ERR_NOERROR)
+			if ((ret = can_act_tcapApplicationProcessTable_row(StorageNew)) != SNMP_ERR_NOERROR)
 				return (ret);
 			break;
 		case RS_CREATEANDWAIT:
-			/* row does not have to be consistent */
 			break;
 		case RS_ACTIVE:
-			old_value = StorageTmp->tcapApplicationProcessRowStatus;
-			StorageTmp->tcapApplicationProcessRowStatus = set_value;
-			if (old_value != RS_ACTIVE) {
-				/* check that activation is possible */
-				if ((ret = tcapApplicationProcessTable_consistent(StorageTmp)) != SNMP_ERR_NOERROR) {
-					StorageTmp->tcapApplicationProcessRowStatus = old_value;
+			/* check that activation is possible */
+			if (StorageTmp->tcapApplicationProcessRowStatus != RS_ACTIVE)
+				if ((ret = can_act_tcapApplicationProcessTable_row(StorageTmp)) != SNMP_ERR_NOERROR)
 					return (ret);
-				}
+			break;
+		case RS_NOTINSERVICE:
+			/* check that deactivation is possible */
+			if (StorageTmp->tcapApplicationProcessRowStatus != RS_NOTINSERVICE)
+				if ((ret = can_deact_tcapApplicationProcessTable_row(StorageTmp)) != SNMP_ERR_NOERROR)
+					return (ret);
+			break;
+		case RS_DESTROY:
+			/* check that deactivation is possible */
+			if (StorageTmp->tcapApplicationProcessRowStatus != RS_NOTINSERVICE)
+				if ((ret = can_deact_tcapApplicationProcessTable_row(StorageTmp)) != SNMP_ERR_NOERROR)
+					return (ret);
+			break;
+		default:
+			return SNMP_ERR_WRONGVALUE;
+		}
+		break;
+	case ACTION:
+		/* The variable has been stored in StorageTmp->tcapApplicationProcessRowStatus for you to use, and you have just been asked to do something with it.  Note that anything done here must 
+		   be reversable in the UNDO case */
+		switch (set_value) {
+		case RS_CREATEANDGO:
+			/* activate with underlying device */
+			if (activate_tcapApplicationProcessTable_row(StorageNew) != SNMP_ERR_NOERROR)
+				return SNMP_ERR_COMMITFAILED;
+			break;
+		case RS_CREATEANDWAIT:
+			break;
+		case RS_ACTIVE:
+			/* state change already performed */
+			if (StorageTmp->tcapApplicationProcessRowStatus != RS_ACTIVE) {
+				/* activate with underlying device */
+				if (activate_tcapApplicationProcessTable_row(StorageTmp) != SNMP_ERR_NOERROR)
+					return SNMP_ERR_COMMITFAILED;
 			}
 			break;
 		case RS_NOTINSERVICE:
-			/* set the flag? */
-			old_value = StorageTmp->tcapApplicationProcessRowStatus;
-			StorageTmp->tcapApplicationProcessRowStatus = set_value;
+			/* state change already performed */
+			if (StorageTmp->tcapApplicationProcessRowStatus != RS_NOTINSERVICE) {
+				/* deactivate with underlying device */
+				if (deactivate_tcapApplicationProcessTable_row(StorageTmp) != SNMP_ERR_NOERROR)
+					return SNMP_ERR_COMMITFAILED;
+			}
 			break;
+		case RS_DESTROY:
+			/* commit destrution to underlying device */
+			if (StorageDel == NULL)
+				break;
+			/* deactivate with underlying device */
+			if (deactivate_tcapApplicationProcessTable_row(StorageDel) != SNMP_ERR_NOERROR)
+				return SNMP_ERR_COMMITFAILED;
+			break;
+		default:
+			return SNMP_ERR_WRONGVALUE;
 		}
 		break;
 	case COMMIT:
 		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		switch (set_value) {
 		case RS_CREATEANDGO:
-			/* row creation, set final state */
-			/* XXX: commit creation to underlying device */
-			/* XXX: activate with underlying device */
 			StorageNew->tcapApplicationProcessRowStatus = RS_ACTIVE;
 			break;
 		case RS_CREATEANDWAIT:
-			/* row creation, set final state */
 			StorageNew->tcapApplicationProcessRowStatus = RS_NOTINSERVICE;
 			break;
 		case RS_ACTIVE:
 		case RS_NOTINSERVICE:
-			/* state change already performed */
-			if (old_value != set_value) {
-				switch (set_value) {
-				case RS_ACTIVE:
-					/* XXX: activate with underlying device */
-					break;
-				case RS_NOTINSERVICE:
-					/* XXX: deactivate with underlying device */
-					break;
-				}
+			StorageNew->tcapApplicationProcessRowStatus = set_value;
+			if ((StorageOld = StorageTmp->tcapApplicationProcessTable_old) != NULL) {
+				tcapApplicationProcessTable_destroy(&StorageTmp->tcapApplicationProcessTable_old);
+				StorageTmp->tcapApplicationProcessTable_rsvs = 0;
+				StorageTmp->tcapApplicationProcessTable_tsts = 0;
+				StorageTmp->tcapApplicationProcessTable_sets = 0;
 			}
 			break;
 		case RS_DESTROY:
-			/* row deletion, free it its dead */
 			tcapApplicationProcessTable_destroy(&StorageDel);
-			/* tcapApplicationProcessTable_destroy() can handle NULL pointers. */
 			break;
 		}
 		break;
 	case UNDO:
 		/* Back out any changes made in the ACTION case */
 		switch (set_value) {
+		case RS_CREATEANDGO:
+			/* deactivate with underlying device */
+			deactivate_tcapApplicationProcessTable_row(StorageNew);
+			break;
+		case RS_CREATEANDWAIT:
+			break;
 		case RS_ACTIVE:
+			if (StorageTmp->tcapApplicationProcessRowStatus == RS_NOTINSERVICE)
+				/* deactivate with underlying device */
+				deactivate_tcapApplicationProcessTable_row(StorageTmp);
+			break;
 		case RS_NOTINSERVICE:
-			/* restore state */
-			StorageTmp->tcapApplicationProcessRowStatus = old_value;
+			if (StorageTmp->tcapApplicationProcessRowStatus == RS_ACTIVE)
+				/* activate with underlying device */
+				activate_tcapApplicationProcessTable_row(StorageTmp);
+			break;
+		case RS_DESTROY:
 			break;
 		}
 		/* fall through */
@@ -6938,6 +9332,13 @@ write_tcapApplicationProcessRowStatus(int action, u_char *var_val, u_char var_va
 				tcapApplicationProcessTable_del(StorageNew);
 				tcapApplicationProcessTable_destroy(&StorageNew);
 			}
+			break;
+		case RS_ACTIVE:
+		case RS_NOTINSERVICE:
+			if ((StorageOld = StorageTmp->tcapApplicationProcessTable_old) == NULL)
+				break;
+			if (--StorageTmp->tcapApplicationProcessTable_rsvs == 0)
+				tcapApplicationProcessTable_destroy(&StorageTmp->tcapApplicationProcessTable_old);
 			break;
 		case RS_DESTROY:
 			/* row deletion, so add it again */
@@ -6964,10 +9365,9 @@ write_tcapApplicationProcessRowStatus(int action, u_char *var_val, u_char var_va
 int
 write_tcapSupportEntityRowStatus(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	struct tcapSupportEntityNameTable_data *StorageTmp = NULL;
+	struct tcapSupportEntityNameTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	static struct tcapSupportEntityNameTable_data *StorageNew, *StorageDel;
 	size_t newlen = name_len - 15;
-	static int old_value;
 	int set_value, ret;
 	static struct variable_list *vars, *vp;
 
@@ -6994,40 +9394,6 @@ write_tcapSupportEntityRowStatus(int action, u_char *var_val, u_char var_val_typ
 			if (StorageTmp != NULL)
 				/* cannot create existing row */
 				return SNMP_ERR_INCONSISTENTVALUE;
-			break;
-		case RS_ACTIVE:
-		case RS_NOTINSERVICE:
-			if (StorageTmp == NULL)
-				/* cannot change state of non-existent row */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			if (StorageTmp->tcapSupportEntityRowStatus == RS_NOTREADY)
-				/* cannot change state of row that is not ready */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			/* XXX: interaction with row storage type needed */
-			if (set_value == RS_NOTINSERVICE && StorageTmp->tcapSupportEntityNameTable_refs > 0)
-				/* row is busy and cannot be moved to the RS_NOTINSERVICE state */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			break;
-		case RS_DESTROY:
-			/* destroying existent or non-existent row is ok */
-			if (StorageTmp == NULL)
-				break;
-			/* XXX: interaction with row storage type needed */
-			if (StorageTmp->tcapSupportEntityNameTable_refs > 0)
-				/* row is busy and cannot be deleted */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			break;
-		case RS_NOTREADY:
-			/* management station cannot set this, only agent can */
-		default:
-			return SNMP_ERR_INCONSISTENTVALUE;
-		}
-		break;
-	case RESERVE2:
-		/* memory reseveration, final preparation... */
-		switch (set_value) {
-		case RS_CREATEANDGO:
-		case RS_CREATEANDWAIT:
 			/* creation */
 			vars = NULL;
 			/* tcapSystemId */
@@ -7095,6 +9461,7 @@ write_tcapSupportEntityRowStatus(int action, u_char *var_val, u_char var_val_typ
 				snmp_free_varbind(vars);
 				return SNMP_ERR_RESOURCEUNAVAILABLE;
 			}
+			StorageNew->tcapSupportEntityNameTable_rsvs = 1;
 			vp = vars;
 			StorageNew->tcapSystemId = (long) *vp->val.integer;
 			vp = vp->next_variable;
@@ -7108,7 +9475,37 @@ write_tcapSupportEntityRowStatus(int action, u_char *var_val, u_char var_val_typ
 			vp = vp->next_variable;
 			header_complex_add_data(&tcapSupportEntityNameTableStorage, vars, StorageNew);	/* frees vars */
 			break;
+		case RS_ACTIVE:
+		case RS_NOTINSERVICE:
+			if (StorageTmp == NULL)
+				/* cannot change state of non-existent row */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			if (StorageTmp->tcapSupportEntityRowStatus == RS_NOTREADY)
+				/* cannot change state of row that is not ready */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			/* XXX: interaction with row storage type needed */
+			if (set_value == RS_NOTINSERVICE && StorageTmp->tcapSupportEntityNameTable_refs > 0)
+				/* row is busy and cannot be moved to the RS_NOTINSERVICE state */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			/* activate or deactivate */
+			if (StorageTmp == NULL)
+				return SNMP_ERR_NOSUCHNAME;
+			/* one allocation for the whole row */
+			if ((StorageOld = StorageTmp->tcapSupportEntityNameTable_old) == NULL)
+				if (StorageTmp->tcapSupportEntityNameTable_rsvs == 0)
+					if ((StorageOld = StorageTmp->tcapSupportEntityNameTable_old = tcapSupportEntityNameTable_duplicate(StorageTmp)) == NULL)
+						return SNMP_ERR_RESOURCEUNAVAILABLE;
+			if (StorageOld != NULL)
+				StorageTmp->tcapSupportEntityNameTable_rsvs++;
+			break;
 		case RS_DESTROY:
+			if (StorageTmp == NULL)
+				/* cannot destroy non-existent row */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			/* XXX: interaction with row storage type needed */
+			if (StorageTmp->tcapSupportEntityNameTable_refs > 0)
+				/* row is busy and cannot be deleted */
+				return SNMP_ERR_INCONSISTENTVALUE;
 			/* destroy */
 			if (StorageTmp != NULL) {
 				/* exists, extract it for now */
@@ -7118,78 +9515,127 @@ write_tcapSupportEntityRowStatus(int action, u_char *var_val, u_char var_val_typ
 				StorageDel = NULL;
 			}
 			break;
+		case RS_NOTREADY:
+			/* management station cannot set this, only agent can */
+		default:
+			return SNMP_ERR_INCONSISTENTVALUE;
 		}
 		break;
-	case ACTION:
-		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the UNDO case */
+	case RESERVE2:
+		/* memory reseveration, final preparation... */
 		switch (set_value) {
 		case RS_CREATEANDGO:
 			/* check that activation is possible */
-			if ((ret = tcapSupportEntityNameTable_consistent(StorageNew)) != SNMP_ERR_NOERROR)
+			if ((ret = can_act_tcapSupportEntityNameTable_row(StorageNew)) != SNMP_ERR_NOERROR)
 				return (ret);
 			break;
 		case RS_CREATEANDWAIT:
-			/* row does not have to be consistent */
 			break;
 		case RS_ACTIVE:
-			old_value = StorageTmp->tcapSupportEntityRowStatus;
-			StorageTmp->tcapSupportEntityRowStatus = set_value;
-			if (old_value != RS_ACTIVE) {
-				/* check that activation is possible */
-				if ((ret = tcapSupportEntityNameTable_consistent(StorageTmp)) != SNMP_ERR_NOERROR) {
-					StorageTmp->tcapSupportEntityRowStatus = old_value;
+			/* check that activation is possible */
+			if (StorageTmp->tcapSupportEntityRowStatus != RS_ACTIVE)
+				if ((ret = can_act_tcapSupportEntityNameTable_row(StorageTmp)) != SNMP_ERR_NOERROR)
 					return (ret);
-				}
+			break;
+		case RS_NOTINSERVICE:
+			/* check that deactivation is possible */
+			if (StorageTmp->tcapSupportEntityRowStatus != RS_NOTINSERVICE)
+				if ((ret = can_deact_tcapSupportEntityNameTable_row(StorageTmp)) != SNMP_ERR_NOERROR)
+					return (ret);
+			break;
+		case RS_DESTROY:
+			/* check that deactivation is possible */
+			if (StorageTmp->tcapSupportEntityRowStatus != RS_NOTINSERVICE)
+				if ((ret = can_deact_tcapSupportEntityNameTable_row(StorageTmp)) != SNMP_ERR_NOERROR)
+					return (ret);
+			break;
+		default:
+			return SNMP_ERR_WRONGVALUE;
+		}
+		break;
+	case ACTION:
+		/* The variable has been stored in StorageTmp->tcapSupportEntityRowStatus for you to use, and you have just been asked to do something with it.  Note that anything done here must be
+		   reversable in the UNDO case */
+		switch (set_value) {
+		case RS_CREATEANDGO:
+			/* activate with underlying device */
+			if (activate_tcapSupportEntityNameTable_row(StorageNew) != SNMP_ERR_NOERROR)
+				return SNMP_ERR_COMMITFAILED;
+			break;
+		case RS_CREATEANDWAIT:
+			break;
+		case RS_ACTIVE:
+			/* state change already performed */
+			if (StorageTmp->tcapSupportEntityRowStatus != RS_ACTIVE) {
+				/* activate with underlying device */
+				if (activate_tcapSupportEntityNameTable_row(StorageTmp) != SNMP_ERR_NOERROR)
+					return SNMP_ERR_COMMITFAILED;
 			}
 			break;
 		case RS_NOTINSERVICE:
-			/* set the flag? */
-			old_value = StorageTmp->tcapSupportEntityRowStatus;
-			StorageTmp->tcapSupportEntityRowStatus = set_value;
+			/* state change already performed */
+			if (StorageTmp->tcapSupportEntityRowStatus != RS_NOTINSERVICE) {
+				/* deactivate with underlying device */
+				if (deactivate_tcapSupportEntityNameTable_row(StorageTmp) != SNMP_ERR_NOERROR)
+					return SNMP_ERR_COMMITFAILED;
+			}
 			break;
+		case RS_DESTROY:
+			/* commit destrution to underlying device */
+			if (StorageDel == NULL)
+				break;
+			/* deactivate with underlying device */
+			if (deactivate_tcapSupportEntityNameTable_row(StorageDel) != SNMP_ERR_NOERROR)
+				return SNMP_ERR_COMMITFAILED;
+			break;
+		default:
+			return SNMP_ERR_WRONGVALUE;
 		}
 		break;
 	case COMMIT:
 		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		switch (set_value) {
 		case RS_CREATEANDGO:
-			/* row creation, set final state */
-			/* XXX: commit creation to underlying device */
-			/* XXX: activate with underlying device */
 			StorageNew->tcapSupportEntityRowStatus = RS_ACTIVE;
 			break;
 		case RS_CREATEANDWAIT:
-			/* row creation, set final state */
 			StorageNew->tcapSupportEntityRowStatus = RS_NOTINSERVICE;
 			break;
 		case RS_ACTIVE:
 		case RS_NOTINSERVICE:
-			/* state change already performed */
-			if (old_value != set_value) {
-				switch (set_value) {
-				case RS_ACTIVE:
-					/* XXX: activate with underlying device */
-					break;
-				case RS_NOTINSERVICE:
-					/* XXX: deactivate with underlying device */
-					break;
-				}
+			StorageNew->tcapSupportEntityRowStatus = set_value;
+			if ((StorageOld = StorageTmp->tcapSupportEntityNameTable_old) != NULL) {
+				tcapSupportEntityNameTable_destroy(&StorageTmp->tcapSupportEntityNameTable_old);
+				StorageTmp->tcapSupportEntityNameTable_rsvs = 0;
+				StorageTmp->tcapSupportEntityNameTable_tsts = 0;
+				StorageTmp->tcapSupportEntityNameTable_sets = 0;
 			}
 			break;
 		case RS_DESTROY:
-			/* row deletion, free it its dead */
 			tcapSupportEntityNameTable_destroy(&StorageDel);
-			/* tcapSupportEntityNameTable_destroy() can handle NULL pointers. */
 			break;
 		}
 		break;
 	case UNDO:
 		/* Back out any changes made in the ACTION case */
 		switch (set_value) {
+		case RS_CREATEANDGO:
+			/* deactivate with underlying device */
+			deactivate_tcapSupportEntityNameTable_row(StorageNew);
+			break;
+		case RS_CREATEANDWAIT:
+			break;
 		case RS_ACTIVE:
+			if (StorageTmp->tcapSupportEntityRowStatus == RS_NOTINSERVICE)
+				/* deactivate with underlying device */
+				deactivate_tcapSupportEntityNameTable_row(StorageTmp);
+			break;
 		case RS_NOTINSERVICE:
-			/* restore state */
-			StorageTmp->tcapSupportEntityRowStatus = old_value;
+			if (StorageTmp->tcapSupportEntityRowStatus == RS_ACTIVE)
+				/* activate with underlying device */
+				activate_tcapSupportEntityNameTable_row(StorageTmp);
+			break;
+		case RS_DESTROY:
 			break;
 		}
 		/* fall through */
@@ -7203,6 +9649,13 @@ write_tcapSupportEntityRowStatus(int action, u_char *var_val, u_char var_val_typ
 				tcapSupportEntityNameTable_del(StorageNew);
 				tcapSupportEntityNameTable_destroy(&StorageNew);
 			}
+			break;
+		case RS_ACTIVE:
+		case RS_NOTINSERVICE:
+			if ((StorageOld = StorageTmp->tcapSupportEntityNameTable_old) == NULL)
+				break;
+			if (--StorageTmp->tcapSupportEntityNameTable_rsvs == 0)
+				tcapSupportEntityNameTable_destroy(&StorageTmp->tcapSupportEntityNameTable_old);
 			break;
 		case RS_DESTROY:
 			/* row deletion, so add it again */
@@ -7229,10 +9682,9 @@ write_tcapSupportEntityRowStatus(int action, u_char *var_val, u_char var_val_typ
 int
 write_tcapApplicationEntityRowStatus(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	struct tcapApplicationEntityTable_data *StorageTmp = NULL;
+	struct tcapApplicationEntityTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	static struct tcapApplicationEntityTable_data *StorageNew, *StorageDel;
 	size_t newlen = name_len - 15;
-	static int old_value;
 	int set_value, ret;
 	static struct variable_list *vars, *vp;
 
@@ -7259,40 +9711,6 @@ write_tcapApplicationEntityRowStatus(int action, u_char *var_val, u_char var_val
 			if (StorageTmp != NULL)
 				/* cannot create existing row */
 				return SNMP_ERR_INCONSISTENTVALUE;
-			break;
-		case RS_ACTIVE:
-		case RS_NOTINSERVICE:
-			if (StorageTmp == NULL)
-				/* cannot change state of non-existent row */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			if (StorageTmp->tcapApplicationEntityRowStatus == RS_NOTREADY)
-				/* cannot change state of row that is not ready */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			/* XXX: interaction with row storage type needed */
-			if (set_value == RS_NOTINSERVICE && StorageTmp->tcapApplicationEntityTable_refs > 0)
-				/* row is busy and cannot be moved to the RS_NOTINSERVICE state */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			break;
-		case RS_DESTROY:
-			/* destroying existent or non-existent row is ok */
-			if (StorageTmp == NULL)
-				break;
-			/* XXX: interaction with row storage type needed */
-			if (StorageTmp->tcapApplicationEntityTable_refs > 0)
-				/* row is busy and cannot be deleted */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			break;
-		case RS_NOTREADY:
-			/* management station cannot set this, only agent can */
-		default:
-			return SNMP_ERR_INCONSISTENTVALUE;
-		}
-		break;
-	case RESERVE2:
-		/* memory reseveration, final preparation... */
-		switch (set_value) {
-		case RS_CREATEANDGO:
-		case RS_CREATEANDWAIT:
 			/* creation */
 			vars = NULL;
 			/* tcapApplicationSubsystemId */
@@ -7330,6 +9748,7 @@ write_tcapApplicationEntityRowStatus(int action, u_char *var_val, u_char var_val
 				snmp_free_varbind(vars);
 				return SNMP_ERR_RESOURCEUNAVAILABLE;
 			}
+			StorageNew->tcapApplicationEntityTable_rsvs = 1;
 			vp = vars;
 			memdup((void *) &StorageNew->tcapApplicationSubsystemId, vp->val.string, vp->val_len);
 			StorageNew->tcapApplicationSubsystemIdLen = vp->val_len;
@@ -7339,7 +9758,37 @@ write_tcapApplicationEntityRowStatus(int action, u_char *var_val, u_char var_val
 			vp = vp->next_variable;
 			header_complex_add_data(&tcapApplicationEntityTableStorage, vars, StorageNew);	/* frees vars */
 			break;
+		case RS_ACTIVE:
+		case RS_NOTINSERVICE:
+			if (StorageTmp == NULL)
+				/* cannot change state of non-existent row */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			if (StorageTmp->tcapApplicationEntityRowStatus == RS_NOTREADY)
+				/* cannot change state of row that is not ready */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			/* XXX: interaction with row storage type needed */
+			if (set_value == RS_NOTINSERVICE && StorageTmp->tcapApplicationEntityTable_refs > 0)
+				/* row is busy and cannot be moved to the RS_NOTINSERVICE state */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			/* activate or deactivate */
+			if (StorageTmp == NULL)
+				return SNMP_ERR_NOSUCHNAME;
+			/* one allocation for the whole row */
+			if ((StorageOld = StorageTmp->tcapApplicationEntityTable_old) == NULL)
+				if (StorageTmp->tcapApplicationEntityTable_rsvs == 0)
+					if ((StorageOld = StorageTmp->tcapApplicationEntityTable_old = tcapApplicationEntityTable_duplicate(StorageTmp)) == NULL)
+						return SNMP_ERR_RESOURCEUNAVAILABLE;
+			if (StorageOld != NULL)
+				StorageTmp->tcapApplicationEntityTable_rsvs++;
+			break;
 		case RS_DESTROY:
+			if (StorageTmp == NULL)
+				/* cannot destroy non-existent row */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			/* XXX: interaction with row storage type needed */
+			if (StorageTmp->tcapApplicationEntityTable_refs > 0)
+				/* row is busy and cannot be deleted */
+				return SNMP_ERR_INCONSISTENTVALUE;
 			/* destroy */
 			if (StorageTmp != NULL) {
 				/* exists, extract it for now */
@@ -7349,78 +9798,127 @@ write_tcapApplicationEntityRowStatus(int action, u_char *var_val, u_char var_val
 				StorageDel = NULL;
 			}
 			break;
+		case RS_NOTREADY:
+			/* management station cannot set this, only agent can */
+		default:
+			return SNMP_ERR_INCONSISTENTVALUE;
 		}
 		break;
-	case ACTION:
-		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the UNDO case */
+	case RESERVE2:
+		/* memory reseveration, final preparation... */
 		switch (set_value) {
 		case RS_CREATEANDGO:
 			/* check that activation is possible */
-			if ((ret = tcapApplicationEntityTable_consistent(StorageNew)) != SNMP_ERR_NOERROR)
+			if ((ret = can_act_tcapApplicationEntityTable_row(StorageNew)) != SNMP_ERR_NOERROR)
 				return (ret);
 			break;
 		case RS_CREATEANDWAIT:
-			/* row does not have to be consistent */
 			break;
 		case RS_ACTIVE:
-			old_value = StorageTmp->tcapApplicationEntityRowStatus;
-			StorageTmp->tcapApplicationEntityRowStatus = set_value;
-			if (old_value != RS_ACTIVE) {
-				/* check that activation is possible */
-				if ((ret = tcapApplicationEntityTable_consistent(StorageTmp)) != SNMP_ERR_NOERROR) {
-					StorageTmp->tcapApplicationEntityRowStatus = old_value;
+			/* check that activation is possible */
+			if (StorageTmp->tcapApplicationEntityRowStatus != RS_ACTIVE)
+				if ((ret = can_act_tcapApplicationEntityTable_row(StorageTmp)) != SNMP_ERR_NOERROR)
 					return (ret);
-				}
+			break;
+		case RS_NOTINSERVICE:
+			/* check that deactivation is possible */
+			if (StorageTmp->tcapApplicationEntityRowStatus != RS_NOTINSERVICE)
+				if ((ret = can_deact_tcapApplicationEntityTable_row(StorageTmp)) != SNMP_ERR_NOERROR)
+					return (ret);
+			break;
+		case RS_DESTROY:
+			/* check that deactivation is possible */
+			if (StorageTmp->tcapApplicationEntityRowStatus != RS_NOTINSERVICE)
+				if ((ret = can_deact_tcapApplicationEntityTable_row(StorageTmp)) != SNMP_ERR_NOERROR)
+					return (ret);
+			break;
+		default:
+			return SNMP_ERR_WRONGVALUE;
+		}
+		break;
+	case ACTION:
+		/* The variable has been stored in StorageTmp->tcapApplicationEntityRowStatus for you to use, and you have just been asked to do something with it.  Note that anything done here must
+		   be reversable in the UNDO case */
+		switch (set_value) {
+		case RS_CREATEANDGO:
+			/* activate with underlying device */
+			if (activate_tcapApplicationEntityTable_row(StorageNew) != SNMP_ERR_NOERROR)
+				return SNMP_ERR_COMMITFAILED;
+			break;
+		case RS_CREATEANDWAIT:
+			break;
+		case RS_ACTIVE:
+			/* state change already performed */
+			if (StorageTmp->tcapApplicationEntityRowStatus != RS_ACTIVE) {
+				/* activate with underlying device */
+				if (activate_tcapApplicationEntityTable_row(StorageTmp) != SNMP_ERR_NOERROR)
+					return SNMP_ERR_COMMITFAILED;
 			}
 			break;
 		case RS_NOTINSERVICE:
-			/* set the flag? */
-			old_value = StorageTmp->tcapApplicationEntityRowStatus;
-			StorageTmp->tcapApplicationEntityRowStatus = set_value;
+			/* state change already performed */
+			if (StorageTmp->tcapApplicationEntityRowStatus != RS_NOTINSERVICE) {
+				/* deactivate with underlying device */
+				if (deactivate_tcapApplicationEntityTable_row(StorageTmp) != SNMP_ERR_NOERROR)
+					return SNMP_ERR_COMMITFAILED;
+			}
 			break;
+		case RS_DESTROY:
+			/* commit destrution to underlying device */
+			if (StorageDel == NULL)
+				break;
+			/* deactivate with underlying device */
+			if (deactivate_tcapApplicationEntityTable_row(StorageDel) != SNMP_ERR_NOERROR)
+				return SNMP_ERR_COMMITFAILED;
+			break;
+		default:
+			return SNMP_ERR_WRONGVALUE;
 		}
 		break;
 	case COMMIT:
 		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		switch (set_value) {
 		case RS_CREATEANDGO:
-			/* row creation, set final state */
-			/* XXX: commit creation to underlying device */
-			/* XXX: activate with underlying device */
 			StorageNew->tcapApplicationEntityRowStatus = RS_ACTIVE;
 			break;
 		case RS_CREATEANDWAIT:
-			/* row creation, set final state */
 			StorageNew->tcapApplicationEntityRowStatus = RS_NOTINSERVICE;
 			break;
 		case RS_ACTIVE:
 		case RS_NOTINSERVICE:
-			/* state change already performed */
-			if (old_value != set_value) {
-				switch (set_value) {
-				case RS_ACTIVE:
-					/* XXX: activate with underlying device */
-					break;
-				case RS_NOTINSERVICE:
-					/* XXX: deactivate with underlying device */
-					break;
-				}
+			StorageNew->tcapApplicationEntityRowStatus = set_value;
+			if ((StorageOld = StorageTmp->tcapApplicationEntityTable_old) != NULL) {
+				tcapApplicationEntityTable_destroy(&StorageTmp->tcapApplicationEntityTable_old);
+				StorageTmp->tcapApplicationEntityTable_rsvs = 0;
+				StorageTmp->tcapApplicationEntityTable_tsts = 0;
+				StorageTmp->tcapApplicationEntityTable_sets = 0;
 			}
 			break;
 		case RS_DESTROY:
-			/* row deletion, free it its dead */
 			tcapApplicationEntityTable_destroy(&StorageDel);
-			/* tcapApplicationEntityTable_destroy() can handle NULL pointers. */
 			break;
 		}
 		break;
 	case UNDO:
 		/* Back out any changes made in the ACTION case */
 		switch (set_value) {
+		case RS_CREATEANDGO:
+			/* deactivate with underlying device */
+			deactivate_tcapApplicationEntityTable_row(StorageNew);
+			break;
+		case RS_CREATEANDWAIT:
+			break;
 		case RS_ACTIVE:
+			if (StorageTmp->tcapApplicationEntityRowStatus == RS_NOTINSERVICE)
+				/* deactivate with underlying device */
+				deactivate_tcapApplicationEntityTable_row(StorageTmp);
+			break;
 		case RS_NOTINSERVICE:
-			/* restore state */
-			StorageTmp->tcapApplicationEntityRowStatus = old_value;
+			if (StorageTmp->tcapApplicationEntityRowStatus == RS_ACTIVE)
+				/* activate with underlying device */
+				activate_tcapApplicationEntityTable_row(StorageTmp);
+			break;
+		case RS_DESTROY:
 			break;
 		}
 		/* fall through */
@@ -7434,6 +9932,13 @@ write_tcapApplicationEntityRowStatus(int action, u_char *var_val, u_char var_val
 				tcapApplicationEntityTable_del(StorageNew);
 				tcapApplicationEntityTable_destroy(&StorageNew);
 			}
+			break;
+		case RS_ACTIVE:
+		case RS_NOTINSERVICE:
+			if ((StorageOld = StorageTmp->tcapApplicationEntityTable_old) == NULL)
+				break;
+			if (--StorageTmp->tcapApplicationEntityTable_rsvs == 0)
+				tcapApplicationEntityTable_destroy(&StorageTmp->tcapApplicationEntityTable_old);
 			break;
 		case RS_DESTROY:
 			/* row deletion, so add it again */
@@ -7460,10 +9965,9 @@ write_tcapApplicationEntityRowStatus(int action, u_char *var_val, u_char var_val
 int
 write_tcapLocalSapNameRowStatus(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	struct tcapLocalSapNameTable_data *StorageTmp = NULL;
+	struct tcapLocalSapNameTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	static struct tcapLocalSapNameTable_data *StorageNew, *StorageDel;
 	size_t newlen = name_len - 15;
-	static int old_value;
 	int set_value, ret;
 	static struct variable_list *vars, *vp;
 
@@ -7490,40 +9994,6 @@ write_tcapLocalSapNameRowStatus(int action, u_char *var_val, u_char var_val_type
 			if (StorageTmp != NULL)
 				/* cannot create existing row */
 				return SNMP_ERR_INCONSISTENTVALUE;
-			break;
-		case RS_ACTIVE:
-		case RS_NOTINSERVICE:
-			if (StorageTmp == NULL)
-				/* cannot change state of non-existent row */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			if (StorageTmp->tcapLocalSapNameRowStatus == RS_NOTREADY)
-				/* cannot change state of row that is not ready */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			/* XXX: interaction with row storage type needed */
-			if (set_value == RS_NOTINSERVICE && StorageTmp->tcapLocalSapNameTable_refs > 0)
-				/* row is busy and cannot be moved to the RS_NOTINSERVICE state */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			break;
-		case RS_DESTROY:
-			/* destroying existent or non-existent row is ok */
-			if (StorageTmp == NULL)
-				break;
-			/* XXX: interaction with row storage type needed */
-			if (StorageTmp->tcapLocalSapNameTable_refs > 0)
-				/* row is busy and cannot be deleted */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			break;
-		case RS_NOTREADY:
-			/* management station cannot set this, only agent can */
-		default:
-			return SNMP_ERR_INCONSISTENTVALUE;
-		}
-		break;
-	case RESERVE2:
-		/* memory reseveration, final preparation... */
-		switch (set_value) {
-		case RS_CREATEANDGO:
-		case RS_CREATEANDWAIT:
 			/* creation */
 			vars = NULL;
 			/* tcapApplicationSubsystemId */
@@ -7573,6 +10043,7 @@ write_tcapLocalSapNameRowStatus(int action, u_char *var_val, u_char var_val_type
 				snmp_free_varbind(vars);
 				return SNMP_ERR_RESOURCEUNAVAILABLE;
 			}
+			StorageNew->tcapLocalSapNameTable_rsvs = 1;
 			vp = vars;
 			memdup((void *) &StorageNew->tcapApplicationSubsystemId, vp->val.string, vp->val_len);
 			StorageNew->tcapApplicationSubsystemIdLen = vp->val_len;
@@ -7584,7 +10055,37 @@ write_tcapLocalSapNameRowStatus(int action, u_char *var_val, u_char var_val_type
 			vp = vp->next_variable;
 			header_complex_add_data(&tcapLocalSapNameTableStorage, vars, StorageNew);	/* frees vars */
 			break;
+		case RS_ACTIVE:
+		case RS_NOTINSERVICE:
+			if (StorageTmp == NULL)
+				/* cannot change state of non-existent row */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			if (StorageTmp->tcapLocalSapNameRowStatus == RS_NOTREADY)
+				/* cannot change state of row that is not ready */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			/* XXX: interaction with row storage type needed */
+			if (set_value == RS_NOTINSERVICE && StorageTmp->tcapLocalSapNameTable_refs > 0)
+				/* row is busy and cannot be moved to the RS_NOTINSERVICE state */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			/* activate or deactivate */
+			if (StorageTmp == NULL)
+				return SNMP_ERR_NOSUCHNAME;
+			/* one allocation for the whole row */
+			if ((StorageOld = StorageTmp->tcapLocalSapNameTable_old) == NULL)
+				if (StorageTmp->tcapLocalSapNameTable_rsvs == 0)
+					if ((StorageOld = StorageTmp->tcapLocalSapNameTable_old = tcapLocalSapNameTable_duplicate(StorageTmp)) == NULL)
+						return SNMP_ERR_RESOURCEUNAVAILABLE;
+			if (StorageOld != NULL)
+				StorageTmp->tcapLocalSapNameTable_rsvs++;
+			break;
 		case RS_DESTROY:
+			if (StorageTmp == NULL)
+				/* cannot destroy non-existent row */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			/* XXX: interaction with row storage type needed */
+			if (StorageTmp->tcapLocalSapNameTable_refs > 0)
+				/* row is busy and cannot be deleted */
+				return SNMP_ERR_INCONSISTENTVALUE;
 			/* destroy */
 			if (StorageTmp != NULL) {
 				/* exists, extract it for now */
@@ -7594,78 +10095,127 @@ write_tcapLocalSapNameRowStatus(int action, u_char *var_val, u_char var_val_type
 				StorageDel = NULL;
 			}
 			break;
+		case RS_NOTREADY:
+			/* management station cannot set this, only agent can */
+		default:
+			return SNMP_ERR_INCONSISTENTVALUE;
 		}
 		break;
-	case ACTION:
-		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the UNDO case */
+	case RESERVE2:
+		/* memory reseveration, final preparation... */
 		switch (set_value) {
 		case RS_CREATEANDGO:
 			/* check that activation is possible */
-			if ((ret = tcapLocalSapNameTable_consistent(StorageNew)) != SNMP_ERR_NOERROR)
+			if ((ret = can_act_tcapLocalSapNameTable_row(StorageNew)) != SNMP_ERR_NOERROR)
 				return (ret);
 			break;
 		case RS_CREATEANDWAIT:
-			/* row does not have to be consistent */
 			break;
 		case RS_ACTIVE:
-			old_value = StorageTmp->tcapLocalSapNameRowStatus;
-			StorageTmp->tcapLocalSapNameRowStatus = set_value;
-			if (old_value != RS_ACTIVE) {
-				/* check that activation is possible */
-				if ((ret = tcapLocalSapNameTable_consistent(StorageTmp)) != SNMP_ERR_NOERROR) {
-					StorageTmp->tcapLocalSapNameRowStatus = old_value;
+			/* check that activation is possible */
+			if (StorageTmp->tcapLocalSapNameRowStatus != RS_ACTIVE)
+				if ((ret = can_act_tcapLocalSapNameTable_row(StorageTmp)) != SNMP_ERR_NOERROR)
 					return (ret);
-				}
+			break;
+		case RS_NOTINSERVICE:
+			/* check that deactivation is possible */
+			if (StorageTmp->tcapLocalSapNameRowStatus != RS_NOTINSERVICE)
+				if ((ret = can_deact_tcapLocalSapNameTable_row(StorageTmp)) != SNMP_ERR_NOERROR)
+					return (ret);
+			break;
+		case RS_DESTROY:
+			/* check that deactivation is possible */
+			if (StorageTmp->tcapLocalSapNameRowStatus != RS_NOTINSERVICE)
+				if ((ret = can_deact_tcapLocalSapNameTable_row(StorageTmp)) != SNMP_ERR_NOERROR)
+					return (ret);
+			break;
+		default:
+			return SNMP_ERR_WRONGVALUE;
+		}
+		break;
+	case ACTION:
+		/* The variable has been stored in StorageTmp->tcapLocalSapNameRowStatus for you to use, and you have just been asked to do something with it.  Note that anything done here must be
+		   reversable in the UNDO case */
+		switch (set_value) {
+		case RS_CREATEANDGO:
+			/* activate with underlying device */
+			if (activate_tcapLocalSapNameTable_row(StorageNew) != SNMP_ERR_NOERROR)
+				return SNMP_ERR_COMMITFAILED;
+			break;
+		case RS_CREATEANDWAIT:
+			break;
+		case RS_ACTIVE:
+			/* state change already performed */
+			if (StorageTmp->tcapLocalSapNameRowStatus != RS_ACTIVE) {
+				/* activate with underlying device */
+				if (activate_tcapLocalSapNameTable_row(StorageTmp) != SNMP_ERR_NOERROR)
+					return SNMP_ERR_COMMITFAILED;
 			}
 			break;
 		case RS_NOTINSERVICE:
-			/* set the flag? */
-			old_value = StorageTmp->tcapLocalSapNameRowStatus;
-			StorageTmp->tcapLocalSapNameRowStatus = set_value;
+			/* state change already performed */
+			if (StorageTmp->tcapLocalSapNameRowStatus != RS_NOTINSERVICE) {
+				/* deactivate with underlying device */
+				if (deactivate_tcapLocalSapNameTable_row(StorageTmp) != SNMP_ERR_NOERROR)
+					return SNMP_ERR_COMMITFAILED;
+			}
 			break;
+		case RS_DESTROY:
+			/* commit destrution to underlying device */
+			if (StorageDel == NULL)
+				break;
+			/* deactivate with underlying device */
+			if (deactivate_tcapLocalSapNameTable_row(StorageDel) != SNMP_ERR_NOERROR)
+				return SNMP_ERR_COMMITFAILED;
+			break;
+		default:
+			return SNMP_ERR_WRONGVALUE;
 		}
 		break;
 	case COMMIT:
 		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		switch (set_value) {
 		case RS_CREATEANDGO:
-			/* row creation, set final state */
-			/* XXX: commit creation to underlying device */
-			/* XXX: activate with underlying device */
 			StorageNew->tcapLocalSapNameRowStatus = RS_ACTIVE;
 			break;
 		case RS_CREATEANDWAIT:
-			/* row creation, set final state */
 			StorageNew->tcapLocalSapNameRowStatus = RS_NOTINSERVICE;
 			break;
 		case RS_ACTIVE:
 		case RS_NOTINSERVICE:
-			/* state change already performed */
-			if (old_value != set_value) {
-				switch (set_value) {
-				case RS_ACTIVE:
-					/* XXX: activate with underlying device */
-					break;
-				case RS_NOTINSERVICE:
-					/* XXX: deactivate with underlying device */
-					break;
-				}
+			StorageNew->tcapLocalSapNameRowStatus = set_value;
+			if ((StorageOld = StorageTmp->tcapLocalSapNameTable_old) != NULL) {
+				tcapLocalSapNameTable_destroy(&StorageTmp->tcapLocalSapNameTable_old);
+				StorageTmp->tcapLocalSapNameTable_rsvs = 0;
+				StorageTmp->tcapLocalSapNameTable_tsts = 0;
+				StorageTmp->tcapLocalSapNameTable_sets = 0;
 			}
 			break;
 		case RS_DESTROY:
-			/* row deletion, free it its dead */
 			tcapLocalSapNameTable_destroy(&StorageDel);
-			/* tcapLocalSapNameTable_destroy() can handle NULL pointers. */
 			break;
 		}
 		break;
 	case UNDO:
 		/* Back out any changes made in the ACTION case */
 		switch (set_value) {
+		case RS_CREATEANDGO:
+			/* deactivate with underlying device */
+			deactivate_tcapLocalSapNameTable_row(StorageNew);
+			break;
+		case RS_CREATEANDWAIT:
+			break;
 		case RS_ACTIVE:
+			if (StorageTmp->tcapLocalSapNameRowStatus == RS_NOTINSERVICE)
+				/* deactivate with underlying device */
+				deactivate_tcapLocalSapNameTable_row(StorageTmp);
+			break;
 		case RS_NOTINSERVICE:
-			/* restore state */
-			StorageTmp->tcapLocalSapNameRowStatus = old_value;
+			if (StorageTmp->tcapLocalSapNameRowStatus == RS_ACTIVE)
+				/* activate with underlying device */
+				activate_tcapLocalSapNameTable_row(StorageTmp);
+			break;
+		case RS_DESTROY:
 			break;
 		}
 		/* fall through */
@@ -7679,6 +10229,13 @@ write_tcapLocalSapNameRowStatus(int action, u_char *var_val, u_char var_val_type
 				tcapLocalSapNameTable_del(StorageNew);
 				tcapLocalSapNameTable_destroy(&StorageNew);
 			}
+			break;
+		case RS_ACTIVE:
+		case RS_NOTINSERVICE:
+			if ((StorageOld = StorageTmp->tcapLocalSapNameTable_old) == NULL)
+				break;
+			if (--StorageTmp->tcapLocalSapNameTable_rsvs == 0)
+				tcapLocalSapNameTable_destroy(&StorageTmp->tcapLocalSapNameTable_old);
 			break;
 		case RS_DESTROY:
 			/* row deletion, so add it again */
@@ -7705,10 +10262,9 @@ write_tcapLocalSapNameRowStatus(int action, u_char *var_val, u_char var_val_type
 int
 write_tcapApplicationContextRowStatus(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	struct tcapApplicationContextNameTable_data *StorageTmp = NULL;
+	struct tcapApplicationContextNameTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	static struct tcapApplicationContextNameTable_data *StorageNew, *StorageDel;
 	size_t newlen = name_len - 15;
-	static int old_value;
 	int set_value, ret;
 	static struct variable_list *vars, *vp;
 
@@ -7735,40 +10291,6 @@ write_tcapApplicationContextRowStatus(int action, u_char *var_val, u_char var_va
 			if (StorageTmp != NULL)
 				/* cannot create existing row */
 				return SNMP_ERR_INCONSISTENTVALUE;
-			break;
-		case RS_ACTIVE:
-		case RS_NOTINSERVICE:
-			if (StorageTmp == NULL)
-				/* cannot change state of non-existent row */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			if (StorageTmp->tcapApplicationContextRowStatus == RS_NOTREADY)
-				/* cannot change state of row that is not ready */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			/* XXX: interaction with row storage type needed */
-			if (set_value == RS_NOTINSERVICE && StorageTmp->tcapApplicationContextNameTable_refs > 0)
-				/* row is busy and cannot be moved to the RS_NOTINSERVICE state */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			break;
-		case RS_DESTROY:
-			/* destroying existent or non-existent row is ok */
-			if (StorageTmp == NULL)
-				break;
-			/* XXX: interaction with row storage type needed */
-			if (StorageTmp->tcapApplicationContextNameTable_refs > 0)
-				/* row is busy and cannot be deleted */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			break;
-		case RS_NOTREADY:
-			/* management station cannot set this, only agent can */
-		default:
-			return SNMP_ERR_INCONSISTENTVALUE;
-		}
-		break;
-	case RESERVE2:
-		/* memory reseveration, final preparation... */
-		switch (set_value) {
-		case RS_CREATEANDGO:
-		case RS_CREATEANDWAIT:
 			/* creation */
 			vars = NULL;
 			/* tcapApplicationSubsystemId */
@@ -7818,6 +10340,7 @@ write_tcapApplicationContextRowStatus(int action, u_char *var_val, u_char var_va
 				snmp_free_varbind(vars);
 				return SNMP_ERR_RESOURCEUNAVAILABLE;
 			}
+			StorageNew->tcapApplicationContextNameTable_rsvs = 1;
 			vp = vars;
 			memdup((void *) &StorageNew->tcapApplicationSubsystemId, vp->val.string, vp->val_len);
 			StorageNew->tcapApplicationSubsystemIdLen = vp->val_len;
@@ -7829,7 +10352,37 @@ write_tcapApplicationContextRowStatus(int action, u_char *var_val, u_char var_va
 			vp = vp->next_variable;
 			header_complex_add_data(&tcapApplicationContextNameTableStorage, vars, StorageNew);	/* frees vars */
 			break;
+		case RS_ACTIVE:
+		case RS_NOTINSERVICE:
+			if (StorageTmp == NULL)
+				/* cannot change state of non-existent row */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			if (StorageTmp->tcapApplicationContextRowStatus == RS_NOTREADY)
+				/* cannot change state of row that is not ready */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			/* XXX: interaction with row storage type needed */
+			if (set_value == RS_NOTINSERVICE && StorageTmp->tcapApplicationContextNameTable_refs > 0)
+				/* row is busy and cannot be moved to the RS_NOTINSERVICE state */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			/* activate or deactivate */
+			if (StorageTmp == NULL)
+				return SNMP_ERR_NOSUCHNAME;
+			/* one allocation for the whole row */
+			if ((StorageOld = StorageTmp->tcapApplicationContextNameTable_old) == NULL)
+				if (StorageTmp->tcapApplicationContextNameTable_rsvs == 0)
+					if ((StorageOld = StorageTmp->tcapApplicationContextNameTable_old = tcapApplicationContextNameTable_duplicate(StorageTmp)) == NULL)
+						return SNMP_ERR_RESOURCEUNAVAILABLE;
+			if (StorageOld != NULL)
+				StorageTmp->tcapApplicationContextNameTable_rsvs++;
+			break;
 		case RS_DESTROY:
+			if (StorageTmp == NULL)
+				/* cannot destroy non-existent row */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			/* XXX: interaction with row storage type needed */
+			if (StorageTmp->tcapApplicationContextNameTable_refs > 0)
+				/* row is busy and cannot be deleted */
+				return SNMP_ERR_INCONSISTENTVALUE;
 			/* destroy */
 			if (StorageTmp != NULL) {
 				/* exists, extract it for now */
@@ -7839,78 +10392,127 @@ write_tcapApplicationContextRowStatus(int action, u_char *var_val, u_char var_va
 				StorageDel = NULL;
 			}
 			break;
+		case RS_NOTREADY:
+			/* management station cannot set this, only agent can */
+		default:
+			return SNMP_ERR_INCONSISTENTVALUE;
 		}
 		break;
-	case ACTION:
-		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the UNDO case */
+	case RESERVE2:
+		/* memory reseveration, final preparation... */
 		switch (set_value) {
 		case RS_CREATEANDGO:
 			/* check that activation is possible */
-			if ((ret = tcapApplicationContextNameTable_consistent(StorageNew)) != SNMP_ERR_NOERROR)
+			if ((ret = can_act_tcapApplicationContextNameTable_row(StorageNew)) != SNMP_ERR_NOERROR)
 				return (ret);
 			break;
 		case RS_CREATEANDWAIT:
-			/* row does not have to be consistent */
 			break;
 		case RS_ACTIVE:
-			old_value = StorageTmp->tcapApplicationContextRowStatus;
-			StorageTmp->tcapApplicationContextRowStatus = set_value;
-			if (old_value != RS_ACTIVE) {
-				/* check that activation is possible */
-				if ((ret = tcapApplicationContextNameTable_consistent(StorageTmp)) != SNMP_ERR_NOERROR) {
-					StorageTmp->tcapApplicationContextRowStatus = old_value;
+			/* check that activation is possible */
+			if (StorageTmp->tcapApplicationContextRowStatus != RS_ACTIVE)
+				if ((ret = can_act_tcapApplicationContextNameTable_row(StorageTmp)) != SNMP_ERR_NOERROR)
 					return (ret);
-				}
+			break;
+		case RS_NOTINSERVICE:
+			/* check that deactivation is possible */
+			if (StorageTmp->tcapApplicationContextRowStatus != RS_NOTINSERVICE)
+				if ((ret = can_deact_tcapApplicationContextNameTable_row(StorageTmp)) != SNMP_ERR_NOERROR)
+					return (ret);
+			break;
+		case RS_DESTROY:
+			/* check that deactivation is possible */
+			if (StorageTmp->tcapApplicationContextRowStatus != RS_NOTINSERVICE)
+				if ((ret = can_deact_tcapApplicationContextNameTable_row(StorageTmp)) != SNMP_ERR_NOERROR)
+					return (ret);
+			break;
+		default:
+			return SNMP_ERR_WRONGVALUE;
+		}
+		break;
+	case ACTION:
+		/* The variable has been stored in StorageTmp->tcapApplicationContextRowStatus for you to use, and you have just been asked to do something with it.  Note that anything done here must 
+		   be reversable in the UNDO case */
+		switch (set_value) {
+		case RS_CREATEANDGO:
+			/* activate with underlying device */
+			if (activate_tcapApplicationContextNameTable_row(StorageNew) != SNMP_ERR_NOERROR)
+				return SNMP_ERR_COMMITFAILED;
+			break;
+		case RS_CREATEANDWAIT:
+			break;
+		case RS_ACTIVE:
+			/* state change already performed */
+			if (StorageTmp->tcapApplicationContextRowStatus != RS_ACTIVE) {
+				/* activate with underlying device */
+				if (activate_tcapApplicationContextNameTable_row(StorageTmp) != SNMP_ERR_NOERROR)
+					return SNMP_ERR_COMMITFAILED;
 			}
 			break;
 		case RS_NOTINSERVICE:
-			/* set the flag? */
-			old_value = StorageTmp->tcapApplicationContextRowStatus;
-			StorageTmp->tcapApplicationContextRowStatus = set_value;
+			/* state change already performed */
+			if (StorageTmp->tcapApplicationContextRowStatus != RS_NOTINSERVICE) {
+				/* deactivate with underlying device */
+				if (deactivate_tcapApplicationContextNameTable_row(StorageTmp) != SNMP_ERR_NOERROR)
+					return SNMP_ERR_COMMITFAILED;
+			}
 			break;
+		case RS_DESTROY:
+			/* commit destrution to underlying device */
+			if (StorageDel == NULL)
+				break;
+			/* deactivate with underlying device */
+			if (deactivate_tcapApplicationContextNameTable_row(StorageDel) != SNMP_ERR_NOERROR)
+				return SNMP_ERR_COMMITFAILED;
+			break;
+		default:
+			return SNMP_ERR_WRONGVALUE;
 		}
 		break;
 	case COMMIT:
 		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		switch (set_value) {
 		case RS_CREATEANDGO:
-			/* row creation, set final state */
-			/* XXX: commit creation to underlying device */
-			/* XXX: activate with underlying device */
 			StorageNew->tcapApplicationContextRowStatus = RS_ACTIVE;
 			break;
 		case RS_CREATEANDWAIT:
-			/* row creation, set final state */
 			StorageNew->tcapApplicationContextRowStatus = RS_NOTINSERVICE;
 			break;
 		case RS_ACTIVE:
 		case RS_NOTINSERVICE:
-			/* state change already performed */
-			if (old_value != set_value) {
-				switch (set_value) {
-				case RS_ACTIVE:
-					/* XXX: activate with underlying device */
-					break;
-				case RS_NOTINSERVICE:
-					/* XXX: deactivate with underlying device */
-					break;
-				}
+			StorageNew->tcapApplicationContextRowStatus = set_value;
+			if ((StorageOld = StorageTmp->tcapApplicationContextNameTable_old) != NULL) {
+				tcapApplicationContextNameTable_destroy(&StorageTmp->tcapApplicationContextNameTable_old);
+				StorageTmp->tcapApplicationContextNameTable_rsvs = 0;
+				StorageTmp->tcapApplicationContextNameTable_tsts = 0;
+				StorageTmp->tcapApplicationContextNameTable_sets = 0;
 			}
 			break;
 		case RS_DESTROY:
-			/* row deletion, free it its dead */
 			tcapApplicationContextNameTable_destroy(&StorageDel);
-			/* tcapApplicationContextNameTable_destroy() can handle NULL pointers. */
 			break;
 		}
 		break;
 	case UNDO:
 		/* Back out any changes made in the ACTION case */
 		switch (set_value) {
+		case RS_CREATEANDGO:
+			/* deactivate with underlying device */
+			deactivate_tcapApplicationContextNameTable_row(StorageNew);
+			break;
+		case RS_CREATEANDWAIT:
+			break;
 		case RS_ACTIVE:
+			if (StorageTmp->tcapApplicationContextRowStatus == RS_NOTINSERVICE)
+				/* deactivate with underlying device */
+				deactivate_tcapApplicationContextNameTable_row(StorageTmp);
+			break;
 		case RS_NOTINSERVICE:
-			/* restore state */
-			StorageTmp->tcapApplicationContextRowStatus = old_value;
+			if (StorageTmp->tcapApplicationContextRowStatus == RS_ACTIVE)
+				/* activate with underlying device */
+				activate_tcapApplicationContextNameTable_row(StorageTmp);
+			break;
+		case RS_DESTROY:
 			break;
 		}
 		/* fall through */
@@ -7924,6 +10526,13 @@ write_tcapApplicationContextRowStatus(int action, u_char *var_val, u_char var_va
 				tcapApplicationContextNameTable_del(StorageNew);
 				tcapApplicationContextNameTable_destroy(&StorageNew);
 			}
+			break;
+		case RS_ACTIVE:
+		case RS_NOTINSERVICE:
+			if ((StorageOld = StorageTmp->tcapApplicationContextNameTable_old) == NULL)
+				break;
+			if (--StorageTmp->tcapApplicationContextNameTable_rsvs == 0)
+				tcapApplicationContextNameTable_destroy(&StorageTmp->tcapApplicationContextNameTable_old);
 			break;
 		case RS_DESTROY:
 			/* row deletion, so add it again */
@@ -7950,10 +10559,9 @@ write_tcapApplicationContextRowStatus(int action, u_char *var_val, u_char var_va
 int
 write_tcapAbstractSyntaxRowStatus(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	struct tcapAbstractSyntaxTable_data *StorageTmp = NULL;
+	struct tcapAbstractSyntaxTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	static struct tcapAbstractSyntaxTable_data *StorageNew, *StorageDel;
 	size_t newlen = name_len - 15;
-	static int old_value;
 	int set_value, ret;
 	static struct variable_list *vars, *vp;
 
@@ -7980,40 +10588,6 @@ write_tcapAbstractSyntaxRowStatus(int action, u_char *var_val, u_char var_val_ty
 			if (StorageTmp != NULL)
 				/* cannot create existing row */
 				return SNMP_ERR_INCONSISTENTVALUE;
-			break;
-		case RS_ACTIVE:
-		case RS_NOTINSERVICE:
-			if (StorageTmp == NULL)
-				/* cannot change state of non-existent row */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			if (StorageTmp->tcapAbstractSyntaxRowStatus == RS_NOTREADY)
-				/* cannot change state of row that is not ready */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			/* XXX: interaction with row storage type needed */
-			if (set_value == RS_NOTINSERVICE && StorageTmp->tcapAbstractSyntaxTable_refs > 0)
-				/* row is busy and cannot be moved to the RS_NOTINSERVICE state */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			break;
-		case RS_DESTROY:
-			/* destroying existent or non-existent row is ok */
-			if (StorageTmp == NULL)
-				break;
-			/* XXX: interaction with row storage type needed */
-			if (StorageTmp->tcapAbstractSyntaxTable_refs > 0)
-				/* row is busy and cannot be deleted */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			break;
-		case RS_NOTREADY:
-			/* management station cannot set this, only agent can */
-		default:
-			return SNMP_ERR_INCONSISTENTVALUE;
-		}
-		break;
-	case RESERVE2:
-		/* memory reseveration, final preparation... */
-		switch (set_value) {
-		case RS_CREATEANDGO:
-		case RS_CREATEANDWAIT:
 			/* creation */
 			vars = NULL;
 			/* tcapApplicationEntityId */
@@ -8050,6 +10624,7 @@ write_tcapAbstractSyntaxRowStatus(int action, u_char *var_val, u_char var_val_ty
 				snmp_free_varbind(vars);
 				return SNMP_ERR_RESOURCEUNAVAILABLE;
 			}
+			StorageNew->tcapAbstractSyntaxTable_rsvs = 1;
 			vp = vars;
 			memdup((void *) &StorageNew->tcapApplicationEntityId, vp->val.string, vp->val_len);
 			StorageNew->tcapApplicationEntityIdLen = vp->val_len;
@@ -8058,7 +10633,37 @@ write_tcapAbstractSyntaxRowStatus(int action, u_char *var_val, u_char var_val_ty
 			vp = vp->next_variable;
 			header_complex_add_data(&tcapAbstractSyntaxTableStorage, vars, StorageNew);	/* frees vars */
 			break;
+		case RS_ACTIVE:
+		case RS_NOTINSERVICE:
+			if (StorageTmp == NULL)
+				/* cannot change state of non-existent row */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			if (StorageTmp->tcapAbstractSyntaxRowStatus == RS_NOTREADY)
+				/* cannot change state of row that is not ready */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			/* XXX: interaction with row storage type needed */
+			if (set_value == RS_NOTINSERVICE && StorageTmp->tcapAbstractSyntaxTable_refs > 0)
+				/* row is busy and cannot be moved to the RS_NOTINSERVICE state */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			/* activate or deactivate */
+			if (StorageTmp == NULL)
+				return SNMP_ERR_NOSUCHNAME;
+			/* one allocation for the whole row */
+			if ((StorageOld = StorageTmp->tcapAbstractSyntaxTable_old) == NULL)
+				if (StorageTmp->tcapAbstractSyntaxTable_rsvs == 0)
+					if ((StorageOld = StorageTmp->tcapAbstractSyntaxTable_old = tcapAbstractSyntaxTable_duplicate(StorageTmp)) == NULL)
+						return SNMP_ERR_RESOURCEUNAVAILABLE;
+			if (StorageOld != NULL)
+				StorageTmp->tcapAbstractSyntaxTable_rsvs++;
+			break;
 		case RS_DESTROY:
+			if (StorageTmp == NULL)
+				/* cannot destroy non-existent row */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			/* XXX: interaction with row storage type needed */
+			if (StorageTmp->tcapAbstractSyntaxTable_refs > 0)
+				/* row is busy and cannot be deleted */
+				return SNMP_ERR_INCONSISTENTVALUE;
 			/* destroy */
 			if (StorageTmp != NULL) {
 				/* exists, extract it for now */
@@ -8068,78 +10673,127 @@ write_tcapAbstractSyntaxRowStatus(int action, u_char *var_val, u_char var_val_ty
 				StorageDel = NULL;
 			}
 			break;
+		case RS_NOTREADY:
+			/* management station cannot set this, only agent can */
+		default:
+			return SNMP_ERR_INCONSISTENTVALUE;
 		}
 		break;
-	case ACTION:
-		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the UNDO case */
+	case RESERVE2:
+		/* memory reseveration, final preparation... */
 		switch (set_value) {
 		case RS_CREATEANDGO:
 			/* check that activation is possible */
-			if ((ret = tcapAbstractSyntaxTable_consistent(StorageNew)) != SNMP_ERR_NOERROR)
+			if ((ret = can_act_tcapAbstractSyntaxTable_row(StorageNew)) != SNMP_ERR_NOERROR)
 				return (ret);
 			break;
 		case RS_CREATEANDWAIT:
-			/* row does not have to be consistent */
 			break;
 		case RS_ACTIVE:
-			old_value = StorageTmp->tcapAbstractSyntaxRowStatus;
-			StorageTmp->tcapAbstractSyntaxRowStatus = set_value;
-			if (old_value != RS_ACTIVE) {
-				/* check that activation is possible */
-				if ((ret = tcapAbstractSyntaxTable_consistent(StorageTmp)) != SNMP_ERR_NOERROR) {
-					StorageTmp->tcapAbstractSyntaxRowStatus = old_value;
+			/* check that activation is possible */
+			if (StorageTmp->tcapAbstractSyntaxRowStatus != RS_ACTIVE)
+				if ((ret = can_act_tcapAbstractSyntaxTable_row(StorageTmp)) != SNMP_ERR_NOERROR)
 					return (ret);
-				}
+			break;
+		case RS_NOTINSERVICE:
+			/* check that deactivation is possible */
+			if (StorageTmp->tcapAbstractSyntaxRowStatus != RS_NOTINSERVICE)
+				if ((ret = can_deact_tcapAbstractSyntaxTable_row(StorageTmp)) != SNMP_ERR_NOERROR)
+					return (ret);
+			break;
+		case RS_DESTROY:
+			/* check that deactivation is possible */
+			if (StorageTmp->tcapAbstractSyntaxRowStatus != RS_NOTINSERVICE)
+				if ((ret = can_deact_tcapAbstractSyntaxTable_row(StorageTmp)) != SNMP_ERR_NOERROR)
+					return (ret);
+			break;
+		default:
+			return SNMP_ERR_WRONGVALUE;
+		}
+		break;
+	case ACTION:
+		/* The variable has been stored in StorageTmp->tcapAbstractSyntaxRowStatus for you to use, and you have just been asked to do something with it.  Note that anything done here must be
+		   reversable in the UNDO case */
+		switch (set_value) {
+		case RS_CREATEANDGO:
+			/* activate with underlying device */
+			if (activate_tcapAbstractSyntaxTable_row(StorageNew) != SNMP_ERR_NOERROR)
+				return SNMP_ERR_COMMITFAILED;
+			break;
+		case RS_CREATEANDWAIT:
+			break;
+		case RS_ACTIVE:
+			/* state change already performed */
+			if (StorageTmp->tcapAbstractSyntaxRowStatus != RS_ACTIVE) {
+				/* activate with underlying device */
+				if (activate_tcapAbstractSyntaxTable_row(StorageTmp) != SNMP_ERR_NOERROR)
+					return SNMP_ERR_COMMITFAILED;
 			}
 			break;
 		case RS_NOTINSERVICE:
-			/* set the flag? */
-			old_value = StorageTmp->tcapAbstractSyntaxRowStatus;
-			StorageTmp->tcapAbstractSyntaxRowStatus = set_value;
+			/* state change already performed */
+			if (StorageTmp->tcapAbstractSyntaxRowStatus != RS_NOTINSERVICE) {
+				/* deactivate with underlying device */
+				if (deactivate_tcapAbstractSyntaxTable_row(StorageTmp) != SNMP_ERR_NOERROR)
+					return SNMP_ERR_COMMITFAILED;
+			}
 			break;
+		case RS_DESTROY:
+			/* commit destrution to underlying device */
+			if (StorageDel == NULL)
+				break;
+			/* deactivate with underlying device */
+			if (deactivate_tcapAbstractSyntaxTable_row(StorageDel) != SNMP_ERR_NOERROR)
+				return SNMP_ERR_COMMITFAILED;
+			break;
+		default:
+			return SNMP_ERR_WRONGVALUE;
 		}
 		break;
 	case COMMIT:
 		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		switch (set_value) {
 		case RS_CREATEANDGO:
-			/* row creation, set final state */
-			/* XXX: commit creation to underlying device */
-			/* XXX: activate with underlying device */
 			StorageNew->tcapAbstractSyntaxRowStatus = RS_ACTIVE;
 			break;
 		case RS_CREATEANDWAIT:
-			/* row creation, set final state */
 			StorageNew->tcapAbstractSyntaxRowStatus = RS_NOTINSERVICE;
 			break;
 		case RS_ACTIVE:
 		case RS_NOTINSERVICE:
-			/* state change already performed */
-			if (old_value != set_value) {
-				switch (set_value) {
-				case RS_ACTIVE:
-					/* XXX: activate with underlying device */
-					break;
-				case RS_NOTINSERVICE:
-					/* XXX: deactivate with underlying device */
-					break;
-				}
+			StorageNew->tcapAbstractSyntaxRowStatus = set_value;
+			if ((StorageOld = StorageTmp->tcapAbstractSyntaxTable_old) != NULL) {
+				tcapAbstractSyntaxTable_destroy(&StorageTmp->tcapAbstractSyntaxTable_old);
+				StorageTmp->tcapAbstractSyntaxTable_rsvs = 0;
+				StorageTmp->tcapAbstractSyntaxTable_tsts = 0;
+				StorageTmp->tcapAbstractSyntaxTable_sets = 0;
 			}
 			break;
 		case RS_DESTROY:
-			/* row deletion, free it its dead */
 			tcapAbstractSyntaxTable_destroy(&StorageDel);
-			/* tcapAbstractSyntaxTable_destroy() can handle NULL pointers. */
 			break;
 		}
 		break;
 	case UNDO:
 		/* Back out any changes made in the ACTION case */
 		switch (set_value) {
+		case RS_CREATEANDGO:
+			/* deactivate with underlying device */
+			deactivate_tcapAbstractSyntaxTable_row(StorageNew);
+			break;
+		case RS_CREATEANDWAIT:
+			break;
 		case RS_ACTIVE:
+			if (StorageTmp->tcapAbstractSyntaxRowStatus == RS_NOTINSERVICE)
+				/* deactivate with underlying device */
+				deactivate_tcapAbstractSyntaxTable_row(StorageTmp);
+			break;
 		case RS_NOTINSERVICE:
-			/* restore state */
-			StorageTmp->tcapAbstractSyntaxRowStatus = old_value;
+			if (StorageTmp->tcapAbstractSyntaxRowStatus == RS_ACTIVE)
+				/* activate with underlying device */
+				activate_tcapAbstractSyntaxTable_row(StorageTmp);
+			break;
+		case RS_DESTROY:
 			break;
 		}
 		/* fall through */
@@ -8153,6 +10807,13 @@ write_tcapAbstractSyntaxRowStatus(int action, u_char *var_val, u_char var_val_ty
 				tcapAbstractSyntaxTable_del(StorageNew);
 				tcapAbstractSyntaxTable_destroy(&StorageNew);
 			}
+			break;
+		case RS_ACTIVE:
+		case RS_NOTINSERVICE:
+			if ((StorageOld = StorageTmp->tcapAbstractSyntaxTable_old) == NULL)
+				break;
+			if (--StorageTmp->tcapAbstractSyntaxTable_rsvs == 0)
+				tcapAbstractSyntaxTable_destroy(&StorageTmp->tcapAbstractSyntaxTable_old);
 			break;
 		case RS_DESTROY:
 			/* row deletion, so add it again */
@@ -8179,10 +10840,9 @@ write_tcapAbstractSyntaxRowStatus(int action, u_char *var_val, u_char var_val_ty
 int
 write_tcapTransferSyntaxRowStatus(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	struct tcapTransferSyntaxTable_data *StorageTmp = NULL;
+	struct tcapTransferSyntaxTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	static struct tcapTransferSyntaxTable_data *StorageNew, *StorageDel;
 	size_t newlen = name_len - 15;
-	static int old_value;
 	int set_value, ret;
 	static struct variable_list *vars, *vp;
 
@@ -8209,40 +10869,6 @@ write_tcapTransferSyntaxRowStatus(int action, u_char *var_val, u_char var_val_ty
 			if (StorageTmp != NULL)
 				/* cannot create existing row */
 				return SNMP_ERR_INCONSISTENTVALUE;
-			break;
-		case RS_ACTIVE:
-		case RS_NOTINSERVICE:
-			if (StorageTmp == NULL)
-				/* cannot change state of non-existent row */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			if (StorageTmp->tcapTransferSyntaxRowStatus == RS_NOTREADY)
-				/* cannot change state of row that is not ready */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			/* XXX: interaction with row storage type needed */
-			if (set_value == RS_NOTINSERVICE && StorageTmp->tcapTransferSyntaxTable_refs > 0)
-				/* row is busy and cannot be moved to the RS_NOTINSERVICE state */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			break;
-		case RS_DESTROY:
-			/* destroying existent or non-existent row is ok */
-			if (StorageTmp == NULL)
-				break;
-			/* XXX: interaction with row storage type needed */
-			if (StorageTmp->tcapTransferSyntaxTable_refs > 0)
-				/* row is busy and cannot be deleted */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			break;
-		case RS_NOTREADY:
-			/* management station cannot set this, only agent can */
-		default:
-			return SNMP_ERR_INCONSISTENTVALUE;
-		}
-		break;
-	case RESERVE2:
-		/* memory reseveration, final preparation... */
-		switch (set_value) {
-		case RS_CREATEANDGO:
-		case RS_CREATEANDWAIT:
 			/* creation */
 			vars = NULL;
 			/* tcapApplicationEntityId */
@@ -8279,6 +10905,7 @@ write_tcapTransferSyntaxRowStatus(int action, u_char *var_val, u_char var_val_ty
 				snmp_free_varbind(vars);
 				return SNMP_ERR_RESOURCEUNAVAILABLE;
 			}
+			StorageNew->tcapTransferSyntaxTable_rsvs = 1;
 			vp = vars;
 			memdup((void *) &StorageNew->tcapApplicationEntityId, vp->val.string, vp->val_len);
 			StorageNew->tcapApplicationEntityIdLen = vp->val_len;
@@ -8288,7 +10915,37 @@ write_tcapTransferSyntaxRowStatus(int action, u_char *var_val, u_char var_val_ty
 			vp = vp->next_variable;
 			header_complex_add_data(&tcapTransferSyntaxTableStorage, vars, StorageNew);	/* frees vars */
 			break;
+		case RS_ACTIVE:
+		case RS_NOTINSERVICE:
+			if (StorageTmp == NULL)
+				/* cannot change state of non-existent row */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			if (StorageTmp->tcapTransferSyntaxRowStatus == RS_NOTREADY)
+				/* cannot change state of row that is not ready */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			/* XXX: interaction with row storage type needed */
+			if (set_value == RS_NOTINSERVICE && StorageTmp->tcapTransferSyntaxTable_refs > 0)
+				/* row is busy and cannot be moved to the RS_NOTINSERVICE state */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			/* activate or deactivate */
+			if (StorageTmp == NULL)
+				return SNMP_ERR_NOSUCHNAME;
+			/* one allocation for the whole row */
+			if ((StorageOld = StorageTmp->tcapTransferSyntaxTable_old) == NULL)
+				if (StorageTmp->tcapTransferSyntaxTable_rsvs == 0)
+					if ((StorageOld = StorageTmp->tcapTransferSyntaxTable_old = tcapTransferSyntaxTable_duplicate(StorageTmp)) == NULL)
+						return SNMP_ERR_RESOURCEUNAVAILABLE;
+			if (StorageOld != NULL)
+				StorageTmp->tcapTransferSyntaxTable_rsvs++;
+			break;
 		case RS_DESTROY:
+			if (StorageTmp == NULL)
+				/* cannot destroy non-existent row */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			/* XXX: interaction with row storage type needed */
+			if (StorageTmp->tcapTransferSyntaxTable_refs > 0)
+				/* row is busy and cannot be deleted */
+				return SNMP_ERR_INCONSISTENTVALUE;
 			/* destroy */
 			if (StorageTmp != NULL) {
 				/* exists, extract it for now */
@@ -8298,78 +10955,127 @@ write_tcapTransferSyntaxRowStatus(int action, u_char *var_val, u_char var_val_ty
 				StorageDel = NULL;
 			}
 			break;
+		case RS_NOTREADY:
+			/* management station cannot set this, only agent can */
+		default:
+			return SNMP_ERR_INCONSISTENTVALUE;
 		}
 		break;
-	case ACTION:
-		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the UNDO case */
+	case RESERVE2:
+		/* memory reseveration, final preparation... */
 		switch (set_value) {
 		case RS_CREATEANDGO:
 			/* check that activation is possible */
-			if ((ret = tcapTransferSyntaxTable_consistent(StorageNew)) != SNMP_ERR_NOERROR)
+			if ((ret = can_act_tcapTransferSyntaxTable_row(StorageNew)) != SNMP_ERR_NOERROR)
 				return (ret);
 			break;
 		case RS_CREATEANDWAIT:
-			/* row does not have to be consistent */
 			break;
 		case RS_ACTIVE:
-			old_value = StorageTmp->tcapTransferSyntaxRowStatus;
-			StorageTmp->tcapTransferSyntaxRowStatus = set_value;
-			if (old_value != RS_ACTIVE) {
-				/* check that activation is possible */
-				if ((ret = tcapTransferSyntaxTable_consistent(StorageTmp)) != SNMP_ERR_NOERROR) {
-					StorageTmp->tcapTransferSyntaxRowStatus = old_value;
+			/* check that activation is possible */
+			if (StorageTmp->tcapTransferSyntaxRowStatus != RS_ACTIVE)
+				if ((ret = can_act_tcapTransferSyntaxTable_row(StorageTmp)) != SNMP_ERR_NOERROR)
 					return (ret);
-				}
+			break;
+		case RS_NOTINSERVICE:
+			/* check that deactivation is possible */
+			if (StorageTmp->tcapTransferSyntaxRowStatus != RS_NOTINSERVICE)
+				if ((ret = can_deact_tcapTransferSyntaxTable_row(StorageTmp)) != SNMP_ERR_NOERROR)
+					return (ret);
+			break;
+		case RS_DESTROY:
+			/* check that deactivation is possible */
+			if (StorageTmp->tcapTransferSyntaxRowStatus != RS_NOTINSERVICE)
+				if ((ret = can_deact_tcapTransferSyntaxTable_row(StorageTmp)) != SNMP_ERR_NOERROR)
+					return (ret);
+			break;
+		default:
+			return SNMP_ERR_WRONGVALUE;
+		}
+		break;
+	case ACTION:
+		/* The variable has been stored in StorageTmp->tcapTransferSyntaxRowStatus for you to use, and you have just been asked to do something with it.  Note that anything done here must be
+		   reversable in the UNDO case */
+		switch (set_value) {
+		case RS_CREATEANDGO:
+			/* activate with underlying device */
+			if (activate_tcapTransferSyntaxTable_row(StorageNew) != SNMP_ERR_NOERROR)
+				return SNMP_ERR_COMMITFAILED;
+			break;
+		case RS_CREATEANDWAIT:
+			break;
+		case RS_ACTIVE:
+			/* state change already performed */
+			if (StorageTmp->tcapTransferSyntaxRowStatus != RS_ACTIVE) {
+				/* activate with underlying device */
+				if (activate_tcapTransferSyntaxTable_row(StorageTmp) != SNMP_ERR_NOERROR)
+					return SNMP_ERR_COMMITFAILED;
 			}
 			break;
 		case RS_NOTINSERVICE:
-			/* set the flag? */
-			old_value = StorageTmp->tcapTransferSyntaxRowStatus;
-			StorageTmp->tcapTransferSyntaxRowStatus = set_value;
+			/* state change already performed */
+			if (StorageTmp->tcapTransferSyntaxRowStatus != RS_NOTINSERVICE) {
+				/* deactivate with underlying device */
+				if (deactivate_tcapTransferSyntaxTable_row(StorageTmp) != SNMP_ERR_NOERROR)
+					return SNMP_ERR_COMMITFAILED;
+			}
 			break;
+		case RS_DESTROY:
+			/* commit destrution to underlying device */
+			if (StorageDel == NULL)
+				break;
+			/* deactivate with underlying device */
+			if (deactivate_tcapTransferSyntaxTable_row(StorageDel) != SNMP_ERR_NOERROR)
+				return SNMP_ERR_COMMITFAILED;
+			break;
+		default:
+			return SNMP_ERR_WRONGVALUE;
 		}
 		break;
 	case COMMIT:
 		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		switch (set_value) {
 		case RS_CREATEANDGO:
-			/* row creation, set final state */
-			/* XXX: commit creation to underlying device */
-			/* XXX: activate with underlying device */
 			StorageNew->tcapTransferSyntaxRowStatus = RS_ACTIVE;
 			break;
 		case RS_CREATEANDWAIT:
-			/* row creation, set final state */
 			StorageNew->tcapTransferSyntaxRowStatus = RS_NOTINSERVICE;
 			break;
 		case RS_ACTIVE:
 		case RS_NOTINSERVICE:
-			/* state change already performed */
-			if (old_value != set_value) {
-				switch (set_value) {
-				case RS_ACTIVE:
-					/* XXX: activate with underlying device */
-					break;
-				case RS_NOTINSERVICE:
-					/* XXX: deactivate with underlying device */
-					break;
-				}
+			StorageNew->tcapTransferSyntaxRowStatus = set_value;
+			if ((StorageOld = StorageTmp->tcapTransferSyntaxTable_old) != NULL) {
+				tcapTransferSyntaxTable_destroy(&StorageTmp->tcapTransferSyntaxTable_old);
+				StorageTmp->tcapTransferSyntaxTable_rsvs = 0;
+				StorageTmp->tcapTransferSyntaxTable_tsts = 0;
+				StorageTmp->tcapTransferSyntaxTable_sets = 0;
 			}
 			break;
 		case RS_DESTROY:
-			/* row deletion, free it its dead */
 			tcapTransferSyntaxTable_destroy(&StorageDel);
-			/* tcapTransferSyntaxTable_destroy() can handle NULL pointers. */
 			break;
 		}
 		break;
 	case UNDO:
 		/* Back out any changes made in the ACTION case */
 		switch (set_value) {
+		case RS_CREATEANDGO:
+			/* deactivate with underlying device */
+			deactivate_tcapTransferSyntaxTable_row(StorageNew);
+			break;
+		case RS_CREATEANDWAIT:
+			break;
 		case RS_ACTIVE:
+			if (StorageTmp->tcapTransferSyntaxRowStatus == RS_NOTINSERVICE)
+				/* deactivate with underlying device */
+				deactivate_tcapTransferSyntaxTable_row(StorageTmp);
+			break;
 		case RS_NOTINSERVICE:
-			/* restore state */
-			StorageTmp->tcapTransferSyntaxRowStatus = old_value;
+			if (StorageTmp->tcapTransferSyntaxRowStatus == RS_ACTIVE)
+				/* activate with underlying device */
+				activate_tcapTransferSyntaxTable_row(StorageTmp);
+			break;
+		case RS_DESTROY:
 			break;
 		}
 		/* fall through */
@@ -8383,6 +11089,13 @@ write_tcapTransferSyntaxRowStatus(int action, u_char *var_val, u_char var_val_ty
 				tcapTransferSyntaxTable_del(StorageNew);
 				tcapTransferSyntaxTable_destroy(&StorageNew);
 			}
+			break;
+		case RS_ACTIVE:
+		case RS_NOTINSERVICE:
+			if ((StorageOld = StorageTmp->tcapTransferSyntaxTable_old) == NULL)
+				break;
+			if (--StorageTmp->tcapTransferSyntaxTable_rsvs == 0)
+				tcapTransferSyntaxTable_destroy(&StorageTmp->tcapTransferSyntaxTable_old);
 			break;
 		case RS_DESTROY:
 			/* row deletion, so add it again */

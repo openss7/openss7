@@ -821,6 +821,11 @@ libOS7drivers_a_SOURCES		= src/drivers/pty.c \
 				  src/drivers/x400p-ss7.c \
 				  src/drivers/x100p-ss7.c \
 				  src/drivers/sl_x400p.c \
+				  src/include/net/bpf.h \
+				  src/include/net/lif.h \
+				  src/include/net/nit_buf.h \
+				  src/include/net/nit_if.h \
+				  src/include/net/nit_pf.h \
 				  src/drivers/sl_x100p.c \
 				  src/drivers/v400pfw.h \
 				  src/drivers/v401pfw.h \
@@ -1692,6 +1697,29 @@ EXTRA_PROGRAMS			+= chand
 
 ## =====================================================================
 
+xmond_SOURCES			= src/snmp/xmond.c \
+				  src/snmp/xmond.h \
+				  src/snmp/xmonMIB.c \
+				  src/snmp/xmonMIB.h \
+				  src/snmp/ds_agent.h \
+				  src/snmp/header_complex.h \
+				  src/snmp/mib_modules.h \
+				  src/snmp/struct.h \
+				  src/snmp/util_funcs.h
+xmond_CPPFLAGS			= $(PKG_INCLUDES) $(USER_CPPFLAGS) $(SNMP_CPPFLAGS)
+xmond_CFLAGS			= $(USER_CFLAGS) $(USER_DFLAGS)
+xmond_LDADD			= libstreams.la $(SNMP_LDADD)
+xmond_LDFLAGS			= $(USER_LDFLAGS) $(SNMP_LDFLAGS) -lpcap
+
+if WITH_SNMP
+if WITH_SNMP_AGENT
+sbin_PROGRAMS			+= xmond
+endif
+endif
+EXTRA_PROGRAMS			+= xmond
+
+## =====================================================================
+
 ifrdlci_SOURCES			= src/util/ifrdlci.c
 ifrdlci_CPPFLAGS		= $(UTIL_INCLUDES)
 ifrdlci_CFLAGS			= $(USER_CFLAGS) $(USER_DFLAGS)
@@ -2023,6 +2051,24 @@ sdlconfig_LDFLAGS		= $(USER_LDFLAGS)
 sdlconfig_LDADD			= libstreams.la
 
 sbin_PROGRAMS			+= sdlconfig
+
+## =====================================================================
+
+soconf_SOURCES			= src/util/soconf.c
+soconf_CPPFLAGS			= $(UTIL_INCLUDES)
+soconf_LDFLAGS			= $(USER_CFLAGS) $(USER_DFLAGS)
+soconf_LDADD			= libstreams.la
+
+sbin_PROGRAMS			+= soconf
+
+## =====================================================================
+
+mxconfig_SOURCES		= src/util/mxconf.c
+mxconfig_CPPFLAGS		= $(UTIL_INCLUDES)
+mxconfig_LDFLAGS		= $(USER_CFLAGS) $(USER_DFLAGS)
+mxconfig_LDADD			= libstreams.la
+
+sbin_PROGRAMS			+= mxconfig
 
 ## =====================================================================
 

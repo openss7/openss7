@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2012  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -420,8 +420,44 @@ strExtMIB_create(void)
 		StorageNew->strExtTraceLog = TV_FALSE;
 
 	}
+      done:
 	DEBUGMSGTL(("strExtMIB", "done.\n"));
 	return (StorageNew);
+	goto nomem;
+      nomem:
+	strExtMIB_destroy(&StorageNew);
+	goto done;
+}
+
+/**
+ * @fn struct strExtMIB_data *strExtMIB_duplicate(struct strExtMIB_data *thedata)
+ * @param thedata the mib structure to duplicate
+ * @brief duplicate a mib structure for the mib
+ *
+ * Duplicates the specified mib structure @param thedata and returns a pointer to the newly
+ * allocated mib structure on success, or NULL on failure.
+ */
+struct strExtMIB_data *
+strExtMIB_duplicate(struct strExtMIB_data *thedata)
+{
+	struct strExtMIB_data *StorageNew = SNMP_MALLOC_STRUCT(strExtMIB_data);
+
+	DEBUGMSGTL(("strExtMIB", "strExtMIB_duplicate: duplicating mib... "));
+	if (StorageNew != NULL) {
+		StorageNew->strExtStrlogRecordNextIndex = thedata->strExtStrlogRecordNextIndex;
+		StorageNew->strNlogargs = thedata->strNlogargs;
+		StorageNew->strExtLogMsgSize = thedata->strExtLogMsgSize;
+		StorageNew->strExtConsoleLog = thedata->strExtConsoleLog;
+		StorageNew->strExtErrorLog = thedata->strExtErrorLog;
+		StorageNew->strExtTraceLog = thedata->strExtTraceLog;
+	}
+      done:
+	DEBUGMSGTL(("strExtMIB", "done.\n"));
+	return (StorageNew);
+	goto destroy;
+      destroy:
+	strExtMIB_destroy(&StorageNew);
+	goto done;
 }
 
 /**
@@ -472,7 +508,7 @@ strExtMIB_add(struct strExtMIB_data *thedata)
  * @param line line from configuration file matching the token.
  * @brief parse configuration file for strExtMIB entries.
  *
- * This callback is called by UCD-SNMP when it prases a configuration file and finds a configuration
+ * This callback is called by UCD-SNMP when it parses a configuration file and finds a configuration
  * file line for the registsred token (in this case strExtMIB).  This routine is invoked by
  * UCD-SNMP to read the values of scalars in the MIB from the configuration file.  Note that this
  * procedure may exist regardless of the persistence of the MIB.  If there are no configured entries
@@ -536,6 +572,62 @@ store_strExtMIB(int majorID, int minorID, void *serverarg, void *clientarg)
 	}
 	DEBUGMSGTL(("strExtMIB", "done.\n"));
 	return SNMPERR_SUCCESS;
+}
+
+/**
+ * @fn int check_strExtMIB(struct strExtMIB_data *StorageTmp, struct strExtMIB_data *StorageOld)
+ * @param StorageTmp the data as updated
+ * @param StorageOld the data previous to update
+ *
+ * This function is used by mibs.  It is used to check, all scalars at a time, the varbinds
+ * belonging to the mib.  This function is called for the first varbind in a mib at the beginning of
+ * the ACTION phase.  The COMMIT phase does not ensue unless this check passes.  This function can
+ * return SNMP_ERR_NOERR or a specific SNMP error value.  Values in StorageOld are the values before
+ * the varbinds on the mib were applied; the values in StorageTmp are the new values.  The function
+ * is permitted to change the values in StorageTmp to correct them; however, preferences should be
+ * made for setting values that were not in the varbinds.
+ */
+int
+check_strExtMIB(struct strExtMIB_data *StorageTmp, struct strExtMIB_data *StorageOld)
+{
+	/* XXX: provide code to check the scalars for consistency */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int update_strExtMIB(struct strExtMIB_data *StorageTmp, struct strExtMIB_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the set operation (ACTION phase)
+ *
+ * This function is used by mibs.  It is used to update, all scalars at a time, the varbinds
+ * belonging to the mib.  This function is called for the first varbind in a mib at the beginning of
+ * the COMMIT phase.  The start of the ACTION phase performs a consistency check on the mib before
+ * allowing the request to proceed to the COMMIT phase.  The COMMIT phase then arrives here with
+ * consistency already checked (see check_strExtMIB()).  This function can
+ * return SNMP_ERR_NOERROR or SNMP_ERR_COMMITFAILED.  Values in StorageOld are the values before the
+ * varbinds on the mib were applied: the values in StorageTmp are the new values.
+ */
+int
+update_strExtMIB(struct strExtMIB_data *StorageTmp, struct strExtMIB_data *StorageOld)
+{
+	/* XXX: provide code to update the row with the underlying device */
+	strExtMIB_refresh = 1;
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn revert_strExtMIB(struct 
+ * @fn void revert_strExtMIB(struct strExtMIB_data *StorageTmp, struct strExtMIB_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the undo operation (UNDO phase)
+ */
+void
+revert_strExtMIB(struct strExtMIB_data *StorageTmp, struct strExtMIB_data *StorageOld)
+{
+	/* XXX: provide code to revert the row with the underlying device */
+	update_strExtMIB(StorageOld, NULL);
 }
 
 /**
@@ -673,27 +765,37 @@ strExtStrlogRecordTable_create(void)
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
 		StorageNew->strExtStrlogRecordSeqNo = 0;
-		if ((StorageNew->strExtStrlogRecordDateAndTime = (uint8_t *) strdup("")) != NULL)
-			StorageNew->strExtStrlogRecordDateAndTimeLen = strlen("");
+		if ((StorageNew->strExtStrlogRecordDateAndTime = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->strExtStrlogRecordDateAndTimeLen = 0;
+		StorageNew->strExtStrlogRecordDateAndTime[StorageNew->strExtStrlogRecordDateAndTimeLen] = 0;
 		StorageNew->strExtStrlogRecordTimeStamp = 0;
 		StorageNew->strExtStrlogRecordMid = 0;
 		StorageNew->strExtStrlogRecordSid = 0;
 		StorageNew->strExtStrlogRecordLevel = 0;
-		if (memdup((u_char **) &StorageNew->strExtStrlogRecordFlags, (u_char *) "\x00", 1) == SNMPERR_SUCCESS)
-			StorageNew->strExtStrlogRecordFlagsLen = 1;
-		if ((StorageNew->strExtStrlogRecordMsgString = (uint8_t *) strdup("")) != NULL)
-			StorageNew->strExtStrlogRecordMsgStringLen = strlen("");
+		if (memdup((u_char **) &StorageNew->strExtStrlogRecordFlags, (u_char *) "\x00", 1) != SNMPERR_SUCCESS)
+			goto nomem;
+		StorageNew->strExtStrlogRecordFlagsLen = 1;
+		if ((StorageNew->strExtStrlogRecordMsgString = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->strExtStrlogRecordMsgStringLen = 0;
+		StorageNew->strExtStrlogRecordMsgString[StorageNew->strExtStrlogRecordMsgStringLen] = 0;
 		StorageNew->strExtStrlogRecordRowStatus = 0;
 		StorageNew->strExtStrlogRecordRowStatus = RS_NOTREADY;
 	}
+      done:
 	DEBUGMSGTL(("strExtMIB", "done.\n"));
 	return (StorageNew);
+	goto nomem;
+      nomem:
+	strExtStrlogRecordTable_destroy(&StorageNew);
+	goto done;
 }
 
 /**
  * @fn struct strExtStrlogRecordTable_data *strExtStrlogRecordTable_duplicate(struct strExtStrlogRecordTable_data *thedata)
  * @param thedata the row structure to duplicate.
- * @brief duplicat a row structure for a table.
+ * @brief duplicate a row structure for a table.
  *
  * Duplicates the specified row structure @param thedata and returns a pointer to the newly
  * allocated row structure on success, or NULL on failure.
@@ -705,6 +807,29 @@ strExtStrlogRecordTable_duplicate(struct strExtStrlogRecordTable_data *thedata)
 
 	DEBUGMSGTL(("strExtMIB", "strExtStrlogRecordTable_duplicate: duplicating row...  "));
 	if (StorageNew != NULL) {
+		StorageNew->strExtStrlogRecordTable_id = thedata->strExtStrlogRecordTable_id;
+		StorageNew->strExtStrlogRecordIndex = thedata->strExtStrlogRecordIndex;
+		StorageNew->strExtStrlogRecordSeqNo = thedata->strExtStrlogRecordSeqNo;
+		if (!(StorageNew->strExtStrlogRecordDateAndTime = malloc(thedata->strExtStrlogRecordDateAndTimeLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->strExtStrlogRecordDateAndTime, thedata->strExtStrlogRecordDateAndTime, thedata->strExtStrlogRecordDateAndTimeLen);
+		StorageNew->strExtStrlogRecordDateAndTimeLen = thedata->strExtStrlogRecordDateAndTimeLen;
+		StorageNew->strExtStrlogRecordDateAndTime[StorageNew->strExtStrlogRecordDateAndTimeLen] = 0;
+		StorageNew->strExtStrlogRecordTimeStamp = thedata->strExtStrlogRecordTimeStamp;
+		StorageNew->strExtStrlogRecordMid = thedata->strExtStrlogRecordMid;
+		StorageNew->strExtStrlogRecordSid = thedata->strExtStrlogRecordSid;
+		StorageNew->strExtStrlogRecordLevel = thedata->strExtStrlogRecordLevel;
+		if (!(StorageNew->strExtStrlogRecordFlags = malloc(thedata->strExtStrlogRecordFlagsLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->strExtStrlogRecordFlags, thedata->strExtStrlogRecordFlags, thedata->strExtStrlogRecordFlagsLen);
+		StorageNew->strExtStrlogRecordFlagsLen = thedata->strExtStrlogRecordFlagsLen;
+		StorageNew->strExtStrlogRecordFlags[StorageNew->strExtStrlogRecordFlagsLen] = 0;
+		if (!(StorageNew->strExtStrlogRecordMsgString = malloc(thedata->strExtStrlogRecordMsgStringLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->strExtStrlogRecordMsgString, thedata->strExtStrlogRecordMsgString, thedata->strExtStrlogRecordMsgStringLen);
+		StorageNew->strExtStrlogRecordMsgStringLen = thedata->strExtStrlogRecordMsgStringLen;
+		StorageNew->strExtStrlogRecordMsgString[StorageNew->strExtStrlogRecordMsgStringLen] = 0;
+		StorageNew->strExtStrlogRecordRowStatus = thedata->strExtStrlogRecordRowStatus;
 	}
       done:
 	DEBUGMSGTL(("strExtMIB", "done.\n"));
@@ -804,7 +929,7 @@ strExtStrlogRecordTable_del(struct strExtStrlogRecordTable_data *thedata)
  * @param line line from configuration file matching the token.
  * @brief parse configuration file for strExtStrlogRecordTable entries.
  *
- * This callback is called by UCD-SNMP when it prases a configuration file and finds a configuration
+ * This callback is called by UCD-SNMP when it parses a configuration file and finds a configuration
  * file line for the registsred token (in this case strExtStrlogRecordTable).  This routine is invoked by UCD-SNMP
  * to read the values of each row in the table from the configuration file.  Note that this
  * procedure may exist regardless of the persistence of the table.  If there are no configured
@@ -916,14 +1041,19 @@ strExtTraceTable_create(void)
 		StorageNew->strExtTraceRowStatus = 0;
 		StorageNew->strExtTraceRowStatus = RS_NOTREADY;
 	}
+      done:
 	DEBUGMSGTL(("strExtMIB", "done.\n"));
 	return (StorageNew);
+	goto nomem;
+      nomem:
+	strExtTraceTable_destroy(&StorageNew);
+	goto done;
 }
 
 /**
  * @fn struct strExtTraceTable_data *strExtTraceTable_duplicate(struct strExtTraceTable_data *thedata)
  * @param thedata the row structure to duplicate.
- * @brief duplicat a row structure for a table.
+ * @brief duplicate a row structure for a table.
  *
  * Duplicates the specified row structure @param thedata and returns a pointer to the newly
  * allocated row structure on success, or NULL on failure.
@@ -935,6 +1065,12 @@ strExtTraceTable_duplicate(struct strExtTraceTable_data *thedata)
 
 	DEBUGMSGTL(("strExtMIB", "strExtTraceTable_duplicate: duplicating row...  "));
 	if (StorageNew != NULL) {
+		StorageNew->strExtTraceTable_id = thedata->strExtTraceTable_id;
+		StorageNew->strExtTraceId = thedata->strExtTraceId;
+		StorageNew->strExtTraceMid = thedata->strExtTraceMid;
+		StorageNew->strExtTraceSid = thedata->strExtTraceSid;
+		StorageNew->strExtTraceLevel = thedata->strExtTraceLevel;
+		StorageNew->strExtTraceRowStatus = thedata->strExtTraceRowStatus;
 	}
       done:
 	DEBUGMSGTL(("strExtMIB", "done.\n"));
@@ -1028,7 +1164,7 @@ strExtTraceTable_del(struct strExtTraceTable_data *thedata)
  * @param line line from configuration file matching the token.
  * @brief parse configuration file for strExtTraceTable entries.
  *
- * This callback is called by UCD-SNMP when it prases a configuration file and finds a configuration
+ * This callback is called by UCD-SNMP when it parses a configuration file and finds a configuration
  * file line for the registsred token (in this case strExtTraceTable).  This routine is invoked by UCD-SNMP
  * to read the values of each row in the table from the configuration file.  Note that this
  * procedure may exist regardless of the persistence of the table.  If there are no configured
@@ -1091,6 +1227,132 @@ store_strExtTraceTable(int majorID, int minorID, void *serverarg, void *clientar
 	}
 	DEBUGMSGTL(("strExtMIB", "done.\n"));
 	return SNMPERR_SUCCESS;
+}
+
+/**
+ * @fn int activate_strExtStrlogRecordTable_row(struct strExtStrlogRecordTable_data *StorageTmp)
+ * @param StorageTmp the data row to activate
+ * @brief commit activation of a row to the underlying device
+ *
+ * This function is used by tables that contain a RowStatus object.  It is used to move the row from
+ * the RS_NOTINSERVICE state to the RS_ACTIVE state.  It is also used when transitioning from the
+ * RS_CREATEANDGO state to the RS_ACTIVE state.  If activation fails, the function should return
+ * SNMP_ERR_COMMITFAILED; otherwise, SNMP_ERR_NOERROR.
+ */
+int
+activate_strExtStrlogRecordTable_row(struct strExtStrlogRecordTable_data *StorageTmp)
+{
+	/* XXX: provide code to activate the row with the underlying device */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int deactivate_strExtStrlogRecordTable_row(struct strExtStrlogRecordTable_data *StorageTmp)
+ * @param StorageTmp the data row to deactivate
+ * @brief commit deactivation of a row to the underlying device
+ *
+ * This function is used by tables that contain a RowStatus object.  It is used to move the row from
+ * the RS_ACTIVE state to the RS_NOTINSERVICE state.  It is also used when transitioning from the
+ * RS_ACTIVE state to the RS_DESTROY state.  If deactivation fails, the function should return
+ * SNMP_ERR_COMMITFAILED; otherwise, SNMP_ERR_NOERROR.
+ */
+int
+deactivate_strExtStrlogRecordTable_row(struct strExtStrlogRecordTable_data *StorageTmp)
+{
+	/* XXX: provide code to deactivate the row with the underlying device */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int activate_strExtTraceTable_row(struct strExtTraceTable_data *StorageTmp)
+ * @param StorageTmp the data row to activate
+ * @brief commit activation of a row to the underlying device
+ *
+ * This function is used by tables that contain a RowStatus object.  It is used to move the row from
+ * the RS_NOTINSERVICE state to the RS_ACTIVE state.  It is also used when transitioning from the
+ * RS_CREATEANDGO state to the RS_ACTIVE state.  If activation fails, the function should return
+ * SNMP_ERR_COMMITFAILED; otherwise, SNMP_ERR_NOERROR.
+ */
+int
+activate_strExtTraceTable_row(struct strExtTraceTable_data *StorageTmp)
+{
+	/* XXX: provide code to activate the row with the underlying device */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int deactivate_strExtTraceTable_row(struct strExtTraceTable_data *StorageTmp)
+ * @param StorageTmp the data row to deactivate
+ * @brief commit deactivation of a row to the underlying device
+ *
+ * This function is used by tables that contain a RowStatus object.  It is used to move the row from
+ * the RS_ACTIVE state to the RS_NOTINSERVICE state.  It is also used when transitioning from the
+ * RS_ACTIVE state to the RS_DESTROY state.  If deactivation fails, the function should return
+ * SNMP_ERR_COMMITFAILED; otherwise, SNMP_ERR_NOERROR.
+ */
+int
+deactivate_strExtTraceTable_row(struct strExtTraceTable_data *StorageTmp)
+{
+	/* XXX: provide code to deactivate the row with the underlying device */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int check_strExtStrlogRecordTable_row(struct strExtStrlogRecordTable_data *StorageTmp, struct strExtStrlogRecordTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to check, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the ACTION phase.  The start of the ACTION pahse performs this consitency check
+ * on the row before allowing the request to proceed to the COMMIT phase.  This function can return
+ * SNMP_ERR_NOERR or a specific SNMP error value.  Values in StorageOld are the values before the
+ * varbinds on the mib were applied; the values in StorageTmp are the new values.  The function is
+ * permitted to change the values in StorageTmp to correct them; however, preference should be made
+ * for setting values where were not in the varbinds.
+ */
+int
+check_strExtStrlogRecordTable_row(struct strExtStrlogRecordTable_data *StorageTmp, struct strExtStrlogRecordTable_data *StorageOld)
+{
+	/* XXX: provide code to check the row for consistency */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int update_strExtStrlogRecordTable_row(struct strExtStrlogRecordTable_data *StorageTmp, struct strExtStrlogRecordTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the set operation (ACTION phase) on a row
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to update, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the COMMIT phase.  The start of the ACTION phase performs a consistency check on
+ * the row before allowing the request to proceed to the COMMIT phase.  The COMMIT phase then
+ * arrives here with consistency already checked (see check_strExtStrlogRecordTable_row()).  This function can
+ * return SNMP_ERR_NOERROR or SNMP_ERR_COMMITFAILED.  Values in StorageOld are the values before the
+ * varbinds on the row were applied: the values in StorageTmp are the new values.
+ */
+int
+update_strExtStrlogRecordTable_row(struct strExtStrlogRecordTable_data *StorageTmp, struct strExtStrlogRecordTable_data *StorageOld)
+{
+	/* XXX: provide code to update the row with the underlying device */
+	strExtStrlogRecordTable_refresh = 1;
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int revert_strExtStrlogRecordTable_row(struct strExtStrlogRecordTable_data *StorageTmp, struct strExtStrlogRecordTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the undo operation (UNDO phase) on a row
+ */
+void
+revert_strExtStrlogRecordTable_row(struct strExtStrlogRecordTable_data *StorageTmp, struct strExtStrlogRecordTable_data *StorageOld)
+{
+	/* XXX: provide code to revert the row with the underlying device */
+	update_strExtStrlogRecordTable_row(StorageOld, NULL);
 }
 
 /**
@@ -1225,6 +1487,64 @@ var_strExtStrlogRecordTable(struct variable *vp, oid * name, size_t *length, int
 }
 
 /**
+ * @fn int check_strExtTraceTable_row(struct strExtTraceTable_data *StorageTmp, struct strExtTraceTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to check, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the ACTION phase.  The start of the ACTION pahse performs this consitency check
+ * on the row before allowing the request to proceed to the COMMIT phase.  This function can return
+ * SNMP_ERR_NOERR or a specific SNMP error value.  Values in StorageOld are the values before the
+ * varbinds on the mib were applied; the values in StorageTmp are the new values.  The function is
+ * permitted to change the values in StorageTmp to correct them; however, preference should be made
+ * for setting values where were not in the varbinds.
+ */
+int
+check_strExtTraceTable_row(struct strExtTraceTable_data *StorageTmp, struct strExtTraceTable_data *StorageOld)
+{
+	/* XXX: provide code to check the row for consistency */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int update_strExtTraceTable_row(struct strExtTraceTable_data *StorageTmp, struct strExtTraceTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the set operation (ACTION phase) on a row
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to update, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the COMMIT phase.  The start of the ACTION phase performs a consistency check on
+ * the row before allowing the request to proceed to the COMMIT phase.  The COMMIT phase then
+ * arrives here with consistency already checked (see check_strExtTraceTable_row()).  This function can
+ * return SNMP_ERR_NOERROR or SNMP_ERR_COMMITFAILED.  Values in StorageOld are the values before the
+ * varbinds on the row were applied: the values in StorageTmp are the new values.
+ */
+int
+update_strExtTraceTable_row(struct strExtTraceTable_data *StorageTmp, struct strExtTraceTable_data *StorageOld)
+{
+	/* XXX: provide code to update the row with the underlying device */
+	strExtTraceTable_refresh = 1;
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int revert_strExtTraceTable_row(struct strExtTraceTable_data *StorageTmp, struct strExtTraceTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the undo operation (UNDO phase) on a row
+ */
+void
+revert_strExtTraceTable_row(struct strExtTraceTable_data *StorageTmp, struct strExtTraceTable_data *StorageOld)
+{
+	/* XXX: provide code to revert the row with the underlying device */
+	update_strExtTraceTable_row(StorageOld, NULL);
+}
+
+/**
  * @fn void refresh_strExtTraceTable_row(struct strExtTraceTable_data *StorageTmp, int force)
  * @param StorageTmp the data row to refresh.
  * @param force force refresh if non-zero.
@@ -1337,12 +1657,14 @@ var_strExtTraceTable(struct variable *vp, oid * name, size_t *length, int exact,
 int
 write_strExtStrlogRecordMid(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static ulong old_value;
-	struct strExtStrlogRecordTable_data *StorageTmp = NULL;
+	struct strExtStrlogRecordTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 15;
 	ulong set_value = *((ulong *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("strExtMIB", "write_strExtStrlogRecordMid entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(strExtStrlogRecordTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -1372,22 +1694,61 @@ write_strExtStrlogRecordMid(int action, u_char *var_val, u_char var_val_type, si
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to strExtStrlogRecordMid: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->strExtStrlogRecordTable_old) == NULL)
+			if (StorageTmp->strExtStrlogRecordTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->strExtStrlogRecordTable_old = strExtStrlogRecordTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->strExtStrlogRecordTable_rsvs++;
+		StorageTmp->strExtStrlogRecordMid = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->strExtStrlogRecordTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->strExtStrlogRecordTable_tsts == 0)
+				if ((ret = check_strExtStrlogRecordTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->strExtStrlogRecordTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->strExtStrlogRecordMid for you to use, and you have just been asked to do something with it.  Note that anything done
 				   here must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->strExtStrlogRecordMid;
-		StorageTmp->strExtStrlogRecordMid = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->strExtStrlogRecordTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->strExtStrlogRecordTable_sets == 0)
+				if ((ret = update_strExtStrlogRecordTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->strExtStrlogRecordTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->strExtStrlogRecordTable_old) != NULL) {
+			strExtStrlogRecordTable_destroy(&StorageTmp->strExtStrlogRecordTable_old);
+			StorageTmp->strExtStrlogRecordTable_rsvs = 0;
+			StorageTmp->strExtStrlogRecordTable_tsts = 0;
+			StorageTmp->strExtStrlogRecordTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->strExtStrlogRecordMid = old_value;
+		if ((StorageOld = StorageTmp->strExtStrlogRecordTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->strExtStrlogRecordTable_sets == 0)
+			revert_strExtStrlogRecordTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->strExtStrlogRecordTable_old) == NULL)
+			break;
+		StorageTmp->strExtStrlogRecordMid = StorageOld->strExtStrlogRecordMid;
+		if (--StorageTmp->strExtStrlogRecordTable_rsvs == 0)
+			strExtStrlogRecordTable_destroy(&StorageTmp->strExtStrlogRecordTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -1407,12 +1768,14 @@ write_strExtStrlogRecordMid(int action, u_char *var_val, u_char var_val_type, si
 int
 write_strExtStrlogRecordSid(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static ulong old_value;
-	struct strExtStrlogRecordTable_data *StorageTmp = NULL;
+	struct strExtStrlogRecordTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 15;
 	ulong set_value = *((ulong *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("strExtMIB", "write_strExtStrlogRecordSid entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(strExtStrlogRecordTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -1442,22 +1805,61 @@ write_strExtStrlogRecordSid(int action, u_char *var_val, u_char var_val_type, si
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to strExtStrlogRecordSid: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->strExtStrlogRecordTable_old) == NULL)
+			if (StorageTmp->strExtStrlogRecordTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->strExtStrlogRecordTable_old = strExtStrlogRecordTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->strExtStrlogRecordTable_rsvs++;
+		StorageTmp->strExtStrlogRecordSid = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->strExtStrlogRecordTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->strExtStrlogRecordTable_tsts == 0)
+				if ((ret = check_strExtStrlogRecordTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->strExtStrlogRecordTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->strExtStrlogRecordSid for you to use, and you have just been asked to do something with it.  Note that anything done
 				   here must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->strExtStrlogRecordSid;
-		StorageTmp->strExtStrlogRecordSid = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->strExtStrlogRecordTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->strExtStrlogRecordTable_sets == 0)
+				if ((ret = update_strExtStrlogRecordTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->strExtStrlogRecordTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->strExtStrlogRecordTable_old) != NULL) {
+			strExtStrlogRecordTable_destroy(&StorageTmp->strExtStrlogRecordTable_old);
+			StorageTmp->strExtStrlogRecordTable_rsvs = 0;
+			StorageTmp->strExtStrlogRecordTable_tsts = 0;
+			StorageTmp->strExtStrlogRecordTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->strExtStrlogRecordSid = old_value;
+		if ((StorageOld = StorageTmp->strExtStrlogRecordTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->strExtStrlogRecordTable_sets == 0)
+			revert_strExtStrlogRecordTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->strExtStrlogRecordTable_old) == NULL)
+			break;
+		StorageTmp->strExtStrlogRecordSid = StorageOld->strExtStrlogRecordSid;
+		if (--StorageTmp->strExtStrlogRecordTable_rsvs == 0)
+			strExtStrlogRecordTable_destroy(&StorageTmp->strExtStrlogRecordTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -1477,12 +1879,14 @@ write_strExtStrlogRecordSid(int action, u_char *var_val, u_char var_val_type, si
 int
 write_strExtStrlogRecordLevel(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static ulong old_value;
-	struct strExtStrlogRecordTable_data *StorageTmp = NULL;
+	struct strExtStrlogRecordTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 15;
 	ulong set_value = *((ulong *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("strExtMIB", "write_strExtStrlogRecordLevel entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(strExtStrlogRecordTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -1512,22 +1916,61 @@ write_strExtStrlogRecordLevel(int action, u_char *var_val, u_char var_val_type, 
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to strExtStrlogRecordLevel: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->strExtStrlogRecordTable_old) == NULL)
+			if (StorageTmp->strExtStrlogRecordTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->strExtStrlogRecordTable_old = strExtStrlogRecordTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->strExtStrlogRecordTable_rsvs++;
+		StorageTmp->strExtStrlogRecordLevel = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->strExtStrlogRecordTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->strExtStrlogRecordTable_tsts == 0)
+				if ((ret = check_strExtStrlogRecordTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->strExtStrlogRecordTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->strExtStrlogRecordLevel for you to use, and you have just been asked to do something with it.  Note that anything done
 				   here must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->strExtStrlogRecordLevel;
-		StorageTmp->strExtStrlogRecordLevel = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->strExtStrlogRecordTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->strExtStrlogRecordTable_sets == 0)
+				if ((ret = update_strExtStrlogRecordTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->strExtStrlogRecordTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->strExtStrlogRecordTable_old) != NULL) {
+			strExtStrlogRecordTable_destroy(&StorageTmp->strExtStrlogRecordTable_old);
+			StorageTmp->strExtStrlogRecordTable_rsvs = 0;
+			StorageTmp->strExtStrlogRecordTable_tsts = 0;
+			StorageTmp->strExtStrlogRecordTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->strExtStrlogRecordLevel = old_value;
+		if ((StorageOld = StorageTmp->strExtStrlogRecordTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->strExtStrlogRecordTable_sets == 0)
+			revert_strExtStrlogRecordTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->strExtStrlogRecordTable_old) == NULL)
+			break;
+		StorageTmp->strExtStrlogRecordLevel = StorageOld->strExtStrlogRecordLevel;
+		if (--StorageTmp->strExtStrlogRecordTable_rsvs == 0)
+			strExtStrlogRecordTable_destroy(&StorageTmp->strExtStrlogRecordTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -1547,17 +1990,17 @@ write_strExtStrlogRecordLevel(int action, u_char *var_val, u_char var_val_type, 
 int
 write_strExtStrlogRecordFlags(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static uint8_t *old_value;
-	struct strExtStrlogRecordTable_data *StorageTmp = NULL;
+	struct strExtStrlogRecordTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 15;
-	static size_t old_length = 0;
-	static uint8_t *string = NULL;
+	uint8_t *string = NULL;
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("strExtMIB", "write_strExtStrlogRecordFlags entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(strExtStrlogRecordTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
-		string = NULL;
 		if (StorageTmp != NULL && statP == NULL) {
 			/* have row but no column */
 			switch (StorageTmp->strExtStrlogRecordRowStatus) {
@@ -1587,33 +2030,73 @@ write_strExtStrlogRecordFlags(int action, u_char *var_val, u_char var_val_type, 
 				return SNMP_ERR_WRONGLENGTH;
 			}
 		}
-		break;
-	case RESERVE2:		/* memory reseveration, final preparation... */
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->strExtStrlogRecordTable_old) == NULL)
+			if (StorageTmp->strExtStrlogRecordTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->strExtStrlogRecordTable_old = strExtStrlogRecordTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->strExtStrlogRecordTable_rsvs++;
 		if ((string = malloc(var_val_len + 1)) == NULL)
 			return SNMP_ERR_RESOURCEUNAVAILABLE;
 		memcpy((void *) string, (void *) var_val, var_val_len);
 		string[var_val_len] = 0;
+		SNMP_FREE(StorageTmp->strExtStrlogRecordFlags);
+		StorageTmp->strExtStrlogRecordFlags = string;
+		StorageTmp->strExtStrlogRecordFlagsLen = var_val_len;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
+		break;
+	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->strExtStrlogRecordTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->strExtStrlogRecordTable_tsts == 0)
+				if ((ret = check_strExtStrlogRecordTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->strExtStrlogRecordTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->strExtStrlogRecordFlags for you to use, and you have just been asked to do something with it.  Note that anything done
 				   here must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->strExtStrlogRecordFlags;
-		old_length = StorageTmp->strExtStrlogRecordFlagsLen;
-		StorageTmp->strExtStrlogRecordFlags = string;
-		StorageTmp->strExtStrlogRecordFlagsLen = var_val_len;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->strExtStrlogRecordTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->strExtStrlogRecordTable_sets == 0)
+				if ((ret = update_strExtStrlogRecordTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->strExtStrlogRecordTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
-		SNMP_FREE(old_value);
-		old_length = 0;
-		string = NULL;
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->strExtStrlogRecordTable_old) != NULL) {
+			strExtStrlogRecordTable_destroy(&StorageTmp->strExtStrlogRecordTable_old);
+			StorageTmp->strExtStrlogRecordTable_rsvs = 0;
+			StorageTmp->strExtStrlogRecordTable_tsts = 0;
+			StorageTmp->strExtStrlogRecordTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->strExtStrlogRecordFlags = old_value;
-		StorageTmp->strExtStrlogRecordFlagsLen = old_length;
+		if ((StorageOld = StorageTmp->strExtStrlogRecordTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->strExtStrlogRecordTable_sets == 0)
+			revert_strExtStrlogRecordTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
-		SNMP_FREE(string);
+		if ((StorageOld = StorageTmp->strExtStrlogRecordTable_old) == NULL)
+			break;
+		if (StorageOld->strExtStrlogRecordFlags != NULL) {
+			SNMP_FREE(StorageTmp->strExtStrlogRecordFlags);
+			StorageTmp->strExtStrlogRecordFlags = StorageOld->strExtStrlogRecordFlags;
+			StorageTmp->strExtStrlogRecordFlagsLen = StorageOld->strExtStrlogRecordFlagsLen;
+			StorageOld->strExtStrlogRecordFlags = NULL;
+			StorageOld->strExtStrlogRecordFlagsLen = 0;
+		}
+		if (--StorageTmp->strExtStrlogRecordTable_rsvs == 0)
+			strExtStrlogRecordTable_destroy(&StorageTmp->strExtStrlogRecordTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -1633,17 +2116,17 @@ write_strExtStrlogRecordFlags(int action, u_char *var_val, u_char var_val_type, 
 int
 write_strExtStrlogRecordMsgString(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static uint8_t *old_value;
-	struct strExtStrlogRecordTable_data *StorageTmp = NULL;
+	struct strExtStrlogRecordTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 15;
-	static size_t old_length = 0;
-	static uint8_t *string = NULL;
+	uint8_t *string = NULL;
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("strExtMIB", "write_strExtStrlogRecordMsgString entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(strExtStrlogRecordTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
-		string = NULL;
 		if (StorageTmp != NULL && statP == NULL) {
 			/* have row but no column */
 			switch (StorageTmp->strExtStrlogRecordRowStatus) {
@@ -1666,33 +2149,73 @@ write_strExtStrlogRecordMsgString(int action, u_char *var_val, u_char var_val_ty
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to strExtStrlogRecordMsgString: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
-		break;
-	case RESERVE2:		/* memory reseveration, final preparation... */
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->strExtStrlogRecordTable_old) == NULL)
+			if (StorageTmp->strExtStrlogRecordTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->strExtStrlogRecordTable_old = strExtStrlogRecordTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->strExtStrlogRecordTable_rsvs++;
 		if ((string = malloc(var_val_len + 1)) == NULL)
 			return SNMP_ERR_RESOURCEUNAVAILABLE;
 		memcpy((void *) string, (void *) var_val, var_val_len);
 		string[var_val_len] = 0;
+		SNMP_FREE(StorageTmp->strExtStrlogRecordMsgString);
+		StorageTmp->strExtStrlogRecordMsgString = string;
+		StorageTmp->strExtStrlogRecordMsgStringLen = var_val_len;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
+		break;
+	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->strExtStrlogRecordTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->strExtStrlogRecordTable_tsts == 0)
+				if ((ret = check_strExtStrlogRecordTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->strExtStrlogRecordTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->strExtStrlogRecordMsgString for you to use, and you have just been asked to do something with it.  Note that anything
 				   done here must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->strExtStrlogRecordMsgString;
-		old_length = StorageTmp->strExtStrlogRecordMsgStringLen;
-		StorageTmp->strExtStrlogRecordMsgString = string;
-		StorageTmp->strExtStrlogRecordMsgStringLen = var_val_len;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->strExtStrlogRecordTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->strExtStrlogRecordTable_sets == 0)
+				if ((ret = update_strExtStrlogRecordTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->strExtStrlogRecordTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
-		SNMP_FREE(old_value);
-		old_length = 0;
-		string = NULL;
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->strExtStrlogRecordTable_old) != NULL) {
+			strExtStrlogRecordTable_destroy(&StorageTmp->strExtStrlogRecordTable_old);
+			StorageTmp->strExtStrlogRecordTable_rsvs = 0;
+			StorageTmp->strExtStrlogRecordTable_tsts = 0;
+			StorageTmp->strExtStrlogRecordTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->strExtStrlogRecordMsgString = old_value;
-		StorageTmp->strExtStrlogRecordMsgStringLen = old_length;
+		if ((StorageOld = StorageTmp->strExtStrlogRecordTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->strExtStrlogRecordTable_sets == 0)
+			revert_strExtStrlogRecordTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
-		SNMP_FREE(string);
+		if ((StorageOld = StorageTmp->strExtStrlogRecordTable_old) == NULL)
+			break;
+		if (StorageOld->strExtStrlogRecordMsgString != NULL) {
+			SNMP_FREE(StorageTmp->strExtStrlogRecordMsgString);
+			StorageTmp->strExtStrlogRecordMsgString = StorageOld->strExtStrlogRecordMsgString;
+			StorageTmp->strExtStrlogRecordMsgStringLen = StorageOld->strExtStrlogRecordMsgStringLen;
+			StorageOld->strExtStrlogRecordMsgString = NULL;
+			StorageOld->strExtStrlogRecordMsgStringLen = 0;
+		}
+		if (--StorageTmp->strExtStrlogRecordTable_rsvs == 0)
+			strExtStrlogRecordTable_destroy(&StorageTmp->strExtStrlogRecordTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -1712,12 +2235,14 @@ write_strExtStrlogRecordMsgString(int action, u_char *var_val, u_char var_val_ty
 int
 write_strExtTraceMid(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static long old_value;
-	struct strExtTraceTable_data *StorageTmp = NULL;
+	struct strExtTraceTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 14;
 	long set_value = *((long *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("strExtMIB", "write_strExtTraceMid entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(strExtTraceTableStorage, NULL, &name[14], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -1747,22 +2272,61 @@ write_strExtTraceMid(int action, u_char *var_val, u_char var_val_type, size_t va
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to strExtTraceMid: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->strExtTraceTable_old) == NULL)
+			if (StorageTmp->strExtTraceTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->strExtTraceTable_old = strExtTraceTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->strExtTraceTable_rsvs++;
+		StorageTmp->strExtTraceMid = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->strExtTraceTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->strExtTraceTable_tsts == 0)
+				if ((ret = check_strExtTraceTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->strExtTraceTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->strExtTraceMid for you to use, and you have just been asked to do something with it.  Note that anything done here must
 				   be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->strExtTraceMid;
-		StorageTmp->strExtTraceMid = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->strExtTraceTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->strExtTraceTable_sets == 0)
+				if ((ret = update_strExtTraceTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->strExtTraceTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->strExtTraceTable_old) != NULL) {
+			strExtTraceTable_destroy(&StorageTmp->strExtTraceTable_old);
+			StorageTmp->strExtTraceTable_rsvs = 0;
+			StorageTmp->strExtTraceTable_tsts = 0;
+			StorageTmp->strExtTraceTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->strExtTraceMid = old_value;
+		if ((StorageOld = StorageTmp->strExtTraceTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->strExtTraceTable_sets == 0)
+			revert_strExtTraceTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->strExtTraceTable_old) == NULL)
+			break;
+		StorageTmp->strExtTraceMid = StorageOld->strExtTraceMid;
+		if (--StorageTmp->strExtTraceTable_rsvs == 0)
+			strExtTraceTable_destroy(&StorageTmp->strExtTraceTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -1782,12 +2346,14 @@ write_strExtTraceMid(int action, u_char *var_val, u_char var_val_type, size_t va
 int
 write_strExtTraceSid(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static long old_value;
-	struct strExtTraceTable_data *StorageTmp = NULL;
+	struct strExtTraceTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 14;
 	long set_value = *((long *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("strExtMIB", "write_strExtTraceSid entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(strExtTraceTableStorage, NULL, &name[14], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -1817,22 +2383,61 @@ write_strExtTraceSid(int action, u_char *var_val, u_char var_val_type, size_t va
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to strExtTraceSid: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->strExtTraceTable_old) == NULL)
+			if (StorageTmp->strExtTraceTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->strExtTraceTable_old = strExtTraceTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->strExtTraceTable_rsvs++;
+		StorageTmp->strExtTraceSid = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->strExtTraceTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->strExtTraceTable_tsts == 0)
+				if ((ret = check_strExtTraceTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->strExtTraceTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->strExtTraceSid for you to use, and you have just been asked to do something with it.  Note that anything done here must
 				   be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->strExtTraceSid;
-		StorageTmp->strExtTraceSid = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->strExtTraceTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->strExtTraceTable_sets == 0)
+				if ((ret = update_strExtTraceTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->strExtTraceTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->strExtTraceTable_old) != NULL) {
+			strExtTraceTable_destroy(&StorageTmp->strExtTraceTable_old);
+			StorageTmp->strExtTraceTable_rsvs = 0;
+			StorageTmp->strExtTraceTable_tsts = 0;
+			StorageTmp->strExtTraceTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->strExtTraceSid = old_value;
+		if ((StorageOld = StorageTmp->strExtTraceTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->strExtTraceTable_sets == 0)
+			revert_strExtTraceTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->strExtTraceTable_old) == NULL)
+			break;
+		StorageTmp->strExtTraceSid = StorageOld->strExtTraceSid;
+		if (--StorageTmp->strExtTraceTable_rsvs == 0)
+			strExtTraceTable_destroy(&StorageTmp->strExtTraceTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -1852,12 +2457,14 @@ write_strExtTraceSid(int action, u_char *var_val, u_char var_val_type, size_t va
 int
 write_strExtTraceLevel(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static long old_value;
-	struct strExtTraceTable_data *StorageTmp = NULL;
+	struct strExtTraceTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 14;
 	long set_value = *((long *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("strExtMIB", "write_strExtTraceLevel entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(strExtTraceTableStorage, NULL, &name[14], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -1887,22 +2494,61 @@ write_strExtTraceLevel(int action, u_char *var_val, u_char var_val_type, size_t 
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to strExtTraceLevel: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->strExtTraceTable_old) == NULL)
+			if (StorageTmp->strExtTraceTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->strExtTraceTable_old = strExtTraceTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->strExtTraceTable_rsvs++;
+		StorageTmp->strExtTraceLevel = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->strExtTraceTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->strExtTraceTable_tsts == 0)
+				if ((ret = check_strExtTraceTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->strExtTraceTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->strExtTraceLevel for you to use, and you have just been asked to do something with it.  Note that anything done here
 				   must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->strExtTraceLevel;
-		StorageTmp->strExtTraceLevel = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->strExtTraceTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->strExtTraceTable_sets == 0)
+				if ((ret = update_strExtTraceTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->strExtTraceTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->strExtTraceTable_old) != NULL) {
+			strExtTraceTable_destroy(&StorageTmp->strExtTraceTable_old);
+			StorageTmp->strExtTraceTable_rsvs = 0;
+			StorageTmp->strExtTraceTable_tsts = 0;
+			StorageTmp->strExtTraceTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->strExtTraceLevel = old_value;
+		if ((StorageOld = StorageTmp->strExtTraceTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->strExtTraceTable_sets == 0)
+			revert_strExtTraceTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->strExtTraceTable_old) == NULL)
+			break;
+		StorageTmp->strExtTraceLevel = StorageOld->strExtTraceLevel;
+		if (--StorageTmp->strExtTraceTable_rsvs == 0)
+			strExtTraceTable_destroy(&StorageTmp->strExtTraceTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -1922,13 +2568,13 @@ write_strExtTraceLevel(int action, u_char *var_val, u_char var_val_type, size_t 
 int
 write_strNlogargs(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static ulong old_value;
-	struct strExtMIB_data *StorageTmp = NULL;
+	struct strExtMIB_data *StorageTmp = NULL, *StorageOld = NULL;
 	ulong set_value = *((ulong *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("strExtMIB", "write_strNlogargs entering action=%d...  \n", action));
 	if ((StorageTmp = strExtMIBStorage) == NULL)
-		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
+		return SNMP_ERR_NOSUCHNAME;
 	switch (action) {
 	case RESERVE1:
 		if (var_val_type != ASN_UNSIGNED) {
@@ -1945,20 +2591,59 @@ write_strNlogargs(int action, u_char *var_val, u_char var_val_type, size_t var_v
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to strNlogargs: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
+		/* one allocation for whole mib */
+		if ((StorageOld = StorageTmp->strExtMIB_old) == NULL)
+			if (StorageTmp->strExtMIB_rsvs == 0)
+				if ((StorageOld = StorageTmp->strExtMIB_old = strExtMIB_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->strExtMIB_rsvs++;
+		StorageTmp->strNlogargs = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->strExtMIB_old) != NULL) {
+			/* one consistency check for the whole mib */
+			if (StorageTmp->strExtMIB_tsts == 0)
+				if ((ret = check_strExtMIB(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->strExtMIB_tsts++;
+		}
 		break;
-	case ACTION:		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in
-				   the UNDO case */
-		old_value = StorageTmp->strNlogargs;
-		StorageTmp->strNlogargs = set_value;
+	case ACTION:		/* The variable has been stored in StorageTmp->strNlogargs for you to use, and you have just been asked to do something with it.  Note that anything done here must be
+				   reversable in the UNDO case */
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole mib */
+		if ((StorageOld = StorageTmp->strExtMIB_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->strExtMIB_sets == 0)
+				if ((ret = update_strExtMIB(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->strExtMIB_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->strExtMIB_old) != NULL) {
+			strExtMIB_destroy(&StorageTmp->strExtMIB_old);
+			StorageTmp->strExtMIB_rsvs = 0;
+			StorageTmp->strExtMIB_tsts = 0;
+			StorageTmp->strExtMIB_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->strNlogargs = old_value;
+		if ((StorageOld = StorageTmp->strExtMIB_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->strExtMIB_tsts == 0)
+			revert_strExtMIB(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->strExtMIB_old) == NULL)
+			break;
+		StorageTmp->strNlogargs = StorageOld->strNlogargs;
+		if (--StorageTmp->strExtMIB_rsvs == 0)
+			strExtMIB_destroy(&StorageTmp->strExtMIB_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -1978,13 +2663,13 @@ write_strNlogargs(int action, u_char *var_val, u_char var_val_type, size_t var_v
 int
 write_strExtLogMsgSize(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static ulong old_value;
-	struct strExtMIB_data *StorageTmp = NULL;
+	struct strExtMIB_data *StorageTmp = NULL, *StorageOld = NULL;
 	ulong set_value = *((ulong *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("strExtMIB", "write_strExtLogMsgSize entering action=%d...  \n", action));
 	if ((StorageTmp = strExtMIBStorage) == NULL)
-		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
+		return SNMP_ERR_NOSUCHNAME;
 	switch (action) {
 	case RESERVE1:
 		if (var_val_type != ASN_UNSIGNED) {
@@ -2001,20 +2686,59 @@ write_strExtLogMsgSize(int action, u_char *var_val, u_char var_val_type, size_t 
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to strExtLogMsgSize: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
+		/* one allocation for whole mib */
+		if ((StorageOld = StorageTmp->strExtMIB_old) == NULL)
+			if (StorageTmp->strExtMIB_rsvs == 0)
+				if ((StorageOld = StorageTmp->strExtMIB_old = strExtMIB_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->strExtMIB_rsvs++;
+		StorageTmp->strExtLogMsgSize = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->strExtMIB_old) != NULL) {
+			/* one consistency check for the whole mib */
+			if (StorageTmp->strExtMIB_tsts == 0)
+				if ((ret = check_strExtMIB(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->strExtMIB_tsts++;
+		}
 		break;
-	case ACTION:		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in
-				   the UNDO case */
-		old_value = StorageTmp->strExtLogMsgSize;
-		StorageTmp->strExtLogMsgSize = set_value;
+	case ACTION:		/* The variable has been stored in StorageTmp->strExtLogMsgSize for you to use, and you have just been asked to do something with it.  Note that anything done here
+				   must be reversable in the UNDO case */
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole mib */
+		if ((StorageOld = StorageTmp->strExtMIB_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->strExtMIB_sets == 0)
+				if ((ret = update_strExtMIB(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->strExtMIB_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->strExtMIB_old) != NULL) {
+			strExtMIB_destroy(&StorageTmp->strExtMIB_old);
+			StorageTmp->strExtMIB_rsvs = 0;
+			StorageTmp->strExtMIB_tsts = 0;
+			StorageTmp->strExtMIB_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->strExtLogMsgSize = old_value;
+		if ((StorageOld = StorageTmp->strExtMIB_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->strExtMIB_tsts == 0)
+			revert_strExtMIB(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->strExtMIB_old) == NULL)
+			break;
+		StorageTmp->strExtLogMsgSize = StorageOld->strExtLogMsgSize;
+		if (--StorageTmp->strExtMIB_rsvs == 0)
+			strExtMIB_destroy(&StorageTmp->strExtMIB_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -2072,13 +2796,13 @@ strExtConsoleLog_stop()
 int
 write_strExtConsoleLog(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static long old_value;
-	struct strExtMIB_data *StorageTmp = NULL;
+	struct strExtMIB_data *StorageTmp = NULL, *StorageOld = NULL;
 	long set_value = *((long *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("strExtMIB", "write_strExtConsoleLog entering action=%d...  \n", action));
 	if ((StorageTmp = strExtMIBStorage) == NULL)
-		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
+		return SNMP_ERR_NOSUCHNAME;
 	switch (action) {
 	case RESERVE1:
 		if (var_val_type != ASN_INTEGER) {
@@ -2098,34 +2822,66 @@ write_strExtConsoleLog(int action, u_char *var_val, u_char var_val_type, size_t 
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to strExtConsoleLog: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
+		/* one allocation for whole mib */
+		if ((StorageOld = StorageTmp->strExtMIB_old) == NULL)
+			if (StorageTmp->strExtMIB_rsvs == 0)
+				if ((StorageOld = StorageTmp->strExtMIB_old = strExtMIB_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->strExtMIB_rsvs++;
+		StorageTmp->strExtConsoleLog = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->strExtMIB_old) != NULL) {
+			/* one consistency check for the whole mib */
+			if (StorageTmp->strExtMIB_tsts == 0)
+				if ((ret = check_strExtMIB(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->strExtMIB_tsts++;
+		}
 		break;
-	case ACTION:		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in
-				   the UNDO case */
-		old_value = StorageTmp->strExtConsoleLog;
-		StorageTmp->strExtConsoleLog = set_value;
-		if (old_value != set_value) {
-			switch (set_value) {
-			case TV_TRUE:
-				/* turn it on */
-				if (strExtConsoleLog_start() != SNMP_ERR_NOERROR)
-					return SNMP_ERR_GENERR;
-				break;
-			case TV_FALSE:
-				/* turn it off */
-				if (strExtConsoleLog_stop() != SNMP_ERR_NOERROR)
-					return SNMP_ERR_GENERR;
-				break;
+	case ACTION:		/* The variable has been stored in StorageTmp->strExtConsoleLog for you to use, and you have just been asked to do something with it.  Note that anything done here
+				   must be reversable in the UNDO case */
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole mib */
+		if ((StorageOld = StorageTmp->strExtMIB_old) != NULL) {
+			if (StorageOld->strExtConsoleLog != set_value) {
+				switch (set_value) {
+				case TV_TRUE:
+					/* turn it on */
+					if (strExtConsoleLog_start() != SNMP_ERR_NOERROR)
+						return SNMP_ERR_GENERR;
+					break;
+				case TV_FALSE:
+					/* turn it off */
+					if (strExtConsoleLog_stop() != SNMP_ERR_NOERROR)
+						return SNMP_ERR_GENERR;
+					break;
+				}
 			}
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->strExtMIB_sets == 0)
+				if ((ret = update_strExtMIB(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->strExtMIB_sets++;
 		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->strExtMIB_old) != NULL) {
+			strExtMIB_destroy(&StorageTmp->strExtMIB_old);
+			StorageTmp->strExtMIB_rsvs = 0;
+			StorageTmp->strExtMIB_tsts = 0;
+			StorageTmp->strExtMIB_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->strExtConsoleLog = old_value;
-		if (old_value != set_value) {
-			switch (old_value) {
+		if ((StorageOld = StorageTmp->strExtMIB_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (StorageOld->strExtConsoleLog != set_value) {
+			switch (StorageOld->strExtConsoleLog) {
 			case TV_TRUE:
 				/* turn it back on */
 				if (strExtConsoleLog_start() != SNMP_ERR_NOERROR)
@@ -2138,8 +2894,15 @@ write_strExtConsoleLog(int action, u_char *var_val, u_char var_val_type, size_t 
 				break;
 			}
 		}
+		if (--StorageTmp->strExtMIB_tsts == 0)
+			revert_strExtMIB(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->strExtMIB_old) == NULL)
+			break;
+		StorageTmp->strExtConsoleLog = StorageOld->strExtConsoleLog;
+		if (--StorageTmp->strExtMIB_rsvs == 0)
+			strExtMIB_destroy(&StorageTmp->strExtMIB_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -2197,13 +2960,13 @@ strExtErrorLog_stop()
 int
 write_strExtErrorLog(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static long old_value;
-	struct strExtMIB_data *StorageTmp = NULL;
+	struct strExtMIB_data *StorageTmp = NULL, *StorageOld = NULL;
 	long set_value = *((long *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("strExtMIB", "write_strExtErrorLog entering action=%d...  \n", action));
 	if ((StorageTmp = strExtMIBStorage) == NULL)
-		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
+		return SNMP_ERR_NOSUCHNAME;
 	switch (action) {
 	case RESERVE1:
 		if (var_val_type != ASN_INTEGER) {
@@ -2223,34 +2986,66 @@ write_strExtErrorLog(int action, u_char *var_val, u_char var_val_type, size_t va
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to strExtErrorLog: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
+		/* one allocation for whole mib */
+		if ((StorageOld = StorageTmp->strExtMIB_old) == NULL)
+			if (StorageTmp->strExtMIB_rsvs == 0)
+				if ((StorageOld = StorageTmp->strExtMIB_old = strExtMIB_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->strExtMIB_rsvs++;
+		StorageTmp->strExtErrorLog = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->strExtMIB_old) != NULL) {
+			/* one consistency check for the whole mib */
+			if (StorageTmp->strExtMIB_tsts == 0)
+				if ((ret = check_strExtMIB(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->strExtMIB_tsts++;
+		}
 		break;
-	case ACTION:		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in
-				   the UNDO case */
-		old_value = StorageTmp->strExtErrorLog;
-		StorageTmp->strExtErrorLog = set_value;
-		if (old_value != set_value) {
-			switch (set_value) {
-			case TV_TRUE:
-				/* turn it on */
-				if (strExtErrorLog_start() != SNMP_ERR_NOERROR)
-					return SNMP_ERR_GENERR;
-				break;
-			case TV_FALSE:
-				/* turn it off */
-				if (strExtErrorLog_stop() != SNMP_ERR_NOERROR)
-					return SNMP_ERR_GENERR;
-				break;
+	case ACTION:		/* The variable has been stored in StorageTmp->strExtErrorLog for you to use, and you have just been asked to do something with it.  Note that anything done here must
+				   be reversable in the UNDO case */
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole mib */
+		if ((StorageOld = StorageTmp->strExtMIB_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageOld->strExtErrorLog != set_value) {
+				switch (set_value) {
+				case TV_TRUE:
+					/* turn it on */
+					if (strExtErrorLog_start() != SNMP_ERR_NOERROR)
+						return SNMP_ERR_GENERR;
+					break;
+				case TV_FALSE:
+					/* turn it off */
+					if (strExtErrorLog_stop() != SNMP_ERR_NOERROR)
+						return SNMP_ERR_GENERR;
+					break;
+				}
 			}
+			if (StorageTmp->strExtMIB_sets == 0)
+				if ((ret = update_strExtMIB(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->strExtMIB_sets++;
 		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->strExtMIB_old) != NULL) {
+			strExtMIB_destroy(&StorageTmp->strExtMIB_old);
+			StorageTmp->strExtMIB_rsvs = 0;
+			StorageTmp->strExtMIB_tsts = 0;
+			StorageTmp->strExtMIB_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->strExtErrorLog = old_value;
-		if (old_value != set_value) {
-			switch (old_value) {
+		if ((StorageOld = StorageTmp->strExtMIB_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (StorageOld->strExtErrorLog != set_value) {
+			switch (StorageOld->strExtErrorLog) {
 			case TV_TRUE:
 				/* turn it back on */
 				if (strExtErrorLog_start() != SNMP_ERR_NOERROR)
@@ -2263,8 +3058,15 @@ write_strExtErrorLog(int action, u_char *var_val, u_char var_val_type, size_t va
 				break;
 			}
 		}
+		if (--StorageTmp->strExtMIB_tsts == 0)
+			revert_strExtMIB(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->strExtMIB_old) == NULL)
+			break;
+		StorageTmp->strExtErrorLog = StorageOld->strExtErrorLog;
+		if (--StorageTmp->strExtMIB_rsvs == 0)
+			strExtMIB_destroy(&StorageTmp->strExtMIB_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -2352,14 +3154,13 @@ strExtTraceLog_stop()
 int
 write_strExtTraceLog(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static long old_value;
-	struct strExtMIB_data *StorageTmp = NULL;
+	struct strExtMIB_data *StorageTmp = NULL, *StorageOld = NULL;
 	long set_value = *((long *) var_val);
-	int ret;
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("strExtMIB", "write_strExtTraceLog entering action=%d...  \n", action));
 	if ((StorageTmp = strExtMIBStorage) == NULL)
-		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
+		return SNMP_ERR_NOSUCHNAME;
 	switch (action) {
 	case RESERVE1:
 		if (var_val_type != ASN_INTEGER) {
@@ -2379,34 +3180,66 @@ write_strExtTraceLog(int action, u_char *var_val, u_char var_val_type, size_t va
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to strExtTraceLog: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
+		/* one allocation for whole mib */
+		if ((StorageOld = StorageTmp->strExtMIB_old) == NULL)
+			if (StorageTmp->strExtMIB_rsvs == 0)
+				if ((StorageOld = StorageTmp->strExtMIB_old = strExtMIB_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->strExtMIB_rsvs++;
+		StorageTmp->strExtTraceLog = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->strExtMIB_old) != NULL) {
+			/* one consistency check for the whole mib */
+			if (StorageTmp->strExtMIB_tsts == 0)
+				if ((ret = check_strExtMIB(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->strExtMIB_tsts++;
+		}
 		break;
-	case ACTION:		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in
-				   the UNDO case */
-		old_value = StorageTmp->strExtTraceLog;
-		StorageTmp->strExtTraceLog = set_value;
-		if (old_value != set_value) {
-			switch (set_value) {
-			case TV_TRUE:
-				/* turn it on */
-				if ((ret = strExtTraceLog_start()) != SNMP_ERR_NOERROR)
-					return (ret);
-				break;
-			case TV_FALSE:
-				/* turn it off */
-				if ((ret = strExtTraceLog_stop()) != SNMP_ERR_NOERROR)
-					return (ret);
-				break;
+	case ACTION:		/* The variable has been stored in StorageTmp->strExtTraceLog for you to use, and you have just been asked to do something with it.  Note that anything done here must
+				   be reversable in the UNDO case */
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole mib */
+		if ((StorageOld = StorageTmp->strExtMIB_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageOld->strExtTraceLog != set_value) {
+				switch (set_value) {
+				case TV_TRUE:
+					/* turn it on */
+					if ((ret = strExtTraceLog_start()) != SNMP_ERR_NOERROR)
+						return (ret);
+					break;
+				case TV_FALSE:
+					/* turn it off */
+					if ((ret = strExtTraceLog_stop()) != SNMP_ERR_NOERROR)
+						return (ret);
+					break;
+				}
 			}
+			if (StorageTmp->strExtMIB_sets == 0)
+				if ((ret = update_strExtMIB(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->strExtMIB_sets++;
 		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->strExtMIB_old) != NULL) {
+			strExtMIB_destroy(&StorageTmp->strExtMIB_old);
+			StorageTmp->strExtMIB_rsvs = 0;
+			StorageTmp->strExtMIB_tsts = 0;
+			StorageTmp->strExtMIB_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->strExtTraceLog = old_value;
-		if (old_value != set_value) {
-			switch (old_value) {
+		if ((StorageOld = StorageTmp->strExtMIB_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (StorageOld->strExtTraceLog != set_value) {
+			switch (StorageOld->strExtTraceLog) {
 			case TV_TRUE:
 				/* turn it back on */
 				if ((ret = strExtTraceLog_start()) != SNMP_ERR_NOERROR)
@@ -2419,47 +3252,86 @@ write_strExtTraceLog(int action, u_char *var_val, u_char var_val_type, size_t va
 				break;
 			}
 		}
+		if (--StorageTmp->strExtMIB_tsts == 0)
+			revert_strExtMIB(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->strExtMIB_old) == NULL)
+			break;
+		StorageTmp->strExtTraceLog = StorageOld->strExtTraceLog;
+		if (--StorageTmp->strExtMIB_rsvs == 0)
+			strExtMIB_destroy(&StorageTmp->strExtMIB_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
 }
 
 /**
- * @fn int strExtStrlogRecordTable_consistent(struct strExtStrlogRecordTable_data *thedata)
- * @param thedata the row data to check for consistency.
- * @brief check the internal consistency of a table row.
+ * @fn int can_act_strExtStrlogRecordTable_row(struct strExtStrlogRecordTable_data *StorageTmp)
+ * @param StorageTmp the data (as updated)
+ * @brief check whether an inactive table row can be activated
  *
- * This function checks the internal consistency of a table row for the strExtStrlogRecordTable table.  If the
- * table row is internally consistent, then this function returns SNMP_ERR_NOERROR, otherwise the
- * function returns an SNMP error code and it will not be possible to activate the row until the
- * row's internal consistency is corrected.  This function might use a 'test' operation against the
- * driver to ensure that the commit phase will succeed.
+ * This function is used by the ACTION phase of a RowStatus object to test whether an inactive table
+ * row can be activated.  Returns SNMP_ERR_NOERROR when activation is permitted; an SNMP error
+ * value, otherwise.  This function might use a 'test' operation against the driver to ensure that
+ * the commit phase will succeed.
  */
 int
-strExtStrlogRecordTable_consistent(struct strExtStrlogRecordTable_data *thedata)
+can_act_strExtStrlogRecordTable_row(struct strExtStrlogRecordTable_data *StorageTmp)
 {
-	/* XXX: check row consistency return SNMP_ERR_NOERROR if consistent, or an SNMP error code if not. */
-	return (SNMP_ERR_NOERROR);
+	/* XXX: provide code to check whether the new or inactive table row can be activated */
+	return SNMP_ERR_NOERROR;
 }
 
 /**
- * @fn int strExtTraceTable_consistent(struct strExtTraceTable_data *thedata)
- * @param thedata the row data to check for consistency.
- * @brief check the internal consistency of a table row.
+ * @fn int can_deact_strExtStrlogRecordTable_row(struct strExtStrlogRecordTable_data *StorageTmp)
+ * @param StorageTmp the data (as updated)
+ * @brief check whether an active table row can be deactivated
  *
- * This function checks the internal consistency of a table row for the strExtTraceTable table.  If the
- * table row is internally consistent, then this function returns SNMP_ERR_NOERROR, otherwise the
- * function returns an SNMP error code and it will not be possible to activate the row until the
- * row's internal consistency is corrected.  This function might use a 'test' operation against the
- * driver to ensure that the commit phase will succeed.
+ * This function is used by the ACTION phase of a RowStatus object to test whether an active table
+ * row can be deactivated.  Returns SNMP_ERR_NOERROR when deactivation is permitted; an SNMP error
+ * value, otherwise.  This function might use a 'test' operation against the driver to ensure that
+ * the commit phase will succeed.
  */
 int
-strExtTraceTable_consistent(struct strExtTraceTable_data *thedata)
+can_deact_strExtStrlogRecordTable_row(struct strExtStrlogRecordTable_data *StorageTmp)
 {
-	/* XXX: check row consistency return SNMP_ERR_NOERROR if consistent, or an SNMP error code if not. */
-	return (SNMP_ERR_NOERROR);
+	/* XXX: provide code to check whether the active table row can be deactivated */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int can_act_strExtTraceTable_row(struct strExtTraceTable_data *StorageTmp)
+ * @param StorageTmp the data (as updated)
+ * @brief check whether an inactive table row can be activated
+ *
+ * This function is used by the ACTION phase of a RowStatus object to test whether an inactive table
+ * row can be activated.  Returns SNMP_ERR_NOERROR when activation is permitted; an SNMP error
+ * value, otherwise.  This function might use a 'test' operation against the driver to ensure that
+ * the commit phase will succeed.
+ */
+int
+can_act_strExtTraceTable_row(struct strExtTraceTable_data *StorageTmp)
+{
+	/* XXX: provide code to check whether the new or inactive table row can be activated */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int can_deact_strExtTraceTable_row(struct strExtTraceTable_data *StorageTmp)
+ * @param StorageTmp the data (as updated)
+ * @brief check whether an active table row can be deactivated
+ *
+ * This function is used by the ACTION phase of a RowStatus object to test whether an active table
+ * row can be deactivated.  Returns SNMP_ERR_NOERROR when deactivation is permitted; an SNMP error
+ * value, otherwise.  This function might use a 'test' operation against the driver to ensure that
+ * the commit phase will succeed.
+ */
+int
+can_deact_strExtTraceTable_row(struct strExtTraceTable_data *StorageTmp)
+{
+	/* XXX: provide code to check whether the active table row can be deactivated */
+	return SNMP_ERR_NOERROR;
 }
 
 /**
@@ -2476,10 +3348,9 @@ strExtTraceTable_consistent(struct strExtTraceTable_data *thedata)
 int
 write_strExtStrlogRecordRowStatus(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	struct strExtStrlogRecordTable_data *StorageTmp = NULL;
+	struct strExtStrlogRecordTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	static struct strExtStrlogRecordTable_data *StorageNew, *StorageDel;
 	size_t newlen = name_len - 15;
-	static int old_value;
 	int set_value, ret;
 	static struct variable_list *vars, *vp;
 
@@ -2506,40 +3377,6 @@ write_strExtStrlogRecordRowStatus(int action, u_char *var_val, u_char var_val_ty
 			if (StorageTmp != NULL)
 				/* cannot create existing row */
 				return SNMP_ERR_INCONSISTENTVALUE;
-			break;
-		case RS_ACTIVE:
-		case RS_NOTINSERVICE:
-			if (StorageTmp == NULL)
-				/* cannot change state of non-existent row */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			if (StorageTmp->strExtStrlogRecordRowStatus == RS_NOTREADY)
-				/* cannot change state of row that is not ready */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			/* XXX: interaction with row storage type needed */
-			if (set_value == RS_NOTINSERVICE && StorageTmp->strExtStrlogRecordTable_refs > 0)
-				/* row is busy and cannot be moved to the RS_NOTINSERVICE state */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			break;
-		case RS_DESTROY:
-			/* destroying existent or non-existent row is ok */
-			if (StorageTmp == NULL)
-				break;
-			/* XXX: interaction with row storage type needed */
-			if (StorageTmp->strExtStrlogRecordTable_refs > 0)
-				/* row is busy and cannot be deleted */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			break;
-		case RS_NOTREADY:
-			/* management station cannot set this, only agent can */
-		default:
-			return SNMP_ERR_INCONSISTENTVALUE;
-		}
-		break;
-	case RESERVE2:
-		/* memory reseveration, final preparation... */
-		switch (set_value) {
-		case RS_CREATEANDGO:
-		case RS_CREATEANDWAIT:
 			/* creation */
 			vars = NULL;
 			/* strExtStrlogRecordIndex */
@@ -2563,12 +3400,43 @@ write_strExtStrlogRecordRowStatus(int action, u_char *var_val, u_char var_val_ty
 				snmp_free_varbind(vars);
 				return SNMP_ERR_RESOURCEUNAVAILABLE;
 			}
+			StorageNew->strExtStrlogRecordTable_rsvs = 1;
 			vp = vars;
 			StorageNew->strExtStrlogRecordIndex = (ulong) *vp->val.integer;
 			vp = vp->next_variable;
 			header_complex_add_data(&strExtStrlogRecordTableStorage, vars, StorageNew);	/* frees vars */
 			break;
+		case RS_ACTIVE:
+		case RS_NOTINSERVICE:
+			if (StorageTmp == NULL)
+				/* cannot change state of non-existent row */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			if (StorageTmp->strExtStrlogRecordRowStatus == RS_NOTREADY)
+				/* cannot change state of row that is not ready */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			/* XXX: interaction with row storage type needed */
+			if (set_value == RS_NOTINSERVICE && StorageTmp->strExtStrlogRecordTable_refs > 0)
+				/* row is busy and cannot be moved to the RS_NOTINSERVICE state */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			/* activate or deactivate */
+			if (StorageTmp == NULL)
+				return SNMP_ERR_NOSUCHNAME;
+			/* one allocation for the whole row */
+			if ((StorageOld = StorageTmp->strExtStrlogRecordTable_old) == NULL)
+				if (StorageTmp->strExtStrlogRecordTable_rsvs == 0)
+					if ((StorageOld = StorageTmp->strExtStrlogRecordTable_old = strExtStrlogRecordTable_duplicate(StorageTmp)) == NULL)
+						return SNMP_ERR_RESOURCEUNAVAILABLE;
+			if (StorageOld != NULL)
+				StorageTmp->strExtStrlogRecordTable_rsvs++;
+			break;
 		case RS_DESTROY:
+			if (StorageTmp == NULL)
+				/* cannot destroy non-existent row */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			/* XXX: interaction with row storage type needed */
+			if (StorageTmp->strExtStrlogRecordTable_refs > 0)
+				/* row is busy and cannot be deleted */
+				return SNMP_ERR_INCONSISTENTVALUE;
 			/* destroy */
 			if (StorageTmp != NULL) {
 				/* exists, extract it for now */
@@ -2578,78 +3446,127 @@ write_strExtStrlogRecordRowStatus(int action, u_char *var_val, u_char var_val_ty
 				StorageDel = NULL;
 			}
 			break;
+		case RS_NOTREADY:
+			/* management station cannot set this, only agent can */
+		default:
+			return SNMP_ERR_INCONSISTENTVALUE;
 		}
 		break;
-	case ACTION:
-		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the UNDO case */
+	case RESERVE2:
+		/* memory reseveration, final preparation... */
 		switch (set_value) {
 		case RS_CREATEANDGO:
 			/* check that activation is possible */
-			if ((ret = strExtStrlogRecordTable_consistent(StorageNew)) != SNMP_ERR_NOERROR)
+			if ((ret = can_act_strExtStrlogRecordTable_row(StorageNew)) != SNMP_ERR_NOERROR)
 				return (ret);
 			break;
 		case RS_CREATEANDWAIT:
-			/* row does not have to be consistent */
 			break;
 		case RS_ACTIVE:
-			old_value = StorageTmp->strExtStrlogRecordRowStatus;
-			StorageTmp->strExtStrlogRecordRowStatus = set_value;
-			if (old_value != RS_ACTIVE) {
-				/* check that activation is possible */
-				if ((ret = strExtStrlogRecordTable_consistent(StorageTmp)) != SNMP_ERR_NOERROR) {
-					StorageTmp->strExtStrlogRecordRowStatus = old_value;
+			/* check that activation is possible */
+			if (StorageTmp->strExtStrlogRecordRowStatus != RS_ACTIVE)
+				if ((ret = can_act_strExtStrlogRecordTable_row(StorageTmp)) != SNMP_ERR_NOERROR)
 					return (ret);
-				}
+			break;
+		case RS_NOTINSERVICE:
+			/* check that deactivation is possible */
+			if (StorageTmp->strExtStrlogRecordRowStatus != RS_NOTINSERVICE)
+				if ((ret = can_deact_strExtStrlogRecordTable_row(StorageTmp)) != SNMP_ERR_NOERROR)
+					return (ret);
+			break;
+		case RS_DESTROY:
+			/* check that deactivation is possible */
+			if (StorageTmp->strExtStrlogRecordRowStatus != RS_NOTINSERVICE)
+				if ((ret = can_deact_strExtStrlogRecordTable_row(StorageTmp)) != SNMP_ERR_NOERROR)
+					return (ret);
+			break;
+		default:
+			return SNMP_ERR_WRONGVALUE;
+		}
+		break;
+	case ACTION:
+		/* The variable has been stored in StorageTmp->strExtStrlogRecordRowStatus for you to use, and you have just been asked to do something with it.  Note that anything done here must be
+		   reversable in the UNDO case */
+		switch (set_value) {
+		case RS_CREATEANDGO:
+			/* activate with underlying device */
+			if (activate_strExtStrlogRecordTable_row(StorageNew) != SNMP_ERR_NOERROR)
+				return SNMP_ERR_COMMITFAILED;
+			break;
+		case RS_CREATEANDWAIT:
+			break;
+		case RS_ACTIVE:
+			/* state change already performed */
+			if (StorageTmp->strExtStrlogRecordRowStatus != RS_ACTIVE) {
+				/* activate with underlying device */
+				if (activate_strExtStrlogRecordTable_row(StorageTmp) != SNMP_ERR_NOERROR)
+					return SNMP_ERR_COMMITFAILED;
 			}
 			break;
 		case RS_NOTINSERVICE:
-			/* set the flag? */
-			old_value = StorageTmp->strExtStrlogRecordRowStatus;
-			StorageTmp->strExtStrlogRecordRowStatus = set_value;
+			/* state change already performed */
+			if (StorageTmp->strExtStrlogRecordRowStatus != RS_NOTINSERVICE) {
+				/* deactivate with underlying device */
+				if (deactivate_strExtStrlogRecordTable_row(StorageTmp) != SNMP_ERR_NOERROR)
+					return SNMP_ERR_COMMITFAILED;
+			}
 			break;
+		case RS_DESTROY:
+			/* commit destrution to underlying device */
+			if (StorageDel == NULL)
+				break;
+			/* deactivate with underlying device */
+			if (deactivate_strExtStrlogRecordTable_row(StorageDel) != SNMP_ERR_NOERROR)
+				return SNMP_ERR_COMMITFAILED;
+			break;
+		default:
+			return SNMP_ERR_WRONGVALUE;
 		}
 		break;
 	case COMMIT:
 		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		switch (set_value) {
 		case RS_CREATEANDGO:
-			/* row creation, set final state */
-			/* XXX: commit creation to underlying device */
-			/* XXX: activate with underlying device */
 			StorageNew->strExtStrlogRecordRowStatus = RS_ACTIVE;
 			break;
 		case RS_CREATEANDWAIT:
-			/* row creation, set final state */
 			StorageNew->strExtStrlogRecordRowStatus = RS_NOTINSERVICE;
 			break;
 		case RS_ACTIVE:
 		case RS_NOTINSERVICE:
-			/* state change already performed */
-			if (old_value != set_value) {
-				switch (set_value) {
-				case RS_ACTIVE:
-					/* XXX: activate with underlying device */
-					break;
-				case RS_NOTINSERVICE:
-					/* XXX: deactivate with underlying device */
-					break;
-				}
+			StorageNew->strExtStrlogRecordRowStatus = set_value;
+			if ((StorageOld = StorageTmp->strExtStrlogRecordTable_old) != NULL) {
+				strExtStrlogRecordTable_destroy(&StorageTmp->strExtStrlogRecordTable_old);
+				StorageTmp->strExtStrlogRecordTable_rsvs = 0;
+				StorageTmp->strExtStrlogRecordTable_tsts = 0;
+				StorageTmp->strExtStrlogRecordTable_sets = 0;
 			}
 			break;
 		case RS_DESTROY:
-			/* row deletion, free it its dead */
 			strExtStrlogRecordTable_destroy(&StorageDel);
-			/* strExtStrlogRecordTable_destroy() can handle NULL pointers. */
 			break;
 		}
 		break;
 	case UNDO:
 		/* Back out any changes made in the ACTION case */
 		switch (set_value) {
+		case RS_CREATEANDGO:
+			/* deactivate with underlying device */
+			deactivate_strExtStrlogRecordTable_row(StorageNew);
+			break;
+		case RS_CREATEANDWAIT:
+			break;
 		case RS_ACTIVE:
+			if (StorageTmp->strExtStrlogRecordRowStatus == RS_NOTINSERVICE)
+				/* deactivate with underlying device */
+				deactivate_strExtStrlogRecordTable_row(StorageTmp);
+			break;
 		case RS_NOTINSERVICE:
-			/* restore state */
-			StorageTmp->strExtStrlogRecordRowStatus = old_value;
+			if (StorageTmp->strExtStrlogRecordRowStatus == RS_ACTIVE)
+				/* activate with underlying device */
+				activate_strExtStrlogRecordTable_row(StorageTmp);
+			break;
+		case RS_DESTROY:
 			break;
 		}
 		/* fall through */
@@ -2663,6 +3580,13 @@ write_strExtStrlogRecordRowStatus(int action, u_char *var_val, u_char var_val_ty
 				strExtStrlogRecordTable_del(StorageNew);
 				strExtStrlogRecordTable_destroy(&StorageNew);
 			}
+			break;
+		case RS_ACTIVE:
+		case RS_NOTINSERVICE:
+			if ((StorageOld = StorageTmp->strExtStrlogRecordTable_old) == NULL)
+				break;
+			if (--StorageTmp->strExtStrlogRecordTable_rsvs == 0)
+				strExtStrlogRecordTable_destroy(&StorageTmp->strExtStrlogRecordTable_old);
 			break;
 		case RS_DESTROY:
 			/* row deletion, so add it again */
@@ -2689,10 +3613,9 @@ write_strExtStrlogRecordRowStatus(int action, u_char *var_val, u_char var_val_ty
 int
 write_strExtTraceRowStatus(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	struct strExtTraceTable_data *StorageTmp = NULL;
+	struct strExtTraceTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	static struct strExtTraceTable_data *StorageNew, *StorageDel;
 	size_t newlen = name_len - 14;
-	static int old_value;
 	int set_value, ret;
 	static struct variable_list *vars, *vp;
 
@@ -2719,40 +3642,6 @@ write_strExtTraceRowStatus(int action, u_char *var_val, u_char var_val_type, siz
 			if (StorageTmp != NULL)
 				/* cannot create existing row */
 				return SNMP_ERR_INCONSISTENTVALUE;
-			break;
-		case RS_ACTIVE:
-		case RS_NOTINSERVICE:
-			if (StorageTmp == NULL)
-				/* cannot change state of non-existent row */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			if (StorageTmp->strExtTraceRowStatus == RS_NOTREADY)
-				/* cannot change state of row that is not ready */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			/* XXX: interaction with row storage type needed */
-			if (set_value == RS_NOTINSERVICE && StorageTmp->strExtTraceTable_refs > 0)
-				/* row is busy and cannot be moved to the RS_NOTINSERVICE state */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			break;
-		case RS_DESTROY:
-			/* destroying existent or non-existent row is ok */
-			if (StorageTmp == NULL)
-				break;
-			/* XXX: interaction with row storage type needed */
-			if (StorageTmp->strExtTraceTable_refs > 0)
-				/* row is busy and cannot be deleted */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			break;
-		case RS_NOTREADY:
-			/* management station cannot set this, only agent can */
-		default:
-			return SNMP_ERR_INCONSISTENTVALUE;
-		}
-		break;
-	case RESERVE2:
-		/* memory reseveration, final preparation... */
-		switch (set_value) {
-		case RS_CREATEANDGO:
-		case RS_CREATEANDWAIT:
 			/* creation */
 			vars = NULL;
 			/* strExtTraceId */
@@ -2776,12 +3665,43 @@ write_strExtTraceRowStatus(int action, u_char *var_val, u_char var_val_type, siz
 				snmp_free_varbind(vars);
 				return SNMP_ERR_RESOURCEUNAVAILABLE;
 			}
+			StorageNew->strExtTraceTable_rsvs = 1;
 			vp = vars;
 			StorageNew->strExtTraceId = (ulong) *vp->val.integer;
 			vp = vp->next_variable;
 			header_complex_add_data(&strExtTraceTableStorage, vars, StorageNew);	/* frees vars */
 			break;
+		case RS_ACTIVE:
+		case RS_NOTINSERVICE:
+			if (StorageTmp == NULL)
+				/* cannot change state of non-existent row */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			if (StorageTmp->strExtTraceRowStatus == RS_NOTREADY)
+				/* cannot change state of row that is not ready */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			/* XXX: interaction with row storage type needed */
+			if (set_value == RS_NOTINSERVICE && StorageTmp->strExtTraceTable_refs > 0)
+				/* row is busy and cannot be moved to the RS_NOTINSERVICE state */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			/* activate or deactivate */
+			if (StorageTmp == NULL)
+				return SNMP_ERR_NOSUCHNAME;
+			/* one allocation for the whole row */
+			if ((StorageOld = StorageTmp->strExtTraceTable_old) == NULL)
+				if (StorageTmp->strExtTraceTable_rsvs == 0)
+					if ((StorageOld = StorageTmp->strExtTraceTable_old = strExtTraceTable_duplicate(StorageTmp)) == NULL)
+						return SNMP_ERR_RESOURCEUNAVAILABLE;
+			if (StorageOld != NULL)
+				StorageTmp->strExtTraceTable_rsvs++;
+			break;
 		case RS_DESTROY:
+			if (StorageTmp == NULL)
+				/* cannot destroy non-existent row */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			/* XXX: interaction with row storage type needed */
+			if (StorageTmp->strExtTraceTable_refs > 0)
+				/* row is busy and cannot be deleted */
+				return SNMP_ERR_INCONSISTENTVALUE;
 			/* destroy */
 			if (StorageTmp != NULL) {
 				/* exists, extract it for now */
@@ -2791,78 +3711,127 @@ write_strExtTraceRowStatus(int action, u_char *var_val, u_char var_val_type, siz
 				StorageDel = NULL;
 			}
 			break;
+		case RS_NOTREADY:
+			/* management station cannot set this, only agent can */
+		default:
+			return SNMP_ERR_INCONSISTENTVALUE;
 		}
 		break;
-	case ACTION:
-		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the UNDO case */
+	case RESERVE2:
+		/* memory reseveration, final preparation... */
 		switch (set_value) {
 		case RS_CREATEANDGO:
 			/* check that activation is possible */
-			if ((ret = strExtTraceTable_consistent(StorageNew)) != SNMP_ERR_NOERROR)
+			if ((ret = can_act_strExtTraceTable_row(StorageNew)) != SNMP_ERR_NOERROR)
 				return (ret);
 			break;
 		case RS_CREATEANDWAIT:
-			/* row does not have to be consistent */
 			break;
 		case RS_ACTIVE:
-			old_value = StorageTmp->strExtTraceRowStatus;
-			StorageTmp->strExtTraceRowStatus = set_value;
-			if (old_value != RS_ACTIVE) {
-				/* check that activation is possible */
-				if ((ret = strExtTraceTable_consistent(StorageTmp)) != SNMP_ERR_NOERROR) {
-					StorageTmp->strExtTraceRowStatus = old_value;
+			/* check that activation is possible */
+			if (StorageTmp->strExtTraceRowStatus != RS_ACTIVE)
+				if ((ret = can_act_strExtTraceTable_row(StorageTmp)) != SNMP_ERR_NOERROR)
 					return (ret);
-				}
+			break;
+		case RS_NOTINSERVICE:
+			/* check that deactivation is possible */
+			if (StorageTmp->strExtTraceRowStatus != RS_NOTINSERVICE)
+				if ((ret = can_deact_strExtTraceTable_row(StorageTmp)) != SNMP_ERR_NOERROR)
+					return (ret);
+			break;
+		case RS_DESTROY:
+			/* check that deactivation is possible */
+			if (StorageTmp->strExtTraceRowStatus != RS_NOTINSERVICE)
+				if ((ret = can_deact_strExtTraceTable_row(StorageTmp)) != SNMP_ERR_NOERROR)
+					return (ret);
+			break;
+		default:
+			return SNMP_ERR_WRONGVALUE;
+		}
+		break;
+	case ACTION:
+		/* The variable has been stored in StorageTmp->strExtTraceRowStatus for you to use, and you have just been asked to do something with it.  Note that anything done here must be
+		   reversable in the UNDO case */
+		switch (set_value) {
+		case RS_CREATEANDGO:
+			/* activate with underlying device */
+			if (activate_strExtTraceTable_row(StorageNew) != SNMP_ERR_NOERROR)
+				return SNMP_ERR_COMMITFAILED;
+			break;
+		case RS_CREATEANDWAIT:
+			break;
+		case RS_ACTIVE:
+			/* state change already performed */
+			if (StorageTmp->strExtTraceRowStatus != RS_ACTIVE) {
+				/* activate with underlying device */
+				if (activate_strExtTraceTable_row(StorageTmp) != SNMP_ERR_NOERROR)
+					return SNMP_ERR_COMMITFAILED;
 			}
 			break;
 		case RS_NOTINSERVICE:
-			/* set the flag? */
-			old_value = StorageTmp->strExtTraceRowStatus;
-			StorageTmp->strExtTraceRowStatus = set_value;
+			/* state change already performed */
+			if (StorageTmp->strExtTraceRowStatus != RS_NOTINSERVICE) {
+				/* deactivate with underlying device */
+				if (deactivate_strExtTraceTable_row(StorageTmp) != SNMP_ERR_NOERROR)
+					return SNMP_ERR_COMMITFAILED;
+			}
 			break;
+		case RS_DESTROY:
+			/* commit destrution to underlying device */
+			if (StorageDel == NULL)
+				break;
+			/* deactivate with underlying device */
+			if (deactivate_strExtTraceTable_row(StorageDel) != SNMP_ERR_NOERROR)
+				return SNMP_ERR_COMMITFAILED;
+			break;
+		default:
+			return SNMP_ERR_WRONGVALUE;
 		}
 		break;
 	case COMMIT:
 		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		switch (set_value) {
 		case RS_CREATEANDGO:
-			/* row creation, set final state */
-			/* XXX: commit creation to underlying device */
-			/* XXX: activate with underlying device */
 			StorageNew->strExtTraceRowStatus = RS_ACTIVE;
 			break;
 		case RS_CREATEANDWAIT:
-			/* row creation, set final state */
 			StorageNew->strExtTraceRowStatus = RS_NOTINSERVICE;
 			break;
 		case RS_ACTIVE:
 		case RS_NOTINSERVICE:
-			/* state change already performed */
-			if (old_value != set_value) {
-				switch (set_value) {
-				case RS_ACTIVE:
-					/* XXX: activate with underlying device */
-					break;
-				case RS_NOTINSERVICE:
-					/* XXX: deactivate with underlying device */
-					break;
-				}
+			StorageNew->strExtTraceRowStatus = set_value;
+			if ((StorageOld = StorageTmp->strExtTraceTable_old) != NULL) {
+				strExtTraceTable_destroy(&StorageTmp->strExtTraceTable_old);
+				StorageTmp->strExtTraceTable_rsvs = 0;
+				StorageTmp->strExtTraceTable_tsts = 0;
+				StorageTmp->strExtTraceTable_sets = 0;
 			}
 			break;
 		case RS_DESTROY:
-			/* row deletion, free it its dead */
 			strExtTraceTable_destroy(&StorageDel);
-			/* strExtTraceTable_destroy() can handle NULL pointers. */
 			break;
 		}
 		break;
 	case UNDO:
 		/* Back out any changes made in the ACTION case */
 		switch (set_value) {
+		case RS_CREATEANDGO:
+			/* deactivate with underlying device */
+			deactivate_strExtTraceTable_row(StorageNew);
+			break;
+		case RS_CREATEANDWAIT:
+			break;
 		case RS_ACTIVE:
+			if (StorageTmp->strExtTraceRowStatus == RS_NOTINSERVICE)
+				/* deactivate with underlying device */
+				deactivate_strExtTraceTable_row(StorageTmp);
+			break;
 		case RS_NOTINSERVICE:
-			/* restore state */
-			StorageTmp->strExtTraceRowStatus = old_value;
+			if (StorageTmp->strExtTraceRowStatus == RS_ACTIVE)
+				/* activate with underlying device */
+				activate_strExtTraceTable_row(StorageTmp);
+			break;
+		case RS_DESTROY:
 			break;
 		}
 		/* fall through */
@@ -2876,6 +3845,13 @@ write_strExtTraceRowStatus(int action, u_char *var_val, u_char var_val_type, siz
 				strExtTraceTable_del(StorageNew);
 				strExtTraceTable_destroy(&StorageNew);
 			}
+			break;
+		case RS_ACTIVE:
+		case RS_NOTINSERVICE:
+			if ((StorageOld = StorageTmp->strExtTraceTable_old) == NULL)
+				break;
+			if (--StorageTmp->strExtTraceTable_rsvs == 0)
+				strExtTraceTable_destroy(&StorageTmp->strExtTraceTable_old);
 			break;
 		case RS_DESTROY:
 			/* row deletion, so add it again */

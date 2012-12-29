@@ -1,0 +1,938 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+use threads;
+use threads::shared;
+use Thread::Queue;
+
+use Net::Libdnet::Arp;
+use Net::Libdnet::Intf;
+use Net::Libdnet::Route;
+use Net::hostent;
+use Socket;
+use Carp;
+use SNMP::Info;
+use SNMP::Info::LLDP;
+use SNMP;
+
+$ENV{MIBDIRS} = '+'.join(':',qw{
+/var/lib/mibs
+/var/lib/mibs/ietf
+/var/lib/mibs/iana
+/usr/share/netdisco/mibs
+/usr/share/netdisco/mibs/allied
+/usr/share/netdisco/mibs/arista
+/usr/share/netdisco/mibs/aruba
+/usr/share/netdisco/mibs/asante
+/usr/share/netdisco/mibs/cabletron
+/usr/share/netdisco/mibs/cisco
+/usr/share/netdisco/mibs/cyclades
+/usr/share/netdisco/mibs/dell
+/usr/share/netdisco/mibs/enterasys
+/usr/share/netdisco/mibs/extreme
+/usr/share/netdisco/mibs/foundry
+/usr/share/netdisco/mibs/hp
+/usr/share/netdisco/mibs/juniper
+/usr/share/netdisco/mibs/netscreen
+/usr/share/netdisco/mibs/net-snmp
+/usr/share/netdisco/mibs/nortel
+/usr/share/netdisco/mibs/rfc});
+
+$SNMP::verbose = 0;
+$SNMP::use_long_names = 0;
+$SNMP::use_sprint_value = 0;
+$SNMP::use_enums = 1;
+$SNMP::use_numeric = 0;
+$SNMP::best_guess = 2;
+$SNMP::save_descriptions = 1;
+SNMP::initMib();
+SNMP::addMibDirs(qw(../mibs));
+SNMP::loadModules('SNMPv2-MIB', 'RFC1213-MIB', 'IF-MIB', 'IP-MIB');
+#SNMP::loadModules('ALL');
+
+# ---------------------------------------------------
+package System;
+# ---------------------------------------------------
+# Systems are IP hosts.  What distinguishes a System package from an Interface,
+# Ipaddr or Host package is that a System can have numerous interfaces
+# (Interface packages), numerous IP addresses (Ipaddr packages) and numerous
+# host names (Host packages).  Systems are identified by their SNMP system name.
+# ---------------------------------------------------
+
+# ---------------------------------------------------
+package Station;
+# ---------------------------------------------------
+# Stations are an unidentified IP host or gateway.  We know that there are two
+# stations on the edge of a single ethernet, we just do not know which stations
+# yet.  A bare Station object is an unknown IP host or gateway.  It is just a
+# place holder for when the station is bound to an actual IP host or gateway.
+# Stations need a put method so that the ethernet can put these stations once
+# they are no longer necessary.  Stations are created in reference to an
+# ethernet, the edge of the ethernet on which they exist.
+#
+# When a Station is created, we know possibly one of its Ethernet hardware
+# addresses (Port), but we have no idea which IP addresses belong to it until an
+# ARP or LLDP packet is processed.  When we are live (we are viewing captured
+# files or performing capture on the monitoring point itself), we can query ARP,
+# LLDP and SNMP for further information.  In particular LLDP can help us find
+# the management IP address associated with the station so that we can query it
+# directly with SNMP.
+# ---------------------------------------------------
+
+# ---------------------------------------------------
+package Peering;
+# ---------------------------------------------------
+# A peering is a relationship between hosts that communicate with each other.
+# This object is used to trace these interactions, primarily for identifying the
+# role of hosts.
+# ---------------------------------------------------
+
+# ---------------------------------------------------
+package Flow;
+# ---------------------------------------------------
+# A Flow is a path between a Station and a Host.  It models the Station to Host
+# relationship where the Station is an ethernet station and the Host is an IP
+# host.  A Flow is bidirectional.  Arp caches establish relationships between
+# Stations and Hosts.
+# ---------------------------------------------------
+
+# ---------------------------------------------------
+package Subnet;
+# ---------------------------------------------------
+# Subnets are IP addresses and network masks that define a range of IP addresses
+# that belong to the same subnet.  Subnets can exists on Lans and Vlans.  A
+# route is a relationship between an IP host and an Subnet.
+# ---------------------------------------------------
+
+# ---------------------------------------------------
+package Lan;
+# ---------------------------------------------------
+# A Lan is a relationship between any number of Port packages.  All ports that
+# share a hardware address with a Lan are on that LAN.
+#
+# When we add a packet to a Lan both hardware addresses are discovered to also
+# belong to the same Lan.  The Lan was looked up by source hardware address, so
+# we add the destination hardware addresses when it is available.  A destination
+# hardware address is not available when the packet comes from a Linux cooked
+# header capture.  When another Lan exists that already has the destination
+# hardware address as one of its addresses, the two Lan packages will be merged.
+# In this way membership of hardware addresses (Port and Station packages) to
+# Lan packages are discovered.
+# ---------------------------------------------------
+
+# ---------------------------------------------------
+package Vlan;
+# ---------------------------------------------------
+# A Vlain is an IEEE 802.1P/Q virtual LAN.  It is a relationship between any
+# number of Vprt packages.  All virtual ports that share a hardware address and
+# VLAN id with a Vlan are on that VLAN.
+#
+# When we add a package to a Vlan both hardware addresses are discovered to also
+# belong to the same Vlan.  The Vlan was looked up by source hardware address
+# and VLAN id, so we add the destination hardware address when it is available.
+# A destination hardware address is not available when the packet comes from a
+# Linux cooked header capture.  When another Vlan exists that already has this
+# destination hardware address as one of its addresses, the two Vlan packages
+# will be merged.  In this way membership of hardware addresses (Port and
+# Station packages) to Vlan packages is discovered.
+# ---------------------------------------------------
+
+# ---------------------------------------------------
+package Port;
+# ---------------------------------------------------
+# A Port is a LAN link layer interface.  Fundamentally, a Port belongs to the
+# Lan to which it is attached (with which it shares its hardware address key).
+# Also, it fundamentally belongs to the Station to which it is attached (and
+# also shares its hardware address key).  The Lan to which a Port belongs can be
+# found by simply looking up the Lan with the Port hardware address.  The same
+# is true of the Station.
+# ---------------------------------------------------
+
+# ---------------------------------------------------
+package Vptr;
+# ---------------------------------------------------
+# A Vprt is a VLAN link layer interface.  Fundamentally, a Vprt belongs to the
+# Vlan to which it shares its hardware address and VLAN id key).  Also, a Vprt
+# is a child of a Port.  The Vlan to which a Vprt belongs can be found by simply
+# looking up the Vlan with the Vprt hardware address and VLAN id.
+#
+# To avoid unnecessary complexity, we deal with Vptr packages only.  The parent
+# Port package is just for automatically tracking membership of Vprt to Port
+# relationships.
+# ---------------------------------------------------
+
+# ---------------------------------------------------
+package Host;
+# ---------------------------------------------------
+# ---------------------------------------------------
+use strict;
+use warnings;
+use threads;
+use threads::shared;
+use Thread::Queue;
+
+%Host::hosts = ();
+$Host::rq = Thread::Queue->new();
+$Host::hostent_lockvar = 1;
+$Host::snmpinf_lockvar = 1;
+$Host::netsnmp_lockvar = 1;
+
+#package Host;
+sub start {
+	share($Host::hostent_lockvar);
+	share($Host::snmpinf_lockvar);
+	share($Host::netsnmp_lockvar);
+	threads->create(sub{
+			while (my $item = $Host::rq->dequeue()) {
+				threads->create(sub{
+						lock($Host::hostent_lockvar);
+						if (my $h = Net::hostent::gethost($item)) {
+							my $host = {
+								name=>$h->name,
+								aliases=>$h->aliases,
+								addrtype=>$h->addrtype,
+								length=>$h->length,
+								addr_list=>[ @{$h->addr_list} ],
+							};
+							$main::wq->enqueue(['Host::gethost',$item,$host]);
+						} else {
+							$main::wq->enqueue(['Host::gethost',$item,undef]);
+						}
+					})->detach();
+				threads->create(sub{
+						lock($Host::snmpinf_lockvar);
+						my $info = new SNMP::Info(
+							AutoSpecify=>1,
+							Debug=>0,
+							DestHost=>$item,
+							Community=>'public',
+							Version=>2,
+						);
+						return unless $info;
+						return if defined $info->error;
+						if (my $hr = $info->at_index) {
+							foreach my $id (keys %$hr) {
+								my $e = {
+									arp_ha=>$info->at_paddr->{$id},
+									arp_pa=>$info->at_netaddr->{$id},
+								};
+								$main::wq->enqueue(['Interface::run_arp',$e]);
+							}
+						}
+					})->detach();
+				threads->create(sub{
+						#lock($Host::netsnmp_lockvar);
+						Carp::carp "SNMP session for host $item\n";
+						my $s = new SNMP::Session(
+							DestHost=>$item,
+							Community=>'public',
+							Version=>2,
+						);
+						Carp::carp "SNMP query for host $item\n";
+						if (my $r = $s->gettable('atTable')) {
+							foreach my $index (keys %$r) {
+								my $e =  {
+									arp_ha=>Interface::from_binary($r->{$index}{'atPhysAddress'}),
+									arp_pa=>$r->{$index}{'atNetAddress'},
+								};
+								$main::wq->enqueue(['Interface::test_arp',$e]);
+							}
+						} else {
+							Carp::carp "SNMP error is ".$s->ErrorStr;
+						}
+					})->detach();
+			}
+		})->detach();
+}
+#package Host;
+sub request {
+	my $hostname = shift;
+	$Host::rq->enqueue($hostname);
+}
+#package Host;
+sub gethost {
+	my ($hostname,$hostent) = @_;
+	if (my $self = Host->get($hostname)) {
+		if ($hostent) {
+			foreach (qw/name aliases addrtype length addr_list/) {
+				$self->{$_} = $hostent->{$_};
+			}
+		}
+		$self->print;
+	}
+}
+#package Host;
+sub find {
+	my $hn = shift;
+	$hn = "\L$hn\E";
+	return $Host::hosts{$hn} if exists $Host::hosts{$hn};
+	return undef;
+}
+#package Host;
+sub print {
+	my $self = shift;
+	printf STDERR "Completed Host %s\n", $self->{hn};
+}
+#package Host;
+sub new {
+	my ($type,$hname) = @_;
+	print STDERR "New $type for $hname\n";
+	Host::request($hname);
+	my $self = {};
+	bless $self,$type;
+	my $hn = "\L$hname\E";
+	$self->{hn} = $hn;
+	$self->{addrs} = {};
+	$self->{name} = '';
+	$self->{aliases} = [];
+	$self->{addrtype} = 2;
+	$self->{length} = 4;
+	$self->{addr_list} = [];
+	$Host::hosts{$hn} = $self;
+	return $self;
+}
+#package Host;
+sub get {
+	my ($type,$hname) = @_;
+	my $hn = "\L$hname\E";
+	my $self = Host::find($hn);
+	$self = Host::new(@_) unless $self;
+	return $self;
+}
+#package Host;
+sub add_addr {
+	my ($self,$ipaddr) = @_;
+	my $ip = Ipaddr::to_binary($ipaddr);
+	return if exists $self->{addrs}{$ip};
+	$self->{addrs}{$ip} = '';
+	my $obj = $self->{addrs}{$ip} = Ipaddr->get($ipaddr);
+	$obj->add_host($self->{hn});
+}
+#package Host;
+sub del_addr {
+	my ($self,$ipaddr) = @_;
+	my $ip = Ipaddr::to_binary($ipaddr);
+	if (my $obj = delete $self->{addrs}{$ip}) {
+		$obj->del_host($self->{hn});
+	}
+}
+
+# ---------------------------------------------------
+package Ipaddr;
+# ---------------------------------------------------
+# ---------------------------------------------------
+use strict;
+use warnings;
+use threads;
+use threads::shared;
+use Thread::Queue;
+
+%Ipaddr::addrs = ();
+$Ipaddr::rq = Thread::Queue->new();
+
+#package Ipaddr;
+sub start {
+	threads->create(sub{
+			while (my $item = $Ipaddr::rq->dequeue()) {
+				my $thr = threads->create(sub{
+						lock($Host::hostent_lockvar);
+						if (my $h = Net::hostent::gethost($item)) {
+							my $host = {
+								name=>$h->name,
+								aliases=>$h->aliases,
+								addrtype=>$h->addrtype,
+								length=>$h->length,
+								addr_list=>[ @{$h->addr_list} ],
+							};
+							$main::wq->enqueue(['Ipaddr::gethost',$item,$host]);
+						} else {
+							$main::wq->enqueue(['Ipaddr::gethost',$item,undef]);
+						}
+					})->detach();
+			}
+		})->detach();
+}
+#package Ipaddr;
+sub request {
+	my $ipaddr = shift;
+	$Ipaddr::rq->enqueue($ipaddr);
+}
+#package Ipaddr;
+sub gethost {
+	my ($ipaddr,$hostent) = @_;
+	if (my $self = Ipaddr->get($ipaddr)) {
+		if ($hostent) {
+			foreach (qw/name aliases addrtype length addr_list/) {
+				$self->{$_} = $hostent->{$_};
+			}
+			foreach ($self->{name},@{$self->{aliases}}) {
+				next unless $_;
+				$self->add_host($_);
+			}
+		}
+		$self->print;
+	}
+}
+#package Ipaddr;
+sub find {
+	my $ip = shift;
+	return $Ipaddr::addrs{$ip} if exists $Ipaddr::addrs{$ip};
+	return undef;
+}
+#package Ipaddr;
+sub print {
+	my $self = shift;
+	printf STDERR "Completed Ipaddr %s\n", Ipaddr::from_binary($self->{ip});
+}
+#package Ipaddr;
+sub new {
+	my ($type,$ipaddr) = @_;
+	print STDERR "New $type for $ipaddr\n";
+	Ipaddr::request($ipaddr);
+	my $self = {};
+	bless $self,$type;
+	my $ip = Ipaddr::to_binary($ipaddr);
+	$self->{ip} = $ip;
+	$self->{macs} = {};
+	$self->{hosts} = {};
+	$self->{others} = {};
+	$self->{routes} = {};
+	$self->{name} = '';
+	$self->{aliases} = [];
+	$self->{addrtype} = 2;
+	$self->{length} = 4;
+	$self->{addr_list} = [];
+	$Ipaddr::addrs{$ip} = $self;
+	return $self;
+}
+#package Ipaddr;
+sub get {
+	my ($type,$ipaddr) = @_;
+	my $ip = Ipaddr::to_binary($ipaddr);
+	my $self = Ipaddr::find($ip);
+	$self = Ipaddr::new(@_) unless $self;
+	return $self;
+}
+#package Ipaddr;
+sub to_binary {
+	my $ip = shift;
+	return pack('C*',split(/\./,$ip));
+}
+#package Ipaddr;
+sub from_binary {
+	my $ip = shift;
+	return join('.',unpack('C*',$ip));
+}
+#package Ipaddr;
+sub add_mac {
+	my ($self,$hwaddr) = @_;
+	my $hw = Interface::to_binary($hwaddr);
+	return if exists $self->{macs}{$hw};
+	$self->{macs}{$hw} = '';
+	my $obj = $self->{macs}{$hw} = Interface->get($hwaddr);
+	$obj->add_addr(Ipaddr::from_binary($self->{ip}));
+}
+#package Ipaddr;
+sub del_mac {
+	my ($self,$hwaddr) = @_;
+	my $hw = Interface::to_binary($hwaddr);
+	if (my $obj = delete $self->{macs}{$hw}) {
+		$obj->del_addr(Ipaddr::from_binary($self->{ip}));
+	}
+}
+#package Ipaddr;
+sub add_host {
+	my ($self,$hname) = @_;
+	my $hn = "\L$hname\E";
+	return if exists $self->{hosts}{$hn};
+	$self->{hosts}{$hn} = '';
+	my $obj = $self->{hosts}{$hn} = Host->get($hname);
+	$obj->add_addr(Ipaddr::from_binary($self->{ip}));
+}
+#package Ipaddr;
+sub del_host {
+	my ($self,$hname) = @_;
+	my $hn = "\L$hname\E";
+	if (my $obj = delete $self->{hosts}{$hn}) {
+		$obj->del_addr(Ipaddr::from_binary($self->{ip}));
+	}
+}
+#package Ipaddr;
+sub add_rte {
+	my ($self,$dest) = @_;
+	my $dst = Route::to_binary($dest);
+	return if exists $self->{routes}{$dst};
+	$self->{routes}{$dst} = '';
+	my $obj = $self->{routes}{$dst} = Route->get($dest);
+	$obj->add_gw(Ipaddr::from_binary($self->{ip}));
+}
+#package Ipaddr;
+sub del_rte {
+	my ($self,$dest) = @_;
+	my $dst = Route::to_binary($dest);
+	if (my $obj = delete $self->{routes}{$dst}) {
+		$obj->del_gw(Ipaddr::from_binary($self->{ip}));
+	}
+}
+
+# ---------------------------------------------------
+package Route;
+# ---------------------------------------------------
+# ---------------------------------------------------
+use strict;
+use warnings;
+use threads;
+use threads::shared;
+use Thread::Queue;
+
+%Route::dests = ();
+$Route::libdnet_lockvar = 1;
+
+#package Route;
+sub start {
+	share($Route::libdnet_lockvar);
+	threads->create(sub{
+			while (1) {
+				{
+					lock($Route::libdnet_lockvar);
+					Net::Libdnet::Route->new->loop('Route::loop','Route::run');
+				}
+				sleep 5;
+			}
+		})->detach();
+}
+#package Route;
+sub loop {
+	my ($e,$sub) = @_;
+	$main::wq->enqueue([$sub,$e]);
+	threads->yield();
+}
+#package Route;
+sub run {
+	if (my $e = shift) {
+		if ($e->{route_dst} =~ m/^\d+\.\d+\.\d+\.\d+\/\d+$/) {
+			my $rt = Route->get($e->{route_dst});
+			$rt->add_gw($e->{route_gw}) if $e->{route_gw};
+		}
+	}
+}
+#package Route;
+sub find {
+	my $dst = shift;
+	return $Route::dests{$dst} if exists $Route::dests{$dst};
+	return undef;
+}
+#package Route;
+sub new {
+	my ($type,$dest) = @_;
+	print STDERR "New $type for $dest\n";
+	my $self = {};
+	bless $self,$type;
+	my $dst = Route::to_binary($dest);
+	$self->{dst} = $dst;
+	$self->{gateways} = {};
+	$self->{devices} = {};
+	$Route::dests{$dst} = $self;
+	return $self;
+}
+#package Route;
+sub get {
+	my ($type,$dest) = @_;
+	my $dst = Route::to_binary($dest);
+	my $self = Route::find($dst);
+	$self = Route::new(@_) unless $self;
+	return $self;
+}
+#package Route;
+sub to_binary {
+	my $dest = shift;
+	my $dst = pack('C*',split(/[\/\.]/,$dest));
+	my ($addr,$mask) = (unpack('NC',$dst));
+	$addr = $addr & ~((1<<(32-$mask))-1);
+	$dst = pack('NC',$addr,$mask);
+	return $dst;
+}
+#package Route;
+sub from_binary {
+	my $dst = shift;
+	my @parts = (unpack('C*',$dst));
+	return join('/',join('.',@parts[0..3]),$parts[4]);
+}
+#package Route;
+sub add_gw {
+	my ($self,$ipaddr) = @_;
+	my $ip = Ipaddr::to_binary($ipaddr);
+	return if exists $self->{gateways}{$ip};
+	$self->{gateways}{$ip} = '';
+	my $obj = $self->{gateways}{$ip} = Ipaddr->get($ipaddr);
+	$obj->add_rte(Route::from_binary($self->{dst}));
+}
+#package Route;
+sub del_gw {
+	my ($self,$ipaddr) = @_;
+	my $ip = Ipaddr::to_binary($ipaddr);
+	if (my $obj = delete $self->{gateways}{$ip}) {
+		$obj->del_rte(Route::from_binary($self->{dst}));
+	}
+}
+#package Route;
+sub add_dev {
+	my ($self,$hwaddr) = @_;
+	my $hw = Interface::to_binary($hwaddr);
+	return if exists $self->{devices}{$hw};
+	$self->{devices}{$hw} = '';
+	my $obj = $self->{devices}{$hw} = Interface->get($hwaddr);
+	$obj->add_rte(Route::from_binary($self->{dst}));
+}
+#package Route;
+sub del_dev {
+	my ($self,$hwaddr) = @_;
+	my $hw = Interface::to_binary($hwaddr);
+	if (my $obj = delete $self->{devices}{$hw}) {
+		$obj->del_rte(Route::from_binary($self->{dst}));
+	}
+}
+
+
+# ---------------------------------------------------
+package Interface;
+# ---------------------------------------------------
+# ---------------------------------------------------
+use strict;
+use warnings;
+use threads;
+use threads::shared;
+use Thread::Queue;
+
+%Interface::ports = ();
+
+#package Interface;
+sub start {
+	threads->create(sub{
+			while (1) {
+				{
+					lock($Route::libdnet_lockvar);
+					Net::Libdnet::Arp->new->loop('Interface::loop','Interface::run_arp');
+				}
+				{
+					lock($Route::libdnet_lockvar);
+					Net::Libdnet::Intf->new->loop('Interface::loop','Interface::run_intf');
+				}
+				sleep 5;
+			}
+		})->detach();
+}
+#package Interface;
+sub loop {
+	my ($e,$sub) = @_;
+	$main::wq->enqueue([$sub,$e]);
+	threads->yield();
+}
+#package Interface;
+sub run_arp {
+	my $e = shift;
+	my $if = Interface->get($e->{arp_ha});
+	$if->add_addr($e->{arp_pa});
+}
+#package Interface;
+sub test_arp {
+	my $e = shift;
+	Carp::cluck "arp_ha = $e->{arp_ha}, arp_pa = $e->{arp_pa}";
+}
+#package Interface;
+sub run_intf {
+	my $e = shift;
+	my $hw = $e->{intf_link_addr};
+	$hw = '00:00:00:00:00:00' unless $hw;
+	my $if = Interface->get($hw);
+	$if->{mtu} = $e->{intf_mtu};
+	$if->{len} = $e->{intf_len};
+	$if->{type} = $e->{intf_type};
+	$if->{name} = $e->{intf_name};
+	$if->{dst_addr} = $e->{intf_dst_addr};
+	$if->{flags} = $e->{intf_flags};
+	my @addrs = ();
+	push @addrs, $e->{intf_addr} if $e->{intf_addr};
+	push @addrs, @{$e->{intf_alias_addrs}} if $e->{intf_alias_addrs} and @{$e->{intf_alias_addrs}};
+	foreach my $ip (@addrs) {
+		$ip=~s{/.*}{};
+		$if->add_addr($ip) if $ip=~m/^\d+\.\d+\.\d+\.\d+$/;
+	}
+	foreach my $dest (@addrs) {
+		if ($dest =~ m/^\d+\.\d+\.\d+\.\d+\/\d+$/) {
+			my $rt = Route->get($dest);
+			$rt->add_dev($hw);
+		}
+	}
+}
+#package Interface;
+sub find {
+	my $hw = shift;
+	return $Interface::ports{$hw} if exists $Interface::ports{$hw};
+	return undef;
+}
+#package Interface;
+sub new {
+	my ($type,$hwaddr) = @_;
+	print STDERR "New $type for $hwaddr\n";
+	my $self = {};
+	bless $self,$type;
+	my $hw = Interface::to_binary($hwaddr);
+	$self->{hw} = $hw;
+	$self->{addrs} = {};
+	$self->{routes} = {};
+	$Interface::ports{$hw} = $self;
+	return $self;
+}
+#package Interface;
+sub get {
+	my ($type,$hwaddr) = @_;
+	my $hw = Interface::to_binary($hwaddr);
+	my $self = Interface::find($hw);
+	$self = Interface::new(@_) unless $self;
+	return $self;
+}
+#package Interface;
+sub to_binary {
+	my $hw = shift;
+	$hw =~ s/://g;
+	return pack('H*',$hw);
+}
+#package Interface;
+sub from_binary {
+	my $hw = shift;
+	return join(':',map { sprintf('%02x',$_) } unpack('C*',$hw));
+}
+#package Interface;
+sub add_addr {
+	my ($self,$ipaddr) = @_;
+	my $ip = Ipaddr::to_binary($ipaddr);
+	return if exists $self->{addrs}{$ip};
+	$self->{addrs}{$ip} = '';
+	my $obj = $self->{addrs}{$ip} = Ipaddr->get($ipaddr);
+	$obj->add_mac(Interface::from_binary($self->{hw}));
+}
+#package Interface;
+sub del_addr {
+	my ($self,$ipaddr) = @_;
+	my $ip = Ipaddr::to_binary($ipaddr);
+	if (my $obj = delete $self->{addrs}{$ip}) {
+		$obj->del_mac(Interface::from_binary($self->{hw}));
+	}
+}
+#package Interface;
+sub add_rte {
+	my ($self,$dest) = @_;
+	my $de = Route::to_binary($dest);
+	return if exists $self->{routes}{$de};
+	$self->{routes}{$de} = '';
+	my $obj = $self->{routes}{$de} = Route->get($dest);
+	$obj->add_dev(Route::from_binary($self->{dst}));
+}
+#package Interface;
+sub del_rte {
+	my ($self,$dest) = @_;
+	my $de = Route::to_binary($dest);
+	if (my $obj = delete $self->{routes}{$de}) {
+		$obj->del_dev(Route::from_binary($self->{dst}));
+	}
+}
+
+# ---------------------------------------------------
+package main;
+# ---------------------------------------------------
+# ---------------------------------------------------
+use strict;
+use warnings;
+use threads;
+use threads::shared;
+use Thread::Queue;
+use Net::Libdnet::Arp;
+use Net::Libdnet::Intf;
+use Net::Libdnet::Route;
+
+$main::wq = Thread::Queue->new();
+
+Host::start;
+Ipaddr::start;
+Route::start;
+Interface::start;
+
+for (my $i=0;$i<20;$i++) {
+	while (my $item = $main::wq->dequeue_nb) {
+		my ($sub,@args) = @$item;
+		eval "$sub".'(@args);';
+		print STDERR "$@\n" if $@;
+	}
+	print STDERR "Run out of things to do, iteration = $i\n";
+	sleep 1;
+}
+
+foreach (sort keys %Interface::ports) {
+	my $if = $Interface::ports{$_};
+	print $if->{name}, ": ", Interface::from_binary($_);
+	foreach my $ip (sort keys %{$if->{addrs}}) {
+		my $obj = $if->{addrs}{$ip};
+		print ",\n\t", Ipaddr::from_binary($ip);
+		print ", ", $obj->{name};
+		print ", ", $obj->{addrtype};
+		print ", ", $obj->{length};
+		print ", [", join(",",@{$obj->{aliases}}), "]";
+		print ", [", join(",",map {Ipaddr::from_binary($_)} @{$obj->{addr_list}}), "]";
+		print ", [", join(",",map {Interface::from_binary($_)} keys %{$obj->{macs}}), "]";
+		foreach my $hn (sort keys %{$obj->{hosts}}) {
+			print ",\n\t\t", $hn;
+		}
+	}
+	print "\n";
+}
+
+
+foreach (sort keys %Host::hosts) {
+	Carp::carp "Processing host $_...";
+	my $info = new SNMP::Info(
+		AutoSpecify=>1,
+		Debug=>0,
+		DestHost=>$_,
+		Community=>'public',
+		Version=>2
+	);
+	unless ($info) { Carp::carp "Can't connect to host $_"; next }
+	my $err = $info->error;
+	if (defined $err) { Carp::carp "Error connecting to host $_. $err\n"; next }
+	my $class = $info->class;
+	Carp::carp "SNMP::Info is using device class $class for $_.";
+	my $lldp;
+	{
+		my $args = $info->args;
+		my $session = $info->session;
+		$lldp = SNMP::Info::LLDP->new(
+			%$args,
+			Session=>$session,
+			AutoSpecify=>0,
+		);
+	}
+	unless ($lldp) { Carp::carp "Can't connect to host $_"; next }
+	$err = $lldp->error;
+	if (defined $err) { Carp::carp "Error connecting to host $_. $err\n"; next }
+	$class = $lldp->class;
+	Carp::carp "SNMP::Info::LLDP is using device class $class for $_.";
+	print "DestHost: ", $_, "\n";
+	print "sysName: ", $info->name, "\n";
+	print "sysLocation: ", $info->location, "\n";
+	print "sysContact: ", $info->contact, "\n";
+	print "sysUptime: ", $info->uptime, "\n";
+	print "sysServices: ", $info->layers, "\n";
+	print "ifNumber: ", $info->ports, "\n";
+	print "ipForwarding: ", $info->ipforwarding, "\n";
+	my $interfaces = $info->interfaces;
+	my $if_ignore = $info->if_ignore;
+	my $i_index = $info->i_index;
+	my $i_description = $info->i_description;
+	my $i_type = $info->i_type;
+	my $i_mtu = $info->i_mtu;
+	my $i_speed = $info->i_speed;
+	my $i_speed_raw = $info->i_speed_raw;
+	my $i_speed_high = $info->i_speed_high;
+	my $i_mac = $info->i_mac;
+	my $i_up = $info->i_up;
+	my $i_up_admin = $info->i_up_admin;
+	my $i_lastchange = $info->i_lastchange;
+	my $i_name = $info->i_name;
+	my $i_alias = $info->i_alias;
+	if ($lldp->hasLLDP) {
+		print "lldpLocSysName: ", $lldp->lldp_sysname, "\n";
+		print "lldpLocSysDesc: ", $lldp->lldp_sysdesc, "\n";
+		print "lldpLocSysCapEnabled: ", $lldp->lldp_sys_cap, "\n";
+		print "lldpLocTable:\n";
+		foreach my $id (keys %{$lldp->lldp_id}) {
+			print "\tid = ", $id, "\n";
+			print "\tlldp_id = ", $lldp->lldp_id->{$id}, "\n";
+			print "\tlldp_if = ", $lldp->lldp_if->{$id}, "\n";
+			print "\tlldp_ip = ", $lldp->lldp_ip->{$id}, "\n";
+			print "\tlldp_addr = ", $lldp->lldp_addr->{$id}, "\n";
+			print "\tlldp_port = ", $lldp->lldp_port->{$id}, "\n";
+			print "\tlldp_lman_addr = ", $lldp->lldp_lman_addr->{$id}, "\n";
+		}
+		print "lldpRemTable:\n";
+		foreach my $id (keys %{$lldp->lldp_rem_id}) {
+			print "\tid = ", $id, "\n";
+			print "\tlldp_rem_id_type = ", $lldp->lldp_rem_id_type->{$id}, "\n";
+			print "\tlldp_rem_id = ", Interface::from_binary($lldp->lldp_rem_id->{$id}), "\n";
+			print "\tlldp_rem_pid_type = ", $lldp->lldp_rem_pid_type->{$id}, "\n";
+			print "\tlldp_rem_pid = ", Interface::from_binary($lldp->lldp_rem_pid->{$id}), "\n";
+			print "\tlldp_rem_desc = ", $lldp->lldp_rem_desc->{$id}, "\n";
+			print "\tlldp_rem_sysname = ", $lldp->lldp_rem_sysname->{$id}, "\n";
+			print "\tlldp_rem_sysdesc = ", $lldp->lldp_rem_sysdesc->{$id}, "\n";
+			print "\tlldp_rem_sys_cap = ", $lldp->lldp_rem_sys_cap->{$id}, "\n";
+			print "\tlldp_rman_addr = ", $lldp->lldp_rman_addr->{$id}, "\n";
+		}
+	} else {
+		print STDERR "W: host $_ has no LLDP support.\n";
+	}
+	if ($info->class =~ m/Layer3/) {
+		print "ipPhysAddress.1: ", $info->mac, "\n";
+		print "ospfRouterId.0: ", $info->router_ip, "\n";
+		print "bgpIdentifier.0: ", $info->bgp_id, "\n";
+		print "bgpLocalAs.0: ", $info->bgp_local_as, "\n";
+		my $hr;
+		if ($hr = $info->interfaces) {
+			print "Interfaces:\n";
+			foreach my $id (keys %$hr) {
+				print "\tid = ", $id, "\n";
+				print "\tinterfaces = ", $info->interfaces->{$id}, "\n";
+				print "\ti_ignore = ", $info->i_ignore->{$id}, "\n";
+				print "\ti_name = ", $info->i_name->{$id}, "\n";
+				print "\ti_duplex = ", $info->i_duplex->{$id}, "\n";
+			}
+		}
+		if ($hr = $info->at_index) {
+			print "Arp cache:\n";
+			foreach my $id (keys %$hr) {
+				print "\tid = ", $id, "\n";
+				print "\tat_index = ", $info->at_index->{$id}, "\n";
+				print "\tat_paddr = ", $info->at_paddr->{$id}, "\n";
+				print "\tat_netaddr = ", $info->at_netaddr->{$id}, "\n";
+			}
+		}
+		if ($hr = $info->bgp_peer_id) {
+			print "bgpPeerTable:\n";
+			foreach my $id (keys %$hr) {
+				print "\tid = ", $id, "\n";
+				print "\tbgpPeerLocalAddr.$id = ", $info->bgp_peers->{$id}, "\n";
+				print "\tbgpPeerIdentifier.$id = ", $info->bgp_peer_id->{$id}, "\n";
+				print "\tbgpPeerState.$id = ", $info->bgp_peer_state->{$id}, "\n";
+				print "\tbgpPeerRemoteAddr.$id = ", $info->bgp_peer_as->{$id}, "\n";
+				print "\tbgpPeerInTotalMessages.$id = ", $info->bgp_peer_addr->{$id}, "\n";
+				print "\tbgpPeerInUpdateElapsedTime.$id = ", $info->bgp_peer_fsm_est_trans->{$id}, "\n";
+				print "\tbgpPeerInUpdates.$id = ", $info->bgp_peer_in_tot_msgs->{$id}, "\n";
+				print "\tbgpPeerOutTotalMessages.$id = ", $info->bgp_perr_in_upd_el_time->{$id}, "\n";
+				print "\tbgpPeerOutUpdates.$id = ", $info->bgp_peer_in_udp->{$id}, "\n";
+			}
+		}
+		if ($hr = $info->ospf_peer_id) {
+			print "ospfNbrTable:\n";
+			foreach my $id (keys %$hr) {
+				print "\tid = ", $id, "\n";
+				print "\tospfNbrIpAddr.$id = ", $info->ospf_peers->{$id}, "\n";
+				print "\tospfNbrRtrId.$id = ", $info->ospf_peer_id->{$id}, "\n";
+				print "\tospfNbrState.$id = ", $info->ospf_peer_state->{$id}, "\n";
+			}
+		}
+	}
+	foreach my $iid (keys %$interfaces) {
+		my $port = $interfaces->{$iid};
+		print "\tInterface $port, ";
+		print $i_name->{$iid}, ": ";
+		print $i_mac->{$iid}, ", ";
+		print $i_index->{$iid}, ", ";
+		print $i_type->{$iid}, ", ";
+		print $i_description->{$iid}, ", ";
+		print $i_mtu->{$iid}, ", ";
+		print $i_speed->{$iid}, ", ";
+		print $i_up->{$iid}, ", ";
+		print $i_up_admin->{$iid}, "\n";
+	}
+}
+

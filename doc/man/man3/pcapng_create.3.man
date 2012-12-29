@@ -1,0 +1,252 @@
+'\" rtp
+.\" vim: ft=nroff sw=4 noet nocin nosi com=b\:.\\\" fo+=tcqlorn tw=77
+.\" =========================================================================
+.\"
+.\" @(#) $Id$
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2008-2012  Monavacon Limited <http://www.monavacon.com/>
+.\" Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+.\" Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to copy, distribute and/or modify this manual
+.\" under the terms of the GNU Free Documentation License, Version 1.3 or
+.\" any later version published by the Free Software Foundation; with no
+.\" Invariant Sections, no Front-Cover Texts, and no Back-Cover Texts.  A
+.\" copy of the license is included in the section entitled "GNU Free
+.\" Documentation License".
+.\"
+.\" Permission to use, copy and distribute this manual without modification,
+.\" for any purpose and without fee or royalty is hereby granted, provided
+.\" that both the above copyright notice and this permission notice appears
+.\" in all copies and that the name of OpenSS7 Corporation not be used in
+.\" advertising or publicity pertaining to distribution of this documentation
+.\" or its contents without specific, written prior permission.  OpenSS7
+.\" Corporation makes no representation about the suitability of this manual
+.\" for any purpose.  It is provided "as is" without express or implied
+.\" warranty.
+.\"
+.\" Permission is granted to process this file through groff and print the
+.\" results, provided the printed document carries a copying permission
+.\" notice identical to this one except for the removal of this paragraph
+.\" (this paragraph not being relevant to the printed manual).
+.\"
+.\" OPENSS7 CORPORATION DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS MANUAL
+.\" INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A
+.\" PARTICULAR PURPOSE, NON-INFRINGEMENT, OR TITLE; THAT THE CONTENTS OF THE
+.\" DOCUMENT ARE SUITABLE FOR ANY PURPOSE, OR THAT THE IMPLEMENTATION OF
+.\" SUCH CONTENTS WILL NOT INFRINGE ON ANY THIRD PARTY PATENTS, COPYRIGHTS,
+.\" TRADEMARKS OR OTHER RIGHTS.  IN NO EVENT SHALL OPENSS7 CORPORATION BE
+.\" LIABLE FOR ANY DIRECT, INDIRECT, SPECIAL OR CONSEQUENTIAL DAMAGES OR ANY
+.\" DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER
+.\" IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING
+.\" OUT OF OR IN CONNECTION WITH ANY USE OF THIS DOCUMENT OR THE PERFORMANCE
+.\" OR IMPLEMENTATION OF THE CONTENTS THEREOF.
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not have
+.\" taken the same level of care in the production of this manual, which is
+.\" licensed free of charge, as they might when working professionally.  The
+.\" author(s) will take no responsibility in it.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by the
+.\" source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any successor
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date$ by $Author$
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Log$
+.\" =========================================================================
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database openss7.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+search-truncate 40
+search-ignore CGIQOSTU
+.R2
+.so openss7.macros
+.\"
+.\"
+.TH PCAPNG_CREATE 3 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "PCAP-NG Library Calls"
+.\"
+.\"
+.SH NAME
+.B pcapng_create
+\- create a live capture PCAP-NG handle.
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+.B #include <pcapng.h>
+.HP 8
+.BI "pcapng_t *pcapng_create(const char *" source );
+.\"
+.\"
+.SH ARGUMENTS
+.PP
+.TP
+.I source
+name of the network device to add initially.
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+.B pcapng_create
+creates a PCAP-NG packet capture handle to look at packets on the network.
+.I source
+is a string that specifies the network device to open; on Linux an argument
+of \(lqany\(rq or
+.B NULL
+can be used to capture packets on all interfaces (using
+.BR DLT_LINUX_SLL ).
+A
+.I source
+argument of \(lqall\(rq can be used to capture on all interfaces (an
+interface is defined for each and every interface that can be found with
+.BR pcap_findalldevs (3pcap),
+except \(lqany\(rq).
+.PP
+Each interface of the returned handle must be activated with
+.BR pcapng_activate (3)
+or
+.BR pcapng_activate_all (3)
+before packets can be captured with it; options for the interface, such as
+promiscuous mode, can be set on each interface before activating it.
+.\"
+.\"
+.SH USAGE
+.PP
+.B pcapng_create
+is one of the functions that can be used to open a live capture.  The other
+functions include:
+.BR pcapng_open_dead "(3) and " pcapng_open_live (3).
+.\"
+.\"
+.SH MT CONTEXT
+.PP
+.B pcapng_create
+is thread-safe with regard to error numbers and buffers.  Full thread-safety,
+however, relies on a thread-safe version of
+.B libpcap .
+.PP
+.B pcapng_create
+IS a thread cancellation point.
+.\"
+.\"
+.SH RETURN
+.PP
+Upon success,
+.B pcapng_create
+creates a PCAP-NG handle, with or without an allocated interface.
+Upon failure,
+.B pcapng_create
+returns
+.B NULL
+and sets an appropriate error message in 
+.IR p_errbuf (3)
+and possibly more information in
+.IR errno (3).
+.\"
+.\"
+.SH ERRORS
+.PP
+When
+.B pcapng_create
+fails, it returns
+.B NULL
+and sets an appropriate error messages in 
+.IR p_errbuf (3).
+Additional information about the error can be
+obtained from
+.IR errno (3).
+.\"
+.\"
+.SH SEE ALSO
+.PP
+.BR pcapng (3),
+.BR pcapng_open_live (3),
+.BR pcapng_open_dead (3),
+.BR pcap_create (3pcap),
+.BR pcap (3cap).
+.\"
+.\"
+.SH BUGS
+.PP
+.B pcapng_create
+has no known bugs.
+.\"
+.\"
+.SH NOTICES
+.PP
+.B pcapng_create
+does not return a proper error code in
+.IR p_errno (3).
+This deficiency is caused by the underlying
+.B libpcap
+library.
+.PP
+.B pcapng_create
+cannot ensure proper thread-safety due to the inherent deficiencies of the
+underlying
+.B libpcap
+library.
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+.\"
+.\"
+.SH HISTORY
+.PP
+.\"
+.\"
+.SH VERSIONS
+.PP
+This manual page was written for the OpenSS7 PCAP-NG Library.
+.\"
+.\"
+.[
+$LIST$
+.]
+.T4

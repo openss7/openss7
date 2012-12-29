@@ -129,6 +129,7 @@ package() {
 	cp -pv ${mpost_file} $d
 	cp -pv System.symvers $d
 	cp -pv Module.symvers $d
+	cp -pv config.h $d
 	cat System.symvers Module.symvers | gzip -9 -c >$d/symvers-@kversion@.gz
 	cp -pv $d/symvers-@kversion@.gz $b
 	cat System.symvers Module.symvers | awk '{print$4"\t"$3"\t"$1"\t"$2}' > $d/abi-@kversion@
@@ -187,7 +188,6 @@ package_@PACKAGE@-devel() {
 	pkgdesc='OpenSS7 Fast-STREAMS and Protocol Suites (Development)'
 	groups=('@PACKAGE@-devel')
 	depends=(
-		'@PACKAGE@=@VERSION@-@PACKAGE_PACRELEASE@'
 		'linux-api-headers')
 	install=@PACKAGE@-devel.install
 	package
@@ -292,13 +292,13 @@ package_@PACKAGE@-@kversion@-devel() {
 	conflicts=('@PACKAGE@-kernel-devel')
 	depends=(
 		'@PACKAGE@-devel=@VERSION@-@PACKAGE_PACRELEASE@'
-		"@PACKAGE@-@kversion@=@VERSION@.$_kv-@PACKAGE_PACRELEASE@.$_kr"
 		"${kpkg:-linux}-headers=$_kvr")
 	install=@PACKAGE@-kernel-devel.install
 	package
 	cd $srcdir/_install
 	mkdir -p $pkgdir/usr
 	cp -av usr/src $pkgdir/usr
+	(cd $pkgdir/usr/src; ln -s @PACKAGE@-@VERSION@-@PACKAGE_PACRELEASE@ @PACKAGE@)
 	mkdir -p $pkgdir/usr/share/man
 	cp -av usr/share/man/man9 $pkgdir/usr/share/man
 	( cat <<-EOF

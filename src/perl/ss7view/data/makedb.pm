@@ -12,7 +12,7 @@ use DBI;
 use strict;
 
 my %schema = (
-	tables=>[ qw/lergst nanpst ocndata pcdata rcdata exdata lcadata wcdata switchdata prefixdata pooldata linedata/ ],
+	tables=>[ qw/lergst nanpst ocndata pcdata rcdata rndata exdata lcadata wcdata switchdata npadata prefixdata pooldata linedata/ ],
 	lergst=>{
 		keys=>[ qw/rg/ ],
 		cols=>[ qw/cc st rg cs pc ps loc/ ],
@@ -43,7 +43,7 @@ my %schema = (
 	},
 	ocndata=>{
 		keys=>[ qw/ocn/ ],
-		cols=>[ qw/ocn ocntype companyname companytype overall neca trgt commonname carrier abbv dba fka oocn address name title org careof street city state zip country suite pobox pocity pocountry sect fdate/ ],
+		cols=>[ qw/ocn ocntype companyname companytype overall neca trgt commonname carrier abbv dba fka oocn address name title org careof street city state zip country suite pobox pocity pocountry sect cref fdate/ ],
 		tsql=>q{
 	CREATE TABLE IF NOT EXISTS ocndata (
 		ocn CHARACTER(4) PRIMARY KEY,
@@ -74,6 +74,7 @@ my %schema = (
 		pocity TEXT,
 		pocountry TEXT,
 		sect TEXT,
+		cref TEXT,
 		fdate DOUBLE,
 		updating BOOLEAN
 	);
@@ -81,7 +82,7 @@ my %schema = (
 	},
 	pcdata=>{
 		keys=>[ qw/spc/ ],
-		cols=>[ qw/spc apc switch host cls45sw e911sw stp1 stp2 mate sect fdate/ ],
+		cols=>[ qw/spc apc switch host cls45sw e911sw stp1 stp2 mate sect cref fdate/ ],
 		tsql=>q{
 	CREATE TABLE IF NOT EXISTS pcdata (
 		spc CHARACTER(11) PRIMARY KEY,
@@ -94,6 +95,7 @@ my %schema = (
 		stp2 CHARACTER(11),
 		mate CHARACTER(11),
 		sect TEXT,
+		cref TEXT,
 		fdate DOUBLE,
 		updating BOOLEAN
 	);
@@ -101,7 +103,7 @@ my %schema = (
 	},
 	rcdata=>{
 		keys=>[ qw/region rcshort/ ],
-		cols=>[ qw/region rcshort rclata rc rcst rccc rccity rcv rch rclat rclon tzone dst zone zonetype pointid ratestep loctype locname rccounty cbsa cbsalevel csa cellmarket mta bta udate sect fdate/ ],
+		cols=>[ qw/region rcshort rclata rc rcst rccc rccity rcv rch rclat rclon tzone dst zone zonetype pointid ratestep loctype locname rccounty cbsa cbsalevel csa cellmarket mta bta udate sect cref fdate/ ],
 		tsql=>q{
 	CREATE TABLE IF NOT EXISTS rcdata (
 		region CHARACTER(2),
@@ -132,6 +134,7 @@ my %schema = (
 		bta TEXT,
 		udate DOUBLE,
 		sect TEXT,
+		cref TEXT,
 		fdate DOUBLE,
 		updating BOOLEAN,
 		PRIMARY KEY(region,rcshort),
@@ -139,9 +142,50 @@ my %schema = (
 	);
 },
 	},
+	rndata=>{
+		keys=>[ qw/region rc/ ],
+		cols=>[ qw/region rcshort rclata rc rcst rccc rccity rcv rch rclat rclon tzone dst zone zonetype pointid ratestep loctype locname rccounty cbsa cbsalevel csa cellmarket mta bta udate sect cref fdate/ ],
+		tsql=>q{
+	CREATE TABLE IF NOT EXISTS rndata (
+		region CHARACTER(2),
+		rcshort VCHAR(10),
+		rclata CHARACTER(4),
+		rc TEXT,
+		rcst CHARACTER(2),
+		rccc CHARACTER(2),
+		rccity TEXT,
+		rcv INTEGER,
+		rch INTEGER,
+		rclat DOUBLE,
+		rclon DOUBLE,
+		tzone TEXT,
+		dst BOOLEAN,
+		zone TEXT,
+		zonetype TEXT,
+		pointid TEXT,
+		ratestep TEXT,
+		loctype TEXT,
+		locname TEXT,
+		rccounty TEXT,
+		cbsa TEXT,
+		cbsalevel TEXT,
+		csa TEXT,
+		cellmarket TEXT,
+		mta TEXT,
+		bta TEXT,
+		udate DOUBLE,
+		sect TEXT,
+		cref TEXT,
+		fdate DOUBLE,
+		updating BOOLEAN,
+		PRIMARY KEY(region,rc),
+		FOREIGN KEY(region) REFERENCES lergst(ps)
+	);
+},
+	},
 	exdata=>{
 		keys=>[ qw/exch/ ],
-		cols=>[ qw/exch ex region exshort seeexch seeex seeregion ilecocn exlata rcv rch rclat rclon udate sect fdate/ ],
+		cols=>[ qw/exch ex region exshort seeexch seeex seeregion ilecocn exlata rcv rch rclat rclon udate sect cref fdate/ ],
 		tsql=>q{
 	CREATE TABLE IF NOT EXISTS exdata (
 		exch CHARACTER(6) PRIMARY KEY,
@@ -159,6 +203,7 @@ my %schema = (
 		rclon DOUBLE,
 		udate DOUBLE,
 		sect TEXT,
+		cref TEXT,
 		fdate DOUBLE,
 		updating BOOLEAN,
 		FOREIGN KEY(ilecocn) REFERENCES ocndata(ocn),
@@ -169,7 +214,7 @@ my %schema = (
 	},
 	lcadata=>{
 		keys=>[ qw/exchob exchib/ ],
-		cols=>[ qw/exchob exchib plantype calltype monthlylimit note effdate sect fdate/ ],
+		cols=>[ qw/exchob exchib plantype calltype monthlylimit note effdate sect cref fdate/ ],
 		tsql=>q{
 	CREATE TABLE IF NOT EXISTS lcadata (
 		exchob CHARACTER(6),
@@ -180,6 +225,7 @@ my %schema = (
 		note TEXT,
 		effdate INTEGER,
 		sect TEXT,
+		cref TEXT,
 		fdate DOUBLE,
 		updating BOOLEAN,
 		PRIMARY KEY(exchob,exchib),
@@ -190,7 +236,7 @@ my %schema = (
 	},
 	wcdata=>{
 		keys=>[ qw/wc/ ],
-		cols=>[ qw/wc wcname wclata wcv wch wclat wclon wcaddr wczip wccity wccounty wcst wccc sect fdate/ ],
+		cols=>[ qw/wc wcname wclata wcv wch wclat wclon wcaddr wczip wccity wccounty wcst wccc sect cref fdate/ ],
 		tsql=>q{
 	CREATE TABLE IF NOT EXISTS wcdata (
 		wc CHARACTER(8) PRIMARY KEY,
@@ -207,22 +253,35 @@ my %schema = (
 		wcst CHARACTER(2),
 		wccc CHARACTER(2),
 		sect TEXT,
+		cref TEXT,
 		fdate DOUBLE,
 		updating BOOLEAN
 	);
 },
+		gsql=>[
+			q{
+	CREATE TRIGGER IF NOT EXISTS wcdata_wcvh_ins AFTER INSERT ON wcdata FOR EACH ROW WHEN NEW.wcv NOT NULL and NEW.wch NOT NULL
+	BEGIN
+		UPDATE switchdata SET wcv=NEW.wcv,wch=NEW.wch WHERE switch LIKE (NEW.wc||'%') and wcv IS NULL and wch IS NULL;
+	END
+},
+			q{
+	CREATE TRIGGER IF NOT EXISTS wcdata_wcvh_upd AFTER UPDATE OF wcv,wch ON wcdata FOR EACH ROW WHEN NEW.wcv NOT NULL and NEW.wch NOT NULL
+	BEGIN
+		UPDATE switchdata SET wcv=NEW.wcv,wch=NEW.wch WHERE switch LIKE (OLD.wc||'%') and wcv IS NULL and wch IS NULL;
+	END
+},
+		],
 	},
 	switchdata=>{
 		keys=>[ qw/switch/ ],
-		cols=>[ qw/switch switchname switchtype switchdesc npa nxx swlata swoocn swocn swabbv swdesc swfunc wcv wch wclat wclon feat tgclli cls45sw e911sw spc apc stp1 stp2 actual agent host mate tdm tdmilt tdmfgc tdmfgd tdmlcl tdmfgb tdmops tdm911 tdmchk tdmblv udate sect fdate/ ],
+		cols=>[ qw/switch switchname switchtype switchdesc swlata swoocn swocn swabbv swdesc swfunc wcv wch wclat wclon feat tgclli cls45sw e911sw spc apc stp1 stp2 actual agent host mate tdm tdmilt tdmfgc tdmfgd tdmlcl tdmfgb tdmops tdm911 tdmchk tdmblv tdmpvt repl idate ddate udate sect cref fdate/ ],
 		tsql=>q{
 	CREATE TABLE IF NOT EXISTS switchdata (
 		switch CHARACTER(11) PRIMARY KEY,
 		switchname TEXT,
 		switchtype VCHAR(3),
 		switchdesc TEXT,
-		npa TEXT, -- served NPAs comma separated
-		nxx TEXT, -- served NPA-NXXs comma separated
 		swlata VCHAR(5), -- only the switch lata
 		swoocn CHARACTER(4), -- only switch oocn
 		swocn CHARACTER(4), -- only switch ocn
@@ -255,8 +314,214 @@ my %schema = (
 		tdm911 CHARACTER(11),
 		tdmchk CHARACTER(11),
 		tdmblv CHARACTER(11),
+		tdmpvt CHARACTER(11),
+		repl CHARACTER(11),
+		idate DOUBLE,
+		ddate DOUBLE,
 		udate DOUBLE,
 		sect TEXT,
+		cref TEXT,
+		fdate DOUBLE,
+		updating BOOLEAN
+	);
+},
+#		gsql=>[
+#			q{
+#	CREATE TRIGGER IF NOT EXISTS switchdata_insert AFTER INSERT ON switchdata FOR EACH ROW
+#	BEGIN
+#		INSERT OR IGNORE INTO wcdata (wc,wcv,wch) VALUES(substr(NEW.switch,1,8),NEW.wcv,NEW.wch);
+#		UPDATE switchdata SET wcv=(SELECT wcv FROM wcdata WHERE wc==substr(NEW.switch,1,8)),
+#		                      wch=(SELECT wch FROM wcdata WHERE wc==substr(NEW.switch,1,8))
+#			WHERE switch==NEW.switch and wcv IS NULL and wch IS NULL;
+#	END
+#},
+#			q{
+#	CREATE TRIGGER IF NOT EXISTS switchdata_func AFTER UPDATE ON switchdata FOR EACH ROW WHEN OLD.swfunc NOT NULL
+#	BEGIN
+#		UPDATE switchdata SET swfunc=(OLD.swfunc||','||NEW.swfunc) WHERE switch==OLD.switch
+#			and OLD.swfunc NOT LIKE ('%'||NEW.swfunc||'%');
+#		UPDATE switchdata SET swfunc= OLD.swfunc                   WHERE switch==OLD.switch
+#			and OLD.swfunc     LIKE ('%'||NEW.swfunc||'%');
+#	END;
+#},
+#			q{
+#	CREATE TRIGGER IF NOT EXISTS switchdata_tgw AFTER UPDATE OF switch,tgclli ON switchdata FOR EACH ROW WHEN NEW.tgclli NOT NULL
+#	BEGIN
+#		INSERT OR IGNORE INTO switchdata (switch,swfunc) VALUES(NEW.tgclli,'TGW');
+#		UPDATE switchdata SET swfunc='TGW' WHERE switch==NEW.tgclli or switch==OLD.switch;
+#	END;
+#},
+#			q{
+#	CREATE TRIGGER IF NOT EXISTS switchdata_cls45 AFTER UPDATE OF switch,cls45sw ON switchdata FOR EACH ROW WHEN NEW.cls45sw NOT NULL
+#	BEGIN
+#		INSERT OR IGNORE INTO switchdata (switch,swfunc,cls45sw) VALUES(NEW.cls45sw,'CLS45SW',OLD.switch);
+#		UPDATE switchdata SET swfunc='CLS45SW',cls45sw=OLD.switch WHERE switch==NEW.cls45sw;
+#		UPDATE switchdata SET swfunc='CLS45SW' WHERE switch==OLD.switch;
+#	END;
+#},
+#			q{
+#	CREATE TRIGGER IF NOT EXISTS switchdata_e911 AFTER UPDATE OF switch,e911sw ON switchdata FOR EACH ROW WHEN NEW.e911sw NOT NULL
+#	BEGIN
+#		INSERT OR IGNORE INTO switchdata (switch,swfunc) VALUES(NEW.e911sw,'E911');
+#		UPDATE switchdata SET swfunc='E911' WHERE switch==NEW.e911sw or switch==OLD.switch;
+#	END;
+#},
+#			q{
+#	CREATE TRIGGER IF NOT EXISTS switchdata_stp AFTER UPDATE OF stp1,stp2 ON switchdata FOR EACH ROW WHEN NEW.stp1 NOT NULL or NEW.stp2 NOT NULL
+#	BEGIN
+#		INSERT OR IGNORE INTO switchdata (switch,swfunc,mate) VALUES(NEW.stp1,'STP,MATE',NEW.stp2);
+#		INSERT OR IGNORE INTO switchdata (switch,swfunc,mate) VALUES(NEW.stp2,'STP,MATE',NEW.stp1);
+#		UPDATE switchdata SET swfunc='STP' WHERE switch==NEW.stp1 or switch==NEW.stp2;
+#	END;
+#},
+#			q{
+#	CREATE TRIGGER IF NOT EXISTS switchdata_actual AFTER UPDATE OF switch,actual ON switchdata FOR EACH ROW WHEN NEW.actual NOT NULL
+#	BEGIN
+#		INSERT OR IGNORE INTO switchdata (switch,swfunc) VALUES(NEW.actual,'ACTUAL');
+#		UPDATE switchdata SET swfunc='ACTUAL' WHERE switch==NEW.actual;
+#		UPDATE switchdata SET swfunc='POI'    WHERE switch==OLD.switch;
+#	END;
+#},
+#			q{
+#	CREATE TRIGGER IF NOT EXISTS switchdata_agent AFTER UPDATE OF switch,agent ON switchdata FOR EACH ROW WHEN NEW.agent NOT NULL
+#	BEGIN
+#		INSERT OR IGNORE INTO switchdata (switch,swfunc) VALUES(NEW.agent,'AGENT');
+#		UPDATE switchdata SET swfunc='AGENT' WHERE switch==NEW.agent;
+#		UPDATE switchdata SET swfunc='MGW'   WHERE switch==OLD.switch;
+#	END;
+#},
+#			q{
+#	CREATE TRIGGER IF NOT EXISTS switchdata_host AFTER UPDATE OF switch,host ON switchdata FOR EACH ROW WHEN NEW.host NOT NULL
+#	BEGIN
+#		INSERT OR IGNORE INTO switchdata (switch,swfunc) VALUES(NEW.host,'HOST');
+#		UPDATE switchdata SET swfunc='HOST'   WHERE switch==NEW.host;
+#		UPDATE switchdata SET swfunc='REMOTE' WHERE switch==OLD.switch;
+#	END;
+#},
+#			q{
+#	CREATE TRIGGER IF NOT EXISTS switchdata_mate AFTER UPDATE OF switch,mate ON switchdata FOR EACH ROW WHEN NEW.mate NOT NULL
+#	BEGIN
+#		INSERT OR IGNORE INTO switchdata (switch,swfunc,mate) VALUES(NEW.mate,'MATE',OLD.switch);
+#		UPDATE switchdata SET swfunc='MATE',mate=OLD.switch WHERE switch==NEW.mate;
+#		UPDATE switchdata SET swfunc='MATE' WHERE switch==OLD.switch;
+#	END;
+#},
+#			q{
+#	CREATE TRIGGER IF NOT EXISTS switchdata_tdm AFTER UPDATE OF tdm ON switchdata FOR EACH ROW WHEN NEW.tdm NOT NULL
+#	BEGIN
+#		INSERT OR IGNORE INTO switchdata (switch,swfunc) VALUES(NEW.tdm,'EAT');
+#		UPDATE switchdata SET swfunc='EAT' WHERE switch==NEW.tdm;
+#	END;
+#},
+#			q{
+#	CREATE TRIGGER IF NOT EXISTS switchdata_tdmilt AFTER UPDATE OF tdmilt ON switchdata FOR EACH ROW WHEN NEW.tdmilt NOT NULL
+#	BEGIN
+#		INSERT OR IGNORE INTO switchdata (switch,swfunc) VALUES(NEW.tdmilt,'IAL');
+#		UPDATE switchdata SET swfunc='IAL' WHERE switch==NEW.tdmilt;
+#	END;
+#},
+#			q{
+#	CREATE TRIGGER IF NOT EXISTS switchdata_tdmfgc AFTER UPDATE OF tdmfgc ON switchdata FOR EACH ROW WHEN NEW.tdmfgc NOT NULL
+#	BEGIN
+#		INSERT OR IGNORE INTO switchdata (switch,swfunc) VALUES(NEW.tdmfgc,'FGC');
+#		UPDATE switchdata SET swfunc='FGC' WHERE switch==NEW.tdmfgc;
+#	END;
+#},
+#			q{
+#	CREATE TRIGGER IF NOT EXISTS switchdata_tdmfgd AFTER UPDATE OF tdmfgd ON switchdata FOR EACH ROW WHEN NEW.tdmfgd NOT NULL
+#	BEGIN
+#		INSERT OR IGNORE INTO switchdata (switch,swfunc) VALUES(NEW.tdmfgd,'FGD');
+#		UPDATE switchdata SET swfunc='FGD' WHERE switch==NEW.tdmfgd;
+#	END;
+#},
+#			q{
+#	CREATE TRIGGER IF NOT EXISTS switchdata_tdmlcl AFTER UPDATE OF tdmlcl ON switchdata FOR EACH ROW WHEN NEW.tdmlcl NOT NULL
+#	BEGIN
+#		INSERT OR IGNORE INTO switchdata (switch,swfunc) VALUES(NEW.tdmlcl,'LCL');
+#		UPDATE switchdata SET swfunc='LCL' WHERE switch==NEW.tdmlcl;
+#	END;
+#},
+#			q{
+#	CREATE TRIGGER IF NOT EXISTS switchdata_tdmfgb AFTER UPDATE OF tdmfgb ON switchdata FOR EACH ROW WHEN NEW.tdmfgb NOT NULL
+#	BEGIN
+#		INSERT OR IGNORE INTO switchdata (switch,swfunc) VALUES(NEW.tdmfgb,'FGB');
+#		UPDATE switchdata SET swfunc='FGB' WHERE switch==NEW.tdmfgb;
+#	END;
+#},
+#			q{
+#	CREATE TRIGGER IF NOT EXISTS switchdata_tdmops AFTER UPDATE OF tdmops ON switchdata FOR EACH ROW WHEN NEW.tdmops NOT NULL
+#	BEGIN
+#		INSERT OR IGNORE INTO switchdata (switch,swfunc) VALUES(NEW.tdmops,'OPS');
+#		UPDATE switchdata SET swfunc='OPS' WHERE switch==NEW.tdmops;
+#	END;
+#},
+#			q{
+#	CREATE TRIGGER IF NOT EXISTS switchdata_tdm911 AFTER UPDATE OF tdm911 ON switchdata FOR EACH ROW WHEN NEW.tdm911 NOT NULL
+#	BEGIN
+#		INSERT OR IGNORE INTO switchdata (switch,swfunc) VALUES(NEW.tdm911,'911');
+#		UPDATE switchdata SET swfunc='911' WHERE switch==NEW.tdm911;
+#	END;
+#},
+#			q{
+#	CREATE TRIGGER IF NOT EXISTS switchdata_tdmchk AFTER UPDATE OF tdmchk ON switchdata FOR EACH ROW WHEN NEW.tdmchk NOT NULL
+#	BEGIN
+#		INSERT OR IGNORE INTO switchdata (switch,swfunc) VALUES(NEW.tdmchk,'CHK');
+#		UPDATE switchdata SET swfunc='CHK' WHERE switch==NEW.tdmchk;
+#	END;
+#},
+#			q{
+#	CREATE TRIGGER IF NOT EXISTS switchdata_tdmblv AFTER UPDATE OF tdmblv ON switchdata FOR EACH ROW WHEN NEW.tdmblv NOT NULL
+#	BEGIN
+#		INSERT OR IGNORE INTO switchdata (switch,swfunc) VALUES(NEW.tdmblv,'BLVI');
+#		UPDATE switchdata SET swfunc='BLVI' WHERE switch==NEW.tdmblv;
+#	END;
+#},
+#			q{
+#	CREATE TRIGGER IF NOT EXISTS switchdata_tdmpvt AFTER UPDATE OF tdmpvt ON switchdata FOR EACH ROW WHEN NEW.tdmpvt NOT NULL
+#	BEGIN
+#		INSERT OR IGNORE INTO switchdata (switch,swfunc) VALUES(NEW.tdmpvt,'PVT');
+#		UPDATE switchdata SET swfunc='PVT' WHERE switch==NEW.tdmpvt;
+#	END;
+#},
+#		],
+	},
+	npadata=>{
+		keys=>[ qw/npa/ ],
+		cols=>[ qw/npa type assignable explanation reserved assigned assigndate use service location country inservice effdate status pl overlay complex parent tzones map jeoparady relief hnpalocl hnpatoll fnpalocl fnpatoll permhnpalocl permhnpatoll permfnpalocl notes sect cref fdate/ ],
+		tsql=>q{
+	CREATE TABLE IF NOT EXISTS npadata (
+		npa CHARACTER(3) PRIMARY KEY,
+		type CHARACTER(1), -- (G|E)
+		assignable BOOLEAN,
+		explanation VCHAR(3),
+		reserved BOOLEAN,
+		assigned BOOLEAN,
+		assigndate INTEGER,
+		use CHARACTER(1), -- (G|N)
+		service CHARACTER(3),
+		location CHARACTER(2), -- postal state
+		country CHARACTER(2), -- postal country
+		inservice BOOLEAN,
+		effdate INTEGER,
+		status CHARACTER(1), -- (A|S)
+		pl TEXT, -- planning letter
+		overlay BOOLEAN,
+		complex TEXT,
+		parent CHARACTER(3),
+		tzones VCHAR(10),
+		map TEXT, -- NANPA map
+		jeoparady BOOLEAN,
+		relief BOOLEAN,
+		hnpalocl VCHAR(10),
+		hnpatoll VCHAR(10),
+		fnpalocl VCHAR(10),
+		fnpatoll VCHAR(10),
+		permhnpalocl VCHAR(10),
+		permhnpatoll VCHAR(10),
+		permfnpalocl VCHAR(10),
+		notes TEXT,
+		sect TEXT,
+		cref TEXT,
 		fdate DOUBLE,
 		updating BOOLEAN
 	);
@@ -264,12 +529,15 @@ my %schema = (
 	},
 	prefixdata=>{
 		keys=>[ qw/npa nxx/ ],
-		cols=>[ qw/npa nxx nxxtype use wirelessblock portableblock tbpooling nbpooling contaminated retained overlays switch ocn carrier exch region rcshort rc lata loc st newnpa overlay assigndate effdate actdate discdate udate sect fdate/ ],
+		cols=>[ qw/npa nxx nxxtype status nxxuse initialgrowth use wirelessblock portableblock tbpooling nbpooling contaminated retained overlays switch ocn carrier exch region rcshort rc lata loc st newnpa overlay discon special remarks assigndate effdate actdate discdate udate sect cref fdate/ ],
 		tsql=>q{
 	CREATE TABLE IF NOT EXISTS prefixdata (
 		npa CHARACTER(3),
 		nxx CHARACTER(3),
 		nxxtype TEXT,
+		status CHARACTER(2),
+		nxxuse CHARACTER(2),
+		initialgrowth CHARACTER(1),
 		use CHARACTER(1),
 		wirelessblock BOOLEAN,
 		portableblock BOOLEAN,
@@ -290,26 +558,29 @@ my %schema = (
 		st CHARACTER(2),
 		newnpa BOOLEAN,
 		overlay BOOLEAN,
+		discon BOOLEAN,
+		special BOOLEAN,
+		remarks TEXT,
 		assigndate INTEGER,
 		effdate INTEGER,
 		actdate INTEGER,
 		discdate INTEGER,
 		udate DOUBLE,
 		sect TEXT,
+		cref TEXT,
 		fdate DOUBLE,
 		updating BOOLEAN,
 		PRIMARY KEY(npa,nxx)
 		-- FOREIGN KEY(exch) REFERENCES exdata(exch),
 		-- FOREIGN KEY(region) REFERENCES lergst(ps),
 		-- FOREIGN KEY(switch) REFERENCES switchdata(switch),
-		-- FOREIGN KEY(ocn) REFERENCES ocndata(ocn),
-		-- FOREIGN KEY(region,rcshort) REFERENCES rcdata(region,rcshort)
+		-- FOREIGN KEY(ocn) REFERENCES ocndata(ocn)
 	);
 },
 	},
 	pooldata=>{
 		keys=>[ qw/npa nxx x/ ],
-		cols=>[ qw/npa nxx x switch ocn udate sect fdate/ ],
+		cols=>[ qw/npa nxx x switch ocn udate sect cref fdate/ ],
 		tsql=>q{
 	CREATE TABLE IF NOT EXISTS pooldata (
 		npa CHARACTER(3),
@@ -319,6 +590,7 @@ my %schema = (
 		ocn CHARACTER(4),
 		udate DOUBLE,
 		sect TEXT,
+		cref TEXT,
 		fdate DOUBLE,
 		updating BOOLEAN,
 		PRIMARY KEY(npa,nxx,x),
@@ -330,7 +602,7 @@ my %schema = (
 	},
 	linedata=>{
 		keys=>[ qw/npa nxx xxxx yyyy/ ],
-		cols=>[ qw/npa nxx xxxx yyyy switch ocn sect fdate/ ],
+		cols=>[ qw/npa nxx xxxx yyyy switch ocn sect cref fdate/ ],
 		tsql=>q{
 	CREATE TABLE IF NOT EXISTS linedata (
 		npa CHARACTER(3),
@@ -340,6 +612,7 @@ my %schema = (
 		switch CHARACTER(11),
 		ocn CHARACTER(4),
 		sect TEXT,
+		cref TEXT,
 		fdate DOUBLE,
 		updating BOOLEAN,
 		PRIMARY KEY(npa,nxx,xxxx,yyyy),
@@ -350,6 +623,10 @@ my %schema = (
 },
 	},
 );
+
+sub getschema {
+	return \%schema;
+}
 
 my %sth = ();
 
@@ -399,12 +676,15 @@ sub getselect {
 sub insertit {
 	my ($schema,$dat,$tab) = @_;
 	my @values = ();
+	my @written = ();
 	foreach my $k (@{$schema->{$tab}{cols}}) {
 		push @values, $dat->{$k};
+		push @written,$k if length($dat->{$k});
 	}
 	unless ($schema->{$tab}{insert}->execute(@values)) {
 		print STDERR "E: $tab: '",join("','",@values),"'\n";
 	}
+	return \@written;
 }
 
 sub modifyit {
@@ -450,12 +730,12 @@ sub updateit {
 		warn $schema->{$tab}{select}->errstr;
 		return;
 	}
+	my $modified = [];
 	if (my $row = $schema->{$tab}{select}->fetchrow_hashref) {
 		my %dat = %$data;
 		my %rec = %$row;
 		my @new = ();
 		my @old = ();
-		my $modified = undef;
 		my $overwrite = ($rec{fdate} and $rec{fdate} > $dat{fdate});
 		my $conflict = ($rec{fdate} and $dat{fdate} and $rec{fdate} == $dat{fdate});
 		foreach my $k (@{$schema->{$tab}{cols}}) {
@@ -471,18 +751,18 @@ sub updateit {
 					}
 					if ($dat{$k}) {
 						foreach my $f (keys %feats) {
-							$modified = 1 unless $feats{$f} == 2;
+							push @$modified,$k unless $feats{$f} == 2;
 						}
 					}
 					$dat{$k} = $rec{$k} = join(' ',sort keys %feats);
-				} elsif ($k =~ /^(npa|nxx|wcst|sect|swfunc)$/) {
+				} elsif ($k =~ /^(npa|nxx|wcst|sect|cref|swfunc)$/) {
 					my %sects = ();
 					foreach my $s (split(/[,;\/ ]\s*/,$dat{$k}),split(/[,;\/ ]\s*/,$rec{$k})) {
 						$sects{$s}++ if $s;
 					}
 					if ($dat{$k}) {
 						foreach my $s (keys %sects) {
-							$modified = 1 unless $sects{$s} == 2;
+							push @$modified,$k unless $sects{$s} == 2;
 						}
 					}
 					$dat{$k} = $rec{$k} = join(',',sort keys %sects);
@@ -505,7 +785,7 @@ sub updateit {
 			} else {
 				delete $dat{$k} if $overwrite;
 			}
-			$modified = 1 if ($dat{$k} ne $rec{$k});
+			push @$modified,$k if ($dat{$k} ne $rec{$k});
 		}
 		if (@new or @old) {
 			my @bounds = ();
@@ -517,10 +797,13 @@ sub updateit {
 			print STDERR "S: $sql";
 			print $of $sql;
 		}
-		modifyit($schema,\%dat,$tab,$binds) if $modified;
+		$schema->{$tab}{select}->finish;
+		modifyit($schema,\%dat,$tab,$binds) if @$modified;
 	} else {
-		insertit($schema,$data,$tab);
+		$schema->{$tab}{select}->finish;
+		$modified = insertit($schema,$data,$tab);
 	}
+	return $modified;
 }
 
 sub maketables {
@@ -530,9 +813,30 @@ sub maketables {
 		next unless defined $sql;
 		print STDERR "S: $sql";
 		$dbh->do($sql) or die $dbh->errstr;
+	}
+	foreach my $tab (@{$schema->{tables}}) {
+		next unless exists $schema->{$tab}{tsql};
+		if (exists $schema->{$tab}{gsql} and ref $schema->{$tab}{gsql} eq 'ARRAY') {
+			foreach my $sql (@{$schema->{$tab}{gsql}}) {
+				print STDERR "S: $sql";
+				$dbh->do($sql) or die $dbh->errstr;
+			}
+		}
+	}
+	foreach my $tab (@{$schema->{tables}}) {
+		next unless exists $schema->{$tab}{tsql};
 		$schema->{$tab}{insert} = getinsert($schema,$tab,$dbh);
 		$schema->{$tab}{update} = getupdate($schema,$tab,$dbh);
 		$schema->{$tab}{select} = getselect($schema,$tab,$dbh);
+	}
+}
+
+sub destroysth {
+	my ($schema,$dbh) = @_;
+	foreach my $tab (@{$schema->{tables}}) {
+		delete $schema->{$tab}{insert};
+		delete $schema->{$tab}{update};
+		delete $schema->{$tab}{select};
 	}
 }
 
@@ -546,6 +850,7 @@ sub dolergst {
 	my $fh = \*INFILE;
 	$dbh->begin_work;
 	my $fn = "../lergst.txt";
+	$fn = "lergst.txt" unless -f $fn;
 	print STDERR "I: reading $fn\n";
 	open($fh,"<:utf8",$fn) or die "can't read $fn";
 	while (<$fh>) { chomp;
@@ -558,6 +863,37 @@ sub dolergst {
 		next if $tokens[3] eq 'XX';
 		unless ($schema{lergst}{insert}->execute(split(/\t/,$_))) {
 			print STDERR "E: lergst: '",join("','",@tokens),"'\n";
+		}
+	}
+	close($fh);
+	$dbh->commit;
+}
+
+my %npapc = ();
+my %npaps = ();
+my %nparg = ();
+
+sub donanpst {
+	my $dbh = shift;
+	$dbh->begin_work;
+	my $fh = \*INFILE;
+	my $fn = "../nanpa/nanpst.txt";
+	$fn = "nanpa/nanpst.txt" unless -f $fn;
+	print STDERR "I: reading $fn\n";
+	open($fh,"<:utf8",$fn) or die "can't read $fn";
+	while (<$fh>) { chomp;
+		my @tokens = split(/\t/,$_);
+		unless ($tokens[0] =~ /[2-9]11/) {
+			if ($tokens[2]) {
+				$nparg{$tokens[0]} = $ccst2rg{$tokens[1]}{$tokens[2]};
+				$npapc{$tokens[0]} = $ccst2pc{$tokens[1]}{$tokens[2]};
+				$npaps{$tokens[0]} = $ccst2ps{$tokens[1]}{$tokens[2]};
+			} elsif ($tokens[1]) {
+				$npapc{$tokens[0]} = $tokens[1];
+			}
+		}
+		unless ($schema{nanpst}{insert}->execute(split(/\t/,$_))) {
+			print STDERR "E: nanpst: '",join("','",@tokens),"'\n";
 		}
 	}
 	close($fh);
@@ -577,10 +913,12 @@ sub makedb {
 	print STDERR "I: writing $fn\n";
 	open($of,">:utf8",$fn) or die "can't write $fn";
 	dolergst($dbh);
+	donanpst($dbh);
 	&{$callback}($dbh);
 	close($of);
 	$sql = qq{VACUUM;\n};
 	print STDERR "S: $sql";
+	destroysth(\%schema,$dbh);
 	print STDERR "I: disconnecting database\n";
 	$dbh->disconnect;
 	print STDERR "I: database disconnected\n";
@@ -640,13 +978,37 @@ my %swfuncmap = (
 	IAL=>'IAL', IAT=>'IAL', EAT=>'EAT', IXC=>'IXC', FGB=>'FGB', FGC=>'FGC', FGD=>'FGD',
 	LCL=>'LCL', OPS=>'OPS', '911'=>'911', E911=>'E911', CLS45SW=>'CLS45SW', STP=>'STP',
 	MATE=>'MATE', ACTUAL=>'ACTUAL', AGENT=>'AGENT', HOST=>'HOST', REMOTE=>'REMOTE',
-	'SMART-REMOTE'=>'REMOTE', STANDALONE=>'', TANDEM=>'EAT',
+	'SMART-REMOTE'=>'REMOTE', STANDALONE=>'', TANDEM=>'EAT', SCP=>'SCP', '8XX'=>'8XX',
+	LNP=>'LNP', CNAM=>'CNAM', LIDB=>'LIDB',
 );
 
-my @swcllis = qw/cls45sw e911sw stp1 stp2 actual agent host mate tdm tdmilt tdmfgc tdmfgd tdmlcl tdmfgb tdmops tdm911 tdmchk tdmblv/;
-my @allcllis = (qw/switch tgclli/,@swcllis);
+my %swcllis = (
+	'tgclli'=>1,
+	'cls45sw'=>1,
+	'e911sw'=>1,
+	'stp1'=>1,
+	'stp2'=>1,
+	'actual'=>1,
+	'agent'=>1,
+	'host'=>1,
+	'mate'=>1,
+	'tdm'=>1,
+	'tdmilt'=>1,
+	'tdmfgc'=>1,
+	'tdmfgd'=>1,
+	'tdmlcl'=>1,
+	'tdmfgb'=>1,
+	'tdmops'=>1,
+	'tdm911'=>1,
+	'tdmchk'=>1,
+	'tdmblv'=>1,
+	'tdmpvt'=>1,
+	'repl'=>1,
+);
+my @allcllis = ('switch',keys %swcllis);
 
 my %swfuncflg = (
+	tgclli=>'TGW',
 	cls45sw=>'CLS45SW',
 	e911sw=>'E911',
 	stp1=>'STP',
@@ -655,7 +1017,7 @@ my %swfuncflg = (
 	agent=>'AGENT',
 	host=>'HOST',
 	mate=>'MATE,STP',
-	tdm=>'TDM',
+	tdm=>'EAT',
 	tdmilt=>'IAL',
 	tdmfgc=>'FGC',
 	tdmfgd=>'FGD',
@@ -665,12 +1027,14 @@ my %swfuncflg = (
 	tdm911=>'911',
 	tdmchk=>'CHK',
 	tdmblv=>'BLVI',
+	tdmpvt=>'PVT',
 );
 
 my %swfuncoth = (
 	cls45sw=>'CLS45SW',
+	e911sw=>'E911',
 	actual=>'POI',
-	agent=>'TGW',
+	agent=>'MGW',
 	host=>'REMOTE',
 	mate=>'MATE,STP',
 );
@@ -695,7 +1059,6 @@ sub updatedata {
 	foreach my $f (qw/wclat wclon rclat rclon/) {
 		$dat->{$f} = sprintf('%.8f',$dat->{$f}) if $dat->{$f};
 	}
-	$dat->{wc} = substr($dat->{switch},0,8) if $dat->{switch} and not $dat->{wc};
 	if (exists $schema{ocndata}{keys}) {
 		if ($dat->{ocn}) {
 			updateit(\%schema,$dat,'ocndata',[$dat->{ocn}]);
@@ -726,8 +1089,14 @@ sub updatedata {
 		}
 		updateit(\%schema,$dat,'rcdata',$binds) if $havem;
 	}
-	if (exists $schema{wcdata}{keys} and $dat->{wc}) {
-		updateit(\%schema,$dat,'wcdata',[$dat->{wc}]);
+	if (exists $schema{rndata}{keys}) {
+		my $havem = 1;
+		my $binds = [];
+		foreach my $k (@{$schema{rndata}{keys}}) {
+			$havem = undef unless $dat->{$k};
+			push @$binds, $dat->{$k};
+		}
+		updateit(\%schema,$dat,'rndata',$binds) if $havem;
 	}
 	if (exists $schema{switchdata}{keys} and $dat->{switch}) {
 		my %data = %$dat;
@@ -746,37 +1115,98 @@ sub updatedata {
 				$data{swfunc}{$f}++ if $f;
 			}
 		}
-		foreach my $f (@swcllis) {
-			next unless $data{$f};
-			my %rec = (sect=>$sect,fdate=>$fdate);
-			$rec{switch} = $data{$f};
-			$rec{swfunc} = $swfuncflg{$f};
-			my $func = $swfuncoth{$f};
-			$data{swfunc}{$func}++ if $func;
-			updateit(\%schema,\%rec,'switchdata',[$rec{switch}]) if $rec{switch};
-		}
+		foreach my $f (keys %swcllis) { $data{swfunc}{$swfuncoth{$f}}++ if $swfuncoth{$f} and $data{$f}; }
 		$data{swfunc} = join(',',sort keys %{$data{swfunc}}) if $data{swfunc} and ref $data{swfunc} eq 'HASH';
-		updateit(\%schema,\%data,'switchdata',[$data{switch}]);
+		my $fields = updateit(\%schema,\%data,'switchdata',[$data{switch}]);
+		if (@$fields) {
+			if (exists $schema{wcdata}{keys}) {
+				foreach my $c (@$fields) {
+					if ($c eq 'switch' or $c eq 'wcv' or $c eq 'wch') {
+						$data{wc} = substr($data{switch},0,8) unless $data{wc};
+						updateit(\%schema,\%data,'wcdata',[$data{wc}]);
+						last;
+					}
+				}
+			}
+			foreach my $f (@$fields) {
+				if ($swcllis{$f}) {
+					my %rec = (
+						switch=>$data{$f},
+						swfunc=>$swfuncflg{$f},
+						sect=>$sect,
+						fdate=>$fdate,
+					);
+					my $result = updateit(\%schema,\%rec,'switchdata',[$rec{switch}]) if $rec{switch};
+					if (@$result) {
+						if (exists $schema{wcdata}{keys}) {
+							foreach my $c (@$result) {
+								if ($c eq 'switch' or $c eq 'wcv' or $c eq 'wch') {
+									$rec{wc} = substr($rec{switch},0,8) unless $rec{wc};
+									updateit(\%schema,\%rec,'wcdata',[$rec{wc}]);
+									last;
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	} elsif (exists $schema{wcdata}{keys} and $dat->{wc}) {
+		updateit(\%schema,$dat,'wcdata',[$dat->{wc}]);
 	}
-	if (exists $schema{prefixdata}{keys} and $dat->{npa} and $dat->{nxx}) {
+	if (exists $schema{npadata}{keys} and $dat->{npa}) {
 		my %data = %$dat;
-		if (exists $schema{linedata}{keys} and length($data{xxxx}) and length($data{yyyy})) {
-			updateit(\%schema,\%data,'linedata',[$data{npa},$data{nxx},$data{xxxx},$data{yyyy}]);
-			delete $data{switch};
-			delete $data{ocn};
-			delete $data{udate};
-			delete $data{fdate};
-			updateit(\%schema,\%data,'pooldata',[$data{npa},$data{nxx},$data{x}]);
-			updateit(\%schema,\%data,'prefixdata',[$data{npa},$data{nxx}]);
-		} elsif (exists $schema{pooldata}{keys} and length($data{x})) {
-			updateit(\%schema,\%data,'pooldata',[$data{npa},$data{nxx},$data{x}]);
-			delete $data{switch};
-			delete $data{ocn};
-			delete $data{udate};
-			delete $data{fdate};
-			updateit(\%schema,\%data,'prefixdata',[$data{npa},$data{nxx}]);
+		if (exists $schema{prefixdata}{keys} and $dat->{npa} and $dat->{nxx}) {
+			if (exists $schema{linedata}{keys} and length($data{xxxx}) and length($data{yyyy})) {
+				my $result = updateit(\%schema,\%data,'linedata',[$data{npa},$data{nxx},$data{xxxx},$data{yyyy}]);
+				if (@$result) {
+					delete $data{switch};
+					delete $data{ocn};
+					delete $data{udate};
+					delete $data{fdate};
+					$result = updateit(\%schema,\%data,'pooldata',[$data{npa},$data{nxx},$data{x}]);
+					if (@$result) {
+						$result = updateit(\%schema,\%data,'prefixdata',[$data{npa},$data{nxx}]);
+						if (@$result) {
+							delete $data{use};
+							delete $data{status};
+							delete $data{assigndate};
+							delete $data{effdate};
+							delete $data{overlay};
+							updateit(\%schema,\%data,'npadata',[$data{npa}]);
+						}
+					}
+				}
+			} elsif (exists $schema{pooldata}{keys} and length($data{x})) {
+				my $result = updateit(\%schema,\%data,'pooldata',[$data{npa},$data{nxx},$data{x}]);
+				if (@$result) {
+					delete $data{switch};
+					delete $data{ocn};
+					delete $data{udate};
+					delete $data{fdate};
+					$result = updateit(\%schema,\%data,'prefixdata',[$data{npa},$data{nxx}]);
+					if (@$result) {
+						delete $data{use};
+						delete $data{status};
+						delete $data{assigndate};
+						delete $data{effdate};
+						delete $data{overlay};
+						updateit(\%schema,\%data,'npadata',[$data{npa}]);
+					}
+				}
+			} else {
+				my $result = updateit(\%schema,\%data,'prefixdata',[$data{npa},$data{nxx}]);
+				if (@$result) {
+					delete $data{use};
+					delete $data{status};
+					delete $data{assigndate};
+					delete $data{effdate};
+					delete $data{overlay};
+					updateit(\%schema,\%data,'npadata',[$data{npa}]);
+				}
+			}
 		} else {
-			updateit(\%schema,\%data,'prefixdata',[$data{npa},$data{nxx}]);
+			updateit(\%schema,\%data,'npadata',[$data{npa}]);
 		}
 	}
 	if (exists $schema{pcdata}{keys} and $dat->{spc}) {

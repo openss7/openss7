@@ -175,6 +175,7 @@
 #define SIOCGLIFFLAGS	_IOWR('i', 117, struct lifreq)
 
 #define O_SIOCGLIFCONF	_IOWRN('i', 120, 16)
+#define SIOCGLIFCONF	_IOWR('i', 120, struct lifconf)
 #define SIOCSLIFMTU	_IOW('i', 121, struct lifreq)
 #define SIOCGLIFMTU	_IOWR('i', 122, struct lifreq)
 #define SIOCGLIFBRDADDR	_IOWR('i', 123, struct lifreq)

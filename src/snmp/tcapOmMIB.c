@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2010  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2012  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -1037,26 +1037,84 @@ tcapOmMIB_create(void)
 	DEBUGMSGTL(("tcapOmMIB", "tcapOmMIB_create: creating scalars...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default scalar values here into StorageNew */
-		if ((StorageNew->tcapOm1stAndIntervalActivate = snmp_duplicate_objid(zeroDotZero_oid, 2)))
-			StorageNew->tcapOm1stAndIntervalActivateLen = 2;
-		if ((StorageNew->tcapOm1stAndIntervalDeactivate = snmp_duplicate_objid(zeroDotZero_oid, 2)))
-			StorageNew->tcapOm1stAndIntervalDeactivateLen = 2;
-		if ((StorageNew->tcapOm5MinActivate = snmp_duplicate_objid(zeroDotZero_oid, 2)))
-			StorageNew->tcapOm5MinActivateLen = 2;
-		if ((StorageNew->tcapOm5MinDeaActivate = snmp_duplicate_objid(zeroDotZero_oid, 2)))
-			StorageNew->tcapOm5MinDeaActivateLen = 2;
-		if ((StorageNew->tcapOm15MinActivate = snmp_duplicate_objid(zeroDotZero_oid, 2)))
-			StorageNew->tcapOm15MinActivateLen = 2;
-		if ((StorageNew->tcapOm15MinDeaActivate = snmp_duplicate_objid(zeroDotZero_oid, 2)))
-			StorageNew->tcapOm15MinDeaActivateLen = 2;
+		if ((StorageNew->tcapOm1stAndIntervalActivate = snmp_duplicate_objid(zeroDotZero_oid, 2)) == NULL)
+			goto nomem;
+		StorageNew->tcapOm1stAndIntervalActivateLen = 2;
+		if ((StorageNew->tcapOm1stAndIntervalDeactivate = snmp_duplicate_objid(zeroDotZero_oid, 2)) == NULL)
+			goto nomem;
+		StorageNew->tcapOm1stAndIntervalDeactivateLen = 2;
+		if ((StorageNew->tcapOm5MinActivate = snmp_duplicate_objid(zeroDotZero_oid, 2)) == NULL)
+			goto nomem;
+		StorageNew->tcapOm5MinActivateLen = 2;
+		if ((StorageNew->tcapOm5MinDeaActivate = snmp_duplicate_objid(zeroDotZero_oid, 2)) == NULL)
+			goto nomem;
+		StorageNew->tcapOm5MinDeaActivateLen = 2;
+		if ((StorageNew->tcapOm15MinActivate = snmp_duplicate_objid(zeroDotZero_oid, 2)) == NULL)
+			goto nomem;
+		StorageNew->tcapOm15MinActivateLen = 2;
+		if ((StorageNew->tcapOm15MinDeaActivate = snmp_duplicate_objid(zeroDotZero_oid, 2)) == NULL)
+			goto nomem;
+		StorageNew->tcapOm15MinDeaActivateLen = 2;
 		StorageNew->tcapOmDiscontinuityTime = 0;
 		StorageNew->tcapOmTimeStamp = 0;
 		StorageNew->tcapOm5MinMaxIntervals = 96;
 		StorageNew->tcapOm15MinMaxIntervals = 96;
 
 	}
+      done:
 	DEBUGMSGTL(("tcapOmMIB", "done.\n"));
 	return (StorageNew);
+	goto nomem;
+      nomem:
+	tcapOmMIB_destroy(&StorageNew);
+	goto done;
+}
+
+/**
+ * @fn struct tcapOmMIB_data *tcapOmMIB_duplicate(struct tcapOmMIB_data *thedata)
+ * @param thedata the mib structure to duplicate
+ * @brief duplicate a mib structure for the mib
+ *
+ * Duplicates the specified mib structure @param thedata and returns a pointer to the newly
+ * allocated mib structure on success, or NULL on failure.
+ */
+struct tcapOmMIB_data *
+tcapOmMIB_duplicate(struct tcapOmMIB_data *thedata)
+{
+	struct tcapOmMIB_data *StorageNew = SNMP_MALLOC_STRUCT(tcapOmMIB_data);
+
+	DEBUGMSGTL(("tcapOmMIB", "tcapOmMIB_duplicate: duplicating mib... "));
+	if (StorageNew != NULL) {
+		if (!(StorageNew->tcapOm1stAndIntervalActivate = snmp_duplicate_objid(thedata->tcapOm1stAndIntervalActivate, thedata->tcapOm1stAndIntervalActivateLen / sizeof(oid))))
+			goto destroy;
+		StorageNew->tcapOm1stAndIntervalActivateLen = thedata->tcapOm1stAndIntervalActivateLen;
+		if (!(StorageNew->tcapOm1stAndIntervalDeactivate = snmp_duplicate_objid(thedata->tcapOm1stAndIntervalDeactivate, thedata->tcapOm1stAndIntervalDeactivateLen / sizeof(oid))))
+			goto destroy;
+		StorageNew->tcapOm1stAndIntervalDeactivateLen = thedata->tcapOm1stAndIntervalDeactivateLen;
+		if (!(StorageNew->tcapOm5MinActivate = snmp_duplicate_objid(thedata->tcapOm5MinActivate, thedata->tcapOm5MinActivateLen / sizeof(oid))))
+			goto destroy;
+		StorageNew->tcapOm5MinActivateLen = thedata->tcapOm5MinActivateLen;
+		if (!(StorageNew->tcapOm5MinDeaActivate = snmp_duplicate_objid(thedata->tcapOm5MinDeaActivate, thedata->tcapOm5MinDeaActivateLen / sizeof(oid))))
+			goto destroy;
+		StorageNew->tcapOm5MinDeaActivateLen = thedata->tcapOm5MinDeaActivateLen;
+		if (!(StorageNew->tcapOm15MinActivate = snmp_duplicate_objid(thedata->tcapOm15MinActivate, thedata->tcapOm15MinActivateLen / sizeof(oid))))
+			goto destroy;
+		StorageNew->tcapOm15MinActivateLen = thedata->tcapOm15MinActivateLen;
+		if (!(StorageNew->tcapOm15MinDeaActivate = snmp_duplicate_objid(thedata->tcapOm15MinDeaActivate, thedata->tcapOm15MinDeaActivateLen / sizeof(oid))))
+			goto destroy;
+		StorageNew->tcapOm15MinDeaActivateLen = thedata->tcapOm15MinDeaActivateLen;
+		StorageNew->tcapOmDiscontinuityTime = thedata->tcapOmDiscontinuityTime;
+		StorageNew->tcapOmTimeStamp = thedata->tcapOmTimeStamp;
+		StorageNew->tcapOm5MinMaxIntervals = thedata->tcapOm5MinMaxIntervals;
+		StorageNew->tcapOm15MinMaxIntervals = thedata->tcapOm15MinMaxIntervals;
+	}
+      done:
+	DEBUGMSGTL(("tcapOmMIB", "done.\n"));
+	return (StorageNew);
+	goto destroy;
+      destroy:
+	tcapOmMIB_destroy(&StorageNew);
+	goto done;
 }
 
 /**
@@ -1119,7 +1177,7 @@ tcapOmMIB_add(struct tcapOmMIB_data *thedata)
  * @param line line from configuration file matching the token.
  * @brief parse configuration file for tcapOmMIB entries.
  *
- * This callback is called by UCD-SNMP when it prases a configuration file and finds a configuration
+ * This callback is called by UCD-SNMP when it parses a configuration file and finds a configuration
  * file line for the registsred token (in this case tcapOmMIB).  This routine is invoked by
  * UCD-SNMP to read the values of scalars in the MIB from the configuration file.  Note that this
  * procedure may exist regardless of the persistence of the MIB.  If there are no configured entries
@@ -1205,6 +1263,7 @@ store_tcapOmMIB(int majorID, int minorID, void *serverarg, void *clientarg)
 		memset(line, 0, sizeof(line));
 		strcat(line, "tcapOmMIB ");
 		cptr = line + strlen(line);
+		(void) cptr;
 		/* XXX: remove individual scalars that are not persistent */
 		cptr = read_config_store_data(ASN_OBJECT_ID, cptr, &StorageTmp->tcapOm1stAndIntervalActivate, &StorageTmp->tcapOm1stAndIntervalActivateLen);
 		cptr = read_config_store_data(ASN_OBJECT_ID, cptr, &StorageTmp->tcapOm1stAndIntervalDeactivate, &StorageTmp->tcapOm1stAndIntervalDeactivateLen);
@@ -1220,6 +1279,62 @@ store_tcapOmMIB(int majorID, int minorID, void *serverarg, void *clientarg)
 	}
 	DEBUGMSGTL(("tcapOmMIB", "done.\n"));
 	return SNMPERR_SUCCESS;
+}
+
+/**
+ * @fn int check_tcapOmMIB(struct tcapOmMIB_data *StorageTmp, struct tcapOmMIB_data *StorageOld)
+ * @param StorageTmp the data as updated
+ * @param StorageOld the data previous to update
+ *
+ * This function is used by mibs.  It is used to check, all scalars at a time, the varbinds
+ * belonging to the mib.  This function is called for the first varbind in a mib at the beginning of
+ * the ACTION phase.  The COMMIT phase does not ensue unless this check passes.  This function can
+ * return SNMP_ERR_NOERR or a specific SNMP error value.  Values in StorageOld are the values before
+ * the varbinds on the mib were applied; the values in StorageTmp are the new values.  The function
+ * is permitted to change the values in StorageTmp to correct them; however, preferences should be
+ * made for setting values that were not in the varbinds.
+ */
+int
+check_tcapOmMIB(struct tcapOmMIB_data *StorageTmp, struct tcapOmMIB_data *StorageOld)
+{
+	/* XXX: provide code to check the scalars for consistency */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int update_tcapOmMIB(struct tcapOmMIB_data *StorageTmp, struct tcapOmMIB_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the set operation (ACTION phase)
+ *
+ * This function is used by mibs.  It is used to update, all scalars at a time, the varbinds
+ * belonging to the mib.  This function is called for the first varbind in a mib at the beginning of
+ * the COMMIT phase.  The start of the ACTION phase performs a consistency check on the mib before
+ * allowing the request to proceed to the COMMIT phase.  The COMMIT phase then arrives here with
+ * consistency already checked (see check_tcapOmMIB()).  This function can
+ * return SNMP_ERR_NOERROR or SNMP_ERR_COMMITFAILED.  Values in StorageOld are the values before the
+ * varbinds on the mib were applied: the values in StorageTmp are the new values.
+ */
+int
+update_tcapOmMIB(struct tcapOmMIB_data *StorageTmp, struct tcapOmMIB_data *StorageOld)
+{
+	/* XXX: provide code to update the row with the underlying device */
+	tcapOmMIB_refresh = 1;
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn revert_tcapOmMIB(struct 
+ * @fn void revert_tcapOmMIB(struct tcapOmMIB_data *StorageTmp, struct tcapOmMIB_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the undo operation (UNDO phase)
+ */
+void
+revert_tcapOmMIB(struct tcapOmMIB_data *StorageTmp, struct tcapOmMIB_data *StorageOld)
+{
+	/* XXX: provide code to revert the row with the underlying device */
+	update_tcapOmMIB(StorageOld, NULL);
 }
 
 /**
@@ -1299,21 +1414,21 @@ var_tcapOmMIB(struct variable *vp, oid * name, size_t *length, int exact, size_t
 	case (u_char) TCAPOM1STANDINTERVALDEACTIVATE:	/* ReadWrite */
 		*write_method = write_tcapOm1stAndIntervalDeactivate;
 		if (!StorageTmp)
-		break;
+			break;
 		*var_len = StorageTmp->tcapOm1stAndIntervalDeactivateLen * sizeof(oid);
 		rval = (u_char *) StorageTmp->tcapOm1stAndIntervalDeactivate;
 		break;
 	case (u_char) TCAPOM5MINACTIVATE:	/* ReadWrite */
 		*write_method = write_tcapOm5MinActivate;
 		if (!StorageTmp)
-		break;
+			break;
 		*var_len = StorageTmp->tcapOm5MinActivateLen * sizeof(oid);
 		rval = (u_char *) StorageTmp->tcapOm5MinActivate;
 		break;
 	case (u_char) TCAPOM5MINDEAACTIVATE:	/* ReadWrite */
 		*write_method = write_tcapOm5MinDeaActivate;
 		if (!StorageTmp)
-		break;
+			break;
 		*var_len = StorageTmp->tcapOm5MinDeaActivateLen * sizeof(oid);
 		rval = (u_char *) StorageTmp->tcapOm5MinDeaActivate;
 		break;
@@ -1383,24 +1498,30 @@ tcapOmNodeTable_create(void)
 	DEBUGMSGTL(("tcapOmMIB", "tcapOmNodeTable_create: creating row...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
-		if ((StorageNew->sccpNetworkEntityId = (uint8_t *) strdup("")) != NULL)
-			StorageNew->sccpNetworkEntityIdLen = strlen("");
+		if ((StorageNew->sccpNetworkEntityId = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->sccpNetworkEntityIdLen = 0;
+		StorageNew->sccpNetworkEntityId[StorageNew->sccpNetworkEntityIdLen] = 0;
 		StorageNew->tcapOmNodeMessagesSent = 0;
 		StorageNew->tcapOmNodeMessagesRecv = 0;
 		StorageNew->tcapOmNodeComponentsSent = 0;
 		StorageNew->tcapOmNodeComponentsRecv = 0;
 		StorageNew->tcapOmNode5minValidIntervals = 0;
 		StorageNew->tcapOmNode15minValidIntervals = 0;
-
 	}
+      done:
 	DEBUGMSGTL(("tcapOmMIB", "done.\n"));
 	return (StorageNew);
+	goto nomem;
+      nomem:
+	tcapOmNodeTable_destroy(&StorageNew);
+	goto done;
 }
 
 /**
  * @fn struct tcapOmNodeTable_data *tcapOmNodeTable_duplicate(struct tcapOmNodeTable_data *thedata)
  * @param thedata the row structure to duplicate.
- * @brief duplicat a row structure for a table.
+ * @brief duplicate a row structure for a table.
  *
  * Duplicates the specified row structure @param thedata and returns a pointer to the newly
  * allocated row structure on success, or NULL on failure.
@@ -1412,6 +1533,18 @@ tcapOmNodeTable_duplicate(struct tcapOmNodeTable_data *thedata)
 
 	DEBUGMSGTL(("tcapOmMIB", "tcapOmNodeTable_duplicate: duplicating row...  "));
 	if (StorageNew != NULL) {
+		StorageNew->tcapOmNodeTable_id = thedata->tcapOmNodeTable_id;
+		if (!(StorageNew->sccpNetworkEntityId = malloc(thedata->sccpNetworkEntityIdLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->sccpNetworkEntityId, thedata->sccpNetworkEntityId, thedata->sccpNetworkEntityIdLen);
+		StorageNew->sccpNetworkEntityIdLen = thedata->sccpNetworkEntityIdLen;
+		StorageNew->sccpNetworkEntityId[StorageNew->sccpNetworkEntityIdLen] = 0;
+		StorageNew->tcapOmNodeMessagesSent = thedata->tcapOmNodeMessagesSent;
+		StorageNew->tcapOmNodeMessagesRecv = thedata->tcapOmNodeMessagesRecv;
+		StorageNew->tcapOmNodeComponentsSent = thedata->tcapOmNodeComponentsSent;
+		StorageNew->tcapOmNodeComponentsRecv = thedata->tcapOmNodeComponentsRecv;
+		StorageNew->tcapOmNode5minValidIntervals = thedata->tcapOmNode5minValidIntervals;
+		StorageNew->tcapOmNode15minValidIntervals = thedata->tcapOmNode15minValidIntervals;
 	}
       done:
 	DEBUGMSGTL(("tcapOmMIB", "done.\n"));
@@ -1507,7 +1640,7 @@ tcapOmNodeTable_del(struct tcapOmNodeTable_data *thedata)
  * @param line line from configuration file matching the token.
  * @brief parse configuration file for tcapOmNodeTable entries.
  *
- * This callback is called by UCD-SNMP when it prases a configuration file and finds a configuration
+ * This callback is called by UCD-SNMP when it parses a configuration file and finds a configuration
  * file line for the registsred token (in this case tcapOmNodeTable).  This routine is invoked by UCD-SNMP
  * to read the values of each row in the table from the configuration file.  Note that this
  * procedure may exist regardless of the persistence of the table.  If there are no configured
@@ -1565,6 +1698,7 @@ store_tcapOmNodeTable(int majorID, int minorID, void *serverarg, void *clientarg
 			memset(line, 0, sizeof(line));
 			strcat(line, "tcapOmNodeTable ");
 			cptr = line + strlen(line);
+			(void) cptr;
 			/* XXX: remove individual columns if not persistent */
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->sccpNetworkEntityId, &StorageTmp->sccpNetworkEntityIdLen);
 			cptr = read_config_store_data(ASN_COUNTER, cptr, &StorageTmp->tcapOmNodeMessagesSent, &tmpsize);
@@ -1596,22 +1730,28 @@ tcapOmNodeCurrentTable_create(void)
 	DEBUGMSGTL(("tcapOmMIB", "tcapOmNodeCurrentTable_create: creating row...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
-		if ((StorageNew->sccpNetworkEntityId = (uint8_t *) strdup("")) != NULL)
-			StorageNew->sccpNetworkEntityIdLen = strlen("");
+		if ((StorageNew->sccpNetworkEntityId = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->sccpNetworkEntityIdLen = 0;
+		StorageNew->sccpNetworkEntityId[StorageNew->sccpNetworkEntityIdLen] = 0;
 		StorageNew->tcapOmNodeCurrentMessagesSent = 0;
 		StorageNew->tcapOmNodeCurrentMessagesRecv = 0;
 		StorageNew->tcapOmNodeCurrentComponentsSent = 0;
 		StorageNew->tcapOmNodeCurrentComponentsRecv = 0;
-
 	}
+      done:
 	DEBUGMSGTL(("tcapOmMIB", "done.\n"));
 	return (StorageNew);
+	goto nomem;
+      nomem:
+	tcapOmNodeCurrentTable_destroy(&StorageNew);
+	goto done;
 }
 
 /**
  * @fn struct tcapOmNodeCurrentTable_data *tcapOmNodeCurrentTable_duplicate(struct tcapOmNodeCurrentTable_data *thedata)
  * @param thedata the row structure to duplicate.
- * @brief duplicat a row structure for a table.
+ * @brief duplicate a row structure for a table.
  *
  * Duplicates the specified row structure @param thedata and returns a pointer to the newly
  * allocated row structure on success, or NULL on failure.
@@ -1623,6 +1763,16 @@ tcapOmNodeCurrentTable_duplicate(struct tcapOmNodeCurrentTable_data *thedata)
 
 	DEBUGMSGTL(("tcapOmMIB", "tcapOmNodeCurrentTable_duplicate: duplicating row...  "));
 	if (StorageNew != NULL) {
+		StorageNew->tcapOmNodeCurrentTable_id = thedata->tcapOmNodeCurrentTable_id;
+		if (!(StorageNew->sccpNetworkEntityId = malloc(thedata->sccpNetworkEntityIdLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->sccpNetworkEntityId, thedata->sccpNetworkEntityId, thedata->sccpNetworkEntityIdLen);
+		StorageNew->sccpNetworkEntityIdLen = thedata->sccpNetworkEntityIdLen;
+		StorageNew->sccpNetworkEntityId[StorageNew->sccpNetworkEntityIdLen] = 0;
+		StorageNew->tcapOmNodeCurrentMessagesSent = thedata->tcapOmNodeCurrentMessagesSent;
+		StorageNew->tcapOmNodeCurrentMessagesRecv = thedata->tcapOmNodeCurrentMessagesRecv;
+		StorageNew->tcapOmNodeCurrentComponentsSent = thedata->tcapOmNodeCurrentComponentsSent;
+		StorageNew->tcapOmNodeCurrentComponentsRecv = thedata->tcapOmNodeCurrentComponentsRecv;
 	}
       done:
 	DEBUGMSGTL(("tcapOmMIB", "done.\n"));
@@ -1718,7 +1868,7 @@ tcapOmNodeCurrentTable_del(struct tcapOmNodeCurrentTable_data *thedata)
  * @param line line from configuration file matching the token.
  * @brief parse configuration file for tcapOmNodeCurrentTable entries.
  *
- * This callback is called by UCD-SNMP when it prases a configuration file and finds a configuration
+ * This callback is called by UCD-SNMP when it parses a configuration file and finds a configuration
  * file line for the registsred token (in this case tcapOmNodeCurrentTable).  This routine is invoked by UCD-SNMP
  * to read the values of each row in the table from the configuration file.  Note that this
  * procedure may exist regardless of the persistence of the table.  If there are no configured
@@ -1774,6 +1924,7 @@ store_tcapOmNodeCurrentTable(int majorID, int minorID, void *serverarg, void *cl
 			memset(line, 0, sizeof(line));
 			strcat(line, "tcapOmNodeCurrentTable ");
 			cptr = line + strlen(line);
+			(void) cptr;
 			/* XXX: remove individual columns if not persistent */
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->sccpNetworkEntityId, &StorageTmp->sccpNetworkEntityIdLen);
 			cptr = read_config_store_data(ASN_GAUGE, cptr, &StorageTmp->tcapOmNodeCurrentMessagesSent, &tmpsize);
@@ -1803,22 +1954,28 @@ tcapOmNode5minIntTable_create(void)
 	DEBUGMSGTL(("tcapOmMIB", "tcapOmNode5minIntTable_create: creating row...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
-		if ((StorageNew->sccpNetworkEntityId = (uint8_t *) strdup("")) != NULL)
-			StorageNew->sccpNetworkEntityIdLen = strlen("");
+		if ((StorageNew->sccpNetworkEntityId = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->sccpNetworkEntityIdLen = 0;
+		StorageNew->sccpNetworkEntityId[StorageNew->sccpNetworkEntityIdLen] = 0;
 		StorageNew->tcapOmNode5minIntMessagesSent = 0;
 		StorageNew->tcapOmNode5minIntMessagesRecv = 0;
 		StorageNew->tcapOmNode5minIntComponentsSent = 0;
 		StorageNew->tcapOmNode5minIntComponentsRecv = 0;
-
 	}
+      done:
 	DEBUGMSGTL(("tcapOmMIB", "done.\n"));
 	return (StorageNew);
+	goto nomem;
+      nomem:
+	tcapOmNode5minIntTable_destroy(&StorageNew);
+	goto done;
 }
 
 /**
  * @fn struct tcapOmNode5minIntTable_data *tcapOmNode5minIntTable_duplicate(struct tcapOmNode5minIntTable_data *thedata)
  * @param thedata the row structure to duplicate.
- * @brief duplicat a row structure for a table.
+ * @brief duplicate a row structure for a table.
  *
  * Duplicates the specified row structure @param thedata and returns a pointer to the newly
  * allocated row structure on success, or NULL on failure.
@@ -1830,6 +1987,17 @@ tcapOmNode5minIntTable_duplicate(struct tcapOmNode5minIntTable_data *thedata)
 
 	DEBUGMSGTL(("tcapOmMIB", "tcapOmNode5minIntTable_duplicate: duplicating row...  "));
 	if (StorageNew != NULL) {
+		StorageNew->tcapOmNode5minIntTable_id = thedata->tcapOmNode5minIntTable_id;
+		if (!(StorageNew->sccpNetworkEntityId = malloc(thedata->sccpNetworkEntityIdLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->sccpNetworkEntityId, thedata->sccpNetworkEntityId, thedata->sccpNetworkEntityIdLen);
+		StorageNew->sccpNetworkEntityIdLen = thedata->sccpNetworkEntityIdLen;
+		StorageNew->sccpNetworkEntityId[StorageNew->sccpNetworkEntityIdLen] = 0;
+		StorageNew->tcapOmInterval = thedata->tcapOmInterval;
+		StorageNew->tcapOmNode5minIntMessagesSent = thedata->tcapOmNode5minIntMessagesSent;
+		StorageNew->tcapOmNode5minIntMessagesRecv = thedata->tcapOmNode5minIntMessagesRecv;
+		StorageNew->tcapOmNode5minIntComponentsSent = thedata->tcapOmNode5minIntComponentsSent;
+		StorageNew->tcapOmNode5minIntComponentsRecv = thedata->tcapOmNode5minIntComponentsRecv;
 	}
       done:
 	DEBUGMSGTL(("tcapOmMIB", "done.\n"));
@@ -1927,7 +2095,7 @@ tcapOmNode5minIntTable_del(struct tcapOmNode5minIntTable_data *thedata)
  * @param line line from configuration file matching the token.
  * @brief parse configuration file for tcapOmNode5minIntTable entries.
  *
- * This callback is called by UCD-SNMP when it prases a configuration file and finds a configuration
+ * This callback is called by UCD-SNMP when it parses a configuration file and finds a configuration
  * file line for the registsred token (in this case tcapOmNode5minIntTable).  This routine is invoked by UCD-SNMP
  * to read the values of each row in the table from the configuration file.  Note that this
  * procedure may exist regardless of the persistence of the table.  If there are no configured
@@ -1984,6 +2152,7 @@ store_tcapOmNode5minIntTable(int majorID, int minorID, void *serverarg, void *cl
 			memset(line, 0, sizeof(line));
 			strcat(line, "tcapOmNode5minIntTable ");
 			cptr = line + strlen(line);
+			(void) cptr;
 			/* XXX: remove individual columns if not persistent */
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->sccpNetworkEntityId, &StorageTmp->sccpNetworkEntityIdLen);
 			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->tcapOmInterval, &tmpsize);
@@ -2014,23 +2183,29 @@ tcapOmNode15minIntTable_create(void)
 	DEBUGMSGTL(("tcapOmMIB", "tcapOmNode15minIntTable_create: creating row...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
-		if ((StorageNew->sccpNetworkEntityId = (uint8_t *) strdup("")) != NULL)
-			StorageNew->sccpNetworkEntityIdLen = strlen("");
+		if ((StorageNew->sccpNetworkEntityId = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->sccpNetworkEntityIdLen = 0;
+		StorageNew->sccpNetworkEntityId[StorageNew->sccpNetworkEntityIdLen] = 0;
 		StorageNew->tcapOmInterval = 0;
 		StorageNew->tcapOmNode15minIntMessagesSent = 0;
 		StorageNew->tcapOmNode15minIntMessagesRecv = 0;
 		StorageNew->tcapOmNode15minIntComponentsSent = 0;
 		StorageNew->tcapOmNode15minIntComponentsRecv = 0;
-
 	}
+      done:
 	DEBUGMSGTL(("tcapOmMIB", "done.\n"));
 	return (StorageNew);
+	goto nomem;
+      nomem:
+	tcapOmNode15minIntTable_destroy(&StorageNew);
+	goto done;
 }
 
 /**
  * @fn struct tcapOmNode15minIntTable_data *tcapOmNode15minIntTable_duplicate(struct tcapOmNode15minIntTable_data *thedata)
  * @param thedata the row structure to duplicate.
- * @brief duplicat a row structure for a table.
+ * @brief duplicate a row structure for a table.
  *
  * Duplicates the specified row structure @param thedata and returns a pointer to the newly
  * allocated row structure on success, or NULL on failure.
@@ -2042,6 +2217,17 @@ tcapOmNode15minIntTable_duplicate(struct tcapOmNode15minIntTable_data *thedata)
 
 	DEBUGMSGTL(("tcapOmMIB", "tcapOmNode15minIntTable_duplicate: duplicating row...  "));
 	if (StorageNew != NULL) {
+		StorageNew->tcapOmNode15minIntTable_id = thedata->tcapOmNode15minIntTable_id;
+		if (!(StorageNew->sccpNetworkEntityId = malloc(thedata->sccpNetworkEntityIdLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->sccpNetworkEntityId, thedata->sccpNetworkEntityId, thedata->sccpNetworkEntityIdLen);
+		StorageNew->sccpNetworkEntityIdLen = thedata->sccpNetworkEntityIdLen;
+		StorageNew->sccpNetworkEntityId[StorageNew->sccpNetworkEntityIdLen] = 0;
+		StorageNew->tcapOmInterval = thedata->tcapOmInterval;
+		StorageNew->tcapOmNode15minIntMessagesSent = thedata->tcapOmNode15minIntMessagesSent;
+		StorageNew->tcapOmNode15minIntMessagesRecv = thedata->tcapOmNode15minIntMessagesRecv;
+		StorageNew->tcapOmNode15minIntComponentsSent = thedata->tcapOmNode15minIntComponentsSent;
+		StorageNew->tcapOmNode15minIntComponentsRecv = thedata->tcapOmNode15minIntComponentsRecv;
 	}
       done:
 	DEBUGMSGTL(("tcapOmMIB", "done.\n"));
@@ -2139,7 +2325,7 @@ tcapOmNode15minIntTable_del(struct tcapOmNode15minIntTable_data *thedata)
  * @param line line from configuration file matching the token.
  * @brief parse configuration file for tcapOmNode15minIntTable entries.
  *
- * This callback is called by UCD-SNMP when it prases a configuration file and finds a configuration
+ * This callback is called by UCD-SNMP when it parses a configuration file and finds a configuration
  * file line for the registsred token (in this case tcapOmNode15minIntTable).  This routine is invoked by UCD-SNMP
  * to read the values of each row in the table from the configuration file.  Note that this
  * procedure may exist regardless of the persistence of the table.  If there are no configured
@@ -2196,6 +2382,7 @@ store_tcapOmNode15minIntTable(int majorID, int minorID, void *serverarg, void *c
 			memset(line, 0, sizeof(line));
 			strcat(line, "tcapOmNode15minIntTable ");
 			cptr = line + strlen(line);
+			(void) cptr;
 			/* XXX: remove individual columns if not persistent */
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->sccpNetworkEntityId, &StorageTmp->sccpNetworkEntityIdLen);
 			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->tcapOmInterval, &tmpsize);
@@ -2226,22 +2413,28 @@ tcapOmMsgsTable_create(void)
 	DEBUGMSGTL(("tcapOmMIB", "tcapOmMsgsTable_create: creating row...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
-		if ((StorageNew->sccpNetworkEntityId = (uint8_t *) strdup("")) != NULL)
-			StorageNew->sccpNetworkEntityIdLen = strlen("");
+		if ((StorageNew->sccpNetworkEntityId = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->sccpNetworkEntityIdLen = 0;
+		StorageNew->sccpNetworkEntityId[StorageNew->sccpNetworkEntityIdLen] = 0;
 		StorageNew->tcapOmMsgsMessagesSent = 0;
 		StorageNew->tcapOmMsgsMessagesRecv = 0;
 		StorageNew->tcapOmMsgs5minValidIntervals = 0;
 		StorageNew->tcapOmMsgs15minValidIntervals = 0;
-
 	}
+      done:
 	DEBUGMSGTL(("tcapOmMIB", "done.\n"));
 	return (StorageNew);
+	goto nomem;
+      nomem:
+	tcapOmMsgsTable_destroy(&StorageNew);
+	goto done;
 }
 
 /**
  * @fn struct tcapOmMsgsTable_data *tcapOmMsgsTable_duplicate(struct tcapOmMsgsTable_data *thedata)
  * @param thedata the row structure to duplicate.
- * @brief duplicat a row structure for a table.
+ * @brief duplicate a row structure for a table.
  *
  * Duplicates the specified row structure @param thedata and returns a pointer to the newly
  * allocated row structure on success, or NULL on failure.
@@ -2253,6 +2446,17 @@ tcapOmMsgsTable_duplicate(struct tcapOmMsgsTable_data *thedata)
 
 	DEBUGMSGTL(("tcapOmMIB", "tcapOmMsgsTable_duplicate: duplicating row...  "));
 	if (StorageNew != NULL) {
+		StorageNew->tcapOmMsgsTable_id = thedata->tcapOmMsgsTable_id;
+		if (!(StorageNew->sccpNetworkEntityId = malloc(thedata->sccpNetworkEntityIdLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->sccpNetworkEntityId, thedata->sccpNetworkEntityId, thedata->sccpNetworkEntityIdLen);
+		StorageNew->sccpNetworkEntityIdLen = thedata->sccpNetworkEntityIdLen;
+		StorageNew->sccpNetworkEntityId[StorageNew->sccpNetworkEntityIdLen] = 0;
+		StorageNew->tcapOmMessageType = thedata->tcapOmMessageType;
+		StorageNew->tcapOmMsgsMessagesSent = thedata->tcapOmMsgsMessagesSent;
+		StorageNew->tcapOmMsgsMessagesRecv = thedata->tcapOmMsgsMessagesRecv;
+		StorageNew->tcapOmMsgs5minValidIntervals = thedata->tcapOmMsgs5minValidIntervals;
+		StorageNew->tcapOmMsgs15minValidIntervals = thedata->tcapOmMsgs15minValidIntervals;
 	}
       done:
 	DEBUGMSGTL(("tcapOmMIB", "done.\n"));
@@ -2350,7 +2554,7 @@ tcapOmMsgsTable_del(struct tcapOmMsgsTable_data *thedata)
  * @param line line from configuration file matching the token.
  * @brief parse configuration file for tcapOmMsgsTable entries.
  *
- * This callback is called by UCD-SNMP when it prases a configuration file and finds a configuration
+ * This callback is called by UCD-SNMP when it parses a configuration file and finds a configuration
  * file line for the registsred token (in this case tcapOmMsgsTable).  This routine is invoked by UCD-SNMP
  * to read the values of each row in the table from the configuration file.  Note that this
  * procedure may exist regardless of the persistence of the table.  If there are no configured
@@ -2407,6 +2611,7 @@ store_tcapOmMsgsTable(int majorID, int minorID, void *serverarg, void *clientarg
 			memset(line, 0, sizeof(line));
 			strcat(line, "tcapOmMsgsTable ");
 			cptr = line + strlen(line);
+			(void) cptr;
 			/* XXX: remove individual columns if not persistent */
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->sccpNetworkEntityId, &StorageTmp->sccpNetworkEntityIdLen);
 			cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->tcapOmMessageType, &tmpsize);
@@ -2437,21 +2642,27 @@ tcapOmMsgsCurrentTable_create(void)
 	DEBUGMSGTL(("tcapOmMIB", "tcapOmMsgsCurrentTable_create: creating row...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
-		if ((StorageNew->sccpNetworkEntityId = (uint8_t *) strdup("")) != NULL)
-			StorageNew->sccpNetworkEntityIdLen = strlen("");
+		if ((StorageNew->sccpNetworkEntityId = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->sccpNetworkEntityIdLen = 0;
+		StorageNew->sccpNetworkEntityId[StorageNew->sccpNetworkEntityIdLen] = 0;
 		StorageNew->tcapOmMessageType = 0;
 		StorageNew->tcapOmMsgsCurrentMessagesSent = 0;
 		StorageNew->tcapOmMsgsCurrentMessagesRecv = 0;
-
 	}
+      done:
 	DEBUGMSGTL(("tcapOmMIB", "done.\n"));
 	return (StorageNew);
+	goto nomem;
+      nomem:
+	tcapOmMsgsCurrentTable_destroy(&StorageNew);
+	goto done;
 }
 
 /**
  * @fn struct tcapOmMsgsCurrentTable_data *tcapOmMsgsCurrentTable_duplicate(struct tcapOmMsgsCurrentTable_data *thedata)
  * @param thedata the row structure to duplicate.
- * @brief duplicat a row structure for a table.
+ * @brief duplicate a row structure for a table.
  *
  * Duplicates the specified row structure @param thedata and returns a pointer to the newly
  * allocated row structure on success, or NULL on failure.
@@ -2463,6 +2674,15 @@ tcapOmMsgsCurrentTable_duplicate(struct tcapOmMsgsCurrentTable_data *thedata)
 
 	DEBUGMSGTL(("tcapOmMIB", "tcapOmMsgsCurrentTable_duplicate: duplicating row...  "));
 	if (StorageNew != NULL) {
+		StorageNew->tcapOmMsgsCurrentTable_id = thedata->tcapOmMsgsCurrentTable_id;
+		if (!(StorageNew->sccpNetworkEntityId = malloc(thedata->sccpNetworkEntityIdLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->sccpNetworkEntityId, thedata->sccpNetworkEntityId, thedata->sccpNetworkEntityIdLen);
+		StorageNew->sccpNetworkEntityIdLen = thedata->sccpNetworkEntityIdLen;
+		StorageNew->sccpNetworkEntityId[StorageNew->sccpNetworkEntityIdLen] = 0;
+		StorageNew->tcapOmMessageType = thedata->tcapOmMessageType;
+		StorageNew->tcapOmMsgsCurrentMessagesSent = thedata->tcapOmMsgsCurrentMessagesSent;
+		StorageNew->tcapOmMsgsCurrentMessagesRecv = thedata->tcapOmMsgsCurrentMessagesRecv;
 	}
       done:
 	DEBUGMSGTL(("tcapOmMIB", "done.\n"));
@@ -2560,7 +2780,7 @@ tcapOmMsgsCurrentTable_del(struct tcapOmMsgsCurrentTable_data *thedata)
  * @param line line from configuration file matching the token.
  * @brief parse configuration file for tcapOmMsgsCurrentTable entries.
  *
- * This callback is called by UCD-SNMP when it prases a configuration file and finds a configuration
+ * This callback is called by UCD-SNMP when it parses a configuration file and finds a configuration
  * file line for the registsred token (in this case tcapOmMsgsCurrentTable).  This routine is invoked by UCD-SNMP
  * to read the values of each row in the table from the configuration file.  Note that this
  * procedure may exist regardless of the persistence of the table.  If there are no configured
@@ -2615,6 +2835,7 @@ store_tcapOmMsgsCurrentTable(int majorID, int minorID, void *serverarg, void *cl
 			memset(line, 0, sizeof(line));
 			strcat(line, "tcapOmMsgsCurrentTable ");
 			cptr = line + strlen(line);
+			(void) cptr;
 			/* XXX: remove individual columns if not persistent */
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->sccpNetworkEntityId, &StorageTmp->sccpNetworkEntityIdLen);
 			cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->tcapOmMessageType, &tmpsize);
@@ -2643,22 +2864,28 @@ tcapOmMsgs5minIntTable_create(void)
 	DEBUGMSGTL(("tcapOmMIB", "tcapOmMsgs5minIntTable_create: creating row...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
-		if ((StorageNew->sccpNetworkEntityId = (uint8_t *) strdup("")) != NULL)
-			StorageNew->sccpNetworkEntityIdLen = strlen("");
+		if ((StorageNew->sccpNetworkEntityId = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->sccpNetworkEntityIdLen = 0;
+		StorageNew->sccpNetworkEntityId[StorageNew->sccpNetworkEntityIdLen] = 0;
 		StorageNew->tcapOmMessageType = 0;
 		StorageNew->tcapOmInterval = 0;
 		StorageNew->tcapOmMsgs5minIntMessagesSent = 0;
 		StorageNew->tcapOmMsgs5minIntMessagesRecv = 0;
-
 	}
+      done:
 	DEBUGMSGTL(("tcapOmMIB", "done.\n"));
 	return (StorageNew);
+	goto nomem;
+      nomem:
+	tcapOmMsgs5minIntTable_destroy(&StorageNew);
+	goto done;
 }
 
 /**
  * @fn struct tcapOmMsgs5minIntTable_data *tcapOmMsgs5minIntTable_duplicate(struct tcapOmMsgs5minIntTable_data *thedata)
  * @param thedata the row structure to duplicate.
- * @brief duplicat a row structure for a table.
+ * @brief duplicate a row structure for a table.
  *
  * Duplicates the specified row structure @param thedata and returns a pointer to the newly
  * allocated row structure on success, or NULL on failure.
@@ -2670,6 +2897,16 @@ tcapOmMsgs5minIntTable_duplicate(struct tcapOmMsgs5minIntTable_data *thedata)
 
 	DEBUGMSGTL(("tcapOmMIB", "tcapOmMsgs5minIntTable_duplicate: duplicating row...  "));
 	if (StorageNew != NULL) {
+		StorageNew->tcapOmMsgs5minIntTable_id = thedata->tcapOmMsgs5minIntTable_id;
+		if (!(StorageNew->sccpNetworkEntityId = malloc(thedata->sccpNetworkEntityIdLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->sccpNetworkEntityId, thedata->sccpNetworkEntityId, thedata->sccpNetworkEntityIdLen);
+		StorageNew->sccpNetworkEntityIdLen = thedata->sccpNetworkEntityIdLen;
+		StorageNew->sccpNetworkEntityId[StorageNew->sccpNetworkEntityIdLen] = 0;
+		StorageNew->tcapOmMessageType = thedata->tcapOmMessageType;
+		StorageNew->tcapOmInterval = thedata->tcapOmInterval;
+		StorageNew->tcapOmMsgs5minIntMessagesSent = thedata->tcapOmMsgs5minIntMessagesSent;
+		StorageNew->tcapOmMsgs5minIntMessagesRecv = thedata->tcapOmMsgs5minIntMessagesRecv;
 	}
       done:
 	DEBUGMSGTL(("tcapOmMIB", "done.\n"));
@@ -2769,7 +3006,7 @@ tcapOmMsgs5minIntTable_del(struct tcapOmMsgs5minIntTable_data *thedata)
  * @param line line from configuration file matching the token.
  * @brief parse configuration file for tcapOmMsgs5minIntTable entries.
  *
- * This callback is called by UCD-SNMP when it prases a configuration file and finds a configuration
+ * This callback is called by UCD-SNMP when it parses a configuration file and finds a configuration
  * file line for the registsred token (in this case tcapOmMsgs5minIntTable).  This routine is invoked by UCD-SNMP
  * to read the values of each row in the table from the configuration file.  Note that this
  * procedure may exist regardless of the persistence of the table.  If there are no configured
@@ -2825,6 +3062,7 @@ store_tcapOmMsgs5minIntTable(int majorID, int minorID, void *serverarg, void *cl
 			memset(line, 0, sizeof(line));
 			strcat(line, "tcapOmMsgs5minIntTable ");
 			cptr = line + strlen(line);
+			(void) cptr;
 			/* XXX: remove individual columns if not persistent */
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->sccpNetworkEntityId, &StorageTmp->sccpNetworkEntityIdLen);
 			cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->tcapOmMessageType, &tmpsize);
@@ -2854,22 +3092,28 @@ tcapOmMsgs15minIntTable_create(void)
 	DEBUGMSGTL(("tcapOmMIB", "tcapOmMsgs15minIntTable_create: creating row...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
-		if ((StorageNew->sccpNetworkEntityId = (uint8_t *) strdup("")) != NULL)
-			StorageNew->sccpNetworkEntityIdLen = strlen("");
+		if ((StorageNew->sccpNetworkEntityId = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->sccpNetworkEntityIdLen = 0;
+		StorageNew->sccpNetworkEntityId[StorageNew->sccpNetworkEntityIdLen] = 0;
 		StorageNew->tcapOmMessageType = 0;
 		StorageNew->tcapOmInterval = 0;
 		StorageNew->tcapOmMsgs15minIntMessagesSent = 0;
 		StorageNew->tcapOmMsgs15minIntMessagesRecv = 0;
-
 	}
+      done:
 	DEBUGMSGTL(("tcapOmMIB", "done.\n"));
 	return (StorageNew);
+	goto nomem;
+      nomem:
+	tcapOmMsgs15minIntTable_destroy(&StorageNew);
+	goto done;
 }
 
 /**
  * @fn struct tcapOmMsgs15minIntTable_data *tcapOmMsgs15minIntTable_duplicate(struct tcapOmMsgs15minIntTable_data *thedata)
  * @param thedata the row structure to duplicate.
- * @brief duplicat a row structure for a table.
+ * @brief duplicate a row structure for a table.
  *
  * Duplicates the specified row structure @param thedata and returns a pointer to the newly
  * allocated row structure on success, or NULL on failure.
@@ -2881,6 +3125,16 @@ tcapOmMsgs15minIntTable_duplicate(struct tcapOmMsgs15minIntTable_data *thedata)
 
 	DEBUGMSGTL(("tcapOmMIB", "tcapOmMsgs15minIntTable_duplicate: duplicating row...  "));
 	if (StorageNew != NULL) {
+		StorageNew->tcapOmMsgs15minIntTable_id = thedata->tcapOmMsgs15minIntTable_id;
+		if (!(StorageNew->sccpNetworkEntityId = malloc(thedata->sccpNetworkEntityIdLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->sccpNetworkEntityId, thedata->sccpNetworkEntityId, thedata->sccpNetworkEntityIdLen);
+		StorageNew->sccpNetworkEntityIdLen = thedata->sccpNetworkEntityIdLen;
+		StorageNew->sccpNetworkEntityId[StorageNew->sccpNetworkEntityIdLen] = 0;
+		StorageNew->tcapOmMessageType = thedata->tcapOmMessageType;
+		StorageNew->tcapOmInterval = thedata->tcapOmInterval;
+		StorageNew->tcapOmMsgs15minIntMessagesSent = thedata->tcapOmMsgs15minIntMessagesSent;
+		StorageNew->tcapOmMsgs15minIntMessagesRecv = thedata->tcapOmMsgs15minIntMessagesRecv;
 	}
       done:
 	DEBUGMSGTL(("tcapOmMIB", "done.\n"));
@@ -2980,7 +3234,7 @@ tcapOmMsgs15minIntTable_del(struct tcapOmMsgs15minIntTable_data *thedata)
  * @param line line from configuration file matching the token.
  * @brief parse configuration file for tcapOmMsgs15minIntTable entries.
  *
- * This callback is called by UCD-SNMP when it prases a configuration file and finds a configuration
+ * This callback is called by UCD-SNMP when it parses a configuration file and finds a configuration
  * file line for the registsred token (in this case tcapOmMsgs15minIntTable).  This routine is invoked by UCD-SNMP
  * to read the values of each row in the table from the configuration file.  Note that this
  * procedure may exist regardless of the persistence of the table.  If there are no configured
@@ -3036,6 +3290,7 @@ store_tcapOmMsgs15minIntTable(int majorID, int minorID, void *serverarg, void *c
 			memset(line, 0, sizeof(line));
 			strcat(line, "tcapOmMsgs15minIntTable ");
 			cptr = line + strlen(line);
+			(void) cptr;
 			/* XXX: remove individual columns if not persistent */
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->sccpNetworkEntityId, &StorageTmp->sccpNetworkEntityIdLen);
 			cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->tcapOmMessageType, &tmpsize);
@@ -3065,10 +3320,14 @@ tcapOmAETable_create(void)
 	DEBUGMSGTL(("tcapOmMIB", "tcapOmAETable_create: creating row...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
-		if ((StorageNew->tcapApplicationSubsystemId = (uint8_t *) strdup("")) != NULL)
-			StorageNew->tcapApplicationSubsystemIdLen = strlen("");
-		if ((StorageNew->tcapApplicationEntityId = (uint8_t *) strdup("")) != NULL)
-			StorageNew->tcapApplicationEntityIdLen = strlen("");
+		if ((StorageNew->tcapApplicationSubsystemId = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->tcapApplicationSubsystemIdLen = 0;
+		StorageNew->tcapApplicationSubsystemId[StorageNew->tcapApplicationSubsystemIdLen] = 0;
+		if ((StorageNew->tcapApplicationEntityId = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->tcapApplicationEntityIdLen = 0;
+		StorageNew->tcapApplicationEntityId[StorageNew->tcapApplicationEntityIdLen] = 0;
 		StorageNew->tcapOmAEMeasurementDeleted = 0;
 		StorageNew->tcapOmAENewTransactions = 0;
 		StorageNew->tcapOmAEMeanOpenTransactions = 0;
@@ -3078,16 +3337,20 @@ tcapOmAETable_create(void)
 		StorageNew->tcapOmAEThresholdExceeded = 0;
 		StorageNew->tcapOmAE5minValidIntervals = 0;
 		StorageNew->tcapOmAE15minValidIntervals = 0;
-
 	}
+      done:
 	DEBUGMSGTL(("tcapOmMIB", "done.\n"));
 	return (StorageNew);
+	goto nomem;
+      nomem:
+	tcapOmAETable_destroy(&StorageNew);
+	goto done;
 }
 
 /**
  * @fn struct tcapOmAETable_data *tcapOmAETable_duplicate(struct tcapOmAETable_data *thedata)
  * @param thedata the row structure to duplicate.
- * @brief duplicat a row structure for a table.
+ * @brief duplicate a row structure for a table.
  *
  * Duplicates the specified row structure @param thedata and returns a pointer to the newly
  * allocated row structure on success, or NULL on failure.
@@ -3099,6 +3362,26 @@ tcapOmAETable_duplicate(struct tcapOmAETable_data *thedata)
 
 	DEBUGMSGTL(("tcapOmMIB", "tcapOmAETable_duplicate: duplicating row...  "));
 	if (StorageNew != NULL) {
+		StorageNew->tcapOmAETable_id = thedata->tcapOmAETable_id;
+		if (!(StorageNew->tcapApplicationSubsystemId = malloc(thedata->tcapApplicationSubsystemIdLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->tcapApplicationSubsystemId, thedata->tcapApplicationSubsystemId, thedata->tcapApplicationSubsystemIdLen);
+		StorageNew->tcapApplicationSubsystemIdLen = thedata->tcapApplicationSubsystemIdLen;
+		StorageNew->tcapApplicationSubsystemId[StorageNew->tcapApplicationSubsystemIdLen] = 0;
+		if (!(StorageNew->tcapApplicationEntityId = malloc(thedata->tcapApplicationEntityIdLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->tcapApplicationEntityId, thedata->tcapApplicationEntityId, thedata->tcapApplicationEntityIdLen);
+		StorageNew->tcapApplicationEntityIdLen = thedata->tcapApplicationEntityIdLen;
+		StorageNew->tcapApplicationEntityId[StorageNew->tcapApplicationEntityIdLen] = 0;
+		StorageNew->tcapOmAEMeasurementDeleted = thedata->tcapOmAEMeasurementDeleted;
+		StorageNew->tcapOmAENewTransactions = thedata->tcapOmAENewTransactions;
+		StorageNew->tcapOmAEMeanOpenTransactions = thedata->tcapOmAEMeanOpenTransactions;
+		StorageNew->tcapOmAENotUsed = thedata->tcapOmAENotUsed;
+		StorageNew->tcapOmAECummulativeMeanDuration = thedata->tcapOmAECummulativeMeanDuration;
+		StorageNew->tcapOmAEMaximumOpenTranactions = thedata->tcapOmAEMaximumOpenTranactions;
+		StorageNew->tcapOmAEThresholdExceeded = thedata->tcapOmAEThresholdExceeded;
+		StorageNew->tcapOmAE5minValidIntervals = thedata->tcapOmAE5minValidIntervals;
+		StorageNew->tcapOmAE15minValidIntervals = thedata->tcapOmAE15minValidIntervals;
 	}
       done:
 	DEBUGMSGTL(("tcapOmMIB", "done.\n"));
@@ -3198,7 +3481,7 @@ tcapOmAETable_del(struct tcapOmAETable_data *thedata)
  * @param line line from configuration file matching the token.
  * @brief parse configuration file for tcapOmAETable entries.
  *
- * This callback is called by UCD-SNMP when it prases a configuration file and finds a configuration
+ * This callback is called by UCD-SNMP when it parses a configuration file and finds a configuration
  * file line for the registsred token (in this case tcapOmAETable).  This routine is invoked by UCD-SNMP
  * to read the values of each row in the table from the configuration file.  Note that this
  * procedure may exist regardless of the persistence of the table.  If there are no configured
@@ -3265,6 +3548,7 @@ store_tcapOmAETable(int majorID, int minorID, void *serverarg, void *clientarg)
 			memset(line, 0, sizeof(line));
 			strcat(line, "tcapOmAETable ");
 			cptr = line + strlen(line);
+			(void) cptr;
 			/* XXX: remove individual columns if not persistent */
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->tcapApplicationSubsystemId, &StorageTmp->tcapApplicationSubsystemIdLen);
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->tcapApplicationEntityId, &StorageTmp->tcapApplicationEntityIdLen);
@@ -3300,10 +3584,14 @@ tcapOmAECurrentTable_create(void)
 	DEBUGMSGTL(("tcapOmMIB", "tcapOmAECurrentTable_create: creating row...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
-		if ((StorageNew->tcapApplicationSubsystemId = (uint8_t *) strdup("")) != NULL)
-			StorageNew->tcapApplicationSubsystemIdLen = strlen("");
-		if ((StorageNew->tcapApplicationEntityId = (uint8_t *) strdup("")) != NULL)
-			StorageNew->tcapApplicationEntityIdLen = strlen("");
+		if ((StorageNew->tcapApplicationSubsystemId = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->tcapApplicationSubsystemIdLen = 0;
+		StorageNew->tcapApplicationSubsystemId[StorageNew->tcapApplicationSubsystemIdLen] = 0;
+		if ((StorageNew->tcapApplicationEntityId = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->tcapApplicationEntityIdLen = 0;
+		StorageNew->tcapApplicationEntityId[StorageNew->tcapApplicationEntityIdLen] = 0;
 		StorageNew->tcapOmAECurrentMeasurementDeleted = 0;
 		StorageNew->tcapOmAECurrentNewTransactions = 0;
 		StorageNew->tcapOmAECurrentMeanOpenTransactions = 0;
@@ -3311,16 +3599,20 @@ tcapOmAECurrentTable_create(void)
 		StorageNew->tcapOmAECurrentCummulativeMeanDuration = 0;
 		StorageNew->tcapOmAECurrentMaximumOpenTranactions = 0;
 		StorageNew->tcapOmAECurrentThresholdExceeded = 0;
-
 	}
+      done:
 	DEBUGMSGTL(("tcapOmMIB", "done.\n"));
 	return (StorageNew);
+	goto nomem;
+      nomem:
+	tcapOmAECurrentTable_destroy(&StorageNew);
+	goto done;
 }
 
 /**
  * @fn struct tcapOmAECurrentTable_data *tcapOmAECurrentTable_duplicate(struct tcapOmAECurrentTable_data *thedata)
  * @param thedata the row structure to duplicate.
- * @brief duplicat a row structure for a table.
+ * @brief duplicate a row structure for a table.
  *
  * Duplicates the specified row structure @param thedata and returns a pointer to the newly
  * allocated row structure on success, or NULL on failure.
@@ -3332,6 +3624,24 @@ tcapOmAECurrentTable_duplicate(struct tcapOmAECurrentTable_data *thedata)
 
 	DEBUGMSGTL(("tcapOmMIB", "tcapOmAECurrentTable_duplicate: duplicating row...  "));
 	if (StorageNew != NULL) {
+		StorageNew->tcapOmAECurrentTable_id = thedata->tcapOmAECurrentTable_id;
+		if (!(StorageNew->tcapApplicationSubsystemId = malloc(thedata->tcapApplicationSubsystemIdLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->tcapApplicationSubsystemId, thedata->tcapApplicationSubsystemId, thedata->tcapApplicationSubsystemIdLen);
+		StorageNew->tcapApplicationSubsystemIdLen = thedata->tcapApplicationSubsystemIdLen;
+		StorageNew->tcapApplicationSubsystemId[StorageNew->tcapApplicationSubsystemIdLen] = 0;
+		if (!(StorageNew->tcapApplicationEntityId = malloc(thedata->tcapApplicationEntityIdLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->tcapApplicationEntityId, thedata->tcapApplicationEntityId, thedata->tcapApplicationEntityIdLen);
+		StorageNew->tcapApplicationEntityIdLen = thedata->tcapApplicationEntityIdLen;
+		StorageNew->tcapApplicationEntityId[StorageNew->tcapApplicationEntityIdLen] = 0;
+		StorageNew->tcapOmAECurrentMeasurementDeleted = thedata->tcapOmAECurrentMeasurementDeleted;
+		StorageNew->tcapOmAECurrentNewTransactions = thedata->tcapOmAECurrentNewTransactions;
+		StorageNew->tcapOmAECurrentMeanOpenTransactions = thedata->tcapOmAECurrentMeanOpenTransactions;
+		StorageNew->tcapOmAECurrentNotUsed = thedata->tcapOmAECurrentNotUsed;
+		StorageNew->tcapOmAECurrentCummulativeMeanDuration = thedata->tcapOmAECurrentCummulativeMeanDuration;
+		StorageNew->tcapOmAECurrentMaximumOpenTranactions = thedata->tcapOmAECurrentMaximumOpenTranactions;
+		StorageNew->tcapOmAECurrentThresholdExceeded = thedata->tcapOmAECurrentThresholdExceeded;
 	}
       done:
 	DEBUGMSGTL(("tcapOmMIB", "done.\n"));
@@ -3431,7 +3741,7 @@ tcapOmAECurrentTable_del(struct tcapOmAECurrentTable_data *thedata)
  * @param line line from configuration file matching the token.
  * @brief parse configuration file for tcapOmAECurrentTable entries.
  *
- * This callback is called by UCD-SNMP when it prases a configuration file and finds a configuration
+ * This callback is called by UCD-SNMP when it parses a configuration file and finds a configuration
  * file line for the registsred token (in this case tcapOmAECurrentTable).  This routine is invoked by UCD-SNMP
  * to read the values of each row in the table from the configuration file.  Note that this
  * procedure may exist regardless of the persistence of the table.  If there are no configured
@@ -3496,6 +3806,7 @@ store_tcapOmAECurrentTable(int majorID, int minorID, void *serverarg, void *clie
 			memset(line, 0, sizeof(line));
 			strcat(line, "tcapOmAECurrentTable ");
 			cptr = line + strlen(line);
+			(void) cptr;
 			/* XXX: remove individual columns if not persistent */
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->tcapApplicationSubsystemId, &StorageTmp->tcapApplicationSubsystemIdLen);
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->tcapApplicationEntityId, &StorageTmp->tcapApplicationEntityIdLen);
@@ -3529,10 +3840,14 @@ tcapOmAE5minIntTable_create(void)
 	DEBUGMSGTL(("tcapOmMIB", "tcapOmAE5minIntTable_create: creating row...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
-		if ((StorageNew->tcapApplicationSubsystemId = (uint8_t *) strdup("")) != NULL)
-			StorageNew->tcapApplicationSubsystemIdLen = strlen("");
-		if ((StorageNew->tcapApplicationEntityId = (uint8_t *) strdup("")) != NULL)
-			StorageNew->tcapApplicationEntityIdLen = strlen("");
+		if ((StorageNew->tcapApplicationSubsystemId = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->tcapApplicationSubsystemIdLen = 0;
+		StorageNew->tcapApplicationSubsystemId[StorageNew->tcapApplicationSubsystemIdLen] = 0;
+		if ((StorageNew->tcapApplicationEntityId = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->tcapApplicationEntityIdLen = 0;
+		StorageNew->tcapApplicationEntityId[StorageNew->tcapApplicationEntityIdLen] = 0;
 		StorageNew->tcapOmInterval = 0;
 		StorageNew->tcapOmAE5minIntMeasurementDeleted = 0;
 		StorageNew->tcapOmAE5minIntNewTransactions = 0;
@@ -3541,16 +3856,20 @@ tcapOmAE5minIntTable_create(void)
 		StorageNew->tcapOmAE5minIntCummulativeMeanDuration = 0;
 		StorageNew->tcapOmAE5minIntMaximumOpenTranactions = 0;
 		StorageNew->tcapOmAE5minIntThresholdExceeded = 0;
-
 	}
+      done:
 	DEBUGMSGTL(("tcapOmMIB", "done.\n"));
 	return (StorageNew);
+	goto nomem;
+      nomem:
+	tcapOmAE5minIntTable_destroy(&StorageNew);
+	goto done;
 }
 
 /**
  * @fn struct tcapOmAE5minIntTable_data *tcapOmAE5minIntTable_duplicate(struct tcapOmAE5minIntTable_data *thedata)
  * @param thedata the row structure to duplicate.
- * @brief duplicat a row structure for a table.
+ * @brief duplicate a row structure for a table.
  *
  * Duplicates the specified row structure @param thedata and returns a pointer to the newly
  * allocated row structure on success, or NULL on failure.
@@ -3562,6 +3881,25 @@ tcapOmAE5minIntTable_duplicate(struct tcapOmAE5minIntTable_data *thedata)
 
 	DEBUGMSGTL(("tcapOmMIB", "tcapOmAE5minIntTable_duplicate: duplicating row...  "));
 	if (StorageNew != NULL) {
+		StorageNew->tcapOmAE5minIntTable_id = thedata->tcapOmAE5minIntTable_id;
+		if (!(StorageNew->tcapApplicationSubsystemId = malloc(thedata->tcapApplicationSubsystemIdLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->tcapApplicationSubsystemId, thedata->tcapApplicationSubsystemId, thedata->tcapApplicationSubsystemIdLen);
+		StorageNew->tcapApplicationSubsystemIdLen = thedata->tcapApplicationSubsystemIdLen;
+		StorageNew->tcapApplicationSubsystemId[StorageNew->tcapApplicationSubsystemIdLen] = 0;
+		if (!(StorageNew->tcapApplicationEntityId = malloc(thedata->tcapApplicationEntityIdLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->tcapApplicationEntityId, thedata->tcapApplicationEntityId, thedata->tcapApplicationEntityIdLen);
+		StorageNew->tcapApplicationEntityIdLen = thedata->tcapApplicationEntityIdLen;
+		StorageNew->tcapApplicationEntityId[StorageNew->tcapApplicationEntityIdLen] = 0;
+		StorageNew->tcapOmInterval = thedata->tcapOmInterval;
+		StorageNew->tcapOmAE5minIntMeasurementDeleted = thedata->tcapOmAE5minIntMeasurementDeleted;
+		StorageNew->tcapOmAE5minIntNewTransactions = thedata->tcapOmAE5minIntNewTransactions;
+		StorageNew->tcapOmAE5minIntMeanOpenTransactions = thedata->tcapOmAE5minIntMeanOpenTransactions;
+		StorageNew->tcapOmAE5minIntNotUsed = thedata->tcapOmAE5minIntNotUsed;
+		StorageNew->tcapOmAE5minIntCummulativeMeanDuration = thedata->tcapOmAE5minIntCummulativeMeanDuration;
+		StorageNew->tcapOmAE5minIntMaximumOpenTranactions = thedata->tcapOmAE5minIntMaximumOpenTranactions;
+		StorageNew->tcapOmAE5minIntThresholdExceeded = thedata->tcapOmAE5minIntThresholdExceeded;
 	}
       done:
 	DEBUGMSGTL(("tcapOmMIB", "done.\n"));
@@ -3663,7 +4001,7 @@ tcapOmAE5minIntTable_del(struct tcapOmAE5minIntTable_data *thedata)
  * @param line line from configuration file matching the token.
  * @brief parse configuration file for tcapOmAE5minIntTable entries.
  *
- * This callback is called by UCD-SNMP when it prases a configuration file and finds a configuration
+ * This callback is called by UCD-SNMP when it parses a configuration file and finds a configuration
  * file line for the registsred token (in this case tcapOmAE5minIntTable).  This routine is invoked by UCD-SNMP
  * to read the values of each row in the table from the configuration file.  Note that this
  * procedure may exist regardless of the persistence of the table.  If there are no configured
@@ -3729,6 +4067,7 @@ store_tcapOmAE5minIntTable(int majorID, int minorID, void *serverarg, void *clie
 			memset(line, 0, sizeof(line));
 			strcat(line, "tcapOmAE5minIntTable ");
 			cptr = line + strlen(line);
+			(void) cptr;
 			/* XXX: remove individual columns if not persistent */
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->tcapApplicationSubsystemId, &StorageTmp->tcapApplicationSubsystemIdLen);
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->tcapApplicationEntityId, &StorageTmp->tcapApplicationEntityIdLen);
@@ -3763,10 +4102,14 @@ tcapOmAE15minIntTable_create(void)
 	DEBUGMSGTL(("tcapOmMIB", "tcapOmAE15minIntTable_create: creating row...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
-		if ((StorageNew->tcapApplicationSubsystemId = (uint8_t *) strdup("")) != NULL)
-			StorageNew->tcapApplicationSubsystemIdLen = strlen("");
-		if ((StorageNew->tcapApplicationEntityId = (uint8_t *) strdup("")) != NULL)
-			StorageNew->tcapApplicationEntityIdLen = strlen("");
+		if ((StorageNew->tcapApplicationSubsystemId = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->tcapApplicationSubsystemIdLen = 0;
+		StorageNew->tcapApplicationSubsystemId[StorageNew->tcapApplicationSubsystemIdLen] = 0;
+		if ((StorageNew->tcapApplicationEntityId = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->tcapApplicationEntityIdLen = 0;
+		StorageNew->tcapApplicationEntityId[StorageNew->tcapApplicationEntityIdLen] = 0;
 		StorageNew->tcapOmInterval = 0;
 		StorageNew->tcapOmAE15minIntMeasurementDeleted = 0;
 		StorageNew->tcapOmAE15minIntNewTransactions = 0;
@@ -3775,16 +4118,20 @@ tcapOmAE15minIntTable_create(void)
 		StorageNew->tcapOmAE15minIntCummulativeMeanDuration = 0;
 		StorageNew->tcapOmAE15minIntMaximumOpenTranactions = 0;
 		StorageNew->tcapOmAE15minIntThresholdExceeded = 0;
-
 	}
+      done:
 	DEBUGMSGTL(("tcapOmMIB", "done.\n"));
 	return (StorageNew);
+	goto nomem;
+      nomem:
+	tcapOmAE15minIntTable_destroy(&StorageNew);
+	goto done;
 }
 
 /**
  * @fn struct tcapOmAE15minIntTable_data *tcapOmAE15minIntTable_duplicate(struct tcapOmAE15minIntTable_data *thedata)
  * @param thedata the row structure to duplicate.
- * @brief duplicat a row structure for a table.
+ * @brief duplicate a row structure for a table.
  *
  * Duplicates the specified row structure @param thedata and returns a pointer to the newly
  * allocated row structure on success, or NULL on failure.
@@ -3796,6 +4143,25 @@ tcapOmAE15minIntTable_duplicate(struct tcapOmAE15minIntTable_data *thedata)
 
 	DEBUGMSGTL(("tcapOmMIB", "tcapOmAE15minIntTable_duplicate: duplicating row...  "));
 	if (StorageNew != NULL) {
+		StorageNew->tcapOmAE15minIntTable_id = thedata->tcapOmAE15minIntTable_id;
+		if (!(StorageNew->tcapApplicationSubsystemId = malloc(thedata->tcapApplicationSubsystemIdLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->tcapApplicationSubsystemId, thedata->tcapApplicationSubsystemId, thedata->tcapApplicationSubsystemIdLen);
+		StorageNew->tcapApplicationSubsystemIdLen = thedata->tcapApplicationSubsystemIdLen;
+		StorageNew->tcapApplicationSubsystemId[StorageNew->tcapApplicationSubsystemIdLen] = 0;
+		if (!(StorageNew->tcapApplicationEntityId = malloc(thedata->tcapApplicationEntityIdLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->tcapApplicationEntityId, thedata->tcapApplicationEntityId, thedata->tcapApplicationEntityIdLen);
+		StorageNew->tcapApplicationEntityIdLen = thedata->tcapApplicationEntityIdLen;
+		StorageNew->tcapApplicationEntityId[StorageNew->tcapApplicationEntityIdLen] = 0;
+		StorageNew->tcapOmInterval = thedata->tcapOmInterval;
+		StorageNew->tcapOmAE15minIntMeasurementDeleted = thedata->tcapOmAE15minIntMeasurementDeleted;
+		StorageNew->tcapOmAE15minIntNewTransactions = thedata->tcapOmAE15minIntNewTransactions;
+		StorageNew->tcapOmAE15minIntMeanOpenTransactions = thedata->tcapOmAE15minIntMeanOpenTransactions;
+		StorageNew->tcapOmAE15minIntNotUsed = thedata->tcapOmAE15minIntNotUsed;
+		StorageNew->tcapOmAE15minIntCummulativeMeanDuration = thedata->tcapOmAE15minIntCummulativeMeanDuration;
+		StorageNew->tcapOmAE15minIntMaximumOpenTranactions = thedata->tcapOmAE15minIntMaximumOpenTranactions;
+		StorageNew->tcapOmAE15minIntThresholdExceeded = thedata->tcapOmAE15minIntThresholdExceeded;
 	}
       done:
 	DEBUGMSGTL(("tcapOmMIB", "done.\n"));
@@ -3897,7 +4263,7 @@ tcapOmAE15minIntTable_del(struct tcapOmAE15minIntTable_data *thedata)
  * @param line line from configuration file matching the token.
  * @brief parse configuration file for tcapOmAE15minIntTable entries.
  *
- * This callback is called by UCD-SNMP when it prases a configuration file and finds a configuration
+ * This callback is called by UCD-SNMP when it parses a configuration file and finds a configuration
  * file line for the registsred token (in this case tcapOmAE15minIntTable).  This routine is invoked by UCD-SNMP
  * to read the values of each row in the table from the configuration file.  Note that this
  * procedure may exist regardless of the persistence of the table.  If there are no configured
@@ -3963,6 +4329,7 @@ store_tcapOmAE15minIntTable(int majorID, int minorID, void *serverarg, void *cli
 			memset(line, 0, sizeof(line));
 			strcat(line, "tcapOmAE15minIntTable ");
 			cptr = line + strlen(line);
+			(void) cptr;
 			/* XXX: remove individual columns if not persistent */
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->tcapApplicationSubsystemId, &StorageTmp->tcapApplicationSubsystemIdLen);
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->tcapApplicationEntityId, &StorageTmp->tcapApplicationEntityIdLen);
@@ -3997,10 +4364,14 @@ tcapOmTcTable_create(void)
 	DEBUGMSGTL(("tcapOmMIB", "tcapOmTcTable_create: creating row...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
-		if ((StorageNew->tcapApplicationSubsystemId = (uint8_t *) strdup("")) != NULL)
-			StorageNew->tcapApplicationSubsystemIdLen = strlen("");
-		if ((StorageNew->tcapApplicationEntityId = (uint8_t *) strdup("")) != NULL)
-			StorageNew->tcapApplicationEntityIdLen = strlen("");
+		if ((StorageNew->tcapApplicationSubsystemId = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->tcapApplicationSubsystemIdLen = 0;
+		StorageNew->tcapApplicationSubsystemId[StorageNew->tcapApplicationSubsystemIdLen] = 0;
+		if ((StorageNew->tcapApplicationEntityId = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->tcapApplicationEntityIdLen = 0;
+		StorageNew->tcapApplicationEntityId[StorageNew->tcapApplicationEntityIdLen] = 0;
 		StorageNew->tcapOmTcPabortRecvUnrecTid = 0;
 		StorageNew->tcapOmTcPabortRecvResourceLim = 0;
 		StorageNew->tcapOmTcRejectRecvResourceLim = 0;
@@ -4015,16 +4386,20 @@ tcapOmTcTable_create(void)
 		StorageNew->tcapOmTcTpErrors = 0;
 		StorageNew->tcapOmTc5minValidIntervals = 0;
 		StorageNew->tcapOmTc15minValidIntervals = 0;
-
 	}
+      done:
 	DEBUGMSGTL(("tcapOmMIB", "done.\n"));
 	return (StorageNew);
+	goto nomem;
+      nomem:
+	tcapOmTcTable_destroy(&StorageNew);
+	goto done;
 }
 
 /**
  * @fn struct tcapOmTcTable_data *tcapOmTcTable_duplicate(struct tcapOmTcTable_data *thedata)
  * @param thedata the row structure to duplicate.
- * @brief duplicat a row structure for a table.
+ * @brief duplicate a row structure for a table.
  *
  * Duplicates the specified row structure @param thedata and returns a pointer to the newly
  * allocated row structure on success, or NULL on failure.
@@ -4036,6 +4411,31 @@ tcapOmTcTable_duplicate(struct tcapOmTcTable_data *thedata)
 
 	DEBUGMSGTL(("tcapOmMIB", "tcapOmTcTable_duplicate: duplicating row...  "));
 	if (StorageNew != NULL) {
+		StorageNew->tcapOmTcTable_id = thedata->tcapOmTcTable_id;
+		if (!(StorageNew->tcapApplicationSubsystemId = malloc(thedata->tcapApplicationSubsystemIdLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->tcapApplicationSubsystemId, thedata->tcapApplicationSubsystemId, thedata->tcapApplicationSubsystemIdLen);
+		StorageNew->tcapApplicationSubsystemIdLen = thedata->tcapApplicationSubsystemIdLen;
+		StorageNew->tcapApplicationSubsystemId[StorageNew->tcapApplicationSubsystemIdLen] = 0;
+		if (!(StorageNew->tcapApplicationEntityId = malloc(thedata->tcapApplicationEntityIdLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->tcapApplicationEntityId, thedata->tcapApplicationEntityId, thedata->tcapApplicationEntityIdLen);
+		StorageNew->tcapApplicationEntityIdLen = thedata->tcapApplicationEntityIdLen;
+		StorageNew->tcapApplicationEntityId[StorageNew->tcapApplicationEntityIdLen] = 0;
+		StorageNew->tcapOmTcPabortRecvUnrecTid = thedata->tcapOmTcPabortRecvUnrecTid;
+		StorageNew->tcapOmTcPabortRecvResourceLim = thedata->tcapOmTcPabortRecvResourceLim;
+		StorageNew->tcapOmTcRejectRecvResourceLim = thedata->tcapOmTcRejectRecvResourceLim;
+		StorageNew->tcapOmTcPabortSentUnrecTid = thedata->tcapOmTcPabortSentUnrecTid;
+		StorageNew->tcapOmTcPabortSentResourceLim = thedata->tcapOmTcPabortSentResourceLim;
+		StorageNew->tcapOmTcRejectSentResourceLim = thedata->tcapOmTcRejectSentResourceLim;
+		StorageNew->tcapOmTcTcUserCancel = thedata->tcapOmTcTcUserCancel;
+		StorageNew->tcapOmTcMessagesDiscarded = thedata->tcapOmTcMessagesDiscarded;
+		StorageNew->tcapOmTcNotUsed = thedata->tcapOmTcNotUsed;
+		StorageNew->tcapOmTcPabortsReceived = thedata->tcapOmTcPabortsReceived;
+		StorageNew->tcapOmTcTcUserRejectsReceived = thedata->tcapOmTcTcUserRejectsReceived;
+		StorageNew->tcapOmTcTpErrors = thedata->tcapOmTcTpErrors;
+		StorageNew->tcapOmTc5minValidIntervals = thedata->tcapOmTc5minValidIntervals;
+		StorageNew->tcapOmTc15minValidIntervals = thedata->tcapOmTc15minValidIntervals;
 	}
       done:
 	DEBUGMSGTL(("tcapOmMIB", "done.\n"));
@@ -4135,7 +4535,7 @@ tcapOmTcTable_del(struct tcapOmTcTable_data *thedata)
  * @param line line from configuration file matching the token.
  * @brief parse configuration file for tcapOmTcTable entries.
  *
- * This callback is called by UCD-SNMP when it prases a configuration file and finds a configuration
+ * This callback is called by UCD-SNMP when it parses a configuration file and finds a configuration
  * file line for the registsred token (in this case tcapOmTcTable).  This routine is invoked by UCD-SNMP
  * to read the values of each row in the table from the configuration file.  Note that this
  * procedure may exist regardless of the persistence of the table.  If there are no configured
@@ -4207,6 +4607,7 @@ store_tcapOmTcTable(int majorID, int minorID, void *serverarg, void *clientarg)
 			memset(line, 0, sizeof(line));
 			strcat(line, "tcapOmTcTable ");
 			cptr = line + strlen(line);
+			(void) cptr;
 			/* XXX: remove individual columns if not persistent */
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->tcapApplicationSubsystemId, &StorageTmp->tcapApplicationSubsystemIdLen);
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->tcapApplicationEntityId, &StorageTmp->tcapApplicationEntityIdLen);
@@ -4247,10 +4648,14 @@ tcapOmTcCurrentTable_create(void)
 	DEBUGMSGTL(("tcapOmMIB", "tcapOmTcCurrentTable_create: creating row...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
-		if ((StorageNew->tcapApplicationSubsystemId = (uint8_t *) strdup("")) != NULL)
-			StorageNew->tcapApplicationSubsystemIdLen = strlen("");
-		if ((StorageNew->tcapApplicationEntityId = (uint8_t *) strdup("")) != NULL)
-			StorageNew->tcapApplicationEntityIdLen = strlen("");
+		if ((StorageNew->tcapApplicationSubsystemId = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->tcapApplicationSubsystemIdLen = 0;
+		StorageNew->tcapApplicationSubsystemId[StorageNew->tcapApplicationSubsystemIdLen] = 0;
+		if ((StorageNew->tcapApplicationEntityId = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->tcapApplicationEntityIdLen = 0;
+		StorageNew->tcapApplicationEntityId[StorageNew->tcapApplicationEntityIdLen] = 0;
 		StorageNew->tcapOmTcCurrentPabortRecvUnrecTid = 0;
 		StorageNew->tcapOmTcCurrentPabortRecvResourceLim = 0;
 		StorageNew->tcapOmTcCurrentRejectRecvResourceLim = 0;
@@ -4263,16 +4668,20 @@ tcapOmTcCurrentTable_create(void)
 		StorageNew->tcapOmTcCurrentPabortsReceived = 0;
 		StorageNew->tcapOmTcCurrentTcUserRejectsReceived = 0;
 		StorageNew->tcapOmTcCurrentTpErrors = 0;
-
 	}
+      done:
 	DEBUGMSGTL(("tcapOmMIB", "done.\n"));
 	return (StorageNew);
+	goto nomem;
+      nomem:
+	tcapOmTcCurrentTable_destroy(&StorageNew);
+	goto done;
 }
 
 /**
  * @fn struct tcapOmTcCurrentTable_data *tcapOmTcCurrentTable_duplicate(struct tcapOmTcCurrentTable_data *thedata)
  * @param thedata the row structure to duplicate.
- * @brief duplicat a row structure for a table.
+ * @brief duplicate a row structure for a table.
  *
  * Duplicates the specified row structure @param thedata and returns a pointer to the newly
  * allocated row structure on success, or NULL on failure.
@@ -4284,6 +4693,29 @@ tcapOmTcCurrentTable_duplicate(struct tcapOmTcCurrentTable_data *thedata)
 
 	DEBUGMSGTL(("tcapOmMIB", "tcapOmTcCurrentTable_duplicate: duplicating row...  "));
 	if (StorageNew != NULL) {
+		StorageNew->tcapOmTcCurrentTable_id = thedata->tcapOmTcCurrentTable_id;
+		if (!(StorageNew->tcapApplicationSubsystemId = malloc(thedata->tcapApplicationSubsystemIdLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->tcapApplicationSubsystemId, thedata->tcapApplicationSubsystemId, thedata->tcapApplicationSubsystemIdLen);
+		StorageNew->tcapApplicationSubsystemIdLen = thedata->tcapApplicationSubsystemIdLen;
+		StorageNew->tcapApplicationSubsystemId[StorageNew->tcapApplicationSubsystemIdLen] = 0;
+		if (!(StorageNew->tcapApplicationEntityId = malloc(thedata->tcapApplicationEntityIdLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->tcapApplicationEntityId, thedata->tcapApplicationEntityId, thedata->tcapApplicationEntityIdLen);
+		StorageNew->tcapApplicationEntityIdLen = thedata->tcapApplicationEntityIdLen;
+		StorageNew->tcapApplicationEntityId[StorageNew->tcapApplicationEntityIdLen] = 0;
+		StorageNew->tcapOmTcCurrentPabortRecvUnrecTid = thedata->tcapOmTcCurrentPabortRecvUnrecTid;
+		StorageNew->tcapOmTcCurrentPabortRecvResourceLim = thedata->tcapOmTcCurrentPabortRecvResourceLim;
+		StorageNew->tcapOmTcCurrentRejectRecvResourceLim = thedata->tcapOmTcCurrentRejectRecvResourceLim;
+		StorageNew->tcapOmTcCurrentPabortSentUnrecTid = thedata->tcapOmTcCurrentPabortSentUnrecTid;
+		StorageNew->tcapOmTcCurrentPabortSentResourceLim = thedata->tcapOmTcCurrentPabortSentResourceLim;
+		StorageNew->tcapOmTcCurrentRejectSentResourceLim = thedata->tcapOmTcCurrentRejectSentResourceLim;
+		StorageNew->tcapOmTcCurrentTcUserCancel = thedata->tcapOmTcCurrentTcUserCancel;
+		StorageNew->tcapOmTcCurrentMessagesDiscarded = thedata->tcapOmTcCurrentMessagesDiscarded;
+		StorageNew->tcapOmTcCurrentNotUsed = thedata->tcapOmTcCurrentNotUsed;
+		StorageNew->tcapOmTcCurrentPabortsReceived = thedata->tcapOmTcCurrentPabortsReceived;
+		StorageNew->tcapOmTcCurrentTcUserRejectsReceived = thedata->tcapOmTcCurrentTcUserRejectsReceived;
+		StorageNew->tcapOmTcCurrentTpErrors = thedata->tcapOmTcCurrentTpErrors;
 	}
       done:
 	DEBUGMSGTL(("tcapOmMIB", "done.\n"));
@@ -4383,7 +4815,7 @@ tcapOmTcCurrentTable_del(struct tcapOmTcCurrentTable_data *thedata)
  * @param line line from configuration file matching the token.
  * @brief parse configuration file for tcapOmTcCurrentTable entries.
  *
- * This callback is called by UCD-SNMP when it prases a configuration file and finds a configuration
+ * This callback is called by UCD-SNMP when it parses a configuration file and finds a configuration
  * file line for the registsred token (in this case tcapOmTcCurrentTable).  This routine is invoked by UCD-SNMP
  * to read the values of each row in the table from the configuration file.  Note that this
  * procedure may exist regardless of the persistence of the table.  If there are no configured
@@ -4453,6 +4885,7 @@ store_tcapOmTcCurrentTable(int majorID, int minorID, void *serverarg, void *clie
 			memset(line, 0, sizeof(line));
 			strcat(line, "tcapOmTcCurrentTable ");
 			cptr = line + strlen(line);
+			(void) cptr;
 			/* XXX: remove individual columns if not persistent */
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->tcapApplicationSubsystemId, &StorageTmp->tcapApplicationSubsystemIdLen);
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->tcapApplicationEntityId, &StorageTmp->tcapApplicationEntityIdLen);
@@ -4491,10 +4924,14 @@ tcapOmTc5minIntTable_create(void)
 	DEBUGMSGTL(("tcapOmMIB", "tcapOmTc5minIntTable_create: creating row...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
-		if ((StorageNew->tcapApplicationSubsystemId = (uint8_t *) strdup("")) != NULL)
-			StorageNew->tcapApplicationSubsystemIdLen = strlen("");
-		if ((StorageNew->tcapApplicationEntityId = (uint8_t *) strdup("")) != NULL)
-			StorageNew->tcapApplicationEntityIdLen = strlen("");
+		if ((StorageNew->tcapApplicationSubsystemId = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->tcapApplicationSubsystemIdLen = 0;
+		StorageNew->tcapApplicationSubsystemId[StorageNew->tcapApplicationSubsystemIdLen] = 0;
+		if ((StorageNew->tcapApplicationEntityId = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->tcapApplicationEntityIdLen = 0;
+		StorageNew->tcapApplicationEntityId[StorageNew->tcapApplicationEntityIdLen] = 0;
 		StorageNew->tcapOmInterval = 0;
 		StorageNew->tcapOmTc5minIntPabortRecvUnrecTid = 0;
 		StorageNew->tcapOmTc5minIntPabortRecvResourceLim = 0;
@@ -4508,16 +4945,20 @@ tcapOmTc5minIntTable_create(void)
 		StorageNew->tcapOmTc5minIntPabortsReceived = 0;
 		StorageNew->tcapOmTc5minIntTcUserRejectsReceived = 0;
 		StorageNew->tcapOmTc5minIntTpErrors = 0;
-
 	}
+      done:
 	DEBUGMSGTL(("tcapOmMIB", "done.\n"));
 	return (StorageNew);
+	goto nomem;
+      nomem:
+	tcapOmTc5minIntTable_destroy(&StorageNew);
+	goto done;
 }
 
 /**
  * @fn struct tcapOmTc5minIntTable_data *tcapOmTc5minIntTable_duplicate(struct tcapOmTc5minIntTable_data *thedata)
  * @param thedata the row structure to duplicate.
- * @brief duplicat a row structure for a table.
+ * @brief duplicate a row structure for a table.
  *
  * Duplicates the specified row structure @param thedata and returns a pointer to the newly
  * allocated row structure on success, or NULL on failure.
@@ -4529,6 +4970,30 @@ tcapOmTc5minIntTable_duplicate(struct tcapOmTc5minIntTable_data *thedata)
 
 	DEBUGMSGTL(("tcapOmMIB", "tcapOmTc5minIntTable_duplicate: duplicating row...  "));
 	if (StorageNew != NULL) {
+		StorageNew->tcapOmTc5minIntTable_id = thedata->tcapOmTc5minIntTable_id;
+		if (!(StorageNew->tcapApplicationSubsystemId = malloc(thedata->tcapApplicationSubsystemIdLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->tcapApplicationSubsystemId, thedata->tcapApplicationSubsystemId, thedata->tcapApplicationSubsystemIdLen);
+		StorageNew->tcapApplicationSubsystemIdLen = thedata->tcapApplicationSubsystemIdLen;
+		StorageNew->tcapApplicationSubsystemId[StorageNew->tcapApplicationSubsystemIdLen] = 0;
+		if (!(StorageNew->tcapApplicationEntityId = malloc(thedata->tcapApplicationEntityIdLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->tcapApplicationEntityId, thedata->tcapApplicationEntityId, thedata->tcapApplicationEntityIdLen);
+		StorageNew->tcapApplicationEntityIdLen = thedata->tcapApplicationEntityIdLen;
+		StorageNew->tcapApplicationEntityId[StorageNew->tcapApplicationEntityIdLen] = 0;
+		StorageNew->tcapOmInterval = thedata->tcapOmInterval;
+		StorageNew->tcapOmTc5minIntPabortRecvUnrecTid = thedata->tcapOmTc5minIntPabortRecvUnrecTid;
+		StorageNew->tcapOmTc5minIntPabortRecvResourceLim = thedata->tcapOmTc5minIntPabortRecvResourceLim;
+		StorageNew->tcapOmTc5minIntRejectRecvResourceLim = thedata->tcapOmTc5minIntRejectRecvResourceLim;
+		StorageNew->tcapOmTc5minIntPabortSentUnrecTid = thedata->tcapOmTc5minIntPabortSentUnrecTid;
+		StorageNew->tcapOmTc5minIntPabortSentResourceLim = thedata->tcapOmTc5minIntPabortSentResourceLim;
+		StorageNew->tcapOmTc5minIntRejectSentResourceLim = thedata->tcapOmTc5minIntRejectSentResourceLim;
+		StorageNew->tcapOmTc5minIntTcUserCancel = thedata->tcapOmTc5minIntTcUserCancel;
+		StorageNew->tcapOmTc5minIntMessagesDiscarded = thedata->tcapOmTc5minIntMessagesDiscarded;
+		StorageNew->tcapOmTc5minIntNotUsed = thedata->tcapOmTc5minIntNotUsed;
+		StorageNew->tcapOmTc5minIntPabortsReceived = thedata->tcapOmTc5minIntPabortsReceived;
+		StorageNew->tcapOmTc5minIntTcUserRejectsReceived = thedata->tcapOmTc5minIntTcUserRejectsReceived;
+		StorageNew->tcapOmTc5minIntTpErrors = thedata->tcapOmTc5minIntTpErrors;
 	}
       done:
 	DEBUGMSGTL(("tcapOmMIB", "done.\n"));
@@ -4630,7 +5095,7 @@ tcapOmTc5minIntTable_del(struct tcapOmTc5minIntTable_data *thedata)
  * @param line line from configuration file matching the token.
  * @brief parse configuration file for tcapOmTc5minIntTable entries.
  *
- * This callback is called by UCD-SNMP when it prases a configuration file and finds a configuration
+ * This callback is called by UCD-SNMP when it parses a configuration file and finds a configuration
  * file line for the registsred token (in this case tcapOmTc5minIntTable).  This routine is invoked by UCD-SNMP
  * to read the values of each row in the table from the configuration file.  Note that this
  * procedure may exist regardless of the persistence of the table.  If there are no configured
@@ -4701,6 +5166,7 @@ store_tcapOmTc5minIntTable(int majorID, int minorID, void *serverarg, void *clie
 			memset(line, 0, sizeof(line));
 			strcat(line, "tcapOmTc5minIntTable ");
 			cptr = line + strlen(line);
+			(void) cptr;
 			/* XXX: remove individual columns if not persistent */
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->tcapApplicationSubsystemId, &StorageTmp->tcapApplicationSubsystemIdLen);
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->tcapApplicationEntityId, &StorageTmp->tcapApplicationEntityIdLen);
@@ -4740,10 +5206,14 @@ tcapOmTc15minIntTable_create(void)
 	DEBUGMSGTL(("tcapOmMIB", "tcapOmTc15minIntTable_create: creating row...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
-		if ((StorageNew->tcapApplicationSubsystemId = (uint8_t *) strdup("")) != NULL)
-			StorageNew->tcapApplicationSubsystemIdLen = strlen("");
-		if ((StorageNew->tcapApplicationEntityId = (uint8_t *) strdup("")) != NULL)
-			StorageNew->tcapApplicationEntityIdLen = strlen("");
+		if ((StorageNew->tcapApplicationSubsystemId = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->tcapApplicationSubsystemIdLen = 0;
+		StorageNew->tcapApplicationSubsystemId[StorageNew->tcapApplicationSubsystemIdLen] = 0;
+		if ((StorageNew->tcapApplicationEntityId = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->tcapApplicationEntityIdLen = 0;
+		StorageNew->tcapApplicationEntityId[StorageNew->tcapApplicationEntityIdLen] = 0;
 		StorageNew->tcapOmInterval = 0;
 		StorageNew->tcapOmTc15minIntPabortRecvUnrecTid = 0;
 		StorageNew->tcapOmTc15minIntPabortRecvResourceLim = 0;
@@ -4757,16 +5227,20 @@ tcapOmTc15minIntTable_create(void)
 		StorageNew->tcapOmTc15minIntPabortsReceived = 0;
 		StorageNew->tcapOmTc15minIntTcUserRejectsReceived = 0;
 		StorageNew->tcapOmTc15minIntTpErrors = 0;
-
 	}
+      done:
 	DEBUGMSGTL(("tcapOmMIB", "done.\n"));
 	return (StorageNew);
+	goto nomem;
+      nomem:
+	tcapOmTc15minIntTable_destroy(&StorageNew);
+	goto done;
 }
 
 /**
  * @fn struct tcapOmTc15minIntTable_data *tcapOmTc15minIntTable_duplicate(struct tcapOmTc15minIntTable_data *thedata)
  * @param thedata the row structure to duplicate.
- * @brief duplicat a row structure for a table.
+ * @brief duplicate a row structure for a table.
  *
  * Duplicates the specified row structure @param thedata and returns a pointer to the newly
  * allocated row structure on success, or NULL on failure.
@@ -4778,6 +5252,30 @@ tcapOmTc15minIntTable_duplicate(struct tcapOmTc15minIntTable_data *thedata)
 
 	DEBUGMSGTL(("tcapOmMIB", "tcapOmTc15minIntTable_duplicate: duplicating row...  "));
 	if (StorageNew != NULL) {
+		StorageNew->tcapOmTc15minIntTable_id = thedata->tcapOmTc15minIntTable_id;
+		if (!(StorageNew->tcapApplicationSubsystemId = malloc(thedata->tcapApplicationSubsystemIdLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->tcapApplicationSubsystemId, thedata->tcapApplicationSubsystemId, thedata->tcapApplicationSubsystemIdLen);
+		StorageNew->tcapApplicationSubsystemIdLen = thedata->tcapApplicationSubsystemIdLen;
+		StorageNew->tcapApplicationSubsystemId[StorageNew->tcapApplicationSubsystemIdLen] = 0;
+		if (!(StorageNew->tcapApplicationEntityId = malloc(thedata->tcapApplicationEntityIdLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->tcapApplicationEntityId, thedata->tcapApplicationEntityId, thedata->tcapApplicationEntityIdLen);
+		StorageNew->tcapApplicationEntityIdLen = thedata->tcapApplicationEntityIdLen;
+		StorageNew->tcapApplicationEntityId[StorageNew->tcapApplicationEntityIdLen] = 0;
+		StorageNew->tcapOmInterval = thedata->tcapOmInterval;
+		StorageNew->tcapOmTc15minIntPabortRecvUnrecTid = thedata->tcapOmTc15minIntPabortRecvUnrecTid;
+		StorageNew->tcapOmTc15minIntPabortRecvResourceLim = thedata->tcapOmTc15minIntPabortRecvResourceLim;
+		StorageNew->tcapOmTc15minIntRejectRecvResourceLim = thedata->tcapOmTc15minIntRejectRecvResourceLim;
+		StorageNew->tcapOmTc15minIntPabortSentUnrecTid = thedata->tcapOmTc15minIntPabortSentUnrecTid;
+		StorageNew->tcapOmTc15minIntPabortSentResourceLim = thedata->tcapOmTc15minIntPabortSentResourceLim;
+		StorageNew->tcapOmTc15minIntRejectSentResourceLim = thedata->tcapOmTc15minIntRejectSentResourceLim;
+		StorageNew->tcapOmTc15minIntTcUserCancel = thedata->tcapOmTc15minIntTcUserCancel;
+		StorageNew->tcapOmTc15minIntMessagesDiscarded = thedata->tcapOmTc15minIntMessagesDiscarded;
+		StorageNew->tcapOmTc15minIntNotUsed = thedata->tcapOmTc15minIntNotUsed;
+		StorageNew->tcapOmTc15minIntPabortsReceived = thedata->tcapOmTc15minIntPabortsReceived;
+		StorageNew->tcapOmTc15minIntTcUserRejectsReceived = thedata->tcapOmTc15minIntTcUserRejectsReceived;
+		StorageNew->tcapOmTc15minIntTpErrors = thedata->tcapOmTc15minIntTpErrors;
 	}
       done:
 	DEBUGMSGTL(("tcapOmMIB", "done.\n"));
@@ -4879,7 +5377,7 @@ tcapOmTc15minIntTable_del(struct tcapOmTc15minIntTable_data *thedata)
  * @param line line from configuration file matching the token.
  * @brief parse configuration file for tcapOmTc15minIntTable entries.
  *
- * This callback is called by UCD-SNMP when it prases a configuration file and finds a configuration
+ * This callback is called by UCD-SNMP when it parses a configuration file and finds a configuration
  * file line for the registsred token (in this case tcapOmTc15minIntTable).  This routine is invoked by UCD-SNMP
  * to read the values of each row in the table from the configuration file.  Note that this
  * procedure may exist regardless of the persistence of the table.  If there are no configured
@@ -4950,6 +5448,7 @@ store_tcapOmTc15minIntTable(int majorID, int minorID, void *serverarg, void *cli
 			memset(line, 0, sizeof(line));
 			strcat(line, "tcapOmTc15minIntTable ");
 			cptr = line + strlen(line);
+			(void) cptr;
 			/* XXX: remove individual columns if not persistent */
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->tcapApplicationSubsystemId, &StorageTmp->tcapApplicationSubsystemIdLen);
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->tcapApplicationEntityId, &StorageTmp->tcapApplicationEntityIdLen);
@@ -4989,10 +5488,14 @@ tcapOmDevelRecvTable_create(void)
 	DEBUGMSGTL(("tcapOmMIB", "tcapOmDevelRecvTable_create: creating row...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
-		if ((StorageNew->tcapApplicationSubsystemId = (uint8_t *) strdup("")) != NULL)
-			StorageNew->tcapApplicationSubsystemIdLen = strlen("");
-		if ((StorageNew->tcapApplicationEntityId = (uint8_t *) strdup("")) != NULL)
-			StorageNew->tcapApplicationEntityIdLen = strlen("");
+		if ((StorageNew->tcapApplicationSubsystemId = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->tcapApplicationSubsystemIdLen = 0;
+		StorageNew->tcapApplicationSubsystemId[StorageNew->tcapApplicationSubsystemIdLen] = 0;
+		if ((StorageNew->tcapApplicationEntityId = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->tcapApplicationEntityIdLen = 0;
+		StorageNew->tcapApplicationEntityId[StorageNew->tcapApplicationEntityIdLen] = 0;
 		StorageNew->tcapOmDevelRecvPabortMessageType = 0;
 		StorageNew->tcapOmDevelRecvPabortIncorrectTp = 0;
 		StorageNew->tcapOmDevelRecvPabortBadTp = 0;
@@ -5016,16 +5519,20 @@ tcapOmDevelRecvTable_create(void)
 		StorageNew->tcapOmDevelRecvUsrRejParmRetError = 0;
 		StorageNew->tcapOmDevelRecv5minValidIntervals = 0;
 		StorageNew->tcapOmDevelRecv15minValidIntervals = 0;
-
 	}
+      done:
 	DEBUGMSGTL(("tcapOmMIB", "done.\n"));
 	return (StorageNew);
+	goto nomem;
+      nomem:
+	tcapOmDevelRecvTable_destroy(&StorageNew);
+	goto done;
 }
 
 /**
  * @fn struct tcapOmDevelRecvTable_data *tcapOmDevelRecvTable_duplicate(struct tcapOmDevelRecvTable_data *thedata)
  * @param thedata the row structure to duplicate.
- * @brief duplicat a row structure for a table.
+ * @brief duplicate a row structure for a table.
  *
  * Duplicates the specified row structure @param thedata and returns a pointer to the newly
  * allocated row structure on success, or NULL on failure.
@@ -5037,6 +5544,40 @@ tcapOmDevelRecvTable_duplicate(struct tcapOmDevelRecvTable_data *thedata)
 
 	DEBUGMSGTL(("tcapOmMIB", "tcapOmDevelRecvTable_duplicate: duplicating row...  "));
 	if (StorageNew != NULL) {
+		StorageNew->tcapOmDevelRecvTable_id = thedata->tcapOmDevelRecvTable_id;
+		if (!(StorageNew->tcapApplicationSubsystemId = malloc(thedata->tcapApplicationSubsystemIdLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->tcapApplicationSubsystemId, thedata->tcapApplicationSubsystemId, thedata->tcapApplicationSubsystemIdLen);
+		StorageNew->tcapApplicationSubsystemIdLen = thedata->tcapApplicationSubsystemIdLen;
+		StorageNew->tcapApplicationSubsystemId[StorageNew->tcapApplicationSubsystemIdLen] = 0;
+		if (!(StorageNew->tcapApplicationEntityId = malloc(thedata->tcapApplicationEntityIdLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->tcapApplicationEntityId, thedata->tcapApplicationEntityId, thedata->tcapApplicationEntityIdLen);
+		StorageNew->tcapApplicationEntityIdLen = thedata->tcapApplicationEntityIdLen;
+		StorageNew->tcapApplicationEntityId[StorageNew->tcapApplicationEntityIdLen] = 0;
+		StorageNew->tcapOmDevelRecvPabortMessageType = thedata->tcapOmDevelRecvPabortMessageType;
+		StorageNew->tcapOmDevelRecvPabortIncorrectTp = thedata->tcapOmDevelRecvPabortIncorrectTp;
+		StorageNew->tcapOmDevelRecvPabortBadTp = thedata->tcapOmDevelRecvPabortBadTp;
+		StorageNew->tcapOmDevelRecvRejectUnrecComp = thedata->tcapOmDevelRecvRejectUnrecComp;
+		StorageNew->tcapOmDevelRecvRejectMistypeComp = thedata->tcapOmDevelRecvRejectMistypeComp;
+		StorageNew->tcapOmDevelRecvRejectBadCompStruct = thedata->tcapOmDevelRecvRejectBadCompStruct;
+		StorageNew->tcapOmDevelRecvRejectUnrecLinkId = thedata->tcapOmDevelRecvRejectUnrecLinkId;
+		StorageNew->tcapOmDevelRecvRejectUnrecIdRetRes = thedata->tcapOmDevelRecvRejectUnrecIdRetRes;
+		StorageNew->tcapOmDevelRecvRejectUnexpRetRes = thedata->tcapOmDevelRecvRejectUnexpRetRes;
+		StorageNew->tcapOmDevelRecvRejectUnrecIdRetErr = thedata->tcapOmDevelRecvRejectUnrecIdRetErr;
+		StorageNew->tcapOmDevelRecvRejectUnexpRetErr = thedata->tcapOmDevelRecvRejectUnexpRetErr;
+		StorageNew->tcapOmDevelRecvUsrRejDupInvokeId = thedata->tcapOmDevelRecvUsrRejDupInvokeId;
+		StorageNew->tcapOmDevelRecvUsrRejUnrecOper = thedata->tcapOmDevelRecvUsrRejUnrecOper;
+		StorageNew->tcapOmDevelRecvUsrRejParmInvoke = thedata->tcapOmDevelRecvUsrRejParmInvoke;
+		StorageNew->tcapOmDevelRecvUsrRejReleasing = thedata->tcapOmDevelRecvUsrRejReleasing;
+		StorageNew->tcapOmDevelRecvUsrRejUnexpLinkResp = thedata->tcapOmDevelRecvUsrRejUnexpLinkResp;
+		StorageNew->tcapOmDevelRecvUsrRejUnexpLinkOper = thedata->tcapOmDevelRecvUsrRejUnexpLinkOper;
+		StorageNew->tcapOmDevelRecvUsrRejUnrecError = thedata->tcapOmDevelRecvUsrRejUnrecError;
+		StorageNew->tcapOmDevelRecvUsrRejUnexpError = thedata->tcapOmDevelRecvUsrRejUnexpError;
+		StorageNew->tcapOmDevelRecvUsrRejParmRetResult = thedata->tcapOmDevelRecvUsrRejParmRetResult;
+		StorageNew->tcapOmDevelRecvUsrRejParmRetError = thedata->tcapOmDevelRecvUsrRejParmRetError;
+		StorageNew->tcapOmDevelRecv5minValidIntervals = thedata->tcapOmDevelRecv5minValidIntervals;
+		StorageNew->tcapOmDevelRecv15minValidIntervals = thedata->tcapOmDevelRecv15minValidIntervals;
 	}
       done:
 	DEBUGMSGTL(("tcapOmMIB", "done.\n"));
@@ -5136,7 +5677,7 @@ tcapOmDevelRecvTable_del(struct tcapOmDevelRecvTable_data *thedata)
  * @param line line from configuration file matching the token.
  * @brief parse configuration file for tcapOmDevelRecvTable entries.
  *
- * This callback is called by UCD-SNMP when it prases a configuration file and finds a configuration
+ * This callback is called by UCD-SNMP when it parses a configuration file and finds a configuration
  * file line for the registsred token (in this case tcapOmDevelRecvTable).  This routine is invoked by UCD-SNMP
  * to read the values of each row in the table from the configuration file.  Note that this
  * procedure may exist regardless of the persistence of the table.  If there are no configured
@@ -5217,6 +5758,7 @@ store_tcapOmDevelRecvTable(int majorID, int minorID, void *serverarg, void *clie
 			memset(line, 0, sizeof(line));
 			strcat(line, "tcapOmDevelRecvTable ");
 			cptr = line + strlen(line);
+			(void) cptr;
 			/* XXX: remove individual columns if not persistent */
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->tcapApplicationSubsystemId, &StorageTmp->tcapApplicationSubsystemIdLen);
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->tcapApplicationEntityId, &StorageTmp->tcapApplicationEntityIdLen);
@@ -5266,10 +5808,14 @@ tcapOmDevelRecvCurrentTable_create(void)
 	DEBUGMSGTL(("tcapOmMIB", "tcapOmDevelRecvCurrentTable_create: creating row...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
-		if ((StorageNew->tcapApplicationSubsystemId = (uint8_t *) strdup("")) != NULL)
-			StorageNew->tcapApplicationSubsystemIdLen = strlen("");
-		if ((StorageNew->tcapApplicationEntityId = (uint8_t *) strdup("")) != NULL)
-			StorageNew->tcapApplicationEntityIdLen = strlen("");
+		if ((StorageNew->tcapApplicationSubsystemId = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->tcapApplicationSubsystemIdLen = 0;
+		StorageNew->tcapApplicationSubsystemId[StorageNew->tcapApplicationSubsystemIdLen] = 0;
+		if ((StorageNew->tcapApplicationEntityId = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->tcapApplicationEntityIdLen = 0;
+		StorageNew->tcapApplicationEntityId[StorageNew->tcapApplicationEntityIdLen] = 0;
 		StorageNew->tcapOmDevelRecvCurrentPabortMessageType = 0;
 		StorageNew->tcapOmDevelRecvCurrentPabortIncorrectTp = 0;
 		StorageNew->tcapOmDevelRecvCurrentPabortBadTp = 0;
@@ -5291,16 +5837,20 @@ tcapOmDevelRecvCurrentTable_create(void)
 		StorageNew->tcapOmDevelRecvCurrentUsrRejUnexpError = 0;
 		StorageNew->tcapOmDevelRecvCurrentUsrRejParmRetResult = 0;
 		StorageNew->tcapOmDevelRecvCurrentUsrRejParmRetError = 0;
-
 	}
+      done:
 	DEBUGMSGTL(("tcapOmMIB", "done.\n"));
 	return (StorageNew);
+	goto nomem;
+      nomem:
+	tcapOmDevelRecvCurrentTable_destroy(&StorageNew);
+	goto done;
 }
 
 /**
  * @fn struct tcapOmDevelRecvCurrentTable_data *tcapOmDevelRecvCurrentTable_duplicate(struct tcapOmDevelRecvCurrentTable_data *thedata)
  * @param thedata the row structure to duplicate.
- * @brief duplicat a row structure for a table.
+ * @brief duplicate a row structure for a table.
  *
  * Duplicates the specified row structure @param thedata and returns a pointer to the newly
  * allocated row structure on success, or NULL on failure.
@@ -5312,6 +5862,38 @@ tcapOmDevelRecvCurrentTable_duplicate(struct tcapOmDevelRecvCurrentTable_data *t
 
 	DEBUGMSGTL(("tcapOmMIB", "tcapOmDevelRecvCurrentTable_duplicate: duplicating row...  "));
 	if (StorageNew != NULL) {
+		StorageNew->tcapOmDevelRecvCurrentTable_id = thedata->tcapOmDevelRecvCurrentTable_id;
+		if (!(StorageNew->tcapApplicationSubsystemId = malloc(thedata->tcapApplicationSubsystemIdLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->tcapApplicationSubsystemId, thedata->tcapApplicationSubsystemId, thedata->tcapApplicationSubsystemIdLen);
+		StorageNew->tcapApplicationSubsystemIdLen = thedata->tcapApplicationSubsystemIdLen;
+		StorageNew->tcapApplicationSubsystemId[StorageNew->tcapApplicationSubsystemIdLen] = 0;
+		if (!(StorageNew->tcapApplicationEntityId = malloc(thedata->tcapApplicationEntityIdLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->tcapApplicationEntityId, thedata->tcapApplicationEntityId, thedata->tcapApplicationEntityIdLen);
+		StorageNew->tcapApplicationEntityIdLen = thedata->tcapApplicationEntityIdLen;
+		StorageNew->tcapApplicationEntityId[StorageNew->tcapApplicationEntityIdLen] = 0;
+		StorageNew->tcapOmDevelRecvCurrentPabortMessageType = thedata->tcapOmDevelRecvCurrentPabortMessageType;
+		StorageNew->tcapOmDevelRecvCurrentPabortIncorrectTp = thedata->tcapOmDevelRecvCurrentPabortIncorrectTp;
+		StorageNew->tcapOmDevelRecvCurrentPabortBadTp = thedata->tcapOmDevelRecvCurrentPabortBadTp;
+		StorageNew->tcapOmDevelRecvCurrentRejectUnrecComp = thedata->tcapOmDevelRecvCurrentRejectUnrecComp;
+		StorageNew->tcapOmDevelRecvCurrentRejectMistypeComp = thedata->tcapOmDevelRecvCurrentRejectMistypeComp;
+		StorageNew->tcapOmDevelRecvCurrentRejectBadCompStruct = thedata->tcapOmDevelRecvCurrentRejectBadCompStruct;
+		StorageNew->tcapOmDevelRecvCurrentRejectUnrecLinkId = thedata->tcapOmDevelRecvCurrentRejectUnrecLinkId;
+		StorageNew->tcapOmDevelRecvCurrentRejectUnrecIdRetRes = thedata->tcapOmDevelRecvCurrentRejectUnrecIdRetRes;
+		StorageNew->tcapOmDevelRecvCurrentRejectUnexpRetRes = thedata->tcapOmDevelRecvCurrentRejectUnexpRetRes;
+		StorageNew->tcapOmDevelRecvCurrentRejectUnrecIdRetErr = thedata->tcapOmDevelRecvCurrentRejectUnrecIdRetErr;
+		StorageNew->tcapOmDevelRecvCurrentRejectUnexpRetErr = thedata->tcapOmDevelRecvCurrentRejectUnexpRetErr;
+		StorageNew->tcapOmDevelRecvCurrentUsrRejDupInvokeId = thedata->tcapOmDevelRecvCurrentUsrRejDupInvokeId;
+		StorageNew->tcapOmDevelRecvCurrentUsrRejUnrecOper = thedata->tcapOmDevelRecvCurrentUsrRejUnrecOper;
+		StorageNew->tcapOmDevelRecvCurrentUsrRejParmInvoke = thedata->tcapOmDevelRecvCurrentUsrRejParmInvoke;
+		StorageNew->tcapOmDevelRecvCurrentUsrRejReleasing = thedata->tcapOmDevelRecvCurrentUsrRejReleasing;
+		StorageNew->tcapOmDevelRecvCurrentUsrRejUnexpLinkResp = thedata->tcapOmDevelRecvCurrentUsrRejUnexpLinkResp;
+		StorageNew->tcapOmDevelRecvCurrentUsrRejUnexpLinkOper = thedata->tcapOmDevelRecvCurrentUsrRejUnexpLinkOper;
+		StorageNew->tcapOmDevelRecvCurrentUsrRejUnrecError = thedata->tcapOmDevelRecvCurrentUsrRejUnrecError;
+		StorageNew->tcapOmDevelRecvCurrentUsrRejUnexpError = thedata->tcapOmDevelRecvCurrentUsrRejUnexpError;
+		StorageNew->tcapOmDevelRecvCurrentUsrRejParmRetResult = thedata->tcapOmDevelRecvCurrentUsrRejParmRetResult;
+		StorageNew->tcapOmDevelRecvCurrentUsrRejParmRetError = thedata->tcapOmDevelRecvCurrentUsrRejParmRetError;
 	}
       done:
 	DEBUGMSGTL(("tcapOmMIB", "done.\n"));
@@ -5411,7 +5993,7 @@ tcapOmDevelRecvCurrentTable_del(struct tcapOmDevelRecvCurrentTable_data *thedata
  * @param line line from configuration file matching the token.
  * @brief parse configuration file for tcapOmDevelRecvCurrentTable entries.
  *
- * This callback is called by UCD-SNMP when it prases a configuration file and finds a configuration
+ * This callback is called by UCD-SNMP when it parses a configuration file and finds a configuration
  * file line for the registsred token (in this case tcapOmDevelRecvCurrentTable).  This routine is invoked by UCD-SNMP
  * to read the values of each row in the table from the configuration file.  Note that this
  * procedure may exist regardless of the persistence of the table.  If there are no configured
@@ -5490,6 +6072,7 @@ store_tcapOmDevelRecvCurrentTable(int majorID, int minorID, void *serverarg, voi
 			memset(line, 0, sizeof(line));
 			strcat(line, "tcapOmDevelRecvCurrentTable ");
 			cptr = line + strlen(line);
+			(void) cptr;
 			/* XXX: remove individual columns if not persistent */
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->tcapApplicationSubsystemId, &StorageTmp->tcapApplicationSubsystemIdLen);
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->tcapApplicationEntityId, &StorageTmp->tcapApplicationEntityIdLen);
@@ -5537,10 +6120,14 @@ tcapOmDevelRecv5minIntTable_create(void)
 	DEBUGMSGTL(("tcapOmMIB", "tcapOmDevelRecv5minIntTable_create: creating row...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
-		if ((StorageNew->tcapApplicationSubsystemId = (uint8_t *) strdup("")) != NULL)
-			StorageNew->tcapApplicationSubsystemIdLen = strlen("");
-		if ((StorageNew->tcapApplicationEntityId = (uint8_t *) strdup("")) != NULL)
-			StorageNew->tcapApplicationEntityIdLen = strlen("");
+		if ((StorageNew->tcapApplicationSubsystemId = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->tcapApplicationSubsystemIdLen = 0;
+		StorageNew->tcapApplicationSubsystemId[StorageNew->tcapApplicationSubsystemIdLen] = 0;
+		if ((StorageNew->tcapApplicationEntityId = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->tcapApplicationEntityIdLen = 0;
+		StorageNew->tcapApplicationEntityId[StorageNew->tcapApplicationEntityIdLen] = 0;
 		StorageNew->tcapOmInterval = 0;
 		StorageNew->tcapOmDevelRecv5minIntPabortMessageType = 0;
 		StorageNew->tcapOmDevelRecv5minIntPabortIncorrectTp = 0;
@@ -5563,16 +6150,20 @@ tcapOmDevelRecv5minIntTable_create(void)
 		StorageNew->tcapOmDevelRecv5minIntUsrRejUnexpError = 0;
 		StorageNew->tcapOmDevelRecv5minIntUsrRejParmRetResult = 0;
 		StorageNew->tcapOmDevelRecv5minIntUsrRejParmRetError = 0;
-
 	}
+      done:
 	DEBUGMSGTL(("tcapOmMIB", "done.\n"));
 	return (StorageNew);
+	goto nomem;
+      nomem:
+	tcapOmDevelRecv5minIntTable_destroy(&StorageNew);
+	goto done;
 }
 
 /**
  * @fn struct tcapOmDevelRecv5minIntTable_data *tcapOmDevelRecv5minIntTable_duplicate(struct tcapOmDevelRecv5minIntTable_data *thedata)
  * @param thedata the row structure to duplicate.
- * @brief duplicat a row structure for a table.
+ * @brief duplicate a row structure for a table.
  *
  * Duplicates the specified row structure @param thedata and returns a pointer to the newly
  * allocated row structure on success, or NULL on failure.
@@ -5584,6 +6175,39 @@ tcapOmDevelRecv5minIntTable_duplicate(struct tcapOmDevelRecv5minIntTable_data *t
 
 	DEBUGMSGTL(("tcapOmMIB", "tcapOmDevelRecv5minIntTable_duplicate: duplicating row...  "));
 	if (StorageNew != NULL) {
+		StorageNew->tcapOmDevelRecv5minIntTable_id = thedata->tcapOmDevelRecv5minIntTable_id;
+		if (!(StorageNew->tcapApplicationSubsystemId = malloc(thedata->tcapApplicationSubsystemIdLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->tcapApplicationSubsystemId, thedata->tcapApplicationSubsystemId, thedata->tcapApplicationSubsystemIdLen);
+		StorageNew->tcapApplicationSubsystemIdLen = thedata->tcapApplicationSubsystemIdLen;
+		StorageNew->tcapApplicationSubsystemId[StorageNew->tcapApplicationSubsystemIdLen] = 0;
+		if (!(StorageNew->tcapApplicationEntityId = malloc(thedata->tcapApplicationEntityIdLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->tcapApplicationEntityId, thedata->tcapApplicationEntityId, thedata->tcapApplicationEntityIdLen);
+		StorageNew->tcapApplicationEntityIdLen = thedata->tcapApplicationEntityIdLen;
+		StorageNew->tcapApplicationEntityId[StorageNew->tcapApplicationEntityIdLen] = 0;
+		StorageNew->tcapOmInterval = thedata->tcapOmInterval;
+		StorageNew->tcapOmDevelRecv5minIntPabortMessageType = thedata->tcapOmDevelRecv5minIntPabortMessageType;
+		StorageNew->tcapOmDevelRecv5minIntPabortIncorrectTp = thedata->tcapOmDevelRecv5minIntPabortIncorrectTp;
+		StorageNew->tcapOmDevelRecv5minIntPabortBadTp = thedata->tcapOmDevelRecv5minIntPabortBadTp;
+		StorageNew->tcapOmDevelRecv5minIntRejectUnrecComp = thedata->tcapOmDevelRecv5minIntRejectUnrecComp;
+		StorageNew->tcapOmDevelRecv5minIntRejectMistypeComp = thedata->tcapOmDevelRecv5minIntRejectMistypeComp;
+		StorageNew->tcapOmDevelRecv5minIntRejectBadCompStruct = thedata->tcapOmDevelRecv5minIntRejectBadCompStruct;
+		StorageNew->tcapOmDevelRecv5minIntRejectUnrecLinkId = thedata->tcapOmDevelRecv5minIntRejectUnrecLinkId;
+		StorageNew->tcapOmDevelRecv5minIntRejectUnrecIdRetRes = thedata->tcapOmDevelRecv5minIntRejectUnrecIdRetRes;
+		StorageNew->tcapOmDevelRecv5minIntRejectUnexpRetRes = thedata->tcapOmDevelRecv5minIntRejectUnexpRetRes;
+		StorageNew->tcapOmDevelRecv5minIntRejectUnrecIdRetErr = thedata->tcapOmDevelRecv5minIntRejectUnrecIdRetErr;
+		StorageNew->tcapOmDevelRecv5minIntRejectUnexpRetErr = thedata->tcapOmDevelRecv5minIntRejectUnexpRetErr;
+		StorageNew->tcapOmDevelRecv5minIntUsrRejDupInvokeId = thedata->tcapOmDevelRecv5minIntUsrRejDupInvokeId;
+		StorageNew->tcapOmDevelRecv5minIntUsrRejUnrecOper = thedata->tcapOmDevelRecv5minIntUsrRejUnrecOper;
+		StorageNew->tcapOmDevelRecv5minIntUsrRejParmInvoke = thedata->tcapOmDevelRecv5minIntUsrRejParmInvoke;
+		StorageNew->tcapOmDevelRecv5minIntUsrRejReleasing = thedata->tcapOmDevelRecv5minIntUsrRejReleasing;
+		StorageNew->tcapOmDevelRecv5minIntUsrRejUnexpLinkResp = thedata->tcapOmDevelRecv5minIntUsrRejUnexpLinkResp;
+		StorageNew->tcapOmDevelRecv5minIntUsrRejUnexpLinkOper = thedata->tcapOmDevelRecv5minIntUsrRejUnexpLinkOper;
+		StorageNew->tcapOmDevelRecv5minIntUsrRejUnrecError = thedata->tcapOmDevelRecv5minIntUsrRejUnrecError;
+		StorageNew->tcapOmDevelRecv5minIntUsrRejUnexpError = thedata->tcapOmDevelRecv5minIntUsrRejUnexpError;
+		StorageNew->tcapOmDevelRecv5minIntUsrRejParmRetResult = thedata->tcapOmDevelRecv5minIntUsrRejParmRetResult;
+		StorageNew->tcapOmDevelRecv5minIntUsrRejParmRetError = thedata->tcapOmDevelRecv5minIntUsrRejParmRetError;
 	}
       done:
 	DEBUGMSGTL(("tcapOmMIB", "done.\n"));
@@ -5685,7 +6309,7 @@ tcapOmDevelRecv5minIntTable_del(struct tcapOmDevelRecv5minIntTable_data *thedata
  * @param line line from configuration file matching the token.
  * @brief parse configuration file for tcapOmDevelRecv5minIntTable entries.
  *
- * This callback is called by UCD-SNMP when it prases a configuration file and finds a configuration
+ * This callback is called by UCD-SNMP when it parses a configuration file and finds a configuration
  * file line for the registsred token (in this case tcapOmDevelRecv5minIntTable).  This routine is invoked by UCD-SNMP
  * to read the values of each row in the table from the configuration file.  Note that this
  * procedure may exist regardless of the persistence of the table.  If there are no configured
@@ -5765,6 +6389,7 @@ store_tcapOmDevelRecv5minIntTable(int majorID, int minorID, void *serverarg, voi
 			memset(line, 0, sizeof(line));
 			strcat(line, "tcapOmDevelRecv5minIntTable ");
 			cptr = line + strlen(line);
+			(void) cptr;
 			/* XXX: remove individual columns if not persistent */
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->tcapApplicationSubsystemId, &StorageTmp->tcapApplicationSubsystemIdLen);
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->tcapApplicationEntityId, &StorageTmp->tcapApplicationEntityIdLen);
@@ -5813,10 +6438,14 @@ tcapOmDevelRecv15minIntTable_create(void)
 	DEBUGMSGTL(("tcapOmMIB", "tcapOmDevelRecv15minIntTable_create: creating row...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
-		if ((StorageNew->tcapApplicationSubsystemId = (uint8_t *) strdup("")) != NULL)
-			StorageNew->tcapApplicationSubsystemIdLen = strlen("");
-		if ((StorageNew->tcapApplicationEntityId = (uint8_t *) strdup("")) != NULL)
-			StorageNew->tcapApplicationEntityIdLen = strlen("");
+		if ((StorageNew->tcapApplicationSubsystemId = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->tcapApplicationSubsystemIdLen = 0;
+		StorageNew->tcapApplicationSubsystemId[StorageNew->tcapApplicationSubsystemIdLen] = 0;
+		if ((StorageNew->tcapApplicationEntityId = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->tcapApplicationEntityIdLen = 0;
+		StorageNew->tcapApplicationEntityId[StorageNew->tcapApplicationEntityIdLen] = 0;
 		StorageNew->tcapOmInterval = 0;
 		StorageNew->tcapOmDevelRecv15minIntPabortMessageType = 0;
 		StorageNew->tcapOmDevelRecv15minIntPabortIncorrectTp = 0;
@@ -5839,16 +6468,20 @@ tcapOmDevelRecv15minIntTable_create(void)
 		StorageNew->tcapOmDevelRecv15minIntUsrRejUnexpError = 0;
 		StorageNew->tcapOmDevelRecv15minIntUsrRejParmRetResult = 0;
 		StorageNew->tcapOmDevelRecv15minIntUsrRejParmRetError = 0;
-
 	}
+      done:
 	DEBUGMSGTL(("tcapOmMIB", "done.\n"));
 	return (StorageNew);
+	goto nomem;
+      nomem:
+	tcapOmDevelRecv15minIntTable_destroy(&StorageNew);
+	goto done;
 }
 
 /**
  * @fn struct tcapOmDevelRecv15minIntTable_data *tcapOmDevelRecv15minIntTable_duplicate(struct tcapOmDevelRecv15minIntTable_data *thedata)
  * @param thedata the row structure to duplicate.
- * @brief duplicat a row structure for a table.
+ * @brief duplicate a row structure for a table.
  *
  * Duplicates the specified row structure @param thedata and returns a pointer to the newly
  * allocated row structure on success, or NULL on failure.
@@ -5860,6 +6493,39 @@ tcapOmDevelRecv15minIntTable_duplicate(struct tcapOmDevelRecv15minIntTable_data 
 
 	DEBUGMSGTL(("tcapOmMIB", "tcapOmDevelRecv15minIntTable_duplicate: duplicating row...  "));
 	if (StorageNew != NULL) {
+		StorageNew->tcapOmDevelRecv15minIntTable_id = thedata->tcapOmDevelRecv15minIntTable_id;
+		if (!(StorageNew->tcapApplicationSubsystemId = malloc(thedata->tcapApplicationSubsystemIdLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->tcapApplicationSubsystemId, thedata->tcapApplicationSubsystemId, thedata->tcapApplicationSubsystemIdLen);
+		StorageNew->tcapApplicationSubsystemIdLen = thedata->tcapApplicationSubsystemIdLen;
+		StorageNew->tcapApplicationSubsystemId[StorageNew->tcapApplicationSubsystemIdLen] = 0;
+		if (!(StorageNew->tcapApplicationEntityId = malloc(thedata->tcapApplicationEntityIdLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->tcapApplicationEntityId, thedata->tcapApplicationEntityId, thedata->tcapApplicationEntityIdLen);
+		StorageNew->tcapApplicationEntityIdLen = thedata->tcapApplicationEntityIdLen;
+		StorageNew->tcapApplicationEntityId[StorageNew->tcapApplicationEntityIdLen] = 0;
+		StorageNew->tcapOmInterval = thedata->tcapOmInterval;
+		StorageNew->tcapOmDevelRecv15minIntPabortMessageType = thedata->tcapOmDevelRecv15minIntPabortMessageType;
+		StorageNew->tcapOmDevelRecv15minIntPabortIncorrectTp = thedata->tcapOmDevelRecv15minIntPabortIncorrectTp;
+		StorageNew->tcapOmDevelRecv15minIntPabortBadTp = thedata->tcapOmDevelRecv15minIntPabortBadTp;
+		StorageNew->tcapOmDevelRecv15minIntRejectUnrecComp = thedata->tcapOmDevelRecv15minIntRejectUnrecComp;
+		StorageNew->tcapOmDevelRecv15minIntRejectMistypeComp = thedata->tcapOmDevelRecv15minIntRejectMistypeComp;
+		StorageNew->tcapOmDevelRecv15minIntRejectBadCompStruct = thedata->tcapOmDevelRecv15minIntRejectBadCompStruct;
+		StorageNew->tcapOmDevelRecv15minIntRejectUnrecLinkId = thedata->tcapOmDevelRecv15minIntRejectUnrecLinkId;
+		StorageNew->tcapOmDevelRecv15minIntRejectUnrecIdRetRes = thedata->tcapOmDevelRecv15minIntRejectUnrecIdRetRes;
+		StorageNew->tcapOmDevelRecv15minIntRejectUnexpRetRes = thedata->tcapOmDevelRecv15minIntRejectUnexpRetRes;
+		StorageNew->tcapOmDevelRecv15minIntRejectUnrecIdRetErr = thedata->tcapOmDevelRecv15minIntRejectUnrecIdRetErr;
+		StorageNew->tcapOmDevelRecv15minIntRejectUnexpRetErr = thedata->tcapOmDevelRecv15minIntRejectUnexpRetErr;
+		StorageNew->tcapOmDevelRecv15minIntUsrRejDupInvokeId = thedata->tcapOmDevelRecv15minIntUsrRejDupInvokeId;
+		StorageNew->tcapOmDevelRecv15minIntUsrRejUnrecOper = thedata->tcapOmDevelRecv15minIntUsrRejUnrecOper;
+		StorageNew->tcapOmDevelRecv15minIntUsrRejParmInvoke = thedata->tcapOmDevelRecv15minIntUsrRejParmInvoke;
+		StorageNew->tcapOmDevelRecv15minIntUsrRejReleasing = thedata->tcapOmDevelRecv15minIntUsrRejReleasing;
+		StorageNew->tcapOmDevelRecv15minIntUsrRejUnexpLinkResp = thedata->tcapOmDevelRecv15minIntUsrRejUnexpLinkResp;
+		StorageNew->tcapOmDevelRecv15minIntUsrRejUnexpLinkOper = thedata->tcapOmDevelRecv15minIntUsrRejUnexpLinkOper;
+		StorageNew->tcapOmDevelRecv15minIntUsrRejUnrecError = thedata->tcapOmDevelRecv15minIntUsrRejUnrecError;
+		StorageNew->tcapOmDevelRecv15minIntUsrRejUnexpError = thedata->tcapOmDevelRecv15minIntUsrRejUnexpError;
+		StorageNew->tcapOmDevelRecv15minIntUsrRejParmRetResult = thedata->tcapOmDevelRecv15minIntUsrRejParmRetResult;
+		StorageNew->tcapOmDevelRecv15minIntUsrRejParmRetError = thedata->tcapOmDevelRecv15minIntUsrRejParmRetError;
 	}
       done:
 	DEBUGMSGTL(("tcapOmMIB", "done.\n"));
@@ -5961,7 +6627,7 @@ tcapOmDevelRecv15minIntTable_del(struct tcapOmDevelRecv15minIntTable_data *theda
  * @param line line from configuration file matching the token.
  * @brief parse configuration file for tcapOmDevelRecv15minIntTable entries.
  *
- * This callback is called by UCD-SNMP when it prases a configuration file and finds a configuration
+ * This callback is called by UCD-SNMP when it parses a configuration file and finds a configuration
  * file line for the registsred token (in this case tcapOmDevelRecv15minIntTable).  This routine is invoked by UCD-SNMP
  * to read the values of each row in the table from the configuration file.  Note that this
  * procedure may exist regardless of the persistence of the table.  If there are no configured
@@ -6041,6 +6707,7 @@ store_tcapOmDevelRecv15minIntTable(int majorID, int minorID, void *serverarg, vo
 			memset(line, 0, sizeof(line));
 			strcat(line, "tcapOmDevelRecv15minIntTable ");
 			cptr = line + strlen(line);
+			(void) cptr;
 			/* XXX: remove individual columns if not persistent */
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->tcapApplicationSubsystemId, &StorageTmp->tcapApplicationSubsystemIdLen);
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->tcapApplicationEntityId, &StorageTmp->tcapApplicationEntityIdLen);
@@ -6089,8 +6756,10 @@ tcapOmDevelSentTable_create(void)
 	DEBUGMSGTL(("tcapOmMIB", "tcapOmDevelSentTable_create: creating row...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
-		if ((StorageNew->tcapApplicationSubsystemId = (uint8_t *) strdup("")) != NULL)
-			StorageNew->tcapApplicationSubsystemIdLen = strlen("");
+		if ((StorageNew->tcapApplicationSubsystemId = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->tcapApplicationSubsystemIdLen = 0;
+		StorageNew->tcapApplicationSubsystemId[StorageNew->tcapApplicationSubsystemIdLen] = 0;
 		StorageNew->tcapTcUserId = 0;
 		StorageNew->tcapOmDevelSentPabortMessageType = 0;
 		StorageNew->tcapOmDevelSentPabortIncorrectTp = 0;
@@ -6115,16 +6784,20 @@ tcapOmDevelSentTable_create(void)
 		StorageNew->tcapOmDevelSentUsrRejParmRetError = 0;
 		StorageNew->tcapOmDevelSent5minValidIntervals = 0;
 		StorageNew->tcapOmDevelSent15minValidIntervals = 0;
-
 	}
+      done:
 	DEBUGMSGTL(("tcapOmMIB", "done.\n"));
 	return (StorageNew);
+	goto nomem;
+      nomem:
+	tcapOmDevelSentTable_destroy(&StorageNew);
+	goto done;
 }
 
 /**
  * @fn struct tcapOmDevelSentTable_data *tcapOmDevelSentTable_duplicate(struct tcapOmDevelSentTable_data *thedata)
  * @param thedata the row structure to duplicate.
- * @brief duplicat a row structure for a table.
+ * @brief duplicate a row structure for a table.
  *
  * Duplicates the specified row structure @param thedata and returns a pointer to the newly
  * allocated row structure on success, or NULL on failure.
@@ -6136,6 +6809,36 @@ tcapOmDevelSentTable_duplicate(struct tcapOmDevelSentTable_data *thedata)
 
 	DEBUGMSGTL(("tcapOmMIB", "tcapOmDevelSentTable_duplicate: duplicating row...  "));
 	if (StorageNew != NULL) {
+		StorageNew->tcapOmDevelSentTable_id = thedata->tcapOmDevelSentTable_id;
+		if (!(StorageNew->tcapApplicationSubsystemId = malloc(thedata->tcapApplicationSubsystemIdLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->tcapApplicationSubsystemId, thedata->tcapApplicationSubsystemId, thedata->tcapApplicationSubsystemIdLen);
+		StorageNew->tcapApplicationSubsystemIdLen = thedata->tcapApplicationSubsystemIdLen;
+		StorageNew->tcapApplicationSubsystemId[StorageNew->tcapApplicationSubsystemIdLen] = 0;
+		StorageNew->tcapTcUserId = thedata->tcapTcUserId;
+		StorageNew->tcapOmDevelSentPabortMessageType = thedata->tcapOmDevelSentPabortMessageType;
+		StorageNew->tcapOmDevelSentPabortIncorrectTp = thedata->tcapOmDevelSentPabortIncorrectTp;
+		StorageNew->tcapOmDevelSentPabortBadTp = thedata->tcapOmDevelSentPabortBadTp;
+		StorageNew->tcapOmDevelSentRejectUnrecComp = thedata->tcapOmDevelSentRejectUnrecComp;
+		StorageNew->tcapOmDevelSentRejectMistypeComp = thedata->tcapOmDevelSentRejectMistypeComp;
+		StorageNew->tcapOmDevelSentRejectBadCompStruct = thedata->tcapOmDevelSentRejectBadCompStruct;
+		StorageNew->tcapOmDevelSentRejectUnrecLinkId = thedata->tcapOmDevelSentRejectUnrecLinkId;
+		StorageNew->tcapOmDevelSentRejectUnrecIdRetRes = thedata->tcapOmDevelSentRejectUnrecIdRetRes;
+		StorageNew->tcapOmDevelSentRejectUnexpRetRes = thedata->tcapOmDevelSentRejectUnexpRetRes;
+		StorageNew->tcapOmDevelSentRejectUnrecIdRetErr = thedata->tcapOmDevelSentRejectUnrecIdRetErr;
+		StorageNew->tcapOmDevelSentRejectUnexpRetErr = thedata->tcapOmDevelSentRejectUnexpRetErr;
+		StorageNew->tcapOmDevelSentUsrRejDupInvokeId = thedata->tcapOmDevelSentUsrRejDupInvokeId;
+		StorageNew->tcapOmDevelSentUsrRejUnrecOper = thedata->tcapOmDevelSentUsrRejUnrecOper;
+		StorageNew->tcapOmDevelSentUsrRejParmInvoke = thedata->tcapOmDevelSentUsrRejParmInvoke;
+		StorageNew->tcapOmDevelSentUsrRejReleasing = thedata->tcapOmDevelSentUsrRejReleasing;
+		StorageNew->tcapOmDevelSentUsrRejUnexpLinkResp = thedata->tcapOmDevelSentUsrRejUnexpLinkResp;
+		StorageNew->tcapOmDevelSentUsrRejUnexpLinkOper = thedata->tcapOmDevelSentUsrRejUnexpLinkOper;
+		StorageNew->tcapOmDevelSentUsrRejUnrecError = thedata->tcapOmDevelSentUsrRejUnrecError;
+		StorageNew->tcapOmDevelSentUsrRejUnexpError = thedata->tcapOmDevelSentUsrRejUnexpError;
+		StorageNew->tcapOmDevelSentUsrRejParmRetResult = thedata->tcapOmDevelSentUsrRejParmRetResult;
+		StorageNew->tcapOmDevelSentUsrRejParmRetError = thedata->tcapOmDevelSentUsrRejParmRetError;
+		StorageNew->tcapOmDevelSent5minValidIntervals = thedata->tcapOmDevelSent5minValidIntervals;
+		StorageNew->tcapOmDevelSent15minValidIntervals = thedata->tcapOmDevelSent15minValidIntervals;
 	}
       done:
 	DEBUGMSGTL(("tcapOmMIB", "done.\n"));
@@ -6233,7 +6936,7 @@ tcapOmDevelSentTable_del(struct tcapOmDevelSentTable_data *thedata)
  * @param line line from configuration file matching the token.
  * @brief parse configuration file for tcapOmDevelSentTable entries.
  *
- * This callback is called by UCD-SNMP when it prases a configuration file and finds a configuration
+ * This callback is called by UCD-SNMP when it parses a configuration file and finds a configuration
  * file line for the registsred token (in this case tcapOmDevelSentTable).  This routine is invoked by UCD-SNMP
  * to read the values of each row in the table from the configuration file.  Note that this
  * procedure may exist regardless of the persistence of the table.  If there are no configured
@@ -6309,6 +7012,7 @@ store_tcapOmDevelSentTable(int majorID, int minorID, void *serverarg, void *clie
 			memset(line, 0, sizeof(line));
 			strcat(line, "tcapOmDevelSentTable ");
 			cptr = line + strlen(line);
+			(void) cptr;
 			/* XXX: remove individual columns if not persistent */
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->tcapApplicationSubsystemId, &StorageTmp->tcapApplicationSubsystemIdLen);
 			cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->tcapTcUserId, &tmpsize);
@@ -6358,8 +7062,10 @@ tcapOmDevelSentCurrentTable_create(void)
 	DEBUGMSGTL(("tcapOmMIB", "tcapOmDevelSentCurrentTable_create: creating row...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
-		if ((StorageNew->tcapApplicationSubsystemId = (uint8_t *) strdup("")) != NULL)
-			StorageNew->tcapApplicationSubsystemIdLen = strlen("");
+		if ((StorageNew->tcapApplicationSubsystemId = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->tcapApplicationSubsystemIdLen = 0;
+		StorageNew->tcapApplicationSubsystemId[StorageNew->tcapApplicationSubsystemIdLen] = 0;
 		StorageNew->tcapTcUserId = 0;
 		StorageNew->tcapOmDevelSentCurrentPabortMessageType = 0;
 		StorageNew->tcapOmDevelSentCurrentPabortIncorrectTp = 0;
@@ -6382,16 +7088,20 @@ tcapOmDevelSentCurrentTable_create(void)
 		StorageNew->tcapOmDevelSentCurrentUsrRejUnexpError = 0;
 		StorageNew->tcapOmDevelSentCurrentUsrRejParmRetResult = 0;
 		StorageNew->tcapOmDevelSentCurrentUsrRejParmRetError = 0;
-
 	}
+      done:
 	DEBUGMSGTL(("tcapOmMIB", "done.\n"));
 	return (StorageNew);
+	goto nomem;
+      nomem:
+	tcapOmDevelSentCurrentTable_destroy(&StorageNew);
+	goto done;
 }
 
 /**
  * @fn struct tcapOmDevelSentCurrentTable_data *tcapOmDevelSentCurrentTable_duplicate(struct tcapOmDevelSentCurrentTable_data *thedata)
  * @param thedata the row structure to duplicate.
- * @brief duplicat a row structure for a table.
+ * @brief duplicate a row structure for a table.
  *
  * Duplicates the specified row structure @param thedata and returns a pointer to the newly
  * allocated row structure on success, or NULL on failure.
@@ -6403,6 +7113,34 @@ tcapOmDevelSentCurrentTable_duplicate(struct tcapOmDevelSentCurrentTable_data *t
 
 	DEBUGMSGTL(("tcapOmMIB", "tcapOmDevelSentCurrentTable_duplicate: duplicating row...  "));
 	if (StorageNew != NULL) {
+		StorageNew->tcapOmDevelSentCurrentTable_id = thedata->tcapOmDevelSentCurrentTable_id;
+		if (!(StorageNew->tcapApplicationSubsystemId = malloc(thedata->tcapApplicationSubsystemIdLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->tcapApplicationSubsystemId, thedata->tcapApplicationSubsystemId, thedata->tcapApplicationSubsystemIdLen);
+		StorageNew->tcapApplicationSubsystemIdLen = thedata->tcapApplicationSubsystemIdLen;
+		StorageNew->tcapApplicationSubsystemId[StorageNew->tcapApplicationSubsystemIdLen] = 0;
+		StorageNew->tcapTcUserId = thedata->tcapTcUserId;
+		StorageNew->tcapOmDevelSentCurrentPabortMessageType = thedata->tcapOmDevelSentCurrentPabortMessageType;
+		StorageNew->tcapOmDevelSentCurrentPabortIncorrectTp = thedata->tcapOmDevelSentCurrentPabortIncorrectTp;
+		StorageNew->tcapOmDevelSentCurrentPabortBadTp = thedata->tcapOmDevelSentCurrentPabortBadTp;
+		StorageNew->tcapOmDevelSentCurrentRejectUnrecComp = thedata->tcapOmDevelSentCurrentRejectUnrecComp;
+		StorageNew->tcapOmDevelSentCurrentRejectMistypeComp = thedata->tcapOmDevelSentCurrentRejectMistypeComp;
+		StorageNew->tcapOmDevelSentCurrentRejectBadCompStruct = thedata->tcapOmDevelSentCurrentRejectBadCompStruct;
+		StorageNew->tcapOmDevelSentCurrentRejectUnrecLinkId = thedata->tcapOmDevelSentCurrentRejectUnrecLinkId;
+		StorageNew->tcapOmDevelSentCurrentRejectUnrecIdRetRes = thedata->tcapOmDevelSentCurrentRejectUnrecIdRetRes;
+		StorageNew->tcapOmDevelSentCurrentRejectUnexpRetRes = thedata->tcapOmDevelSentCurrentRejectUnexpRetRes;
+		StorageNew->tcapOmDevelSentCurrentRejectUnrecIdRetErr = thedata->tcapOmDevelSentCurrentRejectUnrecIdRetErr;
+		StorageNew->tcapOmDevelSentCurrentRejectUnexpRetErr = thedata->tcapOmDevelSentCurrentRejectUnexpRetErr;
+		StorageNew->tcapOmDevelSentCurrentUsrRejDupInvokeId = thedata->tcapOmDevelSentCurrentUsrRejDupInvokeId;
+		StorageNew->tcapOmDevelSentCurrentUsrRejUnrecOper = thedata->tcapOmDevelSentCurrentUsrRejUnrecOper;
+		StorageNew->tcapOmDevelSentCurrentUsrRejParmInvoke = thedata->tcapOmDevelSentCurrentUsrRejParmInvoke;
+		StorageNew->tcapOmDevelSentCurrentUsrRejReleasing = thedata->tcapOmDevelSentCurrentUsrRejReleasing;
+		StorageNew->tcapOmDevelSentCurrentUsrRejUnexpLinkResp = thedata->tcapOmDevelSentCurrentUsrRejUnexpLinkResp;
+		StorageNew->tcapOmDevelSentCurrentUsrRejUnexpLinkOper = thedata->tcapOmDevelSentCurrentUsrRejUnexpLinkOper;
+		StorageNew->tcapOmDevelSentCurrentUsrRejUnrecError = thedata->tcapOmDevelSentCurrentUsrRejUnrecError;
+		StorageNew->tcapOmDevelSentCurrentUsrRejUnexpError = thedata->tcapOmDevelSentCurrentUsrRejUnexpError;
+		StorageNew->tcapOmDevelSentCurrentUsrRejParmRetResult = thedata->tcapOmDevelSentCurrentUsrRejParmRetResult;
+		StorageNew->tcapOmDevelSentCurrentUsrRejParmRetError = thedata->tcapOmDevelSentCurrentUsrRejParmRetError;
 	}
       done:
 	DEBUGMSGTL(("tcapOmMIB", "done.\n"));
@@ -6500,7 +7238,7 @@ tcapOmDevelSentCurrentTable_del(struct tcapOmDevelSentCurrentTable_data *thedata
  * @param line line from configuration file matching the token.
  * @brief parse configuration file for tcapOmDevelSentCurrentTable entries.
  *
- * This callback is called by UCD-SNMP when it prases a configuration file and finds a configuration
+ * This callback is called by UCD-SNMP when it parses a configuration file and finds a configuration
  * file line for the registsred token (in this case tcapOmDevelSentCurrentTable).  This routine is invoked by UCD-SNMP
  * to read the values of each row in the table from the configuration file.  Note that this
  * procedure may exist regardless of the persistence of the table.  If there are no configured
@@ -6574,6 +7312,7 @@ store_tcapOmDevelSentCurrentTable(int majorID, int minorID, void *serverarg, voi
 			memset(line, 0, sizeof(line));
 			strcat(line, "tcapOmDevelSentCurrentTable ");
 			cptr = line + strlen(line);
+			(void) cptr;
 			/* XXX: remove individual columns if not persistent */
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->tcapApplicationSubsystemId, &StorageTmp->tcapApplicationSubsystemIdLen);
 			cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->tcapTcUserId, &tmpsize);
@@ -6621,8 +7360,10 @@ tcapOmDevelSent5minIntTable_create(void)
 	DEBUGMSGTL(("tcapOmMIB", "tcapOmDevelSent5minIntTable_create: creating row...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
-		if ((StorageNew->tcapApplicationSubsystemId = (uint8_t *) strdup("")) != NULL)
-			StorageNew->tcapApplicationSubsystemIdLen = strlen("");
+		if ((StorageNew->tcapApplicationSubsystemId = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->tcapApplicationSubsystemIdLen = 0;
+		StorageNew->tcapApplicationSubsystemId[StorageNew->tcapApplicationSubsystemIdLen] = 0;
 		StorageNew->tcapTcUserId = 0;
 		StorageNew->tcapOmInterval = 0;
 		StorageNew->tcapOmDevelSent5minIntPabortMessageType = 0;
@@ -6646,16 +7387,20 @@ tcapOmDevelSent5minIntTable_create(void)
 		StorageNew->tcapOmDevelSent5minIntUsrRejUnexpError = 0;
 		StorageNew->tcapOmDevelSent5minIntUsrRejParmRetResult = 0;
 		StorageNew->tcapOmDevelSent5minIntUsrRejParmRetError = 0;
-
 	}
+      done:
 	DEBUGMSGTL(("tcapOmMIB", "done.\n"));
 	return (StorageNew);
+	goto nomem;
+      nomem:
+	tcapOmDevelSent5minIntTable_destroy(&StorageNew);
+	goto done;
 }
 
 /**
  * @fn struct tcapOmDevelSent5minIntTable_data *tcapOmDevelSent5minIntTable_duplicate(struct tcapOmDevelSent5minIntTable_data *thedata)
  * @param thedata the row structure to duplicate.
- * @brief duplicat a row structure for a table.
+ * @brief duplicate a row structure for a table.
  *
  * Duplicates the specified row structure @param thedata and returns a pointer to the newly
  * allocated row structure on success, or NULL on failure.
@@ -6667,6 +7412,35 @@ tcapOmDevelSent5minIntTable_duplicate(struct tcapOmDevelSent5minIntTable_data *t
 
 	DEBUGMSGTL(("tcapOmMIB", "tcapOmDevelSent5minIntTable_duplicate: duplicating row...  "));
 	if (StorageNew != NULL) {
+		StorageNew->tcapOmDevelSent5minIntTable_id = thedata->tcapOmDevelSent5minIntTable_id;
+		if (!(StorageNew->tcapApplicationSubsystemId = malloc(thedata->tcapApplicationSubsystemIdLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->tcapApplicationSubsystemId, thedata->tcapApplicationSubsystemId, thedata->tcapApplicationSubsystemIdLen);
+		StorageNew->tcapApplicationSubsystemIdLen = thedata->tcapApplicationSubsystemIdLen;
+		StorageNew->tcapApplicationSubsystemId[StorageNew->tcapApplicationSubsystemIdLen] = 0;
+		StorageNew->tcapTcUserId = thedata->tcapTcUserId;
+		StorageNew->tcapOmInterval = thedata->tcapOmInterval;
+		StorageNew->tcapOmDevelSent5minIntPabortMessageType = thedata->tcapOmDevelSent5minIntPabortMessageType;
+		StorageNew->tcapOmDevelSent5minIntPabortIncorrectTp = thedata->tcapOmDevelSent5minIntPabortIncorrectTp;
+		StorageNew->tcapOmDevelSent5minIntPabortBadTp = thedata->tcapOmDevelSent5minIntPabortBadTp;
+		StorageNew->tcapOmDevelSent5minIntRejectUnrecComp = thedata->tcapOmDevelSent5minIntRejectUnrecComp;
+		StorageNew->tcapOmDevelSent5minIntRejectMistypeComp = thedata->tcapOmDevelSent5minIntRejectMistypeComp;
+		StorageNew->tcapOmDevelSent5minIntRejectBadCompStruct = thedata->tcapOmDevelSent5minIntRejectBadCompStruct;
+		StorageNew->tcapOmDevelSent5minIntRejectUnrecLinkId = thedata->tcapOmDevelSent5minIntRejectUnrecLinkId;
+		StorageNew->tcapOmDevelSent5minIntRejectUnrecIdRetRes = thedata->tcapOmDevelSent5minIntRejectUnrecIdRetRes;
+		StorageNew->tcapOmDevelSent5minIntRejectUnexpRetRes = thedata->tcapOmDevelSent5minIntRejectUnexpRetRes;
+		StorageNew->tcapOmDevelSent5minIntRejectUnrecIdRetErr = thedata->tcapOmDevelSent5minIntRejectUnrecIdRetErr;
+		StorageNew->tcapOmDevelSent5minIntRejectUnexpRetErr = thedata->tcapOmDevelSent5minIntRejectUnexpRetErr;
+		StorageNew->tcapOmDevelSent5minIntUsrRejDupInvokeId = thedata->tcapOmDevelSent5minIntUsrRejDupInvokeId;
+		StorageNew->tcapOmDevelSent5minIntUsrRejUnrecOper = thedata->tcapOmDevelSent5minIntUsrRejUnrecOper;
+		StorageNew->tcapOmDevelSent5minIntUsrRejParmInvoke = thedata->tcapOmDevelSent5minIntUsrRejParmInvoke;
+		StorageNew->tcapOmDevelSent5minIntUsrRejReleasing = thedata->tcapOmDevelSent5minIntUsrRejReleasing;
+		StorageNew->tcapOmDevelSent5minIntUsrRejUnexpLinkResp = thedata->tcapOmDevelSent5minIntUsrRejUnexpLinkResp;
+		StorageNew->tcapOmDevelSent5minIntUsrRejUnexpLinkOper = thedata->tcapOmDevelSent5minIntUsrRejUnexpLinkOper;
+		StorageNew->tcapOmDevelSent5minIntUsrRejUnrecError = thedata->tcapOmDevelSent5minIntUsrRejUnrecError;
+		StorageNew->tcapOmDevelSent5minIntUsrRejUnexpError = thedata->tcapOmDevelSent5minIntUsrRejUnexpError;
+		StorageNew->tcapOmDevelSent5minIntUsrRejParmRetResult = thedata->tcapOmDevelSent5minIntUsrRejParmRetResult;
+		StorageNew->tcapOmDevelSent5minIntUsrRejParmRetError = thedata->tcapOmDevelSent5minIntUsrRejParmRetError;
 	}
       done:
 	DEBUGMSGTL(("tcapOmMIB", "done.\n"));
@@ -6766,7 +7540,7 @@ tcapOmDevelSent5minIntTable_del(struct tcapOmDevelSent5minIntTable_data *thedata
  * @param line line from configuration file matching the token.
  * @brief parse configuration file for tcapOmDevelSent5minIntTable entries.
  *
- * This callback is called by UCD-SNMP when it prases a configuration file and finds a configuration
+ * This callback is called by UCD-SNMP when it parses a configuration file and finds a configuration
  * file line for the registsred token (in this case tcapOmDevelSent5minIntTable).  This routine is invoked by UCD-SNMP
  * to read the values of each row in the table from the configuration file.  Note that this
  * procedure may exist regardless of the persistence of the table.  If there are no configured
@@ -6841,6 +7615,7 @@ store_tcapOmDevelSent5minIntTable(int majorID, int minorID, void *serverarg, voi
 			memset(line, 0, sizeof(line));
 			strcat(line, "tcapOmDevelSent5minIntTable ");
 			cptr = line + strlen(line);
+			(void) cptr;
 			/* XXX: remove individual columns if not persistent */
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->tcapApplicationSubsystemId, &StorageTmp->tcapApplicationSubsystemIdLen);
 			cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->tcapTcUserId, &tmpsize);
@@ -6889,8 +7664,10 @@ tcapOmDevelSent15minIntTable_create(void)
 	DEBUGMSGTL(("tcapOmMIB", "tcapOmDevelSent15minIntTable_create: creating row...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
-		if ((StorageNew->tcapApplicationSubsystemId = (uint8_t *) strdup("")) != NULL)
-			StorageNew->tcapApplicationSubsystemIdLen = strlen("");
+		if ((StorageNew->tcapApplicationSubsystemId = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->tcapApplicationSubsystemIdLen = 0;
+		StorageNew->tcapApplicationSubsystemId[StorageNew->tcapApplicationSubsystemIdLen] = 0;
 		StorageNew->tcapTcUserId = 0;
 		StorageNew->tcapOmInterval = 0;
 		StorageNew->tcapOmDevelSent15minIntPabortMessageType = 0;
@@ -6914,16 +7691,20 @@ tcapOmDevelSent15minIntTable_create(void)
 		StorageNew->tcapOmDevelSent15minIntUsrRejUnexpError = 0;
 		StorageNew->tcapOmDevelSent15minIntUsrRejParmRetResult = 0;
 		StorageNew->tcapOmDevelSent15minIntUsrRejParmRetError = 0;
-
 	}
+      done:
 	DEBUGMSGTL(("tcapOmMIB", "done.\n"));
 	return (StorageNew);
+	goto nomem;
+      nomem:
+	tcapOmDevelSent15minIntTable_destroy(&StorageNew);
+	goto done;
 }
 
 /**
  * @fn struct tcapOmDevelSent15minIntTable_data *tcapOmDevelSent15minIntTable_duplicate(struct tcapOmDevelSent15minIntTable_data *thedata)
  * @param thedata the row structure to duplicate.
- * @brief duplicat a row structure for a table.
+ * @brief duplicate a row structure for a table.
  *
  * Duplicates the specified row structure @param thedata and returns a pointer to the newly
  * allocated row structure on success, or NULL on failure.
@@ -6935,6 +7716,35 @@ tcapOmDevelSent15minIntTable_duplicate(struct tcapOmDevelSent15minIntTable_data 
 
 	DEBUGMSGTL(("tcapOmMIB", "tcapOmDevelSent15minIntTable_duplicate: duplicating row...  "));
 	if (StorageNew != NULL) {
+		StorageNew->tcapOmDevelSent15minIntTable_id = thedata->tcapOmDevelSent15minIntTable_id;
+		if (!(StorageNew->tcapApplicationSubsystemId = malloc(thedata->tcapApplicationSubsystemIdLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->tcapApplicationSubsystemId, thedata->tcapApplicationSubsystemId, thedata->tcapApplicationSubsystemIdLen);
+		StorageNew->tcapApplicationSubsystemIdLen = thedata->tcapApplicationSubsystemIdLen;
+		StorageNew->tcapApplicationSubsystemId[StorageNew->tcapApplicationSubsystemIdLen] = 0;
+		StorageNew->tcapTcUserId = thedata->tcapTcUserId;
+		StorageNew->tcapOmInterval = thedata->tcapOmInterval;
+		StorageNew->tcapOmDevelSent15minIntPabortMessageType = thedata->tcapOmDevelSent15minIntPabortMessageType;
+		StorageNew->tcapOmDevelSent15minIntPabortIncorrectTp = thedata->tcapOmDevelSent15minIntPabortIncorrectTp;
+		StorageNew->tcapOmDevelSent15minIntPabortBadTp = thedata->tcapOmDevelSent15minIntPabortBadTp;
+		StorageNew->tcapOmDevelSent15minIntRejectUnrecComp = thedata->tcapOmDevelSent15minIntRejectUnrecComp;
+		StorageNew->tcapOmDevelSent15minIntRejectMistypeComp = thedata->tcapOmDevelSent15minIntRejectMistypeComp;
+		StorageNew->tcapOmDevelSent15minIntRejectBadCompStruct = thedata->tcapOmDevelSent15minIntRejectBadCompStruct;
+		StorageNew->tcapOmDevelSent15minIntRejectUnrecLinkId = thedata->tcapOmDevelSent15minIntRejectUnrecLinkId;
+		StorageNew->tcapOmDevelSent15minIntRejectUnrecIdRetRes = thedata->tcapOmDevelSent15minIntRejectUnrecIdRetRes;
+		StorageNew->tcapOmDevelSent15minIntRejectUnexpRetRes = thedata->tcapOmDevelSent15minIntRejectUnexpRetRes;
+		StorageNew->tcapOmDevelSent15minIntRejectUnrecIdRetErr = thedata->tcapOmDevelSent15minIntRejectUnrecIdRetErr;
+		StorageNew->tcapOmDevelSent15minIntRejectUnexpRetErr = thedata->tcapOmDevelSent15minIntRejectUnexpRetErr;
+		StorageNew->tcapOmDevelSent15minIntUsrRejDupInvokeId = thedata->tcapOmDevelSent15minIntUsrRejDupInvokeId;
+		StorageNew->tcapOmDevelSent15minIntUsrRejUnrecOper = thedata->tcapOmDevelSent15minIntUsrRejUnrecOper;
+		StorageNew->tcapOmDevelSent15minIntUsrRejParmInvoke = thedata->tcapOmDevelSent15minIntUsrRejParmInvoke;
+		StorageNew->tcapOmDevelSent15minIntUsrRejReleasing = thedata->tcapOmDevelSent15minIntUsrRejReleasing;
+		StorageNew->tcapOmDevelSent15minIntUsrRejUnexpLinkResp = thedata->tcapOmDevelSent15minIntUsrRejUnexpLinkResp;
+		StorageNew->tcapOmDevelSent15minIntUsrRejUnexpLinkOper = thedata->tcapOmDevelSent15minIntUsrRejUnexpLinkOper;
+		StorageNew->tcapOmDevelSent15minIntUsrRejUnrecError = thedata->tcapOmDevelSent15minIntUsrRejUnrecError;
+		StorageNew->tcapOmDevelSent15minIntUsrRejUnexpError = thedata->tcapOmDevelSent15minIntUsrRejUnexpError;
+		StorageNew->tcapOmDevelSent15minIntUsrRejParmRetResult = thedata->tcapOmDevelSent15minIntUsrRejParmRetResult;
+		StorageNew->tcapOmDevelSent15minIntUsrRejParmRetError = thedata->tcapOmDevelSent15minIntUsrRejParmRetError;
 	}
       done:
 	DEBUGMSGTL(("tcapOmMIB", "done.\n"));
@@ -7034,7 +7844,7 @@ tcapOmDevelSent15minIntTable_del(struct tcapOmDevelSent15minIntTable_data *theda
  * @param line line from configuration file matching the token.
  * @brief parse configuration file for tcapOmDevelSent15minIntTable entries.
  *
- * This callback is called by UCD-SNMP when it prases a configuration file and finds a configuration
+ * This callback is called by UCD-SNMP when it parses a configuration file and finds a configuration
  * file line for the registsred token (in this case tcapOmDevelSent15minIntTable).  This routine is invoked by UCD-SNMP
  * to read the values of each row in the table from the configuration file.  Note that this
  * procedure may exist regardless of the persistence of the table.  If there are no configured
@@ -7109,6 +7919,7 @@ store_tcapOmDevelSent15minIntTable(int majorID, int minorID, void *serverarg, vo
 			memset(line, 0, sizeof(line));
 			strcat(line, "tcapOmDevelSent15minIntTable ");
 			cptr = line + strlen(line);
+			(void) cptr;
 			/* XXX: remove individual columns if not persistent */
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->tcapApplicationSubsystemId, &StorageTmp->tcapApplicationSubsystemIdLen);
 			cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->tcapTcUserId, &tmpsize);
@@ -7139,6 +7950,64 @@ store_tcapOmDevelSent15minIntTable(int majorID, int minorID, void *serverarg, vo
 	}
 	DEBUGMSGTL(("tcapOmMIB", "done.\n"));
 	return SNMPERR_SUCCESS;
+}
+
+/**
+ * @fn int check_tcapOmNodeTable_row(struct tcapOmNodeTable_data *StorageTmp, struct tcapOmNodeTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to check, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the ACTION phase.  The start of the ACTION pahse performs this consitency check
+ * on the row before allowing the request to proceed to the COMMIT phase.  This function can return
+ * SNMP_ERR_NOERR or a specific SNMP error value.  Values in StorageOld are the values before the
+ * varbinds on the mib were applied; the values in StorageTmp are the new values.  The function is
+ * permitted to change the values in StorageTmp to correct them; however, preference should be made
+ * for setting values where were not in the varbinds.
+ */
+int
+check_tcapOmNodeTable_row(struct tcapOmNodeTable_data *StorageTmp, struct tcapOmNodeTable_data *StorageOld)
+{
+	/* XXX: provide code to check the row for consistency */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int update_tcapOmNodeTable_row(struct tcapOmNodeTable_data *StorageTmp, struct tcapOmNodeTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the set operation (ACTION phase) on a row
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to update, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the COMMIT phase.  The start of the ACTION phase performs a consistency check on
+ * the row before allowing the request to proceed to the COMMIT phase.  The COMMIT phase then
+ * arrives here with consistency already checked (see check_tcapOmNodeTable_row()).  This function can
+ * return SNMP_ERR_NOERROR or SNMP_ERR_COMMITFAILED.  Values in StorageOld are the values before the
+ * varbinds on the row were applied: the values in StorageTmp are the new values.
+ */
+int
+update_tcapOmNodeTable_row(struct tcapOmNodeTable_data *StorageTmp, struct tcapOmNodeTable_data *StorageOld)
+{
+	/* XXX: provide code to update the row with the underlying device */
+	tcapOmNodeTable_refresh = 1;
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int revert_tcapOmNodeTable_row(struct tcapOmNodeTable_data *StorageTmp, struct tcapOmNodeTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the undo operation (UNDO phase) on a row
+ */
+void
+revert_tcapOmNodeTable_row(struct tcapOmNodeTable_data *StorageTmp, struct tcapOmNodeTable_data *StorageOld)
+{
+	/* XXX: provide code to revert the row with the underlying device */
+	update_tcapOmNodeTable_row(StorageOld, NULL);
 }
 
 /**
@@ -7249,6 +8118,64 @@ var_tcapOmNodeTable(struct variable *vp, oid * name, size_t *length, int exact, 
 }
 
 /**
+ * @fn int check_tcapOmNodeCurrentTable_row(struct tcapOmNodeCurrentTable_data *StorageTmp, struct tcapOmNodeCurrentTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to check, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the ACTION phase.  The start of the ACTION pahse performs this consitency check
+ * on the row before allowing the request to proceed to the COMMIT phase.  This function can return
+ * SNMP_ERR_NOERR or a specific SNMP error value.  Values in StorageOld are the values before the
+ * varbinds on the mib were applied; the values in StorageTmp are the new values.  The function is
+ * permitted to change the values in StorageTmp to correct them; however, preference should be made
+ * for setting values where were not in the varbinds.
+ */
+int
+check_tcapOmNodeCurrentTable_row(struct tcapOmNodeCurrentTable_data *StorageTmp, struct tcapOmNodeCurrentTable_data *StorageOld)
+{
+	/* XXX: provide code to check the row for consistency */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int update_tcapOmNodeCurrentTable_row(struct tcapOmNodeCurrentTable_data *StorageTmp, struct tcapOmNodeCurrentTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the set operation (ACTION phase) on a row
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to update, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the COMMIT phase.  The start of the ACTION phase performs a consistency check on
+ * the row before allowing the request to proceed to the COMMIT phase.  The COMMIT phase then
+ * arrives here with consistency already checked (see check_tcapOmNodeCurrentTable_row()).  This function can
+ * return SNMP_ERR_NOERROR or SNMP_ERR_COMMITFAILED.  Values in StorageOld are the values before the
+ * varbinds on the row were applied: the values in StorageTmp are the new values.
+ */
+int
+update_tcapOmNodeCurrentTable_row(struct tcapOmNodeCurrentTable_data *StorageTmp, struct tcapOmNodeCurrentTable_data *StorageOld)
+{
+	/* XXX: provide code to update the row with the underlying device */
+	tcapOmNodeCurrentTable_refresh = 1;
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int revert_tcapOmNodeCurrentTable_row(struct tcapOmNodeCurrentTable_data *StorageTmp, struct tcapOmNodeCurrentTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the undo operation (UNDO phase) on a row
+ */
+void
+revert_tcapOmNodeCurrentTable_row(struct tcapOmNodeCurrentTable_data *StorageTmp, struct tcapOmNodeCurrentTable_data *StorageOld)
+{
+	/* XXX: provide code to revert the row with the underlying device */
+	update_tcapOmNodeCurrentTable_row(StorageOld, NULL);
+}
+
+/**
  * @fn void refresh_tcapOmNodeCurrentTable_row(struct tcapOmNodeCurrentTable_data *StorageTmp, int force)
  * @param StorageTmp the data row to refresh.
  * @param force force refresh if non-zero.
@@ -7341,6 +8268,64 @@ var_tcapOmNodeCurrentTable(struct variable *vp, oid * name, size_t *length, int 
 		ERROR_MSG("");
 	}
 	return (rval);
+}
+
+/**
+ * @fn int check_tcapOmNode5minIntTable_row(struct tcapOmNode5minIntTable_data *StorageTmp, struct tcapOmNode5minIntTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to check, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the ACTION phase.  The start of the ACTION pahse performs this consitency check
+ * on the row before allowing the request to proceed to the COMMIT phase.  This function can return
+ * SNMP_ERR_NOERR or a specific SNMP error value.  Values in StorageOld are the values before the
+ * varbinds on the mib were applied; the values in StorageTmp are the new values.  The function is
+ * permitted to change the values in StorageTmp to correct them; however, preference should be made
+ * for setting values where were not in the varbinds.
+ */
+int
+check_tcapOmNode5minIntTable_row(struct tcapOmNode5minIntTable_data *StorageTmp, struct tcapOmNode5minIntTable_data *StorageOld)
+{
+	/* XXX: provide code to check the row for consistency */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int update_tcapOmNode5minIntTable_row(struct tcapOmNode5minIntTable_data *StorageTmp, struct tcapOmNode5minIntTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the set operation (ACTION phase) on a row
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to update, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the COMMIT phase.  The start of the ACTION phase performs a consistency check on
+ * the row before allowing the request to proceed to the COMMIT phase.  The COMMIT phase then
+ * arrives here with consistency already checked (see check_tcapOmNode5minIntTable_row()).  This function can
+ * return SNMP_ERR_NOERROR or SNMP_ERR_COMMITFAILED.  Values in StorageOld are the values before the
+ * varbinds on the row were applied: the values in StorageTmp are the new values.
+ */
+int
+update_tcapOmNode5minIntTable_row(struct tcapOmNode5minIntTable_data *StorageTmp, struct tcapOmNode5minIntTable_data *StorageOld)
+{
+	/* XXX: provide code to update the row with the underlying device */
+	tcapOmNode5minIntTable_refresh = 1;
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int revert_tcapOmNode5minIntTable_row(struct tcapOmNode5minIntTable_data *StorageTmp, struct tcapOmNode5minIntTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the undo operation (UNDO phase) on a row
+ */
+void
+revert_tcapOmNode5minIntTable_row(struct tcapOmNode5minIntTable_data *StorageTmp, struct tcapOmNode5minIntTable_data *StorageOld)
+{
+	/* XXX: provide code to revert the row with the underlying device */
+	update_tcapOmNode5minIntTable_row(StorageOld, NULL);
 }
 
 /**
@@ -7439,6 +8424,64 @@ var_tcapOmNode5minIntTable(struct variable *vp, oid * name, size_t *length, int 
 }
 
 /**
+ * @fn int check_tcapOmNode15minIntTable_row(struct tcapOmNode15minIntTable_data *StorageTmp, struct tcapOmNode15minIntTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to check, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the ACTION phase.  The start of the ACTION pahse performs this consitency check
+ * on the row before allowing the request to proceed to the COMMIT phase.  This function can return
+ * SNMP_ERR_NOERR or a specific SNMP error value.  Values in StorageOld are the values before the
+ * varbinds on the mib were applied; the values in StorageTmp are the new values.  The function is
+ * permitted to change the values in StorageTmp to correct them; however, preference should be made
+ * for setting values where were not in the varbinds.
+ */
+int
+check_tcapOmNode15minIntTable_row(struct tcapOmNode15minIntTable_data *StorageTmp, struct tcapOmNode15minIntTable_data *StorageOld)
+{
+	/* XXX: provide code to check the row for consistency */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int update_tcapOmNode15minIntTable_row(struct tcapOmNode15minIntTable_data *StorageTmp, struct tcapOmNode15minIntTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the set operation (ACTION phase) on a row
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to update, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the COMMIT phase.  The start of the ACTION phase performs a consistency check on
+ * the row before allowing the request to proceed to the COMMIT phase.  The COMMIT phase then
+ * arrives here with consistency already checked (see check_tcapOmNode15minIntTable_row()).  This function can
+ * return SNMP_ERR_NOERROR or SNMP_ERR_COMMITFAILED.  Values in StorageOld are the values before the
+ * varbinds on the row were applied: the values in StorageTmp are the new values.
+ */
+int
+update_tcapOmNode15minIntTable_row(struct tcapOmNode15minIntTable_data *StorageTmp, struct tcapOmNode15minIntTable_data *StorageOld)
+{
+	/* XXX: provide code to update the row with the underlying device */
+	tcapOmNode15minIntTable_refresh = 1;
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int revert_tcapOmNode15minIntTable_row(struct tcapOmNode15minIntTable_data *StorageTmp, struct tcapOmNode15minIntTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the undo operation (UNDO phase) on a row
+ */
+void
+revert_tcapOmNode15minIntTable_row(struct tcapOmNode15minIntTable_data *StorageTmp, struct tcapOmNode15minIntTable_data *StorageOld)
+{
+	/* XXX: provide code to revert the row with the underlying device */
+	update_tcapOmNode15minIntTable_row(StorageOld, NULL);
+}
+
+/**
  * @fn void refresh_tcapOmNode15minIntTable_row(struct tcapOmNode15minIntTable_data *StorageTmp, int force)
  * @param StorageTmp the data row to refresh.
  * @param force force refresh if non-zero.
@@ -7531,6 +8574,64 @@ var_tcapOmNode15minIntTable(struct variable *vp, oid * name, size_t *length, int
 		ERROR_MSG("");
 	}
 	return (rval);
+}
+
+/**
+ * @fn int check_tcapOmMsgsTable_row(struct tcapOmMsgsTable_data *StorageTmp, struct tcapOmMsgsTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to check, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the ACTION phase.  The start of the ACTION pahse performs this consitency check
+ * on the row before allowing the request to proceed to the COMMIT phase.  This function can return
+ * SNMP_ERR_NOERR or a specific SNMP error value.  Values in StorageOld are the values before the
+ * varbinds on the mib were applied; the values in StorageTmp are the new values.  The function is
+ * permitted to change the values in StorageTmp to correct them; however, preference should be made
+ * for setting values where were not in the varbinds.
+ */
+int
+check_tcapOmMsgsTable_row(struct tcapOmMsgsTable_data *StorageTmp, struct tcapOmMsgsTable_data *StorageOld)
+{
+	/* XXX: provide code to check the row for consistency */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int update_tcapOmMsgsTable_row(struct tcapOmMsgsTable_data *StorageTmp, struct tcapOmMsgsTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the set operation (ACTION phase) on a row
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to update, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the COMMIT phase.  The start of the ACTION phase performs a consistency check on
+ * the row before allowing the request to proceed to the COMMIT phase.  The COMMIT phase then
+ * arrives here with consistency already checked (see check_tcapOmMsgsTable_row()).  This function can
+ * return SNMP_ERR_NOERROR or SNMP_ERR_COMMITFAILED.  Values in StorageOld are the values before the
+ * varbinds on the row were applied: the values in StorageTmp are the new values.
+ */
+int
+update_tcapOmMsgsTable_row(struct tcapOmMsgsTable_data *StorageTmp, struct tcapOmMsgsTable_data *StorageOld)
+{
+	/* XXX: provide code to update the row with the underlying device */
+	tcapOmMsgsTable_refresh = 1;
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int revert_tcapOmMsgsTable_row(struct tcapOmMsgsTable_data *StorageTmp, struct tcapOmMsgsTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the undo operation (UNDO phase) on a row
+ */
+void
+revert_tcapOmMsgsTable_row(struct tcapOmMsgsTable_data *StorageTmp, struct tcapOmMsgsTable_data *StorageOld)
+{
+	/* XXX: provide code to revert the row with the underlying device */
+	update_tcapOmMsgsTable_row(StorageOld, NULL);
 }
 
 /**
@@ -7629,6 +8730,64 @@ var_tcapOmMsgsTable(struct variable *vp, oid * name, size_t *length, int exact, 
 }
 
 /**
+ * @fn int check_tcapOmMsgsCurrentTable_row(struct tcapOmMsgsCurrentTable_data *StorageTmp, struct tcapOmMsgsCurrentTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to check, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the ACTION phase.  The start of the ACTION pahse performs this consitency check
+ * on the row before allowing the request to proceed to the COMMIT phase.  This function can return
+ * SNMP_ERR_NOERR or a specific SNMP error value.  Values in StorageOld are the values before the
+ * varbinds on the mib were applied; the values in StorageTmp are the new values.  The function is
+ * permitted to change the values in StorageTmp to correct them; however, preference should be made
+ * for setting values where were not in the varbinds.
+ */
+int
+check_tcapOmMsgsCurrentTable_row(struct tcapOmMsgsCurrentTable_data *StorageTmp, struct tcapOmMsgsCurrentTable_data *StorageOld)
+{
+	/* XXX: provide code to check the row for consistency */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int update_tcapOmMsgsCurrentTable_row(struct tcapOmMsgsCurrentTable_data *StorageTmp, struct tcapOmMsgsCurrentTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the set operation (ACTION phase) on a row
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to update, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the COMMIT phase.  The start of the ACTION phase performs a consistency check on
+ * the row before allowing the request to proceed to the COMMIT phase.  The COMMIT phase then
+ * arrives here with consistency already checked (see check_tcapOmMsgsCurrentTable_row()).  This function can
+ * return SNMP_ERR_NOERROR or SNMP_ERR_COMMITFAILED.  Values in StorageOld are the values before the
+ * varbinds on the row were applied: the values in StorageTmp are the new values.
+ */
+int
+update_tcapOmMsgsCurrentTable_row(struct tcapOmMsgsCurrentTable_data *StorageTmp, struct tcapOmMsgsCurrentTable_data *StorageOld)
+{
+	/* XXX: provide code to update the row with the underlying device */
+	tcapOmMsgsCurrentTable_refresh = 1;
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int revert_tcapOmMsgsCurrentTable_row(struct tcapOmMsgsCurrentTable_data *StorageTmp, struct tcapOmMsgsCurrentTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the undo operation (UNDO phase) on a row
+ */
+void
+revert_tcapOmMsgsCurrentTable_row(struct tcapOmMsgsCurrentTable_data *StorageTmp, struct tcapOmMsgsCurrentTable_data *StorageOld)
+{
+	/* XXX: provide code to revert the row with the underlying device */
+	update_tcapOmMsgsCurrentTable_row(StorageOld, NULL);
+}
+
+/**
  * @fn void refresh_tcapOmMsgsCurrentTable_row(struct tcapOmMsgsCurrentTable_data *StorageTmp, int force)
  * @param StorageTmp the data row to refresh.
  * @param force force refresh if non-zero.
@@ -7709,6 +8868,64 @@ var_tcapOmMsgsCurrentTable(struct variable *vp, oid * name, size_t *length, int 
 		ERROR_MSG("");
 	}
 	return (rval);
+}
+
+/**
+ * @fn int check_tcapOmMsgs5minIntTable_row(struct tcapOmMsgs5minIntTable_data *StorageTmp, struct tcapOmMsgs5minIntTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to check, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the ACTION phase.  The start of the ACTION pahse performs this consitency check
+ * on the row before allowing the request to proceed to the COMMIT phase.  This function can return
+ * SNMP_ERR_NOERR or a specific SNMP error value.  Values in StorageOld are the values before the
+ * varbinds on the mib were applied; the values in StorageTmp are the new values.  The function is
+ * permitted to change the values in StorageTmp to correct them; however, preference should be made
+ * for setting values where were not in the varbinds.
+ */
+int
+check_tcapOmMsgs5minIntTable_row(struct tcapOmMsgs5minIntTable_data *StorageTmp, struct tcapOmMsgs5minIntTable_data *StorageOld)
+{
+	/* XXX: provide code to check the row for consistency */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int update_tcapOmMsgs5minIntTable_row(struct tcapOmMsgs5minIntTable_data *StorageTmp, struct tcapOmMsgs5minIntTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the set operation (ACTION phase) on a row
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to update, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the COMMIT phase.  The start of the ACTION phase performs a consistency check on
+ * the row before allowing the request to proceed to the COMMIT phase.  The COMMIT phase then
+ * arrives here with consistency already checked (see check_tcapOmMsgs5minIntTable_row()).  This function can
+ * return SNMP_ERR_NOERROR or SNMP_ERR_COMMITFAILED.  Values in StorageOld are the values before the
+ * varbinds on the row were applied: the values in StorageTmp are the new values.
+ */
+int
+update_tcapOmMsgs5minIntTable_row(struct tcapOmMsgs5minIntTable_data *StorageTmp, struct tcapOmMsgs5minIntTable_data *StorageOld)
+{
+	/* XXX: provide code to update the row with the underlying device */
+	tcapOmMsgs5minIntTable_refresh = 1;
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int revert_tcapOmMsgs5minIntTable_row(struct tcapOmMsgs5minIntTable_data *StorageTmp, struct tcapOmMsgs5minIntTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the undo operation (UNDO phase) on a row
+ */
+void
+revert_tcapOmMsgs5minIntTable_row(struct tcapOmMsgs5minIntTable_data *StorageTmp, struct tcapOmMsgs5minIntTable_data *StorageOld)
+{
+	/* XXX: provide code to revert the row with the underlying device */
+	update_tcapOmMsgs5minIntTable_row(StorageOld, NULL);
 }
 
 /**
@@ -7795,6 +9012,64 @@ var_tcapOmMsgs5minIntTable(struct variable *vp, oid * name, size_t *length, int 
 }
 
 /**
+ * @fn int check_tcapOmMsgs15minIntTable_row(struct tcapOmMsgs15minIntTable_data *StorageTmp, struct tcapOmMsgs15minIntTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to check, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the ACTION phase.  The start of the ACTION pahse performs this consitency check
+ * on the row before allowing the request to proceed to the COMMIT phase.  This function can return
+ * SNMP_ERR_NOERR or a specific SNMP error value.  Values in StorageOld are the values before the
+ * varbinds on the mib were applied; the values in StorageTmp are the new values.  The function is
+ * permitted to change the values in StorageTmp to correct them; however, preference should be made
+ * for setting values where were not in the varbinds.
+ */
+int
+check_tcapOmMsgs15minIntTable_row(struct tcapOmMsgs15minIntTable_data *StorageTmp, struct tcapOmMsgs15minIntTable_data *StorageOld)
+{
+	/* XXX: provide code to check the row for consistency */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int update_tcapOmMsgs15minIntTable_row(struct tcapOmMsgs15minIntTable_data *StorageTmp, struct tcapOmMsgs15minIntTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the set operation (ACTION phase) on a row
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to update, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the COMMIT phase.  The start of the ACTION phase performs a consistency check on
+ * the row before allowing the request to proceed to the COMMIT phase.  The COMMIT phase then
+ * arrives here with consistency already checked (see check_tcapOmMsgs15minIntTable_row()).  This function can
+ * return SNMP_ERR_NOERROR or SNMP_ERR_COMMITFAILED.  Values in StorageOld are the values before the
+ * varbinds on the row were applied: the values in StorageTmp are the new values.
+ */
+int
+update_tcapOmMsgs15minIntTable_row(struct tcapOmMsgs15minIntTable_data *StorageTmp, struct tcapOmMsgs15minIntTable_data *StorageOld)
+{
+	/* XXX: provide code to update the row with the underlying device */
+	tcapOmMsgs15minIntTable_refresh = 1;
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int revert_tcapOmMsgs15minIntTable_row(struct tcapOmMsgs15minIntTable_data *StorageTmp, struct tcapOmMsgs15minIntTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the undo operation (UNDO phase) on a row
+ */
+void
+revert_tcapOmMsgs15minIntTable_row(struct tcapOmMsgs15minIntTable_data *StorageTmp, struct tcapOmMsgs15minIntTable_data *StorageOld)
+{
+	/* XXX: provide code to revert the row with the underlying device */
+	update_tcapOmMsgs15minIntTable_row(StorageOld, NULL);
+}
+
+/**
  * @fn void refresh_tcapOmMsgs15minIntTable_row(struct tcapOmMsgs15minIntTable_data *StorageTmp, int force)
  * @param StorageTmp the data row to refresh.
  * @param force force refresh if non-zero.
@@ -7875,6 +9150,64 @@ var_tcapOmMsgs15minIntTable(struct variable *vp, oid * name, size_t *length, int
 		ERROR_MSG("");
 	}
 	return (rval);
+}
+
+/**
+ * @fn int check_tcapOmAETable_row(struct tcapOmAETable_data *StorageTmp, struct tcapOmAETable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to check, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the ACTION phase.  The start of the ACTION pahse performs this consitency check
+ * on the row before allowing the request to proceed to the COMMIT phase.  This function can return
+ * SNMP_ERR_NOERR or a specific SNMP error value.  Values in StorageOld are the values before the
+ * varbinds on the mib were applied; the values in StorageTmp are the new values.  The function is
+ * permitted to change the values in StorageTmp to correct them; however, preference should be made
+ * for setting values where were not in the varbinds.
+ */
+int
+check_tcapOmAETable_row(struct tcapOmAETable_data *StorageTmp, struct tcapOmAETable_data *StorageOld)
+{
+	/* XXX: provide code to check the row for consistency */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int update_tcapOmAETable_row(struct tcapOmAETable_data *StorageTmp, struct tcapOmAETable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the set operation (ACTION phase) on a row
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to update, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the COMMIT phase.  The start of the ACTION phase performs a consistency check on
+ * the row before allowing the request to proceed to the COMMIT phase.  The COMMIT phase then
+ * arrives here with consistency already checked (see check_tcapOmAETable_row()).  This function can
+ * return SNMP_ERR_NOERROR or SNMP_ERR_COMMITFAILED.  Values in StorageOld are the values before the
+ * varbinds on the row were applied: the values in StorageTmp are the new values.
+ */
+int
+update_tcapOmAETable_row(struct tcapOmAETable_data *StorageTmp, struct tcapOmAETable_data *StorageOld)
+{
+	/* XXX: provide code to update the row with the underlying device */
+	tcapOmAETable_refresh = 1;
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int revert_tcapOmAETable_row(struct tcapOmAETable_data *StorageTmp, struct tcapOmAETable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the undo operation (UNDO phase) on a row
+ */
+void
+revert_tcapOmAETable_row(struct tcapOmAETable_data *StorageTmp, struct tcapOmAETable_data *StorageOld)
+{
+	/* XXX: provide code to revert the row with the underlying device */
+	update_tcapOmAETable_row(StorageOld, NULL);
 }
 
 /**
@@ -8003,6 +9336,64 @@ var_tcapOmAETable(struct variable *vp, oid * name, size_t *length, int exact, si
 }
 
 /**
+ * @fn int check_tcapOmAECurrentTable_row(struct tcapOmAECurrentTable_data *StorageTmp, struct tcapOmAECurrentTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to check, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the ACTION phase.  The start of the ACTION pahse performs this consitency check
+ * on the row before allowing the request to proceed to the COMMIT phase.  This function can return
+ * SNMP_ERR_NOERR or a specific SNMP error value.  Values in StorageOld are the values before the
+ * varbinds on the mib were applied; the values in StorageTmp are the new values.  The function is
+ * permitted to change the values in StorageTmp to correct them; however, preference should be made
+ * for setting values where were not in the varbinds.
+ */
+int
+check_tcapOmAECurrentTable_row(struct tcapOmAECurrentTable_data *StorageTmp, struct tcapOmAECurrentTable_data *StorageOld)
+{
+	/* XXX: provide code to check the row for consistency */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int update_tcapOmAECurrentTable_row(struct tcapOmAECurrentTable_data *StorageTmp, struct tcapOmAECurrentTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the set operation (ACTION phase) on a row
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to update, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the COMMIT phase.  The start of the ACTION phase performs a consistency check on
+ * the row before allowing the request to proceed to the COMMIT phase.  The COMMIT phase then
+ * arrives here with consistency already checked (see check_tcapOmAECurrentTable_row()).  This function can
+ * return SNMP_ERR_NOERROR or SNMP_ERR_COMMITFAILED.  Values in StorageOld are the values before the
+ * varbinds on the row were applied: the values in StorageTmp are the new values.
+ */
+int
+update_tcapOmAECurrentTable_row(struct tcapOmAECurrentTable_data *StorageTmp, struct tcapOmAECurrentTable_data *StorageOld)
+{
+	/* XXX: provide code to update the row with the underlying device */
+	tcapOmAECurrentTable_refresh = 1;
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int revert_tcapOmAECurrentTable_row(struct tcapOmAECurrentTable_data *StorageTmp, struct tcapOmAECurrentTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the undo operation (UNDO phase) on a row
+ */
+void
+revert_tcapOmAECurrentTable_row(struct tcapOmAECurrentTable_data *StorageTmp, struct tcapOmAECurrentTable_data *StorageOld)
+{
+	/* XXX: provide code to revert the row with the underlying device */
+	update_tcapOmAECurrentTable_row(StorageOld, NULL);
+}
+
+/**
  * @fn void refresh_tcapOmAECurrentTable_row(struct tcapOmAECurrentTable_data *StorageTmp, int force)
  * @param StorageTmp the data row to refresh.
  * @param force force refresh if non-zero.
@@ -8113,6 +9504,64 @@ var_tcapOmAECurrentTable(struct variable *vp, oid * name, size_t *length, int ex
 		ERROR_MSG("");
 	}
 	return (rval);
+}
+
+/**
+ * @fn int check_tcapOmAE5minIntTable_row(struct tcapOmAE5minIntTable_data *StorageTmp, struct tcapOmAE5minIntTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to check, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the ACTION phase.  The start of the ACTION pahse performs this consitency check
+ * on the row before allowing the request to proceed to the COMMIT phase.  This function can return
+ * SNMP_ERR_NOERR or a specific SNMP error value.  Values in StorageOld are the values before the
+ * varbinds on the mib were applied; the values in StorageTmp are the new values.  The function is
+ * permitted to change the values in StorageTmp to correct them; however, preference should be made
+ * for setting values where were not in the varbinds.
+ */
+int
+check_tcapOmAE5minIntTable_row(struct tcapOmAE5minIntTable_data *StorageTmp, struct tcapOmAE5minIntTable_data *StorageOld)
+{
+	/* XXX: provide code to check the row for consistency */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int update_tcapOmAE5minIntTable_row(struct tcapOmAE5minIntTable_data *StorageTmp, struct tcapOmAE5minIntTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the set operation (ACTION phase) on a row
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to update, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the COMMIT phase.  The start of the ACTION phase performs a consistency check on
+ * the row before allowing the request to proceed to the COMMIT phase.  The COMMIT phase then
+ * arrives here with consistency already checked (see check_tcapOmAE5minIntTable_row()).  This function can
+ * return SNMP_ERR_NOERROR or SNMP_ERR_COMMITFAILED.  Values in StorageOld are the values before the
+ * varbinds on the row were applied: the values in StorageTmp are the new values.
+ */
+int
+update_tcapOmAE5minIntTable_row(struct tcapOmAE5minIntTable_data *StorageTmp, struct tcapOmAE5minIntTable_data *StorageOld)
+{
+	/* XXX: provide code to update the row with the underlying device */
+	tcapOmAE5minIntTable_refresh = 1;
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int revert_tcapOmAE5minIntTable_row(struct tcapOmAE5minIntTable_data *StorageTmp, struct tcapOmAE5minIntTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the undo operation (UNDO phase) on a row
+ */
+void
+revert_tcapOmAE5minIntTable_row(struct tcapOmAE5minIntTable_data *StorageTmp, struct tcapOmAE5minIntTable_data *StorageOld)
+{
+	/* XXX: provide code to revert the row with the underlying device */
+	update_tcapOmAE5minIntTable_row(StorageOld, NULL);
 }
 
 /**
@@ -8229,6 +9678,64 @@ var_tcapOmAE5minIntTable(struct variable *vp, oid * name, size_t *length, int ex
 }
 
 /**
+ * @fn int check_tcapOmAE15minIntTable_row(struct tcapOmAE15minIntTable_data *StorageTmp, struct tcapOmAE15minIntTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to check, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the ACTION phase.  The start of the ACTION pahse performs this consitency check
+ * on the row before allowing the request to proceed to the COMMIT phase.  This function can return
+ * SNMP_ERR_NOERR or a specific SNMP error value.  Values in StorageOld are the values before the
+ * varbinds on the mib were applied; the values in StorageTmp are the new values.  The function is
+ * permitted to change the values in StorageTmp to correct them; however, preference should be made
+ * for setting values where were not in the varbinds.
+ */
+int
+check_tcapOmAE15minIntTable_row(struct tcapOmAE15minIntTable_data *StorageTmp, struct tcapOmAE15minIntTable_data *StorageOld)
+{
+	/* XXX: provide code to check the row for consistency */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int update_tcapOmAE15minIntTable_row(struct tcapOmAE15minIntTable_data *StorageTmp, struct tcapOmAE15minIntTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the set operation (ACTION phase) on a row
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to update, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the COMMIT phase.  The start of the ACTION phase performs a consistency check on
+ * the row before allowing the request to proceed to the COMMIT phase.  The COMMIT phase then
+ * arrives here with consistency already checked (see check_tcapOmAE15minIntTable_row()).  This function can
+ * return SNMP_ERR_NOERROR or SNMP_ERR_COMMITFAILED.  Values in StorageOld are the values before the
+ * varbinds on the row were applied: the values in StorageTmp are the new values.
+ */
+int
+update_tcapOmAE15minIntTable_row(struct tcapOmAE15minIntTable_data *StorageTmp, struct tcapOmAE15minIntTable_data *StorageOld)
+{
+	/* XXX: provide code to update the row with the underlying device */
+	tcapOmAE15minIntTable_refresh = 1;
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int revert_tcapOmAE15minIntTable_row(struct tcapOmAE15minIntTable_data *StorageTmp, struct tcapOmAE15minIntTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the undo operation (UNDO phase) on a row
+ */
+void
+revert_tcapOmAE15minIntTable_row(struct tcapOmAE15minIntTable_data *StorageTmp, struct tcapOmAE15minIntTable_data *StorageOld)
+{
+	/* XXX: provide code to revert the row with the underlying device */
+	update_tcapOmAE15minIntTable_row(StorageOld, NULL);
+}
+
+/**
  * @fn void refresh_tcapOmAE15minIntTable_row(struct tcapOmAE15minIntTable_data *StorageTmp, int force)
  * @param StorageTmp the data row to refresh.
  * @param force force refresh if non-zero.
@@ -8339,6 +9846,64 @@ var_tcapOmAE15minIntTable(struct variable *vp, oid * name, size_t *length, int e
 		ERROR_MSG("");
 	}
 	return (rval);
+}
+
+/**
+ * @fn int check_tcapOmTcTable_row(struct tcapOmTcTable_data *StorageTmp, struct tcapOmTcTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to check, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the ACTION phase.  The start of the ACTION pahse performs this consitency check
+ * on the row before allowing the request to proceed to the COMMIT phase.  This function can return
+ * SNMP_ERR_NOERR or a specific SNMP error value.  Values in StorageOld are the values before the
+ * varbinds on the mib were applied; the values in StorageTmp are the new values.  The function is
+ * permitted to change the values in StorageTmp to correct them; however, preference should be made
+ * for setting values where were not in the varbinds.
+ */
+int
+check_tcapOmTcTable_row(struct tcapOmTcTable_data *StorageTmp, struct tcapOmTcTable_data *StorageOld)
+{
+	/* XXX: provide code to check the row for consistency */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int update_tcapOmTcTable_row(struct tcapOmTcTable_data *StorageTmp, struct tcapOmTcTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the set operation (ACTION phase) on a row
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to update, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the COMMIT phase.  The start of the ACTION phase performs a consistency check on
+ * the row before allowing the request to proceed to the COMMIT phase.  The COMMIT phase then
+ * arrives here with consistency already checked (see check_tcapOmTcTable_row()).  This function can
+ * return SNMP_ERR_NOERROR or SNMP_ERR_COMMITFAILED.  Values in StorageOld are the values before the
+ * varbinds on the row were applied: the values in StorageTmp are the new values.
+ */
+int
+update_tcapOmTcTable_row(struct tcapOmTcTable_data *StorageTmp, struct tcapOmTcTable_data *StorageOld)
+{
+	/* XXX: provide code to update the row with the underlying device */
+	tcapOmTcTable_refresh = 1;
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int revert_tcapOmTcTable_row(struct tcapOmTcTable_data *StorageTmp, struct tcapOmTcTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the undo operation (UNDO phase) on a row
+ */
+void
+revert_tcapOmTcTable_row(struct tcapOmTcTable_data *StorageTmp, struct tcapOmTcTable_data *StorageOld)
+{
+	/* XXX: provide code to revert the row with the underlying device */
+	update_tcapOmTcTable_row(StorageOld, NULL);
 }
 
 /**
@@ -8497,6 +10062,64 @@ var_tcapOmTcTable(struct variable *vp, oid * name, size_t *length, int exact, si
 }
 
 /**
+ * @fn int check_tcapOmTcCurrentTable_row(struct tcapOmTcCurrentTable_data *StorageTmp, struct tcapOmTcCurrentTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to check, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the ACTION phase.  The start of the ACTION pahse performs this consitency check
+ * on the row before allowing the request to proceed to the COMMIT phase.  This function can return
+ * SNMP_ERR_NOERR or a specific SNMP error value.  Values in StorageOld are the values before the
+ * varbinds on the mib were applied; the values in StorageTmp are the new values.  The function is
+ * permitted to change the values in StorageTmp to correct them; however, preference should be made
+ * for setting values where were not in the varbinds.
+ */
+int
+check_tcapOmTcCurrentTable_row(struct tcapOmTcCurrentTable_data *StorageTmp, struct tcapOmTcCurrentTable_data *StorageOld)
+{
+	/* XXX: provide code to check the row for consistency */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int update_tcapOmTcCurrentTable_row(struct tcapOmTcCurrentTable_data *StorageTmp, struct tcapOmTcCurrentTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the set operation (ACTION phase) on a row
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to update, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the COMMIT phase.  The start of the ACTION phase performs a consistency check on
+ * the row before allowing the request to proceed to the COMMIT phase.  The COMMIT phase then
+ * arrives here with consistency already checked (see check_tcapOmTcCurrentTable_row()).  This function can
+ * return SNMP_ERR_NOERROR or SNMP_ERR_COMMITFAILED.  Values in StorageOld are the values before the
+ * varbinds on the row were applied: the values in StorageTmp are the new values.
+ */
+int
+update_tcapOmTcCurrentTable_row(struct tcapOmTcCurrentTable_data *StorageTmp, struct tcapOmTcCurrentTable_data *StorageOld)
+{
+	/* XXX: provide code to update the row with the underlying device */
+	tcapOmTcCurrentTable_refresh = 1;
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int revert_tcapOmTcCurrentTable_row(struct tcapOmTcCurrentTable_data *StorageTmp, struct tcapOmTcCurrentTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the undo operation (UNDO phase) on a row
+ */
+void
+revert_tcapOmTcCurrentTable_row(struct tcapOmTcCurrentTable_data *StorageTmp, struct tcapOmTcCurrentTable_data *StorageOld)
+{
+	/* XXX: provide code to revert the row with the underlying device */
+	update_tcapOmTcCurrentTable_row(StorageOld, NULL);
+}
+
+/**
  * @fn void refresh_tcapOmTcCurrentTable_row(struct tcapOmTcCurrentTable_data *StorageTmp, int force)
  * @param StorageTmp the data row to refresh.
  * @param force force refresh if non-zero.
@@ -8637,6 +10260,64 @@ var_tcapOmTcCurrentTable(struct variable *vp, oid * name, size_t *length, int ex
 		ERROR_MSG("");
 	}
 	return (rval);
+}
+
+/**
+ * @fn int check_tcapOmTc5minIntTable_row(struct tcapOmTc5minIntTable_data *StorageTmp, struct tcapOmTc5minIntTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to check, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the ACTION phase.  The start of the ACTION pahse performs this consitency check
+ * on the row before allowing the request to proceed to the COMMIT phase.  This function can return
+ * SNMP_ERR_NOERR or a specific SNMP error value.  Values in StorageOld are the values before the
+ * varbinds on the mib were applied; the values in StorageTmp are the new values.  The function is
+ * permitted to change the values in StorageTmp to correct them; however, preference should be made
+ * for setting values where were not in the varbinds.
+ */
+int
+check_tcapOmTc5minIntTable_row(struct tcapOmTc5minIntTable_data *StorageTmp, struct tcapOmTc5minIntTable_data *StorageOld)
+{
+	/* XXX: provide code to check the row for consistency */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int update_tcapOmTc5minIntTable_row(struct tcapOmTc5minIntTable_data *StorageTmp, struct tcapOmTc5minIntTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the set operation (ACTION phase) on a row
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to update, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the COMMIT phase.  The start of the ACTION phase performs a consistency check on
+ * the row before allowing the request to proceed to the COMMIT phase.  The COMMIT phase then
+ * arrives here with consistency already checked (see check_tcapOmTc5minIntTable_row()).  This function can
+ * return SNMP_ERR_NOERROR or SNMP_ERR_COMMITFAILED.  Values in StorageOld are the values before the
+ * varbinds on the row were applied: the values in StorageTmp are the new values.
+ */
+int
+update_tcapOmTc5minIntTable_row(struct tcapOmTc5minIntTable_data *StorageTmp, struct tcapOmTc5minIntTable_data *StorageOld)
+{
+	/* XXX: provide code to update the row with the underlying device */
+	tcapOmTc5minIntTable_refresh = 1;
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int revert_tcapOmTc5minIntTable_row(struct tcapOmTc5minIntTable_data *StorageTmp, struct tcapOmTc5minIntTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the undo operation (UNDO phase) on a row
+ */
+void
+revert_tcapOmTc5minIntTable_row(struct tcapOmTc5minIntTable_data *StorageTmp, struct tcapOmTc5minIntTable_data *StorageOld)
+{
+	/* XXX: provide code to revert the row with the underlying device */
+	update_tcapOmTc5minIntTable_row(StorageOld, NULL);
 }
 
 /**
@@ -8783,6 +10464,64 @@ var_tcapOmTc5minIntTable(struct variable *vp, oid * name, size_t *length, int ex
 }
 
 /**
+ * @fn int check_tcapOmTc15minIntTable_row(struct tcapOmTc15minIntTable_data *StorageTmp, struct tcapOmTc15minIntTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to check, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the ACTION phase.  The start of the ACTION pahse performs this consitency check
+ * on the row before allowing the request to proceed to the COMMIT phase.  This function can return
+ * SNMP_ERR_NOERR or a specific SNMP error value.  Values in StorageOld are the values before the
+ * varbinds on the mib were applied; the values in StorageTmp are the new values.  The function is
+ * permitted to change the values in StorageTmp to correct them; however, preference should be made
+ * for setting values where were not in the varbinds.
+ */
+int
+check_tcapOmTc15minIntTable_row(struct tcapOmTc15minIntTable_data *StorageTmp, struct tcapOmTc15minIntTable_data *StorageOld)
+{
+	/* XXX: provide code to check the row for consistency */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int update_tcapOmTc15minIntTable_row(struct tcapOmTc15minIntTable_data *StorageTmp, struct tcapOmTc15minIntTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the set operation (ACTION phase) on a row
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to update, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the COMMIT phase.  The start of the ACTION phase performs a consistency check on
+ * the row before allowing the request to proceed to the COMMIT phase.  The COMMIT phase then
+ * arrives here with consistency already checked (see check_tcapOmTc15minIntTable_row()).  This function can
+ * return SNMP_ERR_NOERROR or SNMP_ERR_COMMITFAILED.  Values in StorageOld are the values before the
+ * varbinds on the row were applied: the values in StorageTmp are the new values.
+ */
+int
+update_tcapOmTc15minIntTable_row(struct tcapOmTc15minIntTable_data *StorageTmp, struct tcapOmTc15minIntTable_data *StorageOld)
+{
+	/* XXX: provide code to update the row with the underlying device */
+	tcapOmTc15minIntTable_refresh = 1;
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int revert_tcapOmTc15minIntTable_row(struct tcapOmTc15minIntTable_data *StorageTmp, struct tcapOmTc15minIntTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the undo operation (UNDO phase) on a row
+ */
+void
+revert_tcapOmTc15minIntTable_row(struct tcapOmTc15minIntTable_data *StorageTmp, struct tcapOmTc15minIntTable_data *StorageOld)
+{
+	/* XXX: provide code to revert the row with the underlying device */
+	update_tcapOmTc15minIntTable_row(StorageOld, NULL);
+}
+
+/**
  * @fn void refresh_tcapOmTc15minIntTable_row(struct tcapOmTc15minIntTable_data *StorageTmp, int force)
  * @param StorageTmp the data row to refresh.
  * @param force force refresh if non-zero.
@@ -8923,6 +10662,64 @@ var_tcapOmTc15minIntTable(struct variable *vp, oid * name, size_t *length, int e
 		ERROR_MSG("");
 	}
 	return (rval);
+}
+
+/**
+ * @fn int check_tcapOmDevelRecvTable_row(struct tcapOmDevelRecvTable_data *StorageTmp, struct tcapOmDevelRecvTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to check, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the ACTION phase.  The start of the ACTION pahse performs this consitency check
+ * on the row before allowing the request to proceed to the COMMIT phase.  This function can return
+ * SNMP_ERR_NOERR or a specific SNMP error value.  Values in StorageOld are the values before the
+ * varbinds on the mib were applied; the values in StorageTmp are the new values.  The function is
+ * permitted to change the values in StorageTmp to correct them; however, preference should be made
+ * for setting values where were not in the varbinds.
+ */
+int
+check_tcapOmDevelRecvTable_row(struct tcapOmDevelRecvTable_data *StorageTmp, struct tcapOmDevelRecvTable_data *StorageOld)
+{
+	/* XXX: provide code to check the row for consistency */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int update_tcapOmDevelRecvTable_row(struct tcapOmDevelRecvTable_data *StorageTmp, struct tcapOmDevelRecvTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the set operation (ACTION phase) on a row
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to update, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the COMMIT phase.  The start of the ACTION phase performs a consistency check on
+ * the row before allowing the request to proceed to the COMMIT phase.  The COMMIT phase then
+ * arrives here with consistency already checked (see check_tcapOmDevelRecvTable_row()).  This function can
+ * return SNMP_ERR_NOERROR or SNMP_ERR_COMMITFAILED.  Values in StorageOld are the values before the
+ * varbinds on the row were applied: the values in StorageTmp are the new values.
+ */
+int
+update_tcapOmDevelRecvTable_row(struct tcapOmDevelRecvTable_data *StorageTmp, struct tcapOmDevelRecvTable_data *StorageOld)
+{
+	/* XXX: provide code to update the row with the underlying device */
+	tcapOmDevelRecvTable_refresh = 1;
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int revert_tcapOmDevelRecvTable_row(struct tcapOmDevelRecvTable_data *StorageTmp, struct tcapOmDevelRecvTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the undo operation (UNDO phase) on a row
+ */
+void
+revert_tcapOmDevelRecvTable_row(struct tcapOmDevelRecvTable_data *StorageTmp, struct tcapOmDevelRecvTable_data *StorageOld)
+{
+	/* XXX: provide code to revert the row with the underlying device */
+	update_tcapOmDevelRecvTable_row(StorageOld, NULL);
 }
 
 /**
@@ -9135,6 +10932,64 @@ var_tcapOmDevelRecvTable(struct variable *vp, oid * name, size_t *length, int ex
 }
 
 /**
+ * @fn int check_tcapOmDevelRecvCurrentTable_row(struct tcapOmDevelRecvCurrentTable_data *StorageTmp, struct tcapOmDevelRecvCurrentTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to check, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the ACTION phase.  The start of the ACTION pahse performs this consitency check
+ * on the row before allowing the request to proceed to the COMMIT phase.  This function can return
+ * SNMP_ERR_NOERR or a specific SNMP error value.  Values in StorageOld are the values before the
+ * varbinds on the mib were applied; the values in StorageTmp are the new values.  The function is
+ * permitted to change the values in StorageTmp to correct them; however, preference should be made
+ * for setting values where were not in the varbinds.
+ */
+int
+check_tcapOmDevelRecvCurrentTable_row(struct tcapOmDevelRecvCurrentTable_data *StorageTmp, struct tcapOmDevelRecvCurrentTable_data *StorageOld)
+{
+	/* XXX: provide code to check the row for consistency */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int update_tcapOmDevelRecvCurrentTable_row(struct tcapOmDevelRecvCurrentTable_data *StorageTmp, struct tcapOmDevelRecvCurrentTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the set operation (ACTION phase) on a row
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to update, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the COMMIT phase.  The start of the ACTION phase performs a consistency check on
+ * the row before allowing the request to proceed to the COMMIT phase.  The COMMIT phase then
+ * arrives here with consistency already checked (see check_tcapOmDevelRecvCurrentTable_row()).  This function can
+ * return SNMP_ERR_NOERROR or SNMP_ERR_COMMITFAILED.  Values in StorageOld are the values before the
+ * varbinds on the row were applied: the values in StorageTmp are the new values.
+ */
+int
+update_tcapOmDevelRecvCurrentTable_row(struct tcapOmDevelRecvCurrentTable_data *StorageTmp, struct tcapOmDevelRecvCurrentTable_data *StorageOld)
+{
+	/* XXX: provide code to update the row with the underlying device */
+	tcapOmDevelRecvCurrentTable_refresh = 1;
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int revert_tcapOmDevelRecvCurrentTable_row(struct tcapOmDevelRecvCurrentTable_data *StorageTmp, struct tcapOmDevelRecvCurrentTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the undo operation (UNDO phase) on a row
+ */
+void
+revert_tcapOmDevelRecvCurrentTable_row(struct tcapOmDevelRecvCurrentTable_data *StorageTmp, struct tcapOmDevelRecvCurrentTable_data *StorageOld)
+{
+	/* XXX: provide code to revert the row with the underlying device */
+	update_tcapOmDevelRecvCurrentTable_row(StorageOld, NULL);
+}
+
+/**
  * @fn void refresh_tcapOmDevelRecvCurrentTable_row(struct tcapOmDevelRecvCurrentTable_data *StorageTmp, int force)
  * @param StorageTmp the data row to refresh.
  * @param force force refresh if non-zero.
@@ -9329,6 +11184,64 @@ var_tcapOmDevelRecvCurrentTable(struct variable *vp, oid * name, size_t *length,
 		ERROR_MSG("");
 	}
 	return (rval);
+}
+
+/**
+ * @fn int check_tcapOmDevelRecv5minIntTable_row(struct tcapOmDevelRecv5minIntTable_data *StorageTmp, struct tcapOmDevelRecv5minIntTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to check, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the ACTION phase.  The start of the ACTION pahse performs this consitency check
+ * on the row before allowing the request to proceed to the COMMIT phase.  This function can return
+ * SNMP_ERR_NOERR or a specific SNMP error value.  Values in StorageOld are the values before the
+ * varbinds on the mib were applied; the values in StorageTmp are the new values.  The function is
+ * permitted to change the values in StorageTmp to correct them; however, preference should be made
+ * for setting values where were not in the varbinds.
+ */
+int
+check_tcapOmDevelRecv5minIntTable_row(struct tcapOmDevelRecv5minIntTable_data *StorageTmp, struct tcapOmDevelRecv5minIntTable_data *StorageOld)
+{
+	/* XXX: provide code to check the row for consistency */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int update_tcapOmDevelRecv5minIntTable_row(struct tcapOmDevelRecv5minIntTable_data *StorageTmp, struct tcapOmDevelRecv5minIntTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the set operation (ACTION phase) on a row
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to update, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the COMMIT phase.  The start of the ACTION phase performs a consistency check on
+ * the row before allowing the request to proceed to the COMMIT phase.  The COMMIT phase then
+ * arrives here with consistency already checked (see check_tcapOmDevelRecv5minIntTable_row()).  This function can
+ * return SNMP_ERR_NOERROR or SNMP_ERR_COMMITFAILED.  Values in StorageOld are the values before the
+ * varbinds on the row were applied: the values in StorageTmp are the new values.
+ */
+int
+update_tcapOmDevelRecv5minIntTable_row(struct tcapOmDevelRecv5minIntTable_data *StorageTmp, struct tcapOmDevelRecv5minIntTable_data *StorageOld)
+{
+	/* XXX: provide code to update the row with the underlying device */
+	tcapOmDevelRecv5minIntTable_refresh = 1;
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int revert_tcapOmDevelRecv5minIntTable_row(struct tcapOmDevelRecv5minIntTable_data *StorageTmp, struct tcapOmDevelRecv5minIntTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the undo operation (UNDO phase) on a row
+ */
+void
+revert_tcapOmDevelRecv5minIntTable_row(struct tcapOmDevelRecv5minIntTable_data *StorageTmp, struct tcapOmDevelRecv5minIntTable_data *StorageOld)
+{
+	/* XXX: provide code to revert the row with the underlying device */
+	update_tcapOmDevelRecv5minIntTable_row(StorageOld, NULL);
 }
 
 /**
@@ -9529,6 +11442,64 @@ var_tcapOmDevelRecv5minIntTable(struct variable *vp, oid * name, size_t *length,
 }
 
 /**
+ * @fn int check_tcapOmDevelRecv15minIntTable_row(struct tcapOmDevelRecv15minIntTable_data *StorageTmp, struct tcapOmDevelRecv15minIntTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to check, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the ACTION phase.  The start of the ACTION pahse performs this consitency check
+ * on the row before allowing the request to proceed to the COMMIT phase.  This function can return
+ * SNMP_ERR_NOERR or a specific SNMP error value.  Values in StorageOld are the values before the
+ * varbinds on the mib were applied; the values in StorageTmp are the new values.  The function is
+ * permitted to change the values in StorageTmp to correct them; however, preference should be made
+ * for setting values where were not in the varbinds.
+ */
+int
+check_tcapOmDevelRecv15minIntTable_row(struct tcapOmDevelRecv15minIntTable_data *StorageTmp, struct tcapOmDevelRecv15minIntTable_data *StorageOld)
+{
+	/* XXX: provide code to check the row for consistency */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int update_tcapOmDevelRecv15minIntTable_row(struct tcapOmDevelRecv15minIntTable_data *StorageTmp, struct tcapOmDevelRecv15minIntTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the set operation (ACTION phase) on a row
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to update, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the COMMIT phase.  The start of the ACTION phase performs a consistency check on
+ * the row before allowing the request to proceed to the COMMIT phase.  The COMMIT phase then
+ * arrives here with consistency already checked (see check_tcapOmDevelRecv15minIntTable_row()).  This function can
+ * return SNMP_ERR_NOERROR or SNMP_ERR_COMMITFAILED.  Values in StorageOld are the values before the
+ * varbinds on the row were applied: the values in StorageTmp are the new values.
+ */
+int
+update_tcapOmDevelRecv15minIntTable_row(struct tcapOmDevelRecv15minIntTable_data *StorageTmp, struct tcapOmDevelRecv15minIntTable_data *StorageOld)
+{
+	/* XXX: provide code to update the row with the underlying device */
+	tcapOmDevelRecv15minIntTable_refresh = 1;
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int revert_tcapOmDevelRecv15minIntTable_row(struct tcapOmDevelRecv15minIntTable_data *StorageTmp, struct tcapOmDevelRecv15minIntTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the undo operation (UNDO phase) on a row
+ */
+void
+revert_tcapOmDevelRecv15minIntTable_row(struct tcapOmDevelRecv15minIntTable_data *StorageTmp, struct tcapOmDevelRecv15minIntTable_data *StorageOld)
+{
+	/* XXX: provide code to revert the row with the underlying device */
+	update_tcapOmDevelRecv15minIntTable_row(StorageOld, NULL);
+}
+
+/**
  * @fn void refresh_tcapOmDevelRecv15minIntTable_row(struct tcapOmDevelRecv15minIntTable_data *StorageTmp, int force)
  * @param StorageTmp the data row to refresh.
  * @param force force refresh if non-zero.
@@ -9723,6 +11694,64 @@ var_tcapOmDevelRecv15minIntTable(struct variable *vp, oid * name, size_t *length
 		ERROR_MSG("");
 	}
 	return (rval);
+}
+
+/**
+ * @fn int check_tcapOmDevelSentTable_row(struct tcapOmDevelSentTable_data *StorageTmp, struct tcapOmDevelSentTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to check, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the ACTION phase.  The start of the ACTION pahse performs this consitency check
+ * on the row before allowing the request to proceed to the COMMIT phase.  This function can return
+ * SNMP_ERR_NOERR or a specific SNMP error value.  Values in StorageOld are the values before the
+ * varbinds on the mib were applied; the values in StorageTmp are the new values.  The function is
+ * permitted to change the values in StorageTmp to correct them; however, preference should be made
+ * for setting values where were not in the varbinds.
+ */
+int
+check_tcapOmDevelSentTable_row(struct tcapOmDevelSentTable_data *StorageTmp, struct tcapOmDevelSentTable_data *StorageOld)
+{
+	/* XXX: provide code to check the row for consistency */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int update_tcapOmDevelSentTable_row(struct tcapOmDevelSentTable_data *StorageTmp, struct tcapOmDevelSentTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the set operation (ACTION phase) on a row
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to update, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the COMMIT phase.  The start of the ACTION phase performs a consistency check on
+ * the row before allowing the request to proceed to the COMMIT phase.  The COMMIT phase then
+ * arrives here with consistency already checked (see check_tcapOmDevelSentTable_row()).  This function can
+ * return SNMP_ERR_NOERROR or SNMP_ERR_COMMITFAILED.  Values in StorageOld are the values before the
+ * varbinds on the row were applied: the values in StorageTmp are the new values.
+ */
+int
+update_tcapOmDevelSentTable_row(struct tcapOmDevelSentTable_data *StorageTmp, struct tcapOmDevelSentTable_data *StorageOld)
+{
+	/* XXX: provide code to update the row with the underlying device */
+	tcapOmDevelSentTable_refresh = 1;
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int revert_tcapOmDevelSentTable_row(struct tcapOmDevelSentTable_data *StorageTmp, struct tcapOmDevelSentTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the undo operation (UNDO phase) on a row
+ */
+void
+revert_tcapOmDevelSentTable_row(struct tcapOmDevelSentTable_data *StorageTmp, struct tcapOmDevelSentTable_data *StorageOld)
+{
+	/* XXX: provide code to revert the row with the underlying device */
+	update_tcapOmDevelSentTable_row(StorageOld, NULL);
 }
 
 /**
@@ -9935,6 +11964,64 @@ var_tcapOmDevelSentTable(struct variable *vp, oid * name, size_t *length, int ex
 }
 
 /**
+ * @fn int check_tcapOmDevelSentCurrentTable_row(struct tcapOmDevelSentCurrentTable_data *StorageTmp, struct tcapOmDevelSentCurrentTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to check, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the ACTION phase.  The start of the ACTION pahse performs this consitency check
+ * on the row before allowing the request to proceed to the COMMIT phase.  This function can return
+ * SNMP_ERR_NOERR or a specific SNMP error value.  Values in StorageOld are the values before the
+ * varbinds on the mib were applied; the values in StorageTmp are the new values.  The function is
+ * permitted to change the values in StorageTmp to correct them; however, preference should be made
+ * for setting values where were not in the varbinds.
+ */
+int
+check_tcapOmDevelSentCurrentTable_row(struct tcapOmDevelSentCurrentTable_data *StorageTmp, struct tcapOmDevelSentCurrentTable_data *StorageOld)
+{
+	/* XXX: provide code to check the row for consistency */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int update_tcapOmDevelSentCurrentTable_row(struct tcapOmDevelSentCurrentTable_data *StorageTmp, struct tcapOmDevelSentCurrentTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the set operation (ACTION phase) on a row
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to update, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the COMMIT phase.  The start of the ACTION phase performs a consistency check on
+ * the row before allowing the request to proceed to the COMMIT phase.  The COMMIT phase then
+ * arrives here with consistency already checked (see check_tcapOmDevelSentCurrentTable_row()).  This function can
+ * return SNMP_ERR_NOERROR or SNMP_ERR_COMMITFAILED.  Values in StorageOld are the values before the
+ * varbinds on the row were applied: the values in StorageTmp are the new values.
+ */
+int
+update_tcapOmDevelSentCurrentTable_row(struct tcapOmDevelSentCurrentTable_data *StorageTmp, struct tcapOmDevelSentCurrentTable_data *StorageOld)
+{
+	/* XXX: provide code to update the row with the underlying device */
+	tcapOmDevelSentCurrentTable_refresh = 1;
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int revert_tcapOmDevelSentCurrentTable_row(struct tcapOmDevelSentCurrentTable_data *StorageTmp, struct tcapOmDevelSentCurrentTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the undo operation (UNDO phase) on a row
+ */
+void
+revert_tcapOmDevelSentCurrentTable_row(struct tcapOmDevelSentCurrentTable_data *StorageTmp, struct tcapOmDevelSentCurrentTable_data *StorageOld)
+{
+	/* XXX: provide code to revert the row with the underlying device */
+	update_tcapOmDevelSentCurrentTable_row(StorageOld, NULL);
+}
+
+/**
  * @fn void refresh_tcapOmDevelSentCurrentTable_row(struct tcapOmDevelSentCurrentTable_data *StorageTmp, int force)
  * @param StorageTmp the data row to refresh.
  * @param force force refresh if non-zero.
@@ -10132,6 +12219,64 @@ var_tcapOmDevelSentCurrentTable(struct variable *vp, oid * name, size_t *length,
 }
 
 /**
+ * @fn int check_tcapOmDevelSent5minIntTable_row(struct tcapOmDevelSent5minIntTable_data *StorageTmp, struct tcapOmDevelSent5minIntTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to check, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the ACTION phase.  The start of the ACTION pahse performs this consitency check
+ * on the row before allowing the request to proceed to the COMMIT phase.  This function can return
+ * SNMP_ERR_NOERR or a specific SNMP error value.  Values in StorageOld are the values before the
+ * varbinds on the mib were applied; the values in StorageTmp are the new values.  The function is
+ * permitted to change the values in StorageTmp to correct them; however, preference should be made
+ * for setting values where were not in the varbinds.
+ */
+int
+check_tcapOmDevelSent5minIntTable_row(struct tcapOmDevelSent5minIntTable_data *StorageTmp, struct tcapOmDevelSent5minIntTable_data *StorageOld)
+{
+	/* XXX: provide code to check the row for consistency */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int update_tcapOmDevelSent5minIntTable_row(struct tcapOmDevelSent5minIntTable_data *StorageTmp, struct tcapOmDevelSent5minIntTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the set operation (ACTION phase) on a row
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to update, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the COMMIT phase.  The start of the ACTION phase performs a consistency check on
+ * the row before allowing the request to proceed to the COMMIT phase.  The COMMIT phase then
+ * arrives here with consistency already checked (see check_tcapOmDevelSent5minIntTable_row()).  This function can
+ * return SNMP_ERR_NOERROR or SNMP_ERR_COMMITFAILED.  Values in StorageOld are the values before the
+ * varbinds on the row were applied: the values in StorageTmp are the new values.
+ */
+int
+update_tcapOmDevelSent5minIntTable_row(struct tcapOmDevelSent5minIntTable_data *StorageTmp, struct tcapOmDevelSent5minIntTable_data *StorageOld)
+{
+	/* XXX: provide code to update the row with the underlying device */
+	tcapOmDevelSent5minIntTable_refresh = 1;
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int revert_tcapOmDevelSent5minIntTable_row(struct tcapOmDevelSent5minIntTable_data *StorageTmp, struct tcapOmDevelSent5minIntTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the undo operation (UNDO phase) on a row
+ */
+void
+revert_tcapOmDevelSent5minIntTable_row(struct tcapOmDevelSent5minIntTable_data *StorageTmp, struct tcapOmDevelSent5minIntTable_data *StorageOld)
+{
+	/* XXX: provide code to revert the row with the underlying device */
+	update_tcapOmDevelSent5minIntTable_row(StorageOld, NULL);
+}
+
+/**
  * @fn void refresh_tcapOmDevelSent5minIntTable_row(struct tcapOmDevelSent5minIntTable_data *StorageTmp, int force)
  * @param StorageTmp the data row to refresh.
  * @param force force refresh if non-zero.
@@ -10326,6 +12471,64 @@ var_tcapOmDevelSent5minIntTable(struct variable *vp, oid * name, size_t *length,
 		ERROR_MSG("");
 	}
 	return (rval);
+}
+
+/**
+ * @fn int check_tcapOmDevelSent15minIntTable_row(struct tcapOmDevelSent15minIntTable_data *StorageTmp, struct tcapOmDevelSent15minIntTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to check, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the ACTION phase.  The start of the ACTION pahse performs this consitency check
+ * on the row before allowing the request to proceed to the COMMIT phase.  This function can return
+ * SNMP_ERR_NOERR or a specific SNMP error value.  Values in StorageOld are the values before the
+ * varbinds on the mib were applied; the values in StorageTmp are the new values.  The function is
+ * permitted to change the values in StorageTmp to correct them; however, preference should be made
+ * for setting values where were not in the varbinds.
+ */
+int
+check_tcapOmDevelSent15minIntTable_row(struct tcapOmDevelSent15minIntTable_data *StorageTmp, struct tcapOmDevelSent15minIntTable_data *StorageOld)
+{
+	/* XXX: provide code to check the row for consistency */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int update_tcapOmDevelSent15minIntTable_row(struct tcapOmDevelSent15minIntTable_data *StorageTmp, struct tcapOmDevelSent15minIntTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the set operation (ACTION phase) on a row
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to update, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the COMMIT phase.  The start of the ACTION phase performs a consistency check on
+ * the row before allowing the request to proceed to the COMMIT phase.  The COMMIT phase then
+ * arrives here with consistency already checked (see check_tcapOmDevelSent15minIntTable_row()).  This function can
+ * return SNMP_ERR_NOERROR or SNMP_ERR_COMMITFAILED.  Values in StorageOld are the values before the
+ * varbinds on the row were applied: the values in StorageTmp are the new values.
+ */
+int
+update_tcapOmDevelSent15minIntTable_row(struct tcapOmDevelSent15minIntTable_data *StorageTmp, struct tcapOmDevelSent15minIntTable_data *StorageOld)
+{
+	/* XXX: provide code to update the row with the underlying device */
+	tcapOmDevelSent15minIntTable_refresh = 1;
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int revert_tcapOmDevelSent15minIntTable_row(struct tcapOmDevelSent15minIntTable_data *StorageTmp, struct tcapOmDevelSent15minIntTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the undo operation (UNDO phase) on a row
+ */
+void
+revert_tcapOmDevelSent15minIntTable_row(struct tcapOmDevelSent15minIntTable_data *StorageTmp, struct tcapOmDevelSent15minIntTable_data *StorageOld)
+{
+	/* XXX: provide code to revert the row with the underlying device */
+	update_tcapOmDevelSent15minIntTable_row(StorageOld, NULL);
 }
 
 /**
@@ -10539,17 +12742,15 @@ var_tcapOmDevelSent15minIntTable(struct variable *vp, oid * name, size_t *length
 int
 write_tcapOm1stAndIntervalActivate(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static oid *old_value;
-	struct tcapOmMIB_data *StorageTmp = NULL;
-	static size_t old_length = 0;
-	static oid *objid = NULL;
+	struct tcapOmMIB_data *StorageTmp = NULL, *StorageOld = NULL;
+	oid *objid = NULL;
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("tcapOmMIB", "write_tcapOm1stAndIntervalActivate entering action=%d...  \n", action));
 	if ((StorageTmp = tcapOmMIBStorage) == NULL)
-		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
+		return SNMP_ERR_NOSUCHNAME;
 	switch (action) {
 	case RESERVE1:
-		objid = NULL;
 		if (var_val_type != ASN_OBJECT_ID) {
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to tcapOm1stAndIntervalActivate not ASN_OBJECT_ID\n");
 			return SNMP_ERR_WRONGTYPE;
@@ -10558,29 +12759,69 @@ write_tcapOm1stAndIntervalActivate(int action, u_char *var_val, u_char var_val_t
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to tcapOm1stAndIntervalActivate: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
-		break;
-	case RESERVE2:		/* memory reseveration, final preparation... */
+		/* one allocation for whole mib */
+		if ((StorageOld = StorageTmp->tcapOmMIB_old) == NULL)
+			if (StorageTmp->tcapOmMIB_rsvs == 0)
+				if ((StorageOld = StorageTmp->tcapOmMIB_old = tcapOmMIB_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->tcapOmMIB_rsvs++;
 		if ((objid = snmp_duplicate_objid((void *) var_val, var_val_len / sizeof(oid))) == NULL)
 			return SNMP_ERR_RESOURCEUNAVAILABLE;
-		break;
-	case ACTION:		/* The variable has been stored in objid for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the
-				   UNDO case */
-		old_value = StorageTmp->tcapOm1stAndIntervalActivate;
-		old_length = StorageTmp->tcapOm1stAndIntervalActivateLen;
+		SNMP_FREE(StorageTmp->tcapOm1stAndIntervalActivate);
 		StorageTmp->tcapOm1stAndIntervalActivate = objid;
 		StorageTmp->tcapOm1stAndIntervalActivateLen = var_val_len / sizeof(oid);
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
+		break;
+	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->tcapOmMIB_old) != NULL) {
+			/* one consistency check for the whole mib */
+			if (StorageTmp->tcapOmMIB_tsts == 0)
+				if ((ret = check_tcapOmMIB(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->tcapOmMIB_tsts++;
+		}
+		break;
+	case ACTION:		/* The variable has been stored in StorageTmp->tcapOm1stAndIntervalActivate for you to use, and you have just been asked to do something with it.  Note that anything
+				   done here must be reversable in the UNDO case */
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole mib */
+		if ((StorageOld = StorageTmp->tcapOmMIB_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->tcapOmMIB_sets == 0)
+				if ((ret = update_tcapOmMIB(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->tcapOmMIB_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
-		SNMP_FREE(old_value);
-		old_length = 0;
-		objid = NULL;
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->tcapOmMIB_old) != NULL) {
+			tcapOmMIB_destroy(&StorageTmp->tcapOmMIB_old);
+			StorageTmp->tcapOmMIB_rsvs = 0;
+			StorageTmp->tcapOmMIB_tsts = 0;
+			StorageTmp->tcapOmMIB_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->tcapOm1stAndIntervalActivate = old_value;
-		StorageTmp->tcapOm1stAndIntervalActivateLen = old_length;
+		if ((StorageOld = StorageTmp->tcapOmMIB_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->tcapOmMIB_tsts == 0)
+			revert_tcapOmMIB(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
-		SNMP_FREE(objid);
+		if ((StorageOld = StorageTmp->tcapOmMIB_old) == NULL)
+			break;
+		if (StorageOld->tcapOm1stAndIntervalActivate != NULL) {
+			SNMP_FREE(StorageTmp->tcapOm1stAndIntervalActivate);
+			StorageTmp->tcapOm1stAndIntervalActivate = StorageOld->tcapOm1stAndIntervalActivate;
+			StorageTmp->tcapOm1stAndIntervalActivateLen = StorageOld->tcapOm1stAndIntervalActivateLen;
+			StorageOld->tcapOm1stAndIntervalActivate = NULL;
+			StorageOld->tcapOm1stAndIntervalActivateLen = 0;
+		}
+		if (--StorageTmp->tcapOmMIB_rsvs == 0)
+			tcapOmMIB_destroy(&StorageTmp->tcapOmMIB_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -10600,17 +12841,15 @@ write_tcapOm1stAndIntervalActivate(int action, u_char *var_val, u_char var_val_t
 int
 write_tcapOm1stAndIntervalDeactivate(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static oid *old_value;
-	struct tcapOmMIB_data *StorageTmp = NULL;
-	static size_t old_length = 0;
-	static oid *objid = NULL;
+	struct tcapOmMIB_data *StorageTmp = NULL, *StorageOld = NULL;
+	oid *objid = NULL;
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("tcapOmMIB", "write_tcapOm1stAndIntervalDeactivate entering action=%d...  \n", action));
 	if ((StorageTmp = tcapOmMIBStorage) == NULL)
-		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
+		return SNMP_ERR_NOSUCHNAME;
 	switch (action) {
 	case RESERVE1:
-		objid = NULL;
 		if (var_val_type != ASN_OBJECT_ID) {
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to tcapOm1stAndIntervalDeactivate not ASN_OBJECT_ID\n");
 			return SNMP_ERR_WRONGTYPE;
@@ -10619,29 +12858,69 @@ write_tcapOm1stAndIntervalDeactivate(int action, u_char *var_val, u_char var_val
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to tcapOm1stAndIntervalDeactivate: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
-		break;
-	case RESERVE2:		/* memory reseveration, final preparation... */
+		/* one allocation for whole mib */
+		if ((StorageOld = StorageTmp->tcapOmMIB_old) == NULL)
+			if (StorageTmp->tcapOmMIB_rsvs == 0)
+				if ((StorageOld = StorageTmp->tcapOmMIB_old = tcapOmMIB_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->tcapOmMIB_rsvs++;
 		if ((objid = snmp_duplicate_objid((void *) var_val, var_val_len / sizeof(oid))) == NULL)
 			return SNMP_ERR_RESOURCEUNAVAILABLE;
-		break;
-	case ACTION:		/* The variable has been stored in objid for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the
-				   UNDO case */
-		old_value = StorageTmp->tcapOm1stAndIntervalDeactivate;
-		old_length = StorageTmp->tcapOm1stAndIntervalDeactivateLen;
+		SNMP_FREE(StorageTmp->tcapOm1stAndIntervalDeactivate);
 		StorageTmp->tcapOm1stAndIntervalDeactivate = objid;
 		StorageTmp->tcapOm1stAndIntervalDeactivateLen = var_val_len / sizeof(oid);
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
+		break;
+	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->tcapOmMIB_old) != NULL) {
+			/* one consistency check for the whole mib */
+			if (StorageTmp->tcapOmMIB_tsts == 0)
+				if ((ret = check_tcapOmMIB(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->tcapOmMIB_tsts++;
+		}
+		break;
+	case ACTION:		/* The variable has been stored in StorageTmp->tcapOm1stAndIntervalDeactivate for you to use, and you have just been asked to do something with it.  Note that anything 
+				   done here must be reversable in the UNDO case */
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole mib */
+		if ((StorageOld = StorageTmp->tcapOmMIB_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->tcapOmMIB_sets == 0)
+				if ((ret = update_tcapOmMIB(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->tcapOmMIB_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
-		SNMP_FREE(old_value);
-		old_length = 0;
-		objid = NULL;
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->tcapOmMIB_old) != NULL) {
+			tcapOmMIB_destroy(&StorageTmp->tcapOmMIB_old);
+			StorageTmp->tcapOmMIB_rsvs = 0;
+			StorageTmp->tcapOmMIB_tsts = 0;
+			StorageTmp->tcapOmMIB_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->tcapOm1stAndIntervalDeactivate = old_value;
-		StorageTmp->tcapOm1stAndIntervalDeactivateLen = old_length;
+		if ((StorageOld = StorageTmp->tcapOmMIB_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->tcapOmMIB_tsts == 0)
+			revert_tcapOmMIB(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
-		SNMP_FREE(objid);
+		if ((StorageOld = StorageTmp->tcapOmMIB_old) == NULL)
+			break;
+		if (StorageOld->tcapOm1stAndIntervalDeactivate != NULL) {
+			SNMP_FREE(StorageTmp->tcapOm1stAndIntervalDeactivate);
+			StorageTmp->tcapOm1stAndIntervalDeactivate = StorageOld->tcapOm1stAndIntervalDeactivate;
+			StorageTmp->tcapOm1stAndIntervalDeactivateLen = StorageOld->tcapOm1stAndIntervalDeactivateLen;
+			StorageOld->tcapOm1stAndIntervalDeactivate = NULL;
+			StorageOld->tcapOm1stAndIntervalDeactivateLen = 0;
+		}
+		if (--StorageTmp->tcapOmMIB_rsvs == 0)
+			tcapOmMIB_destroy(&StorageTmp->tcapOmMIB_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -10661,17 +12940,15 @@ write_tcapOm1stAndIntervalDeactivate(int action, u_char *var_val, u_char var_val
 int
 write_tcapOm5MinActivate(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static oid *old_value;
-	struct tcapOmMIB_data *StorageTmp = NULL;
-	static size_t old_length = 0;
-	static oid *objid = NULL;
+	struct tcapOmMIB_data *StorageTmp = NULL, *StorageOld = NULL;
+	oid *objid = NULL;
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("tcapOmMIB", "write_tcapOm5MinActivate entering action=%d...  \n", action));
 	if ((StorageTmp = tcapOmMIBStorage) == NULL)
-		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
+		return SNMP_ERR_NOSUCHNAME;
 	switch (action) {
 	case RESERVE1:
-		objid = NULL;
 		if (var_val_type != ASN_OBJECT_ID) {
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to tcapOm5MinActivate not ASN_OBJECT_ID\n");
 			return SNMP_ERR_WRONGTYPE;
@@ -10680,29 +12957,69 @@ write_tcapOm5MinActivate(int action, u_char *var_val, u_char var_val_type, size_
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to tcapOm5MinActivate: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
-		break;
-	case RESERVE2:		/* memory reseveration, final preparation... */
+		/* one allocation for whole mib */
+		if ((StorageOld = StorageTmp->tcapOmMIB_old) == NULL)
+			if (StorageTmp->tcapOmMIB_rsvs == 0)
+				if ((StorageOld = StorageTmp->tcapOmMIB_old = tcapOmMIB_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->tcapOmMIB_rsvs++;
 		if ((objid = snmp_duplicate_objid((void *) var_val, var_val_len / sizeof(oid))) == NULL)
 			return SNMP_ERR_RESOURCEUNAVAILABLE;
-		break;
-	case ACTION:		/* The variable has been stored in objid for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the
-				   UNDO case */
-		old_value = StorageTmp->tcapOm5MinActivate;
-		old_length = StorageTmp->tcapOm5MinActivateLen;
+		SNMP_FREE(StorageTmp->tcapOm5MinActivate);
 		StorageTmp->tcapOm5MinActivate = objid;
 		StorageTmp->tcapOm5MinActivateLen = var_val_len / sizeof(oid);
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
+		break;
+	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->tcapOmMIB_old) != NULL) {
+			/* one consistency check for the whole mib */
+			if (StorageTmp->tcapOmMIB_tsts == 0)
+				if ((ret = check_tcapOmMIB(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->tcapOmMIB_tsts++;
+		}
+		break;
+	case ACTION:		/* The variable has been stored in StorageTmp->tcapOm5MinActivate for you to use, and you have just been asked to do something with it.  Note that anything done here
+				   must be reversable in the UNDO case */
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole mib */
+		if ((StorageOld = StorageTmp->tcapOmMIB_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->tcapOmMIB_sets == 0)
+				if ((ret = update_tcapOmMIB(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->tcapOmMIB_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
-		SNMP_FREE(old_value);
-		old_length = 0;
-		objid = NULL;
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->tcapOmMIB_old) != NULL) {
+			tcapOmMIB_destroy(&StorageTmp->tcapOmMIB_old);
+			StorageTmp->tcapOmMIB_rsvs = 0;
+			StorageTmp->tcapOmMIB_tsts = 0;
+			StorageTmp->tcapOmMIB_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->tcapOm5MinActivate = old_value;
-		StorageTmp->tcapOm5MinActivateLen = old_length;
+		if ((StorageOld = StorageTmp->tcapOmMIB_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->tcapOmMIB_tsts == 0)
+			revert_tcapOmMIB(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
-		SNMP_FREE(objid);
+		if ((StorageOld = StorageTmp->tcapOmMIB_old) == NULL)
+			break;
+		if (StorageOld->tcapOm5MinActivate != NULL) {
+			SNMP_FREE(StorageTmp->tcapOm5MinActivate);
+			StorageTmp->tcapOm5MinActivate = StorageOld->tcapOm5MinActivate;
+			StorageTmp->tcapOm5MinActivateLen = StorageOld->tcapOm5MinActivateLen;
+			StorageOld->tcapOm5MinActivate = NULL;
+			StorageOld->tcapOm5MinActivateLen = 0;
+		}
+		if (--StorageTmp->tcapOmMIB_rsvs == 0)
+			tcapOmMIB_destroy(&StorageTmp->tcapOmMIB_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -10722,17 +13039,15 @@ write_tcapOm5MinActivate(int action, u_char *var_val, u_char var_val_type, size_
 int
 write_tcapOm5MinDeaActivate(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static oid *old_value;
-	struct tcapOmMIB_data *StorageTmp = NULL;
-	static size_t old_length = 0;
-	static oid *objid = NULL;
+	struct tcapOmMIB_data *StorageTmp = NULL, *StorageOld = NULL;
+	oid *objid = NULL;
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("tcapOmMIB", "write_tcapOm5MinDeaActivate entering action=%d...  \n", action));
 	if ((StorageTmp = tcapOmMIBStorage) == NULL)
-		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
+		return SNMP_ERR_NOSUCHNAME;
 	switch (action) {
 	case RESERVE1:
-		objid = NULL;
 		if (var_val_type != ASN_OBJECT_ID) {
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to tcapOm5MinDeaActivate not ASN_OBJECT_ID\n");
 			return SNMP_ERR_WRONGTYPE;
@@ -10741,29 +13056,69 @@ write_tcapOm5MinDeaActivate(int action, u_char *var_val, u_char var_val_type, si
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to tcapOm5MinDeaActivate: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
-		break;
-	case RESERVE2:		/* memory reseveration, final preparation... */
+		/* one allocation for whole mib */
+		if ((StorageOld = StorageTmp->tcapOmMIB_old) == NULL)
+			if (StorageTmp->tcapOmMIB_rsvs == 0)
+				if ((StorageOld = StorageTmp->tcapOmMIB_old = tcapOmMIB_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->tcapOmMIB_rsvs++;
 		if ((objid = snmp_duplicate_objid((void *) var_val, var_val_len / sizeof(oid))) == NULL)
 			return SNMP_ERR_RESOURCEUNAVAILABLE;
-		break;
-	case ACTION:		/* The variable has been stored in objid for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the
-				   UNDO case */
-		old_value = StorageTmp->tcapOm5MinDeaActivate;
-		old_length = StorageTmp->tcapOm5MinDeaActivateLen;
+		SNMP_FREE(StorageTmp->tcapOm5MinDeaActivate);
 		StorageTmp->tcapOm5MinDeaActivate = objid;
 		StorageTmp->tcapOm5MinDeaActivateLen = var_val_len / sizeof(oid);
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
+		break;
+	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->tcapOmMIB_old) != NULL) {
+			/* one consistency check for the whole mib */
+			if (StorageTmp->tcapOmMIB_tsts == 0)
+				if ((ret = check_tcapOmMIB(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->tcapOmMIB_tsts++;
+		}
+		break;
+	case ACTION:		/* The variable has been stored in StorageTmp->tcapOm5MinDeaActivate for you to use, and you have just been asked to do something with it.  Note that anything done
+				   here must be reversable in the UNDO case */
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole mib */
+		if ((StorageOld = StorageTmp->tcapOmMIB_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->tcapOmMIB_sets == 0)
+				if ((ret = update_tcapOmMIB(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->tcapOmMIB_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
-		SNMP_FREE(old_value);
-		old_length = 0;
-		objid = NULL;
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->tcapOmMIB_old) != NULL) {
+			tcapOmMIB_destroy(&StorageTmp->tcapOmMIB_old);
+			StorageTmp->tcapOmMIB_rsvs = 0;
+			StorageTmp->tcapOmMIB_tsts = 0;
+			StorageTmp->tcapOmMIB_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->tcapOm5MinDeaActivate = old_value;
-		StorageTmp->tcapOm5MinDeaActivateLen = old_length;
+		if ((StorageOld = StorageTmp->tcapOmMIB_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->tcapOmMIB_tsts == 0)
+			revert_tcapOmMIB(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
-		SNMP_FREE(objid);
+		if ((StorageOld = StorageTmp->tcapOmMIB_old) == NULL)
+			break;
+		if (StorageOld->tcapOm5MinDeaActivate != NULL) {
+			SNMP_FREE(StorageTmp->tcapOm5MinDeaActivate);
+			StorageTmp->tcapOm5MinDeaActivate = StorageOld->tcapOm5MinDeaActivate;
+			StorageTmp->tcapOm5MinDeaActivateLen = StorageOld->tcapOm5MinDeaActivateLen;
+			StorageOld->tcapOm5MinDeaActivate = NULL;
+			StorageOld->tcapOm5MinDeaActivateLen = 0;
+		}
+		if (--StorageTmp->tcapOmMIB_rsvs == 0)
+			tcapOmMIB_destroy(&StorageTmp->tcapOmMIB_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -10783,17 +13138,15 @@ write_tcapOm5MinDeaActivate(int action, u_char *var_val, u_char var_val_type, si
 int
 write_tcapOm15MinActivate(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static oid *old_value;
-	struct tcapOmMIB_data *StorageTmp = NULL;
-	static size_t old_length = 0;
-	static oid *objid = NULL;
+	struct tcapOmMIB_data *StorageTmp = NULL, *StorageOld = NULL;
+	oid *objid = NULL;
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("tcapOmMIB", "write_tcapOm15MinActivate entering action=%d...  \n", action));
 	if ((StorageTmp = tcapOmMIBStorage) == NULL)
-		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
+		return SNMP_ERR_NOSUCHNAME;
 	switch (action) {
 	case RESERVE1:
-		objid = NULL;
 		if (var_val_type != ASN_OBJECT_ID) {
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to tcapOm15MinActivate not ASN_OBJECT_ID\n");
 			return SNMP_ERR_WRONGTYPE;
@@ -10802,29 +13155,69 @@ write_tcapOm15MinActivate(int action, u_char *var_val, u_char var_val_type, size
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to tcapOm15MinActivate: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
-		break;
-	case RESERVE2:		/* memory reseveration, final preparation... */
+		/* one allocation for whole mib */
+		if ((StorageOld = StorageTmp->tcapOmMIB_old) == NULL)
+			if (StorageTmp->tcapOmMIB_rsvs == 0)
+				if ((StorageOld = StorageTmp->tcapOmMIB_old = tcapOmMIB_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->tcapOmMIB_rsvs++;
 		if ((objid = snmp_duplicate_objid((void *) var_val, var_val_len / sizeof(oid))) == NULL)
 			return SNMP_ERR_RESOURCEUNAVAILABLE;
-		break;
-	case ACTION:		/* The variable has been stored in objid for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the
-				   UNDO case */
-		old_value = StorageTmp->tcapOm15MinActivate;
-		old_length = StorageTmp->tcapOm15MinActivateLen;
+		SNMP_FREE(StorageTmp->tcapOm15MinActivate);
 		StorageTmp->tcapOm15MinActivate = objid;
 		StorageTmp->tcapOm15MinActivateLen = var_val_len / sizeof(oid);
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
+		break;
+	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->tcapOmMIB_old) != NULL) {
+			/* one consistency check for the whole mib */
+			if (StorageTmp->tcapOmMIB_tsts == 0)
+				if ((ret = check_tcapOmMIB(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->tcapOmMIB_tsts++;
+		}
+		break;
+	case ACTION:		/* The variable has been stored in StorageTmp->tcapOm15MinActivate for you to use, and you have just been asked to do something with it.  Note that anything done here
+				   must be reversable in the UNDO case */
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole mib */
+		if ((StorageOld = StorageTmp->tcapOmMIB_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->tcapOmMIB_sets == 0)
+				if ((ret = update_tcapOmMIB(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->tcapOmMIB_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
-		SNMP_FREE(old_value);
-		old_length = 0;
-		objid = NULL;
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->tcapOmMIB_old) != NULL) {
+			tcapOmMIB_destroy(&StorageTmp->tcapOmMIB_old);
+			StorageTmp->tcapOmMIB_rsvs = 0;
+			StorageTmp->tcapOmMIB_tsts = 0;
+			StorageTmp->tcapOmMIB_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->tcapOm15MinActivate = old_value;
-		StorageTmp->tcapOm15MinActivateLen = old_length;
+		if ((StorageOld = StorageTmp->tcapOmMIB_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->tcapOmMIB_tsts == 0)
+			revert_tcapOmMIB(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
-		SNMP_FREE(objid);
+		if ((StorageOld = StorageTmp->tcapOmMIB_old) == NULL)
+			break;
+		if (StorageOld->tcapOm15MinActivate != NULL) {
+			SNMP_FREE(StorageTmp->tcapOm15MinActivate);
+			StorageTmp->tcapOm15MinActivate = StorageOld->tcapOm15MinActivate;
+			StorageTmp->tcapOm15MinActivateLen = StorageOld->tcapOm15MinActivateLen;
+			StorageOld->tcapOm15MinActivate = NULL;
+			StorageOld->tcapOm15MinActivateLen = 0;
+		}
+		if (--StorageTmp->tcapOmMIB_rsvs == 0)
+			tcapOmMIB_destroy(&StorageTmp->tcapOmMIB_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -10844,17 +13237,15 @@ write_tcapOm15MinActivate(int action, u_char *var_val, u_char var_val_type, size
 int
 write_tcapOm15MinDeaActivate(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static oid *old_value;
-	struct tcapOmMIB_data *StorageTmp = NULL;
-	static size_t old_length = 0;
-	static oid *objid = NULL;
+	struct tcapOmMIB_data *StorageTmp = NULL, *StorageOld = NULL;
+	oid *objid = NULL;
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("tcapOmMIB", "write_tcapOm15MinDeaActivate entering action=%d...  \n", action));
 	if ((StorageTmp = tcapOmMIBStorage) == NULL)
-		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
+		return SNMP_ERR_NOSUCHNAME;
 	switch (action) {
 	case RESERVE1:
-		objid = NULL;
 		if (var_val_type != ASN_OBJECT_ID) {
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to tcapOm15MinDeaActivate not ASN_OBJECT_ID\n");
 			return SNMP_ERR_WRONGTYPE;
@@ -10863,29 +13254,69 @@ write_tcapOm15MinDeaActivate(int action, u_char *var_val, u_char var_val_type, s
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to tcapOm15MinDeaActivate: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
-		break;
-	case RESERVE2:		/* memory reseveration, final preparation... */
+		/* one allocation for whole mib */
+		if ((StorageOld = StorageTmp->tcapOmMIB_old) == NULL)
+			if (StorageTmp->tcapOmMIB_rsvs == 0)
+				if ((StorageOld = StorageTmp->tcapOmMIB_old = tcapOmMIB_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->tcapOmMIB_rsvs++;
 		if ((objid = snmp_duplicate_objid((void *) var_val, var_val_len / sizeof(oid))) == NULL)
 			return SNMP_ERR_RESOURCEUNAVAILABLE;
-		break;
-	case ACTION:		/* The variable has been stored in objid for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the
-				   UNDO case */
-		old_value = StorageTmp->tcapOm15MinDeaActivate;
-		old_length = StorageTmp->tcapOm15MinDeaActivateLen;
+		SNMP_FREE(StorageTmp->tcapOm15MinDeaActivate);
 		StorageTmp->tcapOm15MinDeaActivate = objid;
 		StorageTmp->tcapOm15MinDeaActivateLen = var_val_len / sizeof(oid);
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
+		break;
+	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->tcapOmMIB_old) != NULL) {
+			/* one consistency check for the whole mib */
+			if (StorageTmp->tcapOmMIB_tsts == 0)
+				if ((ret = check_tcapOmMIB(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->tcapOmMIB_tsts++;
+		}
+		break;
+	case ACTION:		/* The variable has been stored in StorageTmp->tcapOm15MinDeaActivate for you to use, and you have just been asked to do something with it.  Note that anything done
+				   here must be reversable in the UNDO case */
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole mib */
+		if ((StorageOld = StorageTmp->tcapOmMIB_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->tcapOmMIB_sets == 0)
+				if ((ret = update_tcapOmMIB(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->tcapOmMIB_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
-		SNMP_FREE(old_value);
-		old_length = 0;
-		objid = NULL;
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->tcapOmMIB_old) != NULL) {
+			tcapOmMIB_destroy(&StorageTmp->tcapOmMIB_old);
+			StorageTmp->tcapOmMIB_rsvs = 0;
+			StorageTmp->tcapOmMIB_tsts = 0;
+			StorageTmp->tcapOmMIB_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->tcapOm15MinDeaActivate = old_value;
-		StorageTmp->tcapOm15MinDeaActivateLen = old_length;
+		if ((StorageOld = StorageTmp->tcapOmMIB_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->tcapOmMIB_tsts == 0)
+			revert_tcapOmMIB(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
-		SNMP_FREE(objid);
+		if ((StorageOld = StorageTmp->tcapOmMIB_old) == NULL)
+			break;
+		if (StorageOld->tcapOm15MinDeaActivate != NULL) {
+			SNMP_FREE(StorageTmp->tcapOm15MinDeaActivate);
+			StorageTmp->tcapOm15MinDeaActivate = StorageOld->tcapOm15MinDeaActivate;
+			StorageTmp->tcapOm15MinDeaActivateLen = StorageOld->tcapOm15MinDeaActivateLen;
+			StorageOld->tcapOm15MinDeaActivate = NULL;
+			StorageOld->tcapOm15MinDeaActivateLen = 0;
+		}
+		if (--StorageTmp->tcapOmMIB_rsvs == 0)
+			tcapOmMIB_destroy(&StorageTmp->tcapOmMIB_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -10905,13 +13336,13 @@ write_tcapOm15MinDeaActivate(int action, u_char *var_val, u_char var_val_type, s
 int
 write_tcapOm5MinMaxIntervals(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static ulong old_value;
-	struct tcapOmMIB_data *StorageTmp = NULL;
+	struct tcapOmMIB_data *StorageTmp = NULL, *StorageOld = NULL;
 	ulong set_value = *((ulong *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("tcapOmMIB", "write_tcapOm5MinMaxIntervals entering action=%d...  \n", action));
 	if ((StorageTmp = tcapOmMIBStorage) == NULL)
-		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
+		return SNMP_ERR_NOSUCHNAME;
 	switch (action) {
 	case RESERVE1:
 		if (var_val_type != ASN_UNSIGNED) {
@@ -10928,20 +13359,59 @@ write_tcapOm5MinMaxIntervals(int action, u_char *var_val, u_char var_val_type, s
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to tcapOm5MinMaxIntervals: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
+		/* one allocation for whole mib */
+		if ((StorageOld = StorageTmp->tcapOmMIB_old) == NULL)
+			if (StorageTmp->tcapOmMIB_rsvs == 0)
+				if ((StorageOld = StorageTmp->tcapOmMIB_old = tcapOmMIB_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->tcapOmMIB_rsvs++;
+		StorageTmp->tcapOm5MinMaxIntervals = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->tcapOmMIB_old) != NULL) {
+			/* one consistency check for the whole mib */
+			if (StorageTmp->tcapOmMIB_tsts == 0)
+				if ((ret = check_tcapOmMIB(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->tcapOmMIB_tsts++;
+		}
 		break;
-	case ACTION:		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in
-				   the UNDO case */
-		old_value = StorageTmp->tcapOm5MinMaxIntervals;
-		StorageTmp->tcapOm5MinMaxIntervals = set_value;
+	case ACTION:		/* The variable has been stored in StorageTmp->tcapOm5MinMaxIntervals for you to use, and you have just been asked to do something with it.  Note that anything done
+				   here must be reversable in the UNDO case */
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole mib */
+		if ((StorageOld = StorageTmp->tcapOmMIB_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->tcapOmMIB_sets == 0)
+				if ((ret = update_tcapOmMIB(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->tcapOmMIB_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->tcapOmMIB_old) != NULL) {
+			tcapOmMIB_destroy(&StorageTmp->tcapOmMIB_old);
+			StorageTmp->tcapOmMIB_rsvs = 0;
+			StorageTmp->tcapOmMIB_tsts = 0;
+			StorageTmp->tcapOmMIB_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->tcapOm5MinMaxIntervals = old_value;
+		if ((StorageOld = StorageTmp->tcapOmMIB_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->tcapOmMIB_tsts == 0)
+			revert_tcapOmMIB(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->tcapOmMIB_old) == NULL)
+			break;
+		StorageTmp->tcapOm5MinMaxIntervals = StorageOld->tcapOm5MinMaxIntervals;
+		if (--StorageTmp->tcapOmMIB_rsvs == 0)
+			tcapOmMIB_destroy(&StorageTmp->tcapOmMIB_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -10961,13 +13431,13 @@ write_tcapOm5MinMaxIntervals(int action, u_char *var_val, u_char var_val_type, s
 int
 write_tcapOm15MinMaxIntervals(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static ulong old_value;
-	struct tcapOmMIB_data *StorageTmp = NULL;
+	struct tcapOmMIB_data *StorageTmp = NULL, *StorageOld = NULL;
 	ulong set_value = *((ulong *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("tcapOmMIB", "write_tcapOm15MinMaxIntervals entering action=%d...  \n", action));
 	if ((StorageTmp = tcapOmMIBStorage) == NULL)
-		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
+		return SNMP_ERR_NOSUCHNAME;
 	switch (action) {
 	case RESERVE1:
 		if (var_val_type != ASN_UNSIGNED) {
@@ -10984,455 +13454,62 @@ write_tcapOm15MinMaxIntervals(int action, u_char *var_val, u_char var_val_type, 
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to tcapOm15MinMaxIntervals: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
+		/* one allocation for whole mib */
+		if ((StorageOld = StorageTmp->tcapOmMIB_old) == NULL)
+			if (StorageTmp->tcapOmMIB_rsvs == 0)
+				if ((StorageOld = StorageTmp->tcapOmMIB_old = tcapOmMIB_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->tcapOmMIB_rsvs++;
+		StorageTmp->tcapOm15MinMaxIntervals = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->tcapOmMIB_old) != NULL) {
+			/* one consistency check for the whole mib */
+			if (StorageTmp->tcapOmMIB_tsts == 0)
+				if ((ret = check_tcapOmMIB(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->tcapOmMIB_tsts++;
+		}
 		break;
-	case ACTION:		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in
-				   the UNDO case */
-		old_value = StorageTmp->tcapOm15MinMaxIntervals;
-		StorageTmp->tcapOm15MinMaxIntervals = set_value;
+	case ACTION:		/* The variable has been stored in StorageTmp->tcapOm15MinMaxIntervals for you to use, and you have just been asked to do something with it.  Note that anything done
+				   here must be reversable in the UNDO case */
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole mib */
+		if ((StorageOld = StorageTmp->tcapOmMIB_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->tcapOmMIB_sets == 0)
+				if ((ret = update_tcapOmMIB(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->tcapOmMIB_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->tcapOmMIB_old) != NULL) {
+			tcapOmMIB_destroy(&StorageTmp->tcapOmMIB_old);
+			StorageTmp->tcapOmMIB_rsvs = 0;
+			StorageTmp->tcapOmMIB_tsts = 0;
+			StorageTmp->tcapOmMIB_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->tcapOm15MinMaxIntervals = old_value;
+		if ((StorageOld = StorageTmp->tcapOmMIB_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->tcapOmMIB_tsts == 0)
+			revert_tcapOmMIB(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->tcapOmMIB_old) == NULL)
+			break;
+		StorageTmp->tcapOm15MinMaxIntervals = StorageOld->tcapOm15MinMaxIntervals;
+		if (--StorageTmp->tcapOmMIB_rsvs == 0)
+			tcapOmMIB_destroy(&StorageTmp->tcapOmMIB_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
-}
-
-/**
- * @fn int tcapOmNodeTable_consistent(struct tcapOmNodeTable_data *thedata)
- * @param thedata the row data to check for consistency.
- * @brief check the internal consistency of a table row.
- *
- * This function checks the internal consistency of a table row for the tcapOmNodeTable table.  If the
- * table row is internally consistent, then this function returns SNMP_ERR_NOERROR, otherwise the
- * function returns an SNMP error code and it will not be possible to activate the row until the
- * row's internal consistency is corrected.  This function might use a 'test' operation against the
- * driver to ensure that the commit phase will succeed.
- */
-int
-tcapOmNodeTable_consistent(struct tcapOmNodeTable_data *thedata)
-{
-	/* XXX: check row consistency return SNMP_ERR_NOERROR if consistent, or an SNMP error code if not. */
-	return (SNMP_ERR_NOERROR);
-}
-
-/**
- * @fn int tcapOmNodeCurrentTable_consistent(struct tcapOmNodeCurrentTable_data *thedata)
- * @param thedata the row data to check for consistency.
- * @brief check the internal consistency of a table row.
- *
- * This function checks the internal consistency of a table row for the tcapOmNodeCurrentTable table.  If the
- * table row is internally consistent, then this function returns SNMP_ERR_NOERROR, otherwise the
- * function returns an SNMP error code and it will not be possible to activate the row until the
- * row's internal consistency is corrected.  This function might use a 'test' operation against the
- * driver to ensure that the commit phase will succeed.
- */
-int
-tcapOmNodeCurrentTable_consistent(struct tcapOmNodeCurrentTable_data *thedata)
-{
-	/* XXX: check row consistency return SNMP_ERR_NOERROR if consistent, or an SNMP error code if not. */
-	return (SNMP_ERR_NOERROR);
-}
-
-/**
- * @fn int tcapOmNode5minIntTable_consistent(struct tcapOmNode5minIntTable_data *thedata)
- * @param thedata the row data to check for consistency.
- * @brief check the internal consistency of a table row.
- *
- * This function checks the internal consistency of a table row for the tcapOmNode5minIntTable table.  If the
- * table row is internally consistent, then this function returns SNMP_ERR_NOERROR, otherwise the
- * function returns an SNMP error code and it will not be possible to activate the row until the
- * row's internal consistency is corrected.  This function might use a 'test' operation against the
- * driver to ensure that the commit phase will succeed.
- */
-int
-tcapOmNode5minIntTable_consistent(struct tcapOmNode5minIntTable_data *thedata)
-{
-	/* XXX: check row consistency return SNMP_ERR_NOERROR if consistent, or an SNMP error code if not. */
-	return (SNMP_ERR_NOERROR);
-}
-
-/**
- * @fn int tcapOmNode15minIntTable_consistent(struct tcapOmNode15minIntTable_data *thedata)
- * @param thedata the row data to check for consistency.
- * @brief check the internal consistency of a table row.
- *
- * This function checks the internal consistency of a table row for the tcapOmNode15minIntTable table.  If the
- * table row is internally consistent, then this function returns SNMP_ERR_NOERROR, otherwise the
- * function returns an SNMP error code and it will not be possible to activate the row until the
- * row's internal consistency is corrected.  This function might use a 'test' operation against the
- * driver to ensure that the commit phase will succeed.
- */
-int
-tcapOmNode15minIntTable_consistent(struct tcapOmNode15minIntTable_data *thedata)
-{
-	/* XXX: check row consistency return SNMP_ERR_NOERROR if consistent, or an SNMP error code if not. */
-	return (SNMP_ERR_NOERROR);
-}
-
-/**
- * @fn int tcapOmMsgsTable_consistent(struct tcapOmMsgsTable_data *thedata)
- * @param thedata the row data to check for consistency.
- * @brief check the internal consistency of a table row.
- *
- * This function checks the internal consistency of a table row for the tcapOmMsgsTable table.  If the
- * table row is internally consistent, then this function returns SNMP_ERR_NOERROR, otherwise the
- * function returns an SNMP error code and it will not be possible to activate the row until the
- * row's internal consistency is corrected.  This function might use a 'test' operation against the
- * driver to ensure that the commit phase will succeed.
- */
-int
-tcapOmMsgsTable_consistent(struct tcapOmMsgsTable_data *thedata)
-{
-	/* XXX: check row consistency return SNMP_ERR_NOERROR if consistent, or an SNMP error code if not. */
-	return (SNMP_ERR_NOERROR);
-}
-
-/**
- * @fn int tcapOmMsgsCurrentTable_consistent(struct tcapOmMsgsCurrentTable_data *thedata)
- * @param thedata the row data to check for consistency.
- * @brief check the internal consistency of a table row.
- *
- * This function checks the internal consistency of a table row for the tcapOmMsgsCurrentTable table.  If the
- * table row is internally consistent, then this function returns SNMP_ERR_NOERROR, otherwise the
- * function returns an SNMP error code and it will not be possible to activate the row until the
- * row's internal consistency is corrected.  This function might use a 'test' operation against the
- * driver to ensure that the commit phase will succeed.
- */
-int
-tcapOmMsgsCurrentTable_consistent(struct tcapOmMsgsCurrentTable_data *thedata)
-{
-	/* XXX: check row consistency return SNMP_ERR_NOERROR if consistent, or an SNMP error code if not. */
-	return (SNMP_ERR_NOERROR);
-}
-
-/**
- * @fn int tcapOmMsgs5minIntTable_consistent(struct tcapOmMsgs5minIntTable_data *thedata)
- * @param thedata the row data to check for consistency.
- * @brief check the internal consistency of a table row.
- *
- * This function checks the internal consistency of a table row for the tcapOmMsgs5minIntTable table.  If the
- * table row is internally consistent, then this function returns SNMP_ERR_NOERROR, otherwise the
- * function returns an SNMP error code and it will not be possible to activate the row until the
- * row's internal consistency is corrected.  This function might use a 'test' operation against the
- * driver to ensure that the commit phase will succeed.
- */
-int
-tcapOmMsgs5minIntTable_consistent(struct tcapOmMsgs5minIntTable_data *thedata)
-{
-	/* XXX: check row consistency return SNMP_ERR_NOERROR if consistent, or an SNMP error code if not. */
-	return (SNMP_ERR_NOERROR);
-}
-
-/**
- * @fn int tcapOmMsgs15minIntTable_consistent(struct tcapOmMsgs15minIntTable_data *thedata)
- * @param thedata the row data to check for consistency.
- * @brief check the internal consistency of a table row.
- *
- * This function checks the internal consistency of a table row for the tcapOmMsgs15minIntTable table.  If the
- * table row is internally consistent, then this function returns SNMP_ERR_NOERROR, otherwise the
- * function returns an SNMP error code and it will not be possible to activate the row until the
- * row's internal consistency is corrected.  This function might use a 'test' operation against the
- * driver to ensure that the commit phase will succeed.
- */
-int
-tcapOmMsgs15minIntTable_consistent(struct tcapOmMsgs15minIntTable_data *thedata)
-{
-	/* XXX: check row consistency return SNMP_ERR_NOERROR if consistent, or an SNMP error code if not. */
-	return (SNMP_ERR_NOERROR);
-}
-
-/**
- * @fn int tcapOmAETable_consistent(struct tcapOmAETable_data *thedata)
- * @param thedata the row data to check for consistency.
- * @brief check the internal consistency of a table row.
- *
- * This function checks the internal consistency of a table row for the tcapOmAETable table.  If the
- * table row is internally consistent, then this function returns SNMP_ERR_NOERROR, otherwise the
- * function returns an SNMP error code and it will not be possible to activate the row until the
- * row's internal consistency is corrected.  This function might use a 'test' operation against the
- * driver to ensure that the commit phase will succeed.
- */
-int
-tcapOmAETable_consistent(struct tcapOmAETable_data *thedata)
-{
-	/* XXX: check row consistency return SNMP_ERR_NOERROR if consistent, or an SNMP error code if not. */
-	return (SNMP_ERR_NOERROR);
-}
-
-/**
- * @fn int tcapOmAECurrentTable_consistent(struct tcapOmAECurrentTable_data *thedata)
- * @param thedata the row data to check for consistency.
- * @brief check the internal consistency of a table row.
- *
- * This function checks the internal consistency of a table row for the tcapOmAECurrentTable table.  If the
- * table row is internally consistent, then this function returns SNMP_ERR_NOERROR, otherwise the
- * function returns an SNMP error code and it will not be possible to activate the row until the
- * row's internal consistency is corrected.  This function might use a 'test' operation against the
- * driver to ensure that the commit phase will succeed.
- */
-int
-tcapOmAECurrentTable_consistent(struct tcapOmAECurrentTable_data *thedata)
-{
-	/* XXX: check row consistency return SNMP_ERR_NOERROR if consistent, or an SNMP error code if not. */
-	return (SNMP_ERR_NOERROR);
-}
-
-/**
- * @fn int tcapOmAE5minIntTable_consistent(struct tcapOmAE5minIntTable_data *thedata)
- * @param thedata the row data to check for consistency.
- * @brief check the internal consistency of a table row.
- *
- * This function checks the internal consistency of a table row for the tcapOmAE5minIntTable table.  If the
- * table row is internally consistent, then this function returns SNMP_ERR_NOERROR, otherwise the
- * function returns an SNMP error code and it will not be possible to activate the row until the
- * row's internal consistency is corrected.  This function might use a 'test' operation against the
- * driver to ensure that the commit phase will succeed.
- */
-int
-tcapOmAE5minIntTable_consistent(struct tcapOmAE5minIntTable_data *thedata)
-{
-	/* XXX: check row consistency return SNMP_ERR_NOERROR if consistent, or an SNMP error code if not. */
-	return (SNMP_ERR_NOERROR);
-}
-
-/**
- * @fn int tcapOmAE15minIntTable_consistent(struct tcapOmAE15minIntTable_data *thedata)
- * @param thedata the row data to check for consistency.
- * @brief check the internal consistency of a table row.
- *
- * This function checks the internal consistency of a table row for the tcapOmAE15minIntTable table.  If the
- * table row is internally consistent, then this function returns SNMP_ERR_NOERROR, otherwise the
- * function returns an SNMP error code and it will not be possible to activate the row until the
- * row's internal consistency is corrected.  This function might use a 'test' operation against the
- * driver to ensure that the commit phase will succeed.
- */
-int
-tcapOmAE15minIntTable_consistent(struct tcapOmAE15minIntTable_data *thedata)
-{
-	/* XXX: check row consistency return SNMP_ERR_NOERROR if consistent, or an SNMP error code if not. */
-	return (SNMP_ERR_NOERROR);
-}
-
-/**
- * @fn int tcapOmTcTable_consistent(struct tcapOmTcTable_data *thedata)
- * @param thedata the row data to check for consistency.
- * @brief check the internal consistency of a table row.
- *
- * This function checks the internal consistency of a table row for the tcapOmTcTable table.  If the
- * table row is internally consistent, then this function returns SNMP_ERR_NOERROR, otherwise the
- * function returns an SNMP error code and it will not be possible to activate the row until the
- * row's internal consistency is corrected.  This function might use a 'test' operation against the
- * driver to ensure that the commit phase will succeed.
- */
-int
-tcapOmTcTable_consistent(struct tcapOmTcTable_data *thedata)
-{
-	/* XXX: check row consistency return SNMP_ERR_NOERROR if consistent, or an SNMP error code if not. */
-	return (SNMP_ERR_NOERROR);
-}
-
-/**
- * @fn int tcapOmTcCurrentTable_consistent(struct tcapOmTcCurrentTable_data *thedata)
- * @param thedata the row data to check for consistency.
- * @brief check the internal consistency of a table row.
- *
- * This function checks the internal consistency of a table row for the tcapOmTcCurrentTable table.  If the
- * table row is internally consistent, then this function returns SNMP_ERR_NOERROR, otherwise the
- * function returns an SNMP error code and it will not be possible to activate the row until the
- * row's internal consistency is corrected.  This function might use a 'test' operation against the
- * driver to ensure that the commit phase will succeed.
- */
-int
-tcapOmTcCurrentTable_consistent(struct tcapOmTcCurrentTable_data *thedata)
-{
-	/* XXX: check row consistency return SNMP_ERR_NOERROR if consistent, or an SNMP error code if not. */
-	return (SNMP_ERR_NOERROR);
-}
-
-/**
- * @fn int tcapOmTc5minIntTable_consistent(struct tcapOmTc5minIntTable_data *thedata)
- * @param thedata the row data to check for consistency.
- * @brief check the internal consistency of a table row.
- *
- * This function checks the internal consistency of a table row for the tcapOmTc5minIntTable table.  If the
- * table row is internally consistent, then this function returns SNMP_ERR_NOERROR, otherwise the
- * function returns an SNMP error code and it will not be possible to activate the row until the
- * row's internal consistency is corrected.  This function might use a 'test' operation against the
- * driver to ensure that the commit phase will succeed.
- */
-int
-tcapOmTc5minIntTable_consistent(struct tcapOmTc5minIntTable_data *thedata)
-{
-	/* XXX: check row consistency return SNMP_ERR_NOERROR if consistent, or an SNMP error code if not. */
-	return (SNMP_ERR_NOERROR);
-}
-
-/**
- * @fn int tcapOmTc15minIntTable_consistent(struct tcapOmTc15minIntTable_data *thedata)
- * @param thedata the row data to check for consistency.
- * @brief check the internal consistency of a table row.
- *
- * This function checks the internal consistency of a table row for the tcapOmTc15minIntTable table.  If the
- * table row is internally consistent, then this function returns SNMP_ERR_NOERROR, otherwise the
- * function returns an SNMP error code and it will not be possible to activate the row until the
- * row's internal consistency is corrected.  This function might use a 'test' operation against the
- * driver to ensure that the commit phase will succeed.
- */
-int
-tcapOmTc15minIntTable_consistent(struct tcapOmTc15minIntTable_data *thedata)
-{
-	/* XXX: check row consistency return SNMP_ERR_NOERROR if consistent, or an SNMP error code if not. */
-	return (SNMP_ERR_NOERROR);
-}
-
-/**
- * @fn int tcapOmDevelRecvTable_consistent(struct tcapOmDevelRecvTable_data *thedata)
- * @param thedata the row data to check for consistency.
- * @brief check the internal consistency of a table row.
- *
- * This function checks the internal consistency of a table row for the tcapOmDevelRecvTable table.  If the
- * table row is internally consistent, then this function returns SNMP_ERR_NOERROR, otherwise the
- * function returns an SNMP error code and it will not be possible to activate the row until the
- * row's internal consistency is corrected.  This function might use a 'test' operation against the
- * driver to ensure that the commit phase will succeed.
- */
-int
-tcapOmDevelRecvTable_consistent(struct tcapOmDevelRecvTable_data *thedata)
-{
-	/* XXX: check row consistency return SNMP_ERR_NOERROR if consistent, or an SNMP error code if not. */
-	return (SNMP_ERR_NOERROR);
-}
-
-/**
- * @fn int tcapOmDevelRecvCurrentTable_consistent(struct tcapOmDevelRecvCurrentTable_data *thedata)
- * @param thedata the row data to check for consistency.
- * @brief check the internal consistency of a table row.
- *
- * This function checks the internal consistency of a table row for the tcapOmDevelRecvCurrentTable table.  If the
- * table row is internally consistent, then this function returns SNMP_ERR_NOERROR, otherwise the
- * function returns an SNMP error code and it will not be possible to activate the row until the
- * row's internal consistency is corrected.  This function might use a 'test' operation against the
- * driver to ensure that the commit phase will succeed.
- */
-int
-tcapOmDevelRecvCurrentTable_consistent(struct tcapOmDevelRecvCurrentTable_data *thedata)
-{
-	/* XXX: check row consistency return SNMP_ERR_NOERROR if consistent, or an SNMP error code if not. */
-	return (SNMP_ERR_NOERROR);
-}
-
-/**
- * @fn int tcapOmDevelRecv5minIntTable_consistent(struct tcapOmDevelRecv5minIntTable_data *thedata)
- * @param thedata the row data to check for consistency.
- * @brief check the internal consistency of a table row.
- *
- * This function checks the internal consistency of a table row for the tcapOmDevelRecv5minIntTable table.  If the
- * table row is internally consistent, then this function returns SNMP_ERR_NOERROR, otherwise the
- * function returns an SNMP error code and it will not be possible to activate the row until the
- * row's internal consistency is corrected.  This function might use a 'test' operation against the
- * driver to ensure that the commit phase will succeed.
- */
-int
-tcapOmDevelRecv5minIntTable_consistent(struct tcapOmDevelRecv5minIntTable_data *thedata)
-{
-	/* XXX: check row consistency return SNMP_ERR_NOERROR if consistent, or an SNMP error code if not. */
-	return (SNMP_ERR_NOERROR);
-}
-
-/**
- * @fn int tcapOmDevelRecv15minIntTable_consistent(struct tcapOmDevelRecv15minIntTable_data *thedata)
- * @param thedata the row data to check for consistency.
- * @brief check the internal consistency of a table row.
- *
- * This function checks the internal consistency of a table row for the tcapOmDevelRecv15minIntTable table.  If the
- * table row is internally consistent, then this function returns SNMP_ERR_NOERROR, otherwise the
- * function returns an SNMP error code and it will not be possible to activate the row until the
- * row's internal consistency is corrected.  This function might use a 'test' operation against the
- * driver to ensure that the commit phase will succeed.
- */
-int
-tcapOmDevelRecv15minIntTable_consistent(struct tcapOmDevelRecv15minIntTable_data *thedata)
-{
-	/* XXX: check row consistency return SNMP_ERR_NOERROR if consistent, or an SNMP error code if not. */
-	return (SNMP_ERR_NOERROR);
-}
-
-/**
- * @fn int tcapOmDevelSentTable_consistent(struct tcapOmDevelSentTable_data *thedata)
- * @param thedata the row data to check for consistency.
- * @brief check the internal consistency of a table row.
- *
- * This function checks the internal consistency of a table row for the tcapOmDevelSentTable table.  If the
- * table row is internally consistent, then this function returns SNMP_ERR_NOERROR, otherwise the
- * function returns an SNMP error code and it will not be possible to activate the row until the
- * row's internal consistency is corrected.  This function might use a 'test' operation against the
- * driver to ensure that the commit phase will succeed.
- */
-int
-tcapOmDevelSentTable_consistent(struct tcapOmDevelSentTable_data *thedata)
-{
-	/* XXX: check row consistency return SNMP_ERR_NOERROR if consistent, or an SNMP error code if not. */
-	return (SNMP_ERR_NOERROR);
-}
-
-/**
- * @fn int tcapOmDevelSentCurrentTable_consistent(struct tcapOmDevelSentCurrentTable_data *thedata)
- * @param thedata the row data to check for consistency.
- * @brief check the internal consistency of a table row.
- *
- * This function checks the internal consistency of a table row for the tcapOmDevelSentCurrentTable table.  If the
- * table row is internally consistent, then this function returns SNMP_ERR_NOERROR, otherwise the
- * function returns an SNMP error code and it will not be possible to activate the row until the
- * row's internal consistency is corrected.  This function might use a 'test' operation against the
- * driver to ensure that the commit phase will succeed.
- */
-int
-tcapOmDevelSentCurrentTable_consistent(struct tcapOmDevelSentCurrentTable_data *thedata)
-{
-	/* XXX: check row consistency return SNMP_ERR_NOERROR if consistent, or an SNMP error code if not. */
-	return (SNMP_ERR_NOERROR);
-}
-
-/**
- * @fn int tcapOmDevelSent5minIntTable_consistent(struct tcapOmDevelSent5minIntTable_data *thedata)
- * @param thedata the row data to check for consistency.
- * @brief check the internal consistency of a table row.
- *
- * This function checks the internal consistency of a table row for the tcapOmDevelSent5minIntTable table.  If the
- * table row is internally consistent, then this function returns SNMP_ERR_NOERROR, otherwise the
- * function returns an SNMP error code and it will not be possible to activate the row until the
- * row's internal consistency is corrected.  This function might use a 'test' operation against the
- * driver to ensure that the commit phase will succeed.
- */
-int
-tcapOmDevelSent5minIntTable_consistent(struct tcapOmDevelSent5minIntTable_data *thedata)
-{
-	/* XXX: check row consistency return SNMP_ERR_NOERROR if consistent, or an SNMP error code if not. */
-	return (SNMP_ERR_NOERROR);
-}
-
-/**
- * @fn int tcapOmDevelSent15minIntTable_consistent(struct tcapOmDevelSent15minIntTable_data *thedata)
- * @param thedata the row data to check for consistency.
- * @brief check the internal consistency of a table row.
- *
- * This function checks the internal consistency of a table row for the tcapOmDevelSent15minIntTable table.  If the
- * table row is internally consistent, then this function returns SNMP_ERR_NOERROR, otherwise the
- * function returns an SNMP error code and it will not be possible to activate the row until the
- * row's internal consistency is corrected.  This function might use a 'test' operation against the
- * driver to ensure that the commit phase will succeed.
- */
-int
-tcapOmDevelSent15minIntTable_consistent(struct tcapOmDevelSent15minIntTable_data *thedata)
-{
-	/* XXX: check row consistency return SNMP_ERR_NOERROR if consistent, or an SNMP error code if not. */
-	return (SNMP_ERR_NOERROR);
 }
 
 /**

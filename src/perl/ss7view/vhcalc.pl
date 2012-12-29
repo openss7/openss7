@@ -5,7 +5,74 @@ use Glib qw(TRUE FALSE);
 
 our $geo = new Geo::Coordinates::VandH;
 
-sub closest {
+sub vh2ll {
+	my ($v,$h) = @_;
+	my ($la,$lo) = Geo::Coordinates::VandH->vh2ll($v,$h);
+	$lo = -$lo;
+	$lo += 360 if $lo < -180;
+	$lo -= 360 if $lo >  180;
+	return ($la,$lo);
+}
+
+my %vhcache = ();
+
+sub vh2llfast {
+	my ($v,$h,$inc) = @_;
+	my ($la,$lo);
+	if (exists $vhcache{$v}{$h}) {
+		($la,$lo) = @{$vhcache{$v}{$h}};
+	} else {
+		($la,$lo) = vh2ll($v,$h);
+		$vhcache{$v}{$h} = [$la,$lo] if $inc and $inc >= 100;
+	}
+	return ($la,$lo);
+}
+
+sub dist {
+	my ($la1,$lo1,$la2,$lo2) = @_;
+	my $d = sqrt((($la1-$la2)**2)+(($lo1-$lo2)**2));
+	return $d;
+}
+
+sub adjv {
+	my ($la,$lo,$v,$h,$inc,$d,$dt) = @_;
+	while ($d > ($dt = dist($la,$lo,vh2llfast($v+$inc,$h,$inc)))) { $d = $dt; $v += $inc; }
+	while ($d > ($dt = dist($la,$lo,vh2llfast($v-$inc,$h,$inc)))) { $d = $dt; $v -= $inc; }
+	return ($v,$d);
+}
+
+sub adjh {
+	my ($la,$lo,$v,$h,$inc,$d,$dt) = @_;
+	while ($d > ($dt = dist($la,$lo,vh2llfast($v,$h+$inc,$inc)))) { $d = $dt; $h += $inc; }
+	while ($d > ($dt = dist($la,$lo,vh2llfast($v,$h-$inc,$inc)))) { $d = $dt; $h -= $inc; }
+	return ($h,$d);
+}
+
+sub adjvh {
+	my ($la,$lo,$v,$h,$inc,$d,$dt) = @_;
+	if ($d > ($dt = dist($la,$lo,vh2llfast($v+$inc,$h+$inc,$inc)))) { $v+=$inc; $h+=$inc; return ($v,$h,$dt); }
+	if ($d > ($dt = dist($la,$lo,vh2llfast($v+$inc,$h,     $inc)))) { $v+=$inc;           return ($v,$h,$dt); }
+	if ($d > ($dt = dist($la,$lo,vh2llfast($v+$inc,$h-$inc,$inc)))) { $v+=$inc; $h-=$inc; return ($v,$h,$dt); }
+	if ($d > ($dt = dist($la,$lo,vh2llfast($v,     $h+$inc,$inc)))) {           $h+=$inc; return ($v,$h,$dt); }
+	if ($d > ($dt = dist($la,$lo,vh2llfast($v-$inc,$h+$inc,$inc)))) { $v-=$inc; $h+=$inc; return ($v,$h,$dt); }
+	if ($d > ($dt = dist($la,$lo,vh2llfast($v-$inc,$h,     $inc)))) { $v-=$inc;           return ($v,$h,$dt); }
+	if ($d > ($dt = dist($la,$lo,vh2llfast($v,     $h-$inc,$inc)))) {           $h-=$inc; return ($v,$h,$dt); }
+	if ($d > ($dt = dist($la,$lo,vh2llfast($v-$inc,$h-$inc,$inc)))) { $v-=$inc; $h-=$inc; return ($v,$h,$dt); }
+	return ($v,$h,$d);
+}
+
+sub adj {
+	my ($la,$lo,$v,$h,$inc,$d) = @_;
+	my $changed = 1;
+	while ($changed) {
+		my ($vsav,$hsav) = ($v,$h);
+		($v,$h,$d) = adjvh($la,$lo,$v,$h,$inc,$d);
+		$changed = ($v != $vsav or $h != $hsav);
+	}
+	return ($v,$h,$d);
+}
+
+sub ll2vhold {
 	my ($lat,$lon) = @_;
 	$lon -= 360 if $lon > 0;
 	my ($dd,$td,$cv,$ch);
@@ -29,8 +96,8 @@ sub closest {
 		}
 	}
 	($gv,$gh) = ($cv,$ch);
-	for (my $v=$gv-6000;$v<=$gv+6000;$v+=2000) {
-		for (my $h=$gh-6000;$h<=$gh+6000;$h+=2000) {
+	for (my $v=$gv-8000;$v<=$gv+8000;$v+=2000) {
+		for (my $h=$gh-8000;$h<=$gh+8000;$h+=2000) {
 			my ($y,$x) = Geo::Coordinates::VandH->vh2ll($v,$h);
 			$x = -$x;
 			if (defined $dd) {
@@ -48,8 +115,8 @@ sub closest {
 		}
 	}
 	($gv,$gh) = ($cv,$ch);
-	for (my $v=$gv-3000;$v<=$gv+3000;$v+=1000) {
-		for (my $h=$gh-3000;$h<=$gh+3000;$h+=1000) {
+	for (my $v=$gv-4000;$v<=$gv+4000;$v+=1000) {
+		for (my $h=$gh-4000;$h<=$gh+4000;$h+=1000) {
 			my ($y,$x) = Geo::Coordinates::VandH->vh2ll($v,$h);
 			$x = -$x;
 			if (defined $dd) {
@@ -67,8 +134,8 @@ sub closest {
 		}
 	}
 	($gv,$gh) = ($cv,$ch);
-	for (my $v=$gv-1500;$v<=$gv+1500;$v+=500) {
-		for (my $h=$gh-1500;$h<=$gh+1500;$h+=500) {
+	for (my $v=$gv-2000;$v<=$gv+2000;$v+=500) {
+		for (my $h=$gh-2000;$h<=$gh+2000;$h+=500) {
 			my ($y,$x) = Geo::Coordinates::VandH->vh2ll($v,$h);
 			$x = -$x;
 			if (defined $dd) {
@@ -86,8 +153,8 @@ sub closest {
 		}
 	}
 	($gv,$gh) = ($cv,$ch);
-	for (my $v=$gv-600;$v<=$gv+600;$v+=200) {
-		for (my $h=$gh-600;$h<=$gh+600;$h+=200) {
+	for (my $v=$gv-800;$v<=$gv+800;$v+=200) {
+		for (my $h=$gh-800;$h<=$gh+800;$h+=200) {
 			my ($y,$x) = Geo::Coordinates::VandH->vh2ll($v,$h);
 			$x = -$x;
 			if (defined $dd) {
@@ -105,8 +172,8 @@ sub closest {
 		}
 	}
 	($gv,$gh) = ($cv,$ch);
-	for (my $v=$gv-300;$v<=$gv+300;$v+=100) {
-		for (my $h=$gh-300;$h<=$gh+300;$h+=100) {
+	for (my $v=$gv-400;$v<=$gv+400;$v+=100) {
+		for (my $h=$gh-400;$h<=$gh+400;$h+=100) {
 			my ($y,$x) = Geo::Coordinates::VandH->vh2ll($v,$h);
 			$x = -$x;
 			if (defined $dd) {
@@ -124,8 +191,8 @@ sub closest {
 		}
 	}
 	($gv,$gh) = ($cv,$ch);
-	for (my $v=$gv-150;$v<=$gv+150;$v+=50) {
-		for (my $h=$gh-150;$h<=$gh+150;$h+=50) {
+	for (my $v=$gv-200;$v<=$gv+200;$v+=50) {
+		for (my $h=$gh-200;$h<=$gh+200;$h+=50) {
 			my ($y,$x) = Geo::Coordinates::VandH->vh2ll($v,$h);
 			$x = -$x;
 			if (defined $dd) {
@@ -143,8 +210,8 @@ sub closest {
 		}
 	}
 	($gv,$gh) = ($cv,$ch);
-	for (my $v=$gv-60;$v<=$gv+60;$v+=20) {
-		for (my $h=$gh-60;$h<=$gh+60;$h+=20) {
+	for (my $v=$gv-80;$v<=$gv+80;$v+=20) {
+		for (my $h=$gh-80;$h<=$gh+80;$h+=20) {
 			my ($y,$x) = Geo::Coordinates::VandH->vh2ll($v,$h);
 			$x = -$x;
 			if (defined $dd) {
@@ -162,8 +229,8 @@ sub closest {
 		}
 	}
 	($gv,$gh) = ($cv,$ch);
-	for (my $v=$gv-30;$v<=$gv+30;$v+=10) {
-		for (my $h=$gh-30;$h<=$gh+30;$h+=10) {
+	for (my $v=$gv-40;$v<=$gv+40;$v+=10) {
+		for (my $h=$gh-40;$h<=$gh+40;$h+=10) {
 			my ($y,$x) = Geo::Coordinates::VandH->vh2ll($v,$h);
 			$x = -$x;
 			if (defined $dd) {
@@ -181,8 +248,8 @@ sub closest {
 		}
 	}
 	($gv,$gh) = ($cv,$ch);
-	for (my $v=$gv-15;$v<=$gv+15;$v+=5) {
-		for (my $h=$gh-15;$h<=$gh+15;$h+=5) {
+	for (my $v=$gv-20;$v<=$gv+20;$v+=5) {
+		for (my $h=$gh-20;$h<=$gh+20;$h+=5) {
 			my ($y,$x) = Geo::Coordinates::VandH->vh2ll($v,$h);
 			$x = -$x;
 			if (defined $dd) {
@@ -200,8 +267,8 @@ sub closest {
 		}
 	}
 	($gv,$gh) = ($cv,$ch);
-	for (my $v=$gv-6;$v<=$gv+6;$v+=2) {
-		for (my $h=$gh-6;$h<=$gh+6;$h+=2) {
+	for (my $v=$gv-8;$v<=$gv+8;$v+=2) {
+		for (my $h=$gh-8;$h<=$gh+8;$h+=2) {
 			my ($y,$x) = Geo::Coordinates::VandH->vh2ll($v,$h);
 			$x = -$x;
 			if (defined $dd) {
@@ -219,8 +286,8 @@ sub closest {
 		}
 	}
 	($gv,$gh) = ($cv,$ch);
-	for (my $v=$gv-3;$v<=$gv+3;$v+=1) {
-		for (my $h=$gh-3;$h<=$gh+3;$h+=1) {
+	for (my $v=$gv-4;$v<=$gv+4;$v+=1) {
+		for (my $h=$gh-4;$h<=$gh+4;$h+=1) {
 			my ($y,$x) = Geo::Coordinates::VandH->vh2ll($v,$h);
 			$x = -$x;
 			if (defined $dd) {
@@ -240,88 +307,37 @@ sub closest {
 	return ($cv,$ch);
 }
 
-sub closestold {
-	my ($lat,$lon) = @_;
-	$lon -= 360 if $lon > 0;
-	my ($dd,$td,$cv,$ch);
-	my ($gv,$gh);
-	for (my $v=-5000;$v<=10000;$v+=1000) {
-		for (my $h=-5000;$h<=27000;$h+=1000) {
-			my ($y,$x) = $geo->vh2ll($v,$h);
-			$x = -$x;
-			if (defined $dd) {
-				$td = ($lat-$y)**2 + ($lon-$x)**2;
-				if ($td < $dd) {
-					$cv = $v;
-					$ch = $h;
-					$dd = $td;
-				}
-			} else {
-				$cv = $v;
-				$ch = $h;
-				$dd = ($lat-$y)**2 + ($lon-$x)**2;
-			}
+sub ll2vh {
+	my ($la,$lo) = @_;
+	my ($v,$h) = (-5000,-5000);
+	my $d = dist($la,$lo,vh2llfast($v,$h,5000));
+	($v,$h,$d) = adj($la,$lo,$v,$h,5000,$d);
+	($v,$h,$d) = adj($la,$lo,$v,$h,1250,$d);
+	($v,$h,$d) = adj($la,$lo,$v,$h,400,$d);
+	($v,$h,$d) = adj($la,$lo,$v,$h,100,$d);
+	($v,$h,$d) = adj($la,$lo,$v,$h,25,$d);
+	($v,$h,$d) = adj($la,$lo,$v,$h,5,$d);
+	($v,$h,$d) = adj($la,$lo,$v,$h,1,$d);
+	if (0) {
+	my ($vo,$ho) = ll2vhold($la,$lo);
+	if ($v != $vo or $h != $ho) {
+		my ($la1,$lo1) = vh2ll($v,$h);
+		my $d1 = dist($la,$lo,$la1,$lo1);
+		my ($la2,$lo2) = vh2ll($vo,$ho);
+		my $d2 = dist($la,$lo,$la2,$lo2);
+		print STDERR "E: VH mismatch $la1,$lo1($v,$h)[$d1] instead of $la2,$lo2($vo,$ho)[$d2] targetting $la,$lo";
+		if ($d1 < $d2) {
+			print STDERR " new is closer!\n";
+		} elsif ($d2 < $d1) {
+			print STDERR " old is closer!\n";
+		} else {
+			print STDERR " equidistant!\n";
 		}
 	}
-	($gv,$gh) = ($cv,$ch);
-	for (my $v=$gv-2000;$v<=$gv+2000;$v+=100) {
-		for (my $h=$gh-2000;$h<=$gh+2000;$h+=100) {
-			my ($y,$x) = $geo->vh2ll($v,$h);
-			$x = -$x;
-			if (defined $dd) {
-				$td = ($lat-$y)**2 + ($lon-$x)**2;
-				if ($td < $dd) {
-					$cv = $v;
-					$ch = $h;
-					$dd = $td;
-				}
-			} else {
-				$cv = $v;
-				$ch = $h;
-				$dd = ($lat-$y)**2 + ($lon-$x)**2;
-			}
-		}
 	}
-	($gv,$gh) = ($cv,$ch);
-	for (my $v=$gv-200;$v<=$gv+200;$v+=10) {
-		for (my $h=$gh-200;$h<=$gh+200;$h+=10) {
-			my ($y,$x) = $geo->vh2ll($v,$h);
-			$x = -$x;
-			if (defined $dd) {
-				$td = ($lat-$y)**2 + ($lon-$x)**2;
-				if ($td < $dd) {
-					$cv = $v;
-					$ch = $h;
-					$dd = $td;
-				}
-			} else {
-				$cv = $v;
-				$ch = $h;
-				$dd = ($lat-$y)**2 + ($lon-$x)**2;
-			}
-		}
-	}
-	($gv,$gh) = ($cv,$ch);
-	for (my $v=$gv-20;$v<=$gv+20;$v+=1) {
-		for (my $h=$gh-20;$h<=$gh+20;$h+=1) {
-			my ($y,$x) = $geo->vh2ll($v,$h);
-			$x = -$x;
-			if (defined $dd) {
-				$td = ($lat-$y)**2 + ($lon-$x)**2;
-				if ($td < $dd) {
-					$cv = $v;
-					$ch = $h;
-					$dd = $td;
-				}
-			} else {
-				$cv = $v;
-				$ch = $h;
-				$dd = ($lat-$y)**2 + ($lon-$x)**2;
-			}
-		}
-	}
-	return ($cv,$ch);
+	return ($v,$h);
 }
+
 
 #------------------------------
 package MyTop; use strict;
@@ -386,7 +402,7 @@ sub activate {
 	my ($widget,$data) = @_;
 	my ($self,$label) = @{$data};
 	my $text = $self->{$label}->get_text;
-	print STDERR "activated with label $label and text '$text'\n";
+	#print STDERR "activated with label $label and text '$text'\n";
 	if ($label eq 'Vertical' or $label eq 'Horizontal') {
 		$self->{$label}->set_text(sprintf("%05d",$text));	
 		my $ver = $self->{Vertical}->get_text;
@@ -404,7 +420,7 @@ sub activate {
 	if ($label eq 'Latitude' or $label eq 'Longitude') {
 		my $lat = $self->{Latitude}->get_text;
 		my $lon = $self->{Longitude}->get_text;
-		my ($ver,$hor) = main::closest($lat,$lon);
+		my ($ver,$hor) = main::ll2vh($lat,$lon);
 		$self->{Vertical}->set_text(sprintf("%05d",$ver));
 		$self->{Horizontal}->set_text(sprintf("%05d",$hor));
 		$self->{Google}->set_text("$lat,$lon ($ver,$hor)");

@@ -517,7 +517,6 @@ sub init {
 #package Point;
 sub fini {
 	my $self = shift;
-	my $self = shift;
 	foreach my $side (values %{$self->{end}}) {
 		foreach my $kind (values %{$side}) {
 			foreach my $edge (values %{$kind}) {

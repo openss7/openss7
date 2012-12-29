@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2012  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -106,6 +106,10 @@ extern int sa_request;			/* request number for per-request actions */
 
 /* our storage structure(s) */
 struct mtpOmMIB_data {
+	struct mtpOmMIB_data *mtpOmMIB_old;
+	uint mtpOmMIB_rsvs;
+	uint mtpOmMIB_tsts;
+	uint mtpOmMIB_sets;
 	uint mtpOmMIB_request;
 	oid *mtpOm1stAndIntervalActivate;	/* ReadWrite */
 	size_t mtpOm1stAndIntervalActivateLen;
@@ -125,8 +129,13 @@ struct mtpOmMIB_data {
 	ulong mtpOm15MinMaxIntervals;	/* ReadWrite */
 };
 struct mtpOmSpTable_data {
+	struct mtpOmSpTable_data *mtpOmSpTable_old;
+	uint mtpOmSpTable_rsvs;
+	uint mtpOmSpTable_tsts;
+	uint mtpOmSpTable_sets;
 	uint mtpOmSpTable_request;
 	uint mtpOmSpTable_refs;
+	uint mtpOmSpTable_id;
 	ulong mtpSpId;			/* NoAccess */
 	long mtpOmSpValidIntervals;	/* ReadOnly */
 	long mtpOmSpTimeDiscontinuity;	/* ReadOnly */
@@ -137,8 +146,13 @@ struct mtpOmSpTable_data {
 	long mtpOmSpOctetsXferred;	/* ReadOnly */
 };
 struct mtpOmSpInt5minTable_data {
+	struct mtpOmSpInt5minTable_data *mtpOmSpInt5minTable_old;
+	uint mtpOmSpInt5minTable_rsvs;
+	uint mtpOmSpInt5minTable_tsts;
+	uint mtpOmSpInt5minTable_sets;
 	uint mtpOmSpInt5minTable_request;
 	uint mtpOmSpInt5minTable_refs;
+	uint mtpOmSpInt5minTable_id;
 	ulong mtpSpId;			/* NoAccess */
 	ulong mtpOmSpInt5minInterval;	/* NoAccess */
 	long mtpOmSpInt5minTimeStamp;	/* ReadOnly */
@@ -149,8 +163,13 @@ struct mtpOmSpInt5minTable_data {
 	long mtpOmSpInt5minOctetsXferred;	/* ReadOnly */
 };
 struct mtpOmSpInt15minTable_data {
+	struct mtpOmSpInt15minTable_data *mtpOmSpInt15minTable_old;
+	uint mtpOmSpInt15minTable_rsvs;
+	uint mtpOmSpInt15minTable_tsts;
+	uint mtpOmSpInt15minTable_sets;
 	uint mtpOmSpInt15minTable_request;
 	uint mtpOmSpInt15minTable_refs;
+	uint mtpOmSpInt15minTable_id;
 	ulong mtpSpId;			/* NoAccess */
 	ulong mtpOmSpInt15minInterval;	/* NoAccess */
 	long mtpOmSpInt15minTimeStamp;	/* ReadOnly */
@@ -161,8 +180,13 @@ struct mtpOmSpInt15minTable_data {
 	long mtpOmSpInt15minOctetsXferred;	/* ReadOnly */
 };
 struct mtpOmSpSiTable_data {
+	struct mtpOmSpSiTable_data *mtpOmSpSiTable_old;
+	uint mtpOmSpSiTable_rsvs;
+	uint mtpOmSpSiTable_tsts;
+	uint mtpOmSpSiTable_sets;
 	uint mtpOmSpSiTable_request;
 	uint mtpOmSpSiTable_refs;
+	uint mtpOmSpSiTable_id;
 	ulong mtpSpId;			/* NoAccess */
 	long mtpOmSpSiCode;		/* NoAccess */
 	long mtpOmSpSiValidIntervals;	/* ReadOnly */
@@ -173,8 +197,13 @@ struct mtpOmSpSiTable_data {
 	long mtpOmSpSiStatus;		/* Create */
 };
 struct mtpOmSpSiInt5minTable_data {
+	struct mtpOmSpSiInt5minTable_data *mtpOmSpSiInt5minTable_old;
+	uint mtpOmSpSiInt5minTable_rsvs;
+	uint mtpOmSpSiInt5minTable_tsts;
+	uint mtpOmSpSiInt5minTable_sets;
 	uint mtpOmSpSiInt5minTable_request;
 	uint mtpOmSpSiInt5minTable_refs;
+	uint mtpOmSpSiInt5minTable_id;
 	ulong mtpSpId;			/* NoAccess */
 	long mtpOmSpSiCode;		/* NoAccess */
 	ulong mtpOmSpSiInt5minInterval;	/* NoAccess */
@@ -184,8 +213,13 @@ struct mtpOmSpSiInt5minTable_data {
 	long mtpOmSpSiInt5minHandledOctetsSIO;	/* ReadOnly */
 };
 struct mtpOmSpSiInt15minTable_data {
+	struct mtpOmSpSiInt15minTable_data *mtpOmSpSiInt15minTable_old;
+	uint mtpOmSpSiInt15minTable_rsvs;
+	uint mtpOmSpSiInt15minTable_tsts;
+	uint mtpOmSpSiInt15minTable_sets;
 	uint mtpOmSpSiInt15minTable_request;
 	uint mtpOmSpSiInt15minTable_refs;
+	uint mtpOmSpSiInt15minTable_id;
 	ulong mtpSpId;			/* NoAccess */
 	long mtpOmSpSiCode;		/* NoAccess */
 	ulong mtpOmSpSiInt15minInterval;	/* NoAccess */
@@ -195,8 +229,13 @@ struct mtpOmSpSiInt15minTable_data {
 	long mtpOmSpSiInt15minHandledOctetsSIO;	/* ReadOnly */
 };
 struct mtpOmSpStudyTable_data {
+	struct mtpOmSpStudyTable_data *mtpOmSpStudyTable_old;
+	uint mtpOmSpStudyTable_rsvs;
+	uint mtpOmSpStudyTable_tsts;
+	uint mtpOmSpStudyTable_sets;
 	uint mtpOmSpStudyTable_request;
 	uint mtpOmSpStudyTable_refs;
+	uint mtpOmSpStudyTable_id;
 	ulong mtpOmSpStudyId;		/* NoAccess */
 	long mtpOmSpStudyValidIntervals;	/* ReadOnly */
 	long mtpOmSpStudyTimeDiscontinuity;	/* ReadOnly */
@@ -205,8 +244,13 @@ struct mtpOmSpStudyTable_data {
 	long mtpOmSpStudyStatus;	/* Create */
 };
 struct mtpOmSpStudyInt5minTable_data {
+	struct mtpOmSpStudyInt5minTable_data *mtpOmSpStudyInt5minTable_old;
+	uint mtpOmSpStudyInt5minTable_rsvs;
+	uint mtpOmSpStudyInt5minTable_tsts;
+	uint mtpOmSpStudyInt5minTable_sets;
 	uint mtpOmSpStudyInt5minTable_request;
 	uint mtpOmSpStudyInt5minTable_refs;
+	uint mtpOmSpStudyInt5minTable_id;
 	ulong mtpOmSpStudyId;		/* NoAccess */
 	ulong mtpOmSpStudyInt5minInterval;	/* NoAccess */
 	long mtpOmSpStudyInt5minTimeStamp;	/* ReadOnly */
@@ -214,8 +258,13 @@ struct mtpOmSpStudyInt5minTable_data {
 	long mtpOmSpStudyInt5minHandledMSUsOpcDpcSio;	/* ReadOnly */
 };
 struct mtpOmSpStudyInt15minTable_data {
+	struct mtpOmSpStudyInt15minTable_data *mtpOmSpStudyInt15minTable_old;
+	uint mtpOmSpStudyInt15minTable_rsvs;
+	uint mtpOmSpStudyInt15minTable_tsts;
+	uint mtpOmSpStudyInt15minTable_sets;
 	uint mtpOmSpStudyInt15minTable_request;
 	uint mtpOmSpStudyInt15minTable_refs;
+	uint mtpOmSpStudyInt15minTable_id;
 	ulong mtpOmSpStudyId;		/* NoAccess */
 	ulong mtpOmSpStudyInt15minInterval;	/* NoAccess */
 	long mtpOmSpStudyInt15minTimeStamp;	/* ReadOnly */
@@ -223,8 +272,13 @@ struct mtpOmSpStudyInt15minTable_data {
 	long mtpOmSpStudyInt15minHandledMSUsOpcDpcSio;	/* ReadOnly */
 };
 struct mtpOmSpStudyMapTable_data {
+	struct mtpOmSpStudyMapTable_data *mtpOmSpStudyMapTable_old;
+	uint mtpOmSpStudyMapTable_rsvs;
+	uint mtpOmSpStudyMapTable_tsts;
+	uint mtpOmSpStudyMapTable_sets;
 	uint mtpOmSpStudyMapTable_request;
 	uint mtpOmSpStudyMapTable_refs;
+	uint mtpOmSpStudyMapTable_id;
 	ulong mtpSpId;			/* NoAccess */
 	long mtpOmSpSiCode;		/* NoAccess */
 	ulong mtpOmSpStudyId;		/* NoAccess */
@@ -233,8 +287,13 @@ struct mtpOmSpStudyMapTable_data {
 	long mtpOmSpStudyMapStatus;	/* Create */
 };
 struct mtpOmRsTable_data {
+	struct mtpOmRsTable_data *mtpOmRsTable_old;
+	uint mtpOmRsTable_rsvs;
+	uint mtpOmRsTable_tsts;
+	uint mtpOmRsTable_sets;
 	uint mtpOmRsTable_request;
 	uint mtpOmRsTable_refs;
+	uint mtpOmRsTable_id;
 	ulong mtpSpId;			/* NoAccess */
 	ulong mtpRsId;			/* NoAccess */
 	long mtpOmRsValidIntervals;	/* ReadOnly */
@@ -247,8 +306,13 @@ struct mtpOmRsTable_data {
 	long mtpOmRsRouteSetUnavailableDuration;	/* ReadOnly */
 };
 struct mtpOmRsInt5minTable_data {
+	struct mtpOmRsInt5minTable_data *mtpOmRsInt5minTable_old;
+	uint mtpOmRsInt5minTable_rsvs;
+	uint mtpOmRsInt5minTable_tsts;
+	uint mtpOmRsInt5minTable_sets;
 	uint mtpOmRsInt5minTable_request;
 	uint mtpOmRsInt5minTable_refs;
+	uint mtpOmRsInt5minTable_id;
 	ulong mtpSpId;			/* NoAccess */
 	ulong mtpRsId;			/* NoAccess */
 	ulong mtpOmRsInt5minInterval;	/* NoAccess */
@@ -261,8 +325,13 @@ struct mtpOmRsInt5minTable_data {
 	long mtpOmRsInt5minRouteSetUnavailableDuration;	/* ReadOnly */
 };
 struct mtpOmRsInt15minTable_data {
+	struct mtpOmRsInt15minTable_data *mtpOmRsInt15minTable_old;
+	uint mtpOmRsInt15minTable_rsvs;
+	uint mtpOmRsInt15minTable_tsts;
+	uint mtpOmRsInt15minTable_sets;
 	uint mtpOmRsInt15minTable_request;
 	uint mtpOmRsInt15minTable_refs;
+	uint mtpOmRsInt15minTable_id;
 	ulong mtpSpId;			/* NoAccess */
 	ulong mtpRsId;			/* NoAccess */
 	ulong mtpOmRsInt15minInterval;	/* NoAccess */
@@ -275,8 +344,13 @@ struct mtpOmRsInt15minTable_data {
 	long mtpOmRsInt15minRouteSetUnavailableDuration;	/* ReadOnly */
 };
 struct mtpOmRsSiTable_data {
+	struct mtpOmRsSiTable_data *mtpOmRsSiTable_old;
+	uint mtpOmRsSiTable_rsvs;
+	uint mtpOmRsSiTable_tsts;
+	uint mtpOmRsSiTable_sets;
 	uint mtpOmRsSiTable_request;
 	uint mtpOmRsSiTable_refs;
+	uint mtpOmRsSiTable_id;
 	ulong mtpSpId;			/* NoAccess */
 	ulong mtpRsId;			/* NoAccess */
 	long mtpOmRsSiCode;		/* NoAccess */
@@ -289,8 +363,13 @@ struct mtpOmRsSiTable_data {
 	long mtpOmRsSiStatus;		/* Create */
 };
 struct mtpOmRsSiInt5minTable_data {
+	struct mtpOmRsSiInt5minTable_data *mtpOmRsSiInt5minTable_old;
+	uint mtpOmRsSiInt5minTable_rsvs;
+	uint mtpOmRsSiInt5minTable_tsts;
+	uint mtpOmRsSiInt5minTable_sets;
 	uint mtpOmRsSiInt5minTable_request;
 	uint mtpOmRsSiInt5minTable_refs;
+	uint mtpOmRsSiInt5minTable_id;
 	ulong mtpSpId;			/* NoAccess */
 	ulong mtpRsId;			/* NoAccess */
 	long mtpOmRsSiCode;		/* NoAccess */
@@ -302,8 +381,13 @@ struct mtpOmRsSiInt5minTable_data {
 	long mtpOmRsSiInt5minTransmittedMSUsDpcSio;	/* ReadOnly */
 };
 struct mtpOmRsSiInt15minTable_data {
+	struct mtpOmRsSiInt15minTable_data *mtpOmRsSiInt15minTable_old;
+	uint mtpOmRsSiInt15minTable_rsvs;
+	uint mtpOmRsSiInt15minTable_tsts;
+	uint mtpOmRsSiInt15minTable_sets;
 	uint mtpOmRsSiInt15minTable_request;
 	uint mtpOmRsSiInt15minTable_refs;
+	uint mtpOmRsSiInt15minTable_id;
 	ulong mtpSpId;			/* NoAccess */
 	ulong mtpRsId;			/* NoAccess */
 	long mtpOmRsSiCode;		/* NoAccess */
@@ -315,8 +399,13 @@ struct mtpOmRsSiInt15minTable_data {
 	long mtpOmRsSiInt15minTransmittedMSUsDpcSio;	/* ReadOnly */
 };
 struct mtpOmLsTable_data {
+	struct mtpOmLsTable_data *mtpOmLsTable_old;
+	uint mtpOmLsTable_rsvs;
+	uint mtpOmLsTable_tsts;
+	uint mtpOmLsTable_sets;
 	uint mtpOmLsTable_request;
 	uint mtpOmLsTable_refs;
+	uint mtpOmLsTable_id;
 	ulong mtpSpId;			/* NoAccess */
 	ulong mtpLsId;			/* NoAccess */
 	long mtpOmLsValidIntervals;	/* ReadOnly */
@@ -326,8 +415,13 @@ struct mtpOmLsTable_data {
 	long mtpOmLsSlsUnavailable;	/* ReadOnly */
 };
 struct mtpOmLsInt5minTable_data {
+	struct mtpOmLsInt5minTable_data *mtpOmLsInt5minTable_old;
+	uint mtpOmLsInt5minTable_rsvs;
+	uint mtpOmLsInt5minTable_tsts;
+	uint mtpOmLsInt5minTable_sets;
 	uint mtpOmLsInt5minTable_request;
 	uint mtpOmLsInt5minTable_refs;
+	uint mtpOmLsInt5minTable_id;
 	ulong mtpSpId;			/* NoAccess */
 	ulong mtpLsId;			/* NoAccess */
 	ulong mtpOmLsInt5minInterval;	/* NoAccess */
@@ -337,8 +431,13 @@ struct mtpOmLsInt5minTable_data {
 	long mtpOmLsInt5minSlsUnavailable;	/* ReadOnly */
 };
 struct mtpOmLsInt15minTable_data {
+	struct mtpOmLsInt15minTable_data *mtpOmLsInt15minTable_old;
+	uint mtpOmLsInt15minTable_rsvs;
+	uint mtpOmLsInt15minTable_tsts;
+	uint mtpOmLsInt15minTable_sets;
 	uint mtpOmLsInt15minTable_request;
 	uint mtpOmLsInt15minTable_refs;
+	uint mtpOmLsInt15minTable_id;
 	ulong mtpSpId;			/* NoAccess */
 	ulong mtpLsId;			/* NoAccess */
 	ulong mtpOmLsInt15minInterval;	/* NoAccess */
@@ -348,8 +447,13 @@ struct mtpOmLsInt15minTable_data {
 	long mtpOmLsInt15minSlsUnavailable;	/* ReadOnly */
 };
 struct mtpOmSlStatsTable_data {
+	struct mtpOmSlStatsTable_data *mtpOmSlStatsTable_old;
+	uint mtpOmSlStatsTable_rsvs;
+	uint mtpOmSlStatsTable_tsts;
+	uint mtpOmSlStatsTable_sets;
 	uint mtpOmSlStatsTable_request;
 	uint mtpOmSlStatsTable_refs;
+	uint mtpOmSlStatsTable_id;
 	ulong mtpMsId;			/* NoAccess */
 	ulong mtpSpId;			/* NoAccess */
 	ulong mtpLsId;			/* NoAccess */
@@ -380,8 +484,13 @@ struct mtpOmSlStatsTable_data {
 	long mtpOmSlStatsCongDiscdInd3;	/* ReadOnly */
 };
 struct mtpOmSlL3Table_data {
+	struct mtpOmSlL3Table_data *mtpOmSlL3Table_old;
+	uint mtpOmSlL3Table_rsvs;
+	uint mtpOmSlL3Table_tsts;
+	uint mtpOmSlL3Table_sets;
 	uint mtpOmSlL3Table_request;
 	uint mtpOmSlL3Table_refs;
+	uint mtpOmSlL3Table_id;
 	ulong mtpSpId;			/* NoAccess */
 	ulong mtpLsId;			/* NoAccess */
 	long mtpSlSlCode;		/* NoAccess */
@@ -405,8 +514,13 @@ struct mtpOmSlL3Table_data {
 	long mtpOmSlL3Restorations;	/* ReadOnly */
 };
 struct mtpOmSlL3Int5minTable_data {
+	struct mtpOmSlL3Int5minTable_data *mtpOmSlL3Int5minTable_old;
+	uint mtpOmSlL3Int5minTable_rsvs;
+	uint mtpOmSlL3Int5minTable_tsts;
+	uint mtpOmSlL3Int5minTable_sets;
 	uint mtpOmSlL3Int5minTable_request;
 	uint mtpOmSlL3Int5minTable_refs;
+	uint mtpOmSlL3Int5minTable_id;
 	ulong mtpSpId;			/* NoAccess */
 	ulong mtpLsId;			/* NoAccess */
 	long mtpSlSlCode;		/* NoAccess */
@@ -430,8 +544,13 @@ struct mtpOmSlL3Int5minTable_data {
 	long mtpOmSlL3Int5minRestorations;	/* ReadOnly */
 };
 struct mtpOmSlL3Int15minTable_data {
+	struct mtpOmSlL3Int15minTable_data *mtpOmSlL3Int15minTable_old;
+	uint mtpOmSlL3Int15minTable_rsvs;
+	uint mtpOmSlL3Int15minTable_tsts;
+	uint mtpOmSlL3Int15minTable_sets;
 	uint mtpOmSlL3Int15minTable_request;
 	uint mtpOmSlL3Int15minTable_refs;
+	uint mtpOmSlL3Int15minTable_id;
 	ulong mtpSpId;			/* NoAccess */
 	ulong mtpLsId;			/* NoAccess */
 	long mtpSlSlCode;		/* NoAccess */
@@ -455,8 +574,13 @@ struct mtpOmSlL3Int15minTable_data {
 	long mtpOmSlL3Int15minRestorations;	/* ReadOnly */
 };
 struct mtpOmSlL2Table_data {
+	struct mtpOmSlL2Table_data *mtpOmSlL2Table_old;
+	uint mtpOmSlL2Table_rsvs;
+	uint mtpOmSlL2Table_tsts;
+	uint mtpOmSlL2Table_sets;
 	uint mtpOmSlL2Table_request;
 	uint mtpOmSlL2Table_refs;
+	uint mtpOmSlL2Table_id;
 	ulong mtpSpId;			/* NoAccess */
 	ulong mtpLsId;			/* NoAccess */
 	long mtpSlSlCode;		/* NoAccess */
@@ -473,8 +597,13 @@ struct mtpOmSlL2Table_data {
 	long mtpOmSlL2ReceivedMSUs;	/* ReadOnly */
 };
 struct mtpOmSlL2Int5minTable_data {
+	struct mtpOmSlL2Int5minTable_data *mtpOmSlL2Int5minTable_old;
+	uint mtpOmSlL2Int5minTable_rsvs;
+	uint mtpOmSlL2Int5minTable_tsts;
+	uint mtpOmSlL2Int5minTable_sets;
 	uint mtpOmSlL2Int5minTable_request;
 	uint mtpOmSlL2Int5minTable_refs;
+	uint mtpOmSlL2Int5minTable_id;
 	ulong mtpSpId;			/* NoAccess */
 	ulong mtpLsId;			/* NoAccess */
 	long mtpSlSlCode;		/* NoAccess */
@@ -491,8 +620,13 @@ struct mtpOmSlL2Int5minTable_data {
 	long mtpOmSlL2Int5minReceivedMSUs;	/* ReadOnly */
 };
 struct mtpOmSlL2Int15minTable_data {
+	struct mtpOmSlL2Int15minTable_data *mtpOmSlL2Int15minTable_old;
+	uint mtpOmSlL2Int15minTable_rsvs;
+	uint mtpOmSlL2Int15minTable_tsts;
+	uint mtpOmSlL2Int15minTable_sets;
 	uint mtpOmSlL2Int15minTable_request;
 	uint mtpOmSlL2Int15minTable_refs;
+	uint mtpOmSlL2Int15minTable_id;
 	ulong mtpSpId;			/* NoAccess */
 	ulong mtpLsId;			/* NoAccess */
 	long mtpSlSlCode;		/* NoAccess */
@@ -509,8 +643,13 @@ struct mtpOmSlL2Int15minTable_data {
 	long mtpOmSlL2Int15minReceivedMSUs;	/* ReadOnly */
 };
 struct mtpOmSdtStatsTable_data {
+	struct mtpOmSdtStatsTable_data *mtpOmSdtStatsTable_old;
+	uint mtpOmSdtStatsTable_rsvs;
+	uint mtpOmSdtStatsTable_tsts;
+	uint mtpOmSdtStatsTable_sets;
 	uint mtpOmSdtStatsTable_request;
 	uint mtpOmSdtStatsTable_refs;
+	uint mtpOmSdtStatsTable_id;
 	ulong mtpMsId;			/* NoAccess */
 	ulong mtpSdtId;			/* NoAccess */
 	long mtpOmSdtStatsTxBytes;	/* ReadOnly */
@@ -539,8 +678,13 @@ struct mtpOmSdtStatsTable_data {
 	long mtpOmSdtStatsCarrierLost;	/* ReadOnly */
 };
 struct mtpOmSdlStatsTable_data {
+	struct mtpOmSdlStatsTable_data *mtpOmSdlStatsTable_old;
+	uint mtpOmSdlStatsTable_rsvs;
+	uint mtpOmSdlStatsTable_tsts;
+	uint mtpOmSdlStatsTable_sets;
 	uint mtpOmSdlStatsTable_request;
 	uint mtpOmSdlStatsTable_refs;
+	uint mtpOmSdlStatsTable_id;
 	ulong mtpMsId;			/* NoAccess */
 	ulong mtpSpId;			/* NoAccess */
 	uint8_t *mtpSdlId;		/* NoAccess */
@@ -725,6 +869,10 @@ void init_mtpOmMIB(void);
 void deinit_mtpOmMIB(void);
 int term_mtpOmMIB(int majorID, int minorID, void *serverarg, void *clientarg);
 FindVarMethod var_mtpOmMIB;
+struct mtpOmMIB_data *mtpOmMIB_create(void);
+struct mtpOmMIB_data *mtpOmMIB_duplicate(struct mtpOmMIB_data *);
+int mtpOmMIB_destroy(struct mtpOmMIB_data **);
+int mtpOmMIB_add(struct mtpOmMIB_data *);
 void parse_mtpOmMIB(const char *, char *);
 SNMPCallback store_mtpOmMIB;
 void refresh_mtpOmMIB(int);

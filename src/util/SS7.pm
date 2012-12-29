@@ -1797,6 +1797,7 @@ sub init {
 }
 #package Stateful;
 sub fini {
+	my $self = shift;
 	foreach (qw(options state oldstate)) { delete $self->{$_} }
 }
 #package Stateful;

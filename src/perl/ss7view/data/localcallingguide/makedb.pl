@@ -77,6 +77,10 @@ sub dorcdata {
 				foreach my $k (qw/udate effdate discdate/) {
 					$data{$k} = str2time($data{$k}) if $data{$k};
 				}
+				$data{ex}      = delete $data{rc}      if $data{rc};
+				$data{exshort} = delete $data{rcshort} if $data{rcshort};
+				$data{seeex}   = delete $data{seerc}   if $data{seerc};
+				$data{exlata}  = $data{lata} unless $data{exlata} or not $data{lata};
 				makedb::updatedata(\%data,$fdate,$sect);
 			} elsif (/^<rcdata>/) {
 				%data = (sect=>$sect,fdate=>$fdate);
@@ -155,6 +159,10 @@ sub doswitchdata {
 						}
 						$data{swfunc} = 'HOST';
 					}
+					$data{ex}      = delete $data{rc}      if $data{rc};
+					$data{exshort} = delete $data{rcshort} if $data{rcshort};
+					$data{seeex}   = delete $data{seerc}   if $data{seerc};
+					$data{exlata}  = $data{lata} unless $data{exlata} or not $data{lata};
 					makedb::updatedata(\%data,$fdate,$sect);
 				}
 			}

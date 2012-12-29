@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2012  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -477,6 +477,33 @@ acseMIB_create(void)
 }
 
 /**
+ * @fn struct acseMIB_data *acseMIB_duplicate(struct acseMIB_data *thedata)
+ * @param thedata the mib structure to duplicate
+ * @brief duplicate a mib structure for the mib
+ *
+ * Duplicates the specified mib structure @param thedata and returns a pointer to the newly
+ * allocated mib structure on success, or NULL on failure.
+ */
+struct acseMIB_data *
+acseMIB_duplicate(struct acseMIB_data *thedata)
+{
+	struct acseMIB_data *StorageNew = SNMP_MALLOC_STRUCT(acseMIB_data);
+
+	DEBUGMSGTL(("acseMIB", "acseMIB_duplicate: duplicating mib... "));
+	if (StorageNew != NULL) {
+		StorageNew->acseTcUserId = thedata->acseTcUserId;
+		StorageNew->acseApplicationEntityId = thedata->acseApplicationEntityId;
+	}
+      done:
+	DEBUGMSGTL(("acseMIB", "done.\n"));
+	return (StorageNew);
+	goto destroy;
+      destroy:
+	acseMIB_destroy(&StorageNew);
+	goto done;
+}
+
+/**
  * @fn int acseMIB_destroy(struct acseMIB_data **thedata)
  * @param thedata pointer to the data structure in acseMIB.
  * @brief delete a scalars structure from acseMIB.
@@ -524,7 +551,7 @@ acseMIB_add(struct acseMIB_data *thedata)
  * @param line line from configuration file matching the token.
  * @brief parse configuration file for acseMIB entries.
  *
- * This callback is called by UCD-SNMP when it prases a configuration file and finds a configuration
+ * This callback is called by UCD-SNMP when it parses a configuration file and finds a configuration
  * file line for the registsred token (in this case acseMIB).  This routine is invoked by
  * UCD-SNMP to read the values of scalars in the MIB from the configuration file.  Note that this
  * procedure may exist regardless of the persistence of the MIB.  If there are no configured entries
@@ -576,6 +603,62 @@ store_acseMIB(int majorID, int minorID, void *serverarg, void *clientarg)
 	}
 	DEBUGMSGTL(("acseMIB", "done.\n"));
 	return SNMPERR_SUCCESS;
+}
+
+/**
+ * @fn int check_acseMIB(struct acseMIB_data *StorageTmp, struct acseMIB_data *StorageOld)
+ * @param StorageTmp the data as updated
+ * @param StorageOld the data previous to update
+ *
+ * This function is used by mibs.  It is used to check, all scalars at a time, the varbinds
+ * belonging to the mib.  This function is called for the first varbind in a mib at the beginning of
+ * the ACTION phase.  The COMMIT phase does not ensue unless this check passes.  This function can
+ * return SNMP_ERR_NOERR or a specific SNMP error value.  Values in StorageOld are the values before
+ * the varbinds on the mib were applied; the values in StorageTmp are the new values.  The function
+ * is permitted to change the values in StorageTmp to correct them; however, preferences should be
+ * made for setting values that were not in the varbinds.
+ */
+int
+check_acseMIB(struct acseMIB_data *StorageTmp, struct acseMIB_data *StorageOld)
+{
+	/* XXX: provide code to check the scalars for consistency */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int update_acseMIB(struct acseMIB_data *StorageTmp, struct acseMIB_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the set operation (ACTION phase)
+ *
+ * This function is used by mibs.  It is used to update, all scalars at a time, the varbinds
+ * belonging to the mib.  This function is called for the first varbind in a mib at the beginning of
+ * the COMMIT phase.  The start of the ACTION phase performs a consistency check on the mib before
+ * allowing the request to proceed to the COMMIT phase.  The COMMIT phase then arrives here with
+ * consistency already checked (see check_acseMIB()).  This function can
+ * return SNMP_ERR_NOERROR or SNMP_ERR_COMMITFAILED.  Values in StorageOld are the values before the
+ * varbinds on the mib were applied: the values in StorageTmp are the new values.
+ */
+int
+update_acseMIB(struct acseMIB_data *StorageTmp, struct acseMIB_data *StorageOld)
+{
+	/* XXX: provide code to update the row with the underlying device */
+	acseMIB_refresh = 1;
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn revert_acseMIB(struct 
+ * @fn void revert_acseMIB(struct acseMIB_data *StorageTmp, struct acseMIB_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the undo operation (UNDO phase)
+ */
+void
+revert_acseMIB(struct acseMIB_data *StorageTmp, struct acseMIB_data *StorageOld)
+{
+	/* XXX: provide code to revert the row with the underlying device */
+	update_acseMIB(StorageOld, NULL);
 }
 
 /**
@@ -671,30 +754,45 @@ acseTable_create(void)
 	DEBUGMSGTL(("acseMIB", "acseTable_create: creating row...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
-		if ((StorageNew->subsystemId = (uint8_t *) strdup("")) != NULL)
-			StorageNew->subsystemIdLen = strlen("");
-		if ((StorageNew->applicationProcessId = (uint8_t *) strdup("")) != NULL)
-			StorageNew->applicationProcessIdLen = strlen("");
-		if ((StorageNew->asoEntityId = (uint8_t *) strdup("")) != NULL)
-			StorageNew->asoEntityIdLen = strlen("");
-		if ((StorageNew->asoId = (uint8_t *) strdup("")) != NULL)
-			StorageNew->asoIdLen = strlen("");
-		if (memdup((u_char **) &StorageNew->acseFUinitiator, (u_char *) "\x00", 1) == SNMPERR_SUCCESS)
+		if ((StorageNew->subsystemId = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->subsystemIdLen = 0;
+		StorageNew->subsystemId[StorageNew->subsystemIdLen] = 0;
+		if ((StorageNew->applicationProcessId = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->applicationProcessIdLen = 0;
+		StorageNew->applicationProcessId[StorageNew->applicationProcessIdLen] = 0;
+		if ((StorageNew->asoEntityId = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->asoEntityIdLen = 0;
+		StorageNew->asoEntityId[StorageNew->asoEntityIdLen] = 0;
+		if ((StorageNew->asoId = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->asoIdLen = 0;
+		StorageNew->asoId[StorageNew->asoIdLen] = 0;
+		if (memdup((u_char **) &StorageNew->acseFUinitiator, (u_char *) "\x00", 1) != SNMPERR_SUCCESS)
+			goto nomem;
 			StorageNew->acseFUinitiatorLen = 1;
-		if (memdup((u_char **) &StorageNew->acseEditionsSupported, (u_char *) "\x00", 1) == SNMPERR_SUCCESS)
+		if (memdup((u_char **) &StorageNew->acseEditionsSupported, (u_char *) "\x00", 1) != SNMPERR_SUCCESS)
+			goto nomem;
 			StorageNew->acseEditionsSupportedLen = 1;
-		if (memdup((u_char **) &StorageNew->acseFUresponder, (u_char *) "\x00", 1) == SNMPERR_SUCCESS)
+		if (memdup((u_char **) &StorageNew->acseFUresponder, (u_char *) "\x00", 1) != SNMPERR_SUCCESS)
+			goto nomem;
 			StorageNew->acseFUresponderLen = 1;
-
 	}
+      done:
 	DEBUGMSGTL(("acseMIB", "done.\n"));
 	return (StorageNew);
+	goto nomem;
+      nomem:
+	acseTable_destroy(&StorageNew);
+	goto done;
 }
 
 /**
  * @fn struct acseTable_data *acseTable_duplicate(struct acseTable_data *thedata)
  * @param thedata the row structure to duplicate.
- * @brief duplicat a row structure for a table.
+ * @brief duplicate a row structure for a table.
  *
  * Duplicates the specified row structure @param thedata and returns a pointer to the newly
  * allocated row structure on success, or NULL on failure.
@@ -706,6 +804,41 @@ acseTable_duplicate(struct acseTable_data *thedata)
 
 	DEBUGMSGTL(("acseMIB", "acseTable_duplicate: duplicating row...  "));
 	if (StorageNew != NULL) {
+		if (!(StorageNew->subsystemId = malloc(thedata->subsystemIdLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->subsystemId, thedata->subsystemId, thedata->subsystemIdLen);
+		StorageNew->subsystemIdLen = thedata->subsystemIdLen;
+		StorageNew->subsystemId[StorageNew->subsystemIdLen] = 0;
+		if (!(StorageNew->applicationProcessId = malloc(thedata->applicationProcessIdLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->applicationProcessId, thedata->applicationProcessId, thedata->applicationProcessIdLen);
+		StorageNew->applicationProcessIdLen = thedata->applicationProcessIdLen;
+		StorageNew->applicationProcessId[StorageNew->applicationProcessIdLen] = 0;
+		if (!(StorageNew->asoEntityId = malloc(thedata->asoEntityIdLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->asoEntityId, thedata->asoEntityId, thedata->asoEntityIdLen);
+		StorageNew->asoEntityIdLen = thedata->asoEntityIdLen;
+		StorageNew->asoEntityId[StorageNew->asoEntityIdLen] = 0;
+		if (!(StorageNew->asoId = malloc(thedata->asoIdLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->asoId, thedata->asoId, thedata->asoIdLen);
+		StorageNew->asoIdLen = thedata->asoIdLen;
+		StorageNew->asoId[StorageNew->asoIdLen] = 0;
+		if (!(StorageNew->acseFUinitiator = malloc(thedata->acseFUinitiatorLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->acseFUinitiator, thedata->acseFUinitiator, thedata->acseFUinitiatorLen);
+		StorageNew->acseFUinitiatorLen = thedata->acseFUinitiatorLen;
+		StorageNew->acseFUinitiator[StorageNew->acseFUinitiatorLen] = 0;
+		if (!(StorageNew->acseEditionsSupported = malloc(thedata->acseEditionsSupportedLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->acseEditionsSupported, thedata->acseEditionsSupported, thedata->acseEditionsSupportedLen);
+		StorageNew->acseEditionsSupportedLen = thedata->acseEditionsSupportedLen;
+		StorageNew->acseEditionsSupported[StorageNew->acseEditionsSupportedLen] = 0;
+		if (!(StorageNew->acseFUresponder = malloc(thedata->acseFUresponderLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->acseFUresponder, thedata->acseFUresponder, thedata->acseFUresponderLen);
+		StorageNew->acseFUresponderLen = thedata->acseFUresponderLen;
+		StorageNew->acseFUresponder[StorageNew->acseFUresponderLen] = 0;
 	}
       done:
 	DEBUGMSGTL(("acseMIB", "done.\n"));
@@ -819,7 +952,7 @@ acseTable_del(struct acseTable_data *thedata)
  * @param line line from configuration file matching the token.
  * @brief parse configuration file for acseTable entries.
  *
- * This callback is called by UCD-SNMP when it prases a configuration file and finds a configuration
+ * This callback is called by UCD-SNMP when it parses a configuration file and finds a configuration
  * file line for the registsred token (in this case acseTable).  This routine is invoked by UCD-SNMP
  * to read the values of each row in the table from the configuration file.  Note that this
  * procedure may exist regardless of the persistence of the table.  If there are no configured
@@ -940,31 +1073,47 @@ acseAssociationTable_create(void)
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
 		StorageNew->applicationSubsystemId = 0;
-		if ((StorageNew->apInvocationId = (uint8_t *) strdup("")) != NULL)
-			StorageNew->apInvocationIdLen = strlen("");
-		if ((StorageNew->asoInvocationId = (uint8_t *) strdup("")) != NULL)
-			StorageNew->asoInvocationIdLen = strlen("");
-		if ((StorageNew->acseAssociationCallingAEtitle = (uint8_t *) strdup("")) != NULL)
-			StorageNew->acseAssociationCallingAEtitleLen = strlen("");
-		if (memdup((u_char **) &StorageNew->acseAssociationFUinUse, (u_char *) "\x00", 1) == SNMPERR_SUCCESS)
+		if ((StorageNew->apInvocationId = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->apInvocationIdLen = 0;
+		StorageNew->apInvocationId[StorageNew->apInvocationIdLen] = 0;
+		if ((StorageNew->asoInvocationId = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->asoInvocationIdLen = 0;
+		StorageNew->asoInvocationId[StorageNew->asoInvocationIdLen] = 0;
+		if ((StorageNew->acseAssociationCallingAEtitle = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->acseAssociationCallingAEtitleLen = 0;
+		StorageNew->acseAssociationCallingAEtitle[StorageNew->acseAssociationCallingAEtitleLen] = 0;
+		if (memdup((u_char **) &StorageNew->acseAssociationFUinUse, (u_char *) "\x00", 1) != SNMPERR_SUCCESS)
+			goto nomem;
 			StorageNew->acseAssociationFUinUseLen = 1;
-		if ((StorageNew->acseAssociationApplContextInUse = snmp_duplicate_objid(zeroDotZero_oid, 2)))
+		if ((StorageNew->acseAssociationApplContextInUse = snmp_duplicate_objid(zeroDotZero_oid, 2)) == NULL)
+			goto nomem;
 			StorageNew->acseAssociationApplContextInUseLen = 2;
-		if ((StorageNew->acseAssociationParentAsoinvoc = snmp_duplicate_objid(zeroDotZero_oid, 2)))
+		if ((StorageNew->acseAssociationParentAsoinvoc = snmp_duplicate_objid(zeroDotZero_oid, 2)) == NULL)
+			goto nomem;
 			StorageNew->acseAssociationParentAsoinvocLen = 2;
-		if ((StorageNew->acseAssociationCalledAEtitle = (uint8_t *) strdup("")) != NULL)
-			StorageNew->acseAssociationCalledAEtitleLen = strlen("");
+		if ((StorageNew->acseAssociationCalledAEtitle = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->acseAssociationCalledAEtitleLen = 0;
+		StorageNew->acseAssociationCalledAEtitle[StorageNew->acseAssociationCalledAEtitleLen] = 0;
 		StorageNew->acseAssociationRowStatus = 0;
 		StorageNew->acseAssociationRowStatus = RS_NOTREADY;
 	}
+      done:
 	DEBUGMSGTL(("acseMIB", "done.\n"));
 	return (StorageNew);
+	goto nomem;
+      nomem:
+	acseAssociationTable_destroy(&StorageNew);
+	goto done;
 }
 
 /**
  * @fn struct acseAssociationTable_data *acseAssociationTable_duplicate(struct acseAssociationTable_data *thedata)
  * @param thedata the row structure to duplicate.
- * @brief duplicat a row structure for a table.
+ * @brief duplicate a row structure for a table.
  *
  * Duplicates the specified row structure @param thedata and returns a pointer to the newly
  * allocated row structure on success, or NULL on failure.
@@ -976,6 +1125,39 @@ acseAssociationTable_duplicate(struct acseAssociationTable_data *thedata)
 
 	DEBUGMSGTL(("acseMIB", "acseAssociationTable_duplicate: duplicating row...  "));
 	if (StorageNew != NULL) {
+		StorageNew->applicationSubsystemId = thedata->applicationSubsystemId;
+		if (!(StorageNew->apInvocationId = malloc(thedata->apInvocationIdLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->apInvocationId, thedata->apInvocationId, thedata->apInvocationIdLen);
+		StorageNew->apInvocationIdLen = thedata->apInvocationIdLen;
+		StorageNew->apInvocationId[StorageNew->apInvocationIdLen] = 0;
+		if (!(StorageNew->asoInvocationId = malloc(thedata->asoInvocationIdLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->asoInvocationId, thedata->asoInvocationId, thedata->asoInvocationIdLen);
+		StorageNew->asoInvocationIdLen = thedata->asoInvocationIdLen;
+		StorageNew->asoInvocationId[StorageNew->asoInvocationIdLen] = 0;
+		if (!(StorageNew->acseAssociationCallingAEtitle = malloc(thedata->acseAssociationCallingAEtitleLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->acseAssociationCallingAEtitle, thedata->acseAssociationCallingAEtitle, thedata->acseAssociationCallingAEtitleLen);
+		StorageNew->acseAssociationCallingAEtitleLen = thedata->acseAssociationCallingAEtitleLen;
+		StorageNew->acseAssociationCallingAEtitle[StorageNew->acseAssociationCallingAEtitleLen] = 0;
+		if (!(StorageNew->acseAssociationFUinUse = malloc(thedata->acseAssociationFUinUseLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->acseAssociationFUinUse, thedata->acseAssociationFUinUse, thedata->acseAssociationFUinUseLen);
+		StorageNew->acseAssociationFUinUseLen = thedata->acseAssociationFUinUseLen;
+		StorageNew->acseAssociationFUinUse[StorageNew->acseAssociationFUinUseLen] = 0;
+		if (!(StorageNew->acseAssociationApplContextInUse = snmp_duplicate_objid(thedata->acseAssociationApplContextInUse, thedata->acseAssociationApplContextInUseLen / sizeof(oid))))
+			goto destroy;
+		StorageNew->acseAssociationApplContextInUseLen = thedata->acseAssociationApplContextInUseLen;
+		if (!(StorageNew->acseAssociationParentAsoinvoc = snmp_duplicate_objid(thedata->acseAssociationParentAsoinvoc, thedata->acseAssociationParentAsoinvocLen / sizeof(oid))))
+			goto destroy;
+		StorageNew->acseAssociationParentAsoinvocLen = thedata->acseAssociationParentAsoinvocLen;
+		if (!(StorageNew->acseAssociationCalledAEtitle = malloc(thedata->acseAssociationCalledAEtitleLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->acseAssociationCalledAEtitle, thedata->acseAssociationCalledAEtitle, thedata->acseAssociationCalledAEtitleLen);
+		StorageNew->acseAssociationCalledAEtitleLen = thedata->acseAssociationCalledAEtitleLen;
+		StorageNew->acseAssociationCalledAEtitle[StorageNew->acseAssociationCalledAEtitleLen] = 0;
+		StorageNew->acseAssociationRowStatus = thedata->acseAssociationRowStatus;
 	}
       done:
 	DEBUGMSGTL(("acseMIB", "done.\n"));
@@ -1087,7 +1269,7 @@ acseAssociationTable_del(struct acseAssociationTable_data *thedata)
  * @param line line from configuration file matching the token.
  * @brief parse configuration file for acseAssociationTable entries.
  *
- * This callback is called by UCD-SNMP when it prases a configuration file and finds a configuration
+ * This callback is called by UCD-SNMP when it parses a configuration file and finds a configuration
  * file line for the registsred token (in this case acseAssociationTable).  This routine is invoked by UCD-SNMP
  * to read the values of each row in the table from the configuration file.  Note that this
  * procedure may exist regardless of the persistence of the table.  If there are no configured
@@ -1212,19 +1394,25 @@ apInvocationTable_create(void)
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
 		StorageNew->applicationSubsystemId = 0;
-		if ((StorageNew->apInvocationOfPointer = snmp_duplicate_objid(zeroDotZero_oid, 2)))
+		if ((StorageNew->apInvocationOfPointer = snmp_duplicate_objid(zeroDotZero_oid, 2)) == NULL)
+			goto nomem;
 			StorageNew->apInvocationOfPointerLen = 2;
 		StorageNew->apInvocationRowStatus = 0;
 		StorageNew->apInvocationRowStatus = RS_NOTREADY;
 	}
+      done:
 	DEBUGMSGTL(("acseMIB", "done.\n"));
 	return (StorageNew);
+	goto nomem;
+      nomem:
+	apInvocationTable_destroy(&StorageNew);
+	goto done;
 }
 
 /**
  * @fn struct apInvocationTable_data *apInvocationTable_duplicate(struct apInvocationTable_data *thedata)
  * @param thedata the row structure to duplicate.
- * @brief duplicat a row structure for a table.
+ * @brief duplicate a row structure for a table.
  *
  * Duplicates the specified row structure @param thedata and returns a pointer to the newly
  * allocated row structure on success, or NULL on failure.
@@ -1236,6 +1424,16 @@ apInvocationTable_duplicate(struct apInvocationTable_data *thedata)
 
 	DEBUGMSGTL(("acseMIB", "apInvocationTable_duplicate: duplicating row...  "));
 	if (StorageNew != NULL) {
+		StorageNew->applicationSubsystemId = thedata->applicationSubsystemId;
+		if (!(StorageNew->apInvocationId = malloc(thedata->apInvocationIdLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->apInvocationId, thedata->apInvocationId, thedata->apInvocationIdLen);
+		StorageNew->apInvocationIdLen = thedata->apInvocationIdLen;
+		StorageNew->apInvocationId[StorageNew->apInvocationIdLen] = 0;
+		if (!(StorageNew->apInvocationOfPointer = snmp_duplicate_objid(thedata->apInvocationOfPointer, thedata->apInvocationOfPointerLen / sizeof(oid))))
+			goto destroy;
+		StorageNew->apInvocationOfPointerLen = thedata->apInvocationOfPointerLen;
+		StorageNew->apInvocationRowStatus = thedata->apInvocationRowStatus;
 	}
       done:
 	DEBUGMSGTL(("acseMIB", "done.\n"));
@@ -1335,7 +1533,7 @@ apInvocationTable_del(struct apInvocationTable_data *thedata)
  * @param line line from configuration file matching the token.
  * @brief parse configuration file for apInvocationTable entries.
  *
- * This callback is called by UCD-SNMP when it prases a configuration file and finds a configuration
+ * This callback is called by UCD-SNMP when it parses a configuration file and finds a configuration
  * file line for the registsred token (in this case apInvocationTable).  This routine is invoked by UCD-SNMP
  * to read the values of each row in the table from the configuration file.  Note that this
  * procedure may exist regardless of the persistence of the table.  If there are no configured
@@ -1425,25 +1623,35 @@ applicationEntityInvocationTable_create(void)
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
 		StorageNew->applicationSubsystemId = 0;
-		if ((StorageNew->apInvocationId = (uint8_t *) strdup("")) != NULL)
-			StorageNew->apInvocationIdLen = strlen("");
-		if ((StorageNew->applicationEntityInvocationUnderlyingConnectionNames = snmp_duplicate_objid(zeroDotZero_oid, 2)))
+		if ((StorageNew->apInvocationId = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->apInvocationIdLen = 0;
+		StorageNew->apInvocationId[StorageNew->apInvocationIdLen] = 0;
+		if ((StorageNew->applicationEntityInvocationUnderlyingConnectionNames = snmp_duplicate_objid(zeroDotZero_oid, 2)) == NULL)
+			goto nomem;
 			StorageNew->applicationEntityInvocationUnderlyingConnectionNamesLen = 2;
-		if ((StorageNew->applicationEntityInvocationSupportedConnectionNames = snmp_duplicate_objid(zeroDotZero_oid, 2)))
+		if ((StorageNew->applicationEntityInvocationSupportedConnectionNames = snmp_duplicate_objid(zeroDotZero_oid, 2)) == NULL)
+			goto nomem;
 			StorageNew->applicationEntityInvocationSupportedConnectionNamesLen = 2;
-		if ((StorageNew->applicationEntityInvocationInvocationOfPointer = snmp_duplicate_objid(zeroDotZero_oid, 2)))
+		if ((StorageNew->applicationEntityInvocationInvocationOfPointer = snmp_duplicate_objid(zeroDotZero_oid, 2)) == NULL)
+			goto nomem;
 			StorageNew->applicationEntityInvocationInvocationOfPointerLen = 2;
 		StorageNew->applicationEntityInvocationRowStatus = 0;
 		StorageNew->applicationEntityInvocationRowStatus = RS_NOTREADY;
 	}
+      done:
 	DEBUGMSGTL(("acseMIB", "done.\n"));
 	return (StorageNew);
+	goto nomem;
+      nomem:
+	applicationEntityInvocationTable_destroy(&StorageNew);
+	goto done;
 }
 
 /**
  * @fn struct applicationEntityInvocationTable_data *applicationEntityInvocationTable_duplicate(struct applicationEntityInvocationTable_data *thedata)
  * @param thedata the row structure to duplicate.
- * @brief duplicat a row structure for a table.
+ * @brief duplicate a row structure for a table.
  *
  * Duplicates the specified row structure @param thedata and returns a pointer to the newly
  * allocated row structure on success, or NULL on failure.
@@ -1455,6 +1663,28 @@ applicationEntityInvocationTable_duplicate(struct applicationEntityInvocationTab
 
 	DEBUGMSGTL(("acseMIB", "applicationEntityInvocationTable_duplicate: duplicating row...  "));
 	if (StorageNew != NULL) {
+		StorageNew->applicationSubsystemId = thedata->applicationSubsystemId;
+		if (!(StorageNew->apInvocationId = malloc(thedata->apInvocationIdLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->apInvocationId, thedata->apInvocationId, thedata->apInvocationIdLen);
+		StorageNew->apInvocationIdLen = thedata->apInvocationIdLen;
+		StorageNew->apInvocationId[StorageNew->apInvocationIdLen] = 0;
+		if (!
+		    (StorageNew->applicationEntityInvocationUnderlyingConnectionNames =
+		     snmp_duplicate_objid(thedata->applicationEntityInvocationUnderlyingConnectionNames, thedata->applicationEntityInvocationUnderlyingConnectionNamesLen / sizeof(oid))))
+			goto destroy;
+		StorageNew->applicationEntityInvocationUnderlyingConnectionNamesLen = thedata->applicationEntityInvocationUnderlyingConnectionNamesLen;
+		if (!
+		    (StorageNew->applicationEntityInvocationSupportedConnectionNames =
+		     snmp_duplicate_objid(thedata->applicationEntityInvocationSupportedConnectionNames, thedata->applicationEntityInvocationSupportedConnectionNamesLen / sizeof(oid))))
+			goto destroy;
+		StorageNew->applicationEntityInvocationSupportedConnectionNamesLen = thedata->applicationEntityInvocationSupportedConnectionNamesLen;
+		if (!
+		    (StorageNew->applicationEntityInvocationInvocationOfPointer =
+		     snmp_duplicate_objid(thedata->applicationEntityInvocationInvocationOfPointer, thedata->applicationEntityInvocationInvocationOfPointerLen / sizeof(oid))))
+			goto destroy;
+		StorageNew->applicationEntityInvocationInvocationOfPointerLen = thedata->applicationEntityInvocationInvocationOfPointerLen;
+		StorageNew->applicationEntityInvocationRowStatus = thedata->applicationEntityInvocationRowStatus;
 	}
       done:
 	DEBUGMSGTL(("acseMIB", "done.\n"));
@@ -1558,7 +1788,7 @@ applicationEntityInvocationTable_del(struct applicationEntityInvocationTable_dat
  * @param line line from configuration file matching the token.
  * @brief parse configuration file for applicationEntityInvocationTable entries.
  *
- * This callback is called by UCD-SNMP when it prases a configuration file and finds a configuration
+ * This callback is called by UCD-SNMP when it parses a configuration file and finds a configuration
  * file line for the registsred token (in this case applicationEntityInvocationTable).  This routine is invoked by UCD-SNMP
  * to read the values of each row in the table from the configuration file.  Note that this
  * procedure may exist regardless of the persistence of the table.  If there are no configured
@@ -1665,19 +1895,25 @@ applicationSubsystemTable_create(void)
 	DEBUGMSGTL(("acseMIB", "applicationSubsystemTable_create: creating row...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
-		if ((StorageNew->subsystemId = (uint8_t *) strdup("")) != NULL)
-			StorageNew->subsystemIdLen = strlen("");
+		if ((StorageNew->subsystemId = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->subsystemIdLen = 0;
+		StorageNew->subsystemId[StorageNew->subsystemIdLen] = 0;
 		StorageNew->applicationSubsystemId = 0;
-
 	}
+      done:
 	DEBUGMSGTL(("acseMIB", "done.\n"));
 	return (StorageNew);
+	goto nomem;
+      nomem:
+	applicationSubsystemTable_destroy(&StorageNew);
+	goto done;
 }
 
 /**
  * @fn struct applicationSubsystemTable_data *applicationSubsystemTable_duplicate(struct applicationSubsystemTable_data *thedata)
  * @param thedata the row structure to duplicate.
- * @brief duplicat a row structure for a table.
+ * @brief duplicate a row structure for a table.
  *
  * Duplicates the specified row structure @param thedata and returns a pointer to the newly
  * allocated row structure on success, or NULL on failure.
@@ -1689,6 +1925,12 @@ applicationSubsystemTable_duplicate(struct applicationSubsystemTable_data *theda
 
 	DEBUGMSGTL(("acseMIB", "applicationSubsystemTable_duplicate: duplicating row...  "));
 	if (StorageNew != NULL) {
+		if (!(StorageNew->subsystemId = malloc(thedata->subsystemIdLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->subsystemId, thedata->subsystemId, thedata->subsystemIdLen);
+		StorageNew->subsystemIdLen = thedata->subsystemIdLen;
+		StorageNew->subsystemId[StorageNew->subsystemIdLen] = 0;
+		StorageNew->applicationSubsystemId = thedata->applicationSubsystemId;
 	}
       done:
 	DEBUGMSGTL(("acseMIB", "done.\n"));
@@ -1784,7 +2026,7 @@ applicationSubsystemTable_del(struct applicationSubsystemTable_data *thedata)
  * @param line line from configuration file matching the token.
  * @brief parse configuration file for applicationSubsystemTable entries.
  *
- * This callback is called by UCD-SNMP when it prases a configuration file and finds a configuration
+ * This callback is called by UCD-SNMP when it parses a configuration file and finds a configuration
  * file line for the registsred token (in this case applicationSubsystemTable).  This routine is invoked by UCD-SNMP
  * to read the values of each row in the table from the configuration file.  Note that this
  * procedure may exist regardless of the persistence of the table.  If there are no configured
@@ -1864,28 +2106,41 @@ asoTable_create(void)
 	DEBUGMSGTL(("acseMIB", "asoTable_create: creating row...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
-		if ((StorageNew->subsystemId = (uint8_t *) strdup("")) != NULL)
-			StorageNew->subsystemIdLen = strlen("");
-		if ((StorageNew->applicationProcessId = (uint8_t *) strdup("")) != NULL)
-			StorageNew->applicationProcessIdLen = strlen("");
-		if ((StorageNew->asoEntityId = (uint8_t *) strdup("")) != NULL)
-			StorageNew->asoEntityIdLen = strlen("");
-		if ((StorageNew->asoTitle = snmp_duplicate_objid(zeroDotZero_oid, 2)))
+		if ((StorageNew->subsystemId = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->subsystemIdLen = 0;
+		StorageNew->subsystemId[StorageNew->subsystemIdLen] = 0;
+		if ((StorageNew->applicationProcessId = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->applicationProcessIdLen = 0;
+		StorageNew->applicationProcessId[StorageNew->applicationProcessIdLen] = 0;
+		if ((StorageNew->asoEntityId = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->asoEntityIdLen = 0;
+		StorageNew->asoEntityId[StorageNew->asoEntityIdLen] = 0;
+		if ((StorageNew->asoTitle = snmp_duplicate_objid(zeroDotZero_oid, 2)) == NULL)
+			goto nomem;
 			StorageNew->asoTitleLen = 2;
-		if ((StorageNew->asoQualifier = snmp_duplicate_objid(zeroDotZero_oid, 2)))
+		if ((StorageNew->asoQualifier = snmp_duplicate_objid(zeroDotZero_oid, 2)) == NULL)
+			goto nomem;
 			StorageNew->asoQualifierLen = 2;
 		StorageNew->asoOperationalState = 0;
 		StorageNew->asoRowStatus = 0;
 		StorageNew->asoRowStatus = RS_NOTREADY;
 	}
+      done:
 	DEBUGMSGTL(("acseMIB", "done.\n"));
 	return (StorageNew);
+	goto nomem;
+      nomem:
+	asoTable_destroy(&StorageNew);
+	goto done;
 }
 
 /**
  * @fn struct asoTable_data *asoTable_duplicate(struct asoTable_data *thedata)
  * @param thedata the row structure to duplicate.
- * @brief duplicat a row structure for a table.
+ * @brief duplicate a row structure for a table.
  *
  * Duplicates the specified row structure @param thedata and returns a pointer to the newly
  * allocated row structure on success, or NULL on failure.
@@ -1897,6 +2152,34 @@ asoTable_duplicate(struct asoTable_data *thedata)
 
 	DEBUGMSGTL(("acseMIB", "asoTable_duplicate: duplicating row...  "));
 	if (StorageNew != NULL) {
+		if (!(StorageNew->subsystemId = malloc(thedata->subsystemIdLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->subsystemId, thedata->subsystemId, thedata->subsystemIdLen);
+		StorageNew->subsystemIdLen = thedata->subsystemIdLen;
+		StorageNew->subsystemId[StorageNew->subsystemIdLen] = 0;
+		if (!(StorageNew->applicationProcessId = malloc(thedata->applicationProcessIdLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->applicationProcessId, thedata->applicationProcessId, thedata->applicationProcessIdLen);
+		StorageNew->applicationProcessIdLen = thedata->applicationProcessIdLen;
+		StorageNew->applicationProcessId[StorageNew->applicationProcessIdLen] = 0;
+		if (!(StorageNew->asoEntityId = malloc(thedata->asoEntityIdLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->asoEntityId, thedata->asoEntityId, thedata->asoEntityIdLen);
+		StorageNew->asoEntityIdLen = thedata->asoEntityIdLen;
+		StorageNew->asoEntityId[StorageNew->asoEntityIdLen] = 0;
+		if (!(StorageNew->asoId = malloc(thedata->asoIdLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->asoId, thedata->asoId, thedata->asoIdLen);
+		StorageNew->asoIdLen = thedata->asoIdLen;
+		StorageNew->asoId[StorageNew->asoIdLen] = 0;
+		if (!(StorageNew->asoTitle = snmp_duplicate_objid(thedata->asoTitle, thedata->asoTitleLen / sizeof(oid))))
+			goto destroy;
+		StorageNew->asoTitleLen = thedata->asoTitleLen;
+		if (!(StorageNew->asoQualifier = snmp_duplicate_objid(thedata->asoQualifier, thedata->asoQualifierLen / sizeof(oid))))
+			goto destroy;
+		StorageNew->asoQualifierLen = thedata->asoQualifierLen;
+		StorageNew->asoOperationalState = thedata->asoOperationalState;
+		StorageNew->asoRowStatus = thedata->asoRowStatus;
 	}
       done:
 	DEBUGMSGTL(("acseMIB", "done.\n"));
@@ -2008,7 +2291,7 @@ asoTable_del(struct asoTable_data *thedata)
  * @param line line from configuration file matching the token.
  * @brief parse configuration file for asoTable entries.
  *
- * This callback is called by UCD-SNMP when it prases a configuration file and finds a configuration
+ * This callback is called by UCD-SNMP when it parses a configuration file and finds a configuration
  * file line for the registsred token (in this case asoTable).  This routine is invoked by UCD-SNMP
  * to read the values of each row in the table from the configuration file.  Note that this
  * procedure may exist regardless of the persistence of the table.  If there are no configured
@@ -2125,30 +2408,45 @@ asoEntityTable_create(void)
 	DEBUGMSGTL(("acseMIB", "asoEntityTable_create: creating row...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
-		if ((StorageNew->subsystemId = (uint8_t *) strdup("")) != NULL)
-			StorageNew->subsystemIdLen = strlen("");
-		if ((StorageNew->applicationProcessId = (uint8_t *) strdup("")) != NULL)
-			StorageNew->applicationProcessIdLen = strlen("");
-		if ((StorageNew->asoEntityLocalSapNames = (uint8_t *) strdup("")) != NULL)
-			StorageNew->asoEntityLocalSapNamesLen = strlen("");
+		if ((StorageNew->subsystemId = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->subsystemIdLen = 0;
+		StorageNew->subsystemId[StorageNew->subsystemIdLen] = 0;
+		if ((StorageNew->applicationProcessId = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->applicationProcessIdLen = 0;
+		StorageNew->applicationProcessId[StorageNew->applicationProcessIdLen] = 0;
+		if ((StorageNew->asoEntityLocalSapNames = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->asoEntityLocalSapNamesLen = 0;
+		StorageNew->asoEntityLocalSapNames[StorageNew->asoEntityLocalSapNamesLen] = 0;
 		StorageNew->asoEntityOperationalState = 0;
-		if ((StorageNew->asoEntityTitle = snmp_duplicate_objid(zeroDotZero_oid, 2)))
+		if ((StorageNew->asoEntityTitle = snmp_duplicate_objid(zeroDotZero_oid, 2)) == NULL)
+			goto nomem;
 			StorageNew->asoEntityTitleLen = 2;
-		if ((StorageNew->asoEntityQualifier = snmp_duplicate_objid(zeroDotZero_oid, 2)))
+		if ((StorageNew->asoEntityQualifier = snmp_duplicate_objid(zeroDotZero_oid, 2)) == NULL)
+			goto nomem;
 			StorageNew->asoEntityQualifierLen = 2;
-		if ((StorageNew->asoEntityApplicationContextNameSupport = (uint8_t *) strdup("")) != NULL)
-			StorageNew->asoEntityApplicationContextNameSupportLen = strlen("");
+		if ((StorageNew->asoEntityApplicationContextNameSupport = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->asoEntityApplicationContextNameSupportLen = 0;
+		StorageNew->asoEntityApplicationContextNameSupport[StorageNew->asoEntityApplicationContextNameSupportLen] = 0;
 		StorageNew->asoEntityRowStatus = 0;
 		StorageNew->asoEntityRowStatus = RS_NOTREADY;
 	}
+      done:
 	DEBUGMSGTL(("acseMIB", "done.\n"));
 	return (StorageNew);
+	goto nomem;
+      nomem:
+	asoEntityTable_destroy(&StorageNew);
+	goto done;
 }
 
 /**
  * @fn struct asoEntityTable_data *asoEntityTable_duplicate(struct asoEntityTable_data *thedata)
  * @param thedata the row structure to duplicate.
- * @brief duplicat a row structure for a table.
+ * @brief duplicate a row structure for a table.
  *
  * Duplicates the specified row structure @param thedata and returns a pointer to the newly
  * allocated row structure on success, or NULL on failure.
@@ -2160,6 +2458,39 @@ asoEntityTable_duplicate(struct asoEntityTable_data *thedata)
 
 	DEBUGMSGTL(("acseMIB", "asoEntityTable_duplicate: duplicating row...  "));
 	if (StorageNew != NULL) {
+		if (!(StorageNew->subsystemId = malloc(thedata->subsystemIdLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->subsystemId, thedata->subsystemId, thedata->subsystemIdLen);
+		StorageNew->subsystemIdLen = thedata->subsystemIdLen;
+		StorageNew->subsystemId[StorageNew->subsystemIdLen] = 0;
+		if (!(StorageNew->applicationProcessId = malloc(thedata->applicationProcessIdLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->applicationProcessId, thedata->applicationProcessId, thedata->applicationProcessIdLen);
+		StorageNew->applicationProcessIdLen = thedata->applicationProcessIdLen;
+		StorageNew->applicationProcessId[StorageNew->applicationProcessIdLen] = 0;
+		if (!(StorageNew->asoEntityId = malloc(thedata->asoEntityIdLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->asoEntityId, thedata->asoEntityId, thedata->asoEntityIdLen);
+		StorageNew->asoEntityIdLen = thedata->asoEntityIdLen;
+		StorageNew->asoEntityId[StorageNew->asoEntityIdLen] = 0;
+		if (!(StorageNew->asoEntityLocalSapNames = malloc(thedata->asoEntityLocalSapNamesLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->asoEntityLocalSapNames, thedata->asoEntityLocalSapNames, thedata->asoEntityLocalSapNamesLen);
+		StorageNew->asoEntityLocalSapNamesLen = thedata->asoEntityLocalSapNamesLen;
+		StorageNew->asoEntityLocalSapNames[StorageNew->asoEntityLocalSapNamesLen] = 0;
+		StorageNew->asoEntityOperationalState = thedata->asoEntityOperationalState;
+		if (!(StorageNew->asoEntityTitle = snmp_duplicate_objid(thedata->asoEntityTitle, thedata->asoEntityTitleLen / sizeof(oid))))
+			goto destroy;
+		StorageNew->asoEntityTitleLen = thedata->asoEntityTitleLen;
+		if (!(StorageNew->asoEntityQualifier = snmp_duplicate_objid(thedata->asoEntityQualifier, thedata->asoEntityQualifierLen / sizeof(oid))))
+			goto destroy;
+		StorageNew->asoEntityQualifierLen = thedata->asoEntityQualifierLen;
+		if (!(StorageNew->asoEntityApplicationContextNameSupport = malloc(thedata->asoEntityApplicationContextNameSupportLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->asoEntityApplicationContextNameSupport, thedata->asoEntityApplicationContextNameSupport, thedata->asoEntityApplicationContextNameSupportLen);
+		StorageNew->asoEntityApplicationContextNameSupportLen = thedata->asoEntityApplicationContextNameSupportLen;
+		StorageNew->asoEntityApplicationContextNameSupport[StorageNew->asoEntityApplicationContextNameSupportLen] = 0;
+		StorageNew->asoEntityRowStatus = thedata->asoEntityRowStatus;
 	}
       done:
 	DEBUGMSGTL(("acseMIB", "done.\n"));
@@ -2267,7 +2598,7 @@ asoEntityTable_del(struct asoEntityTable_data *thedata)
  * @param line line from configuration file matching the token.
  * @brief parse configuration file for asoEntityTable entries.
  *
- * This callback is called by UCD-SNMP when it prases a configuration file and finds a configuration
+ * This callback is called by UCD-SNMP when it parses a configuration file and finds a configuration
  * file line for the registsred token (in this case asoEntityTable).  This routine is invoked by UCD-SNMP
  * to read the values of each row in the table from the configuration file.  Note that this
  * procedure may exist regardless of the persistence of the table.  If there are no configured
@@ -2392,21 +2723,29 @@ asoInvocationTable_create(void)
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
 		StorageNew->applicationSubsystemId = 0;
-		if ((StorageNew->apInvocationId = (uint8_t *) strdup("")) != NULL)
-			StorageNew->apInvocationIdLen = strlen("");
-		if ((StorageNew->asoInvocationOfPointer = snmp_duplicate_objid(zeroDotZero_oid, 2)))
+		if ((StorageNew->apInvocationId = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->apInvocationIdLen = 0;
+		StorageNew->apInvocationId[StorageNew->apInvocationIdLen] = 0;
+		if ((StorageNew->asoInvocationOfPointer = snmp_duplicate_objid(zeroDotZero_oid, 2)) == NULL)
+			goto nomem;
 			StorageNew->asoInvocationOfPointerLen = 2;
 		StorageNew->asoInvocationRowStatus = 0;
 		StorageNew->asoInvocationRowStatus = RS_NOTREADY;
 	}
+      done:
 	DEBUGMSGTL(("acseMIB", "done.\n"));
 	return (StorageNew);
+	goto nomem;
+      nomem:
+	asoInvocationTable_destroy(&StorageNew);
+	goto done;
 }
 
 /**
  * @fn struct asoInvocationTable_data *asoInvocationTable_duplicate(struct asoInvocationTable_data *thedata)
  * @param thedata the row structure to duplicate.
- * @brief duplicat a row structure for a table.
+ * @brief duplicate a row structure for a table.
  *
  * Duplicates the specified row structure @param thedata and returns a pointer to the newly
  * allocated row structure on success, or NULL on failure.
@@ -2418,6 +2757,21 @@ asoInvocationTable_duplicate(struct asoInvocationTable_data *thedata)
 
 	DEBUGMSGTL(("acseMIB", "asoInvocationTable_duplicate: duplicating row...  "));
 	if (StorageNew != NULL) {
+		StorageNew->applicationSubsystemId = thedata->applicationSubsystemId;
+		if (!(StorageNew->apInvocationId = malloc(thedata->apInvocationIdLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->apInvocationId, thedata->apInvocationId, thedata->apInvocationIdLen);
+		StorageNew->apInvocationIdLen = thedata->apInvocationIdLen;
+		StorageNew->apInvocationId[StorageNew->apInvocationIdLen] = 0;
+		if (!(StorageNew->asoInvocationId = malloc(thedata->asoInvocationIdLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->asoInvocationId, thedata->asoInvocationId, thedata->asoInvocationIdLen);
+		StorageNew->asoInvocationIdLen = thedata->asoInvocationIdLen;
+		StorageNew->asoInvocationId[StorageNew->asoInvocationIdLen] = 0;
+		if (!(StorageNew->asoInvocationOfPointer = snmp_duplicate_objid(thedata->asoInvocationOfPointer, thedata->asoInvocationOfPointerLen / sizeof(oid))))
+			goto destroy;
+		StorageNew->asoInvocationOfPointerLen = thedata->asoInvocationOfPointerLen;
+		StorageNew->asoInvocationRowStatus = thedata->asoInvocationRowStatus;
 	}
       done:
 	DEBUGMSGTL(("acseMIB", "done.\n"));
@@ -2521,7 +2875,7 @@ asoInvocationTable_del(struct asoInvocationTable_data *thedata)
  * @param line line from configuration file matching the token.
  * @brief parse configuration file for asoInvocationTable entries.
  *
- * This callback is called by UCD-SNMP when it prases a configuration file and finds a configuration
+ * This callback is called by UCD-SNMP when it parses a configuration file and finds a configuration
  * file line for the registsred token (in this case asoInvocationTable).  This routine is invoked by UCD-SNMP
  * to read the values of each row in the table from the configuration file.  Note that this
  * procedure may exist regardless of the persistence of the table.  If there are no configured
@@ -2618,19 +2972,26 @@ monoULConnectionTable_create(void)
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
 		StorageNew->applicationSubsystemId = 0;
-		if ((StorageNew->apInvocationId = (uint8_t *) strdup("")) != NULL)
-			StorageNew->apInvocationIdLen = strlen("");
+		if ((StorageNew->apInvocationId = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->apInvocationIdLen = 0;
+		StorageNew->apInvocationId[StorageNew->apInvocationIdLen] = 0;
 		StorageNew->monoULConnectionRowStatus = 0;
 		StorageNew->monoULConnectionRowStatus = RS_NOTREADY;
 	}
+      done:
 	DEBUGMSGTL(("acseMIB", "done.\n"));
 	return (StorageNew);
+	goto nomem;
+      nomem:
+	monoULConnectionTable_destroy(&StorageNew);
+	goto done;
 }
 
 /**
  * @fn struct monoULConnectionTable_data *monoULConnectionTable_duplicate(struct monoULConnectionTable_data *thedata)
  * @param thedata the row structure to duplicate.
- * @brief duplicat a row structure for a table.
+ * @brief duplicate a row structure for a table.
  *
  * Duplicates the specified row structure @param thedata and returns a pointer to the newly
  * allocated row structure on success, or NULL on failure.
@@ -2642,6 +3003,13 @@ monoULConnectionTable_duplicate(struct monoULConnectionTable_data *thedata)
 
 	DEBUGMSGTL(("acseMIB", "monoULConnectionTable_duplicate: duplicating row...  "));
 	if (StorageNew != NULL) {
+		StorageNew->applicationSubsystemId = thedata->applicationSubsystemId;
+		if (!(StorageNew->apInvocationId = malloc(thedata->apInvocationIdLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->apInvocationId, thedata->apInvocationId, thedata->apInvocationIdLen);
+		StorageNew->apInvocationIdLen = thedata->apInvocationIdLen;
+		StorageNew->apInvocationId[StorageNew->apInvocationIdLen] = 0;
+		StorageNew->monoULConnectionRowStatus = thedata->monoULConnectionRowStatus;
 	}
       done:
 	DEBUGMSGTL(("acseMIB", "done.\n"));
@@ -2739,7 +3107,7 @@ monoULConnectionTable_del(struct monoULConnectionTable_data *thedata)
  * @param line line from configuration file matching the token.
  * @brief parse configuration file for monoULConnectionTable entries.
  *
- * This callback is called by UCD-SNMP when it prases a configuration file and finds a configuration
+ * This callback is called by UCD-SNMP when it parses a configuration file and finds a configuration
  * file line for the registsred token (in this case monoULConnectionTable).  This routine is invoked by UCD-SNMP
  * to read the values of each row in the table from the configuration file.  Note that this
  * procedure may exist regardless of the persistence of the table.  If there are no configured
@@ -2821,19 +3189,25 @@ monoULEntityTable_create(void)
 	DEBUGMSGTL(("acseMIB", "monoULEntityTable_create: creating row...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
-		if ((StorageNew->subsystemId = (uint8_t *) strdup("")) != NULL)
-			StorageNew->subsystemIdLen = strlen("");
+		if ((StorageNew->subsystemId = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->subsystemIdLen = 0;
+		StorageNew->subsystemId[StorageNew->subsystemIdLen] = 0;
 		StorageNew->monoUlEntityId = 0;
-
 	}
+      done:
 	DEBUGMSGTL(("acseMIB", "done.\n"));
 	return (StorageNew);
+	goto nomem;
+      nomem:
+	monoULEntityTable_destroy(&StorageNew);
+	goto done;
 }
 
 /**
  * @fn struct monoULEntityTable_data *monoULEntityTable_duplicate(struct monoULEntityTable_data *thedata)
  * @param thedata the row structure to duplicate.
- * @brief duplicat a row structure for a table.
+ * @brief duplicate a row structure for a table.
  *
  * Duplicates the specified row structure @param thedata and returns a pointer to the newly
  * allocated row structure on success, or NULL on failure.
@@ -2845,6 +3219,12 @@ monoULEntityTable_duplicate(struct monoULEntityTable_data *thedata)
 
 	DEBUGMSGTL(("acseMIB", "monoULEntityTable_duplicate: duplicating row...  "));
 	if (StorageNew != NULL) {
+		if (!(StorageNew->subsystemId = malloc(thedata->subsystemIdLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->subsystemId, thedata->subsystemId, thedata->subsystemIdLen);
+		StorageNew->subsystemIdLen = thedata->subsystemIdLen;
+		StorageNew->subsystemId[StorageNew->subsystemIdLen] = 0;
+		StorageNew->monoUlEntityId = thedata->monoUlEntityId;
 	}
       done:
 	DEBUGMSGTL(("acseMIB", "done.\n"));
@@ -2940,7 +3320,7 @@ monoULEntityTable_del(struct monoULEntityTable_data *thedata)
  * @param line line from configuration file matching the token.
  * @brief parse configuration file for monoULEntityTable entries.
  *
- * This callback is called by UCD-SNMP when it prases a configuration file and finds a configuration
+ * This callback is called by UCD-SNMP when it parses a configuration file and finds a configuration
  * file line for the registsred token (in this case monoULEntityTable).  This routine is invoked by UCD-SNMP
  * to read the values of each row in the table from the configuration file.  Note that this
  * procedure may exist regardless of the persistence of the table.  If there are no configured
@@ -3023,14 +3403,19 @@ monolithicUpperLayerSubsystemTable_create(void)
 		StorageNew->monolithicUpperLayerSubssytemRowStatus = 0;
 		StorageNew->monolithicUpperLayerSubssytemRowStatus = RS_NOTREADY;
 	}
+      done:
 	DEBUGMSGTL(("acseMIB", "done.\n"));
 	return (StorageNew);
+	goto nomem;
+      nomem:
+	monolithicUpperLayerSubsystemTable_destroy(&StorageNew);
+	goto done;
 }
 
 /**
  * @fn struct monolithicUpperLayerSubsystemTable_data *monolithicUpperLayerSubsystemTable_duplicate(struct monolithicUpperLayerSubsystemTable_data *thedata)
  * @param thedata the row structure to duplicate.
- * @brief duplicat a row structure for a table.
+ * @brief duplicate a row structure for a table.
  *
  * Duplicates the specified row structure @param thedata and returns a pointer to the newly
  * allocated row structure on success, or NULL on failure.
@@ -3042,6 +3427,12 @@ monolithicUpperLayerSubsystemTable_duplicate(struct monolithicUpperLayerSubsyste
 
 	DEBUGMSGTL(("acseMIB", "monolithicUpperLayerSubsystemTable_duplicate: duplicating row...  "));
 	if (StorageNew != NULL) {
+		if (!(StorageNew->monolithicUpperLayerSubsystemId = malloc(thedata->monolithicUpperLayerSubsystemIdLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->monolithicUpperLayerSubsystemId, thedata->monolithicUpperLayerSubsystemId, thedata->monolithicUpperLayerSubsystemIdLen);
+		StorageNew->monolithicUpperLayerSubsystemIdLen = thedata->monolithicUpperLayerSubsystemIdLen;
+		StorageNew->monolithicUpperLayerSubsystemId[StorageNew->monolithicUpperLayerSubsystemIdLen] = 0;
+		StorageNew->monolithicUpperLayerSubssytemRowStatus = thedata->monolithicUpperLayerSubssytemRowStatus;
 	}
       done:
 	DEBUGMSGTL(("acseMIB", "done.\n"));
@@ -3137,7 +3528,7 @@ monolithicUpperLayerSubsystemTable_del(struct monolithicUpperLayerSubsystemTable
  * @param line line from configuration file matching the token.
  * @brief parse configuration file for monolithicUpperLayerSubsystemTable entries.
  *
- * This callback is called by UCD-SNMP when it prases a configuration file and finds a configuration
+ * This callback is called by UCD-SNMP when it parses a configuration file and finds a configuration
  * file line for the registsred token (in this case monolithicUpperLayerSubsystemTable).  This routine is invoked by UCD-SNMP
  * to read the values of each row in the table from the configuration file.  Note that this
  * procedure may exist regardless of the persistence of the table.  If there are no configured
@@ -3217,25 +3608,38 @@ pSapTable_create(void)
 	DEBUGMSGTL(("acseMIB", "pSapTable_create: creating row...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
-		if ((StorageNew->subsystemId = (uint8_t *) strdup("")) != NULL)
-			StorageNew->subsystemIdLen = strlen("");
-		if ((StorageNew->pSapId = (uint8_t *) strdup("")) != NULL)
-			StorageNew->pSapIdLen = strlen("");
-		if ((StorageNew->pSapSap1Address = (uint8_t *) strdup("")) != NULL)
-			StorageNew->pSapSap1AddressLen = strlen("");
-		if ((StorageNew->pSapUserEntityNames = (uint8_t *) strdup("")) != NULL)
-			StorageNew->pSapUserEntityNamesLen = strlen("");
+		if ((StorageNew->subsystemId = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->subsystemIdLen = 0;
+		StorageNew->subsystemId[StorageNew->subsystemIdLen] = 0;
+		if ((StorageNew->pSapId = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->pSapIdLen = 0;
+		StorageNew->pSapId[StorageNew->pSapIdLen] = 0;
+		if ((StorageNew->pSapSap1Address = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->pSapSap1AddressLen = 0;
+		StorageNew->pSapSap1Address[StorageNew->pSapSap1AddressLen] = 0;
+		if ((StorageNew->pSapUserEntityNames = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->pSapUserEntityNamesLen = 0;
+		StorageNew->pSapUserEntityNames[StorageNew->pSapUserEntityNamesLen] = 0;
 		StorageNew->pSapRowStatus = 0;
 		StorageNew->pSapRowStatus = RS_NOTREADY;
 	}
+      done:
 	DEBUGMSGTL(("acseMIB", "done.\n"));
 	return (StorageNew);
+	goto nomem;
+      nomem:
+	pSapTable_destroy(&StorageNew);
+	goto done;
 }
 
 /**
  * @fn struct pSapTable_data *pSapTable_duplicate(struct pSapTable_data *thedata)
  * @param thedata the row structure to duplicate.
- * @brief duplicat a row structure for a table.
+ * @brief duplicate a row structure for a table.
  *
  * Duplicates the specified row structure @param thedata and returns a pointer to the newly
  * allocated row structure on success, or NULL on failure.
@@ -3247,6 +3651,27 @@ pSapTable_duplicate(struct pSapTable_data *thedata)
 
 	DEBUGMSGTL(("acseMIB", "pSapTable_duplicate: duplicating row...  "));
 	if (StorageNew != NULL) {
+		if (!(StorageNew->subsystemId = malloc(thedata->subsystemIdLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->subsystemId, thedata->subsystemId, thedata->subsystemIdLen);
+		StorageNew->subsystemIdLen = thedata->subsystemIdLen;
+		StorageNew->subsystemId[StorageNew->subsystemIdLen] = 0;
+		if (!(StorageNew->pSapId = malloc(thedata->pSapIdLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->pSapId, thedata->pSapId, thedata->pSapIdLen);
+		StorageNew->pSapIdLen = thedata->pSapIdLen;
+		StorageNew->pSapId[StorageNew->pSapIdLen] = 0;
+		if (!(StorageNew->pSapSap1Address = malloc(thedata->pSapSap1AddressLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->pSapSap1Address, thedata->pSapSap1Address, thedata->pSapSap1AddressLen);
+		StorageNew->pSapSap1AddressLen = thedata->pSapSap1AddressLen;
+		StorageNew->pSapSap1Address[StorageNew->pSapSap1AddressLen] = 0;
+		if (!(StorageNew->pSapUserEntityNames = malloc(thedata->pSapUserEntityNamesLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->pSapUserEntityNames, thedata->pSapUserEntityNames, thedata->pSapUserEntityNamesLen);
+		StorageNew->pSapUserEntityNamesLen = thedata->pSapUserEntityNamesLen;
+		StorageNew->pSapUserEntityNames[StorageNew->pSapUserEntityNamesLen] = 0;
+		StorageNew->pSapRowStatus = thedata->pSapRowStatus;
 	}
       done:
 	DEBUGMSGTL(("acseMIB", "done.\n"));
@@ -3348,7 +3773,7 @@ pSapTable_del(struct pSapTable_data *thedata)
  * @param line line from configuration file matching the token.
  * @brief parse configuration file for pSapTable entries.
  *
- * This callback is called by UCD-SNMP when it prases a configuration file and finds a configuration
+ * This callback is called by UCD-SNMP when it parses a configuration file and finds a configuration
  * file line for the registsred token (in this case pSapTable).  This routine is invoked by UCD-SNMP
  * to read the values of each row in the table from the configuration file.  Note that this
  * procedure may exist regardless of the persistence of the table.  If there are no configured
@@ -3449,31 +3874,48 @@ presentationConnectionTable_create(void)
 	DEBUGMSGTL(("acseMIB", "presentationConnectionTable_create: creating row...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
-		if ((StorageNew->presentationSubsystemId = (uint8_t *) strdup("")) != NULL)
-			StorageNew->presentationSubsystemIdLen = strlen("");
-		if ((StorageNew->presentationEntityId = (uint8_t *) strdup("")) != NULL)
-			StorageNew->presentationEntityIdLen = strlen("");
-		if ((StorageNew->presentationCopmId = (uint8_t *) strdup("")) != NULL)
-			StorageNew->presentationCopmIdLen = strlen("");
-		if ((StorageNew->presentationConnectionUnderlyingConnectionNames = (uint8_t *) strdup("")) != NULL)
-			StorageNew->presentationConnectionUnderlyingConnectionNamesLen = strlen("");
-		if ((StorageNew->presentationConnectionSupportedConnectionNames = (uint8_t *) strdup("")) != NULL)
-			StorageNew->presentationConnectionSupportedConnectionNamesLen = strlen("");
-		if (memdup((u_char **) &StorageNew->presentationConnectionPresFUinUse, (u_char *) "\x00", 1) == SNMPERR_SUCCESS)
+		if ((StorageNew->presentationSubsystemId = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->presentationSubsystemIdLen = 0;
+		StorageNew->presentationSubsystemId[StorageNew->presentationSubsystemIdLen] = 0;
+		if ((StorageNew->presentationEntityId = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->presentationEntityIdLen = 0;
+		StorageNew->presentationEntityId[StorageNew->presentationEntityIdLen] = 0;
+		if ((StorageNew->presentationCopmId = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->presentationCopmIdLen = 0;
+		StorageNew->presentationCopmId[StorageNew->presentationCopmIdLen] = 0;
+		if ((StorageNew->presentationConnectionUnderlyingConnectionNames = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->presentationConnectionUnderlyingConnectionNamesLen = 0;
+		StorageNew->presentationConnectionUnderlyingConnectionNames[StorageNew->presentationConnectionUnderlyingConnectionNamesLen] = 0;
+		if ((StorageNew->presentationConnectionSupportedConnectionNames = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->presentationConnectionSupportedConnectionNamesLen = 0;
+		StorageNew->presentationConnectionSupportedConnectionNames[StorageNew->presentationConnectionSupportedConnectionNamesLen] = 0;
+		if (memdup((u_char **) &StorageNew->presentationConnectionPresFUinUse, (u_char *) "\x00", 1) != SNMPERR_SUCCESS)
+			goto nomem;
 			StorageNew->presentationConnectionPresFUinUseLen = 1;
-		if ((StorageNew->presentationConnectionPresContextInUse = snmp_duplicate_objid(zeroDotZero_oid, 2)))
+		if ((StorageNew->presentationConnectionPresContextInUse = snmp_duplicate_objid(zeroDotZero_oid, 2)) == NULL)
+			goto nomem;
 			StorageNew->presentationConnectionPresContextInUseLen = 2;
 		StorageNew->presentationCOnnectionRowStatus = 0;
 		StorageNew->presentationCOnnectionRowStatus = RS_NOTREADY;
 	}
+      done:
 	DEBUGMSGTL(("acseMIB", "done.\n"));
 	return (StorageNew);
+	goto nomem;
+      nomem:
+	presentationConnectionTable_destroy(&StorageNew);
+	goto done;
 }
 
 /**
  * @fn struct presentationConnectionTable_data *presentationConnectionTable_duplicate(struct presentationConnectionTable_data *thedata)
  * @param thedata the row structure to duplicate.
- * @brief duplicat a row structure for a table.
+ * @brief duplicate a row structure for a table.
  *
  * Duplicates the specified row structure @param thedata and returns a pointer to the newly
  * allocated row structure on success, or NULL on failure.
@@ -3485,6 +3927,48 @@ presentationConnectionTable_duplicate(struct presentationConnectionTable_data *t
 
 	DEBUGMSGTL(("acseMIB", "presentationConnectionTable_duplicate: duplicating row...  "));
 	if (StorageNew != NULL) {
+		if (!(StorageNew->presentationSubsystemId = malloc(thedata->presentationSubsystemIdLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->presentationSubsystemId, thedata->presentationSubsystemId, thedata->presentationSubsystemIdLen);
+		StorageNew->presentationSubsystemIdLen = thedata->presentationSubsystemIdLen;
+		StorageNew->presentationSubsystemId[StorageNew->presentationSubsystemIdLen] = 0;
+		if (!(StorageNew->presentationEntityId = malloc(thedata->presentationEntityIdLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->presentationEntityId, thedata->presentationEntityId, thedata->presentationEntityIdLen);
+		StorageNew->presentationEntityIdLen = thedata->presentationEntityIdLen;
+		StorageNew->presentationEntityId[StorageNew->presentationEntityIdLen] = 0;
+		if (!(StorageNew->presentationCopmId = malloc(thedata->presentationCopmIdLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->presentationCopmId, thedata->presentationCopmId, thedata->presentationCopmIdLen);
+		StorageNew->presentationCopmIdLen = thedata->presentationCopmIdLen;
+		StorageNew->presentationCopmId[StorageNew->presentationCopmIdLen] = 0;
+		if (!(StorageNew->presentationConnectionId = malloc(thedata->presentationConnectionIdLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->presentationConnectionId, thedata->presentationConnectionId, thedata->presentationConnectionIdLen);
+		StorageNew->presentationConnectionIdLen = thedata->presentationConnectionIdLen;
+		StorageNew->presentationConnectionId[StorageNew->presentationConnectionIdLen] = 0;
+		if (!(StorageNew->presentationConnectionUnderlyingConnectionNames = malloc(thedata->presentationConnectionUnderlyingConnectionNamesLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->presentationConnectionUnderlyingConnectionNames, thedata->presentationConnectionUnderlyingConnectionNames,
+		       thedata->presentationConnectionUnderlyingConnectionNamesLen);
+		StorageNew->presentationConnectionUnderlyingConnectionNamesLen = thedata->presentationConnectionUnderlyingConnectionNamesLen;
+		StorageNew->presentationConnectionUnderlyingConnectionNames[StorageNew->presentationConnectionUnderlyingConnectionNamesLen] = 0;
+		if (!(StorageNew->presentationConnectionSupportedConnectionNames = malloc(thedata->presentationConnectionSupportedConnectionNamesLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->presentationConnectionSupportedConnectionNames, thedata->presentationConnectionSupportedConnectionNames, thedata->presentationConnectionSupportedConnectionNamesLen);
+		StorageNew->presentationConnectionSupportedConnectionNamesLen = thedata->presentationConnectionSupportedConnectionNamesLen;
+		StorageNew->presentationConnectionSupportedConnectionNames[StorageNew->presentationConnectionSupportedConnectionNamesLen] = 0;
+		if (!(StorageNew->presentationConnectionPresFUinUse = malloc(thedata->presentationConnectionPresFUinUseLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->presentationConnectionPresFUinUse, thedata->presentationConnectionPresFUinUse, thedata->presentationConnectionPresFUinUseLen);
+		StorageNew->presentationConnectionPresFUinUseLen = thedata->presentationConnectionPresFUinUseLen;
+		StorageNew->presentationConnectionPresFUinUse[StorageNew->presentationConnectionPresFUinUseLen] = 0;
+		if (!
+		    (StorageNew->presentationConnectionPresContextInUse =
+		     snmp_duplicate_objid(thedata->presentationConnectionPresContextInUse, thedata->presentationConnectionPresContextInUseLen / sizeof(oid))))
+			goto destroy;
+		StorageNew->presentationConnectionPresContextInUseLen = thedata->presentationConnectionPresContextInUseLen;
+		StorageNew->presentationCOnnectionRowStatus = thedata->presentationCOnnectionRowStatus;
 	}
       done:
 	DEBUGMSGTL(("acseMIB", "done.\n"));
@@ -3600,7 +4084,7 @@ presentationConnectionTable_del(struct presentationConnectionTable_data *thedata
  * @param line line from configuration file matching the token.
  * @brief parse configuration file for presentationConnectionTable entries.
  *
- * This callback is called by UCD-SNMP when it prases a configuration file and finds a configuration
+ * This callback is called by UCD-SNMP when it parses a configuration file and finds a configuration
  * file line for the registsred token (in this case presentationConnectionTable).  This routine is invoked by UCD-SNMP
  * to read the values of each row in the table from the configuration file.  Note that this
  * procedure may exist regardless of the persistence of the table.  If there are no configured
@@ -3730,28 +4214,42 @@ presentationCopmTable_create(void)
 	DEBUGMSGTL(("acseMIB", "presentationCopmTable_create: creating row...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
-		if ((StorageNew->presentationSubsystemId = (uint8_t *) strdup("")) != NULL)
-			StorageNew->presentationSubsystemIdLen = strlen("");
-		if ((StorageNew->presentationEntityId = (uint8_t *) strdup("")) != NULL)
-			StorageNew->presentationEntityIdLen = strlen("");
+		if ((StorageNew->presentationSubsystemId = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->presentationSubsystemIdLen = 0;
+		StorageNew->presentationSubsystemId[StorageNew->presentationSubsystemIdLen] = 0;
+		if ((StorageNew->presentationEntityId = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->presentationEntityIdLen = 0;
+		StorageNew->presentationEntityId[StorageNew->presentationEntityIdLen] = 0;
 		StorageNew->presentationCopmOperationalState = 0;
-		if (memdup((u_char **) &StorageNew->presentationCopmPresFUsupport, (u_char *) "\x00", 1) == SNMPERR_SUCCESS)
+		if (memdup((u_char **) &StorageNew->presentationCopmPresFUsupport, (u_char *) "\x00", 1) != SNMPERR_SUCCESS)
+			goto nomem;
 			StorageNew->presentationCopmPresFUsupportLen = 1;
-		if ((StorageNew->presentationCopmabstrSyntaxSupport = (uint8_t *) strdup("")) != NULL)
-			StorageNew->presentationCopmabstrSyntaxSupportLen = strlen("");
-		if ((StorageNew->presentationCopmtransSyntaxSupport = (uint8_t *) strdup("")) != NULL)
-			StorageNew->presentationCopmtransSyntaxSupportLen = strlen("");
+		if ((StorageNew->presentationCopmabstrSyntaxSupport = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->presentationCopmabstrSyntaxSupportLen = 0;
+		StorageNew->presentationCopmabstrSyntaxSupport[StorageNew->presentationCopmabstrSyntaxSupportLen] = 0;
+		if ((StorageNew->presentationCopmtransSyntaxSupport = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->presentationCopmtransSyntaxSupportLen = 0;
+		StorageNew->presentationCopmtransSyntaxSupport[StorageNew->presentationCopmtransSyntaxSupportLen] = 0;
 		StorageNew->presentationCopmRowStatus = 0;
 		StorageNew->presentationCopmRowStatus = RS_NOTREADY;
 	}
+      done:
 	DEBUGMSGTL(("acseMIB", "done.\n"));
 	return (StorageNew);
+	goto nomem;
+      nomem:
+	presentationCopmTable_destroy(&StorageNew);
+	goto done;
 }
 
 /**
  * @fn struct presentationCopmTable_data *presentationCopmTable_duplicate(struct presentationCopmTable_data *thedata)
  * @param thedata the row structure to duplicate.
- * @brief duplicat a row structure for a table.
+ * @brief duplicate a row structure for a table.
  *
  * Duplicates the specified row structure @param thedata and returns a pointer to the newly
  * allocated row structure on success, or NULL on failure.
@@ -3763,6 +4261,38 @@ presentationCopmTable_duplicate(struct presentationCopmTable_data *thedata)
 
 	DEBUGMSGTL(("acseMIB", "presentationCopmTable_duplicate: duplicating row...  "));
 	if (StorageNew != NULL) {
+		if (!(StorageNew->presentationSubsystemId = malloc(thedata->presentationSubsystemIdLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->presentationSubsystemId, thedata->presentationSubsystemId, thedata->presentationSubsystemIdLen);
+		StorageNew->presentationSubsystemIdLen = thedata->presentationSubsystemIdLen;
+		StorageNew->presentationSubsystemId[StorageNew->presentationSubsystemIdLen] = 0;
+		if (!(StorageNew->presentationEntityId = malloc(thedata->presentationEntityIdLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->presentationEntityId, thedata->presentationEntityId, thedata->presentationEntityIdLen);
+		StorageNew->presentationEntityIdLen = thedata->presentationEntityIdLen;
+		StorageNew->presentationEntityId[StorageNew->presentationEntityIdLen] = 0;
+		if (!(StorageNew->presentationCopmId = malloc(thedata->presentationCopmIdLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->presentationCopmId, thedata->presentationCopmId, thedata->presentationCopmIdLen);
+		StorageNew->presentationCopmIdLen = thedata->presentationCopmIdLen;
+		StorageNew->presentationCopmId[StorageNew->presentationCopmIdLen] = 0;
+		StorageNew->presentationCopmOperationalState = thedata->presentationCopmOperationalState;
+		if (!(StorageNew->presentationCopmPresFUsupport = malloc(thedata->presentationCopmPresFUsupportLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->presentationCopmPresFUsupport, thedata->presentationCopmPresFUsupport, thedata->presentationCopmPresFUsupportLen);
+		StorageNew->presentationCopmPresFUsupportLen = thedata->presentationCopmPresFUsupportLen;
+		StorageNew->presentationCopmPresFUsupport[StorageNew->presentationCopmPresFUsupportLen] = 0;
+		if (!(StorageNew->presentationCopmabstrSyntaxSupport = malloc(thedata->presentationCopmabstrSyntaxSupportLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->presentationCopmabstrSyntaxSupport, thedata->presentationCopmabstrSyntaxSupport, thedata->presentationCopmabstrSyntaxSupportLen);
+		StorageNew->presentationCopmabstrSyntaxSupportLen = thedata->presentationCopmabstrSyntaxSupportLen;
+		StorageNew->presentationCopmabstrSyntaxSupport[StorageNew->presentationCopmabstrSyntaxSupportLen] = 0;
+		if (!(StorageNew->presentationCopmtransSyntaxSupport = malloc(thedata->presentationCopmtransSyntaxSupportLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->presentationCopmtransSyntaxSupport, thedata->presentationCopmtransSyntaxSupport, thedata->presentationCopmtransSyntaxSupportLen);
+		StorageNew->presentationCopmtransSyntaxSupportLen = thedata->presentationCopmtransSyntaxSupportLen;
+		StorageNew->presentationCopmtransSyntaxSupport[StorageNew->presentationCopmtransSyntaxSupportLen] = 0;
+		StorageNew->presentationCopmRowStatus = thedata->presentationCopmRowStatus;
 	}
       done:
 	DEBUGMSGTL(("acseMIB", "done.\n"));
@@ -3868,7 +4398,7 @@ presentationCopmTable_del(struct presentationCopmTable_data *thedata)
  * @param line line from configuration file matching the token.
  * @brief parse configuration file for presentationCopmTable entries.
  *
- * This callback is called by UCD-SNMP when it prases a configuration file and finds a configuration
+ * This callback is called by UCD-SNMP when it parses a configuration file and finds a configuration
  * file line for the registsred token (in this case presentationCopmTable).  This routine is invoked by UCD-SNMP
  * to read the values of each row in the table from the configuration file.  Note that this
  * procedure may exist regardless of the persistence of the table.  If there are no configured
@@ -3985,22 +4515,31 @@ presentationEntityTable_create(void)
 	DEBUGMSGTL(("acseMIB", "presentationEntityTable_create: creating row...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
-		if ((StorageNew->presentationSubsystemId = (uint8_t *) strdup("")) != NULL)
-			StorageNew->presentationSubsystemIdLen = strlen("");
-		if ((StorageNew->presentationEntityLocalSapNames = (uint8_t *) strdup("")) != NULL)
-			StorageNew->presentationEntityLocalSapNamesLen = strlen("");
+		if ((StorageNew->presentationSubsystemId = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->presentationSubsystemIdLen = 0;
+		StorageNew->presentationSubsystemId[StorageNew->presentationSubsystemIdLen] = 0;
+		if ((StorageNew->presentationEntityLocalSapNames = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->presentationEntityLocalSapNamesLen = 0;
+		StorageNew->presentationEntityLocalSapNames[StorageNew->presentationEntityLocalSapNamesLen] = 0;
 		StorageNew->presentationEntityOperationalState = 0;
 		StorageNew->presentationEntityRowStatus = 0;
 		StorageNew->presentationEntityRowStatus = RS_NOTREADY;
 	}
+      done:
 	DEBUGMSGTL(("acseMIB", "done.\n"));
 	return (StorageNew);
+	goto nomem;
+      nomem:
+	presentationEntityTable_destroy(&StorageNew);
+	goto done;
 }
 
 /**
  * @fn struct presentationEntityTable_data *presentationEntityTable_duplicate(struct presentationEntityTable_data *thedata)
  * @param thedata the row structure to duplicate.
- * @brief duplicat a row structure for a table.
+ * @brief duplicate a row structure for a table.
  *
  * Duplicates the specified row structure @param thedata and returns a pointer to the newly
  * allocated row structure on success, or NULL on failure.
@@ -4012,6 +4551,23 @@ presentationEntityTable_duplicate(struct presentationEntityTable_data *thedata)
 
 	DEBUGMSGTL(("acseMIB", "presentationEntityTable_duplicate: duplicating row...  "));
 	if (StorageNew != NULL) {
+		if (!(StorageNew->presentationSubsystemId = malloc(thedata->presentationSubsystemIdLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->presentationSubsystemId, thedata->presentationSubsystemId, thedata->presentationSubsystemIdLen);
+		StorageNew->presentationSubsystemIdLen = thedata->presentationSubsystemIdLen;
+		StorageNew->presentationSubsystemId[StorageNew->presentationSubsystemIdLen] = 0;
+		if (!(StorageNew->presentationEntityId = malloc(thedata->presentationEntityIdLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->presentationEntityId, thedata->presentationEntityId, thedata->presentationEntityIdLen);
+		StorageNew->presentationEntityIdLen = thedata->presentationEntityIdLen;
+		StorageNew->presentationEntityId[StorageNew->presentationEntityIdLen] = 0;
+		if (!(StorageNew->presentationEntityLocalSapNames = malloc(thedata->presentationEntityLocalSapNamesLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->presentationEntityLocalSapNames, thedata->presentationEntityLocalSapNames, thedata->presentationEntityLocalSapNamesLen);
+		StorageNew->presentationEntityLocalSapNamesLen = thedata->presentationEntityLocalSapNamesLen;
+		StorageNew->presentationEntityLocalSapNames[StorageNew->presentationEntityLocalSapNamesLen] = 0;
+		StorageNew->presentationEntityOperationalState = thedata->presentationEntityOperationalState;
+		StorageNew->presentationEntityRowStatus = thedata->presentationEntityRowStatus;
 	}
       done:
 	DEBUGMSGTL(("acseMIB", "done.\n"));
@@ -4113,7 +4669,7 @@ presentationEntityTable_del(struct presentationEntityTable_data *thedata)
  * @param line line from configuration file matching the token.
  * @brief parse configuration file for presentationEntityTable entries.
  *
- * This callback is called by UCD-SNMP when it prases a configuration file and finds a configuration
+ * This callback is called by UCD-SNMP when it parses a configuration file and finds a configuration
  * file line for the registsred token (in this case presentationEntityTable).  This routine is invoked by UCD-SNMP
  * to read the values of each row in the table from the configuration file.  Note that this
  * procedure may exist regardless of the persistence of the table.  If there are no configured
@@ -4212,14 +4768,19 @@ presentationSubsystemTable_create(void)
 		StorageNew->presentationSubsystemRowStatus = 0;
 		StorageNew->presentationSubsystemRowStatus = RS_NOTREADY;
 	}
+      done:
 	DEBUGMSGTL(("acseMIB", "done.\n"));
 	return (StorageNew);
+	goto nomem;
+      nomem:
+	presentationSubsystemTable_destroy(&StorageNew);
+	goto done;
 }
 
 /**
  * @fn struct presentationSubsystemTable_data *presentationSubsystemTable_duplicate(struct presentationSubsystemTable_data *thedata)
  * @param thedata the row structure to duplicate.
- * @brief duplicat a row structure for a table.
+ * @brief duplicate a row structure for a table.
  *
  * Duplicates the specified row structure @param thedata and returns a pointer to the newly
  * allocated row structure on success, or NULL on failure.
@@ -4231,6 +4792,12 @@ presentationSubsystemTable_duplicate(struct presentationSubsystemTable_data *the
 
 	DEBUGMSGTL(("acseMIB", "presentationSubsystemTable_duplicate: duplicating row...  "));
 	if (StorageNew != NULL) {
+		if (!(StorageNew->presentationSubsystemId = malloc(thedata->presentationSubsystemIdLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->presentationSubsystemId, thedata->presentationSubsystemId, thedata->presentationSubsystemIdLen);
+		StorageNew->presentationSubsystemIdLen = thedata->presentationSubsystemIdLen;
+		StorageNew->presentationSubsystemId[StorageNew->presentationSubsystemIdLen] = 0;
+		StorageNew->presentationSubsystemRowStatus = thedata->presentationSubsystemRowStatus;
 	}
       done:
 	DEBUGMSGTL(("acseMIB", "done.\n"));
@@ -4326,7 +4893,7 @@ presentationSubsystemTable_del(struct presentationSubsystemTable_data *thedata)
  * @param line line from configuration file matching the token.
  * @brief parse configuration file for presentationSubsystemTable entries.
  *
- * This callback is called by UCD-SNMP when it prases a configuration file and finds a configuration
+ * This callback is called by UCD-SNMP when it parses a configuration file and finds a configuration
  * file line for the registsred token (in this case presentationSubsystemTable).  This routine is invoked by UCD-SNMP
  * to read the values of each row in the table from the configuration file.  Note that this
  * procedure may exist regardless of the persistence of the table.  If there are no configured
@@ -4406,25 +4973,38 @@ sSapTable_create(void)
 	DEBUGMSGTL(("acseMIB", "sSapTable_create: creating row...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
-		if ((StorageNew->subsystemId = (uint8_t *) strdup("")) != NULL)
-			StorageNew->subsystemIdLen = strlen("");
-		if ((StorageNew->sSapId = (uint8_t *) strdup("")) != NULL)
-			StorageNew->sSapIdLen = strlen("");
-		if ((StorageNew->sSapSap1Address = (uint8_t *) strdup("")) != NULL)
-			StorageNew->sSapSap1AddressLen = strlen("");
-		if ((StorageNew->sSapUserEntityNames = (uint8_t *) strdup("")) != NULL)
-			StorageNew->sSapUserEntityNamesLen = strlen("");
+		if ((StorageNew->subsystemId = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->subsystemIdLen = 0;
+		StorageNew->subsystemId[StorageNew->subsystemIdLen] = 0;
+		if ((StorageNew->sSapId = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->sSapIdLen = 0;
+		StorageNew->sSapId[StorageNew->sSapIdLen] = 0;
+		if ((StorageNew->sSapSap1Address = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->sSapSap1AddressLen = 0;
+		StorageNew->sSapSap1Address[StorageNew->sSapSap1AddressLen] = 0;
+		if ((StorageNew->sSapUserEntityNames = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->sSapUserEntityNamesLen = 0;
+		StorageNew->sSapUserEntityNames[StorageNew->sSapUserEntityNamesLen] = 0;
 		StorageNew->sSapRowStatus = 0;
 		StorageNew->sSapRowStatus = RS_NOTREADY;
 	}
+      done:
 	DEBUGMSGTL(("acseMIB", "done.\n"));
 	return (StorageNew);
+	goto nomem;
+      nomem:
+	sSapTable_destroy(&StorageNew);
+	goto done;
 }
 
 /**
  * @fn struct sSapTable_data *sSapTable_duplicate(struct sSapTable_data *thedata)
  * @param thedata the row structure to duplicate.
- * @brief duplicat a row structure for a table.
+ * @brief duplicate a row structure for a table.
  *
  * Duplicates the specified row structure @param thedata and returns a pointer to the newly
  * allocated row structure on success, or NULL on failure.
@@ -4436,6 +5016,27 @@ sSapTable_duplicate(struct sSapTable_data *thedata)
 
 	DEBUGMSGTL(("acseMIB", "sSapTable_duplicate: duplicating row...  "));
 	if (StorageNew != NULL) {
+		if (!(StorageNew->subsystemId = malloc(thedata->subsystemIdLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->subsystemId, thedata->subsystemId, thedata->subsystemIdLen);
+		StorageNew->subsystemIdLen = thedata->subsystemIdLen;
+		StorageNew->subsystemId[StorageNew->subsystemIdLen] = 0;
+		if (!(StorageNew->sSapId = malloc(thedata->sSapIdLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->sSapId, thedata->sSapId, thedata->sSapIdLen);
+		StorageNew->sSapIdLen = thedata->sSapIdLen;
+		StorageNew->sSapId[StorageNew->sSapIdLen] = 0;
+		if (!(StorageNew->sSapSap1Address = malloc(thedata->sSapSap1AddressLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->sSapSap1Address, thedata->sSapSap1Address, thedata->sSapSap1AddressLen);
+		StorageNew->sSapSap1AddressLen = thedata->sSapSap1AddressLen;
+		StorageNew->sSapSap1Address[StorageNew->sSapSap1AddressLen] = 0;
+		if (!(StorageNew->sSapUserEntityNames = malloc(thedata->sSapUserEntityNamesLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->sSapUserEntityNames, thedata->sSapUserEntityNames, thedata->sSapUserEntityNamesLen);
+		StorageNew->sSapUserEntityNamesLen = thedata->sSapUserEntityNamesLen;
+		StorageNew->sSapUserEntityNames[StorageNew->sSapUserEntityNamesLen] = 0;
+		StorageNew->sSapRowStatus = thedata->sSapRowStatus;
 	}
       done:
 	DEBUGMSGTL(("acseMIB", "done.\n"));
@@ -4537,7 +5138,7 @@ sSapTable_del(struct sSapTable_data *thedata)
  * @param line line from configuration file matching the token.
  * @brief parse configuration file for sSapTable entries.
  *
- * This callback is called by UCD-SNMP when it prases a configuration file and finds a configuration
+ * This callback is called by UCD-SNMP when it parses a configuration file and finds a configuration
  * file line for the registsred token (in this case sSapTable).  This routine is invoked by UCD-SNMP
  * to read the values of each row in the table from the configuration file.  Note that this
  * procedure may exist regardless of the persistence of the table.  If there are no configured
@@ -4638,32 +5239,49 @@ sessionConnectionTable_create(void)
 	DEBUGMSGTL(("acseMIB", "sessionConnectionTable_create: creating row...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
-		if ((StorageNew->sessionSubsystemId = (uint8_t *) strdup("")) != NULL)
-			StorageNew->sessionSubsystemIdLen = strlen("");
-		if ((StorageNew->sessionEntityId = (uint8_t *) strdup("")) != NULL)
-			StorageNew->sessionEntityIdLen = strlen("");
-		if ((StorageNew->sessionCopmId = (uint8_t *) strdup("")) != NULL)
-			StorageNew->sessionCopmIdLen = strlen("");
-		if ((StorageNew->sessionConnectionUnderlyingConnectionNames = (uint8_t *) strdup("")) != NULL)
-			StorageNew->sessionConnectionUnderlyingConnectionNamesLen = strlen("");
-		if ((StorageNew->sessionConnectionSupportedConnectionNames = (uint8_t *) strdup("")) != NULL)
-			StorageNew->sessionConnectionSupportedConnectionNamesLen = strlen("");
-		if (memdup((u_char **) &StorageNew->sessionConnectionSessProtInUse, (u_char *) "\x00", 1) == SNMPERR_SUCCESS)
+		if ((StorageNew->sessionSubsystemId = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->sessionSubsystemIdLen = 0;
+		StorageNew->sessionSubsystemId[StorageNew->sessionSubsystemIdLen] = 0;
+		if ((StorageNew->sessionEntityId = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->sessionEntityIdLen = 0;
+		StorageNew->sessionEntityId[StorageNew->sessionEntityIdLen] = 0;
+		if ((StorageNew->sessionCopmId = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->sessionCopmIdLen = 0;
+		StorageNew->sessionCopmId[StorageNew->sessionCopmIdLen] = 0;
+		if ((StorageNew->sessionConnectionUnderlyingConnectionNames = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->sessionConnectionUnderlyingConnectionNamesLen = 0;
+		StorageNew->sessionConnectionUnderlyingConnectionNames[StorageNew->sessionConnectionUnderlyingConnectionNamesLen] = 0;
+		if ((StorageNew->sessionConnectionSupportedConnectionNames = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->sessionConnectionSupportedConnectionNamesLen = 0;
+		StorageNew->sessionConnectionSupportedConnectionNames[StorageNew->sessionConnectionSupportedConnectionNamesLen] = 0;
+		if (memdup((u_char **) &StorageNew->sessionConnectionSessProtInUse, (u_char *) "\x00", 1) != SNMPERR_SUCCESS)
+			goto nomem;
 			StorageNew->sessionConnectionSessProtInUseLen = 1;
-		if (memdup((u_char **) &StorageNew->sessionConnectionSessFUinUse, (u_char *) "\x00", 1) == SNMPERR_SUCCESS)
+		if (memdup((u_char **) &StorageNew->sessionConnectionSessFUinUse, (u_char *) "\x00", 1) != SNMPERR_SUCCESS)
+			goto nomem;
 			StorageNew->sessionConnectionSessFUinUseLen = 1;
 		StorageNew->sessionConnectionMaxTSDUsize = 0;
 		StorageNew->sessionCOnnectionRowStatus = 0;
 		StorageNew->sessionCOnnectionRowStatus = RS_NOTREADY;
 	}
+      done:
 	DEBUGMSGTL(("acseMIB", "done.\n"));
 	return (StorageNew);
+	goto nomem;
+      nomem:
+	sessionConnectionTable_destroy(&StorageNew);
+	goto done;
 }
 
 /**
  * @fn struct sessionConnectionTable_data *sessionConnectionTable_duplicate(struct sessionConnectionTable_data *thedata)
  * @param thedata the row structure to duplicate.
- * @brief duplicat a row structure for a table.
+ * @brief duplicate a row structure for a table.
  *
  * Duplicates the specified row structure @param thedata and returns a pointer to the newly
  * allocated row structure on success, or NULL on failure.
@@ -4675,6 +5293,48 @@ sessionConnectionTable_duplicate(struct sessionConnectionTable_data *thedata)
 
 	DEBUGMSGTL(("acseMIB", "sessionConnectionTable_duplicate: duplicating row...  "));
 	if (StorageNew != NULL) {
+		if (!(StorageNew->sessionSubsystemId = malloc(thedata->sessionSubsystemIdLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->sessionSubsystemId, thedata->sessionSubsystemId, thedata->sessionSubsystemIdLen);
+		StorageNew->sessionSubsystemIdLen = thedata->sessionSubsystemIdLen;
+		StorageNew->sessionSubsystemId[StorageNew->sessionSubsystemIdLen] = 0;
+		if (!(StorageNew->sessionEntityId = malloc(thedata->sessionEntityIdLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->sessionEntityId, thedata->sessionEntityId, thedata->sessionEntityIdLen);
+		StorageNew->sessionEntityIdLen = thedata->sessionEntityIdLen;
+		StorageNew->sessionEntityId[StorageNew->sessionEntityIdLen] = 0;
+		if (!(StorageNew->sessionCopmId = malloc(thedata->sessionCopmIdLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->sessionCopmId, thedata->sessionCopmId, thedata->sessionCopmIdLen);
+		StorageNew->sessionCopmIdLen = thedata->sessionCopmIdLen;
+		StorageNew->sessionCopmId[StorageNew->sessionCopmIdLen] = 0;
+		if (!(StorageNew->sessionConnectionId = malloc(thedata->sessionConnectionIdLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->sessionConnectionId, thedata->sessionConnectionId, thedata->sessionConnectionIdLen);
+		StorageNew->sessionConnectionIdLen = thedata->sessionConnectionIdLen;
+		StorageNew->sessionConnectionId[StorageNew->sessionConnectionIdLen] = 0;
+		if (!(StorageNew->sessionConnectionUnderlyingConnectionNames = malloc(thedata->sessionConnectionUnderlyingConnectionNamesLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->sessionConnectionUnderlyingConnectionNames, thedata->sessionConnectionUnderlyingConnectionNames, thedata->sessionConnectionUnderlyingConnectionNamesLen);
+		StorageNew->sessionConnectionUnderlyingConnectionNamesLen = thedata->sessionConnectionUnderlyingConnectionNamesLen;
+		StorageNew->sessionConnectionUnderlyingConnectionNames[StorageNew->sessionConnectionUnderlyingConnectionNamesLen] = 0;
+		if (!(StorageNew->sessionConnectionSupportedConnectionNames = malloc(thedata->sessionConnectionSupportedConnectionNamesLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->sessionConnectionSupportedConnectionNames, thedata->sessionConnectionSupportedConnectionNames, thedata->sessionConnectionSupportedConnectionNamesLen);
+		StorageNew->sessionConnectionSupportedConnectionNamesLen = thedata->sessionConnectionSupportedConnectionNamesLen;
+		StorageNew->sessionConnectionSupportedConnectionNames[StorageNew->sessionConnectionSupportedConnectionNamesLen] = 0;
+		if (!(StorageNew->sessionConnectionSessProtInUse = malloc(thedata->sessionConnectionSessProtInUseLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->sessionConnectionSessProtInUse, thedata->sessionConnectionSessProtInUse, thedata->sessionConnectionSessProtInUseLen);
+		StorageNew->sessionConnectionSessProtInUseLen = thedata->sessionConnectionSessProtInUseLen;
+		StorageNew->sessionConnectionSessProtInUse[StorageNew->sessionConnectionSessProtInUseLen] = 0;
+		if (!(StorageNew->sessionConnectionSessFUinUse = malloc(thedata->sessionConnectionSessFUinUseLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->sessionConnectionSessFUinUse, thedata->sessionConnectionSessFUinUse, thedata->sessionConnectionSessFUinUseLen);
+		StorageNew->sessionConnectionSessFUinUseLen = thedata->sessionConnectionSessFUinUseLen;
+		StorageNew->sessionConnectionSessFUinUse[StorageNew->sessionConnectionSessFUinUseLen] = 0;
+		StorageNew->sessionConnectionMaxTSDUsize = thedata->sessionConnectionMaxTSDUsize;
+		StorageNew->sessionCOnnectionRowStatus = thedata->sessionCOnnectionRowStatus;
 	}
       done:
 	DEBUGMSGTL(("acseMIB", "done.\n"));
@@ -4790,7 +5450,7 @@ sessionConnectionTable_del(struct sessionConnectionTable_data *thedata)
  * @param line line from configuration file matching the token.
  * @brief parse configuration file for sessionConnectionTable entries.
  *
- * This callback is called by UCD-SNMP when it prases a configuration file and finds a configuration
+ * This callback is called by UCD-SNMP when it parses a configuration file and finds a configuration
  * file line for the registsred token (in this case sessionConnectionTable).  This routine is invoked by UCD-SNMP
  * to read the values of each row in the table from the configuration file.  Note that this
  * procedure may exist regardless of the persistence of the table.  If there are no configured
@@ -4921,28 +5581,40 @@ sessionCopmTable_create(void)
 	DEBUGMSGTL(("acseMIB", "sessionCopmTable_create: creating row...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
-		if ((StorageNew->sessionSubsystemId = (uint8_t *) strdup("")) != NULL)
-			StorageNew->sessionSubsystemIdLen = strlen("");
-		if ((StorageNew->sessionEntityId = (uint8_t *) strdup("")) != NULL)
-			StorageNew->sessionEntityIdLen = strlen("");
+		if ((StorageNew->sessionSubsystemId = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->sessionSubsystemIdLen = 0;
+		StorageNew->sessionSubsystemId[StorageNew->sessionSubsystemIdLen] = 0;
+		if ((StorageNew->sessionEntityId = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->sessionEntityIdLen = 0;
+		StorageNew->sessionEntityId[StorageNew->sessionEntityIdLen] = 0;
 		StorageNew->sessionCopmOperationalState = 0;
-		if (memdup((u_char **) &StorageNew->sessionCopmSessProtVerSupport, (u_char *) "\x00", 1) == SNMPERR_SUCCESS)
+		if (memdup((u_char **) &StorageNew->sessionCopmSessProtVerSupport, (u_char *) "\x00", 1) != SNMPERR_SUCCESS)
+			goto nomem;
 			StorageNew->sessionCopmSessProtVerSupportLen = 1;
-		if (memdup((u_char **) &StorageNew->sessionCopmSessFUsupport, (u_char *) "\x00", 1) == SNMPERR_SUCCESS)
+		if (memdup((u_char **) &StorageNew->sessionCopmSessFUsupport, (u_char *) "\x00", 1) != SNMPERR_SUCCESS)
+			goto nomem;
 			StorageNew->sessionCopmSessFUsupportLen = 1;
-		if (memdup((u_char **) &StorageNew->sessionCopmOptSupport, (u_char *) "\x00", 1) == SNMPERR_SUCCESS)
+		if (memdup((u_char **) &StorageNew->sessionCopmOptSupport, (u_char *) "\x00", 1) != SNMPERR_SUCCESS)
+			goto nomem;
 			StorageNew->sessionCopmOptSupportLen = 1;
 		StorageNew->sessionCopmRowStatus = 0;
 		StorageNew->sessionCopmRowStatus = RS_NOTREADY;
 	}
+      done:
 	DEBUGMSGTL(("acseMIB", "done.\n"));
 	return (StorageNew);
+	goto nomem;
+      nomem:
+	sessionCopmTable_destroy(&StorageNew);
+	goto done;
 }
 
 /**
  * @fn struct sessionCopmTable_data *sessionCopmTable_duplicate(struct sessionCopmTable_data *thedata)
  * @param thedata the row structure to duplicate.
- * @brief duplicat a row structure for a table.
+ * @brief duplicate a row structure for a table.
  *
  * Duplicates the specified row structure @param thedata and returns a pointer to the newly
  * allocated row structure on success, or NULL on failure.
@@ -4954,6 +5626,38 @@ sessionCopmTable_duplicate(struct sessionCopmTable_data *thedata)
 
 	DEBUGMSGTL(("acseMIB", "sessionCopmTable_duplicate: duplicating row...  "));
 	if (StorageNew != NULL) {
+		if (!(StorageNew->sessionSubsystemId = malloc(thedata->sessionSubsystemIdLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->sessionSubsystemId, thedata->sessionSubsystemId, thedata->sessionSubsystemIdLen);
+		StorageNew->sessionSubsystemIdLen = thedata->sessionSubsystemIdLen;
+		StorageNew->sessionSubsystemId[StorageNew->sessionSubsystemIdLen] = 0;
+		if (!(StorageNew->sessionEntityId = malloc(thedata->sessionEntityIdLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->sessionEntityId, thedata->sessionEntityId, thedata->sessionEntityIdLen);
+		StorageNew->sessionEntityIdLen = thedata->sessionEntityIdLen;
+		StorageNew->sessionEntityId[StorageNew->sessionEntityIdLen] = 0;
+		if (!(StorageNew->sessionCopmId = malloc(thedata->sessionCopmIdLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->sessionCopmId, thedata->sessionCopmId, thedata->sessionCopmIdLen);
+		StorageNew->sessionCopmIdLen = thedata->sessionCopmIdLen;
+		StorageNew->sessionCopmId[StorageNew->sessionCopmIdLen] = 0;
+		StorageNew->sessionCopmOperationalState = thedata->sessionCopmOperationalState;
+		if (!(StorageNew->sessionCopmSessProtVerSupport = malloc(thedata->sessionCopmSessProtVerSupportLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->sessionCopmSessProtVerSupport, thedata->sessionCopmSessProtVerSupport, thedata->sessionCopmSessProtVerSupportLen);
+		StorageNew->sessionCopmSessProtVerSupportLen = thedata->sessionCopmSessProtVerSupportLen;
+		StorageNew->sessionCopmSessProtVerSupport[StorageNew->sessionCopmSessProtVerSupportLen] = 0;
+		if (!(StorageNew->sessionCopmSessFUsupport = malloc(thedata->sessionCopmSessFUsupportLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->sessionCopmSessFUsupport, thedata->sessionCopmSessFUsupport, thedata->sessionCopmSessFUsupportLen);
+		StorageNew->sessionCopmSessFUsupportLen = thedata->sessionCopmSessFUsupportLen;
+		StorageNew->sessionCopmSessFUsupport[StorageNew->sessionCopmSessFUsupportLen] = 0;
+		if (!(StorageNew->sessionCopmOptSupport = malloc(thedata->sessionCopmOptSupportLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->sessionCopmOptSupport, thedata->sessionCopmOptSupport, thedata->sessionCopmOptSupportLen);
+		StorageNew->sessionCopmOptSupportLen = thedata->sessionCopmOptSupportLen;
+		StorageNew->sessionCopmOptSupport[StorageNew->sessionCopmOptSupportLen] = 0;
+		StorageNew->sessionCopmRowStatus = thedata->sessionCopmRowStatus;
 	}
       done:
 	DEBUGMSGTL(("acseMIB", "done.\n"));
@@ -5063,7 +5767,7 @@ sessionCopmTable_del(struct sessionCopmTable_data *thedata)
  * @param line line from configuration file matching the token.
  * @brief parse configuration file for sessionCopmTable entries.
  *
- * This callback is called by UCD-SNMP when it prases a configuration file and finds a configuration
+ * This callback is called by UCD-SNMP when it parses a configuration file and finds a configuration
  * file line for the registsred token (in this case sessionCopmTable).  This routine is invoked by UCD-SNMP
  * to read the values of each row in the table from the configuration file.  Note that this
  * procedure may exist regardless of the persistence of the table.  If there are no configured
@@ -5180,22 +5884,31 @@ sessionEntityTable_create(void)
 	DEBUGMSGTL(("acseMIB", "sessionEntityTable_create: creating row...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
-		if ((StorageNew->sessionSubsystemId = (uint8_t *) strdup("")) != NULL)
-			StorageNew->sessionSubsystemIdLen = strlen("");
-		if ((StorageNew->sessionEntityLocalSapNames = (uint8_t *) strdup("")) != NULL)
-			StorageNew->sessionEntityLocalSapNamesLen = strlen("");
+		if ((StorageNew->sessionSubsystemId = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->sessionSubsystemIdLen = 0;
+		StorageNew->sessionSubsystemId[StorageNew->sessionSubsystemIdLen] = 0;
+		if ((StorageNew->sessionEntityLocalSapNames = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->sessionEntityLocalSapNamesLen = 0;
+		StorageNew->sessionEntityLocalSapNames[StorageNew->sessionEntityLocalSapNamesLen] = 0;
 		StorageNew->sessionEntityOperationalState = 0;
 		StorageNew->sessionEntityRowStatus = 0;
 		StorageNew->sessionEntityRowStatus = RS_NOTREADY;
 	}
+      done:
 	DEBUGMSGTL(("acseMIB", "done.\n"));
 	return (StorageNew);
+	goto nomem;
+      nomem:
+	sessionEntityTable_destroy(&StorageNew);
+	goto done;
 }
 
 /**
  * @fn struct sessionEntityTable_data *sessionEntityTable_duplicate(struct sessionEntityTable_data *thedata)
  * @param thedata the row structure to duplicate.
- * @brief duplicat a row structure for a table.
+ * @brief duplicate a row structure for a table.
  *
  * Duplicates the specified row structure @param thedata and returns a pointer to the newly
  * allocated row structure on success, or NULL on failure.
@@ -5207,6 +5920,23 @@ sessionEntityTable_duplicate(struct sessionEntityTable_data *thedata)
 
 	DEBUGMSGTL(("acseMIB", "sessionEntityTable_duplicate: duplicating row...  "));
 	if (StorageNew != NULL) {
+		if (!(StorageNew->sessionSubsystemId = malloc(thedata->sessionSubsystemIdLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->sessionSubsystemId, thedata->sessionSubsystemId, thedata->sessionSubsystemIdLen);
+		StorageNew->sessionSubsystemIdLen = thedata->sessionSubsystemIdLen;
+		StorageNew->sessionSubsystemId[StorageNew->sessionSubsystemIdLen] = 0;
+		if (!(StorageNew->sessionEntityId = malloc(thedata->sessionEntityIdLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->sessionEntityId, thedata->sessionEntityId, thedata->sessionEntityIdLen);
+		StorageNew->sessionEntityIdLen = thedata->sessionEntityIdLen;
+		StorageNew->sessionEntityId[StorageNew->sessionEntityIdLen] = 0;
+		if (!(StorageNew->sessionEntityLocalSapNames = malloc(thedata->sessionEntityLocalSapNamesLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->sessionEntityLocalSapNames, thedata->sessionEntityLocalSapNames, thedata->sessionEntityLocalSapNamesLen);
+		StorageNew->sessionEntityLocalSapNamesLen = thedata->sessionEntityLocalSapNamesLen;
+		StorageNew->sessionEntityLocalSapNames[StorageNew->sessionEntityLocalSapNamesLen] = 0;
+		StorageNew->sessionEntityOperationalState = thedata->sessionEntityOperationalState;
+		StorageNew->sessionEntityRowStatus = thedata->sessionEntityRowStatus;
 	}
       done:
 	DEBUGMSGTL(("acseMIB", "done.\n"));
@@ -5308,7 +6038,7 @@ sessionEntityTable_del(struct sessionEntityTable_data *thedata)
  * @param line line from configuration file matching the token.
  * @brief parse configuration file for sessionEntityTable entries.
  *
- * This callback is called by UCD-SNMP when it prases a configuration file and finds a configuration
+ * This callback is called by UCD-SNMP when it parses a configuration file and finds a configuration
  * file line for the registsred token (in this case sessionEntityTable).  This routine is invoked by UCD-SNMP
  * to read the values of each row in the table from the configuration file.  Note that this
  * procedure may exist regardless of the persistence of the table.  If there are no configured
@@ -5407,14 +6137,19 @@ sessionSubsystemTable_create(void)
 		StorageNew->sessionSubsystemRowStatus = 0;
 		StorageNew->sessionSubsystemRowStatus = RS_NOTREADY;
 	}
+      done:
 	DEBUGMSGTL(("acseMIB", "done.\n"));
 	return (StorageNew);
+	goto nomem;
+      nomem:
+	sessionSubsystemTable_destroy(&StorageNew);
+	goto done;
 }
 
 /**
  * @fn struct sessionSubsystemTable_data *sessionSubsystemTable_duplicate(struct sessionSubsystemTable_data *thedata)
  * @param thedata the row structure to duplicate.
- * @brief duplicat a row structure for a table.
+ * @brief duplicate a row structure for a table.
  *
  * Duplicates the specified row structure @param thedata and returns a pointer to the newly
  * allocated row structure on success, or NULL on failure.
@@ -5426,6 +6161,12 @@ sessionSubsystemTable_duplicate(struct sessionSubsystemTable_data *thedata)
 
 	DEBUGMSGTL(("acseMIB", "sessionSubsystemTable_duplicate: duplicating row...  "));
 	if (StorageNew != NULL) {
+		if (!(StorageNew->sessionSubsystemId = malloc(thedata->sessionSubsystemIdLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->sessionSubsystemId, thedata->sessionSubsystemId, thedata->sessionSubsystemIdLen);
+		StorageNew->sessionSubsystemIdLen = thedata->sessionSubsystemIdLen;
+		StorageNew->sessionSubsystemId[StorageNew->sessionSubsystemIdLen] = 0;
+		StorageNew->sessionSubsystemRowStatus = thedata->sessionSubsystemRowStatus;
 	}
       done:
 	DEBUGMSGTL(("acseMIB", "done.\n"));
@@ -5521,7 +6262,7 @@ sessionSubsystemTable_del(struct sessionSubsystemTable_data *thedata)
  * @param line line from configuration file matching the token.
  * @brief parse configuration file for sessionSubsystemTable entries.
  *
- * This callback is called by UCD-SNMP when it prases a configuration file and finds a configuration
+ * This callback is called by UCD-SNMP when it parses a configuration file and finds a configuration
  * file line for the registsred token (in this case sessionSubsystemTable).  This routine is invoked by UCD-SNMP
  * to read the values of each row in the table from the configuration file.  Note that this
  * procedure may exist regardless of the persistence of the table.  If there are no configured
@@ -5605,14 +6346,19 @@ acseEntityTable_create(void)
 		StorageNew->acseEntityRowStatus = 0;
 		StorageNew->acseEntityRowStatus = RS_NOTREADY;
 	}
+      done:
 	DEBUGMSGTL(("acseMIB", "done.\n"));
 	return (StorageNew);
+	goto nomem;
+      nomem:
+	acseEntityTable_destroy(&StorageNew);
+	goto done;
 }
 
 /**
  * @fn struct acseEntityTable_data *acseEntityTable_duplicate(struct acseEntityTable_data *thedata)
  * @param thedata the row structure to duplicate.
- * @brief duplicat a row structure for a table.
+ * @brief duplicate a row structure for a table.
  *
  * Duplicates the specified row structure @param thedata and returns a pointer to the newly
  * allocated row structure on success, or NULL on failure.
@@ -5624,6 +6370,9 @@ acseEntityTable_duplicate(struct acseEntityTable_data *thedata)
 
 	DEBUGMSGTL(("acseMIB", "acseEntityTable_duplicate: duplicating row...  "));
 	if (StorageNew != NULL) {
+		StorageNew->mtpMsId = thedata->mtpMsId;
+		StorageNew->acseEntityId = thedata->acseEntityId;
+		StorageNew->acseEntityRowStatus = thedata->acseEntityRowStatus;
 	}
       done:
 	DEBUGMSGTL(("acseMIB", "done.\n"));
@@ -5719,7 +6468,7 @@ acseEntityTable_del(struct acseEntityTable_data *thedata)
  * @param line line from configuration file matching the token.
  * @brief parse configuration file for acseEntityTable entries.
  *
- * This callback is called by UCD-SNMP when it prases a configuration file and finds a configuration
+ * This callback is called by UCD-SNMP when it parses a configuration file and finds a configuration
  * file line for the registsred token (in this case acseEntityTable).  This routine is invoked by UCD-SNMP
  * to read the values of each row in the table from the configuration file.  Note that this
  * procedure may exist regardless of the persistence of the table.  If there are no configured
@@ -5801,14 +6550,19 @@ acseAccessPointTable_create(void)
 		StorageNew->acseAccessPointRowStatus = 0;
 		StorageNew->acseAccessPointRowStatus = RS_NOTREADY;
 	}
+      done:
 	DEBUGMSGTL(("acseMIB", "done.\n"));
 	return (StorageNew);
+	goto nomem;
+      nomem:
+	acseAccessPointTable_destroy(&StorageNew);
+	goto done;
 }
 
 /**
  * @fn struct acseAccessPointTable_data *acseAccessPointTable_duplicate(struct acseAccessPointTable_data *thedata)
  * @param thedata the row structure to duplicate.
- * @brief duplicat a row structure for a table.
+ * @brief duplicate a row structure for a table.
  *
  * Duplicates the specified row structure @param thedata and returns a pointer to the newly
  * allocated row structure on success, or NULL on failure.
@@ -5820,6 +6574,10 @@ acseAccessPointTable_duplicate(struct acseAccessPointTable_data *thedata)
 
 	DEBUGMSGTL(("acseMIB", "acseAccessPointTable_duplicate: duplicating row...  "));
 	if (StorageNew != NULL) {
+		StorageNew->mtpMsId = thedata->mtpMsId;
+		StorageNew->acseEntityId = thedata->acseEntityId;
+		StorageNew->acseAccessPointId = thedata->acseAccessPointId;
+		StorageNew->acseAccessPointRowStatus = thedata->acseAccessPointRowStatus;
 	}
       done:
 	DEBUGMSGTL(("acseMIB", "done.\n"));
@@ -5917,7 +6675,7 @@ acseAccessPointTable_del(struct acseAccessPointTable_data *thedata)
  * @param line line from configuration file matching the token.
  * @brief parse configuration file for acseAccessPointTable entries.
  *
- * This callback is called by UCD-SNMP when it prases a configuration file and finds a configuration
+ * This callback is called by UCD-SNMP when it parses a configuration file and finds a configuration
  * file line for the registsred token (in this case acseAccessPointTable).  This routine is invoked by UCD-SNMP
  * to read the values of each row in the table from the configuration file.  Note that this
  * procedure may exist regardless of the persistence of the table.  If there are no configured
@@ -5997,19 +6755,26 @@ acseLinkageTable_create(void)
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
 		StorageNew->mtpMsId = 0;
-		if ((StorageNew->sccpNetworkEntityId = (uint8_t *) strdup("")) != NULL)
-			StorageNew->sccpNetworkEntityIdLen = strlen("");
+		if ((StorageNew->sccpNetworkEntityId = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->sccpNetworkEntityIdLen = 0;
+		StorageNew->sccpNetworkEntityId[StorageNew->sccpNetworkEntityIdLen] = 0;
 		StorageNew->acseLinkageRowStatus = 0;
 		StorageNew->acseLinkageRowStatus = RS_NOTREADY;
 	}
+      done:
 	DEBUGMSGTL(("acseMIB", "done.\n"));
 	return (StorageNew);
+	goto nomem;
+      nomem:
+	acseLinkageTable_destroy(&StorageNew);
+	goto done;
 }
 
 /**
  * @fn struct acseLinkageTable_data *acseLinkageTable_duplicate(struct acseLinkageTable_data *thedata)
  * @param thedata the row structure to duplicate.
- * @brief duplicat a row structure for a table.
+ * @brief duplicate a row structure for a table.
  *
  * Duplicates the specified row structure @param thedata and returns a pointer to the newly
  * allocated row structure on success, or NULL on failure.
@@ -6021,6 +6786,13 @@ acseLinkageTable_duplicate(struct acseLinkageTable_data *thedata)
 
 	DEBUGMSGTL(("acseMIB", "acseLinkageTable_duplicate: duplicating row...  "));
 	if (StorageNew != NULL) {
+		StorageNew->mtpMsId = thedata->mtpMsId;
+		if (!(StorageNew->sccpNetworkEntityId = malloc(thedata->sccpNetworkEntityIdLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->sccpNetworkEntityId, thedata->sccpNetworkEntityId, thedata->sccpNetworkEntityIdLen);
+		StorageNew->sccpNetworkEntityIdLen = thedata->sccpNetworkEntityIdLen;
+		StorageNew->sccpNetworkEntityId[StorageNew->sccpNetworkEntityIdLen] = 0;
+		StorageNew->acseLinkageRowStatus = thedata->acseLinkageRowStatus;
 	}
       done:
 	DEBUGMSGTL(("acseMIB", "done.\n"));
@@ -6118,7 +6890,7 @@ acseLinkageTable_del(struct acseLinkageTable_data *thedata)
  * @param line line from configuration file matching the token.
  * @brief parse configuration file for acseLinkageTable entries.
  *
- * This callback is called by UCD-SNMP when it prases a configuration file and finds a configuration
+ * This callback is called by UCD-SNMP when it parses a configuration file and finds a configuration
  * file line for the registsred token (in this case acseLinkageTable).  This routine is invoked by UCD-SNMP
  * to read the values of each row in the table from the configuration file.  Note that this
  * procedure may exist regardless of the persistence of the table.  If there are no configured
@@ -6182,6 +6954,778 @@ store_acseLinkageTable(int majorID, int minorID, void *serverarg, void *clientar
 	}
 	DEBUGMSGTL(("acseMIB", "done.\n"));
 	return SNMPERR_SUCCESS;
+}
+
+/**
+ * @fn int activate_acseAssociationTable_row(struct acseAssociationTable_data *StorageTmp)
+ * @param StorageTmp the data row to activate
+ * @brief commit activation of a row to the underlying device
+ *
+ * This function is used by tables that contain a RowStatus object.  It is used to move the row from
+ * the RS_NOTINSERVICE state to the RS_ACTIVE state.  It is also used when transitioning from the
+ * RS_CREATEANDGO state to the RS_ACTIVE state.  If activation fails, the function should return
+ * SNMP_ERR_COMMITFAILED; otherwise, SNMP_ERR_NOERROR.
+ */
+int
+activate_acseAssociationTable_row(struct acseAssociationTable_data *StorageTmp)
+{
+	/* XXX: provide code to activate the row with the underlying device */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int deactivate_acseAssociationTable_row(struct acseAssociationTable_data *StorageTmp)
+ * @param StorageTmp the data row to deactivate
+ * @brief commit deactivation of a row to the underlying device
+ *
+ * This function is used by tables that contain a RowStatus object.  It is used to move the row from
+ * the RS_ACTIVE state to the RS_NOTINSERVICE state.  It is also used when transitioning from the
+ * RS_ACTIVE state to the RS_DESTROY state.  If deactivation fails, the function should return
+ * SNMP_ERR_COMMITFAILED; otherwise, SNMP_ERR_NOERROR.
+ */
+int
+deactivate_acseAssociationTable_row(struct acseAssociationTable_data *StorageTmp)
+{
+	/* XXX: provide code to deactivate the row with the underlying device */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int activate_apInvocationTable_row(struct apInvocationTable_data *StorageTmp)
+ * @param StorageTmp the data row to activate
+ * @brief commit activation of a row to the underlying device
+ *
+ * This function is used by tables that contain a RowStatus object.  It is used to move the row from
+ * the RS_NOTINSERVICE state to the RS_ACTIVE state.  It is also used when transitioning from the
+ * RS_CREATEANDGO state to the RS_ACTIVE state.  If activation fails, the function should return
+ * SNMP_ERR_COMMITFAILED; otherwise, SNMP_ERR_NOERROR.
+ */
+int
+activate_apInvocationTable_row(struct apInvocationTable_data *StorageTmp)
+{
+	/* XXX: provide code to activate the row with the underlying device */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int deactivate_apInvocationTable_row(struct apInvocationTable_data *StorageTmp)
+ * @param StorageTmp the data row to deactivate
+ * @brief commit deactivation of a row to the underlying device
+ *
+ * This function is used by tables that contain a RowStatus object.  It is used to move the row from
+ * the RS_ACTIVE state to the RS_NOTINSERVICE state.  It is also used when transitioning from the
+ * RS_ACTIVE state to the RS_DESTROY state.  If deactivation fails, the function should return
+ * SNMP_ERR_COMMITFAILED; otherwise, SNMP_ERR_NOERROR.
+ */
+int
+deactivate_apInvocationTable_row(struct apInvocationTable_data *StorageTmp)
+{
+	/* XXX: provide code to deactivate the row with the underlying device */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int activate_applicationEntityInvocationTable_row(struct applicationEntityInvocationTable_data *StorageTmp)
+ * @param StorageTmp the data row to activate
+ * @brief commit activation of a row to the underlying device
+ *
+ * This function is used by tables that contain a RowStatus object.  It is used to move the row from
+ * the RS_NOTINSERVICE state to the RS_ACTIVE state.  It is also used when transitioning from the
+ * RS_CREATEANDGO state to the RS_ACTIVE state.  If activation fails, the function should return
+ * SNMP_ERR_COMMITFAILED; otherwise, SNMP_ERR_NOERROR.
+ */
+int
+activate_applicationEntityInvocationTable_row(struct applicationEntityInvocationTable_data *StorageTmp)
+{
+	/* XXX: provide code to activate the row with the underlying device */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int deactivate_applicationEntityInvocationTable_row(struct applicationEntityInvocationTable_data *StorageTmp)
+ * @param StorageTmp the data row to deactivate
+ * @brief commit deactivation of a row to the underlying device
+ *
+ * This function is used by tables that contain a RowStatus object.  It is used to move the row from
+ * the RS_ACTIVE state to the RS_NOTINSERVICE state.  It is also used when transitioning from the
+ * RS_ACTIVE state to the RS_DESTROY state.  If deactivation fails, the function should return
+ * SNMP_ERR_COMMITFAILED; otherwise, SNMP_ERR_NOERROR.
+ */
+int
+deactivate_applicationEntityInvocationTable_row(struct applicationEntityInvocationTable_data *StorageTmp)
+{
+	/* XXX: provide code to deactivate the row with the underlying device */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int activate_asoTable_row(struct asoTable_data *StorageTmp)
+ * @param StorageTmp the data row to activate
+ * @brief commit activation of a row to the underlying device
+ *
+ * This function is used by tables that contain a RowStatus object.  It is used to move the row from
+ * the RS_NOTINSERVICE state to the RS_ACTIVE state.  It is also used when transitioning from the
+ * RS_CREATEANDGO state to the RS_ACTIVE state.  If activation fails, the function should return
+ * SNMP_ERR_COMMITFAILED; otherwise, SNMP_ERR_NOERROR.
+ */
+int
+activate_asoTable_row(struct asoTable_data *StorageTmp)
+{
+	/* XXX: provide code to activate the row with the underlying device */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int deactivate_asoTable_row(struct asoTable_data *StorageTmp)
+ * @param StorageTmp the data row to deactivate
+ * @brief commit deactivation of a row to the underlying device
+ *
+ * This function is used by tables that contain a RowStatus object.  It is used to move the row from
+ * the RS_ACTIVE state to the RS_NOTINSERVICE state.  It is also used when transitioning from the
+ * RS_ACTIVE state to the RS_DESTROY state.  If deactivation fails, the function should return
+ * SNMP_ERR_COMMITFAILED; otherwise, SNMP_ERR_NOERROR.
+ */
+int
+deactivate_asoTable_row(struct asoTable_data *StorageTmp)
+{
+	/* XXX: provide code to deactivate the row with the underlying device */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int activate_asoEntityTable_row(struct asoEntityTable_data *StorageTmp)
+ * @param StorageTmp the data row to activate
+ * @brief commit activation of a row to the underlying device
+ *
+ * This function is used by tables that contain a RowStatus object.  It is used to move the row from
+ * the RS_NOTINSERVICE state to the RS_ACTIVE state.  It is also used when transitioning from the
+ * RS_CREATEANDGO state to the RS_ACTIVE state.  If activation fails, the function should return
+ * SNMP_ERR_COMMITFAILED; otherwise, SNMP_ERR_NOERROR.
+ */
+int
+activate_asoEntityTable_row(struct asoEntityTable_data *StorageTmp)
+{
+	/* XXX: provide code to activate the row with the underlying device */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int deactivate_asoEntityTable_row(struct asoEntityTable_data *StorageTmp)
+ * @param StorageTmp the data row to deactivate
+ * @brief commit deactivation of a row to the underlying device
+ *
+ * This function is used by tables that contain a RowStatus object.  It is used to move the row from
+ * the RS_ACTIVE state to the RS_NOTINSERVICE state.  It is also used when transitioning from the
+ * RS_ACTIVE state to the RS_DESTROY state.  If deactivation fails, the function should return
+ * SNMP_ERR_COMMITFAILED; otherwise, SNMP_ERR_NOERROR.
+ */
+int
+deactivate_asoEntityTable_row(struct asoEntityTable_data *StorageTmp)
+{
+	/* XXX: provide code to deactivate the row with the underlying device */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int activate_asoInvocationTable_row(struct asoInvocationTable_data *StorageTmp)
+ * @param StorageTmp the data row to activate
+ * @brief commit activation of a row to the underlying device
+ *
+ * This function is used by tables that contain a RowStatus object.  It is used to move the row from
+ * the RS_NOTINSERVICE state to the RS_ACTIVE state.  It is also used when transitioning from the
+ * RS_CREATEANDGO state to the RS_ACTIVE state.  If activation fails, the function should return
+ * SNMP_ERR_COMMITFAILED; otherwise, SNMP_ERR_NOERROR.
+ */
+int
+activate_asoInvocationTable_row(struct asoInvocationTable_data *StorageTmp)
+{
+	/* XXX: provide code to activate the row with the underlying device */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int deactivate_asoInvocationTable_row(struct asoInvocationTable_data *StorageTmp)
+ * @param StorageTmp the data row to deactivate
+ * @brief commit deactivation of a row to the underlying device
+ *
+ * This function is used by tables that contain a RowStatus object.  It is used to move the row from
+ * the RS_ACTIVE state to the RS_NOTINSERVICE state.  It is also used when transitioning from the
+ * RS_ACTIVE state to the RS_DESTROY state.  If deactivation fails, the function should return
+ * SNMP_ERR_COMMITFAILED; otherwise, SNMP_ERR_NOERROR.
+ */
+int
+deactivate_asoInvocationTable_row(struct asoInvocationTable_data *StorageTmp)
+{
+	/* XXX: provide code to deactivate the row with the underlying device */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int activate_monoULConnectionTable_row(struct monoULConnectionTable_data *StorageTmp)
+ * @param StorageTmp the data row to activate
+ * @brief commit activation of a row to the underlying device
+ *
+ * This function is used by tables that contain a RowStatus object.  It is used to move the row from
+ * the RS_NOTINSERVICE state to the RS_ACTIVE state.  It is also used when transitioning from the
+ * RS_CREATEANDGO state to the RS_ACTIVE state.  If activation fails, the function should return
+ * SNMP_ERR_COMMITFAILED; otherwise, SNMP_ERR_NOERROR.
+ */
+int
+activate_monoULConnectionTable_row(struct monoULConnectionTable_data *StorageTmp)
+{
+	/* XXX: provide code to activate the row with the underlying device */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int deactivate_monoULConnectionTable_row(struct monoULConnectionTable_data *StorageTmp)
+ * @param StorageTmp the data row to deactivate
+ * @brief commit deactivation of a row to the underlying device
+ *
+ * This function is used by tables that contain a RowStatus object.  It is used to move the row from
+ * the RS_ACTIVE state to the RS_NOTINSERVICE state.  It is also used when transitioning from the
+ * RS_ACTIVE state to the RS_DESTROY state.  If deactivation fails, the function should return
+ * SNMP_ERR_COMMITFAILED; otherwise, SNMP_ERR_NOERROR.
+ */
+int
+deactivate_monoULConnectionTable_row(struct monoULConnectionTable_data *StorageTmp)
+{
+	/* XXX: provide code to deactivate the row with the underlying device */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int activate_monolithicUpperLayerSubsystemTable_row(struct monolithicUpperLayerSubsystemTable_data *StorageTmp)
+ * @param StorageTmp the data row to activate
+ * @brief commit activation of a row to the underlying device
+ *
+ * This function is used by tables that contain a RowStatus object.  It is used to move the row from
+ * the RS_NOTINSERVICE state to the RS_ACTIVE state.  It is also used when transitioning from the
+ * RS_CREATEANDGO state to the RS_ACTIVE state.  If activation fails, the function should return
+ * SNMP_ERR_COMMITFAILED; otherwise, SNMP_ERR_NOERROR.
+ */
+int
+activate_monolithicUpperLayerSubsystemTable_row(struct monolithicUpperLayerSubsystemTable_data *StorageTmp)
+{
+	/* XXX: provide code to activate the row with the underlying device */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int deactivate_monolithicUpperLayerSubsystemTable_row(struct monolithicUpperLayerSubsystemTable_data *StorageTmp)
+ * @param StorageTmp the data row to deactivate
+ * @brief commit deactivation of a row to the underlying device
+ *
+ * This function is used by tables that contain a RowStatus object.  It is used to move the row from
+ * the RS_ACTIVE state to the RS_NOTINSERVICE state.  It is also used when transitioning from the
+ * RS_ACTIVE state to the RS_DESTROY state.  If deactivation fails, the function should return
+ * SNMP_ERR_COMMITFAILED; otherwise, SNMP_ERR_NOERROR.
+ */
+int
+deactivate_monolithicUpperLayerSubsystemTable_row(struct monolithicUpperLayerSubsystemTable_data *StorageTmp)
+{
+	/* XXX: provide code to deactivate the row with the underlying device */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int activate_pSapTable_row(struct pSapTable_data *StorageTmp)
+ * @param StorageTmp the data row to activate
+ * @brief commit activation of a row to the underlying device
+ *
+ * This function is used by tables that contain a RowStatus object.  It is used to move the row from
+ * the RS_NOTINSERVICE state to the RS_ACTIVE state.  It is also used when transitioning from the
+ * RS_CREATEANDGO state to the RS_ACTIVE state.  If activation fails, the function should return
+ * SNMP_ERR_COMMITFAILED; otherwise, SNMP_ERR_NOERROR.
+ */
+int
+activate_pSapTable_row(struct pSapTable_data *StorageTmp)
+{
+	/* XXX: provide code to activate the row with the underlying device */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int deactivate_pSapTable_row(struct pSapTable_data *StorageTmp)
+ * @param StorageTmp the data row to deactivate
+ * @brief commit deactivation of a row to the underlying device
+ *
+ * This function is used by tables that contain a RowStatus object.  It is used to move the row from
+ * the RS_ACTIVE state to the RS_NOTINSERVICE state.  It is also used when transitioning from the
+ * RS_ACTIVE state to the RS_DESTROY state.  If deactivation fails, the function should return
+ * SNMP_ERR_COMMITFAILED; otherwise, SNMP_ERR_NOERROR.
+ */
+int
+deactivate_pSapTable_row(struct pSapTable_data *StorageTmp)
+{
+	/* XXX: provide code to deactivate the row with the underlying device */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int activate_presentationConnectionTable_row(struct presentationConnectionTable_data *StorageTmp)
+ * @param StorageTmp the data row to activate
+ * @brief commit activation of a row to the underlying device
+ *
+ * This function is used by tables that contain a RowStatus object.  It is used to move the row from
+ * the RS_NOTINSERVICE state to the RS_ACTIVE state.  It is also used when transitioning from the
+ * RS_CREATEANDGO state to the RS_ACTIVE state.  If activation fails, the function should return
+ * SNMP_ERR_COMMITFAILED; otherwise, SNMP_ERR_NOERROR.
+ */
+int
+activate_presentationConnectionTable_row(struct presentationConnectionTable_data *StorageTmp)
+{
+	/* XXX: provide code to activate the row with the underlying device */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int deactivate_presentationConnectionTable_row(struct presentationConnectionTable_data *StorageTmp)
+ * @param StorageTmp the data row to deactivate
+ * @brief commit deactivation of a row to the underlying device
+ *
+ * This function is used by tables that contain a RowStatus object.  It is used to move the row from
+ * the RS_ACTIVE state to the RS_NOTINSERVICE state.  It is also used when transitioning from the
+ * RS_ACTIVE state to the RS_DESTROY state.  If deactivation fails, the function should return
+ * SNMP_ERR_COMMITFAILED; otherwise, SNMP_ERR_NOERROR.
+ */
+int
+deactivate_presentationConnectionTable_row(struct presentationConnectionTable_data *StorageTmp)
+{
+	/* XXX: provide code to deactivate the row with the underlying device */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int activate_presentationCopmTable_row(struct presentationCopmTable_data *StorageTmp)
+ * @param StorageTmp the data row to activate
+ * @brief commit activation of a row to the underlying device
+ *
+ * This function is used by tables that contain a RowStatus object.  It is used to move the row from
+ * the RS_NOTINSERVICE state to the RS_ACTIVE state.  It is also used when transitioning from the
+ * RS_CREATEANDGO state to the RS_ACTIVE state.  If activation fails, the function should return
+ * SNMP_ERR_COMMITFAILED; otherwise, SNMP_ERR_NOERROR.
+ */
+int
+activate_presentationCopmTable_row(struct presentationCopmTable_data *StorageTmp)
+{
+	/* XXX: provide code to activate the row with the underlying device */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int deactivate_presentationCopmTable_row(struct presentationCopmTable_data *StorageTmp)
+ * @param StorageTmp the data row to deactivate
+ * @brief commit deactivation of a row to the underlying device
+ *
+ * This function is used by tables that contain a RowStatus object.  It is used to move the row from
+ * the RS_ACTIVE state to the RS_NOTINSERVICE state.  It is also used when transitioning from the
+ * RS_ACTIVE state to the RS_DESTROY state.  If deactivation fails, the function should return
+ * SNMP_ERR_COMMITFAILED; otherwise, SNMP_ERR_NOERROR.
+ */
+int
+deactivate_presentationCopmTable_row(struct presentationCopmTable_data *StorageTmp)
+{
+	/* XXX: provide code to deactivate the row with the underlying device */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int activate_presentationEntityTable_row(struct presentationEntityTable_data *StorageTmp)
+ * @param StorageTmp the data row to activate
+ * @brief commit activation of a row to the underlying device
+ *
+ * This function is used by tables that contain a RowStatus object.  It is used to move the row from
+ * the RS_NOTINSERVICE state to the RS_ACTIVE state.  It is also used when transitioning from the
+ * RS_CREATEANDGO state to the RS_ACTIVE state.  If activation fails, the function should return
+ * SNMP_ERR_COMMITFAILED; otherwise, SNMP_ERR_NOERROR.
+ */
+int
+activate_presentationEntityTable_row(struct presentationEntityTable_data *StorageTmp)
+{
+	/* XXX: provide code to activate the row with the underlying device */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int deactivate_presentationEntityTable_row(struct presentationEntityTable_data *StorageTmp)
+ * @param StorageTmp the data row to deactivate
+ * @brief commit deactivation of a row to the underlying device
+ *
+ * This function is used by tables that contain a RowStatus object.  It is used to move the row from
+ * the RS_ACTIVE state to the RS_NOTINSERVICE state.  It is also used when transitioning from the
+ * RS_ACTIVE state to the RS_DESTROY state.  If deactivation fails, the function should return
+ * SNMP_ERR_COMMITFAILED; otherwise, SNMP_ERR_NOERROR.
+ */
+int
+deactivate_presentationEntityTable_row(struct presentationEntityTable_data *StorageTmp)
+{
+	/* XXX: provide code to deactivate the row with the underlying device */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int activate_presentationSubsystemTable_row(struct presentationSubsystemTable_data *StorageTmp)
+ * @param StorageTmp the data row to activate
+ * @brief commit activation of a row to the underlying device
+ *
+ * This function is used by tables that contain a RowStatus object.  It is used to move the row from
+ * the RS_NOTINSERVICE state to the RS_ACTIVE state.  It is also used when transitioning from the
+ * RS_CREATEANDGO state to the RS_ACTIVE state.  If activation fails, the function should return
+ * SNMP_ERR_COMMITFAILED; otherwise, SNMP_ERR_NOERROR.
+ */
+int
+activate_presentationSubsystemTable_row(struct presentationSubsystemTable_data *StorageTmp)
+{
+	/* XXX: provide code to activate the row with the underlying device */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int deactivate_presentationSubsystemTable_row(struct presentationSubsystemTable_data *StorageTmp)
+ * @param StorageTmp the data row to deactivate
+ * @brief commit deactivation of a row to the underlying device
+ *
+ * This function is used by tables that contain a RowStatus object.  It is used to move the row from
+ * the RS_ACTIVE state to the RS_NOTINSERVICE state.  It is also used when transitioning from the
+ * RS_ACTIVE state to the RS_DESTROY state.  If deactivation fails, the function should return
+ * SNMP_ERR_COMMITFAILED; otherwise, SNMP_ERR_NOERROR.
+ */
+int
+deactivate_presentationSubsystemTable_row(struct presentationSubsystemTable_data *StorageTmp)
+{
+	/* XXX: provide code to deactivate the row with the underlying device */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int activate_sSapTable_row(struct sSapTable_data *StorageTmp)
+ * @param StorageTmp the data row to activate
+ * @brief commit activation of a row to the underlying device
+ *
+ * This function is used by tables that contain a RowStatus object.  It is used to move the row from
+ * the RS_NOTINSERVICE state to the RS_ACTIVE state.  It is also used when transitioning from the
+ * RS_CREATEANDGO state to the RS_ACTIVE state.  If activation fails, the function should return
+ * SNMP_ERR_COMMITFAILED; otherwise, SNMP_ERR_NOERROR.
+ */
+int
+activate_sSapTable_row(struct sSapTable_data *StorageTmp)
+{
+	/* XXX: provide code to activate the row with the underlying device */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int deactivate_sSapTable_row(struct sSapTable_data *StorageTmp)
+ * @param StorageTmp the data row to deactivate
+ * @brief commit deactivation of a row to the underlying device
+ *
+ * This function is used by tables that contain a RowStatus object.  It is used to move the row from
+ * the RS_ACTIVE state to the RS_NOTINSERVICE state.  It is also used when transitioning from the
+ * RS_ACTIVE state to the RS_DESTROY state.  If deactivation fails, the function should return
+ * SNMP_ERR_COMMITFAILED; otherwise, SNMP_ERR_NOERROR.
+ */
+int
+deactivate_sSapTable_row(struct sSapTable_data *StorageTmp)
+{
+	/* XXX: provide code to deactivate the row with the underlying device */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int activate_sessionConnectionTable_row(struct sessionConnectionTable_data *StorageTmp)
+ * @param StorageTmp the data row to activate
+ * @brief commit activation of a row to the underlying device
+ *
+ * This function is used by tables that contain a RowStatus object.  It is used to move the row from
+ * the RS_NOTINSERVICE state to the RS_ACTIVE state.  It is also used when transitioning from the
+ * RS_CREATEANDGO state to the RS_ACTIVE state.  If activation fails, the function should return
+ * SNMP_ERR_COMMITFAILED; otherwise, SNMP_ERR_NOERROR.
+ */
+int
+activate_sessionConnectionTable_row(struct sessionConnectionTable_data *StorageTmp)
+{
+	/* XXX: provide code to activate the row with the underlying device */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int deactivate_sessionConnectionTable_row(struct sessionConnectionTable_data *StorageTmp)
+ * @param StorageTmp the data row to deactivate
+ * @brief commit deactivation of a row to the underlying device
+ *
+ * This function is used by tables that contain a RowStatus object.  It is used to move the row from
+ * the RS_ACTIVE state to the RS_NOTINSERVICE state.  It is also used when transitioning from the
+ * RS_ACTIVE state to the RS_DESTROY state.  If deactivation fails, the function should return
+ * SNMP_ERR_COMMITFAILED; otherwise, SNMP_ERR_NOERROR.
+ */
+int
+deactivate_sessionConnectionTable_row(struct sessionConnectionTable_data *StorageTmp)
+{
+	/* XXX: provide code to deactivate the row with the underlying device */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int activate_sessionCopmTable_row(struct sessionCopmTable_data *StorageTmp)
+ * @param StorageTmp the data row to activate
+ * @brief commit activation of a row to the underlying device
+ *
+ * This function is used by tables that contain a RowStatus object.  It is used to move the row from
+ * the RS_NOTINSERVICE state to the RS_ACTIVE state.  It is also used when transitioning from the
+ * RS_CREATEANDGO state to the RS_ACTIVE state.  If activation fails, the function should return
+ * SNMP_ERR_COMMITFAILED; otherwise, SNMP_ERR_NOERROR.
+ */
+int
+activate_sessionCopmTable_row(struct sessionCopmTable_data *StorageTmp)
+{
+	/* XXX: provide code to activate the row with the underlying device */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int deactivate_sessionCopmTable_row(struct sessionCopmTable_data *StorageTmp)
+ * @param StorageTmp the data row to deactivate
+ * @brief commit deactivation of a row to the underlying device
+ *
+ * This function is used by tables that contain a RowStatus object.  It is used to move the row from
+ * the RS_ACTIVE state to the RS_NOTINSERVICE state.  It is also used when transitioning from the
+ * RS_ACTIVE state to the RS_DESTROY state.  If deactivation fails, the function should return
+ * SNMP_ERR_COMMITFAILED; otherwise, SNMP_ERR_NOERROR.
+ */
+int
+deactivate_sessionCopmTable_row(struct sessionCopmTable_data *StorageTmp)
+{
+	/* XXX: provide code to deactivate the row with the underlying device */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int activate_sessionEntityTable_row(struct sessionEntityTable_data *StorageTmp)
+ * @param StorageTmp the data row to activate
+ * @brief commit activation of a row to the underlying device
+ *
+ * This function is used by tables that contain a RowStatus object.  It is used to move the row from
+ * the RS_NOTINSERVICE state to the RS_ACTIVE state.  It is also used when transitioning from the
+ * RS_CREATEANDGO state to the RS_ACTIVE state.  If activation fails, the function should return
+ * SNMP_ERR_COMMITFAILED; otherwise, SNMP_ERR_NOERROR.
+ */
+int
+activate_sessionEntityTable_row(struct sessionEntityTable_data *StorageTmp)
+{
+	/* XXX: provide code to activate the row with the underlying device */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int deactivate_sessionEntityTable_row(struct sessionEntityTable_data *StorageTmp)
+ * @param StorageTmp the data row to deactivate
+ * @brief commit deactivation of a row to the underlying device
+ *
+ * This function is used by tables that contain a RowStatus object.  It is used to move the row from
+ * the RS_ACTIVE state to the RS_NOTINSERVICE state.  It is also used when transitioning from the
+ * RS_ACTIVE state to the RS_DESTROY state.  If deactivation fails, the function should return
+ * SNMP_ERR_COMMITFAILED; otherwise, SNMP_ERR_NOERROR.
+ */
+int
+deactivate_sessionEntityTable_row(struct sessionEntityTable_data *StorageTmp)
+{
+	/* XXX: provide code to deactivate the row with the underlying device */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int activate_sessionSubsystemTable_row(struct sessionSubsystemTable_data *StorageTmp)
+ * @param StorageTmp the data row to activate
+ * @brief commit activation of a row to the underlying device
+ *
+ * This function is used by tables that contain a RowStatus object.  It is used to move the row from
+ * the RS_NOTINSERVICE state to the RS_ACTIVE state.  It is also used when transitioning from the
+ * RS_CREATEANDGO state to the RS_ACTIVE state.  If activation fails, the function should return
+ * SNMP_ERR_COMMITFAILED; otherwise, SNMP_ERR_NOERROR.
+ */
+int
+activate_sessionSubsystemTable_row(struct sessionSubsystemTable_data *StorageTmp)
+{
+	/* XXX: provide code to activate the row with the underlying device */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int deactivate_sessionSubsystemTable_row(struct sessionSubsystemTable_data *StorageTmp)
+ * @param StorageTmp the data row to deactivate
+ * @brief commit deactivation of a row to the underlying device
+ *
+ * This function is used by tables that contain a RowStatus object.  It is used to move the row from
+ * the RS_ACTIVE state to the RS_NOTINSERVICE state.  It is also used when transitioning from the
+ * RS_ACTIVE state to the RS_DESTROY state.  If deactivation fails, the function should return
+ * SNMP_ERR_COMMITFAILED; otherwise, SNMP_ERR_NOERROR.
+ */
+int
+deactivate_sessionSubsystemTable_row(struct sessionSubsystemTable_data *StorageTmp)
+{
+	/* XXX: provide code to deactivate the row with the underlying device */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int activate_acseEntityTable_row(struct acseEntityTable_data *StorageTmp)
+ * @param StorageTmp the data row to activate
+ * @brief commit activation of a row to the underlying device
+ *
+ * This function is used by tables that contain a RowStatus object.  It is used to move the row from
+ * the RS_NOTINSERVICE state to the RS_ACTIVE state.  It is also used when transitioning from the
+ * RS_CREATEANDGO state to the RS_ACTIVE state.  If activation fails, the function should return
+ * SNMP_ERR_COMMITFAILED; otherwise, SNMP_ERR_NOERROR.
+ */
+int
+activate_acseEntityTable_row(struct acseEntityTable_data *StorageTmp)
+{
+	/* XXX: provide code to activate the row with the underlying device */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int deactivate_acseEntityTable_row(struct acseEntityTable_data *StorageTmp)
+ * @param StorageTmp the data row to deactivate
+ * @brief commit deactivation of a row to the underlying device
+ *
+ * This function is used by tables that contain a RowStatus object.  It is used to move the row from
+ * the RS_ACTIVE state to the RS_NOTINSERVICE state.  It is also used when transitioning from the
+ * RS_ACTIVE state to the RS_DESTROY state.  If deactivation fails, the function should return
+ * SNMP_ERR_COMMITFAILED; otherwise, SNMP_ERR_NOERROR.
+ */
+int
+deactivate_acseEntityTable_row(struct acseEntityTable_data *StorageTmp)
+{
+	/* XXX: provide code to deactivate the row with the underlying device */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int activate_acseAccessPointTable_row(struct acseAccessPointTable_data *StorageTmp)
+ * @param StorageTmp the data row to activate
+ * @brief commit activation of a row to the underlying device
+ *
+ * This function is used by tables that contain a RowStatus object.  It is used to move the row from
+ * the RS_NOTINSERVICE state to the RS_ACTIVE state.  It is also used when transitioning from the
+ * RS_CREATEANDGO state to the RS_ACTIVE state.  If activation fails, the function should return
+ * SNMP_ERR_COMMITFAILED; otherwise, SNMP_ERR_NOERROR.
+ */
+int
+activate_acseAccessPointTable_row(struct acseAccessPointTable_data *StorageTmp)
+{
+	/* XXX: provide code to activate the row with the underlying device */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int deactivate_acseAccessPointTable_row(struct acseAccessPointTable_data *StorageTmp)
+ * @param StorageTmp the data row to deactivate
+ * @brief commit deactivation of a row to the underlying device
+ *
+ * This function is used by tables that contain a RowStatus object.  It is used to move the row from
+ * the RS_ACTIVE state to the RS_NOTINSERVICE state.  It is also used when transitioning from the
+ * RS_ACTIVE state to the RS_DESTROY state.  If deactivation fails, the function should return
+ * SNMP_ERR_COMMITFAILED; otherwise, SNMP_ERR_NOERROR.
+ */
+int
+deactivate_acseAccessPointTable_row(struct acseAccessPointTable_data *StorageTmp)
+{
+	/* XXX: provide code to deactivate the row with the underlying device */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int activate_acseLinkageTable_row(struct acseLinkageTable_data *StorageTmp)
+ * @param StorageTmp the data row to activate
+ * @brief commit activation of a row to the underlying device
+ *
+ * This function is used by tables that contain a RowStatus object.  It is used to move the row from
+ * the RS_NOTINSERVICE state to the RS_ACTIVE state.  It is also used when transitioning from the
+ * RS_CREATEANDGO state to the RS_ACTIVE state.  If activation fails, the function should return
+ * SNMP_ERR_COMMITFAILED; otherwise, SNMP_ERR_NOERROR.
+ */
+int
+activate_acseLinkageTable_row(struct acseLinkageTable_data *StorageTmp)
+{
+	/* XXX: provide code to activate the row with the underlying device */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int deactivate_acseLinkageTable_row(struct acseLinkageTable_data *StorageTmp)
+ * @param StorageTmp the data row to deactivate
+ * @brief commit deactivation of a row to the underlying device
+ *
+ * This function is used by tables that contain a RowStatus object.  It is used to move the row from
+ * the RS_ACTIVE state to the RS_NOTINSERVICE state.  It is also used when transitioning from the
+ * RS_ACTIVE state to the RS_DESTROY state.  If deactivation fails, the function should return
+ * SNMP_ERR_COMMITFAILED; otherwise, SNMP_ERR_NOERROR.
+ */
+int
+deactivate_acseLinkageTable_row(struct acseLinkageTable_data *StorageTmp)
+{
+	/* XXX: provide code to deactivate the row with the underlying device */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int check_acseTable_row(struct acseTable_data *StorageTmp, struct acseTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to check, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the ACTION phase.  The start of the ACTION pahse performs this consitency check
+ * on the row before allowing the request to proceed to the COMMIT phase.  This function can return
+ * SNMP_ERR_NOERR or a specific SNMP error value.  Values in StorageOld are the values before the
+ * varbinds on the mib were applied; the values in StorageTmp are the new values.  The function is
+ * permitted to change the values in StorageTmp to correct them; however, preference should be made
+ * for setting values where were not in the varbinds.
+ */
+int
+check_acseTable_row(struct acseTable_data *StorageTmp, struct acseTable_data *StorageOld)
+{
+	/* XXX: provide code to check the row for consistency */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int update_acseTable_row(struct acseTable_data *StorageTmp, struct acseTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the set operation (ACTION phase) on a row
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to update, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the COMMIT phase.  The start of the ACTION phase performs a consistency check on
+ * the row before allowing the request to proceed to the COMMIT phase.  The COMMIT phase then
+ * arrives here with consistency already checked (see check_acseTable_row()).  This function can
+ * return SNMP_ERR_NOERROR or SNMP_ERR_COMMITFAILED.  Values in StorageOld are the values before the
+ * varbinds on the row were applied: the values in StorageTmp are the new values.
+ */
+int
+update_acseTable_row(struct acseTable_data *StorageTmp, struct acseTable_data *StorageOld)
+{
+	/* XXX: provide code to update the row with the underlying device */
+	acseTable_refresh = 1;
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int revert_acseTable_row(struct acseTable_data *StorageTmp, struct acseTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the undo operation (UNDO phase) on a row
+ */
+void
+revert_acseTable_row(struct acseTable_data *StorageTmp, struct acseTable_data *StorageOld)
+{
+	/* XXX: provide code to revert the row with the underlying device */
+	update_acseTable_row(StorageOld, NULL);
 }
 
 /**
@@ -6271,6 +7815,64 @@ var_acseTable(struct variable *vp, oid * name, size_t *length, int exact, size_t
 		ERROR_MSG("");
 	}
 	return (rval);
+}
+
+/**
+ * @fn int check_acseAssociationTable_row(struct acseAssociationTable_data *StorageTmp, struct acseAssociationTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to check, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the ACTION phase.  The start of the ACTION pahse performs this consitency check
+ * on the row before allowing the request to proceed to the COMMIT phase.  This function can return
+ * SNMP_ERR_NOERR or a specific SNMP error value.  Values in StorageOld are the values before the
+ * varbinds on the mib were applied; the values in StorageTmp are the new values.  The function is
+ * permitted to change the values in StorageTmp to correct them; however, preference should be made
+ * for setting values where were not in the varbinds.
+ */
+int
+check_acseAssociationTable_row(struct acseAssociationTable_data *StorageTmp, struct acseAssociationTable_data *StorageOld)
+{
+	/* XXX: provide code to check the row for consistency */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int update_acseAssociationTable_row(struct acseAssociationTable_data *StorageTmp, struct acseAssociationTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the set operation (ACTION phase) on a row
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to update, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the COMMIT phase.  The start of the ACTION phase performs a consistency check on
+ * the row before allowing the request to proceed to the COMMIT phase.  The COMMIT phase then
+ * arrives here with consistency already checked (see check_acseAssociationTable_row()).  This function can
+ * return SNMP_ERR_NOERROR or SNMP_ERR_COMMITFAILED.  Values in StorageOld are the values before the
+ * varbinds on the row were applied: the values in StorageTmp are the new values.
+ */
+int
+update_acseAssociationTable_row(struct acseAssociationTable_data *StorageTmp, struct acseAssociationTable_data *StorageOld)
+{
+	/* XXX: provide code to update the row with the underlying device */
+	acseAssociationTable_refresh = 1;
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int revert_acseAssociationTable_row(struct acseAssociationTable_data *StorageTmp, struct acseAssociationTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the undo operation (UNDO phase) on a row
+ */
+void
+revert_acseAssociationTable_row(struct acseAssociationTable_data *StorageTmp, struct acseAssociationTable_data *StorageOld)
+{
+	/* XXX: provide code to revert the row with the underlying device */
+	update_acseAssociationTable_row(StorageOld, NULL);
 }
 
 /**
@@ -6376,6 +7978,64 @@ var_acseAssociationTable(struct variable *vp, oid * name, size_t *length, int ex
 }
 
 /**
+ * @fn int check_apInvocationTable_row(struct apInvocationTable_data *StorageTmp, struct apInvocationTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to check, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the ACTION phase.  The start of the ACTION pahse performs this consitency check
+ * on the row before allowing the request to proceed to the COMMIT phase.  This function can return
+ * SNMP_ERR_NOERR or a specific SNMP error value.  Values in StorageOld are the values before the
+ * varbinds on the mib were applied; the values in StorageTmp are the new values.  The function is
+ * permitted to change the values in StorageTmp to correct them; however, preference should be made
+ * for setting values where were not in the varbinds.
+ */
+int
+check_apInvocationTable_row(struct apInvocationTable_data *StorageTmp, struct apInvocationTable_data *StorageOld)
+{
+	/* XXX: provide code to check the row for consistency */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int update_apInvocationTable_row(struct apInvocationTable_data *StorageTmp, struct apInvocationTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the set operation (ACTION phase) on a row
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to update, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the COMMIT phase.  The start of the ACTION phase performs a consistency check on
+ * the row before allowing the request to proceed to the COMMIT phase.  The COMMIT phase then
+ * arrives here with consistency already checked (see check_apInvocationTable_row()).  This function can
+ * return SNMP_ERR_NOERROR or SNMP_ERR_COMMITFAILED.  Values in StorageOld are the values before the
+ * varbinds on the row were applied: the values in StorageTmp are the new values.
+ */
+int
+update_apInvocationTable_row(struct apInvocationTable_data *StorageTmp, struct apInvocationTable_data *StorageOld)
+{
+	/* XXX: provide code to update the row with the underlying device */
+	apInvocationTable_refresh = 1;
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int revert_apInvocationTable_row(struct apInvocationTable_data *StorageTmp, struct apInvocationTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the undo operation (UNDO phase) on a row
+ */
+void
+revert_apInvocationTable_row(struct apInvocationTable_data *StorageTmp, struct apInvocationTable_data *StorageOld)
+{
+	/* XXX: provide code to revert the row with the underlying device */
+	update_apInvocationTable_row(StorageOld, NULL);
+}
+
+/**
  * @fn void refresh_apInvocationTable_row(struct apInvocationTable_data *StorageTmp, int force)
  * @param StorageTmp the data row to refresh.
  * @param force force refresh if non-zero.
@@ -6451,6 +8111,64 @@ var_apInvocationTable(struct variable *vp, oid * name, size_t *length, int exact
 		ERROR_MSG("");
 	}
 	return (rval);
+}
+
+/**
+ * @fn int check_applicationEntityInvocationTable_row(struct applicationEntityInvocationTable_data *StorageTmp, struct applicationEntityInvocationTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to check, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the ACTION phase.  The start of the ACTION pahse performs this consitency check
+ * on the row before allowing the request to proceed to the COMMIT phase.  This function can return
+ * SNMP_ERR_NOERR or a specific SNMP error value.  Values in StorageOld are the values before the
+ * varbinds on the mib were applied; the values in StorageTmp are the new values.  The function is
+ * permitted to change the values in StorageTmp to correct them; however, preference should be made
+ * for setting values where were not in the varbinds.
+ */
+int
+check_applicationEntityInvocationTable_row(struct applicationEntityInvocationTable_data *StorageTmp, struct applicationEntityInvocationTable_data *StorageOld)
+{
+	/* XXX: provide code to check the row for consistency */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int update_applicationEntityInvocationTable_row(struct applicationEntityInvocationTable_data *StorageTmp, struct applicationEntityInvocationTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the set operation (ACTION phase) on a row
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to update, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the COMMIT phase.  The start of the ACTION phase performs a consistency check on
+ * the row before allowing the request to proceed to the COMMIT phase.  The COMMIT phase then
+ * arrives here with consistency already checked (see check_applicationEntityInvocationTable_row()).  This function can
+ * return SNMP_ERR_NOERROR or SNMP_ERR_COMMITFAILED.  Values in StorageOld are the values before the
+ * varbinds on the row were applied: the values in StorageTmp are the new values.
+ */
+int
+update_applicationEntityInvocationTable_row(struct applicationEntityInvocationTable_data *StorageTmp, struct applicationEntityInvocationTable_data *StorageOld)
+{
+	/* XXX: provide code to update the row with the underlying device */
+	applicationEntityInvocationTable_refresh = 1;
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int revert_applicationEntityInvocationTable_row(struct applicationEntityInvocationTable_data *StorageTmp, struct applicationEntityInvocationTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the undo operation (UNDO phase) on a row
+ */
+void
+revert_applicationEntityInvocationTable_row(struct applicationEntityInvocationTable_data *StorageTmp, struct applicationEntityInvocationTable_data *StorageOld)
+{
+	/* XXX: provide code to revert the row with the underlying device */
+	update_applicationEntityInvocationTable_row(StorageOld, NULL);
 }
 
 /**
@@ -6532,6 +8250,64 @@ var_applicationEntityInvocationTable(struct variable *vp, oid * name, size_t *le
 }
 
 /**
+ * @fn int check_applicationSubsystemTable_row(struct applicationSubsystemTable_data *StorageTmp, struct applicationSubsystemTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to check, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the ACTION phase.  The start of the ACTION pahse performs this consitency check
+ * on the row before allowing the request to proceed to the COMMIT phase.  This function can return
+ * SNMP_ERR_NOERR or a specific SNMP error value.  Values in StorageOld are the values before the
+ * varbinds on the mib were applied; the values in StorageTmp are the new values.  The function is
+ * permitted to change the values in StorageTmp to correct them; however, preference should be made
+ * for setting values where were not in the varbinds.
+ */
+int
+check_applicationSubsystemTable_row(struct applicationSubsystemTable_data *StorageTmp, struct applicationSubsystemTable_data *StorageOld)
+{
+	/* XXX: provide code to check the row for consistency */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int update_applicationSubsystemTable_row(struct applicationSubsystemTable_data *StorageTmp, struct applicationSubsystemTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the set operation (ACTION phase) on a row
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to update, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the COMMIT phase.  The start of the ACTION phase performs a consistency check on
+ * the row before allowing the request to proceed to the COMMIT phase.  The COMMIT phase then
+ * arrives here with consistency already checked (see check_applicationSubsystemTable_row()).  This function can
+ * return SNMP_ERR_NOERROR or SNMP_ERR_COMMITFAILED.  Values in StorageOld are the values before the
+ * varbinds on the row were applied: the values in StorageTmp are the new values.
+ */
+int
+update_applicationSubsystemTable_row(struct applicationSubsystemTable_data *StorageTmp, struct applicationSubsystemTable_data *StorageOld)
+{
+	/* XXX: provide code to update the row with the underlying device */
+	applicationSubsystemTable_refresh = 1;
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int revert_applicationSubsystemTable_row(struct applicationSubsystemTable_data *StorageTmp, struct applicationSubsystemTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the undo operation (UNDO phase) on a row
+ */
+void
+revert_applicationSubsystemTable_row(struct applicationSubsystemTable_data *StorageTmp, struct applicationSubsystemTable_data *StorageOld)
+{
+	/* XXX: provide code to revert the row with the underlying device */
+	update_applicationSubsystemTable_row(StorageOld, NULL);
+}
+
+/**
  * @fn void refresh_applicationSubsystemTable_row(struct applicationSubsystemTable_data *StorageTmp, int force)
  * @param StorageTmp the data row to refresh.
  * @param force force refresh if non-zero.
@@ -6600,6 +8376,64 @@ var_applicationSubsystemTable(struct variable *vp, oid * name, size_t *length, i
 		ERROR_MSG("");
 	}
 	return (rval);
+}
+
+/**
+ * @fn int check_asoTable_row(struct asoTable_data *StorageTmp, struct asoTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to check, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the ACTION phase.  The start of the ACTION pahse performs this consitency check
+ * on the row before allowing the request to proceed to the COMMIT phase.  This function can return
+ * SNMP_ERR_NOERR or a specific SNMP error value.  Values in StorageOld are the values before the
+ * varbinds on the mib were applied; the values in StorageTmp are the new values.  The function is
+ * permitted to change the values in StorageTmp to correct them; however, preference should be made
+ * for setting values where were not in the varbinds.
+ */
+int
+check_asoTable_row(struct asoTable_data *StorageTmp, struct asoTable_data *StorageOld)
+{
+	/* XXX: provide code to check the row for consistency */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int update_asoTable_row(struct asoTable_data *StorageTmp, struct asoTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the set operation (ACTION phase) on a row
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to update, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the COMMIT phase.  The start of the ACTION phase performs a consistency check on
+ * the row before allowing the request to proceed to the COMMIT phase.  The COMMIT phase then
+ * arrives here with consistency already checked (see check_asoTable_row()).  This function can
+ * return SNMP_ERR_NOERROR or SNMP_ERR_COMMITFAILED.  Values in StorageOld are the values before the
+ * varbinds on the row were applied: the values in StorageTmp are the new values.
+ */
+int
+update_asoTable_row(struct asoTable_data *StorageTmp, struct asoTable_data *StorageOld)
+{
+	/* XXX: provide code to update the row with the underlying device */
+	asoTable_refresh = 1;
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int revert_asoTable_row(struct asoTable_data *StorageTmp, struct asoTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the undo operation (UNDO phase) on a row
+ */
+void
+revert_asoTable_row(struct asoTable_data *StorageTmp, struct asoTable_data *StorageOld)
+{
+	/* XXX: provide code to revert the row with the underlying device */
+	update_asoTable_row(StorageOld, NULL);
 }
 
 /**
@@ -6681,6 +8515,64 @@ var_asoTable(struct variable *vp, oid * name, size_t *length, int exact, size_t 
 }
 
 /**
+ * @fn int check_asoEntityTable_row(struct asoEntityTable_data *StorageTmp, struct asoEntityTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to check, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the ACTION phase.  The start of the ACTION pahse performs this consitency check
+ * on the row before allowing the request to proceed to the COMMIT phase.  This function can return
+ * SNMP_ERR_NOERR or a specific SNMP error value.  Values in StorageOld are the values before the
+ * varbinds on the mib were applied; the values in StorageTmp are the new values.  The function is
+ * permitted to change the values in StorageTmp to correct them; however, preference should be made
+ * for setting values where were not in the varbinds.
+ */
+int
+check_asoEntityTable_row(struct asoEntityTable_data *StorageTmp, struct asoEntityTable_data *StorageOld)
+{
+	/* XXX: provide code to check the row for consistency */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int update_asoEntityTable_row(struct asoEntityTable_data *StorageTmp, struct asoEntityTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the set operation (ACTION phase) on a row
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to update, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the COMMIT phase.  The start of the ACTION phase performs a consistency check on
+ * the row before allowing the request to proceed to the COMMIT phase.  The COMMIT phase then
+ * arrives here with consistency already checked (see check_asoEntityTable_row()).  This function can
+ * return SNMP_ERR_NOERROR or SNMP_ERR_COMMITFAILED.  Values in StorageOld are the values before the
+ * varbinds on the row were applied: the values in StorageTmp are the new values.
+ */
+int
+update_asoEntityTable_row(struct asoEntityTable_data *StorageTmp, struct asoEntityTable_data *StorageOld)
+{
+	/* XXX: provide code to update the row with the underlying device */
+	asoEntityTable_refresh = 1;
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int revert_asoEntityTable_row(struct asoEntityTable_data *StorageTmp, struct asoEntityTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the undo operation (UNDO phase) on a row
+ */
+void
+revert_asoEntityTable_row(struct asoEntityTable_data *StorageTmp, struct asoEntityTable_data *StorageOld)
+{
+	/* XXX: provide code to revert the row with the underlying device */
+	update_asoEntityTable_row(StorageOld, NULL);
+}
+
+/**
  * @fn void refresh_asoEntityTable_row(struct asoEntityTable_data *StorageTmp, int force)
  * @param StorageTmp the data row to refresh.
  * @param force force refresh if non-zero.
@@ -6756,6 +8648,64 @@ var_asoEntityTable(struct variable *vp, oid * name, size_t *length, int exact, s
 		ERROR_MSG("");
 	}
 	return (rval);
+}
+
+/**
+ * @fn int check_asoInvocationTable_row(struct asoInvocationTable_data *StorageTmp, struct asoInvocationTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to check, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the ACTION phase.  The start of the ACTION pahse performs this consitency check
+ * on the row before allowing the request to proceed to the COMMIT phase.  This function can return
+ * SNMP_ERR_NOERR or a specific SNMP error value.  Values in StorageOld are the values before the
+ * varbinds on the mib were applied; the values in StorageTmp are the new values.  The function is
+ * permitted to change the values in StorageTmp to correct them; however, preference should be made
+ * for setting values where were not in the varbinds.
+ */
+int
+check_asoInvocationTable_row(struct asoInvocationTable_data *StorageTmp, struct asoInvocationTable_data *StorageOld)
+{
+	/* XXX: provide code to check the row for consistency */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int update_asoInvocationTable_row(struct asoInvocationTable_data *StorageTmp, struct asoInvocationTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the set operation (ACTION phase) on a row
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to update, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the COMMIT phase.  The start of the ACTION phase performs a consistency check on
+ * the row before allowing the request to proceed to the COMMIT phase.  The COMMIT phase then
+ * arrives here with consistency already checked (see check_asoInvocationTable_row()).  This function can
+ * return SNMP_ERR_NOERROR or SNMP_ERR_COMMITFAILED.  Values in StorageOld are the values before the
+ * varbinds on the row were applied: the values in StorageTmp are the new values.
+ */
+int
+update_asoInvocationTable_row(struct asoInvocationTable_data *StorageTmp, struct asoInvocationTable_data *StorageOld)
+{
+	/* XXX: provide code to update the row with the underlying device */
+	asoInvocationTable_refresh = 1;
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int revert_asoInvocationTable_row(struct asoInvocationTable_data *StorageTmp, struct asoInvocationTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the undo operation (UNDO phase) on a row
+ */
+void
+revert_asoInvocationTable_row(struct asoInvocationTable_data *StorageTmp, struct asoInvocationTable_data *StorageOld)
+{
+	/* XXX: provide code to revert the row with the underlying device */
+	update_asoInvocationTable_row(StorageOld, NULL);
 }
 
 /**
@@ -6837,6 +8787,64 @@ var_asoInvocationTable(struct variable *vp, oid * name, size_t *length, int exac
 }
 
 /**
+ * @fn int check_monoULConnectionTable_row(struct monoULConnectionTable_data *StorageTmp, struct monoULConnectionTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to check, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the ACTION phase.  The start of the ACTION pahse performs this consitency check
+ * on the row before allowing the request to proceed to the COMMIT phase.  This function can return
+ * SNMP_ERR_NOERR or a specific SNMP error value.  Values in StorageOld are the values before the
+ * varbinds on the mib were applied; the values in StorageTmp are the new values.  The function is
+ * permitted to change the values in StorageTmp to correct them; however, preference should be made
+ * for setting values where were not in the varbinds.
+ */
+int
+check_monoULConnectionTable_row(struct monoULConnectionTable_data *StorageTmp, struct monoULConnectionTable_data *StorageOld)
+{
+	/* XXX: provide code to check the row for consistency */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int update_monoULConnectionTable_row(struct monoULConnectionTable_data *StorageTmp, struct monoULConnectionTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the set operation (ACTION phase) on a row
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to update, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the COMMIT phase.  The start of the ACTION phase performs a consistency check on
+ * the row before allowing the request to proceed to the COMMIT phase.  The COMMIT phase then
+ * arrives here with consistency already checked (see check_monoULConnectionTable_row()).  This function can
+ * return SNMP_ERR_NOERROR or SNMP_ERR_COMMITFAILED.  Values in StorageOld are the values before the
+ * varbinds on the row were applied: the values in StorageTmp are the new values.
+ */
+int
+update_monoULConnectionTable_row(struct monoULConnectionTable_data *StorageTmp, struct monoULConnectionTable_data *StorageOld)
+{
+	/* XXX: provide code to update the row with the underlying device */
+	monoULConnectionTable_refresh = 1;
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int revert_monoULConnectionTable_row(struct monoULConnectionTable_data *StorageTmp, struct monoULConnectionTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the undo operation (UNDO phase) on a row
+ */
+void
+revert_monoULConnectionTable_row(struct monoULConnectionTable_data *StorageTmp, struct monoULConnectionTable_data *StorageOld)
+{
+	/* XXX: provide code to revert the row with the underlying device */
+	update_monoULConnectionTable_row(StorageOld, NULL);
+}
+
+/**
  * @fn void refresh_monoULConnectionTable_row(struct monoULConnectionTable_data *StorageTmp, int force)
  * @param StorageTmp the data row to refresh.
  * @param force force refresh if non-zero.
@@ -6915,6 +8923,64 @@ var_monoULConnectionTable(struct variable *vp, oid * name, size_t *length, int e
 }
 
 /**
+ * @fn int check_monoULEntityTable_row(struct monoULEntityTable_data *StorageTmp, struct monoULEntityTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to check, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the ACTION phase.  The start of the ACTION pahse performs this consitency check
+ * on the row before allowing the request to proceed to the COMMIT phase.  This function can return
+ * SNMP_ERR_NOERR or a specific SNMP error value.  Values in StorageOld are the values before the
+ * varbinds on the mib were applied; the values in StorageTmp are the new values.  The function is
+ * permitted to change the values in StorageTmp to correct them; however, preference should be made
+ * for setting values where were not in the varbinds.
+ */
+int
+check_monoULEntityTable_row(struct monoULEntityTable_data *StorageTmp, struct monoULEntityTable_data *StorageOld)
+{
+	/* XXX: provide code to check the row for consistency */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int update_monoULEntityTable_row(struct monoULEntityTable_data *StorageTmp, struct monoULEntityTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the set operation (ACTION phase) on a row
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to update, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the COMMIT phase.  The start of the ACTION phase performs a consistency check on
+ * the row before allowing the request to proceed to the COMMIT phase.  The COMMIT phase then
+ * arrives here with consistency already checked (see check_monoULEntityTable_row()).  This function can
+ * return SNMP_ERR_NOERROR or SNMP_ERR_COMMITFAILED.  Values in StorageOld are the values before the
+ * varbinds on the row were applied: the values in StorageTmp are the new values.
+ */
+int
+update_monoULEntityTable_row(struct monoULEntityTable_data *StorageTmp, struct monoULEntityTable_data *StorageOld)
+{
+	/* XXX: provide code to update the row with the underlying device */
+	monoULEntityTable_refresh = 1;
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int revert_monoULEntityTable_row(struct monoULEntityTable_data *StorageTmp, struct monoULEntityTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the undo operation (UNDO phase) on a row
+ */
+void
+revert_monoULEntityTable_row(struct monoULEntityTable_data *StorageTmp, struct monoULEntityTable_data *StorageOld)
+{
+	/* XXX: provide code to revert the row with the underlying device */
+	update_monoULEntityTable_row(StorageOld, NULL);
+}
+
+/**
  * @fn void refresh_monoULEntityTable_row(struct monoULEntityTable_data *StorageTmp, int force)
  * @param StorageTmp the data row to refresh.
  * @param force force refresh if non-zero.
@@ -6983,6 +9049,64 @@ var_monoULEntityTable(struct variable *vp, oid * name, size_t *length, int exact
 		ERROR_MSG("");
 	}
 	return (rval);
+}
+
+/**
+ * @fn int check_monolithicUpperLayerSubsystemTable_row(struct monolithicUpperLayerSubsystemTable_data *StorageTmp, struct monolithicUpperLayerSubsystemTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to check, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the ACTION phase.  The start of the ACTION pahse performs this consitency check
+ * on the row before allowing the request to proceed to the COMMIT phase.  This function can return
+ * SNMP_ERR_NOERR or a specific SNMP error value.  Values in StorageOld are the values before the
+ * varbinds on the mib were applied; the values in StorageTmp are the new values.  The function is
+ * permitted to change the values in StorageTmp to correct them; however, preference should be made
+ * for setting values where were not in the varbinds.
+ */
+int
+check_monolithicUpperLayerSubsystemTable_row(struct monolithicUpperLayerSubsystemTable_data *StorageTmp, struct monolithicUpperLayerSubsystemTable_data *StorageOld)
+{
+	/* XXX: provide code to check the row for consistency */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int update_monolithicUpperLayerSubsystemTable_row(struct monolithicUpperLayerSubsystemTable_data *StorageTmp, struct monolithicUpperLayerSubsystemTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the set operation (ACTION phase) on a row
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to update, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the COMMIT phase.  The start of the ACTION phase performs a consistency check on
+ * the row before allowing the request to proceed to the COMMIT phase.  The COMMIT phase then
+ * arrives here with consistency already checked (see check_monolithicUpperLayerSubsystemTable_row()).  This function can
+ * return SNMP_ERR_NOERROR or SNMP_ERR_COMMITFAILED.  Values in StorageOld are the values before the
+ * varbinds on the row were applied: the values in StorageTmp are the new values.
+ */
+int
+update_monolithicUpperLayerSubsystemTable_row(struct monolithicUpperLayerSubsystemTable_data *StorageTmp, struct monolithicUpperLayerSubsystemTable_data *StorageOld)
+{
+	/* XXX: provide code to update the row with the underlying device */
+	monolithicUpperLayerSubsystemTable_refresh = 1;
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int revert_monolithicUpperLayerSubsystemTable_row(struct monolithicUpperLayerSubsystemTable_data *StorageTmp, struct monolithicUpperLayerSubsystemTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the undo operation (UNDO phase) on a row
+ */
+void
+revert_monolithicUpperLayerSubsystemTable_row(struct monolithicUpperLayerSubsystemTable_data *StorageTmp, struct monolithicUpperLayerSubsystemTable_data *StorageOld)
+{
+	/* XXX: provide code to revert the row with the underlying device */
+	update_monolithicUpperLayerSubsystemTable_row(StorageOld, NULL);
 }
 
 /**
@@ -7064,6 +9188,64 @@ var_monolithicUpperLayerSubsystemTable(struct variable *vp, oid * name, size_t *
 }
 
 /**
+ * @fn int check_pSapTable_row(struct pSapTable_data *StorageTmp, struct pSapTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to check, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the ACTION phase.  The start of the ACTION pahse performs this consitency check
+ * on the row before allowing the request to proceed to the COMMIT phase.  This function can return
+ * SNMP_ERR_NOERR or a specific SNMP error value.  Values in StorageOld are the values before the
+ * varbinds on the mib were applied; the values in StorageTmp are the new values.  The function is
+ * permitted to change the values in StorageTmp to correct them; however, preference should be made
+ * for setting values where were not in the varbinds.
+ */
+int
+check_pSapTable_row(struct pSapTable_data *StorageTmp, struct pSapTable_data *StorageOld)
+{
+	/* XXX: provide code to check the row for consistency */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int update_pSapTable_row(struct pSapTable_data *StorageTmp, struct pSapTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the set operation (ACTION phase) on a row
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to update, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the COMMIT phase.  The start of the ACTION phase performs a consistency check on
+ * the row before allowing the request to proceed to the COMMIT phase.  The COMMIT phase then
+ * arrives here with consistency already checked (see check_pSapTable_row()).  This function can
+ * return SNMP_ERR_NOERROR or SNMP_ERR_COMMITFAILED.  Values in StorageOld are the values before the
+ * varbinds on the row were applied: the values in StorageTmp are the new values.
+ */
+int
+update_pSapTable_row(struct pSapTable_data *StorageTmp, struct pSapTable_data *StorageOld)
+{
+	/* XXX: provide code to update the row with the underlying device */
+	pSapTable_refresh = 1;
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int revert_pSapTable_row(struct pSapTable_data *StorageTmp, struct pSapTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the undo operation (UNDO phase) on a row
+ */
+void
+revert_pSapTable_row(struct pSapTable_data *StorageTmp, struct pSapTable_data *StorageOld)
+{
+	/* XXX: provide code to revert the row with the underlying device */
+	update_pSapTable_row(StorageOld, NULL);
+}
+
+/**
  * @fn void refresh_pSapTable_row(struct pSapTable_data *StorageTmp, int force)
  * @param StorageTmp the data row to refresh.
  * @param force force refresh if non-zero.
@@ -7139,6 +9321,64 @@ var_pSapTable(struct variable *vp, oid * name, size_t *length, int exact, size_t
 		ERROR_MSG("");
 	}
 	return (rval);
+}
+
+/**
+ * @fn int check_presentationConnectionTable_row(struct presentationConnectionTable_data *StorageTmp, struct presentationConnectionTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to check, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the ACTION phase.  The start of the ACTION pahse performs this consitency check
+ * on the row before allowing the request to proceed to the COMMIT phase.  This function can return
+ * SNMP_ERR_NOERR or a specific SNMP error value.  Values in StorageOld are the values before the
+ * varbinds on the mib were applied; the values in StorageTmp are the new values.  The function is
+ * permitted to change the values in StorageTmp to correct them; however, preference should be made
+ * for setting values where were not in the varbinds.
+ */
+int
+check_presentationConnectionTable_row(struct presentationConnectionTable_data *StorageTmp, struct presentationConnectionTable_data *StorageOld)
+{
+	/* XXX: provide code to check the row for consistency */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int update_presentationConnectionTable_row(struct presentationConnectionTable_data *StorageTmp, struct presentationConnectionTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the set operation (ACTION phase) on a row
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to update, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the COMMIT phase.  The start of the ACTION phase performs a consistency check on
+ * the row before allowing the request to proceed to the COMMIT phase.  The COMMIT phase then
+ * arrives here with consistency already checked (see check_presentationConnectionTable_row()).  This function can
+ * return SNMP_ERR_NOERROR or SNMP_ERR_COMMITFAILED.  Values in StorageOld are the values before the
+ * varbinds on the row were applied: the values in StorageTmp are the new values.
+ */
+int
+update_presentationConnectionTable_row(struct presentationConnectionTable_data *StorageTmp, struct presentationConnectionTable_data *StorageOld)
+{
+	/* XXX: provide code to update the row with the underlying device */
+	presentationConnectionTable_refresh = 1;
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int revert_presentationConnectionTable_row(struct presentationConnectionTable_data *StorageTmp, struct presentationConnectionTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the undo operation (UNDO phase) on a row
+ */
+void
+revert_presentationConnectionTable_row(struct presentationConnectionTable_data *StorageTmp, struct presentationConnectionTable_data *StorageOld)
+{
+	/* XXX: provide code to revert the row with the underlying device */
+	update_presentationConnectionTable_row(StorageOld, NULL);
 }
 
 /**
@@ -7220,6 +9460,64 @@ var_presentationConnectionTable(struct variable *vp, oid * name, size_t *length,
 }
 
 /**
+ * @fn int check_presentationCopmTable_row(struct presentationCopmTable_data *StorageTmp, struct presentationCopmTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to check, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the ACTION phase.  The start of the ACTION pahse performs this consitency check
+ * on the row before allowing the request to proceed to the COMMIT phase.  This function can return
+ * SNMP_ERR_NOERR or a specific SNMP error value.  Values in StorageOld are the values before the
+ * varbinds on the mib were applied; the values in StorageTmp are the new values.  The function is
+ * permitted to change the values in StorageTmp to correct them; however, preference should be made
+ * for setting values where were not in the varbinds.
+ */
+int
+check_presentationCopmTable_row(struct presentationCopmTable_data *StorageTmp, struct presentationCopmTable_data *StorageOld)
+{
+	/* XXX: provide code to check the row for consistency */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int update_presentationCopmTable_row(struct presentationCopmTable_data *StorageTmp, struct presentationCopmTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the set operation (ACTION phase) on a row
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to update, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the COMMIT phase.  The start of the ACTION phase performs a consistency check on
+ * the row before allowing the request to proceed to the COMMIT phase.  The COMMIT phase then
+ * arrives here with consistency already checked (see check_presentationCopmTable_row()).  This function can
+ * return SNMP_ERR_NOERROR or SNMP_ERR_COMMITFAILED.  Values in StorageOld are the values before the
+ * varbinds on the row were applied: the values in StorageTmp are the new values.
+ */
+int
+update_presentationCopmTable_row(struct presentationCopmTable_data *StorageTmp, struct presentationCopmTable_data *StorageOld)
+{
+	/* XXX: provide code to update the row with the underlying device */
+	presentationCopmTable_refresh = 1;
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int revert_presentationCopmTable_row(struct presentationCopmTable_data *StorageTmp, struct presentationCopmTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the undo operation (UNDO phase) on a row
+ */
+void
+revert_presentationCopmTable_row(struct presentationCopmTable_data *StorageTmp, struct presentationCopmTable_data *StorageOld)
+{
+	/* XXX: provide code to revert the row with the underlying device */
+	update_presentationCopmTable_row(StorageOld, NULL);
+}
+
+/**
  * @fn void refresh_presentationCopmTable_row(struct presentationCopmTable_data *StorageTmp, int force)
  * @param StorageTmp the data row to refresh.
  * @param force force refresh if non-zero.
@@ -7295,6 +9593,64 @@ var_presentationCopmTable(struct variable *vp, oid * name, size_t *length, int e
 		ERROR_MSG("");
 	}
 	return (rval);
+}
+
+/**
+ * @fn int check_presentationEntityTable_row(struct presentationEntityTable_data *StorageTmp, struct presentationEntityTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to check, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the ACTION phase.  The start of the ACTION pahse performs this consitency check
+ * on the row before allowing the request to proceed to the COMMIT phase.  This function can return
+ * SNMP_ERR_NOERR or a specific SNMP error value.  Values in StorageOld are the values before the
+ * varbinds on the mib were applied; the values in StorageTmp are the new values.  The function is
+ * permitted to change the values in StorageTmp to correct them; however, preference should be made
+ * for setting values where were not in the varbinds.
+ */
+int
+check_presentationEntityTable_row(struct presentationEntityTable_data *StorageTmp, struct presentationEntityTable_data *StorageOld)
+{
+	/* XXX: provide code to check the row for consistency */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int update_presentationEntityTable_row(struct presentationEntityTable_data *StorageTmp, struct presentationEntityTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the set operation (ACTION phase) on a row
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to update, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the COMMIT phase.  The start of the ACTION phase performs a consistency check on
+ * the row before allowing the request to proceed to the COMMIT phase.  The COMMIT phase then
+ * arrives here with consistency already checked (see check_presentationEntityTable_row()).  This function can
+ * return SNMP_ERR_NOERROR or SNMP_ERR_COMMITFAILED.  Values in StorageOld are the values before the
+ * varbinds on the row were applied: the values in StorageTmp are the new values.
+ */
+int
+update_presentationEntityTable_row(struct presentationEntityTable_data *StorageTmp, struct presentationEntityTable_data *StorageOld)
+{
+	/* XXX: provide code to update the row with the underlying device */
+	presentationEntityTable_refresh = 1;
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int revert_presentationEntityTable_row(struct presentationEntityTable_data *StorageTmp, struct presentationEntityTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the undo operation (UNDO phase) on a row
+ */
+void
+revert_presentationEntityTable_row(struct presentationEntityTable_data *StorageTmp, struct presentationEntityTable_data *StorageOld)
+{
+	/* XXX: provide code to revert the row with the underlying device */
+	update_presentationEntityTable_row(StorageOld, NULL);
 }
 
 /**
@@ -7376,6 +9732,64 @@ var_presentationEntityTable(struct variable *vp, oid * name, size_t *length, int
 }
 
 /**
+ * @fn int check_presentationSubsystemTable_row(struct presentationSubsystemTable_data *StorageTmp, struct presentationSubsystemTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to check, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the ACTION phase.  The start of the ACTION pahse performs this consitency check
+ * on the row before allowing the request to proceed to the COMMIT phase.  This function can return
+ * SNMP_ERR_NOERR or a specific SNMP error value.  Values in StorageOld are the values before the
+ * varbinds on the mib were applied; the values in StorageTmp are the new values.  The function is
+ * permitted to change the values in StorageTmp to correct them; however, preference should be made
+ * for setting values where were not in the varbinds.
+ */
+int
+check_presentationSubsystemTable_row(struct presentationSubsystemTable_data *StorageTmp, struct presentationSubsystemTable_data *StorageOld)
+{
+	/* XXX: provide code to check the row for consistency */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int update_presentationSubsystemTable_row(struct presentationSubsystemTable_data *StorageTmp, struct presentationSubsystemTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the set operation (ACTION phase) on a row
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to update, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the COMMIT phase.  The start of the ACTION phase performs a consistency check on
+ * the row before allowing the request to proceed to the COMMIT phase.  The COMMIT phase then
+ * arrives here with consistency already checked (see check_presentationSubsystemTable_row()).  This function can
+ * return SNMP_ERR_NOERROR or SNMP_ERR_COMMITFAILED.  Values in StorageOld are the values before the
+ * varbinds on the row were applied: the values in StorageTmp are the new values.
+ */
+int
+update_presentationSubsystemTable_row(struct presentationSubsystemTable_data *StorageTmp, struct presentationSubsystemTable_data *StorageOld)
+{
+	/* XXX: provide code to update the row with the underlying device */
+	presentationSubsystemTable_refresh = 1;
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int revert_presentationSubsystemTable_row(struct presentationSubsystemTable_data *StorageTmp, struct presentationSubsystemTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the undo operation (UNDO phase) on a row
+ */
+void
+revert_presentationSubsystemTable_row(struct presentationSubsystemTable_data *StorageTmp, struct presentationSubsystemTable_data *StorageOld)
+{
+	/* XXX: provide code to revert the row with the underlying device */
+	update_presentationSubsystemTable_row(StorageOld, NULL);
+}
+
+/**
  * @fn void refresh_presentationSubsystemTable_row(struct presentationSubsystemTable_data *StorageTmp, int force)
  * @param StorageTmp the data row to refresh.
  * @param force force refresh if non-zero.
@@ -7451,6 +9865,64 @@ var_presentationSubsystemTable(struct variable *vp, oid * name, size_t *length, 
 		ERROR_MSG("");
 	}
 	return (rval);
+}
+
+/**
+ * @fn int check_sSapTable_row(struct sSapTable_data *StorageTmp, struct sSapTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to check, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the ACTION phase.  The start of the ACTION pahse performs this consitency check
+ * on the row before allowing the request to proceed to the COMMIT phase.  This function can return
+ * SNMP_ERR_NOERR or a specific SNMP error value.  Values in StorageOld are the values before the
+ * varbinds on the mib were applied; the values in StorageTmp are the new values.  The function is
+ * permitted to change the values in StorageTmp to correct them; however, preference should be made
+ * for setting values where were not in the varbinds.
+ */
+int
+check_sSapTable_row(struct sSapTable_data *StorageTmp, struct sSapTable_data *StorageOld)
+{
+	/* XXX: provide code to check the row for consistency */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int update_sSapTable_row(struct sSapTable_data *StorageTmp, struct sSapTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the set operation (ACTION phase) on a row
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to update, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the COMMIT phase.  The start of the ACTION phase performs a consistency check on
+ * the row before allowing the request to proceed to the COMMIT phase.  The COMMIT phase then
+ * arrives here with consistency already checked (see check_sSapTable_row()).  This function can
+ * return SNMP_ERR_NOERROR or SNMP_ERR_COMMITFAILED.  Values in StorageOld are the values before the
+ * varbinds on the row were applied: the values in StorageTmp are the new values.
+ */
+int
+update_sSapTable_row(struct sSapTable_data *StorageTmp, struct sSapTable_data *StorageOld)
+{
+	/* XXX: provide code to update the row with the underlying device */
+	sSapTable_refresh = 1;
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int revert_sSapTable_row(struct sSapTable_data *StorageTmp, struct sSapTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the undo operation (UNDO phase) on a row
+ */
+void
+revert_sSapTable_row(struct sSapTable_data *StorageTmp, struct sSapTable_data *StorageOld)
+{
+	/* XXX: provide code to revert the row with the underlying device */
+	update_sSapTable_row(StorageOld, NULL);
 }
 
 /**
@@ -7532,6 +10004,64 @@ var_sSapTable(struct variable *vp, oid * name, size_t *length, int exact, size_t
 }
 
 /**
+ * @fn int check_sessionConnectionTable_row(struct sessionConnectionTable_data *StorageTmp, struct sessionConnectionTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to check, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the ACTION phase.  The start of the ACTION pahse performs this consitency check
+ * on the row before allowing the request to proceed to the COMMIT phase.  This function can return
+ * SNMP_ERR_NOERR or a specific SNMP error value.  Values in StorageOld are the values before the
+ * varbinds on the mib were applied; the values in StorageTmp are the new values.  The function is
+ * permitted to change the values in StorageTmp to correct them; however, preference should be made
+ * for setting values where were not in the varbinds.
+ */
+int
+check_sessionConnectionTable_row(struct sessionConnectionTable_data *StorageTmp, struct sessionConnectionTable_data *StorageOld)
+{
+	/* XXX: provide code to check the row for consistency */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int update_sessionConnectionTable_row(struct sessionConnectionTable_data *StorageTmp, struct sessionConnectionTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the set operation (ACTION phase) on a row
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to update, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the COMMIT phase.  The start of the ACTION phase performs a consistency check on
+ * the row before allowing the request to proceed to the COMMIT phase.  The COMMIT phase then
+ * arrives here with consistency already checked (see check_sessionConnectionTable_row()).  This function can
+ * return SNMP_ERR_NOERROR or SNMP_ERR_COMMITFAILED.  Values in StorageOld are the values before the
+ * varbinds on the row were applied: the values in StorageTmp are the new values.
+ */
+int
+update_sessionConnectionTable_row(struct sessionConnectionTable_data *StorageTmp, struct sessionConnectionTable_data *StorageOld)
+{
+	/* XXX: provide code to update the row with the underlying device */
+	sessionConnectionTable_refresh = 1;
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int revert_sessionConnectionTable_row(struct sessionConnectionTable_data *StorageTmp, struct sessionConnectionTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the undo operation (UNDO phase) on a row
+ */
+void
+revert_sessionConnectionTable_row(struct sessionConnectionTable_data *StorageTmp, struct sessionConnectionTable_data *StorageOld)
+{
+	/* XXX: provide code to revert the row with the underlying device */
+	update_sessionConnectionTable_row(StorageOld, NULL);
+}
+
+/**
  * @fn void refresh_sessionConnectionTable_row(struct sessionConnectionTable_data *StorageTmp, int force)
  * @param StorageTmp the data row to refresh.
  * @param force force refresh if non-zero.
@@ -7607,6 +10137,64 @@ var_sessionConnectionTable(struct variable *vp, oid * name, size_t *length, int 
 		ERROR_MSG("");
 	}
 	return (rval);
+}
+
+/**
+ * @fn int check_sessionCopmTable_row(struct sessionCopmTable_data *StorageTmp, struct sessionCopmTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to check, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the ACTION phase.  The start of the ACTION pahse performs this consitency check
+ * on the row before allowing the request to proceed to the COMMIT phase.  This function can return
+ * SNMP_ERR_NOERR or a specific SNMP error value.  Values in StorageOld are the values before the
+ * varbinds on the mib were applied; the values in StorageTmp are the new values.  The function is
+ * permitted to change the values in StorageTmp to correct them; however, preference should be made
+ * for setting values where were not in the varbinds.
+ */
+int
+check_sessionCopmTable_row(struct sessionCopmTable_data *StorageTmp, struct sessionCopmTable_data *StorageOld)
+{
+	/* XXX: provide code to check the row for consistency */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int update_sessionCopmTable_row(struct sessionCopmTable_data *StorageTmp, struct sessionCopmTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the set operation (ACTION phase) on a row
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to update, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the COMMIT phase.  The start of the ACTION phase performs a consistency check on
+ * the row before allowing the request to proceed to the COMMIT phase.  The COMMIT phase then
+ * arrives here with consistency already checked (see check_sessionCopmTable_row()).  This function can
+ * return SNMP_ERR_NOERROR or SNMP_ERR_COMMITFAILED.  Values in StorageOld are the values before the
+ * varbinds on the row were applied: the values in StorageTmp are the new values.
+ */
+int
+update_sessionCopmTable_row(struct sessionCopmTable_data *StorageTmp, struct sessionCopmTable_data *StorageOld)
+{
+	/* XXX: provide code to update the row with the underlying device */
+	sessionCopmTable_refresh = 1;
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int revert_sessionCopmTable_row(struct sessionCopmTable_data *StorageTmp, struct sessionCopmTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the undo operation (UNDO phase) on a row
+ */
+void
+revert_sessionCopmTable_row(struct sessionCopmTable_data *StorageTmp, struct sessionCopmTable_data *StorageOld)
+{
+	/* XXX: provide code to revert the row with the underlying device */
+	update_sessionCopmTable_row(StorageOld, NULL);
 }
 
 /**
@@ -7688,6 +10276,64 @@ var_sessionCopmTable(struct variable *vp, oid * name, size_t *length, int exact,
 }
 
 /**
+ * @fn int check_sessionEntityTable_row(struct sessionEntityTable_data *StorageTmp, struct sessionEntityTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to check, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the ACTION phase.  The start of the ACTION pahse performs this consitency check
+ * on the row before allowing the request to proceed to the COMMIT phase.  This function can return
+ * SNMP_ERR_NOERR or a specific SNMP error value.  Values in StorageOld are the values before the
+ * varbinds on the mib were applied; the values in StorageTmp are the new values.  The function is
+ * permitted to change the values in StorageTmp to correct them; however, preference should be made
+ * for setting values where were not in the varbinds.
+ */
+int
+check_sessionEntityTable_row(struct sessionEntityTable_data *StorageTmp, struct sessionEntityTable_data *StorageOld)
+{
+	/* XXX: provide code to check the row for consistency */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int update_sessionEntityTable_row(struct sessionEntityTable_data *StorageTmp, struct sessionEntityTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the set operation (ACTION phase) on a row
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to update, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the COMMIT phase.  The start of the ACTION phase performs a consistency check on
+ * the row before allowing the request to proceed to the COMMIT phase.  The COMMIT phase then
+ * arrives here with consistency already checked (see check_sessionEntityTable_row()).  This function can
+ * return SNMP_ERR_NOERROR or SNMP_ERR_COMMITFAILED.  Values in StorageOld are the values before the
+ * varbinds on the row were applied: the values in StorageTmp are the new values.
+ */
+int
+update_sessionEntityTable_row(struct sessionEntityTable_data *StorageTmp, struct sessionEntityTable_data *StorageOld)
+{
+	/* XXX: provide code to update the row with the underlying device */
+	sessionEntityTable_refresh = 1;
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int revert_sessionEntityTable_row(struct sessionEntityTable_data *StorageTmp, struct sessionEntityTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the undo operation (UNDO phase) on a row
+ */
+void
+revert_sessionEntityTable_row(struct sessionEntityTable_data *StorageTmp, struct sessionEntityTable_data *StorageOld)
+{
+	/* XXX: provide code to revert the row with the underlying device */
+	update_sessionEntityTable_row(StorageOld, NULL);
+}
+
+/**
  * @fn void refresh_sessionEntityTable_row(struct sessionEntityTable_data *StorageTmp, int force)
  * @param StorageTmp the data row to refresh.
  * @param force force refresh if non-zero.
@@ -7763,6 +10409,64 @@ var_sessionEntityTable(struct variable *vp, oid * name, size_t *length, int exac
 		ERROR_MSG("");
 	}
 	return (rval);
+}
+
+/**
+ * @fn int check_sessionSubsystemTable_row(struct sessionSubsystemTable_data *StorageTmp, struct sessionSubsystemTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to check, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the ACTION phase.  The start of the ACTION pahse performs this consitency check
+ * on the row before allowing the request to proceed to the COMMIT phase.  This function can return
+ * SNMP_ERR_NOERR or a specific SNMP error value.  Values in StorageOld are the values before the
+ * varbinds on the mib were applied; the values in StorageTmp are the new values.  The function is
+ * permitted to change the values in StorageTmp to correct them; however, preference should be made
+ * for setting values where were not in the varbinds.
+ */
+int
+check_sessionSubsystemTable_row(struct sessionSubsystemTable_data *StorageTmp, struct sessionSubsystemTable_data *StorageOld)
+{
+	/* XXX: provide code to check the row for consistency */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int update_sessionSubsystemTable_row(struct sessionSubsystemTable_data *StorageTmp, struct sessionSubsystemTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the set operation (ACTION phase) on a row
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to update, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the COMMIT phase.  The start of the ACTION phase performs a consistency check on
+ * the row before allowing the request to proceed to the COMMIT phase.  The COMMIT phase then
+ * arrives here with consistency already checked (see check_sessionSubsystemTable_row()).  This function can
+ * return SNMP_ERR_NOERROR or SNMP_ERR_COMMITFAILED.  Values in StorageOld are the values before the
+ * varbinds on the row were applied: the values in StorageTmp are the new values.
+ */
+int
+update_sessionSubsystemTable_row(struct sessionSubsystemTable_data *StorageTmp, struct sessionSubsystemTable_data *StorageOld)
+{
+	/* XXX: provide code to update the row with the underlying device */
+	sessionSubsystemTable_refresh = 1;
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int revert_sessionSubsystemTable_row(struct sessionSubsystemTable_data *StorageTmp, struct sessionSubsystemTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the undo operation (UNDO phase) on a row
+ */
+void
+revert_sessionSubsystemTable_row(struct sessionSubsystemTable_data *StorageTmp, struct sessionSubsystemTable_data *StorageOld)
+{
+	/* XXX: provide code to revert the row with the underlying device */
+	update_sessionSubsystemTable_row(StorageOld, NULL);
 }
 
 /**
@@ -7844,6 +10548,64 @@ var_sessionSubsystemTable(struct variable *vp, oid * name, size_t *length, int e
 }
 
 /**
+ * @fn int check_acseEntityTable_row(struct acseEntityTable_data *StorageTmp, struct acseEntityTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to check, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the ACTION phase.  The start of the ACTION pahse performs this consitency check
+ * on the row before allowing the request to proceed to the COMMIT phase.  This function can return
+ * SNMP_ERR_NOERR or a specific SNMP error value.  Values in StorageOld are the values before the
+ * varbinds on the mib were applied; the values in StorageTmp are the new values.  The function is
+ * permitted to change the values in StorageTmp to correct them; however, preference should be made
+ * for setting values where were not in the varbinds.
+ */
+int
+check_acseEntityTable_row(struct acseEntityTable_data *StorageTmp, struct acseEntityTable_data *StorageOld)
+{
+	/* XXX: provide code to check the row for consistency */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int update_acseEntityTable_row(struct acseEntityTable_data *StorageTmp, struct acseEntityTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the set operation (ACTION phase) on a row
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to update, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the COMMIT phase.  The start of the ACTION phase performs a consistency check on
+ * the row before allowing the request to proceed to the COMMIT phase.  The COMMIT phase then
+ * arrives here with consistency already checked (see check_acseEntityTable_row()).  This function can
+ * return SNMP_ERR_NOERROR or SNMP_ERR_COMMITFAILED.  Values in StorageOld are the values before the
+ * varbinds on the row were applied: the values in StorageTmp are the new values.
+ */
+int
+update_acseEntityTable_row(struct acseEntityTable_data *StorageTmp, struct acseEntityTable_data *StorageOld)
+{
+	/* XXX: provide code to update the row with the underlying device */
+	acseEntityTable_refresh = 1;
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int revert_acseEntityTable_row(struct acseEntityTable_data *StorageTmp, struct acseEntityTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the undo operation (UNDO phase) on a row
+ */
+void
+revert_acseEntityTable_row(struct acseEntityTable_data *StorageTmp, struct acseEntityTable_data *StorageOld)
+{
+	/* XXX: provide code to revert the row with the underlying device */
+	update_acseEntityTable_row(StorageOld, NULL);
+}
+
+/**
  * @fn void refresh_acseEntityTable_row(struct acseEntityTable_data *StorageTmp, int force)
  * @param StorageTmp the data row to refresh.
  * @param force force refresh if non-zero.
@@ -7919,6 +10681,64 @@ var_acseEntityTable(struct variable *vp, oid * name, size_t *length, int exact, 
 		ERROR_MSG("");
 	}
 	return (rval);
+}
+
+/**
+ * @fn int check_acseAccessPointTable_row(struct acseAccessPointTable_data *StorageTmp, struct acseAccessPointTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to check, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the ACTION phase.  The start of the ACTION pahse performs this consitency check
+ * on the row before allowing the request to proceed to the COMMIT phase.  This function can return
+ * SNMP_ERR_NOERR or a specific SNMP error value.  Values in StorageOld are the values before the
+ * varbinds on the mib were applied; the values in StorageTmp are the new values.  The function is
+ * permitted to change the values in StorageTmp to correct them; however, preference should be made
+ * for setting values where were not in the varbinds.
+ */
+int
+check_acseAccessPointTable_row(struct acseAccessPointTable_data *StorageTmp, struct acseAccessPointTable_data *StorageOld)
+{
+	/* XXX: provide code to check the row for consistency */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int update_acseAccessPointTable_row(struct acseAccessPointTable_data *StorageTmp, struct acseAccessPointTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the set operation (ACTION phase) on a row
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to update, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the COMMIT phase.  The start of the ACTION phase performs a consistency check on
+ * the row before allowing the request to proceed to the COMMIT phase.  The COMMIT phase then
+ * arrives here with consistency already checked (see check_acseAccessPointTable_row()).  This function can
+ * return SNMP_ERR_NOERROR or SNMP_ERR_COMMITFAILED.  Values in StorageOld are the values before the
+ * varbinds on the row were applied: the values in StorageTmp are the new values.
+ */
+int
+update_acseAccessPointTable_row(struct acseAccessPointTable_data *StorageTmp, struct acseAccessPointTable_data *StorageOld)
+{
+	/* XXX: provide code to update the row with the underlying device */
+	acseAccessPointTable_refresh = 1;
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int revert_acseAccessPointTable_row(struct acseAccessPointTable_data *StorageTmp, struct acseAccessPointTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the undo operation (UNDO phase) on a row
+ */
+void
+revert_acseAccessPointTable_row(struct acseAccessPointTable_data *StorageTmp, struct acseAccessPointTable_data *StorageOld)
+{
+	/* XXX: provide code to revert the row with the underlying device */
+	update_acseAccessPointTable_row(StorageOld, NULL);
 }
 
 /**
@@ -8000,6 +10820,64 @@ var_acseAccessPointTable(struct variable *vp, oid * name, size_t *length, int ex
 }
 
 /**
+ * @fn int check_acseLinkageTable_row(struct acseLinkageTable_data *StorageTmp, struct acseLinkageTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to check, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the ACTION phase.  The start of the ACTION pahse performs this consitency check
+ * on the row before allowing the request to proceed to the COMMIT phase.  This function can return
+ * SNMP_ERR_NOERR or a specific SNMP error value.  Values in StorageOld are the values before the
+ * varbinds on the mib were applied; the values in StorageTmp are the new values.  The function is
+ * permitted to change the values in StorageTmp to correct them; however, preference should be made
+ * for setting values where were not in the varbinds.
+ */
+int
+check_acseLinkageTable_row(struct acseLinkageTable_data *StorageTmp, struct acseLinkageTable_data *StorageOld)
+{
+	/* XXX: provide code to check the row for consistency */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int update_acseLinkageTable_row(struct acseLinkageTable_data *StorageTmp, struct acseLinkageTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the set operation (ACTION phase) on a row
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to update, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the COMMIT phase.  The start of the ACTION phase performs a consistency check on
+ * the row before allowing the request to proceed to the COMMIT phase.  The COMMIT phase then
+ * arrives here with consistency already checked (see check_acseLinkageTable_row()).  This function can
+ * return SNMP_ERR_NOERROR or SNMP_ERR_COMMITFAILED.  Values in StorageOld are the values before the
+ * varbinds on the row were applied: the values in StorageTmp are the new values.
+ */
+int
+update_acseLinkageTable_row(struct acseLinkageTable_data *StorageTmp, struct acseLinkageTable_data *StorageOld)
+{
+	/* XXX: provide code to update the row with the underlying device */
+	acseLinkageTable_refresh = 1;
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int revert_acseLinkageTable_row(struct acseLinkageTable_data *StorageTmp, struct acseLinkageTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the undo operation (UNDO phase) on a row
+ */
+void
+revert_acseLinkageTable_row(struct acseLinkageTable_data *StorageTmp, struct acseLinkageTable_data *StorageOld)
+{
+	/* XXX: provide code to revert the row with the underlying device */
+	update_acseLinkageTable_row(StorageOld, NULL);
+}
+
+/**
  * @fn void refresh_acseLinkageTable_row(struct acseLinkageTable_data *StorageTmp, int force)
  * @param StorageTmp the data row to refresh.
  * @param force force refresh if non-zero.
@@ -8078,435 +10956,717 @@ var_acseLinkageTable(struct variable *vp, oid * name, size_t *length, int exact,
 }
 
 /**
- * @fn int acseTable_consistent(struct acseTable_data *thedata)
- * @param thedata the row data to check for consistency.
- * @brief check the internal consistency of a table row.
+ * @fn int can_act_acseAssociationTable_row(struct acseAssociationTable_data *StorageTmp)
+ * @param StorageTmp the data (as updated)
+ * @brief check whether an inactive table row can be activated
  *
- * This function checks the internal consistency of a table row for the acseTable table.  If the
- * table row is internally consistent, then this function returns SNMP_ERR_NOERROR, otherwise the
- * function returns an SNMP error code and it will not be possible to activate the row until the
- * row's internal consistency is corrected.  This function might use a 'test' operation against the
- * driver to ensure that the commit phase will succeed.
+ * This function is used by the ACTION phase of a RowStatus object to test whether an inactive table
+ * row can be activated.  Returns SNMP_ERR_NOERROR when activation is permitted; an SNMP error
+ * value, otherwise.  This function might use a 'test' operation against the driver to ensure that
+ * the commit phase will succeed.
  */
 int
-acseTable_consistent(struct acseTable_data *thedata)
+can_act_acseAssociationTable_row(struct acseAssociationTable_data *StorageTmp)
 {
-	/* XXX: check row consistency return SNMP_ERR_NOERROR if consistent, or an SNMP error code if not. */
-	return (SNMP_ERR_NOERROR);
+	/* XXX: provide code to check whether the new or inactive table row can be activated */
+	return SNMP_ERR_NOERROR;
 }
 
 /**
- * @fn int acseAssociationTable_consistent(struct acseAssociationTable_data *thedata)
- * @param thedata the row data to check for consistency.
- * @brief check the internal consistency of a table row.
+ * @fn int can_deact_acseAssociationTable_row(struct acseAssociationTable_data *StorageTmp)
+ * @param StorageTmp the data (as updated)
+ * @brief check whether an active table row can be deactivated
  *
- * This function checks the internal consistency of a table row for the acseAssociationTable table.  If the
- * table row is internally consistent, then this function returns SNMP_ERR_NOERROR, otherwise the
- * function returns an SNMP error code and it will not be possible to activate the row until the
- * row's internal consistency is corrected.  This function might use a 'test' operation against the
- * driver to ensure that the commit phase will succeed.
+ * This function is used by the ACTION phase of a RowStatus object to test whether an active table
+ * row can be deactivated.  Returns SNMP_ERR_NOERROR when deactivation is permitted; an SNMP error
+ * value, otherwise.  This function might use a 'test' operation against the driver to ensure that
+ * the commit phase will succeed.
  */
 int
-acseAssociationTable_consistent(struct acseAssociationTable_data *thedata)
+can_deact_acseAssociationTable_row(struct acseAssociationTable_data *StorageTmp)
 {
-	/* XXX: check row consistency return SNMP_ERR_NOERROR if consistent, or an SNMP error code if not. */
-	return (SNMP_ERR_NOERROR);
+	/* XXX: provide code to check whether the active table row can be deactivated */
+	return SNMP_ERR_NOERROR;
 }
 
 /**
- * @fn int apInvocationTable_consistent(struct apInvocationTable_data *thedata)
- * @param thedata the row data to check for consistency.
- * @brief check the internal consistency of a table row.
+ * @fn int can_act_apInvocationTable_row(struct apInvocationTable_data *StorageTmp)
+ * @param StorageTmp the data (as updated)
+ * @brief check whether an inactive table row can be activated
  *
- * This function checks the internal consistency of a table row for the apInvocationTable table.  If the
- * table row is internally consistent, then this function returns SNMP_ERR_NOERROR, otherwise the
- * function returns an SNMP error code and it will not be possible to activate the row until the
- * row's internal consistency is corrected.  This function might use a 'test' operation against the
- * driver to ensure that the commit phase will succeed.
+ * This function is used by the ACTION phase of a RowStatus object to test whether an inactive table
+ * row can be activated.  Returns SNMP_ERR_NOERROR when activation is permitted; an SNMP error
+ * value, otherwise.  This function might use a 'test' operation against the driver to ensure that
+ * the commit phase will succeed.
  */
 int
-apInvocationTable_consistent(struct apInvocationTable_data *thedata)
+can_act_apInvocationTable_row(struct apInvocationTable_data *StorageTmp)
 {
-	/* XXX: check row consistency return SNMP_ERR_NOERROR if consistent, or an SNMP error code if not. */
-	return (SNMP_ERR_NOERROR);
+	/* XXX: provide code to check whether the new or inactive table row can be activated */
+	return SNMP_ERR_NOERROR;
 }
 
 /**
- * @fn int applicationEntityInvocationTable_consistent(struct applicationEntityInvocationTable_data *thedata)
- * @param thedata the row data to check for consistency.
- * @brief check the internal consistency of a table row.
+ * @fn int can_deact_apInvocationTable_row(struct apInvocationTable_data *StorageTmp)
+ * @param StorageTmp the data (as updated)
+ * @brief check whether an active table row can be deactivated
  *
- * This function checks the internal consistency of a table row for the applicationEntityInvocationTable table.  If the
- * table row is internally consistent, then this function returns SNMP_ERR_NOERROR, otherwise the
- * function returns an SNMP error code and it will not be possible to activate the row until the
- * row's internal consistency is corrected.  This function might use a 'test' operation against the
- * driver to ensure that the commit phase will succeed.
+ * This function is used by the ACTION phase of a RowStatus object to test whether an active table
+ * row can be deactivated.  Returns SNMP_ERR_NOERROR when deactivation is permitted; an SNMP error
+ * value, otherwise.  This function might use a 'test' operation against the driver to ensure that
+ * the commit phase will succeed.
  */
 int
-applicationEntityInvocationTable_consistent(struct applicationEntityInvocationTable_data *thedata)
+can_deact_apInvocationTable_row(struct apInvocationTable_data *StorageTmp)
 {
-	/* XXX: check row consistency return SNMP_ERR_NOERROR if consistent, or an SNMP error code if not. */
-	return (SNMP_ERR_NOERROR);
+	/* XXX: provide code to check whether the active table row can be deactivated */
+	return SNMP_ERR_NOERROR;
 }
 
 /**
- * @fn int applicationSubsystemTable_consistent(struct applicationSubsystemTable_data *thedata)
- * @param thedata the row data to check for consistency.
- * @brief check the internal consistency of a table row.
+ * @fn int can_act_applicationEntityInvocationTable_row(struct applicationEntityInvocationTable_data *StorageTmp)
+ * @param StorageTmp the data (as updated)
+ * @brief check whether an inactive table row can be activated
  *
- * This function checks the internal consistency of a table row for the applicationSubsystemTable table.  If the
- * table row is internally consistent, then this function returns SNMP_ERR_NOERROR, otherwise the
- * function returns an SNMP error code and it will not be possible to activate the row until the
- * row's internal consistency is corrected.  This function might use a 'test' operation against the
- * driver to ensure that the commit phase will succeed.
+ * This function is used by the ACTION phase of a RowStatus object to test whether an inactive table
+ * row can be activated.  Returns SNMP_ERR_NOERROR when activation is permitted; an SNMP error
+ * value, otherwise.  This function might use a 'test' operation against the driver to ensure that
+ * the commit phase will succeed.
  */
 int
-applicationSubsystemTable_consistent(struct applicationSubsystemTable_data *thedata)
+can_act_applicationEntityInvocationTable_row(struct applicationEntityInvocationTable_data *StorageTmp)
 {
-	/* XXX: check row consistency return SNMP_ERR_NOERROR if consistent, or an SNMP error code if not. */
-	return (SNMP_ERR_NOERROR);
+	/* XXX: provide code to check whether the new or inactive table row can be activated */
+	return SNMP_ERR_NOERROR;
 }
 
 /**
- * @fn int asoTable_consistent(struct asoTable_data *thedata)
- * @param thedata the row data to check for consistency.
- * @brief check the internal consistency of a table row.
+ * @fn int can_deact_applicationEntityInvocationTable_row(struct applicationEntityInvocationTable_data *StorageTmp)
+ * @param StorageTmp the data (as updated)
+ * @brief check whether an active table row can be deactivated
  *
- * This function checks the internal consistency of a table row for the asoTable table.  If the
- * table row is internally consistent, then this function returns SNMP_ERR_NOERROR, otherwise the
- * function returns an SNMP error code and it will not be possible to activate the row until the
- * row's internal consistency is corrected.  This function might use a 'test' operation against the
- * driver to ensure that the commit phase will succeed.
+ * This function is used by the ACTION phase of a RowStatus object to test whether an active table
+ * row can be deactivated.  Returns SNMP_ERR_NOERROR when deactivation is permitted; an SNMP error
+ * value, otherwise.  This function might use a 'test' operation against the driver to ensure that
+ * the commit phase will succeed.
  */
 int
-asoTable_consistent(struct asoTable_data *thedata)
+can_deact_applicationEntityInvocationTable_row(struct applicationEntityInvocationTable_data *StorageTmp)
 {
-	/* XXX: check row consistency return SNMP_ERR_NOERROR if consistent, or an SNMP error code if not. */
-	return (SNMP_ERR_NOERROR);
+	/* XXX: provide code to check whether the active table row can be deactivated */
+	return SNMP_ERR_NOERROR;
 }
 
 /**
- * @fn int asoEntityTable_consistent(struct asoEntityTable_data *thedata)
- * @param thedata the row data to check for consistency.
- * @brief check the internal consistency of a table row.
+ * @fn int can_act_asoTable_row(struct asoTable_data *StorageTmp)
+ * @param StorageTmp the data (as updated)
+ * @brief check whether an inactive table row can be activated
  *
- * This function checks the internal consistency of a table row for the asoEntityTable table.  If the
- * table row is internally consistent, then this function returns SNMP_ERR_NOERROR, otherwise the
- * function returns an SNMP error code and it will not be possible to activate the row until the
- * row's internal consistency is corrected.  This function might use a 'test' operation against the
- * driver to ensure that the commit phase will succeed.
+ * This function is used by the ACTION phase of a RowStatus object to test whether an inactive table
+ * row can be activated.  Returns SNMP_ERR_NOERROR when activation is permitted; an SNMP error
+ * value, otherwise.  This function might use a 'test' operation against the driver to ensure that
+ * the commit phase will succeed.
  */
 int
-asoEntityTable_consistent(struct asoEntityTable_data *thedata)
+can_act_asoTable_row(struct asoTable_data *StorageTmp)
 {
-	/* XXX: check row consistency return SNMP_ERR_NOERROR if consistent, or an SNMP error code if not. */
-	return (SNMP_ERR_NOERROR);
+	/* XXX: provide code to check whether the new or inactive table row can be activated */
+	return SNMP_ERR_NOERROR;
 }
 
 /**
- * @fn int asoInvocationTable_consistent(struct asoInvocationTable_data *thedata)
- * @param thedata the row data to check for consistency.
- * @brief check the internal consistency of a table row.
+ * @fn int can_deact_asoTable_row(struct asoTable_data *StorageTmp)
+ * @param StorageTmp the data (as updated)
+ * @brief check whether an active table row can be deactivated
  *
- * This function checks the internal consistency of a table row for the asoInvocationTable table.  If the
- * table row is internally consistent, then this function returns SNMP_ERR_NOERROR, otherwise the
- * function returns an SNMP error code and it will not be possible to activate the row until the
- * row's internal consistency is corrected.  This function might use a 'test' operation against the
- * driver to ensure that the commit phase will succeed.
+ * This function is used by the ACTION phase of a RowStatus object to test whether an active table
+ * row can be deactivated.  Returns SNMP_ERR_NOERROR when deactivation is permitted; an SNMP error
+ * value, otherwise.  This function might use a 'test' operation against the driver to ensure that
+ * the commit phase will succeed.
  */
 int
-asoInvocationTable_consistent(struct asoInvocationTable_data *thedata)
+can_deact_asoTable_row(struct asoTable_data *StorageTmp)
 {
-	/* XXX: check row consistency return SNMP_ERR_NOERROR if consistent, or an SNMP error code if not. */
-	return (SNMP_ERR_NOERROR);
+	/* XXX: provide code to check whether the active table row can be deactivated */
+	return SNMP_ERR_NOERROR;
 }
 
 /**
- * @fn int monoULConnectionTable_consistent(struct monoULConnectionTable_data *thedata)
- * @param thedata the row data to check for consistency.
- * @brief check the internal consistency of a table row.
+ * @fn int can_act_asoEntityTable_row(struct asoEntityTable_data *StorageTmp)
+ * @param StorageTmp the data (as updated)
+ * @brief check whether an inactive table row can be activated
  *
- * This function checks the internal consistency of a table row for the monoULConnectionTable table.  If the
- * table row is internally consistent, then this function returns SNMP_ERR_NOERROR, otherwise the
- * function returns an SNMP error code and it will not be possible to activate the row until the
- * row's internal consistency is corrected.  This function might use a 'test' operation against the
- * driver to ensure that the commit phase will succeed.
+ * This function is used by the ACTION phase of a RowStatus object to test whether an inactive table
+ * row can be activated.  Returns SNMP_ERR_NOERROR when activation is permitted; an SNMP error
+ * value, otherwise.  This function might use a 'test' operation against the driver to ensure that
+ * the commit phase will succeed.
  */
 int
-monoULConnectionTable_consistent(struct monoULConnectionTable_data *thedata)
+can_act_asoEntityTable_row(struct asoEntityTable_data *StorageTmp)
 {
-	/* XXX: check row consistency return SNMP_ERR_NOERROR if consistent, or an SNMP error code if not. */
-	return (SNMP_ERR_NOERROR);
+	/* XXX: provide code to check whether the new or inactive table row can be activated */
+	return SNMP_ERR_NOERROR;
 }
 
 /**
- * @fn int monoULEntityTable_consistent(struct monoULEntityTable_data *thedata)
- * @param thedata the row data to check for consistency.
- * @brief check the internal consistency of a table row.
+ * @fn int can_deact_asoEntityTable_row(struct asoEntityTable_data *StorageTmp)
+ * @param StorageTmp the data (as updated)
+ * @brief check whether an active table row can be deactivated
  *
- * This function checks the internal consistency of a table row for the monoULEntityTable table.  If the
- * table row is internally consistent, then this function returns SNMP_ERR_NOERROR, otherwise the
- * function returns an SNMP error code and it will not be possible to activate the row until the
- * row's internal consistency is corrected.  This function might use a 'test' operation against the
- * driver to ensure that the commit phase will succeed.
+ * This function is used by the ACTION phase of a RowStatus object to test whether an active table
+ * row can be deactivated.  Returns SNMP_ERR_NOERROR when deactivation is permitted; an SNMP error
+ * value, otherwise.  This function might use a 'test' operation against the driver to ensure that
+ * the commit phase will succeed.
  */
 int
-monoULEntityTable_consistent(struct monoULEntityTable_data *thedata)
+can_deact_asoEntityTable_row(struct asoEntityTable_data *StorageTmp)
 {
-	/* XXX: check row consistency return SNMP_ERR_NOERROR if consistent, or an SNMP error code if not. */
-	return (SNMP_ERR_NOERROR);
+	/* XXX: provide code to check whether the active table row can be deactivated */
+	return SNMP_ERR_NOERROR;
 }
 
 /**
- * @fn int monolithicUpperLayerSubsystemTable_consistent(struct monolithicUpperLayerSubsystemTable_data *thedata)
- * @param thedata the row data to check for consistency.
- * @brief check the internal consistency of a table row.
+ * @fn int can_act_asoInvocationTable_row(struct asoInvocationTable_data *StorageTmp)
+ * @param StorageTmp the data (as updated)
+ * @brief check whether an inactive table row can be activated
  *
- * This function checks the internal consistency of a table row for the monolithicUpperLayerSubsystemTable table.  If the
- * table row is internally consistent, then this function returns SNMP_ERR_NOERROR, otherwise the
- * function returns an SNMP error code and it will not be possible to activate the row until the
- * row's internal consistency is corrected.  This function might use a 'test' operation against the
- * driver to ensure that the commit phase will succeed.
+ * This function is used by the ACTION phase of a RowStatus object to test whether an inactive table
+ * row can be activated.  Returns SNMP_ERR_NOERROR when activation is permitted; an SNMP error
+ * value, otherwise.  This function might use a 'test' operation against the driver to ensure that
+ * the commit phase will succeed.
  */
 int
-monolithicUpperLayerSubsystemTable_consistent(struct monolithicUpperLayerSubsystemTable_data *thedata)
+can_act_asoInvocationTable_row(struct asoInvocationTable_data *StorageTmp)
 {
-	/* XXX: check row consistency return SNMP_ERR_NOERROR if consistent, or an SNMP error code if not. */
-	return (SNMP_ERR_NOERROR);
+	/* XXX: provide code to check whether the new or inactive table row can be activated */
+	return SNMP_ERR_NOERROR;
 }
 
 /**
- * @fn int pSapTable_consistent(struct pSapTable_data *thedata)
- * @param thedata the row data to check for consistency.
- * @brief check the internal consistency of a table row.
+ * @fn int can_deact_asoInvocationTable_row(struct asoInvocationTable_data *StorageTmp)
+ * @param StorageTmp the data (as updated)
+ * @brief check whether an active table row can be deactivated
  *
- * This function checks the internal consistency of a table row for the pSapTable table.  If the
- * table row is internally consistent, then this function returns SNMP_ERR_NOERROR, otherwise the
- * function returns an SNMP error code and it will not be possible to activate the row until the
- * row's internal consistency is corrected.  This function might use a 'test' operation against the
- * driver to ensure that the commit phase will succeed.
+ * This function is used by the ACTION phase of a RowStatus object to test whether an active table
+ * row can be deactivated.  Returns SNMP_ERR_NOERROR when deactivation is permitted; an SNMP error
+ * value, otherwise.  This function might use a 'test' operation against the driver to ensure that
+ * the commit phase will succeed.
  */
 int
-pSapTable_consistent(struct pSapTable_data *thedata)
+can_deact_asoInvocationTable_row(struct asoInvocationTable_data *StorageTmp)
 {
-	/* XXX: check row consistency return SNMP_ERR_NOERROR if consistent, or an SNMP error code if not. */
-	return (SNMP_ERR_NOERROR);
+	/* XXX: provide code to check whether the active table row can be deactivated */
+	return SNMP_ERR_NOERROR;
 }
 
 /**
- * @fn int presentationConnectionTable_consistent(struct presentationConnectionTable_data *thedata)
- * @param thedata the row data to check for consistency.
- * @brief check the internal consistency of a table row.
+ * @fn int can_act_monoULConnectionTable_row(struct monoULConnectionTable_data *StorageTmp)
+ * @param StorageTmp the data (as updated)
+ * @brief check whether an inactive table row can be activated
  *
- * This function checks the internal consistency of a table row for the presentationConnectionTable table.  If the
- * table row is internally consistent, then this function returns SNMP_ERR_NOERROR, otherwise the
- * function returns an SNMP error code and it will not be possible to activate the row until the
- * row's internal consistency is corrected.  This function might use a 'test' operation against the
- * driver to ensure that the commit phase will succeed.
+ * This function is used by the ACTION phase of a RowStatus object to test whether an inactive table
+ * row can be activated.  Returns SNMP_ERR_NOERROR when activation is permitted; an SNMP error
+ * value, otherwise.  This function might use a 'test' operation against the driver to ensure that
+ * the commit phase will succeed.
  */
 int
-presentationConnectionTable_consistent(struct presentationConnectionTable_data *thedata)
+can_act_monoULConnectionTable_row(struct monoULConnectionTable_data *StorageTmp)
 {
-	/* XXX: check row consistency return SNMP_ERR_NOERROR if consistent, or an SNMP error code if not. */
-	return (SNMP_ERR_NOERROR);
+	/* XXX: provide code to check whether the new or inactive table row can be activated */
+	return SNMP_ERR_NOERROR;
 }
 
 /**
- * @fn int presentationCopmTable_consistent(struct presentationCopmTable_data *thedata)
- * @param thedata the row data to check for consistency.
- * @brief check the internal consistency of a table row.
+ * @fn int can_deact_monoULConnectionTable_row(struct monoULConnectionTable_data *StorageTmp)
+ * @param StorageTmp the data (as updated)
+ * @brief check whether an active table row can be deactivated
  *
- * This function checks the internal consistency of a table row for the presentationCopmTable table.  If the
- * table row is internally consistent, then this function returns SNMP_ERR_NOERROR, otherwise the
- * function returns an SNMP error code and it will not be possible to activate the row until the
- * row's internal consistency is corrected.  This function might use a 'test' operation against the
- * driver to ensure that the commit phase will succeed.
+ * This function is used by the ACTION phase of a RowStatus object to test whether an active table
+ * row can be deactivated.  Returns SNMP_ERR_NOERROR when deactivation is permitted; an SNMP error
+ * value, otherwise.  This function might use a 'test' operation against the driver to ensure that
+ * the commit phase will succeed.
  */
 int
-presentationCopmTable_consistent(struct presentationCopmTable_data *thedata)
+can_deact_monoULConnectionTable_row(struct monoULConnectionTable_data *StorageTmp)
 {
-	/* XXX: check row consistency return SNMP_ERR_NOERROR if consistent, or an SNMP error code if not. */
-	return (SNMP_ERR_NOERROR);
+	/* XXX: provide code to check whether the active table row can be deactivated */
+	return SNMP_ERR_NOERROR;
 }
 
 /**
- * @fn int presentationEntityTable_consistent(struct presentationEntityTable_data *thedata)
- * @param thedata the row data to check for consistency.
- * @brief check the internal consistency of a table row.
+ * @fn int can_act_monolithicUpperLayerSubsystemTable_row(struct monolithicUpperLayerSubsystemTable_data *StorageTmp)
+ * @param StorageTmp the data (as updated)
+ * @brief check whether an inactive table row can be activated
  *
- * This function checks the internal consistency of a table row for the presentationEntityTable table.  If the
- * table row is internally consistent, then this function returns SNMP_ERR_NOERROR, otherwise the
- * function returns an SNMP error code and it will not be possible to activate the row until the
- * row's internal consistency is corrected.  This function might use a 'test' operation against the
- * driver to ensure that the commit phase will succeed.
+ * This function is used by the ACTION phase of a RowStatus object to test whether an inactive table
+ * row can be activated.  Returns SNMP_ERR_NOERROR when activation is permitted; an SNMP error
+ * value, otherwise.  This function might use a 'test' operation against the driver to ensure that
+ * the commit phase will succeed.
  */
 int
-presentationEntityTable_consistent(struct presentationEntityTable_data *thedata)
+can_act_monolithicUpperLayerSubsystemTable_row(struct monolithicUpperLayerSubsystemTable_data *StorageTmp)
 {
-	/* XXX: check row consistency return SNMP_ERR_NOERROR if consistent, or an SNMP error code if not. */
-	return (SNMP_ERR_NOERROR);
+	/* XXX: provide code to check whether the new or inactive table row can be activated */
+	return SNMP_ERR_NOERROR;
 }
 
 /**
- * @fn int presentationSubsystemTable_consistent(struct presentationSubsystemTable_data *thedata)
- * @param thedata the row data to check for consistency.
- * @brief check the internal consistency of a table row.
+ * @fn int can_deact_monolithicUpperLayerSubsystemTable_row(struct monolithicUpperLayerSubsystemTable_data *StorageTmp)
+ * @param StorageTmp the data (as updated)
+ * @brief check whether an active table row can be deactivated
  *
- * This function checks the internal consistency of a table row for the presentationSubsystemTable table.  If the
- * table row is internally consistent, then this function returns SNMP_ERR_NOERROR, otherwise the
- * function returns an SNMP error code and it will not be possible to activate the row until the
- * row's internal consistency is corrected.  This function might use a 'test' operation against the
- * driver to ensure that the commit phase will succeed.
+ * This function is used by the ACTION phase of a RowStatus object to test whether an active table
+ * row can be deactivated.  Returns SNMP_ERR_NOERROR when deactivation is permitted; an SNMP error
+ * value, otherwise.  This function might use a 'test' operation against the driver to ensure that
+ * the commit phase will succeed.
  */
 int
-presentationSubsystemTable_consistent(struct presentationSubsystemTable_data *thedata)
+can_deact_monolithicUpperLayerSubsystemTable_row(struct monolithicUpperLayerSubsystemTable_data *StorageTmp)
 {
-	/* XXX: check row consistency return SNMP_ERR_NOERROR if consistent, or an SNMP error code if not. */
-	return (SNMP_ERR_NOERROR);
+	/* XXX: provide code to check whether the active table row can be deactivated */
+	return SNMP_ERR_NOERROR;
 }
 
 /**
- * @fn int sSapTable_consistent(struct sSapTable_data *thedata)
- * @param thedata the row data to check for consistency.
- * @brief check the internal consistency of a table row.
+ * @fn int can_act_pSapTable_row(struct pSapTable_data *StorageTmp)
+ * @param StorageTmp the data (as updated)
+ * @brief check whether an inactive table row can be activated
  *
- * This function checks the internal consistency of a table row for the sSapTable table.  If the
- * table row is internally consistent, then this function returns SNMP_ERR_NOERROR, otherwise the
- * function returns an SNMP error code and it will not be possible to activate the row until the
- * row's internal consistency is corrected.  This function might use a 'test' operation against the
- * driver to ensure that the commit phase will succeed.
+ * This function is used by the ACTION phase of a RowStatus object to test whether an inactive table
+ * row can be activated.  Returns SNMP_ERR_NOERROR when activation is permitted; an SNMP error
+ * value, otherwise.  This function might use a 'test' operation against the driver to ensure that
+ * the commit phase will succeed.
  */
 int
-sSapTable_consistent(struct sSapTable_data *thedata)
+can_act_pSapTable_row(struct pSapTable_data *StorageTmp)
 {
-	/* XXX: check row consistency return SNMP_ERR_NOERROR if consistent, or an SNMP error code if not. */
-	return (SNMP_ERR_NOERROR);
+	/* XXX: provide code to check whether the new or inactive table row can be activated */
+	return SNMP_ERR_NOERROR;
 }
 
 /**
- * @fn int sessionConnectionTable_consistent(struct sessionConnectionTable_data *thedata)
- * @param thedata the row data to check for consistency.
- * @brief check the internal consistency of a table row.
+ * @fn int can_deact_pSapTable_row(struct pSapTable_data *StorageTmp)
+ * @param StorageTmp the data (as updated)
+ * @brief check whether an active table row can be deactivated
  *
- * This function checks the internal consistency of a table row for the sessionConnectionTable table.  If the
- * table row is internally consistent, then this function returns SNMP_ERR_NOERROR, otherwise the
- * function returns an SNMP error code and it will not be possible to activate the row until the
- * row's internal consistency is corrected.  This function might use a 'test' operation against the
- * driver to ensure that the commit phase will succeed.
+ * This function is used by the ACTION phase of a RowStatus object to test whether an active table
+ * row can be deactivated.  Returns SNMP_ERR_NOERROR when deactivation is permitted; an SNMP error
+ * value, otherwise.  This function might use a 'test' operation against the driver to ensure that
+ * the commit phase will succeed.
  */
 int
-sessionConnectionTable_consistent(struct sessionConnectionTable_data *thedata)
+can_deact_pSapTable_row(struct pSapTable_data *StorageTmp)
 {
-	/* XXX: check row consistency return SNMP_ERR_NOERROR if consistent, or an SNMP error code if not. */
-	return (SNMP_ERR_NOERROR);
+	/* XXX: provide code to check whether the active table row can be deactivated */
+	return SNMP_ERR_NOERROR;
 }
 
 /**
- * @fn int sessionCopmTable_consistent(struct sessionCopmTable_data *thedata)
- * @param thedata the row data to check for consistency.
- * @brief check the internal consistency of a table row.
+ * @fn int can_act_presentationConnectionTable_row(struct presentationConnectionTable_data *StorageTmp)
+ * @param StorageTmp the data (as updated)
+ * @brief check whether an inactive table row can be activated
  *
- * This function checks the internal consistency of a table row for the sessionCopmTable table.  If the
- * table row is internally consistent, then this function returns SNMP_ERR_NOERROR, otherwise the
- * function returns an SNMP error code and it will not be possible to activate the row until the
- * row's internal consistency is corrected.  This function might use a 'test' operation against the
- * driver to ensure that the commit phase will succeed.
+ * This function is used by the ACTION phase of a RowStatus object to test whether an inactive table
+ * row can be activated.  Returns SNMP_ERR_NOERROR when activation is permitted; an SNMP error
+ * value, otherwise.  This function might use a 'test' operation against the driver to ensure that
+ * the commit phase will succeed.
  */
 int
-sessionCopmTable_consistent(struct sessionCopmTable_data *thedata)
+can_act_presentationConnectionTable_row(struct presentationConnectionTable_data *StorageTmp)
 {
-	/* XXX: check row consistency return SNMP_ERR_NOERROR if consistent, or an SNMP error code if not. */
-	return (SNMP_ERR_NOERROR);
+	/* XXX: provide code to check whether the new or inactive table row can be activated */
+	return SNMP_ERR_NOERROR;
 }
 
 /**
- * @fn int sessionEntityTable_consistent(struct sessionEntityTable_data *thedata)
- * @param thedata the row data to check for consistency.
- * @brief check the internal consistency of a table row.
+ * @fn int can_deact_presentationConnectionTable_row(struct presentationConnectionTable_data *StorageTmp)
+ * @param StorageTmp the data (as updated)
+ * @brief check whether an active table row can be deactivated
  *
- * This function checks the internal consistency of a table row for the sessionEntityTable table.  If the
- * table row is internally consistent, then this function returns SNMP_ERR_NOERROR, otherwise the
- * function returns an SNMP error code and it will not be possible to activate the row until the
- * row's internal consistency is corrected.  This function might use a 'test' operation against the
- * driver to ensure that the commit phase will succeed.
+ * This function is used by the ACTION phase of a RowStatus object to test whether an active table
+ * row can be deactivated.  Returns SNMP_ERR_NOERROR when deactivation is permitted; an SNMP error
+ * value, otherwise.  This function might use a 'test' operation against the driver to ensure that
+ * the commit phase will succeed.
  */
 int
-sessionEntityTable_consistent(struct sessionEntityTable_data *thedata)
+can_deact_presentationConnectionTable_row(struct presentationConnectionTable_data *StorageTmp)
 {
-	/* XXX: check row consistency return SNMP_ERR_NOERROR if consistent, or an SNMP error code if not. */
-	return (SNMP_ERR_NOERROR);
+	/* XXX: provide code to check whether the active table row can be deactivated */
+	return SNMP_ERR_NOERROR;
 }
 
 /**
- * @fn int sessionSubsystemTable_consistent(struct sessionSubsystemTable_data *thedata)
- * @param thedata the row data to check for consistency.
- * @brief check the internal consistency of a table row.
+ * @fn int can_act_presentationCopmTable_row(struct presentationCopmTable_data *StorageTmp)
+ * @param StorageTmp the data (as updated)
+ * @brief check whether an inactive table row can be activated
  *
- * This function checks the internal consistency of a table row for the sessionSubsystemTable table.  If the
- * table row is internally consistent, then this function returns SNMP_ERR_NOERROR, otherwise the
- * function returns an SNMP error code and it will not be possible to activate the row until the
- * row's internal consistency is corrected.  This function might use a 'test' operation against the
- * driver to ensure that the commit phase will succeed.
+ * This function is used by the ACTION phase of a RowStatus object to test whether an inactive table
+ * row can be activated.  Returns SNMP_ERR_NOERROR when activation is permitted; an SNMP error
+ * value, otherwise.  This function might use a 'test' operation against the driver to ensure that
+ * the commit phase will succeed.
  */
 int
-sessionSubsystemTable_consistent(struct sessionSubsystemTable_data *thedata)
+can_act_presentationCopmTable_row(struct presentationCopmTable_data *StorageTmp)
 {
-	/* XXX: check row consistency return SNMP_ERR_NOERROR if consistent, or an SNMP error code if not. */
-	return (SNMP_ERR_NOERROR);
+	/* XXX: provide code to check whether the new or inactive table row can be activated */
+	return SNMP_ERR_NOERROR;
 }
 
 /**
- * @fn int acseEntityTable_consistent(struct acseEntityTable_data *thedata)
- * @param thedata the row data to check for consistency.
- * @brief check the internal consistency of a table row.
+ * @fn int can_deact_presentationCopmTable_row(struct presentationCopmTable_data *StorageTmp)
+ * @param StorageTmp the data (as updated)
+ * @brief check whether an active table row can be deactivated
  *
- * This function checks the internal consistency of a table row for the acseEntityTable table.  If the
- * table row is internally consistent, then this function returns SNMP_ERR_NOERROR, otherwise the
- * function returns an SNMP error code and it will not be possible to activate the row until the
- * row's internal consistency is corrected.  This function might use a 'test' operation against the
- * driver to ensure that the commit phase will succeed.
+ * This function is used by the ACTION phase of a RowStatus object to test whether an active table
+ * row can be deactivated.  Returns SNMP_ERR_NOERROR when deactivation is permitted; an SNMP error
+ * value, otherwise.  This function might use a 'test' operation against the driver to ensure that
+ * the commit phase will succeed.
  */
 int
-acseEntityTable_consistent(struct acseEntityTable_data *thedata)
+can_deact_presentationCopmTable_row(struct presentationCopmTable_data *StorageTmp)
 {
-	/* XXX: check row consistency return SNMP_ERR_NOERROR if consistent, or an SNMP error code if not. */
-	return (SNMP_ERR_NOERROR);
+	/* XXX: provide code to check whether the active table row can be deactivated */
+	return SNMP_ERR_NOERROR;
 }
 
 /**
- * @fn int acseAccessPointTable_consistent(struct acseAccessPointTable_data *thedata)
- * @param thedata the row data to check for consistency.
- * @brief check the internal consistency of a table row.
+ * @fn int can_act_presentationEntityTable_row(struct presentationEntityTable_data *StorageTmp)
+ * @param StorageTmp the data (as updated)
+ * @brief check whether an inactive table row can be activated
  *
- * This function checks the internal consistency of a table row for the acseAccessPointTable table.  If the
- * table row is internally consistent, then this function returns SNMP_ERR_NOERROR, otherwise the
- * function returns an SNMP error code and it will not be possible to activate the row until the
- * row's internal consistency is corrected.  This function might use a 'test' operation against the
- * driver to ensure that the commit phase will succeed.
+ * This function is used by the ACTION phase of a RowStatus object to test whether an inactive table
+ * row can be activated.  Returns SNMP_ERR_NOERROR when activation is permitted; an SNMP error
+ * value, otherwise.  This function might use a 'test' operation against the driver to ensure that
+ * the commit phase will succeed.
  */
 int
-acseAccessPointTable_consistent(struct acseAccessPointTable_data *thedata)
+can_act_presentationEntityTable_row(struct presentationEntityTable_data *StorageTmp)
 {
-	/* XXX: check row consistency return SNMP_ERR_NOERROR if consistent, or an SNMP error code if not. */
-	return (SNMP_ERR_NOERROR);
+	/* XXX: provide code to check whether the new or inactive table row can be activated */
+	return SNMP_ERR_NOERROR;
 }
 
 /**
- * @fn int acseLinkageTable_consistent(struct acseLinkageTable_data *thedata)
- * @param thedata the row data to check for consistency.
- * @brief check the internal consistency of a table row.
+ * @fn int can_deact_presentationEntityTable_row(struct presentationEntityTable_data *StorageTmp)
+ * @param StorageTmp the data (as updated)
+ * @brief check whether an active table row can be deactivated
  *
- * This function checks the internal consistency of a table row for the acseLinkageTable table.  If the
- * table row is internally consistent, then this function returns SNMP_ERR_NOERROR, otherwise the
- * function returns an SNMP error code and it will not be possible to activate the row until the
- * row's internal consistency is corrected.  This function might use a 'test' operation against the
- * driver to ensure that the commit phase will succeed.
+ * This function is used by the ACTION phase of a RowStatus object to test whether an active table
+ * row can be deactivated.  Returns SNMP_ERR_NOERROR when deactivation is permitted; an SNMP error
+ * value, otherwise.  This function might use a 'test' operation against the driver to ensure that
+ * the commit phase will succeed.
  */
 int
-acseLinkageTable_consistent(struct acseLinkageTable_data *thedata)
+can_deact_presentationEntityTable_row(struct presentationEntityTable_data *StorageTmp)
 {
-	/* XXX: check row consistency return SNMP_ERR_NOERROR if consistent, or an SNMP error code if not. */
-	return (SNMP_ERR_NOERROR);
+	/* XXX: provide code to check whether the active table row can be deactivated */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int can_act_presentationSubsystemTable_row(struct presentationSubsystemTable_data *StorageTmp)
+ * @param StorageTmp the data (as updated)
+ * @brief check whether an inactive table row can be activated
+ *
+ * This function is used by the ACTION phase of a RowStatus object to test whether an inactive table
+ * row can be activated.  Returns SNMP_ERR_NOERROR when activation is permitted; an SNMP error
+ * value, otherwise.  This function might use a 'test' operation against the driver to ensure that
+ * the commit phase will succeed.
+ */
+int
+can_act_presentationSubsystemTable_row(struct presentationSubsystemTable_data *StorageTmp)
+{
+	/* XXX: provide code to check whether the new or inactive table row can be activated */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int can_deact_presentationSubsystemTable_row(struct presentationSubsystemTable_data *StorageTmp)
+ * @param StorageTmp the data (as updated)
+ * @brief check whether an active table row can be deactivated
+ *
+ * This function is used by the ACTION phase of a RowStatus object to test whether an active table
+ * row can be deactivated.  Returns SNMP_ERR_NOERROR when deactivation is permitted; an SNMP error
+ * value, otherwise.  This function might use a 'test' operation against the driver to ensure that
+ * the commit phase will succeed.
+ */
+int
+can_deact_presentationSubsystemTable_row(struct presentationSubsystemTable_data *StorageTmp)
+{
+	/* XXX: provide code to check whether the active table row can be deactivated */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int can_act_sSapTable_row(struct sSapTable_data *StorageTmp)
+ * @param StorageTmp the data (as updated)
+ * @brief check whether an inactive table row can be activated
+ *
+ * This function is used by the ACTION phase of a RowStatus object to test whether an inactive table
+ * row can be activated.  Returns SNMP_ERR_NOERROR when activation is permitted; an SNMP error
+ * value, otherwise.  This function might use a 'test' operation against the driver to ensure that
+ * the commit phase will succeed.
+ */
+int
+can_act_sSapTable_row(struct sSapTable_data *StorageTmp)
+{
+	/* XXX: provide code to check whether the new or inactive table row can be activated */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int can_deact_sSapTable_row(struct sSapTable_data *StorageTmp)
+ * @param StorageTmp the data (as updated)
+ * @brief check whether an active table row can be deactivated
+ *
+ * This function is used by the ACTION phase of a RowStatus object to test whether an active table
+ * row can be deactivated.  Returns SNMP_ERR_NOERROR when deactivation is permitted; an SNMP error
+ * value, otherwise.  This function might use a 'test' operation against the driver to ensure that
+ * the commit phase will succeed.
+ */
+int
+can_deact_sSapTable_row(struct sSapTable_data *StorageTmp)
+{
+	/* XXX: provide code to check whether the active table row can be deactivated */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int can_act_sessionConnectionTable_row(struct sessionConnectionTable_data *StorageTmp)
+ * @param StorageTmp the data (as updated)
+ * @brief check whether an inactive table row can be activated
+ *
+ * This function is used by the ACTION phase of a RowStatus object to test whether an inactive table
+ * row can be activated.  Returns SNMP_ERR_NOERROR when activation is permitted; an SNMP error
+ * value, otherwise.  This function might use a 'test' operation against the driver to ensure that
+ * the commit phase will succeed.
+ */
+int
+can_act_sessionConnectionTable_row(struct sessionConnectionTable_data *StorageTmp)
+{
+	/* XXX: provide code to check whether the new or inactive table row can be activated */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int can_deact_sessionConnectionTable_row(struct sessionConnectionTable_data *StorageTmp)
+ * @param StorageTmp the data (as updated)
+ * @brief check whether an active table row can be deactivated
+ *
+ * This function is used by the ACTION phase of a RowStatus object to test whether an active table
+ * row can be deactivated.  Returns SNMP_ERR_NOERROR when deactivation is permitted; an SNMP error
+ * value, otherwise.  This function might use a 'test' operation against the driver to ensure that
+ * the commit phase will succeed.
+ */
+int
+can_deact_sessionConnectionTable_row(struct sessionConnectionTable_data *StorageTmp)
+{
+	/* XXX: provide code to check whether the active table row can be deactivated */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int can_act_sessionCopmTable_row(struct sessionCopmTable_data *StorageTmp)
+ * @param StorageTmp the data (as updated)
+ * @brief check whether an inactive table row can be activated
+ *
+ * This function is used by the ACTION phase of a RowStatus object to test whether an inactive table
+ * row can be activated.  Returns SNMP_ERR_NOERROR when activation is permitted; an SNMP error
+ * value, otherwise.  This function might use a 'test' operation against the driver to ensure that
+ * the commit phase will succeed.
+ */
+int
+can_act_sessionCopmTable_row(struct sessionCopmTable_data *StorageTmp)
+{
+	/* XXX: provide code to check whether the new or inactive table row can be activated */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int can_deact_sessionCopmTable_row(struct sessionCopmTable_data *StorageTmp)
+ * @param StorageTmp the data (as updated)
+ * @brief check whether an active table row can be deactivated
+ *
+ * This function is used by the ACTION phase of a RowStatus object to test whether an active table
+ * row can be deactivated.  Returns SNMP_ERR_NOERROR when deactivation is permitted; an SNMP error
+ * value, otherwise.  This function might use a 'test' operation against the driver to ensure that
+ * the commit phase will succeed.
+ */
+int
+can_deact_sessionCopmTable_row(struct sessionCopmTable_data *StorageTmp)
+{
+	/* XXX: provide code to check whether the active table row can be deactivated */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int can_act_sessionEntityTable_row(struct sessionEntityTable_data *StorageTmp)
+ * @param StorageTmp the data (as updated)
+ * @brief check whether an inactive table row can be activated
+ *
+ * This function is used by the ACTION phase of a RowStatus object to test whether an inactive table
+ * row can be activated.  Returns SNMP_ERR_NOERROR when activation is permitted; an SNMP error
+ * value, otherwise.  This function might use a 'test' operation against the driver to ensure that
+ * the commit phase will succeed.
+ */
+int
+can_act_sessionEntityTable_row(struct sessionEntityTable_data *StorageTmp)
+{
+	/* XXX: provide code to check whether the new or inactive table row can be activated */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int can_deact_sessionEntityTable_row(struct sessionEntityTable_data *StorageTmp)
+ * @param StorageTmp the data (as updated)
+ * @brief check whether an active table row can be deactivated
+ *
+ * This function is used by the ACTION phase of a RowStatus object to test whether an active table
+ * row can be deactivated.  Returns SNMP_ERR_NOERROR when deactivation is permitted; an SNMP error
+ * value, otherwise.  This function might use a 'test' operation against the driver to ensure that
+ * the commit phase will succeed.
+ */
+int
+can_deact_sessionEntityTable_row(struct sessionEntityTable_data *StorageTmp)
+{
+	/* XXX: provide code to check whether the active table row can be deactivated */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int can_act_sessionSubsystemTable_row(struct sessionSubsystemTable_data *StorageTmp)
+ * @param StorageTmp the data (as updated)
+ * @brief check whether an inactive table row can be activated
+ *
+ * This function is used by the ACTION phase of a RowStatus object to test whether an inactive table
+ * row can be activated.  Returns SNMP_ERR_NOERROR when activation is permitted; an SNMP error
+ * value, otherwise.  This function might use a 'test' operation against the driver to ensure that
+ * the commit phase will succeed.
+ */
+int
+can_act_sessionSubsystemTable_row(struct sessionSubsystemTable_data *StorageTmp)
+{
+	/* XXX: provide code to check whether the new or inactive table row can be activated */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int can_deact_sessionSubsystemTable_row(struct sessionSubsystemTable_data *StorageTmp)
+ * @param StorageTmp the data (as updated)
+ * @brief check whether an active table row can be deactivated
+ *
+ * This function is used by the ACTION phase of a RowStatus object to test whether an active table
+ * row can be deactivated.  Returns SNMP_ERR_NOERROR when deactivation is permitted; an SNMP error
+ * value, otherwise.  This function might use a 'test' operation against the driver to ensure that
+ * the commit phase will succeed.
+ */
+int
+can_deact_sessionSubsystemTable_row(struct sessionSubsystemTable_data *StorageTmp)
+{
+	/* XXX: provide code to check whether the active table row can be deactivated */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int can_act_acseEntityTable_row(struct acseEntityTable_data *StorageTmp)
+ * @param StorageTmp the data (as updated)
+ * @brief check whether an inactive table row can be activated
+ *
+ * This function is used by the ACTION phase of a RowStatus object to test whether an inactive table
+ * row can be activated.  Returns SNMP_ERR_NOERROR when activation is permitted; an SNMP error
+ * value, otherwise.  This function might use a 'test' operation against the driver to ensure that
+ * the commit phase will succeed.
+ */
+int
+can_act_acseEntityTable_row(struct acseEntityTable_data *StorageTmp)
+{
+	/* XXX: provide code to check whether the new or inactive table row can be activated */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int can_deact_acseEntityTable_row(struct acseEntityTable_data *StorageTmp)
+ * @param StorageTmp the data (as updated)
+ * @brief check whether an active table row can be deactivated
+ *
+ * This function is used by the ACTION phase of a RowStatus object to test whether an active table
+ * row can be deactivated.  Returns SNMP_ERR_NOERROR when deactivation is permitted; an SNMP error
+ * value, otherwise.  This function might use a 'test' operation against the driver to ensure that
+ * the commit phase will succeed.
+ */
+int
+can_deact_acseEntityTable_row(struct acseEntityTable_data *StorageTmp)
+{
+	/* XXX: provide code to check whether the active table row can be deactivated */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int can_act_acseAccessPointTable_row(struct acseAccessPointTable_data *StorageTmp)
+ * @param StorageTmp the data (as updated)
+ * @brief check whether an inactive table row can be activated
+ *
+ * This function is used by the ACTION phase of a RowStatus object to test whether an inactive table
+ * row can be activated.  Returns SNMP_ERR_NOERROR when activation is permitted; an SNMP error
+ * value, otherwise.  This function might use a 'test' operation against the driver to ensure that
+ * the commit phase will succeed.
+ */
+int
+can_act_acseAccessPointTable_row(struct acseAccessPointTable_data *StorageTmp)
+{
+	/* XXX: provide code to check whether the new or inactive table row can be activated */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int can_deact_acseAccessPointTable_row(struct acseAccessPointTable_data *StorageTmp)
+ * @param StorageTmp the data (as updated)
+ * @brief check whether an active table row can be deactivated
+ *
+ * This function is used by the ACTION phase of a RowStatus object to test whether an active table
+ * row can be deactivated.  Returns SNMP_ERR_NOERROR when deactivation is permitted; an SNMP error
+ * value, otherwise.  This function might use a 'test' operation against the driver to ensure that
+ * the commit phase will succeed.
+ */
+int
+can_deact_acseAccessPointTable_row(struct acseAccessPointTable_data *StorageTmp)
+{
+	/* XXX: provide code to check whether the active table row can be deactivated */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int can_act_acseLinkageTable_row(struct acseLinkageTable_data *StorageTmp)
+ * @param StorageTmp the data (as updated)
+ * @brief check whether an inactive table row can be activated
+ *
+ * This function is used by the ACTION phase of a RowStatus object to test whether an inactive table
+ * row can be activated.  Returns SNMP_ERR_NOERROR when activation is permitted; an SNMP error
+ * value, otherwise.  This function might use a 'test' operation against the driver to ensure that
+ * the commit phase will succeed.
+ */
+int
+can_act_acseLinkageTable_row(struct acseLinkageTable_data *StorageTmp)
+{
+	/* XXX: provide code to check whether the new or inactive table row can be activated */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int can_deact_acseLinkageTable_row(struct acseLinkageTable_data *StorageTmp)
+ * @param StorageTmp the data (as updated)
+ * @brief check whether an active table row can be deactivated
+ *
+ * This function is used by the ACTION phase of a RowStatus object to test whether an active table
+ * row can be deactivated.  Returns SNMP_ERR_NOERROR when deactivation is permitted; an SNMP error
+ * value, otherwise.  This function might use a 'test' operation against the driver to ensure that
+ * the commit phase will succeed.
+ */
+int
+can_deact_acseLinkageTable_row(struct acseLinkageTable_data *StorageTmp)
+{
+	/* XXX: provide code to check whether the active table row can be deactivated */
+	return SNMP_ERR_NOERROR;
 }
 
 /**
@@ -8523,10 +11683,9 @@ acseLinkageTable_consistent(struct acseLinkageTable_data *thedata)
 int
 write_acseAssociationRowStatus(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	struct acseAssociationTable_data *StorageTmp = NULL;
+	struct acseAssociationTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	static struct acseAssociationTable_data *StorageNew, *StorageDel;
 	size_t newlen = name_len - 15;
-	static int old_value;
 	int set_value, ret;
 	static struct variable_list *vars, *vp;
 
@@ -8553,40 +11712,6 @@ write_acseAssociationRowStatus(int action, u_char *var_val, u_char var_val_type,
 			if (StorageTmp != NULL)
 				/* cannot create existing row */
 				return SNMP_ERR_INCONSISTENTVALUE;
-			break;
-		case RS_ACTIVE:
-		case RS_NOTINSERVICE:
-			if (StorageTmp == NULL)
-				/* cannot change state of non-existent row */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			if (StorageTmp->acseAssociationRowStatus == RS_NOTREADY)
-				/* cannot change state of row that is not ready */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			/* XXX: interaction with row storage type needed */
-			if (set_value == RS_NOTINSERVICE && StorageTmp->acseAssociationTable_refs > 0)
-				/* row is busy and cannot be moved to the RS_NOTINSERVICE state */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			break;
-		case RS_DESTROY:
-			/* destroying existent or non-existent row is ok */
-			if (StorageTmp == NULL)
-				break;
-			/* XXX: interaction with row storage type needed */
-			if (StorageTmp->acseAssociationTable_refs > 0)
-				/* row is busy and cannot be deleted */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			break;
-		case RS_NOTREADY:
-			/* management station cannot set this, only agent can */
-		default:
-			return SNMP_ERR_INCONSISTENTVALUE;
-		}
-		break;
-	case RESERVE2:
-		/* memory reseveration, final preparation... */
-		switch (set_value) {
-		case RS_CREATEANDGO:
-		case RS_CREATEANDWAIT:
 			/* creation */
 			vars = NULL;
 			/* applicationSubsystemId */
@@ -8636,6 +11761,7 @@ write_acseAssociationRowStatus(int action, u_char *var_val, u_char var_val_type,
 				snmp_free_varbind(vars);
 				return SNMP_ERR_RESOURCEUNAVAILABLE;
 			}
+			StorageNew->acseAssociationTable_rsvs = 1;
 			vp = vars;
 			StorageNew->applicationSubsystemId = (ulong) *vp->val.integer;
 			vp = vp->next_variable;
@@ -8647,7 +11773,37 @@ write_acseAssociationRowStatus(int action, u_char *var_val, u_char var_val_type,
 			vp = vp->next_variable;
 			header_complex_add_data(&acseAssociationTableStorage, vars, StorageNew);	/* frees vars */
 			break;
+		case RS_ACTIVE:
+		case RS_NOTINSERVICE:
+			if (StorageTmp == NULL)
+				/* cannot change state of non-existent row */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			if (StorageTmp->acseAssociationRowStatus == RS_NOTREADY)
+				/* cannot change state of row that is not ready */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			/* XXX: interaction with row storage type needed */
+			if (set_value == RS_NOTINSERVICE && StorageTmp->acseAssociationTable_refs > 0)
+				/* row is busy and cannot be moved to the RS_NOTINSERVICE state */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			/* activate or deactivate */
+			if (StorageTmp == NULL)
+				return SNMP_ERR_NOSUCHNAME;
+			/* one allocation for the whole row */
+			if ((StorageOld = StorageTmp->acseAssociationTable_old) == NULL)
+				if (StorageTmp->acseAssociationTable_rsvs == 0)
+					if ((StorageOld = StorageTmp->acseAssociationTable_old = acseAssociationTable_duplicate(StorageTmp)) == NULL)
+						return SNMP_ERR_RESOURCEUNAVAILABLE;
+			if (StorageOld != NULL)
+				StorageTmp->acseAssociationTable_rsvs++;
+			break;
 		case RS_DESTROY:
+			if (StorageTmp == NULL)
+				/* cannot destroy non-existent row */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			/* XXX: interaction with row storage type needed */
+			if (StorageTmp->acseAssociationTable_refs > 0)
+				/* row is busy and cannot be deleted */
+				return SNMP_ERR_INCONSISTENTVALUE;
 			/* destroy */
 			if (StorageTmp != NULL) {
 				/* exists, extract it for now */
@@ -8657,78 +11813,127 @@ write_acseAssociationRowStatus(int action, u_char *var_val, u_char var_val_type,
 				StorageDel = NULL;
 			}
 			break;
+		case RS_NOTREADY:
+			/* management station cannot set this, only agent can */
+		default:
+			return SNMP_ERR_INCONSISTENTVALUE;
 		}
 		break;
-	case ACTION:
-		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the UNDO case */
+	case RESERVE2:
+		/* memory reseveration, final preparation... */
 		switch (set_value) {
 		case RS_CREATEANDGO:
 			/* check that activation is possible */
-			if ((ret = acseAssociationTable_consistent(StorageNew)) != SNMP_ERR_NOERROR)
+			if ((ret = can_act_acseAssociationTable_row(StorageNew)) != SNMP_ERR_NOERROR)
 				return (ret);
 			break;
 		case RS_CREATEANDWAIT:
-			/* row does not have to be consistent */
 			break;
 		case RS_ACTIVE:
-			old_value = StorageTmp->acseAssociationRowStatus;
-			StorageTmp->acseAssociationRowStatus = set_value;
-			if (old_value != RS_ACTIVE) {
 				/* check that activation is possible */
-				if ((ret = acseAssociationTable_consistent(StorageTmp)) != SNMP_ERR_NOERROR) {
-					StorageTmp->acseAssociationRowStatus = old_value;
+			if (StorageTmp->acseAssociationRowStatus != RS_ACTIVE)
+				if ((ret = can_act_acseAssociationTable_row(StorageTmp)) != SNMP_ERR_NOERROR)
 					return (ret);
+			break;
+		case RS_NOTINSERVICE:
+			/* check that deactivation is possible */
+			if (StorageTmp->acseAssociationRowStatus != RS_NOTINSERVICE)
+				if ((ret = can_deact_acseAssociationTable_row(StorageTmp)) != SNMP_ERR_NOERROR)
+					return (ret);
+			break;
+		case RS_DESTROY:
+			/* check that deactivation is possible */
+			if (StorageTmp->acseAssociationRowStatus != RS_NOTINSERVICE)
+				if ((ret = can_deact_acseAssociationTable_row(StorageTmp)) != SNMP_ERR_NOERROR)
+					return (ret);
+			break;
+		default:
+			return SNMP_ERR_WRONGVALUE;
 				}
+		break;
+	case ACTION:
+		/* The variable has been stored in StorageTmp->acseAssociationRowStatus for you to use, and you have just been asked to do something with it.  Note that anything done here must be
+		   reversable in the UNDO case */
+		switch (set_value) {
+		case RS_CREATEANDGO:
+			/* activate with underlying device */
+			if (activate_acseAssociationTable_row(StorageNew) != SNMP_ERR_NOERROR)
+				return SNMP_ERR_COMMITFAILED;
+			break;
+		case RS_CREATEANDWAIT:
+			break;
+		case RS_ACTIVE:
+			/* state change already performed */
+			if (StorageTmp->acseAssociationRowStatus != RS_ACTIVE) {
+				/* activate with underlying device */
+				if (activate_acseAssociationTable_row(StorageTmp) != SNMP_ERR_NOERROR)
+					return SNMP_ERR_COMMITFAILED;
 			}
 			break;
 		case RS_NOTINSERVICE:
-			/* set the flag? */
-			old_value = StorageTmp->acseAssociationRowStatus;
-			StorageTmp->acseAssociationRowStatus = set_value;
+			/* state change already performed */
+			if (StorageTmp->acseAssociationRowStatus != RS_NOTINSERVICE) {
+				/* deactivate with underlying device */
+				if (deactivate_acseAssociationTable_row(StorageTmp) != SNMP_ERR_NOERROR)
+					return SNMP_ERR_COMMITFAILED;
+			}
 			break;
+		case RS_DESTROY:
+			/* commit destrution to underlying device */
+			if (StorageDel == NULL)
+				break;
+			/* deactivate with underlying device */
+			if (deactivate_acseAssociationTable_row(StorageDel) != SNMP_ERR_NOERROR)
+				return SNMP_ERR_COMMITFAILED;
+			break;
+		default:
+			return SNMP_ERR_WRONGVALUE;
 		}
 		break;
 	case COMMIT:
 		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		switch (set_value) {
 		case RS_CREATEANDGO:
-			/* row creation, set final state */
-			/* XXX: commit creation to underlying device */
-			/* XXX: activate with underlying device */
 			StorageNew->acseAssociationRowStatus = RS_ACTIVE;
 			break;
 		case RS_CREATEANDWAIT:
-			/* row creation, set final state */
 			StorageNew->acseAssociationRowStatus = RS_NOTINSERVICE;
 			break;
 		case RS_ACTIVE:
 		case RS_NOTINSERVICE:
-			/* state change already performed */
-			if (old_value != set_value) {
-				switch (set_value) {
-				case RS_ACTIVE:
-					/* XXX: activate with underlying device */
-					break;
-				case RS_NOTINSERVICE:
-					/* XXX: deactivate with underlying device */
-					break;
-				}
+			StorageNew->acseAssociationRowStatus = set_value;
+			if ((StorageOld = StorageTmp->acseAssociationTable_old) != NULL) {
+				acseAssociationTable_destroy(&StorageTmp->acseAssociationTable_old);
+				StorageTmp->acseAssociationTable_rsvs = 0;
+				StorageTmp->acseAssociationTable_tsts = 0;
+				StorageTmp->acseAssociationTable_sets = 0;
 			}
 			break;
 		case RS_DESTROY:
-			/* row deletion, free it its dead */
 			acseAssociationTable_destroy(&StorageDel);
-			/* acseAssociationTable_destroy() can handle NULL pointers. */
 			break;
 		}
 		break;
 	case UNDO:
 		/* Back out any changes made in the ACTION case */
 		switch (set_value) {
+		case RS_CREATEANDGO:
+			/* deactivate with underlying device */
+			deactivate_acseAssociationTable_row(StorageNew);
+			break;
+		case RS_CREATEANDWAIT:
+			break;
 		case RS_ACTIVE:
+			if (StorageTmp->acseAssociationRowStatus == RS_NOTINSERVICE)
+				/* deactivate with underlying device */
+				deactivate_acseAssociationTable_row(StorageTmp);
+			break;
 		case RS_NOTINSERVICE:
-			/* restore state */
-			StorageTmp->acseAssociationRowStatus = old_value;
+			if (StorageTmp->acseAssociationRowStatus == RS_ACTIVE)
+				/* activate with underlying device */
+				activate_acseAssociationTable_row(StorageTmp);
+			break;
+		case RS_DESTROY:
 			break;
 		}
 		/* fall through */
@@ -8742,6 +11947,13 @@ write_acseAssociationRowStatus(int action, u_char *var_val, u_char var_val_type,
 				acseAssociationTable_del(StorageNew);
 				acseAssociationTable_destroy(&StorageNew);
 			}
+			break;
+		case RS_ACTIVE:
+		case RS_NOTINSERVICE:
+			if ((StorageOld = StorageTmp->acseAssociationTable_old) == NULL)
+				break;
+			if (--StorageTmp->acseAssociationTable_rsvs == 0)
+				acseAssociationTable_destroy(&StorageTmp->acseAssociationTable_old);
 			break;
 		case RS_DESTROY:
 			/* row deletion, so add it again */
@@ -8768,10 +11980,9 @@ write_acseAssociationRowStatus(int action, u_char *var_val, u_char var_val_type,
 int
 write_apInvocationRowStatus(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	struct apInvocationTable_data *StorageTmp = NULL;
+	struct apInvocationTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	static struct apInvocationTable_data *StorageNew, *StorageDel;
 	size_t newlen = name_len - 15;
-	static int old_value;
 	int set_value, ret;
 	static struct variable_list *vars, *vp;
 
@@ -8798,40 +12009,6 @@ write_apInvocationRowStatus(int action, u_char *var_val, u_char var_val_type, si
 			if (StorageTmp != NULL)
 				/* cannot create existing row */
 				return SNMP_ERR_INCONSISTENTVALUE;
-			break;
-		case RS_ACTIVE:
-		case RS_NOTINSERVICE:
-			if (StorageTmp == NULL)
-				/* cannot change state of non-existent row */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			if (StorageTmp->apInvocationRowStatus == RS_NOTREADY)
-				/* cannot change state of row that is not ready */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			/* XXX: interaction with row storage type needed */
-			if (set_value == RS_NOTINSERVICE && StorageTmp->apInvocationTable_refs > 0)
-				/* row is busy and cannot be moved to the RS_NOTINSERVICE state */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			break;
-		case RS_DESTROY:
-			/* destroying existent or non-existent row is ok */
-			if (StorageTmp == NULL)
-				break;
-			/* XXX: interaction with row storage type needed */
-			if (StorageTmp->apInvocationTable_refs > 0)
-				/* row is busy and cannot be deleted */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			break;
-		case RS_NOTREADY:
-			/* management station cannot set this, only agent can */
-		default:
-			return SNMP_ERR_INCONSISTENTVALUE;
-		}
-		break;
-	case RESERVE2:
-		/* memory reseveration, final preparation... */
-		switch (set_value) {
-		case RS_CREATEANDGO:
-		case RS_CREATEANDWAIT:
 			/* creation */
 			vars = NULL;
 			/* applicationSubsystemId */
@@ -8868,6 +12045,7 @@ write_apInvocationRowStatus(int action, u_char *var_val, u_char var_val_type, si
 				snmp_free_varbind(vars);
 				return SNMP_ERR_RESOURCEUNAVAILABLE;
 			}
+			StorageNew->apInvocationTable_rsvs = 1;
 			vp = vars;
 			StorageNew->applicationSubsystemId = (ulong) *vp->val.integer;
 			vp = vp->next_variable;
@@ -8876,7 +12054,37 @@ write_apInvocationRowStatus(int action, u_char *var_val, u_char var_val_type, si
 			vp = vp->next_variable;
 			header_complex_add_data(&apInvocationTableStorage, vars, StorageNew);	/* frees vars */
 			break;
+		case RS_ACTIVE:
+		case RS_NOTINSERVICE:
+			if (StorageTmp == NULL)
+				/* cannot change state of non-existent row */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			if (StorageTmp->apInvocationRowStatus == RS_NOTREADY)
+				/* cannot change state of row that is not ready */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			/* XXX: interaction with row storage type needed */
+			if (set_value == RS_NOTINSERVICE && StorageTmp->apInvocationTable_refs > 0)
+				/* row is busy and cannot be moved to the RS_NOTINSERVICE state */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			/* activate or deactivate */
+			if (StorageTmp == NULL)
+				return SNMP_ERR_NOSUCHNAME;
+			/* one allocation for the whole row */
+			if ((StorageOld = StorageTmp->apInvocationTable_old) == NULL)
+				if (StorageTmp->apInvocationTable_rsvs == 0)
+					if ((StorageOld = StorageTmp->apInvocationTable_old = apInvocationTable_duplicate(StorageTmp)) == NULL)
+						return SNMP_ERR_RESOURCEUNAVAILABLE;
+			if (StorageOld != NULL)
+				StorageTmp->apInvocationTable_rsvs++;
+			break;
 		case RS_DESTROY:
+			if (StorageTmp == NULL)
+				/* cannot destroy non-existent row */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			/* XXX: interaction with row storage type needed */
+			if (StorageTmp->apInvocationTable_refs > 0)
+				/* row is busy and cannot be deleted */
+				return SNMP_ERR_INCONSISTENTVALUE;
 			/* destroy */
 			if (StorageTmp != NULL) {
 				/* exists, extract it for now */
@@ -8886,78 +12094,127 @@ write_apInvocationRowStatus(int action, u_char *var_val, u_char var_val_type, si
 				StorageDel = NULL;
 			}
 			break;
+		case RS_NOTREADY:
+			/* management station cannot set this, only agent can */
+		default:
+			return SNMP_ERR_INCONSISTENTVALUE;
 		}
 		break;
-	case ACTION:
-		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the UNDO case */
+	case RESERVE2:
+		/* memory reseveration, final preparation... */
 		switch (set_value) {
 		case RS_CREATEANDGO:
 			/* check that activation is possible */
-			if ((ret = apInvocationTable_consistent(StorageNew)) != SNMP_ERR_NOERROR)
+			if ((ret = can_act_apInvocationTable_row(StorageNew)) != SNMP_ERR_NOERROR)
 				return (ret);
 			break;
 		case RS_CREATEANDWAIT:
-			/* row does not have to be consistent */
 			break;
 		case RS_ACTIVE:
-			old_value = StorageTmp->apInvocationRowStatus;
-			StorageTmp->apInvocationRowStatus = set_value;
-			if (old_value != RS_ACTIVE) {
 				/* check that activation is possible */
-				if ((ret = apInvocationTable_consistent(StorageTmp)) != SNMP_ERR_NOERROR) {
-					StorageTmp->apInvocationRowStatus = old_value;
+			if (StorageTmp->apInvocationRowStatus != RS_ACTIVE)
+				if ((ret = can_act_apInvocationTable_row(StorageTmp)) != SNMP_ERR_NOERROR)
 					return (ret);
+			break;
+		case RS_NOTINSERVICE:
+			/* check that deactivation is possible */
+			if (StorageTmp->apInvocationRowStatus != RS_NOTINSERVICE)
+				if ((ret = can_deact_apInvocationTable_row(StorageTmp)) != SNMP_ERR_NOERROR)
+					return (ret);
+			break;
+		case RS_DESTROY:
+			/* check that deactivation is possible */
+			if (StorageTmp->apInvocationRowStatus != RS_NOTINSERVICE)
+				if ((ret = can_deact_apInvocationTable_row(StorageTmp)) != SNMP_ERR_NOERROR)
+					return (ret);
+			break;
+		default:
+			return SNMP_ERR_WRONGVALUE;
 				}
+		break;
+	case ACTION:
+		/* The variable has been stored in StorageTmp->apInvocationRowStatus for you to use, and you have just been asked to do something with it.  Note that anything done here must be
+		   reversable in the UNDO case */
+		switch (set_value) {
+		case RS_CREATEANDGO:
+			/* activate with underlying device */
+			if (activate_apInvocationTable_row(StorageNew) != SNMP_ERR_NOERROR)
+				return SNMP_ERR_COMMITFAILED;
+			break;
+		case RS_CREATEANDWAIT:
+			break;
+		case RS_ACTIVE:
+			/* state change already performed */
+			if (StorageTmp->apInvocationRowStatus != RS_ACTIVE) {
+				/* activate with underlying device */
+				if (activate_apInvocationTable_row(StorageTmp) != SNMP_ERR_NOERROR)
+					return SNMP_ERR_COMMITFAILED;
 			}
 			break;
 		case RS_NOTINSERVICE:
-			/* set the flag? */
-			old_value = StorageTmp->apInvocationRowStatus;
-			StorageTmp->apInvocationRowStatus = set_value;
+			/* state change already performed */
+			if (StorageTmp->apInvocationRowStatus != RS_NOTINSERVICE) {
+				/* deactivate with underlying device */
+				if (deactivate_apInvocationTable_row(StorageTmp) != SNMP_ERR_NOERROR)
+					return SNMP_ERR_COMMITFAILED;
+			}
 			break;
+		case RS_DESTROY:
+			/* commit destrution to underlying device */
+			if (StorageDel == NULL)
+				break;
+			/* deactivate with underlying device */
+			if (deactivate_apInvocationTable_row(StorageDel) != SNMP_ERR_NOERROR)
+				return SNMP_ERR_COMMITFAILED;
+			break;
+		default:
+			return SNMP_ERR_WRONGVALUE;
 		}
 		break;
 	case COMMIT:
 		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		switch (set_value) {
 		case RS_CREATEANDGO:
-			/* row creation, set final state */
-			/* XXX: commit creation to underlying device */
-			/* XXX: activate with underlying device */
 			StorageNew->apInvocationRowStatus = RS_ACTIVE;
 			break;
 		case RS_CREATEANDWAIT:
-			/* row creation, set final state */
 			StorageNew->apInvocationRowStatus = RS_NOTINSERVICE;
 			break;
 		case RS_ACTIVE:
 		case RS_NOTINSERVICE:
-			/* state change already performed */
-			if (old_value != set_value) {
-				switch (set_value) {
-				case RS_ACTIVE:
-					/* XXX: activate with underlying device */
-					break;
-				case RS_NOTINSERVICE:
-					/* XXX: deactivate with underlying device */
-					break;
-				}
+			StorageNew->apInvocationRowStatus = set_value;
+			if ((StorageOld = StorageTmp->apInvocationTable_old) != NULL) {
+				apInvocationTable_destroy(&StorageTmp->apInvocationTable_old);
+				StorageTmp->apInvocationTable_rsvs = 0;
+				StorageTmp->apInvocationTable_tsts = 0;
+				StorageTmp->apInvocationTable_sets = 0;
 			}
 			break;
 		case RS_DESTROY:
-			/* row deletion, free it its dead */
 			apInvocationTable_destroy(&StorageDel);
-			/* apInvocationTable_destroy() can handle NULL pointers. */
 			break;
 		}
 		break;
 	case UNDO:
 		/* Back out any changes made in the ACTION case */
 		switch (set_value) {
+		case RS_CREATEANDGO:
+			/* deactivate with underlying device */
+			deactivate_apInvocationTable_row(StorageNew);
+			break;
+		case RS_CREATEANDWAIT:
+			break;
 		case RS_ACTIVE:
+			if (StorageTmp->apInvocationRowStatus == RS_NOTINSERVICE)
+				/* deactivate with underlying device */
+				deactivate_apInvocationTable_row(StorageTmp);
+			break;
 		case RS_NOTINSERVICE:
-			/* restore state */
-			StorageTmp->apInvocationRowStatus = old_value;
+			if (StorageTmp->apInvocationRowStatus == RS_ACTIVE)
+				/* activate with underlying device */
+				activate_apInvocationTable_row(StorageTmp);
+			break;
+		case RS_DESTROY:
 			break;
 		}
 		/* fall through */
@@ -8971,6 +12228,13 @@ write_apInvocationRowStatus(int action, u_char *var_val, u_char var_val_type, si
 				apInvocationTable_del(StorageNew);
 				apInvocationTable_destroy(&StorageNew);
 			}
+			break;
+		case RS_ACTIVE:
+		case RS_NOTINSERVICE:
+			if ((StorageOld = StorageTmp->apInvocationTable_old) == NULL)
+				break;
+			if (--StorageTmp->apInvocationTable_rsvs == 0)
+				apInvocationTable_destroy(&StorageTmp->apInvocationTable_old);
 			break;
 		case RS_DESTROY:
 			/* row deletion, so add it again */
@@ -8997,10 +12261,9 @@ write_apInvocationRowStatus(int action, u_char *var_val, u_char var_val_type, si
 int
 write_applicationEntityInvocationRowStatus(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	struct applicationEntityInvocationTable_data *StorageTmp = NULL;
+	struct applicationEntityInvocationTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	static struct applicationEntityInvocationTable_data *StorageNew, *StorageDel;
 	size_t newlen = name_len - 15;
-	static int old_value;
 	int set_value, ret;
 	static struct variable_list *vars, *vp;
 
@@ -9027,40 +12290,6 @@ write_applicationEntityInvocationRowStatus(int action, u_char *var_val, u_char v
 			if (StorageTmp != NULL)
 				/* cannot create existing row */
 				return SNMP_ERR_INCONSISTENTVALUE;
-			break;
-		case RS_ACTIVE:
-		case RS_NOTINSERVICE:
-			if (StorageTmp == NULL)
-				/* cannot change state of non-existent row */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			if (StorageTmp->applicationEntityInvocationRowStatus == RS_NOTREADY)
-				/* cannot change state of row that is not ready */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			/* XXX: interaction with row storage type needed */
-			if (set_value == RS_NOTINSERVICE && StorageTmp->applicationEntityInvocationTable_refs > 0)
-				/* row is busy and cannot be moved to the RS_NOTINSERVICE state */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			break;
-		case RS_DESTROY:
-			/* destroying existent or non-existent row is ok */
-			if (StorageTmp == NULL)
-				break;
-			/* XXX: interaction with row storage type needed */
-			if (StorageTmp->applicationEntityInvocationTable_refs > 0)
-				/* row is busy and cannot be deleted */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			break;
-		case RS_NOTREADY:
-			/* management station cannot set this, only agent can */
-		default:
-			return SNMP_ERR_INCONSISTENTVALUE;
-		}
-		break;
-	case RESERVE2:
-		/* memory reseveration, final preparation... */
-		switch (set_value) {
-		case RS_CREATEANDGO:
-		case RS_CREATEANDWAIT:
 			/* creation */
 			vars = NULL;
 			/* applicationSubsystemId */
@@ -9097,6 +12326,7 @@ write_applicationEntityInvocationRowStatus(int action, u_char *var_val, u_char v
 				snmp_free_varbind(vars);
 				return SNMP_ERR_RESOURCEUNAVAILABLE;
 			}
+			StorageNew->applicationEntityInvocationTable_rsvs = 1;
 			vp = vars;
 			StorageNew->applicationSubsystemId = (ulong) *vp->val.integer;
 			vp = vp->next_variable;
@@ -9105,7 +12335,37 @@ write_applicationEntityInvocationRowStatus(int action, u_char *var_val, u_char v
 			vp = vp->next_variable;
 			header_complex_add_data(&applicationEntityInvocationTableStorage, vars, StorageNew);	/* frees vars */
 			break;
+		case RS_ACTIVE:
+		case RS_NOTINSERVICE:
+			if (StorageTmp == NULL)
+				/* cannot change state of non-existent row */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			if (StorageTmp->applicationEntityInvocationRowStatus == RS_NOTREADY)
+				/* cannot change state of row that is not ready */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			/* XXX: interaction with row storage type needed */
+			if (set_value == RS_NOTINSERVICE && StorageTmp->applicationEntityInvocationTable_refs > 0)
+				/* row is busy and cannot be moved to the RS_NOTINSERVICE state */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			/* activate or deactivate */
+			if (StorageTmp == NULL)
+				return SNMP_ERR_NOSUCHNAME;
+			/* one allocation for the whole row */
+			if ((StorageOld = StorageTmp->applicationEntityInvocationTable_old) == NULL)
+				if (StorageTmp->applicationEntityInvocationTable_rsvs == 0)
+					if ((StorageOld = StorageTmp->applicationEntityInvocationTable_old = applicationEntityInvocationTable_duplicate(StorageTmp)) == NULL)
+						return SNMP_ERR_RESOURCEUNAVAILABLE;
+			if (StorageOld != NULL)
+				StorageTmp->applicationEntityInvocationTable_rsvs++;
+			break;
 		case RS_DESTROY:
+			if (StorageTmp == NULL)
+				/* cannot destroy non-existent row */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			/* XXX: interaction with row storage type needed */
+			if (StorageTmp->applicationEntityInvocationTable_refs > 0)
+				/* row is busy and cannot be deleted */
+				return SNMP_ERR_INCONSISTENTVALUE;
 			/* destroy */
 			if (StorageTmp != NULL) {
 				/* exists, extract it for now */
@@ -9115,78 +12375,127 @@ write_applicationEntityInvocationRowStatus(int action, u_char *var_val, u_char v
 				StorageDel = NULL;
 			}
 			break;
+		case RS_NOTREADY:
+			/* management station cannot set this, only agent can */
+		default:
+			return SNMP_ERR_INCONSISTENTVALUE;
 		}
 		break;
-	case ACTION:
-		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the UNDO case */
+	case RESERVE2:
+		/* memory reseveration, final preparation... */
 		switch (set_value) {
 		case RS_CREATEANDGO:
 			/* check that activation is possible */
-			if ((ret = applicationEntityInvocationTable_consistent(StorageNew)) != SNMP_ERR_NOERROR)
+			if ((ret = can_act_applicationEntityInvocationTable_row(StorageNew)) != SNMP_ERR_NOERROR)
 				return (ret);
 			break;
 		case RS_CREATEANDWAIT:
-			/* row does not have to be consistent */
 			break;
 		case RS_ACTIVE:
-			old_value = StorageTmp->applicationEntityInvocationRowStatus;
-			StorageTmp->applicationEntityInvocationRowStatus = set_value;
-			if (old_value != RS_ACTIVE) {
 				/* check that activation is possible */
-				if ((ret = applicationEntityInvocationTable_consistent(StorageTmp)) != SNMP_ERR_NOERROR) {
-					StorageTmp->applicationEntityInvocationRowStatus = old_value;
+			if (StorageTmp->applicationEntityInvocationRowStatus != RS_ACTIVE)
+				if ((ret = can_act_applicationEntityInvocationTable_row(StorageTmp)) != SNMP_ERR_NOERROR)
 					return (ret);
+			break;
+		case RS_NOTINSERVICE:
+			/* check that deactivation is possible */
+			if (StorageTmp->applicationEntityInvocationRowStatus != RS_NOTINSERVICE)
+				if ((ret = can_deact_applicationEntityInvocationTable_row(StorageTmp)) != SNMP_ERR_NOERROR)
+					return (ret);
+			break;
+		case RS_DESTROY:
+			/* check that deactivation is possible */
+			if (StorageTmp->applicationEntityInvocationRowStatus != RS_NOTINSERVICE)
+				if ((ret = can_deact_applicationEntityInvocationTable_row(StorageTmp)) != SNMP_ERR_NOERROR)
+					return (ret);
+			break;
+		default:
+			return SNMP_ERR_WRONGVALUE;
 				}
+		break;
+	case ACTION:
+		/* The variable has been stored in StorageTmp->applicationEntityInvocationRowStatus for you to use, and you have just been asked to do something with it.  Note that anything done here 
+		   must be reversable in the UNDO case */
+		switch (set_value) {
+		case RS_CREATEANDGO:
+			/* activate with underlying device */
+			if (activate_applicationEntityInvocationTable_row(StorageNew) != SNMP_ERR_NOERROR)
+				return SNMP_ERR_COMMITFAILED;
+			break;
+		case RS_CREATEANDWAIT:
+			break;
+		case RS_ACTIVE:
+			/* state change already performed */
+			if (StorageTmp->applicationEntityInvocationRowStatus != RS_ACTIVE) {
+				/* activate with underlying device */
+				if (activate_applicationEntityInvocationTable_row(StorageTmp) != SNMP_ERR_NOERROR)
+					return SNMP_ERR_COMMITFAILED;
 			}
 			break;
 		case RS_NOTINSERVICE:
-			/* set the flag? */
-			old_value = StorageTmp->applicationEntityInvocationRowStatus;
-			StorageTmp->applicationEntityInvocationRowStatus = set_value;
+			/* state change already performed */
+			if (StorageTmp->applicationEntityInvocationRowStatus != RS_NOTINSERVICE) {
+				/* deactivate with underlying device */
+				if (deactivate_applicationEntityInvocationTable_row(StorageTmp) != SNMP_ERR_NOERROR)
+					return SNMP_ERR_COMMITFAILED;
+			}
 			break;
+		case RS_DESTROY:
+			/* commit destrution to underlying device */
+			if (StorageDel == NULL)
+				break;
+			/* deactivate with underlying device */
+			if (deactivate_applicationEntityInvocationTable_row(StorageDel) != SNMP_ERR_NOERROR)
+				return SNMP_ERR_COMMITFAILED;
+			break;
+		default:
+			return SNMP_ERR_WRONGVALUE;
 		}
 		break;
 	case COMMIT:
 		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		switch (set_value) {
 		case RS_CREATEANDGO:
-			/* row creation, set final state */
-			/* XXX: commit creation to underlying device */
-			/* XXX: activate with underlying device */
 			StorageNew->applicationEntityInvocationRowStatus = RS_ACTIVE;
 			break;
 		case RS_CREATEANDWAIT:
-			/* row creation, set final state */
 			StorageNew->applicationEntityInvocationRowStatus = RS_NOTINSERVICE;
 			break;
 		case RS_ACTIVE:
 		case RS_NOTINSERVICE:
-			/* state change already performed */
-			if (old_value != set_value) {
-				switch (set_value) {
-				case RS_ACTIVE:
-					/* XXX: activate with underlying device */
-					break;
-				case RS_NOTINSERVICE:
-					/* XXX: deactivate with underlying device */
-					break;
-				}
+			StorageNew->applicationEntityInvocationRowStatus = set_value;
+			if ((StorageOld = StorageTmp->applicationEntityInvocationTable_old) != NULL) {
+				applicationEntityInvocationTable_destroy(&StorageTmp->applicationEntityInvocationTable_old);
+				StorageTmp->applicationEntityInvocationTable_rsvs = 0;
+				StorageTmp->applicationEntityInvocationTable_tsts = 0;
+				StorageTmp->applicationEntityInvocationTable_sets = 0;
 			}
 			break;
 		case RS_DESTROY:
-			/* row deletion, free it its dead */
 			applicationEntityInvocationTable_destroy(&StorageDel);
-			/* applicationEntityInvocationTable_destroy() can handle NULL pointers. */
 			break;
 		}
 		break;
 	case UNDO:
 		/* Back out any changes made in the ACTION case */
 		switch (set_value) {
+		case RS_CREATEANDGO:
+			/* deactivate with underlying device */
+			deactivate_applicationEntityInvocationTable_row(StorageNew);
+			break;
+		case RS_CREATEANDWAIT:
+			break;
 		case RS_ACTIVE:
+			if (StorageTmp->applicationEntityInvocationRowStatus == RS_NOTINSERVICE)
+				/* deactivate with underlying device */
+				deactivate_applicationEntityInvocationTable_row(StorageTmp);
+			break;
 		case RS_NOTINSERVICE:
-			/* restore state */
-			StorageTmp->applicationEntityInvocationRowStatus = old_value;
+			if (StorageTmp->applicationEntityInvocationRowStatus == RS_ACTIVE)
+				/* activate with underlying device */
+				activate_applicationEntityInvocationTable_row(StorageTmp);
+			break;
+		case RS_DESTROY:
 			break;
 		}
 		/* fall through */
@@ -9200,6 +12509,13 @@ write_applicationEntityInvocationRowStatus(int action, u_char *var_val, u_char v
 				applicationEntityInvocationTable_del(StorageNew);
 				applicationEntityInvocationTable_destroy(&StorageNew);
 			}
+			break;
+		case RS_ACTIVE:
+		case RS_NOTINSERVICE:
+			if ((StorageOld = StorageTmp->applicationEntityInvocationTable_old) == NULL)
+				break;
+			if (--StorageTmp->applicationEntityInvocationTable_rsvs == 0)
+				applicationEntityInvocationTable_destroy(&StorageTmp->applicationEntityInvocationTable_old);
 			break;
 		case RS_DESTROY:
 			/* row deletion, so add it again */
@@ -9226,10 +12542,9 @@ write_applicationEntityInvocationRowStatus(int action, u_char *var_val, u_char v
 int
 write_asoRowStatus(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	struct asoTable_data *StorageTmp = NULL;
+	struct asoTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	static struct asoTable_data *StorageNew, *StorageDel;
 	size_t newlen = name_len - 15;
-	static int old_value;
 	int set_value, ret;
 	static struct variable_list *vars, *vp;
 
@@ -9256,40 +12571,6 @@ write_asoRowStatus(int action, u_char *var_val, u_char var_val_type, size_t var_
 			if (StorageTmp != NULL)
 				/* cannot create existing row */
 				return SNMP_ERR_INCONSISTENTVALUE;
-			break;
-		case RS_ACTIVE:
-		case RS_NOTINSERVICE:
-			if (StorageTmp == NULL)
-				/* cannot change state of non-existent row */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			if (StorageTmp->asoRowStatus == RS_NOTREADY)
-				/* cannot change state of row that is not ready */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			/* XXX: interaction with row storage type needed */
-			if (set_value == RS_NOTINSERVICE && StorageTmp->asoTable_refs > 0)
-				/* row is busy and cannot be moved to the RS_NOTINSERVICE state */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			break;
-		case RS_DESTROY:
-			/* destroying existent or non-existent row is ok */
-			if (StorageTmp == NULL)
-				break;
-			/* XXX: interaction with row storage type needed */
-			if (StorageTmp->asoTable_refs > 0)
-				/* row is busy and cannot be deleted */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			break;
-		case RS_NOTREADY:
-			/* management station cannot set this, only agent can */
-		default:
-			return SNMP_ERR_INCONSISTENTVALUE;
-		}
-		break;
-	case RESERVE2:
-		/* memory reseveration, final preparation... */
-		switch (set_value) {
-		case RS_CREATEANDGO:
-		case RS_CREATEANDWAIT:
 			/* creation */
 			vars = NULL;
 			/* subsystemId */
@@ -9353,6 +12634,7 @@ write_asoRowStatus(int action, u_char *var_val, u_char var_val_type, size_t var_
 				snmp_free_varbind(vars);
 				return SNMP_ERR_RESOURCEUNAVAILABLE;
 			}
+			StorageNew->asoTable_rsvs = 1;
 			vp = vars;
 			memdup((void *) &StorageNew->subsystemId, vp->val.string, vp->val_len);
 			StorageNew->subsystemIdLen = vp->val_len;
@@ -9368,7 +12650,37 @@ write_asoRowStatus(int action, u_char *var_val, u_char var_val_type, size_t var_
 			vp = vp->next_variable;
 			header_complex_add_data(&asoTableStorage, vars, StorageNew);	/* frees vars */
 			break;
+		case RS_ACTIVE:
+		case RS_NOTINSERVICE:
+			if (StorageTmp == NULL)
+				/* cannot change state of non-existent row */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			if (StorageTmp->asoRowStatus == RS_NOTREADY)
+				/* cannot change state of row that is not ready */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			/* XXX: interaction with row storage type needed */
+			if (set_value == RS_NOTINSERVICE && StorageTmp->asoTable_refs > 0)
+				/* row is busy and cannot be moved to the RS_NOTINSERVICE state */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			/* activate or deactivate */
+			if (StorageTmp == NULL)
+				return SNMP_ERR_NOSUCHNAME;
+			/* one allocation for the whole row */
+			if ((StorageOld = StorageTmp->asoTable_old) == NULL)
+				if (StorageTmp->asoTable_rsvs == 0)
+					if ((StorageOld = StorageTmp->asoTable_old = asoTable_duplicate(StorageTmp)) == NULL)
+						return SNMP_ERR_RESOURCEUNAVAILABLE;
+			if (StorageOld != NULL)
+				StorageTmp->asoTable_rsvs++;
+			break;
 		case RS_DESTROY:
+			if (StorageTmp == NULL)
+				/* cannot destroy non-existent row */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			/* XXX: interaction with row storage type needed */
+			if (StorageTmp->asoTable_refs > 0)
+				/* row is busy and cannot be deleted */
+				return SNMP_ERR_INCONSISTENTVALUE;
 			/* destroy */
 			if (StorageTmp != NULL) {
 				/* exists, extract it for now */
@@ -9378,78 +12690,127 @@ write_asoRowStatus(int action, u_char *var_val, u_char var_val_type, size_t var_
 				StorageDel = NULL;
 			}
 			break;
+		case RS_NOTREADY:
+			/* management station cannot set this, only agent can */
+		default:
+			return SNMP_ERR_INCONSISTENTVALUE;
 		}
 		break;
-	case ACTION:
-		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the UNDO case */
+	case RESERVE2:
+		/* memory reseveration, final preparation... */
 		switch (set_value) {
 		case RS_CREATEANDGO:
 			/* check that activation is possible */
-			if ((ret = asoTable_consistent(StorageNew)) != SNMP_ERR_NOERROR)
+			if ((ret = can_act_asoTable_row(StorageNew)) != SNMP_ERR_NOERROR)
 				return (ret);
 			break;
 		case RS_CREATEANDWAIT:
-			/* row does not have to be consistent */
 			break;
 		case RS_ACTIVE:
-			old_value = StorageTmp->asoRowStatus;
-			StorageTmp->asoRowStatus = set_value;
-			if (old_value != RS_ACTIVE) {
 				/* check that activation is possible */
-				if ((ret = asoTable_consistent(StorageTmp)) != SNMP_ERR_NOERROR) {
-					StorageTmp->asoRowStatus = old_value;
+			if (StorageTmp->asoRowStatus != RS_ACTIVE)
+				if ((ret = can_act_asoTable_row(StorageTmp)) != SNMP_ERR_NOERROR)
 					return (ret);
+			break;
+		case RS_NOTINSERVICE:
+			/* check that deactivation is possible */
+			if (StorageTmp->asoRowStatus != RS_NOTINSERVICE)
+				if ((ret = can_deact_asoTable_row(StorageTmp)) != SNMP_ERR_NOERROR)
+					return (ret);
+			break;
+		case RS_DESTROY:
+			/* check that deactivation is possible */
+			if (StorageTmp->asoRowStatus != RS_NOTINSERVICE)
+				if ((ret = can_deact_asoTable_row(StorageTmp)) != SNMP_ERR_NOERROR)
+					return (ret);
+			break;
+		default:
+			return SNMP_ERR_WRONGVALUE;
 				}
+		break;
+	case ACTION:
+		/* The variable has been stored in StorageTmp->asoRowStatus for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in
+		   the UNDO case */
+		switch (set_value) {
+		case RS_CREATEANDGO:
+			/* activate with underlying device */
+			if (activate_asoTable_row(StorageNew) != SNMP_ERR_NOERROR)
+				return SNMP_ERR_COMMITFAILED;
+			break;
+		case RS_CREATEANDWAIT:
+			break;
+		case RS_ACTIVE:
+			/* state change already performed */
+			if (StorageTmp->asoRowStatus != RS_ACTIVE) {
+				/* activate with underlying device */
+				if (activate_asoTable_row(StorageTmp) != SNMP_ERR_NOERROR)
+					return SNMP_ERR_COMMITFAILED;
 			}
 			break;
 		case RS_NOTINSERVICE:
-			/* set the flag? */
-			old_value = StorageTmp->asoRowStatus;
-			StorageTmp->asoRowStatus = set_value;
+			/* state change already performed */
+			if (StorageTmp->asoRowStatus != RS_NOTINSERVICE) {
+				/* deactivate with underlying device */
+				if (deactivate_asoTable_row(StorageTmp) != SNMP_ERR_NOERROR)
+					return SNMP_ERR_COMMITFAILED;
+			}
 			break;
+		case RS_DESTROY:
+			/* commit destrution to underlying device */
+			if (StorageDel == NULL)
+			break;
+			/* deactivate with underlying device */
+			if (deactivate_asoTable_row(StorageDel) != SNMP_ERR_NOERROR)
+				return SNMP_ERR_COMMITFAILED;
+			break;
+		default:
+			return SNMP_ERR_WRONGVALUE;
 		}
 		break;
 	case COMMIT:
 		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		switch (set_value) {
 		case RS_CREATEANDGO:
-			/* row creation, set final state */
-			/* XXX: commit creation to underlying device */
-			/* XXX: activate with underlying device */
 			StorageNew->asoRowStatus = RS_ACTIVE;
 			break;
 		case RS_CREATEANDWAIT:
-			/* row creation, set final state */
 			StorageNew->asoRowStatus = RS_NOTINSERVICE;
 			break;
 		case RS_ACTIVE:
 		case RS_NOTINSERVICE:
-			/* state change already performed */
-			if (old_value != set_value) {
-				switch (set_value) {
-				case RS_ACTIVE:
-					/* XXX: activate with underlying device */
-					break;
-				case RS_NOTINSERVICE:
-					/* XXX: deactivate with underlying device */
-					break;
-				}
+			StorageNew->asoRowStatus = set_value;
+			if ((StorageOld = StorageTmp->asoTable_old) != NULL) {
+				asoTable_destroy(&StorageTmp->asoTable_old);
+				StorageTmp->asoTable_rsvs = 0;
+				StorageTmp->asoTable_tsts = 0;
+				StorageTmp->asoTable_sets = 0;
 			}
 			break;
 		case RS_DESTROY:
-			/* row deletion, free it its dead */
 			asoTable_destroy(&StorageDel);
-			/* asoTable_destroy() can handle NULL pointers. */
 			break;
 		}
 		break;
 	case UNDO:
 		/* Back out any changes made in the ACTION case */
 		switch (set_value) {
+		case RS_CREATEANDGO:
+			/* deactivate with underlying device */
+			deactivate_asoTable_row(StorageNew);
+			break;
+		case RS_CREATEANDWAIT:
+			break;
 		case RS_ACTIVE:
+			if (StorageTmp->asoRowStatus == RS_NOTINSERVICE)
+				/* deactivate with underlying device */
+				deactivate_asoTable_row(StorageTmp);
+			break;
 		case RS_NOTINSERVICE:
-			/* restore state */
-			StorageTmp->asoRowStatus = old_value;
+			if (StorageTmp->asoRowStatus == RS_ACTIVE)
+				/* activate with underlying device */
+				activate_asoTable_row(StorageTmp);
+			break;
+		case RS_DESTROY:
 			break;
 		}
 		/* fall through */
@@ -9463,6 +12824,13 @@ write_asoRowStatus(int action, u_char *var_val, u_char var_val_type, size_t var_
 				asoTable_del(StorageNew);
 				asoTable_destroy(&StorageNew);
 			}
+			break;
+		case RS_ACTIVE:
+		case RS_NOTINSERVICE:
+			if ((StorageOld = StorageTmp->asoTable_old) == NULL)
+				break;
+			if (--StorageTmp->asoTable_rsvs == 0)
+				asoTable_destroy(&StorageTmp->asoTable_old);
 			break;
 		case RS_DESTROY:
 			/* row deletion, so add it again */
@@ -9489,10 +12857,9 @@ write_asoRowStatus(int action, u_char *var_val, u_char var_val_type, size_t var_
 int
 write_asoEntityRowStatus(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	struct asoEntityTable_data *StorageTmp = NULL;
+	struct asoEntityTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	static struct asoEntityTable_data *StorageNew, *StorageDel;
 	size_t newlen = name_len - 15;
-	static int old_value;
 	int set_value, ret;
 	static struct variable_list *vars, *vp;
 
@@ -9519,40 +12886,6 @@ write_asoEntityRowStatus(int action, u_char *var_val, u_char var_val_type, size_
 			if (StorageTmp != NULL)
 				/* cannot create existing row */
 				return SNMP_ERR_INCONSISTENTVALUE;
-			break;
-		case RS_ACTIVE:
-		case RS_NOTINSERVICE:
-			if (StorageTmp == NULL)
-				/* cannot change state of non-existent row */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			if (StorageTmp->asoEntityRowStatus == RS_NOTREADY)
-				/* cannot change state of row that is not ready */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			/* XXX: interaction with row storage type needed */
-			if (set_value == RS_NOTINSERVICE && StorageTmp->asoEntityTable_refs > 0)
-				/* row is busy and cannot be moved to the RS_NOTINSERVICE state */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			break;
-		case RS_DESTROY:
-			/* destroying existent or non-existent row is ok */
-			if (StorageTmp == NULL)
-				break;
-			/* XXX: interaction with row storage type needed */
-			if (StorageTmp->asoEntityTable_refs > 0)
-				/* row is busy and cannot be deleted */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			break;
-		case RS_NOTREADY:
-			/* management station cannot set this, only agent can */
-		default:
-			return SNMP_ERR_INCONSISTENTVALUE;
-		}
-		break;
-	case RESERVE2:
-		/* memory reseveration, final preparation... */
-		switch (set_value) {
-		case RS_CREATEANDGO:
-		case RS_CREATEANDWAIT:
 			/* creation */
 			vars = NULL;
 			/* subsystemId */
@@ -9603,6 +12936,7 @@ write_asoEntityRowStatus(int action, u_char *var_val, u_char var_val_type, size_
 				snmp_free_varbind(vars);
 				return SNMP_ERR_RESOURCEUNAVAILABLE;
 			}
+			StorageNew->asoEntityTable_rsvs = 1;
 			vp = vars;
 			memdup((void *) &StorageNew->subsystemId, vp->val.string, vp->val_len);
 			StorageNew->subsystemIdLen = vp->val_len;
@@ -9615,7 +12949,37 @@ write_asoEntityRowStatus(int action, u_char *var_val, u_char var_val_type, size_
 			vp = vp->next_variable;
 			header_complex_add_data(&asoEntityTableStorage, vars, StorageNew);	/* frees vars */
 			break;
+		case RS_ACTIVE:
+		case RS_NOTINSERVICE:
+			if (StorageTmp == NULL)
+				/* cannot change state of non-existent row */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			if (StorageTmp->asoEntityRowStatus == RS_NOTREADY)
+				/* cannot change state of row that is not ready */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			/* XXX: interaction with row storage type needed */
+			if (set_value == RS_NOTINSERVICE && StorageTmp->asoEntityTable_refs > 0)
+				/* row is busy and cannot be moved to the RS_NOTINSERVICE state */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			/* activate or deactivate */
+			if (StorageTmp == NULL)
+				return SNMP_ERR_NOSUCHNAME;
+			/* one allocation for the whole row */
+			if ((StorageOld = StorageTmp->asoEntityTable_old) == NULL)
+				if (StorageTmp->asoEntityTable_rsvs == 0)
+					if ((StorageOld = StorageTmp->asoEntityTable_old = asoEntityTable_duplicate(StorageTmp)) == NULL)
+						return SNMP_ERR_RESOURCEUNAVAILABLE;
+			if (StorageOld != NULL)
+				StorageTmp->asoEntityTable_rsvs++;
+			break;
 		case RS_DESTROY:
+			if (StorageTmp == NULL)
+				/* cannot destroy non-existent row */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			/* XXX: interaction with row storage type needed */
+			if (StorageTmp->asoEntityTable_refs > 0)
+				/* row is busy and cannot be deleted */
+				return SNMP_ERR_INCONSISTENTVALUE;
 			/* destroy */
 			if (StorageTmp != NULL) {
 				/* exists, extract it for now */
@@ -9625,78 +12989,127 @@ write_asoEntityRowStatus(int action, u_char *var_val, u_char var_val_type, size_
 				StorageDel = NULL;
 			}
 			break;
+		case RS_NOTREADY:
+			/* management station cannot set this, only agent can */
+		default:
+			return SNMP_ERR_INCONSISTENTVALUE;
 		}
 		break;
-	case ACTION:
-		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the UNDO case */
+	case RESERVE2:
+		/* memory reseveration, final preparation... */
 		switch (set_value) {
 		case RS_CREATEANDGO:
 			/* check that activation is possible */
-			if ((ret = asoEntityTable_consistent(StorageNew)) != SNMP_ERR_NOERROR)
+			if ((ret = can_act_asoEntityTable_row(StorageNew)) != SNMP_ERR_NOERROR)
 				return (ret);
 			break;
 		case RS_CREATEANDWAIT:
-			/* row does not have to be consistent */
 			break;
 		case RS_ACTIVE:
-			old_value = StorageTmp->asoEntityRowStatus;
-			StorageTmp->asoEntityRowStatus = set_value;
-			if (old_value != RS_ACTIVE) {
 				/* check that activation is possible */
-				if ((ret = asoEntityTable_consistent(StorageTmp)) != SNMP_ERR_NOERROR) {
-					StorageTmp->asoEntityRowStatus = old_value;
+			if (StorageTmp->asoEntityRowStatus != RS_ACTIVE)
+				if ((ret = can_act_asoEntityTable_row(StorageTmp)) != SNMP_ERR_NOERROR)
 					return (ret);
+			break;
+		case RS_NOTINSERVICE:
+			/* check that deactivation is possible */
+			if (StorageTmp->asoEntityRowStatus != RS_NOTINSERVICE)
+				if ((ret = can_deact_asoEntityTable_row(StorageTmp)) != SNMP_ERR_NOERROR)
+					return (ret);
+			break;
+		case RS_DESTROY:
+			/* check that deactivation is possible */
+			if (StorageTmp->asoEntityRowStatus != RS_NOTINSERVICE)
+				if ((ret = can_deact_asoEntityTable_row(StorageTmp)) != SNMP_ERR_NOERROR)
+					return (ret);
+			break;
+		default:
+			return SNMP_ERR_WRONGVALUE;
 				}
+		break;
+	case ACTION:
+		/* The variable has been stored in StorageTmp->asoEntityRowStatus for you to use, and you have just been asked to do something with it.  Note that anything done here must be
+		   reversable in the UNDO case */
+		switch (set_value) {
+		case RS_CREATEANDGO:
+			/* activate with underlying device */
+			if (activate_asoEntityTable_row(StorageNew) != SNMP_ERR_NOERROR)
+				return SNMP_ERR_COMMITFAILED;
+			break;
+		case RS_CREATEANDWAIT:
+			break;
+		case RS_ACTIVE:
+			/* state change already performed */
+			if (StorageTmp->asoEntityRowStatus != RS_ACTIVE) {
+				/* activate with underlying device */
+				if (activate_asoEntityTable_row(StorageTmp) != SNMP_ERR_NOERROR)
+					return SNMP_ERR_COMMITFAILED;
 			}
 			break;
 		case RS_NOTINSERVICE:
-			/* set the flag? */
-			old_value = StorageTmp->asoEntityRowStatus;
-			StorageTmp->asoEntityRowStatus = set_value;
+			/* state change already performed */
+			if (StorageTmp->asoEntityRowStatus != RS_NOTINSERVICE) {
+				/* deactivate with underlying device */
+				if (deactivate_asoEntityTable_row(StorageTmp) != SNMP_ERR_NOERROR)
+					return SNMP_ERR_COMMITFAILED;
+			}
 			break;
+		case RS_DESTROY:
+			/* commit destrution to underlying device */
+			if (StorageDel == NULL)
+				break;
+			/* deactivate with underlying device */
+			if (deactivate_asoEntityTable_row(StorageDel) != SNMP_ERR_NOERROR)
+				return SNMP_ERR_COMMITFAILED;
+			break;
+		default:
+			return SNMP_ERR_WRONGVALUE;
 		}
 		break;
 	case COMMIT:
 		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		switch (set_value) {
 		case RS_CREATEANDGO:
-			/* row creation, set final state */
-			/* XXX: commit creation to underlying device */
-			/* XXX: activate with underlying device */
 			StorageNew->asoEntityRowStatus = RS_ACTIVE;
 			break;
 		case RS_CREATEANDWAIT:
-			/* row creation, set final state */
 			StorageNew->asoEntityRowStatus = RS_NOTINSERVICE;
 			break;
 		case RS_ACTIVE:
 		case RS_NOTINSERVICE:
-			/* state change already performed */
-			if (old_value != set_value) {
-				switch (set_value) {
-				case RS_ACTIVE:
-					/* XXX: activate with underlying device */
-					break;
-				case RS_NOTINSERVICE:
-					/* XXX: deactivate with underlying device */
-					break;
-				}
+			StorageNew->asoEntityRowStatus = set_value;
+			if ((StorageOld = StorageTmp->asoEntityTable_old) != NULL) {
+				asoEntityTable_destroy(&StorageTmp->asoEntityTable_old);
+				StorageTmp->asoEntityTable_rsvs = 0;
+				StorageTmp->asoEntityTable_tsts = 0;
+				StorageTmp->asoEntityTable_sets = 0;
 			}
 			break;
 		case RS_DESTROY:
-			/* row deletion, free it its dead */
 			asoEntityTable_destroy(&StorageDel);
-			/* asoEntityTable_destroy() can handle NULL pointers. */
 			break;
 		}
 		break;
 	case UNDO:
 		/* Back out any changes made in the ACTION case */
 		switch (set_value) {
+		case RS_CREATEANDGO:
+			/* deactivate with underlying device */
+			deactivate_asoEntityTable_row(StorageNew);
+			break;
+		case RS_CREATEANDWAIT:
+			break;
 		case RS_ACTIVE:
+			if (StorageTmp->asoEntityRowStatus == RS_NOTINSERVICE)
+				/* deactivate with underlying device */
+				deactivate_asoEntityTable_row(StorageTmp);
+			break;
 		case RS_NOTINSERVICE:
-			/* restore state */
-			StorageTmp->asoEntityRowStatus = old_value;
+			if (StorageTmp->asoEntityRowStatus == RS_ACTIVE)
+				/* activate with underlying device */
+				activate_asoEntityTable_row(StorageTmp);
+			break;
+		case RS_DESTROY:
 			break;
 		}
 		/* fall through */
@@ -9710,6 +13123,13 @@ write_asoEntityRowStatus(int action, u_char *var_val, u_char var_val_type, size_
 				asoEntityTable_del(StorageNew);
 				asoEntityTable_destroy(&StorageNew);
 			}
+			break;
+		case RS_ACTIVE:
+		case RS_NOTINSERVICE:
+			if ((StorageOld = StorageTmp->asoEntityTable_old) == NULL)
+				break;
+			if (--StorageTmp->asoEntityTable_rsvs == 0)
+				asoEntityTable_destroy(&StorageTmp->asoEntityTable_old);
 			break;
 		case RS_DESTROY:
 			/* row deletion, so add it again */
@@ -9736,10 +13156,9 @@ write_asoEntityRowStatus(int action, u_char *var_val, u_char var_val_type, size_
 int
 write_asoInvocationRowStatus(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	struct asoInvocationTable_data *StorageTmp = NULL;
+	struct asoInvocationTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	static struct asoInvocationTable_data *StorageNew, *StorageDel;
 	size_t newlen = name_len - 15;
-	static int old_value;
 	int set_value, ret;
 	static struct variable_list *vars, *vp;
 
@@ -9766,40 +13185,6 @@ write_asoInvocationRowStatus(int action, u_char *var_val, u_char var_val_type, s
 			if (StorageTmp != NULL)
 				/* cannot create existing row */
 				return SNMP_ERR_INCONSISTENTVALUE;
-			break;
-		case RS_ACTIVE:
-		case RS_NOTINSERVICE:
-			if (StorageTmp == NULL)
-				/* cannot change state of non-existent row */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			if (StorageTmp->asoInvocationRowStatus == RS_NOTREADY)
-				/* cannot change state of row that is not ready */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			/* XXX: interaction with row storage type needed */
-			if (set_value == RS_NOTINSERVICE && StorageTmp->asoInvocationTable_refs > 0)
-				/* row is busy and cannot be moved to the RS_NOTINSERVICE state */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			break;
-		case RS_DESTROY:
-			/* destroying existent or non-existent row is ok */
-			if (StorageTmp == NULL)
-				break;
-			/* XXX: interaction with row storage type needed */
-			if (StorageTmp->asoInvocationTable_refs > 0)
-				/* row is busy and cannot be deleted */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			break;
-		case RS_NOTREADY:
-			/* management station cannot set this, only agent can */
-		default:
-			return SNMP_ERR_INCONSISTENTVALUE;
-		}
-		break;
-	case RESERVE2:
-		/* memory reseveration, final preparation... */
-		switch (set_value) {
-		case RS_CREATEANDGO:
-		case RS_CREATEANDWAIT:
 			/* creation */
 			vars = NULL;
 			/* applicationSubsystemId */
@@ -9849,6 +13234,7 @@ write_asoInvocationRowStatus(int action, u_char *var_val, u_char var_val_type, s
 				snmp_free_varbind(vars);
 				return SNMP_ERR_RESOURCEUNAVAILABLE;
 			}
+			StorageNew->asoInvocationTable_rsvs = 1;
 			vp = vars;
 			StorageNew->applicationSubsystemId = (ulong) *vp->val.integer;
 			vp = vp->next_variable;
@@ -9860,7 +13246,37 @@ write_asoInvocationRowStatus(int action, u_char *var_val, u_char var_val_type, s
 			vp = vp->next_variable;
 			header_complex_add_data(&asoInvocationTableStorage, vars, StorageNew);	/* frees vars */
 			break;
+		case RS_ACTIVE:
+		case RS_NOTINSERVICE:
+			if (StorageTmp == NULL)
+				/* cannot change state of non-existent row */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			if (StorageTmp->asoInvocationRowStatus == RS_NOTREADY)
+				/* cannot change state of row that is not ready */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			/* XXX: interaction with row storage type needed */
+			if (set_value == RS_NOTINSERVICE && StorageTmp->asoInvocationTable_refs > 0)
+				/* row is busy and cannot be moved to the RS_NOTINSERVICE state */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			/* activate or deactivate */
+			if (StorageTmp == NULL)
+				return SNMP_ERR_NOSUCHNAME;
+			/* one allocation for the whole row */
+			if ((StorageOld = StorageTmp->asoInvocationTable_old) == NULL)
+				if (StorageTmp->asoInvocationTable_rsvs == 0)
+					if ((StorageOld = StorageTmp->asoInvocationTable_old = asoInvocationTable_duplicate(StorageTmp)) == NULL)
+						return SNMP_ERR_RESOURCEUNAVAILABLE;
+			if (StorageOld != NULL)
+				StorageTmp->asoInvocationTable_rsvs++;
+			break;
 		case RS_DESTROY:
+			if (StorageTmp == NULL)
+				/* cannot destroy non-existent row */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			/* XXX: interaction with row storage type needed */
+			if (StorageTmp->asoInvocationTable_refs > 0)
+				/* row is busy and cannot be deleted */
+				return SNMP_ERR_INCONSISTENTVALUE;
 			/* destroy */
 			if (StorageTmp != NULL) {
 				/* exists, extract it for now */
@@ -9870,78 +13286,127 @@ write_asoInvocationRowStatus(int action, u_char *var_val, u_char var_val_type, s
 				StorageDel = NULL;
 			}
 			break;
+		case RS_NOTREADY:
+			/* management station cannot set this, only agent can */
+		default:
+			return SNMP_ERR_INCONSISTENTVALUE;
 		}
 		break;
-	case ACTION:
-		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the UNDO case */
+	case RESERVE2:
+		/* memory reseveration, final preparation... */
 		switch (set_value) {
 		case RS_CREATEANDGO:
 			/* check that activation is possible */
-			if ((ret = asoInvocationTable_consistent(StorageNew)) != SNMP_ERR_NOERROR)
+			if ((ret = can_act_asoInvocationTable_row(StorageNew)) != SNMP_ERR_NOERROR)
 				return (ret);
 			break;
 		case RS_CREATEANDWAIT:
-			/* row does not have to be consistent */
 			break;
 		case RS_ACTIVE:
-			old_value = StorageTmp->asoInvocationRowStatus;
-			StorageTmp->asoInvocationRowStatus = set_value;
-			if (old_value != RS_ACTIVE) {
 				/* check that activation is possible */
-				if ((ret = asoInvocationTable_consistent(StorageTmp)) != SNMP_ERR_NOERROR) {
-					StorageTmp->asoInvocationRowStatus = old_value;
+			if (StorageTmp->asoInvocationRowStatus != RS_ACTIVE)
+				if ((ret = can_act_asoInvocationTable_row(StorageTmp)) != SNMP_ERR_NOERROR)
 					return (ret);
+			break;
+		case RS_NOTINSERVICE:
+			/* check that deactivation is possible */
+			if (StorageTmp->asoInvocationRowStatus != RS_NOTINSERVICE)
+				if ((ret = can_deact_asoInvocationTable_row(StorageTmp)) != SNMP_ERR_NOERROR)
+					return (ret);
+			break;
+		case RS_DESTROY:
+			/* check that deactivation is possible */
+			if (StorageTmp->asoInvocationRowStatus != RS_NOTINSERVICE)
+				if ((ret = can_deact_asoInvocationTable_row(StorageTmp)) != SNMP_ERR_NOERROR)
+					return (ret);
+			break;
+		default:
+			return SNMP_ERR_WRONGVALUE;
 				}
+		break;
+	case ACTION:
+		/* The variable has been stored in StorageTmp->asoInvocationRowStatus for you to use, and you have just been asked to do something with it.  Note that anything done here must be
+		   reversable in the UNDO case */
+		switch (set_value) {
+		case RS_CREATEANDGO:
+			/* activate with underlying device */
+			if (activate_asoInvocationTable_row(StorageNew) != SNMP_ERR_NOERROR)
+				return SNMP_ERR_COMMITFAILED;
+			break;
+		case RS_CREATEANDWAIT:
+			break;
+		case RS_ACTIVE:
+			/* state change already performed */
+			if (StorageTmp->asoInvocationRowStatus != RS_ACTIVE) {
+				/* activate with underlying device */
+				if (activate_asoInvocationTable_row(StorageTmp) != SNMP_ERR_NOERROR)
+					return SNMP_ERR_COMMITFAILED;
 			}
 			break;
 		case RS_NOTINSERVICE:
-			/* set the flag? */
-			old_value = StorageTmp->asoInvocationRowStatus;
-			StorageTmp->asoInvocationRowStatus = set_value;
+			/* state change already performed */
+			if (StorageTmp->asoInvocationRowStatus != RS_NOTINSERVICE) {
+				/* deactivate with underlying device */
+				if (deactivate_asoInvocationTable_row(StorageTmp) != SNMP_ERR_NOERROR)
+					return SNMP_ERR_COMMITFAILED;
+			}
 			break;
+		case RS_DESTROY:
+			/* commit destrution to underlying device */
+			if (StorageDel == NULL)
+				break;
+			/* deactivate with underlying device */
+			if (deactivate_asoInvocationTable_row(StorageDel) != SNMP_ERR_NOERROR)
+				return SNMP_ERR_COMMITFAILED;
+			break;
+		default:
+			return SNMP_ERR_WRONGVALUE;
 		}
 		break;
 	case COMMIT:
 		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		switch (set_value) {
 		case RS_CREATEANDGO:
-			/* row creation, set final state */
-			/* XXX: commit creation to underlying device */
-			/* XXX: activate with underlying device */
 			StorageNew->asoInvocationRowStatus = RS_ACTIVE;
 			break;
 		case RS_CREATEANDWAIT:
-			/* row creation, set final state */
 			StorageNew->asoInvocationRowStatus = RS_NOTINSERVICE;
 			break;
 		case RS_ACTIVE:
 		case RS_NOTINSERVICE:
-			/* state change already performed */
-			if (old_value != set_value) {
-				switch (set_value) {
-				case RS_ACTIVE:
-					/* XXX: activate with underlying device */
-					break;
-				case RS_NOTINSERVICE:
-					/* XXX: deactivate with underlying device */
-					break;
-				}
+			StorageNew->asoInvocationRowStatus = set_value;
+			if ((StorageOld = StorageTmp->asoInvocationTable_old) != NULL) {
+				asoInvocationTable_destroy(&StorageTmp->asoInvocationTable_old);
+				StorageTmp->asoInvocationTable_rsvs = 0;
+				StorageTmp->asoInvocationTable_tsts = 0;
+				StorageTmp->asoInvocationTable_sets = 0;
 			}
 			break;
 		case RS_DESTROY:
-			/* row deletion, free it its dead */
 			asoInvocationTable_destroy(&StorageDel);
-			/* asoInvocationTable_destroy() can handle NULL pointers. */
 			break;
 		}
 		break;
 	case UNDO:
 		/* Back out any changes made in the ACTION case */
 		switch (set_value) {
+		case RS_CREATEANDGO:
+			/* deactivate with underlying device */
+			deactivate_asoInvocationTable_row(StorageNew);
+			break;
+		case RS_CREATEANDWAIT:
+			break;
 		case RS_ACTIVE:
+			if (StorageTmp->asoInvocationRowStatus == RS_NOTINSERVICE)
+				/* deactivate with underlying device */
+				deactivate_asoInvocationTable_row(StorageTmp);
+			break;
 		case RS_NOTINSERVICE:
-			/* restore state */
-			StorageTmp->asoInvocationRowStatus = old_value;
+			if (StorageTmp->asoInvocationRowStatus == RS_ACTIVE)
+				/* activate with underlying device */
+				activate_asoInvocationTable_row(StorageTmp);
+			break;
+		case RS_DESTROY:
 			break;
 		}
 		/* fall through */
@@ -9955,6 +13420,13 @@ write_asoInvocationRowStatus(int action, u_char *var_val, u_char var_val_type, s
 				asoInvocationTable_del(StorageNew);
 				asoInvocationTable_destroy(&StorageNew);
 			}
+			break;
+		case RS_ACTIVE:
+		case RS_NOTINSERVICE:
+			if ((StorageOld = StorageTmp->asoInvocationTable_old) == NULL)
+				break;
+			if (--StorageTmp->asoInvocationTable_rsvs == 0)
+				asoInvocationTable_destroy(&StorageTmp->asoInvocationTable_old);
 			break;
 		case RS_DESTROY:
 			/* row deletion, so add it again */
@@ -9981,10 +13453,9 @@ write_asoInvocationRowStatus(int action, u_char *var_val, u_char var_val_type, s
 int
 write_monoULConnectionRowStatus(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	struct monoULConnectionTable_data *StorageTmp = NULL;
+	struct monoULConnectionTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	static struct monoULConnectionTable_data *StorageNew, *StorageDel;
 	size_t newlen = name_len - 15;
-	static int old_value;
 	int set_value, ret;
 	static struct variable_list *vars, *vp;
 
@@ -10011,40 +13482,6 @@ write_monoULConnectionRowStatus(int action, u_char *var_val, u_char var_val_type
 			if (StorageTmp != NULL)
 				/* cannot create existing row */
 				return SNMP_ERR_INCONSISTENTVALUE;
-			break;
-		case RS_ACTIVE:
-		case RS_NOTINSERVICE:
-			if (StorageTmp == NULL)
-				/* cannot change state of non-existent row */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			if (StorageTmp->monoULConnectionRowStatus == RS_NOTREADY)
-				/* cannot change state of row that is not ready */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			/* XXX: interaction with row storage type needed */
-			if (set_value == RS_NOTINSERVICE && StorageTmp->monoULConnectionTable_refs > 0)
-				/* row is busy and cannot be moved to the RS_NOTINSERVICE state */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			break;
-		case RS_DESTROY:
-			/* destroying existent or non-existent row is ok */
-			if (StorageTmp == NULL)
-				break;
-			/* XXX: interaction with row storage type needed */
-			if (StorageTmp->monoULConnectionTable_refs > 0)
-				/* row is busy and cannot be deleted */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			break;
-		case RS_NOTREADY:
-			/* management station cannot set this, only agent can */
-		default:
-			return SNMP_ERR_INCONSISTENTVALUE;
-		}
-		break;
-	case RESERVE2:
-		/* memory reseveration, final preparation... */
-		switch (set_value) {
-		case RS_CREATEANDGO:
-		case RS_CREATEANDWAIT:
 			/* creation */
 			vars = NULL;
 			/* applicationSubsystemId */
@@ -10081,6 +13518,7 @@ write_monoULConnectionRowStatus(int action, u_char *var_val, u_char var_val_type
 				snmp_free_varbind(vars);
 				return SNMP_ERR_RESOURCEUNAVAILABLE;
 			}
+			StorageNew->monoULConnectionTable_rsvs = 1;
 			vp = vars;
 			StorageNew->applicationSubsystemId = (ulong) *vp->val.integer;
 			vp = vp->next_variable;
@@ -10089,7 +13527,37 @@ write_monoULConnectionRowStatus(int action, u_char *var_val, u_char var_val_type
 			vp = vp->next_variable;
 			header_complex_add_data(&monoULConnectionTableStorage, vars, StorageNew);	/* frees vars */
 			break;
+		case RS_ACTIVE:
+		case RS_NOTINSERVICE:
+			if (StorageTmp == NULL)
+				/* cannot change state of non-existent row */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			if (StorageTmp->monoULConnectionRowStatus == RS_NOTREADY)
+				/* cannot change state of row that is not ready */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			/* XXX: interaction with row storage type needed */
+			if (set_value == RS_NOTINSERVICE && StorageTmp->monoULConnectionTable_refs > 0)
+				/* row is busy and cannot be moved to the RS_NOTINSERVICE state */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			/* activate or deactivate */
+			if (StorageTmp == NULL)
+				return SNMP_ERR_NOSUCHNAME;
+			/* one allocation for the whole row */
+			if ((StorageOld = StorageTmp->monoULConnectionTable_old) == NULL)
+				if (StorageTmp->monoULConnectionTable_rsvs == 0)
+					if ((StorageOld = StorageTmp->monoULConnectionTable_old = monoULConnectionTable_duplicate(StorageTmp)) == NULL)
+						return SNMP_ERR_RESOURCEUNAVAILABLE;
+			if (StorageOld != NULL)
+				StorageTmp->monoULConnectionTable_rsvs++;
+			break;
 		case RS_DESTROY:
+			if (StorageTmp == NULL)
+				/* cannot destroy non-existent row */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			/* XXX: interaction with row storage type needed */
+			if (StorageTmp->monoULConnectionTable_refs > 0)
+				/* row is busy and cannot be deleted */
+				return SNMP_ERR_INCONSISTENTVALUE;
 			/* destroy */
 			if (StorageTmp != NULL) {
 				/* exists, extract it for now */
@@ -10099,78 +13567,127 @@ write_monoULConnectionRowStatus(int action, u_char *var_val, u_char var_val_type
 				StorageDel = NULL;
 			}
 			break;
+		case RS_NOTREADY:
+			/* management station cannot set this, only agent can */
+		default:
+			return SNMP_ERR_INCONSISTENTVALUE;
 		}
 		break;
-	case ACTION:
-		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the UNDO case */
+	case RESERVE2:
+		/* memory reseveration, final preparation... */
 		switch (set_value) {
 		case RS_CREATEANDGO:
 			/* check that activation is possible */
-			if ((ret = monoULConnectionTable_consistent(StorageNew)) != SNMP_ERR_NOERROR)
+			if ((ret = can_act_monoULConnectionTable_row(StorageNew)) != SNMP_ERR_NOERROR)
 				return (ret);
 			break;
 		case RS_CREATEANDWAIT:
-			/* row does not have to be consistent */
 			break;
 		case RS_ACTIVE:
-			old_value = StorageTmp->monoULConnectionRowStatus;
-			StorageTmp->monoULConnectionRowStatus = set_value;
-			if (old_value != RS_ACTIVE) {
 				/* check that activation is possible */
-				if ((ret = monoULConnectionTable_consistent(StorageTmp)) != SNMP_ERR_NOERROR) {
-					StorageTmp->monoULConnectionRowStatus = old_value;
+			if (StorageTmp->monoULConnectionRowStatus != RS_ACTIVE)
+				if ((ret = can_act_monoULConnectionTable_row(StorageTmp)) != SNMP_ERR_NOERROR)
 					return (ret);
+			break;
+		case RS_NOTINSERVICE:
+			/* check that deactivation is possible */
+			if (StorageTmp->monoULConnectionRowStatus != RS_NOTINSERVICE)
+				if ((ret = can_deact_monoULConnectionTable_row(StorageTmp)) != SNMP_ERR_NOERROR)
+					return (ret);
+			break;
+		case RS_DESTROY:
+			/* check that deactivation is possible */
+			if (StorageTmp->monoULConnectionRowStatus != RS_NOTINSERVICE)
+				if ((ret = can_deact_monoULConnectionTable_row(StorageTmp)) != SNMP_ERR_NOERROR)
+					return (ret);
+			break;
+		default:
+			return SNMP_ERR_WRONGVALUE;
 				}
+		break;
+	case ACTION:
+		/* The variable has been stored in StorageTmp->monoULConnectionRowStatus for you to use, and you have just been asked to do something with it.  Note that anything done here must be
+		   reversable in the UNDO case */
+		switch (set_value) {
+		case RS_CREATEANDGO:
+			/* activate with underlying device */
+			if (activate_monoULConnectionTable_row(StorageNew) != SNMP_ERR_NOERROR)
+				return SNMP_ERR_COMMITFAILED;
+			break;
+		case RS_CREATEANDWAIT:
+			break;
+		case RS_ACTIVE:
+			/* state change already performed */
+			if (StorageTmp->monoULConnectionRowStatus != RS_ACTIVE) {
+				/* activate with underlying device */
+				if (activate_monoULConnectionTable_row(StorageTmp) != SNMP_ERR_NOERROR)
+					return SNMP_ERR_COMMITFAILED;
 			}
 			break;
 		case RS_NOTINSERVICE:
-			/* set the flag? */
-			old_value = StorageTmp->monoULConnectionRowStatus;
-			StorageTmp->monoULConnectionRowStatus = set_value;
+			/* state change already performed */
+			if (StorageTmp->monoULConnectionRowStatus != RS_NOTINSERVICE) {
+				/* deactivate with underlying device */
+				if (deactivate_monoULConnectionTable_row(StorageTmp) != SNMP_ERR_NOERROR)
+					return SNMP_ERR_COMMITFAILED;
+			}
 			break;
+		case RS_DESTROY:
+			/* commit destrution to underlying device */
+			if (StorageDel == NULL)
+				break;
+			/* deactivate with underlying device */
+			if (deactivate_monoULConnectionTable_row(StorageDel) != SNMP_ERR_NOERROR)
+				return SNMP_ERR_COMMITFAILED;
+			break;
+		default:
+			return SNMP_ERR_WRONGVALUE;
 		}
 		break;
 	case COMMIT:
 		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		switch (set_value) {
 		case RS_CREATEANDGO:
-			/* row creation, set final state */
-			/* XXX: commit creation to underlying device */
-			/* XXX: activate with underlying device */
 			StorageNew->monoULConnectionRowStatus = RS_ACTIVE;
 			break;
 		case RS_CREATEANDWAIT:
-			/* row creation, set final state */
 			StorageNew->monoULConnectionRowStatus = RS_NOTINSERVICE;
 			break;
 		case RS_ACTIVE:
 		case RS_NOTINSERVICE:
-			/* state change already performed */
-			if (old_value != set_value) {
-				switch (set_value) {
-				case RS_ACTIVE:
-					/* XXX: activate with underlying device */
-					break;
-				case RS_NOTINSERVICE:
-					/* XXX: deactivate with underlying device */
-					break;
-				}
+			StorageNew->monoULConnectionRowStatus = set_value;
+			if ((StorageOld = StorageTmp->monoULConnectionTable_old) != NULL) {
+				monoULConnectionTable_destroy(&StorageTmp->monoULConnectionTable_old);
+				StorageTmp->monoULConnectionTable_rsvs = 0;
+				StorageTmp->monoULConnectionTable_tsts = 0;
+				StorageTmp->monoULConnectionTable_sets = 0;
 			}
 			break;
 		case RS_DESTROY:
-			/* row deletion, free it its dead */
 			monoULConnectionTable_destroy(&StorageDel);
-			/* monoULConnectionTable_destroy() can handle NULL pointers. */
 			break;
 		}
 		break;
 	case UNDO:
 		/* Back out any changes made in the ACTION case */
 		switch (set_value) {
+		case RS_CREATEANDGO:
+			/* deactivate with underlying device */
+			deactivate_monoULConnectionTable_row(StorageNew);
+			break;
+		case RS_CREATEANDWAIT:
+			break;
 		case RS_ACTIVE:
+			if (StorageTmp->monoULConnectionRowStatus == RS_NOTINSERVICE)
+				/* deactivate with underlying device */
+				deactivate_monoULConnectionTable_row(StorageTmp);
+			break;
 		case RS_NOTINSERVICE:
-			/* restore state */
-			StorageTmp->monoULConnectionRowStatus = old_value;
+			if (StorageTmp->monoULConnectionRowStatus == RS_ACTIVE)
+				/* activate with underlying device */
+				activate_monoULConnectionTable_row(StorageTmp);
+			break;
+		case RS_DESTROY:
 			break;
 		}
 		/* fall through */
@@ -10184,6 +13701,13 @@ write_monoULConnectionRowStatus(int action, u_char *var_val, u_char var_val_type
 				monoULConnectionTable_del(StorageNew);
 				monoULConnectionTable_destroy(&StorageNew);
 			}
+			break;
+		case RS_ACTIVE:
+		case RS_NOTINSERVICE:
+			if ((StorageOld = StorageTmp->monoULConnectionTable_old) == NULL)
+				break;
+			if (--StorageTmp->monoULConnectionTable_rsvs == 0)
+				monoULConnectionTable_destroy(&StorageTmp->monoULConnectionTable_old);
 			break;
 		case RS_DESTROY:
 			/* row deletion, so add it again */
@@ -10210,10 +13734,9 @@ write_monoULConnectionRowStatus(int action, u_char *var_val, u_char var_val_type
 int
 write_monolithicUpperLayerSubssytemRowStatus(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	struct monolithicUpperLayerSubsystemTable_data *StorageTmp = NULL;
+	struct monolithicUpperLayerSubsystemTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	static struct monolithicUpperLayerSubsystemTable_data *StorageNew, *StorageDel;
 	size_t newlen = name_len - 15;
-	static int old_value;
 	int set_value, ret;
 	static struct variable_list *vars, *vp;
 
@@ -10240,40 +13763,6 @@ write_monolithicUpperLayerSubssytemRowStatus(int action, u_char *var_val, u_char
 			if (StorageTmp != NULL)
 				/* cannot create existing row */
 				return SNMP_ERR_INCONSISTENTVALUE;
-			break;
-		case RS_ACTIVE:
-		case RS_NOTINSERVICE:
-			if (StorageTmp == NULL)
-				/* cannot change state of non-existent row */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			if (StorageTmp->monolithicUpperLayerSubssytemRowStatus == RS_NOTREADY)
-				/* cannot change state of row that is not ready */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			/* XXX: interaction with row storage type needed */
-			if (set_value == RS_NOTINSERVICE && StorageTmp->monolithicUpperLayerSubsystemTable_refs > 0)
-				/* row is busy and cannot be moved to the RS_NOTINSERVICE state */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			break;
-		case RS_DESTROY:
-			/* destroying existent or non-existent row is ok */
-			if (StorageTmp == NULL)
-				break;
-			/* XXX: interaction with row storage type needed */
-			if (StorageTmp->monolithicUpperLayerSubsystemTable_refs > 0)
-				/* row is busy and cannot be deleted */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			break;
-		case RS_NOTREADY:
-			/* management station cannot set this, only agent can */
-		default:
-			return SNMP_ERR_INCONSISTENTVALUE;
-		}
-		break;
-	case RESERVE2:
-		/* memory reseveration, final preparation... */
-		switch (set_value) {
-		case RS_CREATEANDGO:
-		case RS_CREATEANDWAIT:
 			/* creation */
 			vars = NULL;
 			/* monolithicUpperLayerSubsystemId */
@@ -10298,13 +13787,44 @@ write_monolithicUpperLayerSubssytemRowStatus(int action, u_char *var_val, u_char
 				snmp_free_varbind(vars);
 				return SNMP_ERR_RESOURCEUNAVAILABLE;
 			}
+			StorageNew->monolithicUpperLayerSubsystemTable_rsvs = 1;
 			vp = vars;
 			memdup((void *) &StorageNew->monolithicUpperLayerSubsystemId, vp->val.string, vp->val_len);
 			StorageNew->monolithicUpperLayerSubsystemIdLen = vp->val_len;
 			vp = vp->next_variable;
 			header_complex_add_data(&monolithicUpperLayerSubsystemTableStorage, vars, StorageNew);	/* frees vars */
 			break;
+		case RS_ACTIVE:
+		case RS_NOTINSERVICE:
+			if (StorageTmp == NULL)
+				/* cannot change state of non-existent row */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			if (StorageTmp->monolithicUpperLayerSubssytemRowStatus == RS_NOTREADY)
+				/* cannot change state of row that is not ready */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			/* XXX: interaction with row storage type needed */
+			if (set_value == RS_NOTINSERVICE && StorageTmp->monolithicUpperLayerSubsystemTable_refs > 0)
+				/* row is busy and cannot be moved to the RS_NOTINSERVICE state */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			/* activate or deactivate */
+			if (StorageTmp == NULL)
+				return SNMP_ERR_NOSUCHNAME;
+			/* one allocation for the whole row */
+			if ((StorageOld = StorageTmp->monolithicUpperLayerSubsystemTable_old) == NULL)
+				if (StorageTmp->monolithicUpperLayerSubsystemTable_rsvs == 0)
+					if ((StorageOld = StorageTmp->monolithicUpperLayerSubsystemTable_old = monolithicUpperLayerSubsystemTable_duplicate(StorageTmp)) == NULL)
+						return SNMP_ERR_RESOURCEUNAVAILABLE;
+			if (StorageOld != NULL)
+				StorageTmp->monolithicUpperLayerSubsystemTable_rsvs++;
+			break;
 		case RS_DESTROY:
+			if (StorageTmp == NULL)
+				/* cannot destroy non-existent row */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			/* XXX: interaction with row storage type needed */
+			if (StorageTmp->monolithicUpperLayerSubsystemTable_refs > 0)
+				/* row is busy and cannot be deleted */
+				return SNMP_ERR_INCONSISTENTVALUE;
 			/* destroy */
 			if (StorageTmp != NULL) {
 				/* exists, extract it for now */
@@ -10314,78 +13834,127 @@ write_monolithicUpperLayerSubssytemRowStatus(int action, u_char *var_val, u_char
 				StorageDel = NULL;
 			}
 			break;
+		case RS_NOTREADY:
+			/* management station cannot set this, only agent can */
+		default:
+			return SNMP_ERR_INCONSISTENTVALUE;
 		}
 		break;
-	case ACTION:
-		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the UNDO case */
+	case RESERVE2:
+		/* memory reseveration, final preparation... */
 		switch (set_value) {
 		case RS_CREATEANDGO:
 			/* check that activation is possible */
-			if ((ret = monolithicUpperLayerSubsystemTable_consistent(StorageNew)) != SNMP_ERR_NOERROR)
+			if ((ret = can_act_monolithicUpperLayerSubsystemTable_row(StorageNew)) != SNMP_ERR_NOERROR)
 				return (ret);
 			break;
 		case RS_CREATEANDWAIT:
-			/* row does not have to be consistent */
 			break;
 		case RS_ACTIVE:
-			old_value = StorageTmp->monolithicUpperLayerSubssytemRowStatus;
-			StorageTmp->monolithicUpperLayerSubssytemRowStatus = set_value;
-			if (old_value != RS_ACTIVE) {
 				/* check that activation is possible */
-				if ((ret = monolithicUpperLayerSubsystemTable_consistent(StorageTmp)) != SNMP_ERR_NOERROR) {
-					StorageTmp->monolithicUpperLayerSubssytemRowStatus = old_value;
+			if (StorageTmp->monolithicUpperLayerSubssytemRowStatus != RS_ACTIVE)
+				if ((ret = can_act_monolithicUpperLayerSubsystemTable_row(StorageTmp)) != SNMP_ERR_NOERROR)
 					return (ret);
+			break;
+		case RS_NOTINSERVICE:
+			/* check that deactivation is possible */
+			if (StorageTmp->monolithicUpperLayerSubssytemRowStatus != RS_NOTINSERVICE)
+				if ((ret = can_deact_monolithicUpperLayerSubsystemTable_row(StorageTmp)) != SNMP_ERR_NOERROR)
+					return (ret);
+			break;
+		case RS_DESTROY:
+			/* check that deactivation is possible */
+			if (StorageTmp->monolithicUpperLayerSubssytemRowStatus != RS_NOTINSERVICE)
+				if ((ret = can_deact_monolithicUpperLayerSubsystemTable_row(StorageTmp)) != SNMP_ERR_NOERROR)
+					return (ret);
+			break;
+		default:
+			return SNMP_ERR_WRONGVALUE;
 				}
+		break;
+	case ACTION:
+		/* The variable has been stored in StorageTmp->monolithicUpperLayerSubssytemRowStatus for you to use, and you have just been asked to do something with it.  Note that anything done
+		   here must be reversable in the UNDO case */
+		switch (set_value) {
+		case RS_CREATEANDGO:
+			/* activate with underlying device */
+			if (activate_monolithicUpperLayerSubsystemTable_row(StorageNew) != SNMP_ERR_NOERROR)
+				return SNMP_ERR_COMMITFAILED;
+			break;
+		case RS_CREATEANDWAIT:
+			break;
+		case RS_ACTIVE:
+			/* state change already performed */
+			if (StorageTmp->monolithicUpperLayerSubssytemRowStatus != RS_ACTIVE) {
+				/* activate with underlying device */
+				if (activate_monolithicUpperLayerSubsystemTable_row(StorageTmp) != SNMP_ERR_NOERROR)
+					return SNMP_ERR_COMMITFAILED;
 			}
 			break;
 		case RS_NOTINSERVICE:
-			/* set the flag? */
-			old_value = StorageTmp->monolithicUpperLayerSubssytemRowStatus;
-			StorageTmp->monolithicUpperLayerSubssytemRowStatus = set_value;
+			/* state change already performed */
+			if (StorageTmp->monolithicUpperLayerSubssytemRowStatus != RS_NOTINSERVICE) {
+				/* deactivate with underlying device */
+				if (deactivate_monolithicUpperLayerSubsystemTable_row(StorageTmp) != SNMP_ERR_NOERROR)
+					return SNMP_ERR_COMMITFAILED;
+			}
 			break;
+		case RS_DESTROY:
+			/* commit destrution to underlying device */
+			if (StorageDel == NULL)
+			break;
+			/* deactivate with underlying device */
+			if (deactivate_monolithicUpperLayerSubsystemTable_row(StorageDel) != SNMP_ERR_NOERROR)
+				return SNMP_ERR_COMMITFAILED;
+			break;
+		default:
+			return SNMP_ERR_WRONGVALUE;
 		}
 		break;
 	case COMMIT:
 		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		switch (set_value) {
 		case RS_CREATEANDGO:
-			/* row creation, set final state */
-			/* XXX: commit creation to underlying device */
-			/* XXX: activate with underlying device */
 			StorageNew->monolithicUpperLayerSubssytemRowStatus = RS_ACTIVE;
 			break;
 		case RS_CREATEANDWAIT:
-			/* row creation, set final state */
 			StorageNew->monolithicUpperLayerSubssytemRowStatus = RS_NOTINSERVICE;
 			break;
 		case RS_ACTIVE:
 		case RS_NOTINSERVICE:
-			/* state change already performed */
-			if (old_value != set_value) {
-				switch (set_value) {
-				case RS_ACTIVE:
-					/* XXX: activate with underlying device */
-					break;
-				case RS_NOTINSERVICE:
-					/* XXX: deactivate with underlying device */
-					break;
-				}
+			StorageNew->monolithicUpperLayerSubssytemRowStatus = set_value;
+			if ((StorageOld = StorageTmp->monolithicUpperLayerSubsystemTable_old) != NULL) {
+				monolithicUpperLayerSubsystemTable_destroy(&StorageTmp->monolithicUpperLayerSubsystemTable_old);
+				StorageTmp->monolithicUpperLayerSubsystemTable_rsvs = 0;
+				StorageTmp->monolithicUpperLayerSubsystemTable_tsts = 0;
+				StorageTmp->monolithicUpperLayerSubsystemTable_sets = 0;
 			}
 			break;
 		case RS_DESTROY:
-			/* row deletion, free it its dead */
 			monolithicUpperLayerSubsystemTable_destroy(&StorageDel);
-			/* monolithicUpperLayerSubsystemTable_destroy() can handle NULL pointers. */
 			break;
 		}
 		break;
 	case UNDO:
 		/* Back out any changes made in the ACTION case */
 		switch (set_value) {
+		case RS_CREATEANDGO:
+			/* deactivate with underlying device */
+			deactivate_monolithicUpperLayerSubsystemTable_row(StorageNew);
+			break;
+		case RS_CREATEANDWAIT:
+			break;
 		case RS_ACTIVE:
+			if (StorageTmp->monolithicUpperLayerSubssytemRowStatus == RS_NOTINSERVICE)
+				/* deactivate with underlying device */
+				deactivate_monolithicUpperLayerSubsystemTable_row(StorageTmp);
+			break;
 		case RS_NOTINSERVICE:
-			/* restore state */
-			StorageTmp->monolithicUpperLayerSubssytemRowStatus = old_value;
+			if (StorageTmp->monolithicUpperLayerSubssytemRowStatus == RS_ACTIVE)
+				/* activate with underlying device */
+				activate_monolithicUpperLayerSubsystemTable_row(StorageTmp);
+			break;
+		case RS_DESTROY:
 			break;
 		}
 		/* fall through */
@@ -10399,6 +13968,13 @@ write_monolithicUpperLayerSubssytemRowStatus(int action, u_char *var_val, u_char
 				monolithicUpperLayerSubsystemTable_del(StorageNew);
 				monolithicUpperLayerSubsystemTable_destroy(&StorageNew);
 			}
+			break;
+		case RS_ACTIVE:
+		case RS_NOTINSERVICE:
+			if ((StorageOld = StorageTmp->monolithicUpperLayerSubsystemTable_old) == NULL)
+				break;
+			if (--StorageTmp->monolithicUpperLayerSubsystemTable_rsvs == 0)
+				monolithicUpperLayerSubsystemTable_destroy(&StorageTmp->monolithicUpperLayerSubsystemTable_old);
 			break;
 		case RS_DESTROY:
 			/* row deletion, so add it again */
@@ -10425,10 +14001,9 @@ write_monolithicUpperLayerSubssytemRowStatus(int action, u_char *var_val, u_char
 int
 write_pSapRowStatus(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	struct pSapTable_data *StorageTmp = NULL;
+	struct pSapTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	static struct pSapTable_data *StorageNew, *StorageDel;
 	size_t newlen = name_len - 15;
-	static int old_value;
 	int set_value, ret;
 	static struct variable_list *vars, *vp;
 
@@ -10455,40 +14030,6 @@ write_pSapRowStatus(int action, u_char *var_val, u_char var_val_type, size_t var
 			if (StorageTmp != NULL)
 				/* cannot create existing row */
 				return SNMP_ERR_INCONSISTENTVALUE;
-			break;
-		case RS_ACTIVE:
-		case RS_NOTINSERVICE:
-			if (StorageTmp == NULL)
-				/* cannot change state of non-existent row */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			if (StorageTmp->pSapRowStatus == RS_NOTREADY)
-				/* cannot change state of row that is not ready */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			/* XXX: interaction with row storage type needed */
-			if (set_value == RS_NOTINSERVICE && StorageTmp->pSapTable_refs > 0)
-				/* row is busy and cannot be moved to the RS_NOTINSERVICE state */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			break;
-		case RS_DESTROY:
-			/* destroying existent or non-existent row is ok */
-			if (StorageTmp == NULL)
-				break;
-			/* XXX: interaction with row storage type needed */
-			if (StorageTmp->pSapTable_refs > 0)
-				/* row is busy and cannot be deleted */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			break;
-		case RS_NOTREADY:
-			/* management station cannot set this, only agent can */
-		default:
-			return SNMP_ERR_INCONSISTENTVALUE;
-		}
-		break;
-	case RESERVE2:
-		/* memory reseveration, final preparation... */
-		switch (set_value) {
-		case RS_CREATEANDGO:
-		case RS_CREATEANDWAIT:
 			/* creation */
 			vars = NULL;
 			/* subsystemId */
@@ -10513,13 +14054,44 @@ write_pSapRowStatus(int action, u_char *var_val, u_char var_val_type, size_t var
 				snmp_free_varbind(vars);
 				return SNMP_ERR_RESOURCEUNAVAILABLE;
 			}
+			StorageNew->pSapTable_rsvs = 1;
 			vp = vars;
 			memdup((void *) &StorageNew->subsystemId, vp->val.string, vp->val_len);
 			StorageNew->subsystemIdLen = vp->val_len;
 			vp = vp->next_variable;
 			header_complex_add_data(&pSapTableStorage, vars, StorageNew);	/* frees vars */
 			break;
+		case RS_ACTIVE:
+		case RS_NOTINSERVICE:
+			if (StorageTmp == NULL)
+				/* cannot change state of non-existent row */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			if (StorageTmp->pSapRowStatus == RS_NOTREADY)
+				/* cannot change state of row that is not ready */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			/* XXX: interaction with row storage type needed */
+			if (set_value == RS_NOTINSERVICE && StorageTmp->pSapTable_refs > 0)
+				/* row is busy and cannot be moved to the RS_NOTINSERVICE state */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			/* activate or deactivate */
+			if (StorageTmp == NULL)
+				return SNMP_ERR_NOSUCHNAME;
+			/* one allocation for the whole row */
+			if ((StorageOld = StorageTmp->pSapTable_old) == NULL)
+				if (StorageTmp->pSapTable_rsvs == 0)
+					if ((StorageOld = StorageTmp->pSapTable_old = pSapTable_duplicate(StorageTmp)) == NULL)
+						return SNMP_ERR_RESOURCEUNAVAILABLE;
+			if (StorageOld != NULL)
+				StorageTmp->pSapTable_rsvs++;
+			break;
 		case RS_DESTROY:
+			if (StorageTmp == NULL)
+				/* cannot destroy non-existent row */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			/* XXX: interaction with row storage type needed */
+			if (StorageTmp->pSapTable_refs > 0)
+				/* row is busy and cannot be deleted */
+				return SNMP_ERR_INCONSISTENTVALUE;
 			/* destroy */
 			if (StorageTmp != NULL) {
 				/* exists, extract it for now */
@@ -10529,78 +14101,127 @@ write_pSapRowStatus(int action, u_char *var_val, u_char var_val_type, size_t var
 				StorageDel = NULL;
 			}
 			break;
+		case RS_NOTREADY:
+			/* management station cannot set this, only agent can */
+		default:
+			return SNMP_ERR_INCONSISTENTVALUE;
 		}
 		break;
-	case ACTION:
-		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the UNDO case */
+	case RESERVE2:
+		/* memory reseveration, final preparation... */
 		switch (set_value) {
 		case RS_CREATEANDGO:
 			/* check that activation is possible */
-			if ((ret = pSapTable_consistent(StorageNew)) != SNMP_ERR_NOERROR)
+			if ((ret = can_act_pSapTable_row(StorageNew)) != SNMP_ERR_NOERROR)
 				return (ret);
 			break;
 		case RS_CREATEANDWAIT:
-			/* row does not have to be consistent */
 			break;
 		case RS_ACTIVE:
-			old_value = StorageTmp->pSapRowStatus;
-			StorageTmp->pSapRowStatus = set_value;
-			if (old_value != RS_ACTIVE) {
 				/* check that activation is possible */
-				if ((ret = pSapTable_consistent(StorageTmp)) != SNMP_ERR_NOERROR) {
-					StorageTmp->pSapRowStatus = old_value;
+			if (StorageTmp->pSapRowStatus != RS_ACTIVE)
+				if ((ret = can_act_pSapTable_row(StorageTmp)) != SNMP_ERR_NOERROR)
 					return (ret);
+			break;
+		case RS_NOTINSERVICE:
+			/* check that deactivation is possible */
+			if (StorageTmp->pSapRowStatus != RS_NOTINSERVICE)
+				if ((ret = can_deact_pSapTable_row(StorageTmp)) != SNMP_ERR_NOERROR)
+					return (ret);
+			break;
+		case RS_DESTROY:
+			/* check that deactivation is possible */
+			if (StorageTmp->pSapRowStatus != RS_NOTINSERVICE)
+				if ((ret = can_deact_pSapTable_row(StorageTmp)) != SNMP_ERR_NOERROR)
+					return (ret);
+			break;
+		default:
+			return SNMP_ERR_WRONGVALUE;
 				}
+		break;
+	case ACTION:
+		/* The variable has been stored in StorageTmp->pSapRowStatus for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in
+		   the UNDO case */
+		switch (set_value) {
+		case RS_CREATEANDGO:
+			/* activate with underlying device */
+			if (activate_pSapTable_row(StorageNew) != SNMP_ERR_NOERROR)
+				return SNMP_ERR_COMMITFAILED;
+			break;
+		case RS_CREATEANDWAIT:
+			break;
+		case RS_ACTIVE:
+			/* state change already performed */
+			if (StorageTmp->pSapRowStatus != RS_ACTIVE) {
+				/* activate with underlying device */
+				if (activate_pSapTable_row(StorageTmp) != SNMP_ERR_NOERROR)
+					return SNMP_ERR_COMMITFAILED;
 			}
 			break;
 		case RS_NOTINSERVICE:
-			/* set the flag? */
-			old_value = StorageTmp->pSapRowStatus;
-			StorageTmp->pSapRowStatus = set_value;
+			/* state change already performed */
+			if (StorageTmp->pSapRowStatus != RS_NOTINSERVICE) {
+				/* deactivate with underlying device */
+				if (deactivate_pSapTable_row(StorageTmp) != SNMP_ERR_NOERROR)
+					return SNMP_ERR_COMMITFAILED;
+			}
 			break;
+		case RS_DESTROY:
+			/* commit destrution to underlying device */
+			if (StorageDel == NULL)
+				break;
+			/* deactivate with underlying device */
+			if (deactivate_pSapTable_row(StorageDel) != SNMP_ERR_NOERROR)
+				return SNMP_ERR_COMMITFAILED;
+			break;
+		default:
+			return SNMP_ERR_WRONGVALUE;
 		}
 		break;
 	case COMMIT:
 		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		switch (set_value) {
 		case RS_CREATEANDGO:
-			/* row creation, set final state */
-			/* XXX: commit creation to underlying device */
-			/* XXX: activate with underlying device */
 			StorageNew->pSapRowStatus = RS_ACTIVE;
 			break;
 		case RS_CREATEANDWAIT:
-			/* row creation, set final state */
 			StorageNew->pSapRowStatus = RS_NOTINSERVICE;
 			break;
 		case RS_ACTIVE:
 		case RS_NOTINSERVICE:
-			/* state change already performed */
-			if (old_value != set_value) {
-				switch (set_value) {
-				case RS_ACTIVE:
-					/* XXX: activate with underlying device */
-					break;
-				case RS_NOTINSERVICE:
-					/* XXX: deactivate with underlying device */
-					break;
-				}
+			StorageNew->pSapRowStatus = set_value;
+			if ((StorageOld = StorageTmp->pSapTable_old) != NULL) {
+				pSapTable_destroy(&StorageTmp->pSapTable_old);
+				StorageTmp->pSapTable_rsvs = 0;
+				StorageTmp->pSapTable_tsts = 0;
+				StorageTmp->pSapTable_sets = 0;
 			}
 			break;
 		case RS_DESTROY:
-			/* row deletion, free it its dead */
 			pSapTable_destroy(&StorageDel);
-			/* pSapTable_destroy() can handle NULL pointers. */
 			break;
 		}
 		break;
 	case UNDO:
 		/* Back out any changes made in the ACTION case */
 		switch (set_value) {
+		case RS_CREATEANDGO:
+			/* deactivate with underlying device */
+			deactivate_pSapTable_row(StorageNew);
+			break;
+		case RS_CREATEANDWAIT:
+			break;
 		case RS_ACTIVE:
+			if (StorageTmp->pSapRowStatus == RS_NOTINSERVICE)
+				/* deactivate with underlying device */
+				deactivate_pSapTable_row(StorageTmp);
+			break;
 		case RS_NOTINSERVICE:
-			/* restore state */
-			StorageTmp->pSapRowStatus = old_value;
+			if (StorageTmp->pSapRowStatus == RS_ACTIVE)
+				/* activate with underlying device */
+				activate_pSapTable_row(StorageTmp);
+			break;
+		case RS_DESTROY:
 			break;
 		}
 		/* fall through */
@@ -10614,6 +14235,13 @@ write_pSapRowStatus(int action, u_char *var_val, u_char var_val_type, size_t var
 				pSapTable_del(StorageNew);
 				pSapTable_destroy(&StorageNew);
 			}
+			break;
+		case RS_ACTIVE:
+		case RS_NOTINSERVICE:
+			if ((StorageOld = StorageTmp->pSapTable_old) == NULL)
+				break;
+			if (--StorageTmp->pSapTable_rsvs == 0)
+				pSapTable_destroy(&StorageTmp->pSapTable_old);
 			break;
 		case RS_DESTROY:
 			/* row deletion, so add it again */
@@ -10640,10 +14268,9 @@ write_pSapRowStatus(int action, u_char *var_val, u_char var_val_type, size_t var
 int
 write_presentationCOnnectionRowStatus(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	struct presentationConnectionTable_data *StorageTmp = NULL;
+	struct presentationConnectionTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	static struct presentationConnectionTable_data *StorageNew, *StorageDel;
 	size_t newlen = name_len - 15;
-	static int old_value;
 	int set_value, ret;
 	static struct variable_list *vars, *vp;
 
@@ -10670,40 +14297,6 @@ write_presentationCOnnectionRowStatus(int action, u_char *var_val, u_char var_va
 			if (StorageTmp != NULL)
 				/* cannot create existing row */
 				return SNMP_ERR_INCONSISTENTVALUE;
-			break;
-		case RS_ACTIVE:
-		case RS_NOTINSERVICE:
-			if (StorageTmp == NULL)
-				/* cannot change state of non-existent row */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			if (StorageTmp->presentationCOnnectionRowStatus == RS_NOTREADY)
-				/* cannot change state of row that is not ready */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			/* XXX: interaction with row storage type needed */
-			if (set_value == RS_NOTINSERVICE && StorageTmp->presentationConnectionTable_refs > 0)
-				/* row is busy and cannot be moved to the RS_NOTINSERVICE state */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			break;
-		case RS_DESTROY:
-			/* destroying existent or non-existent row is ok */
-			if (StorageTmp == NULL)
-				break;
-			/* XXX: interaction with row storage type needed */
-			if (StorageTmp->presentationConnectionTable_refs > 0)
-				/* row is busy and cannot be deleted */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			break;
-		case RS_NOTREADY:
-			/* management station cannot set this, only agent can */
-		default:
-			return SNMP_ERR_INCONSISTENTVALUE;
-		}
-		break;
-	case RESERVE2:
-		/* memory reseveration, final preparation... */
-		switch (set_value) {
-		case RS_CREATEANDGO:
-		case RS_CREATEANDWAIT:
 			/* creation */
 			vars = NULL;
 			/* presentationSubsystemId */
@@ -10767,6 +14360,7 @@ write_presentationCOnnectionRowStatus(int action, u_char *var_val, u_char var_va
 				snmp_free_varbind(vars);
 				return SNMP_ERR_RESOURCEUNAVAILABLE;
 			}
+			StorageNew->presentationConnectionTable_rsvs = 1;
 			vp = vars;
 			memdup((void *) &StorageNew->presentationSubsystemId, vp->val.string, vp->val_len);
 			StorageNew->presentationSubsystemIdLen = vp->val_len;
@@ -10782,7 +14376,37 @@ write_presentationCOnnectionRowStatus(int action, u_char *var_val, u_char var_va
 			vp = vp->next_variable;
 			header_complex_add_data(&presentationConnectionTableStorage, vars, StorageNew);	/* frees vars */
 			break;
+		case RS_ACTIVE:
+		case RS_NOTINSERVICE:
+			if (StorageTmp == NULL)
+				/* cannot change state of non-existent row */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			if (StorageTmp->presentationCOnnectionRowStatus == RS_NOTREADY)
+				/* cannot change state of row that is not ready */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			/* XXX: interaction with row storage type needed */
+			if (set_value == RS_NOTINSERVICE && StorageTmp->presentationConnectionTable_refs > 0)
+				/* row is busy and cannot be moved to the RS_NOTINSERVICE state */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			/* activate or deactivate */
+			if (StorageTmp == NULL)
+				return SNMP_ERR_NOSUCHNAME;
+			/* one allocation for the whole row */
+			if ((StorageOld = StorageTmp->presentationConnectionTable_old) == NULL)
+				if (StorageTmp->presentationConnectionTable_rsvs == 0)
+					if ((StorageOld = StorageTmp->presentationConnectionTable_old = presentationConnectionTable_duplicate(StorageTmp)) == NULL)
+						return SNMP_ERR_RESOURCEUNAVAILABLE;
+			if (StorageOld != NULL)
+				StorageTmp->presentationConnectionTable_rsvs++;
+			break;
 		case RS_DESTROY:
+			if (StorageTmp == NULL)
+				/* cannot destroy non-existent row */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			/* XXX: interaction with row storage type needed */
+			if (StorageTmp->presentationConnectionTable_refs > 0)
+				/* row is busy and cannot be deleted */
+				return SNMP_ERR_INCONSISTENTVALUE;
 			/* destroy */
 			if (StorageTmp != NULL) {
 				/* exists, extract it for now */
@@ -10792,78 +14416,127 @@ write_presentationCOnnectionRowStatus(int action, u_char *var_val, u_char var_va
 				StorageDel = NULL;
 			}
 			break;
+		case RS_NOTREADY:
+			/* management station cannot set this, only agent can */
+		default:
+			return SNMP_ERR_INCONSISTENTVALUE;
 		}
 		break;
-	case ACTION:
-		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the UNDO case */
+	case RESERVE2:
+		/* memory reseveration, final preparation... */
 		switch (set_value) {
 		case RS_CREATEANDGO:
 			/* check that activation is possible */
-			if ((ret = presentationConnectionTable_consistent(StorageNew)) != SNMP_ERR_NOERROR)
+			if ((ret = can_act_presentationConnectionTable_row(StorageNew)) != SNMP_ERR_NOERROR)
 				return (ret);
 			break;
 		case RS_CREATEANDWAIT:
-			/* row does not have to be consistent */
 			break;
 		case RS_ACTIVE:
-			old_value = StorageTmp->presentationCOnnectionRowStatus;
-			StorageTmp->presentationCOnnectionRowStatus = set_value;
-			if (old_value != RS_ACTIVE) {
 				/* check that activation is possible */
-				if ((ret = presentationConnectionTable_consistent(StorageTmp)) != SNMP_ERR_NOERROR) {
-					StorageTmp->presentationCOnnectionRowStatus = old_value;
+			if (StorageTmp->presentationCOnnectionRowStatus != RS_ACTIVE)
+				if ((ret = can_act_presentationConnectionTable_row(StorageTmp)) != SNMP_ERR_NOERROR)
 					return (ret);
+			break;
+		case RS_NOTINSERVICE:
+			/* check that deactivation is possible */
+			if (StorageTmp->presentationCOnnectionRowStatus != RS_NOTINSERVICE)
+				if ((ret = can_deact_presentationConnectionTable_row(StorageTmp)) != SNMP_ERR_NOERROR)
+					return (ret);
+			break;
+		case RS_DESTROY:
+			/* check that deactivation is possible */
+			if (StorageTmp->presentationCOnnectionRowStatus != RS_NOTINSERVICE)
+				if ((ret = can_deact_presentationConnectionTable_row(StorageTmp)) != SNMP_ERR_NOERROR)
+					return (ret);
+			break;
+		default:
+			return SNMP_ERR_WRONGVALUE;
 				}
+		break;
+	case ACTION:
+		/* The variable has been stored in StorageTmp->presentationCOnnectionRowStatus for you to use, and you have just been asked to do something with it.  Note that anything done here must 
+		   be reversable in the UNDO case */
+		switch (set_value) {
+		case RS_CREATEANDGO:
+			/* activate with underlying device */
+			if (activate_presentationConnectionTable_row(StorageNew) != SNMP_ERR_NOERROR)
+				return SNMP_ERR_COMMITFAILED;
+			break;
+		case RS_CREATEANDWAIT:
+			break;
+		case RS_ACTIVE:
+			/* state change already performed */
+			if (StorageTmp->presentationCOnnectionRowStatus != RS_ACTIVE) {
+				/* activate with underlying device */
+				if (activate_presentationConnectionTable_row(StorageTmp) != SNMP_ERR_NOERROR)
+					return SNMP_ERR_COMMITFAILED;
 			}
 			break;
 		case RS_NOTINSERVICE:
-			/* set the flag? */
-			old_value = StorageTmp->presentationCOnnectionRowStatus;
-			StorageTmp->presentationCOnnectionRowStatus = set_value;
+			/* state change already performed */
+			if (StorageTmp->presentationCOnnectionRowStatus != RS_NOTINSERVICE) {
+				/* deactivate with underlying device */
+				if (deactivate_presentationConnectionTable_row(StorageTmp) != SNMP_ERR_NOERROR)
+					return SNMP_ERR_COMMITFAILED;
+			}
 			break;
+		case RS_DESTROY:
+			/* commit destrution to underlying device */
+			if (StorageDel == NULL)
+				break;
+			/* deactivate with underlying device */
+			if (deactivate_presentationConnectionTable_row(StorageDel) != SNMP_ERR_NOERROR)
+				return SNMP_ERR_COMMITFAILED;
+			break;
+		default:
+			return SNMP_ERR_WRONGVALUE;
 		}
 		break;
 	case COMMIT:
 		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		switch (set_value) {
 		case RS_CREATEANDGO:
-			/* row creation, set final state */
-			/* XXX: commit creation to underlying device */
-			/* XXX: activate with underlying device */
 			StorageNew->presentationCOnnectionRowStatus = RS_ACTIVE;
 			break;
 		case RS_CREATEANDWAIT:
-			/* row creation, set final state */
 			StorageNew->presentationCOnnectionRowStatus = RS_NOTINSERVICE;
 			break;
 		case RS_ACTIVE:
 		case RS_NOTINSERVICE:
-			/* state change already performed */
-			if (old_value != set_value) {
-				switch (set_value) {
-				case RS_ACTIVE:
-					/* XXX: activate with underlying device */
-					break;
-				case RS_NOTINSERVICE:
-					/* XXX: deactivate with underlying device */
-					break;
-				}
+			StorageNew->presentationCOnnectionRowStatus = set_value;
+			if ((StorageOld = StorageTmp->presentationConnectionTable_old) != NULL) {
+				presentationConnectionTable_destroy(&StorageTmp->presentationConnectionTable_old);
+				StorageTmp->presentationConnectionTable_rsvs = 0;
+				StorageTmp->presentationConnectionTable_tsts = 0;
+				StorageTmp->presentationConnectionTable_sets = 0;
 			}
 			break;
 		case RS_DESTROY:
-			/* row deletion, free it its dead */
 			presentationConnectionTable_destroy(&StorageDel);
-			/* presentationConnectionTable_destroy() can handle NULL pointers. */
 			break;
 		}
 		break;
 	case UNDO:
 		/* Back out any changes made in the ACTION case */
 		switch (set_value) {
+		case RS_CREATEANDGO:
+			/* deactivate with underlying device */
+			deactivate_presentationConnectionTable_row(StorageNew);
+			break;
+		case RS_CREATEANDWAIT:
+			break;
 		case RS_ACTIVE:
+			if (StorageTmp->presentationCOnnectionRowStatus == RS_NOTINSERVICE)
+				/* deactivate with underlying device */
+				deactivate_presentationConnectionTable_row(StorageTmp);
+			break;
 		case RS_NOTINSERVICE:
-			/* restore state */
-			StorageTmp->presentationCOnnectionRowStatus = old_value;
+			if (StorageTmp->presentationCOnnectionRowStatus == RS_ACTIVE)
+				/* activate with underlying device */
+				activate_presentationConnectionTable_row(StorageTmp);
+			break;
+		case RS_DESTROY:
 			break;
 		}
 		/* fall through */
@@ -10877,6 +14550,13 @@ write_presentationCOnnectionRowStatus(int action, u_char *var_val, u_char var_va
 				presentationConnectionTable_del(StorageNew);
 				presentationConnectionTable_destroy(&StorageNew);
 			}
+			break;
+		case RS_ACTIVE:
+		case RS_NOTINSERVICE:
+			if ((StorageOld = StorageTmp->presentationConnectionTable_old) == NULL)
+				break;
+			if (--StorageTmp->presentationConnectionTable_rsvs == 0)
+				presentationConnectionTable_destroy(&StorageTmp->presentationConnectionTable_old);
 			break;
 		case RS_DESTROY:
 			/* row deletion, so add it again */
@@ -10903,10 +14583,9 @@ write_presentationCOnnectionRowStatus(int action, u_char *var_val, u_char var_va
 int
 write_presentationCopmRowStatus(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	struct presentationCopmTable_data *StorageTmp = NULL;
+	struct presentationCopmTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	static struct presentationCopmTable_data *StorageNew, *StorageDel;
 	size_t newlen = name_len - 15;
-	static int old_value;
 	int set_value, ret;
 	static struct variable_list *vars, *vp;
 
@@ -10933,40 +14612,6 @@ write_presentationCopmRowStatus(int action, u_char *var_val, u_char var_val_type
 			if (StorageTmp != NULL)
 				/* cannot create existing row */
 				return SNMP_ERR_INCONSISTENTVALUE;
-			break;
-		case RS_ACTIVE:
-		case RS_NOTINSERVICE:
-			if (StorageTmp == NULL)
-				/* cannot change state of non-existent row */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			if (StorageTmp->presentationCopmRowStatus == RS_NOTREADY)
-				/* cannot change state of row that is not ready */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			/* XXX: interaction with row storage type needed */
-			if (set_value == RS_NOTINSERVICE && StorageTmp->presentationCopmTable_refs > 0)
-				/* row is busy and cannot be moved to the RS_NOTINSERVICE state */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			break;
-		case RS_DESTROY:
-			/* destroying existent or non-existent row is ok */
-			if (StorageTmp == NULL)
-				break;
-			/* XXX: interaction with row storage type needed */
-			if (StorageTmp->presentationCopmTable_refs > 0)
-				/* row is busy and cannot be deleted */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			break;
-		case RS_NOTREADY:
-			/* management station cannot set this, only agent can */
-		default:
-			return SNMP_ERR_INCONSISTENTVALUE;
-		}
-		break;
-	case RESERVE2:
-		/* memory reseveration, final preparation... */
-		switch (set_value) {
-		case RS_CREATEANDGO:
-		case RS_CREATEANDWAIT:
 			/* creation */
 			vars = NULL;
 			/* presentationSubsystemId */
@@ -11017,6 +14662,7 @@ write_presentationCopmRowStatus(int action, u_char *var_val, u_char var_val_type
 				snmp_free_varbind(vars);
 				return SNMP_ERR_RESOURCEUNAVAILABLE;
 			}
+			StorageNew->presentationCopmTable_rsvs = 1;
 			vp = vars;
 			memdup((void *) &StorageNew->presentationSubsystemId, vp->val.string, vp->val_len);
 			StorageNew->presentationSubsystemIdLen = vp->val_len;
@@ -11029,7 +14675,37 @@ write_presentationCopmRowStatus(int action, u_char *var_val, u_char var_val_type
 			vp = vp->next_variable;
 			header_complex_add_data(&presentationCopmTableStorage, vars, StorageNew);	/* frees vars */
 			break;
+		case RS_ACTIVE:
+		case RS_NOTINSERVICE:
+			if (StorageTmp == NULL)
+				/* cannot change state of non-existent row */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			if (StorageTmp->presentationCopmRowStatus == RS_NOTREADY)
+				/* cannot change state of row that is not ready */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			/* XXX: interaction with row storage type needed */
+			if (set_value == RS_NOTINSERVICE && StorageTmp->presentationCopmTable_refs > 0)
+				/* row is busy and cannot be moved to the RS_NOTINSERVICE state */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			/* activate or deactivate */
+			if (StorageTmp == NULL)
+				return SNMP_ERR_NOSUCHNAME;
+			/* one allocation for the whole row */
+			if ((StorageOld = StorageTmp->presentationCopmTable_old) == NULL)
+				if (StorageTmp->presentationCopmTable_rsvs == 0)
+					if ((StorageOld = StorageTmp->presentationCopmTable_old = presentationCopmTable_duplicate(StorageTmp)) == NULL)
+						return SNMP_ERR_RESOURCEUNAVAILABLE;
+			if (StorageOld != NULL)
+				StorageTmp->presentationCopmTable_rsvs++;
+			break;
 		case RS_DESTROY:
+			if (StorageTmp == NULL)
+				/* cannot destroy non-existent row */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			/* XXX: interaction with row storage type needed */
+			if (StorageTmp->presentationCopmTable_refs > 0)
+				/* row is busy and cannot be deleted */
+				return SNMP_ERR_INCONSISTENTVALUE;
 			/* destroy */
 			if (StorageTmp != NULL) {
 				/* exists, extract it for now */
@@ -11039,78 +14715,127 @@ write_presentationCopmRowStatus(int action, u_char *var_val, u_char var_val_type
 				StorageDel = NULL;
 			}
 			break;
+		case RS_NOTREADY:
+			/* management station cannot set this, only agent can */
+		default:
+			return SNMP_ERR_INCONSISTENTVALUE;
 		}
 		break;
-	case ACTION:
-		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the UNDO case */
+	case RESERVE2:
+		/* memory reseveration, final preparation... */
 		switch (set_value) {
 		case RS_CREATEANDGO:
 			/* check that activation is possible */
-			if ((ret = presentationCopmTable_consistent(StorageNew)) != SNMP_ERR_NOERROR)
+			if ((ret = can_act_presentationCopmTable_row(StorageNew)) != SNMP_ERR_NOERROR)
 				return (ret);
 			break;
 		case RS_CREATEANDWAIT:
-			/* row does not have to be consistent */
 			break;
 		case RS_ACTIVE:
-			old_value = StorageTmp->presentationCopmRowStatus;
-			StorageTmp->presentationCopmRowStatus = set_value;
-			if (old_value != RS_ACTIVE) {
 				/* check that activation is possible */
-				if ((ret = presentationCopmTable_consistent(StorageTmp)) != SNMP_ERR_NOERROR) {
-					StorageTmp->presentationCopmRowStatus = old_value;
+			if (StorageTmp->presentationCopmRowStatus != RS_ACTIVE)
+				if ((ret = can_act_presentationCopmTable_row(StorageTmp)) != SNMP_ERR_NOERROR)
 					return (ret);
+			break;
+		case RS_NOTINSERVICE:
+			/* check that deactivation is possible */
+			if (StorageTmp->presentationCopmRowStatus != RS_NOTINSERVICE)
+				if ((ret = can_deact_presentationCopmTable_row(StorageTmp)) != SNMP_ERR_NOERROR)
+					return (ret);
+			break;
+		case RS_DESTROY:
+			/* check that deactivation is possible */
+			if (StorageTmp->presentationCopmRowStatus != RS_NOTINSERVICE)
+				if ((ret = can_deact_presentationCopmTable_row(StorageTmp)) != SNMP_ERR_NOERROR)
+					return (ret);
+			break;
+		default:
+			return SNMP_ERR_WRONGVALUE;
 				}
+		break;
+	case ACTION:
+		/* The variable has been stored in StorageTmp->presentationCopmRowStatus for you to use, and you have just been asked to do something with it.  Note that anything done here must be
+		   reversable in the UNDO case */
+		switch (set_value) {
+		case RS_CREATEANDGO:
+			/* activate with underlying device */
+			if (activate_presentationCopmTable_row(StorageNew) != SNMP_ERR_NOERROR)
+				return SNMP_ERR_COMMITFAILED;
+			break;
+		case RS_CREATEANDWAIT:
+			break;
+		case RS_ACTIVE:
+			/* state change already performed */
+			if (StorageTmp->presentationCopmRowStatus != RS_ACTIVE) {
+				/* activate with underlying device */
+				if (activate_presentationCopmTable_row(StorageTmp) != SNMP_ERR_NOERROR)
+					return SNMP_ERR_COMMITFAILED;
 			}
 			break;
 		case RS_NOTINSERVICE:
-			/* set the flag? */
-			old_value = StorageTmp->presentationCopmRowStatus;
-			StorageTmp->presentationCopmRowStatus = set_value;
+			/* state change already performed */
+			if (StorageTmp->presentationCopmRowStatus != RS_NOTINSERVICE) {
+				/* deactivate with underlying device */
+				if (deactivate_presentationCopmTable_row(StorageTmp) != SNMP_ERR_NOERROR)
+					return SNMP_ERR_COMMITFAILED;
+			}
 			break;
+		case RS_DESTROY:
+			/* commit destrution to underlying device */
+			if (StorageDel == NULL)
+				break;
+			/* deactivate with underlying device */
+			if (deactivate_presentationCopmTable_row(StorageDel) != SNMP_ERR_NOERROR)
+				return SNMP_ERR_COMMITFAILED;
+			break;
+		default:
+			return SNMP_ERR_WRONGVALUE;
 		}
 		break;
 	case COMMIT:
 		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		switch (set_value) {
 		case RS_CREATEANDGO:
-			/* row creation, set final state */
-			/* XXX: commit creation to underlying device */
-			/* XXX: activate with underlying device */
 			StorageNew->presentationCopmRowStatus = RS_ACTIVE;
 			break;
 		case RS_CREATEANDWAIT:
-			/* row creation, set final state */
 			StorageNew->presentationCopmRowStatus = RS_NOTINSERVICE;
 			break;
 		case RS_ACTIVE:
 		case RS_NOTINSERVICE:
-			/* state change already performed */
-			if (old_value != set_value) {
-				switch (set_value) {
-				case RS_ACTIVE:
-					/* XXX: activate with underlying device */
-					break;
-				case RS_NOTINSERVICE:
-					/* XXX: deactivate with underlying device */
-					break;
-				}
+			StorageNew->presentationCopmRowStatus = set_value;
+			if ((StorageOld = StorageTmp->presentationCopmTable_old) != NULL) {
+				presentationCopmTable_destroy(&StorageTmp->presentationCopmTable_old);
+				StorageTmp->presentationCopmTable_rsvs = 0;
+				StorageTmp->presentationCopmTable_tsts = 0;
+				StorageTmp->presentationCopmTable_sets = 0;
 			}
 			break;
 		case RS_DESTROY:
-			/* row deletion, free it its dead */
 			presentationCopmTable_destroy(&StorageDel);
-			/* presentationCopmTable_destroy() can handle NULL pointers. */
 			break;
 		}
 		break;
 	case UNDO:
 		/* Back out any changes made in the ACTION case */
 		switch (set_value) {
+		case RS_CREATEANDGO:
+			/* deactivate with underlying device */
+			deactivate_presentationCopmTable_row(StorageNew);
+			break;
+		case RS_CREATEANDWAIT:
+			break;
 		case RS_ACTIVE:
+			if (StorageTmp->presentationCopmRowStatus == RS_NOTINSERVICE)
+				/* deactivate with underlying device */
+				deactivate_presentationCopmTable_row(StorageTmp);
+			break;
 		case RS_NOTINSERVICE:
-			/* restore state */
-			StorageTmp->presentationCopmRowStatus = old_value;
+			if (StorageTmp->presentationCopmRowStatus == RS_ACTIVE)
+				/* activate with underlying device */
+				activate_presentationCopmTable_row(StorageTmp);
+			break;
+		case RS_DESTROY:
 			break;
 		}
 		/* fall through */
@@ -11124,6 +14849,13 @@ write_presentationCopmRowStatus(int action, u_char *var_val, u_char var_val_type
 				presentationCopmTable_del(StorageNew);
 				presentationCopmTable_destroy(&StorageNew);
 			}
+			break;
+		case RS_ACTIVE:
+		case RS_NOTINSERVICE:
+			if ((StorageOld = StorageTmp->presentationCopmTable_old) == NULL)
+				break;
+			if (--StorageTmp->presentationCopmTable_rsvs == 0)
+				presentationCopmTable_destroy(&StorageTmp->presentationCopmTable_old);
 			break;
 		case RS_DESTROY:
 			/* row deletion, so add it again */
@@ -11150,10 +14882,9 @@ write_presentationCopmRowStatus(int action, u_char *var_val, u_char var_val_type
 int
 write_presentationEntityRowStatus(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	struct presentationEntityTable_data *StorageTmp = NULL;
+	struct presentationEntityTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	static struct presentationEntityTable_data *StorageNew, *StorageDel;
 	size_t newlen = name_len - 15;
-	static int old_value;
 	int set_value, ret;
 	static struct variable_list *vars, *vp;
 
@@ -11180,40 +14911,6 @@ write_presentationEntityRowStatus(int action, u_char *var_val, u_char var_val_ty
 			if (StorageTmp != NULL)
 				/* cannot create existing row */
 				return SNMP_ERR_INCONSISTENTVALUE;
-			break;
-		case RS_ACTIVE:
-		case RS_NOTINSERVICE:
-			if (StorageTmp == NULL)
-				/* cannot change state of non-existent row */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			if (StorageTmp->presentationEntityRowStatus == RS_NOTREADY)
-				/* cannot change state of row that is not ready */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			/* XXX: interaction with row storage type needed */
-			if (set_value == RS_NOTINSERVICE && StorageTmp->presentationEntityTable_refs > 0)
-				/* row is busy and cannot be moved to the RS_NOTINSERVICE state */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			break;
-		case RS_DESTROY:
-			/* destroying existent or non-existent row is ok */
-			if (StorageTmp == NULL)
-				break;
-			/* XXX: interaction with row storage type needed */
-			if (StorageTmp->presentationEntityTable_refs > 0)
-				/* row is busy and cannot be deleted */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			break;
-		case RS_NOTREADY:
-			/* management station cannot set this, only agent can */
-		default:
-			return SNMP_ERR_INCONSISTENTVALUE;
-		}
-		break;
-	case RESERVE2:
-		/* memory reseveration, final preparation... */
-		switch (set_value) {
-		case RS_CREATEANDGO:
-		case RS_CREATEANDWAIT:
 			/* creation */
 			vars = NULL;
 			/* presentationSubsystemId */
@@ -11251,6 +14948,7 @@ write_presentationEntityRowStatus(int action, u_char *var_val, u_char var_val_ty
 				snmp_free_varbind(vars);
 				return SNMP_ERR_RESOURCEUNAVAILABLE;
 			}
+			StorageNew->presentationEntityTable_rsvs = 1;
 			vp = vars;
 			memdup((void *) &StorageNew->presentationSubsystemId, vp->val.string, vp->val_len);
 			StorageNew->presentationSubsystemIdLen = vp->val_len;
@@ -11260,7 +14958,37 @@ write_presentationEntityRowStatus(int action, u_char *var_val, u_char var_val_ty
 			vp = vp->next_variable;
 			header_complex_add_data(&presentationEntityTableStorage, vars, StorageNew);	/* frees vars */
 			break;
+		case RS_ACTIVE:
+		case RS_NOTINSERVICE:
+			if (StorageTmp == NULL)
+				/* cannot change state of non-existent row */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			if (StorageTmp->presentationEntityRowStatus == RS_NOTREADY)
+				/* cannot change state of row that is not ready */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			/* XXX: interaction with row storage type needed */
+			if (set_value == RS_NOTINSERVICE && StorageTmp->presentationEntityTable_refs > 0)
+				/* row is busy and cannot be moved to the RS_NOTINSERVICE state */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			/* activate or deactivate */
+			if (StorageTmp == NULL)
+				return SNMP_ERR_NOSUCHNAME;
+			/* one allocation for the whole row */
+			if ((StorageOld = StorageTmp->presentationEntityTable_old) == NULL)
+				if (StorageTmp->presentationEntityTable_rsvs == 0)
+					if ((StorageOld = StorageTmp->presentationEntityTable_old = presentationEntityTable_duplicate(StorageTmp)) == NULL)
+						return SNMP_ERR_RESOURCEUNAVAILABLE;
+			if (StorageOld != NULL)
+				StorageTmp->presentationEntityTable_rsvs++;
+			break;
 		case RS_DESTROY:
+			if (StorageTmp == NULL)
+				/* cannot destroy non-existent row */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			/* XXX: interaction with row storage type needed */
+			if (StorageTmp->presentationEntityTable_refs > 0)
+				/* row is busy and cannot be deleted */
+				return SNMP_ERR_INCONSISTENTVALUE;
 			/* destroy */
 			if (StorageTmp != NULL) {
 				/* exists, extract it for now */
@@ -11270,78 +14998,127 @@ write_presentationEntityRowStatus(int action, u_char *var_val, u_char var_val_ty
 				StorageDel = NULL;
 			}
 			break;
+		case RS_NOTREADY:
+			/* management station cannot set this, only agent can */
+		default:
+			return SNMP_ERR_INCONSISTENTVALUE;
 		}
 		break;
-	case ACTION:
-		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the UNDO case */
+	case RESERVE2:
+		/* memory reseveration, final preparation... */
 		switch (set_value) {
 		case RS_CREATEANDGO:
 			/* check that activation is possible */
-			if ((ret = presentationEntityTable_consistent(StorageNew)) != SNMP_ERR_NOERROR)
+			if ((ret = can_act_presentationEntityTable_row(StorageNew)) != SNMP_ERR_NOERROR)
 				return (ret);
 			break;
 		case RS_CREATEANDWAIT:
-			/* row does not have to be consistent */
 			break;
 		case RS_ACTIVE:
-			old_value = StorageTmp->presentationEntityRowStatus;
-			StorageTmp->presentationEntityRowStatus = set_value;
-			if (old_value != RS_ACTIVE) {
 				/* check that activation is possible */
-				if ((ret = presentationEntityTable_consistent(StorageTmp)) != SNMP_ERR_NOERROR) {
-					StorageTmp->presentationEntityRowStatus = old_value;
+			if (StorageTmp->presentationEntityRowStatus != RS_ACTIVE)
+				if ((ret = can_act_presentationEntityTable_row(StorageTmp)) != SNMP_ERR_NOERROR)
 					return (ret);
+			break;
+		case RS_NOTINSERVICE:
+			/* check that deactivation is possible */
+			if (StorageTmp->presentationEntityRowStatus != RS_NOTINSERVICE)
+				if ((ret = can_deact_presentationEntityTable_row(StorageTmp)) != SNMP_ERR_NOERROR)
+					return (ret);
+			break;
+		case RS_DESTROY:
+			/* check that deactivation is possible */
+			if (StorageTmp->presentationEntityRowStatus != RS_NOTINSERVICE)
+				if ((ret = can_deact_presentationEntityTable_row(StorageTmp)) != SNMP_ERR_NOERROR)
+					return (ret);
+			break;
+		default:
+			return SNMP_ERR_WRONGVALUE;
 				}
+		break;
+	case ACTION:
+		/* The variable has been stored in StorageTmp->presentationEntityRowStatus for you to use, and you have just been asked to do something with it.  Note that anything done here must be
+		   reversable in the UNDO case */
+		switch (set_value) {
+		case RS_CREATEANDGO:
+			/* activate with underlying device */
+			if (activate_presentationEntityTable_row(StorageNew) != SNMP_ERR_NOERROR)
+				return SNMP_ERR_COMMITFAILED;
+			break;
+		case RS_CREATEANDWAIT:
+			break;
+		case RS_ACTIVE:
+			/* state change already performed */
+			if (StorageTmp->presentationEntityRowStatus != RS_ACTIVE) {
+				/* activate with underlying device */
+				if (activate_presentationEntityTable_row(StorageTmp) != SNMP_ERR_NOERROR)
+					return SNMP_ERR_COMMITFAILED;
 			}
 			break;
 		case RS_NOTINSERVICE:
-			/* set the flag? */
-			old_value = StorageTmp->presentationEntityRowStatus;
-			StorageTmp->presentationEntityRowStatus = set_value;
+			/* state change already performed */
+			if (StorageTmp->presentationEntityRowStatus != RS_NOTINSERVICE) {
+				/* deactivate with underlying device */
+				if (deactivate_presentationEntityTable_row(StorageTmp) != SNMP_ERR_NOERROR)
+					return SNMP_ERR_COMMITFAILED;
+			}
 			break;
+		case RS_DESTROY:
+			/* commit destrution to underlying device */
+			if (StorageDel == NULL)
+				break;
+			/* deactivate with underlying device */
+			if (deactivate_presentationEntityTable_row(StorageDel) != SNMP_ERR_NOERROR)
+				return SNMP_ERR_COMMITFAILED;
+			break;
+		default:
+			return SNMP_ERR_WRONGVALUE;
 		}
 		break;
 	case COMMIT:
 		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		switch (set_value) {
 		case RS_CREATEANDGO:
-			/* row creation, set final state */
-			/* XXX: commit creation to underlying device */
-			/* XXX: activate with underlying device */
 			StorageNew->presentationEntityRowStatus = RS_ACTIVE;
 			break;
 		case RS_CREATEANDWAIT:
-			/* row creation, set final state */
 			StorageNew->presentationEntityRowStatus = RS_NOTINSERVICE;
 			break;
 		case RS_ACTIVE:
 		case RS_NOTINSERVICE:
-			/* state change already performed */
-			if (old_value != set_value) {
-				switch (set_value) {
-				case RS_ACTIVE:
-					/* XXX: activate with underlying device */
-					break;
-				case RS_NOTINSERVICE:
-					/* XXX: deactivate with underlying device */
-					break;
-				}
+			StorageNew->presentationEntityRowStatus = set_value;
+			if ((StorageOld = StorageTmp->presentationEntityTable_old) != NULL) {
+				presentationEntityTable_destroy(&StorageTmp->presentationEntityTable_old);
+				StorageTmp->presentationEntityTable_rsvs = 0;
+				StorageTmp->presentationEntityTable_tsts = 0;
+				StorageTmp->presentationEntityTable_sets = 0;
 			}
 			break;
 		case RS_DESTROY:
-			/* row deletion, free it its dead */
 			presentationEntityTable_destroy(&StorageDel);
-			/* presentationEntityTable_destroy() can handle NULL pointers. */
 			break;
 		}
 		break;
 	case UNDO:
 		/* Back out any changes made in the ACTION case */
 		switch (set_value) {
+		case RS_CREATEANDGO:
+			/* deactivate with underlying device */
+			deactivate_presentationEntityTable_row(StorageNew);
+			break;
+		case RS_CREATEANDWAIT:
+			break;
 		case RS_ACTIVE:
+			if (StorageTmp->presentationEntityRowStatus == RS_NOTINSERVICE)
+				/* deactivate with underlying device */
+				deactivate_presentationEntityTable_row(StorageTmp);
+			break;
 		case RS_NOTINSERVICE:
-			/* restore state */
-			StorageTmp->presentationEntityRowStatus = old_value;
+			if (StorageTmp->presentationEntityRowStatus == RS_ACTIVE)
+				/* activate with underlying device */
+				activate_presentationEntityTable_row(StorageTmp);
+			break;
+		case RS_DESTROY:
 			break;
 		}
 		/* fall through */
@@ -11355,6 +15132,13 @@ write_presentationEntityRowStatus(int action, u_char *var_val, u_char var_val_ty
 				presentationEntityTable_del(StorageNew);
 				presentationEntityTable_destroy(&StorageNew);
 			}
+			break;
+		case RS_ACTIVE:
+		case RS_NOTINSERVICE:
+			if ((StorageOld = StorageTmp->presentationEntityTable_old) == NULL)
+				break;
+			if (--StorageTmp->presentationEntityTable_rsvs == 0)
+				presentationEntityTable_destroy(&StorageTmp->presentationEntityTable_old);
 			break;
 		case RS_DESTROY:
 			/* row deletion, so add it again */
@@ -11381,10 +15165,9 @@ write_presentationEntityRowStatus(int action, u_char *var_val, u_char var_val_ty
 int
 write_presentationSubsystemRowStatus(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	struct presentationSubsystemTable_data *StorageTmp = NULL;
+	struct presentationSubsystemTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	static struct presentationSubsystemTable_data *StorageNew, *StorageDel;
 	size_t newlen = name_len - 15;
-	static int old_value;
 	int set_value, ret;
 	static struct variable_list *vars, *vp;
 
@@ -11411,40 +15194,6 @@ write_presentationSubsystemRowStatus(int action, u_char *var_val, u_char var_val
 			if (StorageTmp != NULL)
 				/* cannot create existing row */
 				return SNMP_ERR_INCONSISTENTVALUE;
-			break;
-		case RS_ACTIVE:
-		case RS_NOTINSERVICE:
-			if (StorageTmp == NULL)
-				/* cannot change state of non-existent row */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			if (StorageTmp->presentationSubsystemRowStatus == RS_NOTREADY)
-				/* cannot change state of row that is not ready */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			/* XXX: interaction with row storage type needed */
-			if (set_value == RS_NOTINSERVICE && StorageTmp->presentationSubsystemTable_refs > 0)
-				/* row is busy and cannot be moved to the RS_NOTINSERVICE state */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			break;
-		case RS_DESTROY:
-			/* destroying existent or non-existent row is ok */
-			if (StorageTmp == NULL)
-				break;
-			/* XXX: interaction with row storage type needed */
-			if (StorageTmp->presentationSubsystemTable_refs > 0)
-				/* row is busy and cannot be deleted */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			break;
-		case RS_NOTREADY:
-			/* management station cannot set this, only agent can */
-		default:
-			return SNMP_ERR_INCONSISTENTVALUE;
-		}
-		break;
-	case RESERVE2:
-		/* memory reseveration, final preparation... */
-		switch (set_value) {
-		case RS_CREATEANDGO:
-		case RS_CREATEANDWAIT:
 			/* creation */
 			vars = NULL;
 			/* presentationSubsystemId */
@@ -11469,13 +15218,44 @@ write_presentationSubsystemRowStatus(int action, u_char *var_val, u_char var_val
 				snmp_free_varbind(vars);
 				return SNMP_ERR_RESOURCEUNAVAILABLE;
 			}
+			StorageNew->presentationSubsystemTable_rsvs = 1;
 			vp = vars;
 			memdup((void *) &StorageNew->presentationSubsystemId, vp->val.string, vp->val_len);
 			StorageNew->presentationSubsystemIdLen = vp->val_len;
 			vp = vp->next_variable;
 			header_complex_add_data(&presentationSubsystemTableStorage, vars, StorageNew);	/* frees vars */
 			break;
+		case RS_ACTIVE:
+		case RS_NOTINSERVICE:
+			if (StorageTmp == NULL)
+				/* cannot change state of non-existent row */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			if (StorageTmp->presentationSubsystemRowStatus == RS_NOTREADY)
+				/* cannot change state of row that is not ready */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			/* XXX: interaction with row storage type needed */
+			if (set_value == RS_NOTINSERVICE && StorageTmp->presentationSubsystemTable_refs > 0)
+				/* row is busy and cannot be moved to the RS_NOTINSERVICE state */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			/* activate or deactivate */
+			if (StorageTmp == NULL)
+				return SNMP_ERR_NOSUCHNAME;
+			/* one allocation for the whole row */
+			if ((StorageOld = StorageTmp->presentationSubsystemTable_old) == NULL)
+				if (StorageTmp->presentationSubsystemTable_rsvs == 0)
+					if ((StorageOld = StorageTmp->presentationSubsystemTable_old = presentationSubsystemTable_duplicate(StorageTmp)) == NULL)
+						return SNMP_ERR_RESOURCEUNAVAILABLE;
+			if (StorageOld != NULL)
+				StorageTmp->presentationSubsystemTable_rsvs++;
+			break;
 		case RS_DESTROY:
+			if (StorageTmp == NULL)
+				/* cannot destroy non-existent row */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			/* XXX: interaction with row storage type needed */
+			if (StorageTmp->presentationSubsystemTable_refs > 0)
+				/* row is busy and cannot be deleted */
+				return SNMP_ERR_INCONSISTENTVALUE;
 			/* destroy */
 			if (StorageTmp != NULL) {
 				/* exists, extract it for now */
@@ -11485,78 +15265,127 @@ write_presentationSubsystemRowStatus(int action, u_char *var_val, u_char var_val
 				StorageDel = NULL;
 			}
 			break;
+		case RS_NOTREADY:
+			/* management station cannot set this, only agent can */
+		default:
+			return SNMP_ERR_INCONSISTENTVALUE;
 		}
 		break;
-	case ACTION:
-		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the UNDO case */
+	case RESERVE2:
+		/* memory reseveration, final preparation... */
 		switch (set_value) {
 		case RS_CREATEANDGO:
 			/* check that activation is possible */
-			if ((ret = presentationSubsystemTable_consistent(StorageNew)) != SNMP_ERR_NOERROR)
+			if ((ret = can_act_presentationSubsystemTable_row(StorageNew)) != SNMP_ERR_NOERROR)
 				return (ret);
 			break;
 		case RS_CREATEANDWAIT:
-			/* row does not have to be consistent */
 			break;
 		case RS_ACTIVE:
-			old_value = StorageTmp->presentationSubsystemRowStatus;
-			StorageTmp->presentationSubsystemRowStatus = set_value;
-			if (old_value != RS_ACTIVE) {
 				/* check that activation is possible */
-				if ((ret = presentationSubsystemTable_consistent(StorageTmp)) != SNMP_ERR_NOERROR) {
-					StorageTmp->presentationSubsystemRowStatus = old_value;
+			if (StorageTmp->presentationSubsystemRowStatus != RS_ACTIVE)
+				if ((ret = can_act_presentationSubsystemTable_row(StorageTmp)) != SNMP_ERR_NOERROR)
 					return (ret);
+			break;
+		case RS_NOTINSERVICE:
+			/* check that deactivation is possible */
+			if (StorageTmp->presentationSubsystemRowStatus != RS_NOTINSERVICE)
+				if ((ret = can_deact_presentationSubsystemTable_row(StorageTmp)) != SNMP_ERR_NOERROR)
+					return (ret);
+			break;
+		case RS_DESTROY:
+			/* check that deactivation is possible */
+			if (StorageTmp->presentationSubsystemRowStatus != RS_NOTINSERVICE)
+				if ((ret = can_deact_presentationSubsystemTable_row(StorageTmp)) != SNMP_ERR_NOERROR)
+					return (ret);
+			break;
+		default:
+			return SNMP_ERR_WRONGVALUE;
 				}
+		break;
+	case ACTION:
+		/* The variable has been stored in StorageTmp->presentationSubsystemRowStatus for you to use, and you have just been asked to do something with it.  Note that anything done here must
+		   be reversable in the UNDO case */
+		switch (set_value) {
+		case RS_CREATEANDGO:
+			/* activate with underlying device */
+			if (activate_presentationSubsystemTable_row(StorageNew) != SNMP_ERR_NOERROR)
+				return SNMP_ERR_COMMITFAILED;
+			break;
+		case RS_CREATEANDWAIT:
+			break;
+		case RS_ACTIVE:
+			/* state change already performed */
+			if (StorageTmp->presentationSubsystemRowStatus != RS_ACTIVE) {
+				/* activate with underlying device */
+				if (activate_presentationSubsystemTable_row(StorageTmp) != SNMP_ERR_NOERROR)
+					return SNMP_ERR_COMMITFAILED;
 			}
 			break;
 		case RS_NOTINSERVICE:
-			/* set the flag? */
-			old_value = StorageTmp->presentationSubsystemRowStatus;
-			StorageTmp->presentationSubsystemRowStatus = set_value;
+			/* state change already performed */
+			if (StorageTmp->presentationSubsystemRowStatus != RS_NOTINSERVICE) {
+				/* deactivate with underlying device */
+				if (deactivate_presentationSubsystemTable_row(StorageTmp) != SNMP_ERR_NOERROR)
+					return SNMP_ERR_COMMITFAILED;
+			}
 			break;
+		case RS_DESTROY:
+			/* commit destrution to underlying device */
+			if (StorageDel == NULL)
+				break;
+			/* deactivate with underlying device */
+			if (deactivate_presentationSubsystemTable_row(StorageDel) != SNMP_ERR_NOERROR)
+				return SNMP_ERR_COMMITFAILED;
+			break;
+		default:
+			return SNMP_ERR_WRONGVALUE;
 		}
 		break;
 	case COMMIT:
 		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		switch (set_value) {
 		case RS_CREATEANDGO:
-			/* row creation, set final state */
-			/* XXX: commit creation to underlying device */
-			/* XXX: activate with underlying device */
 			StorageNew->presentationSubsystemRowStatus = RS_ACTIVE;
 			break;
 		case RS_CREATEANDWAIT:
-			/* row creation, set final state */
 			StorageNew->presentationSubsystemRowStatus = RS_NOTINSERVICE;
 			break;
 		case RS_ACTIVE:
 		case RS_NOTINSERVICE:
-			/* state change already performed */
-			if (old_value != set_value) {
-				switch (set_value) {
-				case RS_ACTIVE:
-					/* XXX: activate with underlying device */
-					break;
-				case RS_NOTINSERVICE:
-					/* XXX: deactivate with underlying device */
-					break;
-				}
+			StorageNew->presentationSubsystemRowStatus = set_value;
+			if ((StorageOld = StorageTmp->presentationSubsystemTable_old) != NULL) {
+				presentationSubsystemTable_destroy(&StorageTmp->presentationSubsystemTable_old);
+				StorageTmp->presentationSubsystemTable_rsvs = 0;
+				StorageTmp->presentationSubsystemTable_tsts = 0;
+				StorageTmp->presentationSubsystemTable_sets = 0;
 			}
 			break;
 		case RS_DESTROY:
-			/* row deletion, free it its dead */
 			presentationSubsystemTable_destroy(&StorageDel);
-			/* presentationSubsystemTable_destroy() can handle NULL pointers. */
 			break;
 		}
 		break;
 	case UNDO:
 		/* Back out any changes made in the ACTION case */
 		switch (set_value) {
+		case RS_CREATEANDGO:
+			/* deactivate with underlying device */
+			deactivate_presentationSubsystemTable_row(StorageNew);
+			break;
+		case RS_CREATEANDWAIT:
+			break;
 		case RS_ACTIVE:
+			if (StorageTmp->presentationSubsystemRowStatus == RS_NOTINSERVICE)
+				/* deactivate with underlying device */
+				deactivate_presentationSubsystemTable_row(StorageTmp);
+			break;
 		case RS_NOTINSERVICE:
-			/* restore state */
-			StorageTmp->presentationSubsystemRowStatus = old_value;
+			if (StorageTmp->presentationSubsystemRowStatus == RS_ACTIVE)
+				/* activate with underlying device */
+				activate_presentationSubsystemTable_row(StorageTmp);
+			break;
+		case RS_DESTROY:
 			break;
 		}
 		/* fall through */
@@ -11570,6 +15399,13 @@ write_presentationSubsystemRowStatus(int action, u_char *var_val, u_char var_val
 				presentationSubsystemTable_del(StorageNew);
 				presentationSubsystemTable_destroy(&StorageNew);
 			}
+			break;
+		case RS_ACTIVE:
+		case RS_NOTINSERVICE:
+			if ((StorageOld = StorageTmp->presentationSubsystemTable_old) == NULL)
+				break;
+			if (--StorageTmp->presentationSubsystemTable_rsvs == 0)
+				presentationSubsystemTable_destroy(&StorageTmp->presentationSubsystemTable_old);
 			break;
 		case RS_DESTROY:
 			/* row deletion, so add it again */
@@ -11596,10 +15432,9 @@ write_presentationSubsystemRowStatus(int action, u_char *var_val, u_char var_val
 int
 write_sSapRowStatus(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	struct sSapTable_data *StorageTmp = NULL;
+	struct sSapTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	static struct sSapTable_data *StorageNew, *StorageDel;
 	size_t newlen = name_len - 15;
-	static int old_value;
 	int set_value, ret;
 	static struct variable_list *vars, *vp;
 
@@ -11626,40 +15461,6 @@ write_sSapRowStatus(int action, u_char *var_val, u_char var_val_type, size_t var
 			if (StorageTmp != NULL)
 				/* cannot create existing row */
 				return SNMP_ERR_INCONSISTENTVALUE;
-			break;
-		case RS_ACTIVE:
-		case RS_NOTINSERVICE:
-			if (StorageTmp == NULL)
-				/* cannot change state of non-existent row */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			if (StorageTmp->sSapRowStatus == RS_NOTREADY)
-				/* cannot change state of row that is not ready */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			/* XXX: interaction with row storage type needed */
-			if (set_value == RS_NOTINSERVICE && StorageTmp->sSapTable_refs > 0)
-				/* row is busy and cannot be moved to the RS_NOTINSERVICE state */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			break;
-		case RS_DESTROY:
-			/* destroying existent or non-existent row is ok */
-			if (StorageTmp == NULL)
-				break;
-			/* XXX: interaction with row storage type needed */
-			if (StorageTmp->sSapTable_refs > 0)
-				/* row is busy and cannot be deleted */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			break;
-		case RS_NOTREADY:
-			/* management station cannot set this, only agent can */
-		default:
-			return SNMP_ERR_INCONSISTENTVALUE;
-		}
-		break;
-	case RESERVE2:
-		/* memory reseveration, final preparation... */
-		switch (set_value) {
-		case RS_CREATEANDGO:
-		case RS_CREATEANDWAIT:
 			/* creation */
 			vars = NULL;
 			/* subsystemId */
@@ -11684,13 +15485,44 @@ write_sSapRowStatus(int action, u_char *var_val, u_char var_val_type, size_t var
 				snmp_free_varbind(vars);
 				return SNMP_ERR_RESOURCEUNAVAILABLE;
 			}
+			StorageNew->sSapTable_rsvs = 1;
 			vp = vars;
 			memdup((void *) &StorageNew->subsystemId, vp->val.string, vp->val_len);
 			StorageNew->subsystemIdLen = vp->val_len;
 			vp = vp->next_variable;
 			header_complex_add_data(&sSapTableStorage, vars, StorageNew);	/* frees vars */
 			break;
+		case RS_ACTIVE:
+		case RS_NOTINSERVICE:
+			if (StorageTmp == NULL)
+				/* cannot change state of non-existent row */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			if (StorageTmp->sSapRowStatus == RS_NOTREADY)
+				/* cannot change state of row that is not ready */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			/* XXX: interaction with row storage type needed */
+			if (set_value == RS_NOTINSERVICE && StorageTmp->sSapTable_refs > 0)
+				/* row is busy and cannot be moved to the RS_NOTINSERVICE state */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			/* activate or deactivate */
+			if (StorageTmp == NULL)
+				return SNMP_ERR_NOSUCHNAME;
+			/* one allocation for the whole row */
+			if ((StorageOld = StorageTmp->sSapTable_old) == NULL)
+				if (StorageTmp->sSapTable_rsvs == 0)
+					if ((StorageOld = StorageTmp->sSapTable_old = sSapTable_duplicate(StorageTmp)) == NULL)
+						return SNMP_ERR_RESOURCEUNAVAILABLE;
+			if (StorageOld != NULL)
+				StorageTmp->sSapTable_rsvs++;
+			break;
 		case RS_DESTROY:
+			if (StorageTmp == NULL)
+				/* cannot destroy non-existent row */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			/* XXX: interaction with row storage type needed */
+			if (StorageTmp->sSapTable_refs > 0)
+				/* row is busy and cannot be deleted */
+				return SNMP_ERR_INCONSISTENTVALUE;
 			/* destroy */
 			if (StorageTmp != NULL) {
 				/* exists, extract it for now */
@@ -11700,78 +15532,127 @@ write_sSapRowStatus(int action, u_char *var_val, u_char var_val_type, size_t var
 				StorageDel = NULL;
 			}
 			break;
+		case RS_NOTREADY:
+			/* management station cannot set this, only agent can */
+		default:
+			return SNMP_ERR_INCONSISTENTVALUE;
 		}
 		break;
-	case ACTION:
-		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the UNDO case */
+	case RESERVE2:
+		/* memory reseveration, final preparation... */
 		switch (set_value) {
 		case RS_CREATEANDGO:
 			/* check that activation is possible */
-			if ((ret = sSapTable_consistent(StorageNew)) != SNMP_ERR_NOERROR)
+			if ((ret = can_act_sSapTable_row(StorageNew)) != SNMP_ERR_NOERROR)
 				return (ret);
 			break;
 		case RS_CREATEANDWAIT:
-			/* row does not have to be consistent */
 			break;
 		case RS_ACTIVE:
-			old_value = StorageTmp->sSapRowStatus;
-			StorageTmp->sSapRowStatus = set_value;
-			if (old_value != RS_ACTIVE) {
 				/* check that activation is possible */
-				if ((ret = sSapTable_consistent(StorageTmp)) != SNMP_ERR_NOERROR) {
-					StorageTmp->sSapRowStatus = old_value;
+			if (StorageTmp->sSapRowStatus != RS_ACTIVE)
+				if ((ret = can_act_sSapTable_row(StorageTmp)) != SNMP_ERR_NOERROR)
 					return (ret);
+			break;
+		case RS_NOTINSERVICE:
+			/* check that deactivation is possible */
+			if (StorageTmp->sSapRowStatus != RS_NOTINSERVICE)
+				if ((ret = can_deact_sSapTable_row(StorageTmp)) != SNMP_ERR_NOERROR)
+					return (ret);
+			break;
+		case RS_DESTROY:
+			/* check that deactivation is possible */
+			if (StorageTmp->sSapRowStatus != RS_NOTINSERVICE)
+				if ((ret = can_deact_sSapTable_row(StorageTmp)) != SNMP_ERR_NOERROR)
+					return (ret);
+			break;
+		default:
+			return SNMP_ERR_WRONGVALUE;
 				}
+		break;
+	case ACTION:
+		/* The variable has been stored in StorageTmp->sSapRowStatus for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in
+		   the UNDO case */
+		switch (set_value) {
+		case RS_CREATEANDGO:
+			/* activate with underlying device */
+			if (activate_sSapTable_row(StorageNew) != SNMP_ERR_NOERROR)
+				return SNMP_ERR_COMMITFAILED;
+			break;
+		case RS_CREATEANDWAIT:
+			break;
+		case RS_ACTIVE:
+			/* state change already performed */
+			if (StorageTmp->sSapRowStatus != RS_ACTIVE) {
+				/* activate with underlying device */
+				if (activate_sSapTable_row(StorageTmp) != SNMP_ERR_NOERROR)
+					return SNMP_ERR_COMMITFAILED;
 			}
 			break;
 		case RS_NOTINSERVICE:
-			/* set the flag? */
-			old_value = StorageTmp->sSapRowStatus;
-			StorageTmp->sSapRowStatus = set_value;
+			/* state change already performed */
+			if (StorageTmp->sSapRowStatus != RS_NOTINSERVICE) {
+				/* deactivate with underlying device */
+				if (deactivate_sSapTable_row(StorageTmp) != SNMP_ERR_NOERROR)
+					return SNMP_ERR_COMMITFAILED;
+			}
 			break;
+		case RS_DESTROY:
+			/* commit destrution to underlying device */
+			if (StorageDel == NULL)
+			break;
+			/* deactivate with underlying device */
+			if (deactivate_sSapTable_row(StorageDel) != SNMP_ERR_NOERROR)
+				return SNMP_ERR_COMMITFAILED;
+			break;
+		default:
+			return SNMP_ERR_WRONGVALUE;
 		}
 		break;
 	case COMMIT:
 		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		switch (set_value) {
 		case RS_CREATEANDGO:
-			/* row creation, set final state */
-			/* XXX: commit creation to underlying device */
-			/* XXX: activate with underlying device */
 			StorageNew->sSapRowStatus = RS_ACTIVE;
 			break;
 		case RS_CREATEANDWAIT:
-			/* row creation, set final state */
 			StorageNew->sSapRowStatus = RS_NOTINSERVICE;
 			break;
 		case RS_ACTIVE:
 		case RS_NOTINSERVICE:
-			/* state change already performed */
-			if (old_value != set_value) {
-				switch (set_value) {
-				case RS_ACTIVE:
-					/* XXX: activate with underlying device */
-					break;
-				case RS_NOTINSERVICE:
-					/* XXX: deactivate with underlying device */
-					break;
-				}
+			StorageNew->sSapRowStatus = set_value;
+			if ((StorageOld = StorageTmp->sSapTable_old) != NULL) {
+				sSapTable_destroy(&StorageTmp->sSapTable_old);
+				StorageTmp->sSapTable_rsvs = 0;
+				StorageTmp->sSapTable_tsts = 0;
+				StorageTmp->sSapTable_sets = 0;
 			}
 			break;
 		case RS_DESTROY:
-			/* row deletion, free it its dead */
 			sSapTable_destroy(&StorageDel);
-			/* sSapTable_destroy() can handle NULL pointers. */
 			break;
 		}
 		break;
 	case UNDO:
 		/* Back out any changes made in the ACTION case */
 		switch (set_value) {
+		case RS_CREATEANDGO:
+			/* deactivate with underlying device */
+			deactivate_sSapTable_row(StorageNew);
+			break;
+		case RS_CREATEANDWAIT:
+			break;
 		case RS_ACTIVE:
+			if (StorageTmp->sSapRowStatus == RS_NOTINSERVICE)
+				/* deactivate with underlying device */
+				deactivate_sSapTable_row(StorageTmp);
+			break;
 		case RS_NOTINSERVICE:
-			/* restore state */
-			StorageTmp->sSapRowStatus = old_value;
+			if (StorageTmp->sSapRowStatus == RS_ACTIVE)
+				/* activate with underlying device */
+				activate_sSapTable_row(StorageTmp);
+			break;
+		case RS_DESTROY:
 			break;
 		}
 		/* fall through */
@@ -11785,6 +15666,13 @@ write_sSapRowStatus(int action, u_char *var_val, u_char var_val_type, size_t var
 				sSapTable_del(StorageNew);
 				sSapTable_destroy(&StorageNew);
 			}
+			break;
+		case RS_ACTIVE:
+		case RS_NOTINSERVICE:
+			if ((StorageOld = StorageTmp->sSapTable_old) == NULL)
+				break;
+			if (--StorageTmp->sSapTable_rsvs == 0)
+				sSapTable_destroy(&StorageTmp->sSapTable_old);
 			break;
 		case RS_DESTROY:
 			/* row deletion, so add it again */
@@ -11811,10 +15699,9 @@ write_sSapRowStatus(int action, u_char *var_val, u_char var_val_type, size_t var
 int
 write_sessionCOnnectionRowStatus(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	struct sessionConnectionTable_data *StorageTmp = NULL;
+	struct sessionConnectionTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	static struct sessionConnectionTable_data *StorageNew, *StorageDel;
 	size_t newlen = name_len - 15;
-	static int old_value;
 	int set_value, ret;
 	static struct variable_list *vars, *vp;
 
@@ -11841,40 +15728,6 @@ write_sessionCOnnectionRowStatus(int action, u_char *var_val, u_char var_val_typ
 			if (StorageTmp != NULL)
 				/* cannot create existing row */
 				return SNMP_ERR_INCONSISTENTVALUE;
-			break;
-		case RS_ACTIVE:
-		case RS_NOTINSERVICE:
-			if (StorageTmp == NULL)
-				/* cannot change state of non-existent row */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			if (StorageTmp->sessionCOnnectionRowStatus == RS_NOTREADY)
-				/* cannot change state of row that is not ready */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			/* XXX: interaction with row storage type needed */
-			if (set_value == RS_NOTINSERVICE && StorageTmp->sessionConnectionTable_refs > 0)
-				/* row is busy and cannot be moved to the RS_NOTINSERVICE state */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			break;
-		case RS_DESTROY:
-			/* destroying existent or non-existent row is ok */
-			if (StorageTmp == NULL)
-				break;
-			/* XXX: interaction with row storage type needed */
-			if (StorageTmp->sessionConnectionTable_refs > 0)
-				/* row is busy and cannot be deleted */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			break;
-		case RS_NOTREADY:
-			/* management station cannot set this, only agent can */
-		default:
-			return SNMP_ERR_INCONSISTENTVALUE;
-		}
-		break;
-	case RESERVE2:
-		/* memory reseveration, final preparation... */
-		switch (set_value) {
-		case RS_CREATEANDGO:
-		case RS_CREATEANDWAIT:
 			/* creation */
 			vars = NULL;
 			/* sessionSubsystemId */
@@ -11938,6 +15791,7 @@ write_sessionCOnnectionRowStatus(int action, u_char *var_val, u_char var_val_typ
 				snmp_free_varbind(vars);
 				return SNMP_ERR_RESOURCEUNAVAILABLE;
 			}
+			StorageNew->sessionConnectionTable_rsvs = 1;
 			vp = vars;
 			memdup((void *) &StorageNew->sessionSubsystemId, vp->val.string, vp->val_len);
 			StorageNew->sessionSubsystemIdLen = vp->val_len;
@@ -11953,7 +15807,37 @@ write_sessionCOnnectionRowStatus(int action, u_char *var_val, u_char var_val_typ
 			vp = vp->next_variable;
 			header_complex_add_data(&sessionConnectionTableStorage, vars, StorageNew);	/* frees vars */
 			break;
+		case RS_ACTIVE:
+		case RS_NOTINSERVICE:
+			if (StorageTmp == NULL)
+				/* cannot change state of non-existent row */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			if (StorageTmp->sessionCOnnectionRowStatus == RS_NOTREADY)
+				/* cannot change state of row that is not ready */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			/* XXX: interaction with row storage type needed */
+			if (set_value == RS_NOTINSERVICE && StorageTmp->sessionConnectionTable_refs > 0)
+				/* row is busy and cannot be moved to the RS_NOTINSERVICE state */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			/* activate or deactivate */
+			if (StorageTmp == NULL)
+				return SNMP_ERR_NOSUCHNAME;
+			/* one allocation for the whole row */
+			if ((StorageOld = StorageTmp->sessionConnectionTable_old) == NULL)
+				if (StorageTmp->sessionConnectionTable_rsvs == 0)
+					if ((StorageOld = StorageTmp->sessionConnectionTable_old = sessionConnectionTable_duplicate(StorageTmp)) == NULL)
+						return SNMP_ERR_RESOURCEUNAVAILABLE;
+			if (StorageOld != NULL)
+				StorageTmp->sessionConnectionTable_rsvs++;
+			break;
 		case RS_DESTROY:
+			if (StorageTmp == NULL)
+				/* cannot destroy non-existent row */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			/* XXX: interaction with row storage type needed */
+			if (StorageTmp->sessionConnectionTable_refs > 0)
+				/* row is busy and cannot be deleted */
+				return SNMP_ERR_INCONSISTENTVALUE;
 			/* destroy */
 			if (StorageTmp != NULL) {
 				/* exists, extract it for now */
@@ -11963,78 +15847,127 @@ write_sessionCOnnectionRowStatus(int action, u_char *var_val, u_char var_val_typ
 				StorageDel = NULL;
 			}
 			break;
+		case RS_NOTREADY:
+			/* management station cannot set this, only agent can */
+		default:
+			return SNMP_ERR_INCONSISTENTVALUE;
 		}
 		break;
-	case ACTION:
-		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the UNDO case */
+	case RESERVE2:
+		/* memory reseveration, final preparation... */
 		switch (set_value) {
 		case RS_CREATEANDGO:
 			/* check that activation is possible */
-			if ((ret = sessionConnectionTable_consistent(StorageNew)) != SNMP_ERR_NOERROR)
+			if ((ret = can_act_sessionConnectionTable_row(StorageNew)) != SNMP_ERR_NOERROR)
 				return (ret);
 			break;
 		case RS_CREATEANDWAIT:
-			/* row does not have to be consistent */
 			break;
 		case RS_ACTIVE:
-			old_value = StorageTmp->sessionCOnnectionRowStatus;
-			StorageTmp->sessionCOnnectionRowStatus = set_value;
-			if (old_value != RS_ACTIVE) {
 				/* check that activation is possible */
-				if ((ret = sessionConnectionTable_consistent(StorageTmp)) != SNMP_ERR_NOERROR) {
-					StorageTmp->sessionCOnnectionRowStatus = old_value;
+			if (StorageTmp->sessionCOnnectionRowStatus != RS_ACTIVE)
+				if ((ret = can_act_sessionConnectionTable_row(StorageTmp)) != SNMP_ERR_NOERROR)
 					return (ret);
+			break;
+		case RS_NOTINSERVICE:
+			/* check that deactivation is possible */
+			if (StorageTmp->sessionCOnnectionRowStatus != RS_NOTINSERVICE)
+				if ((ret = can_deact_sessionConnectionTable_row(StorageTmp)) != SNMP_ERR_NOERROR)
+					return (ret);
+			break;
+		case RS_DESTROY:
+			/* check that deactivation is possible */
+			if (StorageTmp->sessionCOnnectionRowStatus != RS_NOTINSERVICE)
+				if ((ret = can_deact_sessionConnectionTable_row(StorageTmp)) != SNMP_ERR_NOERROR)
+					return (ret);
+			break;
+		default:
+			return SNMP_ERR_WRONGVALUE;
 				}
+		break;
+	case ACTION:
+		/* The variable has been stored in StorageTmp->sessionCOnnectionRowStatus for you to use, and you have just been asked to do something with it.  Note that anything done here must be
+		   reversable in the UNDO case */
+		switch (set_value) {
+		case RS_CREATEANDGO:
+			/* activate with underlying device */
+			if (activate_sessionConnectionTable_row(StorageNew) != SNMP_ERR_NOERROR)
+				return SNMP_ERR_COMMITFAILED;
+			break;
+		case RS_CREATEANDWAIT:
+			break;
+		case RS_ACTIVE:
+			/* state change already performed */
+			if (StorageTmp->sessionCOnnectionRowStatus != RS_ACTIVE) {
+				/* activate with underlying device */
+				if (activate_sessionConnectionTable_row(StorageTmp) != SNMP_ERR_NOERROR)
+					return SNMP_ERR_COMMITFAILED;
 			}
 			break;
 		case RS_NOTINSERVICE:
-			/* set the flag? */
-			old_value = StorageTmp->sessionCOnnectionRowStatus;
-			StorageTmp->sessionCOnnectionRowStatus = set_value;
+			/* state change already performed */
+			if (StorageTmp->sessionCOnnectionRowStatus != RS_NOTINSERVICE) {
+				/* deactivate with underlying device */
+				if (deactivate_sessionConnectionTable_row(StorageTmp) != SNMP_ERR_NOERROR)
+					return SNMP_ERR_COMMITFAILED;
+			}
 			break;
+		case RS_DESTROY:
+			/* commit destrution to underlying device */
+			if (StorageDel == NULL)
+				break;
+			/* deactivate with underlying device */
+			if (deactivate_sessionConnectionTable_row(StorageDel) != SNMP_ERR_NOERROR)
+				return SNMP_ERR_COMMITFAILED;
+			break;
+		default:
+			return SNMP_ERR_WRONGVALUE;
 		}
 		break;
 	case COMMIT:
 		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		switch (set_value) {
 		case RS_CREATEANDGO:
-			/* row creation, set final state */
-			/* XXX: commit creation to underlying device */
-			/* XXX: activate with underlying device */
 			StorageNew->sessionCOnnectionRowStatus = RS_ACTIVE;
 			break;
 		case RS_CREATEANDWAIT:
-			/* row creation, set final state */
 			StorageNew->sessionCOnnectionRowStatus = RS_NOTINSERVICE;
 			break;
 		case RS_ACTIVE:
 		case RS_NOTINSERVICE:
-			/* state change already performed */
-			if (old_value != set_value) {
-				switch (set_value) {
-				case RS_ACTIVE:
-					/* XXX: activate with underlying device */
-					break;
-				case RS_NOTINSERVICE:
-					/* XXX: deactivate with underlying device */
-					break;
-				}
+			StorageNew->sessionCOnnectionRowStatus = set_value;
+			if ((StorageOld = StorageTmp->sessionConnectionTable_old) != NULL) {
+				sessionConnectionTable_destroy(&StorageTmp->sessionConnectionTable_old);
+				StorageTmp->sessionConnectionTable_rsvs = 0;
+				StorageTmp->sessionConnectionTable_tsts = 0;
+				StorageTmp->sessionConnectionTable_sets = 0;
 			}
 			break;
 		case RS_DESTROY:
-			/* row deletion, free it its dead */
 			sessionConnectionTable_destroy(&StorageDel);
-			/* sessionConnectionTable_destroy() can handle NULL pointers. */
 			break;
 		}
 		break;
 	case UNDO:
 		/* Back out any changes made in the ACTION case */
 		switch (set_value) {
+		case RS_CREATEANDGO:
+			/* deactivate with underlying device */
+			deactivate_sessionConnectionTable_row(StorageNew);
+			break;
+		case RS_CREATEANDWAIT:
+			break;
 		case RS_ACTIVE:
+			if (StorageTmp->sessionCOnnectionRowStatus == RS_NOTINSERVICE)
+				/* deactivate with underlying device */
+				deactivate_sessionConnectionTable_row(StorageTmp);
+			break;
 		case RS_NOTINSERVICE:
-			/* restore state */
-			StorageTmp->sessionCOnnectionRowStatus = old_value;
+			if (StorageTmp->sessionCOnnectionRowStatus == RS_ACTIVE)
+				/* activate with underlying device */
+				activate_sessionConnectionTable_row(StorageTmp);
+			break;
+		case RS_DESTROY:
 			break;
 		}
 		/* fall through */
@@ -12048,6 +15981,13 @@ write_sessionCOnnectionRowStatus(int action, u_char *var_val, u_char var_val_typ
 				sessionConnectionTable_del(StorageNew);
 				sessionConnectionTable_destroy(&StorageNew);
 			}
+			break;
+		case RS_ACTIVE:
+		case RS_NOTINSERVICE:
+			if ((StorageOld = StorageTmp->sessionConnectionTable_old) == NULL)
+				break;
+			if (--StorageTmp->sessionConnectionTable_rsvs == 0)
+				sessionConnectionTable_destroy(&StorageTmp->sessionConnectionTable_old);
 			break;
 		case RS_DESTROY:
 			/* row deletion, so add it again */
@@ -12074,10 +16014,9 @@ write_sessionCOnnectionRowStatus(int action, u_char *var_val, u_char var_val_typ
 int
 write_sessionCopmRowStatus(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	struct sessionCopmTable_data *StorageTmp = NULL;
+	struct sessionCopmTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	static struct sessionCopmTable_data *StorageNew, *StorageDel;
 	size_t newlen = name_len - 15;
-	static int old_value;
 	int set_value, ret;
 	static struct variable_list *vars, *vp;
 
@@ -12104,40 +16043,6 @@ write_sessionCopmRowStatus(int action, u_char *var_val, u_char var_val_type, siz
 			if (StorageTmp != NULL)
 				/* cannot create existing row */
 				return SNMP_ERR_INCONSISTENTVALUE;
-			break;
-		case RS_ACTIVE:
-		case RS_NOTINSERVICE:
-			if (StorageTmp == NULL)
-				/* cannot change state of non-existent row */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			if (StorageTmp->sessionCopmRowStatus == RS_NOTREADY)
-				/* cannot change state of row that is not ready */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			/* XXX: interaction with row storage type needed */
-			if (set_value == RS_NOTINSERVICE && StorageTmp->sessionCopmTable_refs > 0)
-				/* row is busy and cannot be moved to the RS_NOTINSERVICE state */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			break;
-		case RS_DESTROY:
-			/* destroying existent or non-existent row is ok */
-			if (StorageTmp == NULL)
-				break;
-			/* XXX: interaction with row storage type needed */
-			if (StorageTmp->sessionCopmTable_refs > 0)
-				/* row is busy and cannot be deleted */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			break;
-		case RS_NOTREADY:
-			/* management station cannot set this, only agent can */
-		default:
-			return SNMP_ERR_INCONSISTENTVALUE;
-		}
-		break;
-	case RESERVE2:
-		/* memory reseveration, final preparation... */
-		switch (set_value) {
-		case RS_CREATEANDGO:
-		case RS_CREATEANDWAIT:
 			/* creation */
 			vars = NULL;
 			/* sessionSubsystemId */
@@ -12188,6 +16093,7 @@ write_sessionCopmRowStatus(int action, u_char *var_val, u_char var_val_type, siz
 				snmp_free_varbind(vars);
 				return SNMP_ERR_RESOURCEUNAVAILABLE;
 			}
+			StorageNew->sessionCopmTable_rsvs = 1;
 			vp = vars;
 			memdup((void *) &StorageNew->sessionSubsystemId, vp->val.string, vp->val_len);
 			StorageNew->sessionSubsystemIdLen = vp->val_len;
@@ -12200,7 +16106,37 @@ write_sessionCopmRowStatus(int action, u_char *var_val, u_char var_val_type, siz
 			vp = vp->next_variable;
 			header_complex_add_data(&sessionCopmTableStorage, vars, StorageNew);	/* frees vars */
 			break;
+		case RS_ACTIVE:
+		case RS_NOTINSERVICE:
+			if (StorageTmp == NULL)
+				/* cannot change state of non-existent row */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			if (StorageTmp->sessionCopmRowStatus == RS_NOTREADY)
+				/* cannot change state of row that is not ready */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			/* XXX: interaction with row storage type needed */
+			if (set_value == RS_NOTINSERVICE && StorageTmp->sessionCopmTable_refs > 0)
+				/* row is busy and cannot be moved to the RS_NOTINSERVICE state */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			/* activate or deactivate */
+			if (StorageTmp == NULL)
+				return SNMP_ERR_NOSUCHNAME;
+			/* one allocation for the whole row */
+			if ((StorageOld = StorageTmp->sessionCopmTable_old) == NULL)
+				if (StorageTmp->sessionCopmTable_rsvs == 0)
+					if ((StorageOld = StorageTmp->sessionCopmTable_old = sessionCopmTable_duplicate(StorageTmp)) == NULL)
+						return SNMP_ERR_RESOURCEUNAVAILABLE;
+			if (StorageOld != NULL)
+				StorageTmp->sessionCopmTable_rsvs++;
+			break;
 		case RS_DESTROY:
+			if (StorageTmp == NULL)
+				/* cannot destroy non-existent row */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			/* XXX: interaction with row storage type needed */
+			if (StorageTmp->sessionCopmTable_refs > 0)
+				/* row is busy and cannot be deleted */
+				return SNMP_ERR_INCONSISTENTVALUE;
 			/* destroy */
 			if (StorageTmp != NULL) {
 				/* exists, extract it for now */
@@ -12210,78 +16146,127 @@ write_sessionCopmRowStatus(int action, u_char *var_val, u_char var_val_type, siz
 				StorageDel = NULL;
 			}
 			break;
+		case RS_NOTREADY:
+			/* management station cannot set this, only agent can */
+		default:
+			return SNMP_ERR_INCONSISTENTVALUE;
 		}
 		break;
-	case ACTION:
-		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the UNDO case */
+	case RESERVE2:
+		/* memory reseveration, final preparation... */
 		switch (set_value) {
 		case RS_CREATEANDGO:
 			/* check that activation is possible */
-			if ((ret = sessionCopmTable_consistent(StorageNew)) != SNMP_ERR_NOERROR)
+			if ((ret = can_act_sessionCopmTable_row(StorageNew)) != SNMP_ERR_NOERROR)
 				return (ret);
 			break;
 		case RS_CREATEANDWAIT:
-			/* row does not have to be consistent */
 			break;
 		case RS_ACTIVE:
-			old_value = StorageTmp->sessionCopmRowStatus;
-			StorageTmp->sessionCopmRowStatus = set_value;
-			if (old_value != RS_ACTIVE) {
 				/* check that activation is possible */
-				if ((ret = sessionCopmTable_consistent(StorageTmp)) != SNMP_ERR_NOERROR) {
-					StorageTmp->sessionCopmRowStatus = old_value;
+			if (StorageTmp->sessionCopmRowStatus != RS_ACTIVE)
+				if ((ret = can_act_sessionCopmTable_row(StorageTmp)) != SNMP_ERR_NOERROR)
 					return (ret);
+			break;
+		case RS_NOTINSERVICE:
+			/* check that deactivation is possible */
+			if (StorageTmp->sessionCopmRowStatus != RS_NOTINSERVICE)
+				if ((ret = can_deact_sessionCopmTable_row(StorageTmp)) != SNMP_ERR_NOERROR)
+					return (ret);
+			break;
+		case RS_DESTROY:
+			/* check that deactivation is possible */
+			if (StorageTmp->sessionCopmRowStatus != RS_NOTINSERVICE)
+				if ((ret = can_deact_sessionCopmTable_row(StorageTmp)) != SNMP_ERR_NOERROR)
+					return (ret);
+			break;
+		default:
+			return SNMP_ERR_WRONGVALUE;
 				}
+		break;
+	case ACTION:
+		/* The variable has been stored in StorageTmp->sessionCopmRowStatus for you to use, and you have just been asked to do something with it.  Note that anything done here must be
+		   reversable in the UNDO case */
+		switch (set_value) {
+		case RS_CREATEANDGO:
+			/* activate with underlying device */
+			if (activate_sessionCopmTable_row(StorageNew) != SNMP_ERR_NOERROR)
+				return SNMP_ERR_COMMITFAILED;
+			break;
+		case RS_CREATEANDWAIT:
+			break;
+		case RS_ACTIVE:
+			/* state change already performed */
+			if (StorageTmp->sessionCopmRowStatus != RS_ACTIVE) {
+				/* activate with underlying device */
+				if (activate_sessionCopmTable_row(StorageTmp) != SNMP_ERR_NOERROR)
+					return SNMP_ERR_COMMITFAILED;
 			}
 			break;
 		case RS_NOTINSERVICE:
-			/* set the flag? */
-			old_value = StorageTmp->sessionCopmRowStatus;
-			StorageTmp->sessionCopmRowStatus = set_value;
+			/* state change already performed */
+			if (StorageTmp->sessionCopmRowStatus != RS_NOTINSERVICE) {
+				/* deactivate with underlying device */
+				if (deactivate_sessionCopmTable_row(StorageTmp) != SNMP_ERR_NOERROR)
+					return SNMP_ERR_COMMITFAILED;
+			}
 			break;
+		case RS_DESTROY:
+			/* commit destrution to underlying device */
+			if (StorageDel == NULL)
+				break;
+			/* deactivate with underlying device */
+			if (deactivate_sessionCopmTable_row(StorageDel) != SNMP_ERR_NOERROR)
+				return SNMP_ERR_COMMITFAILED;
+			break;
+		default:
+			return SNMP_ERR_WRONGVALUE;
 		}
 		break;
 	case COMMIT:
 		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		switch (set_value) {
 		case RS_CREATEANDGO:
-			/* row creation, set final state */
-			/* XXX: commit creation to underlying device */
-			/* XXX: activate with underlying device */
 			StorageNew->sessionCopmRowStatus = RS_ACTIVE;
 			break;
 		case RS_CREATEANDWAIT:
-			/* row creation, set final state */
 			StorageNew->sessionCopmRowStatus = RS_NOTINSERVICE;
 			break;
 		case RS_ACTIVE:
 		case RS_NOTINSERVICE:
-			/* state change already performed */
-			if (old_value != set_value) {
-				switch (set_value) {
-				case RS_ACTIVE:
-					/* XXX: activate with underlying device */
-					break;
-				case RS_NOTINSERVICE:
-					/* XXX: deactivate with underlying device */
-					break;
-				}
+			StorageNew->sessionCopmRowStatus = set_value;
+			if ((StorageOld = StorageTmp->sessionCopmTable_old) != NULL) {
+				sessionCopmTable_destroy(&StorageTmp->sessionCopmTable_old);
+				StorageTmp->sessionCopmTable_rsvs = 0;
+				StorageTmp->sessionCopmTable_tsts = 0;
+				StorageTmp->sessionCopmTable_sets = 0;
 			}
 			break;
 		case RS_DESTROY:
-			/* row deletion, free it its dead */
 			sessionCopmTable_destroy(&StorageDel);
-			/* sessionCopmTable_destroy() can handle NULL pointers. */
 			break;
 		}
 		break;
 	case UNDO:
 		/* Back out any changes made in the ACTION case */
 		switch (set_value) {
+		case RS_CREATEANDGO:
+			/* deactivate with underlying device */
+			deactivate_sessionCopmTable_row(StorageNew);
+			break;
+		case RS_CREATEANDWAIT:
+			break;
 		case RS_ACTIVE:
+			if (StorageTmp->sessionCopmRowStatus == RS_NOTINSERVICE)
+				/* deactivate with underlying device */
+				deactivate_sessionCopmTable_row(StorageTmp);
+			break;
 		case RS_NOTINSERVICE:
-			/* restore state */
-			StorageTmp->sessionCopmRowStatus = old_value;
+			if (StorageTmp->sessionCopmRowStatus == RS_ACTIVE)
+				/* activate with underlying device */
+				activate_sessionCopmTable_row(StorageTmp);
+			break;
+		case RS_DESTROY:
 			break;
 		}
 		/* fall through */
@@ -12295,6 +16280,13 @@ write_sessionCopmRowStatus(int action, u_char *var_val, u_char var_val_type, siz
 				sessionCopmTable_del(StorageNew);
 				sessionCopmTable_destroy(&StorageNew);
 			}
+			break;
+		case RS_ACTIVE:
+		case RS_NOTINSERVICE:
+			if ((StorageOld = StorageTmp->sessionCopmTable_old) == NULL)
+				break;
+			if (--StorageTmp->sessionCopmTable_rsvs == 0)
+				sessionCopmTable_destroy(&StorageTmp->sessionCopmTable_old);
 			break;
 		case RS_DESTROY:
 			/* row deletion, so add it again */
@@ -12321,10 +16313,9 @@ write_sessionCopmRowStatus(int action, u_char *var_val, u_char var_val_type, siz
 int
 write_sessionEntityRowStatus(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	struct sessionEntityTable_data *StorageTmp = NULL;
+	struct sessionEntityTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	static struct sessionEntityTable_data *StorageNew, *StorageDel;
 	size_t newlen = name_len - 15;
-	static int old_value;
 	int set_value, ret;
 	static struct variable_list *vars, *vp;
 
@@ -12351,40 +16342,6 @@ write_sessionEntityRowStatus(int action, u_char *var_val, u_char var_val_type, s
 			if (StorageTmp != NULL)
 				/* cannot create existing row */
 				return SNMP_ERR_INCONSISTENTVALUE;
-			break;
-		case RS_ACTIVE:
-		case RS_NOTINSERVICE:
-			if (StorageTmp == NULL)
-				/* cannot change state of non-existent row */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			if (StorageTmp->sessionEntityRowStatus == RS_NOTREADY)
-				/* cannot change state of row that is not ready */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			/* XXX: interaction with row storage type needed */
-			if (set_value == RS_NOTINSERVICE && StorageTmp->sessionEntityTable_refs > 0)
-				/* row is busy and cannot be moved to the RS_NOTINSERVICE state */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			break;
-		case RS_DESTROY:
-			/* destroying existent or non-existent row is ok */
-			if (StorageTmp == NULL)
-				break;
-			/* XXX: interaction with row storage type needed */
-			if (StorageTmp->sessionEntityTable_refs > 0)
-				/* row is busy and cannot be deleted */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			break;
-		case RS_NOTREADY:
-			/* management station cannot set this, only agent can */
-		default:
-			return SNMP_ERR_INCONSISTENTVALUE;
-		}
-		break;
-	case RESERVE2:
-		/* memory reseveration, final preparation... */
-		switch (set_value) {
-		case RS_CREATEANDGO:
-		case RS_CREATEANDWAIT:
 			/* creation */
 			vars = NULL;
 			/* sessionSubsystemId */
@@ -12422,6 +16379,7 @@ write_sessionEntityRowStatus(int action, u_char *var_val, u_char var_val_type, s
 				snmp_free_varbind(vars);
 				return SNMP_ERR_RESOURCEUNAVAILABLE;
 			}
+			StorageNew->sessionEntityTable_rsvs = 1;
 			vp = vars;
 			memdup((void *) &StorageNew->sessionSubsystemId, vp->val.string, vp->val_len);
 			StorageNew->sessionSubsystemIdLen = vp->val_len;
@@ -12431,7 +16389,37 @@ write_sessionEntityRowStatus(int action, u_char *var_val, u_char var_val_type, s
 			vp = vp->next_variable;
 			header_complex_add_data(&sessionEntityTableStorage, vars, StorageNew);	/* frees vars */
 			break;
+		case RS_ACTIVE:
+		case RS_NOTINSERVICE:
+			if (StorageTmp == NULL)
+				/* cannot change state of non-existent row */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			if (StorageTmp->sessionEntityRowStatus == RS_NOTREADY)
+				/* cannot change state of row that is not ready */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			/* XXX: interaction with row storage type needed */
+			if (set_value == RS_NOTINSERVICE && StorageTmp->sessionEntityTable_refs > 0)
+				/* row is busy and cannot be moved to the RS_NOTINSERVICE state */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			/* activate or deactivate */
+			if (StorageTmp == NULL)
+				return SNMP_ERR_NOSUCHNAME;
+			/* one allocation for the whole row */
+			if ((StorageOld = StorageTmp->sessionEntityTable_old) == NULL)
+				if (StorageTmp->sessionEntityTable_rsvs == 0)
+					if ((StorageOld = StorageTmp->sessionEntityTable_old = sessionEntityTable_duplicate(StorageTmp)) == NULL)
+						return SNMP_ERR_RESOURCEUNAVAILABLE;
+			if (StorageOld != NULL)
+				StorageTmp->sessionEntityTable_rsvs++;
+			break;
 		case RS_DESTROY:
+			if (StorageTmp == NULL)
+				/* cannot destroy non-existent row */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			/* XXX: interaction with row storage type needed */
+			if (StorageTmp->sessionEntityTable_refs > 0)
+				/* row is busy and cannot be deleted */
+				return SNMP_ERR_INCONSISTENTVALUE;
 			/* destroy */
 			if (StorageTmp != NULL) {
 				/* exists, extract it for now */
@@ -12441,78 +16429,127 @@ write_sessionEntityRowStatus(int action, u_char *var_val, u_char var_val_type, s
 				StorageDel = NULL;
 			}
 			break;
+		case RS_NOTREADY:
+			/* management station cannot set this, only agent can */
+		default:
+			return SNMP_ERR_INCONSISTENTVALUE;
 		}
 		break;
-	case ACTION:
-		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the UNDO case */
+	case RESERVE2:
+		/* memory reseveration, final preparation... */
 		switch (set_value) {
 		case RS_CREATEANDGO:
 			/* check that activation is possible */
-			if ((ret = sessionEntityTable_consistent(StorageNew)) != SNMP_ERR_NOERROR)
+			if ((ret = can_act_sessionEntityTable_row(StorageNew)) != SNMP_ERR_NOERROR)
 				return (ret);
 			break;
 		case RS_CREATEANDWAIT:
-			/* row does not have to be consistent */
 			break;
 		case RS_ACTIVE:
-			old_value = StorageTmp->sessionEntityRowStatus;
-			StorageTmp->sessionEntityRowStatus = set_value;
-			if (old_value != RS_ACTIVE) {
 				/* check that activation is possible */
-				if ((ret = sessionEntityTable_consistent(StorageTmp)) != SNMP_ERR_NOERROR) {
-					StorageTmp->sessionEntityRowStatus = old_value;
+			if (StorageTmp->sessionEntityRowStatus != RS_ACTIVE)
+				if ((ret = can_act_sessionEntityTable_row(StorageTmp)) != SNMP_ERR_NOERROR)
 					return (ret);
+			break;
+		case RS_NOTINSERVICE:
+			/* check that deactivation is possible */
+			if (StorageTmp->sessionEntityRowStatus != RS_NOTINSERVICE)
+				if ((ret = can_deact_sessionEntityTable_row(StorageTmp)) != SNMP_ERR_NOERROR)
+					return (ret);
+			break;
+		case RS_DESTROY:
+			/* check that deactivation is possible */
+			if (StorageTmp->sessionEntityRowStatus != RS_NOTINSERVICE)
+				if ((ret = can_deact_sessionEntityTable_row(StorageTmp)) != SNMP_ERR_NOERROR)
+					return (ret);
+			break;
+		default:
+			return SNMP_ERR_WRONGVALUE;
 				}
+		break;
+	case ACTION:
+		/* The variable has been stored in StorageTmp->sessionEntityRowStatus for you to use, and you have just been asked to do something with it.  Note that anything done here must be
+		   reversable in the UNDO case */
+		switch (set_value) {
+		case RS_CREATEANDGO:
+			/* activate with underlying device */
+			if (activate_sessionEntityTable_row(StorageNew) != SNMP_ERR_NOERROR)
+				return SNMP_ERR_COMMITFAILED;
+			break;
+		case RS_CREATEANDWAIT:
+			break;
+		case RS_ACTIVE:
+			/* state change already performed */
+			if (StorageTmp->sessionEntityRowStatus != RS_ACTIVE) {
+				/* activate with underlying device */
+				if (activate_sessionEntityTable_row(StorageTmp) != SNMP_ERR_NOERROR)
+					return SNMP_ERR_COMMITFAILED;
 			}
 			break;
 		case RS_NOTINSERVICE:
-			/* set the flag? */
-			old_value = StorageTmp->sessionEntityRowStatus;
-			StorageTmp->sessionEntityRowStatus = set_value;
+			/* state change already performed */
+			if (StorageTmp->sessionEntityRowStatus != RS_NOTINSERVICE) {
+				/* deactivate with underlying device */
+				if (deactivate_sessionEntityTable_row(StorageTmp) != SNMP_ERR_NOERROR)
+					return SNMP_ERR_COMMITFAILED;
+			}
 			break;
+		case RS_DESTROY:
+			/* commit destrution to underlying device */
+			if (StorageDel == NULL)
+				break;
+			/* deactivate with underlying device */
+			if (deactivate_sessionEntityTable_row(StorageDel) != SNMP_ERR_NOERROR)
+				return SNMP_ERR_COMMITFAILED;
+			break;
+		default:
+			return SNMP_ERR_WRONGVALUE;
 		}
 		break;
 	case COMMIT:
 		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		switch (set_value) {
 		case RS_CREATEANDGO:
-			/* row creation, set final state */
-			/* XXX: commit creation to underlying device */
-			/* XXX: activate with underlying device */
 			StorageNew->sessionEntityRowStatus = RS_ACTIVE;
 			break;
 		case RS_CREATEANDWAIT:
-			/* row creation, set final state */
 			StorageNew->sessionEntityRowStatus = RS_NOTINSERVICE;
 			break;
 		case RS_ACTIVE:
 		case RS_NOTINSERVICE:
-			/* state change already performed */
-			if (old_value != set_value) {
-				switch (set_value) {
-				case RS_ACTIVE:
-					/* XXX: activate with underlying device */
-					break;
-				case RS_NOTINSERVICE:
-					/* XXX: deactivate with underlying device */
-					break;
-				}
+			StorageNew->sessionEntityRowStatus = set_value;
+			if ((StorageOld = StorageTmp->sessionEntityTable_old) != NULL) {
+				sessionEntityTable_destroy(&StorageTmp->sessionEntityTable_old);
+				StorageTmp->sessionEntityTable_rsvs = 0;
+				StorageTmp->sessionEntityTable_tsts = 0;
+				StorageTmp->sessionEntityTable_sets = 0;
 			}
 			break;
 		case RS_DESTROY:
-			/* row deletion, free it its dead */
 			sessionEntityTable_destroy(&StorageDel);
-			/* sessionEntityTable_destroy() can handle NULL pointers. */
 			break;
 		}
 		break;
 	case UNDO:
 		/* Back out any changes made in the ACTION case */
 		switch (set_value) {
+		case RS_CREATEANDGO:
+			/* deactivate with underlying device */
+			deactivate_sessionEntityTable_row(StorageNew);
+			break;
+		case RS_CREATEANDWAIT:
+			break;
 		case RS_ACTIVE:
+			if (StorageTmp->sessionEntityRowStatus == RS_NOTINSERVICE)
+				/* deactivate with underlying device */
+				deactivate_sessionEntityTable_row(StorageTmp);
+			break;
 		case RS_NOTINSERVICE:
-			/* restore state */
-			StorageTmp->sessionEntityRowStatus = old_value;
+			if (StorageTmp->sessionEntityRowStatus == RS_ACTIVE)
+				/* activate with underlying device */
+				activate_sessionEntityTable_row(StorageTmp);
+			break;
+		case RS_DESTROY:
 			break;
 		}
 		/* fall through */
@@ -12526,6 +16563,13 @@ write_sessionEntityRowStatus(int action, u_char *var_val, u_char var_val_type, s
 				sessionEntityTable_del(StorageNew);
 				sessionEntityTable_destroy(&StorageNew);
 			}
+			break;
+		case RS_ACTIVE:
+		case RS_NOTINSERVICE:
+			if ((StorageOld = StorageTmp->sessionEntityTable_old) == NULL)
+				break;
+			if (--StorageTmp->sessionEntityTable_rsvs == 0)
+				sessionEntityTable_destroy(&StorageTmp->sessionEntityTable_old);
 			break;
 		case RS_DESTROY:
 			/* row deletion, so add it again */
@@ -12552,10 +16596,9 @@ write_sessionEntityRowStatus(int action, u_char *var_val, u_char var_val_type, s
 int
 write_sessionSubsystemRowStatus(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	struct sessionSubsystemTable_data *StorageTmp = NULL;
+	struct sessionSubsystemTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	static struct sessionSubsystemTable_data *StorageNew, *StorageDel;
 	size_t newlen = name_len - 15;
-	static int old_value;
 	int set_value, ret;
 	static struct variable_list *vars, *vp;
 
@@ -12582,40 +16625,6 @@ write_sessionSubsystemRowStatus(int action, u_char *var_val, u_char var_val_type
 			if (StorageTmp != NULL)
 				/* cannot create existing row */
 				return SNMP_ERR_INCONSISTENTVALUE;
-			break;
-		case RS_ACTIVE:
-		case RS_NOTINSERVICE:
-			if (StorageTmp == NULL)
-				/* cannot change state of non-existent row */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			if (StorageTmp->sessionSubsystemRowStatus == RS_NOTREADY)
-				/* cannot change state of row that is not ready */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			/* XXX: interaction with row storage type needed */
-			if (set_value == RS_NOTINSERVICE && StorageTmp->sessionSubsystemTable_refs > 0)
-				/* row is busy and cannot be moved to the RS_NOTINSERVICE state */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			break;
-		case RS_DESTROY:
-			/* destroying existent or non-existent row is ok */
-			if (StorageTmp == NULL)
-				break;
-			/* XXX: interaction with row storage type needed */
-			if (StorageTmp->sessionSubsystemTable_refs > 0)
-				/* row is busy and cannot be deleted */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			break;
-		case RS_NOTREADY:
-			/* management station cannot set this, only agent can */
-		default:
-			return SNMP_ERR_INCONSISTENTVALUE;
-		}
-		break;
-	case RESERVE2:
-		/* memory reseveration, final preparation... */
-		switch (set_value) {
-		case RS_CREATEANDGO:
-		case RS_CREATEANDWAIT:
 			/* creation */
 			vars = NULL;
 			/* sessionSubsystemId */
@@ -12640,13 +16649,44 @@ write_sessionSubsystemRowStatus(int action, u_char *var_val, u_char var_val_type
 				snmp_free_varbind(vars);
 				return SNMP_ERR_RESOURCEUNAVAILABLE;
 			}
+			StorageNew->sessionSubsystemTable_rsvs = 1;
 			vp = vars;
 			memdup((void *) &StorageNew->sessionSubsystemId, vp->val.string, vp->val_len);
 			StorageNew->sessionSubsystemIdLen = vp->val_len;
 			vp = vp->next_variable;
 			header_complex_add_data(&sessionSubsystemTableStorage, vars, StorageNew);	/* frees vars */
 			break;
+		case RS_ACTIVE:
+		case RS_NOTINSERVICE:
+			if (StorageTmp == NULL)
+				/* cannot change state of non-existent row */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			if (StorageTmp->sessionSubsystemRowStatus == RS_NOTREADY)
+				/* cannot change state of row that is not ready */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			/* XXX: interaction with row storage type needed */
+			if (set_value == RS_NOTINSERVICE && StorageTmp->sessionSubsystemTable_refs > 0)
+				/* row is busy and cannot be moved to the RS_NOTINSERVICE state */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			/* activate or deactivate */
+			if (StorageTmp == NULL)
+				return SNMP_ERR_NOSUCHNAME;
+			/* one allocation for the whole row */
+			if ((StorageOld = StorageTmp->sessionSubsystemTable_old) == NULL)
+				if (StorageTmp->sessionSubsystemTable_rsvs == 0)
+					if ((StorageOld = StorageTmp->sessionSubsystemTable_old = sessionSubsystemTable_duplicate(StorageTmp)) == NULL)
+						return SNMP_ERR_RESOURCEUNAVAILABLE;
+			if (StorageOld != NULL)
+				StorageTmp->sessionSubsystemTable_rsvs++;
+			break;
 		case RS_DESTROY:
+			if (StorageTmp == NULL)
+				/* cannot destroy non-existent row */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			/* XXX: interaction with row storage type needed */
+			if (StorageTmp->sessionSubsystemTable_refs > 0)
+				/* row is busy and cannot be deleted */
+				return SNMP_ERR_INCONSISTENTVALUE;
 			/* destroy */
 			if (StorageTmp != NULL) {
 				/* exists, extract it for now */
@@ -12656,78 +16696,127 @@ write_sessionSubsystemRowStatus(int action, u_char *var_val, u_char var_val_type
 				StorageDel = NULL;
 			}
 			break;
+		case RS_NOTREADY:
+			/* management station cannot set this, only agent can */
+		default:
+			return SNMP_ERR_INCONSISTENTVALUE;
 		}
 		break;
-	case ACTION:
-		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the UNDO case */
+	case RESERVE2:
+		/* memory reseveration, final preparation... */
 		switch (set_value) {
 		case RS_CREATEANDGO:
 			/* check that activation is possible */
-			if ((ret = sessionSubsystemTable_consistent(StorageNew)) != SNMP_ERR_NOERROR)
+			if ((ret = can_act_sessionSubsystemTable_row(StorageNew)) != SNMP_ERR_NOERROR)
 				return (ret);
 			break;
 		case RS_CREATEANDWAIT:
-			/* row does not have to be consistent */
 			break;
 		case RS_ACTIVE:
-			old_value = StorageTmp->sessionSubsystemRowStatus;
-			StorageTmp->sessionSubsystemRowStatus = set_value;
-			if (old_value != RS_ACTIVE) {
 				/* check that activation is possible */
-				if ((ret = sessionSubsystemTable_consistent(StorageTmp)) != SNMP_ERR_NOERROR) {
-					StorageTmp->sessionSubsystemRowStatus = old_value;
+			if (StorageTmp->sessionSubsystemRowStatus != RS_ACTIVE)
+				if ((ret = can_act_sessionSubsystemTable_row(StorageTmp)) != SNMP_ERR_NOERROR)
 					return (ret);
+			break;
+		case RS_NOTINSERVICE:
+			/* check that deactivation is possible */
+			if (StorageTmp->sessionSubsystemRowStatus != RS_NOTINSERVICE)
+				if ((ret = can_deact_sessionSubsystemTable_row(StorageTmp)) != SNMP_ERR_NOERROR)
+					return (ret);
+			break;
+		case RS_DESTROY:
+			/* check that deactivation is possible */
+			if (StorageTmp->sessionSubsystemRowStatus != RS_NOTINSERVICE)
+				if ((ret = can_deact_sessionSubsystemTable_row(StorageTmp)) != SNMP_ERR_NOERROR)
+					return (ret);
+			break;
+		default:
+			return SNMP_ERR_WRONGVALUE;
 				}
+		break;
+	case ACTION:
+		/* The variable has been stored in StorageTmp->sessionSubsystemRowStatus for you to use, and you have just been asked to do something with it.  Note that anything done here must be
+		   reversable in the UNDO case */
+		switch (set_value) {
+		case RS_CREATEANDGO:
+			/* activate with underlying device */
+			if (activate_sessionSubsystemTable_row(StorageNew) != SNMP_ERR_NOERROR)
+				return SNMP_ERR_COMMITFAILED;
+			break;
+		case RS_CREATEANDWAIT:
+			break;
+		case RS_ACTIVE:
+			/* state change already performed */
+			if (StorageTmp->sessionSubsystemRowStatus != RS_ACTIVE) {
+				/* activate with underlying device */
+				if (activate_sessionSubsystemTable_row(StorageTmp) != SNMP_ERR_NOERROR)
+					return SNMP_ERR_COMMITFAILED;
 			}
 			break;
 		case RS_NOTINSERVICE:
-			/* set the flag? */
-			old_value = StorageTmp->sessionSubsystemRowStatus;
-			StorageTmp->sessionSubsystemRowStatus = set_value;
+			/* state change already performed */
+			if (StorageTmp->sessionSubsystemRowStatus != RS_NOTINSERVICE) {
+				/* deactivate with underlying device */
+				if (deactivate_sessionSubsystemTable_row(StorageTmp) != SNMP_ERR_NOERROR)
+					return SNMP_ERR_COMMITFAILED;
+			}
 			break;
+		case RS_DESTROY:
+			/* commit destrution to underlying device */
+			if (StorageDel == NULL)
+			break;
+			/* deactivate with underlying device */
+			if (deactivate_sessionSubsystemTable_row(StorageDel) != SNMP_ERR_NOERROR)
+				return SNMP_ERR_COMMITFAILED;
+			break;
+		default:
+			return SNMP_ERR_WRONGVALUE;
 		}
 		break;
 	case COMMIT:
 		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		switch (set_value) {
 		case RS_CREATEANDGO:
-			/* row creation, set final state */
-			/* XXX: commit creation to underlying device */
-			/* XXX: activate with underlying device */
 			StorageNew->sessionSubsystemRowStatus = RS_ACTIVE;
 			break;
 		case RS_CREATEANDWAIT:
-			/* row creation, set final state */
 			StorageNew->sessionSubsystemRowStatus = RS_NOTINSERVICE;
 			break;
 		case RS_ACTIVE:
 		case RS_NOTINSERVICE:
-			/* state change already performed */
-			if (old_value != set_value) {
-				switch (set_value) {
-				case RS_ACTIVE:
-					/* XXX: activate with underlying device */
-					break;
-				case RS_NOTINSERVICE:
-					/* XXX: deactivate with underlying device */
-					break;
-				}
+			StorageNew->sessionSubsystemRowStatus = set_value;
+			if ((StorageOld = StorageTmp->sessionSubsystemTable_old) != NULL) {
+				sessionSubsystemTable_destroy(&StorageTmp->sessionSubsystemTable_old);
+				StorageTmp->sessionSubsystemTable_rsvs = 0;
+				StorageTmp->sessionSubsystemTable_tsts = 0;
+				StorageTmp->sessionSubsystemTable_sets = 0;
 			}
 			break;
 		case RS_DESTROY:
-			/* row deletion, free it its dead */
 			sessionSubsystemTable_destroy(&StorageDel);
-			/* sessionSubsystemTable_destroy() can handle NULL pointers. */
 			break;
 		}
 		break;
 	case UNDO:
 		/* Back out any changes made in the ACTION case */
 		switch (set_value) {
+		case RS_CREATEANDGO:
+			/* deactivate with underlying device */
+			deactivate_sessionSubsystemTable_row(StorageNew);
+			break;
+		case RS_CREATEANDWAIT:
+			break;
 		case RS_ACTIVE:
+			if (StorageTmp->sessionSubsystemRowStatus == RS_NOTINSERVICE)
+				/* deactivate with underlying device */
+				deactivate_sessionSubsystemTable_row(StorageTmp);
+			break;
 		case RS_NOTINSERVICE:
-			/* restore state */
-			StorageTmp->sessionSubsystemRowStatus = old_value;
+			if (StorageTmp->sessionSubsystemRowStatus == RS_ACTIVE)
+				/* activate with underlying device */
+				activate_sessionSubsystemTable_row(StorageTmp);
+			break;
+		case RS_DESTROY:
 			break;
 		}
 		/* fall through */
@@ -12741,6 +16830,13 @@ write_sessionSubsystemRowStatus(int action, u_char *var_val, u_char var_val_type
 				sessionSubsystemTable_del(StorageNew);
 				sessionSubsystemTable_destroy(&StorageNew);
 			}
+			break;
+		case RS_ACTIVE:
+		case RS_NOTINSERVICE:
+			if ((StorageOld = StorageTmp->sessionSubsystemTable_old) == NULL)
+				break;
+			if (--StorageTmp->sessionSubsystemTable_rsvs == 0)
+				sessionSubsystemTable_destroy(&StorageTmp->sessionSubsystemTable_old);
 			break;
 		case RS_DESTROY:
 			/* row deletion, so add it again */
@@ -12767,10 +16863,9 @@ write_sessionSubsystemRowStatus(int action, u_char *var_val, u_char var_val_type
 int
 write_acseEntityRowStatus(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	struct acseEntityTable_data *StorageTmp = NULL;
+	struct acseEntityTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	static struct acseEntityTable_data *StorageNew, *StorageDel;
 	size_t newlen = name_len - 15;
-	static int old_value;
 	int set_value, ret;
 	static struct variable_list *vars, *vp;
 
@@ -12797,40 +16892,6 @@ write_acseEntityRowStatus(int action, u_char *var_val, u_char var_val_type, size
 			if (StorageTmp != NULL)
 				/* cannot create existing row */
 				return SNMP_ERR_INCONSISTENTVALUE;
-			break;
-		case RS_ACTIVE:
-		case RS_NOTINSERVICE:
-			if (StorageTmp == NULL)
-				/* cannot change state of non-existent row */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			if (StorageTmp->acseEntityRowStatus == RS_NOTREADY)
-				/* cannot change state of row that is not ready */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			/* XXX: interaction with row storage type needed */
-			if (set_value == RS_NOTINSERVICE && StorageTmp->acseEntityTable_refs > 0)
-				/* row is busy and cannot be moved to the RS_NOTINSERVICE state */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			break;
-		case RS_DESTROY:
-			/* destroying existent or non-existent row is ok */
-			if (StorageTmp == NULL)
-				break;
-			/* XXX: interaction with row storage type needed */
-			if (StorageTmp->acseEntityTable_refs > 0)
-				/* row is busy and cannot be deleted */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			break;
-		case RS_NOTREADY:
-			/* management station cannot set this, only agent can */
-		default:
-			return SNMP_ERR_INCONSISTENTVALUE;
-		}
-		break;
-	case RESERVE2:
-		/* memory reseveration, final preparation... */
-		switch (set_value) {
-		case RS_CREATEANDGO:
-		case RS_CREATEANDWAIT:
 			/* creation */
 			vars = NULL;
 			/* mtpMsId */
@@ -12866,6 +16927,7 @@ write_acseEntityRowStatus(int action, u_char *var_val, u_char var_val_type, size
 				snmp_free_varbind(vars);
 				return SNMP_ERR_RESOURCEUNAVAILABLE;
 			}
+			StorageNew->acseEntityTable_rsvs = 1;
 			vp = vars;
 			StorageNew->mtpMsId = (ulong) *vp->val.integer;
 			vp = vp->next_variable;
@@ -12873,7 +16935,37 @@ write_acseEntityRowStatus(int action, u_char *var_val, u_char var_val_type, size
 			vp = vp->next_variable;
 			header_complex_add_data(&acseEntityTableStorage, vars, StorageNew);	/* frees vars */
 			break;
+		case RS_ACTIVE:
+		case RS_NOTINSERVICE:
+			if (StorageTmp == NULL)
+				/* cannot change state of non-existent row */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			if (StorageTmp->acseEntityRowStatus == RS_NOTREADY)
+				/* cannot change state of row that is not ready */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			/* XXX: interaction with row storage type needed */
+			if (set_value == RS_NOTINSERVICE && StorageTmp->acseEntityTable_refs > 0)
+				/* row is busy and cannot be moved to the RS_NOTINSERVICE state */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			/* activate or deactivate */
+			if (StorageTmp == NULL)
+				return SNMP_ERR_NOSUCHNAME;
+			/* one allocation for the whole row */
+			if ((StorageOld = StorageTmp->acseEntityTable_old) == NULL)
+				if (StorageTmp->acseEntityTable_rsvs == 0)
+					if ((StorageOld = StorageTmp->acseEntityTable_old = acseEntityTable_duplicate(StorageTmp)) == NULL)
+						return SNMP_ERR_RESOURCEUNAVAILABLE;
+			if (StorageOld != NULL)
+				StorageTmp->acseEntityTable_rsvs++;
+			break;
 		case RS_DESTROY:
+			if (StorageTmp == NULL)
+				/* cannot destroy non-existent row */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			/* XXX: interaction with row storage type needed */
+			if (StorageTmp->acseEntityTable_refs > 0)
+				/* row is busy and cannot be deleted */
+				return SNMP_ERR_INCONSISTENTVALUE;
 			/* destroy */
 			if (StorageTmp != NULL) {
 				/* exists, extract it for now */
@@ -12883,78 +16975,127 @@ write_acseEntityRowStatus(int action, u_char *var_val, u_char var_val_type, size
 				StorageDel = NULL;
 			}
 			break;
+		case RS_NOTREADY:
+			/* management station cannot set this, only agent can */
+		default:
+			return SNMP_ERR_INCONSISTENTVALUE;
 		}
 		break;
-	case ACTION:
-		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the UNDO case */
+	case RESERVE2:
+		/* memory reseveration, final preparation... */
 		switch (set_value) {
 		case RS_CREATEANDGO:
 			/* check that activation is possible */
-			if ((ret = acseEntityTable_consistent(StorageNew)) != SNMP_ERR_NOERROR)
+			if ((ret = can_act_acseEntityTable_row(StorageNew)) != SNMP_ERR_NOERROR)
 				return (ret);
 			break;
 		case RS_CREATEANDWAIT:
-			/* row does not have to be consistent */
 			break;
 		case RS_ACTIVE:
-			old_value = StorageTmp->acseEntityRowStatus;
-			StorageTmp->acseEntityRowStatus = set_value;
-			if (old_value != RS_ACTIVE) {
 				/* check that activation is possible */
-				if ((ret = acseEntityTable_consistent(StorageTmp)) != SNMP_ERR_NOERROR) {
-					StorageTmp->acseEntityRowStatus = old_value;
+			if (StorageTmp->acseEntityRowStatus != RS_ACTIVE)
+				if ((ret = can_act_acseEntityTable_row(StorageTmp)) != SNMP_ERR_NOERROR)
 					return (ret);
+			break;
+		case RS_NOTINSERVICE:
+			/* check that deactivation is possible */
+			if (StorageTmp->acseEntityRowStatus != RS_NOTINSERVICE)
+				if ((ret = can_deact_acseEntityTable_row(StorageTmp)) != SNMP_ERR_NOERROR)
+					return (ret);
+			break;
+		case RS_DESTROY:
+			/* check that deactivation is possible */
+			if (StorageTmp->acseEntityRowStatus != RS_NOTINSERVICE)
+				if ((ret = can_deact_acseEntityTable_row(StorageTmp)) != SNMP_ERR_NOERROR)
+					return (ret);
+			break;
+		default:
+			return SNMP_ERR_WRONGVALUE;
 				}
+		break;
+	case ACTION:
+		/* The variable has been stored in StorageTmp->acseEntityRowStatus for you to use, and you have just been asked to do something with it.  Note that anything done here must be
+		   reversable in the UNDO case */
+		switch (set_value) {
+		case RS_CREATEANDGO:
+			/* activate with underlying device */
+			if (activate_acseEntityTable_row(StorageNew) != SNMP_ERR_NOERROR)
+				return SNMP_ERR_COMMITFAILED;
+			break;
+		case RS_CREATEANDWAIT:
+			break;
+		case RS_ACTIVE:
+			/* state change already performed */
+			if (StorageTmp->acseEntityRowStatus != RS_ACTIVE) {
+				/* activate with underlying device */
+				if (activate_acseEntityTable_row(StorageTmp) != SNMP_ERR_NOERROR)
+					return SNMP_ERR_COMMITFAILED;
 			}
 			break;
 		case RS_NOTINSERVICE:
-			/* set the flag? */
-			old_value = StorageTmp->acseEntityRowStatus;
-			StorageTmp->acseEntityRowStatus = set_value;
+			/* state change already performed */
+			if (StorageTmp->acseEntityRowStatus != RS_NOTINSERVICE) {
+				/* deactivate with underlying device */
+				if (deactivate_acseEntityTable_row(StorageTmp) != SNMP_ERR_NOERROR)
+					return SNMP_ERR_COMMITFAILED;
+			}
 			break;
+		case RS_DESTROY:
+			/* commit destrution to underlying device */
+			if (StorageDel == NULL)
+				break;
+			/* deactivate with underlying device */
+			if (deactivate_acseEntityTable_row(StorageDel) != SNMP_ERR_NOERROR)
+				return SNMP_ERR_COMMITFAILED;
+			break;
+		default:
+			return SNMP_ERR_WRONGVALUE;
 		}
 		break;
 	case COMMIT:
 		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		switch (set_value) {
 		case RS_CREATEANDGO:
-			/* row creation, set final state */
-			/* XXX: commit creation to underlying device */
-			/* XXX: activate with underlying device */
 			StorageNew->acseEntityRowStatus = RS_ACTIVE;
 			break;
 		case RS_CREATEANDWAIT:
-			/* row creation, set final state */
 			StorageNew->acseEntityRowStatus = RS_NOTINSERVICE;
 			break;
 		case RS_ACTIVE:
 		case RS_NOTINSERVICE:
-			/* state change already performed */
-			if (old_value != set_value) {
-				switch (set_value) {
-				case RS_ACTIVE:
-					/* XXX: activate with underlying device */
-					break;
-				case RS_NOTINSERVICE:
-					/* XXX: deactivate with underlying device */
-					break;
-				}
+			StorageNew->acseEntityRowStatus = set_value;
+			if ((StorageOld = StorageTmp->acseEntityTable_old) != NULL) {
+				acseEntityTable_destroy(&StorageTmp->acseEntityTable_old);
+				StorageTmp->acseEntityTable_rsvs = 0;
+				StorageTmp->acseEntityTable_tsts = 0;
+				StorageTmp->acseEntityTable_sets = 0;
 			}
 			break;
 		case RS_DESTROY:
-			/* row deletion, free it its dead */
 			acseEntityTable_destroy(&StorageDel);
-			/* acseEntityTable_destroy() can handle NULL pointers. */
 			break;
 		}
 		break;
 	case UNDO:
 		/* Back out any changes made in the ACTION case */
 		switch (set_value) {
+		case RS_CREATEANDGO:
+			/* deactivate with underlying device */
+			deactivate_acseEntityTable_row(StorageNew);
+			break;
+		case RS_CREATEANDWAIT:
+			break;
 		case RS_ACTIVE:
+			if (StorageTmp->acseEntityRowStatus == RS_NOTINSERVICE)
+				/* deactivate with underlying device */
+				deactivate_acseEntityTable_row(StorageTmp);
+			break;
 		case RS_NOTINSERVICE:
-			/* restore state */
-			StorageTmp->acseEntityRowStatus = old_value;
+			if (StorageTmp->acseEntityRowStatus == RS_ACTIVE)
+				/* activate with underlying device */
+				activate_acseEntityTable_row(StorageTmp);
+			break;
+		case RS_DESTROY:
 			break;
 		}
 		/* fall through */
@@ -12968,6 +17109,13 @@ write_acseEntityRowStatus(int action, u_char *var_val, u_char var_val_type, size
 				acseEntityTable_del(StorageNew);
 				acseEntityTable_destroy(&StorageNew);
 			}
+			break;
+		case RS_ACTIVE:
+		case RS_NOTINSERVICE:
+			if ((StorageOld = StorageTmp->acseEntityTable_old) == NULL)
+				break;
+			if (--StorageTmp->acseEntityTable_rsvs == 0)
+				acseEntityTable_destroy(&StorageTmp->acseEntityTable_old);
 			break;
 		case RS_DESTROY:
 			/* row deletion, so add it again */
@@ -12994,10 +17142,9 @@ write_acseEntityRowStatus(int action, u_char *var_val, u_char var_val_type, size
 int
 write_acseAccessPointRowStatus(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	struct acseAccessPointTable_data *StorageTmp = NULL;
+	struct acseAccessPointTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	static struct acseAccessPointTable_data *StorageNew, *StorageDel;
 	size_t newlen = name_len - 15;
-	static int old_value;
 	int set_value, ret;
 	static struct variable_list *vars, *vp;
 
@@ -13024,40 +17171,6 @@ write_acseAccessPointRowStatus(int action, u_char *var_val, u_char var_val_type,
 			if (StorageTmp != NULL)
 				/* cannot create existing row */
 				return SNMP_ERR_INCONSISTENTVALUE;
-			break;
-		case RS_ACTIVE:
-		case RS_NOTINSERVICE:
-			if (StorageTmp == NULL)
-				/* cannot change state of non-existent row */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			if (StorageTmp->acseAccessPointRowStatus == RS_NOTREADY)
-				/* cannot change state of row that is not ready */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			/* XXX: interaction with row storage type needed */
-			if (set_value == RS_NOTINSERVICE && StorageTmp->acseAccessPointTable_refs > 0)
-				/* row is busy and cannot be moved to the RS_NOTINSERVICE state */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			break;
-		case RS_DESTROY:
-			/* destroying existent or non-existent row is ok */
-			if (StorageTmp == NULL)
-				break;
-			/* XXX: interaction with row storage type needed */
-			if (StorageTmp->acseAccessPointTable_refs > 0)
-				/* row is busy and cannot be deleted */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			break;
-		case RS_NOTREADY:
-			/* management station cannot set this, only agent can */
-		default:
-			return SNMP_ERR_INCONSISTENTVALUE;
-		}
-		break;
-	case RESERVE2:
-		/* memory reseveration, final preparation... */
-		switch (set_value) {
-		case RS_CREATEANDGO:
-		case RS_CREATEANDWAIT:
 			/* creation */
 			vars = NULL;
 			/* mtpMsId */
@@ -13105,6 +17218,7 @@ write_acseAccessPointRowStatus(int action, u_char *var_val, u_char var_val_type,
 				snmp_free_varbind(vars);
 				return SNMP_ERR_RESOURCEUNAVAILABLE;
 			}
+			StorageNew->acseAccessPointTable_rsvs = 1;
 			vp = vars;
 			StorageNew->mtpMsId = (ulong) *vp->val.integer;
 			vp = vp->next_variable;
@@ -13114,7 +17228,37 @@ write_acseAccessPointRowStatus(int action, u_char *var_val, u_char var_val_type,
 			vp = vp->next_variable;
 			header_complex_add_data(&acseAccessPointTableStorage, vars, StorageNew);	/* frees vars */
 			break;
+		case RS_ACTIVE:
+		case RS_NOTINSERVICE:
+			if (StorageTmp == NULL)
+				/* cannot change state of non-existent row */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			if (StorageTmp->acseAccessPointRowStatus == RS_NOTREADY)
+				/* cannot change state of row that is not ready */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			/* XXX: interaction with row storage type needed */
+			if (set_value == RS_NOTINSERVICE && StorageTmp->acseAccessPointTable_refs > 0)
+				/* row is busy and cannot be moved to the RS_NOTINSERVICE state */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			/* activate or deactivate */
+			if (StorageTmp == NULL)
+				return SNMP_ERR_NOSUCHNAME;
+			/* one allocation for the whole row */
+			if ((StorageOld = StorageTmp->acseAccessPointTable_old) == NULL)
+				if (StorageTmp->acseAccessPointTable_rsvs == 0)
+					if ((StorageOld = StorageTmp->acseAccessPointTable_old = acseAccessPointTable_duplicate(StorageTmp)) == NULL)
+						return SNMP_ERR_RESOURCEUNAVAILABLE;
+			if (StorageOld != NULL)
+				StorageTmp->acseAccessPointTable_rsvs++;
+			break;
 		case RS_DESTROY:
+			if (StorageTmp == NULL)
+				/* cannot destroy non-existent row */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			/* XXX: interaction with row storage type needed */
+			if (StorageTmp->acseAccessPointTable_refs > 0)
+				/* row is busy and cannot be deleted */
+				return SNMP_ERR_INCONSISTENTVALUE;
 			/* destroy */
 			if (StorageTmp != NULL) {
 				/* exists, extract it for now */
@@ -13124,78 +17268,127 @@ write_acseAccessPointRowStatus(int action, u_char *var_val, u_char var_val_type,
 				StorageDel = NULL;
 			}
 			break;
+		case RS_NOTREADY:
+			/* management station cannot set this, only agent can */
+		default:
+			return SNMP_ERR_INCONSISTENTVALUE;
 		}
 		break;
-	case ACTION:
-		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the UNDO case */
+	case RESERVE2:
+		/* memory reseveration, final preparation... */
 		switch (set_value) {
 		case RS_CREATEANDGO:
 			/* check that activation is possible */
-			if ((ret = acseAccessPointTable_consistent(StorageNew)) != SNMP_ERR_NOERROR)
+			if ((ret = can_act_acseAccessPointTable_row(StorageNew)) != SNMP_ERR_NOERROR)
 				return (ret);
 			break;
 		case RS_CREATEANDWAIT:
-			/* row does not have to be consistent */
 			break;
 		case RS_ACTIVE:
-			old_value = StorageTmp->acseAccessPointRowStatus;
-			StorageTmp->acseAccessPointRowStatus = set_value;
-			if (old_value != RS_ACTIVE) {
 				/* check that activation is possible */
-				if ((ret = acseAccessPointTable_consistent(StorageTmp)) != SNMP_ERR_NOERROR) {
-					StorageTmp->acseAccessPointRowStatus = old_value;
+			if (StorageTmp->acseAccessPointRowStatus != RS_ACTIVE)
+				if ((ret = can_act_acseAccessPointTable_row(StorageTmp)) != SNMP_ERR_NOERROR)
 					return (ret);
+			break;
+		case RS_NOTINSERVICE:
+			/* check that deactivation is possible */
+			if (StorageTmp->acseAccessPointRowStatus != RS_NOTINSERVICE)
+				if ((ret = can_deact_acseAccessPointTable_row(StorageTmp)) != SNMP_ERR_NOERROR)
+					return (ret);
+			break;
+		case RS_DESTROY:
+			/* check that deactivation is possible */
+			if (StorageTmp->acseAccessPointRowStatus != RS_NOTINSERVICE)
+				if ((ret = can_deact_acseAccessPointTable_row(StorageTmp)) != SNMP_ERR_NOERROR)
+					return (ret);
+			break;
+		default:
+			return SNMP_ERR_WRONGVALUE;
 				}
+		break;
+	case ACTION:
+		/* The variable has been stored in StorageTmp->acseAccessPointRowStatus for you to use, and you have just been asked to do something with it.  Note that anything done here must be
+		   reversable in the UNDO case */
+		switch (set_value) {
+		case RS_CREATEANDGO:
+			/* activate with underlying device */
+			if (activate_acseAccessPointTable_row(StorageNew) != SNMP_ERR_NOERROR)
+				return SNMP_ERR_COMMITFAILED;
+			break;
+		case RS_CREATEANDWAIT:
+			break;
+		case RS_ACTIVE:
+			/* state change already performed */
+			if (StorageTmp->acseAccessPointRowStatus != RS_ACTIVE) {
+				/* activate with underlying device */
+				if (activate_acseAccessPointTable_row(StorageTmp) != SNMP_ERR_NOERROR)
+					return SNMP_ERR_COMMITFAILED;
 			}
 			break;
 		case RS_NOTINSERVICE:
-			/* set the flag? */
-			old_value = StorageTmp->acseAccessPointRowStatus;
-			StorageTmp->acseAccessPointRowStatus = set_value;
+			/* state change already performed */
+			if (StorageTmp->acseAccessPointRowStatus != RS_NOTINSERVICE) {
+				/* deactivate with underlying device */
+				if (deactivate_acseAccessPointTable_row(StorageTmp) != SNMP_ERR_NOERROR)
+					return SNMP_ERR_COMMITFAILED;
+			}
 			break;
+		case RS_DESTROY:
+			/* commit destrution to underlying device */
+			if (StorageDel == NULL)
+				break;
+			/* deactivate with underlying device */
+			if (deactivate_acseAccessPointTable_row(StorageDel) != SNMP_ERR_NOERROR)
+				return SNMP_ERR_COMMITFAILED;
+			break;
+		default:
+			return SNMP_ERR_WRONGVALUE;
 		}
 		break;
 	case COMMIT:
 		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		switch (set_value) {
 		case RS_CREATEANDGO:
-			/* row creation, set final state */
-			/* XXX: commit creation to underlying device */
-			/* XXX: activate with underlying device */
 			StorageNew->acseAccessPointRowStatus = RS_ACTIVE;
 			break;
 		case RS_CREATEANDWAIT:
-			/* row creation, set final state */
 			StorageNew->acseAccessPointRowStatus = RS_NOTINSERVICE;
 			break;
 		case RS_ACTIVE:
 		case RS_NOTINSERVICE:
-			/* state change already performed */
-			if (old_value != set_value) {
-				switch (set_value) {
-				case RS_ACTIVE:
-					/* XXX: activate with underlying device */
-					break;
-				case RS_NOTINSERVICE:
-					/* XXX: deactivate with underlying device */
-					break;
-				}
+			StorageNew->acseAccessPointRowStatus = set_value;
+			if ((StorageOld = StorageTmp->acseAccessPointTable_old) != NULL) {
+				acseAccessPointTable_destroy(&StorageTmp->acseAccessPointTable_old);
+				StorageTmp->acseAccessPointTable_rsvs = 0;
+				StorageTmp->acseAccessPointTable_tsts = 0;
+				StorageTmp->acseAccessPointTable_sets = 0;
 			}
 			break;
 		case RS_DESTROY:
-			/* row deletion, free it its dead */
 			acseAccessPointTable_destroy(&StorageDel);
-			/* acseAccessPointTable_destroy() can handle NULL pointers. */
 			break;
 		}
 		break;
 	case UNDO:
 		/* Back out any changes made in the ACTION case */
 		switch (set_value) {
+		case RS_CREATEANDGO:
+			/* deactivate with underlying device */
+			deactivate_acseAccessPointTable_row(StorageNew);
+			break;
+		case RS_CREATEANDWAIT:
+			break;
 		case RS_ACTIVE:
+			if (StorageTmp->acseAccessPointRowStatus == RS_NOTINSERVICE)
+				/* deactivate with underlying device */
+				deactivate_acseAccessPointTable_row(StorageTmp);
+			break;
 		case RS_NOTINSERVICE:
-			/* restore state */
-			StorageTmp->acseAccessPointRowStatus = old_value;
+			if (StorageTmp->acseAccessPointRowStatus == RS_ACTIVE)
+				/* activate with underlying device */
+				activate_acseAccessPointTable_row(StorageTmp);
+			break;
+		case RS_DESTROY:
 			break;
 		}
 		/* fall through */
@@ -13209,6 +17402,13 @@ write_acseAccessPointRowStatus(int action, u_char *var_val, u_char var_val_type,
 				acseAccessPointTable_del(StorageNew);
 				acseAccessPointTable_destroy(&StorageNew);
 			}
+			break;
+		case RS_ACTIVE:
+		case RS_NOTINSERVICE:
+			if ((StorageOld = StorageTmp->acseAccessPointTable_old) == NULL)
+				break;
+			if (--StorageTmp->acseAccessPointTable_rsvs == 0)
+				acseAccessPointTable_destroy(&StorageTmp->acseAccessPointTable_old);
 			break;
 		case RS_DESTROY:
 			/* row deletion, so add it again */
@@ -13235,10 +17435,9 @@ write_acseAccessPointRowStatus(int action, u_char *var_val, u_char var_val_type,
 int
 write_acseLinkageRowStatus(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	struct acseLinkageTable_data *StorageTmp = NULL;
+	struct acseLinkageTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	static struct acseLinkageTable_data *StorageNew, *StorageDel;
 	size_t newlen = name_len - 15;
-	static int old_value;
 	int set_value, ret;
 	static struct variable_list *vars, *vp;
 
@@ -13265,40 +17464,6 @@ write_acseLinkageRowStatus(int action, u_char *var_val, u_char var_val_type, siz
 			if (StorageTmp != NULL)
 				/* cannot create existing row */
 				return SNMP_ERR_INCONSISTENTVALUE;
-			break;
-		case RS_ACTIVE:
-		case RS_NOTINSERVICE:
-			if (StorageTmp == NULL)
-				/* cannot change state of non-existent row */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			if (StorageTmp->acseLinkageRowStatus == RS_NOTREADY)
-				/* cannot change state of row that is not ready */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			/* XXX: interaction with row storage type needed */
-			if (set_value == RS_NOTINSERVICE && StorageTmp->acseLinkageTable_refs > 0)
-				/* row is busy and cannot be moved to the RS_NOTINSERVICE state */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			break;
-		case RS_DESTROY:
-			/* destroying existent or non-existent row is ok */
-			if (StorageTmp == NULL)
-				break;
-			/* XXX: interaction with row storage type needed */
-			if (StorageTmp->acseLinkageTable_refs > 0)
-				/* row is busy and cannot be deleted */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			break;
-		case RS_NOTREADY:
-			/* management station cannot set this, only agent can */
-		default:
-			return SNMP_ERR_INCONSISTENTVALUE;
-		}
-		break;
-	case RESERVE2:
-		/* memory reseveration, final preparation... */
-		switch (set_value) {
-		case RS_CREATEANDGO:
-		case RS_CREATEANDWAIT:
 			/* creation */
 			vars = NULL;
 			/* mtpMsId */
@@ -13335,6 +17500,7 @@ write_acseLinkageRowStatus(int action, u_char *var_val, u_char var_val_type, siz
 				snmp_free_varbind(vars);
 				return SNMP_ERR_RESOURCEUNAVAILABLE;
 			}
+			StorageNew->acseLinkageTable_rsvs = 1;
 			vp = vars;
 			StorageNew->mtpMsId = (ulong) *vp->val.integer;
 			vp = vp->next_variable;
@@ -13343,7 +17509,37 @@ write_acseLinkageRowStatus(int action, u_char *var_val, u_char var_val_type, siz
 			vp = vp->next_variable;
 			header_complex_add_data(&acseLinkageTableStorage, vars, StorageNew);	/* frees vars */
 			break;
+		case RS_ACTIVE:
+		case RS_NOTINSERVICE:
+			if (StorageTmp == NULL)
+				/* cannot change state of non-existent row */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			if (StorageTmp->acseLinkageRowStatus == RS_NOTREADY)
+				/* cannot change state of row that is not ready */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			/* XXX: interaction with row storage type needed */
+			if (set_value == RS_NOTINSERVICE && StorageTmp->acseLinkageTable_refs > 0)
+				/* row is busy and cannot be moved to the RS_NOTINSERVICE state */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			/* activate or deactivate */
+			if (StorageTmp == NULL)
+				return SNMP_ERR_NOSUCHNAME;
+			/* one allocation for the whole row */
+			if ((StorageOld = StorageTmp->acseLinkageTable_old) == NULL)
+				if (StorageTmp->acseLinkageTable_rsvs == 0)
+					if ((StorageOld = StorageTmp->acseLinkageTable_old = acseLinkageTable_duplicate(StorageTmp)) == NULL)
+						return SNMP_ERR_RESOURCEUNAVAILABLE;
+			if (StorageOld != NULL)
+				StorageTmp->acseLinkageTable_rsvs++;
+			break;
 		case RS_DESTROY:
+			if (StorageTmp == NULL)
+				/* cannot destroy non-existent row */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			/* XXX: interaction with row storage type needed */
+			if (StorageTmp->acseLinkageTable_refs > 0)
+				/* row is busy and cannot be deleted */
+				return SNMP_ERR_INCONSISTENTVALUE;
 			/* destroy */
 			if (StorageTmp != NULL) {
 				/* exists, extract it for now */
@@ -13353,78 +17549,127 @@ write_acseLinkageRowStatus(int action, u_char *var_val, u_char var_val_type, siz
 				StorageDel = NULL;
 			}
 			break;
+		case RS_NOTREADY:
+			/* management station cannot set this, only agent can */
+		default:
+			return SNMP_ERR_INCONSISTENTVALUE;
 		}
 		break;
-	case ACTION:
-		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the UNDO case */
+	case RESERVE2:
+		/* memory reseveration, final preparation... */
 		switch (set_value) {
 		case RS_CREATEANDGO:
 			/* check that activation is possible */
-			if ((ret = acseLinkageTable_consistent(StorageNew)) != SNMP_ERR_NOERROR)
+			if ((ret = can_act_acseLinkageTable_row(StorageNew)) != SNMP_ERR_NOERROR)
 				return (ret);
 			break;
 		case RS_CREATEANDWAIT:
-			/* row does not have to be consistent */
 			break;
 		case RS_ACTIVE:
-			old_value = StorageTmp->acseLinkageRowStatus;
-			StorageTmp->acseLinkageRowStatus = set_value;
-			if (old_value != RS_ACTIVE) {
 				/* check that activation is possible */
-				if ((ret = acseLinkageTable_consistent(StorageTmp)) != SNMP_ERR_NOERROR) {
-					StorageTmp->acseLinkageRowStatus = old_value;
+			if (StorageTmp->acseLinkageRowStatus != RS_ACTIVE)
+				if ((ret = can_act_acseLinkageTable_row(StorageTmp)) != SNMP_ERR_NOERROR)
 					return (ret);
+			break;
+		case RS_NOTINSERVICE:
+			/* check that deactivation is possible */
+			if (StorageTmp->acseLinkageRowStatus != RS_NOTINSERVICE)
+				if ((ret = can_deact_acseLinkageTable_row(StorageTmp)) != SNMP_ERR_NOERROR)
+					return (ret);
+			break;
+		case RS_DESTROY:
+			/* check that deactivation is possible */
+			if (StorageTmp->acseLinkageRowStatus != RS_NOTINSERVICE)
+				if ((ret = can_deact_acseLinkageTable_row(StorageTmp)) != SNMP_ERR_NOERROR)
+					return (ret);
+			break;
+		default:
+			return SNMP_ERR_WRONGVALUE;
 				}
+		break;
+	case ACTION:
+		/* The variable has been stored in StorageTmp->acseLinkageRowStatus for you to use, and you have just been asked to do something with it.  Note that anything done here must be
+		   reversable in the UNDO case */
+		switch (set_value) {
+		case RS_CREATEANDGO:
+			/* activate with underlying device */
+			if (activate_acseLinkageTable_row(StorageNew) != SNMP_ERR_NOERROR)
+				return SNMP_ERR_COMMITFAILED;
+			break;
+		case RS_CREATEANDWAIT:
+			break;
+		case RS_ACTIVE:
+			/* state change already performed */
+			if (StorageTmp->acseLinkageRowStatus != RS_ACTIVE) {
+				/* activate with underlying device */
+				if (activate_acseLinkageTable_row(StorageTmp) != SNMP_ERR_NOERROR)
+					return SNMP_ERR_COMMITFAILED;
 			}
 			break;
 		case RS_NOTINSERVICE:
-			/* set the flag? */
-			old_value = StorageTmp->acseLinkageRowStatus;
-			StorageTmp->acseLinkageRowStatus = set_value;
+			/* state change already performed */
+			if (StorageTmp->acseLinkageRowStatus != RS_NOTINSERVICE) {
+				/* deactivate with underlying device */
+				if (deactivate_acseLinkageTable_row(StorageTmp) != SNMP_ERR_NOERROR)
+					return SNMP_ERR_COMMITFAILED;
+			}
 			break;
+		case RS_DESTROY:
+			/* commit destrution to underlying device */
+			if (StorageDel == NULL)
+				break;
+			/* deactivate with underlying device */
+			if (deactivate_acseLinkageTable_row(StorageDel) != SNMP_ERR_NOERROR)
+				return SNMP_ERR_COMMITFAILED;
+			break;
+		default:
+			return SNMP_ERR_WRONGVALUE;
 		}
 		break;
 	case COMMIT:
 		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		switch (set_value) {
 		case RS_CREATEANDGO:
-			/* row creation, set final state */
-			/* XXX: commit creation to underlying device */
-			/* XXX: activate with underlying device */
 			StorageNew->acseLinkageRowStatus = RS_ACTIVE;
 			break;
 		case RS_CREATEANDWAIT:
-			/* row creation, set final state */
 			StorageNew->acseLinkageRowStatus = RS_NOTINSERVICE;
 			break;
 		case RS_ACTIVE:
 		case RS_NOTINSERVICE:
-			/* state change already performed */
-			if (old_value != set_value) {
-				switch (set_value) {
-				case RS_ACTIVE:
-					/* XXX: activate with underlying device */
-					break;
-				case RS_NOTINSERVICE:
-					/* XXX: deactivate with underlying device */
-					break;
-				}
+			StorageNew->acseLinkageRowStatus = set_value;
+			if ((StorageOld = StorageTmp->acseLinkageTable_old) != NULL) {
+				acseLinkageTable_destroy(&StorageTmp->acseLinkageTable_old);
+				StorageTmp->acseLinkageTable_rsvs = 0;
+				StorageTmp->acseLinkageTable_tsts = 0;
+				StorageTmp->acseLinkageTable_sets = 0;
 			}
 			break;
 		case RS_DESTROY:
-			/* row deletion, free it its dead */
 			acseLinkageTable_destroy(&StorageDel);
-			/* acseLinkageTable_destroy() can handle NULL pointers. */
 			break;
 		}
 		break;
 	case UNDO:
 		/* Back out any changes made in the ACTION case */
 		switch (set_value) {
+		case RS_CREATEANDGO:
+			/* deactivate with underlying device */
+			deactivate_acseLinkageTable_row(StorageNew);
+			break;
+		case RS_CREATEANDWAIT:
+			break;
 		case RS_ACTIVE:
+			if (StorageTmp->acseLinkageRowStatus == RS_NOTINSERVICE)
+				/* deactivate with underlying device */
+				deactivate_acseLinkageTable_row(StorageTmp);
+			break;
 		case RS_NOTINSERVICE:
-			/* restore state */
-			StorageTmp->acseLinkageRowStatus = old_value;
+			if (StorageTmp->acseLinkageRowStatus == RS_ACTIVE)
+				/* activate with underlying device */
+				activate_acseLinkageTable_row(StorageTmp);
+			break;
+		case RS_DESTROY:
 			break;
 		}
 		/* fall through */
@@ -13438,6 +17683,13 @@ write_acseLinkageRowStatus(int action, u_char *var_val, u_char var_val_type, siz
 				acseLinkageTable_del(StorageNew);
 				acseLinkageTable_destroy(&StorageNew);
 			}
+			break;
+		case RS_ACTIVE:
+		case RS_NOTINSERVICE:
+			if ((StorageOld = StorageTmp->acseLinkageTable_old) == NULL)
+				break;
+			if (--StorageTmp->acseLinkageTable_rsvs == 0)
+				acseLinkageTable_destroy(&StorageTmp->acseLinkageTable_old);
 			break;
 		case RS_DESTROY:
 			/* row deletion, so add it again */

@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2012  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -318,8 +318,39 @@ ds0Bundle_create(void)
 		StorageNew->dsx0BundleNextIndex = 0;
 
 	}
+      done:
 	DEBUGMSGTL(("ds0Bundle", "done.\n"));
 	return (StorageNew);
+	goto nomem;
+      nomem:
+	ds0Bundle_destroy(&StorageNew);
+	goto done;
+}
+
+/**
+ * @fn struct ds0Bundle_data *ds0Bundle_duplicate(struct ds0Bundle_data *thedata)
+ * @param thedata the mib structure to duplicate
+ * @brief duplicate a mib structure for the mib
+ *
+ * Duplicates the specified mib structure @param thedata and returns a pointer to the newly
+ * allocated mib structure on success, or NULL on failure.
+ */
+struct ds0Bundle_data *
+ds0Bundle_duplicate(struct ds0Bundle_data *thedata)
+{
+	struct ds0Bundle_data *StorageNew = SNMP_MALLOC_STRUCT(ds0Bundle_data);
+
+	DEBUGMSGTL(("ds0Bundle", "ds0Bundle_duplicate: duplicating mib... "));
+	if (StorageNew != NULL) {
+		StorageNew->dsx0BundleNextIndex = thedata->dsx0BundleNextIndex;
+	}
+      done:
+	DEBUGMSGTL(("ds0Bundle", "done.\n"));
+	return (StorageNew);
+	goto destroy;
+      destroy:
+	ds0Bundle_destroy(&StorageNew);
+	goto done;
 }
 
 /**
@@ -370,7 +401,7 @@ ds0Bundle_add(struct ds0Bundle_data *thedata)
  * @param line line from configuration file matching the token.
  * @brief parse configuration file for ds0Bundle entries.
  *
- * This callback is called by UCD-SNMP when it prases a configuration file and finds a configuration
+ * This callback is called by UCD-SNMP when it parses a configuration file and finds a configuration
  * file line for the registsred token (in this case ds0Bundle).  This routine is invoked by
  * UCD-SNMP to read the values of scalars in the MIB from the configuration file.  Note that this
  * procedure may exist regardless of the persistence of the MIB.  If there are no configured entries
@@ -424,6 +455,62 @@ store_ds0Bundle(int majorID, int minorID, void *serverarg, void *clientarg)
 	}
 	DEBUGMSGTL(("ds0Bundle", "done.\n"));
 	return SNMPERR_SUCCESS;
+}
+
+/**
+ * @fn int check_ds0Bundle(struct ds0Bundle_data *StorageTmp, struct ds0Bundle_data *StorageOld)
+ * @param StorageTmp the data as updated
+ * @param StorageOld the data previous to update
+ *
+ * This function is used by mibs.  It is used to check, all scalars at a time, the varbinds
+ * belonging to the mib.  This function is called for the first varbind in a mib at the beginning of
+ * the ACTION phase.  The COMMIT phase does not ensue unless this check passes.  This function can
+ * return SNMP_ERR_NOERR or a specific SNMP error value.  Values in StorageOld are the values before
+ * the varbinds on the mib were applied; the values in StorageTmp are the new values.  The function
+ * is permitted to change the values in StorageTmp to correct them; however, preferences should be
+ * made for setting values that were not in the varbinds.
+ */
+int
+check_ds0Bundle(struct ds0Bundle_data *StorageTmp, struct ds0Bundle_data *StorageOld)
+{
+	/* XXX: provide code to check the scalars for consistency */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int update_ds0Bundle(struct ds0Bundle_data *StorageTmp, struct ds0Bundle_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the set operation (ACTION phase)
+ *
+ * This function is used by mibs.  It is used to update, all scalars at a time, the varbinds
+ * belonging to the mib.  This function is called for the first varbind in a mib at the beginning of
+ * the COMMIT phase.  The start of the ACTION phase performs a consistency check on the mib before
+ * allowing the request to proceed to the COMMIT phase.  The COMMIT phase then arrives here with
+ * consistency already checked (see check_ds0Bundle()).  This function can
+ * return SNMP_ERR_NOERROR or SNMP_ERR_COMMITFAILED.  Values in StorageOld are the values before the
+ * varbinds on the mib were applied: the values in StorageTmp are the new values.
+ */
+int
+update_ds0Bundle(struct ds0Bundle_data *StorageTmp, struct ds0Bundle_data *StorageOld)
+{
+	/* XXX: provide code to update the row with the underlying device */
+	ds0Bundle_refresh = 1;
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn revert_ds0Bundle(struct 
+ * @fn void revert_ds0Bundle(struct ds0Bundle_data *StorageTmp, struct ds0Bundle_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the undo operation (UNDO phase)
+ */
+void
+revert_ds0Bundle(struct ds0Bundle_data *StorageTmp, struct ds0Bundle_data *StorageOld)
+{
+	/* XXX: provide code to revert the row with the underlying device */
+	update_ds0Bundle(StorageOld, NULL);
 }
 
 /**
@@ -532,14 +619,19 @@ dsx0BondingTable_create(void)
 		StorageNew->dsx0BondRowStatus = 0;
 		StorageNew->dsx0BondRowStatus = RS_NOTREADY;
 	}
+      done:
 	DEBUGMSGTL(("ds0Bundle", "done.\n"));
 	return (StorageNew);
+	goto nomem;
+      nomem:
+	dsx0BondingTable_destroy(&StorageNew);
+	goto done;
 }
 
 /**
  * @fn struct dsx0BondingTable_data *dsx0BondingTable_duplicate(struct dsx0BondingTable_data *thedata)
  * @param thedata the row structure to duplicate.
- * @brief duplicat a row structure for a table.
+ * @brief duplicate a row structure for a table.
  *
  * Duplicates the specified row structure @param thedata and returns a pointer to the newly
  * allocated row structure on success, or NULL on failure.
@@ -551,6 +643,11 @@ dsx0BondingTable_duplicate(struct dsx0BondingTable_data *thedata)
 
 	DEBUGMSGTL(("ds0Bundle", "dsx0BondingTable_duplicate: duplicating row...  "));
 	if (StorageNew != NULL) {
+		StorageNew->dsx0BondingTable_id = thedata->dsx0BondingTable_id;
+		StorageNew->ifIndex = thedata->ifIndex;
+		StorageNew->dsx0BondMode = thedata->dsx0BondMode;
+		StorageNew->dsx0BondStatus = thedata->dsx0BondStatus;
+		StorageNew->dsx0BondRowStatus = thedata->dsx0BondRowStatus;
 	}
       done:
 	DEBUGMSGTL(("ds0Bundle", "done.\n"));
@@ -644,7 +741,7 @@ dsx0BondingTable_del(struct dsx0BondingTable_data *thedata)
  * @param line line from configuration file matching the token.
  * @brief parse configuration file for dsx0BondingTable entries.
  *
- * This callback is called by UCD-SNMP when it prases a configuration file and finds a configuration
+ * This callback is called by UCD-SNMP when it parses a configuration file and finds a configuration
  * file line for the registsred token (in this case dsx0BondingTable).  This routine is invoked by UCD-SNMP
  * to read the values of each row in the table from the configuration file.  Note that this
  * procedure may exist regardless of the persistence of the table.  If there are no configured
@@ -724,19 +821,26 @@ dsx0BundleTable_create(void)
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
 		StorageNew->dsx0BundleIfIndex = 0;
-		if ((StorageNew->dsx0BundleCircuitIdentifier = (uint8_t *) strdup("")) != NULL)
-			StorageNew->dsx0BundleCircuitIdentifierLen = strlen("");
+		if ((StorageNew->dsx0BundleCircuitIdentifier = malloc(1)) == NULL)
+			goto nomem;
+		StorageNew->dsx0BundleCircuitIdentifierLen = 0;
+		StorageNew->dsx0BundleCircuitIdentifier[StorageNew->dsx0BundleCircuitIdentifierLen] = 0;
 		StorageNew->dsx0BundleRowStatus = 0;
 		StorageNew->dsx0BundleRowStatus = RS_NOTREADY;
 	}
+      done:
 	DEBUGMSGTL(("ds0Bundle", "done.\n"));
 	return (StorageNew);
+	goto nomem;
+      nomem:
+	dsx0BundleTable_destroy(&StorageNew);
+	goto done;
 }
 
 /**
  * @fn struct dsx0BundleTable_data *dsx0BundleTable_duplicate(struct dsx0BundleTable_data *thedata)
  * @param thedata the row structure to duplicate.
- * @brief duplicat a row structure for a table.
+ * @brief duplicate a row structure for a table.
  *
  * Duplicates the specified row structure @param thedata and returns a pointer to the newly
  * allocated row structure on success, or NULL on failure.
@@ -748,6 +852,15 @@ dsx0BundleTable_duplicate(struct dsx0BundleTable_data *thedata)
 
 	DEBUGMSGTL(("ds0Bundle", "dsx0BundleTable_duplicate: duplicating row...  "));
 	if (StorageNew != NULL) {
+		StorageNew->dsx0BundleTable_id = thedata->dsx0BundleTable_id;
+		StorageNew->dsx0BundleIndex = thedata->dsx0BundleIndex;
+		StorageNew->dsx0BundleIfIndex = thedata->dsx0BundleIfIndex;
+		if (!(StorageNew->dsx0BundleCircuitIdentifier = malloc(thedata->dsx0BundleCircuitIdentifierLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->dsx0BundleCircuitIdentifier, thedata->dsx0BundleCircuitIdentifier, thedata->dsx0BundleCircuitIdentifierLen);
+		StorageNew->dsx0BundleCircuitIdentifierLen = thedata->dsx0BundleCircuitIdentifierLen;
+		StorageNew->dsx0BundleCircuitIdentifier[StorageNew->dsx0BundleCircuitIdentifierLen] = 0;
+		StorageNew->dsx0BundleRowStatus = thedata->dsx0BundleRowStatus;
 	}
       done:
 	DEBUGMSGTL(("ds0Bundle", "done.\n"));
@@ -843,7 +956,7 @@ dsx0BundleTable_del(struct dsx0BundleTable_data *thedata)
  * @param line line from configuration file matching the token.
  * @brief parse configuration file for dsx0BundleTable entries.
  *
- * This callback is called by UCD-SNMP when it prases a configuration file and finds a configuration
+ * This callback is called by UCD-SNMP when it parses a configuration file and finds a configuration
  * file line for the registsred token (in this case dsx0BundleTable).  This routine is invoked by UCD-SNMP
  * to read the values of each row in the table from the configuration file.  Note that this
  * procedure may exist regardless of the persistence of the table.  If there are no configured
@@ -909,6 +1022,132 @@ store_dsx0BundleTable(int majorID, int minorID, void *serverarg, void *clientarg
 	}
 	DEBUGMSGTL(("ds0Bundle", "done.\n"));
 	return SNMPERR_SUCCESS;
+}
+
+/**
+ * @fn int activate_dsx0BondingTable_row(struct dsx0BondingTable_data *StorageTmp)
+ * @param StorageTmp the data row to activate
+ * @brief commit activation of a row to the underlying device
+ *
+ * This function is used by tables that contain a RowStatus object.  It is used to move the row from
+ * the RS_NOTINSERVICE state to the RS_ACTIVE state.  It is also used when transitioning from the
+ * RS_CREATEANDGO state to the RS_ACTIVE state.  If activation fails, the function should return
+ * SNMP_ERR_COMMITFAILED; otherwise, SNMP_ERR_NOERROR.
+ */
+int
+activate_dsx0BondingTable_row(struct dsx0BondingTable_data *StorageTmp)
+{
+	/* XXX: provide code to activate the row with the underlying device */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int deactivate_dsx0BondingTable_row(struct dsx0BondingTable_data *StorageTmp)
+ * @param StorageTmp the data row to deactivate
+ * @brief commit deactivation of a row to the underlying device
+ *
+ * This function is used by tables that contain a RowStatus object.  It is used to move the row from
+ * the RS_ACTIVE state to the RS_NOTINSERVICE state.  It is also used when transitioning from the
+ * RS_ACTIVE state to the RS_DESTROY state.  If deactivation fails, the function should return
+ * SNMP_ERR_COMMITFAILED; otherwise, SNMP_ERR_NOERROR.
+ */
+int
+deactivate_dsx0BondingTable_row(struct dsx0BondingTable_data *StorageTmp)
+{
+	/* XXX: provide code to deactivate the row with the underlying device */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int activate_dsx0BundleTable_row(struct dsx0BundleTable_data *StorageTmp)
+ * @param StorageTmp the data row to activate
+ * @brief commit activation of a row to the underlying device
+ *
+ * This function is used by tables that contain a RowStatus object.  It is used to move the row from
+ * the RS_NOTINSERVICE state to the RS_ACTIVE state.  It is also used when transitioning from the
+ * RS_CREATEANDGO state to the RS_ACTIVE state.  If activation fails, the function should return
+ * SNMP_ERR_COMMITFAILED; otherwise, SNMP_ERR_NOERROR.
+ */
+int
+activate_dsx0BundleTable_row(struct dsx0BundleTable_data *StorageTmp)
+{
+	/* XXX: provide code to activate the row with the underlying device */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int deactivate_dsx0BundleTable_row(struct dsx0BundleTable_data *StorageTmp)
+ * @param StorageTmp the data row to deactivate
+ * @brief commit deactivation of a row to the underlying device
+ *
+ * This function is used by tables that contain a RowStatus object.  It is used to move the row from
+ * the RS_ACTIVE state to the RS_NOTINSERVICE state.  It is also used when transitioning from the
+ * RS_ACTIVE state to the RS_DESTROY state.  If deactivation fails, the function should return
+ * SNMP_ERR_COMMITFAILED; otherwise, SNMP_ERR_NOERROR.
+ */
+int
+deactivate_dsx0BundleTable_row(struct dsx0BundleTable_data *StorageTmp)
+{
+	/* XXX: provide code to deactivate the row with the underlying device */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int check_dsx0BondingTable_row(struct dsx0BondingTable_data *StorageTmp, struct dsx0BondingTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to check, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the ACTION phase.  The start of the ACTION pahse performs this consitency check
+ * on the row before allowing the request to proceed to the COMMIT phase.  This function can return
+ * SNMP_ERR_NOERR or a specific SNMP error value.  Values in StorageOld are the values before the
+ * varbinds on the mib were applied; the values in StorageTmp are the new values.  The function is
+ * permitted to change the values in StorageTmp to correct them; however, preference should be made
+ * for setting values where were not in the varbinds.
+ */
+int
+check_dsx0BondingTable_row(struct dsx0BondingTable_data *StorageTmp, struct dsx0BondingTable_data *StorageOld)
+{
+	/* XXX: provide code to check the row for consistency */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int update_dsx0BondingTable_row(struct dsx0BondingTable_data *StorageTmp, struct dsx0BondingTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the set operation (ACTION phase) on a row
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to update, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the COMMIT phase.  The start of the ACTION phase performs a consistency check on
+ * the row before allowing the request to proceed to the COMMIT phase.  The COMMIT phase then
+ * arrives here with consistency already checked (see check_dsx0BondingTable_row()).  This function can
+ * return SNMP_ERR_NOERROR or SNMP_ERR_COMMITFAILED.  Values in StorageOld are the values before the
+ * varbinds on the row were applied: the values in StorageTmp are the new values.
+ */
+int
+update_dsx0BondingTable_row(struct dsx0BondingTable_data *StorageTmp, struct dsx0BondingTable_data *StorageOld)
+{
+	/* XXX: provide code to update the row with the underlying device */
+	dsx0BondingTable_refresh = 1;
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int revert_dsx0BondingTable_row(struct dsx0BondingTable_data *StorageTmp, struct dsx0BondingTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the undo operation (UNDO phase) on a row
+ */
+void
+revert_dsx0BondingTable_row(struct dsx0BondingTable_data *StorageTmp, struct dsx0BondingTable_data *StorageOld)
+{
+	/* XXX: provide code to revert the row with the underlying device */
+	update_dsx0BondingTable_row(StorageOld, NULL);
 }
 
 /**
@@ -1000,6 +1239,64 @@ var_dsx0BondingTable(struct variable *vp, oid * name, size_t *length, int exact,
 		ERROR_MSG("");
 	}
 	return (rval);
+}
+
+/**
+ * @fn int check_dsx0BundleTable_row(struct dsx0BundleTable_data *StorageTmp, struct dsx0BundleTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to check, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the ACTION phase.  The start of the ACTION pahse performs this consitency check
+ * on the row before allowing the request to proceed to the COMMIT phase.  This function can return
+ * SNMP_ERR_NOERR or a specific SNMP error value.  Values in StorageOld are the values before the
+ * varbinds on the mib were applied; the values in StorageTmp are the new values.  The function is
+ * permitted to change the values in StorageTmp to correct them; however, preference should be made
+ * for setting values where were not in the varbinds.
+ */
+int
+check_dsx0BundleTable_row(struct dsx0BundleTable_data *StorageTmp, struct dsx0BundleTable_data *StorageOld)
+{
+	/* XXX: provide code to check the row for consistency */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int update_dsx0BundleTable_row(struct dsx0BundleTable_data *StorageTmp, struct dsx0BundleTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the set operation (ACTION phase) on a row
+ *
+ * This function is used both by tables that do and do not contain a RowStatus object.  It is used
+ * to update, row-at-a-time, the varbinds belonging to the row.  Note that this function is not used
+ * when rows are created or destroyed.  This function is called for the first varbind in a row at
+ * the beginning of the COMMIT phase.  The start of the ACTION phase performs a consistency check on
+ * the row before allowing the request to proceed to the COMMIT phase.  The COMMIT phase then
+ * arrives here with consistency already checked (see check_dsx0BundleTable_row()).  This function can
+ * return SNMP_ERR_NOERROR or SNMP_ERR_COMMITFAILED.  Values in StorageOld are the values before the
+ * varbinds on the row were applied: the values in StorageTmp are the new values.
+ */
+int
+update_dsx0BundleTable_row(struct dsx0BundleTable_data *StorageTmp, struct dsx0BundleTable_data *StorageOld)
+{
+	/* XXX: provide code to update the row with the underlying device */
+	dsx0BundleTable_refresh = 1;
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int revert_dsx0BundleTable_row(struct dsx0BundleTable_data *StorageTmp, struct dsx0BundleTable_data *StorageOld)
+ * @param StorageTmp the data as updated.
+ * @param StorageOld the data previous to update.
+ * @brief perform the undo operation (UNDO phase) on a row
+ */
+void
+revert_dsx0BundleTable_row(struct dsx0BundleTable_data *StorageTmp, struct dsx0BundleTable_data *StorageOld)
+{
+	/* XXX: provide code to revert the row with the underlying device */
+	update_dsx0BundleTable_row(StorageOld, NULL);
 }
 
 /**
@@ -1107,12 +1404,14 @@ var_dsx0BundleTable(struct variable *vp, oid * name, size_t *length, int exact, 
 int
 write_dsx0BondMode(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static long old_value;
-	struct dsx0BondingTable_data *StorageTmp = NULL;
+	struct dsx0BondingTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 11;
 	long set_value = *((long *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("ds0Bundle", "write_dsx0BondMode entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(dsx0BondingTableStorage, NULL, &name[11], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -1149,22 +1448,61 @@ write_dsx0BondMode(int action, u_char *var_val, u_char var_val_type, size_t var_
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to dsx0BondMode: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->dsx0BondingTable_old) == NULL)
+			if (StorageTmp->dsx0BondingTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->dsx0BondingTable_old = dsx0BondingTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->dsx0BondingTable_rsvs++;
+		StorageTmp->dsx0BondMode = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->dsx0BondingTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->dsx0BondingTable_tsts == 0)
+				if ((ret = check_dsx0BondingTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->dsx0BondingTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->dsx0BondMode for you to use, and you have just been asked to do something with it.  Note that anything done here must be 
 				   reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->dsx0BondMode;
-		StorageTmp->dsx0BondMode = set_value;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->dsx0BondingTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->dsx0BondingTable_sets == 0)
+				if ((ret = update_dsx0BondingTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->dsx0BondingTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->dsx0BondingTable_old) != NULL) {
+			dsx0BondingTable_destroy(&StorageTmp->dsx0BondingTable_old);
+			StorageTmp->dsx0BondingTable_rsvs = 0;
+			StorageTmp->dsx0BondingTable_tsts = 0;
+			StorageTmp->dsx0BondingTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->dsx0BondMode = old_value;
+		if ((StorageOld = StorageTmp->dsx0BondingTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->dsx0BondingTable_sets == 0)
+			revert_dsx0BondingTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->dsx0BondingTable_old) == NULL)
+			break;
+		StorageTmp->dsx0BondMode = StorageOld->dsx0BondMode;
+		if (--StorageTmp->dsx0BondingTable_rsvs == 0)
+			dsx0BondingTable_destroy(&StorageTmp->dsx0BondingTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -1184,17 +1522,17 @@ write_dsx0BondMode(int action, u_char *var_val, u_char var_val_type, size_t var_
 int
 write_dsx0BundleCircuitIdentifier(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static uint8_t *old_value;
-	struct dsx0BundleTable_data *StorageTmp = NULL;
+	struct dsx0BundleTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	size_t newlen = name_len - 11;
-	static size_t old_length = 0;
-	static uint8_t *string = NULL;
+	uint8_t *string = NULL;
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("ds0Bundle", "write_dsx0BundleCircuitIdentifier entering action=%d...  \n", action));
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;
 	StorageTmp = header_complex(dsx0BundleTableStorage, NULL, &name[11], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
-		string = NULL;
 		if (StorageTmp != NULL && statP == NULL) {
 			/* have row but no column */
 			switch (StorageTmp->dsx0BundleRowStatus) {
@@ -1217,33 +1555,73 @@ write_dsx0BundleCircuitIdentifier(int action, u_char *var_val, u_char var_val_ty
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to dsx0BundleCircuitIdentifier: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
-		break;
-	case RESERVE2:		/* memory reseveration, final preparation... */
+		/* one allocation for the whole row */
+		if ((StorageOld = StorageTmp->dsx0BundleTable_old) == NULL)
+			if (StorageTmp->dsx0BundleTable_rsvs == 0)
+				if ((StorageOld = StorageTmp->dsx0BundleTable_old = dsx0BundleTable_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->dsx0BundleTable_rsvs++;
 		if ((string = malloc(var_val_len + 1)) == NULL)
 			return SNMP_ERR_RESOURCEUNAVAILABLE;
 		memcpy((void *) string, (void *) var_val, var_val_len);
 		string[var_val_len] = 0;
+		SNMP_FREE(StorageTmp->dsx0BundleCircuitIdentifier);
+		StorageTmp->dsx0BundleCircuitIdentifier = string;
+		StorageTmp->dsx0BundleCircuitIdentifierLen = var_val_len;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
+		break;
+	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->dsx0BundleTable_old) != NULL) {
+			/* one consistency check for the whole row */
+			if (StorageTmp->dsx0BundleTable_tsts == 0)
+				if ((ret = check_dsx0BundleTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->dsx0BundleTable_tsts++;
+		}
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->dsx0BundleCircuitIdentifier for you to use, and you have just been asked to do something with it.  Note that anything
 				   done here must be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->dsx0BundleCircuitIdentifier;
-		old_length = StorageTmp->dsx0BundleCircuitIdentifierLen;
-		StorageTmp->dsx0BundleCircuitIdentifier = string;
-		StorageTmp->dsx0BundleCircuitIdentifierLen = var_val_len;
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole row */
+		if ((StorageOld = StorageTmp->dsx0BundleTable_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->dsx0BundleTable_sets == 0)
+				if ((ret = update_dsx0BundleTable_row(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->dsx0BundleTable_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
-		SNMP_FREE(old_value);
-		old_length = 0;
-		string = NULL;
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->dsx0BundleTable_old) != NULL) {
+			dsx0BundleTable_destroy(&StorageTmp->dsx0BundleTable_old);
+			StorageTmp->dsx0BundleTable_rsvs = 0;
+			StorageTmp->dsx0BundleTable_tsts = 0;
+			StorageTmp->dsx0BundleTable_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->dsx0BundleCircuitIdentifier = old_value;
-		StorageTmp->dsx0BundleCircuitIdentifierLen = old_length;
+		if ((StorageOld = StorageTmp->dsx0BundleTable_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->dsx0BundleTable_sets == 0)
+			revert_dsx0BundleTable_row(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
-		SNMP_FREE(string);
+		if ((StorageOld = StorageTmp->dsx0BundleTable_old) == NULL)
+			break;
+		if (StorageOld->dsx0BundleCircuitIdentifier != NULL) {
+			SNMP_FREE(StorageTmp->dsx0BundleCircuitIdentifier);
+			StorageTmp->dsx0BundleCircuitIdentifier = StorageOld->dsx0BundleCircuitIdentifier;
+			StorageTmp->dsx0BundleCircuitIdentifierLen = StorageOld->dsx0BundleCircuitIdentifierLen;
+			StorageOld->dsx0BundleCircuitIdentifier = NULL;
+			StorageOld->dsx0BundleCircuitIdentifierLen = 0;
+		}
+		if (--StorageTmp->dsx0BundleTable_rsvs == 0)
+			dsx0BundleTable_destroy(&StorageTmp->dsx0BundleTable_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -1263,13 +1641,13 @@ write_dsx0BundleCircuitIdentifier(int action, u_char *var_val, u_char var_val_ty
 int
 write_dsx0BundleNextIndex(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static long old_value;
-	struct ds0Bundle_data *StorageTmp = NULL;
+	struct ds0Bundle_data *StorageTmp = NULL, *StorageOld = NULL;
 	long set_value = *((long *) var_val);
+	int ret = SNMP_ERR_NOERROR;
 
 	DEBUGMSGTL(("ds0Bundle", "write_dsx0BundleNextIndex entering action=%d...  \n", action));
 	if ((StorageTmp = ds0BundleStorage) == NULL)
-		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
+		return SNMP_ERR_NOSUCHNAME;
 	switch (action) {
 	case RESERVE1:
 		if (var_val_type != ASN_INTEGER) {
@@ -1285,59 +1663,130 @@ write_dsx0BundleNextIndex(int action, u_char *var_val, u_char var_val_type, size
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to dsx0BundleNextIndex: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
+		/* one allocation for whole mib */
+		if ((StorageOld = StorageTmp->ds0Bundle_old) == NULL)
+			if (StorageTmp->ds0Bundle_rsvs == 0)
+				if ((StorageOld = StorageTmp->ds0Bundle_old = ds0Bundle_duplicate(StorageTmp)) == NULL)
+					return SNMP_ERR_RESOURCEUNAVAILABLE;
+		if (StorageOld != NULL)
+			StorageTmp->ds0Bundle_rsvs++;
+		StorageTmp->dsx0BundleNextIndex = set_value;
+		/* XXX: insert code to consistency check this particular varbind, if necessary (so error codes are applied to varbinds) */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
+		if ((StorageOld = StorageTmp->ds0Bundle_old) != NULL) {
+			/* one consistency check for the whole mib */
+			if (StorageTmp->ds0Bundle_tsts == 0)
+				if ((ret = check_ds0Bundle(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->ds0Bundle_tsts++;
+		}
 		break;
-	case ACTION:		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in
-				   the UNDO case */
-		old_value = StorageTmp->dsx0BundleNextIndex;
-		StorageTmp->dsx0BundleNextIndex = set_value;
+	case ACTION:		/* The variable has been stored in StorageTmp->dsx0BundleNextIndex for you to use, and you have just been asked to do something with it.  Note that anything done here
+				   must be reversable in the UNDO case */
+		/* XXX: insert code to set this particular varbind, if necessary */
+		/* one set action for the whole mib */
+		if ((StorageOld = StorageTmp->ds0Bundle_old) != NULL) {
+			/* XXX: insert code to set this particular varbind, if necessary */
+			if (StorageTmp->ds0Bundle_sets == 0)
+				if ((ret = update_ds0Bundle(StorageTmp, StorageOld)) != SNMP_ERR_NOERROR)
+					return (ret);
+			StorageTmp->ds0Bundle_sets++;
+		}
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* one commit for the whole mib */
+		if ((StorageOld = StorageTmp->ds0Bundle_old) != NULL) {
+			ds0Bundle_destroy(&StorageTmp->ds0Bundle_old);
+			StorageTmp->ds0Bundle_rsvs = 0;
+			StorageTmp->ds0Bundle_tsts = 0;
+			StorageTmp->ds0Bundle_sets = 0;
+		}
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->dsx0BundleNextIndex = old_value;
+		if ((StorageOld = StorageTmp->ds0Bundle_old) == NULL)
+			break;
+		/* XXX: insert code to undo any action performed on this particular varbind */
+		if (--StorageTmp->ds0Bundle_tsts == 0)
+			revert_ds0Bundle(StorageTmp, StorageOld);
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
+		if ((StorageOld = StorageTmp->ds0Bundle_old) == NULL)
+			break;
+		StorageTmp->dsx0BundleNextIndex = StorageOld->dsx0BundleNextIndex;
+		if (--StorageTmp->ds0Bundle_rsvs == 0)
+			ds0Bundle_destroy(&StorageTmp->ds0Bundle_old);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
 }
 
 /**
- * @fn int dsx0BondingTable_consistent(struct dsx0BondingTable_data *thedata)
- * @param thedata the row data to check for consistency.
- * @brief check the internal consistency of a table row.
+ * @fn int can_act_dsx0BondingTable_row(struct dsx0BondingTable_data *StorageTmp)
+ * @param StorageTmp the data (as updated)
+ * @brief check whether an inactive table row can be activated
  *
- * This function checks the internal consistency of a table row for the dsx0BondingTable table.  If the
- * table row is internally consistent, then this function returns SNMP_ERR_NOERROR, otherwise the
- * function returns an SNMP error code and it will not be possible to activate the row until the
- * row's internal consistency is corrected.  This function might use a 'test' operation against the
- * driver to ensure that the commit phase will succeed.
+ * This function is used by the ACTION phase of a RowStatus object to test whether an inactive table
+ * row can be activated.  Returns SNMP_ERR_NOERROR when activation is permitted; an SNMP error
+ * value, otherwise.  This function might use a 'test' operation against the driver to ensure that
+ * the commit phase will succeed.
  */
 int
-dsx0BondingTable_consistent(struct dsx0BondingTable_data *thedata)
+can_act_dsx0BondingTable_row(struct dsx0BondingTable_data *StorageTmp)
 {
-	/* XXX: check row consistency return SNMP_ERR_NOERROR if consistent, or an SNMP error code if not. */
-	return (SNMP_ERR_NOERROR);
+	/* XXX: provide code to check whether the new or inactive table row can be activated */
+	return SNMP_ERR_NOERROR;
 }
 
 /**
- * @fn int dsx0BundleTable_consistent(struct dsx0BundleTable_data *thedata)
- * @param thedata the row data to check for consistency.
- * @brief check the internal consistency of a table row.
+ * @fn int can_deact_dsx0BondingTable_row(struct dsx0BondingTable_data *StorageTmp)
+ * @param StorageTmp the data (as updated)
+ * @brief check whether an active table row can be deactivated
  *
- * This function checks the internal consistency of a table row for the dsx0BundleTable table.  If the
- * table row is internally consistent, then this function returns SNMP_ERR_NOERROR, otherwise the
- * function returns an SNMP error code and it will not be possible to activate the row until the
- * row's internal consistency is corrected.  This function might use a 'test' operation against the
- * driver to ensure that the commit phase will succeed.
+ * This function is used by the ACTION phase of a RowStatus object to test whether an active table
+ * row can be deactivated.  Returns SNMP_ERR_NOERROR when deactivation is permitted; an SNMP error
+ * value, otherwise.  This function might use a 'test' operation against the driver to ensure that
+ * the commit phase will succeed.
  */
 int
-dsx0BundleTable_consistent(struct dsx0BundleTable_data *thedata)
+can_deact_dsx0BondingTable_row(struct dsx0BondingTable_data *StorageTmp)
 {
-	/* XXX: check row consistency return SNMP_ERR_NOERROR if consistent, or an SNMP error code if not. */
-	return (SNMP_ERR_NOERROR);
+	/* XXX: provide code to check whether the active table row can be deactivated */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int can_act_dsx0BundleTable_row(struct dsx0BundleTable_data *StorageTmp)
+ * @param StorageTmp the data (as updated)
+ * @brief check whether an inactive table row can be activated
+ *
+ * This function is used by the ACTION phase of a RowStatus object to test whether an inactive table
+ * row can be activated.  Returns SNMP_ERR_NOERROR when activation is permitted; an SNMP error
+ * value, otherwise.  This function might use a 'test' operation against the driver to ensure that
+ * the commit phase will succeed.
+ */
+int
+can_act_dsx0BundleTable_row(struct dsx0BundleTable_data *StorageTmp)
+{
+	/* XXX: provide code to check whether the new or inactive table row can be activated */
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int can_deact_dsx0BundleTable_row(struct dsx0BundleTable_data *StorageTmp)
+ * @param StorageTmp the data (as updated)
+ * @brief check whether an active table row can be deactivated
+ *
+ * This function is used by the ACTION phase of a RowStatus object to test whether an active table
+ * row can be deactivated.  Returns SNMP_ERR_NOERROR when deactivation is permitted; an SNMP error
+ * value, otherwise.  This function might use a 'test' operation against the driver to ensure that
+ * the commit phase will succeed.
+ */
+int
+can_deact_dsx0BundleTable_row(struct dsx0BundleTable_data *StorageTmp)
+{
+	/* XXX: provide code to check whether the active table row can be deactivated */
+	return SNMP_ERR_NOERROR;
 }
 
 /**
@@ -1354,10 +1803,9 @@ dsx0BundleTable_consistent(struct dsx0BundleTable_data *thedata)
 int
 write_dsx0BondRowStatus(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	struct dsx0BondingTable_data *StorageTmp = NULL;
+	struct dsx0BondingTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	static struct dsx0BondingTable_data *StorageNew, *StorageDel;
 	size_t newlen = name_len - 11;
-	static int old_value;
 	int set_value, ret;
 	static struct variable_list *vars, *vp;
 
@@ -1384,40 +1832,6 @@ write_dsx0BondRowStatus(int action, u_char *var_val, u_char var_val_type, size_t
 			if (StorageTmp != NULL)
 				/* cannot create existing row */
 				return SNMP_ERR_INCONSISTENTVALUE;
-			break;
-		case RS_ACTIVE:
-		case RS_NOTINSERVICE:
-			if (StorageTmp == NULL)
-				/* cannot change state of non-existent row */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			if (StorageTmp->dsx0BondRowStatus == RS_NOTREADY)
-				/* cannot change state of row that is not ready */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			/* XXX: interaction with row storage type needed */
-			if (set_value == RS_NOTINSERVICE && StorageTmp->dsx0BondingTable_refs > 0)
-				/* row is busy and cannot be moved to the RS_NOTINSERVICE state */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			break;
-		case RS_DESTROY:
-			/* destroying existent or non-existent row is ok */
-			if (StorageTmp == NULL)
-				break;
-			/* XXX: interaction with row storage type needed */
-			if (StorageTmp->dsx0BondingTable_refs > 0)
-				/* row is busy and cannot be deleted */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			break;
-		case RS_NOTREADY:
-			/* management station cannot set this, only agent can */
-		default:
-			return SNMP_ERR_INCONSISTENTVALUE;
-		}
-		break;
-	case RESERVE2:
-		/* memory reseveration, final preparation... */
-		switch (set_value) {
-		case RS_CREATEANDGO:
-		case RS_CREATEANDWAIT:
 			/* creation */
 			vars = NULL;
 			/* ifIndex */
@@ -1447,12 +1861,43 @@ write_dsx0BondRowStatus(int action, u_char *var_val, u_char var_val_type, size_t
 				snmp_free_varbind(vars);
 				return SNMP_ERR_RESOURCEUNAVAILABLE;
 			}
+			StorageNew->dsx0BondingTable_rsvs = 1;
 			vp = vars;
 			StorageNew->ifIndex = (long) *vp->val.integer;
 			vp = vp->next_variable;
 			header_complex_add_data(&dsx0BondingTableStorage, vars, StorageNew);	/* frees vars */
 			break;
+		case RS_ACTIVE:
+		case RS_NOTINSERVICE:
+			if (StorageTmp == NULL)
+				/* cannot change state of non-existent row */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			if (StorageTmp->dsx0BondRowStatus == RS_NOTREADY)
+				/* cannot change state of row that is not ready */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			/* XXX: interaction with row storage type needed */
+			if (set_value == RS_NOTINSERVICE && StorageTmp->dsx0BondingTable_refs > 0)
+				/* row is busy and cannot be moved to the RS_NOTINSERVICE state */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			/* activate or deactivate */
+			if (StorageTmp == NULL)
+				return SNMP_ERR_NOSUCHNAME;
+			/* one allocation for the whole row */
+			if ((StorageOld = StorageTmp->dsx0BondingTable_old) == NULL)
+				if (StorageTmp->dsx0BondingTable_rsvs == 0)
+					if ((StorageOld = StorageTmp->dsx0BondingTable_old = dsx0BondingTable_duplicate(StorageTmp)) == NULL)
+						return SNMP_ERR_RESOURCEUNAVAILABLE;
+			if (StorageOld != NULL)
+				StorageTmp->dsx0BondingTable_rsvs++;
+			break;
 		case RS_DESTROY:
+			if (StorageTmp == NULL)
+				/* cannot destroy non-existent row */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			/* XXX: interaction with row storage type needed */
+			if (StorageTmp->dsx0BondingTable_refs > 0)
+				/* row is busy and cannot be deleted */
+				return SNMP_ERR_INCONSISTENTVALUE;
 			/* destroy */
 			if (StorageTmp != NULL) {
 				/* exists, extract it for now */
@@ -1462,78 +1907,127 @@ write_dsx0BondRowStatus(int action, u_char *var_val, u_char var_val_type, size_t
 				StorageDel = NULL;
 			}
 			break;
+		case RS_NOTREADY:
+			/* management station cannot set this, only agent can */
+		default:
+			return SNMP_ERR_INCONSISTENTVALUE;
 		}
 		break;
-	case ACTION:
-		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the UNDO case */
+	case RESERVE2:
+		/* memory reseveration, final preparation... */
 		switch (set_value) {
 		case RS_CREATEANDGO:
 			/* check that activation is possible */
-			if ((ret = dsx0BondingTable_consistent(StorageNew)) != SNMP_ERR_NOERROR)
+			if ((ret = can_act_dsx0BondingTable_row(StorageNew)) != SNMP_ERR_NOERROR)
 				return (ret);
 			break;
 		case RS_CREATEANDWAIT:
-			/* row does not have to be consistent */
 			break;
 		case RS_ACTIVE:
-			old_value = StorageTmp->dsx0BondRowStatus;
-			StorageTmp->dsx0BondRowStatus = set_value;
-			if (old_value != RS_ACTIVE) {
-				/* check that activation is possible */
-				if ((ret = dsx0BondingTable_consistent(StorageTmp)) != SNMP_ERR_NOERROR) {
-					StorageTmp->dsx0BondRowStatus = old_value;
+			/* check that activation is possible */
+			if (StorageTmp->dsx0BondRowStatus != RS_ACTIVE)
+				if ((ret = can_act_dsx0BondingTable_row(StorageTmp)) != SNMP_ERR_NOERROR)
 					return (ret);
-				}
+			break;
+		case RS_NOTINSERVICE:
+			/* check that deactivation is possible */
+			if (StorageTmp->dsx0BondRowStatus != RS_NOTINSERVICE)
+				if ((ret = can_deact_dsx0BondingTable_row(StorageTmp)) != SNMP_ERR_NOERROR)
+					return (ret);
+			break;
+		case RS_DESTROY:
+			/* check that deactivation is possible */
+			if (StorageTmp->dsx0BondRowStatus != RS_NOTINSERVICE)
+				if ((ret = can_deact_dsx0BondingTable_row(StorageTmp)) != SNMP_ERR_NOERROR)
+					return (ret);
+			break;
+		default:
+			return SNMP_ERR_WRONGVALUE;
+		}
+		break;
+	case ACTION:
+		/* The variable has been stored in StorageTmp->dsx0BondRowStatus for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable 
+		   in the UNDO case */
+		switch (set_value) {
+		case RS_CREATEANDGO:
+			/* activate with underlying device */
+			if (activate_dsx0BondingTable_row(StorageNew) != SNMP_ERR_NOERROR)
+				return SNMP_ERR_COMMITFAILED;
+			break;
+		case RS_CREATEANDWAIT:
+			break;
+		case RS_ACTIVE:
+			/* state change already performed */
+			if (StorageTmp->dsx0BondRowStatus != RS_ACTIVE) {
+				/* activate with underlying device */
+				if (activate_dsx0BondingTable_row(StorageTmp) != SNMP_ERR_NOERROR)
+					return SNMP_ERR_COMMITFAILED;
 			}
 			break;
 		case RS_NOTINSERVICE:
-			/* set the flag? */
-			old_value = StorageTmp->dsx0BondRowStatus;
-			StorageTmp->dsx0BondRowStatus = set_value;
+			/* state change already performed */
+			if (StorageTmp->dsx0BondRowStatus != RS_NOTINSERVICE) {
+				/* deactivate with underlying device */
+				if (deactivate_dsx0BondingTable_row(StorageTmp) != SNMP_ERR_NOERROR)
+					return SNMP_ERR_COMMITFAILED;
+			}
 			break;
+		case RS_DESTROY:
+			/* commit destrution to underlying device */
+			if (StorageDel == NULL)
+				break;
+			/* deactivate with underlying device */
+			if (deactivate_dsx0BondingTable_row(StorageDel) != SNMP_ERR_NOERROR)
+				return SNMP_ERR_COMMITFAILED;
+			break;
+		default:
+			return SNMP_ERR_WRONGVALUE;
 		}
 		break;
 	case COMMIT:
 		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		switch (set_value) {
 		case RS_CREATEANDGO:
-			/* row creation, set final state */
-			/* XXX: commit creation to underlying device */
-			/* XXX: activate with underlying device */
 			StorageNew->dsx0BondRowStatus = RS_ACTIVE;
 			break;
 		case RS_CREATEANDWAIT:
-			/* row creation, set final state */
 			StorageNew->dsx0BondRowStatus = RS_NOTINSERVICE;
 			break;
 		case RS_ACTIVE:
 		case RS_NOTINSERVICE:
-			/* state change already performed */
-			if (old_value != set_value) {
-				switch (set_value) {
-				case RS_ACTIVE:
-					/* XXX: activate with underlying device */
-					break;
-				case RS_NOTINSERVICE:
-					/* XXX: deactivate with underlying device */
-					break;
-				}
+			StorageNew->dsx0BondRowStatus = set_value;
+			if ((StorageOld = StorageTmp->dsx0BondingTable_old) != NULL) {
+				dsx0BondingTable_destroy(&StorageTmp->dsx0BondingTable_old);
+				StorageTmp->dsx0BondingTable_rsvs = 0;
+				StorageTmp->dsx0BondingTable_tsts = 0;
+				StorageTmp->dsx0BondingTable_sets = 0;
 			}
 			break;
 		case RS_DESTROY:
-			/* row deletion, free it its dead */
 			dsx0BondingTable_destroy(&StorageDel);
-			/* dsx0BondingTable_destroy() can handle NULL pointers. */
 			break;
 		}
 		break;
 	case UNDO:
 		/* Back out any changes made in the ACTION case */
 		switch (set_value) {
+		case RS_CREATEANDGO:
+			/* deactivate with underlying device */
+			deactivate_dsx0BondingTable_row(StorageNew);
+			break;
+		case RS_CREATEANDWAIT:
+			break;
 		case RS_ACTIVE:
+			if (StorageTmp->dsx0BondRowStatus == RS_NOTINSERVICE)
+				/* deactivate with underlying device */
+				deactivate_dsx0BondingTable_row(StorageTmp);
+			break;
 		case RS_NOTINSERVICE:
-			/* restore state */
-			StorageTmp->dsx0BondRowStatus = old_value;
+			if (StorageTmp->dsx0BondRowStatus == RS_ACTIVE)
+				/* activate with underlying device */
+				activate_dsx0BondingTable_row(StorageTmp);
+			break;
+		case RS_DESTROY:
 			break;
 		}
 		/* fall through */
@@ -1547,6 +2041,13 @@ write_dsx0BondRowStatus(int action, u_char *var_val, u_char var_val_type, size_t
 				dsx0BondingTable_del(StorageNew);
 				dsx0BondingTable_destroy(&StorageNew);
 			}
+			break;
+		case RS_ACTIVE:
+		case RS_NOTINSERVICE:
+			if ((StorageOld = StorageTmp->dsx0BondingTable_old) == NULL)
+				break;
+			if (--StorageTmp->dsx0BondingTable_rsvs == 0)
+				dsx0BondingTable_destroy(&StorageTmp->dsx0BondingTable_old);
 			break;
 		case RS_DESTROY:
 			/* row deletion, so add it again */
@@ -1573,10 +2074,9 @@ write_dsx0BondRowStatus(int action, u_char *var_val, u_char var_val_type, size_t
 int
 write_dsx0BundleRowStatus(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	struct dsx0BundleTable_data *StorageTmp = NULL;
+	struct dsx0BundleTable_data *StorageTmp = NULL, *StorageOld = NULL;
 	static struct dsx0BundleTable_data *StorageNew, *StorageDel;
 	size_t newlen = name_len - 11;
-	static int old_value;
 	int set_value, ret;
 	static struct variable_list *vars, *vp;
 
@@ -1603,40 +2103,6 @@ write_dsx0BundleRowStatus(int action, u_char *var_val, u_char var_val_type, size
 			if (StorageTmp != NULL)
 				/* cannot create existing row */
 				return SNMP_ERR_INCONSISTENTVALUE;
-			break;
-		case RS_ACTIVE:
-		case RS_NOTINSERVICE:
-			if (StorageTmp == NULL)
-				/* cannot change state of non-existent row */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			if (StorageTmp->dsx0BundleRowStatus == RS_NOTREADY)
-				/* cannot change state of row that is not ready */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			/* XXX: interaction with row storage type needed */
-			if (set_value == RS_NOTINSERVICE && StorageTmp->dsx0BundleTable_refs > 0)
-				/* row is busy and cannot be moved to the RS_NOTINSERVICE state */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			break;
-		case RS_DESTROY:
-			/* destroying existent or non-existent row is ok */
-			if (StorageTmp == NULL)
-				break;
-			/* XXX: interaction with row storage type needed */
-			if (StorageTmp->dsx0BundleTable_refs > 0)
-				/* row is busy and cannot be deleted */
-				return SNMP_ERR_INCONSISTENTVALUE;
-			break;
-		case RS_NOTREADY:
-			/* management station cannot set this, only agent can */
-		default:
-			return SNMP_ERR_INCONSISTENTVALUE;
-		}
-		break;
-	case RESERVE2:
-		/* memory reseveration, final preparation... */
-		switch (set_value) {
-		case RS_CREATEANDGO:
-		case RS_CREATEANDWAIT:
 			/* creation */
 			vars = NULL;
 			/* dsx0BundleIndex */
@@ -1666,12 +2132,43 @@ write_dsx0BundleRowStatus(int action, u_char *var_val, u_char var_val_type, size
 				snmp_free_varbind(vars);
 				return SNMP_ERR_RESOURCEUNAVAILABLE;
 			}
+			StorageNew->dsx0BundleTable_rsvs = 1;
 			vp = vars;
 			StorageNew->dsx0BundleIndex = (long) *vp->val.integer;
 			vp = vp->next_variable;
 			header_complex_add_data(&dsx0BundleTableStorage, vars, StorageNew);	/* frees vars */
 			break;
+		case RS_ACTIVE:
+		case RS_NOTINSERVICE:
+			if (StorageTmp == NULL)
+				/* cannot change state of non-existent row */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			if (StorageTmp->dsx0BundleRowStatus == RS_NOTREADY)
+				/* cannot change state of row that is not ready */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			/* XXX: interaction with row storage type needed */
+			if (set_value == RS_NOTINSERVICE && StorageTmp->dsx0BundleTable_refs > 0)
+				/* row is busy and cannot be moved to the RS_NOTINSERVICE state */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			/* activate or deactivate */
+			if (StorageTmp == NULL)
+				return SNMP_ERR_NOSUCHNAME;
+			/* one allocation for the whole row */
+			if ((StorageOld = StorageTmp->dsx0BundleTable_old) == NULL)
+				if (StorageTmp->dsx0BundleTable_rsvs == 0)
+					if ((StorageOld = StorageTmp->dsx0BundleTable_old = dsx0BundleTable_duplicate(StorageTmp)) == NULL)
+						return SNMP_ERR_RESOURCEUNAVAILABLE;
+			if (StorageOld != NULL)
+				StorageTmp->dsx0BundleTable_rsvs++;
+			break;
 		case RS_DESTROY:
+			if (StorageTmp == NULL)
+				/* cannot destroy non-existent row */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			/* XXX: interaction with row storage type needed */
+			if (StorageTmp->dsx0BundleTable_refs > 0)
+				/* row is busy and cannot be deleted */
+				return SNMP_ERR_INCONSISTENTVALUE;
 			/* destroy */
 			if (StorageTmp != NULL) {
 				/* exists, extract it for now */
@@ -1681,78 +2178,127 @@ write_dsx0BundleRowStatus(int action, u_char *var_val, u_char var_val_type, size
 				StorageDel = NULL;
 			}
 			break;
+		case RS_NOTREADY:
+			/* management station cannot set this, only agent can */
+		default:
+			return SNMP_ERR_INCONSISTENTVALUE;
 		}
 		break;
-	case ACTION:
-		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the UNDO case */
+	case RESERVE2:
+		/* memory reseveration, final preparation... */
 		switch (set_value) {
 		case RS_CREATEANDGO:
 			/* check that activation is possible */
-			if ((ret = dsx0BundleTable_consistent(StorageNew)) != SNMP_ERR_NOERROR)
+			if ((ret = can_act_dsx0BundleTable_row(StorageNew)) != SNMP_ERR_NOERROR)
 				return (ret);
 			break;
 		case RS_CREATEANDWAIT:
-			/* row does not have to be consistent */
 			break;
 		case RS_ACTIVE:
-			old_value = StorageTmp->dsx0BundleRowStatus;
-			StorageTmp->dsx0BundleRowStatus = set_value;
-			if (old_value != RS_ACTIVE) {
-				/* check that activation is possible */
-				if ((ret = dsx0BundleTable_consistent(StorageTmp)) != SNMP_ERR_NOERROR) {
-					StorageTmp->dsx0BundleRowStatus = old_value;
+			/* check that activation is possible */
+			if (StorageTmp->dsx0BundleRowStatus != RS_ACTIVE)
+				if ((ret = can_act_dsx0BundleTable_row(StorageTmp)) != SNMP_ERR_NOERROR)
 					return (ret);
-				}
+			break;
+		case RS_NOTINSERVICE:
+			/* check that deactivation is possible */
+			if (StorageTmp->dsx0BundleRowStatus != RS_NOTINSERVICE)
+				if ((ret = can_deact_dsx0BundleTable_row(StorageTmp)) != SNMP_ERR_NOERROR)
+					return (ret);
+			break;
+		case RS_DESTROY:
+			/* check that deactivation is possible */
+			if (StorageTmp->dsx0BundleRowStatus != RS_NOTINSERVICE)
+				if ((ret = can_deact_dsx0BundleTable_row(StorageTmp)) != SNMP_ERR_NOERROR)
+					return (ret);
+			break;
+		default:
+			return SNMP_ERR_WRONGVALUE;
+		}
+		break;
+	case ACTION:
+		/* The variable has been stored in StorageTmp->dsx0BundleRowStatus for you to use, and you have just been asked to do something with it.  Note that anything done here must be
+		   reversable in the UNDO case */
+		switch (set_value) {
+		case RS_CREATEANDGO:
+			/* activate with underlying device */
+			if (activate_dsx0BundleTable_row(StorageNew) != SNMP_ERR_NOERROR)
+				return SNMP_ERR_COMMITFAILED;
+			break;
+		case RS_CREATEANDWAIT:
+			break;
+		case RS_ACTIVE:
+			/* state change already performed */
+			if (StorageTmp->dsx0BundleRowStatus != RS_ACTIVE) {
+				/* activate with underlying device */
+				if (activate_dsx0BundleTable_row(StorageTmp) != SNMP_ERR_NOERROR)
+					return SNMP_ERR_COMMITFAILED;
 			}
 			break;
 		case RS_NOTINSERVICE:
-			/* set the flag? */
-			old_value = StorageTmp->dsx0BundleRowStatus;
-			StorageTmp->dsx0BundleRowStatus = set_value;
+			/* state change already performed */
+			if (StorageTmp->dsx0BundleRowStatus != RS_NOTINSERVICE) {
+				/* deactivate with underlying device */
+				if (deactivate_dsx0BundleTable_row(StorageTmp) != SNMP_ERR_NOERROR)
+					return SNMP_ERR_COMMITFAILED;
+			}
 			break;
+		case RS_DESTROY:
+			/* commit destrution to underlying device */
+			if (StorageDel == NULL)
+				break;
+			/* deactivate with underlying device */
+			if (deactivate_dsx0BundleTable_row(StorageDel) != SNMP_ERR_NOERROR)
+				return SNMP_ERR_COMMITFAILED;
+			break;
+		default:
+			return SNMP_ERR_WRONGVALUE;
 		}
 		break;
 	case COMMIT:
 		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		switch (set_value) {
 		case RS_CREATEANDGO:
-			/* row creation, set final state */
-			/* XXX: commit creation to underlying device */
-			/* XXX: activate with underlying device */
 			StorageNew->dsx0BundleRowStatus = RS_ACTIVE;
 			break;
 		case RS_CREATEANDWAIT:
-			/* row creation, set final state */
 			StorageNew->dsx0BundleRowStatus = RS_NOTINSERVICE;
 			break;
 		case RS_ACTIVE:
 		case RS_NOTINSERVICE:
-			/* state change already performed */
-			if (old_value != set_value) {
-				switch (set_value) {
-				case RS_ACTIVE:
-					/* XXX: activate with underlying device */
-					break;
-				case RS_NOTINSERVICE:
-					/* XXX: deactivate with underlying device */
-					break;
-				}
+			StorageNew->dsx0BundleRowStatus = set_value;
+			if ((StorageOld = StorageTmp->dsx0BundleTable_old) != NULL) {
+				dsx0BundleTable_destroy(&StorageTmp->dsx0BundleTable_old);
+				StorageTmp->dsx0BundleTable_rsvs = 0;
+				StorageTmp->dsx0BundleTable_tsts = 0;
+				StorageTmp->dsx0BundleTable_sets = 0;
 			}
 			break;
 		case RS_DESTROY:
-			/* row deletion, free it its dead */
 			dsx0BundleTable_destroy(&StorageDel);
-			/* dsx0BundleTable_destroy() can handle NULL pointers. */
 			break;
 		}
 		break;
 	case UNDO:
 		/* Back out any changes made in the ACTION case */
 		switch (set_value) {
+		case RS_CREATEANDGO:
+			/* deactivate with underlying device */
+			deactivate_dsx0BundleTable_row(StorageNew);
+			break;
+		case RS_CREATEANDWAIT:
+			break;
 		case RS_ACTIVE:
+			if (StorageTmp->dsx0BundleRowStatus == RS_NOTINSERVICE)
+				/* deactivate with underlying device */
+				deactivate_dsx0BundleTable_row(StorageTmp);
+			break;
 		case RS_NOTINSERVICE:
-			/* restore state */
-			StorageTmp->dsx0BundleRowStatus = old_value;
+			if (StorageTmp->dsx0BundleRowStatus == RS_ACTIVE)
+				/* activate with underlying device */
+				activate_dsx0BundleTable_row(StorageTmp);
+			break;
+		case RS_DESTROY:
 			break;
 		}
 		/* fall through */
@@ -1766,6 +2312,13 @@ write_dsx0BundleRowStatus(int action, u_char *var_val, u_char var_val_type, size
 				dsx0BundleTable_del(StorageNew);
 				dsx0BundleTable_destroy(&StorageNew);
 			}
+			break;
+		case RS_ACTIVE:
+		case RS_NOTINSERVICE:
+			if ((StorageOld = StorageTmp->dsx0BundleTable_old) == NULL)
+				break;
+			if (--StorageTmp->dsx0BundleTable_rsvs == 0)
+				dsx0BundleTable_destroy(&StorageTmp->dsx0BundleTable_old);
 			break;
 		case RS_DESTROY:
 			/* row deletion, so add it again */
