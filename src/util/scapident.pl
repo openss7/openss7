@@ -847,6 +847,16 @@ sub cnt {
 }
 
 #package CallCounts;
+sub uncnt {
+	my ($self,$top) = @_;
+	if (($self->{ciccnt} -= 1) == 0) {
+		if ($self->isa('Relation')) {
+			$top->canvas->dtag('circuits',withtag=>$self->{item}) if $self->{item};
+		}
+	}
+}
+
+#package CallCounts;
 sub sim_up {
 	my ($self,$event,$dir) = @_;
 	if (my $new = $self->{sims}->{$dir}->{$event}) {
@@ -937,10 +947,45 @@ sub addfrom {
 }
 
 # -------------------------------------
-package History;
-use strict;
-use vars qw(@ISA);
-@ISA = qw(Counts);
+package PktCounts; use strict;
+@PktCounts::ISA = qw(Counts);
+# -------------------------------------
+
+#package PktCounts;
+sub init {
+	my ($self,$top,@args) = @_;
+	$self->Counts::init(@args);
+	$self->{hits} = {0=>{},1=>{},2=>{}};
+	$self->{top} = $top;
+}
+sub destroy {
+	my ($self,$top) = @_;
+	$top->widget->toplevel->traceVdelete(\$self->{pcnt_text});
+	delete $self->{hits};
+	delete $self->{top};
+	$self->Counts::destroy($top);
+}
+
+sub DESTROY {
+	my $self = shift;
+	$self->{TopLevel}->traceVdelete(\$self->{pcnt_text});
+}
+
+#package PktCounts;
+sub hit {
+	my ($self,$msg,$dir) = @_;
+}
+
+#package PktCounts;
+sub addfrom {
+	my ($self,$othr,$flip,@args) = @_;
+
+	return unless $othr->isa('PktCounts');
+}
+
+# -------------------------------------
+package History; use strict;
+@History::ISA = qw(Counts);
 # -------------------------------------
 
 #package History;
@@ -2965,10 +3010,150 @@ sub cstat {
 }
 
 # -------------------------------------
-package MsgCollector;
-use strict;
-use vars qw(@ISA);
-@ISA = qw(MsgStats);
+package PktStats; use strict;
+@PktStats::ISA = qw(PktHistory);
+# -------------------------------------
+
+#package PktStats;;
+sub destroy {
+	my ($self,@args) = @_;
+	if (my $tw = $self->{pstat}) { $tw->destroy; }
+	delete $self->{pstat};
+	$self->PktHistory::destroy(@args);
+}
+#package PktStats;
+sub addfrom {
+	shift->SUPER::addfrom(@_);
+}
+
+#package PktStats;
+sub pstat {
+	my ($self,$top,$X,$Y) = @_;
+	my $row = 0;
+	my ($tw,$w,$bmsg);
+	if ($tw = $self->{pstat}) {
+		if ($tw->state eq 'iconic') {
+			$tw->deiconify;
+		} else {
+			$tw->UnmapWindow;
+		}
+	} else {
+		my $title = $self->identify." Packet Statistics";
+		my $tl = $top->widget->toplevel;
+		$tw = $tl->Toplevel(
+			-title=>$title,
+			Name=>'packetStatistics',
+			-class=>'SS7view',
+		);
+		my $wi = $tw->toplevel->Toplevel(
+			-title=>$title,
+			Name=>'packetStatistics',
+			-class=>'SS7view',
+		);
+		$wi->geometry("48x48");
+		$wi->Label(
+			-justify=>'center',
+			-text=>'Pkts:',
+			-width=>6,
+		)->grid(-row=>0,-column=>0,-sticky=>'ewns');
+		$wi->Entry(
+			-justify=>'center',
+			-textvariable=>\$self->{hits}->{2}->{pkts},
+			-width=>6,
+		)->grid(-row=>2,-column=>0,-sticky=>'ewns');
+		$wi->bind('<Double-Button-1>',[sub{
+			my ($wi,$self) = @_;
+			$self->{pstat}->deiconify;
+		},$self]);
+		$tw->iconwindow($wi);
+		$tw->group($tl);
+		#$tw->transient($tl);
+		#$tw->iconimage('icon');
+		$tw->iconname($title);
+		#$tw->resizable(0,0);
+		$tw->positionfrom('user');
+		$tw->sizefrom('program');
+		#$tw->minsize(600,400);
+		$tw->geometry("+$X+$Y");
+		$tw->protocol('WM_DELETE_WINDOW', [sub {
+			my $self = shift;
+			my $tw = $self->{pstat};
+			delete $self->{pstat};
+			$tw->destroy;
+		},$self]);
+		$self->{pstat} = $tw;
+		my $balloon = $tw->Balloon(-statusbar=>$top->statusbar);
+		my $p = $tw->Scrolled('Pane',
+			-scrollbars=>'osoe',
+			-sticky=>'ewns',
+		)->pack(%tframepack);
+		my $f = $p->Subwidget('scrolled');
+		my $s = $f->Frame->pack(%tframepack);
+		my @show = ();
+		$show[0] = $self->{hits}->{0}->{pkts} != 0;
+		$show[1] = $self->{hits}->{1}->{pkts} != 0;
+		$show[2] = $self->{hits}->{2}->{pkts} != 0 and (($show[0] and $show[1]) or (!$show[0] and !$show[1]));
+		if ($self->{hits}->{2}->{pkts}) {
+			my $col = 0;
+			$w = $s->Label(%labelright,
+				-text=>'Packets:',
+			)->grid(-row=>$row,-column=>$col++,-sticky=>'ewns');
+			$balloon->attach($w,
+				-balloonmsg=>'Number of packets sent and received.',
+			);
+			for (my $i=0;$i<3;$i++) {
+				if ($show[$i]) {
+					$w = $s->Entry(%entryright,
+						-textvariable=>\$self->{hits}->{$i}->{pkts},
+					)->grid(-row=>$row,-column=>$col++,-sticky=>'ewns');
+					$balloon=>attach($w,
+						-balloonmsg=>[
+							'Number of packets sent.',
+							'Number of packets received.',
+							'Number of packets.',
+						]->[$i],
+					);
+				}
+			}
+			$row++;
+		}
+		if ($self->{hits}->{2}->{chks}) {
+			my $col = 0;
+			$w = $s->Label(%labelright,
+				-text=>'Chunks:',
+			)->grid(-row=>$row,-column=>$col++,-sticky=>'ewns');
+			$balloon->attach($w,
+				-balloonmsg=>'Number of chunks sent and received.',
+			);
+			for (my $i=0;$i<3;$i++) {
+				if ($show[$i]) {
+					$w = $s->Entry(%entryright,
+						-textvariable=>\$self->{hits}->{$i}->{chks},
+					)->grid(-row=>$row,-column=>$col++,-sticky=>'ewns');
+					$balloon=>attach($w,
+						-balloonmsg=>[
+							'Number of chunks sent.',
+							'Number of chunks received.',
+							'Number of chunks.',
+						]->[$i],
+					);
+				}
+			}
+			$row++;
+		}
+		$s->update;
+		my $x = $s->width+40;
+		my $y = $s->height+40;
+		$tw->geometry("=$x"."x$y");
+	}
+	$tw->update;
+	$tw->MapWindow;
+}
+
+
+# -------------------------------------
+package MsgCollector; use strict;
+@MsgCollector::ISA = qw(MsgStats);
 # -------------------------------------
 
 #package MsgCollector;
@@ -3765,11 +3950,21 @@ sub init {
 	$self->MsgCollector::init(@args);
 	$self->CallCollector::init(@args);
 }
-#package DualCollector;
-sub addfrom {
-	my ($self,$othr,@args) = @_;
-	$self->MsgCollector::addfrom($othr,@args);
-	$self->CallCollector::addfrom($othr,@args);
+#package PktCollector;
+sub destroy {
+	my ($self,$top,@args) = @_;
+	delete $self->{pkts};
+	delete $self->{pkt};
+	delete $self->{pktcnt};
+	$self->PktStats::destroy($top,@args);
+}
+#package PktCollector;
+sub pushpkt {
+	my ($self,$pkt) = @_;
+	push @{$self->{pkts}}, $pkt;
+	$self->{pkt} = undef;
+	$self->{pktcnt}++;
+	$self->updatelist($pkt) if $self->{show};
 }
 
 # -------------------------------------
@@ -3786,8 +3981,173 @@ sub pushbuf {
 	my ($self,$msg) = @_;
 	return push @{$self->{msgbuf}}, $msg;
 }
+#package PktCollector;
+sub clearpkts {
+	my $self = shift;
+	$self->{pkts} = [];
+	$self->{pkt} = undef;
+	$self->{pktcnt} = 0;
+}
+#package PktCollector;
+sub pktcnt {
+	my $self = shift;
+	return scalar(@{$self->{pkts}});
+}
+#package PktCollector;
+sub addfrom {
+	my ($self,$othr,@args) = @_;
+	$self->PktStats::addfrom($othr,@args);
+	return unless $othr->isa('PktCollector');
+	splice(@{$self->{pkts}},@{$self->{pkts}},0,@{$othr->{pkts}});
+}
+#package PktCollector;
+sub pkts {
+	my ($self,$top,$X,$Y) = @_;
+	my ($tw,$wi,$bmsg);
+	if ($tw = $self->{list}) {
+		if ($tw->state eq 'iconic') {
+			$tw->deiconnify;
+		} else {
+			$tw->UnmapWindow;
+		}
+		$tw->MapWindow;
+		return;
+	}
+	my $title = $self->identify." Packets";
+	my $tl = $top->widget->toplevel;
+	$tw = $tl->Toplevel(
+		-title=>$title,
+		Name=>'packetsTable',
+		-class=>'SS7view',
+	);
+	$tw->iconwindow($wi);
+	$wi->geometry('48x48');
+	$wi->Label(%labelcenter, -width=>6, -text=>'Pkts',
+	)->grid(-row=>0,-column=>0);
+	$wi->Entry(%entrycenter, -width=>6, -textvariable=>\$self->{pktcnt},
+	)->grid(-row=>2,-column=>0);
+	$wi->bind('<Double-Button-1>',[sub{
+		my ($wi,$self) = @_;
+		$self->{list}->deiconify;
+	},$self]);
+	#$tw->group($tl);
+	#$tw->transient($tl);
+	#$tw->iconimage('icon');
+	$tw->iconname($title);
+	#$tw->resizeable(0,0);
+	#$tw->positionfrom('user');
+	#$tw->minsize(600,400);
+	#$tw->geometry("+$X+$Y");
+	$tw->protocol('WM_DELETE_WINDOW', [sub {
+		my $self = shift;
+		my $tw = $self->{list};
+		delete $self->{list};
+		$tw->destroy;
+	},$self]);
+	$self->{list} = $tw;
+	$self->showpkts($tw,$tl);
+	$tw->update;
+	$tw->MapWindow;
+}
+#package PktCollector;
+sub showpkts {
+	my ($self,$tw,$tl) = @_;
+
+	# FIXME: write rest of packet lister and disector.
+}
+
+# -------------------------------------
+package PairCollector; use strict;
+@PairCollector::ISA = qw(PktCollector MsgCollector);
+# -------------------------------------
+#package PairCollector;
+sub init {
+	my ($self,@args) = @_;
+	$self->PktCollector::init(@args);
+	$self->MsgCollector::init(@args);
+}
+#package PairCollector;
+sub destroy {
+	my ($self,@args) = @_;
+	$self->MsgCollector::destroy(@args);
+	$self->PktCollector::destroy(@args);
+}
+#package PairCollector;
+sub addfrom {
+	my ($self,$othr,@args) = @_;
+	$self->PktCollector::addfrom($othr,@args);
+	$self->MsgCollector::addfrom($othr,@args);
+}
+
+# -------------------------------------
+package DualCollector; use strict;
+@DualCollector::ISA = qw(MsgCollector CallCollector);
+# -------------------------------------
+#package DualCollector;
+sub init {
+	my ($self,@args) = @_;
+	$self->MsgCollector::init(@args);
+	$self->CallCollector::init(@args);
+}
+#package DualCollector;
+sub destroy {
+	my ($self,@args) = @_;
+	$self->CallCollector::destroy(@args);
+	$self->MsgCollector::destroy(@args);
+}
+#package DualCollector;
+sub addfrom {
+	my ($self,$othr,@args) = @_;
+	$self->MsgCollector::addfrom($othr,@args);
+	$self->CallCollector::addfrom($othr,@args);
+}
+
+# -------------------------------------
+package TripleCollector; use strict;
+@TripleCollector::ISA = qw(PktCollector MsgCollector CallCollector);
+# -------------------------------------
+#package TripleCollector;
+sub init {
+	my ($self,@args) = @_;
+	$self->PktCollector::init(@args);
+	$self->MsgCollector::init(@args);
+	$self->CallCollector::init(@args);
+}
+#package TripleCollector;
+sub destroy {
+	my ($self,@args) = @_;
+	$self->CallCollector::destroy(@args);
+	$self->MsgCollector::destroy(@args);
+	$self->PktCollector::destroy(@args);
+}
+#package TripleCollector;
+sub addfrom {
+	my ($self,$othr,@args) = @_;
+	$self->PktCollector::addfrom($othr,@args);
+	$self->MsgCollector::addfrom($othr,@args);
+	$self->CallCollector::addfrom($othr,@args);
+}
+
+# -------------------------------------
+package MsgBuffer; use strict;
+# -------------------------------------
 #package MsgBuffer;
-sub shiftbuf {
+sub init {
+	my ($self,@args) = @_;
+	$self->{msgbuf} = [];
+}
+#package MsgBuffer;
+sub destroy {
+	my ($self,@args) = @_;
+	delete $self->{msgbuf};
+}
+#package MsgBuffer;
+sub pushbufmsg {
+	my ($self,$msg) = @_;
+	return push @{$self->{msgbuf}}, $msg;
+}
+#package MsgBuffer;
+sub shiftbufmsg {
 	my $self = shift;
 	return shift @{$self->{msgbuf}};
 }
@@ -4048,6 +4408,11 @@ sub init {
 	$top->widget->traceVariable(\$self->{state},'w'=>[\&Stateful::tracestate,$self,$top]);
 }
 #package Stateful;
+sub destroy {
+	my ($self,$top) = @_;
+	$top->widget->traceVdelete(\$self->{state});
+}
+#package Stateful;
 sub tracestate {
 	my ($ind,$val,$op,$self,$top) = @_;
 	if ($op eq 'w') {
@@ -4210,6 +4575,16 @@ sub init {
 	$self->{arcs} = {};
 	$self->{arcs}->{a} = [];
 	$self->{arcs}->{b} = [];
+}
+#package Arcend;
+sub destroy {
+	my ($self,$top) = @_;
+	while (my $arc = shift @{$self->{arcs}->{a}}) {
+		$arc->destroy($top);
+	}
+	while (my $arc = shift @{$self->{arcs}->{b}}) {
+		$arc->destroy($top);
+	}
 }
 
 #package Arcend;
@@ -5081,9 +5456,17 @@ use vars qw(@ISA);
 # -------------------------------------
 
 #package Circuit;
-sub new {
-	my ($type,$top,$group,$cic,@args) = @_;
-	my $self = {};
+sub get {
+	my ($type,$top,$relation,$cic,@args) = @_;
+	return $relation->{cics}->{$cic} if $relation->{cics}->{$cic};
+	my $self = {
+		cic=>$cic,
+		relation=>$relation,
+		ts=>$top->{begtime},
+		dir=>0,
+		active=>0,
+		state=>::CTS_UNINIT,
+	};
 	bless $self,$type;
 	$self->{group} = $group;
 	$self->{cic} = $cic;
@@ -5780,9 +6163,10 @@ sub getmore {
 		},$self,$mc,$top,$X,$Y]);
 		$m->add('cascade',-menu=>$mc,-label=>'Links');
 	}
-	if ($have->{routes}->{b}) {
-		my ($mc,$m3);
-		$mc = $m->Menu(-title=>'Routes Forward Menu');
+	{
+		my $node = $self->{node}->{a};
+		my $label = 'Node A '.$node->shortid;
+		my $mc = $m->Menu(-title=>"$label Menu");
 		$mc->configure(-postcommand=>[sub {
 			my ($self,$mc,$top,$X,$Y) = @_;
 			$mc->delete(0,'end');
@@ -5797,9 +6181,10 @@ sub getmore {
 		},$self,$mc,$top,$X,$Y]);
 		$m->add('cascade',-menu=>$mc,-label=>'Routes Forward');
 	}
-	if ($have->{routes}->{a}) {
-		my ($mc,$m3);
-		$mc = $m->Menu(-title=>'Routes Reverse Menu');
+	{
+		my $node = $self->{node}->{b};
+		my $label = 'Node B '.$node->shortid;
+		my $mc = $m->Menu(-title=>"$label Menu");
 		$mc->configure(-postcommand=>[sub {
 			my ($self,$mc,$top,$X,$Y) = @_;
 			$mc->delete(0,'end');
@@ -6009,20 +6394,15 @@ sub getmore {
 		$mc->configure(-postcommand=>[sub {
 			my ($self,$mc,$top,$X,$Y) = @_;
 			$mc->delete(0,'end');
-			$channel->getmenu($mc,$top,$X,$Y);
-			$channel->getmore($mc,$top,$X,$Y);
-		},$self,$mc,$top,$X,$Y]);
-		$m->add('cascade', -menu=>$mc, -label=>$label);
-	}
-	if ($have->{revs}) {
-		my $channel = $self->{channelrevs};
-		my $label = 'Reverse channel';
-		my $mc = $m->Menu(-title=>"$label Menu");
-		$mc->configure(-postcommand=>[sub {
-			my ($self,$mc,$top,$X,$Y) = @_;
-			$mc->delete(0,'end');
-			$channel->getmenu($mc,$top,$X,$Y) if $channel;
-			$channel->getmore($mc,$top,$X,$Y) if $channel;
+			foreach my $dli (sort {$a <=> $b} keys %{$self->{datalinks}}) {
+				my $datalink = $self->{datalinks}->{$dli};
+				my $type = ref($datalink); $type=~s/_/ /g;
+				my $label = $type.' '.$datalink->shortid;
+				$m3 = $mc->Menu(-title=>"$label Menu");
+				$datalink->getmenu($m3,$top,$X,$Y);
+				$datalink->getmore($m3,$top,$X,$Y);
+				$mc->add('cascade',-menu=>$m3,-label=>$label);
+			}
 		},$self,$mc,$top,$X,$Y]);
 		$m->add('cascade', -menu=>$mc, -label=>$label);
 	}
@@ -6390,48 +6770,123 @@ sub absorb {
 #package Node;
 sub fillstatus {
 	my ($self,$top,$tw,$row) = @_;
-	my $f;
-	my ($na,$nb);
-	($na,$nb) = (keys %{$self->{paths}->{a}},keys %{$self->{paths}->{b}});
-	if ($na or $nb) {
-		$f = $tw->TFrame(%tframestyle,-label=>'Paths:');
-		my $p = $f;
-		if ($na + $nb > 16) {
-			$f->pack(%tframepack);
-			$p = $f->Scrolled('Pane',
-				-scrollbars=>'osoe',
-				-sticky=>'we',
-				-gridded=>'y',
-			)->pack(%tframepack);
-		} else {
-			$f->pack(%tframescrunch);
-		}
-		$$row = 0;
-		my $col = 0;
-		$p->Label(%labelright,-text=>'Originating:',
-		)->grid(-row=>$$row,-column=>0,-sticky=>'ewns');
-		foreach my $ppa (sort {$a <=> $b} keys %{$self->{paths}->{a}}) {
-			my $path = $self->{paths}->{a}->{$ppa};
-			my $channel = $path->{channel};
-			$col++;
-			my $w = $p->Entry(%entrycenter,-text=>$channel->shortid,
-			)->grid(-row=>$$row,-column=>$col,-sticky=>'ewns');
-			$path->bindtowidget($top,$w);
-			if ($col > 3) { $col = 0; $$row++; }
-		}
-		if ($col != 0) { $col = 0; $$row++; }
-		$p->Label(%labelright,-text=>'Terminating:',
-		)->grid(-row=>$$row,-column=>0,-sticky=>'ewns');
-		foreach my $ppa (sort {$a <=> $b} keys %{$self->{paths}->{b}}) {
-			my $path = $self->{paths}->{b}->{$ppa};
-			my $channel = $path->{channel};
-			$col++;
-			my $w = $p->Entry(%entrycenter,-text=>$channel->shortid,
-			)->grid(-row=>$$row,-column=>$col,-sticky=>'ewns');
-			$path->bindtowidget($top,$w);
-			if ($col > 3) { $col = 0; $$row++; }
-		}
+}
+
+# -------------------------------------
+package Host; use strict;
+@Host::ISA = qw(Node Logging PairCollector);
+# -------------------------------------
+
+#package Host;
+sub get {
+	my ($type,$top,$network,$ipaddr,$col,@args) = @_;
+	my $self = $network->{nodes}->{$ipaddr} if $ipaddr;
+	return $self if $self;
+	$self = Node::get($type,$top,$network,$col,@args);
+	if ($ipaddr) {
+		$network->{nodes}->{$ipaddr} = $self;
+		$self->{ipaddr} = $ipaddr;
+		$self->{ipaddrs} = {$ipaddr=>1};
+		$self->{iaddr} = Host::iaddr($ipaddr);
+		$self->{iname} = Host::iname($ipaddr);
+	} else {
+		$self->{ipaddr} = undef;
+		$self->{ipaddrs} = {};
+		$self->{iaddr} = '';
+		$self->{iname} = '';
 	}
+	$self->Logging::init($top,@args);
+	$self->PairCollector::init($top,@args);
+	if ($ipaddr) {
+		$top->canvas->itemconfigure($self->{text},-text=>$self->{iaddr});
+		$top->canvas->itemconfigure($self->{ownr},-text=>$self->{iname});
+	}
+	$top->{regroupnow} = 1;
+	return $self;
+}
+
+#package Host;
+sub addipaddr {
+	my ($self,$top,$network,$ipaddr) = @_;
+	if (my $host = $network->{nodes}->{$ipaddr}) {
+		return $self->absorb($host);
+	}
+	$self->{ipaddrs}->{$ipaddr} = 1;
+	$ipaddr = [sort {$a<=>$b} keys %{$self->{ipaddrs}}]->[0];
+	if ($self->{ipaddr} != $ipaddr) {
+		$self->{ipaddr} = $ipaddr;
+		$self->{iaddr} = Host::iaddr($ipaddr);
+		$self->{iname} = Host::iname($ipaddr);
+	}
+	return $self;
+}
+
+#package Host;
+# call this as Host::makeone($node,$top,$network,$ipaddr);
+sub makeone {
+	my ($node,$top,$network,$ipaddr) = @_;
+	if (ref $node eq 'Node') {
+		$node->{ipaddr} = $ipaddr;
+		$node->{ipaddrs}->{$ipaddr} = 1;
+		$node->{iaddr} = Host::iaddr($ipaddr);
+		$node->{iname} = Host::iname($ipaddr);
+		SUPER::xform('Host',$node,$top);
+	} else {
+		print STDERR "E: $node: attempt to make a Host DENIED\n";
+	}
+	return $node;
+}
+
+#package Host;
+sub mergefrom {
+	my ($self,$top,$node) = @_;
+
+	foreach (values %{$node->{ipaddrs}}) {
+		$self->{ipaddres}->{$_} = 1;
+	}
+	foreach (qw/ipaddr ipaddrs iaddr iname/) {
+		delete $node->{$_};
+	}
+	$self->addfrom($node,0);
+	$self->SUPER::mergefrom($top,$node);
+}
+
+#package Host;
+sub adjitems {
+	my ($self,$top,$c,$oldtags) = @_;
+	my ($x,$y) = ($self->{x},$self->{y});
+	$self->{item} = $c->createRectangle(
+		$x-40,$y-30,$x+40,$y+30,
+		-fill=>'white',
+		-outline=>'black', -width=>2,
+		-activeoutline=>'cyan', -activewidth=>3,
+		-tags=>[ref($self),'node',@{$oldtags}],
+	);
+	unshift @{$self->{items}}, $self->{item};
+	$c->coords($self->{scri},
+		$x-23,$y-23,$x+23,$y-23,$x+23,$y+23,$x-23,$y+23,$x-23,$y-23,
+	);
+	$c->itemconfigure($self->{ttxt},-text=>ref($self));
+	$c->itemconfigure($self->{text},-text=>$self->{iaddr});
+	$c->itemconfigure($self->{ownr},-text=>$self->{iname});
+	$self->makecol($top,::COL_ADJ);
+}
+
+#package Host;
+sub iaddr {
+	my $ipaddr = shift;
+	return undef unless defined $ipaddr;
+	return '' unless $ipaddr;
+	return join('.',unpack('C*',pack('N',$ipaddr)));
+}
+
+#package Host;
+sub iname {
+	my $ipaddr = shift;
+	return undef unless defined $ipaddr;
+	return '' unless $ipaddr;
+	# TODO: reverse DNS lookup of ip address
+	return '(unknown)';
 }
 
 # -------------------------------------
@@ -6480,9 +6935,9 @@ sub xform {
 	my $mc = $top->mycanvas;
 	$mc->delballoon($self->{items});
 
-	foreach (@{$self->{items}}) {
-		$c->dtag($_,$oldtype);
-		$c->addtag($type,withtag=>$_);
+	if ($node->isa('SP')) {
+		print STDERR "E: $self and $node attempt to merge DENIED\n";
+		return;
 	}
 
 	my @oldtags = ();
@@ -6491,25 +6946,25 @@ sub xform {
 	push @oldtags, 'TCAP' if $self->{orig_tcap} or $self->{term_tcap};
 	push @oldtags, 'circuits' if $self->{ciccnt} > 0;
 
-	$c->delete($self->{item});
-	shift @{$self->{items}};
-	$self->adjitems($c,\@oldtags);
-	$c->itemconfigure($self->{ttxt}, -text=>ref($self));
-	if ($self->{alias}) {
-		$c->itemconfigure($self->{item}, -dash=>[5,2]);
-		$c->itemconfigure($self->{scri}, -dash=>[5,2]);
-	}
-	my $olditem = 'all';
-	foreach (@{$self->{items}}) {
-		$c->raise($_,$olditem);
-		$olditem = $_;
-	}
-	my $state = ($top->{show}->{"\L$type\Es"}) ? 'normal' : 'hidden';
-	foreach (@{$self->{items}}) {
-		$c->itemconfigure($_,-state=>$state);
-	}
-	$self->Clickable::attach($top);
-	$self->findaliases($top);
+#package SP;
+sub adjitems {
+	my ($self,$top,$c,$oldtags) = @_;
+	my ($x,$y) = ($self->{x},$self->{y});
+	$self->{item} = $c->createOval(
+		$x-40,$y-40,$x+40,$y+40,
+		-fill=>'white',
+		-outline=>'black', -width=>2,
+		-activeoutline=>'cyan', -activeWidth=>3,
+		-tags=>[ref($self),'node',@{$oldtags}],
+	);
+	unshift @{$self->{items}}, $self->{item};
+	$c->coords($self->{scri},
+		$x-23,$y-23,$x+23,$y-23,$x+23,$y+23,$x-23,$y+23,$x-23,$y-23,
+	);
+	$c->itemconfigure($self->{ttxt},-text=>ref($self));
+	$c->itemconfigure($self->{text},-text=>$self->{pcode});
+	$c->itemconfigure($self->{ownr},-text=>$self->{pownr});
+	$self->makecol($top,::COL_NOD);
 }
 
 #package SP;
@@ -7337,6 +7792,10 @@ sub adjitems {
 	$c->coords($self->{scri},
 		$x-26,$y-26,$x+26,$y+26,$x+26,$y-26,$x-26,$y+26,$x-26,$y-26,
 	);
+	$c->itemconfigure($self->{ttxt},-text=>ref($self));
+	$c->itemconfigure($self->{text},-text=>$self->{pcode});
+	$c->itemconfigure($self->{ownr},-text=>$self->{pownr});
+	$self->makecol($top,::COL_SSP);
 }
 
 #package SSP;
@@ -7370,6 +7829,13 @@ sub adjitems {
 		-tags=>[ref($self),'node',@{$oldtags}],
 	);
 	unshift @{$self->{items}}, $self->{item};
+	$c->coords($self->{scri},
+		$x-23,$y-23,$x+23,$y-23,$x+23,$y+23,$x-23,$y+23,$x-23,$y-23,
+	);
+	$c->itemconfigure($self->{ttxt},-text=>ref($self));
+	$c->itemconfigure($self->{text},-text=>$self->{pcode});
+	$c->itemconfigure($self->{ownr},-text=>$self->{pownr});
+	$self->makecol($top,::COL_SCP);
 }
 
 #package SCP;
@@ -7406,6 +7872,10 @@ sub adjitems {
 	$c->coords($self->{scri},
 		$x+38,$y-38,$x-38,$y+38,
 	);
+	$c->itemconfigure($self->{ttxt},-text=>ref($self));
+	$c->itemconfigure($self->{text},-text=>$self->{pcode});
+	$c->itemconfigure($self->{ownr},-text=>$self->{pownr});
+	$self->makecol($top,::COL_ADJ);
 }
 
 #package STP;
@@ -7443,6 +7913,10 @@ sub adjitems {
 	$c->coords($self->{scri},
 		$x+38,$y-38,$x-38,$y+38,
 	);
+	$c->itemconfigure($self->{ttxt},-text=>ref($self));
+	$c->itemconfigure($self->{text},-text=>$self->{pcode});
+	$c->itemconfigure($self->{ownr},-text=>$self->{pownr});
+	$self->makecol($top,::COL_GTT);
 }
 
 #package GTT;
@@ -8126,6 +8600,61 @@ sub setpr {
 	}
 }
 
+# -------------------------------------
+package Channel; use strict;
+@Channel::ISA = qw(Datalink);
+# -------------------------------------
+
+use constant {
+	MTP2_ANNEX_A_NOT_USED	    => 0,
+	MTP2_ANNEX_A_USED	    => 1,
+	MTP2_ANNEX_A_USED_UNKNOWN   => 2,
+};
+
+#package Channel;
+sub dli {
+	return pack('n',shift);
+}
+#package Channel;
+sub get {
+	my ($type,$top,$network,$msg,@args) = @_;
+	my $ppa = $msg->{ppa};
+	my $dli = Channel::dli($ppa);
+	my $self = $network->{datalinks}->{$dli};
+	return $self if $self;
+	my $way = $msg->{dir};
+	my $nodea = Node->get($top,$network,0 - (::COL_ADJ));
+	my $nodeb = Node->get($top,$network,0 + (::COL_ADJ));
+	($nodea,$nodeb) = ($nodeb,$nodea) unless $way & 0x1;
+	$self = Datalink::new($type,$top,$network,$dli,$nodea,$nodeb,$msg,@args);
+	$self->{ppa} = $ppa;
+	my ($card,$span,$slot) = Channel::chan($ppa);
+	if ($way & 0x2) {
+		# monitored half-duplex channel in a known direction
+		my $ppa2 = $self->{ppa2} = Channel::ppa($card,$span^0x1,$slot);
+		# tell messages from the other span how to find us
+		$network->{datalinks}->{$ppa2} = $self;
+		$self->{dli} = $ppa2 unless $way & 0x1;
+	} elsif ($way & 0x4) {
+		# monitored half-duplex channel in an unknown direction
+	} else {
+		$self->{duplex} = 1;
+		# active full-duplex channel in a known direction
+	}
+	return $self;
+}
+
+#package Channel;
+sub ppa {
+	my ($card,$span,$slot) = @_;
+	return (($card & 0x03) << 7) | (($span & 0x03) << 5) | (($slot & 0x1f) << 0);
+}
+#package Channel;
+sub chan {
+	my $ppa = shift;
+	return ((($ppa >> 0) & 0x1f), (($ppa >> 5) & 0x03), (($ppa >> 7) & 0x03));
+}
+
 #package Channel;
 sub identify {
 	my $self = shift;
@@ -8345,46 +8874,76 @@ sub new {
 # -------------------------------------
 package BitField; use strict; use vars qw(@ISA); @ISA = qw(Field);
 # -------------------------------------
-sub new {
-	my ($type,$b,$p,$s,$e,@args) = @_;
-	my $self = Field::new($type,$b,$p,@args);
-	$self->{len} = int($e/8) + 1;
-	$self->{ptr} = $p;
-	$self->{beg} = $s;
-	$self->{end} = $e;
-	$self->{wid} = $e+1-$s;
-	#TODO unpack bits
-	my $sb = $p + int($s/8);
-	my $eb = $p + int($e/8);
-	my ($v,$i);
-	for (($v,$i) = (0,$eb); $i >= $sb; $i--) {
-		my ($m,$c) = (0xff,$b->[$i]);
-		if ($i == $eb) { $m &=  ((1<<(8-$e))-1); }
-		if ($i == $sb) { $m &= ~((1<<($s+1))-1); }
-		$v |= ($c & $m);
-		$v <<= 8 unless $i == $sb;
+
+#package Association;
+sub dli {
+	my $hdr = shift;
+	return pack('nnN', $hdr->{sport},$hdr->{dport},$hdr->{vtag});
+}
+#package Association;
+sub find {
+	my ($type,$top,$network,$msg,@args) = @_;
+	my $sub = $type->can('dli');
+	my $dli = &$sub($msg);
+	return $network->{datalinks}->{$dli} if $network->{datalinks}->{$dli};
+	return undef;
+}
+#package Association;
+sub get {
+	my ($type,$top,$network,$msg,@args) = @_;
+	my $dli = Association::dli($msg);
+	my $self = $network->{datalinks}->{$dli};
+	return $self if $self;
+	my ($addra,$addrb,$cola,$colb);
+	if ($msg->{dir} == ::SLL_DIR_RECEIVED) {
+		$addra = $msg->{daddr}; $cola = 0 + (::COL_ADJ);
+		$addrb = $msg->{saddr}; $colb = 0 - (::COL_ADJ);
+	} else {
+		$addra = $msg->{saddr}; $cola = 0 - (::COL_ADJ);
+		$addrb = $msg->{daddr}; $colb = 0 + (::COL_ADJ);
 	}
-	$v >>= $s;
-	$self->{val} = $v;
+	my $hosta = Host->get($top,$network,$addra,$cola);
+	my $hostb = Host->get($top,$network,$addrb,$colb);
+	$self = Datalink::new($type,$top,$network,$dli,$hosta,$hostb,$msg,@args);
+	$self->PktCollector::init($top,@args);
+	$self->PktBuffer::init(@args);
+	$self->{sport} = $msg->{sport};
+	$self->{dport} = $msg->{dport};
+	$self->{vtag} = $msg->{vtag};
+	$self->{duplex} = 1;
+	$self->{mtype} = $type; $self->{mtype} =~ s/Association/Message/;
+	$self->{acks}     = {0=>undef,1=>undef};    # cumm. acks
+	$self->{tsns}     = {0=>{},   1=>{}};	    # data chunks
+	$self->{streams}  = {0=>{},   1=>{}};	    # streams
+	$self->{chunks}   = {0=>[],   1=>[]};	    # reassembled messages
+	$self->{ulps}     = {0=>[],   1=>[]};
 	return $self;
 }
 
 sub bits {
 	my $self = shift;
-	my @bytes = ();
-	my $bits = '';
-	my $word = $self->{val};
-	for (my $i = 0; $i < $self->{beg}; $i++) {
-		$bits = '-'.$bits;
-	}
-	my $p = $self->{ptr};
-	for (my $i = $self->{beg}; $i <= $self->{end}; $i++) {
-		$bits = (($word & 0x1)?'1':'0').$bits;
-		$word >>= 1;
-		if (($i&0x7) == 0x7) {
-			push @bytes, sprintf('%3d %s', $p + scalar(@bytes), $bits);
-			$bits = '';
-		}
+	my $name = ref($self); $name=~s/_/ /g;
+	my $id = sprintf("$name %d::%d(%08x)", $self->{sport},$self->{dport},$self->{vtag});
+	$id .= ", $self->{node}->{a}->{pcode} <=> $self->{node}->{b}->{pcode} link $self->{slc}"
+		if $self->{node}->{a} and $self->{node}->{a}->isa('SP');
+	$id .= ", $self->{node}->{a}->{ipaddr} <=> $self->{node}->{b}->{ipaddr}"
+		if $self->{node}->{a} and $self->{node}->{a}->isa('Host');
+	return ($self->{id} = $id);
+}
+
+#package Association;
+sub shortid {
+	my $self = shift;
+	return sprintf("%d::%d(%08x)", $self->{sport},$self->{dport},$self->{vtag});
+}
+
+#package Association;
+sub hit {
+	my ($self,$msg,$dir) = @_;
+	$self->SUPER::hit($msg,$dir);
+	$self->{node}->{a}->hit($msg,$dir^0x0);
+	$self->{node}->{b}->hit($msg,$dir^0x1);
+}
 
 	}
 	if (($self->{end}&0x7) != 0x7) {
@@ -8441,12 +9000,24 @@ sub new {
 	my ($type,$b,$p,@args) = @_;
 	return BitField::new($type,$b,$p,4,6,@args);
 }
-# ------------------------------------
-package BsnField; use strict; use vars qw(@ISA); @ISA = qw(SnField);
-# ------------------------------------
-sub new {
-	my ($type,$b,$p,@args) = @_;
-	return SnField::new($type,$b,$p+0,@args);
+
+#package M2PA_Association;
+sub add_pkt {
+	my ($self,$top,$network,$pkt) = @_;
+
+	# process chunks into complete messages
+	$self->SUPER::add_pkt($top,$network,$pkt);
+
+	foreach my $dir (%{$self->{ulps}}) {
+		foreach my $msg (@{$self->{ulps}->{$dir}}) {
+			bless $msg,'M2paMessage';
+			if ($msg->decode($self) >= 0) {
+				$self->add_msg($top,$network,$msg,$dir);
+				next;
+			}
+			print STDERR "W: $msg: decoding error, message discarded\n";
+		}
+	}
 }
 # ------------------------------------
 package BibField; use strict; use vars qw(@ISA); @ISA = qw(IbField);
@@ -8469,12 +9040,24 @@ sub new {
 	my ($type,$b,$p,@args) = @_;
 	return IbField::new($type,$b,$p+1,@args);
 }
-# ------------------------------------
-package LiField; use strict; use vars qw(@ISA); @ISA = qw(BitField);
-# ------------------------------------
-sub new {
-	my ($type,$b,$p,@args) = @_;
-	return BitField::new($type,$b,$p+2,0,5,@args);
+
+#package M2UA_Association;
+sub add_pkt {
+	my ($self,$top,$network,$pkt) = @_;
+
+	# process chunks into complete messages
+	$self->SUPER::add_pkt($top,$network,$pkt);
+
+	foreach my $dir (%{$self->{ulps}}) {
+		foreach my $msg (@{$self->{ulps}->{$dir}}) {
+			bless $msg,'M2uaMessage';
+			if ($msg->decode($top,$network,$self) >= 0) {
+				$msg->{interface}->add_msg($top,$network,$msg,$dir);
+				next;
+			}
+			print STDERR "W: $msg: decoding error, message discarded\n";
+		}
+	}
 }
 # ------------------------------------
 package Li0Field; use strict; use vars qw(@ISA); @ISA = qw(BitField);
@@ -8497,12 +9080,24 @@ sub new {
 	my ($type,$b,$p,@args) = @_;
 	return XsnField::new($type,$b,$p+0,@args);
 }
-# ------------------------------------
-package XBsn0Field; use strict; use vars qw(@ISA); @ISA = qw(Xsn0Field);
-# ------------------------------------
-sub new {
-	my ($type,$b,$p,@args) = @_;
-	return Xsn0Field::new($type,$b,$p+1,@args);
+
+#package M3UA_Association;
+sub add_pkt {
+	my ($self,$top,$network,$pkt) = @_;
+
+	# process chunks into complete messages
+	$self->SUPER::add_pkt($top,$network,$pkt);
+
+	foreach my $dir (%{$self->{ulps}}) {
+		foreach my $msg (@{$self->{ulps}->{$dir}}) {
+			bless $msg,'M3uaMessage';
+			if ($msg->decode($top,$network,$self) >= 0) {
+				$msg->{routing}->add_msg($top,$network,$msg,$dir);
+				next;
+			}
+			print STDERR "W: $msg: decoding error, message discarded\n";
+		}
+	}
 }
 # ------------------------------------
 package XBibField; use strict; use vars qw(@ISA); @ISA = qw(IbField);
@@ -8532,26 +9127,24 @@ sub new {
 	my ($type,$b,$p,@args) = @_;
 	return IbField::new($type,$b,$p+3,@args);
 }
-# ------------------------------------
-package XliField; use strict; use vars qw(@ISA); @ISA = qw(BitField);
-# ------------------------------------
-sub new {
-	my ($type,$b,$p,@args) = @_;
-	return BitField::new($type,$b,$p+4,0,8,@args);
-}
-# ------------------------------------
-package Xli0Field; use strict; use vars qw(@ISA); @ISA = qw(BitField);
-# ------------------------------------
-sub new {
-	my ($type,$b,$p,@args) = @_;
-	return BitField::new($type,$b,$p+5,1,7,@args);
-}
-# ------------------------------------
-package XjmpField; use strict; use vars qw(@ISA); @ISA = qw(BitField);
-# ------------------------------------
-sub new {
-	my ($type,$b,$p,@args) = @_;
-	return BitField::new($type,$b,$p+5,6,7,@args);
+
+#package SUA_Association;
+sub add_pkt {
+	my ($self,$top,$network,$pkt) = @_;
+
+	# process chunks into complete messages
+	$self->SUPER::add_pkt($top,$network,$pkt);
+
+	foreach my $dir (%{$self->{ulps}}) {
+		foreach my $msg (@{$self->{ulps}->{$dir}}) {
+			bless $msg,'SuaMessage';
+			if ($msg->decode($top,$network,$self) >= 0) {
+				$msg->{routing}->add_msg($top,$network,$msg,$dir);
+				next;
+			}
+			print STDERR "W: $msg: decoding error, message discarded\n";
+		}
+	}
 }
 # -------------------------------------
 package SfField; use strict; use vars qw(@ISA); @ISA = qw(BitField);
@@ -8564,8 +9157,23 @@ sub new {
 package Sf2Field; use strict; use vars qw(@ISA); @ISA = qw(BitField);
 # -------------------------------------
 sub new {
-	my ($type,$b,$p,@args) = @_;
-	return BitField::new($type,$b,$p+1,0,7,@args);
+	my ($type,$top,$file) = @_;
+	my $self = PcapSource::new(@_);
+	my $err = '';
+	my $pcap;
+
+	unless ($pcap = Net::Pcap::pcap_open_offline($file, \$err)) {
+		my $d = $top->Dialog(
+			-text=>"Non-Fatal Error",
+			-text=>"Could not open file:\n\n\t$file\n\nError was: $err",
+			-default_button=>'Dismiss',
+			-buttons=>qw/Dismiss/,
+		);
+		$d->Show;
+		$d->destroy;
+		return undef;
+	}
+	$top->{network} = new Network($top);
 }
 # -------------------------------------
 package SiField; use strict; use vars qw(@ISA); @ISA = qw(BitField);
@@ -8602,12 +9210,19 @@ sub new {
 	my ($type,$b,$p,@args) = @_;
 	return BitField::new($type,$b,$p+3,0,23,@args);
 }
-# -------------------------------------
-package Sls24Field; use strict; use vars qw(@ISA); @ISA = qw(BitField);
-# -------------------------------------
-sub new {
-	my ($type,$b,$p,@args) = @_;
-	return BitField::new($type,$b,$p+6,0,7,@args);
+
+sub service {
+	my ($self,$top,$network) = @_;
+
+	my %hdr = ();
+	my $dat = '';
+	my $ret;
+
+	while (($ret = $self->getmsg(\%hdr,\$dat)) == 0) {
+		if (my $msg = create PcapMessage($top,$network,$self,\%hdr,$dat,$self->{dltype})) {
+			$msg->process($top,$network);
+		}
+	}
 }
 # -------------------------------------
 package Dpc14Field; use strict; use vars qw(@ISA); @ISA = qw(BitField);
@@ -9862,6 +10477,973 @@ sub showdecode {
 	$hl->configure(-font=>$font);
 	$self->rotext($ro);
 	$self->hlist($hl);
+}
+#package Message;
+sub rotext {
+	my ($self,$ro) = @_;
+	$ro->delete('0.0','end');
+	my @b = (unpack('C*',$self->{dat}));
+	my @lines = ();
+	my ($i,$c,$line);
+	while (@b) {
+		for ($i = 0; ($i < 16) and @b; $i++) {
+			$line .= ' ' if $line;
+			$line .= ' ' unless $i & 0x7;
+			$line .= sprintf('%02X',shift @b);
+		}
+		push @lines, $line;
+		$line = undef;
+	}
+	$ro->insert('0.0',join("\n",@lines));
+}
+#package Message;
+sub makeentry {
+	my ($self,$hl,$byte,$beg,$end,$val,$name,$entry,$desc,$sub) = @_;
+	my @bytes = ();
+	my $bits = '';
+	my $value;
+	if ($sub) {
+		my $func = shift @{$sub};
+		$value = &$func(@{$sub});
+	} else {
+		$value = $val;
+	}
+	my $word = $val;
+	for (my $i = 0; $i < $beg; $i++) {
+		$bits = '-'.$bits;
+	}
+	for (my $i = $beg; $i <= $end; $i++) {
+		$bits = (($word & 0x1) ? '1' : '0') . $bits;
+		$word >>= 1;
+		if (($i & 0x7) == 0x7) {
+			push @bytes, " $bits";
+			$bits = '';
+		}
+	}
+	if (($end & 0x7) != 0x7) {
+		for (my $i = $end+1; ($i&0x7) != 0; $i++) {
+			$bits = '-'.$bits;
+		}
+	}
+	if (length($bits)) {
+		push @bytes, " $bits";
+	}
+	$bits = join("\n", @bytes);
+	my $parent = $entry;
+	$parent=~s/\.[^\.]*$//;
+	$hl->add($entry,-itemtype=>'text', -text=>$name, -style=>$self->{fldstyle});
+	#$hl->indicator('create', $entry, -itemtype=>'image', -image=>'box');
+	$hl->itemCreate($entry, 1, -itemtype=>'text', -text=>$bits, -style=>$self->{bitstyle});
+	$hl->itemCreate($entry, 2, -itemtype=>'text', -text=>" $value", -style=>$self->{valstyle});
+	if (ref($desc) eq 'HASH') {
+		$hl->itemCreate($entry, 3, -itemtype=>'text', -text=>" $desc->{$val}", -style=>$self->{desstyle});
+	} elsif (ref($desc) eq 'ARRAY') {
+		$hl->itemCreate($entry, 3, -itemtype=>'text', -text=>" $desc->[$val]", -style=>$self->{desstyle});
+	} else {
+		$hl->itemCreate($entry, 3, -itemtype=>'text', -text=>" $desc", -style=>$self->{desstyle});
+	}
+	$hl->hide('entry',$entry) if $self->{tree}->{$parent} eq '+';
+}
+#package Message;
+sub hlist {
+	my ($self,$hl) = @_;
+	$hl->delete('all');
+	$hl->add('0',-text=>'L2',);
+	$hl->itemCreate('0',1,-text=>' ********');
+	$hl->itemCreate('0',3,-text=>'L2 Pseudoheader');
+	$hl->indicator('create','0',-itemtype=>'image',-image=>$self->{tree}->{0});
+	$hl->add('1',-itemtype=>'text',-text=>'L2',);
+	$hl->itemCreate('1',1,-text=>' ********');
+	$hl->itemCreate('1',3,-text=>'L2 Header');
+	$hl->indicator('create','1',-itemtype=>'image',-image=>$self->{tree}->{1});
+	my $sio;
+	if ($self->{datalink}->{ht} == ::HT_EXTENDED) {
+		$self->makeentry($hl,0,0,11,$self->{bsn},'BSN','1.2','Backward Sequence Number');
+		$self->makeentry($hl,1,7,7,$self->{bib},'BIB','1.1','Backward Indicator Bit');
+		$self->makeentry($hl,2,0,11,$self->{fsn},'FSN','1.4','Forward Sequence Number');
+		$self->makeentry($hl,3,7,7,$self->{fib},'FIB','1.3','Forward Indicator Bit');
+		$self->makeentry($hl,4,0,8,$self->{li},'LI','1.5','Length Indicator');
+		$self->makeentry($hl,5,2,7,$self->{li0},'LI0','1.6','Spare Bits');
+		$sio = 6;
+	} else {
+		$self->makeentry($hl,0,0,6,$self->{bsn},'BSN','1.2','Backward Sequence Number');
+		$self->makeentry($hl,0,7,7,$self->{bib},'BIB','1.1','Backward Indicator Bit');
+		$self->makeentry($hl,1,0,6,$self->{fsn},'FSN','1.4','Forward Sequence Number');
+		$self->makeentry($hl,1,7,7,$self->{fib},'FIB','1.3','Forward Indicator Bit');
+		$self->makeentry($hl,2,0,5,$self->{li},'LI','1.5','Length Indicator');
+		$self->makeentry($hl,2,6,7,$self->{li0},'LI0','1.6','Spare Bits');
+		$sio = 3;
+	}
+	if ($self->{li} > 3) {
+		$hl->add('2',-itemtype=>'text',-text=>'L3',);
+		$hl->itemCreate('2',1,-text=>' ********');
+		$hl->itemCreate('2',3,-text=>'L3 Header');
+		$hl->indicator('create','2',-itemtype=>'image',-image=>$self->{tree}->{2});
+		my ($desc,$mtyp);
+		if (exists $mtypes{$self->{si}}) {
+			$mtyp = "\U$mtypes{$self->{si}}->{0}->[0]\E";
+			$desc = "Service Indicator: $mtyp";
+		} else {
+			$mtyp = 'L4';
+			$desc = "Service Indicator: ($self->{si}) Unknown.";
+		}
+		$self->makeentry($hl,$sio,0,3,$self->{si},'SI','2.3',$desc,);
+		$self->makeentry($hl,$sio,4,5,$self->{mp},'MP','2.2',{
+				0=>'Message Priority 0',
+				1=>'Message Priority 1',
+				2=>'Message Priority 2',
+				3=>'Message Priority 3',});
+		$self->makeentry($hl,$sio,6,7,$self->{ni},'NI','2.1',{
+				0=>'Network Indicator: International',
+				1=>'Network Indicator: International (spare)',
+				2=>'Network Indicator: National',
+				3=>'Network Indicator: National (spare)',});
+		$self->makeentry($hl,4,0,23,$self->{opc},"\nOPC\n",'2.4',"Originating Point Code",[\&SP::pcstring,$self->{opc}]);
+		$self->makeentry($hl,7,0,23,$self->{dpc},"\nDPC\n",'2.5',"Destination Point Code",[\&SP::pcstring,$self->{dpc}]);
+		$self->makeentry($hl,10,0,7,$self->{sls},'SLS','2.6','Signalling Link Selection');
+		$hl->add('3',-itemtype=>'text',-text=>$mtyp,);
+		$hl->itemCreate('3',1,-text=>' ********');
+		$hl->itemCreate('3',3,-text=>"$mtyp Header");
+		$hl->indicator('create','3',-itemtype=>'image',-image=>$self->{tree}->{3});
+		if (exists $mtypes{$self->{si}}->{$self->{mt}}) {
+			$desc = "Message Type: \U$mtypes{$self->{si}}->{$self->{mt}}->[0]\E";
+		} else {
+			$desc = "Message Type: ($self->{mt}) Unknown.";
+		}
+		if ($self->{si} == 0) {
+			$self->makeentry($hl,11,0,7,$self->{mt},'MT','3.1',$desc,);
+		} elsif ($self->{si} == 1 || $self->{si} == 2) {
+			$self->makeentry($hl,11,0,7,$self->{mt},'MT','3.1',$desc,);
+			if ($self->{datalink}->{rt} == ::RT_24BIT_PC) {
+				$self->makeentry($hl,12,0,3,$self->{slc},'SLC','3.2','Signalling Link Code');
+			} else {
+				$self->makeentry($hl,12,0,3,$self->{slc},'SLC','3.2','Signalling Link Code');
+			}
+			$self->makeentry($hl,12,4,7,$self->{dlen},'DLEN','3.3','Test Data Length');
+		} elsif ($self->{si} == 3) {
+			$self->makeentry($hl,11,0,7,$self->{mt},'MT','3.1',$desc,);
+			$hl->add('4',-itemtype=>'text',-text=>'L5',);
+			$hl->itemCreate('4',1,-text=>' ********');
+			$hl->itemCreate('4',3,-text=>'L5 Header');
+			$hl->indicator('create','4',-itemtype=>'image',-image=>$self->{tree}->{4});
+		} elsif ($self->{si} == 5) {
+			$self->makeentry($hl,12,0,15,$self->{cic},"CIC",'3.1','Circuit Identification Code');
+			$self->makeentry($hl,14,0,7,$self->{mt},'MT','3.2',$desc,);
+			$hl->add('4',-itemtype=>'text',-text=>'L5',);
+			$hl->itemCreate('4',1,-text=>' ********');
+			$hl->itemCreate('4',3,-text=>'Parameters');
+			$hl->indicator('create','4',-itemtype=>'image',-image=>$self->{tree}->{4});
+			my $mt = $self->{mt};
+		}
+	}
+}
+
+# -------------------------------------
+package M2paMessage; use strict;
+@M2paMessage::ISA = qw(Message);
+# -------------------------------------
+
+sub decode {
+	my ($self,$datalink,@args) = @_;
+	my ($off,$len,$dat) = (\$self->{off},\$self->{len},\$self->{dat});
+	my ( $vers, $resv, $clas, $type,)
+		= unpack('CCCC',substr($$dat,$$off,4));
+	return -1 if $vers != 1 || $clas != 11 || $type != 1 || $$len < 20;
+	( $self->{li}, $self->{bsn}, $self->{fsn}, )
+		= unpack('NNN',substr($$dat,$$off+4,12));
+	$self->{bsn} &= 0x00ffffff;
+	$self->{fsn} &= 0x00ffffff;
+	$self->{li} -= 16;
+	return -1 if $self->{li} < 8;
+	$$off += 16; $$len -= 16;
+	$self->{li0} = unpack('C',substr($$dat,$$off,1)) >> 6;
+	$$off += 1; $$len -= 1;
+	if ($$len < $self->{li}) {
+		print STDERR "W: $self: bad length indicator $self->{li} != $$len\n";
+	}
+	if ($self->{li0} != 0) {
+		$datalink->setrt(::RT_24BIT_PC);
+		$datalink->setpr(::MP_JAPAN);
+	}
+	bless $self, 'Mtp3Message';
+	return $self->decode($datalink,@args);
+}
+
+# -------------------------------------
+package M2uaMessage; use strict;
+@M2uaMessage::ISA = qw(Message);
+# -------------------------------------
+
+sub decode {
+	my ($self,$top,$network,$datalink,@args) = @_;
+	my ($off,$len,$dat) = (\$self->{off},\$self->{len},\$self->{dat});
+	my ( $vers, $resv, $clas, $type )
+		= unpack('CCCC',substr($$dat,$$off,4));
+	my $mlen = unpack('N',substr($$dat,$$off+4,4));
+	return -1 if $vers != 1 || $clas != 6 || $type != 1 || $$len < 28 || $$len < $mlen;
+	$$off += 8; $$len -= 8; $self->{li} -= 8;
+	my ( $t, $l ) = unpack('nn',substr($$dat,$$off,4));
+	return -1 if $t != 0x1 and $t != 0x3;
+	return -1 if $t == 0x1 and $l != 8;
+	$$off += 4; $$len -= 4;
+	if ($t == 0x1) {
+		$self->{iid} = unpack('N',substr($$dat,$$off,4));
+	} else {
+		$self->{iid} = substr($$dat,$$off,$l-4);
+	}
+	my $plen = ($l+3)&(~0x3) - 4;
+	$$off += $plen; $$len -= $plen;
+	( $t,$l ) = unpack('nn',substr($$dat,$$off,4));
+	return -1 if $t != 0x300 && $t != 0x301;
+	$$off += 4; $$len -= 4;
+	$plen = ($l+3)&(~0x3) - 4;
+	$$len = $$off + $plen;
+	if ($t == 0x301) {
+		$datalink->setrt(::RT_24BIT_PC);
+		$datalink->setpr(::MP_JAPAN);
+		$self->{li0} = unpack('C',substr($$dat,$$off,1)) >> 6;
+		$self->{mp} = $self->{li0};
+		$$off++; $$len--;
+	}
+	my $interface = M2UA_Interface->get($top,$network,$datalink,$self->{iid},$self);
+	$self->{interface} = $interface;
+	bless $self, 'Mtp3Message';
+	return $self->decode($interface,@args);
+}
+
+# -------------------------------------
+package M3uaMessage; use strict;
+@M3uaMessage::ISA = qw(Message);
+# -------------------------------------
+# The M3UA message contains an M3UA messag header (4-bytes), some number of
+# optional TLV parametes, an RC TLV parameter, a protocol data parameter that
+# contains the sio and all routing label fields.  The pdu starts with the first
+# by of the MTP User part message following the routing label.
+# -------------------------------------
+
+sub decode {
+	my ($self,$top,$network,$datalink,@args) = @_;
+	my ($off,$len,$dat) = (\$self->{off},\$self->{len},\$self->{dat});
+	return -1 if 4 < $$len; 
+	return -1 if unpack('N',substr($$dat,$$off,4)) != 0x01000101;
+	$$off+=4; $$len-=4;
+	my ($doff,$dlen);
+	while ($$len >= 4) {
+		my ($ptag,$plen) = unpack('nn',substr($$dat,$$off,4));
+		     if ($ptag == 0x0200) { # NA
+			return -1 if $plen != 8 || $plen > $$len;
+			$self->{na} = unpack('N',substr($$dat,$$off+4,4));
+		} elsif ($ptag == 0x0006) { # RC
+			return -1 if $plen != 8 || $plen > $$len;
+			$self->{rc} = unpack('N',substr($$dat,$$off+4,4));
+		} elsif ($ptag == 0x0210) { # Protocol data
+			return -1 if $plen < 12 || $plen > $len;
+			(
+				$self->{opc},
+				$self->{dpc},
+				$self->{si},
+				$self->{ni},
+				$self->{mp},
+				$self->{sls},
+			) =
+			unpack('NNCCCC', substr($$dat,$$off+4,12));
+			$dlen = $plen - 16;
+			$doff = $$off + 16;
+		} elsif ($ptag == 0x0013) { # Correlation Id
+			return -1 if $plen != 8 || $plen > $$len;
+			$self->{cid} = unpack('N',substr($$dat,$$off+4,4));
+		} else {
+		}
+		$plen = ($plen+3)&(~0x3);
+		return -1 if $plen > $$len; 
+		$$off += $plen; $$len -= $plen;
+	}
+	return -1 unless defined $dlen and defined $doff;
+
+	unless (exists $mtypes{$self->{si}}) {
+		print STDERR "W: $self: no message type for si=$self->{si}\n";
+	}
+	if ($self->{ni} == 0) {
+		$datalink->setrt(::RT_14BIT_PC);
+		$datalink->setpr(::MP_INTERNATIONAL);
+	}
+	if ($datalink->{pr} == ::MP_UNKNOWN) {
+		$datalink->setpr(::MP_NATIONAL) if $self->{mp} != 0;
+	} elsif ($datalink->{pr} == ::MP_INTERNATIONAL) {
+		$self->{mp} = 0;
+	}
+	$self->setrt(::RT_24BIT_PC) if ($self->{dpc}|$self->{opc})&(~0x3fff);
+	$self->Setpr(::MP_NATIONAL) if $self->{mp} != 0;
+
+	$self->{rc} = 0 unless exists $self->{rc};
+	my $routing = M3UA_Routing->get($top,$network,$datalink,$self->{rc},$self);
+	$self->{routing} = $routing;
+	return 1;
+}
+
+# -------------------------------------
+package SuaMessage; use strict;
+@SuaMessage::ISA = qw(Message);
+# -------------------------------------
+
+sub decode {
+	my ($self,$datalink,@args) = @_;
+	my ($off,$len,$dat) = (\$self->{off},\$self->{len},\$self->{dat});
+}
+
+# -------------------------------------
+package Mtp2Message; use strict;
+@Mtp2Message::ISA = qw(Message);
+# -------------------------------------
+
+sub decode {
+	my ($self,$datalink,@args) = @_;
+	my ($off,$len,$dat) = (\$self->{off},\$self->{len},\$self->{dat});
+	if ($datalink->{ht} == ::HT_UNKNOWN) {
+		if (3 <= $$len && $$len <= 5) {
+			$datalink->setht(::HT_BASIC);
+		} elsif (6 <= $$len && $$len <= 8) {
+			$datalink->setht(::HT_EXTENDED);
+		} else {
+			return 0;
+		}
+	}
+	if ($datalink->{ht} == ::HT_BASIC) {
+		(
+			$self->{bsn},
+			$self->{fsn},
+			$self->{li},
+		)
+		= unpack('CCC',substr($$dat,$$off,3));
+
+		$self->{bib} = ($self->{bsn} >> 7) & 0x01; $self->{bsn} &= 0x7f;
+		$self->{fib} = ($self->{fsn} >> 7) & 0x01; $self->{fsn} &= 0x7f;
+		$self->{li0} = ($self->{li}  >> 6) & 0x03; $self->{li}  &= 0x3f;
+		$$off += 3; $$len -= 3;
+	} else {
+		(
+			$self->{bsn},
+			$self->{fsn},
+			$self->{li},
+		)
+		= unpack('vvv',substr($$dat,$$off,6));
+
+		$self->{bib} = ($self->{bsn} >> 15) & 0x0001; $self->{bsn} &= 0x0fff;
+		$self->{fib} = ($self->{fsn} >> 15) & 0x0001; $self->{fsn} &= 0x0fff;
+		$self->{li0} = ($self->{li}  >> 14) & 0x0003; $self->{li}  &= 0x01ff;
+		$$off += 6; $$len -= 6;
+	}
+	if (($self->{li} != $$len) && ($$len <= 63 || $self->{li} != 63)) {
+		print STDERR "W: $self: bad length indicator $self->{li} != $$len\n";
+	}
+	if ($self->{li0} != 0) {
+		$datalink->setrt(::RT_24BIT_PC);
+		$datalink->setpr(::MP_JAPAN);
+	}
+	if ($self->{li} == 0) {
+		bless $self,'FisuMessage';
+		return 1;
+	}
+	$self->{si} = unpack('C',substr($$dat,$$off,1));
+	if ($self->{li} < 2) {
+		$$off += 1; $$len -= 1;
+		bless $self,'LssuMessage';
+		return 1;
+	}
+	if ($self->{li} < 3) {
+		$$off += 2; $$len -= 2;
+		bless $self,'Lss2Message';
+		return 1;
+	}
+	bless $self,'Mtp3Message';
+	return $self->decode($datalink,@args);
+}
+
+# -------------------------------------
+package Mtp3Message; use strict;
+@Mtp3Message::ISA = qw(Message);
+# -------------------------------------
+
+sub decode {
+	my ($self,$datalink,@args) = @_;
+	my ($off,$len,$dat) = (\$self->{off},\$self->{len},\$self->{dat});
+
+	$self->{si} = unpack('C',substr($$dat,$$off,1));
+	$self->{ni} = ($self->{si} >> 6) & 0x03;
+	$self->{mp} = ($self->{si} >> 4) & 0x03;
+	$self->{si} &= 0x0f;
+	unless (exists $mtypes{$self->{si}}) {
+		print STDERR "W: $self: no message type for si=$self->{si}\n";
+	}
+	if ($self->{ni} == 0) {
+		$datalink->setrt(::RT_14BIT_PC);
+		$datalink->setpr(::MP_INTERNATIONAL);
+	}
+	if ($datalink->{pr} == ::MP_UNKNOWN) {
+		$datalink->setpr(::MP_NATIONAL) if $self->{mp} != 0;
+	} elsif ($datalink->{pr} == ::MP_JAPAN) {
+		$self->{mp} = $self->{li0};
+	} elsif ($datalink->{pr} == ::MP_INTERNATIONAL) {
+		$self->{mp} = 0;
+	}
+	if ($self->{li} < ::HT_EXTENDED) {
+		print STDERR "W: $self: too short for RL, li = $self->{li}\n";
+		return -1;
+	}
+	if ($self->{li} < 9 || ($self->{si} == 5 && $self->{li} < 11)) {
+		$datalink->setrt(::RT_14BIT_PC);
+	}
+	if ($datalink->{rt} == ::RT_UNKNOWN) {
+		my @b = (unpack('C*', substr($$dat, $$off, 11)));
+		my $ret = $self->checkRoutingLabelType($self->{si},$datalink,$self->{li},\@b);
+		if ($ret <= 0) {
+			return $ret;
+		}
+	}
+	return 0 if $datalink->detecting;
+	$$off++; $$len--;
+	if ($datalink->{rt} == ::RT_14BIT_PC) {
+		if ($self->{li} < 6) {
+			print STDERR "W: $self: too short for 14-bit RL, li = $self->{li}\n";
+			return -1;
+		}
+		$self->{dpc} = (unpack('v',substr($$dat,$$off+0,2)) >> 0) & 0x3fff;
+		$self->{opc} = (unpack('V',substr($$dat,$$off+1,4)) >> 2) & 0x3fff;
+		$self->{sls} = (unpack('C',substr($$dat,$$off+3,1)) >> 4) & 0x0f;
+		$$off += 4; $$len -= 4;
+	} else {
+		if ($self->{li} < 9) {
+			print STDERR "W: $self: too short for 24-bit RL, li = $self->{li}\n";
+			return -1;
+		}
+		$self->{dpc} = unpack('V',substr($$dat,$$off+0,4)) & 0x00ffffff;
+		$self->{opc} = unpack('V',substr($$dat,$$off+3,4)) & 0x00ffffff;
+		$self->{sls} = unpack('C',substr($$dat,$$off+6,1));
+		$$off += 7; $$len -= 7;
+	}
+	my $type;
+	if ($self->{si} < 4 || $self->{si} == 5) {
+		$type = {
+			0=>'SnmmMessage',
+			1=>'SntmMessage',
+			2=>'SnsmMessage',
+			3=>'SccpMessage',
+			5=>'IsupMessage',
+		}->{$self->{si}};
+	} else {
+		$type = 'UserMessage';
+	}
+	bless $self,$type;
+	return 1;
+}
+
+# -------------------------------------
+package SnmmMessage; use strict;
+@SnmmMessage::ISA = qw(Message);
+# -------------------------------------
+
+sub decode {
+	my ($self,$datalink,@args) = @_;
+	my ($off,$len,$dat) = (\$self->{off},\$self->{len},\$self->{dat});
+	$self->{mt} = unpack('C',substr($$dat,$$off,1));
+	$self->{mt} = (($self->{mt} & 0x0f) << 4) | ($self->{mt} >> 4);
+	unless (exists $mtypes{$self->{si}}->{$self->{mt}}) {
+		print STDERR "W: $self: no message type for si=$self->{si}, mt=$self->{mt}\n";
+		return -1;
+	}
+	return 1;
+}
+
+# -------------------------------------
+package SntmMessage; use strict;
+@SntmMessage::ISA = qw(Message);
+# -------------------------------------
+
+sub decode {
+	my ($self,$datalink,@args) = @_;
+	my ($off,$len,$dat) = (\$self->{off},\$self->{len},\$self->{dat});
+	$self->{mt} = unpack('C',substr($$dat,$$off,1));
+	$self->{mt} = (($self->{mt} & 0x0f) << 4) | ($self->{mt} >> 4);
+	unless (exists $mtypes{$self->{si}}->{$self->{mt}}) {
+		print STDERR "W: $self: no message type for si=$self->{si}, mt=$self->{mt}\n";
+		return -1;
+	}
+	$$off++; $$len--;
+	$self->{dlen0} = unpack('C',substr($$dat,$$off,1)); $$off++; $$len--;
+	$self->{dlen} = $self->{dlen0} >> 4; $self->{dlen0} &= 0x0f;
+	if ($datalink->{rt} == ::RT_14BIT_PC) {
+		$self->{slc} = $self->{sls};
+	} else {
+		$self->{slc} = $self->{dlen0};
+		delete $self->{dlen0};
+	}
+	$self->{tdata} = substr($$dat,$$off,$self->{dlen});
+	$$off+=$self->{dlen}; $$len-=$self->{dlen};
+	bless $self, {0x11=>'SltmMessage',0x12=>'SltaMessage'}->{$self->{mt}};
+	return 1;
+}
+
+# -------------------------------------
+package SnsmMessage; use strict;
+@SnsmMessage::ISA = qw(Message);
+# -------------------------------------
+
+sub decode {
+	my ($self,$datalink,@args) = @_;
+	my ($off,$len,$dat) = (\$self->{off},\$self->{len},\$self->{dat});
+	$self->{mt} = unpack('C',substr($$dat,$$off,1));
+	$self->{mt} = (($self->{mt} & 0x0f) << 4) | ($self->{mt} >> 4);
+	unless (exists $mtypes{$self->{si}}->{$self->{mt}}) {
+		print STDERR "W: $self: no message type for si=$self->{si}, mt=$self->{mt}\n";
+		return -1;
+	}
+	$$off++; $$len--;
+	$self->{dlen0} = unpack('C',substr($$dat,$$off,1)); $$off++; $$len--;
+	$self->{dlen} = $self->{dlen0} >> 4; $self->{dlen0} &= 0x0f;
+	if ($datalink->{rt} == ::RT_14BIT_PC) {
+		$self->{slc} = $self->{sls};
+	} else {
+		$self->{slc} = $self->{dlen0};
+		delete $self->{dlen0};
+	}
+	$self->{tdata} = substr($$dat,$$off,$self->{dlen});
+	$$off+=$self->{dlen}; $$len-=$self->{dlen};
+	bless $self, {0x11=>'SltmMessage',0x12=>'SltaMessage'}->{$self->{mt}};
+	return 1;
+}
+
+# -------------------------------------
+package SccpMessage; use strict;
+@SccpMessage::ISA = qw(Message);
+# -------------------------------------
+
+sub decode {
+	my ($self,$datalink,@args) = @_;
+	my ($off,$len,$dat) = (\$self->{off},\$self->{len},\$self->{dat});
+	$self->{mt} = unpack('C',substr($$dat,$$off,1));
+	unless (exists $mtypes{$self->{si}}->{$self->{mt}}) {
+		print STDERR "W: $self: no message type for si=$self->{si}, mt=$self->{mt}\n";
+	}
+	return 1;
+}
+
+# -------------------------------------
+package IsupMessage; use strict;
+@IsupMessage::ISA = qw(Message);
+# -------------------------------------
+
+sub decode {
+	my ($self,$datalink,@args) = @_;
+	my ($off,$len,$dat) = (\$self->{off},\$self->{len},\$self->{dat});
+	($self->{cic},$self->{mt}) = unpack('vC',substr($$dat,$$off,3));
+	unless (exists $mtypes{$self->{si}}->{$self->{mt}}) {
+		print STDERR "W: $self: no message type for si=$self->{si}, mt=$self->{mt}\n";
+	}
+	return 1;
+}
+
+# -------------------------------------
+package UserMessage; use strict;
+@UserMessage::ISA = qw(Message);
+# -------------------------------------
+
+sub decode {
+	my ($self,$datalink,@args) = @_;
+	my ($off,$len,$dat) = (\$self->{off},\$self->{len},\$self->{dat});
+	$self->{mt} = unpack('C',substr($$dat,$$off,1));
+	unless (exists $mtypes{$self->{si}}->{$self->{mt}}) {
+		print STDERR "W: $self: no message type for si=$self->{si}, mt=$self->{mt}\n";
+	}
+	return 1;
+}
+
+
+
+
+# -------------------------------------
+package Layer; use strict;
+# -------------------------------------
+
+# -------------------------------------
+package PcapLayer; use strict;
+@PcapLayer::ISA = qw(Layer);
+# -------------------------------------
+
+sub create {
+	my ($type,$top,$network,$msg) = @_;
+	my $dltype = $msg->{dltype};
+	my %dltypes = (
+		  1=>'EthernetLayer',
+		113=>'LinuxCookedLayer',
+		139=>'Mtp2WithPhdrLayer',
+	);
+	unless (exists $dltypes{$dltype}) {
+		print STDERR "E: $msg: wrong data link type $dltype\n";
+		return 2;
+	}
+	return $dltypes{$dltype}->create($top,$network,$msg);
+}
+
+# -------------------------------------
+package Mtp2WithPhdrLayer; use strict;
+@Mtp2WithPhdrLayer::ISA = qw(Layer);
+# -------------------------------------
+
+sub create {
+	my ($type,$top,$network,$msg) = @_;
+	return 2 if 4 > $msg->{len};
+	my $hdr = $msg->gethdr(4);
+	my ($dir,$xsn,$ppa) = unpack('CCn',$hdr);
+	$msg->{ppa} = $ppa;
+	$msg->{dir} = ($dir ^ 0x1) & 0x1;
+	$msg->{xsn} = $xsn;
+	$msg->{ht} = $htoptions[[1,2,0]->[$xsn]]->[1];
+	$msg->{datalink} = Channel->get($top,$network,$msg);
+	$msg->{datalink}->process($top,$network,$msg);
+	return 1;
+}
+
+# -------------------------------------
+package EthernetLayer; use strict;
+@EthernetLayer::ISA = qw(Layer);
+# -------------------------------------
+
+sub create {
+	my ($type,$top,$network,$msg) = @_;
+	return 2 if 14 > $msg->{len};
+	my $hdr = $msg->gethdr(14);
+	my $etyp = unpack('n',substr($hdr,12,2));
+	if ($etyp != 0x0800) {
+		printf STDERR "E: $msg: wrong ether type 0x%x08\n", $etyp;
+		return 2;
+	}
+	return IPLayer->create($top,$network,$msg);
+}
+
+# -------------------------------------
+package LinuxCookedLayer; use strict;
+@LinuxCookedLayer::ISA = qw(Layer);
+# -------------------------------------
+
+sub create {
+	my ($type,$top,$network,$msg) = @_;
+	return 2 if 16 > $msg->{len};
+	my $hdr = $msg->gethdr(16);
+	my ($dir,$etyp) = unpack('nn', substr($hdr,0,2).substr($hdr,14,2));
+	if ($etyp != 0x0800) {
+		printf STDERR "E: $msg: wrong ether type 0x%x08\n", $etyp;
+		return 2;
+	}
+	$msg->{dir} = $dir;
+	return IPLayer->create($top,$network,$msg);
+}
+
+# -------------------------------------
+package IPLayer; use strict;
+@IPLayer::ISA = qw(Layer);
+# -------------------------------------
+
+sub create {
+	my ($type,$top,$network,$msg) = @_;
+	return 2 if 20 > $msg->{len};
+	my $byte = unpack('C',substr($msg->{dat},$msg->{off},1));
+	my $vers = ($byte & 0xf0) >> 4;
+	if ($vers != 4) {
+		printf STDERR "E: $msg: only IPv4 supported but vers is $vers\n";
+		return 2;
+	}
+	my $hlen = ($byte & 0x0f) << 2;
+	if ($msg->{len} < $hlen) {
+		print STDERR "E: $msg: packet too short $hlen > $msg->{len}\n";
+		return 2;
+	}
+	my $hdr = $msg->gethdr($hlen);
+	my $plen = unpack('n',substr($hdr,2,2));
+	my ($proto,$csum,$saddr,$daddr) = unpack('CnNN',substr($hdr,9,12));
+	if ($proto != 132) {
+		unless (exists $top->{error}->{ipproto}) {
+			print STDERR "E: $msg: packet is not SCTP packet, proto is $proto\n";
+			print STDERR "E: $msg: improve your IP capture filter.\n";
+			print STDERR "E: $msg: this is your first and only warning.\n";
+			$top->{error}->{ipproto} = 1;
+		return 2;
+	}
+	my $dlen = $plen - $hlen;
+	if ($dlen > $msg->{len}) {
+		print STDERR "E: $msg: packet too short $dlen > $msg->{len}\n";
+		return 2;
+	}
+	$msg->{len} = $dlen;
+	$msg->{saddr} = $saddr;
+	$msg->{daddr} = $daddr;
+	return SCTPLayer->create($top,$network,$msg);
+}
+
+# -------------------------------------
+package Chunk; use strict;
+@Chunk::ISA = qw(Layer);
+# -------------------------------------
+# We don't keep packets explicitly: we keep chunks.  Chunks refer to the packets that
+# contain them, packets do not refer to their chunks.
+# -------------------------------------
+
+sub new {
+	my ($type,$top,$network,$pkt) = @_;
+	my $self = {off=>$pkt->{off},len=>$pkt->{len}};
+	bless $self,$type;
+	return undef if 4 > $self->{len}; 
+	$self->{pkt} = $pkt;
+	my $hdr = $pkt->gethdr(4);
+	(
+		$self->{ctype},
+		$self->{flags},
+		$self->{clen},
+	)
+	= unpack('CCn', $hdr);
+	$self->{off} += 4;
+	$self->{len} = $self->{clen} - 4;
+	my $plen = ($self->{clen}+3)^(~0x3) - 4;
+	return undef if 0 > $plen;
+	$pkt->{off} += $plen;
+	$pkt->{len} -= $plen;
+	my %ctypes = (
+		0=>'DataChunk',		# DATA (0)
+		#1=>'InitChunk',	# INIT (1)
+		#2=>'InitAckChunk',	# INIT ACK (2)
+		3=>'SackChunk',		# SACK (3)
+		#4=>'BeatChunk',	# HEARTBEAT (4)
+		#5=>'BeatAckChunk',	# HEARTBEAT ACK (5)
+		#6=>'AbortChunk',	# ABORT (6)
+		7=>'ShutdownChunk',	# SHUTDOWN (7)
+		#8=>'ShutdownAckChunk',	# SHUTDOWN ACK (8)
+		#9=>'ErrorChunk',	# ERROR (9)
+		#10=>'CookieEchoChunk',	# COOKIE ECHO (10)
+		#11=>'CookieAckChunk',	# COOKIE ACK (11)
+		#14=>'CompleteChunk',	# SHUTDOWN COMPLETE (14)
+	);
+	if (exists $ctypes{$self->{ctype}}) {
+		bless $self, $ctypes{$self->{ctype}};
+	} else {
+		bless $self,'OtherChunk';
+	}
+	return $self->decode($top,$network,$pkt);
+	if ($self->{ctype} == 0) { # DATA
+		return undef if 12 > $pkt->{len};
+		(
+			$self->{tsn},
+			$self->{stream},
+			$self->{ssn},
+			$self->{ppi},
+		)
+		= unpack('NnnN', $pkt->gethdr(12));
+		$self->{off} += 12;
+		$self->{len} -= 12;
+		$plen -= 12;
+		$pkt->{ppi} = $self->{ppi};
+	}
+	return $self;
+}
+
+# -------------------------------------
+package DataChunk; use strict;
+@DataChunk::ISA = qw(Chunk);
+# -------------------------------------
+
+sub decode {
+	my ($self,$top,$network,$pkt) = @_;
+	return undef if 12 > $self->{len};
+	(
+		$self->{tsn},
+		$self->{stream},
+		$self->{ssn},
+		$self->{ppi},
+	) = unpack('NnnN', substr($pkt->{dat}, $self->{off}, 12));
+	$self->{off} += 12; $self->{len} -= 12;
+	$pkt->{ppi} = $self->{ppi};
+	return $self;
+}
+
+# -------------------------------------
+package SackChunk; use strict;
+@SackChunk::ISA = qw(Chunk);
+# -------------------------------------
+
+sub decode {
+	my ($self,$top,$network,$pkt) = @_;
+	return undef if 12 > $self->{len};
+	(
+		$self->{cumm},
+		$self->{a_rwnd},
+		$self->{nacks},
+		$self->{ndups},
+	) = unpack('NNnn', substr($pkt->{dat}, $self->{off}, 12));
+	$self->{off} += 12; $self->{len} -= 12;
+	return $self;
+}
+
+# -------------------------------------
+package ShutdownChunk; use strict;
+@ShutdownChunk::ISA = qw(Chunk);
+# -------------------------------------
+
+sub decode {
+	my ($self,$top,$network,$pkt) = @_;
+	return undef if 4 > $self->{len};
+	(
+		$self->{cumm},
+	) = unpack('N', $pkt->{dat}, $self->{off}, 4);
+	$self->{off} += 4; $self->{len} -= 4;
+	return $self;
+}
+
+# -------------------------------------
+package SCTPLayer; use strict;
+@SCTPLayer::ISA = qw(Layer);
+# -------------------------------------
+
+sub create {
+	my ($type,$top,$network,$msg) = @_;
+	return 2 if 12 > $msg->{len};
+	(
+		$self->{sport},
+		$self->{dport},
+		$self->{vtag},
+	) =
+	unpack('nnNN', $msg->gethdr(12));
+	my ($datalink,$ppi);
+
+	# Unfortunately I want to use SACK and SHUTDOWN chunks to clock out data
+	# that was actually receieved by each end.  To do so, requires
+	# identifying the association without knowing the PPI value (because a
+	# packet could contain just SACK or SHUTDOWN chunks).  This also means,
+	# however, that it is not possible to filter on PPI, just on well-known
+	# port number because there is no PPi in these desired SACK or SHUTDOWN
+	# packets.  So, DATA chunks must belong to associations that have at
+	# least one well-known port number and either a corresponding PPI or a
+	# PPI of zero.
+	#
+	if ($datalink = $self->{datalink} = Association->find($top,$network,$msg)) {
+		$msg->{ppi} = $datalink->{ppi};
+	} else {
+		my %ports = ( 3565=>5, 2904=>2, 2905=>3, 14001=>4 );
+		$ppi = $ports{$self->{sport}} if !defined $ppi and exists $ports{$self->{sport}};
+		$ppi = $ports{$self->{dport}} if !defined $ppi and exists $ports{$self->{dport}};
+		if (defined $ppi) {
+			my %ppis = ( 2=>'M2UA', 3=>'M3UA', 4=>'SUA', 5=>'M2PA' );
+			$datalink->{ppi} = $ppi;
+			$datalink = $self->{datalink} = $ppis{$ppi}.'_Association'->get($top,$network,$msg);
+		}
+	}
+	my @chunks = ();
+	while ($msg->{len} > 0) {
+		my $chunk = Chunk->new($top,$network,$msg);
+		return 2 unless $chunk;
+		push @chunks, $chunk;
+	}
+	unless (defined $datalink) {
+		return 2 unless defined $msg->{ppi};
+		$ppi = $msg->{ppi};
+		my %ppis = ( 2=>'M2UA', 3=>'M3UA', 4=>'SUA', 5=>'M2PA' );
+		$datalink->{ppi} = $ppi;
+		$datalink = $self->{datalink} = $ppis{$ppi}.'_Association'->get($top,$network,$msg);
+	}
+	$datalink->add_pkt($top,$network,$msg,\@chunks);
+	return 1;
+}
+
+# -------------------------------------
+package ULPLayer; use strict;
+@ULPLayer::ISA = qw(Message);
+# -------------------------------------
+
+sub new {
+	my ($type,$top,$network,$dir,$chunks) = @_;
+	my $self = {};
+	bless $self,$type;
+	$self->{chunks} = $chunks;
+	my $first = $chunks->[0];
+	$self->{stream} = $first->{stream};
+	$self->{ppi} = $first->{ppi};
+	$self->{hdr} = $first->{pkt}->{hdr};
+	$self->{dir} = $dir;
+	$self->{dat} = '';
+	foreach my $chunk (@{$chunks}) {
+		$self->{dat} .= substr($chunk->{pkt}->{dat},$chunk->{off},$chunk->{len});
+	}
+	$self->{off} = 0;
+	$self->{len} = length($self->{dat});
+	return $self;
+}
+
+
+# -------------------------------------
+package PcapMessage; use strict;
+# -------------------------------------
+
+sub create {
+	my ($type,$top,$network,$source,$hdr,$dat,$dltype) = @_;
+	my $self = {};
+	bless $self,$type;
+
+	$self->{hdr} = {};
+	foreach (qw/len caplen tv_sec tv_usec/) {
+		$self->{hdr}->{$_} = $hdr->{$_};
+	}
+	$self->{dat} = $dat;
+	$self->{dltype} = $dltype;
+
+	my %dltypes = (
+		  1=>'EthernetMessage',
+		113=>'LinuxCookedMessage',
+		139=>'Mtp2WithPhdrMessage',
+	);
+	unless (exists $dltypes{$dltype}) {
+		print STDERR "E: ".ref($self).": wrong data link type $dltype\n";
+		return undef;
+	}
+	bless $self,$dltypes{$dltype};
+
+	return $self->create($top,$network);
+}
+
+sub process {
+	my ($self,$top,$network) = @_;
+
+	my $datalink = $self->{type}->get($top,$network,$self);
+	$datalink->process($top,$network,$self);
+}
+
+# -------------------------------------
+package Mtp2WithPhdrMessage; use strict;
+@Mtp2WithPhdrMessage::ISA = qw(PcapMessage);
+# -------------------------------------
+
+use constant {
+	MTP2_ANNEX_A_NOT_USED	    => 0,
+	MTP2_ANNEX_A_USED	    => 1,
+	MTP2_ANNEX_A_USED_UNKNOWN   => 2,
+};
+
+sub create {
+	my ($self,$top,$network) = @_;
+
+	$self->{psu} = substr($msg->{dat},0,4,'');
+	my ($dir,$xsn,$ppa) = unpack('CCn',$self->{psu});
+	$xsn = MTP2_ANNEX_A_USED_UNKNOWN unless 0 <= $xsn and $xsn <= 2;
+	my $ht = $htoptions[[1,2,0]->[$xsn]]->[1];
+	unless ($ht) {
+		my ($card,$span,$slot) = Channel::chan($ppa);
+		$ht = $slot ? ::HT_BASIC : ::HT_EXTENDED;
+	}
+	($self->{dir},$self->{xsn},$self->{ppa},$self->{ht})
+		= ($dir,$xsn,$ppa,$ht);
+
+	my $datalink = Channel->get($top,$network,$ppa,$dir,$ht);
+	# correct direction after creating datalink
+	$self->{dir} = ($self->{dir} ^ 0x1) & 0x1;
+
+	$self->{type} = 'Channel';
+	return $self;
 }
 #package Message;
 sub rotext {
