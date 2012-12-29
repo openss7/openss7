@@ -5,7 +5,7 @@
 %
 % =========================================================================
 %
-% Copyright (c) 2008-2009  Monavacon Limited <http://www.monavacon.com/>
+% Copyright (c) 2008-2012  Monavacon Limited <http://www.monavacon.com/>
 % Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
 % Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 %
@@ -108,7 +108,7 @@ This is Edition @value{PACKAGE_RELEASE}@value{PACKAGE_PATCHLEVEL}, last updated 
 @cite{@value{MANUAL_TITLE} @value{MANUAL_TYPE}}, for Version @value{PACKAGE_VERSION}
 Release @value{PACKAGE_RELEASE}@value{PACKAGE_PATCHLEVEL}.
 
-Copyright @copyright{} 2008-2009  @uref{http://www.monavacon.com/, Monavacon Limited} @*
+Copyright @copyright{} 2008-2012  @uref{http://www.monavacon.com/, Monavacon Limited} @*
 Copyright @copyright{} 2001-2008  @uref{http://www.openss7.com/, OpenSS7 Corporation} @*
 Copyright @copyright{} 1997-2001  @email{bidulock@@openss7.org, Brian F. G. Bidulock} @*
 
@@ -157,7 +157,7 @@ THIS DOCUMENT OR THE PERFORMANCE OR IMPLEMENTATION OF THE CONTENTS THEREOF.
 @sp 0.2
 @subtitle Distributed with Package @value{PACKAGE}-@value{VERSION}
 @sp 2
-@subtitle Copyright @copyright{} 2008-2009  Monavacon Limited
+@subtitle Copyright @copyright{} 2008-2012  Monavacon Limited
 @subtitle All Rights Reserved.
 @sp 4
 @quotation
@@ -184,7 +184,7 @@ Edmonton, Alberta  T6L 6T1 @*
 Canada @*
 
 @noindent
-Copyright @copyright{} 2008-2009  @uref{http://www.monavacon.com/, Monavacon Limited} @*
+Copyright @copyright{} 2008-2012  @uref{http://www.monavacon.com/, Monavacon Limited} @*
 Copyright @copyright{} 2001-2008  @uref{http://www.openss7.com/, OpenSS7 Corporation} @*
 Copyright @copyright{} 1997-2000  @email{bidulock@@openss7.org, Brian F. G. Bidulock} @*
 
@@ -446,6 +446,113 @@ currently available from Varion.
 @node Installation
 @chapter Installation
 @cindex installation
+
+@node Monitoring
+@section Monitoring
+@cindex monitoring
+
+Configuring the X400P driver for a monitoring configuration requires the use of
+a monitoring port and monitoring patch cable that is detailed in the sections
+that follow.
+
+@node Monitoring Jack
+@subsection Monitoring Jack
+@cindex monitoring jack
+
+Performing monitoring of T1/J1/E1 ports requires the use of a RJ48 or Bantaam
+monitoring port.  Your T1/J1/E1 ports may already be through an RJ48 or Bantaam
+patch panel (DSX) that is equipped with a monitoring port.  In this case you do
+not need a separate monitoring port: all that is required is a @ref{Monitoring
+Patch Cable}.
+
+If your T1/J1/E1 spans are not patched through a patch panel (DSX) or DACCS,
+you will need a separate monitoring box.  This is normally the case when
+setting up a low-cost monitoring arrangement in the lab.  T1/J1/E1 monitoring
+ports can be purchased from a number of sources; however, monitoring ports tend
+to be expensive (as much a $50 to $150).  While the production monitoring ports
+can be more reliable than the one that we provided instructions for assembling
+here, the lowest cost arrangement by far is to construct your own monitoring
+port.  A monitoring port for a single T1/J1/E1 span can be constructed for as
+little as $6.00.
+
+@node Monitoring Jack Construction
+@subsubsection Monitoring Jack Construction
+@cindex monitoring jack construction
+
+An RJ48 monitoring jack can be constructed from the following parts:
+@sp 1
+@multitable @columnfractions .03 .67 .30
+@item 1
+@tab RJ48 Modular Wall Mount
+@tab $3.99
+@item 2
+@tab 4 x 470 Ohm 1/4W Resistors
+@tab $1.99
+@item 3
+@tab 4 x RJ45 Modular Connectors
+@tab $0.99
+@item 4
+@tab 1 meter Category 5E Cable
+@tab $0.50
+@end multitable
+@sp 1
+Notes:
+@enumerate
+@item
+The RJ48 modular wall mount can be of the type used for telephone and does not
+have to be the more expensive model used for networking.
+@item
+Note that 432 Ohm to 456 Ohm resistors should be used for minimum attenuation;
+however, 470 Ohm resistors are far more common and are sufficient.
+499 Ohm resistors would be too large.
+@item
+RJ45 modular connections should be of the type used for networking (not phone)
+and should match the type of Category 5E cable (solid core or stranded).
+@item
+@end enumerate
+
+
+@node Monitoring Jack Installation
+@subsubsection Monitoring Jack Installation
+@cindex monitoring jack installation
+
+@node Monitoring Patch Cable
+@subsection Monitoring Patch Cable
+@cindex monitoring patch cable
+
+Performing monitoring of T1/J1/E1 ports with the cards supported by the X400P
+driver requires the use of a monitoring patch cable.  This is a 'Y' cable that
+adapts between the RJ48 monitoring port and the ports on the X400P supported
+card.  These cables can be purchased from a number of sources, but are rather
+expensive considering their simplicity.  @ref{Monitoring Patch Cable
+Construction} details how to construct a monitoring patch cable.
+
+@node Monitoring Patch Cable Construction
+@subsubsection Monitoring Patch Cable Construction
+@cindex monitoring patch cable construction
+
+A monitoring patch cable can be constructed from the following parts:
+@sp 1
+@multitable @columnfractions .03 .67 .30
+@item 1
+@tab 3 x RJ45 Modular Connectors
+@tab $0.75
+@item 2
+@tab 1/2 meter Cat-5E Cable
+@tab $0.25
+@end multitable
+@sp 1
+Notes:
+@enumerate
+@item
+RJ45 modular connections should be of the type used for networking (not phone)
+and should match the type of Cat5 cable (solid core or stranded).
+@item
+@end enumerate
+
+@node Monitoring Patch Cable Installation
+@subsubsection Monitoring Patch Cable Installation
+@cindex monitoring patch cable installation
 
 @c ----------------------------------------------------------------------------
 @c ----------------------------------------------------------------------------
