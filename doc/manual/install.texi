@@ -1601,36 +1601,36 @@ The build host requires the following GNU tools:
 
 @multitable @columnfractions .05 .95
 @item @tab @bullet{} @command{m4 1.4.16}
-@item @tab @bullet{} @command{autoconf 2.68}
-@item @tab @bullet{} @command{automake 1.11.1}
-@item @tab @bullet{} @command{libtool 2.4}
-@item @tab @bullet{} @command{gettext 0.18.1}
-@item @tab @bullet{} @command{flex 2.5.35}
-@item @tab @bullet{} @command{bison 2.5}
-@item @tab @bullet{} @command{swig 2.0.4}
+@item @tab @bullet{} @command{autoconf 2.69}
+@item @tab @bullet{} @command{automake 1.12.6}
+@item @tab @bullet{} @command{libtool 2.4.2}
+@item @tab @bullet{} @command{gettext 0.18.2}
+@item @tab @bullet{} @command{flex 2.5.37}
+@item @tab @bullet{} @command{bison 2.7}
+@item @tab @bullet{} @command{swig 2.0.9}
 @item @tab @bullet{} @command{autobuild 5.3}
-@item @tab @bullet{} @command{xz-5.0.3}
+@item @tab @bullet{} @command{xz-5.0.4}
 @end multitable
 
 Most desktop development GNU/Linux distributions will have these tools; however, some non-development
 or server-style installations might not and they must be installed separately.@footnote{Older
 version of bison (2.0) and the older version of flex (2.5.4a) are also suitable.  Where possible,
-use the more recent bison 2.5 and flex 2.5.35.}
+use the more recent bison 2.7 and flex 2.5.37.}
 
 Also, these tools can be acquired from the @url{http://www.fsf.org/,FSF website} in the free
 software directory, and also at the following locations:
 
 @itemize
 @item @url{http://www.openss7.org/tarballs/m4-1.4.16.tar.bz2,m4-1.4.16}
-@item @url{http://www.openss7.org/tarballs/autoconf-2.68.tar.bz2,autoconf-2.68}
-@item @url{http://www.openss7.org/tarballs/automake-1.11.1.tar.bz2,automake-1.11.1}
-@item @url{http://www.openss7.org/tarballs/libtool-2.4.tar.gz,libtool-2.4}
-@item @url{http://www.openss7.org/tarballs/gettext-0.18.1.tar.gz,gettext-0.18.1}
-@item @url{http://www.openss7.org/tarballs/flex-2.5.35.tar.bz2,flex-2.5.35}
-@item @url{http://www.openss7.org/tarballs/bison-2.5.tar.bz2,bison-2.5}
-@item @url{http://www.openss7.org/tarballs/swig-2.0.4.tar.bz2,swig-2.0.4}
+@item @url{http://www.openss7.org/tarballs/autoconf-2.69.tar.xz,autoconf-2.69}
+@item @url{http://www.openss7.org/tarballs/automake-1.12.6.tar.xz,automake-1.12.6}
+@item @url{http://www.openss7.org/tarballs/libtool-2.4.2.tar.gz,libtool-2.4.2}
+@item @url{http://www.openss7.org/tarballs/gettext-0.18.2.tar.gz,gettext-0.18.2}
+@item @url{http://www.openss7.org/tarballs/flex-2.5.37.tar.bz2,flex-2.5.37}
+@item @url{http://www.openss7.org/tarballs/bison-2.7.tar.xz,bison-2.7}
+@item @url{http://www.openss7.org/tarballs/swig-2.0.9.tar.gz,swig-2.0.9}
 @item @url{http://www.openss7.org/tarballs/autobuild-5.3.tar.gz,autobuild-5.3}
-@item @url{http://www.openss7.org/tarballs/xz-5.0.3.tar.bz2,xz-5.0.3}
+@item @url{http://www.openss7.org/tarballs/xz-5.0.4.tar.xz,xz-5.0.4}
 @end itemize
 
 It should be stressed that, in particular, the @manpage{autoconf(1)}, and @manpage{automake(1)},
