@@ -14528,7 +14528,7 @@ mx_iocginfo_card(struct cd *cd, mx_info_t * arg)
 	val->mxCardPciBus = cd->bus;
 	val->mxCardPciSlot = cd->slot;
 	val->mxCardPciIrq = cd->irq;
-	strncpy(val->mxCardName,xp_board_info[cd->board]->name);
+	strncpy(val->mxCardName,xp_board_info[cd->board].name,sizeof(val->mxCardName));
 	return (0);
 }
 
