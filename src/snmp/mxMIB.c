@@ -278,6 +278,15 @@ oid mxCardTypeAT400P_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 1, 11, 1, 4, 1, 8 };
 oid mxCardTypeAE400P_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 1, 11, 1, 4, 1, 9 };
 oid mxCardTypeA400PT_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 1, 11, 1, 4, 1, 10 };
 oid mxCardTypeA400PE_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 1, 11, 1, 4, 1, 11 };
+oid mxCardTypeCP100_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 1, 11, 1, 4, 1, 12 };
+oid mxCardTypeCP100P_oid[14] = { 1, 3, 6, 1, 4, 1, 29591, 1, 11, 1, 4, 1, 12, 1 };
+oid mxCardTypeCP100E_oid[14] = { 1, 3, 6, 1, 4, 1, 29591, 1, 11, 1, 4, 1, 12, 2 };
+oid mxCardTypeCP200_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 1, 11, 1, 4, 1, 13 };
+oid mxCardTypeCP200P_oid[14] = { 1, 3, 6, 1, 4, 1, 29591, 1, 11, 1, 4, 1, 13, 1 };
+oid mxCardTypeCP200E_oid[14] = { 1, 3, 6, 1, 4, 1, 29591, 1, 11, 1, 4, 1, 13, 2 };
+oid mxCardTypeCP400_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 1, 11, 1, 4, 1, 14 };
+oid mxCardTypeCP400P_oid[14] = { 1, 3, 6, 1, 4, 1, 29591, 1, 11, 1, 4, 1, 14, 1 };
+oid mxCardTypeCP400E_oid[14] = { 1, 3, 6, 1, 4, 1, 29591, 1, 11, 1, 4, 1, 14, 2 };
 oid mxChipTypeDS2152_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 1, 11, 1, 4, 2, 1 };
 oid mxChipTypeDS21352_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 1, 11, 1, 4, 2, 2 };
 oid mxChipTypeDS21552_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 1, 11, 1, 4, 2, 3 };
@@ -1773,6 +1782,10 @@ mxCardTable_create(void)
 		StorageNew->mxCardSyncSpanIdLen = 0;
 		StorageNew->mxCardSyncSpanId[StorageNew->mxCardSyncSpanIdLen] = 0;
 		StorageNew->mxCardSyncTransitions = 0;
+		if (memdup((u_char **) &StorageNew->mxCardLeds, (u_char *) "\x00\x00", 2) != SNMPERR_SUCCESS)
+			goto nomem;
+		StorageNew->mxCardLedsLen = 2;
+		StorageNew->mxCardLastChange = 0;
 		if ((StorageNew->mxCardName = malloc(1)) == NULL)
 			goto nomem;
 		StorageNew->mxCardNameLen = 0;
@@ -7541,6 +7554,12 @@ var_mxSpanTable(struct variable *vp, oid * name, size_t *length, int exact, size
 			break;
 		*var_len = sizeof(StorageTmp->mxSpanReceiveThreshold);
 		rval = (u_char *) &StorageTmp->mxSpanReceiveThreshold;
+		break;
+	case (u_char) MXSPANLASTCHANGE:	/* ReadOnly */
+		if (!StorageTmp)
+			break;
+		*var_len = sizeof(StorageTmp->mxSpanLastChange);
+		rval = (u_char *) &StorageTmp->mxSpanLastChange;
 		break;
 	case (u_char) MXSPANROWSTATUS:	/* Create */
 		*write_method = write_mxSpanRowStatus;

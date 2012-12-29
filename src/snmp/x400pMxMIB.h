@@ -70,13 +70,22 @@ extern int sa_request;			/* request number for per-request actions */
 
 /* our storage structure(s) */
 struct x400pMxMIB_data {
+	struct x400pMxMIB_data *x400pMxMIB_old;
+	uint x400pMxMIB_rsvs;
+	uint x400pMxMIB_tsts;
+	uint x400pMxMIB_sets;
 	uint x400pMxMIB_request;
 	ulong x400pCardNextIndex;		/* ReadOnly */
 	long x400pDiscontinuityTime;	/* ReadOnly */
 };
 struct x400pSyncTable_data {
+	struct x400pSyncTable_data *x400pSyncTable_old;
+	uint x400pSyncTable_rsvs;
+	uint x400pSyncTable_tsts;
+	uint x400pSyncTable_sets;
 	uint x400pSyncTable_request;
 	uint x400pSyncTable_refs;
+	uint x400pSyncTable_id;
 	ulong x400pSyncGroup;		/* NoAccess */
 	ulong x400pSyncIndex;		/* NoAccess */
 	uint8_t *x400pSyncSpanId;		/* Create */
@@ -84,9 +93,13 @@ struct x400pSyncTable_data {
 	long x400pSyncRowStatus;		/* Create */
 };
 struct x400pDrivTable_data {
+	struct x400pDrivTable_data *x400pDrivTable_old;
+	uint x400pDrivTable_rsvs;
+	uint x400pDrivTable_tsts;
+	uint x400pDrivTable_sets;
 	uint x400pDrivTable_request;
 	uint x400pDrivTable_refs;
-	char *x400pDrivTable_devname;
+	uint x400pDrivTable_id;
 	uint8_t *x400pDrivName;		/* NoAccess */
 	size_t x400pDrivNameLen;
 	ulong x400pDrivIdnum;		/* ReadOnly */
@@ -107,8 +120,13 @@ struct x400pDrivTable_data {
 	long x400pDrivRowStatus;		/* Create */
 };
 struct x400pCardTable_data {
+	struct x400pCardTable_data *x400pCardTable_old;
+	uint x400pCardTable_rsvs;
+	uint x400pCardTable_tsts;
+	uint x400pCardTable_sets;
 	uint x400pCardTable_request;
 	uint x400pCardTable_refs;
+	uint x400pCardTable_id;
 	uint8_t *x400pDrivName;		/* NoAccess */
 	size_t x400pDrivNameLen;
 	ulong x400pCardIndex;		/* NoAccess */
@@ -151,8 +169,13 @@ struct x400pCardTable_data {
 	long x400pCardStatus;		/* Create */
 };
 struct x400pSpanTable_data {
+	struct x400pSpanTable_data *x400pSpanTable_old;
+	uint x400pSpanTable_rsvs;
+	uint x400pSpanTable_tsts;
+	uint x400pSpanTable_sets;
 	uint x400pSpanTable_request;
 	uint x400pSpanTable_refs;
+	uint x400pSpanTable_id;
 	uint8_t *x400pDrivName;		/* NoAccess */
 	size_t x400pDrivNameLen;
 	ulong x400pCardIndex;		/* NoAccess */
@@ -217,8 +240,13 @@ struct x400pSpanTable_data {
 	long x400pSpanRowStatus;		/* Create */
 };
 struct x400pBertTable_data {
+	struct x400pBertTable_data *x400pBertTable_old;
+	uint x400pBertTable_rsvs;
+	uint x400pBertTable_tsts;
+	uint x400pBertTable_sets;
 	uint x400pBertTable_request;
 	uint x400pBertTable_refs;
+	uint x400pBertTable_id;
 	uint8_t *x400pDrivName;		/* NoAccess */
 	size_t x400pDrivNameLen;
 	ulong x400pCardIndex;		/* NoAccess */
@@ -234,8 +262,13 @@ struct x400pBertTable_data {
 	long x400pBertErrorCount;		/* ReadOnly */
 };
 struct x400pChanTable_data {
+	struct x400pChanTable_data *x400pChanTable_old;
+	uint x400pChanTable_rsvs;
+	uint x400pChanTable_tsts;
+	uint x400pChanTable_sets;
 	uint x400pChanTable_request;
 	uint x400pChanTable_refs;
+	uint x400pChanTable_id;
 	uint8_t *x400pDrivName;		/* NoAccess */
 	size_t x400pDrivNameLen;
 	ulong x400pCardIndex;		/* NoAccess */
@@ -262,8 +295,13 @@ struct x400pChanTable_data {
 	long x400pChanStandbyStatus;	/* ReadOnly */
 };
 struct x400pXconTable_data {
+	struct x400pXconTable_data *x400pXconTable_old;
+	uint x400pXconTable_rsvs;
+	uint x400pXconTable_tsts;
+	uint x400pXconTable_sets;
 	uint x400pXconTable_request;
 	uint x400pXconTable_refs;
+	uint x400pXconTable_id;
 	uint8_t *x400pDrivName;		/* NoAccess */
 	size_t x400pDrivNameLen;
 	ulong x400pCardIndex;		/* NoAccess */
@@ -277,8 +315,13 @@ struct x400pXconTable_data {
 	long x400pXconRowStatus;		/* Create */
 };
 struct x400pNearEndCurrentTable_data {
+	struct x400pNearEndCurrentTable_data *x400pNearEndCurrentTable_old;
+	uint x400pNearEndCurrentTable_rsvs;
+	uint x400pNearEndCurrentTable_tsts;
+	uint x400pNearEndCurrentTable_sets;
 	uint x400pNearEndCurrentTable_request;
 	uint x400pNearEndCurrentTable_refs;
+	uint x400pNearEndCurrentTable_id;
 	uint8_t *x400pDrivName;		/* NoAccess */
 	size_t x400pDrivNameLen;
 	ulong x400pCardIndex;		/* NoAccess */
@@ -296,8 +339,13 @@ struct x400pNearEndCurrentTable_data {
 	long x400pNearEndCurrentLCVs;	/* ReadOnly */
 };
 struct x400pNearEndIntervalTable_data {
+	struct x400pNearEndIntervalTable_data *x400pNearEndIntervalTable_old;
+	uint x400pNearEndIntervalTable_rsvs;
+	uint x400pNearEndIntervalTable_tsts;
+	uint x400pNearEndIntervalTable_sets;
 	uint x400pNearEndIntervalTable_request;
 	uint x400pNearEndIntervalTable_refs;
+	uint x400pNearEndIntervalTable_id;
 	uint8_t *x400pDrivName;		/* NoAccess */
 	size_t x400pDrivNameLen;
 	ulong x400pCardIndex;		/* NoAccess */
@@ -316,8 +364,13 @@ struct x400pNearEndIntervalTable_data {
 	long x400pNearEndIntervalValidData;	/* ReadOnly */
 };
 struct x400pNearEndTotalTable_data {
+	struct x400pNearEndTotalTable_data *x400pNearEndTotalTable_old;
+	uint x400pNearEndTotalTable_rsvs;
+	uint x400pNearEndTotalTable_tsts;
+	uint x400pNearEndTotalTable_sets;
 	uint x400pNearEndTotalTable_request;
 	uint x400pNearEndTotalTable_refs;
+	uint x400pNearEndTotalTable_id;
 	uint8_t *x400pDrivName;		/* NoAccess */
 	size_t x400pDrivNameLen;
 	ulong x400pCardIndex;		/* NoAccess */
@@ -336,8 +389,13 @@ struct x400pNearEndTotalTable_data {
 	long x400pNearEndTotalLCVs;	/* ReadOnly */
 };
 struct x400pFarEndCurrentTable_data {
+	struct x400pFarEndCurrentTable_data *x400pFarEndCurrentTable_old;
+	uint x400pFarEndCurrentTable_rsvs;
+	uint x400pFarEndCurrentTable_tsts;
+	uint x400pFarEndCurrentTable_sets;
 	uint x400pFarEndCurrentTable_request;
 	uint x400pFarEndCurrentTable_refs;
+	uint x400pFarEndCurrentTable_id;
 	uint8_t *x400pDrivName;		/* NoAccess */
 	size_t x400pDrivNameLen;
 	ulong x400pCardIndex;		/* NoAccess */
@@ -354,8 +412,13 @@ struct x400pFarEndCurrentTable_data {
 	long x400pFarEndCurrentDMs;	/* ReadOnly */
 };
 struct x400pFarEndIntervalTable_data {
+	struct x400pFarEndIntervalTable_data *x400pFarEndIntervalTable_old;
+	uint x400pFarEndIntervalTable_rsvs;
+	uint x400pFarEndIntervalTable_tsts;
+	uint x400pFarEndIntervalTable_sets;
 	uint x400pFarEndIntervalTable_request;
 	uint x400pFarEndIntervalTable_refs;
+	uint x400pFarEndIntervalTable_id;
 	uint8_t *x400pDrivName;		/* NoAccess */
 	size_t x400pDrivNameLen;
 	ulong x400pCardIndex;		/* NoAccess */
@@ -373,8 +436,13 @@ struct x400pFarEndIntervalTable_data {
 	long x400pFarEndIntervalValidData;	/* ReadOnly */
 };
 struct x400pFarEndTotalTable_data {
+	struct x400pFarEndTotalTable_data *x400pFarEndTotalTable_old;
+	uint x400pFarEndTotalTable_rsvs;
+	uint x400pFarEndTotalTable_tsts;
+	uint x400pFarEndTotalTable_sets;
 	uint x400pFarEndTotalTable_request;
 	uint x400pFarEndTotalTable_refs;
+	uint x400pFarEndTotalTable_id;
 	uint8_t *x400pDrivName;		/* NoAccess */
 	size_t x400pDrivNameLen;
 	ulong x400pCardIndex;		/* NoAccess */
@@ -785,6 +853,15 @@ extern oid x400pCardTypeAT400P_oid[13];
 extern oid x400pCardTypeAE400P_oid[13];
 extern oid x400pCardTypeA400PT_oid[13];
 extern oid x400pCardTypeA400PE_oid[13];
+extern oid x400pCardTypeCP100_oid[13];
+extern oid x400pCardTypeCP100P_oid[14];
+extern oid x400pCardTypeCP100E_oid[14];
+extern oid x400pCardTypeCP200_oid[13];
+extern oid x400pCardTypeCP200P_oid[14];
+extern oid x400pCardTypeCP200E_oid[14];
+extern oid x400pCardTypeCP400_oid[13];
+extern oid x400pCardTypeCP400P_oid[14];
+extern oid x400pCardTypeCP400E_oid[14];
 extern oid x400pChipTypeDS2152_oid[13];
 extern oid x400pChipTypeDS21352_oid[13];
 extern oid x400pChipTypeDS21552_oid[13];
@@ -823,6 +900,10 @@ void init_x400pMxMIB(void);
 void deinit_x400pMxMIB(void);
 int term_x400pMxMIB(int majorID, int minorID, void *serverarg, void *clientarg);
 FindVarMethod var_x400pMxMIB;
+struct x400pMxMIB_data *x400pMxMIB_create(void);
+struct x400pMxMIB_data *x400pMxMIB_duplicate(struct x400pMxMIB_data *);
+int x400pMxMIB_destroy(struct x400pMxMIB_data **);
+int x400pMxMIB_add(struct x400pMxMIB_data *);
 void parse_x400pMxMIB(const char *, char *);
 SNMPCallback store_x400pMxMIB;
 void refresh_x400pMxMIB(int);
