@@ -57,7 +57,7 @@ include ../../am/openss7.am
 if PKG_BUILD_INDEP
 ## PKG_BUILD_INDEP
 
-SUBDIRS = xcode inet sctp sigtran streams optranex chan
+SUBDIRS = xcode inet sctp sigtran streams # optranex chan
 
 ## PKG_BUILD_INDEP
 endif
