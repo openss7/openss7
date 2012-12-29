@@ -205,6 +205,28 @@ TimesOfWeek ::= TEXTUAL-CONVENTION
                Attribute-ASN1Module.WeekMask"
     SYNTAX      OCTET STRING
 
+DataLinkType ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION 
+        "This textual convention specifies the data link type of a 
+         capture file or interface in a capture file using the 
+         convention of the PCAP and PCAP-NG file formats."
+    REFERENCE   
+        "PCAP/PCAPNG file formst."
+    SYNTAX      INTEGER { null(0), ethernet(1), expether(2), ax25(3), 
+                    pronet(4), chaos(5), tokenring(6), arcnet(7), 
+                    slip(8), ppp(9), fddi(10), ppphdlc(50), pppether(51), 
+                    symantec(99), rfc1483(100), rawip(101), bsdslip(102), 
+                    bsdppp(103), ciscohdlc(104), ieee80211(105), 
+                    atmclip(106), frelay(107), loop(108), enc(109), 
+                    lane8023(110), hippi(111), hdlc(112), linuxsll(113), 
+                    ltalk(114), econet(115), ipfilter(116), pflog(117), 
+                    prism(119), aironet(120), hhdlc(121), rfc2825(122), 
+                    sunatm(123), rio(124), pcie(125), aurora(126), 
+                    ieee80211radio(127), tzsp(128), arcnetlinux(129), 
+                    ipieee1394(138), mtp2ph(139), mtp2(140), mtp3(141), 
+                    sccp(142), docsis(143), irda(144) }
+
 mxMonNotifications OBJECT IDENTIFIER
     ::= { mxMonMIB 1 }
 
@@ -218,6 +240,47 @@ mxMonObjects OBJECT IDENTIFIER
 mxMonitor OBJECT IDENTIFIER
     ::= { mxMonObjects 1 }
 
+mxMonitorName OBJECT-TYPE
+    SYNTAX      SnmpAdminString
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Provides the name of the probe.  The name of the probe can be 
+         changed by writing to this object.  Note that changes will be 
+         be effective in capture files until rotation."
+    ::= { mxMonitor 1 }
+
+mxMonitorHardware OBJECT-TYPE
+    SYNTAX      SnmpAdminString
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Provides as description of the hardware of the probe.  This 
+         information will go in the shb_hardware option field of a 
+         PCAP-NG file captured from this probe."
+    ::= { mxMonitor 2 }
+
+mxMonitorOs OBJECT-TYPE
+    SYNTAX      SnmpAdminString
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Provides the name of the operating system of the probe.  This 
+         information will go in the shb_os option field of a PCAP-NG 
+         section header in a file captured from this probe."
+    ::= { mxMonitor 3 }
+
+mxMonitorUserAppl OBJECT-TYPE
+    SYNTAX      SnmpAdminString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Provides the name of the application and version runnning on 
+         the probe.  This information will go in the shb_userappl option 
+         field of a PCAP-NG section header in a file captured from this 
+         probe."
+    ::= { mxMonitor 4 }
+
 mxMonitorTable OBJECT-TYPE
     SYNTAX      SEQUENCE OF MxMonitorEntry
     MAX-ACCESS  not-accessible
@@ -225,14 +288,14 @@ mxMonitorTable OBJECT-TYPE
     DESCRIPTION 
         "Provides a table of sources that are to be monitored (messages 
          captured)."
-    ::= { mxMonitor 1 }
+    ::= { mxMonitor 5 }
 
 mxMonitorEntry OBJECT-TYPE
     SYNTAX      MxMonitorEntry
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION 
-        "Each row tin the monitor table describes a message source that 
+        "Each row in the monitor table describes a message source that 
          is to be monitored.  Message sources can be entire drivers, 
          entire cards, specific spans or specific channels within a 
          specific span."
@@ -251,6 +314,7 @@ MxMonitorEntry ::= SEQUENCE {
     mxMonitorMsgOctets          Counter32,
     mxMonitorSusCompressed      Counter32,
     mxMonitorMsuDrops           Counter32,
+    mxMonitorFilterDrops        Counter32,
     mxMonitorActiveLinkDirs     Gauge32,
     mxMonitorActiveHslDirs      Gauge32,
     mxMonitorResetCounts        TruthValue,
@@ -369,7 +433,7 @@ mxMonitorAvailStatus OBJECT-TYPE
          - failed(1), the monitor source has an internal fault that 
            prevents it from operating; operational state disabled(1);
          
-         - powerOff(2), the monitor source is not powered one;
+         - powerOff(2), the monitor source is not powered on;
          
          - offLine(3), the monitor source requires a routing operation;
          
@@ -520,6 +584,26 @@ mxMonitorMsuDrops OBJECT-TYPE
          the compressed signal units."
     ::= { mxMonitorEntry 11 }
 
+mxMonitorFilterDrops OBJECT-TYPE
+    SYNTAX      Counter32
+    UNITS       "messages"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Provides a count of the number of messages that were rejected 
+         by a filter.  For an active monitoring source and capture with 
+         a stringent filter, this counter should increase rapidly and 
+         wrap.  The counter can be reset to zero by writing to the 
+         mxMonitorResetCounts column.
+         
+         Note that this counter is also reset to zero by the agent 
+         whenever a capture file is rotated.
+         
+         Note that the mxMonitorCurrent clumn can be read in the same 
+         request to obtain the time stamp corresponding to the read of 
+         the compressed signal units."
+    ::= { mxMonitorEntry 12 }
+
 mxMonitorActiveLinkDirs OBJECT-TYPE
     SYNTAX      Gauge32
     UNITS       "channels"
@@ -535,7 +619,7 @@ mxMonitorActiveLinkDirs OBJECT-TYPE
          file is rotated.  This column is useful for determining whether 
          the appropriate number of signalling links are being monitored 
          for a span, card, driver or default source."
-    ::= { mxMonitorEntry 12 }
+    ::= { mxMonitorEntry 13 }
 
 mxMonitorActiveHslDirs OBJECT-TYPE
     SYNTAX      Gauge32
@@ -552,7 +636,7 @@ mxMonitorActiveHslDirs OBJECT-TYPE
          capture file is rotated.  This is useful for determining 
          whether an appropriate number of signalling links are being 
          monitored for a card, driver or default source."
-    ::= { mxMonitorEntry 13 }
+    ::= { mxMonitorEntry 14 }
 
 mxMonitorResetCounts OBJECT-TYPE
     SYNTAX      TruthValue
@@ -563,7 +647,7 @@ mxMonitorResetCounts OBJECT-TYPE
          mxMonitorMessages, mxMonitorMsgOctets, mxMonitorActiveLinkDirs 
          and mxMonitorActiveHslDirs are reset to zero."
     DEFVAL      { false }
-    ::= { mxMonitorEntry 14 }
+    ::= { mxMonitorEntry 15 }
 
 mxMonitorLastReset OBJECT-TYPE
     SYNTAX      TimeStamp
@@ -576,7 +660,7 @@ mxMonitorLastReset OBJECT-TYPE
          mxMonitorActiveHslDirs were reset to zero.  The intent of this 
          object is to allow some support for scripting at the management 
          station."
-    ::= { mxMonitorEntry 15 }
+    ::= { mxMonitorEntry 16 }
 
 mxMonitorCurrent OBJECT-TYPE
     SYNTAX      TimeStamp
@@ -589,7 +673,7 @@ mxMonitorCurrent OBJECT-TYPE
          for what time interval the counts also read apply.  The intent 
          of this object is to allow some support for scripting at the 
          management station."
-    ::= { mxMonitorEntry 16 }
+    ::= { mxMonitorEntry 17 }
 
 -- =====================================================================
 -- mxCapture group
@@ -610,6 +694,16 @@ mxCaptureNameString OBJECT-TYPE
          the base name of the file (without file extensions)."
     DEFVAL      { "mxmon-%Y-%M-%D-%H" }
     ::= { mxCapture 1 }
+
+mxCaptureFormat OBJECT-TYPE
+    SYNTAX      INTEGER { pcap(1), pcapng(2) }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Specifies the capture file format.  When written, the change 
+         may not be effective until the next file rotation."
+    DEFVAL      { pcapng }
+    ::= { mxCapture 2 }
 
 mxCaptureAdminState OBJECT-TYPE
     SYNTAX      AdministrativeState
@@ -636,7 +730,7 @@ mxCaptureAdminState OBJECT-TYPE
         "ITU-T Rec. X.735 (1992) | ISO/IEC 10164-6 : 1993, 
                Section 8.1.1.1.3."
     DEFVAL      { unlocked }
-    ::= { mxCapture 2 }
+    ::= { mxCapture 3 }
 
 mxCaptureOpState OBJECT-TYPE
     SYNTAX      OperationalState
@@ -661,7 +755,7 @@ mxCaptureOpState OBJECT-TYPE
         "ITU-T Rec. X.735 (1992) | ISO/IEC 10164-6 : 1993, 
                Section 8.1.1.1.4."
     DEFVAL      { enabled }
-    ::= { mxCapture 3 }
+    ::= { mxCapture 4 }
 
 mxCaptureAvailStatus OBJECT-TYPE
     SYNTAX      AvailabilityStatus
@@ -694,7 +788,7 @@ mxCaptureAvailStatus OBJECT-TYPE
          ITU-T Rec. X.735 (1992) | ISO/IEC 10164-6 : 1993, 
          Section 8.1.1.4.1."
     DEFVAL      { {} }
-    ::= { mxCapture 4 }
+    ::= { mxCapture 5 }
 
 mxCaptureFullAction OBJECT-TYPE
     SYNTAX      FullAction
@@ -713,7 +807,7 @@ mxCaptureFullAction OBJECT-TYPE
            
          Both options are supported by every log."
     DEFVAL      { wrap }
-    ::= { mxCapture 5 }
+    ::= { mxCapture 6 }
 
 mxCaptureMaxSize OBJECT-TYPE
     SYNTAX      Unsigned32
@@ -736,7 +830,7 @@ mxCaptureMaxSize OBJECT-TYPE
         "ITU-T Rec. X.735 (1992) | ISO/IEC 10164-6 : 1993,
                 Section 8.1.1.2.1"
     DEFVAL      { 0 }
-    ::= { mxCapture 6 }
+    ::= { mxCapture 7 }
 
 mxCaptureCurrentSize OBJECT-TYPE
     SYNTAX      Gauge32
@@ -757,7 +851,7 @@ mxCaptureCurrentSize OBJECT-TYPE
         "ITU-T Rec. X.735 (1992) | ISO/IEC 10164-6 : 1993, 
                Section 8.1.1.2.2."
     DEFVAL      { 0 }
-    ::= { mxCapture 7 }
+    ::= { mxCapture 8 }
 
 mxCaptureNumberOfRecords OBJECT-TYPE
     SYNTAX      Gauge32
@@ -770,7 +864,7 @@ mxCaptureNumberOfRecords OBJECT-TYPE
         "ITU-T Rec. X.735 (1992) | ISO/IEC 10164-6 : 1993, 
                Section 8.1.1.2.3."
     DEFVAL      { 0 }
-    ::= { mxCapture 8 }
+    ::= { mxCapture 9 }
 
 mxCaptureAlarmThreshold OBJECT-TYPE
     SYNTAX      LogCapacityAlarmThreshold
@@ -794,7 +888,7 @@ mxCaptureAlarmThreshold OBJECT-TYPE
         "ITU-T Rec. X.735 (1992) | ISO/IEC 10164-6 : 1993, 
                Section 8.1.1.3."
     DEFVAL      { "\x64" }
-    ::= { mxCapture 9 }
+    ::= { mxCapture 10 }
 
 mxCaptureStartTime OBJECT-TYPE
     SYNTAX      TimeStamp
@@ -818,7 +912,7 @@ mxCaptureStartTime OBJECT-TYPE
         "ITU-T Rec. X.735 (1992) | ISO/IEC 10164-6 : 1993, 
                Section 8.1.1.4.2."
     DEFVAL      { 0 }
-    ::= { mxCapture 10 }
+    ::= { mxCapture 11 }
 
 mxCaptureStopTime OBJECT-TYPE
     SYNTAX      TimeStamp
@@ -842,7 +936,7 @@ mxCaptureStopTime OBJECT-TYPE
         "ITU-T Rec. X.735 (1992) | ISO/IEC 10164-6 : 1993, 
                Section 8.1.1.4.2."
     DEFVAL      { 6983120 }
-    ::= { mxCapture 11 }
+    ::= { mxCapture 12 }
 
 mxCaptureIntervalsOfDay OBJECT-TYPE
     SYNTAX      IntervalsOfDay
@@ -864,7 +958,7 @@ mxCaptureIntervalsOfDay OBJECT-TYPE
         "ITU-T Rec. X.735 (1992) | ISO/IEC 10164-6 : 1993, 
                Section 8.1.1.4.3."
     DEFVAL      { "\x00\x00\x17\x3B" }
-    ::= { mxCapture 12 }
+    ::= { mxCapture 13 }
 
 mxCaptureWeekMask OBJECT-TYPE
     SYNTAX      WeekMask
@@ -901,7 +995,7 @@ mxCaptureWeekMask OBJECT-TYPE
         "ITU-T Rec. X.735 (1992) | ISO/IEC 10164-6 : 1993, 
                Section 8.1.1.4.4."
     DEFVAL      { "\x7F\x01\x00\x00\x17\x3B" }
-    ::= { mxCapture 13 }
+    ::= { mxCapture 14 }
 
 mxCaptureRotInterval OBJECT-TYPE
     SYNTAX      TimeInterval
@@ -913,7 +1007,7 @@ mxCaptureRotInterval OBJECT-TYPE
          interval elapses since the last rotation, the file will be 
          rotated.  The time interval of zero is special: it specifies to 
          not rotate files based on interval."
-    ::= { mxCapture 14 }
+    ::= { mxCapture 15 }
 
 mxCaptureRotSize OBJECT-TYPE
     SYNTAX      Unsigned32
@@ -927,7 +1021,7 @@ mxCaptureRotSize OBJECT-TYPE
          When the file exceeds the specified size, the file will be 
          rotated.  The value zero (0) is special: it specifies to not 
          rotate files based on the size of the file."
-    ::= { mxCapture 15 }
+    ::= { mxCapture 16 }
 
 mxCaptureRotNumber OBJECT-TYPE
     SYNTAX      Unsigned32
@@ -941,7 +1035,7 @@ mxCaptureRotNumber OBJECT-TYPE
          be rotated.  The value zero (0) is special: it specifies to not 
          rotate files based on the number of records."
     DEFVAL      { 0 }
-    ::= { mxCapture 16 }
+    ::= { mxCapture 17 }
 
 mxCaptureCachePath OBJECT-TYPE
     SYNTAX      SnmpAdminString
@@ -950,9 +1044,9 @@ mxCaptureCachePath OBJECT-TYPE
     DESCRIPTION 
         "Specifies the file system path to the directory where files are 
          cached while they are being captured.  The default if not 
-         specified on row creation is '/var/local/os7live/cache'."
-    DEFVAL      { "/var/local/os7live/cache" }
-    ::= { mxCapture 17 }
+         specified on row creation is '/var/local/openss7/cache'."
+    DEFVAL      { "/var/local/openss7/cache" }
+    ::= { mxCapture 18 }
 
 mxCaptureSpoolPath OBJECT-TYPE
     SYNTAX      SnmpAdminString
@@ -961,9 +1055,9 @@ mxCaptureSpoolPath OBJECT-TYPE
     DESCRIPTION 
         "Specifies the file system path to the directory where files are 
          spooled once they have been rotated.  The default if not 
-         specified on row creation is '/var/local/os7live/spool'."
-    DEFVAL      { "/var/local/os7live/spool" }
-    ::= { mxCapture 18 }
+         specified on row creation is '/var/local/openss7/spool'."
+    DEFVAL      { "/var/local/openss7/spool" }
+    ::= { mxCapture 19 }
 
 mxCaptureArchivePath OBJECT-TYPE
     SYNTAX      SnmpAdminString
@@ -972,9 +1066,9 @@ mxCaptureArchivePath OBJECT-TYPE
     DESCRIPTION 
         "Specifies the file system path to the directory where files are 
          archived once they have been uploaded.  The default if not 
-         specified on row creation is '/var/local/os7live/archive'"
-    DEFVAL      { "/var/local/os7live/archive" }
-    ::= { mxCapture 19 }
+         specified on row creation is '/var/local/openss7/archive'"
+    DEFVAL      { "/var/local/openss7/archive" }
+    ::= { mxCapture 20 }
 
 mxCaptureArchiveSubdirs OBJECT-TYPE
     SYNTAX      BITS { daily(0), weekly(1), monthly(2), yearly(3) }
@@ -1004,7 +1098,7 @@ mxCaptureArchiveSubdirs OBJECT-TYPE
          The default value on row creation when no set is specified is 
          daily(0) and monthly(2)."
     DEFVAL      { {daily, monthly} }
-    ::= { mxCapture 20 }
+    ::= { mxCapture 21 }
 
 mxCaptureCompression OBJECT-TYPE
     SYNTAX      INTEGER { none(0), gz(1), bz2(2), xz(3), zip(4) }
@@ -1014,7 +1108,7 @@ mxCaptureCompression OBJECT-TYPE
         "When an active capture or correlation file is rotated and 
          spooled it is compressed.  Compression is maintained on the 
          file when it is archived.  This object specifies what 
-         compression to use.  This object is single-values and can have 
+         compression to use.  This object is single-valued and can have 
          one of the following values:
          
          - none(0), no compression, no filename extension;
@@ -1032,7 +1126,7 @@ mxCaptureCompression OBJECT-TYPE
          Zip archive contain the single original file.  The default 
          value if unspecified on row creation is xz(3) compression."
     DEFVAL      { xz }
-    ::= { mxCapture 21 }
+    ::= { mxCapture 22 }
 
 mxCaptureFileSystemAlloc OBJECT-TYPE
     SYNTAX      Unsigned32
@@ -1048,7 +1142,7 @@ mxCaptureFileSystemAlloc OBJECT-TYPE
          When a row is created and this amount is not specified, the 
          default value is 90%."
     DEFVAL      { 90 }
-    ::= { mxCapture 22 }
+    ::= { mxCapture 23 }
 
 mxCaptureMaxDiskUsage OBJECT-TYPE
     SYNTAX      Unsigned32
@@ -1064,7 +1158,7 @@ mxCaptureMaxDiskUsage OBJECT-TYPE
          When a row is created and this amount is not specified, the 
          efault value is 80%."
     DEFVAL      { 80 }
-    ::= { mxCapture 23 }
+    ::= { mxCapture 24 }
 
 mxCaptureDiscardPolicy OBJECT-TYPE
     SYNTAX      INTEGER { ignore(0), oldest(1), largest(2) }
@@ -1085,7 +1179,7 @@ mxCaptureDiscardPolicy OBJECT-TYPE
          When a row is created and this amount is not specified, the 
          default value is oldest(1)."
     DEFVAL      { oldest }
-    ::= { mxCapture 24 }
+    ::= { mxCapture 25 }
 
 mxCaptureUpload OBJECT-TYPE
     SYNTAX      Unsigned32
@@ -1094,7 +1188,7 @@ mxCaptureUpload OBJECT-TYPE
     DESCRIPTION 
         "Provides an index into the mxUploadTable that defines the 
          upload server to which to upload spooled files."
-    ::= { mxCapture 25 }
+    ::= { mxCapture 26 }
 
 mxCaptureTable OBJECT-TYPE
     SYNTAX      SEQUENCE OF MxCaptureEntry
@@ -1102,7 +1196,7 @@ mxCaptureTable OBJECT-TYPE
     STATUS      current
     DESCRIPTION 
         "Provides a table of capture files."
-    ::= { mxCapture 26 }
+    ::= { mxCapture 27 }
 
 mxCaptureEntry OBJECT-TYPE
     SYNTAX      MxCaptureEntry
@@ -1120,14 +1214,17 @@ MxCaptureEntry ::= SEQUENCE {
     mxCaptureName               SnmpAdminString,
     mxCaptureCompressed         INTEGER,
     mxCaptureState              INTEGER,
-    mxCaptureLinkType           INTEGER,
+    mxCaptureLinkType           DataLinkType,
     mxCaptureSize               Gauge32,
     mxCaptureCompSize           Gauge32,
     mxCaptureMessages           Gauge32,
     mxCaptureMsgOctets          Gauge32,
-    mxCaptureInterval           Gauge32,
+    mxCaptureSusCompressed      Gauge32,
+    mxCaptureMsuDrops           Gauge32,
+    mxCaptureFilterDrops        Gauge32,
     mxCaptureActiveLinkDirs     Gauge32,
     mxCaptureActiveHslDirs      Gauge32,
+    mxCaptureInterval           Gauge32,
     mxCaptureBegTime            TimeStamp,
     mxCaptureEndTime            TimeStamp,
     mxCaptureActionResult       INTEGER
@@ -1165,7 +1262,7 @@ mxCaptureCompressed OBJECT-TYPE
     STATUS      current
     DESCRIPTION 
         "Provides the compression applied to the file on the file 
-         system.  Compression is single-values and can assume one of the 
+         system.  Compression is single-valued and can assume one of the 
          following values:
          
          - none(0), the file is not compressed;
@@ -1207,13 +1304,17 @@ mxCaptureState OBJECT-TYPE
     ::= { mxCaptureEntry 4 }
 
 mxCaptureLinkType OBJECT-TYPE
-    SYNTAX      INTEGER { mtp2ph(139), mtp2(140), mtp3(141), sccp(142) }
+    SYNTAX      DataLinkType
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
         "Indicates the PCAP file format link type associated with the 
          capture file.  The link type is single-valued and can assume 
          one of the following values:
+         
+         - ethernet(1), complete ethernet frames;
+         
+         - linuxsll(113), Linux SLL cooked header;
          
          - mtp2ph(139), MTP level 2 with pseudo-header indicating link 
            id and direction;
@@ -1226,7 +1327,9 @@ mxCaptureLinkType OBJECT-TYPE
          - sccp(142), SCCP without pseudo-header; MTP level 2 and 3 
            (link layer) headers are stripped.
            
-         For SS7 monitoring, link types should typically by mtp2ph(139) 
+         For traditional SS7 monitoring, link types should typically be 
+         mtp2ph(139) because it retains the most information.  For 
+         SIGTRAN monitoring, link types should typically be ethernet(1) 
          because it retains the most information."
     ::= { mxCaptureEntry 5 }
 
@@ -1271,16 +1374,36 @@ mxCaptureMsgOctets OBJECT-TYPE
          file."
     ::= { mxCaptureEntry 9 }
 
-mxCaptureInterval OBJECT-TYPE
+mxCaptureSusCompressed OBJECT-TYPE
     SYNTAX      Gauge32
-    UNITS       "milliseconds"
+    UNITS       "SUs"
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        "Indicates the time interval covered by the file.  This is the 
-         difference in time between the last message captured and the 
-         first message captured."
+        "Indicates the number of FISUs or LSSUs that were compressed 
+         due to repetition in the file."
     ::= { mxCaptureEntry 10 }
+
+mxCaptureMsuDrops OBJECT-TYPE
+    SYNTAX      Gauge32
+    UNITS       "MSUs"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Indicates the number of MSUs that were dropped due to 
+         inadequate resources.  This gauge should usually be zero."
+    ::= { mxCaptureEntry 11 }
+
+mxCaptureFilterDrops OBJECT-TYPE
+    SYNTAX      Gauge32
+    UNITS       "messages"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Indicates the number of messages that were rejected by a 
+         filter.  This gauge could be large or small depending on the 
+         stringency of the filter and the amount of traffic filtered."
+    ::= { mxCaptureEntry 12 }
 
 mxCaptureActiveLinkDirs OBJECT-TYPE
     SYNTAX      Gauge32
@@ -1297,7 +1420,7 @@ mxCaptureActiveLinkDirs OBJECT-TYPE
          useful for determining whether the appropriate number of high- 
          and low-speed links have been captured for a span, card, driver 
          or default source."
-    ::= { mxCaptureEntry 11 }
+    ::= { mxCaptureEntry 13 }
 
 mxCaptureActiveHslDirs OBJECT-TYPE
     SYNTAX      Gauge32
@@ -1311,7 +1434,18 @@ mxCaptureActiveHslDirs OBJECT-TYPE
          link for the direction.  This column is useful for determining 
          whether the appropriate number of high- and low-speed links are 
          being captured for a card, driver or default source."
-    ::= { mxCaptureEntry 12 }
+    ::= { mxCaptureEntry 14 }
+
+mxCaptureInterval OBJECT-TYPE
+    SYNTAX      Gauge32
+    UNITS       "milliseconds"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Indicates the time interval covered by the file.  This is the 
+         difference in time between the last message captured and the 
+         first message captured."
+    ::= { mxCaptureEntry 15 }
 
 mxCaptureBegTime OBJECT-TYPE
     SYNTAX      TimeStamp
@@ -1321,7 +1455,7 @@ mxCaptureBegTime OBJECT-TYPE
         "Indicates the time (using the TimeStamp textual convention) 
          that the capture file was opened (capturing of messages to the 
          file began)."
-    ::= { mxCaptureEntry 13 }
+    ::= { mxCaptureEntry 16 }
 
 mxCaptureEndTime OBJECT-TYPE
     SYNTAX      TimeStamp
@@ -1331,7 +1465,7 @@ mxCaptureEndTime OBJECT-TYPE
         "Indicates the time (using the TimeStamp textual convention) 
          that the capture file was closed (capturing of messages to the 
          file ended)."
-    ::= { mxCaptureEntry 14 }
+    ::= { mxCaptureEntry 17 }
 
 mxCaptureActionResult OBJECT-TYPE
     SYNTAX      INTEGER { success(0), failure(1), spool(2), archive(3), 
@@ -1360,7 +1494,161 @@ mxCaptureActionResult OBJECT-TYPE
          upload(5) are valid and represent the action to be performed.  
          When read, only values success(0) or failure(1) will be 
          returned and represent the result of the previous action."
-    ::= { mxCaptureEntry 15 }
+    ::= { mxCaptureEntry 18 }
+
+mxCaptureIfTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF MxCaptureIfEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Provides a table of interfaces associated with a capture file."
+    ::= { mxCapture 28 }
+
+mxCaptureIfEntry OBJECT-TYPE
+    SYNTAX      MxCaptureIfEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Each row in the mxCaptureIfTable provides information 
+         concerning a single interface with data contained in the 
+         capture file and provides some actions that can be performed on 
+         the interface."
+    INDEX       { mxCaptureIndex, mxCaptureIfIndex }
+    ::= { mxCaptureIfTable 1 }
+
+MxCaptureIfEntry ::= SEQUENCE {
+    mxCaptureIfIndex            Unsigned32,
+    mxCaptureIfLinkType         DataLinkType,
+    mxCaptureIfSnapLen          Unsigned32,
+    mxCaptureIfName             SnmpAdminString,
+    mxCaptureIfDescription      SnmpAdminString,
+    mxCaptureIfMacAddr          OCTET STRING,
+    mxCaptureIfEuiAddr          OCTET STRING,
+    mxCaptureIfSpeed            Unsigned32,
+    mxCaptureIfTsRes            Unsigned32,
+    mxCaptureIfTzone            Unsigned32,
+    mxCaptureIfFilter           SnmpAdminString,
+    mxCaptureIfOs               SnmpAdminString,
+    mxCaptureIfFcsLen           Unsigned32,
+    mxCaptureIfTsOffset         Unsigned32
+}
+
+mxCaptureIfIndex OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Provides an positive ordinal index (beginning at 0) into the 
+         mxCaptureIfTable identifying the interface associated with this 
+         conceptual row.  This index also corresponds to the ordinal 
+         index of the interface description block that appears in the 
+         pcapng file."
+    ::= { mxCaptureIfEntry 1 }
+
+mxCaptureIfLinkType OBJECT-TYPE
+    SYNTAX      DataLinkType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Identifies the tcpdump data link type associated with this 
+         interface."
+    ::= { mxCaptureIfEntry 2 }
+
+mxCaptureIfSnapLen OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "TODO"
+    ::= { mxCaptureIfEntry 3 }
+
+mxCaptureIfName OBJECT-TYPE
+    SYNTAX      SnmpAdminString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "TODO"
+    ::= { mxCaptureIfEntry 4 }
+
+mxCaptureIfDescription OBJECT-TYPE
+    SYNTAX      SnmpAdminString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "TODO"
+    ::= { mxCaptureIfEntry 5 }
+
+mxCaptureIfMacAddr OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "TODO"
+    ::= { mxCaptureIfEntry 6 }
+
+mxCaptureIfEuiAddr OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "TODO"
+    ::= { mxCaptureIfEntry 7 }
+
+mxCaptureIfSpeed OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "TODO"
+    ::= { mxCaptureIfEntry 8 }
+
+mxCaptureIfTsRes OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "TODO"
+    ::= { mxCaptureIfEntry 9 }
+
+mxCaptureIfTzone OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "TODO"
+    ::= { mxCaptureIfEntry 10 }
+
+mxCaptureIfFilter OBJECT-TYPE
+    SYNTAX      SnmpAdminString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "TODO"
+    ::= { mxCaptureIfEntry 11 }
+
+mxCaptureIfOs OBJECT-TYPE
+    SYNTAX      SnmpAdminString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "FIXME"
+    ::= { mxCaptureIfEntry 12 }
+
+mxCaptureIfFcsLen OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "FIXME"
+    ::= { mxCaptureIfEntry 13 }
+
+mxCaptureIfTsOffset OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "FIXME"
+    ::= { mxCaptureIfEntry 14 }
 
 -- =====================================================================
 -- mxPush group
@@ -1716,7 +2004,7 @@ mxUploadUsername OBJECT-TYPE
         "Provides a username for use with the upload string when 
          required.  A username will not be provided unless demanded by 
          the remote server."
-    DEFVAL      { "os7live" }
+    DEFVAL      { "openss7" }
     ::= { mxUploadEntry 3 }
 
 mxUploadPassword OBJECT-TYPE
@@ -1728,7 +2016,7 @@ mxUploadPassword OBJECT-TYPE
          required.  A password will not be provided unless demanded by 
          the remote server.  A read of this object will only return the 
          number of '*' characters equal to the length of the password."
-    DEFVAL      { "os7live" }
+    DEFVAL      { "openss7" }
     ::= { mxUploadEntry 4 }
 
 mxUploadAdminState OBJECT-TYPE
@@ -1830,7 +2118,7 @@ mxDownloadUsername OBJECT-TYPE
         "Provides a username for use with the download string when 
          required.  A username will not be provided unless demanded by 
          the remote server."
-    DEFVAL      { "os7live" }
+    DEFVAL      { "openss7" }
     ::= { mxDownloadEntry 3 }
 
 mxDownloadPassword OBJECT-TYPE
@@ -1842,7 +2130,7 @@ mxDownloadPassword OBJECT-TYPE
          required.  A password will not be provided unless demanded by 
          the remote server.  A read of this object will only return the 
          number of '*' characters equal to the length of the password."
-    DEFVAL      { "os7live" }
+    DEFVAL      { "openss7" }
     ::= { mxDownloadEntry 4 }
 
 mxDownloadAdminState OBJECT-TYPE
@@ -3061,9 +3349,9 @@ mxMonMonitorGroup OBJECT-GROUP
                   mxMonitorProcStatus, mxMonitorUsageState, 
                   mxMonitorMessages, mxMonitorMsgOctets, 
                   mxMonitorSusCompressed, mxMonitorMsuDrops, 
-                  mxMonitorActiveLinkDirs, mxMonitorActiveHslDirs, 
-                  mxMonitorResetCounts, mxMonitorLastReset, 
-                  mxMonitorCurrent }
+                  mxMonitorFilterDrops, mxMonitorActiveLinkDirs, 
+                  mxMonitorActiveHslDirs, mxMonitorResetCounts, 
+                  mxMonitorLastReset, mxMonitorCurrent }
     STATUS      current
     DESCRIPTION 
         "A collection of objects providing managements of monitor 
@@ -3094,9 +3382,11 @@ mxMonCaptureTableGroup OBJECT-GROUP
     OBJECTS     { mxCaptureName, mxCaptureCompressed, mxCaptureState, 
                   mxCaptureLinkType, mxCaptureSize, mxCaptureCompSize, 
                   mxCaptureMessages, mxCaptureMsgOctets, 
-                  mxCaptureInterval, mxCaptureActiveLinkDirs, 
-                  mxCaptureActiveHslDirs, mxCaptureBegTime, 
-                  mxCaptureEndTime, mxCaptureActionResult }
+                  mxCaptureSusCompressed, mxCaptureMsuDrops, 
+                  mxCaptureFilterDrops, mxCaptureActiveLinkDirs, 
+                  mxCaptureActiveHslDirs, mxCaptureInterval, 
+                  mxCaptureBegTime, mxCaptureEndTime, 
+                  mxCaptureActionResult }
     STATUS      current
     DESCRIPTION 
         "A collection of tabular objects that control individual files 
