@@ -21,6 +21,8 @@ use Goo::Canvas;
 
 use Convert::Color;
 
+use DBI;
+
 our    $blue_rgba = hex(Convert::Color->new("x11:blue"   )->as_rgb8->hex.'70');
 our   $blue4_rgba = hex(Convert::Color->new("x11:blue4"  )->as_rgb8->hex.'70');
 our  $orange_rgba = hex(Convert::Color->new("x11:orange" )->as_rgb8->hex.'70');
@@ -35,6 +37,32 @@ our $magenta_rgba = hex(Convert::Color->new("x11:magenta")->as_rgb8->hex.'70');
 our   $green_rgba = hex(Convert::Color->new("x11:green"  )->as_rgb8->hex.'70');
 our    $grey_rgba = hex(Convert::Color->new("x11:grey"   )->as_rgb8->hex.'70');
 
+sub vh2ll {
+	my ($v,$h) = @_;
+	my ($la,$lo);
+	if ($v and $h) {
+		($la,$lo) = Geo::Coordinates::VandH->new()->vh2ll($v,$h);
+	}
+	return ($la,$lo);
+}
+sub ll2xy {
+	my ($y,$x) = @_;
+	my $scalex = 1920/360;
+	my $scaley = 1200/180;
+	$x += 180; $x -= 360 if $x > 360;
+	$x = 360 - $x;
+	$x *= $scalex;
+	$y = 90 - $y;
+	$y *= $scaley;
+	return ($x,$y);
+}
+sub vh2xy {
+	my ($v,$h) = @_;
+	my ($y,$x) = vh2ll($v,$h);
+	($x,$y) = ll2xy($y,$x) if $y and $x;
+	return ($x,$y);
+
+}
 #------------------------------
 package MyTop; use strict;
 use Gtk2;
@@ -749,6 +777,97 @@ sub plotlocal {
 		}
 	}
 }
+sub plotdbi {
+	my $self = shift;
+	my $root = $self->{Canvas}->get_root_item;
+	my $dbh = DBI->connect("DBI:SQLite:$datadir/joindata.sqlite",undef,undef,{ReadOnly=>1}) or die "can't open $datadir/joindata.sqlite";
+	my ($sql,$sth);
+	$sql = "SELECT exch,exshort,region,exlata,rcv,rch,rclat,rclon FROM exdata;\n";
+	$sth = $dbh->prepare($sql) or die $dbh->errstr;
+	$sth->execute or die $sth->errstr;
+	while (my $row = $sth->fetchrow_hashref) {
+		my $rec = { %$row };
+		my $r = 1.5 * 4;
+		my ($x,$y) = ::vh2xy($rec->{rcv},$rec->{rch});
+		next unless $x and $y;
+		my $item = Goo::Canvas::Ellipse->new($root,$x,$y,$r,$r,
+			'antialias'=>'default',
+			'fill-color-rgba'=>$cyan_rgba,
+			'line-width'=>0,
+			'stroke-color'=>'white',
+			'pointer-events'=>'visible',
+		);
+		$item->signal_connect('enter_notify_event'=>sub{
+				my ($item,$targ,$ev,$rec) = @_;
+				my ($v,$h) = ($rec->{rcv},$rec->{rch});
+				my ($la,$lo) = ($rec->{rclat},$rec->{rclon});
+				unless ($v==1) { ($la,$lo) = ::vh2ll($v,$h); $lo = -$lo; }
+				print STDERR "entering ex: $rec->{exch} $rec->{region}-$rec->{exshort} $la,$lo ($v,$h)\n";
+			},$rec);
+		my $st = $rec->{region};
+		my $lt = $rec->{exlata};
+		push @{$self->{items}{$st}}, $item if $st;
+		push @{$self->{latas}{$lt}}, $item if $lt;
+	}
+	$sth->finish;
+	$sql = "SELECT region,rcshort,rclata,rcv,rch,rclat,rclon FROM rcdata;\n";
+	$sth = $dbh->prepare($sql) or die $dbh->errstr;
+	$sth->execute or die $sth->errstr;
+	while (my $row = $sth->fetchrow_hashref) {
+		my $rec = { %$row };
+		my $r = 1.0 * 4;
+		my ($x,$y) = ::vh2xy($rec->{rcv},$rec->{rch});
+		next unless $x and $y;
+		my $item = Goo::Canvas::Ellipse->new($root,$x,$y,$r,$r,
+			'antialias'=>'default',
+			'fill-color-rgba'=>$green4_rgba,
+			'line-width'=>0,
+			'stroke-color'=>'white',
+			'pointer-events'=>'visible',
+		);
+		$item->signal_connect('enter_notify_event'=>sub{
+				my ($item,$targ,$ev,$rec) = @_;
+				my ($v,$h) = ($rec->{rcv},$rec->{rch});
+				my ($la,$lo) = ($rec->{rclat},$rec->{rclon});
+				unless ($v==1) { my ($la,$lo) = ::vh2ll($v,$h); $lo = -$lo; }
+				print STDERR "entering rc: $rec->{region}-$rec->{rcshort} $la,$lo ($v,$h)\n";
+			},$rec);
+		my $st = $rec->{region};
+		my $lt = $rec->{rclata};
+		push @{$self->{items}{$st}}, $item if $st;
+		push @{$self->{latas}{$lt}}, $item if $lt;
+	}
+	$sth->finish;
+	$sql = "SELECT wc,wclata,wcv,wch,wclat,wclon FROM wcdata;\n";
+	$sth = $dbh->prepare($sql) or die $dbh->errstr;
+	$sth->execute or die $sth->errstr;
+	while (my $row = $sth->fetchrow_hashref) {
+		my $rec = { %$row };
+		my $r = 0.5 * 4;
+		my ($x,$y) = ::vh2xy($rec->{wcv},$rec->{wch});
+		next unless $x and $y;
+		my $item = Goo::Canvas::Ellipse->new($root,$x,$y,$r,$r,
+			'antialias'=>'default',
+			'fill-color-rgba'=>$red_rgba,
+			'line-width'=>0,
+			'stroke-color'=>'white',
+			'pointer-events'=>'visible',
+		);
+		$item->signal_connect('enter_notify_event'=>sub{
+				my ($item,$targ,$ev,$rec) = @_;
+				my ($v,$h) = ($rec->{wcv},$rec->{wch});
+				my ($la,$lo) = ($rec->{wclat},$rec->{wclon});
+				unless ($v==1) { ($la,$lo) = ::vh2ll($v,$h); $lo = -$lo; }
+				print STDERR "entering wc: [$rec->{wclata}] $rec->{wc} $la,$lo ($v,$h)\n";
+			},$rec);
+		my $st = substr($rec->{wc},4,2);
+		my $lt = $rec->{wclata};
+		push @{$self->{items}{$st}}, $item if $st;
+		push @{$self->{latas}{$lt}}, $item if $lt;
+	}
+	$sth->finish;
+	$dbh->disconnect;
+}
 sub plotwire {
 	my $self = shift;
 	my $scalex = 1920/360;
@@ -991,25 +1110,26 @@ sub menuFileNew {
 	$self->plotdata($black_rgba,0.15,@lines);
 	@lines = `pscoast -Rd -I2 -Di -m`;
 	$self->plotdata($blue4_rgba,0.05,@lines);
-	$self->readareacodes;
-#	$self->readarea;
-#	$self->readwire;
-#	$self->readlerg7;
-#	$self->readlerg8;
-	$self->readlocal;
-	$self->readneca4;
-	$self->readnpanxxsource;
+#	$self->readareacodes;
+##	$self->readarea;
+##	$self->readwire;
+##	$self->readlerg7;
+##	$self->readlerg8;
+#	$self->readlocal;
+#	$self->readneca4;
+#	$self->readnpanxxsource;
 	$self->readuk;
 	$self->readcc;
-#	$self->plotcity;
-#	$self->plotrate;
-#	$self->plotwire;
-	$self->plotareacodes;
-#	$self->plotlerg7;
-#	$self->plotlerg8;
-	$self->plotlocal;
-	$self->plotneca4;
-	$self->plotnpanxxsource;
+##	$self->plotcity;
+##	$self->plotrate;
+##	$self->plotwire;
+#	$self->plotareacodes;
+##	$self->plotlerg7;
+##	$self->plotlerg8;
+#	$self->plotlocal;
+#	$self->plotneca4;
+#	$self->plotnpanxxsource;
+	$self->plotdbi;
 	$self->plotuk;
 	$self->plotcc;
 	$self->plotgrid;
