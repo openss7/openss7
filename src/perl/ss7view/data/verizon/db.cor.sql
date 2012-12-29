@@ -1,0 +1,5 @@
+UPDATE switchdata SET switch='MIO-MIXGDS0' WHERE switch=='MIO MIXGDS0'; -- FIXED: invalid clli 'MIO MIXGDS0' (VZ-331,VZ-945)
+-- UPDATE switchdata SET switch='CLBGWVMAPLU' WHERE switch=='CLBGWVMAPLU'; -- FIXME: poor equipment code 'PLU' (VZ-626)
+-- UPDATE switchdata SET switch='CMBRMABED03' WHERE switch=='CMBRMABED03'; -- FIXME: poor equipment code 'D03' (VZ-666)
+-- UPDATE switchdata SET switch='BRTNMACOD03' WHERE switch=='BRTNMACOD03'; -- FIXME: poor equipment code 'D03' (VZ-667)
+-- UPDATE switchdata SET switch='JENKPAJKD12' WHERE switch=='JENKPAJKD12'; -- FIXME: poor equipment code 'D12' (VZ-669)

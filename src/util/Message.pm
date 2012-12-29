@@ -82,12 +82,12 @@ sub init {
 	$self->{dir}     = $chk->{dir};
 	$self->{stream}  = $chk->{stream};
 	$self->{chunks}  = [];
-	$decoder->{streams}->{$self->{dir}}->{$self->{stream}} = $self;
+	$decoder->{streams}{$self->{dir}}{$self->{stream}} = $self;
 }
 #package Decoder::Stream;
 sub fini {
 	my $self = shift;
-	delete $decoder->{streams}->{$self->{dir}}->{$self->{stream}}
+	delete $decoder->{streams}{$self->{dir}}{$self->{stream}}
 		if my $decoder = $self->{decoder};
 	foreach (qw(decoder stream chunks)) { delete $self->{$_} }
 }
@@ -185,34 +185,34 @@ sub tst_pdu_SCTP {
 sub add_chk_DATA {
 	my ($self,$chk) = (shift,shift);
 	my $dir = $chk->{dir};
-	$self->{acks}->{$dir} = $chk->{tsn} unless exists $self->{acks}->{$dir};
-	my $cumm = $self->{acks}->{$dir};
+	$self->{acks}{$dir} = $chk->{tsn} unless exists $self->{acks}{$dir};
+	my $cumm = $self->{acks}{$dir};
 	my $num = $chk->{tsn} - $cumm;
 	return if $num <= 0; # duplicated or cleared TSN
-	return if exists $self->{tsns}->{$dir}->{$num}; # duplicate not cleared TSN
-	$self->{tsns}->{$dir}->{$num} = $chk;
+	return if exists $self->{tsns}{$dir}{$num}; # duplicate not cleared TSN
+	$self->{tsns}{$dir}{$num} = $chk;
 }
 #package Decoder::SCTP;
 sub add_chk_ack {
 	my ($self,$chk) = @_;
 	my $dir = $chk->{dir}^0x1;
-	$self->{acks}->{$dir} = $chk->{cumm} unless exists $self->{acks}->{$dir};
-	my $cumm = $self->{acks}->{$dir};
+	$self->{acks}{$dir} = $chk->{cumm} unless exists $self->{acks}{$dir};
+	my $cumm = $self->{acks}{$dir};
 	my $ack = $chk->{cumm} - $cumm;
 	return if $ack <= 0; # doesn't ack anything
 	my $seq = undef;
-	foreach my $num (sort {$a<=>$b} keys %{$self->{tsns}->{$dir}}) {
+	foreach my $num (sort {$a<=>$b} keys %{$self->{tsns}{$dir}}) {
 		$seq = $num unless defined $seq;
-		my $c = delete $self->{tsns}->{$dir}->{$num};
+		my $c = delete $self->{tsns}{$dir}{$num};
 		if ($num <= $ack) {
 			my $oos = ($seq != $num);
 			# clear chunks numbered less than or equal to $ack
 			my $stream = Decoder::Stream->new($self,$c,$dir)
-				unless $stream = $self->{streams}->{$dir}->{$c->{stream}};
+				unless $stream = $self->{streams}{$dir}{$c->{stream}};
 			$stream->add_chk($c,$dir,$oos);
 		} else {
 			# renumber chunks in tsn queue to $num - $ack
-			$self->{tsns}->{$dir}->{$num-$ack} = $c;
+			$self->{tsns}{$dir}{$num-$ack} = $c;
 		}
 	}
 }
@@ -227,15 +227,15 @@ sub add_chk_SHUTDOWN {
 #package Decoder::SCTP;
 sub tst_chk_DATA {
 	my ($self,$pdu,$chk) = @_;
-	unless (exists $self->{acks}->{0} or exists $self->{acks}->{1}) {
+	unless (exists $self->{acks}{0} or exists $self->{acks}{1}) {
 		# no data or ack chunk received yet, assume forward direction
 		$pdu->{dir} = 0;
 		return 1;
 	}
 	my $found = undef;
 	for (my $dir = 0;$dir<2;$dir++) {
-		next unless exists $self->{acks}->{$dir};
-		my $cumm = $self->{acks}->{$dir};
+		next unless exists $self->{acks}{$dir};
+		my $cumm = $self->{acks}{$dir};
 		my $num = $chk->{tsn} - $cumm;
 		# TSN would certainly have been filled in by fast-retransmit
 		next if -30 > $num or $num > 30;
@@ -251,15 +251,15 @@ sub tst_chk_DATA {
 #package Decoder::SCTP;
 sub tst_chk_ack {
 	my ($self,$pdu,$chk) = @_;
-	unless (exists $self->{acks}->{0} or exists $self->{acks}->{1}) {
+	unless (exists $self->{acks}{0} or exists $self->{acks}{1}) {
 		# no data or ack chunk received yet, assume reverse direction
 		$pdu->{dir} = 1;
 		return 1;
 	}
 	my $found = undef;
 	for (my $dir = 1;$dir>= 0;$dir--) {
-		next unless exists $self->{acks}->{$dir};
-		my $cumm = $self->{acks}->{$dir};
+		next unless exists $self->{acks}{$dir};
+		my $cumm = $self->{acks}{$dir};
 		my $ack = $chk->{cumm} - $cumm;
 		# Cumm acks must be fairly close together
 		next if -30 > $num or $num > 30;
@@ -462,10 +462,10 @@ sub dissect {
 	my $name = DLT_NAMES->{$self->{dlt}};
 	return 'PCAP Header', [
 		[ undef, undef, 'Data Link Type', $name ],
-		[ undef, undef, 'Package Length', $self->{hdr}->{len}],
-		[ undef, undef, 'Capture Length', $self->{hdr}->{caplen}],
-		[ undef, undef, 'Seconds', $self->{hdr}->{tv_sec} ],
-		[ undef, undef, 'Microseconds', $self->{hdr}->{tv_usec} ],
+		[ undef, undef, 'Package Length', $self->{hdr}{len}],
+		[ undef, undef, 'Capture Length', $self->{hdr}{caplen}],
+		[ undef, undef, 'Seconds', $self->{hdr}{tv_sec} ],
+		[ undef, undef, 'Microseconds', $self->{hdr}{tv_usec} ],
 	], @_;
 }
 # -------------------------------------
@@ -534,7 +534,7 @@ sub dissect {
 		::SLL_DIR_MULTICAST => 'SLL_DIR_MULTICAST',
 		::SLL_DIR_MONITOR   => 'SLL_DIR_MONITOR',
 		::SLL_DIR_SENT	    => 'SLL_DIR_SENT',
-	}->{$self->{from}};
+	}{$self->{from}};
 	return $self->SUPER::dissect('Linux Cooked Header', [
 		[$off +  0, Frame::bytes($self->{from},0xffff,2),'From',$from],
 		[$off +  2, Frame::bytes($self->{arph},0xffff,2),'Arp Hardware', sprintf('0x%04X',$self->{arph})],
@@ -1161,7 +1161,7 @@ sub unpack {
 		$self->{ppi},
 	)
 	= unpack('NnnN',substr(${$self->{buf}},$self->{off},12)); $self->{off} += 12;
-	$self->{pdu}->{ppi} = $self->{ppi};
+	$self->{pdu}{ppi} = $self->{ppi};
 	return $self;
 }
 sub dissect {
@@ -1340,12 +1340,12 @@ sub testit {
 	if (!defined $type) {
 		return -1 if exists $self->{ppi} and $self->{ppi} != 0;
 		if (exists SIGTRAN_PORTS->{$self->{sport}}) {
-			$type = SIGTRAN_PORTS->{$self->{sport}}->[0];
-			$self->{ppi} = SIGTRAN_PORTS->{$self->{sport}}->{1];
+			$type = SIGTRAN_PORTS->{$self->{sport}}[0];
+			$self->{ppi} = SIGTRAN_PORTS->{$self->{sport}}{1];
 		}
 		if (exists SIGTRAN_PORTS->{$self->{dport}}) {
-			$type = SIGTRAN_PORTS->{$self->{dport}}->[0];
-			$self->{ppi} = SIGTRAN_PORTS->{$self->{dport}}->{1];
+			$type = SIGTRAN_PORTS->{$self->{dport}}[0];
+			$self->{ppi} = SIGTRAN_PORTS->{$self->{dport}}{1];
 		}
 		return unless defined $type;
 	}
@@ -1374,7 +1374,7 @@ sub hmmm {
 	}
 	my ($network) = @_;
 
-	my $dir = exists $assoc->objb->{ips}->{$self->{saddr}} ? 1 : 0;
+	my $dir = exists $assoc->objb->{ips}{$self->{saddr}} ? 1 : 0;
 	$assoc->add_pkt($network,$self,$dir);
 
 	if ($self->{shwa}) {
@@ -1390,10 +1390,10 @@ sub hmmm {
 }
 sub dissect {
 	my $self = shift;
-	my $off = $self->{sctp}->{off};
-	my $len = $self->{sctp}->{end} - $off;
-	my $sport = $self->{sport}; $sport = SIGTRAN_PORTS->{$self->{sport}}->[0]."($sport)" if exists SIGTRAN_PORTS->{$self->{sport}};
-	my $dport = $self->{dport}; $dport = SIGTRAN_PORTS->{$self->{dport}}->[0]."($dport)" if exists SIGTRAN_PORTS->{$self->{dport}};
+	my $off = $self->{sctp}{off};
+	my $len = $self->{sctp}{end} - $off;
+	my $sport = $self->{sport}; $sport = SIGTRAN_PORTS->{$self->{sport}}[0]."($sport)" if exists SIGTRAN_PORTS->{$self->{sport}};
+	my $dport = $self->{dport}; $dport = SIGTRAN_PORTS->{$self->{dport}}[0]."($dport)" if exists SIGTRAN_PORTS->{$self->{dport}};
 	my @fields = ('SCTP Packet Header', [
 		[ $off + 0, Frame::bytes($self->{sport},0xffff0000,4), 'Srce Port', $sport ],
 		[ $off + 0, Frame::bytes($self->{dport},0x0000ffff,4), 'Dest Port', $dport ],
@@ -1581,9 +1581,9 @@ sub unpack {
 	$self->{off} += 8;
 	return if $self->{vers} != 1;
 	return unless exists SIGTRAN_TYPES->{$self->{clas}};
-	my $clas = SIGTRAN_TYPES->{$self->{clas}}->[0];
-	return unless exists SIGTRAN_TYPES->{$self->{clas}}->[1]->{$self->{type}};
-	my $type = SIGTRAN_TYPES->{$self->{clas}}->[1]->{$self->{type}};
+	my $clas = SIGTRAN_TYPES->{$self->{clas}}[0];
+	return unless exists SIGTRAN_TYPES->{$self->{clas}}[1]{$self->{type}};
+	my $type = SIGTRAN_TYPES->{$self->{clas}}[1]{$self->{type}};
 	bless $self,ref($self)."::$clas\::$type";
 	return $self->unpack(@_);
 }
@@ -1594,8 +1594,8 @@ sub dissect {
 	my $self = shift;
 	my $off = 0;
 	my $prot = PPI_TYPES->{$self->{ppi}};
-	my $clas = SIGTRAN_TYPES->{$self->{clas}}->[0];
-	my $type = SIGTRAN_TYPES->{$self->{clas}}->[1]->{$self->{type}};
+	my $clas = SIGTRAN_TYPES->{$self->{clas}}[0];
+	my $type = SIGTRAN_TYPES->{$self->{clas}}[1]{$self->{type}};
 	return [
 		"$prot Header $clas\:$type",
 		[$off +  0,Frame::bytes($self->{vers},0xff000000,1),'Version',"$prot($self->{vers})"],
@@ -1694,12 +1694,12 @@ use constant {
 sub unpack_ULP_UCAUS {
 	my ($self,$off,$end,$len,$lab) = @_;
 	return unless $len >= 4;
-	($self->{$lab}->{caus},$self->{$lab}->{user}) = unpack('nn',${$self->{buf}},$off,4);
+	($self->{$lab}{caus},$self->{$lab}{user}) = unpack('nn',${$self->{buf}},$off,4);
 }
 sub unpack_ULP_LABEL {
 	my ($self,$off,$end,$len,$lab) = @_;
 	return unless $len >= 4;
-	($self->{$lab}->{beg},$self->{$lab}->{end},$self->{$lab}->{val}) = unpack('CCn',${$self->{buf}},$off,4);
+	($self->{$lab}{beg},$self->{$lab}{end},$self->{$lab}{val}) = unpack('CCn',${$self->{buf}},$off,4);
 }
 sub unpack_ULP_PDATA {
 	my ($self,$off,$end,$len,$lab) = @_;
@@ -1811,8 +1811,8 @@ sub unpack_ULP_PT_STATUS {
 	my ($self,$off,$end,$len,$lab) = @_;
 	return unless $len >= 4;
 	(
-		$self->{$lab}->{type},
-		$self->{$lab}->{info},
+		$self->{$lab}{type},
+		$self->{$lab}{info},
 	) =
 	unpack('nn',${$self->{buf}},$off,4);
 }
@@ -1833,8 +1833,8 @@ sub unpack_SUA_PT_CAUSE {
 	my ($self,$off,$end,$len,$lab) = @_;
 	return unless $len >= 4;
 	(
-		$self->{$lab}->{type},
-		$self->{$lab}->{valu},
+		$self->{$lab}{type},
+		$self->{$lab}{valu},
 	) =
 	unpack('nn',${$self->{buf}},$off,4);
 }
@@ -1842,15 +1842,15 @@ sub unpack_SUA_PT_SEQNO {
 	my ($self,$off,$end,$len,$lab) = @_;
 	return unless $len >= 4;
 	my $val = unpack('N',substr(${$self->{buf}},$off,4));
-	$self->{$lab}->{rseqno} = ($val >> 9)&0x7f;
-	$self->{$lab}->{sseqno} = ($val >> 0)&0xff;
-	$self->{$lab}->{m}      = ($val >> 8)&0x01;
+	$self->{$lab}{rseqno} = ($val >> 9)&0x7f;
+	$self->{$lab}{sseqno} = ($val >> 0)&0xff;
+	$self->{$lab}{m}      = ($val >> 8)&0x01;
 }
 sub unpack_SUA_PT_RSEQNO	{ return shift->Message::ULP::unpack_ULP_U8BIT(@_) }
 sub unpack_SUA_PT_ASPCAP {
 	my ($self,$off,$end,$len,$lab) = @_;
 	return unless $len >= 4;
-	($self->{$lab}->{spare},$self->{$lab}->{iwf},$self->{$lab}->{iw}) = unpack('nCC',substr(${$self->{buf}},$off,4));
+	($self->{$lab}{spare},$self->{$lab}{iwf},$self->{$lab}{iw}) = unpack('nCC',substr(${$self->{buf}},$off,4));
 }
 sub unpack_SUA_PT_CREDIT	{ return shift->Message::ULP::unpack_ULP_U8BIT(@_) }
 sub unpack_SUA_PT_DATA {
@@ -1873,8 +1873,8 @@ sub unpack_SUA_PT_SEQCTL	{ return shift->Message::ULP::unpack_ULP_32BIT(@_) }
 sub unpack_SUA_PT_SEGM {
 	my ($self,$off,$end,$len,$lab) = @_;
 	return unless $len >= 4;
-	$self->{$lab}->{fr}     = unpack('C',substr(${$self->{buf}},$off,1));
-	$self->{$lab}->{segref} = unpack('N',substr(${$self->{buf}},$off,4)) & 0xffffff;
+	$self->{$lab}{fr}     = unpack('C',substr(${$self->{buf}},$off,1));
+	$self->{$lab}{segref} = unpack('N',substr(${$self->{buf}},$off,4)) & 0xffffff;
 }
 sub unpack_SUA_PT_CONG		{ return shift->Message::ULP::unpack_ULP_32BIT(@_) }
 sub unpack_SUA_PT_GTI {
@@ -2862,8 +2862,8 @@ sub unpack {
 	my $self = shift;
 	return if $self->{mlen} < 16;
 	return if $self->{end} < $self->{off} + 8;
-	$self->{m2pa}->{off} = $self->{off};
-	$self->{m2pa}->{end} = $self->{end};
+	$self->{m2pa}{off} = $self->{off};
+	$self->{m2pa}{end} = $self->{end};
 	(
 		$self->{bsn},
 		$self->{fsn},
@@ -2877,7 +2877,7 @@ sub unpack {
 }
 sub dissect {
 	my $self = shift;
-	my $off = $self->{m2pa}->{off};
+	my $off = $self->{m2pa}{off};
 	return [
 		@{$self->SUPER::dissect(@_)},
 		[$off+0,Frame::bytes($self->{bsn}, 0x00ffffff,4),'BSN',$self->{bsn}],
@@ -2927,7 +2927,7 @@ sub detect {
 }
 sub dissect {
 	my $self = shift;
-	my $off = $self->{m2pa}->{off} + 8;
+	my $off = $self->{m2pa}{off} + 8;
 	my $li00 = unpack('C',substr(${$self->{buf}},$off,1)) & 0x3f;
 	return [
 		@{$self->SUPER::dissect(@_)},
@@ -2964,7 +2964,7 @@ sub unpack {
 }
 sub dissect {
 	my $self = shift;
-	my $off = $self->{m2pa}->{off} + 8;
+	my $off = $self->{m2pa}{off} + 8;
 	my $stat = $self->{stat}; $stat = M2PA_STATUS_TYPES->{$stat}."($stat)";
 	return [
 		@{$self->SUPER::dissect(@_)},
@@ -3194,8 +3194,8 @@ package Message::SUA; our @ISA = qw(Message::ULP);
 # -------------------------------------
 sub unpack {
 	my $self = shift;
-	$self->{sua}->{off} = $self->{off};
-	$self->{sua}->{end} = $self->{end};
+	$self->{sua}{off} = $self->{off};
+	$self->{sua}{end} = $self->{end};
 	return unless $self->SUPER::unpack_parms(@_);
 	return $self;
 }
@@ -3994,8 +3994,8 @@ use constant {
 };
 sub unpack {
 	my $self = shift;
-	$self->{snmm}->{off} = $self->{off};
-	$self->{snmm}->{end} = $self->{end};
+	$self->{snmm}{off} = $self->{off};
+	$self->{snmm}{end} = $self->{end};
 	$self->{mt} = unpack('C',substr(${$self->{buf}},$self->{off},1)); $self->{off} += 1;
 	$self->{h0} = ($self->{mt}>>0)&0xf;
 	$self->{h1} = ($self->{mt}>>4)&0xf;
@@ -5632,7 +5632,7 @@ sub dissect {
 		Message::dissect_MV($self,'DATA',$off+4  ),
 		Message::dissect_oP($self,       $off+5  ),
 	);
-	my $off = $self->{sccp}->{off} + 1;
+	my $off = $self->{sccp}{off} + 1;
 	return [
 		@{$self->SUPER::dissect(@_)},
 	];
@@ -5782,7 +5782,7 @@ sub unpack {
 	$self->{smi} &= 0x03;
 	$self->{scl} &= 0x0f if $self->{fi} == 6;
 	return unless exists SCMG_TYPES->{$self->{fi}};
-	my $type = SCMG_TYPES->{$self->{fi}}->[0];
+	my $type = SCMG_TYPES->{$self->{fi}}[0];
 	bless $self,ref($self)."$type";
 	return $self;
 }
@@ -5811,7 +5811,7 @@ use constant {
 sub dissect {
 	my $self = shift;
 	my $parent = $self->{parent}->dissect(@_);
-	my $off = $self->{scmg}->{off};
+	my $off = $self->{scmg}{off};
 	my ($mt,$desc) = (@{SCMG_TYPES->{$self->{fi}}});
 	my $smi = SMI_TYPES->[$self->{smi}];
 	my $apc = $self->{apc}; $apc = (($apc>>11)&0x07).'-'.(($apc>>3)&0xff).'-'.(($apc>>0)&0x07);
@@ -5855,8 +5855,8 @@ use constant {
 };
 sub unpack {
 	my $self = shift;
-	$self->{scmg}->{off} = $self->{off};
-	$self->{scmg}->{end} = $self->{end};
+	$self->{scmg}{off} = $self->{off};
+	$self->{scmg}{end} = $self->{end};
 	(
 		$self->{fi},
 		$self->{assn},
@@ -5868,14 +5868,14 @@ sub unpack {
 	$self->{smi} &= 0x03;
 	$self->{scl} &= 0x0f if $self->{fi} == 6;
 	return unless exists SCMG_TYPES->{$self->{fi}};
-	my $type = SCMG_TYPES->{$self->{fi}}->[0];
+	my $type = SCMG_TYPES->{$self->{fi}}[0];
 	bless $self,ref($self)."$type";
 	return $self;
 }
 sub dissect {
 	my $self = shift;
 	my $parent = $self->{parent}->dissect(@_);
-	my $off = $self->{scmg}->{off};
+	my $off = $self->{scmg}{off};
 	my ($mt,$desc) = (@{SCMG_TYPES->{$self->{fi}}});
 	my $smi = SMI_TYPES->[$self->{smi}];
 	my $apc = $self->{apc}; $apc = (($apc>>16)&0xff).'-'.(($apc>>8)&0xff).'-'.(($apc>>0)&0xff);
@@ -6108,8 +6108,8 @@ use constant {
 };
 sub unpack {
 	my $self = shift;
-	$self->{isup}->{off} = $self->{off};
-	$self->{isup}->{end} = $self->{end};
+	$self->{isup}{off} = $self->{off};
+	$self->{isup}{end} = $self->{end};
 	(
 		$self->{cic},
 		$self->{mt},
@@ -6122,7 +6122,7 @@ sub unpack {
 }
 sub dissect {
 	my $self = shift;
-	my $off = $self->{isup}->{off};
+	my $off = $self->{isup}{off};
 	my $layers;
 	if (exists $self->{mtp3}) {
 		$layers = $self->SUPER::dissect(@_);
@@ -8054,7 +8054,7 @@ sub unpack {
 }
 sub dissect {
 	my $self = shift;
-	my $off = $self->{isup}->{off} + 3;
+	my $off = $self->{isup}{off} + 3;
 	return [
 		@{$self->SUPER::dissect(@_)},
 	];
@@ -8071,7 +8071,7 @@ sub unpack {
 }
 sub dissect {
 	my $self = shift;
-	my $off = $self->{isup}->{off} + 3;
+	my $off = $self->{isup}{off} + 3;
 	return [
 		@{$self->SUPER::dissect(@_)},
 	];
@@ -8202,7 +8202,7 @@ sub unpack {
 }
 sub dissect {
 	my $self = shift;
-	my $off = $self->{isup}->{off} + 3;
+	my $off = $self->{isup}{off} + 3;
 	return [
 		@{$self->SUPER::dissect(@_)},
 	];
@@ -8291,7 +8291,7 @@ sub unpack {
 }
 sub dissect {
 	my $self = shift;
-	my $off = $self->{isup}->{off} + 3;
+	my $off = $self->{isup}{off} + 3;
 	return [
 		@{$self->SUPER::dissect(@_)},
 	];
@@ -8313,7 +8313,7 @@ sub unpack {
 }
 sub dissect {
 	my $self = shift;
-	my $off = $self->{isup}->{off} + 3;
+	my $off = $self->{isup}{off} + 3;
 	return [
 		@{$self->SUPER::dissect(@_)},
 	];
@@ -8666,8 +8666,8 @@ sub unpack {
 	my ($cls,$tag,$ptr,$end) = $self->unpack_taglen($self->{off},$self->{end});
 	return unless defined $cls;
 	return unless exists TCAP_TYPE->{$cls};
-	return unless exists TCAP_TYPE->{$cls}->{$tag};
-	my $type = TCAP_TYPE->{$cls}->{$tag};
+	return unless exists TCAP_TYPE->{$cls}{$tag};
+	my $type = TCAP_TYPE->{$cls}{$tag};
 	$self->{off} = $ptr;
 	$self->{end} = $end;
 	$self->{cls} = $cls;

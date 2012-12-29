@@ -1,0 +1,159 @@
+#!/usr/bin/perl
+
+use Carp;
+use SNMP;
+use Net::SNMP;
+use Data::Dumper;
+
+SNMP::addMibDirs(qw{
+../mibs
+/usr/share/netdisco/mibs/rfc
+});
+SNMP::loadModules('SNMPv2-SMI', 'SNMPv2-TC', 'SNMPv2-MIB', 'RFC1213-MIB', 'IF-MIB', 'INET-ADDRESS-MIB', 'IP-MIB', 'LLDP-MIB', 'LLDP-EXT-DOT1-MIB', 'LLDP-EXT-DOT3-MIB', 'LLDP-EXT-MED-MIB');
+
+sub strip_dot {
+	my $oid = shift;
+	$oid =~ s/^\.//;
+	return $oid;
+}
+sub add_dot {
+	my $oid = shift;
+	return ".$oid";
+}
+sub xlate_result {
+	my ($table,$result) = @_;
+	my $r = {};
+	foreach (keys %$result) {
+		my $val = $result->{$_};
+		my $tag = SNMP::translateObj(add_dot($_));
+		my ($label,$index) = split(/\./,$tag,2);
+		my $mib = $SNMP::MIB{$label};
+		if ($val =~ /^0x([0-9a-fA-F][0-9a-fA-F])+$/) {
+			$val =~ s/^0x//;
+			my $bin = pack('H*',$val);
+			$val = join(':',(map {sprintf('%02x',$_)} unpack('C*',$bin)));
+		}
+		if ($mib->{enums}) {
+			foreach my $k (keys %{$mib->{enums}}) {
+				$val = "$k($val)" if $mib->{enums}{$k} eq $val;
+			}
+		}
+		if ($mib->{syntax} eq 'InetAddress' and $val=~m/:/) {
+			if ($val=~m/^[0-9a-fA-F]{2}(:[0-9a-fA-F]{2}){3}$/) {
+				my $v = $val; $v =~ s/://g;
+				$val = join('.',unpack('C*',pack('H*',$v)));
+			} else {
+				while ($val=~s/00:/:/) { }
+				while ($val=~s/:::/::/) { }
+				$val=~s/^:[^:]/::/;
+				$val=~s/^0//;
+				while ($val=~s/:0/:/) { }
+			}
+		}
+		if ($val =~ /^1\.3\.6(\.\d+)*$/) {
+			$val = SNMP::translateObj(add_dot($val));
+		}
+		$val =~ s/ .*$// if $val =~ /^\d/;
+		$r->{$index}{$label} = $val;
+	}
+	my $entry = $SNMP::MIB{$table}{children}[0];
+	my @indexes = @{$entry->{indexes}};
+	print "$table indexes are: ", join(',',@indexes), "\n";
+	foreach my $index (keys %$r) {
+		my @inds = (split(/\./,$index));
+		foreach my $i (@indexes) {
+			my $mib = $SNMP::MIB{$i};
+			next if exists $r->{$index}{$i};
+			#next if $mib->{parent} eq $entry;
+			if ($mib->{type} =~ /INTEGER|UNSIGNED|COUNTER|GAUGE|TICKS/) {
+				my $val = shift @inds;
+				if ($SNMP::MIB{$i}{enums}) {
+					foreach my $k (keys %{$SNMP::MIB{$i}{enums}}) {
+						$val = "$k($val)" if $SNMP::MIB{$i}{enums}{$k} eq $val;
+					}
+				}
+				$r->{$index}{$i} = $val;
+			} elsif ($mib->{type} =~ /OCTETSTR/) {
+				my @vals = ();
+				my $len = shift @inds;
+				while ($len > 0) { push @vals, shift @inds; $len-- }
+				my $val = join(':',map {sprintf('%02x',$_)} @vals);
+				if ($val =~ /^0x([0-9a-fA-F][0-9a-fA-F])+$/) {
+					$val =~ s/^0x//;
+					my $bin = pack('H*',$val);
+					$val = join(':',(map {sprintf('%02x',$_)} unpack('C*',$bin)));
+				}
+				if ($mib->{syntax} eq 'InetAddress' and $val=~m/:/) {
+					if ($val=~m/^[0-9a-fA-F]{2}(:[0-9a-fA-F]{2}){3}$/) {
+						my $v = $val; $v =~ s/://g;
+						$val = join('.',unpack('C*',pack('H*',$v)));
+					} else {
+						while ($val=~s/00:/:/) { }
+						while ($val=~s/:::/::/) { }
+						$val=~s/^:[^:]/::/;
+						$val=~s/^0//;
+						while ($val=~s/:0/:/) { }
+					}
+				}
+				$r->{$index}{$i} = $val;
+			} elsif ($mib->{type} =~ /OBJECTID|OPAQUE/) {
+				my @vals = ();
+				my $len = shift @inds;
+				while ($len > 0) { push @vals, shift @inds; $len-- }
+				my $val = join('.',@vals);
+				if ($val =~ /^1\.3\.6(\.\d+)*$/) {
+					$val = SNMP::translateObj(add_dot($val));
+				}
+				$r->{$index}{$i} = $val;
+			} elsif ($mib->{type} =~ /IPADDR/) {
+				my @vals = ();
+				my $len = 4;
+				while ($len > 0) { push @vals, shift @inds; $len-- }
+				$r->{$index}{$i} = join('.',@vals);
+			} elsif ($mib->{type} =~ /NETADDR/) {
+				my @vals = ();
+				my $len = 4; shift @inds;
+				while ($len > 0) { push @vals, shift @inds; $len-- }
+				$r->{$index}{$i} = join('.',@vals);
+			} else {
+				warn "Index type for $i is $mib->{type}\n";
+			}
+		}
+	}
+	return $r;
+}
+
+my ($oid);
+
+sub get_the_table {
+	my ($session,$table) = @_;
+	my $oid = strip_dot(SNMP::translateObj($table));
+	print "oid $table = $oid\n";
+	print Dumper(xlate_result($table,$session->get_table(-baseoid=>$oid)));
+}
+
+foreach my $host (qw/habeascorpus napoleon/) {
+	my ($session,$error) = Net::SNMP->session(
+		-hostname=>$host,
+		-version=>2,
+		-community=>'public',
+	);
+	Carp::carp "SNMP session error $error" unless defined $session;
+
+	foreach (qw/
+	atTable
+	ifTable
+	ipAddrTable
+	ipRouteTable
+	ipAddressTable
+	ipNetToPhysicalTable
+	ipDefaultRouterTable
+	lldpLocPortTable
+	lldpLocManAddrTable
+	lldpRemTable
+	lldpRemManAddrTable
+	lldpRemOrgDefInfoTable
+	/) {
+		get_the_table($session,$_);
+	}
+}

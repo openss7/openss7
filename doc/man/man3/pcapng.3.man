@@ -1,0 +1,481 @@
+'\" rtp
+.\" vim: ft=nroff sw=4 noet nocin nosi com=b\:.\\\" fo+=tcqlorn tw=77
+.\" =========================================================================
+.\"
+.\" @(#) $Id$
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2008-2012  Monavacon Limited <http://www.monavacon.com/>
+.\" Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+.\" Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to copy, distribute and/or modify this manual
+.\" under the terms of the GNU Free Documentation License, Version 1.3 or
+.\" any later version published by the Free Software Foundation; with no
+.\" Invariant Sections, no Front-Cover Texts, and no Back-Cover Texts.  A
+.\" copy of the license is included in the section entitled "GNU Free
+.\" Documentation License".
+.\"
+.\" Permission to use, copy and distribute this manual without modification,
+.\" for any purpose and without fee or royalty is hereby granted, provided
+.\" that both the above copyright notice and this permission notice appears
+.\" in all copies and that the name of OpenSS7 Corporation not be used in
+.\" advertising or publicity pertaining to distribution of this documentation
+.\" or its contents without specific, written prior permission.  OpenSS7
+.\" Corporation makes no representation about the suitability of this manual
+.\" for any purpose.  It is provided "as is" without express or implied
+.\" warranty.
+.\"
+.\" Permission is granted to process this file through groff and print the
+.\" results, provided the printed document carries a copying permission
+.\" notice identical to this one except for the removal of this paragraph
+.\" (this paragraph not being relevant to the printed manual).
+.\"
+.\" OPENSS7 CORPORATION DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS MANUAL
+.\" INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A
+.\" PARTICULAR PURPOSE, NON-INFRINGEMENT, OR TITLE; THAT THE CONTENTS OF THE
+.\" DOCUMENT ARE SUITABLE FOR ANY PURPOSE, OR THAT THE IMPLEMENTATION OF
+.\" SUCH CONTENTS WILL NOT INFRINGE ON ANY THIRD PARTY PATENTS, COPYRIGHTS,
+.\" TRADEMARKS OR OTHER RIGHTS.  IN NO EVENT SHALL OPENSS7 CORPORATION BE
+.\" LIABLE FOR ANY DIRECT, INDIRECT, SPECIAL OR CONSEQUENTIAL DAMAGES OR ANY
+.\" DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER
+.\" IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING
+.\" OUT OF OR IN CONNECTION WITH ANY USE OF THIS DOCUMENT OR THE PERFORMANCE
+.\" OR IMPLEMENTATION OF THE CONTENTS THEREOF.
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not have
+.\" taken the same level of care in the production of this manual, which is
+.\" licensed free of charge, as they might when working professionally.  The
+.\" author(s) will take no responsibility in it.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by the
+.\" source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any successor
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date$ by $Author$
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Log$
+.\" =========================================================================
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database openss7.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+search-truncate 40
+search-ignore CGIQOSTU
+.R2
+.so openss7.macros
+.\"
+.\"
+.TH PCAPNG 3 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "PCAP-NG Library Calls"
+.\"
+.\"
+.SH NAME
+.B pcapng, libpcapng
+\- Packet Capture Next Generation (PCAP-NG) library
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+.B #include <pcapng.h>
+.\"
+.\"
+.SH OVERVIEW
+.PP
+.B libpcapng
+is an
+.B OpenSS7
+implementation of the
+.BR pcap (3pcap)
+library modified for use with the PCAP-NG file format instead of the PCAP
+file format.
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+.B libpcapng
+implements the following PCAP-NG library functions:
+.TP \w'\fBpcapng_set_promisc_all\fR(3)\ 'u
+.BR pcapng_activate (3)
+activates an interface within a PCAP-NG handle
+.PD 0
+.TP
+.BR pcapng_activate_all (3)
+activates all the interfaces within a PCAP-NG handle
+.TP
+.BR pcapng_activated (3)
+test whether an interface is activated
+.TP
+.BR pcapng_breakloop (3)
+a pcapng_dispatch() or pcapng_loop() call to return
+.TP
+.BR pcapng_can_set_rfmon (3)
+check if monitoring mode can be set on an interface
+.TP
+.BR pcapng_close (3)
+close a PCAP-NG capture or \(lqsavefile\(rq
+.TP
+.BR pcapng_create (3)
+create a live capture PCAP-NG handle
+.TP
+.BR pcapng_dump (3)
+write a packet to a capture file
+.TP
+.BR pcapng_dump_close (3)
+close a \(lqsavefile\(rq
+.TP
+.BR pcapng_dump_file (3)
+get the standard I/O stream for a \(lqsavefile\(rq
+.TP
+.BR pcapng_dump_flush (3)
+flushes a \(lqsavefile\(rq
+.TP
+.BR pcapng_dump_fopen (3)
+open a file to which to write packets.
+.TP
+.BR pcapng_dump_ftell (3)
+get the file offset for a \(lqsavefile\(rq
+.TP
+.BR pcapng_dump_open (3)
+open a PCAP-NG dump file
+.TP
+.BR pcapng_dump_stats (3)
+dump interface statistics to a PCAP-NG \(lqsavefile\(rq.
+.TP
+.BR pcapng_dump_stats_all (3)
+dump interface statistics to a PCAP-NG \(lqsavefile\(rq from \(lqcapture\(rq
+.TP
+.BR pcapng_fopen_offline (3)
+open an I/O stream for reading
+.TP
+.BR pcapng_free_stats (3)
+.TP
+.BR pcapng_interfaces (3)
+determine the number of interfaces assigned to a PCAP-NG handle
+.TP
+.BR pcapng_list_stats (3)
+get and free capture statistics
+.TP
+.BR pcapng_open_dead (3)
+open a fake \fBpcapng_t\fP for compiling filters
+.TP
+.BR pcapng_open_live (3)
+open a device for capturing.
+.TP
+.BR pcapng_open_offline (3)
+open a saved capture file for reading
+.TP
+.BR pcapng_set_promisc (3)
+set promiscuous mode on one or more interfaces
+.TP
+.BR pcapng_set_promisc_all (3)
+set promiscuous mode on one or more interfaces
+.TP
+.BR pcapng_set_snaplen (3)
+set snapshot length on one or more interfaces
+.TP
+.BR pcapng_set_snaplen_all (3)
+set snapshot length on one or more interfaces
+.TP
+.BR pcapng_set_timeout (3)
+read timeout for one or more interfaces
+.TP
+.BR pcapng_set_timeout_all (3)
+read timeout for one or more interfaces
+.TP
+.BR pcapng_stats (3)
+get interface capture statistics
+.PD
+.\"
+.\"
+.SH FUNCTIONS
+.PP
+.SS Selecting a link-layer header type for a live capture
+.PP
+Some interfaces may provide more than one link-layer header type.  To obtain
+a list of all link-layer header types provided by an interface, call
+.BR pcapng_list_datalinks (3)
+on a
+.B pcapng_t
+handle that is activated for the interface.
+To free a list of link-layer header types, call
+.BR pcapng_free_datalinks (3).
+To set the link-layer header type for a device, call
+.BR pcapng_set_datalink (3).
+This should be done after the interface has been activated but before any
+packets are read and before any filters are compiled or installed.
+.PP
+.B Routines:
+.TP
+.BR pcapng_list_datalinks (3)
+get a list of link-layer header types for an interface.
+.PD 0
+.TP
+.BR pcapng_free_datalinks (3)
+free a list of link-layer header types.
+.TP
+.BR pcapng_set_datalink (3)
+set the link-layer header type for an interface.
+.TP
+.BR pcap_datalink_val_to_name (3pcap)
+get the name for a link-layer header type.
+.TP
+.BR pcap_datalink_val_to_description (3pcap)
+get the description of a link-layer header type.
+.TP
+.BR pcap_datalink_name_to_val (3pcap)
+get the link-layer header type corresponding to a name.
+.PD
+.\"
+.SS Reading packets
+.PP
+Packets are read with
+.BR pcapng_dispatch "(3) or " pcapng_loop (3),
+which process one or more packets, calling a callback routine for each
+packet, or with
+.BR pcapng_next "(3) or " pcapng_next_ex (3),
+which return the next packet.  The callback for
+.BR pcapng_dispatch "(3) and " pcapng_loop (3)
+is supplied a pointer to a
+.BR pcapng_pkthdr (5)
+structure, which includes the following members:
+.TP 4
+.I pph_interfaceid
+the interface identifier (index) of the interface on which the packet was
+captured.
+.PD 0
+.TP
+.I pph_ts
+the low-order 32-bits followed by the high-order 32-bits of a 64-bit number
+representing the time stamp for the packet.  The time units of the 64-bit
+number are those associated with the interface.
+.TP
+.I pph_captlen
+the capture length of the packet.
+.TP
+.I pph_packlen
+the original length of the packet.
+.TP
+.I pph_datalen
+the length of the data buffer associated with this packet header.
+.TP
+.I pph_flags
+the packet flags.
+.TP
+.I pph_dropcount
+the number of packets dropped between this packet and the last captured
+packet.
+.TP
+.I pph_compcount
+the number of packets compressed (as identical to this packet) between this
+packet and the last captured packet.
+.PD
+.PP
+.BR pcapng_next_ex (3)
+supplies a pointer to the
+.B pcapng_pkthdr
+structure through a pointer argument.
+.BR pcapng_next (3)
+is pass as an argument that points to a
+.B pcapng_pkthdr
+structure, and fills it in.
+.PP
+The callback is also supplied a
+.B const u_char
+pointer to the first
+.I pph_datalen
+bytes of data from the packet.  This is not necessarily the entire packet: to
+capture the entire packet, a snapshot length of sufficient size to get all of
+the packet's data is required.  A value of 65535 should be sufficient on most
+if not all networks.  When reading from a \(lqsavefile\(rq, the snapshot
+length specified for the interface when the capture was performed will limit
+the amount of packet data available.
+.BR pcapng_next (3)
+returns the
+.B const u_char
+pointer, whereas
+.BR pcapng_next_ex (3)
+is supplied a pointer to the
+.B const u_char
+pointer.
+.PP
+To force a loop in
+.BR pcapng_dispatch "(3) or " pcapng_loop (3)
+to terminate, call
+.BR pcapng_breakloop (3)
+or return
+.B PCAP_ERROR_BREAKLOOP
+from the callback.
+.PP
+By default, when reading packets from an interface opened for a live capture,
+.BR pcapng_dispatch "(3), " pcapng_next "(3) and " pcapng_next_ex (3) will,
+if no packets are currently available to be read, block waiting for packets
+to become available.  If a read timeout was specified, the wait will
+terminate after the read timeout expires.
+.PP
+A handle can be put into \(lqnon-blocking mode\(rq, so that those routines
+will, rather than blocking, return an indication that no packets are
+available to be read.  Call
+.BR pcapng_setnonblock (3)
+to put a handle into non-blocking mode or to take it out of non-blocking
+mode; call
+.BR pcapng_getnonblock (3)
+to determine whether a handle is in non-blocking mode.
+.PP
+Non-blocking mode is often combined with routines such as
+.RB select "(2) or " poll (2)
+or other routines a platform offers to wait for the availability of data on
+any of a set of descriptors.  To obtain, for a handle, a descriptor that can
+be used in those routines, call
+.BR pcapng_get_selectable_fd (3).
+.PP
+.B Routines:
+.TP
+.BR pcapng_dispatch (3)
+read a buffer full of packets from a
+.BR pcapng_t
+open for a live capture or the full set of packets from a
+.BR pcapng_t
+open for a \(lqsavefile\(rq.
+.PD 0
+.TP
+.BR pcapng_loop (3)
+read packets form a
+.BR pcapng_t
+until an interrupt or error occurs.
+.TP
+.BR pcapng_next (3)
+read the next packet from a
+.BR pcapng_t
+without an indication of whether an error occurred.
+.TP
+.BR pcapng_next_ex (3)
+read the next packet from a
+.BR pcapng_t
+with an error indication on an error.
+.TP
+.BR pcapng_breakloop (3)
+prematurely terminate the loop in
+.BR pcapng_dispatch "(3) or " pcapng_loop (3).
+.TP
+.BR pcapng_setnonblock (3)
+set or clear non-blocking mode on a
+.BR pcapng_t .
+.TP
+.BR pcapng_getnonblock (3)
+get the state of non-blocking mode for a
+.BR pcapng_t .
+.TP
+.BR pcapng_get_selectable_fd (3)
+attempt to get a list of descriptors for a
+.BR pcapng_t
+that can be used in calls such as
+.BR select "(2) and " poll (2).
+.PD
+.\"
+.\"
+.SH RETURN
+.PP
+Upon success, or success with warnings, most PCAP-NG library functions return
+zero
+.RB ( 0 )
+or a positive integer reflecting a returned parameter value.
+Upon success with warnings, many PCAP-NG library functions set
+.IR p_errno "(3) and " errno (3)
+to an appropriate warning number, and set
+.IR p_errbuf (3)
+to an appropriate warning string when available.
+Upon failure, PCAP-NG library functions return minus one
+.RB ( -1 ),
+set
+.IR p_errno "(3) and " errno (3)
+to an appropriate error number, and set
+.IR p_errbuf (3)
+to an appropriate error string when available.
+.\"
+.\"
+.SH ERRORS
+.PP
+The errors that can be returned by PCAP-NG library calls are detailed in
+.IR p_errno (3).
+.\"
+.\"
+.SH SEE ALSO
+.PP
+.BR pcap (3pcap).
+.\"
+.\"
+.SH BUGS
+.PP
+The PCAP-NG library has no known bugs.
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+Functions are compatible with the PCAP library,
+.BR pcap (3pcap),
+and the PCAP-NG v1.0 file format specification, with the following
+considerations:
+.IP \(em \w'\(em\(em'u
+.IP \(em
+.IP \(em
+.IP \(em
+.IP \(em
+.IP \(em
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+.\"
+.\"
+.SH HISTORY
+.PP
+The PCAP-NG library first appeared in PCAP-NG 1.0.
+.\"
+.\"
+.SH VERSIONS
+.PP
+This manual page was written for the OpenSS7 PCAP-NG Library.
+.\"
+.\"
+.[
+$LIST$
+.]
+.T4

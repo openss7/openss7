@@ -215,6 +215,9 @@ struct mxCardTable_data {
 	uint8_t *mxCardSyncSpanId;	/* ReadOnly */
 	size_t mxCardSyncSpanIdLen;
 	long mxCardSyncTransitions;	/* ReadOnly */
+	uint8_t *mxCardLeds;		/* ReadOnly */
+	size_t mxCardLedsLen;
+	long mxCardLastChange;		/* ReadOnly */
 	uint8_t *mxCardName;		/* ReadOnly */
 	size_t mxCardNameLen;
 	long mxCardStatus;		/* Create */
@@ -286,8 +289,10 @@ struct mxSpanTable_data {
 	size_t mxSpanAlarmsLen;
 	uint8_t *mxSpanEvents;		/* ReadOnly */
 	size_t mxSpanEventsLen;
+	long mxSpanLed;			/* ReadOnly */
 	ulong mxSpanReceiveLevel;	/* ReadOnly */
 	ulong mxSpanReceiveThreshold;	/* Create */
+	long mxSpanLastChange;		/* ReadOnly */
 	long mxSpanRowStatus;		/* Create */
 };
 struct mxBertTable_data {
@@ -610,6 +615,23 @@ extern struct header_complex_index *mxFarEndTotalTableStorage;
 #define MXCARDSTANDBYSTATUS_COLDSTANDBY          1
 #define MXCARDSTANDBYSTATUS_PROVIDINGSERVICE     2
 
+#define MXCARDLEDS_GREEN1                        0
+#define MXCARDLEDS_RED1                          1
+#define MXCARDLEDS_GREEN2                        2
+#define MXCARDLEDS_RED2                          3
+#define MXCARDLEDS_GREEN3                        4
+#define MXCARDLEDS_RED3                          5
+#define MXCARDLEDS_GREEN4                        6
+#define MXCARDLEDS_RED4                          7
+#define MXCARDLEDS_GREEN5                        8
+#define MXCARDLEDS_RED5                          9
+#define MXCARDLEDS_GREEN6                        10
+#define MXCARDLEDS_RED6                          11
+#define MXCARDLEDS_GREEN7                        12
+#define MXCARDLEDS_RED7                          13
+#define MXCARDLEDS_GREEN8                        14
+#define MXCARDLEDS_RED8                          15
+
 #define MXSPANTYPE_NONE                          0
 #define MXSPANTYPE_T1                            1
 #define MXSPANTYPE_E1                            2
@@ -792,6 +814,11 @@ extern struct header_complex_index *mxFarEndTotalTableStorage;
 #define MXSPANEVENTS_TOCD                        12
 #define MXSPANEVENTS_TCLE                        13
 
+#define MXSPANLED_BLACK                          0
+#define MXSPANLED_GREEN                          1
+#define MXSPANLED_RED                            2
+#define MXSPANLED_YELLOW                         3
+
 #define MXBERTMODE_NONE                          0
 #define MXBERTMODE_SPAN                          1
 #define MXBERTMODE_CHANNEL                       2
@@ -891,6 +918,8 @@ extern struct header_complex_index *mxFarEndTotalTableStorage;
 #define MXFARENDINTERVALVALIDDATA_FALSE          2
 
 /* notifications */
+extern oid mxCardStateChange_oid[11];
+extern oid mxSpanStateChange_oid[11];
 
 /* scalars accessible only for notify */
 
@@ -913,6 +942,15 @@ extern oid mxCardTypeAT400P_oid[13];
 extern oid mxCardTypeAE400P_oid[13];
 extern oid mxCardTypeA400PT_oid[13];
 extern oid mxCardTypeA400PE_oid[13];
+extern oid mxCardTypeCP100_oid[13];
+extern oid mxCardTypeCP100P_oid[14];
+extern oid mxCardTypeCP100E_oid[14];
+extern oid mxCardTypeCP200_oid[13];
+extern oid mxCardTypeCP200P_oid[14];
+extern oid mxCardTypeCP200E_oid[14];
+extern oid mxCardTypeCP400_oid[13];
+extern oid mxCardTypeCP400P_oid[14];
+extern oid mxCardTypeCP400E_oid[14];
 extern oid mxChipTypeDS2152_oid[13];
 extern oid mxChipTypeDS21352_oid[13];
 extern oid mxChipTypeDS21552_oid[13];
@@ -940,11 +978,14 @@ extern oid mxFarEndCurrentGroup_oid[12];
 extern oid mxFarEndIntervalGroup_oid[12];
 extern oid mxFarEndTotalGroup_oid[12];
 extern oid mxDrivGroup_oid[12];
+extern oid mxTrapGroup_oid[12];
 extern oid mxBasicCompliance_oid[12];
 extern oid mxEnhancedCompliance_oid[12];
 
 /* function prototypes */
 /* trap function prototypes */
+extern void send_mxCardStateChange_v2trap(struct variable_list *);
+extern void send_mxSpanStateChange_v2trap(struct variable_list *);
 
 /* variable function prototypes */
 void init_mxMIB(void);

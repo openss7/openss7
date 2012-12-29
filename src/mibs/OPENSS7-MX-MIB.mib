@@ -1,4 +1,4 @@
--- vim: ft=mib comments=\f\:\",\b\:\-\-,\:\-\-,\f\b\:- fo+=tcqlornw tw=72 nocin nosi sts=4 sw=4
+-- vim: ft=mib comments=\f\:\",\b\:\-\-,\:\-\-,\f\b\:- fo+=tcqlornw tw=72 nocin nosi sts=4 sw=4 et
 -- =============================================================================
 -- 
 -- @(#) $RCSfile: OPENSS7-MX-MIB.mib,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2011-07-18 19:42:19 $
@@ -87,17 +87,17 @@ IMPORTS
         FROM PerfHist-TC-MIB
     SnmpAdminString
         FROM SNMP-FRAMEWORK-MIB
-    MODULE-COMPLIANCE, OBJECT-GROUP
+    MODULE-COMPLIANCE, NOTIFICATION-GROUP, OBJECT-GROUP
         FROM SNMPv2-CONF
-    Counter32, Integer32, MODULE-IDENTITY, OBJECT-IDENTITY, OBJECT-TYPE, 
-    Unsigned32, zeroDotZero
+    Counter32, Integer32, MODULE-IDENTITY, NOTIFICATION-TYPE, 
+    OBJECT-IDENTITY, OBJECT-TYPE, Unsigned32, zeroDotZero
         FROM SNMPv2-SMI
     AutonomousType, DateAndTime, DisplayString, RowPointer, RowStatus, 
     StorageType, TEXTUAL-CONVENTION, TimeInterval, TimeStamp, TruthValue
         FROM SNMPv2-TC;
 
 mxMIB MODULE-IDENTITY
-    LAST-UPDATED "201112101120Z"
+    LAST-UPDATED "201207171622Z"
     ORGANIZATION 
         "The OpenSS7 Project"
     CONTACT-INFO 
@@ -142,7 +142,7 @@ mxMIB MODULE-IDENTITY
          Modifications must be made only within an object identifier arc 
          under your control."
     REVISION    "201207171622Z"
-    DESCRIPTION
+    DESCRIPTION 
         "Added near end error counts."
     REVISION    "201112101120Z"
     DESCRIPTION 
@@ -587,6 +587,8 @@ MxCardEntry ::= SEQUENCE {
     mxCardStandbyStatus         StandbyStatus,
     mxCardSyncSpanId            SpanIdentity,
     mxCardSyncTransitions       Counter32,
+    mxCardLeds                  BITS,
+    mxCardLastChange            TimeStamp,
     mxCardName                  CommonLanguageName,
     mxCardStatus                RowStatus
 }
@@ -629,7 +631,16 @@ mxCardType OBJECT-TYPE
          - mxCardTypeAE400P,
          - mxCardTypeA400P,
          - mxCardTypeA400PT,
-         - mxCardTypeA400PE,"
+         - mxCardTypeA400PE,
+         - mxCardTypeCP100,
+         - mxCardTypeCP100P,
+         - mxCardTypeCP100E,
+         - mxCardTypeCP200,
+         - mxCardTypeCP200P,
+         - mxCardTypeCP200E,
+         - mxCardTypeCP400,
+         - mxCardTypeCP400P,
+         - mxCardTypeCP400E,"
     ::= { mxCardEntry 2 }
 
 mxCardIdentifier OBJECT-TYPE
@@ -980,7 +991,7 @@ mxCardAlarmStatus OBJECT-TYPE
     REFERENCE   
         "OPENSS7-SMI-MIB, ITU-T Rec. X.721 | ISO/IEC 10165-2, 
          alarmStatus."
-    DEFVAL      { {} } -- '00000'B
+    DEFVAL      { {} }
     ::= { mxCardEntry 18 }
 
 mxCardProceduralStatus OBJECT-TYPE
@@ -1034,7 +1045,7 @@ mxCardProceduralStatus OBJECT-TYPE
     REFERENCE   
         "OPENSS7-SMI-MIB, ITU-T Rec. X.721 | ISO/IEC 10165-2, 
          proceduralStatus."
-    DEFVAL      { {} } -- '00000'B
+    DEFVAL      { {} }
     ::= { mxCardEntry 19 }
 
 mxCardAvailabilityStatus OBJECT-TYPE
@@ -1109,7 +1120,7 @@ mxCardAvailabilityStatus OBJECT-TYPE
     REFERENCE   
         "OPENSS7-SMI-MIB, ITU-T Rec. X.721 | ISO/IEC 10165-2, 
          availabilityStatus."
-    DEFVAL      { {} } -- '000000000'B
+    DEFVAL      { {} }
     ::= { mxCardEntry 20 }
 
 mxCardControlStatus OBJECT-TYPE
@@ -1144,7 +1155,7 @@ mxCardControlStatus OBJECT-TYPE
     REFERENCE   
         "OPENSS7-SMI-MIB, ITU-T Rec. X.721 | ISO/IEC 10165-2, 
          controlStatus."
-    DEFVAL      { {} } -- '0000'B
+    DEFVAL      { {} }
     ::= { mxCardEntry 21 }
 
 mxCardUnknownStatus OBJECT-TYPE
@@ -1237,6 +1248,32 @@ mxCardSyncTransitions OBJECT-TYPE
          transitioned."
     ::= { mxCardEntry 25 }
 
+mxCardLeds OBJECT-TYPE
+    SYNTAX      BITS { green1(0), red1(1), green2(2), red2(3), green3(4), 
+                    red3(5), green4(6), red4(7), green5(8), red5(9), 
+                    green6(10), red6(11), green7(12), red7(13), 
+                    green8(14), red8(15) }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Provides the state of up to 8 multicolored LEDs (Light Emitting 
+         Diodes) associated with the spans on the card.  When both the 
+         green and red elements of the corresponding span are present, 
+         the emitted color is yellow.  When neither element is present, 
+         the LED is unlit (or black)."
+    ::= { mxCardEntry 26 }
+
+mxCardLastChange OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "This value of MIB II's sysUpTime object at the time this card 
+         entered its current mxCardLeds state.  If the current state was 
+         entered prior to the last re-initialization of the proxy-agent, 
+         then this object contains a zero value."
+    ::= { mxCardEntry 27 }
+
 mxCardName OBJECT-TYPE
     SYNTAX      CommonLanguageName
     MAX-ACCESS  read-only
@@ -1247,7 +1284,7 @@ mxCardName OBJECT-TYPE
          convention."
     REFERENCE   
         "OPENSS7-TC"
-    ::= { mxCardEntry 26 }
+    ::= { mxCardEntry 28 }
 
 mxCardStatus OBJECT-TYPE
     SYNTAX      RowStatus
@@ -1269,7 +1306,7 @@ mxCardStatus OBJECT-TYPE
          
          Rows cannot be deleted that correspond to physical 
          cards."
-    ::= { mxCardEntry 27 }
+    ::= { mxCardEntry 29 }
 
 mxSpan OBJECT IDENTIFIER
     ::= { mxTables 4 }
@@ -1296,50 +1333,52 @@ mxSpanEntry OBJECT-TYPE
     ::= { mxSpanTable 1 }
 
 MxSpanEntry ::= SEQUENCE {
-    mxSpanIndex                         Unsigned32,
-    mxSpanName                          CommonLanguageName,
-    mxSpanDevice                        RowPointer,
-    mxSpanEquipmentId                   PhysicalPointOfAppearance,
-    mxSpanType                          INTEGER,
-    mxSpanNumber                        SpanNumber,
-    mxSpanRate                          Integer32,
-    mxSpanMode                          BITS,
-    mxSpanCrc                           INTEGER,
-    mxSpanClocking                      INTEGER,
-    mxSpanPriority                      Unsigned32,
-    mxSpanCoding                        INTEGER,
-    mxSpanFraming                       INTEGER,
-    mxSpanLineImpedance                 INTEGER,
-    mxSpanLineMode                      INTEGER,
-    mxSpanLineLength                    INTEGER,
-    mxSpanLineAttenuation               INTEGER,
-    mxSpanLineGain                      INTEGER,
-    mxSpanLineDelay                     Unsigned32,
-    mxSpanTxLevel                       INTEGER,
-    mxSpanRxLevel                       INTEGER,
-    mxSpanAlarmSettleTime               TimeInterval,
-    mxSpanLineCodeTime                  TimeInterval,
-    mxSpanPrimary                       Unsigned32,
-    mxSpanDataLink                      BITS,
-    mxSpanLineCode                      INTEGER,
-    mxSpanAlarmSeverityMapProfile       RowPointer,
-    mxSpanAdministrativeState           AdministrativeState,
-    mxSpanOperationalState              OperationalState,
-    mxSpanUsageState                    UsageState,
-    mxSpanAlarmStatus                   AlarmStatus,
-    mxSpanProceduralStatus              ProceduralStatus,
-    mxSpanAvailabilityStatus            AvailabilityStatus,
-    mxSpanControlStatus                 ControlStatus,
-    mxSpanStandbyStatus                 StandbyStatus,
-    mxSpanUnknownStatus                 UnknownStatus,
-    mxSpanSap                           RowPointer,
-    mxSpanLoopbackStatus                BITS,
-    mxSpanLineStatus                    BITS,
-    mxSpanAlarms                        BITS,
-    mxSpanEvents                        BITS,
-    mxSpanReceiveLevel                  Unsigned32,
-    mxSpanReceiveThreshold              Unsigned32,
-    mxSpanRowStatus                     RowStatus
+    mxSpanIndex                     Unsigned32,
+    mxSpanName                      CommonLanguageName,
+    mxSpanDevice                    RowPointer,
+    mxSpanEquipmentId               PhysicalPointOfAppearance,
+    mxSpanType                      INTEGER,
+    mxSpanNumber                    SpanNumber,
+    mxSpanRate                      Integer32,
+    mxSpanMode                      BITS,
+    mxSpanCrc                       INTEGER,
+    mxSpanClocking                  INTEGER,
+    mxSpanPriority                  Unsigned32,
+    mxSpanCoding                    INTEGER,
+    mxSpanFraming                   INTEGER,
+    mxSpanLineImpedance             INTEGER,
+    mxSpanLineMode                  INTEGER,
+    mxSpanLineLength                INTEGER,
+    mxSpanLineAttenuation           INTEGER,
+    mxSpanLineGain                  INTEGER,
+    mxSpanLineDelay                 Unsigned32,
+    mxSpanTxLevel                   INTEGER,
+    mxSpanRxLevel                   INTEGER,
+    mxSpanAlarmSettleTime           TimeInterval,
+    mxSpanLineCodeTime              TimeInterval,
+    mxSpanPrimary                   Unsigned32,
+    mxSpanDataLink                  BITS,
+    mxSpanLineCode                  INTEGER,
+    mxSpanAlarmSeverityMapProfile   RowPointer,
+    mxSpanAdministrativeState       AdministrativeState,
+    mxSpanOperationalState          OperationalState,
+    mxSpanUsageState                UsageState,
+    mxSpanAlarmStatus               AlarmStatus,
+    mxSpanProceduralStatus          ProceduralStatus,
+    mxSpanAvailabilityStatus        AvailabilityStatus,
+    mxSpanControlStatus             ControlStatus,
+    mxSpanStandbyStatus             StandbyStatus,
+    mxSpanUnknownStatus             UnknownStatus,
+    mxSpanSap                       RowPointer,
+    mxSpanLoopbackStatus            BITS,
+    mxSpanLineStatus                BITS,
+    mxSpanAlarms                    BITS,
+    mxSpanEvents                    BITS,
+    mxSpanLed                       INTEGER,
+    mxSpanReceiveLevel              Unsigned32,
+    mxSpanReceiveThreshold          Unsigned32,
+    mxSpanLastChange                TimeStamp,
+    mxSpanRowStatus                 RowStatus
 }
 
 mxSpanIndex OBJECT-TYPE
@@ -1510,7 +1549,7 @@ mxSpanMode OBJECT-TYPE
          
          To request or remote a loopback at the far end, use the 
          mxSpanLineCode object."
-    DEFVAL      { {} } -- '0000'B
+    DEFVAL      { {} }
     ::= { mxSpanEntry 8 }
 
 mxSpanCrc OBJECT-TYPE
@@ -1906,7 +1945,7 @@ mxSpanAlarmSettleTime OBJECT-TYPE
          have remained clear for this period of time.  The 
          default is 5 seconds (500 centiseconds).  This column 
          may be read-only for some systems."
-    DEFVAL      { 500 } -- 5 seconds
+    DEFVAL      { 500 }
     ::= { mxSpanEntry 22 }
 
 mxSpanLineCodeTime OBJECT-TYPE
@@ -1920,7 +1959,7 @@ mxSpanLineCodeTime OBJECT-TYPE
          value is only significant for T1 or J1 operation.  The 
          default value is 5 seconds (500 centiseconds).  This 
          column may be read-only for some systems."
-    DEFVAL      { 500 } -- 5 seconds
+    DEFVAL      { 500 }
     ::= { mxSpanEntry 23 }
 
 mxSpanPrimary OBJECT-TYPE
@@ -2139,7 +2178,7 @@ mxSpanAlarmStatus OBJECT-TYPE
     REFERENCE   
         "OPENSS7-SMI-MIB, ITU-T Rec. X.721 | ISO/IEC 10165-2, 
          alarmStatus."
-    DEFVAL      { {} } -- '00000'B
+    DEFVAL      { {} }
     ::= { mxSpanEntry 31 }
 
 mxSpanProceduralStatus OBJECT-TYPE
@@ -2470,7 +2509,7 @@ mxSpanLineStatus OBJECT-TYPE
          - rcvPayloadAIS(15), receiving a payload AIS;
          
          - perfThreshold(16), performance threshold exceeded."
-    DEFVAL      { {} } -- '00000000000000000'B
+    DEFVAL      { {} }
     ::= { mxSpanEntry 39 }
 
 mxSpanAlarms OBJECT-TYPE
@@ -2498,7 +2537,7 @@ mxSpanAlarms OBJECT-TYPE
            sending of yellow alarm (T1/J1) or RAI condition 
            (E1), present after the red or blue/AIS alarms clear 
            while waiting for the alarm recovery period."
-    DEFVAL      { {} } -- '0000'B
+    DEFVAL      { {} }
     ::= { mxSpanEntry 40 }
 
 mxSpanEvents OBJECT-TYPE
@@ -2567,8 +2606,27 @@ mxSpanEvents OBJECT-TYPE
          operation.  Not all devices will report all conditions.  
          Some conditions may also cause alarm conditions and 
          notifications."
-    DEFVAL      { {} } -- '0000000000000'B
+    DEFVAL      { {} }
     ::= { mxSpanEntry 41 }
+
+mxSpanLed OBJECT-TYPE
+    SYNTAX      INTEGER { black(0), green(1), red(2), yellow(3) }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Indicates the color of the multicolor LED (Light Emitting 
+         Diode) associated with the span (if any).  The values are:
+         
+         - black(0), the LED is not lit;
+         - green(1), the LED is lit green;
+         - red(2), the LED is lit red;
+         - yellow(3), the LED is lit yellow (alternating between red and 
+           green on a 50% duty cycle).
+         
+         Not all MX spans have a light-emitting diode and not all 
+         necessarily support all colors."
+    DEFVAL      { black }
+    ::= { mxSpanEntry 42 }
 
 mxSpanReceiveLevel OBJECT-TYPE
     SYNTAX      Unsigned32 (0..600)
@@ -2579,7 +2637,7 @@ mxSpanReceiveLevel OBJECT-TYPE
         "Indicates the receive level in increments of -0.1 dB.  
          The level indicated is only within the range detected 
          by the device."
-    ::= { mxSpanEntry 42 }
+    ::= { mxSpanEntry 43 }
 
 mxSpanReceiveThreshold OBJECT-TYPE
     SYNTAX      Unsigned32 (0..600)
@@ -2593,7 +2651,18 @@ mxSpanReceiveThreshold OBJECT-TYPE
          the range from 0 to this value.  When this value 
          returns zero (0), the device is incapable of providing 
          the receive level."
-    ::= { mxSpanEntry 43 }
+    ::= { mxSpanEntry 44 }
+
+mxSpanLastChange OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The vlue of MIB II's sysUpTime object at the time this card 
+         entered its current state.  If the current state was entered 
+         prior to the last re-initialization of the proxy-agent, then 
+         this object contains a zero value."
+    ::= { mxSpanEntry 45 }
 
 mxSpanRowStatus OBJECT-TYPE
     SYNTAX      RowStatus
@@ -2610,7 +2679,7 @@ mxSpanRowStatus OBJECT-TYPE
          not delete rows that correspond to installed equipment.  
          Management stations may not activate rows that do not 
          correspond to installed equipment."
-    ::= { mxSpanEntry 44 }
+    ::= { mxSpanEntry 46 }
 
 mxBert OBJECT IDENTIFIER
     ::= { mxTables 5 }
@@ -3396,7 +3465,6 @@ mxXconRowStatus OBJECT-TYPE
          not be taken out of service."
     ::= { mxXconEntry 6 }
 
-
 -- ====================================================================
 -- SCALARS
 -- ====================================================================
@@ -3435,22 +3503,22 @@ mxCardTypePLX9030 OBJECT-IDENTITY
     STATUS      current
     DESCRIPTION 
         "This the the PLX 90303 board resulting from finding 
-         '9030'X in the PCI id.  This is a card that has not has 
-         the correct PCI Id burnt into it."
+         '9030'X in the PCI device.  This is a card that has not 
+         had the correct PCI device burnt into it."
     ::= { mxCardTypes 1 }
 
 mxCardTypePLXDevelopmentBoard OBJECT-IDENTITY
     STATUS      current
     DESCRIPTION 
         "This is a PLX development board as identified by the 
-         PCI Id '3001'X."
+         PCI device '3001'X."
     ::= { mxCardTypes 2 }
 
 mxCardTypeX400P OBJECT-IDENTITY
     STATUS      current
     DESCRIPTION 
         "This is an old Digium X400P card as identified by its 
-         PCI Id 'D00D'X.  The next position below this arc 
+         PCI device 'D00D'X.  The next position below this arc 
          identifies whether it is a T1 card or an E1 card.  If 
          there is nothing below this arc, the card supports both 
          E1 and T1 modes.  These cards were discontinued when 
@@ -3462,122 +3530,124 @@ mxCardTypeE400P OBJECT-IDENTITY
     STATUS      current
     DESCRIPTION 
         "This is an old Digium E400P card as identifier by its 
-         PCI Id 'D00D'X.  The card reports a DS2154, DS21354, 
-         DS21554 Dallas chip indicating that this is an E1 card.  
-         This card does not support a T1 mode. It also does not 
-         support some of the snazzier features.  These cards 
-         were discontinued when Digium decided to force upgrade 
-         everyone to a TE410 card."
+         PCI device 'D00D'X.  The card reports a DS2154, 
+         DS21354, DS21554 Dallas chip indicating that this is an 
+         E1 card.  This card does not support a T1 mode. It also 
+         does not support some of the snazzier features.  These 
+         cards were discontinued when Digium decided to force 
+         upgrade everyone to a TE410 card."
     ::= { mxCardTypeX400P 1 }
 
 mxCardTypeT400P OBJECT-IDENTITY
     STATUS      current
     DESCRIPTION 
         "This is the old Digium T400P card as identified by its 
-         PCI Id 'D00D'X.  The card reporets a DS2152, DS21352, 
-         DS21552 Dallas chip indicating that this ia a T1 card.  
-         This card does not support an E1 mode. It also does not 
-         support some of the snazzier features.  These cards 
-         were discontinued when Digium decided to force upgrade 
-         everyone to a TE410 card."
+         PCI device 'D00D'X.  The card reporets a DS2152, 
+         DS21352, DS21552 Dallas chip indicating that this ia a 
+         T1 card.  This card does not support an E1 mode. It 
+         also does not support some of the snazzier features.  
+         These cards were discontinued when Digium decided to 
+         force upgrade everyone to a TE410 card."
     ::= { mxCardTypeX400P 2 }
 
 mxCardTypeX400P-SS7 OBJECT-IDENTITY
     STATUS      current
     DESCRIPTION 
         "This is an old OpenSS7 X400P-SS7 card as identified by 
-         its PCI Id '0557'X. The next position below this arc 
-         identifies whether this is a T1 card or an E1 card.  If 
-         there is nothing below this arc, the card supports both 
-         E1 and T1.  These cards were discontinued when Digium 
-         decided to force upgrade everyone to a TE410 card."
+         its PCI device '0557'X. The next position below this 
+         arc identifies whether this is a T1 card or an E1 card.  
+         If there is nothing below this arc, the card supports 
+         both E1 and T1.  These cards were discontinued when 
+         Digium decided to force upgrade everyone to a TE410 
+         card."
     ::= { mxCardTypes 4 }
 
 mxCardTypeE400P-SS7 OBJECT-IDENTITY
     STATUS      current
     DESCRIPTION 
         "This is an old OpenSS7 E400P-SS7 card as identified by 
-         its PCI Id '0557'X.  These are electically equivalent 
-         to the E400P card.  The card reports a DS2154, DS21354 
-         or DS21554 Dallas chip indicating that this is an E1 
-         card.  This card does not support a T1 mode.  It also 
-         does not support some othe snazzier features.  These 
-         cards were discontinued when Digium decided to force 
-         upgrade everyone to a TE410 card."
+         its PCI device '0557'X.  These are electically 
+         equivalent to the E400P card.  The card reports a 
+         DS2154, DS21354 or DS21554 Dallas chip indicating that 
+         this is an E1 card.  This card does not support a T1 
+         mode.  It also does not support some othe snazzier 
+         features.  These cards were discontinued when Digium 
+         decided to force upgrade everyone to a TE410 card."
     ::= { mxCardTypeX400P-SS7 1 }
 
 mxCardTypeT400P-SS7 OBJECT-IDENTITY
     STATUS      current
     DESCRIPTION 
         "This is an old OpenSS7 T400P-SS7 card as identified by 
-         its PCI Id '0557'X.  These are electically equivalent 
-         to the T400P card.  The card reports a DS2152, DS21352 
-         or DS21552 Dallas chip indicating that this is a T1 
-         card.  This card does not support an E1 mode.  It also 
-         does not support some othe snazzier features.  These 
-         cards were discontinued when Digium decided to force 
-         upgrade everyone to a TE410 card."
+         its PCI device '0557'X.  These are electically 
+         equivalent to the T400P card.  The card reports a 
+         DS2152, DS21352 or DS21552 Dallas chip indicating that 
+         this is a T1 card.  This card does not support an E1 
+         mode.  It also does not support some othe snazzier 
+         features.  These cards were discontinued when Digium 
+         decided to force upgrade everyone to a TE410 card."
     ::= { mxCardTypeX400P-SS7 2 }
 
 mxCardTypeV400P OBJECT-IDENTITY
     STATUS      current
     DESCRIPTION 
         "This is a old Varion V400P card or a newer ATCOM TE400P 
-         as identified by its PCI id '4000'X.  The next position 
-         below this arc identifies whether this is a Varion T1 
-         card, a Varion E1 card, or an ATCOM E1/T1/J1 card.  If 
-         there is nothing below this arc, the card is a Varion 
-         V400P card that supports both E1 and T1.  The Varion 
-         cards were discontinued by Varion due to excessive lead 
-         content compared to newer European standards."
+         as identified by its PCI device '4000'X.  The next 
+         position below this arc identifies whether this is a 
+         Varion T1 card, a Varion E1 card, or an ATCOM E1/T1/J1 
+         card.  If there is nothing below this arc, the card is 
+         a Varion V400P card that supports both E1 and T1.  The 
+         Varion cards were discontinued by Varion due to 
+         excessive lead content compared to newer European 
+         standards."
     ::= { mxCardTypes 5 }
 
 mxCardTypeV400PE OBJECT-IDENTITY
     STATUS      current
     DESCRIPTION 
         "This is an old Varion V400PE card as identified by its 
-         PCI id '4000'X.  These cards sometimes have a E1 only 
-         chip and sometimes have a chip that does both E1 and 
-         T1.  Some of the E1/T1 chips can be configured for J1.  
-         These cards are treated as E1 only.  These cards were 
-         discontinued by Varion due to excessive lead content 
-         compared to newer European standards."
+         PCI device '4000'X.  These cards sometimes have a E1 
+         only chip and sometimes have a chip that does both E1 
+         and T1.  Some of the E1/T1 chips can be configured for 
+         J1.  These cards are treated as E1 only.  These cards 
+         were discontinued by Varion due to excessive lead 
+         content compared to newer European standards."
     ::= { mxCardTypeV400P 1 }
 
 mxCardTypeV400PT OBJECT-IDENTITY
     STATUS      current
     DESCRIPTION 
         "This is an old Varion V400PT card as identified by its 
-         PCI id '4000'X.  These cards sometimes have a T1 only 
-         chip and sometimes have a chip that does both E1 and 
-         T1.  Some of the E1/T1 chips can be configured for J1.  
-         These cards are treated as T1 only.  These cards were 
-         discontinued by Varion due to excessive lead content 
-         compared to newer European standards."
+         PCI device '4000'X.  These cards sometimes have a T1 
+         only chip and sometimes have a chip that does both E1 
+         and T1.  Some of the E1/T1 chips can be configured for 
+         J1.  These cards are treated as T1 only.  These cards 
+         were discontinued by Varion due to excessive lead 
+         content compared to newer European standards."
     ::= { mxCardTypeV400P 2 }
 
 mxCardTypeA400P OBJECT-IDENTITY
     STATUS      current
     DESCRIPTION 
-        "This is an ATCOM TE400P card as identified by its PCI id 
-         '4000'X.  These cards have a chip that supports E1, T1 
-         and J1.  These cards are treated as supporting both E1 
-         and T1/J1.  It is unclear whether these cards are still 
-         available.  They are treated identical to the old Varion 
-         V400P card (x400pCardTypeV400P) with the newer 
-         chipsets."
+        "This is an ATCOM TE400P card as identified by its PCI 
+         device '4000'X.  These cards have a chip that supports 
+         E1, T1 and J1.  These cards are treated as supporting 
+         both E1 and T1/J1.  It is unclear whether these cards 
+         are still available.  They are treated identical to the 
+         old Varion V400P card (x400pCardTypeV400P) with the 
+         newer chipsets."
     ::= { mxCardTypeV400P 3 }
 
 mxCardTypeV401PE OBJECT-IDENTITY
     STATUS      current
     DESCRIPTION 
         "This is a current Varion V401PE card as identified by 
-         its PCI id 'D33D'X.  Unfortunately, even though it 
+         its PCI device 'D33D'X.  Unfortunately, even though it 
          reports itself as an E1 card, most of these cards are 
          electrically identical to the T1 card, just reporting a 
-         different PCI Id.  The chips support E1/T1/J1 and can 
-         be configured for any mode of operation, typically on a 
-         card by card basis and sometimes on a span by span 
+         different PCI device.  The chips support E1/T1/J1 and 
+         can be configured for any mode of operation, typically 
+         on a card by card basis and sometimes on a span by span 
          basis."
     ::= { mxCardTypes 6 }
 
@@ -3585,23 +3655,23 @@ mxCardTypeV401PT OBJECT-IDENTITY
     STATUS      current
     DESCRIPTION 
         "This is a current Varion V401PT card as identified by 
-         its PCI id 'D44D'X.  Unfortunately, even though it 
+         its PCI device 'D44D'X.  Unfortunately, even though it 
          reports itself as a T1 card, most of these cards are 
          electrically identical to the E1 card, just reporting a 
-         different PCI Id.  The chips support E1/T1/J1 and can 
-         be configured for any mode of operation, typically on a 
-         card by card basis and sometimes on a span by span 
+         different PCI device.  The chips support E1/T1/J1 and 
+         can be configured for any mode of operation, typically 
+         on a card by card basis and sometimes on a span by span 
          basis."
     ::= { mxCardTypes 7 }
 
 mxCardTypeAT400P OBJECT-IDENTITY
     STATUS      current
     DESCRIPTION 
-        "This is an ATCOM T400P card as identified by its PCI id 
-         '1000'X.  These cards are configured for T1 only 
-         regardless of whether the chip supports E1.  Some of the 
-         E1/T1 chips can be configured for J1.  These cards are 
-         treated as T1 only.  This is a Tormenta 3 card and 
+        "This is an ATCOM T400P card as identified by its PCI 
+         device '1000'X.  These cards are configured for T1 only 
+         regardless of whether the chip supports E1.  Some of 
+         the E1/T1 chips can be configured for J1.  These cards 
+         are treated as T1 only.  This is a Tormenta 3 card and 
          supports more advanced features.  It is unclear whether 
          these cards are still available."
     ::= { mxCardTypes 8 }
@@ -3609,11 +3679,11 @@ mxCardTypeAT400P OBJECT-IDENTITY
 mxCardTypeAE400P OBJECT-IDENTITY
     STATUS      current
     DESCRIPTION 
-        "This is an ATCOM E400P card as identified by its PCI id 
-         '2000'X.  These cards are configured for E1 only 
-         regardless of whether the chip supports T1.  Some of the
-         E1/T1 chips can be configured for J1.  These cards are 
-         treated as E1 only.  This is a Tormenta 3 card and 
+        "This is an ATCOM E400P card as identified by its PCI 
+         device '2000'X.  These cards are configured for E1 only 
+         regardless of whether the chip supports T1.  Some of 
+         the E1/T1 chips can be configured for J1.  These cards 
+         are treated as E1 only.  This is a Tormenta 3 card and 
          supports more advanced features.  It is unclear whether 
          these cards are still available."
     ::= { mxCardTypes 9 }
@@ -3622,12 +3692,12 @@ mxCardTypeA400PT OBJECT-IDENTITY
     STATUS      current
     DESCRIPTION 
         "This is a current ATCOM T400P card as identified by its 
-         PCI id '4001'X.  Unfortunately, even though it reports 
-         itself as a T1 card, most of these cards are 
-         electrically identifical to the E1 card, just reporting 
-         a different PCI Id.  The chips support E1/T1/J1 and can 
-         be configured for any mode of operation, typically on a 
-         card by card basis and sometimes on a span by span 
+         PCI device '4001'X.  Unfortunately, even though it 
+         reports itself as a T1 card, most of these cards are 
+         electrically identical to the E1 card, just reporting a 
+         different PCI device.  The chips support E1/T1/J1 and 
+         can be configured for any mode of operation, typically 
+         on a card by card basis and sometimes on a span by span 
          basis.  These cards are treated identical to the old 
          Varion V401PE cards (mxCardTypeV401PE)."
     ::= { mxCardTypes 10 }
@@ -3636,15 +3706,167 @@ mxCardTypeA400PE OBJECT-IDENTITY
     STATUS      current
     DESCRIPTION 
         "This is a current ATCOM E400P card as identified by its 
-         PCI id '4002'X.  Unfortunatley, even though it reports 
-         itself as an E1 card, most of these cards are 
-         electrically identifcal to the T1 card, just reporting a 
-         different PCI Id.  The chips support E1/T1/J1 and can be 
-         configured for any mode of operation, typically on a 
-         card by card basis and sometimes on a span by span 
+         PCI device '4002'X.  Unfortunately, even though it 
+         reports itself as an E1 card, most of these cards are 
+         electrically identical to the T1 card, just reporting a 
+         different PCI device.  The chips support E1/T1/J1 and 
+         can be configured for any mode of operation, typically 
+         on a card by card basis and sometimes on a span by span 
          basis.  These cards a treated identical to the old 
          Varion V401PT cards (mxCardTypeV401PT)."
     ::= { mxCardTypes 11 }
+
+mxCardTypeCP100 OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "This is a current Allo CP100P/CP100E card providing a 
+         PCI/PCIe bus interface as identified by its PCI device 
+         'D44D'X and a subsystem device of '17F6'X.  These cards 
+         are marked as a '4E1T1 CARD'.  The PCI device of 
+         'D44D'X reports the card like an old Varion V401PT 
+         card. They currently have a DS21455 chip.  The chip 
+         supports E1/T1/J1 and can be configured for any mode of 
+         operation, typically on a card by card basis and 
+         sometimes on a span by span basis.  These cards are 
+         almost identitical to the CP400P/C400E cards, but only 
+         have one port populated instead of four."
+    ::= { mxCardTypes 12 }
+
+mxCardTypeCP100P OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION 
+        "This is a current Allo CP100P card providing a PCI bus 
+         interface as identified by its PCI device 'D44D'X and a 
+         subsystem device of '17F6'X.  These cards are marked as 
+         a '4E1T1 CARD'.  The PCI device of 'D44D'X reports the 
+         card like an old Varion V401PT (Torementa 3) card. They 
+         currently have a DS21455 chip.  The chip supports 
+         E1/T1/J1 and can be configured for any mode of 
+         operation, typically on a card by card basis and 
+         sometimes on a span by span basis.  These cards are 
+         almost identitical to the CP400P cards, but only have 
+         one port populated instead of four.  These cards can 
+         only be distinguished from the CP100E card by the PCI 
+         bus that they support."
+    ::= { mxCardTypeCP100 1 }
+
+mxCardTypeCP100E OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION 
+        "This is a current Allo CP100E card providing a PCIe bus 
+         interface as identified by its PCI device 'D44D'X and a 
+         subsystem device of '17F6'X.  These cards are marked as 
+         a '4E1T1 CARD'.  The PCI device of 'D44D'X reports the 
+         card like an old Varion V401PT (Torementa 3) card. They 
+         currently have a DS21455 chip.  The chip supports 
+         E1/T1/J1 and can be configured for any mode of 
+         operation, typically on a card by card basis and 
+         sometimes on a span by span basis.  These cards are 
+         almost identitical to the CP400P cards, but only have 
+         one port populated instead of four.  These cards can 
+         only be distinguished from the CP100P card by the PCI 
+         bus that they support."
+    ::= { mxCardTypeCP100 2 }
+
+mxCardTypeCP200 OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "This is a current Allo CP200P/CP200E card providing a 
+         PCI/PCIe bus interface as identified by its PCI device 
+         'D44D'X and a subsystem device of '17F8'X.  These cards 
+         are marked as a '4E1T1 CARD'.  The PCI device of 
+         'D44D'X reports the card like an old Varion V401PT 
+         card. They currently have a DS21455 chip.  The chip 
+         supports E1/T1/J1 and can be configured for any mode of 
+         operation, typically on a card by card basis and 
+         sometimes on a span by span basis.  These cards are 
+         almost identitical to the CP400P/C400E cards, but only 
+         have two ports populated instead of four."
+    ::= { mxCardTypes 13 }
+
+mxCardTypeCP200P OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION 
+        "This is a current Allo CP200P card providing a PCI bus 
+         interface as identified by its PCI device 'D44D'X and a 
+         subsystem device of '17F8'X.  Thses cards are marked as 
+         a '4E1T1 CARD'.  The PCI device of 'D44D'X reports the 
+         card like an old Varion V401PT (Torementa 3) card. They 
+         currently have a DS21455 chip.  The chip supports 
+         E1/T1/J1 and can be configured for any mode of 
+         operation, typically on a card by card basis and 
+         sometimes on a span by span basis.  These cards are 
+         almost identitical to the CP400P cards, but only have 
+         two ports populated instead of four.  These cards can 
+         only be distinguished from the CP200E card by the PCI 
+         bus that they support."
+    ::= { mxCardTypeCP200 1 }
+
+mxCardTypeCP200E OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION 
+        "This is a current Allo CP200E card providing a PCIe bus 
+         interface as identified by its PCI device 'D44D'X and a 
+         subsystem device of '17F8'X.  These cards are marked as 
+         a '4E1T1 CARD'.  The PCI device of 'D44D'X reports the 
+         card like an old Varion V401PT (Torementa 3) card. They 
+         currently have a DS21455 chip.  The chip supports 
+         E1/T1/J1 and can be configured for any mode of 
+         operation, typically on a card by card basis and 
+         sometimes on a span by span basis.  These cards are 
+         almost identitical to the CP400P cards, but only have 
+         one port populated instead of four.  These cards can 
+         only be distinguished from the CP200P card by the PCI 
+         bus that they support."
+    ::= { mxCardTypeCP200 2 }
+
+mxCardTypeCP400 OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "This is a current Allo CP400P/CP400E card providing a 
+         PCI/PCIe bus interface as identified by its PCI device 
+         'D44D'X and a subsystem device of '17F7'X.  These cards 
+         are marked as 'CP400P Rev 12' or 'CP400P Rev 1.1'.  The 
+         PCI device of 'D44D'X reports the card like an old 
+         Varion V401PT card.  They currently have a DS21455 
+         chip.  The chip supports E1/T1/J1 operation and can be 
+         configured for any mode of operation, typically on a 
+         card by card basis and sometimes on a span by span 
+         basis."
+    ::= { mxCardTypes 14 }
+
+mxCardTypeCP400P OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION 
+        "This is a current Allo CP400P card providing a PCI bus 
+         interface as identified by its PCI device 'D44D'X and a 
+         subsystem device of '17F7'X.  These cards are marked as 
+         'CP400P Rev 12'.  The PCI device of 'D44D'X reports the 
+         card like an old Varion V401PT card.  They currently 
+         have a DS21455 chip.  The chip supports E1/T1/J1 
+         operation and can be configured for any mode of 
+         operation, typically on a card by card basis and 
+         sometimes on a span by span basis.  These cards can 
+         only be distinguished from the CP400E card by the PCI 
+         bus that they support."
+    ::= { mxCardTypeCP400 1 }
+
+mxCardTypeCP400E OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION 
+        "This is a current Allo CP400E card providing a PCIe bus 
+         interface as identified by its PCI device 'D44D'X and a 
+         subsystem device of '17F7'X.  These cards are marked as 
+         'CP400P Rev 12'.  The PCI device of 'D44D'X reports the 
+         card like an old Varion V401PT card.  They currently 
+         have a DS21455 chip.  The chip supports E1/T1/J1 
+         operation and can be configured for any mode of 
+         operation, typically on a card by card basis and 
+         sometimes on a span by span basis.  These cards can 
+         only be distinguished from the CP400P card by the PCI 
+         bus that they support."
+    ::= { mxCardTypeCP400 2 }
+
 
 -- ====================================================================
 -- CHIP TYPES
@@ -3905,7 +4127,7 @@ mxNearEndCurrentFASEs OBJECT-TYPE
     UNITS       "errors"
     MAX-ACCESS  read-only
     STATUS      current
-    DESCRIPTION
+    DESCRIPTION 
         "The number of Frame Alignment Signal Errors (FASEs) in the 
          current interval.  The FASE is a count of the number of 
          multi-frames for which the receiver has been out of 
@@ -3917,7 +4139,7 @@ mxNearEndCurrentFABEs OBJECT-TYPE
     UNITS       "errors"
     MAX-ACCESS  read-only
     STATUS      current
-    DESCRIPTION
+    DESCRIPTION 
         "The number of Frame Alignment Bit Errors (FABEs) in the current 
          interval.  The FABE is a count of the number of frame alignment 
          bit errors in the current interval."
@@ -3928,7 +4150,7 @@ mxNearEndCurrentFEBEs OBJECT-TYPE
     UNITS       "errors"
     MAX-ACCESS  read-only
     STATUS      current
-    DESCRIPTION
+    DESCRIPTION 
         "The number of Far End Block Errors (FEBEs) in the current 
          interval.  This is only applicable to E1 and counts the number 
          of error-bits received from the far end indicating a block 
@@ -4098,7 +4320,7 @@ mxNearEndIntervalFASEs OBJECT-TYPE
     UNITS       "errors"
     MAX-ACCESS  read-only
     STATUS      current
-    DESCRIPTION
+    DESCRIPTION 
         "The number of Frame Alignment Signal Errors (FASEs) in the 
          indexed interval.  The FASE is a count of the number of 
          multi-frames for which the receiver has been out of 
@@ -4110,7 +4332,7 @@ mxNearEndIntervalFABEs OBJECT-TYPE
     UNITS       "errors"
     MAX-ACCESS  read-only
     STATUS      current
-    DESCRIPTION
+    DESCRIPTION 
         "The number of Frame Alignment Bit Errors (FABEs) in the indexed 
          interval.  The FABE is a count of the number of frame alignment 
          bit errors in the indexed interval."
@@ -4121,7 +4343,7 @@ mxNearEndIntervalFEBEs OBJECT-TYPE
     UNITS       "errors"
     MAX-ACCESS  read-only
     STATUS      current
-    DESCRIPTION
+    DESCRIPTION 
         "The number of Far End Block Errors (FEBEs) in the indexed 
          interval.  This is only applicable to E1 and counts the number 
          of error-bits received from the far end indicating a block 
@@ -4781,6 +5003,26 @@ mxGroups OBJECT IDENTIFIER
 mxCompliances OBJECT IDENTIFIER
     ::= { mxConformance 2 }
 
+mxCardStateChange NOTIFICATION-TYPE
+    OBJECTS     { mxCardLeds, mxCardLastChange }
+    STATUS      current
+    DESCRIPTION 
+        "An mxCardStateChange trap is sent when the value of an instance 
+         mxCardLeds changes.  It can be utilized by a management station 
+         to provide real-time updates."
+    ::= { mxNotifications 1 }
+
+mxSpanStateChange NOTIFICATION-TYPE
+    OBJECTS     { mxSpanLoopbackStatus, mxSpanLineStatus, mxSpanAlarms, 
+                  mxSpanEvents, mxSpanLed, mxSpanReceiveLevel, 
+                  mxSpanLastChange }
+    STATUS      current
+    DESCRIPTION 
+        "An mxSpanStateChange trap is sent when the value of an instance 
+         of one of the span status objects changes.  It can be utilized 
+         by a management station to provide real-time updates."
+    ::= { mxNotifications 2 }
+
 mxSyncMandatoryGroup OBJECT-GROUP
     OBJECTS     { mxSyncSpanId, mxSyncRowStatus }
     STATUS      current
@@ -4818,7 +5060,8 @@ mxCardGroup OBJECT-GROUP
                   mxCardProceduralStatus, mxCardAvailabilityStatus, 
                   mxCardControlStatus, mxCardUnknownStatus, 
                   mxCardStandbyStatus, mxCardSyncSpanId, 
-                  mxCardSyncTransitions, mxCardName, mxCardStatus }
+                  mxCardSyncTransitions, mxCardLeds, mxCardLastChange, 
+                  mxCardName, mxCardStatus }
     STATUS      current
     DESCRIPTION 
         "A collection of objects identifying the card state."
@@ -4840,8 +5083,8 @@ mxSpanGroup OBJECT-GROUP
                   mxSpanControlStatus, mxSpanStandbyStatus, 
                   mxSpanUnknownStatus, mxSpanSap, mxSpanLoopbackStatus, 
                   mxSpanLineStatus, mxSpanAlarms, mxSpanEvents, 
-                  mxSpanReceiveLevel, mxSpanReceiveThreshold, 
-                  mxSpanRowStatus }
+                  mxSpanLed, mxSpanReceiveLevel, mxSpanReceiveThreshold, 
+                  mxSpanLastChange, mxSpanRowStatus }
     STATUS      current
     DESCRIPTION 
         "A collection of objects implementing the span group."
@@ -4890,7 +5133,7 @@ mxNearEndCurrentGroup OBJECT-GROUP
                   mxNearEndCurrentSESs, mxNearEndCurrentSEFSs, 
                   mxNearEndCurrentUASs, mxNearEndCurrentCSSs, 
                   mxNearEndCurrentPCVs, mxNearEndCurrentLESs, 
-                  mxNearEndCurrentBESs, mxNearEndCurrentDMs,
+                  mxNearEndCurrentBESs, mxNearEndCurrentDMs, 
                   mxNearEndCurrentLCVs, mxNearEndCurrentFASEs, 
                   mxNearEndCurrentFABEs, mxNearEndCurrentFEBEs }
     STATUS      current
@@ -4972,8 +5215,15 @@ mxDrivGroup OBJECT-GROUP
                   mxDrivRowStatus }
     STATUS      current
     DESCRIPTION 
-        "A collection of objects identifyin the driver."
+        "A collection of objects identifying the driver."
     ::= { mxGroups 17 }
+
+mxTrapGroup NOTIFICATION-GROUP
+    NOTIFICATIONS { mxCardStateChange, mxSpanStateChange }
+    STATUS      current
+    DESCRIPTION 
+        "A collection of notifications of state changes."
+    ::= { mxGroups 18 }
 
 mxBasicCompliance MODULE-COMPLIANCE
     STATUS      current
@@ -4982,9 +5232,8 @@ mxBasicCompliance MODULE-COMPLIANCE
 
     MODULE      -- this module
 
-        MANDATORY-GROUPS        { mxSyncMandatoryGroup, 
-                  mxCardIdGroup, mxChipGroup, mxCardGroup, 
-                  mxDrivGroup }
+        MANDATORY-GROUPS        { mxSyncMandatoryGroup, mxCardIdGroup, 
+                  mxChipGroup, mxCardGroup, mxDrivGroup }
 
         GROUP   mxPciGroup
         DESCRIPTION   
@@ -5024,6 +5273,10 @@ mxBasicCompliance MODULE-COMPLIANCE
         DESCRIPTION   
               "Optional group providing far end total statistics."
 
+        GROUP   mxTrapGroup
+        DESCRIPTION   
+              "Optionsl group providing state change notifications."
+
         OBJECT  mxBertSelect
         MIN-ACCESS  read-only
         DESCRIPTION   
@@ -5046,8 +5299,8 @@ mxEnhancedCompliance MODULE-COMPLIANCE
     MODULE      -- this module
 
         MANDATORY-GROUPS        { mxScalarGroup, mxSpanGroup, 
-                  mxChanGroup, mxXconGroup, 
-                  mxNearEndCurrentGroup, mxFarEndCurrentGroup }
+                  mxChanGroup, mxXconGroup, mxNearEndCurrentGroup, 
+                  mxFarEndCurrentGroup, mxTrapGroup }
 
         GROUP   mxBertGroup
         DESCRIPTION   
@@ -5073,4 +5326,4 @@ mxEnhancedCompliance MODULE-COMPLIANCE
 
 END -- end of module OPENSS7-MX-MIB.
 
--- vim: ft=mib comments=\f\:\",\b\:\-\-,\:\-\-,\f\b\:- fo+=tcqlornw tw=72 nocin nosi sts=4 sw=4
+-- vim: ft=mib comments=\f\:\",\b\:\-\-,\:\-\-,\f\b\:- fo+=tcqlornw tw=72 nocin nosi sts=4 sw=4 et

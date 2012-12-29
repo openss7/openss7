@@ -319,7 +319,7 @@ sequence of actions that operate on an internal stack of
 (\*(lqshort-words\*(rq) or an offset register.
 The offset register is initially zero.
 
-Each short-word o fthe comman dlist specifies an action and a binary
+Each short-word of the command list specifies an action and a binary
 operator.  Using
 .I n
 as shorthand for the next short-word of the instruction stream and

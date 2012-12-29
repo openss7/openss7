@@ -1095,11 +1095,10 @@ IntervalsOfDay ::= TEXTUAL-CONVENTION
             intervalEnd Time24 }
          
          It consists of an octet string that is an integral 
-         multiple of 
-         4 octets.  For each 4 octet grouping, the first two 
-         octets are coded as a Time24 textual convention 
-         representing the start time for the interval, and the 
-         last two octets are coded as a Time24 textual 
+         multiple of 4 octets.  For each 4 octet grouping, the 
+         first two octets are coded as a Time24 textual 
+         convention representing the start time for the interval, 
+         and the last two octets are coded as a Time24 textual 
          convention representing the end time for the interval.  
          Each 4-tuple of octets represents a separate interval."
     REFERENCE   
@@ -2954,7 +2953,7 @@ logOperationalState OBJECT-TYPE
             records cannot be created.
          
          A change in operational state shall generate a state 
-         chnage notification."
+         change notification."
     REFERENCE   
         "ITU-T Rec. X.735 (1992) | ISO/IEC 10164-6 : 1993, 
                Section 8.1.1.1.4."
@@ -2984,13 +2983,13 @@ logAvailabilityStatus OBJECT-TYPE
          No state change notification is generated when this 
          attribute changes value.  Note: the log makes use of 
          the availability status to indicate the 'log-full' 
-         condition; the presence fo this conditional package 
+         condition; the presence of this conditional package 
          makes available the 'Off-Duty' value to the object."
     REFERENCE   
         "ITU-T Rec. X.735 (1992) | ISO/IEC 10164-6 : 1993, 
                Section 8.1.1.1.6.
          ITU-T Rec. X.735 (1992) | ISO/IEC 10164-6 : 1993, 
-         Section 8.1.1.4.1."
+               Section 8.1.1.4.1."
     ::= { logEntry 5 }
 
 logFullAction OBJECT-TYPE
@@ -3109,7 +3108,7 @@ logStartTime OBJECT-TYPE
         "The duration package provides the ability to 
          automatically control the time that a managed object 
          starts and stops functioning through the use of the 
-         start and stop time attribtues.
+         start and stop time attributes.
          
          This attribute defines the date and time at which an 
          unlocked and enabled managed object starts functioning.  
@@ -3133,7 +3132,7 @@ logStopTime OBJECT-TYPE
         "The duration package provides the ability to 
          automatically control the time that a managed object 
          starts and stops functioning through the use of the 
-         start and stop time attribtues.
+         start and stop time attributes.
          
          This attribute defines the date and time at which 
          a managed object stops functioning.  If the value of 
@@ -3182,13 +3181,13 @@ logWeekMask OBJECT-TYPE
          capability of scheduling logging with a periodicity of 
          one week.  This structured attribute defines a set of 
          mask components, each specifying a set of time 
-         intervals on a 24-hout time-of-day clock, pertaining to 
+         intervals on a 24-hour time-of-day clock, pertaining to 
          selected days of the week.  The week mask attribute 
          defaults to a scheduling criteria of 'always-on' at 
          logs creation.
          
-         The days of wekk component defines the days of the week 
-         on which the log's scheduling mechansim will allow the 
+         The days of week component defines the days of the week 
+         on which the log's scheduling mechanism will allow the 
          log to have intervals during which logging may occur.  
          This component, if not present is a create, will 
          default to all seven days of the week.
@@ -3197,7 +3196,7 @@ logWeekMask OBJECT-TYPE
          intervals (interval-start and interval-end times of 
          day) for which the log will exhibit the logging-on 
          condition, if the current days is one of the days that 
-         is selected within the corresponding dyas of week.  
+         is selected within the corresponding days of week.  
          
          During excluded intervals the log exhibits the 
          logging-off condition.  If not specified in the create 
@@ -3215,18 +3214,18 @@ logSchedulerName OBJECT-TYPE
     MAX-ACCESS  read-create
     STATUS      current
     DESCRIPTION 
-        "The external shceduler scheduling conditional package 
+        "The external scheduler scheduling conditional package 
          provides the capability of scheduling logging based on 
          a schedule defined in an external scheduler managed 
          object.  The log's logging-on and logging-off condition 
          will be changed in accordance with the scheduling 
-         characeteristics specified by a scheduler managed 
+         characteristics specified by a scheduler managed 
          object.
          
          This attribute specifies the name of the scheduler 
          managed object that is related to the logs.  This 
-         relationship imiplies that the log's logging-on and 
-         logging-off conditions wil be scheduled by the external 
+         relationship implies that the log's logging-on and 
+         logging-off conditions will be scheduled by the external 
          scheduler.  This attribute is read-only once the object 
          has been created.  It defaults to NULL if not specified 
          upon creation."
@@ -3274,7 +3273,7 @@ logRecordEntry OBJECT-TYPE
          Log records are created as a result of the receipt of 
          an event report or notifications, they are not created 
          by explicit management operations.  Log records may 
-         only be retrieved and deleted; attributes of og record 
+         only be retrieved and deleted; attributes of the record 
          cannot be modified.
          
          The operations that can be performed on a log record 

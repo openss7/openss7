@@ -64,14 +64,14 @@ sub dodata {
 		}
 		delete $data{tdmlcl} if $data{tdmlcl} eq 'No Local Tandem';
 		delete $data{tdm911} if $data{tdm911} eq 'NO E-911';
-		$data{switch} = delete $data{swclli} if $data{swclli};
+		$data{switch}	    = delete $data{swclli} if $data{swclli};
 		$data{switchname}   = delete $data{swname} if $data{swname};
 		$data{switchtype}   = delete $data{swtype} if $data{swtype};
-		$data{wc} = delete $data{wcclli} if $data{wcclli};
-		$data{wc} = substr($data{switch},0,8) unless $data{wc};
-		$data{swocn} = delete $data{ocn} if $data{ocn};
-		$data{swoocn} = delete $data{oocn} if $data{oocn};
-		$data{swlata}	    = delete $data{lata} if $data{lata};
+		$data{wc}	    = delete $data{wcclli} if $data{wcclli};
+		$data{wc}	    = substr($data{switch},0,8) unless $data{wc};
+		$data{swocn}	    = $data{ocn} if $data{ocn};
+		$data{swoocn}	    = $data{oocn} if $data{oocn};
+		$data{swlata}	    = $data{lata} if $data{lata};
 		my $f = 'switch';
 		unless (not $data{$f} or length($data{$f}) == 11) {
 			print STDERR "E: bad value at $lineno in field $f '$data{$f}'\n";
@@ -127,6 +127,9 @@ sub dodata {
 		if (length($data{$f}) and $data{$f} !~ /^0[0-9]{4},0[0-9]{4}$/) {
 			print STDERR "E: bad value at $lineno in field $f '$data{$f}'\n";
 			next;
+		}
+		if ($data{nxx} and $data{nxx} =~ /-/) {
+			($data{npa},$data{nxx}) = split(/-/,$data{nxx});
 		}
 		makedb::updatedata(\%data,$fdate,$sect);
 	}

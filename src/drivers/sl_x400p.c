@@ -667,6 +667,7 @@ typedef struct cd {
 	int device;			/* device hardware index */
 	int devrev;			/* device hardware revision */
 	int hw_flags;			/* board and device hardware flags */
+	int ports;			/* number of ports populated on the board */
 	struct {
 		struct cd *next;	/* next card in this sync group */
 		struct cd **prev;	/* prev card in this sync group */
@@ -943,7 +944,16 @@ enum xp_board {
 	AT400P,
 	A400P,
 	A400PE,
-	A400PT
+	A400PT,
+	CP100,
+	CP100P,
+	CP100E,
+	CP200,
+	CP200P,
+	CP200E,
+	CP400,
+	CP400P,
+	CP400E
 };
 
 /* indexed by xp_board above */
@@ -953,25 +963,35 @@ static struct {
 	char *name;
 	uint32_t hw_flags;
 	uint32_t idle_word;
+	int ports;
 } xp_board_info[] __devinitdata = {
-	{ "PLX 9030",			0, 0x00000000 },
-	{ "PLX Development Board",	0, 0x00000000 },
-	{ "X400P",			1, 0xffffffff },
-	{ "E400P",			1, 0xffffffff },
-	{ "T400P",			1, 0xfefefefe },
-	{ "X400P-SS7",			1, 0xffffffff },
-	{ "E400P-SS7",			1, 0xffffffff },
-	{ "T400P-SS7",			1, 0xfefefefe },
-	{ "V400P",			1, 0xffffffff },
-	{ "V400PE",			1, 0xffffffff },
-	{ "V400PT",			1, 0xfefefefe },
-	{ "V401PE",			1, 0xffffffff },
-	{ "V401PT",			1, 0xfefefefe },
-	{ "AE400P",			1, 0xffffffff },
-	{ "AT400P",			1, 0xfefefefe },
-	{ "A400P",			1, 0xffffffff },
-	{ "A400PE",			1, 0xffffffff },
-	{ "A400PT",			1, 0xfefefefe },
+	{ "PLX 9030",			0, 0x00000000, 4 },
+	{ "PLX Development Board",	0, 0x00000000, 4 },
+	{ "X400P",			1, 0xffffffff, 4 },
+	{ "E400P",			1, 0xffffffff, 4 },
+	{ "T400P",			1, 0xfefefefe, 4 },
+	{ "X400P-SS7",			1, 0xffffffff, 4 },
+	{ "E400P-SS7",			1, 0xffffffff, 4 },
+	{ "T400P-SS7",			1, 0xfefefefe, 4 },
+	{ "V400P",			1, 0xffffffff, 4 },
+	{ "V400PE",			1, 0xffffffff, 4 },
+	{ "V400PT",			1, 0xfefefefe, 4 },
+	{ "V401PE",			1, 0xffffffff, 4 },
+	{ "V401PT",			1, 0xfefefefe, 4 },
+	{ "AE400P",			1, 0xffffffff, 4 },
+	{ "AT400P",			1, 0xfefefefe, 4 },
+	{ "A400P",			1, 0xffffffff, 4 },
+	{ "A400PE",			1, 0xffffffff, 4 },
+	{ "A400PT",			1, 0xfefefefe, 4 },
+	{ "CP100",			1, 0xffffffff, 1 },
+	{ "CP100P",			1, 0xffffffff, 1 },
+	{ "CP100E",			1, 0xffffffff, 1 },
+	{ "CP200",			1, 0xffffffff, 2 },
+	{ "CP200P",			1, 0xffffffff, 2 },
+	{ "CP200E",			1, 0xffffffff, 2 },
+	{ "CP400",			1, 0xffffffff, 4 },
+	{ "CP400P",			1, 0xffffffff, 4 },
+	{ "CP400E",			1, 0xffffffff, 4 }
 };
 
 #define XPF_SUPPORTED	(1<<0)
@@ -1019,6 +1039,9 @@ STATIC struct pci_device_id xp_pci_tbl[] __devinitdata = {
 	{PCI_VENDOR_ID_PLX, 0x3001, PCI_ANY_ID, PCI_ANY_ID, PCI_CLASS_BRIDGE_OTHER << 8, 0xffff00, PLXDEVBRD},
 	{PCI_VENDOR_ID_PLX, 0xD00D, PCI_ANY_ID, PCI_ANY_ID, PCI_CLASS_BRIDGE_OTHER << 8, 0xffff00, X400P},
 	{PCI_VENDOR_ID_PLX, 0x0557, PCI_ANY_ID, PCI_ANY_ID, PCI_CLASS_BRIDGE_OTHER << 8, 0xffff00, X400PSS7},
+	{PCI_VENDOR_ID_PLX, 0xD44D, PCI_ANY_ID, 0x17F6,     PCI_CLASS_BRIDGE_OTHER << 8, 0xffff00, CP100},
+	{PCI_VENDOR_ID_PLX, 0xD44D, PCI_ANY_ID, 0x17F8,     PCI_CLASS_BRIDGE_OTHER << 8, 0xffff00, CP200},
+	{PCI_VENDOR_ID_PLX, 0xD44D, PCI_ANY_ID, 0x17F7,     PCI_CLASS_BRIDGE_OTHER << 8, 0xffff00, CP400},
 	{PCI_VENDOR_ID_PLX, 0x4000, PCI_ANY_ID, PCI_ANY_ID, PCI_CLASS_BRIDGE_OTHER << 8, 0xffff00, V400P},
 	{PCI_VENDOR_ID_PLX, 0xD33D, PCI_ANY_ID, PCI_ANY_ID, PCI_CLASS_BRIDGE_OTHER << 8, 0xffff00, V401PT},
 	{PCI_VENDOR_ID_PLX, 0xD44D, PCI_ANY_ID, PCI_ANY_ID, PCI_CLASS_BRIDGE_OTHER << 8, 0xffff00, V401PE},
@@ -1040,6 +1063,13 @@ MODULE_ALIAS("pci:v000010B5d000000557sv*sd*bc06sc80i*");
 MODULE_ALIAS("pci:v000010B5d000004000sv*sd*bc06sc80i*");
 MODULE_ALIAS("pci:v000010B5d00000D33Dsv*sd*bc06sc80i*");
 MODULE_ALIAS("pci:v000010B5d00000D44Dsv*sd*bc06sc80i*");
+MODULE_ALIAS("pci:v000010B5d000001000sv*sd*bc06sc80i*");
+MODULE_ALIAS("pci:v000010B5d000002000sv*sd*bc06sc80i*");
+MODULE_ALIAS("pci:v000010B5d000004001sv*sd*bc06sc80i*");
+MODULE_ALIAS("pci:v000010B5d000004002sv*sd*bc06sc80i*");
+MODULE_ALIAS("pci:v000010B5d00000D44Dsv*sd17F6bc06sc80i*");
+MODULE_ALIAS("pci:v000010B5d00000D44Dsv*sd17F8bc06sc80i*");
+MODULE_ALIAS("pci:v000010B5d00000D44Dsv*sd17F7bc06sc80i*");
 #endif				/* MODULE_ALIAS */
 #endif				/* MODULE_DEVICE_TABLE */
 
@@ -5498,7 +5528,7 @@ xp_t1_card_config(struct cd *cd)
 	cd->config.ifflags = (SDL_IF_UP | SDL_IF_TX_RUNNING | SDL_IF_RX_RUNNING);
 
 	/* Allocate span structures and write all of the registers of interest. */
-	for (span = 0; span < X400_SPANS; span++) {
+	for (span = 0; span < cd->ports; span++) {
 		struct sp *sp;
 		int err;
 
@@ -5648,7 +5678,7 @@ xp_e1_card_config(struct cd *cd)
 	cd->config.ifflags = (SDL_IF_UP | SDL_IF_TX_RUNNING | SDL_IF_RX_RUNNING);
 
 	/* Allocate span structures and write all of the registers of interest. */
-	for (span = 0; span < X400_SPANS; span++) {
+	for (span = 0; span < cd->ports; span++) {
 		struct sp *sp;
 		int err;
 
@@ -5746,6 +5776,12 @@ xp_x1_card_config(struct cd *cd)
 		/* 2.048 MHz Crystal on board.  */
 		cd->xlb[CTLREG] = cd->ctlreg = cd->clkreg = E1DIV;
 		break;
+	case CP100: case CP100P: case CP100E:
+	case CP200: case CP200P: case CP200E:
+	case CP400: case CP400P: case CP400E:
+		/* 2.048 MHz Crystal on board.  */
+		cd->xlb[CTLREG] = cd->ctlreg = cd->clkreg = E1DIV;
+		break;
 	}
 	cd->xlb[SYNREG] = cd->synreg = SYNCSELF;	/* Sync to crystal for now. */
 	cd->xlb[LEDREG] = cd->ledreg = 0;
@@ -5781,6 +5817,9 @@ xp_x1_card_config(struct cd *cd)
 			break;
 		case V400P:
 		case A400P:
+		case CP100: case CP100P: case CP100E:
+		case CP200: case CP200P: case CP200E:
+		case CP400: case CP400P: case CP400E:
 		default:
 			/* setup T1/E1/J1 card defaults */
 			cd->config = sdl_default_t1_chan;
@@ -5864,7 +5903,7 @@ xp_x1_card_config(struct cd *cd)
 	/* Allocate span structures and Write all registers of interest.  The reason that we do not do LIRST
 	   in the span configuration is because we want to start them all and then wait 40ms once for all
 	   instead of waiting 40ms once for each (which would be 160ms). */
-	for (span = 0; span < X400_SPANS; span++) {
+	for (span = 0; span < cd->ports; span++) {
 		struct sp *sp;
 		int err;
 
@@ -6065,7 +6104,7 @@ xp_x1_card_config(struct cd *cd)
 	   mode. */
 	/* SR4.7: RAIS-CI:Set when the receiver detects the AIS-CI pattern as defined in ANSI T1.403. */
 
-	for (span = 0; span < X400_SPANS; span++) {
+	for (span = 0; span < cd->ports; span++) {
 		struct sp *sp;
 		volatile uint8_t *xlb = &cd->xlb[span << 8];
 		uint8_t status, info;
@@ -6322,7 +6361,7 @@ xp_card_reconfig(struct cd *cd, int restart)
 		}
 
 		/* reconfigure all spans */
-		for (span = 0; span < X400_SPANS; span++) {
+		for (span = 0; span < cd->ports; span++) {
 			struct sp *sp;
 			int chan;
 
@@ -11448,7 +11487,7 @@ lmi_attach_req(struct xp *xp, queue_t *q, mblk_t *mp)
 		}
 		/* check span */
 		span = (ppa >> 8) & 0x0f;
-		if (span < 0 || span > X400_SPANS - 1) {
+		if (span < 0 || span > cd->ports - 1) {
 			read_unlock(&xp_core_lock);
 			goto badspan;
 		}
@@ -11891,7 +11930,7 @@ dl_attach_req(struct xp *xp, queue_t *q, mblk_t *mp)
 				struct sp *sp;
 				struct ch *ch;
 
-				if (0 > xp->span || xp->span > X400_SPANS - 1)
+				if (0 > xp->span || xp->span > cd->ports - 1)
 					goto badppa;
 				if (!(sp = cd->spans[xp->span]))
 					goto badppa;
@@ -12126,7 +12165,7 @@ dl_bind_req(struct xp *xp, queue_t *q, mblk_t *mp)
 		for (card = 0; card < X400_CARDS; card++) {
 			if (!(cd = x400p_cards[card]))
 				continue;
-			for (span = 0; span < X400_SPANS; span++) {
+			for (span = 0; span < cd->ports; span++) {
 				int chan;
 
 				if (!(sp = cd->spans[span]))
@@ -13533,7 +13572,7 @@ dsx_lconfig_size(dsx_config_t * arg)
 		for (card = 0; card < X400_CARDS; card++) {
 			if (!(cd = x400p_cards[card]))
 				continue;
-			for (span = 0; span < X400_SPANS; span++)
+			for (span = 0; span < cd->ports; span++)
 				size += sizeof(uint);
 		}
 		break;
@@ -13541,7 +13580,7 @@ dsx_lconfig_size(dsx_config_t * arg)
 		for (card = 0; card < X400_CARDS; card++) {
 			if (!(cd = x400p_cards[card]))
 				continue;
-			for (span = 0; span < X400_SPANS; span++)
+			for (span = 0; span < cd->ports; span++)
 				if ((sp = cd->spans[span])) {
 					switch (sp->config.ifgtype) {
 					case SDL_GTYPE_E1:
@@ -13603,7 +13642,7 @@ dsx_ioclconfig(queue_t *q, mblk_t *mp, mblk_t *dp)
 		for (card = 0; card < X400_CARDS; card++) {
 			if (!(cd = x400p_cards[card]))
 				continue;
-			for (span = 0; span < X400_SPANS; span++, val++, num++)
+			for (span = 0; span < cd->ports; span++, val++, num++)
 				if ((unsigned char *) (val + 1) <= mp->b_cont->b_wptr)
 					*val = (DRV_ID << 16) | (cd->card << 12) | (span << 8);
 		}
@@ -13612,7 +13651,7 @@ dsx_ioclconfig(queue_t *q, mblk_t *mp, mblk_t *dp)
 		for (card = 0; card < X400_CARDS; card++) {
 			if (!(cd = x400p_cards[card]))
 				continue;
-			for (span = 0; span < X400_SPANS; span++) {
+			for (span = 0; span < cd->ports; span++) {
 				if (!(sp = cd->spans[span]))
 					continue;
 				switch (sp->config.ifgtype) {
@@ -14415,6 +14454,33 @@ mx_iocginfo_card(struct cd *cd, mx_info_t * arg)
 	case A400PT:
 		val->mxCardType = X400PCARDTYPE_A400PT;
 		break;
+	case CP100:
+		val->mxCardType = X400PCARDTYPE_CP100;
+		break;
+	case CP100P:
+		val->mxCardType = X400PCARDTYPE_CP100P;
+		break;
+	case CP100E:
+		val->mxCardType = X400PCARDTYPE_CP100E;
+		break;
+	case CP200:
+		val->mxCardType = X400PCARDTYPE_CP200;
+		break;
+	case CP200P:
+		val->mxCardType = X400PCARDTYPE_CP200P;
+		break;
+	case CP200E:
+		val->mxCardType = X400PCARDTYPE_CP200E;
+		break;
+	case CP400:
+		val->mxCardType = X400PCARDTYPE_CP400;
+		break;
+	case CP400P:
+		val->mxCardType = X400PCARDTYPE_CP400P;
+		break;
+	case CP400E:
+		val->mxCardType = X400PCARDTYPE_CP400E;
+		break;
 	default:
 		val->mxCardType = X400PCARDTYPE_NONE;
 		break;
@@ -14462,7 +14528,7 @@ mx_iocginfo_card(struct cd *cd, mx_info_t * arg)
 	val->mxCardPciBus = cd->bus;
 	val->mxCardPciSlot = cd->slot;
 	val->mxCardPciIrq = cd->irq;
-	val->mxCardName[0] = '\0';
+	strncpy(val->mxCardName,xp_board_info[cd->board]->name);
 	return (0);
 }
 
@@ -15991,7 +16057,7 @@ mx_ioclconfig(queue_t *q, mblk_t *mp, mblk_t *dp)
 		for (card = 0; card < X400_CARDS; card++) {
 			if (!(cd = x400p_cards[card]))
 				continue;
-			for (span = 0; span < X400_SPANS; span++, val++, num++)
+			for (span = 0; span < cd->ports; span++, val++, num++)
 				if ((unsigned char *) (val + 1) <= db->b_wptr)
 					*val = (cd->card << 12) | (span << 8);
 		}
@@ -16001,7 +16067,7 @@ mx_ioclconfig(queue_t *q, mblk_t *mp, mblk_t *dp)
 		for (card = 0; card < X400_CARDS; card++) {
 			if (!(cd = x400p_cards[card]))
 				continue;
-			for (span = 0; span < X400_SPANS; span++) {
+			for (span = 0; span < cd->ports; span++) {
 				if (!(sp = cd->spans[span]))
 					continue;
 				switch (sp->config.ifgtype) {
@@ -16375,6 +16441,11 @@ mx_test_config_card(struct cd *cd, mx_config_t * arg)
 		case A400PT:
 			/* These cards actually suport E1. */
 			break;
+		case CP100: case CP100P: case CP100E:
+		case CP200: case CP200P: case CP200E:
+		case CP400: case CP400P: case CP400E:
+			/* These cards suport E1. */
+			break;
 		}
 		break;
 	case MXSPANTYPE_T1:
@@ -16401,6 +16472,11 @@ mx_test_config_card(struct cd *cd, mx_config_t * arg)
 		case V401PE:
 		case A400PE:
 			/* These cards actually support T1 or J1. */
+			break;
+		case CP100: case CP100P: case CP100E:
+		case CP200: case CP200P: case CP200E:
+		case CP400: case CP400P: case CP400E:
+			/* These cards suport T1 or J1. */
 			break;
 		}
 		break;
@@ -16717,7 +16793,7 @@ mx_commit_config_card(struct cd *cd, mx_config_t * arg)
 			break;
 		card_reconfig |= (1 << cd->card);
 		cd->config.ifgtype = SDL_GTYPE_E1;
-		for (span = 0; span < X400_SPANS; span++) {
+		for (span = 0; span < cd->ports; span++) {
 			if ((sp = cd->spans[span]) == NULL)
 				continue;
 			if (sp->config.ifgtype == SDL_GTYPE_E1)
@@ -16748,7 +16824,7 @@ mx_commit_config_card(struct cd *cd, mx_config_t * arg)
 			break;
 		card_reconfig |= (1 << cd->card);
 		cd->config.ifgtype = SDL_GTYPE_T1;
-		for (span = 0; span < X400_SPANS; span++) {
+		for (span = 0; span < cd->ports; span++) {
 			if ((sp = cd->spans[span]) == NULL)
 				continue;
 			if (sp->config.ifgtype == SDL_GTYPE_T1)
@@ -16797,7 +16873,7 @@ mx_commit_config_card(struct cd *cd, mx_config_t * arg)
 			break;
 		card_reconfig |= (1 << cd->card);
 		cd->config.ifgtype = SDL_GTYPE_J1;
-		for (span = 0; span < X400_SPANS; span++) {
+		for (span = 0; span < cd->ports; span++) {
 			if ((sp = cd->spans[span]) == NULL)
 				continue;
 			if (sp->config.ifgtype == SDL_GTYPE_J1)
@@ -16845,7 +16921,7 @@ mx_commit_config_card(struct cd *cd, mx_config_t * arg)
 	if (!card_reconfig || !(cd->config.ifflags & SDL_IF_UP))
 		return (0);
 	xp_card_reconfig(cd, 0);
-	for (span = 0; span < X400_SPANS; span++) {
+	for (span = 0; span < cd->ports; span++) {
 		if ((sp = cd->spans[span]) == NULL)
 			continue;
 		if (!(span_reconfig & (1 << span))
@@ -17359,7 +17435,7 @@ mx_iocgstatus_card(struct cd *cd, mx_status_t * arg)
 		uint span, used = 0, busy = 1, depend = 0, alarms = 0;
 
 		val->mxCardOperationalState = X721_OPERATIONALSTATE_ENABLED;
-		for (span = 0; span < X400_SPANS; span++) {
+		for (span = 0; span < cd->ports; span++) {
 			struct sp *sp;
 
 			if ((sp = cd->spans[span]) && (sp->config.ifflags & SDL_IF_UP)) {
@@ -19234,7 +19310,7 @@ sdl_commit_config(struct ch *ch, sdl_config_t * arg)
 			for (src = 0; src < SDL_SYNCS; src++) {
 				if (cd->config.ifsyncsrc[src] == arg->ifsyncsrc[src])
 					continue;
-				for (span = 0; span < X400_SPANS; span++) {
+				for (span = 0; span < cd->ports; span++) {
 					if (!(s = cd->spans[span]))
 						continue;
 					for (chan = 0; chan < 32; chan++) {
@@ -19581,7 +19657,7 @@ parse_interface(struct xp *xp, char *p, size_t len)
 		p++;
 	}
 	xp->ppa = ((0xff << 0) | ((xp->span & 0x0f) << 8) | ((xp->card & 0x0f) << 12));
-	if (xp->span >= X400_SPANS || (sp = sp_find(xp->ppa)) != NULL)
+	if (xp->span >= cd->ports || (sp = sp_find(xp->ppa)) != NULL)
 		return (-ENXIO);
 	if (p >= e || *p == '\0') {
 		xp->monitor = XP_MONITOR_SPAN;
@@ -19692,7 +19768,7 @@ nit_niocssnap32(struct xp *xp, mblk_t *dp)
 				return (-ERANGE);
 		}
 	}
-	xp->xray.nit.snap = *arg;
+	xp->xray.nit.snap = snap;
 	return (0);
 }
 #endif				/* __LP64__ */
@@ -20015,7 +20091,7 @@ bpf_biocgdltlist(queue_t *q, mblk_t *mp, struct xp *xp, struct copyresp *cp, mbl
 	if (cp->cp_flag == IOC_ILP32) {
 		struct bpf_dltlist32 *bfl = (typeof(bfl)) dp->b_rptr;
 
-		uaddr = (caddr_t) bfl->bfl_list;
+		uaddr = (caddr_t) (ulong) bfl->bfl_list;
 		n = bfl->bfl_len;
 	} else
 #endif				/* defined __LP64__ */
@@ -20733,7 +20809,7 @@ sio_siocgifnum(queue_t *q, mblk_t *mp, struct xp *xp)
 			continue;
 		/* one for the card */
 		num++;
-		for (span = 0; span < X400_SPANS; span++) {
+		for (span = 0; span < cd->ports; span++) {
 			if (!(sp = cd->spans[span]))
 				continue;
 			/* one for the span */
@@ -20763,7 +20839,7 @@ sio_siocgifnum(queue_t *q, mblk_t *mp, struct xp *xp)
   * ifreq structures in ifc_req and its length in bytes in ifc_len.  The driver fills the ifreq
   * structures with all current L3 interface addresses that are running: ifr_name contains the
   * interface addresses that are running: ifr_name contains the interface name (eth0:1, etc.),
-  * ifr_addr the address.  The driver returns the actual length in ifc_len.  If ifc_len is equa to
+  * ifr_addr the address.  The driver returns the actual length in ifc_len.  If ifc_len is equal to
   * the original length the buffer probably has overflowed and the caller should retry with a larger
   * buffer to get all addresses.  When no error occurs, the command returns zero (0); otherwise
   * minus one (1) and errno(3) is set to an appropriate error code.  Overflow is not considered an
@@ -20806,7 +20882,7 @@ sio_siocgifconf(queue_t *q, mblk_t *mp, struct xp *xp, mblk_t *dp)
 		ifr->ifr_addr.sa_family = AF_UNSPEC;
 		ifr++;
 		num++;
-		for (span = 0; span < X400_SPANS && num < max; span++) {
+		for (span = 0; span < cd->ports && num < max; span++) {
 			if (!(sp = cd->spans[span]))
 				continue;
 			/* one for the span */
@@ -20869,7 +20945,7 @@ sio_siocgifconf32(queue_t *q, mblk_t *mp, struct xp *xp, mblk_t *dp)
 		ifr->ifr_addr.sa_family = AF_UNSPEC;
 		ifr++;
 		num++;
-		for (span = 0; span < X400_SPANS && num < max; span++) {
+		for (span = 0; span < cd->ports && num < max; span++) {
 			if (!(sp = cd->spans[span]))
 				continue;
 			/* one for the span */
@@ -21101,7 +21177,7 @@ sio_siocglifnum(queue_t *q, mblk_t *mp, struct xp *xp, mblk_t *dp)
 		if (!(cd = x400p_cards[card]))
 			continue;
 		lifn->lifn_count++;	/* one for the card */
-		for (span = 0; span < X400_SPANS; span++) {
+		for (span = 0; span < cd->ports; span++) {
 			if (!(sp = cd->spans[span]))
 				continue;
 			if (!(sp->config.ifflags & SDL_IF_UP)
@@ -21176,7 +21252,7 @@ sio_siocglifconf(queue_t *q, mblk_t *mp, struct xp *xp, mblk_t *dp)
 		lifr->lifr_addr.sa_familty = AF_UNSPEC;
 		lifr++;
 		num++;
-		for (span = 0; span < X400_SPANS && num < max; span++) {
+		for (span = 0; span < cd->ports && num < max; span++) {
 			if (!(sp = cd->spans[span]))
 				continue;
 			if (!(sp->config.ifflags & SDL_IF_UP)
@@ -21250,7 +21326,7 @@ sio_siocglifconf32(queue_t *q, mblk_t *mp, struct xp *xp, mblk_t *dp)
 		lifr->lifr_addr.sa_familty = AF_UNSPEC;
 		lifr++;
 		num++;
-		for (span = 0; span < X400_SPANS && num < max; span++) {
+		for (span = 0; span < cd->ports && num < max; span++) {
 			if (!(sp = cd->spans[span]))
 				continue;
 			if (!(sp->config.ifflags & SDL_IF_UP)
@@ -21722,7 +21798,7 @@ xp_card_tasklet(unsigned long data)
 			uchar *rend = rbeg + 1024;
 			int span;
 
-			for (span = 0; span < X400_SPANS; span++) {
+			for (span = 0; span < cd->ports; span++) {
 				struct sp *sp;
 
 				if ((sp = cd->spans[span]) && (sp->config.ifflags & SDL_IF_UP)) {
@@ -21751,7 +21827,7 @@ xp_overflow(struct cd *cd)
 	int span;
 
 	_printd(("%s: card %d elastic buffer overrun!\n", __FUNCTION__, cd->card));
-	for (span = 0; span < X400_SPANS; span++) {
+	for (span = 0; span < cd->ports; span++) {
 		struct sp *sp;
 
 		if ((sp = cd->spans[span]) && (sp->config.ifflags & SDL_IF_UP)) {
@@ -21896,7 +21972,7 @@ xp_t1_interrupt(int irq, void *dev_id, struct pt_regs *regs)
 		/* We would like to try to keep this burning a loop here when there is only one span that is
 		   responsible for the Dallas interrupt; however, the DS21352/552 chips do not support an
 		   interrupt information register like the DS2155/455/458. */
-		for (span = 0; span < X400_SPANS; span++)
+		for (span = 0; span < cd->ports; span++)
 			if (likely((sp = cd->spans[span]) != NULL))
 				xp_t1_process_span(cd, sp);
 
@@ -23479,7 +23555,7 @@ xp_t1_eval_syncsrc(struct cd *cd)
 
 			if ((span = cd->config.ifsyncsrc[src]) == 0)
 				break;
-			if ((--span < X400_SPANS && span >= 0)
+			if ((--span < cd->ports && span >= 0)
 			    && (sp = cd->spans[span])
 			    && (sp->config.ifflags & SDL_IF_UP)
 			    && (sp->config.ifflags & SDL_IF_RX_UP)
@@ -23581,7 +23657,7 @@ xp_e1_interrupt(int irq, void *dev_id, struct pt_regs *regs)
 		/* We would like to try to keep this burning a loop here when there is only one span that is
 		   responsible for the Dallas interrupt; however, the DS21354/554 chips do not support an
 		   interrupt information register like the DS2155/455/458. */
-		for (span = 0; span < X400_SPANS; span++)
+		for (span = 0; span < cd->ports; span++)
 			if (likely((sp = cd->spans[span]) != NULL))
 				xp_e1_process_span(cd, sp);
 
@@ -25071,7 +25147,7 @@ xp_e1_eval_syncsrc(struct cd *cd)
 
 			if ((span = cd->config.ifsyncsrc[src]) == 0)
 				break;
-			if ((--span < X400_SPANS && span >= 0)
+			if ((--span < cd->ports && span >= 0)
 			    && (sp = cd->spans[span])
 			    && (sp->config.ifflags & SDL_IF_UP)
 			    && (sp->config.ifflags & SDL_IF_RX_UP)
@@ -25320,7 +25396,7 @@ xp_x1_interrupt(int irq, void *dev_id, struct pt_regs *regs)
 
 		/* Try to keep this burning a loop here when there is only one span that is responsible for
 		   the Dallas interrupt. */
-		for (span = 0; span < X400_SPANS; span++)
+		for (span = 0; span < cd->ports; span++)
 			if (likely((sp = cd->spans[span]) != NULL)) {
 				register volatile uint8_t *xlb = (typeof(xlb)) sp->iobase;
 				register uint ints;
@@ -27767,7 +27843,7 @@ xp_x1_eval_syncsrc(struct cd *cd)
 
 			if ((span = cd->config.ifsyncsrc[src]) == 0)
 				break;
-			if ((--span < X400_SPANS && span >= 0)
+			if ((--span < cd->ports && span >= 0)
 			    && (sp = cd->spans[span])
 			    && (sp->config.ifflags & SDL_IF_UP)
 			    && (sp->config.ifflags & SDL_IF_RX_UP)
@@ -29809,7 +29885,7 @@ bind_it(struct xp *xp)
 		for (card = 0; card < X400_CARDS; card++) {
 			if (!(cd = x400p_cards[card]))
 				continue;
-			for (span = 0; span < X400_SPANS; span++) {
+			for (span = 0; span < cd->ports; span++) {
 				if (!(sp = cd->spans[span]))
 					continue;
 				if (xp->level == XP_LEVEL_MON_SDT && sp->config.iftxlevel > 7)
@@ -29836,7 +29912,7 @@ bind_it(struct xp *xp)
 		xp->xray.prev = &cd->xray;
 		cd->xray = xp;
 		spin_unlock_irqrestore(&cd->lock, flags);
-		for (span = 0; span < X400_SPANS; span++) {
+		for (span = 0; span < cd->ports; span++) {
 			if ((sp = cd->spans[span])) {
 				for (chan = 0; chan < 32; chan++) {
 					if ((ch = sp->chans[chan])) {
@@ -32357,6 +32433,15 @@ xp_probe(struct pci_dev *dev, const struct pci_device_id *id)
 		case A400PT:
 			cd->board = A400PT;
 			break;
+		case CP100:
+			cd->board = dev->is_pcie ? CP100E : CP100P;
+			break;
+		case CP200:
+			cd->board = dev->is_pcie ? CP200E : CP200P;
+			break;
+		case CP400:
+			cd->board = dev->is_pcie ? CP400E : CP400P;
+			break;
 		default:
 			cd->board = -1;
 			break;
@@ -32368,6 +32453,7 @@ xp_probe(struct pci_dev *dev, const struct pci_device_id *id)
 			xp_device_info[cd->device].name, xp_board_info[board].name);
 		goto error_remove;
 	}
+	cd->ports = xp_board_info[cd->board].ports;
 	cd->hw_flags = xp_board_info[cd->board].hw_flags;
 	cd->hw_flags |= xp_device_info[cd->device].hw_flags;
 

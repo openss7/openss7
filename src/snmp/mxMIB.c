@@ -250,6 +250,8 @@ oid mxXconTable_variables_oid[14] = { 1, 3, 6, 1, 4, 1, 29591, 1, 11, 1, 1, 7, 1
 /*
  * Oids for use in notifications defined in this MIB.
  */
+oid mxCardStateChange_oid[11] = { 1, 3, 6, 1, 4, 1, 29591, 1, 11, 0, 1 };
+oid mxSpanStateChange_oid[11] = { 1, 3, 6, 1, 4, 1, 29591, 1, 11, 0, 2 };
 
 /*
  * Oids accessible only for notify defined in this MIB.
@@ -276,6 +278,15 @@ oid mxCardTypeAT400P_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 1, 11, 1, 4, 1, 8 };
 oid mxCardTypeAE400P_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 1, 11, 1, 4, 1, 9 };
 oid mxCardTypeA400PT_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 1, 11, 1, 4, 1, 10 };
 oid mxCardTypeA400PE_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 1, 11, 1, 4, 1, 11 };
+oid mxCardTypeCP100_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 1, 11, 1, 4, 1, 12 };
+oid mxCardTypeCP100P_oid[14] = { 1, 3, 6, 1, 4, 1, 29591, 1, 11, 1, 4, 1, 12, 1 };
+oid mxCardTypeCP100E_oid[14] = { 1, 3, 6, 1, 4, 1, 29591, 1, 11, 1, 4, 1, 12, 2 };
+oid mxCardTypeCP200_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 1, 11, 1, 4, 1, 13 };
+oid mxCardTypeCP200P_oid[14] = { 1, 3, 6, 1, 4, 1, 29591, 1, 11, 1, 4, 1, 13, 1 };
+oid mxCardTypeCP200E_oid[14] = { 1, 3, 6, 1, 4, 1, 29591, 1, 11, 1, 4, 1, 13, 2 };
+oid mxCardTypeCP400_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 1, 11, 1, 4, 1, 14 };
+oid mxCardTypeCP400P_oid[14] = { 1, 3, 6, 1, 4, 1, 29591, 1, 11, 1, 4, 1, 14, 1 };
+oid mxCardTypeCP400E_oid[14] = { 1, 3, 6, 1, 4, 1, 29591, 1, 11, 1, 4, 1, 14, 2 };
 oid mxChipTypeDS2152_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 1, 11, 1, 4, 2, 1 };
 oid mxChipTypeDS21352_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 1, 11, 1, 4, 2, 2 };
 oid mxChipTypeDS21552_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 1, 11, 1, 4, 2, 3 };
@@ -303,6 +314,7 @@ oid mxFarEndCurrentGroup_oid[12] = { 1, 3, 6, 1, 4, 1, 29591, 1, 11, 2, 1, 14 };
 oid mxFarEndIntervalGroup_oid[12] = { 1, 3, 6, 1, 4, 1, 29591, 1, 11, 2, 1, 15 };
 oid mxFarEndTotalGroup_oid[12] = { 1, 3, 6, 1, 4, 1, 29591, 1, 11, 2, 1, 16 };
 oid mxDrivGroup_oid[12] = { 1, 3, 6, 1, 4, 1, 29591, 1, 11, 2, 1, 17 };
+oid mxTrapGroup_oid[12] = { 1, 3, 6, 1, 4, 1, 29591, 1, 11, 2, 1, 18 };
 oid mxBasicCompliance_oid[12] = { 1, 3, 6, 1, 4, 1, 29591, 1, 11, 2, 2, 1 };
 oid mxEnhancedCompliance_oid[12] = { 1, 3, 6, 1, 4, 1, 29591, 1, 11, 2, 2, 2 };
 static oid zeroDotZero_oid[2] = { 0, 0 };
@@ -388,297 +400,305 @@ struct variable7 mxMIB_variables[] = {
 	{(u_char) MXCARDSYNCSPANID, ASN_OCTET_STR, RONLY, var_mxCardTable, 6, {1, 1, 3, 2, 1, 24}},
 #define   MXCARDSYNCTRANSITIONS  37
 	{(u_char) MXCARDSYNCTRANSITIONS, ASN_COUNTER, RONLY, var_mxCardTable, 6, {1, 1, 3, 2, 1, 25}},
-#define   MXCARDNAME            38
-	{(u_char) MXCARDNAME, ASN_OCTET_STR, RONLY, var_mxCardTable, 6, {1, 1, 3, 2, 1, 26}},
-#define   MXCARDSTATUS          39
-	{(u_char) MXCARDSTATUS, ASN_INTEGER, RWRITE, var_mxCardTable, 6, {1, 1, 3, 2, 1, 27}},
-#define   MXSPANNAME            40
+#define   MXCARDLEDS            38
+	{(u_char) MXCARDLEDS, ASN_OCTET_STR, RONLY, var_mxCardTable, 6, {1, 1, 3, 2, 1, 26}},
+#define   MXCARDLASTCHANGE      39
+	{(u_char) MXCARDLASTCHANGE, ASN_TIMETICKS, RONLY, var_mxCardTable, 6, {1, 1, 3, 2, 1, 27}},
+#define   MXCARDNAME            40
+	{(u_char) MXCARDNAME, ASN_OCTET_STR, RONLY, var_mxCardTable, 6, {1, 1, 3, 2, 1, 28}},
+#define   MXCARDSTATUS          41
+	{(u_char) MXCARDSTATUS, ASN_INTEGER, RWRITE, var_mxCardTable, 6, {1, 1, 3, 2, 1, 29}},
+#define   MXSPANNAME            42
 	{(u_char) MXSPANNAME, ASN_OCTET_STR, RWRITE, var_mxSpanTable, 6, {1, 1, 4, 1, 1, 2}},
-#define   MXSPANDEVICE          41
+#define   MXSPANDEVICE          43
 	{(u_char) MXSPANDEVICE, ASN_OBJECT_ID, RWRITE, var_mxSpanTable, 6, {1, 1, 4, 1, 1, 3}},
-#define   MXSPANEQUIPMENTID     42
+#define   MXSPANEQUIPMENTID     44
 	{(u_char) MXSPANEQUIPMENTID, ASN_OCTET_STR, RWRITE, var_mxSpanTable, 6, {1, 1, 4, 1, 1, 4}},
-#define   MXSPANTYPE            43
+#define   MXSPANTYPE            45
 	{(u_char) MXSPANTYPE, ASN_INTEGER, RWRITE, var_mxSpanTable, 6, {1, 1, 4, 1, 1, 5}},
-#define   MXSPANNUMBER          44
+#define   MXSPANNUMBER          46
 	{(u_char) MXSPANNUMBER, ASN_UNSIGNED, RWRITE, var_mxSpanTable, 6, {1, 1, 4, 1, 1, 6}},
-#define   MXSPANRATE            45
+#define   MXSPANRATE            47
 	{(u_char) MXSPANRATE, ASN_INTEGER, RONLY, var_mxSpanTable, 6, {1, 1, 4, 1, 1, 7}},
-#define   MXSPANMODE            46
+#define   MXSPANMODE            48
 	{(u_char) MXSPANMODE, ASN_OCTET_STR, RWRITE, var_mxSpanTable, 6, {1, 1, 4, 1, 1, 8}},
-#define   MXSPANCRC             47
+#define   MXSPANCRC             49
 	{(u_char) MXSPANCRC, ASN_INTEGER, RWRITE, var_mxSpanTable, 6, {1, 1, 4, 1, 1, 9}},
-#define   MXSPANCLOCKING        48
+#define   MXSPANCLOCKING        50
 	{(u_char) MXSPANCLOCKING, ASN_INTEGER, RWRITE, var_mxSpanTable, 6, {1, 1, 4, 1, 1, 10}},
-#define   MXSPANPRIORITY        49
+#define   MXSPANPRIORITY        51
 	{(u_char) MXSPANPRIORITY, ASN_UNSIGNED, RWRITE, var_mxSpanTable, 6, {1, 1, 4, 1, 1, 11}},
-#define   MXSPANCODING          50
+#define   MXSPANCODING          52
 	{(u_char) MXSPANCODING, ASN_INTEGER, RWRITE, var_mxSpanTable, 6, {1, 1, 4, 1, 1, 12}},
-#define   MXSPANFRAMING         51
+#define   MXSPANFRAMING         53
 	{(u_char) MXSPANFRAMING, ASN_INTEGER, RWRITE, var_mxSpanTable, 6, {1, 1, 4, 1, 1, 13}},
-#define   MXSPANLINEIMPEDANCE   52
+#define   MXSPANLINEIMPEDANCE   54
 	{(u_char) MXSPANLINEIMPEDANCE, ASN_INTEGER, RWRITE, var_mxSpanTable, 6, {1, 1, 4, 1, 1, 14}},
-#define   MXSPANLINEMODE        53
+#define   MXSPANLINEMODE        55
 	{(u_char) MXSPANLINEMODE, ASN_INTEGER, RWRITE, var_mxSpanTable, 6, {1, 1, 4, 1, 1, 15}},
-#define   MXSPANLINELENGTH      54
+#define   MXSPANLINELENGTH      56
 	{(u_char) MXSPANLINELENGTH, ASN_INTEGER, RWRITE, var_mxSpanTable, 6, {1, 1, 4, 1, 1, 16}},
-#define   MXSPANLINEATTENUATION  55
+#define   MXSPANLINEATTENUATION  57
 	{(u_char) MXSPANLINEATTENUATION, ASN_INTEGER, RWRITE, var_mxSpanTable, 6, {1, 1, 4, 1, 1, 17}},
-#define   MXSPANLINEGAIN        56
+#define   MXSPANLINEGAIN        58
 	{(u_char) MXSPANLINEGAIN, ASN_INTEGER, RWRITE, var_mxSpanTable, 6, {1, 1, 4, 1, 1, 18}},
-#define   MXSPANLINEDELAY       57
+#define   MXSPANLINEDELAY       59
 	{(u_char) MXSPANLINEDELAY, ASN_UNSIGNED, RWRITE, var_mxSpanTable, 6, {1, 1, 4, 1, 1, 19}},
-#define   MXSPANTXLEVEL         58
+#define   MXSPANTXLEVEL         60
 	{(u_char) MXSPANTXLEVEL, ASN_INTEGER, RWRITE, var_mxSpanTable, 6, {1, 1, 4, 1, 1, 20}},
-#define   MXSPANRXLEVEL         59
+#define   MXSPANRXLEVEL         61
 	{(u_char) MXSPANRXLEVEL, ASN_INTEGER, RWRITE, var_mxSpanTable, 6, {1, 1, 4, 1, 1, 21}},
-#define   MXSPANALARMSETTLETIME  60
+#define   MXSPANALARMSETTLETIME  62
 	{(u_char) MXSPANALARMSETTLETIME, ASN_INTEGER, RWRITE, var_mxSpanTable, 6, {1, 1, 4, 1, 1, 22}},
-#define   MXSPANLINECODETIME    61
+#define   MXSPANLINECODETIME    63
 	{(u_char) MXSPANLINECODETIME, ASN_INTEGER, RWRITE, var_mxSpanTable, 6, {1, 1, 4, 1, 1, 23}},
-#define   MXSPANPRIMARY         62
+#define   MXSPANPRIMARY         64
 	{(u_char) MXSPANPRIMARY, ASN_UNSIGNED, RWRITE, var_mxSpanTable, 6, {1, 1, 4, 1, 1, 24}},
-#define   MXSPANDATALINK        63
+#define   MXSPANDATALINK        65
 	{(u_char) MXSPANDATALINK, ASN_OCTET_STR, RWRITE, var_mxSpanTable, 6, {1, 1, 4, 1, 1, 25}},
-#define   MXSPANLINECODE        64
+#define   MXSPANLINECODE        66
 	{(u_char) MXSPANLINECODE, ASN_INTEGER, RWRITE, var_mxSpanTable, 6, {1, 1, 4, 1, 1, 26}},
-#define   MXSPANALARMSEVERITYMAPPROFILE  65
+#define   MXSPANALARMSEVERITYMAPPROFILE  67
 	{(u_char) MXSPANALARMSEVERITYMAPPROFILE, ASN_OBJECT_ID, RWRITE, var_mxSpanTable, 6, {1, 1, 4, 1, 1, 27}},
-#define   MXSPANADMINISTRATIVESTATE  66
+#define   MXSPANADMINISTRATIVESTATE  68
 	{(u_char) MXSPANADMINISTRATIVESTATE, ASN_INTEGER, RWRITE, var_mxSpanTable, 6, {1, 1, 4, 1, 1, 28}},
-#define   MXSPANOPERATIONALSTATE  67
+#define   MXSPANOPERATIONALSTATE  69
 	{(u_char) MXSPANOPERATIONALSTATE, ASN_INTEGER, RONLY, var_mxSpanTable, 6, {1, 1, 4, 1, 1, 29}},
-#define   MXSPANUSAGESTATE      68
+#define   MXSPANUSAGESTATE      70
 	{(u_char) MXSPANUSAGESTATE, ASN_INTEGER, RONLY, var_mxSpanTable, 6, {1, 1, 4, 1, 1, 30}},
-#define   MXSPANALARMSTATUS     69
+#define   MXSPANALARMSTATUS     71
 	{(u_char) MXSPANALARMSTATUS, ASN_OCTET_STR, RWRITE, var_mxSpanTable, 6, {1, 1, 4, 1, 1, 31}},
-#define   MXSPANPROCEDURALSTATUS  70
+#define   MXSPANPROCEDURALSTATUS  72
 	{(u_char) MXSPANPROCEDURALSTATUS, ASN_OCTET_STR, RONLY, var_mxSpanTable, 6, {1, 1, 4, 1, 1, 32}},
-#define   MXSPANAVAILABILITYSTATUS  71
+#define   MXSPANAVAILABILITYSTATUS  73
 	{(u_char) MXSPANAVAILABILITYSTATUS, ASN_OCTET_STR, RONLY, var_mxSpanTable, 6, {1, 1, 4, 1, 1, 33}},
-#define   MXSPANCONTROLSTATUS   72
+#define   MXSPANCONTROLSTATUS   74
 	{(u_char) MXSPANCONTROLSTATUS, ASN_OCTET_STR, RWRITE, var_mxSpanTable, 6, {1, 1, 4, 1, 1, 34}},
-#define   MXSPANSTANDBYSTATUS   73
+#define   MXSPANSTANDBYSTATUS   75
 	{(u_char) MXSPANSTANDBYSTATUS, ASN_INTEGER, RONLY, var_mxSpanTable, 6, {1, 1, 4, 1, 1, 35}},
-#define   MXSPANUNKNOWNSTATUS   74
+#define   MXSPANUNKNOWNSTATUS   76
 	{(u_char) MXSPANUNKNOWNSTATUS, ASN_INTEGER, RONLY, var_mxSpanTable, 6, {1, 1, 4, 1, 1, 36}},
-#define   MXSPANSAP             75
+#define   MXSPANSAP             77
 	{(u_char) MXSPANSAP, ASN_OBJECT_ID, RONLY, var_mxSpanTable, 6, {1, 1, 4, 1, 1, 37}},
-#define   MXSPANLOOPBACKSTATUS  76
+#define   MXSPANLOOPBACKSTATUS  78
 	{(u_char) MXSPANLOOPBACKSTATUS, ASN_OCTET_STR, RONLY, var_mxSpanTable, 6, {1, 1, 4, 1, 1, 38}},
-#define   MXSPANLINESTATUS      77
+#define   MXSPANLINESTATUS      79
 	{(u_char) MXSPANLINESTATUS, ASN_OCTET_STR, RONLY, var_mxSpanTable, 6, {1, 1, 4, 1, 1, 39}},
-#define   MXSPANALARMS          78
+#define   MXSPANALARMS          80
 	{(u_char) MXSPANALARMS, ASN_OCTET_STR, RONLY, var_mxSpanTable, 6, {1, 1, 4, 1, 1, 40}},
-#define   MXSPANEVENTS          79
+#define   MXSPANEVENTS          81
 	{(u_char) MXSPANEVENTS, ASN_OCTET_STR, RONLY, var_mxSpanTable, 6, {1, 1, 4, 1, 1, 41}},
-#define   MXSPANRECEIVELEVEL    80
-	{(u_char) MXSPANRECEIVELEVEL, ASN_UNSIGNED, RONLY, var_mxSpanTable, 6, {1, 1, 4, 1, 1, 42}},
-#define   MXSPANRECEIVETHRESHOLD  81
-	{(u_char) MXSPANRECEIVETHRESHOLD, ASN_UNSIGNED, RWRITE, var_mxSpanTable, 6, {1, 1, 4, 1, 1, 43}},
-#define   MXSPANROWSTATUS       82
-	{(u_char) MXSPANROWSTATUS, ASN_INTEGER, RWRITE, var_mxSpanTable, 6, {1, 1, 4, 1, 1, 44}},
-#define   MXBERTMODE            83
+#define   MXSPANLED             82
+	{(u_char) MXSPANLED, ASN_INTEGER, RONLY, var_mxSpanTable, 6, {1, 1, 4, 1, 1, 42}},
+#define   MXSPANRECEIVELEVEL    83
+	{(u_char) MXSPANRECEIVELEVEL, ASN_UNSIGNED, RONLY, var_mxSpanTable, 6, {1, 1, 4, 1, 1, 43}},
+#define   MXSPANRECEIVETHRESHOLD  84
+	{(u_char) MXSPANRECEIVETHRESHOLD, ASN_UNSIGNED, RWRITE, var_mxSpanTable, 6, {1, 1, 4, 1, 1, 44}},
+#define   MXSPANLASTCHANGE      85
+	{(u_char) MXSPANLASTCHANGE, ASN_TIMETICKS, RONLY, var_mxSpanTable, 6, {1, 1, 4, 1, 1, 45}},
+#define   MXSPANROWSTATUS       86
+	{(u_char) MXSPANROWSTATUS, ASN_INTEGER, RWRITE, var_mxSpanTable, 6, {1, 1, 4, 1, 1, 46}},
+#define   MXBERTMODE            87
 	{(u_char) MXBERTMODE, ASN_INTEGER, RWRITE, var_mxBertTable, 6, {1, 1, 5, 1, 1, 1}},
-#define   MXBERTSELECT          84
+#define   MXBERTSELECT          88
 	{(u_char) MXBERTSELECT, ASN_INTEGER, RWRITE, var_mxBertTable, 6, {1, 1, 5, 1, 1, 2}},
-#define   MXBERTPATTERN         85
+#define   MXBERTPATTERN         89
 	{(u_char) MXBERTPATTERN, ASN_OCTET_STR, RWRITE, var_mxBertTable, 6, {1, 1, 5, 1, 1, 3}},
-#define   MXBERTOPERATIONALSTATE  86
+#define   MXBERTOPERATIONALSTATE  90
 	{(u_char) MXBERTOPERATIONALSTATE, ASN_INTEGER, RONLY, var_mxBertTable, 6, {1, 1, 5, 1, 1, 4}},
-#define   MXBERTPROCEDURALSTATUS  87
+#define   MXBERTPROCEDURALSTATUS  91
 	{(u_char) MXBERTPROCEDURALSTATUS, ASN_OCTET_STR, RONLY, var_mxBertTable, 6, {1, 1, 5, 1, 1, 5}},
-#define   MXBERTBITCOUNT        88
+#define   MXBERTBITCOUNT        92
 	{(u_char) MXBERTBITCOUNT, ASN_COUNTER, RONLY, var_mxBertTable, 6, {1, 1, 5, 1, 1, 6}},
-#define   MXBERTERRORCOUNT      89
+#define   MXBERTERRORCOUNT      93
 	{(u_char) MXBERTERRORCOUNT, ASN_COUNTER, RONLY, var_mxBertTable, 6, {1, 1, 5, 1, 1, 7}},
-#define   MXCHANTYPE            90
+#define   MXCHANTYPE            94
 	{(u_char) MXCHANTYPE, ASN_INTEGER, RWRITE, var_mxChanTable, 6, {1, 1, 6, 1, 1, 2}},
-#define   MXCHANFORMAT          91
+#define   MXCHANFORMAT          95
 	{(u_char) MXCHANFORMAT, ASN_INTEGER, RWRITE, var_mxChanTable, 6, {1, 1, 6, 1, 1, 3}},
-#define   MXCHANRATE            92
+#define   MXCHANRATE            96
 	{(u_char) MXCHANRATE, ASN_INTEGER, RWRITE, var_mxChanTable, 6, {1, 1, 6, 1, 1, 4}},
-#define   MXCHANMODE            93
+#define   MXCHANMODE            97
 	{(u_char) MXCHANMODE, ASN_OCTET_STR, RWRITE, var_mxChanTable, 6, {1, 1, 6, 1, 1, 5}},
-#define   MXCHANSAP             94
+#define   MXCHANSAP             98
 	{(u_char) MXCHANSAP, ASN_OBJECT_ID, RONLY, var_mxChanTable, 6, {1, 1, 6, 1, 1, 6}},
-#define   MXCHANADMINISTRATIVESTATE  95
+#define   MXCHANADMINISTRATIVESTATE  99
 	{(u_char) MXCHANADMINISTRATIVESTATE, ASN_INTEGER, RWRITE, var_mxChanTable, 6, {1, 1, 6, 1, 1, 7}},
-#define   MXCHANOPERATIONALSTATE  96
+#define   MXCHANOPERATIONALSTATE  100
 	{(u_char) MXCHANOPERATIONALSTATE, ASN_INTEGER, RONLY, var_mxChanTable, 6, {1, 1, 6, 1, 1, 8}},
-#define   MXCHANUSAGESTATE      97
+#define   MXCHANUSAGESTATE      101
 	{(u_char) MXCHANUSAGESTATE, ASN_INTEGER, RONLY, var_mxChanTable, 6, {1, 1, 6, 1, 1, 9}},
-#define   MXCHANAVAILABILITYSTATUS  98
+#define   MXCHANAVAILABILITYSTATUS  102
 	{(u_char) MXCHANAVAILABILITYSTATUS, ASN_OCTET_STR, RONLY, var_mxChanTable, 6, {1, 1, 6, 1, 1, 10}},
-#define   MXCHANCONTROLSTATUS   99
+#define   MXCHANCONTROLSTATUS   103
 	{(u_char) MXCHANCONTROLSTATUS, ASN_OCTET_STR, RWRITE, var_mxChanTable, 6, {1, 1, 6, 1, 1, 11}},
-#define   MXCHANPROCEDURALSTATUS  100
+#define   MXCHANPROCEDURALSTATUS  104
 	{(u_char) MXCHANPROCEDURALSTATUS, ASN_OCTET_STR, RONLY, var_mxChanTable, 6, {1, 1, 6, 1, 1, 12}},
-#define   MXCHANALARMSTATUS     101
+#define   MXCHANALARMSTATUS     105
 	{(u_char) MXCHANALARMSTATUS, ASN_OCTET_STR, RWRITE, var_mxChanTable, 6, {1, 1, 6, 1, 1, 13}},
-#define   MXCHANSTANDBYSTATUS   102
+#define   MXCHANSTANDBYSTATUS   106
 	{(u_char) MXCHANSTANDBYSTATUS, ASN_INTEGER, RONLY, var_mxChanTable, 6, {1, 1, 6, 1, 1, 14}},
-#define   MXXCONCARDINDEX       103
+#define   MXXCONCARDINDEX       107
 	{(u_char) MXXCONCARDINDEX, ASN_UNSIGNED, RWRITE, var_mxXconTable, 6, {1, 1, 7, 1, 1, 1}},
-#define   MXXCONSPANINDEX       104
+#define   MXXCONSPANINDEX       108
 	{(u_char) MXXCONSPANINDEX, ASN_UNSIGNED, RWRITE, var_mxXconTable, 6, {1, 1, 7, 1, 1, 2}},
-#define   MXXCONCHANINDEX       105
+#define   MXXCONCHANINDEX       109
 	{(u_char) MXXCONCHANINDEX, ASN_UNSIGNED, RWRITE, var_mxXconTable, 6, {1, 1, 7, 1, 1, 3}},
-#define   MXXCONTYPE            106
+#define   MXXCONTYPE            110
 	{(u_char) MXXCONTYPE, ASN_INTEGER, RWRITE, var_mxXconTable, 6, {1, 1, 7, 1, 1, 4}},
-#define   MXXCONSTORAGETYPE     107
+#define   MXXCONSTORAGETYPE     111
 	{(u_char) MXXCONSTORAGETYPE, ASN_INTEGER, RWRITE, var_mxXconTable, 6, {1, 1, 7, 1, 1, 5}},
-#define   MXXCONROWSTATUS       108
+#define   MXXCONROWSTATUS       112
 	{(u_char) MXXCONROWSTATUS, ASN_INTEGER, RWRITE, var_mxXconTable, 6, {1, 1, 7, 1, 1, 6}},
-#define   MXDISCONTINUITYTIME   109
+#define   MXDISCONTINUITYTIME   113
 	{(u_char) MXDISCONTINUITYTIME, ASN_TIMETICKS, RONLY, var_mxMIB, 3, {1, 2, 1}},
-#define   MXNEARENDCURRENTTIMEELAPSED  110
+#define   MXNEARENDCURRENTTIMEELAPSED  114
 	{(u_char) MXNEARENDCURRENTTIMEELAPSED, ASN_INTEGER, RONLY, var_mxNearEndCurrentTable, 7, {1, 5, 1, 1, 1, 1, 1}},
-#define   MXNEARENDCURRENTESS   111
+#define   MXNEARENDCURRENTESS   115
 	{(u_char) MXNEARENDCURRENTESS, ASN_GAUGE, RONLY, var_mxNearEndCurrentTable, 7, {1, 5, 1, 1, 1, 1, 2}},
-#define   MXNEARENDCURRENTSESS  112
+#define   MXNEARENDCURRENTSESS  116
 	{(u_char) MXNEARENDCURRENTSESS, ASN_GAUGE, RONLY, var_mxNearEndCurrentTable, 7, {1, 5, 1, 1, 1, 1, 3}},
-#define   MXNEARENDCURRENTSEFSS  113
+#define   MXNEARENDCURRENTSEFSS  117
 	{(u_char) MXNEARENDCURRENTSEFSS, ASN_GAUGE, RONLY, var_mxNearEndCurrentTable, 7, {1, 5, 1, 1, 1, 1, 4}},
-#define   MXNEARENDCURRENTUASS  114
+#define   MXNEARENDCURRENTUASS  118
 	{(u_char) MXNEARENDCURRENTUASS, ASN_GAUGE, RONLY, var_mxNearEndCurrentTable, 7, {1, 5, 1, 1, 1, 1, 5}},
-#define   MXNEARENDCURRENTCSSS  115
+#define   MXNEARENDCURRENTCSSS  119
 	{(u_char) MXNEARENDCURRENTCSSS, ASN_GAUGE, RONLY, var_mxNearEndCurrentTable, 7, {1, 5, 1, 1, 1, 1, 6}},
-#define   MXNEARENDCURRENTPCVS  116
+#define   MXNEARENDCURRENTPCVS  120
 	{(u_char) MXNEARENDCURRENTPCVS, ASN_GAUGE, RONLY, var_mxNearEndCurrentTable, 7, {1, 5, 1, 1, 1, 1, 7}},
-#define   MXNEARENDCURRENTLESS  117
+#define   MXNEARENDCURRENTLESS  121
 	{(u_char) MXNEARENDCURRENTLESS, ASN_GAUGE, RONLY, var_mxNearEndCurrentTable, 7, {1, 5, 1, 1, 1, 1, 8}},
-#define   MXNEARENDCURRENTBESS  118
+#define   MXNEARENDCURRENTBESS  122
 	{(u_char) MXNEARENDCURRENTBESS, ASN_GAUGE, RONLY, var_mxNearEndCurrentTable, 7, {1, 5, 1, 1, 1, 1, 9}},
-#define   MXNEARENDCURRENTDMS   119
+#define   MXNEARENDCURRENTDMS   123
 	{(u_char) MXNEARENDCURRENTDMS, ASN_GAUGE, RONLY, var_mxNearEndCurrentTable, 7, {1, 5, 1, 1, 1, 1, 10}},
-#define   MXNEARENDCURRENTLCVS  120
+#define   MXNEARENDCURRENTLCVS  124
 	{(u_char) MXNEARENDCURRENTLCVS, ASN_GAUGE, RONLY, var_mxNearEndCurrentTable, 7, {1, 5, 1, 1, 1, 1, 11}},
-#define   MXNEARENDCURRENTFASES  121
+#define   MXNEARENDCURRENTFASES  125
 	{(u_char) MXNEARENDCURRENTFASES, ASN_GAUGE, RONLY, var_mxNearEndCurrentTable, 7, {1, 5, 1, 1, 1, 1, 12}},
-#define   MXNEARENDCURRENTFABES  122
+#define   MXNEARENDCURRENTFABES  126
 	{(u_char) MXNEARENDCURRENTFABES, ASN_GAUGE, RONLY, var_mxNearEndCurrentTable, 7, {1, 5, 1, 1, 1, 1, 13}},
-#define   MXNEARENDCURRENTFEBES  123
+#define   MXNEARENDCURRENTFEBES  127
 	{(u_char) MXNEARENDCURRENTFEBES, ASN_GAUGE, RONLY, var_mxNearEndCurrentTable, 7, {1, 5, 1, 1, 1, 1, 14}},
-#define   MXNEARENDINTERVALESS  124
+#define   MXNEARENDINTERVALESS  128
 	{(u_char) MXNEARENDINTERVALESS, ASN_GAUGE, RONLY, var_mxNearEndIntervalTable, 7, {1, 5, 1, 2, 1, 1, 2}},
-#define   MXNEARENDINTERVALSESS  125
+#define   MXNEARENDINTERVALSESS  129
 	{(u_char) MXNEARENDINTERVALSESS, ASN_GAUGE, RONLY, var_mxNearEndIntervalTable, 7, {1, 5, 1, 2, 1, 1, 3}},
-#define   MXNEARENDINTERVALSEFSS  126
+#define   MXNEARENDINTERVALSEFSS  130
 	{(u_char) MXNEARENDINTERVALSEFSS, ASN_GAUGE, RONLY, var_mxNearEndIntervalTable, 7, {1, 5, 1, 2, 1, 1, 4}},
-#define   MXNEARENDINTERVALUASS  127
+#define   MXNEARENDINTERVALUASS  131
 	{(u_char) MXNEARENDINTERVALUASS, ASN_GAUGE, RONLY, var_mxNearEndIntervalTable, 7, {1, 5, 1, 2, 1, 1, 5}},
-#define   MXNEARENDINTERVALCSSS  128
+#define   MXNEARENDINTERVALCSSS  132
 	{(u_char) MXNEARENDINTERVALCSSS, ASN_GAUGE, RONLY, var_mxNearEndIntervalTable, 7, {1, 5, 1, 2, 1, 1, 6}},
-#define   MXNEARENDINTERVALPCVS  129
+#define   MXNEARENDINTERVALPCVS  133
 	{(u_char) MXNEARENDINTERVALPCVS, ASN_GAUGE, RONLY, var_mxNearEndIntervalTable, 7, {1, 5, 1, 2, 1, 1, 7}},
-#define   MXNEARENDINTERVALLESS  130
+#define   MXNEARENDINTERVALLESS  134
 	{(u_char) MXNEARENDINTERVALLESS, ASN_GAUGE, RONLY, var_mxNearEndIntervalTable, 7, {1, 5, 1, 2, 1, 1, 8}},
-#define   MXNEARENDINTERVALBESS  131
+#define   MXNEARENDINTERVALBESS  135
 	{(u_char) MXNEARENDINTERVALBESS, ASN_GAUGE, RONLY, var_mxNearEndIntervalTable, 7, {1, 5, 1, 2, 1, 1, 9}},
-#define   MXNEARENDINTERVALDMS  132
+#define   MXNEARENDINTERVALDMS  136
 	{(u_char) MXNEARENDINTERVALDMS, ASN_GAUGE, RONLY, var_mxNearEndIntervalTable, 7, {1, 5, 1, 2, 1, 1, 10}},
-#define   MXNEARENDINTERVALLCVS  133
+#define   MXNEARENDINTERVALLCVS  137
 	{(u_char) MXNEARENDINTERVALLCVS, ASN_GAUGE, RONLY, var_mxNearEndIntervalTable, 7, {1, 5, 1, 2, 1, 1, 11}},
-#define   MXNEARENDINTERVALFASES  134
+#define   MXNEARENDINTERVALFASES  138
 	{(u_char) MXNEARENDINTERVALFASES, ASN_GAUGE, RONLY, var_mxNearEndIntervalTable, 7, {1, 5, 1, 2, 1, 1, 12}},
-#define   MXNEARENDINTERVALFABES  135
+#define   MXNEARENDINTERVALFABES  139
 	{(u_char) MXNEARENDINTERVALFABES, ASN_GAUGE, RONLY, var_mxNearEndIntervalTable, 7, {1, 5, 1, 2, 1, 1, 13}},
-#define   MXNEARENDINTERVALFEBES  136
+#define   MXNEARENDINTERVALFEBES  140
 	{(u_char) MXNEARENDINTERVALFEBES, ASN_GAUGE, RONLY, var_mxNearEndIntervalTable, 7, {1, 5, 1, 2, 1, 1, 14}},
-#define   MXNEARENDINTERVALVALIDDATA  137
+#define   MXNEARENDINTERVALVALIDDATA  141
 	{(u_char) MXNEARENDINTERVALVALIDDATA, ASN_INTEGER, RONLY, var_mxNearEndIntervalTable, 7, {1, 5, 1, 2, 1, 1, 15}},
-#define   MXNEARENDTOTALVALIDINTERVALS  138
+#define   MXNEARENDTOTALVALIDINTERVALS  142
 	{(u_char) MXNEARENDTOTALVALIDINTERVALS, ASN_INTEGER, RONLY, var_mxNearEndTotalTable, 7, {1, 5, 1, 3, 1, 1, 1}},
-#define   MXNEARENDTOTALINVALIDINTERVALS  139
+#define   MXNEARENDTOTALINVALIDINTERVALS  143
 	{(u_char) MXNEARENDTOTALINVALIDINTERVALS, ASN_INTEGER, RONLY, var_mxNearEndTotalTable, 7, {1, 5, 1, 3, 1, 1, 2}},
-#define   MXNEARENDTOTALESS     140
+#define   MXNEARENDTOTALESS     144
 	{(u_char) MXNEARENDTOTALESS, ASN_GAUGE, RONLY, var_mxNearEndTotalTable, 7, {1, 5, 1, 3, 1, 1, 3}},
-#define   MXNEARENDTOTALSESS    141
+#define   MXNEARENDTOTALSESS    145
 	{(u_char) MXNEARENDTOTALSESS, ASN_GAUGE, RONLY, var_mxNearEndTotalTable, 7, {1, 5, 1, 3, 1, 1, 4}},
-#define   MXNEARENDTOTALSEFSS   142
+#define   MXNEARENDTOTALSEFSS   146
 	{(u_char) MXNEARENDTOTALSEFSS, ASN_GAUGE, RONLY, var_mxNearEndTotalTable, 7, {1, 5, 1, 3, 1, 1, 5}},
-#define   MXNEARENDTOTALUASS    143
+#define   MXNEARENDTOTALUASS    147
 	{(u_char) MXNEARENDTOTALUASS, ASN_GAUGE, RONLY, var_mxNearEndTotalTable, 7, {1, 5, 1, 3, 1, 1, 6}},
-#define   MXNEARENDTOTALCSSS    144
+#define   MXNEARENDTOTALCSSS    148
 	{(u_char) MXNEARENDTOTALCSSS, ASN_GAUGE, RONLY, var_mxNearEndTotalTable, 7, {1, 5, 1, 3, 1, 1, 7}},
-#define   MXNEARENDTOTALPCVS    145
+#define   MXNEARENDTOTALPCVS    149
 	{(u_char) MXNEARENDTOTALPCVS, ASN_GAUGE, RONLY, var_mxNearEndTotalTable, 7, {1, 5, 1, 3, 1, 1, 8}},
-#define   MXNEARENDTOTALLESS    146
+#define   MXNEARENDTOTALLESS    150
 	{(u_char) MXNEARENDTOTALLESS, ASN_GAUGE, RONLY, var_mxNearEndTotalTable, 7, {1, 5, 1, 3, 1, 1, 9}},
-#define   MXNEARENDTOTALBESS    147
+#define   MXNEARENDTOTALBESS    151
 	{(u_char) MXNEARENDTOTALBESS, ASN_GAUGE, RONLY, var_mxNearEndTotalTable, 7, {1, 5, 1, 3, 1, 1, 10}},
-#define   MXNEARENDTOTALDMS     148
+#define   MXNEARENDTOTALDMS     152
 	{(u_char) MXNEARENDTOTALDMS, ASN_GAUGE, RONLY, var_mxNearEndTotalTable, 7, {1, 5, 1, 3, 1, 1, 11}},
-#define   MXNEARENDTOTALLCVS    149
+#define   MXNEARENDTOTALLCVS    153
 	{(u_char) MXNEARENDTOTALLCVS, ASN_GAUGE, RONLY, var_mxNearEndTotalTable, 7, {1, 5, 1, 3, 1, 1, 12}},
-#define   MXNEARENDTOTALFASES   150
+#define   MXNEARENDTOTALFASES   154
 	{(u_char) MXNEARENDTOTALFASES, ASN_GAUGE, RONLY, var_mxNearEndTotalTable, 7, {1, 5, 1, 3, 1, 1, 13}},
-#define   MXNEARENDTOTALFABES   151
+#define   MXNEARENDTOTALFABES   155
 	{(u_char) MXNEARENDTOTALFABES, ASN_GAUGE, RONLY, var_mxNearEndTotalTable, 7, {1, 5, 1, 3, 1, 1, 14}},
-#define   MXNEARENDTOTALFEBES   152
+#define   MXNEARENDTOTALFEBES   156
 	{(u_char) MXNEARENDTOTALFEBES, ASN_GAUGE, RONLY, var_mxNearEndTotalTable, 7, {1, 5, 1, 3, 1, 1, 15}},
-#define   MXFARENDCURRENTTIMEELAPSED  153
+#define   MXFARENDCURRENTTIMEELAPSED  157
 	{(u_char) MXFARENDCURRENTTIMEELAPSED, ASN_INTEGER, RONLY, var_mxFarEndCurrentTable, 7, {1, 5, 2, 1, 1, 1, 1}},
-#define   MXFARENDCURRENTESS    154
+#define   MXFARENDCURRENTESS    158
 	{(u_char) MXFARENDCURRENTESS, ASN_GAUGE, RONLY, var_mxFarEndCurrentTable, 7, {1, 5, 2, 1, 1, 1, 2}},
-#define   MXFARENDCURRENTSESS   155
+#define   MXFARENDCURRENTSESS   159
 	{(u_char) MXFARENDCURRENTSESS, ASN_GAUGE, RONLY, var_mxFarEndCurrentTable, 7, {1, 5, 2, 1, 1, 1, 3}},
-#define   MXFARENDCURRENTSEFSS  156
+#define   MXFARENDCURRENTSEFSS  160
 	{(u_char) MXFARENDCURRENTSEFSS, ASN_GAUGE, RONLY, var_mxFarEndCurrentTable, 7, {1, 5, 2, 1, 1, 1, 4}},
-#define   MXFARENDCURRENTUASS   157
+#define   MXFARENDCURRENTUASS   161
 	{(u_char) MXFARENDCURRENTUASS, ASN_GAUGE, RONLY, var_mxFarEndCurrentTable, 7, {1, 5, 2, 1, 1, 1, 5}},
-#define   MXFARENDCURRENTCSSS   158
+#define   MXFARENDCURRENTCSSS   162
 	{(u_char) MXFARENDCURRENTCSSS, ASN_GAUGE, RONLY, var_mxFarEndCurrentTable, 7, {1, 5, 2, 1, 1, 1, 6}},
-#define   MXFARENDCURRENTPCVS   159
+#define   MXFARENDCURRENTPCVS   163
 	{(u_char) MXFARENDCURRENTPCVS, ASN_GAUGE, RONLY, var_mxFarEndCurrentTable, 7, {1, 5, 2, 1, 1, 1, 7}},
-#define   MXFARENDCURRENTLESS   160
+#define   MXFARENDCURRENTLESS   164
 	{(u_char) MXFARENDCURRENTLESS, ASN_GAUGE, RONLY, var_mxFarEndCurrentTable, 7, {1, 5, 2, 1, 1, 1, 8}},
-#define   MXFARENDCURRENTBESS   161
+#define   MXFARENDCURRENTBESS   165
 	{(u_char) MXFARENDCURRENTBESS, ASN_GAUGE, RONLY, var_mxFarEndCurrentTable, 7, {1, 5, 2, 1, 1, 1, 9}},
-#define   MXFARENDCURRENTDMS    162
+#define   MXFARENDCURRENTDMS    166
 	{(u_char) MXFARENDCURRENTDMS, ASN_GAUGE, RONLY, var_mxFarEndCurrentTable, 7, {1, 5, 2, 1, 1, 1, 10}},
-#define   MXFARENDINTERVALESS   163
+#define   MXFARENDINTERVALESS   167
 	{(u_char) MXFARENDINTERVALESS, ASN_GAUGE, RONLY, var_mxFarEndIntervalTable, 7, {1, 5, 2, 2, 1, 1, 2}},
-#define   MXFARENDINTERVALSESS  164
+#define   MXFARENDINTERVALSESS  168
 	{(u_char) MXFARENDINTERVALSESS, ASN_GAUGE, RONLY, var_mxFarEndIntervalTable, 7, {1, 5, 2, 2, 1, 1, 3}},
-#define   MXFARENDINTERVALSEFSS  165
+#define   MXFARENDINTERVALSEFSS  169
 	{(u_char) MXFARENDINTERVALSEFSS, ASN_GAUGE, RONLY, var_mxFarEndIntervalTable, 7, {1, 5, 2, 2, 1, 1, 4}},
-#define   MXFARENDINTERVALUASS  166
+#define   MXFARENDINTERVALUASS  170
 	{(u_char) MXFARENDINTERVALUASS, ASN_GAUGE, RONLY, var_mxFarEndIntervalTable, 7, {1, 5, 2, 2, 1, 1, 5}},
-#define   MXFARENDINTERVALCSSS  167
+#define   MXFARENDINTERVALCSSS  171
 	{(u_char) MXFARENDINTERVALCSSS, ASN_GAUGE, RONLY, var_mxFarEndIntervalTable, 7, {1, 5, 2, 2, 1, 1, 6}},
-#define   MXFARENDINTERVALPCVS  168
+#define   MXFARENDINTERVALPCVS  172
 	{(u_char) MXFARENDINTERVALPCVS, ASN_GAUGE, RONLY, var_mxFarEndIntervalTable, 7, {1, 5, 2, 2, 1, 1, 7}},
-#define   MXFARENDINTERVALLESS  169
+#define   MXFARENDINTERVALLESS  173
 	{(u_char) MXFARENDINTERVALLESS, ASN_GAUGE, RONLY, var_mxFarEndIntervalTable, 7, {1, 5, 2, 2, 1, 1, 8}},
-#define   MXFARENDINTERVALBESS  170
+#define   MXFARENDINTERVALBESS  174
 	{(u_char) MXFARENDINTERVALBESS, ASN_GAUGE, RONLY, var_mxFarEndIntervalTable, 7, {1, 5, 2, 2, 1, 1, 9}},
-#define   MXFARENDINTERVALDMS   171
+#define   MXFARENDINTERVALDMS   175
 	{(u_char) MXFARENDINTERVALDMS, ASN_GAUGE, RONLY, var_mxFarEndIntervalTable, 7, {1, 5, 2, 2, 1, 1, 10}},
-#define   MXFARENDINTERVALVALIDDATA  172
+#define   MXFARENDINTERVALVALIDDATA  176
 	{(u_char) MXFARENDINTERVALVALIDDATA, ASN_INTEGER, RONLY, var_mxFarEndIntervalTable, 7, {1, 5, 2, 2, 1, 1, 11}},
-#define   MXFARENDTOTALVALIDINTERVALS  173
+#define   MXFARENDTOTALVALIDINTERVALS  177
 	{(u_char) MXFARENDTOTALVALIDINTERVALS, ASN_INTEGER, RONLY, var_mxFarEndTotalTable, 7, {1, 5, 2, 3, 1, 1, 1}},
-#define   MXFARENDTOTALINVALIDINTERVALS  174
+#define   MXFARENDTOTALINVALIDINTERVALS  178
 	{(u_char) MXFARENDTOTALINVALIDINTERVALS, ASN_INTEGER, RONLY, var_mxFarEndTotalTable, 7, {1, 5, 2, 3, 1, 1, 2}},
-#define   MXFARENDTOTALESS      175
+#define   MXFARENDTOTALESS      179
 	{(u_char) MXFARENDTOTALESS, ASN_GAUGE, RONLY, var_mxFarEndTotalTable, 7, {1, 5, 2, 3, 1, 1, 3}},
-#define   MXFARENDTOTALSESS     176
+#define   MXFARENDTOTALSESS     180
 	{(u_char) MXFARENDTOTALSESS, ASN_GAUGE, RONLY, var_mxFarEndTotalTable, 7, {1, 5, 2, 3, 1, 1, 4}},
-#define   MXFARENDTOTALSEFSS    177
+#define   MXFARENDTOTALSEFSS    181
 	{(u_char) MXFARENDTOTALSEFSS, ASN_GAUGE, RONLY, var_mxFarEndTotalTable, 7, {1, 5, 2, 3, 1, 1, 5}},
-#define   MXFARENDTOTALUASS     178
+#define   MXFARENDTOTALUASS     182
 	{(u_char) MXFARENDTOTALUASS, ASN_GAUGE, RONLY, var_mxFarEndTotalTable, 7, {1, 5, 2, 3, 1, 1, 6}},
-#define   MXFARENDTOTALCSSS     179
+#define   MXFARENDTOTALCSSS     183
 	{(u_char) MXFARENDTOTALCSSS, ASN_GAUGE, RONLY, var_mxFarEndTotalTable, 7, {1, 5, 2, 3, 1, 1, 7}},
-#define   MXFARENDTOTALPCVS     180
+#define   MXFARENDTOTALPCVS     184
 	{(u_char) MXFARENDTOTALPCVS, ASN_GAUGE, RONLY, var_mxFarEndTotalTable, 7, {1, 5, 2, 3, 1, 1, 8}},
-#define   MXFARENDTOTALLESS     181
+#define   MXFARENDTOTALLESS     185
 	{(u_char) MXFARENDTOTALLESS, ASN_GAUGE, RONLY, var_mxFarEndTotalTable, 7, {1, 5, 2, 3, 1, 1, 9}},
-#define   MXFARENDTOTALBESS     182
+#define   MXFARENDTOTALBESS     186
 	{(u_char) MXFARENDTOTALBESS, ASN_GAUGE, RONLY, var_mxFarEndTotalTable, 7, {1, 5, 2, 3, 1, 1, 10}},
-#define   MXFARENDTOTALDMS      183
+#define   MXFARENDTOTALDMS      187
 	{(u_char) MXFARENDTOTALDMS, ASN_GAUGE, RONLY, var_mxFarEndTotalTable, 7, {1, 5, 2, 3, 1, 1, 11}},
 };
 
@@ -1762,6 +1782,10 @@ mxCardTable_create(void)
 		StorageNew->mxCardSyncSpanIdLen = 0;
 		StorageNew->mxCardSyncSpanId[StorageNew->mxCardSyncSpanIdLen] = 0;
 		StorageNew->mxCardSyncTransitions = 0;
+		if (memdup((u_char **) &StorageNew->mxCardLeds, (u_char *) "\x00\x00", 2) != SNMPERR_SUCCESS)
+			goto nomem;
+		StorageNew->mxCardLedsLen = 2;
+		StorageNew->mxCardLastChange = 0;
 		if ((StorageNew->mxCardName = malloc(1)) == NULL)
 			goto nomem;
 		StorageNew->mxCardNameLen = 0;
@@ -1860,6 +1884,12 @@ mxCardTable_duplicate(struct mxCardTable_data *thedata)
 		StorageNew->mxCardSyncSpanIdLen = thedata->mxCardSyncSpanIdLen;
 		StorageNew->mxCardSyncSpanId[StorageNew->mxCardSyncSpanIdLen] = 0;
 		StorageNew->mxCardSyncTransitions = thedata->mxCardSyncTransitions;
+		if (!(StorageNew->mxCardLeds = malloc(thedata->mxCardLedsLen + 1)))
+			goto destroy;
+		memcpy(StorageNew->mxCardLeds, thedata->mxCardLeds, thedata->mxCardLedsLen);
+		StorageNew->mxCardLedsLen = thedata->mxCardLedsLen;
+		StorageNew->mxCardLeds[StorageNew->mxCardLedsLen] = 0;
+		StorageNew->mxCardLastChange = thedata->mxCardLastChange;
 		if (!(StorageNew->mxCardName = malloc(thedata->mxCardNameLen + 1)))
 			goto destroy;
 		memcpy(StorageNew->mxCardName, thedata->mxCardName, thedata->mxCardNameLen);
@@ -1915,6 +1945,8 @@ mxCardTable_destroy(struct mxCardTable_data **thedata)
 		StorageDel->mxCardControlStatusLen = 0;
 		SNMP_FREE(StorageDel->mxCardSyncSpanId);
 		StorageDel->mxCardSyncSpanIdLen = 0;
+		SNMP_FREE(StorageDel->mxCardLeds);
+		StorageDel->mxCardLedsLen = 0;
 		SNMP_FREE(StorageDel->mxCardName);
 		StorageDel->mxCardNameLen = 0;
 		SNMP_FREE(StorageDel);
@@ -2084,6 +2116,13 @@ parse_mxCardTable(const char *token, char *line)
 		return;
 	}
 	line = read_config_read_data(ASN_COUNTER, line, &StorageTmp->mxCardSyncTransitions, &tmpsize);
+	SNMP_FREE(StorageTmp->mxCardLeds);
+	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->mxCardLeds, &StorageTmp->mxCardLedsLen);
+	if (StorageTmp->mxCardLeds == NULL) {
+		config_perror("invalid specification for mxCardLeds");
+		return;
+	}
+	line = read_config_read_data(ASN_TIMETICKS, line, &StorageTmp->mxCardLastChange, &tmpsize);
 	SNMP_FREE(StorageTmp->mxCardName);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->mxCardName, &StorageTmp->mxCardNameLen);
 	if (StorageTmp->mxCardName == NULL) {
@@ -2147,6 +2186,8 @@ store_mxCardTable(int majorID, int minorID, void *serverarg, void *clientarg)
 			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->mxCardStandbyStatus, &tmpsize);
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->mxCardSyncSpanId, &StorageTmp->mxCardSyncSpanIdLen);
 			cptr = read_config_store_data(ASN_COUNTER, cptr, &StorageTmp->mxCardSyncTransitions, &tmpsize);
+			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->mxCardLeds, &StorageTmp->mxCardLedsLen);
+			cptr = read_config_store_data(ASN_TIMETICKS, cptr, &StorageTmp->mxCardLastChange, &tmpsize);
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->mxCardName, &StorageTmp->mxCardNameLen);
 			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->mxCardStatus, &tmpsize);
 			snmpd_store_config(line);
@@ -2248,8 +2289,10 @@ mxSpanTable_create(void)
 		if (memdup((u_char **) &StorageNew->mxSpanEvents, (u_char *) "\x00\x00", 2) != SNMPERR_SUCCESS)
 			goto nomem;
 		StorageNew->mxSpanEventsLen = 2;
+		StorageNew->mxSpanLed = MXSPANLED_BLACK;
 		StorageNew->mxSpanReceiveLevel = 0;
 		StorageNew->mxSpanReceiveThreshold = 0;
+		StorageNew->mxSpanLastChange = 0;
 		StorageNew->mxSpanRowStatus = 0;
 		StorageNew->mxSpanRowStatus = RS_NOTREADY;
 	}
@@ -2379,8 +2422,10 @@ mxSpanTable_duplicate(struct mxSpanTable_data *thedata)
 		memcpy(StorageNew->mxSpanEvents, thedata->mxSpanEvents, thedata->mxSpanEventsLen);
 		StorageNew->mxSpanEventsLen = thedata->mxSpanEventsLen;
 		StorageNew->mxSpanEvents[StorageNew->mxSpanEventsLen] = 0;
+		StorageNew->mxSpanLed = thedata->mxSpanLed;
 		StorageNew->mxSpanReceiveLevel = thedata->mxSpanReceiveLevel;
 		StorageNew->mxSpanReceiveThreshold = thedata->mxSpanReceiveThreshold;
+		StorageNew->mxSpanLastChange = thedata->mxSpanLastChange;
 		StorageNew->mxSpanRowStatus = thedata->mxSpanRowStatus;
 	}
       done:
@@ -2652,8 +2697,10 @@ parse_mxSpanTable(const char *token, char *line)
 		config_perror("invalid specification for mxSpanEvents");
 		return;
 	}
+	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->mxSpanLed, &tmpsize);
 	line = read_config_read_data(ASN_UNSIGNED, line, &StorageTmp->mxSpanReceiveLevel, &tmpsize);
 	line = read_config_read_data(ASN_UNSIGNED, line, &StorageTmp->mxSpanReceiveThreshold, &tmpsize);
+	line = read_config_read_data(ASN_TIMETICKS, line, &StorageTmp->mxSpanLastChange, &tmpsize);
 	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->mxSpanRowStatus, &tmpsize);
 	mxSpanTable_add(StorageTmp);
 	(void) tmpsize;
@@ -2728,8 +2775,10 @@ store_mxSpanTable(int majorID, int minorID, void *serverarg, void *clientarg)
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->mxSpanLineStatus, &StorageTmp->mxSpanLineStatusLen);
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->mxSpanAlarms, &StorageTmp->mxSpanAlarmsLen);
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->mxSpanEvents, &StorageTmp->mxSpanEventsLen);
+			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->mxSpanLed, &tmpsize);
 			cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->mxSpanReceiveLevel, &tmpsize);
 			cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->mxSpanReceiveThreshold, &tmpsize);
+			cptr = read_config_store_data(ASN_TIMETICKS, cptr, &StorageTmp->mxSpanLastChange, &tmpsize);
 			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->mxSpanRowStatus, &tmpsize);
 			snmpd_store_config(line);
 		}
@@ -6778,6 +6827,18 @@ var_mxCardTable(struct variable *vp, oid * name, size_t *length, int exact, size
 		*var_len = sizeof(StorageTmp->mxCardSyncTransitions);
 		rval = (u_char *) &StorageTmp->mxCardSyncTransitions;
 		break;
+	case (u_char) MXCARDLEDS:	/* ReadOnly */
+		if (!StorageTmp)
+			break;
+		*var_len = StorageTmp->mxCardLedsLen;
+		rval = (u_char *) StorageTmp->mxCardLeds;
+		break;
+	case (u_char) MXCARDLASTCHANGE:	/* ReadOnly */
+		if (!StorageTmp)
+			break;
+		*var_len = sizeof(StorageTmp->mxCardLastChange);
+		rval = (u_char *) &StorageTmp->mxCardLastChange;
+		break;
 	case (u_char) MXCARDNAME:	/* ReadOnly */
 		if (!StorageTmp)
 			break;
@@ -7475,6 +7536,12 @@ var_mxSpanTable(struct variable *vp, oid * name, size_t *length, int exact, size
 		*var_len = StorageTmp->mxSpanEventsLen;
 		rval = (u_char *) StorageTmp->mxSpanEvents;
 		break;
+	case (u_char) MXSPANLED:	/* ReadOnly */
+		if (!StorageTmp)
+			break;
+		*var_len = sizeof(StorageTmp->mxSpanLed);
+		rval = (u_char *) &StorageTmp->mxSpanLed;
+		break;
 	case (u_char) MXSPANRECEIVELEVEL:	/* ReadOnly */
 		if (!StorageTmp)
 			break;
@@ -7487,6 +7554,12 @@ var_mxSpanTable(struct variable *vp, oid * name, size_t *length, int exact, size
 			break;
 		*var_len = sizeof(StorageTmp->mxSpanReceiveThreshold);
 		rval = (u_char *) &StorageTmp->mxSpanReceiveThreshold;
+		break;
+	case (u_char) MXSPANLASTCHANGE:	/* ReadOnly */
+		if (!StorageTmp)
+			break;
+		*var_len = sizeof(StorageTmp->mxSpanLastChange);
+		rval = (u_char *) &StorageTmp->mxSpanLastChange;
 		break;
 	case (u_char) MXSPANROWSTATUS:	/* Create */
 		*write_method = write_mxSpanRowStatus;
@@ -18331,6 +18404,40 @@ write_mxXconRowStatus(int action, u_char *var_val, u_char var_val_type, size_t v
 		break;
 	}
 	return SNMP_ERR_NOERROR;
+}
+
+void
+send_mxCardStateChange_v2trap(struct variable_list *vars)
+{
+	struct variable_list trap;
+
+	DEBUGMSGTL(("mxMIB", "send_mxCardStateChange_v2trap: sending trap...  "));
+	trap.next_variable = vars;
+	trap.name = snmpTrapOID_oid;
+	trap.name_length = sizeof(snmpTrapOID_oid) / sizeof(oid);
+	trap.type = ASN_OBJECT_ID;
+	trap.val.objid = mxCardStateChange_oid;
+	trap.val_len = sizeof(mxCardStateChange_oid);
+	trap.index = 0;
+	send_v2trap(&trap);
+	DEBUGMSGTL(("mxMIB", "done.\n"));
+}
+
+void
+send_mxSpanStateChange_v2trap(struct variable_list *vars)
+{
+	struct variable_list trap;
+
+	DEBUGMSGTL(("mxMIB", "send_mxSpanStateChange_v2trap: sending trap...  "));
+	trap.next_variable = vars;
+	trap.name = snmpTrapOID_oid;
+	trap.name_length = sizeof(snmpTrapOID_oid) / sizeof(oid);
+	trap.type = ASN_OBJECT_ID;
+	trap.val.objid = mxSpanStateChange_oid;
+	trap.val_len = sizeof(mxSpanStateChange_oid);
+	trap.index = 0;
+	send_v2trap(&trap);
+	DEBUGMSGTL(("mxMIB", "done.\n"));
 }
 
 /**

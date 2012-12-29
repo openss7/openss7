@@ -443,6 +443,7 @@ if (0) {
 	my $pcassign;
 	eval { $pcassign = XMLin("$progdir/pc_assign.xml") };
 	unless ($@) {
+		#print STDERR "D: using PC assignments from $progdir/pcassignments.xml\n";
 		# XML::Simple does not like tag names of '0' so we save them as 256.
 		$pc_assignments = $pcassign;
 		foreach my $k (keys %{$pc_assignments->{5}}) {
@@ -460,14 +461,12 @@ if (1) {
 	my $dumper = new XML::Dumper;
 	eval { $pcassign = $dumper->xml2pl("$progdir/pc_assignments.xml.gz") };
 	unless ($@) {
+		#print STDERR "D: using PC assignments from $progdir/pc_assignments.xml.gz\n";
 		$pc_assignments = $pcassign;
 	}
 }
 
 use constant {
-	HALF_LEFT	=>-1,
-	HALF_RIGHT	=> 1,
-
 	COL_NOD => 5,
 	COL_SSP => 4,
 	COL_SCP => 3,
@@ -496,12 +495,6 @@ use constant {
 	MP_JAPAN => 1,
 	MP_NATIONAL => 2,
 	MP_INTERNATIONAL => 3,
-
-	SLL_DIR_RECEIVED    => 0,   # sent to us by somebody else
-	SLL_DIR_BROADCAST   => 1,   # broadcast by somebody else
-	SLL_DIR_MULTICAST   => 2,   # multicast by somebody else
-	SLL_DIR_MONITOR	    => 3,   # sent to somebody else by somebody else
-	SLL_DIR_SENT	    => 4,   # sent by us
 };
 our @rtoptions = (
 	['Unknown'		=> RT_UNKNOWN		],
@@ -521,7 +514,8 @@ our @mpoptions = (
 );
 
 # -------------------------------------
-package style; use strict;
+package style;
+use strict;
 # -------------------------------------
 
 my %tframestyle = (
@@ -547,10 +541,14 @@ my %tframescrunch = (
 my %labelright = (
 	-anchor=>'e',
 	-justify=>'right',
+	#-relief=>'groove',
+	#-borderwidth=>2,
 );
 my %labelcenter = (
 	-anchor=>'s',
 	-justify=>'center',
+	#-relief=>'groove',
+	#-borderwidth=>2,
 );
 my %labelgrid = (
 );
@@ -561,6 +559,8 @@ my %entryinput = (
 my %entryleft = (
 	%entryinput,
 	-state=>'readonly',
+	#-relief=>'groove',
+	#-borderwidth=>2,
 );
 my %entryright = (
 	%entryleft,
@@ -586,7 +586,8 @@ my %optionleft = (
 );
 
 # -------------------------------------
-package Logging; use strict;
+package Logging;
+use strict;
 # -------------------------------------
 
 #package Logging;
@@ -603,12 +604,6 @@ sub new {
 	bless $self,$type;
 	$self->init(@args);
 	return $self;
-}
-#package Logging;
-sub destroy {
-	my ($self,$top) = @_;
-	delete $self->{logs};
-	delete $self->{top};
 }
 
 #package Logging;
@@ -669,7 +664,8 @@ sub log {
 }
 
 # -------------------------------------
-package Counts; use strict;
+package Counts;
+use strict;
 # -------------------------------------
 
 #package Counts;
@@ -677,11 +673,7 @@ sub init {
 	my ($self,$interval,@args) = @_;
 	$self->{interval} = $interval;
 }
-#package Counts;
-sub destroy {
-	my ($self,$top) = @_;
-	delete $self->{interval};
-}
+
 #package Counts;
 sub new {
 	my ($type,@args) = @_;
@@ -698,8 +690,10 @@ sub addto {
 }
 
 # -------------------------------------
-package MsgCounts; use strict;
-@MsgCounts::ISA = qw(Counts);
+package MsgCounts;
+use strict;
+use vars qw(@ISA);
+@ISA = qw(Counts);
 # -------------------------------------
 
 #package MsgCounts;
@@ -709,23 +703,16 @@ sub init {
 	$self->{incs} = {0=>{},1=>{},2=>{}};
 	$self->{top} = $top;
 }
-#package MsgCounts;
-sub destroy {
-	my ($self,$top) = @_;
-	$top->widget->toplevel->traceVdelete(\$self->{mcnt_text});
-	foreach (qw/incs top/) { delete $self->{$_}; }
-	$self->Counts::destroy($top);
-}
 
 sub DESTROY {
 	my $self = shift;
-
 	$self->{TopLevel}->traceVdelete(\$self->{mcnt_text});
 }
 
 #package MsgCounts;
 sub inc {
 	my ($self,$msg,$dir) = @_;
+	#print STDERR "MsgCounts::inc called by ", $self->identify, "\n";
 	my $li = $msg->{li};
 	$self->{incs}->{$dir}->{sus} += 1;
 	$self->{incs}->{2}->{sus} += 1 unless $dir == 2;
@@ -804,8 +791,10 @@ sub addfrom {
 
 
 # -------------------------------------
-package CallCounts; use strict;
-@CallCounts::ISA = qw(Counts);
+package CallCounts;
+use strict;
+use vars qw(@ISA);
+@ISA = qw(Counts);
 # -------------------------------------
 
 #package CallCounts;
@@ -827,13 +816,6 @@ sub init {
 	$self->{actcnt} = {0=>0,1=>0,2=>0,3=>0};
 	$self->Counts::init(@args);
 }
-#package CallCounts;
-sub destroy {
-	my ($self,$top) = @_;
-	$top->widget->toplevel->traceVdelete(\$self->{ccnt_text});
-	foreach (qw/pegs sims durs iats plots ciccnt actcnt/) { delete $self->{$_}; }
-	$self->Counts::destroy($top);
-}
 
 #package CallCounts;
 sub peg {
@@ -847,13 +829,7 @@ sub peg {
 #package CallCounts;
 sub act {
 	my ($self,$top) = @_;
-	$self->{actcnt}->{0}++;
-}
-
-#package CallCounts;
-sub deact {
-	my ($self,$top) = @_;
-	$self->{actcnt}->{0}--;
+	$self->{actcnt}->{0} += 1;
 }
 
 #package CallCounts;
@@ -867,16 +843,6 @@ sub cnt {
 			$c->itemconfigure($self->{item},-state=>$state);
 		}
 		$self->identify;
-	}
-}
-
-#package CallCounts;
-sub uncnt {
-	my ($self,$top) = @_;
-	if (($self->{ciccnt} -= 1) == 0) {
-		if ($self->isa('Relation')) {
-			$top->canvas;->dtag('circuits',withtag=>$self->{item}) if $self->{item};
-		}
 	}
 }
 
@@ -971,45 +937,10 @@ sub addfrom {
 }
 
 # -------------------------------------
-package PktCounts; use strict;
-@PktCounts::ISA = qw(Counts);
-# -------------------------------------
-
-#package PktCounts;
-sub init {
-	my ($self,$top,$args) = @_;
-	$self->Counts::init(@args);
-	$self->{hits} = {0=>{},1->{},2=>{}};
-	$self->{top} = $top;
-}
-sub destroy {
-	my ($self,$top) = @_;
-	$top->widget->toplevel->traceVdelete(\$self->{pcnt_text});
-	delete $self->{hits};
-	delete $self->{top};
-	$self->Counts::destroy($top);
-}
-
-sub DESTROY {
-	my $self = shift;
-	$self->{TopLevel}->traceVdelete(\$self->{pcnt_text});
-}
-
-#package PktCounts;
-sub hit {
-	my ($self,$msg,$dir) = @_;
-}
-
-#package PktCounts;
-sub addfrom {
-	my ($self,$othr,$flip,@args) = @_;
-
-	return unless $othr->isa('PktCounts');
-}
-
-# -------------------------------------
-package History; use strict;
-@History::ISA = qw(Counts);
+package History;
+use strict;
+use vars qw(@ISA);
+@ISA = qw(Counts);
 # -------------------------------------
 
 #package History;
@@ -1017,13 +948,6 @@ sub init {
 	my ($self,@args) = @_;
 	$self->Counts::init(@args);
 	$self->{hist} = {};
-}
-#package Histroy;
-sub destroy {
-	my ($self,$top) = @_;
-	foreach (values %{$self->{hist}}) { $_->destroy($top); }
-	delete $self->{hist};
-	$self->Counts::destroy($top);
 }
 
 #package History;
@@ -1063,21 +987,16 @@ sub addfrom {
 }
 
 # -------------------------------------
-package MsgHistory; use strict;
-@MsgHistory::ISA = qw(History MsgCounts);
+package MsgHistory;
+use strict;
+use vars qw(@ISA);
+@ISA = qw(History MsgCounts);
 # -------------------------------------
 
-#package MsgHistory;
 sub init {
 	my ($self,$top,@args) = @_;
 	$self->History::init(@args);
 	$self->MsgCounts::init($top,@args);
-}
-#package MsgHistory;
-sub destroy {
-	my ($self,$top) = @_;
-	$self->History::destroy($top);
-	$self->MsgCounts::destroy($top);
 }
 
 #package MsgHistory;
@@ -1096,6 +1015,7 @@ sub addfrom {
 
 #package MsgHistory;
 sub inc { my ($self,$msg,$dir) = @_;
+	#print STDERR "MsgHistory::inc called by ", $self->identify, "\n";
 #	my $int = $self->interval($msg->{hdr});
 #	my $hist = $self->hist($int);
 #	$hist->inc($msg,$dir);
@@ -1103,21 +1023,16 @@ sub inc { my ($self,$msg,$dir) = @_;
 }
 
 # -------------------------------------
-package CallHistory; use strict;
-@CallHistory::ISA = qw(History CallCounts);
+package CallHistory;
+use strict;
+use vars qw(@ISA);
+@ISA = qw(History CallCounts);
 # -------------------------------------
 
-#package CallHistory;
 sub init {
 	my ($self,$top,@args) = @_;
 	$self->History::init(@args);
 	$self->CallCounts::init($top,@args);
-}
-#package CallHistory;
-sub destroy {
-	my ($self,@args) = @_;
-	$self->CallCounts::destroy(@args);
-	$self->History::destroy(@args);
 }
 
 #package CallHistory;
@@ -1179,48 +1094,8 @@ sub iat { my ($self,@args) = @_;
 }
 
 # -------------------------------------
-package PktHistory; use strict;
-@PktHistory::ISA = qw(History PktCounts);
-# -------------------------------------
-
-#package PktHistory;
-sub init {
-	my ($self,$top,@args) = @_;
-	$self->History::init(@args);
-	$self->PktCounts::init($top,@args);
-}
-#package PktHistory;
-sub destroy {
-	my ($self,$top,@args) = @_;
-	$self->History::destroy($top,@args);
-	$self->PktCounts::destroy($top,@args);
-}
-
-
-#package PktHistory;
-sub newcounts {
-	my ($self,$int) = @_;
-	return PktCounts->new($int);
-}
-
-#package PktHistory;
-sub addfrom {
-	my ($self,$othr,@args) = @_;
-	$self->PktCounts::addfrom($othr,@args);
-	$self->History::addfrom($othr,@args);
-}
-
-#package PktHistory;
-sub hit {
-	my ($self,$msg,$dir) = @_;
-#	my $int = $self->interval($msg->{hdr});
-#	my $hist = $self->hist($int);
-#	$hist->hit($msg,$dir);
-	$self->PktCounts::hit($msg,$dir);
-}
-
-# -------------------------------------
-package Plot; use strict;
+package Plot;
+use strict;
 # -------------------------------------
 
 my %centerblack = ( -anchor=>'center', -fill=>'black', -justify=>'center' );
@@ -1678,8 +1553,10 @@ sub setliny {
 }
 
 # -------------------------------------
-package PlotPdf; use strict;
-@PlotPdf::ISA = qw(Plot);
+package PlotPdf;
+use strict;
+use vars qw(@ISA);
+@ISA = qw(Plot);
 # -------------------------------------
 
 #package PlotPdf;
@@ -1778,8 +1655,10 @@ sub plotdata {
 }
 
 # -------------------------------------
-package PlotCdf; use strict;
-@PlotCdf::ISA = qw(Plot);
+package PlotCdf;
+use strict;
+use vars qw(@ISA);
+@ISA = qw(Plot);
 # -------------------------------------
 
 #package PlotCdf;
@@ -1874,8 +1753,10 @@ sub plotdata {
 }
 
 # -------------------------------------
-package PlotPhase; use strict;
-@PlotPhase::ISA = qw(Plot);
+package PlotPhase;
+use strict;
+use vars qw(@ISA);
+@ISA = qw(Plot);
 # -------------------------------------
 
 #package PlotPhase;
@@ -1940,8 +1821,10 @@ sub plotdata {
 }
 
 # -------------------------------------
-package PlotHolding; use strict;
-@PlotHolding::ISA = qw(Plot);
+package PlotHolding;
+use strict;
+use vars qw(@ISA);
+@ISA = qw(Plot);
 # -------------------------------------
 
 #package PlotHolding;
@@ -1988,8 +1871,10 @@ sub compiledata {
 sub labelx { return 'x = holding time (seconds)'; }
 
 # -------------------------------------
-package PlotArrival; use strict;
-@PlotArrival::ISA = qw(Plot);
+package PlotArrival;
+use strict;
+use vars qw(@ISA);
+@ISA = qw(Plot);
 # -------------------------------------
 
 #package PlotArrival;
@@ -2058,8 +1943,10 @@ sub compiledata {
 sub labelx { return 'x = interarrival time (seconds)'; }
 
 # -------------------------------------
-package PlotPdfHolding; use strict;
-@PlotPdfHolding::ISA = qw(PlotPdf PlotHolding);
+package PlotPdfHolding;
+use strict;
+use vars qw(@ISA);
+@ISA = qw(PlotPdf PlotHolding);
 # -------------------------------------
 
 #package PlotPdfHolding;
@@ -2070,8 +1957,10 @@ sub get {
 }
 
 # -------------------------------------
-package PlotCdfHolding; use strict;
-@PlotCdfHolding::ISA = qw(PlotCdf PlotHolding);
+package PlotCdfHolding;
+use strict;
+use vars qw(@ISA);
+@ISA = qw(PlotCdf PlotHolding);
 # -------------------------------------
 
 #package PlotCdfHolding;
@@ -2082,8 +1971,10 @@ sub get {
 }
 
 # -------------------------------------
-package PlotPhaseHolding; use strict;
-@PlotPhaseHolding::ISA = qw(PlotPhase PlotHolding);
+package PlotPhaseHolding;
+use strict;
+use vars qw(@ISA);
+@ISA = qw(PlotPhase PlotHolding);
 # -------------------------------------
 
 #package PlotPhaseHolding;
@@ -2094,8 +1985,10 @@ sub get {
 }
 
 # -------------------------------------
-package PlotPdfArrival; use strict;
-@PlotPdfArrival::ISA = qw(PlotPdf PlotArrival);
+package PlotPdfArrival;
+use strict;
+use vars qw(@ISA);
+@ISA = qw(PlotPdf PlotArrival);
 # -------------------------------------
 
 #package PlotPdfArrival;
@@ -2106,8 +1999,10 @@ sub get {
 }
 
 # -------------------------------------
-package PlotCdfArrival; use strict;
-@PlotCdfArrival::ISA = qw(PlotCdf PlotArrival);
+package PlotCdfArrival;
+use strict;
+use vars qw(@ISA);
+@ISA = qw(PlotCdf PlotArrival);
 # -------------------------------------
 
 #package PlotCdfArrival;
@@ -2118,8 +2013,10 @@ sub get {
 }
 
 # -------------------------------------
-package PlotPhaseArrival; use strict;
-@PlotPhaseArrival::ISA = qw(PlotPhase PlotArrival);
+package PlotPhaseArrival;
+use strict;
+use vars qw(@ISA);
+@ISA = qw(PlotPhase PlotArrival);
 # -------------------------------------
 
 #package PlotPhaseArrival;
@@ -2130,20 +2027,23 @@ sub get {
 }
 
 # -------------------------------------
-package MsgStats; use strict;
-@MsgStats::ISA = qw(MsgHistory);
+package MsgStats;
+use strict;
+use vars qw(@ISA);
+@ISA = qw(MsgHistory);
 # -------------------------------------
 
 #package MsgStats;
-sub destroy {
+sub init {
 	my ($self,@args) = @_;
-	if (my $tw = $self->{stats}) { $tw->destroy; }
-	delete $self->{stats};
-	$self->MsgHistory::destroy(@args);
+	my $self = shift;
+	$self->MsgHistory::init(@args);
+	$self->{dist} = {};
 }
+
 #package MsgStats;
 sub addfrom {
-	shift->SUPER::addfrom(@_);
+	shift->MsgHistory::addfrom(@_);
 }
 
 #package MsgStats;
@@ -2181,10 +2081,7 @@ sub stats {
 			-textvariable=>\$self->{incs}->{2}->{sus},
 			-width=>6,
 		)->grid(-row=>2,-column=>0,-sticky=>'ewns');
-		$wi->bind('<Double-Button-1>',[sub{
-			my ($wi,$self) = @_;
-			$self->{stats}->deiconify;
-		},$self]);
+		$wi->bind('<Double-Button-1>',[sub{ my ($wi,$self) = @_; $self->{stats}->deiconify; },$self]);
 		$tw->iconwindow($wi);
 		$tw->group($tl);
 		#$tw->transient($tl);
@@ -2553,20 +2450,22 @@ sub stats {
 }
 
 # -------------------------------------
-package CallStats; use strict;
-@CallStats::ISA = qw(CallHistory);
+package CallStats;
+use strict;
+use vars qw(@ISA);
+@ISA = qw(CallHistory);
 # -------------------------------------
 
 #package CallStats;
-sub destroy {
+sub init {
 	my ($self,@args) = @_;
-	if (my $tw = $self->{cstat}) { $tw->destroy; }
-	delete $self->{cstat};
-	$self->CallHistory::destroy(@args);
+	$self->CallHistory::init(@args);
+	$self->{dist} = {};
 }
+
 #package CallStats;
 sub addfrom {
-	shift->SUPER::addfrom(@_);
+	shift->CallHistory::addfrom(@_);
 }
 
 #package CallStats;
@@ -3066,150 +2965,10 @@ sub cstat {
 }
 
 # -------------------------------------
-package PktStats; use strict;
-@PktStats::ISA = qw(PktHistory);
-# -------------------------------------
-
-#package PktStats;;
-sub destroy {
-	my ($self,@args) = @_;
-	if (my $tw = $self->{pstat}) { $tw->destroy; }
-	delete $self->{pstat};
-	$self->PktHistory::destroy(@args);
-}
-#package PktStats;
-sub addfrom {
-	shift->SUPER::addfrom(@_);
-}
-
-#package PktStats;
-sub pstat {
-	my ($self,$top,$X,$Y) = @_;
-	my $row = 0;
-	my ($tw,$w,$bmsg);
-	if ($tw = $self->{pstat}) {
-		if ($tw->state eq 'iconic') {
-			$tw->deiconify;
-		} else {
-			$tw->UnmapWindow;
-		}
-	} else {
-		my $title = $self->identify." Packet Statistics";
-		my $tl = $top->widget->toplevel;
-		$tw = $tl->Toplevel(
-			-title=>$title,
-			Name=>'packetStatistics',
-			-class=>'SS7view',
-		);
-		my $wi = $tw->toplevel->Toplevel(
-			-title=>$title,
-			Name=>'packetStatistics',
-			-class=>'SS7view',
-		);
-		$wi->geometry("48x48");
-		$wi->Label(
-			-justify=>'center',
-			-text=>'Pkts:',
-			-width=>6,
-		)->grid(-row=>0,-column=>0,-sticky=>'ewns');
-		$wi->Entry(
-			-justify=>'center',
-			-textvariable=>\$self->{hits}->{2}->{pkts},
-			-width=>6,
-		)->grid(-row=>2,-column=>0,-sticky=>'ewns');
-		$wi->bind('<Double-Button-1>',[sub{
-			my ($wi,$self) = @_;
-			$self->{pstat}->deiconify;
-		},$self]);
-		$tw->iconwindow($wi);
-		$tw->group($tl);
-		#$tw->transient($tl);
-		#$tw->iconimage('icon');
-		$tw->iconname($title);
-		#$tw->resizable(0,0);
-		$tw->positionfrom('user');
-		$tw->sizefrom('program');
-		#$tw->minsize(600,400);
-		$tw->geometry("+$X+$Y");
-		$tw->protocol('WM_DELETE_WINDOW', [sub {
-			my $self = shift;
-			my $tw = $self->{pstat};
-			delete $self->{pstat};
-			$tw->destroy;
-		},$self]);
-		$self->{pstat} = $tw;
-		my $balloon = $tw->Balloon(-statusbar=>$top->statusbar);
-		my $p = $tw->Scrolled('Pane',
-			-scrollbars=>'osoe',
-			-sticky=>'ewns',
-		)->pack(%tframepack);
-		my $f = $p->Subwidget('scrolled');
-		my $s = $f->Frame->pack(%tframepack);
-		my @show = ();
-		my $show[0] = $self->{hits}->{0}->{pkts} != 0;
-		my $show[1] = $self->{hits}->{1}->{pkts} != 0;
-		my $show[2] = $self->{hits}->{2}->{pkts} != 0 and (($show[0] and $show[1]) or (!$show[0] and !$show[1]));
-		if ($self->{hits}->{2}->{pkts}) {
-			my $col = 0;
-			$w = $s->Label(%labelright,
-				-text=>'Packets:',
-			)->grid(-row=>$row,-column=>$col++,-sticky=>'ewns');
-			$balloon->attach($w,
-				-balloonmsg=>'Number of packets sent and received.',
-			);
-			for (my $i=0;$i<3;$i++) {
-				if ($show[$i]) {
-					$w = $s->Entry(%entryright,
-						-textvariable=>\$self->{hits}->{$i}->{pkts},
-					)->grid(-row=>$row,-column=>$col++,-sticky=>'ewns');
-					$balloon=>attach($w,
-						-balloonmsg=>[
-							'Number of packets sent.',
-							'Number of packets received.',
-							'Number of packets.',
-						]->[$i],
-					);
-				}
-			}
-			$row++;
-		}
-		if ($self->{hits}->{2}->{chks}) {
-			my $col = 0;
-			$w = $s->Label(%labelright,
-				-text=>'Chunks:',
-			)->grid(-row=>$row,-column=>$col++,-sticky=>'ewns');
-			$balloon->attach($w,
-				-balloonmsg=>'Number of chunks sent and received.',
-			);
-			for (my $i=0;$i<3;$i++) {
-				if ($show[$i]) {
-					$w = $s->Entry(%entryright,
-						-textvariable=>\$self->{hits}->{$i}->{chks},
-					)->grid(-row=>$row,-column=>$col++,-sticky=>'ewns');
-					$balloon=>attach($w,
-						-balloonmsg=>[
-							'Number of chunks sent.',
-							'Number of chunks received.',
-							'Number of chunks.',
-						]->[$i],
-					);
-				}
-			}
-			$row++;
-		}
-		$s->update;
-		my $x = $s->width+40;
-		my $y = $s->height+40;
-		$tw->geometry("=$x"."x$y");
-	}
-	$tw->update;
-	$tw->MapWindow;
-}
-
-
-# -------------------------------------
-package MsgCollector; use strict;
-@MsgCollector::ISA = qw(MsgStats);
+package MsgCollector;
+use strict;
+use vars qw(@ISA);
+@ISA = qw(MsgStats);
 # -------------------------------------
 
 #package MsgCollector;
@@ -3221,30 +2980,12 @@ sub init {
 	$self->{msgcnt} = 0;
 }
 #package MsgCollector;
-sub destroy {
-	my ($self,$top,@args) = @_;
-	delete $self->{msgs};
-	delete $self->{msg};
-	delete $self->{msgcnt};
-	$self->MsgStats::destroy($top,@args);
-}
-#package MsgCollector;
 sub pushmsg {
 	my ($self,$msg) = @_;
 	push @{$self->{msgs}}, $msg;
 	$self->{msg} = undef;
 	$self->{msgcnt}++;
 	$self->updatelist($msg) if $self->{show};
-}
-#package MsgCollector;
-sub deletemsg {
-	my ($self,$top,$msg) = @_;
-	my @msgs = ();
-	while (my $m = shift @{$self->{msgs}}) {
-		next if $m eq $msg;
-		push @msgs, $m;
-	}
-	$self->{msgs} = \@msgs;
 }
 #package MsgCollector;
 sub popmsg {
@@ -3578,6 +3319,7 @@ sub updatelist {
 		}
 		my ($f,$l,$r,$t) = (0,$msgs-2,0);
 		while (($t = int(($f+$l)/2)) != $f && $t != $l) {
+			#print STDERR "D: f=$f, t=$t, l=$l\n";
 			$r = $func->($msg,$list->[$t]);
 			if ($r > 0) { $l = $t; } else { $f = $t; }
 		}
@@ -3942,43 +3684,25 @@ sub header {
 }
 
 # -------------------------------------
-package CallCollector; use strict;
-@CallCollector::ISA = qw(CallStats);
+package CallCollector;
+use strict;
+use vars qw(@ISA);
+@ISA = qw(CallStats);
 # -------------------------------------
 
-#package CallCollector;
 sub init {
 	my ($self,@args) = @_;
 	$self->CallStats::init(@args);
 	$self->{calls} = [];
 	$self->{call} = undef;
 }
-#package CallCollector;
-sub destroy {
-	my ($self,$top,@args) = @_;
-	delete $self->{calls};
-	delete $self->{call};
-	$self->CallStats::destroy($top,@args);
-}
 
-#package CallCollector;
 sub pushcall {
 	my ($self,$top,$call) = @_;
 	push @{$self->{calls}}, $call;
 	$self->{call} = undef;
 }
-#package CallCollector;
-sub deletecall {
-	my ($self,$top,$call) = @_;
-	my @calls = ();
-	while (my $c = shift @{$self->{calls}}) {
-		next if $c eq $call;
-		push @calls, $c;
-	}
-	$self->{calls} = \@calls;
-}
 
-#package CallCollector;
 sub addfrom {
 	my ($self,$othr,@args) = @_;
 	$self->CallStats::addfrom($othr,@args);
@@ -3986,7 +3710,6 @@ sub addfrom {
 	splice(@{$self->{calls}},@{$self->{calls}},0,@{$othr->{calls}});
 }
 
-#package CallCollector;
 sub calls {
 	my ($self,$top,$X,$Y) = @_;
 	my ($tw,$w,$bmsg);
@@ -4026,169 +3749,21 @@ sub calls {
 	$tw->MapWindow;
 }
 
-#package CallCollector;
 sub showcalls {
 	my ($self,$tw) = @_;
 }
 
 # -------------------------------------
-package PktCollector; use strict;
-@PktCollector::ISA = qw(PktStats);
-# -------------------------------------
-
-#package PktCollector;
-sub init {
-	my ($self,@args) = @_;
-	$self->PktStats::init(@args);
-	$self->{pkts} = [];
-	$self->{pkt} = undef;
-	$self->{pktcnt} = 0;
-}
-#package PktCollector;
-sub destroy {
-	my ($self,$top,@args) = @_;
-	delete $self->{pkts};
-	delete $self->{pkt};
-	delete $self->{pktcnt};
-	$self->PktStats::destroy($top,@args);
-}
-#package PktCollector;
-sub pushpkt {
-	my ($self,$pkt) = @_;
-	push @{$self->{pkts}}, $pkt;
-	$self->{pkt} = undef;
-	$self->{pktcnt}++;
-	$self->updatelist($msg) if $self->{show};
-}
-#package PktCollector;
-sub deletepkt {
-	my ($self,$top,$pkt) = @_;
-	my @pkts = ();
-	while (my $p = shift @{$self->{pkts}}) {
-		next if $p eq $pkt;
-		push @pkts, $p;
-	}
-	$self->{pkts} = \@pkts;
-}
-#package PktCollector;
-sub poppkt {
-	my $self = shift;
-	$self->{pktcnt}--;
-	return pop @{$self->{pkts}};
-}
-#package PktCollector;
-sub clearpkts {
-	my $self = shift;
-	$self->{pkts} = [];
-	$self->{pkt} = undef;
-	$self->{pktcnt} = 0;
-}
-#package PktCollector;
-sub pktcnt {
-	my $self = shift;
-	return scalar(@{$self->{pkts});
-}
-#package PktCollector;
-sub addfrom {
-	my ($self,$othr,@args) = @_;
-	$self->PktStats::addfrom($othr,@args);
-	return unless $othr->isa('PktCollector');
-	splice(@{$self->{pkts}},@{$self->{pkts}},0,@{$othr->{pkts}});
-}
-#package PktCollector;
-sub pkts {
-	my ($self,$top,$X,$Y) = @_;
-	my ($tw,$w,$bmsg);
-	if ($tw = $self->{list}) {
-		if ($tw->state eq 'iconic') {
-			$tw->deiconnify;
-		} else {
-			$tw->UnmapWindow;
-		}
-		$tw->MapWindow;
-		return;
-	}
-	my $title = $self->identify." Packets";
-	my $tl = $top->widget->toplevel;
-	$tw = $tl->Toplevel(
-		-title=>$title,
-		Name=>'packetsTable',
-		-class=>'SS7view',
-	);
-	$tw->iconwindow($wi);
-	$wi->geometry('48x48');
-	$wi->Label(%labelcenter, -width=>6, -text=>'Pkts',
-	)->grid(-row=>0,-column=>0);
-	$wi->Entry(%entrycenter, -width=>6, -textvariable=>\$self->{pktcnt},
-	)->grid(-row=>2,-column=>0);
-	$wi->bind('<Double-Button-1>',[sub{
-		my ($wi,$self) = @_;
-		$self->{list}->deiconify;
-	},$self]);
-	#$tw->group($tl);
-	#$tw->transient($tl);
-	#$tw->iconimage('icon');
-	$tw->iconname($title);
-	#$tw->resizeable(0,0);
-	#$tw->positionfrom('user');
-	#$tw->minsize(600,400);
-	#$tw->geometry("+$X+$Y");
-	$tw->protocol('WM_DELETE_WINDOW', [sub {
-		my $self = shift;
-		my $tw = $self->{list};
-		delete $self->{list};
-		$tw->destroy;
-	},$self]);
-	$self->{list} = $tw;
-	$self->showpkts($tw,$tl);
-	$tw->update;
-	$tw->MapWindow;
-}
-#package PktCollector;
-sub showpkts {
-	my ($self,$tw,$tl) = @_;
-
-	# FIXME: write rest of packet lister and disector.
-}
-
-# -------------------------------------
-package PairCollector; use strict;
-@PairCollector::ISA = qw(PktCollector MsgCollector);
-# -------------------------------------
-#package PairCollector;
-sub init {
-	my ($self,@args) = @_;
-	$self->PktCollector::init(@args);
-	$self->MsgCollector::init(@args);
-}
-#package PairCollector;
-sub destroy {
-	my ($self,@args) = @_;
-	$self->MsgCollector::destroy(@args);
-	$self->PktCollector::destroy(@args);
-}
-#package PairCollector;
-sub addfrom {
-	my ($self,$othr,@args) = @_;
-	$self->PktCollector::addfrom($othr,@args);
-	$self->MsgCollector::addfrom($othr,@args);
-}
-
-# -------------------------------------
-package DualCollector; use strict;
-@DualCollector::ISA = qw(MsgCollector CallCollector);
+package DualCollector;
+use strict;
+use vars qw(@ISA);
+@ISA = qw(MsgCollector CallCollector);
 # -------------------------------------
 #package DualCollector;
 sub init {
 	my ($self,@args) = @_;
 	$self->MsgCollector::init(@args);
 	$self->CallCollector::init(@args);
-}
-#package DualCollector;
-sub destroy {
-	my ($self,@args) = @_;
-	$self->CallCollector::destroy(@args);
-	$self->MsgCollector::destroy(@args);
 }
 #package DualCollector;
 sub addfrom {
@@ -4198,33 +3773,8 @@ sub addfrom {
 }
 
 # -------------------------------------
-package TripleCollector; use strict;
-@TripleCollector::ISA = qw(PktCollector MsgCollector CallCollector);
-# -------------------------------------
-#package TripleCollector;
-sub init {
-	my ($self,@args) = @_;
-	$self->PktCollector::init(@args);
-	$self->MsgCollector::init(@args);
-	$self->CallCollector::init(@args);
-}
-#package TripleCollector;
-sub destroy {
-	my ($self,@args) = @_;
-	$self->CallCollector::destroy(@args);
-	$self->MsgCollector::destroy(@args);
-	$self->PktCollector::destroy(@args);
-}
-#package TripleCollector;
-sub addfrom {
-	my ($self,$othr,@args) = @_;
-	$self->PktCollector::addfrom($othr,@args);
-	$self->MsgCollector::addfrom($othr,@args);
-	$self->CallCollector::addfrom($othr,@args);
-}
-
-# -------------------------------------
-package MsgBuffer; use strict;
+package MsgBuffer;
+use strict;
 # -------------------------------------
 #package MsgBuffer;
 sub init {
@@ -4232,69 +3782,30 @@ sub init {
 	$self->{msgbuf} = [];
 }
 #package MsgBuffer;
-sub destroy {
-	my ($self,@args) = @_;
-	delete $self->{msgbuf};
-}
-#package MsgBuffer;
-sub pushbufmsg {
+sub pushbuf {
 	my ($self,$msg) = @_;
 	return push @{$self->{msgbuf}}, $msg;
 }
 #package MsgBuffer;
-sub shiftbufmsg {
+sub shiftbuf {
 	my $self = shift;
 	return shift @{$self->{msgbuf}};
 }
 #package MsgBuffer;
-sub peekbufmsg {
+sub peekbuf {
 	my $self = shift;
 	return $self->{msgbuf}->[0];
 }
 
 # -------------------------------------
-package PktBuffer; use strict;
-# -------------------------------------
-#package PktBuffer;
-sub init {
-	my ($self,@args) = @_;
-	$self->{pktbuf} = [];
-}
-#package PktBuffer;
-sub destroy {
-	my ($self,@args) = @_;
-	delete $self->{pktbuf};
-}
-#package PktBuffer;
-sub pushbufpkt {
-	my ($self,$pkt) = @_;
-	return push @{$self->{pktbuf}}, $pkt;
-}
-#package PktBuffer;
-sub shiftbufpkt {
-	my $self = shift;
-	return shift @{$self->{pktbuf}};
-}
-#package PktBuffer;
-sub peekbufpkt {
-	my $self = shift;
-	return $self->{pktbuf}->[0];
-}
-
-# -------------------------------------
-package Properties; use strict;
+package Properties;
+use strict;
 # -------------------------------------
 
 #package Properties;
 sub init {
 	my ($self,@args) = @_;
 	$self->{props} = undef;
-}
-#package Properties;
-sub destroy {
-	my ($self,@args) = @_;
-	if (my $tw = $self->{props}) { $tw->destroy; }
-	delete $self->{props};
 }
 
 #package Properties;
@@ -4352,19 +3863,14 @@ sub fillprops {
 }
 
 # -------------------------------------
-package Status; use strict;
+package Status;
+use strict;
 # -------------------------------------
 
 #package Status;
 sub init {
 	my ($self,@args) = @_;
 	$self->{statu} = undef;
-}
-#package Status;
-sub destroy {
-	my ($self,@args) = @_;
-	if (my $tw = $self->{statu}) { $tw->destroy; }
-	delete $self->{statu};
 }
 
 #package Status;
@@ -4411,27 +3917,13 @@ sub fillstatus {
 }
 
 # -------------------------------------
-package Clickable; use strict;
+package Clickable;
+use strict;
 # -------------------------------------
 
 #package Clickable;
 sub init {
 	my ($self) = @_;
-}
-#package Clickable;
-sub destroy {
-	my ($self,$top) = @_;
-	if (exists $self->{items}) {
-		$top->mycanvas->delballoon($self->{items});
-		foreach my $i (@{$self->{items}}) {
-			$top->canvas->bind($i,'<ButtonPress-3>',undef);
-		}
-	} else {
-		$top->mycanvas->delballoon([$self->{item}]);
-		$top->canvas->bind($self->{item},undef);
-	}
-	$top->setstatus("Destroyed ".$self->identify);
-	$top->{updatenow} = 1;
 }
 
 #package Clickable;
@@ -4446,6 +3938,7 @@ sub attach {
 		$top->canvas->bind($self->{item},'<ButtonPress-3>',[\&Clickable::button3,$self,$top,Tk::Ev('X'),Tk::Ev('Y')]);
 		$top->mycanvas->addballoon($self,[$self->{item}]);
 	}
+	#print STDERR "D: discovered ".$self->identify."\n";
 	$top->setstatus("Discovered ".$self->identify);
 	$top->{updatenow} = 1;
 }
@@ -4540,7 +4033,8 @@ sub bindtowidget {
 }
 
 # -------------------------------------
-package Stateful; use strict;
+package Stateful;
+use strict;
 # -------------------------------------
 
 #package Stateful;
@@ -4550,12 +4044,8 @@ sub init {
 	$self->{colors} = $colors;
 	$self->{state} = $self->{oldstate} = $state;
 	$self->{color} = $colors->[$state];
+	my $tl = $top->widget;
 	$top->widget->traceVariable(\$self->{state},'w'=>[\&Stateful::tracestate,$self,$top]);
-}
-#package Stateful;
-sub destroy {
-	my ($self,$top) = @_;
-	$top->widget->traceVdelete(\$self->{state}};
 }
 #package Stateful;
 sub tracestate {
@@ -4602,8 +4092,10 @@ sub fillstate {
 }
 
 # -------------------------------------
-package Tristate; use strict;
-@Tristate::ISA = qw(Stateful);
+package Tristate;
+use strict;
+use vars qw(@ISA);
+@ISA = qw(Stateful);
 # -------------------------------------
 
 #package Tristate;
@@ -4630,15 +4122,12 @@ sub init {
 	$self->Stateful::init($top,TS_AVAILABLE,$Tristate::options,
 		$Tristate::colors->{$color});
 }
-#package Tristate;
-sub destroy {
-	my ($self,@args) = @_;
-	$self->Stateful::destroy(@args);
-}
 
 # -------------------------------------
-package Hexstate; use strict;
-@Hexstate::ISA = qw(Stateful);
+package Hexstate;
+use strict;
+use vars qw(@ISA);
+@ISA = qw(Stateful);
 # -------------------------------------
 
 #package Hexstate;
@@ -4671,15 +4160,12 @@ sub init {
 	$self->Stateful::init($top,HS_AVAILABLE,$Hexstate::options,
 		$Hexstate::colors->{$color});
 }
-#package Hexstate;
-sub destroy {
-	my ($self,@args) = @_;
-	$self->Stateful::destroy(@args);
-}
 
 # -------------------------------------
-package Pentastate; use strict;
-@Pentastate::ISA = qw(Stateful);
+package Pentastate;
+use strict;
+use vars qw(@ISA);
+@ISA = qw(Stateful);
 # -------------------------------------
 
 #package Pentastate;
@@ -4710,14 +4196,10 @@ sub init {
 	$self->Stateful::init($top,PS_INSERVICE,$Pentastate::options,
 		$Pentastate::colors->{$color});
 }
-#package Pentastate;
-sub destroy {
-	my ($self,@args) = @_;
-	$self->Stateful::destroy(@args);
-}
 
 # -------------------------------------
-package Arcend; use strict;
+package Arcend;
+use strict;
 # -------------------------------------
 
 #package Arcend;
@@ -4729,16 +4211,6 @@ sub init {
 	$self->{arcs}->{a} = [];
 	$self->{arcs}->{b} = [];
 }
-#package Arcend;
-sub destroy {
-	my ($self,$top) = @_;
-	while (my $arc = shift @{$end->{arcs}->{a}}) {
-		$arc->destroy($top);
-	}
-	while (my $arc = shift @{$end->{arcs}->{b}}) {
-		$arc->destroy($top);
-	}
-}
 
 #package Arcend;
 sub moveit {
@@ -4746,6 +4218,7 @@ sub moveit {
 	if ($self->{x} != $x or $self->{y} != $y) {
 		$self->{x} = $x;
 		$self->{y} = $y;
+		#print STDERR "D: moving Arcend ".$self->identify."\n";
 		foreach my $side (keys %{$self->{arcs}}) {
 			foreach my $arc (@{$self->{arcs}->{$side}}) {
 				$arc->moveit($top,$side,$x,$y);
@@ -4757,17 +4230,18 @@ sub moveit {
 }
 
 #package Arcend;
-sub mergefrom {
+sub absorb {
 	my ($self,$top,$end) = @_;
+	#print STDERR "D: absorbing Arcend ".$end->identify." into ".$self->identify."\n";
 	# move all the arcs from $end to attach instead to $self.
 	while (my $arc = shift @{$end->{arcs}->{a}}) {
-		print STDERR "E: object mismatch $end and $arc->{obj}->{a}\n" if $end ne $arc->{obj}->{a};
-		$arc->{obj}->{a} = $self;
+		print STDERR "E: object mismatch $end and $arc->{obja}\n" if $end ne $arc->{obja};
+		$arc->{obja} = $self;
 		push @{$self->{arcs}->{a}}, $arc;
 	}
 	while (my $arc = shift @{$end->{arcs}->{b}}) {
-		print STDERR "E: object mismatch $end and $arc->{obj}->{b}\n" if $end ne $arc->{obj}->{b};
-		$arc->{obj}->{b} = $self;
+		print STDERR "E: object mismatch $end and $arc->{objb}\n" if $end ne $arc->{objb};
+		$arc->{objb} = $self;
 		push @{$self->{arcs}->{b}}, $arc;
 	}
 	# note: any arcs that went from $end to $self will wind up going
@@ -4775,13 +4249,17 @@ sub mergefrom {
 }
 
 # -------------------------------------
-package Nodeitem; use strict;
-@Nodeitem::ISA = qw(Arcend);
+package Nodeitem;
+use strict;
+use vars qw(@ISA);
+@ISA = qw(Arcend);
 # -------------------------------------
 
 #package Nodeitem;
-sub init {
-	my ($self,$type,$top,$row,$col,$off,@args) = @_;
+sub new {
+	my ($type,$top,$row,$col,$off,$nodeno,@args) = @_;
+	my $self = {};
+	bless $self,$type;
 	$self->{off} = $off;
 	$self->{col} = $col;
 	$self->{row} = $row;
@@ -4792,35 +4270,25 @@ sub init {
 	$self->Arcend::init($top,$x,$y);
 	my $state = $top->{show}->{"\L$type\Es"} ? 'normal' : 'hidden';
 	my $c = $top->canvas;
-	if ($type eq 'Host') {
-		push @{$self->{items}}, $self->{item} = $c->createRectangle(
-			$x-40,$y-30,$x+40,$y+30,
-			-fill=>$self->{color},
-			-outline=>'black', -width=>2,
-			-activeoutline=>'cyan', -activewidth=>3,
-			-state=>$state,
-			-tags=>[$type,'node'],
-		);
-	} else {
-		push @{$self->{items}}, $self->{item} = $c->createOval(
-			$x-40,$y-40,$x+40,$y+40,
-			-fill=>$self->{color},
-			-outline=>'blue', -width=>2,
-			-activeoutline=>'cyan', -activewidth=>3,
-			-state=>$state,
-			-tags=>[$type,'node'],
-		);
-	}
+	push @{$self->{items}}, $self->{item} = $c->createOval(
+		$x-40,$y-40,$x+40,$y+40,
+		-fill=>$self->{color},
+		-outline=>'blue', -width=>2,
+		-activeoutline=>'cyan', -activewidth=>3,
+		-state=>$state,
+		-tags=>[$type,'node'],
+	);
 	push @{$self->{items}}, $self->{scri} = $c->createLine(
 		$x-23,$y-23,$x+23,$y-23,$x+23,$y+23,$x-23,$y+23,$x-23,$y-23,
 		-arrow=>'none', -capstyle=>'round', -joinstyle=>'round', -smooth=>0,
 		-fill=>'gray', -width=>0.1,
+		#-activefill=>'cyan', -activewidth=>2,
 		-state=>$state,
 		-tags=>[$type,'scri'],
 	);
 	push @{$self->{items}}, $self->{ownr} = $c->createText($x,$y+10,
 		-anchor=>'center', -fill=>'black', -justify=>'center',
-		-text=>'?',
+		-text=>$nodeno,
 		-state=>$state,
 		-tags=>[$type,'text'],
 	);
@@ -4838,7 +4306,7 @@ sub init {
 	);
 	push @{$self->{items}}, $self->{text} = $c->createText($x,$y-5,
 		-anchor=>'center', -fill=>'black', -justify=>'center',
-		-text=>$self->{no},
+		-text=>'?',
 		-state=>$state,
 		-tags=>[$type,'text'],
 	);
@@ -4847,24 +4315,9 @@ sub init {
 		$c->raise($_,$olditem);
 		$olditem = $_;
 	}
+	#print STDERR "D: must regroup\n";
 	$top->{regroupnow} = 1;
-	return $self;
-}
-#package Nodeitem;
-sub destroy {
-	my ($self,$top) = @_;
-	foreach (@{$self->{items}}) { $top->canvas->delete($_); }
-	foreach (qw/text mcnt ttxt ownr scri item/) { delete $self->{$_}; }
-	$self->Arcend::destroy($top);
-	foreach (qw/color items row col off/) { delete $self->{$_}; }
-}
-
-#package Nodeitem;
-sub new {
-	my ($type,@args) = @_;
-	my $self = {};
-	bless $self,$type;
-	$self->init($type,@args);
+	#$top->regroup();
 	return $self;
 }
 
@@ -4872,6 +4325,7 @@ sub new {
 sub moveit {
 	my ($self,$top,$x,$y) = @_;
 	if ($self->{x} != $x or $self->{y} != $y) {
+		#print STDERR "D: moving Nodeitem ".$self->identify."\n";
 		my ($dx,$dy) = ($x-$self->{x},$y-$self->{y});
 		my $c = $top->canvas;
 		foreach my $item (@{$self->{items}}) { $c->move($item,$dx,$dy); }
@@ -4901,7 +4355,9 @@ sub makecol {
 	return undef if $old == $new;
 	$new = -$new if $self->{col} < 0;
 	$self->{col} = $new;
+	#print STDERR "D: must regroup\n";
 	$top->{regroupnow} = 1;
+	#$top->regroup();
 	return 1;
 }
 
@@ -4910,7 +4366,9 @@ sub swapcol {
 	my ($self,$top) = @_;
 	# move node to opposite side of canvas
 	$self->{col} = -$self->{col};
+	#print STDERR "D: must regroup\n";
 	$top->{regroupnow} = 1;
+	#$top->regroup();
 	return 1;
 }
 
@@ -4919,26 +4377,30 @@ sub dashme {
 	my ($self,$top) = @_;
 	$top->canvas->itemconfigure($self->{item},-dash=>[5,2]);
 	$top->canvas->itemconfigure($self->{scri},-dash=>[5,2]);
+	#print STDERR "D: discovered ".$self->identify."\n";
 	$top->setstatus("Discovered ".$self->identify." is an alias.\n");
 }
 
 #package Nodeitem;
-sub mergefrom {
+sub absorb {
 	my ($self,$top,$node) = @_;
-
-	# put node in the same place so arcs don't have to be moved
-	# done here because not all arcends are nodeitems (some are arcitems)
-
-	$node->movenode($top,$self->{col},$self->{row},$self->{off});
-
-	$self->SUPER::mergefrom($top,$node);
-
-	while (my $item = shift @{$node->{items}}) { $top->canvas->delete($item); }
+	#print STDERR "D: absorbing Nodeitem ".$node->identify." into ".$self->identify."\n";
+	# put ourselves in the same place so arcs don't have to be moved
+	$self->movenode($top,$node->{col},$node->{row},$node->{off});
+	$self->Arcend::absorb($top,$node);
+	my $c = $top->canvas;
+	while (my $item = shift @{$node->{items}}) {
+		$c->delete($item);
+	}
 	foreach (qw(item scri ttxt text ownr mcnt off col row)) { delete $node->{$_}; }
+	#print STDERR "D: must regroup\n";
+	$top->{regroupnow} = 1;
+	#$top->regroup();
 }
 
 # -------------------------------------
-package Arcitem; use strict;
+package Arcitem;
+use strict;
 # -------------------------------------
 
 $Arcitem::style = {
@@ -4972,8 +4434,8 @@ sub init {
 	my $tags = "\L$type\E";
 	my $c = $top->canvas;
 	$self->{yoff} = $yoff;
-	$self->{obj}->{a} = $obja;
-	$self->{obj}->{b} = $objb;
+	$self->{obja} = $obja;
+	$self->{objb} = $objb;
 	$obja->{arcs} = {} unless exists $obja->{arcs};
 	$obja->{arcs}->{a} = [] unless exists $obja->{arcs}->{a};
 	push @{$obja->{arcs}->{a}}, $self;
@@ -4998,30 +4460,12 @@ sub init {
 	foreach my $o (@{$above}) { $c->raise($self->{item},$o); }
 	foreach my $u (@{$under}) { $c->lower($self->{item},$u); }
 }
-#package Arcitem;
-sub destroy {
-	my ($self,$top) = @_;
-	foreach (@{$self->{items}}) { $top->canvas->delete($_); }
-	$self->Arcend::destroy($top) if $self->isa('Arcend');
-	foreach (qw/y x yb xb ya xa/) { delete $self->{$_}; }
-	foreach my $side (keys %{$self->{obj}}) {
-		if (my $obj = $self->{obj}->{$side}) {
-			my @arcs = ();
-			while (my $arc = shift @{$obj->{arcs}->{$side}}) {
-				next if $arc eq $self;
-				push @arcs, $arc;
-			}
-			$obj->{arcs}->{a} = \@arcs;
-		}
-	}
-	foreach (qw/obj yoff/) { delete $self->{$_}; }
-}
 
 #package Arcitem;
 sub moveit {
 	my ($self,$top,$side,$xi,$yi) = @_;
-	my $obja = $self->{obj}->{a};
-	my $objb = $self->{obj}->{b};
+	my $obja = $self->{obja};
+	my $objb = $self->{objb};
 	my $xa = $obja->{x};
 	my $ya = $obja->{y};
 	my $xb = $objb->{x};
@@ -5030,6 +4474,7 @@ sub moveit {
 			$ya == $self->{ya} &&
 			$xb == $self->{xb} &&
 			$yb == $self->{yb};
+			#print STDERR "D: moving Arcitem ".$self->identify."\n";
 	my $yoff = $self->{yoff};
 	$top->canvas->coords($self->{item},$xa,$ya+$yoff,$xb,$yb+$yoff);
 	$self->{xa} = $xa;
@@ -5045,8 +4490,10 @@ sub moveit {
 }
 
 # -------------------------------------
-package Relation; use strict;
-@Relation::ISA = qw(Hexstate Arcitem Logging Properties Status Clickable DualCollector);
+package Relation;
+use strict;
+use vars qw(@ISA);
+@ISA = qw(Hexstate Arcitem Logging Properties Status Clickable DualCollector);
 # -------------------------------------
 # A relation is an association between signalling points that communicate with
 # each other.  This object is used to track these interactions, primarily for
@@ -5054,48 +4501,34 @@ package Relation; use strict;
 # -------------------------------------
 
 #package Relation;
-sub get {
-	my ($type,$top,$network,$nodea,$nodeb,@args) = @_;
-	my $key = "$nodea->{pc},$nodeb->{pc}";
-	return $network->{relations}->{$key} if $network->{relations}->{$key};
-	my $yek = "$nodeb->{pc},$nodea->{pc}";
-	my $self = { no=>++$network->{relationno}, key=>$key, yek=>$yek };
-	bless $self,$type;
+sub init {
+	my ($self,$top,$relationno,$nodea,$nodeb,@args) = @_;
 	$self->Hexstate::init($top,'black');
 	$self->Logging::init($top,@args);
 	$self->Properties::init(@args);
 	$self->Status::init(@args);
 	$self->Clickable::init(@args);
 	$self->DualCollector::init($top,@args);
-	$network->{relations}->{$key} = $self;
-	$network->{relations}->{$yek} = $self;
+	$self->{key} = "$nodea->{pc},$nodeb->{pc}";
 	$self->{cics} = {};
 	$self->{slccnt} = 0;
 	$self->{node}->{a} = $nodea;
 	$self->{node}->{b} = $nodeb;
-	$nodea->{relations}->{$nodeb->{pc}} = $self;
-	$nodeb->{relations}->{$nodea->{pc}} = $self;
+	$nodea->{relate}->{$nodeb->{pc}} = $self;
+	$nodeb->{relate}->{$nodea->{pc}} = $self;
 	$self->Arcitem::init($top,$nodea,$nodeb,['node'],[],'line',0);
 	$self->Clickable::attach($top,@args);
-	return $self;
+
+
 }
+
 #package Relation;
-sub destroy {
-	my ($self,$top) = @_;
-	$self->Arcitem::destroy($top);
-	my $nodea = $self->{node}->{a};
-	my $nodeb = $self->{node}->{b};
-	if ($nodea and $nodeb) {
-		delete $nodea->{relations}->{$nodeb->{pc}};
-		delete $nodeb->{relations}->{$nodea->{pc}};
-	}
-	foreach (qw/node slcnt cics key/) { delete $self->{$_}; }
-	$self->DualCollector::destroy($top);
-	$self->Status::destroy($top);
-	$self->Properties::destroy($top);
-	$self->Logging::destroy($top);
-	$self->Hexstate::destroy($top);
-	$self->Clickable::destroy($top);
+sub new {
+	my ($type,@args) = @_;
+	my $self = {};
+	bless $self,$type;
+	$self->init(@args);
+	return $self;
 }
 
 #package Relation;
@@ -5112,6 +4545,15 @@ sub identify {
 sub shortid {
 	my $self = shift;
 	return "$self->{node}->{a}->{pcode}::$self->{node}->{b}->{pcode}";
+}
+
+#package Relation;
+sub getCircuit {
+	my ($self,$top,$cic,@args) = @_;
+	return $self->{cics}->{$cic} if $self->{cics}->{$cic};
+	my $circuit = Circuit->new($top,$self,$cic,@args);
+	$self->{cics}->{$cic} = $circuit;
+	return $circuit;
 }
 
 #package Relation;
@@ -5194,7 +4636,7 @@ sub add_msg {
 	if ($msg->{si} == 5) {
 		my ($mt,$cic) = ($msg->{mt},$msg->{cic});
 		if ($self->{ciccnt} or ($mt == 0x10 || (0x12 <= $mt && $mt <= 0x1b) || $mt == 0x2a || $mt == 0x2b)) {
-			Circuit->get($top,$self,$cic)->add_msg($top,$network,$msg,$dir);
+			$self->getCircuit($top,$cic)->add_msg($top,$network,$msg,$dir);
 		}
 	}
 	if (defined $dir) {
@@ -5371,6 +4813,31 @@ sub getmore {
 		},$self,$mc,$top,$X,$Y]);
 		$m->add('cascade', -menu=>$mc, -label=>'Links');
 	}
+#	$mc = $m->Menu(
+#		-tearoff=>1,
+#		-title=>'Circuits Menu',
+#	);
+#	foreach my $cic (sort {$a <=> $b} keys %{$self->{cics}}) {
+#		my $count = 0;
+#		my $circuit;
+#		$m3 = $mc->Menu(
+#			-tearoff=>0,
+#			-title=>"Circuit $cic Menu",
+#		);
+#		$circuit = $self->{cics}->{$cic};
+#		$count += $circuit->getmenu($m3,$top,$X,$Y) if $circuit;
+#		$mc->add('cascade',
+#			-menu=>$m3,
+#			-label=>"Circuit $cic",
+#		);
+#	}
+#	if ($count) {
+#		$m->add('cascade',
+#			-menu=>$mc,
+#			-label=>'Circuits',
+#			-state=>((keys %{$self->{cics}})?'normal':'disabled'),
+#		);
+#	}
 }
 
 #package Relation;
@@ -5483,30 +4950,31 @@ sub log {
 }
 
 # -------------------------------------
-package Routeset; use strict;
-@Routeset::ISA = qw(Hexstate Arcitem Logging Properties Status Clickable MsgCollector);
+package Routeset;
+use strict;
+use vars qw(@ISA);
+@ISA = qw(Hexstate Arcitem Logging Properties Status Clickable MsgCollector);
 # -------------------------------------
 # A routeset is a collection of routes from one node (node a) to another (node b).
 # In contrast to relations, a routeset is a unidirectional concept.
 # -------------------------------------
 
 #package Routeset;
-sub get {
-	my ($type,$top,$network,$nodea,$nodeb,@args) = @_;
-	my $key = "$nodea->{pc},$nodeb->{pc}";
-	return $network->{routesets}->{$key} if $network->{routesets}->{$key};
-	my $self = {no=>++$network->{routesetno}, key=>$key};
-	bless $self,$type;
+sub init {
+	my ($self,$top,$network,$routesetno,$nodea,$nodeb,@args) = @_;
 	$self->Hexstate::init($top,'black');
 	$self->Logging::init($top,@args);
 	$self->Properties::init(@args);
 	$self->Status::init(@args);
 	$self->Clickable::init(@args);
 	$self->MsgCollector::init($top,@args);
-	$network->{routesets}->{$self->{key}} = $self;
+	$self->{no} = $routesetno;
+	$self->{key} = "$nodea->{pc},$nodeb->{pc}";
 	$self->{node}->{a} = $nodea;
 	$self->{node}->{b} = $nodeb;
-	my $relation = $self->{relation} = Relation->get($top,$network,$nodea,$nodeb,@args);
+	$nodea->{routesets}->{a}->{$nodeb->{pc}} = $self;
+	$nodeb->{routesets}->{b}->{$nodea->{pc}} = $self;
+	my $relation = $self->{relation} = $network->getRelation($top,$nodea,$nodeb,@args);
 	my $yoff = 0;
 	if ($relation->{node}->{a}->{pc} == $nodea->{pc}) {
 		$relation->{routesetforw} = $self;
@@ -5519,26 +4987,15 @@ sub get {
 	}
 	$self->Arcitem::init($top,$nodea,$nodeb,['node','relation'],[],'last',$yoff);
 	$self->Clickable::attach($top,@args);
-	return $self;
 }
+
 #package Routeset;
-sub destroy {
-	my ($self,$top) = @_;
-	$self->Arcitem::destroy($top);
-	if (my $relation = $self->{relation}) {
-		if ($self->{dir}) {
-			delete $relation->{routesetrevs};
-		} else {
-			delete $relation->{routesetforw};
-		}
-	}
-	foreach (qw/relation node key no/) { delete $self->{$_}; }
-	$self->MsgCollector::destroy($top);
-	$self->Status::destroy($top);
-	$self->Properties::destroy($top);
-	$self->Logging::destroy($top);
-	$self->Hexstate::destroy($top);
-	$self->Clickable::destroy($top);
+sub new {
+	my ($type,@args) = @_;
+	my $self = {};
+	bless $self,$type;
+	$self->init(@args);
+	return $self;
 }
 
 #package Routeset;
@@ -5568,15 +5025,15 @@ sub add_msg {
 }
 
 # -------------------------------------
-package Call; use strict;
-@Call::ISA = qw(MsgCollector);
+package Call;
+use strict;
+use vars qw(@ISA);
+@ISA = qw(MsgCollector);
 # -------------------------------------
 
 #package Call;
-sub new {
-	my ($type,$top,$circuit,@args) = @_;
-	my $self = {};
-	bless $self,$type;
+sub init {
+	my ($self,$top,$circuit,@args) = @_;
 	$self->MsgCollector::init($top,@args);
 	$self->{circuit} = $circuit;
 	$self->{state} = 0;
@@ -5584,16 +5041,15 @@ sub new {
 		$circuit->pushcall($top,$circuit->{call});
 	}
 	$circuit->{call} = $self;
-	return $self;
 }
+
 #package Call;
-sub destroy {
-	my ($self,$top) = @_;
-	if (my $circuit = $self->{circuit}) {
-		$circuit->deletecall($top,$self);
-	}
-	foreach (qw/state circuit/) { delete $self->{$_}; }
-	$self->MsgCollector::destroy($top);
+sub new {
+	my ($type,@args) = @_;
+	my $self = {};
+	bless $self,$type;
+	$self->init(@args);
+	return $self;
 }
 
 #package Call;
@@ -5618,45 +5074,30 @@ sub clear {
 
 
 # -------------------------------------
-package Circuit; use strict;
-@Circuit::ISA = qw(Logging Properties Status Clickable DualCollector);
+package Circuit;
+use strict;
+use vars qw(@ISA);
+@ISA = qw(Logging Properties Status Clickable DualCollector);
 # -------------------------------------
 
 #package Circuit;
-sub get {
-	my ($type,$top,$relation,$cic,@args) = @_;
-	return $relation->{cics}->{$cic} if $relation->{cics}->{$cic};
-	my $self = {
-		cic=>$cic,
-		relation=>$relation
-		ts=>$top->{begtime},
-		dir=>0,
-		active=>0,
-		state=>::CTS_UNINIT,
-	};
+sub new {
+	my ($type,$top,$group,$cic,@args) = @_;
+	my $self = {};
 	bless $self,$type;
-	$relation->{cics}->{$cic} = $self;
+	$self->{group} = $group;
+	$self->{cic} = $cic;
 	$self->Logging::init($top,@args);
 	$self->Properties::init(@args);
 	$self->Status::init(@args);
 	$self->DualCollector::init($top,@args);
+	$self->{dir} = 0;
+	$self->{ts} = $top->{begtime};
+	$group->{cics}->{$cic} = $self;
 	$self->cnt($top);
+	$self->{active} = 0;
+	$self->{state} = ::CTS_UNINIT;
 	return $self;
-}
-#package Circuit;
-sub destroy {
-	my ($self,$top) = @_;
-	$self->deact($top) if $self->{active};
-	$self->uncnt($top);
-	foreach (qw/state active/) { delete $self->{$_}; }
-	if (my $relation = $self->{relation}) {
-		delete $relation->{cics}->{$self->{cic}};
-	}
-	foreach (qw/ts dir cic relation/) { delete $self->{$_}; }
-	$self->DualCollector::destroy($top);
-	$self->Status::destroy($top);
-	$self->Properties::destroy($top);
-	$self->Logging::destroy($top);
 }
 
 #package Circuit
@@ -5682,37 +5123,37 @@ sub setstate {
 sub peg { my ($self,@args) = @_;
 	my ($top,$dir) = ($args[0],\$args[3]);
 	$self->CallHistory::peg(@args);
-	$self->{relation}->peg(@args);
-	$self->{relation}->{node}->{a}->peg(@args);
-	$$dir ^= 0x1; $self->{relation}->{node}->{b}->peg(@args);
+	$self->{group}->peg(@args);
+	$self->{group}->{node}->{a}->peg(@args);
+	$$dir ^= 0x1; $self->{group}->{node}->{b}->peg(@args);
 	$$dir = 0x02; $top->{network}->peg(@args);
 }
 #package Circuit;
 sub act { my ($self,@args) = @_;
 	my $top = $args[0];
 	$self->CallHistory::act(@args);
-	$self->{relation}->act(@args);
-	$self->{relation}->{node}->{a}->act(@args);
-	$self->{relation}->{node}->{b}->act(@args);
+	$self->{group}->act(@args);
+	$self->{group}->{node}->{a}->act(@args);
+	$self->{group}->{node}->{b}->act(@args);
 	$top->{network}->act(@args);
 }
 #package Circuit;
 sub cnt { my ($self,@args) = @_;
 	my $top = $args[0];
 	$self->CallHistory::cnt(@args);
-	$self->{relation}->cnt(@args);
-	$self->{relation}->{node}->{a}->cnt(@args);
-	$self->{relation}->{node}->{b}->cnt(@args);
+	$self->{group}->cnt(@args);
+	$self->{group}->{node}->{a}->cnt(@args);
+	$self->{group}->{node}->{b}->cnt(@args);
 	$top->{network}->cnt(@args);
 }
 #package Circuit;
 sub sim { my ($self,@args) = @_;
 	my ($top,$olddir,$newdir) = ($args[0],\$args[2],\$args[4]);
 	$self->CallHistory::sim(@args);
-	$self->{relation}->sim(@args);
-	$self->{relation}->{node}->{a}->sim(@args);
+	$self->{group}->sim(@args);
+	$self->{group}->{node}->{a}->sim(@args);
 	$$olddir ^= 0x1; $$newdir ^= 0x1;
-	$self->{relation}->{node}->{b}->sim(@args);
+	$self->{group}->{node}->{b}->sim(@args);
 	$$olddir = 0x02; $$newdir = 0x02;
 	$top->{network}->sim(@args);
 }
@@ -5720,27 +5161,27 @@ sub sim { my ($self,@args) = @_;
 sub itv { my ($self,@args) = @_;
 	my ($top,$dir) = ($args[0],\$args[4]);
 	$self->CallHistory::itv(@args);
-	$self->{relation}->itv(@args);
-	$self->{relation}->{node}->{a}->itv(@args);
-	$$dir ^= 0x1; $self->{relation}->{node}->{b}->itv(@args);
+	$self->{group}->itv(@args);
+	$self->{group}->{node}->{a}->itv(@args);
+	$$dir ^= 0x1; $self->{group}->{node}->{b}->itv(@args);
 	$$dir = 0x02; $top->{network}->itv(@args);
 }
 #package Circuit
 sub dur { my ($self,@args) = @_;
 	my ($top,$dir) = ($args[0],\$args[4]);
 	$self->CallHistory::dur(@args);
-	$self->{relation}->dur(@args);
-	$self->{relation}->{node}->{a}->dur(@args);
-	$$dir ^= 0x1; $self->{relation}->{node}->{b}->dur(@args);
+	$self->{group}->dur(@args);
+	$self->{group}->{node}->{a}->dur(@args);
+	$$dir ^= 0x1; $self->{group}->{node}->{b}->dur(@args);
 	$$dir = 0x02; $top->{network}->dur(@args);
 }
 #package Circuit
 sub iat { my ($self,@args) = @_;
 	my ($top,$dir) = ($args[0],\$args[2]);
 	$self->CallHistory::iat(@args);
-	$self->{relation}->iat(@args);
-	$self->{relation}->{node}->{a}->iat(@args);
-	$$dir ^= 0x1; $self->{relation}->{node}->{b}->iat(@args);
+	$self->{group}->iat(@args);
+	$self->{group}->{node}->{a}->iat(@args);
+	$$dir ^= 0x1; $self->{group}->{node}->{b}->iat(@args);
 	$$dir = 0x02; $top->{network}->iat(@args);
 }
 #package Circuit;
@@ -5748,9 +5189,9 @@ sub pushcall {
 	my ($self,@args) = @_;
 	my $top = $args[0];
 	$self->CallCollector::pushcall(@args);
-	$self->{relation}->pushcall(@args);
-	$self->{relation}->{node}->{a}->pushcall(@args);
-	$self->{relation}->{node}->{b}->pushcall(@args);
+	$self->{group}->pushcall(@args);
+	$self->{group}->{node}->{a}->pushcall(@args);
+	$self->{group}->{node}->{b}->pushcall(@args);
 	$top->{network}->pushcall(@args);
 }
 
@@ -5783,22 +5224,22 @@ sub restart_call {
 #package Circuit;
 sub activate {
 	my ($self,$network,$msg) = @_;
-	if ($msg->{opc} == $self->{relation}->{node}->{a}->{pc}) {
+	if ($msg->{opc} == $self->{group}->{node}->{a}->{pc}) {
 		unless ($self->{active} & 0x1) {
 			$self->{active} |= 0x1;
 			if ($self->{active} & 0x2) {
-				$self->{relation}->{actcnt}->{3}++;
-				$self->{relation}->{node}->{a}->{actcnt}->{3}++;
-				$self->{relation}->{node}->{b}->{actcnt}->{3}++;
+				$self->{group}->{actcnt}->{3}++;
+				$self->{group}->{node}->{a}->{actcnt}->{3}++;
+				$self->{group}->{node}->{b}->{actcnt}->{3}++;
 				$network->{actcnt}->{2}++;
-				$self->{relation}->{actcnt}->{2}--;
-				$self->{relation}->{node}->{a}->{actcnt}->{2}--;
-				$self->{relation}->{node}->{b}->{actcnt}->{1}--;
+				$self->{group}->{actcnt}->{2}--;
+				$self->{group}->{node}->{a}->{actcnt}->{2}--;
+				$self->{group}->{node}->{b}->{actcnt}->{1}--;
 				$network->{actcnt}->{1}--;
 			} else {
-				$self->{relation}->{actcnt}->{1}++;
-				$self->{relation}->{node}->{a}->{actcnt}->{1}++;
-				$self->{relation}->{node}->{b}->{actcnt}->{2}++;
+				$self->{group}->{actcnt}->{1}++;
+				$self->{group}->{node}->{a}->{actcnt}->{1}++;
+				$self->{group}->{node}->{b}->{actcnt}->{2}++;
 				$network->{actcnt}->{1}++;
 			}
 		}
@@ -5807,18 +5248,18 @@ sub activate {
 		unless ($self->{active} & 0x2) {
 			$self->{active} |= 0x2;
 			if ($self->{active} & 0x1) {
-				$self->{relation}->{actcnt}->{3}++;
-				$self->{relation}->{node}->{a}->{actcnt}->{3}++;
-				$self->{relation}->{node}->{b}->{actcnt}->{3}++;
+				$self->{group}->{actcnt}->{3}++;
+				$self->{group}->{node}->{a}->{actcnt}->{3}++;
+				$self->{group}->{node}->{b}->{actcnt}->{3}++;
 				$network->{actcnt}->{2}++;
-				$self->{relation}->{actcnt}->{1}--;
-				$self->{relation}->{node}->{a}->{actcnt}->{1}--;
-				$self->{relation}->{node}->{b}->{actcnt}->{2}--;
+				$self->{group}->{actcnt}->{1}--;
+				$self->{group}->{node}->{a}->{actcnt}->{1}--;
+				$self->{group}->{node}->{b}->{actcnt}->{2}--;
 				$network->{actcnt}->{1}--;
 			} else {
-				$self->{relation}->{actcnt}->{2}++;
-				$self->{relation}->{node}->{a}->{actcnt}->{2}++;
-				$self->{relation}->{node}->{b}->{actcnt}->{1}++;
+				$self->{group}->{actcnt}->{2}++;
+				$self->{group}->{node}->{a}->{actcnt}->{2}++;
+				$self->{group}->{node}->{b}->{actcnt}->{1}++;
 				$network->{actcnt}->{1}++;
 			}
 		}
@@ -6108,19 +5549,19 @@ sub add_msg {
 #package Circuit;
 sub identify {
 	my $self = shift;
-	my $relation = $self->{relation};
+	my $group = $self->{group};
 	my $id = "Circuit $self->{cic} ";
-	$id .= $relation->{node}->{a}->shortid;
+	$id .= $group->{node}->{a}->shortid;
 	$id .= ', ';
-	$id .= $relation->{node}->{b}->shortid;
+	$id .= $group->{node}->{b}->shortid;
 	return ($self->{id} = $id);
 }
 
 #package Circuit;
 sub shortid {
 	my $self = shift;
-	my $relation = $self->{relation};
-	return "$relation->{node}->{a}->{pcode},$relation->{node}->{b}->{pcode}:$self->{cic}";
+	my $group = $self->{group};
+	return "$group->{node}->{a}->{pcode},$group->{node}->{b}->{pcode}:$self->{cic}";
 }
 
 #package Circuit;
@@ -6137,13 +5578,13 @@ sub fillprops {
 		-text=>'SP A point code:',
 	)->grid(-row=>$$row,-column=>0,-sticky=>'ewns');
 	$tw->Entry(%entrycenter,
-		-text=>$self->{relation}->{node}->{a}->identify, -width=>32,
+		-text=>$self->{group}->{node}->{a}->identify, -width=>32,
 	)->grid(-row=>$$row++,-column=>1,-sticky=>'wns');
 	$tw->Label(%labelright,
 		-text=>'SP B point code:',
 	)->grid(-row=>$$row,-column=>0,-sticky=>'ewns');
 	$tw->Entry(%entrycenter,
-		-text=>$self->{relation}->{node}->{b}->identify, -width=>32,
+		-text=>$self->{group}->{node}->{b}->identify, -width=>32,
 	)->grid(-row=>$$row++,-column=>1,-sticky=>'wns');
 }
 
@@ -6160,39 +5601,40 @@ sub fillstatus {
 }
 
 # -------------------------------------
-package Linkset; use strict;
-@Linkset::ISA = qw(Tristate Arcitem Arcend Logging Properties Status Clickable PairCollector);
+package Linkset;
+use strict;
+use vars qw(@ISA);
+@ISA = qw(Tristate Arcitem Arcend Logging Properties Status Clickable MsgCollector);
 # -------------------------------------
 
 #package Linkset;
-sub get {
-	my ($type,$top,$network,$nodea,$nodeb,@args) = @_;
-	my $key = "$nodea->{pc},$nodeb->{pc}";
-	return $network->{linksets}->{$key} if $network->{linksets}->{$key};
-	my $yek = "$nodeb->{pc},$nodea->{pc}";
-	my $self = {
-		no=>++$network->{linksetno},
-		key=>$key,
-		yek=>$yek,
-		slccnt=>0,
-		node=>{a=>$nodea,b=>$nodeb},
-		links=>{},
-	};
-	bless $self,$type;
-	$network->{linksets}->{$key} = $self;
-	$network->{linksets}->{$yek} = $self;
+sub init {
+	my ($self,$top,$linksetno,$relation,@args) = @_;
 	$self->Tristate::init($top,'black');
 	$self->Logging::init($top,@args);
 	$self->Properties::init(@args);
 	$self->Status::init(@args);
 	$self->Clickable::init(@args);
-	$self->PairCollector::init($top,@args);
-	$self->{relation} = Relation->get($top,$network,$nodea,$nodeb,@args);
-	$self->{relation}->{linkset} = $self;
-	$nodea->{linksets}->{$nodeb->{pc}} = $self;
-	$nodeb->{linksets}->{$nodea->{pc}} = $self;
+	$self->MsgCollector::init($top,@args);
+	$self->{no} = $linksetno;
+	$self->{relation} = $relation; $relation->{linkset} = $self;
+	$self->{slccnt} = 0;
+	$self->{links} = {};
+	my $nodea = $self->{node}->{a} = $relation->{node}->{a};
+	my $nodeb = $self->{node}->{b} = $relation->{node}->{b};
+	$self->{routes} = {};
+	$self->{routes}->{a} = {}; # routes from the a-side
+	$self->{routes}->{b} = {}; # routes from the b-side
 	$self->Arcitem::init($top,$nodea,$nodeb,['node'],[],'line',0);
 	$self->Clickable::attach($top,@args);
+}
+
+#package Linkset;
+sub new {
+	my ($type,@args) = @_;
+	my $self = {};
+	bless $self,$type;
+	$self->init(@args);
 	return $self;
 }
 
@@ -6224,8 +5666,11 @@ sub shortid {
 sub statechange {
 	my ($self,$top,$val) = @_;
 	my $c = $top->canvas;
-	$self->{node}->{a}->updatestate($top,$self);
-	$self->{node}->{b}->updatestate($top,$self);
+	foreach my $side (keys %{$self->{routes}}) {
+		foreach my $route (values %{$self->{routes}->{$side}}) {
+			$route->updatestate($top,$self);
+		}
+	}
 }
 
 #package Linkset;
@@ -6255,10 +5700,30 @@ sub updatestate {
 }
 
 #package Linkset;
+sub getRoute {
+	my ($self,$top,$network,$side,$node,@args) = @_;
+	my $pc = $node->{pc};
+	return $self->{routes}->{$side}->{$pc} if $self->{routes}->{$side}->{$pc};
+	my $route = $network->getRoute($top,$self,$side,$node);
+	$self->{routes}->{$side}->{$pc} = $route;
+	return $route;
+}
+
+#package Linkset;
 sub add_msg {
 	my ($self,$top,$network,$msg,$dir) = @_;
 	$self->inc($msg,$dir);
 	$self->pushmsg($msg);
+	if (exists $msg->{dpc}) {
+		my ($side,$col);
+		if ($dir) { # from b to a to dpc
+			$side = 'a'; $col = $self->{node}->{a}->{col};
+		} else { # from a to b to dpc
+			$side = 'b'; $col = $self->{node}->{b}->{col};
+		}
+		my $node = $network->getSp($top,$msg->{dpc},$col);
+		$self->getRoute($top,$network,$side,$node)->add_msg($top,$network,$msg,2);
+	}
 }
 
 #package Linkset;
@@ -6296,7 +5761,9 @@ sub getmore {
 	my ($self,$m,$top,$X,$Y) = @_;
 	my $have = {};
 	$have->{links} = scalar keys %{$self->{links}};
-	$m->add('separator');
+	$have->{routes}->{a} = scalar keys %{$self->{routes}->{a}};
+	$have->{routes}->{b} = scalar keys %{$self->{routes}->{b}};
+	$m->add('separator') if $have->{links} + $have->{routes}->{a} + $have->{routes}->{b};
 	if ($have->{links}) {
 		my ($mc,$m3);
 		$mc = $m->Menu(-title=>'Links Menu');
@@ -6313,31 +5780,39 @@ sub getmore {
 		},$self,$mc,$top,$X,$Y]);
 		$m->add('cascade',-menu=>$mc,-label=>'Links');
 	}
-	{
-		my $node = $self->{node}->{a};
-		my $label = 'Node A '.$node->shortid;
-		my $mc = $m->Menu(-title=>"$label Menu");
-		$mc->configure(-postcommand->[sub {
+	if ($have->{routes}->{b}) {
+		my ($mc,$m3);
+		$mc = $m->Menu(-title=>'Routes Forward Menu');
+		$mc->configure(-postcommand=>[sub {
 			my ($self,$mc,$top,$X,$Y) = @_;
 			$mc->delete(0,'end');
-			my $node = $self->{node}->{a};
-			$node->getmenu($mc,$top,$X,$Y);
-			$node->getmore($mc,$top,$X,$Y);
+			foreach my $pc (sort {$a <=> $b} keys %{$self->{routes}->{b}}) {
+				my $route = $self->{routes}->{b}->{$pc};
+				$m3 = $mc->Menu(-title=>"Route $route->{node}->{b}->{pcode} Menu");
+				$route->getmenu($m3,$top,$X,$Y);
+				$route->getmore($m3,$top,$X,$Y);
+				$mc->add('cascade',-menu=>$m3,-label=>"Route $route->{node}->{b}->{pcode}");
+
+			}
 		},$self,$mc,$top,$X,$Y]);
-		$m->add('cascade',-menu=>$mc,-label=>$label);
+		$m->add('cascade',-menu=>$mc,-label=>'Routes Forward');
 	}
-	{
-		my $node = $self->{node}->{b};
-		my $label = 'Node B '.$node->shortid;
-		my $mc = $m->Menu(-title=>"$label Menu");
-		$mc->configure(-postcommand->[sub {
+	if ($have->{routes}->{a}) {
+		my ($mc,$m3);
+		$mc = $m->Menu(-title=>'Routes Reverse Menu');
+		$mc->configure(-postcommand=>[sub {
 			my ($self,$mc,$top,$X,$Y) = @_;
 			$mc->delete(0,'end');
-			my $node = $self->{node}->{b};
-			$node->getmenu($mc,$top,$X,$Y);
-			$node->getmore($mc,$top,$X,$Y);
+			foreach my $pc (sort {$a <=> $b} keys %{$self->{routes}->{a}}) {
+				my $route = $self->{routes}->{a}->{$pc};
+				$m3 = $mc->Menu(-title=>"Route $route->{node}->{b}->{pcode} Menu");
+				$route->getmenu($m3,$top,$X,$Y);
+				$route->getmore($m3,$top,$X,$Y);
+				$mc->add('cascade',-menu=>$m3,-label=>"Route $route->{node}->{b}->{pcode}");
+
+			}
 		},$self,$mc,$top,$X,$Y]);
-		$m->add('cascade',-menu=>$mc,-label=>$label);
+		$m->add('cascade',-menu=>$mc,-label=>'Routes Reverse');
 	}
 }
 
@@ -6403,8 +5878,10 @@ sub fillstatus {
 }
 
 # -------------------------------------
-package Combined; use strict;
-@Combined::ISA = qw(Tristate Arcitem Logging Properties Status Clickable PairCollector);
+package Combined;
+use strict;
+use vars qw(@ISA);
+@ISA = qw(Tristate Arcitem Logging Properties Status Clickable MsgCollector);
 # -------------------------------------
 
 #package Combined;
@@ -6416,7 +5893,7 @@ sub init {
 	$self->Properties::init(@args);
 	$self->Status::init(@args);
 	$self->Clickable::init(@args);
-	$self->PairCollector::init($top,@args);
+	$self->MsgCollector::init($top,@args);
 	$self->{no} = $combinedno;
 	$self->{linkseta} = $linkseta;
 	$self->{linksetb} = $linksetb;
@@ -6427,39 +5904,41 @@ sub init {
 
 
 # -------------------------------------
-package Link; use strict;
-@Link::ISA = qw(Tristate Arcitem Logging Properties Status Clickable PairCollector);
+package Link;
+use strict;
+use vars qw(@ISA);
+@ISA = qw(Tristate Arcitem Logging Properties Status Clickable MsgCollector);
 # -------------------------------------
 
 $Link::offsets = [ -3, 3, -8, 8, -13, 13, -18, 18, -23, 23, -28, 28, -33, 33, -38, 38 ];
 
 #package Link;
-sub get {
-	my ($type,$top,$network,$nodea,$nodeb,$slc,@args) = @_;
-	my $key = "$nodea->{pc},$nodeb->{bc}:$slc";
-	return $network->{links}->{$key} if $network->{links}->{$key};
-	my $yek = "$nodeb->{pc},$nodea->{bc}:$slc";
-	my $self = {
-		no=>++$network->{linkno},
-		key=>$key,
-		yek=>$yek,
-		slc=>$slc,
-		node=>{a=>$nodea,b=>$nodeb},
-		datalinks=>{},
-	};
-	bless $self, $type;
-	$network->{links}->{$key} = $self;
-	$network->{links}->{$yek} = $self;
-	$self->{linkset} = Linkset->get($top,$network,$nodea,$nodeb,@args);
-	$self->{linkset}->{links}->{$slc} = $self;
+sub init {
+	my ($self,$top,$linkno,$linkset,$slc,@args) = @_;
 	$self->Tristate::init($top,'black');
 	$self->Logging::init($top,@args);
 	$self->Properties::init(@args);
 	$self->Status::init(@args);
 	$self->Clickable::init(@args);
-	$self->PairCollector::init($top,@args);
+	$self->MsgCollector::init($top,@args);
+	$self->{no} = $linkno;
+	$self->{linkset} = $linkset;
+	$linkset->{links}->{$slc} = $self;
+	$self->{slc} = $slc;
+	my $nodea = $self->{node}->{a} = $linkset->{node}->{a};
+	my $nodeb = $self->{node}->{b} = $linkset->{node}->{b};
+	$self->{channelforw} = undef;
+	$self->{channelrevs} = undef;
 	$self->Arcitem::init($top,$nodea,$nodeb,['node','linkset'],[],'line',$Link::offsets->[$slc]);
 	$self->Clickable::attach($top,@args);
+}
+
+#package Link;
+sub new {
+	my ($type,@args) = @_;
+	my $self = {};
+	bless $self,$type;
+	$self->init(@args);
 	return $self;
 }
 
@@ -6504,11 +5983,11 @@ sub shortid {
 sub getmore {
 	my ($self,$m,$top,$X,$Y) = @_;
 	my $have = {};
-	$have->{linkset}   = $self->{linkset} ? 1 : 0;
-	$have->{datalinks} = keys %{$self->{datalinks}};
+	$have->{linkset} = $self->{linkset} ? 1 : 0;
+	$have->{forw}    = $self->{channelforw} ? 1 : 0;
+	$have->{revs}    = $self->{channelrevs} ? 1 : 0;
 	$m->add('separator') if
 		$have->{linkset} +
-		$have->{both} +
 		$have->{forw} +
 		$have->{revs};
 	if ($have->{linkset}) {
@@ -6523,23 +6002,29 @@ sub getmore {
 		},$self,$mc,$top,$X,$Y]);
 		$m->add('cascade', -menu=>$mc, -label=>$label);
 	}
-	if ($have->{datalinks}) {
-		my ($mc,$m3);
-		$mc = $m->Menu(-title=>'Datalinks Menu');
+	if ($have->{forw}) {
+		my $channel = $self->{channelforw};
+		my $label = 'Forward channel';
+		my $mc = $m->Menu(-title=>"$label Menu");
 		$mc->configure(-postcommand=>[sub {
 			my ($self,$mc,$top,$X,$Y) = @_;
 			$mc->delete(0,'end');
-			foreach my $dli (sort {$a <=> $b} keys %{$self->{datalinks}}) {
-				my $datalink = $self->{datalinks}->{$dli};
-				my $type = ref($datalink); $type~=s/_/ /g;
-				my $label = $type.' '.$datalink->shortid;
-				$m3 = $mc->Menu(-title=>"$label Menu");
-				$datalink->getmenu($m3,$top,$X,$Y);
-				$datalink->getmore($m3,$top,$X,$Y);
-				$mc->add('cascade',-menu=>$m3,-label=>$label);
-			}
+			$channel->getmenu($mc,$top,$X,$Y);
+			$channel->getmore($mc,$top,$X,$Y);
 		},$self,$mc,$top,$X,$Y]);
-		$m->add('cascade', -menu=>$mc, -label=>'Datalinks');
+		$m->add('cascade', -menu=>$mc, -label=>$label);
+	}
+	if ($have->{revs}) {
+		my $channel = $self->{channelrevs};
+		my $label = 'Reverse channel';
+		my $mc = $m->Menu(-title=>"$label Menu");
+		$mc->configure(-postcommand=>[sub {
+			my ($self,$mc,$top,$X,$Y) = @_;
+			$mc->delete(0,'end');
+			$channel->getmenu($mc,$top,$X,$Y) if $channel;
+			$channel->getmore($mc,$top,$X,$Y) if $channel;
+		},$self,$mc,$top,$X,$Y]);
+		$m->add('cascade', -menu=>$mc, -label=>$label);
 	}
 }
 
@@ -6555,25 +6040,27 @@ sub fillstatus {
 }
 
 # -------------------------------------
-package Route; use strict;
-@Route::ISA = qw(Tristate Arcitem Logging Properties Status Clickable MsgCollector);
+package Route;
+use strict;
+use vars qw(@ISA);
+@ISA = qw(Tristate Arcitem Logging Properties Status Clickable MsgCollector);
 # -------------------------------------
 
 #package Route
-sub get {
-	my ($type,$top,$network,$nodea,$nodeb,@args) = @_;
-	my $key = "$nodea->{no},$nodeb->{pc}";
-	my $self = $network->{routes}->{$key};
-	return $self if $self;
-	my $self = { no=>++$network->{routeno}, key=>$key };
+sub new {
+	my ($type,$top,$routeno,$linkset,$side,$nodeb,@args) = @_;
+	my $self = {};
 	bless $self,$type;
-	$network->{routes}->{$key} = $self;
 	$self->Tristate::init($top,'black');
 	$self->Logging::init($top,@args);
 	$self->Properties::init(@args);
 	$self->Status::init(@args);
 	$self->Clickable::init(@args);
 	$self->MsgCollector::init($top,@args);
+	$self->{no} = $routeno;
+	$self->{linkset} = $linkset;
+	$self->{side} = $side;
+	my $nodea = $linkset->{node}->{$side};
 	$self->{node}->{a} = $nodea;
 	$self->{node}->{b} = $nodeb;
 	$nodea->{routes}->{a}->{$nodeb->{pc}} = $self;
@@ -6582,28 +6069,6 @@ sub get {
 	$self->Arcitem::init($top,$nodea,$nodeb,['node','link','linkset'],[],'last',0);
 	$self->Clickable::attach($top,@args);
 	return $self;
-}
-
-#package Route;
-sub destroy {
-	my ($self,$top) = @_;
-
-	# ensure that the route is unlinked for removal
-	print STDERR "D: $self: unlinking\n";
-
-	$self->MsgCollector::destroy($top);
-	$self->Clickable::destroy($top);
-	$self->Status::destroy($top);
-	$self->Properties::destroy($top);
-	$self->Logging::destroy($top);
-	$self->Tristate::destroy($top);
-	$self->Arcitem::destroy($top);
-}
-
-#package Route;
-sub DESTROY {
-	my $self = shift;
-	print STDERR "D: $self: calling destructor\n";
 }
 
 #package Route;
@@ -6648,6 +6113,16 @@ sub getmore {
 	my ($self,$m,$top,$X,$Y) = @_;
 	$m->add('separator');
 	my ($mc,$linkset,$node);
+
+	$linkset = $self->{linkset};
+	$mc = $m->Menu(-title=>'Linkset Menu');
+	$mc->configure(-postcommand=>[sub {
+		my ($self,$mc,$top,$X,$Y) = @_;
+		$mc->delete(0,'end');
+		$linkset->getmenu($mc,$top,$X,$Y);
+		$linkset->getmore($mc,$top,$X,$Y);
+	},$self,$mc,$top,$X,$Y]);
+	$m->add('cascade',-menu=>$mc,-label=>'Linkset');
 
 	$node =  $self->{node}->{a};
 	$mc = $m->Menu(-title=>'Transit Node Menu');
@@ -6701,62 +6176,139 @@ sub fillstatus {
 }
 
 # -------------------------------------
-package Node; use strict;
-@Node::ISA = qw(Nodeitem Properties Status Clickable);
+package Path;
+use strict;
+use vars qw(@ISA);
+@ISA = qw(Arcitem Tristate Logging Properties Status Clickable MsgCollector);
 # -------------------------------------
-# Nodes are unidentified signalling points.  We know that there are two nodes on
-# either side of a datalink, we just do not know which node yet.  A bare Node
-# object is an unknown signalling point.  It just acts as a place holder for when
-# the datalink is bound to an actual node.  Nodes need a destroy method so that
-# the datalink can destroy these nodes once they are no longer necessary.
-#
-# Nodes are created in reference to a datalink, the side of the datalink on which
-# they exist.
-#
-# Note that when nodes are created they should position themselves and rely on
-# the datalink's Arcitem methods to eventually update it.
 
-#package Node;
-sub get {
-	my ($type,$top,$network,$half,$col,@args) = @_;
-	my $self = {
-		no=>++$network->{nodeno},
-		datalinks=>{a=>{},b=>{}},
-		routes=>{a=>{},b=>{}},
-	};
+#package Path;
+sub new {
+	my ($type,$top,$pathno,$channel,$side,$node,@args) = @_;
+	my $self = {};
 	bless $self, $type;
-	$network->{nodes}->{-$self->{no}} = $self;
-	$self->Nodeitem::init($type,$top,0,$half<0?-$col:$col,0);
+	$self->Tristate::init($top,'grey');
+	$self->Logging::init($top,@args);
 	$self->Properties::init(@args);
 	$self->Status::init(@args);
 	$self->Clickable::init(@args);
+	$self->MsgCollector::init($top,@args);
+	$self->{no} = $pathno;
+	$self->{channel} = $channel;
+	$self->{side} = $side;
+	$self->{node} = $node;
+	my ($nodea,$nodeb,$adjacent,$yoff);
+	if ($side eq 'a') {
+		$adjacent = $self->{adjacent} = $channel->{node}->{a};
+		$nodea = $self->{node}->{a} = $node;
+		$nodeb = $self->{node}->{b} = $adjacent;
+		$yoff = -3;
+	} else {
+		$adjacent = $self->{adjacent} = $channel->{node}->{b};
+		$nodea = $self->{node}->{a} = $adjacent;
+		$nodeb = $self->{node}->{b} = $node;
+		$yoff =  3;
+	}
+	$node->makealias($top,$adjacent);
+	$nodea->{paths}->{a}->{$channel->{ppa}} = $self;
+	$nodeb->{paths}->{b}->{$channel->{ppa}} = $self;
+	$self->Arcitem::init($top,$nodea,$nodeb,['node','channel','route','link','linkset'],[],'last',$yoff);
 	$self->Clickable::attach($top,@args);
-	$top->{regroupnow} = 1;
+	$channel->swap($top) if $node->{col} < 0 and $adjacent->{col} > 0;
 	return $self;
 }
-#package Node;
-sub del {
-	my ($self,$top,$network) = @_;
-	my $nodeno = $self->{no};
-	delete $network->{nodes}->{-$nodeno};
+
+#package Path;
+sub add_msg {
+	my ($self,$top,$network,$msg,$dir) = @_;
+	$self->inc($msg,$dir);
+	$self->pushmsg($msg);
 }
 
-#package Node;
-sub assignpc {
-	my ($self,$top,$network,$pc,$node) = @_;
-	if ($node = $network->{nodes}->{$pc}) {
-		return $self->absorb($node);
-	}
-	return SP->makeone($self,$top,$network,$pc);
+#package Path;
+sub statechange {
+	my ($self,$top,$val) = @_;
+	$self->{node}->updatestate($top,$self);
 }
 
+#package Path;
+sub identify {
+	my $self = shift;
+	my $id = "Path ";
+	$id .= '('.$self->{channel}->shortid.')';
+	$id .= ($self->{side} eq 'a') ? ' <- ' : ' -> ';
+	$id .= $self->{node}->shortid;
+	return ($self->{id} = $id);
+}
+
+#package Path;
+sub shortid {
+	my $self = shift;
+	my $id = '('.$self->{channel}->shortid.')';
+	$id .= ($self->{side} eq 'a') ? '<-' : '->';
+	$id .= "($self->{node}->{pcode})";
+	return $id;
+}
+
+#package Path;
+sub fillprops {
+	my ($self,$top,$tw,$row) = @_;
+
+	$tw->Label(%labelright,
+		-text=>'Signalling channel:',
+	)->grid(-row=>$$row,-column=>0,-sticky=>'ewns');
+	$tw->Entry(%entryleft,
+		-text=>$self->{channel}->identify, -width=>32,
+	)->grid(-row=>$$row++,-column=>1,-sticky=>'wns');
+	$tw->Label(%labelright,
+		-text=>'Signalling point:',
+	)->grid(-row=>$$row,-column=>0,-sticky=>'ewns');
+	$tw->Entry(%entryleft,
+		-text=>$self->{node}->identify, -width=>32,
+	)->grid(-row=>$$row++,-column=>1,-sticky=>'wns');
+}
+
+#package Path;
+sub fillstatus {
+	my ($self,$top,$tw,$row) = @_;
+	$self->fillstate($top,$tw,$row);
+}
+
+# -------------------------------------
+package Node;
+use strict;
+use vars qw(@ISA);
+@ISA = qw(Nodeitem Properties Status Clickable);
+# -------------------------------------
+# Nodes are unidentified signalling points.  We know that there are two nodes on either side of a
+# channel, we just do not know which node yet.  A bare Node object is an unknown signalling point.
+# It just acts as a place holder for when the channel is bound to an actual node.  Nodes need a
+# destroy method so that the channel can destroy these nodes once they are no longer necessary.
+#
+# Nodes are created in reference to a channel, the side of the channel on which they exist.
+#
+# Note that when nodes are created they should position themselves and rely on the channel's Arcitem
+# methods to eventually update it.
+
 #package Node;
-sub addipaddr {
-	my ($self,$top,$network,$ipaddr) = @_;
-	if (my $host = $network->{nodes}->{$ipaddr}) {
-		return $self->absorb($host);
-	}
-	return Host->makeone($self,$top,$network,$ipaddr);
+sub new {
+	my ($type,$top,$nodeno,$col,@args) = @_;
+	my $self = Nodeitem::new($type,$top,0,$col,0,$nodeno);
+	$self->Properties::init(@args);
+	$self->Status::init(@args);
+	$self->Clickable::init(@args);
+	$self->{no} = $nodeno;
+	$self->{channels} = {};
+	$self->{channels}->{a} = {};
+	$self->{channels}->{b} = {};
+	$self->{paths} = {};
+	$self->{paths}->{a} = {}; # paths that originate here
+	$self->{paths}->{b} = {}; # paths that terminate here
+	$self->Clickable::attach($top,@args);
+	#print STDERR "D: must regroup\n";
+	$top->{regroupnow} = 1;
+	#$top->regroup();
+	return $self;
 }
 
 #package Node;
@@ -6773,46 +6325,6 @@ sub shortid {
 	my $self = shift;
 	my $ref = ref $self;
 	return "$ref($self->{no})";
-}
-
-#package Node;
-sub xform {
-	my ($type,$self,$top) = @_;
-	return if ref $self eq $type;
-	my $oldtype = ref $self;
-	bless $self,$type;
-	my $c = $top->canvas;
-	my $mc = $top->mycanvas;
-	$mc->delballoon($self->{items});
-	foreach (@$self->{items}) {
-		$c->dtag($_,$oldtype);
-		$c->addtag($type,withtag=>$_);
-	}
-	my @oldtags = ();
-	push @oldtags, 'SLTM' if $self->{xchg_sltm};
-	push @oldtags, 'ISUP' if $self->{xchg_isup};
-	push @oldtags, 'TCAP' if $self->{orig_tcap} or $self->{term_tcap};
-	push @oldtags, 'circuits' if $self->{ciccnt} > 0;
-
-	$c->delete($self->{item});
-	shift @{$self->{items}};
-	$self->adjitems($top,$c,\@oldtags);
-	$c->itemconfigure($self->{ttxt}, -text=>ref($self));
-	if ($self->{alias}) {
-		$c->itemconfigure($self->{item}, -dash=>[5,2]);
-		$c->itemconfigure($self->{scri}, -dash=>[5,2]);
-	}
-	my $olditem = 'all';
-	foreach (@{$self->{items}}) {
-		$c->raise($_,$olditem);
-		$olditem = $_;
-	}
-	my $state = ($top->{show}->{"\L$type\Es"}) ? 'normal' : 'hidden';
-	foreach (@{$self->{items}}) {
-		$c->itemconfigure($_,-state=>$state);
-	}
-	$self->Clickable::attach($top);
-	$self->findaliases($top);
 }
 
 #package Node;
@@ -6843,273 +6355,161 @@ sub findaliases {
 #package Node;
 sub absorb {
 	my ($self,$top,$node) = @_;
-
-	return $self if $self eq $node;
-	# make sure the one lower down the food chain is being eaten
-	# by the one higher up the food chain.
-	return $node->absorb($top,$self)
-		if $node->isa(ref $self) and !$self->isa(ref $node);
-	$self->mergefrom($top,$node);
-	return $self;
-}
-
-#package Node;
-sub mergefrom {
-	my ($self,$top,$node) = @_;
-
-	foreach my $side (keys %{$node->{datalinks}}) {
-		while (my ($dli,$datalink) = each %{$node->{datalinks}->{$side}}) {
-			$self->{datalinks}->{$side}->{$dli} = $datalink;
-			$datalink->{node}->{$side} = $self;
-		}
-	}
-	delete $node->{datalinks};
-	foreach my $side (keys %{$node->{routes}}) {
-		while (my ($id,$route) = each %{$node->{routes}->{$side}}) {
-			if (my $own = $self->{routes}->{$side}->{$id}) {
-				$own->addfrom($route,0);
-				$route->destroy($top);
-			} else {
-				$self->{routes}->{$side}->{$id} = $route;
-				$route->{node}->{$side} = $self;
-			}
-		}
-	}
-	delete $node->{routes};
-	$self->SUPER::mergefrom($top,$node);
-}
-
-#package Node;
-sub absorb {
-	my ($self,$top,$node) = @_;
+	#print STDERR "D: absorbing Node ".$node->identify." into ".$self->identify."\n";
 	# handle arcs
 	$self->Nodeitem::absorb($top,$node);
-	while (my ($dli,$datalink) = each %{$node->{datalinks}}) {
-		$self->{datalinks}->{$dli} = $datalink;
+	foreach my $side (keys %{$node->{channels}}) {
+		while (my ($ppa,$channel) = each %{$node->{channels}->{$side}}) {
+			$self->{channels}->{$side}->{$ppa} = $channel;
+		}
 	}
-	delete $node->{datalinks};
-	# FIXME: this needs work
-	foreach my $side (keys %{$node->{routes}}) {
-		while (my ($id,$route) = each %{$node->{routes}->{$side}}) {
+	delete $node->{channels};
+	foreach my $side (keys %{$node->{paths}}) {
+		while (my ($ppa,$path) = each %{$node->{paths}->{$side}}) {
 			my $exnode;
-			$exnode = $route->{node}->{$side};
+			$exnode = $path->{node}->{$side};
 			if ($node ne $exnode) {
 				print STDERR "E: node $side mismatch $node and $exnode\n";
 			} else {
-				$route->{node}->{$side} = $self;
+				$path->{node}->{$side} = $self;
 			}
-			$self->{routes}->{$side}->{$id} = $route;
+			$exnode = $path->{adjacent};
+			if ($node ne $exnode) {
+				print STDERR "E: adjacent mismatch $node and $exnode\n";
+			} else {
+				$path->{adjacent} = $self;
+			}
+			$self->{paths}->{$side}->{$ppa} = $path;
 		}
 	}
-	delete $node->{routes};
-	delete $top->{network}->{nodes}->{-$self->{no}};
+	delete $node->{paths};
+	delete $top->{network}->{pnodes}->{$self->{no}};
 
 }
 
 #package Node;
 sub fillstatus {
 	my ($self,$top,$tw,$row) = @_;
+	my $f;
+	my ($na,$nb);
+	($na,$nb) = (keys %{$self->{paths}->{a}},keys %{$self->{paths}->{b}});
+	if ($na or $nb) {
+		$f = $tw->TFrame(%tframestyle,-label=>'Paths:');
+		my $p = $f;
+		if ($na + $nb > 16) {
+			$f->pack(%tframepack);
+			$p = $f->Scrolled('Pane',
+				-scrollbars=>'osoe',
+				-sticky=>'we',
+				-gridded=>'y',
+			)->pack(%tframepack);
+		} else {
+			$f->pack(%tframescrunch);
+		}
+		$$row = 0;
+		my $col = 0;
+		$p->Label(%labelright,-text=>'Originating:',
+		)->grid(-row=>$$row,-column=>0,-sticky=>'ewns');
+		foreach my $ppa (sort {$a <=> $b} keys %{$self->{paths}->{a}}) {
+			my $path = $self->{paths}->{a}->{$ppa};
+			my $channel = $path->{channel};
+			$col++;
+			my $w = $p->Entry(%entrycenter,-text=>$channel->shortid,
+			)->grid(-row=>$$row,-column=>$col,-sticky=>'ewns');
+			$path->bindtowidget($top,$w);
+			if ($col > 3) { $col = 0; $$row++; }
+		}
+		if ($col != 0) { $col = 0; $$row++; }
+		$p->Label(%labelright,-text=>'Terminating:',
+		)->grid(-row=>$$row,-column=>0,-sticky=>'ewns');
+		foreach my $ppa (sort {$a <=> $b} keys %{$self->{paths}->{b}}) {
+			my $path = $self->{paths}->{b}->{$ppa};
+			my $channel = $path->{channel};
+			$col++;
+			my $w = $p->Entry(%entrycenter,-text=>$channel->shortid,
+			)->grid(-row=>$$row,-column=>$col,-sticky=>'ewns');
+			$path->bindtowidget($top,$w);
+			if ($col > 3) { $col = 0; $$row++; }
+		}
+	}
 }
 
 # -------------------------------------
-package Host; use strict;
-@Host::ISA = qw(Node Logging PairCollector);
-# -------------------------------------
-
-#package Host;
-sub get {
-	my ($type,$top,$network,$ipaddr,$col,@args) = @_;
-	my $self = $network->{nodes}->{$ipaddr} if $ipaddr;
-	return $self if $self;
-	$self = Node::get($type,$top,$network,$col,@args);
-	if ($ipaddr) {
-		$network->{nodes}->{$ipaddr} = $self;
-		$self->{ipaddr} = $ipaddr;
-		$self->{ipaddrs} = {$ipaddr=>1};
-		$self->{iaddr} = Host::iaddr($ipaddr);
-		$self->{iname} = Host::iname($ipaddr);
-	} else {
-		$self->{ipaddr} = undef;
-		$self->{ipaddrs} = {};
-		$self->{iaddr} = '';
-		$self->{iname} = '';
-	}
-	$self->Logging::init($top,@args);
-	$self->PairCollector::init($top,@args);
-	if ($ipaddr) {
-		$top->canvas->itemconfigure($self->{text},-text=>$self->{iaddr});
-		$top->canvas->itemconfigure($self->{ownr},-text=>$self->{iname});
-	}
-	$top->{regroupnow} = 1;
-	return $self;
-}
-
-#package Host;
-sub addipaddr {
-	my ($self,$top,$network,$ipaddr) = @_;
-	if (my $host = $network->{nodes}->{$ipaddr}) {
-		return $self->absorb($host);
-	}
-	$self->{ipaddrs}->{$ipaddr} = 1;
-	$ipaddr = [sort {$a<=>$b} keys @{$self->{ipaddrs}}]->[0];
-	if ($self->{ipaddr} != $ipaddr) {
-		$self->{ipaddr} = $ipaddr;
-		$self->{iaddr} = Host::iaddr($ipaddr);
-		$self->{iname} = Host::iname($ipaddr);
-	}
-	return $self;
-}
-
-#package Host;
-# call this as Host::makeone($node,$top,$network,$ipaddr);
-sub makeone {
-	my ($node,$top,$network,$ipaddr) = @_;
-	if (ref $node eq 'Node') {
-		$self->{ipaddr} = $ipaddr;
-		$self->{ipaddrs}->{$ipaddr} = 1;
-		$self->{iaddr} = Host::iaddr($ipaddr);
-		$self->{iname} = Host::iname($ipaddr);
-		SUPER::xform('Host',$self,$top);
-	} else {
-		print STDERR "E: $node: attempt to make a Host DENIED\n";
-	}
-	return $self;
-}
-
-#package Host;
-sub mergefrom {
-	my ($self,$top,$node) = @_;
-
-	foreach (values %{$node->{ipaddrs}}) {
-		$self->{ipaddres}->{$_} = 1;
-	}
-	foreach (qw/ipaddr ipaddrs iaddr iname/) {
-		delete $node->{$_};
-	}
-	$self->addfrom($node,0);
-	$self->SUPER::mergefrom($top,$node);
-}
-
-#package Host;
-sub adjitems {
-	my ($self,$top,$c,$oldtags) = @_;
-	my ($x,$y) = ($self->{x},$self->{y});
-	$self->{item} = $c->createRectangle(
-		$x-40,$y-30,$x+40,$y+30,
-		-fill=>'white',
-		-outline=>'black', -width=>2,
-		-activeoutline=>'cyan', -activewidth=>3,
-		-tags=>[ref($self),'node',@{$oldtags}],
-	);
-	unshift @{$self->{items}}, $self->{item};
-	$c->coords($self->{scri},
-		$x-23,$y-23,$x+23,$y-23,$x+23,$y+23,$x-23,$y+23,$x-23,$y-23,
-	);
-	$c->itemconfigure($self->{ttxt},-text=>$type);
-	$c->itemconfigure($self->{text},-text=>$self->{iaddr});
-	$c->itemconfigure($self->{ownr},-text=>$self->{iname});
-	$self->makecol($top,::COL_ADJ);
-}
-
-#package Host;
-sub iaddr {
-	my $ipaddr = shift;
-	return undef unless defined $ipaddr;
-	return '' unless $ipaddr;
-	return join('.',unpack('C*',pack('N',$ipaddr)));
-}
-
-#package Host;
-sub iname {
-	my $ipaddr = shift;
-	return undef unless defined $ipaddr;
-	return '' unless $ipaddr;
-	# TODO: reverse DNS lookup of ip address
-	return '(unknown)';
-}
-
-# -------------------------------------
-package SP; use strict;
-@SP::ISA = qw(Host Tristate CallCollector);
+package SP;
+use strict;
+use vars qw(@ISA);
+@ISA = qw(Node Tristate Logging DualCollector);
 # -------------------------------------
 
 #package SP;
-sub get {
-	my ($type,$top,$network,$pc,$col,@args) = @_;
-	my $self = $network->{nodes}->{$pc};
-	return $self if $self;
-	$self = Host::get($type,$top,$network,undef,$col,@args);
-	$network->{nodes}->{$pc} = $self;
-	$self->{pc} = $pc;
-	$self->{tqueries}  = {};
-	$self->{circuits}  = {};
-	$self->{responds}  = {};
-	$self->{relations} = {};	# relations in which this is a node
-	$self->{linksets}  = {};	# linksets that attach here XXX
-	$self->{pcode}     = SP::pcstring($pc);
-	$self->{pownr}     = SP::pcowner($pc,0);
+sub new {
+	my ($type,$top,$nodeno,$pc,$half,@args) = @_;
+	my $col = ::COL_NOD; $col = -$col if $half < 0;
+	my $self = Node::new($type,$top,$nodeno,$col,@args);
 	$self->Tristate::init($top,'white');
-	$self->CallCollector::init($top,@args);
-	$top->canvas->itemconfigure($self->{text},-text=>$self->{pcode});
-	$top->canvas->itemconfigure($self->{ownr},-text=>$self->{pownr});
-	$top->{regroupnow} = 1;
-	return $self;
-}
-
-#package SP;
-sub assignpc {
-	my ($self,$top,$network,$pc) = @_;
-	print STDERR "E: ".ref($self).": attempt to reassign point code DENIED\n";
-}
-
-#package SP;
-sub makeone {
-	my ($type,$self,$top,$pc) = @_;
+	$self->Logging::init($top,@args);
+	$self->DualCollector::init($top,@args);
 	$self->{pc} = $pc;
+	$self->{tqueries} = {};
+	$self->{circuits} = {};
+	$self->{responds} = {};
+	$self->{routes} = {}; # routes that term or orig here
+	$self->{routes}->{a} = {}; # routes for which I am node-a (i.e. O/G route)
+	$self->{routes}->{b} = {}; # routes for which I am node-b (i.e. I/C route)
+	$self->{relate} = {}; # relations in which this is a node
+	$self->{linksets} = {}; # linksets that attach here
 	$self->{pcode} = SP::pcstring($pc);
-	$self->{pownr} = SP::pcowner($pc,0);
-	SUPER::xform($type,$self,$top);
-}
-
-#package SP;
-sub addfrom {
-	my ($self,$othr,@args) = @_;
-	$self->SUPER::addfrom($othr,@args);
-	$self->CallCollector::addfrom($othr,@args);
-}
-
-#package SP;
-sub mergefrom {
-	my ($self,$top,$node) = @_;
-
-	if ($node->isa{'SP'}) {
-		print STDERR "E: $self and $node attempt to merge DENIED\n";
-		return;
-	}
-	$self->addfrom($node,0);
-	$self->SUPER::mergefrom($top,$node);
-}
-
-
-#package SP;
-sub adjitems {
-	my ($self,$top,$c,$oldtags) = @_;
-	my ($x,$y) = ($self->{x},$self->{y});
-	$self->{item} = $c->createOval(
-		$x-40,$y-40,$x+40,$y+40,
-		-fill=>'white',
-		-outline=>'black', -width=>2,
-		-activeoutline=>'cyan', -activeWidth=>3,
-		-tags=>[ref($self),'node',@{$oldtags}],
-	);
-	unshift @{$self->{items}}, $self->{item};
-	$c->coords($self->{scri},
-		$x-23,$y-23,$x+23,$y-23,$x+23,$y+23,$x-23,$y+23,$x-23,$y-23,
-	);
+	$self->{pownr} = $self->pcowner(0);
+	my $c = $top->canvas;
 	$c->itemconfigure($self->{ttxt},-text=>$type);
 	$c->itemconfigure($self->{text},-text=>$self->{pcode});
 	$c->itemconfigure($self->{ownr},-text=>$self->{pownr});
-	$self->makecol($top,::COL_NOD);
+	#print STDERR "D: must regroup\n";
+	$top->{regroupnow} = 1;
+	#$top->regroup();
+	return $self;
+}
+
+#package SP;
+sub xform {
+	my ($type,$self,$top) = @_;
+	return if ref $self eq $type;
+	my $oldtype = ref $self;
+	bless $self,$type;
+	my $c = $top->canvas;
+	my $mc = $top->mycanvas;
+	$mc->delballoon($self->{items});
+
+	foreach (@{$self->{items}}) {
+		$c->dtag($_,$oldtype);
+		$c->addtag($type,withtag=>$_);
+	}
+
+	my @oldtags = ();
+	push @oldtags, 'SLTM' if $self->{xchg_sltm};
+	push @oldtags, 'ISUP' if $self->{xchg_isup};
+	push @oldtags, 'TCAP' if $self->{orig_tcap} or $self->{term_tcap};
+	push @oldtags, 'circuits' if $self->{ciccnt} > 0;
+
+	$c->delete($self->{item});
+	shift @{$self->{items}};
+	$self->adjitems($c,\@oldtags);
+	$c->itemconfigure($self->{ttxt}, -text=>ref($self));
+	if ($self->{alias}) {
+		$c->itemconfigure($self->{item}, -dash=>[5,2]);
+		$c->itemconfigure($self->{scri}, -dash=>[5,2]);
+	}
+	my $olditem = 'all';
+	foreach (@{$self->{items}}) {
+		$c->raise($_,$olditem);
+		$olditem = $_;
+	}
+	my $state = ($top->{show}->{"\L$type\Es"}) ? 'normal' : 'hidden';
+	foreach (@{$self->{items}}) {
+		$c->itemconfigure($_,-state=>$state);
+	}
+	$self->Clickable::attach($top);
+	$self->findaliases($top);
 }
 
 #package SP;
@@ -7148,6 +6548,20 @@ sub updatestate {
 			$unava++;
 		}
 	}
+	foreach my $k (keys %{$self->{paths}}) {
+		# maybe should just be the term paths ('b').
+		foreach my $path (values %{$self->{paths}->{$k}}) {
+			next if $path->{channel}->{link};
+			my $rstate = $path->{state};
+			if ($rstate == Tristate::TS_AVAILABLE) {
+				$avail++;
+			} elsif ($rstate == Tristate::TS_DEGRADED) {
+				$degra++;
+			} elsif ($rstate == Tristate::TS_UNAVAILABLE) {
+				$unava++;
+			}
+		}
+	}
 	my ($state,$color);
 	if ($avail == 0 && $degra == 0 && $unava >= 0) {
 		$state = Tristate::TS_UNAVAILABLE;
@@ -7158,11 +6572,6 @@ sub updatestate {
 	}
 	return if $self->{state} == $state;
 	$self->{state} = $state;
-
-	# what we want to do here is check the status of the
-	# routes toward us to determine whether we are cut off
-	# from our relations.  We can check the routes from the
-	# other end of the datalinks with routes to us
 }
 
 #package SP;
@@ -7187,7 +6596,8 @@ sub pcstate {
 }
 
 sub pctype {
-	my $pc = shift;
+	my ($self) = @_;
+	my $pc = $self->{pc};
 	my ($ntw,$cls,$mem);
 	$ntw = $pc >> 16;
 	$cls = ($pc >> 8) & 0xff;
@@ -7225,7 +6635,8 @@ sub pctype {
 }
 
 sub pcowner {
-	my ($pc,$i) = @_;
+	my ($self,$i) = @_;
+	my $pc = $self->{pc};
 	my ($ntw,$cls,$mem,$own);
 	$ntw = $pc >> 16;
 	$cls = ($pc >> 8) & 0xff;
@@ -7404,15 +6815,6 @@ sub reanalyze {
 	if ($self->{xchg_sltm}) {
 		foreach (@{$self->{items}}) { $c->addtag('SLTM',withtag=>$_); }
 	}
-	if ($self->{xchg_isup} || ($self->{orig_tcap} && $self->{term_tcap})) {
-		SSP->xform($self,$top);
-	} elsif ($self->{orig_tcap} && !$self->{term_tcap}) {
-		SCP->xform($self,$top);
-	} elsif (!$self->{orig_tcap} && $self->{term_tcap}) {
-		GTT->xform($self,$top);
-	} elsif ($self->{xchg_sltm}) {
-		STP->xform($self,$top);
-	}
 	if ($self->{xchg_sltm}) {
 		$self->makecol($top,::COL_ADJ);
 		$self->findaliases($top);
@@ -7423,6 +6825,15 @@ sub reanalyze {
 	} elsif (!$self->{orig_tcap} && $self->{term_tcap}) {
 		$self->makecol($top,::COL_GTT);
 	} 
+	if ($self->{xchg_isup} || ($self->{orig_tcap} && $self->{term_tcap})) {
+		SP::xform('SSP',$self,$top);
+	} elsif ($self->{orig_tcap} && !$self->{term_tcap}) {
+		SP::xform('SCP',$self,$top);
+	} elsif (!$self->{orig_tcap} && $self->{term_tcap}) {
+		SP::xform('GTT',$self,$top);
+	} elsif ($self->{xchg_sltm}) {
+		SP::xform('STP',$self,$top);
+	}
 	if ($self->{xchg_isup}) {
 		if ($self->{orig_tcap}) {
 			if ($self->{term_tcap}) {
@@ -7483,7 +6894,7 @@ sub getmore {
 	$have->{combined} = scalar keys %{$self->{combined}};
 	$have->{linksets} = scalar keys %{$self->{linksets}};
 	$have->{routes}   = scalar keys %{$self->{routes}->{a}};
-	$have->{relations}   = scalar keys %{$self->{relations}};
+	$have->{relate}   = scalar keys %{$self->{relate}};
 	$have->{circuits} = scalar keys %{$self->{circuits}};
 	$m->add('separator') if
 		$have->{primary} +
@@ -7492,7 +6903,7 @@ sub getmore {
 		$have->{combined} +
 		$have->{linksets} +
 		$have->{routes} +
-		$have->{relations};
+		$have->{relate};
 	if ($have->{primary}) {
 		my $node = $self->{primary};
 		my $label = 'Primary '.$node->shortid;
@@ -7500,7 +6911,6 @@ sub getmore {
 		$mc->configure(-postcommand=>[sub {
 			my ($self,$mc,$top,$X,$Y) = @_;
 			$mc->delete(0,'end');
-			my $node = $self->{primary};
 			$node->getmenu($mc,$top,$X,$Y);
 			$node->getmore($mc,$top,$X,$Y);
 		},$self,$mc,$top,$X,$Y]);
@@ -7595,13 +7005,13 @@ sub getmore {
 		},$self,$mc,$top,$X,$Y]);
 		$m->add('cascade',-menu=>$mc,-label=>'Routesets');
 	}
-	if ($have->{relations}) {
+	if ($have->{relate}) {
 		my $mc = $m->Menu(-title=>'Relations Menu');
 		$mc->configure(-postcommand=>[sub {
 			my ($self,$mc,$top,$X,$Y) = @_;
 			$mc->delete(0,'end');
-			foreach my $pc (sort {$a <=> $b} keys %{$self->{relations}}) {
-				my $relation = $self->{relations}->{$pc};
+			foreach my $pc (sort {$a <=> $b} keys %{$self->{relate}}) {
+				my $relation = $self->{relate}->{$pc};
 				my $node;
 				if ($relation->{node}->{a}->{pc} == $self->{pc}) {
 					$node = $relation->{node}->{b};
@@ -7648,14 +7058,14 @@ sub fillprops {
 	$tw->Label(%labelright,
 		-text=>'Point code type:',
 	)->grid(-row=>$$row,-column=>0,-sticky=>'ewns');
-	my $pctyp = SP::pctype($self->{pc});
+	my $pctyp = $self->pctype();
 	$tw->Entry(%entryinput,
 		-textvariable=>\$pctyp, -width=>32,
 	)->grid(-row=>$$row++,-column=>1,-sticky=>'wns');
 	$tw->Label(%labelright,
 		-text=>'Point code owner:',
 	)->grid(-row=>$$row,-column=>0,-sticky=>'ewns');
-	my $lownr = SP::pcowner($self->{pc},1);
+	my $lownr = $self->pcowner(1);
 	$tw->Entry(%entryinput,
 		-textvariable=>\$lownr, -width=>40,
 	)->grid(-row=>$$row,-column=>1,-sticky=>'wns');
@@ -7800,10 +7210,10 @@ sub fillstatus {
 			if ($col > 3) { $col = 0; $$row++; }
 		}
 	}
-	if (keys %{$self->{relations}}) {
+	if (keys %{$self->{relate}}) {
 		$f = $tw->TFrame(%tframestyle, -label=>'Routesets:');
 		my $p = $f;
-		if (keys %{$self->{relations}} > 16) {
+		if (keys %{$self->{relate}} > 16) {
 			$f->pack(%tframepack);
 			$p = $f->Scrolled('Pane',
 				-scrollbars=>'osoe',
@@ -7817,8 +7227,8 @@ sub fillstatus {
 		my $col = 0;
 		$p->Label(%labelcenter,-text=>'Routesets to:',
 		)->grid(-row=>$$row,-column=>0,-sticky=>'ewns');
-		foreach my $pc (sort {$a <=> $b} keys %{$self->{relations}}) {
-			my $relation = $self->{relations}->{$pc};
+		foreach my $pc (sort {$a <=> $b} keys %{$self->{relate}}) {
+			my $relation = $self->{relate}->{$pc};
 			my $node;
 			if ($relation->{node}->{a}->{pc} == $self->{pc}) {
 				$node = $relation->{node}->{b};
@@ -7863,15 +7273,15 @@ sub fillstatus {
 			my $w = $p->Entry(%entrycenter, -text=>$node->shortid,
 			)->grid(-row=>$$row,-column=>0,-sticky=>'ewns');
 			$node->bindtowidget($top,$w);
-			$p->Entry(%entryright, -textvariable=>\$self->{relations}->{$pc}->{ciccnt},
+			$p->Entry(%entryright, -textvariable=>\$self->{relate}->{$pc}->{ciccnt},
 			)->grid(-row=>$$row,-column=>1,-sticky=>'ewns');
-			$p->Entry(%entryright, -textvariable=>\$self->{relations}->{$pc}->{actcnt}->{0},
+			$p->Entry(%entryright, -textvariable=>\$self->{relate}->{$pc}->{actcnt}->{0},
 			)->grid(-row=>$$row,-column=>2,-sticky=>'ewns');
-			$p->Entry(%entryright, -textvariable=>\$self->{relations}->{$pc}->{actcnt}->{1},
+			$p->Entry(%entryright, -textvariable=>\$self->{relate}->{$pc}->{actcnt}->{1},
 			)->grid(-row=>$$row,-column=>3,-sticky=>'ewns');
-			$p->Entry(%entryright, -textvariable=>\$self->{relations}->{$pc}->{actcnt}->{2},
+			$p->Entry(%entryright, -textvariable=>\$self->{relate}->{$pc}->{actcnt}->{2},
 			)->grid(-row=>$$row,-column=>4,-sticky=>'ewns');
-			$p->Entry(%entryright, -textvariable=>\$self->{relations}->{$pc}->{actcnt}->{3},
+			$p->Entry(%entryright, -textvariable=>\$self->{relate}->{$pc}->{actcnt}->{3},
 			)->grid(-row=>$$row++,-column=>5,-sticky=>'ewns');
 		}
 	}
@@ -7907,12 +7317,14 @@ sub fillstatus {
 }
 
 # -------------------------------------
-package SSP; use strict;
-@SSP::ISA = qw(SP);
+package SSP;
+use strict;
+use vars qw(@ISA);
+@ISA = qw(SP);
 # -------------------------------------
 
 sub adjitems {
-	my ($self,$top,$c,$oldtags) = @_;
+	my ($self,$c,$oldtags) = @_;
 	my ($x,$y) = ($self->{x},$self->{y});
 	$self->{item} = $c->createOval(
 		$x-40,$y-40,$x+40,$y+40,
@@ -7925,10 +7337,6 @@ sub adjitems {
 	$c->coords($self->{scri},
 		$x-26,$y-26,$x+26,$y+26,$x+26,$y-26,$x-26,$y+26,$x-26,$y-26,
 	);
-	$c->itemconfigure($self->{ttxt},-text=>$type);
-	$c->itemconfigure($self->{text},-text=>$self->{pcode});
-	$c->itemconfigure($self->{ownr},-text=>$self->{pownr});
-	$self->makecol($top,::COL_SSP);
 }
 
 #package SSP;
@@ -7945,12 +7353,14 @@ sub fillstatus {
 }
 
 # -------------------------------------
-package SCP; use strict;
-@SCP::ISA = qw(SP);
+package SCP;
+use strict;
+use vars qw(@ISA);
+@ISA = qw(SP);
 # -------------------------------------
 
 sub adjitems {
-	my ($self,$top,$c,$oldtags) = @_;
+	my ($self,$c,$oldtags) = @_;
 	my ($x,$y) = ($self->{x},$self->{y});
 	$self->{item} = $c->createOval(
 		$x-40,$y-30,$x+40,$y+30,
@@ -7960,13 +7370,6 @@ sub adjitems {
 		-tags=>[ref($self),'node',@{$oldtags}],
 	);
 	unshift @{$self->{items}}, $self->{item};
-	$c->coords($self->{scri},
-		$x-23,$y-23,$x+23,$y-23,$x+23,$y+23,$x-23,$y+23,$x-23,$y-23,
-	);
-	$c->itemconfigure($self->{ttxt},-text=>$type);
-	$c->itemconfigure($self->{text},-text=>$self->{pcode});
-	$c->itemconfigure($self->{ownr},-text=>$self->{pownr});
-	$self->makecol($top,::COL_SCP);
 }
 
 #package SCP;
@@ -7983,12 +7386,14 @@ sub fillstatus {
 }
 
 # -------------------------------------
-package STP; use strict;
-@STP::ISA = qw(SP);
+package STP;
+use strict;
+use vars qw(@ISA);
+@ISA = qw(SP);
 # -------------------------------------
 
 sub adjitems {
-	my ($self,$top,$c,$oldtags) = @_;
+	my ($self,$c,$oldtags) = @_;
 	my ($x,$y) = ($self->{x},$self->{y});
 	$self->{item} = $c->createRectangle(
 		$x-38,$y-38,$x+38,$y+38,
@@ -8001,10 +7406,6 @@ sub adjitems {
 	$c->coords($self->{scri},
 		$x+38,$y-38,$x-38,$y+38,
 	);
-	$c->itemconfigure($self->{ttxt},-text=>$type);
-	$c->itemconfigure($self->{text},-text=>$self->{pcode});
-	$c->itemconfigure($self->{ownr},-text=>$self->{pownr});
-	$self->makecol($top,::COL_ADJ);
 }
 
 #package STP;
@@ -8021,12 +7422,14 @@ sub fillstatus {
 }
 
 # -------------------------------------
-package GTT; use strict;
-@GTT::ISA = qw(SP);
+package GTT;
+use strict;
+use vars qw(@ISA);
+@ISA = qw(SP);
 # -------------------------------------
 
 sub adjitems {
-	my ($self,$top,$c,$oldtags) = @_;
+	my ($self,$c,$oldtags) = @_;
 	my ($x,$y) = ($self->{x},$self->{y});
 	$self->{alias} = 1;
 	$self->{item} = $c->createRectangle(
@@ -8040,10 +7443,6 @@ sub adjitems {
 	$c->coords($self->{scri},
 		$x+38,$y-38,$x-38,$y+38,
 	);
-	$c->itemconfigure($self->{ttxt},-text=>$type);
-	$c->itemconfigure($self->{text},-text=>$self->{pcode});
-	$c->itemconfigure($self->{ownr},-text=>$self->{pownr});
-	$self->makecol($top,::COL_GTT);
 }
 
 #package GTT;
@@ -8060,8 +7459,10 @@ sub fillstatus {
 }
 
 # -------------------------------------
-package Network; use strict;
-@Network::ISA = qw(Logging Properties Status Clickable DualCollector);
+package Network;
+use strict;
+use vars qw(@ISA);
+@ISA = qw(Logging Properties Status Clickable DualCollector);
 # -------------------------------------
 
 my $network;
@@ -8080,13 +7481,14 @@ sub new {
 	$self->{msgnum} = 0;
 	$self->{nodes} = {};
 	$self->{nodeno} = 0;
-	$self->{datalinks} = {};
-	$self->{datalinkno} = 0;
+	$self->{channels} = {};
+	$self->{channelno} = 0;
 	$self->{relations} = {};
 	$self->{relationno} = 0;
 	my $c = $top->canvas;
 	$c->CanvasBind('<ButtonPress-3>',[\&Network::button3,$self,$top,Tk::Ev('X'),Tk::Ev('Y'),Tk::Ev('x'),Tk::Ev('y')]);
 	$Network::network = $self;
+	#print STDERR "D: discovered ".$self->identify."\n";
 	$top->setstatus("Discovered ".$self->identify);
 	return $self;
 }
@@ -8094,7 +7496,7 @@ sub new {
 #package Network;
 sub identify {
 	my $self = shift;
-	my $id = 'Network';
+	my $id = 'Newtork';
 	return ($self->{id} = $id);
 }
 
@@ -8102,6 +7504,141 @@ sub identify {
 sub shortid {
 	my $self = shift;
 	return "NET";
+}
+
+#package Network;
+sub getChannel {
+	my ($self,$top,$ppa,$dir,$xsn,@args) = @_;
+	return $self->{channels}->{$ppa} if $self->{channels}->{$ppa};
+	my $channelno = $self->{channelno} + 1;
+	my $loc = ::COL_ADJ;
+	my $nodea = $self->getNode($top,-$loc);
+	my $nodeb = $self->getNode($top, $loc);
+	my $channel = Channel->new($top,$self,$channelno,$ppa,$nodea,$nodeb,$dir,$xsn,@args);
+	$self->{channels}->{$ppa} = $channel;
+	$self->{channelno} = $channelno;
+	return $channel;
+}
+
+#package Network;
+sub getPath {
+	my ($self,$top,$channel,$side,$node,@args) = @_;
+	my $key = "$channel->{ppa}($side)$node->{pc}";
+	return $self->{paths}->{$key} if $self->{paths}->{$key};
+	my $pathno = $self->{pathno} + 1;
+	my $path = Path->new($top,$pathno,$channel,$side,$node,@args);
+	$self->{paths}->{$key} = $path;
+	$self->{pathno} = $pathno;
+	return $path;
+}
+
+#package Network;
+sub getNode {
+	my ($self,$top,$half,@args) = @_;
+	my $nodeno = $self->{nodeno} + 1;
+	my $node = Node->new($top,$nodeno,$half,@args);
+	$self->{pnodes}->{$nodeno} = $node;
+	$self->{nodeno} = $nodeno;
+	return $node;
+}
+
+#package Network;
+sub getSp {
+	my ($self,$top,$pc,@args) = @_;
+	return $self->{nodes}->{$pc} if $self->{nodes}->{$pc};
+	my $nodeno = $self->{nodeno} + 1;
+	my $node = SP->new($top,$nodeno,$pc,@args);
+	$self->{nodes}->{$pc} = $node;
+	$self->{nodeno} = $nodeno;
+	return $node;
+}
+
+#package Network;
+sub getRelation {
+	my ($self,$top,$nodea,$nodeb,@args) = @_;
+	my $key = "$nodea->{pc},$nodeb->{pc}";
+	return $self->{relations}->{$key} if $self->{relations}->{$key};
+	my $relationno = $self->{relationno} + 1;
+	my $relation = Relation->new($top,$relationno,$nodea,$nodeb,@args);
+	$self->{relations}->{$key} = $relation;
+	$key = "$nodeb->{pc},$nodea->{pc}";
+	$self->{relations}->{$key} = $relation;
+	$self->{relationno} = $relationno;
+	return $relation;
+}
+
+#package Network;
+sub getRouteset {
+	my ($self,$top,$channel,$nodea,$nodeb,@args) = @_;
+	my $key = "$nodea->{pc},$nodeb->{pc}";
+	return $self->{routesets}->{$key} if $self->{routesets}->{$key};
+	my $routesetno = $self->{routesetno} + 1;
+	my $routeset = Routeset->new($top,$self,$routesetno,$nodea,$nodeb,@args);
+	$self->{routesets}->{$key} = $routeset;
+	$self->{routesetno} = $routesetno;
+	return $routeset;
+}
+
+#package Network;
+sub getRoute {
+	my ($self,$top,$linkset,$side,$nodeb,@args) = @_;
+	my $nodea = $linkset->{node}->{$side};
+	my $key = "$nodea->{pc},$nodeb->{pc}";
+	return $self->{routes}->{$key} if $self->{routes}->{$key};
+	my $routeno = $self->{routeno} + 1;
+	my $route = Route->new($top,$routeno,$linkset,$side,$nodeb,@args);
+	$self->{routes}->{$key} = $route;
+	$self->{routeno} = $routeno;
+	return $route;
+}
+
+#package Network;
+sub getCombined {
+	my ($self,$top,$linkseta,$linksetb,@args) = @_;
+	my $key = "$linkseta->{key}::$linksetb->{key}";
+	return $self->{combineds}->{$key} if $self->{combined}->{$key};
+	my $combinedno = $self->{combinedno} + 1;
+	my $combined = Combined->new($top,$combinedno,$linkseta,$linksetb,@args);
+	$combined->{key} = $key;
+	$self->{combineds}->{$key} = $combined;
+	$key = "$linksetb->{key}::$linkseta->{key}";
+	$self->{combineds}->{$key} = $combined;
+	$self->{combinedno} = $combinedno;
+	return $combined;
+}
+
+#package Network;
+sub getLinkset {
+	my ($self,$top,$nodea,$nodeb,@args) = @_;
+	my $key = "$nodea->{pc},$nodeb->{pc}";
+	return $self->{linksets}->{$key} if $self->{linksets}->{$key};
+	my $linksetno = $self->{linksetno} + 1;
+	my $relation = $self->getRelation($top,$nodea,$nodeb,@args);
+	my $linkset = Linkset->new($top,$linksetno,$relation,@args);
+	$nodea->{linksets}->{$nodeb->{pc}} = $linkset;
+	$nodeb->{linksets}->{$nodea->{pc}} = $linkset;
+	$linkset->{key} = $key;
+	$relation->{linkset} = $linkset;
+	$self->{linksets}->{$key} = $linkset;
+	$key = "$nodeb->{pc},$nodea->{pc}";
+	$self->{linksets}->{$key} = $linkset;
+	$self->{linksetno} = $linksetno;
+	return $linkset;
+}
+
+#package Network;
+sub getLink {
+	my ($self,$top,$nodea,$nodeb,$slc,@args) = @_;
+	my $key = "$nodea->{pc},$nodeb->{pc}:$slc";
+	return $self->{links}->{$key} if $self->{links}->{$key};
+	my $linkno = $self->{linkno} + 1;
+	my $linkset = $self->getLinkset($top,$nodea,$nodeb,@args);
+	my $link = Link->new($top,$linkno,$linkset,$slc,@args);
+	$self->{links}->{$key} = $link;
+	$key = "$nodeb->{pc},$nodea->{pc}:$slc";
+	$self->{links}->{$key} = $link;
+	$self->{linkno} = $linkno;
+	return $link;
 }
 
 #package Network;
@@ -8140,11 +7677,26 @@ sub cmpkeys {
 	return 0;
 }
 
+sub cmppaths {
+	my ($j,$k) = @_;
+	my ($ja,$jb) = split(/[(]/,$j); my ($jb,$jc) = split(/[)]/,$jb);
+	my ($ka,$kb) = split(/[(]/,$k); my ($kb,$kc) = split(/[)]/,$kb);
+	return -1 if ($ja < $ka);
+	return  1 if ($ja > $ka);
+	return -1 if ($jc < $kc);
+	return  1 if ($jc > $kc);
+	return -1 if ($jb lt $kb);
+	return  1 if ($jb gt $kb);
+	return 0;
+}
+
 #package Network;
 sub getmore {
 	my ($self,$m,$top,$X,$Y) = @_;
 	my $have = {};
-	$have->{datalinks} = scalar keys %{$self->{datalinks}};
+	$have->{channels}  = scalar keys %{$self->{channels}};
+	$have->{paths}     = scalar keys %{$self->{paths}};
+	$have->{pnodes}	   = scalar keys %{$self->{pnodes}};
 	$have->{nodes}     = scalar keys %{$self->{nodes}};
 	$have->{relations} = scalar keys %{$self->{relations}};
 	$have->{routesets} = scalar keys %{$self->{routesets}};
@@ -8153,7 +7705,9 @@ sub getmore {
 	$have->{linksets}  = scalar keys %{$self->{linksets}};
 	$have->{links}     = scalar keys %{$self->{links}};
 	$m->add('separator') if
-		$have->{datalinks} +
+		$have->{channels} +
+		$have->{paths} +
+		$have->{pnodes} +
 		$have->{nodes} +
 		$have->{relations} +
 		$have->{routesets} +
@@ -8161,22 +7715,39 @@ sub getmore {
 		$have->{combined} +
 		$have->{linksets} +
 		$have->{links};
-	if ($have->{datalinks}) {
-		my $mc = $m->Menu(-title=>'Datalinks Menu');
+	if ($have->{channels}) {
+		my $mc = $m->Menu(-title=>'Channels Menu');
 		$mc->configure(-postcommand=>[sub {
 			my ($self,$mc,$top,$X,$Y) = @_;
 			$mc->delete(0,'end');
-			foreach my $ppa (sort {$a <=> $b} keys %{$self->{datalinks}}) {
-				my $datalink = $self->{datalinks}->{$ppa};
-				next unless $datalink;
-				my $label = 'Datalink '.$datalink->shortid;
+			foreach my $ppa (sort {$a <=> $b} keys %{$self->{channels}}) {
+				my $channel = $self->{channels}->{$ppa};
+				next unless $channel;
+				my $label = 'Channel '.$channel->shortid;
 				my $m3 = $mc->Menu(-title=>"$label Menu");
-				$datalink->getmenu($m3,$top,$X,$Y);
-				$datalink->getmore($m3,$top,$X,$Y);
+				$channel->getmenu($m3,$top,$X,$Y);
+				$channel->getmore($m3,$top,$X,$Y);
 				$mc->add('cascade',-menu=>$m3,-label=>$label);
 			}
 		},$self,$mc,$top,$X,$Y]);
-		$m->add('cascade',-menu=>$mc,-label=>'Datalinks');
+		$m->add('cascade',-menu=>$mc,-label=>'Channels');
+	}
+	if ($have->{paths}) {
+		my $mc = $m->Menu(-title=>'Paths Menu');
+		$mc->configure(-postcommand=>[sub {
+			my ($self,$mc,$top,$X,$Y) = @_;
+			$mc->delete(0,'end');
+			foreach my $key (sort {Network::cmppaths($a,$b)} keys %{$self->{paths}}) {
+				my $path = $self->{paths}->{$key};
+				next unless $path;
+				my $label = ref($path).' '.$path->shortid;
+				my $m3 = $mc->Menu(-title=>"$label Menu");
+				$path->getmenu($m3,$top,$X,$Y);
+				$path->getmore($m3,$top,$X,$Y);
+				$mc->add('cascade',-menu=>$m3,-label=>$label);
+			}
+		},$self,$mc,$top,$X,$Y]);
+		$m->add('cascade',-menu=>$mc,-label=>'Paths');
 	}
 	if ($have->{nodes}) {
 		my $mc = $m->Menu(-title=>'Nodes Menu');
@@ -8272,10 +7843,10 @@ sub fillstatus {
 	my ($self,$top,$tw,$row) = @_;
 
 	$tw->Label(%labelright,
-		-text=>'Number of datalinks:',
+		-text=>'Number of channels:',
 	)->grid(-row=>$$row,-column=>0,-sticky=>'ewns');
 	$tw->Entry(%entryright,
-		-textvariable=>\$self->{datalinkno},
+		-textvariable=>\$self->{channelno},
 	)->grid(-row=>$$row++,-column=>1,-sticky=>'ewns');
 	$tw->Label(%labelright,
 		-text=>'Number of nodes:',
@@ -8316,200 +7887,10 @@ sub fillstatus {
 }
 
 # -------------------------------------
-package Datalink; use strict;
-@Datalink::ISA = qw(Arcitem Pentastate Logging Properties Status Clickable MsgCollector MsgBuffer);
-# -------------------------------------
-
-#package Datalink;
-sub new {
-	my ($type,$top,$network,$dli,$nodea,$nodeb,$msg,@args) = @_;
-	my $self = {
-		no=>++$network->{datalinkno},
-		dli=>$dli,
-		ht=>$msg->{ht},
-		ts=>{
-			tv_sec=>$msg->{hdr}->{tv_sec},
-			tv_usec=>$msg->{hdr}->{tv_usec},
-		},
-		pr=>::MP_UNKNOWN,
-		rt=>::RT_UNKNOWN,
-		orig=>{},
-		dest=>{},
-		node=>{a=>$nodea,b=>$nodeb},
-	};
-	bless $self,$type;
-	$nodea->{datalinks}->{a}->{$dli} = $self;
-	$nodeb->{datalinks}->{b}->{$dli} = $self;
-	$network->{datalinks}->{$dli} = $self;
-	$self->Pentastate::init($top,'black');
-	$self->Logging::init($top,@args);
-	$self->Properties::init(@args);
-	$self->Status::init(@args);
-	$self->Clickable::init(@args);
-	$self->MsgCollector::init($top,@args);
-	$self->MsgBuffer::init(@args);
-	$self->Arcitem::init($top,$nodea,$nodeb,['node','relation','link','linkset'],[],'last',0);
-	$self->Clickable::attach($top,@args);
-	$self->log("header type set to ".$self->httext." by data link type") if $self->{ht};
-	return $self;
-}
-
-#package Datalink;
-sub bindit {
-	my ($self,$top,$network,$nodea,$nodeb,$msg) = @_;
-	return if $self->{link}; # already bound
-	($nodea,$nodeb) = ($nodeb,$nodea) if $msg->{dir};
-	my $slc = $self->{slc} = $msg->{slc};
-	my ($pnodea,$pnodeb) = ($self->{node}->{a},$self->{node}->{b});
-	$nodea->absorb($top,$pnodea);
-	$nodeb->absorb($top,$pnodeb);
-	($self->{node}->{a},$self->{node}->{b}) = ($nodea,$nodeb);
-	my $link = Link->get($top,$network,$nodea,$nodeb,$slc);
-	$self->{link} = $link;
-	$self->{dir} = $nodea->{pc} == $link->{node}->{a}->{pc} ? 0 : 1;
-	$link->{datalinks}->{$self->{dli}} = $self;
-	if ($self->{duplex}) {
-		$self->{yoff} = $link->{yoff};
-	} else {
-		if ($msg->{dir}^$self->{dir}) {
-			$self->{yoff} = $link->{yoff} + 1.5;
-		} else {
-			$self->{yoff} = $link->{yoff} - 1.5;
-		}
-	}
-	$link->addfrom($self,$self->{dir});
-	my $linkset = $link->{linkset};
-}
-
-#package Datalink;
-sub put_msg {
-	my ($self,$top,$network,$msg,@args) = @_;
-	# this is where detection is done.
-	unless ($self->{detected}) {
-		if ($self->detecting) {
-			$self->pushbufmsg($msg);
-			return;
-		}
-		$self->{detected} = 1;
-		$self->pushbufmsg($msg);
-		while ($msg = $self->shiftbufmsg()) {
-			$msg->decode($self);
-			$self->add_msg($top,$network,$msg);
-		}
-	} else {
-		$self->add_msg($top,$network,$msg);
-	}
-}
-
-#package Datalink;
-my %msghandler = (
-	0=>{
-	},
-	1=>{
-		0x11=>\&Channel::bindit,
-		0x12=>\&Channel::bindit,
-	},
-	2=>{
-		0x11=>\&Channel::bindit,
-		0x12=>\&Channel::bindit,
-	},
-);
-
-#package Datalink;
-sub add_msg {
-	my ($self,$top,$network,$msg,@args) = @_;
-	$self->inc($msg,$msg->{dir});
-	$self->pushmsg($msg);
-	$network->add_msg($top,$msg);
-	if (exists $msg->{saddr} or exists $msg->{dpc}) {
-		my ($cola,$colb,$sidea,$sideb,$dira,$dirb);
-		if ($msg->{dir}) {
-			$cola = $self->{node}->{b}->{col}; $sidea = 'b'; $dira = 1;
-			$colb = $self->{node}->{a}->{col}; $sideb = 'a'; $dirb = 0;
-		} else {
-			$cola = $self->{node}->{a}->{col}; $sidea = 'a'; $dira = 0;
-			$colb = $self->{node}->{b}->{col}; $sideb = 'b'; $dirb = 1;
-		}
-		if (exists $msg->{saddr}) {
-			$self->{node}->{a}->add_packet($msg,$dira);
-			$self->{node}->{b}->add_packet($msg,$dirb);
-		}
-		if (exists $msg->{dpc}) {
-			my $snode = SP->get($top,$network,$msg->{opc},$cola);
-			my $dnode = SP->get($top,$network,$msg->{dpc},$colb);
-			if (my $sub = $msghandler{$msg->{si}}->{$msg->{mt}}) {
-				&{$sub}($self,$top,$network,$snode,$dnode,$msg);
-			}
-			Route->get($top,$network,$self->{node}->{$sidea},$snode)->add_msg($top,$network,$msg,$dira);
-			Route->get($top,$network,$self->{node}->{$sideb},$dnode)->add_msg($top,$network,$msg,$dirb);
-			Routeset->get($top,$network,$snode,$dnode)->add_msg($top,$network,$msg,0);
-		}
-	}
-	$self->{link}->add_msg($top,$network,$msg,$msg->{dir}^$self->{dir}) if $self->{link};
-}
-
-#package Datalink;
-sub swap {
-	my ($self,$top) = @_;
-
-	my %seen = ();
-	my $nodea = $self->{node}->{a}; $nodea->swapcol($top); $seen{$nodea->{no}} = 1;
-	my $nodeb = $self->{node}->{b}; $nodeb->swapcol($top); $seen{$nodeb->{no}} = 1;
-	foreach my $route (values %{$nodea->{routes}->{a}}) {
-		my $node = $route->{node}->{b};
-		next if $seen{$node->{no}};
-		next if (($nodea->{col} < 0 && $node->{col} > 0) or
-			 ($nodea->{col} > 0 && $node->{col} < 0));
-		$node->swapcol($top);
-	}
-	foreach my $route (values %{$nodeb->{routes}->{a}}) {
-		my $node = $route->{node}->{b};
-		next if $seen{$node->{no}};
-		next if (($nodeb->{col} < 0 && $node->{col} > 0) or
-			 ($nodeb->{col} > 0 && $node->{col} < 0));
-		$node->swapcol($top);
-	}
-}
-
-#package Datalink;
-sub detecting {
-	my $self = shift;
-	return 0 if ($self->{ht} != ::HT_UNKNOWN && $self->{pr} != ::MP_UNKNOWN && $self->{rt} != ::RT_UNKNOWN);
-	return 1;
-}
-
-#package Datalink;
-sub httext { return $htoptions[{0=>0,3=>1,6=>2}->{shift->{ht}}]->[0]; }
-#package Datalink;
-sub setht {
-	my ($self,$ht,$oldht) = @_;
-	if (($oldht = $self->{ht}) != $ht) { $self->{ht} = $ht;
-		$self->log("detected header type ".$self->httext) if $oldht  == ::HT_UNKNOWN;
-	}
-}
-
-#package Datalink;
-sub rttext { return $rtoptions[{0=>0,4=>1,7=>2}->{shift->{rt}}]->[0]; }
-#package Datalink;
-sub setrt {
-	my ($self,$rt,$oldrt) = @_;
-	if (($oldrt = $self->{rt}) != $rt) { $self->{rt} = $rt;
-		$self->log("detected routing label ".$self->rttext) if $oldrt  == ::RT_UNKNOWN;
-	}
-}
-#package Datalink;
-sub prtext { return $mpoptions[shift->{pr}]->[0]; }
-#package Datalink;
-sub setpr {
-	my ($self,$pr,$oldpr) = @_;
-	if (($oldpr = $self->{pr}) != $pr) { $self->{pr} = $pr;
-		$self->log("detected priority type ".$self->prtext) if $oldpr == ::MP_UNKNOWN;
-	}
-}
-
-# -------------------------------------
-package Channel; use strict;
-@Channel::ISA = qw(Datalink);
+package Channel;
+use strict;
+use vars qw(@ISA);
+@ISA = qw(Arcitem Pentastate Logging Properties Status Clickable MsgCollector MsgBuffer);
 # -------------------------------------
 
 use constant {
@@ -8519,35 +7900,61 @@ use constant {
 };
 
 #package Channel;
-sub dli {
-	return pack('n',shift);
-}
-#package Channel;
-sub get {
-	my ($type,$top,$network,$msg,@args) = @_;
-	my $ppa = $msg->{ppa};
-	my $dli = Channel::dli($ppa);
-	my $self = $network->{datalinks}->{$dli};
-	return $self if $self;
-	my $way = $msg->{dir};
-	my $nodea = Node->get($top,$network,0 - ::COL_ADJ);
-	my $nodeb = Node->get($top,$network,0 + ::COL_ADJ);
-	($nodea,$nodeb) = ($nodeb,$nodea) unless $way & 0x1;
-	$self = Datalink::new($type,$top,$network,$dli,$nodea,$nodeb,$msg,@args);
+sub init {
+	my ($self,$top,$network,$channelno,$ppa,$nodea,$nodeb,$dir,$xsn,@args) = @_;
+	$self->Pentastate::init($top,'black');
+	$self->Logging::init($top,@args);
+	$self->Properties::init(@args);
+	$self->Status::init(@args);
+	$self->Clickable::init(@args);
+	$self->MsgCollector::init($top,@args);
+	$self->MsgBuffer::init(@args);
+	$self->{no} = $channelno;
 	$self->{ppa} = $ppa;
 	my ($card,$span,$slot) = Channel::chan($ppa);
-	if ($way & 0x2) {
+	#print STDERR "D: creating channel\n";
+	#print STDERR "D: creation message direction is ", $dir & 0x1 ? 'received' : 'transmitted', "\n";
+	#print STDERR "D: will swap roles of ",$nodea->shortid," and ",$nodeb->shortid,"\n";
+	if ($dir & 0x2) {
 		# monitored half-duplex channel in a known direction
-		my $ppa2 = $self->{ppa2} = Channel::ppa($card,$span^0x1,$slot);
+		#print STDERR "D: channel is a monitored half-duplex channel in a known direction\n";
+		my $ppa2 = Channel::ppa($card,$span^0x1,$slot);
 		# tell messages from the other span how to find us
-		$network->{datalinks}->{$ppa2} = $self;
-		$self->{dli} = $ppa2 unless $way & 0x1;
-	} elsif ($way & 0x4) {
+		$network->{channels}->{$ppa2} = $self;
+		$self->{ppa} = $ppa2 unless $dir & 0x1;
+	} elsif ($dir & 0x4) {
 		# monitored half-duplex channel in an unknown direction
+		#print STDERR "D: channel is a monitored half-duplex channel in an unknown direction\n";
 	} else {
-		$self->{duplex} = 1;
 		# active full-duplex channel in a known direction
+		#print STDERR "D: channel is an active full-duplex channel\n";
 	}
+	($nodea,$nodeb) = ($nodeb,$nodea) unless $dir & 0x1;
+	$self->{node}->{a} = $nodea;
+	$self->{node}->{b} = $nodeb;
+	$self->{xsn} = $xsn; # just to save it
+	$xsn = MTP2_ANNEX_A_USED_UNKNOWN unless 0 <= $xsn and $xsn <= 2;
+	$xsn = MTP2_ANNEX_A_NOT_USED     if $xsn == 2 and $slot != 0;
+	$xsn = MTP2_ANNEX_A_USED	 if $xsn == 2 and $slot == 0;
+	$self->{ht}     = $htoptions[[1,2,0]->[$xsn]]->[1];
+	$self->{pr}     = ::MP_UNKNOWN;
+	$self->{rt}     = ::RT_UNKNOWN;
+	$self->{orig} = {};
+	$self->{dest} = {};
+	$self->{paths} = {};
+	$self->{paths}->{a} = {};  # paths from the a-side
+	$self->{paths}->{b} = {};  # paths from the b-side
+	$self->Arcitem::init($top,$nodea,$nodeb,['node','relation','link','linkset'],[],'last',0);
+	$self->Clickable::attach($top,@args);
+	$self->log("header type set to ".$self->httext." by capture") if $self->{ht};
+}
+
+#package Channel;
+sub new {
+	my ($type,@args) = @_;
+	my $self = {};
+	bless $self,$type;
+	$self->init(@args);
 	return $self;
 }
 
@@ -8563,9 +7970,166 @@ sub chan {
 }
 
 #package Channel;
+sub bindchannel {
+	my ($self,$top,$network,$nodea,$nodeb,$msg) = @_;
+	return if $self->{link}; # already bound
+	#print STDERR "D: binding channel ".$self->identify."\n";
+	($nodea,$nodeb) = ($nodeb,$nodea) if $msg->{dir};
+	my $slc = $self->{slc} = $msg->{slc};
+	my ($pnodea,$pnodeb) = ($self->{node}->{a},$self->{node}->{b});
+	$nodea->absorb($top,$pnodea);
+	$nodeb->absorb($top,$pnodeb);
+	($self->{node}->{a},$self->{node}->{b}) = ($nodea,$nodeb);
+	my $link = $network->getLink($top,$nodea,$nodeb,$slc);
+	$self->{link} = $link;
+	$self->{dir} = $nodea->{pc} == $link->{node}->{a}->{pc} ? 0 : 1;
+	if ($msg->{dir}^$self->{dir}) {
+		$link->{channelrevs} = $self;
+		$self->{yoff} = $link->{yoff} + 1.5;
+	} else {
+		$link->{channelforw} = $self;
+		$self->{yoff} = $link->{yoff} - 1.5;
+	}
+	$link->addfrom($self,$self->{dir});
+	my $linkset = $link->{linkset};
+	foreach my $side (keys %{$self->{paths}}) {
+		foreach my $path (values %{$self->{paths}->{$side}}) {
+			my $lside = (($side eq 'a' and !$self->{dir}) or
+				     ($side eq 'b' and $self->{dir})) ? 'a' : 'b';
+			my $route = $linkset->getRoute($top,$network,$lside,$path->{node});
+			# TODO add path stats to route
+			my $pdir = ($path->{node}->{a} eq $route->{node}->{a}) ? 0 : 1;
+			$route->addfrom($path,$pdir);
+		}
+	}
+}
+
+#package Channel;
+sub getPath {
+	my ($self,$top,$network,$side,$node,@args) = @_;
+	my $pc = $node->{pc};
+	return $self->{paths}->{$side}->{$pc} if $self->{paths}->{$side}->{$pc};
+	my $path = $network->getPath($top,$self,$side,$node,@args);
+	$self->{paths}->{$side}->{$pc} = $path;
+	return $path;
+}
+
+#package Channel;
+sub add_msg {
+	my ($self,$top,$network,$msg,@args) = @_;
+	unless ($self->{detected}) {
+		if ($self->detecting) {
+			$self->pushbuf($msg);
+			return;
+		}
+		$self->{detected} = 1;
+		$self->pushbuf($msg);
+		while ($msg = $self->shiftbuf()) {
+			$msg->decode($self);
+			$self->complete($top,$network,$msg);
+		}
+	} else {
+		$self->complete($top,$network,$msg);
+	}
+}
+my %msghandler = (
+	0=>{
+	},
+	1=>{
+		0x11=>\&Channel::bindchannel,
+		0x12=>\&Channel::bindchannel,
+	},
+	2=>{
+		0x11=>\&Channel::bindchannel,
+		0x12=>\&Channel::bindchannel,
+	},
+);
+#package Channel;
+sub complete {
+	my ($self,$top,$network,$msg,@args) = @_;
+	$self->inc($msg,$msg->{dir});
+	$self->pushmsg($msg);
+	$network->add_msg($top,$msg);
+	if (exists $msg->{dpc}) {
+		my ($cola,$colb,$sidea,$sideb,$dira,$dirb);
+		if ($msg->{dir}) {
+			$cola = $self->{node}->{b}->{col}; $sidea = 'b'; $dira = 1;
+			$colb = $self->{node}->{a}->{col}; $sideb = 'a'; $dirb = 0;
+		} else {
+			$cola = $self->{node}->{a}->{col}; $sidea = 'a'; $dira = 0;
+			$colb = $self->{node}->{b}->{col}; $sideb = 'b'; $dirb = 1;
+		}
+		my $nodea = $network->getSp($top,$msg->{opc},$cola);
+		my $nodeb = $network->getSp($top,$msg->{dpc},$colb);
+		if (my $sub = $msghandler{$msg->{si}}->{$msg->{mt}}) {
+			&{$sub}($self,$top,$network,$nodea,$nodeb,$msg);
+		}
+		$self->getPath($top,$network,$sidea,$nodea)->add_msg($top,$network,$msg,$dira);
+		$self->getPath($top,$network,$sideb,$nodeb)->add_msg($top,$network,$msg,$dirb);
+		$network->getRouteset($top,$self,$nodea,$nodeb)->add_msg($top,$network,$msg,0);
+	}
+	$self->{link}->add_msg($top,$network,$msg,$msg->{dir}^$self->{dir}) if $self->{link};
+}
+#package Channel;
+sub swap {
+	my ($self,$top) = @_;
+
+	my $nodea = $self->{node}->{a}; $nodea->swapcol($top);
+	my $nodeb = $self->{node}->{b}; $nodeb->swapcol($top);
+	foreach my $path (values %{$self->{opcs}}) {
+		my $node = $path->{node};
+		next if $node eq $nodea or $node eq $nodeb;
+		$node->swapcol($top) if $nodea->{col} < 0 && $node->{col} > 0;
+	}
+	foreach my $path (values %{$self->{dpcs}}) {
+		my $node = $path->{node};
+		next if $node eq $nodea or $node eq $nodeb;
+		$node->swapcol($top) if $nodeb->{col} < 0 && $node->{col} > 0;
+	}
+}
+#package Channel;
+sub detecting {
+	my $self = shift;
+	return 0 if ($self->{ht} != 0 && $self->{pr} != 0 && $self->{rt} != 0);
+	return 1;
+}
+
+#package Channel;
+sub httext { return $htoptions[{0=>0,3=>1,6=>2}->{shift->{ht}}]->[0]; }
+#package Channel;
+sub setht {
+	my ($self,$ht,$oldht) = @_;
+	if (($oldht = $self->{ht}) != $ht) { $self->{ht} = $ht;
+		#print STDERR "D: detected header type ", $self->httext, " for ", $self->identify, "\n";
+		$self->log("detected header type ".$self->httext) if $oldht  == ::HT_UNKNOWN;
+	}
+}
+
+#package Channel;
+sub rttext { return $rtoptions[{0=>0,4=>1,7=>2}->{shift->{rt}}]->[0]; }
+#package Channel;
+sub setrt {
+	my ($self,$rt,$oldrt) = @_;
+	if (($oldrt = $self->{rt}) != $rt) { $self->{rt} = $rt;
+		#print STDERR "D: detected routing label ", $self->rttext, " for ", $self->identify, "\n";
+		$self->log("detected routing label ".$self->rttext) if $oldrt  == ::RT_UNKNOWN;
+	}
+}
+#package Channel;
+sub prtext { return $mpoptions[shift->{pr}]->[0]; }
+#package Channel;
+sub setpr {
+	my ($self,$pr,$oldpr) = @_;
+	if (($oldpr = $self->{pr}) != $pr) { $self->{pr} = $pr;
+		#print STDERR "D: detected priority type ", $self->prtext, " for ", $self->identify, "\n";
+		$self->log("detected priority type ".$self->prtext) if $oldpr == ::MP_UNKNOWN;
+	}
+}
+
+#package Channel;
 sub identify {
 	my $self = shift;
-	my ($card,$span,$slot) = Channel::chan($self->{dli});
+	my ($card,$span,$slot) = Channel::chan($self->{ppa});
 	my $id = "Channel $card:$span:$slot";
 	$id .= ", $self->{node}->{a}->{pcode} -> $self->{node}->{b}->{pcode} link $self->{slc}"
 		if $self->{node}->{a} and $self->{node}->{a}->isa('SP');
@@ -8575,23 +8139,9 @@ sub identify {
 #package Channel;
 sub shortid {
 	my $self = shift;
-	my ($card,$span,$slot) = Channel::chan($self->{dli});
+	my ($card,$span,$slot) = Channel::chan($self->{ppa});
 	return "$card:$span:$slot";
 }
-
-
-#package Channel;
-sub process {
-	my ($self,$top,$network,$msg) = @_;
-
-	bless $msg,'Mtp2Message';
-	if ($msg->decode($self) >= 0) {
-		$self->put_msg($top,$network,$msg);
-		return;
-	}
-	print STDERR "W: $msg: decoding error, messages discarded\n";
-}
-
 
 #package Channel;
 sub getmore {
@@ -8684,573 +8234,6 @@ sub fillstatus {
 	)->grid(-row=>$$row++,-column=>1,-sticky=>'ewns');
 	$self->fillstate($top,$tw,$row);
 }
-
-# -------------------------------------
-package Stream; use strict;
-# -------------------------------------
-
-#package Stream;
-sub new {
-	my ($type,$top,$network,$assoc,$dir,$chunk) = @_;
-	my $self = {};
-	bless $self,$type;
-	$self->{assoc} = $assoc;
-	$self->{chunks} = [];
-	return $self if $chunk->{flags} & 0x4;
-	my $beg = (($chunk->{flags} & 0x2) != 0);
-	my $end = (($chunk->{flags} & 0x1) != 0);
-	return $self unless $beg;
-	$self->{ssn} = $chunk->{ssn};
-	if ($end) {
-		$assoc->add_msgs($top,$network,$dir,$chunk);
-	} else {
-		push @{$self->{chunks}}, $chunk;
-	}
-	return $self;
-}
-
-sub add_chunk {
-	my ($self,$top,$network,$assoc,$dir,$oos,$chunk) = @_;
-	return if $chunk->{flags} & 0x4;
-	my $beg = (($chunk->{flags} & 0x2) != 0);
-	my $end = (($chunk->{flags} & 0x1) != 0);
-	if ($beg) {
-		$self->{chunks} = [];
-		$self->{ssn} = $chunk->{ssn};
-		if ($end) {
-			$assoc->add_chunks($top,$network,$dir,[$chunk]);
-		} else {
-			push @{$self->{chunks}}, $chunk;
-		}
-		($self->{beg},$self->{end}) = ($beg,$end);
-		return;
-	}
-	if ($oos or $self->{ssn} != $chunk->{ssn}) {
-		$self->{chunks} = [];
-		return;
-	}
-	if ($end) {
-		push @{$self->{chunks}}, $chunk;
-		$assoc->add_chunks($top,$network,$dir,$self->{chunks});
-		$self->{chunks} = [];
-	}
-}
-
-# -------------------------------------
-package Association; use strict;
-@Association::ISA = qw(Datalink PktCollector PktBuffer);
-# -------------------------------------
-
-#package Association;
-sub dli {
-	my $hdr = shift;
-	return pack('nnN', $hdr->{sport},$hdr->{dport},$hdr->{vtag});
-}
-#package Association;
-sub find {
-	my ($type,$top,$network,$msg,@args) = @_;
-	my $dli = $type::dli($msg);
-	return $network->{datalinks}->{$dli} if $network->{datalinks}->{$dli};
-	return undef;
-}
-#package Association;
-sub get {
-	my ($type,$top,$network,$msg,@args) = @_;
-	my $dli = Association::dli($msg);
-	my $self = $network->{datalinks}->{$dli};
-	return $self if $self;
-	my ($addra,$addrb,$cola,$colb);
-	if ($msg->{dir} == ::SLL_DIR_RECEIVED) {
-		$addra = $msg->{daddr}; $cola = 0 + ::COL_ADJ;
-		$addrb = $msg->{saddr}; $colb = 0 - ::COL_ADJ;
-	} else {
-		$addra = $msg->{saddr}; $cola = 0 - ::COL_ADJ;
-		$addrb = $msg->{daddr}; $colb = 0 + ::COL_ADJ;
-	}
-	my $hosta = Host->get($top,$network,$addra,$cola);
-	my $hostb = Host->get($top,$network,$addrb,$colb);
-	$self = Datalink::new($type,$top,$network,$dli,$nodea,$nodeb,$msg,@args);
-	$self->PktCollector::init($top,@args);
-	$self->PktBuffer::init(@args);
-	$self->{sport} = $msg->{sport};
-	$self->{dport} = $msg->{dport};
-	$self->{vtag} = $msg->{vtag};
-	$self->{duplex} = 1;
-	$self->{mtype} = $type; $self->{mtype} =~ s/Association/Message/;
-	$self->{acks}     = {0=>undef,1=>undef};    # cumm. acks
-	$self->{tsns}     = {0=>{},   1=>{}};	    # data chunks
-	$self->{streams}  = {0=>{},   1=>{}};	    # streams
-	$self->{chunks}   = {0=>[],   1=>[]};	    # reassembled messages
-	$self->{ulps}     = {0=>[],   1=>[]};
-	return $self;
-}
-
-#package Association;
-sub bindit {
-	my ($self,@args) = @_;
-	# XXX: remember to set $msg->{dir} to 1 for ::SLL_DIR_RECEIVED
-	$self->SUPER::bindit(@args);
-}
-
-#package Association;
-sub identify {
-	my $self = shift;
-	my $name = ref($self); $name~=s/_/ /g;
-	my $id = sprintf("$name %d::%d(%08x)", $self->{sport},$self->{dport},$self->{vtag});
-	$id .= ", $self->{node}->{a}->{pcode} <=> $self->{node}->{b}->{pcode} link $self->{slc}"
-		if $self->{node}->{a} and $self->{node}->{a}->isa('SP');
-	$id .= ", $self->{node}->{a}->{ipaddr} <=> $self->{node}->{b}->{ipaddr}"
-		if $self->{node}->{a} and $self->{node}->{a}->isa('Host'};
-	return ($self->{id} = $id);
-}
-
-#package Association;
-sub shortid {
-	my $self = shift;
-	return sprintf("%d::%d(%08x)", $self->{sport},$self->{dport},$self->{vtag});
-}
-
-#package Association;
-sub hit {
-	my ($self,$msg,$dir) = @_;
-	$self->SUPER::hit($msg,$dir);
-	$self->{node}->{a}->hit($msg,$dir^0x0);
-	$self->{node}->{b}->hit($msg,$dir^0x1);
-}
-
-#package Association;
-sub add_chunks {
-	my ($self,$top,$network,$dir,$chunks) = @_;
-	push @{$self->{ulps}->{$dir}}, ULPLayer->new($top,$network,$dir,$chunks);
-}
-
-#package Association;
-sub add_chunk {
-	my ($self,$top,$network,$dir,$oos,$chunk) = @_;
-	if (my $stream = $self->{streams}->{$dir}->{$chunk->{stream}}) {
-		$stream->add_chunk($top,$network,$self,$dir,$oos,$chunk);
-	} else {
-		$self->{streams}->{$dir}->{$chunk->{stream}}
-			= Stream->new($top,$network,$self,$dir,$chunk);
-	}
-}
-
-#package Association;
-sub add_pkt {
-	my ($self,$top,$network,$pkt,$chunks) = @_;
-	my $dir = (exists $self->{node}->{a}->{ipaddrs}->{$pkt->{saddr}}) ? 0 : 1;
-	# do packet stats here
-	$self->hit($pkt,$dir);
-
-	foreach my $chunk (@{$chunks}) {
-		if ($chunk->{ctype} == 0) { # DATA
-			my $dir = $pkt->{dir};
-			$self->{acks}->{$dir} = $chunk->{tsn} unless exists $self->{acks}->{$dir};
-			my $cumm = $self->{acks}->{$dir};
-			my $num = $chunk->{tsn} - $cumm;
-			next if $num <= 0; # duplicate or a cleared tsn
-			next if exists $self->{tsns}->{$dir}->{$num}; # duplicate not cleared
-			$self->{tsns}->{$dir}->{$num} = $chunk;
-		} elsif ($chunk->{ctype} == 3 or $chunk->{ctype} == 7) { # SACK or SHUTDOWN
-			my $dir = $pkt->{dir} ^ 0x01;
-			$self->{acks}->{$dir} = $chunk->{cumm} unless exists $self->{acks}->{$dir};
-			my $cumm = $self->{acks}->{$dir};
-			my $cack = $chunk->{cumm} - $cumm;
-			next if $cack <= 0; # doesn't ack anything
-			my $seq = undef;
-			foreach my $num (sort {$a<=>$b} keys %{$self->{tsns}->{$dir}}) {
-				$seq = $num unless defined $seq;
-				my $chunk = $self->{tsns}->{$dir}->{$num};
-				delete $self->{tsns}->{$dir}->{$num};
-				if ($num <= $cack) {
-					my $oos = ($seq != $num);
-					# clear chunks numbered less than or equal to $cack
-					$self->add_chunk($top,$network,$dir,$oos,$chunk);
-					$seq++;
-				} else {
-					# renumber chunks in tsn queue to number - $cack;
-					$self->{tsns}->{$dir}->{$num-$cack} = $chunk;
-				}
-			}
-		}
-	}
-}
-
-#package Association;
-sub fillprops {
-	my ($self,$top,$tw,$row) = @_;
-
-	$tw->Label(%labelright,
-		-text=>'Source port:',
-	)->grid(-row=>$$row,-column=>0,-sticky=>'ewns');
-	$tw->Entry(%entryleft,
-		-textvariable=>\$self->{sport},
-	)->grid(-row=>$$row++,-column=>1,-sticky=>'ewns');
-	$tw->Label(%labelright,
-		-text=>'Destination port:',
-	)->grid(-row=>$$row,-column=>0,-sticky=>'ewns');
-	$tw->Entry(%entryleft,
-		-textvariable=>\$self->{dport},
-	)->grid(-row=>$$row++,-column=>1,-sticky=>'ewns');
-	$tw->Label(%labelright,
-		-text=>'Verification tag:',
-	)->grid(-row=>$$row,-column=>0,-sticky=>'ewns');
-	$tw->Entry(%entryleft,
-		-textvariable=>\$self->{vtag},
-	)->grid(-row=>$$row++,-column=>1,-sticky=>'ewns');
-}
-
-sub fillstatus {
-	my ($self,$top,$tw,$row) = @_;
-	$self->SUPER::fillstatus($top,$tw,$row);
-}
-
-# -------------------------------------
-package M2PA_Association; use strict;
-@M2PA_Association::ISA = qw(Association);
-# -------------------------------------
-
-#package M2PA_Association;
-sub dli {
-	return pack('N',5).SUPER::dli(shift);
-}
-
-#package M2PA_Association;
-sub get {
-	return SUPER::get(@_);
-}
-
-#package M2PA_Association;
-sub add_pkt {
-	my ($self,$top,$network,$pkt) = @_;
-
-	# process chunks into complete messages
-	$self->SUPER::add_pkt($top,$network,$pkt);
-
-	foreach my $dir (%{$self->{ulps}}) {
-		foreach my $msg (@{$self->{ulps}->{$dir}}) {
-			bless $msg,'M2paMessage';
-			if ($msg->decode($self) >= 0) {
-				$self->add_msg($top,$network,$msg,$dir);
-				next;
-			}
-			print STDERR "W: $m: decoding error, message discarded\n";
-		}
-	}
-}
-
-#package M2PA_Association;
-
-# Same as base class because it is really an SS7 signalling link.
-
-# -------------------------------------
-package M2UA_Interface; use strict;
-@M2UA_Interface::ISA = qw(Datalink);
-# -------------------------------------
-
-#package M2UA_Interface;
-sub dli {
-	my ($assoc,$iid) = @_;
-	return pack('N', 2).SUPER::dli($assoc).pack('N',$iid);
-}
-
-#package M2UA_Interface;
-sub get {
-	my ($type,$top,$network,$assoc,$iid,$msg,@args) = @_;
-	my $self = $assoc->{iids}->{$iid};
-	return $self if $self;
-	my $dli = M2UA_Interface::dli($assoc,$iid);
-	my $nodea = $assoc->{node}->{a};
-	my $nodeb = $assoc->{node}->{b};
-	$self = Datalink::new($type,$top,$network,$dli,$nodea,$nodeb,$msg,@args);
-	$assoc->{iids}->{$iid} = $self;
-	$self->{assoc} = $assoc;
-	$self->{duplex} = 1;
-	return $self;
-}
-
-# -------------------------------------
-package M2UA_Association; use strict;
-@M2UA_Association::ISA = qw(Association);
-# -------------------------------------
-
-# Different than the base class because there can be multiple interface
-# identifiers for any given SCTP association.  Each interface identifier could
-# theoretically belong to a different linkset and are definitely different
-# links.  Therefore, we cannot bind an association to a link in a linkset, but
-# can only bind an interface identifier.
-
-#package M2UA_Association;
-sub get {
-	my ($type,$top,$network,$saddr,$daddr,$sport,$dport,$vtag,$way,$ht,@args) = @_;
-	my $self = Association::get(@_);
-	$self->{iids} = {} unless exists $self->{iids};
-	return $self;
-}
-
-#package M2UA_Association;
-sub add_pkt {
-	my ($self,$top,$network,$pkt) = @_;
-
-	# process chunks into complete messages
-	$self->SUPER::add_pkt($top,$network,$pkt);
-
-	foreach my $dir (%{$self->{ulps}}) {
-		foreach my $msg (@{$self->{ulps}->{$dir}}) {
-			bless $msg,'M2uaMessage';
-			if ($msg->decode($top,$network,$self) >= 0) {
-				$msg->{interface}->add_msg($top,$network,$msg,$dir);
-				next;
-			}
-			print STDERR "W: $m: decoding error, message discarded\n";
-		}
-	}
-}
-
-
-# -------------------------------------
-package M3UA_Routing; use strict;
-@M3UA_Routing::ISA = qw(Datalink);
-# -------------------------------------
-
-#package M3UA_Routing;
-sub dli {
-	my ($assoc,$rc) = @_;
-	return pack('NnnNN',3,$assoc->{sport},$assoc->{dport},$assoc->{vtag},$rc);
-}
-
-#package M3UA_Routing;
-sub get {
-	my ($type,$top,$network,$assoc,$rc,$msg,@args) = @_;
-	my $self->assoc->{rcs}->{$rc};
-	return $self if $self;
-	my $dli = M3UA_Routing::dli($assoc,$rc);
-	my $nodea = $assoc->{node}->{a};
-	my $nodeb = $assoc->{node}->{b};
-	$self = Datalink::new($type,$top,$network,$dli,$nodea,$nodeb,$msg,@args);
-	$assoc->{rcs}->{$rc} = $self;
-	$self->{assoc} = $assoc;
-	$self->{duplex} = 1;
-	return $self;
-}
-
-# -------------------------------------
-package M3UA_Association; use strict;
-@M3UA_Association::ISA = qw(Association);
-# -------------------------------------
-
-# Different than the base class because there are really no signalling links
-# defined.  A group of assocations are, however, be equivalent to a linkset.  So
-# instead of identifying signalling links by SLC (gleened from SLTM/SLTA
-# messages), their groups must be identified.  This can be peformed by checking
-# originating hardware addresses, host ip addresses, SLS distributions and
-# routes to SPs from each end of the association.
-
-
-#package M3UA_Association;
-sub get {
-	my $self = Association::get(@_);
-	$self->{rcs} = {} unless exists $self->{rcs};
-	return $self;
-}
-
-#package M3UA_Association;
-sub add_pkt {
-	my ($self,$top,$network,$pkt) = @_;
-
-	# process chunks into complete messages
-	$self->SUPER::add_pkt($top,$network,$pkt);
-
-	foreach my $dir (%{$self->{ulps}}) {
-		foreach my $msg (@{$self->{ulps}->{$dir}}) {
-			bless $msg,'M3uaMessage';
-			if ($msg->decode($top,$network,$self) >= 0) {
-				$msg->{routing}->add_msg($top,$network,$msg,$dir);
-				next;
-			}
-			print STDERR "W: $m: decoding error, message discarded\n";
-		}
-	}
-}
-
-# -------------------------------------
-package SUA_Routing; use strict;
-@SUA_Routing::ISA = qw(Datalink);
-# -------------------------------------
-
-#package SUA_Routing;
-sub dli {
-	my ($assoc,$rc) = @_;
-	return pack('NnnNN',4,$assoc->{sport},$assoc->{dport},$assoc->{vtag},$rc);
-}
-
-#package SUA_Routing;
-sub get {
-	my ($type,$top,$network,$assoc,$rc,$msg,@args) = @_;
-	my $self->assoc->{rcs}->{$rc};
-	return $self if $self;
-	my $dli = SUA_Routing::dli($assoc,$rc);
-	my $nodea = $assoc->{node}->{a};
-	my $nodeb = $assoc->{node}->{b};
-	$self = Datalink::new($type,$top,$network,$dli,$nodea,$nodeb,$msg,@args);
-	$assoc->{rcs}->{$rc} = $self;
-	$self->{assoc} = $assoc;
-	$self->{duplex} = 1;
-	return $self;
-}
-
-# -------------------------------------
-package SUA_Association; use strict;
-@SUA_Association::ISA = qw(Association);
-# -------------------------------------
-
-#package SUA_Association;
-sub get {
-	my $self = Association::get(@_);
-	$self->{rcs} = {} unless exists $self->{rcs};
-	return $self;
-}
-
-#package SUA_Association;
-sub get {
-	my $self = Association::get(@_);
-	$self->{rcs} = {} unless exists $self->{rcs};
-	return $self;
-}
-
-#package SUA_Association;
-sub add_pkt {
-	my ($self,$top,$network,$pkt) = @_;
-
-	# process chunks into complete messages
-	$self->SUPER::add_pkt($top,$network,$pkt);
-
-	foreach my $dir (%{$self->{ulps}}) {
-		foreach my $msg (@{$self->{ulps}->{$dir}}) {
-			bless $msg,'SuaMessage';
-			if ($msg->decode($top,$network,$self) >= 0) {
-				$msg->{routing}->add_msg($top,$network,$msg,$dir);
-				next;
-			}
-			print STDERR "W: $m: decoding error, message discarded\n";
-		}
-	}
-}
-
-# -------------------------------------
-package PcapSource; use strict;
-# -------------------------------------
-
-sub new {
-	my ($type,@args) = @_;
-	my $self = {};
-	bless $self,$type;
-	return $self;
-}
-
-# -------------------------------------
-package PcapSavefile; use strict;
-@PcapSavefile::ISA = qw(PcapSource);
-# -------------------------------------
-
-sub new {
-	my ($type,$top,$file) = @_;
-	my $self = PcapSource::new(@_);
-	my $err = '';
-	my $pcap;
-
-	unless ($pcap = Net::Pcap::pcap_open_offline($file, \$err)) {
-		my $d = $w->Dialog(
-			-text=>"Non-Fatal Error",
-			-text=>"Could not open file:\n\n\t$file\n\nError was: $err",
-			-default_button=>'Dismiss',
-			-buttons=>qw/Dismiss/,
-		);
-		$d->Show;
-		$d->destroy;
-		return undef;
-	}
-	$top->{network} = new Network($top);
-}
-
-sub getmsg {
-	my ($self,$hdr,$dat) = @_;
-}
-
-# -------------------------------------
-package PcapCapture; use strict;
-@PcapCapture::ISA = qw(PcapSource);
-# -------------------------------------
-
-sub new {
-	my $self = PcapSource::new(@_);
-}
-
-sub getmsg {
-	my ($self,$hdr,$dat) = @_;
-}
-
-# -------------------------------------
-package PcapSecondarySource; use strict;
-@PcapSecondarySource::ISA = qw(PcapSource);
-# -------------------------------------
-
-sub new {
-	my ($type,$source,$dltype) = @_;
-	my $self = PcapSource::new(@_);
-	$self->{source} = $source;
-	$self->{dltype} = $dltype;
-	return $self;
-}
-
-sub getmsg {
-	my ($self,$hdr,$dat) = @_;
-	return $self->{source}->getmsg($hdr,$dat);
-}
-
-sub service {
-	my ($self,$top,$network) = @_;
-
-	my %hdr = ();
-	my $dat = '';
-	my $ret;
-
-	while (($ret = $self->getmsg(\$hdr,\$dat)) == 0) {
-		if (my $msg = create PcapMessage($top,$network,$self,$hdr,$dat,$self->{dltype})) {
-			$msg->process($top,$network);
-		}
-	}
-}
-
-
-# -------------------------------------
-package PcapMtp2withphdrSource; use strict;
-@PcapMtp2withphdrSource::ISA = qw(PcapSecondarySource);
-# -------------------------------------
-
-
-# -------------------------------------
-package PcapLinuxCookedSource; use strict;
-@PcapLinuxCookedSource::ISA = qw(PcapSecondarySource);
-# -------------------------------------
-
-# -------------------------------------
-package PcapEthernetSource; use strict;
-@PcapEthernetSource::ISA = qw(PcapSecondarySource);
-# -------------------------------------
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 # -------------------------------------
 # -------------------------------------
@@ -9349,7 +8332,8 @@ my %ssncodes = (
 
 
 # -------------------------------------
-package Field; use strict;
+package Field;
+use strict;
 # -------------------------------------
 sub new {
 	my ($type,@args) = @_;
@@ -9359,8 +8343,7 @@ sub new {
 }
 
 # -------------------------------------
-package BitField; use strict;
-@BitField::ISA = qw(Field);
+package BitField; use strict; use vars qw(@ISA); @ISA = qw(Field);
 # -------------------------------------
 sub new {
 	my ($type,$b,$p,$s,$e,@args) = @_;
@@ -9431,256 +8414,224 @@ sub makeentry {
 }
 
 # ------------------------------------
-package SnField; use strict;
-@SnField::ISA = qw(BitField);
+package SnField; use strict; use vars qw(@ISA); @ISA = qw(BitField);
 # ------------------------------------
 sub new {
 	my ($type,$b,$p,@args) = @_;
 	return BitField::new($type,$b,$p,0,6,@args);
 }
 # ------------------------------------
-package IbField; use strict;
-@IbField::ISA = qw(BitField);
+package IbField; use strict; use vars qw(@ISA); @ISA = qw(BitField);
 # ------------------------------------
 sub new {
 	my ($type,$b,$p,@args) = @_;
 	return BitField::new($type,$b,$p,7,7,@args);
 }
 # ------------------------------------
-package XsnField; use strict;
-@XsnField::ISA = qw(BitField);
+package XsnField; use strict; use vars qw(@ISA); @ISA = qw(BitField);
 # ------------------------------------
 sub new {
 	my ($type,$b,$p,@args) = @_;
 	return BitField::new($type,$b,$p,0,11,@args);
 }
 # ------------------------------------
-package Xsn0Field; use strict;
-@Xsn0Field::ISA = qw(BitField);
+package Xsn0Field; use strict; use vars qw(@ISA); @ISA = qw(BitField);
 # ------------------------------------
 sub new {
 	my ($type,$b,$p,@args) = @_;
 	return BitField::new($type,$b,$p,4,6,@args);
 }
 # ------------------------------------
-package BsnField; use strict;
-@BsnField::ISA = qw(SnField);
+package BsnField; use strict; use vars qw(@ISA); @ISA = qw(SnField);
 # ------------------------------------
 sub new {
 	my ($type,$b,$p,@args) = @_;
 	return SnField::new($type,$b,$p+0,@args);
 }
 # ------------------------------------
-package BibField; use strict;
-@BibField::ISA = qw(IbField);
+package BibField; use strict; use vars qw(@ISA); @ISA = qw(IbField);
 # ------------------------------------
 sub new {
 	my ($type,$b,$p,@args) = @_;
 	return SnField::new($type,$b,$p+0,@args);
 }
 # ------------------------------------
-package FsnField; use strict;
-@FsnField::ISA = qw(SnField);
+package FsnField; use strict; use vars qw(@ISA); @ISA = qw(SnField);
 # ------------------------------------
 sub new {
 	my ($type,$b,$p,@args) = @_;
 	return SnField::new($type,$b,$p+1,@args);
 }
 # ------------------------------------
-package FibField; use strict;
-@FibField::ISA = qw(IbField);
+package FibField; use strict; use vars qw(@ISA); @ISA = qw(IbField);
 # ------------------------------------
 sub new {
 	my ($type,$b,$p,@args) = @_;
 	return IbField::new($type,$b,$p+1,@args);
 }
 # ------------------------------------
-package LiField; use strict;
-@LiField::ISA = qw(BitField);
+package LiField; use strict; use vars qw(@ISA); @ISA = qw(BitField);
 # ------------------------------------
 sub new {
 	my ($type,$b,$p,@args) = @_;
 	return BitField::new($type,$b,$p+2,0,5,@args);
 }
 # ------------------------------------
-package Li0Field; use strict;
-@Li0Field::ISA = qw(BitField);
+package Li0Field; use strict; use vars qw(@ISA); @ISA = qw(BitField);
 # ------------------------------------
 sub new {
 	my ($type,$b,$p,@args) = @_;
 	return BitField::new($type,$b,$p+2,6,7,@args);
 }
 # ------------------------------------
-package JmpField; use strict;
-@JmpField::ISA = qw(BitField);
+package JmpField; use strict; use vars qw(@ISA); @ISA = qw(BitField);
 # ------------------------------------
 sub new {
 	my ($type,$b,$p,@args) = @_;
 	return BitField::new($type,$b,$p+2,6,7,@args);
 }
 # ------------------------------------
-package XBsnField; use strict;
-@XBsnField::ISA = qw(XsnField);
+package XBsnField; use strict; use vars qw(@ISA); @ISA = qw(XsnField);
 # ------------------------------------
 sub new {
 	my ($type,$b,$p,@args) = @_;
 	return XsnField::new($type,$b,$p+0,@args);
 }
 # ------------------------------------
-package XBsn0Field; use strict;
-@XBsn0Field::ISA = qw(Xsn0Field);
+package XBsn0Field; use strict; use vars qw(@ISA); @ISA = qw(Xsn0Field);
 # ------------------------------------
 sub new {
 	my ($type,$b,$p,@args) = @_;
 	return Xsn0Field::new($type,$b,$p+1,@args);
 }
 # ------------------------------------
-package XBibField; use strict;
-@XBibField::ISA = qw(IbField);
+package XBibField; use strict; use vars qw(@ISA); @ISA = qw(IbField);
 # ------------------------------------
 sub new {
 	my ($type,$b,$p,@args) = @_;
 	return IbField::new($type,$b,$p+1,@args);
 }
 # ------------------------------------
-package XFsnField; use strict;
-@XFsnField::ISA = qw(XsnField);
+package XFsnField; use strict; use vars qw(@ISA); @ISA = qw(XsnField);
 # ------------------------------------
 sub new {
 	my ($type,$b,$p,@args) = @_;
 	return XsnField::new($type,$b,$p+2,@args);
 }
 # ------------------------------------
-package XFsn0Field; use strict;
-@XFsn0Field::ISA = qw(Xsn0Field);
+package XFsn0Field; use strict; use vars qw(@ISA); @ISA = qw(Xsn0Field);
 # ------------------------------------
 sub new {
 	my ($type,$b,$p,@args) = @_;
 	return Xsn0Field::new($type,$b,$p+3,@args);
 }
 # ------------------------------------
-package XFibField; use strict;
-@XFibField::ISA = qw(IbField);
+package XFibField; use strict; use vars qw(@ISA); @ISA = qw(IbField);
 # ------------------------------------
 sub new {
 	my ($type,$b,$p,@args) = @_;
 	return IbField::new($type,$b,$p+3,@args);
 }
 # ------------------------------------
-package XliField; use strict;
-@XliField::ISA = qw(BitField);
+package XliField; use strict; use vars qw(@ISA); @ISA = qw(BitField);
 # ------------------------------------
 sub new {
 	my ($type,$b,$p,@args) = @_;
 	return BitField::new($type,$b,$p+4,0,8,@args);
 }
 # ------------------------------------
-package Xli0Field; use strict;
-@Xli0Field::ISA = qw(BitField);
+package Xli0Field; use strict; use vars qw(@ISA); @ISA = qw(BitField);
 # ------------------------------------
 sub new {
 	my ($type,$b,$p,@args) = @_;
 	return BitField::new($type,$b,$p+5,1,7,@args);
 }
 # ------------------------------------
-package XjmpField; use strict;
-@XjmpField::ISA = qw(BitField);
+package XjmpField; use strict; use vars qw(@ISA); @ISA = qw(BitField);
 # ------------------------------------
 sub new {
 	my ($type,$b,$p,@args) = @_;
 	return BitField::new($type,$b,$p+5,6,7,@args);
 }
 # -------------------------------------
-package SfField; use strict;
-@SfField::ISA = qw(BitField);
+package SfField; use strict; use vars qw(@ISA); @ISA = qw(BitField);
 # -------------------------------------
 sub new {
 	my ($type,$b,$p,@args) = @_;
 	return BitField::new($type,$b,$p+0,0,7,@args);
 }
 # -------------------------------------
-package Sf2Field; use strict;
-@Sf2Field::ISA = qw(BitField);
+package Sf2Field; use strict; use vars qw(@ISA); @ISA = qw(BitField);
 # -------------------------------------
 sub new {
 	my ($type,$b,$p,@args) = @_;
 	return BitField::new($type,$b,$p+1,0,7,@args);
 }
 # -------------------------------------
-package SiField; use strict;
-@SiField::ISA = qw(BitField);
+package SiField; use strict; use vars qw(@ISA); @ISA = qw(BitField);
 # -------------------------------------
 sub new {
 	my ($type,$b,$p,@args) = @_;
 	return BitField::new($type,$b,$p+0,0,3,@args);
 }
 # -------------------------------------
-package MpField; use strict;
-@MpField::ISA = qw(BitField);
+package MpField; use strict; use vars qw(@ISA); @ISA = qw(BitField);
 # -------------------------------------
 sub new {
 	my ($type,$b,$p,@args) = @_;
 	return BitField::new($type,$b,$p+0,5,6,@args);
 }
 # -------------------------------------
-package NiField; use strict;
-@NiField::ISA = qw(BitField);
+package NiField; use strict; use vars qw(@ISA); @ISA = qw(BitField);
 # -------------------------------------
 sub new {
 	my ($type,$b,$p,@args) = @_;
 	return BitField::new($type,$b,$p+0,6,7,@args);
 }
 # -------------------------------------
-package Dpc24Field; use strict;
-@Dpc24Field::ISA = qw(BitField);
+package Dpc24Field; use strict; use vars qw(@ISA); @ISA = qw(BitField);
 # -------------------------------------
 sub new {
 	my ($type,$b,$p,@args) = @_;
 	return BitField::new($type,$b,$p+0,0,23,@args);
 }
 # -------------------------------------
-package Opc24Field; use strict;
-@Opc24Field::ISA = qw(BitField);
+package Opc24Field; use strict; use vars qw(@ISA); @ISA = qw(BitField);
 # -------------------------------------
 sub new {
 	my ($type,$b,$p,@args) = @_;
 	return BitField::new($type,$b,$p+3,0,23,@args);
 }
 # -------------------------------------
-package Sls24Field; use strict;
-@Sls24Field::ISA = qw(BitField);
+package Sls24Field; use strict; use vars qw(@ISA); @ISA = qw(BitField);
 # -------------------------------------
 sub new {
 	my ($type,$b,$p,@args) = @_;
 	return BitField::new($type,$b,$p+6,0,7,@args);
 }
 # -------------------------------------
-package Dpc14Field; use strict;
-@Dpc14Field::ISA = qw(BitField);
+package Dpc14Field; use strict; use vars qw(@ISA); @ISA = qw(BitField);
 # -------------------------------------
 sub new {
 	my ($type,$b,$p,@args) = @_;
 	return BitField::new($type,$b,$p+0,0,13,@args);
 }
 # -------------------------------------
-package Opc14Field; use strict;
-@Opc14Field::ISA = qw(BitField);
+package Opc14Field; use strict; use vars qw(@ISA); @ISA = qw(BitField);
 # -------------------------------------
 sub new {
 	my ($type,$b,$p,@args) = @_;
 	return BitField::new($type,$b,$p+1,6,19,@args);
 }
 # -------------------------------------
-package Slc14Field; use strict;
-@Slc14Field::ISA = qw(BitField);
+package Slc14Field; use strict; use vars qw(@ISA); @ISA = qw(BitField);
 # -------------------------------------
 sub new {
 	my ($type,$b,$p,@args) = @_;
 	return BitField::new($type,$b,$p+3,4,7,@args);
 }
 # -------------------------------------
-package CicField; use strict;
-@CicField::ISA = qw(BitField);
+package CicField; use strict; use vars qw(@ISA); @ISA = qw(BitField);
 # -------------------------------------
 sub new {
 	my ($type,$b,$p,@args) = @_;
@@ -9688,8 +8639,7 @@ sub new {
 }
 
 # -------------------------------------
-package ClrfField; use strict;
-@ClrfField::ISA = qw(BitField);
+package ClrfField; use strict; use vars qw(@ISA); @ISA = qw(BitField);
 # -------------------------------------
 sub new {
 	my ($type,$b,$p,@args) = @_;
@@ -9697,8 +8647,7 @@ sub new {
 }
 
 # -------------------------------------
-package SpcField; use strict;
-@SpcField::ISA = qw(BitField);
+package SpcField; use strict; use vars qw(@ISA); @ISA = qw(BitField);
 # -------------------------------------
 sub new {
 	my ($type,$b,$p,$rt,@args) = @_;
@@ -9710,8 +8659,7 @@ sub new {
 }
 
 # -------------------------------------
-package TmrField; use strict;
-@TmrField::ISA = qw(BitField);
+package TmrField; use strict; use vars qw(@ISA); @ISA = qw(BitField);
 # -------------------------------------
 my %enum = (
 	0x00=>'speech',
@@ -9782,8 +8730,7 @@ sub new {
 }
 
 # -------------------------------------
-package IsupParameter; use strict;
-@IsupParameter::ISA = qw(Parameter);
+package IsupParameter; use strict; use vars qw(@ISA); @ISA = qw(Parameter);
 # -------------------------------------
 sub new {
 	my ($type,$b,$p,$e,@args) = @_;
@@ -9797,8 +8744,7 @@ sub opt {
 	return $self;
 }
 # -------------------------------------
-package FixIsupParameter; use strict;
-@FixIsupParameter::ISA = qw(IsupParameter);
+package FixIsupParameter; use strict; use vars qw(@ISA); @ISA = qw(IsupParameter);
 # -------------------------------------
 sub new {
 	my ($type,$b,$p,$e,@args) = @_;
@@ -9846,8 +8792,7 @@ sub opt {
 
 
 # -------------------------------------
-package VarIsupParameter; use strict;
-@VarIsupParameter::ISA = qw(IsupParameter);
+package VarIsupParameter; use strict; use vars qw(@ISA); @ISA = qw(IsupParameter);
 # -------------------------------------
 sub new {
 	my ($type,$b,$p,$e,@args) = @_;
@@ -9885,8 +8830,7 @@ sub opt {
 }
 
 # -------------------------------------
-package EopIsupParameter; use strict;
-@EopIsupParameter::ISA = qw(FixIsupParameter);
+package EopIsupParameter; use strict; use vars qw(@ISA); @ISA = qw(FixIsupParameter);
 # -------------------------------------
 sub man {
 	my ($type,$b,$p,$e,@args) = @_;
@@ -9897,8 +8841,7 @@ sub opt {
 	return SUPER::opt($type,$b,$p,$$p,@args);
 }
 # -------------------------------------
-package ClrfIsupParameter; use strict;
-@ClrfIsupParameter::ISA = qw(FixIsupParameter);
+package ClrfIsupParameter; use strict; use vars qw(@ISA); @ISA = qw(FixIsupParameter);
 # -------------------------------------
 sub dec {
 	my ($self,$b,$p,$e,$l,$rt,@args) = @_;
@@ -9907,8 +8850,7 @@ sub dec {
 	push @{$self->{fileds}}, SpcField->new($b,$self->{ptr}+3);
 }
 # -------------------------------------
-package TmrIsupParameter; use strict;
-@TmrIsupParameter::ISA = qw(FixIsupParameter);
+package TmrIsupParameter; use strict; use vars qw(@ISA); @ISA = qw(FixIsupParameter);
 # -------------------------------------
 sub dec {
 	my ($self,$b,$p,$e,$l,$rt,@args) = @_;
@@ -9916,432 +8858,325 @@ sub dec {
 	push @{$self->{fields}}, TmrField->new($b,$self->{ptr});
 }
 # -------------------------------------
-package AtpIsupParameter; use strict;
-@AtpIsupParameter::ISA = qw(VarIsupParameter);
+package AtpIsupParameter; use strict; use vars qw(@ISA); @ISA = qw(VarIsupParameter);
 # -------------------------------------
 # -------------------------------------
-package CdpnIsupParameter; use strict;
-@CdpnIsupParameter::ISA = qw(VarIsupParameter);
+package CdpnIsupParameter; use strict; use vars qw(@ISA); @ISA = qw(VarIsupParameter);
 # -------------------------------------
 # -------------------------------------
-package SubnIsupParameter; use strict;
-@SubnIsupParameter::ISA = qw(VarIsupParameter);
+package SubnIsupParameter; use strict; use vars qw(@ISA); @ISA = qw(VarIsupParameter);
 # -------------------------------------
 # -------------------------------------
-package NciIsupParameter; use strict;
-@NciIsupParameter::ISA = qw(FixIsupParameter);
+package NciIsupParameter; use strict; use vars qw(@ISA); @ISA = qw(FixIsupParameter);
 # -------------------------------------
 # -------------------------------------
-package FciIsupParameter; use strict;
-@FciIsupParameter::ISA = qw(FixIsupParameter);
+package FciIsupParameter; use strict; use vars qw(@ISA); @ISA = qw(FixIsupParameter);
 # -------------------------------------
 # -------------------------------------
-package OfciIsupParameter; use strict;
-@OfciIsupParameter::ISA = qw(FixIsupParameter);
+package OfciIsupParameter; use strict; use vars qw(@ISA); @ISA = qw(FixIsupParameter);
 # -------------------------------------
 # -------------------------------------
-package CpcIsupParameter; use strict;
-@CpcIsupParameter::ISA = qw(FixIsupParameter);
+package CpcIsupParameter; use strict; use vars qw(@ISA); @ISA = qw(FixIsupParameter);
 # -------------------------------------
 # -------------------------------------
-package CgpnIsupParameter; use strict;
-@CgpnIsupParameter::ISA = qw(VarIsupParameter);
+package CgpnIsupParameter; use strict; use vars qw(@ISA); @ISA = qw(VarIsupParameter);
 # -------------------------------------
 # -------------------------------------
-package RdgnIsupParameter; use strict;
-@RdgnIsupParameter::ISA = qw(VarIsupParameter);
+package RdgnIsupParameter; use strict; use vars qw(@ISA); @ISA = qw(VarIsupParameter);
 # -------------------------------------
 # -------------------------------------
-package RdnnIsupParameter; use strict;
-@RdnnIsupParameter::ISA = qw(VarIsupParameter);
+package RdnnIsupParameter; use strict; use vars qw(@ISA); @ISA = qw(VarIsupParameter);
 # -------------------------------------
 # -------------------------------------
-package ConrIsupParameter; use strict;
-@ConrIsupParameter::ISA = qw(VarIsupParameter);
+package ConrIsupParameter; use strict; use vars qw(@ISA); @ISA = qw(VarIsupParameter);
 # -------------------------------------
 # -------------------------------------
-package InriIsupParameter; use strict;
-@InriIsupParameter::ISA = qw(FixIsupParameter);
+package InriIsupParameter; use strict; use vars qw(@ISA); @ISA = qw(FixIsupParameter);
 # -------------------------------------
 # -------------------------------------
-package InfiIsupParameter; use strict;
-@InfiIsupParameter::ISA = qw(FixIsupParameter);
+package InfiIsupParameter; use strict; use vars qw(@ISA); @ISA = qw(FixIsupParameter);
 # -------------------------------------
 # -------------------------------------
-package CotiIsupParameter; use strict;
-@CotiIsupParameter::ISA = qw(FixIsupParameter);
+package CotiIsupParameter; use strict; use vars qw(@ISA); @ISA = qw(FixIsupParameter);
 # -------------------------------------
 # -------------------------------------
-package BciIsupParameter; use strict;
-@BciIsupParameter::ISA = qw(FixIsupParameter);
+package BciIsupParameter; use strict; use vars qw(@ISA); @ISA = qw(FixIsupParameter);
 # -------------------------------------
 # -------------------------------------
-package CausIsupParameter; use strict;
-@CausIsupParameter::ISA = qw(VarIsupParameter);
+package CausIsupParameter; use strict; use vars qw(@ISA); @ISA = qw(VarIsupParameter);
 # -------------------------------------
 # -------------------------------------
-package RdiIsupParameter; use strict;
-@RdiIsupParameter::ISA = qw(FixIsupParameter);
+package RdiIsupParameter; use strict; use vars qw(@ISA); @ISA = qw(FixIsupParameter);
 # -------------------------------------
 # -------------------------------------
-package CgiIsupParameter; use strict;
-@CgiIsupParameter::ISA = qw(FixIsupParameter);
+package CgiIsupParameter; use strict; use vars qw(@ISA); @ISA = qw(FixIsupParameter);
 # -------------------------------------
 # -------------------------------------
-package RsIsupParameter; use strict;
-@RsIsupParameter::ISA = qw(FixIsupParameter);
+package RsIsupParameter; use strict; use vars qw(@ISA); @ISA = qw(FixIsupParameter);
 # -------------------------------------
 # -------------------------------------
-package CmiIsupParameter; use strict;
-@CmiIsupParameter::ISA = qw(FixIsupParameter);
+package CmiIsupParameter; use strict; use vars qw(@ISA); @ISA = qw(FixIsupParameter);
 # -------------------------------------
 # -------------------------------------
-package FaciIsupParameter; use strict;
-@FaciIsupParameter::ISA = qw(FixIsupParameter);
+package FaciIsupParameter; use strict; use vars qw(@ISA); @ISA = qw(FixIsupParameter);
 # -------------------------------------
 # -------------------------------------
-package FaiiIsupParameter; use strict;
-@FaiiIsupParameter::ISA = qw(FixIsupParameter);
+package FaiiIsupParameter; use strict; use vars qw(@ISA); @ISA = qw(FixIsupParameter);
 # -------------------------------------
 # -------------------------------------
-package CugiIsupParameter; use strict;
-@CugiIsupParameter::ISA = qw(VarIsupParameter);
+package CugiIsupParameter; use strict; use vars qw(@ISA); @ISA = qw(VarIsupParameter);
 # -------------------------------------
 # -------------------------------------
-package IndexIsupParameter; use strict;
-@IndexIsupParameter::ISA = qw(FixIsupParameter);
+package IndexIsupParameter; use strict; use vars qw(@ISA); @ISA = qw(FixIsupParameter);
 # -------------------------------------
 # -------------------------------------
-package CugcriIsupParameter; use strict;
-@CugcriIsupParameter::ISA = qw(IsupParameter);
+package CugcriIsupParameter; use strict; use vars qw(@ISA); @ISA = qw(IsupParameter);
 # -------------------------------------
 # -------------------------------------
-package UsiIsupParameter; use strict;
-@UsiIsupParameter::ISA = qw(FixIsupParameter);
+package UsiIsupParameter; use strict; use vars qw(@ISA); @ISA = qw(FixIsupParameter);
 # -------------------------------------
 # -------------------------------------
-package SpcIsupParameter; use strict;
-@SpcIsupParameter::ISA = qw(FixIsupParameter);
+package SpcIsupParameter; use strict; use vars qw(@ISA); @ISA = qw(FixIsupParameter);
 # -------------------------------------
 # -------------------------------------
-package UuiIsupParameter; use strict;
-@UuiIsupParameter::ISA = qw(FixIsupParameter);
+package UuiIsupParameter; use strict; use vars qw(@ISA); @ISA = qw(FixIsupParameter);
 # -------------------------------------
 # -------------------------------------
-package ConnIsupParameter; use strict;
-@ConnIsupParameter::ISA = qw(VarIsupParameter);
+package ConnIsupParameter; use strict; use vars qw(@ISA); @ISA = qw(VarIsupParameter);
 # -------------------------------------
 # -------------------------------------
-package SrisIsupParameter; use strict;
-@SrisIsupParameter::ISA = qw(FixIsupParameter);
+package SrisIsupParameter; use strict; use vars qw(@ISA); @ISA = qw(FixIsupParameter);
 # -------------------------------------
 # -------------------------------------
-package TnsIsupParameter; use strict;
-@TnsIsupParameter::ISA = qw(VarIsupParameter);
+package TnsIsupParameter; use strict; use vars qw(@ISA); @ISA = qw(VarIsupParameter);
 # -------------------------------------
 # -------------------------------------
-package EvntIsupParameter; use strict;
-@EvntIsupParameter::ISA = qw(FixIsupParameter);
+package EvntIsupParameter; use strict; use vars qw(@ISA); @ISA = qw(FixIsupParameter);
 # -------------------------------------
 # -------------------------------------
-package CamIsupParameter; use strict;
-@CamIsupParameter::ISA = qw(IsupParameter);
+package CamIsupParameter; use strict; use vars qw(@ISA); @ISA = qw(IsupParameter);
 # -------------------------------------
 # -------------------------------------
-package CsiIsupParameter; use strict;
-@CsiIsupParameter::ISA = qw(FixIsupParameter);
+package CsiIsupParameter; use strict; use vars qw(@ISA); @ISA = qw(FixIsupParameter);
 # -------------------------------------
 # -------------------------------------
-package AclIsupParameter; use strict;
-@AclIsupParameter::ISA = qw(FixIsupParameter);
+package AclIsupParameter; use strict; use vars qw(@ISA); @ISA = qw(FixIsupParameter);
 # -------------------------------------
 # -------------------------------------
-package OcdnIsupParameter; use strict;
-@OcdnIsupParameter::ISA = qw(VarIsupParameter);
+package OcdnIsupParameter; use strict; use vars qw(@ISA); @ISA = qw(VarIsupParameter);
 # -------------------------------------
 # -------------------------------------
-package ObciIsupParameter; use strict;
-@ObciIsupParameter::ISA = qw(FixIsupParameter);
+package ObciIsupParameter; use strict; use vars qw(@ISA); @ISA = qw(FixIsupParameter);
 # -------------------------------------
 # -------------------------------------
-package UuindIsupParameter; use strict;
-@UuindIsupParameter::ISA = qw(FixIsupParameter);
+package UuindIsupParameter; use strict; use vars qw(@ISA); @ISA = qw(FixIsupParameter);
 # -------------------------------------
 # -------------------------------------
-package IspcIsupParameter; use strict;
-@IspcIsupParameter::ISA = qw(FixIsupParameter);
+package IspcIsupParameter; use strict; use vars qw(@ISA); @ISA = qw(FixIsupParameter);
 # -------------------------------------
 # -------------------------------------
-package GnotIsupParameter; use strict;
-@GnotIsupParameter::ISA = qw(FixIsupParameter);
+package GnotIsupParameter; use strict; use vars qw(@ISA); @ISA = qw(FixIsupParameter);
 # -------------------------------------
 # -------------------------------------
-package ChiIsupParameter; use strict;
-@ChiIsupParameter::ISA = qw(FixIsupParameter);
+package ChiIsupParameter; use strict; use vars qw(@ISA); @ISA = qw(FixIsupParameter);
 # -------------------------------------
 # -------------------------------------
-package AdiIsupParameter; use strict;
-@AdiIsupParameter::ISA = qw(FixIsupParameter);
+package AdiIsupParameter; use strict; use vars qw(@ISA); @ISA = qw(FixIsupParameter);
 # -------------------------------------
 # -------------------------------------
-package NsfIsupParameter; use strict;
-@NsfIsupParameter::ISA = qw(FixIsupParameter);
+package NsfIsupParameter; use strict; use vars qw(@ISA); @ISA = qw(FixIsupParameter);
 # -------------------------------------
 # -------------------------------------
-package UsipIsupParameter; use strict;
-@UsipIsupParameter::ISA = qw(VarIsupParameter);
+package UsipIsupParameter; use strict; use vars qw(@ISA); @ISA = qw(VarIsupParameter);
 # -------------------------------------
 # -------------------------------------
-package PropIsupParameter; use strict;
-@PropIsupParameter::ISA = qw(FixIsupParameter);
+package PropIsupParameter; use strict; use vars qw(@ISA); @ISA = qw(FixIsupParameter);
 # -------------------------------------
 # -------------------------------------
-package RopsIsupParameter; use strict;
-@RopsIsupParameter::ISA = qw(VarIsupParameter);
+package RopsIsupParameter; use strict; use vars qw(@ISA); @ISA = qw(VarIsupParameter);
 # -------------------------------------
 # -------------------------------------
-package SaIsupParameter; use strict;
-@SaIsupParameter::ISA = qw(VarIsupParameter);
+package SaIsupParameter; use strict; use vars qw(@ISA); @ISA = qw(VarIsupParameter);
 # -------------------------------------
 # -------------------------------------
-package UtiIsupParameter; use strict;
-@UtiIsupParameter::ISA = qw(VarIsupParameter);
+package UtiIsupParameter; use strict; use vars qw(@ISA); @ISA = qw(VarIsupParameter);
 # -------------------------------------
 # -------------------------------------
-package TmuIsupParameter; use strict;
-@TmuIsupParameter::ISA = qw(FixIsupParameter);
+package TmuIsupParameter; use strict; use vars qw(@ISA); @ISA = qw(FixIsupParameter);
 # -------------------------------------
 # -------------------------------------
-package CdiIsupParameter; use strict;
-@CdiIsupParameter::ISA = qw(FixIsupParameter);
+package CdiIsupParameter; use strict; use vars qw(@ISA); @ISA = qw(FixIsupParameter);
 # -------------------------------------
 # -------------------------------------
-package EciIsupParameter; use strict;
-@EciIsupParameter::ISA = qw(FixIsupParameter);
+package EciIsupParameter; use strict; use vars qw(@ISA); @ISA = qw(FixIsupParameter);
 # -------------------------------------
 # -------------------------------------
-package MciIsupParameter; use strict;
-@MciIsupParameter::ISA = qw(FixIsupParameter);
+package MciIsupParameter; use strict; use vars qw(@ISA); @ISA = qw(FixIsupParameter);
 # -------------------------------------
 # -------------------------------------
-package PciIsupParameter; use strict;
-@PciIsupParameter::ISA = qw(FixIsupParameter);
+package PciIsupParameter; use strict; use vars qw(@ISA); @ISA = qw(FixIsupParameter);
 # -------------------------------------
 # -------------------------------------
-package MlppIsupParameter; use strict;
-@MlppIsupParameter::ISA = qw(FixIsupParameter);
+package MlppIsupParameter; use strict; use vars qw(@ISA); @ISA = qw(FixIsupParameter);
 # -------------------------------------
 # -------------------------------------
-package MciqIsupParameter; use strict;
-@MciqIsupParameter::ISA = qw(FixIsupParameter);
+package MciqIsupParameter; use strict; use vars qw(@ISA); @ISA = qw(FixIsupParameter);
 # -------------------------------------
 # -------------------------------------
-package McirIsupParameter; use strict;
-@McirIsupParameter::ISA = qw(FixIsupParameter);
+package McirIsupParameter; use strict; use vars qw(@ISA); @ISA = qw(FixIsupParameter);
 # -------------------------------------
 # -------------------------------------
-package HopcIsupParameter; use strict;
-@HopcIsupParameter::ISA = qw(FixIsupParameter);
+package HopcIsupParameter; use strict; use vars qw(@ISA); @ISA = qw(FixIsupParameter);
 # -------------------------------------
 # -------------------------------------
-package TmrpIsupParameter; use strict;
-@TmrpIsupParameter::ISA = qw(FixIsupParameter);
+package TmrpIsupParameter; use strict; use vars qw(@ISA); @ISA = qw(FixIsupParameter);
 # -------------------------------------
 # -------------------------------------
-package LnIsupParameter; use strict;
-@LnIsupParameter::ISA = qw(VarIsupParameter);
+package LnIsupParameter; use strict; use vars qw(@ISA); @ISA = qw(VarIsupParameter);
 # -------------------------------------
 # -------------------------------------
-package RdnrIsupParameter; use strict;
-@RdnrIsupParameter::ISA = qw(FixIsupParameter);
+package RdnrIsupParameter; use strict; use vars qw(@ISA); @ISA = qw(FixIsupParameter);
 # -------------------------------------
 # -------------------------------------
-package FreepIsupParameter; use strict;
-@FreepIsupParameter::ISA = qw(FixIsupParameter);
+package FreepIsupParameter; use strict; use vars qw(@ISA); @ISA = qw(FixIsupParameter);
 # -------------------------------------
 # -------------------------------------
-package GrefIsupParameter; use strict;
-@GrefIsupParameter::ISA = qw(FixIsupParameter);
+package GrefIsupParameter; use strict; use vars qw(@ISA); @ISA = qw(FixIsupParameter);
 # -------------------------------------
 # -------------------------------------
-package RcapIsupParameter; use strict;
-@RcapIsupParameter::ISA = qw(IsupParameter);
+package RcapIsupParameter; use strict; use vars qw(@ISA); @ISA = qw(IsupParameter);
 # -------------------------------------
 # -------------------------------------
-package NmcIsupParameter; use strict;
-@NmcIsupParameter::ISA = qw(IsupParameter);
+package NmcIsupParameter; use strict; use vars qw(@ISA); @ISA = qw(IsupParameter);
 # -------------------------------------
 # -------------------------------------
-package RcntIsupParameter; use strict;
-@RcntIsupParameter::ISA = qw(IsupParameter);
+package RcntIsupParameter; use strict; use vars qw(@ISA); @ISA = qw(IsupParameter);
 # -------------------------------------
 # -------------------------------------
-package PcapIsupParameter; use strict;
-@PcapIsupParameter::ISA = qw(IsupParameter);
+package PcapIsupParameter; use strict; use vars qw(@ISA); @ISA = qw(IsupParameter);
 # -------------------------------------
 # -------------------------------------
-package PriIsupParameter; use strict;
-@PriIsupParameter::ISA = qw(IsupParameter);
+package PriIsupParameter; use strict; use vars qw(@ISA); @ISA = qw(IsupParameter);
 # -------------------------------------
 # -------------------------------------
-package GglIsupParameter; use strict;
-@GglIsupParameter::ISA = qw(IsupParameter);
+package GglIsupParameter; use strict; use vars qw(@ISA); @ISA = qw(IsupParameter);
 # -------------------------------------
 # -------------------------------------
-package PstaIsupParameter; use strict;
-@PstaIsupParameter::ISA = qw(IsupParameter);
+package PstaIsupParameter; use strict; use vars qw(@ISA); @ISA = qw(IsupParameter);
 # -------------------------------------
 # -------------------------------------
-package PcntIsupParameter; use strict;
-@PcntIsupParameter::ISA = qw(IsupParameter);
+package PcntIsupParameter; use strict; use vars qw(@ISA); @ISA = qw(IsupParameter);
 # -------------------------------------
 # -------------------------------------
-package PrfiIsupParameter; use strict;
-@PrfiIsupParameter::ISA = qw(IsupParameter);
+package PrfiIsupParameter; use strict; use vars qw(@ISA); @ISA = qw(IsupParameter);
 # -------------------------------------
 # -------------------------------------
-package PrbiIsupParameter; use strict;
-@PrbiIsupParameter::ISA = qw(IsupParameter);
+package PrbiIsupParameter; use strict; use vars qw(@ISA); @ISA = qw(IsupParameter);
 # -------------------------------------
 # -------------------------------------
-package RstaIsupParameter; use strict;
-@RstaIsupParameter::ISA = qw(IsupParameter);
+package RstaIsupParameter; use strict; use vars qw(@ISA); @ISA = qw(IsupParameter);
 # -------------------------------------
 # -------------------------------------
-package RfiIsupParameter; use strict;
-@RfiIsupParameter::ISA = qw(IsupParameter);
+package RfiIsupParameter; use strict; use vars qw(@ISA); @ISA = qw(IsupParameter);
 # -------------------------------------
 # -------------------------------------
-package RbiIsupParameter; use strict;
-@RbiIsupParameter::ISA = qw(IsupParameter);
+package RbiIsupParameter; use strict; use vars qw(@ISA); @ISA = qw(IsupParameter);
 # -------------------------------------
 # -------------------------------------
-package GnumIsupParameter; use strict;
-@GnumIsupParameter::ISA = qw(IsupParameter);
+package GnumIsupParameter; use strict; use vars qw(@ISA); @ISA = qw(IsupParameter);
 # -------------------------------------
 # -------------------------------------
-package GdigIsupParameter; use strict;
-@GdigIsupParameter::ISA = qw(VarIsupParameter);
+package GdigIsupParameter; use strict; use vars qw(@ISA); @ISA = qw(VarIsupParameter);
 # -------------------------------------
 # -------------------------------------
-package OsiIsupParameter; use strict;
-@OsiIsupParameter::ISA = qw(IsupParameter);
+package OsiIsupParameter; use strict; use vars qw(@ISA); @ISA = qw(IsupParameter);
 # -------------------------------------
 # -------------------------------------
-package EgressIsupParameter; use strict;
-@EgressIsupParameter::ISA = qw(FixIsupParameter);
+package EgressIsupParameter; use strict; use vars qw(@ISA); @ISA = qw(FixIsupParameter);
 # -------------------------------------
 # -------------------------------------
-package JurIsupParameter; use strict;
-@JurIsupParameter::ISA = qw(FixIsupParameter);
+package JurIsupParameter; use strict; use vars qw(@ISA); @ISA = qw(FixIsupParameter);
 # -------------------------------------
 # -------------------------------------
-package CidcIsupParameter; use strict;
-@CidcIsupParameter::ISA = qw(FixIsupParameter);
+package CidcIsupParameter; use strict; use vars qw(@ISA); @ISA = qw(FixIsupParameter);
 # -------------------------------------
 # -------------------------------------
-package BgroupIsupParameter; use strict;
-@BgroupIsupParameter::ISA = qw(FixIsupParameter);
+package BgroupIsupParameter; use strict; use vars qw(@ISA); @ISA = qw(FixIsupParameter);
 # -------------------------------------
 # -------------------------------------
-package GnamIsupParameter; use strict;
-@GnamIsupParameter::ISA = qw(IsupParameter);
+package GnamIsupParameter; use strict; use vars qw(@ISA); @ISA = qw(IsupParameter);
 # -------------------------------------
 # -------------------------------------
-package NotiIsupParameter; use strict;
-@NotiIsupParameter::ISA = qw(FixIsupParameter);
+package NotiIsupParameter; use strict; use vars qw(@ISA); @ISA = qw(FixIsupParameter);
 # -------------------------------------
 # -------------------------------------
-package SvactIsupParameter; use strict;
-@SvactIsupParameter::ISA = qw(FixIsupParameter);
+package SvactIsupParameter; use strict; use vars qw(@ISA); @ISA = qw(FixIsupParameter);
 # -------------------------------------
 # -------------------------------------
-package CspiIsupParameter; use strict;
-@CspiIsupParameter::ISA = qw(IsupParameter);
+package CspiIsupParameter; use strict; use vars qw(@ISA); @ISA = qw(IsupParameter);
 # -------------------------------------
 # -------------------------------------
-package TrnreqIsupParameter; use strict;
-@TrnreqIsupParameter::ISA = qw(FixIsupParameter);
+package TrnreqIsupParameter; use strict; use vars qw(@ISA); @ISA = qw(FixIsupParameter);
 # -------------------------------------
 # -------------------------------------
-package LspiIsupParameter; use strict;
-@LspiIsupParameter::ISA = qw(IsupParameter);
+package LspiIsupParameter; use strict; use vars qw(@ISA); @ISA = qw(IsupParameter);
 # -------------------------------------
 # -------------------------------------
-package CgciIsupParameter; use strict;
-@CgciIsupParameter::ISA = qw(FixIsupParameter);
+package CgciIsupParameter; use strict; use vars qw(@ISA); @ISA = qw(FixIsupParameter);
 # -------------------------------------
 # -------------------------------------
-package CvriIsupParameter; use strict;
-@CvriIsupParameter::ISA = qw(FixIsupParameter);
+package CvriIsupParameter; use strict; use vars qw(@ISA); @ISA = qw(FixIsupParameter);
 # -------------------------------------
 # -------------------------------------
-package OtgnIsupParameter; use strict;
-@OtgnIsupParameter::ISA = qw(FixIsupParameter);
+package OtgnIsupParameter; use strict; use vars qw(@ISA); @ISA = qw(FixIsupParameter);
 # -------------------------------------
 # -------------------------------------
-package CinIsupParameter; use strict;
-@CinIsupParameter::ISA = qw(FixIsupParameter);
+package CinIsupParameter; use strict; use vars qw(@ISA); @ISA = qw(FixIsupParameter);
 # -------------------------------------
 # -------------------------------------
-package ClliIsupParameter; use strict;
-@ClliIsupParameter::ISA = qw(VarIsupParameter);
+package ClliIsupParameter; use strict; use vars qw(@ISA); @ISA = qw(VarIsupParameter);
 # -------------------------------------
 # -------------------------------------
-package OliIsupParameter; use strict;
-@OliIsupParameter::ISA = qw(FixIsupParameter);
+package OliIsupParameter; use strict; use vars qw(@ISA); @ISA = qw(FixIsupParameter);
 # -------------------------------------
 # -------------------------------------
-package ChgnIsupParameter; use strict;
-@ChgnIsupParameter::ISA = qw(VarIsupParameter);
+package ChgnIsupParameter; use strict; use vars qw(@ISA); @ISA = qw(VarIsupParameter);
 # -------------------------------------
 # -------------------------------------
-package SvcdIsupParameter; use strict;
-@SvcdIsupParameter::ISA = qw(VarIsupParameter);
+package SvcdIsupParameter; use strict; use vars qw(@ISA); @ISA = qw(VarIsupParameter);
 # -------------------------------------
 # -------------------------------------
-package SprIsupParameter; use strict;
-@SprIsupParameter::ISA = qw(VarIsupParameter);
+package SprIsupParameter; use strict; use vars qw(@ISA); @ISA = qw(VarIsupParameter);
 # -------------------------------------
 # -------------------------------------
-package CselIsupParameter; use strict;
-@CselIsupParameter::ISA = qw(VarIsupParameter);
+package CselIsupParameter; use strict; use vars qw(@ISA); @ISA = qw(VarIsupParameter);
 # -------------------------------------
 # -------------------------------------
-package NtIsupParameter; use strict;
-@NtIsupParameter::ISA = qw(IsupParameter);
+package NtIsupParameter; use strict; use vars qw(@ISA); @ISA = qw(IsupParameter);
 # -------------------------------------
 # -------------------------------------
-package OriIsupParameter; use strict;
-@OriIsupParameter::ISA = qw(VarIsupParameter);
+package OriIsupParameter; use strict; use vars qw(@ISA); @ISA = qw(VarIsupParameter);
 # -------------------------------------
 # -------------------------------------
-package IriIsupParameter; use strict;
-@IriIsupParameter::ISA = qw(VarIsupParameter);
+package IriIsupParameter; use strict; use vars qw(@ISA); @ISA = qw(VarIsupParameter);
 # -------------------------------------
 # -------------------------------------
-package RateIsupParameter; use strict;
-@RateIsupParameter::ISA = qw(FixIsupParameter);
+package RateIsupParameter; use strict; use vars qw(@ISA); @ISA = qw(FixIsupParameter);
 # -------------------------------------
 # -------------------------------------
-package IicIsupParameter; use strict;
-@IicIsupParameter::ISA = qw(FixIsupParameter);
+package IicIsupParameter; use strict; use vars qw(@ISA); @ISA = qw(FixIsupParameter);
 # -------------------------------------
 # -------------------------------------
-package ToiIsupParameter; use strict;
-@ToiIsupParameter::ISA = qw(FixIsupParameter);
+package ToiIsupParameter; use strict; use vars qw(@ISA); @ISA = qw(FixIsupParameter);
 # -------------------------------------
 # -------------------------------------
-package TonIsupParameter; use strict;
-@TonIsupParameter::ISA = qw(FixIsupParameter);
+package TonIsupParameter; use strict; use vars qw(@ISA); @ISA = qw(FixIsupParameter);
 # -------------------------------------
 # -------------------------------------
-package CriIsupParameter; use strict;
-@CriIsupParameter::ISA = qw(FixIsupParameter);
+package CriIsupParameter; use strict; use vars qw(@ISA); @ISA = qw(FixIsupParameter);
 # -------------------------------------
 # -------------------------------------
-package IcciIsupParameter; use strict;
-@IcciIsupParameter::ISA = qw(VarIsupParameter);
+package IcciIsupParameter; use strict; use vars qw(@ISA); @ISA = qw(VarIsupParameter);
 # -------------------------------------
 
 
@@ -10349,12 +9184,6 @@ package IcciIsupParameter; use strict;
 package Message;
 use strict;
 # -------------------------------------
-use constant {
-	MTP2_ANNEX_A_NOT_USED	    => 0,
-	MTP2_ANNEX_A_USED	    => 1,
-	MTP2_ANNEX_A_USED_UNKNOWN   => 2,
-};
-
 # $msg = Message::create($pcap);
 #package Message;
 sub create {
@@ -10373,53 +9202,45 @@ sub create {
 	$self->{hdr}->{tv_usec} = $hdr{tv_usec};
 	$self->{dat} = substr($dat, 4);
 	return undef if $ret != 1;
-	my ( $dir, $xsn, $ppa ) = unpack('CCn', $dat);
-	$xsn = MTP2_ANNEX_A_USED_UNKNOWN unless 0 <= $xsn and $xsn <= 2;
-	my $ht = $htoptions[[1,2,0]->[$xsn]]->[1];
-	unless ($ht) {
-		my ($card,$span,$slot) = Channel::chan($ppa);
-		$ht = $slot ? ::HT_BASIC : ::HT_EXTENDED;
-	}
+	my ( $dir, $xsn, $lkno0, $lkno1 ) = unpack('CCCC', $dat);
 	$self->{dir} = $dir;
 	$self->{xsn} = $xsn;
-	$self->{ppa} = $ppa;
-	$self->{ht} = $ht;
+	$self->{ppa} = ($lkno0 << 8) | $lkno1;
 	return $self;
 }
-
 #package Message;
 sub process {
 	my ($self,$top,$network) = @_;
-	my $datalink = Channel->get($top,$network,$self->{ppa},$self->{dir},$self->{ht});
+	my $channel = $network->getChannel($top,$self->{ppa},$self->{dir},$self->{xsn});
 	$self->{dir} = ($self->{dir} ^ 0x1) & 0x1;
-	if ($self->decode($datalink) >= 0) {
-		$datalink->put_msg($top,$network,$self);
+	if ($self->decode($channel) >= 0) {
+		$channel->add_msg($top,$network,$self);
 		return;
 	}
 	print STDERR "W: decoding error, message discarded\n";
 }
 #package Message;
 sub decode {
-	my ($self,$datalink,@args) = @_;
-	$self->{datalink} = $datalink;
+	my ($self,$channel,@args) = @_;
+	$self->{channel} = $channel;
 	my @b = (unpack('C*', substr($self->{dat}, 0, 8)));
 	if (!exists $self->{mtp2decode}) {
 		my $len = $self->{hdr}->{len};
 		if (3 <= $len && $len <= 5) {
-			$datalink->setht(::HT_BASIC);
+			$channel->setht(::HT_BASIC);
 		} elsif (6 <= $len && $len <= 8) {
-			$datalink->setht(::HT_EXTENDED);
+			$channel->setht(::HT_EXTENDED);
 		}
-		return 0 unless $datalink->{ht} != ::HT_UNKNOWN;
+		return 0 unless $channel->{ht} != ::HT_UNKNOWN;
 		my ($bsn,$bib,$fsn,$fib,$li,$li0);
-		if ($datalink->{ht} == ::HT_BASIC) {
+		if ($channel->{ht} == ::HT_BASIC) {
 			$self->{bsn} = $b[0] & 0x7f;
 			$self->{bib} = $b[0] >> 7;
 			$self->{fsn} = $b[1] & 0x7f;
 			$self->{fib} = $b[1] >> 7;
 			$self->{li} = $b[2] & 0x3f;
 			$self->{li0} = $b[2] >> 6;
-		} elsif ($datalink->{ht} == ::HT_EXTENDED) {
+		} elsif ($channel->{ht} == ::HT_EXTENDED) {
 			$self->{bsn} = $b[0];
 			$self->{bsn} |= ($b[1] & 0x0f) << 8;
 			$self->{bib} = $b[1] >> 7;
@@ -10430,32 +9251,32 @@ sub decode {
 			$self->{li} |= ($b[5] & 0x1) << 8;
 			$self->{li0} = $b[5] >> 6;
 		}
-		my $inf = $len - $datalink->{ht};
+		my $inf = $len - $channel->{ht};
 		if (($self->{li} != $inf) && ($inf <= 63 || $self->{li} != 63)) {
 			print STDERR "W: bad length indicator $self->{li} != $inf\n";
 		}
 		if ($self->{li0} != 0) {
-			$datalink->setrt(::RT_24BIT_PC);
-			$datalink->setpr(::MP_JAPAN);
+			$channel->setrt(::RT_24BIT_PC);
+			$channel->setpr(::MP_JAPAN);
 		}
 		$self->{mtp2decode} = 1;
 	}
 	return 1 if $self->{li} == 0;
-	@b = (unpack('C*', substr($self->{dat}, $datalink->{ht}, 11)));
+	@b = (unpack('C*', substr($self->{dat}, $channel->{ht}, 11)));
 	$self->{si} = $b[0];
 	return 1 if $self->{li} < 3;
 	$self->{ni} = ($b[0] & 0xc0) >> 6;
 	$self->{mp} = ($b[0] & 0x30) >> 4;
 	$self->{si} = ($b[0] & 0x0f);
 	if ($self->{ni} == 0) {
-		$datalink->setrt(::RT_14BIT_PC);
-		$datalink->setpr(::MP_INTERNATIONAL);
+		$channel->setrt(::RT_14BIT_PC);
+		$channel->setpr(::MP_INTERNATIONAL);
 	}
-	if ($datalink->{pr} == ::MP_UNKNOWN) {
-		$datalink->setpr(::MP_NATIONAL) if $self->{mp} != 0;
-	} elsif ($datalink->{pr} == ::MP_JAPAN) {
+	if ($channel->{pr} == ::MP_UNKNOWN) {
+		$channel->setpr(::MP_NATIONAL) if $self->{mp} != 0;
+	} elsif ($channel->{pr} == ::MP_JAPAN) {
 		$self->{mp} = $self->{li0};
-	} elsif ($datalink->{pr} == ::MP_INTERNATIONAL) {
+	} elsif ($channel->{pr} == ::MP_INTERNATIONAL) {
 		$self->{mp} = 0;
 	}
 	if ($self->{li} < ::HT_EXTENDED) {
@@ -10463,17 +9284,19 @@ sub decode {
 		return -1;
 	}
 	if ($self->{li} < 9 || ($self->{si} == 5 && $self->{li} < 11)) {
-		$datalink->setrt(::RT_14BIT_PC);
+		$channel->setrt(::RT_14BIT_PC);
 	}
-	if ($datalink->{rt} == ::RT_UNKNOWN) {
-		my $ret = $self->checkRoutingLabelType($self->{si},$datalink,$self->{li},\@b);
+	if ($channel->{rt} == ::RT_UNKNOWN) {
+		my $ret = $self->checkRoutingLabelType($self->{si},$channel,$self->{li},\@b);
 		if ($ret <= 0) {
+			#print STDERR "D: check failed on si=$self->{si} for ",$channel->identify,"\n";
 			return $ret;
 		}
+		#print STDERR "D: check succeeded on si=$self->{si} for ",$channel->identify,"\n";
 	}
 	if (!exists $self->{mtp3decode}) {
-		return 0 if $datalink->detecting;
-		if ($datalink->{rt} == ::RT_14BIT_PC) {
+		return 0 if $channel->detecting;
+		if ($channel->{rt} == ::RT_14BIT_PC) {
 			if ($self->{li} < 6) {
 				print STDERR "W: too short for 14-bit RL, li = $self->{li}\n";
 				return -1;
@@ -10497,7 +9320,7 @@ sub decode {
 			$self->{opc} |= $b[6] << 16;
 			$self->{sls} = $b[7];
 		}
-		@b = (unpack('C*', substr($self->{dat}, $datalink->{ht} + 1 + $datalink->{rt}, 3)));
+		@b = (unpack('C*', substr($self->{dat}, $channel->{ht} + 1 + $channel->{rt}, 3)));
 		if ($self->{si} == 5) {
 			$self->{cic} = $b[0];
 			$self->{cic} |= $b[1] << 8;
@@ -10514,7 +9337,7 @@ sub decode {
 			print STDERR "W: no message type for si=$self->{si}, mt=$self->{mt}\n";
 		}
 		if ($self->{si} == 1 || $self->{si} == 2) {
-			if ($datalink->{rt} == ::RT_14BIT_PC) {
+			if ($channel->{rt} == ::RT_14BIT_PC) {
 				$self->{slc} = $self->{sls};
 				$self->{dlen0} = $b[1] & 0x0f;
 			} else {
@@ -10549,32 +9372,32 @@ use constant {
 };
 #package Message;
 sub checkSnmm {
-	my ($self,$datalink,@args) = @_;
-	my $ansi = $self->checkAnsiSnmm($datalink,@args);
-	my $itut = $self->checkItutSnmm($datalink,@args);
+	my ($self,$channel,@args) = @_;
+	my $ansi = $self->checkAnsiSnmm($channel,@args);
+	my $itut = $self->checkItutSnmm($channel,@args);
 	if ($ansi == PT_YES) {
 		return 0 if $itut == PT_YES;
-		$datalink->setrt(::RT_24BIT_PC);
+		$channel->setrt(::RT_24BIT_PC);
 		return 1;
 	}
 	elsif ($ansi == PT_MAYBE) {
 		return 0 if $itut == PT_MAYBE;
 		if ($itut == PT_YES) {
-			$datalink->setrt(::RT_14BIT_PC);
+			$channel->setrt(::RT_14BIT_PC);
 		} else {
-			$datalink->setrt(::RT_24BIT_PC);
+			$channel->setrt(::RT_24BIT_PC);
 		}
 		return 1;
 	}
 	else {
 		return -1 if $itut == PT_NO;
-		$datalink->setrt(::RT_14BIT_PC);
+		$channel->setrt(::RT_14BIT_PC);
 		return 1;
 	}
 }
 #package Message;
 sub checkItutSnmm {
-	my ($self,$datalink,$li,$b) = @_;
+	my ($self,$channel,$li,$b) = @_;
 	my $mt = (($b->[5] & 0x0f) << 4) | ($b->[5] >> 4);
 	if ($li == 6) {
 		return PT_YES if $mt == 0x17 || $mt == 0x27 || $mt == 0x13 || $mt == 0x28
@@ -10601,7 +9424,7 @@ sub checkItutSnmm {
 }
 #package Message;
 sub checkAnsiSnmm {
-	my ($self,$datalink,$li,$b) = @_;
+	my ($self,$channel,$li,$b) = @_;
 	my $mt = (($b->[8] & 0x0f) << 4) | ($b->[8] >> 4);
 	return PT_NO if $li < 9;
 	if ($li == 9) {
@@ -10632,32 +9455,32 @@ sub checkAnsiSnmm {
 }
 #package Message;
 sub checkSntm {
-	my ($self,$datalink,@args) = @_;
-	my $ansi = $self->checkAnsiSntm($datalink,@args);
-	my $itut = $self->checkItutSntm($datalink,@args);
+	my ($self,$channel,@args) = @_;
+	my $ansi = $self->checkAnsiSntm($channel,@args);
+	my $itut = $self->checkItutSntm($channel,@args);
 	if ($ansi == PT_YES) {
 		return 0 if $itut == PT_YES;
-		$datalink->setrt(::RT_24BIT_PC);
+		$channel->setrt(::RT_24BIT_PC);
 		return 1;
 	}
 	elsif ($ansi == PT_MAYBE) {
 		return 0 if $itut == PT_MAYBE;
 		if ($itut == PT_YES) {
-			$datalink->setrt(::RT_14BIT_PC);
+			$channel->setrt(::RT_14BIT_PC);
 		} else {
-			$datalink->setrt(::RT_24BIT_PC);
+			$channel->setrt(::RT_24BIT_PC);
 		}
 		return 1;
 	}
 	else {
 		return -1 if $itut == PT_NO;
-		$datalink->setrt(::RT_14BIT_PC);
+		$channel->setrt(::RT_14BIT_PC);
 		return 1;
 	}
 }
 #package Message;
 sub checkItutSntm {
-	my ($self,$datalink,$li,$b) = @_;
+	my ($self,$channel,$li,$b) = @_;
 	my $mt = (($b->[5] & 0x0f) << 4) | ($b->[5] >> 4);
 	return PT_NO if 7 > $li || $li > 22;
 	return PT_NO if $mt != 0x11 && $mt != 0x12;
@@ -10669,7 +9492,7 @@ sub checkItutSntm {
 }
 #package Message;
 sub checkAnsiSntm {
-	my ($self,$datalink,$li,$b) = @_;
+	my ($self,$channel,$li,$b) = @_;
 	my $mt = (($b->[8] & 0x0f) << 4) | ($b->[8] >> 4);
 	return PT_NO if 10 > $li || $li > 25;
 	return PT_NO if $mt != 0x11 && $mt != 0x12;
@@ -10681,26 +9504,26 @@ sub checkAnsiSntm {
 }
 #package Message;
 sub checkSnsm {
-	my ($self,$datalink,@args) = @_;
-	my $ansi = $self->checkAnsiSnsm($datalink,@args);
-	my $itut = $self->checkItutSntm($datalink,@args);
+	my ($self,$channel,@args) = @_;
+	my $ansi = $self->checkAnsiSnsm($channel,@args);
+	my $itut = $self->checkItutSntm($channel,@args);
 	if ($ansi == PT_YES) {
 		return 0 if $itut == PT_YES;
-		$datalink->setrt(::RT_24BIT_PC);
+		$channel->setrt(::RT_24BIT_PC);
 		return 1;
 	}
 	elsif ($ansi == PT_MAYBE) {
 		return 0 if $itut == PT_MAYBE;
 		if ($itut == PT_YES) {
-			$datalink->setrt(::RT_14BIT_PC);
+			$channel->setrt(::RT_14BIT_PC);
 		} else {
-			$datalink->setrt(::RT_24BIT_PC);
+			$channel->setrt(::RT_24BIT_PC);
 		}
 		return 1;
 	}
 	else {
 		return -1 if $itut == PT_NO;
-		$datalink->setrt(::RT_14BIT_PC);
+		$channel->setrt(::RT_14BIT_PC);
 		return 1;
 	}
 }
@@ -10715,71 +9538,71 @@ sub checkAnsiSnsm {
 }
 #package Message;
 sub checkSccp {
-	my ($self,$datalink,$li,$b) = @_;
-	my $ansi = $self->checkAnsiSccp($datalink,$b);
-	my $itut = $self->checkItutSccp($datalink,$b);
+	my ($self,$channel,$li,$b) = @_;
+	my $ansi = $self->checkAnsiSccp($channel,$b);
+	my $itut = $self->checkItutSccp($channel,$b);
 	if ($ansi == PT_YES) {
 		return 0 if $itut == PT_YES;
-		$datalink->setrt(::RT_24BIT_PC);
+		$channel->setrt(::RT_24BIT_PC);
 		return 1;
 	}
 	elsif ($ansi == PT_MAYBE) {
 		return 0 if $itut == PT_MAYBE;
 		if ($itut == PT_YES) {
-			$datalink->setrt(::RT_14BIT_PC);
+			$channel->setrt(::RT_14BIT_PC);
 		} else {
-			$datalink->setrt(::RT_24BIT_PC);
+			$channel->setrt(::RT_24BIT_PC);
 		}
 		return 1;
 	}
 	else {
 		return -1 if $itut == PT_NO;
-		$datalink->setrt(::RT_14BIT_PC);
+		$channel->setrt(::RT_14BIT_PC);
 		return 1;
 	}
 }
 #package Message;
 sub checkItutSccp {
-	my ($self,$datalink,$li,$b) = @_;
+	my ($self,$channel,$li,$b) = @_;
 	my $mt = $b->[5];
 	return PT_MAYBE if 0x01 <= $mt && $mt <= 0x14;
 	return PT_NO;
 }
 #package Message;
 sub checkAnsiSccp {
-	my ($self,$datalink,$li,$b) = @_;
+	my ($self,$channel,$li,$b) = @_;
 	my $mt = $b->[8];
 	return PT_MAYBE if 0x01 <= $mt && $mt <= 0x14;
 	return PT_NO;
 }
 #package Message;
 sub checkIsup {
-	my ($self,$datalink,@args) = @_;
-	my $ansi = $self->checkAnsiIsup($datalink,@args);
-	my $itut = $self->checkItutIsup($datalink,@args);
+	my ($self,$channel,@args) = @_;
+	my $ansi = $self->checkAnsiIsup($channel,@args);
+	my $itut = $self->checkItutIsup($channel,@args);
 	if ($ansi == PT_YES) {
 		return 0 if $itut == PT_YES;
-		$datalink->setrt(::RT_24BIT_PC);
+		$channel->setrt(::RT_24BIT_PC);
 		return 1;
 	}
 	elsif ($ansi == PT_MAYBE) {
 		return 0 if $itut == PT_MAYBE;
 		if ($itut == PT_YES) {
-			$datalink->setrt(::RT_14BIT_PC);
+			$channel->setrt(::RT_14BIT_PC);
 		} else {
-			$datalink->setrt(::RT_24BIT_PC);
+			$channel->setrt(::RT_24BIT_PC);
 		}
 		return 1;
 	}
 	else {
 		return -1 if $itut == PT_NO;
-		$datalink->setrt(::RT_14BIT_PC);
+		$channel->setrt(::RT_14BIT_PC);
 		return 1;
 	}
 }
 #package Message;
 sub checkItutIsup {
-	my ($self,$datalink,$li,$b) = @_;
+	my ($self,$channel,$li,$b) = @_;
 	my $mt = $b->[7];
 	return PT_NO if $li < 8;
 	if ($mt == 0x11 || $mt == 0x12 || $mt == 0x13 || $mt == 0x14 || $mt == 0x15 || $mt == 0x16 || $mt == 0x24 || $mt == 0x2e || $mt == 0x30 || $mt == 0x31) {
@@ -10848,7 +9671,7 @@ sub checkItutIsup {
 }
 #package Message;
 sub checkAnsiIsup {
-	my ($self,$datalink,$li,$b) = @_;
+	my ($self,$channel,$li,$b) = @_;
 	my $mt = $b->[10];
 	return PT_NO if $li < 11;
 	if ($mt == 0x10 || $mt == 0x11 || $mt == 0x12 || $mt == 0x13 || $mt == 0x14 || $mt == 0x15 || $mt == 0x16 || $mt == 0x24 || $mt == 0x2e || $mt == 0xe9 || $mt == 0xec) {
@@ -10877,11 +9700,11 @@ sub checkAnsiIsup {
 sub decodeit {
 	my $self = shift;
 	return if $self->{dec};
-	my $datalink = $self->{datalink};
+	my $channel = $self->{channel};
 	my @l2h = ();
 	my $p = 0;
 	my $li = 0;
-	if ($datalink->{ht} == ::HT_EXTENDED) {
+	if ($channel->{ht} == ::HT_EXTENDED) {
 		push @l2h, XBsnField->new($b,$p);
 		push @l2h, XBsn0Field->new($b,$p);
 		push @l2h, XBibField->new($b,$p);
@@ -10890,7 +9713,7 @@ sub decodeit {
 		push @l2h, XFibField->new($b,$p);
 		push @l2h, ($li = XliField->new($b,$p));
 		push @l2h, Xli0Field->new($b,$p);
-		push @l2h, XjmpField->new($b,$p) if $datalink->{pr} == ::MP_JAPAN;
+		push @l2h, XjmpField->new($b,$p) if $channel->{pr} == ::MP_JAPAN;
 		$p += ::HT_EXTENDED;
 	} else {
 		push @l2h, BsnField->new($b,$p);
@@ -10898,7 +9721,7 @@ sub decodeit {
 		push @l2h, FsnField->new($b,$p);
 		push @l2h, FibField->new($b,$p);
 		push @l2h, ($li = LiField->new($b,$p));
-		if ($datalink->{pr} == ::MP_JAPAN) {
+		if ($channel->{pr} == ::MP_JAPAN) {
 			push @l2h, JmpFiled->new($b,$p);
 		} else {
 			push @l2h, LiField->new($b,$p);
@@ -10921,7 +9744,7 @@ sub decodeit {
 	push @sio, NiField->new($b,$p);
 	$p++;
 	my @rl = ();
-	if ($datalink->{rt} == ::RT_24BIT_PC) {
+	if ($channel->{rt} == ::RT_24BIT_PC) {
 		push @rl, Dpc24Field->new($b,$p);
 		push @rl, Opc24Field->new($b,$p);
 		push @rl, Sls24Field->new($b,$p);
@@ -11119,7 +9942,7 @@ sub hlist {
 	$hl->itemCreate('1',3,-text=>'L2 Header');
 	$hl->indicator('create','1',-itemtype=>'image',-image=>$self->{tree}->{1});
 	my $sio;
-	if ($self->{datalink}->{ht} == ::HT_EXTENDED) {
+	if ($self->{channel}->{ht} == ::HT_EXTENDED) {
 		$self->makeentry($hl,0,0,11,$self->{bsn},'BSN','1.2','Backward Sequence Number');
 		$self->makeentry($hl,1,7,7,$self->{bib},'BIB','1.1','Backward Indicator Bit');
 		$self->makeentry($hl,2,0,11,$self->{fsn},'FSN','1.4','Forward Sequence Number');
@@ -11176,7 +9999,7 @@ sub hlist {
 			$self->makeentry($hl,11,0,7,$self->{mt},'MT','3.1',$desc,);
 		} elsif ($self->{si} == 1 || $self->{si} == 2) {
 			$self->makeentry($hl,11,0,7,$self->{mt},'MT','3.1',$desc,);
-			if ($self->{datalink}->{rt} == ::RT_24BIT_PC) {
+			if ($self->{channel}->{rt} == ::RT_24BIT_PC) {
 				$self->makeentry($hl,12,0,3,$self->{slc},'SLC','3.2','Signalling Link Code');
 			} else {
 				$self->makeentry($hl,12,0,3,$self->{slc},'SLC','3.2','Signalling Link Code');
@@ -11201,1023 +10024,19 @@ sub hlist {
 }
 
 # -------------------------------------
-package M2paMessage; use strict;
-@M2paMessage::ISA = qw(Message);
+package FisuMessage; use strict; use vars qw(@ISA); @ISA = qw(Message);
 # -------------------------------------
-
-sub decode {
-	my ($self,$datalink,@args) = @_;
-	my ($off,$len,$dat) = (\$self->{off},\$self->{len},\$self->{dat});
-	my ( $vers, $resv, $clas, $type,)
-		= unpack('CCCC',substr($$dat,$$off,4));
-	return -1 if $vers != 1 || $clas != 11 || $type != 1 || $$len < 20;
-	( $self->{li}, $self->{bsn}, $self->{fsn}, )
-		= unpack('NNN',substr($$dat,$$off+4,12));
-	$self->{bsn} &= 0x00ffffff;
-	$self->{fsn} &= 0x00ffffff;
-	$self->{li} -= 16;
-	return -1 if $self->{li} < 8;
-	$$off += 16; $$len -= 16;
-	$self->{li0} = unpack('C',substr($$dat,$$off,1)) >> 6;
-	$$off += 1; $$len -= 1;
-	if ($$len < $self->{li}) {
-		print STDERR "W: $self: bad length indicator $self->{li} != $$len\n";
-	}
-	if ($self->{li0} != 0) {
-		$datalink->setrt(::RT_24BIT_PC);
-		$datalink->setpr(::MP_JAPAN);
-	}
-	bless $self, 'Mtp3Message';
-	return $self->decode($datalink,@args);
-}
-
 # -------------------------------------
-package M2uaMessage; use strict;
-@M2uaMessage::ISA = qw(Message);
+package LssuMessage; use strict; use vars qw(@ISA); @ISA = qw(Message);
 # -------------------------------------
-
-sub decode {
-	my ($self,$top,$network,$datalink,@args) = @_;
-	my ($off,$len,$dat) = (\$self->{off},\$self->{len},\$self->{dat});
-	my ( $vers, $resv, $clas, $type )
-		= unpack('CCCC',substr($$dat,$$off,4));
-	my $mlen = unpack('N',substr($$dat,$$off+4,4));
-	return -1 if $vers != 1 || $clas != 6 || $type != 1 || $$len < 28 || $$len < $mlen;
-	$$off += 8; $$len -= 8; $self->{li} -= 8;
-	my ( $t, $l ) = unpack('nn',substr($$dat,$$off,4));
-	return -1 if $t != 0x1 and $t != 0x3;
-	return -1 if $t == 0x1 and $l != 8;
-	$$off += 4; $$len -= 4;
-	if ($t == 0x1) {
-		$self->{iid} = unpack('N',substr($$dat,$$off,4));
-	} else {
-		$self->{iid} = substr($$dat,$$off,$l-4);
-	}
-	my $plen = ($l+3)&(~0x3) - 4;
-	$$off += $plen; $$len -= $plen;
-	( $t,$l ) = unpack('nn',substr($$dat,$$off,4));
-	return -1 if $t != 0x300 && $t != 0x301;
-	$$off += 4; $$len -= 4;
-	$plen = ($l+3)&(~0x3) - 4;
-	$$len = $$off + $plen;
-	if ($t == 0x301) {
-		$datalink->setrt(::RT_24BIT_PC);
-		$datalink->setpr(::MP_JAPAN);
-		$self->{li0} = unpack('C',substr($$dat,$$off,1)) >> 6;
-		$self->{mp} = $self->{li0};
-		$$off++; $$len--;
-	}
-	my $interface = M2UA_Interface->get($top,$network,$datalink,$self->{iid},$self);
-	$self->{interface} = $interface;
-	bless $self, 'Mtp3Message';
-	return $self->decode($interface,@args);
-}
-
 # -------------------------------------
-package M3uaMessage; use strict;
-@M3uaMessage::ISA = qw(Message);
+package Lss2Message; use strict; use vars qw(@ISA); @ISA = qw(Message);
 # -------------------------------------
-# The M3UA message contains an M3UA messag header (4-bytes), some number of
-# optional TLV parametes, an RC TLV parameter, a protocol data parameter that
-# contains the sio and all routing label fields.  The pdu starts with the first
-# by of the MTP User part message following the routing label.
 # -------------------------------------
-
-sub decode {
-	my ($self,$top,$network,$datalink,@args) = @_;
-	my ($off,$len,$dat) = (\$self->{off},\$self->{len},\$self->{dat});
-	return -1 if 4 < $$len; 
-	return -1 if unpack('N',substr($$dat,$$off,4)) != 0x01000101;
-	$$off+=4; $$len-=4;
-	my ($doff,$dlen);
-	while ($$len >= 4) {
-		my ($ptag,$plen) = unpack('nn',substr($$dat,$$off,4));
-		     if ($ptag == 0x0200) { # NA
-			return -1 if $plen != 8 || $plen > $$len;
-			$self->{na} = unpack('N',substr($$dat,$$off+4,4));
-		} elsif ($ptag == 0x0006) { # RC
-			return -1 if $plen != 8 || $plen > $$len;
-			$self->{rc} = unpack('N',substr($$dat,$$off+4,4));
-		} elsif ($ptag == 0x0210) { # Protocol data
-			return -1 if $plen < 12 || $plen > $len;
-			(
-				$self->{opc},
-				$self->{dpc},
-				$self->{si},
-				$self->{ni},
-				$self->{mp},
-				$self->{sls},
-			) =
-			unpack('NNCCCC', substr($$dat,$$off+4,12));
-			$dlen = $plen - 16;
-			$doff = $$off + 16;
-		} elsif ($ptag == 0x0013) { # Correlation Id
-			return -1 if $plen != 8 || $plen > $$len;
-			$self->{cid} = unpack('N',substr($$dat,$$off+4,4));
-		} else {
-		}
-		$plen = ($plen+3)&(~0x3);
-		return -1 if $plen > $$len; 
-		$$off += $plen; $$len -= $plen;
-	}
-	return -1 unless defined $dlen and defined $doff;
-
-	unless (exists $mtypes{$self->{si}}) {
-		print STDERR "W: $self: no message type for si=$self->{si}\n";
-	}
-	if ($self->{ni} == 0) {
-		$datalink->setrt(::RT_14BIT_PC);
-		$datalink->setpr(::MP_INTERNATIONAL);
-	}
-	if ($datalink->{pr} == ::MP_UNKNOWN) {
-		$datalink->setpr(::MP_NATIONAL) if $self->{mp} != 0;
-	} elsif ($datalink->{pr} == ::MP_INTERNATIONAL) {
-		$self->{mp} = 0;
-	}
-	$self->setrt(::RT_24BIT_PC) if ($self->{dpc}|$self->{opc})&(~0x3fff);
-	$self->Setpr(::MP_NATIONAL) if $self->{mp} != 0;
-
-	$self->{rc} = 0 unless exists $self->{rc};
-	my $routing = M3UA_Routing->get($top,$network,$datalink,$self->{rc},@self);
-	$self->{routing} = $routing;
-	return 1;
-}
-
+package MsuMessage; use strict; use vars qw(@ISA); @ISA = qw(Message);
 # -------------------------------------
-package SuaMessage; use strict;
-@SuaMessage::ISA = qw(Message);
 # -------------------------------------
-
-sub decode {
-	my ($self,$datalink,@args) = @_;
-	my ($off,$len,$dat) = (\$self->{off},\$self->{len},\$self->{dat});
-}
-
-# -------------------------------------
-package Mtp2Message; use strict;
-@Mtp2Message::ISA = qw(Message);
-# -------------------------------------
-
-sub decode {
-	my ($self,$datalink,@args) = @_;
-	my ($off,$len,$dat) = (\$self->{off},\$self->{len},\$self->{dat});
-	if ($datalink->{ht} == ::HT_UNKNOWN) {
-		if (3 <= $$len && $$len <= 5) {
-			$datalink->setht(::HT_BASIC);
-		} elsif (6 <= $$len && $$len <= 8) {
-			$datalink->setht(::HT_EXTENDED);
-		} else {
-			return 0;
-		}
-	}
-	if ($datalink->{ht} == ::HT_BASIC) {
-		(
-			$self->{bsn},
-			$self->{fsn},
-			$self->{li},
-		)
-		= unpack('CCC',substr($$dat,$$off,3));
-
-		$self->{bib} = ($self->{bsn} >> 7) & 0x01; $self->{bsn} &= 0x7f;
-		$self->{fib} = ($self->{fsn} >> 7) & 0x01; $self->{fsn} &= 0x7f;
-		$self->{li0} = ($self->{li}  >> 6} & 0x03; $self->{li}  &= 0x3f;
-		$$off += 3; $$len -= 3;
-	} else {
-		(
-			$self->{bsn},
-			$self->{fsn},
-			$self->{li},
-		)
-		= unpack('vvv',substr($$dat,$$off,6));
-
-		$self->{bib} = ($self->{bsn} >> 15) & 0x0001; $self->{bsn} &= 0x0fff;
-		$self->{fib} = ($self->{fsn} >> 15) & 0x0001; $self->{fsn} &= 0x0fff;
-		$self->{li0} = ($self->{li}  >> 14} & 0x0003; $self->{li}  &= 0x01ff;
-		$$off += 6; $$len -= 6;
-	}
-	if (($self->{li} != $$len) && ($$len <= 63 || $self->{li} != 63)) {
-		print STDERR "W: $self: bad length indicator $self->{li} != $$len\n";
-	}
-	if ($self->{li0} != 0) {
-		$datalink->setrt(::RT_24BIT_PC);
-		$datalink->setpr(::MP_JAPAN);
-	}
-	if ($self->{li} == 0) {
-		bless $self,'FisuMessage';
-		return 1;
-	}
-	$self->{si} = unpack('C',substr($$dat,$$off,1));
-	if ($self->{li} < 2) {
-		$$off += 1; $$len -= 1;
-		bless $self,'LssuMessage';
-		return 1;
-	}
-	if ($self->{li} < 3) {
-		$$off += 2; $$len -= 2;
-		bless $self,'Lss2Message';
-		return 1;
-	}
-	bless $self,'Mtp3Message';
-	return $self->decode($datalink,@args);
-}
-
-# -------------------------------------
-package Mtp3Message; use strict;
-@Mtp3Message::ISA = qw(Message);
-# -------------------------------------
-
-sub decode {
-	my ($self,$datalink,@args) = @_;
-	my ($off,$len,$dat) = (\$self->{off},\$self->{len},\$self->{dat});
-
-	$self->{si} = unpack('C',substr($$dat,$$off,1));
-	$self->{ni} = ($self->{si} >> 6) & 0x03;
-	$self->{mp} = ($self->{si} >> 4) & 0x03;
-	$self->{si} &= 0x0f;
-	unless (exists $mtypes{$self->{si}}) {
-		print STDERR "W: $self: no message type for si=$self->{si}\n";
-	}
-	if ($self->{ni} == 0) {
-		$datalink->setrt(::RT_14BIT_PC);
-		$datalink->setpr(::MP_INTERNATIONAL);
-	}
-	if ($datalink->{pr} == ::MP_UNKNOWN) {
-		$datalink->setpr(::MP_NATIONAL) if $self->{mp} != 0;
-	} elsif ($datalink->{pr} == ::MP_JAPAN) {
-		$self->{mp} = $self->{li0};
-	} elsif ($datalink->{pr} == ::MP_INTERNATIONAL) {
-		$self->{mp} = 0;
-	}
-	if ($self->{li} < ::HT_EXTENDED) {
-		print STDERR "W: $self: too short for RL, li = $self->{li}\n";
-		return -1;
-	}
-	if ($self->{li} < 9 || ($self->{si} == 5 && $self->{li} < 11)) {
-		$datalink->setrt(::RT_14BIT_PC);
-	}
-	if ($datalink->{rt} == ::RT_UNKNOWN) {
-		my @b = (unpack('C*', substr($$dat, $$off, 11)));
-		my $ret = $self->checkRoutingLabelType($self->{si},$datalink,$self->{li},\@b);
-		if ($ret <= 0) {
-			return $ret;
-		}
-	}
-	return 0 if $datalink->detecting;
-	$$off++; $$len--;
-	if ($datalink->{rt} == ::RT_14BIT_PC) {
-		if ($self->{li} < 6) {
-			print STDERR "W: $self: too short for 14-bit RL, li = $self->{li}\n";
-			return -1;
-		}
-		$self->{dpc} = (unpack('v',substr($$dat,$$off+0,2)) >> 0) & 0x3fff;
-		$self->{opc} = (unpack('V',substr($$dat,$$off+1,4)) >> 2) & 0x3fff;
-		$self->{sls} = (unpack('C',substr($$dat,$$off+3,1)) >> 4) & 0x0f;
-		$$off += 4; $$len -= 4;
-	} else {
-		if ($self->{li} < 9) {
-			print STDERR "W: $self: too short for 24-bit RL, li = $self->{li}\n";
-			return -1;
-		}
-		$self->{dpc} = unpack('V',substr($$dat,$$off+0,4)) & 0x00ffffff;
-		$self->{opc} = unpack('V',substr($$dat,$$off+3,4)) & 0x00ffffff;
-		$self->{sls} = unpack('C',substr($$dat,$$off+6,1));
-		$$off += 7; $$len -= 7;
-	}
-	my $type;
-	if ($self->{si} < 4 || $self->{si} == 5) {
-		$type = {
-			0=>'SnmmMessage',
-			1=>'SntmMessage',
-			2=>'SnsmMessage',
-			3=>'SccpMessage',
-			5=>'IsupMessage',
-		}->{$self->{si}};
-	} else {
-		$type = 'UserMessage';
-	}
-	bless $self,$type;
-	return 1;
-}
-
-# -------------------------------------
-package SnmmMessage; use strict;
-@SnmmMessage::ISA = qw(Message);
-# -------------------------------------
-
-sub decode {
-	my ($self,$datalink,@args) = @_;
-	my ($off,$len,$dat) = (\$self->{off},\$self->{len},\$self->{dat});
-	$self->{mt} = unpack('C',substr($$dat,$$off,1));
-	$self->{mt} = (($self->{mt} & 0x0f) << 4) | ($self->{mt} >> 4);
-	unless (exists $mtypes{$self->{si}}->{$self->{mt}}) {
-		print STDERR "W: $self: no message type for si=$self->{si}, mt=$self->{mt}\n";
-		return -1;
-	}
-	return 1;
-}
-
-# -------------------------------------
-package SntmMessage; use strict;
-@SntmMessage::ISA = qw(Message);
-# -------------------------------------
-
-sub decode {
-	my ($self,$datalink,@args) = @_;
-	my ($off,$len,$dat) = (\$self->{off},\$self->{len},\$self->{dat});
-	$self->{mt} = unpack('C',substr($$dat,$$off,1));
-	$self->{mt} = (($self->{mt} & 0x0f) << 4) | ($self->{mt} >> 4);
-	unless (exists $mtypes{$self->{si}}->{$self->{mt}}) {
-		print STDERR "W: $self: no message type for si=$self->{si}, mt=$self->{mt}\n";
-		return -1;
-	}
-	$$off++; $$len--;
-	$self->{dlen0} = unpack('C',substr($$dat,$$off,1)); $$off++; $$len--;
-	$self->{dlen} = $self->{dlen0} >> 4; $self->{dlen0} &= 0x0f;
-	if ($datalink->{rt} == ::RT_14BIT_PC) {
-		$self->{slc} = $self->{sls};
-	} else {
-		$self->{slc} = $self->{dlen0};
-		delete $self->{dlen0};
-	}
-	$self->{tdata} = substr($$dat,$$off,$self->{dlen});
-	$$off+=$self->{dlen}; $$len-=$self->{dlen};
-	bless $self, {0x11=>'SltmMessage',0x12=>'SltaMessage'}->{$self->{mt}};
-	return 1;
-}
-
-# -------------------------------------
-package SnsmMessage; use strict;
-@SnsmMessage::ISA = qw(Message);
-# -------------------------------------
-
-sub decode {
-	my ($self,$datalink,@args) = @_;
-	my ($off,$len,$dat) = (\$self->{off},\$self->{len},\$self->{dat});
-	$self->{mt} = unpack('C',substr($$dat,$$off,1));
-	$self->{mt} = (($self->{mt} & 0x0f) << 4) | ($self->{mt} >> 4);
-	unless (exists $mtypes{$self->{si}}->{$self->{mt}}) {
-		print STDERR "W: $self: no message type for si=$self->{si}, mt=$self->{mt}\n";
-		return -1;
-	}
-	$$off++; $$len--;
-	$self->{dlen0} = unpack('C',substr($$dat,$$off,1)); $$off++; $$len--;
-	$self->{dlen} = $self->{dlen0} >> 4; $self->{dlen0} &= 0x0f;
-	if ($datalink->{rt} == ::RT_14BIT_PC) {
-		$self->{slc} = $self->{sls};
-	} else {
-		$self->{slc} = $self->{dlen0};
-		delete $self->{dlen0};
-	}
-	$self->{tdata} = substr($$dat,$$off,$self->{dlen});
-	$$off+=$self->{dlen}; $$len-=$self->{dlen};
-	bless $self, {0x11=>'SltmMessage',0x12=>'SltaMessage'}->{$self->{mt}};
-	return 1;
-}
-
-# -------------------------------------
-package SccpMessage; use strict;
-@SccpMessage::ISA = qw(Message);
-# -------------------------------------
-
-sub decode {
-	my ($self,$datalink,@args) = @_;
-	my ($off,$len,$dat) = (\$self->{off},\$self->{len},\$self->{dat});
-	$self->{mt} = unpack('C',substr($$dat,$$off,1));
-	unless (exists $mtypes{$self->{si}}->{$self->{mt}}) {
-		print STDERR "W: $self: no message type for si=$self->{si}, mt=$self->{mt}\n";
-	}
-	return 1;
-}
-
-# -------------------------------------
-package IsupMessage; use strict;
-@IsupMessage::ISA = qw(Message);
-# -------------------------------------
-
-sub decode {
-	my ($self,$datalink,@args) = @_;
-	my ($off,$len,$dat) = (\$self->{off},\$self->{len},\$self->{dat});
-	($self->{cic},$self->{mt}) = unpack('vC',substr($$dat,$$off,3));
-	unless (exists $mtypes{$self->{si}}->{$self->{mt}}) {
-		print STDERR "W: $self: no message type for si=$self->{si}, mt=$self->{mt}\n";
-	}
-	return 1;
-}
-
-# -------------------------------------
-package UserMessage; use strict;
-@UserMessage::ISA = qw(Message);
-# -------------------------------------
-
-sub decode {
-	my ($self,$datalink,@args) = @_;
-	my ($off,$len,$dat) = (\$self->{off},\$self->{len},\$self->{dat});
-	$self->{mt} = unpack('C',substr($$dat,$$off,1));
-	unless (exists $mtypes{$self->{si}}->{$self->{mt}}) {
-		print STDERR "W: $self: no message type for si=$self->{si}, mt=$self->{mt}\n";
-	}
-	return 1;
-}
-
-
-
-
-# -------------------------------------
-package Layer; use strict;
-# -------------------------------------
-
-# -------------------------------------
-package PcapLayer; use strict;
-@PcapLayer::ISA = qw(Layer);
-# -------------------------------------
-
-sub create {
-	my ($type,$top,$network,$msg) = @_;
-	my $dltype = $msg->{dltype};
-	my %dltypes = (
-		  1=>'EthernetLayer',
-		113=>'LinuxCookedLayer',
-		139=>'Mtp2WithPhdrLayer',
-	);
-	unless (exists $dltypes{$dltype}) {
-		print STDERR "E: $msg: wrong data link type $dltype\n";
-		return 2;
-	}
-	return $dltypes{$dltype}->create($top,$network,$msg);
-}
-
-# -------------------------------------
-package Mtp2WithPhdrLayer; use strict;
-@Mtp2WithPhdrLayer::ISA = qw(Layer);
-# -------------------------------------
-
-sub create {
-	my ($type,$top,$network,$msg) = @_;
-	return 2 if 4 > $msg->{len};
-	my $hdr = $msg->gethdr(4);
-	my ($dir,$xsn,$ppa) = unpack('CCn',$hdr);
-	$msg->{ppa} = $ppa;
-	$msg->{dir} = ($dir ^ 0x1) & 0x1;
-	$msg->{xsn} = $xsn;
-	$msg->{ht} = $htoptions[[1,2,0]->[$xsn]]->[1];
-	$msg->{datalink} = Channel->get($top,$network,$msg);
-	$msg->{datalink}->process($top,$network,$msg);
-	return 1;
-}
-
-# -------------------------------------
-package EthernetLayer; use strict;
-@EthernetLayer::ISA = qw(Layer);
-# -------------------------------------
-
-sub create {
-	my ($type,$top,$network,$msg) = @_;
-	return 2 if 14 > $msg->{len};
-	my $hdr = $msg->gethdr(14);
-	my $etyp = unpack('n',substr($hdr,12,2));
-	if ($etyp != 0x0800) {
-		printf STDERR "E: $msg: wrong ether type 0x%x08\n", $etyp;
-		return 2;
-	}
-	return IPLayer->create($top,$network,$msg);
-}
-
-# -------------------------------------
-package LinuxCookedLayer; use strict;
-@LinuxCookedLayer::ISA = qw(Layer);
-# -------------------------------------
-
-sub create {
-	my ($type,$top,$network,$msg) = @_;
-	return 2 if 16 > $msg->{len};
-	my $hdr = $msg->gethdr(16);
-	my ($dir,$etyp) = unpack('nn', substr($hdr,0,2).substr($hdr,14,2));
-	if ($etyp != 0x0800) {
-		printf STDERR "E: $msg: wrong ether type 0x%x08\n", $etyp;
-		return 2;
-	}
-	$msg->{dir} = $dir;
-	return IPLayer->create($top,$network,$msg);
-}
-
-# -------------------------------------
-package IPLayer; use strict;
-@IPLayer::ISA = qw(Layer);
-# -------------------------------------
-
-sub create {
-	my ($type,$top,$network,$msg) = @_;
-	return 2 if 20 > $msg->{len};
-	my $byte = unpack('C',$msg->{dat},$off,1);
-	my $vers = ($byte & 0xf0) >> 4;
-	if ($vers != 4) {
-		printf STDERR "E: $msg: only IPv4 supported but vers is $vers\n";
-		return 2;
-	}
-	my $hlen = ($byte & 0x0f) << 2;
-	if ($msg->{len} < $hlen) {
-		print STDERR "E: $msg: packet too short $hlen > $msg->{len}\n";
-		return 2;
-	}
-	my $hdr = $msg->gethdr($hlen);
-	my $plen = unpack('n',substr($hdr,2,2));
-	my ($proto,$csum,$saddr,$daddr) = unpack('CnNN',substr($hdr,9,12));
-	if ($proto != 132) {
-		unless (exists $top->{error}->{ipproto}) {
-			print STDERR "E: $msg: packet is not SCTP packet, proto is $proto\n";
-			print STDERR "E: $msg: improve your IP capture filter.\n";
-			print STDERR "E: $msg: this is your first and only warning.\n";
-			$top->{error}->{ipproto} = 1;
-		return 2;
-	}
-	my $dlen = $plen - $hlen;
-	if ($dlen > $msg->{len}) {
-		print STDERR "E: $msg: packet too short $dlen > $msg->{len}\n";
-		return 2;
-	}
-	$msg->{len} = $dlen;
-	$msg->{saddr} = $saddr;
-	$msg->{daddr} = $daddr;
-	return SCTPLayer->create($top,$network,$msg);
-}
-
-# -------------------------------------
-package Chunk; use strict;
-@Chunk::ISA = qw(Layer);
-# -------------------------------------
-# We don't keep packets explicitly: we keep chunks.  Chunks refer to the packets that
-# contain them, packets do not refer to their chunks.
-# -------------------------------------
-
-sub new {
-	my ($type,$top,$network,$pkt) = @_;
-	my $self = {off=>$pkt->{off},len=>$pkt->{len}};
-	bless $self,$type;
-	return undef if 4 > $self->{len}; 
-	$self->{pkt} = $pkt;
-	my $hdr = $pkt->gethdr(4);
-	(
-		$self->{ctype},
-		$self->{flags},
-		$self->{clen},
-	)
-	= unpack('CCn', $hdr);
-	$self->{off} += 4;
-	$self->{len} = $self->{clen} - 4;
-	my $plen = ($self->{clen}+3)^(~0x3) - 4;
-	return undef if 0 > $plen;
-	$pkt->{off} += $plen;
-	$pkt->{len} -= $plen;
-	my %ctypes = (
-		0=>'DataChunk',		# DATA (0)
-		#1=>'InitChunk',	# INIT (1)
-		#2=>'InitAckChunk',	# INIT ACK (2)
-		3=>'SackChunk',		# SACK (3)
-		#4=>'BeatChunk',	# HEARTBEAT (4)
-		#5=>'BeatAckChunk',	# HEARTBEAT ACK (5)
-		#6=>'AbortChunk',	# ABORT (6)
-		7=>'ShutdownChunk',	# SHUTDOWN (7)
-		#8=>'ShutdownAckChunk',	# SHUTDOWN ACK (8)
-		#9=>'ErrorChunk',	# ERROR (9)
-		#10=>'CookieEchoChunk',	# COOKIE ECHO (10)
-		#11=>'CookieAckChunk',	# COOKIE ACK (11)
-		#14=>'CompleteChunk',	# SHUTDOWN COMPLETE (14)
-	);
-	if (exists $ctypes{$self->{ctype}}) {
-		bless $self, $ctypes{$self->{ctype}};
-	} else {
-		bless $self,'OtherChunk';
-	}
-	return $self->decode($top,$network,$pkt);
-	if ($self->{ctype} == 0) { # DATA
-		return undef if 12 > $pkt->{len};
-		(
-			$self->{tsn},
-			$self->{stream},
-			$self->{ssn},
-			$self->{ppi},
-		)
-		= unpack('NnnN', $pkt->gethdr(12));
-		$self->{off} += 12;
-		$self->{len} -= 12;
-		$plen -= 12;
-		$pkt->{ppi} = $self->{ppi};
-	}
-	return $self;
-}
-
-# -------------------------------------
-package DataChunk; use strict;
-@DataChunk::ISA = qw(Chunk);
-# -------------------------------------
-
-sub decode {
-	my ($self,$top,$network,$pkt) = @_;
-	return undef if 12 > $self->{len};
-	(
-		$self->{tsn},
-		$self->{stream},
-		$self->{ssn},
-		$self->{ppi},
-	) = unpack('NnnN', $pkt->{dat}, $self->{off}, 12);
-	$self->{off} += 12; $self->{len} -= 12;
-	$pkt->{ppi} = $self->{ppi};
-	return $self;
-}
-
-# -------------------------------------
-package SackChunk; use strict;
-@SackChunk::ISA = qw(Chunk);
-# -------------------------------------
-
-sub decode {
-	my ($self,$top,$network,$pkt) = @_;
-	return undef if 12 > $self->{len};
-	(
-		$self->{cumm},
-		$self->{a_rwnd},
-		$self->{nacks},
-		$self->{ndups},
-	) = unpack('NNnn', $pkt->{dat}, $self->{off}, 12);
-	$self->{off} += 12; $self->{len} -= 12;
-	return $self;
-}
-
-# -------------------------------------
-package ShutdownChunk; use strict;
-@ShutdownChunk::ISA = qw(Chunk);
-# -------------------------------------
-
-sub decode {
-	my ($self,$top,$network,$pkt) = @_;
-	return undef if 4 > $self->{len};
-	(
-		$self->{cumm},
-	) = unpack('N', $pkt->{dat}, $self->{off}, 4);
-	$self->{off} += 4; $self->{len} -= 4;
-	return $self;
-}
-
-# -------------------------------------
-package SCTPLayer; use strict;
-@SCTPLayer::ISA = qw(Layer);
-# -------------------------------------
-
-sub create {
-	my ($type,$top,$network,$msg) = @_;
-	return 2 if 12 > $msg->{len};
-	(
-		$self->{sport},
-		$self->{dport},
-		$self->{vtag},
-	) =
-	unpack('nnNN', $msg->gethdr(12));
-	my ($datalink,$ppi);
-
-	# Unfortunately I want to use SACK and SHUTDOWN chunks to clock out data
-	# that was actually receieved by each end.  To do so, requires
-	# identifying the association without knowing the PPI value (because a
-	# packet could contain just SACK or SHUTDOWN chunks).  This also means,
-	# however, that it is not possible to filter on PPI, just on well-known
-	# port number because there is no PPi in these desired SACK or SHUTDOWN
-	# packets.  So, DATA chunks must belong to associations that have at
-	# least one well-known port number and either a corresponding PPI or a
-	# PPI of zero.
-	#
-	if ($datalink = $self->{datalink} = Association->find($top,$network,$msg)) {
-		$msg->{ppi} = $datalink->{ppi};
-	} else {
-		my %ports = ( 3565=>5, 2904=>2, 2905=>3, 14001=>4 );
-		$ppi = $ports{$self->{sport}} if !defined $ppi and exists $ports{$self->{sport}};
-		$ppi = $ports{$self->{dport}} if !defined $ppi and exists $ports{$self->{dport}};
-		if (defined $ppi) {
-			my %ppis = ( 2=>'M2UA', 3=>'M3UA', 4=>'SUA', 5=>'M2PA' );
-			$datalink->{ppi} = $ppi;
-			$datalink = $self->{datalink} = $ppis{$ppi}.'_Association'->get($top,$network,$msg);
-		}
-	}
-	my @chunks = ();
-	while ($msg->{len} > 0) {
-		my $chunk = Chunk->new($top,$network,$msg);
-		return 2 unless $chunk;
-		push @chunks, $chunk;
-	}
-	unless (defined $datalink) {
-		return 2 unless defined $msg->{ppi};
-		$ppi = $msg->{ppi};
-		my %ppis = ( 2=>'M2UA', 3=>'M3UA', 4=>'SUA', 5=>'M2PA' );
-		$datalink->{ppi} = $ppi;
-		$datalink = $self->{datalink} = $ppis{$ppi}.'_Association'->get($top,$network,$msg);
-	}
-	$datalink->add_pkt($top,$network,$msg,\@chunks);
-	return 1;
-}
-
-# -------------------------------------
-package ULPLayer; use strict;
-@ULPLayer::ISA = qw(Message);
-# -------------------------------------
-
-sub new {
-	my ($type,$top,$network,$dir,$chunks) = @_;
-	my $self = {};
-	bless $self,$type;
-	$self->{chunks} = $chunks;
-	my $first = $chunks->[0];
-	$self->{stream} = $first->{stream};
-	$self->{ppi} = $first->{ppi};
-	$self->{hdr} = $first->{pkt}->{hdr};
-	$self->{dir} = $dir;
-	$self->{dat} = '';
-	foreach my $chunk (@{$chunks}) {
-		$self->{dat} .= substr($chunk->{pkt}->{dat},$chunk->{off},$chunk->{len});
-	}
-	$self->{off} = 0;
-	$self->{len} = length($self->{dat});
-	return $self;
-}
-
-
-# -------------------------------------
-package PcapMessage; use strict;
-# -------------------------------------
-
-sub create {
-	my ($type,$top,$network,$source,$hdr,$dat,$dltype) = @_;
-	my $self = {};
-	bless $self,$type;
-
-	$self->{hdr} = {};
-	foreach (qw/len caplen tv_sec tv_usec/) {
-		$self->{hdr}->{$_} = $hdr->{$_};
-	}
-	$self->{dat} = $dat;
-	$self->{dltype} = $dltype;
-
-	my %dltypes = (
-		  1=>'EthernetMessage',
-		113=>'LinuxCookedMessage',
-		139=>'Mtp2WithPhdrMessage',
-	);
-	unless (exists $dltypes{$dltype}) {
-		print STDERR "E: ".ref($self).": wrong data link type $dltype\n";
-		return undef;
-	}
-	bless $self,$dltypes{$dltype};
-
-	return $self->create($top,$network);
-}
-
-sub process {
-	my ($self,$top,$network) = @_;
-
-	my $datalink = $self->{type}->get($top,$network,$self);
-	$datalink->process($top,$network,$self);
-}
-
-# -------------------------------------
-package Mtp2WithPhdrMessage; use strict;
-@Mtp2WithPhdrMessage::ISA = qw(PcapMessage);
-# -------------------------------------
-
-use constant {
-	MTP2_ANNEX_A_NOT_USED	    => 0,
-	MTP2_ANNEX_A_USED	    => 1,
-	MTP2_ANNEX_A_USED_UNKNOWN   => 2,
-};
-
-sub create {
-	my ($self,$top,$network) = @_;
-
-	$self->{psu} = substr($msg->{dat},0,4,'');
-	my ($dir,$xsn,$ppa) = unpack('CCn',$self->{psu});
-	$xsn = MTP2_ANNEX_A_USED_UNKNOWN unless 0 <= $xsn and $xsn <= 2;
-	my $ht = $htoptions[[1,2,0]->[$xsn]]->[1];
-	unless ($ht) {
-		my ($card,$span,$slot) = Channel::chan($ppa);
-		$ht = $slot ? ::HT_BASIC : ::HT_EXTENDED;
-	}
-	($self->{dir},$self->{xsn},$self->{ppa},$self->{ht})
-		= ($dir,$xsn,$ppa,$ht);
-
-	my $datalink = Channel->get($top,$network,$ppa,$dir,$ht);
-	# correct direction after creating datalink
-	$self->{dir} = ($self->{dir} ^ 0x1) & 0x1;
-
-	$self->{type} = 'Channel';
-	return $self;
-}
-
-# -------------------------------------
-package LinkLayerMessage; use strict;
-@LinkLayerMessage::ISA = qw(PcapMessage);
-# -------------------------------------
-
-# -------------------------------------
-package EthernetMessage; use strict;
-@EthernetMessage::ISA = qw(LinkLayerMessage);
-# -------------------------------------
-
-sub create {
-	my ($self,$top,$network) = @_;
-
-	my @bytes;
-	$self->{ethhdr} = substr($self->{dat},0,14,'');
-	@bytes = ();
-	foreach (unpack('C*',substr($self->{ethhdr},0,6))) {
-		push @bytes, sprintf('%02x',$_);
-	}
-	$self->{dhwa} = join(':',@bytes);
-	@bytes = ();
-	foreach (unpack('C*',substr($self->{ethhdr},6,6))) {
-		push @bytes, sprintf('%02x',$_);
-	}
-	$self->{shwa} = join(':',@bytes);
-	$self->{etyp} = unpack('n',substr($self->{ethhdr},12,2));
-
-	if ($self->{etyp} != 0x0800) {
-		printf STDERR "E: ".ref($self).": wrong ethernet type 0x%04x\n", $self->{etype};
-		return undef;
-	}
-
-	bless $self,'IPMessage';
-	return $self->create($top,$network);
-}
-
-# -------------------------------------
-package LinuxCookedMessage; use strict;
-@LinuxCookedMessage::ISA = qw(LinkLayerMessage);
-# -------------------------------------
-
-sub create {
-	my ($self,$top,$network) = @_;
-
-	$self->{sllhdr} = substr($self->{dat},0,16,'');
-	$self->{from} = unpack('n', substr($self->{sllhdr},0,2));
-	$self->{arph} = unpack('n', substr($self->{sllhdr},2,2));
-	$self->{llen} = unpack('n', substr($self->{sllhdr},4,2));
-	my $len = $self->{llen};
-	$len = 8 unless $self->{llen} <= 8;
-	my @bytes = ();
-	foreach (unpack('C*',substr($self->{sllhdr},6,$len))) {
-		push @bytes,sprintf('%02x',$_);
-	}
-	$self->{shwa} = join(':',@bytes);
-	$self->{etyp} = unpack('n',substr($self->{sllhdr},14,2));
-
-	if ($self->{etyp} != 0x0800) {
-		printf STDERR "E: ".ref($self).": wrong ethernet type 0x%04x\n", $self->{etype};
-		return undef;
-	}
-
-	bless $self,'IPMessage';
-	return $self->create($top,$network);
-}
-
-# -------------------------------------
-package IPMessage; use strict;
-@IPMessage::ISA = qw(LinkLayerMessage);
-# -------------------------------------
-
-sub create {
-	my ($self,$top,$network) = @_;
-
-	my $byte;
-
-	$byte = unpack('C', substr($msg->{dat},0,1));
-	$self->{ipvers} = ($byte & 0xf0) >> 4;
-
-	if ($self->{ipvers} != 4) {
-		printf STDERR "E: ".ref($self).": only IP version 4 supported but version is $self->{ipvers}\n";
-		return undef;
-	}
-	$self->{iplen} = ($byte & 0x0f) << 2;
-	if ($self->{iplen} < 20) {
-		printf STDERR "E: ".ref($self).": header length is $self->{iplen}\n";
-		return undef;
-	}
-	$self->{iphdr} = substr($msg->{dat},0,$self->{iplen},'');
-	$self->{dsn} = unpack('C', substr($self->{iphdr},1,1));
-	($self->{plen},$self->{ipid}) = unpack('n*',substr($self->{iphdr},2,4));
-	($self->{frag},$self->{frago},$self->{ttl},$self->{ipproto}) =
-		unpack('C*',substr($self->{iphdr},6,4));
-	if ($self->{ipproto} != 132) {
-		printf STDERR "E: ".ref($self).": ip protocol is $self->{ipproto}\n";
-		return undef;
-	}
-	$self->{ipcsum} = unpack($self->{iphdr},10,2);
-	$self->{saddr} = join('.',unpack('C*',substr($self->{iphdr},12,4)));
-	$self->{daddr} = join('.',unpack('C*',substr($self->{iphdr},16,4)));
-	$self->{ipdlen} = $self->{plen} - $self->{iplen};
-	$self->{trailer} = substr($msg->{dat},$self->{ipdlen});
-	$msg->{dat} = substr($msg->{dat},0,$self->{ipdlen});
-
-
-	bless $self, 'SCTPMessage';
-	return $self->create($top,$network);
-}
-
-# -------------------------------------
-package SCTPMessage; use strict;
-@SCTPMessage::ISA = qw(IPMessage);
-# -------------------------------------
-
-sub create {
-	my ($self,$top,$network) = @_;
-
-	$self->{sctphdr} = substr($self->{dat},0,12,'');
-	($self->{sport},$self->{dport}) = unpack('n*',substr($self->{sctphdr},0,4));
-	($self->{vtag},$self->{sctpcsum}) = unpack('N*',substr($self->{sctphdr},4,8));
-
-	unless (length($self->{dat}) < 4) {
-		print STDERR "E: ".ref($self).": empty SCTP message\n";
-		return undef;
-	}
-
-	$self->{chunks} = [];
-
-	while (length($self->{dat} >= 4)) {
-
-		my $chunk = {};
-
-		($chunk->{type},$chunk->{flags},$chunk->{clen}) =
-			unpack('CCn', substr($self->{dat},0,4,''));
-
-		if ($chunk->{type} == 0) { # DATA
-			($chunk->{tsn},$chunk->{stream},$chunk->{ssn},$chunk->{ppi}) =
-				unpack('NnnN', substr($self->{dat},0,12,''));
-			$self->{ppi} = $chunk->{ppi};
-			$chunk->{dlen} = $chunk->{clen} - 16;
-			$chunk->{data} = substr($self->{dat},0,$chunk->{dlen},'');
-			substr($self->{dat},0,(($chunk->{dlen}+3)&(~0x3)) - $chunk->{dlen}) = '';
-			push @$self->{chunks}, $chunk;
-		} else {
-			$chunk->{data} = substr($self->{dat},0,$chunk->{clen}-4,'');
-			push @$self->{chunks}, $chunk;
-		}
-	}
-
-	return undef unless @$self->{chunks};  # uninteresting
-
-	my $type = undef;
-
-	my %ppis = (
-		2=>'M2UA_Association',
-		3=>'M3UA_Association',
-		4=>'SUA_Association',
-		5=>'M2PA_Association',
-	);
-	$type = $ppis{$self->{ppi}} if exists $self->{ppi} and exists $ppis{$self->{ppi}};
-
-	if (!defined $type and exists $self->{ppi} and $self->{ppi} != 0) {
-		print STDERR "E: ".ref($self).": wrong PPI $self->{ppi}\n";
-		return undef;
-	}
-
-	my %ports = (
-		 3565=>'M2PA_Association',
-		 2904=>'M2UA_Association',
-		 2905=>'M3UA_Association',
-		14001=>'SUA_Association',
-	);
-	$type = $ports{$self->{sport}} if !defined $type and exists $ports{$self->{sport}};
-	$type = $ports{$self->{dport}} if !defined $type and exists $ports{$self->{dport}};
-
-	if (!defined $type) {
-		printf STDERR "E: ".ref($self).": cannot determine payload type\n";
-		return undef;
-	}
-
-	$self->{type} = $type;
-	return $self;
-}
-
-
-# -------------------------------------
-# -------------------------------------
-# -------------------------------------
-# -------------------------------------
-# -------------------------------------
-# -------------------------------------
-# -------------------------------------
-package FisuMessage; use strict;
-@FisuMessage::ISA = qw(Message);
-# -------------------------------------
-# -------------------------------------
-package LssuMessage; use strict;
-@LssuMessage::ISA = qw(Message);
-# -------------------------------------
-# -------------------------------------
-package Lss2Message; use strict;
-@Lss2Message::ISA = qw(Message);
-# -------------------------------------
-# -------------------------------------
-package MsuMessage; use strict;
-@MsuMessage::ISA = qw(Message);
-# -------------------------------------
-# -------------------------------------
-package SnmmMessage; use strict;
-@SnmmMessage::ISA = qw(MsuMessage);
+package SnmmMessage; use strict; use vars qw(@ISA); @ISA = qw(MsuMessage);
 # -------------------------------------
 sub decode {
 	my ($self,$b,$o) = @_;
@@ -12233,12 +10052,11 @@ sub decode {
 	}
 }
 # -------------------------------------
-package ComMessage; use strict;
-@ComMessage::ISA = qw(SnmmMessage);
+package ComMessage; use strict; use vars qw(@ISA); @ISA = qw(SnmmMessage);
 # -------------------------------------
 sub decode {
 	my ($self,$b,$o) = @_;
-	if ($self->{datalink}->{rt} == ::RT_14BIT_PC) {
+	if ($self->{channel}->{rt} == ::RT_14BIT_PC) {
 		$self->{slc} = $self->{sls};
 		$self->{fsnl} = $b->[$$o] & 0x7f;
 		$self->{fsnl0} = $b->[$$o] >> 7;
@@ -12253,12 +10071,11 @@ sub decode {
 	}
 }
 # -------------------------------------
-package CbmMessage; use strict;
-@CbmMessage::ISA = qw(SnmmMessage);
+package CbmMessage; use strict; use vars qw(@ISA); @ISA = qw(SnmmMessage);
 # -------------------------------------
 sub decode {
 	my ($self,$b,$o) = @_;
-	if ($self->{datalink}->{rt} == ::RT_14BIT_PC) {
+	if ($self->{channel}->{rt} == ::RT_14BIT_PC) {
 		$self->{slc} = $self->{sls};
 		$self->{cbc} = $b->[$$o];
 		$$o++;
@@ -12272,12 +10089,11 @@ sub decode {
 	}
 }
 # -------------------------------------
-package SlmMessage; use strict;
-@SlmMessage::ISA = qw(SnmmMessage);
+package SlmMessage; use strict; use vars qw(@ISA); @ISA = qw(SnmmMessage);
 # -------------------------------------
 sub decode {
 	my ($self,$b,$o) = @_;
-	if ($self->{datalink}->{rt} == ::RT_14BIT_PC) {
+	if ($self->{channel}->{rt} == ::RT_14BIT_PC) {
 		$self->{slc} = $self->{sls};
 	} else {
 		$self->{slc} = $b->[$$o] & 0x0f;
@@ -12286,8 +10102,7 @@ sub decode {
 	}
 }
 # -------------------------------------
-package TfmMessage; use strict;
-@TfmMessage::ISA = qw(SnmmMessage);
+package TfmMessage; use strict; use vars qw(@ISA); @ISA = qw(SnmmMessage);
 # -------------------------------------
 sub decode {
 	my ($self,$b,$o,$rt) = @_;
@@ -12307,8 +10122,7 @@ sub decode {
 	}
 }
 # -------------------------------------
-package UpmMessage; use strict;
-@UpmMessage::ISA = qw(SnmmMessage);
+package UpmMessage; use strict; use vars qw(@ISA); @ISA = qw(SnmmMessage);
 # -------------------------------------
 sub decode {
 	my ($self,$b,$o,$rt) = @_;
@@ -12331,40 +10145,32 @@ sub decode {
 	$$o++;
 }
 # -------------------------------------
-package CooMessage; use strict;
-@CooMessage::ISA = qw(ComMessage);
+package CooMessage; use strict; use vars qw(@ISA); @ISA = qw(ComMessage);
 # -------------------------------------
 # -------------------------------------
-package CoaMessage; use strict;
-@CoaMessage::ISA = qw(ComMessage);
+package CoaMessage; use strict; use vars qw(@ISA); @ISA = qw(ComMessage);
 # -------------------------------------
 # -------------------------------------
-package CbdMessage; use strict;
-@CbdMessage::ISA = qw(CbmMessage);
+package CbdMessage; use strict; use vars qw(@ISA); @ISA = qw(CbmMessage);
 # -------------------------------------
 # -------------------------------------
-package CbaMessage; use strict;
-@CbaMessage::ISA = qw(CbmMessage);
+package CbaMessage; use strict; use vars qw(@ISA); @ISA = qw(CbmMessage);
 # -------------------------------------
 # -------------------------------------
-package EcoMessage; use strict;
-@EcoMessage::ISA = qw(SlmMessage);
+package EcoMessage; use strict; use vars qw(@ISA); @ISA = qw(SlmMessage);
 # -------------------------------------
 # -------------------------------------
-package EcaMessage; use strict;
-@EcaMessage::ISA = qw(SlmMessage);
+package EcaMessage; use strict; use vars qw(@ISA); @ISA = qw(SlmMessage);
 # -------------------------------------
 # -------------------------------------
-package RctMessage; use strict;
-@RctMessage::ISA = qw(SnmmMessage);
+package RctMessage; use strict; use vars qw(@ISA); @ISA = qw(SnmmMessage);
 # -------------------------------------
 # -------------------------------------
-package TfcMessage; use strict;
-@TfcMessage::ISA = qw(SnmmMessage);
+package TfcMessage; use strict; use vars qw(@ISA); @ISA = qw(SnmmMessage);
 # -------------------------------------
 sub decode {
 	my ($self,$b,$o) = @_;
-	if ($self->{datalink}->{rt} == ::RT_14BIT_PC) {
+	if ($self->{channel}->{rt} == ::RT_14BIT_PC) {
 		$self->{dest} = $b->[$$o];
 		$$o++;
 		$self->{dest} |= ($b->[$$o] & 0x3f) << 8;
@@ -12383,88 +10189,67 @@ sub decode {
 	}
 }
 # -------------------------------------
-package TfpMessage; use strict;
-@TfpMessage::ISA = qw(TfmMessage);
+package TfpMessage; use strict; use vars qw(@ISA); @ISA = qw(TfmMessage);
 # -------------------------------------
 # -------------------------------------
-package TcpMessage; use strict;
-@TcpMessage::ISA = qw(TfmMessage);
+package TcpMessage; use strict; use vars qw(@ISA); @ISA = qw(TfmMessage);
 # -------------------------------------
 # -------------------------------------
-package TfrMessage; use strict;
-@TfrMessage::ISA = qw(TfmMessage);
+package TfrMessage; use strict; use vars qw(@ISA); @ISA = qw(TfmMessage);
 # -------------------------------------
 # -------------------------------------
-package TcrMessage; use strict;
-@TcrMessage::ISA = qw(TfmMessage);
+package TcrMessage; use strict; use vars qw(@ISA); @ISA = qw(TfmMessage);
 # -------------------------------------
 # -------------------------------------
-package TfaMessage; use strict;
-@TfaMessage::ISA = qw(TfmMessage);
+package TfaMessage; use strict; use vars qw(@ISA); @ISA = qw(TfmMessage);
 # -------------------------------------
 # -------------------------------------
-package TcaMessage; use strict;
-@TcaMessage::ISA = qw(TfmMessage);
+package TcaMessage; use strict; use vars qw(@ISA); @ISA = qw(TfmMessage);
 # -------------------------------------
 # -------------------------------------
-package RstMessage; use strict;
-@RstMessage::ISA = qw(TfmMessage);
+package RstMessage; use strict; use vars qw(@ISA); @ISA = qw(TfmMessage);
 # -------------------------------------
 # -------------------------------------
-package RsrMessage; use strict;
-@RsrMessage::ISA = qw(TfmMessage);
+package RsrMessage; use strict; use vars qw(@ISA); @ISA = qw(TfmMessage);
 # -------------------------------------
 # -------------------------------------
-package RcpMessage; use strict;
-@RcpMessage::ISA = qw(TfmMessage);
+package RcpMessage; use strict; use vars qw(@ISA); @ISA = qw(TfmMessage);
 # -------------------------------------
 # -------------------------------------
-package RcrMessage; use strict;
-@RcrMessage::ISA = qw(TfmMessage);
+package RcrMessage; use strict; use vars qw(@ISA); @ISA = qw(TfmMessage);
 # -------------------------------------
 # -------------------------------------
-package LinMessage; use strict;
-@LinMessage::ISA = qw(SlmMessage);
+package LinMessage; use strict; use vars qw(@ISA); @ISA = qw(SlmMessage);
 # -------------------------------------
 # -------------------------------------
-package LunMessage; use strict;
-@LunMessage::ISA = qw(SlmMessage);
+package LunMessage; use strict; use vars qw(@ISA); @ISA = qw(SlmMessage);
 # -------------------------------------
 # -------------------------------------
-package LiaMessage; use strict;
-@LiaMessage::ISA = qw(SlmMessage);
+package LiaMessage; use strict; use vars qw(@ISA); @ISA = qw(SlmMessage);
 # -------------------------------------
 # -------------------------------------
-package LuaMessage; use strict;
-@LuaMessage::ISA = qw(SlmMessage);
+package LuaMessage; use strict; use vars qw(@ISA); @ISA = qw(SlmMessage);
 # -------------------------------------
 # -------------------------------------
-package LidMessage; use strict;
-@LidMessage::ISA = qw(SlmMessage);
+package LidMessage; use strict; use vars qw(@ISA); @ISA = qw(SlmMessage);
 # -------------------------------------
 # -------------------------------------
-package LfuMessage; use strict;
-@LfuMessage::ISA = qw(SlmMessage);
+package LfuMessage; use strict; use vars qw(@ISA); @ISA = qw(SlmMessage);
 # -------------------------------------
 # -------------------------------------
-package LltMessage; use strict;
-@LltMessage::ISA = qw(SlmMessage);
+package LltMessage; use strict; use vars qw(@ISA); @ISA = qw(SlmMessage);
 # -------------------------------------
 # -------------------------------------
-package LrtMessage; use strict;
-@LrtMessage::ISA = qw(SlmMessage);
+package LrtMessage; use strict; use vars qw(@ISA); @ISA = qw(SlmMessage);
 # -------------------------------------
 # -------------------------------------
-package TraMessage; use strict;
-@TraMessage::ISA = qw(SnmmMessage);
+package TraMessage; use strict; use vars qw(@ISA); @ISA = qw(SnmmMessage);
 # -------------------------------------
 # -------------------------------------
-package TrwMessage; use strict;
-@TrwMessage::ISA = qw(SnmmMessage);
+package TrwMessage; use strict; use vars qw(@ISA); @ISA = qw(SnmmMessage);
 # -------------------------------------
 # -------------------------------------
-package DlcMessage; use strict;
-@DlcMessage::ISA = qw(SnmmMessage);
+package DlcMessage; use strict; use vars qw(@ISA); @ISA = qw(SnmmMessage);
 # -------------------------------------
 sub decode {
 	my ($self,$b,$o,$rt) = @_;
@@ -12487,33 +10272,26 @@ sub decode {
 	}
 }
 # -------------------------------------
-package CssMessage; use strict;
-@CssMessage::ISA = qw(SlmMessage);
+package CssMessage; use strict; use vars qw(@ISA); @ISA = qw(SlmMessage);
 # -------------------------------------
 # -------------------------------------
-package CnsMessage; use strict;
-@CnsMessage::ISA = qw(SlmMessage);
+package CnsMessage; use strict; use vars qw(@ISA); @ISA = qw(SlmMessage);
 # -------------------------------------
 # -------------------------------------
-package CnpMessage; use strict;
-@CnpMessage::ISA = qw(SlmMessage);
+package CnpMessage; use strict; use vars qw(@ISA); @ISA = qw(SlmMessage);
 # -------------------------------------
 # -------------------------------------
-package UpuMessage; use strict;
-@UpuMessage::ISA = qw(UpmMessage);
+package UpuMessage; use strict; use vars qw(@ISA); @ISA = qw(UpmMessage);
 # -------------------------------------
 # -------------------------------------
-package UpaMessage; use strict;
-@UpaMessage::ISA = qw(UpmMessage);
+package UpaMessage; use strict; use vars qw(@ISA); @ISA = qw(UpmMessage);
 # -------------------------------------
 # -------------------------------------
-package UptMessage; use strict;
-@UptMessage::ISA = qw(UpmMessage);
+package UptMessage; use strict; use vars qw(@ISA); @ISA = qw(UpmMessage);
 # -------------------------------------
 
 # -------------------------------------
-package SntmMessage; use strict;
-@SntmMessage::ISA = qw(MsuMessage);
+package SntmMessage; use strict; use vars qw(@ISA); @ISA = qw(MsuMessage);
 # -------------------------------------
 sub decode {
 	my ($self,$b,$o,$rt) = @_;
@@ -12532,110 +10310,85 @@ sub decode {
 	$$o += $self->{dlen};
 }
 # -------------------------------------
-package SnsmMessage; use strict;
-@SnsmMessage::ISA = qw(MsuMessage);
+package SnsmMessage; use strict; use vars qw(@ISA); @ISA = qw(MsuMessage);
 # -------------------------------------
 sub decode {
 	my ($self,@args) = @_;
 	SntmMessage::decode(@args);
 }
 # -------------------------------------
-package SltmMessage; use strict;
-@SltmMessage::ISA = qw(SntmMessage SnsmMessage);
+package SltmMessage; use strict; use vars qw(@ISA); @ISA = qw(SntmMessage SnsmMessage);
 # -------------------------------------
 # -------------------------------------
-package SltaMessage; use strict;
-@SltaMessage::ISA = qw(SntmMessage SnsmMessage);
+package SltaMessage; use strict; use vars qw(@ISA); @ISA = qw(SntmMessage SnsmMessage);
 # -------------------------------------
 
 # -------------------------------------
-package SccpMessage; use strict;
-@SccpMessage::ISA = qw(MsuMessage);
+package SccpMessage; use strict; use vars qw(@ISA); @ISA = qw(MsuMessage);
 # -------------------------------------
 # -------------------------------------
-package CrMessage; use strict;
-@CrMessage::ISA = qw(SccpMessage);
+package CrMessage; use strict; use vars qw(@ISA); @ISA = qw(SccpMessage);
 # -------------------------------------
 # -------------------------------------
-package CcMessage; use strict;
-@CcMessage::ISA = qw(SccpMessage);
+package CcMessage; use strict; use vars qw(@ISA); @ISA = qw(SccpMessage);
 # -------------------------------------
 # -------------------------------------
-package CrefMessage; use strict;
-@CrefMessage::ISA = qw(SccpMessage);
+package CrefMessage; use strict; use vars qw(@ISA); @ISA = qw(SccpMessage);
 # -------------------------------------
 # -------------------------------------
-package RlsdMessage; use strict;
-@RlsdMessage::ISA = qw(SccpMessage);
+package RlsdMessage; use strict; use vars qw(@ISA); @ISA = qw(SccpMessage);
 # -------------------------------------
 # -------------------------------------
-package RlcMessage; use strict;
-@RlcMessage::ISA = qw(SccpMessage);
+package RlcMessage; use strict; use vars qw(@ISA); @ISA = qw(SccpMessage);
 # -------------------------------------
 # -------------------------------------
-package Dt1Message; use strict;
-@Dt1Message::ISA = qw(SccpMessage);
+package Dt1Message; use strict; use vars qw(@ISA); @ISA = qw(SccpMessage);
 # -------------------------------------
 # -------------------------------------
-package Dt2Message; use strict;
-@Dt2Message::ISA = qw(SccpMessage);
+package Dt2Message; use strict; use vars qw(@ISA); @ISA = qw(SccpMessage);
 # -------------------------------------
 # -------------------------------------
-package AkMessage; use strict;
-@AkMessage::ISA = qw(SccpMessage);
+package AkMessage; use strict; use vars qw(@ISA); @ISA = qw(SccpMessage);
 # -------------------------------------
 # -------------------------------------
-package UdtMessage; use strict;
-@UdtMessage::ISA = qw(SccpMessage);
+package UdtMessage; use strict; use vars qw(@ISA); @ISA = qw(SccpMessage);
 # -------------------------------------
 # -------------------------------------
-package UdtsMessage; use strict;
-@UdtsMessage::ISA = qw(SccpMessage);
+package UdtsMessage; use strict; use vars qw(@ISA); @ISA = qw(SccpMessage);
 # -------------------------------------
 # -------------------------------------
-package EdMessage; use strict;
-@EdMessage::ISA = qw(SccpMessage);
+package EdMessage; use strict; use vars qw(@ISA); @ISA = qw(SccpMessage);
 # -------------------------------------
 # -------------------------------------
-package EaMessage; use strict;
-@EaMessage::ISA = qw(SccpMessage);
+package EaMessage; use strict; use vars qw(@ISA); @ISA = qw(SccpMessage);
 # -------------------------------------
 # -------------------------------------
-package RsrMessage; use strict;
-@RsrMessage::ISA = qw(SccpMessage);
+package RsrMessage; use strict; use vars qw(@ISA); @ISA = qw(SccpMessage);
 # -------------------------------------
 # -------------------------------------
-package RscMessage; use strict;
-@RscMessage::ISA = qw(SccpMessage);
+package RscMessage; use strict; use vars qw(@ISA); @ISA = qw(SccpMessage);
 # -------------------------------------
 # -------------------------------------
-package ErrMessage; use strict;
-@ErrMessage::ISA = qw(SccpMessage);
+package ErrMessage; use strict; use vars qw(@ISA); @ISA = qw(SccpMessage);
 # -------------------------------------
 # -------------------------------------
-package ItMessage; use strict;
-@ItMessage::ISA = qw(SccpMessage);
+package ItMessage; use strict; use vars qw(@ISA); @ISA = qw(SccpMessage);
 # -------------------------------------
 # -------------------------------------
-package XudtMessage; use strict;
-@XudtMessage::ISA = qw(SccpMessage);
+package XudtMessage; use strict; use vars qw(@ISA); @ISA = qw(SccpMessage);
 # -------------------------------------
 # -------------------------------------
-package XudtsMessage; use strict;
-@XudtsMessage::ISA = qw(SccpMessage);
+package XudtsMessage; use strict; use vars qw(@ISA); @ISA = qw(SccpMessage);
 # -------------------------------------
 # -------------------------------------
-package LudtMessage; use strict;
-@LudtMessage::ISA = qw(SccpMessage);
+package LudtMessage; use strict; use vars qw(@ISA); @ISA = qw(SccpMessage);
 # -------------------------------------
 # -------------------------------------
-package LudtsMessage; use strict;
-@LudtsMessage::ISA = qw(SccpMessage);
+package LudtsMessage; use strict; use vars qw(@ISA); @ISA = qw(SccpMessage);
 # -------------------------------------
 
 # -------------------------------------
-package IsupMessage; use strict;
-@IsupMessage::ISA = qw(MsuMessage);
+package IsupMessage; use strict; use vars qw(@ISA); @ISA = qw(MsuMessage);
 # -------------------------------------
 my %isupparm = (
 	0x00 => ['eop',		'End of optional parameters',			'EopIsupParameter'	],
@@ -12762,8 +10515,7 @@ sub oparms {
 	return \@parms;
 }
 # -------------------------------------
-package IamMessage; use strict;
-@IamMessage::ISA = qw(IsupMessage);
+package IamMessage; use strict; use vars qw(@ISA); @ISA = qw(IsupMessage);
 # -------------------------------------
 sub decode {
 	my ($self,$b,$p,$e,$rt) = @_;
@@ -12783,8 +10535,7 @@ sub decode {
 	$self->{oparms} = $self->oparms($b,$p,$e,$rt);
 }
 # -------------------------------------
-package SamMessage; use strict;
-@SamMessage::ISA = qw(IsupMessage);
+package SamMessage; use strict; use vars qw(@ISA); @ISA = qw(IsupMessage);
 # -------------------------------------
 sub decode {
 	my ($self,$b,$p,$e,$rt) = @_;
@@ -12794,8 +10545,7 @@ sub decode {
 	}
 }
 # -------------------------------------
-package InrMessage; use strict;
-@InrMessage::ISA = qw(IsupMessage);
+package InrMessage; use strict; use vars qw(@ISA); @ISA = qw(IsupMessage);
 # -------------------------------------
 sub decode {
 	my ($self,$b,$p,$e,$rt) = @_;
@@ -12803,8 +10553,7 @@ sub decode {
 	$self->{oparms} = $self->oparms($b,$p,$e,$rt);
 }
 # -------------------------------------
-package InfMessage; use strict;
-@InfMessage::ISA = qw(IsupMessage);
+package InfMessage; use strict; use vars qw(@ISA); @ISA = qw(IsupMessage);
 # -------------------------------------
 sub decode {
 	my ($self,$b,$p,$e,$rt) = @_;
@@ -12812,16 +10561,14 @@ sub decode {
 	$self->{oparms} = $self->oparms($b,$p,$e,$rt);
 }
 # -------------------------------------
-package CotMessage; use strict;
-@CotMessage::ISA = qw(IsupMessage);
+package CotMessage; use strict; use vars qw(@ISA); @ISA = qw(IsupMessage);
 # -------------------------------------
 sub decode {
 	my ($self,$b,$p,$e,$rt) = @_;
 	$self->{coti} = CotiIsupParameter->man($b,$p,$e,$rt);
 }
 # -------------------------------------
-package AcmMessage; use strict;
-@AcmMessage::ISA = qw(IsupMessage);
+package AcmMessage; use strict; use vars qw(@ISA); @ISA = qw(IsupMessage);
 # -------------------------------------
 sub decode {
 	my ($self,$b,$p,$e,$rt) = @_;
@@ -12829,8 +10576,7 @@ sub decode {
 	$self->{oparms} = $self->oparms($b,$p,$e,$rt);
 }
 # -------------------------------------
-package ConMessage; use strict;
-@ConMessage::ISA = qw(IsupMessage);
+package ConMessage; use strict; use vars qw(@ISA); @ISA = qw(IsupMessage);
 # -------------------------------------
 sub decode {
 	my ($self,$b,$p,$e,$rt) = @_;
@@ -12840,24 +10586,21 @@ sub decode {
 	}
 }
 # -------------------------------------
-package FotMessage; use strict;
-@FotMessage::ISA = qw(IsupMessage);
+package FotMessage; use strict; use vars qw(@ISA); @ISA = qw(IsupMessage);
 # -------------------------------------
 sub decode {
 	my ($self,$b,$p,$e,$rt) = @_;
 	$self->{oparms} = $self->oparms($b,$p,$e,$rt);
 }
 # -------------------------------------
-package AnmMessage; use strict;
-@AnmMessage::ISA = qw(IsupMessage);
+package AnmMessage; use strict; use vars qw(@ISA); @ISA = qw(IsupMessage);
 # -------------------------------------
 sub decode {
 	my ($self,$b,$p,$e,$rt) = @_;
 	$self->{oparms} = $self->oparms($b,$p,$e,$rt);
 }
 # -------------------------------------
-package RelMessage; use strict;
-@RelMessage::ISA = qw(IsupMessage);
+package RelMessage; use strict; use vars qw(@ISA); @ISA = qw(IsupMessage);
 # -------------------------------------
 sub decode {
 	my ($self,$b,$p,$e,$rt) = @_;
@@ -12865,8 +10608,7 @@ sub decode {
 	$self->{oparms} = $self->oparms($b,$p,$e,$rt);
 }
 # -------------------------------------
-package SusMessage; use strict;
-@SusMessage::ISA = qw(IsupMessage);
+package SusMessage; use strict; use vars qw(@ISA); @ISA = qw(IsupMessage);
 # -------------------------------------
 sub decode {
 	my ($self,$b,$p,$e,$rt) = @_;
@@ -12874,8 +10616,7 @@ sub decode {
 	$self->{oparms} = $self->oparms($b,$p,$e,$rt);
 }
 # -------------------------------------
-package ResMessage; use strict;
-@ResMessage::ISA = qw(IsupMessage);
+package ResMessage; use strict; use vars qw(@ISA); @ISA = qw(IsupMessage);
 # -------------------------------------
 sub decode {
 	my ($self,$b,$p,$e,$rt) = @_;
@@ -12883,8 +10624,7 @@ sub decode {
 	$self->{oparms} = $self->oparms($b,$p,$e,$rt);
 }
 # -------------------------------------
-package RlcMessage; use strict;
-@RlcMessage::ISA = qw(IsupMessage);
+package RlcMessage; use strict; use vars qw(@ISA); @ISA = qw(IsupMessage);
 # -------------------------------------
 sub decode {
 	my ($self,$b,$p,$e,$rt) = @_;
@@ -12893,40 +10633,32 @@ sub decode {
 	}
 }
 # -------------------------------------
-package CcrMessage; use strict;
-@CcrMessage::ISA = qw(IsupMessage);
+package CcrMessage; use strict; use vars qw(@ISA); @ISA = qw(IsupMessage);
 # -------------------------------------
 # -------------------------------------
-package RscMessage; use strict;
-@RscMessage::ISA = qw(IsupMessage);
+package RscMessage; use strict; use vars qw(@ISA); @ISA = qw(IsupMessage);
 # -------------------------------------
 # -------------------------------------
-package BloMessage; use strict;
-@BloMessage::ISA = qw(IsupMessage);
+package BloMessage; use strict; use vars qw(@ISA); @ISA = qw(IsupMessage);
 # -------------------------------------
 # -------------------------------------
-package UblMessage; use strict;
-@UblMessage::ISA = qw(IsupMessage);
+package UblMessage; use strict; use vars qw(@ISA); @ISA = qw(IsupMessage);
 # -------------------------------------
 # -------------------------------------
-package BlaMessage; use strict;
-@BlaMessage::ISA = qw(IsupMessage);
+package BlaMessage; use strict; use vars qw(@ISA); @ISA = qw(IsupMessage);
 # -------------------------------------
 # -------------------------------------
-package UbaMessage; use strict;
-@UbaMessage::ISA = qw(IsupMessage);
+package UbaMessage; use strict; use vars qw(@ISA); @ISA = qw(IsupMessage);
 # -------------------------------------
 # -------------------------------------
-package GrsMessage; use strict;
-@GrsMessage::ISA = qw(IsupMessage);
+package GrsMessage; use strict; use vars qw(@ISA); @ISA = qw(IsupMessage);
 # -------------------------------------
 sub decode {
 	my ($self,$b,$p,$e,$rt) = @_;
 	$self->{rs} = RsIsupParameter->man($b,$p,$e,$rt);
 }
 # -------------------------------------
-package CgbMessage; use strict;
-@CgbMessage::ISA = qw(IsupMessage);
+package CgbMessage; use strict; use vars qw(@ISA); @ISA = qw(IsupMessage);
 # -------------------------------------
 sub decode {
 	my ($self,$b,$p,$e,$rt) = @_;
@@ -12934,8 +10666,7 @@ sub decode {
 	$self->{rs} = RsIsupParameter->man($b,$p,$e,$rt);
 }
 # -------------------------------------
-package CguMessage; use strict;
-@CguMessage::ISA = qw(IsupMessage);
+package CguMessage; use strict; use vars qw(@ISA); @ISA = qw(IsupMessage);
 # -------------------------------------
 sub decode {
 	my ($self,$b,$p,$e,$rt) = @_;
@@ -12943,8 +10674,7 @@ sub decode {
 	$self->{rs} = RsIsupParameter->man($b,$p,$e,$rt);
 }
 # -------------------------------------
-package CgbaMessage; use strict;
-@CgbaMessage::ISA = qw(IsupMessage);
+package CgbaMessage; use strict; use vars qw(@ISA); @ISA = qw(IsupMessage);
 # -------------------------------------
 sub decode {
 	my ($self,$b,$p,$e,$rt) = @_;
@@ -12952,8 +10682,7 @@ sub decode {
 	$self->{rs} = RsIsupParameter->man($b,$p,$e,$rt);
 }
 # -------------------------------------
-package CguaMessage; use strict;
-@CguaMessage::ISA = qw(IsupMessage);
+package CguaMessage; use strict; use vars qw(@ISA); @ISA = qw(IsupMessage);
 # -------------------------------------
 sub decode {
 	my ($self,$b,$p,$e,$rt) = @_;
@@ -12961,8 +10690,7 @@ sub decode {
 	$self->{rs} = RsIsupParameter->man($b,$p,$e,$rt);
 }
 # -------------------------------------
-package CmrMessage; use strict;
-@CmrMessage::ISA = qw(IsupMessage);
+package CmrMessage; use strict; use vars qw(@ISA); @ISA = qw(IsupMessage);
 # -------------------------------------
 sub decode {
 	my ($self,$b,$p,$e,$rt) = @_;
@@ -12972,8 +10700,7 @@ sub decode {
 	}
 }
 # -------------------------------------
-package CmcMessage; use strict;
-@CmcMessage::ISA = qw(IsupMessage);
+package CmcMessage; use strict; use vars qw(@ISA); @ISA = qw(IsupMessage);
 # -------------------------------------
 sub decode {
 	my ($self,$b,$p,$e,$rt) = @_;
@@ -12983,8 +10710,7 @@ sub decode {
 	}
 }
 # -------------------------------------
-package CmrjMessage; use strict;
-@CmrjMessage::ISA = qw(IsupMessage);
+package CmrjMessage; use strict; use vars qw(@ISA); @ISA = qw(IsupMessage);
 # -------------------------------------
 sub decode {
 	my ($self,$b,$p,$e,$rt) = @_;
@@ -12994,8 +10720,7 @@ sub decode {
 	}
 }
 # -------------------------------------
-package FarMessage; use strict;
-@FarMessage::ISA = qw(IsupMessage);
+package FarMessage; use strict; use vars qw(@ISA); @ISA = qw(IsupMessage);
 # -------------------------------------
 sub decode {
 	my ($self,$b,$p,$e,$rt) = @_;
@@ -13003,8 +10728,7 @@ sub decode {
 	$self->{oparms} = $self->oparms($b,$p,$e,$rt);
 }
 # -------------------------------------
-package FaaMessage; use strict;
-@FaaMessage::ISA = qw(IsupMessage);
+package FaaMessage; use strict; use vars qw(@ISA); @ISA = qw(IsupMessage);
 # -------------------------------------
 sub decode {
 	my ($self,$b,$p,$e,$rt) = @_;
@@ -13012,8 +10736,7 @@ sub decode {
 	$self->{oparms} = $self->oparms($b,$p,$e,$rt);
 }
 # -------------------------------------
-package FrjMessage; use strict;
-@FrjMessage::ISA = qw(IsupMessage);
+package FrjMessage; use strict; use vars qw(@ISA); @ISA = qw(IsupMessage);
 # -------------------------------------
 sub decode {
 	my ($self,$b,$p,$e,$rt) = @_;
@@ -13022,8 +10745,7 @@ sub decode {
 	$self->{oparms} = $self->oparms($b,$p,$e,$rt);
 }
 # -------------------------------------
-package FadMessage; use strict;
-@FadMessage::ISA = qw(IsupMessage);
+package FadMessage; use strict; use vars qw(@ISA); @ISA = qw(IsupMessage);
 # -------------------------------------
 sub decode {
 	my ($self,$b,$p,$e,$rt) = @_;
@@ -13033,8 +10755,7 @@ sub decode {
 	}
 }
 # -------------------------------------
-package FaiMessage; use strict;
-@FaiMessage::ISA = qw(IsupMessage);
+package FaiMessage; use strict; use vars qw(@ISA); @ISA = qw(IsupMessage);
 # -------------------------------------
 sub decode {
 	my ($self,$b,$p,$e,$rt) = @_;
@@ -13045,20 +10766,16 @@ sub decode {
 	}
 }
 # -------------------------------------
-package LpaMessage; use strict;
-@LpaMessage::ISA = qw(IsupMessage);
+package LpaMessage; use strict; use vars qw(@ISA); @ISA = qw(IsupMessage);
 # -------------------------------------
 # -------------------------------------
-package CsvqMessage; use strict;
-@CsvqMessage::ISA = qw(IsupMessage);
+package CsvqMessage; use strict; use vars qw(@ISA); @ISA = qw(IsupMessage);
 # -------------------------------------
 # -------------------------------------
-package CsvrMessage; use strict;
-@CsvrMessage::ISA = qw(IsupMessage);
+package CsvrMessage; use strict; use vars qw(@ISA); @ISA = qw(IsupMessage);
 # -------------------------------------
 # -------------------------------------
-package DrsMessage; use strict;
-@DrsMessage::ISA = qw(IsupMessage);
+package DrsMessage; use strict; use vars qw(@ISA); @ISA = qw(IsupMessage);
 # -------------------------------------
 sub decode {
 	my ($self,$b,$p,$e,$rt) = @_;
@@ -13067,28 +10784,24 @@ sub decode {
 	}
 }
 # -------------------------------------
-package PamMessage; use strict;
-@PamMessage::ISA = qw(IsupMessage);
+package PamMessage; use strict; use vars qw(@ISA); @ISA = qw(IsupMessage);
 # -------------------------------------
 # -------------------------------------
-package GraMessage; use strict;
-@GraMessage::ISA = qw(IsupMessage);
+package GraMessage; use strict; use vars qw(@ISA); @ISA = qw(IsupMessage);
 # -------------------------------------
 sub decode {
 	my ($self,$b,$p,$e,$rt) = @_;
 	$self->{rs} = RsIsupParameter->man($b,$p,$e,$rt);
 }
 # -------------------------------------
-package CqmMessage; use strict;
-@CqmMessage::ISA = qw(IsupMessage);
+package CqmMessage; use strict; use vars qw(@ISA); @ISA = qw(IsupMessage);
 # -------------------------------------
 sub decode {
 	my ($self,$b,$p,$e,$rt) = @_;
 	$self->{rs} = RsIsupParameter->man($b,$p,$e,$rt);
 }
 # -------------------------------------
-package CqrMessage; use strict;
-@CqrMessage::ISA = qw(IsupMessage);
+package CqrMessage; use strict; use vars qw(@ISA); @ISA = qw(IsupMessage);
 # -------------------------------------
 sub decode {
 	my ($self,$b,$p,$e,$rt) = @_;
@@ -13096,8 +10809,7 @@ sub decode {
 	$self->{csi} = CsiIsupParameter->man($b,$p,$e,$rt);
 }
 # -------------------------------------
-package CpgMessage; use strict;
-@CpgMessage::ISA = qw(IsupMessage);
+package CpgMessage; use strict; use vars qw(@ISA); @ISA = qw(IsupMessage);
 # -------------------------------------
 sub decode {
 	my ($self,$b,$p,$e,$rt) = @_;
@@ -13105,8 +10817,7 @@ sub decode {
 	$self->{oparms} = $self->oparms($b,$p,$e,$rt);
 }
 # -------------------------------------
-package UsrMessage; use strict;
-@UsrMessage::ISA = qw(IsupMessage);
+package UsrMessage; use strict; use vars qw(@ISA); @ISA = qw(IsupMessage);
 # -------------------------------------
 sub decode {
 	my ($self,$b,$p,$e,$rt) = @_;
@@ -13116,12 +10827,10 @@ sub decode {
 	}
 }
 # -------------------------------------
-package UcicMessage; use strict;
-@UcicMessage::ISA = qw(IsupMessage);
+package UcicMessage; use strict; use vars qw(@ISA); @ISA = qw(IsupMessage);
 # -------------------------------------
 # -------------------------------------
-package CfnMessage; use strict;
-@CfnMessage::ISA = qw(IsupMessage);
+package CfnMessage; use strict; use vars qw(@ISA); @ISA = qw(IsupMessage);
 # -------------------------------------
 sub decode {
 	my ($self,$b,$p,$e,$rt) = @_;
@@ -13129,12 +10838,10 @@ sub decode {
 	$self->{oparms} = $self->oparms($b,$p,$e,$rt);
 }
 # -------------------------------------
-package OlmMessage; use strict;
-@OlmMessage::ISA = qw(IsupMessage);
+package OlmMessage; use strict; use vars qw(@ISA); @ISA = qw(IsupMessage);
 # -------------------------------------
 # -------------------------------------
-package CrgMessage; use strict;
-@CrgMessage::ISA = qw(IsupMessage);
+package CrgMessage; use strict; use vars qw(@ISA); @ISA = qw(IsupMessage);
 # -------------------------------------
 sub decode {
 	my ($self,$b,$p,$e,$rt) = @_;
@@ -13146,8 +10853,7 @@ sub decode {
 	}
 }
 # -------------------------------------
-package NrmMessage; use strict;
-@NrmMessage::ISA = qw(IsupMessage);
+package NrmMessage; use strict; use vars qw(@ISA); @ISA = qw(IsupMessage);
 # -------------------------------------
 sub decode {
 	my ($self,$b,$p,$e,$rt) = @_;
@@ -13156,8 +10862,7 @@ sub decode {
 	}
 }
 # -------------------------------------
-package FacMessage; use strict;
-@FacMessage::ISA = qw(IsupMessage);
+package FacMessage; use strict; use vars qw(@ISA); @ISA = qw(IsupMessage);
 # -------------------------------------
 sub decode {
 	my ($self,$b,$p,$e,$rt) = @_;
@@ -13166,8 +10871,7 @@ sub decode {
 	}
 }
 # -------------------------------------
-package UptMessage; use strict;
-@UptMessage::ISA = qw(IsupMessage);
+package UptMessage; use strict; use vars qw(@ISA); @ISA = qw(IsupMessage);
 # -------------------------------------
 sub decode {
 	my ($self,$b,$p,$e,$rt) = @_;
@@ -13176,8 +10880,7 @@ sub decode {
 	}
 }
 # -------------------------------------
-package UpaMessage; use strict;
-@UpaMessage::ISA = qw(IsupMessage);
+package UpaMessage; use strict; use vars qw(@ISA); @ISA = qw(IsupMessage);
 # -------------------------------------
 sub decode {
 	my ($self,$b,$p,$e,$rt) = @_;
@@ -13186,8 +10889,7 @@ sub decode {
 	}
 }
 # -------------------------------------
-package IdrMessage; use strict;
-@IdrMessage::ISA = qw(IsupMessage);
+package IdrMessage; use strict; use vars qw(@ISA); @ISA = qw(IsupMessage);
 # -------------------------------------
 sub decode {
 	my ($self,$b,$p,$e,$rt) = @_;
@@ -13196,8 +10898,7 @@ sub decode {
 	}
 }
 # -------------------------------------
-package IrsMessage; use strict;
-@IrsMessage::ISA = qw(IsupMessage);
+package IrsMessage; use strict; use vars qw(@ISA); @ISA = qw(IsupMessage);
 # -------------------------------------
 sub decode {
 	my ($self,$b,$p,$e,$rt) = @_;
@@ -13206,8 +10907,7 @@ sub decode {
 	}
 }
 # -------------------------------------
-package SgmMessage; use strict;
-@SgmMessage::ISA = qw(IsupMessage);
+package SgmMessage; use strict; use vars qw(@ISA); @ISA = qw(IsupMessage);
 # -------------------------------------
 sub decode {
 	my ($self,$b,$p,$e,$rt) = @_;
@@ -13216,8 +10916,7 @@ sub decode {
 	}
 }
 # -------------------------------------
-package CraMessage; use strict;
-@CraMessage::ISA = qw(IsupMessage);
+package CraMessage; use strict; use vars qw(@ISA); @ISA = qw(IsupMessage);
 # -------------------------------------
 sub decode {
 	my ($self,$b,$p,$e,$rt) = @_;
@@ -13226,8 +10925,7 @@ sub decode {
 	}
 }
 # -------------------------------------
-package CrmMessage; use strict;
-@CrmMessage::ISA = qw(IsupMessage);
+package CrmMessage; use strict; use vars qw(@ISA); @ISA = qw(IsupMessage);
 # -------------------------------------
 sub decode {
 	my ($self,$b,$p,$e,$rt) = @_;
@@ -13236,8 +10934,7 @@ sub decode {
 	}
 }
 # -------------------------------------
-package CvrMessage; use strict;
-@CvrMessage::ISA = qw(IsupMessage);
+package CvrMessage; use strict; use vars qw(@ISA); @ISA = qw(IsupMessage);
 # -------------------------------------
 sub decode {
 	my ($self,$b,$p,$e,$rt) = @_;
@@ -13247,8 +10944,7 @@ sub decode {
 	}
 }
 # -------------------------------------
-package CvtMessage; use strict;
-@CvtMessage::ISA = qw(IsupMessage);
+package CvtMessage; use strict; use vars qw(@ISA); @ISA = qw(IsupMessage);
 # -------------------------------------
 sub decode {
 	my ($self,$b,$p,$e,$rt) = @_;
@@ -13257,8 +10953,7 @@ sub decode {
 	}
 }
 # -------------------------------------
-package ExmMessage; use strict;
-@ExmMessage::ISA = qw(IsupMessage);
+package ExmMessage; use strict; use vars qw(@ISA); @ISA = qw(IsupMessage);
 # -------------------------------------
 sub decode {
 	my ($self,$b,$p,$e,$rt) = @_;
@@ -13267,8 +10962,7 @@ sub decode {
 	}
 }
 # -------------------------------------
-package NonMessage; use strict;
-@NonMessage::ISA = qw(IsupMessage);
+package NonMessage; use strict; use vars qw(@ISA); @ISA = qw(IsupMessage);
 # -------------------------------------
 sub decode {
 	my ($self,$b,$p,$e,$rt) = @_;
@@ -13278,8 +10972,7 @@ sub decode {
 	}
 }
 # -------------------------------------
-package LlmMessage; use strict;
-@LlmMessage::ISA = qw(IsupMessage);
+package LlmMessage; use strict; use vars qw(@ISA); @ISA = qw(IsupMessage);
 # -------------------------------------
 sub decode {
 	my ($self,$b,$p,$e,$rt) = @_;
@@ -13289,8 +10982,7 @@ sub decode {
 	}
 }
 # -------------------------------------
-package CakMessage; use strict;
-@CakMessage::ISA = qw(IsupMessage);
+package CakMessage; use strict; use vars qw(@ISA); @ISA = qw(IsupMessage);
 # -------------------------------------
 sub decode {
 	my ($self,$b,$p,$e,$rt) = @_;
@@ -13300,8 +10992,7 @@ sub decode {
 	}
 }
 # -------------------------------------
-package TcmMessage; use strict;
-@TcmMessage::ISA = qw(IsupMessage);
+package TcmMessage; use strict; use vars qw(@ISA); @ISA = qw(IsupMessage);
 # -------------------------------------
 sub decode {
 	my ($self,$b,$p,$e,$rt) = @_;
@@ -13312,8 +11003,7 @@ sub decode {
 	}
 }
 # -------------------------------------
-package McpMessage; use strict;
-@McpMessage::ISA = qw(IsupMessage);
+package McpMessage; use strict; use vars qw(@ISA); @ISA = qw(IsupMessage);
 # -------------------------------------
 sub decode {
 	my ($self,$b,$p,$e,$rt) = @_;
@@ -14748,7 +12438,8 @@ sub assign {
 }
 
 # -------------------------------------
-package MyWidget; use strict;
+package MyWidget;
+use strict;
 # -------------------------------------
 
 #package MyWidget;
@@ -14855,8 +12546,10 @@ sub pack {
 
 
 # -------------------------------------
-package MyMainWindow; use strict;
-@MyMainWindow::ISA = qw(MyWidget);
+package MyMainWindow;
+use strict;
+use vars qw(@ISA);
+@ISA = qw(MyWidget);
 # -------------------------------------
 
 @MyMainWindow::windows = ();
@@ -14912,8 +12605,10 @@ sub wm_take_focus {
 }
 
 # -------------------------------------
-package MyCanvas; use strict;
-@MyCanvas::ISA = qw(MyWidget);
+package MyCanvas;
+use strict;
+use vars qw(@ISA);
+@ISA = qw(MyWidget);
 # -------------------------------------
 
 #package MyCanvas;
@@ -14943,6 +12638,14 @@ sub new {
 				$self->{h} = $c->height;
 				$top->regroup();
 			},$self,$top,Tk::Ev('w'),Tk::Ev('h')]);
+	# try creating some bindings by tag
+#	$c->bind('ssp', '<ButtonPress-3>',[\&SSP::popup,Tk::Ev('b'),Tk::Ev('x'),Tk::Ev('y'),Tk::Ev('X'),Tk::Ev('Y')]);
+#	$c->bind('stp', '<ButtonPress-3>',[\&STP::popup,Tk::Ev('b'),Tk::Ev('x'),Tk::Ev('y'),Tk::Ev('X'),Tk::Ev('Y')]);
+#	$c->bind('scp', '<ButtonPress-3>',[\&SCP::popup,Tk::Ev('b'),Tk::Ev('x'),Tk::Ev('y'),Tk::Ev('X'),Tk::Ev('Y')]);
+#	$c->bind('node','<ButtonPress-3>',[\&SP::popup,Tk::Ev('b'),Tk::Ev('x'),Tk::Ev('y'),Tk::Ev('X'),Tk::Ev('Y')]);
+#	$c->bind('channel','<ButtonPress-3>',[\&Channel::popup,Tk::Ev('b'),Tk::Ev('x'),Tk::Ev('y'),Tk::Ev('X'),Tk::Ev('Y')]);
+#	$c->bind('path','<ButtonPress-3>',[\&Path::popup,Tk::Ev('b'),Tk::Ev('x'),Tk::Ev('y'),Tk::Ev('X'),Tk::Ev('Y')]);
+#	$c->bind('relation','<ButtonPress-3>',[\&Relation::popup,Tk::Ev('b'),Tk::Ev('x'),Tk::Ev('y'),Tk::Ev('X'),Tk::Ev('Y')]);
 	my $w = $self->{w} = $c->width;
 	my $h = $self->{h} = $c->height;
 	$self->{maxcol} =  5;
@@ -14984,16 +12687,13 @@ sub relayer {
 	$c->raise('scri','node');
 	$c->raise('text','scri');
 	$c->lower('relation','node');
-	$c->lower('datalink','node');
+	$c->lower('path','node');
 	$c->lower('channel','node');
-	$c->lower('association','node');
 	$c->lower('relation','linkset');
-	$c->lower('datalink','linkset');
+	$c->lower('path','linkset');
 	$c->lower('channel','linkset');
-	$c->lower('association','linkset');
-	$c->lower('relation','datalink');
 	$c->lower('relation','channel');
-	$c->lower('relation','association');
+	$c->lower('path','channel');
 }
 
 # unknown nodes are in columns +-7
@@ -15008,6 +12708,7 @@ sub colpos {
 	my ($self,$col) = @_;
 	my $w = $self->{w};
 	my $dw = $w / ($self->{maxcol} - $self->{mincol} + 1);
+	#my $dw = $w / 10; # 10 columns
 	my $off = (abs($self->{mincol}) - abs($self->{maxcol}))/2;
 	if ($col < 0) {
 		return ($col+$off) * $dw + $dw/2 + $w/2;
@@ -15026,8 +12727,10 @@ sub rowpos {
 }
 
 # -------------------------------------
-package MyTop; use strict;
-@MyTop::ISA = qw(MyMainWindow);
+package MyTop;
+use strict;
+use vars qw(@ISA);
+@ISA = qw(MyMainWindow);
 # -------------------------------------
 
 @MyTop::mytops = ();
@@ -15199,7 +12902,7 @@ sub createmenubar {
 		-msg=>[
 			"Tearoff this menu.",
 			"Full view with all nodes and arcs.",
-			"Signalling view with linksets, adjacent SPs\nand signalling routes.",
+			"Signalling view with linksets, adjacent SPs\nand signalling paths.",
 			"Circuit view with SSPs and circuits.",
 			"Transaction view with SSPs, GTTs and SCPs.",
 		]);
@@ -15226,12 +12929,11 @@ sub createmenubar {
 		relations=>0,
 		routesets=>0,
 		routes=>1,
+		paths=>1,
 		combineds=>1,
 		linksets=>1,
 		links=>1,
-		datalinks=>1,
 		channels=>1,
-		associations=>1,
 		nodes=>1,
 		sps=>1,
 		ssps=>1,
@@ -15254,12 +12956,10 @@ sub createmenubar {
 					$self->{show}->{$k} = 1;
 				}
 				$c->itemconfigure('all',-state=>'normal');
-				$self->{show}->{datalinks} = 0;
-				$c->itemconfigure('datalink',-state=>'hidden');
 				$self->{show}->{channels} = 0;
 				$c->itemconfigure('channel',-state=>'hidden');
-				$self->{show}->{associations} = 0;
-				$c->itemconfigure('association',-state=>'hidden');
+				$self->{show}->{paths} = 0;
+				$c->itemconfigure('path',-state=>'hidden');
 				$self->mycanvas->relayer();
 			},$self],
 	);
@@ -15278,15 +12978,14 @@ sub createmenubar {
 				$self->{show}->{all} = 0;
 				$c->itemconfigure('route',-state=>'normal');
 				$self->{show}->{routes} = 1;
+				$c->itemconfigure('path',-state=>'normal');
+				$self->{show}->{paths} = 1;
 				$c->itemconfigure('combined',-state=>'normal');
 				$self->{show}->{combineds} = 1;
 				$c->itemconfigure('linkset',-state=>'normal');
 				$self->{show}->{linksets} = 1;
-				$c->itemconfigure('datalink',-state=>'normal');
-				$self->{show}->{datalinks} = 1;
 				$c->itemconfigure('channel',-state=>'normal');
-				$c->itemconfigure('association',-state=>'normal');
-				$self->{show}->{associations} = 1;
+				$self->{show}->{channels} = 1;
 				$c->itemconfigure('Node',-state=>'normal');
 				$self->{show}->{nodes} = 1;
 				$c->itemconfigure('SP',-state=>'normal');
@@ -15461,15 +13160,15 @@ sub createmenubar {
 				$c->itemconfigure('route',-state=>$s) if $c->find(withtag=>'route');
 			},$self],
 	);
-	$mi->add('checkbutton', -label=>'Datalinks',
-		-onvalue=>1, -offvalue=>0, -variable=>\$self->{show}->{datalinks},
+	$mi->add('checkbutton', -label=>'Paths',
+		-onvalue=>1, -offvalue=>0, -variable=>\$self->{show}->{paths},
 		-command=>[sub{
 				my $self = shift;
-				my $v = $self->{show}->{datalinks};
+				my $v = $self->{show}->{paths};
 				$self->{view} = 4;
 				my $c = $self->canvas;
 				my $s = $v ? 'normal' : 'hidden';
-				$c->itemconfigure('datalink',-state=>$s) if $c->find(withtag=>'datalink');
+				$c->itemconfigure('path',-state=>$s) if $c->find(withtag=>'path');
 			},$self],
 	);
 	$mi->add('checkbutton', -label=>'Channels',
@@ -15481,17 +13180,6 @@ sub createmenubar {
 				my $c = $self->canvas;
 				my $s = $v ? 'normal' : 'hidden';
 				$c->itemconfigure('channel',-state=>$s) if $c->find(withtag=>'channel');
-			},$self],
-	);
-	$mi->add('checkbutton', -label=>'Associations',
-		-onvalue=>1, -offvalue=>0, -variable=>\$self->{show}->{associations},
-		-command=>[sub{
-				my $self = shift;
-				my $v = $self->{show}->{associations};
-				$self->{view} = 4;
-				my $c = $self->canvas;
-				my $s = $v ? 'normal' : 'hidden';
-				$c->itemconfigure('association',-state=>$s) if $c->find(withtag=>'association');
 			},$self],
 	);
 	$mi->add('separator',);
@@ -15575,7 +13263,7 @@ sub createmenubar {
 			"Zoom out from canvas.",
 			undef, # separator
 			"Full view with all nodes and arcs.",
-			"Signalling view with linksets, adjacent SPs\nand signalling routes.",
+			"Signalling view with linksets, adjacent SPs\nand signalling paths.",
 			"Circuit view with SSPs and circuits.",
 			"Transaction view with SSPs, GTTs and SCPs.",
 			undef, # separator
@@ -15590,9 +13278,8 @@ sub createmenubar {
 			"Show/hide signalling links.",
 			undef, # separator
 			"Show/hide signalling routes.",
-			"Show/hide signalling datalinks.",
+			"Show/hide signalling paths.",
 			"Show/hide signalling channels.",
-			"Show/hide signalling associations.",
 			undef, # separator
 			"Show/hide Nodes.",
 			"Show/hide SPs.",
@@ -16038,14 +13725,21 @@ sub contmsg {
 #package MyTop;
 sub regroup {
 	my $self = shift;
+	#print STDERR "D: regrouping...\n";
 	my $network = $self->{network};
 	return unless $network;
 	my $mc = $self->mycanvas;
 	my %totals;
 	my %offset;
 	my ($mincol,$maxcol) = (0,0);
-	while (my ($no,$node) = each %{$network->{nodes}}) {
-		next unless $no < 0;
+	while (my ($no,$node) = each %{$network->{pnodes}}) {
+		my $col = $node->{col};
+		$totals{$col}++;
+		$offset{$col}=0;
+		$mincol = $col if $col < $mincol;
+		$maxcol = $col if $col > $maxcol;
+	}
+	while (my ($pc,$node) = each %{$network->{nodes}}) {
 		my $col = $node->{col};
 		$totals{$col}++;
 		$offset{$col}=0;
@@ -16058,9 +13752,8 @@ sub regroup {
 	$mc->{maxcol} = $maxcol;
 	my $max = int($mc->{h}/42/2);
 	my %counts;
-	foreach my $no (sort {$b <=> $a} keys %{$network->{nodes}}) {
-		next unless $no < 0;
-		my $node = $network->{nodes}->{$no};
+	foreach my $no (sort {$a <=> $b} keys %{$network->{pnodes}}) {
+		my $node = $network->{pnodes}->{$no};
 		my $col = $node->{col};
 		my $tot = $totals{$col};
 		my $row = $counts{$col} - $tot;
@@ -16074,12 +13767,29 @@ sub regroup {
 		}
 		$node->movenode($self,$col,$row,$off/2);
 	}
+	foreach my $pc (sort {$a <=> $b} keys %{$network->{nodes}}) {
+		my $node = $network->{nodes}->{$pc};
+		my $col = $node->{col};
+		my $tot = $totals{$col};
+		my $row = $counts{$col} - $tot;
+		my $off = $offset{$col};
+		$counts{$col} += 2;
+		if ($tot > $max) {
+			if ($off != 0)   { $offset{$col} =  0; }
+			elsif ($col > 0) { $offset{$col} =  1; }
+			else		 { $offset{$col} = -1; }
+			$row /= 2;
+		}
+		$node->movenode($self,$col,$row,$off/2);
+	}
+	#print STDERR "D: ...regrouped.\n";
 	delete $self->{regroupnow};
 	$self->{updatenow} = 1;
 }
 
 # -------------------------------------
-package main; use strict;
+package main;
+use strict;
 # -------------------------------------
 
 if (length @infiles == 0) {

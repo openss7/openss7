@@ -230,7 +230,7 @@
 579	CA	QC	Quebec
 580	US	OK	Oklahoma
 581	CA	QC	Quebec
-582	US		Reserved US
+582	US	PA	Pennsylvania
 584	CA		Reserved CA
 585	US	NY	New York
 586	US	MI	Michigan

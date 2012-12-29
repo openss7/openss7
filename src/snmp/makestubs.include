@@ -2278,3 +2278,200 @@ mxMonMIB_openss7.c mxMonMIB_openss7.h: mib2c mib2c.conf ../mibs/OPENSS7-MX-MON-M
 	./mib2c -c ./mib2c.openss7.conf -f mxMonMIB_openss7 OPENSS7-MX-MON-MIB::mxMonMIB
 	indent -nhnl mxMonMIB_openss7.[ch]
 
+# root = lldpXdot1MIB
+
+MIBPREFIXES += lldpXdot1MIB
+
+lldpXdot1MIB.mib: ../mibs/lldp_dot1.mib
+	smidump -k ../mibs/lldp_dot1.mib>$@ || :
+
+lldpXdot1MIB.lint: ../mibs/lldp_dot1.mib
+	smilint $(SMILINTIGNORES) -ms ../mibs/lldp_dot1.mib>$@ 2>&1 || :
+
+lldpXdot1MIB.tree: ../mibs/lldp_dot1.mib
+	snmptranslate -Tp LLDP-EXT-DOT1-MIB::lldpXdot1MIB>$@ || :
+
+lldpXdot1MIB_simple.c lldpXdot1MIB_simple.h: mib2c mib2c.conf ../mibs/lldp_dot1.mib
+	./mib2c -c ./mib2c.conf -f lldpXdot1MIB_simple LLDP-EXT-DOT1-MIB::lldpXdot1MIB
+	indent -nhnl lldpXdot1MIB_simple.[ch]
+
+lldpXdot1MIB_storage.c lldpXdot1MIB_storage.h: mib2c mib2c.conf ../mibs/lldp_dot1.mib
+	./mib2c -c ./mib2c.storage.conf -f lldpXdot1MIB_storage LLDP-EXT-DOT1-MIB::lldpXdot1MIB
+	indent -nhnl lldpXdot1MIB_storage.[ch]
+
+lldpXdot1MIB_openss7.c lldpXdot1MIB_openss7.h: mib2c mib2c.conf ../mibs/lldp_dot1.mib
+	./mib2c -c ./mib2c.openss7.conf -f lldpXdot1MIB_openss7 LLDP-EXT-DOT1-MIB::lldpXdot1MIB
+	indent -nhnl lldpXdot1MIB_openss7.[ch]
+
+# root = lldpXdot3MIB
+
+MIBPREFIXES += lldpXdot3MIB
+
+lldpXdot3MIB.mib: ../mibs/lldp_dot3.mib
+	smidump -k ../mibs/lldp_dot3.mib>$@ || :
+
+lldpXdot3MIB.lint: ../mibs/lldp_dot3.mib
+	smilint $(SMILINTIGNORES) -ms ../mibs/lldp_dot3.mib>$@ 2>&1 || :
+
+lldpXdot3MIB.tree: ../mibs/lldp_dot3.mib
+	snmptranslate -Tp LLDP-EXT-DOT3-MIB::lldpXdot3MIB>$@ || :
+
+lldpXdot3MIB_simple.c lldpXdot3MIB_simple.h: mib2c mib2c.conf ../mibs/lldp_dot3.mib
+	./mib2c -c ./mib2c.conf -f lldpXdot3MIB_simple LLDP-EXT-DOT3-MIB::lldpXdot3MIB
+	indent -nhnl lldpXdot3MIB_simple.[ch]
+
+lldpXdot3MIB_storage.c lldpXdot3MIB_storage.h: mib2c mib2c.conf ../mibs/lldp_dot3.mib
+	./mib2c -c ./mib2c.storage.conf -f lldpXdot3MIB_storage LLDP-EXT-DOT3-MIB::lldpXdot3MIB
+	indent -nhnl lldpXdot3MIB_storage.[ch]
+
+lldpXdot3MIB_openss7.c lldpXdot3MIB_openss7.h: mib2c mib2c.conf ../mibs/lldp_dot3.mib
+	./mib2c -c ./mib2c.openss7.conf -f lldpXdot3MIB_openss7 LLDP-EXT-DOT3-MIB::lldpXdot3MIB
+	indent -nhnl lldpXdot3MIB_openss7.[ch]
+
+# root = lldpMIB
+
+MIBPREFIXES += lldpMIB
+
+lldpMIB.mib: ../mibs/lldp.mib
+	smidump -k ../mibs/lldp.mib>$@ || :
+
+lldpMIB.lint: ../mibs/lldp.mib
+	smilint $(SMILINTIGNORES) -ms ../mibs/lldp.mib>$@ 2>&1 || :
+
+lldpMIB.tree: ../mibs/lldp.mib
+	snmptranslate -Tp LLDP-MIB::lldpMIB>$@ || :
+
+lldpMIB_simple.c lldpMIB_simple.h: mib2c mib2c.conf ../mibs/lldp.mib
+	./mib2c -c ./mib2c.conf -f lldpMIB_simple LLDP-MIB::lldpMIB
+	indent -nhnl lldpMIB_simple.[ch]
+
+lldpMIB_storage.c lldpMIB_storage.h: mib2c mib2c.conf ../mibs/lldp.mib
+	./mib2c -c ./mib2c.storage.conf -f lldpMIB_storage LLDP-MIB::lldpMIB
+	indent -nhnl lldpMIB_storage.[ch]
+
+lldpMIB_openss7.c lldpMIB_openss7.h: mib2c mib2c.conf ../mibs/lldp.mib
+	./mib2c -c ./mib2c.openss7.conf -f lldpMIB_openss7 LLDP-MIB::lldpMIB
+	indent -nhnl lldpMIB_openss7.[ch]
+
+# root = lldpXMedMIB
+
+MIBPREFIXES += lldpXMedMIB
+
+lldpXMedMIB.mib: ../mibs/LLDP-EXT-MED-MIB
+	smidump -k ../mibs/LLDP-EXT-MED-MIB>$@ || :
+
+lldpXMedMIB.lint: ../mibs/LLDP-EXT-MED-MIB
+	smilint $(SMILINTIGNORES) -ms ../mibs/LLDP-EXT-MED-MIB>$@ 2>&1 || :
+
+lldpXMedMIB.tree: ../mibs/LLDP-EXT-MED-MIB
+	snmptranslate -Tp LLDP-EXT-MED-MIB::lldpXMedMIB>$@ || :
+
+lldpXMedMIB_simple.c lldpXMedMIB_simple.h: mib2c mib2c.conf ../mibs/LLDP-EXT-MED-MIB
+	./mib2c -c ./mib2c.conf -f lldpXMedMIB_simple LLDP-EXT-MED-MIB::lldpXMedMIB
+	indent -nhnl lldpXMedMIB_simple.[ch]
+
+lldpXMedMIB_storage.c lldpXMedMIB_storage.h: mib2c mib2c.conf ../mibs/LLDP-EXT-MED-MIB
+	./mib2c -c ./mib2c.storage.conf -f lldpXMedMIB_storage LLDP-EXT-MED-MIB::lldpXMedMIB
+	indent -nhnl lldpXMedMIB_storage.[ch]
+
+lldpXMedMIB_openss7.c lldpXMedMIB_openss7.h: mib2c mib2c.conf ../mibs/LLDP-EXT-MED-MIB
+	./mib2c -c ./mib2c.openss7.conf -f lldpXMedMIB_openss7 LLDP-EXT-MED-MIB::lldpXMedMIB
+	indent -nhnl lldpXMedMIB_openss7.[ch]
+
+
+MIBPREFIXES += probeMIB
+
+probeMIB.mib: ../mibs/OPENSS7-PROBE-MIB.mib
+	smidump -k ../mibs/OPENSS7-PROBE-MIB.mib>$@ || :
+
+probeMIB.lint: ../mibs/OPENSS7-PROBE-MIB.mib
+	smilint $(SMILINTIGNORES) -ms ../mibs/OPENSS7-PROBE-MIB.mib>$@ 2>&1 || :
+
+probeMIB.tree: ../mibs/OPENSS7-PROBE-MIB.mib
+	snmptranslate -Tp OPENSS7-PROBE-MIB::probeMIB>$@ || :
+
+probeMIB_simple.c probeMIB_simple.h: mib2c mib2c.conf ../mibs/OPENSS7-PROBE-MIB.mib
+	./mib2c -c ./mib2c.conf -f probeMIB_simple OPENSS7-PROBE-MIB::probeMIB
+	indent -nhnl probeMIB_simple.[ch]
+
+probeMIB_storage.c probeMIB_storage.h: mib2c mib2c.conf ../mibs/OPENSS7-PROBE-MIB.mib
+	./mib2c -c ./mib2c.storage.conf -f probeMIB_storage OPENSS7-PROBE-MIB::probeMIB
+	indent -nhnl probeMIB_storage.[ch]
+
+probeMIB_openss7.c probeMIB_openss7.h: mib2c mib2c.conf ../mibs/OPENSS7-PROBE-MIB.mib
+	./mib2c -c ./mib2c.openss7.conf -f probeMIB_openss7 OPENSS7-PROBE-MIB::probeMIB
+	indent -nhnl probeMIB_openss7.[ch]
+
+
+MIBPREFIXES += switchRMON
+
+switchRMON.mib: /usr/share/mibs/ietf/SMON-MIB
+	smidump -k /usr/share/mibs/ietf/SMON-MIB>$@ || :
+
+switchRMON.lint: /usr/share/mibs/ietf/SMON-MIB
+	smilint $(SMILINTIGNORES) -ms /usr/share/mibs/ietf/SMON-MIB>$@ 2>&1 || :
+
+switchRMON.tree: /usr/share/mibs/ietf/SMON-MIB
+	snmptranslate -Tp SMON-MIB::switchRMON>$@ || :
+
+switchRMON_simple.c switchRMON_simple.h: mib2c mib2c.conf /usr/share/mibs/ietf/SMON-MIB
+	./mib2c -c ./mib2c.conf -f switchRMON_simple SMON-MIB::switchRMON
+	indent -nhnl switchRMON_simple.[ch]
+
+switchRMON_storage.c switchRMON_storage.h: mib2c mib2c.conf /usr/share/mibs/ietf/SMON-MIB
+	./mib2c -c ./mib2c.storage.conf -f switchRMON_storage SMON-MIB::switchRMON
+	indent -nhnl switchRMON_storage.[ch]
+
+switchRMON_openss7.c switchRMON_openss7.h: mib2c mib2c.conf /usr/share/mibs/ietf/SMON-MIB
+	./mib2c -c ./mib2c.openss7.conf -f switchRMON_openss7 SMON-MIB::switchRMON
+	indent -nhnl switchRMON_openss7.[ch]
+
+# root = rmonMibModule
+
+MIBPREFIXES += rmonMibModule
+
+rmonMibModule.mib: /usr/share/mibs/ietf/RMON-MIB
+	smidump -k /usr/share/mibs/ietf/RMON-MIB>$@ || :
+
+rmonMibModule.lint: /usr/share/mibs/ietf/RMON-MIB
+	smilint $(SMILINTIGNORES) -ms /usr/share/mibs/ietf/RMON-MIB>$@ 2>&1 || :
+
+rmonMibModule.tree: /usr/share/mibs/ietf/RMON-MIB
+	snmptranslate -Tp RMON-MIB::rmonMibModule>$@ || :
+
+rmonMibModule_simple.c rmonMibModule_simple.h: mib2c mib2c.conf /usr/share/mibs/ietf/RMON-MIB
+	./mib2c -c ./mib2c.conf -f rmonMibModule_simple RMON-MIB::rmonMibModule
+	indent -nhnl rmonMibModule_simple.[ch]
+
+rmonMibModule_storage.c rmonMibModule_storage.h: mib2c mib2c.conf /usr/share/mibs/ietf/RMON-MIB
+	./mib2c -c ./mib2c.storage.conf -f rmonMibModule_storage RMON-MIB::rmonMibModule
+	indent -nhnl rmonMibModule_storage.[ch]
+
+rmonMibModule_openss7.c rmonMibModule_openss7.h: mib2c mib2c.conf /usr/share/mibs/ietf/RMON-MIB
+	./mib2c -c ./mib2c.openss7.conf -f rmonMibModule_openss7 RMON-MIB::rmonMibModule
+	indent -nhnl rmonMibModule_openss7.[ch]
+
+
+MIBPREFIXES += xmonMIB
+
+xmonMIB.mib: ../mibs/OPENSS7-XMON-MIB.mib
+	smidump -k ../mibs/OPENSS7-XMON-MIB.mib>$@ || :
+
+xmonMIB.lint: ../mibs/OPENSS7-XMON-MIB.mib
+	smilint $(SMILINTIGNORES) -ms ../mibs/OPENSS7-XMON-MIB.mib>$@ 2>&1 || :
+
+xmonMIB.tree: ../mibs/OPENSS7-XMON-MIB.mib
+	snmptranslate -Tp OPENSS7-XMON-MIB::xmonMIB>$@ || :
+
+xmonMIB_simple.c xmonMIB_simple.h: mib2c mib2c.conf ../mibs/OPENSS7-XMON-MIB.mib
+	./mib2c -c ./mib2c.conf -f xmonMIB_simple OPENSS7-XMON-MIB::xmonMIB
+	indent -nhnl xmonMIB_simple.[ch]
+
+xmonMIB_storage.c xmonMIB_storage.h: mib2c mib2c.conf ../mibs/OPENSS7-XMON-MIB.mib
+	./mib2c -c ./mib2c.storage.conf -f xmonMIB_storage OPENSS7-XMON-MIB::xmonMIB
+	indent -nhnl xmonMIB_storage.[ch]
+
+xmonMIB_openss7.c xmonMIB_openss7.h: mib2c mib2c.conf ../mibs/OPENSS7-XMON-MIB.mib
+	./mib2c -c ./mib2c.openss7.conf -f xmonMIB_openss7 OPENSS7-XMON-MIB::xmonMIB
+	indent -nhnl xmonMIB_openss7.[ch]
+

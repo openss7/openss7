@@ -125,6 +125,15 @@ struct mx_info_card {
 #define X400PCARDTYPE_A400P                             16
 #define X400PCARDTYPE_A400PE                            17
 #define X400PCARDTYPE_A400PT                            18
+#define X400PCARDTYPE_CP100				19
+#define X400PCARDTYPE_CP100P				20
+#define X400PCARDTYPE_CP100E				21
+#define X400PCARDTYPE_CP200				22
+#define X400PCARDTYPE_CP200P				23
+#define X400PCARDTYPE_CP200E				24
+#define X400PCARDTYPE_CP400				25
+#define X400PCARDTYPE_CP400P				26
+#define X400PCARDTYPE_CP400E				27
 	uint mxCardIdentifier;
 	uint mxCardRevision;
 	uint mxCardChipType;
