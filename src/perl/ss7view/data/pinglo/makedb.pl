@@ -44,6 +44,7 @@ sub dodata {
 			$data{switch} = $5;
 			$data{rc} = $6;
 			$data{st} = $7;
+			$data{switch} =~ s/_/ / if $data{switch} =~ /^[A-Z]{3}_/;
 			makedb::updatedata(\%data,$fdate,$sect);
 		}
 		close(INFILE);

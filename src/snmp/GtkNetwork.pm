@@ -1,7 +1,6 @@
 # ------------------------------------------
-package Viewer; our @ISA = qw(Base Gtk2::ScrolledWindow);
-#use strict; use warnings; use Carp;
-use Gtk2; use Glib; use Goo::Canvas;
+package Viewer; use base qw(Base Gtk2::ScrolledWindow);
+#use strict; use warnings;
 # ------------------------------------------
 #package Viewer;
 our $viewno = 0;
@@ -14,13 +13,11 @@ sub find {
 	return $viewer;
 }
 #package Viewer;
-sub new {
+sub make {
 	my $type = shift;
 	my ($windid,$pageid,$base,$viewid) = @_;
 	my $self = new Gtk2::ScrolledWindow();
 	bless $self,$type;
-	$self->{items} = {};
-	$self->_init($type,@_);
 	return $self;
 }
 #package Viewer;
@@ -39,12 +36,13 @@ sub init {
 	$self->{pageid} = $pageid;
 	$self->{viewid} = $viewid;
 	$viewers{$viewid} = $self;
+	$self->{items} = {};
 	$self->set_policy('automatic','automatic');
 	my $canv = $self->{canv} = new Goo::Canvas();
 	$canv->set(
 		'background-color'=>'white',
-		'automatic-bounds'=>Glib::TRUE,
-		'bounds-from-origin'=>Glib::FALSE,
+		'automatic-bounds'=>1,
+		'bounds-from-origin'=>0,
 		'bounds-padding'=>3,
 		'units'=>'mm',
 	);
@@ -105,6 +103,11 @@ sub items {
 sub canvas {
 	my $self = shift;
 	return $self->{canv};
+}
+#package Viewer;
+sub canvases {
+	my $self = shift;
+	return @{$self->{canvases}};
 }
 #package Viewer;
 sub setview {
@@ -251,8 +254,6 @@ sub refresh {
 	}
 }
 #package Viewer;
-$Viewer::added_child_count = 0;
-#package Viewer;
 sub added_child {
 	my ($type,$pdata,$cdata) = @_;
 	foreach my $viewer (values %viewers) {
@@ -267,8 +268,6 @@ sub added_child {
 		$viewer->{changed} = 1;
 	}
 }
-#package Viewer;
-$Viewer::added_path_count = 0;
 #package Viewer;
 sub added_path {
 	my ($type,$ndata,$pdata) = @_;
@@ -285,8 +284,6 @@ sub added_path {
 	}
 }
 #package Viewer;
-$Viewer::removed_count = 0;
-#package Viewer;
 sub removed {
 	my ($type,$data) = @_;
 	foreach my $viewer (values %viewers) {
@@ -296,8 +293,6 @@ sub removed {
 		$viewer->{changed} = 1;
 	}
 }
-#package Viewer;
-$Viewer::updated_count = 0;
 #package Viewer;
 sub updated {
 	my ($type,$data) = @_;
@@ -310,8 +305,6 @@ sub updated {
 		$viewer->{changed} = 1;
 	}
 }
-#package Viewer;
-$Viewer::merged_count = 0;
 #package Viewer;
 sub merged {
 	my ($type,$data) = @_;
@@ -326,8 +319,6 @@ sub merged {
 	}
 }
 #package Viewer;
-$Viewer::changed_count = 0;
-#package Viewer;
 sub changed {
 	my ($type,@data) = @_;
 	foreach my $viewer (values %viewers) {
@@ -341,8 +332,6 @@ sub changed {
 	}
 }
 #package Viewer;
-$Viewer::xformed_count = 0;
-#package Viewer;
 sub xformed {
 	my ($type,$data) = @_;
 	my $vtyp = ref($data).'::View';
@@ -355,11 +344,19 @@ sub xformed {
 		$viewer->{changed} = 1;
 	}
 }
+#package Viewer;
+sub add_canvas {
+	my $self = shift;
+	my ($page) = @_;
+	my $canv = new Canvas(@_);
+	push @{$self->{canvases}}, $canv;
+	my $view = $self->{view};
+	$view->fill_view($canv);
+}
 
 # ------------------------------------------
-package Viewer::Network; our @ISA = qw(Viewer);
-use strict; use warnings; use Carp;
-use Gtk2; use Glib; use Goo::Canvas;
+package Viewer::Network; use base qw(Viewer);
+use strict; use warnings;
 use Time::HiRes qw(gettimeofday tv_interval);
 # ------------------------------------------
 # Columns in the display are laid out as follows:
@@ -467,10 +464,10 @@ sub init {
 	my ($windid,$pageid,$base,$viewid) = @_;
 	$self->{visibility} = {};
 	foreach (qw/Host Subnet Address Network Private/) {
-		$self->{visibility}{$_} = Glib::TRUE;
+		$self->{visibility}{$_} = 1;
 	}
 	foreach (qw/Vlan Lan Vprt Port/) {
-		$self->{visibility}{$_} = Glib::FALSE;
+		$self->{visibility}{$_} = 0;
 	}
 }
 #package Viewer::Network;
@@ -484,12 +481,12 @@ sub selected {
 	my ($self,$kind,$from) = @$args;
 	foreach my $view (qw{Subnet/Address Vlan/Vprt Lan/Port}) {
 		my @pair = split(/\//,$view);
-		my $vis = ($view eq $kind) ? Glib::TRUE : Glib::FALSE;
+		my $vis = ($view eq $kind) ? 1 : 0;
 		$self->{visibility}{$pair[0]} = $vis;
 		$self->{visibility}{$pair[1]} = $vis;
 	}
-	$radio->set_inconsistent(Glib::FALSE);
-	$radio->set_active(Glib::TRUE);
+	$self->set_inconsistent($radio,0);
+	$self->set_active($radio,1);
 	$self->layout();
 }
 #package Viewer::Network;
@@ -497,15 +494,49 @@ sub toggled {
 	my ($check,$args) = @_;
 	my ($self,$kind,$from) = @$args;
 	if ($self->{visibility}{$kind}) {
-		$self->{visibility}{$kind} = Glib::FALSE;
-		$check->set_active(Glib::FALSE);
+		$self->{visibility}{$kind} = 0;
+		$self->set_active($check,0);
 	} else {
-		$self->{visibility}{$kind} = Glib::TRUE;
-		$check->set_active(Glib::TRUE);
+		$self->{visibility}{$kind} = 1;
+		$self->set_active($check,1);
 	}
 	$self->layout();
 }
 #package Viewer::Network;
+sub isvisible {
+	my $self = shift;
+	my $kind = shift;
+	return $self->{visibility}{$kind};
+}
+#package Viewer::Network;
+sub layout {
+	my $self = shift;
+	my $view = $self->{view};
+	my ($hbox,$wbox) = $self->getdims;
+	$view->resize($hbox,$wbox);
+	$view->move_view(0,0,0,0);
+	$view->layout($hbox,$wbox);
+	$view->place_view(0,0,0,0);
+	$view->show_view(0,0,0,0);
+}
+
+# ------------------------------------------
+package Viewer::Network::Gtk; use base qw(Viewer::Network);
+use strict; use warnings;
+# ------------------------------------------
+#package Viewer::Network::Gtk;
+sub set_inconsistent {
+	my $self = shift;
+	my ($radio,$bool) = @_;
+	$radio->set_inconsistent($bool);
+}
+#package Viewer::Network::Gtk;
+sub set_active {
+	my $self = shift;
+	my ($radio,$bool) = @_;
+	$radio->set_active($bool);
+}
+#package Viewer::Network::Gtk;
 sub click {
 	my ($root,$targ,$ev,$self) = @_;
 	unless ($targ) {
@@ -521,19 +552,19 @@ sub click {
 			$mv->append($mi);
 			foreach my $view (qw{Subnet/Address Vlan/Vprt Lan/Port}) {
 				my $mr = Gtk2::CheckMenuItem->new($view);
-				$mr->set_draw_as_radio(Glib::TRUE);
+				$mr->set_draw_as_radio(1);
 				my @pair = map {$self->isvisible($_)} split(/\//,$view);
 				if ($pair[0] and $pair[1]) {
-					$mr->set_active(Glib::TRUE);
-					$mr->set_inconsistent(Glib::FALSE);
+					$mr->set_active(1);
+					$mr->set_inconsistent(0);
 				}
 				elsif (not $pair[0] and not $pair[1]) {
-					$mr->set_active(Glib::FALSE);
-					$mr->set_inconsistent(Glib::FALSE);
+					$mr->set_active(0);
+					$mr->set_inconsistent(0);
 				}
 				else {
-					$mr->set_active(Glib::FALSE);
-					$mr->set_inconsistent(Glib::TRUE);
+					$mr->set_active(0);
+					$mr->set_inconsistent(1);
 				}
 				$mr->show_all;
 				if (my $sub = $self->can('selected')) {
@@ -561,39 +592,15 @@ sub click {
 	}
 	return Gtk2::EVENT_PROPAGATE;
 }
-#package Viewer::Network;
-sub isvisible {
+#package Viewer::Network::Gtk;
+sub getdims {
 	my $self = shift;
-	my $kind = shift;
-	return $self->{visibility}{$kind};
-}
-#package Viewer::Network;
-$Viewer::Network::callcount = 0;
-#package Viewer::Network;
-sub layout {
-	my $self = shift;
-	my $view = $self->{view};
 	my $canv = $self->{canv};
 	my $hbox = $canv->get_screen->get_height_mm;
 	my $wbox = $canv->get_screen->get_width_mm;
-	my ($h,$w,$mh,$mw) = $view->resize($hbox,$wbox);
-	if (0) {
-		$w =
-			$view->{pad}[1]+
-			$view->{siz}{l}{total}[1] + 2.0*$view->{siz}{l}{total}[3]+
-			$view->{siz}{c}{total}[1]/2.0 + $view->{siz}{c}{total}[3];
-		$h = $h/2.0 + $mh;
-	} else {
-		$w = 0;
-		$h = 0;
-	}
-	$view->move_view($w,$h,0,0);
-	$view->layout($hbox,$wbox);
-	$view->place_view($w,$h,0,0);
-	$view->show_view($w,$h,0,0);
-	$canv->update;
+	return ($hbox,$wbox);
 }
-#package Viewer::Network;
+#package Viewer::Network::Gtk;
 sub start_idle {
 	my $self = shift;
 	my $tag = delete $self->{tag};
@@ -601,7 +608,7 @@ sub start_idle {
 	$tag = Glib::Idle->add($self->can('do_idle'),$self);
 	$self->{tag} = $tag;
 }
-#package Viewer::Network;
+#package Viewer::Network::Gtk;
 sub start_quick {
 	my $self = shift;
 	my $tag = delete $self->{tag};
@@ -609,7 +616,7 @@ sub start_quick {
 	$tag = Glib::Timeout->add(100,$self->can('do_quick'),$self);
 	$self->{tag} = $tag;
 }
-#package Viewer::Network;
+#package Viewer::Network::Gtk;
 sub start_timeout {
 	my $self = shift;
 	my $tag = delete $self->{tag};
@@ -617,7 +624,7 @@ sub start_timeout {
 	$tag = Glib::Timeout->add(1000,$self->can('do_timeout'),$self);
 	$self->{tag} = $tag;
 }
-#package Viewer::Network;
+#package Viewer::Network::Gtk;
 sub do_quick {
 	my $self = shift;
 	my $model = $self->{model};
@@ -627,13 +634,13 @@ sub do_quick {
 		$self->start_timeout();
 	}
 }
-#package Viewer::Network;
+#package Viewer::Network::Gtk;
 sub do_idle {
 	my $self = shift;
 	my $model = $self->{model};
 	$self->start_timeout() unless $model->snmp_doone();
 }
-#package Viewer::Network;
+#package Viewer::Network::Gtk;
 sub do_timeout {
 	my $self = shift;
 	my $model = $self->{model};
@@ -645,15 +652,13 @@ sub do_timeout {
 }
 
 # ------------------------------------------
-package Viewer::Driver; our @ISA = qw(Viewer);
-use strict; use warnings; use Carp;
-use Gtk2; use Glib; use Goo::Canvas;
+package Viewer::Driver; use base qw(Viewer);
+use strict; use warnings;
 # ------------------------------------------
 
 # ------------------------------------------
-package Table::Window; our @ISA = qw(Table);
-use strict; use warnings; use Carp;
-use Data::Dumper; use DBI;
+package Table::Window; use base qw(Table);
+use strict; use warnings;
 # ------------------------------------------
 #package Table::Window;
 our %schema = (
@@ -672,9 +677,8 @@ q{CREATE TABLE IF NOT EXISTS winds (
 );
 
 # ------------------------------------------
-package Table::Page; our @ISA = qw(Table);
-use strict; use warnings; use Carp;
-use Data::Dumper; use DBI;
+package Table::Page; use base qw(Table);
+use strict; use warnings;
 # ------------------------------------------
 #package Table::Page;
 our %schema = (
@@ -696,16 +700,22 @@ q{CREATE TABLE IF NOT EXISTS winds (
 );
 
 # ------------------------------------------
-package View; our @ISA = qw(Base);
-use strict; use warnings; use Carp;
-use Gtk2; use Glib; use Goo::Canvas;
+package View; use base qw(Base);
+use strict; use warnings;
 # ------------------------------------------
 #package View;
 sub kind {
 	my $type = shift;
 	$type = ref $type if ref $type;
-	$type =~ s/::.*$//;
-	return $type;
+	my ($kind,$subtype) = split(/::/,$type,2);
+	return $kind;
+}
+#package View;
+sub subtype {
+	my $type = shift;
+	$type = ref $type if ref $type;
+	my ($kind,$subtype) = split(/::/,$type,2);
+	return $subtype;
 }
 #package View;
 sub isvisible {
@@ -713,7 +723,7 @@ sub isvisible {
 	return $self->{viewer}->isvisible($self->kind);
 }
 #package View;
-sub isanchor { return Glib::FALSE }
+sub isanchor { return 0 }
 #package View;
 sub getmodels { return {} }
 #package View;
@@ -805,7 +815,6 @@ sub move_view {
 	$xo = $XO unless defined $xo;
 	$yo = $YO unless defined $yo;
 	#return unless ($x != $X or $y != $Y or $xo != $XO or $yo != $YO);
-	#Carp::carp "****** Moving $self ($x,$y,$xo,$yo) component is negative or zero" if $x <= 0 or $y <= 0;
 	$self->{pos} = [$x,$y,$xo,$yo];
 	$self->{set} = 1;
 	$self->{moving} = 1;
@@ -834,11 +843,20 @@ sub xform {
 	my ($type,$view) = @_;
 	bless $view,$type;
 }
+#package View;
+sub fill_view {
+	my $self = shift;
+	return unless $self->{set};
+	my ($canv) = @_;
+	$self->{filling} = 1;
+	my $type = ref $self;
+	$self->_forw($type,undef,'filling',@_);
+	delete $self->{filling};
+}
 
 # ------------------------------------------
-package Group::View; our @ISA = qw(View);
-use strict; use warnings; use Carp;
-use Gtk2; use Glib; use Goo::Canvas;
+package Group::View; use base qw(View);
+use strict; use warnings;
 # ------------------------------------------
 #package Group::View;
 sub init {
@@ -846,7 +864,7 @@ sub init {
 	my ($viewer,$data) = @_;
 	my $layer = $self->{layer} = $viewer->getlayer($self->kind);
 	my $grp = $self->{grp} = {pnts=>[0,0]};
-	$grp->{item} = new Goo::Canvas::Group($layer,
+	my $item = $grp->{item} = new Goo::Canvas::GroupModel($layer,
 			visibility=>'invisible',
 			);
 }
@@ -875,9 +893,8 @@ sub makevisible {
 }
 
 # ------------------------------------------
-package Clickable::View; our @ISA = qw(Group::View);
-use strict; use warnings; use Carp;
-use Gtk2; use Glib; use Goo::Canvas;
+package Clickable::View; use base qw(Group::View);
+use strict; use warnings;
 # ------------------------------------------
 #package Clickable::View;
 sub init {
@@ -918,9 +935,8 @@ sub init {
 }
 
 # ------------------------------------------
-package Node::View; our @ISA = qw(ThreeColumn::View);
-use strict; use warnings; use Carp;
-use Gtk2; use Glib; use Goo::Canvas;
+package Node::View; use base qw(ThreeColumn::View);
+use strict; use warnings;
 # ------------------------------------------
 #package Node::View;
 sub mycolor { return 'black' }
@@ -1029,26 +1045,17 @@ sub parent_walk {
 	}
 }
 #package Node::View;
-sub parent_moving {
-	my $self = shift;
-	$self->Node::View::parent_propagate('move',@_);
-}
+sub parent_moving { shift->Node::View::parent_propagate('move',@_) }
 #package Node::View;
-sub parent_placing {
-	my $self = shift;
-	$self->Node::View::parent_walk('place',@_);
-}
+sub parent_placing { shift->Node::View::parent_walk('place',@_) }
 #package Node::View;
-sub parent_showing {
-	my $self = shift;
-	$self->Node::View::parent_walk('show',@_);
-}
+sub parent_showing { shift->Node::View::parent_walk('show',@_) }
+#package Node::View;
+sub parent_filling { shift->Node::View::parent_walk('fill',@_) }
 
 # ------------------------------------------
-package Bus::View; our @ISA = qw(Clickable::View);
-use strict; use warnings; use Carp;
-use Gtk2; use Glib; use Goo::Canvas;
-use Data::Dumper;
+package Bus::View; use base qw(Clickable::View);
+use strict; use warnings;
 # ------------------------------------------
 #package Bus::View;
 sub mycolor { return 'black' }
@@ -1060,7 +1067,7 @@ sub init {
 	my $group = $self->{grp}{item};
 	my $bus = $self->{bus} = {pnts=>[0,-10,0,10]};
 	$bus->{item} = new Goo::Canvas::Polyline(
-		$group,Glib::FALSE,$bus->{pnts},
+		$group,0,$bus->{pnts},
 #'antialias'=>'subpixel',
 #'line-join'=>'round',
 #'line-cap'=>'round',
@@ -1191,26 +1198,17 @@ sub parent_walk {
 	}
 }
 #package Bus::View;
-sub parent_moving {
-	my $self = shift;
-	$self->Bus::View::parent_propagate('move',@_);
-}
+sub parent_moving { shift->Bus::View::parent_propagate('move',@_) }
 #package Bus::View;
-sub parent_placing {
-	my $self = shift;
-	$self->Bus::View::parent_walk('place',@_);
-}
+sub parent_placing { shift->Bus::View::parent_walk('place',@_) }
 #package Bus::View;
-sub parent_showing {
-	my $self = shift;
-	$self->Bus::View::parent_walk('show',@_);
-}
+sub parent_showing { shift->Bus::View::parent_walk('show',@_) }
+#package Bus::View;
+sub parent_filling { shift->Bus::View::parent_walk('fill',@_) }
 
 # ------------------------------------------
-package BoxAndLink::View; our @ISA = qw(Clickable::View);
-use strict; use warnings; use Carp;
-use Gtk2; use Glib; use Goo::Canvas;
-use Data::Dumper;
+package BoxAndLink::View; use base qw(Clickable::View);
+use strict; use warnings;
 # ------------------------------------------
 #package BoxAndLink::View;
 sub mycolor { return 'black' }
@@ -1233,7 +1231,7 @@ sub init {
 	);
 	my $lnk = $self->{lnk} = {pnts=>[0,0,5,0,10,0]};
 	$lnk->{item} = new Goo::Canvas::Polyline(
-		$group,Glib::FALSE,$lnk->{pnts},
+		$group,0,$lnk->{pnts},
 #'antialias'=>'subpixel',
 #'line-join'=>'round',
 #'line-cap'=>'round',
@@ -1443,25 +1441,17 @@ sub parent_walk {
 	}
 }
 #package BoxAndLink::View;
-sub parent_moving {
-	my $self = shift;
-	$self->BoxAndLink::View::parent_propagate('move',@_);
-}
+sub parent_moving { shift->BoxAndLink::View::parent_propagate('move',@_) }
 #package BoxAndLink::View;
-sub parent_placing {
-	my $self = shift;
-	$self->BoxAndLink::View::parent_walk('place',@_);
-}
+sub parent_placing { shift->BoxAndLink::View::parent_walk('place',@_) }
 #package BoxAndLink::View;
-sub parent_showing {
-	my $self = shift;
-	$self->BoxAndLink::View::parent_walk('show',@_);
-}
+sub parent_showing { shift->BoxAndLink::View::parent_walk('show',@_) }
+#package BoxAndLink::View;
+sub parent_filling { shift->BoxAndLink::View::parent_walk('fill',@_) }
 
 # ------------------------------------------
-package Root::View; our @ISA = qw(Base);
-use strict; use warnings; use Carp;
-use Gtk2; use Glib; use Goo::Canvas;
+package Root::View; use base qw(Base);
+use strict; use warnings;
 # ------------------------------------------
 #package Root::View;
 sub child {
@@ -1541,11 +1531,12 @@ sub moving { shift->Root::View::propagate('moving',@_) }
 sub placing { shift->Root::View::propagate('placing',@_) }
 #package Root::View;
 sub showing { shift->Root::View::propagate('showing',@_) }
+#package Root::View;
+sub filling { shift->Root::View::propagate('filling',@_) }
 
 # ------------------------------------------
-package Leaf::View; our @ISA = qw(Base);
-use strict; use warnings; use Carp;
-use Gtk2; use Glib; use Goo::Canvas;
+package Leaf::View; use base qw(Base);
+use strict; use warnings;
 # ------------------------------------------
 #package Leaf::View;
 sub parent {
@@ -1558,7 +1549,7 @@ sub parents {
 	return $self->{viewer}->findviews($self->{data}->parents);
 }
 #package Leaf::View;
-sub parent_anchor { return Glib::FALSE }
+sub parent_anchor { return 0 }
 #package Leaf::View;
 sub propagate {
 	my $self = shift;
@@ -1574,17 +1565,17 @@ sub moving_old { shift->Leaf::View::propagate('moving',@_) }
 sub placing_old { shift->Leaf::View::propagate('placing',@_) }
 #package Leaf::View;
 sub showing_old { shift->Leaf::View::propagate('showing',@_) }
+#package Leaf::View;
+sub filling_old { shift->Leaf::View::propagate('filling',@_) }
 
 # ------------------------------------------
-package Tree::View; our @ISA = qw(Root::View Leaf::View);
-use strict; use warnings; use Carp;
-use Gtk2; use Glib; use Goo::Canvas;
+package Tree::View; use base qw(Root::View Leaf::View);
+use strict; use warnings;
 # ------------------------------------------
 
 # ------------------------------------------
-package Point::View; our @ISA = qw(Base);
-use strict; use warnings; use Carp;
-use Gtk2; use Glib; use Goo::Canvas;
+package Point::View; use base qw(Base);
+use strict; use warnings;
 # ------------------------------------------
 #package Point::View;
 sub pathsx {
@@ -1635,11 +1626,12 @@ sub moving_old { shift->Point::View::propagate('moving',@_) }
 sub placing_old { shift->Point::View::propagate('placing',@_) }
 #package Point::View;
 sub showing_old { shift->Point::View::propagate('showing',@_) }
+#package Point::View;
+sub filling_old { shift->Point::View::propagate('filling',@_) }
 
 # ------------------------------------------
-package Path::View; our @ISA = qw(Base);
-use strict; use warnings; use Carp;
-use Gtk2; use Glib; use Goo::Canvas;
+package Path::View; use base qw(Base);
+use strict; use warnings;
 # ------------------------------------------
 #package Path::View;
 sub obj {
@@ -1665,10 +1657,8 @@ sub objs {
 }
 
 # ------------------------------------------
-package MibInfo; our @ISA = qw(Base);
-use strict; use warnings; use Carp;
-use Gtk2; use Glib qw/TRUE FALSE/; use Goo::Canvas;
-use Gtk2::SimpleList; use SNMP;
+package MibInfo; use base qw(Base);
+use strict; use warnings;
 use threads::shared;
 # ------------------------------------------
 #package MibInfo;
@@ -1828,10 +1818,8 @@ sub reference {
 }
 
 # ------------------------------------------
-package MibLabel; our @ISA = qw(MibInfo);
-use strict; use warnings; use Carp;
-use Gtk2; use Glib qw/TRUE FALSE/; use Goo::Canvas;
-use Gtk2::SimpleList; use SNMP;
+package MibLabel; use base qw(MibInfo);
+use strict; use warnings;
 # ------------------------------------------
 #package MibLabel;
 our %prefixes = (
@@ -1873,10 +1861,8 @@ sub add_to_table {
 }
 
 # ------------------------------------------
-package MibUnits; our @ISA = qw(MibInfo);
-use strict; use warnings; use Carp;
-use Gtk2; use Glib qw/TRUE FALSE/; use Goo::Canvas;
-use Gtk2::SimpleList; use SNMP;
+package MibUnits; use base qw(MibInfo);
+use strict; use warnings;
 use threads::shared;
 # ------------------------------------------
 #package MibUnits;
@@ -1908,10 +1894,8 @@ sub add_to_table {
 }
 
 # ------------------------------------------
-package MibNode; our @ISA = qw(MibInfo);
-use strict; use warnings; use Carp;
-use Gtk2; use Glib qw/TRUE FALSE/; use Goo::Canvas;
-use Gtk2::SimpleList; use SNMP;
+package MibNode; use base qw(MibInfo);
+use strict; use warnings;
 use threads::shared;
 # ------------------------------------------
 #package MibNode;
@@ -1924,7 +1908,7 @@ sub init {
 	if ((defined $m->{syntax} and $m->{syntax} eq 'TruthValue') or (defined $m->{type} and $m->{type} eq 'BOOLEAN')) {
 		$$val = 0 unless defined $$val;
 		$e = $self->{e} = new Gtk2::ToggleButton();
-		$e->set_active(($$val eq 'true(1)' or $$val eq '1') ? TRUE : FALSE);
+		$e->set_active(($$val eq 'true(1)' or $$val eq '1') ? 1 : 0);
 		$f = $self->{f} = $e;
 		if ($m->{syntax} eq 'TruthValue') {
 			bless $self,'MibNode::Truth';
@@ -1940,13 +1924,13 @@ sub init {
 		}
 		$f = $self->{f} = new Gtk2::Frame;
 		$e = $self->{e} = new Gtk2::SimpleList(tag=>'text',value=>'int');
-		$e->set_headers_visible(FALSE);
+		$e->set_headers_visible(0);
 		$e->set_grid_lines('horizontal');
 		@{$e->{data}} = @rows;
 		$e->get_selection->set_mode('multiple');
 		my @sels = ();
 		my @bits = ();
-		foreach (values %{$m->{enums}}) { $bits[$_] = '0'; }
+		foreach (values %{$m->{enums}}) { $bits[$_] = '0' }
 		@bits = map {'0'} @bits;
 		my $bits = join('',@bits);
 
@@ -1987,8 +1971,8 @@ sub init {
 		$$val = '' unless defined $$val;
 		my $b = $self->{b} = Gtk2::EntryBuffer->new($$val);
 		$e = $self->{e} = Gtk2::Entry->new_with_buffer($b);
-		$e->set_editable((defined $m->{access} and $m->{access} =~ /Write|Create/) ? TRUE : FALSE);
-		$e->set(visibility=>FALSE) if defined $m->{type} and $m->{type} eq 'PASSWORD';
+		$e->set_editable((defined $m->{access} and $m->{access} =~ /Write|Create/) ? 1 : 0);
+		$e->set(visibility=>0) if defined $m->{type} and $m->{type} eq 'PASSWORD';
 		$f = $self->{f} = $e;
 		bless $self,'MibNode::Entry';
 	}
@@ -2036,12 +2020,10 @@ sub convert {
 	return $val;
 }
 
-# ----------------------------------
-package MibNode::Truth; our @ISA = qw(MibNode);
-use strict; use warnings; use Carp;
-use Gtk2; use Glib qw/TRUE FALSE/; use Goo::Canvas;
-use Gtk2::SimpleList; use SNMP;
-# ----------------------------------
+# ------------------------------------------
+package MibNode::Truth; use base qw(MibNode);
+use strict; use warnings;
+# ------------------------------------------
 #package MibNode::Truth;
 sub snmpval {
 	my ($type,$m,$val) = @_;
@@ -2063,14 +2045,12 @@ sub getval {
 }
 #package MibNode::Truth;
 sub setval {
-	shift->{e}->set_active(shift == 1 ? TRUE : FALSE);
+	shift->{e}->set_active(shift == 1 ? 1 : 0);
 }
 
 # ----------------------------------
-package MibNode::Boolean; our @ISA = qw(MibNode);
-use strict; use warnings; use Carp;
-use Glib qw/TRUE FALSE/; use Gtk2; use Goo::Canvas;
-use Gtk2::SimpleList; use SNMP;
+package MibNode::Boolean; use base qw(MibNode);
+use strict; use warnings;
 # ----------------------------------
 #package MibNode::Boolean;
 sub snmpval {
@@ -2089,30 +2069,29 @@ sub getval {
 }
 #package MibNode::Boolean;
 sub setval {
-	shift->{e}->set_active(shift == 1 ? Glib::TRUE : Glib::FALSE);
+	shift->{e}->set_active(shift == 1 ? 1 : 0);
 }
 
 # ----------------------------------
-package MibNode::List; our @ISA = qw(MibNode);
-use strict; use warnings; use Carp;
-use Glib qw/TRUE FALSE/; use Gtk2; use Goo::Canvas;
-use Gtk2::SimpleList; use SNMP;
+package MibNode::List; use base qw(MibNode);
+use strict; use warnings;
 use threads::shared;
 # ----------------------------------
+#package MibNode::List;
 sub snmpval {
 	my ($type,$m,$val) = @_;
 	if (not defined $val) {
 		# try default
 		return MibNode::List->snmpval($m,$m->{defaultValue}) if exists $m->{defaultValue} and defined $m->{defaultValue};
 		# do all zeros
-		my @bits = (); foreach (values %{$m->{enums}}) { $bits[$_] = 0; }
+		my @bits = (); foreach (values %{$m->{enums}}) { $bits[$_] = 0 }
 		@bits = map {'0'} @bits;
 		my $bits = join('',@bits).'0000000';
 		$bits = substr($bits,0,8*int(length($bits)/8));
 		$val = pack('B*',$bits);
 	} elsif ($val=~/^((\w+\b)(\n?\w+\b)*)?$/) {
 		# found line feed array
-		my @bits = (); foreach (values %{$m->{enums}}) { $bits[$_] = 0; }
+		my @bits = (); foreach (values %{$m->{enums}}) { $bits[$_] = 0 }
 		@bits = map {'0'} @bits;
 		my $bits = join('',@bits).'0000000';
 		$bits = substr($bits,0,8*int(length($bits)/8));
@@ -2126,7 +2105,7 @@ sub snmpval {
 		$val = pack('B*',$bits);
 	} elsif ($val=~/^\s*{\s*((\w+\b)(\s*[,]?\s*\w+\b)*)?\s*}\s*$/) {
 		# found parethentical list
-		my @bits = (); foreach (values %{$m->{enums}}) { $bits[$_] = 0; }
+		my @bits = (); foreach (values %{$m->{enums}}) { $bits[$_] = 0 }
 		@bits = map {'0'} @bits;
 		my $bits = join('',@bits).'0000000';
 		$bits = substr($bits,0,8*int(length($bits)/8));
@@ -2155,7 +2134,7 @@ sub getval {
 	lock $Model::SNMP::lockvar;
 	my $m = $self->{m};
 	my @bits = ();
-	foreach (values %{$m->{enums}}) { $bits[$_] = 0; }
+	foreach (values %{$m->{enums}}) { $bits[$_] = 0 }
 	foreach ($e->get_selected_indices) {
 		$bits[$e->{data}[$_][1]] = 1;
 	}
@@ -2171,7 +2150,7 @@ sub setval {
 	lock $Model::SNMP::lockvar;
 	my $m = $self->{m};
 	my @sels = ();
-	my @bits = (); foreach (values %{$m->{enums}}) { $bits[$_] = '0'; }
+	my @bits = (); foreach (values %{$m->{enums}}) { $bits[$_] = '0' }
 	@bits = map {'0'} @bits;
 	my $bits = join('',@bits);
 	$bits = unpack('B*',$val).$bits;
@@ -2186,10 +2165,8 @@ sub setval {
 }
 
 # ----------------------------------
-package MibNode::Combo; our @ISA = qw(MibNode);
-use strict; use warnings; use Carp;
-use Glib qw/TRUE FALSE/; use Gtk2; use Goo::Canvas;
-use Gtk2::SimpleList; use SNMP;
+package MibNode::Combo; use base qw(MibNode);
+use strict; use warnings;
 use threads::shared;
 # ----------------------------------
 #package MibNode::Combo;
@@ -2241,10 +2218,8 @@ sub setval {
 }
 
 # ----------------------------------
-package MibNode::Entry; our @ISA = qw(MibNode);
-use strict; use warnings; use Carp;
-use Glib qw/TRUE FALSE/; use Gtk2; use Goo::Canvas;
-use Gtk2::SimpleList; use SNMP;
+package MibNode::Entry; use base qw(MibNode);
+use strict; use warnings;
 # ----------------------------------
 #package MibNode::Entry;
 sub snmpval {
@@ -2284,10 +2259,8 @@ sub setval {
 }
 
 # ------------------------------------------
-package MibEntry; our @ISA = qw(Base Gtk2::Window);
-use strict; use warnings; use Carp;
-use Gtk2; use Glib qw/TRUE FALSE/; use Goo::Canvas;
-use Gtk2::SimpleList; use SNMP;
+package MibEntry; use base qw(Base Gtk2::Window);
+use strict; use warnings;
 use threads::shared;
 # ------------------------------------------
 #package MibEntry;
@@ -2303,7 +2276,7 @@ sub new {
 	$self->{data} = $data;
 	$self->{rows} = \@rows;
 	my $fr = new Gtk2::Frame($table);
-	my $t = new Gtk2::Table(scalar(@rows),scalar(@cols)+2,FALSE);
+	my $t = new Gtk2::Table(scalar(@rows),scalar(@cols)+2,0);
 	$t->set_col_spacings(0);
 	$t->set_row_spacings(0);
 	my $sw = new Gtk2::ScrolledWindow;
@@ -2357,14 +2330,14 @@ sub new {
 	my $vb = new Gtk2::VBox;
 	$vb->set_spacing(0);
 	$fr->set_border_width(5);
-	$vb->pack_start($fr,TRUE,TRUE,0);
+	$vb->pack_start($fr,1,1,0);
 	$bb->set_border_width(5);
-	$vb->pack_start($bb,FALSE,FALSE,0);
+	$vb->pack_start($bb,0,0,0);
 	$self->set_type_hint('normal');
 	$self->set_default_size(-1,600);
 	$self->set_opacity(0.5);
 	$self->set_position('mouse');
-	$self->{deleted} = FALSE;
+	$self->{deleted} = 0;
 	$self->signal_connect('delete-event'=>sub{
 		my ($self,$ev) = @_;
 		$self->hide_all;
@@ -2423,13 +2396,13 @@ sub refresh_view {
 #package MibEntry;
 sub enable_view {
 	my $self = shift;
-	$self->{active} = TRUE;
+	$self->{active} = 1;
 	return $self;
 }
 #package MibEntry;
 sub disable_view {
 	my $self = shift;
-	$self->{active} = FALSE;
+	$self->{active} = 0;
 	return $self;
 }
 #package MibEntry;
@@ -2486,10 +2459,8 @@ sub okButton {
 }
 
 # ------------------------------------------
-package Datum::View; our @ISA = qw(Base);
-use strict; use warnings; use Carp;
-use Gtk2; use Glib qw/TRUE FALSE/; use Goo::Canvas;
-use SNMP;
+package Datum::View; use base qw(Base);
+use strict; use warnings;
 # ------------------------------------------
 #package Datum::View;
 sub fini {
@@ -2527,10 +2498,8 @@ sub fillmenu {
 }
 
 # ------------------------------------------
-package ThreeColumn::View; our @ISA = qw(Clickable::View);
-use strict; use warnings; use Carp;
-use Gtk2; use Glib; use Goo::Canvas;
-use Data::Dumper;
+package ThreeColumn::View; use base qw(Clickable::View);
+use strict; use warnings;
 # ------------------------------------------
 #package ThreeColumn::View;
 sub init {
@@ -2540,7 +2509,7 @@ sub init {
 	my $group = $self->{grp}{item};
 	my $tbox = $self->{tbox} = {pnts=>[0,0,0,0,0,0,0,0]};
 	$tbox->{item} = new Goo::Canvas::Polyline(
-		$group,Glib::TRUE,$tbox->{pnts},
+		$group,1,$tbox->{pnts},
 #'antialias'=>'subpixel',
 #'line-join'=>'round',
 #'line-cap'=>'round',
@@ -2551,7 +2520,7 @@ sub init {
 	);
 	my $lbox = $self->{lbox} = {pnts=>[0,0,0,0,0,0,0,0]};
 	$lbox->{item} = new Goo::Canvas::Polyline(
-		$group,Glib::TRUE,$lbox->{pnts},
+		$group,1,$lbox->{pnts},
 #'antialias'=>'subpixel',
 #'line-join'=>'round',
 #'line-cap'=>'round',
@@ -2562,7 +2531,7 @@ sub init {
 	);
 	my $cbox = $self->{cbox} = {pnts=>[0,0,0,0,0,0,0,0]};
 	$cbox->{item} = new Goo::Canvas::Polyline(
-		$group,Glib::TRUE,$cbox->{pnts},
+		$group,1,$cbox->{pnts},
 #'antialias'=>'subpixel',
 #'line-join'=>'round',
 #'line-cap'=>'round',
@@ -2573,7 +2542,7 @@ sub init {
 	);
 	my $rbox = $self->{rbox} = {pnts=>[0,0,0,0,0,0,0,0]};
 	$rbox->{item} = new Goo::Canvas::Polyline(
-		$group,Glib::TRUE,$rbox->{pnts},
+		$group,1,$rbox->{pnts},
 #'antialias'=>'subpixel',
 #'line-join'=>'round',
 #'line-cap'=>'round',
@@ -2658,10 +2627,8 @@ sub placing {
 #package ThreeColumn::View;
 
 # ------------------------------------------
-package Subnetwork::View; our @ISA = qw(ThreeColumn::View);
-use strict; use warnings; use Carp;
-use Gtk2; use Glib; use Goo::Canvas;
-use Data::Dumper;
+package Subnetwork::View; use base qw(ThreeColumn::View);
+use strict; use warnings;
 # ------------------------------------------
 #package Subnetwork::View;
 sub fini {
@@ -2807,7 +2774,6 @@ sub layout {
 	my $kind = $self->kind;
 	my $geom = delete $self->{geo};
 	my $size = $self->{siz};
-	#warn "****** Laying out $self:\n", Data::Dumper->new([$geom])->Maxdepth(3)->Dump, Data::Dumper->new([$size])->Dump;
 	my ($X,$Y) = $self->pos;
 	foreach my $side (keys %$geom) {
 		if ($side eq 'c') {
@@ -2846,17 +2812,15 @@ sub layout {
 }
 
 # ------------------------------------------
-package Network::View; our @ISA = qw(Subnetwork::View Point::View Root::View);
-use strict; use warnings; use Carp;
-use Gtk2; use Glib; use Goo::Canvas;
-use Data::Dumper;
+package Network::View; use base qw(Subnetwork::View Point::View Root::View);
+use strict; use warnings;
 # ------------------------------------------
 #package Network::View;
 sub mycolor { return 'grey' }
 #package Network::View;
 sub ctypes { return qw/Private Host Vlan Lan Subnet/ }
 #package Network::View;
-sub isanchor { return Glib::TRUE }
+sub isanchor { return 1 }
 #package Network::View;
 sub geom {
 	my $self = shift;
@@ -2952,10 +2916,8 @@ sub rebalance {
 }
 
 # ------------------------------------------
-package Private::View; our @ISA = qw(Subnetwork::View Point::View Tree::View);
-use strict; use warnings; use Carp;
-use Gtk2; use Glib; use Goo::Canvas;
-use Data::Dumper;
+package Private::View; use base qw(Subnetwork::View Point::View Tree::View);
+use strict; use warnings;
 # ------------------------------------------
 #package Private::View;
 sub mycolor { return 'orange' }
@@ -3084,11 +3046,15 @@ sub parent_showing {
 	my $self = shift;
 	$self->Private::View::parent_walk('show',@_);
 }
+#package Private::View;
+sub parent_filling {
+	my $self = shift;
+	$self->Private::View::parent_walk('fill',@_);
+}
 
 # ------------------------------------------
-package Private::Here::View; our @ISA = qw(Private::View);
-use strict; use warnings; use Carp;
-use Gtk2; use Glib; use Goo::Canvas;
+package Private::Here::View; use base qw(Private::View);
+use strict; use warnings;
 # ------------------------------------------
 sub xformed {
 	my ($type,$self) = @_;
@@ -3096,9 +3062,8 @@ sub xformed {
 }
 
 # ------------------------------------------
-package Local::View; our @ISA = qw(View Point::View Tree::View);
-use strict; use warnings; use Carp;
-use Gtk2; use Glib; use Goo::Canvas;
+package Local::View; use base qw(View Point::View Tree::View);
+use strict; use warnings;
 # ------------------------------------------
 #package Local::View;
 sub repos {
@@ -3108,16 +3073,13 @@ sub repos {
 }
 
 # ------------------------------------------
-package Local::Here::View; our @ISA = qw(Local::View);
-use strict; use warnings; use Carp;
-use Gtk2; use Glib; use Goo::Canvas;
+package Local::Here::View; use base qw(Local::View);
+use strict; use warnings;
 # ------------------------------------------
 
 # ------------------------------------------
-package Host::View; our @ISA = qw(Node::View Point::View Tree::View Datum::View);
-use strict; use warnings; use Carp;
-use Gtk2; use Glib; use Goo::Canvas;
-use Data::Dumper;
+package Host::View; use base qw(Node::View Point::View Tree::View Datum::View);
+use strict; use warnings;
 # ------------------------------------------
 #package Host::View;
 sub mycolor { return 'red' }
@@ -3325,9 +3287,8 @@ sub layout {
 }
 
 # ------------------------------------------
-package Host::Ip::View; our @ISA = qw(Host::View);
-use strict; use warnings; use Carp;
-use Gtk2; use Glib; use Goo::Canvas;
+package Host::Ip::View; use base qw(Host::View);
+use strict; use warnings;
 # ------------------------------------------
 #package Host::Ip::View;
 sub mycolor {
@@ -3364,9 +3325,8 @@ sub xformed {
 }
 
 # ------------------------------------------
-package Host::Ip::Here::View; our @ISA = qw(Host::Ip::View);
-use strict; use warnings; use Carp;
-use Gtk2; use Glib; use Goo::Canvas;
+package Host::Ip::Here::View; use base qw(Host::Ip::View);
+use strict; use warnings;
 # ------------------------------------------
 #package Host::Ip::Here::View;
 sub mycolor {
@@ -3384,9 +3344,8 @@ sub xformed {
 }
 
 # ------------------------------------------
-package Subnet::View; our @ISA = qw(Bus::View Point::View Tree::View Datum::View);
-use strict; use warnings; use Carp;
-use Gtk2; use Glib; use Goo::Canvas;
+package Subnet::View; use base qw(Bus::View Point::View Tree::View Datum::View);
+use strict; use warnings;
 # ------------------------------------------
 #package Subnet::View;
 sub mycolor { return 'brown' }
@@ -3410,9 +3369,8 @@ sub gettxt {
 }
 
 # ------------------------------------------
-package Lan::View; our @ISA = qw(Bus::View Point::View Tree::View);
-use strict; use warnings; use Carp;
-use Gtk2; use Glib; use Goo::Canvas;
+package Lan::View; use base qw(Bus::View Point::View Tree::View);
+use strict; use warnings;
 # ------------------------------------------
 #package Lan::View;
 sub mycolor { return 'black' }
@@ -3420,9 +3378,8 @@ sub mycolor { return 'black' }
 sub ctypes { return qw/Port/ }
 
 # ------------------------------------------
-package Vlan::View; our @ISA = qw(Bus::View Point::View Tree::View);
-use strict; use warnings; use Carp;
-use Gtk2; use Glib; use Goo::Canvas;
+package Vlan::View; use base qw(Bus::View Point::View Tree::View);
+use strict; use warnings;
 # ------------------------------------------
 #package Vlan::View;
 sub mycolor { return 'blue' }
@@ -3430,9 +3387,8 @@ sub mycolor { return 'blue' }
 sub ctypes { return qw/Vprt/ }
 
 # ------------------------------------------
-package Address::View; our @ISA = qw(BoxAndLink::View Point::View Leaf::View Datum::View);
-use strict; use warnings; use Carp;
-use Gtk2; use Glib; use Goo::Canvas;
+package Address::View; use base qw(BoxAndLink::View Point::View Leaf::View Datum::View);
+use strict; use warnings;
 # ------------------------------------------
 #package Address::View;
 sub init { shift->{txt}{pnts}[2] = 11 }
@@ -3458,9 +3414,8 @@ sub gettxt {
 }
 
 # ------------------------------------------
-package Port::View; our @ISA = qw(BoxAndLink::View Point::View Tree::View Datum::View);
-use strict; use warnings; use Carp;
-use Gtk2; use Glib; use Goo::Canvas;
+package Port::View; use base qw(BoxAndLink::View Point::View Tree::View Datum::View);
+use strict; use warnings;
 # ------------------------------------------
 #package Port::View;
 sub init { shift->{txt}{pnts}[2] = 13 }
@@ -3488,9 +3443,7 @@ sub gettxt {
 }
 
 # ------------------------------------------
-package Vprt::View; our @ISA = qw(BoxAndLink::View Point::View Tree::View Datum::View);
-use strict; use warnings; use Carp;
-use Gtk2; use Glib; use Goo::Canvas;
+package Vprt::View; use base qw(BoxAndLink::View Point::View Tree::View Datum::View);
 # ------------------------------------------
 #package Vprt::View;
 sub init { shift->{txt}{pnts}[2] = 17 }
@@ -3526,23 +3479,18 @@ sub gettxt {
 }
 
 # ------------------------------------------
-package Route::View; our @ISA = qw(View Path::View Datum::View);
-use strict; use warnings; use Carp;
-use Gtk2; use Glib; use Goo::Canvas;
+package Route::View; use base qw(View Path::View Datum::View);
 # ------------------------------------------
 
 # ------------------------------------------
-package Driv::View; our @ISA = qw(View Point::View Tree::View Datum::View);
-use strict; use warnings; use Carp;
-use Gtk2; use Glib; use Goo::Canvas;
+package Driv::View; use base qw(View Point::View Tree::View Datum::View);
 # ------------------------------------------
 #package Driv::View;
-sub isanchor { return Glib::TRUE }
+sub isanchor { return 1 }
 
 # ------------------------------------------
-package Card::View; our @ISA = qw(Group::View Point::View Tree::View Datum::View);
-use strict; use warnings; use Carp;
-use Gtk2; use Glib; use Goo::Canvas;
+package Card::View; use base qw(Group::View Point::View Tree::View Datum::View);
+use strict; use warnings;
 # ------------------------------------------
 #package Card::View;
 sub mycolor { return 'black' }
@@ -3574,7 +3522,7 @@ sub init {
 			$x+  0,$y+95,
 		]};
 	$otl->{item} = new Goo::Canvas::Polyline(
-			$group,Glib::FALSE,$otl->{pnts},
+			$group,0,$otl->{pnts},
 #'antialias'=>'subpixel',
 #'line-join'=>'round',
 #'line-cap'=>'round',
@@ -3587,30 +3535,23 @@ sub init {
 }
 
 # ------------------------------------------
-package Span::View; our @ISA = qw(Group::View Point::View Tree::View Datum::View);
-use strict; use warnings; use Carp;
-use Gtk2; use Glib; use Goo::Canvas;
+package Span::View; use base qw(Group::View Point::View Tree::View Datum::View);
 # ------------------------------------------
 #package Span::View;
 
 # ------------------------------------------
-package Chan::View; our @ISA = qw(Group::View Point::View Tree::View Datum::View);
-use strict; use warnings; use Carp;
-use Gtk2; use Glib; use Goo::Canvas;
+package Chan::View; use base qw(Group::View Point::View Tree::View Datum::View);
 # ------------------------------------------
 #package Chan::View;
 
 # ------------------------------------------
-package Xcon::View; our @ISA = qw(Group::View Point::View Tree::View Datum::View);
-use strict; use warnings; use Carp;
-use Gtk2; use Glib; use Goo::Canvas;
+package Xcon::View; use base qw(Group::View Point::View Tree::View Datum::View);
 # ------------------------------------------
 #package Xcon::View;
 
 # ------------------------------------------
-package Window; our @ISA = qw(Gtk2::Window);
-use strict; use warnings; use Carp;
-use Gtk2; use Glib; use Goo::Canvas;
+package Window; use base qw(Gtk2::Window);
+use strict; use warnings;
 # ------------------------------------------
 #package Window;
 our $windidn = 0;
@@ -3653,8 +3594,8 @@ sub new {
 	$nb->popup_disable;
 	my $vb = new Gtk2::VBox();
 	$vb->set_spacing(0);
-	$vb->pack_start($mb,Glib::FALSE,Glib::FALSE,0);
-	$vb->pack_start($nb,Glib::TRUE,Glib::TRUE,0);
+	$vb->pack_start($mb,0,0,0);
+	$vb->pack_start($nb,1,1,0);
 	$self->set_type_hint('normal');
 	$self->set_default_size(1000,800);
 #	if (0) {
@@ -3670,9 +3611,7 @@ sub new {
 	$self->set_position('mouse');
 	$self->signal_connect('delete-event'=>sub{
 			my ($self,$ev) = @_;
-			my %windows = map {$_=>$_} @windows;
-			delete $windows{$self};
-			@windows = (values %windows);
+			@windows = map {$_ eq $self ? () : $_} @windows;
 			if ($quitting or scalar @windows == 0) {
 				#$self->save_all;
 			} else {
@@ -3724,8 +3663,8 @@ sub add_viewer {
 	my ($self,$viewer) = @_;
 	my $nb = $self->{nb};
 	$nb->append_page($viewer,'Viewer '.$viewer->{viewid});
-	$nb->set_tab_detachable($viewer,Glib::TRUE);
-	$nb->set_tab_reorderable($viewer,Glib::TRUE);
+	$nb->set_tab_detachable($viewer,1);
+	$nb->set_tab_reorderable($viewer,1);
 	$self->show_all;
 }
 #package Window;
@@ -3734,10 +3673,39 @@ sub new_network {
 	my $windid = $self->{windid};
 	my $nb = $self->{nb};
 	my $pageid = $nb->get_n_pages;
-	my $viewer = new Viewer::Network($windid,$pageid,$network);
+	my $viewer = new Viewer::Network::Gtk($windid,$pageid,$network);
 	$self->add_viewer($viewer);
 	return $viewer;
 }
+
+# ------------------------------------------
+package Canvas; use base qw(Base Tk::Canvas);
+use strict; use warnings;
+# ------------------------------------------
+#package Canvas;
+sub new {
+	my $type = shift;
+	my ($page,$width) = @_;
+	$width = 1024 unless defined $width;
+	my $self = {};
+	bless $self,$type;
+	return $self;
+}
+#package Canvas;
+sub fini {
+	my $self = shift;
+}
+
+# ------------------------------------------
+package MyOptions;
+use strict; use warnings;
+# ------------------------------------------
+#package MyOptions;
+
+# ------------------------------------------
+package MyPixmaps;
+use strict; use warnings;
+# ------------------------------------------
 
 1;
 

@@ -7,7 +7,10 @@ use threads::shared;
 use Thread qw/:DEFAULT async yield/;
 use Thread::Queue;
 use Carp;
-if (0) {
+use constant {
+	MY_USE_GTK=>1,
+};
+if (MY_USE_GTK) {
 	use Gtk2 qw/-init -threads-init/;
 	use Gtk2::SimpleList;
 	use Glib;
@@ -57,7 +60,7 @@ print STDERR "Loading Network.pm...\n";
 require "Network.pm";
 print STDERR "Loading Viewer.pm...\n";
 require "Viewer.pm";
-if (0) {
+if (MY_USE_GTK) {
 	print STDERR "Loading GtkViewer.pm...\n";
 	require "GtkViewer.pm";
 } else {
@@ -135,18 +138,18 @@ use strict;
 use warnings;
 
 my $db = new Database('./.netdisc');
-my $model = new Model::Network($db);
+my $model = new Model::Internet($db);
 my $gui;
-if (0) {
+if (MY_USE_GTK) {
 	$gui = new Gui::Gtk($db,$model);
 } else {
 	$gui = new Gui::Tk($db,$model);
 }
-#my @windows = values %{$gui->{items}{Window}};
-#unless (@windows) {
+my @windows = values %{$gui->{gobjs}{Window}};
+unless (@windows) {
 	print STDERR "Creating window...\n";
 	my $window;
-	if (0) {
+	if (MY_USE_GTK) {
 		$window = new Window::Gtk($gui);
 	} else {
 		$window = new Window::Tk($gui);
@@ -155,7 +158,7 @@ if (0) {
 	my $net = $model->{net}{PUBLIC};
 	print STDERR "Creating viewer...\n";
 	my $viewer = $window->new_viewer($net);
-#}
+}
 my $hkey = Item::makekey('127.0.0.1');
 my $loc = $model->{net}{LOOPBACK};
 $loc->getchild('Host::Ip::Here',$hkey,undef,[['Local::Here',$loc,$hkey]]);

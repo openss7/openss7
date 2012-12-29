@@ -193,6 +193,7 @@ sub _dump {
 sub show {
 	my $self = shift;
 	my $type = ref $self;
+	warn "Bad object of type $type, $self\n" if $self->{bad};
 	print STDERR "\nShowing item $self\n-------------------------\n";
 	$self->_dump($type,@_);
 }

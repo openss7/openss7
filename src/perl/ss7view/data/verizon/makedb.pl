@@ -54,7 +54,7 @@ sub dodatacsv {
 			print STDERR "E: bad line $lineno: ",scalar(@tokens)," tokens instead of ",scalar(@fields),"\n";
 			next;
 		}
-		my $sect = "XLS-$lineno";
+		my $sect = "VZ-$lineno";
 		my %data = (sect=>$sect,fdate=>$fdate);
 		for (my $i=0;$i<@fields;$i++) {
 			$tokens[$i] =~ s/^\s+//;
@@ -69,16 +69,16 @@ sub dodatacsv {
 		$data{switchtype}   = delete $data{swtype} if $data{swtype};
 		$data{wc}	    = delete $data{wcclli} if $data{wcclli};
 		$data{wc}	    = substr($data{switch},0,8) unless $data{wc};
-		$data{swocn}	    = delete $data{ocn} if $data{ocn};
-		$data{swoocn}	    = delete $data{oocn} if $data{oocn};
-		$data{swlata}	    = delete $data{lata} if $data{lata};
+		$data{swocn}	    = $data{ocn} if $data{ocn};
+		$data{swoocn}	    = $data{oocn} if $data{oocn};
+		$data{swlata}	    = $data{lata} if $data{lata};
 		my $f = 'switch';
 		unless (not $data{$f} or length($data{$f}) == 11) {
 			print STDERR "E: bad value at $lineno in field $f '$data{$f}'\n";
 			next;
 		}
 		my $f = 'wc';
-		unless (length($data{$f}) == 8) {
+		unless (not $data{$f} or length($data{$f}) == 8) {
 			print STDERR "E: bad value at $lineno in field $f '$data{$f}'\n";
 			next;
 		}
@@ -127,6 +127,9 @@ sub dodatacsv {
 		if (length($data{$f}) and $data{$f} !~ /^0[0-9]{4},0[0-9]{4}$/) {
 			print STDERR "E: bad value at $lineno in field $f '$data{$f}'\n";
 			next;
+		}
+		if ($data{nxx} and $data{nxx} =~ /-/) {
+			($data{npa},$data{nxx}) = split(/-/,$data{nxx});
 		}
 		makedb::updatedata(\%data,$fdate,$sect);
 	}

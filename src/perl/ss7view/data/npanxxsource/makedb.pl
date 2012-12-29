@@ -24,7 +24,27 @@ require "$progdir/../makedb.pm";
 
 binmode(STDERR,':utf8');
 
-sub dodata {
+my %ccst2rg = ();
+my %ccst2pc = ();
+my %ccst2ps = ();
+my %pcps2rg = ();
+
+sub dolergst {
+	my $fn = "$codedir/lergst.txt";
+	print STDERR "I: reading $fn\n";
+	open(INFILE,"<:utf8",$fn) or die "can't read $fn";
+	while (<INFILE>) { chomp;
+		next unless /^[A-Z][A-Z]\t/;
+		my @tokens = split(/\t/,$_);
+		$ccst2rg{$tokens[0]}{$tokens[1]} = $tokens[2];
+		$ccst2pc{$tokens[0]}{$tokens[1]} = $tokens[4] if $tokens[4] ne 'ZZ';
+		$ccst2ps{$tokens[0]}{$tokens[1]} = $tokens[5] if $tokens[5] ne 'XX';
+		$pcps2rg{$tokens[4]}{$tokens[5]} = $tokens[2] if $tokens[2] ne 'XX' and $tokens[2] ne 'ZZ';
+	}
+	close(INFILE);
+}
+
+sub donpanxx {
 	my $dbh = shift;
 	$dbh->begin_work;
 	my %mapping = (
@@ -294,7 +314,11 @@ sub dodata {
 			'Country'=>sub{
 				my ($dat,$fld,$val) = @_;
 				makedb::simplefield($dat,'rccc',$val);
-				$dat->{region} = $makedb::pcps2rg{$dat->{rccc}}{$dat->{rcst}} if exists $makedb::pcps2rg{$dat->{rccc}}{$dat->{rcst}};
+				if (exists $pcps2rg{$dat->{rccc}}{$dat->{rcst}}) {
+					$dat->{region} = $pcps2rg{$dat->{rccc}}{$dat->{rcst}};
+				} else {
+					print STDERR "E: no region for $dat->{rccc}-$dat->{rcst}\n";
+				}
 			},
 			'LERG Abbreviation'=>sub{
 				my ($dat,$fld,$val) = @_;
@@ -510,6 +534,12 @@ sub dodata {
 		makedb::updatedata(\%data,$fdate,$sect);
 	}
 	$dbh->commit;
+}
+
+sub dodata {
+	my $dbh = shift;
+	dolergst($dbh);
+	donpanxx($dbh);
 }
 
 makedb::makedb('nnxsdata',\&dodata);

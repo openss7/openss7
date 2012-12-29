@@ -7,6 +7,7 @@ my $program = $0; $program =~ s/^.*\///;
 my $progdir = $0; $progdir =~ s/\/[^\/]*$//;
 my $datadir = $progdir;
 my $geondir = "$progdir/../geonames";
+my $nanpdir = "$progdir/../nanpa";
 my $codedir = "$progdir/..";
 
 use strict;
@@ -20,317 +21,9 @@ use Time::gmtime;
 use Date::Parse;
 use DBI;
 
-my $fh = \*INFILE;
-my $of = \*OUTFILE;
-my ($fn,$fp);
+require "$progdir/../makedb.pm";
 
-binmode(INFILE,':utf8');
-binmode(OUTFILE,':utf8');
 binmode(STDERR,':utf8');
-
-my ($dbh,%sth,$sql);
-
-$fn = "$progdir/nanpdata.sqlite";
-print STDERR "I: connecting to database $fn\n";
-$dbh = DBI->connect("dbi:SQLite:dbname=$fn", {
-		AutoCommit=>0,
-	}) or die "can't open $fn";
-
-$sql = q{PRAGMA foreign_keys = OFF;
-};
-print STDERR "S: $sql";
-$dbh->do($sql) or die $dbh->errstr;
-
-$sql = q{
-	CREATE TABLE IF NOT EXISTS lergst (
-		cc CHARACTER(2), -- iso alpha2 country code
-		st CHARACTER(2), -- iso alpha2 state code
-		rg CHARACTER(2) PRIMARY KEY, -- lerg state/prov/territory
-		cs CHARACTER(2) UNIQUE, -- CLLI state/prov/territory
-		pc CHARACTER(2), -- USPS country code
-		ps CHARACTER(2), -- USPS state code
-		loc TEXT
-	);
-};
-print STDERR "S: $sql";
-$dbh->do($sql) or die $dbh->errstr;
-
-$sql = q{CREATE UNIQUE INDEX IF NOT EXISTS ccst_idx ON lergst (cc ASC, st ASC);
-};
-print STDERR "S: $sql";
-$dbh->do($sql) or die $dbh->errstr;
-$sql = q{CREATE UNIQUE INDEX IF NOT EXISTS pcps_idx ON lergst (pc ASC, ps ASC);
-};
-print STDERR "S: $sql";
-$dbh->do($sql) or die $dbh->errstr;
-
-$sql = q{
-	CREATE TABLE IF NOT EXISTS nanpst (
-		npa CHARACTER(3) PRIMARY KEY,
-		cc CHARACTER(2),
-		st CHARACTER(2),
-		loc TEXT,
-		FOREIGN KEY(cc,st) REFERENCES lergst(cc,st)
-	);
-};
-print STDERR "S: $sql";
-$dbh->do($sql) or die $dbh->strerr;
-
-$sql = q{
-	CREATE TABLE IF NOT EXISTS ocndata (
-		ocn CHARACTER(4) PRIMARY KEY,
-		companyname TEXT,
-		fdate INTEGER,
-		updating BOOLEAN
-	);
-};
-print STDERR "S: $sql";
-$dbh->do($sql) or die $dbh->strerr;
-
-$sql = q{
-	CREATE TABLE IF NOT EXISTS npadata (
-		npa CHARACTER(3) PRIMARY KEY,
-		type CHARACTER(1), -- (G|E)
-		assignable BOOLEAN,
-		explanation VCHAR(3),
-		reserved BOOLEAN,
-		assigned BOOLEAN,
-		assigndate INTEGER,
-		use CHARACTER(1), -- (G|N)
-		service CHARACTER(3),
-		location CHARACTER(2), -- postal state
-		country CHARACTER(2), -- postal country
-		inservice BOOLEAN,
-		effdate INTEGER,
-		status CHARACTER(1), -- (A|S)
-		pl TEXT, -- planning letter
-		overlay BOOLEAN,
-		complex TEXT,
-		parent CHARACTER(3),
-		tzones VCHAR(10),
-		map TEXT, -- NANPA map
-		jeoparady BOOLEAN,
-		relief BOOLEAN,
-		hnpalocl VCHAR(10),
-		hnpatoll VCHAR(10),
-		fnpalocl VCHAR(10),
-		fnpatoll VCHAR(10),
-		permhnpalocl VCHAR(10),
-		permhnpatoll VCHAR(10),
-		permfnpalocl VCHAR(10),
-		notes TEXT,
-		fdate INTEGER,
-		updating BOOLEAN
-	);
-};
-print STDERR "S: $sql";
-$dbh->do($sql) or die $dbh->strerr;
-
-$sql = q{
-	CREATE TABLE IF NOT EXISTS nxxdata (
-		npa CHARACTER(3),
-		nxx CHARACTER(3),
-		ocn CHARACTER(4),
-		companyname TEXT,
-		status CHARACTER(2),
-		rc TEXT,
-		remarks TEXT,
-		rg CHARACTER(2),
-		effdate INTEGER,
-		use CHARACTER(2),
-		assigndate INTEGER,
-		initialgrowth CHARACTER(1),
-		discon BOOLEAN,
-		special BOOLEAN,
-		fdate INTEGER,
-		updating BOOLEAN,
-		PRIMARY KEY(npa,nxx),
-		FOREIGN KEY(ocn) REFERENCES ocndata(ocn),
-		FOREIGN KEY(rg) REFERENCES lergst(rg)
-	);
-};
-print STDERR "S: $sql";
-$dbh->do($sql) or die $dbh->strerr;
-
-my %cols = (
-	lergst=>    [ qw/cc st rg cs pc ps loc/ ],
-	nanpst=>    [ qw/npa cc st loc/ ],
-	ocndata=>   [ qw/ocn companyname fdate/ ],
-	npadata=>   [ qw/npa type assignable explanation reserved assigned assigndate use service location country inservice effdate status pl overlay complex parent tzones map jeoparady relief hnpalocl hnpatoll fnpalocl fnpatoll permhnpalocl permhnpatoll permfnpalocl notes fdate/ ],
-	nxxdata=>   [ qw/npa nxx ocn companyname status rc remarks rg effdate use assigndate initialgrowth discon special fdate/ ],
-);
-
-my %keys = (
-	lergst=>    [ qw/rg/ ],
-	ocndata=>   [ qw/ocn/ ],
-	nanpst=>    [ qw/npa/ ],
-	npadata=>   [ qw/npa/ ],
-	nxxdata=>   [ qw/npa nxx/ ],
-);
-
-sub getinsert {
-	my $tab = shift;
-	my @bind = (); foreach (@{$cols{$tab}}) { push @bind, '?' }
-	my $sql = qq{
-	INSERT OR REPLACE INTO $tab (
-		}.join(',',@{$cols{$tab}}).q{
-	) VALUES (
-		}.join(',',@bind).q{
-	);
-};
-	print STDERR "S: $sql";
-	my $sth = $dbh->prepare($sql) or die $dbh->errstr;
-	return $sth;
-}
-
-sub getupdate {
-	my $tab = shift;
-	my @bind = (); foreach (@{$cols{$tab}}) { push @bind, "$_=?" }
-	my @indx = (); foreach (@{$keys{$tab}}) { push @indx, "$_=?" }
-	my $sql = qq{
-	UPDATE OR REPLACE $tab SET
-		}.join(',',@bind).q{
-	WHERE }.join(' AND ',@indx).q{;
-};
-	print STDERR "S: $sql";
-	my $sth = $dbh->prepare($sql) or die $dbh->errstr;
-	return $sth;
-} 
-
-sub getselect {
-	my $tab = shift;
-	my @indx = (); foreach (@{$keys{$tab}}) { push @indx, "$_=?" }
-	my $sql = q{
-	SELECT
-		}.join(',',@{$cols{$tab}}).qq{
-	FROM $tab WHERE
-		}.join(' AND ',@indx).q{;
-};
-	print STDERR "S: $sql";
-	my $sth = $dbh->prepare($sql) or die $dbh->errstr;
-	return $sth;
-}
-
-foreach my $tab (keys %cols) {
-	$sth{$tab}{insert} = getinsert($tab);
-	$sth{$tab}{update} = getupdate($tab);
-	$sth{$tab}{select} = getselect($tab);
-}
-
-sub insertit {
-	my ($dat,$tab) = @_;
-	my @values = ();
-	foreach my $k (@{$cols{$tab}}) {
-		push @values, $dat->{$k};
-	}
-	unless ($sth{$tab}{insert}->execute(@values)) {
-		print STDERR "E: $tab: '",join("','",@values),"'\n";
-	}
-}
-
-sub modifyit {
-	my ($dat,$tab,$binds) = @_;
-	my @values = ();
-	foreach my $k (@{$cols{$tab}}) {
-		push @values, $dat->{$k};
-	}
-	unless ($sth{$tab}{update}->execute(@values,@$binds)) {
-		print STDERR "E: $tab: '",join("','",@values),"'\n";
-	}
-}
-
-sub updateit {
-	my ($data,$tab,$binds) = @_;
-	unless ($sth{$tab}{select}->execute(@$binds)) {
-		warn $sth{$tab}{select}->errstr;
-		return;
-	}
-	if (my $row = $sth{$tab}{select}->fetchrow_hashref) {
-		my %dat = %$data;
-		my %rec = %$row;
-		my @new = ();
-		my @old = ();
-		my $modified = undef;
-		my $overwrite = ($rec{fdate} and $rec{fdate} > $dat{fdate});
-		my $conflict = ($rec{fdate} and $dat{fdate} and $rec{fdate} == $dat{fdate});
-		foreach my $k (@{$cols{$tab}}) {
-			if (length($rec{$k})) {
-				$rec{$k} = sprintf('%05d',$rec{$k}) if $k =~ /wcv|wch|rcv|rch/;
-				if ($k eq 'feat') {
-					my %feats = ();
-					foreach my $f (split(/\s+/,$dat{$k}),split(/\s+/,$rec{$k})) {
-						$feats{$f}++ if $f;
-					}
-					foreach my $f (keys %feats) {
-						$modified = 1 unless $feats{$f} == 2;
-					}
-					$dat{$k} = $rec{$k} = join(' ',sort keys %feats);
-				}
-				if ($k eq 'sect') {
-					my %sects = ();
-					foreach my $s (split(/,/,$dat{$k}),split(/,/,$rec{$k})) {
-						$sects{$s}++ if $s;
-					}
-					foreach my $s (keys %sects) {
-						$modified = 1 unless $sects{$s} == 2;
-					}
-					$dat{$k} = $rec{$k} = join(',',sort keys %sects);
-				}
-				if ($overwrite or not length($dat{$k})) {
-					$dat{$k} = $rec{$k};
-				} elsif ($conflict) {
-					if ($dat{$k} ne $rec{$k}) {
-						#pick one, generate sql to change it back
-						push @old, "$k='$rec{$k}'";
-						push @new, "$k='$dat{$k}'";
-					}
-				}
-			} else {
-				delete $dat{$k} if $overwrite;
-			}
-			$modified = 1 if ($dat{$k} ne $rec{$k});
-		}
-		if (@new or @old) {
-			my @bounds = ();
-			foreach my $k (@{$keys{$tab}}) { push @bounds,"$k=='$dat{$k}'"; }
-			my $sql = "UPDATE $tab SET ".join(',',@old)." WHERE ".join(' AND ',@new,@bounds)."; -- FIXME: (A) pick one! ($dat{sect})\n";
-			print STDERR "S: $sql";
-			print $of $sql;
-			my $sql = "UPDATE $tab SET ".join(',',@new)." WHERE ".join(' AND ',@old,@bounds)."; -- FIXME: (B) pick one! ($dat{sect})\n";
-			print STDERR "S: $sql";
-			print $of $sql;
-		}
-		modifyit(\%dat,$tab,$binds) if $modified;
-	} else {
-		insertit($data,$tab);
-	}
-}
-
-my %ccst2rg = ();
-my %ccst2pc = ();
-my %ccst2ps = ();
-my %pcps2rg = ();
-
-sub dolergst {
-	$dbh->begin_work;
-	$fn = "$progdir/../lergst.txt";
-	print STDERR "I: reading $fn\n";
-	open($fh,"<:utf8",$fn) or die "can't read $fn";
-	while (<$fh>) { chomp;
-		next unless /^[A-Z][A-Z]\t/;
-		my @tokens = split(/\t/,$_);
-		$ccst2rg{$tokens[0]}{$tokens[1]} = $tokens[2];
-		$ccst2pc{$tokens[0]}{$tokens[1]} = $tokens[4] if $tokens[4] ne 'ZZ';
-		$ccst2ps{$tokens[0]}{$tokens[1]} = $tokens[5] if $tokens[5] ne 'XX';
-		$pcps2rg{$tokens[4]}{$tokens[5]} = $tokens[2] if $tokens[2] ne 'XX' and $tokens[2] ne 'ZZ';
-		next if $tokens[3] eq 'XX';
-		unless ($sth{lergst}{insert}->execute(split(/\t/,$_))) {
-			print STDERR "E: lergst: '",join("','",@tokens),"'\n";
-		}
-	}
-	close($fh);
-	$dbh->commit;
-}
 
 my %nsnxxrg = (
 	'202'=>'NS',
@@ -1103,14 +796,35 @@ my %ntnxxrg = (
 	'999'=>'NT',
 );
 
-my (%npapc,%npaps,%nparg);
+my %ccst2rg = ();
+my %ccst2pc = ();
+my %ccst2ps = ();
+my %pcps2rg = ();
+
+sub dolergst {
+	my $fn = "$codedir/lergst.txt";
+	print STDERR "I: reading $fn\n";
+	open(INFILE,"<:utf8",$fn) or die "can't read $fn";
+	while (<INFILE>) { chomp;
+		next unless /^[A-Z][A-Z]\t/;
+		my @tokens = split(/\t/,$_);
+		$ccst2rg{$tokens[0]}{$tokens[1]} = $tokens[2];
+		$ccst2pc{$tokens[0]}{$tokens[1]} = $tokens[4] if $tokens[4] ne 'ZZ';
+		$ccst2ps{$tokens[0]}{$tokens[1]} = $tokens[5] if $tokens[5] ne 'XX';
+		$pcps2rg{$tokens[4]}{$tokens[5]} = $tokens[2] if $tokens[2] ne 'XX' and $tokens[2] ne 'ZZ';
+	}
+	close(INFILE);
+}
+
+my %npapc = ();
+my %npaps = ();
+my %nparg = ();
 
 sub donanpst {
-	$dbh->begin_work;
-	$fn = "$progdir/nanpst.txt";
+	my $fn = "$nanpdir/nanpst.txt";
 	print STDERR "I: reading $fn\n";
-	open($fh,"<:utf8",$fn) or die "can't read $fn";
-	while (<$fh>) { chomp;
+	open(INFILE,"<:utf8",$fn) or die "can't read $fn";
+	while (<INFILE>) { chomp;
 		my @tokens = split(/\t/,$_);
 		unless ($tokens[0] =~ /[2-9]11/) {
 			if ($tokens[2]) {
@@ -1121,65 +835,26 @@ sub donanpst {
 				$npapc{$tokens[0]} = $tokens[1];
 			}
 		}
-		$sth{nanpst}{insert}->execute(@tokens);
 	}
-	close($fh);
-	$dbh->commit;
+	close(INFILE);
 }
-
-sub simplefield {
-	my ($dat,$fld,$val) = @_;
-	$fld =~ s/\?//g; $fld =~ s/\s+//g;
-	$val =~ s/^\s+//; $val =~ s/\s+$//;
-	$dat->{"\L$fld\E"} = $val if length($val);
-}
-
-sub datefield {
-	my ($dat,$fld,$val) = @_;
-	if (length($val)) {
-		if (my $time = str2time($val)) {
-			simplefield($dat,$fld,$time);
-		} else {
-			print STDERR "E: cannot grok time format '$val'\n";
-		}
-	}
-}
-
-sub mappedfield {
-	my ($dat,$fld,$val,$map) = @_;
-	if (length($val)) {
-		if (exists $map->{$val}) {
-			simplefield($dat,$fld,$map->{$val});
-		} else {
-			print STDERR "E: no map for $fld:'$val'\n";
-		}
-	}
-}
-
-sub booleanfield {
-	my ($dat,$fld,$val) = @_;
-	mappedfield($dat,$fld,$val,{
-			'No'=>0,
-			'Yes'=>1,
-		});
-}
-
 
 sub doallnpas {
+	my $dbh = shift;
 	$dbh->begin_work;
 	my %mapping = (
-		'NPA'=>\&simplefield,
+		'NPA'=>\&makedb::simplefield,
 		'Type of Code'=>sub{
 			my ($dat,$fld,$val) = @_;
-			mappedfield($dat,'type',$val,{
+			makedb::mappedfield($dat,'type',$val,{
 					'General Purpose Code'=>'G',
 					'Easily Recognizable Code'=>'E',
 				});
 		},
-		'Assignable'=>\&booleanfield,
+		'Assignable'=>\&makedb::booleanfield,
 		'Explanation'=>sub{
 			my ($dat,$fld,$val) = @_;
-			mappedfield($dat,$fld,$val,{
+			makedb::mappedfield($dat,$fld,$val,{
 					'Carrier Access'=>'CA',
 					'Directory Assistance'=>'DA',
 					'Expansion Code'=>'EXP',
@@ -1188,16 +863,16 @@ sub doallnpas {
 					'Set aside for toll free'=>'TF',
 				});
 		},
-		'Reserved'=>\&booleanfield,
-		'Assigned?'=>\&booleanfield,
+		'Reserved'=>\&makedb::booleanfield,
+		'Assigned?'=>\&makedb::booleanfield,
 		'Asgt Date'=>sub{
 			my ($dat,$fld,$val) = @_;
-			datefield($dat,'assigndate',$val);
+			makedb::datefield($dat,'assigndate',$val);
 		},
-		'Use'=>\&simplefield,
+		'Use'=>\&makedb::simplefield,
 		'Service'=>sub{
 			my ($dat,$fld,$val) = @_;
-			mappedfield($dat,$fld,$val,{
+			makedb::mappedfield($dat,$fld,$val,{
 					'Canadian Services'=>'CDN',
 					'Inbound International'=>'INT',
 					'Interexchange Carrier Services'=>'IXC',
@@ -1209,7 +884,7 @@ sub doallnpas {
 		},
 		'Location'=>sub{
 			my ($dat,$fld,$val) = @_;
-			mappedfield($dat,$fld,$val,{
+			makedb::mappedfield($dat,$fld,$val,{
 					'AK'=>'AK',
 					'AL'=>'AL',
 					'Alberta'=>'AB',
@@ -1305,7 +980,7 @@ sub doallnpas {
 		},
 		'Country'=>sub{
 			my ($dat,$fld,$val) = @_;
-			mappedfield($dat,$fld,$val,{
+			makedb::mappedfield($dat,$fld,$val,{
 					'ANGUILLA'=>'AI',
 					'ANTIGUA/BARBUDA'=>'AG',
 					'BAHAMAS'=>'BS',
@@ -1331,75 +1006,75 @@ sub doallnpas {
 				print STDERR "E: conflicting country assignments NPA $dat->{npa}: '$dat->{country}' <-> '$npapc{$dat->{npa}}'\n";
 			}
 		},
-		'In Service?'=>\&booleanfield,
+		'In Service?'=>\&makedb::booleanfield,
 		'In Svc Date'=>sub{
 			my ($dat,$fld,$val) = @_;
-			datefield($dat,'effdate',$val);
+			makedb::datefield($dat,'effdate',$val);
 		},
 		'Status'=>sub{
 			my ($dat,$fld,$val) = @_;
-			mappedfield($dat,$fld,$val,{
+			makedb::mappedfield($dat,$fld,$val,{
 					'Active'=>'A',
 					'Suspended'=>'S',
 				});
 		},
-		'PL'=>\&simplefield,
-		'Overlay'=>\&booleanfield,
+		'PL'=>\&makedb::simplefield,
+		'Overlay'=>\&makedb::booleanfield,
 		'Overlay Complex'=>sub{
 			my ($dat,$fld,$val) = @_;
-			simplefield($dat,'complex',$val);
+			makedb::simplefield($dat,'complex',$val);
 		},
-		'Parent'=>\&simplefield,
+		'Parent'=>\&makedb::simplefield,
 		'Time Zone'=>sub{
 			my ($dat,$fld,$val) = @_;
-			simplefield($dat,'tzones',$val);
+			makedb::simplefield($dat,'tzones',$val);
 		},
-		'Map'=>\&simplefield,
+		'Map'=>\&makedb::simplefield,
 		'Is NPA in Jeoparady?'=>sub{
 			my ($dat,$fld,$val) = @_;
-			booleanfield($dat,'jeoparady',$val);
+			makedb::booleanfield($dat,'jeoparady',$val);
 		},
 		'Is Relief Planning in Progress'=>sub{
 			my ($dat,$fld,$val) = @_;
-			booleanfield($dat,'relief',$val);
+			makedb::booleanfield($dat,'relief',$val);
 		},
 		'Home NPA Local Calls'=>sub{
 			my ($dat,$fld,$val) = @_;
-			simplefield($dat,'hnpalocl',$val);
+			makedb::simplefield($dat,'hnpalocl',$val);
 		},
 		'Home NPA Toll Calls'=>sub{
 			my ($dat,$fld,$val) = @_;
-			simplefield($dat,'hnpatoll',$val);
+			makedb::simplefield($dat,'hnpatoll',$val);
 		},
 		'Foreign NPA Local Calls'=>sub{
 			my ($dat,$fld,$val) = @_;
-			simplefield($dat,'fnpalocl',$val);
+			makedb::simplefield($dat,'fnpalocl',$val);
 		},
 		'Foreign NPA Toll Calls'=>sub{
 			my ($dat,$fld,$val) = @_;
-			simplefield($dat,'fnpatoll',$val);
+			makedb::simplefield($dat,'fnpatoll',$val);
 		},
 		'perm HNPA local'=>sub{
 			my ($dat,$fld,$val) = @_;
-			simplefield($dat,'permhnpalocl',$val);
+			makedb::simplefield($dat,'permhnpalocl',$val);
 		},
 		'perm HNPA toll'=>sub{
 			my ($dat,$fld,$val) = @_;
-			simplefield($dat,'permhnpatoll',$val);
+			makedb::simplefield($dat,'permhnpatoll',$val);
 		},
 		'perm FNPA local'=>sub{
 			my ($dat,$fld,$val) = @_;
-			simplefield($dat,'permfnpalocl',$val);
+			makedb::simplefield($dat,'permfnpalocl',$val);
 		},
-		'dp Notes'=>\&simplefield,
+		'dp Notes'=>\&makedb::simplefield,
 	);
-	$fn = "$progdir/AllNPAs.mdb";
+	my $fn = "$progdir/AllNPAs.mdb";
 	print STDERR "processing $fn\n";
 	my $fdate = stat($fn)->mtime;
-	open($fh,"mdb-export -Q \"-d\\t\" '-D%F' $fn 'Public NPA Database Table' |") or die "can't process $fn";
+	open(INFILE,"mdb-export -Q \"-d\\t\" '-D%F' $fn 'Public NPA Database Table' |") or die "can't process $fn";
 	my $header = 1;
 	my @fields = ();
-	while (<$fh>) { chomp;
+	while (<INFILE>) { chomp;
 		my @tokens = split(/\t/,$_);
 		if ($header) {
 			@fields = @tokens;
@@ -1414,17 +1089,20 @@ sub doallnpas {
 				print STDERR "W: no mapping for $fn:$fields[$i]\n";
 			}
 		}
-		updateit(\%data,'npadata',[$data{npa}]) if $data{npa};
+		my $sect = "NANPA-$data{npa}";
+		makedb::updatedata(\%data,$fdate,$sect) if $data{npa};
+		#updateit(\%data,'npadata',[$data{npa}]) if $data{npa};
 	}
-	close($fh);
+	close(INFILE);
 	$dbh->commit;
 }
 
 sub donpanxx {
+	my $dbh = shift;
 	$dbh->begin_work;
-	$fn = "$progdir/NPANXX.zip";
+	my $fn = "$progdir/NPANXX.zip";
 	print STDERR "I: processing $fn\n";
-	open($fh,"unzip -p $fn cygdrive/d/cna/COCode-ESRDData/NPANXX.csv |") or die "can't process $fn";
+	open(INFILE,"unzip -p $fn cygdrive/d/cna/COCode-ESRDData/NPANXX.csv |") or die "can't process $fn";
 	my $header = 1;
 	my @fields = ();
 	my $fdate = stat($fn)->mtime;
@@ -1432,28 +1110,32 @@ sub donpanxx {
 		'NPA'=>sub{
 			my ($dat,$fld,$val) = @_;
 			if (length($val)) {
-				simplefield(@_);
-				$dat->{rg} = $nparg{$val} if exists $nparg{$val};
+				makedb::simplefield(@_);
+				if (exists $nparg{$val}) {
+					$dat->{region} = $nparg{$val};
+				} else {
+					print STDERR "E: no region for NPA $val\n";
+				}
 			}
 		},
 		'NXX'=>sub{
 			my ($dat,$fld,$val) = @_;
 			if (length($val)) {
-				simplefield(@_);
-				$dat->{rg} = $ntnxxrg{$val} if $dat->{rg} eq 'NT' and exists $ntnxxrg{$val};
-				$dat->{rg} = $nsnxxrg{$val} if $dat->{rg} eq 'NS' and exists $nsnxxrg{$val};
+				makedb::simplefield(@_);
+				$dat->{region} = $ntnxxrg{$val} if $dat->{region} eq 'NT' and exists $ntnxxrg{$val};
+				$dat->{region} = $nsnxxrg{$val} if $dat->{region} eq 'NS' and exists $nsnxxrg{$val};
 			}
 		},
-		'OCN'=>\&simplefield,
+		'OCN'=>\&makedb::simplefield,
 		'Company'=>sub{
 			my ($dat,$fld,$val) = @_;
-			simplefield($dat,'companyname',$val);
+			makedb::simplefield($dat,'companyname',$val);
 		},
 		'Status'=>sub{
 			my ($dat,$fld,$val) = @_;
 			if (length($val)) {
-				simplefield(@_);
-				mappedfield($dat,$fld,$val,{
+				makedb::simplefield(@_);
+				makedb::mappedfield($dat,$fld,$val,{
 						'Assigned'=>'AS',
 						'Available'=>'AV',
 						'Available as Initial Code only'=>'IC',
@@ -1470,7 +1152,7 @@ sub donpanxx {
 						'Relief NPA'=>'RN',
 						'Temporarily Unavailable'=>'TU',
 					});
-				mappedfield($dat,'use',$val,{
+				makedb::mappedfield($dat,'nxxuse',$val,{
 						'Assigned'=>'AS',
 						'Available'=>'UA',
 						'Available as Initial Code only'=>'UA',
@@ -1491,11 +1173,11 @@ sub donpanxx {
 		},
 		'RateCenter'=>sub{
 			my ($dat,$fld,$val) = @_;
-			simplefield($dat,'rc',$val);
+			makedb::simplefield($dat,'rc',$val);
 		},
-		'Remarks'=>\&simplefield,
+		'Remarks'=>\&makedb::simplefield,
 	);
-	while (<$fh>) { chomp; s/\r//g;
+	while (<INFILE>) { chomp; s/\r//g;
 		s/^"//; s/"$//; my @tokens = split(/","/,$_);
 		if ($header) {
 			@fields = @tokens;
@@ -1510,19 +1192,22 @@ sub donpanxx {
 				print STDERR "E: no mapping for $fn:$fields[$i]\n";
 			}
 		}
-		updateit(\%data,'nxxdata',[$data{npa},$data{nxx}]) if $data{npa} and $data{nxx};
-		updateit(\%data,'ocndata',[$data{ocn}]) if $data{ocn};
+		my $sect = "CNA-$data{npa}-$data{nxx}";
+		makedb::updatedata(\%data,$fdate,$sect) if $data{npa} and $data{nxx};
+		#updateit(\%data,'nxxdata',[$data{npa},$data{nxx}]) if $data{npa} and $data{nxx};
+		#updateit(\%data,'ocndata',[$data{ocn}]) if $data{ocn};
 	}
-	close($fh);
+	close(INFILE);
 	$dbh->commit;
 }
 
 sub dodiscon {
+	my $dbh = shift;
 	$dbh->begin_work;
 	my %mapping = (
 		'State'=>sub{
 			my ($dat,$fld,$val) = @_;
-			$dat->{rg} = $val if length($val);
+			$dat->{region} = $val if length($val);
 		},
 		'NPA'=>sub{
 			my ($dat,$fld,$val) = @_;
@@ -1541,13 +1226,13 @@ sub dodiscon {
 			}
 		},
 	);
-	$fn = "discon.xls";
+	my $fn = "discon.xls";
 	print STDERR "I: processing $fn\n";
-	open($fh,"py_xls2csv $fn | sed -e '".'s/, ,/,"",/g;s/, ,/,"",/g;s/^,/"",/;s/,$$/,""/;s/", "/","/g;s/\.0"/"/g'."' |") or die "can't process $fn";
+	open(INFILE,"py_xls2csv $fn | sed -e '".'s/, ,/,"",/g;s/, ,/,"",/g;s/^,/"",/;s/,$$/,""/;s/", "/","/g;s/\.0"/"/g'."' |") or die "can't process $fn";
 	my $fdate = stat($fn)->mtime;
 	my $heading = 1;
 	my @fields = ();
-	while (<$fh>) { chomp; s/\r//g; chomp;
+	while (<INFILE>) { chomp; s/\r//g; chomp;
 		next if /^Sheet/;
 		next if /^-----/;
 		s/^"//; s/"$//; my @tokens = split(/","/,$_);
@@ -1570,18 +1255,21 @@ sub dodiscon {
 			}
 		}
 		$data{discon} = 1;
-		updateit(\%data,'nxxdata',[$data{npa},$data{nxx}]) if $data{npa} and $data{nxx};
+		my $sect = "NANPA-$data{npa}-$data{nxx}";
+		makedb::updatedata(\%data,$fdate,$sect) if $data{npa} and $data{nxx};
+		#updateit(\%data,'nxxdata',[$data{npa},$data{nxx}]) if $data{npa} and $data{nxx};
 	}
-	close($fh);
+	close(INFILE);
 	$dbh->commit;
 }
 
 sub dospecial {
+	my $dbh = shift;
 	$dbh->begin_work;
 	my %mapping = (
 		'STATE'=>sub{
 			my ($dat,$fld,$val) = @_;
-			$dat->{rg} = $val if length($val);
+			$dat->{region} = $val if length($val);
 		},
 		'NPA'=>sub{
 			my ($dat,$fld,$val) = @_;
@@ -1593,20 +1281,20 @@ sub dospecial {
 		},
 		'RATE CENTER ABBREVIATION'=>sub{
 			my ($dat,$fld,$val) = @_;
-			$dat->{rc} = $val if length($val);
+			$dat->{rcshort} = $val if length($val);
 		},
 		'NOTES'=>sub{
 			my ($dat,$fld,$val) = @_;
 			$dat->{"\L$fld\E"} = $val if length($val);
 		},
 	);
-	$fn = "special.xls";
+	my $fn = "special.xls";
 	print STDERR "I: processing $fn\n";
-	open($fh,"py_xls2csv $fn | sed -e '".'s/, ,/,"",/g;s/, ,/,"",/g;s/^,/"",/;s/,$$/,""/;s/", "/","/g;s/\.0"/"/g'."' |") or die "can't process $fn";
+	open(INFILE,"py_xls2csv $fn | sed -e '".'s/, ,/,"",/g;s/, ,/,"",/g;s/^,/"",/;s/,$$/,""/;s/", "/","/g;s/\.0"/"/g'."' |") or die "can't process $fn";
 	my $fdate = stat($fn)->mtime;
 	my $heading = 1;
 	my @fields = ();
-	while (<$fh>) { chomp; s/\r//g; chomp;
+	while (<INFILE>) { chomp; s/\r//g; chomp;
 		next if /^Sheet/;
 		next if /^-----/;
 		s/^"//; s/"$//; my @tokens = split(/","/,$_);
@@ -1629,55 +1317,63 @@ sub dospecial {
 			}
 		}
 		$data{special} = 1;
-		updateit(\%data,'nxxdata',[$data{npa},$data{nxx}]) if $data{npa} and $data{nxx};
+		my $sect = "NANPA-$data{npa}-$data{nxx}";
+		makedb::updatedata(\%data,$fdate,$sect) if $data{npa} and $data{nxx};
+		#updateit(\%data,'nxxdata',[$data{npa},$data{nxx}]) if $data{npa} and $data{nxx};
 	}
-	close($fh);
+	close(INFILE);
 	$dbh->commit;
 }
 
 sub doallutlzd {
+	my $dbh = shift;
 	$dbh->begin_work;
 	my %mapping = (
-		'rg'=>\&simplefield,
+		'region'=>\&makedb::simplefield,
 		'npa'=>sub{
 			my ($dat,$fld,$val) = @_;
 			if (length($val)) {
-				simplefield(@_);
-				my $rg = $nparg{$val} if exists $nparg{$val};
-				if ($rg and $rg ne $dat->{rg}) {
-					print STDERR "W: changing state $dat->{rg} -> $rg\n";
+				makedb::simplefield(@_);
+				my $region;
+				if (exists $nparg{$val}) {
+					$region = $nparg{$val};
+				} else {
+					print STDERR "E: no region for NPA $val\n";
 				}
-				$dat->{rg} = $rg if $rg;
+				if ($region and $region ne $dat->{region}) {
+					print STDERR "W: changing state $dat->{region} -> $region\n";
+				}
+				$dat->{region} = $region if $region;
 			}
 		},
 		'nxx'=>sub{
 			my ($dat,$fld,$val) = @_;
 			if (length($val)) {
-				simplefield(@_);
-				my $rg = $dat->{rg};
-				$rg = $ntnxxrg{$val} if $rg eq 'NT' and exists $ntnxxrg{$val};
-				$rg = $nsnxxrg{$val} if $rg eq 'NS' and exists $nsnxxrg{$val};
-				if ($rg and $rg ne $dat->{rg}) {
-					print STDERR "W: changing state $dat->{rg} -> $rg\n";
+				makedb::simplefield(@_);
+				my $region = $dat->{region};
+				$region = $ntnxxrg{$val} if $region eq 'NT' and exists $ntnxxrg{$val};
+				$region = $nsnxxrg{$val} if $region eq 'NS' and exists $nsnxxrg{$val};
+				if ($region and $region ne $dat->{region}) {
+					print STDERR "W: changing state $dat->{region} -> $region\n";
 				}
-				$dat->{rg} = $rg if $rg;
+				$dat->{region} = $region if $region;
 			}
 		},
-		'ocn'=>\&simplefield,
-		'companyname'=>\&simplefield,
-		'rc'=>\&simplefield,
-		'effdate'=>\&datefield,
-		'use'=>\&simplefield,
-		'assigndate'=>\&datefield,
-		'initialgrowth'=>\&simplefield, # (I|G)
+		'ocn'=>\&makedb::simplefield,
+		'companyname'=>\&makedb::simplefield,
+		'rcshort'=>\&makedb::simplefield,
+		'effdate'=>\&makedb::datefield,
+		'nxxuse'=>\&makedb::simplefield,
+		'assigndate'=>\&makedb::datefield,
+		'initialgrowth'=>\&makedb::simplefield, # (I|G)
 	);
-	$fn = "$progdir/allutlzd.zip";
+	my $fn = "$progdir/allutlzd.zip";
 	print STDERR "I: processing $fn\n";
-	open($fh,"unzip -p $fn allutlzd.txt | expand |") or die "can't process $fn";
+	open(INFILE,"unzip -p $fn allutlzd.txt | expand |") or die "can't process $fn";
 	my $header = 1;
-	my $fdate = stat($fh)->mtime;
-	my @fields = qw/rg npa nxx ocn companyname rc effdate use assigndate initialgrowth/;
-	while (<$fh>) { chomp;
+	my $fdate = stat($fn)->mtime;
+	my @fields = qw/region npa nxx ocn companyname rcshort effdate nxxuse assigndate initialgrowth/;
+	while (<INFILE>) { chomp;
 		if ($header) {
 			$header = undef;
 			next;
@@ -1705,40 +1401,30 @@ sub doallutlzd {
 				print STDERR "E: no mapping for $fn:$fields[$i]\n";
 			}
 		}
-		updateit(\%data,'nxxdata',[$data{npa},$data{nxx}]) if $data{npa} and $data{nxx};
-		updateit(\%data,'ocndata',[$data{ocn}]) if $data{ocn};
+		my $sect = "NANPA-$data{npa}-$data{nxx}";
+		makedb::updatedata(\%data,$fdate,$sect) if $data{npa} and $data{nxx};
+		#updateit(\%data,'nxxdata',[$data{npa},$data{nxx}]) if $data{npa} and $data{nxx};
+		#updateit(\%data,'ocndata',[$data{ocn}]) if $data{ocn};
 	}
-	close($fh);
+	close(INFILE);
 	$dbh->commit;
 }
 
-$fn = "db.bad.sql";
-print STDERR "I: writing $fn\n";
-open($of,">:utf8",$fn) or die "can't write $fn";
+sub dodata {
+	my $dbh = shift;
+	dolergst($dbh);
+	donanpst($dbh);
+	doallnpas($dbh);
+	dodiscon($dbh);
+	dospecial($dbh);
+	donpanxx($dbh);
+	doallutlzd($dbh);
+}
 
-dolergst;
-donanpst;
-doallnpas;
-dodiscon;
-dospecial;
-donpanxx;
-doallutlzd;
-
-close($of);
-
-$sql = q{VACUUM;
-};
-print STDERR "S: $sql";
-$dbh->do($sql) or die $dbh->errstr;
-
-undef %sth;
-print STDERR "I: disconnecting database\n";
-$dbh->disconnect;
-print STDERR "I: database disconnected\n";
+makedb::makedb('nnpadata',\&dodata);
 
 exit;
 
 1;
 
 __END__
-

@@ -64,6 +64,19 @@ sub start_timeout {
 }
 
 # ------------------------------------------
+package Viewer::Gtk; our @ISA = qw(Viewer);
+# ------------------------------------------
+sub new { Carp::confess "Don't call me!" }
+# ------------------------------------------
+package Viewer::Internet::Gtk; our @ISA = qw(Viewer::Internet);
+# ------------------------------------------
+sub new { Carp::confess "Don't call me!" }
+# ------------------------------------------
+package Viewer::Driv::Gtk; our @ISA = qw(Viewer::Driv);
+# ------------------------------------------
+sub new { Carp::confess "Don't call me!" }
+
+# ------------------------------------------
 package Canvas::Gtk; our @ISA = qw(Canvas);
 # ------------------------------------------
 #package Canvas::Gtk;
@@ -105,6 +118,8 @@ sub init {
 	$viewer = $self->{viewer} unless $viewer;
 	$self->{layers} = {};
 	foreach ($viewer->stack) { $self->getlayer($_) }
+	my $tt = $self->{tooltips} = new Gtk2::Tooltips;
+	$tt->enable;
 }
 #package Canvas::Gtk;
 sub fini {
@@ -233,6 +248,10 @@ sub enter_notify_event {
 	my ($self,$targ,$ev,$root) = @_;
 	if ($targ) {
 		if (my $draw = $targ->{draw}) {
+			my $tt = $self->{tooltips};
+			$tt->set_tip($self->{canv},$draw->gettxt);
+			$tt->enable;
+			$tt->force_window;
 			$draw->setcolor('cyan');
 			return Gtk2::EVENT_STOP;
 		}
@@ -244,6 +263,8 @@ sub leave_notify_event {
 	my ($self,$targ,$ev,$root) = @_;
 	if ($targ) {
 		if (my $draw = $targ->{draw}) {
+			my $tt = $self->{tooltips};
+			$tt->disable;
 			$draw->setcolor($draw->mycolor);
 			return Gtk2::EVENT_STOP;
 		}
@@ -291,8 +312,12 @@ sub button_press_event {
 		return Gtk2::EVENT_PROPAGATE;
 	}
 	return Gtk2::EVENT_PROPAGATE unless $ev->button == 3;
-	my $menu = Gtk2::Menu->new();
-	my $mi = Gtk2::MenuItem->new_with_label("View");
+	my $menu = Gtk2::Menu->new;
+	$menu->set(tearoff_title=>'Root Menu');
+	my $mi = Gtk2::TearoffMenuItem->new();
+	$mi->show_all;
+	$menu->append($mi);
+	$mi = Gtk2::MenuItem->new_with_label("View");
 	$mi->show_all;
 	$menu->append($mi);
 	my $mv = Gtk2::Menu->new;
@@ -633,7 +658,7 @@ package MibLabel::Gtk; our @ISA = qw(MibLabel MibInfo::Gtk);
 #package MibLabel::Gtk;
 sub init {
 	my $self = shift;
-	#my ($dialog,$view,$table,$label) = @_;
+	#my ($dialog,$draw,$table,$label) = @_;
 	my $f = $self->{f} = new Gtk2::Frame;
 	my $l = $self->{l} = new Gtk2::Label($self->{short});
 	$l->set_alignment(1.0,0.5);
@@ -658,7 +683,7 @@ package MibUnits::Gtk; our @ISA = qw(MibUnits MibInfo::Gtk);
 #package MibUnits::Gtk;
 sub init {
 	my $self = shift;
-	my ($dialog,$view,$table,$label) = @_;
+	my ($dialog,$draw,$table,$label) = @_;
 	my $f = $self->{f} = new Gtk2::Frame;
 	my $u = $self->{u} = new Gtk2::Label($self->{units});
 	$u->set_alignment(0.0,0.5);
@@ -687,12 +712,12 @@ sub add_to_table {
 }
 
 # ------------------------------------------
-package MibNode::Truth::Gtk; our @ISA = qw(MibNode::Truth);
+package MibNode::Truth::Gtk; our @ISA = qw(MibNode::Truth MibNode::Gtk);
 # ------------------------------------------
 #package MibNode::Truth::Gtk;
 sub init {
 	my $self = shift;
-	my ($dialog,$view,$table,$label,$val) = @_;
+	my ($dialog,$draw,$table,$label,$val) = @_;
 	my ($f,$e);
 	$e = $self->{e} = new Gtk2::ToggleButton();
 	$e->set_active(($$val eq 'true(1)' or $$val eq '1') ? 1 : 0);
@@ -700,12 +725,12 @@ sub init {
 }
 
 # ------------------------------------------
-package MibNode::Boolean::Gtk; our @ISA = qw(MibNode::Boolean);
+package MibNode::Boolean::Gtk; our @ISA = qw(MibNode::Boolean MibNode::Gtk);
 # ------------------------------------------
 #package MibNode::Boolean::Gtk;
 sub init {
 	my $self = shift;
-	my ($dialog,$view,$table,$label,$val) = @_;
+	my ($dialog,$draw,$table,$label,$val) = @_;
 	my ($f,$e);
 	$e = $self->{e} = new Gtk2::ToggleButton();
 	$e->set_active(($$val eq 'true(1)' or $$val eq '1') ? 1 : 0);
@@ -713,12 +738,12 @@ sub init {
 }
 
 # ------------------------------------------
-package MibNode::List::Gtk; our @ISA = qw(MibNode::List);
+package MibNode::List::Gtk; our @ISA = qw(MibNode::List MibNode::Gtk);
 # ------------------------------------------
 #package MibNode::List::Gtk;
 sub init {
 	my $self = shift;
-	my ($dialog,$view,$table,$label,$val) = @_;
+	my ($dialog,$draw,$table,$label,$val) = @_;
 	my ($f,$e);
 	$f = $self->{f} = new Gtk2::Frame;
 	$e = $self->{e} = new Gtk2::SimpleList(tag=>'text',value=>'int');
@@ -732,12 +757,12 @@ sub init {
 }
 
 # ------------------------------------------
-package MibNode::Combo::Gtk; our @ISA = qw(MibNode::Combo);
+package MibNode::Combo::Gtk; our @ISA = qw(MibNode::Combo MibNode::Gtk);
 # ------------------------------------------
 #package MibNode::Combo::Gtk;
 sub init {
 	my $self = shift;
-	my ($dialog,$view,$table,$label,$val) = @_;
+	my ($dialog,$draw,$table,$label,$val) = @_;
 	my ($f,$e);
 	$e = $self->{e} = Gtk2::ComboBox->new_text;
 	$e->set_title($label);
@@ -749,12 +774,12 @@ sub init {
 }
 
 # ------------------------------------------
-package MibNode::Entry::Gtk; our @ISA = qw(MibNode::Entry);
+package MibNode::Entry::Gtk; our @ISA = qw(MibNode::Entry MibNode::Gtk);
 # ------------------------------------------
 #package MibNode::Entry::Gtk;
 sub init {
 	my $self = shift;
-	my ($dialog,$view,$table,$label,$val) = @_;
+	my ($dialog,$draw,$table,$label,$val) = @_;
 	my ($f,$e,$b);
 	$b = $self->{b} = Gtk2::EntryBuffer->new($$val);
 	$e = $self->{e} = Gtk2::Entry->new_with_buffer($b);
@@ -764,24 +789,19 @@ sub init {
 }
 
 # ------------------------------------------
-package MibEntry::Gtk; our @ISA = qw(MibEntry Gtk2::Window);
+package MibEntry::Gtk; our @ISA = qw(MibEntry);
 # ------------------------------------------
-#package MibEntry::Gtk;
-sub make {
-	my $type = shift;
-	my ($view,$table) = @_;
-	my $self = new Gtk2::Window('toplevel');
-	bless $self,$type;
-	return $self;
-}
 #package MibEntry::Gtk;
 sub init {
 	my $self = shift;
-	my ($view,$table) = @_;
-	my $data = $view->{item}{data}{$table};
+	my ($draw,$table) = @_;
+	my $wind = $self->{wind} = new Gtk2::Window;
+	my $data = $draw->{view}{item}{data}{$table};
 	my @rows = $self->getrows($table);
 	my @cols = $self->getcols($table,$data);
-	$self->{view} = $view;
+	print STDERR "There are ",scalar(@rows)," rows\n";
+	print STDERR "There are ",scalar(@cols)," cols\n";
+	$self->{draw} = $draw;
 	$self->{table} = $table;
 	$self->{data} = $data;
 	$self->{rows} = \@rows;
@@ -797,16 +817,16 @@ sub init {
 	my $i = 0;
 	foreach my $row (@rows) {
 		my $j = 0;
-		my $lab = $self->{labels}{$row} = MibLabel::Gtk->new($self,$view,$table,$row);
+		my $lab = $self->{labels}{$row} = MibLabel::Gtk->new($self,$draw,$table,$row);
 		$lab->add_to_table($ta,$i,$j); $j++;
 		$lab->add_tooltip($tt);
 		foreach my $col (@cols) {
 			$col->{$row} = undef unless exists $col->{$row};
 			my $val = \$col->{$row};
-			my $ent = $self->{entries}{$row}{$j} = MibNode::Gtk->new($self,$view,$table,$row,$val);
+			my $ent = $self->{entries}{$row}{$j} = MibNode::Gtk->new($self,$draw,$table,$row,$val);
 			$ent->add_to_table($ta,$i,$j); $j++;
 		}
-		my $uni = $self->{units}{$row} = MibUnits::Gtk->new($self,$view,$table,$row);
+		my $uni = $self->{units}{$row} = MibUnits::Gtk->new($self,$draw,$table,$row);
 		$uni->add_to_table($ta,$i,$j); $j++;
 		$uni->add_tooltip($tt);
 		$i++;
@@ -826,7 +846,7 @@ sub init {
 	$b->signal_connect('clicked'=>sub{ my ($b,$self) = @_; return $self->store; },$self);
 	$bb->add($b);
 	$b = Gtk2::Button->new_from_stock('gtk-close');
-	$b->signal_connect('clicked'=>sub{ my ($b,$self) = @_; return $self->hide; },$self);
+	$b->signal_connect('clicked'=>sub{ my ($b,$self) = @_; return $self->{wind}->hide; },$self);
 	$bb->add($b);
 #	$b = Gtk2::Button->new_from_stock('gtk-connect');
 #	$b->signal_connect('clicked'=>sub{ my ($b,$self) = @_; return $self->connectButton; },$self);
@@ -843,17 +863,13 @@ sub init {
 	$vb->pack_start($fr,1,1,0);
 	$bb->set_border_width(5);
 	$vb->pack_start($bb,0,0,0);
-	$self->set_type_hint('normal');
-	$self->set_default_size(-1,600);
-	$self->set_opacity(0.5);
-	$self->set_position('mouse');
+	$wind->set_type_hint('normal');
+	$wind->set_default_size(-1,600);
+	$wind->set_opacity(0.5);
+	$wind->set_position('mouse');
 	$self->{deleted} = 0;
-	$self->signal_connect('delete-event'=>sub{
-		my ($self,$ev) = @_;
-		$self->hide_all;
-		return Gtk2::EVENT_STOP;
-	});
-	$self->add($vb);
+	$wind->signal_connect('delete-event'=>\&Gtk2::Widget::hide_on_delete);
+	$wind->add($vb);
 }
 #package MibEntry::Gtk;
 sub closeButton {
@@ -924,7 +940,7 @@ sub fillmenu {
 							$ent = $self->{mibentry}{$table} =
 							MibEntry::Gtk->new($self,$table);
 						}
-						$ent->show_all;
+						$ent->{wind}->show_all;
 						return Gtk2::EVENT_STOP;
 					},[$self,$table]);
 				$mi->show_all;
@@ -988,22 +1004,22 @@ sub placing {
 }
 
 # ------------------------------------------
-package Subnetwork::Network::Draw::Gtk; our @ISA = qw(Subnetwork::Network::Draw);
-package Network::Network::Draw::Gtk; our @ISA = qw(Network::Network::Draw);
-package Private::Network::Draw::Gtk; our @ISA = qw(Private::Network::Draw);
-package Private::Here::Network::Draw::Gtk; our @ISA = qw(Private::Here::Network::Draw);
-package Local::Network::Draw::Gtk; our @ISA = qw(Local::Network::Draw);
-package Local::Here::Network::Draw::Gtk; our @ISA = qw(Local::Here::Network::Draw);
-package Host::Network::Draw::Gtk; our @ISA = qw(Host::Network::Draw);
-package Host::Ip::Network::Draw::Gtk; our @ISA = qw(Host::Ip::Network::Draw);
-package Host::Ip::Here::Network::Draw::Gtk; our @ISA = qw(Host::Ip::Here::Network::Draw);
-package Subnet::Network::Draw::Gtk; our @ISA = qw(Subnet::Network::Draw);
-package Lan::Network::Draw::Gtk; our @ISA = qw(Lan::Network::Draw);
-package Vlan::Network::Draw::Gtk; our @ISA = qw(Vlan::Network::Draw);
-package Address::Network::Draw::Gtk; our @ISA = qw(Address::Network::Draw);
-package Port::Network::Draw::Gtk; our @ISA = qw(Port::Network::Draw);
-package Vprt::Network::Draw::Gtk; our @ISA = qw(Vprt::Network::Draw);
-package Route::Network::Draw::Gtk; our @ISA = qw(Route::Network::Draw);
+package Subnetwork::Internet::Draw::Gtk; our @ISA = qw(Subnetwork::Internet::Draw);
+package Internet::Internet::Draw::Gtk; our @ISA = qw(Internet::Internet::Draw);
+package Private::Internet::Draw::Gtk; our @ISA = qw(Private::Internet::Draw);
+package Private::Here::Internet::Draw::Gtk; our @ISA = qw(Private::Here::Internet::Draw);
+package Local::Internet::Draw::Gtk; our @ISA = qw(Local::Internet::Draw);
+package Local::Here::Internet::Draw::Gtk; our @ISA = qw(Local::Here::Internet::Draw);
+package Host::Internet::Draw::Gtk; our @ISA = qw(Host::Internet::Draw);
+package Host::Ip::Internet::Draw::Gtk; our @ISA = qw(Host::Ip::Internet::Draw);
+package Host::Ip::Here::Internet::Draw::Gtk; our @ISA = qw(Host::Ip::Here::Internet::Draw);
+package Subnet::Internet::Draw::Gtk; our @ISA = qw(Subnet::Internet::Draw);
+package Lan::Internet::Draw::Gtk; our @ISA = qw(Lan::Internet::Draw);
+package Vlan::Internet::Draw::Gtk; our @ISA = qw(Vlan::Internet::Draw);
+package Address::Internet::Draw::Gtk; our @ISA = qw(Address::Internet::Draw);
+package Port::Internet::Draw::Gtk; our @ISA = qw(Port::Internet::Draw);
+package Vprt::Internet::Draw::Gtk; our @ISA = qw(Vprt::Internet::Draw);
+package Route::Internet::Draw::Gtk; our @ISA = qw(Route::Internet::Draw);
 # ------------------------------------------
 
 # ------------------------------------------
@@ -1064,6 +1080,11 @@ package Xcon::Driv::Draw::Gtk; our @ISA = qw(Xcon::Driv::Draw);
 # ------------------------------------------
 package Window::Gtk; our @ISA = qw(Window);
 # ------------------------------------------
+#package Window::Gtk;
+sub destroy {
+	my $self = shift;
+	$self->{wind}->destroy;
+}
 #package Window::Gtk;
 sub init {
 	my $self = shift;

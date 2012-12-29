@@ -54,7 +54,7 @@ sub dodata {
 			print STDERR "E: bad line $lineno: ",scalar(@tokens)," tokens instead of ",scalar(@fields),"\n";
 			next;
 		}
-		my $sect = "XLS-$lineno";
+		my $sect = "CL-$lineno";
 		my %data = (sect=>$sect,fdate=>$fdate);
 		for (my $i=0;$i<@fields;$i++) {
 			$tokens[$i] =~ s/^\s+//;
@@ -69,9 +69,9 @@ sub dodata {
 		$data{switchtype}   = delete $data{swtype} if $data{swtype};
 		$data{wc}	    = delete $data{wcclli} if $data{wcclli};
 		$data{wc}	    = substr($data{switch},0,8) unless $data{wc};
-		$data{swocn}	    = delete $data{ocn} if $data{ocn};
-		$data{swoocn}	    = delete $data{oocn} if $data{oocn};
-		$data{swlata}	    = delete $data{lata} if $data{lata};
+		$data{swocn}	    = $data{ocn} if $data{ocn};
+		$data{swoocn}	    = $data{oocn} if $data{oocn};
+		$data{swlata}	    = $data{lata} if $data{lata};
 		my $f = 'switch';
 		unless (not $data{$f} or length($data{$f}) == 11) {
 			print STDERR "E: bad value at $lineno in field $f '$data{$f}'\n";
@@ -128,13 +128,16 @@ sub dodata {
 			print STDERR "E: bad value at $lineno in field $f '$data{$f}'\n";
 			next;
 		}
+		if ($data{nxx} and $data{nxx} =~ /-/) {
+			($data{npa},$data{nxx}) = split(/-/,$data{nxx});
+		}
 		makedb::updatedata(\%data,$fdate,$sect);
 	}
 	close(INFILE);
 	$dbh->commit;
 }
 
-makedb::makedb('atntdata',\&dodata);
+makedb::makedb('cntydata',\&dodata);
 
 exit;
 

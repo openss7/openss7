@@ -127,13 +127,12 @@ sub xformed {
 }
 
 # ------------------------------------------
-package Gui; our @ISA = qw(Base);
+package Gui; our @ISA = qw(Database::Owner);
 # ------------------------------------------
 #package Gui;
 sub init {
 	my $self = shift;
 	my ($db,$model) = @_;
-	$self->{db} = $db;
 	$self->{model} = $model;
 	my $type = ref $self;
 	my $gtk = $self->{gtk} = ($type =~ s/(Gtk|Tk|Html|Qt|Fltk)$//) ? $& : '';
@@ -149,7 +148,7 @@ sub init {
 				my $sub = $dat->{$id}{sub};
 				my $type = $kind;
 				$type = join('::',$type,$sub) if $sub;
-				$type = join('::',$type,$gtk) if $gtk;
+				$type = join('::',$type,$gtk) if $gtk and $kind ne 'Viewer';
 				$type->get($self,$id);
 			}
 		}
@@ -159,7 +158,6 @@ sub init {
 #package Gui;
 sub fini {
 	my $self = shift;
-	delete $self->{db};
 	# TODO: more, but gui packages are never destroyed
 }
 #package Gui;
@@ -167,7 +165,7 @@ sub table {
 	my ($self,$kind) = @_;
 	my $tab = 'Table::'.$kind;
 	my $db = $self->{db};
-	return $tab->get($db,$kind);
+	return $tab->get($self,$kind);
 }
 #package Gui;
 sub lookup {
@@ -189,14 +187,18 @@ sub do_quick {
 sub do_idle {
 	my $self = shift;
 	my $model = $self->{model};
-	$self->start_timeout() unless $model->snmp_doone();
+	if ($model->snmp_doone()) {
+		$self->start_idle();
+	} else {
+		$self->start_timeout();
+	}
 }
 #package Gui;
 sub do_timeout {
 	my $self = shift;
 	my $model = $self->{model};
 	if ($model->snmp_doone()) {
-		$self->start_quick();
+		$self->start_idle();
 	} else {
 		$self->start_timeout();
 	}
@@ -275,7 +277,6 @@ sub subtype {
 	return $subtype;
 }
 #package Gui::Object;
-#package Gui::Object;
 sub find {
 	my $type = shift;
 	my $gui = shift;
@@ -349,8 +350,6 @@ sub fini {
 	delete $gui->{gobjs}{$kind}{$id};
 }
 #package Gui::Object;
-sub tab { return "Table\::".shift->kind }
-#package Gui::Object;
 sub table_command {
 	my ($self,$cmd) = @_;
 	return if $self->{reading};
@@ -380,8 +379,8 @@ our %schema = (
 q{CREATE TABLE IF NOT EXISTS Viewer (
 	id INT,		-- id of Viewer
 	name TEXT,	-- name of Viewer (possibly user assigned)
-	sub TEXT,	-- subtype of viewer (e.g. Network, Ss7)
-	type TEXT,	-- type of base object (e.g. Network)
+	sub TEXT,	-- subtype of viewer (e.g.  Internet, Ss7)
+	type TEXT,	-- type of base object (e.g.  Internet)
 	obj INT,	-- base object id in model
 	vis TEXT,	-- visibility matrix
 	PRIMARY KEY(id)
@@ -579,7 +578,7 @@ sub layout {
 }
 
 # ------------------------------------------
-package Viewer::Network; our @ISA = qw(Viewer);
+package Viewer::Internet; our @ISA = qw(Viewer);
 # ------------------------------------------
 # Columns in the display are laid out as follows:
 #   - local host
@@ -667,17 +666,17 @@ package Viewer::Network; our @ISA = qw(Viewer);
 #                                           |  |  |  |                                            
 #                                                                                                 
 # ------------------------------------------
-#package Viewer::Network;
-sub kinds { return qw/Host Vlan Lan Subnet Vprt Port Address Network Private Route/ }
-#package Viewer::Network;
-sub stack { return qw/Network Private Route Subnet Address Vlan Vprt Lan Port Host/ }
-#package Viewer::Network;
-sub vis_sel { return qw{Subnet/Address Vlan/Vprt Lan/Port} }
-#package Viewer::Network;
-sub vis_tog { return qw/Host Vlan Lan Subnet Vprt Port Address Network Private/ }
-#package Viewer::Network;
-sub vis_def { return qw/X _ _ X _ _ X X X/ }
-#package Viewer::Network;
+#package Viewer::Internet;
+sub kinds { qw/Host Vlan Lan Subnet Vprt Port Address Internet Private Route/ }
+#package Viewer::Internet;
+sub stack { qw/Internet Private Route Subnet Address Vlan Vprt Lan Port Host/ }
+#package Viewer::Internet;
+sub vis_sel { qw{Subnet/Address Vlan/Vprt Lan/Port} }
+#package Viewer::Internet;
+sub vis_tog { qw/Host Vlan Lan Subnet Vprt Port Address Internet Private/ }
+#package Viewer::Internet;
+sub vis_def { qw/X _ _ X _ _ X X X/ }
+#package Viewer::Internet;
 sub layout {
 	my $self = shift;
 	foreach my $canvas (values %{$self->{canvas}}) {
@@ -704,7 +703,7 @@ q{CREATE TABLE IF NOT EXISTS Canvas (
 	Window INT,	-- id of Window object
 	seq INT,	-- sequence of page in notebook;
 	Viewer INT,	-- id of base object within model
-	type TEXT,	-- subtype of viewer object (e.g. Network)
+	type TEXT,	-- subtype of viewer object (e.g. Internet)
 	xoffset INT,	-- xoffset of scrolled window
 	yoffset INT,	-- yoffset of scrolled window
 	scale REAL,	-- scale of canvas
@@ -729,7 +728,7 @@ sub init {
 	my $row = $self->{row};
 	if ($self->{readme}) {
 		my $wtyp = join('::','Window',$self->{gtk});
-		my $vtyp = join('::','Viewer',$row->{type},$self->{gtk});
+		my $vtyp = join('::','Viewer',$row->{type});
 		$window = $wtyp->get($gui,$row->{Window});
 		$viewer = $vtyp->get($gui,$row->{Viewer});
 	}
@@ -876,11 +875,13 @@ sub init {
 	my $self = shift;
 	$self->{new} = 1;
 	my ($viewer,$item) = @_;
-	if (my $row = $self->lookup(@_)) {
-		$self->{row} = $row;
+	my $row = $self->lookup(@_);
+	if ($row) {
 		$self->{readme} = 1;
+	} else {
+		$row = $self->{row} ? $self->{row} : {};
 	}
-	my $row = $self->{row} = $self->{row} ? $self->{row} : {};
+	$self->{row} = $row;
 	$row->{id} = $viewer->{no};
 	$row->{type} = $item->kind;
 	$row->{obj} = $item->{no};
@@ -1262,7 +1263,7 @@ sub placing {
 sub myparent {
 	my ($self,$parent) = @_;
 	my $kind = $parent->kind;
-	return ($kind eq 'Private' or ($kind eq 'Network' and not $self->parent('Private')));
+	return ($kind eq 'Private' or ($kind eq 'Internet' and not $self->parent('Private')));
 }
 
 # ------------------------------------------
@@ -1315,7 +1316,7 @@ sub layout { }
 sub myparent {
 	my ($self,$parent) = @_;
 	my $kind = $parent->kind;
-	return ($kind eq 'Private' or ($kind eq 'Network' and not $self->parent('Private')));
+	return ($kind eq 'Private' or ($kind eq 'Internet' and not $self->parent('Private')));
 }
 #package Bus::Draw;
 sub placing {
@@ -1733,75 +1734,75 @@ package Tree::Draw; our @ISA = qw(Root::Draw Leaf::Draw);
 # ------------------------------------------
 
 # ------------------------------------------
-package Point::View; our @ISA = qw(Base);
+package Vertex::View; our @ISA = qw(Base);
 # ------------------------------------------
-#package Point::View;
+#package Vertex::View;
 sub pathsx {
 	my $self = shift;
 	my @paths = $self->{item}->pathsx(@_);
 	return $self->{viewer}->findviews(@paths);
 }
-#package Point::View;
+#package Vertex::View;
 sub pathsa {
 	my $self = shift;
 	my @paths = $self->{item}->pathsa(@_);
 	return $self->{viewer}->findviews(@paths);
 }
-#package Point::View;
+#package Vertex::View;
 sub pathsb {
 	my $self = shift;
 	my @paths = $self->{item}->pathsb(@_);
 	return $self->{viewer}->findviews(@paths);
 }
-#package Point::View;
+#package Vertex::View;
 sub paths {
 	my $self = shift;
 	my @paths = $self->{item}->paths(@_);
 	return $self->{viewer}->findviews(@paths);
 }
-#package Point::View;
+#package Vertex::View;
 sub getpaths {
 	my $self = shift;
 	my @paths = $self->{item}->paths(@_);
 	return $self->{viewer}->getviews(@paths);
 }
-#package Point::View;
+#package Vertex::View;
 sub ptypes { return () }
-#package Point::View;
+#package Vertex::View;
 sub filling {
 	my $self = shift;
 	my @paths = $self->getpaths([$self->ptypes]);
 }
 
 # ------------------------------------------
-package Point::Draw; our @ISA = qw(Base);
+package Vertex::Draw; our @ISA = qw(Base);
 # ------------------------------------------
-#package Point::Draw;
+#package Vertex::Draw;
 sub pathsx {
 	my $self = shift;
 	return $self->{canvas}->getdraws($self->{view}->pathsx(@_));
 }
-#package Point::Draw;
+#package Vertex::Draw;
 sub pathsa {
 	my $self = shift;
 	return $self->{canvas}->getdraws($self->{view}->pathsa(@_));
 }
-#package Point::Draw;
+#package Vertex::Draw;
 sub pathsb {
 	my $self = shift;
 	return $self->{canvas}->getdraws($self->{view}->pathsb(@_));
 }
-#package Point::Draw;
+#package Vertex::Draw;
 sub paths {
 	my $self = shift;
 	return $self->{canvas}->getdraws($self->{view}->paths(@_));
 }
-#package Point::Draw;
+#package Vertex::Draw;
 sub getpaths {
 	my $self = shift;
 	return $self->{canvas}->getdraws($self->{view}->paths(@_));
 }
-#package Point::Draw;
+#package Vertex::Draw;
 sub propagate {
 	my ($self,$tag) = (shift,shift);
 	foreach my $path ($self->pathsa) {
@@ -1813,58 +1814,58 @@ sub propagate {
 		if (my $sub = $path->can("objb_$tag")) { &$sub($path,$self,@_) }
 	}
 }
-#package Point::Draw;
-sub moving_old { shift->Point::Draw::propagate('moving',@_) }
-#package Point::Draw;
-sub placing_old { shift->Point::Draw::propagate('placing',@_) }
+#package Vertex::Draw;
+sub moving_old { shift->Vertex::Draw::propagate('moving',@_) }
+#package Vertex::Draw;
+sub placing_old { shift->Vertex::Draw::propagate('placing',@_) }
 
 # ------------------------------------------
-package Path::View; our @ISA = qw(Base);
+package Edge::View; our @ISA = qw(Base);
 # ------------------------------------------
-#package Path::View;
+#package Edge::View;
 sub obj {
 	my $self = shift;
 	my $side = shift;
 	return $self->{viewer}->findview($self->{item}->obj($side));
 }
-#package Path::View;
+#package Edge::View;
 sub objo {
 	my $self = shift;
 	my $side = shift;
 	$side = (($side eq 'a') ? 'b' : 'a');
 	return $self->obj($side);
 }
-#package Path::View;
+#package Edge::View;
 sub obja { return shift->obj('a') }
-#package Path::View;
+#package Edge::View;
 sub objb { return shift->obj('b') }
-#package Path::View;
+#package Edge::View;
 sub objs {
 	my $self = shift;
 	return $self->obja,$self->objb;
 }
 
 # ------------------------------------------
-package Path::Draw; our @ISA = qw(Base);
+package Edge::Draw; our @ISA = qw(Base);
 # ------------------------------------------
-#package Path::Draw;
+#package Edge::Draw;
 sub obj {
 	my $self = shift;
 	my $side = shift;
 	return $self->{canvas}->getdraw($self->{view}->obj($side));
 }
-#package Path::Draw;
+#package Edge::Draw;
 sub objo {
 	my $self = shift;
 	my $side = shift;
 	$side = (($side eq 'a') ? 'b' : 'a');
 	return $self->obj($side);
 }
-#package Path::Draw;
+#package Edge::Draw;
 sub obja { return shift->obj('a') }
-#package Path::Draw;
+#package Edge::Draw;
 sub objb { return shift->obj('b') }
-#package Path::Draw;
+#package Edge::Draw;
 sub objs {
 	my $self = shift;
 	return $self->obja,$self->objb;
@@ -1876,9 +1877,9 @@ package MibInfo; our @ISA = qw(Base);
 #package MibInfo;
 sub init {
 	my $self = shift;
-	my ($dialog,$view,$table,$label) = @_;
+	my ($dialog,$draw,$table,$label) = @_;
 	$self->{dialog} = $dialog;
-	$self->{view} = $view;
+	$self->{draw} = $draw;
 	$self->{table} = $table;
 	$self->{label} = $label;
 	lock $Model::SNMP::lockvar;
@@ -2041,7 +2042,7 @@ my %prefixes = (
 #package MibLabel;
 sub init {
 	my $self = shift;
-	my ($dialog,$view,$table,$label) = @_;
+	my ($dialog,$draw,$table,$label) = @_;
 	my $prefix = $table;
 	$prefix =~ s/Data$//;
 	$prefix =~ s/Scalars$//;
@@ -2059,7 +2060,7 @@ package MibUnits; our @ISA = qw(MibInfo);
 #package MibUnits;
 sub init {
 	my $self = shift;
-	my ($dialog,$view,$table,$label) = @_;
+	my ($dialog,$draw,$table,$label) = @_;
 	lock $Model::SNMP::lockvar;
 	my $m = $self->{m};
 	my $units = '';
@@ -2085,7 +2086,7 @@ sub bless {
 #package MibNode;
 sub init {
 	my $self = shift;
-	my ($dialog,$view,$table,$label,$val) = @_;
+	my ($dialog,$draw,$table,$label,$val) = @_;
 	lock $Model::SNMP::lockvar;
 	my $m = $self->{m};
 	$self->{editable} = (defined $m->{access} and $m->{access} =~ /Write|Create/);
@@ -2319,6 +2320,16 @@ sub snmpval {
 package MibEntry; our @ISA = qw(Base);
 # ------------------------------------------
 #package MibEntry;
+sub lexical_oids {
+	my (@indexes) = @_;
+	my %tuples = ();
+	foreach my $index (@indexes) {
+		$tuples{$index} = pack('S*',split(/\./,$index));
+	}
+	my @sort = sort {$tuples{$a} cmp $tuples{$b}} keys %tuples;
+	return @sort;
+}
+#package MibEntry;
 sub getcols {
 	my ($self,$table,$data) = @_;
 	my @cols = ();
@@ -2437,13 +2448,13 @@ sub placing {
 }
 
 # ------------------------------------------
-package Subnetwork::Network::View; our @ISA = qw(ThreeColumn::View);
+package Subnetwork::Internet::View; our @ISA = qw(ThreeColumn::View);
 # ------------------------------------------
 
 # ------------------------------------------
-package Subnetwork::Network::Draw; our @ISA = qw(ThreeColumn::Draw);
+package Subnetwork::Internet::Draw; our @ISA = qw(ThreeColumn::Draw);
 # ------------------------------------------
-#package Subnetwork::Network::Draw;
+#package Subnetwork::Internet::Draw;
 sub getsize {
 	my $self = shift;
 	my ($hbox,$wbox,$geom) = @_;
@@ -2456,7 +2467,7 @@ sub getsize {
 		}
 	}
 }
-#package Subnetwork::Network::Draw;
+#package Subnetwork::Internet::Draw;
 sub sizecalc {
 	my $self = shift;
 	my ($geom,$size) = @_;
@@ -2512,7 +2523,7 @@ sub sizecalc {
 	$tsiz->[1] += $smax + $smax;
 	$tsiz->[3] += $mmax + $mmax if $smax;
 }
-#package Subnetwork::Network::Draw;
+#package Subnetwork::Internet::Draw;
 sub shrink {
 	my $self = shift;
 	my ($hbox,$wbox,$geom,$size) = @_;
@@ -2540,7 +2551,7 @@ sub shrink {
 		}
 	}
 }
-#package Subnetwork::Network::Draw;
+#package Subnetwork::Internet::Draw;
 sub resize {
 	my $self = shift;
 	my ($hbox,$wbox) = @_;
@@ -2565,7 +2576,7 @@ sub resize {
 	}
 	return $self->siz;
 }
-#package Subnetwork::Network::Draw;
+#package Subnetwork::Internet::Draw;
 sub layout {
 	my $self = shift;
 	my $kind = $self->kind;
@@ -2609,20 +2620,20 @@ sub layout {
 }
 
 # ------------------------------------------
-package Network::Network::View; our @ISA = qw(Subnetwork::Network::View Point::View Root::View);
+package Internet::Internet::View; our @ISA = qw(Subnetwork::Internet::View Vertex::View Root::View);
 # ------------------------------------------
-#package Network::Network::View;
+#package Internet::Internet::View;
 sub mycolor { return 'grey' }
-#package Network::Network::View;
+#package Internet::Internet::View;
 sub ctypes { return qw/Private Host Vlan Lan Subnet/ }
-#package Network::Network::View;
+#package Internet::Internet::View;
 sub geom {
 	my $self = shift;
 	my $geom = $self->{geom};
 	unless ($geom) {
 		$geom = $self->{geom} = {};
 		foreach my $net ($self->children('Private')) {
-			if ($net->isa('Private::Here::Network::View')) {
+			if ($net->isa('Private::Here::Internet::View')) {
 				push @{$geom->{l}{Private}}, $net;
 			} else {
 				push @{$geom->{r}{Private}}, $net;
@@ -2632,7 +2643,7 @@ sub geom {
 					Item::IPV4ADDRKEY,
 					Item::IPV6ADDRKEY])) {
 			next if ($host->parent('Private'));
-			if ($host->isa('Host::Ip::Here::Network::View')) {
+			if ($host->isa('Host::Ip::Here::Internet::View')) {
 				push @{$geom->{l}{Host}}, $host;
 			} else {
 				push @{$geom->{r}{Host}}, $host;
@@ -2650,7 +2661,7 @@ sub geom {
 	}
 	return $geom;
 }
-#package Network::Network::View;
+#package Internet::Internet::View;
 sub getgeom {
 	my $self = shift;
 	my $geom = $self->{geo};
@@ -2658,7 +2669,7 @@ sub getgeom {
 		#$geom = $self->{geo} = {};
 		$geom = {};
 		foreach my $net ($self->children('Private')) {
-			if ($net->isa('Private::Here::Network::View')) {
+			if ($net->isa('Private::Here::Internet::View')) {
 				push @{$geom->{l}{Private}},$net;
 				$net->{col} = -2;
 			} else {
@@ -2670,7 +2681,7 @@ sub getgeom {
 					Item::IPV4ADDRKEY,
 					Item::IPV6ADDRKEY])) {
 			next if ($host->parent('Private'));
-			if ($host->isa('Host::Ip::Here::Network::View')) {
+			if ($host->isa('Host::Ip::Here::Internet::View')) {
 				push @{$geom->{l}{Host}},$host;
 				$host->{col} = -1;
 			} else {
@@ -2691,7 +2702,7 @@ sub getgeom {
 	}
 	return $geom;
 }
-#package Network::Network::View;
+#package Internet::Internet::View;
 sub adding {
 	my ($self,$child) = @_;
 	return unless $self->{geo} or $self->{geom};
@@ -2702,13 +2713,13 @@ sub adding {
 	$self->{viewer}->changed if delete $self->{geom};
 	$self->{viewer}->changed if delete $self->{geo};
 }
-#package Network::Network::View;
+#package Internet::Internet::View;
 sub rekeying { shift->adding(@_) }
 
 # ------------------------------------------
-package Network::Network::Draw; our @ISA = qw(Subnetwork::Network::Draw Point::Draw Root::Draw);
+package Internet::Internet::Draw; our @ISA = qw(Subnetwork::Internet::Draw Vertex::Draw Root::Draw);
 # ------------------------------------------
-#package Network::Network::Draw;
+#package Internet::Internet::Draw;
 sub rebalance {
 	my $self = shift;
 	my ($hbox,$wbox,$geom,$size) = @_;
@@ -2734,13 +2745,13 @@ sub rebalance {
 }
 
 # ------------------------------------------
-package Private::Network::View; our @ISA = qw(Subnetwork::Network::View Point::View Tree::View);
+package Private::Internet::View; our @ISA = qw(Subnetwork::Internet::View Vertex::View Tree::View);
 # ------------------------------------------
-#package Private::Network::View;
+#package Private::Internet::View;
 sub mycolor { return 'orange' }
-#package Private::Network::View;
+#package Private::Internet::View;
 sub ctypes { return qw/Host Vlan Lan Subnet/ }
-#package Private::Network::View;
+#package Private::Internet::View;
 sub geom {
 	my $self = shift;
 	my $geom = $self->{geom};
@@ -2749,7 +2760,7 @@ sub geom {
 		foreach my $host ($self->offspring_sortbytype('Host',[
 					Item::IPV4ADDRKEY,
 					Item::IPV6ADDRKEY])) {
-			if ($host->parent('Network')) {
+			if ($host->parent('Internet')) {
 				push @{$geom->{l}{Host}}, $host;
 			}
 			elsif ($host->parent('Private')) {
@@ -2762,7 +2773,7 @@ sub geom {
 						Item::VLANKEY,
 						Item::IPV4MASKKEY,
 						Item::IPV6MASKKEY])) {
-				unless ($bus->parent('Network')) {
+				unless ($bus->parent('Internet')) {
 					push @{$geom->{c}{$form}},$bus;
 				}
 			}
@@ -2770,7 +2781,7 @@ sub geom {
 	}
 	return $geom;
 }
-#package Private::Network::View;
+#package Private::Internet::View;
 sub getgeom {
 	my $self = shift;
 	my $geom = $self->{geo};
@@ -2783,7 +2794,7 @@ sub getgeom {
 		foreach my $host ($self->offspring_sortbytype('Host',[
 					Item::IPV4ADDRKEY,
 					Item::IPV6ADDRKEY])) {
-			if ($host->parent('Network')) {
+			if ($host->parent('Internet')) {
 				push @{$geom->{$l}{Host}},$host;
 				$host->{col} = ($col > 0) ? $col-1 : $col+1;
 			}
@@ -2798,7 +2809,7 @@ sub getgeom {
 						Item::VLANKEY,
 						Item::IPV4MASKKEY,
 						Item::IPV6MASKKEY])) {
-				unless ($bus->parent('Network')) {
+				unless ($bus->parent('Internet')) {
 					push @{$geom->{c}{$form}},$bus;
 					$bus->{col} = $col;
 				}
@@ -2807,28 +2818,28 @@ sub getgeom {
 	}
 	return $geom;
 }
-#package Private::Network::View;
+#package Private::Internet::View;
 sub adding {
 	my ($self,$child) = @_;
 	return unless $self->{geo} or $self->{geom};
 	my $kind = $child->kind;
 	my %map = map {$_=>1} qw/Private Host Lan Vlan Subnet/;
 	return unless $map{$kind};
-	if (my $net = $child->parent('Network')) {
-		# Needs to be removed from Network and added here
+	if (my $net = $child->parent('Internet')) {
+		# Needs to be removed from Internet and added here
 		$self->{viewer}->changed if delete $net->{geom};
 		$self->{viewer}->changed if delete $net->{geo};
 	}
 	$self->{viewer}->changed if delete $self->{geom};
 	$self->{viewer}->changed if delete $self->{geo};
 }
-#package Private::Network::View;
+#package Private::Internet::View;
 sub rekeying { shift->adding(@_) }
 
 # ------------------------------------------
-package Private::Network::Draw; our @ISA = qw(Subnetwork::Network::Draw Point::Draw Tree::Draw);
+package Private::Internet::Draw; our @ISA = qw(Subnetwork::Internet::Draw Vertex::Draw Tree::Draw);
 # ------------------------------------------
-#package Private::Network::Draw;
+#package Private::Internet::Draw;
 sub rebalance {
 	my $self = shift;
 	my ($hbox,$wbox,$geom,$size) = @_;
@@ -2855,44 +2866,44 @@ sub rebalance {
 		$draw->{col} = ($col > 0) ? $col-1 : $col+1;
 	}
 }
-#package Private::Network::Draw;
+#package Private::Internet::Draw;
 sub myparent {
 	my ($self,$parent) = @_;
-	return $parent->kind eq 'Network';
+	return $parent->kind eq 'Internet';
 }
 
 # ------------------------------------------
-package Private::Here::Network::View; our @ISA = qw(Private::Network::View);
+package Private::Here::Internet::View; our @ISA = qw(Private::Internet::View);
 # ------------------------------------------
 
 # ------------------------------------------
-package Private::Here::Network::Draw; our @ISA = qw(Private::Network::Draw);
+package Private::Here::Internet::Draw; our @ISA = qw(Private::Internet::Draw);
 # ------------------------------------------
 
 # ------------------------------------------
-package Local::Network::View; our @ISA = qw(View Point::View Tree::View);
+package Local::Internet::View; our @ISA = qw(View Vertex::View Tree::View);
 # ------------------------------------------
 
 # ------------------------------------------
-package Local::Network::Draw; our @ISA = qw(Draw Point::Draw Tree::Draw);
+package Local::Internet::Draw; our @ISA = qw(Draw Vertex::Draw Tree::Draw);
 # ------------------------------------------
 
 # ------------------------------------------
-package Local::Here::Network::View; our @ISA = qw(Local::Network::View);
+package Local::Here::Internet::View; our @ISA = qw(Local::Internet::View);
 # ------------------------------------------
 
 # ------------------------------------------
-package Local::Here::Network::Draw; our @ISA = qw(Local::Network::Draw);
+package Local::Here::Internet::Draw; our @ISA = qw(Local::Internet::Draw);
 # ------------------------------------------
 
 # ------------------------------------------
-package Host::Network::View; our @ISA = qw(Node::View Point::View Tree::View Datum::View);
+package Host::Internet::View; our @ISA = qw(Node::View Vertex::View Tree::View Datum::View);
 # ------------------------------------------
-#package Host::Network::View;
+#package Host::Internet::View;
 sub mycolor { return 'red' }
-#package Host::Network::View;
+#package Host::Internet::View;
 sub ctypes { return qw/Vprt Port Address/ }
-#package Host::Network::View;
+#package Host::Internet::View;
 sub geom {
 	my $self = shift;
 	my $geom = $self->{geom};
@@ -2903,7 +2914,7 @@ sub geom {
 			my $ptype = shift @buses;
 			foreach my $box ($self->offspring($kind)) {
 				if (my $bus = $box->parent($ptype)) {
-					if ($bus->parent('Network')) {
+					if ($bus->parent('Internet')) {
 						push @{$geom->{l}{$kind}}, $box;
 					}
 					elsif ($bus->parent('Private')) {
@@ -2917,7 +2928,7 @@ sub geom {
 	}
 	return $geom;
 }
-#package Host::Network::View;
+#package Host::Internet::View;
 sub getgeom {
 	my $self = shift;
 	my $geom = $self->{geo};
@@ -2929,7 +2940,7 @@ sub getgeom {
 					Item::INTKEY,
 					Item::VLANKEY])) {
 			my $vlan = $vprt->parent('Vlan');
-			if ($vlan and exists $vlan->{col} and ($vlan->parent('Network') or $vlan->parent('Private'))) {
+			if ($vlan and exists $vlan->{col} and ($vlan->parent('Internet') or $vlan->parent('Private'))) {
 				if ($vlan->{col} < $col)
 				{ push @{$geom->{l}{Vprt}},$vprt } else
 				{ push @{$geom->{r}{Vprt}},$vprt }
@@ -2939,7 +2950,7 @@ sub getgeom {
 					Item::INTKEY,
 					Item::MACKEY])) {
 			my $plan = $port->parent('Lan');
-			if ($plan and exists $plan->{col} and ($plan->parent('Network') or $plan->parent('Private'))) {
+			if ($plan and exists $plan->{col} and ($plan->parent('Internet') or $plan->parent('Private'))) {
 				if ($plan->{col} < $col)
 				{ push @{$geom->{l}{Port}},$port } else
 				{ push @{$geom->{r}{Port}},$port }
@@ -2949,7 +2960,7 @@ sub getgeom {
 					Item::IPV4ADDRKEY,
 					Item::IPV6ADDRKEY])) {
 			my $subn = $addr->parent('Subnet');
-			if ($subn and exists $subn->{col} and ($subn->parent('Network') or $subn->parent('Private'))) {
+			if ($subn and exists $subn->{col} and ($subn->parent('Internet') or $subn->parent('Private'))) {
 				if ($subn->{col} < $col)
 				{ push @{$geom->{l}{Address}},$addr } else
 				{ push @{$geom->{r}{Address}},$addr }
@@ -2958,7 +2969,7 @@ sub getgeom {
 	}
 	return $geom;
 }
-#package Host::Network::View;
+#package Host::Internet::View;
 sub adding {
 	my ($self,$child) = @_;
 	return unless $self->{geo} or $self->{geom};
@@ -2968,13 +2979,13 @@ sub adding {
 	$self->{viewer}->changed if delete $self->{geom};
 	$self->{viewer}->changed if delete $self->{geo};
 }
-#package Host::Network::View;
+#package Host::Internet::View;
 sub rekeying { shift->adding(@_) }
 
 # ------------------------------------------
-package Host::Network::Draw; our @ISA = qw(Node::Draw Point::Draw Tree::Draw Datum::Draw);
+package Host::Internet::Draw; our @ISA = qw(Node::Draw Vertex::Draw Tree::Draw Datum::Draw);
 # ------------------------------------------
-#package Host::Network::Draw;
+#package Host::Internet::Draw;
 sub getsize {
 	my $self = shift;
 	my ($hbox,$wbox,$geom) = @_;
@@ -2987,7 +2998,7 @@ sub getsize {
 		}
 	}
 }
-#package Host::Network::Draw;
+#package Host::Internet::Draw;
 sub sizecalc {
 	my $self = shift;
 	my ($geom,$size) = @_;
@@ -3018,7 +3029,7 @@ sub sizecalc {
 	$size->{r}{total}[1] = $smax;
 	$tsiz->[1] += $smax + $smax;
 }
-#package Host::Network::Draw;
+#package Host::Internet::Draw;
 sub shrink {
 	my $self = shift;
 	my ($hbox,$wbox,$geom,$size) = @_;
@@ -3035,7 +3046,7 @@ sub shrink {
 		}
 	}
 }
-#package Host::Network::Draw;
+#package Host::Internet::Draw;
 sub recalc {
 	my $self = shift;
 	my $canvas = $self->{canvas};
@@ -3069,7 +3080,7 @@ sub recalc {
 	$wmrg = 0;
 	return ($hbox,$wbox,$hmrg,$wmrg);
 }
-#package Host::Network::Draw;
+#package Host::Internet::Draw;
 sub resize {
 	my $self = shift;
 	my ($hbox,$wbox) = @_;
@@ -3085,7 +3096,7 @@ sub resize {
 	}
 	return $self->siz;
 }
-#package Host::Network::Draw;
+#package Host::Internet::Draw;
 sub layout {
 	my $self = shift;
 	my $geom = delete $self->{geo};
@@ -3117,9 +3128,9 @@ sub layout {
 }
 
 # ------------------------------------------
-package Host::Ip::Network::View; our @ISA = qw(Host::Network::View);
+package Host::Ip::Internet::View; our @ISA = qw(Host::Internet::View);
 # ------------------------------------------
-#package Host::Ip::Network::View;
+#package Host::Ip::Internet::View;
 sub mycolor {
 	my $self = shift;
 	my $data = $self->{item}{data};
@@ -3127,7 +3138,7 @@ sub mycolor {
 	my $color = ($sysd and exists $sysd->{sysName}) ? 'black' : 'darkgrey';
 	return $color;
 }
-#package Host::Ip::Network::View;
+#package Host::Ip::Internet::View;
 sub gettxt {
 	my $self = shift;
 	my @lines = ();
@@ -3136,7 +3147,7 @@ sub gettxt {
 	my $name = $sysd->{sysName} if $sysd;
 	push @lines, $name if $name;
 	my @keys = ();
-	foreach my $kind (qw/Network Private Local/) {
+	foreach my $kind (qw/Internet Private Local/) {
 		if (exists $self->{item}{key}{p}{$kind}) {
 			push @keys,sort keys %{$self->{item}{key}{p}{$kind}};
 		}
@@ -3148,9 +3159,9 @@ sub gettxt {
 }
 
 # ------------------------------------------
-package Host::Ip::Network::Draw; our @ISA = qw(Host::Network::Draw);
+package Host::Ip::Internet::Draw; our @ISA = qw(Host::Internet::Draw);
 # ------------------------------------------
-#package Host::Ip::Network::Draw;
+#package Host::Ip::Internet::Draw;
 sub xform {
 	my ($type,$self) = @_;
 	bless $self,$type;
@@ -3158,9 +3169,9 @@ sub xform {
 }
 
 # ------------------------------------------
-package Host::Ip::Here::Network::View; our @ISA = qw(Host::Ip::Network::View);
+package Host::Ip::Here::Internet::View; our @ISA = qw(Host::Ip::Internet::View);
 # ------------------------------------------
-#package Host::Ip::Here::Network::View;
+#package Host::Ip::Here::Internet::View;
 sub mycolor {
 	my $self = shift;
 	my $data = $self->{item}{data};
@@ -3170,9 +3181,9 @@ sub mycolor {
 }
 
 # ------------------------------------------
-package Host::Ip::Here::Network::Draw; our @ISA = qw(Host::Ip::Network::Draw);
+package Host::Ip::Here::Internet::Draw; our @ISA = qw(Host::Ip::Internet::Draw);
 # ------------------------------------------
-#package Host::Ip::Here::Network::Draw;
+#package Host::Ip::Here::Internet::Draw;
 sub xform {
 	my ($type,$self) = @_;
 	bless $self,$type;
@@ -3180,17 +3191,17 @@ sub xform {
 }
 
 # ------------------------------------------
-package Subnet::Network::View; our @ISA = qw(Bus::View Point::View Tree::View Datum::View);
+package Subnet::Internet::View; our @ISA = qw(Bus::View Vertex::View Tree::View Datum::View);
 # ------------------------------------------
-#package Subnet::Network::View;
+#package Subnet::Internet::View;
 sub mycolor { return 'brown' }
-#package Subnet::Network::View;
+#package Subnet::Internet::View;
 sub ctypes { return qw/Address/ }
-#package Subnet::Network::View;
+#package Subnet::Internet::View;
 sub gettxt {
 	my $self = shift;
 	my @keys = ();
-	foreach my $kind (qw/Network Private Local/) {
+	foreach my $kind (qw/Internet Private Local/) {
 		if (exists $self->{item}{key}{p}{$kind}) {
 			foreach (keys %{$self->{item}{key}{p}{$kind}}) {
 				push @keys, $_ if Item::keytype($_) == Item::IPV4MASKKEY();
@@ -3206,35 +3217,35 @@ sub gettxt {
 }
 
 # ------------------------------------------
-package Subnet::Network::Draw; our @ISA = qw(Bus::Draw Point::Draw Tree::Draw Datum::Draw);
+package Subnet::Internet::Draw; our @ISA = qw(Bus::Draw Vertex::Draw Tree::Draw Datum::Draw);
 # ------------------------------------------
 
 # ------------------------------------------
-package Lan::Network::View; our @ISA = qw(Bus::View Point::View Tree::View);
+package Lan::Internet::View; our @ISA = qw(Bus::View Vertex::View Tree::View);
 # ------------------------------------------
-#package Lan::Network::View;
+#package Lan::Internet::View;
 sub ctypes { return qw/Port/ }
 
 # ------------------------------------------
-package Lan::Network::Draw; our @ISA = qw(Bus::Draw Point::Draw Tree::Draw);
+package Lan::Internet::Draw; our @ISA = qw(Bus::Draw Vertex::Draw Tree::Draw);
 # ------------------------------------------
 
 # ------------------------------------------
-package Vlan::Network::View; our @ISA = qw(Bus::View Point::View Tree::View);
+package Vlan::Internet::View; our @ISA = qw(Bus::View Vertex::View Tree::View);
 # ------------------------------------------
-#package Vlan::Network::View;
+#package Vlan::Internet::View;
 sub mycolor { return 'blue' }
-#package Vlan::Network::View;
+#package Vlan::Internet::View;
 sub ctypes { return qw/Vprt/ }
 
 # ------------------------------------------
-package Vlan::Network::Draw; our @ISA = qw(Bus::Draw Point::Draw Tree::Draw);
+package Vlan::Internet::Draw; our @ISA = qw(Bus::Draw Vertex::Draw Tree::Draw);
 # ------------------------------------------
 
 # ------------------------------------------
-package Address::Network::View; our @ISA = qw(BoxAndLink::View Point::View Leaf::View Datum::View);
+package Address::Internet::View; our @ISA = qw(BoxAndLink::View Vertex::View Leaf::View Datum::View);
 # ------------------------------------------
-#package Address::Network::View;
+#package Address::Internet::View;
 sub mycolor {
 	my $self = shift;
 	my $data = $self->{item}{data};
@@ -3242,9 +3253,9 @@ sub mycolor {
 	return 'brown' if exists $data->{ipAddressEntry};
 	return 'darkgrey';
 }
-#package Address::Network::View;
+#package Address::Internet::View;
 sub types { return qw{Subnet Host} }
-#package Address::Network::View;
+#package Address::Internet::View;
 sub gettxt {
 	my $self = shift;
 	if (exists $self->{item}{key}{p}{Host}) {
@@ -3258,17 +3269,17 @@ sub gettxt {
 }
 
 # ------------------------------------------
-package Address::Network::Draw; our @ISA = qw(BoxAndLink::Draw Point::Draw Leaf::Draw Datum::Draw);
+package Address::Internet::Draw; our @ISA = qw(BoxAndLink::Draw Vertex::Draw Leaf::Draw Datum::Draw);
 # ------------------------------------------
-#package Address::Network::Draw;
+#package Address::Internet::Draw;
 sub init { shift->{txt}{pnts}[2] = 11 }
 
 # ------------------------------------------
-package Port::Network::View; our @ISA = qw(BoxAndLink::View Point::View Tree::View Datum::View);
+package Port::Internet::View; our @ISA = qw(BoxAndLink::View Vertex::View Tree::View Datum::View);
 # ------------------------------------------
-#package Port::Network::View;
+#package Port::Internet::View;
 sub types { return qw{Lan Host} }
-#package Port::Network::View;
+#package Port::Internet::View;
 sub gettxt {
 	my $self = shift;
 	my $txt;
@@ -3290,15 +3301,15 @@ sub gettxt {
 }
 
 # ------------------------------------------
-package Port::Network::Draw; our @ISA = qw(BoxAndLink::Draw Point::Draw Tree::Draw Datum::Draw);
+package Port::Internet::Draw; our @ISA = qw(BoxAndLink::Draw Vertex::Draw Tree::Draw Datum::Draw);
 # ------------------------------------------
-#package Port::Network::Draw;
+#package Port::Internet::Draw;
 sub init { shift->{txt}{pnts}[2] = 13 }
 
 # ------------------------------------------
-package Vprt::Network::View; our @ISA = qw(BoxAndLink::View Point::View Tree::View Datum::View);
+package Vprt::Internet::View; our @ISA = qw(BoxAndLink::View Vertex::View Tree::View Datum::View);
 # ------------------------------------------
-#package Vprt::Network::View;
+#package Vprt::Internet::View;
 sub mycolor {
 	my $self = shift;
 	my $data = $self->{item}{data};
@@ -3308,9 +3319,9 @@ sub mycolor {
 	return 'blue' if exists $data->{lldpLocPortEntry};
 	return 'darkgrey';
 }
-#package Vprt::Network::View;
+#package Vprt::Internet::View;
 sub types { return qw{Vlan Host} }
-#package Vprt::Network::View;
+#package Vprt::Internet::View;
 sub gettxt {
 	my $self = shift;
 	my $txt;
@@ -3332,64 +3343,64 @@ sub gettxt {
 }
 
 # ------------------------------------------
-package Vprt::Network::Draw; our @ISA = qw(BoxAndLink::Draw Point::Draw Tree::Draw Datum::Draw);
+package Vprt::Internet::Draw; our @ISA = qw(BoxAndLink::Draw Vertex::Draw Tree::Draw Datum::Draw);
 # ------------------------------------------
-#package Vprt::Network::Draw;
+#package Vprt::Internet::Draw;
 sub init { shift->{txt}{pnts}[2] = 17 }
 
 # ------------------------------------------
-package Route::Network::View; our @ISA = qw(View Path::View Datum::View);
+package Route::Internet::View; our @ISA = qw(View Edge::View Datum::View);
 # ------------------------------------------
 
 # ------------------------------------------
-package Route::Network::Draw; our @ISA = qw(Draw Path::Draw Datum::Draw);
+package Route::Internet::Draw; our @ISA = qw(Draw Edge::Draw Datum::Draw);
 # ------------------------------------------
 
 # ------------------------------------------
-package Driv::Driv::View; our @ISA = qw(View Point::View Tree::View Datum::View);
+package Driv::Driv::View; our @ISA = qw(View Vertex::View Tree::View Datum::View);
 # ------------------------------------------
 
 # ------------------------------------------
-package Driv::Driv::Draw; our @ISA = qw(Draw Point::Draw Tree::Draw Datum::Draw);
+package Driv::Driv::Draw; our @ISA = qw(Draw Vertex::Draw Tree::Draw Datum::Draw);
 # ------------------------------------------
 
 # ------------------------------------------
-package Card::Driv::View; our @ISA = qw(Group::View Point::View Tree::View Datum::View);
+package Card::Driv::View; our @ISA = qw(Group::View Vertex::View Tree::View Datum::View);
 # ------------------------------------------
 
 # ------------------------------------------
-package Card::Driv::Draw; our @ISA = qw(Group::Draw Point::Draw Tree::Draw Datum::Draw);
+package Card::Driv::Draw; our @ISA = qw(Group::Draw Vertex::Draw Tree::Draw Datum::Draw);
 # ------------------------------------------
 #package Card::Driv::Draw;
 sub init { shift->impl(__PACKAGE__,'init',@_) }
 
 # ------------------------------------------
-package Span::Driv::View; our @ISA = qw(Group::View Point::View Tree::View Datum::View);
+package Span::Driv::View; our @ISA = qw(Group::View Vertex::View Tree::View Datum::View);
 # ------------------------------------------
 #package Span::Driv::View;
 
 # ------------------------------------------
-package Span::Driv::Draw; our @ISA = qw(Group::Draw Point::Draw Tree::Draw Datum::Draw);
+package Span::Driv::Draw; our @ISA = qw(Group::Draw Vertex::Draw Tree::Draw Datum::Draw);
 # ------------------------------------------
 #package Span::Driv::Draw;
 
 # ------------------------------------------
-package Chan::Driv::View; our @ISA = qw(Group::View Point::View Tree::View Datum::View);
+package Chan::Driv::View; our @ISA = qw(Group::View Vertex::View Tree::View Datum::View);
 # ------------------------------------------
 #package Chan::Driv::View;
 
 # ------------------------------------------
-package Chan::Driv::Draw; our @ISA = qw(Group::Draw Point::Draw Tree::Draw Datum::Draw);
+package Chan::Driv::Draw; our @ISA = qw(Group::Draw Vertex::Draw Tree::Draw Datum::Draw);
 # ------------------------------------------
 #package Chan::Driv::Draw;
 
 # ------------------------------------------
-package Xcon::Driv::View; our @ISA = qw(Group::View Point::View Tree::View Datum::View);
+package Xcon::Driv::View; our @ISA = qw(Group::View Vertex::View Tree::View Datum::View);
 # ------------------------------------------
 #package Xcon::Driv::View;
 
 # ------------------------------------------
-package Xcon::Driv::Draw; our @ISA = qw(Group::Draw Point::Draw Tree::Draw Datum::Draw);
+package Xcon::Driv::Draw; our @ISA = qw(Group::Draw Vertex::Draw Tree::Draw Datum::Draw);
 # ------------------------------------------
 #package Xcon::Driv::Draw;
 
@@ -3483,9 +3494,9 @@ sub new_viewer {
 	my ($self,$base) = @_;
 	my $id = undef;
 	my $gui = $self->{gui};
-	my $vtyp = 'Viewer::'.$base->kind;
+	my $vtyp = join('::','Viewer',$base->kind);
 	my $viewer = $vtyp->new($gui,$id,$base);
-	my $ctyp = 'Canvas::'.$self->{gtk};
+	my $ctyp = join('::','Canvas',$self->{gtk});
 	my $canvas = $ctyp->new($gui,$id,$self,$viewer);
 	return $viewer;
 }

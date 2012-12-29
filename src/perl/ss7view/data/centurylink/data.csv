@@ -1,20 +1,20 @@
 Sheet = "11_002_Clinton_Missouri_Switch_Replacement_08152011.pdf" 2011-05-24
 -------------
 "WCST","WCCITY","SWNAME","SWCLLI","SWTYPE","SWDESC","SPC","HOST","EFFDATE"
-"MO","Clinton","Clinton","CNTNMOXADS0","DMH","DMS100","239-012-017","-","2011-09-28"
-"MO","Clinton","Clinton","CNTNMOXARS0","-","CALIX Digital Line Concentrator","239-012-002","WRBGMOXADS0","2011-09-28"
+"MO","Clinton","Clinton","CLTNMOXADS0","DMH","Genband DMS100","239-012-017","-","2011-09-28"
+"MO","Clinton","Clinton","CLTNMOXARS0","-","CALIX Digital Line Concentrator","239-012-002","WRBGMOXADS0","2011-09-28"
 "MO","Warrensburg","Warrensburg","WRBGMOXADS0","DMH","DMS100","239-012-002","-","2011-09-28"
 -------------
 "NPA","NXX","SWCLLI","EFFDATE"
-"660","885","CNTNMOXARS0","2011-09-28"
-"660","890","CNTNMOXARS0","2011-09-28"
+"660","885","CLTNMOXARS0","2011-09-28"
+"660","890","CLTNMOXARS0","2011-09-28"
 Sheet = "11_003_Deepwater_Missouri_Rehome_08152011.pdf" 2011-05-24
 -------------
 "WCST","WCCITY","SWNAME","SWCLLI","SWTYPE","SWDESC","SPC","HOST","EFFDATE"
-"MO","Deepwater","Deepwater","DPWRMOXARS0","RLC","GENBAND DMS RLC Remote","239-012-017","CLTNMOXADS0","-"
-"MO","Deepwater","Deepwater","DPWRMOXARS0","RLC","GENBAND DMS RLC Remote","239-012-002","WRBGMOXADS0","2011-08-15"
-"MO","Warrensburg","Warrensburg","WRBGMOXADS0","DMH","GENBAND DMS100","239-012-002","-","2011-08-15"
-"MO","Clinton","Clinton","CLTNMOXADS0","DMH","GENBAND DMS100","239-012-017","-","2011-08-15"
+"MO","Deepwater","Deepwater","DPWRMOXARS0","RLC","Genband DMS RLC Remote","239-012-017","CLTNMOXADS0","-"
+"MO","Deepwater","Deepwater","DPWRMOXARS0","RLC","Genband DMS RLC Remote","239-012-002","WRBGMOXADS0","2011-08-15"
+"MO","Warrensburg","Warrensburg","WRBGMOXADS0","DMH","Genband DMS100","239-012-002","-","2011-08-15"
+"MO","Clinton","Clinton","CLTNMOXADS0","DMH","Genband DMS100","239-012-017","-","2011-08-15"
 -------------
 "NPA","NXX","X","SWCLLI","EFFDATE"
 "660","696","0","DPWRMOXARS0","-"
