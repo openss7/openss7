@@ -1,0 +1,4 @@
+PCAPNG_1.0 {
+	__pcapng_*;
+	_pcapng_*;
+};
