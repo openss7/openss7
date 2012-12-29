@@ -1697,6 +1697,29 @@ EXTRA_PROGRAMS			+= chand
 
 ## =====================================================================
 
+xmond_SOURCES			= src/snmp/xmond.c \
+				  src/snmp/xmond.h \
+				  src/snmp/xmonMIB.c \
+				  src/snmp/xmonMIB.h \
+				  src/snmp/ds_agent.h \
+				  src/snmp/header_complex.h \
+				  src/snmp/mib_modules.h \
+				  src/snmp/struct.h \
+				  src/snmp/util_funcs.h
+xmond_CPPFLAGS			= $(PKG_INCLUDES) $(USER_CPPFLAGS) $(SNMP_CPPFLAGS)
+xmond_CFLAGS			= $(USER_CFLAGS) $(USER_DFLAGS)
+xmond_LDADD			= libstreams.la $(SNMP_LDADD)
+xmond_LDFLAGS			= $(USER_LDFLAGS) $(SNMP_LDFLAGS) -lpcap
+
+if WITH_SNMP
+if WITH_SNMP_AGENT
+sbin_PROGRAMS			+= xmond
+endif
+endif
+EXTRA_PROGRAMS			+= xmond
+
+## =====================================================================
+
 ifrdlci_SOURCES			= src/util/ifrdlci.c
 ifrdlci_CPPFLAGS		= $(UTIL_INCLUDES)
 ifrdlci_CFLAGS			= $(USER_CFLAGS) $(USER_DFLAGS)
