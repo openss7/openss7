@@ -125,8 +125,12 @@ Major features since the last release are as follows:
 
 @itemize -
 @item
+Updated GNU build chain to m4-1.4.16, autoconf-2.69, automake-1.12.6, libtool-2.4.2, gettext-0.18.2,
+flex-2.5.37, bison-2.7, swig-2.0.9, autobuild-5.3, texinfo-4.13a, xz-5.0.4.
+
+@item
 Updated GNU build chain to m4-1.4.16, autoconf-2.69, automake 1.12.1, libtool 2.4.2, gettext 0.18.1,
-flex 2.5.35, bison 2.5, swig 2.0.7, autobuild 45.3, texinfo 4.13a, xz 5.0.3.
+flex 2.5.35, bison 2.5, swig 2.0.7, autobuild 5.3, texinfo 4.13a, xz 5.0.3.
 
 @item
 Support for Archlinux.
