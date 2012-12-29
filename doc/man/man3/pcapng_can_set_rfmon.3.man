@@ -1,0 +1,273 @@
+'\" rtp
+.\" vim: ft=nroff sw=4 noet nocin nosi com=b\:.\\\" fo+=tcqlorn tw=77
+.\" =========================================================================
+.\"
+.\" @(#) $Id$
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2008-2012  Monavacon Limited <http://www.monavacon.com/>
+.\" Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+.\" Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to copy, distribute and/or modify this manual
+.\" under the terms of the GNU Free Documentation License, Version 1.3 or
+.\" any later version published by the Free Software Foundation; with no
+.\" Invariant Sections, no Front-Cover Texts, and no Back-Cover Texts.  A
+.\" copy of the license is included in the section entitled "GNU Free
+.\" Documentation License".
+.\"
+.\" Permission to use, copy and distribute this manual without modification,
+.\" for any purpose and without fee or royalty is hereby granted, provided
+.\" that both the above copyright notice and this permission notice appears
+.\" in all copies and that the name of OpenSS7 Corporation not be used in
+.\" advertising or publicity pertaining to distribution of this documentation
+.\" or its contents without specific, written prior permission.  OpenSS7
+.\" Corporation makes no representation about the suitability of this manual
+.\" for any purpose.  It is provided "as is" without express or implied
+.\" warranty.
+.\"
+.\" Permission is granted to process this file through groff and print the
+.\" results, provided the printed document carries a copying permission
+.\" notice identical to this one except for the removal of this paragraph
+.\" (this paragraph not being relevant to the printed manual).
+.\"
+.\" OPENSS7 CORPORATION DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS MANUAL
+.\" INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A
+.\" PARTICULAR PURPOSE, NON-INFRINGEMENT, OR TITLE; THAT THE CONTENTS OF THE
+.\" DOCUMENT ARE SUITABLE FOR ANY PURPOSE, OR THAT THE IMPLEMENTATION OF
+.\" SUCH CONTENTS WILL NOT INFRINGE ON ANY THIRD PARTY PATENTS, COPYRIGHTS,
+.\" TRADEMARKS OR OTHER RIGHTS.  IN NO EVENT SHALL OPENSS7 CORPORATION BE
+.\" LIABLE FOR ANY DIRECT, INDIRECT, SPECIAL OR CONSEQUENTIAL DAMAGES OR ANY
+.\" DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER
+.\" IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING
+.\" OUT OF OR IN CONNECTION WITH ANY USE OF THIS DOCUMENT OR THE PERFORMANCE
+.\" OR IMPLEMENTATION OF THE CONTENTS THEREOF.
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not have
+.\" taken the same level of care in the production of this manual, which is
+.\" licensed free of charge, as they might when working professionally.  The
+.\" author(s) will take no responsibility in it.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by the
+.\" source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any successor
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date$ by $Author$
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Log$
+.\" =========================================================================
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database openss7.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+search-truncate 40
+search-ignore CGIQOSTU
+.R2
+.so openss7.macros
+.\"
+.\"
+.TH PCAPNG_CAN_SET_RFMON 3 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "PCAP-NG Library Calls"
+.\"
+.\"
+.B pcapng_can_set_rfmon
+\- check if monitoring mode can be set on an interface.
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+.B #include <pcapng.h>
+.HP 8
+.BI "int pcapng_can_set_rfmon(pcapng_t *" p ", int " iid );
+.\"
+.\"
+.SH ARGUMENTS
+.PP
+.TP
+.I p
+a PCAP-NG handle.
+.PD 0
+.TP
+.I iid
+the interface identifier to check.
+.PD
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+.B pcapng_can_set_rfmon
+checks whether monitoring mode can be set on the interface,
+.IR iid ,
+belonging to a live capture PCAP-NG handle,
+.IR p .
+.\"
+.\"
+.SH USAGE
+.PP
+.B pcapng_can_set_rfmon
+can be used to check whether an interface belonging to a live capture PCAP-NG
+handle can be set for monitoring.
+.\"
+.\"
+.SH MT CONTEXT
+.PP
+.B pcapng_can_set_rfmon
+is fully thread-safe.  What are described as global variables
+are in fact thread-specific data when linked with
+.BR libpthread .
+.B pcapng_can_set_rfmon
+takes a write-lock on the PCAP-NG handle while testing whether monitoring
+mode can be set on the interface.
+.B pcapng_can_set_rfmon
+is NOT a thread cancellation point.
+.\"
+.\"
+.SH RETURN
+.PP
+Upon success,
+.B pcapng_can_set_rfmon
+returns zero
+.RB ( 0 )
+to indicate that the interface,
+.IR iid ,
+cannot support monitor mode; one
+.RB ( 1 ),
+when it can.
+Upon failure,
+.B pcapng_can_set_rfmon
+returns minus one
+.RB ( -1 ),
+sets
+.IR p_errno "(3) and " errno (3)
+to an appropriate error code, and sets
+.IR p_errbuf (3)
+to an appropriate error string when available.
+.\"
+.\"
+.SH ERRORS
+.PP
+When
+.B pcapng_can_set_rfmon
+fails, it returns minus one
+.RB ( -1 ),
+sets
+.IR p_errbuf (3)
+to an appropriate error string when available, and sets
+.IR p_errno "(3) and " errno (3)
+to appropriate error codes as follows:
+.PP
+.TP
+.RB [ PCAP_ERROR_NO_SUCH_INTERFACE "], [" EINVAL ]
+The argument,
+.IR iid ,
+is out of range.
+.TP
+.RB [ PCAP_ERROR_NO_SUCH_DEVICE "], [" ENXIO ]
+The interface,
+.IR iid ,
+did not exist at the time of the call.
+.TP
+.RB [ PCAP_ERROR_PERM_DENIED "], [" EACCES ]
+The calling process does not have sufficient privilege to
+test for monitoring mode.
+.TP
+.RB [ PCAP_ERROR_ACTIVATED "], [" EALREADY ]
+The interface,
+.IR iid ,
+has already been activated.
+.TP
+.RB [ PCAP_ERROR ]
+An unspecified error occurred.
+.IR errno "(3) and " p_errbuf (3)
+may provide additional information.
+.\"
+.\"
+.SH SEE ALSO
+.PP
+.BR pcapng (3),
+.BR pcap_can_set_rfmon (3pcap),
+.BR pcap (3pcap).
+.\"
+.\"
+.SH BUGS
+.PP
+.B pcapng_can_set_rfmon
+has no known bugs.
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+.B pcapng_can_set_rfmon
+is compatible with
+.BR pcap_can_set_rfmon (3pcap),
+as it is used to implement this function.
+.B pcapng_can_set_rfmon
+adds thread-safety to the
+.BR pcap_can_set_rfmon (3pcap)
+call by appropriately wrapping the function.
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+.B pcapng_can_set_rfmon
+conforms to the operation of
+.BR pcap_can_set_rfmon (3pcap)
+from
+.BR libpcap .
+.\"
+.\"
+.SH HISTORY
+.PP
+.B pcapng_can_set_rfmon
+first appeared in PCAP-NG 1.0.
+.BR pcap_can_set_rfmon (3pcap)
+appeared in
+.BR libpcap .
+.\"
+.\"
+.SH VERSIONS
+.PP
+This manual page was written for the OpenSS7 PCAP-NG Library.
+.\"
+.\"
+.[
+$LIST$
+.]
+.T4
