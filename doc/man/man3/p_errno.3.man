@@ -1,0 +1,285 @@
+'\" rtp
+.\" vim: ft=nroff sw=4 noet nocin nosi com=b\:.\\\" fo+=tcqlorn tw=77
+.\" =========================================================================
+.\"
+.\" @(#) $Id$
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2008-2012  Monavacon Limited <http://www.monavacon.com/>
+.\" Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+.\" Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to copy, distribute and/or modify this manual
+.\" under the terms of the GNU Free Documentation License, Version 1.3 or
+.\" any later version published by the Free Software Foundation; with no
+.\" Invariant Sections, no Front-Cover Texts, and no Back-Cover Texts.  A
+.\" copy of the license is included in the section entitled "GNU Free
+.\" Documentation License".
+.\"
+.\" Permission to use, copy and distribute this manual without modification,
+.\" for any purpose and without fee or royalty is hereby granted, provided
+.\" that both the above copyright notice and this permission notice appears
+.\" in all copies and that the name of OpenSS7 Corporation not be used in
+.\" advertising or publicity pertaining to distribution of this documentation
+.\" or its contents without specific, written prior permission.  OpenSS7
+.\" Corporation makes no representation about the suitability of this manual
+.\" for any purpose.  It is provided "as is" without express or implied
+.\" warranty.
+.\"
+.\" Permission is granted to process this file through groff and print the
+.\" results, provided the printed document carries a copying permission
+.\" notice identical to this one except for the removal of this paragraph
+.\" (this paragraph not being relevant to the printed manual).
+.\"
+.\" OPENSS7 CORPORATION DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS MANUAL
+.\" INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A
+.\" PARTICULAR PURPOSE, NON-INFRINGEMENT, OR TITLE; THAT THE CONTENTS OF THE
+.\" DOCUMENT ARE SUITABLE FOR ANY PURPOSE, OR THAT THE IMPLEMENTATION OF
+.\" SUCH CONTENTS WILL NOT INFRINGE ON ANY THIRD PARTY PATENTS, COPYRIGHTS,
+.\" TRADEMARKS OR OTHER RIGHTS.  IN NO EVENT SHALL OPENSS7 CORPORATION BE
+.\" LIABLE FOR ANY DIRECT, INDIRECT, SPECIAL OR CONSEQUENTIAL DAMAGES OR ANY
+.\" DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER
+.\" IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING
+.\" OUT OF OR IN CONNECTION WITH ANY USE OF THIS DOCUMENT OR THE PERFORMANCE
+.\" OR IMPLEMENTATION OF THE CONTENTS THEREOF.
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not have
+.\" taken the same level of care in the production of this manual, which is
+.\" licensed free of charge, as they might when working professionally.  The
+.\" author(s) will take no responsibility in it.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by the
+.\" source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any successor
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date$ by $Author$
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Log$
+.\" =========================================================================
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database openss7.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+search-truncate 40
+search-ignore CGIQOSTU
+.R2
+.so openss7.macros
+.\"
+.\"
+.TH P_ERRNO 3 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "PCAP-NG Library Calls"
+.\"
+.\"
+.SH NAME
+.B p_errno, p_errbuf
+\- PCAP-NG error number and buffer.
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+.B #include <pcapng.h>
+.HP 8
+.B extern int p_errno;
+.PD 0
+.HP 8
+.B extern char p_errbuf[PCAP_ERRBUF_SIZE];
+.PD
+.\"
+.\"
+.SH MEMBERS
+.TP \w'\fIp_errbuf\fP\ \ 'u
+.I p_errno
+the PCAP-NG error number.
+.TP
+.I p_errbuf
+the PCAP-NG error string.
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+.I p_errno
+contains the last error or warning number generated by a PCAP-NG Library call
+when a PCAP-NG Library call fails, or succeeds with warnings.
+.I p_errbuf
+contains the last error or warning string generated by a PCAP-NG Library call
+when a PCAP-NG Library call fails, or succeeds with warnings.
+(Note: not all PCAP-NG Library calls can fail or succeed with warnings.)
+.PP
+If a PCAP-NG Library call succeeds, there is no guarantee that
+.IR p_errno " or " p_errbuf
+will contain the same value as before the call, even though the PCAP-NG
+Library call succeeded.
+.PP
+Most PCAP-NG Library calls will also set an appropriate error number in
+.IR errno (3).
+.PP
+Following are the error numbers reported and their error strings:
+.TP 8
+.RB [ PCAP_ERROR ]
+An unspecified error occurred.
+.IR errno "(3) and " p_errbuf (3)
+may provide additional information.
+.TP
+.RB [ PCAP_ERROR_BREAK "], [" EINTR ]
+A loop was terminated due to a request from
+.BR pcapng_breakloop (3).
+.TP
+.RB [ PCAP_ERROR_NOT_ACTIVATED "], [" ENXIO ]
+An operation was attempted where the device must be active, however, the
+device was found to be inactive.  (This error will not be returned as there
+are no such operations defined.)
+.TP
+.RB [ PCAP_ERROR_ACTIVATED "], [" EALREADY ]
+An operation was attempted where the device must be inactive, however, the
+device was found to be activated.
+.TP
+.RB [ PCAP_ERROR_NO_SUCH_DEVICE "], [" ENODEV ]
+A device name specified a device that does not exist.
+.TP
+.RB [ PCAP_ERROR_RFMON_NOTSUP "], [" ENOTSUP ]
+Monitoring mode was specified for an interface before it was activated, but
+the interface does not support monitor mode.
+.TP
+.RB [ PCAP_ERROR_NOT_RFMON "], [" ENOTTY ]
+An operation was attempted where the device must be in monitor mode, but the
+device was found to not be in monitor mode.  (This error will not be
+returned as there are no such operations defined.)
+.TP
+.RB [ PCAP_ERROR_PERM_DENIED "], [" EACCES ]
+The calling process does not have sufficient privilege to access the device.
+.TP
+.RB [ PCAP_ERROR_IFACE_NOT_UP "], [" ENETDOWN ]
+The device specified is not up, and therefore, not available for capture.
+.TP
+.RB [ PCAP_ERROR_CANTSET_TSTAMP_TYPE "], [" EOPNOTSUPP ]
+An attempt was made to set a time stamp type on a device that does not
+support setting of time stamp type at all.
+.TP
+.RB [ PCAP_ERROR_PROMISC_PERM_DENIED "], [" EPERM ]
+The calling process does not have sufficient privilege to set promisuous
+mode.
+.TP
+.RB [ PCAP_ERROR_NO_SUCH_INTERFACE "], [" EINVAL ]
+An interface index was specified for a PCAP-NG handle that does not have that
+interface index attached.
+.PP
+Following are the warning numbers reported and their warning strings:
+.TP 8
+.RB [ PCAP_WARNING ]
+An unspecified warning occurred.
+.IR errno "(3) and " p_errbuf (3)
+may provide additional information.
+.TP
+.RB [ PCAP_WARNING_PROMISC_NOTSUP "], [" ENOTSUP ]
+The interface does not support promiscuous mode, but promiscuous mode was
+requested on the interface before activation.
+.TP
+.RB [ PCAP_WARNING_TSTAMP_TYPE_NOTSUP "], [" EOPNOTSUPP ]
+The time stamp type specified for the interface is not supported: the default
+time stamp type for the interface was used instead.
+.\"
+.\"
+.SH MT CONTEXT
+.PP
+.BR p_errno " and " p_errbuf
+are fully thread-safe.  What are described as global variables
+are in fact thread-specific data when linked with
+.BR libpthread .
+.\"
+.\"
+.SH SEE ALSO
+.PP
+.BR pcapng (3),
+.BR pcapng_strerror (3),
+.BR pcap_geterr (3pcap),
+.BR pcap_perror (3pcap),
+.BR pcap_strerror (3pcap).
+.BR pcap (3pcap).
+.\"
+.\"
+.SH BUGS
+.PP
+.BR p_errno " and " p_errbuf
+have no known bugs.
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+.BR p_errno " and " p_errbuf
+are fully compatible with the equivalent error numbers and strings returned
+by
+.BR libpcap ;
+however, these are thread-safe equivalents whereas the
+.B libpcap
+approach is inherently non-thread-safe
+.RB ( libpcap
+accesses static members and buffers).
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+.BR p_errno " and " p_errbuf
+conform to the operation of the non-thread-safe
+.B libpcap
+equivalents:
+.BR pcap_geterr (3pcap),
+.BR pcap_perror (3pcap),
+and
+.BR pcap_strerror (3pcap).
+.\"
+.\"
+.SH HISTORY
+.PP
+.BR p_errno " and " p_errbuf
+first appeared in PCAP-NG 1.0.
+.B libpcap
+uses stores error numbers and strings in the PCAP handle, which is not
+thread-safe.
+.\"
+.\"
+.SH VERSIONS
+.PP
+This manual page was written for the OpenSS7 PCAP-NG Library.
+.\"
+.\"
+.[
+$LIST$
+.]
+.T4
