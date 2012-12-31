@@ -20917,7 +20917,7 @@ sio_siocgifconf32(queue_t *q, mblk_t *mp, struct xp *xp, mblk_t *dp)
 {
 	struct ifconf32 *ifc = (typeof(ifc)) dp->b_rptr;
 	int max = ifc->ifc_len / sizeof(struct ifreq);
-	caddr_t uaddr = (caddr_t) ifc->ifc_buf;
+	caddr_t uaddr = (caddr_t)(ulong) ifc->ifc_buf;
 	struct ifreq *ifr;
 	struct cd *cd;
 	struct sp *sp;
@@ -28347,39 +28347,39 @@ sl_ioctl(queue_t *q, mblk_t *mp, struct xp *xp, struct iocblk *ioc)
 
 	switch (_IOC_NR(ioc->ioc_cmd)) {
 	case _IOC_NR(SL_IOCGOPTIONS):	/* lmi_option_t */
-		err = -sizeof(lmi_option_t);
+		err = (int)-sizeof(lmi_option_t);
 		break;
 	case _IOC_NR(SL_IOCSOPTIONS):	/* lmi_option_t */
-		err = sizeof(lmi_option_t);
+		err = (int)sizeof(lmi_option_t);
 		break;
 	case _IOC_NR(SL_IOCGCONFIG):	/* sl_config_t */
-		err = -sizeof(sl_config_t);
+		err = (int)-sizeof(sl_config_t);
 		break;
 	case _IOC_NR(SL_IOCSCONFIG):	/* sl_config_t */
 	case _IOC_NR(SL_IOCTCONFIG):	/* sl_config_t */
 	case _IOC_NR(SL_IOCCCONFIG):	/* sl_config_t */
-		err = sizeof(sl_config_t);
+		err = (int)sizeof(sl_config_t);
 		break;
 	case _IOC_NR(SL_IOCGSTATEM):	/* sl_statem_t */
-		err = -sizeof(sl_statem_t);
+		err = (int)-sizeof(sl_statem_t);
 		break;
 	case _IOC_NR(SL_IOCCMRESET):	/* sl_statem_t */
-		err = sizeof(sl_statem_t);
+		err = (int)sizeof(sl_statem_t);
 		break;
 	case _IOC_NR(SL_IOCGSTATSP):	/* sl_stats_t */
 	case _IOC_NR(SL_IOCGSTATS):	/* sl_stats_t */
-		err = -sizeof(sl_stats_t);
+		err = (int)-sizeof(sl_stats_t);
 		break;
 	case _IOC_NR(SL_IOCSSTATSP):	/* sl_stats_t */
 	case _IOC_NR(SL_IOCCSTATS):	/* sl_stats_t */
-		err = sizeof(sl_stats_t);
+		err = (int)sizeof(sl_stats_t);
 		break;
 	case _IOC_NR(SL_IOCGNOTIFY):	/* sl_notify_t */
-		err = -sizeof(sl_notify_t);
+		err = (int)-sizeof(sl_notify_t);
 		break;
 	case _IOC_NR(SL_IOCSNOTIFY):	/* sl_notify_t */
 	case _IOC_NR(SL_IOCCNOTIFY):	/* sl_notify_t */
-		err = sizeof(sl_notify_t);
+		err = (int)sizeof(sl_notify_t);
 		break;
 	default:
 		goto einval;
@@ -28493,43 +28493,43 @@ sdt_ioctl(queue_t *q, mblk_t *mp, struct xp *xp, struct iocblk *ioc)
 
 	switch (_IOC_NR(ioc->ioc_cmd)) {
 	case _IOC_NR(SDT_IOCGOPTIONS):	/* lmi_option_t */
-		err = -sizeof(lmi_option_t);
+		err = (int)-sizeof(lmi_option_t);
 		break;
 	case _IOC_NR(SDT_IOCSOPTIONS):	/* lmi_option_t */
-		err = sizeof(lmi_option_t);
+		err = (int)sizeof(lmi_option_t);
 		break;
 	case _IOC_NR(SDT_IOCGCONFIG):	/* sdt_config_t */
-		err = -sizeof(sdt_config_t);
+		err = (int)-sizeof(sdt_config_t);
 		break;
 	case _IOC_NR(SDT_IOCSCONFIG):	/* sdt_config_t */
 	case _IOC_NR(SDT_IOCTCONFIG):	/* sdt_config_t */
 	case _IOC_NR(SDT_IOCCCONFIG):	/* sdt_config_t */
-		err = sizeof(sdt_config_t);
+		err = (int)sizeof(sdt_config_t);
 		break;
 	case _IOC_NR(SDT_IOCGSTATEM):	/* sdt_statem_t */
-		err = -sizeof(sdt_statem_t);
+		err = (int)-sizeof(sdt_statem_t);
 		break;
 	case _IOC_NR(SDT_IOCCMRESET):	/* sdt_statem_t */
-		err = sizeof(sdt_statem_t);
+		err = (int)sizeof(sdt_statem_t);
 		break;
 	case _IOC_NR(SDT_IOCGSTATSP):	/* lmi_sta_t */
-		err = -sizeof(sdt_stats_t);
+		err = (int)-sizeof(sdt_stats_t);
 		break;
 	case _IOC_NR(SDT_IOCSSTATSP):	/* lmi_sta_t */
-		err = sizeof(lmi_sta_t);
+		err = (int)sizeof(lmi_sta_t);
 		break;
 	case _IOC_NR(SDT_IOCGSTATS):	/* sdt_stats_t */
-		err = -sizeof(sdt_stats_t);
+		err = (int)-sizeof(sdt_stats_t);
 		break;
 	case _IOC_NR(SDT_IOCCSTATS):	/* sdt_stats_t */
-		err = sizeof(sdt_stats_t);
+		err = (int)sizeof(sdt_stats_t);
 		break;
 	case _IOC_NR(SDT_IOCGNOTIFY):	/* sdt_notify_t */
-		err = -sizeof(sdt_notify_t);
+		err = (int)-sizeof(sdt_notify_t);
 		break;
 	case _IOC_NR(SDT_IOCSNOTIFY):	/* sdt_notify_t */
 	case _IOC_NR(SDT_IOCCNOTIFY):	/* sdt_notify_t */
-		err = sizeof(sdt_notify_t);
+		err = (int)sizeof(sdt_notify_t);
 		break;
 	case _IOC_NR(SDT_IOCCABORT):	/* */
 		err = 0;
@@ -28654,41 +28654,41 @@ sdl_ioctl(queue_t *q, mblk_t *mp, struct xp *xp, struct iocblk *ioc)
 
 	switch (_IOC_NR(ioc->ioc_cmd)) {
 	case _IOC_NR(SDL_IOCGOPTIONS):	/* lmi_option_t */
-		err = -sizeof(lmi_option_t);
+		err = (int)-sizeof(lmi_option_t);
 		break;
 	case _IOC_NR(SDL_IOCSOPTIONS):	/* lmi_option_t */
-		err = sizeof(lmi_option_t);
+		err = (int)sizeof(lmi_option_t);
 		break;
 	case _IOC_NR(SDL_IOCGCONFIG):	/* sdl_config_t */
-		err = -sizeof(sdl_config_t);
+		err = (int)-sizeof(sdl_config_t);
 		break;
 	case _IOC_NR(SDL_IOCSCONFIG):	/* sdl_config_t */
 	case _IOC_NR(SDL_IOCTCONFIG):	/* sdl_config_t */
 	case _IOC_NR(SDL_IOCCCONFIG):	/* sdl_config_t */
-		err = sizeof(sdl_config_t);
+		err = (int)sizeof(sdl_config_t);
 		break;
 	case _IOC_NR(SDL_IOCGSTATEM):	/* sdl_statem_t */
-		err = -sizeof(sdl_statem_t);
+		err = (int)-sizeof(sdl_statem_t);
 		break;
 	case _IOC_NR(SDL_IOCCMRESET):	/* sdl_statem_t */
-		err = sizeof(sdl_statem_t);
+		err = (int)sizeof(sdl_statem_t);
 		break;
 	case _IOC_NR(SDL_IOCGSTATSP):	/* sdl_stats_t */
-		err = -sizeof(sdl_stats_t);
+		err = (int)-sizeof(sdl_stats_t);
 		break;
 	case _IOC_NR(SDL_IOCGSTATS):	/* sdl_stats_t */
-		err = -sizeof(sdl_stats_t);
+		err = (int)-sizeof(sdl_stats_t);
 		break;
 	case _IOC_NR(SDL_IOCSSTATSP):	/* sdl_stats_t */
 	case _IOC_NR(SDL_IOCCSTATS):	/* sdl_stats_t */
-		err = sizeof(sdl_stats_t);
+		err = (int)sizeof(sdl_stats_t);
 		break;
 	case _IOC_NR(SDL_IOCGNOTIFY):	/* sdl_notify_t */
-		err = -sizeof(sdl_notify_t);
+		err = (int)-sizeof(sdl_notify_t);
 		break;
 	case _IOC_NR(SDL_IOCSNOTIFY):	/* sdl_notify_t */
 	case _IOC_NR(SDL_IOCCNOTIFY):	/* sdl_notify_t */
-		err = sizeof(sdl_notify_t);
+		err = (int)sizeof(sdl_notify_t);
 		break;
 	case _IOC_NR(SDL_IOCCDISCTX):	/* */
 		err = 0;

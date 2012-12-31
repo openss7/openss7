@@ -373,6 +373,8 @@ struct ifreq {
 #define ifr_arp_muxid	ifr_ifru.if_muxid[1]
 };
 
+#endif				/* IFNAMSIZ */
+
 #ifdef __KERNEL__
 #ifdef __LP64__
 
@@ -386,7 +388,5 @@ struct ifconf32 {
 
 #endif				/* __LP64__ */
 #endif				/* __KERNEL__ */
-
-#endif				/* IFNAMSIZ */
 
 #endif				/* _NET_LIF_H */
