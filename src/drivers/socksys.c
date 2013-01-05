@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2013  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -118,7 +118,7 @@ static char const ident[] = "$RCSfile: socksys.c,v $ $Name:  $($Revision: 1.1.2.
 #include <sys/socksys.h>
 
 #define SOCKSYS_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
-#define SOCKSYS_COPYRIGHT	"Copyright (c) 2008-2011  Monavacon Limited.  All Rights Reserved."
+#define SOCKSYS_COPYRIGHT	"Copyright (c) 2008-2013  Monavacon Limited.  All Rights Reserved."
 #define SOCKSYS_REVISION	"OpenSS7 $RCSfile: socksys.c,v $ $Name:  $($Revision: 1.1.2.6 $) $Date: 2011-09-20 09:51:37 $"
 #define SOCKSYS_DEVICE		"SVR 4.2 MP STREAMS Socket System Driver (SOCKSYS)"
 #define SOCKSYS_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
@@ -156,6 +156,7 @@ MODULE_ALIAS("char-major-" __stringify(SOCKSYS_CMAJOR_0));
 MODULE_ALIAS("char-major-" __stringify(SOCKSYS_CMAJOR_0) "-*");
 MODULE_ALIAS("char-major-" __stringify(SOCKSYS_CMAJOR_0) "-0");
 MODULE_ALIAS("/dev/socksys");
+MODULE_ALIAS("devname:socksys");
 #endif				/* MODULE_ALIAS */
 #ifdef MODULE_VERSION
 MODULE_VERSION(PACKAGE_ENVR);

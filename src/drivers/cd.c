@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2013  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -94,7 +94,7 @@ static char const ident[] = "$RCSfile: cd.c,v $ $Name:  $($Revision: 1.1.2.4 $) 
 
 #define CD_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define CD_EXTRA	"Part of the OpenSS7 stack for Linux Fast-STREAMS"
-#define CD_COPYRIGHT	"Copyright (c) 2008-2011  Monavacon Limited.  All Rights Reserved."
+#define CD_COPYRIGHT	"Copyright (c) 2008-2013  Monavacon Limited.  All Rights Reserved."
 #define CD_REVISION	"OpenSS7 $RCSfile: cd.c,v $ $Name:  $ ($Revision: 1.1.2.4 $) $Date: 2011-09-02 08:46:32 $"
 #define CD_DEVICE	"SVR 4.2 MP STREAMS CDI OSI Communications Device Provider"
 #define CD_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -141,6 +141,7 @@ MODULE_ALIAS("char-major-" __stringify(DL_CMAJOR_0) "-*");
 MODULE_ALIAS("char-major-" __stringify(DL_CMAJOR_0) "-0");
 MODULE_ALIAS("char-major-" __stringify(DL_CMAJOR_0) "-" __stringify(DL_CMINOR));
 MODULE_ALIAS("/dev/cd");
+MODULE_ALIAS("devname:cd");
 #endif				/* MODULE_ALIAS */
 #endif				/* LINUX */
 

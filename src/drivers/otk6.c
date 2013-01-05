@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2013  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -423,7 +423,7 @@ extern void tcp_set_skb_tso_factor(struct sk_buff *skb, unsigned int mss_std);
 
 #define OTK6_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define OTK6_EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS"
-#define OTK6_COPYRIGHT	"Copyright (c) 2008-2011  Monavacon Limited.  All Rights Reserved."
+#define OTK6_COPYRIGHT	"Copyright (c) 2008-2013  Monavacon Limited.  All Rights Reserved."
 #define OTK6_REVISION	"OpenSS7 $RCSfile: otk6.c,v $ $Name:  $($Revision: 1.1.2.7 $) $Date: 2011-09-02 08:46:35 $"
 #define OTK6_DEVICE	"SVR 4.2 MP STREAMS RFC1006 TPI OSI Transport Provider Driver"
 #define OTK6_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -465,6 +465,7 @@ MODULE_ALIAS("char-major-" __stringify(OTK6_CMAJOR_0) "-*");
 MODULE_ALIAS("char-major-" __stringify(OTK6_CMAJOR_0) "-0");
 MODULE_ALIAS("char-major-" __stringify(OTK6_CMAJOR_0) "-" __stringify(OTK6_CMINOR));
 MODULE_ALIAS("/dev/otk6");
+MODULE_ALIAS("devname:otk6");
 #endif				/* MODULE_ALIAS */
 #endif				/* LINUX */
 /*

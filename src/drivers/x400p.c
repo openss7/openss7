@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2013  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -275,7 +275,7 @@ static char const ident[] = "$RCSfile: x400p.c,v $ $Name:  $($Revision: 1.1.2.3 
 #define MX_X400P_DESCRIP    "X400P: MX (Multiplex) STREAMS DRIVER."
 #define MX_X400P_EXTRA		"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define MX_X400P_REVISION	"OpenSS7 $RCSfile: x400p.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-09-02 08:46:39 $"
-#define MX_X400P_COPYRIGHT	"Copyright (c) 2008-2011  Monavacon Limited.  All Rights Reserved."
+#define MX_X400P_COPYRIGHT	"Copyright (c) 2008-2013  Monavacon Limited.  All Rights Reserved."
 #define MX_X400P_DEVICE		"Supports the X40XP E1/T1/J1 (Tormenta II/III) PCI boards."
 #define MX_X400P_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define MX_X400P_LICENSE	"GPL"
@@ -321,6 +321,7 @@ MODULE_ALIAS("char-major-" __stringify(MX_X400P_CMAJOR_0));
 MODULE_ALIAS("char-major-" __stringify(MX_X400P_CMAJOR_0) "-*");
 MODULE_ALIAS("char-major-" __stringify(MX_X400P_CMAJOR_0) "-0");
 MODULE_ALIAS("/dev/x400p-mx");
+MODULE_ALIAS("devname:x400p-mx");
 #endif				/* MODULE_ALIAS */
 #endif				/* LINUX */
 

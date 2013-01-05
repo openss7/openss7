@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2013  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -85,7 +85,7 @@ static char const ident[] =
 
 #define LAPB_DESCRIP	"SVR 4.2 DLPI X25-LAPB DRIVER FOR LINUX FAST-STREAMS"
 #define LAPB_EXTRA      "Part of the OpenSS7 X.25 Stack for Linux Fast-STREAMS"
-#define LAPB_COPYRIGHT	"Copyright (c) 2008-2011  Monavacon Limited.  All Rights Reserved."
+#define LAPB_COPYRIGHT	"Copyright (c) 2008-2013  Monavacon Limited.  All Rights Reserved."
 #define LAPB_REVISION	"OpenSS7 $RCSfile: x25-lapb.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2011-09-02 08:46:39 $"
 #define LAPB_DEVICE	"SVR 4.2MP DLPI Driver (DLPI) for X.25 Link Access Protocol B-Channel (X25-LAPB)"
 #define LAPB_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -122,10 +122,11 @@ MODULE_ALIAS("streams-major-" __stringify(CONFIG_STREAMS_LAPB_MAJOR));
 MODULE_ALIAS("/dev/streams/lapb");
 MODULE_ALIAS("/dev/streams/lapb/*");
 MODULE_ALIAS("/dev/streams/clone/lapb");
-MODULE_ALIAS("char-major-" __stringify(LAPB_MAJOR_0));
-MODULE_ALIAS("char-major-" __stringify(LAPB_MAJOR_0) "-*");
-MODULE_ALIAS("char-major-" __stringify(LAPB_MAJOR_0) "-0");
+MODULE_ALIAS("char-major-" __stringify(CONFIG_STREAMS_LAPB_MAJOR));
+MODULE_ALIAS("char-major-" __stringify(CONFIG_STREAMS_LAPB_MAJOR) "-*");
+MODULE_ALIAS("char-major-" __stringify(CONFIG_STREAMS_LAPB_MAJOR) "-0");
 MODULE_ALIAS("/dev/lapb");
+MODULE_ALIAS("devname:lapb");
 #endif				/* MODULE_ALIAS */
 #ifdef MODULE_VERSION
 MODULE_VERSION(PACKAGE_ENVR);

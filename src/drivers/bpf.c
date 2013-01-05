@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2012  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2013  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -82,7 +82,7 @@ static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
 #include "sys/config.h"
 
 #define BPF_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
-#define BPF_COPYRIGHT	"Copyright (c) 2008-2012  Monavacon Limited.  All Rights Reserved."
+#define BPF_COPYRIGHT	"Copyright (c) 2008-2013  Monavacon Limited.  All Rights Reserved."
 #define BPF_REVISION	"LfS $RCSfile$ $Name$($Revision$) $Date$"
 #define BPF_DEVICE	"SVR 4.2 MP STREAMS BPF Driver"
 #define BPF_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -150,6 +150,7 @@ MODULE_ALIAS("char-major-" __stringify(CONFIG_STREAMS_BPF_MAJOR));
 MODULE_ALIAS("char-major-" __stringify(CONFIG_STREAMS_BPF_MAJOR) "-*");
 MODULE_ALIAS("char-major-" __stringify(CONFIG_STREAMS_BPF_MAJOR) "-0");
 MODULE_ALIAS("/dev/bpf");
+MODULE_ALIAS("devname:bpf");
 MODULE_ALIAS("streams-major-" __stringify(CONFIG_STREAMS_BPF_MAJOR));
 MODULE_ALIAS("/dev/streams/bpf");
 MODULE_ALIAS("/dev/streams/bpf/*");

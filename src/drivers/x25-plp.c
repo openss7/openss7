@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2013  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -101,7 +101,7 @@ static char const ident[] =
 
 #define PLP_DESCRIP	"SVR 4.2 NLI X.25 PLP DRIVER FOR LINUX FAST-STREAMS"
 #define PLP_EXTRA	"Part of the OpenSS7 X.25 Stack for Linux Fast-STREAMS"
-#define PLP_COPYRIGHT	"Copyright (c) 2008-2011  Monavacon Limited.  All Rights Reserved."
+#define PLP_COPYRIGHT	"Copyright (c) 2008-2013  Monavacon Limited.  All Rights Reserved."
 #define PLP_REVISION	"OpenSS7 $RCSfile: x25-plp.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2011-09-02 08:46:39 $"
 #define PLP_DEVICE	"SVR 4.2MP NLI Driver (NLI) for X.25/ISO 8208"
 #define PLP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -141,17 +141,21 @@ MODULE_ALIAS("/dev/streams/x25-plp/x25");
 MODULE_ALIAS("/dev/streams/x25-plp/xx25");
 MODULE_ALIAS("/dev/streams/x25-plp/cons");
 MODULE_ALIAS("/dev/streams/clone/x25-plp");
-MODULE_ALIAS("char-major-" __stringify(PLP_MAJOR_0));
-MODULE_ALIAS("char-major-" __stringify(PLP_MAJOR_0) "-*");
-MODULE_ALIAS("char-major-" __stringify(PLP_MAJOR_0) "-0");
-MODULE_ALIAS("char-major-" __stringify(PLP_MAJOR_0) "-1");
-MODULE_ALIAS("char-major-" __stringify(PLP_MAJOR_0) "-2");
-MODULE_ALIAS("char-major-" __stringify(PLP_MAJOR_0) "-3");
-MODULE_ALIAS("char-major-" __stringify(PLP_MAJOR_0) "-" __stringify(PLP_CMINOR));
+MODULE_ALIAS("char-major-" __stringify(CONFIG_STREAMS_PLP_MAJOR));
+MODULE_ALIAS("char-major-" __stringify(CONFIG_STREAMS_PLP_MAJOR) "-*");
+MODULE_ALIAS("char-major-" __stringify(CONFIG_STREAMS_PLP_MAJOR) "-0");
+MODULE_ALIAS("char-major-" __stringify(CONFIG_STREAMS_PLP_MAJOR) "-1");
+MODULE_ALIAS("char-major-" __stringify(CONFIG_STREAMS_PLP_MAJOR) "-2");
+MODULE_ALIAS("char-major-" __stringify(CONFIG_STREAMS_PLP_MAJOR) "-3");
+//MODULE_ALIAS("char-major-" __stringify(CONFIG_STREAMS_PLP_MAJOR) "-" __stringify(PLP_CMINOR));
 MODULE_ALIAS("/dev/x25-plp");
 MODULE_ALIAS("/dev/x25");
 MODULE_ALIAS("/dev/xx25");
 MODULE_ALIAS("/dev/cons");
+MODULE_ALIAS("devname:x25-plp");
+MODULE_ALIAS("devname:x25");
+MODULE_ALIAS("devname:xx25");
+MODULE_ALIAS("devname:cons");
 #endif				/* MODULE_ALIAS */
 #ifdef MODULE_VERSION
 MODULE_VERSION(PACKAGE_ENVR);

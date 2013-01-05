@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2013  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -95,7 +95,7 @@ static char const ident[] = "$RCSfile: dl2.c,v $ $Name:  $($Revision: 1.1.2.3 $)
 #define ND_DESCRIP	"NETDEV (DL) STREAMS MULTIPLEXING DRIVER."
 #define ND_EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define ND_REVISION	"OpenSS7 $RCSfile: dl2.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-09-02 08:46:32 $"
-#define ND_COPYRIGHT	"Copyright (c) 2008-2011  Monavacon Limited.  All Rights Reserved."
+#define ND_COPYRIGHT	"Copyright (c) 2008-2013  Monavacon Limited.  All Rights Reserved."
 #define ND_DEVICE	"Supports Linux HDLC devices."
 #define ND_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define ND_LICENSE	"GPL"
@@ -140,6 +140,7 @@ MODULE_ALIAS("char-major-" __stringify(ND_CMAJOR_0));
 MODULE_ALIAS("char-major-" __stringify(ND_CMAJOR_0) "-*");
 MODULE_ALIAS("char-major-" __stringify(ND_CMAJOR_0) "-0");
 MODULE_ALIAS("/dev/nd");
+MODULE_ALIAS("devname:nd");
 #endif				/* MODULE_ALIAS */
 #endif				/* LINUX */
 

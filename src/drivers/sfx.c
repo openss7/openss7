@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2012  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2013  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -90,7 +90,7 @@ static char const ident[] = "$RCSfile: sfx.c,v $ $Name:  $($Revision: 1.1.2.5 $)
 #include "src/drivers/fifo.h"	/* for fifo stuff */
 
 #define SFX_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
-#define SFX_COPYRIGHT	"Copyright (c) 2008-2012  Monavacon Limited.  All Rights Reserved."
+#define SFX_COPYRIGHT	"Copyright (c) 2008-2013  Monavacon Limited.  All Rights Reserved."
 #define SFX_REVISION	"LfS $RCSfile: sfx.c,v $ $Name:  $($Revision: 1.1.2.5 $) $Date: 2011-09-02 08:46:36 $"
 #define SFX_DEVICE	"SVR 4.2 MP STREAMS-based FIFOs"
 #define SFX_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -171,6 +171,7 @@ MODULE_PARM_DESC(major, "Major device number for STREAMS-based FIFOs (0 for allo
 #ifdef MODULE_ALIAS
 MODULE_ALIAS("char-major-" __stringify(CONFIG_STREAMS_SFX_MAJOR) "-*");
 MODULE_ALIAS("/dev/sfx");
+MODULE_ALIAS("devname:sfx");
 MODULE_ALIAS("streams-major-" __stringify(CONFIG_STREAMS_SFX_MAJOR));
 MODULE_ALIAS("/dev/streams/sfx");
 MODULE_ALIAS("/dev/streams/sfx/*");
