@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2013  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -109,7 +109,7 @@ static char const ident[] = "$RCSfile: tl.c,v $ $Name:  $($Revision: 1.1.2.5 $) 
 
 #define TI_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define TI_EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS"
-#define TI_COPYRIGHT	"Copyright (c) 2008-2011  Monavacon Limited.  All Rights Reserved."
+#define TI_COPYRIGHT	"Copyright (c) 2008-2013  Monavacon Limited.  All Rights Reserved."
 #define TI_REVISION	"OpenSS7 $RCSfile: tl.c,v $ $Name:  $($Revision: 1.1.2.5 $) $Date: 2011-09-02 08:46:37 $"
 #define TI_DEVICE	"SVR 4.2 MP STREAMS TI Driver"
 #define TI_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -162,6 +162,10 @@ MODULE_ALIAS("/dev/tl");
 MODULE_ALIAS("/dev/ticlts");
 MODULE_ALIAS("/dev/ticots");
 MODULE_ALIAS("/dev/ticotsord");
+MODULE_ALIAS("devname:tl");
+MODULE_ALIAS("devname:ticlts");
+MODULE_ALIAS("devname:ticots");
+MODULE_ALIAS("devname:ticotsord");
 #endif				/* MODULE_ALIAS */
 #endif				/* LINUX */
 

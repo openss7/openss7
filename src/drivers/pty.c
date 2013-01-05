@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2013  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -89,7 +89,7 @@ static char const ident[] = "$RCSfile: pty.c,v $ $Name:  $($Revision: 1.1.2.5 $)
 #include <linux/spinlock.h>
 
 #define PTY_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
-#define PTY_COPYRIGHT	"Copyright (c) 2008-2011  Monavacon Limited.  All Rights Reserved."
+#define PTY_COPYRIGHT	"Copyright (c) 2008-2013  Monavacon Limited.  All Rights Reserved."
 #define PTY_REVISION	"OpenSS7 $RCSfile: pty.c,v $ $Name:  $($Revision: 1.1.2.5 $) $Date: 2011-09-20 09:51:36 $"
 #define PTY_DEVICE	"SVR 4.2 MP STREAMS Pseudo-Terminal Driver (PTY)"
 #define PTY_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -162,10 +162,12 @@ MODULE_ALIAS("char-major-" __stringify(PTM_CMAJOR_0));
 MODULE_ALIAS("char-major-" __stringify(PTM_CMAJOR_0) "-*");
 MODULE_ALIAS("char-major-" __stringify(PTM_CMAJOR_0) "-0");
 MODULE_ALIAS("/dev/ptm");
+MODULE_ALIAS("devname:ptm");
 MODULE_ALIAS("char-major-" __stringify(PTS_CMAJOR_0));
 MODULE_ALIAS("char-major-" __stringify(PTS_CMAJOR_0) "-*");
 MODULE_ALIAS("char-major-" __stringify(PTS_CMAJOR_0) "-0");
 MODULE_ALIAS("/dev/pts");
+MODULE_ALIAS("devname:pts");
 #endif				/* MODULE_ALIAS */
 #endif				/* LINUX */
 

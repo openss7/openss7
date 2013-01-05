@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2013  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -158,7 +158,7 @@ static char const ident[] = "$RCSfile: mx.c,v $ $Name:  $($Revision: 1.1.2.3 $) 
 
 #define MX_DESCRIP	"MX (MX) STREAMS MULTIPLEXING DRIVER."
 #define MX_REVISION	"LfS $RCSfile: mx.c,v $ $Name:  $ ($Revision: 1.1.2.3 $) $Date: 2011-09-02 08:46:34 $"
-#define MX_COPYRIGHT	"Copyright (c) 2008-2011  Monavacon Limited.  All Rights Reserved."
+#define MX_COPYRIGHT	"Copyright (c) 2008-2013  Monavacon Limited.  All Rights Reserved."
 #define MX_DEVICE	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define MX_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define MX_LICENSE	"GPL"
@@ -219,6 +219,7 @@ MODULE_ALIAS("char-major-" __stringify(MX_CMAJOR_0));
 MODULE_ALIAS("char-major-" __stringify(MX_CMAJOR_0) "-*");
 MODULE_ALIAS("char-major-" __stringify(MX_CMAJOR_0) "-0");
 MODULE_ALIAS("/dev/mx");
+MODULE_ALIAS("devname:mx");
 #endif				/* defined MODULE_ALIAS */
 
 #endif				/* defined LINUX */

@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2013  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -702,7 +702,7 @@ extern void tcp_set_skb_tso_factor(struct sk_buff *skb, unsigned int mss_std);
 
 #define SS__DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define SS__EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
-#define SS__COPYRIGHT	"Copyright (c) 2008-2011  Monavacon Limited.  All Rights Reserved."
+#define SS__COPYRIGHT	"Copyright (c) 2008-2013  Monavacon Limited.  All Rights Reserved."
 #define SS__REVISION	"OpenSS7 $RCSfile: inet.c,v $ $Name:  $($Revision: 1.1.2.11 $) $Date: 2011-09-20 09:51:34 $"
 #define SS__DEVICE	"SVR 4.2 MP STREAMS INET Drivers (NET4)"
 #define SS__CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -778,43 +778,68 @@ MODULE_ALIAS("char-major-" __stringify(SS__CMAJOR_0) "-0");
 MODULE_ALIAS("char-major-" __stringify(SS__CMAJOR_0) "-" __stringify(IP_CMINOR));
 MODULE_ALIAS("/dev/ip");
 MODULE_ALIAS("/dev/inet/ip");
+MODULE_ALIAS("devname:ip");
+MODULE_ALIAS("devname:inet/ip");
 MODULE_ALIAS("char-major-" __stringify(SS__CMAJOR_0) "-" __stringify(ICMP_CMINOR));
 MODULE_ALIAS("/dev/icmp");
 MODULE_ALIAS("/dev/inet/icmp");
+MODULE_ALIAS("devname:icmp");
+MODULE_ALIAS("devname:inet/icmp");
 MODULE_ALIAS("char-major-" __stringify(SS__CMAJOR_0) "-" __stringify(GGP_CMINOR));
 MODULE_ALIAS("/dev/ggp");
 MODULE_ALIAS("/dev/inet/ggp");
+MODULE_ALIAS("devname:ggp");
+MODULE_ALIAS("devname:inet/ggp");
 MODULE_ALIAS("char-major-" __stringify(SS__CMAJOR_0) "-" __stringify(IPIP_CMINOR));
 MODULE_ALIAS("/dev/ipip");
 MODULE_ALIAS("/dev/inet/ipip");
+MODULE_ALIAS("devname:ipip");
+MODULE_ALIAS("devname:inet/ipip");
 MODULE_ALIAS("char-major-" __stringify(SS__CMAJOR_0) "-" __stringify(TCP_CMINOR));
 MODULE_ALIAS("/dev/tcp");
 MODULE_ALIAS("/dev/inet/tcp");
+MODULE_ALIAS("devname:tcp");
+MODULE_ALIAS("devname:inet/tcp");
 MODULE_ALIAS("char-major-" __stringify(SS__CMAJOR_0) "-" __stringify(EGP_CMINOR));
 MODULE_ALIAS("/dev/egp");
 MODULE_ALIAS("/dev/inet/egp");
+MODULE_ALIAS("devname:egp");
+MODULE_ALIAS("devname:inet/egp");
 MODULE_ALIAS("char-major-" __stringify(SS__CMAJOR_0) "-" __stringify(PUP_CMINOR));
 MODULE_ALIAS("/dev/pup");
 MODULE_ALIAS("/dev/inet/pup");
+MODULE_ALIAS("devname:pup");
+MODULE_ALIAS("devname:inet/pup");
 MODULE_ALIAS("char-major-" __stringify(SS__CMAJOR_0) "-" __stringify(UDP_CMINOR));
 MODULE_ALIAS("/dev/udp");
 MODULE_ALIAS("/dev/inet/udp");
+MODULE_ALIAS("devname:udp");
+MODULE_ALIAS("devname:inet/udp");
 MODULE_ALIAS("char-major-" __stringify(SS__CMAJOR_0) "-" __stringify(IDP_CMINOR));
 MODULE_ALIAS("/dev/idp");
 MODULE_ALIAS("/dev/inet/idp");
+MODULE_ALIAS("devname:idp");
+MODULE_ALIAS("devname:inet/idp");
 MODULE_ALIAS("char-major-" __stringify(SS__CMAJOR_0) "-" __stringify(RAWIP_CMINOR));
 MODULE_ALIAS("/dev/rawip");
 MODULE_ALIAS("/dev/inet/rawip");
+MODULE_ALIAS("devname:rawip");
+MODULE_ALIAS("devname:inet/rawip");
 MODULE_ALIAS("char-major-" __stringify(SS__CMAJOR_0) "-" __stringify(TICOTS_ORD_CMINOR));
 MODULE_ALIAS("/dev/ticots_ord");
+MODULE_ALIAS("devname:ticots_ord");
 MODULE_ALIAS("char-major-" __stringify(SS__CMAJOR_0) "-" __stringify(TICOTS_CMINOR));
 MODULE_ALIAS("/dev/ticots");
+MODULE_ALIAS("devname:ticots");
 MODULE_ALIAS("char-major-" __stringify(SS__CMAJOR_0) "-" __stringify(TICLTS_CMINOR));
 MODULE_ALIAS("/dev/ticlts");
+MODULE_ALIAS("devname:ticlts");
 #if defined HAVE_OPENSS7_SCTP
 MODULE_ALIAS("char-major-" __stringify(SS__CMAJOR_0) "-" __stringify(SCTP_CMINOR));
 MODULE_ALIAS("/dev/sctp");
 MODULE_ALIAS("/dev/inet/sctp");
+MODULE_ALIAS("devname:sctp");
+MODULE_ALIAS("devname:inet/sctp");
 #endif				/* HAVE_OPENSS7_SCTP */
 #endif				/* MODULE_ALIAS */
 #endif				/* LINUX */

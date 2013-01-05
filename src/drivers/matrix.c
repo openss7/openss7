@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2013  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -159,7 +159,7 @@ static char const ident[] = "$RCSfile: matrix.c,v $ $Name:  $($Revision: 1.1.2.3
 
 #define MATRIX_DESCRIP		"MATRIX (MX) STREAMS MULTIPLEXING DRIVER."
 #define MATRIX_REVISION		"OpenSS7 $RCSfile: matrix.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-09-02 08:46:34 $"
-#define MATRIX_COPYRIGHT	"Copyright (c) 2008-2011  Monavacon Limited.  All Rights Reserved."
+#define MATRIX_COPYRIGHT	"Copyright (c) 2008-2013  Monavacon Limited.  All Rights Reserved."
 #define MATRIX_DEVICE		"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define MATRIX_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define MATRIX_LICENSE		"GPL"
@@ -222,6 +222,7 @@ MODULE_ALIAS("char-major-" __stringify(MATRIX_CMAJOR_0));
 MODULE_ALIAS("char-major-" __stringify(MATRIX_CMAJOR_0) "-*");
 MODULE_ALIAS("char-major-" __stringify(MATRIX_CMAJOR_0) "-0");
 MODULE_ALIAS("/dev/matrix");
+MODULE_ALIAS("devname:matrix");
 #endif				/* defined MODULE_ALIAS */
 
 #endif				/* defined LINUX */

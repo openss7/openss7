@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2013  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -110,7 +110,7 @@ static char const ident[] = "$RCSfile: dl-llc.c,v $ $Name:  $($Revision: 1.1.2.5
 
 #define LLC_DESCRIP	"UNIX SVR 4.2 LLC DRIVER FOR LINUX FAST-STREAMS"
 #define LLC_EXTRA	"Part of the OpenSS7 X.25 Stack for Linux Fast-STREAMS"
-#define LLC_COPYRIGHT	"Copyright (c) 2008-2011  Monavacon Limited.  All Rights Reserved."
+#define LLC_COPYRIGHT	"Copyright (c) 2008-2013  Monavacon Limited.  All Rights Reserved."
 #define LLC_REVISION	"OpenSS7 $RCSfile: dl-llc.c,v $ $Name:  $($Revision: 1.1.2.5 $) $Date: 2011-09-02 08:46:32 $"
 #define LLC_DEVICE	"SVR 4.2MP IEEE 802.2 LLC Driver (LLC)"
 #define LLC_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -166,6 +166,11 @@ MODULE_ALIAS("/dev/llc");
 MODULE_ALIAS("/dev/tpb");
 MODULE_ALIAS("/dev/tpr");
 MODULE_ALIAS("/dev/fddi");
+MODULE_ALIAS("devname:eth");
+MODULE_ALIAS("devname:llc");
+MODULE_ALIAS("devname:tpb");
+MODULE_ALIAS("devname:tpr");
+MODULE_ALIAS("devname:fddi");
 #endif				/* MODULE_ALIAS */
 #ifdef MODULE_VERSION
 MODULE_VERSION(PACKAGE_ENVR);

@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2013  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -170,7 +170,7 @@ static char const ident[] = "$RCSfile: udp.c,v $ $Name:  $($Revision: 1.1.2.12 $
 
 #define TP_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define TP_EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS"
-#define TP_COPYRIGHT	"Copyright (c) 2008-2011  Monavacon Limited.  All Rights Reserved."
+#define TP_COPYRIGHT	"Copyright (c) 2008-2013  Monavacon Limited.  All Rights Reserved."
 #define TP_REVISION	"OpenSS7 $RCSfile: udp.c,v $ $Name:  $($Revision: 1.1.2.12 $) $Date: 2011-09-20 09:51:38 $"
 #define TP_DEVICE	"SVR 4.2 MP STREAMS UDP Driver"
 #define TP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -217,6 +217,7 @@ MODULE_ALIAS("char-major-" __stringify(TP_CMAJOR_0));
 MODULE_ALIAS("char-major-" __stringify(TP_CMAJOR_0) "-*");
 MODULE_ALIAS("char-major-" __stringify(TP_CMAJOR_0) "-0");
 MODULE_ALIAS("/dev/udp2");
+MODULE_ALIAS("devname:udp2");
 #endif				/* MODULE_ALIAS */
 #endif				/* LINUX */
 

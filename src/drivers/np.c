@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2013  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -113,7 +113,7 @@ static char const ident[] = "$RCSfile: np.c,v $ $Name:  $($Revision: 1.1.2.7 $) 
 
 #define NP_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define NP_EXTRA	"Part of the OpenSS7 stack for Linux Fast-STREAMS"
-#define NP_COPYRIGHT	"Copyright (c) 2008-2011  Monavacon Limited.  All Rights Reserved."
+#define NP_COPYRIGHT	"Copyright (c) 2008-2013  Monavacon Limited.  All Rights Reserved."
 #define NP_REVISION	"OpenSS7 $RCSfile: np.c,v $ $Name:  $ ($Revision: 1.1.2.7 $) $Date: 2011-09-02 08:46:35 $"
 #define NP_DEVICE	"SVR 4.2 MP STREAMS NPI Network Provider"
 #define NP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -160,6 +160,7 @@ MODULE_ALIAS("char-major-" __stringify(NP_IP_CMAJOR_0) "-*");
 MODULE_ALIAS("char-major-" __stringify(NP_IP_CMAJOR_0) "-0");
 MODULE_ALIAS("char-major-" __stringify(NP_IP_CMAJOR_0) "-" __stringify(NP_IP_CMINOR));
 MODULE_ALIAS("/dev/np_ip");
+MODULE_ALIAS("devname:np_ip");
 #endif				/* MODULE_ALIAS */
 #endif				/* LINUX */
 

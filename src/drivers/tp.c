@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2013  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -117,7 +117,7 @@ typedef unsigned int socklen_t;
 
 #define TP_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define TP_EXTRA	"Part of the OpenSS7 stack for Linux Fast-STREAMS"
-#define TP_COPYRIGHT	"Copyright (c) 2008-2011  Monavacon Limited.  All Rights Reserved."
+#define TP_COPYRIGHT	"Copyright (c) 2008-2013  Monavacon Limited.  All Rights Reserved."
 #define TP_REVISION	"OpenSS7 $RCSfile: tp.c,v $ $Name:  $ ($Revision: 1.1.2.4 $) $Date: 2011-09-02 08:46:37 $"
 #define TP_DEVICE	"SVR 4.2 MP STREAMS TPI OSI Transport Provider Driver"
 #define TP_CONTACT	"Brian Bidulock <bidulock@opens7.org>"
@@ -171,6 +171,11 @@ MODULE_ALIAS("/dev/tp1");
 MODULE_ALIAS("/dev/tp2");
 MODULE_ALIAS("/dev/tp4_cons");
 MODULE_ALIAS("/dev/tp4_clns");
+MODULE_ALIAS("devname:tp0");
+MODULE_ALIAS("devname:tp1");
+MODULE_ALIAS("devname:tp2");
+MODULE_ALIAS("devname:tp4_cons");
+MODULE_ALIAS("devname:tp4_clns");
 #endif				/* MOUDLE_ALIAS */
 #endif				/* LINUX */
 

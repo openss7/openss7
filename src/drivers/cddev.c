@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2013  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -89,7 +89,7 @@ static char const ident[] = "$RCSfile: cddev.c,v $ $Name:  $($Revision: 1.1.2.4 
 
 #define CDDEV_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define CDDEV_EXTRA	"Part of the OpenSS7 X/Open Networking Serivces for Linux Fast-STREAMS"
-#define CDDEV_COPYRIGHT	"Copyright (c) 2008-2011  Monavacon Limited.  All Rights Reserved."
+#define CDDEV_COPYRIGHT	"Copyright (c) 2008-2013  Monavacon Limited.  All Rights Reserved."
 #define CDDEV_REVISION	"OpenSS7 $RCSfile: cddev.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2011-09-02 08:46:32 $"
 #define CDDEV_DEVICE	"SVR 4.2 MP STREAMS CDI Communication Device Interface Provider"
 #define CDDEV_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -127,6 +127,7 @@ MODULE_ALIAS("char-major-" __stringify(CDDEV_CMAJOR_0));
 MODULE_ALIAS("char-major-" __stringify(CDDEV_CMAJOR_0) "-*");
 MODULE_ALIAS("char-major-" __stringify(CDDEV_CMAJOR_0) "-0");
 MODULE_ALIAS("/dev/cddev");
+MODULE_ALIAS("devname:cddev");
 #endif				/* MODULE_ALIAS */
 #ifdef MODULE_VERSION
 MODULE_VERSION(PACKAGE_ENVR);
