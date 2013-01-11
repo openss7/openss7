@@ -93,13 +93,15 @@ static char const ident[] = "$RCSfile: nsdev.c,v $ $Name:  $($Revision: 1.1.2.6 
 #include "sys/config.h"
 #include "src/modules/sth.h"
 
-#define NSDEV_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
+#define NSDEV_DESCRIP	"STREAMS Named Stream Device (NSDEV) STREAMS Driver"
+#define NSDEV_EXTRA	"Part of Linux Fast-STREAMS"
 #define NSDEV_COPYRIGHT	"Copyright (c) 2008-2013  Monavacon Limited.  All Rights Reserved."
 #define NSDEV_REVISION	"LfS $RCSfile: nsdev.c,v $ $Name:  $($Revision: 1.1.2.6 $) $Date: 2011-09-02 08:46:35 $"
 #define NSDEV_DEVICE	"SVR 4.2 MP STREAMS Named Stream Device (NSDEV) Driver"
 #define NSDEV_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define NSDEV_LICENSE	"GPL"
 #define NSDEV_BANNER	NSDEV_DESCRIP	"\n" \
+			NSDEV_EXTRA	"\n" \
 			NSDEV_COPYRIGHT	"\n" \
 			NSDEV_REVISION	"\n" \
 			NSDEV_DEVICE	"\n" \

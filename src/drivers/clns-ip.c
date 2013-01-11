@@ -127,7 +127,7 @@ static char const ident[] = "$RCSfile: clns-ip.c,v $ $Name:  $($Revision: 1.1.2.
 
 #include <sys/npi.h>
 
-#define CLNS_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
+#define CLNS_DESCRIP	"CLNS OSI ISO-IP (RFC 1070) Network Provider STREAMS Driver"
 #define CLNS_EXTRA	"Part of the OpenSS7 OSI stack for Linux Fast-STREAMS"
 #define CLNS_COPYRIGHT	"Copyright (c) 2008-2013  Monavacon Limited.  All Rights Reserved."
 #define CLNS_REVISION	"OpenSS7 $RCSfile: clns-ip.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2011-09-02 08:46:32 $"
@@ -171,9 +171,7 @@ MODULE_ALIAS("streams-major-" __stringify(CONFIG_STREAMS_CLNS_MAJOR));
 MODULE_ALIAS("/dev/streams/clns-ip");
 MODULE_ALIAS("/dev/streams/clns-ip/*");
 MODULE_ALIAS("/dev/streams/clone/clns-ip");
-MODULE_ALIAS("char-major-" __stringify(CLNS_CMAJOR_0));
-MODULE_ALIAS("char-major-" __stringify(CLNS_CMAJOR_0) "-*");
-MODULE_ALIAS("char-major-" __stringify(CLNS_CMAJOR_0) "-0");
+MODULE_ALIAS("char-major-" __stringify(CONFIG_STREAMS_CLONE_MAJOR) "-" __stringify(CLNS_CMAJOR_0));
 MODULE_ALIAS("/dev/clns-ip");
 MODULE_ALIAS("devname:clns-ip");
 #endif				/* MODULE_ALIAS */

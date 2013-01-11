@@ -83,7 +83,7 @@ static char const ident[] = "$RCSfile: x25-plp.other.c,v $ $Name:  $($Revision: 
 #include <sys/npi.h>
 #include <sys/tihdr.h>
 
-#define PLP_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
+#define PLP_DESCRIP	"ISO 8208 X.25 Packet Layer Protocol (X25-PLP) Network Provider"
 #define PLP_EXTRA	"Part of the OpenSS7 OSI Stack for Linux Fast-STREAMS"
 #define PLP_COPYRIGHT	"Copyright (c) 2008-2013  Monavacon Limited.  All Rights Reserved."
 #define PLP_REVISION	"OpenSS7 $RCSfile: x25-plp.other.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2011-09-02 08:46:39 $"
@@ -127,9 +127,7 @@ MODULE_ALIAS("streams-major-" __stringify(CONFIG_STREAMS_PLP_MAJOR));
 MODULE_ALIAS("/dev/streams/x25-plp");
 MODULE_ALIAS("/dev/streams/x25-plp/*");
 MODULE_ALIAS("/dev/streams/clone/x25-plp");
-MODULE_ALIAS("char-major-" __stringify(PLP_CMAJOR_0));
-MODULE_ALIAS("char-major-" __stringify(PLP_CMAJOR_0) "-*");
-MODULE_ALIAS("char-major-" __stringify(PLP_CMAJOR_0) "-0");
+MODULE_ALIAS("char-major-" __stringify(CONFIG_STREAMS_CLONE_MAJOR) "-" __stringify(PLP_CMAJOR_0));
 MODULE_ALIAS("/dev/x25-plp");
 MODULE_ALIAS("devname:x25-plp");
 #endif				/* MODULE_ALIAS */

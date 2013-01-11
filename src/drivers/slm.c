@@ -102,13 +102,15 @@ static char const ident[] = "$RCSfile: slm.c,v $ $Name:  $($Revision: 1.1.2.3 $)
 #include <ss7/ua_lm.h>
 #include <ss7/ua_lm_ioctl.h>
 
-#define SLM_DESCRIP	"SLM: SS7/SL (Signalling Link) STREAMS MULTIPLEXING DRIVER."
+#define SLM_DESCRIP	"SLM: SS7/SL (Signalling Link) STREAMS Multiplexing Driver"
+#define SLM_EXTRA	"Part of the OpenSS7 SS7 Stack for Linux Fast-STREAMS"
 #define SLM_REVISION	"OpenSS7 $RCSfile: slm.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-09-02 08:46:37 $"
 #define SLM_COPYRIGHT	"Copyright (c) 2008-2011  Monavacon Limited.  All Rights Reserved."
 #define SLM_DEVICE	"Supports the OpenSS7 MTP2 and INET transport drivers."
 #define SLM_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define SLM_LICENSE	"GPL"
 #define SLM_BANNER	SLM_DESCRIP	"\n" \
+			SLM_EXTRA	"\n" \
 			SLM_REVISION	"\n" \
 			SLM_COPYRIGHT	"\n" \
 			SLM_DEVICE	"\n" \

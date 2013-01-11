@@ -106,11 +106,11 @@ static char const ident[] = "$RCSfile: x100p-ss7.c,v $ $Name:  $($Revision: 1.1.
 #include <ss7/sli.h>
 #include <ss7/sli_ioctl.h>
 
-#define X100P_DESCRIP		"E/T100P-SS7: SS7/SL (Signalling Link) STREAMS DRIVER."
-#define X100P_EXTRA		"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
+#define X100P_DESCRIP		"E/T100P-SS7: SS7/SL (Signalling Link) STREAMS Driver"
+#define X100P_EXTRA		"Part of the OpenSS7 Stack for Linux Fast-STREAMS"
 #define X100P_REVISION		"OpenSS7 $RCSfile: x100p-ss7.c,v $ $Name:  $ ($Revision: 1.1.2.6 $) $Date: 2011-09-20 09:51:38 $"
 #define X100P_COPYRIGHT		"Copyright (c) 2008-2011  Monavacon Limited.  All Rights Reserved."
-#define X100P_DEVICE		"Supports the T/E100P-SS7 T1/E1 PCI boards."
+#define X100P_DEVICE		"Supports the T/E100P-SS7 T1/E1 PCI boards"
 #define X100P_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define X100P_LICENSE		"GPL"
 #define X100P_BANNER		X100P_DESCRIP		"\n" \

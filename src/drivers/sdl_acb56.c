@@ -93,15 +93,17 @@ static char const ident[] = "$RCSfile: sdl_acb56.c,v $ $Name:  $($Revision: 1.1.
 #include "../devi/dev.h"
 #include "../sdli/sdl.h"
 
-#define ACB56_DESCRIP	"ACB56: SS7/SDL (Signalling Data Link) STREAMS DRIVER."
+#define ACB56_DESCRIP	"ACB56: SS7/SDL (Signalling Data Link) STREAMS Driver"
+#define ACB56_EXTRA	"Part of the OpenSS7 SS7 Stack for Linux Fast-STREAMS"
 #define ACB56_COPYRIGHT	"Copyright (c) 2008-2011  Monavacon Limited.  All Rights Reserved."
-#define ACB56_DEVICES	"Supports the SeaLevel ACB56(tm) V.35 boards."
+#define ACB56_DEVICES	"Supports the SeaLevel ACB56(tm) V.35 boards"
 #define ACB56_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define ACB56_LICENSE	"GPL"
-#define ACB56_BANNER	ACB56_DESCRIP   "\n" \
-			ACB56_COPYRIGHT "\n" \
-			ACB56_DEVICES   "\n" \
-			ACB56_CONTACT   "\n"
+#define ACB56_BANNER	ACB56_DESCRIP	"\n" \
+			ACB56_EXTRA	"\n" \
+			ACB56_COPYRIGHT	"\n" \
+			ACB56_DEVICES	"\n" \
+			ACB56_CONTACT	"\n"
 
 #ifdef MODULE
 MODULE_AUTHOR(ACB56_CONTACT);

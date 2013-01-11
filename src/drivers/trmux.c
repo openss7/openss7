@@ -85,8 +85,8 @@ static char const ident[] = "$RCSfile: trmux.c,v $ $Name:  $($Revision: 1.1.2.4 
 
 #include <sys/sad.h>
 
-#define TRMUX_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
-#define TRMUX_EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS"
+#define TRMUX_DESCRIP	"TCAP Q.771 Transaction Sublayer (TR) STREAMS Driver"
+#define TRMUX_EXTRA	"Part of the OpenSS7 SS7 Stack for Linux Fast-STREAMS"
 #define TRMUX_COPYRIGHT	"Copyright (c) 2008-2013  Monavacon Limited.  All Rights Reserved."
 #define TRMUX_REVISION	"Monavacon $RCSfile: trmux.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2011-09-02 08:46:37 $"
 #define TRMUX_DEVICE	"SVR 4.2 MP STREAMS Q.771 Transaction Sublayer (TR) Driver"
@@ -151,14 +151,8 @@ MODULE_ALIAS("/dev/streams/trmux/mgr");
 MODULE_ALIAS("/dev/streams/trmux/tp");
 MODULE_ALIAS("/dev/streams/trmux/tc");
 MODULE_ALIAS("/dev/streams/trmux/map");
-MODULE_ALIAS("char-major-" __stringify(TRMUX_CMAJOR_0));
-MODULE_ALIAS("char-major-" __stringify(TRMUX_CMAJOR_0) "-*");
-MODULE_ALIAS("char-major-" __stringify(TRMUX_CMAJOR_0) "-0");
-MODULE_ALIAS("char-major-" __stringify(TRMUX_CMAJOR_0) "-" __stringify(TR_CMINOR));
-MODULE_ALIAS("char-major-" __stringify(TRMUX_CMAJOR_0) "-" __stringify(MGR_CMINOR));
-MODULE_ALIAS("char-major-" __stringify(TRMUX_CMAJOR_0) "-" __stringify(TP_CMINOR));
-MODULE_ALIAS("char-major-" __stringify(TRMUX_CMAJOR_0) "-" __stringify(TC_CMINOR));
-MODULE_ALIAS("char-major-" __stringify(TRMUX_CMAJOR_0) "-" __stringify(MAP_CMINOR));
+MODULE_ALIAS("char-major-" __stringify(CONFIG_STREAMS_CLONE_MAJOR) "-" __stringify(TRMUX_CMAJOR_0));
+MODULE_ALIAS("devname:trmux");
 #endif				/* MODULE_ALIAS */
 #endif				/* LINUX */
 

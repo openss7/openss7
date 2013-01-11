@@ -85,7 +85,7 @@ static char const ident[] = "$RCSfile: mcmux.c,v $ $Name:  $($Revision: 1.1.2.4 
 
 #include <sys/sad.h>
 
-#define MCMUX_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
+#define MCMUX_DESCRIP	"3GPP TS 29.002 MAP Common Services (MCMUX) STREAMS Mux Driver"
 #define MCMUX_EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS"
 #define MCMUX_COPYRIGHT	"Copyright (c) 2008-2013  Monavacon Limited.  All Rights Reserved."
 #define MCMUX_REVISION	"Monavacon $RCSfile: mcmux.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2011-09-02 08:46:34 $"
@@ -165,11 +165,8 @@ MODULE_ALIAS("/dev/streams/clone/mcmux");
 MODULE_ALIAS("/dev/streams/mcmux/mc");
 MODULE_ALIAS("/dev/streams/mcmux/mgr");
 MODULE_ALIAS("/dev/streams/mcmux/tp");
-MODULE_ALIAS("char-major-" __stringify(MCMUX_CMAJOR_0));
-MODULE_ALIAS("char-major-" __stringify(MCMUX_CMAJOR_0) "-*");
-MODULE_ALIAS("char-major-" __stringify(MCMUX_CMAJOR_0) "-0");
-MODULE_ALIAS("char-major-" __stringify(MCMUX_CMAJOR_0) "-" __stringify(MGR_CMINOR));
-MODULE_ALIAS("char-major-" __stringify(MCMUX_CMAJOR_0) "-" __stringify(TP_CMINOR));
+MODULE_ALIAS("char-major-" __stringify(CONFIG_STREAMS_CLONE_MAJOR) "-" __stringify(MCMUX_CMAJOR_0));
+MODULE_ALIAS("devname:mcmux");
 #endif				/* MODULE_ALIAS */
 #endif				/* LINUX */
 

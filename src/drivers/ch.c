@@ -86,8 +86,8 @@ static char const ident[] = "$RCSfile: ch.c,v $ $Name:  $($Revision: 1.1.2.3 $) 
 #include <sys/mxi.h>
 #include <sys/mxi_ioctl.h>
 
-#define CHMUX_DESCRIP	"CH (Channel) STREAMS MULTIPLEXING DRIVER."
-#define CHMUX_EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
+#define CHMUX_DESCRIP	"CH (Channel) STREAMS Multiplexing Driver"
+#define CHMUX_EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS"
 #define CHMUX_REVISION	"OpenSS7 $RCSfile: ch.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-09-02 08:46:32 $"
 #define CHMUX_COPYRIGHT	"Copyright (c) 2008-2013  Monavacon Limited.  All Rights Reserved."
 #define CHMUX_DEVICE	"Supports MX devices."
@@ -131,9 +131,7 @@ MODULE_ALIAS("streams-major-" __stringify(CONFIG_STREAMS_MXMUX_MAJOR));
 MODULE_ALIAS("/dev/streams/ch");
 MODULE_ALIAS("/dev/streams/ch/*");
 MODULE_ALIAS("/dev/streams/clone/ch");
-MODULE_ALIAS("char-major-" __stringify(CHMUX_CMAJOR_0));
-MODULE_ALIAS("char-major-" __stringify(CHMUX_CMAJOR_0) "-*");
-MODULE_ALIAS("char-major-" __stringify(CHMUX_CMAJOR_0) "-0");
+MODULE_ALIAS("char-major-" __stringify(CONFIG_STREAMS_CLONE_MAJOR) "-" __stringify(CHMUX_CMAJOR_0));
 MODULE_ALIAS("/dev/ch");
 MODULE_ALIAS("devname:ch");
 #endif				/* MODULE_ALIAS */

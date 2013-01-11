@@ -79,13 +79,15 @@ static char const ident[] = "$RCSfile: llc.c,v $ $Name:  $($Revision: 1.1.2.3 $)
 
 #include <sys/dlpi.h>
 
-#define DL_DESCRIP	"Data Link (DL) for IEEE 802.2 LLC STREAMS DRIVER."
+#define DL_DESCRIP	"Data Link (DL) for IEEE 802.2 LLC STREAMS Driver"
+#define DL_EXTRA	"Part of the OpenSS7 OSI Stack for Linux Fast-STREAMS"
 #define DL_REVISION	"OpenSS7 $RCSfile: llc.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-09-02 08:46:33 $"
 #define DL_COPYRIGHT	"Copyright (c) 2008-2013  Monavacon Limited.  All Rights Reserved."
-#define DL_DEVICE	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
+#define DL_DEVICE	"Part of the OpenSS7 Stack for Linux Fast-STREAMS"
 #define DL_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define DL_LICENSE	"GPL"
 #define DL_BANNER	DL_DESCRIP	"\n" \
+			DL_EXTRA	"\n" \
 			DL_REVISION	"\n" \
 			DL_COPYRIGHT	"\n" \
 			DL_DEVICE	"\n" \
@@ -107,9 +109,8 @@ MODULE_ALIAS("/dev/streams/llc");
 MODULE_ALIAS("/dev/streams/llc/*");
 MODULE_ALIAS("/dev/streams/clone/llc");
 MODULE_ALIAS("streams-llc");
-MODULE_ALIAS("char-major-" __stringify(LLC_CMAJOR_0));
-MODULE_ALIAS("char-major-" __stringify(LLC_CMAJOR_0) "-*");
-MODULE_ALIAS("char-major-" __stringify(LLC_CMAJOR_0) "-0");
+MODULE_ALIAS("char-major-" __stringify(CONFIG_STREAMS_CLONE_MAJOR) "-" __stringify(LLC_CMAJOR_0));
+MODULE_ALIAS("devname:llc");
 #endif				/* MODULE_ALIAS */
 #ifdef MODULE_VERSION
 MODULE_VERSION(PACKAGE_ENVR);

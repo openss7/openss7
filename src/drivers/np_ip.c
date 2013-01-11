@@ -147,7 +147,7 @@ static char const ident[] = "$RCSfile: np_ip.c,v $ $Name:  $($Revision: 1.1.2.11
 #include <sys/npi.h>
 #include <sys/npi_ip.h>
 
-#define NP_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
+#define NP_DESCRIP	"Internet Protocol (IP) Network Provider (NP_IP) STREAMS Driver"
 #define NP_EXTRA	"Part of the OpenSS7 stack for Linux Fast-STREAMS"
 #define NP_COPYRIGHT	"Copyright (c) 2008-2013  Monavacon Limited.  All Rights Reserved."
 #define NP_REVISION	"OpenSS7 $RCSfile: np_ip.c,v $ $Name:  $ ($Revision: 1.1.2.11 $) $Date: 2011-09-20 09:51:36 $"
@@ -192,9 +192,7 @@ MODULE_ALIAS("streams-major-" __stringify(CONFIG_STREAMS_NP_IP_MAJOR));
 MODULE_ALIAS("/dev/streams/np_ip");
 MODULE_ALIAS("/dev/streams/np_ip/*");
 MODULE_ALIAS("/dev/streams/clone/np_ip");
-MODULE_ALIAS("char-major-" __stringify(NP_CMAJOR_0));
-MODULE_ALIAS("char-major-" __stringify(NP_CMAJOR_0) "-*");
-MODULE_ALIAS("char-major-" __stringify(NP_CMAJOR_0) "-0");
+MODULE_ALIAS("char-major-" __stringify(CONFIG_STREAMS_CLONE_MAJOR) "-" __stringify(NP_CMAJOR_0));
 MODULE_ALIAS("/dev/np_ip");
 MODULE_ALIAS("devname:np_ip");
 #endif				/* defined MODULE_ALIAS */

@@ -70,12 +70,14 @@ static char const ident[] = "$RCSfile: m3ua_as.old.c,v $ $Name:  $($Revision: 1.
 #include <ss7/m3ua.h>
 #include <ss7/m3ua_ioctl.h>
 
-#define M3UA_DESCRIP	"M3UA/SCTP STREAMS MULTIPLEXOR."
+#define M3UA_DESCRIP	"M3UA/SCTP STREAMS Multiplexor"
+#define M3UA_EXTRA	"Part of the OpenSS7 SS7 Stack for Linux Fast-STREAMS"
 #define M3UA_COPYRIGHT	"Copyright (c) 2008-2011  Monavacon Limited.  All Rights Reserved."
-#define M3UA_DEVICES	"Supports OpenSS7 drivers."
+#define M3UA_DEVICES	"Supports OpenSS7 drivers"
 #define M3UA_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define M3UA_LICENSE	"GPL"
 #define M3UA_BANNER	M3UA_DESCRIP	"\n" \
+			M3UA_EXTRA	"\n" \
 			M3UA_COPYRIGHT	"\n" \
 			M3UA_DEVICES	"\n" \
 			M3UA_CONTACT	"\n"

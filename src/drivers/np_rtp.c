@@ -150,8 +150,8 @@ static char const ident[] = "$RCSfile: np_rtp.c,v $ $Name:  $($Revision: 1.1.2.5
 #include <sys/npi_ip.h>
 #include <sys/npi_udp.h>
 
-#define NP_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
-#define NP_EXTRA	"Part of the OpenSS7 stack for Linux Fast-STREAMS"
+#define NP_DESCRIP	"Real-Time Protocol (RTP) Network Provider (NP) STREAMS Driver"
+#define NP_EXTRA	"Part of the OpenSS7 VoIP Stack for Linux Fast-STREAMS"
 #define NP_COPYRIGHT	"Copyright (c) 2008-2013  Monavacon Limited.  All Rights Reserved."
 #define NP_REVISION	"OpenSS7 $RCSfile: np_rtp.c,v $ $Name:  $($Revision: 1.1.2.5 $) $Date: 2011-09-02 08:46:35 $"
 #define NP_DEVICE	"SVR 4.2 MP STREAMS NPI NP_RTP Network Provider"
@@ -195,9 +195,7 @@ MODULE_ALIAS("streams-major-" __stringify(CONFIG_STREAMS_NP_RTP_MAJOR));
 MODULE_ALIAS("/dev/streams/np_rtp");
 MODULE_ALIAS("/dev/streams/np_rtp/*");
 MODULE_ALIAS("/dev/streams/clone/np_rtp");
-MODULE_ALIAS("char-major-" __stringify(NP_CMAJOR_0));
-MODULE_ALIAS("char-major-" __stringify(NP_CMAJOR_0) "-*");
-MODULE_ALIAS("char-major-" __stringify(NP_CMAJOR_0) "-0");
+MODULE_ALIAS("char-major-" __stringify(CONFIG_STREAMS_CLONE_MAJOR) "-" __stringify(CONFIG_STREAMS_NP_RTP_MAJOR));
 MODULE_ALIAS("/dev/np_rtp");
 MODULE_ALIAS("devname:np_rtp");
 #endif				/* defined MODULE_ALIAS */

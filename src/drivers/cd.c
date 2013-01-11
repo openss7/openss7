@@ -92,7 +92,7 @@ static char const ident[] = "$RCSfile: cd.c,v $ $Name:  $($Revision: 1.1.2.4 $) 
 
 #include <sys/cdi.h>
 
-#define CD_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
+#define CD_DESCRIP	"OSI Communication Device Provider (CD) STREAMS Driver"
 #define CD_EXTRA	"Part of the OpenSS7 stack for Linux Fast-STREAMS"
 #define CD_COPYRIGHT	"Copyright (c) 2008-2013  Monavacon Limited.  All Rights Reserved."
 #define CD_REVISION	"OpenSS7 $RCSfile: cd.c,v $ $Name:  $ ($Revision: 1.1.2.4 $) $Date: 2011-09-02 08:46:32 $"
@@ -136,10 +136,7 @@ MODULE_ALIAS("streams-major-" __stringify(CONFIG_STREAMS_CD_MAJOR));
 MODULE_ALIAS("/dev/streams/cd");
 MODULE_ALIAS("/dev/streams/cd/*");
 MODULE_ALIAS("/dev/streams/clone/cd");
-MODULE_ALIAS("char-major-" __stringify(DL_CMAJOR_0));
-MODULE_ALIAS("char-major-" __stringify(DL_CMAJOR_0) "-*");
-MODULE_ALIAS("char-major-" __stringify(DL_CMAJOR_0) "-0");
-MODULE_ALIAS("char-major-" __stringify(DL_CMAJOR_0) "-" __stringify(DL_CMINOR));
+MODULE_ALIAS("char-major-" __stringify(CONFIG_STREAMS_CLONE_MAJOR) "-" __stringify(DL_CMAJOR_0));
 MODULE_ALIAS("/dev/cd");
 MODULE_ALIAS("devname:cd");
 #endif				/* MODULE_ALIAS */

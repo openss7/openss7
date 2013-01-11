@@ -89,14 +89,15 @@ static char const ident[] = "$RCSfile: sdlm.c,v $ $Name:  $($Revision: 1.1.2.3 $
 #include <ss7/sdli.h>
 #include <ss7/sdli_ioctl.h>
 
-#define SDLM_DESCRIP	"SS7/SDL: (Signalling Data Link) MULTIPLEXING STREAMS DRIVER." "\n" \
-			"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
+#define SDLM_DESCRIP	"SS7/SDL: (Signalling Data Link) Multiplexing STREAMS Driver"
+#define SDLM_EXTRA	"Part of the OpenSS7 SS7 Stack for Linux Fast-STREAMS"
 #define SDLM_REVISION	"OpenSS7 $RCSfile: sdlm.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-09-02 08:46:36 $"
 #define SDLM_COPYRIGHT	"Copyright (c) 2008-2011  Monavacon Limited.  All Rights Reserved."
 #define SDLM_DEVICE	"Supports OpenSS7 SDL Drivers."
 #define SDLM_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define SDLM_LICENSE	"GPL"
 #define SDLM_BANNER	SDLM_DESCRIP	"\n" \
+			SDLM_EXTRA	"\n" \
 			SDLM_REVISION	"\n" \
 			SDLM_COPYRIGHT	"\n" \
 			SDLM_DEVICE	"\n" \

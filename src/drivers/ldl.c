@@ -105,8 +105,8 @@ static char const ident[] = "$RCSfile: ldl.c,v $ $Name:  $($Revision: 1.1.2.8 $)
 
 #include <sys/ldl.h>
 
-#define LDL_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
-#define LDL_EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
+#define LDL_DESCRIP	"INET Data Link Provider (DLPI) NET4 STREAMS Driver"
+#define LDL_EXTRA	"Part of the OpenSS7 Protocol Stacks for Linux Fast-STREAMS"
 #define LDL_COPYRIGHT	"Copyright (c) 2008-2013  Monavacon Limited.  All Rights Reserved."
 #define LDL_REVISION	"LfS $RCSfile: ldl.c,v $ $Name:  $ ($Revision: 1.1.2.8 $) $Date: 2011-09-20 09:51:35 $"
 #define LDL_DEVICE	"SVR 4.2 MP STREAMS INET DLPI Drivers (NET4)"
@@ -153,9 +153,7 @@ MODULE_ALIAS("streams-major-" __stringify(CONFIG_STREAMS_LDL_MAJOR));
 MODULE_ALIAS("/dev/streams/link-dri");
 MODULE_ALIAS("/dev/streams/link-dri/*");
 MODULE_ALIAS("/dev/streams/clone/link-dri");
-MODULE_ALIAS("char-major-" __stringify(LDL_CMAJOR_0));
-MODULE_ALIAS("char-major-" __stringify(LDL_CMAJOR_0) "-*");
-MODULE_ALIAS("char-major-" __stringify(LDL_CMAJOR_0) "-0");
+MODULE_ALIAS("char-major-" __stringify(CONFIG_STREAMS_CLONE_MAJOR) "-" __stringify(LDL_CMAJOR_0));
 MODULE_ALIAS("/dev/ldl");
 MODULE_ALIAS("devname:ldl");
 #endif				/* MODULE_ALIAS */

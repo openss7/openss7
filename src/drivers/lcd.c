@@ -87,7 +87,7 @@ static char const ident[] = "$RCSfile: lcd.c,v $ $Name:  $($Revision: 1.1.2.3 $)
 #include <sys/strsun.h>		/* For SUN convenience macros. */
 #include <sys/cdi.h>		/* For CDI interface definitions. */
 
-#define	LCD_DESCRIP	"SVR 4.2 COMMUNICATIONS DEVICE DRIVER FOR LINUX FAST-STREAMS"
+#define	LCD_DESCRIP	"SVR 4.2 Communications Device Driver for Linux Fast-STREAMS"
 #define	LCD_EXTRA	"Part of X/Open Network Services for Linux Fast-STREAMS"
 #define	LCD_COPYRIGHT	"Copyright (c) 2008-2013  Monavacon Limited.  All Rights Reserved."
 #define	LCD_REVISION	"OpenSS7 $RCSfile: lcd.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-09-02 08:46:33 $"
@@ -123,23 +123,13 @@ MODULE_ALIAS("/dev/streams/lcd/sdlc");
 MODULE_ALIAS("/dev/streams/lcd/mac");
 MODULE_ALIAS("/dev/streams/lcd/lan");
 MODULE_ALIAS("/dev/streams/clone/lcd");
-MODULE_ALIAS("char-major-" __stringify(LCD_CMAJOR_0));
-MODULE_ALIAS("char-major-" __stringify(LCD_CMAJOR_0) "-*");
-MODULE_ALIAS("char-major-" __stringify(LCD_CMAJOR_0) "-0");
-MODULE_ALIAS("char-major-" __stringify(LCD_CMAJOR_0) "-1");
-MODULE_ALIAS("char-major-" __stringify(LCD_CMAJOR_0) "-2");
-MODULE_ALIAS("char-major-" __stringify(LCD_CMAJOR_0) "-3");
-MODULE_ALIAS("char-major-" __stringify(LCD_CMAJOR_0) "-4");
+MODULE_ALIAS("char-major-" __stringify(CONFIG_STREAMS_CLONE_MAJOR) "-" __stringify(LCD_CMAJOR_0));
 MODULE_ALIAS("/dev/lcd");
+MODULE_ALIAS("devname:lcd");
 MODULE_ALIAS("/dev/hdlc");
 MODULE_ALIAS("/dev/sdlc");
 MODULE_ALIAS("/dev/lan");
 MODULE_ALIAS("/dev/mac");
-MODULE_ALIAS("devname:lcd");
-MODULE_ALIAS("devname:hdlc");
-MODULE_ALIAS("devname:sdlc");
-MODULE_ALIAS("devname:lan");
-MODULE_ALIAS("devname:mac");
 #endif				/* MODULE_ALIAS */
 #ifdef MODULE_VERSION
 MODULE_VERSION(PACKAGE_ENVR);

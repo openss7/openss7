@@ -84,12 +84,14 @@ static char const ident[] = "$RCSfile: sua.c,v $ $Name:  $($Revision: 1.1.2.3 $)
  *  for both SG and AS use by the UA/LM control stream.
  */
 
-#define SUA_DESCRIP	"SUA STREAMS MULTIPLEXING DRIVER."
+#define SUA_DESCRIP	"SUA STREAMS Multiplexing Driver"
+#define SUA_EXTRA	"Part of the OpenSS7 SS7 Stack for Linux Fast-STREAMS"
 #define SUA_COPYRIGHT	"Copyright (c) 2008-2011  Monavacon Limited.  All Rights Reserved."
 #define SUA_DEVICE	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define SUA_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define SUA_LICENSE	"GPL"
 #define SUA_BANNER	SUA_DESCRIP	"\n" \
+			SUA_EXTRA	"\n" \
 			SUA_COPYRIGHT	"\n" \
 			SUA_DEVICE	"\n" \
 			SUA_CONTACT	"\n"

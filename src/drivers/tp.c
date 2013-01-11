@@ -115,8 +115,8 @@ typedef unsigned int socklen_t;
 
 #include <sys/xti.h>
 
-#define TP_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
-#define TP_EXTRA	"Part of the OpenSS7 stack for Linux Fast-STREAMS"
+#define TP_DESCRIP	"OSI Transport Provider (TP) STREAMS Driver"
+#define TP_EXTRA	"Part of the OpenSS7 OSI Stack for Linux Fast-STREAMS"
 #define TP_COPYRIGHT	"Copyright (c) 2008-2013  Monavacon Limited.  All Rights Reserved."
 #define TP_REVISION	"OpenSS7 $RCSfile: tp.c,v $ $Name:  $ ($Revision: 1.1.2.4 $) $Date: 2011-09-02 08:46:37 $"
 #define TP_DEVICE	"SVR 4.2 MP STREAMS TPI OSI Transport Provider Driver"
@@ -162,20 +162,14 @@ MODULE_ALIAS("streams-major-" __stringify(CONFIG_STREAMS_TP_MAJOR));
 MODULE_ALIAS("/dev/streams/tp");
 MODULE_ALIAS("/dev/streams/tp/*");
 MODULE_ALIAS("/dev/streams/clone/tp");
-MODULE_ALIAS("char-major-" __stringify(TP_CMAJOR_0));
-MODULE_ALIAS("char-major-" __stringify(TP_CMAJOR_0) "-*");
-MODULE_ALIAS("char-major-" __stringify(TP_CMAJOR_0) "-0");
-MODULE_ALIAS("char-major-" __stringify(TP_CMAJOR_0) "-" __stringify(TP_CMINOR));
+MODULE_ALIAS("char-major-" __stringify(CONFIG_STREAMS_CLONE_MAJOR) "-" __stringify(TP_CMAJOR_0));
+MODULE_ALIAS("/dev/tp");
+MODULE_ALIAS("devname:tp");
 MODULE_ALIAS("/dev/tp0");
 MODULE_ALIAS("/dev/tp1");
 MODULE_ALIAS("/dev/tp2");
 MODULE_ALIAS("/dev/tp4_cons");
 MODULE_ALIAS("/dev/tp4_clns");
-MODULE_ALIAS("devname:tp0");
-MODULE_ALIAS("devname:tp1");
-MODULE_ALIAS("devname:tp2");
-MODULE_ALIAS("devname:tp4_cons");
-MODULE_ALIAS("devname:tp4_clns");
 #endif				/* MOUDLE_ALIAS */
 #endif				/* LINUX */
 

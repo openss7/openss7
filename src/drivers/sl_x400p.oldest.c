@@ -95,12 +95,14 @@ static char const ident[] = "$RCSfile: sl_x400p.oldest.c,v $ $Name:  $($Revision
 #include "x400p-ss7/x400pfw.h"	/* X400P-SS7 firmware load */
 #endif
 
-#define SL_X400P_DESCRIP	"E/T400P-SS7: SS7/SL (Signalling Link) STREAMS DRIVER."
+#define SL_X400P_DESCRIP	"E/T400P-SS7: SS7/SL (Signalling Link) STREAMS Driver"
+#define SL_X400P_EXTRA		"Part of the OpenSS7 Stack for Linux Fast-STREAMS"
 #define SL_X400P_COPYRIGHT	"Copyright (c) 2008-2010  Monavacon Limited.  All Rights Reserved."
 #define SL_X400P_DEVICE		"Supports the T/E400P-SS7 T1/E1 PCI boards."
 #define SL_X400P_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define SL_X400P_LICENSE	"GPL"
 #define SL_X400P_BANNER		SL_X400P_DESCRIP	"\n" \
+				SL_X400P_EXTRA	"\n" \
 				SL_X400P_COPYRIGHT	"\n" \
 				SL_X400P_DEVICE	"\n" \
 				SL_X400P_CONTACT	"\n"

@@ -132,19 +132,21 @@ static char const ident[] = "$RCSfile: isua_as.c,v $ $Name:  $($Revision: 1.1.2.
 
 /* ============================== */
 
-#define ISUA_AS_DESCRIP	"ISUA/SCTP AS MTP STREAMS MULTIPLEXING DRIVER."
+#define ISUA_AS_DESCRIP		"ISUA/SCTP AS MTP STREAMS Multiplexing Driver"
+#define ISUA_AS_EXTRA		"Part of the OpenSS7 ISDN Stack for Linux Fast-STREAMS"
 #define ISUA_AS_REVISION	"OpenSS7 $RCSfile: isua_as.c,v $ $Name:  $ ($Revision: 1.1.2.5 $) $Date: 2011-09-20 09:51:35 $"
 #define ISUA_AS_COPYRIGHT	"Copyright (c) 2008-2011  Monavacon Limited.  All Rights Reserved."
-#define ISUA_AS_DEVICE	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
-#define ISUA_AS_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
-#define ISUA_AS_LICENSE	"GPL"
-#define ISUA_AS_BANNER	ISUA_AS_DESCRIP	"\n" \
-			ISUA_AS_REVISION	"\n" \
-			ISUA_AS_COPYRIGHT	"\n" \
-			ISUA_AS_DEVICE	"\n" \
-			ISUA_AS_CONTACT	"\n"
-#define ISUA_AS_SPLASH	ISUA_AS_DESCRIP	" - " \
-			ISUA_AS_REVISION	"\n"
+#define ISUA_AS_DEVICE		"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
+#define ISUA_AS_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
+#define ISUA_AS_LICENSE		"GPL"
+#define ISUA_AS_BANNER		ISUA_AS_DESCRIP		"\n" \
+				ISUA_AS_EXTRA		"\n" \
+				ISUA_AS_REVISION	"\n" \
+				ISUA_AS_COPYRIGHT	"\n" \
+				ISUA_AS_DEVICE		"\n" \
+				ISUA_AS_CONTACT		"\n"
+#define ISUA_AS_SPLASH		ISUA_AS_DESCRIP		" - " \
+				ISUA_AS_REVISION	"\n"
 
 #ifdef LINUX
 MODULE_AUTHOR(ISUA_AS_CONTACT);

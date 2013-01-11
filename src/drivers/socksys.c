@@ -117,13 +117,15 @@ static char const ident[] = "$RCSfile: socksys.c,v $ $Name:  $($Revision: 1.1.2.
 
 #include <sys/socksys.h>
 
-#define SOCKSYS_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
+#define SOCKSYS_DESCRIP		"SVR 4.2 Socket System (SOCKSYS) STREAMS Driver"
+#define SOCKSYS_EXTRA		"Part of UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define SOCKSYS_COPYRIGHT	"Copyright (c) 2008-2013  Monavacon Limited.  All Rights Reserved."
 #define SOCKSYS_REVISION	"OpenSS7 $RCSfile: socksys.c,v $ $Name:  $($Revision: 1.1.2.6 $) $Date: 2011-09-20 09:51:37 $"
 #define SOCKSYS_DEVICE		"SVR 4.2 MP STREAMS Socket System Driver (SOCKSYS)"
 #define SOCKSYS_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define SOCKSYS_LICENSE		"GPL"
 #define SOCKSYS_BANNER		SOCKSYS_DESCRIP		"\n" \
+				SOCKSYS_EXTRA		"\n" \
 				SOCKSYS_COPYRIGHT	"\n" \
 				SOCKSYS_REVISION	"\n" \
 				SOCKSYS_DEVICE		"\n" \
@@ -152,9 +154,7 @@ MODULE_ALIAS("streams-major-" __stringify(CONFIG_STREAMS_SOCKSYS_MAJOR));
 MODULE_ALIAS("/dev/streams/socksys");
 MODULE_ALIAS("/dev/streams/socksys/*");
 MODULE_ALIAS("/dev/streams/clone/socksys");
-MODULE_ALIAS("char-major-" __stringify(SOCKSYS_CMAJOR_0));
-MODULE_ALIAS("char-major-" __stringify(SOCKSYS_CMAJOR_0) "-*");
-MODULE_ALIAS("char-major-" __stringify(SOCKSYS_CMAJOR_0) "-0");
+MODULE_ALIAS("char-major-" __stringify(CONFIG_STREAMS_CLONE_MAJOR) "-" __stringify(SOCKSYS_CMAJOR_0));
 MODULE_ALIAS("/dev/socksys");
 MODULE_ALIAS("devname:socksys");
 #endif				/* MODULE_ALIAS */

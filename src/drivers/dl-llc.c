@@ -108,7 +108,7 @@ static char const ident[] = "$RCSfile: dl-llc.c,v $ $Name:  $($Revision: 1.1.2.5
 #include <linux/netdevice.h>
 #include <net/protocol.h>
 
-#define LLC_DESCRIP	"UNIX SVR 4.2 LLC DRIVER FOR LINUX FAST-STREAMS"
+#define LLC_DESCRIP	"UNIX SVR 4.2 LLC Driver for Linux Fast-STREAMS"
 #define LLC_EXTRA	"Part of the OpenSS7 X.25 Stack for Linux Fast-STREAMS"
 #define LLC_COPYRIGHT	"Copyright (c) 2008-2013  Monavacon Limited.  All Rights Reserved."
 #define LLC_REVISION	"OpenSS7 $RCSfile: dl-llc.c,v $ $Name:  $($Revision: 1.1.2.5 $) $Date: 2011-09-02 08:46:32 $"
@@ -152,25 +152,13 @@ MODULE_ALIAS("/dev/streams/llc/tpb");
 MODULE_ALIAS("/dev/streams/llc/tpr");
 MODULE_ALIAS("/dev/streams/llc/fddi");
 MODULE_ALIAS("/dev/streams/clone/llc");
-MODULE_ALIAS("char-major-" __stringify(LLC_MAJOR_0));
-MODULE_ALIAS("char-major-" __stringify(LLC_MAJOR_0) "-*");
-MODULE_ALIAS("char-major-" __stringify(LLC_MAJOR_0) "-0");
-MODULE_ALIAS("char-major-" __stringify(LLC_MAJOR_0) "-1");
-MODULE_ALIAS("char-major-" __stringify(LLC_MAJOR_0) "-2");
-MODULE_ALIAS("char-major-" __stringify(LLC_MAJOR_0) "-3");
-MODULE_ALIAS("char-major-" __stringify(LLC_MAJOR_0) "-4");
-MODULE_ALIAS("char-major-" __stringify(LLC_MAJOR_0) "-5");
-MODULE_ALIAS("char-major-" __stringify(LLC_MAJOR_0) "-" __stringify(LLC_CMINOR));
+MODULE_ALIAS("char-major-" __stringify(CONFIG_STREAMS_CLONE_MAJOR) "-" __stringify(LLC_MAJOR_0));
+MODULE_ALIAS("devname:llc");
 MODULE_ALIAS("/dev/eth");
 MODULE_ALIAS("/dev/llc");
 MODULE_ALIAS("/dev/tpb");
 MODULE_ALIAS("/dev/tpr");
 MODULE_ALIAS("/dev/fddi");
-MODULE_ALIAS("devname:eth");
-MODULE_ALIAS("devname:llc");
-MODULE_ALIAS("devname:tpb");
-MODULE_ALIAS("devname:tpr");
-MODULE_ALIAS("devname:fddi");
 #endif				/* MODULE_ALIAS */
 #ifdef MODULE_VERSION
 MODULE_VERSION(PACKAGE_ENVR);

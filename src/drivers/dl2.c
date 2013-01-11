@@ -92,8 +92,8 @@ static char const ident[] = "$RCSfile: dl2.c,v $ $Name:  $($Revision: 1.1.2.3 $)
 #include <sys/os7/compat.h>
 #include <sys/dlpi.h>
 #include <linux/netdevice.h>
-#define ND_DESCRIP	"NETDEV (DL) STREAMS MULTIPLEXING DRIVER."
-#define ND_EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
+#define ND_DESCRIP	"NETDEV (DL) STREAMS Multiplexing Driver"
+#define ND_EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS"
 #define ND_REVISION	"OpenSS7 $RCSfile: dl2.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-09-02 08:46:32 $"
 #define ND_COPYRIGHT	"Copyright (c) 2008-2013  Monavacon Limited.  All Rights Reserved."
 #define ND_DEVICE	"Supports Linux HDLC devices."
@@ -136,9 +136,7 @@ MODULE_ALIAS("streams-major-" __stringify(CONFIG_STREAMS_ND_MAJOR));
 MODULE_ALIAS("/dev/streams/nd");
 MODULE_ALIAS("/dev/streams/nd/*");
 MODULE_ALIAS("/dev/streams/clone/nd");
-MODULE_ALIAS("char-major-" __stringify(ND_CMAJOR_0));
-MODULE_ALIAS("char-major-" __stringify(ND_CMAJOR_0) "-*");
-MODULE_ALIAS("char-major-" __stringify(ND_CMAJOR_0) "-0");
+MODULE_ALIAS("char-major-" __stringify(CONFIG_STREAMS_CLONE_MAJOR) "-" __stringify(ND_CMAJOR_0));
 MODULE_ALIAS("/dev/nd");
 MODULE_ALIAS("devname:nd");
 #endif				/* MODULE_ALIAS */

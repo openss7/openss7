@@ -272,11 +272,11 @@ static char const ident[] = "$RCSfile: x400p.c,v $ $Name:  $($Revision: 1.1.2.3 
 #include <v401pfw.h>
 #endif
 
-#define MX_X400P_DESCRIP    "X400P: MX (Multiplex) STREAMS DRIVER."
-#define MX_X400P_EXTRA		"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
+#define MX_X400P_DESCRIP	"X400P: MX (Multiplex) STREAMS Driver"
+#define MX_X400P_EXTRA		"Part of the OpenSS7 Stack for Linux Fast-STREAMS"
 #define MX_X400P_REVISION	"OpenSS7 $RCSfile: x400p.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-09-02 08:46:39 $"
 #define MX_X400P_COPYRIGHT	"Copyright (c) 2008-2013  Monavacon Limited.  All Rights Reserved."
-#define MX_X400P_DEVICE		"Supports the X40XP E1/T1/J1 (Tormenta II/III) PCI boards."
+#define MX_X400P_DEVICE		"Supports the X40XP E1/T1/J1 (Tormenta II/III) PCI boards"
 #define MX_X400P_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define MX_X400P_LICENSE	"GPL"
 #define MX_X400P_BANNER		MX_X400P_DESCRIP	"\n" \
@@ -317,9 +317,7 @@ MODULE_ALIAS("streams-major-" __stringify(CONFIG_STREAMS_MX_X400P_MAJOR));
 MODULE_ALIAS("/dev/streams/x400p-mx");
 MODULE_ALIAS("/dev/streams/x400p-mx/*");
 MODULE_ALIAS("/dev/streams/clone/x400p-mx");
-MODULE_ALIAS("char-major-" __stringify(MX_X400P_CMAJOR_0));
-MODULE_ALIAS("char-major-" __stringify(MX_X400P_CMAJOR_0) "-*");
-MODULE_ALIAS("char-major-" __stringify(MX_X400P_CMAJOR_0) "-0");
+MODULE_ALIAS("char-major-" __stringify(CONFIG_STREAMS_CLONE_MAJOR) "-" __stringify(MX_X400P_CMAJOR_0));
 MODULE_ALIAS("/dev/x400p-mx");
 MODULE_ALIAS("devname:x400p-mx");
 #endif				/* MODULE_ALIAS */
@@ -443,13 +441,13 @@ STATIC struct pci_device_id xp_pci_tbl[] __devinitdata = {
 #ifdef MODULE_DEVICE_TABLE
 MODULE_DEVICE_TABLE(pci, xp_pci_tbl);
 #ifdef MODULE_ALIAS
-MODULE_ALIAS("pci:v000010B5d000009030sv*sd*bc06sc80i*");
-MODULE_ALIAS("pci:v000010B5d000003001sv*sd*bc06sc80i*");
-MODULE_ALIAS("pci:v000010B5d00000D00Dsv*sd*bc06sc80i*");
-MODULE_ALIAS("pci:v000010B5d000000557sv*sd*bc06sc80i*");
-MODULE_ALIAS("pci:v000010B5d000004000sv*sd*bc06sc80i*");
-MODULE_ALIAS("pci:v000010B5d00000D33Dsv*sd*bc06sc80i*");
-MODULE_ALIAS("pci:v000010B5d00000D44Dsv*sd*bc06sc80i*");
+MODULE_ALIAS("pci:v000010B5d00009030sv*sd*bc06sc80i*");
+MODULE_ALIAS("pci:v000010B5d00003001sv*sd*bc06sc80i*");
+MODULE_ALIAS("pci:v000010B5d0000D00Dsv*sd*bc06sc80i*");
+MODULE_ALIAS("pci:v000010B5d00000557sv*sd*bc06sc80i*");
+MODULE_ALIAS("pci:v000010B5d00004000sv*sd*bc06sc80i*");
+MODULE_ALIAS("pci:v000010B5d0000D33Dsv*sd*bc06sc80i*");
+MODULE_ALIAS("pci:v000010B5d0000D44Dsv*sd*bc06sc80i*");
 #endif				/* MODULE_ALIAS */
 #endif				/* MODULE_DEVICE_TABLE */
 

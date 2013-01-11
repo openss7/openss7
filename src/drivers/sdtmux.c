@@ -83,12 +83,14 @@ static char const ident[] = "$RCSfile: sdtmux.c,v $ $Name:  $($Revision: 1.1.2.3
 #include <ss7/sdti.h>
 #include <ss7/sdti_ioctl.h>
 
-#define SDTM_DESCRIP	"SIGNALLING DATA TERMINAL (SDT) STREAMS MULTIPLEXING DRIVER."
+#define SDTM_DESCRIP	"Signalling Data Terminal (SDT) STREAMS Multiplexing Driver"
+#define SDTM_EXTRA	"Part of the OpenSS7 SS7 Stack for Linux Fast-STREAMS"
 #define SDTM_COPYRIGHT	"Copyright (c) 2008-2011  Monavacon Limited.  All Rights Reserved."
 #define SDTM_DEVICE	"Part of the OpenSS7 Stack for STREAMS."
 #define SDTM_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define SDTM_LICENSE	"GPL"
 #define SDTM_BANNER	SDTM_DESCRIP	"\n" \
+			SDTM_EXTRA	"\n" \
 			SDTM_COPYRIGHT	"\n" \
 			SDTM_DEVICE	"\n" \
 			SDTM_CONTACT

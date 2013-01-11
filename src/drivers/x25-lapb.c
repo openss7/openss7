@@ -83,7 +83,7 @@ static char const ident[] =
 
 #include <sys/os7/compat.h>
 
-#define LAPB_DESCRIP	"SVR 4.2 DLPI X25-LAPB DRIVER FOR LINUX FAST-STREAMS"
+#define LAPB_DESCRIP	"SVR 4.2 DLPI X25-LAPB Driver for Linux Fast-STREAMS"
 #define LAPB_EXTRA      "Part of the OpenSS7 X.25 Stack for Linux Fast-STREAMS"
 #define LAPB_COPYRIGHT	"Copyright (c) 2008-2013  Monavacon Limited.  All Rights Reserved."
 #define LAPB_REVISION	"OpenSS7 $RCSfile: x25-lapb.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2011-09-02 08:46:39 $"
@@ -122,9 +122,7 @@ MODULE_ALIAS("streams-major-" __stringify(CONFIG_STREAMS_LAPB_MAJOR));
 MODULE_ALIAS("/dev/streams/lapb");
 MODULE_ALIAS("/dev/streams/lapb/*");
 MODULE_ALIAS("/dev/streams/clone/lapb");
-MODULE_ALIAS("char-major-" __stringify(CONFIG_STREAMS_LAPB_MAJOR));
-MODULE_ALIAS("char-major-" __stringify(CONFIG_STREAMS_LAPB_MAJOR) "-*");
-MODULE_ALIAS("char-major-" __stringify(CONFIG_STREAMS_LAPB_MAJOR) "-0");
+MODULE_ALIAS("char-major-" __stringify(CONFIG_STREAMS_CLONE_MAJOR) "-" __stringify(CONFIG_STREAMS_LAPB_MAJOR));
 MODULE_ALIAS("/dev/lapb");
 MODULE_ALIAS("devname:lapb");
 #endif				/* MODULE_ALIAS */

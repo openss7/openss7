@@ -87,8 +87,8 @@ static char const ident[] = "$RCSfile: cddev.c,v $ $Name:  $($Revision: 1.1.2.4 
 #include <sys/strsun.h>		/* For SUN convenience macros. */
 #include <sys/cdi.h>		/* For CDI interface definitions. */
 
-#define CDDEV_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
-#define CDDEV_EXTRA	"Part of the OpenSS7 X/Open Networking Serivces for Linux Fast-STREAMS"
+#define CDDEV_DESCRIP	"Communication Device Interface (CDI) Provider STREAMS Driver"
+#define CDDEV_EXTRA	"Part of the OpenSS7 XNS Stack for Linux Fast-STREAMS"
 #define CDDEV_COPYRIGHT	"Copyright (c) 2008-2013  Monavacon Limited.  All Rights Reserved."
 #define CDDEV_REVISION	"OpenSS7 $RCSfile: cddev.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2011-09-02 08:46:32 $"
 #define CDDEV_DEVICE	"SVR 4.2 MP STREAMS CDI Communication Device Interface Provider"
@@ -123,9 +123,7 @@ MODULE_ALIAS("streams-major-" __stringify(CDDEV_CMAJOR_0));
 MODULE_ALIAS("/dev/streams/cddev");
 MODULE_ALIAS("/dev/streams/cddev/*");
 MODULE_ALIAS("/dev/streams/clone/cddev");
-MODULE_ALIAS("char-major-" __stringify(CDDEV_CMAJOR_0));
-MODULE_ALIAS("char-major-" __stringify(CDDEV_CMAJOR_0) "-*");
-MODULE_ALIAS("char-major-" __stringify(CDDEV_CMAJOR_0) "-0");
+MODULE_ALIAS("char-major-" __stringify(CONFIG_STREAMS_CLONE_MAJOR) "-" __stringify(CDDEV_CMAJOR_0));
 MODULE_ALIAS("/dev/cddev");
 MODULE_ALIAS("devname:cddev");
 #endif				/* MODULE_ALIAS */

@@ -97,13 +97,15 @@ static char const ident[] = "$RCSfile: vf.c,v $ $Name:  $($Revision: 1.1.2.5 $) 
 
 #include "sys/config.h"
 
-#define VF_DESCRIP	"UNIX/SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
+#define VF_DESCRIP	"SVR 4.2 STREAMS Verification (VF) Driver"
+#define VF_EXTRA	"Part of UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define VF_COPYRIGHT	"Copyright (c) 2008-2013  Monavacon Limited.  All Rights Reserved."
 #define VF_REVISION	"LfS $RCSfile: vf.c,v $ $Name:  $ ($Revision: 1.1.2.5 $) $Date: 2011-09-02 08:46:38 $"
 #define VF_DEVICE	"SVR 4.2 MP STREAMS Verification Driver (VF)"
 #define VF_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define VF_LICENSE	"GPL"
 #define VF_BANNER	VF_DESCRIP	"\n" \
+			VF_EXTRA	"\n" \
 			VF_COPYRIGHT	"\n" \
 			VF_REVISION	"\n" \
 			VF_DEVICE	"\n" \
@@ -158,7 +160,7 @@ module_param(major, uint, 0444);
 MODULE_PARM_DESC(major, "Major device number for STREAMS-vf driver.");
 
 #ifdef MODULE_ALIAS
-MODULE_ALIAS("char-major-" __stringify(CONFIG_STREAMS_VF_MAJOR) "-*");
+MODULE_ALIAS("char-major-" __stringify(CONFIG_STREAMS_CLONE_MAJOR) "-" __stringify(CONFIG_STREAMS_VF_MAJOR));
 MODULE_ALIAS("/dev/vf");
 MODULE_ALIAS("devname:vf");
 MODULE_ALIAS("streams-major-" __stringify(CONFIG_STREAMS_VF_MAJOR));

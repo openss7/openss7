@@ -119,8 +119,8 @@ static char const ident[] = "$RCSfile: tcap.c,v $ $Name:  $($Revision: 1.1.2.6 $
 #include <ss7/tcap.h>
 #include <ss7/tcap_ioctl.h>
 
-#define TCAP_DESCRIP	"SS7 TRANSACTION CAPABILITIES APPLICATION PART (TCAP) STREAMS MULTIPLEXING DRIVER."
-#define TCAP_EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS"
+#define TCAP_DESCRIP	"SS7 Transaction Capabilities Application Part (TCAP) STREAMS Multiplexing Driver"
+#define TCAP_EXTRA	"Part of the OpenSS7 SS7 Stack for Linux Fast-STREAMS"
 #define TCAP_REVISION	"OpenSS7 $RCSfile: tcap.c,v $ $Name:  $ ($Revision: 1.1.2.6 $) $Date: 2011-09-20 09:51:37 $"
 #define TCAP_COPYRIGHT	"Copyright (c) 2008-2011  Monavacon Limited.  All Rights Reserved."
 #define TCAP_DEVICE	"Supports OpenSS7 SCCP NPI Interface Pseudo-Device Drivers."

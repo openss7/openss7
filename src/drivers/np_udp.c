@@ -147,8 +147,8 @@ static char const ident[] = "$RCSfile: np_udp.c,v $ $Name:  $($Revision: 1.1.2.1
 #include <sys/npi_ip.h>
 #include <sys/npi_udp.h>
 
-#define NP_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
-#define NP_EXTRA	"Part of the OpenSS7 stack for Linux Fast-STREAMS"
+#define NP_DESCRIP	"User Datagram Protocol (UDP) Network Provider (NP_UDP) STREAMS Driver"
+#define NP_EXTRA	"Part of the OpenSS7 IP Stack for Linux Fast-STREAMS"
 #define NP_COPYRIGHT	"Copyright (c) 2008-2013  Monavacon Limited.  All Rights Reserved."
 #define NP_REVISION	"OpenSS7 $RCSfile: np_udp.c,v $ $Name:  $($Revision: 1.1.2.10 $) $Date: 2011-09-20 09:51:36 $"
 #define NP_DEVICE	"SVR 4.2 MP STREAMS NPI NP_UDP Network Provider"
@@ -192,9 +192,7 @@ MODULE_ALIAS("streams-major-" __stringify(CONFIG_STREAMS_NP_UDP_MAJOR));
 MODULE_ALIAS("/dev/streams/np_udp");
 MODULE_ALIAS("/dev/streams/np_udp/*");
 MODULE_ALIAS("/dev/streams/clone/np_udp");
-MODULE_ALIAS("char-major-" __stringify(NP_CMAJOR_0));
-MODULE_ALIAS("char-major-" __stringify(NP_CMAJOR_0) "-*");
-MODULE_ALIAS("char-major-" __stringify(NP_CMAJOR_0) "-0");
+MODULE_ALIAS("char-major-" __stringify(CONFIG_STREAMS_CLONE_MAJOR) "-" __stringify(NP_CMAJOR_0));
 MODULE_ALIAS("/dev/np_udp");
 MODULE_ALIAS("devname:np_udp");
 #endif				/* defined MODULE_ALIAS */

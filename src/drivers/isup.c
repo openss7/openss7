@@ -104,13 +104,15 @@ static char const ident[] = "$RCSfile: isup.c,v $ $Name:  $($Revision: 1.1.2.8 $
 #include <ss7/isupi.h>
 #include <ss7/isupi_ioctl.h>
 
-#define ISUP_DESCRIP	"ISUP STREAMS MULTIPLEXING DRIVER."
+#define ISUP_DESCRIP	"ISUP STREAMS Multiplexing Driver"
+#define ISUP_EXTRA	"Part of the OpenSS7 SS7 Stack for Linux Fast-STREAMS"
 #define ISUP_REVISION	"LfS $RCSfile: isup.c,v $ $Name:  $($Revision: 1.1.2.8 $) $Date: 2011-09-02 08:46:33 $"
 #define ISUP_COPYRIGHT	"Copyright (c) 2008-2011  Monavacon Limited.  All Rights Reserved."
 #define ISUP_DEVICE	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define ISUP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define ISUP_LICENSE	"GPL"
 #define ISUP_BANNER	ISUP_DESCRIP	"\n" \
+			ISUP_EXTRA	"\n" \
 			ISUP_REVISION	"\n" \
 			ISUP_COPYRIGHT	"\n" \
 			ISUP_DEVICE	"\n" \

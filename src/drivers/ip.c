@@ -131,7 +131,7 @@ typedef unsigned int socklen_t;
 #include <sys/npi.h>
 #include <sys/npi_ip.h>
 
-#define IP_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
+#define IP_DESCRIP	"Internet Protocol (IP) Network Provider STREAMS Driver"
 #define IP_EXTRA	"Part of the OpenSS7 stack for Linux Fast-STREAMS"
 #define IP_COPYRIGHT	"Copyright (c) 2008-2013  Monavacon Limited.  All Rights Reserved."
 #define IP_REVISION	"OpenSS7 $RCSfile: ip.c,v $ $Name:  $($Revision: 1.1.2.9 $) $Date: 2011-09-02 08:46:33 $"
@@ -176,10 +176,7 @@ MODULE_ALIAS("streams-major-" __stringify(CONFIG_STREAMS_IP_MAJOR));
 MODULE_ALIAS("/dev/streams/ip");
 MODULE_ALIAS("/dev/streams/ip/*");
 MODULE_ALIAS("/dev/streams/clone/ip");
-MODULE_ALIAS("char-major-" __stringify(IP_CMAJOR_0));
-MODULE_ALIAS("char-major-" __stringify(IP_CMAJOR_0) "-*");
-MODULE_ALIAS("char-major-" __stringify(IP_CMAJOR_0) "-0");
-MODULE_ALIAS("char-major-" __stringify(IP_CMAJOR_0) "-" __stringify(IP_CMINOR));
+MODULE_ALIAS("char-major-" __stringify(CONFIG_STREAMS_CLONE_MAJOR) "-" __stringify(IP_CMAJOR_0));
 MODULE_ALIAS("/dev/ip");
 MODULE_ALIAS("devname:ip");
 #endif				/* MODULE_ALIAS */

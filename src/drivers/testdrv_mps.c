@@ -84,8 +84,8 @@ static char const ident[] = "$RCSfile: testdrv_mps.c,v $ $Name:  $($Revision: 1.
 #include <sys/os7/compat.h>
 
  /* This is simply defines for use with Linux module functions. */
-#define TD_MPS_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
-#define TD_MPS_EXTRA		"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
+#define TD_MPS_DESCRIP		"MPS Compatiblity TEST (TEST-DRV-MPS) STREAMS Driver"
+#define TD_MPS_EXTRA		"Part of UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define TD_MPS_COPYRIGHT	"Copyright (c) 2008-2013  Monavacon Limited.  All Rights Reserved."
 #define TD_MPS_REVISION		"OpenSS7 $RCSfile: testdrv_mps.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-09-02 08:46:37 $"
 #define TD_MPS_DEVICE		"MPS Compatability TEST Driver (TEST-DRV-MPS)"
@@ -128,19 +128,10 @@ MODULE_VERSION(PACKAGE_ENVR);
 #if defined MODULE_ALIAS
  /* autoload kernel module by driver id */
 MODULE_ALIAS("streams-modid-" __stringify(CONFIG_STREAMS_TD_MPS_MODID));
- /* autoload kernel module by driver name */
 MODULE_ALIAS("streams-driver-testdrv-mps");
- /* autoload kernel module by specfs device node */
 MODULE_ALIAS("/dev/streams/testdrv-mps");
- /* autoload kernel module by specfs clone device node */
 MODULE_ALIAS("/dev/streams/clone/testdrv-mps");
- /* autoload kernel module by major device number */
-MODULE_ALIAS("char-major-" __stringify(CONFIG_STREAMS_TD_MPS_MAJOR));
- /* autoload kernel module by minor device number */
-MODULE_ALIAS("char-major-" __stringify(CONFIG_STREAMS_TD_MPS_MAJOR) "-*");
- /* autoload kernel module by clone device number */
-MODULE_ALIAS("char-major-" __stringify(CONFIG_STREAMS_TD_MPS_MAJOR) "-0");
- /* autoload kernel module by external device name */
+MODULE_ALIAS("char-major-" __stringify(CONFIG_STREAMS_CLONE_MAJOR) "-" __stringify(CONFIG_STREAMS_TD_MPS_MAJOR));
 MODULE_ALIAS("/dev/testdrv-mps");
 MODULE_ALIAS("devname:testdrv-mps");
 #endif				/* defined MODULE_ALIAS */

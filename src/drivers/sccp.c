@@ -110,13 +110,15 @@ static char const ident[] = "$RCSfile: sccp.c,v $ $Name:  $($Revision: 1.1.2.7 $
 #include <sys/xti_mtp.h>
 #include <sys/xti_sccp.h>
 
-#define SCCP_DESCRIP	"SS7 SIGNALLING CONNECTION CONTROL PART (SCCP) STREAMS MULTIPLEXING DRIVER."
+#define SCCP_DESCRIP	"SS7 Signalling Connection Control Part (SCCP) STREAMS Multiplexing Driver"
+#define SCCP_EXTRA	"Part of the OpenSS7 SS7 Stack for Linux Fast-STREAMS"
 #define SCCP_REVISION	"LfS $RCSfile: sccp.c,v $ $Name:  $($Revision: 1.1.2.7 $) $Date: 2011-09-20 09:51:36 $"
 #define SCCP_COPYRIGHT	"Copyright (c) 2008-2011  Monavacon Limited.  All Rights Reserved."
 #define SCCP_DEVICE	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define SCCP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define SCCP_LICENSE	"GPL"
 #define SCCP_BANNER	SCCP_DESCRIP	"\n" \
+			SCCP_EXTRA	"\n" \
 			SCCP_REVISION	"\n" \
 			SCCP_COPYRIGHT	"\n" \
 			SCCP_DEVICE	"\n" \

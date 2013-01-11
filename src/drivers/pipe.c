@@ -90,13 +90,15 @@ static char const ident[] = "$RCSfile: pipe.c,v $ $Name:  $($Revision: 1.1.2.5 $
 #include "src/modules/sth.h"
 #include "pipe.h"		/* extern verification */
 
-#define PIPE_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
+#define PIPE_DESCRIP	"SVR 4.2 STREAMS-based Pipe (PIPE) STREAMS Driver"
+#define PIPE_EXTRA	"Part of UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define PIPE_COPYRIGHT	"Copyright (c) 2008-2013  Monavacon Limited.  All Rights Reserved."
 #define PIPE_REVISION	"LfS $RCSfile: pipe.c,v $ $Name:  $($Revision: 1.1.2.5 $) $Date: 2011-09-02 08:46:35 $"
 #define PIPE_DEVICE	"SVR 4.2 MP STREAMS-based PIPEs"
 #define PIPE_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define PIPE_LICENSE	"GPL"
 #define PIPE_BANNER	PIPE_DESCRIP	"\n" \
+			PIPE_EXTRA	"\n" \
 			PIPE_COPYRIGHT	"\n" \
 			PIPE_REVISION	"\n" \
 			PIPE_DEVICE	"\n" \
@@ -170,7 +172,7 @@ MODULE_PARM_DESC(major, "Major device number for STREAMS-based PIPEs (0 for allo
 
 #ifdef MODULE
 #ifdef MODULE_ALIAS
-MODULE_ALIAS("char-major-" __stringify(CONFIG_STREAMS_PIPE_MAJOR) "-*");
+MODULE_ALIAS("char-major-" __stringify(CONFIG_STREAMS_CLONE_MAJOR) "-" __stringify(CONFIG_STREAMS_PIPE_MAJOR));
 MODULE_ALIAS("/dev/pipe");
 MODULE_ALIAS("devname:pipe");
 MODULE_ALIAS("streams-major-" __stringify(CONFIG_STREAMS_PIPE_MAJOR));
