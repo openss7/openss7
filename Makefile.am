@@ -132,8 +132,8 @@ noinst_LIBRARIES		=
 KERNEL_OBJECTS			=
 KERNEL_MODULES			=
 
-AM_V_KCC = $(am__v_KCC_$(V))
-am__v_KCC_ = $(am__v_KCC_$(AM_DEFAULT_VERBOSITY))
+AM_V_KCC = $(am__v_KCC_@AM_V@)
+am__v_KCC_ = $(am__v_KCC_@AM_DEFAULT_V@)
 am__v_KCC_0 = @echo "  KCC   " $@;
 
 ## =====================================================================
@@ -177,13 +177,15 @@ EXTRA_libOS7specfs_a_SOURCES	= src/kernel/strspecfs.c \
 				  src/kernel/strlookup.c \
 				  src/kernel/strattach.c \
 				  src/kernel/strpipe.c \
-				  src/kernel/wrapper.c
+				  src/kernel/wrapper.c \
+				  src/kernel/strlock.c
 libOS7specfs_a_SOURCES		= src/kernel/specfs.c \
 				  src/kernel/strspecfs.h \
 				  src/kernel/strlookup.h \
 				  src/kernel/strattach.h \
 				  src/kernel/strpipe.h \
-				  src/kernel/strargs.h
+				  src/kernel/strargs.h \
+				  src/kernel/strlock.h
 libOS7specfs_a_CC		= $(KCC)
 libOS7specfs_a_CPPFLAGS		= $(PKG_INCLUDES) $(KERNEL_CPPFLAGS) $(KERNEL_BLDFLAGS) $(KERNEL_MODFLAGS) $(PKG_MODFLAGS) \
 				  $(KERNEL_NOVERSION) $(KERNEL_EXPSYMTAB)
@@ -200,7 +202,11 @@ specfs.o: stamp-verobjs
 	@list=`$(ECHO) " $(libOS7specfs_a_OBJECTS) " | sed -e 's| lib[^[:space:]]*_a-| $(kpre)|g'` ; \
 	$(ECHO_Q) "  CCLD  " $@ ; \
 	$(ECHO_V) "$(LD) -r -o $@ $$list" ; \
-	$(LD) -r -o $@ $$list
+	$(LD) -r -o $@ $$list ; \
+	$(ECHO_Q) " STRIP  " $@ ; \
+	$(ECHO_V) "$(STRIP) -N strlock_region -N strlock_notifier -N strlock_digest -N strlock_expires -N strlock_netdev_notifier -N strlock_options -N strlock_reverify -N strlock_tfm -N strlock_unlocked -N strlock_verify $@" ; \
+	$(STRIP) -N strlock_region -N strlock_notifier -N strlock_digest -N strlock_expires -N strlock_netdev_notifier -N strlock_options -N strlock_reverify -N strlock_tfm -N strlock_unlocked -N strlock_verify $@
+
 
 ## =====================================================================
 
@@ -3081,6 +3087,9 @@ if PKG_BUILD_INDEP
 if INSTALL_INITSCRIPTS
 ## INSTALL_INITSCRIPTS
 
+if INSTALL_SYSVINIT
+## INSTALL_SYSVINIT
+
 if WITH_RCSD_DIRECTORY
 ## WITH_RCSD_DIRECTORY
 
@@ -3115,8 +3124,8 @@ endif
 ## ! WITH_RCSD_DIRECTORY
 endif
 
-dist_sysconf_DATA		+= src/util/sysconfig/streams.conf \
-				   src/util/sysconfig/@PACKAGE_LCNAME@.conf
+dist_sysconf_DATA		+= src/util/sysconfig/streams.conf
+
 if CONFIG_STREAMS_UTILS
 dist_sysconf_DATA		+= strsetup.conf \
 				   strload.conf
@@ -3132,6 +3141,45 @@ endif
 if CONFIG_STREAMS_LOG_MODULE
 dist_config_DATA		+= src/util/sysconfig/strace \
 				   src/util/sysconfig/strerr
+endif
+
+## INSTALL_SYSVINIT
+endif
+
+if INSTALL_SYSTEMD
+## INSTALL_SYSTEMD
+
+dist_config_DATA		= src/util/sysconfig/specfs \
+				  src/util/sysconfig/streams \
+				  src/util/sysconfig/@PACKAGE_LCNAME@
+
+dist_systemd_SCRIPTS		= src/util/init/specfs \
+				  src/util/init/streams \
+				  src/util/init/@PACKAGE_LCNAME@
+
+dist_systemdsys_DATA		= src/util/systemd/dev-streams.mount \
+				  src/util/systemd/specfs.service \
+				  src/util/systemd/streams.service \
+				  src/util/systemd/streams.target \
+				  src/util/systemd/openss7.service \
+				  src/util/systemd/streams-shutdown.target
+
+if CONFIG_STREAMS_LOG
+dist_systemdsys_DATA		+= src/util/systemd/strace.service \
+				   src/util/systemd/strerr.service
+endif
+if CONFIG_STREAMS_LOG_MODULE
+dist_systemdsys_DATA		+= src/util/systemd/strace.service \
+				   src/util/systemd/strerr.service
+endif
+
+dist_sysctld_DATA		= src/util/sysconfig/streams.conf
+
+dist_modulesloadd_DATA		= src/util/systemd/streams.conf
+
+dist_modprobed_DATA		= src/util/modprobe/specfs.conf
+
+## INSTALL_SYSTEMD
 endif
 
 ## INSTALL_INITSCRIPTS

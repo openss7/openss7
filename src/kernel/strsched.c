@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2012  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2013  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -144,11 +144,12 @@ static char const ident[] = "$RCSfile: strsched.c,v $ $Name:  $($Revision: 1.1.2
 #include <sys/ddi.h>
 
 #include "sys/config.h"
-#include "src/modules/sth.h"	/* for str_minfo */
+#include "src/modules/sth.h"		/* for str_minfo */
 #include "src/kernel/strsysctl.h"	/* for sysctl_str_ defs */
 #include "src/kernel/strsched.h"	/* for in_stream */
-#include "src/kernel/strutil.h"	/* for q locking and puts and gets */
+#include "src/kernel/strutil.h"		/* for q locking and puts and gets */
 #include "src/kernel/strsched.h"	/* verification of externs */
+#include "src/kernel/strlock.h"		/* for filesystem signage */
 
 #if defined HAVE_KFUNC_IN_ATOMIC || defined in_atomic
 #define can_sleep() (!in_interrupt()&&!in_atomic())
@@ -3784,6 +3785,9 @@ qopen(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
 
 	if (unlikely((q_open = q->q_qinfo->qi_qopen) == NULL))
 		return (-ENOPKG);
+
+	if (unlikely((err = strlock_open_check()) != 0))
+		return (err);
 
 #ifdef CONFIG_STREAMS_SYNCQS
 	if (unlikely(test_bit(QSYNCH_BIT, &q->q_flag))) {
