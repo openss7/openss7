@@ -1,0 +1,152 @@
+#!/usr/bin/perl
+
+eval 'exec perl -S $0 ${1+"@"}'
+    if $running_under_some_shell;
+
+#
+# A program that performs patching of module files in accordance
+# with modprobe(8).
+#
+
+use strict;
+use warnings;
+
+my @args;
+
+my $patchfile = "modules.patch";
+my $basedir   = "";
+my $subdir    = "updates";
+my $pkgdir    = "openss7";
+my $kversion  = `uname -r`; chomp($kversion);
+my $modudir   = "/lib/modules/$kversion";
+my $verbose   = 0;
+
+while (@ARGV) {
+	$_ = shift @ARGV;
+	if (/^-/) {
+		if (/^-(b|-basedir)/)  { $basedir   = shift; next; }
+		if (/^-(k|-kversion)/) { $kversion  = shift; next; }
+		if (/^-(s|-subdir)/)   { $subdir    = shift; next; }
+		if (/^-(p|-pkgdir)/)   { $pkgdir    = shift; next; }
+		if (/^-(m|-modudir)/)  { $modudir   = shift; next; }
+		if (/^-(v|-verbose)/)  { $verbose   = 1;     next; }
+		if (/^-(f|-file)/)     { $patchfile = shift; next; }
+		die "Unrecognized switch $_";
+	} else {
+		push @args, $_;
+	}
+}
+
+die "Excess arguments: ", join(' ',@args) if (@args);
+
+my $fulldir = "$basedir$modudir";
+my $fullfil = "$fulldir/$patchfile";
+
+print STDERR "fulldir = $fulldir\n" if $verbose;
+print STDERR "fullfil = $fullfil\n" if $verbose;
+
+die "fulldir = $fulldir does not exist!" unless -d $fulldir;
+
+unless (-f $fullfil) {
+	print STDERR "File $fullfil does not exist!\n" if $verbose;
+	exit 0
+}
+
+# File syntax:
+#
+# <modulename.ko>: <search> <offset> <replace>
+
+my $failed = 0;
+
+open(my $mh, "<", $fullfil);
+
+while (<$mh>) {
+	next if /^[[:space:]]*#/;
+	if (/^([-a-z.]+):\s+(([0-9a-f][0-9a-f])+)\s+([0-9]+)\s+(([0-9a-f][0-9a-f])+)/) {
+		my $module = $1;
+		my $search = $2;
+		my $offset = $4;
+		my $insert = $5;
+		print STDERR "module = $module\n" if $verbose;
+		print STDERR "search = $search\n" if $verbose;
+		print STDERR "offset = $offset\n" if $verbose;
+		print STDERR "insert = $insert\n" if $verbose;
+		my @files = ( `find $fulldir -maxdepth 4 -name "$module" -o -name "$module.gz"` );
+		if (@files == 0) {
+			print STDERR "Could not find module $module\n";
+			$failed = 1;
+			next;
+		}
+		if (@files > 1) {
+			print STDERR "Too many files named $module\n";
+			$failed = 1;
+			next;
+		}
+		my $comp = shift @files; chomp($comp);
+		print STDERR "Using comp = $comp\n" if $verbose;
+		my $needdecomp = 0;
+		my $file = $comp;
+		if ($file =~ /\.gz$/) {
+			$needdecomp = 1;
+			$file =~ s/\.gz$//;
+			system("gzip -d -- $comp");
+		}
+		my $newf = "$file.$$.tmp";
+		print STDERR "Using newf = $newf\n" if $verbose;
+
+		$search = pack('H*',$search);
+		$insert = pack('H*',$insert);
+
+		my $slen = length($search);
+		my $rlen = length($insert);
+		my $len = $slen + $rlen;
+
+		my ($fh,$bh);
+
+		unless (open($fh, '<:bytes', $file)) { $failed = 1; next; }
+		unless (open($bh, '>:bytes', $newf)) { $failed = 1; close($fh); next; }
+
+		my $buf1 = '';
+		my $buf2 = '';
+		my $num;
+		my $patched = 0;
+
+		while (($num = read($fh,$buf1,$len))) {
+			unless ($patched) {
+				my $buf = $buf2.$buf1;
+				my $ind = index($buf,$search);
+				if ($ind != -1 and $ind <= $len) {
+					substr($buf,$ind+$slen,$rlen,$insert);
+					$buf2 = substr($buf,0,$len);
+					$buf1 = substr($buf,$len,$len);
+					$patched = 1;
+					print STDERR "Found it!\n" if $verbose;
+				}
+			}
+			print $bh $buf2;
+			$buf2 = $buf1;
+			$buf1 = '';
+		}
+		print $bh $buf2;
+		close($fh);
+		close($bh);
+		unless (defined $num and $patched) {
+			print STDERR "Failed to process $comp\n";
+			system("rm -f -- $newf");
+			system("gzip -- $file") if $needdecomp;
+			$failed = 1;
+			next;
+		}
+		system("mv -f -- $newf $file");
+		system("gzip -- $file") if $needdecomp;
+		print STDERR "Successfully processed $comp\n" if $verbose;
+	}
+}
+
+close($mh);
+
+exit 1 if $failed;
+
+system("rm -f -- $fullfil");
+
+exit 0;

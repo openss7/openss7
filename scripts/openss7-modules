@@ -5,7 +5,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
+# Copyright (c) 2008-2013  Monavacon Limited <http://www.monavacon.com/>
 # Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
 # Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 #
@@ -1224,6 +1224,9 @@ function getsysinfo(kversion,
     print_vinfo(2, pfx sprintf(fmt, s, n, e))
     if (e == 0) { return e }
     if (kversion == krunning) {
+	if (values["style"] == "arch") {
+	    usesysmap[kversion] = usesysmap[krunning]
+	} else
 	if (values["style"] == "suse11") {
 	    usesysmap[kversion] = 0
 	} else
@@ -2483,10 +2486,9 @@ function chcksolution(kversion, kver,
 	    }
 	}
 	if (altered) {
-	    # tell init script to correct on reboot
+	    # tell ourselves to correct on reboot
 	    print_warns(pfx "*** REBOOT REQUIRED ***")
-	    doit("mkdir -p -- /var/lib/openss7")
-	    doit("touch /var/lib/openss7/.openss7_update-" krunning)
+	    doit("touch /.openss7_update-" krunning)
 	    return 0
 	}
     }
@@ -2720,7 +2722,7 @@ function testdepmod(		pfx,command,result)
     if (!("depmodx" in values)) {
 	result = 0
 	command = "/sbin/depmod --help 2>&1"
-	while ((command | getline) == 1) { if (/[[:space:]]-E[[:space:]]/) { result = 1 } }
+	while ((command | getline) == 1) { if (/[[:space:]]-E,?[[:space:]]/) { result = 1 } }
 	close(command)
 	if (result) {
 	    values["depmodx"] = 1
@@ -2735,6 +2737,11 @@ function testwstyle(		pfx,command,result)
 {
     pfx = "t: wstyle,    "
     if (!("style" in values) || !values["style"]) {
+	if (system_command("test -e /lib/modules/" krunning "/extramodules") == 0) {
+	    values["style"] = "arch"
+	    if (!("weakdir" in values) || values["weakdir"] == defaults["weakdir"])
+	    { values["weakdir"] = "updates" }
+	} else
 	if (system_command("test -r /usr/lib/module-init-tools/weak-modules2") == 0) {
 	    values["style"] = "suse11"
 	    if (!("weakdir" in values) || values["weakdir"] == defaults["weakdir"])
@@ -2760,11 +2767,48 @@ function testwstyle(		pfx,command,result)
 	    { values["weakdir"] = "updates" }
 	}
     } else
-    if (values["style"] !~ /^(debian|ubuntu|redhat|suse10|suse11|mandriva)$/) {
-	print_error(pfx "style is '" values["style"] "' but must be one of {debian|ubuntu|redhat|suse10|suse11|mandriva}")
+    if (values["style"] !~ /^(debian|ubuntu|redhat|suse10|suse11|mandriva|arch)$/) {
+	print_error(pfx "style is '" values["style"] "' but must be one of {debian|ubuntu|redhat|suse10|suse11|mandriva|arch}")
 	usage(stderr)
 	exit 2
     }
+}
+function dompatch(kversion,
+		  pfx,command,file,string,dir,patch) {
+    if (system("test -x /sbin/openss7-patch") == 0) {
+	command = "/sbin/openss7-patch"
+    } else
+    if (system("test -x /usr/sbin/openss7-patch") == 0) {
+	command = "/usr/sbin/openss7-patch"
+    } else {
+	print_debug(4, pfx "cannot find openss7-patch script")
+	return
+    }
+    dir = "/lib/modules/" kversion
+    command = command " -m /lib/modules/" kversion
+    if (values["basedir"]) {
+	command = command " -b " values["basedir"]
+	dir = values["basedir"] dir
+    }
+    file = dir "/modules.patch"
+    if (system("test -r \"" file "\"") != 0) {
+	patch = "/var/lib/openss7/patches"
+	if (system("test -r \"" patch "\"") == 0) {
+	    if ((getline string < patch) == 1)
+		close(patch)
+	}
+	if (length(string) != 48) {
+	    print_debug(4, pfx "patch length " length(string) " != 48")
+	    return
+	}
+	if (system("test -d \"" dir "\"") != 0) {
+	    print_debug(4, pfx "directory " dir " does not exist")
+	    return
+	}
+	print "specfs.ko: d5f3c4981e2e41f3bdba506861e8b5eca27e48c9b4eecdda 24 " string > file
+	close(file)
+    }
+    doit(command)
 }
 function dodepmod(kversion,
 		  command,file) {
@@ -2798,53 +2842,85 @@ function dodepmod(kversion,
     doit(command)
 }
 function initstart(	n,scripts,i,script,command) {
-    if (!("initscripts" in values))
-	return
-    n = split(values["initscripts"],scripts,/,/)
-    if ( n == 0 )
-	return
-    if (system_command("test -x /sbin/service") == 0) {
-	for (i=1;i<=n;i++) { script = scripts[i]
-	    command = "/sbin/service " script " start"
-	    doit(command)
-	}
-    } else
-    if (system_command("test -x /usr/bin/invoke-rc.d") == 0) {
-	for (i=1;i<=n;i++) { script = scripts[i]
-	    command = "/usr/sbin/invoke-rc.d " script " start"
-	    doit(command)
+    if (system_command("test -r /proc/1/comm -a `cat /proc/1/comm` = 'systemd'") == 0) {
+	if (!("unitfiles" in values))
+	    return
+	n = split(values["unitfiles"],scripts,/,/)
+	if (n == 0)
+	    return
+	if (system_command("test -x /usr/bin/systemctl") == 0) {
+	    for (i=1;i<=n;i++) { script = scripts[i]
+		if (script~/shutdown/)
+		    continue
+		command = "/usr/bin/systemctl start " script
+		doit(command)
+	    }
 	}
     } else {
-	for (i=1;i<=n;i++) { script = scripts[i]
-	    if (system_command("test -x /etc/init.d/" script) == 0) {
-		command = "/etc/init.d/" script " start"
+	if (!("initscripts" in values))
+	    return
+	n = split(values["initscripts"],scripts,/,/)
+	if ( n == 0 )
+	    return
+	if (system_command("test -x /sbin/service") == 0) {
+	    for (i=1;i<=n;i++) { script = scripts[i]
+		command = "/sbin/service " script " start"
 		doit(command)
+	    }
+	} else
+	if (system_command("test -x /usr/bin/invoke-rc.d") == 0) {
+	    for (i=1;i<=n;i++) { script = scripts[i]
+		command = "/usr/sbin/invoke-rc.d " script " start"
+		doit(command)
+	    }
+	} else {
+	    for (i=1;i<=n;i++) { script = scripts[i]
+		if (system_command("test -x /etc/init.d/" script) == 0) {
+		    command = "/etc/init.d/" script " start"
+		    doit(command)
+		}
 	    }
 	}
     }
 }
 function initstop(	n,scripts,i,script,command) {
-    if (!("initscripts" in values))
-	return
-    n = split(values["initscripts"],scripts,/,/)
-    if (n == 0)
-	return
-    if (system_command("test -x /sbin/service") == 0) {
-	for (i=n;i>=1;i--) { script = scripts[i]
-	    command = "/sbin/service " script " stop"
-	    doit(command)
-	}
-    } else
-    if (system_command("test -x /usr/bin/invoke-rc.d") == 0) {
-	for (i=n;i>=1;i--) { script = scripts[i]
-	    command = "/usr/sbin/invoke-rc.d " script " stop"
-	    doit(command)
+    if (system_command("test -r /proc/1/comm -a `cat /proc/1/comm` = 'systemd'") == 0) {
+	if (!("unitfiles" in values))
+	    return
+	n = split(values["unitfiles"],scripts,/,/)
+	if (n == 0)
+	    return
+	if (system_command("test -x /usr/bin/systemctl") == 0) {
+	    for (i=n;i>=1;i--) { script = scripts[i]
+		if (script!~/shutdown/)
+		    continue
+		command = "/usr/bin/systemctl start " script
+		doit(command)
+	    }
 	}
     } else {
-	for (i=n;i>=1;i--) { script = scripts[i]
-	    if (system_command("test -x /etc/init.d/" script) == 0) {
-		command = "/etc/init.d/" script " stop"
+	if (!("initscripts" in values))
+	    return
+	n = split(values["initscripts"],scripts,/,/)
+	if (n == 0)
+	    return
+	if (system_command("test -x /sbin/service") == 0) {
+	    for (i=n;i>=1;i--) { script = scripts[i]
+		command = "/sbin/service " script " stop"
 		doit(command)
+	    }
+	} else
+	if (system_command("test -x /usr/bin/invoke-rc.d") == 0) {
+	    for (i=n;i>=1;i--) { script = scripts[i]
+		command = "/usr/sbin/invoke-rc.d " script " stop"
+		doit(command)
+	    }
+	} else {
+	    for (i=n;i>=1;i--) { script = scripts[i]
+		if (system_command("test -x /etc/init.d/" script) == 0) {
+		    command = "/etc/init.d/" script " stop"
+		    doit(command)
+		}
 	    }
 	}
     }
@@ -2909,8 +2985,10 @@ function add_kernel(kversion,
     chckunneeded(kversion, solution, creates, unlinks, changes, relinks, dolinks, removes, retains, inserts)
     if (chcksolution(kversion, solution, creates, unlinks, changes, relinks, dolinks, removes, retains, inserts)) {
 	makesolution(kversion, solution, creates, unlinks, changes, relinks, dolinks, removes, retains, inserts)
+	dompatch(kversion)
 	dodepmod(kversion)
-	if ("initscripts" in values && values["initscripts"]) {
+	if (("initscripts" in values && values["initscripts"]) ||
+	    ("unitfiles"   in values && values["unitfiles"]  )) {
 	    if ( kversion == krunning ) {
 		if (kversion in kremoved)
 		    initstop()
@@ -3067,11 +3145,12 @@ BEGIN {
     d["weakdir" ] = "weak-updates"
     d["allsym"  ] = "/proc/kallsyms"
     d["sysmap"  ] = "/boot/System.map-$KVERSION"
-    d["vmlinux" ] = "/lib/modules/$KVERSION/build/vmlinux"
+    d["vmlinux" ] = "/usr/src/linux-$KVERSION/vmlinux"
     d["sysver"  ] = "/lib/modules/$KVERSION/build/Module.symvers"
     d["symver"  ] = "/boot/symvers-$KVERSION.gz"
     d["symabi"  ] = "/boot/abi-$KVERSION"
     d["inits"   ] = "specfs,streams,strace,strerr,openss7"
+    d["units"   ] = "streams.target"
 											  descrips["kernels"       ] = "kernel versions for which to perform operations"					; longargs["kernels"       ] = "KERNEL ..."
     longopts["kversion"      ] = "k:" ; defaults["kversion"      ] = d["kversion"]	; descrips["kversion"      ] = "default kernel version"
     longopts["add-kernel"    ] = "A!" ;							  descrips["add-kernel"    ] = "mode: add kernels with versions"
@@ -3086,7 +3165,7 @@ BEGIN {
     longopts["modules"       ] = "M:" ; defaults["modules"       ] = ""			; descrips["modules"       ] = "modules for which to generate symbols (search when unspec.)"				; longargs["modules"       ] = "MODULE ..."
     longopts["rootdir"       ] = "c:" ; defaults["rootdir"       ] = ""			; descrips["rootdir"       ] = "root of the kernels being installed"
     longopts["basedir"       ] = "b:" ; defaults["basedir"       ] = d["basedir" ]	; descrips["basedir"       ] = "use a base directory other than root, BASEDIR"
-    longopts["weakdir"       ] = "w:" ; defaults["weakdir"       ] = d["weakdir" ]	; descrips["weakdir"       ] = "where to place weak update symbolic links\nabsolute or rel. to /lib/modules/$KVERSION)"	; longargs["weakdir"       ] = "PATH"
+    longopts["weakdir"       ] = "w:" ; defaults["weakdir"       ] = d["weakdir" ]	; descrips["weakdir"       ] = "where to place weak update symbolic links\nabsolute or rel. to /lib/modules/$KVERSION)"
     longopts["allsym"        ] = "y:" ; defaults["allsym"        ] = d["allsym"  ]      ; descrips["allsym"        ] = "kernel symbols file (search when unspec.)"
     longopts["sysmap"        ] = "F:" ; defaults["sysmap"        ] = d["sysmap"  ]	; descrips["sysmap"        ] = "system map file (same as depmod) (search when unspec.)"
     longopts["vmlinux"       ] = "I:" ; defaults["vmlinux"       ] = d["vmlinux" ]	; descrips["vmlinux"       ] = "kernel vmlinux image"
@@ -3094,8 +3173,9 @@ BEGIN {
     longopts["symver"        ] = "S:" ; defaults["symver"        ] = d["symver"  ]	; descrips["symver"        ] = "system version file (compressed) (search when unspec.)"
     longopts["symabi"        ] = "Y:" ; defaults["symabi"        ] = d["symabi"  ]	; descrips["symabi"        ] = "system version file (ubuntu abi) (search when unspec.)"
     longopts["package"       ] = "P:" ; defaults["package"       ] = d["package" ]	; descrips["package"       ] = "package name (used to find subdirectories)"
-    longopts["style"         ] = "s:" ; defaults["style"         ] = d["style"   ]	; descrips["style"         ] = "style of weak-updates (detect when unspec.)"						; longargs["style"         ] = "{debian|redhat|suse10|suse11|ubuntu|mandriva}"
+    longopts["style"         ] = "s:" ; defaults["style"         ] = d["style"   ]	; descrips["style"         ] = "style of weak-updates (detect when unspec.)"						; longargs["style"         ] = "{debian|redhat|suse10|suse11|ubuntu|mandriva|arch}"
     longopts["initscripts"   ] = "i::"; defaults["initscripts"   ] = d["inits"   ]	; descrips["initscripts"   ] = "comma-separated list of init scripts to run"						; longargs["initscripts"   ] = "[SCRIPT[,SCRIPT]...]"
+    longopts["unitfiles"     ] = "f::"; defaults["unitfiles"     ] = d["units"   ]	; descrips["unitfiles"     ] = "comma-separated list of unit files to run"						; longargs["unitfiles"     ] = "[UNIT[,UNIT]...]"
     longopts["delete-modules"] = "d"  ; defaults["delete-modules"] = 0			; descrips["delete-modules"] = "delete modules for specified kernel version"
     longopts["depmodx"       ] = "x"  ; defaults["depmodx"       ] = 0			; descrips["depmodx"       ] = "depmod supports -E option (detect when unspec.)"
     longopts["preserve"      ] = "p"  ; defaults["preserve"      ] = 1			; descrips["preserve"      ] = "preserve configuration for running kernel"
@@ -3133,7 +3213,7 @@ BEGIN {
     values["silent"        ] = defaults["silent"        ]
     values["debug"         ] = defaults["debug"         ]
     values["verbose"       ] = defaults["verbose"       ]
-    optstring = "k:ALRUalruM:c:b:w:F:E:S:Y:P:s:i::podtxjenqD::v::hVC"
+    optstring = "k:ALRUBalruM:c:b:w:y:F:I:E:S:Y:P:s:i::f::podtxenqD::v::hVC"
     optind = 0
     #opts = ""; for (i=1;i<ARGC;i++) { if (i == 1) { opts = ARGV[i] } else { opts = opts " " ARGV[i] } }
     #print me ": D: o: command line: " opts > stderr; written[stderr] = 1
@@ -3142,8 +3222,8 @@ BEGIN {
 	c = getopt_long(ARGC, ARGV, optstring, longopts)
 	#if (c != -1) { print me ": D: o: option -" c ", longopt --" option ", optset = " optset ", optarg = " optarg > stderr; written[stderr] = 1 }
 	if (c == -1) break
-	else if (c~/[kMcbwFESPsi]/)			{ values[option] = optarg }
-	else if (c~/[podtxjenq]/)			{ values[option] = optset }
+	else if (c~/[kMcbwyFIESYPsif]/)			{ values[option] = optarg }
+	else if (c~/[podtxenq]/)			{ values[option] = optset }
 	else if (c~/[Dv]/)	{ if (optarg  != "")	{ values[option] = optarg } else { if (optset)  { values[option]++ } else { values[option] = optset } } }
 	else if (c~/[ALRUBalru]/)			{ values[option] = optset; if (!optset && command == option)	{ command = "" } else
 										   if (optset && !command)		{ command = option } else
@@ -3181,6 +3261,8 @@ BEGIN {
 	    values["overwrite"] == defaults["overwrite"]) {
 	    if ("initscripts" in values)
 		delete values["initscripts"]
+	    if ("unitfiles" in values)
+		delete values["unitfiles"]
 	    values["preserve" ] = 0
 	    values["overwrite"] = 1
 	}
