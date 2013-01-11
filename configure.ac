@@ -80,7 +80,7 @@ AC_MSG_NOTICE([+-------------------------+])
 AC_MSG_NOTICE([| General Autoconf Checks |])
 AC_MSG_NOTICE([+-------------------------+])
 
-AM_INIT_AUTOMAKE([gnits 1.12 dist-bzip2 no-dist-gzip std-options -Wall color-tests silent-rules tar-pax])
+AM_INIT_AUTOMAKE([gnits 1.13 dist-bzip2 no-dist-gzip std-options -Wall color-tests silent-rules tar-pax])
 AM_MAINTAINER_MODE
 dnl
 dnl Default to --enable-silent-rules.  Let the user specify
