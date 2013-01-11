@@ -79,13 +79,15 @@ static char const ident[] =
 
 #include <sys/os7/compat.h>
 
-#define LAPF_DESCRIP	"LAPF STREAMS MODULE"
+#define LAPF_DESCRIP	"LAPF STREAMS Module"
+#define LAPF_EXTRA	"Part of the OpenSS7 X.25 Stack for Linux Fast-STREAMS"
 #define LAPF_REVISION	"OpenSS7 $RCSfile: lapf.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2011-09-02 08:46:53 $"
 #define LAPF_COPYRIGHT	"Copyright (c) 2008-2011  Monavacon Limited.  All Rights Reserved."
 #define LAPF_DEVICE	"Provides OpenSS7 Link Access Protocol Frame Relay (LAPF)"
 #define LAPF_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define LAPF_LICENSE	"GPL"
 #define LAPF_BANNER	LAPF_DESCRIP	"\n" \
+			LAPF_EXTRA	"\n" \
 			LAPF_REVISION	"\n" \
 			LAPF_COPYRIGHT	"\n" \
 			LAPF_DEVICE	"\n" \

@@ -86,13 +86,15 @@ static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
 
 #include "sys/config.h"
 
-#define PFMOD_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
+#define PFMOD_DESCRIP		"SVR 4.2 Packet Filter Module (PFMOD) STREAMS Module"
+#define PFMOD_EXTRA		"Part of UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define PFMOD_COPYRIGHT		"Copyright (c) 2008-2012  Monavacon Limited.  All Rights Reserved."
 #define PFMOD_REVISION		"Lfs $RCSfile$ $Name$($Revision$) $Date$"
 #define PFMOD_DEVICE		"SVR 4.2 Packet Filter Module (PFMOD) for STREAMS"
 #define PFMOD_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define PFMOD_LICENSE		"GPL"
 #define PFMOD_BANNER		PFMOD_DESCRIP		"\n" \
+				PFMOD_EXTRA		"\n" \
 				PFMOD_COPYRIGHT		"\n" \
 				PFMOD_REVISION		"\n" \
 				PFMOD_DEVICE		"\n" \

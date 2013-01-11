@@ -74,8 +74,8 @@ static char const ident[] = "$RCSfile: ch_x400p.c,v $ $Name:  $($Revision: 1.1.2
 #include <ss7/chi.h>
 #include <ss7/chi_ioctl.h>
 
-#define CH_SDL_DESCRIP		"X400P-SS7 CHANNEL (CH) STREAMS MODULE."
-#define CH_SDL_EXTRA		"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
+#define CH_SDL_DESCRIP		"X400P-SS7 Channel (CH) STREAMS Module"
+#define CH_SDL_EXTRA		"Part of the OpenSS7 SS7 Stack for Linux Fast-STREAMS"
 #define CH_SDL_REVISION		"OpenSS7 $RCSfile: ch_x400p.c,v $ $Name:  $ ($Revision: 1.1.2.3 $) $Date: 2011-09-02 08:46:52 $"
 #define CH_SDL_COPYRIGHT	"Copyright (c) 2008-2011  Monavacon Limited.  All Rights Reserved."
 #define CH_SDL_DEVICE		"Supports SDLI pseudo-device drivers."

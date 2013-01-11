@@ -80,16 +80,18 @@ static char const ident[] = "$RCSfile: cd_old.c,v $ $Name:  $($Revision: 1.1.2.3
 
 #include "cd/cd.h"
 
-#define HDLC_DESCRIP	"ISO 3309/4335 HDLC: (High-Level Data Link Control) STREAMS MODULE."
+#define HDLC_DESCRIP	"ISO 3309/4335 HDLC: (High-Level Data Link Control) STREAMS Module"
+#define HDLC_EXTRA	"Part of the OpenSS7 OSI Stack for Linux Fast-STREAMS"
 #define HDLC_REVISION	"OpenSS7 $RCSfile: cd_old.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-09-02 08:46:52 $"
 #define HDLC_COPYRIGHT	"Copyright (c) 2008-2011  Monavacon Limited.  All Rights Reserved."
 #define HDLC_DEVICES	"Supports OpenSS7 Channel Drivers."
 #define HDLC_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define HDLC_LICENSE	"GPL"
-#define HDLC_BANNER	HDLC_DESCRIP   "\n" \
-			HDLC_COPYRIGHT "\n" \
-			HDLC_DEVICES   "\n" \
-			HDLC_CONTACT   "\n"
+#define HDLC_BANNER	HDLC_DESCRIP	"\n" \
+			HDLC_EXTRA	"\n" \
+			HDLC_COPYRIGHT	"\n" \
+			HDLC_DEVICES	"\n" \
+			HDLC_CONTACT	"\n"
 
 #ifdef LINUX
 MODULE_AUTHOR(HDLC_CONTACT);

@@ -81,7 +81,7 @@ static char const ident[] =
 
 /* ---------------------- */
 
-#define CMOT_DESCRIP	"CMOT STREAMS MODULE"
+#define CMOT_DESCRIP	"CMOT STREAMS Module"
 #define CMOT_EXTRA      "Part of the OpenSS7 OSI Stack for Linux Fast-STREAMS"
 #define CMOT_COPYRIGHT	"Copyright (c) 2008-2011  Monavacon Limited.  All Rights Reserved."
 #define CMOT_REVISION	"OpenSS7 $RCSfile: cmot.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2011-09-02 08:46:52 $"

@@ -96,13 +96,15 @@ static char const ident[] = "$RCSfile: zaptel-mod.c,v $ $Name:  $($Revision: 1.1
 #include <ss7/zap.h>
 #include <ss7/zap_ioctl.h>
 
-#define ZAP_MX_DESCRIP	"ZAPTEL MULTIPLEX (ZAP-MX) STREAMS MODULE."
+#define ZAP_MX_DESCRIP	"ZAPTEL Multiplex (ZAP-MX) STREAMS Module"
+#define ZAP_MX_EXTRA	"Part of the OpenSS7 VoIP Stack for Linux Fast-STREAMS"
 #define ZAP_MX_REVISION	"LfS $RCSfile: zaptel-mod.c,v $ $Name:  $ ($Revision: 1.1.2.3 $) $Date: 2011-09-02 08:46:57 $"
 #define ZAP_MX_COPYRIGHT    "Copyright (c) 2008-2011  Monavacon Limited.  All Rights Reserved."
 #define ZAP_MX_DEVICE	"Part of the OpenSS7 Stack for Linux Fast-STREAMS"
 #define ZAP_MX_CONTACT	"Brian Biduock <bidulock@openss7.org>"
 #define ZAP_MX_LICENSE	"GPL"
 #define ZAP_MX_BANNER	ZAP_MX_DESCRIP		"\n" \
+			ZAP_MX_EXTRA		"\n" \
 			ZAP_MX_REVISION		"\n" \
 			ZAP_MX_COPYRIGHT	"\n" \
 			ZAP_MX_DEVICE		"\n" \

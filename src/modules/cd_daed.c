@@ -80,13 +80,15 @@ static char const ident[] = "$RCSfile: cd_daed.c,v $ $Name:  $($Revision: 1.1.2.
 
 #include "cd/cd.h"
 
-#define CD_DAED_DESCRIP		"Q.703/T1.111.3 DAED: (Delimination Alignment and Error Detection) STREAMS MODULE."
+#define CD_DAED_DESCRIP		"Q.703/T1.111.3 DAED: (Delimination Alignment and Error Detection) STREAMS Module"
+#define CD_DAED_EXTRA		"Part of the OpenSS7 SS7 Stack for Linux Fast-STREAMS"
 #define CD_DAED_COPYRIGHT	"Copyright (c) 2008-2011  Monavacon Limited.  All Rights Reserved."
 #define CD_DAED_REVISION	"OpenSS7 $RCSfile: cd_daed.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2011-09-02 08:46:52 $"
 #define CD_DAED_DEVICE		"SVR 4.2 MP STREAMS CDI DAED Module for SS7 Channel Devices (DAED)."
 #define CD_DAED_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define CD_DAED_LICENSE		"GPL"
 #define CD_DAED_BANNER		CD_DAED_DESCRIP		"\n" \
+				CD_DAED_EXTRA		"\n" \
 				CD_DAED_COPYRIGHT	"\n" \
 				CD_DAED_REVISION	"\n" \
 				CD_DAED_DEVICE		"\n" \

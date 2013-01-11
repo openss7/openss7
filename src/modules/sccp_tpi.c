@@ -103,7 +103,7 @@ static char const ident[] = "$RCSfile: sccp_tpi.c,v $ $Name:  $($Revision: 1.1.2
 #define t_set_bit(nr,addr)  __set_bit(nr,addr)
 #define t_clr_bit(nr,addr) __clear_bit(nr,addr)
 
-#define SCCP_TPI_DESCRIP	"SCCPI to TPI CONVERSION MODULE FOR LINUX FAST-STREAMS"
+#define SCCP_TPI_DESCRIP	"SCCPI to TPI Conversion Module for Linux Fast-STREAMS"
 #define SCCP_TPI_EXTRA		"Part of the OpenSS7 SS7 Stack for Linux Fast-STREAMS"
 #define SCCP_TPI_COPYRIGHT	"Copyright (c) 2008-2011  Monavacon Limited.  All Rights Reserved."
 #define SCCP_TPI_REVISION	"OpenSS7 $RCSfile: sccp_tpi.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-09-02 08:46:54 $"

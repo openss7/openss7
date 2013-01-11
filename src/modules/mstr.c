@@ -75,13 +75,15 @@ static char const ident[] = "$RCSfile: mstr.c,v $ $Name:  $($Revision: 1.1.2.2 $
 
 #include <sys/os7/compat.h>
 
-#define MSTR_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
+#define MSTR_DESCRIP	"Multi-Stream (MSTR) STREAMS Module"
+#define MSTR_EXTRA	"Part of Linux Fast-STREAMS"
 #define MSTR_COPYRIGHT	"Copyright (c) 2008-2011  Monavacon Limited.  All Rights Reserved."
 #define MSTR_REVISION	"OpenSS7 $RCSfile: mstr.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2011-09-02 08:46:53 $"
 #define MSTR_DEVICE	"SVR 4.2 MP STREAMS Multi-Stream Module"
 #define MSTR_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define MSTR_LICENSE	"GPL"
 #define MSTR_BANNER	MSTR_DESCRIP	"\n" \
+			MSTR_EXTRA	"\n" \
 			MSTR_COPYRIGHT	"\n" \
 			MSTR_REVISION	"\n" \
 			MSTR_DEVICE	"\n" \

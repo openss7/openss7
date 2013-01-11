@@ -81,7 +81,7 @@ static char const ident[] =
 
 /* ----------------------------- */
 
-#define ISOS_DESCRIP	"SVR 4.2 ISO TRANSPORT OVER SCTP FOR LINUX FAST-STREAMS"
+#define ISOS_DESCRIP	"SVR 4.2 ISO Transport over SCTP for Linux Fast-STREAMS"
 #define ISOS_EXTRA	"Part of the OpenSS7 OSI Stack for Linux Fast-STREAMS"
 #define ISOS_COPYRIGHT	"Copyright (c) 2008-2011  Monavacon Limited.  All Rights Reserved."
 #define ISOS_REVISION	"OpenSS7 $RCSfile: isos.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2011-09-02 08:46:52 $"

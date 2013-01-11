@@ -104,13 +104,15 @@ static char const ident[] = "$RCSfile: cd.c,v $ $Name:  $($Revision: 1.1.2.4 $) 
 
 #include "tab.h"		/* HDLC tables */
 
-#define CD_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
+#define CD_DESCRIP	"Communications Device (CD) STREAMS Module"
+#define CD_EXTRA	"Part of UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define CD_COPYRIGHT	"Copyright (c) 2008-2011  Monavacon Limited.  All Rights Reserved."
 #define CD_REVISION	"OpenSS7 $RCSfile: cd.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2011-09-02 08:46:51 $"
 #define CD_DEVICE	"SVR 4.2 MP STREAMS Communications Device (CD)"
 #define CD_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define CD_LICENSE	"GPL"
 #define CD_BANNER	CD_DESCRIP	"\n" \
+			CD_EXTRA	"\n" \
 			CD_COPYRIGHT	"\n" \
 			CD_REVISION	"\n" \
 			CD_DEVICE	"\n" \

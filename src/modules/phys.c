@@ -100,13 +100,15 @@ static char const ident[] = "$RCSfile: phys.c,v $ $Name:  $($Revision: 1.1.2.4 $
 #include <sys/cdi.h>
 #include <sys/chi.h>
 
-#define PHYS_DESCRIP	"MTP3B-PHYS STREAMS MODULE."
+#define PHYS_DESCRIP	"MTP3B-PHYS STREAMS Module"
+#define PHYS_EXTRA	"Part of the OpenSS7 SS7 Stack for Linux Fast-STREAMS"
 #define PHYS_REVISION	"OpenSS7 $RCSfile: phys.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2011-09-20 09:51:40 $"
 #define PHYS_COPYRIGHT	"Copyright (c) 2008-2011  Monavacon Limited.  All Rights Reserved."
 #define PHYS_DEVICE	"Provides OpenSS7 MTP3B-I.432.3-PHYS module."
 #define PHYS_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define PHYS_LICENSE	"GPL"
 #define PHYS_BANNER	PHYS_DESCRIP	"\n" \
+			PHYS_EXTRA	"\n" \
 			PHYS_REVISION	"\n" \
 			PHYS_COPYRIGHT	"\n" \
 			PHYS_DEVICE	"\n" \

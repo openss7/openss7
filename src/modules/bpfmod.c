@@ -86,13 +86,15 @@ static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
 
 #include "sys/config.h"
 
-#define BPFMOD_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
+#define BPFMOD_DESCRIP		"Berkeley Packet Filter Module (BPFMOD) STREAMS Module"
+#define BPFMOD_EXTRA		"Part of UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define BPFMOD_COPYRIGHT	"Copyright (c) 2008-2012  Monavacon Limited.  All Rights Reserved."
 #define BPFMOD_REVISION		"Lfs $RCSfile$ $Name$($Revision$) $Date$"
 #define BPFMOD_DEVICE		"SVR 4.2 Berkeley Packet Filter Module (BPFMOD) for STREAMS"
 #define BPFMOD_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define BPFMOD_LICENSE		"GPL"
 #define BPFMOD_BANNER		BPFMOD_DESCRIP		"\n" \
+				BPFMOD_EXTRA		"\n" \
 				BPFMOD_COPYRIGHT	"\n" \
 				BPFMOD_REVISION		"\n" \
 				BPFMOD_DEVICE		"\n" \

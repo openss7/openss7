@@ -85,13 +85,15 @@ static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
 
 #include "sys/config.h"
 
-#define NBUF_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
+#define NBUF_DESCRIP	"SVR 4.1 SNI Buffer Module (NBUF) STREAMS Module"
+#define NBUF_EXTRA	"Part of UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define NBUF_COPYRIGHT	"Copyright (c) 2008-2012  Monavacon Limited.  All Rights Reserved."
 #define NBUF_REVISION	"Lfs $RCSfile$ $Name$($Revision$) $Date$"
 #define NBUF_DEVICE	"SVR 4.1 SNIT Buffer Module (NBUF) for STREAMS."
 #define NBUF_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define NBUF_LICENSE	"GPL"
 #define NBUF_BANNER	NBUF_DESCRIP	"\n" \
+			NBUF_EXTRA	"\n" \
 			NBUF_COPYRIGHT	"\n" \
 			NBUF_REVISION	"\n" \
 			NBUF_DEVICE	"\n" \

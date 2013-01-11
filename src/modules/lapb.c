@@ -80,7 +80,7 @@ static char const ident[] = "$RCSfile: lapb.c,v $ $Name:  $($Revision: 1.1.2.3 $
 #include <sys/cdi.h>
 #include <sys/dlpi.h>
 
-#define LAPB_DESCRIP	"LAPB OVER HDLC MODULE FOR LINUX FAST-STREAMS"
+#define LAPB_DESCRIP	"LAPB over HDLC Module for Linux Fast-STREAMS"
 #define LAPB_EXTRA	"Part of the OpenSS7 X.25 Stack for Linux Fast-STREAMS"
 #define LAPB_COPYRIGHT	"Copyright (c) 2008-2011  Monavacon Limited.  All Rights Reserved."
 #define LAPB_REVISION	"OpenSS7 $RCSfile: lapb.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-09-02 08:46:53 $"

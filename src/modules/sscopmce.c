@@ -84,13 +84,15 @@ static char const ident[] = "$RCSfile: sscopmce.c,v $ $Name:  $($Revision: 1.1.2
 #include <sys/npi.h>
 #include <sys/npi_ip.h>
 
-#define SSCOPMCE_DESCRIP	"MTP3B-SSCOPMCE STREAMS MODULE."
+#define SSCOPMCE_DESCRIP	"MTP3B-SSCOPMCE STREAMS Module"
+#define SSCOPMCE_EXTRA		"Part of the OpenSS7 ATM Stack for Linux Fast-STREAMS"
 #define SSCOPMCE_REVISION	"OpenSS7 $RCSfile: sscopmce.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2011-09-20 09:51:41 $"
 #define SSCOPMCE_COPYRIGHT	"Copyright (c) 2008-2011  Monavacon Limited.  All Rights Reserved."
 #define SSCOPMCE_DEVICE		"Provides OpenSS7 MTP3B-I.432.3-SSCOPMCE module."
 #define SSCOPMCE_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define SSCOPMCE_LICENSE	"GPL"
 #define SSCOPMCE_BANNER		SSCOPMCE_DESCRIP	"\n" \
+				SSCOPMCE_EXTRA		"\n" \
 				SSCOPMCE_REVISION	"\n" \
 				SSCOPMCE_COPYRIGHT	"\n" \
 				SSCOPMCE_DEVICE		"\n" \

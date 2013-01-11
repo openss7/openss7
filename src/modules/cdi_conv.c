@@ -80,7 +80,7 @@ static char const ident[] = "$RCSfile: cdi_conv.c,v $ $Name:  $($Revision: 1.1.2
 #include <sys/os7/compat.h>
 #include <sys/cdi.h>
 
-#define CDI_CONV_DESCRIP	"CDI ENDIAN CONVERSION (CDI-CONV) FOR LINUX FAST-STREAMS"
+#define CDI_CONV_DESCRIP	"CDI Endian Conversion (CDI-CONV) for Linux Fast-STREAMS"
 #define CDI_CONV_COPYRIGHT	"Copyright (c) 2008-2011  Monavacon Limited.  All Rights Reserved."
 #define CDI_CONV_REVISION	"OpenSS7 $RCSfile: cdi_conv.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2011-09-02 08:46:52 $"
 #define CDI_CONV_DEVICE		"SVR 4.2 CDI Endian Conversion (CDI-CONV) for STREAMS"

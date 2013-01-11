@@ -81,7 +81,7 @@ static char const ident[] = "$RCSfile: s_nli.c,v $ $Name:  $($Revision: 1.1.2.3 
 #include <sys/snet/x25_proto.h>
 #include <sys/snet/x25_control.h>
 
-#define S_NLI_DESCRIP	"SPIDER X25 COMPATIBILITY MODULE FOR LINUX FAST-STREAMS"
+#define S_NLI_DESCRIP	"Spider X25 Compatibility Module for Linux Fast-STREAMS"
 #define S_NLI_EXTRA	"Part of the OpenSS7 X.25 Stack for Linux Fast-STREAMS"
 #define S_NLI_COPYRIGHT	"Copyright (c) 2008-2011  Monavacon Limited.  All Rights Reserved."
 #define S_NLI_REVISION	"OpenSS7 $RCSfile: s_nli.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-09-02 08:46:54 $"

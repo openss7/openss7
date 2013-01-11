@@ -99,13 +99,15 @@ static char const ident[] = "$RCSfile: mtp_mod.c,v $ $Name:  $($Revision: 1.1.2.
 #include <ss7/mtpi.h>
 #include <ss7/mtpi_ioctl.h>
 
-#define MT_DESCRIP	"SS7/MTP (Minimal MTP) STREAMS MODULE."
+#define MT_DESCRIP	"SS7/MTP (Minimal MTP) STREAMS Module"
+#define MT_EXTRA	"Part of the OpenSS7 SS7 Stack for Linux Fast-STREAMS"
 #define MT_REVISION	"OpenSS7 $RCSfile: mtp_mod.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-09-02 08:46:53 $"
 #define MT_COPYRIGHT	"Copyright (c) 2008-2011  Monavacon Limited.  All Rights Reserved."
 #define MT_DEVICE	"Provides OpenSS7 MTP Minimal Module."
 #define MT_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define MT_LICENSE	"GPL"
 #define MT_BANNER	MT_DESCRIP	"\n" \
+			MT_EXTRA	"\n" \
 			MT_REVISION	"\n" \
 			MT_COPYRIGHT	"\n" \
 			MT_DEVICE	"\n" \

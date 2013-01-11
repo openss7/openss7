@@ -82,13 +82,15 @@ static char const ident[] = "$RCSfile: tirdwr.c,v $ $Name:  $($Revision: 1.1.2.4
 // #define TIRDWR_PEDANTIC
 // #define TIRDWR_TPI_PEDANTIC
 
-#define TIRDWR_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
+#define TIRDWR_DESCRIP		"Read Write Module for XTI/TLI Devices (TIRDWR) STREAMS Module"
+#define TIRDWR_EXTRA		"Part of UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define TIRDWR_COPYRIGHT	"Copyright (c) 2008-2011  Monavacon Limited.  All Rights Reserved."
 #define TIRDWR_REVISION		"OpenSS7 $RCSfile: tirdwr.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2011-09-02 08:46:56 $"
 #define TIRDWR_DEVICE		"SVR 4.2 MP STREAMS Read Write Module for XTI/TLI Devices (TIRDWR)"
 #define TIRDWR_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define TIRDWR_LICENSE		"GPL"
 #define TIRDWR_BANNER		TIRDWR_DESCRIP		"\n" \
+				TIRDWR_EXTRA		"\n" \
 				TIRDWR_COPYRIGHT	"\n" \
 				TIRDWR_REVISION		"\n" \
 				TIRDWR_DEVICE		"\n" \

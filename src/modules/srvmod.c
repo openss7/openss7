@@ -95,13 +95,15 @@ static char const ident[] = "$RCSfile: srvmod.c,v $ $Name:  $($Revision: 1.1.2.4
 
 #include "sys/config.h"
 
-#define SRVMOD_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
+#define SRVMOD_DESCRIP		"SVR 4.2 Buffer Module (SRVMOD) for STREAMS"
+#define SRVMOD_EXTRA		"Part of UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define SRVMOD_COPYRIGHT	"Copyright (c) 2008-2012  Monavacon Limited.  All Rights Reserved."
 #define SRVMOD_REVISION		"LfS $RCSfile: srvmod.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2011-09-02 08:46:51 $"
 #define SRVMOD_DEVICE		"SVR 4.2 Buffer Module (SRVMOD) for STREAMS"
 #define SRVMOD_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define SRVMOD_LICENSE		"GPL"
 #define SRVMOD_BANNER		SRVMOD_DESCRIP		"\n" \
+				SRVMOD_EXTRA		"\n" \
 				SRVMOD_COPYRIGHT	"\n" \
 				SRVMOD_REVISION		"\n" \
 				SRVMOD_DEVICE		"\n" \

@@ -89,13 +89,15 @@ static char const ident[] = "$RCSfile: apmod.c,v $ $Name:  $($Revision: 1.1.2.4 
 #   include <sys/tihdr.h>
 #endif
 
-#define APLI_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
+#define APLI_DESCRIP	"ACSE/Presentation Layer (APLI) Library Module (APMOD) STREAMS Module"
+#define APLI_EXTRA	"Part of UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define APLI_COPYRIGHT	"Copyright (c) 2008-2011  Monavacon Limited.  All Rights Reserved."
 #define APLI_REVISION	"OpenSS7 $RCSfile: apmod.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2011-09-02 08:46:51 $"
 #define APLI_DEVICE	"SVR 4.2 MP STREAMS APLI Module for APLI"
 #define APLI_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define APLI_LICENSE	"GPL"
 #define APLI_BANNER	APLI_DESCRIP	"\n" \
+			APLI_EXTRA	"\n" \
 			APLI_COPYRIGHT	"\n" \
 			APLI_REVISION	"\n" \
 			APLI_DEVICE	"\n" \

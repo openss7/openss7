@@ -71,13 +71,15 @@ static char const ident[] = "$RCSfile: sm_mod.c,v $ $Name:  $($Revision: 1.1.2.3
 #include <ss7/lmi.h>
 #include <ss7/mtpi.h>
 
-#define SM_MOD_DESCRIP		"SIMPLE SINGLE LINK MTP."
+#define SM_MOD_DESCRIP		"SIMPLE SINGLE LINK MTP"
+#define SM_MOD_EXTRA		"Part of the OpenSS7 SS7 Stack for Linux Fast-STREAMS"
 #define SM_MOD_REVISION		"LfS $RCSfile: sm_mod.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-09-02 08:46:55 $"
 #define SM_MOD_COPYRIGHT	"Copyright (c) 2008-2011  Monavacon Limited.  All Rights Reserved."
 #define SM_MOD_DEVICE		"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define SM_MOD_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define SM_MOD_LICENSE		"GPL"
 #define SM_MOD_BANNER		SM_MOD_DESCRIP		"\n" \
+				SM_MOD_EXTRA		"\n" \
 				SM_MOD_REVISION		"\n" \
 				SM_MOD_COPYRIGHT	"\n" \
 				SM_MOD_DEVICE		"\n" \

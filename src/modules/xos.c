@@ -83,7 +83,7 @@ static char const ident[] = "$RCSfile: xos.c,v $ $Name:  $($Revision: 1.1.2.3 $)
 #include <sys/tihdr.h>
 #include <sys/tpi_sctp.h>
 
-#define XOS_DESCRIPT	"X.25 OVER SCTP MODULE FOR LINUX FAST-STREAMS"
+#define XOS_DESCRIP	"X.25 over SCTP Module for Linux Fast-STREAMS"
 #define XOS_EXTRA	"Part fo the OpenSS7 X.25 Stack for Linux Fast-STREAMS"
 #define XOS_COPYRIGHT	"Copyright (c) 2008-2011  Monavacon Limited.  All Rights Reserved."
 #define XOS_REVISION	"OpenSS7 $RCSfile: xos.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-09-02 08:46:57 $"

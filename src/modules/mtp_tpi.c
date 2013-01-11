@@ -88,13 +88,15 @@ static char const ident[] = "$RCSfile: mtp_tpi.c,v $ $Name:  $($Revision: 1.1.2.
 #include <sys/xti.h>
 #include <sys/xti_mtp.h>
 
-#define MTP_TPI_DESCRIP		"SS7 Message Transfer Part (MTP) TPI STREAMS MODULE."
+#define MTP_TPI_DESCRIP		"SS7 Message Transfer Part (MTP) TPI STREAMS Module"
+#define MTP_TPI_EXTRA		"Part of the OpenSS7 SS7 Stack for Linux Fast-STREAMS"
 #define MTP_TPI_REVISION	"LfS $RCSfile: mtp_tpi.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-09-02 08:46:53 $"
 #define MTP_TPI_COPYRIGHT	"Copyright (c) 2008-2011  Monavacon Limited.  All Rights Reserved."
 #define MTP_TPI_DEVICE		"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define MTP_TPI_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define MTP_TPI_LICENSE		"GPL"
 #define MTP_TPI_BANNER		MTP_TPI_DESCRIP		"\n" \
+				MTP_TPI_EXTRA		"\n" \
 				MTP_TPI_REVISION	"\n" \
 				MTP_TPI_COPYRIGHT	"\n" \
 				MTP_TPI_DEVICE		"\n" \

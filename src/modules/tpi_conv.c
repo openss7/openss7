@@ -89,13 +89,15 @@ static char const ident[] = "$RCSfile: tpi_conv.c,v $ $Name:  $($Revision: 1.1.2
 #   include <sys/tihdr.h>
 #endif
 
-#define TPI_CONV_DESCRIP	"TPI ENDIAN CONVERSION (TPI-CONV) FOR LINUX FAST-STREAMS"
+#define TPI_CONV_DESCRIP	"TPI Endian Conversion (TPI-CONV) for Linux Fast-STREAMS"
+#define TPI_CONV_EXTRA		"Part of OpenSS7 Linux Fast-STREAMS"
 #define TPI_CONV_COPYRIGHT	"Copyright (c) 2008-2011  Monavacon Limited.  All Rights Reserved."
 #define TPI_CONV_REVISION	"OpenSS7 $RCSfile: tpi_conv.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2011-09-02 08:46:56 $"
 #define TPI_CONV_DEVICE		"SVR 4.2 TPI Endian Conversion (TPI-CONV) for STREAMS"
 #define TPI_CONV_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define TPI_CONV_LICENSE	"GPL"
 #define TPI_CONV_BANNER		TPI_CONV_DESCRIP	"\n" \
+				TPI_CONV_EXTRA		"\n" \
 				TPI_CONV_COPYRIGHT	"\n" \
 				TPI_CONV_REVISION	"\n" \
 				TPI_CONV_DEVICE		"\n" \

@@ -89,13 +89,15 @@ static char const ident[] = "$RCSfile: tp0.c,v $ $Name:  $($Revision: 1.1.2.4 $)
 
 #include <sys/npi.h>
 
-#define TP0_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
+#define TP0_DESCRIP	"RFC 1006 and RFC 2126 (TP0) STREAMS Module"
+#define TP0_EXTRA	"Part of the OpenSS7 OSI Stack for Linux Fast-STREAMS"
 #define TP0_COPYRIGHT	"Copyright (c) 2008-2011  Monavacon Limited.  All Rights Reserved."
 #define TP0_REVISION	"OpenSS7 $RCSfile: tp0.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2011-09-02 08:46:56 $"
 #define TP0_DEVICE	"SVR 4.2 MP STREAMS TP0 Module for RFC 1006 and RFC 2126"
 #define TP0_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define TP0_LICENSE	"GPL"
 #define TP0_BANNER	TP0_DESCRIP	"\n" \
+			TP0_EXTRA	"\n" \
 			TP0_COPYRIGHT	"\n" \
 			TP0_REVISION	"\n" \
 			TP0_DEVICE	"\n" \

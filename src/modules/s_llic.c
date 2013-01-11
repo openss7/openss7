@@ -81,7 +81,7 @@ static char const ident[] = "$RCSfile: s_llic.c,v $ $Name:  $($Revision: 1.1.2.3
 #include <sys/snet/ll_proto.h>
 #include <sys/snet/ll_control.h>
 
-#define S_LLIC_DESCRIP		"SPIDER LLI ADMIN COMPATIBILITY MODULE FOR LINUX FAST-STREAMS"
+#define S_LLIC_DESCRIP		"Spider LLI Admin Compatibility Module for Linux Fast-STREAMS"
 #define S_LLIC_EXTRA		"Part of the OpenSS7 X.25 Stack for Linux Fast-STREAMS"
 #define S_LLIC_COPYRIGHT	"Copyright (c) 2008-2011  Monavacon Limited.  All Rights Reserved."
 #define S_LLIC_REVISION		"OpenSS7 $RCSfile: s_llic.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-09-02 08:46:54 $"

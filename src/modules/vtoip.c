@@ -92,13 +92,15 @@ static char const ident[] =
 
 #include <sys/os7/compat.h>
 
-#define VTOIP_DESCRIP	"VTOIP STREAMS MODULE"
+#define VTOIP_DESCRIP	"VTOIP STREAMS Module"
+#define VTOIP_EXTRA	"Part of the OpenSS7 VoIP Stack for Linux Fast-STREAMS"
 #define VTOIP_REVISION	"OpenSS7 $RCSfile: vtoip.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2011-09-02 08:46:57 $"
 #define VTOIP_COPYRIGHT	"Copyright (c) 2008-2011  Monavacon Limited.  All Rights Reserved."
 #define VTOIP_DEVICE	"Provides OpenSS7 Voice Trunking over IP (VTOIP)"
 #define VTOIP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define VTOIP_LICENSE	"GPL"
 #define VTOIP_BANNER	VTOIP_DESCRIP	"\n" \
+			VTOIP_EXTRA	"\n" \
 			VTOIP_REVISION	"\n" \
 			VTOIP_COPYRIGHT	"\n" \
 			VTOIP_DEVICE	"\n" \

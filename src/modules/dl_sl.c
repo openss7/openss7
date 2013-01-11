@@ -72,13 +72,15 @@ static char const ident[] = "$RCSfile: dl_sl.c,v $ $Name:  $($Revision: 1.1.2.3 
 
 #include <sys/os7/compat.h>
 
-#define DL_SL_DESCRIP	"DLPI/SLI CONVERSION STREAMS MODULE."
+#define DL_SL_DESCRIP	"DLPI/SLI Conversion STREAMS Module"
+#define DL_SL_EXTRA	"Part of the OpenSS7 SS7 Stack for Linux Fast-STREAMS"
 #define DL_SL_REVISION	"OpenSS7 $RCSfile: dl_sl.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-09-02 08:46:52 $"
 #define DL_SL_COPYRIGHT	"Copyright (c) 2008-2011  Monavacon Limited.  All Rights Reserved."
 #define DL_SL_DEVICE	"Part of the OpenSS7 Stack for Linux Fast STREAMS."
 #define DL_SL_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define DL_SL_LICENSE	"GPL"
 #define DL_SL_BANNER	DL_SL_DESCRIP	"\n" \
+			DL_SL_EXTRA	"\n" \
 			DL_SL_REVISION	"\n" \
 			DL_SL_COPYRIGHT	"\n" \
 			DL_SL_DEVICE	"\n" \

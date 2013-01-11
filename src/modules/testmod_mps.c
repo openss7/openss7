@@ -84,8 +84,8 @@ static char const ident[] = "$RCSfile: testmod_mps.c,v $ $Name:  $($Revision: 1.
 #include <sys/os7/compat.h>
 
  /* This is simply defines for use with Linux module functions. */
-#define TM_MPS_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
-#define TM_MPS_EXTRA		"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
+#define TM_MPS_DESCRIP		"MPS Compatibility Test Module (TEST-MOD-MPS) STREAMS Module"
+#define TM_MPS_EXTRA		"Part of UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define TM_MPS_COPYRIGHT	"Copyright (c) 2008-2011  Monavacon Limited.  All Rights Reserved."
 #define TM_MPS_REVISION		"OpenSS7 $RCSfile: testmod_mps.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-09-02 08:46:56 $"
 #define TM_MPS_DEVICE		"MPS Compatability TEST Module (TEST-MOD-MPS)"

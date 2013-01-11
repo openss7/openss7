@@ -95,9 +95,9 @@ static char const ident[] = "$RCSfile: mapmod.c,v $ $Name:  $($Revision: 1.1.2.3
 #include <ss7/tc.h>
 #include <ss7/mc.h>
 
-#define MCMOD_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
-#define MCMOD_EXTRA		"Part of the OpenSS7 Stack for Linux Fast-STREAMS"
-#define MCMOD_COPYRIGHT	"Copyright (c) 2008-2011  Monavacon Limited.  All Rights Reserved."
+#define MCMOD_DESCRIP		"GSM 29.002 MAP Common Services for ITU-T Q.771 TC STREAMS Module"
+#define MCMOD_EXTRA		"Part of the OpenSS7 SS7 Stack for Linux Fast-STREAMS"
+#define MCMOD_COPYRIGHT		"Copyright (c) 2008-2011  Monavacon Limited.  All Rights Reserved."
 #define MCMOD_REVISION		"Monavacon $RCSfile: mapmod.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-09-02 08:46:53 $"
 #define MCMOD_DEVICE		"GSM 29.002 MAP Common Services module for ITU-T Q.771 TC"
 #define MCMOD_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
@@ -165,22 +165,6 @@ MODULE_PARM_DESC(modid, "Module ID for MCMOD.  (0 for allocation.)");
 #ifdef LINUX
 #ifdef MODULE_ALIAS
 MODULE_ALIAS("streams-modid-" __stringify(CONFIG_STREAMS_MCMOD_MODID));
-#if 0
-MODULE_ALIAS("streams-driver-mcmod");
-MODULE_ALIAS("/dev/streams/mcmod");
-MODULE_ALIAS("/dev/streams/mcmod/*");
-MODULE_ALIAS("/dev/streams/clone/mcmod");
-MODULE_ALIAS("/dev/streams/mcmod/mc");
-MODULE_ALIAS("/dev/streams/mcmod/mgr");
-MODULE_ALIAS("/dev/streams/mcmod/tp");
-#endif
-#if 0
-MODULE_ALIAS("char-major-" __stringify(MCMOD_CMAJOR_0));
-MODULE_ALIAS("char-major-" __stringify(MCMOD_CMAJOR_0) "-*");
-MODULE_ALIAS("char-major-" __stringify(MCMOD_CMAJOR_0) "-0");
-MODULE_ALIAS("char-major-" __stringify(MCMOD_CMAJOR_0) "-" __stringify(MGR_CMINOR));
-MODULE_ALIAS("char-major-" __stringify(MCMOD_CMAJOR_0) "-" __stringify(TP_CMINOR));
-#endif
 #endif				/* MODULE_ALIAS */
 #endif				/* LINUX */
 

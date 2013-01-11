@@ -81,13 +81,15 @@ static char const ident[] = "$RCSfile: npi_conv.c,v $ $Name:  $($Revision: 1.1.2
 #include <sys/os7/compat.h>
 #include <sys/npi.h>
 
-#define NPI_CONV_DESCRIP	"NPI ENDIAN CONVERSION (NPI-CONV) FOR LINUX FAST-STREAMS"
+#define NPI_CONV_DESCRIP	"NPI Endian Conversion (NPI-CONV) for Linux Fast-STREAMS"
+#define NPI_CONV_EXTRA		"Part of Linux Fast-STREAMS"
 #define NPI_CONV_COPYRIGHT	"Copyright (c) 2008-2011  Monavacon Limited.  All Rights Reserved."
 #define NPI_CONV_REVISION	"OpenSS7 $RCSfile: npi_conv.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2011-09-02 08:46:54 $"
 #define NPI_CONV_DEVICE		"SVR 4.2 NPI Endian Conversion (NPI-CONV) for STREAMS"
 #define NPI_CONV_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define NPI_CONV_LICENSE	"GPL"
 #define NPI_CONV_BANNER		NPI_CONV_DESCRIP	"\n" \
+				NPI_CONV_EXTRA		"\n" \
 				NPI_CONV_COPYRIGHT	"\n" \
 				NPI_CONV_REVISION	"\n" \
 				NPI_CONV_DEVICE		"\n" \

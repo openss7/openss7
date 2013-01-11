@@ -103,19 +103,21 @@ static char const ident[] = "$RCSfile: sdt_tpi.c,v $ $Name:  $($Revision: 1.1.2.
 #include <ss7/sdti.h>
 #include <ss7/sdti_ioctl.h>
 
-#define SDT_TPI_DESCRIP	"SS7/IP SIGNALLING DATA TERMINAL (SDT) STREAMS MODULE."
+#define SDT_TPI_DESCRIP		"SS7/IP Signalling Data Terminal (SDT) STREAMS Module"
+#define SDT_TPI_EXTRA		"Part of the OpenSS7 SS7 Stack for Linux Fast-STREAMS"
 #define SDT_TPI_COPYRIGHT	"Copyright (c) 2008-2011  Monavacon Limited.  All Rights Reserved."
 #define SDT_TPI_REVISION	"OpenSS7 $RCSfile: sdt_tpi.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2011-09-02 08:46:55 $"
-#define SDT_TPI_DEVICE	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
-#define SDT_TPI_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
-#define SDT_TPI_LICENSE	"GPL"
-#define SDT_TPI_BANNER	SDT_TPI_DESCRIP	"\n" \
-			SDT_TPI_COPYRIGHT	"\n" \
-			SDT_TPI_REVISION	"\n" \
-			SDT_TPI_DEVICE	"\n" \
-			SDT_TPI_CONTACT	"\n"
-#define SDT_TPI_SPLASH	SDT_TPI_DESCRIP	" - " \
-			SDT_TPI_REVISION	"\n"
+#define SDT_TPI_DEVICE		"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
+#define SDT_TPI_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
+#define SDT_TPI_LICENSE		"GPL"
+#define SDT_TPI_BANNER		SDT_TPI_DESCRIP		"\n" \
+				SDT_TPI_EXTRA		"\n" \
+				SDT_TPI_COPYRIGHT	"\n" \
+				SDT_TPI_REVISION	"\n" \
+				SDT_TPI_DEVICE		"\n" \
+				SDT_TPI_CONTACT		"\n"
+#define SDT_TPI_SPLASH		SDT_TPI_DESCRIP		" - " \
+				SDT_TPI_REVISION	"\n"
 
 #ifdef LINUX
 MODULE_AUTHOR(SDT_TPI_CONTACT);

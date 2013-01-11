@@ -79,13 +79,15 @@ static char const ident[] =
 
 #include <sys/os7/compat.h>
 
-#define ITOS_DESCRIP	"ITOS STREAMS MODULE"
+#define ITOS_DESCRIP	"ITOS STREAMS Module"
+#define ITOS_EXTRA	"Part of the OpenSS7 OSI Stack for Linux Fast-STREAMS"
 #define ITOS_REVISION	"OpenSS7 $RCSfile: itos.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2011-09-02 08:46:53 $"
 #define ITOS_COPYRIGHT	"Copyright (c) 2008-2011  Monavacon Limited.  All Rights Reserved."
 #define ITOS_DEVICE	"Provides OpenSS7 ISO Transport over SCTP (ITOS)"
 #define ITOS_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define ITOS_LICENSE	"GPL"
 #define ITOS_BANNER	ITOS_DESCRIP	"\n" \
+			ITOS_EXTRA	"\n" \
 			ITOS_REVISION	"\n" \
 			ITOS_COPYRIGHT	"\n" \
 			ITOS_DEVICE	"\n" \

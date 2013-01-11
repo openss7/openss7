@@ -91,13 +91,15 @@ static char const ident[] = "$RCSfile: sdt.c,v $ $Name:  $($Revision: 1.1.2.4 $)
 #include <ss7/sdti.h>
 #include <ss7/sdti_ioctl.h>
 
-#define SDT_DESCRIP	"SS7/SDT: (Signalling Data Terminal) STREAMS MODULE."
+#define SDT_DESCRIP	"SS7/SDT: (Signalling Data Terminal) STREAMS Module"
+#define SDT_EXTRA	"Part of the OpenSS7 SS7 Stack for Linux Fast-STREAMS"
 #define SDT_REVISION	"OpenSS7 $RCSfile: sdt.c,v $ $Name:  $ ($Revision: 1.1.2.4 $) $Date: 2011-09-02 08:46:55 $"
 #define SDT_COPYRIGHT	"Copyright (c) 2008-2011  Monavacon Limited.  All Rights Reserved."
 #define SDT_DEVICE	"Supports OpenSS7 SDL drivers."
 #define SDT_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define SDT_LICENSE	"GPL"
 #define SDT_BANNER	SDT_DESCRIP	"\n" \
+			SDT_EXTRA	"\n" \
 			SDT_REVISION	"\n" \
 			SDT_COPYRIGHT	"\n" \
 			SDT_DEVICE	"\n" \

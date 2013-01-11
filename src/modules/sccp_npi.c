@@ -98,7 +98,7 @@ static char const ident[] = "$RCSfile: sccp_npi.c,v $ $Name:  $($Revision: 1.1.2
 #define n_set_bit(nr,addr)  __set_bit(nr,addr)
 #define n_clr_bit(nr,addr) __clear_bit(nr,addr)
 
-#define SCCP_NPI_DESCRIP	"SCCPI to NPI CONVERSION MODULE FOR LINUX FAST-STREAMS"
+#define SCCP_NPI_DESCRIP	"SCCPI to NPI Conversion Module for Linux Fast-STREAMS"
 #define SCCP_NPI_EXTRA		"Part of the OpenSS7 SS7 Stack for Linux Fast-STREAMS"
 #define SCCP_NPI_COPYRIGHT	"Copyright (c) 2008-2011  Monavacon Limited.  All Rights Reserved."
 #define SCCP_NPI_REVISION	"OpenSS7 $RCSfile: sccp_npi.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-09-02 08:46:54 $"

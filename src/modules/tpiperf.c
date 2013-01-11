@@ -88,13 +88,15 @@ static char const ident[] = "$RCSfile: tpiperf.c,v $ $Name:  $($Revision: 1.1.2.
 #   include <sys/tihdr.h>
 #endif
 
-#define TPIPERF_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
+#define TPIPERF_DESCRIP		"TPI Performance (TPIPERF) STREAMS Module"
+#define TPIPERF_EXTRA		"Part of UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define TPIPERF_COPYRIGHT	"Copyright (c) 2008-2011  Monavacon Limited.  All Rights Reserved."
 #define TPIPERF_REVISION	"OpenSS7 $RCSfile: tpiperf.c,v $ $Name:  $($Revision: 1.1.2.5 $) $Date: 2011-09-02 08:46:56 $"
 #define TPIPERF_DEVICE		"SVR 4.2 MP STREAMS TPI Performance Module (TPIPERF)"
 #define TPIPERF_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define TPIPERF_LICENSE		"GPL"
 #define TPIPERF_BANNER		TPIPERF_DESCRIP		"\n" \
+				TPIPERF_EXTRA		"\n" \
 				TPIPERF_COPYRIGHT	"\n" \
 				TPIPERF_REVISION	"\n" \
 				TPIPERF_DEVICE		"\n" \

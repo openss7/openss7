@@ -87,13 +87,15 @@ static char const ident[] = "$RCSfile: connld.c,v $ $Name:  $($Revision: 1.1.2.4
 
 #include "sys/config.h"
 
-#define CONNLD_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
+#define CONNLD_DESCRIP		"SVR 4.2 Connection Line Discipline (CONNLD) STREAMS Module"
+#define CONNLD_EXTRA		"Part of UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define CONNLD_COPYRIGHT	"Copyright (c) 2008-2012  Monavacon Limited.  All Rights Reserved."
 #define CONNLD_REVISION		"LfS $RCSfile: connld.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2011-09-02 08:46:52 $"
 #define CONNLD_DEVICE		"SVR 4.2 CONNLD Module for STREAMS-based pipes"
 #define CONNLD_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define CONNLD_LICENSE		"GPL"
 #define CONNLD_BANNER		CONNLD_DESCRIP		"\n" \
+				CONNLD_EXTRA		"\n" \
 				CONNLD_COPYRIGHT	"\n" \
 				CONNLD_REVISION		"\n" \
 				CONNLD_DEVICE		"\n" \

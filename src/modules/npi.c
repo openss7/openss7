@@ -93,7 +93,7 @@ static char const ident[] = "$RCSfile: npi.c,v $ $Name:  $($Revision: 1.1.2.3 $)
 #include <sys/npi.h>
 #include <sys/npi_x25.h>
 
-#define NPI_DESCRIP	"NLI to NPI CONVERSION MODULE FOR LINUX FAST-STREAMS"
+#define NPI_DESCRIP	"NLI to NPI Conversion Module for Linux Fast-STREAMS"
 #define NPI_EXTRA	"Part of the OpenSS7 X.25 Stack for Linux Fast-STREAMS"
 #define NPI_COPYRIGHT	"Copyright (c) 2008-2011  Monavacon Limited.  All Rights Reserved."
 #define NPI_REVISION	"OpenSS7 $RCSfile: npi.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-09-02 08:46:54 $"

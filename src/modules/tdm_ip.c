@@ -92,7 +92,7 @@ static char const ident[] = "$RCSfile: tdm_ip.c,v $ $Name:  $($Revision: 1.1.2.4
 #include <sys/mxi.h>
 #include <sys/mxi_ioctl.h>
 
-#define TDM_IP_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
+#define TDM_IP_DESCRIP		"TDM over IP (TDM-IP) STREAMS Module"
 #define TDM_IP_EXTRA		"Part of the OpenSS7 VoIP Stack for Linux Fast-STREAMS"
 #define TDM_IP_COPYRIGHT	"Copyright (c) 2008-2011  Monavacon Limited.  All Rights Reserved."
 #define TDM_IP_REVISION		"OpenSS7 $RCSfile: tdm_ip.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2011-09-02 08:46:56 $"

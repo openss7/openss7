@@ -79,13 +79,15 @@ static char const ident[] =
 
 #include <sys/os7/compat.h>
 
-#define LPP_DESCRIP	"LPP STREAMS MODULE"
+#define LPP_DESCRIP	"LPP STREAMS Module"
+#define LPP_EXTRA	"Part of the OpenSS7 OSI Stack for Linux Fast-STREAMS"
 #define LPP_REVISION	"OpenSS7 $RCSfile: lpp.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2011-09-02 08:46:53 $"
 #define LPP_COPYRIGHT	"Copyright (c) 2008-2011  Monavacon Limited.  All Rights Reserved."
 #define LPP_DEVICE	"Provides OpenSS7 Lightweight Presentation Protocol (LPP)"
 #define LPP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define LPP_LICENSE	"GPL"
 #define LPP_BANNER	LPP_DESCRIP	"\n" \
+			LPP_EXTRA	"\n" \
 			LPP_REVISION	"\n" \
 			LPP_COPYRIGHT	"\n" \
 			LPP_DEVICE	"\n" \

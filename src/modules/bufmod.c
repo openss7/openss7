@@ -87,13 +87,15 @@ static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
 
 #include "sys/config.h"
 
-#define BUFMOD_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
+#define BUFMOD_DESCRIP		"SVR 4.2 Buffer Module (BUFMOD) STREAMS Module"
+#define BUFMOD_EXTRA		"Part of UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define BUFMOD_COPYRIGHT	"Copyright (c) 2008-2012  Monavacon Limited.  All Rights Reserved."
 #define BUFMOD_REVISION		"Lfs $RCSfile$ $Name$($Revision$) $Date$"
 #define BUFMOD_DEVICE		"SVR 4.2 Buffer Module (BUFMOD) for STREAMS"
 #define BUFMOD_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define BUFMOD_LICENSE		"GPL"
 #define BUFMOD_BANNER		BUFMOD_DESCRIP		"\n" \
+				BUFMOD_EXTRA		"\n" \
 				BUFMOD_COPYRIGHT	"\n" \
 				BUFMOD_REVISION		"\n" \
 				BUFMOD_DEVICE		"\n" \
