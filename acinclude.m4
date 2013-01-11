@@ -784,6 +784,9 @@ dnl----------------------------------------------------------------------------
 	net/request_sock.h \
 	linux/percpu.h \
 	linux/cred.h \
+	linux/device.h \
+	linux/notifier.h \
+	linux/crypto.h \
 	], [:], [:], [
 #include <linux/compiler.h>
 #ifdef NEED_LINUX_AUTOCONF_H
@@ -825,6 +828,9 @@ dnl----------------------------------------------------------------------------
 	access_ok \
 	atomic_add_return \
 	check_region \
+	class_create \
+	__class_create \
+	class_destroy \
 	cli \
 	compat_ptr \
 	cpu_raise_softirq \
@@ -832,6 +838,8 @@ dnl----------------------------------------------------------------------------
 	create_proc_info_entry \
 	d_alloc_pseudo \
 	dev_init_buffers \
+	device_create \
+	device_destroy \
 	dst_mtu \
 	dst_output \
 	find_pid \
@@ -1010,11 +1018,15 @@ dnl----------------------------------------------------------------------------
 #include <net/route.h>
 #include <net/inet_ecn.h>
 #include <net/tcp.h>
+#ifdef HAVE_KINC_LINUX_DEVICE_H
+#include <linux/device.h>
+#endif
     ]) # _LINUX_CHECK_FUNCS
 dnl----------------------------------------------------------------------------
 dnl----------------------------------------------------------------------------
     _LINUX_CHECK_MACROS([ \
 	access_ok \
+	class_create \
 	do_each_pid_task \
 	MOD_DEC_USE_COUNT \
 	MOD_INC_USE_COUNT \
@@ -1067,6 +1079,9 @@ dnl----------------------------------------------------------------------------
 #endif
 #ifdef HAVE_KINC_NET_DST_H
 #include <net/dst.h>
+#endif
+#ifdef HAVE_KINC_LINUX_DEVICE_H
+#include <linux/device.h>
 #endif
     ]) # _LINUX_CHECK_MACROS
 dnl----------------------------------------------------------------------------
@@ -1257,6 +1272,9 @@ dnl----------------------------------------------------------------------------
 #include <net/protocol.h>
 #ifdef HAVE_NET_DST_H
 #include <net/dst.h>
+#endif
+#ifdef HAVE_KINC_LINUX_DEVICE_H
+#include <linux/device.h>
 #endif
     ]) # _LINUX_CHECK_MEMBERS
 dnl----------------------------------------------------------------------------
@@ -3198,6 +3216,33 @@ dnl	_LINUX_KERNEL_SYMBOL_EXPORT([mount_sem],     [os7_cv_fattach=no])
 	    necessary symbols above are defined, then define this to include
 	    pipe support.])
     fi
+dnl----------------------------------------------------------------------------
+    AC_ARG_ENABLE([specfs-lock],
+	[AS_HELP_STRING([--disable-specfs-lock],
+	    [specfs filesystems locks @<:@default=yes@:>@])])
+    AC_CACHE_CHECK([for specfs locking], [os7_cv_specfs_lock], [dnl
+	os7_cv_specfs_lock=${enable_specfs_lock:-yes}
+	if test :${linux_cv_header_linux_notifier_h} != :yes; then
+	    if test :${os7_cv_specfs_lock} = :yes; then
+		os7_cv_specfs_lock=disabled
+	    fi
+	fi
+	if test :${linux_cv_header_linux_crypto_h} != :yes; then
+	    if test :${os7_cv_specfs_lock} = :yes; then
+		os7_cv_specfs_lock=disabled
+	    fi
+	fi
+    ])
+    if test :${os7_cv_specfs_lock:-yes} = :yes; then
+	AC_DEFINE([WITH_SPECFS_LOCK], [1], [When defined, specfs locking is
+	supported and enabled.])dnl
+    fi
+    AC_CACHE_CHECK([for specfs lock expiry date], [os7_cv_specfs_date], [dnl
+	os7_cv_specfs_date=`date +%s`
+	os7_cv_specfs_date=$((os7_cv_specfs_date+15768000))
+    ])
+    AC_DEFINE_UNQUOTED([STRLOCK_EXPIRES], [$os7_cv_specfs_date], [Defines the
+    specfs lock expiry date.])
 dnl----------------------------------------------------------------------------
     _LINUX_KERNEL_SYMBOL_EXPORT([sys_unlink], [dnl
 	if test :"${linux_cv_k_marchdir}" = :parisc ; then

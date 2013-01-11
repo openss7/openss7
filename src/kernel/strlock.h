@@ -1,18 +1,18 @@
 /*****************************************************************************
 
- @(#) $RCSfile: specfs.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2011-03-17 07:01:29 $
+ @(#) $Id$
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2010  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2013  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
 
- This program is free software: you can redistribute it and/or modify it under
+ This program is free software; you can redistribute it and/or modify it under
  the terms of the GNU Affero General Public License as published by the Free
- Software Foundation, version 3 of the license.
+ Software Foundation; version 3 of the License.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -47,60 +47,27 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2011-03-17 07:01:29 $ by $Author: brian $
+ Last Modified $Date$ by $Author$
 
  -----------------------------------------------------------------------------
 
- $Log: specfs.c,v $
- Revision 1.1.2.4  2011-03-17 07:01:29  brian
- - build and repo system improvements
-
- Revision 1.1.2.3  2010-11-28 14:21:56  brian
- - remove #ident, protect _XOPEN_SOURCE
-
- Revision 1.1.2.2  2009-09-01 09:09:51  brian
- - added text image files
-
- Revision 1.1.2.1  2009-06-21 11:37:16  brian
- - added files to new distro
-
+ $Log$
  *****************************************************************************/
 
-static char const ident[] = "$RCSfile: specfs.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2011-03-17 07:01:29 $";
+#ifndef __LOCAL_STRLOCK_H__
+#define __LOCAL_STRLOCK_H__
 
-/* can we just include these into one big compilation unit? */
+#ifndef __EXTERN
+#define __EXTERN extern
+#endif
 
-#define BIG_COMPILE 1
-#define BIG_STATIC static
-#define BIG_STATIC_INLINE static streams_inline
+#ifndef __STREAMS_EXTERN
+#define __STREAMS_EXTERN __EXTERN streams_fastcall
+#endif
 
-#define BIG_COMPILE_SPECFS 1
+__STREAMS_EXTERN int strlock_open_check(void);
+int strlock_init(void);
+void strlock_exit(void);
 
-#define __EXTERN_INLINE
-#define __STRSCHD_EXTERN_INLINE static inline streams_fastcall
-#define __STRUTIL_EXTERN_INLINE static inline streams_fastcall
+#endif				/* __LOCAL_STRLOCK_H__ */
 
-/* initialization for specfs */
-BIG_STATIC int strlookup_init(void);
-BIG_STATIC void strlookup_exit(void);
-
-#ifndef CONFIG_STREAMS_WRAPPER_MODULE
-#undef ident
-#define ident ident_wrapper
-#include "wrapper.c"
-#endif				/* CONFIG_STREAMS_WRAPPER_MODULE */
-#undef ident
-#define ident ident_strlock
-#include "strlock.c"
-#undef ident
-#define ident ident_strspecfs
-#include "strspecfs.c"
-#undef ident
-#define ident ident_strlookup
-#include "strlookup.c"
-#undef ident
-#define ident ident_strattach
-#include "strattach.c"
-#undef ident
-#define ident ident_strpipe
-#include "strpipe.c"

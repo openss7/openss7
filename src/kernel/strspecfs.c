@@ -138,13 +138,15 @@ static char const ident[] = "$RCSfile: strspecfs.c,v $ $Name:  $($Revision: 1.1.
 
 #include "sys/config.h"
 
-#define SPECFS_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
+#define SPECFS_DESCRIP		"SVR 4.2 Special Shadow Filesystem (SPECFS)"
+#define SPECFS_EXTRA		"Part of UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define SPECFS_COPYRIGHT	"Copyright (c) 2008-2013  Monavacon Limited.  All Rights Reserved."
 #define SPECFS_REVISION		"LfS $RCSfile: strspecfs.c,v $ $Name:  $($Revision: 1.1.2.11 $) $Date: 2011-09-20 09:51:39 $"
 #define SPECFS_DEVICE		"SVR 4.2 Special Shadow Filesystem (SPECFS)"
 #define SPECFS_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define SPECFS_LICENSE		"GPL"
 #define SPECFS_BANNER		SPECFS_DESCRIP		"\n" \
+				SPECFS_EXTRA		"\n" \
 				SPECFS_COPYRIGHT	"\n" \
 				SPECFS_REVISION		"\n" \
 				SPECFS_DEVICE		"\n" \
@@ -169,7 +171,6 @@ MODULE_VERSION(PACKAGE_ENVR);
 #ifdef MODULE_ALIAS
 MODULE_ALIAS("/dev/streams");
 MODULE_ALIAS("/dev/streams/*");
-MODULE_ALIAS("devname:streams");
 #endif
 #endif
 
@@ -180,6 +181,7 @@ MODULE_ALIAS("devname:streams");
 
 #include "strlookup.h"		/* for cdevsw_list */
 #include "strspecfs.h"		/* for own struct spec_sb_info */
+#include "strlock.h"		/* for filesystem signage initialization */
 
 /* 
  *  -------------------------------------------------------------------------
@@ -1600,6 +1602,8 @@ specfs_init(void)
 #else
 	printk(KERN_INFO SPECFS_SPLASH);	/* console splash */
 #endif
+	if ((result = strlock_init()))
+		goto no_locks;
 	if ((result = specfs_init_cache()))
 		goto no_cache;
 	if ((result = register_filesystem(&spec_fs_type)))
@@ -1612,6 +1616,8 @@ specfs_init(void)
       no_specfs:
 	specfs_term_cache();
       no_cache:
+	strlock_exit();
+      no_locks:
 	return (result);
 }
 
@@ -1627,6 +1633,7 @@ specfs_exit(void)
 	strlookup_exit();
 	unregister_filesystem(&spec_fs_type);
 	specfs_term_cache();
+	strlock_exit();
 }
 
 #ifdef CONFIG_STREAMS_MODULE
