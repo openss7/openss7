@@ -1,0 +1,20 @@
+[Unit]
+Description=STREAMS error logger
+Documentation=man:strerr(8)
+ConditionPathIsMountPoint=/dev/streams
+Conflicts=streams-shutdown.target
+Before=streams-shutdown.target
+After=streams.service
+
+[Service]
+Type=forking
+EnvironmentFile=-/etc/sysconfig/strerr
+EnvironmentFile=-/etc/default/strerr
+EnvironmentFile=-/etc/conf.d/strerr
+PIDFile=/var/run/strerr.pid
+ExecStartPre=/bin/mkdir -p -- /var/log/streams
+ExecStart=/usr/sbin/strerr $STRERR_OPTIONS
+ExecReload=/bin/kill -HUP $MAINPID
+
+[Install]
+WantedBy=streams.target

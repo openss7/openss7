@@ -1,0 +1,15 @@
+[Unit]
+Description=OpenSS7 Subsystem
+Conflicts=streams-shutdown.target
+Before=streams-shutdown.target
+After=streams.target
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+ExecStart=/lib/systemd/openss7 start
+ExecStop=/lib/systemd/openss7 stop
+
+[Install]
+WantedBy=multi-user.target
+Also=streams.target

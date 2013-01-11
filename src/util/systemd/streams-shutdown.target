@@ -1,0 +1,3 @@
+[Unit]
+Description=Shutdown of STREAMS Subsystem
+Documentation=man:streams(4)
