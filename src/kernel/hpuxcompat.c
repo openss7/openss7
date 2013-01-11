@@ -86,13 +86,15 @@ static char const ident[] = "$RCSfile: hpuxcompat.c,v $ $Name:  $($Revision: 1.1
 
 #include "sys/os7/compat.h"
 
-#define HPUXCOMP_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
+#define HPUXCOMP_DESCRIP	"HP-UX 11i v2 Compatibility for Linux Fast-STREAMS"
+#define HPUXCOMP_EXTRA		"Part of UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define HPUXCOMP_COPYRIGHT	"Copyright (c) 2008-2011  Monavacon Limited.  All Rights Reserved."
 #define HPUXCOMP_REVISION	"LfS $RCSfile: hpuxcompat.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2011-09-20 09:51:39 $"
 #define HPUXCOMP_DEVICE		"HP-UX 11i v2 Compatibility"
 #define HPUXCOMP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define HPUXCOMP_LICENSE	"GPL"
 #define HPUXCOMP_BANNER		HPUXCOMP_DESCRIP	"\n" \
+				HPUXCOMP_EXTRA		"\n" \
 				HPUXCOMP_COPYRIGHT	"\n" \
 				HPUXCOMP_REVISION	"\n" \
 				HPUXCOMP_DEVICE		"\n" \

@@ -83,13 +83,15 @@ static char const ident[] = "$RCSfile: suncompat.c,v $ $Name:  $($Revision: 1.1.
 
 #include "sys/os7/compat.h"
 
-#define SUNCOMP_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
+#define SUNCOMP_DESCRIP		"Solaris(R) 8 Compatibility for Linux Fast-STREAMS"
+#define SUNCOMP_EXTRA		"Part of UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define SUNCOMP_COPYRIGHT	"Copyright (c) 2008-2011  Monavacon Limited.  All Rights Reserved."
 #define SUNCOMP_REVISION	"LfS $RCSfile: suncompat.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-09-02 08:46:51 $"
 #define SUNCOMP_DEVICE		"Solaris(R) 8 Compatibility"
 #define SUNCOMP_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define SUNCOMP_LICENSE		"GPL"
 #define SUNCOMP_BANNER		SUNCOMP_DESCRIP		"\n" \
+				SUNCOMP_EXTRA		"\n" \
 				SUNCOMP_COPYRIGHT	"\n" \
 				SUNCOMP_REVISION	"\n" \
 				SUNCOMP_DEVICE		"\n" \

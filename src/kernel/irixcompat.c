@@ -89,13 +89,15 @@ static char const ident[] = "$RCSfile: irixcompat.c,v $ $Name:  $($Revision: 1.1
 
 #include "sys/os7/compat.h"
 
-#define IRIXCOMP_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
+#define IRIXCOMP_DESCRIP	"IRIX 6.5.17 Compatibility module for Linux Fast-STREAMS"
+#define IRIXCOMP_EXTRA		"Part of UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define IRIXCOMP_COPYRIGHT	"Copyright (c) 2008-2011  Monavacon Limited.  All Rights Reserved."
 #define IRIXCOMP_REVISION	"LfS $RCSfile: irixcompat.c,v $ $Name:  $($Revision: 1.1.2.5 $) $Date: 2011-09-02 08:46:50 $"
 #define IRIXCOMP_DEVICE		"IRIX 6.5.17 Compatibility"
 #define IRIXCOMP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define IRIXCOMP_LICENSE	"GPL"
 #define IRIXCOMP_BANNER		IRIXCOMP_DESCRIP	"\n" \
+				IRIXCOMP_EXTRA		"\n" \
 				IRIXCOMP_COPYRIGHT	"\n" \
 				IRIXCOMP_REVISION	"\n" \
 				IRIXCOMP_DEVICE		"\n" \

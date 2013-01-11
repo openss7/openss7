@@ -83,13 +83,15 @@ static char const ident[] = "$RCSfile: maccompat.c,v $ $Name:  $($Revision: 1.1.
 
 #include "sys/os7/compat.h"
 
-#define MACCOMP_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
+#define MACCOMP_DESCRIP		"Mac OpenTransport Version 1.5r2 Compatibility for Linux Fast-STREAMS"
+#define MACCOMP_EXTRA		"Part of UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define MACCOMP_COPYRIGHT	"Copyright (c) 2008-2011  Monavacon Limited.  All Rights Reserved."
 #define MACCOMP_REVISION	"LfS $RCSfile: maccompat.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-09-02 08:46:51 $"
 #define MACCOMP_DEVICE		"Mac OpenTransport Version 1.5r2 Compatibility"
 #define MACCOMP_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define MACCOMP_LICENSE		"GPL"
 #define MACCOMP_BANNER		MACCOMP_DESCRIP		"\n" \
+				MACCOMP_EXTRA		"\n" \
 				MACCOMP_COPYRIGHT	"\n" \
 				MACCOMP_REVISION	"\n" \
 				MACCOMP_DEVICE		"\n" \

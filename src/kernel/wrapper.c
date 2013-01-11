@@ -122,7 +122,8 @@ static char const ident[] =
 #ifdef CONFIG_STREAMS_WRAPPER_MODULE
 #include <sys/os7/compat.h>
 
-#define WRAPPER_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
+#define WRAPPER_DESCRIP		"SVR 4.2 Symbol Definition Wrappers for Linux Fast-STREAMS"
+#define WRAPPER_EXTRA		"Part of UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define WRAPPER_COPYRIGHT	"Copyright (c) 2008-2012  Monavacon Limited.  All Rights Reserved."
 #define WRAPPER_REVISION	"LfS $RCSfile: wrapper.c,v $ $Name:  $($Revision: 1.1.2.9 $) $Date: 2011-09-02 08:46:51 $"
 #define WRAPPER_DEVICE		"SVR 4.2 Wrappers (WRAPPER)"

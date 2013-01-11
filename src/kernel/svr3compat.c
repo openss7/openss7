@@ -83,13 +83,15 @@ static char const ident[] = "$RCSfile: svr3compat.c,v $ $Name:  $($Revision: 1.1
 
 #include "sys/os7/compat.h"
 
-#define SVR3COMP_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
+#define SVR3COMP_DESCRIP	"UNIX(R) SVR 3.2 Compatibility for Linux Fast-STREAMS"
+#define SVR3COMP_EXTRA		"Part of UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define SVR3COMP_COPYRIGHT	"Copyright (c) 2008-2011  Monavacon Limited.  All Rights Reserved."
 #define SVR3COMP_REVISION	"LfS $RCSfile: svr3compat.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-09-02 08:46:51 $"
 #define SVR3COMP_DEVICE		"UNIX(R) SVR 3.2 Compatibility"
 #define SVR3COMP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define SVR3COMP_LICENSE	"GPL"
 #define SVR3COMP_BANNER		SVR3COMP_DESCRIP	"\n" \
+				SVR3COMP_EXTRA		"\n" \
 				SVR3COMP_COPYRIGHT	"\n" \
 				SVR3COMP_REVISION	"\n" \
 				SVR3COMP_DEVICE		"\n" \
