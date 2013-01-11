@@ -88,13 +88,15 @@ static char const ident[] = "$RCSfile: pty.c,v $ $Name:  $($Revision: 1.1.2.5 $)
 #include <linux/interrupt.h>
 #include <linux/spinlock.h>
 
-#define PTY_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
+#define PTY_DESCRIP	"SVR 4.2 Pseudo-Terminal (PTY) STREAMS Driver"
+#define PTY_EXTRA	"Part of UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define PTY_COPYRIGHT	"Copyright (c) 2008-2013  Monavacon Limited.  All Rights Reserved."
 #define PTY_REVISION	"OpenSS7 $RCSfile: pty.c,v $ $Name:  $($Revision: 1.1.2.5 $) $Date: 2011-09-20 09:51:36 $"
 #define PTY_DEVICE	"SVR 4.2 MP STREAMS Pseudo-Terminal Driver (PTY)"
 #define PTY_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define PTY_LICENSE	"GPL"
 #define PTY_BANNER	PTY_DESCRIP	"\n" \
+			PTY_EXTRA	"\n" \
 			PTY_COPYRIGHT	"\n" \
 			PTY_REVISION	"\n" \
 			PTY_DEVICE	"\n" \
@@ -158,16 +160,12 @@ MODULE_ALIAS("/dev/streams/ptm/ptmx");
 MODULE_ALIAS("/dev/streams/pts");
 MODULE_ALIAS("/dev/streams/pts/*");
 MODULE_ALIAS("/dev/streams/clone/pts");
-MODULE_ALIAS("char-major-" __stringify(PTM_CMAJOR_0));
+/*
 MODULE_ALIAS("char-major-" __stringify(PTM_CMAJOR_0) "-*");
-MODULE_ALIAS("char-major-" __stringify(PTM_CMAJOR_0) "-0");
 MODULE_ALIAS("/dev/ptm");
-MODULE_ALIAS("devname:ptm");
-MODULE_ALIAS("char-major-" __stringify(PTS_CMAJOR_0));
 MODULE_ALIAS("char-major-" __stringify(PTS_CMAJOR_0) "-*");
-MODULE_ALIAS("char-major-" __stringify(PTS_CMAJOR_0) "-0");
 MODULE_ALIAS("/dev/pts");
-MODULE_ALIAS("devname:pts");
+*/
 #endif				/* MODULE_ALIAS */
 #endif				/* LINUX */
 

@@ -100,13 +100,15 @@ static char const ident[] = "$RCSfile: fifo.c,v $ $Name:  $($Revision: 1.1.2.7 $
 #include "src/modules/sth.h"
 #include "fifo.h"		/* extern verification */
 
-#define FIFO_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
+#define FIFO_DESCRIP	"SVR 4.2 STREAMS-based FIFOs"
+#define FIFO_EXTRA	"Part of UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define FIFO_COPYRIGHT	"Copyright (c) 2008-2013  Monavacon Limited.  All Rights Reserved."
 #define FIFO_REVISION	"LfS $RCSfile: fifo.c,v $ $Name:  $($Revision: 1.1.2.7 $) $Date: 2011-09-02 08:46:32 $"
 #define FIFO_DEVICE	"SVR 4.2 MP STREAMS-based FIFOs"
 #define FIFO_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define FIFO_LICENSE	"GPL"
 #define FIFO_BANNER	FIFO_DESCRIP	"\n" \
+			FIFO_EXTRA	"\n" \
 			FIFO_COPYRIGHT	"\n" \
 			FIFO_REVISION	"\n" \
 			FIFO_DEVICE	"\n" \
@@ -180,7 +182,7 @@ MODULE_PARM_DESC(major, "Major device number for STREAMS-based FIFOs.");
 
 #ifdef MODULE
 #ifdef MODULE_ALIAS
-MODULE_ALIAS("char-major-" __stringify(CONFIG_STREAMS_FIFO_MAJOR) "-*");
+MODULE_ALIAS("char-major-" __stringify(CONFIG_STREAMS_CLONE_MAJOR) "-" __stringify(CONFIG_STREAMS_FIFO_MAJOR));
 MODULE_ALIAS("/dev/fifo");
 MODULE_ALIAS("devname:fifo");
 MODULE_ALIAS("streams-major-" __stringify(CONFIG_STREAMS_FIFO_MAJOR));

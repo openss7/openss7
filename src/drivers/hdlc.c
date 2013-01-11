@@ -94,8 +94,8 @@ static char const ident[] = "$RCSfile: hdlc.c,v $ $Name:  $($Revision: 1.1.2.3 $
 
 #include <linux/hdlc.h>
 
-#define HDLC_DESCRIP	"HDLC STREAMS MULTIPLEXING DRIVER."
-#define HDLC_EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
+#define HDLC_DESCRIP	"HDLC STREAMS Multiplexing Driver"
+#define HDLC_EXTRA	"Part of the OpenSS7 OSI Stack for Linux Fast-STREAMS"
 #define HDLC_REVISION	"OpenSS7 $RCSfile: hdlc.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-09-02 08:46:32 $"
 #define HDLC_COPYRIGHT	"Copyright (c) 2008-2013  Monavacon Limited.  All Rights Reserved."
 #define HDLC_DEVICE	"Supports Linux HDLC devices."
@@ -139,9 +139,7 @@ MODULE_ALIAS("streams-major-" __stringify(CONFIG_STREAMS_HDLC_MAJOR));
 MODULE_ALIAS("/dev/streams/hdlc");
 MODULE_ALIAS("/dev/streams/hdlc/*");
 MODULE_ALIAS("/dev/streams/clone/hdlc");
-MODULE_ALIAS("char-major-" __stringify(HDLC_CMAJOR_0));
-MODULE_ALIAS("char-major-" __stringify(HDLC_CMAJOR_0) "-*");
-MODULE_ALIAS("char-major-" __stringify(HDLC_CMAJOR_0) "-0");
+MODULE_ALIAS("char-major-" __stringify(CONFIG_STREAMS_CLONE_MAJOR) "-" __stringify(HDLC_CMAJOR_0));
 MODULE_ALIAS("/dev/hdlc");
 MODULE_ALIAS("devname:hdlc");
 #endif				/* MODULE_ALIAS */

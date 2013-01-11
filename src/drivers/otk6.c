@@ -421,8 +421,8 @@ extern void tcp_set_skb_tso_factor(struct sk_buff *skb, unsigned int mss_std);
 #include <sys/xti_inet.h>
 #include <sys/xti_osi.h>
 
-#define OTK6_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
-#define OTK6_EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS"
+#define OTK6_DESCRIP	"RFC 1006 TPI OSI Transport Provider STREAMS Driver"
+#define OTK6_EXTRA	"Part of the OpenSS7 OSI Stack for Linux Fast-STREAMS"
 #define OTK6_COPYRIGHT	"Copyright (c) 2008-2013  Monavacon Limited.  All Rights Reserved."
 #define OTK6_REVISION	"OpenSS7 $RCSfile: otk6.c,v $ $Name:  $($Revision: 1.1.2.7 $) $Date: 2011-09-02 08:46:35 $"
 #define OTK6_DEVICE	"SVR 4.2 MP STREAMS RFC1006 TPI OSI Transport Provider Driver"
@@ -460,10 +460,7 @@ MODULE_ALIAS("streams-major-" __stringify(CONFIG_STREAMS_OTK6_MAJOR));
 MODULE_ALIAS("/dev/streams/otk6");
 MODULE_ALIAS("/dev/streams/otk6/*");
 MODULE_ALIAS("/dev/streams/clone/otk6");
-MODULE_ALIAS("char-major-" __stringify(OTK6_CMAJOR_0));
-MODULE_ALIAS("char-major-" __stringify(OTK6_CMAJOR_0) "-*");
-MODULE_ALIAS("char-major-" __stringify(OTK6_CMAJOR_0) "-0");
-MODULE_ALIAS("char-major-" __stringify(OTK6_CMAJOR_0) "-" __stringify(OTK6_CMINOR));
+MODULE_ALIAS("char-major-" __stringify(CONFIG_STREAMS_CLONE_MAJOR) "-" __stringify(OTK6_CMAJOR_0));
 MODULE_ALIAS("/dev/otk6");
 MODULE_ALIAS("devname:otk6");
 #endif				/* MODULE_ALIAS */

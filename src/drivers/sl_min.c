@@ -70,13 +70,15 @@ static char const ident[] = "$RCSfile: sl_min.c,v $ $Name:  $($Revision: 1.1.2.3
 #include <ss7/lmi.h>
 #include <ss7/sli.h>
 
-#define SL_MIN_DESCRIP		"SS7/IP SIGNALLING LINK (SL) STREAMS MULTIPLEXING DRIVER."
+#define SL_MIN_DESCRIP		"SS7/IP Signalling Link (SL) STREAMS Multiplexing Driver"
+#define SL_MIN_EXTRA		"Part of the OpenSS7 SS7 Stack for Linux Fast-STREAMS"
 #define SL_MIN_REVISION		"LfS $RCSname$ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-09-02 08:46:36 $"
 #define SL_MIN_COPYRIGHT	"Copyright (c) 2008-2011  Monavacon Limited.  All Rights Reserved."
 #define SL_MIN_DEVICE		"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define SL_MIN_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define SL_MIN_LICENSE		"GPL"
 #define SL_MIN_BANNER		SL_MIN_DESCRIP		"\n" \
+				SL_MIN_EXTRA		"\n" \
 				SL_MIN_REVISION		"\n" \
 				SL_MIN_COPYRIGHT	"\n" \
 				SL_MIN_DEVICE		"\n" \

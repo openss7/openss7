@@ -266,7 +266,7 @@ static char const ident[] = "$RCSfile: rsw.c,v $ $Name:  $($Revision: 1.1.2.4 $)
 
 #define T_ALLLEVELS -1
 
-#define RSW_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
+#define RSW_DESCRIP	"Real-Time Protocol (RTP) Switching STREAMS Driver"
 #define RSW_EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS"
 #define RSW_COPYRIGHT	"Copyright (c) 2008-2013  Monavacon Limited.  All Rights Reserved."
 #define RSW_REVISION	"OpenSS7 $RCSfile: rsw.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2011-09-02 08:46:35 $"
@@ -311,9 +311,7 @@ MODULE_ALIAS("streams-major-" __stringify(CONFIG_STREAMS_RSW_MAJOR));
 MODULE_ALIAS("/dev/streams/rsw");
 MODULE_ALIAS("/dev/streams/rsw/*");
 MODULE_ALIAS("/dev/streams/clone/rsw");
-MODULE_ALIAS("char-major-" __stringify(RSW_CMAJOR_0));
-MODULE_ALIAS("char-major-" __stringify(RSW_CMAJOR_0) "-*");
-MODULE_ALIAS("char-major-" __stringify(RSW_CMAJOR_0) "-0");
+MODULE_ALIAS("char-major-" __stringify(CONFIG_STREAMS_CLONE_MAJOR) "-" __stringify(RSW_CMAJOR_0));
 MODULE_ALIAS("/dev/rsw");
 MODULE_ALIAS("devname:rsw");
 #endif				/* MODULE_ALIAS */

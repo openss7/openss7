@@ -90,7 +90,7 @@ static char const ident[] = "$RCSfile: dl_ip.c,v $ $Name:  $($Revision: 1.1.2.4 
 
 #include <sys/dlpi.h>
 
-#define DL_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
+#define DL_DESCRIP	"Internet Protocol (IP) Data Link Provider (DL_IP) STREAMS Driver"
 #define DL_EXTRA	"Part of the OpenSS7 stack for Linux Fast-STREAMS"
 #define DL_COPYRIGHT	"Copyright (c) 2008-2013  Monavacon Limited.  All Rights Reserved."
 #define DL_REVISION	"OpenSS7 $RCSfile: dl_ip.c,v $ $Name:  $ ($Revision: 1.1.2.4 $) $Date: 2011-09-02 08:46:32 $"
@@ -134,10 +134,7 @@ MODULE_ALIAS("streams-major-" __stringify(CONFIG_STREAMS_DL_MAJOR));
 MODULE_ALIAS("/dev/streams/dl_ip");
 MODULE_ALIAS("/dev/streams/dl_ip/*");
 MODULE_ALIAS("/dev/streams/clone/dl_ip");
-MODULE_ALIAS("char-major-" __stringify(DL_CMAJOR_0));
-MODULE_ALIAS("char-major-" __stringify(DL_CMAJOR_0) "-*");
-MODULE_ALIAS("char-major-" __stringify(DL_CMAJOR_0) "-0");
-MODULE_ALIAS("char-major-" __stringify(DL_CMAJOR_0) "-" __stringify(DL_CMINOR));
+MODULE_ALIAS("char-major-" __stringify(CONFIG_STREAMS_CLONE_MAJOR) "-" __stringify(DL_CMAJOR_0));
 MODULE_ALIAS("/dev/dl_ip");
 MODULE_ALIAS("devname:dl_ip");
 #endif				/* MODULE_ALIAS */

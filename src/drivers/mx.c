@@ -156,13 +156,15 @@ static char const ident[] = "$RCSfile: mx.c,v $ $Name:  $($Revision: 1.1.2.3 $) 
 #include <ss7/chi.h>
 #include <ss7/chi_ioctl.h>
 
-#define MX_DESCRIP	"MX (MX) STREAMS MULTIPLEXING DRIVER."
+#define MX_DESCRIP	"MX (MX) STREAMS Multiplexing Driver"
+#define MX_EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS"
 #define MX_REVISION	"LfS $RCSfile: mx.c,v $ $Name:  $ ($Revision: 1.1.2.3 $) $Date: 2011-09-02 08:46:34 $"
 #define MX_COPYRIGHT	"Copyright (c) 2008-2013  Monavacon Limited.  All Rights Reserved."
 #define MX_DEVICE	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define MX_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define MX_LICENSE	"GPL"
 #define MX_BANNER	MX_DESCRIP	"\n" \
+			MX_EXTRA	"\n" \
 			MX_REVISION	"\n" \
 			MX_COPYRIGHT	"\n" \
 			MX_DEVICE	"\n" \
@@ -215,9 +217,7 @@ MODULE_ALIAS("/dev/streams/mx/*");
 MODULE_ALIAS("/dev/streams/mx/mx");
 MODULE_ALIAS("/dev/streams/mx/ch");
 MODULE_ALIAS("/dev/streams/clone/mx");
-MODULE_ALIAS("char-major-" __stringify(MX_CMAJOR_0));
-MODULE_ALIAS("char-major-" __stringify(MX_CMAJOR_0) "-*");
-MODULE_ALIAS("char-major-" __stringify(MX_CMAJOR_0) "-0");
+MODULE_ALIAS("char-major-" __stringify(CONFIG_STREAMS_CLONE_MAJOR) "-" __stringify(MX_CMAJOR_0));
 MODULE_ALIAS("/dev/mx");
 MODULE_ALIAS("devname:mx");
 #endif				/* defined MODULE_ALIAS */

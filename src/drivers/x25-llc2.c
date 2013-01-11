@@ -75,7 +75,7 @@ static char const ident[] =
 
 #include <sys/os7/compat.h>
 
-#define LLC2_DESCRIP	"SVR 4.2 DLPI X25-LLC2 DRIVER FOR LINUX FAST-STREAMS"
+#define LLC2_DESCRIP	"SVR 4.2 DLPI X25-LLC2 Driver for Linux Fast-STREAMS"
 #define LLC2_EXTRA      "Part of the OpenSS7 X.25 Stack for Linux Fast-STREAMS"
 #define LLC2_COPYRIGHT	"Copyright (c) 2008-2013  Monavacon Limited.  All Rights Reserved."
 #define LLC2_REVISION	"OpenSS7 $RCSfile: x25-llc2.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2011-09-02 08:46:39 $"
@@ -114,9 +114,7 @@ MODULE_ALIAS("streams-major-" __stringify(CONFIG_STREAMS_LLC2_MAJOR));
 MODULE_ALIAS("/dev/streams/llc2");
 MODULE_ALIAS("/dev/streams/llc2/*");
 MODULE_ALIAS("/dev/streams/clone/llc2");
-MODULE_ALIAS("char-major-" __stringify(CONFIG_STREAMS_LLC2_MAJOR));
-MODULE_ALIAS("char-major-" __stringify(CONFIG_STREAMS_LLC2_MAJOR) "-*");
-MODULE_ALIAS("char-major-" __stringify(CONFIG_STREAMS_LLC2_MAJOR) "-0");
+MODULE_ALIAS("char-major-" __stringify(CONFIG_STREAMS_CLONE_MAJOR) "-" __stringify(CONFIG_STREAMS_LLC2_MAJOR));
 MODULE_ALIAS("/dev/llc2");
 MODULE_ALIAS("devname:llc2");
 #endif				/* MODULE_ALIAS */

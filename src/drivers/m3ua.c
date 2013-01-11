@@ -84,13 +84,15 @@ static char const ident[] = "$RCSfile: m3ua.c,v $ $Name:  $($Revision: 1.1.2.3 $
  *  for both SG and AS use by the UA/LM control stream.
  */
 
-#define M3UA_DESCRIP	"M3UA STREAMS MULTIPLEXING DRIVER."
+#define M3UA_DESCRIP	"M3UA STREAMS Multiplexing Driver"
+#define M3UA_EXTRA	"Part of the OpenSS7 SS7 Stack for Linux Fast-STREAMS"
 #define M3UA_REVISION	"OpenSS7 $RCSfile: m3ua.c,v $ $Name:  $ ($Revision: 1.1.2.3 $) $Date: 2011-09-02 08:46:34 $"
 #define M3UA_COPYRIGHT	"Copyright (c) 2008-2011  Monavacon Limited.  All Rights Reserved."
 #define M3UA_DEVICE	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define M3UA_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define M3UA_LICENSE	"GPL"
 #define M3UA_BANNER	M3UA_DESCRIP	"\n" \
+			M3UA_EXTRA	"\n" \
 			M3UA_REVISION	"\n" \
 			M3UA_COPYRIGHT	"\n" \
 			M3UA_DEVICE	"\n" \

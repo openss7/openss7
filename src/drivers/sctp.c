@@ -160,14 +160,15 @@ struct sockaddr_storage {
 #include "sctp_t.h"
 #include "sctp_input.h"
 
-#define SCTP_DESCRIP	"SCTP/IP STREAMS (NPI/TPI) DRIVER." "\n" \
-			"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
+#define SCTP_DESCRIP	"SCTP/IP STREAMS (NPI/TPI) Driver"
+#define SCTP_EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS"
 #define SCTP_REVISION	"LfS $RCSfile: sctp.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2011-09-02 08:46:35 $"
 #define SCTP_COPYRIGHT	"Copyright (c) 2008-2012  Monavacon Limited.  All Rights Reserved."
-#define SCTP_DEVICE	"Supports LiS STREAMS and Linux NET4."
+#define SCTP_DEVICE	"Supports LiS STREAMS and Linux NET4"
 #define SCTP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define SCTP_LICENSE	"GPL"
 #define SCTP_BANNER	SCTP_DESCRIP	"\n" \
+			SCTP_EXTRA	"\n" \
 			SCTP_REVISION	"\n" \
 			SCTP_COPYRIGHT	"\n" \
 			SCTP_DEVICE	"\n" \

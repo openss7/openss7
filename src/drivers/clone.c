@@ -88,7 +88,8 @@ static char const ident[] =
 #include "sys/config.h"
 #include "clone.h"		/* extern verification */
 
-#define CLONE_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
+#define CLONE_DESCRIP	"SVR 4.2 STREAMS Clone Driver"
+#define CLONE_EXTRA	"Part of UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define CLONE_COPYRIGHT	"Copyright (c) 2008-2013  Monavacon Limited.  All Rights Reserved."
 #define CLONE_REVISION	"LfS $RCSfile: clone.c,v $ $Name:  $($Revision: 1.1.2.5 $) $Date: 2011-09-02 08:46:32 $"
 #define CLONE_DEVICE	"SVR 4.2 MP STREAMS CLONE Driver"
@@ -156,11 +157,8 @@ static major_t major = CONFIG_STREAMS_CLONE_MAJOR;
 MODULE_ALIAS("streams-clone");
 MODULE_ALIAS("streams-modid-" __stringify(CONFIG_STREAMS_CLONE_MODID));
 MODULE_ALIAS("streams-driver-clone");
-MODULE_ALIAS("char-major-" __stringify(CONFIG_STREAMS_CLONE_MAJOR));
 MODULE_ALIAS("char-major-" __stringify(CONFIG_STREAMS_CLONE_MAJOR) "-*");
-MODULE_ALIAS("char-major-" __stringify(CONFIG_STREAMS_CLONE_MAJOR) "-0");
 MODULE_ALIAS("/dev/clone");
-MODULE_ALIAS("devname:clone");
 MODULE_ALIAS("streams-major-" __stringify(CONFIG_STREAMS_CLONE_MAJOR));
 MODULE_ALIAS("/dev/streams/clone");
 MODULE_ALIAS("/dev/streams/clone/*");

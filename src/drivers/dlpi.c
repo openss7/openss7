@@ -105,7 +105,7 @@ static char const ident[] = "$RCSfile: dlpi.c,v $ $Name:  $($Revision: 1.1.2.3 $
 #include <linux/netdevice.h>
 #include <net/protocol.h>
 
-#define DLPI_DESCRIP	"UNIX SVR 4.2 DLPI DRIVER FOR LINUX FAST-STREAMS"
+#define DLPI_DESCRIP	"UNIX SVR 4.2 DLPI Driver for Linux Fast-STREAMS"
 #define DLPI_EXTRA	"Part of the OpenSS7 Protocol Stacks for Linux Fast-STREAMS"
 #define DLPI_COPYRIGHT	"Copyright (c) 2008-2013  Monavacon Limited.  All Rights Reserved."
 #define DLPI_REVISION	"OpenSS7 $RCSfile: dlpi.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-09-02 08:46:32 $"
@@ -147,22 +147,11 @@ MODULE_ALIAS("/dev/streams/dlpi/eth");
 MODULE_ALIAS("/dev/streams/dlpi/llc");
 MODULE_ALIAS("/dev/streams/dlpi/hdlc");
 MODULE_ALIAS("/dev/streams/dlpi/lapb");
-MODULE_ALIAS("char-major-" __stringify(DLPI_MAJOR_0));
 MODULE_ALIAS("char-major-" __stringify(DLPI_MAJOR_0) "-*");
-MODULE_ALIAS("char-major-" __stringify(DLPI_MAJOR_0) "-0");
-MODULE_ALIAS("char-major-" __stringify(DLPI_MAJOR_0) "-1");
-MODULE_ALIAS("char-major-" __stringify(DLPI_MAJOR_0) "-2");
-MODULE_ALIAS("char-major-" __stringify(DLPI_MAJOR_0) "-3");
-MODULE_ALIAS("char-major-" __stringify(DLPI_MAJOR_0) "-4");
-MODULE_ALIAS("char-major-" __stringify(DLPI_MAJOR_0) "-" __stringify(DLPI_CMINOR));
 MODULE_ALIAS("/dev/eth");
 MODULE_ALIAS("/dev/llc");
 MODULE_ALIAS("/dev/hdlc");
 MODULE_ALIAS("/dev/lapb");
-MODULE_ALIAS("devname:eth");
-MODULE_ALIAS("devname:llc");
-MODULE_ALIAS("devname:hdlc");
-MODULE_ALIAS("devname:lapb");
 #endif				/* MODULE_ALIAS */
 #ifdef MODULE_VERSION
 MODULE_VERSION(PACKAGE_ENVR);

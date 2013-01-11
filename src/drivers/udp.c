@@ -168,8 +168,8 @@ static char const ident[] = "$RCSfile: udp.c,v $ $Name:  $($Revision: 1.1.2.12 $
 
 #define T_ALLLEVELS -1
 
-#define TP_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
-#define TP_EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS"
+#define TP_DESCRIP	"User Datagram Protocol (UDP) STREAMS Driver"
+#define TP_EXTRA	"Part of the OpenSS7 IP Stack for Linux Fast-STREAMS"
 #define TP_COPYRIGHT	"Copyright (c) 2008-2013  Monavacon Limited.  All Rights Reserved."
 #define TP_REVISION	"OpenSS7 $RCSfile: udp.c,v $ $Name:  $($Revision: 1.1.2.12 $) $Date: 2011-09-20 09:51:38 $"
 #define TP_DEVICE	"SVR 4.2 MP STREAMS UDP Driver"
@@ -213,9 +213,7 @@ MODULE_ALIAS("streams-major-" __stringify(CONFIG_STREAMS_UDP_MAJOR));
 MODULE_ALIAS("/dev/streams/udp");
 MODULE_ALIAS("/dev/streams/udp/*");
 MODULE_ALIAS("/dev/streams/clone/udp");
-MODULE_ALIAS("char-major-" __stringify(TP_CMAJOR_0));
-MODULE_ALIAS("char-major-" __stringify(TP_CMAJOR_0) "-*");
-MODULE_ALIAS("char-major-" __stringify(TP_CMAJOR_0) "-0");
+MODULE_ALIAS("char-major-" __stringify(CONFIG_STREAMS_CLONE_MAJOR) "-" __stringify(TP_CMAJOR_0));
 MODULE_ALIAS("/dev/udp2");
 MODULE_ALIAS("devname:udp2");
 #endif				/* MODULE_ALIAS */

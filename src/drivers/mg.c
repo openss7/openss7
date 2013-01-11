@@ -119,13 +119,15 @@ static char const ident[] =
 #include <ss7/mgi.h>
 #include <ss7/mgi_ioctl.h>
 
-#define MG_DESCRIP	"SS7 MEDIA GATEWAY (MG) STREAMS MULTIPLEXING DRIVER."
+#define MG_DESCRIP	"SS7 Media Gateway (MG) STREAMS Multiplexing Driver"
+#define MG_EXTRA	"Part of the OpenSS7 VoIP Stack for Linux Fast-STREAMS"
 #define MG_REVISION	"LfS $RCSfile: mg.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2011-09-02 08:46:34 $"
 #define MG_COPYRIGHT	"Copyright (c) 2008-2011  Monavacon Limited.  All Rights Reserved."
 #define MG_DEVICE	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define MG_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define MG_LICENSE	"GPL"
 #define MG_BANNER	MG_DESCRIP	"\n" \
+			MG_EXTRA	"\n" \
 			MG_REVISION	"\n" \
 			MG_COPYRIGHT	"\n" \
 			MG_DEVICE	"\n" \

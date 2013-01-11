@@ -97,8 +97,8 @@ static char const ident[] = "$RCSfile: dl.c,v $ $Name:  $($Revision: 1.1.2.4 $) 
 
 #include <sys/dlpi.h>
 
-#define DL_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
-#define DL_EXTRA	"Part of the OpenSS7 stack for Linux Fast-STREAMS"
+#define DL_DESCRIP	"DLPI OSI Data Link Provider (DL) STREAMS Driver"
+#define DL_EXTRA	"Part of the OpenSS7 Protocol Stacks for Linux Fast-STREAMS"
 #define DL_COPYRIGHT	"Copyright (c) 2008-2013  Monavacon Limited.  All Rights Reserved."
 #define DL_REVISION	"OpenSS7 $RCSfile: dl.c,v $ $Name:  $ ($Revision: 1.1.2.4 $) $Date: 2011-09-02 08:46:32 $"
 #define DL_DEVICE	"SVR 4.2 MP STREAMS DLPI OSI Data Link Provider"
@@ -141,10 +141,7 @@ MODULE_ALIAS("streams-major-" __stringify(CONFIG_STREAMS_DL_MAJOR));
 MODULE_ALIAS("/dev/streams/dl");
 MODULE_ALIAS("/dev/streams/dl/*");
 MODULE_ALIAS("/dev/streams/clone/dl");
-MODULE_ALIAS("char-major-" __stringify(DL_CMAJOR_0));
-MODULE_ALIAS("char-major-" __stringify(DL_CMAJOR_0) "-*");
-MODULE_ALIAS("char-major-" __stringify(DL_CMAJOR_0) "-0");
-MODULE_ALIAS("char-major-" __stringify(DL_CMAJOR_0) "-" __stringify(DL_CMINOR));
+MODULE_ALIAS("char-major-" __stringify(CONFIG_STREAMS_CLONE_MAJOR) "-" __stringify(DL_CMAJOR_0));
 MODULE_ALIAS("/dev/dl");
 MODULE_ALIAS("devname:dl");
 #endif				/* MODULE_ALIAS */

@@ -107,7 +107,7 @@ static char const ident[] = "$RCSfile: tl.c,v $ $Name:  $($Revision: 1.1.2.5 $) 
 
 #define T_ALLLEVELS -1
 
-#define TI_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
+#define TI_DESCRIP	"SVR 4.2 Transport Layer (TL) STREAMS Driver"
 #define TI_EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS"
 #define TI_COPYRIGHT	"Copyright (c) 2008-2013  Monavacon Limited.  All Rights Reserved."
 #define TI_REVISION	"OpenSS7 $RCSfile: tl.c,v $ $Name:  $($Revision: 1.1.2.5 $) $Date: 2011-09-02 08:46:37 $"
@@ -155,17 +155,12 @@ MODULE_ALIAS("/dev/streams/tl/ticots");
 MODULE_ALIAS("/dev/streams/tl/ticotsord");
 MODULE_ALIAS("/dev/streams/tl/*");
 MODULE_ALIAS("/dev/streams/clone/tl");
-MODULE_ALIAS("char-major-" __stringify(UDP_CMAJOR_0));
-MODULE_ALIAS("char-major-" __stringify(UDP_CMAJOR_0) "-*");
-MODULE_ALIAS("char-major-" __stringify(UDP_CMAJOR_0) "-0");
+MODULE_ALIAS("char-major-" __stringify(CONFIG_STREAMS_CLONE_MAJOR) "-" __stringify(UDP_CMAJOR_0));
 MODULE_ALIAS("/dev/tl");
 MODULE_ALIAS("/dev/ticlts");
 MODULE_ALIAS("/dev/ticots");
 MODULE_ALIAS("/dev/ticotsord");
 MODULE_ALIAS("devname:tl");
-MODULE_ALIAS("devname:ticlts");
-MODULE_ALIAS("devname:ticots");
-MODULE_ALIAS("devname:ticotsord");
 #endif				/* MODULE_ALIAS */
 #endif				/* LINUX */
 

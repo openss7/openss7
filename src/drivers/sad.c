@@ -106,13 +106,15 @@ static char const ident[] = "$RCSfile: sad.c,v $ $Name:  $($Revision: 1.1.2.5 $)
 //#include "src/kernel/strreg.h"
 #include "src/kernel/strsad.h"	/* for autopush functions */
 
-#define SAD_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
+#define SAD_DESCRIP	"SVR 4.2 STREAMS Administrative Driver (SAD)"
+#define SAD_EXTRA	"Part of UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define SAD_COPYRIGHT	"Copyright (c) 2008-2013  Monavacon Limited.  All Rights Reserved."
 #define SAD_REVISION	"LfS $RCSfile: sad.c,v $ $Name:  $($Revision: 1.1.2.5 $) $Date: 2011-09-02 08:46:35 $"
 #define SAD_DEVICE	"SVR 4.2 MP STREAMS Administrative Driver (SAD)"
 #define SAD_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define SAD_LICENSE	"GPL"
 #define SAD_BANNER	SAD_DESCRIP	"\n" \
+			SAD_EXTRA	"\n" \
 			SAD_COPYRIGHT	"\n" \
 			SAD_REVISION	"\n" \
 			SAD_DEVICE	"\n" \
@@ -183,13 +185,11 @@ MODULE_PARM_DESC(major, "Major device number for STREAMS-administrative driver."
 
 #ifdef MODULE
 #ifdef MODULE_ALIAS
-MODULE_ALIAS("char-major-" __stringify(CONFIG_STREAMS_SAD_MAJOR) "-*");
+MODULE_ALIAS("char-major-" __stringify(CONFIG_STREAMS_CLONE_MAJOR) "-" __stringify(CONFIG_STREAMS_SAD_MAJOR));
+MODULE_ALIAS("devname:sad");
 MODULE_ALIAS("/dev/sad");
 MODULE_ALIAS("/dev/sad/admin");
 MODULE_ALIAS("/dev/sad/user");
-MODULE_ALIAS("devname:sad");
-MODULE_ALIAS("devname:sad/admin");
-MODULE_ALIAS("devname:sad/user");
 MODULE_ALIAS("streams-major-" __stringify(CONFIG_STREAMS_SAD_MAJOR));
 MODULE_ALIAS("/dev/streams/sad");
 MODULE_ALIAS("/dev/streams/sad/*");

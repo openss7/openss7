@@ -98,11 +98,11 @@ static char const ident[] = "$RCSfile: sdt_x400p.c,v $ $Name:  $($Revision: 1.1.
 #include "x400p-ss7/x400pfw.h"	/* X400P-SS7 firmware load */
 #endif
 
-#define SDT_X400P_DESCRIP	"E/T400P-SS7: SS7/SDT (Signalling Data Terminal) STREAMS DRIVER."
+#define SDT_X400P_DESCRIP	"E/T400P-SS7: SS7/SDT (Signalling Data Terminal) STREAMS Driver"
 #define SDT_X400P_EXTRA		"Part of the OpenSS7 Stack for Linux Fast-STREAMS"
 #define SDT_X400P_REVISION	"OpenSS7 $RCSfile: sdt_x400p.c,v $ $Name:  $ ($Revision: 1.1.2.3 $) $Date: 2011-09-02 08:46:36 $"
 #define SDT_X400P_COPYRIGHT	"Copyright (c) 2008-2011  Monavacon Limited.  All Rights Reserved."
-#define SDT_X400P_DEVICE	"Supports the T/E400P-SS7 T1/E1 PCI boards."
+#define SDT_X400P_DEVICE	"Supports the T/E400P-SS7 T1/E1 PCI boards"
 #define SDT_X400P_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define SDT_X400P_LICENSE	"GPL"
 #define SDT_X400P_BANNER	SDT_X400P_DESCRIP	"\n" \

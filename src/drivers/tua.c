@@ -97,8 +97,8 @@ static char const ident[] = "$RCSfile: tua.c,v $ $Name:  $($Revision: 1.1.2.3 $)
  *  for both SG and AS use by the UA/LM control stream.
  */
 
-#define TUA_DESCRIP	"TUA STREAMS MULTIPLEXING DRIVER."
-#define TUA_EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS"
+#define TUA_DESCRIP	"TUA STREAMS Multiplexing Driver"
+#define TUA_EXTRA	"Part of the OpenSS7 SS7 Stack for Linux Fast-STREAMS"
 #define TUA_REVISION	"OpenSS7 $RCSfile: tua.c,v $ $Name:  $ ($Revision: 1.1.2.3 $) $Date: 2011-09-02 08:46:37 $"
 #define TUA_COPYRIGHT	"Copyright (c) 2008-2011  Monavacon Limited.  All Rights Reserved."
 #define TUA_DEVICE	"Supports OpenSS7 TCAP TCI/TRI Interface Pseudo-Device Drivers."

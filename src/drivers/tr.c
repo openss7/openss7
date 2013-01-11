@@ -78,13 +78,15 @@ static char const ident[] = "$RCSfile: tr.c,v $ $Name:  $($Revision: 1.1.2.3 $) 
 
 #include <sys/os7/compat.h>
 
-#define TR_DESCRIP	"TCAP TR STREAMS MULTIPLEXING DRIVER."
+#define TR_DESCRIP	"TCAP TR STREAMS Multiplexing Driver"
+#define TR_EXTRA	"Part of the OpenSS7 SS7 Stack for Linux Fast-STREAMS"
 #define TR_REVISION	"LfS $RCSfile: tr.c,v $ $Name:  $ ($Revision: 1.1.2.3 $) $Date"
 #define TR_COPYRIGHT	"Copyright (c) 2008-2011  Monavacon Limited.  All Rights Reserved."
 #define TR_DEVICE	"Part of the OpenSS7 Stack for Linux Fast STREAMS."
 #define TR_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define TR_LICENSE	"GPL"
 #define TR_BANNER	TR_DESCRIP	"\n" \
+			TR_EXTRA	"\n" \
 			TR_REVISION	"\n" \
 			TR_COPYRIGHT	"\n" \
 			TR_DEVICE	"\n" \

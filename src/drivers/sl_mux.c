@@ -109,13 +109,15 @@ static char const ident[] = "$RCSfile: sl_mux.c,v $ $Name:  $($Revision: 1.1.2.5
 
 #include <ss7/sl_mux.h>
 
-#define SL_MUX_DESCRIP		"SL-MUX: SS7/SL (Signalling Link) STREAMS MULTIPLEXING DRIVER."
+#define SL_MUX_DESCRIP		"SL-MUX: SS7/SL (Signalling Link) STREAMS Multiplexing Driver"
+#define SL_MUX_EXTRA		"Part of the OpenSS7 SS7 Stack for Linux Fast-STREAMS"
 #define SL_MUX_REVISION		"OpenSS7 $RCSfile: sl_mux.c,v $ $Name:  $($Revision: 1.1.2.5 $) $Date: 2011-09-20 09:51:37 $"
 #define SL_MUX_COPYRIGHT	"Copyright (c) 2008-2011  Monavacon Limited.  All Rights Reserved."
 #define SL_MUX_DEVICE		"Supports the OpenSS7 MTP2 and INET transport drivers."
 #define SL_MUX_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define SL_MUX_LICENSE		"GPL"
 #define SL_MUX_BANNER		SL_MUX_DESCRIP		"\n" \
+				SL_MUX_EXTRA		"\n" \
 				SL_MUX_REVISION		"\n" \
 				SL_MUX_COPYRIGHT	"\n" \
 				SL_MUX_DEVICE		"\n" \

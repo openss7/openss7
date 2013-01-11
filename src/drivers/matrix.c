@@ -157,13 +157,15 @@ static char const ident[] = "$RCSfile: matrix.c,v $ $Name:  $($Revision: 1.1.2.3
 #include <ss7/mxi.h>
 #include <ss7/mxi_ioctl.h>
 
-#define MATRIX_DESCRIP		"MATRIX (MX) STREAMS MULTIPLEXING DRIVER."
+#define MATRIX_DESCRIP		"MATRIX (MX) STREAMS Multiplexing Driver"
+#define MATRIX_EXTRA		"Part of the OpenSS7 VoIP Stack for Linux Fast-STREAMS"
 #define MATRIX_REVISION		"OpenSS7 $RCSfile: matrix.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-09-02 08:46:34 $"
 #define MATRIX_COPYRIGHT	"Copyright (c) 2008-2013  Monavacon Limited.  All Rights Reserved."
 #define MATRIX_DEVICE		"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define MATRIX_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define MATRIX_LICENSE		"GPL"
 #define MATRIX_BANNER		MATRIX_DESCRIP		"\n" \
+				MATRIX_EXTRA		"\n" \
 				MATRIX_REVISION		"\n" \
 				MATRIX_COPYRIGHT	"\n" \
 				MATRIX_DEVICE		"\n" \
@@ -218,9 +220,7 @@ MODULE_ALIAS("/dev/streams/matrix/mx");
 MODULE_ALIAS("/dev/streams/matrix/ch");
 MODULE_ALIAS("/dev/streams/matrix/admin");
 MODULE_ALIAS("/dev/stremas/clone/matrix");
-MODULE_ALIAS("char-major-" __stringify(MATRIX_CMAJOR_0));
-MODULE_ALIAS("char-major-" __stringify(MATRIX_CMAJOR_0) "-*");
-MODULE_ALIAS("char-major-" __stringify(MATRIX_CMAJOR_0) "-0");
+MODULE_ALIAS("char-major-" __stringify(CONFIG_STREAMS_CLONE_MAJOR) "-" __stringify(MATRIX_CMAJOR_0));
 MODULE_ALIAS("/dev/matrix");
 MODULE_ALIAS("devname:matrix");
 #endif				/* defined MODULE_ALIAS */

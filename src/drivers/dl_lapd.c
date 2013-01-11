@@ -77,14 +77,15 @@ static char const ident[] = "$RCSfile: dl_lapd.c,v $ $Name:  $($Revision: 1.1.2.
 #include <ss7/lapd_ioctl.h>
 #include <ss7/hdlc_ioctl.h>
 
-#define DL_LAPD_DESCRIP		"LAPD Data Link (DL-LAPD) STREAMS (DLPI) DRIVER" "\n" \
-				"Part of the OpenSS7 Stack for Linux Fast-STREAMS"
+#define DL_LAPD_DESCRIP		"LAPD Data Link (DL-LAPD) STREAMS (DLPI) Driver"
+#define DL_LAPD_EXTRA		"Part of the OpenSS7 ISDN Stack for Linux Fast-STREAMS"
 #define DL_LAPD_REVISION	"OpenSS7 $RCSfile: dl_lapd.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-09-02 08:46:32 $"
 #define DL_LAPD_COPYRIGHT	"Copyright (c) 2008-2011  Monavacon Limited.  All Rights Reserved."
 #define DL_LAPD_DEVICE		"Supports Linux Fast-STREAMS and OpenSS7 CDI Devices."
 #define DL_LAPD_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define DL_LAPD_LICENSE		"GPL"
 #define DL_LAPD_BANNER		DL_LAPD_DESCRIP		"\n" \
+				DL_LAPD_EXTRA		"\n" \
 				DL_LAPD_REVISION	"\n" \
 				DL_LAPD_COPYRIGHT	"\n" \
 				DL_LAPD_DEVICE		"\n" \

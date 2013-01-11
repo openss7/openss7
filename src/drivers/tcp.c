@@ -160,7 +160,7 @@ static char const ident[] = "$RCSfile: tcp.c,v $ $Name:  $($Revision: 1.1.2.10 $
 
 #define T_ALLLEVELS -1
 
-#define TCP_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
+#define TCP_DESCRIP	"Transport Control Protocol (TCP) STREAMS Driver"
 #define TCP_EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS"
 #define TCP_COPYRIGHT	"Copyright (c) 2008-2013  Monavacon Limited.  All Rights Reserved."
 #define TCP_REVISION	"OpenSS7 $RCSfile: tcp.c,v $ $Name:  $($Revision: 1.1.2.10 $) $Date: 2011-09-20 09:51:37 $"
@@ -205,13 +205,12 @@ MODULE_ALIAS("streams-major-" __stringify(CONFIG_STREAMS_TCP_MAJOR));
 MODULE_ALIAS("/dev/streams/tcp");
 MODULE_ALIAS("/dev/streams/tcp/*");
 MODULE_ALIAS("/dev/streams/clone/tcp");
-MODULE_ALIAS("char-major-" __stringify(TCP_CMAJOR_0));
-MODULE_ALIAS("char-major-" __stringify(TCP_CMAJOR_0) "-*");
-MODULE_ALIAS("char-major-" __stringify(TCP_CMAJOR_0) "-0");
+/*
+MODULE_ALIAS("char-major-" __stringify(CONFIG_STREAMS_CLONE_MAJOR) "-" __stringify(TCP_CMAJOR_0));
 MODULE_ALIAS("/dev/tcp");
 MODULE_ALIAS("/dev/inet/tcp");
-MODULE_ALIAS("devname:tcp");
 MODULE_ALIAS("devname:inet/tcp");
+*/
 #endif				/* MODULE_ALIAS */
 #endif				/* LINUX */
 

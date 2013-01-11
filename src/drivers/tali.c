@@ -79,14 +79,15 @@ static char const ident[] = "$RCSfile: tali.c,v $ $Name:  $($Revision: 1.1.2.3 $
  *  user streams, it provides either a normal OpenSS7 MTP, ISUP, or SCCP stream.
  */
 
-#define TALI_DESCRIP	"TALI STREAMS MULTIPLEXING DRIVER." "\n" \
-			"Part of the OpenSS7 stack for Linux Fast-STREAMS"
+#define TALI_DESCRIP	"TALI STREAMS Multiplexing Driver"
+#define TALI_EXTRA	"Part of the OpenSS7 SS7 Stack for Linux Fast-STREAMS"
 #define TALI_REVISION	"OpenSS7 $RCSfile: tali.c,v $ $Name:  $ ($Revision: 1.1.2.3 $) $Date: 2011-09-02 08:46:37 $"
 #define TALI_COPYRIGHT	"Copyright (c) 2008-2011  Monavacon Limited.  All Rights Reserved."
 #define TALI_DEVICE	"Part of the OpenSS7 Stack for Linux Fast STREAMS."
 #define TALI_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define TALI_LICENSE	"GPL"
 #define TALI_BANNER	TALI_DESCRIP	"\n" \
+			TALI_EXTRA	"\n" \
 			TALI_REVISION	"\n" \
 			TALI_COPYRIGHT	"\n" \
 			TALI_DEVICE	"\n" \

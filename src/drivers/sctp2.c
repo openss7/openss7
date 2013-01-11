@@ -93,8 +93,8 @@ static char const ident[] = "$RCSfile: sctp2.c,v $ $Name:  $($Revision: 1.1.2.8 
 
 #include "sctp_hooks.h"
 
-#define SCTP_DESCRIP	"SCTP/IP STREAMS (NPI/TPI) DRIVER."
-#define SCTP_EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
+#define SCTP_DESCRIP	"SCTP/IP STREAMS (NPI/TPI) Driver"
+#define SCTP_EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS"
 #define SCTP_REVISION	"OpenSS7 $RCSfile: sctp2.c,v $ $Name:  $($Revision: 1.1.2.8 $) $Date: 2011-09-20 09:51:36 $"
 #define SCTP_COPYRIGHT	"Copyright (c) 2008-2013  Monavacon Limited.  All Rights Reserved."
 #define SCTP_DEVICE	"Supports Linux Fast-STREAMS and Linux NET4."
@@ -17797,10 +17797,9 @@ MODULE_ALIAS("streams-major-" __stringify(SCTP_N_CMAJOR_0));
 MODULE_ALIAS("/dev/streams/sctp_n");
 MODULE_ALIAS("/dev/streams/sctp_n/*");
 MODULE_ALIAS("/dev/streams/clone/sctp_n");
-MODULE_ALIAS("char-major-" __stringify(SCTP_N_CMAJOR_0));
-MODULE_ALIAS("char-major-" __stringify(SCTP_N_CMAJOR_0) "-*");
-MODULE_ALIAS("char-major-" __stringify(SCTP_N_CMAJOR_0) "-0");
+MODULE_ALIAS("char-major-" __stringify(CONFIG_STREAMS_CLONE_MAJOR) "-" __stringify(SCTP_N_CMAJOR_0));
 MODULE_ALIAS("/dev/sctp_n");
+MODULE_ALIAS("devname:sctp_n");
 #endif				/* MODULE_ALIAS */
 
 #endif				/* LINUX */
@@ -29273,9 +29272,7 @@ MODULE_ALIAS("streams-major-" __stringify(SCTP_T_CMAJOR_0));
 MODULE_ALIAS("/dev/streams/sctp_t");
 MODULE_ALIAS("/dev/streams/sctp_t/*");
 MODULE_ALIAS("/dev/streams/clone/sctp_t");
-MODULE_ALIAS("char-major-" __stringify(SCTP_T_CMAJOR_0));
-MODULE_ALIAS("char-major-" __stringify(SCTP_T_CMAJOR_0) "-*");
-MODULE_ALIAS("char-major-" __stringify(SCTP_T_CMAJOR_0) "-0");
+MODULE_ALIAS("char-major-" __stringify(CONFIG_STREAMS_CLONE_MAJOR) "-" __stringify(SCTP_T_CMAJOR_0));
 MODULE_ALIAS("/dev/sctp_t");
 MODULE_ALIAS("devname:sctp_t");
 #endif				/* MODULE_ALIAS */

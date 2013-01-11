@@ -106,8 +106,8 @@ static char const ident[] = "$RCSfile: nf.c,v $ $Name:  $($Revision: 1.1.2.4 $) 
 
 #include "ip_hooks.h"
 
-#define NF_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
-#define NF_EXTRA	"Part of the OpenSS7 stack for Linux Fast-STREAMS"
+#define NF_DESCRIP	"Netfilter (NF) STREAMS Driver"
+#define NF_EXTRA	"Part of the OpenSS7 IP Stack for Linux Fast-STREAMS"
 #define NF_COPYRIGHT	"Copyright (c) 2008-2013  Monavacon Limited.  All Rights Reserved."
 #define NF_REVISION	"OpenSS7 $RCSfile: nf.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2011-09-02 08:46:35 $"
 #define NF_DEVICE	"SVR 4.2 MP STREAMS NETFILTER Driver"
@@ -151,13 +151,9 @@ MODULE_ALIAS("streams-major-" __stringify(CONFIG_STREAMS_NF_MAJOR));
 MODULE_ALIAS("/dev/streams/nf");
 MODULE_ALIAS("/dev/streams/nf/*");
 MODULE_ALIAS("/dev/streams/clone/nf");
-MODULE_ALIAS("char-major-" __stringify(NF_CMAJOR_0));
-MODULE_ALIAS("char-major-" __stringify(NF_CMAJOR_0) "-*");
-MODULE_ALIAS("char-major-" __stringify(NF_CMAJOR_0) "-0");
-MODULE_ALIAS("char-major-" __stringify(NF_CMAJOR_0) "-" __stringify(NF_CMINOR));
+MODULE_ALIAS("char-major-" __stringify(CONFIG_STREAMS_CLONE_MAJOR) "-" __stringify(NF_CMAJOR_0));
 MODULE_ALIAS("/dev/nf");
 MODULE_ALIAS("/dev/inet/nf");
-MODULE_ALIAS("devname:nf");
 MODULE_ALIAS("devname:inet/nf");
 #endif				/* MODULE_ALIAS */
 #endif				/* LINUX */

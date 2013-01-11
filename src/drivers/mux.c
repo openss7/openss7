@@ -100,13 +100,15 @@ static char const ident[] = "$RCSfile: mux.c,v $ $Name:  $($Revision: 1.1.2.6 $)
 
 #include "sys/config.h"
 
-#define MUX_DESCRIP	"UNIX/SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
+#define MUX_DESCRIP	"SVR 4.2 STREAMS Multiplexing (MUX) Driver"
+#define MUX_EXTRA	"Part of UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define MUX_COPYRIGHT	"Copyright (c) 2008-2013  Monavacon Limited.  All Rights Reserved."
 #define MUX_REVISION	"LfS $RCSfile: mux.c,v $ $Name:  $($Revision: 1.1.2.6 $) $Date: 2011-09-20 09:51:36 $"
 #define MUX_DEVICE	"SVR 4.2 MP STREAMS Multiplexing Driver (MUX)"
 #define MUX_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define MUX_LICENSE	"GPL"
 #define MUX_BANNER	MUX_DESCRIP	"\n" \
+			MUX_EXTRA	"\n" \
 			MUX_COPYRIGHT	"\n" \
 			MUX_REVISION	"\n" \
 			MUX_DEVICE	"\n" \
@@ -177,7 +179,7 @@ MODULE_PARM_DESC(major, "Major device number for STREAMS-mux driver.");
 
 #ifdef MODULE
 #ifdef MODULE_ALIAS
-MODULE_ALIAS("char-major-" __stringify(CONFIG_STREAMS_MUX_MAJOR) "-*");
+MODULE_ALIAS("char-major-" __stringify(CONFIG_STREAMS_CLONE_MAJOR) "-" __stringify(CONFIG_STREAMS_MUX_MAJOR));
 MODULE_ALIAS("/dev/mux");
 MODULE_ALIAS("devname:mux");
 MODULE_ALIAS("streams-major-" __stringify(CONFIG_STREAMS_MUX_MAJOR));

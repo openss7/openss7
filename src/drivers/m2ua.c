@@ -77,13 +77,15 @@ static char const ident[] = "$RCSfile: m2ua.c,v $ $Name:  $($Revision: 1.1.2.3 $
 #include <sys/xti.h>
 #include <sys/xti_sctp.h>
 
-#define M2UA_DESCRIP	"SS7 MTP2 USER ADAPTATION (M2UA) STREAMS MULTIPLEXING DRIVER."
+#define M2UA_DESCRIP	"SS7 MTP2 User Adaptation (M2UA) STREAMS Multiplexing Driver"
+#define M2UA_EXTRA	"Part of the OpenSS7 SS7 Stack for Linux Fast-STREAMS"
 #define M2UA_REVISION	"LfS $RCSfile: m2ua.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-09-02 08:46:33 $"
 #define M2UA_COPYRIGHT	"Copyright (c) 2008-2011  Monavacon Limited.  All Rights Reserved."
 #define M2UA_DEVICE	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define M2UA_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define M2UA_LICENSE	"GPL"
 #define M2UA_BANNER	M2UA_DESCRIP	"\n" \
+			M2UA_EXTRA	"\n" \
 			M2UA_REVISION	"\n" \
 			M2UA_COPYRIGHT	"\n" \
 			M2UA_DEVICE	"\n" \

@@ -83,13 +83,15 @@ static char const ident[] = "$RCSfile: h225.c,v $ $Name:  $($Revision: 1.1.2.3 $
 #include <ss7/isdni.h>
 #include <ss7/isdni_ioctl.h>
 
-#define ISDN_DESCRIP	"INTEGRATED SERVICES DIGITAL NETWORK (ISDN/Q.931) STREAMS DRIVER."
+#define ISDN_DESCRIP	"Integrated Services Digital Network (ISDN/Q.931) STREAMS Driver"
+#define ISDN_EXTRA	"Part of the OpenSS7 VoIP Stack for Linux Fast-STREAMS"
 #define ISDN_REVISION	"OpenSS7 $RCSfile: h225.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-09-02 08:46:32 $"
 #define ISDN_COPYRIGHT	"Copyright (c) 2008-2011  Monavacon Limited.  All Rights Reserved."
-#define ISDN_DEVICE	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
+#define ISDN_DEVICE	"Part of the OpenSS7 Stack for Linux Fast-STREAMS"
 #define ISDN_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define ISDN_LICENSE	"GPL"
 #define ISDN_BANNER	ISDN_DESCRIP	"\n" \
+			ISDN_EXTRA	"\n" \
 			ISDN_REVISION	"\n" \
 			ISDN_COPYRIGHT	"\n" \
 			ISDN_DEVICE	"\n" \

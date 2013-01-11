@@ -115,13 +115,15 @@ static char const ident[] = "$RCSfile: log.c,v $ $Name:  $($Revision: 1.1.2.6 $)
 #include "src/kernel/strutil.h"
 #endif
 
-#define LOG_DESCRIP	"UNIX/SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
+#define LOG_DESCRIP	"SVR 4.2 STREAMS Log (STRLOG) Driver"
+#define LOG_EXTRA	"Part of UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define LOG_COPYRIGHT	"Copyright (c) 2008-2013  Monavacon Limited.  All Rights Reserved."
 #define LOG_REVISION	"LfS $RCSfile: log.c,v $ $Name:  $($Revision: 1.1.2.6 $) $Date: 2011-09-20 09:51:35 $"
 #define LOG_DEVICE	"SVR 4.2 MP STREAMS Log Driver (STRLOG)"
 #define LOG_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define LOG_LICENSE	"GPL"
 #define LOG_BANNER	LOG_DESCRIP	"\n" \
+			LOG_EXTRA	"\n" \
 			LOG_COPYRIGHT	"\n" \
 			LOG_REVISION	"\n" \
 			LOG_DEVICE	"\n" \
@@ -192,13 +194,11 @@ MODULE_PARM_DESC(major, "Major device number for STREAMS-log driver.");
 
 #ifdef MODULE
 #ifdef MODULE_ALIAS
-MODULE_ALIAS("char-major-" __stringify(CONFIG_STREAMS_LOG_MAJOR) "-*");
-MODULE_ALIAS("/dev/log");
+MODULE_ALIAS("char-major-" __stringify(CONFIG_STREAMS_CLONE_MAJOR) "-" __stringify(CONFIG_STREAMS_LOG_MAJOR));
+/* MODULE_ALIAS("/dev/log"); */
+MODULE_ALIAS("devname:strlog");
 MODULE_ALIAS("/dev/strlog");
 MODULE_ALIAS("/dev/conslog");
-MODULE_ALIAS("devname:log");
-MODULE_ALIAS("devname:strlog");
-MODULE_ALIAS("devname:conslog");
 MODULE_ALIAS("streams-major-" __stringify(CONFIG_STREAMS_LOG_MAJOR));
 MODULE_ALIAS("/dev/streams/log");
 MODULE_ALIAS("/dev/streams/log/*");

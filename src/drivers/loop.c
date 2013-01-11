@@ -99,13 +99,15 @@ static char const ident[] = "$RCSfile: loop.c,v $ $Name:  $($Revision: 1.1.2.6 $
 
 #include "sys/config.h"
 
-#define LOOP_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
+#define LOOP_DESCRIP	"SVR 4.2 STREAMS Null Stream (LOOP) Driver"
+#define LOOP_EXTRA	"Part of UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define LOOP_COPYRIGHT	"Copyright (c) 2008-2013  Monavacon Limited.  All Rights Reserved."
 #define LOOP_REVISION	"LfS $RCSfile: loop.c,v $ $Name:  $($Revision: 1.1.2.6 $) $Date: 2011-09-20 09:51:35 $"
 #define LOOP_DEVICE	"SVR 4.2 MP STREAMS Null Stream (LOOP) Device"
 #define LOOP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define LOOP_LICENSE	"GPL"
 #define LOOP_BANNER	LOOP_DESCRIP	"\n" \
+			LOOP_EXTRA	"\n" \
 			LOOP_COPYRIGHT	"\n" \
 			LOOP_REVISION	"\n" \
 			LOOP_DEVICE	"\n" \
@@ -176,12 +178,10 @@ MODULE_PARM_DESC(major, "Major device number for LOOP driver. (0 for auto alloca
 
 #ifdef MODULE
 #ifdef MODULE_ALIAS
-MODULE_ALIAS("char-major-" __stringify(CONFIG_STREAMS_LOOP_MAJOR) "-*");
+MODULE_ALIAS("char-major-" __stringify(CONFIG_STREAMS_CLONE_MAJOR) "-" __stringify(CONFIG_STREAMS_LOOP_MAJOR));
 MODULE_ALIAS("/dev/loop.1");
 MODULE_ALIAS("/dev/loop.2");
 MODULE_ALIAS("/dev/loop_clone");
-MODULE_ALIAS("devname:loop.1");
-MODULE_ALIAS("devname:loop.2");
 MODULE_ALIAS("devname:loop_clone");
 MODULE_ALIAS("streams-major-" __stringify(CONFIG_STREAMS_LOOP_MAJOR));
 MODULE_ALIAS("/dev/streams/loop");

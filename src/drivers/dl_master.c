@@ -76,13 +76,15 @@ static char const ident[] = "$RCSfile: dl_master.c,v $ $Name:  $($Revision: 1.1.
  *  obviates the need for this driver.
  */
 
-#define DL_DESCRIP	"Data Link (DL) STREAMS MULTIPLEXING DRIVER ($Revision: 1.1.2.4 $)"
+#define DL_DESCRIP	"Data Link (DL) STREAMS Multiplexing Driver"
+#define DL_EXTRA	"Part of the OpenSS7 Protocol Stacks for Linux Fast-STREAMS"
 #define DL_REVISION	"OpenSS7 $RCSfile: dl_master.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2011-09-02 08:46:32 $"
 #define DL_COPYRIGHT	"Copyright (c) 2008-2011  Monavacon Limited.  All Rights Reserved."
 #define DL_DEVICE	"OpenSS7 CDI Devices."
 #define DL_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define DL_LICENSE	"GPL"
 #define DL_BANNER	DL_DESCRIP	"\n" \
+			DL_EXTRA	"\n" \
 			DL_REVISION	"\n" \
 			DL_COPYRIGHT	"\n" \
 			DL_DEVICE	"\n" \

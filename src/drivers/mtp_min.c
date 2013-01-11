@@ -100,13 +100,15 @@ static char const ident[] = "$RCSfile: mtp_min.c,v $ $Name:  $($Revision: 1.1.2.
 #include <sys/xti_mtp.h>
 #include <sys/tihdr.h>
 
-#define MTP_MIN_DESCRIP		"SS7 MESSAGE TRANSFER PART (MTP) STREAMS MULTIPLEXING DRIVER."
+#define MTP_MIN_DESCRIP		"SS7 Message Transfer Part (MTP) STREAMS Multiplexing Driver"
+#define MTP_MIN_EXTRA		"Part of the OpenSS7 Stack for Linux Fast-STREAMS"
 #define MTP_MIN_REVISION	"OpenSS7 $RCSfile: mtp_min.c,v $ $Name:  $($Revision: 1.1.2.6 $) $Date: 2011-09-20 09:51:36 $"
 #define MTP_MIN_COPYRIGHT	"Copyright (c) 2008-2011  Monavacon Limited.  All Rights Reserved."
 #define MTP_MIN_DEVICE		"Part of the OpenSS7 Stack for Linux STREAMS."
 #define MTP_MIN_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define MTP_MIN_LICENSE		"GPL"
 #define MTP_MIN_BANNER		MTP_MIN_DESCRIP		"\n" \
+				MTP_MIN_EXTRA		"\n" \
 				MTP_MIN_REVISION	"\n" \
 				MTP_MIN_COPYRIGHT	"\n" \
 				MTP_MIN_DEVICE		"\n" \

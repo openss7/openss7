@@ -81,13 +81,15 @@ static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
 
 #include "sys/config.h"
 
-#define BPF_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
+#define BPF_DESCRIP	"Berkeley Packet Filter (BPF) STREAMS Driver"
+#define BPF_EXTRA	"Part of UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define BPF_COPYRIGHT	"Copyright (c) 2008-2013  Monavacon Limited.  All Rights Reserved."
 #define BPF_REVISION	"LfS $RCSfile$ $Name$($Revision$) $Date$"
 #define BPF_DEVICE	"SVR 4.2 MP STREAMS BPF Driver"
 #define BPF_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define BPF_LICENSE	"GPL"
 #define BPF_BANNER	BPF_DESCRIP	"\n" \
+			BPF_EXTRA	"\n" \
 			BPF_COPYRIGHT	"\n" \
 			BPF_REVISION	"\n" \
 			BPF_DEVICE	"\n" \
@@ -146,11 +148,7 @@ static major_t major = CONFIG_STREAMS_BPF_MAJOR;
 MODULE_ALIAS("streams-bpf");
 MODULE_ALIAS("streams-modid-" __stringify(CONFIG_STREAMS_BPF_MODID));
 MODULE_ALIAS("streams-driver-bpf");
-MODULE_ALIAS("char-major-" __stringify(CONFIG_STREAMS_BPF_MAJOR));
 MODULE_ALIAS("char-major-" __stringify(CONFIG_STREAMS_BPF_MAJOR) "-*");
-MODULE_ALIAS("char-major-" __stringify(CONFIG_STREAMS_BPF_MAJOR) "-0");
-MODULE_ALIAS("/dev/bpf");
-MODULE_ALIAS("devname:bpf");
 MODULE_ALIAS("streams-major-" __stringify(CONFIG_STREAMS_BPF_MAJOR));
 MODULE_ALIAS("/dev/streams/bpf");
 MODULE_ALIAS("/dev/streams/bpf/*");

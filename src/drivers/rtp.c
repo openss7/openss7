@@ -107,8 +107,8 @@ static char const ident[] = "$RCSfile: rtp.c,v $ $Name:  $($Revision: 1.1.2.4 $)
 #include <sys/npi.h>
 #include <sys/npi_ip.h>
 
-#define RTP_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
-#define RTP_EXTRA	"Part of the OpenSS7 stack for Linux Fast-STREAMS"
+#define RTP_DESCRIP	"Real-Time Protocol (RTP) STREAMS Driver"
+#define RTP_EXTRA	"Part of the OpenSS7 VoIP Stack for Linux Fast-STREAMS"
 #define RTP_COPYRIGHT	"Copyright (c) 2008-2013  Monavacon Limited.  All Rights Reserved."
 #define RTP_REVISION	"OpenSS7 $RCSfile: rtp.c,v $ $Name:  $ ($Revision: 1.1.2.4 $) $Date: 2011-09-02 08:46:35 $"
 #define RTP_DEVICE	"SVR 4.2 MP STREAMS RTP Driver"
@@ -152,10 +152,9 @@ MODULE_ALIAS("streams-major-" __stringify(CONFIG_STREAMS_RTP_MAJOR));
 MODULE_ALIAS("/dev/streams/rtp");
 MODULE_ALIAS("/dev/streams/rtp/*");
 MODULE_ALIAS("/dev/streams/clone/rtp");
-MODULE_ALIAS("char-major-" __stringify(RTP_CMAJOR_0));
-MODULE_ALIAS("char-major-" __stringify(RTP_CMAJOR_0) "-*");
-MODULE_ALIAS("char-major-" __stringify(RTP_CMAJOR_0) "-0");
-MODULE_ALIAS("char-major-" __stringify(RTP_CMAJOR_0) "-" __stringify(RTP_CMINOR));
+MODULE_ALIAS("char-major-" __stringify(CONFIG_STREAMS_CLONE_MAJOR) "-" __stringify(RTP_CMAJOR_0));
+MODULE_ALIAS("/dev/rtp");
+MODULE_ALIAS("devname:rtp");
 #endif				/* MODULE_ALIAS */
 #endif				/* LINUX */
 

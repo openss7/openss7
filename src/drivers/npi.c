@@ -78,7 +78,7 @@ static char const ident[] = "$RCSfile: npi.c,v $ $Name:  $($Revision: 1.1.2.3 $)
 #include <sys/os7/compat.h>
 #include <sys/npi.h>
 
-#define NPI_DESCRIP	"NLI TO NPI CONVERSION FOR LINUX FAST STREAMS"
+#define NPI_DESCRIP	"NLI TO NPI Conversion for Linux Fast-STREAMS"
 #define NPI_EXTRA	"Part of the OpenSS7 X.25 Stack for Linux Fast-STREAMS"
 #define NPI_COPYRIGHT	"Copyright (c) 2008-2013  Monavacon Limited.  All Rights Reserved."
 #define NPI_REVISION	"OpenSS7 $RCSfile: npi.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-09-02 08:46:35 $"
@@ -124,10 +124,7 @@ MODULE_ALIAS("streams-major-" __stringify(CONFIG_STREAMS_NPI_MAJOR));
 MODULE_ALIAS("/dev/streams/npi");
 MODULE_ALIAS("/dev/streams/npi/*");
 MODULE_ALIAS("/dev/streams/clone/npi");
-MODULE_ALIAS("char-major-" __stringify(NPI_CMAJOR_0));
-MODULE_ALIAS("char-major-" __stringify(NPI_CMAJOR_0) "-*");
-MODULE_ALIAS("char-major-" __stringify(NPI_CMAJOR_0) "-0");
-MODULE_ALIAS("char-major-" __stringify(NPI_CMAJOR_0) "-" __stringify(NPI_CMINOR));
+MODULE_ALIAS("char-major-" __stringify(CONFIG_STREAMS_CLONE_MAJOR) "-" __stringify(NPI_CMAJOR_0));
 MODULE_ALIAS("/dev/npi");
 MODULE_ALIAS("devname:npi");
 #endif				/* MODULE_ALIAS */

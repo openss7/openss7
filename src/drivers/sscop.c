@@ -84,13 +84,15 @@ static char const ident[] = "$RCSfile: sscop.c,v $ $Name:  $($Revision: 1.1.2.3 
 //#include "sscop_t.h"
 //#include "sscop_input.h"
 
-#define SSCOP_DESCRIP	"SSCOPMCE/IP STREAMS DRIVER."
+#define SSCOP_DESCRIP	"SSCOPMCE/IP STREAMS Driver"
+#define SSCOP_EXTRA	"Part of the OpenSS7 ATM Stack for Linux Fast-STREAMS"
 #define SSCOP_REVISION	"OpenSS7 $RCSfile: sscop.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-09-02 08:46:37 $"
 #define SSCOP_COPYRIGHT	"Copyright (c) 2008-2011  Monavacon Limited.  All Rights Reserved."
-#define SSCOP_DEVICE	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
+#define SSCOP_DEVICE	"Part of the OpenSS7 Stack for Linux Fast-STREAMS"
 #define SSCOP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define SSCOP_LICENSE	"GPL"
 #define SSCOP_BANNER	SSCOP_DESCRIP	"\n" \
+			SSCOP_EXTRA	"\n" \
 			SSCOP_REVISION	"\n" \
 			SSCOP_COPYRIGHT	"\n" \
 			SSCOP_DEVICE	"\n" \

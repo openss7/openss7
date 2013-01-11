@@ -157,8 +157,8 @@ static char const ident[] = "$RCSfile: clns.c,v $ $Name:  $($Revision: 1.1.2.5 $
 #include <sys/npi.h>
 #include <sys/strlog.h>
 
-#define CLNS_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
-#define CLNS_EXTRA	"Part of the OpenSS7 stack for Linux Fast-STREAMS"
+#define CLNS_DESCRIP	"OSI CLNS Network Provider STREAMS Driver"
+#define CLNS_EXTRA	"Part of the OpenSS7 OSI Stack for Linux Fast-STREAMS"
 #define CLNS_COPYRIGHT	"Copyright (c) 2008-2013  Monavacon Limited.  All Rights Reserved."
 #define CLNS_REVISION	"OpenSS7 $RCSfile: clns.c,v $ $Name:  $ ($Revision: 1.1.2.5 $) $Date: 2011-09-20 09:51:34 $"
 #define CLNS_DEVICE	"SVR 4.2 MP STREAMS CLNS OSI Network Provider"
@@ -205,18 +205,12 @@ MODULE_ALIAS("/dev/streams/clnl/clns");
 MODULE_ALIAS("/dev/streams/clnl/esis");
 MODULE_ALIAS("/dev/streams/clnl/isis");
 MODULE_ALIAS("/dev/streams/clone/clnl");
-MODULE_ALIAS("char-major-" __stringify(CLNS_CMAJOR_0));
-MODULE_ALIAS("char-major-" __stringify(CLNS_CMAJOR_0) "-*");
-MODULE_ALIAS("char-major-" __stringify(CLNS_CMAJOR_0) "-0");
-//MODULE_ALIAS("char-major-" __stringify(CLNS_CMAJOR_0) "-" __stringify(CLNS_CMINOR));
+MODULE_ALIAS("char-major-" __stringify(CONFIG_STREAMS_CLONE_MAJOR) "-" __stringify(CLNS_CMAJOR_0));
 MODULE_ALIAS("/dev/clnl");
+MODULE_ALIAS("devname:clnl");
 MODULE_ALIAS("/dev/clns");
 MODULE_ALIAS("/dev/esis");
 MODULE_ALIAS("/dev/isis");
-MODULE_ALIAS("devname:clnl");
-MODULE_ALIAS("devname:clns");
-MODULE_ALIAS("devname:esis");
-MODULE_ALIAS("devname:isis");
 #endif				/* MODULE_ALIAS */
 #endif				/* LINUX */
 

@@ -119,13 +119,15 @@ static char const ident[] = "$RCSfile: mxmux.c,v $ $Name:  $($Revision: 1.1.2.3 
 #include <ss7/chi.h>
 #include <ss7/chi_ioctl.h>
 
-#define MX_MUX_DESCRIP		"MX/CH MULTIPLEX (MX-MUX) STREAMS MULTIPLEXING DRIVER."
+#define MX_MUX_DESCRIP		"MX/CH Multiplex (MX-MUX) STREAMS Multiplexing Driver"
+#define MX_MUX_EXTRA		"Part of the OpenSS7 Stack for Linux Fast-STREAMS"
 #define MX_MUX_REVISION		"OpenSS7 $RCSfile: mxmux.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-09-02 08:46:35 $"
 #define MX_MUX_COPYRIGHT	"Copyright (c) 2008-2013  Monavacon Limited.  All Rights Reserved."
 #define MX_MUX_DEVICE		"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define MX_MUX_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define MX_MUX_LICENSE		"GPL"
 #define MX_MUX_BANNER		MX_MUX_DESCRIP		"\n" \
+				MX_MUX_EXTRA		"\n" \
 				MX_MUX_REVISION		"\n" \
 				MX_MUX_COPYRIGHT	"\n" \
 				MX_MUX_DEVICE		"\n" \
@@ -174,11 +176,9 @@ MODULE_PARM_DESC(mx_modid, "Module id number for STREAMS MX-MUX driver (0 for al
 MODULE_PARM_DESC(mx_major, "Major device number for STREAMS MX-MUX driver (0 for allocation).");
 
 #if defined MODULE_ALIAS
-MODULE_ALIAS("char-major-" __stringify(CONFIG_STREAMS_MX_MUX_MAJOR));
+MODULE_ALIAS("char-major-" __stringify(CONFIG_STREAMS_MX_MUX_MAJOR) "-*");
 MODULE_ALIAS("/dev/mx");
 MODULE_ALIAS("/dev/ch");
-MODULE_ALIAS("devname:mx");
-MODULE_ALIAS("devname:ch");
 MODULE_ALIAS("streams-major-" __stringify(CONFIG_STREAMS_MX_MUX_MAJOR));
 MODULE_ALIAS("/dev/streams/mx");
 MODULE_ALIAS("/dev/streams/mx/*");

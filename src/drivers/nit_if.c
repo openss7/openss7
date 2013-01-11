@@ -81,13 +81,15 @@ static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
 
 #include "sys/config.h"
 
-#define NIT_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
+#define NIT_DESCRIP	"SVR 4.1 SNIT (NIT_IF) STREAMS Driver"
+#define NIT_EXTRA	"Part of UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define NIT_COPYRIGHT	"Copyright (c) 2008-2013  Monavacon Limited.  All Rights Reserved."
 #define NIT_REVISION	"LfS $RCSfile$ $Name$($Revision$) $Date$"
 #define NIT_DEVICE	"SVR 4.2 MP STREAMS NIT Driver"
 #define NIT_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define NIT_LICENSE	"GPL"
 #define NIT_BANNER	NIT_DESCRIP	"\n" \
+			NIT_EXTRA	"\n" \
 			NIT_COPYRIGHT	"\n" \
 			NIT_REVISION	"\n" \
 			NIT_DEVICE	"\n" \
@@ -146,9 +148,7 @@ static major_t major = CONFIG_STREAMS_NIT_MAJOR;
 MODULE_ALIAS("streams-nit");
 MODULE_ALIAS("streams-modid-" __stringify(CONFIG_STREAMS_NIT_MODID));
 MODULE_ALIAS("streams-driver-nit");
-MODULE_ALIAS("char-major-" __stringify(CONFIG_STREAMS_NIT_MAJOR));
-MODULE_ALIAS("char-major-" __stringify(CONFIG_STREAMS_NIT_MAJOR) "-*");
-MODULE_ALIAS("char-major-" __stringify(CONFIG_STREAMS_NIT_MAJOR) "-0");
+MODULE_ALIAS("char-major-" __stringify(CONFIG_STREAMS_CLONE_MAJOR) "-" __stringify(CONFIG_STREAMS_NIT_MAJOR));
 MODULE_ALIAS("/dev/nit");
 MODULE_ALIAS("devname:nit");
 MODULE_ALIAS("streams-major-" __stringify(CONFIG_STREAMS_NIT_MAJOR));

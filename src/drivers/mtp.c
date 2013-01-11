@@ -114,13 +114,15 @@ static char const ident[] = "$RCSfile: mtp.c,v $ $Name:  $($Revision: 1.1.2.7 $)
 #define STRLOGIO	6	/* log Stream additional data */
 #define STRLOGDA	7	/* log Stream data */
 
-#define MTP_DESCRIP	"SS7 MESSAGE TRANSFER PART (MTP) STREAMS MULTIPLEXING DRIVER."
+#define MTP_DESCRIP	"SS7 Message Transfer Part (MTP) STREAMS Multiplexing Driver"
+#define MTP_EXTRA	"Part of the OpenSS7 SS7 Stack for Linux Fast-STREAMS"
 #define MTP_REVISION	"LfS $RCSfile: mtp.c,v $ $Name:  $($Revision: 1.1.2.7 $) $Date: 2011-09-20 09:51:36 $"
 #define MTP_COPYRIGHT	"Copyright (c) 2008-2011  Monavacon Limited.  All Rights Reserved."
 #define MTP_DEVICE	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define MTP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define MTP_LICENSE	"GPL"
 #define MTP_BANNER	MTP_DESCRIP	"\n" \
+			MTP_EXTRA	"\n" \
 			MTP_REVISION	"\n" \
 			MTP_COPYRIGHT	"\n" \
 			MTP_DEVICE	"\n" \

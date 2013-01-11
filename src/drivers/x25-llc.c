@@ -96,7 +96,7 @@ static char const ident[] =
 #include <sys/strsun.h>
 #include <sys/dlpi.h>
 
-#define LLC_DESCRIP	"SVR 4.2 DLPI X25-LLC DRIVER FOR LINUX FAST-STREAMS"
+#define LLC_DESCRIP	"SVR 4.2 DLPI X25-LLC Driver for Linux Fast-STREAMS"
 #define LLC_EXTRA	"Part of the Openss7 X.25 Stack for Linux Fast-STREAMS"
 #define LLC_COPYRIGHT	"Copyright (c) 2008-2013  Monavacon Limited.  All Rights Reserved."
 #define LLC_REVISION	"OpenSS7 $RCSfile: x25-llc.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2011-09-02 08:46:39 $"
@@ -135,10 +135,7 @@ MODULE_ALIAS("streams-major-" __stringify(CONFIG_STREAMS_LLC_MAJOR));
 MODULE_ALIAS("/dev/streams/llc");
 MODULE_ALIAS("/dev/streams/llc/*");
 MODULE_ALIAS("/dev/streams/clone/llc");
-MODULE_ALIAS("char-major-" __stringify(CONFIG_STREAMS_LLC_MAJOR_0));
-MODULE_ALIAS("char-major-" __stringify(CONFIG_STREAMS_LLC_MAJOR_0) "-*");
-MODULE_ALIAS("char-major-" __stringify(CONFIG_STREAMS_LLC_MAJOR_0) "-0");
-MODULE_ALIAS("char-major-" __stringify(CONFIG_STREAMS_LLC_MAJOR_0) "-" __stringify(LLC_CMINOR));
+MODULE_ALIAS("char-major-" __stringify(CONFIG_STREAMS_CLONE_MAJOR) "-" __stringify(CONFIG_STREAMS_LLC_MAJOR_0));
 MODULE_ALIAS("/dev/llc");
 MODULE_ALIAS("devname:llc");
 #endif				/* MODULE_ALIAS */

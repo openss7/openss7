@@ -73,14 +73,16 @@ static char const ident[] = "$RCSfile: sscop_n.c,v $ $Name:  $($Revision: 1.1.2.
 
 #include <sys/os7/compat.h>
 
-#define SSCOP_NPI_DESCRIP	"SSCOP/IP STREAMS DRIVER."
+#define SSCOP_NPI_DESCRIP	"SSCOP/IP STREAMS Driver"
+#define SSCOP_NPI_EXTRA		"Part of the OpenSS7 ATM Stack for Linux Fast-STREAMS"
 #define SSCOP_NPI_REVISION	"OpenSS7 $RCSfile: sscop_n.c,v $ $Name:  $ ($Revision: 1.1.2.5 $) $Date: 2011-09-02 08:46:37 $"
 #define SSCOP_NPI_COPYRIGHT	"Copyright (c) 2008-2011  Monavacon Limited.  All Rights Reserved."
-#define SSCOP_NPI_DEVICE	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
+#define SSCOP_NPI_DEVICE	"Part of the OpenSS7 Stack for Linux Fast-STREAMS"
 #define SSCOP_NPI_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define SSCOP_NPI_LICENSE	"GPL"
 #define SSCOP_NPI_BANNER	SSCOP_NPI_DESCRIP	"\n" \
-				SSCOP_NPI_REIVISION	"\n" \
+				SSCOP_NPI_EXTRA		"\n" \
+				SSCOP_NPI_REVISION	"\n" \
 				SSCOP_NPI_COPYRIGHT	"\n" \
 				SSCOP_NPI_DEVICE	"\n" \
 				SSCOP_NPI_CONTACT
