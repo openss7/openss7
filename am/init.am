@@ -5,7 +5,7 @@
 ##
 ## -----------------------------------------------------------------------------
 ##
-## Copyright (c) 2008-2009  Monavacon Limited <http://www.monavacon.com/>
+## Copyright (c) 2008-2013  Monavacon Limited <http://www.monavacon.com/>
 ## Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
 ## Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 ##
@@ -71,52 +71,56 @@ install-initscripts: $(dist_initrd_SCRIPTS)
 post-initscripts:
 	@$(ECHO_V) "D: Making $@ in `pwd`"
 	@if test -z '$(DESTDIR)$(rootdir)' -a \( -f $(DESTDIR)$(initrddir)/rc -o -f $(DESTDIR)$(initrddir)/../rc \) ; then \
-		if runlevel >/dev/null 2>&1 ; then \
-			list='$(dist_initrd_SCRIPTS)' ; for p in $$list ; do \
-				f=`$(ECHO) $$p | sed 's|^.*/||'` ; \
-				flist="$$flist $$f" ; \
-				rlist="$$f $$rlist" ; \
-			done ; \
-			r=`runlevel | sed 's|.*[[:space:]]||'` ; \
-			for d in $$r S ; do \
-				for i in $$rlist ; do \
-					if test -L $(initrddir)/../rc$${d}.d/S[0-9][0-9]$$i \
-					        -o -L $(initrddir)/rc$${d}.d/S[0-9][0-9]$$i ; then \
-						$(ECHO) "$(SHELL) $(initrddir)/$$i stop" ; \
-						$(SHELL) $(initrddir)/$$i stop || : ; \
-					fi ; \
+		if test ! -r /proc/1/comm -o `cat /proc/1/comm` != 'systemd'; then \
+			if runlevel >/dev/null 2>&1 ; then \
+				list='$(dist_initrd_SCRIPTS)' ; for p in $$list ; do \
+					f=`$(ECHO) $$p | sed 's|^.*/||'` ; \
+					flist="$$flist $$f" ; \
+					rlist="$$f $$rlist" ; \
 				done ; \
-			done ; \
-			for d in S $$r ; do \
-				for i in $$flist ; do \
-					if test -L $(initrddir)/../rc$${d}.d/S[0-9][0-9]$$i \
-					        -o -L $(initrddir)/rc$${d}.d/S[0-9][0-9]$$i ; then \
-						$(ECHO) "$(SHELL) $(initrddir)/$$i start" ; \
-						$(SHELL) $(initrddir)/$$i start || : ; \
-					fi ; \
+				r=`runlevel | sed 's|.*[[:space:]]||'` ; \
+				for d in $$r S ; do \
+					for i in $$rlist ; do \
+						if test -L $(initrddir)/../rc$${d}.d/S[0-9][0-9]$$i \
+							-o -L $(initrddir)/rc$${d}.d/S[0-9][0-9]$$i ; then \
+							$(ECHO) "$(SHELL) $(initrddir)/$$i stop" ; \
+							$(SHELL) $(initrddir)/$$i stop || : ; \
+						fi ; \
+					done ; \
 				done ; \
-			done ; \
+				for d in S $$r ; do \
+					for i in $$flist ; do \
+						if test -L $(initrddir)/../rc$${d}.d/S[0-9][0-9]$$i \
+							-o -L $(initrddir)/rc$${d}.d/S[0-9][0-9]$$i ; then \
+							$(ECHO) "$(SHELL) $(initrddir)/$$i start" ; \
+							$(SHELL) $(initrddir)/$$i start || : ; \
+						fi ; \
+					done ; \
+				done ; \
+			fi ; \
 		fi ; \
 	fi
 
 preun-initscripts:
 	@$(ECHO_V) "D: Making $@ in `pwd`"
 	@if test -z '$(DESTDIR)$(rootdir)' -a \( -f $(DESTDIR)$(initrddir)/rc -o -f $(DESTDIR)$(initrddir)/../rc \) ; then \
-		if runlevel >/dev/null 2>&1 ; then \
-			list='$(dist_initrd_SCRIPTS)' ; for p in $$list ; do \
-				rlist="$$p $$rlist" ; \
-			done ; \
-			r=`runlevel | sed 's|.*[[:space:]]||'` ; \
-			for d in $$r S ; do \
-				for p in $$rlist ; do \
-					f=`$(ECHO) $$p | sed 's|^.*/||'` ; \
-					if test -L $(initrddir)/../rc$${d}.d/S[0-9][0-9]$$f \
-					        -o -L $(initrddir)/rc$${d}.d/S[0-9][0-9]$$f ; then \
-						$(ECHO) "$(SHELL) $(srcdir)/$$p stop" ; \
-						$(SHELL) $(srcdir)/$$p stop || : ; \
-					fi ; \
+		if test ! -r /proc/1/comm -o `cat /proc/1/comm` != 'systemd'; then \
+			if runlevel >/dev/null 2>&1 ; then \
+				list='$(dist_initrd_SCRIPTS)' ; for p in $$list ; do \
+					rlist="$$p $$rlist" ; \
 				done ; \
-			done ; \
+				r=`runlevel | sed 's|.*[[:space:]]||'` ; \
+				for d in $$r S ; do \
+					for p in $$rlist ; do \
+						f=`$(ECHO) $$p | sed 's|^.*/||'` ; \
+						if test -L $(initrddir)/../rc$${d}.d/S[0-9][0-9]$$f \
+							-o -L $(initrddir)/rc$${d}.d/S[0-9][0-9]$$f ; then \
+							$(ECHO) "$(SHELL) $(srcdir)/$$p stop" ; \
+							$(SHELL) $(srcdir)/$$p stop || : ; \
+						fi ; \
+					done ; \
+				done ; \
+			fi ; \
 		fi ; \
 	fi
 
@@ -131,8 +135,111 @@ uninstall-initscripts:
 
 dist_noinst_SCRIPTS	+= $(top_srcdir)/scripts/install_initd $(top_srcdir)/scripts/remove_initd
 
+install-systemd: $(dist_systemdsys_DATA)
+	@$(ECHO_V) "D: Making $@ in `pwd`"
+	@$(NORMAL_INSTALL)
+	@d="$(DESTDIR)$(systemdsysdir)" ; \
+	list='$(dist_systemdsys_DATA)' ; for p in $$list ; do \
+		f=`$(ECHO) $$p | sed 's|^.*/||'` ; \
+		if grep '^[[]Install[]]' $$d/$$f >/dev/null 2>&1 ; then \
+			r=(`cat $$d/$$f | sed -n 's,^RequiredBy=,,p'`) ; \
+			for s in $${r[@]}; do \
+				rd="$$d/$$s.requires" ; \
+				test -d "$$rd" || $(MKDIR_P) -- "$$rd" ; \
+				$(ECHO) "$(LN_S) -fr -- $$d/$$f $$rd/" ; \
+				$(LN_S) -fr -- "$$d/$$f" "$$rd/" ; \
+			done ; \
+			w=(`cat $$d/$$f | sed -n 's,^WantedBy=,,p'`) ; \
+			for s in $${w[@]}; do \
+				wd="$$d/$$s.wants" ; \
+				test -d "$$wd" || $(MKDIR_P) -- "$$wd" ; \
+				$(ECHO) "$(LN_S) -fr -- $$d/$$f $$wd/" ; \
+				$(LN_S) -fr -- "$$d/$$f" "$$wd/" ; \
+			done ; \
+		else \
+			$(ECHO) "WARNING: cannot find [Install] section in $$d/$$f" >&2; \
+		fi ; \
+	done
+
+post-systemd:
+	@$(ECHO_V) "D: Making $@ in `pwd`"
+	@if test -z '$(DESTDIR)$(rootdir)' -a -f $(DESTDIR)$(systemddir)/systemd ; then \
+		if test -r /proc/1/comm -a `cat /proc/1/comm` = 'systemd'; then \
+			d="$(DESTDIR)$(systemdsysdir)" ; flist= ; rlist= ; \
+			list='$(dist_systemdsys_DATA)' ; for p in $$list ; do \
+				f=`$(ECHO) $$p | sed 's|^.*/||'` ; \
+				case "$$f" in \
+				(*-shutdown.target) \
+					rlist="$$f $$rlist" ;; \
+				(*.target) \
+					flist="$$flist $$f" ;; \
+				esac ; \
+			done ; \
+			$(ECHO) "$(SYSTEMCTL) --system daemon-reload" ; \
+			$(SYSTEMCTL) --system daemon-reload ; \
+			for f in $$rlist ; do \
+				if test -f "$$d/$$f" ; then \
+					$(ECHO) "$(SYSTEMCTL) start $$f" ; \
+					$(SYSTEMCTL) start $$f || : ; \
+				fi ; \
+			done ; \
+			for f in $$flist ; do \
+				if test -f "$$d/$$f" ; then \
+					$(ECHO) "$(SYSTEMCTL) start $$f" ; \
+					$(SYSTEMCTL) start $$f || : ; \
+				fi ; \
+			done ; \
+		else \
+			$(ECHO) "Not running systemd!" ; \
+		fi ; \
+	fi
+
+preun-systemd:
+	@$(ECHO_V) "D: Making $@ in `pwd`"
+	@if test -z '$(DESTDIR)$(rootdir)' -a -f $(DESTDIR)$(systemddir)/systemd ; then \
+		if test -r /proc/1/comm -a `cat /proc/1/comm` = 'systemd'; then \
+			d="$(DESTDIR)$(systemdsysdir)" ; flist= ; rlist= ; \
+			list='$(dist_systemdsys_DATA)' ; for p in $$list ; do \
+				f=`$(ECHO) $$p | sed 's|^.*/||'` ; \
+				case "$$f" in \
+				(*-shutdown.target) \
+					rlist="$$f $$rlist" ;; \
+				(*.target) \
+					flist="$$flist $$f" ;; \
+				esac ; \
+			done ; \
+			for f in $$rlist ; do \
+				if test -f "$$d/$$f" ; then \
+					$(ECHO) "$(SYSTEMCTL) start $$f" ; \
+					$(SYSTEMCTL) start $$f || : ; \
+				fi ; \
+			done ; \
+		else \
+			$(ECHO) "Not running systemd!" ; \
+		fi ; \
+	fi
+
+uninstall-systemd:
+	@$(ECHO_V) "D: Making $@ in `pwd`"
+	@$(NORMAL_UNINSTALL)
+	@d="$(DESTDIR)$(systemdsysdir)" ; \
+	list='$(dist_systemdsys_DATA)' ; for p in $$list ; do \
+		f=`$(ECHO) $$p | sed 's|^.*/||'` ; \
+		for s in $$d/*.requires/$$f $$d/*.wants/$$f; do \
+			if test -L "$$s" ; then \
+				$(ECHO) "rm -f -- $$s" ; \
+				rm -f -- "$$s" ; \
+				dd=`echo "$$s" | sed 's,[^/]*$$,,'` ; \
+				rmdir -- "$$dd" 2>/dev/null || : ; \
+			fi ; \
+		done ; \
+	done
+
 if INSTALL_INITSCRIPTS
 ## INSTALL_INITSCRIPTS
+
+if INSTALL_SYSVINIT
+## INSTALL_SYSVINIT
 
 INSTALL_DATA_HOOK	+= install-initscripts
 
@@ -141,6 +248,23 @@ POST_INSTALL_AM		+= post-initscripts
 UNINSTALL_LOCAL		+= uninstall-initscripts
 
 PRE_UNINSTALL_MA	+= preun-initscripts
+
+## INSTALL_SYSVINIT
+endif
+
+if INSTALL_SYSTEMD
+## INSTALL_SYSTEMD
+
+INSTALL_DATA_HOOK	+= install-systemd
+
+POST_INSTALL_AM		+= post-systemd
+
+UNINSTALL_LOCAL		+= uninstall-systemd
+
+PRE_UNINSTALL_MA	+= preun-systemd
+
+## INSTALL_SYSTEMD
+endif
 
 ## INSTALL_INITSCRIPTS
 endif
