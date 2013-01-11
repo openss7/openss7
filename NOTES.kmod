@@ -1,4 +1,4 @@
-OpenSS7 -- kernel module notes.  2011-02-12
+OpenSS7 -- kernel module notes.  2013-01-03
 $Id: NOTES.kmod,v 1.1.2.6 2011-09-02 08:46:26 brian Exp $
 Copyright (c) 2008-2011  Monavacon Limited. <http://www.monavacon.com/>
 Copyright (c) 2001-2008  OpenSS7 Corporation. <http://www.openss7.com/>
@@ -762,6 +762,46 @@ Mageia, Mandriva:
     upgrade that bumps past the oldest kernel).  This should handle MES,
     Mandriva and Mageia properly.
 
+Archlinux:
+----------
+
+    Archlinux named its 2.6-series kernels, kernel26[-FLAVOR]; its
+    3.x-series kernels, linux[-FLAVOR]
+
+	FLAVOR = '' for base kernels, and 'lts' for long-term-support
+		 kernels.  Some AUR kernels use 'mainline' for
+		 plain-jane kernel.org kernels.
+
+    On Archlinux, uname -r will return 2.6.M-FLAV for 2.6-series
+    kernels, 3.M-FLAV for older 3.x-series kernels, and 3.M.REL-REV-FLAV
+    for newer 3.x-series kernels, where:
+
+	M[.REL]	= upstream kernel minor version numbers (the .REL
+		  component is always used).
+	REV	= revision of the same M[.REL] (package version)
+	FLAV	= 'ARCH' for default kernels, 'lts' for long-term
+		  support kernels.  AUR uses 'mainline' for plain-jane
+		  kernel.org kernels.
+
+    This is important.  For the original 2.6 and 3.x schemes, when
+    kernels are updated that do not change the kernel ABI, they will
+    used the same /lib/modules/2.6.M-FLAV or /lib/modules/3.M-FLAV
+    subdirectory and kernel modules will be overwritten.  The most
+    recent scheme; however, uses a different
+    /lib/modules/3.M.REL-REV-FLAV directory and kernel modules are not
+    overwritten.  A separate /lib/extramodules-3.M-FLAV directory is
+    symbolic linked from /lib/modules/3.M.REL-REV-FLAV/extramodules that
+    can contain modules that are not overwritten.  There is a file
+    called 'version' in this extramodules directory that contains the
+    kernel version (uname -r) (and is owned by the kernel package).
+    Archlinux really only supports one version of kernel for each FLAV,
+    so this file is always owned by the current kernel for 3.M-FLAV.
+
+    The old version did not support weak updates.  The newer version
+    supports weak updates by putting kernel modules in
+    /lib/extramodules-3.M-FLAV/openss7 and checking
+    /lib/extramodules-3.M-FLAV/version at boot to see whether kernel
+    updates are required.
 
 -----
 
