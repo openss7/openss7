@@ -186,14 +186,14 @@ __spec_getkeys(struct hwaddr *hwa)
 		case ARPHRD_IEEE802:
 			hwa[num].addr[0] = hwa[num].addr[1] = 0;
 			memcpy(&hwa[num].addr[2], dev->dev_addr, 6);
-			__printd((KERN_WARNING "Got ether address %02x:%02x:%02x:%02x:%02x:%02x", dev->dev_addr[0],dev->dev_addr[1], dev->dev_addr[2],dev->dev_addr[3], dev->dev_addr[4],dev->dev_addr[5]));
+			_printd((KERN_WARNING "Got ether address %02x:%02x:%02x:%02x:%02x:%02x", dev->dev_addr[0],dev->dev_addr[1], dev->dev_addr[2],dev->dev_addr[3], dev->dev_addr[4],dev->dev_addr[5]));
 			num++;
 			if (num < 8)
 				continue;
 			break;
 		case ARPHRD_IEEE802_TR:
 			memcpy(&hwa[num].addr[0], dev->dev_addr, 8);
-			__printd((KERN_WARNING "Got token address %02x:%02x:%02x:%02x:%02x:%02x:%02x:%02x", dev->dev_addr[0],dev->dev_addr[1], dev->dev_addr[2],dev->dev_addr[3], dev->dev_addr[4],dev->dev_addr[5],dev->dev_addr[6],dev->dev_addr[7]));
+			_printd((KERN_WARNING "Got token address %02x:%02x:%02x:%02x:%02x:%02x:%02x:%02x", dev->dev_addr[0],dev->dev_addr[1], dev->dev_addr[2],dev->dev_addr[3], dev->dev_addr[4],dev->dev_addr[5],dev->dev_addr[6],dev->dev_addr[7]));
 			num++;
 			if (num < 8)
 				continue;
@@ -269,12 +269,12 @@ strlock_verify(void)
 
 	__trace();
 	if (strlock_digest == NULL) {
-		__ptrace((KERN_WARNING "no disgest"));
+		_ptrace((KERN_WARNING "no disgest"));
 		return;
 	}
 
 	if ((num = strlock_getkeys(hwa)) == 0) {
-		__ptrace((KERN_WARNING "no hardware addresses"));
+		_ptrace((KERN_WARNING "no hardware addresses"));
 		return;
 	}
 
@@ -288,43 +288,43 @@ strlock_verify(void)
 	for (i = 0; i < num; i++) {
 		memcpy(text.addr, hwa[i].addr, 8);
 		if (crypto_hash_setkey(desc_md5.tfm, hwa[i].addr, 8) != 0) {
-			__ptrace((KERN_WARNING "could not set md5 key"));
+			_ptrace((KERN_WARNING "could not set md5 key"));
 			continue;
 		}
 		sg_init_one(&sg, &text, sizeof(text));
 		crypto_hash_digest(&desc_md5, &sg, sg.length, &digest[4]);
 		memcpy(digest, &text.expires, sizeof(text.expires));
-		__ptrace((KERN_WARNING "Got md5 digest: %02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x",
+		_ptrace((KERN_WARNING "Got md5 digest: %02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x",
 					digest[ 4],digest[ 5],digest[ 6],digest[ 7],
 					digest[ 8],digest[ 9],digest[10],digest[11],
 					digest[12],digest[13],digest[14],digest[15],
 					digest[16],digest[17],digest[18],digest[19]));
 		if ((strlock_unlocked = (memcmp(digest, strlock_digest, SHA_DIGEST_SIZE) == 0))) {
-			__ptrace((KERN_WARNING "md5 digest matched!"));
+			_ptrace((KERN_WARNING "md5 digest matched!"));
 			strlock_reverify = 0;
 			return;
 		} else {
-			__ptrace((KERN_WARNING "md5 digest did not match"));
+			_ptrace((KERN_WARNING "md5 digest did not match"));
 		}
 		if (crypto_hash_setkey(desc_sha.tfm, hwa[i].addr, 8) != 0) {
-			__ptrace((KERN_WARNING "could not set sha1 key"));
+			_ptrace((KERN_WARNING "could not set sha1 key"));
 			continue;
 		}
 		sg_init_one(&sg, &text, sizeof(text));
 		crypto_hash_digest(&desc_sha, &sg, sg.length, digest);
 		memcpy(digest, &text.expires, sizeof(text.expires));
-		__ptrace((KERN_WARNING "Got sha1 digest: %02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x",
+		_ptrace((KERN_WARNING "Got sha1 digest: %02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x",
 					digest[ 0],digest[ 1],digest[ 2],digest[ 3],
 					digest[ 4],digest[ 5],digest[ 6],digest[ 7],
 					digest[ 8],digest[ 9],digest[10],digest[11],
 					digest[12],digest[13],digest[14],digest[15],
 					digest[16],digest[17],digest[18],digest[19]));
 		if ((strlock_unlocked = (memcmp(digest, strlock_digest, SHA_DIGEST_SIZE) == 0))) {
-			__ptrace((KERN_WARNING "sha1 digest matched!"));
+			_ptrace((KERN_WARNING "sha1 digest matched!"));
 			strlock_reverify = 0;
 			return;
 		} else {
-			__ptrace((KERN_WARNING "sha1 digest did not match"));
+			_ptrace((KERN_WARNING "sha1 digest did not match"));
 		}
 	}
 }
@@ -345,7 +345,7 @@ strlock_open_check(void)
 
 	__trace();
 	if (strlock_digest == NULL) {
-		__ptrace((KERN_WARNING "digest is empty"));
+		_ptrace((KERN_WARNING "digest is empty"));
 		if ((strlock_options & STRLOCK_FAIL_OPEN_EMPTY) == 0) {
 			return (-ENXIO);
 		}
@@ -353,7 +353,7 @@ strlock_open_check(void)
 	if (strlock_reverify)
 		strlock_verify();
 	if (!strlock_unlocked) {
-		__ptrace((KERN_WARNING "digest not verified"));
+		_ptrace((KERN_WARNING "digest not verified"));
 		if ((strlock_options & STRLOCK_FAIL_OPEN_VERIFY) == 0) {
 			return (-ENXIO);
 		}
@@ -361,13 +361,13 @@ strlock_open_check(void)
 	}
 	do_gettimeofday(&tv);
 	if (tv.tv_sec > strlock_expires) {
-		__ptrace((KERN_WARNING "digest expired"));
+		_ptrace((KERN_WARNING "digest expired"));
 		if ((strlock_options & STRLOCK_FAIL_OPEN_EXPIRE) == 0) {
 			return (-ENXIO);
 		}
 	}
 	if (tv.tv_sec > STRLOCK_EXPIRES) {
-		__ptrace((KERN_WARNING "digest past deadline"));
+		_ptrace((KERN_WARNING "digest past deadline"));
 		if ((strlock_options & STRLOCK_FAIL_OPEN_DEADLINE) == 0) {
 			return (-ENXIO);
 		}
@@ -384,7 +384,7 @@ strlock_load_check(void)
 
 	__trace();
 	if (strlock_digest == NULL) {
-		__ptrace((KERN_WARNING "digest is empty"));
+		_ptrace((KERN_WARNING "digest is empty"));
 		if ((strlock_options & STRLOCK_FAIL_LOAD_EMPTY) == 0) {
 			return (-EACCES);
 		}
@@ -398,20 +398,20 @@ strlock_load_check(void)
 	if (strlock_reverify)
 		strlock_verify();
 	if (!strlock_unlocked) {
-		__ptrace((KERN_WARNING "digest not verified"));
+		_ptrace((KERN_WARNING "digest not verified"));
 		if ((strlock_options & STRLOCK_FAIL_LOAD_VERIFY) == 0) {
 			return (-EACCES);
 		}
 	}
 	do_gettimeofday(&tv);
 	if (tv.tv_sec > strlock_expires) {
-		__ptrace((KERN_WARNING "digest expired"));
+		_ptrace((KERN_WARNING "digest expired"));
 		if ((strlock_options & STRLOCK_FAIL_LOAD_EXPIRE) == 0) {
 			return (-EACCES);
 		}
 	}
 	if (tv.tv_sec > STRLOCK_EXPIRES) {
-		__ptrace((KERN_WARNING "digest past deadline"));
+		_ptrace((KERN_WARNING "digest past deadline"));
 		if ((strlock_options & STRLOCK_FAIL_LOAD_DEADLINE) == 0) {
 			return (-EACCES);
 		}
@@ -433,31 +433,31 @@ strlock_init(void)
 	strlock_tfm[0] = crypto_alloc_hash("hmac(md5)", 0, CRYPTO_ALG_ASYNC);
 	if (IS_ERR(strlock_tfm[0])) {
 		err = PTR_ERR(strlock_tfm[0]);
-		__ptrace((KERN_WARNING "could not allocate hmac(md5), %d", err));
+		_ptrace((KERN_WARNING "could not allocate hmac(md5), %d", err));
 		goto done;
 	}
 	strlock_tfm[1] = crypto_alloc_hash("hmac(sha1)", 0, CRYPTO_ALG_ASYNC);
 	if (IS_ERR(strlock_tfm[1])) {
 		err = PTR_ERR(strlock_tfm[1]);
-		__ptrace((KERN_WARNING "could not allocate hmac(sha1), %d", err));
+		_ptrace((KERN_WARNING "could not allocate hmac(sha1), %d", err));
 		goto no_sha1;
 	}
 	if ((err = register_netdevice_notifier(&strlock_netdev_notifier))) {
-		__ptrace((KERN_WARNING "could not register notifier, %d", err));
+		_ptrace((KERN_WARNING "could not register notifier, %d", err));
 		goto no_notify;
 	}
 	if (memcmp(&strlock_region[0], &strlock_region[24], 24) != 0) {
-		__ptrace((KERN_WARNING "strlock_region filled"));
+		_ptrace((KERN_WARNING "strlock_region filled"));
 		if (memcmp(&strlock_region[20], &strlock_region[44], 4) == 0) {
-			__ptrace((KERN_WARNING "trailer matches"));
+			_ptrace((KERN_WARNING "trailer matches"));
 			strlock_digest = &strlock_region[24];
 			for (i = 0; i < 4; i++)
 				strlock_digest[i] ^= 0x5C;
 		} else {
-			__printd((KERN_WARNING "trailer does not match!"));
+			_printd((KERN_WARNING "trailer does not match!"));
 		}
 	} else {
-		__printd((KERN_WARNING "strlock_region is empty!"));
+		_printd((KERN_WARNING "strlock_region is empty!"));
 	}
 	if ((err = strlock_load_check()))
 		goto no_check;
