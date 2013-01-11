@@ -84,13 +84,15 @@ static char const ident[] = "$RCSfile: ch_pmod.c,v $ $Name:  $($Revision: 1.1.2.
 //#undef freezestr
 //#undef unfreezestr
 
-#define CH_DESCRIP	"CH (Channel) STREAMS PIPE MODULE."
+#define CH_DESCRIP	"CH (Channel) STREAMS Pipe Module"
+#define CH_EXTRA	"Part of the OpenSS7 VoIP Stack for Linux Fast-STREAMS"
 #define CH_REVISION	"OpenSS7 $RCSfile: ch_pmod.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-09-02 08:46:52 $"
 #define CH_COPYRIGHT	"Copyright (c) 2008-2011  Monavacon Limited.  All Rights Reserved."
 #define CH_DEVICE	"Provides OpenSS7 CH pipe driver."
 #define CH_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define CH_LICENSE	"GPL"
 #define CH_BANNER	CH_DESCRIP	"\n" \
+			CH_EXTRA	"\n" \
 			CH_REVISION	"\n" \
 			CH_COPYRIGHT	"\n" \
 			CH_DEVICE	"\n" \

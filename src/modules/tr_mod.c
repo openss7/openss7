@@ -107,13 +107,15 @@ static char const ident[] = "$RCSfile: tr_mod.c,v $ $Name:  $($Revision: 1.1.2.3
 #include <ss7/tcap.h>
 #include <ss7/tcap_ioctl.h>
 
-#define TR_DESCRIP	"SS7/TCAP-TR (TCAP Transaction Handling) STREAMS MODULE."
+#define TR_DESCRIP	"SS7/TCAP-TR (TCAP Transaction Handling) STREAMS Module"
+#define TR_EXTRA	"Part of the OpenSS7 SS7 Stack for Linux Fast-STREAMS"
 #define TR_REVISION	"OpenSS7 $RCSfile: tr_mod.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-09-02 08:46:57 $"
 #define TR_COPYRIGHT	"Copyright (c) 2008-2011  Monavacon Limited.  All Rights Reserved."
 #define TR_DEVICE	"Provides OpenSS7 TCAP-TR module."
 #define TR_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define TR_LICENSE	"GPL"
 #define TR_BANNER	TR_DESCRIP	"\n" \
+			TR_EXTRA	"\n" \
 			TR_REVISION	"\n" \
 			TR_COPYRIGHT	"\n" \
 			TR_DEVICE	"\n" \

@@ -97,13 +97,15 @@ static char const ident[] = "$RCSfile: sc.c,v $ $Name:  $($Revision: 1.1.2.5 $) 
 #include "sys/config.h"
 #include "src/kernel/strlookup.h"
 
-#define SC_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
+#define SC_DESCRIP	"STREAMS Configuration (SC) STREAMS Module" 
+#define SC_EXTRA	"Part of UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define SC_COPYRIGHT	"Copyright (c) 2008-2012  Monavacon Limited.  All Rights Reserved."
 #define SC_REVISION	"LfS $RCSfile: sc.c,v $ $Name:  $($Revision: 1.1.2.5 $) $Date: 2011-09-02 08:46:54 $"
 #define SC_DEVICE	"SVR 4.2 MP STREAMS STREAMS Configuration Module (SC)"
 #define SC_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define SC_LICENSE	"GPL"
 #define SC_BANNER	SC_DESCRIP	"\n" \
+			SC_EXTRA	"\n" \
 			SC_COPYRIGHT	"\n" \
 			SC_REVISION	"\n" \
 			SC_DEVICE	"\n" \

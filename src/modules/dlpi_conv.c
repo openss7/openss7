@@ -80,13 +80,15 @@ static char const ident[] = "$RCSfile: dlpi_conv.c,v $ $Name:  $($Revision: 1.1.
 #include <sys/os7/compat.h>
 #include <sys/dlpi.h>
 
-#define DLPI_CONV_DESCRIP	"DLPI ENDIAN CONVERSION (DLPI-CONV) FOR LINUX FAST-STREAMS"
+#define DLPI_CONV_DESCRIP	"DLPI Endian Conversion (DLPI-CONV) for Linux Fast-STREAMS"
+#define DLPI_CONV_EXTRA		"Part of the OpenSS7 Protocol Stacks for Linux Fast-STREAMS"
 #define DLPI_CONV_COPYRIGHT	"Copyright (c) 2008-2011  Monavacon Limited.  All Rights Reserved."
 #define DLPI_CONV_REVISION	"OpenSS7 $RCSfile: dlpi_conv.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2011-09-02 08:46:52 $"
 #define DLPI_CONV_DEVICE	"SVR 4.2 DLPI Endian Conversion (DLPI-CONV) for STREAMS"
 #define DLPI_CONV_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define DLPI_CONV_LICENSE	"GPL"
 #define DLPI_CONV_BANNER	DLPI_CONV_DESCRIP	"\n" \
+				DLPI_CONV_EXTRA		"\n" \
 				DLPI_CONV_COPYRIGHT	"\n" \
 				DLPI_CONV_REVISION	"\n" \
 				DLPI_CONV_DEVICE	"\n" \

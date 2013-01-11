@@ -73,13 +73,15 @@ static char const ident[] = "$RCSfile: mtp3b.c,v $ $Name:  $($Revision: 1.1.2.3 
  * boundary, see Q.2140 and Q.703 and SLI.
  */
 
-#define MTP3B_DESCRIP	"MTP3B-MTP3B STREAMS MODULE."
+#define MTP3B_DESCRIP	"MTP3B-MTP3B STREAMS Module"
+#define MTP3B_EXTRA	"Part of the OpenSS7 ATM Stack for Linux Fast-STREAMS"
 #define MTP3B_REVISION	"OpenSS7 $RCSfile: mtp3b.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-09-02 08:46:53 $"
 #define MTP3B_COPYRIGHT	"Copyright (c) 2008-2011  Monavacon Limited.  All Rights Reserved."
 #define MTP3B_DEVICE	"Provides OpenSS7 MTP3B-I.432.3-MTP3B module."
 #define MTP3B_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define MTP3B_LICENSE	"GPL"
 #define MTP3B_BANNER	MTP3B_DESCRIP	"\n" \
+			MTP3B_EXTRA	"\n" \
 			MTP3B_REVISIOn	"\n" \
 			MTP3B_COPYRIGHT	"\n" \
 			MTP3B_DEVICE	"\n" \

@@ -83,7 +83,7 @@ static char const ident[] = "$RCSfile: s_wan.c,v $ $Name:  $($Revision: 1.1.2.3 
 #include <sys/snet/wan_proto.h>
 #include <sys/snet/wan_control.h>
 
-#define S_WAN_DESCRIP	"SPIDER WAN COMPATIBILITY MODULE FOR LINUX FAST-STREAMS"
+#define S_WAN_DESCRIP	"Spider WAN Compatibility Module for Linux Fast-STREAMS"
 #define S_WAN_EXTRA	"Part of the OpenSS7 X.25 Stack for Linux Fast-STREAMS"
 #define S_WAN_COPYRIGHT	"Copyright (c) 2008-2011  Monavacon Limited.  All Rights Reserved."
 #define S_WAN_REVISION	"OpenSS7 $RCSfile: s_wan.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-09-02 08:46:54 $"

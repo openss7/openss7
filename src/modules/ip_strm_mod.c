@@ -87,8 +87,8 @@ static char const ident[] = "$RCSfile: ip_strm_mod.c,v $ $Name:  $($Revision: 1.
 
 #include <sys/dlpi.h>
 
-#define IP_TO_STREAMS_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 STREAMS FOR LINUX"
-#define IP_TO_STREAMS_EXTRA		"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
+#define IP_TO_STREAMS_DESCRIP		"IP STREAMS Module (IP_TO_STREAMS) STREAMS Module"
+#define IP_TO_STREAMS_EXTRA		"Part of the OpenSS7 IP Stack for Linux Fast-STREAMS"
 #define IP_TO_STREAMS_COPYRIGHT		"Copyright (c) 2008-2011  Monavacon Limited.  All Rights Reserved."
 #define IP_TO_STREAMS_REVISION		"LfS $RCSfile: ip_strm_mod.c,v $ $Name:  $ ($Revision: 1.1.2.4 $) $Date: 2011-09-02 08:46:52 $"
 #define IP_TO_STREAMS_DEVICE		"SVR 4.2 MP STREAMS IP STREAMS Module (IP_TO_STREAMS)"

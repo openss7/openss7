@@ -78,13 +78,15 @@ static char const ident[] = "$RCSfile: rtp_test.c,v $ $Name:  $($Revision: 1.1.2
 #include <sys/npi_ip.h>
 #include <sys/npi_udp.h>
 
-#define RTPT_DESCRIP	"RTP-TEST STREAMS MODULE."
+#define RTPT_DESCRIP	"RTP-TEST STREAMS Module"
+#define RTPT_EXTRA	"Part of the OpenSS7 VoIP Stack for Linux Fast-STREAMS"
 #define RTPT_REVISION	"OpenSS7 $RCSfile: rtp_test.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2011-09-02 08:46:54 $"
 #define RTPT_COPYRIGHT	"Copyright (c) 2008-2011  Monavacon Limitied.  All Rights Reserved."
 #define RTPT_DEVICE	"Provides OpenSS7 RTP Test driver."
 #define RTPT_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define RTPT_LICENSE	"GPL"
 #define RTPT_BANNER	RTPT_DESCRIP	"\n" \
+			RTPT_EXTRA	"\n" \
 			RTPT_REVISION	"\n" \
 			RTPT_COPYRIGHT	"\n" \
 			RTPT_DEVICE	"\n" \

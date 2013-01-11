@@ -68,13 +68,15 @@ static char const ident[] = "$RCSfile: m2pa_dl.c,v $ $Name:  $($Revision: 1.1.2.
 
 #include <sys/os7/compat.h>
 
-#define M2PA_DL_DESCRIP		"M2PA/SCTP SS7 DATA LINK (DL) STREAMS MODULE"
+#define M2PA_DL_DESCRIP		"M2PA/SCTP SS7 Data Link (DL) STREAMS Module"
+#define M2PA_DL_EXTRA		"Part of the OpenSS7 SS7 Stack for Linux Fast-STREAMS"
 #define M2PA_DL_REVISION	"OpenSS7 $RCSfile: m2pa_dl.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-09-02 08:46:53 $"
 #define M2PA_DL_COPYRIGHT	"Copyright (c) 2008-2011  Monavacon Limited.  All Rights Reserved."
 #define M2PA_DL_DEVICE		"Part of the OpenSS7 Stack for Linux Fast STREAMS"
 #define M2PA_DL_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define M2PA_DL_LICENSE		"GPL"
 #define M2PA_DL_BANNER		M2PA_DL_DESCRIP		"\n" \
+				M2PA_DL_EXTRA		"\n" \
 				M2PA_DL_REVISION	"\n" \
 				M2PA_DL_COPYRIGHT	"\n" \
 				M2PA_DL_DEVICE		"\n" \

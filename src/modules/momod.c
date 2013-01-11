@@ -89,13 +89,15 @@ static char const ident[] = "$RCSfile: momod.c,v $ $Name:  $($Revision: 1.1.2.4 
 #   include <sys/tihdr.h>
 #endif
 
-#define MOSI_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
+#define MOSI_DESCRIP	"SVR 4.2 MP RFC 1698 Minimal OSI (mOSI) STREAMS Module"
+#define MOSI_EXTRA	"Part of the OpenSS7 OSI Stack for Linux Fast-STREAMS"
 #define MOSI_COPYRIGHT	"Copyright (c) 2008-2011  Monavacon Limited.  All Rights Reserved."
 #define MOSI_REVISION	"OpenSS7 $RCSfile: momod.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2011-09-02 08:46:53 $"
 #define MOSI_DEVICE	"SVR 4.2 MP STREAMS MOSI Module for RFC 1698 (mOSI)"
 #define MOSI_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define MOSI_LICENSE	"GPL"
 #define MOSI_BANNER	MOSI_DESCRIP	"\n" \
+			MOSI_EXTRA	"\n" \
 			MOSI_COPYRIGHT	"\n" \
 			MOSI_REVISION	"\n" \
 			MOSI_DEVICE	"\n" \

@@ -90,13 +90,15 @@ static char const ident[] =
 
 #include <sys/os7/compat.h>
 
-#define IAX_DESCRIP	"IAX STREAMS MODULE"
+#define IAX_DESCRIP	"IAX STREAMS Module"
+#define IAX_EXTRA	"Part of the OpenSS7 VoIP Stack for Linux Fast-STREAMS"
 #define IAX_REVISION	"OpenSS7 $RCSfile: iax.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2011-09-02 08:46:52 $"
 #define IAX_COPYRIGHT	"Copyright (c) 2008-2011  Monavacon Limited.  All Rights Reserved."
 #define IAX_DEVICE	"Provides OpenSS7 Asterisk (IAX)"
 #define IAX_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define IAX_LICENSE	"GPL"
 #define IAX_BANNER	IAX_DESCRIP	"\n" \
+			IAX_EXTRA	"\n" \
 			IAX_REVISION	"\n" \
 			IAX_COPYRIGHT	"\n" \
 			IAX_DEVICE	"\n" \

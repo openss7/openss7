@@ -104,8 +104,8 @@ static char const ident[] =
 
 /* ---------------------- */
 
-#define XOT_DESCRIP	"X.25 OVER TCP MODULE FOR LINUX FAST-STREAMS"
-#define XOT_EXTRA	"Part fo the OpenSS7 X.25 Stack for Linux Fast-STREAMS"
+#define XOT_DESCRIP	"X.25 over TCP Module for Linux Fast-STREAMS"
+#define XOT_EXTRA	"Part of the OpenSS7 X.25 Stack for Linux Fast-STREAMS"
 #define XOT_COPYRIGHT	"Copyright (c) 2008-2011  Monavacon Limited.  All Rights Reserved."
 #define XOT_REVISION	"OpenSS7 $RCSfile: xot.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2011-09-02 08:46:57 $"
 #define XOT_DEVICE	"SVR 4.2MP X.25 over TCP Module (XOT) for X.25 CONS"

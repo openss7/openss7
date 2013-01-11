@@ -96,7 +96,7 @@ static char const ident[] = "$RCSfile: hdlc.c,v $ $Name:  $($Revision: 1.1.2.3 $
 #include <sys/cdi.h>
 #include <sys/ch.h>
 
-#define HDLC_DESCRIP	"HDLC OVER CH MODULE FOR LINUX FAST-STREAMS"
+#define HDLC_DESCRIP	"HDLC over CH Module for Linux Fast-STREAMS"
 #define HDLC_EXTRA	"Part of the OpenSS7 X.25 Stack for Linux Fast-STREAMS"
 #define HDLC_COPYRIGHT	"Copyright (c) 2008-2011  Monavacon Limited.  All Rights Reserved."
 #define HDLC_REVISION	"OpenSS7 $RCSfile: hdlc.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-09-02 08:46:52 $"

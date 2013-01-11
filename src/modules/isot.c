@@ -102,7 +102,7 @@ static char const ident[] = "$RCSfile: isot.c,v $ $Name:  $($Revision: 1.1.2.5 $
 
 /* ----------------------------- */
 
-#define ISOT_DESCRIP	"SVR 4.2 ISO TRANSPORT OVER TCP FOR LINUX FAST-STREAMS"
+#define ISOT_DESCRIP	"SVR 4.2 ISO Transport over TCP for Linux Fast-STREAMS"
 #define ISOT_EXTRA	"Part of the OpenSS7 OSI Stack for Linux Fast-STREAMS"
 #define ISOT_COPYRIGHT	"Copyright (c) 2008-2011  Monavacon Limited.  All Rights Reserved."
 #define ISOT_REVISION	"OpenSS7 $RCSfile: isot.c,v $ $Name:  $($Revision: 1.1.2.5 $) $Date: 2011-09-02 08:46:52 $"

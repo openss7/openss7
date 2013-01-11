@@ -123,13 +123,15 @@ References
 #include <ttcompat.h>
 #include <sys/strtty.h>
 
-#define PTEM_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
+#define PTEM_DESCRIP		"Pseudo-Terminal Emulation Module (PTEM) STREAMS Module"
+#define PTEM_EXTRA		"Part of UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define PTEM_COPYRIGHT		"Copyright (c) 2008-2011  Monavacon Limited.  All Rights Reserved."
 #define PTEM_REVISION		"OpenSS7 $RCSfile: ptem.c,v $ $Name:  $($Revision: 1.1.2.5 $) $Date: 2011-09-02 08:46:54 $"
 #define PTEM_DEVICE		"SVR 4.2 MP STREAMS Pseudo-Terminal Emulation Module (PTEM)"
 #define PTEM_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define PTEM_LICENSE		"GPL"
 #define PTEM_BANNER		PTEM_DESCRIP	"\n" \
+				PTEM_EXTRA	"\n" \
 				PTEM_COPYRIGHT	"\n" \
 				PTEM_REVISION	"\n" \
 				PTEM_DEVICE	"\n" \

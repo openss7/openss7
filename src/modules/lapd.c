@@ -79,13 +79,15 @@ static char const ident[] =
 
 #include <sys/os7/compat.h>
 
-#define LAPD_DESCRIP	"LAPD STREAMS MODULE"
+#define LAPD_DESCRIP	"LAPD STREAMS Module"
+#define LAPD_EXTRA	"Part of the OpenSS7 ISDN Stack for Linux Fast-STREAMS"
 #define LAPD_REVISION	"OpenSS7 $RCSfile: lapd.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2011-09-02 08:46:53 $"
 #define LAPD_COPYRIGHT	"Copyright (c) 2008-2011  Monavacon Limited.  All Rights Reserved."
 #define LAPD_DEVICE	"Provides OpenSS7 Link Access Protocol D-Channel (LAPD)"
 #define LAPD_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define LAPD_LICENSE	"GPL"
 #define LAPD_BANNER	LAPD_DESCRIP	"\n" \
+			LAPD_EXTRA	"\n" \
 			LAPD_REVISION	"\n" \
 			LAPD_COPYRIGHT	"\n" \
 			LAPD_DEVICE	"\n" \

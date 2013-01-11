@@ -85,13 +85,15 @@ static char const ident[] = "$RCSfile: mx_pmod.c,v $ $Name:  $($Revision: 1.1.2.
 //#undef freezestr
 //#undef unfreezestr
 
-#define MX_DESCRIP	"MX (Multiplex) STREAMS PIPE MODULE."
+#define MX_DESCRIP	"MX (Multiplex) STREAMS Pipe Module"
+#define MX_EXTRA	"Part of the OpenSS7 VoIP Stack for Linux Fast-STREAMS"
 #define MX_REVISION	"OpenSS7 $RCSfile: mx_pmod.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-09-02 08:46:53 $"
 #define MX_COPYRIGHT	"Copyright (c) 2008-2011  Monavacon Limited.  All Rights Reserved."
 #define MX_DEVICE	"Provides OpenSS7 MX pipe driver."
 #define MX_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define MX_LICENSE	"GPL"
 #define MX_BANNER	MX_DESCRIP	"\n" \
+			MX_EXTRA	"\n" \
 			MX_REVISION	"\n" \
 			MX_COPYRIGHT	"\n" \
 			MX_DEVICE	"\n" \

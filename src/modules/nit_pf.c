@@ -85,13 +85,15 @@ static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
 
 #include "sys/config.h"
 
-#define PF_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
+#define PF_DESCRIP	"SVR 4.1 SNIT Packet Filter (PF) STREAMS Module"
+#define PF_EXTRA	"Part of UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define PF_COPYRIGHT	"Copyright (c) 2008-2012  Monavacon Limited.  All Rights Reserved."
 #define PF_REVISION	"Lfs $RCSfile$ $Name$($Revision$) $Date$"
 #define PF_DEVICE	"SVR 4.1 SNIT Packet Filter (PF) for STREAMS."
 #define PF_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define PF_LICENSE	"GPL"
 #define PF_BANNER	PF_DESCRIP	"\n" \
+			PF_EXTRA	"\n" \
 			PF_COPYRIGHT	"\n" \
 			PF_REVISION	"\n" \
 			PF_DEVICE	"\n" \

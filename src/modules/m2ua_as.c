@@ -133,13 +133,15 @@ static char const ident[] = "$RCSfile: m2ua_as.c,v $ $Name:  $($Revision: 1.1.2.
 
 /* ======================= */
 
-#define M2UA_AS_DESCRIP		"M2UA/SCTP SIGNALLING LINK (SL) STREAMS MODULE."
+#define M2UA_AS_DESCRIP		"M2UA/SCTP Signalling Link (SL) STREAMS Module"
+#define M2UA_AS_EXTRA		"Part of the OpenSS7 SS7 Stack for Linux Fast-STREAMS"
 #define M2UA_AS_REVISION	"OpenSS7 $RCSfile: m2ua_as.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2011-09-02 08:46:53 $"
 #define M2UA_AS_COPYRIGHT	"Copyright (c) 2008-2011  Monavacon Limited.  All Rights Reserved."
 #define M2UA_AS_DEVICE		"Part of the OpenSS7 Stack for Linux Fast STREAMS."
 #define M2UA_AS_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define M2UA_AS_LICENSE		"GPL"
 #define M2UA_AS_BANNER		M2UA_AS_DESCRIP		"\n" \
+				M2UA_AS_EXTRA		"\n" \
 				M2UA_AS_REVISION	"\n" \
 				M2UA_AS_COPYRIGHT	"\n" \
 				M2UA_AS_DEVICE		"\n" \

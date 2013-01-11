@@ -96,12 +96,14 @@ static char const ident[] = "$RCSfile: sl_tpi.c,v $ $Name:  $($Revision: 1.1.2.5
 #include <ss7/sli.h>
 #include <ss7/sli_ioctl.h>
 
-#define SL_TPI_DESCRIP		"SS7/IP SIGNALLING LINK (SL) STREAMS MODULE."
+#define SL_TPI_DESCRIP		"SS7/IP Signalling Link (SL) STREAMS Module"
+#define SL_TPI_EXTRA		"Part of the OpenSS7 SS7 Stack for Linux-Fast STREAMS"
 #define SL_TPI_COPYRIGHT	"Copyright (c) 2008-2011  Monavacon Limited.  All Rights Reserved."
 #define SL_TPI_DEVICE		"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define SL_TPI_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define SL_TPI_LICENSE		"GPL"
 #define SL_TPI_BANNER		SL_TPI_DESCRIP		"\n" \
+				SL_TPI_EXTRA		"\n" \
 				SL_TPI_COPYRIGHT	"\n" \
 				SL_TPI_DEVICE		"\n" \
 				SL_TPI_CONTACT		"\n"

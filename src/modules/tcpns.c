@@ -98,13 +98,15 @@ static char const ident[] = "$RCSfile: tcpns.c,v $ $Name:  $($Revision: 1.1.2.4 
 #include <net/sock.h>
 #include <net/ip.h>
 
-#define TCPNS_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
+#define TCPNS_DESCRIP	"RFC 1006/2126 ISOT/ITOT NS (TCPNS) STREAMS Module"
+#define TCPNS_EXTRA	"Part of the OpenSS7 OSI Stack for Linux Fast-STREAMS"
 #define TCPNS_COPYRIGHT	"Copyright (c) 2008-2011  Monavacon Limited.  All Rights Reserved."
 #define TCPNS_REVISION	"OpenSS7 $RCSfile: tcpns.c,v $ $Name:  $ ($Revision: 1.1.2.4 $) $Date: 2011-09-02 08:46:56 $"
 #define TCPNS_DEVICE	"SVR 4.2 MP STREAMS NS Module for RFC 1006/2126 ISOT/ITOT"
 #define TCPNS_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define TCPNS_LICENSE	"GPL"
 #define TCPNS_BANNER	TCPNS_DESCRIP	"\n" \
+			TCPNS_EXTRA	"\n" \
 			TCPNS_COPYRIGHT	"\n" \
 			TCPNS_REVISION	"\n" \
 			TCPNS_DEVICE	"\n" \

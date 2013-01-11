@@ -91,13 +91,15 @@ static char const ident[] = "$RCSfile: itot.c,v $ $Name:  $($Revision: 1.1.2.5 $
 #include <net/sock.h>
 #include <net/ip.h>
 
-#define ITOT_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
+#define ITOT_DESCRIP	"RFC 2161 ISO Transport over TCP (ITOT) STREAMS Module"
+#define ITOT_EXTRA	"Part of the OpenSS7 OSI Stack for Linux Fast-STREAMS"
 #define ITOT_COPYRIGHT	"Copyright (c) 2008-2011  Monavacon Limited.  All Rights Reserved."
 #define ITOT_REVISION	"OpenSS7 $RCSfile: itot.c,v $ $Name:  $($Revision: 1.1.2.5 $) $Date: 2011-09-02 08:46:53 $"
 #define ITOT_DEVICE	"SVR 4.2 MP STREAMS ITOT Module for RFC 2126 (ITOT)"
 #define ITOT_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define ITOT_LICENSE	"GPL"
 #define ITOT_BANNER	ITOT_DESCRIP	"\n" \
+			ITOT_EXTRA	"\n" \
 			ITOT_COPYRIGHT	"\n" \
 			ITOT_REVISION	"\n" \
 			ITOT_DEVICE	"\n" \

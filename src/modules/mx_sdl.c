@@ -87,13 +87,15 @@ static char const ident[] = "$RCSfile: mx_sdl.c,v $ $Name:  $($Revision: 1.1.2.3
 #include <ss7/mxi.h>
 #include <ss7/mxi_ioctl.h>
 
-#define MX_SDL_DESCRIP	"SDL MULTIPLEX (MX) STREAMS MODULE."
+#define MX_SDL_DESCRIP	"SDL Multiplex (MX) STREAMS Module"
+#define MX_SDL_EXTRA	"Part of the OpenSS7 SS7 Stack for Linux Fast-STREAMS"
 #define MX_SDL_REVISION	"LfS $RCSfile: mx_sdl.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-09-02 08:46:54 $"
 #define MX_SDL_COPYRIGHT	"Copyright (c) 2008-2011  Monavacon Limited.  All Rights Reserved."
 #define MX_SDL_DEVICE	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define MX_SDL_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define MX_SDL_LICENSE	"GPL"
 #define MX_SDL_BANNER	MX_SDL_DESCRIP	"\n" \
+			MX_SDL_EXTRA	"\n" \
 			MX_SDL_REVISION	"\n" \
 			MX_SDL_COPYRIGHT	"\n" \
 			MX_SDL_DEVICE	"\n" \

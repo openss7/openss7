@@ -85,13 +85,15 @@ static char const ident[] = "$RCSfile: aal2.c,v $ $Name:  $($Revision: 1.1.2.4 $
 #include <sys/chi.h>
 #include <sys/dlpi.h>
 
-#define AAL2_DESCRIP	"MTP3B-AAL2 STREAMS MODULE."
+#define AAL2_DESCRIP	"MTP3B-AAL2 STREAMS Module"
+#define AAL2_EXTRA	"Part of the OpenSS7 ATM Stack for Linux Fast-STREAMS"
 #define AAL2_REVISION	"OpenSS7 $RCSfile: aal2.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2011-09-20 09:51:40 $"
 #define AAL2_COPYRIGHT	"Copyright (c) 2008-2011  Monavacon Limited.  All Rights Reserved."
 #define AAL2_DEVICE	"Provides OpenSS7 MTP3B-I.432.3-AAL2 module."
 #define AAL2_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define AAL2_LICENSE	"GPL"
 #define AAL2_BANNER	AAL2_DESCRIP	"\n" \
+			AAL2_EXTRA	"\n" \
 			AAL2_REVISION	"\n" \
 			AAL2_COPYRIGHT	"\n" \
 			AAL2_DEVICE	"\n" \

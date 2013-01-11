@@ -92,13 +92,15 @@ static char const ident[] = "$RCSfile: lapb.other.c,v $ $Name:  $($Revision: 1.1
 #include <sys/cdi.h>		/* Lower boundary. */
 #include <sys/dlpi.h>		/* Upper boundary. */
 
-#define LAPB_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
+#define LAPB_DESCRIP	"Link Access Procedure Balanced (LAPB) STREAMS Module"
+#define LAPB_EXTRA	"Part of the OpenSS7 X.25 Stack for Linux Fast-STREAMS"
 #define LAPB_COPYRIGHT	"Copyright (c) 2008-2011  Monavacon Limited.  All Rights Reserved."
 #define LAPB_REVISION	"OpenSS7 $RCSfile: lapb.other.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2011-09-02 08:46:53 $"
 #define LAPB_DEVICE	"SVR 4.2 MP STREAMS Link Access Procedure Balanced (LAPB)"
 #define LAPB_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define LAPB_LICENSE	"GPL"
 #define LAPB_BANNER	LAPB_DESCRIP	"\n" \
+			LAPB_EXTRA	"\n" \
 			LAPB_COPYRIGHT	"\n" \
 			LAPB_REVISION	"\n" \
 			LAPB_DEVICE	"\n" \

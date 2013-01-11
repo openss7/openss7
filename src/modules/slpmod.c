@@ -89,13 +89,15 @@ static char const ident[] = "$RCSfile: slpmod.c,v $ $Name:  $($Revision: 1.1.2.3
 #include <ss7/sli.h>
 #include <ss7/sli_ioctl.h>
 
-#define SL_DESCRIP	"Signalling Link (SL) Pipe Module (SLPMOD) STREAMS MODULE."
+#define SL_DESCRIP	"Signalling Link (SL) Pipe Module (SLPMOD) STREAMS Module"
+#define SL_EXTRA	"Part of the OpenSS7 SS7 Stack for Linux Fast-STREAMS"
 #define SL_REVISION	"OpenSS7 $RCSfile: slpmod.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-09-02 08:46:55 $"
 #define SL_COPYRIGHT	"Copyright (c) 2008-2011  Monavacon Limited.  All Rights Reserved."
 #define SL_DEVICE	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define SL_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define SL_LICENSE	"GPL"
 #define SL_BANNER	SL_DESCRIP	"\n" \
+			SL_EXTRA	"\n" \
 			SL_REVISION	"\n" \
 			SL_COPYRIGHT	"\n" \
 			SL_DEVICE	"\n" \

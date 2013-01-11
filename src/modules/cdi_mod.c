@@ -69,13 +69,15 @@ static char const ident[] = "$RCSfile: cdi_mod.c,v $ $Name:  $($Revision: 1.1.2.
 
 #include <sys/cdi.h>
 
-#define CDI_DESCRIP	"CDI SIGNALLING DATA LINK (SDL) STREAMS MODULE."
+#define CDI_DESCRIP	"CDI Signalling Data Link (SDL) STREAMS Module"
+#define CDI_EXTRA	"Part of the OpenSS7 SS7 Stack for Linux Fast-STREAMS"
 #define CDI_REVISION	"OpenSS7 $RCSfile: cdi_mod.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-09-02 08:46:52 $"
 #define CDI_COPYRIGHT	"Copyright (c) 2008-2011  Monavacon Limited.  All Rights Reserved."
 #define CDI_DEVICE	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define CDI_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define CDI_LICENSE	"GPL"
 #define CDI_BANNER	CDI_DESCRIP	"\n" \
+			CDI_EXTRA	"\n" \
 			CDI_REVISION	"\n" \
 			CDI_COPYRIGHT	"\n" \
 			CDI_DEVICE	"\n" \

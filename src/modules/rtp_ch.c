@@ -104,13 +104,15 @@ static char const ident[] = "$RCSfile: rtp_ch.c,v $ $Name:  $($Revision: 1.1.2.2
 #include <sys/chi.h>
 #include <sys/chi_ioctl.h>
 
-#define RTPCH_DESCRIP	"RTP-CH STREAMS MODULE."
+#define RTPCH_DESCRIP	"RTP-CH STREAMS Module"
+#define RTPCH_EXTRA	"Part of the OpenSS7 VoIP Stack for Linux Fast-STREAMS"
 #define RTPCH_REVISION	"OpenSS7 $RCSfile: rtp_ch.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2011-09-02 08:46:54 $"
 #define RTPCH_COPYRIGHT	"Copyright (c) 2008-2011  Monavacon Limited.  All Rights Reserved."
 #define RTPCH_DEVICE	"Provides OpenSS7 RTP to CH module."
 #define RTPCH_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define RTPCH_LICENSE	"GPL"
 #define RTPCH_BANNER	RTPCH_DESCRIP	"\n" \
+			RTPCH_EXTRA	"\n" \
 			RTPCH_REVISION	"\n" \
 			RTPCH_COPYRIGHT	"\n" \
 			RTPCH_DEVICE	"\n" \

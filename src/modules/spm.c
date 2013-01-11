@@ -82,13 +82,15 @@ static char const ident[] = "$RCSfile: spm.c,v $ $Name:  $($Revision: 1.1.2.3 $)
 #include <ss7/sdli.h>
 #include <ss7/sdli_ioctl.h>
 
-#define SPM_DESCRIP	"SS7/SDL: (Signalling Data Terminal) STREAMS PIPE MODULE."
+#define SPM_DESCRIP	"SS7/SDL: (Signalling Data Terminal) STREAMS Pipe Module"
+#define SPM_EXTRA	"Part of the OpenSS7 SS7 Stack for Linux Fast-STREAMS"
 #define SPM_REVISION	"OpenSS7 $RCSfile: spm.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-09-02 08:46:56 $"
 #define SPM_COPYRIGHT	"Copyright (c) 2008-2011  Monavacon Limited.  All Rights Reserved."
 #define SPM_DEVICE	"Provides OpenSS7 SDL pipe driver."
 #define SPM_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define SPM_LICENSE	"GPL"
 #define SPM_BANNER	SPM_DESCRIP	"\n" \
+			SPM_EXTRA	"\n" \
 			SPM_REVISION	"\n" \
 			SPM_COPYRIGHT	"\n" \
 			SPM_DEVICE	"\n" \

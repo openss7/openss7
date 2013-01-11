@@ -492,18 +492,20 @@ struct ltchars {
 #include <sys/termios.h>
 #include <sys/strtty.h>
 
-#define TTCOMPAT_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
+#define TTCOMPAT_DESCRIP	"Packet Mode (TTCOMPAT) STREAMS Module"
+#define TTCOMPAT_EXTRA		"Part of UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define TTCOMPAT_COPYRIGHT	"Copyright (c) 2008-2011  Monavacon Limited.  All Rights Reserved."
 #define TTCOMPAT_REVISION	"OpenSS7 $RCSfile: ttcompat.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2011-09-02 08:46:57 $"
 #define TTCOMPAT_DEVICE		"SVR 4.2 MP STREAMS Packet Mode Module (TTCOMPAT)"
 #define TTCOMPAT_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define TTCOMPAT_LICENSE	"GPL"
 #define TTCOMPAT_BANNER		TTCOMPAT_DESCRIP	"\n" \
+				TTCOMPAT_EXTRA		"\n" \
 				TTCOMPAT_COPYRIGHT	"\n" \
 				TTCOMPAT_REVISION	"\n" \
-				TTCOMPAT_DEVICE	"\n" \
+				TTCOMPAT_DEVICE		"\n" \
 				TTCOMPAT_CONTACT
-#define TTCOMPAT_SPLASH		TTCOMPAT_DEVICE	" - " \
+#define TTCOMPAT_SPLASH		TTCOMPAT_DEVICE		" - " \
 				TTCOMPAT_REVISION
 #ifdef LINUX
 MODULE_AUTHOR(TTCOMPAT_CONTACT);

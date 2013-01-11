@@ -76,19 +76,20 @@ static char const ident[] = "$RCSfile: sl_dl.c,v $ $Name:  $($Revision: 1.1.2.3 
 
 #include <sys/os7/compat.h>
 
-#define SL_DL_DESCRIP		"SIGNALLING LINK (SL) DATA LINK (DL) STREAMS MODULE"
+#define SL_DL_DESCRIP		"Signalling Link (SL) Data Link (DL) STREAMS Module"
+#define SL_DL_EXTRA		"Part of the OpenSS7 SS7 Stack for Linux Fast-STREAMS"
 #define SL_DL_REVISION		"OpenSS7 $RCSfile: sl_dl.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-09-02 08:46:55 $"
-
 #define SL_DL_COPYRIGHT		"Copyright (c) 2008-2011  Monavacon Limited.  All Rights Reserved."
 #define SL_DL_DEVICE		"Part of the OpenSS7 Stack for Linux Fast STREAMS"
 #define SL_DL_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define SL_DL_LICENSE		"GPL"
-#define SL_DL_BANNER		SL_DL_DESCRIP		"\n" \
+#define SL_DL_BANNER		SL_DL_DESCRIP	"\n" \
+				SL_DL_EXTRA	"\n" \
 				SL_DL_REVISION	"\n" \
 				SL_DL_COPYRIGHT	"\n" \
-				SL_DL_DEVICE		"\n" \
-				SL_DL_CONTACT		"\n"
-#define SL_DL_SPLASH		SL_DL_DEVICE		" - " \
+				SL_DL_DEVICE	"\n" \
+				SL_DL_CONTACT	"\n"
+#define SL_DL_SPLASH		SL_DL_DEVICE	" - " \
 				SL_DL_REVISION	"\n"
 
 #ifdef LINUX

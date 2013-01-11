@@ -85,8 +85,8 @@ static char const ident[] = "$RCSfile: trmod.c,v $ $Name:  $($Revision: 1.1.2.4 
 
 #include <sys/sad.h>
 
-#define TRMOD_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
-#define TRMOD_EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS"
+#define TRMOD_DESCRIP	"TCAP Q.771 Transaction Sublayer (TR) STREAMS Module"
+#define TRMOD_EXTRA	"Part of the OpenSS7 SS7 Stack for Linux Fast-STREAMS"
 #define TRMOD_COPYRIGHT	"Copyright (c) 2008-2011  Monavacon Limited.  All Rights Reserved."
 #define TRMOD_REVISION	"$RCSfile: trmod.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2011-09-02 08:46:57 $"
 #define TRMOD_DEVICE	"SVR 4.2 MP STREAMS Q.771 Transaction Sublayer (TR) Module"

@@ -102,13 +102,15 @@ static char const ident[] = "$RCSfile: sccp_mod.c,v $ $Name:  $($Revision: 1.1.2
 #include <ss7/mtpi.h>
 #include <ss7/mtpi_ioctl.h>
 
-#define SC_DESCRIP	"SS7/SCCP (SCCP Minimal Module) STREAMS MODULE."
+#define SC_DESCRIP	"SS7/SCCP (SCCP Minimal Module) STREAMS Module"
+#define SC_EXTRA	"Part of the OpenSS7 SS7 Stack for Linux Fast-STREAMS"
 #define SC_REVISION	"OpenSS7 $RCSfile: sccp_mod.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-09-02 08:46:54 $"
 #define SC_COPYRIGHT	"Copyright (c) 2008-2011  Monavacon Limited.  All Rights Reserved."
 #define SC_DEVICE	"Provides OpenSS7 SCCP module."
 #define SC_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define SC_LICENSE	"GPL"
 #define SC_BANNER	SC_DESCRIP	"\n" \
+			SC_EXTRA	"\n" \
 			SC_REVISION	"\n" \
 			SC_COPYRIGHT	"\n" \
 			SC_DEVICE	"\n" \

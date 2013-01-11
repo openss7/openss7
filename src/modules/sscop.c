@@ -84,13 +84,15 @@ static char const ident[] = "$RCSfile: sscop.c,v $ $Name:  $($Revision: 1.1.2.4 
 #include <sys/npi.h>
 #include <sys/dlpi.h>
 
-#define SSCOP_DESCRIP	"MTP3B-SSCOP STREAMS MODULE."
+#define SSCOP_DESCRIP	"MTP3B-SSCOP STREAMS Module"
+#define SSCOP_EXTRA	"Part of the OpenSS7 ATM Stack for Linux Fast-STREAMS"
 #define SSCOP_REVISION	"OpenSS7 $RCSfile: sscop.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2011-09-20 09:51:41 $"
 #define SSCOP_COPYRIGHT	"Copyright (c) 2008-2011  Monavacon Limited.  All Rights Reserved."
 #define SSCOP_DEVICE	"Provides OpenSS7 MTP3B-I.432.3-SSCOP module."
 #define SSCOP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define SSCOP_LICENSE	"GPL"
 #define SSCOP_BANNER	SSCOP_DESCRIP	"\n" \
+			SSCOP_EXTRA	"\n" \
 			SSCOP_REVISION	"\n" \
 			SSCOP_COPYRIGHT	"\n" \
 			SSCOP_DEVICE	"\n" \

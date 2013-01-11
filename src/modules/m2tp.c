@@ -86,13 +86,15 @@ static char const ident[] = "$RCSfile: m2tp.c,v $ $Name:  $($Revision: 1.1.2.3 $
 #include <ss7/sli_ioctl.h>
 //#include <ss7/m2tp_ioctl.h>
 
-#define M2TP_DESCRIP	"M2TP/SCTP MTP2 TUNNELING PROTOCOL (SL) STREAMS MODULE."
+#define M2TP_DESCRIP	"M2TP/SCTP MTP2 Tunneling Protocol (SL) STREAMS Module"
+#define M2TP_EXTRA	"Part of the OpenSS7 SS7 Stack for Linux Fast-STREAMS"
 #define M2TP_REVISION	"OpenSS7 $RCSfile: m2tp.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Data$"
 #define M2TP_COPYRIGHT	"Copyright (c) 2008-2011  Monavacon Limited.  All Rights Reserved."
 #define M2TP_DEVICE	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define M2TP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define M2TP_LICENSE	"GPL"
 #define M2TP_BANNER	M2TP_DESCRIP	"\n" \
+			M2TP_EXTRA	"\n" \
 			M2TP_REVISION	"\n" \
 			M2TP_COPYRIGHT	"\n" \
 			M2TP_DEVICE	"\n" \

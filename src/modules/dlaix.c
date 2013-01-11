@@ -83,7 +83,7 @@ static char const ident[] = "$RCSfile: dlaix.c,v $ $Name:  $($Revision: 1.1.2.3 
 #define CD_DETACH_PENDING (CD_XRAY+2)
 #endif
 
-#define DLAIX_DESCRIP	"LAPB OVER HDLC MODULE FOR LINUX FAST-STREAMS"
+#define DLAIX_DESCRIP	"LAPB over HDLC Module for Linux Fast-STREAMS"
 #define DLAIX_EXTRA	"Part of the OpenSS7 X.25 Stack for Linux Fast-STREAMS"
 #define DLAIX_COPYRIGHT	"Copyright (c) 2008-2011  Monavacon Limited.  All Rights Reserved."
 #define DLAIX_REVISION	"OpenSS7 $RCSfile: dlaix.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-09-02 08:46:52 $"

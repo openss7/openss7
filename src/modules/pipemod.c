@@ -92,13 +92,15 @@ static char const ident[] = "$RCSfile: pipemod.c,v $ $Name:  $($Revision: 1.1.2.
 
 #include "sys/config.h"
 
-#define PIPEMOD_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
+#define PIPEMOD_DESCRIP		"SVR 4.2 Pipe Module (PIPEMOD) STREAMS Module"
+#define PIPEMOD_EXTRA		"Part of UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define PIPEMOD_COPYRIGHT	"Copyright (c) 2008-2012  Monavacon Limited.  All Rights Reserved."
 #define PIPEMOD_REVISION	"LfS $RCSfile: pipemod.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2011-09-02 08:46:54 $"
 #define PIPEMOD_DEVICE		"SVR 4.2 Pipe Module for STREAMS-based Pipes"
 #define PIPEMOD_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define PIPEMOD_LICENSE		"GPL"
 #define PIPEMOD_BANNER		PIPEMOD_DESCRIP		"\n" \
+				PIPEMOD_EXTRA		"\n" \
 				PIPEMOD_COPYRIGHT	"\n" \
 				PIPEMOD_REVISION	"\n" \
 				PIPEMOD_DEVICE		"\n" \

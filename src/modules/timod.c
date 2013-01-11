@@ -94,13 +94,15 @@ static char const ident[] = "$RCSfile: timod.c,v $ $Name:  $($Revision: 1.1.2.4 
 #   include <sys/timod.h>
 #endif
 
-#define TIMOD_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
+#define TIMOD_DESCRIP	"XTI Library Module for TLI Devices (TIMOD) STREAMS Module"
+#define TIMOD_EXTRA	"Part of UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define TIMOD_COPYRIGHT	"Copyright (c) 2008-2011  Monavacon Limited.  All Rights Reserved."
 #define TIMOD_REVISION	"OpenSS7 $RCSfile: timod.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2011-09-02 08:46:56 $"
 #define TIMOD_DEVICE	"SVR 4.2 MP STREAMS XTI Library Module for TLI Devices (TIMOD)"
 #define TIMOD_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define TIMOD_LICENSE	"GPL"
 #define TIMOD_BANNER	TIMOD_DESCRIP	"\n" \
+			TIMOD_EXTRA	"\n" \
 			TIMOD_COPYRIGHT	"\n" \
 			TIMOD_REVISION	"\n" \
 			TIMOD_DEVICE	"\n" \

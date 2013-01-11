@@ -70,8 +70,8 @@ static char const ident[] = "$RCSfile: tcmod.c,v $ $Name:  $($Revision: 1.1.2.2 
 #include <sys/os8/compat.h>
 #include <sys/strsun.h>
 
-#define TCMOD_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
-#define TCMOD_EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS"
+#define TCMOD_DESCRIP	"ITU_T Q.771 TC for ITU-T Q.771 TR (TCMOD) STREAMS Module"
+#define TCMOD_EXTRA	"Part of the OpenSS7 SS7 Stack for Linux Fast-STREAMS"
 #define TCMOD_COPYRIGHT	"Copyright (c) 2008-2010  Monavacon Limited.  All Rights Reserved."
 #define TCMOD_REVISION	"Monavacon $RCSfile: tcmod.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2010-11-28 14:22:07 $"
 #define TCMOD_DEVICE	"ITU-T Q.771 TC modules for ITU-T Q.771 TR"

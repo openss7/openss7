@@ -93,13 +93,15 @@ static char const ident[] = "$RCSfile: nullmod.c,v $ $Name:  $($Revision: 1.1.2.
 #include <sys/strsubr.h>
 #include <sys/ddi.h>
 
-#define NULLMOD_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
+#define NULLMOD_DESCRIP		"Null Module (NULLMOD) STREAMS Module"
+#define NULLMOD_EXTRA		"Part of UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define NULLMOD_COPYRIGHT	"Copyright (c) 2008-2012  Monavacon Limited.  All Rights Reserved."
 #define NULLMOD_REVISION	"LfS $RCSfile: nullmod.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2011-09-02 08:46:54 $"
 #define NULLMOD_DEVICE		"SVR 4.2 Null Module (NULLMOD) for STREAMS"
 #define NULLMOD_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define NULLMOD_LICENSE		"GPL"
 #define NULLMOD_BANNER		NULLMOD_DESCRIP		"\n" \
+				NULLMOD_EXTRA		"\n" \
 				NULLMOD_COPYRIGHT	"\n" \
 				NULLMOD_REVISION	"\n" \
 				NULLMOD_DEVICE		"\n" \

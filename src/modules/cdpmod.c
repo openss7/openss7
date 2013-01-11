@@ -77,7 +77,7 @@ static char const ident[] = "$RCSfile: cdpmod.c,v $ $Name:  $($Revision: 1.1.2.3
 #include <sys/strsun.h>
 #include <sys/cdi.h>
 
-#define CDPMOD_DESCRIP	"HDLC PIPE MODULE FOR LINUX FAST-STREAMS"
+#define CDPMOD_DESCRIP	"HDLC Pipe Module for Linux Fast-STREAMS"
 #define CDPMOD_EXTRA	"Part of the OpenSS7 X.25 Stack for Linux Fast-STREAMS"
 #define CDPMOD_COPYRIGHT "Copyright (c) 2008-2011  Monavacon Limited.  All Rights Reserved."
 #define CDPMOD_REVISION	"OpenSS7 $RCSfile: cdpmod.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-09-02 08:46:52 $"

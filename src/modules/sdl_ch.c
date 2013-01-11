@@ -88,13 +88,15 @@ static char const ident[] = "$RCSfile: sdl_ch.c,v $ $Name:  $($Revision: 1.1.2.3
 #include <sys/chi.h>
 #include <sys/chi_ioctl.h>
 
-#define SDL_DESCRIP	"SS7/SDL: (Signalling Data Link) STREAMS MODULE."
+#define SDL_DESCRIP	"SS7/SDL: (Signalling Data Link) STREAMS Module"
+#define SDL_EXTRA	"Part of the OpenSS7 SS7 Stack for Linux Fast-STREAMS"
 #define SDL_REVISION	"OpenSS7 $RCSfile: sdl_ch.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-09-02 08:46:55 $"
 #define SDL_COPYRIGHT	"Copyright (c) 2008-2011  Monavacon Limited.  All Rights Reserved."
 #define SDL_DEVICE	"Provides OpenSS7 SDL-CH module."
 #define SDL_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define SDL_LICENSE	"GPL"
 #define SDL_BANNER	SDL_DESCRIP	"\n" \
+			SDL_EXTRA	"\n" \
 			SDL_REVISION	"\n" \
 			SDL_COPYRIGHT	"\n" \
 			SDL_DEVICE	"\n" \

@@ -84,13 +84,15 @@ static char const ident[] = "$RCSfile: tua_as.c,v $ $Name:  $($Revision: 1.1.2.3
 #include <sys/tihdr.h>
 #include <sys/tpi_tcap.h>
 
-#define TUA_AS_DESCRIP		"TUA/SCTP SIGNALLING LINK (SL) STREAMS MODULE."
+#define TUA_AS_DESCRIP		"TUA/SCTP Signalling Link (SL) STREAMS Module"
+#define TUA_AS_EXTRA		"Part of the OpenSS7 SS7 Stack for Linux Fast-STREAMS"
 #define TUA_AS_REVISION		"OpenSS7 $RCSfile: tua_as.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-09-02 08:46:57 $"
 #define TUA_AS_COPYRIGHT	"Copyright (c) 2008-2011  Monavacon Limited.  All Rights Reserved."
 #define TUA_AS_DEVICE		"Part of the OpenSS7 Stack for Linux Fast STREAMS."
 #define TUA_AS_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define TUA_AS_LICENSE		"GPL"
 #define TUA_AS_BANNER		TUA_AS_DESCRIP		"\n" \
+				TUA_AS_EXTRA		"\n" \
 				TUA_AS_REVISION		"\n" \
 				TUA_AS_COPYRIGHT	"\n" \
 				TUA_AS_DEVICE		"\n" \
