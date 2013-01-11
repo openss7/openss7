@@ -1,7 +1,7 @@
 #!/bin/bash
 #
 # @(#) $RCSfile: specfs,v $ $Name:  $($Revision: 1.1.2.8 $) $Date: 2011-09-20 09:51:42 $
-# Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
+# Copyright (c) 2008-2013  Monavacon Limited <http://www.monavacon.com/>
 # Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
 # Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 # All Rights Reserved.
@@ -47,7 +47,8 @@ PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
 
 # Source init script functions library.
 init_mode="standalone"
-  if [ -r /etc/init.d/functions   ] ; then . /etc/init.d/functions   ; init_mode="chkconfig" ;
+  if [ -r /proc/1/comm -a "`cat /proc/1/comm`" = systemd ] ; then      init_mode="systemd"   ;
+elif [ -r /etc/init.d/functions   ] ; then . /etc/init.d/functions   ; init_mode="chkconfig" ;
 elif [ -r /etc/rc.status          ] ; then . /etc/rc.status          ; init_mode="insserv"   ;
 elif [ -r /lib/lsb/init-functions ] ; then . /lib/lsb/init-functions ; init_mode="lsb"       ;
 elif [ -r /sbin/start-stop-daemon ] ; then                             init_mode="debian"    ;
@@ -93,7 +94,7 @@ case "$init_mode" in
 	    status "$@"
 	}
 	;;
-    (standalone|*)
+    (standalone|systemd|*)
 	action () {
 	    echo -en "$1"
 	    shift 1
@@ -124,19 +125,19 @@ if [ ! -e /proc/filesystems ] ; then if [ "$1" = 'stop' ] ; then exit 0 ; else e
 [ -n "$SPECFS_BOOTLOAD"       ] || SPECFS_BOOTLOAD='no'
 [ -n "$SPECFS_BOOTMOUNT"      ] || SPECFS_BOOTMOUNT='no'
 
-[ -n "$SPECFS_MOUNTSPECFS"    ] || SPECFS_MOUNTSPECFS='yes'
-[ -n "$SPECFS_UMOUNTSPECFS"   ] || SPECFS_UMOUNTSPECFS='yes'
+[ -n "$SPECFS_MOUNTSPECFS"    ] || SPECFS_MOUNTSPECFS='no'
+[ -n "$SPECFS_UMOUNTSPECFS"   ] || SPECFS_UMOUNTSPECFS='no'
 [ -n "$SPECFS_MOUNTPOINT"     ] || SPECFS_MOUNTPOINT='/dev/streams'
 [ -n "$SPECFS_UID"            ] || SPECFS_UID='0'
 [ -n "$SPECFS_GID"            ] || SPECFS_GID='0'
 [ -n "$SPECFS_MODE"           ] || SPECFS_MODE='0777'
 [ -n "$SPECFS_OPTIONS"        ] || SPECFS_OPTIONS='-o uid=0,gid=0,mode=0777'
 
-[ -n "$SPECFS_PRELOAD"        ] || SPECFS_PRELOAD=
+[ -n "$SPECFS_PRELOAD"        ] || SPECFS_PRELOAD="specfs"
 [ -n "$SPECFS_DRIVERS"        ] || SPECFS_DRIVERS=
 [ -n "$SPECFS_MODULES"        ] || SPECFS_MODULES=
-[ -n "$SPECFS_MAKEDEVICES"    ] || SPECFS_MAKEDEVICES='yes'
-[ -n "$SPECFS_REMOVEDEVICES"  ] || SPECFS_REMOVEDEVICES='yes'
+[ -n "$SPECFS_MAKEDEVICES"    ] || SPECFS_MAKEDEVICES='no'
+[ -n "$SPECFS_REMOVEDEVICES"  ] || SPECFS_REMOVEDEVICES='no'
 [ -n "$SPECFS_FORCEREMOVE"    ] || SPECFS_FORCEREMOVE='yes'
 
 # Source redhat and/or debian config file
@@ -294,8 +295,9 @@ start_update () {
     [ :${runlevel+set} = :set ] || runlevel=$RUNLEVEL
     [ :${previous+set} = :set ] || previous=${PREVLEVEL:-N}
     if [ ":$previous" = ':N' -a ":$runlevel" != ':' ] ; then
-	marker="/var/lib/openss7/.openss7_update-`uname -r`"
-	if [ ":$SPECFS_KUPDATE" = ':yes' -a -e $marker ] ; then
+	marker="/.openss7_update-`uname -r`"
+	haveit="/.openss7_haveit-`uname -r`"
+	if [ ":$SPECFS_KUPDATE" = ':yes' -a \( -e $marker -o ! -e $haveit \) ] ; then
 	    for command in /sbin/openss7-modules /usr/sbin/openss7-modules ; do
 		if [ -x $command ] ; then
 		    action "Updating kernel modules" \
@@ -303,6 +305,7 @@ start_update () {
 		    RETVAL=$?
 		    if [ $RETVAL -eq 0 ] ; then
 			rm -f -- $marker || :
+			touch -- $haveit || :
 		    fi
 		    break
 		fi
@@ -330,8 +333,9 @@ stop_update () {
     [ :${runlevel+set} = :set ] || runlevel=$RUNLEVEL
     [ :${previous+set} = :set ] || previous=${PREVLEVEL:-N}
     if [ ":$previous" != ':N' -a \( ":$runlevel" = ':0' -o ":$runlevel" = ':6' \) ]; then
-	marker="/var/lib/openss7/.openss7_update-`uname -r`"
-	if [ ":$SPECFS_KUPDATE" = ':yes' -a -e $marker ]; then
+	marker="/.openss7_update-`uname -r`"
+	haveit="/.openss7_haveit-`uname -r`"
+	if [ ":$SPECFS_KUPDATE" = ':yes' -a \( -e $marker -o ! -e $haveit \) ]; then
 	    for command in /sbin/openss7-modules /usr/sbin/openss7-modules
 	    do
 		[ -x $command ] || continue
@@ -340,6 +344,7 @@ stop_update () {
 		RETVAL=$?
 		if [ $RETVAL -eq 0 ]; then
 		    rm -f -- $marker || :
+		    touch -- $haveit || :
 		fi
 		break
 	    done
@@ -992,7 +997,7 @@ esac
 #
 # -----------------------------------------------------------------------------
 #
-# Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
+# Copyright (c) 2008-2013  Monavacon Limited <http://www.monavacon.com/>
 # Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
 # Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 #

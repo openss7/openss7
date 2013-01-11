@@ -5,7 +5,7 @@
 # Update kernel modules at boot?
 STREAMS_KUPDATE='no'
 # Load modules at boot?
-STREAMS_BOOTLOAD='yes'
+STREAMS_BOOTLOAD='no'
 # Mount specfs file system at boot?
 STREAMS_BOOTMOUNT='no'
 
@@ -32,11 +32,11 @@ STREAMS_MODULES='streams-srvmod streams-connld streams-nullmod streams-pipemod s
 # NOTE: streams-liscompat does not seem to be installed
 
 # Make real character devices before intializing subsystem?
-STREAMS_MAKEDEVICES='yes'
+STREAMS_MAKEDEVICES='no'
 # Remove devices when removing subsystem?
-STREAMS_REMOVEDEVICES='yes'
+STREAMS_REMOVEDEVICES='no'
 # Force removal of kernel modules when shutting down.
-STREAMS_FORCEREMOVE='yes'
+STREAMS_FORCEREMOVE='no'
 
 # =============================================================================
 # 

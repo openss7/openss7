@@ -39,9 +39,9 @@ OPENSS7_MODULES='streams-ip_strm_mod streams-timod streams-tirdwr streams-tpiper
 # NOTE: streams-tstmod does not seem to be installed
 
 # Make real character devices before intializing subsystem?
-OPENSS7_MAKEDEVICES='yes'
+OPENSS7_MAKEDEVICES='no'
 # Remove devices when removing subsystem?
-OPENSS7_REMOVEDEVICES='yes'
+OPENSS7_REMOVEDEVICES='no'
 # Force removal of kernel modules when shutting down.
 OPENSS7_FORCEREMOVE='no'
 

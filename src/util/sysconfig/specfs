@@ -5,9 +5,9 @@
 # Update kernel modules at boot?
 SPECFS_KUPDATE='yes'
 # Load modules at boot?
-SPECFS_BOOTLOAD='yes'
+SPECFS_BOOTLOAD='no'
 # Mount specfs file system at boot?
-SPECFS_BOOTMOUNT='yes'
+SPECFS_BOOTMOUNT='no'
 
 # Mount specfs file system?
 SPECFS_MOUNTSPECFS='no'
@@ -31,9 +31,9 @@ SPECFS_DRIVERS=
 SPECFS_MODULES=
 
 # Make real character devices before intializing subsystem?
-SPECFS_MAKEDEVICES='yes'
+SPECFS_MAKEDEVICES='no'
 # Remove devices when removing subsystem?
-SPECFS_REMOVEDEVICES='yes'
+SPECFS_REMOVEDEVICES='no'
 # Force removal of kernel modules when shutting down.
 SPECFS_FORCEREMOVE='yes'
 
