@@ -395,8 +395,8 @@ MY_PHONY	+= $(ALL_REVERSIVE_TARGETS)
 # directory for test suites and other test programs
 ##
 if PERFORM_CHECKS
-dist_check_SCRIPTS	= $(top_srcdir)/scripts/check
-#dist_check_SCRIPTS	= $(top_srcdir)/scripts/check_commands
+dist_check_SCRIPTS	= @top_srcdir@/scripts/check
+#dist_check_SCRIPTS	= scripts/check_commands
 TESTS			= $(dist_check_SCRIPTS)
 TESTS_ENVIRONMENT	= srcdir='$(srcdir)' \
 			  top_srcdir='$(top_srcdir)' \
