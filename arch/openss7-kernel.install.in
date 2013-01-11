@@ -5,7 +5,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
+# Copyright (c) 2008-2013  Monavacon Limited <http://www.monavacon.com/>
 # Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
 # Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 #
@@ -112,10 +112,10 @@ _post_kernel_oldmods() {
     sysmap=/boot/System.map-@kversion@
     if [ -x "`which depmod 2>/dev/null`" ]; then
         if [ "@kversion@" = "`uname -r`" ]; then
-            depmod -a || :
+            depmod -a >&2 || :
         elif [ -r $sysmap ]; then
             UNAME_MACHINE=@target_cpu@ \
-            depmod -ae -F $sysmap @kversion@ || :
+            depmod -ae -F $sysmap @kversion@ >&2 || :
         fi
     fi
 }
@@ -307,28 +307,62 @@ _pre_install_kernel_modules() {
 # Note that we really don't support way-old versions of archlinux and these
 # scripts are never used.
 # ---------------------------------------------------------------------------
+# _post_kernel_sysvinit() - Attempt to start init scripts.
+#
+_post_kernel_sysvinit () {
+    local r i start l
+    [ -z '@INSTALL_SYSVINIT_TRUE@' ] || return 0
+    echo ">>> Starting initscripts..." >&2
+    r="`runlevel | awk '{print$2}'`"
+    for i in ${initfiles}; do
+	[ -f @initrddir@/$i ] || continue
+	[ ! -e /var/lock/subsys/$i ] || continue
+	start=no
+	for l in @initrddir@/../rc${r}.d/S[0-9][0-9]$i @initrddir@/rc${r}.d/S[0-9][0-9]$i; do
+	    if [ -L $l ]; then start=yes; break; fi
+	done
+	[ $start = yes ] || continue
+	[ -x "`which service     2>/dev/null`" ] && { service     $i start && continue || break; }
+	[ -x "`which invoke-rc.d 2>/dev/null`" ] && { invoke-rc.d $i start && continue || break; }
+	[ -x "@initrddir@/$i"                  ] && { @initrddir@/$i start && continue || break; }
+    done
+}
+# _post_kernel_systemd() - Attempt to start unit files.  This should never
+#   really happen: a really old kernel with systemd.
+#
+_post_kernel_systemd () { :
+    local i
+    [ -z '@INSTALL_SYSTEMD_TRUE@' ] || return 0
+    echo ">>> Staring unit files..." >&2
+    forward=
+    for i in $unitfiles; do
+	case "$i" in
+	(*-shutdown.target)
+	    ;;
+	(*.target)
+	    forward="${forward:+ }$forward$i" ;;
+	esac
+    done
+    if [ -r /proc/1/comm -o "`cat /proc/1/comm`" != systemd ]; then
+	systemctl --system daemon-reload
+	for i in $forward; do
+	    if [ -r "@systemdsysdir@/$i" ]; then
+		[ -x "`which systemctl 2>/dev/null`" ] && { systemctl start $i 2>&1 && continue || true; }
+	    fi
+	done
+    fi
+}
 # _post_kernel_initscripts() - For old modules attempt to start init
 #   scripts when they are not already started and they are supposed to be
 #   started in the current run level.
 #
 _post_kernel_initscripts() {
-    local r i start l
     [ -z '@WITH_KO_MODULES_FALSE@' ] || return 0
-    echo ">>> Starting initscripts..." >&2
-    if [ "@kversion@" = "`uname -r`" ]; then
-        r="`runlevel | awk '{print$2}'`"
-        for i in ${initfiles}; do
-            [ -f @initrddir@/$i ] || continue
-            [ ! -e /var/lock/subsys/$i ] || continue
-            start=no
-            for l in @initrddir@/../rc${r}.d/S[0-9][0-9]$i @initrddir@/rc${r}.d/S[0-9][0-9]$i; do
-                if [ -L $l ]; then start=yes; break; fi
-            done
-            [ $start = yes ] || continue
-            [ -x "`which service     2>/dev/null`" ] && { service     $i start && continue || break; }
-            [ -x "`which invoke-rc.d 2>/dev/null`" ] && { invoke-rc.d $i start && continue || break; }
-            [ -x "@initrddir@/$i"                  ] && { @initrddir@/$i start && continue || break; }
-        done
+    [ "@kversion@" = "`uname -r`" ] || return 0
+    if [ -r /proc/1/comm -a "`cat /proc/1/comm`" = systemd ]; then
+	_post_kernel_systemd
+    else
+	_post_kernel_sysvinit
     fi
 }
 _post_install_kernel_initscripts() {
@@ -337,27 +371,60 @@ _post_install_kernel_initscripts() {
 _post_upgrade_kernel_initscripts() {
     _post_kernel_initscripts	|| :
 }
+# _post_remove_kernel_sysvinit() - Atttempt to stop init scripts.
+#
+_post_remove_kernel_sysvinit () {
+    local reverse i
+    [ -z '@INSTALL_SYSVINIT_TRUE@' ] || return 0
+    echo ">>> Stopping initscripts..." >&2
+    reverse=
+    for i in $initfiles; do
+	reverse="$i${reverse:+ }$reverse"
+    done
+    for i in $reverse; do
+	if [ -f @initrddir@/$i ] ; then
+	    [ -x "`which service     2>/dev/null`" ] && { service     $i stop && continue || :; }
+	    [ -x "`which invoke-rc.d 2>/dev/null`" ] && { invoke-rc.d $i stop && continue || :; }
+	    [ -x "@initrddir@/$i"                  ] && { @initrddir@/$i stop && continue || :; }
+	fi
+    done
+}
+# _post_remove_kernel_systemd() - Attempt to stop unit files.
+#
+_post_remove_kernel_systemd () {
+    local reverse i
+    [ -z '@INSTALL_SYSTEMD_TRUE@' ] || return 0
+    echo ">>> Stopping unit files..." >&2
+    reverse=
+    for i in $unitfiles; do
+	case "$i" in
+	(*-shutdown.target)
+	    reverse="$i${reverse:+ }$reverse" ;;
+	(*.target)
+	    ;;
+	esac
+    done
+    if [ -r /proc/1/comm -o "`cat /proc/1/comm`" != systemd ]; then
+	systemctl --system daemon-reload
+	for i in $reverse; do
+	    if [ -r "@systemdsysdir@/$i" ]; then
+		[ -x "`which systemctl 2>/dev/null`" ] && { systemctl start $i 2>&1 && continue || true; }
+	    fi
+	done
+    fi
+}
 # _post_remove_kernel_initscripts() - When old modules for the running kernel
 #   have been removed, stop the init scripts.  Note that dpkg is smarter than
 #   rpm about the installation and removal order of packages and the init
 #   scripts should still be present.
 #
 _post_remove_kernel_initscripts() {
-    local reverse i
     [ -z '@WITH_KO_MODULES_FALSE@' ] || return 0
-    echo ">>> Stopping initscripts..." >&2
-    if [ "@kversion@" = "`uname -r`" ]; then
-        reverse=
-        for i in $initfiles; do
-            reverse="$i${reverse:+ }$reverse"
-        done
-        for i in $reverse; do
-            if [ -f @initrddir@/$i ] ; then
-                [ -x "`which service     2>/dev/null`" ] && { service     $i stop && continue || :; }
-                [ -x "`which invoke-rc.d 2>/dev/null`" ] && { invoke-rc.d $i stop && continue || :; }
-                [ -x "@initrddir@/$i"                  ] && { @initrddir@/$i stop && continue || :; }
-            fi
-        done
+    [ "@kversion@" = "`uname -r`" ] || return 0
+    if [ -r /proc/1/comm -a "`cat /proc/1/comm`" = 'systemd' ]; then
+	_post_remove_kernel_systemd
+    else
+	_post_remove_kernel_sysvinit
     fi
 }
 # ---------------------------------------------------------------------------
@@ -376,20 +443,18 @@ _post_remove_kernel_initscripts() {
 #   weak-updates script from the base package should already be installed.
 #
 _post_kernel_weakmods() {
-    local scripts v
+    local scripts units v
     [ -z '@WITH_KO_MODULES_TRUE@' ] || return 0
     echo ">>> Updating weak kernel modules..." >&2
     if [ -x @sbindir@/${name}-modules ]; then
-        scripts=`echo "$initfiles" | sed -e 's/ /,/g'`
-        v="`set -o | sed -n -e 's,xtrace[[:space:]]*on$,--verbose=2 --debug=2,p;s,xtrace[[:space:]]*off$,--verbose=1,p'`"
-        if [ -n "$scripts" ] ; then
-            V=1 @sbindir@/${name}-modules -- $v -e \
-                --initscripts="$scripts" \
-                --add-modules @kversion@ || :
-        else
-            V=1 @sbindir@/${name}-modules -- $v -e \
-                --add-modules @kversion@ || :
-        fi
+	v="`set -o | sed -n -e 's,xtrace[[:space:]]*on$,--verbose=2 --debug=2,p;s,xtrace[[:space:]]*off$,--quiet,p'`"
+	units=`echo "$unitfiles" | sed -e 's/ /,/g'`
+	inits=`echo "$initfiles" | sed -e 's/ /,/g'`
+	options="--add-modules @kversion@"
+	options="'--vmlinux=/usr/src/linux-\$KVERSION/vmlinux' $options"
+	[ -z "$inits" -o -n '@INSTALL_SYSVINIT_TRUE@' ] || options="--initscripts=\"$inits\" $options"
+	[ -z "$units" -o -n '@INSTALL_SYSTEMD_TRUE@'  ] || options="--unitfiles=\"$units\" $options"
+	V=1 @sbindir@/${name}-modules -- $v -e $options || :
     fi
 }
 _post_install_kernel_weakmods() {
@@ -412,18 +477,14 @@ _post_remove_kernel_weakmods() {
     [ -z '@WITH_KO_MODULES_TRUE@' ] || return 0
     echo ">>> Updating weak kernel modules..." >&2
     if [ -x @sbindir@/${name}-modules ]; then
-        scripts=`echo "$initfiles" | sed -e 's/ /,/g'`
-        v="`set -o | sed -n -e 's,xtrace[[:space:]]*on$,--verbose=2 --debug=2,p;s,xtrace[[:space:]]*off$,--verbose=1,p'`"
-        if [ -n "$scripts" ]; then
-            V=1 @sbindir@/${name}-modules -- $v -e \
-                --initscripts="$scripts" \
-                --delete-modules \
-                --remove-modules @kversion@ || :
-        else
-            V=1 @sbindir@/${name}-modules -- $v -e \
-                --delete-modules \
-                --remove-modules @kversion@ || :
-        fi
+	v="`set -o | sed -n -e 's,xtrace[[:space:]]*on$,--verbose=2 --debug=2,p;s,xtrace[[:space:]]*off$,--quiet,p'`"
+	units=`echo "$unitfiles" | sed -e 's/ /,/g'`
+	inits=`echo "$initfiles" | sed -e 's/ /,/g'`
+	options="--delete-modules --remove-modules @kversion@"
+	options="'--vmlinux=/usr/src/linux-\$KVERSION/vmlinux' $options"
+	[ -z "$inits" -o -n '@INSTALL_SYSVINIT_TRUE@' ] || options="--initscripts=\"$inits\" $options"
+	[ -z "$units" -o -n '@INSTALL_SYSTEMD_TRUE@'  ] || options="--unitfiles=\"$units\" $options"
+	V=1 @sbindir@/${name}-modules -- $v -e $options || :
     fi
 }
 # ---------------------------------------------------------------------------

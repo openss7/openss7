@@ -5,19 +5,11 @@
 
 PACKAGER="${PACKAGER:-Brian Bidulock <bidulock@openss7.org>}"
 
-case "@kversion@" in
-	(3.*-ARCH)	kpkg='linux'	    ;;
-	(3.*-lts)	kpkg='linux-lts'    ;;
-	(2.6.*-lts)	kpkg='kernel26-lts' ;;
-	(2.6.*)		kpkg='kernel26'	    ;;
-	(*) echo "*** Bad kernel version @kversion@" >&2
-			kpkg='linux'	    ;;
-esac
-
-_kvr="$(pacman -Qi ${kpkg:-linux}|grep -i '^version'|awk '{print$3}')"
+_kvr="$(pacman -Qi @kernel_image@|grep -i '^version'|awk '{print$3}')"
 _kv=$(echo "$_kvr" | sed -e 's,-.*$,,')
 _kr=$(echo "$_kvr" | sed -e 's,^.*-,,')
 
+if [ '@kversion@' = '@kseries@' ]; then
 pkgname=(
 	'@PACKAGE@'
 	'@PACKAGE@-devel'
@@ -26,6 +18,16 @@ pkgname=(
 	'@PACKAGE@-java'
 	'@PACKAGE@-repo'
 	)
+else
+pkgname=(
+	'@PACKAGE@'
+	'@PACKAGE@-devel'
+	'@PACKAGE@-@kernel_image@'
+	'@PACKAGE@-@kernel_image@-devel'
+	'@PACKAGE@-java'
+	'@PACKAGE@-repo'
+	)
+fi
 pkgver='@VERSION@'
 pkgrel='@PACKAGE_PACRELEASE@'
 epoch=0
@@ -36,8 +38,8 @@ license=('AGPL3' 'GPL3' 'BSD')
 groups=('openss7')
 depends=()
 makedepends=(
-	'linux-api-headers' "${kpkg:-linux}=$_kvr"
-	"${kpkg:-linux}-headers=$_kvr" 'bzip2' 'coreutils' 'gcc-gcj'
+	'linux-api-headers' "@kernel_image@=$_kvr"
+	"@kernel_headers@=$_kvr" 'bzip2' 'coreutils' 'gcc-gcj'
 	'ghostscript' 'glibc' 'gnupg' 'gnuplot' 'groff' 'gzip' 'imagemagick'
 	'kmod' 'latex2html' 'lsof' 'man-db' 'net-snmp' 'pacman' 'perl' 'tcl'
 	'texlive-bin' 'texlive-core' 'transfig' 'zip')
@@ -78,6 +80,7 @@ build() {
 		--cache-file=${cache_file} \
 		--libexecdir='${exec_prefix}/lib' \
 		--disable-maintainer-mode \
+		--disable-sysvinit \
 		--with-k-release=@kversion@ \
 		--with-k-subdir=@ksubdir@ \
 		--with-k-optimize=speed \
@@ -109,7 +112,7 @@ package() {
 	local b d cache_file csite_file mpost_file
 	[ -d $srcdir/_install ] && return 0
 	cd $srcdir/_build
-	make DESTDIR=$srcdir/_install install-strip
+	make V=1 DESTDIR=$srcdir/_install install-strip
 	d=$srcdir/_install/usr/share/doc/openss7
 	mkdir -p $d
 	_install_doc 'AUTHORS' 'ANNOUNCE' 'ABOUT-NLS' 'BUGS' 'COPYING' 'CHANGELOG' 'INSTALL' \
@@ -158,10 +161,8 @@ package_@PACKAGE@() {
 		'gtkdialog: for graphical utilities')
 	backup=('etc/conf.d/openss7' 'etc/conf.d/specfs' 'etc/conf.d/strace'
 		'etc/conf.d/streams' 'etc/conf.d/strerr' 'etc/nslconfig.d/openss7'
-		'etc/openss7.conf' 'etc/rc.d/openss7' 'etc/rc.d/specfs' 'etc/rc.d/strace'
-		'etc/rc.d/streams' 'etc/rc.d/strerr' 'etc/snmp/snmp.d/01openss7'
-		'etc/sock2path.d/openss7' 'etc/streams.conf' 'etc/strload.conf'
-		'etc/strsetup.conf')
+		'etc/snmp/snmp.d/01openss7'
+		'etc/sock2path.d/openss7')
 	install=@PACKAGE@.install
 	package
 	cd $srcdir/_install
@@ -253,7 +254,7 @@ EOF
 
 package_@PACKAGE@-@kversion@() {
 	local _kvr _kv _kr
-	_kvr="$(pacman -Qi ${kpkg:-linux}|grep -i '^version'|awk '{print$3}')"
+	_kvr="$(pacman -Qi @kernel_image@|grep -i '^version'|awk '{print$3}')"
 	_kv=$(echo "$_kvr" | sed -e 's,-.*$,,')
 	_kr=$(echo "$_kvr" | sed -e 's,^.*-,,')
 	epoch=0
@@ -264,7 +265,7 @@ package_@PACKAGE@-@kversion@() {
 	provides=('@PACKAGE@-kernel')
 	depends=(
 		'@PACKAGE@=@VERSION@-@PACKAGE_PACRELEASE@'
-		"${kpkg:-linux}=$_kvr")
+		"@kernel_image@=$_kvr")
 	install=@PACKAGE@-kernel.install
 	package
 	cd $srcdir/_install
@@ -280,7 +281,7 @@ package_@PACKAGE@-@kversion@() {
 
 package_@PACKAGE@-@kversion@-devel() {
 	local _kvr _kv _kr
-	_kvr="$(pacman -Qi ${kpkg:-linux}|grep -i '^version'|awk '{print$3}')"
+	_kvr="$(pacman -Qi @kernel_image@|grep -i '^version'|awk '{print$3}')"
 	_kv=$(echo "$_kvr" | sed -e 's,-.*$,,')
 	_kr=$(echo "$_kvr" | sed -e 's,^.*-,,')
 	epoch=0
@@ -292,7 +293,7 @@ package_@PACKAGE@-@kversion@-devel() {
 	conflicts=('@PACKAGE@-kernel-devel')
 	depends=(
 		'@PACKAGE@-devel=@VERSION@-@PACKAGE_PACRELEASE@'
-		"${kpkg:-linux}-headers=$_kvr")
+		"@kernel_headers@=$_kvr")
 	install=@PACKAGE@-kernel-devel.install
 	package
 	cd $srcdir/_install
@@ -342,6 +343,116 @@ EOF
 	cd $startdir
 	( cd $pkgdir; find . | sort ) >@PACKAGE@-@kversion@-devel.list
 	join -v 1 unused.list @PACKAGE@-@kversion@-devel.list >unused.tmp
+	mv -f -- unused.tmp unused.list
+}
+
+package_@PACKAGE@-@kernel_image@() {
+	local _kvr _kv _kr _kmin _kmax
+	_kvr="$(pacman -Qi @kernel_image@|grep -i '^version'|awk '{print$3}')"
+	_kv=$(echo "$_kvr" | sed -e 's,-.*$,,')
+	_kr=$(echo "$_kvr" | sed -e 's,^.*-,,')
+	if [ "@kmajor@" -eq 3 ]; then
+		_kmin="@kmajor@.@kminor@"
+		_kmax="@kmajor@.$((@kminor@+1))"
+	else
+		_kmin="@kmajor@.@kminor@.@kpatch@"
+		_kmax="@kmajor@.@kminor@.$((@kpatch@+1))"
+	fi
+	epoch=0
+	pkgver="@VERSION@.$_kv"
+	pkgrel="@PACKAGE_PACRELEASE@.$_kr"
+	pkgdesc='OpenSS7 Fast-STREAMS and Protocol Suites (Kernel Modules)'
+	groups=('@PACKAGE@')
+	provides=('@PACKAGE@-kernel')
+	depends=(
+		'@PACKAGE@=@VERSION@-@PACKAGE_PACRELEASE@'
+		"@kernel_image@>$_kmin"
+		"@kernel_image@<$_kmax")
+	install=@PACKAGE@-kernel.install
+	package
+	cd $srcdir/_install
+	mkdir -p $pkgdir
+	cp -av boot $pkgdir
+	mkdir -p $pkgdir/lib
+	cp -av lib/modules $pkgdir/lib
+	cd $startdir
+	( cd $pkgdir; find . | sort ) >@PACKAGE@-@kernel_image@.list
+	join -v 1 unused.list @PACKAGE@-@kernel_image@.list >unused.tmp
+	mv -f -- unused.tmp unused.list
+}
+
+package_@PACKAGE@-@kernel_image@-devel() {
+	local _kvr _kv _kr _kmin _kmax
+	_kvr="$(pacman -Qi @kernel_image@|grep -i '^version'|awk '{print$3}')"
+	_kv=$(echo "$_kvr" | sed -e 's,-.*$,,')
+	_kr=$(echo "$_kvr" | sed -e 's,^.*-,,')
+	if [ "@kmajor@" -eq 3 ]; then
+		_kmin="@kmajor@.@kminor@"
+		_kmax="@kmajor@.$((@kminor@+1))"
+	else
+		_kmin="@kmajor@.@kminor@.@kpatch@"
+		_kmax="@kmajor@.@kminor@.$((@kpatch@+1))"
+	fi
+	epoch=0
+	pkgver="@VERSION@.$_kv"
+	pkgrel="@PACKAGE_PACRELEASE@.$_kr"
+	pkgdesc='OpenSS7 Fast-STREAMS and Protocol Suites (Kernel Development)'
+	groups=('@PACKAGE@-devel')
+	provides=('@PACKAGE@-kernel-devel')
+	conflicts=('@PACKAGE@-kernel-devel')
+	depends=(
+		'@PACKAGE@-devel=@VERSION@-@PACKAGE_PACRELEASE@'
+		"@kernel_headers@>$_kmin"
+		"@kernel_headers@<$_kmax")
+	install=@PACKAGE@-kernel-devel.install
+	package
+	cd $srcdir/_install
+	mkdir -p $pkgdir/usr
+	cp -av usr/src $pkgdir/usr
+	(cd $pkgdir/usr/src; ln -s @PACKAGE@-@VERSION@-@PACKAGE_PACRELEASE@ @PACKAGE@)
+	mkdir -p $pkgdir/usr/share/man
+	cp -av usr/share/man/man9 $pkgdir/usr/share/man
+	( cat <<-EOF
+	usr/include/openss7/sys/cmn_err.h
+	usr/include/openss7/sys/ddi.h
+	usr/include/openss7/sys/debug.h
+	usr/include/openss7/sys/dki.h
+	usr/include/openss7/sys/kmem.h
+	usr/include/openss7/sys/strconf.h
+	usr/include/openss7/sys/strdebug.h
+	usr/include/openss7/sys/stream.h
+	usr/include/openss7/sys/strsubr.h
+	usr/include/openss7/sys/sunddi.h
+	usr/include/openss7/sys/openss7/cmn_err.h
+	usr/include/openss7/sys/openss7/config.h
+	usr/include/openss7/sys/openss7/ddi.h
+	usr/include/openss7/sys/openss7/debug.h
+	usr/include/openss7/sys/openss7/dki.h
+	usr/include/openss7/sys/openss7/kmem.h
+	usr/include/openss7/sys/openss7/strconf.h
+	usr/include/openss7/sys/openss7/strdebug.h
+	usr/include/openss7/sys/openss7/stream.h
+	usr/include/openss7/sys/openss7/strsubr.h
+EOF
+	) | while read f ; do
+		echo "install -D $f $pkgdir/$f"
+		install -D $f $pkgdir/$f
+	done
+	mkdir -p $pkgdir/usr/include/openss7/sys
+	cp -av usr/include/openss7/sys/aix  $pkgdir/usr/include/openss7/sys
+	cp -av usr/include/openss7/sys/hpux $pkgdir/usr/include/openss7/sys
+	cp -av usr/include/openss7/sys/irix $pkgdir/usr/include/openss7/sys
+	cp -av usr/include/openss7/sys/mac  $pkgdir/usr/include/openss7/sys
+	cp -av usr/include/openss7/sys/mps  $pkgdir/usr/include/openss7/sys
+	cp -av usr/include/openss7/sys/os7  $pkgdir/usr/include/openss7/sys
+	cp -av usr/include/openss7/sys/osf  $pkgdir/usr/include/openss7/sys
+	cp -av usr/include/openss7/sys/sun  $pkgdir/usr/include/openss7/sys
+	cp -av usr/include/openss7/sys/svr3 $pkgdir/usr/include/openss7/sys
+	cp -av usr/include/openss7/sys/svr4 $pkgdir/usr/include/openss7/sys
+	cp -av usr/include/openss7/sys/uw7  $pkgdir/usr/include/openss7/sys
+	cd $startdir
+	( cd $pkgdir; find . | sort ) >@PACKAGE@-@kernel_image@-devel.list
+	join -v 1 unused.list @PACKAGE@-@kernel_image@-devel.list >unused.tmp
 	mv -f -- unused.tmp unused.list
 }
 

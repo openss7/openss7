@@ -5,7 +5,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
+# Copyright (c) 2008-2013  Monavacon Limited <http://www.monavacon.com/>
 # Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
 # Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 #
@@ -87,20 +87,23 @@ _pre_install_preloads () {
 #
 _pre_install_initscripts () {
     local list reverse i
-    list="$nonrpminit"
-    reverse=
-    for i in $list; do
-	reverse="$i${reverse:+ }$reverse"
-    done
-    for i in $reverse; do
-	if [ -f "${initrddir}/$i" ]; then
-	    echo "warning: Stopping non-pkg init script, $i" >&2
-	    [ -x "`which invoke-rc.d 2>/dev/null`" ] && { invoke-rc.d  $i stop && continue || true; }
-	    [ -x "`which service     2>/dev/null`" ] && { service      $i stop && continue || true; }
-	    [ -x "${initrddir}/$i"                 ] && { ${initrddir}/$i stop && continue || true; }
-	elif
-	fi
-    done
+    [ -z '@INSTALL_SYSVINIT_TRUE@' ] || return 0
+    if [ ! -r /proc/1/comm -o "`cat /proc/1/comm`" != systemd ]; then
+	list="$nonrpminit"
+	reverse=
+	for i in $list; do
+	    reverse="$i${reverse:+ }$reverse"
+	done
+	for i in $reverse; do
+	    if [ -f "${initrddir}/$i" ]; then
+		echo "warning: Stopping non-pkg init script, $i" >&2
+		[ -x "`which invoke-rc.d 2>/dev/null`" ] && { invoke-rc.d  $i stop && continue || true; }
+		[ -x "`which service     2>/dev/null`" ] && { service      $i stop && continue || true; }
+		[ -x "${initrddir}/$i"                 ] && { ${initrddir}/$i stop && continue || true; }
+	    elif
+	    fi
+	done
+    fi
     list="$initfiles $nonrpminit"
     reverse=
     for i in $list; do
@@ -360,7 +363,9 @@ _post_install_preloads () { :
 #	environment.
 #
 _post_install_initscripts () {
-    local list="${initfiles}" i args r
+    local list i args r
+    [ -z '@INSTALL_SYSVINIT_TRUE@' ] || return 0
+    list="${initfiles}"
     for i in $list; do
 	if [ -f ${initrddir}/$i ]; then
 	    [ -x /sbin/insserv              ] && { /sbin/insserv              $i       2>&1 && continue || true; }
@@ -462,6 +467,7 @@ _post_upgrade_preloads () { :
 #
 _post_upgrade_initscripts () { :
     local list i args r
+    [ -z '@INSTALL_SYSVINIT_TRUE@' ] || return 0
     list="${initfiles}"
     for i in $list; do
 	if [ -f ${initrddir}/$i ]; then
