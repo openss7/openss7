@@ -622,6 +622,7 @@ scripts/install-sh
 scripts/ltmain.sh
 scripts/mdate-sh
 scripts/missing
+scripts/test-driver
 scripts/texinfo.tex
 scripts/ylwrap
 src/.hide/
