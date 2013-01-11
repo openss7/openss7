@@ -5,7 +5,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
+# Copyright (c) 2008-2013  Monavacon Limited <http://www.monavacon.com/>
 # Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
 # Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 #
@@ -639,20 +639,23 @@ _pre_upgrade_base_preloads() {
 _pre_install_base_initscripts() {
     local list reverse i
     return 0 # far too invasive for Archlinux
+    [ -z '@INSTALL_SYSVINIT_TRUE@' ] || return 0
     echo ">>> Updating initscripts..." >&2
     list="$nonrpminit"
     reverse=
     for i in $list; do
 	reverse="$i${reverse:+ }$reverse"
     done
-    for i in $reverse; do
-	if [ -f "@initrddir@/$i" ]; then
-	    echo ">>> warning: Stopping non-pkg init script, $i" >&2
-	    [ -x "`which invoke-rc.d 2>/dev/null`" ] && { invoke-rc.d $i stop && continue || true; }
-	    [ -x "`which service     2>/dev/null`" ] && { service     $i stop && continue || true; }
-	    [ -x "@initrddir@/$i"                  ] && { @initrddir@/$i stop && continue || true; }
-	fi
-    done
+    if [ ! -r /proc/1/comm -o "`cat /proc/1/comm`" != systemd ]; then
+	for i in $reverse; do
+	    if [ -f "@initrddir@/$i" ]; then
+		echo ">>> warning: Stopping non-pkg init script, $i" >&2
+		[ -x "`which invoke-rc.d 2>/dev/null`" ] && { invoke-rc.d $i stop && continue || true; }
+		[ -x "`which service     2>/dev/null`" ] && { service     $i stop && continue || true; }
+		[ -x "@initrddir@/$i"                  ] && { @initrddir@/$i stop && continue || true; }
+	    fi
+	done
+    fi
     list="$initfiles $nonrpminit"
     reverse=
     for i in $list; do
@@ -674,6 +677,7 @@ _pre_install_base_initscripts() {
 #
 _post_install_base_initscripts() {
     local list i args r
+    [ -z '@INSTALL_SYSVINIT_TRUE@' ] || return 0
     echo ">>> Updating initscripts..." >&2
     list="${initfiles}"
     for i in $list; do
@@ -685,6 +689,61 @@ _post_install_base_initscripts() {
 	    [ -x /usr/sbin/update-rc.d      ] && { /usr/sbin/update-rc.d      $i $args 2>&1 && continue || true; }
 	fi
     done
+}
+# _post_remove_base_sysvinit() - When purging the package, remove the init
+#   scripts.
+#
+_post_remove_base_sysvinit () {
+    local reverse list i
+    return 0 # far too invasive for Archlinux
+    echo ">>> Removing initscripts..." >&2
+    reverse=
+    list="${initfiles}"
+    for i in $list; do
+	reverse="$i${reverse:+ }$reverse"
+    done
+    if [ ! -r /proc/1/comm -o "`cat /proc/1/comm`" != systemd ]; then
+	for i in $reverse; do
+	    if [ -f @initrddir@/$i ]; then
+		[ -x "`which invoke-rc.d 2>/dev/null`" ] && { invoke-rc.d $i stop && continue || :; }
+		[ -x "`which service     2>/dev/null`" ] && { service     $i stop && continue || :; }
+		[ -x @initrddir@/$i                    ] && { @initrddir@/$i stop && continue || :; }
+	    fi
+	done
+    fi
+    for i in $reverse; do
+	if [ -f @initrddir@/$i ]; then
+	    [ -x /sbin/insserv             ] && { /sbin/insserv -r          $i        2>&1 && continue || :; }
+	    [ -x /sbin/chkconfig           ] && { /sbin/chkconfig --del     $i        2>&1 && continue || :; }
+	    [ -x /usr/lib/lsb/remove_initd ] && { /usr/lib/lsb/remove_initd $i        2>&1 && continue || :; }
+	    [ -x /usr/sbin/update-rc.d     ] && { /usr/sbin/update-rc.d     $i remove 2>&1 && continue || :; }
+	fi
+    done
+}
+# _post_remove_base_systemd() - When purging the package, disable the systemd
+#   unit files.
+#
+_post_remove_base_systemd () {
+    local reverse list i
+    echo ">>> Removing unit files..." >&2
+    reverse=
+    list="${unitfiles}"
+    for i in $list; do
+	case "$i" in
+	(*-shutdown.target)
+	    reverse="$i${reverse:+ }$reverse" ;;
+	(*.target)
+	    ;;
+	esac
+    done
+    if [ -r /proc/1/comm -o "`cat /proc/1/comm`" != systemd ]; then
+	systemctl --system daemon-reload
+	for i in $reverse; do
+	    if [ -f "@systemdsysdir@/$i" ]; then
+		[ -x "`which systemctl 2>/dev/null`" ] && { systemctl start $i 2>&1 && continue || true; }
+	    fi
+	done
+    fi
 }
 # _post_remove_base_initscripts() - When purging the package, remove the
 #   symbolic links associated with the init scripts before they are purged.
@@ -698,30 +757,9 @@ _post_install_base_initscripts() {
 #   have been removed from the DAEMONS line, otherwise warn the user.  We can
 #   stop the scripts on removal.
 #
-_post_remove_base_initscripts() {
-    local reverse list i
-    return 0 # far too invasive for Archlinux
-    echo ">>> Updating initscripts..." >&2
-    reverse=
-    list="${initfiles}"
-    for i in $list; do
-	reverse="$i${reverse:+ }$reverse"
-    done
-    for i in $reverse; do
-	if [ -f @initrddir@/$i ]; then
-	    [ -x "`which invoke-rc.d 2>/dev/null`" ] && { invoke-rc.d $i stop && continue || :; }
-	    [ -x "`which service     2>/dev/null`" ] && { service     $i stop && continue || :; }
-	    [ -x @initrddir@/$i                    ] && { @initrddir@/$i stop && continue || :; }
-	fi
-    done
-    for i in $reverse; do
-	if [ -f @initrddir@/$i ]; then
-	    [ -x /sbin/insserv             ] && { /sbin/insserv -r          $i        2>&1 && continue || :; }
-	    [ -x /sbin/chkconfig           ] && { /sbin/chkconfig --del     $i        2>&1 && continue || :; }
-	    [ -x /usr/lib/lsb/remove_initd ] && { /usr/lib/lsb/remove_initd $i        2>&1 && continue || :; }
-	    [ -x /usr/sbin/update-rc.d     ] && { /usr/sbin/update-rc.d     $i remove 2>&1 && continue || :; }
-	fi
-    done
+_post_remove_base_initscripts () {
+    [ -n '@INSTALL_SYSVINIT_TRUE@' ] || _post_remove_base_sysvinit
+    [ -n '@INSTALL_SYSTEMD_TRUE@'  ] || _post_remove_base_systemd
 }
 # ---------------------------------------------------------------------------
 
