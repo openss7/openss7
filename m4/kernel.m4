@@ -7,7 +7,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
+# Copyright (c) 2008-2013  Monavacon Limited <http://www.monavacon.com/>
 # Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
 # Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 #
@@ -414,18 +414,23 @@ dnl pull out versions from release number
     AC_SUBST([knumber])dnl
     AC_SUBST([kextra])dnl
     AC_SUBST([kflavor])dnl
+    kseries="${kmajor}.${kminor}.${kpatch}${kflavor:+-$kflavor}"
     if test "$linux_cv_k_major" -eq 2 -a "$linux_cv_k_minor" -eq 4
     then
 	AC_DEFINE_UNQUOTED([LINUX_2_4], [1], [Define for the linux 2.4 kernel series.])
+	kseries="${kmajor}.${kminor}.${kpatch}${kflavor:+-$kflavor}"
     fi
     if test "$linux_cv_k_major" -eq 2 -a "$linux_cv_k_minor" -eq 6
     then
 	AC_DEFINE_UNQUOTED([LINUX_2_6], [1], [Define for the linux 2.6 kernel series.])
+	kseries="${kmajor}.${kminor}.${kpatch}${kflavor:+-$kflavor}"
     fi
     if test "$linux_cv_k_major" -eq 3
     then
 	AC_DEFINE_UNQUOTED([LINUX_3_X], [1], [Define for the linux 3.x kernel series.])
+	kseries="${kmajor}.${kminor}${kflavor:+-$kflavor}"
     fi
+    AC_SUBST([kseries])
     if test "$linux_cv_k_major" -eq 3 -o \( "$linux_cv_k_major" -eq 2 -a \( "$linux_cv_k_minor" -gt 5 -o "$linux_cv_k_patch" -ge 48 \) \)
     then
 	AC_DEFINE_UNQUOTED([WITH_KO_MODULES], [1], [Define for linux 2.5.48+ .ko kernel modules.])
@@ -929,12 +934,12 @@ dnl directory, we need to go searching for them.
 dnl 
     _BLD_FIND_DIR([for kernel header directory], [linux_cv_k_hdrdir], [
 	    ${kbuildir}/include/asm-generic
-	    ${rootdir}/lib/modules/${kversion}/source/include/asm-generic
-	    ${rootdir}/usr/src/linux-headers-${kversion}/include/asm-generic
-	    ${rootdir}/usr/src/linux-headers-${knumber}/include/asm-generic
-	    ${rootdir}/usr/src/linux-headers-${knumber}-${kextra}/include/asm-generic
-	    ${rootdir}/usr/src/linux-headers-${knumber}-${kextra}-common/include/asm-generic
-	    ${rootdir}/usr/src/linux-headers-${knumber}-${kextra}-common-${kflavor}/include/asm-generic],
+	    ${rootdir}/lib/modules/${kversion}/source
+	    ${rootdir}/usr/src/linux-headers-${kversion}
+	    ${rootdir}/usr/src/linux-headers-${knumber}
+	    ${rootdir}/usr/src/linux-headers-${knumber}-${kextra}
+	    ${rootdir}/usr/src/linux-headers-${knumber}-${kextra}-common
+	    ${rootdir}/usr/src/linux-headers-${knumber}-${kextra}-common-${kflavor}],
 	    [], [$kbuilddir], [], [], [with_k_hdrdir], [-a -d "$bld_dir/include/asm-generic"])
     _khdrdir="$linux_cv_k_hdrdir_eval"
     khdrdir="$linux_cv_k_hdrdir"
@@ -2132,9 +2137,29 @@ AC_DEFUN([_LINUX_CHECK_KERNEL_FILES], [dnl
 	    kernel_headers="linux-headers-${kmajor}.${kminor}"
 	    ;;
 	(slackware-3.?|salix-3.?)
-	    kernel_image="kernel-gneric-${kversion}"
+	    kernel_image="kernel-generic-${kversion}"
 	    kernel_source="kernel-source-${kversion}"
 	    kernel_headers="kernel-headers-${kversion}"
+	    ;;
+	(arch-2.6)
+	    if test "$kflavor" != "ARCH"; then
+		kernel_image="kernel26${kflavor:+-$kflavor}"
+		kernel_headers="kernel26${kflavor:+-$kflavor}-headers"
+	    else
+		kernel_image="kernel26"
+		kernel_headers="kernel26-headers"
+	    fi
+	    kernel_source=
+	    ;;
+	(arch-3.?)
+	    if test "$kflavor" != "ARCH"; then
+		kernel_image="linux${kflavor:+-$kflavor}"
+		kernel_headers="linux${kflavor:+-$kflavor}-headers"
+	    else
+		kernel_image="linux"
+		kernel_headers="linux-headers"
+	    fi
+	    kernel_source=
 	    ;;
 	(*)
 	    kernel_image='kernel'
