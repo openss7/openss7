@@ -83,13 +83,15 @@ static char const ident[] = "$RCSfile: aixcompat.c,v $ $Name:  $($Revision: 1.1.
 
 #include "sys/os7/compat.h"
 
-#define AIXCOMP_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
+#define AIXCOMP_DESCRIP		"AIX 5L Version 5.1 Compatibility for Linx Fast-STREAMS"
+#define AIXCOMP_EXTRA		"Part of hUNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define AIXCOMP_COPYRIGHT	"Copyright (c) 2008-2011  Monavacon Limited.  All Rights Reserved."
 #define AIXCOMP_REVISION	"LfS $RCSfile: aixcompat.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-09-02 08:46:50 $"
 #define AIXCOMP_DEVICE		"AIX 5L Version 5.1 Compatibility"
 #define AIXCOMP_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define AIXCOMP_LICENSE		"GPL"
 #define AIXCOMP_BANNER		AIXCOMP_DESCRIP		"\n" \
+				AIXCOMP_EXTRA		"\n" \
 				AIXCOMP_COPYRIGHT	"\n" \
 				AIXCOMP_REVISION	"\n" \
 				AIXCOMP_DEVICE		"\n" \

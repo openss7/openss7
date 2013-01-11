@@ -95,13 +95,15 @@ static char const ident[] = "$RCSfile: mpscompat.c,v $ $Name:  $($Revision: 1.1.
 #include <linux/ctype.h>	/* for isdigit */
 #include <asm/div64.h>		/* for do_div */
 
-#define MPSCOMP_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
+#define MPSCOMP_DESCRIP		"Mentat Portable STREAMS Compatibility for Linux Fast-STREAMS"
+#define MPSCOMP_EXTRA		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define MPSCOMP_COPYRIGHT	"Copyright (c) 2008-2011  Monavacon Limited.  All Rights Reserved."
 #define MPSCOMP_REVISION	"LfS $RCSfile: mpscompat.c,v $ $Name:  $($Revision: 1.1.2.6 $) $Date: 2011-09-20 09:51:39 $"
 #define MPSCOMP_DEVICE		"Mentat Portable STREAMS Compatibility"
 #define MPSCOMP_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define MPSCOMP_LICENSE		"GPL"
 #define MPSCOMP_BANNER		MPSCOMP_DESCRIP		"\n" \
+				MPSCOMP_EXTRA		"\n" \
 				MPSCOMP_COPYRIGHT	"\n" \
 				MPSCOMP_REVISION	"\n" \
 				MPSCOMP_DEVICE		"\n" \

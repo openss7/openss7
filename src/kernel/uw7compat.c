@@ -86,13 +86,15 @@ static char const ident[] = "$RCSfile: uw7compat.c,v $ $Name:  $($Revision: 1.1.
 
 #include "sys/os7/compat.h"
 
-#define UW7COMP_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
+#define UW7COMP_DESCRIP		"UnixWare(R) 7.1.3 Compatibility for Linux Fast-STREAMS"
+#define UW7COMP_EXTRA		"Part of UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define UW7COMP_COPYRIGHT	"Copyright (c) 2008-2011  Monavacon Limited.  All Rights Reserved."
 #define UW7COMP_REVISION	"LfS $RCSfile: uw7compat.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2011-09-02 08:46:51 $"
 #define UW7COMP_DEVICE		"UnixWare(R) 7.1.3 Compatibility"
 #define UW7COMP_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define UW7COMP_LICENSE		"GPL"
 #define UW7COMP_BANNER		UW7COMP_DESCRIP		"\n" \
+				UW7COMP_EXTRA		"\n" \
 				UW7COMP_COPYRIGHT	"\n" \
 				UW7COMP_REVISION	"\n" \
 				UW7COMP_DEVICE		"\n" \

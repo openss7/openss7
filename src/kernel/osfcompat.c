@@ -89,13 +89,15 @@ static char const ident[] = "$RCSfile: osfcompat.c,v $ $Name:  $($Revision: 1.1.
 
 #include "sys/os7/compat.h"
 
-#define OSFCOMP_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
+#define OSFCOMP_DESCRIP		"OSF/1.2 Compatibility module for Linux Fast-STREAMS"
+#define OSFCOMP_EXTRA		"Part of UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define OSFCOMP_COPYRIGHT	"Copyright (c) 2008-2011  Monavacon Limited.  All Rights Reserved."
 #define OSFCOMP_REVISION	"LfS $RCSfile: osfcompat.c,v $ $Name:  $($Revision: 1.1.2.5 $) $Date: 2011-09-20 09:51:39 $"
 #define OSFCOMP_DEVICE		"OSF/1.2 Compatibility"
 #define OSFCOMP_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define OSFCOMP_LICENSE		"GPL"
 #define OSFCOMP_BANNER		OSFCOMP_DESCRIP		"\n" \
+				OSFCOMP_EXTRA		"\n" \
 				OSFCOMP_COPYRIGHT	"\n" \
 				OSFCOMP_REVISION	"\n" \
 				OSFCOMP_DEVICE		"\n" \

@@ -83,13 +83,15 @@ static char const ident[] = "$RCSfile: os7compat.c,v $ $Name:  $($Revision: 1.1.
 
 #include "sys/os7/compat.h"
 
-#define OS7COMP_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
+#define OS7COMP_DESCRIP		"OpenSS7 STREAMS Compatibility module for Linux Fast-STREAMS"
+#define OS7COMP_EXTRA		"Part of UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define OS7COMP_COPYRIGHT	"Copyright (c) 2008-2011  Monavacon Limited.  All Rights Reserved."
 #define OS7COMP_REVISION	"LfS $RCSfile: os7compat.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-09-02 08:46:51 $"
 #define OS7COMP_DEVICE		"OpenSS7 Compatibility"
 #define OS7COMP_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define OS7COMP_LICENSE		"GPL"
 #define OS7COMP_BANNER		OS7COMP_DESCRIP		"\n" \
+				OS7COMP_EXTRA		"\n" \
 				OS7COMP_COPYRIGHT	"\n" \
 				OS7COMP_REVISION	"\n" \
 				OS7COMP_DEVICE		"\n" \
