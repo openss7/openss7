@@ -1,7 +1,7 @@
 #!/bin/bash
 #
 # @(#) $RCSfile: openss7,v $ $Name:  $($Revision: 1.1.2.10 $) $Date: 2011-09-20 09:51:42 $
-# Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
+# Copyright (c) 2008-2013  Monavacon Limited <http://www.monavacon.com/>
 # Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
 # Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 # All Rights Reserved.
@@ -46,7 +46,8 @@ PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
 
 # Source init script functions library.
 init_mode="standalone"
-  if [ -r /etc/init.d/functions   ] ; then . /etc/init.d/functions   ; init_mode="chkconfig" ;
+  if [ -r /proc/1/comm -a "`cat /proc/1/comm`" = systemd ] ; then      init_mode="systemd"   ;
+elif [ -r /etc/init.d/functions   ] ; then . /etc/init.d/functions   ; init_mode="chkconfig" ;
 elif [ -r /etc/rc.status          ] ; then . /etc/rc.status          ; init_mode="insserv"   ;
 elif [ -r /lib/lsb/init-functions ] ; then . /lib/lsb/init-functions ; init_mode="lsb"       ;
 elif [ -r /sbin/start-stop-daemon ] ; then                             init_mode="debian"    ;
@@ -92,7 +93,7 @@ case "$init_mode" in
 	    status "$@"
 	}
 	;;
-    (standalone|*)
+    (standalone|systemd|*)
 	action () {
 	    echo -en "$1"
 	    shift 1
@@ -123,8 +124,8 @@ if [ ! -e /proc/filesystems ] ; then if [ "$1" = 'stop' ] ; then exit 0 ; else e
 [ -n "$OPENSS7_BOOTLOAD"      ] || OPENSS7_BOOTLOAD='no'
 [ -n "$OPENSS7_BOOTMOUNT"     ] || OPENSS7_BOOTMOUNT='no'
 
-[ -n "$OPENSS7_MOUNTSPECFS"   ] || OPENSS7_MOUNTSPECFS='yes'
-[ -n "$OPENSS7_UMOUNTSPECFS"  ] || OPENSS7_UMOUNTSPECFS='yes'
+[ -n "$OPENSS7_MOUNTSPECFS"   ] || OPENSS7_MOUNTSPECFS='no'
+[ -n "$OPENSS7_UMOUNTSPECFS"  ] || OPENSS7_UMOUNTSPECFS='no'
 [ -n "$OPENSS7_MOUNTPOINT"    ] || OPENSS7_MOUNTPOINT='/dev/streams'
 [ -n "$OPENSS7_UID"           ] || OPENSS7_UID='0'
 [ -n "$OPENSS7_GID"           ] || OPENSS7_GID='0'
@@ -134,8 +135,8 @@ if [ ! -e /proc/filesystems ] ; then if [ "$1" = 'stop' ] ; then exit 0 ; else e
 [ -n "$OPENSS7_PRELOAD"       ] || OPENSS7_PRELOAD=
 [ -n "$OPENSS7_DRIVERS"       ] || OPENSS7_DRIVERS='streams-ip_to_dlpi streams-ldl streams-np_ip streams-np_udp streams-x25-lapb streams-x25-llc2 streams-x25-plp streams-inet streams-rawip streams-udp streams-tcp streams-sctp streams-clns streams-tp streams-socksys streams-ua_as streams-m2ua_as streams-m3ua_as streams-sua_as streams-tua_as streams-isua_as streams-atm streams-tstdrv streams-sl-x400p streams-x100p-ss7 streams-x400p-ss7 streams-sl_x100p streams-sl_x400p streams-sdlm streams-sl_min streams-sl_mux streams-mtp streams-mtp_min streams-sccp streams-tcap streams-isup'
 [ -n "$OPENSS7_MODULES"       ] || OPENSS7_MODULES='streams-ip_strm_mod streams-timod streams-tirdwr streams-tpiperf streams-mstr streams-cmot streams-isot streams-itot streams-lpp streams-tcpns streams-xot streams-sockmod streams-m2pa_sl streams-sdl_sctp streams-sdt_sctp streams-sdt_tpi streams-sl_tpi streams-sl_sctp streams-m2tp streams-phys streams-aal1 streams-aal2 streams-aal5 streams-sscop streams-sscopmce streams-mtp3b streams-tstmod streasm-cdpmod streams-ch_pmod streams-mx_pmod streams-sccp_mod streams-npi_sccp streams-tpi_sccp streams-spm streams-sdl_pmod streams-sdt_pmod streams-slpmod streams-sm_mod streams-tc_mod streams-tr_mod streams-sdl_ch streams-mtp_npi streams-mtp_tpi streams-sdl streams-sdt streams-sl streams-dlaix streams-tpi_conv streams-npi_conv streams-dlpi_conv streams-cdi_conv'
-[ -n "$OPENSS7_MAKEDEVICES"   ] || OPENSS7_MAKEDEVICES='yes'
-[ -n "$OPENSS7_REMOVEDEVICES" ] || OPENSS7_REMOVEDEVICES='yes'
+[ -n "$OPENSS7_MAKEDEVICES"   ] || OPENSS7_MAKEDEVICES='no'
+[ -n "$OPENSS7_REMOVEDEVICES" ] || OPENSS7_REMOVEDEVICES='no'
 [ -n "$OPENSS7_FORCEREMOVE"   ] || OPENSS7_FORCEREMOVE='no'
 
 # Source redhat and/or debian config file
@@ -293,8 +294,9 @@ start_update () {
     [ :${previous+set} = :set ] || previous=${PREVLEVEL:-N}
     RETVAL=0
     if [ ":$previous" = ':N' -a ":$runlevel" != ':' ] ; then
-	marker="/var/lib/openss7/.openss7_update-`uname -r`"
-	if [ ":$OPENSS7_KUPDATE" = ':yes' -a -e $marker ] ; then
+	marker="/.openss7_update-`uname -r`"
+	haveit="/.openss7_haveit-`uname -r`"
+	if [ ":$OPENSS7_KUPDATE" = ':yes' -a \( -e $marker -o ! -e $haveit \) ] ; then
 	    for command in /sbin/openss7-modules /usr/sbin/openss7-modules ; do
 		if [ -x $command ] ; then
 		    action "Updating kernel modules" \
@@ -302,6 +304,7 @@ start_update () {
 		    RETVAL=$?
 		    if [ $RETVAL -eq 0 ] ; then
 			rm -f -- $marker || :
+			touch -- $haveit || :
 		    fi
 		    break
 		fi
@@ -329,8 +332,9 @@ stop_update () {
     [ :${runlevel+set} = :set ] || runlevel=$RUNLEVEL
     [ :${previous+set} = :set ] || previous=${PREVLEVEL:-N}
     if [ ":$previous" != ':N' -a \( ":$runlevel" = ':0' -o ":$runlevel" = ':6' \) ]; then
-	marker="/var/lib/openss7/.openss7_update-`uname -r`"
-	if [ ":$OPENSS7_KUPDATE" = ':yes' -a -e $marker ]; then
+	marker="/.openss7_update-`uname -r`"
+	haveit="/.openss7_haveit-`uname -r`"
+	if [ ":$OPENSS7_KUPDATE" = ':yes' -a \( -e $marker -o ! -e $haveit \) ]; then
 	    for command in /sbin/openss7-modules /usr/sbin/openss7-modules
 	    do
 		[ -x $command ] || continue
@@ -339,6 +343,7 @@ stop_update () {
 		RETVAL=$?
 		if [ $RETVAL -eq 0 ]; then
 		    rm -f -- $marker || :
+		    touch -- $haveit || :
 		fi
 		break
 	    done
@@ -990,7 +995,7 @@ esac
 #
 # -----------------------------------------------------------------------------
 #
-# Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
+# Copyright (c) 2008-2013  Monavacon Limited <http://www.monavacon.com/>
 # Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
 # Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 #

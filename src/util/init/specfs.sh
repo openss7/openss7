@@ -1,7 +1,7 @@
 #!/bin/sh
 #
 # @(#) $RCSfile: specfs.sh,v $ $Name:  $($Revision: 1.1.2.8 $) $Date: 2011-09-20 09:51:42 $
-# Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
+# Copyright (c) 2008-2013  Monavacon Limited <http://www.monavacon.com/>
 # Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
 # Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 # All Rights Reserved.
@@ -286,7 +286,8 @@ start_update () {
     RETVAL=0
     if [ ":$previous" = 'N' -a ":$runlevel" != ':' ] ; then
 	marker="/.openss7_update-`uname -r`"
-	if [ ":$SPECFS_KUPDATE" = ':yes' -a -e $marker ] ; then
+	haveit="/.openss7_haveit-`uname -r`"
+	if [ ":$SPECFS_KUPDATE" = ':yes' -a \( -e $marker -o ! -e $haveit \) ] ; then
 	    for command in /sbin/openss7-modules /usr/sbin/openss7-modules ; do
 		if [ -x $command ] ; then
 		    action "Updating kernel modules" \
@@ -294,6 +295,7 @@ start_update () {
 		    RETVAL=$?
 		    if [ $RETVAL -eq 0 ] ; then
 			rm -f -- $marker || :
+			touch -- $haveit || :
 		    fi
 		    break
 		fi
@@ -319,7 +321,8 @@ stop_update () {
     RETVAL=0
     if [ ":$previous" != 'N' -a \( ":$runlevel" = ':0' -o ":$runlevel" = ':6' \) ]; then
 	marker="/.openss7_update-`uname -r`"
-	if [ ":$SPECFS_KUPDATE" = ':yes' -a -e $marker ]; then
+	haveit="/.openss7_haveit-`uname -r`"
+	if [ ":$SPECFS_KUPDATE" = ':yes' -a \( -e $marker -o ! -e $haveit \) ]; then
 		for command in /sbin/openss7-modules /usr/sbin/openss7-modules
 		do
 		    [ -x $command ] || continue
@@ -327,7 +330,8 @@ stop_update () {
 			$command -- -q --boot-kernel
 		    RETVAL=$?
 		    if [ $RETVAL -eq 0 ]; then
-		    rm -f -- $marker || :
+			rm -f -- $marker || :
+			touch -- $haveit || :
 		    fi
 		    break
 		done
@@ -980,7 +984,7 @@ esac
 #
 # -----------------------------------------------------------------------------
 #
-# Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
+# Copyright (c) 2008-2013  Monavacon Limited <http://www.monavacon.com/>
 # Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
 # Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 #
