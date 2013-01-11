@@ -3411,8 +3411,8 @@ CLEAN_LOCAL += clean-org_openss7_javax_csapi_cc_jcc
 
 OBJCOPY = objcopy
 objectlink_objects =
-AM_V_FIX = $(am__v_FIX_$(v))
-am__v_FIX_ = $(am__v_FIX_$(AM_DEFAULT_VERBOSITY))
+AM_V_FIX = $(am__v_FIX_@AM_V@)
+am__v_FIX_ = $(am__v_FIX_@AM_DEFAULT_V@)
 am__v_FIX_0 = echo "  FIX   " `basename $$o`;
 am__v_FIX_1 = echo "$(OBJCOPY) -L '_ZGr8_\$$_dummy' $$o";
 CLEANFILES += objectlink_fix.stamp
