@@ -35,7 +35,7 @@ pkgdesc='OpenSS7 Fast-STREAMS and Protocol Suites'
 arch=('i686' 'x86_64')
 url='http://www.openss7.org/'
 license=('AGPL3' 'GPL3' 'BSD')
-groups=('openss7')
+groups=('@PACKAGE@')
 depends=()
 makedepends=(
 	'linux-api-headers' "@kernel_image@=$_kvr"
@@ -145,15 +145,27 @@ package() {
 
 package_@PACKAGE@-repo() {
 	pkgdesc='OpenSS7 Fast-STREAMS and Protocol Suites (Repository)'
-	groups=('@PACKAGE@')
+	groups=('@PACKAGE@-repo')
 	backup=('etc/pacman.conf')
 	install=@PACKAGE@-repo.install
 	package
+	keydir=$pkgdir/usr/share/pacman/keyrings
+	mkdir -p $keydir
+	gpg --export --armor --output $keydir/openss7.gpg openss7@openss7.org
+	gpg --fingerprint openss7@openss7.org|sed -n 's,Key fingerprint =,,p'|sed 's,  *,,g;s,$,:4:' >$keydir/openss7-trusted
+	touch $keydir/openss7-revoked
+	repodir=$pkgdir/etc/pacman.d
+	mkdir -p $repodir
+	touch $repodir/openss7list
+	cd $startdir
+	( cd $pkgdir; find . | sort ) >@PACKAGE@-repo.list
+	join -v 1 unused.list @PACKAGE@-repo.list >unused.tmp
+	mv -f -- unused.tmp unused.list
 }
 
 package_@PACKAGE@() {
 	pkgdesc='OpenSS7 Fast-STREAMS and Protocol Suites'
-	groups=('@PACKAGE@')
+	groups=('@PACKAGE@-run')
 	depends=('@PACKAGE@-repo=@VERSION@-@PACKAGE_PACRELEASE@')
 	optdepends=(
 		'net-snmp: for SNMP agent support'
@@ -187,7 +199,7 @@ package_@PACKAGE@() {
 
 package_@PACKAGE@-devel() {
 	pkgdesc='OpenSS7 Fast-STREAMS and Protocol Suites (Development)'
-	groups=('@PACKAGE@-devel')
+	groups=('@PACKAGE@-sdk')
 	depends=(
 		'linux-api-headers')
 	install=@PACKAGE@-devel.install
@@ -261,7 +273,7 @@ package_@PACKAGE@-@kversion@() {
 	pkgver="@VERSION@.$_kv"
 	pkgrel="@PACKAGE_PACRELEASE@.$_kr"
 	pkgdesc='OpenSS7 Fast-STREAMS and Protocol Suites (Kernel Modules)'
-	groups=('@PACKAGE@')
+	groups=('@PACKAGE@-run')
 	provides=('@PACKAGE@-kernel')
 	depends=(
 		'@PACKAGE@=@VERSION@-@PACKAGE_PACRELEASE@'
@@ -288,7 +300,7 @@ package_@PACKAGE@-@kversion@-devel() {
 	pkgver="@VERSION@.$_kv"
 	pkgrel="@PACKAGE_PACRELEASE@.$_kr"
 	pkgdesc='OpenSS7 Fast-STREAMS and Protocol Suites (Kernel Development)'
-	groups=('@PACKAGE@-devel')
+	groups=('@PACKAGE@-sdk')
 	provides=('@PACKAGE@-kernel-devel')
 	conflicts=('@PACKAGE@-kernel-devel')
 	depends=(
@@ -362,7 +374,7 @@ package_@PACKAGE@-@kernel_image@() {
 	pkgver="@VERSION@.$_kv"
 	pkgrel="@PACKAGE_PACRELEASE@.$_kr"
 	pkgdesc='OpenSS7 Fast-STREAMS and Protocol Suites (Kernel Modules)'
-	groups=('@PACKAGE@')
+	groups=('@PACKAGE@-run')
 	provides=('@PACKAGE@-kernel')
 	depends=(
 		'@PACKAGE@=@VERSION@-@PACKAGE_PACRELEASE@'
@@ -397,7 +409,7 @@ package_@PACKAGE@-@kernel_image@-devel() {
 	pkgver="@VERSION@.$_kv"
 	pkgrel="@PACKAGE_PACRELEASE@.$_kr"
 	pkgdesc='OpenSS7 Fast-STREAMS and Protocol Suites (Kernel Development)'
-	groups=('@PACKAGE@-devel')
+	groups=('@PACKAGE@-sdk')
 	provides=('@PACKAGE@-kernel-devel')
 	conflicts=('@PACKAGE@-kernel-devel')
 	depends=(
@@ -458,7 +470,7 @@ EOF
 
 package_@PACKAGE@-java() {
 	pkgdesc='OpenSS7 Fast-STREAMS and Protocol Suites (Java)'
-	groups=('@PACKAGE@')
+	groups=('@PACKAGE@-java')
 	depends=('@PACKAGE@=@VERSION@-@PACKAGE_PACRELEASE@')
 	install=@PACKAGE@-libs.install
 	package
