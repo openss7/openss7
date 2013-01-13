@@ -109,6 +109,7 @@ AC_DEFUN([AC_OPENSS7], [dnl
     _DRAFTS
     _OS7_OPTIONS
     _INIT_SCRIPTS
+    _SSL
     AC_CONFIG_FILES([src/util/modutils/openss7
 		     src/include/sys/openss7/version.h
 		     Module.mkvars])

@@ -3185,6 +3185,12 @@ endif
 ## INSTALL_INITSCRIPTS
 endif
 
+if WITH_UPDATE_CA_CERTS
+dist_lcacert_DATA		= scripts/OPENSS7-CA-CERT
+else
+dist_sslcert_DATA		= scripts/OPENSS7-CA-CERT
+endif
+
 dist_snmpmib_DATA		= 
 
 if WITH_SNMP
@@ -3306,6 +3312,11 @@ endif
 ## Rules for init scripts
 ##
 include am/init.am
+
+##
+## Rules for CA certs
+##
+include am/ssl.am
 
 ##
 ## Rules for net config files
