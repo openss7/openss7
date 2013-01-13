@@ -635,7 +635,7 @@ dnl srpms and rpms, they would not be useful.  Usually rpm tools
 dnl are just there for examining rpm packages.
 dnl
     AC_REQUIRE([_OPENSS7_MISSING3])dnl
-    tmp_path="${PATH:+$PATH:}/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/X11R6/bin";
+    tmp_PATH="${PATH:+$PATH:}/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/X11R6/bin";
     AC_ARG_ENABLE([rpms],
 	[AS_HELP_STRING([--disable-rpms],
 	    [build rpms @<:@default=auto@:>@])],
@@ -656,7 +656,7 @@ dnl
 	esac])
     AC_ARG_VAR([RPM],
 	       [Rpm command. @<:@default=rpm@:>@])
-    _BLD_PATH_PROG([RPM], [rpm], [${am_missing3_run}rpm], [$tmp_path], [dnl
+    _BLD_PATH_PROG([RPM], [rpm], [${am_missing3_run}rpm], [$tmp_PATH], [dnl
 	if test ":$enable_rpms" = :yes; then
 	    case "$target_vendor" in
 		(oracle|puias|centos|lineox|whitebox|scientific|mandrake|mandriva|mageia|redhat|suse)
@@ -666,7 +666,7 @@ dnl
 	fi])
     AC_ARG_VAR([RPMBUILD],
 	       [Rpm build command. @<:@default=rpmbuild@:>@])
-    _BLD_PATH_PROG([RPMBUILD], [rpmbuild], [${am_missing3_run}rpmbuild], [$tmp_path], [dnl
+    _BLD_PATH_PROG([RPMBUILD], [rpmbuild], [${am_missing3_run}rpmbuild], [$tmp_PATH], [dnl
 	if test ":$enable_rpms" = :yes; then
 	    RPMBUILD="$RPM"
 	else
@@ -707,14 +707,14 @@ AC_DEFUN([_RPM_REPO_SETUP], [dnl
 # -----------------------------------------------------------------------------
 AC_DEFUN([_RPM_REPO_SETUP_YUM], [dnl
     AC_REQUIRE([_OPENSS7_MISSING3])dnl
-    tmp_path="${PATH:+$PATH:}/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/X11R6/bin";
+    tmp_PATH="${PATH:+$PATH:}/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/X11R6/bin";
     AC_ARG_ENABLE([repo-yum],
 	[AS_HELP_STRING([--disable-repo-yum],
 	    [yum repo construction @<:@default=auto@:>@])],
 	[], [enable_repo_yum=yes])
     AC_ARG_VAR([CREATEREPO],
 	       [Create repomd repository command. @<:@default=createrepo@:>@])
-    _BLD_PATH_PROG([CREATEREPO], [createrepo], [${am_missing3_run}createrepo], [$tmp_path], [dnl
+    _BLD_PATH_PROG([CREATEREPO], [createrepo], [${am_missing3_run}createrepo], [$tmp_PATH], [dnl
 	if test ":$rpm_cv_rpms" = :yes -a ${USE_MAINTAINER_MODE:-no} = yes ; then
 	    case "${target_vendor:-none}" in
 		(redhat|whitebox|lineox|oracle|puias|centos|scientific|suse)
@@ -740,7 +740,7 @@ AC_DEFUN([_RPM_REPO_SETUP_YUM], [dnl
 	enable_repo_yum=no])
     AC_ARG_VAR([MODIFYREPO],
 	       [Modify repomd repository command. @<:@default=modifyrepo@:>@])
-    _BLD_PATH_PROG([MODIFYREPO], [modifyrepo], [${am_missing3_run}modifyrepo], [$tmp_path], [dnl
+    _BLD_PATH_PROG([MODIFYREPO], [modifyrepo], [${am_missing3_run}modifyrepo], [$tmp_PATH], [dnl
 	if test ":$rpm_cv_rpms" = :yes -a ${USE_MAINTAINER_MODE:-no} = yes ; then
 	    case "${target_vendor:-none}" in
 		(redhat|whitebox|lineox|oracle|puias|centos|scientific|suse)
@@ -788,14 +788,14 @@ AC_DEFUN([_RPM_REPO_SETUP_YUM], [dnl
 # -----------------------------------------------------------------------------
 AC_DEFUN([_RPM_REPO_SETUP_YAST], [dnl
     AC_REQUIRE([_OPENSS7_MISSING3])dnl
-    tmp_path="${PATH:+$PATH:}/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/X11R6/bin";
+    tmp_PATH="${PATH:+$PATH:}/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/X11R6/bin";
     AC_ARG_ENABLE([repo-yast],
 	[AS_HELP_STRING([--disable-repo-yast],
 	    [yast repo construction @<:@default=auto@:>@])],
 	[], [enable_repo_yast=yes])
     AC_ARG_VAR([CREATE_PACKAGE_DESCR],
 	       [Create YaST package descriptions command.  @<:@default=create_package_descr@:>@])
-    _BLD_PATH_PROG([CREATE_PACKAGE_DESCR], [create_package_descr], [${am_missing3_run}create_package_descr], [$tmp_path], [dnl
+    _BLD_PATH_PROG([CREATE_PACKAGE_DESCR], [create_package_descr], [${am_missing3_run}create_package_descr], [$tmp_PATH], [dnl
 	if test ":$rpm_cv_rpms" = :yes -a ${USE_MAINTAINER_MODE:-no} = yes ; then
 	    case "${target_vendor:-none}" in
 		(suse)
@@ -836,20 +836,20 @@ AC_DEFUN([_RPM_REPO_SETUP_YAST], [dnl
 # -----------------------------------------------------------------------------
 AC_DEFUN([_RPM_REPO_SETUP_URPMI], [dnl
     AC_REQUIRE([_OPENSS7_MISSING3])
-    tmp_path="${PATH:+$PATH:}/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/X11R6/bin";
+    tmp_PATH="${PATH:+$PATH:}/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/X11R6/bin";
     AC_ARG_ENABLE([repo-urpmi],
 	[AS_HELP_STRING([--disable-repo-urpmi],
 	    [urpmi repo construction @<:@default=auto@:>@])],
 	[], [enable_repo_urpmi=yes])
     AC_ARG_VAR([GENDISTRIB],
 	       [Generate urpmi distribution command. @<:@default=gendistrib@:>@])
-    _BLD_PATH_PROG([GENDISTRIB], [gendistrib], [${am_missing3_run}gendistrib], [$tmp_path], [dnl
+    _BLD_PATH_PROG([GENDISTRIB], [gendistrib], [${am_missing3_run}gendistrib], [$tmp_PATH], [dnl
 	if test ":$rpm_cv_rpms" = :yes -a ${USE_MAINTAINER_MODE:-no} = yes ; then
 	    AC_MSG_WARN([Cannot find 'gendistrib' program in PATH.])
 	fi])
     AC_ARG_VAR([GENHDLIST],
 	       [Generate urpmi repository command. @<:@default=genhdlist@:>@])
-    _BLD_PATH_PROGS([GENHDLIST], [genhdlist2 genhdlist], [${am_missing3_run}genhdlist2], [$tmp_path], [dnl
+    _BLD_PATH_PROGS([GENHDLIST], [genhdlist2 genhdlist], [${am_missing3_run}genhdlist2], [$tmp_PATH], [dnl
 	if test ":$rpm_cv_rpms" = :yes -a ${USE_MAINTAINER_MODE:-no} = yes ; then
 	    case "${target_vendor:-none}" in
 		(mandrake|mandriva|mageia)
@@ -896,7 +896,7 @@ AC_DEFUN([_RPM_REPO_SETUP_URPMI], [dnl
 # -----------------------------------------------------------------------------
 AC_DEFUN([_RPM_REPO_SETUP_APT], [dnl
     AC_REQUIRE([_OPENSS7_MISSING3])
-    tmp_path="${PATH:+$PATH:}/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/X11R6/bin";
+    tmp_PATH="${PATH:+$PATH:}/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/X11R6/bin";
     AC_ARG_ENABLE([repo-apt-rpm],
 	[AS_HELP_STRING([--disable-repo-apt-rpm],
 	    [apt-rpm repo construction @<:@defulat=auto@:>@])],
@@ -907,13 +907,13 @@ dnl themselves.
 dnl
     AC_ARG_VAR([GENBASEDIR],
 	       [Generate apt-rpm repository command. @<:@default=genbasedir@:>@])
-    _BLD_PATH_PROGS([GENBASEDIR], [genbasedir], [${am_missing3_run}genbasedir], [$tmp_path], [dnl
+    _BLD_PATH_PROGS([GENBASEDIR], [genbasedir], [${am_missing3_run}genbasedir], [$tmp_PATH], [dnl
 	if test ":$rpm_cv_rpms" = :yes -a ${USE_MAINTAINER_MODE:-no} = yes ; then
 	    AC_MSG_WARN([Cannot find 'genbasedir' program in PATH.])
 	fi])
     AC_ARG_VAR([GENSRCLIST],
 	       [Generate apt-rpm repository sources command. @<:@default=gensrclist@:>@])
-    _BLD_PATH_PROGS([GENSRCLIST], [gensrclist], [${am_missing3_run}gensrclist], [$tmp_path], [dnl
+    _BLD_PATH_PROGS([GENSRCLIST], [gensrclist], [${am_missing3_run}gensrclist], [$tmp_PATH], [dnl
 	if test ":$rpm_cv_rpms" = :yes -a ${USE_MAINTAINER_MODE:-no} = yes ; then
 	    case "${target_vendor:-none}" in
 		(mandrake|mandriva|mageia)
@@ -938,7 +938,7 @@ dnl
 	enable_repo_apt_rpm=no])
     AC_ARG_VAR([GENPKGLIST],
 	       [Generate apt-rpm repository packages command.  @<:@default=genpkglist@:>@])
-    _BLD_PATH_PROGS([GENPKGLIST], [genpkglist], [${am_missing3_run}genpkglist], [$tmp_path], [dnl
+    _BLD_PATH_PROGS([GENPKGLIST], [genpkglist], [${am_missing3_run}genpkglist], [$tmp_PATH], [dnl
 	if test ":$rpm_cv_rpms" = :yes -a ${USE_MAINTAINER_MODE:-no} = yes ; then
 	    case "${target_vendor:-none}" in
 		(mandrake|mandriva|mageia)
@@ -967,7 +967,7 @@ dnl grep and wc.
 dnl
     AC_ARG_VAR([COUNTPKGLIST],
 	       [Count packages in apt-rpm package lists command. @<:@default=countpkglist@:>@])
-    _BLD_PATH_PROGS([COUNTPKGLIST], [countpkglist], [${am_missing3_run}countpkglist], [$tmp_path], [dnl
+    _BLD_PATH_PROGS([COUNTPKGLIST], [countpkglist], [${am_missing3_run}countpkglist], [$tmp_PATH], [dnl
 	if test ":$rpm_cv_rpms" = :yes -a ${USE_MAINTAINER_MODE:-no} = yes ; then
 	    AC_MSG_WARN([Cannot find 'countpkglist' program in PATH.])
 	fi])

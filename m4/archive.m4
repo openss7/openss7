@@ -106,11 +106,11 @@ AC_DEFUN([_ARCHIVE_ARGS], [dnl
 # -----------------------------------------------------------------------------
 AC_DEFUN([_ARCHIVE_SETUP], [dnl
     AC_REQUIRE([_OPENSS7_MISSING3])
-    tmp_path="${PATH:+$PATH:}/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/X11R6/bin:$am_aux_dir"
+    tmp_PATH="${PATH:+$PATH:}/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/X11R6/bin:$am_aux_dir"
     test -n "$GZIP" || GZIP='-f9'
     AC_ARG_VAR([GZIP],      [Gzip default compression options @<:@default=-f9@:>@])
-    AC_ARG_VAR([GZIP_CMD],  [Gzip compression command @<:@default=gzip@:>@])
-    _BLD_PATH_PROG([GZIP_CMD], [gzip], [], [$tmp_path], [dnl
+    _BLD_VAR_PATH_PROG([GZIP_CMD], [gzip], [$tmp_PATH],
+	[Gzip compression command @<:@default=gzip@:>@], [dnl
 	_BLD_INSTALL_ERROR([GZIP_CMD], [
 ***
 *** Configure cannot find a suitable 'gzip' program.  Creating gzip
@@ -128,8 +128,8 @@ AC_DEFUN([_ARCHIVE_SETUP], [dnl
 *** ])])
     test -n "$BZIP2" || BZIP2='-f9'
     AC_ARG_VAR([BZIP2],     [Bzip2 default compression options @<:@default=-f9@:>@])
-    AC_ARG_VAR([BZIP2_CMD], [Bzip2 compression command @<:@default=bzip2@:>@])
-    _BLD_PATH_PROG([BZIP2_CMD], [bzip2], [], [$tmp_path], [dnl
+    _BLD_VAR_PATH_PROG([BZIP2_CMD], [bzip2], [$tmp_PATH],
+	[Bzip2 compression command @<:@default=bzip2@:>@], [dnl
 	_BLD_INSTALL_ERROR([BZIP2_CMD], [
 ***
 *** Configure cannot find a suitable 'bzip2' program.  Creating bzip2
@@ -147,8 +147,8 @@ AC_DEFUN([_ARCHIVE_SETUP], [dnl
 *** ])])
     test -n "$LZMA" || LZMA='-f9'
     AC_ARG_VAR([LZMA],      [Lzma default compression options @<:@default=-f9@:>@])
-    AC_ARG_VAR([LZMA_CMD],  [Lzma compression command @<:@default=lzma@:>@])
-    _BLD_PATH_PROG([LZMA_CMD], [lzma], [], [$tmp_path], [dnl
+    _BLD_VAR_PATH_PROG([LZMA_CMD], [lzma], [$tmp_PATH],
+	[Lzma compression command @<:@default=lzma@:>@], [dnl
 	if test :"${disable_bestzip:-yes}" != :yes -a :"$enable_bestzip" = :lzma
 	then
 	    _BLD_INSTALL_WARN([LZMA_CMD], [
@@ -174,8 +174,8 @@ AC_DEFUN([_ARCHIVE_SETUP], [dnl
 	fi])
     test -n "$XZ" || XZ='-f9'
     AC_ARG_VAR([XZ],        [Xz default compression options @<:@default=-f9@:>@])
-    AC_ARG_VAR([XZ_CMD],    [Xz compression command @<:@default=xz@:>@])
-    _BLD_PATH_PROG([XZ_CMD], [xz], [], [$tmp_path], [dnl
+    _BLD_VAR_PATH_PROG([XZ_CMD], [xz], [$tmp_PATH],
+	[Xz compression command @<:@default=xz@:>@], [dnl
 	if test :"${disable_bestzip:-yes}" != :yes -a :"$enable_bestzip" = :xz
 	then
 	    _BLD_INSTALL_WARN([XZ_CMD], [
@@ -208,7 +208,7 @@ AC_DEFUN([_ARCHIVE_SETUP], [dnl
     disable_repo_tar=
     AC_ARG_VAR([MD5SUM],    [MD5 sum command @<:@default=md5sum@:>@])
     _BLD_PATH_PROG([MD5SUM], [md5sum], [${am_missing3_run}md5sum],
-		   [$tmp_path], [dnl
+		   [$tmp_PATH], [dnl
 	if test :$enable_repo_tar = :yes ; then
 	    disable_repo_tar=yes
 	    _BLD_INSTALL_ERROR([MD5SUM], [
@@ -241,7 +241,7 @@ AC_DEFUN([_ARCHIVE_SETUP], [dnl
 	fi])
     AC_ARG_VAR([SHA1SUM],   [SHA1 sum command @<:@default=sha1sum@:>@])
     _BLD_PATH_PROG([SHA1SUM], [sha1sum], [${am_missing3_run}sha1sum],
-		   [$tmp_path], [dnl
+		   [$tmp_PATH], [dnl
 	if test :$enable_repo_tar = :yes ; then
 	    disable_repo_tar=yes
 	    _BLD_INSTALL_WARN([SHA1SUM], [
@@ -274,7 +274,7 @@ AC_DEFUN([_ARCHIVE_SETUP], [dnl
 	fi])
     AC_ARG_VAR([SHA256SUM], [SHA256 sum command @<:@default=sha256sum@:>@])
     _BLD_PATH_PROG([SHA256SUM], [sha256sum], [${am_missing3_run}sha256sum],
-		   [$tmp_path], [dnl
+		   [$tmp_PATH], [dnl
 	if test :$enable_repo_tar = :yes ; then
 	    disable_repo_tar=yes
 	    _BLD_INSTALL_WARN([SHA256SUM], [

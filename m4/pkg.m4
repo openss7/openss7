@@ -170,12 +170,12 @@ AC_DEFUN([_PAC_ARCH_SETUP_TOPDIR], [dnl
     AC_REQUIRE([_OPENSS7_OPTIONS_PKG_DISTDIR])
     AC_ARG_WITH([pac-distdir],
 	[AS_HELP_STRING([--with-pac-distdir=DIR],
-	    [pacman dist directory @<:@default=PKG-DISTDIR/arch/PKG-SUBDIR@:>@])],
-	[], [with_pac_distdir='${DISTDIR}/arch/${reposubdir}'])
+	    [pacman dist directory @<:@default=PKG-DISTDIR/pkgs/PKG-SUBDIR@:>@])],
+	[], [with_pac_distdir='${DISTDIR}/pkgs/${reposubdir}'])
     AC_MSG_CHECKING([for pacman distribution directory])
     if test ":${pacdistdir+set}" != :set ; then
 	case ":${with_pac_distdir:-no}" in
-	    (:no|:yes)	pacdistdir='${DISTDIR}/arch/${reposubdir}' ;;
+	    (:no|:yes)	pacdistdir='${DISTDIR}/pkgs/${reposubdir}' ;;
 	    (*)		pacdistdir="$with_pac_distdir" ;;
 	esac
     fi
@@ -289,7 +289,7 @@ AC_DEFUN([_PAC_ARCH_SETUP_OPTIONS], [dnl
 # -----------------------------------------------------------------------------
 AC_DEFUN([_PAC_ARCH_SETUP_BUILD], [dnl
   AC_REQUIRE([_OPENSS7_MISSING3])dnl
-    tmp_path="${PATH:+$PATH:}/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/X11R6/bin";
+    tmp_PATH="${PATH:+$PATH:}/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/X11R6/bin";
     AC_ARG_ENABLE([pkgs],
 	[AS_HELP_STRING([--disable-pkgs],
 	    [build pacman pkgs @<:@default=auto@:>@])],
@@ -308,7 +308,7 @@ AC_DEFUN([_PAC_ARCH_SETUP_BUILD], [dnl
 	esac])
     AC_ARG_VAR([PACMAN],
 	       [pacman command. @<:@default=pacman@:>@])
-    _BLD_PATH_PROG([PACMAN], [pacman], [${am_missing3_run}pacman], [$tmp_path], [dnl
+    _BLD_PATH_PROG([PACMAN], [pacman], [${am_missing3_run}pacman], [$tmp_PATH], [dnl
 	case "$target_vendor" in
 	    (arch)
 		AC_MSG_WARN([Cannot find pacman program in PATH.]) ;;
@@ -316,7 +316,7 @@ AC_DEFUN([_PAC_ARCH_SETUP_BUILD], [dnl
 	esac])
     AC_ARG_VAR([MAKEPKG],
 	       [makepkg command. @<:@default=makepkg@:>@])
-    _BLD_PATH_PROG([MAKEPKG], [makepkg], [${am_missing3_run}makepkg], [$tmp_path], [dnl
+    _BLD_PATH_PROG([MAKEPKG], [makepkg], [${am_missing3_run}makepkg], [$tmp_PATH], [dnl
 	case "$target_vendor" in
 	    (arch)
 		AC_MSG_WARN([Cannot find makepkg program in PATH.]) ;;
@@ -344,14 +344,14 @@ AC_DEFUN([_PAC_REPO_SETUP], [dnl
 # -----------------------------------------------------------------------------
 AC_DEFUN([_PAC_REPO_SETUP_PACMAN], [dnl
     AC_REQUIRE([_OPENSS7_MISSING3])dnl
-    tmp_path="${PATH:+$PATH:}/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/X11R6/bin";
+    tmp_PATH="${PATH:+$PATH:}/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/X11R6/bin";
     AC_ARG_ENABLE([repo-pacman],
 	[AS_HELP_STRING([--disable-repo-pacman],
 	    [arch repo construction @<:@default=auto@:>@])],
 	[], [enable_repo_pacman=yes])
     AC_ARG_VAR([REPO_ADD],
 	       [repo-add command. @<:@default=repo-add@:>@])
-    _BLD_PATH_PROG([REPO_ADD], [repo-add], [${am_missing3_run}repo-add], [$tmp_path], [dnl
+    _BLD_PATH_PROG([REPO_ADD], [repo-add], [${am_missing3_run}repo-add], [$tmp_PATH], [dnl
 	if test ":$pac_cv_pkgs" = :yes -a ${USE_MAINTAINER_MODE:-no} = yes ; then
 	    case "${target_vendor:-none}" in
 		(arch)
@@ -375,7 +375,7 @@ AC_DEFUN([_PAC_REPO_SETUP_PACMAN], [dnl
 	else enable_repo_pacman=no; fi])
     AC_ARG_VAR([REPO_REMOVE],
 	       [repo-remove command. @<:@default=repo-remove@:>@])
-    _BLD_PATH_PROG([REPO_REMOVE], [repo-remove], [${am_missing3_run}repo-remove], [$tmp_path], [dnl
+    _BLD_PATH_PROG([REPO_REMOVE], [repo-remove], [${am_missing3_run}repo-remove], [$tmp_PATH], [dnl
 	if test ":$pac_cv_pkgs" = :yes -a ${USE_MAINTAINER_MODE:-no} = yes; then
 	    case "${target_vendor:-none}" in
 		(arch)

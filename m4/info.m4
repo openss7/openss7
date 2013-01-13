@@ -132,7 +132,7 @@ dnl AC_ARG_VAR([NROFF],    [Roff text formatting command @<:@default=nroff@:>@])
 # -----------------------------------------------------------------------------
 AC_DEFUN([_INFO_SETUP], [dnl
     AC_REQUIRE([_OPENSS7_MISSING2])dnl
-    tmp_path="${PATH:+$PATH:}/usr/local/bin:/usr/bin:/bin:/usr/X11R6/bin:$am_aux_dir";
+    tmp_PATH="${PATH:+$PATH:}/usr/local/bin:/usr/bin:/bin:/usr/X11R6/bin:$am_aux_dir";
     if test :$enable_texinfo = :no ; then
 	enable_texinfo_html=no
 	enable_texinfo_print=no
@@ -140,7 +140,7 @@ AC_DEFUN([_INFO_SETUP], [dnl
     disable_texinfo=
     disable_texinfo_html=
     disable_texinfo_print=
-    _BLD_PATH_PROGS([TEX], [etex tex], [${am_missing2_run}tex], [$tmp_path], [dnl
+    _BLD_PATH_PROGS([TEX], [etex tex], [${am_missing2_run}tex], [$tmp_PATH], [dnl
 	if test :$enable_texinfo_print != :no ; then
 	    disable_texinfo_print=yes
 	    _BLD_INSTALL_WARN([TEX], [
@@ -168,7 +168,7 @@ AC_DEFUN([_INFO_SETUP], [dnl
 *** 'configure'.
 *** ])
 	fi])
-    _BLD_PATH_PROGS([PDFTEX], [pdfetex pdftex], [${am_missing2_run}pdftex], [$tmp_path], [dnl
+    _BLD_PATH_PROGS([PDFTEX], [pdfetex pdftex], [${am_missing2_run}pdftex], [$tmp_PATH], [dnl
 	if test :$enable_texinfo_print != :no ; then
 	    disable_texinfo_print=yes
 	    _BLD_INSTALL_WARN([PDFTEX], [
@@ -196,7 +196,7 @@ AC_DEFUN([_INFO_SETUP], [dnl
 *** 'configure'.
 *** ])
 	fi])
-    _BLD_PATH_PROGS([TBL], [gtbl tbl], [/bin/cat], [$tmp_path], [dnl
+    _BLD_PATH_PROGS([TBL], [gtbl tbl], [/bin/cat], [$tmp_PATH], [dnl
 	if test :$enable_texinfo != :no ; then
 	    disable_texinfo=yes
 	    _BLD_INSTALL_WARN([TBL], [
@@ -220,11 +220,11 @@ AC_DEFUN([_INFO_SETUP], [dnl
 *** 'configure', or specify the --disable-texinfo option to 'configure'.
 *** ])
 	fi])
-dnl    _BLD_PATH_PROG([NROFF], [nroff], [${am_missing4_run}nroff], [$tmp_path], [dnl
+dnl    _BLD_PATH_PROG([NROFF], [nroff], [${am_missing4_run}nroff], [$tmp_PATH], [dnl
 dnl	if test :$enable_texinfo != :no ; then
 dnl	    : # will attempt to emulate with groff
 dnl	fi])
-    _BLD_PATH_PROG([GROFF], [groff], [${am_missing4_run}groff], [$tmp_path], [dnl
+    _BLD_PATH_PROG([GROFF], [groff], [${am_missing4_run}groff], [$tmp_PATH], [dnl
 	if test :$enable_texinfo != :no ; then
 	    disable_texinfo=yes
 	    _BLD_INSTALL_WARN([GROFF], [
@@ -248,7 +248,7 @@ dnl	fi])
 *** 'configure', or specify the --disable-texinfo option to 'configure'.
 *** ])
 	fi])
-    _BLD_PATH_PROG([FIG2DEV], [fig2dev], [${am_missing2_run}fig2dev], [$tmp_path], [dnl
+    _BLD_PATH_PROG([FIG2DEV], [fig2dev], [${am_missing2_run}fig2dev], [$tmp_PATH], [dnl
 	if test :$enable_texinfo_html != :no -o :$enable_texinfo_print != :no ; then
 	    if test :$enable_texinfo_html != :no ; then
 		disable_texinfo_html=yes
@@ -282,7 +282,7 @@ dnl	fi])
 *** --disable-texinfo-print options to 'configure'.
 *** ])
 	fi])
-    _BLD_PATH_PROG([CONVERT], [convert], [${am_missing2_run}convert], [$tmp_path], [dnl
+    _BLD_PATH_PROG([CONVERT], [convert], [${am_missing2_run}convert], [$tmp_PATH], [dnl
 	if test :$enable_texinfo_html != :no -o :$enable_texinfo_print != :no ; then
 	    if test :$enable_texinfo_html != :no ; then
 		disable_texinfo_html=yes
@@ -316,12 +316,12 @@ dnl	fi])
 *** --disable-texinfo-print options to 'configure'.
 *** ])
 	fi])
-    _BLD_PATH_PROG([PS2EPSI], [ps2epsi], [${am_missing2_run}ps2epsi], [$tmp_path], [dnl
+    _BLD_PATH_PROG([PS2EPSI], [ps2epsi], [${am_missing2_run}ps2epsi], [$tmp_PATH], [dnl
 	if test :$enable_texinfo_print != :no ; then
 	    # disable_texinfo_print=yes
 	    : # ok for now as we fall back to convert
 	fi])
-    _BLD_PATH_PROG([EPSTOPDF], [epstopdf], [${am_missing2_run}epstopdf], [$tmp_path], [dnl
+    _BLD_PATH_PROG([EPSTOPDF], [epstopdf], [${am_missing2_run}epstopdf], [$tmp_PATH], [dnl
 	if test :$enable_texinfo_print != :no ; then
 	    # disable_texinfo_print=yes
 	    : # ok for now as we fall back to convert
@@ -330,7 +330,7 @@ dnl
 dnl We use DVI2PS instead of DVIPS here because automake already defines the
 dnl DVIPS make variable and complains if we try to redefine it.
 dnl
-    _BLD_PATH_PROG([DVI2PS], [dvips], [${am_missing2_run}dvips], [$tmp_path], [dnl
+    _BLD_PATH_PROG([DVI2PS], [dvips], [${am_missing2_run}dvips], [$tmp_PATH], [dnl
 	if test :$enable_texinfo_print != :no ; then
 	    disable_texinfo_print=yes
 	    _BLD_INSTALL_WARN([DVI2PS], [

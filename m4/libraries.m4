@@ -78,11 +78,19 @@ AC_DEFUN([_LDCONFIG_SPEC_OPTIONS], [dnl
 # _LDCONFIG_SPEC_SETUP
 # -------------------------------------------------------------------------
 AC_DEFUN([_LDCONFIG_SPEC_SETUP], [dnl
-    tmp_path="${PATH:+$PATH:}/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin";
-    AC_ARG_VAR([LDCONFIG],
-	       [Configure loader command. @<:@default=ldconfig@:>@])
-    _BLD_PATH_PROG([LDCONFIG], [ldconfig], [/sbin/ldconfig], [$tmp_path], [dnl
-	AC_MSG_WARN([Cannot find ldconfig program in PATH.])])
+    tmp_PATH="${PATH:+$PATH:}/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin";
+    _BLD_VAR_PATH_PROG([LDCONFIG], [ldconfig], [$tmp_PATH],
+	[Configure loader command. @<:@default=ldconfig@:>@], [dnl
+	_BLD_INSTALL_ERROR([LDCONFIG], [
+***
+*** Configure cannot find a suitable 'ldconfig' program.  Installing
+*** shared libraries requires the 'ldconfig' program.  It is strange
+*** that it is not installed on the system.  Try:
+*** ], [], [
+***
+*** To get rid of this error, load the 'ldconfig' package, or specify the
+*** location with the LDCONFIG environment variable to 'configure'.
+*** ])])
 ])# _LDCONFIG_SPEC_SETUP
 # =========================================================================
 

@@ -455,7 +455,7 @@ AC_DEFUN([_GCJ_CONFIG], [dnl
 # -----------------------------------------------------------------------------
 AC_DEFUN([_GCJ_TOOLS], [dnl
     AC_REQUIRE([_OPENSS7_MISSING4])dnl
-    tmp_path="${PATH:+$PATH:}/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/X11R6/bin";
+    tmp_PATH="${PATH:+$PATH:}/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/X11R6/bin";
 dnl
 dnl We need a javac compiler or we cannot compile any classes.
 dnl
@@ -464,7 +464,7 @@ dnl
 	[Java class compiler. @<:@default=[$]GCJ@:>@])
     AC_ARG_VAR([JAVACFLAGS],
 	[Java class compiler flags. @<:@default=auto@:>@])
-    _BLD_PATH_PROGS([JAVAC], [$GCJ javac], [], [$tmp_path], [dnl
+    _BLD_PATH_PROGS([JAVAC], [$GCJ javac], [], [$tmp_PATH], [dnl
 	_BLD_INSTALL_ERROR([JAVAC], [
 ***
 *** Configure could not find the Java class compiler program 'javac'
@@ -496,7 +496,7 @@ dnl classmap databases.
 dnl
     AC_ARG_VAR([GCJDBTOOL],
 	[GCJ database tool. @<:@default=gcj-dbtool@:>@])
-    _BLD_PATH_PROGS([GCJDBTOOL], [gcj-dbtool], [${am_missing4_run}gcj-dbtool], [$tmp_path], [dnl
+    _BLD_PATH_PROGS([GCJDBTOOL], [gcj-dbtool], [${am_missing4_run}gcj-dbtool], [$tmp_PATH], [dnl
 	if test :"${USE_MAINTAINER_MODE:-no}" != :no ; then
 	    _BLD_INSTALL_WARN([GCJDBTOOL], [
 ***
@@ -534,7 +534,7 @@ dnl
 	[Java CNI header command. @<:@default=gcjh@:>@])
     AC_ARG_VAR([GCJHFLAGS],
 	[Java CNI header command flags. @<:@default=auto@:>@])
-    _BLD_PATH_PROGS([GCJH], [$GCJH gcjh3 gcjh], [${am_missing4_run}gcjh], [$tmp_path], [dnl
+    _BLD_PATH_PROGS([GCJH], [$GCJH gcjh3 gcjh], [${am_missing4_run}gcjh], [$tmp_PATH], [dnl
 	if test :"${USE_MAINTAINER_MODE:-no}" != :no ; then
 	    _BLD_INSTALL_WARN([GCJH], [
 ***
@@ -570,7 +570,7 @@ dnl
 	[Java JNI header command. @<:@default=gcjh@:>@])
     AC_ARG_VAR([JAVAHFLAGS],
 	[Java JNI header command flags. @<:@default=auto@:>@])
-    _BLD_PATH_PROGS([JAVAH], [$GCJH gcjh3 gcjh gcjnih gjavah javah], [${am_missing4_run}gcjh], [$tmp_path], [dnl
+    _BLD_PATH_PROGS([JAVAH], [$GCJH gcjh3 gcjh gcjnih gjavah javah], [${am_missing4_run}gcjh], [$tmp_PATH], [dnl
 	if test :"${USE_MAINTAINER_MODE:-no}" != :no ; then
 	    _BLD_INSTALL_WARN([JAVAH], [
 ***
@@ -606,7 +606,7 @@ dnl
 	[Java documentation doclet. @<:@default=gjdoc@:>@])
     AC_ARG_VAR([JAVADOCFLAGS],
 	[Java documentation flags. @<:@default=auto@:>@])
-    _BLD_PATH_PROGS([JAVADOC], [javadoc gjdoc], [${am_missing4_run}gjdoc], [$tmp_path], [dnl
+    _BLD_PATH_PROGS([JAVADOC], [javadoc gjdoc], [${am_missing4_run}gjdoc], [$tmp_PATH], [dnl
 	if test :"${USE_MAINTAINER_MODE:-no}" != :no ; then
 	    _BLD_INSTALL_WARN([JAVADOC], [
 ***

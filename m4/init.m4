@@ -7,7 +7,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
+# Copyright (c) 2008-2013  Monavacon Limited <http://www.monavacon.com/>
 # Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
 # Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 #
@@ -143,15 +143,11 @@ dnl I suppose we really don't care about these.  It is funny, though, that SuSE
 dnl used to use insserv (SuSE wrote it!), but now, SuSE uses service.  Debian
 dnl used to use update-rc.d, but now uses insserv!
 dnl
-    tmp_path="${PATH:+$PATH:}/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin";
-    AC_ARG_VAR([CHKCONFIG],
-	       [Chkconfig command. @<:@default=chkconfig@:>@])
-    _BLD_PATH_PROG([CHKCONFIG], [chkconfig], [], [$tmp_path], [dnl
-	AC_MSG_WARN([Cannot find chkconfig program in PATH.])])
-    AC_ARG_VAR([INSSERV],
-	       [Insserv command. @<:@default=inserv@:>@])
-    _BLD_PATH_PROG([INSSERV], [insserv], [], [$tmp_path], [dnl
-	AC_MSG_WARN([Cannot find insserv program in PATH.])])
+    tmp_PATH="${PATH:+$PATH:}/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin";
+    _BLD_VAR_PATH_PROG([CHKCONFIG], [chkconfig], [$tmp_PATH],
+	    [Chkconfig command. @<:@default=chkconfig@:>@])
+    _BLD_VAR_PATH_PROG([INSSERV], [insserv], [$tmp_PATH],
+	    [Insserv command. @<:@default=inserv@:>@])
 dnl
 dnl initrddir is where we are going to put init scripts
 dnl
@@ -196,12 +192,10 @@ dnl
 	    ${syslibdir}/systemd
 	    ${sysconfdir}/sysctl.d], [], [no], [dnl
 	    disable_systemd=yes])
-    tmp_path="${PATH:+$PATH:}/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin";
-    AC_ARG_VAR([SYSTEMCTL],
-	       [Systemctl command. @<:@default=systemctl@:>@])
-    _BLD_PATH_PROG([SYSTEMCTL], [systemctl], [], [$tmp_path], [dnl
-	AC_MSG_WARN([Cannot find systemctl program in PATH.], [dnl
-	disable_systemd=yes])])
+    tmp_PATH="${PATH:+$PATH:}/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin";
+    _BLD_VAR_PATH_PROG([SYSTEMCTL], [systemctl], [$tmp_PATH],
+	    [Systemctl command. @<:@default=systemctl@:>@],
+	    [disable_systemd=yes])
 ])# _INIT_SCRIPTS_SYSTEMD_SETUP
 # =============================================================================
 
@@ -384,7 +378,7 @@ AC_DEFUN([_INIT_], [dnl
 #
 # =============================================================================
 # 
-# Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
+# Copyright (c) 2008-2013  Monavacon Limited <http://www.monavacon.com/>
 # Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
 # Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 # 
