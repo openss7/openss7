@@ -137,6 +137,7 @@ AC_DEFUN([_BLD_PROG_CHECK],
 	[AS_FUNCTION_DESCRIBE([bld_prog_check],
 	    [COMMAND],
 	    [COMMAND - Variable containing the command to check.])], [dnl
+    local _bld_tmp_cn _bld_tmp_result _bld_tmp_cmd _bld_tmp_cmd2
     _bld_tmp_cn="[$]1"
     eval "_bld_tmp_result=\"\${$_bld_tmp_cn}\""
     case "$_bld_tmp_result" in
@@ -278,6 +279,7 @@ AC_DEFUN([_BLD_PATH_CHECK],
 	    [VARIABLE, [[PATH]]],
 [VARIABLE - Variable name containing the directory portion of the path.
 PATH - Optional subdirectory and filename within directory])], [dnl
+    local _bld_tmp_path _bld_tmp_pn _bld_tmp_result
     if test -n "[$]2" ; then
 	eval "_bld_tmp_path=\"\${[$]1}/[$]2\""
 	eval "_bld_tmp_pn=\"[$]2\""
@@ -377,13 +379,13 @@ PATH - Optional subdirectory and filename within directory])], [dnl
 		eval "bld_cv_pkg_cmd_${_bld_tmp_pn}=\"aptitude install \$_bld_tmp_result\""
 		;;
 	    (arch)
-		eval "bld_cv_pkg_cmd_${_bld_tmp_cn}=\"pacman --sync \$_bld_tmp_result\""
+		eval "bld_cv_pkg_cmd_${_bld_tmp_pn}=\"pacman --sync \$_bld_tmp_result\""
 		;;
 	    (salix)
-		eval "bld_cv_pkg_cmd_${_bld_tmp_cn}=\"slapt-get --install \$_bld_tmp_result\""
+		eval "bld_cv_pkg_cmd_${_bld_tmp_pn}=\"slapt-get --install \$_bld_tmp_result\""
 		;;
 	    (slackware)
-		eval "bld_cv_pkg_cmd_${_bld_tmp_cn}=\"slackpkg install \$_bld_tmp_result\""
+		eval "bld_cv_pkg_cmd_${_bld_tmp_pn}=\"slackpkg install \$_bld_tmp_result\""
 		;;
 	    (*)
 		eval "unset bld_cv_pkg_cmd_${_bld_tmp_pn}"
@@ -410,6 +412,7 @@ AC_DEFUN([_BLD_FILE_CHECK],
 	[AS_FUNCTION_DESCRIBE([bld_file_check],
 	    [FILENAME],
 	    [FILENAME - Variable containing the file to check.])], [dnl
+    local _bld_tmp_file _bld_tmp_fn _bld_tmp_result
     eval "_bld_tmp_file=\"\${[$]1}\""
     _bld_tmp_fn=`basename $_bld_tmp_file`
     _bld_tmp_fn=`echo "$_bld_tmp_fn" | sed -e 'y/abcdefghijklmnopqrstuvwxyz/ABCDEFGHIJKLMNOPQRSTUVWXYZ/'`
@@ -499,7 +502,7 @@ AC_DEFUN([_BLD_FILE_CHECK],
 		eval "bld_cv_pkg_cmd_${_bld_tmp_fn}=\"aptitude install \$_bld_tmp_result\""
 		;;
 	    (arch)
-		eval "bld_cv_pkg_cmd_${_bld_tmp_cn}=\"pacman --sync \$_bld_tmp_result\""
+		eval "bld_cv_pkg_cmd_${_bld_tmp_fn}=\"pacman --sync \$_bld_tmp_result\""
 		;;
 	    (*)
 		eval "unset bld_cv_pkg_cmd_${_bld_tmp_fn}"
