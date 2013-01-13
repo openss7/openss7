@@ -56,100 +56,75 @@ _set_vars() {
 datarootdir=@datarootdir@
 }
 
-_pre() {
-    un=; pw=; o=
-    for s in '' .bak .new; do
+# preinst_repo() - When we go to install this subpackage fresh, we need to
+#   acquire a username and password from the user and get credentials for this
+#   machine.  When reinstalling (previous package was not purged), this function
+#   gets the existing credentials from the persistent configuration file.  Even
+#   when a package is purged, we like to keep a copy of the credentials lying
+#   around in a .pacold file so that the machine credentials don't get lost.
+#
+#   Note that because the credentials are really machine credentials, we should
+#   really be saving them in /boot so that installations of other distros can
+#   also see the same machine credentials.
+#
+preinst_repo () { :
+    local d un pw o f s ext u p m
+    for s in '' .pacold .pacnew; do
     for p in credentials; do
-    for d in ${_localstatedir}/lib/${_name}/; do
+    for d in $localstatedir/lib/$name/; do
 	o=$d$p$s
 	[ -r $o ] || continue
-	un=`awk 'BEGIN{FS="="}{if($1~/^username$/){print$2;exit}}' $o`
-	pw=`awk 'BEGIN{FS="="}{if($1~/^password$/){print$2;exit}}' $o`
-	[ -n "$un" -a -n "$pw" ] || continue
-	break 3
+        un=`awk 'BEGIN{FS="="}{if($1~/^username$/){print$2;exit}}' $o`
+        pw=`awk 'BEGIN{FS="="}{if($1~/^password$/){print$2;exit}}' $o`
+        [ -n "$un" -a -n "$pw" ] || continue
+        break 3
     done
     done
-    if -n "${_FILES_zypprepo}"; then
-	for o in @PACKAGE_UCNAME@ NCC; do
-	for d in ${_zyppcreddir}/; do
-	    o=$d${p}credentials$s
-	    [ -r $o ] || continue
-	    un=`awk 'BEGIN{FS="="}{if($1~/^username$/){print$2;exit}}' $o`
-	    pw=`awk 'BEGIN{FS="="}{if($1~/^password$/){print$2;exit}}' $o`
-	    [ -n "$un" -a -n "$pw" ] || continue
-	    break 3
-	done
-	done
-    fi
-    if -n "${_FILES_yumrepo}"; then
-	for p in @PACKAGE@.repo; do
-	for d in ${_yumrepodir}/; do
-	    o=$d$p$s
-	    [ -r $o ] || continue
-	    un=`sed -n -r 's,^.*(baseurl|include)[[:space:]]*=[[:space:]]*http[s]?://([^@:]*)(:([^@]*))@.*$,\2,p;t end;b;: end q' $o`
-	    pw=`sed -n -r 's,^.*(baseurl|include)[[:space:]]*=[[:space:]]*http[s]?://([^@:]*)(:([^@]*))@.*$,\4,p;t end;b;: end q' $o`
-	    [ -n "$un" -a -n "$pw" ] || continue
-	    break 3
-	done
-	done
-    fi
-    if -n "${_FILES_urpmirepo}"; then
-	for p in netrc netrc.@PACKAGE@; do
-	for d in ${_urpmiconfdir}/; do
-	    o=$d$p$s
-	    [ -r $o ] || continue
-	    un=`sed -n -r 's,^machine[[:space:]]*'${_repobase}'[[:space:]]*login[[:space:]]*([^[:space:]]*)[[:space:]]*password[[:space:]]*([^[:space:]]*)[[:space:]]*.*$,\1,p;t end;b;: end q' $o`
-	    pw=`sed -n -r 's,^machine[[:space:]]*'${_repobase}'[[:space:]]*login[[:space:]]*([^[:space:]]*)[[:space:]]*password[[:space:]]*([^[:space:]]*)[[:space:]]*.*$,\2,p;t end;b;: end q' $o`
-	    [ -n "$un" -a -n "$pw" ] || continue
-	    break 3
-	done
-	done
-    fi
-    if -n "${_FILES_aptrepo}"; then
-	for p in @PACKAGE@ sources; do
-	for d in ${_aptrepodir}/ ${_aptconfdir}/; do
-	    o=$d$p.list$s
-	    [ -r $o ] || continue
-	    un=`sed -n -r 's,^[#]?(deb|rpm|urpm|repomd)(-src)?[[:space:]][[:space:]]*http[s]?://([^@:]*)(:([^@]*))@.*$,\3,p;t end;b;: end q' $o`
-	    pw=`sed -n -r 's,^[#]?(deb|rpm|urpm|repomd)(-src)?[[:space:]][[:space:]]*http[s]?://([^@:]*)(:([^@]*))@.*$,\5,p;t end;b;: end q' $o`
-	    [ -n "$un" -a -n "$pw" ] || continue
-	    break 3
-	done
-	done
-    fi
+    for p in $PACKAGE; do
+    for d in $pacmanrepodir/; do
+	o=$d${p}list$s
+	[ -r $o ] || continue
+	un=`sed -n -r 's,^.*Server[[:space:]]*=[[:space:]]*http[s]?://([^@:]*)(:([^@]*))@.*$,\2,p;t end;b;: end q' $o`
+	pw=`sed -n -r 's,^.*Server[[:space:]]*=[[:space:]]*http[s]?://([^@:]*)(:([^@]*))@.*$,\4,p;t end;b;: end q' $o`
+        [ -n "$un" -a -n "$pw" ] || continue
+        break 3
+    done
+    done
     done
     [ -n "$un" -a -n "$pw" ] || { un=; pw=; }
-    d=${_localstatedir}/lib/${_name}; n=credentials
+    d=$localstatedir/lib/$name; n=credentials
     o=; f=$d/$n; [ -d $d ] || mkdir -p -- $d
     [ ! -e $f ] || { o=$f; mv -f -- $f $f.$$; }
-    ext="?hn=`hostname -f`&ip=`hostname -i | sed 'y/ /,/'`${un:+&un=}${un}${pw:+&pw=}${pw}"
-    ext="$ext`echo '/${_reposubdir}' | sed 's,//,/,g;s,/,\&distro=,;s,/,\&relver=,;s,/,\&osarch=,'`"
+    hn=`hostname -f`; ip=`hostname -I | sed 'y/ /,/'`; n=patches
+    id=`e=$(for s in /sys/class/net/eth*; do if [ ! -L $s ]; then continue ; fi ; echo $(readlink $s)" "$s ; done | sort | head -1 | cut -f2 "-d ") ; [ -r $e/address ] && cat $e/address | sed "s,:,,g"`
+    ext="?hn=$hn&ip=$ip&id=$id${un:+&un=}${un}${pw:+&pw=}${pw}"
+    ext="$ext`echo /$reposubdir | sed 's,//,/,g;s,/,\&distro=,;s,/,\&relver=,;s,/,\&osarch=,'`"
     key="${un:+${un}${pw:+:}${pw}@}"
-    url='${_reposerv}://'"${key}"'${_repobase}/${_reporoot}/'"`basename $f`$ext"
+    url="$reposerv://$key$repobase/$reporoot/`basename $f`$ext"
     if ! echo "$url" | wget -i - -O $f 2>/dev/null ; then
         if echo "$url" | wget -i - -O /dev/null 2>&1 | grep '401 Authorization Required' >/dev/null 2>&1 ; then
             u='anonymous'; p=
             m='Authorization required for repository access.'
             if [ -n "$DISPLAY" -a -x "`which zenity 2>/dev/null`" ]; then
-                zenity --info --text="$m" --no-wrap || exit 1
+                zenity --info --text="$m" --no-wrap || return 1
                 while true; do
-                    u=`zenity --entry --text='Username: ' --entry-text="$u" || exit 1` || exit 1; u=${u:-anonymous}
+                    u=`zenity --entry --text='Username: ' --entry-text="$u" || exit 1` || return 1; u=${u:-anonymous}
                     [ "$u" != anonymous ] || break
                     p=`zenity --entry --text="Password for '$u': " --hide-text || exit 1` || continue
                     [ -z "$p" ] || break
                 done
             elif [ "${DISPLAY+set}" = set -a -x "`which whiptail 2>/dev/null`" ]; then
-                whiptail --msgbox "$m" 7 50 >/dev/tty </dev/tty || exit 1
+                whiptail --msgbox "$m" 7 50 >/dev/tty </dev/tty || return 1
                 while true; do
-                    u=`whiptail --inputbox 'Username: ' 8 40 "$u" 2>&1 >/dev/tty </dev/tty || exit 1` || exit 1; u=${u:-anonymous}
+                    u=`whiptail --inputbox 'Username: ' 8 40 "$u" 2>&1 >/dev/tty </dev/tty || exit 1` || return 1; u=${u:-anonymous}
                     [ "$u" != anonymous ] || break
                     p=`whiptail --passwordbox "Password for '$u': " 8 40 2>&1 >/dev/tty </dev/tty || exit 1` || continue
                     [ -z "$p" ] || break
                 done
             elif [ "${DISPLAY+set}" = set -a -x "`which dialog 2>/dev/null`" ]; then
-                dialog --msgbox "$m" 5 50 >/dev/tty </dev/tty || exit 1
+                dialog --msgbox "$m" 5 50 >/dev/tty </dev/tty || return 1
                 while true; do
-                    u=`dialog --inputbox 'Username: ' 0 0 "$u" 2>&1 >/dev/tty </dev/tty || exit 1` || exit 1; u=${u:-anonymous}
+                    u=`dialog --inputbox 'Username: ' 0 0 "$u" 2>&1 >/dev/tty </dev/tty || exit 1` || return 1; u=${u:-anonymous}
                     [ "$u" != anonymous ] || break
                     p=`dialog --passwordbox "Password for '$u': " 0 0 2>&1 >/dev/tty </dev/tty || exit 1` || continue
                     [ -z "$p" ] || break
@@ -158,7 +133,7 @@ _pre() {
                 echo "$m" >/dev/tty
                 while true; do
                     d="$u"
-                    read -e  -p "Username ($u): " u </dev/tty >/dev/tty || { echo '' >/dev/tty; exit 1; }; u=${u:-$d}
+                    read -e  -p "Username ($u): " u </dev/tty >/dev/tty || { echo '' >/dev/tty; return 1; }; u=${u:-$d}
                     [ "$u" != anonymous ] || break
                     read -es -p "Password ($u): " p </dev/tty >/dev/tty || { echo '' >/dev/tty; continue; }
                     echo '' >/dev/tty
@@ -166,7 +141,7 @@ _pre() {
                 done
             fi
             key="${u:+${u}${p:+:}${p}@}"
-            url='${_reposerv}://'"${key}"'${_repobase}/${_reporoot}/'"`basename $f`$ext"
+            url="$reposerv://$key$repobase/$reporoot/`basename $f`$ext"
             rm -f -- $f
             if ! echo "$url" | wget -i - -O $f 2>/dev/null; then
                 rm -f -- $f
@@ -181,46 +156,48 @@ _pre() {
                     echo "$m" >/dev/tty
                 fi
                 [ "$o" != "$f" -o ! -e $o.$$ ] || mv -f -- $o.$$ $o
-                exit 1
+                return 1
             fi
-        fi
+	fi
     fi
     if [ ! -e $f ]; then
         [ "$o" != "$f" -o ! -e $o.$$ ] || mv -f -- $o.$$ $o
-        exit 1
+        return 1
     fi
     [ "$o" != "$f" ] || rm -f -- $o.$$
     chmod 0600 $f
+    un=`awk 'BEGIN{FS="="}{if($1~/^username$/){print$2;exit}}' $f`
+    pw=`awk 'BEGIN{FS="="}{if($1~/^password$/){print$2;exit}}' $f`
+    [ -n "$un" -a -n "$pw" ] || return 1
+    unp="`echo $un | cut -c1-24`"
+    pwp="`echo $pw | cut -c1-24`"
+    echo "$unp$pwp" >$d/$n
+    key="${un:+${un}${pw:+:$pw}@}"
+    ext="`echo /$reposubdir | sed 's,//,/,g;s,/,?distro=,;s,/,\&relver=,;s,/,\&osarch=,'`"
+    d=$pacmanrepodir; n=${PACKAGE}list
+    o=; f=$d/$n; [ -d $d ] || mkdir -p -- $d
+    [ ! -e $f ] || { o=$f; mv -f -- $f $f.$$; }
+    url="$reposerv://$key$repobase/$reporoot/$n$ext"
+    if ! echo "$url" | wget -i - -O $f 2>/dev/null || [ ! -e $f ]; then
+        [ "$o" != "$f" -o ! -e $o.$$ ] || mv -f -- $o.$$ $o
+        return 1
+    fi
+    [ "$o" != "$f" ] || rm -f -- $o.$$
+    d=$pacmanrepodir; n=${PACKAGE}repo
+    o=; f=$d/$n; [ -d $d ] || mkdir -p -- $d
+    [ ! -e $f ] || { o=$f; mv -f -- $f $f.$$; }
+    url="$reposerv://$key$repobase/$reporoot/$n$ext"
+    if ! echo "$url" | wget -i - -O $f 2>/dev/null || [ ! -e $f ]; then
+        [ "$o" != "$f" -o ! -e $o.$$ ] || mv -f -- $o.$$ $o
+        return 1
+    fi
+    [ "$o" != "$f" ] || rm -f -- $o.$$
+    return 0
 }
 
-_post() {
-    if -n "${_FILES_yumrepo}"; then :
-	d=${_sysconfdir}/yum/pluginconf.d
-	for f in kmod.conf fedorakmod.conf ; do f="$d/$f"
-	    if [ -f $f ] ; then
-		mv -f -- $f $f.rpmsave
-		sed -r -e 's,^pinkernels.*$,pinkernels = 1,;s,^installforallkernels.*$,installforallkernels = 1,' $f.rpmsave >$f
-		if ! diff $f.rpmsave $f >/dev/null 2>&1 ; then
-		    mv -f -- $f.rpmsave $f
-		fi
-	    fi
-	done
-    fi
-    if -n "${_FILES_zypprepo}"; then :
-	d=${_sysconfdir}/zypp
-	for f in zypp.conf ; do f="$d/$f"
-	    if [ -f $f ] ; then
-		mv -f -- $f $f.rpmsave
-		sed -r -e 's,^multiversion.*$,multiversion = provides:multiversion(kernel),' $f.rpmsave >$f
-		if ! diff $f.rpmsave $f >/dev/null 2>&1 ; then
-		    mv -f -- $f.rpmsave $f
-		fi
-	    fi
-	done
-    fi
-    if -n "${_FILES_urpmirepo}"; then :
-    fi
-    if -n "${_FILES_aptrepo}"; then :
+postinst_keyring () { :
+    if [ -x /usr/bin/pacman-key ]; then
+	/usr/bin/pacman-key --populate openss7
     fi
 }
 
@@ -229,7 +206,7 @@ _post() {
 #
 pre_install() {
     _set_vars
-    #_pre $*
+    preinst_repo || exit $?
 }
 
 # post_install($newver) - Run right after files are extracted.  One argument is
@@ -237,7 +214,7 @@ pre_install() {
 #
 post_install() {
     _set_vars
-    #_post $*
+    postinst_keyring || :
 }
 
 # pre_upgrade($newver,$oldver) - Run right before files are extracted.  Two
