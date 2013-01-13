@@ -502,22 +502,22 @@ AC_DEFUN([_LINUX_CHECK_KERNEL_TOOLS], [dnl
 	ac_configure_args="KCC=\"$KCC\"${ac_configure_args:+ $ac_configure_args}"
     fi
     AC_SUBST([KCC])dnl
-    tmp_path="${PATH:+$PATH:}/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/X11R6/bin";
+    tmp_PATH="${PATH:+$PATH:}/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/X11R6/bin";
     AC_ARG_VAR([DEPMOD],
 	       [Build kernel module dependencies command. @<:@default=depmod@:>@])
-    _BLD_PATH_PROG([DEPMOD], [depmod], [/sbin/depmod], [$tmp_path], [dnl
+    _BLD_PATH_PROG([DEPMOD], [depmod], [/sbin/depmod], [$tmp_PATH], [dnl
 	AC_MSG_WARN([Cannot find depmod program in PATH.])])
     AC_ARG_VAR([MODPROBE],
 	       [Probe kernel module dependencies command. @<:@default=modprobe@:>@])
-    _BLD_PATH_PROG([MODPROBE], [modprobe], [/sbin/modprobe], [$tmp_path], [dnl
+    _BLD_PATH_PROG([MODPROBE], [modprobe], [/sbin/modprobe], [$tmp_PATH], [dnl
 	AC_MSG_WARN([Cannot find depmod program in PATH.])])
     AC_ARG_VAR([LSMOD],
 	       [List kernel modules command. @<:@default=lsmod@:>@])
-    _BLD_PATH_PROG([LSMOD], [lsmod], [/sbin/lsmod], [$tmp_path], [dnl
+    _BLD_PATH_PROG([LSMOD], [lsmod], [/sbin/lsmod], [$tmp_PATH], [dnl
 	AC_MSG_WARN([Cannot find lsmod program in PATH.])])
     AC_ARG_VAR([LSOF],
 	       [List open files command. @<:@default=lsof@:>@])
-    _BLD_PATH_PROG([LSOF], [lsof], [/sbin/lsof], [$tmp_path], [dnl
+    _BLD_PATH_PROG([LSOF], [lsof], [/sbin/lsof], [$tmp_PATH], [dnl
 	AC_MSG_WARN([Cannot find lsof program in PATH.])])
 ])# _LINUX_CHECK_KERNEL_TOOLS
 # =========================================================================

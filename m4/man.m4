@@ -103,9 +103,9 @@ AC_DEFUN([_MAN_CONVERSION_ARGS], [dnl
 #
 # -------------------------------------------------------------------------
 AC_DEFUN([_MAN_CONVERSION_SETUP], [dnl
-    tmp_path="${PATH:+$PATH:}/usr/local/bin:/usr/bin:/bin:/usr/X11R6/bin:$am_aux_dir";
-    AC_ARG_VAR([SOELIM], [Roff source elimination command. @<:@default=gsoelim,soelim@:>@])
-    _BLD_PATH_PROGS([SOELIM], [gsoelim soelim], [/bin/cat], [$tmp_path], [dnl
+    tmp_PATH="${PATH:+$PATH:}/usr/local/bin:/usr/bin:/bin:/usr/X11R6/bin:$am_aux_dir";
+    _BLD_VAR_PATH_PROG([SOELIM], [gsoelim soelim], [$tmp_PATH],
+	[Roff source elimination command. @<:@default=gsoelim,soelim@:>@], [dnl
 	if test :$with_cooked_manpages != :no ; then
 	    without_cooked_manpages=yes
 	    _BLD_INSTALL_WARN([SOELIM], [
@@ -131,8 +131,8 @@ AC_DEFUN([_MAN_CONVERSION_SETUP], [dnl
 *** 'configure'.
 *** ])
 	fi])
-    AC_ARG_VAR([REFER], [Roff references command. @<:@default=grefer,refer@:>@])
-    _BLD_PATH_PROGS([REFER], [grefer refer], [/bin/cat], [$tmp_path], [dnl
+    _BLD_VAR_PATH_PROG([REFER], [grefer refer], [$tmp_PATH],
+	[Roff references command. @<:@default=grefer,refer@:>@], [dnl
 	if test :$with_cooked_manpages != :no ; then
 	    without_cooked_manpages=yes
 	    _BLD_INSTALL_WARN([REFER], [
@@ -157,14 +157,14 @@ AC_DEFUN([_MAN_CONVERSION_SETUP], [dnl
 *** 'configure'.
 *** ])
 	fi])
-    AC_ARG_VAR([PIC], [Roff picture command. @<:@default=gpic,pic@:>@])
-    _BLD_PATH_PROGS([PIC], [gpic pic], [/bin/cat], [$tmp_path], [dnl
+    _BLD_VAR_PATH_PROG([PIC], [gpic pic], [$tmp_PATH],
+	[Roff picture command. @<:@default=gpic,pic@:>@], [dnl
 	if test :$with_cooked_manpages != :no ; then
 	    # without_cooked_manpages=yes
 	    : # do not need pic to cook manpages
 	fi])
-    AC_ARG_VAR([TBL], [Roff table command. @<:@default=gtbl,tbl@:>@])
-    _BLD_PATH_PROGS([TBL], [gtbl tbl], [/bin/cat], [$tmp_path], [dnl
+    _BLD_VAR_PATH_PROG([TBL], [gtbl tbl], [$tmp_PATH],
+	[Roff table command. @<:@default=gtbl,tbl@:>@], [dnl
 	if test :$with_cooked_manpages != :no ; then
 	    without_cooked_manpages=yes
 	    _BLD_INSTALL_WARN([TBL], [
@@ -190,8 +190,8 @@ AC_DEFUN([_MAN_CONVERSION_SETUP], [dnl
 *** 'configure'.
 *** ])
 	fi])
-    AC_ARG_VAR([MAKEWHATIS], [Makewhatis command. @<:@default=mandb,makewhatis@:>@])
-    _BLD_PATH_PROGS([MAKEWHATIS], [mandb makewhatis], [], [$tmp_path], [dnl
+    _BLD_VAR_PATH_PROG([MAKEWHATIS], [mandb makewhatis], [$tmp_PATH],
+	[Makewhatis command. @<:@default=mandb,makewhatis@:>@], [dnl
 	_BLD_INSTALL_WARN([MAKEWHATIS], [
 ***
 *** Configure cannot find a suitable 'makewhatis' program.  Installing
@@ -224,8 +224,8 @@ AC_DEFUN([_MAN_CONVERSION_SETUP], [dnl
 	fi])
     AC_ARG_VAR([GZIP], [Gzip default compression options @<:@default=-f9@:>@])
     test -n "$GZIP" || GZIP='-f9'
-    AC_ARG_VAR([GZIP_CMD], [Gzip compression command @<:@default=gzip@:>@])
-    _BLD_PATH_PROG([GZIP_CMD], [gzip], [], [$tmp_path], [dnl
+    _BLD_VAR_PATH_PROG([GZIP_CMD], [gzip], [$tmp_PATH],
+	[Gzip compression command @<:@default=gzip@:>@], [dnl
 	_BLD_INSTALL_WARN([GZIP_CMD], [
 ***
 *** Configure cannot find a suitable 'gzip' program.  Compressing manual
@@ -244,8 +244,8 @@ AC_DEFUN([_MAN_CONVERSION_SETUP], [dnl
 *** ])])
     AC_ARG_VAR([BZIP2], [Bzip2 default compression options @<:@default=-f9@:>@])
     test -n "$BZIP2" || BZIP2='-f9'
-    AC_ARG_VAR([BZIP2_CMD], [Bzip2 compression command @<:@default=bzip2@:>@])
-    _BLD_PATH_PROG([BZIP2_CMD], [bzip2], [], [$tmp_path], [dnl
+    _BLD_VAR_PATH_PROG([BZIP2_CMD], [bzip2], [$tmp_PATH],
+	[Bzip2 compression command @<:@default=bzip2@:>@], [dnl
 	_BLD_INSTALL_WARN([BZIP2_CMD], [
 ***
 *** Configure cannot find a suitable 'bzip2' program.  Compressing
@@ -265,8 +265,8 @@ AC_DEFUN([_MAN_CONVERSION_SETUP], [dnl
 *** ])])
     AC_ARG_VAR([LZMA], [Lzma default compression options @<:@default=-f9@:>@])
     test -n "$LZMA" || LZMA='-f9'
-    AC_ARG_VAR([LZMA_CMD], [Lzma compression command @<:@default=lzma@:>@])
-    _BLD_PATH_PROG([LZMA_CMD], [lzma], [], [$tmp_path], [dnl
+    _BLD_VAR_PATH_PROG([LZMA_CMD], [lzma], [$tmp_PATH],
+	[Lzma compression command @<:@default=lzma@:>@], [dnl
 	_BLD_INSTALL_WARN([LZMA_CMD], [
 ***
 *** Configure cannot find a suitable 'lzma' program.  Compressing
@@ -286,8 +286,8 @@ AC_DEFUN([_MAN_CONVERSION_SETUP], [dnl
 *** ])])
     AC_ARG_VAR([XZ], [Xz default compression options @<:@default=-f9@:>@])
     test -n "$XZ" || XZ='-f9'
-    AC_ARG_VAR([XZ_CMD], [Xz compression command @<:@default=xz@:>@])
-    _BLD_PATH_PROG([XZ_CMD], [xz], [], [$tmp_path], [dnl
+    _BLD_VAR_PATH_PROG([XZ_CMD], [xz], [$tmp_PATH],
+	[Xz compression command @<:@default=xz@:>@], [dnl
 	_BLD_INSTALL_WARN([XZ_CMD], [
 *** 
 *** Configure cannot find a suitable 'xz' program.  Compressing archives

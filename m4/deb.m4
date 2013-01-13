@@ -265,7 +265,7 @@ dnl debs and dscs, they would not be useful.  Usually dpkg tools
 dnl are just there for examining deb packages.
 dnl
     AC_REQUIRE([_OPENSS7_MISSING3])dnl
-    tmp_path="${PATH:+$PATH:}/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/X11R6/bin";
+    tmp_PATH="${PATH:+$PATH:}/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/X11R6/bin";
     AC_ARG_ENABLE([debs],
 	[AS_HELP_STRING([--disable-debs],
 	    [build debs @<:@default=auto@:>@])],
@@ -284,7 +284,7 @@ dnl
 	esac])
     AC_ARG_VAR([DPKG],
 	       [dpkg command. @<:@default=dpkg@:>@])
-    _BLD_PATH_PROG([DPKG], [dpkg], [${am_missing3_run}dpkg], [$tmp_path], [dnl
+    _BLD_PATH_PROG([DPKG], [dpkg], [${am_missing3_run}dpkg], [$tmp_PATH], [dnl
 	case "$target_vendor" in
 	    (debian|ubuntu|mint)
 		AC_MSG_WARN([Cannot find dpkg program in PATH.]) ;;
@@ -292,7 +292,7 @@ dnl
 	esac])
     AC_ARG_VAR([DPKG_ARCHITECTURE],
 	       [dpkg-architecture command. @<:@default=dpkg-architecture@:>@])
-    _BLD_PATH_PROG([DPKG_ARCHITECTURE], [dpkg-architecture], [${am_missing3_run}dpkg-architecture], [$tmp_path], [dnl
+    _BLD_PATH_PROG([DPKG_ARCHITECTURE], [dpkg-architecture], [${am_missing3_run}dpkg-architecture], [$tmp_PATH], [dnl
 	case "$target_vendor" in
 	    (debian|ubuntu|mint)
 		AC_MSG_WARN([Cannot find dpkg-architecture program in PATH.]) ;;
@@ -300,7 +300,7 @@ dnl
 	esac])
     AC_ARG_VAR([DPKG_BUILDFLAGS],
 	       [dpkg-buildflags command. @<:@default=dpkg-buildflags@:>@])
-    _BLD_PATH_PROG([DPKG_BUILDFLAGS], [dpkg-buildflags], [${am_missing3_run}dpkg-buildflags], [$tmp_path], [dnl
+    _BLD_PATH_PROG([DPKG_BUILDFLAGS], [dpkg-buildflags], [${am_missing3_run}dpkg-buildflags], [$tmp_PATH], [dnl
 	case "$target_vendor" in
 	    (debian|ubuntu|mint)
 		AC_MSG_WARN([Cannot find dpkg-buildflags program in PATH.]) ;;
@@ -308,7 +308,7 @@ dnl
 	esac])
     AC_ARG_VAR([DPKG_GENCHANGES],
 	       [dpkg-genchanges command. @<:@default=dpkg-genchanges@:>@])
-    _BLD_PATH_PROG([DPKG_GENCHANGES], [dpkg-genchanges], [${am_missing3_run}dpkg-genchanges], [$tmp_path], [dnl
+    _BLD_PATH_PROG([DPKG_GENCHANGES], [dpkg-genchanges], [${am_missing3_run}dpkg-genchanges], [$tmp_PATH], [dnl
 	case "$target_vendor" in
 	    (debian|ubuntu|mint)
 		AC_MSG_WARN([Cannot find dpkg-genchanges program in PATH.]) ;;
@@ -316,7 +316,7 @@ dnl
 	esac])
     AC_ARG_VAR([DPKG_SOURCE],
 	       [dpkg-source command. @<:@default=dpkg-source@:>@])
-    _BLD_PATH_PROG([DPKG_SOURCE], [dpkg-source], [${am_missing3_run}dpkg-source], [$tmp_path], [dnl
+    _BLD_PATH_PROG([DPKG_SOURCE], [dpkg-source], [${am_missing3_run}dpkg-source], [$tmp_PATH], [dnl
 	case "$target_vendor" in
 	    (debian|ubuntu|mint)
 		AC_MSG_WARN([Cannot find dpkg-source program in PATH.]) ;;
@@ -324,7 +324,7 @@ dnl
 	esac])
     AC_ARG_VAR([DPKG_BUILDPACKAGE],
 	       [dpkg-buildpackage command. @<:@default=dpkg-buildpackage@:>@])
-    _BLD_PATH_PROG([DPKG_BUILDPACKAGE], [dpkg-buildpackage], [${am_missing3_run}dpkg-buildpackage], [$tmp_path], [dnl
+    _BLD_PATH_PROG([DPKG_BUILDPACKAGE], [dpkg-buildpackage], [${am_missing3_run}dpkg-buildpackage], [$tmp_PATH], [dnl
 	case "$target_vendor" in
 	    (debian|ubuntu|mint)
 		AC_MSG_WARN([Cannot find dpkg-buildpackage program in PATH.]) ;;
@@ -406,14 +406,14 @@ AC_DEFUN([_DEB_REPO_SETUP], [dnl
 # -----------------------------------------------------------------------------
 AC_DEFUN([_DEB_REPO_SETUP_APT], [dnl
     AC_REQUIRE([_OPENSS7_MISSING3])dnl
-    tmp_path="${PATH:+$PATH:}/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/X11R6/bin";
+    tmp_PATH="${PATH:+$PATH:}/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/X11R6/bin";
     AC_ARG_ENABLE([repo-apt],
 	[AS_HELP_STRING([--disable-repo-apt],
 	    [apt repo construction @<:@default=auto@:>@])],
 	[], [enable_repo_apt=yes])
     AC_ARG_VAR([APT_FTPARCHIVE],
 	       [apt-ftparchive command. @<:@default=apt-ftparchive@:>@])
-    _BLD_PATH_PROG([APT_FTPARCHIVE], [apt-ftparchive], [${am_missing3_run}apt-ftparchive], [$tmp_path], [dnl
+    _BLD_PATH_PROG([APT_FTPARCHIVE], [apt-ftparchive], [${am_missing3_run}apt-ftparchive], [$tmp_PATH], [dnl
 	if test ":$deb_cv_debs" = :yes -a ${USE_MAINTAINER_MODE:-no} = yes ; then
 	    case "${target_vendor:-none}" in
 		(debian|ubuntu|mint)
@@ -437,7 +437,7 @@ AC_DEFUN([_DEB_REPO_SETUP_APT], [dnl
 	else enable_repo_apt=no; fi])
     AC_ARG_VAR([DPKG_SCANSOURCES],
 	       [dpkg-scansources command. @<:@default=dpkg-scansources@:>@])
-    _BLD_PATH_PROG([DPKG_SCANSOURCES], [dpkg-scansources], [${am_missing3_run}dpkg-scansources], [$tmp_path], [dnl
+    _BLD_PATH_PROG([DPKG_SCANSOURCES], [dpkg-scansources], [${am_missing3_run}dpkg-scansources], [$tmp_PATH], [dnl
 	if test ":$deb_cv_debs" = :yes -a ${USE_MAINTAINER_MODE:-no} = yes ; then
 	    case "${target_vendor:-none}" in
 		(debian|ubuntu|mint)
@@ -461,7 +461,7 @@ AC_DEFUN([_DEB_REPO_SETUP_APT], [dnl
 	else enable_repo_apt=no; fi])
     AC_ARG_VAR([DPKG_SCANPACKAGES],
 	       [dpkg-scanpackages command. @<:@default=dpkg-scanpackages@:>@])
-    _BLD_PATH_PROG([DPKG_SCANPACKAGES], [dpkg-scanpackages], [${am_missing3_run}dpkg-scanpackages], [$tmp_path], [dnl
+    _BLD_PATH_PROG([DPKG_SCANPACKAGES], [dpkg-scanpackages], [${am_missing3_run}dpkg-scanpackages], [$tmp_PATH], [dnl
 	if test ":$deb_cv_debs" = :yes -a ${USE_MAINTAINER_MODE:-no} = yes ; then
 	    case "${target_vendor:-none}" in
 		(debian|ubuntu|mint)
@@ -485,7 +485,7 @@ AC_DEFUN([_DEB_REPO_SETUP_APT], [dnl
 	else enable_repo_apt=no; fi])
     AC_ARG_VAR([DPKG_DEB],
 	       [dpkg-deb command. @<:@default=dpkg-deb@:>@])
-    _BLD_PATH_PROG([DPKG_DEB], [dpkg-deb], [${am_missing3_run}dpkg-deb], [$tmp_path], [dnl
+    _BLD_PATH_PROG([DPKG_DEB], [dpkg-deb], [${am_missing3_run}dpkg-deb], [$tmp_PATH], [dnl
 	if test ":$deb_cv_debs" = :yes -a ${USE_MAINTAINER_MODE:-no} = yes ; then
 	    case "${target_vendor:-none}" in
 		(debian|ubuntu|mint)

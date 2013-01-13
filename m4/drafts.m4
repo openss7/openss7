@@ -131,8 +131,8 @@ AC_DEFUN([_DRAFTS_SETUP], [dnl
     disable_drafts=
     disable_drafts_html=
     disable_drafts_print=
-    tmp_path="${PATH:+$PATH:}/usr/local/bin:/usr/bin:/bin:/usr/X11R6/bin:$am_aux_dir";
-    _BLD_PATH_PROGS([SOELIM], [gsoelim soelim], [/bin/cat], [$tmp_path], [dnl
+    tmp_PATH="${PATH:+$PATH:}/usr/local/bin:/usr/bin:/bin:/usr/X11R6/bin:$am_aux_dir";
+    _BLD_PATH_PROGS([SOELIM], [gsoelim soelim], [/bin/cat], [$tmp_PATH], [dnl
 	if test :$enable_drafts != :no ; then
 	    disable_drafts=yes
 	    _BLD_INSTALL_WARN([SOELIM], [
@@ -158,7 +158,7 @@ AC_DEFUN([_DRAFTS_SETUP], [dnl
 *** 'configure', or specify the --disable-drafts option to 'configure'.
 *** ])
 	fi])
-    _BLD_PATH_PROGS([REFER], [grefer refer], [/bin/cat], [$tmp_path], [dnl
+    _BLD_PATH_PROGS([REFER], [grefer refer], [/bin/cat], [$tmp_PATH], [dnl
 	if test :$enable_drafts != :no ; then
 	    disable_drafts=yes
 	    _BLD_INSTALL_WARN([REFER], [
@@ -184,7 +184,7 @@ AC_DEFUN([_DRAFTS_SETUP], [dnl
 *** 'configure', or specify the --disable-drafts option to 'configure'.
 *** ])
 	fi])
-    _BLD_PATH_PROGS([PIC], [gpic pic], [/bin/cat], [$tmp_path], [dnl
+    _BLD_PATH_PROGS([PIC], [gpic pic], [/bin/cat], [$tmp_PATH], [dnl
 	if test :$enable_drafts != :no ; then
 	    disable_drafts=yes
 	    _BLD_INSTALL_WARN([PIC], [
@@ -210,7 +210,7 @@ AC_DEFUN([_DRAFTS_SETUP], [dnl
 *** 'configure', or specify the --disable-drafts option to 'configure'.
 *** ])
 	fi])
-    _BLD_PATH_PROGS([TBL], [gtbl tbl], [/bin/cat], [$tmp_path], [dnl
+    _BLD_PATH_PROGS([TBL], [gtbl tbl], [/bin/cat], [$tmp_PATH], [dnl
 	if test :$enable_drafts != :no ; then
 	    disable_drafts=yes
 	    _BLD_INSTALL_WARN([TBL], [
@@ -236,12 +236,12 @@ AC_DEFUN([_DRAFTS_SETUP], [dnl
 *** 'configure', or specify the --disable-drafts option to 'configure'.
 *** ])
 	fi])
-dnl    _BLD_PATH_PROG([NROFF], [nroff], [${am_missing5_run}nroff], [$tmp_path], [dnl
+dnl    _BLD_PATH_PROG([NROFF], [nroff], [${am_missing5_run}nroff], [$tmp_PATH], [dnl
 dnl	if test :$enable_drafts != :no ; then
 dnl	    : # will attempt to emulate with groff
 dnl	fi])
     _BLD_PATH_PROG([GROFF], [groff], [${am_missing5_run}groff],
-		 [$tmp_path], [dnl
+		 [$tmp_PATH], [dnl
 	if test :$enable_drafts != :no ; then
 	    disable_drafts=yes
 	    _BLD_INSTALL_WARN([GROFF], [
@@ -268,7 +268,7 @@ dnl	fi])
 *** ])
 	fi])
     _BLD_PATH_PROGS([PS2PDF], [ps2pdf12 ps2pdf13 ps2pdf14 ps2pdf ps2pdfwr],
-		    [${am_missing2_run}ps2pdf], [$tmp_path], [dnl
+		    [${am_missing2_run}ps2pdf], [$tmp_PATH], [dnl
 	if test :$enable_drafts_print != :no ; then
 	    disable_drafts_print=yes
 	    _BLD_INSTALL_WARN([PS2PDF], [
@@ -300,7 +300,7 @@ dnl	fi])
 *** ])
 	fi])
     _BLD_PATH_PROG([FIG2DEV], [fig2dev], [${am_missing2_run}fig2dev],
-		   [$tmp_path], [dnl
+		   [$tmp_PATH], [dnl
 	if test :$enable_drafts_print != :no ; then
 	    disable_drafts_print=yes
 	    _BLD_INSTALL_WARN([FIG2DEV], [
@@ -332,7 +332,7 @@ dnl	fi])
 *** ])
 	fi])
     _BLD_PATH_PROGS([DVIPDF], [dvipdf], [${am_missing2_run}dvipdf],
-		    [$tmp_path], [dnl
+		    [$tmp_PATH], [dnl
 	if test :$enable_drafts_print != :no ; then
 	    : # ok for now, we prefer ps2pdf and they are in same package
 	fi])

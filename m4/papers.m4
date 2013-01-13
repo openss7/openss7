@@ -140,8 +140,8 @@ AC_DEFUN([_PAPERS_SETUP], [dnl
     disable_papers=
     disable_papers_print=
     disable_papers_html=
-    tmp_path="${PATH:+$PATH:}/usr/local/bin:/usr/bin:/bin:/usr/X11R6/bin:$am_aux_dir";
-    _BLD_PATH_PROGS([GNUPLOT], [gnuplot plot], [${am_missing2_run}gnuplot], [$tmp_path], [dnl
+    tmp_PATH="${PATH:+$PATH:}/usr/local/bin:/usr/bin:/bin:/usr/X11R6/bin:$am_aux_dir";
+    _BLD_PATH_PROGS([GNUPLOT], [gnuplot plot], [${am_missing2_run}gnuplot], [$tmp_PATH], [dnl
 	if test :$enable_papers != :no ; then
 	    disable_papers=yes
 	    _BLD_INSTALL_WARN([GNUPLOT], [
@@ -169,7 +169,7 @@ AC_DEFUN([_PAPERS_SETUP], [dnl
 *** 'configure', or specify the --disable-papers option to 'configure'.
 *** ])
 	fi])
-    _BLD_PATH_PROG([FIG2DEV], [fig2dev], [${am_missing2_run}fig2dev], [$tmp_path], [dnl
+    _BLD_PATH_PROG([FIG2DEV], [fig2dev], [${am_missing2_run}fig2dev], [$tmp_PATH], [dnl
 	if test :$enable_papers != :no ; then
 	    disable_papers=yes
 	    _BLD_INSTALL_WARN([FIG2DEV], [
@@ -198,7 +198,7 @@ AC_DEFUN([_PAPERS_SETUP], [dnl
 *** 'configure', or specify the --disable-papers option to 'configure'.
 *** ])
 	fi])
-    _BLD_PATH_PROG([BIBTEX], [bibtex], [${am_missing2_run}bibtex], [$tmp_path], [dnl
+    _BLD_PATH_PROG([BIBTEX], [bibtex], [${am_missing2_run}bibtex], [$tmp_PATH], [dnl
 	if test :$enable_papers_print != :no ; then
 	    disable_papers_print=yes
 	    _BLD_INSTALL_WARN([BIBTEX], [
@@ -224,7 +224,7 @@ AC_DEFUN([_PAPERS_SETUP], [dnl
 *** 'configure'.
 *** ])
 	fi])
-    _BLD_PATH_PROG([LATEX], [latex], [${am_missing2_run}latex], [$tmp_path], [dnl
+    _BLD_PATH_PROG([LATEX], [latex], [${am_missing2_run}latex], [$tmp_PATH], [dnl
 	if test :$enable_papers_print != :no ; then
 	    disable_papers_print=yes
 	    _BLD_INSTALL_WARN([LATEX], [
@@ -252,7 +252,7 @@ AC_DEFUN([_PAPERS_SETUP], [dnl
 *** 'configure'.
 *** ])
 	fi])
-    _BLD_PATH_PROG([PSLATEX], [pslatex], [${am_missing2_run}pslatex], [$tmp_path], [dnl
+    _BLD_PATH_PROG([PSLATEX], [pslatex], [${am_missing2_run}pslatex], [$tmp_PATH], [dnl
 	if test :$enable_papers_print != :no ; then
 	    disable_papers_print=yes
 	    _BLD_INSTALL_WARN([PSLATEX], [
@@ -280,7 +280,7 @@ AC_DEFUN([_PAPERS_SETUP], [dnl
 *** 'configure'.
 *** ])
 	fi])
-    _BLD_PATH_PROG([PDFLATEX], [pdflatex], [${am_missing2_run}pdflatex], [$tmp_path], [dnl
+    _BLD_PATH_PROG([PDFLATEX], [pdflatex], [${am_missing2_run}pdflatex], [$tmp_PATH], [dnl
 	if test :$enable_papers_print != :no ; then
 	    disable_papers_print=yes
 	    _BLD_INSTALL_WARN([PDFLATEX], [
@@ -308,7 +308,7 @@ AC_DEFUN([_PAPERS_SETUP], [dnl
 *** 'configure'.
 *** ])
 	fi])
-    _BLD_PATH_PROG([LATEX2HTML], [latex2html], [${am_missing2_run}latex2html], [$tmp_path], [dnl
+    _BLD_PATH_PROG([LATEX2HTML], [latex2html], [${am_missing2_run}latex2html], [$tmp_PATH], [dnl
 	if test :$enable_papers_html != :no ; then
 	    disable_papers_html=yes
 	    _BLD_INSTALL_WARN([LATEX2HTML], [
@@ -336,7 +336,7 @@ AC_DEFUN([_PAPERS_SETUP], [dnl
 *** 'configure'.
 *** ])
 	fi])
-    _BLD_PATH_PROG([CONVERT], [convert], [${am_missing2_run}convert], [$tmp_path], [dnl
+    _BLD_PATH_PROG([CONVERT], [convert], [${am_missing2_run}convert], [$tmp_PATH], [dnl
 	if test :$enable_papers != :no ; then
 	    disable_papers=yes
 	    _BLD_INSTALL_WARN([CONVERT], [
@@ -365,12 +365,12 @@ AC_DEFUN([_PAPERS_SETUP], [dnl
 *** 'configure'.
 *** ])
 	fi])
-    _BLD_PATH_PROG([PS2EPSI], [ps2epsi], [${am_missing2_run}ps2epsi], [$tmp_path], [dnl
+    _BLD_PATH_PROG([PS2EPSI], [ps2epsi], [${am_missing2_run}ps2epsi], [$tmp_PATH], [dnl
 	if test :$enable_papers_print != :no ; then
 	    # disable_papers_print=yes
 	    : # ok for now as we fall back to convert
 	fi])
-    _BLD_PATH_PROG([EPSTOPDF], [epstopdf], [${am_missing2_run}epstopdf], [$tmp_path], [dnl
+    _BLD_PATH_PROG([EPSTOPDF], [epstopdf], [${am_missing2_run}epstopdf], [$tmp_PATH], [dnl
 	if test :$enable_papers_print != :no ; then
 	    # disable_papers_print=yes
 	    : # ok for now as we fall back to convert
@@ -379,7 +379,7 @@ dnl
 dnl We use DVI2PS instead of DVIPS here because automake already defines the
 dnl DVIPS make variable and complains if we try to redefine it.
 dnl
-    _BLD_PATH_PROG([DVI2PS], [dvips], [${am_missing2_run}dvips], [$tmp_path], [dnl
+    _BLD_PATH_PROG([DVI2PS], [dvips], [${am_missing2_run}dvips], [$tmp_PATH], [dnl
 	if test :$enable_papers_print != :no ; then
 	    disable_papers_print=yes
 	    _BLD_INSTALL_WARN([DVI2PS], [

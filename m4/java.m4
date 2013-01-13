@@ -109,14 +109,14 @@ AC_DEFUN([_JAVA_SETUP], [dnl
 # -----------------------------------------------------------------------------
 AC_DEFUN([_JAVA_SETUP_JAR], [dnl
     AC_REQUIRE([_OPENSS7_MISSING4])dnl
-    tmp_path="${PATH:+$PATH:}/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/X11R6/bin";
+    tmp_PATH="${PATH:+$PATH:}/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/X11R6/bin";
     AC_ARG_VAR([JAR],
 	[Java archive command. @<:@default=fastjar,jar@:>@])
 dnl
 dnl On older systems with both gcj and gcj3 use jar3 over jar.
 dnl fastjar is a later incarnation.
 dnl
-    _BLD_PATH_PROGS([JAR], [gjar fastjar jar3 jar], [${am_missing4_run}jar], [$tmp_path], [dnl
+    _BLD_PATH_PROGS([JAR], [gjar fastjar jar3 jar], [${am_missing4_run}jar], [$tmp_PATH], [dnl
 	_BLD_INSTALL_WARN([JAR], [
 ***
 *** Configure cannot find a suitable 'jar' program.  Generating Java
@@ -139,7 +139,7 @@ dnl
 *** ])])
     AC_ARG_VAR([ZIP],
 	[Zip archive command. @<:@default=zip@:>@])
-    _BLD_PATH_PROG([ZIP], [zip], [${am_missing4_run}zip], [$tmp_path], [dnl
+    _BLD_PATH_PROG([ZIP], [zip], [${am_missing4_run}zip], [$tmp_PATH], [dnl
 	_BLD_INSTALL_WARN([ZIP], [
 ***
 *** Configure cannot find a suitable 'zip' program.  Try:
@@ -160,7 +160,7 @@ dnl Note that SLES 11.1 fails to provide proper symbolic links from gjarsigner
 dnl to gjarsigner-4.3 as well as from gkeytool to gkeytool-4.3.  This is the
 dnl reason for explicitly placing gjarsigner-4.3 and gkeytool-4.3 in the lists.
 dnl
-    _BLD_PATH_PROGS([JARSIGNER], [gjarsigner jarsigner gjarsigner-4.3], [${am_missing4_run}jarsigner], [$tmp_path], [dnl
+    _BLD_PATH_PROGS([JARSIGNER], [gjarsigner jarsigner gjarsigner-4.3], [${am_missing4_run}jarsigner], [$tmp_PATH], [dnl
 	_BLD_INSTALL_WARN([JARSIGNER], [
 *** 
 *** Configure cannot find a suitable 'jarsigner' program.  Try:
@@ -172,7 +172,7 @@ dnl
 *** the appropriate program with the JARSIGNER environment variable to
 *** 'configure'.
 *** ])])
-    _BLD_PATH_PROGS([KEYTOOL], [gkeytool keytool gkeytool-4.3], [${am_missing4_run}keytool], [$tmp_path], [dnl
+    _BLD_PATH_PROGS([KEYTOOL], [gkeytool keytool gkeytool-4.3], [${am_missing4_run}keytool], [$tmp_PATH], [dnl
 	_BLD_INSTALL_WARN([KEYTOOL], [
 *** 
 *** Configure cannot find a suitable 'keytool' program.  Try:

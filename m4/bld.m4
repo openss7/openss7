@@ -137,128 +137,128 @@ AC_DEFUN([_BLD_PROG_CHECK],
 	[AS_FUNCTION_DESCRIBE([bld_prog_check],
 	    [COMMAND],
 	    [COMMAND - Variable containing the command to check.])], [dnl
-    tmp_cn="[$]1"
-    eval "tmp_result=\"\${$tmp_cn}\""
-    case "$tmp_result" in
+    _bld_tmp_cn="[$]1"
+    eval "_bld_tmp_result=\"\${$_bld_tmp_cn}\""
+    case "$_bld_tmp_result" in
 	([[\\/]]* | ?:[[\\/]]*)
-	    eval "tmp_cmd=\"\${$tmp_cn}\""
+	    eval "_bld_tmp_cmd=\"\${$_bld_tmp_cn}\""
 	    ;;
 	(*)
 	    # the command is expected just to be in the configure path
-	    eval "tmp_cmd=\"\`which \${$tmp_cn} 2>/dev/null\`\""
+	    eval "_bld_tmp_cmd=\"\`which \${$_bld_tmp_cn} 2>/dev/null\`\""
 	    ;;
     esac
     # check four levels of indirection for /etc/alternatives
-    test -L "$tmp_cmd" && tmp_cmd=`readlink "$tmp_cmd"`
-    test -L "$tmp_cmd" && tmp_cmd=`readlink "$tmp_cmd"`
-    test -L "$tmp_cmd" && tmp_cmd=`readlink "$tmp_cmd"`
-    test -L "$tmp_cmd" && tmp_cmd=`readlink "$tmp_cmd"`
-    tmp_result=
-    if test -n "$tmp_cmd" ; then
-	if test -z "$tmp_result" -a -x "`which rpm 2>/dev/null`" ; then
-	    tmp_result=`rpm -q --qf '[%{NAME}]\n' --whatprovides $tmp_cmd 2>/dev/null | head -1`
-	    tmp_result=`echo "$tmp_result" | sed -e 's|.* is not .*||'`
-	    tmp_result=`echo "$tmp_result" | sed -e 's|.*no package provides.*||'`
+    test -L "$_bld_tmp_cmd" && _bld_tmp_cmd=`readlink "$_bld_tmp_cmd"`
+    test -L "$_bld_tmp_cmd" && _bld_tmp_cmd=`readlink "$_bld_tmp_cmd"`
+    test -L "$_bld_tmp_cmd" && _bld_tmp_cmd=`readlink "$_bld_tmp_cmd"`
+    test -L "$_bld_tmp_cmd" && _bld_tmp_cmd=`readlink "$_bld_tmp_cmd"`
+    _bld_tmp_result=
+    if test -n "$_bld_tmp_cmd" ; then
+	if test -z "$_bld_tmp_result" -a -x "`which rpm 2>/dev/null`" ; then
+	    _bld_tmp_result=`rpm -q --qf '[%{NAME}]\n' --whatprovides $_bld_tmp_cmd 2>/dev/null | head -1`
+	    _bld_tmp_result=`echo "$_bld_tmp_result" | sed -e 's|.* is not .*||'`
+	    _bld_tmp_result=`echo "$_bld_tmp_result" | sed -e 's|.*no package provides.*||'`
 	fi
-	if test -z "$tmp_result" -a \( -x "`which dlocate 2>/dev/null`" -o -x "`which dpkg 2>/dev/null`" \) ; then
+	if test -z "$_bld_tmp_result" -a \( -x "`which dlocate 2>/dev/null`" -o -x "`which dpkg 2>/dev/null`" \) ; then
 dnl	    dlocate is much faster than dpkg and dpkg-query
 	    if which dlocate >/dev/null 2>&1
 	    then dlocate=dlocate; term='$'
 	    else dlocate=dpkg;    term=
 	    fi
-	    tmp_result=`$dlocate -S "$tmp_cmd$term" 2>/dev/null | tail -1`
-	    tmp_result=`echo "$tmp_result" | sed -e 's|.*not found.*||'`
-	    tmp_result=`echo "$tmp_result" | sed -e 's|[[^:]]*$$||;s|:.*||;s|,||g'`
+	    _bld_tmp_result=`$dlocate -S "$_bld_tmp_cmd$term" 2>/dev/null | tail -1`
+	    _bld_tmp_result=`echo "$_bld_tmp_result" | sed -e 's|.*not found.*||'`
+	    _bld_tmp_result=`echo "$_bld_tmp_result" | sed -e 's|[[^:]]*$$||;s|:.*||;s|,||g'`
 	fi
-	if test -z "$tmp_result" -a -x "`which pacman 2>/dev/null`" ; then
-	    tmp_result=`pacman -Q --owns $tmp_cmd 2>/dev/null | head -1`
-	    tmp_result=`echo "$tmp_result" | sed -e 's|.*No package owns.*||'`
-	    tmp_result=`echo "$tmp_result" | awk '{print[$]5}'`
+	if test -z "$_bld_tmp_result" -a -x "`which pacman 2>/dev/null`" ; then
+	    _bld_tmp_result=`pacman -Q --owns $_bld_tmp_cmd 2>/dev/null | head -1`
+	    _bld_tmp_result=`echo "$_bld_tmp_result" | sed -e 's|.*No package owns.*||'`
+	    _bld_tmp_result=`echo "$_bld_tmp_result" | awk '{print[$]5}'`
 	fi
-	if test -z "$tmp_result" -a -x "`which slackpkg 2>/dev/null`"; then
-	    tmp_cmd2=`echo "$tmp_cmd" | sed -e 's,^/,,'`
-	    tmp_result=`slackpkg file-search $tmp_cmd2 2>/dev/null | grep '^[[[] installed []]]' | head -1 | awk '{print[$]NF}'`
-	    test -z "$tmp_result" || tmp_result=`echo "$tmp_result" | awk 'BEGIN{FS="-";OFS="-"}{NF=NF-3;print[$]0}'`
+	if test -z "$_bld_tmp_result" -a -x "`which slackpkg 2>/dev/null`"; then
+	    _bld_tmp_cmd2=`echo "$_bld_tmp_cmd" | sed -e 's,^/,,'`
+	    _bld_tmp_result=`slackpkg file-search $_bld_tmp_cmd2 2>/dev/null | grep '^[[[] installed []]]' | head -1 | awk '{print[$]NF}'`
+	    test -z "$_bld_tmp_result" || _bld_tmp_result=`echo "$_bld_tmp_result" | awk 'BEGIN{FS="-";OFS="-"}{NF=NF-3;print[$]0}'`
 	fi
     fi
-    if test -n "$tmp_result" ; then
-	eval "bld_cv_pkg_name_${tmp_cn}=\"\$tmp_result\""
+    if test -n "$_bld_tmp_result" ; then
+	eval "bld_cv_pkg_name_${_bld_tmp_cn}=\"\$_bld_tmp_result\""
     else
-	eval "unset bld_cv_pkg_name_${tmp_cn}"
+	eval "unset bld_cv_pkg_name_${_bld_tmp_cn}"
     fi
-    tmp_result=
-    if test -n "$tmp_cmd" ; then
-	if test -z "$tmp_result" -a -x "`which rpm 2>/dev/null`" ; then
-	    tmp_result=`rpm -q --qf '[%{VERSION}]\n' --whatprovides $tmp_cmd 2>/dev/null | head -1`
-	    tmp_result=`echo "$tmp_result" | sed -e 's|.* is not .*||'`
-	    tmp_result=`echo "$tmp_result" | sed -e 's|.*no package provides.*||'`
+    _bld_tmp_result=
+    if test -n "$_bld_tmp_cmd" ; then
+	if test -z "$_bld_tmp_result" -a -x "`which rpm 2>/dev/null`" ; then
+	    _bld_tmp_result=`rpm -q --qf '[%{VERSION}]\n' --whatprovides $_bld_tmp_cmd 2>/dev/null | head -1`
+	    _bld_tmp_result=`echo "$_bld_tmp_result" | sed -e 's|.* is not .*||'`
+	    _bld_tmp_result=`echo "$_bld_tmp_result" | sed -e 's|.*no package provides.*||'`
 	fi
-	if test -z "$tmp_result" -a \( -x "`which dlocate 2>/dev/null`" -o -x "`which dpkg 2>/dev/null`" \) ; then
+	if test -z "$_bld_tmp_result" -a \( -x "`which dlocate 2>/dev/null`" -o -x "`which dpkg 2>/dev/null`" \) ; then
 dnl	    dlocate is much faster than dpkg and dpkg-query
 	    if which dlocate >/dev/null 2>&1
 	    then dlocate=dlocate; term='$'
 	    else dlocate=dpkg;    term=
 	    fi
-	    eval "tmp_result=\"\$bld_cv_pkg_name_${tmp_cn}\""
-	    if test -n "$tmp_result" ; then
-		tmp_result=`$dlocate -s "$tmp_result" 2>/dev/null | grep '^Version:' | cut -f2 '-d '` || tmp_result=
+	    eval "_bld_tmp_result=\"\$bld_cv_pkg_name_${_bld_tmp_cn}\""
+	    if test -n "$_bld_tmp_result" ; then
+		_bld_tmp_result=`$dlocate -s "$_bld_tmp_result" 2>/dev/null | grep '^Version:' | cut -f2 '-d '` || _bld_tmp_result=
 	    fi
 	fi
-	if test -z "$tmp_result" -a -x "`which pacman 2>/dev/null`" ; then
-	    tmp_result=`pacman -Q --owns $tmp_cmd 2>/dev/null | head -1`
-	    tmp_result=`echo "$tmp_result" | sed -e 's|.*No package owns.*||'`
-	    tmp_result=`echo "$tmp_result" | awk '{print[$]6}'`
+	if test -z "$_bld_tmp_result" -a -x "`which pacman 2>/dev/null`" ; then
+	    _bld_tmp_result=`pacman -Q --owns $_bld_tmp_cmd 2>/dev/null | head -1`
+	    _bld_tmp_result=`echo "$_bld_tmp_result" | sed -e 's|.*No package owns.*||'`
+	    _bld_tmp_result=`echo "$_bld_tmp_result" | awk '{print[$]6}'`
 	fi
-	if test -z "$tmp_result" -a -x "`which slackpkg 2>/dev/null`"; then
-	    tmp_cmd2=`echo "$tmp_cmd" | sed -e 's,^/,,'`
-	    tmp_result=`slackpkg file-search $tmp_cmd2 2>/dev/null | grep '^[[[] installed []]]' | head -1 | awk '{print[$]NF}'`
-	    test -z "$tmp_result" || tmp_result=`echo "$tmp_result" | awk 'BEGIN{FS="-"}{print[$](NF-2)}'`
+	if test -z "$_bld_tmp_result" -a -x "`which slackpkg 2>/dev/null`"; then
+	    _bld_tmp_cmd2=`echo "$_bld_tmp_cmd" | sed -e 's,^/,,'`
+	    _bld_tmp_result=`slackpkg file-search $_bld_tmp_cmd2 2>/dev/null | grep '^[[[] installed []]]' | head -1 | awk '{print[$]NF}'`
+	    test -z "$_bld_tmp_result" || _bld_tmp_result=`echo "$_bld_tmp_result" | awk 'BEGIN{FS="-"}{print[$](NF-2)}'`
 	fi
     fi
-    if test -n "$tmp_result" ; then
-	eval "bld_cv_pkg_ver_${tmp_cn}=\"\$tmp_result\""
+    if test -n "$_bld_tmp_result" ; then
+	eval "bld_cv_pkg_ver_${_bld_tmp_cn}=\"\$_bld_tmp_result\""
     else
-	eval "unset bld_cv_pkg_ver_${tmp_cn}"
+	eval "unset bld_cv_pkg_ver_${_bld_tmp_cn}"
     fi
-    tmp_result=`echo "$tmp_cmd" | sed -e 's|.*/||;s| .*||'`
-    if test -n "$tmp_result" ; then
-	eval "bld_cv_pkg_prog_${tmp_cn}=\"\$tmp_result\""
+    _bld_tmp_result=`echo "$_bld_tmp_cmd" | sed -e 's|.*/||;s| .*||'`
+    if test -n "$_bld_tmp_result" ; then
+	eval "bld_cv_pkg_prog_${_bld_tmp_cn}=\"\$_bld_tmp_result\""
     else
-	eval "unset bld_cv_pkg_prog_${tmp_cn}"
+	eval "unset bld_cv_pkg_prog_${_bld_tmp_cn}"
     fi
-    eval "tmp_result=\"\$bld_cv_pkg_name_${tmp_cn}\""
-    if test -n "$tmp_result" ; then
+    eval "_bld_tmp_result=\"\$bld_cv_pkg_name_${_bld_tmp_cn}\""
+    if test -n "$_bld_tmp_result" ; then
 	case "$build_distro" in
 	    (oracle|puias|centos|lineox|whitebox|scientific|fedora|rhel)
-		eval "bld_cv_pkg_cmd_${tmp_cn}=\"yum install \$tmp_result\""
+		eval "bld_cv_pkg_cmd_${_bld_tmp_cn}=\"yum install \$_bld_tmp_result\""
 		;;
 	    (suse|sle|openSUSE)
-		eval "bld_cv_pkg_cmd_${tmp_cn}=\"zypper install \$tmp_result\""
+		eval "bld_cv_pkg_cmd_${_bld_tmp_cn}=\"zypper install \$_bld_tmp_result\""
 		;;
 	    (redhat)
-		eval "bld_cv_pkg_cmd_${tmp_cn}=\"up2date install \$tmp_result\""
+		eval "bld_cv_pkg_cmd_${_bld_tmp_cn}=\"up2date install \$_bld_tmp_result\""
 		;;
 	    (mandrake|mandriva|manbo|mageia|mes)
-		eval "bld_cv_pkg_cmd_${tmp_cn}=\"urpmi \$tmp_result\""
+		eval "bld_cv_pkg_cmd_${_bld_tmp_cn}=\"urpmi \$_bld_tmp_result\""
 		;;
 	    (debian|ubuntu|lts|mint)
-		eval "bld_cv_pkg_cmd_${tmp_cn}=\"aptitude install \$tmp_result\""
+		eval "bld_cv_pkg_cmd_${_bld_tmp_cn}=\"aptitude install \$_bld_tmp_result\""
 		;;
 	    (arch)
-		eval "bld_cv_pkg_cmd_${tmp_cn}=\"pacman --sync \$tmp_result\""
+		eval "bld_cv_pkg_cmd_${_bld_tmp_cn}=\"pacman --sync \$_bld_tmp_result\""
 		;;
 	    (salix)
-		eval "bld_cv_pkg_cmd_${tmp_cn}=\"slapt-get --install \$tmp_result\""
+		eval "bld_cv_pkg_cmd_${_bld_tmp_cn}=\"slapt-get --install \$_bld_tmp_result\""
 		;;
 	    (slackware)
-		eval "bld_cv_pkg_cmd_${tmp_cn}=\"slackpkg install \$tmp_result\""
+		eval "bld_cv_pkg_cmd_${_bld_tmp_cn}=\"slackpkg install \$_bld_tmp_result\""
 		;;
 	    (*)
-		eval "unset bld_cv_pkg_cmd_${tmp_cn}"
+		eval "unset bld_cv_pkg_cmd_${_bld_tmp_cn}"
 		;;
 	esac
     else
-	eval "unset bld_cv_pkg_cmd_${tmp_cn}"
+	eval "unset bld_cv_pkg_cmd_${_bld_tmp_cn}"
     fi])
 ])# _BLD_PROG_CHECK
 # =============================================================================
@@ -279,118 +279,118 @@ AC_DEFUN([_BLD_PATH_CHECK],
 [VARIABLE - Variable name containing the directory portion of the path.
 PATH - Optional subdirectory and filename within directory])], [dnl
     if test -n "[$]2" ; then
-	eval "tmp_path=\"\${[$]1}/[$]2\""
-	eval "tmp_pn=\"[$]2\""
+	eval "_bld_tmp_path=\"\${[$]1}/[$]2\""
+	eval "_bld_tmp_pn=\"[$]2\""
     else
-	eval "tmp_path=\"\${[$]1}\""
-	eval "tmp_pn=\"\${[$]1}\""
+	eval "_bld_tmp_path=\"\${[$]1}\""
+	eval "_bld_tmp_pn=\"\${[$]1}\""
     fi
-    tmp_pn=`echo "$tmp_pn" | sed -e 'y/abcdefghijklmnopqrstuvwxyz/ABCDEFGHIJKLMNOPQRSTUVWXYZ/'`
-    tmp_pn=`echo "$tmp_pn" | sed -e 's,[[^A-Z0-9_]],_,g'`
-    tmp_result=
-    if test -n "$tmp_path"; then
-	if test -z "$tmp_result" -a -x "`which rpm 2>/dev/null`" ; then
-	    tmp_result=`rpm -q --qf '[%{NAME}]\n' --whatprovides $tmp_path 2>/dev/null | head -1`
-	    tmp_result=`echo "$tmp_result" | sed -e 's|.* is not .*||'`
-	    tmp_result=`echo "$tmp_result" | sed -e 's|.*no package provides.*||'`
+    _bld_tmp_pn=`echo "$_bld_tmp_pn" | sed -e 'y/abcdefghijklmnopqrstuvwxyz/ABCDEFGHIJKLMNOPQRSTUVWXYZ/'`
+    _bld_tmp_pn=`echo "$_bld_tmp_pn" | sed -e 's,[[^A-Z0-9_]],_,g'`
+    _bld_tmp_result=
+    if test -n "$_bld_tmp_path"; then
+	if test -z "$_bld_tmp_result" -a -x "`which rpm 2>/dev/null`" ; then
+	    _bld_tmp_result=`rpm -q --qf '[%{NAME}]\n' --whatprovides $_bld_tmp_path 2>/dev/null | head -1`
+	    _bld_tmp_result=`echo "$_bld_tmp_result" | sed -e 's|.* is not .*||'`
+	    _bld_tmp_result=`echo "$_bld_tmp_result" | sed -e 's|.*no package provides.*||'`
 	fi
-	if test -z "$tmp_result" -a \( -x "`which dlocate 2>/dev/null`" -o -x "`which dpkg 2>/dev/null`" \) ; then
+	if test -z "$_bld_tmp_result" -a \( -x "`which dlocate 2>/dev/null`" -o -x "`which dpkg 2>/dev/null`" \) ; then
 	    if which dlocate >/dev/null 2>&1
 	    then dlocate=dlocate; term='$'
 	    else dlocate=dpkg;    term=
 	    fi
-	    tmp_result=`$dlocate -S "$tmp_path$term" 2>/dev/null | tail -1`
-	    tmp_result=`echo "$tmp_result" | sed -e 's|.*not found.*||'`
-	    tmp_result=`echo "$tmp_result" | sed -e 's|[[^:]]*$$||;s|:.*||;s|,||g'`
+	    _bld_tmp_result=`$dlocate -S "$_bld_tmp_path$term" 2>/dev/null | tail -1`
+	    _bld_tmp_result=`echo "$_bld_tmp_result" | sed -e 's|.*not found.*||'`
+	    _bld_tmp_result=`echo "$_bld_tmp_result" | sed -e 's|[[^:]]*$$||;s|:.*||;s|,||g'`
 	fi
-	if test -z "$tmp_result" -a -x "`which pacman 2>/dev/null`" ; then
-	    tmp_result=`pacman -Q --owns $tmp_path 2>/dev/null | head -1`
-	    tmp_result=`echo "$tmp_result" | sed -e 's|.*No package owns.*||'`
-	    tmp_result=`echo "$tmp_result" | awk '{print[$]5}'`
+	if test -z "$_bld_tmp_result" -a -x "`which pacman 2>/dev/null`" ; then
+	    _bld_tmp_result=`pacman -Q --owns $_bld_tmp_path 2>/dev/null | head -1`
+	    _bld_tmp_result=`echo "$_bld_tmp_result" | sed -e 's|.*No package owns.*||'`
+	    _bld_tmp_result=`echo "$_bld_tmp_result" | awk '{print[$]5}'`
 	fi
-	if test -z "$tmp_result" -a -x "`which slackpkg 2>/dev/null`"; then
-	    tmp_path2=`echo "$tmp_path" | sed -e 's,^/,,'`
-	    tmp_result=`slackpkg file-search $tmp_path2 2>/dev/null | grep '^[[[] installed []]]' | head -1 | awk '{print[$]NF}'`
-	    test -z "$tmp_result" || tmp_result=`echo "$tmp_result" | awk 'BEGIN{FS="-";OFS="-"}{NF=NF-3;print[$]0}'`
+	if test -z "$_bld_tmp_result" -a -x "`which slackpkg 2>/dev/null`"; then
+	    _bld_tmp_path2=`echo "$_bld_tmp_path" | sed -e 's,^/,,'`
+	    _bld_tmp_result=`slackpkg file-search $_bld_tmp_path2 2>/dev/null | grep '^[[[] installed []]]' | head -1 | awk '{print[$]NF}'`
+	    test -z "$_bld_tmp_result" || _bld_tmp_result=`echo "$_bld_tmp_result" | awk 'BEGIN{FS="-";OFS="-"}{NF=NF-3;print[$]0}'`
 	fi
     fi
-    if test -n "$tmp_result" ; then
-	eval "bld_cv_pkg_name_${tmp_pn}=\"$tmp_result\""
+    if test -n "$_bld_tmp_result" ; then
+	eval "bld_cv_pkg_name_${_bld_tmp_pn}=\"$_bld_tmp_result\""
     else
-	eval "unset bld_cv_pkg_name_${tmp_pn}"
+	eval "unset bld_cv_pkg_name_${_bld_tmp_pn}"
     fi
-    tmp_result=
-    if test -n "$tmp_path" ; then
-	if test -z "$tmp_result" -a -x "`which rpm 2>/dev/null`" ; then
-	    tmp_result=`rpm -q --qf '[%{VERSION}]\n' --whatprovides $tmp_path 2>/dev/null | head -1`
-	    tmp_result=`echo "$tmp_result" | sed -e 's|.* is not .*||'`
-	    tmp_result=`echo "$tmp_result" | sed -e 's|.*no package provides.*||'`
+    _bld_tmp_result=
+    if test -n "$_bld_tmp_path" ; then
+	if test -z "$_bld_tmp_result" -a -x "`which rpm 2>/dev/null`" ; then
+	    _bld_tmp_result=`rpm -q --qf '[%{VERSION}]\n' --whatprovides $_bld_tmp_path 2>/dev/null | head -1`
+	    _bld_tmp_result=`echo "$_bld_tmp_result" | sed -e 's|.* is not .*||'`
+	    _bld_tmp_result=`echo "$_bld_tmp_result" | sed -e 's|.*no package provides.*||'`
 	fi
-	if test -z "$tmp_result" -a \( -x "`which dlocate 2>/dev/null`" -o -x "`which dpkg 2>/dev/null`" \) ; then
+	if test -z "$_bld_tmp_result" -a \( -x "`which dlocate 2>/dev/null`" -o -x "`which dpkg 2>/dev/null`" \) ; then
 	    if which dlocate >/dev/null 2>&1
 	    then dlocate=dlocate; term='$'
 	    else dlocate=dpkg;    term=
 	    fi
-	    eval "tmp_result=\"\$bld_cv_pkg_name_${tmp_pn}\""
-	    if test -n "$tmp_result" ; then
-		tmp_result=`$dlocate -s "$tmp_result" 2>/dev/null | grep '^Version:' | cut -f2 '-d '` || tmp_result=
+	    eval "_bld_tmp_result=\"\$bld_cv_pkg_name_${_bld_tmp_pn}\""
+	    if test -n "$_bld_tmp_result" ; then
+		_bld_tmp_result=`$dlocate -s "$_bld_tmp_result" 2>/dev/null | grep '^Version:' | cut -f2 '-d '` || _bld_tmp_result=
 	    fi
 	fi
-	if test -z "$tmp_result" -a -x "`which pacman 2>/dev/null`" ; then
-	    tmp_result=`pacman -Q --owns $tmp_path 2>/dev/null | head -1`
-	    tmp_result=`echo "$tmp_result" | sed -e 's|.*No package owns.*||'`
-	    tmp_result=`echo "$tmp_result" | awk '{print[$]6}'`
+	if test -z "$_bld_tmp_result" -a -x "`which pacman 2>/dev/null`" ; then
+	    _bld_tmp_result=`pacman -Q --owns $_bld_tmp_path 2>/dev/null | head -1`
+	    _bld_tmp_result=`echo "$_bld_tmp_result" | sed -e 's|.*No package owns.*||'`
+	    _bld_tmp_result=`echo "$_bld_tmp_result" | awk '{print[$]6}'`
 	fi
-	if test -z "$tmp_result" -a -x "`which slackpkg 2>/dev/null`"; then
-	    tmp_path2=`echo "$tmp_path" | sed -e 's,^/,,'`
-	    tmp_result=`slackpkg file-search $tmp_path2 2>/dev/null | grep '^[[[] installed []]]' | head -1 | awk '{print[$]NF}'`
-	    test -z "$tmp_result" || tmp_result=`echo "$tmp_result" | awk 'BEGIN{FS="-"}{print[$](NF-2)}'`
+	if test -z "$_bld_tmp_result" -a -x "`which slackpkg 2>/dev/null`"; then
+	    _bld_tmp_path2=`echo "$_bld_tmp_path" | sed -e 's,^/,,'`
+	    _bld_tmp_result=`slackpkg file-search $_bld_tmp_path2 2>/dev/null | grep '^[[[] installed []]]' | head -1 | awk '{print[$]NF}'`
+	    test -z "$_bld_tmp_result" || _bld_tmp_result=`echo "$_bld_tmp_result" | awk 'BEGIN{FS="-"}{print[$](NF-2)}'`
 	fi
     fi
-    if test -n "$tmp_result" ; then
-	eval "bld_cv_pkg_ver_${tmp_pn}=\"\$tmp_result\""
+    if test -n "$_bld_tmp_result" ; then
+	eval "bld_cv_pkg_ver_${_bld_tmp_pn}=\"\$_bld_tmp_result\""
     else
-	eval "unset bld_cv_pkg_ver_${tmp_pn}"
+	eval "unset bld_cv_pkg_ver_${_bld_tmp_pn}"
     fi
-    tmp_result="$tmp_path"
-    if test -n "$tmp_result" ; then
-	eval "bld_cv_pkg_path_${tmp_pn}=\"\$tmp_result\""
+    _bld_tmp_result="$_bld_tmp_path"
+    if test -n "$_bld_tmp_result" ; then
+	eval "bld_cv_pkg_path_${_bld_tmp_pn}=\"\$_bld_tmp_result\""
     else
-	eval "unset bld_cv_pkg_path_${tmp_pn}"
+	eval "unset bld_cv_pkg_path_${_bld_tmp_pn}"
     fi
-    eval "tmp_result=\"\$bld_cv_pkg_name_${tmp_pn}\""
-    if test -n "$tmp_result" ; then
+    eval "_bld_tmp_result=\"\$bld_cv_pkg_name_${_bld_tmp_pn}\""
+    if test -n "$_bld_tmp_result" ; then
 	case "$build_distro" in
 	    (oracle|puias|centos|lineox|whitebox|scientific|fedora|rhel)
-		eval "bld_cv_pkg_cmd_${tmp_pn}=\"yum install \$tmp_result\""
+		eval "bld_cv_pkg_cmd_${_bld_tmp_pn}=\"yum install \$_bld_tmp_result\""
 		;;
 	    (suse|sle|openSUSE)
-		eval "bld_cv_pkg_cmd_${tmp_pn}=\"zypper install \$tmp_result\""
+		eval "bld_cv_pkg_cmd_${_bld_tmp_pn}=\"zypper install \$_bld_tmp_result\""
 		;;
 	    (redhat)
-		eval "bld_cv_pkg_cmd_${tmp_pn}=\"up2date install \$tmp_result\""
+		eval "bld_cv_pkg_cmd_${_bld_tmp_pn}=\"up2date install \$_bld_tmp_result\""
 		;;
 	    (mandrake|mandriva|manbo|mageia|mes)
-		eval "bld_cv_pkg_cmd_${tmp_pn}=\"urpmi \$tmp_result\""
+		eval "bld_cv_pkg_cmd_${_bld_tmp_pn}=\"urpmi \$_bld_tmp_result\""
 		;;
 	    (debian|ubuntu|lts|mint)
-		eval "bld_cv_pkg_cmd_${tmp_pn}=\"aptitude install \$tmp_result\""
+		eval "bld_cv_pkg_cmd_${_bld_tmp_pn}=\"aptitude install \$_bld_tmp_result\""
 		;;
 	    (arch)
-		eval "bld_cv_pkg_cmd_${tmp_cn}=\"pacman --sync \$tmp_result\""
+		eval "bld_cv_pkg_cmd_${_bld_tmp_cn}=\"pacman --sync \$_bld_tmp_result\""
 		;;
 	    (salix)
-		eval "bld_cv_pkg_cmd_${tmp_cn}=\"slapt-get --install \$tmp_result\""
+		eval "bld_cv_pkg_cmd_${_bld_tmp_cn}=\"slapt-get --install \$_bld_tmp_result\""
 		;;
 	    (slackware)
-		eval "bld_cv_pkg_cmd_${tmp_cn}=\"slackpkg install \$tmp_result\""
+		eval "bld_cv_pkg_cmd_${_bld_tmp_cn}=\"slackpkg install \$_bld_tmp_result\""
 		;;
 	    (*)
-		eval "unset bld_cv_pkg_cmd_${tmp_pn}"
+		eval "unset bld_cv_pkg_cmd_${_bld_tmp_pn}"
 		;;
 	esac
     else
-	eval "unset bld_cv_pkg_cmd_${tmp_pn}"
+	eval "unset bld_cv_pkg_cmd_${_bld_tmp_pn}"
     fi])dnl
 ])# _BLD_PATH_CHECK
 # =============================================================================
@@ -410,103 +410,103 @@ AC_DEFUN([_BLD_FILE_CHECK],
 	[AS_FUNCTION_DESCRIBE([bld_file_check],
 	    [FILENAME],
 	    [FILENAME - Variable containing the file to check.])], [dnl
-    eval "tmp_file=\"\${[$]1}\""
-    tmp_fn=`basename $tmp_file`
-    tmp_fn=`echo "$tmp_fn" | sed -e 'y/abcdefghijklmnopqrstuvwxyz/ABCDEFGHIJKLMNOPQRSTUVWXYZ/'`
-    tmp_fn=`echo "$tmp_fn" | sed -e 's,[[^A-Z0-9_]],_,g'`
+    eval "_bld_tmp_file=\"\${[$]1}\""
+    _bld_tmp_fn=`basename $_bld_tmp_file`
+    _bld_tmp_fn=`echo "$_bld_tmp_fn" | sed -e 'y/abcdefghijklmnopqrstuvwxyz/ABCDEFGHIJKLMNOPQRSTUVWXYZ/'`
+    _bld_tmp_fn=`echo "$_bld_tmp_fn" | sed -e 's,[[^A-Z0-9_]],_,g'`
     # check four levels of indirection for /etc/alternatives
-    test -L "$tmp_file" && tmp_file=`readlink "$tmp_file"`
-    test -L "$tmp_file" && tmp_file=`readlink "$tmp_file"`
-    test -L "$tmp_file" && tmp_file=`readlink "$tmp_file"`
-    test -L "$tmp_file" && tmp_file=`readlink "$tmp_file"`
-    tmp_result=
-    if test -n "$tmp_file"; then
-	if test -z "$tmp_result" -a -x "`which rpm 2>/dev/null`" ; then
-	    tmp_result=`rpm -q --qf '[%{NAME}]\n' --whatprovides $tmp_file 2>/dev/null | head -1`
-	    tmp_result=`echo "$tmp_result" | sed -e 's|.* is not .*||'`
-	    tmp_result=`echo "$tmp_result" | sed -e 's|.*no package provides.*||'`
+    test -L "$_bld_tmp_file" && _bld_tmp_file=`readlink "$_bld_tmp_file"`
+    test -L "$_bld_tmp_file" && _bld_tmp_file=`readlink "$_bld_tmp_file"`
+    test -L "$_bld_tmp_file" && _bld_tmp_file=`readlink "$_bld_tmp_file"`
+    test -L "$_bld_tmp_file" && _bld_tmp_file=`readlink "$_bld_tmp_file"`
+    _bld_tmp_result=
+    if test -n "$_bld_tmp_file"; then
+	if test -z "$_bld_tmp_result" -a -x "`which rpm 2>/dev/null`" ; then
+	    _bld_tmp_result=`rpm -q --qf '[%{NAME}]\n' --whatprovides $_bld_tmp_file 2>/dev/null | head -1`
+	    _bld_tmp_result=`echo "$_bld_tmp_result" | sed -e 's|.* is not .*||'`
+	    _bld_tmp_result=`echo "$_bld_tmp_result" | sed -e 's|.*no package provides.*||'`
 	fi
-	if test -z "$tmp_result" -a \( -x "`which dlocate 2>/dev/null`" -o -x "`which dpkg 2>/dev/null`" \) ; then
+	if test -z "$_bld_tmp_result" -a \( -x "`which dlocate 2>/dev/null`" -o -x "`which dpkg 2>/dev/null`" \) ; then
 	    if which dlocate >/dev/null 2>&1
 	    then dlocate=dlocate; term='$'
 	    else dlocate=dpkg;    term=
 	    fi
-	    tmp_result=`$dlocate -S "$tmp_file$term" 2>/dev/null | tail -1`
-	    tmp_result=`echo "$tmp_result" | sed -e 's|.*not found.*||'`
-	    tmp_result=`echo "$tmp_result" | sed -e 's|[[^:]]*$$||;s|:.*||;s|,||g'`
+	    _bld_tmp_result=`$dlocate -S "$_bld_tmp_file$term" 2>/dev/null | tail -1`
+	    _bld_tmp_result=`echo "$_bld_tmp_result" | sed -e 's|.*not found.*||'`
+	    _bld_tmp_result=`echo "$_bld_tmp_result" | sed -e 's|[[^:]]*$$||;s|:.*||;s|,||g'`
 	fi
-	if test -z "$tmp_result" -a -x "`which pacman 2>/dev/null`" ; then
-	    tmp_result=`pacman -Q --owns $tmp_file 2>/dev/null | head -1`
-	    tmp_result=`echo "$tmp_result" | sed -e 's|.*No package owns.*||'`
-	    tmp_result=`echo "$tmp_result" | awk '{print[$]5}'`
+	if test -z "$_bld_tmp_result" -a -x "`which pacman 2>/dev/null`" ; then
+	    _bld_tmp_result=`pacman -Q --owns $_bld_tmp_file 2>/dev/null | head -1`
+	    _bld_tmp_result=`echo "$_bld_tmp_result" | sed -e 's|.*No package owns.*||'`
+	    _bld_tmp_result=`echo "$_bld_tmp_result" | awk '{print[$]5}'`
 	fi
     fi
-    if test -n "$tmp_result" ; then
-	eval "bld_cv_pkg_name_${tmp_fn}=\"$tmp_result\""
+    if test -n "$_bld_tmp_result" ; then
+	eval "bld_cv_pkg_name_${_bld_tmp_fn}=\"$_bld_tmp_result\""
     else
-	eval "unset bld_cv_pkg_name_${tmp_fn}"
+	eval "unset bld_cv_pkg_name_${_bld_tmp_fn}"
     fi
-    tmp_result=
-    if test -n "$tmp_file" ; then
-	if test -z "$tmp_result" -a -x "`which rpm 2>/dev/null`" ; then
-	    tmp_result=`rpm -q --qf '[%{VERSION}]\n' --whatprovides $tmp_file 2>/dev/null | head -1`
-	    tmp_result=`echo "$tmp_result" | sed -e 's|.* is not .*||'`
-	    tmp_result=`echo "$tmp_result" | sed -e 's|.*no package provides.*||'`
+    _bld_tmp_result=
+    if test -n "$_bld_tmp_file" ; then
+	if test -z "$_bld_tmp_result" -a -x "`which rpm 2>/dev/null`" ; then
+	    _bld_tmp_result=`rpm -q --qf '[%{VERSION}]\n' --whatprovides $_bld_tmp_file 2>/dev/null | head -1`
+	    _bld_tmp_result=`echo "$_bld_tmp_result" | sed -e 's|.* is not .*||'`
+	    _bld_tmp_result=`echo "$_bld_tmp_result" | sed -e 's|.*no package provides.*||'`
 	fi
-	if test -z "$tmp_result" -a \( -x "`which dlocate 2>/dev/null`" -o -x "`which dpkg 2>/dev/null`" \) ; then
+	if test -z "$_bld_tmp_result" -a \( -x "`which dlocate 2>/dev/null`" -o -x "`which dpkg 2>/dev/null`" \) ; then
 	    if which dlocate >/dev/null 2>&1
 	    then dlocate=dlocate; term='$'
 	    else dlocate=dpkg;    term=
 	    fi
-	    eval "tmp_result=\"\$bld_cv_pkg_name_${tmp_fn}\""
-	    if test -n "$tmp_result" ; then
-		tmp_result=`$dlocate -s "$tmp_result" 2>/dev/null | grep '^Version:' | cut -f2 '-d '` || tmp_result=
+	    eval "_bld_tmp_result=\"\$bld_cv_pkg_name_${_bld_tmp_fn}\""
+	    if test -n "$_bld_tmp_result" ; then
+		_bld_tmp_result=`$dlocate -s "$_bld_tmp_result" 2>/dev/null | grep '^Version:' | cut -f2 '-d '` || _bld_tmp_result=
 	    fi
 	fi
-	if test -z "$tmp_result" -a -x "`which pacman 2>/dev/null`" ; then
-	    tmp_result=`pacman -Q --owns $tmp_file 2>/dev/null | head -1`
-	    tmp_result=`echo "$tmp_result" | sed -e 's|.*No package owns.*||'`
-	    tmp_result=`echo "$tmp_result" | awk '{print[$]6}'`
+	if test -z "$_bld_tmp_result" -a -x "`which pacman 2>/dev/null`" ; then
+	    _bld_tmp_result=`pacman -Q --owns $_bld_tmp_file 2>/dev/null | head -1`
+	    _bld_tmp_result=`echo "$_bld_tmp_result" | sed -e 's|.*No package owns.*||'`
+	    _bld_tmp_result=`echo "$_bld_tmp_result" | awk '{print[$]6}'`
 	fi
     fi
-    if test -n "$tmp_result" ; then
-	eval "bld_cv_pkg_ver_${tmp_fn}=\"\$tmp_result\""
+    if test -n "$_bld_tmp_result" ; then
+	eval "bld_cv_pkg_ver_${_bld_tmp_fn}=\"\$_bld_tmp_result\""
     else
-	eval "unset bld_cv_pkg_ver_${tmp_fn}"
+	eval "unset bld_cv_pkg_ver_${_bld_tmp_fn}"
     fi
-    tmp_result="$tmp_file"
-    if test -n "$tmp_result" ; then
-	eval "bld_cv_pkg_path_${tmp_fn}=\"\$tmp_result\""
+    _bld_tmp_result="$_bld_tmp_file"
+    if test -n "$_bld_tmp_result" ; then
+	eval "bld_cv_pkg_path_${_bld_tmp_fn}=\"\$_bld_tmp_result\""
     else
-	eval "unset bld_cv_pkg_path_${tmp_fn}"
+	eval "unset bld_cv_pkg_path_${_bld_tmp_fn}"
     fi
-    eval "tmp_result=\"\$bld_cv_pkg_name_${tmp_fn}\""
-    if test -n "$tmp_result" ; then
+    eval "_bld_tmp_result=\"\$bld_cv_pkg_name_${_bld_tmp_fn}\""
+    if test -n "$_bld_tmp_result" ; then
 	case "$build_distro" in
 	    (oracle|puias|centos|lineox|whitebox|scientific|fedora|rhel)
-		eval "bld_cv_pkg_cmd_${tmp_fn}=\"yum install \$tmp_result\""
+		eval "bld_cv_pkg_cmd_${_bld_tmp_fn}=\"yum install \$_bld_tmp_result\""
 		;;
 	    (suse|sle|openSUSE)
-		eval "bld_cv_pkg_cmd_${tmp_fn}=\"zypper install \$tmp_result\""
+		eval "bld_cv_pkg_cmd_${_bld_tmp_fn}=\"zypper install \$_bld_tmp_result\""
 		;;
 	    (redhat)
-		eval "bld_cv_pkg_cmd_${tmp_fn}=\"up2date install \$tmp_result\""
+		eval "bld_cv_pkg_cmd_${_bld_tmp_fn}=\"up2date install \$_bld_tmp_result\""
 		;;
 	    (mandrake|mandriva|manbo|mageia|mes)
-		eval "bld_cv_pkg_cmd_${tmp_fn}=\"urpmi \$tmp_result\""
+		eval "bld_cv_pkg_cmd_${_bld_tmp_fn}=\"urpmi \$_bld_tmp_result\""
 		;;
 	    (debian|ubuntu|lts|mint)
-		eval "bld_cv_pkg_cmd_${tmp_fn}=\"aptitude install \$tmp_result\""
+		eval "bld_cv_pkg_cmd_${_bld_tmp_fn}=\"aptitude install \$_bld_tmp_result\""
 		;;
 	    (arch)
-		eval "bld_cv_pkg_cmd_${tmp_cn}=\"pacman --sync \$tmp_result\""
+		eval "bld_cv_pkg_cmd_${_bld_tmp_cn}=\"pacman --sync \$_bld_tmp_result\""
 		;;
 	    (*)
-		eval "unset bld_cv_pkg_cmd_${tmp_fn}"
+		eval "unset bld_cv_pkg_cmd_${_bld_tmp_fn}"
 		;;
 	esac
     else
-	eval "unset bld_cv_pkg_cmd_${tmp_fn}"
+	eval "unset bld_cv_pkg_cmd_${_bld_tmp_fn}"
     fi])dnl
 ])# _BLD_FILE_CHECK
 # =============================================================================
@@ -523,10 +523,9 @@ AC_DEFUN([_BLD_FILE_CHECK],
 AC_DEFUN([_BLD_VAR_PATH_PROG], [dnl
     AC_REQUIRE([_BLD_PROG_CHECK])dnl
     AC_ARG_VAR([$1], [$4])dnl
-    AC_PATH_PROG([$1], [$2], [], [$3])
+    AC_PATH_PROGS([$1], [$2], [], [$3])
     if test :"${$1:-no}" = :no ; then
-	:
-	$5
+	m4_if([$5], [], [:], [$5])
     else
 	bld_prog_check "$1"
     fi
@@ -545,7 +544,7 @@ AC_DEFUN([_BLD_PATH_PROG], [dnl
     AC_PATH_PROG([$1], [$2], [], [$4])
     if test :"${$1:-no}" = :no ; then
 	$1="$3"
-	m4_if([$5], [], [AC_MSG_WARN([Cannot find $2 in PATH.])], [$5])
+	m4_if([$5], [], [:], [$5])
     else
 	bld_prog_check "$1"
 	m4_if([$6], [], [:], [$6])
@@ -565,7 +564,7 @@ AC_DEFUN([_BLD_PATH_PROGS], [dnl
     AC_PATH_PROGS([$1], [$2], [], [$4])
     if test :"${$1:-no}" = :no ; then
 	$1="$3"
-	m4_if([$5], [], [AC_MSG_WARN([Cannot find '$2' program in PATH.])], [$5])
+	m4_if([$5], [], [:], [$5])
     else
 	bld_prog_check "$1"
 	m4_if([$6], [], [:], [$6])
@@ -584,16 +583,16 @@ AC_DEFUN([_BLD_PATH_PROGS], [dnl
 # MESSAGE-LEAD, the GENERIC-INSTALL-MESSAGE and the MESSAGE-TAIL.
 # -----------------------------------------------------------------------------
 AC_DEFUN([_BLD_INSTALL_WARN], [dnl
-    tmp_var="bld_cv_pkg_cmd_$1"
-    eval "tmp_val=\"\$$tmp_var\""
-    if test -n "$tmp_val" ; then
-	tmp_msg="
-*** $build_distro: $tmp_val"
+    _bld_tmp_var="bld_cv_pkg_cmd_$1"
+    eval "_bld_tmp_val=\"\$$_bld_tmp_var\""
+    if test -n "$_bld_tmp_val" ; then
+	_bld_tmp_msg="
+*** $build_distro: $_bld_tmp_val"
     else
-	tmp_msg="$3"
+	_bld_tmp_msg="$3"
     fi
-    tmp_msg="$2$tmp_msg$4"
-    AC_MSG_WARN([$tmp_msg])
+    _bld_tmp_msg="$2$_bld_tmp_msg$4"
+    AC_MSG_WARN([$_bld_tmp_msg])
 ])# _BLD_INSTALL_WARN
 # =============================================================================
 
@@ -608,16 +607,16 @@ AC_DEFUN([_BLD_INSTALL_WARN], [dnl
 # MESSAGE-LEAD, the GENERIC-INSTALL-MESSAGE and the MESSAGE-TAIL.
 # -----------------------------------------------------------------------------
 AC_DEFUN([_BLD_INSTALL_ERROR], [dnl
-    tmp_var="bld_cv_pkg_cmd_$1"
-    eval "tmp_val=\"\$$tmp_var\""
-    if test -n "$tmp_val" ; then
-	tmp_msg="
-*** $build_distro: $tmp_val"
+    _bld_tmp_var="bld_cv_pkg_cmd_$1"
+    eval "_bld_tmp_val=\"\$$_bld_tmp_var\""
+    if test -n "$_bld_tmp_val" ; then
+	_bld_tmp_msg="
+*** $build_distro: $_bld_tmp_val"
     else
-	tmp_msg="$3"
+	_bld_tmp_msg="$3"
     fi
-    tmp_msg="$2$tmp_msg$4"
-    AC_MSG_ERROR([$tmp_msg])
+    _bld_tmp_msg="$2$_bld_tmp_msg$4"
+    AC_MSG_ERROR([$_bld_tmp_msg])
 ])# _BLD_INSTALL_ERROR
 # =============================================================================
 
@@ -682,7 +681,7 @@ AC_DEFUN([_BLD_FIND_DIR], [dnl
 	    done
 	    if test -z "${$2}" ; then
 		$2="$5"
-		m4_if([$6], [], [AC_MSG_WARN([Cannot find $1.])], [$6])
+		m4_if([$6], [], [:], [$6])
 		eval "[$2]_eval=\"${$2}\""
 	    else
 		eval "[$2]_eval=\"${$2}\""
@@ -736,7 +735,7 @@ AC_DEFUN([_BLD_FIND_FILE], [dnl
 	    done
 	    if test -z "${$2}" ; then
 		$2="$4"
-		m4_if([$5], [], [AC_MSG_WARN([Cannot find $1.])], [$5])
+		m4_if([$5], [], [:], [$5])
 		eval "[$2]_eval=\"${$2}\""
 	    else
 		eval "[$2]_eval=\"${$2}\""

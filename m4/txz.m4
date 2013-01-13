@@ -290,7 +290,7 @@ AC_DEFUN([_TXZ_ARCH_SETUP_OPTIONS], [dnl
 # -----------------------------------------------------------------------------
 AC_DEFUN([_TXZ_ARCH_SETUP_BUILD], [dnl
   AC_REQUIRE([_OPENSS7_MISSING3])dnl
-    tmp_path="${PATH:+$PATH:}/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/X11R6/bin";
+    tmp_PATH="${PATH:+$PATH:}/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/X11R6/bin";
     AC_ARG_ENABLE([txzs],
 	[AS_HELP_STRING([--disable-txzs],
 	    [build txzs @<:@default=auto@:>@])],
@@ -302,7 +302,7 @@ AC_DEFUN([_TXZ_ARCH_SETUP_BUILD], [dnl
 	esac])
     AC_ARG_VAR([SLACKPKG],
 	       [slackpkg command. @<:@default=slackpkg@:>@])
-    _BLD_PATH_PROG([SLACKPKG], [slackpkg], [${am_missing3_run}slackpkg], [$tmp_path], [dnl
+    _BLD_PATH_PROG([SLACKPKG], [slackpkg], [${am_missing3_run}slackpkg], [$tmp_PATH], [dnl
 	case "$target_vendor" in
 	    (slackware)
 		_BLD_INSTALL_WARN([SLACKPKG], [
@@ -326,7 +326,7 @@ AC_DEFUN([_TXZ_ARCH_SETUP_BUILD], [dnl
 	esac])
     AC_ARG_VAR([MAKEPKG],
 	       [makepkg command. @<:@default=makepkg@:>@])
-    _BLD_PATH_PROG([MAKEPKG], [makepkg], [${am_missing3_run}makepkg], [$tmp_path], [dnl
+    _BLD_PATH_PROG([MAKEPKG], [makepkg], [${am_missing3_run}makepkg], [$tmp_PATH], [dnl
 	case "$target_vendor" in
 	    (slackware|salix)
 		_BLD_INSTALL_WARN([MAKEPKG], [
@@ -349,7 +349,7 @@ AC_DEFUN([_TXZ_ARCH_SETUP_BUILD], [dnl
 	enable_txzs=no])
     AC_ARG_VAR([SLACKTRACK],
 	       [slacktrack command. @<:@default=slacktrack@:>@])
-    _BLD_PATH_PROG([SLACKTRACK], [slacktrack], [${am_missing3_run}slacktrack], [$tmp_path], [dnl
+    _BLD_PATH_PROG([SLACKTRACK], [slacktrack], [${am_missing3_run}slacktrack], [$tmp_PATH], [dnl
 	case "$target_vendor" in
 	    (slackware|salix)
 		AC_MSG_WARN([Cannot find slacktrack program in PATH.]) ;;
@@ -357,7 +357,7 @@ AC_DEFUN([_TXZ_ARCH_SETUP_BUILD], [dnl
 	esac])
     AC_ARG_VAR([SPKG],
 	       [spkg command. @<:@default=spkg@:>@])
-    _BLD_PATH_PROG([SPKG], [spkg], [${am_missing3_run}spkg], [$tmp_path], [dnl
+    _BLD_PATH_PROG([SPKG], [spkg], [${am_missing3_run}spkg], [$tmp_PATH], [dnl
 	case "$target_vendor" in
 	    (salix)
 		AC_MSG_WARN([Cannot find spkg program in PATH.]) ;;
@@ -366,7 +366,7 @@ AC_DEFUN([_TXZ_ARCH_SETUP_BUILD], [dnl
 	esac])
     AC_ARG_VAR([SLKBUILD],
 	       [slkbuild command. @<:@default=slkbuild@:>@])
-    _BLD_PATH_PROG([SLKBUILD], [slkbuild], [${am_missing3_run}slkbuild], [$tmp_path], [dnl
+    _BLD_PATH_PROG([SLKBUILD], [slkbuild], [${am_missing3_run}slkbuild], [$tmp_PATH], [dnl
 	case "$target_vendor" in
 	    (salix)
 		AC_MSG_WARN([Cannot find slkbuild program in PATH.]) ;;
@@ -394,14 +394,14 @@ AC_DEFUN([_TXZ_REPO_SETUP], [dnl
 # -----------------------------------------------------------------------------
 AC_DEFUN([_TXZ_REPO_SETUP_SLACKPKG], [dnl
     AC_REQUIRE([_OPENSS7_MISSING3])dnl
-    tmp_path="${PATH:+$PATH:}/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/X11R6/bin";
+    tmp_PATH="${PATH:+$PATH:}/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/X11R6/bin";
     AC_ARG_ENABLE([repo-slackpkg],
 	[AS_HELP_STRING([--disable-repo-slackpkg],
 	    [slackpkg repo construction @<:@default=auto@:>@])],
 	[], [enable_repo_slackpkg=yes])
     AC_ARG_VAR([SLACKDTXT],
 	       [slackdtxt command. @<:@default=slackdtxt@:>@])
-    _BLD_PATH_PROG([SLACKDTXT], [slackdtxt], [${am_missing3_run}slackdtxt], [$tmp_path], [dnl
+    _BLD_PATH_PROG([SLACKDTXT], [slackdtxt], [${am_missing3_run}slackdtxt], [$tmp_PATH], [dnl
 	case "$target_vendor" in
 	    (slackware)
 		AC_MSG_WARN([Cannot find slackdtxt program in PATH.]) ;;

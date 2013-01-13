@@ -63,10 +63,10 @@
 # should simply touch the target files.
 # -----------------------------------------------------------------------------
 m4_define([AC_PROG_SWIG], [dnl
-    tmp_path="${PATH:+$PATH:}/usr/local/bin:/usr/bin:/bin";
+    tmp_PATH="${PATH:+$PATH:}/usr/local/bin:/usr/bin:/bin";
     AC_ARG_VAR([SWIG],
 	[Swig command. @<@default=swig@:>@])
-    _BLD_PATH_PROG([SWIG], [swig], [${am_missing4_run}swig], [$tmp_path], [dnl
+    _BLD_PATH_PROG([SWIG], [swig], [${am_missing4_run}swig], [$tmp_PATH], [dnl
 	AC_MSG_WARN([Cannot find swig program in PATH.])])
 ])# AC_PROG_SWIG
 # =============================================================================

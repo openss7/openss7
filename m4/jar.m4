@@ -82,13 +82,13 @@ AC_DEFUN([_JAR_OPTIONS], [dnl
 # -----------------------------------------------------------------------------
 AC_DEFUN([_JAR_SETUP], [dnl
     AC_REQUIRE([_OPENSS7_MISSING4])dnl
-    tmp_path="${PATH:+$PATH:}/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin";
+    tmp_PATH="${PATH:+$PATH:}/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin";
     AC_ARG_VAR([JAR],
 	[Java archive command. @<:@default=fastjar,jar@:>@])
-    _BLD_PATH_PROGS([JAR], [fastjar jar], [${am_missing4_run}jar], [$tmp_path])
+    _BLD_PATH_PROGS([JAR], [fastjar jar], [${am_missing4_run}jar], [$tmp_PATH])
     AC_ARG_VAR([ZIP],
 	[Zip archive command. @<:@default=zip@:>@])
-    _BLD_PATH_PROGS([ZIP], [zip], [${am_missing4_run}zip], [$tmp_path])
+    _BLD_PATH_PROGS([ZIP], [zip], [${am_missing4_run}zip], [$tmp_PATH])
 ])# _JAR_SETUP
 # =============================================================================
 
