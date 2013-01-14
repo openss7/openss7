@@ -70,10 +70,10 @@ postin-update-certs:
 			s=`$(OPENSSL) x509 -hash -noout -in $$l/$$f`.0 ; \
 			$(ECHO) "ln -- $$l/$$f $$l/$$f.crt" ; \
 			ln -- $$l/$$f $$l/$$f.crt ; \
-			$(ECHO) "$(LN_S) -fr -- $$l/$$f.crt $$d/$$f.crt" ; \
-			$(LN_S) -fr -- $$l/$$f.crt $$d/$$f.crt ; \
-			$(ECHO) "$(LN_S) -fr -- $$l/$$f.crt $$d/$$s" ; \
-			$(LN_S) -fr -- $$l/$$f.crt $$d/$$s ; \
+			$(ECHO) "$(LN_S) -f -- $(lcacertdir)/$$f.crt $$d/$$f.crt" ; \
+			$(LN_S) -f -- $(lcacertdir)/$$f.crt $$d/$$f.crt ; \
+			$(ECHO) "$(LN_S) -f -- $(lcacertdir)/$$f.crt $$d/$$s" ; \
+			$(LN_S) -f -- $(lcacertdir)/$$f.crt $$d/$$s ; \
 		done ; \
 	fi
 
@@ -107,8 +107,8 @@ postin-certs:
 		s=`$(OPENSSL) x509 -hash -noout -in $$d/$$f`.0 ; \
 		$(ECHO) "ln -- $$d/$$f $$d/$$f.crt" ; \
 		ln -- $$d/$$f $$d/$$f.crt ; \
-		$(ECHO) "$(LN_S) -fr -- $$d/$$f.crt $$d/$$s" ; \
-		$(LN_S) -fr -- $$d/$$f.crt $$d/$$s ; \
+		$(ECHO) "$(LN_S) -f -- $(sslcertdir)/$$f.crt $$d/$$s" ; \
+		$(LN_S) -f -- $(sslcertdir)/$$f.crt $$d/$$s ; \
 	done
 
 preun-certs:

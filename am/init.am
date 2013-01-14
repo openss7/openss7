@@ -146,15 +146,15 @@ install-systemd: $(dist_systemdsys_DATA)
 			for s in $${r[@]}; do \
 				rd="$$d/$$s.requires" ; \
 				test -d "$$rd" || $(MKDIR_P) -- "$$rd" ; \
-				$(ECHO) "$(LN_S) -fr -- $$d/$$f $$rd/" ; \
-				$(LN_S) -fr -- "$$d/$$f" "$$rd/" ; \
+				$(ECHO) "$(LN_S) -f -- $(systemdsysdir)/$$f $$rd/" ; \
+				$(LN_S) -f -- "$(systemdsysdir)/$$f" "$$rd/" ; \
 			done ; \
 			w=(`cat $$d/$$f | sed -n 's,^WantedBy=,,p'`) ; \
 			for s in $${w[@]}; do \
 				wd="$$d/$$s.wants" ; \
 				test -d "$$wd" || $(MKDIR_P) -- "$$wd" ; \
-				$(ECHO) "$(LN_S) -fr -- $$d/$$f $$wd/" ; \
-				$(LN_S) -fr -- "$$d/$$f" "$$wd/" ; \
+				$(ECHO) "$(LN_S) -f -- $(systemdsysdir)/$$f $$wd/" ; \
+				$(LN_S) -f -- "$(systemdsysdir)/$$f" "$$wd/" ; \
 			done ; \
 		else \
 			$(ECHO) "WARNING: cannot find [Install] section in $$d/$$f" >&2; \
