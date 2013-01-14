@@ -92,9 +92,9 @@ AC_DEFUN([_SSL_SETUP], [dnl
     fi
     AC_MSG_RESULT([])
     _BLD_FIND_DIR([for ssl directory], [ssl_cv_ssl_directory], [
-	    ${rootdir}/etc/pki/tls
 	    ${rootdir}/etc/ssl
 	    ${rootdir}/usr/lib/ssl
+	    ${rootdir}/etc/pki/tls
 	    ${rootdir}/usr/share/ssl
 	    ${rootdir}/usr/local/ssl], [], [], [dnl
 	AC_MSG_ERROR([
