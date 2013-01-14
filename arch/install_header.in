@@ -178,6 +178,10 @@ systemddir=@systemddir@
 systemdsysdir=@systemdsysdir@
 modulesloadddir=@modulesloadddir@
 sysctlddir=@sysctlddir@
+ssldir=@ssldir@
+sslcertdir=@sslcertdir@
+cacetdir=@cacertdir@
+lcacertdir=@lcacertdir@
 [ ":${subpkg:+'set'}" = ":set" ] || subpkg=
 package="@PACKAGE@${subpkg:+'-'}${subpkg}(@VERSION@-@PACKAGE_PACRELEASE@)"
 script="${0##*/}"
