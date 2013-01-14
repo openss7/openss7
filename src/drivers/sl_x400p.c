@@ -19783,14 +19783,13 @@ nit_niocssnap32(struct xp *xp, mblk_t *dp)
 noinline __unlikely int
 nit_niocgsnap(queue_t *q, mblk_t *mp, struct xp *xp)
 {
-	ulong *arg;
 	mblk_t *db;
 
-	if ((db = mi_copyout_alloc(q, mp, 0, sizeof(*arg), 0))) {
-		*arg = xp->xray.nit.snap;
-		return (0);
-	}
-	return (-ENOSR);
+	if (!(db = mi_copyout_alloc(q, mp, 0, sizeof(ulong), 0)))
+		return (-ENOSR);
+
+	*(ulong *)db->b_rptr = xp->xray.nit.snap;
+	return (0);
 }
 
 #ifdef __LP64__
@@ -19805,14 +19804,13 @@ nit_niocgsnap(queue_t *q, mblk_t *mp, struct xp *xp)
 noinline __unlikely int
 nit_niocgsnap32(queue_t *q, mblk_t *mp, struct xp *xp)
 {
-	uint32_t *arg;
 	mblk_t *db;
 
-	if ((db = mi_copyout_alloc(q, mp, 0, sizeof(*arg), 0))) {
-		*arg = xp->xray.nit.snap;
-		return (0);
-	}
-	return (-ENOSR);
+	if (!(db = mi_copyout_alloc(q, mp, 0, sizeof(uint32_t), 0)))
+		return (-ENOSR);
+
+	*(uint32_t *)db->b_rptr = xp->xray.nit.snap;
+	return (0);
 }
 #endif				/* __LP64__ */
 
@@ -19885,14 +19883,13 @@ nit_niocsflags32(struct xp *xp, mblk_t *dp)
 noinline __unlikely int
 nit_niocgflags(queue_t *q, mblk_t *mp, struct xp *xp)
 {
-	ulong *arg;
 	mblk_t *db;
 
-	if ((db = mi_copyout_alloc(q, mp, 0, sizeof(*arg), 0))) {
-		*arg = xp->xray.nit.flags & NI_USERBITS;
-		return (0);
-	}
-	return (-ENOSR);
+	if (!(db = mi_copyout_alloc(q, mp, 0, sizeof(ulong), 0)))
+		return (-ENOSR);
+
+	*(ulong *)db->b_rptr = xp->xray.nit.flags & NI_USERBITS;
+	return (0);
 }
 
 #ifdef __LP64__
@@ -19907,14 +19904,13 @@ nit_niocgflags(queue_t *q, mblk_t *mp, struct xp *xp)
 noinline __unlikely int
 nit_niocgflags32(queue_t *q, mblk_t *mp, struct xp *xp)
 {
-	uint32_t *arg;
 	mblk_t *db;
 
-	if ((db = mi_copyout_alloc(q, mp, 0, sizeof(*arg), 0))) {
-		*arg = xp->xray.nit.flags & NI_USERBITS;
-		return (0);
-	}
-	return (-ENOSR);
+	if (!(db = mi_copyout_alloc(q, mp, 0, sizeof(uint32_t), 0)))
+		return (-ENOSR);
+
+	*(uint32_t *)db->b_rptr = xp->xray.nit.flags & NI_USERBITS;
+	return (0);
 }
 #endif				/* __LP64__ */
 

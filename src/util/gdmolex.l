@@ -461,9 +461,9 @@ WITH[- ]SYNTAX				{ return TOK_WITH_SYNTAX			; }
 <com>{EOL}				{
 						// if (gdmo_column && gdmo_column != 8 * gdmo_level) {
 						// 	gdmo_newline(yyout);
-						// 	gdmo_column += fprintf(yyout, "%.*s", yyleng - 1, yytext);
+						// 	gdmo_column += fprintf(yyout, "%.*s", (int)(yyleng - 1), yytext);
 						// } else {
-							gdmo_column += fprintf(yyout, "%.*s", yyleng - 1, yytext);
+							gdmo_column += fprintf(yyout, "%.*s", (int)(yyleng - 1), yytext);
 							gdmo_newline(yyout);
 						// }
 						yy_pop_state();

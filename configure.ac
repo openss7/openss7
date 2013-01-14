@@ -160,7 +160,10 @@ AC_CHECK_LIB([LiS], [fattach])
 AC_CHECK_LIB([streams], [fattach])
 AC_CHECK_LIB([xnet], [t_open])
 AC_CHECK_LIB([socket], [socket])
+AC_CHECK_LIB([pcap], [pcap_dump])
 LIBS="$pkg_save_LIBS"
+
+AM_CONDITIONAL([WITH_LIB_PCAP],[test :"${ac_cv_lib_pcap_pcap_dump:-no}" != :no])dnl
 
 dnl
 dnl Checks for header files.
