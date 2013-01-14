@@ -4,13 +4,23 @@
     use DB_File;
     use MIME::Base64;
     use Storable qw(nfreeze thaw);
-    use Apache::Constants qw(:common);
+    BEGIN {
+	if (eval { require Apache::Constants; }) {
+	    import Apache::Constants qw(:common);
+	} else {
+	    require Apache2::Const;
+	    import  Apache2::Const -compile=>qw(:common);
+	    require Apache2::Access;
+	}
+    }
+    use Digest::MD5;
     my $self = $m->base_comp;
     my $page = $self->name;
 </%init>
 <%args>
     $hn	    => undef
     $ip	    => undef
+    $id	    => undef
     $un	    => undef
     $pw	    => undef
 </%args>
@@ -26,11 +36,13 @@
 	    $page eq 'repoindex.xml'	    or
 	    $page eq 'media.cfg'	    or
 	    $page eq 'urpmi.cfg'	    or
-	    $page eq 'OPENSS7.service'	    );
+	    $page eq 'OPENSS7.service'	    or
+	    $page eq 'openss7-mirrors'	    or
+	    $page eq 'openss7.defs'	    );
 
     my ($fd,$url,$artype,$distro,$relver,$osarch,$media,$branch,$subrep);
-    my ($username,$userpass,$usergrps,$useraccs,$usercred,$userdata,$userinfo,$userauth,$userdflt,$date);
-    my ($hostname,$hostpass,$hostgrps,$hostaccs,$hostcred,$hostdata,$hostinfo,$hostauth,$testpass);
+    my ($username,$userpass,$usergrps,$useraccs,$usercred,$usermach,$userdata,$userinfo,$userauth,$userdflt,$date);
+    my ($hostname,$hostpass,$hostgrps,$hostaccs,$hostcred,$hostmach,$hostdata,$hostinfo,$hostauth,$testpass);
 
     $date = `date -Iseconds`; chomp $date;
 
@@ -47,7 +59,9 @@
 	 $page eq 'openss7.list'	or
 	 $page eq 'openss7.vendor.list'	or
 	 $page eq 'media.cfg'		or
-	 $page eq 'urpmi.cfg'		)
+	 $page eq 'urpmi.cfg'		or
+	 $page eq 'openss7-mirrors'	or
+	 $page eq 'openss7.defs'	)
     {
 	$artype = $ARGS{'artype'};
 	$distro = $ARGS{'distro'};
@@ -58,7 +72,9 @@
 	      $page eq 'openss7.list'		or
 	      $page eq 'openss7.vendor.list'	or
 	      $page eq 'media.cfg'		or
-	      $page eq 'urpmi.cfg'		) and
+	      $page eq 'urpmi.cfg'		or
+	      $page eq 'openss7-mirrors'	or
+	      $page eq 'openss7.defs'		) and
 	     (!$distro or !$relver or !$osarch) )
 	{
 	    if ( $page eq 'openss7.repo' )
@@ -84,6 +100,16 @@
 		    $page eq 'urpmi.cfg'    )
 	    {
 		if ( $r->uri !~ m,/repo/(rpms)/(([^/].*)/)?media/media_info/(.*)$, ) {
+		    $r->log_reason("file is out of place", $r->filename);
+		    $m->abort(404);
+		}
+		$artype = $1;
+		$url = $3;
+	    }
+	    elsif ( $page eq 'openss7-mirrors'  or
+		    $page eq 'openss7.defs'	)
+	    {
+		if ( $r->uri !~ m,/repo/(pkgs)/(([^/].*)/)?(.*)$, ) {
 		    $r->log_reason("file is out of place", $r->filename);
 		    $m->abort(404);
 		}
@@ -136,6 +162,12 @@
 	    $artype = $ARGS{'artype'}						     unless ($artype);
 	    $artype = ( $distro =~ m/^(debian|ubuntu|mint|lts)$/ ) ? 'debs' : 'rpms' unless ($artype);
 	}
+	elsif ( $page eq 'openss7-mirrors'	or
+		$page eq 'openss7.defs'		)
+	{
+	    $artype = $ARGS{'artype'}	unless ($artype);
+	    $artype = 'pkgs'		unless ($artype);
+	}
     }
 
     if ( $page eq 'mirrorlist' ) {
@@ -149,7 +181,7 @@
 	$username = $ENV{'REMOTE_USER'};
 	unless ( $username ) {
 	    $r->note_basic_auth_failure;
-	    $r->log_reason("require user name", $r->url);
+	    $r->log_reason("require user name", $r->uri);
 	    $m->abort(401);
 	}
 	my $ret; ($ret, $testpass) = $r->get_basic_auth_pw;
@@ -174,6 +206,7 @@
 	$userinfo = {};
     }
     $userpass = $userinfo->{'REMOTE_PASS'} if ( exists $userinfo->{'REMOTE_PASS'} );
+    $usermach = $userinfo->{'REMOTE_MACH'} if ( exists $userinfo->{'REMOTE_MACH'} );
 
     if ( $testpass ne $userpass or $testpass eq '' ) {
 	if ( $page eq 'repoindex.xml' ) {
@@ -183,7 +216,11 @@
 	}
 	$userauth = 'invalid';
     } else {
-	if ( $page eq 'mirrorlist' or $page eq 'repoindex.xml' or $page eq 'OPENSS7.service') {
+	if ( $page eq 'mirrorlist'	or
+	     $page eq 'repoindex.xml'	or
+	     $page eq 'OPENSS7.service'	or
+	     $page eq 'openss7-mirrors'	or
+	     $page eq 'openss7.defs'	) {
 	    if ( $useraccs !~ /,hosts,/ ) {
 		$r->note_basic_auth_failure;
 		$r->log_reason("user $username not in group 'hosts'", $r->uri);
@@ -198,6 +235,7 @@
 	$hostname = $username; $username = undef;
 	$hostpass = $userpass; $userpass = undef;
 	$hostcred = $usercred; $usercred = undef;
+	$hostmach = $usermach; $usermach = undef;
 	$hostgrps = $usergrps; $usergrps = undef;
 	$hostaccs = $useraccs; $useraccs = undef;
 	$hostdata = $userdata; $userdata = undef;
@@ -218,6 +256,7 @@
 	    $userinfo = {};
 	}
 	$userpass = $userinfo->{'REMOTE_PASS'} if ( exists $userinfo->{'REMOTE_PASS'} );
+	$usermach = $userinfo->{'REMOTE_MACH'} if ( exists $userinfo->{'REMOTE_MACH'} );
     }
 
     if ( $page eq 'OPENSS7credentials'	or
@@ -226,11 +265,53 @@
 	 $page eq 'openss7.repo'	or
 	 $page eq 'openss7.list'	or
 	 $page eq 'media.cfg'		or
-	 $page eq 'urpmi.cfg'		)
+	 $page eq 'urpmi.cfg'		or
+	 $page eq 'openss7-mirrors'	or
+	 $page eq 'openss7.defs'	)
     {
 	if ( $hostname ) {
-	    $un = $hostname;
-	    $pw = $hostpass;
+	    if ( $page eq 'credentials' )
+	    {
+		unless ($hn) {
+		    $r->log_reason("hn argument required", $r->uri.'?'.scalar($r->args));
+		    $m->abort(403);
+		}
+		unless ($ip) {
+		    $r->log_reason("ip argument required", $r->uri.'?'.scalar($r->args));
+		    $m->abort(403);
+		}
+		unless ($id) {
+		    $r->log_reason("id argument required", $r->uri.'?'.scalar($r->args));
+		    $m->abort(403);
+		}
+		unless ( length($id) == 12 and $id=~/[0-9a-f]{12}/i ) {
+		    $r->log_reason("id argument invalid", $r->uri.'?'.scalar($r->args));
+		    $m->abort(403);
+		}
+		if ( $un and $un ne $hostname ) {
+		    $r->log_reason("un mismatch: '$un' ne '$hostname'", $r->uri.'?'.scalar($r->args));
+		    $m->abort(403);
+		}
+		if ( $pw and $pw ne $hostpass ) {
+		    $r->log_reason("pw mismatch: '$pw' ne '$hostpass'", $r->uri.'?'.scalar($r->args));
+		    $m->abort(403);
+		}
+		if ($hostmach and $id ne $hostmach ) {
+		    $r->log_reason("id mismatch: '$id' ne '$hostmach'", $r->uri.'?'.scalar($r->args));
+		    $m->abort(403);
+		}
+	    }
+	    else {
+		unless ($hostmach) {
+		    $r->log_reason("old host '$hostname' must reregister", $r->uri.'?'.scalar($r->args));
+		    $m->abort(403);
+		}
+		$un = $hostname;
+		$pw = $hostpass;
+		$hn = undef;
+		$ip = undef;
+		$id = $hostmach;
+	    }
 	} else {
 	    unless ($hn) {
 		$r->log_reason("hn argument required", $r->uri.'?'.scalar($r->args));
@@ -238,6 +319,14 @@
 	    }
 	    unless ($ip) {
 		$r->log_reason("ip argument required", $r->uri.'?'.scalar($r->args));
+		$m->abort(403);
+	    }
+	    unless ($id) {
+		$r->log_reason("id argument required", $r->uri.'?'.scalar($r->args));
+		$m->abort(403);
+	    }
+	    unless ( length($id) == 12 and $id=~/[0-9a-f]{12}/i ) {
+		$r->log_reason("id argument invalid", $r->uri.'?'.scalar($r->args));
 		$m->abort(403);
 	    }
 	    unless ($distro) {
@@ -252,12 +341,43 @@
 		$r->log_reason("osarch required", $r->uri.'?'.scalar($r->args));
 		$m->abort(403);
 	    }
-	    if ( $un ) { $hostname = $un; } else {
-		$hostname = `uuidgen`;
-		chomp $hostname;
-		$hostname =~ s/-//g;
-		$hostname = substr($hostname,0,24);
+
+	    tie my %machs, 'DB_File', '/var/www/mason/machids', O_CREAT|O_RDWR, 0640 or die $!;
+	    if (exists $machs{$id}) {
+		($hostname,$hostpass) = split(/:/,$machs{$id});
+	    } else {
+		my $key = pack('H*','0000'.$id);
+		my $flg = 0x00;
+		   $flg |= 0x80 unless ($useraccs=~/,fail-load-dead,/);
+		   $flg |= 0x40 unless ($useraccs=~/,fail-open-dead,/);
+		   $flg |= 0x20 unless ($useraccs=~/,fail-load-expy,/);
+		   $flg |= 0x10 unless ($useraccs=~/,fail-open-expy,/);
+		   $flg |= 0x08 unless ($useraccs=~/,fail-load-empt,/); # always reset
+		   $flg |= 0x04 unless ($useraccs=~/,fail-open-empt,/);
+		   $flg |= 0x02 unless ($useraccs=~/,fail-load-vrfy,/);
+		   $flg |= 0x01 unless ($useraccs=~/,fail-open-vrfy,/); # always reset
+		my $tim = time();
+		   $tim = $tim + 60*60*24*30 if ($useraccs=~/,30days,/);
+		   $tim = $tim + 60*60*24*90 if ($useraccs=~/,90days,/);
+		   $tim = $tim + 60*60*24*365 if ($useraccs=~/,1year,/);
+		   $tim = 0xffffffff if ($useraccs=~/,nolimit,/);
+		my $dat = pack('CCnH*',$flg,0x00,$tim>>16).$key;
+		my $i_pad = pack('H*',("00" x 64)); substr($i_pad,0,length($key),$key);
+		my $o_pad = pack('H*',("00" x 64)); substr($o_pad,0,length($key),$key);
+		$i_pad = pack('C*',map {$_^0x36} unpack('C*',$i_pad));
+		$o_pad = pack('C*',map {$_^0x5c} unpack('C*',$o_pad));
+		my $inner = Digest::MD5->new; $inner->add($i_pad.$dat);
+		my $res = $inner->digest;
+		my $outer = Digest::MD5->new; $outer->add($o_pad.$res);
+		my $dig = $outer->digest;
+		my $pfx = pack('C*',map {$_^0x5c} unpack('C*',substr($dat,0,4)));
+		my $suf = 'b4eecdda';
+		my $mid = unpack('H*', $pfx.$dig.$suf);
+		$hostname = substr($mid,24,24);
+		$hostpass = substr($mid, 0,24);
+		$machs{$id} = "$hostname:$hostpass";
 	    }
+	    untie %machs;
 
 	    $hostauth = $userauth;
 
@@ -275,21 +395,16 @@
 		    $m->abort(403);
 		}
 
-		if ( $hostdata ) { $hostinfo = thaw(decode_base64($hostdata)); } else { $hostinfo = {}; }
+		if ( $hostdata ) { $hostinfo = thaw(decode_base64($hostdata)) } else { $hostinfo = {} }
 		$hostpass = $hostinfo->{'REMOTE_PASS'} if ( exists $hostinfo->{'REMOTE_PASS'} );
+		$hostmach = $hostinfo->{'REMOTE_MACH'} if ( exists $hostinfo->{'REMOTE_MACH'} );
 	    }
 	    else
 	    {
-		if ( $pw ) { $hostpass = $pw; } else {
-		    $hostpass = `uuidgen`;
-		    chomp $hostpass;
-		    $hostpass =~ s/-//g;
-		    $hostpass = substr($hostpass,0,24);
-		}
-
-		$hostcred = `htpasswd -nbm $hostname $hostpass`; chomp $hostcred;
+		$hostcred = `htpasswd -nbm $hostname $hostpass`; chomp $hostcred; chomp $hostcred;
 		$hostcred =~ s/^[^:]*://;
 		$hostinfo = {};
+		$hostmach = $id;
 	    }
 	}
     }
@@ -327,6 +442,7 @@
 #	$userinfo->{'REMOTE_HOST'}	  = $ENV{'REMOTE_HOST'}	    unless ( exists $userinfo->{'REMOTE_HOST'} );
 #	$userinfo->{'REPOTE_PORT'}	  = $ENV{'REPOTE_PORT'}	    unless ( exists $userinfo->{'REPOTE_PORT'} );
 #	$userinfo->{'REMOTE_PASS'}	  = $userpass		    unless ( exists $userinfo->{'REMOTE_PASS'} );
+#	$userinfo->{'REMOTE_MACH'}	  = $usermach		    unless ( exists $userinfo->{'REMOTE_MACH'} );
 #	$userinfo->{'REMOTE_USER'}	  = $ENV{'REMOTE_USER'}	    unless ( exists $userinfo->{'REMOTE_USER'} );
 #	$userinfo->{'REPO_STATUS'}	  = 'unverified'	    unless ( exists $userinfo->{'REPO_STATUS'} );
 #	$userinfo->{'REPO_ACCESS_STATUS'} = 'accessed'		    unless ( exists $userinfo->{'REPO_ACCESS_STATUS'} );
@@ -373,6 +489,7 @@
 	$hostinfo->{'REMOTE_HOST'}	  = $ENV{'REMOTE_HOST'}	    unless ( exists $hostinfo->{'REMOTE_HOST'} );
 	$hostinfo->{'REMOTE_PORT'}	  = $ENV{'REMOTE_PORT'}	    unless ( exists $hostinfo->{'REMOTE_PORT'} );
 	$hostinfo->{'REMOTE_PASS'}	  = $hostpass		    unless ( exists $hostinfo->{'REMOTE_PASS'} );
+	$hostinfo->{'REMOTE_MACH'}	  = $hostmach		    unless ( exists $hostinfo->{'REMOTE_MACH'} );
 	$hostinfo->{'REMOTE_USER'}	  = $ENV{'REMOTE_USER'}	    unless ( exists $hostinfo->{'REMOTE_USER'} );
 	$hostinfo->{'REPO_STATUS'}	  = 'unverified'	    unless ( exists $hostinfo->{'REPO_STATUS'} );
 	$hostinfo->{'REPO_ACCESS_STATUS'} = 'accessed'		    unless ( exists $hostinfo->{'REPO_ACCESS_STATUS'} );
@@ -406,14 +523,17 @@
 	    my $manage = ( $distro =~ m/^(sle|sles|sled|suse|openSUSE)$/ ) ? 'zypp' : 'yum';
 	       $manage = ( $distro =~ m/^(mageia|mandriva|mandrake|mes)$/ ) ? 'urpm' : $manage;
 	       $manage = ( $distro =~ m/^(debian|ubuntu|lts|mint)$/ ) ? 'apt' : $manage;
+	       $manage = ( $distro =~ m/^(arch)$/ ) ? 'pacman' : $manage;
 	    my @hostgrps = ( 'hosts' );
 	    push @hostgrps, $username.'-hosts';
 	    push @hostgrps, $distro.'-'.$osarch.'-host';  # note 'host' instead of 'hosts'
-	    push @hostgrps, 'zypp-hosts' if ( $page eq 'OPENSS7credentials' or $manage eq 'zypp'    );
-	    push @hostgrps, 'yum-hosts'  if ( $page eq 'openss7.repo'	    or $manage eq 'yum'	    );
-	    push @hostgrps, 'urpm-hosts' if ( $page eq 'netrc.openss7'	    or $manage eq 'urpm'    );
-	    push @hostgrps, 'apt-hosts'  if ( $page eq 'openss7.list'	    or $manage eq 'apt'	    );
-	    push @hostgrps, 'apt-hosts'  if ( $page eq 'credentials'	    or $manage ne 'apt'	    );
+	    push @hostgrps, 'zypp-hosts'    if ( $page eq 'OPENSS7credentials'	or $manage eq 'zypp'	);
+	    push @hostgrps, 'yum-hosts'	    if ( $page eq 'openss7.repo'	or $manage eq 'yum'	);
+	    push @hostgrps, 'urpm-hosts'    if ( $page eq 'netrc.openss7'	or $manage eq 'urpm'	);
+	    push @hostgrps, 'apt-hosts'	    if ( $page eq 'openss7.list'	or $manage eq 'apt'	);
+	    push @hostgrps, 'apt-hosts'	    if ( $page eq 'credentials'		or $manage ne 'apt'	);
+	    push @hostgrps, 'pacman-hosts'  if ( $page eq 'openss7-mirrors'	or $manage eq 'pacman'	);
+#	    FIXME: must make sure that no username such as 'zypp' (or worse still 'owner') can be assigned
 	    foreach my $g ( split(/,/,$usergrps) ) {
 		push @hostgrps, $g.'-hosts';
 	    }
@@ -457,11 +577,19 @@ password=<% $hostpass %>
 machine www.openss7.org login <% $hostname %> password <% $hostpass %>
 <%perl>
     }
+    elsif ( $page eq 'openss7-mirrors' )
+    {
+	$r->content_type('text/plain');
+</%perl>
+Server = https://<% $hostname %>:<% $hostpass %>@www.openss7.org/repo/<% $artype %>/<% $distro %>/<% $relver %>/$arch/$repo/
+<%perl>
+    }
     elsif ( $page eq 'openss7.repo'	or
 	    $page eq 'OPENSS7.service'	or
 	    $page eq 'openss7.list'	or
 	    $page eq 'media.cfg'	or
-	    $page eq 'urpmi.cfg'	)
+	    $page eq 'urpmi.cfg'	or
+	    $page eq 'openss7.defs'	)
     {
 	my @brarepos = ( 'base', 'extras', 'updates', 'testing' );
 	my @subrepos = ( 'full', 'main', 'debug', 'devel', 'source' );
@@ -499,6 +627,7 @@ xml-info=1
 		my $manage = ( $distro =~ m/^(sle|sles|sled|suse|openSUSE)$/ ) ? 'zypp' : 'yum';
 		   $manage = ( $distro =~ m/^(mageia|mandriva|mandrake|mes)$/ ) ? 'urpm' : $manage;
 		   $manage = ( $distro =~ m/^(debian|ubuntu|lts|mint)$/ ) ? 'apt' : $manage;
+		   $manage = ( $distro =~ m/^(arch)$/ ) ? 'pacman' : $manage;
 		my $enterp = ( $distro =~ m/^(sle|sles|sled|rhel|centos|mes|puias|oracle|scientific|lts)$/ ) ? 'enterprise' : 'community';
 		my $server = ( $osarch !~ m/^i[3456]86$/ ) ? 'server' : 'desktop';
 
@@ -507,7 +636,7 @@ xml-info=1
 		my $offerred = 1;
 #		if ($offerred) {
 #		    $offerred = 0 if ($hostaccs !~ /,(opt-)?$manage-hosts,/);
-#		    unless ($offerred) { $reason = "Host $hostname not in group '(opt-)?$manage-hosts'"; }
+#		    unless ($offerred) { $reason = "Host $hostname not in group '(opt-)?$manage-hosts'" }
 #		}
 		if ($offerred) {
 		    $offerred = 0;
@@ -519,19 +648,19 @@ xml-info=1
 		    $offerred = 1 if ($hostaccs =~ /,(opt-)?$enterp-hosts,/ or $hostaccs =~ /,(opt-)?$osarch-hosts,/);
 		    $offerred = 1 if ($hostaccs =~ /,(opt-)?$enterp-$server-hosts,/);
 		    $offerred = 1 if ($hostaccs =~ /,(opt-)?$enterp-hosts,/ or $hostaccs =~ /,(opt-)?$server-hosts,/);
-		    unless ($offerred) { $reason = "Host $hostname not in groups '(opt-)?$enterp-hosts', '(opt-)?$server-hosts', '(opt-)?$distro-hosts' or '(opt-)?$osarch-hosts'"; }
+		    unless ($offerred) { $reason = "Host $hostname not in groups '(opt-)?$enterp-hosts', '(opt-)?$server-hosts', '(opt-)?$distro-hosts' or '(opt-)?$osarch-hosts'" }
 		}
 		if ($offerred) {
 		    $offerred = 0;
 		    $offerred = 1 if ($hostaccs =~ /,(opt-)?$branch-$subrep-hosts,/);
 		    $offerred = 1 if ($hostaccs =~ /,(opt-)?$branch-hosts,/ and $hostaccs =~ /,(opt-)?$subrep-hosts,/);
-		    unless ($offerred) { $reason = "Host $hostname not in groups '(opt-)?$branch-hosts', '(opt-)?$subrep-hosts'"; }
+		    unless ($offerred) { $reason = "Host $hostname not in groups '(opt-)?$branch-hosts', '(opt-)?$subrep-hosts'" }
 		}
 
 		my $allowed = 1;
 #		if ($allowed) {
 #		    $allowed = 0 if ($hostaccs !~ /,$manage-hosts,/);
-#		    unless ($allowed) { $reason = "Host $hostname not in group '$manage-hosts'"; }
+#		    unless ($allowed) { $reason = "Host $hostname not in group '$manage-hosts'" }
 #		}
 		if ($allowed) {
 		    $allowed = 0;
@@ -543,13 +672,13 @@ xml-info=1
 		    $allowed = 1 if ($hostaccs =~ /,$enterp-hosts,/ or $hostaccs =~ /,$osarch-hosts,/);
 		    $allowed = 1 if ($hostaccs =~ /,$enterp-$server-hosts,/);
 		    $allowed = 1 if ($hostaccs =~ /,$enterp-hosts,/ or $hostaccs =~ /,$server-hosts,/);
-		    unless ($allowed) { $reason = "Host $hostname not in groups '$enterp-hosts', '$server-hosts', '$distro-hosts' or '$osarch-hosts'"; }
+		    unless ($allowed) { $reason = "Host $hostname not in groups '$enterp-hosts', '$server-hosts', '$distro-hosts' or '$osarch-hosts'" }
 		}
 		if ($allowed) {
 		    $allowed = 0;
 		    $allowed = 1 if ($hostaccs =~ /,$branch-$subrep-hosts,/);
 		    $allowed = 1 if ($hostaccs =~ /,$branch-hosts,/ and $hostaccs =~ /,$subrep-hosts,/);
-		    unless ($allowed) { $reason = "Host $hostname not in groups '$branch-hosts', '$subrep-hosts'"; }
+		    unless ($allowed) { $reason = "Host $hostname not in groups '$branch-hosts', '$subrep-hosts'" }
 		}
 
 		my $enabled = 1;
@@ -807,21 +936,21 @@ xml-info=1
 
 		    my $s;
 		    if ($subrep eq 'full')
-		    { if ($branch eq 'base') { $s = ''; } else { $s = $branch; } } else
-		    { if ($branch eq 'base') { $s = $subrep; } else { $s = $branch.'/'.$subrep; } }
+		    { if ($branch eq 'base') { $s = '' } else { $s = $branch } } else
+		    { if ($branch eq 'base') { $s = $subrep } else { $s = $branch.'/'.$subrep } }
 		    my $r;
-		    if    ($subrep eq 'full')	{ $r = 'Full';	 }
-		    elsif ($subrep eq 'main')	{ $r = 'Main';	 }
-		    elsif ($subrep eq 'debug')	{ $r = 'Debug';	 }
-		    elsif ($subrep eq 'devel')	{ $r = 'Devel';	 }
-		    elsif ($subrep eq 'source')	{ $r = 'Source'; }
-		    else			{ $r = $subrep;	 }
+		    if    ($subrep eq 'full')	{ $r = 'Full'	}
+		    elsif ($subrep eq 'main')	{ $r = 'Main'	}
+		    elsif ($subrep eq 'debug')	{ $r = 'Debug'	}
+		    elsif ($subrep eq 'devel')	{ $r = 'Devel'	}
+		    elsif ($subrep eq 'source')	{ $r = 'Source'	}
+		    else			{ $r = $subrep	}
 		    my $b;
-		    if	  ($branch eq 'base')	 { $b = 'Base';	   }
-		    elsif ($branch eq 'updates') { $b = 'Updates'; }
-		    elsif ($branch eq 'extras')	 { $b = 'Extras';  }
-		    elsif ($branch eq 'testing') { $b = 'Testing'; }
-		    else			 { $b = $branch;   }
+		    if	  ($branch eq 'base')	 { $b = 'Base'	  }
+		    elsif ($branch eq 'updates') { $b = 'Updates' }
+		    elsif ($branch eq 'extras')	 { $b = 'Extras'  }
+		    elsif ($branch eq 'testing') { $b = 'Testing' }
+		    else			 { $b = $branch   }
 		    my $n = $r.' '.$b;
 		    my $t = 'release:'.$branch.':'.$subrep;
 
@@ -910,21 +1039,21 @@ xml-info=1
 
 		    my $s;
 		    if ($subrep eq 'full')
-		    { if ($branch eq 'base') { $s = ''; } else { $s = $branch; } } else
-		    { if ($branch eq 'base') { $s = $subrep; } else { $s = $branch.'/'.$subrep; } }
+		    { if ($branch eq 'base') { $s = '' } else { $s = $branch } } else
+		    { if ($branch eq 'base') { $s = $subrep } else { $s = $branch.'/'.$subrep } }
 		    my $r;
-		    if    ($subrep eq 'full')	{ $r = 'Full';	 }
-		    elsif ($subrep eq 'main')	{ $r = 'Main';	 }
-		    elsif ($subrep eq 'debug')	{ $r = 'Debug';	 }
-		    elsif ($subrep eq 'devel')	{ $r = 'Devel';	 }
-		    elsif ($subrep eq 'source')	{ $r = 'Source'; }
-		    else			{ $r = $subrep;	 }
+		    if    ($subrep eq 'full')	{ $r = 'Full'	 }
+		    elsif ($subrep eq 'main')	{ $r = 'Main'	 }
+		    elsif ($subrep eq 'debug')	{ $r = 'Debug'	 }
+		    elsif ($subrep eq 'devel')	{ $r = 'Devel'	 }
+		    elsif ($subrep eq 'source')	{ $r = 'Source'	 }
+		    else			{ $r = $subrep	 }
 		    my $b;
-		    if	  ($branch eq 'base')	 { $b = 'Base';	   }
-		    elsif ($branch eq 'updates') { $b = 'Updates'; }
-		    elsif ($branch eq 'extras')	 { $b = 'Extras';  }
-		    elsif ($branch eq 'testing') { $b = 'Testing'; }
-		    else			 { $b = $branch;   }
+		    if	  ($branch eq 'base')	 { $b = 'Base'	  }
+		    elsif ($branch eq 'updates') { $b = 'Updates' }
+		    elsif ($branch eq 'extras')	 { $b = 'Extras'  }
+		    elsif ($branch eq 'testing') { $b = 'Testing' }
+		    else			 { $b = $branch   }
 		    my $n = 'OpenSS7\ '.$r.'\ '.$b.'\ (openss7'.$numb.')';
 
 		    $numb = $numb + 1;
@@ -963,6 +1092,49 @@ xml-info=1
   mirrorlist: https://www.openss7.org<% $url %>
   with-dir: <% $sub %>
 }
+
+<%perl>
+		}
+		elsif ( $page eq 'openss7.defs' )
+		{
+		    my $rcreds = $hostname.':'.$hostpass.'@';
+
+		    $url = '/repo';
+		    $url = "/$artype";
+		    $url = "/$distro" if ($distro);
+		    $url = "/$relver";
+		    $url = "/$osarch";
+		    $url = "/$branch" if ($branch ne 'base');
+		    $url = "/$subrep" if ($subrep ne 'full');
+
+		    my $repo = 'openss7';
+		       $repo .= '-'.$branch if ($branch ne 'base');
+		       $repo .= '-'.$subrep if ($subrep ne 'full');
+
+		    my $present;
+		    $present = 1 if ( -e $ENV{'DOCUMENT_ROOT'}.$url.".db.tar.gz" );
+
+		    my $pre = '';
+		    $pre = '#' if ( !$present ); # and !$emptyrepo );
+
+		    if ( !$allowed ) {
+			$pre = '#';
+			if ( $hostaccs=~/,guests-hosts,/) {
+</%perl>
+<% $pre %># This repository is not authorized by default.
+<% $pre %># To active this repository, contact &lt;sales@openss7.com&gt;.
+<%perl>
+			} else {
+</%perl>
+<% $pre %># This repository is currently not authorized to host <% $hostname %>.
+<% $pre %># <% $reason %>.
+<% $pre %># To activate this repository, contact your software provider [<% $username %>].
+<%perl>
+			}
+		    }
+</%perl>
+<% $pre %>[<% $repo %>]
+<% $pre %>Include = /etc/pacman.d/openss7-mirrors
 
 <%perl>
 		}
@@ -1032,7 +1204,7 @@ repostoenable =<% $toenable %>
 	    my $allowed = 1;
 #	    if ($allowed) {
 #		$allowed = 0  if ($hostaccs !~ /,$manage-hosts,/);
-#		unless ($allowed) { $reason = "Host $hostname not in group '$manage-hosts'"; }
+#		unless ($allowed) { $reason = "Host $hostname not in group '$manage-hosts'" }
 #	    }
 	    if ($allowed) {
 		$allowed = 0;
@@ -1044,13 +1216,13 @@ repostoenable =<% $toenable %>
 		$allowed = 1 if ($hostaccs =~ /,$enterp-hosts,/ or $hostaccs =~ /,$osarch-hosts,/);
 		$allowed = 1 if ($hostaccs =~ /,$enterp-$server-hosts,/);
 		$allowed = 1 if ($hostaccs =~ /,$enterp-hosts,/ or $hostaccs =~ /,$server-hosts,/);
-		unless ($allowed) { $reason = "Host $hostname not in groups '$enterp-hosts', '$server-hosts', '$distro-hosts' or '$osarch-hosts'"; }
+		unless ($allowed) { $reason = "Host $hostname not in groups '$enterp-hosts', '$server-hosts', '$distro-hosts' or '$osarch-hosts'" }
 	    }
 	    if ($allowed) {
 		$allowed = 0;
 		$allowed = 1 if ($hostaccs =~ /,$branch-$subrep-hosts,/);
 		$allowed = 1 if ($hostaccs =~ /,$branch-hosts,/ and $hostaccs =~ /,$subrep-hosts,/);
-		unless ($allowed) { $reason = "Host $hostname not in groups '$branch-hosts', '$subrep-hosts'"; }
+		unless ($allowed) { $reason = "Host $hostname not in groups '$branch-hosts', '$subrep-hosts'" }
 	    }
 
 	    next unless ( $allowed );

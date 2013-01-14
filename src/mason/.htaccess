@@ -8,7 +8,26 @@
 	ForceType "text/plain"
 </FilesMatch>
 # All repo files are controlled by the autohandler
-<FilesMatch "^(OPENSS7credentials|credentials|openss7.repo|openss7.list|netrc.openss7)$">
+<IfModule mod_authn_dbm.c>
+<FilesMatch "^(OPENSS7credentials|credentials|openss7.repo|openss7.list|netrc.openss7|openss7.defs|openss7-mirrors)$">
+	Order allow,deny
+	Allow from all
+	SSLRequireSSL
+	AuthType Basic
+	AuthName "Client OpenSS7 Repository Access Credentials"
+	AuthBasicProvider dbm
+	AuthDBMType DB
+	AuthDBMUserFile /var/www/mason/repousers
+	AuthDBMGroupFile /var/www/mason/repousers
+	Require group owners subs guests hosts
+	Satisfy all
+	ForceType "text/plain"
+	SetHandler perl-script
+	PerlHandler HTML::Mason::ApacheHandler
+</FilesMatch>
+</IfModule>
+<IfModule !mod_authn_dbm.c>
+<FilesMatch "^(OPENSS7credentials|credentials|openss7.repo|openss7.list|netrc.openss7|openss7.defs|openss7-mirrors)$">
 	Order allow,deny
 	Allow from all
 	SSLRequireSSL
@@ -22,6 +41,26 @@
 	SetHandler perl-script
 	PerlHandler HTML::Mason::ApacheHandler
 </FilesMatch>
+</IfModule>
+<IfModule mod_authn_dbm.c>
+<FilesMatch "^(OPENSS7.service|openss7.vendor.list|media.cfg|urpmi.cfg)$">
+	Order allow,deny
+	Allow from all
+	SSLRequireSSL
+	AuthType Basic
+	AuthName "Client OpenSS7 Repository Access Credentials"
+	AuthBasicProvider dbm
+	AuthDBMType DB
+	AuthDBMUserFile /var/www/mason/repousers
+	AuthDBMGroupFile /var/www/mason/repousers
+	Require group hosts
+	Satisfy all
+	ForceType "text/plain"
+	SetHandler perl-script
+	PerlHandler HTML::Mason::ApacheHandler
+</FilesMatch>
+</IfModule>
+<IfModule !mod_authn_dbm.c>
 <FilesMatch "^(OPENSS7.service|openss7.vendor.list|media.cfg|urpmi.cfg)$">
 	Order allow,deny
 	Allow from all
@@ -36,6 +75,7 @@
 	SetHandler perl-script
 	PerlHandler HTML::Mason::ApacheHandler
 </FilesMatch>
+</IfModule>
 <Files "mirrorlist">
 	Order allow,deny
 	Allow from all
@@ -45,6 +85,23 @@
 	PerlHandler HTML::Mason::ApacheHandler
 </Files>
 # xml files must only be downloaded by machines (but any machine)
+<IfModule mod_authn_dbm.c>
+<FilesMatch "\.xml(\.gz)?$">
+	Order allow,deny
+	Allow from all
+	SSLRequireSSL
+	AuthType Basic
+	AuthName "OpenSS7 Repository Host Access Credentials"
+	AuthBasicProvider dbm
+	AuthDBMType DB
+	AuthDBMUserFile /var/www/mason/repousers
+	AuthDBMGroupFile /var/www/mason/repousers
+	PerlRequire /var/www/mason/perl/auth.pl
+	PerlAuthenHandler OpenSS7::Auth::rpmauthenhandler
+	Require group hosts
+</FilesMatch>
+</IfModule>
+<IfModule !mod_authn_dbm.c>
 <FilesMatch "\.xml(\.gz)?$">
 	Order allow,deny
 	Allow from all
@@ -57,7 +114,25 @@
 	PerlAuthenHandler OpenSS7::Auth::rpmauthenhandler
 	Require group hosts
 </FilesMatch>
+</IfModule>
 # apt meta files must only be downloaded by machines (but any machine)
+<IfModule mod_authn_dbm.c>
+<FilesMatch "^((Packages|Sources|Contents|Release)(.gz|.bz2|.gpg|.key)?|md5sum.txt)$">
+	Order allow,deny
+	Allow from all
+	SSLRequireSSL
+	AuthType Basic
+	AuthName "OpenSS7 Repository Host Access Credentials"
+	AuthBasicProvider dbm
+	AuthDBMType DB
+	AuthDBMUserFile /var/www/mason/repousers
+	AuthDBMGroupFile /var/www/mason/repousers
+	PerlRequire /var/www/mason/perl/auth.pl
+	PerlAuthenHandler OpenSS7::Auth::rpmauthenhandler
+	Require group hosts
+</FilesMatch>
+</IfModule>
+<IfModule !mod_authn_dbm.c>
 <FilesMatch "^((Packages|Sources|Contents|Release)(.gz|.bz2|.gpg|.key)?|md5sum.txt)$">
 	Order allow,deny
 	Allow from all
@@ -70,7 +145,27 @@
 	PerlAuthenHandler OpenSS7::Auth::rpmauthenhandler
 	Require group hosts
 </FilesMatch>
+</IfModule>
 # repoindex.xml only downloaded by machines with correct credentials
+<IfModule mod_authn_dbm.c>
+<Files "repoindex.xml">
+	Order allow,deny
+	Allow from all
+	SSLRequireSSL
+	AuthType Basic
+	AuthName "OpenSS7 Repository Host Access Credentials"
+	AuthBasicProvider dbm
+	AuthDBMType DB
+	AuthDBMUserFile /var/www/mason/repousers
+	AuthDBMGroupFile /var/www/mason/repousers
+	Require group zypp-hosts
+	Satisfy all
+	ForceType "text/plain"
+	SetHandler perl-script
+	PerlHandler HTML::Mason::ApacheHandler
+</Files>
+</IfModule>
+<IfModule !mod_authn_dbm.c>
 <Files "repoindex.xml">
 	Order allow,deny
 	Allow from all
@@ -85,8 +180,26 @@
 	SetHandler perl-script
 	PerlHandler HTML::Mason::ApacheHandler
 </Files>
+</IfModule>
 # RPMs or DEBs (other than openss7-repo) must only be downloaded by machines
 # RPMs or DEBs must be overridden to allow guests-hosts in individual subdirectories
+<IfModule mod_authn_dbm.c>
+<FilesMatch "^openss7-[^r].*\.(rpm|u?d?deb)$">
+	Order allow,deny
+	Allow from all
+	SSLRequireSSL
+	AuthType Basic
+	AuthName "OpenSS7 Repository Host Access Credentials"
+	AuthBasicProvider dbm
+	AuthDBMType DB
+	AuthDBMUserFile /var/www/mason/repousers
+	AuthDBMGroupFile /var/www/mason/repousers
+	PerlRequire /var/www/mason/perl/auth.pl
+	PerlAuthenHandler OpenSS7::Auth::rpmauthenhandler
+	Require group hosts
+</FilesMatch>
+</IfModule>
+<IfModule !mod_authn_dbm.c>
 <FilesMatch "^openss7-[^r].*\.(rpm|u?d?deb)$">
 	Order allow,deny
 	Allow from all
@@ -99,21 +212,28 @@
 	PerlAuthenHandler OpenSS7::Auth::rpmauthenhandler
 	Require group hosts
 </FilesMatch>
+</IfModule>
 # Anybody can download the repository RPMs or DEBs
 <FilesMatch "^openss7-repo.*\.(rpm|u?d?deb)$">
 	Order allow,deny
 	Allow from all
-#SSLRequireSSL
-#AuthType Basic
-#AuthName "OpenSS7 Repository Subscriber Access Credentials"
-#AuthDBUserFile /var/www/mason/repousers
-#AuthDBGroupFile /var/www/mason/repousers
-#PerlRequire /var/www/mason/perl/auth.pl
-#PerlAuthenHandler OpenSS7::Auth::rpmauthenhandler
-#Require valid-user
 </FilesMatch>
 # tarballs and spec files must only be downloaded by subscribers
 # must be overridden to allow guests
+<IfModule mod_authn_dbm.c>
+<FilesMatch "^openss7-1\..*\.(tar\.(gz|bz2|xz|lzma)|spec|src\.rpm|dsc(\.asc)?)$">
+	Order allow,deny
+	Allow from all
+	SSLRequireSSL
+	AuthType Basic
+	AuthName "OpenSS7 Repository Subscriber Access Credentials"
+	AuthBasicProvider file
+	AuthUserFile /etc/httpd/passwd
+	AuthGroupFile /etc/httpd/group
+	Require group owners subs
+</FilesMatch>
+</IfModule>
+<IfModule !mod_authn_dbm.c>
 <FilesMatch "^openss7-1\..*\.(tar\.(gz|bz2|xz|lzma)|spec|src\.rpm|dsc(\.asc)?)$">
 	Order allow,deny
 	Allow from all
@@ -124,3 +244,4 @@
 	AuthGroupFile /etc/httpd/group
 	Require group owners subs
 </FilesMatch>
+</IfModule>
