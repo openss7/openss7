@@ -516,26 +516,6 @@ AC_DEFUN([_BLD_FILE_CHECK],
 
 
 # =============================================================================
-# _BLD_VAR_PATH_PROG([VARIABLE], [PROGRAMS], [PATH], [VAR-MSG], [IF-NOT-FOUND])
-# -----------------------------------------------------------------------------
-# Performs AC_ARG_VAR([VARIABLE], [VAR-MSG]), and then performs a call to
-# AC_PATH_PROG([VARIABLE], [PROGRAMS], [IF-NOT-FOUND], [PATH]) and examines the
-# result.  It then calls bld_prog_check "VARIABLE" when successful to set
-# what package name and package version provides the program (if any).
-# -----------------------------------------------------------------------------
-AC_DEFUN([_BLD_VAR_PATH_PROG], [dnl
-    AC_REQUIRE([_BLD_PROG_CHECK])dnl
-    AC_ARG_VAR([$1], [$4])dnl
-    AC_PATH_PROGS([$1], [$2], [], [$3])
-    if test :"${$1:-no}" = :no ; then
-	m4_if([$5], [], [:], [$5])
-    else
-	bld_prog_check "$1"
-    fi
-])# _BLD_VAR_PATH_PROG
-# =============================================================================
-
-# =============================================================================
 # _BLD_PATH_PROG (VARIABLE, PROG-TO-CHECK-FOR, [VALUE-IF-NOT-FOUND],
 #		  [PATH = `$PATH'], [IF-NOT-FOUND], [IF-FOUND])
 # -----------------------------------------------------------------------------
@@ -573,6 +553,22 @@ AC_DEFUN([_BLD_PATH_PROGS], [dnl
 	m4_if([$6], [], [:], [$6])
     fi
 ])# _BLD_PATH_PROGS
+# =============================================================================
+
+# =============================================================================
+# _BLD_VAR_PATH_PROG([VARIABLE], [PROGRAMS], [PATH], [VAR-MSG],
+#		     [IF-NOT-FOUND], [IF-FOUND])
+# -----------------------------------------------------------------------------
+# Performs AC_ARG_VAR([VARIABLE], [VAR-MSG]), and then performs a call to
+# AC_PATH_PROG([VARIABLE], [PROGRAMS], [IF-NOT-FOUND], [PATH]) and examines the
+# result.  It then calls bld_prog_check "VARIABLE" when successful to set
+# what package name and package version provides the program (if any).
+# -----------------------------------------------------------------------------
+AC_DEFUN([_BLD_VAR_PATH_PROG], [dnl
+    AC_REQUIRE([_BLD_PROG_CHECK])dnl
+    AC_ARG_VAR([$1], [$4])dnl
+    _BLD_PATH_PROGS([$1],[$2],[],[$3],[$5],[$6])
+])# _BLD_VAR_PATH_PROG
 # =============================================================================
 
 # =============================================================================
