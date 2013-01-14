@@ -162,9 +162,9 @@ AC_DEFUN([_REPO_SETUP_URL], [dnl
 # _REPO_SETUP_RPM
 # -----------------------------------------------------------------------------
 AC_DEFUN([_REPO_SETUP_RPM], [dnl
-    _BLD_FIND_DIR([for rpm gpg directory], [repo_cv_rpm_gpgdir], [dnl
+    _BLD_FIND_DIR([for rpm gpg directory], [repo_cv_rpm_gpgdir], [
 	    ${sysconfdir}/pki/rpm-gpg
-	    ${rootdir}/etc/pki/rpm-gpg], [] [no])
+	    ${rootdir}/etc/pki/rpm-gpg], [], [no])
 ])# _REPO_SETUP_RPM
 # =============================================================================
 
