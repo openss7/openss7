@@ -4,7 +4,15 @@ use Fcntl qw(:DEFAULT :flock);
 use DB_File;
 use MIME::Base64;
 use Storable qw(nfreeze thaw);
-use Apache::Constants qw(:common);
+BEGIN {
+    if (eval { require Apache::Constants; }) {
+	import Apache::Constants qw(:common);
+    } else {
+	require Apache2::Const;
+	import  Apache2::Const -compile=>qw(:common);
+	require Apache2::Access;
+    }
+}
 
 sub rpmaccesshandler {
     my $r = shift;
@@ -181,9 +189,10 @@ sub check_distarch {
     $manage = 'yum';
     $manage = 'zypp' if ( $distro =~ m,^(sle|sles|sled|suse|openSUSE)$, );
     $manage = 'apt'  if ( $distro =~ m,^(debian|ubuntu|mint|mepis|knoppix|pclinux)$, );
+    $manage = 'pacman'	if ( $distro =~ m,^(arch)$, );
 
     $enterp = 'community'; 
-    $enterp = 'enterprise' if ( $distro =~ m,^(sle|sles|sled|rhel|centos)$, );
+    $enterp = 'enterprise' if ( $distro =~ m,^(sle|sles|sled|rhel|centos|ults)$, );
     # FIXME: need to make ubuntu LTS enterprise
 
     $server = 'desktop';
