@@ -316,8 +316,8 @@ endif
 texi/args.texi:
 	@if test ! -e texi -a -e $(top_builddir)/scripts/texi ; then \
 		$(ECHO_Q) "  GEN   " `basename $@` ; \
-		$(ECHO_V) "$(LN_S) $(top_builddir)/scripts/texi texi" ; \
-		$(LN_S) $(top_builddir)/scripts/texi texi ; \
+		$(ECHO_V) "$(LN_S) -fn -- $(top_builddir)/scripts/texi texi" ; \
+		$(LN_S) -fn -- $(top_builddir)/scripts/texi texi ; \
 	fi
 
 clean-figs:
