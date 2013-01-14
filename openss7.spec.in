@@ -3855,7 +3855,7 @@ fi
 %{?files_wmscripts:%{_sbindir}/%{name}-update}
 %{?files_wmscripts:%{_sbindir}/%{name}-patch}
 %{?files_wmscripts:%{_sbindir}/%{name}-modprobe}
-%{?files_wmscripts:%{_modprobeddir}/specfs.conf
+%{?files_wmscripts:%{_modprobeddir}/specfs.conf}
 %endif
 
 # ===========================================================================
