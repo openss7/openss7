@@ -115,19 +115,19 @@
 #    global _kversion on the rpmbuild command line
 #    global PACKAGE_KVERSION environment variable
 #    just let it default to `uname -r`
-#{!?_kversion: #{expand: ##global _kversion #(env | grep PACKAGE_KVERSION | sed -e 's,.*=,,')}}
+#{!?_kversion: #{expand: ##global _kversion #(env|grep PACKAGE_KVERSION|sed -e 's,.*=,,')}}
 %{!?_kversion: %{expand: %%global _kversion %(uname -r)}}
 
-%global without_ko_modules %(echo %{_kversion} | sed -e 's,^2\.[56]\..*$,0,;s,^2\.4\..*$,1,')
+%global without_ko_modules %(echo %{_kversion}|sed -e 's,^2\.[56]\..*$,0,;s,^2\.4\..*$,1,')
 %global kernel_version %{_kversion}
-%global kernel_source %(echo %{_kversion} | sed -r -e 's,BOOT$,,;s,-?smp$,,;s,bigmem$,,;s,debug$,,;s,enterprise$,,;s,hugemem$,,;s,secure$,,;s,-i686-up-4GB$,,;s,-p3-smp-64GB$,,;s,-64GB-SMP,.SuSE,;s,-default$,,;s,-tmb-(desktop586|desktop|laptop|server)-,-tmb-,;s,-(netbook|server|desktop|desktop586)-,-,')
-%global kernel_number %(echo %{_kversion} | sed -e 's,-.*$,,')
-%global kernel_majnum %(echo %{kernel_number} | sed -e 's,\.[^\.]*$,,')
-%global kernel_flavor %(echo %{_kversion} | sed -r -e 's,.*BOOT,-BOOT,;t;s,.*-?smp$,-smp,;t;s,.*bigmem$,-bigmem,;t;s,.*debug$,-debug,;t;s,.*kdump$,-kdump,;t;s,.*enterprise$,-enterprise,;t;s,.*hugemem$,-hugemem,;t;s,.*secure$,-secure,;t;s,.*-i686-up-4GB,-i686-up-4GB,;t;s,.*-p3-smp-4GB$,-p3-smp-4GB,;t;s,.*-64GB-SMP$,-64GB-SMP,;t;s,.*-default$,-default,;t;s,.*pae$,-pae,;t;s,.*PAE$,-PAE,;t;s,.*-tmb-desktop-.*,-tmb-desktop,;t;s,.*-tmb-desktop586-.*,-tmb-desktop586,;t;s,-tmb-laptop-.*,-tmb-laptop,;t;s,.*-tmb-server-.*,-tmb-server,;t;s,.*-vserver-.*,-vserver,;t;s,.*-xen-pvops-.*,-xen-pvops,;t;s,.*-desktop-.*,-desktop,;t;s,.*-desktop586-.*,-desktop586,;t;s,.*-server-.*,-server,;t;s,.*-netbook-.*,-netbook,;t;s,.*-linus-.*,-linus,;t;s,.*,,')
+%global kernel_source %(echo %{_kversion}|sed -r -e 's,BOOT$,,;s,-?smp$,,;s,bigmem$,,;s,debug$,,;s,enterprise$,,;s,hugemem$,,;s,secure$,,;s,-i686-up-4GB$,,;s,-p3-smp-64GB$,,;s,-64GB-SMP,.SuSE,;s,-default$,,;s,-tmb-(desktop586|desktop|laptop|server)-,-tmb-,;s,-(netbook|server|desktop|desktop586)-,-,')
+%global kernel_number %(echo %{_kversion}|sed -e 's,-.*$,,')
+%global kernel_majnum %(echo %{kernel_number}|sed -e 's,\.[^\.]*$,,')
+%global kernel_flavor %(echo %{_kversion}|sed -r -e 's,.*BOOT,-BOOT,;t;s,.*-?smp$,-smp,;t;s,.*bigmem$,-bigmem,;t;s,.*debug$,-debug,;t;s,.*kdump$,-kdump,;t;s,.*enterprise$,-enterprise,;t;s,.*hugemem$,-hugemem,;t;s,.*secure$,-secure,;t;s,.*-i686-up-4GB,-i686-up-4GB,;t;s,.*-p3-smp-4GB$,-p3-smp-4GB,;t;s,.*-64GB-SMP$,-64GB-SMP,;t;s,.*-default$,-default,;t;s,.*pae$,-pae,;t;s,.*PAE$,-PAE,;t;s,.*-tmb-desktop-.*,-tmb-desktop,;t;s,.*-tmb-desktop586-.*,-tmb-desktop586,;t;s,-tmb-laptop-.*,-tmb-laptop,;t;s,.*-tmb-server-.*,-tmb-server,;t;s,.*-vserver-.*,-vserver,;t;s,.*-xen-pvops-.*,-xen-pvops,;t;s,.*-desktop-.*,-desktop,;t;s,.*-desktop586-.*,-desktop586,;t;s,.*-server-.*,-server,;t;s,.*-netbook-.*,-netbook,;t;s,.*-linus-.*,-linus,;t;s,.*,,')
 %global kernel_symvers symvers-%{_kversion}.gz
 %global kernel_symsets symsets-%{_kversion}.tar.gz
-%global kernel_latest %((LANG_ALL="C" rpm -q --whatprovides /lib/modules/%{_kversion}/kernel | grep -v 'not owned' | sed -r -n 's,.*-([23]\..*),\\1,;T;s,^([^-]*-[0-9]*)\.[^\.]*(\..*)$,\\1\\2,p') 2>/dev/null)
-%global kernel_series %(echo %{_kversion} | sed -r -e 's,.*-tmb-(desktop|desktop586|laptop|server)-.*,-tmb,;t;s,.*-vserver-.*,-vserver,;t;s,.*-linus-.*,-linus,;t;s,.*-xen-pvops-.*,-vserver,;t;s,.*-(desktop|desktop586|netbook|server)-.*,,;t;s,.*,,')
+%global kernel_latest %((LANG_ALL="C" rpm -q --whatprovides /lib/modules/%{_kversion}/kernel|grep -v 'not owned'|sed -r -n 's,.*-([23]\..*),\\1,;T;s,^([^-]*-[0-9]*)\.[^\.]*(\..*)$,\\1\\2,p') 2>/dev/null)
+%global kernel_series %(echo %{_kversion}|sed -r -e 's,.*-tmb-(desktop|desktop586|laptop|server)-.*,-tmb,;t;s,.*-vserver-.*,-vserver,;t;s,.*-linus-.*,-linus,;t;s,.*-xen-pvops-.*,-vserver,;t;s,.*-(desktop|desktop586|netbook|server)-.*,,;t;s,.*,,')
 
 %global HAVE_devices        %{?majbase:     1}%{!?majbase:     0}
 %global HAVE_makedev        %{?makedev:     1}%{!?makedev:     0}
@@ -307,7 +307,7 @@
 %global USE_makedev         0
 %endif
 
-%if %(if (echo "%{_kversion}" | grep '^2\.4\.' >/dev/null 2>&1) ; then echo 1 ; else echo 0; fi)
+%if %(if (echo "%{_kversion}"|grep '^2\.4\.' >/dev/null 2>&1) ; then echo 1 ; else echo 0; fi)
 %global HAVE_oldmods        %{HAVE_modules}
 %global HAVE_oldprel        %{HAVE_preloads}
 %global HAVE_newmods        0
@@ -345,11 +345,11 @@
 %endif
 
 %if %{HAVE_weakmods}
-%global target_kernel %((LANG_ALL="C" rpm -q --whatprovides /boot/%{kernel_symvers} --qf "%%{NAME}\\n" | grep -v 'not owned' | tail -1) 2>/dev/null)
+%global target_kernel %((LANG_ALL="C" rpm -q --whatprovides /boot/%{kernel_symvers} --qf "%%{NAME}\\n"|grep -v 'not owned'|tail -1) 2>/dev/null)
 %else
-%global target_kernel %((LANG_ALL="C" rpm -q --whatprovides /boot/%{kernel_symvers} --qf "%%{NAME} = %%{VERSION}-%%{RELEASE}\\n" | grep -v 'not owned' | tail -1) 2>/dev/null)
+%global target_kernel %((LANG_ALL="C" rpm -q --whatprovides /boot/%{kernel_symvers} --qf "%%{NAME} = %%{VERSION}-%%{RELEASE}\\n"|grep -v 'not owned'|tail -1) 2>/dev/null)
 %endif
-%global target_kdevel %((LANG_ALL="C" rpm -q --whatprovides `(cd %{_kmoduledir}/build; /bin/pwd)` --qf "%%{NAME} = %%{VERSION}-%%{RELEASE}\\n" | grep -v 'not owned' | tail -1) 2>/dev/null)
+%global target_kdevel %((LANG_ALL="C" rpm -q --whatprovides `(cd %{_kmoduledir}/build; /bin/pwd)` --qf "%%{NAME} = %%{VERSION}-%%{RELEASE}\\n"|grep -v 'not owned'|tail -1) 2>/dev/null)
 
 %global HAVE_urpmkmps 0
 %global HAVE_susekmps 0
@@ -673,9 +673,9 @@
 %{!?_lib32dir:          %{expand: %%global _lib32dir        %%{_exec_prefix}/lib}}
 %{!?_pkglibexec32dir:   %{expand: %%global _pkglibexec32dir %%{_pkglibexecdir}/lib32}}
 %{!?_syslib32dir:       %{expand: %%global _syslib32dir     /lib}}
-%{!?_syslibdir:         %{expand: %%global _syslibdir       %(echo %{_libdir} | sed 's,/usr,,')}}
-%{!?_sysbindir:         %{expand: %%global _sysbindir       %(echo %{_bindir} | sed 's,/usr,,')}}
-%{!?_syssbindir:        %{expand: %%global _syssbindir      %(echo %{_sbindir} | sed 's,/usr,,')}}
+%{!?_syslibdir:         %{expand: %%global _syslibdir       %(echo %{_libdir}|sed 's,/usr,,')}}
+%{!?_sysbindir:         %{expand: %%global _sysbindir       %(echo %{_bindir}|sed 's,/usr,,')}}
+%{!?_syssbindir:        %{expand: %%global _syssbindir      %(echo %{_sbindir}|sed 's,/usr,,')}}
 %{!?_snmpdlmod32dir:    %{expand: %%global _snmpdlmod32dir  %%{_lib32dir}/snmp/dlmod}}
 %{!?_gcjdir:            %{expand: %%global _gcjdir          %%{_libdir}/gcj}}
 %{!?_pkggcjdir:         %{expand: %%global _pkggcjdir       %%{_gcjdir}/%%{name}}}
@@ -686,7 +686,7 @@
 %{!?_tcllibdir:         %{expand: %%global _tcllibdir       %%{_libdir}}}
 %{!?_tclsrcdir:         %{expand: %%global _tclsrcdir       %%{_datadir}}}
 %{!?_pkgtcllibdir:      %{expand: %%global _pkgtcllibdir    %%{_tcllibdir}/@PACKAGE_NAME@@PACKAGE_VERSION@}}
-%{!?_perldir:           %{expand: %%global _perldir         %(eval "`perl -V:installvendorarch`"; echo $installvendorarch | sed -e 's,//*$,,')}}
+%{!?_perldir:           %{expand: %%global _perldir         %(eval "`perl -V:installvendorarch`"; echo $installvendorarch|sed -e 's,//*$,,')}}
 %{!?_yumrepodir:        %{expand: %%global _yumrepodir      %(if test -d %{_sysconfdir}/yum/repos.d; then echo %{_sysconfdir}/yum/repos.d; else echo %{_sysconfdir}/yum.repos.d; fi)}}
 %{!?_yumplugdir:        %{expand: %%global _yumplugdir      %%{_libdir}/yum-plugins}}
 %{!?_yumdir:            %{expand: %%global _yumdir          %%{_sysconfdir}/yum}}
@@ -697,9 +697,13 @@
 %{!?_rpmgpgdir:         %{expand: %%global _rpmgpgdir       %%{_sysconfdir}/pki/rpm-gpg}}
 %{!?_urpmirepodir:      %{expand: %%global _urpmirepodir    %%{_sysconfdir}/urpmi/mediacfg.d}}
 %{!?_urpmiconfdir:      %{expand: %%global _urpmiconfdir    %%{_sysconfdir}/urpmi}}
-%{!?_aptconfdir         %{expand: %%global _aptconfdir      %%{_sysconfdir}/apt}}
-%{!?_aptrepodir         %{expand: %%global _aptrepodir      %%{_aptconfdir}/sources.list.d}}
-%{!?_aptvenddir         %{expand: %%global _aptvenddir      %%{_aptconfdir}/vendors.list.d}}
+%{!?_aptconfdir:        %{expand: %%global _aptconfdir      %%{_sysconfdir}/apt}}
+%{!?_aptrepodir:        %{expand: %%global _aptrepodir      %%{_aptconfdir}/sources.list.d}}
+%{!?_aptvenddir:        %{expand: %%global _aptvenddir      %%{_aptconfdir}/vendors.list.d}}
+
+%{!?_ssldir:            %{expand: %%global _ssldir          %%{_sysconfdir}/ssl}}
+%{!?_sslcertdir:        %{expand: %%global _sslcertdir      %%{_ssldir}/certs}}
+%{!?_modprobeddir:      %{expand: %%global _modprobeddir    %%{_sysconfdir}/modprobe.d}}
 
 %{!?_repobase:          %{expand: %%global _repobase        @repobase@}}
 %{!?_reporoot:          %{expand: %%global _reporoot        @reporoot@}}
@@ -709,8 +713,8 @@
 # Calculate which files were not built (and are not included)
 # ---------------------------------------------------------------------------
 
-%global kernel_fedora       %(echo %{_kversion} | sed -r -e 's,.*FC[456].*$,1,;t;s,.*\.fc[1]?[1-9].*$,1,;t;s,.*\.EL[45]?.*$,1,;t;s,.*\.el[56].*$,1,;t;s,.*$,0,')
-%global kernel_others       %(echo %{_kversion} | sed -r -e 's,.*FC[456].*$,0,;t;s,.*\.fc[1]?[1-9].*$,0,;t;s,.*\.EL[45]?.*$,0,;t;s,.*\.el[56].*$,0,;t;s,.*$,1,')
+%global kernel_fedora       %(echo %{_kversion}|sed -r -e 's,.*FC[456].*$,1,;t;s,.*\.fc[1]?[1-9].*$,1,;t;s,.*\.EL[45]?.*$,1,;t;s,.*\.el[56].*$,1,;t;s,.*$,0,')
+%global kernel_others       %(echo %{_kversion}|sed -r -e 's,.*FC[456].*$,0,;t;s,.*\.fc[1]?[1-9].*$,0,;t;s,.*\.EL[45]?.*$,0,;t;s,.*\.el[56].*$,0,;t;s,.*$,1,')
 
 %{!?VIRT_virt:  %{expand: %%global VIRT_virt       0}}
 %{!?VIRT_repo:  %{expand: %%global VIRT_repo       0}}
@@ -2048,7 +2052,7 @@
 
 # RedHat adds a mogrified kernel version string to the kmp release (or commonly not at all).
 %if %{HAVE_rhatkmps}
-%global kbaserelease %{rpmrelease}%(echo '.%{_kversion}' | sed -e 'y,-,.,;s,\.%{arch}$,,')
+%global kbaserelease %{rpmrelease}%(echo '.%{_kversion}'|sed -e 'y,-,.,;s,\.%{arch}$,,')
 %global kspecrelease %{baserelease}
 %global krelsrequire %{nil}
 %endif
@@ -2065,7 +2069,7 @@
 
 # SuSE adds a mogrified kernel version string to the kmp version.
 %if %{HAVE_susekmps}
-%global kbaseversion %{baseversion}%(echo '_%{kernel_source}' | sed -r -e 'y,-,_,;s,^(2\.6\.2[0-9]+)_,\\1.0_,')
+%global kbaseversion %{baseversion}%(echo '_%{kernel_source}'|sed -r -e 'y,-,_,;s,^(2\.6\.2[0-9]+)_,\\1.0_,')
 %global kspecversion %{baseversion}
 %global kversrequire %{nil}
 %endif
@@ -2082,8 +2086,8 @@
 # Splits the 2.6.M.REL-ABI.KIND at the - between version and release string to
 # avoid inserting a - into either
 %if %{HAVE_urpmkmps}
-%global lbaseversion %{baseversion}%(echo '.%{kernel_latest}' | sed -e 's,-.*,,')
-%global lbaserelease %(echo '.%{kernel_latest}' | sed -e 's,.*-,,;s,\.[^\.]*$,,')%{extrarelease2}
+%global lbaseversion %{baseversion}%(echo '.%{kernel_latest}'|sed -e 's,-.*,,')
+%global lbaserelease %(echo '.%{kernel_latest}'|sed -e 's,.*-,,;s,\.[^\.]*$,,')%{extrarelease2}
 %endif
 
 %if %{HAVE_weakmods}
@@ -2124,8 +2128,8 @@
 
 # a macro to [build] require one package of the same version as another (possibly virtual) package
 # use the arguments [Build]Requires: package1 [>]= package2
-%global requires_prov() %{expand: %(LANG= rpm -q --provides %3 --qf "%1 %2 %%{EPOCH}:%%{VERSION}-%%{RELEASE}\\n" | tail -1 | sed -e 's|.*is not.*$|%1|')}%{nil}
-%global version_of_or() %{expand: %(LANG= rpm -q --provides %1 --qf "= %%{EPOCH}:%%{VERSION}-%%{RELEASE}\\n" | tail -1 | sed -e 's|.*is not.*$|>= %2|')}%{nil}
+%global requires_prov() %{expand: %(LANG= rpm -q --provides %3 --qf "%1 %2 %%{EPOCH}:%%{VERSION}-%%{RELEASE}\\n"|tail -1|sed -e 's|.*is not.*$|%1|')}%{nil}
+%global version_of_or() %{expand: %(LANG= rpm -q --provides %1 --qf "= %%{EPOCH}:%%{VERSION}-%%{RELEASE}\\n"|tail -1|sed -e 's|.*is not.*$|>= %2|')}%{nil}
 
 %global descripline %{title} provides Linux Fast-STREAMS for Linux.
 
@@ -2167,7 +2171,7 @@ Autoprov:       true
 #BuildRequires:    @SED@
 #BuildRequires:    @AWK@
 
-%global newgcc %(if test `gcc -v 2>&1 | grep 'gcc version' | sed -e 's|gcc version ||;s| .*$||'` != '2.95.3' ; then echo 1 ; else echo 0 ; fi)
+%global newgcc %(if test `gcc -v 2>&1|grep 'gcc version'|sed -e 's|gcc version ||;s| .*$||'` != '2.95.3' ; then echo 1 ; else echo 0 ; fi)
 
 %ifnarch noarch
 %ifarch s390 s390x
@@ -2398,8 +2402,8 @@ generating and submitting problem reports to @PACKAGE_BUGREPORT@.
 %global csite_file %{_host}-config.site
 %global mpost_file %{_host}-%{kernel_version}-modpost.cache
 
-%define enable()  %(echo "%1" | sed -e 's|^--with-|--enable-|')%{nil}
-%define disable() %(echo "%1" | sed -e 's|^--without-|--disable-|')%{nil}
+%define enable()  %(echo "%1"|sed -e 's|^--with-|--enable-|')%{nil}
+%define disable() %(echo "%1"|sed -e 's|^--without-|--disable-|')%{nil}
 
 ./configure \
     ${CC+CC="${CC}"} \
@@ -2705,7 +2709,7 @@ cp -p System.symvers $d
 cp -p Module.symvers $d
 cp -p Modules.map $d
 # create symbol versions file
-cat System.symvers Module.symvers | gzip > $d/%{kernel_symvers}
+cat System.symvers Module.symvers|gzip > $d/%{kernel_symvers}
 # copy in symbol sets file
 cp -p %{kernel_symsets} $d
 # copy in symbol sets file to boot directory as well
@@ -2723,7 +2727,7 @@ echo '.Custom.1'  > .rpmextra
 # create configured source directory for source package
 mkdir -p %{buildroot}%{_usrsrc}/%{name}-%{baseversion}-%{specrelease}
 # tar and move the sources for source release
-tar cf - . | tar xf - -C %{buildroot}%{_usrsrc}/%{name}-%{baseversion}-%{specrelease}
+tar cf - .|tar xf - -C %{buildroot}%{_usrsrc}/%{name}-%{baseversion}-%{specrelease}
 # clean out binaries and auxilliary files
 ( cd %{buildroot}%{_usrsrc}/%{name}-%{baseversion}-%{specrelease} ; make V=1 mostlyclean )
 # create symbolic link
@@ -2824,7 +2828,7 @@ Autoprov:           true
 
 %if %{FILES_yumrepo}
 #refix:             %{_yumrepodir}
-#refix:             %{_rpmgpgdir}
+Prefix:             %{_rpmgpgdir}
 Prefix:             %{_yumplugdir}
 Prefix:             %{_yumconfdir}
 %endif
@@ -2833,6 +2837,7 @@ Prefix:             %{_yumconfdir}
 #refix:             %{_zypprepodir}
 %endif
 %if %{FILES_urpmirepo}
+Prefix:             %{_rpmgpgdir}
 #refix:             %{_urpmirepodir}
 %endif
 %if %{FILES_aptrepo}
@@ -2882,6 +2887,22 @@ Requires(pre):      %(which wget 2>/dev/null)
 Requires(pre):      %(which sed  2>/dev/null)
 Requires(pre):      %(which awk  2>/dev/null)
 %endif
+
+Conflicts:          %{name}                     < %{baseversion}
+Conflicts:          %{name}-repo                < %{baseversion}
+Conflicts:          %{name}-base                < %{baseversion}
+Conflicts:          %{name}-doc                 < %{baseversion}
+Conflicts:          %{name}-lib                 < %{baseversion}
+Conflicts:          %{name}-compat              < %{baseversion}
+Conflicts:          %{name}-devel               < %{baseversion}
+Conflicts:          %{name}-debug               < %{baseversion}
+Conflicts:          %{name}-kernel              < %{baseversion}
+Conflicts:          %{name}-devel-kernel        < %{baseversion}
+Conflicts:          %{name}-debuginfo-kernel    < %{baseversion}
+Conflicts:          %{name}-debugsource-kernel  < %{baseversion}
+Conflicts:          %{name}-source-kernel       < %{baseversion}
+Conflicts:          %{name}-java                < %{baseversion}
+Conflicts:          %{name}-javadoc             < %{baseversion}
 
 Provides:           %{name}-repo    = %{baseversion}-%{specrelease}
 Provides:           %{name}-repo    = %{baseversion}-%{baserelease}
@@ -2962,15 +2983,20 @@ if [ $1 -eq 1 -o $1 -eq 2 ] ; then : # first install or upgrade
 %endif
     done
     [ -n "$un" -a -n "$pw" ] || { un=; pw=; }
+    d=%{_sslcertdir}; n=OPENSS7-CA-CERT.pem
+    o=; f=$d/$n; [ -d $d ] || mkdir -p -- $d
+    [ -e $f ] || { wget --no-check-certificate -O $f %{_reposerv}://%{_repobase}/cacert.pem 2>/dev/null; (cd $d; ln -sf $n `openssl x509 -hash -noout -in $f`.0); }
     d=%{_localstatedir}/lib/%{name}; n=credentials
     o=; f=$d/$n; [ -d $d ] || mkdir -p -- $d
     [ ! -e $f ] || { o=$f; mv -f -- $f $f.$$; }
-    ext="?hn=`hostname -f`&ip=`hostname -i | sed 'y/ /,/'`${un:+&un=}${un}${pw:+&pw=}${pw}"
-    ext="$ext`echo '/%{_reposubdir}' | sed 's,//,/,g;s,/,\&distro=,;s,/,\&relver=,;s,/,\&osarch=,'`"
+    hn=`hostname -f`; ip=`hostname -i|sed 'y/ /,/'`;n=patches
+    id=`e=$(for s in /sys/class/net/e*;do if [ ! -L $s ];then continue;fi;echo $(readlink $s)" "$s;done|sort|head -1|cut -f2 "-d ");[ -r $e/address ] && cat $e/address|sed "s,:,,g"`
+    ext="?hn=$hn&ip=$ip&id=$id${un:+&un=}${un}${pw:+&pw=}${pw}"
+    ext="$ext`echo '/%{_reposubdir}'|sed 's,//,/,g;s,/,\&distro=,;s,/,\&relver=,;s,/,\&osarch=,'`"
     key="${un:+${un}${pw:+:}${pw}@}"
     url='%{_reposerv}://'"${key}"'%{_repobase}/%{_reporoot}/'"`basename $f`$ext"
-    if ! echo "$url" | wget -i - -O $f 2>/dev/null ; then
-        if echo "$url" | wget -i - -O /dev/null 2>&1 | grep '401 Authorization Required' >/dev/null 2>&1 ; then
+    if ! echo "$url"|wget -i - -O $f 2>/dev/null ; then
+        if echo "$url"|wget -i - -O /dev/null 2>&1|grep '401 Authorization Required' >/dev/null 2>&1 ; then
             u='anonymous'; p=
             m='Authorization required for repository access.'
             if [ -n "$DISPLAY" -a -x "`which zenity 2>/dev/null`" ]; then
@@ -3011,7 +3037,7 @@ if [ $1 -eq 1 -o $1 -eq 2 ] ; then : # first install or upgrade
             key="${u:+${u}${p:+:}${p}@}"
             url='%{_reposerv}://'"${key}"'%{_repobase}/%{_reporoot}/'"`basename $f`$ext"
             rm -f -- $f
-            if ! echo "$url" | wget -i - -O $f 2>/dev/null; then
+            if ! echo "$url"|wget -i - -O $f 2>/dev/null; then
                 rm -f -- $f
                 m='Authorization failed.'
                 if [ -n "$DISPLAY" -a -x "`which zenity 2>/dev/null`" ]; then
@@ -3034,6 +3060,12 @@ if [ $1 -eq 1 -o $1 -eq 2 ] ; then : # first install or upgrade
     fi
     [ "$o" != "$f" ] || rm -f -- $o.$$
     chmod 0600 $f
+    un=`awk 'BEGIN{FS="="}{if($1~/^username$/){print$2;exit}}' $f`
+    pw=`awk 'BEGIN{FS="="}{if($1~/^password$/){print$2;exit}}' $f`
+    [ -n "$un" -a -n "$pw" ] || return 1
+    unp="`echo $un|cut -c1-24`"
+    pwp="`echo $pw|cut -c1-24`"
+    echo "$pwp$unp" >$d/$n
 fi
 
 %post -p /bin/bash repo
@@ -3079,12 +3111,12 @@ if [ $1 -ge 1 -o $2 -ge 1 ] ; then : # apt is being installed or upgraded with r
     pw=`awk 'BEGIN{FS="="}{if($1~/^password$/){print$2;exit}}' $c`
     [ -n "$un" -a -n "$pw" ] || exit 1
     key="${un:+${un}${pw:+:$pw}@}"
-    ext="`echo '/%{_reposubdir}' | sed 's,//,/,g;s,/,?distro=,;s,/,\&relver=,;s,/,\&osarch=,'`"
+    ext="`echo '/%{_reposubdir}'|sed 's,//,/,g;s,/,?distro=,;s,/,\&relver=,;s,/,\&osarch=,'`"
     d=%{_aptrepodir}; n=@PACKAGE@.list
     o=; f=$d/$n; [ -d $d ] || mkdir -p -- $d
     [ ! -e $f ] || { o=$f; mv -f -- $f $f.$$; }
     url='%{_reposerv}://'"$key"'%{_repobase}/%{_reporoot}/'"$n$ext"
-    if ! echo "$url" | wget -i - -O $f 2>/dev/null || [ ! -e $f ]; then
+    if ! echo "$url"|wget -i - -O $f 2>/dev/null || [ ! -e $f ]; then
         [ "$o" != "$f" -o ! -e $o.$$ ] || mv -f -- $o.$$ $o
         exit 1
     fi
@@ -3093,7 +3125,7 @@ if [ $1 -ge 1 -o $2 -ge 1 ] ; then : # apt is being installed or upgraded with r
     o=; f=$d/$n; [ -d $d ] || mkdir -p -- $d
     [ ! -e $f ] || { o=$f; mv -f -- $f $f.$$; }
     url='%{_reposerv}://'"$key"'%{_repobase}/%{_reporoot}/'"$n$ext"
-    if ! echo "$url" | wget -i - -O $f 2>/dev/null || [ ! -e $f ]; then
+    if ! echo "$url"|wget -i - -O $f 2>/dev/null || [ ! -e $f ]; then
         [ "$o" != "$f" -o ! -e $o.$$ ] || mv -f -- $o.$$ $o
     fi
     [ "$o" != "$f" ] || rm -f -- $o.$$
@@ -3108,13 +3140,13 @@ if [ $1 -ge 1 -o $2 -ge 1 ] ; then : # urpm is being installed or upgraded with 
     pw=`awk 'BEGIN{FS="="}{if($1~/^password$/){print$2;exit}}' $c`
     [ -n "$un" -a -n "$pw" ] || exit 1
     key="${un:+${un}${pw:+:$pw}@}"
-    ext="`echo '/%{_reposubdir}' | sed 's,//,/,g;s,/,?distro=,;s,/,\&relver=,;s,/,\&osarch=,'`"
-    d="`echo '%{_reposubdir}' | sed 's,^[^/]*/,@PACKAGE_NAME@-,;y,/,-,'`"
+    ext="`echo '/%{_reposubdir}'|sed 's,//,/,g;s,/,?distro=,;s,/,\&relver=,;s,/,\&osarch=,'`"
+    d="`echo '%{_reposubdir}'|sed 's,^[^/]*/,@PACKAGE_NAME@-,;y,/,-,'`"
     d="%{_urpmirepodir}/$d"; n=media.cfg
     o=; f=$d/$n; [ -d $d ] || mkdir -p -- $d
     [ ! -e $f ] || { o=$f; mv -f -- $f $f.$$; }
     url='%{_reposerv}://'"$key"'%{_repobase}/%{_reporoot}/'"$n$ext"
-    if ! echo "$url" | wget -i - -O $f 2>/dev/null || [ ! -e $f ]; then
+    if ! echo "$url"|wget -i - -O $f 2>/dev/null || [ ! -e $f ]; then
         [ "$o" != "$f" -o ! -e $o.$$ ] || mv -f -- $o.$$ $o
         exit 1
     fi
@@ -3123,7 +3155,7 @@ if [ $1 -ge 1 -o $2 -ge 1 ] ; then : # urpm is being installed or upgraded with 
     o=; f=$d/$n; [ -d $d ] || mkdir -p -- $d
     [ ! -e $f ] || { o=$f; mv -f -- $f $f.$$; }
     url='%{_reposerv}://'"$key"'%{_repobase}/%{_reporoot}/'"$n$ext"
-    if ! echo "$url" | wget -i - -O $f 2>/dev/null || [ ! -e $f ]; then
+    if ! echo "$url"|wget -i - -O $f 2>/dev/null || [ ! -e $f ]; then
         [ "$o" != "$f" -o ! -e $o.$$ ] || mv -f -- $o.$$ $o
         exit 1
     fi
@@ -3154,7 +3186,7 @@ if [ $1 -ge 1 -o $2 -ge 1 ] ; then : # yum is being installed or upgraded with r
     pw=`awk 'BEGIN{FS="="}{if($1~/^password$/){print$2;exit}}' $c`
     [ -n "$un" -a -n "$pw" ] || exit 1
     key="${un:+${un}${pw:+:$pw}@}"
-    ext="`echo '/%{_reposubdir}' | sed 's,//,/,g;s,/,?distro=,;s,/,\&relver=,;s,/,\&osarch=,'`"
+    ext="`echo '/%{_reposubdir}'|sed 's,//,/,g;s,/,?distro=,;s,/,\&relver=,;s,/,\&osarch=,'`"
     d=%{_yumrepodir}; n=@PACKAGE@.repo
     o=; f=$d/$n; [ -d $d ] || mkdir -p -- $d
     [ ! -e $f ] || { o=$f; mv -f -- $f $f.$$; }
@@ -3172,12 +3204,12 @@ if [ $1 -ge 1 -o $2 -ge 1 ] ; then : # urpm is being installed or upgraded with 
     pw=`awk 'BEGIN{FS="="}{if($1~/^password$/){print$2;exit}}' $c`
     [ -n "$un" -a -n "$pw" ] || exit 1
     key="${un:+${un}${pw:+:$pw}@}"
-    ext="`echo '/%{_reposubdir}' | sed 's,//,/,g;s,/,?distro=,;s,/,\&relver=,;s,/,\&osarch=,'`"
+    ext="`echo '/%{_reposubdir}'|sed 's,//,/,g;s,/,?distro=,;s,/,\&relver=,;s,/,\&osarch=,'`"
     d=%{_zyppservdir}; n=@PACKAGE_UCNAME@.service
     o=; f=$d/$n; [ -d $d ] || mkdir -p -- $d
     [ ! -e $f ] || { o=$f; mv -f -- $f $f.$$; }
     url='%{_reposerv}://'"$key"'%{_repobase}/%{_reporoot}/'"$n$ext"
-    if ! echo "$url" | wget -i - -O $f 2>/dev/null || [ ! -e $f ]; then
+    if ! echo "$url"|wget -i - -O $f 2>/dev/null || [ ! -e $f ]; then
         [ "$o" != "$f" -o ! -e $o.$$ ] || mv -f -- $o.$$ $o
         exit 1
     fi
@@ -3200,7 +3232,7 @@ fi
 if [ $1 -eq 0 -o $2 -eq 0 ] ; then : # repo being removed with urpm present (or visa versa)
     f=%{_urpmiconfdir}/urpmi.cfg
     if [ -f $f ]; then
-        sed '/^.*(@PACKAGE@[0-9]*).*{/,/}/d' $f | cat -s >$f.$$
+        sed '/^.*(@PACKAGE@[0-9]*).*{/,/}/d' $f|cat -s >$f.$$
         mv -f -- $f.$$ $f
     fi
     f=%{_urpmiconfdir}/netrc
@@ -3209,7 +3241,7 @@ if [ $1 -eq 0 -o $2 -eq 0 ] ; then : # repo being removed with urpm present (or 
         sed '/^machine[[:space:]]*%{_repobase}/d' $f >>$f.$$
         mv -f -- $f.$$ $f
     fi
-    d="`echo '%{_reposubdir}' | sed 's,^[^/]*/,@PACKAGE_NAME@-,;y,/,-,'`"
+    d="`echo '%{_reposubdir}'|sed 's,^[^/]*/,@PACKAGE_NAME@-,;y,/,-,'`"
     rm -rf -- %{_urpmirepodir}/$d
     rm -rf -- %{_localstatedir}/lib/urpmi/*'(@PACKAGE@'[0-9]*')'*
 fi
@@ -3268,10 +3300,11 @@ fi
 %defattr(-,root,root)
 %dir %{_localstatedir}/lib/%{name}
 #{?files_yumrepo:%config(noreplace) %{_yumrepodir}/*}
-#{?files_yumrepo:%{_rpmgpgdir}/*}
+{?files_yumrepo:%{_rpmgpgdir}/*}
 #{?files_zypprepo:%config(noreplace) %{_zypprepodir}/*}
 %{?files_yumrepo:%{_yumplugdir}/*.py*}
 %{?files_yumrepo:%config(noreplace) %{_yumconfdir}/*.conf}
+{?files_urpmirepo:%{_rpmgpgdir}/*}
 #{?files_urpmirepo:%config(noreplace) %{_urpmirepodir}/*}
 #{?files_aptrepo:%config(noreplace) %{_aptrepodir}/*}
 %endif
@@ -3444,7 +3477,7 @@ if [ $1 -eq 1 ] ; then : # fresh install
         [ $# -gt 0 ] || return 0
         echo "$*"
         for t in $@ ; do
-            prereq=prereq_`echo $t | sed -r -e 's|^.*/||;s|\.(k)?o(\.gz)?(:)?$||;s|[^a-zA-Z0-9_]|_|g'`
+            prereq=prereq_`echo $t|sed -r -e 's|^.*/||;s|\.(k)?o(\.gz)?(:)?$||;s|[^a-zA-Z0-9_]|_|g'`
             eval "pre_remove_depmods \$$prereq"
         done
     }
@@ -3453,27 +3486,27 @@ if [ $1 -eq 1 ] ; then : # fresh install
 	[ -d $dir ] || continue
 	modl_mods=
 	for m in `find $dir \( -name '*.o' -o -name '*.ko' -o -name '*.o.gz' -o -name '*.ko.gz' \) 2>/dev/null`; do
-	    b=`echo $m | sed -r -e 's,^.*/,,;s,\.(k)?o(\.gz)? , ,'`
+	    b=`echo $m|sed -r -e 's,^.*/,,;s,\.(k)?o(\.gz)? , ,'`
 	    case " $modules " in (*" $b "*) modl_mods="$modl_mods${modl_mods:+ }$m" ;; esac
 	done
 	if [ -n "$modl_mods" -a -f $dir/modules.dep ] ; then
-	    xtrace=`set -o | sed -n 's,xtrace[[:space:]]*on,set -o xtrace,p;t;s,xtrace[[:space:]]*off,set +o xtrace,p;t'`
+	    xtrace=`set -o|sed -n 's,xtrace[[:space:]]*on,set -o xtrace,p;t;s,xtrace[[:space:]]*off,set +o xtrace,p;t'`
 	    set +x
 	    dep=
             while read line; do
 		case $line in
-		    (*\\)   line="`echo $line | sed -e 's,\\$,,'`"
+		    (*\\)   line="`echo $line|sed -e 's,\\$,,'`"
 			    dep="$dep${dep:+ }$line" ; continue ;;
 		    (*)     dep="$dep${dep:+ }$line" ;;
 		esac
 		if [ -n "$dep" ] ; then
 		    set -- $dep
 		    if [ $# -ge 2 ] ; then
-			t=`echo $1 | sed -e 's,:$,,'`
-			target=target_`echo $t | sed -r -e 's,^.*/,,;s,\.(k)?o(\.gz)?(:)?$,,;s,[^a-zA-Z0-9_],_,g'`
+			t=`echo $1|sed -e 's,:$,,'`
+			target=target_`echo $t|sed -r -e 's,^.*/,,;s,\.(k)?o(\.gz)?(:)?$,,;s,[^a-zA-Z0-9_],_,g'`
 			shift
 			for p in $@ ; do
-			    prereq=prereq_`echo $p | sed -r -e 's,^.*/,,;s,\.(k)?o(\.gz)?(:)?$,,;s,[^a-zA-Z0-9_],_,g'`
+			    prereq=prereq_`echo $p|sed -r -e 's,^.*/,,;s,\.(k)?o(\.gz)?(:)?$,,;s,[^a-zA-Z0-9_],_,g'`
 			    eval "$prereq=\"\$$prereq\${$prereq:+ }$t\""
 			    eval "$target=\"\$$target\${$target:+ }$p\""
 			done
@@ -3485,8 +3518,8 @@ if [ $1 -eq 1 ] ; then : # fresh install
             for m in $modl_mods; do
                 echo "warning: Removing non-rpm kernel module, $m" >&2
                 rm -f -- $m 2>/dev/null || :
-                prereq=prereq_`echo $m | sed -r -e 's,^.*/,,;s,\.(k)?o(\.gz)?(:)?$,,;s,[^a-zA-Z0-9_],_,g'`
-                eval "pre_remove_depmods \$$prereq" | while read b; do
+                prereq=prereq_`echo $m|sed -r -e 's,^.*/,,;s,\.(k)?o(\.gz)?(:)?$,,;s,[^a-zA-Z0-9_],_,g'`
+                eval "pre_remove_depmods \$$prereq"|while read b; do
                     echo "warning: Removing dependent non-rpm kernel module, $b" >&2
                     rm -f -- $b 2>/dev/null || :
                 done
@@ -3616,7 +3649,7 @@ if [ $1 -eq 1 -o $1 -eq 2 ] ; then : # fresh install or upgrade
 	    [ -x /sbin/insserv              ] && { /sbin/insserv              $i       && continue || :; }
 	    [ -x /sbin/chkconfig            ] && { /sbin/chkconfig --add      $i       && continue || :; }
 	    [ -x /usr/lib/lsb/install_initd ] && { /usr/lib/lsb/install_initd $i       && continue || :; }
-	    args="`grep '^#[[:space:]]*update-rc.d:' %_initrddir/$i | sed -e 's,#[[:space:]]*update-rc.d:[[:space:]]*,,'`"
+	    args="`grep '^#[[:space:]]*update-rc.d:' %_initrddir/$i|sed -e 's,#[[:space:]]*update-rc.d:[[:space:]]*,,'`"
 	    [ -x /usr/sbin/update-rc.d      ] && { /usr/sbin/update-rc.d      $i $args && continue || :; }
 	fi
     done
@@ -3657,7 +3690,7 @@ if [ $1 -eq 1 ] ; then : # kernel is being installed or upgraded with base prese
         if [ -e /var/run/%{name}-base.post ]; then
             rm -f -- /var/run/%{name}-base.post
         else
-            v="`set -o | sed -n -e 's,xtrace[[:space:]]*on$,--verbose=2 --debug=2,p;s,xtrace[[:space:]]*off$,--quiet,p'`"
+            v="`set -o|sed -n -e 's,xtrace[[:space:]]*on$,--verbose=2 --debug=2,p;s,xtrace[[:space:]]*off$,--quiet,p'`"
             %{_sbindir}/%{name}-modules -- $v -e \
                 --update-kernel || :
         fi
@@ -3783,7 +3816,7 @@ if [ -x %{_sbindir}/%{name}-modules ]; then
         fi
     done
     if [ -n "$kernels" ]; then
-        v="`set -o | sed -n -e 's,xtrace[[:space:]]*on$,--verbose=2 --debug=2,p;s,xtrace[[:space:]]*off$,--quiet,p'`"
+        v="`set -o|sed -n -e 's,xtrace[[:space:]]*on$,--verbose=2 --debug=2,p;s,xtrace[[:space:]]*off$,--quiet,p'`"
         %{_sbindir}/%{name}-modules -- $v -e \
             --remove-kernel $kernels || :
     fi
@@ -3820,6 +3853,9 @@ fi
 %{?files_kupdate:%{_sysconfdir}/kernel/src_postinst.d/%{name}-update}
 %{?files_wmscripts:%{_sbindir}/%{name}-modules}
 %{?files_wmscripts:%{_sbindir}/%{name}-update}
+%{?files_wmscripts:%{_sbindir}/%{name}-patch}
+%{?files_wmscripts:%{_sbindir}/%{name}-modprobe}
+%{?files_wmscripts:%{_modprobeddir}/specfs.conf
 %endif
 
 # ===========================================================================
@@ -4120,7 +4156,7 @@ if [ $1 -eq 1 ] ; then : # fresh install
     libraries='%{libraries}'
     if [ -x "`which ldconfig 2>/dev/null`" ]; then
         for lib in $libraries ; do
-            ( ldconfig -p | grep '\<lib'$lib'\>' | cut '-d ' -f4 ) 2>/dev/null | \
+            ( ldconfig -p|grep '\<lib'$lib'\>'|cut '-d ' -f4 ) 2>/dev/null|\
             while read l; do
                 echo "warning: Removing old non-rpm library, $l" >&2
                 rm -f -- "$l" || :
@@ -4146,7 +4182,7 @@ fi
 if [ $1 -eq 1 -o $1 -eq 2 ] ; then : # fresh install or upgrade
 %if %{FILES_libraries}
     if   [ -x "`which libtool 2>/dev/null`" ]; then
-        v="`set -o | sed -n -e 's,xtrace[[:space:]]*on$,--verbose,p;s,xtrace[[:space:]]*off$,--quiet,p'`"
+        v="`set -o|sed -n -e 's,xtrace[[:space:]]*on$,--verbose,p;s,xtrace[[:space:]]*off$,--quiet,p'`"
 	[ -d %{_libdir}    ] && { libtool --mode=finish $v %{_libdir}    || : }
 	[ -d %{_syslibdir} ] && { libtool --mode=finish $v %{_syslibdir} || : }
     elif [ -x "`which ldconfig 2>/dev/null`" ]; then
@@ -4305,7 +4341,7 @@ if [ $1 -eq 1 -o $1 -eq 2 ] ; then : # fresh install or upgrade
     rm -f -- $snmp_tmp || :
     if [ $changed_local = yes ]; then
         if [ -f %_initrddir/snmpd ]; then
-            r="`runlevel | awk '{print$2}'`"
+            r="`runlevel|awk '{print$2}'`"
             start=no
             for l in %_initrddir/../rc${r}.d/S[0-9][0-9]snmpd %_initrddir/rc${r}.d/S[0-9][0-9]snmpd; do
                 if [ -L $l ]; then start=yes; break; fi
@@ -4323,7 +4359,7 @@ if [ $1 -eq 1 -o $1 -eq 2 ] ; then : # fresh install or upgrade
 #if %{FILES_tcllibs}
 #   if [ -x "`which tclsh 2>/dev/null`" ]; then
 #       for d in `find %{_pkgtcllibdir} -mindepth 1 -maxdepth 1 -type d` ; do
-#           echo -e "pkg_mkIndex $d\\nexit" | tclsh || :
+#           echo -e "pkg_mkIndex $d\\nexit"|tclsh || :
 #       done
 #   fi
 #endif
@@ -4334,11 +4370,11 @@ fi
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 if [ $1 -ge 1 -o $2 -ge 1 ] ; then : # both present install or upgrade
     initfiles='%{initfiles}'
-    r="`runlevel | awk '{print$2}'`"
+    r="`runlevel|awk '{print$2}'`"
     for i in $initfiles; do
 	[ -f %_initrddir/$i ] || continue
 	[ ! -e /var/lock/subsys/$i ] || continue
-	n=`echo "$i" | sed -e 's,\.sh$,,'`
+	n=`echo "$i"|sed -e 's,\.sh$,,'`
 	grep '^#[[:space:]]*pidfile:[[:space:]]*/var/run/'"$n"'.pid[[:space:]]*$' %_initrddir/$i >/dev/null 2>&1 || break
 	start=no
 	for l in %_initrddir/../rc$r.d/S[0-9][0-9]$i %_initrddir/rc$r.d/S[0-9][0-9]$i; do
@@ -4357,7 +4393,7 @@ fi
 if [ $1 -eq 0 -o $1 -eq 1 ] ; then : # final removal or upgrade
 %if %{FILES_libraries}
     if   [ -x "`which libtool 2>/dev/null`" ]; then
-        v="`set -o | sed -n -e 's,xtrace[[:space:]]*on$,--verbose,p;s,xtrace[[:space:]]*off$,--quiet,p'`"
+        v="`set -o|sed -n -e 's,xtrace[[:space:]]*on$,--verbose,p;s,xtrace[[:space:]]*off$,--quiet,p'`"
 	[ -d %{_libdir}    ] && { libtool --mode=finish $v %{_libdir}    || : }
 	[ -d %{_syslibdir} ] && { libtool --mode=finish $v %{_syslibdir} || : }
     elif [ -x "`which ldconfig 2>/dev/null`" ]; then
@@ -4370,7 +4406,7 @@ if [ $1 -eq 0 -o $1 -eq 1 ] ; then : # final removal or upgrade
         if [ -x "`which lsof 2>/dev/null`" ]; then
             for signal in TERM KILL; do
                 did_one=no
-                lsof | awk '{if($NF~"^%{_libdir}/libxnsl"||$NF~"^%{_lib32dir}/libxnsl"){print$2}}' | \
+                lsof|awk '{if($NF~"^%{_libdir}/libxnsl"||$NF~"^%{_lib32dir}/libxnsl"){print$2}}'|\
                 while read pid; do
                     kill -$signal $pid || :
                     did_one=yes
@@ -4440,7 +4476,7 @@ if [ $1 -eq 0 -o $1 -eq 1 ] ; then : # final removal or upgrade
         if [ -x "`which lsof 2>/dev/null`" ]; then
             for signal in TERM KILL; do
                 did_one=no
-                lsof | awk '{if($NF~"^%{_libdir}/libsocket"||$NF~"^%{_lib32dir}/libsocket"){print$2}}' | \
+                lsof|awk '{if($NF~"^%{_libdir}/libsocket"||$NF~"^%{_lib32dir}/libsocket"){print$2}}'|\
                 while read pid; do
                     kill -$signal $pid || :
                     did_one=yes
@@ -4546,7 +4582,7 @@ if [ $1 -eq 0 -o $1 -eq 1 ] ; then : # final removal or upgrade
     rm -f -- $snmp_tmp || :
     if [ $changed_local = yes ]; then
         if [ -f %_initrddir/snmpd ]; then
-            r="`runlevel | awk '{print$2}'`"
+            r="`runlevel|awk '{print$2}'`"
             start=no
             for l in %_initrddir/../rc${r}.d/S[0-9][0-9]snmpd %_initrddir/rc${r}.d/S[0-9][0-9]snmpd; do
                 if [ -L $l ]; then start=yes; break; fi
@@ -4678,7 +4714,7 @@ developed for %{title}.  Also included are 32-bit test utilities for the
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 if [ $1 -eq 1 -o $1 -eq 2 ] ; then : # fresh install or upgrade
     if   [ -x "`which libtool 2>/dev/null`" ]; then
-        v="`set -o | sed -n -e 's,xtrace[[:space:]]*on$,--verbose,p;s,xtrace[[:space:]]*off$,--quiet,p'`"
+        v="`set -o|sed -n -e 's,xtrace[[:space:]]*on$,--verbose,p;s,xtrace[[:space:]]*off$,--quiet,p'`"
 	[ -d %{_lib32dir}    ] && { libtool --mode=finish $v %{_lib32dir}    || : }
 	[ -d %{_syslib32dir} ] && { libtool --mode=finish $v %{_syslib32dir} || : }
     elif [ -x "`which ldconfig 2>/dev/null`" ]; then
@@ -4693,7 +4729,7 @@ fi
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 if [ $1 -eq 0 -o $1 -eq 1 ] ; then : # final removal or upgrade
     if   [ -x "`which libtool 2>/dev/null`" ]; then
-        v="`set -o | sed -n -e 's,xtrace[[:space:]]*on$,--verbose,p;s,xtrace[[:space:]]*off$,--quiet,p'`"
+        v="`set -o|sed -n -e 's,xtrace[[:space:]]*on$,--verbose,p;s,xtrace[[:space:]]*off$,--quiet,p'`"
 	[ -d %{_lib32dir}    ] && { libtool --mode=finish $v %{_lib32dir}    || : }
 	[ -d %{_syslib32dir} ] && { libtool --mode=finish $v %{_syslib32dir} || : }
     elif [ -x "`which ldconfig 2>/dev/null`" ]; then
@@ -4994,11 +5030,11 @@ Requires(preun):    lsof
 Requires(postun):   lsof
 
 # this is enough for the following
-%((LANG_ALL="C" rpm -q --whatprovides %{_sbindir}/modprobe --qf "Requires:           %{NAME}\\n" | grep -v 'not owned') 2>/dev/null)
-%((LANG_ALL="C" rpm -q --whatprovides %{_sbindir}/modprobe --qf "Requires(pre):      %{NAME}\\n" | grep -v 'not owned') 2>/dev/null)
-%((LANG_ALL="C" rpm -q --whatprovides %{_sbindir}/modprobe --qf "Requires(post):     %{NAME}\\n" | grep -v 'not owned') 2>/dev/null)
-%((LANG_ALL="C" rpm -q --whatprovides %{_sbindir}/modprobe --qf "Requires(preun):    %{NAME}\\n" | grep -v 'not owned') 2>/dev/null)
-%((LANG_ALL="C" rpm -q --whatprovides %{_sbindir}/modprobe --qf "Requires(postun):   %{NAME}\\n" | grep -v 'not owned') 2>/dev/null)
+%((LANG_ALL="C" rpm -q --whatprovides %{_sbindir}/modprobe --qf "Requires:           %{NAME}\\n"|grep -v 'not owned') 2>/dev/null)
+%((LANG_ALL="C" rpm -q --whatprovides %{_sbindir}/modprobe --qf "Requires(pre):      %{NAME}\\n"|grep -v 'not owned') 2>/dev/null)
+%((LANG_ALL="C" rpm -q --whatprovides %{_sbindir}/modprobe --qf "Requires(post):     %{NAME}\\n"|grep -v 'not owned') 2>/dev/null)
+%((LANG_ALL="C" rpm -q --whatprovides %{_sbindir}/modprobe --qf "Requires(preun):    %{NAME}\\n"|grep -v 'not owned') 2>/dev/null)
+%((LANG_ALL="C" rpm -q --whatprovides %{_sbindir}/modprobe --qf "Requires(postun):   %{NAME}\\n"|grep -v 'not owned') 2>/dev/null)
 
 #Requires(pre):      @MODPROBE@
 #Requires(pre):      @LSMOD@
@@ -5016,29 +5052,29 @@ Requires(postun):   lsof
 
 %if %{HAVE_weakmods}
 %if %{HAVE_rhatkmps}
-%((LANG_ALL="C" rpm -q --whatprovides %{_kmoduledir}/kernel --qf "%{Enhances}: %{NAME}-%{ARCH}\\n" | grep -v 'not owned') 2>/dev/null)
+%((LANG_ALL="C" rpm -q --whatprovides %{_kmoduledir}/kernel --qf "%{Enhances}: %{NAME}-%{ARCH}\\n"|grep -v 'not owned') 2>/dev/null)
 %else
 %if %{HAVE_susekmps}
-%((LANG_ALL="C" rpm -q --whatprovides %{_kmoduledir}/kernel --qf "%{Enhances}: %{NAME}_%{ARCH}\\n" | grep -v 'not owned') 2>/dev/null)
+%((LANG_ALL="C" rpm -q --whatprovides %{_kmoduledir}/kernel --qf "%{Enhances}: %{NAME}_%{ARCH}\\n"|grep -v 'not owned') 2>/dev/null)
 %else
 %if %{HAVE_urpmkmps}
-%((LANG_ALL="C" rpm -q --whatprovides %{_kmoduledir}/kernel --qf "%{Enhances}: %{NAME} = %{VERSION}-%{RELEASE}\\n" | grep -v 'not owned') 2>/dev/null)
+%((LANG_ALL="C" rpm -q --whatprovides %{_kmoduledir}/kernel --qf "%{Enhances}: %{NAME} = %{VERSION}-%{RELEASE}\\n"|grep -v 'not owned') 2>/dev/null)
 %else
-%((LANG_ALL="C" rpm -q --whatprovides %{_kmoduledir}/kernel --qf "%{Enhances}: %{NAME}\\n" | grep -v 'not owned') 2>/dev/null)
+%((LANG_ALL="C" rpm -q --whatprovides %{_kmoduledir}/kernel --qf "%{Enhances}: %{NAME}\\n"|grep -v 'not owned') 2>/dev/null)
 %endif
 %endif
 %endif
 %else
 %if %{HAVE_yumrepo}
-%((LANG_ALL="C" rpm -q --whatprovides %{_kmoduledir}/kernel --qf "%{Enhances}: %{NAME}-%{ARCH} = %{VERSION}-%{RELEASE}\\n" | grep -v 'not owned') 2>/dev/null)
+%((LANG_ALL="C" rpm -q --whatprovides %{_kmoduledir}/kernel --qf "%{Enhances}: %{NAME}-%{ARCH} = %{VERSION}-%{RELEASE}\\n"|grep -v 'not owned') 2>/dev/null)
 %else
 %if %{HAVE_zypprepo}
-%((LANG_ALL="C" rpm -q --whatprovides %{_kmoduledir}/kernel --qf "%{Enhances}: %{NAME}_%{ARCH} = %{VERSION}-%{RELEASE}\\n" | grep -v 'not owned') 2>/dev/null)
+%((LANG_ALL="C" rpm -q --whatprovides %{_kmoduledir}/kernel --qf "%{Enhances}: %{NAME}_%{ARCH} = %{VERSION}-%{RELEASE}\\n"|grep -v 'not owned') 2>/dev/null)
 %else
 %if %{HAVE_urpmirepo}
-%((LANG_ALL="C" rpm -q --whatprovides %{_kmoduledir}/kernel | grep -v 'not owned' | sed -r -n 's,.*-([23]\..*),\\1,;T;s,^([^-]*-[0-9]*)\.[^\.]*(\..*)$,%{Enhances}: kernel = \\1\\2,p') 2>/dev/null)
+%((LANG_ALL="C" rpm -q --whatprovides %{_kmoduledir}/kernel|grep -v 'not owned'|sed -r -n 's,.*-([23]\..*),\\1,;T;s,^([^-]*-[0-9]*)\.[^\.]*(\..*)$,%{Enhances}: kernel = \\1\\2,p') 2>/dev/null)
 %else
-%((LANG_ALL="C" rpm -q --whatprovides %{_kmoduledir}/kernel --qf "%{Enhances}: %{NAME} = %{VERSION}-%{RELEASE}\\n" | grep -v 'not owned') 2>/dev/null)
+%((LANG_ALL="C" rpm -q --whatprovides %{_kmoduledir}/kernel --qf "%{Enhances}: %{NAME} = %{VERSION}-%{RELEASE}\\n"|grep -v 'not owned') 2>/dev/null)
 %endif
 %endif
 %endif
@@ -5133,40 +5169,40 @@ if [ $1 -eq 1 ]; then : # fresh install
         [ $# -gt 0 ] || return 0
         echo "$*"
         for t in $@ ; do
-            prereq=prereq_`echo $t | sed -r -e 's|^.*/||;s|\.(k)?o(\.gz)?(:)?$||;s|[^a-zA-Z0-9_]|_|g'`
+            prereq=prereq_`echo $t|sed -r -e 's|^.*/||;s|\.(k)?o(\.gz)?(:)?$||;s|[^a-zA-Z0-9_]|_|g'`
             eval "pre_remove_depmods \$$prereq"
         done
     }
     modules='%{modules}'
     for dir in %{_kmoduledir}; do
 	[ -d $dir ] || continue
-        xtrace=`set -o | sed -n 's,xtrace[[:space:]]*on,set -o xtrace,p;t;s,xtrace[[:space:]]*off,set +o xtrace,p;t'`
+        xtrace=`set -o|sed -n 's,xtrace[[:space:]]*on,set -o xtrace,p;t;s,xtrace[[:space:]]*off,set +o xtrace,p;t'`
         set +x
 	modl_mods=
 	for m in `find $dir \( -name '*.o' -o -name '*.ko' -o -name '*.o.gz' -o -name '*.ko.gz' \) 2>/dev/null` ; do
-		b=`echo $m | sed -r -e 's,^.*/,,;s,\.(k)?o(\.gz)?,,'`
+		b=`echo $m|sed -r -e 's,^.*/,,;s,\.(k)?o(\.gz)?,,'`
 		case " $modules " in (*" $b "*) ;; (*) continue ;; esac
 		modl_mods="$modl_mods${modl_mods:+ }$m"
 	done
         eval "$xtrace"
 	if [ -n "$modl_mods" -a -f $dir/modules.dep ] ; then
-	    xtrace=`set -o | sed -n 's,xtrace[[:space:]]*on,set -o xtrace,p;t;s,xtrace[[:space:]]*off,set +o xtrace,p;t'`
+	    xtrace=`set -o|sed -n 's,xtrace[[:space:]]*on,set -o xtrace,p;t;s,xtrace[[:space:]]*off,set +o xtrace,p;t'`
 	    set +x
 	    dep=
             while read line ; do
 		case $line in
-		    (*\\)   line="`echo $line | sed -e 's,\\$,,'`"
+		    (*\\)   line="`echo $line|sed -e 's,\\$,,'`"
 			    dep="$dep${dep:+ }$line"; continue ;;
 		    (*)     dep="$dep${dep:+ }$line" ;;
 		esac
 		if [ -n "$dep" ] ; then
 		    set -- $dep
 		    if [ $# -ge 2 ] ; then
-			t=`echo $1 | sed -e 's,:$,,'`
-			target=target_`echo $t | sed -r -e 's,^.*/,,;s,\.(k)?o(\.gz)?(:)?$,,;s,[^a-zA-Z0-9_],_,g'`
+			t=`echo $1|sed -e 's,:$,,'`
+			target=target_`echo $t|sed -r -e 's,^.*/,,;s,\.(k)?o(\.gz)?(:)?$,,;s,[^a-zA-Z0-9_],_,g'`
 			shift
 			for p in $@ ; do
-			    prereq=prereq_`echo $p | sed -r -e 's,^.*/,,;s,\.(k)?o(\.gz)?(:)?$,,;s,[^a-zA-Z0-9_],_,g'`
+			    prereq=prereq_`echo $p|sed -r -e 's,^.*/,,;s,\.(k)?o(\.gz)?(:)?$,,;s,[^a-zA-Z0-9_],_,g'`
 			    eval "$prereq=\"\$$prereq\${$prereq:+ }$t\""
 			    eval "$target=\"\$$target\${$target:+ }$p\""
 			done
@@ -5178,8 +5214,8 @@ if [ $1 -eq 1 ]; then : # fresh install
             for m in $modl_mods; do
                 echo "warning: Removing non-rpm kernel module, $m" >&2
                 rm -f -- "$m" 2>/dev/null || :
-                prereq=prereq_`echo $m | sed -r -e 's,^.*/,,;s,\.(k)?o(\.gz)?(:)?$,,;s,[^a-zA-Z0-9_],_,g'`
-                eval "pre_remove_depmods \$$prereq" | while read b; do
+                prereq=prereq_`echo $m|sed -r -e 's,^.*/,,;s,\.(k)?o(\.gz)?(:)?$,,;s,[^a-zA-Z0-9_],_,g'`
+                eval "pre_remove_depmods \$$prereq"|while read b; do
                     echo "warning: Removing non-rpm dependent kernel module, $b" >&2
                     rm -f -- "$b" 2>/dev/null || :
                 done
@@ -5223,7 +5259,7 @@ if [ $1 -eq 1 -o $1 -eq 1 ] ; then : # fresh install or upgrade
 %if %{FILES_oldmods}
 %if %{HAVE_initscripts}
     initfiles='%{initfiles}'
-    r="`runlevel | awk '{print$2}'`"
+    r="`runlevel|awk '{print$2}'`"
     for i in $initfiles; do
 	[ -f %{_initrddir}/$i ] || continue
 	[ ! -e /var/lock/subsys/$i ] || continue
@@ -5254,8 +5290,8 @@ fi
 if [ $1 -ge 1 -o $2 -ge 1 ] ; then : # install either or upgrade either w/ other present
 %if %{HAVE_weakmods}
     if [ -x %{_sbindir}/%{name}-modules ]; then
-        scripts="`echo '%{initfiles}' | sed -e 's/ /,/g'`"
-        v="`set -o | sed -n -e 's,xtrace[[:space:]]*on$,--verbose=2 --debug=2,p;s,xtrace[[:space:]]*off$,--quiet,p'`"
+        scripts="`echo '%{initfiles}'|sed -e 's/ /,/g'`"
+        v="`set -o|sed -n -e 's,xtrace[[:space:]]*on$,--verbose=2 --debug=2,p;s,xtrace[[:space:]]*off$,--quiet,p'`"
         if [ -n "$scripts" ] ; then
             %{_sbindir}/%{name}-modules -- $v -e \
                 --initscripts="$scripts" \
@@ -5270,7 +5306,7 @@ if [ $1 -ge 1 -o $2 -ge 1 ] ; then : # install either or upgrade either w/ other
 %if %{HAVE_initscripts}
     if [ "%{_kversion}" = "`uname -r`" ]; then
         initfiles='%{initfiles}'
-        r="`runlevel | awk '{print$2}'`"
+        r="`runlevel|awk '{print$2}'`"
         for i in $initfiles; do
             [ -f %{_initrddir}/$i ] || continue
             [ ! -e /var/lock/subsys/$i ] || continue
@@ -5300,8 +5336,8 @@ fi
 if [ $1 -eq 0 -o $2 -eq 0 ] ; then : # one being removed with other present
 %if %{HAVE_weakmods}
     if [ -x %{_sbindir}/%{name}-modules ]; then
-        scripts="`echo '%{initfiles}' | sed -e 's/ /,/g'`"
-        v="`set -o | sed -n -e 's,xtrace[[:space:]]*on$,--verbose=2 --debug=2,p;s,xtrace[[:space:]]*off$,--quiet,p'`"
+        scripts="`echo '%{initfiles}'|sed -e 's/ /,/g'`"
+        v="`set -o|sed -n -e 's,xtrace[[:space:]]*on$,--verbose=2 --debug=2,p;s,xtrace[[:space:]]*off$,--quiet,p'`"
         if [ -n "$scripts" ] ; then
             %{_sbindir}/%{name}-modules -- $v -e \
                 --initscripts="$scripts" \
@@ -5482,19 +5518,19 @@ Prefix:             %{_includedir}/%{name}/%{kernel_version}
 # /boot/System.map-%{_kversion} is available.  Also, the specific kernel
 # development package is also required.
 %if %{HAVE_rhatkmps}
-%((LANG_ALL="C" rpm -q --whatprovides %{_kmoduledir}/kernel --qf "%{Enhances}: %{NAME}-%{ARCH} = %{VERSION}-%{RELEASE}\\n" | grep -v 'not owned') 2>/dev/null)
+%((LANG_ALL="C" rpm -q --whatprovides %{_kmoduledir}/kernel --qf "%{Enhances}: %{NAME}-%{ARCH} = %{VERSION}-%{RELEASE}\\n"|grep -v 'not owned') 2>/dev/null)
 %else
 %if %{HAVE_susekmps}
-%((LANG_ALL="C" rpm -q --whatprovides %{_kmoduledir}/kernel --qf "%{Enhances}: %{NAME}_%{ARCH} = %{VERSION}-%{RELEASE}\\n" | grep -v 'not owned') 2>/dev/null)
+%((LANG_ALL="C" rpm -q --whatprovides %{_kmoduledir}/kernel --qf "%{Enhances}: %{NAME}_%{ARCH} = %{VERSION}-%{RELEASE}\\n"|grep -v 'not owned') 2>/dev/null)
 %else
 %if %{HAVE_urpmkmps}
-%((LANG_ALL="C" rpm -q --whatprovides %{_kmoduledir}/kernel --qf "%{Enhances}: %{NAME} = %{VERSION}-%{RELEASE}\\n" | grep -v 'not owned') 2>/dev/null)
+%((LANG_ALL="C" rpm -q --whatprovides %{_kmoduledir}/kernel --qf "%{Enhances}: %{NAME} = %{VERSION}-%{RELEASE}\\n"|grep -v 'not owned') 2>/dev/null)
 %else
-%((LANG_ALL="C" rpm -q --whatprovides %{_kmoduledir}/kernel --qf "%{Enhances}: %{NAME} = %{VERSION}-%{RELEASE}\\n" | grep -v 'not owned') 2>/dev/null)
+%((LANG_ALL="C" rpm -q --whatprovides %{_kmoduledir}/kernel --qf "%{Enhances}: %{NAME} = %{VERSION}-%{RELEASE}\\n"|grep -v 'not owned') 2>/dev/null)
 %endif
 %endif
 %endif
-%((LANG_ALL="C" rpm -q --whatprovides `(cd %{_kmoduledir}/build; /bin/pwd)` --qf "%{Enhances}: %{NAME} = %{VERSION}-%{RELEASE}\\n" | grep -v 'not owned') 2>/dev/null)
+%((LANG_ALL="C" rpm -q --whatprovides `(cd %{_kmoduledir}/build; /bin/pwd)` --qf "%{Enhances}: %{NAME} = %{VERSION}-%{RELEASE}\\n"|grep -v 'not owned') 2>/dev/null)
 
 # kernel develoment needs the kernel (it defines the symbols necessary for development)
 %if %{NEED_kmod}
@@ -5881,7 +5917,7 @@ Prefix:             %{_usrsrc}/%{name}-%{baseversion}-%{specrelease}
 #bsoletes:          kernel-module-%{name}-source%{kernel_flavor}
 #bsoletes:          %{name}-source-kmod%{kernel_flavor}
 
-%((LANG_ALL="C" rpm -q --whatprovides `(cd %{_kmoduledir}/build; /bin/pwd)` --qf "%{Enhnaces}: %{NAME} = %{VERSION}-%{RELEASE}\\n" | grep -v 'not owned') 2>/dev/null)
+%((LANG_ALL="C" rpm -q --whatprovides `(cd %{_kmoduledir}/build; /bin/pwd)` --qf "%{Enhnaces}: %{NAME} = %{VERSION}-%{RELEASE}\\n"|grep -v 'not owned') 2>/dev/null)
 
 %if %{NEED_virt}
 Requires:           %{name} = %{baseversion}-%{baserelease}
@@ -6055,7 +6091,7 @@ if [ $1 -eq 1 ] ; then : # fresh install
     jnilibs='%{jnilibs}'
     if [ -x "`which ldconfig 2>/dev/null`" ]; then
         for lib in $jnilibs; do
-            ( ldconfig -p | grep '\<lib'$lib'\>' | cut '-d ' -f4 ) 2>/dev/null | \
+            ( ldconfig -p|grep '\<lib'$lib'\>'|cut '-d ' -f4 ) 2>/dev/null|\
             while read l; do
                 echo "warning: Removing old non-rpm library, $l" >&2
                 rm -f -- "$l" || :
@@ -6070,7 +6106,7 @@ fi
 if [ $1 -eq 1 ] ; then : # fresh install
 %if %{FILES_jnilibs}
     if   [ -x "`which libtool 2>/dev/null`" ]; then
-        v="`set -o | sed -n -e 's,xtrace[[:space:]]*on$,--verbose,p;s,xtrace[[:space:]]*off$,--quiet,p'`"
+        v="`set -o|sed -n -e 's,xtrace[[:space:]]*on$,--verbose,p;s,xtrace[[:space:]]*off$,--quiet,p'`"
 	[ -d %{_jnidir} ] && { libtool --mode=finish $v %{_jnidir} || : }
     elif [ -x "`which ldconfig 2>/dev/null`" ]; then
 	[ -d %{_jnidir} ] && { ldconfig %{_jnidir} || : }
@@ -6078,7 +6114,7 @@ if [ $1 -eq 1 ] ; then : # fresh install
 %endif
 %if %{FILES_gcjlibs}
     if   [ -x "`which libtool 2>/dev/null`" ]; then
-        v="`set -o | sed -n -e 's,xtrace[[:space:]]*on$,--verbose,p;s,xtrace[[:space:]]*off$,--quiet,p'`"
+        v="`set -o|sed -n -e 's,xtrace[[:space:]]*on$,--verbose,p;s,xtrace[[:space:]]*off$,--quiet,p'`"
 	[ -d %{_pkggcjdir} ] && { libtool --mode=finish $v %{_pkggcjdir} || : }
     elif [ -x "`which ldconfig 2>/dev/null`" ]; then
 	[ -d %{_pkggcjdir} ] && { ldconfig %{_pkggcjdir} || : }
@@ -6094,9 +6130,9 @@ if [ $1 -eq 1 ] ; then : # fresh install
 		[ -d $d ] || continue
 		db=`gcj-dbtool -p $base`
 		[ -n "$db" ]  || continue
-		dirname $db | xargs mkdir -p
+		dirname $db|xargs mkdir -p
 		gcj-dbtool -n $db.tmp 64
-		find $d -follow -name '*.db' -print0 | \
+		find $d -follow -name '*.db' -print0|\
 		    xargs -0 gcj-dbtool -m $db.tmp $db.tmp
 		mv -f -- $db.tmp $db
 	    done
@@ -6115,7 +6151,7 @@ fi
 if [ $1 -eq 0 -o $1 -eq 1 ] ; then : # final removal or upgrade
 %if %{FILES_jnilibs}
     if   [ -x "`which libtool 2>/dev/null`" ]; then
-        v="`set -o | sed -n -e 's,xtrace[[:space:]]*on$,--verbose,p;s,xtrace[[:space:]]*off$,--quiet,p'`"
+        v="`set -o|sed -n -e 's,xtrace[[:space:]]*on$,--verbose,p;s,xtrace[[:space:]]*off$,--quiet,p'`"
 	[ -d %{_jnidir} ] && { libtool --mode=finish $v %{_jnidir} || : }
     elif [ -x "`which ldconfig 2>/dev/null`" ]; then
 	[ -d %{_jnidir} ] && { ldconfig -n %{_jnidir} || : }
@@ -6123,7 +6159,7 @@ if [ $1 -eq 0 -o $1 -eq 1 ] ; then : # final removal or upgrade
 %endif
 %if %{FILES_gcjlibs}
     if   [ -x "`which libtool 2>/dev/null`" ]; then
-        v="`set -o | sed -n -e 's,xtrace[[:space:]]*on$,--verbose,p;s,xtrace[[:space:]]*off$,--quiet,p'`"
+        v="`set -o|sed -n -e 's,xtrace[[:space:]]*on$,--verbose,p;s,xtrace[[:space:]]*off$,--quiet,p'`"
 	[ -d %{_pkggcjdir} ] && { libtool --mode=finish $v %{_pkggcjdir} || : }
     elif [ -x "`which ldconfig 2>/dev/null`" ]; then
 	[ -d %{_pkggcjdir} ] && { ldconfig -n %{_pkggcjdir} || : }
@@ -6139,9 +6175,9 @@ if [ $1 -eq 0 -o $1 -eq 1 ] ; then : # final removal or upgrade
 		[ -d $d ] || continue
 		db=`gcj-dbtool -p $base`
 		[ -n "$db" ] || continue
-		dirname $db | xargs mkdir -p
+		dirname $db|xargs mkdir -p
 		gcj-dbtool -n $db.tmp 64
-		find $d -follow -name '*.db' -print0 | \
+		find $d -follow -name '*.db' -print0|\
 		    xargs -0 gcj-dbtool -m $db.tmp $db.tmp
 		mv -f -- $db.tmp $db
 	    done
