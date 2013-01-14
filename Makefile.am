@@ -1719,7 +1719,9 @@ xmond_LDFLAGS			= $(USER_LDFLAGS) $(SNMP_LDFLAGS) -lpcap
 
 if WITH_SNMP
 if WITH_SNMP_AGENT
+if WITH_LIB_PCAP
 sbin_PROGRAMS			+= xmond
+endif
 endif
 endif
 EXTRA_PROGRAMS			+= xmond

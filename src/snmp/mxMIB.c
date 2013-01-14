@@ -9496,7 +9496,7 @@ refresh_mxNearEndTotalTable_row(struct mxNearEndTotalTable_data *StorageTmp, int
 		}
 		buf.stats.type = MX_OBJ_TYPE_SPAN;
 		buf.stats.id = StorageTmp->mxNearEndTotalTable_id;
-		buf.stats.interval = -1UL; /* totals */
+		buf.stats.interval = -1U; /* totals */
 		buf.stats.time = 0; /* returned */
 		buf.stats.stamp = 0; /* returned */
 		ioc.ic_cmd = MX_IOCGSTATS;
@@ -10461,7 +10461,7 @@ refresh_mxFarEndTotalTable_row(struct mxFarEndTotalTable_data *StorageTmp, int f
 		}
 		buf.stats.type = MX_OBJ_TYPE_SPAN;
 		buf.stats.id = StorageTmp->mxFarEndTotalTable_id;
-		buf.stats.interval = -1UL; /* totals */
+		buf.stats.interval = -1U; /* totals */
 		buf.stats.time = 0; /* returned */
 		buf.stats.stamp = 0; /* returned */
 		ioc.ic_cmd = MX_IOCGSTATS;
