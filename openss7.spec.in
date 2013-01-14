@@ -5,7 +5,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
+# Copyright (c) 2008-2013  Monavacon Limited <http://www.monavacon.com/>
 # Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
 # Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 #
@@ -3300,11 +3300,11 @@ fi
 %defattr(-,root,root)
 %dir %{_localstatedir}/lib/%{name}
 #{?files_yumrepo:%config(noreplace) %{_yumrepodir}/*}
-{?files_yumrepo:%{_rpmgpgdir}/*}
+%{?files_yumrepo:%{_rpmgpgdir}/*}
 #{?files_zypprepo:%config(noreplace) %{_zypprepodir}/*}
 %{?files_yumrepo:%{_yumplugdir}/*.py*}
 %{?files_yumrepo:%config(noreplace) %{_yumconfdir}/*.conf}
-{?files_urpmirepo:%{_rpmgpgdir}/*}
+%{?files_urpmirepo:%{_rpmgpgdir}/*}
 #{?files_urpmirepo:%config(noreplace) %{_urpmirepodir}/*}
 #{?files_aptrepo:%config(noreplace) %{_aptrepodir}/*}
 %endif
