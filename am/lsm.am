@@ -154,7 +154,9 @@ repo_need_files		= mirrorlist \
 			  repoindex.xml \
 			  credentials \
 			  media.cfg \
-			  urpmi.cfg
+			  urpmi.cfg \
+			  $(PACKAGE).defs \
+			  $(PACKAGE)-mirrors
 
 EXTRA_DIST		+= $(repo_html_files)
 
