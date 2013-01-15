@@ -2295,7 +2295,9 @@ test_readv(int child, const struct iovec *iov, int count)
 int
 test_ti_ioctl(int child, int cmd, intptr_t arg)
 {
+#if 0
 	int tpi_error;
+#endif
 
 	if (cmd == I_STR && verbose > 3) {
 		struct strioctl *icp = (struct strioctl *) arg;
@@ -2339,8 +2341,8 @@ test_ti_ioctl(int child, int cmd, intptr_t arg)
 		fprintf(stdout, "***************ERROR: ioctl failed\n");
 		if (verbose > 3)
 			fprintf(stdout, "                    : %s; result = %d\n", __FUNCTION__, last_retval);
-		fprintf(stdout, "                    : %s; TPI error = %d\n", __FUNCTION__, tpi_error);
 #if 0
+		fprintf(stdout, "                    : %s; TPI error = %d\n", __FUNCTION__, tpi_error);
 		if (tpi_error == TSYSERR)
 			fprintf(stdout, "                    : %s; %s\n", __FUNCTION__, strerror(last_errno));
 #endif
