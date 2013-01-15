@@ -57,17 +57,22 @@ if PKG_BUILD_INDEP
 if PKG_BUILD_USER
 ## PKG_BUILD_USER
 
-dist_sbin_SCRIPTS		+= scripts/openss7-modules \
-				   src/util/openss7-update \
-				   scripts/openss7-patch \
-				   src/util/openss7-modprobe
+dist_sbin_SCRIPTS			+= scripts/openss7-patch
 
-AM_INSTALLCHECK_STD_OPTIONS_EXEMPT	+= src/util/openss7-update \
-					   scripts/openss7-patch \
-					   src/util/openss7-modprobe
+AM_INSTALLCHECK_STD_OPTIONS_EXEMPT	+= scripts/openss7-patch
 
 if WITH_KO_MODULES
 ## WITH_KO_MODULES
+
+dist_modprobed_DATA			= src/util/modprobe/specfs.conf
+
+dist_sbin_SCRIPTS			+= scripts/openss7-modules \
+					   src/util/openss7-update \
+					   src/util/openss7-modprobe
+
+AM_INSTALLCHECK_STD_OPTIONS_EXEMPT	+= src/util/openss7-update \
+					   src/util/openss7-modprobe
+
 if KERNEL_UPDATES
 ## KERNEL_UPDATES
 
