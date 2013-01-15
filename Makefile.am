@@ -3179,8 +3179,6 @@ dist_sysctld_DATA		= src/util/sysconfig/streams.conf
 
 dist_modulesloadd_DATA		= src/util/systemd/streams.conf
 
-dist_modprobed_DATA		= src/util/modprobe/specfs.conf
-
 ## INSTALL_SYSTEMD
 endif
 
@@ -3188,9 +3186,9 @@ endif
 endif
 
 if WITH_UPDATE_CA_CERTS
-dist_lcacert_DATA		= scripts/OPENSS7-CA-CERT
+#dist_lcacert_DATA		= scripts/OPENSS7-CA-CERT
 else
-dist_sslcert_DATA		= scripts/OPENSS7-CA-CERT
+#dist_sslcert_DATA		= scripts/OPENSS7-CA-CERT
 endif
 
 dist_snmpmib_DATA		= 
