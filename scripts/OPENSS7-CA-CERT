@@ -1,19 +1,102 @@
+Certificate:
+    Data:
+        Version: 3 (0x2)
+        Serial Number:
+            de:9a:5b:48:36:a7:2c:c2
+        Signature Algorithm: sha1WithRSAEncryption
+        Issuer: C=CA, ST=Alberta, L=Edmonton, O=OpenSS7 Corporation, OU=The OpenSS7 Project, CN=www.openss7.org/emailAddress=openss7@openss7.org
+        Validity
+            Not Before: Jan 15 11:49:28 2013 GMT
+            Not After : Jan 13 11:49:28 2023 GMT
+        Subject: C=CA, ST=Alberta, L=Edmonton, O=OpenSS7 Corporation, OU=The OpenSS7 Project, CN=www.openss7.org/emailAddress=openss7@openss7.org
+        Subject Public Key Info:
+            Public Key Algorithm: rsaEncryption
+                Public-Key: (1024 bit)
+                Modulus:
+                    00:bb:a0:86:c3:a7:60:44:b8:cd:1d:d9:a0:44:aa:
+                    d5:fa:73:07:51:4b:34:b5:6b:1d:1b:80:2d:b5:c3:
+                    28:71:de:ea:93:20:4a:49:e2:a7:8a:b3:19:36:6e:
+                    da:0f:25:29:85:77:d7:a2:a0:a6:fe:ae:f4:c4:7f:
+                    7f:d2:3d:a1:b6:b9:4c:e7:ea:86:cb:0f:49:65:0a:
+                    d5:93:0f:30:37:14:c0:06:c8:90:33:e7:24:ce:7c:
+                    dc:05:c5:1c:b7:db:9d:0d:69:7d:aa:e5:04:cd:ec:
+                    09:49:d4:49:82:71:f1:3e:15:2b:ca:9b:13:e4:52:
+                    33:a5:b3:a2:30:b9:c0:61:bb
+                Exponent: 65537 (0x10001)
+        X509v3 extensions:
+            X509v3 Subject Key Identifier: 
+                83:EA:4E:E0:11:79:1A:62:B2:29:22:B9:C3:BB:54:18:41:A3:A7:8E
+            X509v3 Authority Key Identifier: 
+                keyid:83:EA:4E:E0:11:79:1A:62:B2:29:22:B9:C3:BB:54:18:41:A3:A7:8E
+                DirName:/C=CA/ST=Alberta/L=Edmonton/O=OpenSS7 Corporation/OU=The OpenSS7 Project/CN=www.openss7.org/emailAddress=openss7@openss7.org
+                serial:DE:9A:5B:48:36:A7:2C:C2
+
+            X509v3 Basic Constraints: 
+                CA:TRUE
+            X509v3 Key Usage: 
+                Certificate Sign, CRL Sign
+            Netscape Cert Type: 
+                SSL CA, S/MIME CA, Object Signing CA
+            X509v3 Subject Alternative Name: 
+                email:openss7@openss7.org
+            X509v3 Issuer Alternative Name: 
+                email:openss7@openss7.org, URI:http://www.openss7.org/cacert.pem
+            Netscape CA Revocation Url: 
+                https://www.openss7.org/ca-crl.pem
+            Netscape Comment: 
+                Certificate issued by http://www.openss7.org/
+            Netscape Base Url: 
+                https://www.openss7.org/ssl/
+            Netscape Revocation Url: 
+                revocation.html?
+            Netscape Renewal Url: 
+                renewal.html?
+            Netscape CA Policy Url: 
+                policy.html
+            X509v3 CRL Distribution Points: 
+
+                Full Name:
+                  URI:https://www.openss7.org/ca-crl.pem
+
+    Signature Algorithm: sha1WithRSAEncryption
+        30:85:70:54:7a:fe:8d:00:ce:14:e0:b1:82:50:cb:4b:60:a8:
+        45:f2:72:e2:4d:94:96:2c:b5:53:73:9b:a0:52:96:9f:a9:54:
+        fd:e9:a5:a8:c6:4e:79:85:75:4d:7a:50:b0:03:98:4e:9d:1b:
+        f4:b7:5c:41:6b:91:ed:17:ee:27:d8:60:8a:f3:f2:2f:89:db:
+        5b:7c:af:5b:fc:a3:38:fc:f9:f0:76:fc:ea:d7:bc:7c:3d:48:
+        72:ca:9a:39:e2:d5:fb:e0:e3:2b:18:92:35:eb:47:de:3b:44:
+        e7:fe:e7:dd:79:0f:86:41:a2:af:5a:86:16:8e:20:9c:3a:dd:
+        91:43
 -----BEGIN CERTIFICATE-----
-MIIDKjCCApOgAwIBAgIJAITDi0fXvTpJMA0GCSqGSIb3DQEBBQUAMIGtMQswCQYD
+MIIFoDCCBQmgAwIBAgIJAN6aW0g2pyzCMA0GCSqGSIb3DQEBBQUAMIGsMQswCQYD
 VQQGEwJDQTEQMA4GA1UECAwHQWxiZXJ0YTERMA8GA1UEBwwIRWRtb250b24xHDAa
 BgNVBAoME09wZW5TUzcgQ29ycG9yYXRpb24xHDAaBgNVBAsME1RoZSBPcGVuU1M3
-IFByb2plY3QxGDAWBgNVBAMMD3d3dy5vcGVuc3M3Lm9yZzEjMCEGCSqGSIb3DQEJ
-ARYUYmlkdWxvY2tAb3BlbnNzNy5vcmcwHhcNMTMwMTEyMjM1NDUyWhcNMTMwMjEx
-MjM1NDUyWjCBrTELMAkGA1UEBhMCQ0ExEDAOBgNVBAgMB0FsYmVydGExETAPBgNV
-BAcMCEVkbW9udG9uMRwwGgYDVQQKDBNPcGVuU1M3IENvcnBvcmF0aW9uMRwwGgYD
-VQQLDBNUaGUgT3BlblNTNyBQcm9qZWN0MRgwFgYDVQQDDA93d3cub3BlbnNzNy5v
-cmcxIzAhBgkqhkiG9w0BCQEWFGJpZHVsb2NrQG9wZW5zczcub3JnMIGfMA0GCSqG
-SIb3DQEBAQUAA4GNADCBiQKBgQC9IyZRNL33PTjh57jfdnCTM6q3Uv9P2ngaL4mz
-I+SjNANWbvwO8VmpgqFrdpUycOscHBoW9hdvoC4mp3pnDR7b+obZzfGcrPWUxV5g
-xC2+q7+ZCEjzQFF8Q0Bh9f+fYc2Cirtpmn32qDVw41NyNtF40Tiu4OFSkqElbiiq
-kTZZxwIDAQABo1AwTjAdBgNVHQ4EFgQUIst9yK1f2Qo9NRSngEGeb6UHJTkwHwYD
-VR0jBBgwFoAUIst9yK1f2Qo9NRSngEGeb6UHJTkwDAYDVR0TBAUwAwEB/zANBgkq
-hkiG9w0BAQUFAAOBgQCizdKf7lIBJWtmugQFPpV3XISdgpr4PNLp1xa+7FqL2OWD
-YaWqEtxETRneaUbmE4XKnh6fSYiW3Islk9j8Q0ehZl8R0q5yqoc2SRSIH6uZ0gDw
-AWHhcNBN+9/wUrJiZFFJ0e8s9fAwQdkPpU9NslJOT93DzSxvrwOqQcFGG5u2Pg==
+IFByb2plY3QxGDAWBgNVBAMMD3d3dy5vcGVuc3M3Lm9yZzEiMCAGCSqGSIb3DQEJ
+ARYTb3BlbnNzN0BvcGVuc3M3Lm9yZzAeFw0xMzAxMTUxMTQ5MjhaFw0yMzAxMTMx
+MTQ5MjhaMIGsMQswCQYDVQQGEwJDQTEQMA4GA1UECAwHQWxiZXJ0YTERMA8GA1UE
+BwwIRWRtb250b24xHDAaBgNVBAoME09wZW5TUzcgQ29ycG9yYXRpb24xHDAaBgNV
+BAsME1RoZSBPcGVuU1M3IFByb2plY3QxGDAWBgNVBAMMD3d3dy5vcGVuc3M3Lm9y
+ZzEiMCAGCSqGSIb3DQEJARYTb3BlbnNzN0BvcGVuc3M3Lm9yZzCBnzANBgkqhkiG
+9w0BAQEFAAOBjQAwgYkCgYEAu6CGw6dgRLjNHdmgRKrV+nMHUUs0tWsdG4AttcMo
+cd7qkyBKSeKnirMZNm7aDyUphXfXoqCm/q70xH9/0j2htrlM5+qGyw9JZQrVkw8w
+NxTABsiQM+ckznzcBcUct9udDWl9quUEzewJSdRJgnHxPhUrypsT5FIzpbOiMLnA
+YbsCAwEAAaOCAsYwggLCMB0GA1UdDgQWBBSD6k7gEXkaYrIpIrnDu1QYQaOnjjCB
+4QYDVR0jBIHZMIHWgBSD6k7gEXkaYrIpIrnDu1QYQaOnjqGBsqSBrzCBrDELMAkG
+A1UEBhMCQ0ExEDAOBgNVBAgMB0FsYmVydGExETAPBgNVBAcMCEVkbW9udG9uMRww
+GgYDVQQKDBNPcGVuU1M3IENvcnBvcmF0aW9uMRwwGgYDVQQLDBNUaGUgT3BlblNT
+NyBQcm9qZWN0MRgwFgYDVQQDDA93d3cub3BlbnNzNy5vcmcxIjAgBgkqhkiG9w0B
+CQEWE29wZW5zczdAb3BlbnNzNy5vcmeCCQDemltINqcswjAMBgNVHRMEBTADAQH/
+MAsGA1UdDwQEAwIBBjARBglghkgBhvhCAQEEBAMCAAcwHgYDVR0RBBcwFYETb3Bl
+bnNzN0BvcGVuc3M3Lm9yZzBBBgNVHRIEOjA4gRNvcGVuc3M3QG9wZW5zczcub3Jn
+hiFodHRwOi8vd3d3Lm9wZW5zczcub3JnL2NhY2VydC5wZW0wMQYJYIZIAYb4QgEE
+BCQWImh0dHBzOi8vd3d3Lm9wZW5zczcub3JnL2NhLWNybC5wZW0wPAYJYIZIAYb4
+QgENBC8WLUNlcnRpZmljYXRlIGlzc3VlZCBieSBodHRwOi8vd3d3Lm9wZW5zczcu
+b3JnLzArBglghkgBhvhCAQIEHhYcaHR0cHM6Ly93d3cub3BlbnNzNy5vcmcvc3Ns
+LzAfBglghkgBhvhCAQMEEhYQcmV2b2NhdGlvbi5odG1sPzAcBglghkgBhvhCAQcE
+DxYNcmVuZXdhbC5odG1sPzAaBglghkgBhvhCAQgEDRYLcG9saWN5Lmh0bWwwMwYD
+VR0fBCwwKjAooCagJIYiaHR0cHM6Ly93d3cub3BlbnNzNy5vcmcvY2EtY3JsLnBl
+bTANBgkqhkiG9w0BAQUFAAOBgQAwhXBUev6NAM4U4LGCUMtLYKhF8nLiTZSWLLVT
+c5ugUpafqVT96aWoxk55hXVNelCwA5hOnRv0t1xBa5HtF+4n2GCK8/IvidtbfK9b
+/KM4/Pnwdvzq17x8PUhyypo54tX74OMrGJI160feO0Tn/ufdeQ+GQaKvWoYWjiCc
+Ot2RQw==
 -----END CERTIFICATE-----
