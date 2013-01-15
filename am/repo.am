@@ -205,6 +205,80 @@ repo-uninstall-credentials:
 REPO_INSTALL			+= repo-install-credentials
 REPO_UNINSTALL			+= repo-uninstall-credentials
 
+repo-install-update-certs:
+	@$(ECHO_V) "D: Making $@ in `pwd`."
+	@$(NORMAL_INSTALL)
+	@c='OPENSS7-CA-CERT' ; \
+	if test ! -d '$(DESTDIR)$(lcacertdir)' ; then \
+		$(ECHO) "$(MKDIR_P) $(DESTDIR)$(lcacertdir)" ; \
+		$(MKDIR_P) $(DESTDIR)$(lcacertdir) ; \
+	fi ; \
+	$(ECHO) " $(INSTALL_DATA) $(srcdir)/scripts/$$c '$(DESTDIR)$(lcacertdir)/$$c.crt'" ; \
+	$(INSTALL_DATA) $(srcdir)/scripts/$$c '$(DESTDIR)$(lcacertdir)/$$c.crt' ; \
+	if test ! -d '$(DESTDIR)$(sslcertdir)' ; then \
+		$(ECHO) " $(MKDIR_P) $(DESTDIR)$(sslcertdir)" ; \
+		$(MKDIR_P) $(DESTDIR)$(sslcertdir) ; \
+	fi ; \
+	if test -z "$(DESTDIR)$(rootdir)" ; then \
+		$(ECHO) " $(UCC)" ; \
+		$(UCC) ; \
+	else \
+		s=`$(OPENSSL) x509 -hash -noout -in $(srcdir)/scripts/$$c` ; \
+		$(ECHO) " $(LN_S) -f -- $(lcacertdir)/$$c.crt $(DESTDIR)$(sslcertdir)/$$c.crt" ; \
+		$(LN_S) -f -- $(lcacertdir)/$$c.crt $(DESTDIR)$(sslcertdir)/$$c.crt ; \
+		$(ECHO) " $(LN_S) -f -- $(lcacertdir)/$$c.crt $(DESTDIR)$(sslcertdir)/$$s.0" ; \
+		$(LN_S) -f -- $(lcacertdir)/$$c.crt $(DESTDIR)$(sslcertdir)/$$s.0 ; \
+	fi
+
+repo-uninstall-update-certs:
+	@$(ECHO_V) "D: Making $@ in `pwd`."
+	@$(NORMAL_UNINSTALL)
+	@c='OPENSS7-CA-CERT' ; \
+	$(ECHO) " rm -f -- $(DESTDIR)$(lcacertdir)/$$c.crt" ; \
+	rm -f -- $(DESTDIR)$(lcacertdir)/$$c.crt ; \
+	if test -z "$(DESTDIR)$(rootdir)" ; then \
+		$(ECHO) " $(UCC) --fresh" ; \
+		$(UCC) -- fresh ; \
+	else \
+		s=`$(OPENSSL) x509 -hash -noout -in $(srcdir)/scripts/$$c` ; \
+		$(ECHO) " rm -f -- $(DESTDIR)$(sslcertdir)/$$c.crt $(DESTDIR)$(sslcertdir)/$$s.0"; \
+		rm -f -- $(DESTDIR)$(sslcertdir)/$$c.crt $(DESTDIR)$(sslcertdir)/$$s.0; \
+	fi
+
+repo-install-certs:
+	@$(ECHO_V) "D: Making $@ in `pwd`."
+	@$(NORMAL_INSTALL)
+	@c='OPENSS7-CA-CERT' ; \
+	if test ! -d '$(DESTDIR)$(sslcertdir)' ; then \
+		$(ECHO) " $(MKDIR_P) $(DESTDIR)$(sslcertdir)" ; \
+		$(MKDIR_P) $(DESTDIR)$(sslcertdir) ; \
+	fi ; \
+	$(ECHO) " $(INSTALL_DATA) $(srcdir)/scripts/$$c '$(DESTDIR)$(sslcertdir)/$$c.pem'" ; \
+	$(INSTALL_DATA) $(srcdir)/scripts/$$c '$(DESTDIR)$(sslcertdir)/$$c.pem' ; \
+	s=`$(OPENSSL) x509 -hash -noout -in $(srcdir)/scripts/$$c` ; \
+	$(ECHO) " $(LN_S) -f -- $$c.pem $(DESTDIR)$(sslcertdir)/$$s.0" ; \
+	$(LN_S) -f -- $$c.pem $(DESTDIR)$(sslcertdir)/$$s.0
+
+repo-uninstall-certs:
+	@$(ECHO_V) "D: Making $@ in `pwd`."
+	@$(NORMAL_UNINSTALL)
+	@c='OPENSS7-CA-CERT' ; \
+	s=`$(OPENSSL) x509 -hash -noout -in $(srcdir)/scripts/$$c` ; \
+	$(ECHO) " rm -f -- $(DESTDIR)$(sslcertdir)/$$c.pem $(DESTDIR)$(sslcertdir)/$$s.0" ; \
+	rm -f -- $(DESTDIR)$(sslcertdir)/$$c.pem $(DESTDIR)$(sslcertdir)/$$s.0
+
+if WITH_UPDATE_CA_CERTS
+## WITH_UPDATE_CA_CERTS
+REPO_INSTALL			+= repo-install-update-certs
+REPO_UNINSTALL			+= repo-uninstall-update-certs
+## WITH_UPDATE_CA_CERTS
+else
+## !WITH_UPDATE_CA_CERTS
+REPO_INSTALL			+= repo-install-certs
+REPO_UNINSTALL			+= repo-uninstall-certs
+## !WITH_UPDATE_CA_CERTS
+endif
+
 if WITH_INSTALL_SOURCE_YUM
 ## WITH_INSTALL_SOURCE_YUM
 

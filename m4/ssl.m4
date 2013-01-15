@@ -132,12 +132,20 @@ AC_DEFUN([_SSL_SETUP], [dnl
 # _SSL_OUTPUT
 # -----------------------------------------------------------------------------
 AC_DEFUN([_SSL_OUTPUT], [dnl
-    ssldir="${ssl_cv_ssl_directory}"
-    sslcertdir="$ssldir/certs"
+    ssldir=
+    sslcertdir=
+    if test :"${ssl_cv_ssl_directory:-no}" != :no ; then
+	ssldir="${ssl_cv_ssl_directory}"
+	sslcertdir="$ssldir/certs"
+    fi
     AC_SUBST([ssldir])
     AC_SUBST([sslcertdir])
-    cacertdir="${ssl_cv_ca_cert_dir}"
-    lcacertdir=`echo "${ssl_cv_ca_cert_dir:-no}" | sed 's,/share/,/local/share/,'`
+    cacertdir=
+    lcacertdir=
+    if test :"${ssl_cv_ca_cert_dir:-no}" != :no ; then
+	cacertdir="${ssl_cv_ca_cert_dir}"
+	lcacertdir=`echo "${ssl_cv_ca_cert_dir:-no}" | sed 's,/share/,/local/share/,'`
+    fi
     AC_SUBST([cacertdir])
     AC_SUBST([lcacertdir])
     AM_CONDITIONAL([WITH_UPDATE_CA_CERTS], [test :"${UCC:-no}" != :no -a :"${ssl_cv_ca_cert_dir:-no}" != :no])dnl
