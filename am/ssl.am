@@ -105,10 +105,10 @@ postin-certs:
 	list='$(dist_sslcert_DATA)' ; for p in $$list ; do \
 		f=`$(ECHO) $$p | sed 's|^.*/||'` ; \
 		s=`$(OPENSSL) x509 -hash -noout -in $$d/$$f`.0 ; \
-		$(ECHO) "ln -- $$d/$$f $$d/$$f.crt" ; \
-		ln -- $$d/$$f $$d/$$f.crt ; \
-		$(ECHO) "$(LN_S) -f -- $(sslcertdir)/$$f.crt $$d/$$s" ; \
-		$(LN_S) -f -- $(sslcertdir)/$$f.crt $$d/$$s ; \
+		$(ECHO) "ln -- $$d/$$f $$d/$$f.pem" ; \
+		ln -- $$d/$$f $$d/$$f.pem ; \
+		$(ECHO) "$(LN_S) -f -- $(sslcertdir)/$$f.pem $$d/$$s" ; \
+		$(LN_S) -f -- $(sslcertdir)/$$f.pem $$d/$$s ; \
 	done
 
 preun-certs:
@@ -117,23 +117,23 @@ preun-certs:
 	list='$(dist_sslcert_DATA)' ; for p in $$list ; do \
 		f=`$(ECHO) $$p | sed 's|^.*/||'` ; \
 		s=`$(OPENSSL) x509 -hash -noout -in $$d/$$f`.0 ; \
-		$(ECHO) "rm -f -- $$d/$$f.crt $$d/$$s" ; \
-		rm -f -- $$d/$$f.crt $$d/$$s ; \
+		$(ECHO) "rm -f -- $$d/$$f.pem $$d/$$s" ; \
+		rm -f -- $$d/$$f.pem $$d/$$s ; \
 	done
 
 if WITH_UPDATE_CA_CERTS
 ## WITH_UPDATE_CA_CERTS
 
-POST_INSTALL_AM		+= postin-update-certs
-PRE_UNINSTALL_MA	+= preun-update-certs
-POST_UNINSTALL_MA	+= postun-update-certs
+#POST_INSTALL_AM		+= postin-update-certs
+#PRE_UNINSTALL_MA		+= preun-update-certs
+#POST_UNINSTALL_MA		+= postun-update-certs
 
 ## WITH_UPDATE_CA_CERTS
 else
 ## !WITH_UPDATE_CA_CERTS
 
-POST_INSTALL_AM		+= postin-certs
-PRE_UNINSTALL_MA	+= preun-certs
+#POST_INSTALL_AM		+= postin-certs
+#PRE_UNINSTALL_MA		+= preun-certs
 
 ## !WITH_UPDATE_CA_CERTS
 endif
