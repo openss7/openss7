@@ -26,19 +26,20 @@
 </%args>
 <%perl>
     $m->call_next unless (
-	    $page eq 'OPENSS7credentials'   or
 	    $page eq 'credentials'	    or
-	    $page eq 'netrc.openss7'	    or
-	    $page eq 'openss7.repo'	    or
+	    $page eq 'media.cfg'	    or
 	    $page eq 'mirrorlist'	    or
+	    $page eq 'netrc.openss7'	    or
+	    $page eq 'OPENSS7credentials'   or
+	    $page eq 'openss7.defs'	    or
 	    $page eq 'openss7.list'	    or
+	    $page eq 'openss7-mirrors'	    or
+	    $page eq 'openss7.repo'	    or
+	    $page eq 'OPENSS7.service'	    or
 	    $page eq 'openss7.vendor.list'  or
 	    $page eq 'repoindex.xml'	    or
-	    $page eq 'media.cfg'	    or
 	    $page eq 'urpmi.cfg'	    or
-	    $page eq 'OPENSS7.service'	    or
-	    $page eq 'openss7-mirrors'	    or
-	    $page eq 'openss7.defs'	    );
+	    0);
 
     my ($fd,$url,$artype,$distro,$relver,$osarch,$media,$branch,$subrep);
     my ($username,$userpass,$usergrps,$useraccs,$usercred,$usermach,$userdata,$userinfo,$userauth,$userdflt,$date);
@@ -47,34 +48,91 @@
     $date = `date -Iseconds`; chomp $date;
 
     unless ( exists $ENV{'HTTPS'} and $ENV{'HTTPS'} eq 'on' ) {
+#	FIXME: we should really redirect to the same page on the HTTPS site
 	$r->log_reason("https access required", $r->uri);
 	$m->abort(403)
     }
+#
+#   This is the list of automatically generated files (with the exception of
+#   empty repo files).  Of these, only the 'credentials' file can be accessed
+#   with a user name and pass; the rest need a host name and pass.  None of
+#   these files can be accessed by a browser.  Some can only be accessed by a
+#   specific depsolver.
+#
+#   FIXME: need to add pacman to the list (but we need to use wget or curl from
+#   pacman anyway.
+#
+    my $agent;
+    $agent = 'wget'	if !defined $agent and $ENV{HTTP_USER_AGENT} =~ m,^wget,i;
+    $agent = 'yum'	if !defined $agent and $ENV{HTTP_USER_AGENT} =~ m,^urlgrabber,i;
+    $agent = 'zypper'	if !defined $agent and $ENV{HTTP_USER_AGENT} =~ m,^zypp,i;
+    $agent = 'curl'	if !defined $agent and $ENV{HTTP_USER_AGENT} =~ m,^curl,i;
 
-    if ( $page eq 'openss7.repo'	or
-	 $page eq 'mirrorlist'		or
-	 $page eq 'OPENSS7credentials'	or
+    unless (defined $agent) {
+	$r->log_reason("illegal user agent: ".$ENV{HTTP_USER_AGENT}, $r->uri);
+	$m->abort(404)
+    }
+
+#   Automatic files fall into three categories:
+#	1)  primary access files (that exist at or near the repo root) these
+#	    files must specify the distro, relver and osarch as variables (such
+#	    as for the 'credentials' file), or they must be retrievable from the
+#	    host profile;
+#
+#	2)  secondary access files (that exist at or near the repo root), that
+#	    cannot be coaxed into providing a username and password, nor post
+#	    arguments; (a particular one here is the yum or apt mirrorlist, that
+#	    can be required to access using https, and accepts a post argument,
+#	    but cannot supply username or password, we require ?un=username for
+#	    this one); (OPENSS7.service cannot be coaxed into supplying a
+#	    username or password at all; therefore we activate all
+#
+#	3)  repository access files (that exists under a repository path) these
+#	    files specify the distro, relver and osarch in the path; they must,
+#	    however, match with the distro and osarch retrievable from the host
+#	    profile (but not necessarily relver).
+
+#   Note: we should split out 'credentials' because it is treated quite differently:
+#   - it is the only file download that can change distro, machine name and password
+#   - other files mismatching on distro are not permitted
+
+#   Missing here is:
+#	OPENSS7.service
+#	repoindex.xml
+#	repoindex.xml.asc
+    if (
 	 $page eq 'credentials'		or
-	 $page eq 'netrc.openss7'	or
-	 $page eq 'openss7.list'	or
-	 $page eq 'openss7.vendor.list'	or
 	 $page eq 'media.cfg'		or
-	 $page eq 'urpmi.cfg'		or
+	 $page eq 'mirrorlist'		or
+	 $page eq 'netrc.openss7'	or
+	 $page eq 'OPENSS7credentials'	or
+	 $page eq 'openss7.defs'	or
+	 $page eq 'openss7.list'	or
 	 $page eq 'openss7-mirrors'	or
-	 $page eq 'openss7.defs'	)
+	 $page eq 'openss7.repo'	or
+	 $page eq 'openss7.vendor.list'	or
+	 $page eq 'urpmi.cfg'		or
+	 0)
     {
 	$artype = $ARGS{'artype'};
 	$distro = $ARGS{'distro'};
 	$relver = $ARGS{'relver'};
 	$osarch = $ARGS{'osarch'};
 
-	if ( ($page eq 'openss7.repo'		or
-	      $page eq 'openss7.list'		or
-	      $page eq 'openss7.vendor.list'	or
+#	Missing here is:
+#	    credentials
+#	    mirrorlist		    (handled in separate clause, below)
+#	    netrc.openss7	    (handled in additional clause, below)
+#	    OPENSS7credentials
+	if ( (
 	      $page eq 'media.cfg'		or
-	      $page eq 'urpmi.cfg'		or
+	      $page eq 'openss7.defs'		or
+	      $page eq 'openss7.list'		or
 	      $page eq 'openss7-mirrors'	or
-	      $page eq 'openss7.defs'		) and
+	      $page eq 'openss7.repo'		or
+	      $page eq 'openss7.vendor.list'	or
+	      $page eq 'urpmi.cfg'		or
+	      0) and
 	     (!$distro or !$relver or !$osarch) )
 	{
 	    if ( $page eq 'openss7.repo' )
@@ -146,24 +204,32 @@
 	    $branch = $ARGS{'branch'}; $branch = 'base' unless ($branch);
 	    $subrep = $ARGS{'subrep'}; $subrep = 'full' unless ($subrep);
 	}
-	if ( $page eq 'openss7.repo'	    or
-	     $page eq 'mirrorlist'	    or
-	     $page eq 'OPENSS7credentials'  or
-	     $page eq 'netrc.openss7'	    or
+#	Missing here is:
+#	    credentials
+	if ( 
 	     $page eq 'media.cfg'	    or
-	     $page eq 'urpmi.cfg'	    )
+	     $page eq 'mirrorlist'	    or
+	     $page eq 'netrc.openss7'	    or
+	     $page eq 'OPENSS7credentials'  or
+	     $page eq 'openss7.repo'	    or
+	     $page eq 'urpmi.cfg'	    or
+	     0)
 	{
 	    $artype = $ARGS{'artype'}	unless ($artype);
 	    $artype = 'rpms'		unless ($artype);
 	}
-	elsif ( $page eq 'openss7.list'		or
-		$page eq 'openss7.vendor.list'	)
+	elsif ( 
+		$page eq 'openss7.list'		or
+		$page eq 'openss7.vendor.list'	or
+		0)
 	{
 	    $artype = $ARGS{'artype'}						     unless ($artype);
 	    $artype = ( $distro =~ m/^(debian|ubuntu|mint|lts)$/ ) ? 'debs' : 'rpms' unless ($artype);
 	}
-	elsif ( $page eq 'openss7-mirrors'	or
-		$page eq 'openss7.defs'		)
+	elsif ( 
+		$page eq 'openss7.defs'		or
+		$page eq 'openss7-mirrors'	or
+		0)
 	{
 	    $artype = $ARGS{'artype'}	unless ($artype);
 	    $artype = 'pkgs'		unless ($artype);
@@ -1134,6 +1200,7 @@ xml-info=1
 		    }
 </%perl>
 <% $pre %>[<% $repo %>]
+<% $pre %>SigLevel = PackageRequired
 <% $pre %>Include = /etc/pacman.d/openss7-mirrors
 
 <%perl>
