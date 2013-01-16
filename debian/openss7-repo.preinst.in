@@ -58,17 +58,6 @@ datarootdir=@datarootdir@
 # Auxiliary functions:
 # -----------------------------------------------------------------------------
 #
-# preinst_repo() - When we go to install this subpackage fresh, we need to
-#   acquire a username and password from the user and get credentials for this
-#   machine.  When reinstalling (previous package was not purged), this function
-#   gets the existing credentials from the persistent configuration file.  Even
-#   when a package is purged, we like to keep a copy of the credentials lying
-#   around in a .dpkg-old file so that the machine credentials don't get lost.
-#
-#   Note that because the credentials are really machine credentials, we should
-#   really be saving them in /boot so that installations of other distros can
-#   also see the same machine credentials.
-#
 preinst_repo () { :
     local d un pw o f s ext u p m
     for s in '' .dpkg-old .dpkg-new; do
@@ -94,52 +83,55 @@ preinst_repo () { :
     done
     done
     [ -n "$un" -a -n "$pw" ] || { un=; pw=; }
+    d=$sslcertdir; n=OPENSS7-CA-CERT.pem
+    o=; f=$d/$n; [ -d $d ] || mkdir -p -- $d
+    { wget --no-check-certificate -O $f $reposerv://$repobase/cacert.pem 2>/dev/null; c_rehash &>/dev/null; } ||:
     d=$localstatedir/lib/$name; n=credentials
     o=; f=$d/$n; [ -d $d ] || mkdir -p -- $d
     [ ! -e $f ] || { o=$f; mv -f -- $f $f.$$; }
     hn=`hostname -f`; ip=`hostname -I | sed 'y/ /,/'`; n=patches
-    id=`e=$(for s in /sys/class/net/eth*; do if [ ! -L $s ]; then continue ; fi ; echo $(readlink $s)" "$s ; done | sort | head -1 | cut -f2 "-d ") ; [ -r $e/address ] && cat $e/address | sed "s,:,,g"`
+    id=`e=$(for s in /sys/class/net/e*; do if [ ! -L $s ]; then continue ; fi ; echo $(readlink $s)" "$s ; done | sort | head -1 | cut -f2 "-d ") ; [ -r $e/address ] && cat $e/address | sed "s,:,,g"`
     ext="?hn=$hn&ip=$ip&id=$id${un:+&un=}${un}${pw:+&pw=}${pw}"
     ext="$ext`echo /$reposubdir | sed 's,//,/,g;s,/,\&distro=,;s,/,\&relver=,;s,/,\&osarch=,'`"
     key="${un:+${un}${pw:+:}${pw}@}"
     url="$reposerv://$key$repobase/$reporoot/`basename $f`$ext"
     if ! echo "$url" | wget -i - -O $f 2>/dev/null ; then
         if echo "$url" | wget -i - -O /dev/null 2>&1 | grep '401 Authorization Required' >/dev/null 2>&1 ; then
-            u='anonymous'; p=
+            u="$custname"; p="$custpass"
             m='Authorization required for repository access.'
             if [ -n "$DISPLAY" -a -x "`which zenity 2>/dev/null`" ]; then
                 zenity --info --text="$m" --no-wrap || return 1
                 while true; do
-                    u=`zenity --entry --text='Username: ' --entry-text="$u" || exit 1` || return 1; u=${u:-anonymous}
-                    [ "$u" != anonymous ] || break
+                    u=`zenity --entry --text='Username: ' --entry-text="$u" || exit 1` || return 1; u=${u:-$custname}
+                    [ "$u" != "$custname" ] || break
                     p=`zenity --entry --text="Password for '$u': " --hide-text || exit 1` || continue
-                    [ -z "$p" ] || break
+                    [ -z "$p" -o "$p" = "$custpass" ] || break
                 done
             elif [ "${DISPLAY+set}" = set -a -x "`which whiptail 2>/dev/null`" ]; then
                 whiptail --msgbox "$m" 7 50 >/dev/tty </dev/tty || return 1
                 while true; do
-                    u=`whiptail --inputbox 'Username: ' 8 40 "$u" 2>&1 >/dev/tty </dev/tty || exit 1` || return 1; u=${u:-anonymous}
-                    [ "$u" != anonymous ] || break
+                    u=`whiptail --inputbox 'Username: ' 8 40 "$u" 2>&1 >/dev/tty </dev/tty || exit 1` || return 1; u=${u:-$custname}
+                    [ "$u" != "$custname" ] || break
                     p=`whiptail --passwordbox "Password for '$u': " 8 40 2>&1 >/dev/tty </dev/tty || exit 1` || continue
-                    [ -z "$p" ] || break
+                    [ -z "$p" -o "$p" = "$custpass" ] || break
                 done
             elif [ "${DISPLAY+set}" = set -a -x "`which dialog 2>/dev/null`" ]; then
                 dialog --msgbox "$m" 5 50 >/dev/tty </dev/tty || return 1
                 while true; do
-                    u=`dialog --inputbox 'Username: ' 0 0 "$u" 2>&1 >/dev/tty </dev/tty || exit 1` || return 1; u=${u:-anonymous}
-                    [ "$u" != anonymous ] || break
+                    u=`dialog --inputbox 'Username: ' 0 0 "$u" 2>&1 >/dev/tty </dev/tty || exit 1` || return 1; u=${u:-$custname}
+                    [ "$u" != "$custname" ] || break
                     p=`dialog --passwordbox "Password for '$u': " 0 0 2>&1 >/dev/tty </dev/tty || exit 1` || continue
-                    [ -z "$p" ] || break
+                    [ -z "$p" -o "$p" = "$custpass" ] || break
                 done
             else
                 echo "$m" >/dev/tty
                 while true; do
                     d="$u"
-                    read -e  -p "Username ($u): " u </dev/tty >/dev/tty || { echo '' >/dev/tty; return 1; }; u=${u:-$d}
-                    [ "$u" != anonymous ] || break
-                    read -es -p "Password ($u): " p </dev/tty >/dev/tty || { echo '' >/dev/tty; continue; }
+                    read -e  -p "Username [ENTER:default;CTRL-D:cancel] ($u): " u </dev/tty >/dev/tty || { echo '' >/dev/tty; return 1; }; u=${u:-$d}
+                    [ "$u" != "$custname" ] || break
+                    read -es -p "Password [ENTER:default;CTRL-D:cancel] ($u): " p </dev/tty >/dev/tty || { echo '' >/dev/tty; continue; }
                     echo '' >/dev/tty
-                    [ -z "$p" ] || break
+                    [ -z "$p" -o "$p" = "$custpass" ] || break
                 done
             fi
             key="${u:+${u}${p:+:}${p}@}"
