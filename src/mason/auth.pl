@@ -29,8 +29,8 @@ sub rpmauthenhandler {
 
     my $user = $r->connection->user;
 
-    if ( $r->filename =~ m,/openss7-repo.*\.(rpm|deb)$, ) {
-	#$r->warn("Any host ($user) can download the repo defintion rpm or deb ".$r->uri);
+    if ( $r->filename =~ m,/openss7-repo.*\.(rpm|deb|pkg\.tar\.xz)$, ) {
+	#$r->warn("Any host ($user) can download the repo defintion rpm, deb or pkg ".$r->uri);
 	return OK;
     }
     if ( $r->filename =~ m,/repo/rpms/repodata/[^/]+\.xml(\.gz)?$, ) {
@@ -41,10 +41,14 @@ sub rpmauthenhandler {
 	#$r->warn("Any host ($user) can download the empty repository ".$r->uri);
 	return OK;
     }
-    if ( $r->filename !~ m,(\.xml(\.gz)?|\.rpm|\.deb)$, and
+    if ( $r->filename =~ m,/repo/pkgs/openss7.*\.db*(\.tar\.(gz|bz2|xz))?(\.sig)?$, ) {
+	#$r->warn("Any host ($user) can download the empty repository ".$r->uri);
+	return OK;
+    }
+    if ( $r->filename !~ m,(\.xml(\.gz)?|\.rpm|\.deb|\.pkg.tar.xz)$, and
 	 $r->filename !~ m,((Packages|Sources|Contents|Release)(\.(gz|bz2|gpg|key))?|md5sum.txt)$, )
     {
-	$r->log_reason("not an rpm, deb, xml or apt file", $r->filename);
+	$r->log_reason("not an rpm, deb, xml, pkg or apt file", $r->filename);
 	return FORBIDDEN;
     }
 
@@ -102,6 +106,10 @@ sub rpmauthenhandler {
 	$r->log_reason("DSC access forbidden by rule", $r->filename);
 	return NOT_FOUND;
     }
+    if ( $r->filename =~ m,\.src\.tar\.xz$, ) {
+	$r->log_reason("SRC access forbidden by rule", $r->filename);
+	return NOT_FOUND;
+    }
 
     # top level repodata is always ok
     return OK unless ($path);
@@ -138,8 +146,8 @@ sub rpmauthenhandler {
 
     my $retval = OK;
 
-    if ($retval == OK) { $retval = check_distarch($r,$user,$grps,$distro,$osarch); }
-    if ($retval == OK) { $retval = check_bransubr($r,$user,$grps,$branch,$subrep); }
+    if ($retval == OK) { $retval = check_distarch($r,$user,$grps,$distro,$relver,$osarch); }
+    if ($retval == OK) { $retval = check_bransubr($r,$user,$grps,$branch,$subrep,$osarch); }
 
     if ($retval == FORBIDDEN) {
 	return NOT_FOUND unless ( $type eq 'repodata' or $type eq '' );
@@ -182,17 +190,17 @@ sub check_host {
 }
 
 sub check_distarch {
-    my ($r,$user,$grps,$distro,$osarch) = @_;
+    my ($r,$user,$grps,$distro,$relver,$osarch) = @_;
 
     my ($manage,$enterp,$server) = ( 'yum', 'community', 'desktop' );
 
     $manage = 'yum';
-    $manage = 'zypp' if ( $distro =~ m,^(sle|sles|sled|suse|openSUSE)$, );
-    $manage = 'apt'  if ( $distro =~ m,^(debian|ubuntu|mint|mepis|knoppix|pclinux)$, );
+    $manage = 'zypp'	if ( $distro =~ m,^(sle|sles|sled|suse|openSUSE)$, );
+    $manage = 'apt'	if ( $distro =~ m,^(debian|ubuntu|mint|mepis|knoppix|pclinux)$, );
     $manage = 'pacman'	if ( $distro =~ m,^(arch)$, );
 
     $enterp = 'community'; 
-    $enterp = 'enterprise' if ( $distro =~ m,^(sle|sles|sled|rhel|centos|ults)$, );
+    $enterp = 'enterprise' if ( $distro =~ m,^(sle|sles|sled|rhel|centos|lts)$, );
     # FIXME: need to make ubuntu LTS enterprise
 
     $server = 'desktop';
@@ -227,7 +235,7 @@ sub check_distarch {
 }
 
 sub check_bransubr {
-    my ($r,$user,$grps,$branch,$subrep) = @_;
+    my ($r,$user,$grps,$branch,$subrep,$osarch) = @_;
 
     my $access = ",$grps,";
 
