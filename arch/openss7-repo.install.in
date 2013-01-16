@@ -56,18 +56,7 @@ _set_vars() {
 datarootdir=@datarootdir@
 }
 
-# preinst_repo() - When we go to install this subpackage fresh, we need to
-#   acquire a username and password from the user and get credentials for this
-#   machine.  When reinstalling (previous package was not purged), this function
-#   gets the existing credentials from the persistent configuration file.  Even
-#   when a package is purged, we like to keep a copy of the credentials lying
-#   around in a .pacold file so that the machine credentials don't get lost.
-#
-#   Note that because the credentials are really machine credentials, we should
-#   really be saving them in /boot so that installations of other distros can
-#   also see the same machine credentials.
-#
-preinst_repo () { :
+prein_repo () { :
     local d un pw o f s ext u p m
     for s in '' .pacold .pacnew; do
     for p in credentials; do
@@ -82,7 +71,7 @@ preinst_repo () { :
     done
     for p in $PACKAGE; do
     for d in $pacmanrepodir/; do
-	o=$d${p}list$s
+	o=$d${p}-mirrors$s
 	[ -r $o ] || continue
 	un=`sed -n -r 's,^.*Server[[:space:]]*=[[:space:]]*http[s]?://([^@:]*)(:([^@]*))@.*$,\2,p;t end;b;: end q' $o`
 	pw=`sed -n -r 's,^.*Server[[:space:]]*=[[:space:]]*http[s]?://([^@:]*)(:([^@]*))@.*$,\4,p;t end;b;: end q' $o`
@@ -91,10 +80,10 @@ preinst_repo () { :
     done
     done
     done
-    [ -n "$un" -a -n "$pw" ] || { un=; pw=; }
+    [ -n "$un" -a -n "$pw" ] || { un="$custname"; pw="$custpass"; }
     d=$sslcertdir; n=OPENSS7-CA-CERT.pem
     o=; f=$d/$n; [ -d $d ] || mkdir -p -- $d
-    [ -e $f ] || { wget --no-check-certificate -O $f $reposerv://$repobase/cacert.pem 2>/dev/null; (cd $d; ln -sf $n `openssl x509 -hash -noout -in $f`.0); }
+    { wget --no-check-certificate -O $f $reposerv://$repobase/cacert.pem 2>/dev/null; c_rehash &>/dev/null; } ||:
     d=$localstatedir/lib/$name; n=credentials
     o=; f=$d/$n; [ -d $d ] || mkdir -p -- $d
     [ ! -e $f ] || { o=$f; mv -f -- $f $f.$$; }
@@ -106,41 +95,41 @@ preinst_repo () { :
     url="$reposerv://$key$repobase/$reporoot/`basename $f`$ext"
     if ! echo "$url"|wget -i - -O $f 2>/dev/null ; then
         if echo "$url"|wget -i - -O /dev/null 2>&1|grep '401 Authorization Required' >/dev/null 2>&1 ; then
-            u='anonymous'; p=
+            u="$custname"; p="$custpass"
             m='Authorization required for repository access.'
             if [ -n "$DISPLAY" -a -x "`which zenity 2>/dev/null`" ]; then
                 zenity --info --text="$m" --no-wrap || return 1
                 while true; do
-                    u=`zenity --entry --text='Username: ' --entry-text="$u" || exit 1` || return 1; u=${u:-anonymous}
-                    [ "$u" != anonymous ] || break
+                    u=`zenity --entry --text='Username: ' --entry-text="$u" || exit 1` || return 1; u=${u:-$custname}
+                    [ "$u" != "$custname" ] || break
                     p=`zenity --entry --text="Password for '$u': " --hide-text || exit 1` || continue
-                    [ -z "$p" ] || break
+                    [ -z "$p" -o "$p" = "$custpass" ] || break
                 done
             elif [ "${DISPLAY+set}" = set -a -x "`which whiptail 2>/dev/null`" ]; then
                 whiptail --msgbox "$m" 7 50 >/dev/tty </dev/tty || return 1
                 while true; do
-                    u=`whiptail --inputbox 'Username: ' 8 40 "$u" 2>&1 >/dev/tty </dev/tty || exit 1` || return 1; u=${u:-anonymous}
-                    [ "$u" != anonymous ] || break
+                    u=`whiptail --inputbox 'Username: ' 8 40 "$u" 2>&1 >/dev/tty </dev/tty || exit 1` || return 1; u=${u:-$custname}
+                    [ "$u" != "$custname" ] || break
                     p=`whiptail --passwordbox "Password for '$u': " 8 40 2>&1 >/dev/tty </dev/tty || exit 1` || continue
-                    [ -z "$p" ] || break
+                    [ -z "$p" -o "$p" = "$custpass" ] || break
                 done
             elif [ "${DISPLAY+set}" = set -a -x "`which dialog 2>/dev/null`" ]; then
                 dialog --msgbox "$m" 5 50 >/dev/tty </dev/tty || return 1
                 while true; do
-                    u=`dialog --inputbox 'Username: ' 0 0 "$u" 2>&1 >/dev/tty </dev/tty || exit 1` || return 1; u=${u:-anonymous}
-                    [ "$u" != anonymous ] || break
+                    u=`dialog --inputbox 'Username: ' 0 0 "$u" 2>&1 >/dev/tty </dev/tty || exit 1` || return 1; u=${u:-$custname}
+                    [ "$u" != "$custname" ] || break
                     p=`dialog --passwordbox "Password for '$u': " 0 0 2>&1 >/dev/tty </dev/tty || exit 1` || continue
-                    [ -z "$p" ] || break
+                    [ -z "$p" -o "$p" = "$custpass" ] || break
                 done
             else
                 echo "$m" >/dev/tty
                 while true; do
                     d="$u"
-                    read -e  -p "Username ($u): " u </dev/tty >/dev/tty || { echo '' >/dev/tty; return 1; }; u=${u:-$d}
-                    [ "$u" != anonymous ] || break
-                    read -es -p "Password ($u): " p </dev/tty >/dev/tty || { echo '' >/dev/tty; continue; }
+                    read -e  -p "Username [ENTER:default;CTRL-D:cancel] ($u): " u </dev/tty >/dev/tty || { echo '' >/dev/tty; return 1; }; u=${u:-$d}
+                    [ "$u" != "$custname" ] || break
+                    read -es -p "Password [ENTER:default;CTRL-D:cancel] ($u): " p </dev/tty >/dev/tty || { echo '' >/dev/tty; continue; }
                     echo '' >/dev/tty
-                    [ -z "$p" ] || break
+                    [ -z "$p" -o "$p" = "$custpass" ] || break
                 done
             fi
             key="${u:+${u}${p:+:}${p}@}"
@@ -177,7 +166,7 @@ preinst_repo () { :
     echo "$pwp$unp" >$d/$n
     key="${un:+${un}${pw:+:$pw}@}"
     ext="`echo /$reposubdir|sed 's,//,/,g;s,/,?distro=,;s,/,\&relver=,;s,/,\&osarch=,'`"
-    d=$pacmanrepodir; n=${PACKAGE}list
+    d=$pacmanrepodir; n=${PACKAGE}-mirrors
     o=; f=$d/$n; [ -d $d ] || mkdir -p -- $d
     [ ! -e $f ] || { o=$f; mv -f -- $f $f.$$; }
     url="$reposerv://$key$repobase/$reporoot/$n$ext"
@@ -186,7 +175,7 @@ preinst_repo () { :
         return 1
     fi
     [ "$o" != "$f" ] || rm -f -- $o.$$
-    d=$pacmanrepodir; n=${PACKAGE}repo
+    d=$pacmanrepodir; n=${PACKAGE}.defs
     o=; f=$d/$n; [ -d $d ] || mkdir -p -- $d
     [ ! -e $f ] || { o=$f; mv -f -- $f $f.$$; }
     url="$reposerv://$key$repobase/$reporoot/$n$ext"
@@ -198,55 +187,91 @@ preinst_repo () { :
     return 0
 }
 
-postinst_keyring () { :
+postin_repo () { :
+    mv -f -- "${pacmanconfig}" "${pacmanconfig}.pacold"
+    cat "${pacmanconfig}.pacold" | awk '
+	BEGIN{options=0;myline=0}
+	/BEGIN openss7-repo/{myline=1}
+	/^[[:space:]]*XferCommand/{if (!myline) $0="#"$0;}
+	/^[[:space:]]*([[]|Include)/{
+	  if (options && !myline) {
+	    print "## BEGIN openss7-repo: do not remove this line\n"
+	    print "# OpenSS7 repositories require wget or curl\n"
+	    print "#XferCommand = /usr/bin/curl -C - -f %u > %o"
+	    print "XferCommand = /usr/bin/wget --passive-ftp -c -O %o %u\n"
+	    print "# OpenSS7 repository definitions are here"
+	    print "# Leave these ahead of other repository definitions\n"
+	    print "Include = /etc/pacman.d/openss7.defs"
+	    print "\n## END openss7-repo: do not remove this line"
+	    options=0
+	  }
+	}
+	/^[[:space:]]*[[][[:space:]]*options[[:space:]]*[]]/{options=1;}
+	{if (!myline) print$0;}
+	/END openss7-repo/{myline=0}
+    ' >${pacmanconfig}
+}
+
+prerm_repo () { :
+    mv -f -- "${pacmanconfig}" "${pacmanconfig}.pacold"
+    cat "${pacmanconfig}.pacold" | awk '
+	BEGIN{myline=0}
+	/BEGIN openss7-repo/{myline=1}
+	{if (!myline) print$0;}
+	/END openss7-repo/{myline=0}
+    ' >${pacmanconfig}
+}
+
+postin_keyring () { :
     if [ -x /usr/bin/pacman-key ]; then
 	/usr/bin/pacman-key --populate openss7
     fi
 }
 
 # pre_install($newver) - Run right before files are extracted.  One argument is
-#   passed: new package full version string.
+#	passed: new package full version string.
 #
 pre_install() {
     _set_vars
-    preinst_repo || exit $?
+    prein_repo || exit $?
 }
 
 # post_install($newver) - Run right after files are extracted.  One argument is
-#   passed: new package full version string.
+#	passed: new package full version string.
 #
 post_install() {
     _set_vars
-    postinst_keyring || :
+    postin_repo || :
+    postin_keyring || :
 }
 
 # pre_upgrade($newver,$oldver) - Run right before files are extracted.  Two
-#   arguments are passed in this order: new package ful version string, old
-#   package full version string.
+#	arguments are passed in this order: new package ful version string, old
+#	package full version string.
 #
 pre_upgrade() {
     _set_vars
-    #_pre $*
+    prerm_repo || :
 }
 
 # post_upgrade($newver,$oldver) - Run after files are extracted.  Two arguments
-#   are passed in this order: new package full version string, old package full
-#   version string.
+#	are passed in this order: new package full version string, old package
+#	full version string.
 #
 post_upgrade() {
     _set_vars
-    #_post $*
+    postin_repo || :
 }
 
 # pre_remove($oldver) - Run right before files are removed.  One argument is
-#   passed: old package full version string.
+#	passed: old package full version string.
 #
 pre_remove() {
     _set_vars
 }
 
 # post_remove($oldver) - Run right after files are removed.  One argument is
-#   passed: old package full version string.
+#	passed: old package full version string.
 #
 post_remove() {
     _set_vars
