@@ -113,8 +113,28 @@ AC_DEFUN([_SSL_SETUP], [dnl
 *** 
 *** Configure cannot find a suitable 'openssl' program.  Installing CA
 *** certificates requires the 'openssl' program from the 'openssl'
-*** package on the target host.  The 'openssl' package has been available
-*** for may years on all distributions and is available everywhere.  Try:
+*** package on the target host.  The 'openssl' package has been
+*** available for may years on all distributions and is available
+*** everywhere.  Try:
+*** ], [
+*** Debian:    'aptitude install openssl'
+*** SuSE:      'zypper install openssl'
+*** CentOS:    'yum install openssl'
+*** Mandriva:  'urpmi openssl'
+*** Archlinux: 'yaourt -S openssl'], [
+***
+*** To get rid of this error, load the 'openssl' package, or specify the
+*** location with the OPENSSL environment variable to 'configure'.
+*** ])])
+    _BLD_VAR_PATH_PROG([C_REHASH], [c_rehash], [$tmp_PATH],
+	[c_rehash command @<:@default=c_rehash@:>@], [dnl
+	_BLD_INSTALL_ERROR([C_REHASH], [
+*** 
+*** Configure cannot find a suitable 'c_rehash' program.  Installing CA
+*** certificates requires the 'c_rehash' program from the 'openssl'
+*** package on the target host.  The 'openssl' package has been
+*** available for may years on all distributions and is available
+*** everywhere.  Try:
 *** ], [
 *** Debian:    'aptitude install openssl'
 *** SuSE:      'zypper install openssl'
