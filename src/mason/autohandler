@@ -41,6 +41,7 @@
 	    $page eq 'urpmi.cfg'	    or
 	    0);
 
+    my $httphost = $ENV{HTTP_HOST};
     my ($fd,$url,$artype,$distro,$relver,$osarch,$media,$branch,$subrep);
     my ($username,$userpass,$usergrps,$useraccs,$usercred,$usermach,$userdata,$userinfo,$userauth,$userdflt,$date);
     my ($hostname,$hostpass,$hostgrps,$hostaccs,$hostcred,$hostmach,$hostdata,$hostinfo,$hostauth,$testpass);
@@ -640,14 +641,14 @@ password=<% $hostpass %>
     {
 	$r->content_type('text/plain');
 </%perl>
-machine www.openss7.org login <% $hostname %> password <% $hostpass %>
+machine <% $httphost %> login <% $hostname %> password <% $hostpass %>
 <%perl>
     }
     elsif ( $page eq 'openss7-mirrors' )
     {
 	$r->content_type('text/plain');
 </%perl>
-Server = https://<% $hostname %>:<% $hostpass %>@www.openss7.org/repo/<% $artype %>/<% $distro %>/<% $relver %>/$arch/$repo/
+Server = https://<% $hostname %>:<% $hostpass %>@<% $httphost %>/repo/<% $artype %>/<% $distro %>/<% $relver %>/$arch/$repo/
 <%perl>
     }
     elsif ( $page eq 'openss7.repo'	or
@@ -824,10 +825,10 @@ xml-info=1
 <% $pre %>[<% $name %>]
 <% $pre %>enabled = <% $enabled %>
 <% $pre %>name = <% $desc %>
-<% $pre %>#baseurl = https://<% $rcreds %>www.openss7.org<% $url %>/
-<% $pre %>mirrorlist = https://www.openss7.org/repo/mirrorlist<% $repostr %>
-<% $pre %>gpgkey = https://www.openss7.org/pubkey.asc
-<% $pre %>         https://www.openss7.org/repo/tarballs/OPENSS7-GPG-KEY
+<% $pre %>#baseurl = https://<% $rcreds %><% $httphost %><% $url %>/
+<% $pre %>mirrorlist = https://<% $httphost %>/repo/mirrorlist<% $repostr %>
+<% $pre %>gpgkey = https://<% $httphost %>/pubkey.asc
+<% $pre %>         https://<% $httphost %>/repo/tarballs/OPENSS7-GPG-KEY
 <% $pre %>gpgcheck = 1
 
 <%perl>
@@ -964,11 +965,11 @@ xml-info=1
 			    }
 			}
 </%perl>
-<% $pre %><% $pkgtype %> https://<% $rcreds %>www.openss7.org<% $url %>
+<% $pre %><% $pkgtype %> https://<% $rcreds %><% $httphost %><% $url %>
 <%perl>
 			if ( $subrep eq 'source' ) {
 </%perl>
-<% $pre %><% $srctype %> https://<% $rcreds %>www.openss7.org<% $url %>
+<% $pre %><% $srctype %> https://<% $rcreds %><% $httphost %><% $url %>
 <%perl>
 			}
 </%perl>
@@ -1155,7 +1156,7 @@ xml-info=1
 		    }
 </%perl>
   key-ids: 5a3fe379
-  mirrorlist: https://www.openss7.org<% $url %>
+  mirrorlist: https://<% $httphost %><% $url %>
   with-dir: <% $sub %>
 }
 
@@ -1217,7 +1218,7 @@ xml-info=1
 name=OpenSS7 Repository Service
 enabled=1
 autorefresh=1
-url = https://www.openss7.org/?credentials=OPENSS7credentials
+url = https://<% $httphost %>/?credentials=OPENSS7credentials
 type = ris
 repostoenable =<% $toenable %>
 <%perl>
@@ -1381,7 +1382,7 @@ repostoenable =<% $toenable %>
 	    $url .= "/$subrep" if ($subrep ne 'full');
 	}
 </%perl>
-https://<% $rcreds %>www.openss7.org<% $url %>
+https://<% $rcreds %><% $httphost %><% $url %>
 <%perl>
     } else {
 	$m->call_next;
