@@ -377,7 +377,7 @@ reupload:
 		for k in $$kernels; do \
 			k=`basename $$k`; \
 			test -e $(DESTDIR)$(rootdir)/lib/modules/$$k/build || { $(ECHO) "D: $@: skipping $$k (no build directory)"; continue; }; \
-			test -e $(DESTDIR)$(rootdir)/boot/System.map-$$k || { $(ECHO) "D: $@: skipping $$k (no system mamp)"; continue; }; \
+			test -e $(DESTDIR)$(rootdir)/boot/System.map-$$k || { $(ECHO) "D: $@: skipping $$k (no system map)"; continue; }; \
 			test -n '$(DESTDIR)$(rootdir)' || $(DPKG) -S `(cd /lib/modules/$$k/build; /bin/pwd)` >/dev/null 2>&1 || { $(ECHO) "D: $@: skipping $$k (no build provides)"; continue; }; \
 			ks=`echo $$k | sed 's,-,.,g;s,_,.,g'`; \
 			debs="`(find $(debdir) -name '$(PACKAGE_LCNAME)-$$k*_$(VERSION)-$(PACKAGE_DEBRELEASE)_*[ud.]deb' | LANG= sort -u | grep -v '_all\..*deb$$') 2>/dev/null`"; \
