@@ -786,8 +786,9 @@ Archlinux:
     This is important.  For the original 2.6 and 3.x schemes, when
     kernels are updated that do not change the kernel ABI, they will
     used the same /lib/modules/2.6.M-FLAV or /lib/modules/3.M-FLAV
-    subdirectory and kernel modules will be overwritten.  The most
-    recent scheme; however, uses a different
+    subdirectory and kernel modules will be overwritten.
+    
+    The most recent scheme; however, uses a different
     /lib/modules/3.M.REL-REV-FLAV directory and kernel modules are not
     overwritten.  A separate /lib/extramodules-3.M-FLAV directory is
     symbolic linked from /lib/modules/3.M.REL-REV-FLAV/extramodules that
@@ -802,6 +803,23 @@ Archlinux:
     /lib/extramodules-3.M-FLAV/openss7 and checking
     /lib/extramodules-3.M-FLAV/version at boot to see whether kernel
     updates are required.
+
+    UPDATE:
+
+    We do not put kernel modules in extramodules because the weak module
+    mechanism (openss7-modules awk script) expects different
+    subdirectories per kernel release.
+
+    We had to come up with a new openss7 kernel module naming scheme for
+    archlinux.  The old naming scheme named the kernel modules package:
+    openss7-@kversion@-@VERSION@.(2.6.M|3.M)-@PACKAGE_PACRELEASE@.REV-ARCH.pkg.tar.xz
+
+    Under the new scheme, an openss7 kernel modules package will work
+    with any 3.M kernel.  Therefore, the kernel modules package are
+    named openss7-linux(-FLAV)-@VERSION@.3.M-@PACKAGE_PACRELEASE@.REV-ARCH.pkg.tar.xz
+
+    Which is the same as the old names; however, getting the 3.M no
+    longer consists of splitting `uname -r` at '-'.
 
 -----
 

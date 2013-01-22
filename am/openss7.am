@@ -110,6 +110,7 @@ am__gpg_clear_sign_file = \
 		$(am__gpg_prepare) ; \
 		$(ECHO) "$(GPG) --clearsign -a --passphrase-fd 0$$user$$home$$pass -- $$f 2>/dev/null"; \
 		eval "$$pipe $(GPG) --clearsign -a --passphrase-fd 0$$user$$home$$pass -- $$f 2>/dev/null"; \
+		sigs="$$sigs$${sigs:+ }$$f" ; \
 	else \
 		$(ECHO) "D: gpg OK  $$f" ; \
 		touch "$$f"; \
@@ -121,9 +122,21 @@ am__gpg_verify_sign_file = \
 		$(am__gpg_prepare) ; \
 		$(ECHO) "$(GPG) -ba --passphrase-fd 0$$user$$home$$pass -o- -- $$f >$$a 2>/dev/null"; \
 		eval "$$pipe $(GPG) -ba --passphrase-fd 0$$user$$home$$pass -o- -- $$f >$$a 2>/dev/null"; \
+		sigs="$$sigs$${sigs:+ }$$a" ; \
 	else \
 		$(ECHO) "D: gpg OK  $$a" ; \
 		touch "$$a"; \
+	fi
+
+am__gpg_binary_sign_file = \
+	if test ! -s $$a || ! $(GPG) --verify -- $$a >/dev/null 2>&1; then \
+		test ! -s $$a || $(ECHO) "D: gpg BAD $$a" ; \
+		$(am__gpg_prepare) ; \
+		$(ECHO) "$(GPG) -b --passphrase-fd 0$$user$$home$$pass -o- -- $$f >$$a 2>/dev/null"; \
+		eval "$$pipe $(GPG) -b --passphrase-fd 0$$user$$home$$pass -o- -- $$f >$$a 2>/dev/null"; \
+		sigs="$$sigs$${sigs:+ }$$a" ; \
+	else \
+		$(ECHO) "D: gpg OK  $$a" ; \
 	fi
 
 am__gpg_export_key_file = \
@@ -138,6 +151,9 @@ am__gpg_clear_sign = \
 
 am__gpg_verify_sign = \
 	$(AM_V_GEN) a='$@';f='$<'; $(am__gpg_verify_sign_file)
+
+am__gpg_binary_sign = \
+	$(AM_V_GEN) a='$@';f='$<'; $(am__gpg_binary_sign_file)
 
 am__gpg_export_key = \
 	$(AM_V_GEN) k='$@'; $(am__gpg_export_key_file)

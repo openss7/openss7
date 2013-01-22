@@ -51,7 +51,7 @@ replaces=()
 backup=()
 options=('!strip' 'docs' 'libtool' 'emptydirs' 'ccache' '!distcc' 'buildflags' '!makeflags')
 install=
-changelog=@PACKAGE@.changelog
+#changelog=@PACKAGE@.changelog
 source=('http://www.openss7.org/repo/tarballs/@PACKAGE@-@VERSION@.tar.xz')
 noextract=()
 
@@ -152,7 +152,7 @@ package_@PACKAGE@-repo() {
 	keydir=$pkgdir/usr/share/pacman/keyrings
 	mkdir -p $keydir
 	gpg --export --armor --output $keydir/openss7.gpg openss7@openss7.org
-	gpg --fingerprint openss7@openss7.org|sed -n 's,Key fingerprint =,,p'|sed 's,  *,,g;s,$,:4:' >$keydir/openss7-trusted
+	gpg --fingerprint openss7@openss7.org|sed -n 's,Key fingerprint =,,p'|sed 's,  *,,g;s,$,:4:,' >$keydir/openss7-trusted
 	touch $keydir/openss7-revoked
 	repodir=$pkgdir/etc/pacman.d
 	mkdir -p $repodir
@@ -359,19 +359,22 @@ EOF
 }
 
 package_@PACKAGE@-@kernel_image@() {
-	local _kvr _kv _kr _kmin _kmax
+	local _kvr _kv _kr _kmin _kmax _kmajor _kminor _kpatch
 	_kvr="$(pacman -Qi @kernel_image@|grep -i '^version'|awk '{print$3}')"
 	_kv=$(echo "$_kvr" | sed -e 's,-.*$,,')
 	_kr=$(echo "$_kvr" | sed -e 's,^.*-,,')
-	if [ "@kmajor@" -eq 3 ]; then
-		_kmin="@kmajor@.@kminor@"
-		_kmax="@kmajor@.$((@kminor@+1))"
+	_kmajor=$(echo "$_kv" |sed -e 's,[.], ,g'|awk '{print$1}')
+	_kminor=$(echo "$_kv" |sed -e 's,[.], ,g'|awk '{print$2}')
+	_kpatch=$(echo "$_kv" |sed -e 's,[.], ,g'|awk '{print$3}')
+	if [ "$_kmajor" -eq 3 ]; then
+		_kmin="$_kmajor.$_kminor"
+		_kmax="$_kmajor.$((_kminor+1))"
 	else
-		_kmin="@kmajor@.@kminor@.@kpatch@"
-		_kmax="@kmajor@.@kminor@.$((@kpatch@+1))"
+		_kmin="$_kmajor.$_kminor.$_kpatch"
+		_kmax="$_kmajor.$_kminor.$((_kpatch+1))"
 	fi
 	epoch=0
-	pkgver="@VERSION@.$_kv"
+	pkgver="@VERSION@.$_kmin"
 	pkgrel="@PACKAGE_PACRELEASE@.$_kr"
 	pkgdesc='OpenSS7 Fast-STREAMS and Protocol Suites (Kernel Modules)'
 	groups=('@PACKAGE@-run')
@@ -394,19 +397,22 @@ package_@PACKAGE@-@kernel_image@() {
 }
 
 package_@PACKAGE@-@kernel_image@-devel() {
-	local _kvr _kv _kr _kmin _kmax
+	local _kvr _kv _kr _kmin _kmax _kmajor _kminor _kpatch
 	_kvr="$(pacman -Qi @kernel_image@|grep -i '^version'|awk '{print$3}')"
 	_kv=$(echo "$_kvr" | sed -e 's,-.*$,,')
 	_kr=$(echo "$_kvr" | sed -e 's,^.*-,,')
-	if [ "@kmajor@" -eq 3 ]; then
-		_kmin="@kmajor@.@kminor@"
-		_kmax="@kmajor@.$((@kminor@+1))"
+	_kmajor=$(echo "$_kv" |sed -e 's,[.], ,g'|awk '{print$1}')
+	_kminor=$(echo "$_kv" |sed -e 's,[.], ,g'|awk '{print$2}')
+	_kpatch=$(echo "$_kv" |sed -e 's,[.], ,g'|awk '{print$3}')
+	if [ "$_kmajor" -eq 3 ]; then
+		_kmin="$_kmajor.$_kminor"
+		_kmax="$_kmajor.$((_kminor+1))"
 	else
-		_kmin="@kmajor@.@kminor@.@kpatch@"
-		_kmax="@kmajor@.@kminor@.$((@kpatch@+1))"
+		_kmin="$_kmajor.$_kminor.$_kpatch"
+		_kmax="$_kmajor.$_kminor.$((_kpatch+1))"
 	fi
 	epoch=0
-	pkgver="@VERSION@.$_kv"
+	pkgver="@VERSION@.$_kmin"
 	pkgrel="@PACKAGE_PACRELEASE@.$_kr"
 	pkgdesc='OpenSS7 Fast-STREAMS and Protocol Suites (Kernel Development)'
 	groups=('@PACKAGE@-sdk')
