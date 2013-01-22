@@ -188,7 +188,7 @@ AC_DEFUN([_PAC_ARCH_SETUP_TOPDIR], [dnl
     AC_MSG_CHECKING([for pacman top build directory])
     if test ":${pacdir+set}" != :set ; then
 	case ":${with_pac_topdir:-no}" in
-	    (:no|:yes)	pacdir='${packdistdir}${repobranch}' ;;
+	    (:no|:yes)	pacdir='${pacdistdir}${repobranch}' ;;
 	    (*)		pacdir="${with_pac_topdir}" ;;
 	esac
     fi
@@ -196,16 +196,16 @@ AC_DEFUN([_PAC_ARCH_SETUP_TOPDIR], [dnl
     AC_SUBST([pacdir])dnl
     pkgdir='${pacdistdir}'
     AC_SUBST([pkgdir])dnl
-    pkgfulldir='${pacdir}'
-    AC_SUBST([pkgfulldir])dnl
-    pkgmaindir='${pacdir}/main'
-    AC_SUBST([pkgmaindir])dnl
-    pkgdebgdir='${pacdir}/debug'
-    AC_SUBST([pkgdebgdir])dnl
-    pkgdevldir='${pacdir}/devel'
-    AC_SUBST([pkgdevldir])dnl
-    pkgsrcsdir='${pacdir}/source'
-    AC_SUBST([pkgsrcsdir])dnl
+    pacfulldir='${pacdir}'
+    AC_SUBST([pacfulldir])dnl
+    pacmaindir='${pacdir}/main'
+    AC_SUBST([pacmaindir])dnl
+    pacdebgdir='${pacdir}/debug'
+    AC_SUBST([pacdebgdir])dnl
+    pacdevldir='${pacdir}/devel'
+    AC_SUBST([pacdevldir])dnl
+    pacsrcsdir='${pacdir}/source'
+    AC_SUBST([pacsrcsdir])dnl
     AC_MSG_CHECKING([for pacman BUILD directory])
     if test ":${mpkgtopdir+set}" != :set ; then
 	# mpkgtopdir needs to be absolute: always build in the top build
@@ -214,24 +214,39 @@ AC_DEFUN([_PAC_ARCH_SETUP_TOPDIR], [dnl
     fi
     AC_MSG_RESULT([$mpkgtopdir])
     AC_SUBST([mpkgtopdir])dnl
-    AC_MSG_CHECKING([for pacman source directory])
-    if test ":${mpkgsourcedir+set}" != :set ; then
-	mpkgsourcedir="${mpkgtopdir}/src"
+    # set defaults for the rest
+    AC_MSG_CHECKING([for makepkg SRCDEST directory])
+    if test ":${mpkgsrcdest+set}" != :set ; then
+	# always use the sources from the tarballs directory in the distribution
+	# directory.  This saves making them again.
+	mpkgsrcdest='${tardir}'
     fi
-    AC_MSG_RESULT([$mpkgsourcedir])
-    AC_SUBST([mpkgsourcedir])dnl
-    AC_MSG_CHECKING([for pacman build directory])
+    AC_MSG_RESULT([$mpkgsrcdest])
+    AC_SUBST([mpkgsrcdest])
+    AC_MSG_CHECKING([for makepkg BUILDDIR directory])
     if test ":${mpkgbuilddir+set}" != :set ; then
-	mpkgbuilddir="${mpkgtopdir}/bld"
+	# always build in the top build directory on the local machine
+	mpkgbuilddir=`pwd`/BUILD
     fi
     AC_MSG_RESULT([$mpkgbuilddir])
-    AC_SUBST([mpkgbuilddir])dnl
-    AC_MSG_CHECKING([for pacman install directory])
-    if test ":${mpkginstalldir+set}" != :set ; then
-	mpkginstalldir="${mpkgtopdir}/pkg"
+    AC_SUBST([mpkgbuilddir])
+    AC_MSG_CHECKING([for makepkg PKGDEST directory])
+    if test ":${mpkgpkgdest+set}" != :set ; then
+	# put binary packages under the repo/pkgs/arch/os/i686/PKGS distribution
+	# directory we will symbolic link from there to build repos
+	mpkgpkgdest='${pacdir}'
     fi
-    AC_MSG_RESULT([$mpkginstalldir])
-    AC_SUBST([mpkginstalldir])dnl
+    AC_MSG_RESULT([$mpkgpkgdest])
+    AC_SUBST([mpkgpkgdest])
+    AC_MSG_CHECKING([for makepkg SRCPKGDEST directory])
+    if test ":${mpkgsrcpkgdest+set}" != :set ; then
+	# put source packages under the repo/pkgs/SRCS distribution directory
+	# and we will symbolic link from there to build repos
+	mpkgsrcpkgdest='${pacdir}'
+    fi
+    AC_MSG_RESULT([$mpkgsrcpkgdest])
+    AC_SUBST([mpkgsrcpkgdest])
+
 ])# _PAC_ARCH_SETUP_TOPDIR
 # =============================================================================
 

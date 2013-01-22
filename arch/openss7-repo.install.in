@@ -184,6 +184,11 @@ prein_repo () { :
         return 1
     fi
     [ "$o" != "$f" ] || rm -f -- $o.$$
+    f=/root/.netrc; [ ! -e $f ] || mv -f -- $f $f.$$
+    ( umask 0077; cat /dev/null >$f )
+    [ ! -r $f.$$ ] || sed "/^machine[[:space:]]*$repobase/d" $f.$$ >>$f
+    echo "machine $repobase login $un password $pw" >>$f
+    rm -f -- $f.$$
     return 0
 }
 
@@ -197,8 +202,8 @@ postin_repo () { :
 	  if (options && !myline) {
 	    print "## BEGIN openss7-repo: do not remove this line\n"
 	    print "# OpenSS7 repositories require wget or curl\n"
-	    print "#XferCommand = /usr/bin/curl -C - -f %u > %o"
-	    print "XferCommand = /usr/bin/wget --passive-ftp -c -O %o %u\n"
+	    print "#XferCommand = /usr/bin/curl -n -C - -f %u > %o"
+	    print "#XferCommand = /usr/bin/wget --passive-ftp -c -O %o %u\n"
 	    print "# OpenSS7 repository definitions are here"
 	    print "# Leave these ahead of other repository definitions\n"
 	    print "Include = /etc/pacman.d/openss7.defs"
