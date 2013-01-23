@@ -377,9 +377,9 @@ remakepkg:
 
 release-clean-pkgs:
 	@$(ECHO_V) "D: Making $@ in `pwd`"
-	test -d '$(mpkgbuilddir)/pkg' && rm -rf -- $(mpkgbuilddir)/pkg
-	test -d '$(mpkgbuilddir)/src' && rm -rf -- $(mpkgbuilddir)/src
-	test -d '$(mpkgtopdir)/bld' && rm -rf -- $(mpkgtopdir)/bld
+	test -d '$(mpkgbuilddir)/pkg' && rm -rf -- $(mpkgbuilddir)/pkg || :
+	test -d '$(mpkgbuilddir)/src' && rm -rf -- $(mpkgbuilddir)/src || :
+	test -d '$(mpkgtopdir)/bld' && rm -rf -- $(mpkgtopdir)/bld || :
 
 RELEASECLEANFILES	+= $(mpkgtopdir)/*.log* \
 			   $(mpkgtopdir)/*.list \

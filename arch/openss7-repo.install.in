@@ -57,7 +57,8 @@ datarootdir=@datarootdir@
 }
 
 prein_repo () { :
-    local d un pw o f s ext u p m
+    local d un pw o f s ext u p m ud unp pwp id hn key url
+    [ -z "$DEBUG_REPO" ] || { exec 1>&2; set -x; }
     for s in '' .pacold .pacnew; do
     for p in credentials; do
     for d in $localstatedir/lib/$name/; do
@@ -74,20 +75,20 @@ prein_repo () { :
 	o=$d${p}-mirrors$s
 	[ -r $o ] || continue
 	un=`sed -n -r 's,^.*Server[[:space:]]*=[[:space:]]*http[s]?://([^@:]*)(:([^@]*))@.*$,\2,p;t end;b;: end q' $o`
-	pw=`sed -n -r 's,^.*Server[[:space:]]*=[[:space:]]*http[s]?://([^@:]*)(:([^@]*))@.*$,\4,p;t end;b;: end q' $o`
+	pw=`sed -n -r 's,^.*Server[[:space:]]*=[[:space:]]*http[s]?://([^@:]*)(:([^@]*))@.*$,\3,p;t end;b;: end q' $o`
         [ -n "$un" -a -n "$pw" ] || continue
         break 3
     done
     done
     done
     [ -n "$un" -a -n "$pw" ] || { un="$custname"; pw="$custpass"; }
-    d=$sslcertdir; n=OPENSS7-CA-CERT.pem
+    d=$lcacertdir/$name; n=cacert.crt
     o=; f=$d/$n; [ -d $d ] || mkdir -p -- $d
-    { wget --no-check-certificate -O $f $reposerv://$repobase/cacert.pem 2>/dev/null; c_rehash &>/dev/null; } ||:
+    { wget --no-check-certificate -O $f $reposerv://$repobase/cacert.crt 2>/dev/null; update-ca-certificates 2>/dev/null; } ||:
     d=$localstatedir/lib/$name; n=credentials
     o=; f=$d/$n; [ -d $d ] || mkdir -p -- $d
     [ ! -e $f ] || { o=$f; mv -f -- $f $f.$$; }
-    hn=`hostname -f`; ip=`hostname -I|sed 'y/ /,/'`;n=patches
+    hn=`hostname -f`; ip=`hostname -i|sed 'y/ /,/'`;n=patches
     id=`e=$(for s in /sys/class/net/e*;do if [ ! -L $s ];then continue;fi;echo $(readlink $s)" "$s;done|sort|head -1|cut -f2 "-d ");[ -r $e/address ] && cat $e/address|sed "s,:,,g"`
     ext="?hn=$hn&ip=$ip&id=$id${un:+&un=}${un}${pw:+&pw=}${pw}"
     ext="$ext`echo /$reposubdir|sed 's,//,/,g;s,/,\&distro=,;s,/,\&relver=,;s,/,\&osarch=,'`"
@@ -124,8 +125,8 @@ prein_repo () { :
             else
                 echo "$m" >/dev/tty
                 while true; do
-                    d="$u"
-                    read -e  -p "Username [ENTER:default;CTRL-D:cancel] ($u): " u </dev/tty >/dev/tty || { echo '' >/dev/tty; return 1; }; u=${u:-$d}
+                    ud="$u"
+                    read -e  -p "Username [ENTER:default;CTRL-D:cancel] ($u): " u </dev/tty >/dev/tty || { echo '' >/dev/tty; return 1; }; u=${u:-$ud}
                     [ "$u" != "$custname" ] || break
                     read -es -p "Password [ENTER:default;CTRL-D:cancel] ($u): " p </dev/tty >/dev/tty || { echo '' >/dev/tty; continue; }
                     echo '' >/dev/tty
@@ -273,6 +274,7 @@ post_upgrade() {
 #
 pre_remove() {
     _set_vars
+    prerm_repo || :
 }
 
 # post_remove($oldver) - Run right after files are removed.  One argument is
@@ -281,6 +283,8 @@ pre_remove() {
 post_remove() {
     _set_vars
 }
+
+set +e
 
 # =============================================================================
 #

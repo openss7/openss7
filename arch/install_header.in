@@ -7,7 +7,7 @@
 # This software is licensed under the GNU Affero General Public License (AGPL)
 # Version 3, 19 November 2007, available at <http://www.gnu.org/licenses/>.
 # -----------------------------------------------------------------------------
-set -e
+set +e
 tmppath=/var/tmp
 PACKAGE=@PACKAGE@
 VERSION=@VERSION@
