@@ -1,0 +1,9 @@
+ACTION=="remove", GOTO="specfs_end"
+
+#
+# This rule automagically mounts the STREAMS special shadow filesystem
+# at /dev/streams whenever the specfs kernel module successfully loads.
+#
+SUBSYSTEM=="module", KERNEL="specfs", ACTION="add", TAG+="systemd", ENV{SYSTEMD_WANTS}+="dev-streams.mount"
+
+LABEL="specfs_end"
