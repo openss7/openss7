@@ -27,7 +27,12 @@ sub rpmauthenhandler {
     my ($res,$sent_pw) = $r->get_basic_auth_pw;
     return $res if ( $res != OK );
 
-    my $user = $r->connection->user;
+    my $user;
+    if ($r->connection->can('user')) {
+	    $user = $r->connection->user;
+    } else {
+	    $user = $r->user;
+    }
 
     if ( $r->filename =~ m,/openss7-repo.*\.(rpm|deb|pkg\.tar\.xz)$, ) {
 	#$r->warn("Any host ($user) can download the repo defintion rpm, deb or pkg ".$r->uri);
