@@ -184,7 +184,7 @@
 # RPMs or DEBs (other than openss7-repo) must only be downloaded by machines
 # RPMs or DEBs must be overridden to allow guests-hosts in individual subdirectories
 <IfModule mod_authn_dbm.c>
-<FilesMatch "^openss7-[^r].*\.(rpm|u?d?deb|pkg\.tar\.xz)$">
+<FilesMatch "^openss7-[^r].*\.(rpm|u?d?deb|pkg\.tar\.xz(\.sig)?)$">
 	Order allow,deny
 	Allow from all
 	SSLRequireSSL
@@ -200,7 +200,7 @@
 </FilesMatch>
 </IfModule>
 <IfModule !mod_authn_dbm.c>
-<FilesMatch "^openss7-[^r].*\.(rpm|u?d?deb|pkg\.tar\.xz)$">
+<FilesMatch "^openss7-[^r].*\.(rpm|u?d?deb|pkg\.tar\.xz(\.sig)?)$">
 	Order allow,deny
 	Allow from all
 	SSLRequireSSL
@@ -214,14 +214,14 @@
 </FilesMatch>
 </IfModule>
 # Anybody can download the repository RPMs or DEBs
-<FilesMatch "^openss7-repo.*\.(rpm|u?d?deb|pkg\.tar\.xz)$">
+<FilesMatch "^openss7-repo.*\.(rpm|u?d?deb|pkg\.tar\.xz(\.sig)?)$">
 	Order allow,deny
 	Allow from all
 </FilesMatch>
 # tarballs and spec files must only be downloaded by subscribers
 # must be overridden to allow guests
 <IfModule mod_authn_dbm.c>
-<FilesMatch "^openss7-1\..*\.(tar\.(gz|bz2|xz|lzma)|spec|src\.rpm|dsc(\.asc)?|\.src\.tar\.xz)$">
+<FilesMatch "^openss7-1\..*[0-9]\.(tar\.(gz|bz2|xz|lzma)|spec|src\.rpm|dsc(\.asc)?|\.src\.tar\.xz(\.sig)?)$">
 	Order allow,deny
 	Allow from all
 	SSLRequireSSL
@@ -234,7 +234,7 @@
 </FilesMatch>
 </IfModule>
 <IfModule !mod_authn_dbm.c>
-<FilesMatch "^openss7-1\..*\.(tar\.(gz|bz2|xz|lzma)|spec|src\.rpm|dsc(\.asc)?|\.src\.tar\.xz)$">
+<FilesMatch "^openss7-1\..*[0-9]\.(tar\.(gz|bz2|xz|lzma)|spec|src\.rpm|dsc(\.asc)?|\.src\.tar\.xz(\.sig)?)$">
 	Order allow,deny
 	Allow from all
 	SSLRequireSSL
