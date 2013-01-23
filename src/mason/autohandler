@@ -68,6 +68,7 @@
     $agent = 'yum'	if !defined $agent and $ENV{HTTP_USER_AGENT} =~ m,^urlgrabber,i;
     $agent = 'zypper'	if !defined $agent and $ENV{HTTP_USER_AGENT} =~ m,^zypp,i;
     $agent = 'curl'	if !defined $agent and $ENV{HTTP_USER_AGENT} =~ m,^curl,i;
+    $agent = 'pacman'	if !defined $agent and $ENV{HTTP_USER_AGENT} =~ m,^pacman,i;
 
     unless (defined $agent) {
 	$r->log_reason("illegal user agent: ".$ENV{HTTP_USER_AGENT}, $r->uri);
@@ -1167,19 +1168,19 @@ xml-info=1
 		    my $rcreds = $hostname.':'.$hostpass.'@';
 
 		    $url = '/repo';
-		    $url = "/$artype";
-		    $url = "/$distro" if ($distro);
-		    $url = "/$relver";
-		    $url = "/$osarch";
-		    $url = "/$branch" if ($branch ne 'base');
-		    $url = "/$subrep" if ($subrep ne 'full');
+		    $url .= "/$artype";
+		    $url .= "/$distro" if ($distro);
+		    $url .= "/$relver";
+		    $url .= "/$osarch";
+		    $url .= "/$branch" if ($branch ne 'base');
+		    $url .= "/$subrep" if ($subrep ne 'full');
 
 		    my $repo = 'openss7';
 		       $repo .= '-'.$branch if ($branch ne 'base');
 		       $repo .= '-'.$subrep if ($subrep ne 'full');
 
 		    my $present;
-		    $present = 1 if ( -e $ENV{'DOCUMENT_ROOT'}.$url.".db.tar.gz" );
+		    $present = 1 if ( -e $ENV{'DOCUMENT_ROOT'}.$url."/".$repo.".db.tar.xz" );
 
 		    my $pre = '';
 		    $pre = '#' if ( !$present ); # and !$emptyrepo );
@@ -1202,7 +1203,7 @@ xml-info=1
 </%perl>
 <% $pre %>[<% $repo %>]
 <% $pre %>SigLevel = PackageRequired
-<% $pre %>Include = /etc/pacman.d/openss7-mirrors
+<% $pre %>Server = https://<% $httphost %><% $url %>
 
 <%perl>
 		}
