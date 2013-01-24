@@ -178,7 +178,7 @@ __spec_getkeys(struct hwaddr *hwa)
 	struct net_device *dev;
 	int num = 0;
 
-	__trace();
+	_trace();
 	read_lock(&dev_base_lock);
 	for (dev = first_net_device(); dev; dev = next_net_device(dev)) {
 		switch (dev->type) {
@@ -213,7 +213,7 @@ strlock_getkeys(struct hwaddr *hwa)
 	unsigned long flags;
 	int num;
 
-	__trace();
+	_trace();
 	local_irq_save(flags);
 	num = __spec_getkeys(hwa);
 	local_irq_restore(flags);
@@ -225,7 +225,7 @@ strlock_notifier(struct notifier_block *self, unsigned long msg, void *data)
 {
 	struct net_device *dev = (struct net_device *) data;
 
-	__trace();
+	_trace();
 	switch (dev->type) {
 	case ARPHRD_ETHER:
 	case ARPHRD_IEEE802:
@@ -267,7 +267,7 @@ strlock_verify(void)
 	__u8 digest[SHA_DIGEST_SIZE];
 	int i, num;
 
-	__trace();
+	_trace();
 	if (strlock_digest == NULL) {
 		_ptrace((KERN_WARNING "no disgest"));
 		return;
@@ -343,7 +343,7 @@ strlock_open_check(void)
 {
 	struct timeval tv;
 
-	__trace();
+	_trace();
 	if (strlock_digest == NULL) {
 		_ptrace((KERN_WARNING "digest is empty"));
 		if ((strlock_options & STRLOCK_FAIL_OPEN_EMPTY) == 0) {
@@ -382,7 +382,7 @@ strlock_load_check(void)
 {
 	struct timeval tv;
 
-	__trace();
+	_trace();
 	if (strlock_digest == NULL) {
 		_ptrace((KERN_WARNING "digest is empty"));
 		if ((strlock_options & STRLOCK_FAIL_LOAD_EMPTY) == 0) {
@@ -429,7 +429,7 @@ strlock_init(void)
 {
 	int err, i;
 
-	__trace();
+	_trace();
 	strlock_tfm[0] = crypto_alloc_hash("hmac(md5)", 0, CRYPTO_ALG_ASYNC);
 	if (IS_ERR(strlock_tfm[0])) {
 		err = PTR_ERR(strlock_tfm[0]);
