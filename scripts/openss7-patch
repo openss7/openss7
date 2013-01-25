@@ -71,7 +71,7 @@ while (<$mh>) {
 		print STDERR "search = $search\n" if $verbose;
 		print STDERR "offset = $offset\n" if $verbose;
 		print STDERR "insert = $insert\n" if $verbose;
-		my @files = ( `find $fulldir -maxdepth 4 -name "$module" -o -name "$module.gz"` );
+		my @files = ( `find $fulldir -follow -maxdepth 4 -name "$module" -o -name "$module.gz"` );
 		if (@files == 0) {
 			print STDERR "Could not find module $module\n";
 			$failed = 1;
@@ -83,13 +83,16 @@ while (<$mh>) {
 			next;
 		}
 		my $comp = shift @files; chomp($comp);
+		if (-l $comp) {
+			$comp = `readlink $comp`; chomp($comp);
+		}
 		print STDERR "Using comp = $comp\n" if $verbose;
 		my $needdecomp = 0;
 		my $file = $comp;
 		if ($file =~ /\.gz$/) {
 			$needdecomp = 1;
 			$file =~ s/\.gz$//;
-			system("gzip -d -- $comp");
+			system("gzip -fd -- $comp");
 		}
 		my $newf = "$file.$$.tmp";
 		print STDERR "Using newf = $newf\n" if $verbose;
@@ -133,12 +136,12 @@ while (<$mh>) {
 		unless (defined $num and $patched) {
 			print STDERR "Failed to process $comp\n";
 			system("rm -f -- $newf");
-			system("gzip -- $file") if $needdecomp;
+			system("gzip -f9 -- $file") if $needdecomp;
 			$failed = 1;
 			next;
 		}
 		system("mv -f -- $newf $file");
-		system("gzip -- $file") if $needdecomp;
+		system("gzip -f9 -- $file") if $needdecomp;
 		print STDERR "Successfully processed $comp\n" if $verbose;
 	}
 }
