@@ -440,7 +440,7 @@
 		my $dig = $outer->digest;
 		my $pfx = pack('C*',map {$_^0x5c} unpack('C*',substr($dat,0,4)));
 		my $suf = 'b4eecdda';
-		my $mid = unpack('H*', $pfx.$dig.$suf);
+		my $mid = unpack('H*', $pfx.$dig).$suf;
 		$hostname = substr($mid,24,24);
 		$hostpass = substr($mid, 0,24);
 		$machs{$id} = "$hostname:$hostpass";
