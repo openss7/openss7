@@ -52,6 +52,9 @@
 # =============================================================================
 subpkg=repo
 _set_vars() {
+    if [ -r /var/lib/openss7/environ ] ; then
+	. /var/lib/openss7/environ
+    fi
 @package_archhdr@
 datarootdir=@datarootdir@
 }
@@ -66,16 +69,6 @@ prein_repo () { :
 	[ -r $o ] || continue
         un=`awk 'BEGIN{FS="="}{if($1~/^username$/){print$2;exit}}' $o`
         pw=`awk 'BEGIN{FS="="}{if($1~/^password$/){print$2;exit}}' $o`
-        [ -n "$un" -a -n "$pw" ] || continue
-        break 3
-    done
-    done
-    for p in $PACKAGE; do
-    for d in $pacmanrepodir/; do
-	o=$d${p}-mirrors$s
-	[ -r $o ] || continue
-	un=`sed -n -r 's,^.*Server[[:space:]]*=[[:space:]]*http[s]?://([^@:]*)(:([^@]*))@.*$,\2,p;t end;b;: end q' $o`
-	pw=`sed -n -r 's,^.*Server[[:space:]]*=[[:space:]]*http[s]?://([^@:]*)(:([^@]*))@.*$,\3,p;t end;b;: end q' $o`
         [ -n "$un" -a -n "$pw" ] || continue
         break 3
     done
@@ -167,15 +160,6 @@ prein_repo () { :
     echo "$pwp$unp" >$d/$n
     key="${un:+${un}${pw:+:$pw}@}"
     ext="`echo /$reposubdir|sed 's,//,/,g;s,/,?distro=,;s,/,\&relver=,;s,/,\&osarch=,'`"
-    d=$pacmanrepodir; n=${PACKAGE}-mirrors
-    o=; f=$d/$n; [ -d $d ] || mkdir -p -- $d
-    [ ! -e $f ] || { o=$f; mv -f -- $f $f.$$; }
-    url="$reposerv://$key$repobase/$reporoot/$n$ext"
-    if ! echo "$url"|wget -i - -O $f 2>/dev/null || [ ! -e $f ]; then
-        [ "$o" != "$f" -o ! -e $o.$$ ] || mv -f -- $o.$$ $o
-        return 1
-    fi
-    [ "$o" != "$f" ] || rm -f -- $o.$$
     d=$pacmanrepodir; n=${PACKAGE}.defs
     o=; f=$d/$n; [ -d $d ] || mkdir -p -- $d
     [ ! -e $f ] || { o=$f; mv -f -- $f $f.$$; }
