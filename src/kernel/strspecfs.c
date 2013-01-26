@@ -1407,10 +1407,14 @@ STATIC void
 specfs_kill_sb(struct super_block *sb)
 {
 	_ptrace(("killing superblock %p\n", sb));
+#if 1
+	return kill_anon_super(sb);
+#else
 #ifdef HAVE_KFUNC_KILL_LITTER_SUPER
 	return kill_litter_super(sb);
 #else
 	return kill_anon_super(sb);
+#endif
 #endif
 }
 
@@ -1442,10 +1446,14 @@ STATIC void
 specfs_kill_sb(struct super_block *sb)
 {
 	_ptrace(("killing superblock %p\n", sb));
+#if 1
+	return kill_anon_super(sb);
+#else
 #ifdef HAVE_KFUNC_KILL_LITTER_SUPER
 	return kill_litter_super(sb);
 #else
 	return kill_anon_super(sb);
+#endif
 #endif
 }
 
