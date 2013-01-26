@@ -932,7 +932,7 @@ function readsymabi(kversion, file,
 		print_error(pfx "conflicting crc for " sym " in " kversion)
 		symvers[kversion,sym] = crc
 	    } else {
-		print_warns(pfx "duplicate crc for " sym " in " kversion)
+		print_vinfo(3,pfx "duplicate crc for " sym " in " kversion)
 	    }
 	    if (crc != "0x00000000") {
 		modversions = 1
@@ -968,7 +968,7 @@ function readsymver(kversion, file,
 		print_error(pfx "conflicting crc for " sym " in " kversion)
 		symvers[kversion,sym] = crc
 	    } else {
-		print_warns(pfx "duplicate crc for " sym " in " kversion)
+		print_vinfo(3,pfx "duplicate crc for " sym " in " kversion)
 	    }
 	    if (crc != "0x00000000") {
 		modversions = 1
