@@ -443,18 +443,20 @@ _post_remove_kernel_initscripts() {
 #   weak-updates script from the base package should already be installed.
 #
 _post_kernel_weakmods() {
-    local scripts units v
+    local inits units v
     [ -z '@WITH_KO_MODULES_TRUE@' ] || return 0
     echo ">>> Updating weak kernel modules..." >&2
     if [ -x @sbindir@/${name}-modules ]; then
 	v="`set -o | sed -n -e 's,xtrace[[:space:]]*on$,--verbose=2 --debug=2,p;s,xtrace[[:space:]]*off$,--quiet,p'`"
-	units=`echo "$unitfiles" | sed -e 's/ /,/g'`
-	inits=`echo "$initfiles" | sed -e 's/ /,/g'`
-	options="--add-modules @kversion@"
-	options="'--vmlinux=/usr/src/linux-\$KVERSION/vmlinux' $options"
-	[ -z "$inits" -o -n '@INSTALL_SYSVINIT_TRUE@' ] || options="--initscripts=\"$inits\" $options"
-	[ -z "$units" -o -n '@INSTALL_SYSTEMD_TRUE@'  ] || options="--unitfiles=\"$units\" $options"
-	V=1 @sbindir@/${name}-modules -- $v -e $options || :
+	if [ -z '@INSTALL_SYSTEMD_TRUE@' ]; then
+	    units=`echo "$unitfiles" | sed -e 's/ /,/g'`
+	    @sbindir@/${name}-modules -- $v -e --unitfiles="$units" --add-modules @kversion@ || :
+	elif [ -z '@INSTALL_SYSVINIT_TRUE@' ]; then
+	    inits=`echo "$initfiles" | sed -e 's/ /,/g'`
+	    @sbindir@/${name}-modules -- $v -e --initscripts="$inits" --add-modules @kversion@ || :
+	else
+	    @sbindir@/${name}-modules -- $v -e --add-modules @kversion@ || :
+	fi
     fi
 }
 _post_install_kernel_weakmods() {
@@ -474,17 +476,20 @@ _post_upgrade_kernel_weakmods() {
 #   on the directories with removed links or modules to update dependencies.
 #
 _post_remove_kernel_weakmods() {
+    local inits units v
     [ -z '@WITH_KO_MODULES_TRUE@' ] || return 0
     echo ">>> Updating weak kernel modules..." >&2
     if [ -x @sbindir@/${name}-modules ]; then
 	v="`set -o | sed -n -e 's,xtrace[[:space:]]*on$,--verbose=2 --debug=2,p;s,xtrace[[:space:]]*off$,--quiet,p'`"
-	units=`echo "$unitfiles" | sed -e 's/ /,/g'`
-	inits=`echo "$initfiles" | sed -e 's/ /,/g'`
-	options="--delete-modules --remove-modules @kversion@"
-	options="'--vmlinux=/usr/src/linux-\$KVERSION/vmlinux' $options"
-	[ -z "$inits" -o -n '@INSTALL_SYSVINIT_TRUE@' ] || options="--initscripts=\"$inits\" $options"
-	[ -z "$units" -o -n '@INSTALL_SYSTEMD_TRUE@'  ] || options="--unitfiles=\"$units\" $options"
-	V=1 @sbindir@/${name}-modules -- $v -e $options || :
+	if [ -z '@INSTALL_SYSTEMD_TRUE@' ]; then
+	    units=`echo "$unitfiles" | sed -e 's/ /,/g'`
+	    @sbindir@/${name}-modules -- $v -e --unitfiles="$units" --delete-modules --remove-modules @kversion@ || :
+	elif [ -z '@INSTALL_SYSVINIT_TRUE@' ]; then
+	    inits=`echo "$initfiles" | sed -e 's/ /,/g'`
+	    @sbindir@/${name}-modules -- $v -e --initscripts="$inits" --delete-modules --remove-modules @kversion@ || :
+	else
+	    @sbindir@/${name}-modules -- $v -e --delete-modules --remove-modules @kversion@ || :
+	fi
     fi
 }
 # ---------------------------------------------------------------------------
