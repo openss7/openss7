@@ -174,7 +174,7 @@ MODULE_PARM_DESC(major, "Major device number for STREAMS-pipe driver (0 for allo
 #ifdef MODULE_ALIAS
 MODULE_ALIAS("char-major-" __stringify(CONFIG_STREAMS_CLONE_MAJOR) "-" __stringify(CONFIG_STREAMS_SPX_MAJOR));
 MODULE_ALIAS("/dev/spx");
-MODULE_ALIAS("devname:spx");
+//MODULE_ALIAS("devname:spx");
 MODULE_ALIAS("streams-major-" __stringify(CONFIG_STREAMS_SPX_MAJOR));
 MODULE_ALIAS("/dev/streams/spx");
 MODULE_ALIAS("/dev/streams/spx/*");

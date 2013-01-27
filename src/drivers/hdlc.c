@@ -141,7 +141,7 @@ MODULE_ALIAS("/dev/streams/hdlc/*");
 MODULE_ALIAS("/dev/streams/clone/hdlc");
 MODULE_ALIAS("char-major-" __stringify(CONFIG_STREAMS_CLONE_MAJOR) "-" __stringify(HDLC_CMAJOR_0));
 MODULE_ALIAS("/dev/hdlc");
-MODULE_ALIAS("devname:hdlc");
+//MODULE_ALIAS("devname:hdlc");
 #endif				/* MODULE_ALIAS */
 #endif				/* LINUX */
 

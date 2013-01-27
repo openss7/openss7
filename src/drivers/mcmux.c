@@ -166,7 +166,7 @@ MODULE_ALIAS("/dev/streams/mcmux/mc");
 MODULE_ALIAS("/dev/streams/mcmux/mgr");
 MODULE_ALIAS("/dev/streams/mcmux/tp");
 MODULE_ALIAS("char-major-" __stringify(CONFIG_STREAMS_CLONE_MAJOR) "-" __stringify(MCMUX_CMAJOR_0));
-MODULE_ALIAS("devname:mcmux");
+//MODULE_ALIAS("devname:mcmux");
 #endif				/* MODULE_ALIAS */
 #endif				/* LINUX */
 

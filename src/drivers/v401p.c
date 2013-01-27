@@ -303,7 +303,7 @@ MODULE_ALIAS("/dev/streams/v400p-mx/*");
 MODULE_ALIAS("/dev/streams/clone/v400p-mx");
 MODULE_ALIAS("char-major-" __stringify(CONFIG_STREAMS_CLONE_MAJOR) "-" __stringify(MX_V400P_CMAJOR_0));
 MODULE_ALIAS("/dev/v400p-mx");
-MODULE_ALIAS("devname:v400p-mx");
+//MODULE_ALIAS("devname:v400p-mx");
 #endif				/* MODULE_ALIAS */
 #endif				/* LINUX */
 

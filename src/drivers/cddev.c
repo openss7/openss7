@@ -125,7 +125,7 @@ MODULE_ALIAS("/dev/streams/cddev/*");
 MODULE_ALIAS("/dev/streams/clone/cddev");
 MODULE_ALIAS("char-major-" __stringify(CONFIG_STREAMS_CLONE_MAJOR) "-" __stringify(CDDEV_CMAJOR_0));
 MODULE_ALIAS("/dev/cddev");
-MODULE_ALIAS("devname:cddev");
+//MODULE_ALIAS("devname:cddev");
 #endif				/* MODULE_ALIAS */
 #ifdef MODULE_VERSION
 MODULE_VERSION(PACKAGE_ENVR);

@@ -150,7 +150,7 @@ MODULE_ALIAS("streams-modid-" __stringify(CONFIG_STREAMS_NIT_MODID));
 MODULE_ALIAS("streams-driver-nit");
 MODULE_ALIAS("char-major-" __stringify(CONFIG_STREAMS_CLONE_MAJOR) "-" __stringify(CONFIG_STREAMS_NIT_MAJOR));
 MODULE_ALIAS("/dev/nit");
-MODULE_ALIAS("devname:nit");
+//MODULE_ALIAS("devname:nit");
 MODULE_ALIAS("streams-major-" __stringify(CONFIG_STREAMS_NIT_MAJOR));
 MODULE_ALIAS("/dev/streams/nit");
 MODULE_ALIAS("/dev/streams/nit/*");

@@ -164,7 +164,7 @@ MODULE_ALIAS("/dev/streams/tp/*");
 MODULE_ALIAS("/dev/streams/clone/tp");
 MODULE_ALIAS("char-major-" __stringify(CONFIG_STREAMS_CLONE_MAJOR) "-" __stringify(TP_CMAJOR_0));
 MODULE_ALIAS("/dev/tp");
-MODULE_ALIAS("devname:tp");
+//MODULE_ALIAS("devname:tp");
 MODULE_ALIAS("/dev/tp0");
 MODULE_ALIAS("/dev/tp1");
 MODULE_ALIAS("/dev/tp2");

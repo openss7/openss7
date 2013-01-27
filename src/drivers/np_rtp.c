@@ -197,7 +197,7 @@ MODULE_ALIAS("/dev/streams/np_rtp/*");
 MODULE_ALIAS("/dev/streams/clone/np_rtp");
 MODULE_ALIAS("char-major-" __stringify(CONFIG_STREAMS_CLONE_MAJOR) "-" __stringify(CONFIG_STREAMS_NP_RTP_MAJOR));
 MODULE_ALIAS("/dev/np_rtp");
-MODULE_ALIAS("devname:np_rtp");
+//MODULE_ALIAS("devname:np_rtp");
 #endif				/* defined MODULE_ALIAS */
 #endif				/* defined LINUX */
 

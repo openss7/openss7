@@ -160,7 +160,7 @@ MODULE_ALIAS("/dev/tl");
 MODULE_ALIAS("/dev/ticlts");
 MODULE_ALIAS("/dev/ticots");
 MODULE_ALIAS("/dev/ticotsord");
-MODULE_ALIAS("devname:tl");
+//MODULE_ALIAS("devname:tl");
 #endif				/* MODULE_ALIAS */
 #endif				/* LINUX */
 

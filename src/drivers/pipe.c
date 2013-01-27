@@ -174,7 +174,7 @@ MODULE_PARM_DESC(major, "Major device number for STREAMS-based PIPEs (0 for allo
 #ifdef MODULE_ALIAS
 MODULE_ALIAS("char-major-" __stringify(CONFIG_STREAMS_CLONE_MAJOR) "-" __stringify(CONFIG_STREAMS_PIPE_MAJOR));
 MODULE_ALIAS("/dev/pipe");
-MODULE_ALIAS("devname:pipe");
+//MODULE_ALIAS("devname:pipe");
 MODULE_ALIAS("streams-major-" __stringify(CONFIG_STREAMS_PIPE_MAJOR));
 MODULE_ALIAS("/dev/streams/pipe");
 MODULE_ALIAS("/dev/streams/pipe/*");

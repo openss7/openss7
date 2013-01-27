@@ -154,7 +154,7 @@ MODULE_ALIAS("/dev/streams/clone/nf");
 MODULE_ALIAS("char-major-" __stringify(CONFIG_STREAMS_CLONE_MAJOR) "-" __stringify(NF_CMAJOR_0));
 MODULE_ALIAS("/dev/nf");
 MODULE_ALIAS("/dev/inet/nf");
-MODULE_ALIAS("devname:inet/nf");
+//MODULE_ALIAS("devname:inet/nf");
 #endif				/* MODULE_ALIAS */
 #endif				/* LINUX */
 

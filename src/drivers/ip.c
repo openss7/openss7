@@ -178,7 +178,7 @@ MODULE_ALIAS("/dev/streams/ip/*");
 MODULE_ALIAS("/dev/streams/clone/ip");
 MODULE_ALIAS("char-major-" __stringify(CONFIG_STREAMS_CLONE_MAJOR) "-" __stringify(IP_CMAJOR_0));
 MODULE_ALIAS("/dev/ip");
-MODULE_ALIAS("devname:ip");
+//MODULE_ALIAS("devname:ip");
 #endif				/* MODULE_ALIAS */
 #endif				/* LINUX */
 

@@ -194,7 +194,7 @@ MODULE_ALIAS("/dev/streams/np_udp/*");
 MODULE_ALIAS("/dev/streams/clone/np_udp");
 MODULE_ALIAS("char-major-" __stringify(CONFIG_STREAMS_CLONE_MAJOR) "-" __stringify(NP_CMAJOR_0));
 MODULE_ALIAS("/dev/np_udp");
-MODULE_ALIAS("devname:np_udp");
+//MODULE_ALIAS("devname:np_udp");
 #endif				/* defined MODULE_ALIAS */
 #endif				/* defined LINUX */
 

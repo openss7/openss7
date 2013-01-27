@@ -151,7 +151,7 @@ MODULE_PARM_DESC(major, "Major device number for STREAMS MX-MUX driver.");
 #ifdef MODULE_ALIAS
 MODULE_ALIAS("char-major-" __stringify(CONFIG_STREAMS_CLONE_MAJOR) "-" __stringify(CONFIG_STREAMS_MX_MUX_MAJOR));
 MODULE_ALIAS("/dev/mx");
-MODULE_ALIAS("devname:mx");
+//MODULE_ALIAS("devname:mx");
 MODULE_ALIAS("streams-major-" __stringify(CONFIG_STREAMS_MX_MUX_MAJOR));
 MODULE_ALIAS("/dev/streams/mx");
 MODULE_ALIAS("/dev/streams/mx/*");

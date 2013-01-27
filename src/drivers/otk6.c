@@ -462,7 +462,7 @@ MODULE_ALIAS("/dev/streams/otk6/*");
 MODULE_ALIAS("/dev/streams/clone/otk6");
 MODULE_ALIAS("char-major-" __stringify(CONFIG_STREAMS_CLONE_MAJOR) "-" __stringify(OTK6_CMAJOR_0));
 MODULE_ALIAS("/dev/otk6");
-MODULE_ALIAS("devname:otk6");
+//MODULE_ALIAS("devname:otk6");
 #endif				/* MODULE_ALIAS */
 #endif				/* LINUX */
 /*

@@ -173,7 +173,7 @@ MODULE_ALIAS("/dev/streams/clns-ip/*");
 MODULE_ALIAS("/dev/streams/clone/clns-ip");
 MODULE_ALIAS("char-major-" __stringify(CONFIG_STREAMS_CLONE_MAJOR) "-" __stringify(CLNS_CMAJOR_0));
 MODULE_ALIAS("/dev/clns-ip");
-MODULE_ALIAS("devname:clns-ip");
+//MODULE_ALIAS("devname:clns-ip");
 #endif				/* MODULE_ALIAS */
 #endif				/* LINUX */
 

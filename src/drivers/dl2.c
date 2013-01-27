@@ -138,7 +138,7 @@ MODULE_ALIAS("/dev/streams/nd/*");
 MODULE_ALIAS("/dev/streams/clone/nd");
 MODULE_ALIAS("char-major-" __stringify(CONFIG_STREAMS_CLONE_MAJOR) "-" __stringify(ND_CMAJOR_0));
 MODULE_ALIAS("/dev/nd");
-MODULE_ALIAS("devname:nd");
+//MODULE_ALIAS("devname:nd");
 #endif				/* MODULE_ALIAS */
 #endif				/* LINUX */
 

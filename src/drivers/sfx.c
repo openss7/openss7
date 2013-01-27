@@ -173,7 +173,7 @@ MODULE_PARM_DESC(major, "Major device number for STREAMS-based FIFOs (0 for allo
 #ifdef MODULE_ALIAS
 MODULE_ALIAS("char-major-" __stringify(CONFIG_STREAMS_CLONE_MAJOR) "-" __stringify(CONFIG_STREAMS_SFX_MAJOR));
 MODULE_ALIAS("/dev/sfx");
-MODULE_ALIAS("devname:sfx");
+//MODULE_ALIAS("devname:sfx");
 MODULE_ALIAS("streams-major-" __stringify(CONFIG_STREAMS_SFX_MAJOR));
 MODULE_ALIAS("/dev/streams/sfx");
 MODULE_ALIAS("/dev/streams/sfx/*");

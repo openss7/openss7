@@ -182,7 +182,7 @@ MODULE_ALIAS("char-major-" __stringify(CONFIG_STREAMS_CLONE_MAJOR) "-" __stringi
 MODULE_ALIAS("/dev/loop.1");
 MODULE_ALIAS("/dev/loop.2");
 MODULE_ALIAS("/dev/loop_clone");
-MODULE_ALIAS("devname:loop_clone");
+//MODULE_ALIAS("devname:loop_clone");
 MODULE_ALIAS("streams-major-" __stringify(CONFIG_STREAMS_LOOP_MAJOR));
 MODULE_ALIAS("/dev/streams/loop");
 MODULE_ALIAS("/dev/streams/loop/*");
