@@ -166,7 +166,9 @@ package_@PACKAGE@-repo() {
 package_@PACKAGE@() {
 	pkgdesc='OpenSS7 Fast-STREAMS and Protocol Suites'
 	groups=('@PACKAGE@-run')
-	depends=('@PACKAGE@-repo=@VERSION@-@PACKAGE_PACRELEASE@')
+	depends=(
+		'@PACKAGE@-repo=@VERSION@-@PACKAGE_PACRELEASE@'
+		'binutils')
 	optdepends=(
 		'net-snmp: for SNMP agent support'
 		'perl-tk: for graphical utilities'
