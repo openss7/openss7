@@ -1374,8 +1374,10 @@ cmin_add(struct devnode *cmin, struct cdevsw *cdev)
 	list_add(&cmin->n_list, &cdev->d_minors);
 	list_add(&cmin->n_hash, strnod_hash_slot(cmin->n_minor));
 	cmin_count++;
+#if 0
 #ifdef HAVE_KFUNC_DEVICE_CREATE
 	device_create(streams_class,NULL,MKDEV(cdev->d_major,cmin->n_minor),NULL,"streams/%s/%s",cdev->d_name,cmin->n_name);
+#endif
 #endif
 	return (0);
 }
@@ -1392,8 +1394,10 @@ cmin_del(struct devnode *cmin, struct cdevsw *cdev)
 	list_del_init(&cmin->n_list);
 	list_del_init(&cmin->n_hash);
 	cmin_count--;
+#if 0
 #ifdef HAVE_KFUNC_DEVICE_DESTROY
-	device_destroy(streams_class,MKDEV(cdev->d_major,cmin->n_minor));
+	//device_destroy(streams_class,MKDEV(cdev->d_major,cmin->n_minor));
+#endif
 #endif
 }
 
@@ -1756,8 +1760,10 @@ strlookup_init(void)
 	init_fmod_hash();
 	init_cdev_hash();
 	init_cmin_hash();
+#if 0
 #if defined(HAVE_KFUNC_CLASS_CREATE) || defined(HAVE_KMACRO_CLASS_CREATE)
 	streams_class = class_create(THIS_MODULE, "streams");
+#endif
 #endif
 	return (0);
 }
@@ -1765,8 +1771,10 @@ strlookup_init(void)
 BIG_STATIC void
 strlookup_exit(void)
 {
+#if 0
 #ifdef HAVE_KFUNC_CLASS_DESTROY
 	class_destroy(streams_class);
+#endif
 #endif
 	return;
 }
