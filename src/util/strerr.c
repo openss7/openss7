@@ -306,11 +306,25 @@ snprintf_text(char *sbuf, size_t slen, const char *buf, int len)
 
 	if (slen == 0)
 		return (0);
+	if (output > 2)
+		fprintf(stderr, "format string and arguments contain %d bytes\n", len);
 	fmt = buf;
+	if (output > 2)
+		fprintf(stderr, "format string at %p\n", fmt);
 	flen = strnlen(fmt, len);
+	if (output > 2)
+		fprintf(stderr, "format string of length %zu\n", flen);
 	plen = PROMOTE_ALIGN(flen + 1);
+	if (output > 2)
+		fprintf(stderr, "format string of promoted length %zu\n", plen);
 	args = &buf[plen];
+	if (output > 2)
+		fprintf(stderr, "arguments start at %p\n", args);
 	aend = buf + len;
+	if (output > 2) {
+		fprintf(stderr, "arguments end at %p\n", aend);
+		fprintf(stderr, "arguments contain %zu bytes\n", (size_t) (aend - args));
+	}
 	str = sbuf;
 	end = str + slen - 1;	/* room for null */
 	for (; *fmt; ++fmt) {

@@ -383,8 +383,7 @@ snprintf_text(char *sbuf, size_t slen, const char *buf, int len)
 		if (*fmt == '.') {
 			++fmt;
 			if (isdigit(*fmt))
-				for (decimal = 0; isdigit(*fmt);
-				     decimal *= 10, decimal += (*fmt - '0')) ;
+				for (decimal = 0; isdigit(*fmt); decimal *= 10, decimal += (*fmt - '0')) ;
 			else if (*fmt == '*') {
 				if (args + PROMOTE_SIZEOF(int) <= aend) {
 					decimal = PROMOTE_ARGVAL(int, args);
@@ -627,7 +626,7 @@ snprintf_text(char *sbuf, size_t slen, const char *buf, int len)
 }
 
 int
-strace_pstrlog(FILE * file, struct strbuf *ctrl, struct strbuf *data)
+strace_pstrlog(FILE *file, struct strbuf *ctrl, struct strbuf *data)
 {
 	char sbuf[LOGMSGSZ << 2];
 	struct log_ctl lc;
@@ -1017,21 +1016,16 @@ strlog_enter(int argc, char *argv[])
 
 				/* initialize default filename */
 				if (pidfile[0] == '\0')
-					snprintf(pidfile, sizeof(pidfile), "/var/run/%s.pid",
-						 program);
+					snprintf(pidfile, sizeof(pidfile), "/var/run/%s.pid", program);
 				if (output > 1)
-					syslog(MY_FACILITY(LOG_NOTICE),
-					       "%s: Writing daemon pid to file %s", program,
-					       pidfile);
+					syslog(MY_FACILITY(LOG_NOTICE), "%s: Writing daemon pid to file %s", program, pidfile);
 				if ((pidf = fopen(pidfile, "w+"))) {
 					fprintf(pidf, "%d", (int) pid);
 					fflush(pidf);
 					fclose(pidf);
 				} else {
 					syslog(MY_FACILITY(LOG_ERR), "%s: %m", program);
-					syslog(MY_FACILITY(LOG_ERR),
-					       "%s: Could not write pid to file %s", program,
-					       pidfile);
+					syslog(MY_FACILITY(LOG_ERR), "%s: Could not write pid to file %s", program, pidfile);
 					strlog_exit(2);
 				}
 			}
@@ -1059,18 +1053,15 @@ strlog_enter(int argc, char *argv[])
 		localtime_r(&curtime, &tm);
 		/* initialize default filename */
 		if (outfile[0] == '\0')
-			snprintf(outpath, sizeof(outpath), "%s/%s.%02d-%02d", outpdir, basname,
-				 tm.tm_mon + 1, tm.tm_mday);
+			snprintf(outpath, sizeof(outpath), "%s/%s.%02d-%02d", outpdir, basname, tm.tm_mon + 1, tm.tm_mday);
 		else
 			snprintf(outpath, sizeof(outpath), "%s/%s", outpdir, outfile);
 		if (output > 1)
-			syslog(MY_FACILITY(LOG_NOTICE), "%s: Redirecting stdout to file %s",
-			       program, outpath);
+			syslog(MY_FACILITY(LOG_NOTICE), "%s: Redirecting stdout to file %s", program, outpath);
 		fflush(stdout);
 		if (freopen(outpath, "a", stdout) == NULL) {
 			syslog(MY_FACILITY(LOG_ERR), "%s: %m", program);
-			syslog(MY_FACILITY(LOG_ERR), "%s: Could not redirect stdout to %s", program,
-			       outpath);
+			syslog(MY_FACILITY(LOG_ERR), "%s: Could not redirect stdout to %s", program, outpath);
 			strlog_exit(2);
 		}
 	}
@@ -1081,13 +1072,11 @@ strlog_enter(int argc, char *argv[])
 		else
 			snprintf(errpath, sizeof(errpath), "%s/%s", outpdir, errfile);
 		if (output > 1)
-			syslog(MY_FACILITY(LOG_NOTICE), "%s: Redirecting stderr to file %s",
-			       program, errpath);
+			syslog(MY_FACILITY(LOG_NOTICE), "%s: Redirecting stderr to file %s", program, errpath);
 		fflush(stderr);
 		if (freopen(errpath, "a", stderr) == NULL) {
 			syslog(MY_FACILITY(LOG_ERR), "%s: %m", program);
-			syslog(MY_FACILITY(LOG_ERR), "%s: Could not redirect stderr to %s", program,
-			       errpath);
+			syslog(MY_FACILITY(LOG_ERR), "%s: Could not redirect stderr to %s", program, errpath);
 			strlog_exit(2);
 		}
 	}
@@ -1179,8 +1168,7 @@ main(int argc, char *argv[])
 		};
 		/* *INDENT-ON* */
 
-		c = getopt_long_only(argc, argv, "a:d:nb:o:e:p:l:qD::v::hVC?W:", long_options,
-				     &option_index);
+		c = getopt_long_only(argc, argv, "a:d:nb:o:e:p:l:qD::v::hVC?W:", long_options, &option_index);
 #else				/* defined _GNU_SOURCE */
 		c = getopt(argc, argv, "a:d:nb:o:e:p:l:qDvhVC?");
 #endif				/* defined _GNU_SOURCE */
@@ -1421,14 +1409,12 @@ main(int argc, char *argv[])
 				lc = (struct log_ctl *) cbuf;
 				if (ctl.len < sizeof(*lc)) {
 					if (output > 2)
-						fprintf(stderr, "ctl.len = %d, skipping\n",
-							ctl.len);
+						fprintf(stderr, "ctl.len = %d, skipping\n", ctl.len);
 					continue;
 				}
 				if (dat.len <= 0) {
 					if (output > 2)
-						fprintf(stderr, "dat.len = %d, skipping\n",
-							dat.len);
+						fprintf(stderr, "dat.len = %d, skipping\n", dat.len);
 					continue;
 				}
 				if (!nomead || outfile[0] == '\0') {
