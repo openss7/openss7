@@ -13,7 +13,7 @@ EnvironmentFile=-/etc/default/strace
 EnvironmentFile=-/etc/conf.d/strace
 PIDFile=/var/run/strace.pid
 ExecStartPre=/bin/mkdir -p -- /var/log/streams
-ExecStart=/usr/sbin/strace $STRACE_OPTIONS
+ExecStart=/usr/sbin/strace -n $STRACE_OPTIONS
 ExecReload=/bin/kill -HUP $MAINPID
 
 [Install]
