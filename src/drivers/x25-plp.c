@@ -143,7 +143,7 @@ MODULE_ALIAS("/dev/streams/x25-plp/cons");
 MODULE_ALIAS("/dev/streams/clone/x25-plp");
 MODULE_ALIAS("char-major-" __stringify(CONFIG_STREAMS_CLONE_MAJOR) "-" __stringify(CONFIG_STREAMS_PLP_MAJOR));
 MODULE_ALIAS("/dev/x25-plp");
-MODULE_ALIAS("devname:x25-plp");
+//MODULE_ALIAS("devname:x25-plp");
 MODULE_ALIAS("/dev/x25");
 MODULE_ALIAS("/dev/xx25");
 MODULE_ALIAS("/dev/cons");

@@ -222,7 +222,7 @@ MODULE_ALIAS("/dev/streams/matrix/admin");
 MODULE_ALIAS("/dev/stremas/clone/matrix");
 MODULE_ALIAS("char-major-" __stringify(CONFIG_STREAMS_CLONE_MAJOR) "-" __stringify(MATRIX_CMAJOR_0));
 MODULE_ALIAS("/dev/matrix");
-MODULE_ALIAS("devname:matrix");
+//MODULE_ALIAS("devname:matrix");
 #endif				/* defined MODULE_ALIAS */
 
 #endif				/* defined LINUX */

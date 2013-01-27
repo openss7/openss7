@@ -215,7 +215,7 @@ MODULE_ALIAS("/dev/streams/udp/*");
 MODULE_ALIAS("/dev/streams/clone/udp");
 MODULE_ALIAS("char-major-" __stringify(CONFIG_STREAMS_CLONE_MAJOR) "-" __stringify(TP_CMAJOR_0));
 MODULE_ALIAS("/dev/udp2");
-MODULE_ALIAS("devname:udp2");
+//MODULE_ALIAS("devname:udp2");
 #endif				/* MODULE_ALIAS */
 #endif				/* LINUX */
 

@@ -156,7 +156,7 @@ MODULE_ALIAS("/dev/streams/socksys/*");
 MODULE_ALIAS("/dev/streams/clone/socksys");
 MODULE_ALIAS("char-major-" __stringify(CONFIG_STREAMS_CLONE_MAJOR) "-" __stringify(SOCKSYS_CMAJOR_0));
 MODULE_ALIAS("/dev/socksys");
-MODULE_ALIAS("devname:socksys");
+//MODULE_ALIAS("devname:socksys");
 #endif				/* MODULE_ALIAS */
 #ifdef MODULE_VERSION
 MODULE_VERSION(PACKAGE_ENVR);

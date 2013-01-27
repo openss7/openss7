@@ -194,7 +194,7 @@ MODULE_ALIAS("/dev/streams/np_ip/*");
 MODULE_ALIAS("/dev/streams/clone/np_ip");
 MODULE_ALIAS("char-major-" __stringify(CONFIG_STREAMS_CLONE_MAJOR) "-" __stringify(NP_CMAJOR_0));
 MODULE_ALIAS("/dev/np_ip");
-MODULE_ALIAS("devname:np_ip");
+//MODULE_ALIAS("devname:np_ip");
 #endif				/* defined MODULE_ALIAS */
 #endif				/* defined LINUX */
 

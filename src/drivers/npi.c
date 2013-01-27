@@ -126,7 +126,7 @@ MODULE_ALIAS("/dev/streams/npi/*");
 MODULE_ALIAS("/dev/streams/clone/npi");
 MODULE_ALIAS("char-major-" __stringify(CONFIG_STREAMS_CLONE_MAJOR) "-" __stringify(NPI_CMAJOR_0));
 MODULE_ALIAS("/dev/npi");
-MODULE_ALIAS("devname:npi");
+//MODULE_ALIAS("devname:npi");
 #endif				/* MODULE_ALIAS */
 #endif				/* LINUX */
 

@@ -211,7 +211,7 @@ MODULE_ALIAS("/dev/streams/rawip/*");
 MODULE_ALIAS("/dev/streams/clone/rawip");
 MODULE_ALIAS("char-major-" __stringify(CONFIG_STREAMS_CLONE_MAJOR) "-" __stringify(TP_CMAJOR_0));
 MODULE_ALIAS("/dev/rawip2");
-MODULE_ALIAS("devname:rawip2");
+//MODULE_ALIAS("devname:rawip2");
 #endif				/* MODULE_ALIAS */
 #endif				/* LINUX */
 

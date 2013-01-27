@@ -177,7 +177,7 @@ MODULE_PARM_DESC(major, "Major device number for NSDEV driver.");
 #ifdef MODULE_ALIAS
 MODULE_ALIAS("char-major-" __stringify(CONFIG_STREAMS_NSDEV_MAJOR) "-*");
 MODULE_ALIAS("/dev/nsdev");
-MODULE_ALIAS("devname:nsdev");
+//MODULE_ALIAS("devname:nsdev");
 MODULE_ALIAS("streams-major-" __stringify(CONFIG_STREAMS_NSDEV_MAJOR));
 MODULE_ALIAS("/dev/streams/nsdev");
 MODULE_ALIAS("/dev/streams/nsdev/*");

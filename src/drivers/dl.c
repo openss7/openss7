@@ -143,7 +143,7 @@ MODULE_ALIAS("/dev/streams/dl/*");
 MODULE_ALIAS("/dev/streams/clone/dl");
 MODULE_ALIAS("char-major-" __stringify(CONFIG_STREAMS_CLONE_MAJOR) "-" __stringify(DL_CMAJOR_0));
 MODULE_ALIAS("/dev/dl");
-MODULE_ALIAS("devname:dl");
+//MODULE_ALIAS("devname:dl");
 #endif				/* MODULE_ALIAS */
 #endif				/* LINUX */
 

@@ -125,7 +125,7 @@ MODULE_ALIAS("/dev/streams/lcd/lan");
 MODULE_ALIAS("/dev/streams/clone/lcd");
 MODULE_ALIAS("char-major-" __stringify(CONFIG_STREAMS_CLONE_MAJOR) "-" __stringify(LCD_CMAJOR_0));
 MODULE_ALIAS("/dev/lcd");
-MODULE_ALIAS("devname:lcd");
+//MODULE_ALIAS("devname:lcd");
 MODULE_ALIAS("/dev/hdlc");
 MODULE_ALIAS("/dev/sdlc");
 MODULE_ALIAS("/dev/lan");

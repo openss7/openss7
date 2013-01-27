@@ -178,7 +178,7 @@ MODULE_PARM_DESC(major, "Major device number for STREAMS CH-MUX driver (0 for al
 #if defined MODULE_ALIAS
 MODULE_ALIAS("char-major-" __stringify(CONFIG_STREAMS_CLONE_MAJOR) "-" __stringify(CONFIG_STREAMS_CH_MUX_MAJOR));
 MODULE_ALIAS("/dev/ch");
-MODULE_ALIAS("devname:ch");
+//MODULE_ALIAS("devname:ch");
 MODULE_ALIAS("streams-major-" __stringify(CONFIG_STREAMS_CH_MUX_MAJOR));
 MODULE_ALIAS("/dev/streams/ch");
 MODULE_ALIAS("/dev/streams/ch/*");

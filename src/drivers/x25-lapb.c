@@ -124,7 +124,7 @@ MODULE_ALIAS("/dev/streams/lapb/*");
 MODULE_ALIAS("/dev/streams/clone/lapb");
 MODULE_ALIAS("char-major-" __stringify(CONFIG_STREAMS_CLONE_MAJOR) "-" __stringify(CONFIG_STREAMS_LAPB_MAJOR));
 MODULE_ALIAS("/dev/lapb");
-MODULE_ALIAS("devname:lapb");
+//MODULE_ALIAS("devname:lapb");
 #endif				/* MODULE_ALIAS */
 #ifdef MODULE_VERSION
 MODULE_VERSION(PACKAGE_ENVR);

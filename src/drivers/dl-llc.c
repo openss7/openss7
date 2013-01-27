@@ -153,7 +153,7 @@ MODULE_ALIAS("/dev/streams/llc/tpr");
 MODULE_ALIAS("/dev/streams/llc/fddi");
 MODULE_ALIAS("/dev/streams/clone/llc");
 MODULE_ALIAS("char-major-" __stringify(CONFIG_STREAMS_CLONE_MAJOR) "-" __stringify(LLC_MAJOR_0));
-MODULE_ALIAS("devname:llc");
+//MODULE_ALIAS("devname:llc");
 MODULE_ALIAS("/dev/eth");
 MODULE_ALIAS("/dev/llc");
 MODULE_ALIAS("/dev/tpb");

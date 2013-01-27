@@ -186,7 +186,7 @@ MODULE_PARM_DESC(major, "Major device number for STREAMS-administrative driver."
 #ifdef MODULE
 #ifdef MODULE_ALIAS
 MODULE_ALIAS("char-major-" __stringify(CONFIG_STREAMS_CLONE_MAJOR) "-" __stringify(CONFIG_STREAMS_SAD_MAJOR));
-MODULE_ALIAS("devname:sad");
+//MODULE_ALIAS("devname:sad");
 MODULE_ALIAS("/dev/sad");
 MODULE_ALIAS("/dev/sad/admin");
 MODULE_ALIAS("/dev/sad/user");

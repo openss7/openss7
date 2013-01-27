@@ -152,7 +152,7 @@ MODULE_ALIAS("/dev/streams/trmux/tp");
 MODULE_ALIAS("/dev/streams/trmux/tc");
 MODULE_ALIAS("/dev/streams/trmux/map");
 MODULE_ALIAS("char-major-" __stringify(CONFIG_STREAMS_CLONE_MAJOR) "-" __stringify(TRMUX_CMAJOR_0));
-MODULE_ALIAS("devname:trmux");
+//MODULE_ALIAS("devname:trmux");
 #endif				/* MODULE_ALIAS */
 #endif				/* LINUX */
 

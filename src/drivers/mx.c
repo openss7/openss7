@@ -219,7 +219,7 @@ MODULE_ALIAS("/dev/streams/mx/ch");
 MODULE_ALIAS("/dev/streams/clone/mx");
 MODULE_ALIAS("char-major-" __stringify(CONFIG_STREAMS_CLONE_MAJOR) "-" __stringify(MX_CMAJOR_0));
 MODULE_ALIAS("/dev/mx");
-MODULE_ALIAS("devname:mx");
+//MODULE_ALIAS("devname:mx");
 #endif				/* defined MODULE_ALIAS */
 
 #endif				/* defined LINUX */

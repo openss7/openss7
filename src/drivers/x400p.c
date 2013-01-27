@@ -319,7 +319,7 @@ MODULE_ALIAS("/dev/streams/x400p-mx/*");
 MODULE_ALIAS("/dev/streams/clone/x400p-mx");
 MODULE_ALIAS("char-major-" __stringify(CONFIG_STREAMS_CLONE_MAJOR) "-" __stringify(MX_X400P_CMAJOR_0));
 MODULE_ALIAS("/dev/x400p-mx");
-MODULE_ALIAS("devname:x400p-mx");
+//MODULE_ALIAS("devname:x400p-mx");
 #endif				/* MODULE_ALIAS */
 #endif				/* LINUX */
 

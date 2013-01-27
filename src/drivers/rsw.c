@@ -313,7 +313,7 @@ MODULE_ALIAS("/dev/streams/rsw/*");
 MODULE_ALIAS("/dev/streams/clone/rsw");
 MODULE_ALIAS("char-major-" __stringify(CONFIG_STREAMS_CLONE_MAJOR) "-" __stringify(RSW_CMAJOR_0));
 MODULE_ALIAS("/dev/rsw");
-MODULE_ALIAS("devname:rsw");
+//MODULE_ALIAS("devname:rsw");
 #endif				/* MODULE_ALIAS */
 #endif				/* LINUX */
 

@@ -137,7 +137,7 @@ MODULE_ALIAS("/dev/streams/llc/*");
 MODULE_ALIAS("/dev/streams/clone/llc");
 MODULE_ALIAS("char-major-" __stringify(CONFIG_STREAMS_CLONE_MAJOR) "-" __stringify(CONFIG_STREAMS_LLC_MAJOR_0));
 MODULE_ALIAS("/dev/llc");
-MODULE_ALIAS("devname:llc");
+//MODULE_ALIAS("devname:llc");
 #endif				/* MODULE_ALIAS */
 #ifdef MODULE_VERSION
 MODULE_VERSION(PACKAGE_ENVR);

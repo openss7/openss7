@@ -133,7 +133,7 @@ MODULE_ALIAS("/dev/streams/ch/*");
 MODULE_ALIAS("/dev/streams/clone/ch");
 MODULE_ALIAS("char-major-" __stringify(CONFIG_STREAMS_CLONE_MAJOR) "-" __stringify(CHMUX_CMAJOR_0));
 MODULE_ALIAS("/dev/ch");
-MODULE_ALIAS("devname:ch");
+//MODULE_ALIAS("devname:ch");
 #endif				/* MODULE_ALIAS */
 #endif				/* LINUX */
 

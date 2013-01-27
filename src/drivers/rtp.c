@@ -154,7 +154,7 @@ MODULE_ALIAS("/dev/streams/rtp/*");
 MODULE_ALIAS("/dev/streams/clone/rtp");
 MODULE_ALIAS("char-major-" __stringify(CONFIG_STREAMS_CLONE_MAJOR) "-" __stringify(RTP_CMAJOR_0));
 MODULE_ALIAS("/dev/rtp");
-MODULE_ALIAS("devname:rtp");
+//MODULE_ALIAS("devname:rtp");
 #endif				/* MODULE_ALIAS */
 #endif				/* LINUX */
 

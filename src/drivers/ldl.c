@@ -155,7 +155,7 @@ MODULE_ALIAS("/dev/streams/link-dri/*");
 MODULE_ALIAS("/dev/streams/clone/link-dri");
 MODULE_ALIAS("char-major-" __stringify(CONFIG_STREAMS_CLONE_MAJOR) "-" __stringify(LDL_CMAJOR_0));
 MODULE_ALIAS("/dev/ldl");
-MODULE_ALIAS("devname:ldl");
+//MODULE_ALIAS("devname:ldl");
 #endif				/* MODULE_ALIAS */
 #endif				/* LINUX */
 

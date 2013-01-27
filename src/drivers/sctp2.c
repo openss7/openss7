@@ -17799,7 +17799,7 @@ MODULE_ALIAS("/dev/streams/sctp_n/*");
 MODULE_ALIAS("/dev/streams/clone/sctp_n");
 MODULE_ALIAS("char-major-" __stringify(CONFIG_STREAMS_CLONE_MAJOR) "-" __stringify(SCTP_N_CMAJOR_0));
 MODULE_ALIAS("/dev/sctp_n");
-MODULE_ALIAS("devname:sctp_n");
+//MODULE_ALIAS("devname:sctp_n");
 #endif				/* MODULE_ALIAS */
 
 #endif				/* LINUX */

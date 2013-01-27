@@ -207,7 +207,7 @@ MODULE_ALIAS("/dev/streams/clnl/isis");
 MODULE_ALIAS("/dev/streams/clone/clnl");
 MODULE_ALIAS("char-major-" __stringify(CONFIG_STREAMS_CLONE_MAJOR) "-" __stringify(CLNS_CMAJOR_0));
 MODULE_ALIAS("/dev/clnl");
-MODULE_ALIAS("devname:clnl");
+//MODULE_ALIAS("devname:clnl");
 MODULE_ALIAS("/dev/clns");
 MODULE_ALIAS("/dev/esis");
 MODULE_ALIAS("/dev/isis");

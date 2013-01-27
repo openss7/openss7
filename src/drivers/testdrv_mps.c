@@ -133,7 +133,7 @@ MODULE_ALIAS("/dev/streams/testdrv-mps");
 MODULE_ALIAS("/dev/streams/clone/testdrv-mps");
 MODULE_ALIAS("char-major-" __stringify(CONFIG_STREAMS_CLONE_MAJOR) "-" __stringify(CONFIG_STREAMS_TD_MPS_MAJOR));
 MODULE_ALIAS("/dev/testdrv-mps");
-MODULE_ALIAS("devname:testdrv-mps");
+//MODULE_ALIAS("devname:testdrv-mps");
 #endif				/* defined MODULE_ALIAS */
 #endif				/* defined LINUX */
 
