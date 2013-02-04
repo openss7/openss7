@@ -1,6 +1,7 @@
 bld_cv_pkg_cmd_BIBTEX=${bld_cv_pkg_cmd_BIBTEX='urpmi tetex'}
 bld_cv_pkg_cmd_BZIP2_CMD=${bld_cv_pkg_cmd_BZIP2_CMD='urpmi bzip2'}
 bld_cv_pkg_cmd_CHKCONFIG=${bld_cv_pkg_cmd_CHKCONFIG='urpmi chkconfig'}
+bld_cv_pkg_cmd_CONFIG_2_6_33_7_DESKTOP_2MNB=${bld_cv_pkg_cmd_CONFIG_2_6_33_7_DESKTOP_2MNB='urpmi kernel-2.6.33-desktop-2.6.33.7-2mnb'}
 bld_cv_pkg_cmd_CONVERT=${bld_cv_pkg_cmd_CONVERT='urpmi imagemagick'}
 bld_cv_pkg_cmd_COUNTPKGLIST=${bld_cv_pkg_cmd_COUNTPKGLIST='urpmi apt'}
 bld_cv_pkg_cmd_DEPMOD=${bld_cv_pkg_cmd_DEPMOD='urpmi module-init-tools'}
@@ -22,6 +23,7 @@ bld_cv_pkg_cmd_GNUPLOT=${bld_cv_pkg_cmd_GNUPLOT='urpmi gnuplot'}
 bld_cv_pkg_cmd_GPG=${bld_cv_pkg_cmd_GPG='urpmi gnupg'}
 bld_cv_pkg_cmd_GROFF=${bld_cv_pkg_cmd_GROFF='urpmi groff-for-man'}
 bld_cv_pkg_cmd_GZIP_CMD=${bld_cv_pkg_cmd_GZIP_CMD='urpmi gzip'}
+bld_cv_pkg_cmd_INITTAB=${bld_cv_pkg_cmd_INITTAB='urpmi initscripts'}
 bld_cv_pkg_cmd_JAR=${bld_cv_pkg_cmd_JAR='urpmi gcj-tools'}
 bld_cv_pkg_cmd_JARSIGNER=${bld_cv_pkg_cmd_JARSIGNER='urpmi gcj-tools'}
 bld_cv_pkg_cmd_JAVAC=${bld_cv_pkg_cmd_JAVAC='urpmi gcc-java'}
@@ -35,7 +37,10 @@ bld_cv_pkg_cmd_LSOF=${bld_cv_pkg_cmd_LSOF='urpmi lsof'}
 bld_cv_pkg_cmd_LZMA_CMD=${bld_cv_pkg_cmd_LZMA_CMD='urpmi xz'}
 bld_cv_pkg_cmd_MD5SUM=${bld_cv_pkg_cmd_MD5SUM='urpmi coreutils'}
 bld_cv_pkg_cmd_MODPROBE=${bld_cv_pkg_cmd_MODPROBE='urpmi module-init-tools'}
+bld_cv_pkg_cmd_MODULES=${bld_cv_pkg_cmd_MODULES='urpmi initscripts'}
+bld_cv_pkg_cmd_MODULES_DEP=${bld_cv_pkg_cmd_MODULES_DEP='urpmi kernel-2.6.33-desktop-2.6.33.7-2mnb'}
 bld_cv_pkg_cmd_MODULE_SYMVERS=${bld_cv_pkg_cmd_MODULE_SYMVERS='urpmi kernel-2.6.33-desktop-devel-2.6.33.7-2mnb'}
+bld_cv_pkg_cmd_OPENSSL=${bld_cv_pkg_cmd_OPENSSL='urpmi openssl'}
 bld_cv_pkg_cmd_PACKAGE_LIST=${bld_cv_pkg_cmd_PACKAGE_LIST='urpmi java-1.6.0-openjdk-javadoc'}
 bld_cv_pkg_cmd_PDFTEX=${bld_cv_pkg_cmd_PDFTEX='urpmi tetex'}
 bld_cv_pkg_cmd_PS2EPSI=${bld_cv_pkg_cmd_PS2EPSI='urpmi ghostscript-common'}
@@ -44,13 +49,27 @@ bld_cv_pkg_cmd_PSLATEX=${bld_cv_pkg_cmd_PSLATEX='urpmi tetex-latex'}
 bld_cv_pkg_cmd_RPM=${bld_cv_pkg_cmd_RPM='urpmi rpm'}
 bld_cv_pkg_cmd_SHA1SUM=${bld_cv_pkg_cmd_SHA1SUM='urpmi coreutils'}
 bld_cv_pkg_cmd_SHA256SUM=${bld_cv_pkg_cmd_SHA256SUM='urpmi coreutils'}
+bld_cv_pkg_cmd_SOURCES_LIST=${bld_cv_pkg_cmd_SOURCES_LIST='urpmi apt-common'}
 bld_cv_pkg_cmd_SYMVERS_2_6_33_7_DESKTOP_2MNB_GZ=${bld_cv_pkg_cmd_SYMVERS_2_6_33_7_DESKTOP_2MNB_GZ='urpmi kernel-2.6.33-desktop-2.6.33.7-2mnb'}
+bld_cv_pkg_cmd_SYSTEM_MAP_2_6_33_7_DESKTOP_2MNB=${bld_cv_pkg_cmd_SYSTEM_MAP_2_6_33_7_DESKTOP_2MNB='urpmi kernel-2.6.33-desktop-2.6.33.7-2mnb'}
 bld_cv_pkg_cmd_TCL_H=${bld_cv_pkg_cmd_TCL_H='urpmi lib64tcl-devel'}
 bld_cv_pkg_cmd_UCD_SNMP_UCD_SNMP_CONFIG_H=${bld_cv_pkg_cmd_UCD_SNMP_UCD_SNMP_CONFIG_H='urpmi lib64net-snmp-devel'}
+bld_cv_pkg_cmd_VENDORS_LIST=${bld_cv_pkg_cmd_VENDORS_LIST='urpmi apt-common'}
 bld_cv_pkg_cmd_ZIP=${bld_cv_pkg_cmd_ZIP='urpmi zip'}
+bld_cv_pkg_cmd__ETC_APT=${bld_cv_pkg_cmd__ETC_APT='urpmi apt-common'}
+bld_cv_pkg_cmd__ETC_MODPROBE_D=${bld_cv_pkg_cmd__ETC_MODPROBE_D='urpmi module-init-tools'}
+bld_cv_pkg_cmd__ETC_RC_D_INIT_D=${bld_cv_pkg_cmd__ETC_RC_D_INIT_D='urpmi chkconfig'}
+bld_cv_pkg_cmd__ETC_RC_D_RC0_D=${bld_cv_pkg_cmd__ETC_RC_D_RC0_D='urpmi chkconfig'}
+bld_cv_pkg_cmd__ETC_SSL=${bld_cv_pkg_cmd__ETC_SSL='urpmi filesystem'}
+bld_cv_pkg_cmd__ETC_SYSCONFIG=${bld_cv_pkg_cmd__ETC_SYSCONFIG='urpmi initscripts'}
+bld_cv_pkg_cmd__ETC_URPMI=${bld_cv_pkg_cmd__ETC_URPMI='urpmi urpmi'}
+bld_cv_pkg_cmd__LIB_MODULES_2_6_33_7_DESKTOP_2MNB=${bld_cv_pkg_cmd__LIB_MODULES_2_6_33_7_DESKTOP_2MNB='urpmi kernel-2.6.33-desktop-2.6.33.7-2mnb'}
+bld_cv_pkg_cmd__LIB_MODULES_2_6_33_7_DESKTOP_2MNB_BUILD_ARCH_X86=${bld_cv_pkg_cmd__LIB_MODULES_2_6_33_7_DESKTOP_2MNB_BUILD_ARCH_X86='urpmi kernel-2.6.33-desktop-devel-2.6.33.7-2mnb'}
+bld_cv_pkg_cmd__LIB_MODULES_2_6_33_7_DESKTOP_2MNB_SOURCE_ARCH=${bld_cv_pkg_cmd__LIB_MODULES_2_6_33_7_DESKTOP_2MNB_SOURCE_ARCH='urpmi kernel-2.6.33-desktop-devel-2.6.33.7-2mnb'}
 bld_cv_pkg_name_BIBTEX=${bld_cv_pkg_name_BIBTEX=tetex}
 bld_cv_pkg_name_BZIP2_CMD=${bld_cv_pkg_name_BZIP2_CMD=bzip2}
 bld_cv_pkg_name_CHKCONFIG=${bld_cv_pkg_name_CHKCONFIG=chkconfig}
+bld_cv_pkg_name_CONFIG_2_6_33_7_DESKTOP_2MNB=${bld_cv_pkg_name_CONFIG_2_6_33_7_DESKTOP_2MNB=kernel-2.6.33-desktop-2.6.33.7-2mnb}
 bld_cv_pkg_name_CONVERT=${bld_cv_pkg_name_CONVERT=imagemagick}
 bld_cv_pkg_name_COUNTPKGLIST=${bld_cv_pkg_name_COUNTPKGLIST=apt}
 bld_cv_pkg_name_DEPMOD=${bld_cv_pkg_name_DEPMOD=module-init-tools}
@@ -72,6 +91,7 @@ bld_cv_pkg_name_GNUPLOT=${bld_cv_pkg_name_GNUPLOT=gnuplot}
 bld_cv_pkg_name_GPG=${bld_cv_pkg_name_GPG=gnupg}
 bld_cv_pkg_name_GROFF=${bld_cv_pkg_name_GROFF=groff-for-man}
 bld_cv_pkg_name_GZIP_CMD=${bld_cv_pkg_name_GZIP_CMD=gzip}
+bld_cv_pkg_name_INITTAB=${bld_cv_pkg_name_INITTAB=initscripts}
 bld_cv_pkg_name_JAR=${bld_cv_pkg_name_JAR=gcj-tools}
 bld_cv_pkg_name_JARSIGNER=${bld_cv_pkg_name_JARSIGNER=gcj-tools}
 bld_cv_pkg_name_JAVAC=${bld_cv_pkg_name_JAVAC=gcc-java}
@@ -80,12 +100,17 @@ bld_cv_pkg_name_KEYTOOL=${bld_cv_pkg_name_KEYTOOL=gcj-tools}
 bld_cv_pkg_name_KGENKSYMS=${bld_cv_pkg_name_KGENKSYMS=kernel-2.6.33-desktop-devel-2.6.33.7-2mnb}
 bld_cv_pkg_name_LATEX2HTML=${bld_cv_pkg_name_LATEX2HTML=latex2html}
 bld_cv_pkg_name_LDCONFIG=${bld_cv_pkg_name_LDCONFIG=glibc}
+bld_cv_pkg_name_LSB_RELEASE=${bld_cv_pkg_name_LSB_RELEASE=lsb-release}
 bld_cv_pkg_name_LSMOD=${bld_cv_pkg_name_LSMOD=module-init-tools}
 bld_cv_pkg_name_LSOF=${bld_cv_pkg_name_LSOF=lsof}
 bld_cv_pkg_name_LZMA_CMD=${bld_cv_pkg_name_LZMA_CMD=xz}
+bld_cv_pkg_name_MANDRIVA_RELEASE=${bld_cv_pkg_name_MANDRIVA_RELEASE=mandriva-release-common}
 bld_cv_pkg_name_MD5SUM=${bld_cv_pkg_name_MD5SUM=coreutils}
 bld_cv_pkg_name_MODPROBE=${bld_cv_pkg_name_MODPROBE=module-init-tools}
+bld_cv_pkg_name_MODULES=${bld_cv_pkg_name_MODULES=initscripts}
+bld_cv_pkg_name_MODULES_DEP=${bld_cv_pkg_name_MODULES_DEP=kernel-2.6.33-desktop-2.6.33.7-2mnb}
 bld_cv_pkg_name_MODULE_SYMVERS=${bld_cv_pkg_name_MODULE_SYMVERS=kernel-2.6.33-desktop-devel-2.6.33.7-2mnb}
+bld_cv_pkg_name_OPENSSL=${bld_cv_pkg_name_OPENSSL=openssl}
 bld_cv_pkg_name_PACKAGE_LIST=${bld_cv_pkg_name_PACKAGE_LIST=java-1.6.0-openjdk-javadoc}
 bld_cv_pkg_name_PDFTEX=${bld_cv_pkg_name_PDFTEX=tetex}
 bld_cv_pkg_name_PS2EPSI=${bld_cv_pkg_name_PS2EPSI=ghostscript-common}
@@ -94,17 +119,54 @@ bld_cv_pkg_name_PSLATEX=${bld_cv_pkg_name_PSLATEX=tetex-latex}
 bld_cv_pkg_name_RPM=${bld_cv_pkg_name_RPM=rpm}
 bld_cv_pkg_name_SHA1SUM=${bld_cv_pkg_name_SHA1SUM=coreutils}
 bld_cv_pkg_name_SHA256SUM=${bld_cv_pkg_name_SHA256SUM=coreutils}
+bld_cv_pkg_name_SOURCES_LIST=${bld_cv_pkg_name_SOURCES_LIST=apt-common}
 bld_cv_pkg_name_SYMVERS_2_6_33_7_DESKTOP_2MNB_GZ=${bld_cv_pkg_name_SYMVERS_2_6_33_7_DESKTOP_2MNB_GZ=kernel-2.6.33-desktop-2.6.33.7-2mnb}
+bld_cv_pkg_name_SYSTEM_MAP_2_6_33_7_DESKTOP_2MNB=${bld_cv_pkg_name_SYSTEM_MAP_2_6_33_7_DESKTOP_2MNB=kernel-2.6.33-desktop-2.6.33.7-2mnb}
 bld_cv_pkg_name_TCL_H=${bld_cv_pkg_name_TCL_H=lib64tcl-devel}
 bld_cv_pkg_name_UCD_SNMP_UCD_SNMP_CONFIG_H=${bld_cv_pkg_name_UCD_SNMP_UCD_SNMP_CONFIG_H=lib64net-snmp-devel}
+bld_cv_pkg_name_VENDORS_LIST=${bld_cv_pkg_name_VENDORS_LIST=apt-common}
 bld_cv_pkg_name_ZIP=${bld_cv_pkg_name_ZIP=zip}
+bld_cv_pkg_name__ETC_APT=${bld_cv_pkg_name__ETC_APT=apt-common}
+bld_cv_pkg_name__ETC_MODPROBE_D=${bld_cv_pkg_name__ETC_MODPROBE_D=module-init-tools}
+bld_cv_pkg_name__ETC_RC_D_INIT_D=${bld_cv_pkg_name__ETC_RC_D_INIT_D=chkconfig}
+bld_cv_pkg_name__ETC_RC_D_RC0_D=${bld_cv_pkg_name__ETC_RC_D_RC0_D=chkconfig}
+bld_cv_pkg_name__ETC_SSL=${bld_cv_pkg_name__ETC_SSL=filesystem}
+bld_cv_pkg_name__ETC_SYSCONFIG=${bld_cv_pkg_name__ETC_SYSCONFIG=initscripts}
+bld_cv_pkg_name__ETC_URPMI=${bld_cv_pkg_name__ETC_URPMI=urpmi}
+bld_cv_pkg_name__LIB_MODULES_2_6_33_7_DESKTOP_2MNB=${bld_cv_pkg_name__LIB_MODULES_2_6_33_7_DESKTOP_2MNB=kernel-2.6.33-desktop-2.6.33.7-2mnb}
+bld_cv_pkg_name__LIB_MODULES_2_6_33_7_DESKTOP_2MNB_BUILD_ARCH_X86=${bld_cv_pkg_name__LIB_MODULES_2_6_33_7_DESKTOP_2MNB_BUILD_ARCH_X86=kernel-2.6.33-desktop-devel-2.6.33.7-2mnb}
+bld_cv_pkg_name__LIB_MODULES_2_6_33_7_DESKTOP_2MNB_SOURCE_ARCH=${bld_cv_pkg_name__LIB_MODULES_2_6_33_7_DESKTOP_2MNB_SOURCE_ARCH=kernel-2.6.33-desktop-devel-2.6.33.7-2mnb}
+bld_cv_pkg_path_CONFIG_2_6_33_7_DESKTOP_2MNB=${bld_cv_pkg_path_CONFIG_2_6_33_7_DESKTOP_2MNB=/boot/config-2.6.33.7-desktop-2mnb}
 bld_cv_pkg_path_EXTERN_H=${bld_cv_pkg_path_EXTERN_H=/usr/lib/perl5/5.10.0/x86_64-linux-thread-multi/CORE/EXTERN.h}
 bld_cv_pkg_path_GCJ_CNI_H=${bld_cv_pkg_path_GCJ_CNI_H=/usr/include/libgcj-4.3.2/gcj/cni.h}
+bld_cv_pkg_path_INITTAB=${bld_cv_pkg_path_INITTAB=/etc/inittab}
+bld_cv_pkg_path_ISSUE=${bld_cv_pkg_path_ISSUE=/etc/issue}
+bld_cv_pkg_path_LSB_RELEASE=${bld_cv_pkg_path_LSB_RELEASE=/etc/lsb-release}
+bld_cv_pkg_path_MANDRIVA_RELEASE=${bld_cv_pkg_path_MANDRIVA_RELEASE=/etc/mandriva-release}
+bld_cv_pkg_path_MODULES=${bld_cv_pkg_path_MODULES=/etc/modules}
+bld_cv_pkg_path_MODULES_DEP=${bld_cv_pkg_path_MODULES_DEP=/lib/modules/2.6.33.7-desktop-2mnb/modules.dep}
 bld_cv_pkg_path_MODULE_SYMVERS=${bld_cv_pkg_path_MODULE_SYMVERS=/lib/modules/2.6.33.7-desktop-2mnb/build/Module.symvers}
 bld_cv_pkg_path_PACKAGE_LIST=${bld_cv_pkg_path_PACKAGE_LIST=/usr/share/javadoc/java-1.6.0-openjdk/api/package-list}
+bld_cv_pkg_path_SOURCES_LIST=${bld_cv_pkg_path_SOURCES_LIST=/etc/apt/sources.list}
 bld_cv_pkg_path_SYMVERS_2_6_33_7_DESKTOP_2MNB_GZ=${bld_cv_pkg_path_SYMVERS_2_6_33_7_DESKTOP_2MNB_GZ=/boot/symvers-2.6.33.7-desktop-2mnb.gz}
+bld_cv_pkg_path_SYSTEM_MAP_2_6_33_7_DESKTOP_2MNB=${bld_cv_pkg_path_SYSTEM_MAP_2_6_33_7_DESKTOP_2MNB=/boot/System.map-2.6.33.7-desktop-2mnb}
 bld_cv_pkg_path_TCL_H=${bld_cv_pkg_path_TCL_H=/usr/include/tcl8.5.4/generic/tcl.h}
 bld_cv_pkg_path_UCD_SNMP_UCD_SNMP_CONFIG_H=${bld_cv_pkg_path_UCD_SNMP_UCD_SNMP_CONFIG_H=/usr/include/net-snmp/ucd-snmp/ucd-snmp-config.h}
+bld_cv_pkg_path_URPMI_CFG=${bld_cv_pkg_path_URPMI_CFG=/etc/urpmi/urpmi.cfg}
+bld_cv_pkg_path_VENDORS_LIST=${bld_cv_pkg_path_VENDORS_LIST=/etc/apt/vendors.list}
+bld_cv_pkg_path__ETC_APT=${bld_cv_pkg_path__ETC_APT=/etc/apt}
+bld_cv_pkg_path__ETC_MODPROBE_D=${bld_cv_pkg_path__ETC_MODPROBE_D=/etc/modprobe.d}
+bld_cv_pkg_path__ETC_RC_D=${bld_cv_pkg_path__ETC_RC_D=/etc/rc.d}
+bld_cv_pkg_path__ETC_RC_D_INIT_D=${bld_cv_pkg_path__ETC_RC_D_INIT_D=/etc/rc.d/init.d}
+bld_cv_pkg_path__ETC_RC_D_RC0_D=${bld_cv_pkg_path__ETC_RC_D_RC0_D=/etc/rc.d/rc0.d}
+bld_cv_pkg_path__ETC_SSL=${bld_cv_pkg_path__ETC_SSL=/etc/ssl}
+bld_cv_pkg_path__ETC_SYSCONFIG=${bld_cv_pkg_path__ETC_SYSCONFIG=/etc/sysconfig}
+bld_cv_pkg_path__ETC_URPMI=${bld_cv_pkg_path__ETC_URPMI=/etc/urpmi}
+bld_cv_pkg_path__LIB_MODULES_2_6_33_7_DESKTOP_2MNB=${bld_cv_pkg_path__LIB_MODULES_2_6_33_7_DESKTOP_2MNB=/lib/modules/2.6.33.7-desktop-2mnb}
+bld_cv_pkg_path__LIB_MODULES_2_6_33_7_DESKTOP_2MNB_BUILD=${bld_cv_pkg_path__LIB_MODULES_2_6_33_7_DESKTOP_2MNB_BUILD=/lib/modules/2.6.33.7-desktop-2mnb/build}
+bld_cv_pkg_path__LIB_MODULES_2_6_33_7_DESKTOP_2MNB_BUILD_ARCH_X86=${bld_cv_pkg_path__LIB_MODULES_2_6_33_7_DESKTOP_2MNB_BUILD_ARCH_X86=/lib/modules/2.6.33.7-desktop-2mnb/build/arch/x86}
+bld_cv_pkg_path__LIB_MODULES_2_6_33_7_DESKTOP_2MNB_SOURCE=${bld_cv_pkg_path__LIB_MODULES_2_6_33_7_DESKTOP_2MNB_SOURCE=/lib/modules/2.6.33.7-desktop-2mnb/source}
+bld_cv_pkg_path__LIB_MODULES_2_6_33_7_DESKTOP_2MNB_SOURCE_ARCH=${bld_cv_pkg_path__LIB_MODULES_2_6_33_7_DESKTOP_2MNB_SOURCE_ARCH=/lib/modules/2.6.33.7-desktop-2mnb/source/arch}
 bld_cv_pkg_prog_AUTOM4TE=${bld_cv_pkg_prog_AUTOM4TE=autom4te}
 bld_cv_pkg_prog_BIBTEX=${bld_cv_pkg_prog_BIBTEX=bibtex}
 bld_cv_pkg_prog_BZIP2_CMD=${bld_cv_pkg_prog_BZIP2_CMD=bzip2}
@@ -144,6 +206,7 @@ bld_cv_pkg_prog_LZMA_CMD=${bld_cv_pkg_prog_LZMA_CMD=xz}
 bld_cv_pkg_prog_MAKEWHATIS=${bld_cv_pkg_prog_MAKEWHATIS=makewhatis}
 bld_cv_pkg_prog_MD5SUM=${bld_cv_pkg_prog_MD5SUM=md5sum}
 bld_cv_pkg_prog_MODPROBE=${bld_cv_pkg_prog_MODPROBE=modprobe}
+bld_cv_pkg_prog_OPENSSL=${bld_cv_pkg_prog_OPENSSL=openssl}
 bld_cv_pkg_prog_PDFLATEX=${bld_cv_pkg_prog_PDFLATEX=pdftex}
 bld_cv_pkg_prog_PDFTEX=${bld_cv_pkg_prog_PDFTEX=pdfetex}
 bld_cv_pkg_prog_PIC=${bld_cv_pkg_prog_PIC=pic}
@@ -164,6 +227,7 @@ bld_cv_pkg_prog_ZIP=${bld_cv_pkg_prog_ZIP=zip}
 bld_cv_pkg_ver_BIBTEX=${bld_cv_pkg_ver_BIBTEX=3.0}
 bld_cv_pkg_ver_BZIP2_CMD=${bld_cv_pkg_ver_BZIP2_CMD=1.0.5}
 bld_cv_pkg_ver_CHKCONFIG=${bld_cv_pkg_ver_CHKCONFIG=1.3.37}
+bld_cv_pkg_ver_CONFIG_2_6_33_7_DESKTOP_2MNB=${bld_cv_pkg_ver_CONFIG_2_6_33_7_DESKTOP_2MNB=1}
 bld_cv_pkg_ver_CONVERT=${bld_cv_pkg_ver_CONVERT=6.4.2.10}
 bld_cv_pkg_ver_COUNTPKGLIST=${bld_cv_pkg_ver_COUNTPKGLIST=0.5.15lorg3.2}
 bld_cv_pkg_ver_DEPMOD=${bld_cv_pkg_ver_DEPMOD=3.5}
@@ -185,6 +249,7 @@ bld_cv_pkg_ver_GNUPLOT=${bld_cv_pkg_ver_GNUPLOT=4.2.3}
 bld_cv_pkg_ver_GPG=${bld_cv_pkg_ver_GPG=1.4.9}
 bld_cv_pkg_ver_GROFF=${bld_cv_pkg_ver_GROFF=1.19.1}
 bld_cv_pkg_ver_GZIP_CMD=${bld_cv_pkg_ver_GZIP_CMD=1.3.12}
+bld_cv_pkg_ver_INITTAB=${bld_cv_pkg_ver_INITTAB=8.81}
 bld_cv_pkg_ver_JAR=${bld_cv_pkg_ver_JAR=4.3.2}
 bld_cv_pkg_ver_JARSIGNER=${bld_cv_pkg_ver_JARSIGNER=4.3.2}
 bld_cv_pkg_ver_JAVAC=${bld_cv_pkg_ver_JAVAC=4.3.2}
@@ -193,12 +258,17 @@ bld_cv_pkg_ver_KEYTOOL=${bld_cv_pkg_ver_KEYTOOL=4.3.2}
 bld_cv_pkg_ver_KGENKSYMS=${bld_cv_pkg_ver_KGENKSYMS=1}
 bld_cv_pkg_ver_LATEX2HTML=${bld_cv_pkg_ver_LATEX2HTML=2002}
 bld_cv_pkg_ver_LDCONFIG=${bld_cv_pkg_ver_LDCONFIG=2.8}
+bld_cv_pkg_ver_LSB_RELEASE=${bld_cv_pkg_ver_LSB_RELEASE=2.0}
 bld_cv_pkg_ver_LSMOD=${bld_cv_pkg_ver_LSMOD=3.5}
 bld_cv_pkg_ver_LSOF=${bld_cv_pkg_ver_LSOF=4.80}
 bld_cv_pkg_ver_LZMA_CMD=${bld_cv_pkg_ver_LZMA_CMD=5.0.0}
+bld_cv_pkg_ver_MANDRIVA_RELEASE=${bld_cv_pkg_ver_MANDRIVA_RELEASE=2009.0}
 bld_cv_pkg_ver_MD5SUM=${bld_cv_pkg_ver_MD5SUM=6.12}
 bld_cv_pkg_ver_MODPROBE=${bld_cv_pkg_ver_MODPROBE=3.5}
+bld_cv_pkg_ver_MODULES=${bld_cv_pkg_ver_MODULES=8.81}
+bld_cv_pkg_ver_MODULES_DEP=${bld_cv_pkg_ver_MODULES_DEP=1}
 bld_cv_pkg_ver_MODULE_SYMVERS=${bld_cv_pkg_ver_MODULE_SYMVERS=1}
+bld_cv_pkg_ver_OPENSSL=${bld_cv_pkg_ver_OPENSSL=0.9.8h}
 bld_cv_pkg_ver_PACKAGE_LIST=${bld_cv_pkg_ver_PACKAGE_LIST=1.6.0.0}
 bld_cv_pkg_ver_PDFTEX=${bld_cv_pkg_ver_PDFTEX=3.0}
 bld_cv_pkg_ver_PS2EPSI=${bld_cv_pkg_ver_PS2EPSI=8.63}
@@ -207,7 +277,20 @@ bld_cv_pkg_ver_PSLATEX=${bld_cv_pkg_ver_PSLATEX=3.0}
 bld_cv_pkg_ver_RPM=${bld_cv_pkg_ver_RPM=4.4.2.3}
 bld_cv_pkg_ver_SHA1SUM=${bld_cv_pkg_ver_SHA1SUM=6.12}
 bld_cv_pkg_ver_SHA256SUM=${bld_cv_pkg_ver_SHA256SUM=6.12}
+bld_cv_pkg_ver_SOURCES_LIST=${bld_cv_pkg_ver_SOURCES_LIST=0.5.15lorg3.2}
 bld_cv_pkg_ver_SYMVERS_2_6_33_7_DESKTOP_2MNB_GZ=${bld_cv_pkg_ver_SYMVERS_2_6_33_7_DESKTOP_2MNB_GZ=1}
+bld_cv_pkg_ver_SYSTEM_MAP_2_6_33_7_DESKTOP_2MNB=${bld_cv_pkg_ver_SYSTEM_MAP_2_6_33_7_DESKTOP_2MNB=1}
 bld_cv_pkg_ver_TCL_H=${bld_cv_pkg_ver_TCL_H=8.5.4}
 bld_cv_pkg_ver_UCD_SNMP_UCD_SNMP_CONFIG_H=${bld_cv_pkg_ver_UCD_SNMP_UCD_SNMP_CONFIG_H=5.4.2}
+bld_cv_pkg_ver_VENDORS_LIST=${bld_cv_pkg_ver_VENDORS_LIST=0.5.15lorg3.2}
 bld_cv_pkg_ver_ZIP=${bld_cv_pkg_ver_ZIP=3.0}
+bld_cv_pkg_ver__ETC_APT=${bld_cv_pkg_ver__ETC_APT=0.5.15lorg3.2}
+bld_cv_pkg_ver__ETC_MODPROBE_D=${bld_cv_pkg_ver__ETC_MODPROBE_D=3.5}
+bld_cv_pkg_ver__ETC_RC_D_INIT_D=${bld_cv_pkg_ver__ETC_RC_D_INIT_D=1.3.37}
+bld_cv_pkg_ver__ETC_RC_D_RC0_D=${bld_cv_pkg_ver__ETC_RC_D_RC0_D=1.3.37}
+bld_cv_pkg_ver__ETC_SSL=${bld_cv_pkg_ver__ETC_SSL=2.1.9}
+bld_cv_pkg_ver__ETC_SYSCONFIG=${bld_cv_pkg_ver__ETC_SYSCONFIG=8.81}
+bld_cv_pkg_ver__ETC_URPMI=${bld_cv_pkg_ver__ETC_URPMI=6.14.17}
+bld_cv_pkg_ver__LIB_MODULES_2_6_33_7_DESKTOP_2MNB=${bld_cv_pkg_ver__LIB_MODULES_2_6_33_7_DESKTOP_2MNB=1}
+bld_cv_pkg_ver__LIB_MODULES_2_6_33_7_DESKTOP_2MNB_BUILD_ARCH_X86=${bld_cv_pkg_ver__LIB_MODULES_2_6_33_7_DESKTOP_2MNB_BUILD_ARCH_X86=1}
+bld_cv_pkg_ver__LIB_MODULES_2_6_33_7_DESKTOP_2MNB_SOURCE_ARCH=${bld_cv_pkg_ver__LIB_MODULES_2_6_33_7_DESKTOP_2MNB_SOURCE_ARCH=1}
