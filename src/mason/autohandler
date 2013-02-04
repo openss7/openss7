@@ -416,18 +416,19 @@
 	    } else {
 		my $key = pack('H*','0000'.$id);
 		my $flg = 0x00;
-		   $flg |= 0x80 unless ($useraccs=~/,fail-load-dead,/);
-		   $flg |= 0x40 unless ($useraccs=~/,fail-open-dead,/);
-		   $flg |= 0x20 unless ($useraccs=~/,fail-load-expy,/);
-		   $flg |= 0x10 unless ($useraccs=~/,fail-open-expy,/);
-		   $flg |= 0x08 unless ($useraccs=~/,fail-load-empt,/); # always reset
-		   $flg |= 0x04 unless ($useraccs=~/,fail-open-empt,/);
-		   $flg |= 0x02 unless ($useraccs=~/,fail-load-vrfy,/);
-		   $flg |= 0x01 unless ($useraccs=~/,fail-open-vrfy,/); # always reset
+		   $flg |= 0x80 if ($useraccs=~/,skip-load-dead,/);
+		   $flg |= 0x40 if ($useraccs=~/,skip-open-dead,/);
+		   $flg |= 0x20 if ($useraccs=~/,skip-load-expy,/);
+		   $flg |= 0x10 if ($useraccs=~/,skip-open-expy,/);
+		   $flg |= 0x08 if ($useraccs=~/,skip-load-empt,/); # always reset
+		   $flg |= 0x04 if ($useraccs=~/,skip-open-empt,/);
+		   $flg |= 0x02 if ($useraccs=~/,skip-load-vrfy,/);
+		   $flg |= 0x01 if ($useraccs=~/,skip-open-vrfy,/); # always reset
 		my $tim = time();
-		   $tim = $tim + 60*60*24*30 if ($useraccs=~/,30days,/);
-		   $tim = $tim + 60*60*24*90 if ($useraccs=~/,90days,/);
-		   $tim = $tim + 60*60*24*365 if ($useraccs=~/,1year,/);
+		   $tim = $tim + 60*60*24*15;
+		   $tim = $tim + 60*60*24*(30-15) if ($useraccs=~/,30days,/);
+		   $tim = $tim + 60*60*24*(90-15) if ($useraccs=~/,90days,/);
+		   $tim = $tim + 60*60*24*(365-15) if ($useraccs=~/,1year,/);
 		   $tim = 0xffffffff if ($useraccs=~/,nolimit,/);
 		my $dat = pack('CCnH*',$flg,0x00,$tim>>16).$key;
 		my $i_pad = pack('H*',("00" x 64)); substr($i_pad,0,length($key),$key);
