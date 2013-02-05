@@ -4,6 +4,7 @@ bld_cv_pkg_cmd_CHKCONFIG=${bld_cv_pkg_cmd_CHKCONFIG='zypper install aaa_base'}
 bld_cv_pkg_cmd_CONVERT=${bld_cv_pkg_cmd_CONVERT='zypper install ImageMagick'}
 bld_cv_pkg_cmd_CREATEREPO=${bld_cv_pkg_cmd_CREATEREPO='zypper install createrepo'}
 bld_cv_pkg_cmd_CREATE_PACKAGE_DESCR=${bld_cv_pkg_cmd_CREATE_PACKAGE_DESCR='zypper install inst-source-utils'}
+bld_cv_pkg_cmd_C_REHASH=${bld_cv_pkg_cmd_C_REHASH='zypper install openssl'}
 bld_cv_pkg_cmd_DEPMOD=${bld_cv_pkg_cmd_DEPMOD='zypper install module-init-tools'}
 bld_cv_pkg_cmd_DOXYGEN=${bld_cv_pkg_cmd_DOXYGEN='zypper install doxygen'}
 bld_cv_pkg_cmd_DVIPDF=${bld_cv_pkg_cmd_DVIPDF='zypper install ghostscript-library'}
@@ -64,6 +65,7 @@ bld_cv_pkg_name_CHKCONFIG=${bld_cv_pkg_name_CHKCONFIG=aaa_base}
 bld_cv_pkg_name_CONVERT=${bld_cv_pkg_name_CONVERT=ImageMagick}
 bld_cv_pkg_name_CREATEREPO=${bld_cv_pkg_name_CREATEREPO=createrepo}
 bld_cv_pkg_name_CREATE_PACKAGE_DESCR=${bld_cv_pkg_name_CREATE_PACKAGE_DESCR=inst-source-utils}
+bld_cv_pkg_name_C_REHASH=${bld_cv_pkg_name_C_REHASH=openssl}
 bld_cv_pkg_name_DEPMOD=${bld_cv_pkg_name_DEPMOD=module-init-tools}
 bld_cv_pkg_name_DOXYGEN=${bld_cv_pkg_name_DOXYGEN=doxygen}
 bld_cv_pkg_name_DVIPDF=${bld_cv_pkg_name_DVIPDF=ghostscript-library}
@@ -160,6 +162,7 @@ bld_cv_pkg_prog_CHKCONFIG=${bld_cv_pkg_prog_CHKCONFIG=chkconfig}
 bld_cv_pkg_prog_CONVERT=${bld_cv_pkg_prog_CONVERT=convert}
 bld_cv_pkg_prog_CREATEREPO=${bld_cv_pkg_prog_CREATEREPO=createrepo}
 bld_cv_pkg_prog_CREATE_PACKAGE_DESCR=${bld_cv_pkg_prog_CREATE_PACKAGE_DESCR=create_package_descr}
+bld_cv_pkg_prog_C_REHASH=${bld_cv_pkg_prog_C_REHASH=c_rehash}
 bld_cv_pkg_prog_DEPMOD=${bld_cv_pkg_prog_DEPMOD=depmod}
 bld_cv_pkg_prog_DOXYGEN=${bld_cv_pkg_prog_DOXYGEN=doxygen}
 bld_cv_pkg_prog_DVI2PS=${bld_cv_pkg_prog_DVI2PS=dvips}
@@ -213,6 +216,7 @@ bld_cv_pkg_ver_CHKCONFIG=${bld_cv_pkg_ver_CHKCONFIG=11}
 bld_cv_pkg_ver_CONVERT=${bld_cv_pkg_ver_CONVERT=6.4.3.6}
 bld_cv_pkg_ver_CREATEREPO=${bld_cv_pkg_ver_CREATEREPO=0.4.11}
 bld_cv_pkg_ver_CREATE_PACKAGE_DESCR=${bld_cv_pkg_ver_CREATE_PACKAGE_DESCR=2010.3.18}
+bld_cv_pkg_ver_C_REHASH=${bld_cv_pkg_ver_C_REHASH=0.9.8h}
 bld_cv_pkg_ver_DEPMOD=${bld_cv_pkg_ver_DEPMOD=3.11.1}
 bld_cv_pkg_ver_DOXYGEN=${bld_cv_pkg_ver_DOXYGEN=1.5.6}
 bld_cv_pkg_ver_DVIPDF=${bld_cv_pkg_ver_DVIPDF=8.62}
