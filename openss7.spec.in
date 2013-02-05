@@ -4242,11 +4242,11 @@ if [ $1 -eq 1 -o $1 -eq 2 ] ; then : # fresh install or upgrade
 %if %{FILES_libraries}
     if   [ -x "`which libtool 2>/dev/null`" ]; then
         v="`set -o | sed -n -e 's,xtrace[[:space:]]*on$,--verbose,p;s,xtrace[[:space:]]*off$,--quiet,p'`"
-	[ -d %{_libdir}    ] && { libtool --mode=finish $v %{_libdir}    || : }
-	[ -d %{_syslibdir} ] && { libtool --mode=finish $v %{_syslibdir} || : }
+	[ -d %{_libdir}    ] && { libtool --mode=finish $v %{_libdir}    || :; }
+	[ -d %{_syslibdir} ] && { libtool --mode=finish $v %{_syslibdir} || :; }
     elif [ -x "`which ldconfig 2>/dev/null`" ]; then
-	[ -d %{_libdir}    ] && { ldconfig -n %{_libdir}    || : }
-	[ -d %{_syslibdir} ] && { ldconfig -n %{_syslibdir} || : }
+	[ -d %{_libdir}    ] && { ldconfig -n %{_libdir}    || :; }
+	[ -d %{_syslibdir} ] && { ldconfig -n %{_syslibdir} || :; }
     fi
 %endif
 %if %{FILES_netconfig}
@@ -4453,11 +4453,11 @@ if [ $1 -eq 0 -o $1 -eq 1 ] ; then : # final removal or upgrade
 %if %{FILES_libraries}
     if   [ -x "`which libtool 2>/dev/null`" ]; then
         v="`set -o | sed -n -e 's,xtrace[[:space:]]*on$,--verbose,p;s,xtrace[[:space:]]*off$,--quiet,p'`"
-	[ -d %{_libdir}    ] && { libtool --mode=finish $v %{_libdir}    || : }
-	[ -d %{_syslibdir} ] && { libtool --mode=finish $v %{_syslibdir} || : }
+	[ -d %{_libdir}    ] && { libtool --mode=finish $v %{_libdir}    || :; }
+	[ -d %{_syslibdir} ] && { libtool --mode=finish $v %{_syslibdir} || :; }
     elif [ -x "`which ldconfig 2>/dev/null`" ]; then
-	[ -d %{_libdir}    ] && { ldconfig -n %{_libdir}    || : }
-	[ -d %{_syslibdir} ] && { ldconfig -n %{_syslibdir} || : }
+	[ -d %{_libdir}    ] && { ldconfig -n %{_libdir}    || :; }
+	[ -d %{_syslibdir} ] && { ldconfig -n %{_syslibdir} || :; }
     fi
 %endif
 %if %{FILES_netconfig}
@@ -4774,11 +4774,11 @@ developed for %{title}.  Also included are 32-bit test utilities for the
 if [ $1 -eq 1 -o $1 -eq 2 ] ; then : # fresh install or upgrade
     if   [ -x "`which libtool 2>/dev/null`" ]; then
         v="`set -o | sed -n -e 's,xtrace[[:space:]]*on$,--verbose,p;s,xtrace[[:space:]]*off$,--quiet,p'`"
-	[ -d %{_lib32dir}    ] && { libtool --mode=finish $v %{_lib32dir}    || : }
-	[ -d %{_syslib32dir} ] && { libtool --mode=finish $v %{_syslib32dir} || : }
+	[ -d %{_lib32dir}    ] && { libtool --mode=finish $v %{_lib32dir}    || :; }
+	[ -d %{_syslib32dir} ] && { libtool --mode=finish $v %{_syslib32dir} || :; }
     elif [ -x "`which ldconfig 2>/dev/null`" ]; then
-	[ -d %{_lib32dir}    ] && { ldconfig -n %{_lib32dir}    || : }
-	[ -d %{_syslib32dir} ] && { ldconfig -n %{_syslib32dir} || : }
+	[ -d %{_lib32dir}    ] && { ldconfig -n %{_lib32dir}    || :; }
+	[ -d %{_syslib32dir} ] && { ldconfig -n %{_syslib32dir} || :; }
     fi
 fi
 %endif
@@ -4789,11 +4789,11 @@ fi
 if [ $1 -eq 0 -o $1 -eq 1 ] ; then : # final removal or upgrade
     if   [ -x "`which libtool 2>/dev/null`" ]; then
         v="`set -o | sed -n -e 's,xtrace[[:space:]]*on$,--verbose,p;s,xtrace[[:space:]]*off$,--quiet,p'`"
-	[ -d %{_lib32dir}    ] && { libtool --mode=finish $v %{_lib32dir}    || : }
-	[ -d %{_syslib32dir} ] && { libtool --mode=finish $v %{_syslib32dir} || : }
+	[ -d %{_lib32dir}    ] && { libtool --mode=finish $v %{_lib32dir}    || :; }
+	[ -d %{_syslib32dir} ] && { libtool --mode=finish $v %{_syslib32dir} || :; }
     elif [ -x "`which ldconfig 2>/dev/null`" ]; then
-	[ -d %{_lib32dir}    ] && { ldconfig -n %{_lib32dir}    || : }
-	[ -d %{_syslib32dir} ] && { ldconfig -n %{_syslib32dir} || : }
+	[ -d %{_lib32dir}    ] && { ldconfig -n %{_lib32dir}    || :; }
+	[ -d %{_syslib32dir} ] && { ldconfig -n %{_syslib32dir} || :; }
     fi
 fi
 %endif
@@ -6166,17 +6166,17 @@ if [ $1 -eq 1 ] ; then : # fresh install
 %if %{FILES_jnilibs}
     if   [ -x "`which libtool 2>/dev/null`" ]; then
         v="`set -o | sed -n -e 's,xtrace[[:space:]]*on$,--verbose,p;s,xtrace[[:space:]]*off$,--quiet,p'`"
-	[ -d %{_jnidir} ] && { libtool --mode=finish $v %{_jnidir} || : }
+	[ -d %{_jnidir} ] && { libtool --mode=finish $v %{_jnidir} || :; }
     elif [ -x "`which ldconfig 2>/dev/null`" ]; then
-	[ -d %{_jnidir} ] && { ldconfig %{_jnidir} || : }
+	[ -d %{_jnidir} ] && { ldconfig %{_jnidir} || :; }
     fi
 %endif
 %if %{FILES_gcjlibs}
     if   [ -x "`which libtool 2>/dev/null`" ]; then
         v="`set -o | sed -n -e 's,xtrace[[:space:]]*on$,--verbose,p;s,xtrace[[:space:]]*off$,--quiet,p'`"
-	[ -d %{_pkggcjdir} ] && { libtool --mode=finish $v %{_pkggcjdir} || : }
+	[ -d %{_pkggcjdir} ] && { libtool --mode=finish $v %{_pkggcjdir} || :; }
     elif [ -x "`which ldconfig 2>/dev/null`" ]; then
-	[ -d %{_pkggcjdir} ] && { ldconfig %{_pkggcjdir} || : }
+	[ -d %{_pkggcjdir} ] && { ldconfig %{_pkggcjdir} || :; }
     fi
 %endif
 %if %{FILES_gcjmaps}
@@ -6211,17 +6211,17 @@ if [ $1 -eq 0 -o $1 -eq 1 ] ; then : # final removal or upgrade
 %if %{FILES_jnilibs}
     if   [ -x "`which libtool 2>/dev/null`" ]; then
         v="`set -o | sed -n -e 's,xtrace[[:space:]]*on$,--verbose,p;s,xtrace[[:space:]]*off$,--quiet,p'`"
-	[ -d %{_jnidir} ] && { libtool --mode=finish $v %{_jnidir} || : }
+	[ -d %{_jnidir} ] && { libtool --mode=finish $v %{_jnidir} || :; }
     elif [ -x "`which ldconfig 2>/dev/null`" ]; then
-	[ -d %{_jnidir} ] && { ldconfig -n %{_jnidir} || : }
+	[ -d %{_jnidir} ] && { ldconfig -n %{_jnidir} || :; }
     fi
 %endif
 %if %{FILES_gcjlibs}
     if   [ -x "`which libtool 2>/dev/null`" ]; then
         v="`set -o | sed -n -e 's,xtrace[[:space:]]*on$,--verbose,p;s,xtrace[[:space:]]*off$,--quiet,p'`"
-	[ -d %{_pkggcjdir} ] && { libtool --mode=finish $v %{_pkggcjdir} || : }
+	[ -d %{_pkggcjdir} ] && { libtool --mode=finish $v %{_pkggcjdir} || :; }
     elif [ -x "`which ldconfig 2>/dev/null`" ]; then
-	[ -d %{_pkggcjdir} ] && { ldconfig -n %{_pkggcjdir} || : }
+	[ -d %{_pkggcjdir} ] && { ldconfig -n %{_pkggcjdir} || :; }
     fi
 %endif
 %if %{FILES_gcjmaps}
