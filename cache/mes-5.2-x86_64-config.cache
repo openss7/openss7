@@ -4,6 +4,7 @@ bld_cv_pkg_cmd_CHKCONFIG=${bld_cv_pkg_cmd_CHKCONFIG='urpmi chkconfig'}
 bld_cv_pkg_cmd_CONFIG_2_6_33_7_DESKTOP_2MNB=${bld_cv_pkg_cmd_CONFIG_2_6_33_7_DESKTOP_2MNB='urpmi kernel-2.6.33-desktop-2.6.33.7-2mnb'}
 bld_cv_pkg_cmd_CONVERT=${bld_cv_pkg_cmd_CONVERT='urpmi imagemagick'}
 bld_cv_pkg_cmd_COUNTPKGLIST=${bld_cv_pkg_cmd_COUNTPKGLIST='urpmi apt'}
+bld_cv_pkg_cmd_C_REHASH=${bld_cv_pkg_cmd_C_REHASH='urpmi openssl'}
 bld_cv_pkg_cmd_DEPMOD=${bld_cv_pkg_cmd_DEPMOD='urpmi module-init-tools'}
 bld_cv_pkg_cmd_DOXYGEN=${bld_cv_pkg_cmd_DOXYGEN='urpmi doxygen'}
 bld_cv_pkg_cmd_DVI2PS=${bld_cv_pkg_cmd_DVI2PS='urpmi tetex-dvips'}
@@ -72,6 +73,7 @@ bld_cv_pkg_name_CHKCONFIG=${bld_cv_pkg_name_CHKCONFIG=chkconfig}
 bld_cv_pkg_name_CONFIG_2_6_33_7_DESKTOP_2MNB=${bld_cv_pkg_name_CONFIG_2_6_33_7_DESKTOP_2MNB=kernel-2.6.33-desktop-2.6.33.7-2mnb}
 bld_cv_pkg_name_CONVERT=${bld_cv_pkg_name_CONVERT=imagemagick}
 bld_cv_pkg_name_COUNTPKGLIST=${bld_cv_pkg_name_COUNTPKGLIST=apt}
+bld_cv_pkg_name_C_REHASH=${bld_cv_pkg_name_C_REHASH=openssl}
 bld_cv_pkg_name_DEPMOD=${bld_cv_pkg_name_DEPMOD=module-init-tools}
 bld_cv_pkg_name_DOXYGEN=${bld_cv_pkg_name_DOXYGEN=doxygen}
 bld_cv_pkg_name_DVI2PS=${bld_cv_pkg_name_DVI2PS=tetex-dvips}
@@ -173,6 +175,7 @@ bld_cv_pkg_prog_BZIP2_CMD=${bld_cv_pkg_prog_BZIP2_CMD=bzip2}
 bld_cv_pkg_prog_CHKCONFIG=${bld_cv_pkg_prog_CHKCONFIG=chkconfig}
 bld_cv_pkg_prog_CONVERT=${bld_cv_pkg_prog_CONVERT=convert}
 bld_cv_pkg_prog_COUNTPKGLIST=${bld_cv_pkg_prog_COUNTPKGLIST=countpkglist}
+bld_cv_pkg_prog_C_REHASH=${bld_cv_pkg_prog_C_REHASH=c_rehash}
 bld_cv_pkg_prog_DEPMOD=${bld_cv_pkg_prog_DEPMOD=depmod}
 bld_cv_pkg_prog_DOXYGEN=${bld_cv_pkg_prog_DOXYGEN=doxygen}
 bld_cv_pkg_prog_DVI2PS=${bld_cv_pkg_prog_DVI2PS=dvips}
@@ -230,6 +233,7 @@ bld_cv_pkg_ver_CHKCONFIG=${bld_cv_pkg_ver_CHKCONFIG=1.3.37}
 bld_cv_pkg_ver_CONFIG_2_6_33_7_DESKTOP_2MNB=${bld_cv_pkg_ver_CONFIG_2_6_33_7_DESKTOP_2MNB=1}
 bld_cv_pkg_ver_CONVERT=${bld_cv_pkg_ver_CONVERT=6.4.2.10}
 bld_cv_pkg_ver_COUNTPKGLIST=${bld_cv_pkg_ver_COUNTPKGLIST=0.5.15lorg3.2}
+bld_cv_pkg_ver_C_REHASH=${bld_cv_pkg_ver_C_REHASH=0.9.8h}
 bld_cv_pkg_ver_DEPMOD=${bld_cv_pkg_ver_DEPMOD=3.5}
 bld_cv_pkg_ver_DOXYGEN=${bld_cv_pkg_ver_DOXYGEN=1.5.9}
 bld_cv_pkg_ver_DVI2PS=${bld_cv_pkg_ver_DVI2PS=3.0}
