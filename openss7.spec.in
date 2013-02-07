@@ -3030,8 +3030,8 @@ if [ $1 -eq 1 -o $1 -eq 2 ] ; then : # first install or upgrade
     d=%{_sslcertdir}; n=OPENSS7-CA-CERT.pem
     o=; f=$d/$n; [ -d $d ] || mkdir -p -- $d
     if wget --no-check-certificate -O $f %{_reposerv}://${REPOBASE:-%{_repobase}}/cacert.pem 2>/dev/null; then
-        [ ! -e "$d/ca-bundle.crt"       ] || openssl x509 -in $f -text >>$d/ca-bundle.crt || :
-        [ ! -e "$d/ca-bundle.trust.crt" ] || openssl x509 -in $f -text -trustout -addtrust codeSigning -addtrust serverAuth >>$d/ca-bundle.trust.crt || :
+        b="$d/ca-bundle.crt"       [ ! -e "$b" ] || { openssl x509 -in $f -text | comm -13 $b - >$d/toadd && cat $d/toadd >>$b; rm -f -- $d/toadd; }
+        b="$d/ca-bundle.trust.crt" [ ! -e "$b" ] || { openssl x509 -in $f -text -trustout -addtrust codeSigning -addtrust serverAuth | comm -13 $b - >$d/toadd && cat $d/toadd >>$b; rm -f -- $d/toadd; }
         if [ -x "`which c_rehash 2>/dev/null`" ]; then c_rehash &>/dev/null || :; else rm -f -- $f; fi
     fi
     d=%{_localstatedir}/lib/%{name}; n=credentials
