@@ -368,19 +368,20 @@
 		    $r->log_reason("id mismatch: '$id' ne '$hostmach'", $r->uri.'?'.scalar($r->args));
 		    $m->abort(403);
 		}
-	    }
-	    else {
 		unless ($hostmach) {
 		    $r->log_reason("old host '$hostname' must reregister", $r->uri.'?'.scalar($r->args));
 		    $m->abort(403);
 		}
+	    }
+	    else {
 		$un = $hostname;
 		$pw = $hostpass;
 		$hn = undef;
 		$ip = undef;
 		$id = $hostmach;
 	    }
-	} else {
+	}
+	else {
 	    unless ($hn) {
 		$r->log_reason("hn argument required", $r->uri.'?'.scalar($r->args));
 		$m->abort(403);
