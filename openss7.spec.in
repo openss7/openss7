@@ -3074,8 +3074,8 @@ if [ $1 -eq 1 -o $1 -eq 2 ] ; then : # first install or upgrade
             else
                 echo "$m" >/dev/tty
                 while true; do
-                    d="$u"
-                    read -e  -p "Username ($u): " u </dev/tty >/dev/tty || { echo '' >/dev/tty; exit 1; }; u=${u:-$d}
+                    ud="$u"
+                    read -e  -p "Username ($u): " u </dev/tty >/dev/tty || { echo '' >/dev/tty; exit 1; }; u=${u:-$ud}
                     [ "$u" != anonymous ] || break
                     read -es -p "Password ($u): " p </dev/tty >/dev/tty || { echo '' >/dev/tty; continue; }
                     echo '' >/dev/tty
