@@ -2946,9 +2946,7 @@ function dodepmod(kversion,
     doit(command)
 }
 function initstart(	n,scripts,i,script,command) {
-    if (system_command("test -r /proc/1/comm -a `cat /proc/1/comm` = 'systemd'") == 0) {
-	if (!("unitfiles" in values))
-	    return
+    if ("unitfiles" in values) {
 	n = split(values["unitfiles"],scripts,/,/)
 	if (n == 0)
 	    return
@@ -2960,9 +2958,8 @@ function initstart(	n,scripts,i,script,command) {
 		doit(command)
 	    }
 	}
-    } else {
-	if (!("initscripts" in values))
-	    return
+    } else
+    if ("initscripts" in values) {
 	n = split(values["initscripts"],scripts,/,/)
 	if ( n == 0 )
 	    return
@@ -2988,9 +2985,7 @@ function initstart(	n,scripts,i,script,command) {
     }
 }
 function initstop(	n,scripts,i,script,command) {
-    if (system_command("test -r /proc/1/comm -a `cat /proc/1/comm` = 'systemd'") == 0) {
-	if (!("unitfiles" in values))
-	    return
+    if ("unitfiles" in values) {
 	n = split(values["unitfiles"],scripts,/,/)
 	if (n == 0)
 	    return
@@ -3002,9 +2997,8 @@ function initstop(	n,scripts,i,script,command) {
 		doit(command)
 	    }
 	}
-    } else {
-	if (!("initscripts" in values))
-	    return
+    } else
+    if ("initscripts" in values) {
 	n = split(values["initscripts"],scripts,/,/)
 	if (n == 0)
 	    return
