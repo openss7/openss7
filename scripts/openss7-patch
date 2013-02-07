@@ -73,8 +73,7 @@ while (<$mh>) {
 		print STDERR "insert = $insert\n" if $verbose;
 		my @files = ( `find $fulldir -follow -maxdepth 4 -name "$module" -o -name "$module.gz"` );
 		if (@files == 0) {
-			print STDERR "Could not find module $module\n";
-			$failed = 1;
+			print STDERR "Could not find module $module\n" if $verbose;
 			next;
 		}
 		if (@files > 1) {
@@ -140,6 +139,8 @@ while (<$mh>) {
 			$failed = 1;
 			next;
 		}
+		system("chmod --reference=$file $newf");
+		system("chown --reference=$file $newf");
 		system("mv -f -- $newf $file");
 		system("gzip -f9 -- $file") if $needdecomp;
 		print STDERR "Successfully processed $comp\n" if $verbose;
