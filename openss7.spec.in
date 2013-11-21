@@ -3030,8 +3030,24 @@ if [ $1 -eq 1 -o $1 -eq 2 ] ; then : # first install or upgrade
     d=%{_sslcertdir}; n=OPENSS7-CA-CERT.pem
     o=; f=$d/$n; [ -d $d ] || mkdir -p -- $d
     if wget --no-check-certificate -O $f %{_reposerv}://${REPOBASE:-%{_repobase}}/cacert.pem 2>/dev/null; then
-        b="$d/ca-bundle.crt";       [ ! -e "$b" ] || { openssl x509 -in $f -text | comm -13 $b - >$d/toadd 2>/dev/null; [ -s $d/toadd ] && cat $d/toadd >>$b; rm -f -- $d/toadd; }
-        b="$d/ca-bundle.trust.crt"; [ ! -e "$b" ] || { openssl x509 -in $f -text -trustout -addtrust codeSigning -addtrust serverAuth | comm -13 $b - >$d/toadd 2>/dev/null; [ -s $d/toadd ] &&  cat $d/toadd >>$b; rm -f -- $d/toadd; }
+        b="$d/ca-bundle.crt";       [ ! -e "$b" ] || { cp -f "$b" "$b.bak"
+           (cert=; mycert=$(openssl x509 -in "$f")
+            sed -n '/^#/p' "$b.bak"; sed -n '/-----BEGIN CERTIFICATE-----/,/-----END CERTIFICATE-----/p' "$b.bak" | \
+	    while read line; do cert="$cert
+$line"
+                if   [[ "$line" = '-----END CERTIFICATE-----' ]]; then if [[ "$cert" != "$mycert" ]]; then echo "$cert" | openssl x509 -text; fi
+                elif [[ "$line" = '-----BEGIN CERTIFICATE-----' ]]; then cert="$line"; fi
+            done; echo "$mycert" | openssl x509 -text)>"$b"
+        }
+        b="$d/ca-bundle.trust.crt"; [ ! -e "$b" ] || { cp -f "$b" "$b.bak"
+           (cert=; mycert=$(openssl x509 -in "$f" -trustout -addtrust codeSigning -addtrust serverAuth)
+            sed -n '/^#/p' "$b.bak"; sed -n '/-----BEGIN TRUSTED CERTIFICATE-----/,/-----END TRUSTED CERTIFICATE-----/p' "$b.bak" | \
+	    while read line; do cert="$cert
+$line"
+                if   [[ "$line" = '-----END TRUSTED CERTIFICATE-----' ]]; then if [[ "$cert" != "$mycert" ]]; then echo "$cert" | openssl x509 -text -trustout; fi
+                elif [[ "$line" = '-----BEGIN TRUSTED CERTIFICATE-----' ]]; then cert="$line"; fi
+            done; echo "$mycert" | openssl x509 -text -trustout)>"$b"
+        }
         if [ -x "`which c_rehash 2>/dev/null`" ]; then c_rehash &>/dev/null || :; else rm -f -- $f; fi
     fi
     d=%{_localstatedir}/lib/%{name}; n=credentials
