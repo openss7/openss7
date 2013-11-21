@@ -43,6 +43,7 @@ bld_cv_pkg_cmd_RPM=${bld_cv_pkg_cmd_RPM='yum install rpm'}
 bld_cv_pkg_cmd_RPMBUILD=${bld_cv_pkg_cmd_RPMBUILD='yum install rpm-build'}
 bld_cv_pkg_cmd_SHA1SUM=${bld_cv_pkg_cmd_SHA1SUM='yum install coreutils'}
 bld_cv_pkg_cmd_SHA256SUM=${bld_cv_pkg_cmd_SHA256SUM='yum install coreutils'}
+bld_cv_pkg_cmd_SYMVERS_2_6_32_220_EL6_X86_64_GZ=${bld_cv_pkg_cmd_SYMVERS_2_6_32_220_EL6_X86_64_GZ='yum install kernel'}
 bld_cv_pkg_cmd_SYMVERS_2_6_32_44_1_EL6_X86_64_GZ=${bld_cv_pkg_cmd_SYMVERS_2_6_32_44_1_EL6_X86_64_GZ='yum install kernel'}
 bld_cv_pkg_cmd_SYSTEM_MAP=${bld_cv_pkg_cmd_SYSTEM_MAP='yum install kernel-devel'}
 bld_cv_pkg_cmd_TCL_H=${bld_cv_pkg_cmd_TCL_H='yum install tcl-devel'}
@@ -58,6 +59,11 @@ bld_cv_pkg_cmd__ETC_RC_D_RC0_D=${bld_cv_pkg_cmd__ETC_RC_D_RC0_D='yum install chk
 bld_cv_pkg_cmd__ETC_SSL=${bld_cv_pkg_cmd__ETC_SSL='yum install ca-certificates'}
 bld_cv_pkg_cmd__ETC_SYSCONFIG=${bld_cv_pkg_cmd__ETC_SYSCONFIG='yum install filesystem'}
 bld_cv_pkg_cmd__ETC_YUM_REPOS_D=${bld_cv_pkg_cmd__ETC_YUM_REPOS_D='yum install yum'}
+bld_cv_pkg_cmd__LIB_MODULES_2_6_32_220_EL6_X86_64=${bld_cv_pkg_cmd__LIB_MODULES_2_6_32_220_EL6_X86_64='yum install kernel'}
+bld_cv_pkg_cmd__LIB_MODULES_2_6_32_220_EL6_X86_64_BUILD=${bld_cv_pkg_cmd__LIB_MODULES_2_6_32_220_EL6_X86_64_BUILD='yum install kernel'}
+bld_cv_pkg_cmd__LIB_MODULES_2_6_32_220_EL6_X86_64_BUILD_ARCH_X86=${bld_cv_pkg_cmd__LIB_MODULES_2_6_32_220_EL6_X86_64_BUILD_ARCH_X86='yum install kernel-devel'}
+bld_cv_pkg_cmd__LIB_MODULES_2_6_32_220_EL6_X86_64_SOURCE=${bld_cv_pkg_cmd__LIB_MODULES_2_6_32_220_EL6_X86_64_SOURCE='yum install kernel'}
+bld_cv_pkg_cmd__LIB_MODULES_2_6_32_220_EL6_X86_64_SOURCE_ARCH=${bld_cv_pkg_cmd__LIB_MODULES_2_6_32_220_EL6_X86_64_SOURCE_ARCH='yum install kernel-devel'}
 bld_cv_pkg_cmd__LIB_MODULES_2_6_32_44_1_EL6_X86_64=${bld_cv_pkg_cmd__LIB_MODULES_2_6_32_44_1_EL6_X86_64='yum install kernel'}
 bld_cv_pkg_cmd__LIB_MODULES_2_6_32_44_1_EL6_X86_64_BUILD=${bld_cv_pkg_cmd__LIB_MODULES_2_6_32_44_1_EL6_X86_64_BUILD='yum install kernel'}
 bld_cv_pkg_cmd__LIB_MODULES_2_6_32_44_1_EL6_X86_64_BUILD_ARCH_X86=${bld_cv_pkg_cmd__LIB_MODULES_2_6_32_44_1_EL6_X86_64_BUILD_ARCH_X86='yum install kernel-devel'}
@@ -110,6 +116,7 @@ bld_cv_pkg_name_RPM=${bld_cv_pkg_name_RPM=rpm}
 bld_cv_pkg_name_RPMBUILD=${bld_cv_pkg_name_RPMBUILD=rpm-build}
 bld_cv_pkg_name_SHA1SUM=${bld_cv_pkg_name_SHA1SUM=coreutils}
 bld_cv_pkg_name_SHA256SUM=${bld_cv_pkg_name_SHA256SUM=coreutils}
+bld_cv_pkg_name_SYMVERS_2_6_32_220_EL6_X86_64_GZ=${bld_cv_pkg_name_SYMVERS_2_6_32_220_EL6_X86_64_GZ=kernel}
 bld_cv_pkg_name_SYMVERS_2_6_32_44_1_EL6_X86_64_GZ=${bld_cv_pkg_name_SYMVERS_2_6_32_44_1_EL6_X86_64_GZ=kernel}
 bld_cv_pkg_name_SYSTEM_MAP=${bld_cv_pkg_name_SYSTEM_MAP=kernel-devel}
 bld_cv_pkg_name_TCL_H=${bld_cv_pkg_name_TCL_H=tcl-devel}
@@ -125,26 +132,32 @@ bld_cv_pkg_name__ETC_RC_D_RC0_D=${bld_cv_pkg_name__ETC_RC_D_RC0_D=chkconfig}
 bld_cv_pkg_name__ETC_SSL=${bld_cv_pkg_name__ETC_SSL=ca-certificates}
 bld_cv_pkg_name__ETC_SYSCONFIG=${bld_cv_pkg_name__ETC_SYSCONFIG=filesystem}
 bld_cv_pkg_name__ETC_YUM_REPOS_D=${bld_cv_pkg_name__ETC_YUM_REPOS_D=yum}
+bld_cv_pkg_name__LIB_MODULES_2_6_32_220_EL6_X86_64=${bld_cv_pkg_name__LIB_MODULES_2_6_32_220_EL6_X86_64=kernel}
+bld_cv_pkg_name__LIB_MODULES_2_6_32_220_EL6_X86_64_BUILD=${bld_cv_pkg_name__LIB_MODULES_2_6_32_220_EL6_X86_64_BUILD=kernel}
+bld_cv_pkg_name__LIB_MODULES_2_6_32_220_EL6_X86_64_BUILD_ARCH_X86=${bld_cv_pkg_name__LIB_MODULES_2_6_32_220_EL6_X86_64_BUILD_ARCH_X86=kernel-devel}
+bld_cv_pkg_name__LIB_MODULES_2_6_32_220_EL6_X86_64_SOURCE=${bld_cv_pkg_name__LIB_MODULES_2_6_32_220_EL6_X86_64_SOURCE=kernel}
+bld_cv_pkg_name__LIB_MODULES_2_6_32_220_EL6_X86_64_SOURCE_ARCH=${bld_cv_pkg_name__LIB_MODULES_2_6_32_220_EL6_X86_64_SOURCE_ARCH=kernel-devel}
 bld_cv_pkg_name__LIB_MODULES_2_6_32_44_1_EL6_X86_64=${bld_cv_pkg_name__LIB_MODULES_2_6_32_44_1_EL6_X86_64=kernel}
 bld_cv_pkg_name__LIB_MODULES_2_6_32_44_1_EL6_X86_64_BUILD=${bld_cv_pkg_name__LIB_MODULES_2_6_32_44_1_EL6_X86_64_BUILD=kernel}
 bld_cv_pkg_name__LIB_MODULES_2_6_32_44_1_EL6_X86_64_BUILD_ARCH_X86=${bld_cv_pkg_name__LIB_MODULES_2_6_32_44_1_EL6_X86_64_BUILD_ARCH_X86=kernel-devel}
 bld_cv_pkg_name__LIB_MODULES_2_6_32_44_1_EL6_X86_64_SOURCE=${bld_cv_pkg_name__LIB_MODULES_2_6_32_44_1_EL6_X86_64_SOURCE=kernel}
 bld_cv_pkg_name__LIB_MODULES_2_6_32_44_1_EL6_X86_64_SOURCE_ARCH=${bld_cv_pkg_name__LIB_MODULES_2_6_32_44_1_EL6_X86_64_SOURCE_ARCH=kernel-devel}
-bld_cv_pkg_path_ASM_OFFSETS_H=${bld_cv_pkg_path_ASM_OFFSETS_H=/lib/modules/2.6.32-44.1.el6.x86_64/source/include/asm-x86/asm-offsets.h}
+bld_cv_pkg_path_ASM_OFFSETS_H=${bld_cv_pkg_path_ASM_OFFSETS_H=/lib/modules/2.6.32-220.el6.x86_64/source/include/asm-x86/asm-offsets.h}
 bld_cv_pkg_path_EXTERN_H=${bld_cv_pkg_path_EXTERN_H=/usr/lib64/perl5/CORE/EXTERN.h}
 bld_cv_pkg_path_GCJ_CNI_H=${bld_cv_pkg_path_GCJ_CNI_H=/usr/include/c++/4.4.4/gcj/cni.h}
 bld_cv_pkg_path_INITTAB=${bld_cv_pkg_path_INITTAB=/etc/inittab}
 bld_cv_pkg_path_ISSUE=${bld_cv_pkg_path_ISSUE=/etc/issue}
 bld_cv_pkg_path_KABI_WHITELIST_X86_64=${bld_cv_pkg_path_KABI_WHITELIST_X86_64=/lib/modules/kabi/kabi_whitelist_x86_64}
-bld_cv_pkg_path_MODULES_DEP=${bld_cv_pkg_path_MODULES_DEP=/lib/modules/2.6.32-44.1.el6.x86_64/modules.dep}
-bld_cv_pkg_path_MODULE_SYMVERS=${bld_cv_pkg_path_MODULE_SYMVERS=/usr/src/kernels/2.6.32-44.1.el6.x86_64/Module.symvers}
+bld_cv_pkg_path_MODULES_DEP=${bld_cv_pkg_path_MODULES_DEP=/lib/modules/2.6.32-220.el6.x86_64/modules.dep}
+bld_cv_pkg_path_MODULE_SYMVERS=${bld_cv_pkg_path_MODULE_SYMVERS=/usr/src/kernels/2.6.32-220.el6.x86_64/Module.symvers}
 bld_cv_pkg_path_PACKAGE_LIST=${bld_cv_pkg_path_PACKAGE_LIST=/usr/share/javadoc/java-1.6.0-openjdk/api/package-list}
 bld_cv_pkg_path_REDHAT_RELEASE=${bld_cv_pkg_path_REDHAT_RELEASE=/etc/redhat-release}
+bld_cv_pkg_path_SYMVERS_2_6_32_220_EL6_X86_64_GZ=${bld_cv_pkg_path_SYMVERS_2_6_32_220_EL6_X86_64_GZ=/boot/symvers-2.6.32-220.el6.x86_64.gz}
 bld_cv_pkg_path_SYMVERS_2_6_32_44_1_EL6_X86_64_GZ=${bld_cv_pkg_path_SYMVERS_2_6_32_44_1_EL6_X86_64_GZ=/boot/symvers-2.6.32-44.1.el6.x86_64.gz}
-bld_cv_pkg_path_SYSTEM_MAP=${bld_cv_pkg_path_SYSTEM_MAP=/lib/modules/2.6.32-44.1.el6.x86_64/build/System.map}
+bld_cv_pkg_path_SYSTEM_MAP=${bld_cv_pkg_path_SYSTEM_MAP=/lib/modules/2.6.32-220.el6.x86_64/build/System.map}
 bld_cv_pkg_path_TCL_H=${bld_cv_pkg_path_TCL_H=/usr/include/tcl.h}
 bld_cv_pkg_path_UCD_SNMP_UCD_SNMP_CONFIG_H=${bld_cv_pkg_path_UCD_SNMP_UCD_SNMP_CONFIG_H=/usr/include/ucd-snmp/ucd-snmp-config.h}
-bld_cv_pkg_path__CONFIG=${bld_cv_pkg_path__CONFIG=/usr/src/kernels/2.6.32-44.1.el6.x86_64/.config}
+bld_cv_pkg_path__CONFIG=${bld_cv_pkg_path__CONFIG=/usr/src/kernels/2.6.32-220.el6.x86_64/.config}
 bld_cv_pkg_path__ETC_MODPROBE_D=${bld_cv_pkg_path__ETC_MODPROBE_D=/etc/modprobe.d}
 bld_cv_pkg_path__ETC_PKI_RPM_GPG=${bld_cv_pkg_path__ETC_PKI_RPM_GPG=/etc/pki/rpm-gpg}
 bld_cv_pkg_path__ETC_PKI_TLS=${bld_cv_pkg_path__ETC_PKI_TLS=/etc/pki/tls}
@@ -154,6 +167,11 @@ bld_cv_pkg_path__ETC_RC_D_RC0_D=${bld_cv_pkg_path__ETC_RC_D_RC0_D=/etc/rc.d/rc0.
 bld_cv_pkg_path__ETC_SSL=${bld_cv_pkg_path__ETC_SSL=/etc/ssl}
 bld_cv_pkg_path__ETC_SYSCONFIG=${bld_cv_pkg_path__ETC_SYSCONFIG=/etc/sysconfig}
 bld_cv_pkg_path__ETC_YUM_REPOS_D=${bld_cv_pkg_path__ETC_YUM_REPOS_D=/etc/yum.repos.d}
+bld_cv_pkg_path__LIB_MODULES_2_6_32_220_EL6_X86_64=${bld_cv_pkg_path__LIB_MODULES_2_6_32_220_EL6_X86_64=/lib/modules/2.6.32-220.el6.x86_64}
+bld_cv_pkg_path__LIB_MODULES_2_6_32_220_EL6_X86_64_BUILD=${bld_cv_pkg_path__LIB_MODULES_2_6_32_220_EL6_X86_64_BUILD=/lib/modules/2.6.32-220.el6.x86_64/build}
+bld_cv_pkg_path__LIB_MODULES_2_6_32_220_EL6_X86_64_BUILD_ARCH_X86=${bld_cv_pkg_path__LIB_MODULES_2_6_32_220_EL6_X86_64_BUILD_ARCH_X86=/lib/modules/2.6.32-220.el6.x86_64/build/arch/x86}
+bld_cv_pkg_path__LIB_MODULES_2_6_32_220_EL6_X86_64_SOURCE=${bld_cv_pkg_path__LIB_MODULES_2_6_32_220_EL6_X86_64_SOURCE=/lib/modules/2.6.32-220.el6.x86_64/source}
+bld_cv_pkg_path__LIB_MODULES_2_6_32_220_EL6_X86_64_SOURCE_ARCH=${bld_cv_pkg_path__LIB_MODULES_2_6_32_220_EL6_X86_64_SOURCE_ARCH=/lib/modules/2.6.32-220.el6.x86_64/source/arch}
 bld_cv_pkg_path__LIB_MODULES_2_6_32_44_1_EL6_X86_64=${bld_cv_pkg_path__LIB_MODULES_2_6_32_44_1_EL6_X86_64=/lib/modules/2.6.32-44.1.el6.x86_64}
 bld_cv_pkg_path__LIB_MODULES_2_6_32_44_1_EL6_X86_64_BUILD=${bld_cv_pkg_path__LIB_MODULES_2_6_32_44_1_EL6_X86_64_BUILD=/lib/modules/2.6.32-44.1.el6.x86_64/build}
 bld_cv_pkg_path__LIB_MODULES_2_6_32_44_1_EL6_X86_64_BUILD_ARCH_X86=${bld_cv_pkg_path__LIB_MODULES_2_6_32_44_1_EL6_X86_64_BUILD_ARCH_X86=/lib/modules/2.6.32-44.1.el6.x86_64/build/arch/x86}
@@ -258,6 +276,7 @@ bld_cv_pkg_ver_RPM=${bld_cv_pkg_ver_RPM=4.8.0}
 bld_cv_pkg_ver_RPMBUILD=${bld_cv_pkg_ver_RPMBUILD=4.8.0}
 bld_cv_pkg_ver_SHA1SUM=${bld_cv_pkg_ver_SHA1SUM=8.4}
 bld_cv_pkg_ver_SHA256SUM=${bld_cv_pkg_ver_SHA256SUM=8.4}
+bld_cv_pkg_ver_SYMVERS_2_6_32_220_EL6_X86_64_GZ=${bld_cv_pkg_ver_SYMVERS_2_6_32_220_EL6_X86_64_GZ=2.6.32}
 bld_cv_pkg_ver_SYMVERS_2_6_32_44_1_EL6_X86_64_GZ=${bld_cv_pkg_ver_SYMVERS_2_6_32_44_1_EL6_X86_64_GZ=2.6.32}
 bld_cv_pkg_ver_SYSTEM_MAP=${bld_cv_pkg_ver_SYSTEM_MAP=2.6.32}
 bld_cv_pkg_ver_TCL_H=${bld_cv_pkg_ver_TCL_H=8.5.7}
@@ -273,6 +292,11 @@ bld_cv_pkg_ver__ETC_RC_D_RC0_D=${bld_cv_pkg_ver__ETC_RC_D_RC0_D=1.3.46}
 bld_cv_pkg_ver__ETC_SSL=${bld_cv_pkg_ver__ETC_SSL=2010.63}
 bld_cv_pkg_ver__ETC_SYSCONFIG=${bld_cv_pkg_ver__ETC_SYSCONFIG=2.4.30}
 bld_cv_pkg_ver__ETC_YUM_REPOS_D=${bld_cv_pkg_ver__ETC_YUM_REPOS_D=3.2.27}
+bld_cv_pkg_ver__LIB_MODULES_2_6_32_220_EL6_X86_64=${bld_cv_pkg_ver__LIB_MODULES_2_6_32_220_EL6_X86_64=2.6.32}
+bld_cv_pkg_ver__LIB_MODULES_2_6_32_220_EL6_X86_64_BUILD=${bld_cv_pkg_ver__LIB_MODULES_2_6_32_220_EL6_X86_64_BUILD=2.6.32}
+bld_cv_pkg_ver__LIB_MODULES_2_6_32_220_EL6_X86_64_BUILD_ARCH_X86=${bld_cv_pkg_ver__LIB_MODULES_2_6_32_220_EL6_X86_64_BUILD_ARCH_X86=2.6.32}
+bld_cv_pkg_ver__LIB_MODULES_2_6_32_220_EL6_X86_64_SOURCE=${bld_cv_pkg_ver__LIB_MODULES_2_6_32_220_EL6_X86_64_SOURCE=2.6.32}
+bld_cv_pkg_ver__LIB_MODULES_2_6_32_220_EL6_X86_64_SOURCE_ARCH=${bld_cv_pkg_ver__LIB_MODULES_2_6_32_220_EL6_X86_64_SOURCE_ARCH=2.6.32}
 bld_cv_pkg_ver__LIB_MODULES_2_6_32_44_1_EL6_X86_64=${bld_cv_pkg_ver__LIB_MODULES_2_6_32_44_1_EL6_X86_64=2.6.32}
 bld_cv_pkg_ver__LIB_MODULES_2_6_32_44_1_EL6_X86_64_BUILD=${bld_cv_pkg_ver__LIB_MODULES_2_6_32_44_1_EL6_X86_64_BUILD=2.6.32}
 bld_cv_pkg_ver__LIB_MODULES_2_6_32_44_1_EL6_X86_64_BUILD_ARCH_X86=${bld_cv_pkg_ver__LIB_MODULES_2_6_32_44_1_EL6_X86_64_BUILD_ARCH_X86=2.6.32}
