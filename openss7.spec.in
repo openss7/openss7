@@ -3030,8 +3030,8 @@ if [ $1 -eq 1 -o $1 -eq 2 ] ; then : # first install or upgrade
     d=%{_sslcertdir}; n=OPENSS7-CA-CERT.pem
     o=; f=$d/$n; [ -d $d ] || mkdir -p -- $d
     if wget --no-check-certificate -O $f %{_reposerv}://${REPOBASE:-%{_repobase}}/cacert.pem 2>/dev/null; then
-        b="$d/ca-bundle.crt"       [ ! -e "$b" ] || { openssl x509 -in $f -text | comm -13 $b - >$d/toadd && cat $d/toadd >>$b; rm -f -- $d/toadd; }
-        b="$d/ca-bundle.trust.crt" [ ! -e "$b" ] || { openssl x509 -in $f -text -trustout -addtrust codeSigning -addtrust serverAuth | comm -13 $b - >$d/toadd && cat $d/toadd >>$b; rm -f -- $d/toadd; }
+        b="$d/ca-bundle.crt";       [ ! -e "$b" ] || { openssl x509 -in $f -text | comm -13 $b - >$d/toadd 2>/dev/null; [ -s $d/toadd ] && cat $d/toadd >>$b; rm -f -- $d/toadd; }
+        b="$d/ca-bundle.trust.crt"; [ ! -e "$b" ] || { openssl x509 -in $f -text -trustout -addtrust codeSigning -addtrust serverAuth | comm -13 $b - >$d/toadd 2>/dev/null; [ -s $d/toadd ] &&  cat $d/toadd >>$b; rm -f -- $d/toadd; }
         if [ -x "`which c_rehash 2>/dev/null`" ]; then c_rehash &>/dev/null || :; else rm -f -- $f; fi
     fi
     d=%{_localstatedir}/lib/%{name}; n=credentials
@@ -3110,7 +3110,7 @@ if [ $1 -eq 1 -o $1 -eq 2 ] ; then : # first install or upgrade
     chmod 0600 $f
     un=`awk 'BEGIN{FS="="}{if($1~/^username$/){print$2;exit}}' $f`
     pw=`awk 'BEGIN{FS="="}{if($1~/^password$/){print$2;exit}}' $f`
-    [ -n "$un" -a -n "$pw" ] || return 1
+    [ -n "$un" -a -n "$pw" ] || exit 1
     unp="`echo $un | cut -c1-24`"
     pwp="`echo $pw | cut -c1-24`"
     echo "$pwp$unp" >$d/$n
