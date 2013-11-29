@@ -351,7 +351,7 @@ AC_DEFUN([_KSYMS_OUTPUT_UPDATES_CONFIG], [dnl
     AC_SUBST([UPDATES])dnl
     AC_CACHE_CHECK([for updates options], [ksyms_cv_updates_options], [dnl
 	case "$target_vendor" in
-	    (oracle|puias|centos|lineox|whitebox|scientific|redhat)
+	    (oracle|springdale|puias|centos|lineox|whitebox|scientific|redhat)
 		ksyms_cv_updates_options='--style=redhat' ;;
 	    (suse)
 		ksyms_cv_updates_options='--style=suse11' ;;
@@ -395,7 +395,7 @@ AC_DEFUN([_KSYMS_OUTPUT_UPDATES_CONFIG], [dnl
 			fi
 			ksyms_cv_updates_directory=/etc/kernel
 			;;
-		    (mes|fedora|redhat|oracle|puias|centos|scientific|lineox|whitebox)
+		    (mes|fedora|redhat|oracle|springdale|puias|centos|scientific|lineox|whitebox)
 			if test -z "${rootdir}" ; then
 			    AC_MSG_WARN([
 ***
@@ -446,7 +446,7 @@ AC_DEFUN([_KSYMS_OUTPUT_SYMSETS_CONFIG], [dnl
     AC_SUBST([SYMSETS])dnl
     AC_CACHE_CHECK([for symsets options], [ksyms_cv_symsets_options], [dnl
 	case "$target_vendor" in
-	    (oracle|puias|centos|lineox|whitebox|scientific|redhat)
+	    (oracle|springdale|puias|centos|lineox|whitebox|scientific|redhat)
 		ksyms_cv_symsets_options='--redhat' ;;
 	    (*) ksyms_cv_symsets_options='--suse'   ;;
 	esac])

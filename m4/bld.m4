@@ -230,7 +230,7 @@ dnl	    dlocate is much faster than dpkg and dpkg-query
     eval "_bld_tmp_result=\"\$bld_cv_pkg_name_${_bld_tmp_cn}\""
     if test -n "$_bld_tmp_result" ; then
 	case "$build_distro" in
-	    (oracle|puias|centos|lineox|whitebox|scientific|fedora|rhel)
+	    (oracle|springdale|puias|centos|lineox|whitebox|scientific|fedora|rhel)
 		eval "bld_cv_pkg_cmd_${_bld_tmp_cn}=\"yum install \$_bld_tmp_result\""
 		;;
 	    (suse|sle|openSUSE)
@@ -363,7 +363,7 @@ PATH - Optional subdirectory and filename within directory])], [dnl
     eval "_bld_tmp_result=\"\$bld_cv_pkg_name_${_bld_tmp_pn}\""
     if test -n "$_bld_tmp_result" ; then
 	case "$build_distro" in
-	    (oracle|puias|centos|lineox|whitebox|scientific|fedora|rhel)
+	    (oracle|springdale|puias|centos|lineox|whitebox|scientific|fedora|rhel)
 		eval "bld_cv_pkg_cmd_${_bld_tmp_pn}=\"yum install \$_bld_tmp_result\""
 		;;
 	    (suse|sle|openSUSE)
@@ -486,7 +486,7 @@ AC_DEFUN([_BLD_FILE_CHECK],
     eval "_bld_tmp_result=\"\$bld_cv_pkg_name_${_bld_tmp_fn}\""
     if test -n "$_bld_tmp_result" ; then
 	case "$build_distro" in
-	    (oracle|puias|centos|lineox|whitebox|scientific|fedora|rhel)
+	    (oracle|springdale|puias|centos|lineox|whitebox|scientific|fedora|rhel)
 		eval "bld_cv_pkg_cmd_${_bld_tmp_fn}=\"yum install \$_bld_tmp_result\""
 		;;
 	    (suse|sle|openSUSE)

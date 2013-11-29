@@ -681,7 +681,7 @@ AC_DEFUN([_LINUX_CHECK_KERNEL_BOOT], [dnl
 	linux_cv_k_boot=no
 	linux_cv_k_base="$kversion"
 	case "$target_vendor" in
-	    (oracle|puias|centos|whitebox|redhat|scientific)
+	    (oracle|springdale|puias|centos|whitebox|redhat|scientific)
 		case "${kversion}" in
 		    # redhat boot kernels
 		    (*BOOT)	    linux_cv_k_boot=BOOT	 ;;
@@ -1041,7 +1041,7 @@ AC_DEFUN([_LINUX_CHECK_KERNEL_MODVER], [dnl
 		    case "$target_vendor" in
 			(mandrake|mandriva|mageia)
 			    ;;
-			(redhat|oracle|puias|centos|whitebox|scientific|debian|ubuntu|suse|*)
+			(redhat|oracle|springdale|puias|centos|whitebox|scientific|debian|ubuntu|suse|*)
 			    AC_MSG_WARN([
 *** 
 *** Configuration information is being read from an unreliable source:
@@ -1229,7 +1229,7 @@ dnl				image name approach with the Redhat kernel version number in the
 dnl				kernel image name approach to yeild reliable system map files.
 dnl
 				;;
-			    (redhat|oracle|puias|centos|whitebox|scientific|debian|ubuntu|suse|*)
+			    (redhat|oracle|springdale|puias|centos|whitebox|scientific|debian|ubuntu|suse|*)
 dnl
 dnl				Unfortunately the redhat system map files are unreliable because the
 dnl				are not unique for each architecture.  The system map file has to be
@@ -1329,7 +1329,7 @@ AC_DEFUN([_LINUX_CHECK_KERNEL_SYMVERS], [dnl
 			# debian based systems do not have this file
 			(debian|ubuntu|mint|arch|slackware|salix)
 			    ;;
-			(oracle|puias|centos|lineox|whitebox|scientific|redhat|suse|*)
+			(oracle|springdale|puias|centos|lineox|whitebox|scientific|redhat|suse|*)
 			    tmp_fn="symvers-${kversion}.gz"
 			    tmp_fn=`echo "$tmp_fn" | sed -e 'y/abcdefghijklmnopqrstuvwxyz/ABCDEFGHIJKLMNOPQRSTUVWXYZ/'`
 			    tmp_fn=`echo "$tmp_fn" | sed -e 's,[[^A-Z0-9_]],_,g'`
@@ -1369,7 +1369,7 @@ AC_DEFUN([_LINUX_CHECK_KERNEL_SYMVERS], [dnl
 		    case "$target_vendor" in
 			(mandrake|mandriva|mageia)
 			    ;;
-			(redhat|oracle|puias|centos|whitebox|scientific|debian|ubuntu|suse|*)
+			(redhat|oracle|springdale|puias|centos|whitebox|scientific|debian|ubuntu|suse|*)
 			    AC_MSG_WARN([
 *** 
 *** Configuration information is being read from an unreliable source:
@@ -1451,7 +1451,7 @@ AC_DEFUN([_LINUX_CHECK_KERNEL_MODABI], [dnl
 		    case "$target_vendor" in
 			(mandrake|mandriva|mageia)
 			    ;;
-			(redhat|oracle|puias|centos|whitebox|scientific|debian|ubuntu|suse|*)
+			(redhat|oracle|springdale|puias|centos|whitebox|scientific|debian|ubuntu|suse|*)
 			    AC_MSG_WARN([
 *** 
 *** Configuration information is being read from an unreliable source:
@@ -1540,7 +1540,7 @@ AC_DEFUN([_LINUX_CHECK_KERNEL_SYMSETS], [dnl
 		    case "$target_vendor" in
 			(mandrake|mandriva|mageia)
 			    ;;
-			(redhat|oracle|puias|centos|whitebox|scientific|debian|ubuntu|suse|*)
+			(redhat|oracle|springdale|puias|centos|whitebox|scientific|debian|ubuntu|suse|*)
 			    AC_MSG_WARN([
 *** 
 *** Configuration information is being read from an unreliable source:
@@ -1584,7 +1584,7 @@ AC_DEFUN([_LINUX_CHECK_KERNEL_KABI], [dnl
 	    ${rootdir}/lib/modules/kabi/kabi_whitelist_${karch}], [], [dnl
 	if test ${with_kabi_whitelist:-search} != no ; then
 	    case "$target_vendor:$target_edition" in
-		(redhat:[[67]]*|oracle:[[67]]*|puias:[[67]]*|centos:[[67]]*|scientific:[[67]]*)
+		(redhat:[[67]]*|oracle:[[67]]*|springdale:[[67]]*|puias:[[67]]*|centos:[[67]]*|scientific:[[67]]*)
 		    tmp_fn="kabi_whitelist_${karch}"
 		    tmp_fn=`echo "$tmp_fn" | sed -e 'y/abcdefghijklmnopqrstuvwxyz/ABCDEFGHIJKLMNOPQRSTUVWXYZ/'`
 		    tmp_fn=`echo "$tmp_fn" | sed -e 's,[[^A-Z0-9_]],_,g'`
@@ -2201,7 +2201,7 @@ dnl
 		    linux_cv_vers="${linux_cv_vers:+$linux_cv_vers }'$linux_ver'"
 		done
 		;;
-	    (redhat|oracle|puias|centos|whitebox|scientific|suse)
+	    (redhat|oracle|springdale|puias|centos|whitebox|scientific|suse)
 dnl
 dnl		Redhat and variants can have a mismatch in kernel architecture.
 dnl
