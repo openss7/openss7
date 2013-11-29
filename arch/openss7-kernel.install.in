@@ -343,7 +343,7 @@ _post_kernel_systemd () { :
 	    forward="${forward:+ }$forward$i" ;;
 	esac
     done
-    if [ -r /proc/1/comm -o "`cat /proc/1/comm`" != systemd ]; then
+    if [ -r /proc/1/comm -o "`cat /proc/1/comm 2>/dev/null`" != systemd ]; then
 	systemctl --system daemon-reload
 	for i in $forward; do
 	    if [ -r "@systemdsysdir@/$i" ]; then
@@ -359,7 +359,7 @@ _post_kernel_systemd () { :
 _post_kernel_initscripts() {
     [ -z '@WITH_KO_MODULES_FALSE@' ] || return 0
     [ "@kversion@" = "`uname -r`" ] || return 0
-    if [ -r /proc/1/comm -a "`cat /proc/1/comm`" = systemd ]; then
+    if [ -r /proc/1/comm -a "`cat /proc/1/comm 2>/dev/null`" = systemd ]; then
 	_post_kernel_systemd
     else
 	_post_kernel_sysvinit
@@ -404,7 +404,7 @@ _post_remove_kernel_systemd () {
 	    ;;
 	esac
     done
-    if [ -r /proc/1/comm -o "`cat /proc/1/comm`" != systemd ]; then
+    if [ -r /proc/1/comm -o "`cat /proc/1/comm 2>/dev/null`" != systemd ]; then
 	systemctl --system daemon-reload
 	for i in $reverse; do
 	    if [ -r "@systemdsysdir@/$i" ]; then
@@ -421,7 +421,7 @@ _post_remove_kernel_systemd () {
 _post_remove_kernel_initscripts() {
     [ -z '@WITH_KO_MODULES_FALSE@' ] || return 0
     [ "@kversion@" = "`uname -r`" ] || return 0
-    if [ -r /proc/1/comm -a "`cat /proc/1/comm`" = 'systemd' ]; then
+    if [ -r /proc/1/comm -a "`cat /proc/1/comm 2>/dev/null`" = 'systemd' ]; then
 	_post_remove_kernel_systemd
     else
 	_post_remove_kernel_sysvinit

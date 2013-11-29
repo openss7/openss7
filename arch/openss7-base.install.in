@@ -88,7 +88,7 @@ _pre_install_preloads () {
 _pre_install_initscripts () {
     local list reverse i
     [ -z '@INSTALL_SYSVINIT_TRUE@' ] || return 0
-    if [ ! -r /proc/1/comm -o "`cat /proc/1/comm`" != systemd ]; then
+    if [ ! -r /proc/1/comm -o "`cat /proc/1/comm 2>/dev/null`" != systemd ]; then
 	list="$nonrpminit"
 	reverse=
 	for i in $list; do

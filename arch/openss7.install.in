@@ -646,7 +646,7 @@ _pre_install_base_initscripts() {
     for i in $list; do
 	reverse="$i${reverse:+ }$reverse"
     done
-    if [ ! -r /proc/1/comm -o "`cat /proc/1/comm`" != systemd ]; then
+    if [ ! -r /proc/1/comm -o "`cat /proc/1/comm 2>/dev/null`" != systemd ]; then
 	for i in $reverse; do
 	    if [ -f "@initrddir@/$i" ]; then
 		echo ">>> warning: Stopping non-pkg init script, $i" >&2
@@ -702,7 +702,7 @@ _post_remove_base_sysvinit () {
     for i in $list; do
 	reverse="$i${reverse:+ }$reverse"
     done
-    if [ ! -r /proc/1/comm -o "`cat /proc/1/comm`" != systemd ]; then
+    if [ ! -r /proc/1/comm -o "`cat /proc/1/comm 2>/dev/null`" != systemd ]; then
 	for i in $reverse; do
 	    if [ -f @initrddir@/$i ]; then
 		[ -x "`which invoke-rc.d 2>/dev/null`" ] && { invoke-rc.d $i stop && continue || :; }
@@ -736,7 +736,7 @@ _post_remove_base_systemd () {
 	    ;;
 	esac
     done
-    if [ -r /proc/1/comm -o "`cat /proc/1/comm`" != systemd ]; then
+    if [ -r /proc/1/comm -o "`cat /proc/1/comm 2>/dev/null`" != systemd ]; then
 	systemctl --system daemon-reload
 	for i in $reverse; do
 	    if [ -f "@systemdsysdir@/$i" ]; then

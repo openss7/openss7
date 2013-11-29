@@ -71,7 +71,7 @@ install-initscripts: $(dist_initrd_SCRIPTS)
 post-initscripts:
 	@$(ECHO_V) "D: Making $@ in `pwd`"
 	@if test -z '$(DESTDIR)$(rootdir)' -a \( -f $(DESTDIR)$(initrddir)/rc -o -f $(DESTDIR)$(initrddir)/../rc \) ; then \
-		if test ! -r /proc/1/comm -o `cat /proc/1/comm` != 'systemd'; then \
+		if test ! -r /proc/1/comm -o "`cat /proc/1/comm 2>/dev/null`" != 'systemd'; then \
 			if runlevel >/dev/null 2>&1 ; then \
 				list='$(dist_initrd_SCRIPTS)' ; for p in $$list ; do \
 					f=`$(ECHO) $$p | sed 's|^.*/||'` ; \
@@ -104,7 +104,7 @@ post-initscripts:
 preun-initscripts:
 	@$(ECHO_V) "D: Making $@ in `pwd`"
 	@if test -z '$(DESTDIR)$(rootdir)' -a \( -f $(DESTDIR)$(initrddir)/rc -o -f $(DESTDIR)$(initrddir)/../rc \) ; then \
-		if test ! -r /proc/1/comm -o `cat /proc/1/comm` != 'systemd'; then \
+		if test ! -r /proc/1/comm -o "`cat /proc/1/comm 2>/dev/null`" != 'systemd'; then \
 			if runlevel >/dev/null 2>&1 ; then \
 				list='$(dist_initrd_SCRIPTS)' ; for p in $$list ; do \
 					rlist="$$p $$rlist" ; \
@@ -164,7 +164,7 @@ install-systemd: $(dist_systemdsys_DATA)
 post-systemd:
 	@$(ECHO_V) "D: Making $@ in `pwd`"
 	@if test -z '$(DESTDIR)$(rootdir)' -a -f $(DESTDIR)$(systemddir)/systemd ; then \
-		if test -r /proc/1/comm -a `cat /proc/1/comm` = 'systemd'; then \
+		if test -r /proc/1/comm -a "`cat /proc/1/comm 2>/dev/null`" = 'systemd'; then \
 			d="$(DESTDIR)$(systemdsysdir)" ; flist= ; rlist= ; \
 			list='$(dist_systemdsys_DATA)' ; for p in $$list ; do \
 				f=`$(ECHO) $$p | sed 's|^.*/||'` ; \
@@ -197,7 +197,7 @@ post-systemd:
 preun-systemd:
 	@$(ECHO_V) "D: Making $@ in `pwd`"
 	@if test -z '$(DESTDIR)$(rootdir)' -a -f $(DESTDIR)$(systemddir)/systemd ; then \
-		if test -r /proc/1/comm -a `cat /proc/1/comm` = 'systemd'; then \
+		if test -r /proc/1/comm -a "`cat /proc/1/comm 2>/dev/null`" = 'systemd'; then \
 			d="$(DESTDIR)$(systemdsysdir)" ; flist= ; rlist= ; \
 			list='$(dist_systemdsys_DATA)' ; for p in $$list ; do \
 				f=`$(ECHO) $$p | sed 's|^.*/||'` ; \
