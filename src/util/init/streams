@@ -46,7 +46,7 @@ PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
 
 # Source init script functions library.
 init_mode="standalone"
-  if [ -r /proc/1/comm -a "`cat /proc/1/comm`" = systemd ] ; then      init_mode="systemd"   ;
+  if [ -r /proc/1/comm -a "`cat /proc/1/comm 2>/dev/null`" = systemd ] ; then      init_mode="systemd"   ;
 elif [ -r /etc/init.d/functions   ] ; then . /etc/init.d/functions   ; init_mode="chkconfig" ;
 elif [ -r /etc/rc.status          ] ; then . /etc/rc.status          ; init_mode="insserv"   ;
 elif [ -r /lib/lsb/init-functions ] ; then . /lib/lsb/init-functions ; init_mode="lsb"       ;
