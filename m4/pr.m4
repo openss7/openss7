@@ -74,6 +74,7 @@ AC_DEFUN([_AUTOPR_SETUP], [dnl
 	case "$dist_cv_host_flavor" in
 	    (oracle)	 ap_cv_distribution="OUL$dist_cv_host_release"	    ;;
 	    (scientific) ap_cv_distribution="SL$dist_cv_host_release"	    ;;
+	    (springdale) ap_cv_distribution="RHEL$dist_cv_host_release"    ;;
 	    (puias)	 ap_cv_distribution="PUIAS$dist_cv_host_release"    ;;
 	    (centos)	 ap_cv_distribution="COS$dist_cv_host_release"	    ;;
 	    (lineox)	 ap_cv_distribution="LEL$dist_cv_host_release"	    ;;

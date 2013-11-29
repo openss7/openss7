@@ -141,6 +141,7 @@ AC_DEFUN([_DISTRO_SETUP], [dnl
 	    /etc/slackware-version
 	    /etc/arch-release
 	    /etc/oracle-release
+	    /etc/springdale-release
 	    /etc/puias-release
 	    /etc/centos-release
 	    /etc/lineox-release
@@ -170,6 +171,7 @@ dnl AC_MSG_WARN([checking for flavor in $[1]])
 	(*Arch?Linux*)					echo 'arch'	  ;;
 	(*Oracle*|*ORACLE*)				echo 'oracle'	  ;;
 	(*PUIAS*|*PU_IAS*|*PU-IAS*)			echo 'puias'	  ;;
+	(*SPRINGDALE*|*Springdale*)			echo 'rhel'	  ;;
 	(*CentOS*|*CENTOS*)				echo 'centos'	  ;;
 	(*Lineox*|*LINEOX*)				echo 'lineox'	  ;;
 	(*White?Box*|*WHITE?BOX*)			echo 'whitebox'	  ;;
@@ -241,6 +243,7 @@ dnl AC_MSG_WARN([checking for vendor in $[1]])
 	(salix)				echo 'salix'	  ;;
 	(arch)				echo 'arch'	  ;;
 	(oracle)			echo 'oracle'	  ;;
+	(springdale)			echo 'springdale' ;;
 	(puias)				echo 'puias'	  ;;
 	(centos)			echo 'centos'	  ;;
 	(lineox)			echo 'lineox'	  ;;
@@ -310,6 +313,7 @@ dnl AC_MSG_WARN([checking for distrib in $[1]])
 	(salix)		echo 'Salix Linux' ;;
 	(arch)		echo 'Arch Linux' ;;
 	(oracle)	echo 'Oracle Linux Server' ;;
+	(springdale)	echo 'Springdale Linux' ;;
 	(puias)		echo 'PUIAS Linux' ;;
 	(centos)	echo 'CentOS Enterprise Linux' ;;
 	(lineox)	echo 'Lineox Enterprise Linux' ;;
@@ -407,7 +411,7 @@ dnl AC_MSG_WARN([checking for codename in $[1]])
 		dist_tmp=`echo "${dist_cv_build_release}" | sed -r 's,^[([^\.]*(\.[^\.]*)?)(\.[^\.]*)*][$],\1,'` ;;
 	    (suse)
 		dist_tmp=`echo "${dist_cv_build_release}" | sed -r 's,^(9|[[1-9]][[0-9]])\..*[$],\1,'` ;;
-	    (oracle|puias|centos|lineox|whitebox|scientific|rhel|sle)
+	    (oracle|springdale|puias|centos|lineox|whitebox|scientific|rhel|sle)
 		dist_tmp=`echo "${dist_cv_build_release}" | sed -r 's,\..*[$],,'` ;;
 	    (fedora|mandrake|mandriva|manbo|mageia|mes|redhat|openSUSE)
 		dist_tmp="${dist_cv_build_release}" ;;
@@ -458,6 +462,7 @@ dnl AC_MSG_WARN([checking for cpu in $[1]])
 	    ${sysconfdir}/slackware-version
 	    ${sysconfdir}/arch-release
 	    ${sysconfdir}/oracle-release
+	    ${sysconfdir}/springdale-release
 	    ${sysconfdir}/puias-release
 	    ${sysconfdir}/centos-release
 	    ${sysconfdir}/lineox-release
@@ -621,7 +626,7 @@ dnl AC_MSG_WARN([checking for cpu in $[1]])
 		dist_tmp=`echo "${dist_cv_host_release}" | sed -r 's,^[([^\.]*(\.[^\.]*)?)(\.[^\.]*)*][$],\1,'` ;;
 	    (suse)
 		dist_tmp=`echo "${dist_cv_host_release}" | sed -r 's,^(9|[[1-9]][[0-9]])\..*[$],\1,'` ;;
-	    (oracle|puias|centos|lineox|whitebox|scientific|rhel|sle)
+	    (oracle|springdale|puias|centos|lineox|whitebox|scientific|rhel|sle)
 		dist_tmp=`echo "${dist_cv_host_release}" | sed -r 's,\..*[$],,'` ;;
 	    (fedora|mandrake|mandriva|manbo|mageia|mes|redhat|openSUSE)
 		dist_tmp="${dist_cv_host_release}" ;;
@@ -690,7 +695,7 @@ AC_DEFUN([_DISTRO_OUTPUT], [dnl
     AC_MSG_CHECKING([build system type])
     build_vendor="$dist_cv_build_vendor"
     case "$build_vendor" in
-	(oracle|puias|centos|lineox|whitebox|scientific|redhat|suse|debian|slackware|salix)  
+	(oracle|springdale|puias|centos|lineox|whitebox|scientific|redhat|suse|debian|slackware|salix)
 	    case "$build_os" in (*linux*) build_os='linux'     ;; esac ;;
 	(arch|mandrake|mandriva|mageia|ubuntu)  
 	    case "$build_os" in (*linux*) build_os='linux-gnu' ;; esac ;;
@@ -716,7 +721,7 @@ AC_DEFUN([_DISTRO_OUTPUT], [dnl
     else
 	host_vendor="$dist_cv_host_vendor"
 	case "$host_vendor" in
-	    (oracle|puias|centos|lineox|whitebox|scientific|redhat|suse|debian|slackware|salix)  
+	    (oracle|springdale|puias|centos|lineox|whitebox|scientific|redhat|suse|debian|slackware|salix)
 		case "$host_os" in (*linux*) host_os='linux'     ;; esac ;;
 	    (arch|mandrake|mandriva|mageia|ubuntu)  
 		case "$host_os" in (*linux*) host_os='linux-gnu' ;; esac ;;
@@ -740,7 +745,7 @@ AC_DEFUN([_DISTRO_OUTPUT], [dnl
     else
 	target_vendor="$dist_cv_host_vendor"
 	case "$target_vendor" in
-	    (oracle|puias|centos|lineox|whitebox|scientific|redhat|suse|debian|slackware|salix)  
+	    (oracle|springdale|puias|centos|lineox|whitebox|scientific|redhat|suse|debian|slackware|salix)
 		case "$target_os" in (*linux*) target_os='linux'     ;; esac ;;
 	    (arch|mandrake|mandriva|mageia|ubuntu)  
 		case "$target_os" in (*linux*) target_os='linux-gnu' ;; esac ;;

@@ -171,6 +171,13 @@ AC_DEFUN([_RPM_SPEC_SETUP_DIST], [dnl
 			    (*)		rpm_cv_dist_extra=".uek${dist_cv_host_release}"   ;;
 			esac
 			;;
+		    (springdale)
+			case $dist_cv_host_release in
+			    (3|3.?|4|4.?|5|5.?|6|6.?)
+					rpm_cv_dist_extra=".el${rpm_tmp}"		    ;;
+			    (*)		rpm_cv_dist_extra=".el${dist_cv_host_release}"   ;;
+			esac
+			;;
 		    (puias)
 			case $dist_cv_host_release in
 			    (3|3.?|4|4.?|5|5.?|6|6.?)
@@ -305,6 +312,13 @@ AC_DEFUN([_RPM_SPEC_SETUP_DIST], [dnl
 			    (*)		  rpm_cv_dist_extra2=".UEK${dist_cv_host_release}"  ;;
 			esac
 			;;
+		    (springdale)
+			case $dist_cv_host_release in
+			    (3|3.?|4|4.?) rpm_cv_dist_extra2=".EL${rpm_tmp}"		    ;;
+			    (5|5.?|6|6.?) rpm_cv_dist_extra2=".el${rpm_tmp}"		    ;;
+			    (*)		  rpm_cv_dist_extra2=".el${rpm_tmp}"		    ;;
+			esac
+			;;
 		    (puias)
 			case $dist_cv_host_release in
 			    (3|3.?|4|4.?) rpm_cv_dist_extra2=".EL${rpm_tmp}"		    ;;
@@ -417,7 +431,7 @@ AC_DEFUN([_RPM_SPEC_SETUP_DIST], [dnl
     ])
     AC_CACHE_CHECK([for rpm distribution default topdir], [rpm_cv_dist_topdir], [dnl
 	case "$dist_cv_host_distro" in
-	    (oracle|puias|centos|lineox|whitebox|scientific|fedora|redhat|rhel)
+	    (oracle|springdale|puias|centos|lineox|whitebox|scientific|fedora|redhat|rhel)
 		rpm_cv_dist_topdir='/usr/src/redhat'	;;
 	    (suse|openSUSE)
 		rpm_cv_dist_topdir='/usr/src/SuSE'	;;
@@ -659,7 +673,7 @@ dnl
     _BLD_PATH_PROG([RPM], [rpm], [${am_missing3_run}rpm], [$tmp_PATH], [dnl
 	if test ":$enable_rpms" = :yes; then
 	    case "$target_vendor" in
-		(oracle|puias|centos|lineox|whitebox|scientific|mandrake|mandriva|mageia|redhat|suse)
+		(oracle|springdale|puias|centos|lineox|whitebox|scientific|mandrake|mandriva|mageia|redhat|suse)
 		    AC_MSG_WARN([Cannot find rpm program in PATH.]) ;;
 		(*) enable_rpms=no ;;
 	    esac
@@ -717,7 +731,7 @@ AC_DEFUN([_RPM_REPO_SETUP_YUM], [dnl
     _BLD_PATH_PROG([CREATEREPO], [createrepo], [${am_missing3_run}createrepo], [$tmp_PATH], [dnl
 	if test ":$rpm_cv_rpms" = :yes -a ${USE_MAINTAINER_MODE:-no} = yes ; then
 	    case "${target_vendor:-none}" in
-		(redhat|whitebox|lineox|oracle|puias|centos|scientific|suse)
+		(redhat|whitebox|lineox|oracle|springdale|puias|centos|scientific|suse)
 		    _BLD_INSTALL_WARN([CREATEREPO], [
 *** 
 *** Configure could not find a suitable  tool for creating REPOMD
@@ -743,7 +757,7 @@ AC_DEFUN([_RPM_REPO_SETUP_YUM], [dnl
     _BLD_PATH_PROG([MODIFYREPO], [modifyrepo], [${am_missing3_run}modifyrepo], [$tmp_PATH], [dnl
 	if test ":$rpm_cv_rpms" = :yes -a ${USE_MAINTAINER_MODE:-no} = yes ; then
 	    case "${target_vendor:-none}" in
-		(redhat|whitebox|lineox|oracle|puias|centos|scientific|suse)
+		(redhat|whitebox|lineox|oracle|springdale|puias|centos|scientific|suse)
 		    _BLD_INSTALL_WARN([MODIFYREPO], [
 *** 
 *** Configure could not find a suitable tool for modifying REPOMD
