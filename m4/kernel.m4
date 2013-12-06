@@ -2476,9 +2476,11 @@ dnl
 	fi
     ])
     if ! echo "$linux_cv_k_cppflags" | grep 'autoconf\.h' >/dev/null 2>&1 ; then
-	AC_DEFINE_UNQUOTED([NEED_LINUX_AUTOCONF_H], [$linux_cv_k_autoconf],
-	    [Defined when the header file ]$linux_cv_k_autoconf[ needs to be explicitly included.])
+	if ! echo "$linux_cv_k_cppflags" | grep 'kconfig\.h' >/dev/null 2>&1 ; then
+	    AC_DEFINE_UNQUOTED([NEED_LINUX_AUTOCONF_H], [$linux_cv_k_autoconf],
+		[Defined when the header file ]$linux_cv_k_autoconf[ needs to be explicitly included.])
 	fi
+    fi
     AC_CACHE_CHECK([for kernel MODFLAGS], [linux_cv_k_modflags], [dnl
 	_LINUX_KBUILD_ENV([dnl
 dnl
