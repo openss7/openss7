@@ -2,6 +2,8 @@ SECTIONS
 {
 	/DISCARD/		: { *(.discard) }
 
+	.noaltinstructions	: { *(.altinstructions) }
+
 	.text			: { *(.text.streams.hot.put)
 				    *(.text.streams.hot.write)
 				    *(.text.streams.hot.out)
