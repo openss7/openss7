@@ -116,7 +116,7 @@ sort-adjacent-labels
 .TH GETXHOSTBYADDR 3 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ Library Calls"
 .SH NAME
 .B getxhostbyaddr
-\-
+\- get X.25 host database entry for a specified address
 .\"
 .\"
 .SH SYNOPSIS
@@ -139,6 +139,20 @@ X.25 Support Library,
 .BR libsx25 (3).
 .\"
 .\"
+.SH ARGUMENTS
+.PP
+.TP
+.I addr
+A pointer to a structure containing the address of the X.25 host whose
+database entry is to be retrieved.
+.TP
+.I len
+The length of the address structure.
+.TP
+.I type
+The type of the address structure.
+.\"
+.\"
 .SH DESCRIPTION
 .PP
 .BR getxhostbyaddr ()
@@ -147,47 +161,176 @@ located in the
 .B /etc/x25/
 directory.  It returns a pointer to an
 .BR xhostent (5)
-structure contianing information on the entry.
+structure containing information on the entry.
+.\"
+.SS FILE FORMAT
+.PP
+The format of the
+.B @sysconfdir@/x25/xhosts
+X.25 host database file is as described in
+.BR xhostent (5).
+.\"
+.\"
+.\".SH NOTICES
+.\".PP
 .\"
 .\"
 .SH RETURN VALUE
 .PP
-Returns a pointer to static storage.  You must copy the value to keep and reuse it.  A return vlaue
-of
+Returns a pointer to an
+.BR xhostent (5)
+structure.
+When successful,
+.BR getxhostbyaddr ()
+returns a pointer to a
+.BR xhostent (5)
+structure, which contains the entry from the X.25 Hosts database
+corresponding to the specified address,
+.IR addr .
+Returns a pointer to static storage.
+You must copy the value to keep and reuse it.
+A return value of
 .B NULL
 indicates the address supplied is either invalid or unknown.
 .\"
 .\"
-.SH NOTICES
+.SH ERRORS
 .PP
+When unsuccessful,
+.BR getxhostbyaddr ()
+returns a
+.B NULL
+pointer indicating that no entry matched the specified address,
+.IR addr .
 .\"
 .\"
 .SH FILES
 .PP
+.TP
+.RB < netx25/xnetdb.h >
+The
+.B xhostent
+structure is defined in the
+.RB < netx25/xnetdb.h >
+header file.
+.TP
+.B @sysconfdir@/x25/xhosts
+Contains the X.25 host database defined in
+.BR xhostent (5).
+.TP
+.B @libdir@/libsx25.so
+The X.25 network services shared object library.
+.TP
+.B @libdir@/libsx25.a
+The X.25 network services static library.
 .\"
 .\"
 .SH BUGS
 .PP
+.BR getxhostbyaddr ()
+has no known bugs.
 .\"
 .\"
 .SH SEE ALSO
 .PP
+.BR libsx25 (3),
+.BR xhostent (5),
+.BR endxhostent (3),
+.BR getxhostbyaddr (3),
+.BR getxhostbyname (3),
+.BR getxhostent (3),
+.BR setxhostent (3).
 .\"
 .\"
 .SH COMPATIBILITY
 .PP
+.B getxhostbyaddr
+is compatible with
+.IR AIXlink/X.25 ,
+.[
+aixx25
+.]
+.IR "HP-UX X.25/9000" ,
+.[
+hpuxdoc
+.]
+.IR "IRIS SX.25" ,
+.[
+sx25
+.]
+.IR "PT X.25" ,
+.[
+ptx25
+.]
+.IR "RadiSys WAN" ,
+.[
+radwan
+.]
+.IR "SBE X.25" ,
+.[
+sbex25
+.]
+.IR "SunLink X.25" ,
+.IR "Solstice X.25" ,
+.[
+solx25dg
+.]
+and systems based on
+.IR "Spider X.25" ,
+with the following compatibility considerations:
+.IP \(em \w'\(em\(em'u
+.IR "Solaris Solstice" "\(rg " "X.25 9.2" ,
+.[
+solx25dg
+.]
+.IR "IRIX SX.25" ,
+.[
+sx25
+.]
+.IR "PT X.25" ,
+.[
+ptx25
+.]
+are consistent in their documentation of the
+.B xhostent
+structure.
+.IP \(em
+On
+.IR UNIX \(rg
+systems, these utility subroutines are part of the X.25 library,
+.BR libsx25 .
+.IP \(em
+These subroutines are consistently described across implementations of X.25
+on
+.IR UNIX \(rg
+and can be used portably by applications programs.
+.PP
+See
+.BR libsx25 (3)
+for additional compatibility information.
 .\"
 .\"
 .SH CONFORMANCE
 .PP
+.IR "Spider X.25" .
 .\"
 .\"
 .SH HISTORY
 .PP
+The PAD host subroutines first appeared in
+.IR "Spider X.25" .
+These subroutines are related to
+.IR UNIX \(rg
+.BR STREAMS (9)
+implementation of X.25 PAD providers.
 .\"
 .\"
-.SH VERSION
+.SH VERSIONS
 .PP
+This manual page was written for the
+.B @PACKAGE_TITLE@
+package
+.RB ( "@PACKAGE@-@VERSION@" ).
 .\"
 .\"
 .[

@@ -659,7 +659,6 @@ testmod_init(void)
 #ifdef LIS
 	if ((err = lis_register_module_qlock_option(modid, LIS_QLOCK_NONE)) < 0) {
 		lis_unregister_strmod(&testmod_info);
-		tm_unregister_ioctl32();
 		return (err);
 	}
 #endif

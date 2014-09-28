@@ -160,6 +160,7 @@ sort-adjacent-labels
 .\"
 .SH DESCRIPTION
 .PP
+Configure X.25 address and IP address mapping.
 .\".PP
 .\"There are a number of automatic translation schemes for translating IP
 .\"addresses into OSI NSAPs.
@@ -627,12 +628,8 @@ and diagnostic messages to
 .IR stderr .
 .\"
 .\"
-.SH FILE FORMAT
-.PP
-.\"
-.\"
-.SH NOTICES
-.PP
+.\".SH NOTICES
+.\".PP
 .\"
 .\"
 .SH FILES

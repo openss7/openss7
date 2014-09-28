@@ -106,8 +106,43 @@ Major features since the last public release are:
 
 @itemize -
 @item
+Deprecated sub-packages have been excluded from the master package release.  The excluded
+sub-packages are:
+
+@multitable @columnfractions .05 .95
+@item @tab -- @file{sctp-@value{VERSION_SCTP}}
+@item @tab -- @file{iperf-@value{VERSION_IPERF}}
+@item @tab -- @file{netperf-@value{VERSION_NETPERF}}
+@item @tab -- @file{osr61-@value{VERSION_OSR}}
+@end multitable
+
+@item
+Documentation license upgraded to GFDL 1.3.
+
+@item
+Updated tool chain to @file{m4-1.4.13}, @file{automake-1.10.2}, @file{bison-2.4.1},
+@file{libtool-2.2.6a}, @file{texinfo-4.13a}.
+
+@item
+Addition of the following sub-packages:
+
+@multitable @columnfractions .05 .95
+@item @tab -- @file{stratm-@value{VERSION_STRATM}}
+@end multitable
+
+@item
 Addition of the @file{stratm} sub-package to the master build and release that now includes all of
 the ATM components that were previously part of the @file{strss7} sub-package.
+
+@item
+Significant feature updates were made to:
+
+@multitable @columnfractions .05 .95
+@item @tab -- @file{strchan-@value{VERSION_STRCHAN}}
+@item @tab -- @file{strsock-@value{VERSION_STRSOCK}}
+@item @tab -- @file{strnsl-@value{VERSION_STRNSL}}
+@item @tab -- @file{sigtran-@value{VERSION_SIGTRAN}}
+@end multitable
 
 @item
 Significant rework of the @file{strchan} sub-package into the @file{strss7}, @file{strisdn},
@@ -144,7 +179,7 @@ See @uref{http://www.openss7.org/codefiles/@value{PACKAGE}-@value{VERSION}/Chang
 information.  Also, see the @file{@value{PACKAGE}.pdf} manual in the release (also in
 @uref{http://www.openss7.org/@value{PACKAGE}_manual.html,html}).
 
-For the news release, see @uref{http://www.openss7.org/rel20081029_L.html}.
+For the news release, see @uref{http://www.openss7.org/rel2009XXXX_L.html}.
 
 @c ----------------------------------------------------------------------------
 

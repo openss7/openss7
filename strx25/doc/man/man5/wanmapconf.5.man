@@ -113,15 +113,46 @@ sort-adjacent-labels
 .\"
 .SH DESCRIPTION
 .PP
+The
+.B wanmapconf
+file contains information regarding the mapping between remote addresses of
+network hosts and underlying interface addresses.  It is loaded into the WAN
+driver,
+.BR wan (4),
+by
+.BR wanmap (8),
+and is stored in the WAN internal address table.
 .\"
 .\"
 .SH FORMAT
 .PP
+Each line should contain a remote address followed by an interface address,
+separated by whitespace.  Items are separated by any number of spaces and/or
+table characters.  A
+.RB ' # '
+indicates the beginning of a commend; characters up to the end of the line
+are not interpreted by routine that search the file.  The remote address may
+be either a destination name of X.121 address.
+.PP
+The interface address follows the format for the corresponding interface.
+.\"
+.\"
+.SH EXAMPLE
+.PP
+Following is an example file:
+.sp
+.RS
+.nf
+12345678901234       0101444567865
+uk.co.host           2323,1223233,2233442332323
+12342342432          uk.ac.host
+.fi
+.RE
 .\"
 .\"
 .SH FILES
 .PP
-Files following this format are normally keps in the
+Files following this format are normally kept in the
 .B @configdir@/@PACKAGE@/wanmapconf
 file.
 .PP
@@ -192,7 +223,7 @@ aixx25
 .[
 hpuxdoc
 .]
-.IR "IRIS SX.25" ,
+.IR "IRIX SX.25" ,
 .[
 sx25
 .]
@@ -217,6 +248,13 @@ The
 .B wanmapconf
 file format first appeared in
 .IR "Spider X.25" .
+.\"
+.\"
+.SH VERSIONS
+.PP
+This manual page was written for the
+.IR OpenSS7 \(tm
+implementation of X.25.
 .\"
 .\"
 .[

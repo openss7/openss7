@@ -5081,6 +5081,17 @@ Part 1: Protocol Specification
 %C Mountainview, California
 %U http://techpubs.sgi.com/
 
+%L CCCSMAD
+%R PowerMAX OS STREAMS
+%K cccsmad
+%T STREAMS Modules and Drivers
+%G Part No: 0890426-020
+%D February 1998
+%Q Concurrent Computer Corporation
+%I CCC
+%C Ft. Lauderdale, Florida
+%U http:/www.concurrent.com/
+
 %L HPUXDDI
 %R STREAMS/UX
 %K hpuxddi
@@ -7777,7 +7788,7 @@ Part 1: Protocol Specification
 %T IAX: Inter-Asterisk eXchange Version 2
 %D February 2009
 %I The Internet Society
-%U http://www.ietf.org/rfc/rfc5456.txt
+%U http://www.rfc-editor.org/authors/rfc5456.txt
 
 %K rfc3286
 %L RFC3286

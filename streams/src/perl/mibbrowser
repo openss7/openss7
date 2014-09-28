@@ -1,12 +1,13 @@
 #!/usr/bin/perl -W
 # =============================================================================
 # 
-# @(#) $RCSfile: mibbrowser,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2009-03-02 05:15:01 $
+# @(#) $RCSfile: mibbrowser,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2009-07-21 11:06:17 $
 #
 # -----------------------------------------------------------------------------
 #
+# Copyright (c) 2008-2009  Monavacon Limited <http://www.monavacon.com/>
 # Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
-# Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
+# Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 #
 # All Rights Reserved.
 #
@@ -46,82 +47,22 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2009-03-02 05:15:01 $ by $Author: brian $
+# Last Modified $Date: 2009-07-21 11:06:17 $ by $Author: brian $
 #
 # =============================================================================
 
 #eval 'exec perl -S $0 ${1+"@"}'
 #    if $running_under_some_shell;
 
-if (!eval { require SNMP; }) {
-	print STDERR<<EOF;
-ERROR: You do not have the SNMP perl module installed.  Please obtain
-this by getting the latest source release of the ucd-snmp toolkit from
-http://www.net-snmp.org/download/ .  The perl module is contained in
-the perl/SNMP directory.  See the INSTALL file there for instructions.
-EOF
-	exit;
-} else {
-	eval { import SNMP; }
-}
-
-#if (!eval { require Gtk2; }) {
-#	print STDERR<<EOF;
-#ERROR: Use of the $0 program requires the availability of the perl
-#Gtk2 module.  It can either be obtained from CPAN or by installing
-#the necessary package on your system.
-#EOF
-#} else {
-#	eval { import Gtk2; }
-#}
-
-if (!eval { require Tk; }) {
-    print STDERR<<EOF;
-ERROR: Use of the $0 program requires the availablity of the perl
-Tk module.  It can either be obtained from CPAN or by insgalling the
-necessary package on your system.
-EOF
-} else {
-    eval { import Tk; }
-}
-
-use Carp;
-use Data::Dumper;
-#use XML::Simple;
-
-#my $xml = new XML::Simple;
-
-my $mibs = {};
-
 $\ = "\n";
 
 use strict;
 
 my $program = $0; $program =~ s/^.*\///;
-my $ident = '$RCSfile: mibbrowser,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2009-03-02 05:15:01 $';
-my $version = '$Revision: 0.9.2.13 $';
-my $date = '$Date: 2009-03-02 05:15:01 $';
+my $ident = '$RCSfile: mibbrowser,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2009-07-21 11:06:17 $';
+my $version = '$Revision: 1.1.2.2 $';
+my $date = '$Date: 2009-07-21 11:06:17 $';
 my $title = 'OpenSS7 Network Manager';
-
-use SNMP;
-
-$SNMP::verbose = 1;
-$SNMP::use_long_names = 0;
-$SNMP::use_sprint_value = 0;
-$SNMP::use_enums = 1;
-$SNMP::use_numeric = 0;
-$SNMP::best_guess = 2;
-$SNMP::save_descriptions = 1;
-SNMP::initMib();
-#SNMP::addMibDirs(qw//);
-SNMP::loadModules('ALL');
-
-sub sess {
-    my (%args) = @_;
-    foreach (keys %args) {
-    }
-    return new SNMP::Session(%args);
-}
 
 my $statusbar;
 
@@ -137,7 +78,9 @@ $Title =~ s/^\n*//;
 my $Version = <<EOF;
 Version $version
 $ident
+Copyright (c) 2008-2009  Monavacon Limited.    All Rights Reserved.
 Copyright (c) 2001-2008  OpenSS7 Corporation.  All Rights Reserved.
+Copyright (c) 1997-2000  Brian F. G. Bidulock. All Rights Reserved.
 Distributed under Affero GPL Version 3, included here by reference.
 See `$program --copying' for copying permissions.
 EOF
@@ -151,6 +94,7 @@ ________________________________________________________________________________
 $ident
 ________________________________________________________________________________
 
+Copyright (c) 2008-2009  Monavacon Limited <http://www.monavacon.com/>
 Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
 Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock\@openss7.org>
 
@@ -178,6 +122,7 @@ my $CopyingMono = <<EOF;
 --------------------------------------------------------------------------------
 $ident
 --------------------------------------------------------------------------------
+Copyright (c) 2008-2009  Monavacon Limited <http://www.monavacon.com/>
 Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
 Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock\@openss7.org>
 
@@ -269,7 +214,9 @@ sub version {
 	print STDOUT<<EOF;
 Version $version
 $ident
+Copyright (c) 2008-2009  Monavacon Limited.    All Rights Reserved.
 Copyright (c) 2001-2008  OpenSS7 Corporation.  All Rights Reserved.
+Copyright (c) 1997-2000  Brian F. G. Bidulock. All Rights Reserved.
 Distributed under Affero GPL Version 3, included here by reference.
 See `$program --copying' for copying permissions.
 EOF
@@ -324,6 +271,7 @@ sub copying {
 --------------------------------------------------------------------------------
 $ident
 --------------------------------------------------------------------------------
+Copyright (c) 2008-2009  Monavacon Limited <http://www.monavacon.com/>
 Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
 Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock\@openss7.org>
 
@@ -547,6 +495,48 @@ while ($#defaults >= 2) {
     }
 }
 
+if (!eval { require SNMP; }) {
+	print STDERR<<EOF;
+ERROR: You do not have the SNMP perl module installed.  Please obtain
+this by getting the latest source release of the ucd-snmp toolkit from
+http://www.net-snmp.org/download/ .  The perl module is contained in
+the perl/SNMP directory.  See the INSTALL file there for instructions.
+EOF
+	exit;
+} else {
+	eval { import SNMP; }
+}
+
+if (!eval { require Tk; }) {
+    print STDERR<<EOF;
+ERROR: Use of the $0 program requires the availablity of the perl
+Tk module.  It can either be obtained from CPAN or by insgalling the
+necessary package on your system.
+EOF
+} else {
+    eval { import Tk; }
+}
+
+use Carp;
+use Data::Dumper;
+#use XML::Simple;
+
+use Encode;
+
+#my $xml = new XML::Simple;
+
+use SNMP;
+
+#if (!eval { require Gtk2; }) {
+#	print STDERR<<EOF;
+#ERROR: Use of the $0 program requires the availability of the perl
+#Gtk2 module.  It can either be obtained from CPAN or by installing
+#the necessary package on your system.
+#EOF
+#} else {
+#	eval { import Gtk2; }
+#}
+
 #Gtk2->init;
 #
 #my $w = Gtk2::Window->new('toplevel');
@@ -575,6 +565,26 @@ require Tk::TableMatrix::Spreadsheet;
 require Tk::Frame;
 
 use Storable qw(lock_store lock_nstore lock_retrieve);
+
+my $mibs = {};
+
+$SNMP::verbose = 1;
+$SNMP::use_long_names = 0;
+$SNMP::use_sprint_value = 0;
+$SNMP::use_enums = 1;
+$SNMP::use_numeric = 0;
+$SNMP::best_guess = 2;
+$SNMP::save_descriptions = 1;
+SNMP::initMib();
+#SNMP::addMibDirs(qw//);
+SNMP::loadModules('ALL');
+
+sub sess {
+    my (%args) = @_;
+    foreach (keys %args) {
+    }
+    return new SNMP::Session(%args);
+}
 
 my $dragobj;
 
@@ -3522,7 +3532,8 @@ sub createcmd {
     );
     $rotext = $rotext->Subwidget('scrolled');
     $self->{'dropsite'} = $rotext->DropSite(
-	-droptypes=>[qw/XDND Sun Local/],
+	-droptypes=>[ 'XDND', 'SUN', 'Local' ],
+#	-droptypes=>[ Encode::encode("iso-8859-1", "XDND"), Encode::encode("iso-8859-1", "SUN"), Encode::encode("iso-8859-1", "Local") ],
 	-dropcommand=>[\&MyROText::dropcommand,$self],
     );
     $self->{'rotext'} = $rotext;
@@ -3704,7 +3715,8 @@ EOF
 	-balloonmsg=>$msg,
     );
     $self->{'dropsite'} = $pane->DropSite(
-	-droptypes=>[qw/XDND Sun Local/],
+	-droptypes=>[ 'XDND', 'SUN', 'Local' ],
+#	-droptypes=>[ Encode::encode("iso-8859-1", "XDND"), Encode::encode("iso-8859-1", "SUN"), Encode::encode("iso-8859-1", "Local") ],
 	-dropcommand=>[\&MyMatrix::dropcommand,$self],
     );
     $pane->bind('<Control-v>', # paste
@@ -4079,7 +4091,8 @@ sub new {
     $self->{'top'} = $parent->widget;
     $self->setwidget($nb);
 #    $self->{'dropsite'} = $nb->DropSite(
-#	-droptypes=>[qw/XDND Sun Local/],
+#	-droptypes=>[ 'XDND', 'SUN', 'Local' ],
+##	-droptypes=>[ Encode::encode("iso-8859-1", "XDND"), Encode::encode("iso-8859-1", "SUN"), Encode::encode("iso-8859-1", "Local") ],
 #	-dropcommand=>[sub { my ($self,@args) = @_; $self->drop(@args); }, $self],
 #    );
     $nb->bind('<Button-3>',
@@ -10482,7 +10495,8 @@ sub addentry {
     $e->validate;
     $self->{'smsg'}='Enter (or drag) an object id.';
     $e->DropSite(
-	-droptypes=>[qw/XDND Sun Local/],
+	-droptypes=>[ 'XDND', 'SUN', 'Local' ],
+#	-droptypes=>[ Encode::encode("iso-8859-1", "XDND"), Encode::encode("iso-8859-1", "SUN"), Encode::encode("iso-8859-1", "Local") ],
 	-dropcommand=>[\&MyObjectId::dropcommand,$self,$parent,$entry],
     );
     return $e;
@@ -12696,7 +12710,8 @@ sub createcmd {
     $top->header('configure', 1, -text=>'Detail',);
     $top->header('configure', 2, -text=>'State',);
     $self->{'dragdrop'} = $top->DragDrop(
-	-sitetypes=>[qw/XDND Sun Local/],
+	-sitetypes=>[ 'XDND', 'SUN', 'Local' ],
+#	-sitetypes=>[ Encode::encode("iso-8859-1", "XDND"), Encode::encode("iso-8859-1", "SUN"), Encode::encode("iso-8859-1", "Local") ],
 	-startcommand=>[ sub {
 	    return 1 if ($::dragobj);
 	    my ($token,$e) = @_;
@@ -12965,7 +12980,8 @@ sub createcmd {
     $top->header('configure', 1, -text=>'Syntax/Value',);
     $top->header('configure', 2, -text=>'Units',);
     $self->{'dragdrop'} = $top->DragDrop(
-	-sitetypes=>[qw/XDND Sun Local/],
+	-sitetypes=>[ 'XDND', 'SUN', 'Local' ],
+#	-sitetypes=>[ Encode::encode("iso-8859-1", "XDND"), Encode::encode("iso-8859-1", "SUN"), Encode::encode("iso-8859-1", "Local") ],
 	-startcommand=>[ sub {
 	    return 1 if ($::dragobj);
 	    my ($token,$e) = @_;
@@ -14738,7 +14754,8 @@ sub objprops {
     $tx->{_private} = {};
     my $w = $tx->Subwidget('scrolled');
     my $dropsite = $w->DropSite(
-	-droptypes=>[qw/XDND Sun Local/],
+	-droptypes=>[ 'XDND', 'SUN', 'Local' ],
+#	-droptypes=>[ Encode::encode("iso-8859-1", "XDND"), Encode::encode("iso-8859-1", "SUN"), Encode::encode("iso-8859-1", "Local") ],
 	-dropcommand=>[sub {
 	    my ($self,$tx,$seln,$action,$targets,$xo,$yo,@args) = @_;
 	    if ($action eq 'LocalDrop' || $::dragobj) {
@@ -14801,9 +14818,17 @@ Tk::MainLoop;
 
 exit;
 
+1;
+
 # =============================================================================
 #
 # $Log: mibbrowser,v $
+# Revision 1.1.2.2  2009-07-21 11:06:17  brian
+# - changes from release build
+#
+# Revision 1.1.2.1  2009-06-21 11:41:58  brian
+# - added files to new distro
+#
 # Revision 0.9.2.13  2009-03-02 05:15:01  brian
 # - updates
 #

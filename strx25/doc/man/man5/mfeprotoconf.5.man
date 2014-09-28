@@ -283,7 +283,7 @@ aixx25
 .[
 hpuxdoc
 .]
-.IR "IRIS SX.25" ,
+.IR "IRIX SX.25" ,
 .[
 sx25
 .]
@@ -308,6 +308,13 @@ The
 .B mfeprotoconf
 file format first appeared in
 .IR "Spider Frame Relay" .
+.\"
+.\"
+.SH VERSIONS
+.PP
+This manual page was written for the
+.IR OpenSS7 \(tm
+implementation of Frame Relay.
 .\"
 .\"
 .[

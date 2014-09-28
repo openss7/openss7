@@ -103,9 +103,14 @@ join-authors ", " ", " " and "
 et-al " et al" 2 3
 abbreviate-label-ranges ".."
 sort-adjacent-labels
+search-ignore T
 .R2
 .so strx25.macros
+.\"
+.\"
 .TH S_WAN 4 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ Devices"
+.\"
+.\"
 .SH NAME
 .B s_wan
 \- SpiderWAN compatibility \fISTREAMS\fP(9) module
@@ -113,9 +118,9 @@ sort-adjacent-labels
 .\"
 .SH SYNOPSIS
 .PP
-\fB#include <unitstd.h>\fP
+.B #include <unistd.h>
 .br
-\fB#include <stropts.h>\fP
+.B #include <stropts.h>
 .HP 12
 \fIcdi_stream\fP = \fBopen\fP(\fIcdi_device\fP, O_RDWR);
 .HP
@@ -153,6 +158,9 @@ developed to provide source compatibility with these programs.
 .\"
 .SH USAGE
 .PP
+This module is not normaly used directly by user applications: it is normally
+used by agents or daemons responsible for configuring the X.25 protocol
+suite.
 .\"
 .\"
 .SH PRIMITIVES
@@ -536,8 +544,8 @@ This primitive is issued by the WAN interface provider.
 .RE
 .\"
 .\"
-.SH IOCTLS
-.PP
+.\".SH IOCTLS
+.\".PP
 .\"
 .\"
 .SH NOTICES
@@ -559,10 +567,17 @@ should be used in its stead.
 .\"
 .SH MODULES
 .PP
+.B S_WAN
+is a
+.I STREAMS
+module named
+.RI \*(lq s_wan \*(rq.
 .\"
 .\"
 .SH BUGS
 .PP
+.B S_WAN
+has no known bugs.
 .\"
 .\"
 .SH SEE ALSO
@@ -577,9 +592,9 @@ should be used in its stead.
 .\"
 .SH COMPATIBILITY
 .PP
-The
 .B S_WAN
-module is compatible with CDI,
+is compatible with
+CDI,
 .[
 cdi revision 0.9.2
 .]
@@ -597,9 +612,9 @@ spiderisdnwan
 and implementations based on SpiderWAN, such as
 .IR AIXlink/X.25 \(rg,
 .[
-aixlink
+aixx25
 .]
-.IR HP-UX \(rg,
+.IR "HP-UX X.25/9000" \(rg,
 .[
 hpuxdoc
 .]
@@ -607,32 +622,40 @@ hpuxdoc
 .[
 sx25
 .]
-.IR "Solstice X.25" \(rg,
-.[
-solx25pg
-.]
 .IR "PT WAN" ,
 .[
 ptx25
-.]
-.IR "SBE X.25" ,
-.[
-sbex25
 .]
 .IR "RadiSys WAN" ,
 .[
 radwan
 .]
+.IR "SBE X.25" ,
+.[
+sbex25
+.]
+.IR "SunLink X.25" \(rg,
+.[
+solx25dg
+.]
+.IR "Solstice X.25" \(rg,
+.[
+solx25pg
+.]
 and others, with the following compatibility considerations:
 .IP \(em \w'\(em\(em'u
+Not all implementations specify or utilize this module.
 .IP \(em
 Only source compatibility with SpiderWAN is attempted.  Binary compatibility
 is not attempted.  Any binary compatibility experienced may change in a future
 release.
 .IP \(em
-.IP \(em
-.IP \(em
-.IP \(em
+For portability, this module should always be used instead of using the WAN
+interface directly.
+.PP
+See
+.BR X25 (4)
+for additional compatibility information.
 .\"
 .\"
 .SH CONFORMANCE
@@ -683,6 +706,14 @@ The
 module first appeared in page
 .BR "@PACKAGE_TITLE@" ", version " "@PACKAGE@-@VERSION@" .
 The interface to which it is compatible first appeared in SpiderWAN releases as early as 1993.
+.\"
+.\"
+.SH VERSIONS
+.PP
+This manual page was written for the
+.B @PACKAGE_TITLE@
+package
+.RB ( "@PACKAGE@-@VERSION@" ).
 .\"
 .\"
 .[

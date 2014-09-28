@@ -125,10 +125,12 @@ struct yyy {
 .\"
 .SH MEMBERS
 .PP
+Unknown.
 .\"
 .\"
 .SH DESCRIPTION
 .PP
+Read link configuration.
 .\"
 .\"
 .\".SH USAGE

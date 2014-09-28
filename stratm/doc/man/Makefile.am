@@ -59,10 +59,28 @@ if PKG_BUILD_INDEP
 MANS_UNUSED =
 
 man_MANS = \
-	man8/stratm_mknod.8
+	man4/aal1.4 \
+	man4/aal2.4 \
+	man4/aal5.4 \
+	man4/atm.4 \
+	man4/mtp3b.4 \
+	man4/phys.4 \
+	man4/sscopmce.4 \
+	man5/stratm.5 \
+	man8/stratm_mknod.8 \
+	man8/test-atm.8
 
 dist_noinst_MANS = \
-	man8/stratm_mknod.8.man
+	man4/aal1.4.man \
+	man4/aal2.4.man \
+	man4/aal5.4.man \
+	man4/atm.4.man \
+	man4/mtp3b.4.man \
+	man4/phys.4.man \
+	man4/sscopmce.4.man \
+	man5/stratm.5.man \
+	man8/stratm_mknod.8.man \
+	man8/test-atm.8.man
 
 ## PKG_BUILD_INDEP
 endif

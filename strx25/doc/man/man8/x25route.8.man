@@ -117,17 +117,17 @@ sort-adjacent-labels
 .PP
 .ad l
 .nh
-.HP \w'\fB\)xxxx\fP\ 'u
-\fB\)xxxx\fP [\fIoptions\fP]
+.HP \w'\fB\)x25route\fP\ 'u
+\fB\)x25route\fP [\fIoptions\fP]
 .PD 0
 .HP
-\fB\)xxxx\fP
+\fB\)x25route\fP
 {\fB-h\fP|\fB--help\fP}
 .HP
-\fB\)xxxx\fP
+\fB\)x25route\fP
 {\fB-V\fP|\fB--version\fP}
 .HP
-\fB\)xxxx\fP
+\fB\)x25route\fP
 {\fB-C\fP|\fB--copying\fP}
 .PD
 .ad b
@@ -136,6 +136,7 @@ sort-adjacent-labels
 .\"
 .SH DESCRIPTION
 .PP
+Add routes to X.25.
 .\"
 .\"
 .SH OPTIONS
@@ -186,16 +187,16 @@ Specify or increase the output verbosity.  Sets the output verbosity to
 .SH ARGUMENTS
 .PP
 The
-.I xxxx
+.I x25route
 command takes no non-option arguments.
 .\"
 .\"
-.SH FILE FORMAT
-.PP
+.\".SH FILE FORMAT
+.\".PP
 .\"
 .\"
-.SH EXAMPLES
-.PP
+.\".SH EXAMPLES
+.\".PP
 .\"
 .\"
 .SH DIAGNOSTICS
@@ -215,35 +216,32 @@ and diagnostic messages to
 .IR stderr .
 .\"
 .\"
-.SH FILE FORMAT
-.PP
+.\".SH NOTICES
+.\".PP
 .\"
 .\"
-.SH NOTICES
-.PP
+.\".SH FILES
+.\".PP
 .\"
 .\"
-.SH FILES
-.PP
-.\"
-.\"
-.SH DEVICES
-.PP
+.\".SH DEVICES
+.\".PP
 .\"
 .\"
 .SH SEE ALSO
 .PP
+.BR X25 (4).
 .\"
 .\"
 .SH BUGS
 .PP
-.B xxxx
+.B x25route
 has no known bugs.
 .\"
 .\"
 .SH COMPATIBILITY
 .PP
-.B xxxx
+.B x25route
 is compatible with
 .IR "AIXlink/X.25" ,
 .[
@@ -281,7 +279,7 @@ Options \fB-q\fP, \fB-v\fP, \fB-h\fP, \fB-V\fP, \fB-C\fP, and all long
 options, are specific to this
 .B @PACKAGE_TITLE@
 implementation of
-.B xxxx
+.B x25route
 and should not be used by portable command scripts.
 .IP \(em
 Options
@@ -289,7 +287,7 @@ Options
 and all long options, are specific to this
 .B @PACKAGE_TITLE@
 implementation of
-.BR xxxx
+.BR x25route
 and will not be used by portable command scripts.
 .IP \(em
 No other implementation documents the \fB-q\fP, \fB-v\fP, \fB-h\fP, \fB-V\fP
@@ -335,7 +333,7 @@ documentation.
 .\"
 .SH HISTORY
 .PP
-.B xxxx
+.B x25route
 first appeared in
 .IR "Spider X.25" .
 .\"

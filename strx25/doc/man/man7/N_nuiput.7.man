@@ -125,10 +125,12 @@ struct yyy {
 .\"
 .SH MEMBERS
 .PP
+Unknown.
 .\"
 .\"
 .SH DESCRIPTION
 .PP
+Put network user information.
 .\"
 .\"
 .\".SH USAGE

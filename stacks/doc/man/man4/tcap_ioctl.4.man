@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: tcap_ioctl.4.man,v 0.9.2.10 2008-04-29 07:10:20 brian Exp $
+.\" @(#) $Id: tcap_ioctl.4.man,v 0.9.2.11 2009-05-01 09:16:56 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2008-04-29 07:10:20 $ by $Author: brian $
+.\" Last Modified $Date: 2009-05-01 09:16:56 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: tcap_ioctl.4.man,v $
+.\" Revision 0.9.2.11  2009-05-01 09:16:56  brian
+.\" - pass check target for release
+.\"
 .\" Revision 0.9.2.10  2008-04-29 07:10:20  brian
 .\" - updating headers for release
 .\"
@@ -226,7 +229,7 @@ TCAP provides the following stream types:
 This device provides the TCAP protocol service interface using the TC-primitives of the Transaction
 Component Interface (TCI)
 .[
-tci revision 0.9.2
+tci revision 0.9a
 .]
 described in
 .BR tci (7).
@@ -235,7 +238,7 @@ described in
 This device provides the TCAP protocol service interface using the TR-primitives of the Transaction
 Interface (TRI)
 .[
-tri revision 0.9.2
+tri revision 0.9a
 .]
 described in
 .BR tri (7).
@@ -278,12 +281,12 @@ and this object is a candidate for this type of peristence.)
 This managed object represents the user of the protocol service interface being provided by the TCAP
 provider.  For TCAP, this is a Transaction Component Interface (TCI),
 .[
-tci revision 0.9.2
+tci revision 0.9a
 .]
 .BR tci (7),
 a Transaction Interface (TRI),
 .[
-tri revision 0.9.2
+tri revision 0.9a
 .]
 .BR tri (7),
 or Transport Provider Interface (TPI),

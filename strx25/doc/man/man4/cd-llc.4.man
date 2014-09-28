@@ -100,6 +100,7 @@ join-authors ", " ", " " and "
 et-al " et al" 2 3
 abbreviate-label-ranges ".."
 sort-adjacent-labels
+search-ignore T
 .R2
 .so strx25.macros
 .\"
@@ -121,7 +122,12 @@ sort-adjacent-labels
 .\"
 .SH DESCRIPTION
 .PP
-This driver has not been implemented.
+This is a driver for the IEEE 802.2 Logical Link Control (LLC).  It presents
+a CDI interface to its users.  Each CDI stream on the upper multiplex
+represents an LLC station.  These LLC station streams are intended on being
+linked beneath a DL LLC multiplexing driver that provides the LLC LSAP and
+Connection Component units.  Enabled upper streams will respond automatically
+to XID and TEST frames when necessary.
 .\"
 .\"
 .SH USAGE
@@ -213,6 +219,10 @@ This driver has not been implemented.
 .\"
 .SH VERSIONS
 .PP
+This manual page was written for the
+.B @PACKAGE_TITLE@
+package
+.RB ( "@PACKAGE@-@VERSION@" ).
 .\"
 .\"
 .XX

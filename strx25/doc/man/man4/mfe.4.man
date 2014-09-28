@@ -103,6 +103,7 @@ join-authors ", " ", " " and "
 et-al " et al" 2 3
 abbreviate-label-ranges ".."
 sort-adjacent-labels
+search-ignore T
 .R2
 .so strx25.macros
 .\"
@@ -199,13 +200,13 @@ The
 .B MFE
 .I STREAMS
 driver was created from publicly available documentation of the driver's
-operation, primarly under
+operation, primarily under
 .IR IRIS \(rg.
 This driver may not function identical to that actually present in any given
 Spider Frame Relay or
 .IR IRIS \(rg
 release.  Because this driver is not normally accessed by user-level programs
-and is primarily only invoved in lower level system configuration, this should
+and is primarily only involved in lower level system configuration, this should
 not be an issue when porting application-level programs from these
 environments to \fBLinux\fP.  See \*(lq\fICOMPATIBILITY\fP,\*(rq below, for
 specific compatibility considerations.
@@ -315,7 +316,8 @@ For additional compatibility information, see
 .BR pvcmap (8),
 .BR lltune (8),
 and
-.BR STREAMS (9).
+.BR STREAMS (9),
+for additional compatibility information.
 .\"
 .\"
 .SH CONFORMANCE
@@ -331,6 +333,14 @@ dlpi revision 2.0.0
 The
 .B MFE
 driver first appeared in Spider Frame Relay.
+.\"
+.\"
+.SH VERSIONS
+.PP
+This manual page was written for the
+.B @PACKAGE_TITLE@
+package
+.RB ( "@PACKAGE@-@VERSION@" ).
 .\"
 .\"
 .[

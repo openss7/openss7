@@ -585,8 +585,8 @@ AT_CLEANUP
 
 dnl Test Case XNS/NPI-SCTP/3.7.3: EPROTO for N_DATACK_REQ in the NS_WRES_CIND state
 AT_SETUP([sctp-npi-2 test 3.7.3])
-AT_CHECK([test_sctp_n2 3.7.3], [], [ignore], [], [], [])
 AT_KEYWORDS([EPROTO N_DATACK_REQ NS_WRES_CIND])
+AT_CHECK([test_sctp_n2 3.7.3], [], [ignore], [], [], [])
 AT_CLEANUP
 
 dnl Test Case XNS/NPI-SCTP/3.7.4: EPROTO for N_UNITDATA_REQ in the NS_WRES_CIND state

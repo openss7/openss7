@@ -1,11 +1,13 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: psfd.1.man,v 1.1.4.4 2008-04-29 08:33:17 brian Exp $
+.\" @(#) $Id$
 .\"
 .\" =========================================================================
 .\"
+.\" Copyright (c) 2008-2009  Monavacon Limited <http://www.monavacon.com/>
 .\" Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+.\" Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 .\"
 .\" All Rights Reserved.
 .\"
@@ -53,7 +55,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2008-04-29 08:33:17 $ by $Author: brian $
+.\" Last Modified $Date$ by $Author$
 .\"
 .\" -------------------------------------------------------------------------
 .\"
@@ -80,18 +82,18 @@ sort-adjacent-labels
 .so lis.macros
 .\"
 .\"
-.TH XXXX 1 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ User Commands"
+.TH PSFD 1 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ User Commands"
 .\"
 .\"
 .SH NAME
-.B xxx
-\- incomplete man page
+.B psfd
+\- pass a pipe end's file descriptor to itself
 .\"
 .\"
 .SH SYNOPSIS
 .PP
 .HP 12
-\fBpsfd\fR [\fIoptions\fR]
+\fBpsfd\fR [\fIoptions\fR] \fIPATH\fP
 .PD 0
 .HP 12
 \fBpsfd\fR {\fB-h\fR|\fB--help\fR}
@@ -102,51 +104,108 @@ sort-adjacent-labels
 .PD
 .\"
 .\"
+.SH ARGUMENTS
+.PP
+.TP
+.I PATH
+The path to which to fattach.
+.\"
+.\"
 .SH OPTIONS
 .PP
+.TP
+\fB-w\fP, \fB--wait\fP \fIWAIT\fP
+set the wait in milliseconds.  The default value is zero (0).
+.TP
+\fB-n\fP, \fB--compare\fP
+compare sent and received file descriptor.
+.TP
+\fB-i\fP, \fB--ignore\fP
+ignore passing file descriptors.
+.TP
+\fB-v\fP, \fB--verbose\fP [\fILEVEL\fP]
+increase verbosity or set to \fILEVEL\fP.
+.TP
+\fB-h\fP, \fB--help\fP, \fB-?\fP, \fB--?\fP
+print usage message and exit.
+.TP
+\fB-V\fP, \fB--version\fP
+print version and exit.
+.TP
+\fB-C\fP, \fB--copying\fP
+print copying permission and exit.
 .\"
 .\"
 .SH DESCRIPTION
 .PP
+This program tests file descriptor passing by passing a pipe end's file descriptor to itself.
 .\"
 .\"
-.SH DIAGNOSTICS
-.PP
+.\".SH DIAGNOSTICS
+.\".PP
 .\"
 .\"
-.SH ERRORS
-.PP
-.\"
-.\"
-.SH MT-LEVEL
-.PP
+.\".SH ERRORS
+.\".PP
 .\"
 .\"
 .SH NOTICES
 .PP
+.B psfd
+is normally invoked from the
+.B @PACKAGE@-@VERSION@
+test suite.
+.\"
+.\"
+.SH FILES
+.PP
+.TP
+.B /usr/libexec/LiS/psfd
+contains the
+.B psfd
+command.
 .\"
 .\"
 .SH "SEE ALSO"
 .PP
+.BR oc (1),
+.BR rwf (1),
+.BR pafd (1),
+.BR test-streams (8),
+.BR STREAMS (4),
+.IR "Linux STREAMS Installation and Reference Manual" .
 .\"
 .\"
 .SH BUGS
 .PP
+.B psfd
+has no known bugs.
 .\"
 .\"
-.SH COMPATIBILITY
-.PP
+.\".SH COMPATIBILITY
+.\".PP
 .\"
 .\"
 .SH CONFORMANCE
 .PP
+.B psfd
+tests conformance of
+.BR STREAMS (4)
+to the specifications listed on the
+.BR STREAMS (4)
+manual page.
 .\"
 .\"
 .SH HISTORY
 .PP
+.B psfd
+is provided with the
+.I @PACKAGE_TITLE@
+package.
 .\"
 .\"
 .[
 $LIST$
 .]
 .TI
+.\" vim: ft=nroff sw=4 noet nocin nosi com=b\:.\\\" fo+=tcqlorn tw=77

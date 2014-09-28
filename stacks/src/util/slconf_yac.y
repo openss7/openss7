@@ -404,12 +404,14 @@ struct select sel[MAX_HANDLES] = {
     [0x1f] = {"/dev/x400p-sl", "", 1, 1, 1, 1, 0, -1, -1},
 };
 
+#if 0
 #undef TOK_T1
 #define TOK_T1 TOK_T1T
 #undef TOK_T2
 #define TOK_T2 TOK_T2T
 #undef TOK_T3
 #define TOK_T3 TOK_T3T
+#endif
 
 %}
 

@@ -1247,8 +1247,10 @@ main(int argc, char *argv[])
 					continue;
 				snprintf_text(sbuf, sizeof(sbuf), dbuf, dat.len);
 				if (nomead && outfile[0] != '\0') {
+					clock_t ltime = lc->ltime;
+
 					fprintf(stdout, "%d", lc->seq_no);
-					fprintf(stdout, " %s", ctime(&lc->ltime));
+					fprintf(stdout, " %s", ctime(&ltime));
 					fprintf(stdout, "%lu", (unsigned long) lc->ttime);
 					fprintf(stdout, "%3d", lc->level);
 					if (lc->flags & SL_ERROR)

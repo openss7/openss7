@@ -291,6 +291,7 @@
 %U http://www.gcom.com/
 
 %L NLI
+%K nlispec
 %A Brian Bidulock
 %Q OpenSS7 Corporation
 %R NLI
@@ -5081,6 +5082,17 @@ Part 1: Protocol Specification
 %C Mountainview, California
 %U http://techpubs.sgi.com/
 
+%L CCCSMAD
+%R PowerMAX OS STREAMS
+%K cccsmad
+%T STREAMS Modules and Drivers
+%G Part No: 0890426-020
+%D February 1998
+%Q Concurrent Computer Corporation
+%I CCC
+%C Ft. Lauderdale, Florida
+%U http:/www.concurrent.com/
+
 %L HPUXDDI
 %R STREAMS/UX
 %K hpuxddi
@@ -5130,6 +5142,38 @@ Part 1: Protocol Specification
 %G Part No: 5991-7498
 %D February 2007
 %Q Hewlett-Packard Development Company L.P.
+%I HP
+%C Palo Alto, California
+%U http://docs.hp.com/
+
+%L HPX25PG
+%R HP X.25/9000
+%K hpx25pg
+%T HP X.25/9000 Programmer's Guide
+%G Part No: 36960-90058
+%D April 1996
+%Q Hewlett-Packard Company
+%I HP
+%C Palo Alto, California
+%U http://docs.hp.com/
+
+%L HPX25PG5
+%R HP X.25/9000
+%K hpx25pg5
+%T HP X.25/9000 Programmer's Guide
+%G Part No: J2793-90048 E1100
+%D 2000
+%Q Hewlett-Packard Company
+%I HP
+%C Palo Alto, California
+%U http://docs.hp.com/
+
+%L HPX25AN
+%R HP X.25
+%K hpx25an
+%T Migrating X.25 over ACC to X.25 over PSI
+%D 2008
+%Q Hewlett-Packard Company
 %I HP
 %C Palo Alto, California
 %U http://docs.hp.com/
@@ -7764,6 +7808,21 @@ Part 1: Protocol Specification
 %I The Internet Society
 %U http://www.ietf.org/rfc/rfc3267.txt
 
+%K rfc5456
+%L RFC5456
+%R RFC 5456
+%A Mark Spencer
+%A Brian Capouch
+%A Ed Guy
+%A Frank Miller
+%A Kenneth Shumard
+%E Ed Guy
+%Q Internet Engineering Task Force
+%T IAX: Inter-Asterisk eXchange Version 2
+%D February 2009
+%I The Internet Society
+%U http://www.rfc-editor.org/authors/rfc5456.txt
+
 %K rfc3286
 %L RFC3286
 %R RFC 3286
@@ -8312,7 +8371,7 @@ Part 1: Protocol Specification
 %I The Internet Society
 %U http://www.ietf.org/rfc/rfc3020.txt
 
-%K frf12
+%K frf1_2
 %L FRF.1.2
 %R FRF.1.2
 %T The Frame Relay Forum PVC User-to-Network Interface (UNI) Implementation Agreement
@@ -8322,7 +8381,7 @@ Part 1: Protocol Specification
 %Q The Frame Relay Forum
 %U http://www.ipmplsforum.org/frame/Approved/FRF.1/FRF.1.2.pdf
 
-%K frf22
+%K frf2_2
 %L FRF.2.2
 %R FRF.2.2
 %T PVC Network-to-Network Interface (NNI) Implementation Agreement
@@ -8332,7 +8391,7 @@ Part 1: Protocol Specification
 %Q The Frame Relay Forum
 %U http://www.ipmplsforum.org/frame/Approved/FRF.2/FRF.2.2.pdf
 
-%K frf32
+%K frf3_2
 %L FRF.3.2
 %E Andrew G. Malis
 %E Rao Cherukuri
@@ -8344,7 +8403,7 @@ Part 1: Protocol Specification
 %Q The Frame Relay Forum
 %U http://www.ipmplsforum.org/frame/Approved/FRF.3/FRF.3.2.pdf
 
-%K frf41
+%K frf4_1
 %L FRF.4.1
 %R FRF.4.1
 %T The Frame Relay Forum SVC User-to-Network Interface (UNI) Implementation Agreement
@@ -8375,7 +8434,7 @@ Part 1: Protocol Specification
 %Q The Frame Relay Forum
 %U http://www.ipmplsforum.org/frame/Approved/FRF.7/FRF.7.pdf
 
-%K frf81
+%K frf8_1
 %L FRF.8.1
 %R FRF.8.1
 %T Frame Relay/ATM PVC Service Interworking Implementation Agreement
@@ -8385,7 +8444,7 @@ Part 1: Protocol Specification
 %Q The Frame Relay Forum
 %U http://www.ipmplsforum.org/frame/Approved/FRF.8/FRF.8.1.pdf
 
-%K frf82
+%K frf8_2
 %L FRF.8.2
 %R FRF.8.2
 %T Frame Relay/ATM PVC Service Interworking Implementation Agreement
@@ -8405,7 +8464,7 @@ Part 1: Protocol Specification
 %Q The Frame Relay Forum
 %U http://www.ipmplsforum.org/frame/Approved/FRF.9/FRF.9.pdf
 
-%K frf101
+%K frf10_1
 %L FRF.10.1
 %R FRF.10.1
 %T The Frame Relay Forum SVC Network-to-Network Interface (NNI) Implementation Agreement
@@ -8415,7 +8474,7 @@ Part 1: Protocol Specification
 %Q The Frame Relay Forum
 %U http://www.ipmplsforum.org/frame/Approved/FRF.10/FRF.10.1.pdf
 
-%K frf111
+%K frf11_1
 %L FRF.11.1
 %R FRF.11.1
 %T Voice over Frame Relay Implementation Agreement
@@ -8456,7 +8515,7 @@ Part 1: Protocol Specification
 %Q The Frame Relay Forum
 %U http://www.ipmplsforum.org/frame/Approved/FRF.15/FRF.15.pdf
 
-%K frf161
+%K frf16_1
 %L FRF.16.1
 %R FRF.16.1
 %T Multilink Frame Relay UNI/NNI Implementation Agreement

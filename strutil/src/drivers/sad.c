@@ -465,7 +465,7 @@ sad_put(queue_t *q, mblk_t *mp)
 					struct strapush sa, *sap = &sa;
 
 					sap32_convert(sap32, sap);
-					if ((err = apush_getnext(sap)))
+					if ((err = apush_lst(sap)))
 						goto nak;
 					sap32_revert(sap, sap32);
 				} else
@@ -474,7 +474,7 @@ sad_put(queue_t *q, mblk_t *mp)
 					struct strapush *sap;
 
 					sap = (typeof(sap)) dp->b_rptr;
-					if ((err = apush_getnext(sap)))
+					if ((err = apush_lst(sap)))
 						goto nak;
 				}
 				if (sad->transparent == 1) {

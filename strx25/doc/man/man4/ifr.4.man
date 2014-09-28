@@ -103,6 +103,7 @@ join-authors ", " ", " " and "
 et-al " et al" 2 3
 abbreviate-label-ranges ".."
 sort-adjacent-labels
+search-ignore T
 .R2
 .so strx25.macros
 .\"
@@ -158,30 +159,6 @@ Streams opened on the \fBIFR\fP driver may be used directly by user-level
 programs, or linked under additional Streams multiplexing drivers such as the
 .BR mfe (4)
 multiplexing driver.
-.\"
-.\"
-.\"
-.\"
-.\"
-.\"
-.\"
-.\"
-.\"
-.\"
-.\"
-.\"
-.\"
-.\"
-.\"
-.\"
-.\"
-.\"
-.\"
-.\"
-.\"
-.\"
-.\"
-.\"
 .\"
 .\"
 .SH NOTICES

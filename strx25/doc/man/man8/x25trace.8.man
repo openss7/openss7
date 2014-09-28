@@ -117,17 +117,17 @@ sort-adjacent-labels
 .PP
 .ad l
 .nh
-.HP \w'\fB\)xxxx\fP\ 'u
-\fB\)xxxx\fP [\fIoptions\fP]
+.HP \w'\fB\)x25trace\fP\ 'u
+\fB\)x25trace\fP [\fIoptions\fP]
 .PD 0
 .HP
-\fB\)xxxx\fP
+\fB\)x25trace\fP
 {\fB-h\fP|\fB--help\fP}
 .HP
-\fB\)xxxx\fP
+\fB\)x25trace\fP
 {\fB-V\fP|\fB--version\fP}
 .HP
-\fB\)xxxx\fP
+\fB\)x25trace\fP
 {\fB-C\fP|\fB--copying\fP}
 .PD
 .ad b
@@ -136,6 +136,8 @@ sort-adjacent-labels
 .\"
 .SH DESCRIPTION
 .PP
+Run a trace at X.25 packet level.  When expriencing communications problems,
+use this command and redirect its output to a file.
 .\"
 .\"
 .SH OPTIONS
@@ -146,6 +148,30 @@ The following command options are mutually exclusive: only one command option
 should be present on the command line at a time.  The exceptions are the
 \fB-h\fP, \fB-V\fP and \fB-C\fP options that can be specified alone, or with
 any other option.
+.TP
+\fB-a\fP, \fB--bytes\fP
+Displays total bytes of user data instead of the data itself.
+.TP
+\fB-u\fP, \fB--buffered\fP
+Buffers the output line by line.
+.TP
+\fB-x\fP, \fB--hex\fP
+Decodes packet and displays in hexadecimal.
+.TP
+\fB-D\fP, \fB--decode\fP
+Decodes and displays DLPI messages exchanged between X.25 PLP and LAPB/LLC2.
+.TP
+\fB-i\fP, \fB--interface\fP \fIinterface\fP
+Specifies the interface to trace: \fB/dev/llc2\fP, the LLC interface for X.25
+over LLC type 2; \fB/dev/lapb\fP, the LAPB interface for X.25 over
+synchronous point-to-point lines; \fB/dev/x25\fP, the X.25 packet layer
+interface (the default).
+.TP
+\fB-l\fP, \fB--link\fP \fIlink\fP
+Specify a single link to trace.
+.TP
+\fB-t\fP, \fB--time\fP
+Display absolute rather than relative time stamps.
 .TP
 \fB-h\fP, \fB--help\fP
 When this option is encountered, display usage information to
@@ -186,16 +212,51 @@ Specify or increase the output verbosity.  Sets the output verbosity to
 .SH ARGUMENTS
 .PP
 The
-.I xxxx
-command takes no non-option arguments.
-.\"
-.\"
-.SH FILE FORMAT
+.I x25trace
+command takes the following non-option arguments:
+.TP
+.I filter_expression
+Specifies on eof the following filter expressions:
+.RS
+.TP
+.B betweenmac
+Trace packets between MACs.
+.TP
+.B datmac
+Trace only packets with this destination MAC address.
+.TP
+.B mac
+Trace packets to or from this MAC address.
+.TP
+.B multicast
+Trace only LLC2 packets with a multicast address.
+.TP
+.B pdu_in
+Trace only incoming PDUs.
+.TP
+.B pdu_out
+Trace only outgoing PDUs.
+.TP
+.B srcmac
+Trace only packets or frames with this source MAC.
+.TP
+.B x25lcn +
+Trace only packets on the next logical channel set up.
+.TP
+.BI x25lcn " n
+Trace only packets on logical channel \fIn\fP.
 .PP
+Note that logical operations (\fBand\fP, \fBor\fP, and \fBnot\fP) can be used
+with the expression defined above.
+.RE
 .\"
 .\"
-.SH EXAMPLES
-.PP
+.\".SH FILE FORMAT
+.\".PP
+.\"
+.\"
+.\".SH EXAMPLES
+.\".PP
 .\"
 .\"
 .SH DIAGNOSTICS
@@ -215,35 +276,32 @@ and diagnostic messages to
 .IR stderr .
 .\"
 .\"
-.SH FILE FORMAT
-.PP
+.\".SH NOTICES
+.\".PP
 .\"
 .\"
-.SH NOTICES
-.PP
+.\".SH FILES
+.\".PP
 .\"
 .\"
-.SH FILES
-.PP
-.\"
-.\"
-.SH DEVICES
-.PP
+.\".SH DEVICES
+.\".PP
 .\"
 .\"
 .SH SEE ALSO
 .PP
+.BR X25 (4).
 .\"
 .\"
 .SH BUGS
 .PP
-.B xxxx
+.B x25trace
 has no known bugs.
 .\"
 .\"
 .SH COMPATIBILITY
 .PP
-.B xxxx
+.B x25trace
 is compatible with
 .IR "AIXlink/X.25" ,
 .[
@@ -281,7 +339,7 @@ Options \fB-q\fP, \fB-v\fP, \fB-h\fP, \fB-V\fP, \fB-C\fP, and all long
 options, are specific to this
 .B @PACKAGE_TITLE@
 implementation of
-.B xxxx
+.B x25trace
 and should not be used by portable command scripts.
 .IP \(em
 Options
@@ -289,7 +347,7 @@ Options
 and all long options, are specific to this
 .B @PACKAGE_TITLE@
 implementation of
-.BR xxxx
+.BR x25trace
 and will not be used by portable command scripts.
 .IP \(em
 No other implementation documents the \fB-q\fP, \fB-v\fP, \fB-h\fP, \fB-V\fP
@@ -335,7 +393,7 @@ documentation.
 .\"
 .SH HISTORY
 .PP
-.B xxxx
+.B x25trace
 first appeared in
 .IR "Spider X.25" .
 .\"

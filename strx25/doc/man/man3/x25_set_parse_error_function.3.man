@@ -124,6 +124,8 @@ sort-adjacent-labels
 .B #include <netx25/x25_proto.h>
 .br
 .B #include <netx25/xnetdb.h>
+.br
+.B #include <netx25/config_functions.h>
 .HP
 .BI "int (*x25_set_parse_error_function(int (*" func ")(char *)))(char *);
 .\"
@@ -139,40 +141,158 @@ X.25 Support Library,
 .BR libsx25 (3).
 .\"
 .\"
+.SH ARGUMENTS
+.PP
+.TP
+.I func
+A pointer to a function that is installed as the default error handler.  This
+function will be called with a signle argument: a pointer to the error
+string.  When set to
+.BR NULL ,
+the previous default action is removed.
+.\"
+.\"
 .SH DESCRIPTION
 .PP
+By default errors are handled by printing a message to standard error and
+continuing.  This ufnction allows a different function to be installed ofr
+use, for example, with windowing programs.
 .\"
 .\"
-.SH NOTICES
+.\".SH NOTICES
+.\".PP
+.\"
+.\"
+.SH RETURN VALUE
 .PP
+The address of the previous error function is returned.
 .\"
 .\"
 .SH FILES
 .PP
+.TP
+.RB < netx25/config_functions.h >
+A header file containing configuration function declarations.
+.TP
+.B @libdir@/libsx25.so
+The X.25 network services shared object library.
+.TP
+.B @libdir@/libsx25.a
+The X.25 network services static library.
 .\"
 .\"
 .SH BUGS
 .PP
+.BR x25_set_parse_error_function
+has no known bugs.
 .\"
 .\"
 .SH SEE ALSO
 .PP
+.BR libsx25 (3),
+.BR x25_find_link_parameters (3),
+.BR x25_read_config_parameters (3),
+.BR x25_read_config_parameters_file (3),
+.BR x25_save_link_parameters (3),
+.BR x25_set_parse_error_function (3),
+.BR x25_write_config_parameters (3),
+.BR x25_write_config_parameters_file (3).
 .\"
 .\"
 .SH COMPATIBILITY
 .PP
+.B x25_set_parse_error_function
+is compatible with
+.IR AIXlink/X.25 ,
+.[
+aixx25
+.]
+.IR "HP-UX X.25/9000" ,
+.[
+hpuxdoc
+.]
+.IR "IRIS SX.25" ,
+.[
+sx25
+.]
+.IR "PT X.25" ,
+.[
+ptx25
+.]
+.IR "RadiSys WAN" ,
+.[
+radwan
+.]
+.IR "SBE X.25" ,
+.[
+sbex25
+.]
+.IR "SunLink X.25" ,
+.IR "Solstice X.25" ,
+.[
+solx25dg
+.]
+and systems based on
+.IR "Spider X.25" ,
+with the following compatibility considerations:
+.IP \(em \w'\(em\(em'u
+.IR "Solaris Solstice" "\(rg " "X.25 9.2" ,
+.[
+solx25dg
+.]
+.IR "IRIX SX.25" ,
+.[
+sx25
+.]
+.IR "PT X.25" ,
+.[
+ptx25
+.]
+are consistent in their documentation of the
+.B xaddrf
+structure.
+.IR "Solaris Solstice" "\(rg " "X.25 9.2" ,
+.[
+solx25dg
+.]
+however, uses a somewhat different link id.
+.IP \(em
+On
+.IR UNIX \(rg
+systems, these utility subroutines are part of the X.25 library,
+.BR libsx25 .
+.IP \(em
+These subroutines are consistently described across implementations of X.25
+on
+.IR UNIX \(rg
+and can be used portably by applications programs.
+.PP
+See
+.BR libsx25 (3)
+for additional compatibility information.
 .\"
 .\"
 .SH CONFORMANCE
 .PP
+.IR "Spider X.25" .
 .\"
 .\"
 .SH HISTORY
 .PP
+The X.25 host subroutines first appeared in
+.IR "Spider X.25" .
+These subroutines are related to
+.IR UNIX \(rg
+.BR STREAMS (9)
+implementation of X.25 providers.
 .\"
 .\"
-.SH VERSION
+.SH VERSIONS
 .PP
+This manual page was written for the
+.B @PACKAGE_TITLE@
+package
+.RB ( "@PACKAGE@-@VERSION@" ).
 .\"
 .\"
 .[

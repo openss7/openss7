@@ -86,6 +86,13 @@ This is the first full production @cite{OpenSS7 Project} release of the @cite{@v
 package.  This public release has all OpenSS7 components, many of which were only previously
 available in commercial releases.
 
+@quotation
+@b{Note Well:} With this release, the @file{strss7} subpackage will no longer be released as a
+separate subpackage, but is only contained in the OpenSS7 Master Package release.  With a subsequent
+release all subpackages of the OpenSS7 Master Package will be collapsed into a single release
+package.
+@end quotation
+
 This is the ninth release of the package. The package contains SS7 (Signalling System No. 7)
 signalling stack components for @cite{Linux Fast-STREAMS}.@footnote{These components will no longer
 work with the long deprecated @cite{LiS} package.}  All non-SS7 components that were part of the
@@ -101,6 +108,14 @@ releases: please upgrade before reporting bugs.
 Major features since the last public release are as follows:
 
 @itemize -
+
+@item
+Documentation license upgraded to GFDL 1.3.
+
+@item
+Updated tool chain to @file{m4-1.4.13}, @file{automake-1.10.2}, @file{bison-2.4.1},
+@file{libtool-2.2.6a}, @file{texinfo-4.13a}.
+
 @item
 Addition to the public release of all SS7 components including MTP Level 2, MTP Level 3, SCCP, TCAP,
 ISUP and MAP in ANSI, ETSI, ITU-T and a host of other variants.
@@ -131,7 +146,7 @@ See @uref{http://www.openss7.org/codefiles/@value{PACKAGE}-@value{VERSION}/Chang
 more information.  Also, see the @file{@value{PACKAGE}.pdf} manual in the release (also in
 @uref{http://www.openss7.org/@value{PACKAGE}_manual.html,html}).
 
-For the news release, see @uref{http://www.openss7.org/rel20081029_5.html}.
+For the news release, see @uref{http://www.openss7.org/rel2009XXXX_5.html}.
 
 @c ----------------------------------------------------------------------------
 

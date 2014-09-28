@@ -100,6 +100,7 @@ join-authors ", " ", " " and "
 et-al " et al" 2 3
 abbreviate-label-ranges ".."
 sort-adjacent-labels
+search-ignore T
 .R2
 .so strx25.macros
 .\"
@@ -121,7 +122,36 @@ sort-adjacent-labels
 .\"
 .SH DESCRIPTION
 .PP
-This driver has not been implemented.
+This is a DLPI interface LLC driver for Linux Fast-STREAMS.  What it does it
+provides DLPI access to the Linux interface devices, such as Ehternet or
+FDDI.  There are several types of encapsulation that can be performed and
+this driver supports a number of them.
+.PP
+When a DLPI stream is opened on this driver it is an unattached Style 2
+stream.  The Stream must be attached to a PPA (Physical Point of Appearance)
+before it can be bound and messages exchanged.  The information reported in
+.BR DL_INFO_ACK (7)
+will be meaningless until the Stream is attached to a PPA.  This driver uses
+a specialized PPA addressing scheme that is based on the level of access to
+the MAC device that is desired (in terms of framing and station or combined
+station level), and the Linux device index number.  An input-output control
+method is provided for translating between interface names (e.g., "eth0") and
+Linux interface index numbers.
+.PP
+To make the PPA also compatible with other systems, in that the PPA is simply
+and index number, this driver provides clone minor device numbers that
+provide framing specific interfaces and also supports some of the AIX
+input-output controls that will adjust the framing.
+.PP
+The purpose of this driver is to provide IEEE 802.2 LLC access for SNA, X.25
+and OSI CONS and CLNS.  The driver is a non-multiplexing pseudo-device
+driver.  If you have DLPI MAC drivers for specific interface cards, use the
+drivers from the @code{strxns} package to first make them available to Linux.
+.PP
+This driver also supports some of the AIX mechanisms, input-output controls
+and specifics from the GDLC based drivers DLC8023, DLCETHER, DLCTOKEN,
+DLCFDDI, but not DLCSDLC or DLCQLLC.  The latter are provided by a separate
+HDLC driver.
 .\"
 .\"
 .SH USAGE
@@ -213,6 +243,10 @@ This driver has not been implemented.
 .\"
 .SH VERSIONS
 .PP
+This manual page was written for the
+.B @PACKAGE_TITLE@
+package
+.RB ( "@PACKAGE@-@VERSION@" ).
 .\"
 .\"
 .XX

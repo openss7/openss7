@@ -1,11 +1,13 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: connld.4.man,v 1.1.4.4 2008-04-29 08:33:18 brian Exp $
+.\" @(#) $Id$
 .\"
 .\" =========================================================================
 .\"
+.\" Copyright (c) 2008-2009  Monavacon Limited <http://www.monavacon.com/>
 .\" Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+.\" Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 .\"
 .\" All Rights Reserved.
 .\"
@@ -53,7 +55,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2008-04-29 08:33:18 $ by $Author: brian $
+.\" Last Modified $Date$ by $Author$
 .\"
 .\" -------------------------------------------------------------------------
 .\"
@@ -90,6 +92,16 @@ sort-adjacent-labels
 .\"
 .SH SYNOPSIS
 .PP
+.HP
+.BI "int " pfds[2] ;
+.HP
+.BI "int s_pipe(" pfds );
+.HP
+.BI "int ioctl(" pfds[0] ", " I_PUSH ", " \*(lqconnld\*(rq );
+.HP
+.BI "int fattach(" pfds[0] ", " \*(lq/tmp/server\*(rq );
+.HP
+.BI "int ioctl(" pfds[1] ", " I_RECVFD ", struct strfdinser *" fdi );
 .\"
 .\"
 .SH DESCRIPTION
@@ -229,6 +241,11 @@ as long as both ends remain attached.
 .\"
 .SH MODULES
 .PP
+.B connld
+is a
+.I STREAMS
+module named
+.RI \*(lq connld \*(rq.
 .\"
 .\"
 .SH "SEE ALSO"
@@ -256,3 +273,4 @@ John Boyd, protologos LLC.
 $LIST$
 .]
 .T3
+.\" vim: ft=nroff sw=4 noet nocin nosi com=b\:.\\\" fo+=tcqlorn tw=77

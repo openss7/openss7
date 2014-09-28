@@ -139,12 +139,30 @@ X.25 Support Library,
 .BR libsx25 (3).
 .\"
 .\"
+.SH ARGUMENTS
+.PP
+.TP
+.I x1
+A pointer to a
+.BR xaddrf (5)
+structure containing the first X.25 address for comparison.
+.TP
+.I x2
+A pointer to a
+.BR xaddrf (5)
+structure containing the second X.25 address for comparison.
+.\"
+.\"
 .SH DESCRIPTION
 .PP
 .BR equalx25 ()
 compares to X.25 addresses by checking to see whether the two
 .BR xaddrf (5)
 structures holding them are the same.
+.\"
+.\"
+.\".SH NOTICES
+.\".PP
 .\"
 .\"
 .SH RETURN VALUE
@@ -156,40 +174,194 @@ if the two structures are the same and false
 if they are not.
 .\"
 .\"
-.SH ERRORS
-.PP
-.\"
-.\"
-.SH NOTICES
-.PP
+.\".SH ERRORS
+.\".PP
 .\"
 .\"
 .SH FILES
 .PP
+.TP
+.RB < netx25/x25_proto.h >
+The
+.BR xaddrf (5)
+structure is defined in the
+.RB < netx25/x25_proto.h >
+header file.
+.TP
+.B @libdir@/libsx25.so
+The X.25 network services shared object library.
+.TP
+.B @libdir@/libsx25.a
+The X.25 network services static library.
 .\"
 .\"
 .SH BUGS
 .PP
+.BR equalx25 ()
+has no known bugs.
 .\"
 .\"
 .SH SEE ALSO
 .PP
+.BR xaddrf (5),
+.BR stox25 (3),
+.BR x25tos (3),
+.BR equalx25 (3),
+.BR libsx25 (3).
 .\"
 .\"
 .SH COMPATIBILITY
 .PP
+.B equalx25
+is compatible with
+.IR AIXlink/X.25 ,
+.[
+aixx25
+.]
+.IR "HP-UX X.25/9000" ,
+.[
+hpuxdoc
+.]
+.IR "IRIS SX.25" ,
+.[
+sx25
+.]
+.IR "PT X.25" ,
+.[
+ptx25
+.]
+.IR "RadiSys WAN" ,
+.[
+radwan
+.]
+.IR "SBE X.25" ,
+.[
+sbex25
+.]
+.IR "SunLink X.25" ,
+.IR "Solstice X.25" ,
+.[
+solx25dg
+.]
+and systems based on
+.IR "Spider X.25" ,
+with the following compatibility considerations:
+.IP \(em \w'\(em\(em'u
+.IR "Solaris Solstice" "\(rg " "X.25 9.2" ,
+.[
+solx25dg
+.]
+.IR "IRIX SX.25" ,
+.[
+sx25
+.]
+.IR "PT X.25" ,
+.[
+ptx25
+.]
+are consistent in their documentation of the
+.B xaddrf
+structure.
+.IR "Solaris Solstice" "\(rg " "X.25 9.2" ,
+.[
+solx25dg
+.]
+however, uses a somewhat different link id.
+.IP \(em
+On
+.IR UNIX \(rg
+systems, these utility subroutines are part of the X.25 library,
+.BR libsx25 .
+.IP \(em
+These subroutines are consistently described across implementations of X.25
+on
+.IR UNIX \(rg
+and can be used portably by applications programs.
+.IP \(em
+Some implementations place header files in different locations:
+.I Solstice X.25
+.[
+solx25pg
+.]
+includes the \fBxnetdb.h\fP header file from <\fBnetx25/xnetdb.h\fP>.
+.I IRIS SX.25
+.[
+sx25
+.]
+includes the \fBxnetdb.h\fP header file from <\fBxnetdb.h\fP>.
+.I Solstice X.25
+.[
+solx25pg
+.]
+includes the \fBx25_proto.h\fP header file from <\fBnetx25/x25_proto.h\fP>.
+.I IRIS SX.25
+.[
+sx25
+.]
+includes the \fBx25_proto.h\fP header file from <\fBsys/snet/x25_proto.h\fP>.
+For
+.I IRIS SX.25
+.[
+sx25
+.]
+it is necessary to include the \fBx25_proto.h\fP header file.
+For
+.I Solstice X.25
+.[
+solx25dg
+.]
+is is not necessary to include the \fBx25_proto.h\fP header file.
+.PP
+See
+.BR libsx25 (3)
+for additional compatibility information.
 .\"
 .\"
 .SH CONFORMANCE
 .PP
+.IR "AIXlink/X.25" ,
+.[
+aixx25
+.]
+.IR "HP-UX" ,
+.[
+hpuxdoc
+.]
+.IR "IRIS SX.25" ,
+.[
+sx25
+.]
+.IR "Solstice X.25" ,
+.[
+solx25dg
+.]
+.IR "PT X.25" ,
+.[
+ptx25
+.]
+.IR "SBE X.25" ,
+.[
+sbex25
+.]
+documentation.
 .\"
 .\"
 .SH HISTORY
 .PP
+The X.25 host subroutines first appeared in
+.IR "Spider X.25" .
+These subroutines are related to
+.IR UNIX \(rg
+.BR STREAMS (9)
+implementation of X.25 providers.
 .\"
 .\"
-.SH VERSION
+.SH VERSIONS
 .PP
+This manual page was written for the
+.B @PACKAGE_TITLE@
+package
+.RB ( "@PACKAGE@-@VERSION@" ).
 .\"
 .\"
 .[

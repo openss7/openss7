@@ -985,7 +985,7 @@ port STREAMS based driver packages to Linux.
 @end ignore
 
 @strong{WARNING:} This autoconf/RPM release of Linux STREAMS is distributed
-under the terms of the GNU Affer Public License (AGPL) and @emph{not} the GNU Lesser
+under the terms of the GNU Affero Public License (AGPL) and @emph{not} the GNU Lesser
 Public License (LGPL).
 
 This means that you @emph{cannot} link proprietary STREAMS drivers with LiS and

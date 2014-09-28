@@ -106,6 +106,7 @@ join-authors ", " ", " " and "
 et-al " et al" 2 3
 abbreviate-label-ranges ".."
 sort-adjacent-labels
+search-ignore T
 .R2
 .so strx25.macros
 .\"
@@ -166,8 +167,31 @@ at the upper service interface.
 .\"
 .SH USAGE
 .PP
-.\"
-.\"
+This is a pushable module that converts between the Link Layer Interface
+(LLI),
+.[
+lli revision 0.9.2
+.]
+.BR lli (7),
+and the Data Link Provider Interface (DLPI),
+.[
+dlpi revision 2.0.0
+.]
+.BR dlpi (7).
+It is typically pushed over a device or pseudo-device
+.I STREAMS
+driver that implements the
+.BR lli (7)
+interface at its upper service interface.  An example of such a driver is the
+.BR x25-lapb (4)
+device driver.
+.PP
+The
+.B S_DLPI
+module is not normally pushed by the user, but is configured using the
+.BR autopush (8)
+mechanism, or is pushed by a configuration deamon during the process of
+linking a protocol stack (such as the OSI DL).
 .\"
 .\"
 .SH NOTICES
@@ -181,9 +205,125 @@ dlpi revision 2.0.0
 .]
 .BR dlpi (7),
 should be used in its stead.
+This module provides the conversion necessary to accomplish that.
 .\"
 .\"
+.SH MODULES
+.PP
+.B S_DLPI
+is a
+.I STREAMS
+module named
+.RI \*(lq s_dlpi \*(rq.
 .\"
+.\"
+.SH BUGS
+.PP
+.B S_DLPI
+has no known bugs.
+.\"
+.\"
+.SH SEE ALSO
+.PP
+.BR lli (7),
+.BR dlpi (7),
+.BR X25 (4).
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+.B S_DLPI
+is compatible with
+.IR AIXlink/X.25 ,
+.[
+aixx25
+.]
+.IR "HP-UX X.25/9000" ,
+.[
+hpuxdoc
+.]
+.IR "IRIS SX.25" ,
+.[
+sx25
+.]
+.IR "PT X.25" ,
+.[
+ptx25
+.]
+.IR "RadiSys WAN" ,
+.[
+radwan
+.]
+.IR "SBE X.25" ,
+.[
+sbex25
+.]
+.IR "SunLink X.25" ,
+.IR "Solstice X.25" ,
+.[
+solx25dg
+.]
+and systems based on
+.IR "Spider X.25" ,
+with the following compatibility considerations:
+.IP \(em \w'\(em\(em'u
+Not all implementations specify or utilize this module.
+.IP \(em
+Some implementations bundle this module in with the OSI protocol suite rather
+than the X.25 protocol suite.
+.IP \(em
+For portability, this module should always be used instead of using the NLI
+interface directly.
+.PP
+See
+.BR X25 (4)
+for additional compatibility information.
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+.IR DLPI ,
+.[
+dlpi revision 2.0.0
+.]
+.IR LLI .
+.[
+lli revision 0.9.2
+.]
+.\"
+.\"
+.SH HISTORY
+.PP
+.BR S_DLPI
+first appeared in
+.IR "SpiderX25" .
+Its use, however, was only evident in the
+.IR AIXlink/X25
+.[
+aixx25
+.]
+product from IBM.
+.\"
+.\"
+.SH VERSIONS
+.PP
+This manual page was written for the
+.B @PACKAGE_TITLE@
+package
+.RB ( "@PACKAGE@-@VERSION@" ).
+.PP
+The upper service interface conforms to Revision 2.0.0 of the
+.IR "Data Link Provider Interface " ( DLPI ),
+.[
+dlpi revision 2.0.0
+.]
+.BR dlpi (7).
+The lower service interface conforms to Version 3 of the
+.IR "Link Layer Interface " ( LLI ),
+.[
+lli revision 0.9.2
+.]
+.BR lli (7).
 .\"
 .\"
 .\"

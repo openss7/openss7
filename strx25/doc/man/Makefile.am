@@ -56,7 +56,33 @@ MANMACRO_PFX			= @PACKAGE_TARNAME@
 if PKG_BUILD_INDEP
 ## PKG_BUILD_INDEP
 
-MANS_UNUSED =
+MANS_UNUSED = \
+	man3/libx25.3 \
+	man3/xti_x25.3 \
+	man4/cd-llc.4 \
+	man4/dl-llc.4 \
+	man4/ifr.4 \
+	man4/ipx25.4 \
+	man4/ixe.4 \
+	man4/lli.4 \
+	man4/mfe.4 \
+	man4/mlp.4 \
+	man4/npi.4 \
+	man4/s_cons.4 \
+	man4/s_lli.4 \
+	man4/s_nli3.4 \
+	man4/s_wan.4 \
+	man4/s_dlpi.4 \
+	man4/s_xx25.4 \
+	man4/wan.4 \
+	man4/X25.4 \
+	man4/x25-llc.4 \
+	man4/xos.4 \
+	man8/lltune.8 \
+	man8/mfeproto.8 \
+	man8/mfevc.8 \
+	man8/wanmap.8 \
+	man8/x25tune.8
 
 man_MANS = \
 	man3/libsx25.3 \
@@ -78,7 +104,6 @@ man_MANS = \
 	man3/setxhostent.3 \
 	man3/snidtox25.3 \
 	man3/stox25.3 \
-	man3/x25diags.3 \
 	man3/x25_find_link_parameters.3 \
 	man3/x25_read_config_parameters.3 \
 	man3/x25_read_config_parameters_file.3 \
@@ -242,7 +267,6 @@ dist_noinst_MANS = \
 	man3/setxhostent.3.man \
 	man3/snidtox25.3.man \
 	man3/stox25.3.man \
-	man3/x25diags.3.man \
 	man3/x25_find_link_parameters.3.man \
 	man3/x25_read_config_parameters.3.man \
 	man3/x25_read_config_parameters_file.3.man \

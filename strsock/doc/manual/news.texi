@@ -85,6 +85,13 @@ This package provides a Sockets library for use with STREAMS drivers and modules
 TPI and XTI/TLI interfaces.  This package contains all of the necessary manual pages and other
 documentation and is release as an OpenSS7-style @manref{autoconf(1)} tarball.
 
+@quotation
+@b{Note Well:} With this release, the @file{@value{PACKAGE}} subpackage will no longer be released
+as a separate subpackage, but is only contained in the OpenSS7 Master Package release.  With a
+subsequent release all subpackages of the OpenSS7 Master Package will be collapsed into a single
+release package.
+@end quotation
+
 This is a beta release and is part of the @cite{OpenSS7 Master Package}
 (@file{opesns7-@value{VERSION_OPENSS7}}).  Previous releases were pre-alpha and did not contain full
 functionality, primarily because Socket interface to STREAMS drivers was of lower importance.  This
@@ -93,6 +100,13 @@ release contains full functionality: please upgrade before reporting bugs.
 Major features since the last public release are:
 
 @itemize
+@item
+Documentation license upgraded to GFDL 1.3.
+
+@item
+Updated tool chain to @file{m4-1.4.13}, @file{automake-1.10.2}, @file{bison-2.4.1},
+@file{libtool-2.2.6a}, @file{texinfo-4.13a}.
+
 @item
 Previous release of this package had incomplete functionality.  The Sockets compatibilty library
 (@file{libsocket}) now has complete functionality for use with STREAMS drivers and modules
@@ -132,7 +146,7 @@ See @uref{http://www.openss7.org/codefiles/@value{PACKAGE}-@value{VERSION}/Chang
 more information.  Also, see the @file{@value{PACKAGE}.pdf} manual in the release (also in
 @uref{http://www.openss7.org/@value{PACKAGE}_manual.html,html}).
 
-For the news release, see @uref{http://www.openss7.org/rel20081029_C.html}.
+For the news release, see @uref{http://www.openss7.org/rel2009XXXX_C.html}.
 
 @c ----------------------------------------------------------------------------
 

@@ -119,17 +119,6 @@ sort-adjacent-labels
 \- convert a subnetwork or link character string to subnetwork or link identifier
 .\"
 .\"
-.SH INTERFACE
-.PP
-X.25 Network Layer Interface (NLI).
-.\"
-.\"
-.SH LIBRARY
-.PP
-X.25 Support Library,
-.BR libsx25 (3).
-.\"
-.\"
 .SH SYNOPSIS
 .PP
 .B #include <netx25/x25_proto.h>
@@ -139,6 +128,17 @@ X.25 Support Library,
 .BI "unsigned long snidtox25(unsigned char *" snid );
 .HP
 .BI "unsigned long linkidtox25(unsigned char *" linkid );
+.\"
+.\"
+.SH INTERFACE
+.PP
+X.25 Network Layer Interface (NLI).
+.\"
+.\"
+.SH LIBRARY
+.PP
+X.25 Support Library,
+.BR libsx25 (3).
 .\"
 .\"
 .SH ARGUMENTS
@@ -159,7 +159,11 @@ representing a subnetwork identifier, \fIsnid\fP, or link identifier,
 32-bits), without knowledge of the details of the conversion.
 .\"
 .\"
-.SH RETURN
+.\".SH NOTICES
+.\".PP
+.\"
+.\"
+.SH RETURN VALUE
 .PP
 Upon success
 .BR snidtox25 " and " linkidtox25
@@ -180,12 +184,14 @@ the supplied unsigned character string, \fIsnid\fP or \fIlinkid\fP was
 \fBNULL\fP or invalid.
 .\"
 .\"
-.\".SH NOTICES
-.\".PP
-.\"
-.\"
-.\".SH FILES
-.\".PP
+.SH FILES
+.PP
+.TP
+.B @libdir@/libsx25.so
+The X.25 network services shared object library.
+.TP
+.B @libdir@/libsx25.a
+The X.25 network services static library.
 .\"
 .\"
 .SH BUGS
@@ -205,15 +211,11 @@ have no known bugs.
 .PP
 .BR snidtox25 " and " linkidtox25
 are compatible with
-.IR "Spider X.25" ,
-and implementations based on
-.IR "Spider X.25" ,
-such as
-.IR "AIXlink/X.25" ,
+.IR AIXlink/X.25 ,
 .[
 aixx25
 .]
-.IR "HP-UX" ,
+.IR "HP-UX X.25/9000" ,
 .[
 hpuxdoc
 .]
@@ -221,18 +223,25 @@ hpuxdoc
 .[
 sx25
 .]
-.IR "Solstice X.25" ,
-.[
-solx25ag
-.]
 .IR "PT X.25" ,
 .[
 ptx25
+.]
+.IR "RadiSys WAN" ,
+.[
+radwan
 .]
 .IR "SBE X.25" ,
 .[
 sbex25
 .]
+.IR "SunLink X.25" ,
+.IR "Solstice X.25" ,
+.[
+solx25dg
+.]
+and systems based on
+.IR "Spider X.25" ,
 with the following compatibility considerations:
 .IP \(em \w'\(em\(em'u
 .I Solstice X.25
@@ -240,6 +249,40 @@ with the following compatibility considerations:
 solx25pg
 .]
 refers to the subnetwork identifier as a link identifier.
+.IP \(em
+Some implementations place header files in different locations:
+.I Solstice X.25
+.[
+solx25pg
+.]
+includes the \fBxnetdb.h\fP header file from <\fBnetx25/xnetdb.h\fP>.
+.I IRIS SX.25
+.[
+sx25
+.]
+includes the \fBxnetdb.h\fP header file from <\fBxnetdb.h\fP>.
+.I Solstice X.25
+.[
+solx25pg
+.]
+includes the \fBx25_proto.h\fP header file from <\fBnetx25/x25_proto.h\fP>.
+.I IRIS SX.25
+.[
+sx25
+.]
+includes the \fBx25_proto.h\fP header file from <\fBsys/snet/x25_proto.h\fP>.
+For
+.I IRIS SX.25
+.[
+sx25
+.]
+it is necessary to include the \fBx25_proto.h\fP header file.
+For
+.I Solstice X.25
+.[
+solx25dg
+.]
+is is not necessary to include the \fBx25_proto.h\fP header file.
 .PP
 For additional compatibiltiy information see,
 .BR libsx25 (3),
@@ -263,7 +306,7 @@ sx25
 .]
 .IR "Solstice X.25" ,
 .[
-solx25ag
+solx25dg
 .]
 .IR "PT X.25" ,
 .[
@@ -287,6 +330,14 @@ first appeared in
 .[
 solx25pg
 .]
+.\"
+.\"
+.SH VERSIONS
+.PP
+This manual page was written for the
+.B @PACKAGE_TITLE@
+package
+.RB ( "@PACKAGE@-@VERSION@" ).
 .\"
 .\"
 .[

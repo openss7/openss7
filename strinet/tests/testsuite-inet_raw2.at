@@ -1,41 +1,42 @@
 dnl vim: ft=config sw=4 noet nocin com+=b\:dnl fo+=or tw=78
-dnl ==========================================================================
+dnl =========================================================================
 dnl 
 dnl @(#) $RCSfile: testsuite-inet_raw2.at,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2008-04-28 22:52:18 $
 dnl
-dnl --------------------------------------------------------------------------
+dnl -------------------------------------------------------------------------
 dnl
+dnl Copyright (c) 2008-2009  Monavacon Limited <http://www.monavacon.com/>
 dnl Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
-dnl Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
+dnl Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 dnl
 dnl All Rights Reserved.
 dnl
 dnl Unauthorized distribution or duplication is prohibited.
 dnl
 dnl This software and related documentation is protected by copyright and
-dnl distributed under licenses restricting its use, copying, distribution
-dnl and decompilation.  No part of this software or related documentation
-dnl may be reproduced in any form by any means without the prior written
+dnl distributed under licenses restricting its use, copying, distribution and
+dnl decompilation.  No part of this software or related documentation may be
+dnl reproduced in any form by any means without the prior written
 dnl authorization of the copyright holder, and licensors, if any.
 dnl
 dnl The recipient of this document, by its retention and use, warrants that
-dnl the recipient will protect this information and keep it confidential,
-dnl and will not disclose the information contained in this document
-dnl without the written permission of its owner.
+dnl the recipient will protect this information and keep it confidential, and
+dnl will not disclose the information contained in this document without the
+dnl written permission of its owner.
 dnl
 dnl The author reserves the right to revise this software and documentation
 dnl for any reason, including but not limited to, conformity with standards
-dnl promulgated by various agencies, utilization of advances in the state
-dnl of the technical arts, or the reflection of changes in the design of any
-dnl techniques, or procedures embodied, described, or referred to herein.
-dnl The author is under no obligation to provide any feature listed herein.
+dnl promulgated by various agencies, utilization of advances in the state of
+dnl the technical arts, or the reflection of changes in the design of any
+dnl techniques, or procedures embodied, described, or referred to herein.  The
+dnl author is under no obligation to provide any feature listed herein.
 dnl
 dnl --------------------------------------------------------------------------
 dnl
 dnl As an exception to the above, this software may be distributed under the
-dnl GNU General Public License (GPL) Version 3, so long as the software is
-dnl distributed with, and only used for the testing of, OpenSS7 modules,
-dnl drivers, and libraries.
+dnl GNU Affero General Public License (AGPL) Version 3, so long as the
+dnl software is distributed with, and only used for the testing of, OpenSS7
+dnl modules, drivers, and libraries.
 dnl
 dnl --------------------------------------------------------------------------
 dnl
@@ -54,16 +55,16 @@ dnl Acquisition Regulations ("FAR") (or any successor regulations) or, in the
 dnl cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
 dnl (or any successor regulations).
 dnl
-dnl --------------------------------------------------------------------------
+dnl -------------------------------------------------------------------------
 dnl
-dnl Commercial licensing and support of this software is available from OpenSS7
-dnl Corporation at a fee.  See http://www.openss7.com/
+dnl Commercial licensing and support of this software is available from
+dnl OpenSS7 Corporation at a fee.  See http://www.openss7.com/
 dnl
-dnl --------------------------------------------------------------------------
+dnl -------------------------------------------------------------------------
 dnl
 dnl Last Modified $Date: 2008-04-28 22:52:18 $ by $Author: brian $
 dnl
-dnl ==========================================================================
+dnl =========================================================================
 
 m4_divert_push([DEFAULTS])
 function test_inet_raw2() {

@@ -79,6 +79,13 @@ This is the second separate @cite{OpenSS7 Project} release of the @cite{@value{P
 package.  The package contains modules and drivers formerly part of the @cite{strss7} and
 @cite{striso} packages and which have been moved to this subpackage.
 
+@quotation
+@b{Note Well:} With this release, the @file{@value{PACKAGE}} subpackage will no longer be released
+as a separate subpackage, but is only contained in the OpenSS7 Master Package release.  With a
+subsequent release all subpackages of the OpenSS7 Master Package will be collapsed into a single
+release package.
+@end quotation
+
 With @cite{OpenSS7 Master Package} release @file{openss7-0.9.2.D}, the X.25 and Frame Relay
 components were separated from the @file{strss7} package and placed into the @file{striso} package.
 With release @file{openss7-0.9.2.G}, the X.25 and Frame Relay components were separated from the
@@ -88,8 +95,10 @@ using validation test suites.  See
 @uref{http://www.openss7.org/codefiles/@value{PACKAGE}-@value{VERSION}/TODO,,@file{TODO}} in the
 release, or @refman{Schedule}, for more information about release schedule.
 
-This is a beta release and is part of the @cite{OpenSS7 Master Package}
-(@file{openss7-@value{VERSION_OPENSS7}}|).
+This is an alpha release and is part of the @cite{OpenSS7 Master Package}
+(@file{openss7-@value{VERSION_OPENSS7}}).  This is primarly a tracking release that updates tool
+chains and provides master package increments, but no significant development has been performed on
+this package since the last public release.
 
 Major features since the last public release are:
 
@@ -114,11 +123,11 @@ Includes all Frame Relay drivers and modules.  Drivers include the Frame Relay d
 @manref{mfe(4)},
 
 @item
-Full conformance validation test suites for each protocol components.
+Conformance validation test suites for each protocol component.
 
 @item
-Full management an SNMP agents for all of the protocol layers.  Integration of SNMP management with
-the OpenSS7 SNMP management tool.
+Management and SNMP agents for all of the protocol layers.  Integration of SNMP management with the
+OpenSS7 SNMP management tool.
 
 @end itemize
 

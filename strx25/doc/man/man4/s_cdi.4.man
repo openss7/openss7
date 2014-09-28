@@ -106,6 +106,7 @@ join-authors ", " ", " " and "
 et-al " et al" 2 3
 abbreviate-label-ranges ".."
 sort-adjacent-labels
+search-ignore T
 .R2
 .so strx25.macros
 .\"
@@ -338,6 +339,11 @@ module first appears in OpenSS7
 .\"
 .\"
 .SH VERSIONS
+.PP
+This manual page was written for the
+.B @PACKAGE_TITLE@
+package
+.RB ( "@PACKAGE@-@VERSION@" ).
 .PP
 This version of the
 .B S_CDI

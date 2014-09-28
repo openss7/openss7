@@ -93,6 +93,70 @@ sort-adjacent-labels
 .\"
 .SH SYNOPSIS
 .PP
+.HP
+\fBMP_status mp_abandon(OM_private_object \fIsession\fB, OM_sint32 \fIinvoke_id\fB);\fR
+.HP
+\fBMP_status mp_abort_req(OM_private_object \fIsession\fB, OM_private_object \fIcontext\fB, OM_object \fIargument\fB);\fR
+.HP
+\fBMP_status mp_action_req(OM_private_object \fIsession\fB, OM_private_object \fIcontext\fB, OM_object \fIargument\fB, OM_private_object *\fIresult_return\fB, OM_sint32 *\fIinvoke_id_return\fB);\fR
+.HP
+\fBMP_status mp_action_rsp(OM_private_object \fIsession\fB, OM_private_object \fIcontext\fB, OM_object \fIresponse\fB, OM_sint32 \fIinvoke_id\fB);\fR
+.HP
+\fBMP_status mp_assoc_req(OM_private_object \fIsession\fB, OM_private_object \fIcontext\fB, OM_object \fIargument\fB, OM_private_object *\fIresult_return\fB, OM_sint32 *\fIinvoke_id_return\fB);\fR
+.HP
+\fBMP_status mp_assoc_rsp(OM_private_object \fIsession\fB, OM_private_object \fIcontext\fB, OM_object \fIresponse\fB, OM_sint32 \fIinvoke_id\fB);\fR
+.HP
+\fBMP_status mp_bind(OM_object \fIsession\fB, OM_workspace \fIworkspace\fB, OM_private_object *\fIbound_session_return\fB);\fR
+.HP
+\fBMP_status mp_cancel_get_req(OM_private_object \fIsession\fB, OM_private_object \fIcontext\fB, OM_object \fIargument\fB, OM_sint32 *\fIinvoke_id_return\fB);\fR
+.HP
+\fBMP_status mp_cancel_get_rsp(OM_private_object \fIsession\fB, OM_private_object \fIcontext\fB, OM_object \fIresponse\fB, OM_sint32 \fIinvoke_id\fB);\fR
+.HP
+\fBMP_status mp_create_req(OM_private_object \fIsession\fB, OM_private_object \fIcontext\fB, OM_object \fIargument\fB, OM_private_object *\fIresult_return\fB, OM_sint32 *\fIinvoke_id_return\fB);\fR
+.HP
+\fBMP_status mp_create_rsp(OM_private_object \fIsession\fB, OM_private_object \fIcontext\fB, OM_object \fIresponse\fB, OM_sint32 \fIinvoke_id\fB);\fR
+.HP
+\fBMP_status mp_delete_req(OM_private_object \fIsession\fB, OM_private_object \fIcontext\fB, OM_object \fIargument\fB, OM_private_objt * \fIresult_return\fB, OM_sint32 *\fIinvoke_id_return\fB);\fR
+.HP
+\fBMP_status mp_delete_rsp(OM_private_object \fIsession\fB, OM_private_object \fIcontext\fB, OM_object \fIresponse\fB, OM_sint32 \fIinvoke_id\fB);\fR
+.HP
+\fBOM_sint mp_error_message(MP_status \fIerror\fB, OM_sint \fIlength\fB, unsigned char *\fIerror_text_return\fB);\fR
+.HP
+\fBMP_status mp_event_report_req(OM_private_object \fIsession\fB, OM_private_object \fIcontext\fB, OM_object \fIargument\fB, OM_private_object *\fIresult_return\fB, OM_sint32 *\fIinvoke_id_return\fB);\fR
+.HP
+\fBMP_status mp_event_report_rsp(OM_private_object \fIsession\fB, OM_private_object \fIcontext\fB, OM_object \fIresponse\fB, OM_sint32 \fIinvoke_id\fB);\fR
+.HP
+\fBMP_status mp_get_assoc_info(OM_private_object \fIreceive_result_or_argument\fB, OM_uint \fIrequest_mask\fB, OM_uint \fIresult_mask\fB, OM_public_object *\fIpres_layer_args\fB, OM_public_object *\fIacse_args\fB, OM_public_object *\fIcmip_assoc_args\fB, OM_public_object *\fIstandard_externals\fB);\fR
+.HP
+\fBMP_status mp_get_last_error(OM_workspace \fIworkspace\fB, OM_uint32 *\fIadditional_error_return\fB);\fR
+.HP
+\fBMP_status mp_get_next_req(OM_private_object \fIsession\fB, OM_private_object \fIcontext\fB, OM_object \fIargument\fB, OM_private_object *\fIresult_return\fB, OM_sint32 *\fIinvoke_id_return\fB);\fR
+.HP
+\fBMP_status mp_get_req(OM_private_object \fIsession\fB, OM_private_object \fIcontext\fB, OM_object \fIargument\fB, OM_private_object *\fIresult_return\fB, OM_sint32 *\fIinvoke_id_return\fB);\fR
+.HP
+\fBMP_status mp_get_rsp(OM_private_object \fIsession\fB, OM_private_object \fIcontext\fB, OM_object \fIresponse\fB, OM_sint32 \fIinvoke_id\fB);\fR
+.HP
+\fBOM_workspace mp_initialize(void);\fR
+.HP
+\fBMP_status mp_negotiate(MP_feature \fIfeature_list\fB[], OM_workspace \fIworkspace\fB);\fR
+.HP
+\fBMP_status mp_receive(OM_private_object \fIsession\fB, OM_private_object \fIcontext\fB, OM_sint *\fIprimitive_return\fB, OM_sint *\fIcompletion_flag_return\fB, MP_status *\fIoperation_notification_status_return\fB, OM_private_object *\fIresult_or_argument_return\fB, OM_sint32 *\fIinvoke_id_return\fB);\fR
+.HP
+\fBMP_status mp_release_req(OM_private_object \fIsession\fB, OM_private_object \fIcontext\fB, OM_object \fIargument\fB, OM_private_object *\fIresult_return\fB, OM_sint32 *\fIinvoke_id_return\fB);\fR
+.HP
+\fBMP_status mp_release_rsp(OM_private_object \fIsession\fB, OM_private_object \fIcontext\fB, OM_object \fIresponse\fB, OM_sint32 \fIinvoke_id\fB);\fR
+.HP
+\fBMP_status mp_set_req(OM_private_object \fIsession\fB, OM_private_object \fIcontext\fB, OM_object \fIargument\fB, OM_private_object *\fIresult_return\fB, OM_sint32 *\fIinvoke_id_return\fB);\fR
+.HP
+\fBMP_status mp_set_rsp(OM_private_object \fIsession\fB, OM_private_object \fIcontext\fB, OM_object \fIresponse\fB, OM_sint32 \fIinvoke_id\fB);\fR
+.HP
+\fBvoid mp_shutdown(OM_workspace \fIworkspace\fB);\fR
+.HP
+\fBMP_status mp_unbind(OM_private_object \fIsession\fB);\fR
+.HP
+\fBMP_status mp_validate_object(OM_workspace \fIworkspace\fB, OM_object \fItest_object\fB, OM_private_object *\fIbad_argument_return\fB);\fR
+.HP
+\fBMP_status mp_wait(MP_waiting_sessions \fIbound_session_list\fB[], OM_workspace \fIworkspace\fB, OM_uint32 \fItimeout\fB);\fR
 .\"
 .\"
 .SH FUNCTIONS

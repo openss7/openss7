@@ -4,8 +4,9 @@
 
  -----------------------------------------------------------------------------
 
+ Copyright (c) 2008-2009  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
- Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
+ Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
 
@@ -89,7 +90,7 @@ static char const ident[] =
 #include "sys/config.h"
 
 #define VF_DESCRIP	"UNIX/SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
-#define VF_COPYRIGHT	"Copyright (c) 1997-2008 OpenSS7 Corporation.  All Rights Reserved."
+#define VF_COPYRIGHT	"Copyright (c) 2008-2009  Monavacon Limited.  All Rights Reserved."
 #define VF_REVISION	"LfS $RCSfile: vf.c,v $ $Name:  $ ($Revision: 0.9.2.18 $) $Date: 2008-09-22 20:31:30 $"
 #define VF_DEVICE	"SVR 4.2 STREAMS Verification Driver (VF)"
 #define VF_CONTACT	"Brian Bidulock <bidulock@openss7.org>"

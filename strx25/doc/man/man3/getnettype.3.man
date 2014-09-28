@@ -242,7 +242,7 @@ sx25
 .]
 .IR "Solstice X.25" ,
 .[
-solx25ag
+solx25dg
 .]
 .IR "PT X.25" ,
 .[
@@ -290,7 +290,7 @@ it is necessary to include the \fBx25_proto.h\fP header file.
 For
 .I Solstice X.25
 .[
-solx25ag
+solx25dg
 .]
 is is not necessary to include the \fBx25_proto.h\fP header file.
 .PP
@@ -319,7 +319,7 @@ sx25
 .]
 .IR "Solstice X.25" ,
 .[
-solx25ag
+solx25dg
 .]
 .IR "PT X.25" ,
 .[

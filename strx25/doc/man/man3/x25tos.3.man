@@ -139,40 +139,182 @@ X.25 Support Library,
 .BR libsx25 (3).
 .\"
 .\"
+.SH ARGUMENTS
+.PP
+.TP
+.I xad
+A pointer to an
+.BR xaddrf (5)
+structure containing the X.25 dot format address.
+.TP
+.I  cp
+A pointer to a character string containing the X.25 address for conversion.
+.TP
+.I lookup
+Determines the level of address checking carried out before the address is
+converted.  Zero
+.RB ( 0 )
+specifies that no address checking should be carried out.  This allows for
+faster conversion, but means that the address may not be valid for the type
+of network upon which it is used.  A non-zero value specifies that the
+address format is checked with the cofniguration file for the link.
+.\"
+.\"
 .SH DESCRIPTION
 .PP
+This function converts an
+.BR xaddrf (5)
+structure in an X.25 address string.  Before doing so, it checks the validity
+of the
+.BR xaddrf (5)
+structure.
 .\"
 .\"
-.SH NOTICES
+.\".SH NOTICES
+.\".PP
+.\"
+.\"
+.SH RETURN VALUE
 .PP
+When successful,
+.BR x25tos ()
+returns zero
+.RB ( 0 ),
+.\"
+.\"
+.SH ERRORS
+.PP
+When unsuccessful,
+.BR x25tos ()
+returns a negative number indicating
 .\"
 .\"
 .SH FILES
 .PP
+.TP
+.RB < netx25/x25_proto.h >
+The
+.BR xaddrf (5)
+structure is defined in the
+.RB < netx25/x25_proto.h >
+header file.
+.TP
+.B @libdir@/libsx25.so
+The X.25 network services shared object library.
+.TP
+.B @libdir@/libsx25.a
+The X.25 network services static library.
 .\"
 .\"
 .SH BUGS
 .PP
+.BR x25tos
+has no known bugs.
 .\"
 .\"
 .SH SEE ALSO
 .PP
+.BR libsx25 (3),
+.BR xaddrf (5),
+.BR stox25 (3),
+.BR x25tos (3),
+.BR equalx25 (3).
 .\"
 .\"
 .SH COMPATIBILITY
 .PP
+.B x25tos
+is compatible with
+.IR AIXlink/X.25 ,
+.[
+aixx25
+.]
+.IR "HP-UX X.25/9000" ,
+.[
+hpuxdoc
+.]
+.IR "IRIS SX.25" ,
+.[
+sx25
+.]
+.IR "PT X.25" ,
+.[
+ptx25
+.]
+.IR "RadiSys WAN" ,
+.[
+radwan
+.]
+.IR "SBE X.25" ,
+.[
+sbex25
+.]
+.IR "SunLink X.25" ,
+.IR "Solstice X.25" ,
+.[
+solx25dg
+.]
+and systems based on
+.IR "Spider X.25" ,
+with the following compatibility considerations:
+.IP \(em \w'\(em\(em'u
+.IR "Solaris Solstice" "\(rg " "X.25 9.2" ,
+.[
+solx25dg
+.]
+.IR "IRIX SX.25" ,
+.[
+sx25
+.]
+.IR "PT X.25" ,
+.[
+ptx25
+.]
+are consistent in their documentation of the
+.B xaddrf
+structure.
+.IR "Solaris Solstice" "\(rg " "X.25 9.2" ,
+.[
+solx25dg
+.]
+however, uses a somewhat different link id.
+.IP \(em
+On
+.IR UNIX \(rg
+systems, these utility subroutines are part of the X.25 library,
+.BR libsx25 .
+.IP \(em
+These subroutines are consistently described across implementations of X.25
+on
+.IR UNIX \(rg
+and can be used portably by applications programs.
+.PP
+See
+.BR libsx25 (3)
+for additional compatibility information.
 .\"
 .\"
 .SH CONFORMANCE
 .PP
+.IR "Spider X.25" .
 .\"
 .\"
 .SH HISTORY
 .PP
+The X.25 host subroutines first appeared in
+.IR "Spider X.25" .
+These subroutines are related to
+.IR UNIX \(rg
+.BR STREAMS (9)
+implementation of X.25 providers.
 .\"
 .\"
-.SH VERSION
+.SH VERSIONS
 .PP
+This manual page was written for the
+.B @PACKAGE_TITLE@
+package
+.RB ( "@PACKAGE@-@VERSION@" ).
 .\"
 .\"
 .[

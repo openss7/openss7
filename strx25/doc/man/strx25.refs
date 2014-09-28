@@ -291,6 +291,7 @@
 %U http://www.gcom.com/
 
 %L NLI
+%K nlispec
 %A Brian Bidulock
 %Q OpenSS7 Corporation
 %R NLI
@@ -5081,6 +5082,17 @@ Part 1: Protocol Specification
 %C Mountainview, California
 %U http://techpubs.sgi.com/
 
+%L CCCSMAD
+%R PowerMAX OS STREAMS
+%K cccsmad
+%T STREAMS Modules and Drivers
+%G Part No: 0890426-020
+%D February 1998
+%Q Concurrent Computer Corporation
+%I CCC
+%C Ft. Lauderdale, Florida
+%U http:/www.concurrent.com/
+
 %L HPUXDDI
 %R STREAMS/UX
 %K hpuxddi
@@ -5130,6 +5142,38 @@ Part 1: Protocol Specification
 %G Part No: 5991-7498
 %D February 2007
 %Q Hewlett-Packard Development Company L.P.
+%I HP
+%C Palo Alto, California
+%U http://docs.hp.com/
+
+%L HPX25PG
+%R HP X.25/9000
+%K hpx25pg
+%T HP X.25/9000 Programmer's Guide
+%G Part No: 36960-90058
+%D April 1996
+%Q Hewlett-Packard Company
+%I HP
+%C Palo Alto, California
+%U http://docs.hp.com/
+
+%L HPX25PG5
+%R HP X.25/9000
+%K hpx25pg5
+%T HP X.25/9000 Programmer's Guide
+%G Part No: J2793-90048 E1100
+%D 2000
+%Q Hewlett-Packard Company
+%I HP
+%C Palo Alto, California
+%U http://docs.hp.com/
+
+%L HPX25AN
+%R HP X.25
+%K hpx25an
+%T Migrating X.25 over ACC to X.25 over PSI
+%D 2008
+%Q Hewlett-Packard Company
 %I HP
 %C Palo Alto, California
 %U http://docs.hp.com/

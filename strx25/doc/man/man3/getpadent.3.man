@@ -116,7 +116,7 @@ sort-adjacent-labels
 .TH GETPADENT 3 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ Library Calls"
 .SH NAME
 .B getpadent
-\-
+\- get next entry in the X.25 PAD Hosts Database
 .\"
 .\"
 .SH SYNOPSIS
@@ -139,40 +139,196 @@ X.25 Support Library,
 .BR libsx25 (3).
 .\"
 .\"
+.SH ARGUMENTS
+.PP
+None.
+.\"
+.\"
 .SH DESCRIPTION
 .PP
+.BR getpadent ()
+returns a pointer to a
+.BR padent (5)
+structure, which contains the next entry from the X.25 PAD Hosts Database.
+If necessary,
+.BR getpadent ()
+opens the database.
+When the database was previously opened using
+.BR setpadent (3)
+and not subsequently closed using
+.BR endpadent (3),
+it is not necessary for
+.BR getpadent ()
+to open the database.
+When
+.BR setpadent (3)
+is called, or when the database has not yet been opened, the database is
+rewound to the beginning of the file.
 .\"
-.\"
-.SH NOTICES
+.SS FILE FORMAT
 .PP
+The format of the
+.B @sysconfdir@/x25/padent
+X.25 PAD host database file is as described in
+.BR padent (5).
+.\"
+.\"
+.\".SH NOTICES
+.\".PP
+.\"
+.\"
+.SH RETURN VALUE
+.PP
+Returns a pointer to an
+.BR xhostent (5)
+structure.
+When successful,
+.BR getpadent ()
+returns a pointer to a
+.BR padent (5)
+structure, which contains the next entry from the X.25 PAD Hosts database.
+A return value of
+.B NULL
+indicates an error.
+.\"
+.\"
+.SH ERRORS
+.PP
+When unsuccessful,
+.BR getpadent ()
+returns a
+.B NULL
+pointer indicating that there are no further entries in the X.25 PAD Hosts
+Database.
 .\"
 .\"
 .SH FILES
 .PP
+.TP
+.RB < netx25/xnetdb.h >
+The
+.B padent
+structure is defined in the
+.RB < netx25/xnetdb.h >
+header file.
+.TP
+.B @sysconfdir@/x25/padmapconf
+Contains the PAD host database defined in
+.BR padent (5).
+.TP
+.B @libdir@/libsx25.so
+The X.25 network services shared object library.
+.TP
+.B @libdir@/libsx25.a
+The X.25 network services static library.
 .\"
 .\"
 .SH BUGS
 .PP
+.BR getpadent ()
+has no known bugs.
 .\"
 .\"
 .SH SEE ALSO
 .PP
+.BR libsx25 (3),
+.BR padent (5),
+.BR endpadent (3),
+.BR getpadbyaddr (3),
+.BR getpadent (3),
+.BR padtos (3),
+.BR setpadent (3).
 .\"
 .\"
 .SH COMPATIBILITY
 .PP
+.B getpadent
+is compatible with
+.IR AIXlink/X.25 ,
+.[
+aixx25
+.]
+.IR "HP-UX X.25/9000" ,
+.[
+hpuxdoc
+.]
+.IR "IRIS SX.25" ,
+.[
+sx25
+.]
+.IR "PT X.25" ,
+.[
+ptx25
+.]
+.IR "RadiSys WAN" ,
+.[
+radwan
+.]
+.IR "SBE X.25" ,
+.[
+sbex25
+.]
+.IR "SunLink X.25" ,
+.IR "Solstice X.25" ,
+.[
+solx25dg
+.]
+and systems based on
+.IR "Spider X.25" ,
+with the following compatibility considerations:
+.IP \(em \w'\(em\(em'u
+.IR "Solaris Solstice" "\(rg " "X.25 9.2" ,
+.[
+solx25dg
+.]
+.IR "IRIX SX.25" ,
+.[
+sx25
+.]
+.IR "PT X.25" ,
+.[
+ptx25
+.]
+are consistent in their documentation of the
+.B padent
+structure.
+.IP \(em
+On
+.IR UNIX \(rg
+systems, these utility subroutines are part of the X.25 library,
+.BR libsx25 .
+.IP \(em
+These subroutines are consistently described across implementations of X.25
+on
+.IR UNIX \(rg
+and can be used portably by applications programs.
+.PP
+See
+.BR libsx25 (3)
+for additional compatibility information.
 .\"
 .\"
 .SH CONFORMANCE
 .PP
+.IR "Spider X.25" .
 .\"
 .\"
 .SH HISTORY
 .PP
+The PAD host subroutines first appeared in
+.IR "Spider X.25" .
+These subroutines are related to
+.IR UNIX \(rg
+.BR STREAMS (9)
+implementation of X.25 PAD providers.
 .\"
 .\"
-.SH VERSION
+.SH VERSIONS
 .PP
+This manual page was written for the
+.B @PACKAGE_TITLE@
+package
+.RB ( "@PACKAGE@-@VERSION@" ).
 .\"
 .\"
 .[

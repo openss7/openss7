@@ -98,12 +98,19 @@ none
 This manpage is under construction.
 .\"
 .\"
+.SH MODULES
+.PP
+various
+.\"
+.\"
 .SH DEVICES
 .PP
+various
 .\"
 .\"
 .SH "SEE ALSO"
 .PP
+Related manual pages.
 .\"
 .\"
 .SH BUGS

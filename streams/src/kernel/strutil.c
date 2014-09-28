@@ -4,8 +4,9 @@
 
  -----------------------------------------------------------------------------
 
+ Copyright (c) 2008-2009  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
- Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
+ Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
 
@@ -2781,6 +2782,12 @@ EXPORT_SYMBOL(qattach);
  *  Don't do gets and puts on the Stream head when adding or removing queue pairs from the stream
  *  because the Stream head reference count falling to zero is used to deallocate the Stream head
  *  queue pair.
+ *
+ *  SYNCHRONIZATION: The %QPROCSON flag is reset.  Therefore, any put procedures pending on a
+ *  synchronization queue or with a streams_put() operation will ultimately free the message block.
+ *  These procedures hold a reference on the queue pair so the queue pair will not be freed until
+ *  the procedure runs.  We must release the references on the syncrhronization queues and drop the
+ *  pointers at this point.
  */
 streams_fastcall __unlikely void
 qdelete(queue_t *q)
@@ -2804,6 +2811,9 @@ qdelete(queue_t *q)
 	pwlock(sd, pl);
 	if ((sd2 = wq->q_next ? qstream(wq->q_next) : NULL) && sd2 > sd)
 		phwlock(sd2);
+
+	/* First, release synchronization queues. */
+	__setsq(q, NULL);
 
 	rq->q_next = NULL;
 	rq->q_nfsrv = NULL;

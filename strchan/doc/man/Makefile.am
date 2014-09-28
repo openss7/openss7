@@ -291,6 +291,7 @@ man_MANS = \
 	man7/MX_OPTMGMT_REQ.7 \
 	man7/MX_optmgmt_req.7 \
 	man7/MX_optmgmt_req_t.7 \
+	man8/chand.8 \
 	man8/test-chan.8 \
 	man8/strchan_mknod.8 \
 	man8/mxmib.8 \
@@ -553,6 +554,7 @@ dist_noinst_MANS = \
 	man7/MX_OPTMGMT_REQ.7.man \
 	man7/MX_optmgmt_req.7.man \
 	man7/MX_optmgmt_req_t.7.man \
+	man8/chand.8.man \
 	man8/test-chan.8.man \
 	man8/strchan_mknod.8.man \
 	man8/mxmib.8.man \
@@ -583,12 +585,18 @@ dist_noinst_MANS = \
 MANS_UNUSED = \
 	man4/ch.4 \
 	man4/ch_ioctl.4 \
+	man4/ch_mux.4 \
+	man4/matrix.4 \
 	man4/mg_ioctl.4 \
-	man4/mx_ioctl.4 \
-	man4/mx_sdl.4 \
 	man4/mxi_ioctl.4 \
+	man4/mx_ioctl.4 \
+	man4/mx_mux.4 \
+	man4/mx_sdl.4 \
 	man4/v401p.4 \
 	man5/strchan.5 \
+	man8/mxmib.8 \
+	man8/phymib.8 \
+	man8/x400pmib.8 \
 	man9/zaptel.9 \
 	man9/zt_alarm_notify.9 \
 	man9/zt_dtmf_tone.9 \

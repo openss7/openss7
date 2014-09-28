@@ -1,3 +1,9 @@
+2009-05-01  Brian Bidulock  <bidulock@openss7.org>
+
+	* doc/man/man4/mtp.4.man: pass check target for release
+	* doc/man/man4/tcap.4.man: pass check target for release
+	* doc/man/man4/tcap_ioctl.4.man: pass check target for release
+
 2009-04-19  Brian Bidulock  <bidulock@openss7.org>
 
 	* src/modules/mx/mx_mux.c

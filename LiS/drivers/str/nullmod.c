@@ -517,7 +517,6 @@ nullmod_init(void)
 #ifdef LIS
 	if ((err = lis_register_module_qlock_option(modid, LIS_QLOCK_NONE)) < 0) {
 		lis_unregister_strmod(&nullmod_info);
-		nullmod_unregister_ioctl32();
 		return (err);
 	}
 #endif
