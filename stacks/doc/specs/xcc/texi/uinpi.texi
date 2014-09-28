@@ -1,0 +1,64 @@
+@c @setfilename uinpi.info
+
+@node UNIX International NPI License
+@section UNIX International NPI License
+@cindex license, UI NPI
+@cindex license, UNIX International Inc.
+
+This license is from the Revision 2.0.0 Network Provider Interface (NPI)
+specification published by UNIX International Inc, August 17, 1992:
+
+@noindent
+Copyright @copyright{} 1992  UNIX International, Inc. @*
+All Rights Reserved.
+
+@noindent
+Permission is granted to make and distribute verbatim copies of this manual
+provided the copyright notice and this permission notice are preserved on all
+copies.
+
+@noindent
+Permission to use, copy, modify, and distribute this documentation for any
+purpose and without fee is hereby granted, provided that the above copyright
+notice appears in all copies and that both that copyright notice and this
+permission notice appear in supporting documentation, and that the name UNIX
+International not be used in advertising or publicity pertaining to distribution
+of the software without specific, written prior permission. UNIX International
+makes no representations about the suitability of this documentation for any
+purpose. It is provided ``as is'' without express or implied warranty.
+
+@noindent
+@b{UNIX INTERNATIONAL DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS
+DOCUMENTATION, INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS,
+IN NO EVENT SHALL UNIX INTERNATIONAL BE LIABLE FOR ANY SPECIAL, INDIRECT OR
+CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA
+OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS
+ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS
+DOCUMENTATION.}
+
+@subsubheading Notice:
+
+@noindent
+This document is based on the UNIX System Laboratories Network Provider
+Interface (NPI) specification which was used with permission by the UNIX
+International OSI Work Group (UI OSIWG).  Participation inthe UI OSIWG is open
+to UNIX International members and other interested parties.  For further
+information contact UNIX International at the addresses above.
+
+@noindent
+UNIX International is making this documentation available as a reference point
+for the industry.  While UNIX International believes that these interfaces are
+well defined in this release of the document, minor changes may be made prior to
+products conforming to the interfaces being made available from UNIX System
+Laboratories or UNIX International members.
+
+@subsubheading Trademarks:
+
+@noindent
+UNIX@registeredsymbol{} is a registered trademark of UNIX System Laboratories in the United
+States and other countries.
+
+@noindent
+X/Open(TM) is a trademark of the X/Open Company Ltd. in the UK and other
+countries.
+

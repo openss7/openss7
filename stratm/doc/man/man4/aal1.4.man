@@ -1,0 +1,281 @@
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff nocin nosi
+.\"
+.\" @(#) $Id$
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2008-2009  Monavacon Limited <http://www.monavacon.com/>
+.\" Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+.\" Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.  The author(s) will take no responsibility in it.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any successor
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date$ by $Author$
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Log$
+.\" =========================================================================
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database stratm.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.so stratm.macros
+.\"
+.\"
+.TH AAL1 4 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ Drivers and Modules"
+.\"
+.\"
+.SH NAME
+.B aal1
+\- ATM Adaption Layer 1 Module
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+.B #include <sys/stropts.h>
+.br
+.B #include <sys/atm.h>
+.br
+.B #include <sys/aal1.h>
+.br
+.B #include <sys/atm_ioctl.h>
+.HP
+.BI "int " aa_stream " = open(" aa_device ", " flags );
+.HP
+.BI "int " retval " = ioctl(" aa_device ", " \fRI_PUSH\fP ", " \fR\*(lqaal1\*(rq\fP );
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+.B AAL1
+is an implementation of the ATM Adaption Layer 1 (AAL1) procedures as
+specified in
+.BR "ITU-T I.363.1" ,
+.[
+i.363.1
+.]
+and a number of ATM Forum documents.
+.[
+af89
+.]
+.[
+af91
+.]
+.B AAL1
+is intended to be used with the channel,
+.BR ch (4),
+and multiplex,
+.BR mx (4),
+multiplexing drivers.
+.PP
+.B AAL1
+is implemented as a pushable
+.IR STREAMS (4)
+module.
+The
+.B AAL1
+module can be pushed over a stream conforming to the ATM Interface (AAL0) as
+described in
+.BR aal0 (7).
+The
+.B AAL1
+module provides ATM Adaption Layer 1 access to the octets string from the
+.BR atm (4)
+stream below it, by performing ATM functions on the raw octet stream.  The
+upper interface provided by the
+.B AAL1
+module is the Channel Interface (CHI) as described in
+.BR chi (7),
+and the Multiplex Interface (MXI) as described in
+.BR mxi (7).
+.PP
+.B AAL1
+streams can be linked under
+.BR mx (4)
+drivers using the
+.IR I_LINK " and " I_PLINK
+commands of
+.BR streamio (7),
+to provide a complete multiplex that can be linked under an
+.BR mg (4)
+driver using the
+.IR I_LINK " and " I_PLINK
+commands of
+.BR streamio (7),
+to provide multiplex services to the upper protocol.  This is normally
+performed, as required, by the ATM Configuration Daemon,
+.BR atmconfd (8).
+.PP
+.B AAL1
+is also implemented as an independent module so that it can be used with
+packetized transports such as Internet Protocol as specified in
+.BR "ITU-T Y.1452" ,
+.[
+y1452
+.]
+.BR "ITU-T Y.1453"
+.[
+y1453
+.]
+and
+.BR "ITU-T Y.1454" .
+.[
+y1454
+.]
+.\"
+.\"
+.SH IMPLEMENTATION
+.PP
+.B AAL1
+has been implemented as a pushable module to ease the development of channel
+and multiplex drivers for various cards and ATM transports.  All that is
+required is for the card to provide an ATM Adaption Layer 0 (AAL0),
+.BR atm (4),
+interface and push the
+.BR aal1 (4)
+module to provide a complete and compliant channel or multiplex link.
+.PP
+.B AAL1
+is implemented internally as an ATM SAR using host-based processing.  While
+this is fairly efficient, devices that are capable of performing this
+function in hardware should provide the
+channel interface,
+.BR chi (7),
+or multiplex interface,
+.BR mxi (7),
+directly.  An example of a device that does not include ATM SAR is the
+OpenSS7 OC-48 SONET/SDH card design.  An example of one that does, is the
+.BR pca200e (4)
+driver.
+.\"
+.\"
+.SH NOTICES
+.PP
+.B AAL1
+modules are not normally pushed or accessed directly by user-level programs.
+The
+.B AAL1
+module is used directly by some test and monitoring programs.
+.\"
+.\"
+.SH IOCTLS
+.PP
+The
+.B AAL1 module reponds to Local Management Interface (LMI)
+.BR lmi_ioctl (4),
+input-output controls as interpreted for Channel and Multiplex operation as
+described in
+.BR ch_ioctl (4)
+and
+.BR mx_ioctl (4).
+.\"
+.\"
+.SH FILES
+.PP
+.RB < sys/chi.h >,
+.RB < sys/chi_ioctl.h >,
+.RB < sys/mxi.h >,
+.RB < sys/mxi_ioctl.h >,
+.RB < sys/atm.h >,
+.RB < sys/atm_ioctl.h >.
+.\"
+.\"
+.SH MODULES
+.PP
+.RI streams- aal1 .o
+.\"
+.\"
+.SH SEE ALSO
+.PP
+.BR atm (4),
+.BR ch (4),
+.BR chi (7),
+.BR mx (4),
+.BR mxi (7).
+.XX
+.[
+chi revision 1.0.0
+.]
+.[
+mxi revision 1.0.0
+.]
+.\"
+.\"
+.SH VERSIONS
+.PP
+The
+.B AAL1
+module conforms to the ATM specifications,
+.BR "ITU-T I.363.1" .
+.[
+i.363.1
+.]
+The
+.B AAL1
+module appears in
+.B @PACKAGE@
+release
+@VERSION@.
+.\"
+.\"
+.[
+$LIST$
+.]
+.TI
+.\"
+.\"
+.\" vim: ft=nroff sw=4 noet nocin nosi com=b\:.\\\" fo+=tcqlorn tw=77
