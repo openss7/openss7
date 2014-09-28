@@ -117,17 +117,17 @@ sort-adjacent-labels
 .PP
 .ad l
 .nh
-.HP \w'\fB\)xxxx\fP\ 'u
-\fB\)xxxx\fP [\fIoptions\fP]
+.HP \w'\fB\)x25diags\fP\ 'u
+\fB\)x25diags\fP [\fIoptions\fP]
 .PD 0
 .HP
-\fB\)xxxx\fP
+\fB\)x25diags\fP
 {\fB-h\fP|\fB--help\fP}
 .HP
-\fB\)xxxx\fP
+\fB\)x25diags\fP
 {\fB-V\fP|\fB--version\fP}
 .HP
-\fB\)xxxx\fP
+\fB\)x25diags\fP
 {\fB-C\fP|\fB--copying\fP}
 .PD
 .ad b
@@ -136,6 +136,13 @@ sort-adjacent-labels
 .\"
 .SH DESCRIPTION
 .PP
+Converts a hexadecimal diagnostic into a short textual description as defined
+in the X.25 standard.  This utility can typically be used when a cause and
+diagnostic code are returned by the PAD program or when such a diagnostic is
+detected in
+.BR x25trace (8)
+output.  The parameter value must be given in hexadecimal without including
+the error code.
 .\"
 .\"
 .SH OPTIONS
@@ -186,16 +193,16 @@ Specify or increase the output verbosity.  Sets the output verbosity to
 .SH ARGUMENTS
 .PP
 The
-.I xxxx
+.I x25diags
 command takes no non-option arguments.
 .\"
 .\"
-.SH FILE FORMAT
-.PP
+.\".SH FILE FORMAT
+.\".PP
 .\"
 .\"
-.SH EXAMPLES
-.PP
+.\".SH EXAMPLES
+.\".PP
 .\"
 .\"
 .SH DIAGNOSTICS
@@ -215,35 +222,32 @@ and diagnostic messages to
 .IR stderr .
 .\"
 .\"
-.SH FILE FORMAT
-.PP
+.\".SH NOTICES
+.\".PP
 .\"
 .\"
-.SH NOTICES
-.PP
+.\".SH FILES
+.\".PP
 .\"
 .\"
-.SH FILES
-.PP
-.\"
-.\"
-.SH DEVICES
-.PP
+.\".SH DEVICES
+.\".PP
 .\"
 .\"
 .SH SEE ALSO
 .PP
+.BR X25 (4).
 .\"
 .\"
 .SH BUGS
 .PP
-.B xxxx
+.B x25diags
 has no known bugs.
 .\"
 .\"
 .SH COMPATIBILITY
 .PP
-.B xxxx
+.B x25diags
 is compatible with
 .IR "AIXlink/X.25" ,
 .[
@@ -281,7 +285,7 @@ Options \fB-q\fP, \fB-v\fP, \fB-h\fP, \fB-V\fP, \fB-C\fP, and all long
 options, are specific to this
 .B @PACKAGE_TITLE@
 implementation of
-.B xxxx
+.B x25diags
 and should not be used by portable command scripts.
 .IP \(em
 Options
@@ -289,7 +293,7 @@ Options
 and all long options, are specific to this
 .B @PACKAGE_TITLE@
 implementation of
-.BR xxxx
+.BR x25diags
 and will not be used by portable command scripts.
 .IP \(em
 No other implementation documents the \fB-q\fP, \fB-v\fP, \fB-h\fP, \fB-V\fP
@@ -335,7 +339,7 @@ documentation.
 .\"
 .SH HISTORY
 .PP
-.B xxxx
+.B x25diags
 first appeared in
 .IR "Spider X.25" .
 .\"

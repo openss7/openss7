@@ -2606,6 +2606,7 @@ stratm/ABOUT-NLS
 stratm/AUTHORS
 stratm/BUGS
 stratm/COPYING
+stratm/doc/manual/stratm.info
 stratm/INSTALL
 stratm/intl/*
 stratm/libltdl/*

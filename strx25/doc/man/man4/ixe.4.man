@@ -103,6 +103,7 @@ join-authors ", " ", " " and "
 et-al " et al" 2 3
 abbreviate-label-ranges ".."
 sort-adjacent-labels
+search-ignore T
 .R2
 .so strx25.macros
 .\"
@@ -199,6 +200,20 @@ inteface.
 .\"
 .SH NOTICES
 .PP
+The
+.B IXE
+.I STREAMS
+driver was created from publicly available documentation of the driver's
+operation, primarily under
+.IR IRIS \(rg.
+This driver may not function identical to that actually present in any given
+Spider X.25 or
+.IR IRIS \(rg
+release.  Because this driver is not normally accessed by user-level programs
+and is primarily only involved in lower level system configuration, this should
+not be an issue when porting application-level programs from these
+environments to \fBLinux\fP.  See \*(lq\fICOMPATIBILITY\fP,\*(rq below, for
+specific compatibility considerations.
 .\"
 .\"
 .SH IOCTLS
@@ -856,10 +871,19 @@ Contains the IP Version 4 address in network byte order.
 .\"
 .SH DEVICES
 .PP
+.TP
+.B /dev/streams/clone/ixe
+The \fBIXE\fP driver clone device.
+.TP
+.BI /dev/streams/ixe/ n
+The n'th \fBIXE\fP device protocol.
 .\"
 .\"
 .SH SEE ALSO
 .PP
+.BR ixemap (8),
+.BR X25 (4),
+.BR STREAMS (9).
 .\"
 .\"
 .SH COMPATIBILITY
@@ -942,17 +966,25 @@ for additional compatibility information.
 .\"
 .SH CONFORMANCE
 .PP
-None.
+DLPI.
+.[
+dlpi revision 2.0.0
+.]
 .\"
 .\"
 .SH HISTORY
 .PP
 The
-.BR
+.B IXE
+driver first appeared in Spider X.25. 
 .\"
 .\"
 .SH VERSIONS
 .PP
+This manual page was written for the
+.B @PACKAGE_TITLE@
+package
+.RB ( "@PACKAGE@-@VERSION@" ).
 .\"
 .\"
 .XX

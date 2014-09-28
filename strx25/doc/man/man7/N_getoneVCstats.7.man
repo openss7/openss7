@@ -125,10 +125,12 @@ struct yyy {
 .\"
 .SH MEMBERS
 .PP
+Unknown.
 .\"
 .\"
 .SH DESCRIPTION
 .PP
+Get VC statistics for one VC.
 .\"
 .\"
 .\".SH USAGE

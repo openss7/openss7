@@ -125,10 +125,12 @@ struct yyy {
 .\"
 .SH MEMBERS
 .PP
+Unknown.
 .\"
 .\"
 .SH DESCRIPTION
 .PP
+Get next X.25 route.
 .\"
 .\"
 .\".SH USAGE

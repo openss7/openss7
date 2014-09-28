@@ -106,11 +106,14 @@ join-authors ", " ", " " and "
 et-al " et al" 2 3
 abbreviate-label-ranges ".."
 sort-adjacent-labels
+search-ignore T
 .R2
 .so strx25.macros
 .\"
 .\"
 .TH NPI 4 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ Devices"
+.\"
+.\"
 .SH NAME
 .B s_npi, npi
 \- Network Provider Interface (NPI) Conversion Module
@@ -118,8 +121,10 @@ sort-adjacent-labels
 .\"
 .SH SYNOPSIS
 .PP
-.B #include <sys/stream.h>
-.HP
+.B #include <unistd.h>
+.br
+.B #include <stropts.h>
+.HP 12
 .BI "int " x25_stream " = open(" x25_device ", " flags );
 .HP
 .BI "int " retval " = ioctl(" x25_stream ", " \fRI_PUSH\fP ", \*(lq" \fBs_npi\fP \*(rq);
@@ -127,7 +132,7 @@ sort-adjacent-labels
 .\"
 .SH DESCRIPTION
 .PP
-.BR "@PACKAGE_TITLE@"
+.BR "@PACKAGE_TITLE@" ,
 and most OpenSS7 packages, utilize the Network Provider Interface (NPI),
 .[
 npi revision 2.0.0
@@ -159,102 +164,196 @@ at the upper service interface.
 .\"
 .SH USAGE
 .PP
+This is a pushable module that converts between the Network Layer
+Interface (NLI),
+.[
+nlispec
+.]
+.BR nli (7),
+and the Network Provider Interface (NPI),
+.[
+npi revision 2.0.0
+.]
+.BR npi (7).
+It is typically pushed over a device or pseudo-device
+.I STREAMS
+driver that implements the
+.BR nli (7)
+interface at its upper service interface.  An example of such a driver is the
+.BR x25-plp (4)
+device driver.
+.PP
+The
+.B S_NPI
+module is not normally pushed by the user, but is configured using the
+.BR autopush (8)
+mechanism, or is pushed by a configuration deamon during the process of
+linking a protocol stack (such as the OSI CONS).
 .\"
 .\"
 .SH NOTICES
 .PP
 The Spider Network Layer Interface (NLI) is a proprietary interface without
 a \fIformal\fP standard (although its widespread use makes it an \fIipso
-facto\fP standard).  The Netwnr Provider Interface (NPI),
+facto\fP standard).  The Network Provider Interface (NPI),
 .[
 npi revision 2.0.0
 .]
 .BR npi (7),
 should be used in its stead.
+This module provides the conversion necessary to accomplish that.
 .\"
 .\"
-.SH DEVICES
+.SH MODULES
 .PP
+.B S_NPI
+is a
+.I STREAMS
+module named
+.RI \*(lq s_npi \*(rq.
+.\"
+.\"
+.SH BUGS
+.PP
+.B S_NPI
+has no known bugs.
 .\"
 .\"
 .SH SEE ALSO
 .PP
+.BR nli (7),
+.BR npi (7),
+.BR X25 (4).
 .\"
 .\"
 .SH COMPATIBILITY
 .PP
+.B S_NPI
+is compatible with
+.IR AIXlink/X.25 \(rg,
+.[
+aixx25
+.]
+.IR "HP-UX X.25/9000" \(rg,
+.[
+hpuxdoc
+.]
+.IR "IRIS SX.25" \(rg,
+.[
+sx25
+.]
+.IR "PT X.25" ,
+.[
+ptx25
+.]
+.IR "RadiSys WAN" ,
+.[
+radwan
+.]
+.IR "SBE X.25" ,
+.[
+sbex25
+.]
+.IR "SunLink X.25" \(rg,
+.[
+solx25dg
+.]
+.IR "Solstice X.25" \(rg,
+.[
+solx25pg
+.]
+and systems based on
+.IR "Spider X.25" ,
+with the following compatibility considerations:
+.IP \(em \w'\(em\(em'u
+Not all implementations specify or utilize this module.
+.IP \(em
+Some implementations bundle this module in with the OSI protocol suite rather
+than the X.25 protocol suite.
+.IP \(em
+For portability, this module should always be used instead of using the NLI
+interface directly.
+.PP
+See
+.BR X25 (4)
+for additional compatibility information.
 .\"
 .\"
 .SH CONFORMANCE
 .PP
+.BR "NPI Revision 2.0.0" ,
+.[
+npi revision 2.0.0
+.]
+.BR "NLI Version 3" ,
+.[
+nli revision 0.9.2
+.]
+.IR AIXlink/X.25 \(rg,
+.[
+aixlink
+.]
+.IR HP-UX \(rg,
+.[
+hpuxdoc
+.]
+.IR "IRIS SX.25" \(rg,
+.[
+sx25
+.]
+.IR "Solstice X.25" \(rg,
+.[
+solx25pg
+.]
+.IR "PT WAN" ,
+.[
+ptx25
+.]
+.IR "SBE X.25" ,
+.[
+sbex25
+.]
+.IR "RadiSys WAN" ,
+.[
+radwan
+.]
+documentation.
 .\"
 .\"
 .SH HISTORY
 .PP
+.BR S_NPI
+first appeared in
+.IR "SpiderX25" .
+Its use, however, was only evident in the
+.IR AIXlink/X25
+.[
+aixx25
+.]
+product from IBM.
 .\"
 .\"
 .SH VERSIONS
 .PP
-.\"
-.\"
-.XX
+This manual page was written for the
+.B @PACKAGE_TITLE@
+package
+.RB ( "@PACKAGE@-@VERSION@" ).
+.PP
+The upper service interface conforms to Revision 2.0.0 of the
+.IR "Network Provider Interface " ( NPI ),
 .[
 npi revision 2.0.0
 .]
+.BR npi (7).
+The lower service interface conforms to Version 3 of the
+.IR "Network Layer Interface " ( NLI ),
 .[
-aixx25
+nlispec
 .]
-.[
-sx25
-.]
-.[
-solx25pg
-.]
-.[
-ptx25
-.]
-.[
-x25
-.]
-.[
-x223
-.]
-.[
-x622
-.]
-.[
-iso7776
-.]
-.[
-iso8208
-.]
-.[
-iso8881
-.]
-.[
-iso10177
-.]
-.[
-rfc1086
-.]
-.[
-rfc1356
-.]
-.[
-rfc1381
-.]
-.[
-rfc1382
-.]
-.[
-rfc1461
-.]
-.[
-rfc1598
-.]
-.[
-rfc1613
-.]
+.BR nli (7).
+.\"
+.\"
 .\"
 .\"
 .[

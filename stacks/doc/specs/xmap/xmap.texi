@@ -569,10 +569,10 @@ A brief introduction to Mobile Application Services is given in @ref{Introductor
 Following this is an overview of OSI-Abstract-DATA Manipulation OM, which provides the Data
 Abstraction service as defined in the XOM specification (reference @b{XOM}).  Then the optional features of
 this specification are described, and the chapter closes with a list of abbreviations.  In all cases
-the reader should refere to the Standards (reference @b{TCAP}, reference @b{GSM MAP}), or to the XOM Specification
+the reader should refer to the Standards (reference @b{TCAP}, reference @b{GSM MAP}), or to the XOM Specification
 (reference @b{XOM}) for further authoritative details.
 
-The structure of the remaining chapters and appendices is described in the @ref{Preface}.
+The structure of the remaining chapters and appendices are described in the @ref{Preface}.
 
 @node Format of the Specification
 @section Format of the Specification
@@ -594,7 +594,7 @@ while the C language binding conventions are described in @ref{C Language Bindin
 @subsection Relationship to MAP Protocols
 
 The interaction between mobile application programs acting in a mobile application entity role are
-realized throught the exchange of mobile application service information.  The general
+realized through the exchange of mobile application service information.  The general
 communications service for the mobile applications is the @dfn{Mobile Application Part}.  MAP
 defines the following operations:
 
@@ -632,7 +632,7 @@ as @dfn{confirmations} by the consumer.
 @node Relationship to GSM and ANSI MAP
 @section Relationship to GSM and ANSI MAP
 
-The API is essentially based on the abstract services fo the GSM MAP and ANSI MAP, but is
+The API is essentially based on the abstract services of the GSM MAP and ANSI MAP, but is
 independent of the underlying communications stack.  The API allows the manipulation of ITU-T and
 ANSI mobile application service information.  Thus this API does not preclude and does not force the
 use of either the GSM MAP protocol or the ANSI MAP protocol.
@@ -699,7 +699,7 @@ but within the same @dfn{Package-Closure}.
 
 @item Workspace
 A @dfn{workspace} is allocated storage that contains one or more @dfn{Package-Closures}, together
-with an implementatin of the Mobile Application data abstraction services, that supports all the OM
+with an implementation of the Mobile Application data abstraction services, that supports all the OM
 classes of OM objects in the @dfn{Package-Closures}.
 
 @item Descriptor

@@ -116,7 +116,7 @@ sort-adjacent-labels
 .TH PADTOS 3 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ Library Calls"
 .SH NAME
 .B padtos
-\-
+\- convert X.25 PAD Host Database entry to a string
 .\"
 .\"
 .SH SYNOPSIS
@@ -139,40 +139,243 @@ X.25 Support Library,
 .BR libsx25 (3).
 .\"
 .\"
+.SH ARGUMENTS
+.PP
+.TP
+.I p
+A pointer to the
+.BR padent (5)
+structure for conversion.
+.TP
+.I strp
+A pointer to the character string that will hold the result.
+.\"
+.\"
 .SH DESCRIPTION
 .PP
+Converts an X.25 PAD Host Database entry,
+.BR padent (5),
+into a string containing all the facilieis, CUGs, RPOAs and call user data
+defined in the X.25 PAD Host Database entry structure.  The validity of the
+structure is checked before conversion.
 .\"
-.\"
-.SH NOTICES
+.SS FILE FORMAT
 .PP
+The format of the
+.B @sysconfdir@/x25/padent
+X.25 PAD host database file is as described in
+.BR padent (5).
+.\"
+.SS STRING FORMAT
+.PP
+The character string pointed to by
+.I strp
+will contain the following format:
+.RS
+.PP
+.BI ~ "CUD facilities year CUG RPOA"
+.RE
+.PP
+This format is defined as follows:
+.TP
+.I CUD
+Call user data.  This is always preceded by a tilde (~).
+.TP
+.I facilities
+Holds the values for packet size, window size, fast select and reverse
+charging.
+.TP
+.I year
+Possible values are
+.BR 80 ,
+.BR 84 " and " 88 .
+These correspond to the X.29(80) Yellow Book, X.29(84) Red Book and X.29(88)
+Blue Book.
+.TP
+.I CUG
+Specifies the call user groups that apply to this call.  Preceded by
+.BR g ", " G ", " b " or " B.
+.BR b " and " B
+signify bilateral CUGs.
+.TP
+.I RPOA
+Signifies any Recognized Private Operating Agency.  Always preceded by
+.BR T " or " t .
+.\"
+.SS EXAMPLE
+.PP
+For example, this string:
+.RS
+.PP
+.B ~hello p7/9w4/2fr 80 B1234 T5678
+.RE
+.sp
+has the following meaning:
+.PP
+The CUD is
+.BR hello .
+There is a local-to-remote packet size of
+.BR 7 ,
+a remote-to-local packet size of
+.BR 9 ,
+a local-to-remote window size of
+.BR 4 ,
+a remote-to-local window size of
+.BR 2 .
+Fast select and reverse charging are set.  The X.29(80) Yellow Book
+recommendation is being used.  The bilateral CUG is
+.BR 1234 ,
+and the RPOA is
+.BR 5678 .
+.\"
+.\"
+.\".SH NOTICES
+.\".PP
+.\"
+.\"
+.SH RETURN VALUE
+.PP
+When successful,
+.BR padtos ()
+returns zero
+.RB ( 0 ).
+.\"
+.\"
+.SH ERRORS
+.PP
+When unsuccessful,
+.BR padtos ()
+returns a negative number indicating that the X.25 PAD Host Database
+structure was invalid.
 .\"
 .\"
 .SH FILES
 .PP
+.TP
+.RB < netx25/xnetdb.h >
+The
+.BR padent (5)
+structure is defined in the
+.RB < netx25/xnetdb.h >
+header file.
+.TP
+.B @sysconfdir@/x25/padmapconf
+Contains the PAD host database defined in
+.BR padent (5).
+.TP
+.B @libdir@/libsx25.so
+The X.25 network services shared object library.
+.TP
+.B @libdir@/libsx25.a
+The X.25 network services static library.
 .\"
 .\"
 .SH BUGS
 .PP
+.BR padtos ()
+has no known bugs.
 .\"
 .\"
 .SH SEE ALSO
 .PP
+.BR libsx25 (3),
+.BR padent (5),
+.BR endpadent (3),
+.BR getpadbyaddr (3),
+.BR getpadent (3),
+.BR padtos (3),
+.BR setpadent (3).
 .\"
 .\"
 .SH COMPATIBILITY
 .PP
+.B padtos
+is compatible with
+.IR AIXlink/X.25 ,
+.[
+aixx25
+.]
+.IR "HP-UX X.25/9000" ,
+.[
+hpuxdoc
+.]
+.IR "IRIS SX.25" ,
+.[
+sx25
+.]
+.IR "PT X.25" ,
+.[
+ptx25
+.]
+.IR "RadiSys WAN" ,
+.[
+radwan
+.]
+.IR "SBE X.25" ,
+.[
+sbex25
+.]
+.IR "SunLink X.25" ,
+.IR "Solstice X.25" ,
+.[
+solx25dg
+.]
+and systems based on
+.IR "Spider X.25" ,
+with the following compatibility considerations:
+.IP \(em \w'\(em\(em'u
+.IR "Solaris Solstice" "\(rg " "X.25 9.2" ,
+.[
+solx25dg
+.]
+.IR "IRIX SX.25" ,
+.[
+sx25
+.]
+.IR "PT X.25" ,
+.[
+ptx25
+.]
+are consistent in their documentation of the
+.B padent
+structure.
+.IP \(em
+On
+.IR UNIX \(rg
+systems, these utility subroutines are part of the X.25 library,
+.BR libsx25 .
+.IP \(em
+These subroutines are consistently described across implementations of X.25
+on
+.IR UNIX \(rg
+and can be used portably by applications programs.
+.PP
+See
+.BR libsx25 (3)
+for additional compatibility information.
 .\"
 .\"
 .SH CONFORMANCE
 .PP
+.IR "Spider X.25" .
 .\"
 .\"
 .SH HISTORY
 .PP
+The PAD host subroutines first appeared in
+.IR "Spider X.25" .
+These subroutines are related to
+.IR UNIX \(rg
+.BR STREAMS (9)
+implementation of X.25 PAD providers.
 .\"
 .\"
-.SH VERSION
+.SH VERSIONS
 .PP
+This manual page was written for the
+.B @PACKAGE_TITLE@
+package
+.RB ( "@PACKAGE@-@VERSION@" ).
 .\"
 .\"
 .[

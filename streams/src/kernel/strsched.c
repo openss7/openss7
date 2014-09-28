@@ -4,8 +4,9 @@
 
  -----------------------------------------------------------------------------
 
+ Copyright (c) 2008-2009  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
- Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
+ Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
 
@@ -3253,10 +3254,10 @@ enter_inner_syncq_asputp(struct syncq_cookie *sc)
 }
 
 STATIC streams_fastcall __unlikely int
-enter_syncq_writer(struct syncq_cookie *sc, void streamscall (*func) (queue_t *, mblk_t *),
-		   int perim)
+enter_syncq_writer(struct syncq_cookie *sc, void streamscall (*func) (queue_t *, mblk_t *), int perim)
 {
 	struct mbinfo *m = (typeof(m)) sc->sc_mp;
+	int synced = 1;
 
 	m->m_func = (void *) &strwrit;
 	m->m_queue = qget(sc->sc_q);
@@ -3265,35 +3266,51 @@ enter_syncq_writer(struct syncq_cookie *sc, void streamscall (*func) (queue_t *,
 	dassert(perim == PERIM_OUTER || perim == PERIM_INNER);
 
 	if (perim & PERIM_OUTER)
-		return enter_outer_syncq_exclus(sc);
-	if (perim & PERIM_INNER)
-		return enter_inner_syncq_exclus(sc);
-	return (1);
+		synced = enter_outer_syncq_exclus(sc);
+	else if (perim & PERIM_INNER)
+		synced = enter_inner_syncq_exclus(sc);
+	if (likely(synced)) {
+		m->m_func = NULL;
+		qput(&m->m_queue);
+		m->m_private = NULL;
+	}
+	return (synced);
 }
 
 STATIC streams_fastcall int
-enter_inner_syncq_func(struct syncq_cookie *sc, void streamscall (*func) (void *, mblk_t *),
-		       void *arg)
+enter_inner_syncq_func(struct syncq_cookie *sc, void streamscall (*func) (void *, mblk_t *), void *arg)
 {
 	struct mbinfo *m = (typeof(m)) sc->sc_mp;
+	int synced;
 
 	m->m_func = (void *) func;
 	m->m_queue = qget(sc->sc_q);
 	m->m_private = arg;
 
-	return enter_inner_syncq_asputp(sc);
+	if (likely((synced = enter_inner_syncq_asputp(sc)))) {
+		m->m_func = NULL;
+		qput(&m->m_queue);
+		m->m_private = NULL;
+	}
+	return (synced);
 }
 
 STATIC streams_fastcall __hot int
 enter_inner_syncq_putp(struct syncq_cookie *sc)
 {
 	struct mbinfo *m = (typeof(m)) sc->sc_mp;
+	int synced;
 
 	m->m_func = (void *) &putp;
 	m->m_queue = qget(sc->sc_q);
 	m->m_private = NULL;
 
-	return enter_inner_syncq_asputp(sc);
+	if (likely((synced = enter_inner_syncq_asputp(sc)))) {
+		m->m_func = NULL;
+		qput(&m->m_queue);
+		m->m_private = NULL;
+	}
+	return (synced);
 }
 
 STATIC streams_fastcall __hot_in int

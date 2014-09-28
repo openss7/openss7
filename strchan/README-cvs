@@ -1,4 +1,4 @@
-OpenSS7 STREAMS Channels -- read me CVS file.  2009-04-04
+OpenSS7 STREAMS Channels -- read me CVS file.  2009-05-03
 $Id: README-cvs,v 0.9.2.49 2009-04-19 00:28:29 brian Exp $
 Copyright (c) 2008-2009  Monavacon Limited. <http://www.monavacon.com/>
 Copyright (c) 2001-2008  OpenSS7 Corporation. <http://www.openss7.com/>
@@ -40,21 +40,21 @@ requires tools not normally distributed with the other releases.
 
 The build host requires the following GNU tools:
 
-   * `m4 1.4.12'
+   * `m4 1.4.13'
 
    * `autoconf 2.63'
 
-   * `automake 1.10.1'
+   * `automake 1.10.2'
 
-   * `libtool 2.2.4'
+   * `libtool 2.2.6a'
 
    * `gettext 0.17'
 
    * `flex 2.5.33'
 
-   * `bison 2.3'
+   * `bison 2.4.1'
 
-Most desktop development GNU/Linux distributions wil have these tools;
+Most desktop development GNU/Linux distributions will have these tools;
 however, some non-development or server-style installations might not
 and they must be installed separately.(1)
 
@@ -62,25 +62,25 @@ Also, these tools can be acquired from the FSF website
 (http://www.fsf.org/) in the free software directory, and also at the
 following locations:
 
-   * m4-1.4.12 (http://www.openss7.org/tarballs/m4-1.4.12.tar.bz2)
+   * m4-1.4.13 (http://www.openss7.org/tarballs/m4-1.4.13.tar.bz2)
 
    * autoconf-2.63
      (http://www.openss7.org/tarballs/autoconf-2.63.tar.bz2)
 
-   * automake-1.10.1
-     (http://www.openss7.org/tarballs/automake-1.10.1.tar.bz2)
+   * automake-1.10.2
+     (http://www.openss7.org/tarballs/automake-1.10.2.tar.bz2)
 
-   * libtool-2.2.4
-     (http://www.openss7.org/tarballs/libtool-2.2.4.tar.gz)
+   * libtool-2.2.6a
+     (http://www.openss7.org/tarballs/libtool-2.2.6a.tar.gz)
 
    * gettext-0.17 (http://www.openss7.org/tarballs/gettext-0.17.tar.gz)
 
    * flex-2.5.33 (http://www.openss7.org/tarballs/flex-2.5.33.tar.bz2)
 
-   * bison-2.3 (http://www.openss7.org/tarballs/bison-2.3.tar.bz2)
+   * bison-2.4.1 (http://www.openss7.org/tarballs/bison-2.4.1.tar.bz2)
 
 It should be stressed that, in particular, the `autoconf(1)', and
-`automake(1)', must be at version releases `2.63' and `1.10.1'.  _The
+`automake(1)', must be at version releases `2.63' and `1.10.2'.  _The
 versions normally distributed in some mainstream GNU/Linux
 distributions are, in fact, much older than these versions._(2)  GNU
 version of these packages configured and installed to default
@@ -182,7 +182,7 @@ under the `/usr/src' directory.
 ---------- Footnotes ----------
 
 (1) Older version of bison (2.0) and the older version of flex (2.5.4a)
-are also suitable.  Where possible, use the more recent bison 2.3 and
+are also suitable.  Where possible, use the more recent bison 2.4.1 and
 flex 2.5.33.
 
 (2) A notable exception is Debian and Fedora 7.  Note that on Fedora 7

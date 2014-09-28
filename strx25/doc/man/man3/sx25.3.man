@@ -220,7 +220,7 @@ lfs
 .B libsx25
 implements the following X.25 API library functions:
 .\"
-.SS Pad Database Functions
+.SS X.25 PAD Database Functions
 .PP
 .TP \w'\fBgetpadbyaddr\fR(3)\(em'u
 .BR setpadent (3)
@@ -230,8 +230,12 @@ file and rewinds to the start of the file.
 .PD 0
 .TP
 .BR getnettype (3)
+get X.25 network type for a subnetwork identifier.
 .TP
 .BR getpadbyaddr (3)
+get the
+.BR padent (5)
+entry corresponding to an address.
 .TP
 .BR getpadent (3)
 gets the next entry in the
@@ -244,21 +248,39 @@ closes the
 file.
 .TP
 .BR padtos (3)
+convert
+.BR padent (5)
+entry to a string.
 .PD
 .\"
 .SS X.25 Host Database Functions
 .PP
 .TP \w'\fBgetxhostbyname\fR(3)\(em'u
 .BR setxhostent (3)
+opens or reopens the
+.BR xhostent (5)
+file and rewinds to the start of the file.
 .PD 0
 .TP
 .BR getxhostbyaddr (3)
+get the
+.BR xhostent (5)
+entry corresponding to an X.25 address.
 .TP
 .BR getxhostbyname (3)
+get the
+.BR xhostent (5)
+entry corresponding to an X.25 host name.
 .TP
 .BR getxhostent (3)
+gets the next entry in the
+.BR xhostent (5)
+file, opening the file if required.
 .TP
 .BR endxhostent (3)
+clsoes the
+.BR xhostent (5)
+file.
 .PD
 .\"
 .SS X.25 Link/Subnetwork Database Functions
@@ -305,8 +327,8 @@ file.
 .PD
 .\"
 .\"
-.SH OPTIONS
-.PP
+.\".SH OPTIONS
+.\".PP
 .\"
 .\"
 .SH RETURN VALUES
@@ -401,7 +423,7 @@ sx25
 .]
 .IR "Solstice X.25" ,
 .[
-solx25ag
+solx25dg
 .]
 .IR "PT X.25" ,
 .[
@@ -484,7 +506,7 @@ sx25
 .]
 .IR "Solstice X.25" ,
 .[
-solx25ag
+solx25dg
 .]
 .IR "PT X.25" ,
 .[

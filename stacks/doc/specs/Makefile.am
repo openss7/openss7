@@ -52,7 +52,7 @@
 
 include ../../am/openss7.am
 
-SUBDIRS = cci tri tci mapi sccpi mtpi sli sdli sdti xmap
+SUBDIRS = cci tri tci mapi sccpi mtpi sli sdli sdti xcc xmap
 
 ## =============================================================================
 ##

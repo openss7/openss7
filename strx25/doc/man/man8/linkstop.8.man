@@ -117,17 +117,17 @@ sort-adjacent-labels
 .PP
 .ad l
 .nh
-.HP \w'\fB\)xxxx\fP\ 'u
-\fB\)xxxx\fP [\fIoptions\fP]
+.HP \w'\fB\)linkstop\fP\ 'u
+\fB\)linkstop\fP [\fIoptions\fP]
 .PD 0
 .HP
-\fB\)xxxx\fP
+\fB\)linkstop\fP
 {\fB-h\fP|\fB--help\fP}
 .HP
-\fB\)xxxx\fP
+\fB\)linkstop\fP
 {\fB-V\fP|\fB--version\fP}
 .HP
-\fB\)xxxx\fP
+\fB\)linkstop\fP
 {\fB-C\fP|\fB--copying\fP}
 .PD
 .ad b
@@ -136,6 +136,23 @@ sort-adjacent-labels
 .\"
 .SH DESCRIPTION
 .PP
+Puts a LAPB link into non-running state.  This command forces the internal
+state machine of the LAPB to assume that it has received a disconnect
+request.  This puts the specified link into the disconnected state.  The
+utility also prevents LAPB from responding to any incoming frames on the
+specified link, until the link has been restarted with
+.BR linkstart (8)
+or
+.BR linkreset (8).
+All counters and timers associated wtih the link protocol are reset to their
+initial values.
+.PP
+This command operates on an individual link, so the link identifier must be
+specified.
+.PP
+Note, when use on an MLP link,
+.B linkstop
+returns the highest status available on such links.
 .\"
 .\"
 .SH OPTIONS
@@ -186,16 +203,16 @@ Specify or increase the output verbosity.  Sets the output verbosity to
 .SH ARGUMENTS
 .PP
 The
-.I xxxx
+.I linkstop
 command takes no non-option arguments.
 .\"
 .\"
-.SH FILE FORMAT
-.PP
+.\".SH FILE FORMAT
+.\".PP
 .\"
 .\"
-.SH EXAMPLES
-.PP
+.\".SH EXAMPLES
+.\".PP
 .\"
 .\"
 .SH DIAGNOSTICS
@@ -215,35 +232,33 @@ and diagnostic messages to
 .IR stderr .
 .\"
 .\"
-.SH FILE FORMAT
-.PP
+.\".SH NOTICES
+.\".PP
 .\"
 .\"
-.SH NOTICES
-.PP
+.\".SH FILES
+.\".PP
 .\"
 .\"
-.SH FILES
-.PP
-.\"
-.\"
-.SH DEVICES
-.PP
+.\".SH DEVICES
+.\".PP
 .\"
 .\"
 .SH SEE ALSO
 .PP
+.BR linkstart (8),
+.BR linkreset (8).
 .\"
 .\"
 .SH BUGS
 .PP
-.B xxxx
+.B linkstop
 has no known bugs.
 .\"
 .\"
 .SH COMPATIBILITY
 .PP
-.B xxxx
+.B linkstop
 is compatible with
 .IR "AIXlink/X.25" ,
 .[
@@ -281,7 +296,7 @@ Options \fB-q\fP, \fB-v\fP, \fB-h\fP, \fB-V\fP, \fB-C\fP, and all long
 options, are specific to this
 .B @PACKAGE_TITLE@
 implementation of
-.B xxxx
+.B linkstop
 and should not be used by portable command scripts.
 .IP \(em
 Options
@@ -289,7 +304,7 @@ Options
 and all long options, are specific to this
 .B @PACKAGE_TITLE@
 implementation of
-.BR xxxx
+.BR linkstop
 and will not be used by portable command scripts.
 .IP \(em
 No other implementation documents the \fB-q\fP, \fB-v\fP, \fB-h\fP, \fB-V\fP
@@ -335,7 +350,7 @@ documentation.
 .\"
 .SH HISTORY
 .PP
-.B xxxx
+.B linkstop
 first appeared in
 .IR "Spider X.25" .
 .\"

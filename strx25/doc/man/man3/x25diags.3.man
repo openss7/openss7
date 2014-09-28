@@ -168,7 +168,7 @@ X.25 Support Library,
 .PP
 .\"
 .\"
-.SH VERSION
+.SH VERSIONS
 .PP
 .\"
 .\"

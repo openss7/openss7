@@ -87,6 +87,13 @@ package.  The package was formerly contributed by the @cite{OpenSS7 Project} as 
 deprecated @cite{LiS} package.  The package provides networking drivers as well as TPI and XTI
 header files for InET components in an OpenSS7-style @manref{autoconf(1)} tarball.
 
+@quotation
+@b{Note Well:} With this release, the @file{@value{PACKAGE}} subpackage will no longer be released
+as a separate subpackage, but is only contained in the OpenSS7 Master Package release.  With a
+subsequent release all subpackages of the OpenSS7 Master Package will be collapsed into a single
+release package.
+@end quotation
+
 This release is a stable, production grade reelase for @cite{Linux Fast-STREAMS} and is part of the
 @cite{OpenSS7 Master Package} (@file{openss7-@value{VERSION_OPENSS7}}).  The release includes
 maintenance support for recent distributions, production kernsls and tool chains but also includes
@@ -96,6 +103,12 @@ Major features since the last public release are:
 
 @itemize -
 @item
+Documentation license upgraded to GFDL 1.3.
+
+@item
+Updated tool chain to @file{m4-1.4.13}, @file{automake-1.10.2}, @file{bison-2.4.1},
+@file{libtool-2.2.6a}, @file{texinfo-4.13a}.
+
 @end itemize
 
 @emph{This is a public stable production grade release of the package: it deprecates previous
@@ -118,7 +131,7 @@ See @uref{http://www.openss7.org/codefiles/@value{PACKAGE}-@value{VERSION}/Chang
 more information.  Also, see the @file{@value{PACKAGE}.pdf} manual in the release (also in
 @uref{http://www.openss7.org/@value{PACKAGE}_manual.html,html}).
 
-For the news release, see @uref{http://www.openss7.org/rel20081029_B.html}.
+For the news release, see @uref{http://www.openss7.org/rel2009XXXX_B.html}.
 
 @c ----------------------------------------------------------------------------
 

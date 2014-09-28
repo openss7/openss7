@@ -140,10 +140,38 @@ The
 adminstrative command tunes the IXE driver,
 .BR ixe (4),
 from a configuration file containing configuration information.
+.PP
+.B ixetune
+configures the
+.BR ixe (4)
+driver.  The
+.B ixetune
+utility reads registration and configuration information from the file
+.BR ixetuneconf (5)
+and sends this information to the
+.BR ixe (4)
+driver.  It determines which called addresses an
+.BR ixe (4)
+driver is willing to receive connection indications on (listen information).
+It also specifies the configuration for each IP network, as well as the
+host's calling/responding address for this network.
 .\"
 .\"
 .SH OPTIONS
 .PP
+.TP
+\fB-d\fP, \fB--device\fP \fIdevice\fP
+Specify a device for the information to be sent to.  The default is
+\fB/dev/ixe\fP.
+.TP
+\fB-l\fP, \fB--link\fP \fIlink\fP
+Specify the IP interface to tune.  If this option is not specified, all the
+interfaces will be tuned.
+.TP
+\fB-D\fP, \fB--devconfig\fP \fIfilename\fP
+Specify the pathname of the configuration file to use.  The default directory is
+\fB@sysconfdir@/x25/\fP.  The filename used is the default,
+\fBixetuneconf\fP.
 .TP
 \fB-f\fP, \fB--file\fP [\fIfilename\fP]
 Specifies the \fIfilename\fP from which to read IXE tuning information.  See \*(lq\fIFILE
@@ -208,6 +236,16 @@ No further processing of options or arguments is performed and no actions are ta
 .PP
 .B ixetune
 does not accept any non-option arguments.
+.\"
+.\"
+.SH DIAGNOSTICS
+.PP
+An exit status of zero (0) indicates that the command was successful; one (1)
+indicates that an error occured and a diagnostic message is printed to
+.IR stderr ;
+two (2) indicates that the option or argument syntax was in error and a
+diagnostic message is printed to
+.IR stderr .
 .\"
 .\"
 .SH "FILE FORMAT"
@@ -464,6 +502,7 @@ The default IXE device driver to tune.
 .\"
 .SH SEE ALSO
 .PP
+.BR X25 (4).
 .\"
 .\"
 .SH BUGS
@@ -520,7 +559,7 @@ Options
 and all long options, are specific to this
 .B @PACKAGE_TITLE@
 implementation of
-.BR xxxx
+.BR ixetune
 and will not be used by portable command scripts.
 .IP \(em
 No other implementation documents the \fB-q\fP, \fB-v\fP, \fB-h\fP, \fB-V\fP

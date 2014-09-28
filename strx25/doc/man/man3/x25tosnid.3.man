@@ -119,17 +119,6 @@ sort-adjacent-labels
 \- convert a subnetwork or link number to a subnetwork or link character string
 .\"
 .\"
-.SH INTERFACE
-.PP
-X.25 Network Layer Interface (NLI).
-.\"
-.\"
-.SH LIBRARY
-.PP
-X.25 Support Library,
-.BR libsx25 (3).
-.\"
-.\"
 .SH SYNOPSIS
 .PP
 .B #include <netx25/x25_proto.h>
@@ -139,6 +128,17 @@ X.25 Support Library,
 .BI "int x25tosnid(unsigned long " snid ", unsigned char *" str_snid );
 .HP
 .BI "int x25tolinkid(unsigned long " linkid ", unsigned char *" str_linkid );
+.\"
+.\"
+.SH INTERFACE
+.PP
+X.25 Network Layer Interface (NLI).
+.\"
+.\"
+.SH LIBRARY
+.PP
+X.25 Support Library,
+.BR libsx25 (3).
 .\"
 .\"
 .SH ARGUMENTS
@@ -158,6 +158,10 @@ Provides a mechanism whereby a user can convert a 32-bit subnetwork
 identifier, \fIsnid\fP, or a 32-bit link identifier, \fIlinkid\fP, to a
 unsigned character string representing the subnetwork, \fIstr_snid\fP, or
 link, \fIstr_linkid\fP, without knowledge of the details of the conversion.
+.\"
+.\"
+.\".SH NOTICES
+.\".PP
 .\"
 .\"
 .SH RETURN
@@ -182,12 +186,14 @@ the supplied unsigned character string, \fIstr_snid\fP or \fIstr_linkid\fP was
 the supplited \fIsnid\fP or \fIlinkid\fP was invalid.
 .\"
 .\"
-.\".SH NOTICES
-.\".PP
-.\"
-.\"
-.\".SH FILES
-.\".PP
+.SH FILES
+.PP
+.TP
+.B @libdir@/libsx25.so
+The X.25 network services shared object library.
+.TP
+.B @libdir@/libsx25.a
+The X.25 network services static library.
 .\"
 .\"
 .SH BUGS
@@ -207,15 +213,11 @@ have no known bugs.
 .PP
 .BR x25tosnid " and " x25tolinkid
 are compatible with
-.IR "Spider X.25" ,
-and implementations based on
-.IR "Spider X.25" ,
-such as
-.IR "AIXlink/X.25" ,
+.IR AIXlink/X.25 ,
 .[
 aixx25
 .]
-.IR "HP-UX" ,
+.IR "HP-UX X.25/9000" ,
 .[
 hpuxdoc
 .]
@@ -223,18 +225,25 @@ hpuxdoc
 .[
 sx25
 .]
-.IR "Solstice X.25" ,
-.[
-solx25ag
-.]
 .IR "PT X.25" ,
 .[
 ptx25
+.]
+.IR "RadiSys WAN" ,
+.[
+radwan
 .]
 .IR "SBE X.25" ,
 .[
 sbex25
 .]
+.IR "SunLink X.25" ,
+.IR "Solstice X.25" ,
+.[
+solx25dg
+.]
+and systems based on
+.IR "Spider X.25" ,
 with the following compatibility considerations:
 .IP \(em \w'\(em\(em'u
 .I Solstice X.25
@@ -273,7 +282,7 @@ it is necessary to include the \fBx25_proto.h\fP header file.
 For
 .I Solstice X.25
 .[
-solx25ag
+solx25dg
 .]
 is is not necessary to include the \fBx25_proto.h\fP header file.
 .PP
@@ -299,7 +308,7 @@ sx25
 .]
 .IR "Solstice X.25" ,
 .[
-solx25ag
+solx25dg
 .]
 .IR "PT X.25" ,
 .[
@@ -323,6 +332,14 @@ first appeared in
 .[
 solx25pg
 .]
+.\"
+.\"
+.SH VERSIONS
+.PP
+This manual page was written for the
+.B @PACKAGE_TITLE@
+package
+.RB ( "@PACKAGE@-@VERSION@" ).
 .\"
 .\"
 .[

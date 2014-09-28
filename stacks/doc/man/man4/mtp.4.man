@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: mtp.4.man,v 0.9.2.10 2008-04-30 14:05:05 brian Exp $
+.\" @(#) $Id: mtp.4.man,v 0.9.2.11 2009-05-01 09:16:56 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2008-04-30 14:05:05 $ by $Author: brian $
+.\" Last Modified $Date: 2009-05-01 09:16:56 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: mtp.4.man,v $
+.\" Revision 0.9.2.11  2009-05-01 09:16:56  brian
+.\" - pass check target for release
+.\"
 .\" Revision 0.9.2.10  2008-04-30 14:05:05  brian
 .\" - updates to pass make check target
 .\"
@@ -179,7 +182,7 @@ This device provides the
 protocol service interface using the M-primitives of the
 Message Transfer Part Interface (MTPI)
 .[
-mtpi revision 0.9.2
+mtpi revision 1.0.0
 .]
 described in
 .BR mtpi (7).
@@ -196,7 +199,7 @@ This device provides the
 protocol service interface using the N-primitives of the
 Network Provider Interface (NPI)
 .[
-NPI
+NPI Revision 2.0.0
 .]
 described in
 .BR npi (7),
@@ -403,7 +406,7 @@ signalling relation can be considered as a 'connection'.
 These device names are two names for the same device.  The device provides a
 clone or auto-clone Stream providing the MTPI
 .[
-mtpi revision 0.9.2
+mtpi revision 1.0.0
 .]
 interface, not associated with a Signalling Point.  This device can also be
 opened using the

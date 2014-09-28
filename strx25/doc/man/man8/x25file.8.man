@@ -117,17 +117,17 @@ sort-adjacent-labels
 .PP
 .ad l
 .nh
-.HP \w'\fB\)xxxx\fP\ 'u
-\fB\)xxxx\fP [\fIoptions\fP]
+.HP \w'\fB\)x25file\fP\ 'u
+\fB\)x25file\fP [\fIoptions\fP]
 .PD 0
 .HP
-\fB\)xxxx\fP
+\fB\)x25file\fP
 {\fB-h\fP|\fB--help\fP}
 .HP
-\fB\)xxxx\fP
+\fB\)x25file\fP
 {\fB-V\fP|\fB--version\fP}
 .HP
-\fB\)xxxx\fP
+\fB\)x25file\fP
 {\fB-C\fP|\fB--copying\fP}
 .PD
 .ad b
@@ -136,6 +136,7 @@ sort-adjacent-labels
 .\"
 .SH DESCRIPTION
 .PP
+Displays per protocol statistics.
 .\"
 .\"
 .SH OPTIONS
@@ -146,6 +147,48 @@ The following command options are mutually exclusive: only one command option
 should be present on the command line at a time.  The exceptions are the
 \fB-h\fP, \fB-V\fP and \fB-C\fP options that can be specified alone, or with
 any other option.
+.TP
+\fB-p\fP, \fB--protocol\fP \fIprotocol\fP
+Shows statistics for a specified protocol or list of protocols.  Protocol may
+be one of
+.BR ixe ", " lapb ", " llc ", " mlp ", " wan ", " x25 " or " all .
+.B all
+is used to get statistics for all protocols.
+.TP
+\fB-g\fP, \fB--global\fP
+Display statistics global to the specified protocols.  No global statistics
+are displayed for the
+.B wan
+level.
+.TP
+\fB-l\fP, \fB--link\fP \fIlink\fP
+Display statistics on a per-link basis.
+.TP
+\fB-L\fP, \fB--links\fP
+Display statistics for all links.
+.TP
+\fB-v\fP, \fB--vc\fP \fIvc\fP
+When x25 protocol is used, display statistics on a per-VC basis.  The VC can
+be an actual VC number or a list of VCs separated by commas, or a range of
+VCs: VC1-VC2.
+.TP
+\fB-V\fP, \fB--vcs\fP
+When x25 protocol is used, display statistics relating to all VCs.
+.TP
+\fB-s\fP, \fB--symbolic\fP
+Display addresses symbolically whenever possible.
+.TP
+\fB-a\fP, \fB--active\fP
+When used with \fB-v\fP or \fB-V\fP options, prints abbreviated statistics
+for active VCs.
+.TP
+\fB-F\fP, \fB--full\fP
+Display all statistics currently available.
+.TP
+\fB-z\fP, \fB--reset\fP
+Resets the statistics.  The options \fB-g\fP, \fB-p\fP, \fB-l\fP, \fB-L\fP,
+\fB-v\fP, \fB-V\fP, apply as for displaying the statistics.  Note: this
+option is only availabel to the super-user.
 .TP
 \fB-h\fP, \fB--help\fP
 When this option is encountered, display usage information to
@@ -186,16 +229,16 @@ Specify or increase the output verbosity.  Sets the output verbosity to
 .SH ARGUMENTS
 .PP
 The
-.I xxxx
+.I x25file
 command takes no non-option arguments.
 .\"
 .\"
-.SH FILE FORMAT
-.PP
+.\".SH FILE FORMAT
+.\".PP
 .\"
 .\"
-.SH EXAMPLES
-.PP
+.\".SH EXAMPLES
+.\".PP
 .\"
 .\"
 .SH DIAGNOSTICS
@@ -215,35 +258,32 @@ and diagnostic messages to
 .IR stderr .
 .\"
 .\"
-.SH FILE FORMAT
-.PP
+.\".SH NOTICES
+.\".PP
 .\"
 .\"
-.SH NOTICES
-.PP
+.\".SH FILES
+.\".PP
 .\"
 .\"
-.SH FILES
-.PP
-.\"
-.\"
-.SH DEVICES
-.PP
+.\".SH DEVICES
+.\".PP
 .\"
 .\"
 .SH SEE ALSO
 .PP
+.BR X25 (4).
 .\"
 .\"
 .SH BUGS
 .PP
-.B xxxx
+.B x25file
 has no known bugs.
 .\"
 .\"
 .SH COMPATIBILITY
 .PP
-.B xxxx
+.B x25file
 is compatible with
 .IR "AIXlink/X.25" ,
 .[
@@ -281,7 +321,7 @@ Options \fB-q\fP, \fB-v\fP, \fB-h\fP, \fB-V\fP, \fB-C\fP, and all long
 options, are specific to this
 .B @PACKAGE_TITLE@
 implementation of
-.B xxxx
+.B x25file
 and should not be used by portable command scripts.
 .IP \(em
 Options
@@ -289,7 +329,7 @@ Options
 and all long options, are specific to this
 .B @PACKAGE_TITLE@
 implementation of
-.BR xxxx
+.BR x25file
 and will not be used by portable command scripts.
 .IP \(em
 No other implementation documents the \fB-q\fP, \fB-v\fP, \fB-h\fP, \fB-V\fP
@@ -335,7 +375,7 @@ documentation.
 .\"
 .SH HISTORY
 .PP
-.B xxxx
+.B x25file
 first appeared in
 .IR "Spider X.25" .
 .\"

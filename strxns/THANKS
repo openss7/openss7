@@ -1,4 +1,4 @@
-OpenSS7 XNS Networking -- acknowledgements.  2009-04-04
+OpenSS7 XNS Networking -- acknowledgements.  2009-05-03
 $Id: THANKS,v 0.9.2.62 2009-04-19 00:28:37 brian Exp $
 Copyright (c) 2008-2009  Monavacon Limited. <http://www.monavacon.com/>
 Copyright (c) 2001-2008  OpenSS7 Corporation. <http://www.openss7.com/>
@@ -7,6 +7,14 @@ See the end for copying conditions (for this file).
 
  Acknowledgements
 =================
+
+The OpenSS7 Project was funded in part by:
+
+     * Monavacon Limited (http://www.monavacon.com/)
+     * OpenSS7 Corporation (http://www.openss7.com/)
+
+Thanks to the subscribers to and sponsors of The OpenSS7 Project.
+Without their support, open software like this would not be possible.
 
 As with most open source projects, this project would not have been
 possible without the valiant efforts and productive software of the
@@ -48,7 +56,10 @@ list of notable contributors to The OpenSS7 Project:
      - Chuck Winters                       - Angel Diaz
      - Peter Courtney                      - Jérémy Compostella
      - Tom Chandler                        - Sylvain Chouleur
-     - Gurol Ackman                        - Others
+     - Gurol Ackman                        - Christophe Nolibos
+     - Pierre Crepieux                     - Bryan Shupe
+     - Christopher Lydick                  - D. Milanovic
+     - Omer Tunali                         - Others
 
  Supporters
 -----------

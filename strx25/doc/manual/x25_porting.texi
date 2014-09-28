@@ -1085,6 +1085,24 @@ This chapter is applicable to porting X.25 drivers, modules and applications
 from @cite{HP-UX}, and in particular the @cite{HP X.25/9000} STREAMS drivers,
 to @cite{Linux Fast-STREAMS}.
 
+Historically HP-UX did not have STREAMS as it was heavily based on a BSD
+kernel.  Furthermore, it had an X.25 implementation that was socket based.
+Some time prior to the year 2000, HP-UX added STREAMS (STREAMS/UX) to the HP-UX
+OS and endeavoured to convert the X.25 protocol stacks to take advantage of the
+new OSI stacks available for license from Sun Microsystems (what turned into
+the HP OTS 9000 package).  To work with this software, the @cite{Spider
+Systems, Ltd.} X.25 package as needed.  To accomplish this, HP converted the
+older ZCOM based ACC cards to Spider X.25 based PSI cards for X.25.  However,
+instead of presenting a WAN, LLI and NLI interface for X.25, HP chose to
+maintain compatibility with the prior BSD Sockets based X.25 API.
+
+As a result, if you are faced with porting one of these older BSD Sockets based
+HP X.25 API applications to @cite{Linux Fast-STREAMS} and the
+@cite{@value{PACKAGE_TITLE}} package, you are largely out of luck.  If however,
+you are porting HP OTS 9000 CONS applications based on X.25 you are in luck;
+however, see the @cite{OpenSS7 OSI Networking} package
+(@code{@value{PACKAGE}-@value{VERSION}}) instead of this package.
+
 @menu
 * HP-UX Data Link Provider Interface::
 * HP-UX Network Layer Interface::

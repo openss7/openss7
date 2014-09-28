@@ -1,12 +1,13 @@
 @c -*- texinfo -*- vim: ft=texinfo
 @c =========================================================================
 @c
-@c @(#) $Id: install.texi,v 0.9.2.83 2008-10-25 13:20:14 brian Exp $
+@c @(#) $Id: install.texi,v 0.9.2.86 2009-05-02 04:58:54 brian Exp $
 @c
 @c =========================================================================
 @c
-@c Copyright (c) 2001-2008  OpenSS7 Corporation <www.openss7.com>
-@c Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
+@c Copyright (c) 2008-2009  Monavacon Limited <http://www.monavacon.com/>
+@c Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+@c Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 @c
 @c All Rights Reserved.
 @c
@@ -54,7 +55,7 @@
 @c 
 @c =========================================================================
 @c
-@c Last Modified $Date: 2008-10-25 13:20:14 $ by $Author: brian $
+@c Last Modified $Date: 2009-05-02 04:58:54 $ by $Author: brian $
 @c
 @c =========================================================================
 
@@ -85,7 +86,7 @@ The @value{PACKAGE_TITLE} package release can be accessed from the repositories 
 @uref{http://www.openss7.org/repos, The OpenSS7 Project}.  For @manpage{rpm(1)} based systems, the
 package is available in a @manpage{yum(8)} repository based on @file{repomd} XML and may also be
 accessed using @manpage{zypper(8)} or @manpage{yast(8)}.  For @manpage{dpkg(1)} based systems, the
-package is available in a @manpage{apt(8)} repository.
+package is available in an @manpage{apt(8)} repository.
 
 By far the easiest (most repeatable and manageable) form for installing and using @cite{OpenSS7}
 packages is to install packages from the @manpage{yum(8)} or @manpage{apt(8)} repositories.  If your
@@ -132,7 +133,7 @@ This example assumes the the distribution is @samp{centos} and the distribution 
 @file{$REPOS/i686/suse/11.0/i686/repodata/openss7.repo}, for using @manpage{yum(8)} with SUSE.
 
 Once the repository is set up, @cite{OpenSS7} includes a number of virtual package definitions that
-eas the installation and removal of kernel modules, libraries and utilities.  Downloading,
+ease the installation and removal of kernel modules, libraries and utilities.  Downloading,
 configuring, building and installation for a single-kernel distribution is as easy as:
 
 @example
@@ -262,7 +263,7 @@ YaST and YaST2 formats.
 
 OpenSS7 includes virtual packages that ease the installation and removal of kernel modules,
 libraries and utilities.
-Downloading, configuration, building and installation for a signle-kernel distribution installation
+Downloading, configuration, building and installation for a single-kernel distribution installation
 is as easy as:
 
 @cartouche
@@ -285,7 +286,7 @@ This will install the @file{@value{PACKAGE}}, @file{@value{PACKAGE}-lib} and
 @file{@value{PACKAGE}-KVERSION} RPMs, where @samp{KVERSION} is the highest version number kernel on
 your system.
 
-Remove this package if you need to remove all vestages of the @file{@value{PACKAGE}} package.
+Remove this package if you need to remove all vestiges of the @file{@value{PACKAGE}} package.
 
 @smallexample
 % sudo yum remove @value{PACKAGE}
@@ -379,7 +380,7 @@ Note that this is a virtual package name: the actual RPMs installed or removed f
 kernel module package whose precise name will depend upon the system being used.
 
 @item @value{PACKAGE}-lib
-This package is an auxillary package that should be removed and inserted automatically by
+This package is an auxilliary package that should be removed and inserted automatically by
 @manref{yum(8)}.  In rare instances you might need to remove or install this package explicitly.
 
 @end table
@@ -391,7 +392,7 @@ This package is an auxillary package that should be removed and inserted automat
 @cindex downloading, apt
 @cindex apt
 
-OpenSS7 repositries support @manref{apt(8)} repositorie digests and signatures.
+OpenSS7 repositories support @manref{apt(8)} repository digests and signatures.
 
 @c ----------------------------------------------------------------------------
 
@@ -638,7 +639,7 @@ contains all of the manual pages necessary for developing @value{PACKAGE_TITLE} 
 @value{PACKAGE_TITLE} @dfn{STREAMS} modules or drivers.
 
 @item @uref{http://www.openss7.org/debian/@value{PACKAGE}-init_@value{VERSION}-@value{PACKAGE_DEBRELEASE}_all.deb,, @value{PACKAGE}@--init_@value{VERSION}@--@value{PACKAGE_DEBRELEASE}_all@-.deb}
-The @file{@value{PACKAGE}@--init} package contains the @command{init} scripts and provides the postinst
+The @file{@value{PACKAGE}@--init} package contains the @command{init} scripts and provides the @command{postinst}
 scripts necessary to create kernel module preloads and modules definitions for all kernel module
 @samp{core} subpackages.
 
@@ -917,7 +918,7 @@ version from the archive:
 
 @cartouche
 @example
-% export CVSROOT='-d:pserver:@var{username}@@cvs.openss7.com:2401/var/cvs'
+% export CVSROOT=':pserver:@var{username}@@cvs.openss7.org:2401/var/cvs'
 % cvs login
 Password: *********
 % cvs co -r @value{PACKAGE}_@value{VERSION} @value{PACKAGE_CVSMODULE}
@@ -937,35 +938,35 @@ the other releases.
 The build host requires the following GNU tools:
 
 @itemize
-@item @command{m4 1.4.12}
+@item @command{m4 1.4.13}
 @item @command{autoconf 2.63}
-@item @command{automake 1.10.1}
-@item @command{libtool 2.2.4}
+@item @command{automake 1.10.2}
+@item @command{libtool 2.2.6a}
 @item @command{gettext 0.17}
 @item @command{flex 2.5.33}
-@item @command{bison 2.3}
+@item @command{bison 2.4.1}
 @end itemize
 
-Most desktop development GNU/Linux distributions wil have these tools; however, some non-development
+Most desktop development GNU/Linux distributions will have these tools; however, some non-development
 or server-style installations might not and they must be installed separately.@footnote{Older
 version of bison (2.0) and the older version of flex (2.5.4a) are also suitable.  Where possible,
-use the more recent bison 2.3 and flex 2.5.33.}
+use the more recent bison 2.4.1 and flex 2.5.33.}
 
 Also, these tools can be acquired from the @url{http://www.fsf.org/,FSF website} in the free
 software directory, and also at the following locations:
 
 @itemize
-@item @url{http://www.openss7.org/tarballs/m4-1.4.12.tar.bz2,m4-1.4.12}
+@item @url{http://www.openss7.org/tarballs/m4-1.4.13.tar.bz2,m4-1.4.13}
 @item @url{http://www.openss7.org/tarballs/autoconf-2.63.tar.bz2,autoconf-2.63}
-@item @url{http://www.openss7.org/tarballs/automake-1.10.1.tar.bz2,automake-1.10.1}
-@item @url{http://www.openss7.org/tarballs/libtool-2.2.4.tar.gz,libtool-2.2.4}
+@item @url{http://www.openss7.org/tarballs/automake-1.10.2.tar.bz2,automake-1.10.2}
+@item @url{http://www.openss7.org/tarballs/libtool-2.2.6a.tar.gz,libtool-2.2.6a}
 @item @url{http://www.openss7.org/tarballs/gettext-0.17.tar.gz,gettext-0.17}
 @item @url{http://www.openss7.org/tarballs/flex-2.5.33.tar.bz2,flex-2.5.33}
-@item @url{http://www.openss7.org/tarballs/bison-2.3.tar.bz2,bison-2.3}
+@item @url{http://www.openss7.org/tarballs/bison-2.4.1.tar.bz2,bison-2.4.1}
 @end itemize
 
 It should be stressed that, in particular, the @manpage{autoconf(1)}, and @manpage{automake(1)},
-must be at version releases @command{2.63} and @command{1.10.1}.  @emph{The versions normally
+must be at version releases @command{2.63} and @command{1.10.2}.  @emph{The versions normally
 distributed in some mainstream GNU/Linux distributions are, in fact, much older than these
 versions.}@footnote{A notable exception is Debian and Fedora 7.  Note that on Fedora 7 the
 @command{gettext-devel} package must be installed.}  GNU version of these packages configured and
@@ -1525,7 +1526,7 @@ that do not support System V @command{init} script layout.
 @opindex 32bit-libs
 Disables the build and install of 32-bit compatibility libraries and test binaries on 64-bit systems
 that support 32-bit compatibility.  The default is to build and install 32-bit compatibility
-libraries and test binaries.  This option can be usefule when configuring for an embedded target
+libraries and test binaries.  This option can be useful when configuring for an embedded target
 where only native shared libraries and binaries are desired.
 
 @item --disable-devel
@@ -1960,42 +1961,42 @@ deb packages.  By default, @file{configure} will search for this tool.
 @item DEB_BUILD_ARCH
 Debian build architecture.
 This variable is used for building Debian packages.
-The default is the autoconf build architecture.
+The default is the @command{autoconf} build architecture.
 
 @item DEB_BUILD_GNU_CPU
 Debian build cpu.
 This variable is used for building Debian packages.
-The default is the autoconf build cpu.
+The default is the @command{autoconf} build cpu.
 
 @item DEB_BUILD_GNU_SYSTEM
 Debian build os.
 This variable is used for building Debian packages.
-The default is the autoconf build os.
+The default is the @command{autoconf} build os.
 
 @item DEB_BUILD_GNU_TYPE
 Debian build alias.
 This variable is used for building Debian packages.
-The default is the autoconf build alias.
+The default is the @command{autoconf} build alias.
 
 @item DEB_HOST_ARCH
 Debian host architecture.
 This variable is used for building Debian packages.
-The default is the autoconf host architecture.
+The default is the @command{autoconf} host architecture.
 
 @item DEB_HOST_GNU_CPU
 Debian host cpu.
 This variable is used for building Debian packages.
-The default is the autoconf host cpu.
+The default is the @command{autoconf} host cpu.
 
 @item DEB_HOST_GNU_SYSTEM
 Debian host os.
 This variable is used for building Debian packages.
-The default is the autoconf host os.
+The default is the @command{autoconf} host os.
 
 @item DEB_HOST_GNU_TYPE
 Debian host alias.
 This variable is used for building Debian packages.
-The default is the autoconf host alias.
+The default is the @command{autoconf} host alias.
 
 @item LDCONFIG
 Configure loader command, @manref{ldconfig(8)}.  Command used to configure the loader when libraries
@@ -3139,7 +3140,7 @@ generate doxygen html documentation:
 @table @samp
 @item doxy
 @mkindex doxy
-This target generates @manref{doxygen(1)} documetnation from suitably marked sources.  File
+This target generates @manref{doxygen(1)} documentation from suitably marked sources.  File
 containing the necessary documentation marks are discovered automatically by @command{configure}.
 Doxygen documentation can be generated bus is not distributed.  Documentation is cerated in the
 subdirectory @file{doc/html}.

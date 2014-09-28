@@ -132,18 +132,21 @@ Internet Draft         SNARE over UDP (SNARE-UDP)          June 18, 2008
 Change Log
 
     $Log: draft-bidulock-tsvwg-snare-00.me,v $
+    Revision 0.9.2.2  2008-07-01 12:31:04  brian
+    - updated man pages, drafts, specs, header files
+
     Revision 0.9.2.1  2008-06-13 06:43:52  brian
     - added files
 
 
 
 
-  [ISO/IEC 10030]  ISO, "Information Processing Systems -
-      Telecommunications and Information Exchange between Systems - End
+  [ISO/IEC 10030]  ISO, "Information Processing Systems --
+      Telecommunications and Information Exchange between Systems -- End
       System Routeing Information Exchange Protocol for use in
-      conjunction with ISO/IEC 8878," ISO/IEC 10030 : 1995,
-      International Organization for Standardization (1995).
-      <http://www.iso.org/>
+      conjunction with ISO/IEC 8878," ISO/IEC 10030:1995, International
+      Organization for Standardization, Geneva (1995).  Also ITU-T
+      Recommendation X.116 (similar text).  <http://www.iso.org/>
 
   [X.223]  ITU, "Use of X.25 to Provide the OSI Connection-mode Network
       Service for ITU-T Applications," ITU-T Recommendation X.223
@@ -160,9 +163,6 @@ Normative References
   [RFC2119]  Bradner, S., "Key words for use in RFCs to Indicate
       Requirement Levels," BCP 14/RFC 2119, The Internet Society (March
       1997).  <http://www.ietf.org/rfc/rfc2119.txt>
-
-
-
 
 
 

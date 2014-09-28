@@ -2981,7 +2981,6 @@ device.  These primitives support the Enable and Disable services described earl
 * Message CD_DISABLE_CON (cd_disable_con_t)::
 @end menu
 
-@page
 @node Message CD_ENABLE_REQ (cd_enable_req_t)
 @subsection Message CD_ENABLE_REQ (cd_enable_req_t)
 @prindex CD_ENABLE_REQ
@@ -3533,7 +3532,6 @@ state.
 * Message CD_UNITDATA_ACK (cd_unitdata_ack_t)::
 @end menu
 
-@page
 @node Message CD_ERROR_IND (cd_error_ind_t)
 @subsection Message CD_ERROR_IND (cd_error_ind_t)
 @prindex CD_ERROR_IND
@@ -4334,7 +4332,6 @@ The new state is unchanged.
 * Message CD_WRITE_READ_REQ (cd_write_read_req_t)::
 @end menu
 
-@page
 @node Message CD_READ_REQ (cd_read_req_t)
 @subsection Message CD_READ_REQ (cd_read_req_t)
 @prindex CD_READ_REQ
@@ -4991,7 +4988,6 @@ Unit data request failed.
 * Message CD_MODEM_SIG_REQ (cd_modem_sig_req_t)::
 @end menu
 
-@page
 @node Message CD_MODEM_SIG_IND (cd_modem_sig_ind_t)
 @subsection Message CD_MODEM_SIG_IND (cd_modem_sig_ind_t)
 @prindex CD_MODEM_SIG_IND

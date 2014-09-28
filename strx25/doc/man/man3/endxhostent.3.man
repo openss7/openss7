@@ -116,7 +116,7 @@ sort-adjacent-labels
 .TH ENDXHOSTENT 3 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ Library Calls"
 .SH NAME
 .B endxhostent
-\-
+\- close the X.25 host database
 .\"
 .\"
 .SH SYNOPSIS
@@ -139,6 +139,11 @@ X.25 Support Library,
 .BR libsx25 (3).
 .\"
 .\"
+.SH ARGUMENTS
+.PP
+None.
+.\"
+.\"
 .SH DESCRIPTION
 .PP
 .BR endxhostent ()
@@ -146,37 +151,161 @@ closes the xhosts file.  By default, this file is located in the
 .B /etc/x25/
 directory.
 .\"
-.\"
-.SH NOTICES
+.SS FILE FORMAT
 .PP
+The format of the
+.B @sysconfdir@/x25/xhosts
+X.25 host database file is as described in
+.BR xhostent (5).
+.\"
+.\"
+.\".SH NOTICES
+.\".PP
+.\"
+.\"
+.SH RETURN VALUE
+.PP
+.BR endxhostent ()
+returns
+.BR void .
+.\"
+.\"
+.SH ERRORS
+.PP
+When
+.BR endxhostent ()
+fails, it fails silently.
+.BR endxhostent ()
+fails when the X.25 host database was not opened by the caller.
 .\"
 .\"
 .SH FILES
 .PP
+.TP
+.RB < netx25/xnetdb.h >
+The
+.B xhostent
+structure is defined in the
+.RB < netx25/xnetdb.h >
+header file.
+.TP
+.B @sysconfdir@/x25/xhosts
+Contains the X.25 host database defined in
+.BR padent (5).
+.TP
+.B @libdir@/libsx25.so
+The X.25 network services shared object library.
+.TP
+.B @libdir@/libsx25.a
+The X.25 network services static library.
 .\"
 .\"
 .SH BUGS
 .PP
+.BR endxhostent ()
+has no known bugs.
 .\"
 .\"
 .SH SEE ALSO
 .PP
+.BR libsx25 (3),
+.BR xhostent (5),
+.BR endxhostent (3),
+.BR getxhostbyaddr (3),
+.BR getxhostbyname (3),
+.BR getxhostent (3),
+.BR setxhostent (3).
 .\"
 .\"
 .SH COMPATIBILITY
 .PP
+.B endxhostent
+is compatible with
+.IR AIXlink/X.25 ,
+.[
+aixx25
+.]
+.IR "HP-UX X.25/9000" ,
+.[
+hpuxdoc
+.]
+.IR "IRIS SX.25" ,
+.[
+sx25
+.]
+.IR "PT X.25" ,
+.[
+ptx25
+.]
+.IR "RadiSys WAN" ,
+.[
+radwan
+.]
+.IR "SBE X.25" ,
+.[
+sbex25
+.]
+.IR "SunLink X.25" ,
+.IR "Solstice X.25" ,
+.[
+solx25dg
+.]
+and systems based on
+.IR "Spider X.25" ,
+with the following compatibility considerations:
+.IP \(em \w'\(em\(em'u
+.IR "Solaris Solstice" "\(rg " "X.25 9.2" ,
+.[
+solx25dg
+.]
+.IR "IRIX SX.25" ,
+.[
+sx25
+.]
+.IR "PT X.25" ,
+.[
+ptx25
+.]
+are consistent in their documentation of the
+.B xhostent
+structure.
+.IP \(em
+On
+.IR UNIX \(rg
+systems, these utility subroutines are part of the X.25 library,
+.BR libsx25 .
+.IP \(em
+These subroutines are consistently described across implementations of X.25
+on
+.IR UNIX \(rg
+and can be used portably by applications programs.
+.PP
+See
+.BR libsx25 (3)
+for additional compatibility information.
 .\"
 .\"
 .SH CONFORMANCE
 .PP
+.IR "Spider X.25" .
 .\"
 .\"
 .SH HISTORY
 .PP
+The X.25 host subroutines first appeared in
+.IR "Spider X.25" .
+These subroutines are related to
+.IR UNIX \(rg
+.BR STREAMS (9)
+implementation of X.25 providers.
 .\"
 .\"
-.SH VERSION
+.SH VERSIONS
 .PP
+This manual page was written for the
+.B @PACKAGE_TITLE@
+package
+.RB ( "@PACKAGE@-@VERSION@" ).
 .\"
 .\"
 .[

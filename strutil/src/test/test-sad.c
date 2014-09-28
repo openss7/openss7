@@ -188,7 +188,7 @@ static char const ident[] = "$RCSfile: test-sad.c,v $ $Name:  $($Revision: 0.9.2
 #include <sys/sad.h>
 
 #ifdef LFS
-#include "include/sys/config.h"
+#include "sys/config.h"
 #endif
 
 #ifdef LIS

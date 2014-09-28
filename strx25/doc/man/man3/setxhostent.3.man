@@ -116,7 +116,7 @@ sort-adjacent-labels
 .TH SETXHOSTENT 3 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ Library Calls"
 .SH NAME
 .B setxhostent
-\-
+\- open and rewind the X.25 Hosts Database
 .\"
 .\"
 .SH SYNOPSIS
@@ -139,40 +139,187 @@ X.25 Support Library,
 .BR libsx25 (3).
 .\"
 .\"
+.SH ARGUMENTS
+.PP
+.TP
+.I stayopen
+If this argument is set to zero
+.BR ( 0 ),
+the X.25 Hosts Database is closed after each
+.BR getxhostent (3)
+call.  Otherwise, the X.25 Hosts Database is not closed.
+.\"
+.\"
 .SH DESCRIPTION
 .PP
-.\"
-.\"
-.SH NOTICES
+.BR setxhostent ()
+opens and rewinds the X.25 Hosts Database.  When the database was already
+open due to a previous call to
+.BR setxhostent ()
+or a call to
+.BR getxhostent (3),
+the X.25 Hosts Database is simply rewound.  When the database is not
+already opened, it is opened and rewound.
 .PP
+.BR endxhostent (3)
+can be used to close the opened database.
+.\"
+.SS FILE FORMAT
+.PP
+The format of the
+.B @sysconfdir@/x25/xhosts
+X.25 host database file is as described in
+.BR xhostent (5).
+.\"
+.\"
+.\".SH NOTICES
+.\".PP
+.\"
+.\"
+.SH RETURN VALUE
+.PP
+.BR setxhostent ()
+returns
+.BR void .
+.\"
+.\"
+.SH ERRORS
+.PP
+When
+.BR setxhostent ()
+fails, it fails silently.
+.BR setxhostent ()
+fails when the X.25 Host Database was not available or a system error was
+encountered during the opening of the database.
 .\"
 .\"
 .SH FILES
 .PP
+.TP
+.RB < netx25/xnetdb.h >
+The
+.B xhostent
+structure is defined in the
+.RB < netx25/xnetdb.h >
+header file.
+.TP
+.B @sysconfdir@/x25/xhosts
+Contains the X.25 host database defined in
+.BR padent (5).
+.TP
+.B @libdir@/libsx25.so
+The X.25 network services shared object library.
+.TP
+.B @libdir@/libsx25.a
+The X.25 network services static library.
 .\"
 .\"
 .SH BUGS
 .PP
+.BR setxhostent ()
+has no known bugs.
 .\"
 .\"
 .SH SEE ALSO
 .PP
+.BR libsx25 (3),
+.BR xhostent (5),
+.BR endxhostent (3),
+.BR getxhostbyaddr (3),
+.BR getxhostbyname (3),
+.BR getxhostent (3),
+.BR setxhostent (3).
 .\"
 .\"
 .SH COMPATIBILITY
 .PP
+.B setxhostent
+is compatible with
+.IR AIXlink/X.25 ,
+.[
+aixx25
+.]
+.IR "HP-UX X.25/9000" ,
+.[
+hpuxdoc
+.]
+.IR "IRIS SX.25" ,
+.[
+sx25
+.]
+.IR "PT X.25" ,
+.[
+ptx25
+.]
+.IR "RadiSys WAN" ,
+.[
+radwan
+.]
+.IR "SBE X.25" ,
+.[
+sbex25
+.]
+.IR "SunLink X.25" ,
+.IR "Solstice X.25" ,
+.[
+solx25dg
+.]
+and systems based on
+.IR "Spider X.25" ,
+with the following compatibility considerations:
+.IP \(em \w'\(em\(em'u
+.IR "Solaris Solstice" "\(rg " "X.25 9.2" ,
+.[
+solx25dg
+.]
+.IR "IRIX SX.25" ,
+.[
+sx25
+.]
+.IR "PT X.25" ,
+.[
+ptx25
+.]
+are consistent in their documentation of the
+.B xhostent
+structure.
+.IP \(em
+On
+.IR UNIX \(rg
+systems, these utility subroutines are part of the X.25 library,
+.BR libsx25 .
+.IP \(em
+These subroutines are consistently described across implementations of X.25
+on
+.IR UNIX \(rg
+and can be used portably by applications programs.
+.PP
+See
+.BR libsx25 (3)
+for additional compatibility information.
 .\"
 .\"
 .SH CONFORMANCE
 .PP
+.IR "Spider X.25" .
 .\"
 .\"
 .SH HISTORY
 .PP
+The X.25 host subroutines first appeared in
+.IR "Spider X.25" .
+These subroutines are related to
+.IR UNIX \(rg
+.BR STREAMS (9)
+implementation of X.25 providers.
 .\"
 .\"
-.SH VERSION
+.SH VERSIONS
 .PP
+This manual page was written for the
+.B @PACKAGE_TITLE@
+package
+.RB ( "@PACKAGE@-@VERSION@" ).
 .\"
 .\"
 .[

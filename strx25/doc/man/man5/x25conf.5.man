@@ -239,6 +239,116 @@ The administrator is advised to edit this file using the
 option in
 .BR x25adm (8)
 only, as this performs necessary consistency checks on each entry in the file.
+.\"
+.\"
+.SH FILES
+.PP
+Files following this format are normally kept in the
+.B @configdir@/@PACKAGE@/x25conf
+file.
+.PP
+(Note that this directory varies depending on whether the build was on a
+.BR dpkg (1)-based
+or
+.BR rpm (1)-based
+system.)
+.\"
+.\"
+.SH SEE ALSO
+.PP
+.BR x25adm (8),
+.BR plp (4),
+.BR netcreate (8).
+.BR xnetd (8).
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+The
+.B x25conf
+file format is compatible with
+.IR "Spider X.25" ,
+and implementations based on
+.IR "Spider X.25" ,
+such as
+.IR "AIXlink/X.25" ,
+.[
+aixx25
+.]
+.IR "HP-UX" ,
+.[
+hpuxdoc
+.]
+.IR "IRIS SX.25" ,
+.[
+sx25
+.]
+.IR "Solstice X.25" ,
+.[
+solx25ag
+.]
+.IR "PT X.25" ,
+.[
+ptx25
+.]
+.IR "SBE X.25" ,
+.[
+sbex25
+.]
+with the following compatibility considerations:
+.IP \(em \w'\(em\(em'u
+.IP \(em
+.PP
+For additional compatibiltiy information see,
+.BR wan (4),
+and
+.BR STREAMS (9).
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+.IR "AIXlink/X.25" ,
+.[
+aixx25
+.]
+.IR "HP-UX" ,
+.[
+hpuxdoc
+.]
+.IR "IRIX SX.25" ,
+.[
+sx25
+.]
+.IR "Solstice X.25" ,
+.[
+solx25ag
+.]
+.IR "PT X.25" ,
+.[
+ptx25
+.]
+.IR "SBE X.25" ,
+.[
+sbex25
+.]
+documentation.
+.\"
+.\"
+.SH HISTORY
+.PP
+The
+.B x25conf
+file format first appeared in
+.IR "Spider X.25".
+.\"
+.\"
+.SH VERSIONS
+.PP
+This manual page was written for the
+.IR OpenSS7 \(tm
+implementation of X.25.
+.\"
+.\"
 .[
 $LIST$
 .]

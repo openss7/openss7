@@ -152,6 +152,7 @@ sort-adjacent-labels
 .\"
 .SH DESCRIPTION
 .PP
+Configure WAN remote and interface address mapping.
 .\"
 .\"
 .SH OPTIONS
@@ -237,8 +238,8 @@ The file format is described in the
 manual page.
 .\"
 .\"
-.SH EXAMPLES
-.PP
+.\".SH EXAMPLES
+.\".PP
 .\"
 .\"
 .SH DIAGNOSTICS
@@ -258,12 +259,8 @@ and diagnostic messages to
 .IR stderr .
 .\"
 .\"
-.SH FILE FORMAT
-.PP
-.\"
-.\"
-.SH NOTICES
-.PP
+.\".SH NOTICES
+.\".PP
 .\"
 .\"
 .SH FILES

@@ -818,7 +818,7 @@ Linux.  Initial work on development of the SS7 stack attempted to integrate the 
 elements into Linux's BSD-like Sockets based networking system.  Early on this approach became
 problematic.  Although the true BSD sockets networking system is somewhat amenable to a wider range
 of protocols that just the TCP/IP protocol suite, as evidenced by the early adoption of OSI
-protocols into BSD 4.3 , the incarnation of the system present in Linux deviates largely from the
+protocols into BSD 4.3, the incarnation of the system present in Linux deviates largely from the
 BSD module in that there is no clean separation between the socket layer and the protocol layer, and
 that the protocol layer cannot actually be stacked in the same fashion as is possible in BSD.  These
 and other difficulties led the project, in 2001, to pursue the STREAMS approach to networking.
@@ -868,7 +868,7 @@ dependencies between packages.
 @subsection STREAMS Packages
 @cindex STREAMS packages
 
-Because OpenSS7 packages first built with @dfn{Linux STREAMS (LiS)} but now build with the superior
+Because OpenSS7 packages first built with @dfn{Linux STREAMS (LiS)} but now builds with the superior
 @dfn{Linux Fast-STREAMS (LfS)}, the master package had the objective from the onset of being able to
 build all OpenSS7 packages against either @dfn{LiS} or @dfn{LfS} or both.  This was the case from
 @dfn{LiS} version @emph{2.18.1} through @emph{2.18.3} and @dfn{streams} version @emph{0.7a.3}

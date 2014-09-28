@@ -171,7 +171,8 @@ The options recognized by
 are summarized, alphabetically sorted by short option, as follows (see
 .RI \(lq DESCRIPTION ,\(rq
 below, for more detailed option descriptions):
-.TP \w'\fB-I\fP,\ \fB--initialize\fP\ [\fB-\fP][\fIMODULE\fP[\fB,\fP\fIMODULE\fP]*]\(em'u
+.\".TP \w'\fB-I\fP,\ \fB--initialize\fP\ [\fB-\fP][\fIMODULE\fP[\fB,\fP\fIMODULE\fP]*]\(em'u
+.TP
 \fB-a\fP, \fB--log-addresses\fP
 Log addresses connecting to agent.
 .PD 0
